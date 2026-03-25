@@ -1,0 +1,10 @@
+[
+  {
+    "id": "9e1f369e-8eb1-4f7e-badc-0673a2047a6e",
+    "name": "10 Derslik Paket",
+    "product_type": "Credit",
+    "validity_days": 30,
+    "credit_amount": 10,
+    "is_active": true
+  }
+]

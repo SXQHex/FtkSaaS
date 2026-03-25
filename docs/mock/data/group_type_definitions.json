@@ -1,0 +1,9 @@
+[
+  {
+    "id": "2e8cc030-d45f-4b9a-939b-dd12c0aada76",
+    "name": "Grup",
+    "description": "Standart Grup",
+    "billing_period": "Aylık",
+    "is_private_lesson": false
+  }
+]

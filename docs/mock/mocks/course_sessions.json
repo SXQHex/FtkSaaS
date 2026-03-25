@@ -1,0 +1,1352 @@
+[
+  {
+    "id": "f459c98c-4219-47b3-89b5-f88b79737814",
+    "course_group_id": "cd6f263b-e146-4949-ac66-c77ecbc4337f",
+    "session_date": "2026-04-16",
+    "start_datetime": "2026-04-16T17:00:00.000Z",
+    "end_datetime": "2026-04-16T18:00:00.000Z",
+    "is_completed": false,
+    "room_id": "54441d45-6042-4416-8cab-e66be027adcf"
+  },
+  {
+    "id": "3c5416a1-202a-417a-8e04-8dcbe9272de3",
+    "course_group_id": "cd6f263b-e146-4949-ac66-c77ecbc4337f",
+    "session_date": "2026-02-07",
+    "start_datetime": "2026-02-07T15:00:00.000Z",
+    "end_datetime": "2026-02-07T17:00:00.000Z",
+    "is_completed": false,
+    "room_id": "54441d45-6042-4416-8cab-e66be027adcf"
+  },
+  {
+    "id": "cb4f8a05-18e7-4b99-b9d5-bd0a0638a6d1",
+    "course_group_id": "cd6f263b-e146-4949-ac66-c77ecbc4337f",
+    "session_date": "2026-07-16",
+    "start_datetime": "2026-07-16T15:00:00.000Z",
+    "end_datetime": "2026-07-16T16:00:00.000Z",
+    "is_completed": false,
+    "room_id": "54441d45-6042-4416-8cab-e66be027adcf"
+  },
+  {
+    "id": "6935736d-05b3-42bd-9b6c-cd4d2179a5e1",
+    "course_group_id": "cd6f263b-e146-4949-ac66-c77ecbc4337f",
+    "session_date": "2026-04-14",
+    "start_datetime": "2026-04-14T16:00:00.000Z",
+    "end_datetime": "2026-04-14T17:00:00.000Z",
+    "is_completed": false,
+    "room_id": "767819c5-cf10-433e-9a93-55ab4e95709d"
+  },
+  {
+    "id": "2e8df3dd-8458-4245-9455-8286d403a7d6",
+    "course_group_id": "cd6f263b-e146-4949-ac66-c77ecbc4337f",
+    "session_date": "2026-04-22",
+    "start_datetime": "2026-04-22T16:00:00.000Z",
+    "end_datetime": "2026-04-22T17:30:00.000Z",
+    "is_completed": false,
+    "room_id": "767819c5-cf10-433e-9a93-55ab4e95709d"
+  },
+  {
+    "id": "c7a06976-0226-4542-9b7a-67220ee601d5",
+    "course_group_id": "cd6f263b-e146-4949-ac66-c77ecbc4337f",
+    "session_date": "2026-07-08",
+    "start_datetime": "2026-07-08T17:00:00.000Z",
+    "end_datetime": "2026-07-08T18:30:00.000Z",
+    "is_completed": true,
+    "room_id": "767819c5-cf10-433e-9a93-55ab4e95709d"
+  },
+  {
+    "id": "8108aae1-e8f0-4eb1-88b8-d4b8c1b62dc8",
+    "course_group_id": "cd6f263b-e146-4949-ac66-c77ecbc4337f",
+    "session_date": "2026-04-22",
+    "start_datetime": "2026-04-22T17:00:00.000Z",
+    "end_datetime": "2026-04-22T19:00:00.000Z",
+    "is_completed": true,
+    "room_id": "767819c5-cf10-433e-9a93-55ab4e95709d"
+  },
+  {
+    "id": "3d9b30ca-1554-47b1-95df-541ff817b2de",
+    "course_group_id": "cd6f263b-e146-4949-ac66-c77ecbc4337f",
+    "session_date": "2026-01-23",
+    "start_datetime": "2026-01-23T16:00:00.000Z",
+    "end_datetime": "2026-01-23T17:00:00.000Z",
+    "is_completed": true,
+    "room_id": "54441d45-6042-4416-8cab-e66be027adcf"
+  },
+  {
+    "id": "cb3b63db-d6fb-4041-a1f0-26977b3d08e5",
+    "course_group_id": "cd6f263b-e146-4949-ac66-c77ecbc4337f",
+    "session_date": "2026-04-29",
+    "start_datetime": "2026-04-29T15:00:00.000Z",
+    "end_datetime": "2026-04-29T16:00:00.000Z",
+    "is_completed": true,
+    "room_id": "767819c5-cf10-433e-9a93-55ab4e95709d"
+  },
+  {
+    "id": "674d0ee3-be9f-4263-82e0-bbb79b849af7",
+    "course_group_id": "cd6f263b-e146-4949-ac66-c77ecbc4337f",
+    "session_date": "2026-01-10",
+    "start_datetime": "2026-01-10T15:00:00.000Z",
+    "end_datetime": "2026-01-10T17:00:00.000Z",
+    "is_completed": true,
+    "room_id": "767819c5-cf10-433e-9a93-55ab4e95709d"
+  },
+  {
+    "id": "6efabe19-d6f2-4a63-b83d-5269a349aed2",
+    "course_group_id": "99ff9287-3886-483e-a3e2-491b51bceee7",
+    "session_date": "2026-08-18",
+    "start_datetime": "2026-08-18T15:00:00.000Z",
+    "end_datetime": "2026-08-18T16:30:00.000Z",
+    "is_completed": false,
+    "room_id": "54441d45-6042-4416-8cab-e66be027adcf"
+  },
+  {
+    "id": "35e7c1b7-4558-4843-8cae-7133f8515d23",
+    "course_group_id": "99ff9287-3886-483e-a3e2-491b51bceee7",
+    "session_date": "2026-09-23",
+    "start_datetime": "2026-09-23T16:00:00.000Z",
+    "end_datetime": "2026-09-23T18:00:00.000Z",
+    "is_completed": false,
+    "room_id": "54441d45-6042-4416-8cab-e66be027adcf"
+  },
+  {
+    "id": "2644a36a-5b2d-43cc-a760-30bf1c781124",
+    "course_group_id": "99ff9287-3886-483e-a3e2-491b51bceee7",
+    "session_date": "2027-04-30",
+    "start_datetime": "2027-04-30T17:00:00.000Z",
+    "end_datetime": "2027-04-30T18:30:00.000Z",
+    "is_completed": false,
+    "room_id": "767819c5-cf10-433e-9a93-55ab4e95709d"
+  },
+  {
+    "id": "8e07054e-5788-4ac8-bf00-2b6043061670",
+    "course_group_id": "99ff9287-3886-483e-a3e2-491b51bceee7",
+    "session_date": "2026-10-26",
+    "start_datetime": "2026-10-26T16:00:00.000Z",
+    "end_datetime": "2026-10-26T17:30:00.000Z",
+    "is_completed": false,
+    "room_id": "767819c5-cf10-433e-9a93-55ab4e95709d"
+  },
+  {
+    "id": "8b1b270e-bbc9-4a72-b718-88737afaaca4",
+    "course_group_id": "99ff9287-3886-483e-a3e2-491b51bceee7",
+    "session_date": "2027-03-08",
+    "start_datetime": "2027-03-08T15:00:00.000Z",
+    "end_datetime": "2027-03-08T16:00:00.000Z",
+    "is_completed": false,
+    "room_id": "54441d45-6042-4416-8cab-e66be027adcf"
+  },
+  {
+    "id": "70846c52-5fd3-46f3-a094-75b4ead6a852",
+    "course_group_id": "99ff9287-3886-483e-a3e2-491b51bceee7",
+    "session_date": "2027-03-17",
+    "start_datetime": "2027-03-17T15:00:00.000Z",
+    "end_datetime": "2027-03-17T16:30:00.000Z",
+    "is_completed": false,
+    "room_id": "767819c5-cf10-433e-9a93-55ab4e95709d"
+  },
+  {
+    "id": "a5126695-4edd-4154-8c63-15869497464e",
+    "course_group_id": "99ff9287-3886-483e-a3e2-491b51bceee7",
+    "session_date": "2027-03-08",
+    "start_datetime": "2027-03-08T17:00:00.000Z",
+    "end_datetime": "2027-03-08T19:00:00.000Z",
+    "is_completed": true,
+    "room_id": "54441d45-6042-4416-8cab-e66be027adcf"
+  },
+  {
+    "id": "af0ffd28-7fd5-4054-bcda-2fe10422cb52",
+    "course_group_id": "99ff9287-3886-483e-a3e2-491b51bceee7",
+    "session_date": "2026-07-04",
+    "start_datetime": "2026-07-04T15:00:00.000Z",
+    "end_datetime": "2026-07-04T16:30:00.000Z",
+    "is_completed": true,
+    "room_id": "54441d45-6042-4416-8cab-e66be027adcf"
+  },
+  {
+    "id": "34d1342a-3b39-45da-8c04-a78267ced0b7",
+    "course_group_id": "99ff9287-3886-483e-a3e2-491b51bceee7",
+    "session_date": "2026-06-13",
+    "start_datetime": "2026-06-13T15:00:00.000Z",
+    "end_datetime": "2026-06-13T16:00:00.000Z",
+    "is_completed": false,
+    "room_id": "54441d45-6042-4416-8cab-e66be027adcf"
+  },
+  {
+    "id": "834b8c83-a582-4799-ba0c-b51cd35a880e",
+    "course_group_id": "99ff9287-3886-483e-a3e2-491b51bceee7",
+    "session_date": "2026-07-14",
+    "start_datetime": "2026-07-14T16:00:00.000Z",
+    "end_datetime": "2026-07-14T17:30:00.000Z",
+    "is_completed": true,
+    "room_id": "767819c5-cf10-433e-9a93-55ab4e95709d"
+  },
+  {
+    "id": "6e539668-83a7-474a-b40d-02de9bd8e58a",
+    "course_group_id": "6fefe484-a16d-4487-9bae-a54c3e8017d8",
+    "session_date": "2027-02-14",
+    "start_datetime": "2027-02-14T16:00:00.000Z",
+    "end_datetime": "2027-02-14T17:00:00.000Z",
+    "is_completed": false,
+    "room_id": "767819c5-cf10-433e-9a93-55ab4e95709d"
+  },
+  {
+    "id": "b36ebeff-5411-41af-804e-6331a5002d25",
+    "course_group_id": "6fefe484-a16d-4487-9bae-a54c3e8017d8",
+    "session_date": "2027-02-02",
+    "start_datetime": "2027-02-02T17:00:00.000Z",
+    "end_datetime": "2027-02-02T19:00:00.000Z",
+    "is_completed": false,
+    "room_id": "767819c5-cf10-433e-9a93-55ab4e95709d"
+  },
+  {
+    "id": "62cd35ec-90e1-450a-818a-46776560c258",
+    "course_group_id": "6fefe484-a16d-4487-9bae-a54c3e8017d8",
+    "session_date": "2026-10-29",
+    "start_datetime": "2026-10-29T17:00:00.000Z",
+    "end_datetime": "2026-10-29T18:00:00.000Z",
+    "is_completed": false,
+    "room_id": "54441d45-6042-4416-8cab-e66be027adcf"
+  },
+  {
+    "id": "c7664cee-1692-4eff-b297-7446a077fbd9",
+    "course_group_id": "6fefe484-a16d-4487-9bae-a54c3e8017d8",
+    "session_date": "2026-10-10",
+    "start_datetime": "2026-10-10T17:00:00.000Z",
+    "end_datetime": "2026-10-10T19:00:00.000Z",
+    "is_completed": false,
+    "room_id": "54441d45-6042-4416-8cab-e66be027adcf"
+  },
+  {
+    "id": "69d54c64-1ceb-4108-a47c-594cc2941543",
+    "course_group_id": "6fefe484-a16d-4487-9bae-a54c3e8017d8",
+    "session_date": "2026-12-22",
+    "start_datetime": "2026-12-22T17:00:00.000Z",
+    "end_datetime": "2026-12-22T18:00:00.000Z",
+    "is_completed": false,
+    "room_id": "54441d45-6042-4416-8cab-e66be027adcf"
+  },
+  {
+    "id": "acd409b3-546a-45b7-890b-6aee5d36bfe0",
+    "course_group_id": "6fefe484-a16d-4487-9bae-a54c3e8017d8",
+    "session_date": "2026-05-31",
+    "start_datetime": "2026-05-31T15:00:00.000Z",
+    "end_datetime": "2026-05-31T16:00:00.000Z",
+    "is_completed": true,
+    "room_id": "767819c5-cf10-433e-9a93-55ab4e95709d"
+  },
+  {
+    "id": "5cc85e20-d419-418a-89bb-1d1ece6eee3f",
+    "course_group_id": "6fefe484-a16d-4487-9bae-a54c3e8017d8",
+    "session_date": "2026-08-26",
+    "start_datetime": "2026-08-26T16:00:00.000Z",
+    "end_datetime": "2026-08-26T17:30:00.000Z",
+    "is_completed": false,
+    "room_id": "767819c5-cf10-433e-9a93-55ab4e95709d"
+  },
+  {
+    "id": "6193e820-3aa1-4f04-b69c-3126b39a4f48",
+    "course_group_id": "6fefe484-a16d-4487-9bae-a54c3e8017d8",
+    "session_date": "2027-02-12",
+    "start_datetime": "2027-02-12T17:00:00.000Z",
+    "end_datetime": "2027-02-12T18:00:00.000Z",
+    "is_completed": true,
+    "room_id": "54441d45-6042-4416-8cab-e66be027adcf"
+  },
+  {
+    "id": "32839cdf-dbd2-4d49-b8dd-6dcbd360953b",
+    "course_group_id": "6fefe484-a16d-4487-9bae-a54c3e8017d8",
+    "session_date": "2026-06-10",
+    "start_datetime": "2026-06-10T15:00:00.000Z",
+    "end_datetime": "2026-06-10T16:30:00.000Z",
+    "is_completed": true,
+    "room_id": "54441d45-6042-4416-8cab-e66be027adcf"
+  },
+  {
+    "id": "989c971d-39d8-4614-8275-98c39d148ace",
+    "course_group_id": "6fefe484-a16d-4487-9bae-a54c3e8017d8",
+    "session_date": "2027-04-01",
+    "start_datetime": "2027-04-01T16:00:00.000Z",
+    "end_datetime": "2027-04-01T18:00:00.000Z",
+    "is_completed": true,
+    "room_id": "767819c5-cf10-433e-9a93-55ab4e95709d"
+  },
+  {
+    "id": "95a8ac23-d17a-4698-9283-15f7c04cca63",
+    "course_group_id": "266e4083-f092-409d-8583-e615f8ab2c95",
+    "session_date": "2027-02-16",
+    "start_datetime": "2027-02-16T17:00:00.000Z",
+    "end_datetime": "2027-02-16T18:00:00.000Z",
+    "is_completed": false,
+    "room_id": "767819c5-cf10-433e-9a93-55ab4e95709d"
+  },
+  {
+    "id": "e759f440-96ec-4e81-bfc0-a3fdc9e4f4e5",
+    "course_group_id": "266e4083-f092-409d-8583-e615f8ab2c95",
+    "session_date": "2026-05-30",
+    "start_datetime": "2026-05-30T15:00:00.000Z",
+    "end_datetime": "2026-05-30T16:30:00.000Z",
+    "is_completed": false,
+    "room_id": "767819c5-cf10-433e-9a93-55ab4e95709d"
+  },
+  {
+    "id": "8ce8d62d-e5c1-40f7-8101-420105f896f2",
+    "course_group_id": "266e4083-f092-409d-8583-e615f8ab2c95",
+    "session_date": "2026-12-13",
+    "start_datetime": "2026-12-13T16:00:00.000Z",
+    "end_datetime": "2026-12-13T17:00:00.000Z",
+    "is_completed": false,
+    "room_id": "767819c5-cf10-433e-9a93-55ab4e95709d"
+  },
+  {
+    "id": "b032e440-d14a-4ce9-9776-d0288bfb1917",
+    "course_group_id": "266e4083-f092-409d-8583-e615f8ab2c95",
+    "session_date": "2026-09-24",
+    "start_datetime": "2026-09-24T16:00:00.000Z",
+    "end_datetime": "2026-09-24T17:00:00.000Z",
+    "is_completed": false,
+    "room_id": "767819c5-cf10-433e-9a93-55ab4e95709d"
+  },
+  {
+    "id": "0b2ccf9b-5eb5-422b-b577-7b19554860a8",
+    "course_group_id": "266e4083-f092-409d-8583-e615f8ab2c95",
+    "session_date": "2026-06-08",
+    "start_datetime": "2026-06-08T16:00:00.000Z",
+    "end_datetime": "2026-06-08T18:00:00.000Z",
+    "is_completed": false,
+    "room_id": "767819c5-cf10-433e-9a93-55ab4e95709d"
+  },
+  {
+    "id": "599be917-4517-461a-baaa-2f887ce490e9",
+    "course_group_id": "266e4083-f092-409d-8583-e615f8ab2c95",
+    "session_date": "2026-11-08",
+    "start_datetime": "2026-11-08T17:00:00.000Z",
+    "end_datetime": "2026-11-08T19:00:00.000Z",
+    "is_completed": true,
+    "room_id": "54441d45-6042-4416-8cab-e66be027adcf"
+  },
+  {
+    "id": "d1e2206f-f90a-4e89-a74f-a0218c4a8178",
+    "course_group_id": "266e4083-f092-409d-8583-e615f8ab2c95",
+    "session_date": "2026-09-18",
+    "start_datetime": "2026-09-18T17:00:00.000Z",
+    "end_datetime": "2026-09-18T18:00:00.000Z",
+    "is_completed": false,
+    "room_id": "54441d45-6042-4416-8cab-e66be027adcf"
+  },
+  {
+    "id": "7ea5e2ef-8f9d-4b64-9ab9-9524f3915d1d",
+    "course_group_id": "266e4083-f092-409d-8583-e615f8ab2c95",
+    "session_date": "2026-11-05",
+    "start_datetime": "2026-11-05T15:00:00.000Z",
+    "end_datetime": "2026-11-05T16:00:00.000Z",
+    "is_completed": true,
+    "room_id": "767819c5-cf10-433e-9a93-55ab4e95709d"
+  },
+  {
+    "id": "cb1e0818-88ec-4cc9-bfd3-15ca268f742e",
+    "course_group_id": "266e4083-f092-409d-8583-e615f8ab2c95",
+    "session_date": "2026-12-10",
+    "start_datetime": "2026-12-10T16:00:00.000Z",
+    "end_datetime": "2026-12-10T17:00:00.000Z",
+    "is_completed": true,
+    "room_id": "54441d45-6042-4416-8cab-e66be027adcf"
+  },
+  {
+    "id": "93a9d27b-456a-4fd0-90af-49cb04f4b99f",
+    "course_group_id": "266e4083-f092-409d-8583-e615f8ab2c95",
+    "session_date": "2026-08-02",
+    "start_datetime": "2026-08-02T15:00:00.000Z",
+    "end_datetime": "2026-08-02T17:00:00.000Z",
+    "is_completed": true,
+    "room_id": "54441d45-6042-4416-8cab-e66be027adcf"
+  },
+  {
+    "id": "0c8565d4-5984-4ca1-805c-f21a0a9b6165",
+    "course_group_id": "151fb1a6-888b-4cd0-b44b-4fdb04d725d3",
+    "session_date": "2026-11-22",
+    "start_datetime": "2026-11-22T17:00:00.000Z",
+    "end_datetime": "2026-11-22T19:00:00.000Z",
+    "is_completed": false,
+    "room_id": "767819c5-cf10-433e-9a93-55ab4e95709d"
+  },
+  {
+    "id": "76d375a2-f812-4671-a70b-525cc00885f4",
+    "course_group_id": "151fb1a6-888b-4cd0-b44b-4fdb04d725d3",
+    "session_date": "2026-09-07",
+    "start_datetime": "2026-09-07T16:00:00.000Z",
+    "end_datetime": "2026-09-07T17:00:00.000Z",
+    "is_completed": false,
+    "room_id": "54441d45-6042-4416-8cab-e66be027adcf"
+  },
+  {
+    "id": "f0dc5c9f-1195-4a9b-8602-701c6250dc3d",
+    "course_group_id": "151fb1a6-888b-4cd0-b44b-4fdb04d725d3",
+    "session_date": "2026-07-27",
+    "start_datetime": "2026-07-27T15:00:00.000Z",
+    "end_datetime": "2026-07-27T16:00:00.000Z",
+    "is_completed": false,
+    "room_id": "54441d45-6042-4416-8cab-e66be027adcf"
+  },
+  {
+    "id": "b7032514-130d-4659-a384-b2f2dd111af5",
+    "course_group_id": "151fb1a6-888b-4cd0-b44b-4fdb04d725d3",
+    "session_date": "2026-10-01",
+    "start_datetime": "2026-10-01T17:00:00.000Z",
+    "end_datetime": "2026-10-01T18:30:00.000Z",
+    "is_completed": false,
+    "room_id": "54441d45-6042-4416-8cab-e66be027adcf"
+  },
+  {
+    "id": "dc7ce4ab-b6b6-4608-a649-bf8136dd2613",
+    "course_group_id": "151fb1a6-888b-4cd0-b44b-4fdb04d725d3",
+    "session_date": "2026-06-27",
+    "start_datetime": "2026-06-27T16:00:00.000Z",
+    "end_datetime": "2026-06-27T17:30:00.000Z",
+    "is_completed": false,
+    "room_id": "767819c5-cf10-433e-9a93-55ab4e95709d"
+  },
+  {
+    "id": "77eb53ef-05fa-46f5-bd0b-2570eda8eb7c",
+    "course_group_id": "151fb1a6-888b-4cd0-b44b-4fdb04d725d3",
+    "session_date": "2026-07-12",
+    "start_datetime": "2026-07-12T15:00:00.000Z",
+    "end_datetime": "2026-07-12T16:00:00.000Z",
+    "is_completed": true,
+    "room_id": "54441d45-6042-4416-8cab-e66be027adcf"
+  },
+  {
+    "id": "a8c32229-449e-4a03-b60a-e41ee197c327",
+    "course_group_id": "151fb1a6-888b-4cd0-b44b-4fdb04d725d3",
+    "session_date": "2026-07-16",
+    "start_datetime": "2026-07-16T15:00:00.000Z",
+    "end_datetime": "2026-07-16T16:30:00.000Z",
+    "is_completed": true,
+    "room_id": "54441d45-6042-4416-8cab-e66be027adcf"
+  },
+  {
+    "id": "1927cceb-df62-42c6-89b6-d1d0b1e56cac",
+    "course_group_id": "151fb1a6-888b-4cd0-b44b-4fdb04d725d3",
+    "session_date": "2027-01-19",
+    "start_datetime": "2027-01-19T16:00:00.000Z",
+    "end_datetime": "2027-01-19T18:00:00.000Z",
+    "is_completed": true,
+    "room_id": "767819c5-cf10-433e-9a93-55ab4e95709d"
+  },
+  {
+    "id": "6e80949a-d7cd-486e-82f9-3bd68be9928e",
+    "course_group_id": "151fb1a6-888b-4cd0-b44b-4fdb04d725d3",
+    "session_date": "2026-08-25",
+    "start_datetime": "2026-08-25T16:00:00.000Z",
+    "end_datetime": "2026-08-25T17:30:00.000Z",
+    "is_completed": true,
+    "room_id": "54441d45-6042-4416-8cab-e66be027adcf"
+  },
+  {
+    "id": "33742911-f2d2-46fa-8729-4e17130cfe4f",
+    "course_group_id": "151fb1a6-888b-4cd0-b44b-4fdb04d725d3",
+    "session_date": "2026-08-08",
+    "start_datetime": "2026-08-08T17:00:00.000Z",
+    "end_datetime": "2026-08-08T18:00:00.000Z",
+    "is_completed": true,
+    "room_id": "54441d45-6042-4416-8cab-e66be027adcf"
+  },
+  {
+    "id": "23bdbd6a-5e8d-46d9-996b-09d6a7b9499d",
+    "course_group_id": "4187d14a-7a92-4efa-b969-c72ba585bcf4",
+    "session_date": "2026-05-27",
+    "start_datetime": "2026-05-27T16:00:00.000Z",
+    "end_datetime": "2026-05-27T18:00:00.000Z",
+    "is_completed": false,
+    "room_id": "54441d45-6042-4416-8cab-e66be027adcf"
+  },
+  {
+    "id": "cf0d9bff-2a22-4fec-9e34-8bb28bce212d",
+    "course_group_id": "4187d14a-7a92-4efa-b969-c72ba585bcf4",
+    "session_date": "2026-10-18",
+    "start_datetime": "2026-10-18T16:00:00.000Z",
+    "end_datetime": "2026-10-18T17:00:00.000Z",
+    "is_completed": false,
+    "room_id": "54441d45-6042-4416-8cab-e66be027adcf"
+  },
+  {
+    "id": "0d85fe19-935d-4fd1-b9db-1862d595b519",
+    "course_group_id": "4187d14a-7a92-4efa-b969-c72ba585bcf4",
+    "session_date": "2026-12-10",
+    "start_datetime": "2026-12-10T15:00:00.000Z",
+    "end_datetime": "2026-12-10T16:30:00.000Z",
+    "is_completed": false,
+    "room_id": "54441d45-6042-4416-8cab-e66be027adcf"
+  },
+  {
+    "id": "aed230aa-20c9-468d-9841-6279b59ad93e",
+    "course_group_id": "4187d14a-7a92-4efa-b969-c72ba585bcf4",
+    "session_date": "2027-01-28",
+    "start_datetime": "2027-01-28T15:00:00.000Z",
+    "end_datetime": "2027-01-28T17:00:00.000Z",
+    "is_completed": false,
+    "room_id": "54441d45-6042-4416-8cab-e66be027adcf"
+  },
+  {
+    "id": "3904f3a1-17b3-4fdb-a476-589c379b7a45",
+    "course_group_id": "4187d14a-7a92-4efa-b969-c72ba585bcf4",
+    "session_date": "2026-12-21",
+    "start_datetime": "2026-12-21T16:00:00.000Z",
+    "end_datetime": "2026-12-21T17:00:00.000Z",
+    "is_completed": false,
+    "room_id": "767819c5-cf10-433e-9a93-55ab4e95709d"
+  },
+  {
+    "id": "3b57dcf6-e809-4a26-859b-63472788a7b8",
+    "course_group_id": "4187d14a-7a92-4efa-b969-c72ba585bcf4",
+    "session_date": "2026-11-21",
+    "start_datetime": "2026-11-21T17:00:00.000Z",
+    "end_datetime": "2026-11-21T18:30:00.000Z",
+    "is_completed": true,
+    "room_id": "54441d45-6042-4416-8cab-e66be027adcf"
+  },
+  {
+    "id": "f18544b1-fca2-453c-8cb5-f15b5db0554d",
+    "course_group_id": "4187d14a-7a92-4efa-b969-c72ba585bcf4",
+    "session_date": "2027-02-12",
+    "start_datetime": "2027-02-12T17:00:00.000Z",
+    "end_datetime": "2027-02-12T18:00:00.000Z",
+    "is_completed": true,
+    "room_id": "767819c5-cf10-433e-9a93-55ab4e95709d"
+  },
+  {
+    "id": "078616c0-49da-446b-82de-cef34b24c55f",
+    "course_group_id": "4187d14a-7a92-4efa-b969-c72ba585bcf4",
+    "session_date": "2027-01-18",
+    "start_datetime": "2027-01-18T17:00:00.000Z",
+    "end_datetime": "2027-01-18T18:30:00.000Z",
+    "is_completed": true,
+    "room_id": "767819c5-cf10-433e-9a93-55ab4e95709d"
+  },
+  {
+    "id": "3a8c053c-cc83-4c1c-8566-fff721d84425",
+    "course_group_id": "4187d14a-7a92-4efa-b969-c72ba585bcf4",
+    "session_date": "2026-08-15",
+    "start_datetime": "2026-08-15T17:00:00.000Z",
+    "end_datetime": "2026-08-15T18:30:00.000Z",
+    "is_completed": true,
+    "room_id": "767819c5-cf10-433e-9a93-55ab4e95709d"
+  },
+  {
+    "id": "b6f32f5e-4ec3-4876-b3d6-75a89a9dc81c",
+    "course_group_id": "4187d14a-7a92-4efa-b969-c72ba585bcf4",
+    "session_date": "2026-10-09",
+    "start_datetime": "2026-10-09T16:00:00.000Z",
+    "end_datetime": "2026-10-09T18:00:00.000Z",
+    "is_completed": false,
+    "room_id": "767819c5-cf10-433e-9a93-55ab4e95709d"
+  },
+  {
+    "id": "2d0bfa6e-8b18-4845-a273-cfb5c95f5cbb",
+    "course_group_id": "8d5a1f83-e9bd-4047-8f00-381bdad44ddf",
+    "session_date": "2026-09-23",
+    "start_datetime": "2026-09-23T17:00:00.000Z",
+    "end_datetime": "2026-09-23T18:00:00.000Z",
+    "is_completed": false,
+    "room_id": "767819c5-cf10-433e-9a93-55ab4e95709d"
+  },
+  {
+    "id": "40c4e74d-4f29-432c-9512-ab5168d2f30b",
+    "course_group_id": "8d5a1f83-e9bd-4047-8f00-381bdad44ddf",
+    "session_date": "2026-07-19",
+    "start_datetime": "2026-07-19T17:00:00.000Z",
+    "end_datetime": "2026-07-19T19:00:00.000Z",
+    "is_completed": false,
+    "room_id": "54441d45-6042-4416-8cab-e66be027adcf"
+  },
+  {
+    "id": "7732722b-28ae-481d-a393-e866f35806d1",
+    "course_group_id": "8d5a1f83-e9bd-4047-8f00-381bdad44ddf",
+    "session_date": "2026-05-22",
+    "start_datetime": "2026-05-22T17:00:00.000Z",
+    "end_datetime": "2026-05-22T19:00:00.000Z",
+    "is_completed": false,
+    "room_id": "54441d45-6042-4416-8cab-e66be027adcf"
+  },
+  {
+    "id": "ab7432f2-0635-43d0-bbb1-d4af6e30522e",
+    "course_group_id": "8d5a1f83-e9bd-4047-8f00-381bdad44ddf",
+    "session_date": "2027-01-04",
+    "start_datetime": "2027-01-04T17:00:00.000Z",
+    "end_datetime": "2027-01-04T18:30:00.000Z",
+    "is_completed": true,
+    "room_id": "767819c5-cf10-433e-9a93-55ab4e95709d"
+  },
+  {
+    "id": "eaecd4bc-392f-41e0-8b7c-0dbb57206eee",
+    "course_group_id": "8d5a1f83-e9bd-4047-8f00-381bdad44ddf",
+    "session_date": "2027-02-09",
+    "start_datetime": "2027-02-09T17:00:00.000Z",
+    "end_datetime": "2027-02-09T19:00:00.000Z",
+    "is_completed": false,
+    "room_id": "54441d45-6042-4416-8cab-e66be027adcf"
+  },
+  {
+    "id": "24f3b2a8-002d-4ad6-9627-b5b0ab70d685",
+    "course_group_id": "8d5a1f83-e9bd-4047-8f00-381bdad44ddf",
+    "session_date": "2026-09-03",
+    "start_datetime": "2026-09-03T15:00:00.000Z",
+    "end_datetime": "2026-09-03T17:00:00.000Z",
+    "is_completed": true,
+    "room_id": "767819c5-cf10-433e-9a93-55ab4e95709d"
+  },
+  {
+    "id": "a62c1a54-06fd-4498-a00f-b3b8ee71bc72",
+    "course_group_id": "8d5a1f83-e9bd-4047-8f00-381bdad44ddf",
+    "session_date": "2027-04-11",
+    "start_datetime": "2027-04-11T15:00:00.000Z",
+    "end_datetime": "2027-04-11T16:00:00.000Z",
+    "is_completed": true,
+    "room_id": "767819c5-cf10-433e-9a93-55ab4e95709d"
+  },
+  {
+    "id": "a586c9fe-ec5c-475f-b8eb-7c78e530aaad",
+    "course_group_id": "8d5a1f83-e9bd-4047-8f00-381bdad44ddf",
+    "session_date": "2026-08-21",
+    "start_datetime": "2026-08-21T16:00:00.000Z",
+    "end_datetime": "2026-08-21T18:00:00.000Z",
+    "is_completed": true,
+    "room_id": "54441d45-6042-4416-8cab-e66be027adcf"
+  },
+  {
+    "id": "b2b2cb75-bcbb-4e53-8bed-01f6e1f367a0",
+    "course_group_id": "8d5a1f83-e9bd-4047-8f00-381bdad44ddf",
+    "session_date": "2026-10-02",
+    "start_datetime": "2026-10-02T15:00:00.000Z",
+    "end_datetime": "2026-10-02T16:00:00.000Z",
+    "is_completed": true,
+    "room_id": "767819c5-cf10-433e-9a93-55ab4e95709d"
+  },
+  {
+    "id": "15df7334-653b-4c66-91b2-7e3bcdc61eaf",
+    "course_group_id": "8d5a1f83-e9bd-4047-8f00-381bdad44ddf",
+    "session_date": "2027-04-04",
+    "start_datetime": "2027-04-04T17:00:00.000Z",
+    "end_datetime": "2027-04-04T19:00:00.000Z",
+    "is_completed": false,
+    "room_id": "767819c5-cf10-433e-9a93-55ab4e95709d"
+  },
+  {
+    "id": "3216b6cb-4943-4a04-bd34-447bce1bed68",
+    "course_group_id": "b8f6a1d6-8723-461c-a41c-08a53432af43",
+    "session_date": "2026-05-11",
+    "start_datetime": "2026-05-11T17:00:00.000Z",
+    "end_datetime": "2026-05-11T18:30:00.000Z",
+    "is_completed": false,
+    "room_id": "54441d45-6042-4416-8cab-e66be027adcf"
+  },
+  {
+    "id": "d3e76cf2-0609-4280-b18c-7be3fdb7933d",
+    "course_group_id": "b8f6a1d6-8723-461c-a41c-08a53432af43",
+    "session_date": "2026-08-27",
+    "start_datetime": "2026-08-27T16:00:00.000Z",
+    "end_datetime": "2026-08-27T17:30:00.000Z",
+    "is_completed": false,
+    "room_id": "54441d45-6042-4416-8cab-e66be027adcf"
+  },
+  {
+    "id": "58a8c652-199a-4ddc-aabe-f193408c1600",
+    "course_group_id": "b8f6a1d6-8723-461c-a41c-08a53432af43",
+    "session_date": "2026-06-20",
+    "start_datetime": "2026-06-20T16:00:00.000Z",
+    "end_datetime": "2026-06-20T18:00:00.000Z",
+    "is_completed": false,
+    "room_id": "54441d45-6042-4416-8cab-e66be027adcf"
+  },
+  {
+    "id": "990dff4c-e603-4bff-9d8a-9f43bb51d525",
+    "course_group_id": "b8f6a1d6-8723-461c-a41c-08a53432af43",
+    "session_date": "2026-12-25",
+    "start_datetime": "2026-12-25T16:00:00.000Z",
+    "end_datetime": "2026-12-25T17:00:00.000Z",
+    "is_completed": false,
+    "room_id": "54441d45-6042-4416-8cab-e66be027adcf"
+  },
+  {
+    "id": "183c28c8-8905-4147-b0a9-c201bf8cb87e",
+    "course_group_id": "b8f6a1d6-8723-461c-a41c-08a53432af43",
+    "session_date": "2026-10-12",
+    "start_datetime": "2026-10-12T15:00:00.000Z",
+    "end_datetime": "2026-10-12T16:30:00.000Z",
+    "is_completed": false,
+    "room_id": "54441d45-6042-4416-8cab-e66be027adcf"
+  },
+  {
+    "id": "e7707133-8f96-4782-a085-1136b5f2c32b",
+    "course_group_id": "b8f6a1d6-8723-461c-a41c-08a53432af43",
+    "session_date": "2027-01-10",
+    "start_datetime": "2027-01-10T17:00:00.000Z",
+    "end_datetime": "2027-01-10T18:00:00.000Z",
+    "is_completed": true,
+    "room_id": "767819c5-cf10-433e-9a93-55ab4e95709d"
+  },
+  {
+    "id": "65c39d3c-9db5-4141-9d0b-f7d25a8b092e",
+    "course_group_id": "b8f6a1d6-8723-461c-a41c-08a53432af43",
+    "session_date": "2026-07-20",
+    "start_datetime": "2026-07-20T16:00:00.000Z",
+    "end_datetime": "2026-07-20T17:00:00.000Z",
+    "is_completed": true,
+    "room_id": "767819c5-cf10-433e-9a93-55ab4e95709d"
+  },
+  {
+    "id": "02751320-46a2-4b1f-85be-8b4154b49298",
+    "course_group_id": "b8f6a1d6-8723-461c-a41c-08a53432af43",
+    "session_date": "2026-12-30",
+    "start_datetime": "2026-12-30T15:00:00.000Z",
+    "end_datetime": "2026-12-30T16:30:00.000Z",
+    "is_completed": true,
+    "room_id": "54441d45-6042-4416-8cab-e66be027adcf"
+  },
+  {
+    "id": "a130b9b6-30fd-4aa4-95a0-260f128e4197",
+    "course_group_id": "b8f6a1d6-8723-461c-a41c-08a53432af43",
+    "session_date": "2026-11-18",
+    "start_datetime": "2026-11-18T17:00:00.000Z",
+    "end_datetime": "2026-11-18T18:30:00.000Z",
+    "is_completed": true,
+    "room_id": "54441d45-6042-4416-8cab-e66be027adcf"
+  },
+  {
+    "id": "fdb78d42-3f12-453e-8514-b44a28f88613",
+    "course_group_id": "b8f6a1d6-8723-461c-a41c-08a53432af43",
+    "session_date": "2026-10-06",
+    "start_datetime": "2026-10-06T15:00:00.000Z",
+    "end_datetime": "2026-10-06T17:00:00.000Z",
+    "is_completed": true,
+    "room_id": "54441d45-6042-4416-8cab-e66be027adcf"
+  },
+  {
+    "id": "edf8e17d-cfaf-47d3-892b-1f5d8e6355d0",
+    "course_group_id": "cecde2aa-2db9-405d-ae82-0d6192e468f7",
+    "session_date": "2026-08-30",
+    "start_datetime": "2026-08-30T15:00:00.000Z",
+    "end_datetime": "2026-08-30T17:00:00.000Z",
+    "is_completed": false,
+    "room_id": "54441d45-6042-4416-8cab-e66be027adcf"
+  },
+  {
+    "id": "39019f35-d7a0-43b3-9455-e95cf421c14b",
+    "course_group_id": "cecde2aa-2db9-405d-ae82-0d6192e468f7",
+    "session_date": "2026-04-08",
+    "start_datetime": "2026-04-08T15:00:00.000Z",
+    "end_datetime": "2026-04-08T16:30:00.000Z",
+    "is_completed": false,
+    "room_id": "767819c5-cf10-433e-9a93-55ab4e95709d"
+  },
+  {
+    "id": "24e4d8b6-9383-457d-b753-dc096e05ae24",
+    "course_group_id": "cecde2aa-2db9-405d-ae82-0d6192e468f7",
+    "session_date": "2027-02-22",
+    "start_datetime": "2027-02-22T17:00:00.000Z",
+    "end_datetime": "2027-02-22T19:00:00.000Z",
+    "is_completed": false,
+    "room_id": "767819c5-cf10-433e-9a93-55ab4e95709d"
+  },
+  {
+    "id": "1357df4e-655b-416f-a0dc-49f85a14f54c",
+    "course_group_id": "cecde2aa-2db9-405d-ae82-0d6192e468f7",
+    "session_date": "2026-12-27",
+    "start_datetime": "2026-12-27T16:00:00.000Z",
+    "end_datetime": "2026-12-27T17:00:00.000Z",
+    "is_completed": false,
+    "room_id": "767819c5-cf10-433e-9a93-55ab4e95709d"
+  },
+  {
+    "id": "8cfa3994-d570-4e13-9c92-9cd73131feb2",
+    "course_group_id": "cecde2aa-2db9-405d-ae82-0d6192e468f7",
+    "session_date": "2027-03-07",
+    "start_datetime": "2027-03-07T17:00:00.000Z",
+    "end_datetime": "2027-03-07T18:30:00.000Z",
+    "is_completed": false,
+    "room_id": "54441d45-6042-4416-8cab-e66be027adcf"
+  },
+  {
+    "id": "3fb5451b-1699-4227-9cb6-73360d21d6b5",
+    "course_group_id": "cecde2aa-2db9-405d-ae82-0d6192e468f7",
+    "session_date": "2026-06-08",
+    "start_datetime": "2026-06-08T17:00:00.000Z",
+    "end_datetime": "2026-06-08T18:00:00.000Z",
+    "is_completed": true,
+    "room_id": "767819c5-cf10-433e-9a93-55ab4e95709d"
+  },
+  {
+    "id": "4b8a8fea-e4c9-4575-806e-24328d1f3d2f",
+    "course_group_id": "cecde2aa-2db9-405d-ae82-0d6192e468f7",
+    "session_date": "2027-01-13",
+    "start_datetime": "2027-01-13T15:00:00.000Z",
+    "end_datetime": "2027-01-13T16:30:00.000Z",
+    "is_completed": false,
+    "room_id": "767819c5-cf10-433e-9a93-55ab4e95709d"
+  },
+  {
+    "id": "3ae25727-ecda-4d4a-a5bc-8a5fd52ae573",
+    "course_group_id": "cecde2aa-2db9-405d-ae82-0d6192e468f7",
+    "session_date": "2026-08-01",
+    "start_datetime": "2026-08-01T17:00:00.000Z",
+    "end_datetime": "2026-08-01T18:00:00.000Z",
+    "is_completed": true,
+    "room_id": "54441d45-6042-4416-8cab-e66be027adcf"
+  },
+  {
+    "id": "a706c1cf-3550-4c4a-b38a-5291b1b54d02",
+    "course_group_id": "cecde2aa-2db9-405d-ae82-0d6192e468f7",
+    "session_date": "2026-10-17",
+    "start_datetime": "2026-10-17T15:00:00.000Z",
+    "end_datetime": "2026-10-17T16:00:00.000Z",
+    "is_completed": false,
+    "room_id": "54441d45-6042-4416-8cab-e66be027adcf"
+  },
+  {
+    "id": "357158a8-ed74-45cf-a12a-6025a1d52bd6",
+    "course_group_id": "cecde2aa-2db9-405d-ae82-0d6192e468f7",
+    "session_date": "2026-12-01",
+    "start_datetime": "2026-12-01T16:00:00.000Z",
+    "end_datetime": "2026-12-01T17:30:00.000Z",
+    "is_completed": true,
+    "room_id": "54441d45-6042-4416-8cab-e66be027adcf"
+  },
+  {
+    "id": "49be964d-3621-4385-9e79-598b9db7ce9d",
+    "course_group_id": "327ebb53-de86-4a04-9396-3203d239ab08",
+    "session_date": "2027-02-03",
+    "start_datetime": "2027-02-03T15:00:00.000Z",
+    "end_datetime": "2027-02-03T17:00:00.000Z",
+    "is_completed": false,
+    "room_id": "54441d45-6042-4416-8cab-e66be027adcf"
+  },
+  {
+    "id": "e7df8a08-eadc-4007-8d66-87469e56a482",
+    "course_group_id": "327ebb53-de86-4a04-9396-3203d239ab08",
+    "session_date": "2026-08-17",
+    "start_datetime": "2026-08-17T15:00:00.000Z",
+    "end_datetime": "2026-08-17T17:00:00.000Z",
+    "is_completed": false,
+    "room_id": "767819c5-cf10-433e-9a93-55ab4e95709d"
+  },
+  {
+    "id": "2fbae1a7-e268-4cdf-9b2f-cbfbee7efaae",
+    "course_group_id": "327ebb53-de86-4a04-9396-3203d239ab08",
+    "session_date": "2026-07-24",
+    "start_datetime": "2026-07-24T15:00:00.000Z",
+    "end_datetime": "2026-07-24T17:00:00.000Z",
+    "is_completed": false,
+    "room_id": "767819c5-cf10-433e-9a93-55ab4e95709d"
+  },
+  {
+    "id": "d04fc18c-5ae7-4feb-aab5-f331160ba676",
+    "course_group_id": "327ebb53-de86-4a04-9396-3203d239ab08",
+    "session_date": "2027-01-06",
+    "start_datetime": "2027-01-06T16:00:00.000Z",
+    "end_datetime": "2027-01-06T17:00:00.000Z",
+    "is_completed": false,
+    "room_id": "54441d45-6042-4416-8cab-e66be027adcf"
+  },
+  {
+    "id": "9de2fd27-5955-485a-af0b-c66f2bb8ca1c",
+    "course_group_id": "327ebb53-de86-4a04-9396-3203d239ab08",
+    "session_date": "2026-10-17",
+    "start_datetime": "2026-10-17T16:00:00.000Z",
+    "end_datetime": "2026-10-17T18:00:00.000Z",
+    "is_completed": false,
+    "room_id": "54441d45-6042-4416-8cab-e66be027adcf"
+  },
+  {
+    "id": "1ecdfbc1-19b3-4907-ab9d-15d269189047",
+    "course_group_id": "327ebb53-de86-4a04-9396-3203d239ab08",
+    "session_date": "2027-03-02",
+    "start_datetime": "2027-03-02T15:00:00.000Z",
+    "end_datetime": "2027-03-02T16:00:00.000Z",
+    "is_completed": true,
+    "room_id": "54441d45-6042-4416-8cab-e66be027adcf"
+  },
+  {
+    "id": "04ec0bfd-56d6-4b25-ac06-8b8e0d203442",
+    "course_group_id": "327ebb53-de86-4a04-9396-3203d239ab08",
+    "session_date": "2026-05-05",
+    "start_datetime": "2026-05-05T16:00:00.000Z",
+    "end_datetime": "2026-05-05T17:30:00.000Z",
+    "is_completed": true,
+    "room_id": "767819c5-cf10-433e-9a93-55ab4e95709d"
+  },
+  {
+    "id": "3259c586-df25-4d17-9de1-fe23c6d7a8d4",
+    "course_group_id": "327ebb53-de86-4a04-9396-3203d239ab08",
+    "session_date": "2027-01-17",
+    "start_datetime": "2027-01-17T16:00:00.000Z",
+    "end_datetime": "2027-01-17T17:30:00.000Z",
+    "is_completed": true,
+    "room_id": "767819c5-cf10-433e-9a93-55ab4e95709d"
+  },
+  {
+    "id": "feef6ff0-102d-4b9f-bf94-0d58133ae8f0",
+    "course_group_id": "327ebb53-de86-4a04-9396-3203d239ab08",
+    "session_date": "2026-09-23",
+    "start_datetime": "2026-09-23T15:00:00.000Z",
+    "end_datetime": "2026-09-23T16:30:00.000Z",
+    "is_completed": true,
+    "room_id": "767819c5-cf10-433e-9a93-55ab4e95709d"
+  },
+  {
+    "id": "64c8994a-99d6-4715-b946-c37129dafce3",
+    "course_group_id": "327ebb53-de86-4a04-9396-3203d239ab08",
+    "session_date": "2026-08-03",
+    "start_datetime": "2026-08-03T17:00:00.000Z",
+    "end_datetime": "2026-08-03T18:30:00.000Z",
+    "is_completed": true,
+    "room_id": "767819c5-cf10-433e-9a93-55ab4e95709d"
+  },
+  {
+    "id": "c4d6037d-f5ac-4036-ae30-afef7a7ea913",
+    "course_group_id": "e0e56d59-b221-4f53-973d-e89064df2cbf",
+    "session_date": "2026-03-03",
+    "start_datetime": "2026-03-03T17:00:00.000Z",
+    "end_datetime": "2026-03-03T18:00:00.000Z",
+    "is_completed": true,
+    "room_id": "767819c5-cf10-433e-9a93-55ab4e95709d"
+  },
+  {
+    "id": "2b0ad0dd-5e8e-47ea-ad83-da84d2553f6f",
+    "course_group_id": "e0e56d59-b221-4f53-973d-e89064df2cbf",
+    "session_date": "2026-12-13",
+    "start_datetime": "2026-12-13T15:00:00.000Z",
+    "end_datetime": "2026-12-13T17:00:00.000Z",
+    "is_completed": false,
+    "room_id": "767819c5-cf10-433e-9a93-55ab4e95709d"
+  },
+  {
+    "id": "2a714cb5-37d4-4f8b-975e-8b8b356a5744",
+    "course_group_id": "e0e56d59-b221-4f53-973d-e89064df2cbf",
+    "session_date": "2026-07-18",
+    "start_datetime": "2026-07-18T17:00:00.000Z",
+    "end_datetime": "2026-07-18T18:00:00.000Z",
+    "is_completed": true,
+    "room_id": "54441d45-6042-4416-8cab-e66be027adcf"
+  },
+  {
+    "id": "ccb18c6f-b068-4238-a708-7aed2ad4fbf5",
+    "course_group_id": "e0e56d59-b221-4f53-973d-e89064df2cbf",
+    "session_date": "2026-10-18",
+    "start_datetime": "2026-10-18T17:00:00.000Z",
+    "end_datetime": "2026-10-18T18:00:00.000Z",
+    "is_completed": false,
+    "room_id": "54441d45-6042-4416-8cab-e66be027adcf"
+  },
+  {
+    "id": "835b2194-020f-49e1-8cf8-f886a101f1f3",
+    "course_group_id": "e0e56d59-b221-4f53-973d-e89064df2cbf",
+    "session_date": "2026-09-16",
+    "start_datetime": "2026-09-16T17:00:00.000Z",
+    "end_datetime": "2026-09-16T18:30:00.000Z",
+    "is_completed": false,
+    "room_id": "54441d45-6042-4416-8cab-e66be027adcf"
+  },
+  {
+    "id": "a10e9dce-162b-4d4e-b195-55296caff63e",
+    "course_group_id": "e0e56d59-b221-4f53-973d-e89064df2cbf",
+    "session_date": "2026-02-10",
+    "start_datetime": "2026-02-10T16:00:00.000Z",
+    "end_datetime": "2026-02-10T17:00:00.000Z",
+    "is_completed": true,
+    "room_id": "54441d45-6042-4416-8cab-e66be027adcf"
+  },
+  {
+    "id": "a0db2ca9-7701-4495-94d5-11e92e6d6f36",
+    "course_group_id": "e0e56d59-b221-4f53-973d-e89064df2cbf",
+    "session_date": "2026-02-14",
+    "start_datetime": "2026-02-14T17:00:00.000Z",
+    "end_datetime": "2026-02-14T18:30:00.000Z",
+    "is_completed": true,
+    "room_id": "767819c5-cf10-433e-9a93-55ab4e95709d"
+  },
+  {
+    "id": "5b5eff89-2f51-478c-92b4-25666a0ed670",
+    "course_group_id": "e0e56d59-b221-4f53-973d-e89064df2cbf",
+    "session_date": "2026-11-09",
+    "start_datetime": "2026-11-09T16:00:00.000Z",
+    "end_datetime": "2026-11-09T17:00:00.000Z",
+    "is_completed": true,
+    "room_id": "767819c5-cf10-433e-9a93-55ab4e95709d"
+  },
+  {
+    "id": "a1f2b044-9b9d-4220-a903-1f8e4ffb2fca",
+    "course_group_id": "e0e56d59-b221-4f53-973d-e89064df2cbf",
+    "session_date": "2026-04-28",
+    "start_datetime": "2026-04-28T15:00:00.000Z",
+    "end_datetime": "2026-04-28T16:00:00.000Z",
+    "is_completed": true,
+    "room_id": "54441d45-6042-4416-8cab-e66be027adcf"
+  },
+  {
+    "id": "f7e28d9c-6090-4ca6-b00f-d0cad096e073",
+    "course_group_id": "e0e56d59-b221-4f53-973d-e89064df2cbf",
+    "session_date": "2026-04-01",
+    "start_datetime": "2026-04-01T16:00:00.000Z",
+    "end_datetime": "2026-04-01T17:30:00.000Z",
+    "is_completed": true,
+    "room_id": "767819c5-cf10-433e-9a93-55ab4e95709d"
+  },
+  {
+    "id": "4cfc3688-8bab-4c44-9445-8525d6779481",
+    "course_group_id": "e5d07e9a-e947-4980-984a-69be0e9878e6",
+    "session_date": "2026-12-18",
+    "start_datetime": "2026-12-18T17:00:00.000Z",
+    "end_datetime": "2026-12-18T19:00:00.000Z",
+    "is_completed": false,
+    "room_id": "767819c5-cf10-433e-9a93-55ab4e95709d"
+  },
+  {
+    "id": "d2adf9c5-b532-4028-9ea4-4b1c0e8f04b3",
+    "course_group_id": "e5d07e9a-e947-4980-984a-69be0e9878e6",
+    "session_date": "2026-05-20",
+    "start_datetime": "2026-05-20T16:00:00.000Z",
+    "end_datetime": "2026-05-20T18:00:00.000Z",
+    "is_completed": false,
+    "room_id": "767819c5-cf10-433e-9a93-55ab4e95709d"
+  },
+  {
+    "id": "0edf3513-dd9d-4c20-a851-2edbd0c8490a",
+    "course_group_id": "e5d07e9a-e947-4980-984a-69be0e9878e6",
+    "session_date": "2026-04-29",
+    "start_datetime": "2026-04-29T15:00:00.000Z",
+    "end_datetime": "2026-04-29T17:00:00.000Z",
+    "is_completed": false,
+    "room_id": "54441d45-6042-4416-8cab-e66be027adcf"
+  },
+  {
+    "id": "b1be3fd9-a9aa-4bd4-b291-29917f598db5",
+    "course_group_id": "e5d07e9a-e947-4980-984a-69be0e9878e6",
+    "session_date": "2026-07-30",
+    "start_datetime": "2026-07-30T17:00:00.000Z",
+    "end_datetime": "2026-07-30T18:00:00.000Z",
+    "is_completed": true,
+    "room_id": "54441d45-6042-4416-8cab-e66be027adcf"
+  },
+  {
+    "id": "0f61de73-c6fe-4162-9351-63a9b40fde07",
+    "course_group_id": "e5d07e9a-e947-4980-984a-69be0e9878e6",
+    "session_date": "2026-03-17",
+    "start_datetime": "2026-03-17T17:00:00.000Z",
+    "end_datetime": "2026-03-17T19:00:00.000Z",
+    "is_completed": false,
+    "room_id": "54441d45-6042-4416-8cab-e66be027adcf"
+  },
+  {
+    "id": "69c8d7dd-d808-4f4d-9bdc-8fab2074014d",
+    "course_group_id": "e5d07e9a-e947-4980-984a-69be0e9878e6",
+    "session_date": "2026-02-26",
+    "start_datetime": "2026-02-26T16:00:00.000Z",
+    "end_datetime": "2026-02-26T18:00:00.000Z",
+    "is_completed": true,
+    "room_id": "767819c5-cf10-433e-9a93-55ab4e95709d"
+  },
+  {
+    "id": "0e217520-0ea0-4c3e-bb77-8b5f905567d1",
+    "course_group_id": "e5d07e9a-e947-4980-984a-69be0e9878e6",
+    "session_date": "2026-08-25",
+    "start_datetime": "2026-08-25T15:00:00.000Z",
+    "end_datetime": "2026-08-25T16:30:00.000Z",
+    "is_completed": true,
+    "room_id": "767819c5-cf10-433e-9a93-55ab4e95709d"
+  },
+  {
+    "id": "bda93364-94fb-4f21-ae2f-36451a2db6de",
+    "course_group_id": "e5d07e9a-e947-4980-984a-69be0e9878e6",
+    "session_date": "2026-03-27",
+    "start_datetime": "2026-03-27T16:00:00.000Z",
+    "end_datetime": "2026-03-27T17:00:00.000Z",
+    "is_completed": true,
+    "room_id": "54441d45-6042-4416-8cab-e66be027adcf"
+  },
+  {
+    "id": "53676119-bc86-489f-a803-622424efeda0",
+    "course_group_id": "e5d07e9a-e947-4980-984a-69be0e9878e6",
+    "session_date": "2026-11-03",
+    "start_datetime": "2026-11-03T16:00:00.000Z",
+    "end_datetime": "2026-11-03T17:30:00.000Z",
+    "is_completed": true,
+    "room_id": "767819c5-cf10-433e-9a93-55ab4e95709d"
+  },
+  {
+    "id": "2793407b-233d-42f5-a27c-84776172edf9",
+    "course_group_id": "e5d07e9a-e947-4980-984a-69be0e9878e6",
+    "session_date": "2026-10-21",
+    "start_datetime": "2026-10-21T16:00:00.000Z",
+    "end_datetime": "2026-10-21T17:30:00.000Z",
+    "is_completed": true,
+    "room_id": "767819c5-cf10-433e-9a93-55ab4e95709d"
+  },
+  {
+    "id": "1167a108-f0a6-4650-aaa1-88a7e37ffdd4",
+    "course_group_id": "fa6894ff-b1fd-4827-858f-1d7139334c32",
+    "session_date": "2026-02-24",
+    "start_datetime": "2026-02-24T16:00:00.000Z",
+    "end_datetime": "2026-02-24T17:00:00.000Z",
+    "is_completed": false,
+    "room_id": "54441d45-6042-4416-8cab-e66be027adcf"
+  },
+  {
+    "id": "77edde8b-0809-4de5-9d51-0914fd7ad41a",
+    "course_group_id": "fa6894ff-b1fd-4827-858f-1d7139334c32",
+    "session_date": "2026-09-12",
+    "start_datetime": "2026-09-12T15:00:00.000Z",
+    "end_datetime": "2026-09-12T17:00:00.000Z",
+    "is_completed": false,
+    "room_id": "767819c5-cf10-433e-9a93-55ab4e95709d"
+  },
+  {
+    "id": "2a709969-b464-4367-bffc-1229fea398eb",
+    "course_group_id": "fa6894ff-b1fd-4827-858f-1d7139334c32",
+    "session_date": "2026-11-25",
+    "start_datetime": "2026-11-25T15:00:00.000Z",
+    "end_datetime": "2026-11-25T17:00:00.000Z",
+    "is_completed": false,
+    "room_id": "767819c5-cf10-433e-9a93-55ab4e95709d"
+  },
+  {
+    "id": "baf27803-9f22-4061-94a4-ee2b8bd45b27",
+    "course_group_id": "fa6894ff-b1fd-4827-858f-1d7139334c32",
+    "session_date": "2026-01-20",
+    "start_datetime": "2026-01-20T16:00:00.000Z",
+    "end_datetime": "2026-01-20T17:30:00.000Z",
+    "is_completed": false,
+    "room_id": "767819c5-cf10-433e-9a93-55ab4e95709d"
+  },
+  {
+    "id": "6534b616-62d7-45ec-9d6a-654b5c6f4700",
+    "course_group_id": "fa6894ff-b1fd-4827-858f-1d7139334c32",
+    "session_date": "2026-11-11",
+    "start_datetime": "2026-11-11T16:00:00.000Z",
+    "end_datetime": "2026-11-11T18:00:00.000Z",
+    "is_completed": false,
+    "room_id": "54441d45-6042-4416-8cab-e66be027adcf"
+  },
+  {
+    "id": "620e845f-cbed-4273-8a01-da59889366c0",
+    "course_group_id": "fa6894ff-b1fd-4827-858f-1d7139334c32",
+    "session_date": "2026-01-22",
+    "start_datetime": "2026-01-22T15:00:00.000Z",
+    "end_datetime": "2026-01-22T16:00:00.000Z",
+    "is_completed": true,
+    "room_id": "767819c5-cf10-433e-9a93-55ab4e95709d"
+  },
+  {
+    "id": "ee3b977c-b081-4ad6-939b-7ac88becf8ab",
+    "course_group_id": "fa6894ff-b1fd-4827-858f-1d7139334c32",
+    "session_date": "2026-09-13",
+    "start_datetime": "2026-09-13T15:00:00.000Z",
+    "end_datetime": "2026-09-13T16:30:00.000Z",
+    "is_completed": true,
+    "room_id": "54441d45-6042-4416-8cab-e66be027adcf"
+  },
+  {
+    "id": "3d908cfa-9512-4e70-8649-5d86347003d9",
+    "course_group_id": "fa6894ff-b1fd-4827-858f-1d7139334c32",
+    "session_date": "2026-05-31",
+    "start_datetime": "2026-05-31T15:00:00.000Z",
+    "end_datetime": "2026-05-31T16:00:00.000Z",
+    "is_completed": true,
+    "room_id": "54441d45-6042-4416-8cab-e66be027adcf"
+  },
+  {
+    "id": "a4d4aa5a-3e30-47bd-b99e-0e4113f7c2a4",
+    "course_group_id": "fa6894ff-b1fd-4827-858f-1d7139334c32",
+    "session_date": "2026-07-21",
+    "start_datetime": "2026-07-21T15:00:00.000Z",
+    "end_datetime": "2026-07-21T16:30:00.000Z",
+    "is_completed": true,
+    "room_id": "54441d45-6042-4416-8cab-e66be027adcf"
+  },
+  {
+    "id": "9b810cdf-487e-4b9e-8208-00a75defa363",
+    "course_group_id": "fa6894ff-b1fd-4827-858f-1d7139334c32",
+    "session_date": "2026-11-26",
+    "start_datetime": "2026-11-26T15:00:00.000Z",
+    "end_datetime": "2026-11-26T17:00:00.000Z",
+    "is_completed": true,
+    "room_id": "54441d45-6042-4416-8cab-e66be027adcf"
+  },
+  {
+    "id": "ff7e1c47-370f-410a-bce4-cfc4c4d41c8d",
+    "course_group_id": "cd0b1d7b-802e-46a0-8518-53165f068edb",
+    "session_date": "2026-11-16",
+    "start_datetime": "2026-11-16T16:00:00.000Z",
+    "end_datetime": "2026-11-16T17:30:00.000Z",
+    "is_completed": false,
+    "room_id": "54441d45-6042-4416-8cab-e66be027adcf"
+  },
+  {
+    "id": "b5745154-58ed-4fa6-85c0-b5aa3dde95fb",
+    "course_group_id": "cd0b1d7b-802e-46a0-8518-53165f068edb",
+    "session_date": "2026-04-15",
+    "start_datetime": "2026-04-15T15:00:00.000Z",
+    "end_datetime": "2026-04-15T16:30:00.000Z",
+    "is_completed": false,
+    "room_id": "54441d45-6042-4416-8cab-e66be027adcf"
+  },
+  {
+    "id": "c9631c79-4de7-4238-9cb3-789d4f7e0644",
+    "course_group_id": "cd0b1d7b-802e-46a0-8518-53165f068edb",
+    "session_date": "2026-03-12",
+    "start_datetime": "2026-03-12T15:00:00.000Z",
+    "end_datetime": "2026-03-12T16:30:00.000Z",
+    "is_completed": false,
+    "room_id": "54441d45-6042-4416-8cab-e66be027adcf"
+  },
+  {
+    "id": "98bc3dc5-a418-4f62-b7cc-b16f03e09849",
+    "course_group_id": "cd0b1d7b-802e-46a0-8518-53165f068edb",
+    "session_date": "2026-10-22",
+    "start_datetime": "2026-10-22T17:00:00.000Z",
+    "end_datetime": "2026-10-22T19:00:00.000Z",
+    "is_completed": false,
+    "room_id": "54441d45-6042-4416-8cab-e66be027adcf"
+  },
+  {
+    "id": "cb1255d4-65bc-4be4-a738-fadc5dc12c2c",
+    "course_group_id": "cd0b1d7b-802e-46a0-8518-53165f068edb",
+    "session_date": "2026-05-16",
+    "start_datetime": "2026-05-16T16:00:00.000Z",
+    "end_datetime": "2026-05-16T17:00:00.000Z",
+    "is_completed": false,
+    "room_id": "54441d45-6042-4416-8cab-e66be027adcf"
+  },
+  {
+    "id": "b7ce7ef1-5728-476d-8b72-6bc13fbcfc7a",
+    "course_group_id": "cd0b1d7b-802e-46a0-8518-53165f068edb",
+    "session_date": "2026-10-01",
+    "start_datetime": "2026-10-01T15:00:00.000Z",
+    "end_datetime": "2026-10-01T16:30:00.000Z",
+    "is_completed": true,
+    "room_id": "767819c5-cf10-433e-9a93-55ab4e95709d"
+  },
+  {
+    "id": "1f8d6305-dd8e-41ae-99b3-2ab70e3b4bab",
+    "course_group_id": "cd0b1d7b-802e-46a0-8518-53165f068edb",
+    "session_date": "2026-04-22",
+    "start_datetime": "2026-04-22T16:00:00.000Z",
+    "end_datetime": "2026-04-22T17:30:00.000Z",
+    "is_completed": true,
+    "room_id": "767819c5-cf10-433e-9a93-55ab4e95709d"
+  },
+  {
+    "id": "c84446db-ef7a-47a3-89af-07a2f9ca1c61",
+    "course_group_id": "cd0b1d7b-802e-46a0-8518-53165f068edb",
+    "session_date": "2026-01-18",
+    "start_datetime": "2026-01-18T15:00:00.000Z",
+    "end_datetime": "2026-01-18T17:00:00.000Z",
+    "is_completed": true,
+    "room_id": "54441d45-6042-4416-8cab-e66be027adcf"
+  },
+  {
+    "id": "9dab189e-6623-42f3-b827-16fd31a13db9",
+    "course_group_id": "cd0b1d7b-802e-46a0-8518-53165f068edb",
+    "session_date": "2026-02-14",
+    "start_datetime": "2026-02-14T15:00:00.000Z",
+    "end_datetime": "2026-02-14T16:30:00.000Z",
+    "is_completed": false,
+    "room_id": "767819c5-cf10-433e-9a93-55ab4e95709d"
+  },
+  {
+    "id": "90c15e48-c403-403b-96c1-8fff9ea096b5",
+    "course_group_id": "cd0b1d7b-802e-46a0-8518-53165f068edb",
+    "session_date": "2026-06-27",
+    "start_datetime": "2026-06-27T16:00:00.000Z",
+    "end_datetime": "2026-06-27T17:30:00.000Z",
+    "is_completed": true,
+    "room_id": "54441d45-6042-4416-8cab-e66be027adcf"
+  },
+  {
+    "id": "2f3a58d7-e4c7-4ed9-9b93-daadcc77c0ee",
+    "course_group_id": "dcecc607-5ec8-40cc-a4f1-4dd0dd1b11ec",
+    "session_date": "2026-08-21",
+    "start_datetime": "2026-08-21T16:00:00.000Z",
+    "end_datetime": "2026-08-21T18:00:00.000Z",
+    "is_completed": false,
+    "room_id": "767819c5-cf10-433e-9a93-55ab4e95709d"
+  },
+  {
+    "id": "ebacae4e-6795-4d18-8b6b-d7fad1746b63",
+    "course_group_id": "dcecc607-5ec8-40cc-a4f1-4dd0dd1b11ec",
+    "session_date": "2026-12-05",
+    "start_datetime": "2026-12-05T17:00:00.000Z",
+    "end_datetime": "2026-12-05T18:00:00.000Z",
+    "is_completed": false,
+    "room_id": "767819c5-cf10-433e-9a93-55ab4e95709d"
+  },
+  {
+    "id": "c276a187-1255-43cc-b194-b1472321873e",
+    "course_group_id": "dcecc607-5ec8-40cc-a4f1-4dd0dd1b11ec",
+    "session_date": "2026-09-20",
+    "start_datetime": "2026-09-20T17:00:00.000Z",
+    "end_datetime": "2026-09-20T18:30:00.000Z",
+    "is_completed": false,
+    "room_id": "54441d45-6042-4416-8cab-e66be027adcf"
+  },
+  {
+    "id": "60b59e39-8ba2-41b4-9bd3-ff0b818f544e",
+    "course_group_id": "dcecc607-5ec8-40cc-a4f1-4dd0dd1b11ec",
+    "session_date": "2026-07-21",
+    "start_datetime": "2026-07-21T16:00:00.000Z",
+    "end_datetime": "2026-07-21T17:00:00.000Z",
+    "is_completed": false,
+    "room_id": "54441d45-6042-4416-8cab-e66be027adcf"
+  },
+  {
+    "id": "2b9dd1cc-43f6-429a-9552-7d16fa899bcd",
+    "course_group_id": "dcecc607-5ec8-40cc-a4f1-4dd0dd1b11ec",
+    "session_date": "2026-08-07",
+    "start_datetime": "2026-08-07T15:00:00.000Z",
+    "end_datetime": "2026-08-07T16:00:00.000Z",
+    "is_completed": false,
+    "room_id": "767819c5-cf10-433e-9a93-55ab4e95709d"
+  },
+  {
+    "id": "e1743766-afe6-4e2b-805e-89d2e668e4c0",
+    "course_group_id": "dcecc607-5ec8-40cc-a4f1-4dd0dd1b11ec",
+    "session_date": "2026-07-25",
+    "start_datetime": "2026-07-25T17:00:00.000Z",
+    "end_datetime": "2026-07-25T19:00:00.000Z",
+    "is_completed": false,
+    "room_id": "54441d45-6042-4416-8cab-e66be027adcf"
+  },
+  {
+    "id": "65f4e222-7750-433c-a1fc-fb8ed951814d",
+    "course_group_id": "dcecc607-5ec8-40cc-a4f1-4dd0dd1b11ec",
+    "session_date": "2026-11-05",
+    "start_datetime": "2026-11-05T15:00:00.000Z",
+    "end_datetime": "2026-11-05T16:00:00.000Z",
+    "is_completed": false,
+    "room_id": "767819c5-cf10-433e-9a93-55ab4e95709d"
+  },
+  {
+    "id": "43577423-4ace-44ae-9c8c-ad35cdbf3e6b",
+    "course_group_id": "dcecc607-5ec8-40cc-a4f1-4dd0dd1b11ec",
+    "session_date": "2026-04-13",
+    "start_datetime": "2026-04-13T17:00:00.000Z",
+    "end_datetime": "2026-04-13T18:30:00.000Z",
+    "is_completed": true,
+    "room_id": "54441d45-6042-4416-8cab-e66be027adcf"
+  },
+  {
+    "id": "c9f09a63-fa94-4266-a749-48b32cb280aa",
+    "course_group_id": "dcecc607-5ec8-40cc-a4f1-4dd0dd1b11ec",
+    "session_date": "2026-01-02",
+    "start_datetime": "2026-01-02T17:00:00.000Z",
+    "end_datetime": "2026-01-02T18:00:00.000Z",
+    "is_completed": true,
+    "room_id": "54441d45-6042-4416-8cab-e66be027adcf"
+  },
+  {
+    "id": "2e74ed69-eedd-4904-b8ce-19e8e6a2acf8",
+    "course_group_id": "dcecc607-5ec8-40cc-a4f1-4dd0dd1b11ec",
+    "session_date": "2026-04-20",
+    "start_datetime": "2026-04-20T17:00:00.000Z",
+    "end_datetime": "2026-04-20T18:30:00.000Z",
+    "is_completed": true,
+    "room_id": "767819c5-cf10-433e-9a93-55ab4e95709d"
+  }
+]

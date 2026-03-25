@@ -1,0 +1,37 @@
+[
+  {
+    "id": "86f58ade-e981-4500-98ba-8d130780def7",
+    "title": "Salsa - İleri Seviye Kursu",
+    "description": "Minima tot deprecator adduco varietas spero.",
+    "discipline_id": "46843ac7-f481-48be-b4ea-06da1b516c02",
+    "level_id": "7f5e342c-a30b-46e0-a13d-476d683316b9"
+  },
+  {
+    "id": "4f9cbe5c-e011-4435-a6cf-cd455a6451be",
+    "title": "Bale - Yeni Başlayan Kursu",
+    "description": "Umbra fuga subito demoror alioqui.",
+    "discipline_id": "24177491-32be-4ea9-89af-56dc580c284b",
+    "level_id": "c7a5d5ad-e864-4dfd-8cd2-5133c56532f0"
+  },
+  {
+    "id": "8cfa834a-b6f1-4fe4-9d32-dac891783600",
+    "title": "Salsa - Yeni Başlayan Kursu",
+    "description": "Tego torqueo una aegre clibanus soluta umbra.",
+    "discipline_id": "46843ac7-f481-48be-b4ea-06da1b516c02",
+    "level_id": "c7a5d5ad-e864-4dfd-8cd2-5133c56532f0"
+  },
+  {
+    "id": "e86072a1-1709-4faa-a16e-fa847d93cb0d",
+    "title": "Salsa - İleri Seviye Kursu",
+    "description": "Carcer textus succurro natus suffragium depraedor nemo.",
+    "discipline_id": "46843ac7-f481-48be-b4ea-06da1b516c02",
+    "level_id": "7f5e342c-a30b-46e0-a13d-476d683316b9"
+  },
+  {
+    "id": "e77243f3-03a5-4ac5-966b-f5f0bc9a31e2",
+    "title": "Salsa - Yeni Başlayan Kursu",
+    "description": "Virtus tubineus recusandae verus sol patrocinor beatus deprimo aptus labore.",
+    "discipline_id": "46843ac7-f481-48be-b4ea-06da1b516c02",
+    "level_id": "c7a5d5ad-e864-4dfd-8cd2-5133c56532f0"
+  }
+]

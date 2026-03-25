@@ -1,0 +1,14 @@
+{% autoescape off %}
+Merhaba {{ user.username }},
+
+[{{ domain }}] uygulamasında kayıt olduğunuz için teşekkür ederiz.
+
+Hesabınızı aktif etmek ve giriş yapabilmek için lütfen aşağıdaki bağlantıya tıklayın:
+
+{{ verify_url }}
+
+Eğer bu isteği siz yapmadıysanız, bu e-postayı dikkate almayın.
+
+Saygılarımızla,
+{{ domain }} Ekibi
+{% endautoescape %}

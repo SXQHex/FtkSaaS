@@ -1,0 +1,2986 @@
+[
+  {
+    "id": "38919c58-1396-47d8-acec-4511402be340",
+    "user_id": "684da07a-2986-408b-8f9b-382b7d3ddd39",
+    "course_session_id": "f459c98c-4219-47b3-89b5-f88b79737814",
+    "membership_id": null,
+    "status": "Enrolled",
+    "enrolled_at": "2025-04-23T09:35:56.024Z"
+  },
+  {
+    "id": "95b0ff8a-a9ac-49ea-b1ff-192e4d5a71ec",
+    "user_id": "3b1eb72a-2e36-4e17-bf24-663567840207",
+    "course_session_id": "f459c98c-4219-47b3-89b5-f88b79737814",
+    "membership_id": null,
+    "status": "Enrolled",
+    "enrolled_at": "2025-11-26T20:46:10.084Z"
+  },
+  {
+    "id": "b36e03eb-942a-4a8b-9792-1728151566ff",
+    "user_id": "be48e2c2-129b-4f06-a70b-4cfe68cf661e",
+    "course_session_id": "f459c98c-4219-47b3-89b5-f88b79737814",
+    "membership_id": null,
+    "status": "Enrolled",
+    "enrolled_at": "2025-06-17T09:22:45.751Z"
+  },
+  {
+    "id": "5de53dcf-a0e9-4e4f-b3e1-81c6a72f9898",
+    "user_id": "7dd17b7d-bea9-433c-95b3-2378cc8c86d4",
+    "course_session_id": "3c5416a1-202a-417a-8e04-8dcbe9272de3",
+    "membership_id": null,
+    "status": "Enrolled",
+    "enrolled_at": "2025-05-12T18:56:11.099Z"
+  },
+  {
+    "id": "2eb17c5e-977e-473f-b95c-4fb6068a140e",
+    "user_id": "b018ab06-64be-4b6a-8b57-c91a7d62ad22",
+    "course_session_id": "3c5416a1-202a-417a-8e04-8dcbe9272de3",
+    "membership_id": null,
+    "status": "Enrolled",
+    "enrolled_at": "2026-01-31T19:22:01.025Z"
+  },
+  {
+    "id": "9587536d-6d36-45ac-ab8e-1af5d5172e3b",
+    "user_id": "2742d149-666f-4e3b-9fcd-07041fdb1afa",
+    "course_session_id": "3c5416a1-202a-417a-8e04-8dcbe9272de3",
+    "membership_id": null,
+    "status": "Enrolled",
+    "enrolled_at": "2025-12-15T22:41:55.685Z"
+  },
+  {
+    "id": "924cf166-90d8-418f-bbd7-f0b94940652a",
+    "user_id": "1977fab3-b903-41f5-9829-6403fbbddb61",
+    "course_session_id": "3c5416a1-202a-417a-8e04-8dcbe9272de3",
+    "membership_id": null,
+    "status": "Enrolled",
+    "enrolled_at": "2025-11-30T00:04:08.077Z"
+  },
+  {
+    "id": "110a9287-7680-485c-8d58-018fd0a8371e",
+    "user_id": "be48e2c2-129b-4f06-a70b-4cfe68cf661e",
+    "course_session_id": "3c5416a1-202a-417a-8e04-8dcbe9272de3",
+    "membership_id": null,
+    "status": "Enrolled",
+    "enrolled_at": "2025-12-07T23:44:48.703Z"
+  },
+  {
+    "id": "3611d089-fe49-4d61-925c-15db952598fe",
+    "user_id": "051ad41c-7453-4576-a2e7-f73f5cf85533",
+    "course_session_id": "2e8df3dd-8458-4245-9455-8286d403a7d6",
+    "membership_id": null,
+    "status": "Enrolled",
+    "enrolled_at": "2025-07-09T15:26:46.335Z"
+  },
+  {
+    "id": "fbc304a9-7a60-412a-9b39-054954d3a376",
+    "user_id": "b6722aa7-92c5-44d8-aa44-f07126a59731",
+    "course_session_id": "c7a06976-0226-4542-9b7a-67220ee601d5",
+    "membership_id": null,
+    "status": "Enrolled",
+    "enrolled_at": "2025-08-14T02:36:19.306Z"
+  },
+  {
+    "id": "2d5aaf54-5fa3-4fff-a40a-d6676df10354",
+    "user_id": "3c5d3324-666b-49d6-9840-24f002409a04",
+    "course_session_id": "c7a06976-0226-4542-9b7a-67220ee601d5",
+    "membership_id": null,
+    "status": "Enrolled",
+    "enrolled_at": "2026-02-15T02:51:31.686Z"
+  },
+  {
+    "id": "c0a38d31-4d8c-4e64-a869-cd69ad0115c9",
+    "user_id": "276b5dd4-d4ca-4772-aa14-55d716f025f1",
+    "course_session_id": "c7a06976-0226-4542-9b7a-67220ee601d5",
+    "membership_id": null,
+    "status": "Enrolled",
+    "enrolled_at": "2025-09-04T06:22:00.984Z"
+  },
+  {
+    "id": "6e6eb1d3-b69e-4135-ba5d-93d394b9daac",
+    "user_id": "b6722aa7-92c5-44d8-aa44-f07126a59731",
+    "course_session_id": "8108aae1-e8f0-4eb1-88b8-d4b8c1b62dc8",
+    "membership_id": null,
+    "status": "Enrolled",
+    "enrolled_at": "2026-03-08T14:35:15.083Z"
+  },
+  {
+    "id": "d9d9f4ec-2607-48c6-98a1-24239d2c177a",
+    "user_id": "c532e090-614f-4d4b-98de-b2f842bbda21",
+    "course_session_id": "8108aae1-e8f0-4eb1-88b8-d4b8c1b62dc8",
+    "membership_id": null,
+    "status": "Enrolled",
+    "enrolled_at": "2025-05-16T05:11:39.951Z"
+  },
+  {
+    "id": "acf79c51-4341-4da2-84a9-a0619a4f6806",
+    "user_id": "1cee369d-a706-4048-90fd-65c6a85e13ef",
+    "course_session_id": "3d9b30ca-1554-47b1-95df-541ff817b2de",
+    "membership_id": null,
+    "status": "Enrolled",
+    "enrolled_at": "2025-11-30T19:52:27.756Z"
+  },
+  {
+    "id": "3badebdf-c79c-46ef-888d-ffe23fb708a2",
+    "user_id": "532b3ad9-45ce-497b-8da2-d75399474fe0",
+    "course_session_id": "3d9b30ca-1554-47b1-95df-541ff817b2de",
+    "membership_id": null,
+    "status": "Enrolled",
+    "enrolled_at": "2026-01-04T19:11:19.257Z"
+  },
+  {
+    "id": "18d75759-3ec0-4eba-bdd8-54dbb14c030e",
+    "user_id": "afb932a6-f877-40ba-b8f7-3988913c1e9b",
+    "course_session_id": "3d9b30ca-1554-47b1-95df-541ff817b2de",
+    "membership_id": null,
+    "status": "Enrolled",
+    "enrolled_at": "2026-01-07T18:01:06.976Z"
+  },
+  {
+    "id": "8c502a97-4249-4dc2-8371-8df9c0829366",
+    "user_id": "9ad5f2b9-d18d-498e-a56b-a2f4453e54c0",
+    "course_session_id": "3d9b30ca-1554-47b1-95df-541ff817b2de",
+    "membership_id": null,
+    "status": "Enrolled",
+    "enrolled_at": "2025-04-23T20:06:42.181Z"
+  },
+  {
+    "id": "3d705d2e-5fcf-4300-ae0e-37cf48589ba5",
+    "user_id": "c40632ad-c573-4b6b-ac73-67a2c610654d",
+    "course_session_id": "3d9b30ca-1554-47b1-95df-541ff817b2de",
+    "membership_id": null,
+    "status": "Enrolled",
+    "enrolled_at": "2025-12-03T15:07:49.796Z"
+  },
+  {
+    "id": "25c3d55c-971f-4770-94a9-681b91f548cb",
+    "user_id": "a7c68af4-b74c-490e-991d-efd26cc3b03e",
+    "course_session_id": "cb3b63db-d6fb-4041-a1f0-26977b3d08e5",
+    "membership_id": null,
+    "status": "Enrolled",
+    "enrolled_at": "2025-07-22T09:48:08.611Z"
+  },
+  {
+    "id": "ff072116-c4a7-429e-aeb3-3a818c43d458",
+    "user_id": "8e4a85a9-76b9-45fa-9ebb-bb210d3b733b",
+    "course_session_id": "6efabe19-d6f2-4a63-b83d-5269a349aed2",
+    "membership_id": null,
+    "status": "Enrolled",
+    "enrolled_at": "2026-05-04T17:43:37.395Z"
+  },
+  {
+    "id": "a013dd05-9d8b-4f42-a926-d62f98b8734d",
+    "user_id": "35623e13-469a-4157-9352-6bb49ef7a4e0",
+    "course_session_id": "6efabe19-d6f2-4a63-b83d-5269a349aed2",
+    "membership_id": null,
+    "status": "Enrolled",
+    "enrolled_at": "2025-10-07T21:39:04.732Z"
+  },
+  {
+    "id": "21314006-083e-403e-bead-05f7403eb0a6",
+    "user_id": "08d3abc2-3d3a-4c2e-94e7-9039eb1eea48",
+    "course_session_id": "6efabe19-d6f2-4a63-b83d-5269a349aed2",
+    "membership_id": null,
+    "status": "Enrolled",
+    "enrolled_at": "2026-01-21T09:11:35.583Z"
+  },
+  {
+    "id": "1a95c435-ef21-4f39-b5a4-a64380c258cb",
+    "user_id": "1cee369d-a706-4048-90fd-65c6a85e13ef",
+    "course_session_id": "35e7c1b7-4558-4843-8cae-7133f8515d23",
+    "membership_id": null,
+    "status": "Enrolled",
+    "enrolled_at": "2026-03-17T06:13:44.517Z"
+  },
+  {
+    "id": "8813be6d-803d-469a-8742-cff8d3e09204",
+    "user_id": "2742d149-666f-4e3b-9fcd-07041fdb1afa",
+    "course_session_id": "35e7c1b7-4558-4843-8cae-7133f8515d23",
+    "membership_id": null,
+    "status": "Enrolled",
+    "enrolled_at": "2026-07-02T09:40:46.676Z"
+  },
+  {
+    "id": "3e8cff68-8e9d-4ab0-8bc2-c0d06be7cd42",
+    "user_id": "b018ab06-64be-4b6a-8b57-c91a7d62ad22",
+    "course_session_id": "2644a36a-5b2d-43cc-a760-30bf1c781124",
+    "membership_id": null,
+    "status": "Enrolled",
+    "enrolled_at": "2026-06-17T06:35:59.885Z"
+  },
+  {
+    "id": "b204db0c-210b-495d-8c72-dd01f7bd4be6",
+    "user_id": "41ebb534-d9b8-44c0-80c1-00d99d736a58",
+    "course_session_id": "2644a36a-5b2d-43cc-a760-30bf1c781124",
+    "membership_id": null,
+    "status": "Enrolled",
+    "enrolled_at": "2026-08-26T02:29:02.149Z"
+  },
+  {
+    "id": "8c36b21c-1007-4bdf-ad22-6098ad703bf0",
+    "user_id": "a8acea85-d91d-4203-85a9-30180cf2d73a",
+    "course_session_id": "8e07054e-5788-4ac8-bf00-2b6043061670",
+    "membership_id": null,
+    "status": "Enrolled",
+    "enrolled_at": "2025-11-27T03:06:11.009Z"
+  },
+  {
+    "id": "d027e16c-82c8-46cb-b28b-67640f4386b9",
+    "user_id": "ae3c0fa3-d364-4d7e-8ca1-2b36f237e255",
+    "course_session_id": "8e07054e-5788-4ac8-bf00-2b6043061670",
+    "membership_id": null,
+    "status": "Enrolled",
+    "enrolled_at": "2025-11-20T02:37:29.099Z"
+  },
+  {
+    "id": "b6639ce3-4205-4173-85c9-7f9aea8c3d9e",
+    "user_id": "72fdff62-8495-432e-85eb-69604f17c2d4",
+    "course_session_id": "8e07054e-5788-4ac8-bf00-2b6043061670",
+    "membership_id": null,
+    "status": "Enrolled",
+    "enrolled_at": "2026-03-05T01:47:55.347Z"
+  },
+  {
+    "id": "4b06588b-4ea5-41e6-8cf9-e633300f50e8",
+    "user_id": "3ecdac3c-def4-4954-ac30-a10116fb8b97",
+    "course_session_id": "8b1b270e-bbc9-4a72-b718-88737afaaca4",
+    "membership_id": null,
+    "status": "Enrolled",
+    "enrolled_at": "2026-11-05T23:18:33.072Z"
+  },
+  {
+    "id": "4b822d90-c3ab-45d0-b9a8-3cf388809fa3",
+    "user_id": "afb932a6-f877-40ba-b8f7-3988913c1e9b",
+    "course_session_id": "8b1b270e-bbc9-4a72-b718-88737afaaca4",
+    "membership_id": null,
+    "status": "Enrolled",
+    "enrolled_at": "2026-10-16T06:45:48.883Z"
+  },
+  {
+    "id": "d94fbf2f-2e5a-449d-a40c-4ba11f285ed0",
+    "user_id": "ebcec7ea-5698-4146-a791-f31a69787f91",
+    "course_session_id": "8b1b270e-bbc9-4a72-b718-88737afaaca4",
+    "membership_id": null,
+    "status": "Enrolled",
+    "enrolled_at": "2026-08-12T22:13:25.008Z"
+  },
+  {
+    "id": "997bc37c-e9df-461a-af05-6bdd609d9d77",
+    "user_id": "7e66a6eb-08a5-4550-8c3a-c18995dee934",
+    "course_session_id": "70846c52-5fd3-46f3-a094-75b4ead6a852",
+    "membership_id": null,
+    "status": "Enrolled",
+    "enrolled_at": "2026-05-06T13:54:37.486Z"
+  },
+  {
+    "id": "2c7dada5-c9b8-4763-8fda-95259976833c",
+    "user_id": "ae3c0fa3-d364-4d7e-8ca1-2b36f237e255",
+    "course_session_id": "a5126695-4edd-4154-8c63-15869497464e",
+    "membership_id": null,
+    "status": "Enrolled",
+    "enrolled_at": "2026-07-21T11:11:04.386Z"
+  },
+  {
+    "id": "5c36aee7-f9c7-4b70-8c2c-ab7c16c84b01",
+    "user_id": "2309b086-27db-46e7-92aa-9ca87a34913d",
+    "course_session_id": "af0ffd28-7fd5-4054-bcda-2fe10422cb52",
+    "membership_id": null,
+    "status": "Enrolled",
+    "enrolled_at": "2025-10-21T06:29:57.386Z"
+  },
+  {
+    "id": "531cbc5d-a0d7-42aa-91b0-bc6127dff546",
+    "user_id": "331964dd-292c-4174-8036-cbe4a081789c",
+    "course_session_id": "af0ffd28-7fd5-4054-bcda-2fe10422cb52",
+    "membership_id": null,
+    "status": "Enrolled",
+    "enrolled_at": "2026-03-02T04:35:18.750Z"
+  },
+  {
+    "id": "041b056d-6bba-4646-942a-26d6a8031dcf",
+    "user_id": "276b5dd4-d4ca-4772-aa14-55d716f025f1",
+    "course_session_id": "af0ffd28-7fd5-4054-bcda-2fe10422cb52",
+    "membership_id": null,
+    "status": "Enrolled",
+    "enrolled_at": "2026-02-15T16:11:47.025Z"
+  },
+  {
+    "id": "fc81e4f6-ab49-4191-a593-017bf14b182a",
+    "user_id": "32a429a6-d76c-4d9f-947f-5bfedcdbc338",
+    "course_session_id": "34d1342a-3b39-45da-8c04-a78267ced0b7",
+    "membership_id": null,
+    "status": "Enrolled",
+    "enrolled_at": "2026-02-21T20:46:20.540Z"
+  },
+  {
+    "id": "0abf27a1-25a8-4891-a046-e1130bbaa45a",
+    "user_id": "edbc586e-a3e1-46c3-a803-aec46510b4ff",
+    "course_session_id": "34d1342a-3b39-45da-8c04-a78267ced0b7",
+    "membership_id": null,
+    "status": "Enrolled",
+    "enrolled_at": "2025-09-09T02:57:46.932Z"
+  },
+  {
+    "id": "4c866ba7-6001-4836-963a-8e6ee2af5066",
+    "user_id": "a8acea85-d91d-4203-85a9-30180cf2d73a",
+    "course_session_id": "34d1342a-3b39-45da-8c04-a78267ced0b7",
+    "membership_id": null,
+    "status": "Enrolled",
+    "enrolled_at": "2025-12-19T23:55:28.210Z"
+  },
+  {
+    "id": "fdd22572-4019-4879-bb75-f72f2977cc5d",
+    "user_id": "2742d149-666f-4e3b-9fcd-07041fdb1afa",
+    "course_session_id": "34d1342a-3b39-45da-8c04-a78267ced0b7",
+    "membership_id": null,
+    "status": "Enrolled",
+    "enrolled_at": "2026-04-27T15:35:25.829Z"
+  },
+  {
+    "id": "3ac22eaf-8bfe-4132-a187-81d1a4326609",
+    "user_id": "7848b498-0806-4843-9c8a-b55d3771b0bb",
+    "course_session_id": "834b8c83-a582-4799-ba0c-b51cd35a880e",
+    "membership_id": null,
+    "status": "Enrolled",
+    "enrolled_at": "2026-03-25T01:23:45.025Z"
+  },
+  {
+    "id": "1063762f-36e8-4136-9961-f1fdafba7e9a",
+    "user_id": "57e9731e-815c-45dd-8778-0c55ac2c64c8",
+    "course_session_id": "834b8c83-a582-4799-ba0c-b51cd35a880e",
+    "membership_id": null,
+    "status": "Enrolled",
+    "enrolled_at": "2025-11-18T03:04:34.518Z"
+  },
+  {
+    "id": "64372fc9-78de-4a84-a6c0-2aa01743ec58",
+    "user_id": "7848b498-0806-4843-9c8a-b55d3771b0bb",
+    "course_session_id": "b36ebeff-5411-41af-804e-6331a5002d25",
+    "membership_id": null,
+    "status": "Enrolled",
+    "enrolled_at": "2026-07-15T14:58:15.761Z"
+  },
+  {
+    "id": "dc349bf2-368f-47f7-88a3-2c43669cd22c",
+    "user_id": "b6722aa7-92c5-44d8-aa44-f07126a59731",
+    "course_session_id": "62cd35ec-90e1-450a-818a-46776560c258",
+    "membership_id": null,
+    "status": "Enrolled",
+    "enrolled_at": "2025-11-07T13:33:08.505Z"
+  },
+  {
+    "id": "2e956fa4-af07-4466-ad66-d6810c92c997",
+    "user_id": "ceab0fa9-dafc-4a20-b19a-f93e2a6b2b5f",
+    "course_session_id": "62cd35ec-90e1-450a-818a-46776560c258",
+    "membership_id": null,
+    "status": "Enrolled",
+    "enrolled_at": "2026-03-25T14:36:22.229Z"
+  },
+  {
+    "id": "23a9b7ef-59a2-4879-a455-60cf38c43eba",
+    "user_id": "28c95fd7-8121-4e24-b6f5-0c57ef82b734",
+    "course_session_id": "62cd35ec-90e1-450a-818a-46776560c258",
+    "membership_id": null,
+    "status": "Enrolled",
+    "enrolled_at": "2026-08-08T02:48:41.491Z"
+  },
+  {
+    "id": "274f28ce-2d5b-482c-93ea-f4283b48902f",
+    "user_id": "051ad41c-7453-4576-a2e7-f73f5cf85533",
+    "course_session_id": "69d54c64-1ceb-4108-a47c-594cc2941543",
+    "membership_id": null,
+    "status": "Enrolled",
+    "enrolled_at": "2026-09-04T06:34:09.204Z"
+  },
+  {
+    "id": "fe34c787-e23f-485d-bc49-e595017a531e",
+    "user_id": "a7c68af4-b74c-490e-991d-efd26cc3b03e",
+    "course_session_id": "69d54c64-1ceb-4108-a47c-594cc2941543",
+    "membership_id": null,
+    "status": "Enrolled",
+    "enrolled_at": "2026-01-17T01:12:15.521Z"
+  },
+  {
+    "id": "5a1c84bd-696c-4697-bfc4-e612c4744ebb",
+    "user_id": "5a578939-bf89-4e5c-8d2a-6d5c25b8169d",
+    "course_session_id": "69d54c64-1ceb-4108-a47c-594cc2941543",
+    "membership_id": null,
+    "status": "Enrolled",
+    "enrolled_at": "2026-09-17T13:46:18.233Z"
+  },
+  {
+    "id": "220ad214-ae1c-470c-8415-f5e8fc151547",
+    "user_id": "d80ed918-962a-475e-9038-7e52a101f533",
+    "course_session_id": "69d54c64-1ceb-4108-a47c-594cc2941543",
+    "membership_id": null,
+    "status": "Enrolled",
+    "enrolled_at": "2026-06-01T18:53:45.318Z"
+  },
+  {
+    "id": "1b40b2d1-ab5c-4ecb-aac7-2063be0414e0",
+    "user_id": "c40632ad-c573-4b6b-ac73-67a2c610654d",
+    "course_session_id": "69d54c64-1ceb-4108-a47c-594cc2941543",
+    "membership_id": null,
+    "status": "Enrolled",
+    "enrolled_at": "2026-06-03T15:15:34.325Z"
+  },
+  {
+    "id": "a9b13753-3a8a-4e87-9f0d-3d0a8b698a7b",
+    "user_id": "5a578939-bf89-4e5c-8d2a-6d5c25b8169d",
+    "course_session_id": "5cc85e20-d419-418a-89bb-1d1ece6eee3f",
+    "membership_id": null,
+    "status": "Enrolled",
+    "enrolled_at": "2025-10-31T07:03:13.469Z"
+  },
+  {
+    "id": "c8323fe1-e858-457c-8300-4ad6d6fbe733",
+    "user_id": "1cee369d-a706-4048-90fd-65c6a85e13ef",
+    "course_session_id": "6193e820-3aa1-4f04-b69c-3126b39a4f48",
+    "membership_id": null,
+    "status": "Enrolled",
+    "enrolled_at": "2026-12-27T03:46:57.424Z"
+  },
+  {
+    "id": "e6f8608f-045a-41de-9b0a-307bbec0dac0",
+    "user_id": "c532e090-614f-4d4b-98de-b2f842bbda21",
+    "course_session_id": "6193e820-3aa1-4f04-b69c-3126b39a4f48",
+    "membership_id": null,
+    "status": "Enrolled",
+    "enrolled_at": "2027-01-03T08:17:02.808Z"
+  },
+  {
+    "id": "6de0cf3c-1f20-4100-9977-970f37731509",
+    "user_id": "1977fab3-b903-41f5-9829-6403fbbddb61",
+    "course_session_id": "32839cdf-dbd2-4d49-b8dd-6dcbd360953b",
+    "membership_id": null,
+    "status": "Enrolled",
+    "enrolled_at": "2026-03-29T10:26:12.545Z"
+  },
+  {
+    "id": "457995d3-28cb-445b-b749-9159650126d5",
+    "user_id": "55b2c18e-2678-497f-8a14-19f210b80831",
+    "course_session_id": "32839cdf-dbd2-4d49-b8dd-6dcbd360953b",
+    "membership_id": null,
+    "status": "Enrolled",
+    "enrolled_at": "2026-01-07T11:51:03.641Z"
+  },
+  {
+    "id": "5ae64926-3080-43d0-bc86-4e124b862b5b",
+    "user_id": "d80ed918-962a-475e-9038-7e52a101f533",
+    "course_session_id": "32839cdf-dbd2-4d49-b8dd-6dcbd360953b",
+    "membership_id": null,
+    "status": "Enrolled",
+    "enrolled_at": "2026-02-07T22:50:48.066Z"
+  },
+  {
+    "id": "123fcb8c-a59c-4f7a-bcb2-27394edfb297",
+    "user_id": "9ad5f2b9-d18d-498e-a56b-a2f4453e54c0",
+    "course_session_id": "32839cdf-dbd2-4d49-b8dd-6dcbd360953b",
+    "membership_id": null,
+    "status": "Enrolled",
+    "enrolled_at": "2025-11-28T13:09:57.858Z"
+  },
+  {
+    "id": "8eaf362a-a389-47b0-8363-2a01f9c8d6a8",
+    "user_id": "246dc918-cf11-4b5d-9555-d5dd46758595",
+    "course_session_id": "32839cdf-dbd2-4d49-b8dd-6dcbd360953b",
+    "membership_id": null,
+    "status": "Enrolled",
+    "enrolled_at": "2025-08-07T23:56:02.557Z"
+  },
+  {
+    "id": "a0b8faf8-87f8-4a39-9e8a-244b92853f5d",
+    "user_id": "5a578939-bf89-4e5c-8d2a-6d5c25b8169d",
+    "course_session_id": "989c971d-39d8-4614-8275-98c39d148ace",
+    "membership_id": null,
+    "status": "Enrolled",
+    "enrolled_at": "2026-07-24T07:33:21.202Z"
+  },
+  {
+    "id": "5d0f2d9a-2375-4713-94a0-522b3d6d0d4f",
+    "user_id": "ebcec7ea-5698-4146-a791-f31a69787f91",
+    "course_session_id": "95a8ac23-d17a-4698-9283-15f7c04cca63",
+    "membership_id": null,
+    "status": "Enrolled",
+    "enrolled_at": "2026-07-03T18:18:34.938Z"
+  },
+  {
+    "id": "d7538e97-330f-4e76-829b-37c1e6fd7403",
+    "user_id": "e792d825-42ac-4bf5-85e9-f01e16044372",
+    "course_session_id": "95a8ac23-d17a-4698-9283-15f7c04cca63",
+    "membership_id": null,
+    "status": "Enrolled",
+    "enrolled_at": "2026-04-18T09:33:27.950Z"
+  },
+  {
+    "id": "90c316bc-c02d-4a2c-91bd-f950faa4798d",
+    "user_id": "ceab0fa9-dafc-4a20-b19a-f93e2a6b2b5f",
+    "course_session_id": "95a8ac23-d17a-4698-9283-15f7c04cca63",
+    "membership_id": null,
+    "status": "Enrolled",
+    "enrolled_at": "2026-07-27T11:47:19.453Z"
+  },
+  {
+    "id": "6dcd4fbc-90f1-4e64-8b32-b7d3d0b43a01",
+    "user_id": "3fa4dee5-522b-4463-a4b8-b539278d2e22",
+    "course_session_id": "e759f440-96ec-4e81-bfc0-a3fdc9e4f4e5",
+    "membership_id": null,
+    "status": "Enrolled",
+    "enrolled_at": "2026-01-29T21:41:46.630Z"
+  },
+  {
+    "id": "2e3b82f5-9e1a-419e-97ac-18329edeca55",
+    "user_id": "944456d6-5f42-4a1f-ab65-98ad7da0e030",
+    "course_session_id": "b032e440-d14a-4ce9-9776-d0288bfb1917",
+    "membership_id": null,
+    "status": "Enrolled",
+    "enrolled_at": "2025-10-18T15:13:20.373Z"
+  },
+  {
+    "id": "6ae3e305-9114-4b3c-a5c0-857e3ecf45a5",
+    "user_id": "7e66a6eb-08a5-4550-8c3a-c18995dee934",
+    "course_session_id": "0b2ccf9b-5eb5-422b-b577-7b19554860a8",
+    "membership_id": null,
+    "status": "Enrolled",
+    "enrolled_at": "2026-03-30T11:27:07.104Z"
+  },
+  {
+    "id": "95b43ceb-9c6f-4cea-81f2-dcd2c6cd5de7",
+    "user_id": "7848b498-0806-4843-9c8a-b55d3771b0bb",
+    "course_session_id": "0b2ccf9b-5eb5-422b-b577-7b19554860a8",
+    "membership_id": null,
+    "status": "Enrolled",
+    "enrolled_at": "2026-06-02T23:20:55.052Z"
+  },
+  {
+    "id": "dc053fcd-7293-46cc-b5b7-aad7f9b3fd3b",
+    "user_id": "28c95fd7-8121-4e24-b6f5-0c57ef82b734",
+    "course_session_id": "0b2ccf9b-5eb5-422b-b577-7b19554860a8",
+    "membership_id": null,
+    "status": "Enrolled",
+    "enrolled_at": "2025-08-26T01:00:02.095Z"
+  },
+  {
+    "id": "16c286dd-e3fe-469d-b016-916aa37721da",
+    "user_id": "5a578939-bf89-4e5c-8d2a-6d5c25b8169d",
+    "course_session_id": "0b2ccf9b-5eb5-422b-b577-7b19554860a8",
+    "membership_id": null,
+    "status": "Enrolled",
+    "enrolled_at": "2025-07-26T07:08:19.945Z"
+  },
+  {
+    "id": "27b29be4-e16c-4bdd-8f4a-cd7ade9ea5a1",
+    "user_id": "c532e090-614f-4d4b-98de-b2f842bbda21",
+    "course_session_id": "0b2ccf9b-5eb5-422b-b577-7b19554860a8",
+    "membership_id": null,
+    "status": "Enrolled",
+    "enrolled_at": "2025-12-04T16:55:07.156Z"
+  },
+  {
+    "id": "cfb3e76e-5c1e-4ea6-a04f-11d47172637e",
+    "user_id": "944456d6-5f42-4a1f-ab65-98ad7da0e030",
+    "course_session_id": "599be917-4517-461a-baaa-2f887ce490e9",
+    "membership_id": null,
+    "status": "Enrolled",
+    "enrolled_at": "2026-10-02T19:59:21.729Z"
+  },
+  {
+    "id": "ba76af8a-a3d8-4251-81da-c2c295cfd06b",
+    "user_id": "41ebb534-d9b8-44c0-80c1-00d99d736a58",
+    "course_session_id": "599be917-4517-461a-baaa-2f887ce490e9",
+    "membership_id": null,
+    "status": "Enrolled",
+    "enrolled_at": "2026-01-30T06:50:00.668Z"
+  },
+  {
+    "id": "4b7e7363-4fc9-4f61-92ad-8c7e877ede76",
+    "user_id": "1977fab3-b903-41f5-9829-6403fbbddb61",
+    "course_session_id": "599be917-4517-461a-baaa-2f887ce490e9",
+    "membership_id": null,
+    "status": "Enrolled",
+    "enrolled_at": "2026-02-08T17:13:24.535Z"
+  },
+  {
+    "id": "a7d77393-b468-4a93-939d-310c05ae4a57",
+    "user_id": "32a429a6-d76c-4d9f-947f-5bfedcdbc338",
+    "course_session_id": "599be917-4517-461a-baaa-2f887ce490e9",
+    "membership_id": null,
+    "status": "Enrolled",
+    "enrolled_at": "2026-04-06T06:30:19.795Z"
+  },
+  {
+    "id": "778b892a-4478-4e25-a2d9-450b10b3ea27",
+    "user_id": "1cee369d-a706-4048-90fd-65c6a85e13ef",
+    "course_session_id": "cb1e0818-88ec-4cc9-bfd3-15ca268f742e",
+    "membership_id": null,
+    "status": "Enrolled",
+    "enrolled_at": "2026-11-16T01:58:18.589Z"
+  },
+  {
+    "id": "bd8dd24a-8e67-42d5-9df8-b897ba495171",
+    "user_id": "b6722aa7-92c5-44d8-aa44-f07126a59731",
+    "course_session_id": "cb1e0818-88ec-4cc9-bfd3-15ca268f742e",
+    "membership_id": null,
+    "status": "Enrolled",
+    "enrolled_at": "2026-05-03T15:27:12.818Z"
+  },
+  {
+    "id": "2a53a1ac-055e-4d81-aa50-3c958c99f8fa",
+    "user_id": "2742d149-666f-4e3b-9fcd-07041fdb1afa",
+    "course_session_id": "cb1e0818-88ec-4cc9-bfd3-15ca268f742e",
+    "membership_id": null,
+    "status": "Enrolled",
+    "enrolled_at": "2026-02-25T20:14:06.030Z"
+  },
+  {
+    "id": "38f0fa3b-2af5-4955-aae6-ce14cb10325f",
+    "user_id": "7848b498-0806-4843-9c8a-b55d3771b0bb",
+    "course_session_id": "93a9d27b-456a-4fd0-90af-49cb04f4b99f",
+    "membership_id": null,
+    "status": "Enrolled",
+    "enrolled_at": "2025-11-12T09:23:31.158Z"
+  },
+  {
+    "id": "d79a39f3-3193-47b8-a94c-70682a1f95a5",
+    "user_id": "d80ed918-962a-475e-9038-7e52a101f533",
+    "course_session_id": "0c8565d4-5984-4ca1-805c-f21a0a9b6165",
+    "membership_id": null,
+    "status": "Enrolled",
+    "enrolled_at": "2025-12-19T01:09:37.456Z"
+  },
+  {
+    "id": "ed37e44c-816f-4282-af1a-f38df1fa1d3d",
+    "user_id": "3fa57db7-f8cb-4ff9-8a35-d15a865d82b4",
+    "course_session_id": "0c8565d4-5984-4ca1-805c-f21a0a9b6165",
+    "membership_id": null,
+    "status": "Enrolled",
+    "enrolled_at": "2026-05-19T19:52:00.736Z"
+  },
+  {
+    "id": "5a43b26c-d2f5-4fa2-8c20-f53ee98816b7",
+    "user_id": "2309b086-27db-46e7-92aa-9ca87a34913d",
+    "course_session_id": "0c8565d4-5984-4ca1-805c-f21a0a9b6165",
+    "membership_id": null,
+    "status": "Enrolled",
+    "enrolled_at": "2026-08-18T18:09:08.963Z"
+  },
+  {
+    "id": "aa95beaa-48f4-45b7-b058-e66ee4b5e49d",
+    "user_id": "ebcec7ea-5698-4146-a791-f31a69787f91",
+    "course_session_id": "76d375a2-f812-4671-a70b-525cc00885f4",
+    "membership_id": null,
+    "status": "Enrolled",
+    "enrolled_at": "2026-04-01T00:29:37.562Z"
+  },
+  {
+    "id": "0575b310-f29f-4df5-a585-63a112543a43",
+    "user_id": "944456d6-5f42-4a1f-ab65-98ad7da0e030",
+    "course_session_id": "76d375a2-f812-4671-a70b-525cc00885f4",
+    "membership_id": null,
+    "status": "Enrolled",
+    "enrolled_at": "2025-09-18T19:33:26.475Z"
+  },
+  {
+    "id": "11adfdf9-e5b4-4d94-bd8c-324b3b9f3a11",
+    "user_id": "7e66a6eb-08a5-4550-8c3a-c18995dee934",
+    "course_session_id": "76d375a2-f812-4671-a70b-525cc00885f4",
+    "membership_id": null,
+    "status": "Enrolled",
+    "enrolled_at": "2026-07-01T07:23:11.443Z"
+  },
+  {
+    "id": "20c1c7c3-84ca-4567-a9ff-9151f03b4d6f",
+    "user_id": "2742d149-666f-4e3b-9fcd-07041fdb1afa",
+    "course_session_id": "f0dc5c9f-1195-4a9b-8602-701c6250dc3d",
+    "membership_id": null,
+    "status": "Enrolled",
+    "enrolled_at": "2026-05-16T02:24:12.387Z"
+  },
+  {
+    "id": "51975bfb-fe19-4673-b7e6-f68100ec5b69",
+    "user_id": "ebcec7ea-5698-4146-a791-f31a69787f91",
+    "course_session_id": "f0dc5c9f-1195-4a9b-8602-701c6250dc3d",
+    "membership_id": null,
+    "status": "Enrolled",
+    "enrolled_at": "2026-01-30T03:08:41.131Z"
+  },
+  {
+    "id": "ba348c93-300d-4742-87f5-8d1966f2fc3c",
+    "user_id": "9ad5f2b9-d18d-498e-a56b-a2f4453e54c0",
+    "course_session_id": "f0dc5c9f-1195-4a9b-8602-701c6250dc3d",
+    "membership_id": null,
+    "status": "Enrolled",
+    "enrolled_at": "2026-04-04T13:49:53.008Z"
+  },
+  {
+    "id": "5f778218-3bff-4fe9-a5d3-1b7f2b7fbea0",
+    "user_id": "73fcaa45-a519-452a-8781-ec1e35e0d800",
+    "course_session_id": "b7032514-130d-4659-a384-b2f2dd111af5",
+    "membership_id": null,
+    "status": "Enrolled",
+    "enrolled_at": "2026-01-11T13:48:24.879Z"
+  },
+  {
+    "id": "e2f08e24-26c4-4a1b-b3ae-ea76b214cd23",
+    "user_id": "7e66a6eb-08a5-4550-8c3a-c18995dee934",
+    "course_session_id": "b7032514-130d-4659-a384-b2f2dd111af5",
+    "membership_id": null,
+    "status": "Enrolled",
+    "enrolled_at": "2026-03-10T08:32:33.314Z"
+  },
+  {
+    "id": "61900fa4-534c-4597-84c7-96849823a6f0",
+    "user_id": "3fa4dee5-522b-4463-a4b8-b539278d2e22",
+    "course_session_id": "b7032514-130d-4659-a384-b2f2dd111af5",
+    "membership_id": null,
+    "status": "Enrolled",
+    "enrolled_at": "2026-05-09T10:06:43.597Z"
+  },
+  {
+    "id": "c91dc6a9-364a-4224-9d07-7ead4a708eb6",
+    "user_id": "5a578939-bf89-4e5c-8d2a-6d5c25b8169d",
+    "course_session_id": "b7032514-130d-4659-a384-b2f2dd111af5",
+    "membership_id": null,
+    "status": "Enrolled",
+    "enrolled_at": "2026-04-11T14:01:13.403Z"
+  },
+  {
+    "id": "db1ddef1-3fdc-4bc7-be11-ebdc64358048",
+    "user_id": "331964dd-292c-4174-8036-cbe4a081789c",
+    "course_session_id": "b7032514-130d-4659-a384-b2f2dd111af5",
+    "membership_id": null,
+    "status": "Enrolled",
+    "enrolled_at": "2026-08-03T04:32:41.222Z"
+  },
+  {
+    "id": "5223f225-c373-435b-818f-1599101d2a03",
+    "user_id": "9ad5f2b9-d18d-498e-a56b-a2f4453e54c0",
+    "course_session_id": "dc7ce4ab-b6b6-4608-a649-bf8136dd2613",
+    "membership_id": null,
+    "status": "Enrolled",
+    "enrolled_at": "2025-09-19T00:06:40.340Z"
+  },
+  {
+    "id": "eef148a3-ecb1-4609-bf85-25b0be43c31b",
+    "user_id": "08d3abc2-3d3a-4c2e-94e7-9039eb1eea48",
+    "course_session_id": "77eb53ef-05fa-46f5-bd0b-2570eda8eb7c",
+    "membership_id": null,
+    "status": "Enrolled",
+    "enrolled_at": "2025-11-23T04:25:22.517Z"
+  },
+  {
+    "id": "f0796dfb-4d5f-482f-b59e-a28bdfc95b50",
+    "user_id": "684da07a-2986-408b-8f9b-382b7d3ddd39",
+    "course_session_id": "77eb53ef-05fa-46f5-bd0b-2570eda8eb7c",
+    "membership_id": null,
+    "status": "Enrolled",
+    "enrolled_at": "2025-08-28T15:49:37.755Z"
+  },
+  {
+    "id": "9899af41-4ad6-4df5-8f66-5f25e0328501",
+    "user_id": "276b5dd4-d4ca-4772-aa14-55d716f025f1",
+    "course_session_id": "77eb53ef-05fa-46f5-bd0b-2570eda8eb7c",
+    "membership_id": null,
+    "status": "Enrolled",
+    "enrolled_at": "2025-10-01T09:27:18.986Z"
+  },
+  {
+    "id": "982d1741-6fd7-4038-8de1-84e80398b16e",
+    "user_id": "73fcaa45-a519-452a-8781-ec1e35e0d800",
+    "course_session_id": "a8c32229-449e-4a03-b60a-e41ee197c327",
+    "membership_id": null,
+    "status": "Enrolled",
+    "enrolled_at": "2025-08-20T16:57:29.392Z"
+  },
+  {
+    "id": "497ca144-ce9d-42e1-84b8-c053979f6d5e",
+    "user_id": "684da07a-2986-408b-8f9b-382b7d3ddd39",
+    "course_session_id": "a8c32229-449e-4a03-b60a-e41ee197c327",
+    "membership_id": null,
+    "status": "Enrolled",
+    "enrolled_at": "2025-09-10T23:42:37.257Z"
+  },
+  {
+    "id": "6fcb4662-cff0-4c7b-a6b4-d97e17974217",
+    "user_id": "b6722aa7-92c5-44d8-aa44-f07126a59731",
+    "course_session_id": "a8c32229-449e-4a03-b60a-e41ee197c327",
+    "membership_id": null,
+    "status": "Enrolled",
+    "enrolled_at": "2026-06-08T05:21:42.423Z"
+  },
+  {
+    "id": "0b1d7afd-8209-4108-a7c2-05c2b8064583",
+    "user_id": "edbc586e-a3e1-46c3-a803-aec46510b4ff",
+    "course_session_id": "a8c32229-449e-4a03-b60a-e41ee197c327",
+    "membership_id": null,
+    "status": "Enrolled",
+    "enrolled_at": "2025-10-13T13:45:29.890Z"
+  },
+  {
+    "id": "279a7bee-aad8-44fc-8cb0-198338b0c9da",
+    "user_id": "edbc586e-a3e1-46c3-a803-aec46510b4ff",
+    "course_session_id": "1927cceb-df62-42c6-89b6-d1d0b1e56cac",
+    "membership_id": null,
+    "status": "Enrolled",
+    "enrolled_at": "2026-08-03T10:57:23.318Z"
+  },
+  {
+    "id": "f039bfbd-2d60-4828-a37f-aace42b6eea8",
+    "user_id": "5a578939-bf89-4e5c-8d2a-6d5c25b8169d",
+    "course_session_id": "1927cceb-df62-42c6-89b6-d1d0b1e56cac",
+    "membership_id": null,
+    "status": "Enrolled",
+    "enrolled_at": "2026-10-13T21:33:02.032Z"
+  },
+  {
+    "id": "3ecb82b9-3a7d-4b3e-934e-6987056dfba5",
+    "user_id": "57e9731e-815c-45dd-8778-0c55ac2c64c8",
+    "course_session_id": "6e80949a-d7cd-486e-82f9-3bd68be9928e",
+    "membership_id": null,
+    "status": "Enrolled",
+    "enrolled_at": "2025-10-20T18:25:38.899Z"
+  },
+  {
+    "id": "85a16d85-70e4-4ce4-8c46-57ff97d68bd9",
+    "user_id": "1977fab3-b903-41f5-9829-6403fbbddb61",
+    "course_session_id": "6e80949a-d7cd-486e-82f9-3bd68be9928e",
+    "membership_id": null,
+    "status": "Enrolled",
+    "enrolled_at": "2025-12-31T16:42:26.352Z"
+  },
+  {
+    "id": "c3400f52-9e16-408e-be4f-2a19045e7fa9",
+    "user_id": "c40632ad-c573-4b6b-ac73-67a2c610654d",
+    "course_session_id": "6e80949a-d7cd-486e-82f9-3bd68be9928e",
+    "membership_id": null,
+    "status": "Enrolled",
+    "enrolled_at": "2026-07-21T09:01:30.672Z"
+  },
+  {
+    "id": "3c757d14-0d13-4340-b4aa-a6b35081dbba",
+    "user_id": "914a57ce-269c-4f59-95d1-1d20cface636",
+    "course_session_id": "6e80949a-d7cd-486e-82f9-3bd68be9928e",
+    "membership_id": null,
+    "status": "Enrolled",
+    "enrolled_at": "2026-05-25T10:40:27.776Z"
+  },
+  {
+    "id": "f800276b-68eb-4aa0-84b8-bf53e2c10fbf",
+    "user_id": "684da07a-2986-408b-8f9b-382b7d3ddd39",
+    "course_session_id": "6e80949a-d7cd-486e-82f9-3bd68be9928e",
+    "membership_id": null,
+    "status": "Enrolled",
+    "enrolled_at": "2026-05-16T11:52:03.417Z"
+  },
+  {
+    "id": "87ad0416-6497-4330-90e2-a8beebc2a3c3",
+    "user_id": "28c95fd7-8121-4e24-b6f5-0c57ef82b734",
+    "course_session_id": "33742911-f2d2-46fa-8729-4e17130cfe4f",
+    "membership_id": null,
+    "status": "Enrolled",
+    "enrolled_at": "2026-02-01T16:32:55.618Z"
+  },
+  {
+    "id": "a97e9eb1-7ade-4d29-a282-02406819d7d1",
+    "user_id": "7848b498-0806-4843-9c8a-b55d3771b0bb",
+    "course_session_id": "33742911-f2d2-46fa-8729-4e17130cfe4f",
+    "membership_id": null,
+    "status": "Enrolled",
+    "enrolled_at": "2026-07-20T12:40:53.969Z"
+  },
+  {
+    "id": "d5f11971-0478-4df9-86fb-b3d32ec01e50",
+    "user_id": "944456d6-5f42-4a1f-ab65-98ad7da0e030",
+    "course_session_id": "33742911-f2d2-46fa-8729-4e17130cfe4f",
+    "membership_id": null,
+    "status": "Enrolled",
+    "enrolled_at": "2025-12-02T21:03:31.890Z"
+  },
+  {
+    "id": "21b60080-e2e2-41f7-aa51-e34deb5e2e50",
+    "user_id": "684da07a-2986-408b-8f9b-382b7d3ddd39",
+    "course_session_id": "23bdbd6a-5e8d-46d9-996b-09d6a7b9499d",
+    "membership_id": null,
+    "status": "Enrolled",
+    "enrolled_at": "2026-01-14T02:28:12.826Z"
+  },
+  {
+    "id": "caf5e839-cf09-41d8-871f-35f4086f3aed",
+    "user_id": "532b3ad9-45ce-497b-8da2-d75399474fe0",
+    "course_session_id": "23bdbd6a-5e8d-46d9-996b-09d6a7b9499d",
+    "membership_id": null,
+    "status": "Enrolled",
+    "enrolled_at": "2025-10-29T09:22:08.751Z"
+  },
+  {
+    "id": "5ce9e986-469a-4feb-bb00-66d95bea5562",
+    "user_id": "2742d149-666f-4e3b-9fcd-07041fdb1afa",
+    "course_session_id": "23bdbd6a-5e8d-46d9-996b-09d6a7b9499d",
+    "membership_id": null,
+    "status": "Enrolled",
+    "enrolled_at": "2026-02-22T00:04:05.970Z"
+  },
+  {
+    "id": "c931a24e-40c5-44a5-ad8d-5b4466829cab",
+    "user_id": "4bc9b12d-82ff-4c0e-9684-84bcd903e569",
+    "course_session_id": "23bdbd6a-5e8d-46d9-996b-09d6a7b9499d",
+    "membership_id": null,
+    "status": "Enrolled",
+    "enrolled_at": "2026-04-02T19:07:56.700Z"
+  },
+  {
+    "id": "60e708e7-675b-41c7-929f-fea893a6ff6f",
+    "user_id": "1cee369d-a706-4048-90fd-65c6a85e13ef",
+    "course_session_id": "23bdbd6a-5e8d-46d9-996b-09d6a7b9499d",
+    "membership_id": null,
+    "status": "Enrolled",
+    "enrolled_at": "2025-10-17T15:03:31.045Z"
+  },
+  {
+    "id": "6e6fb02d-3111-40ed-9e31-7b5d24ecbaf8",
+    "user_id": "e792d825-42ac-4bf5-85e9-f01e16044372",
+    "course_session_id": "cf0d9bff-2a22-4fec-9e34-8bb28bce212d",
+    "membership_id": null,
+    "status": "Enrolled",
+    "enrolled_at": "2026-03-25T01:32:58.641Z"
+  },
+  {
+    "id": "e3ba5244-edbc-4ff0-b3c3-32be4cf62123",
+    "user_id": "28c95fd7-8121-4e24-b6f5-0c57ef82b734",
+    "course_session_id": "cf0d9bff-2a22-4fec-9e34-8bb28bce212d",
+    "membership_id": null,
+    "status": "Enrolled",
+    "enrolled_at": "2026-03-17T03:01:59.860Z"
+  },
+  {
+    "id": "2a4e8bbd-9793-433a-986f-2d2c4de0ce94",
+    "user_id": "08d3abc2-3d3a-4c2e-94e7-9039eb1eea48",
+    "course_session_id": "cf0d9bff-2a22-4fec-9e34-8bb28bce212d",
+    "membership_id": null,
+    "status": "Enrolled",
+    "enrolled_at": "2026-07-08T14:23:50.675Z"
+  },
+  {
+    "id": "92bf9e7a-ef34-425e-b103-e3d462cd0d03",
+    "user_id": "b82bb59c-becc-4c97-a325-6ab1735cb964",
+    "course_session_id": "0d85fe19-935d-4fd1-b9db-1862d595b519",
+    "membership_id": null,
+    "status": "Enrolled",
+    "enrolled_at": "2026-05-16T10:51:37.883Z"
+  },
+  {
+    "id": "5469467b-de3f-4015-9729-844f1e6e1857",
+    "user_id": "3fa57db7-f8cb-4ff9-8a35-d15a865d82b4",
+    "course_session_id": "0d85fe19-935d-4fd1-b9db-1862d595b519",
+    "membership_id": null,
+    "status": "Enrolled",
+    "enrolled_at": "2026-10-13T12:35:26.496Z"
+  },
+  {
+    "id": "d3cfec33-d694-465d-a209-e7179c740a99",
+    "user_id": "e792d825-42ac-4bf5-85e9-f01e16044372",
+    "course_session_id": "0d85fe19-935d-4fd1-b9db-1862d595b519",
+    "membership_id": null,
+    "status": "Enrolled",
+    "enrolled_at": "2026-01-06T16:02:37.066Z"
+  },
+  {
+    "id": "d31a381b-c3c3-485e-9ff6-ce06a22410bd",
+    "user_id": "edbc586e-a3e1-46c3-a803-aec46510b4ff",
+    "course_session_id": "0d85fe19-935d-4fd1-b9db-1862d595b519",
+    "membership_id": null,
+    "status": "Enrolled",
+    "enrolled_at": "2026-05-20T07:32:00.977Z"
+  },
+  {
+    "id": "66e192fc-0fcd-43d1-ab3a-74e9445ad3eb",
+    "user_id": "944456d6-5f42-4a1f-ab65-98ad7da0e030",
+    "course_session_id": "0d85fe19-935d-4fd1-b9db-1862d595b519",
+    "membership_id": null,
+    "status": "Enrolled",
+    "enrolled_at": "2026-05-31T03:17:45.562Z"
+  },
+  {
+    "id": "de474b76-d748-4676-af2a-3c0f3fd8e48b",
+    "user_id": "3fa4dee5-522b-4463-a4b8-b539278d2e22",
+    "course_session_id": "3904f3a1-17b3-4fdb-a476-589c379b7a45",
+    "membership_id": null,
+    "status": "Enrolled",
+    "enrolled_at": "2026-04-23T18:23:48.861Z"
+  },
+  {
+    "id": "9c19c56e-c84e-4101-aa7d-54b01d5caaea",
+    "user_id": "532b3ad9-45ce-497b-8da2-d75399474fe0",
+    "course_session_id": "3904f3a1-17b3-4fdb-a476-589c379b7a45",
+    "membership_id": null,
+    "status": "Enrolled",
+    "enrolled_at": "2026-01-30T19:50:51.555Z"
+  },
+  {
+    "id": "a6b8513f-022c-4adc-80ad-aedf04373347",
+    "user_id": "914a57ce-269c-4f59-95d1-1d20cface636",
+    "course_session_id": "3b57dcf6-e809-4a26-859b-63472788a7b8",
+    "membership_id": null,
+    "status": "Enrolled",
+    "enrolled_at": "2026-04-22T07:09:45.109Z"
+  },
+  {
+    "id": "7169075d-fe7b-4b67-8778-0464fb429bfb",
+    "user_id": "3b1eb72a-2e36-4e17-bf24-663567840207",
+    "course_session_id": "3b57dcf6-e809-4a26-859b-63472788a7b8",
+    "membership_id": null,
+    "status": "Enrolled",
+    "enrolled_at": "2025-12-05T23:25:58.929Z"
+  },
+  {
+    "id": "36bb3ba9-e74e-4492-9886-5eeea69c931b",
+    "user_id": "4bc9b12d-82ff-4c0e-9684-84bcd903e569",
+    "course_session_id": "3b57dcf6-e809-4a26-859b-63472788a7b8",
+    "membership_id": null,
+    "status": "Enrolled",
+    "enrolled_at": "2026-03-18T07:37:57.554Z"
+  },
+  {
+    "id": "2abe749d-6d03-4b7e-ae33-90d8ccb3a422",
+    "user_id": "532b3ad9-45ce-497b-8da2-d75399474fe0",
+    "course_session_id": "3b57dcf6-e809-4a26-859b-63472788a7b8",
+    "membership_id": null,
+    "status": "Enrolled",
+    "enrolled_at": "2026-11-17T04:28:00.108Z"
+  },
+  {
+    "id": "f6074ffc-fce4-4293-95ff-6e9d2c1bbddd",
+    "user_id": "a8acea85-d91d-4203-85a9-30180cf2d73a",
+    "course_session_id": "3b57dcf6-e809-4a26-859b-63472788a7b8",
+    "membership_id": null,
+    "status": "Enrolled",
+    "enrolled_at": "2026-03-20T01:13:20.203Z"
+  },
+  {
+    "id": "ba117ae1-bbec-4701-a5b8-f67d030d34cb",
+    "user_id": "55b2c18e-2678-497f-8a14-19f210b80831",
+    "course_session_id": "f18544b1-fca2-453c-8cb5-f15b5db0554d",
+    "membership_id": null,
+    "status": "Enrolled",
+    "enrolled_at": "2026-03-18T11:59:07.386Z"
+  },
+  {
+    "id": "b694b918-8151-4857-ae97-ceb730a11219",
+    "user_id": "ceab0fa9-dafc-4a20-b19a-f93e2a6b2b5f",
+    "course_session_id": "078616c0-49da-446b-82de-cef34b24c55f",
+    "membership_id": null,
+    "status": "Enrolled",
+    "enrolled_at": "2026-08-24T07:36:55.273Z"
+  },
+  {
+    "id": "8a540e4f-dd99-4b33-8976-239984bc1ac5",
+    "user_id": "2309b086-27db-46e7-92aa-9ca87a34913d",
+    "course_session_id": "078616c0-49da-446b-82de-cef34b24c55f",
+    "membership_id": null,
+    "status": "Enrolled",
+    "enrolled_at": "2026-05-27T10:51:43.339Z"
+  },
+  {
+    "id": "740dede4-a910-4d66-ab65-a50d052b036d",
+    "user_id": "051ad41c-7453-4576-a2e7-f73f5cf85533",
+    "course_session_id": "078616c0-49da-446b-82de-cef34b24c55f",
+    "membership_id": null,
+    "status": "Enrolled",
+    "enrolled_at": "2026-05-29T14:39:04.863Z"
+  },
+  {
+    "id": "aa491517-60fd-4429-bfe6-6db454a459ee",
+    "user_id": "e792d825-42ac-4bf5-85e9-f01e16044372",
+    "course_session_id": "078616c0-49da-446b-82de-cef34b24c55f",
+    "membership_id": null,
+    "status": "Enrolled",
+    "enrolled_at": "2026-04-03T07:35:08.110Z"
+  },
+  {
+    "id": "ebb50083-bc2d-43e3-82f2-dc56eceb0749",
+    "user_id": "55b2c18e-2678-497f-8a14-19f210b80831",
+    "course_session_id": "3a8c053c-cc83-4c1c-8566-fff721d84425",
+    "membership_id": null,
+    "status": "Enrolled",
+    "enrolled_at": "2026-01-24T05:40:51.509Z"
+  },
+  {
+    "id": "46910002-2036-4485-9a15-20ca60c9a122",
+    "user_id": "ceab0fa9-dafc-4a20-b19a-f93e2a6b2b5f",
+    "course_session_id": "3a8c053c-cc83-4c1c-8566-fff721d84425",
+    "membership_id": null,
+    "status": "Enrolled",
+    "enrolled_at": "2026-01-26T07:13:51.058Z"
+  },
+  {
+    "id": "ecb95663-4082-4222-ac3f-aae12b1b44dd",
+    "user_id": "b6722aa7-92c5-44d8-aa44-f07126a59731",
+    "course_session_id": "3a8c053c-cc83-4c1c-8566-fff721d84425",
+    "membership_id": null,
+    "status": "Enrolled",
+    "enrolled_at": "2026-04-30T15:13:07.013Z"
+  },
+  {
+    "id": "c19b6021-6889-43a9-8f80-5b39716d044b",
+    "user_id": "57e9731e-815c-45dd-8778-0c55ac2c64c8",
+    "course_session_id": "3a8c053c-cc83-4c1c-8566-fff721d84425",
+    "membership_id": null,
+    "status": "Enrolled",
+    "enrolled_at": "2026-07-06T01:12:36.118Z"
+  },
+  {
+    "id": "2c114f14-774d-4116-8ff6-35482adb612e",
+    "user_id": "1977fab3-b903-41f5-9829-6403fbbddb61",
+    "course_session_id": "3a8c053c-cc83-4c1c-8566-fff721d84425",
+    "membership_id": null,
+    "status": "Enrolled",
+    "enrolled_at": "2025-09-30T18:21:37.083Z"
+  },
+  {
+    "id": "7e5e71e8-5c10-4e66-b47b-69868c0e0b2b",
+    "user_id": "c532e090-614f-4d4b-98de-b2f842bbda21",
+    "course_session_id": "b6f32f5e-4ec3-4876-b3d6-75a89a9dc81c",
+    "membership_id": null,
+    "status": "Enrolled",
+    "enrolled_at": "2026-08-20T13:49:56.640Z"
+  },
+  {
+    "id": "3ea83935-bde4-4c92-9631-7e981b7d975c",
+    "user_id": "57e9731e-815c-45dd-8778-0c55ac2c64c8",
+    "course_session_id": "2d0bfa6e-8b18-4845-a273-cfb5c95f5cbb",
+    "membership_id": null,
+    "status": "Enrolled",
+    "enrolled_at": "2026-01-25T13:40:39.698Z"
+  },
+  {
+    "id": "b6c5463b-3b9a-4a5c-9d46-6e4ebb7e30b4",
+    "user_id": "8e4a85a9-76b9-45fa-9ebb-bb210d3b733b",
+    "course_session_id": "2d0bfa6e-8b18-4845-a273-cfb5c95f5cbb",
+    "membership_id": null,
+    "status": "Enrolled",
+    "enrolled_at": "2026-02-27T14:36:26.239Z"
+  },
+  {
+    "id": "baf8848f-da8a-4007-9eaf-303c55235eb1",
+    "user_id": "edbc586e-a3e1-46c3-a803-aec46510b4ff",
+    "course_session_id": "2d0bfa6e-8b18-4845-a273-cfb5c95f5cbb",
+    "membership_id": null,
+    "status": "Enrolled",
+    "enrolled_at": "2025-10-06T03:24:35.615Z"
+  },
+  {
+    "id": "b36425ed-a51f-4bd3-b7f0-d598e7cfbda5",
+    "user_id": "ebcec7ea-5698-4146-a791-f31a69787f91",
+    "course_session_id": "2d0bfa6e-8b18-4845-a273-cfb5c95f5cbb",
+    "membership_id": null,
+    "status": "Enrolled",
+    "enrolled_at": "2026-09-02T14:15:56.833Z"
+  },
+  {
+    "id": "41c363a9-6e1b-4729-a93e-ea05d8b2eb14",
+    "user_id": "9ad5f2b9-d18d-498e-a56b-a2f4453e54c0",
+    "course_session_id": "2d0bfa6e-8b18-4845-a273-cfb5c95f5cbb",
+    "membership_id": null,
+    "status": "Enrolled",
+    "enrolled_at": "2026-08-31T16:42:22.812Z"
+  },
+  {
+    "id": "cbb95c85-6e62-452f-a69f-6facbffe16e0",
+    "user_id": "9ad5f2b9-d18d-498e-a56b-a2f4453e54c0",
+    "course_session_id": "40c4e74d-4f29-432c-9512-ab5168d2f30b",
+    "membership_id": null,
+    "status": "Enrolled",
+    "enrolled_at": "2026-05-15T11:09:49.651Z"
+  },
+  {
+    "id": "fe1a989c-987f-4820-9a81-988d3f746e71",
+    "user_id": "32a429a6-d76c-4d9f-947f-5bfedcdbc338",
+    "course_session_id": "40c4e74d-4f29-432c-9512-ab5168d2f30b",
+    "membership_id": null,
+    "status": "Enrolled",
+    "enrolled_at": "2026-02-12T23:15:56.792Z"
+  },
+  {
+    "id": "fb44de58-5c23-48a5-8d2b-28c6af52b35d",
+    "user_id": "944456d6-5f42-4a1f-ab65-98ad7da0e030",
+    "course_session_id": "7732722b-28ae-481d-a393-e866f35806d1",
+    "membership_id": null,
+    "status": "Enrolled",
+    "enrolled_at": "2025-11-11T11:21:35.687Z"
+  },
+  {
+    "id": "c2169f29-eeac-4f02-aa7d-3d0870a8d46d",
+    "user_id": "8e4a85a9-76b9-45fa-9ebb-bb210d3b733b",
+    "course_session_id": "7732722b-28ae-481d-a393-e866f35806d1",
+    "membership_id": null,
+    "status": "Enrolled",
+    "enrolled_at": "2025-07-31T14:02:43.015Z"
+  },
+  {
+    "id": "9f53a6ae-7aee-4042-812a-bcf862ed8661",
+    "user_id": "914a57ce-269c-4f59-95d1-1d20cface636",
+    "course_session_id": "7732722b-28ae-481d-a393-e866f35806d1",
+    "membership_id": null,
+    "status": "Enrolled",
+    "enrolled_at": "2025-08-28T10:04:58.193Z"
+  },
+  {
+    "id": "81937705-56ce-4144-882e-df103634d5bc",
+    "user_id": "28c95fd7-8121-4e24-b6f5-0c57ef82b734",
+    "course_session_id": "7732722b-28ae-481d-a393-e866f35806d1",
+    "membership_id": null,
+    "status": "Enrolled",
+    "enrolled_at": "2026-02-03T18:35:59.220Z"
+  },
+  {
+    "id": "0f287264-54b5-4150-a515-00aad7965861",
+    "user_id": "7e66a6eb-08a5-4550-8c3a-c18995dee934",
+    "course_session_id": "ab7432f2-0635-43d0-bbb1-d4af6e30522e",
+    "membership_id": null,
+    "status": "Enrolled",
+    "enrolled_at": "2026-03-03T01:03:16.014Z"
+  },
+  {
+    "id": "a3fcff0c-faa2-44f4-a191-cdc6a1c14faf",
+    "user_id": "2309b086-27db-46e7-92aa-9ca87a34913d",
+    "course_session_id": "ab7432f2-0635-43d0-bbb1-d4af6e30522e",
+    "membership_id": null,
+    "status": "Enrolled",
+    "enrolled_at": "2026-09-09T19:37:34.159Z"
+  },
+  {
+    "id": "6c7a061b-f6aa-4323-939a-a34af6364f27",
+    "user_id": "914a57ce-269c-4f59-95d1-1d20cface636",
+    "course_session_id": "ab7432f2-0635-43d0-bbb1-d4af6e30522e",
+    "membership_id": null,
+    "status": "Enrolled",
+    "enrolled_at": "2026-01-14T20:04:44.973Z"
+  },
+  {
+    "id": "c6b40b46-ed14-46ae-8101-0c8ec1819b3d",
+    "user_id": "08d3abc2-3d3a-4c2e-94e7-9039eb1eea48",
+    "course_session_id": "ab7432f2-0635-43d0-bbb1-d4af6e30522e",
+    "membership_id": null,
+    "status": "Enrolled",
+    "enrolled_at": "2026-05-28T15:30:50.602Z"
+  },
+  {
+    "id": "12816dfb-125f-439f-a852-28af1cd6cdaa",
+    "user_id": "276b5dd4-d4ca-4772-aa14-55d716f025f1",
+    "course_session_id": "ab7432f2-0635-43d0-bbb1-d4af6e30522e",
+    "membership_id": null,
+    "status": "Enrolled",
+    "enrolled_at": "2026-04-18T09:19:24.338Z"
+  },
+  {
+    "id": "861d118c-d817-4b3a-b04b-b635d1de56a9",
+    "user_id": "1977fab3-b903-41f5-9829-6403fbbddb61",
+    "course_session_id": "eaecd4bc-392f-41e0-8b7c-0dbb57206eee",
+    "membership_id": null,
+    "status": "Enrolled",
+    "enrolled_at": "2027-01-01T08:46:52.073Z"
+  },
+  {
+    "id": "ab0ff566-8a93-470c-9e5f-7ce565669f75",
+    "user_id": "3c5d3324-666b-49d6-9840-24f002409a04",
+    "course_session_id": "eaecd4bc-392f-41e0-8b7c-0dbb57206eee",
+    "membership_id": null,
+    "status": "Enrolled",
+    "enrolled_at": "2026-09-27T23:49:32.510Z"
+  },
+  {
+    "id": "a9f4ddd1-a47a-411d-9828-22755608de57",
+    "user_id": "2309b086-27db-46e7-92aa-9ca87a34913d",
+    "course_session_id": "eaecd4bc-392f-41e0-8b7c-0dbb57206eee",
+    "membership_id": null,
+    "status": "Enrolled",
+    "enrolled_at": "2026-12-04T23:50:15.256Z"
+  },
+  {
+    "id": "10fd65d3-d727-4a0e-9aa7-608b6fa62a04",
+    "user_id": "331964dd-292c-4174-8036-cbe4a081789c",
+    "course_session_id": "eaecd4bc-392f-41e0-8b7c-0dbb57206eee",
+    "membership_id": null,
+    "status": "Enrolled",
+    "enrolled_at": "2026-12-27T13:16:07.926Z"
+  },
+  {
+    "id": "767bad13-f5ce-4a51-a498-3d32273616c8",
+    "user_id": "3b1eb72a-2e36-4e17-bf24-663567840207",
+    "course_session_id": "eaecd4bc-392f-41e0-8b7c-0dbb57206eee",
+    "membership_id": null,
+    "status": "Enrolled",
+    "enrolled_at": "2026-06-02T17:44:16.964Z"
+  },
+  {
+    "id": "33d285eb-b34a-408e-8ad2-748720fd8249",
+    "user_id": "72fdff62-8495-432e-85eb-69604f17c2d4",
+    "course_session_id": "24f3b2a8-002d-4ad6-9627-b5b0ab70d685",
+    "membership_id": null,
+    "status": "Enrolled",
+    "enrolled_at": "2026-01-10T10:02:11.941Z"
+  },
+  {
+    "id": "bd18c45c-feca-472d-a0de-19fa8bd9ef7d",
+    "user_id": "3b1eb72a-2e36-4e17-bf24-663567840207",
+    "course_session_id": "24f3b2a8-002d-4ad6-9627-b5b0ab70d685",
+    "membership_id": null,
+    "status": "Enrolled",
+    "enrolled_at": "2026-01-05T04:06:26.174Z"
+  },
+  {
+    "id": "b66bcc98-86b2-4d6a-82da-4c01f8c4d0de",
+    "user_id": "3ecdac3c-def4-4954-ac30-a10116fb8b97",
+    "course_session_id": "24f3b2a8-002d-4ad6-9627-b5b0ab70d685",
+    "membership_id": null,
+    "status": "Enrolled",
+    "enrolled_at": "2026-05-23T18:39:36.903Z"
+  },
+  {
+    "id": "21213d07-d646-47d2-9c28-d827f4ba56c0",
+    "user_id": "d80ed918-962a-475e-9038-7e52a101f533",
+    "course_session_id": "24f3b2a8-002d-4ad6-9627-b5b0ab70d685",
+    "membership_id": null,
+    "status": "Enrolled",
+    "enrolled_at": "2026-02-23T09:20:11.745Z"
+  },
+  {
+    "id": "34c963c2-8617-4a48-96d2-b6e9b4acad3c",
+    "user_id": "35623e13-469a-4157-9352-6bb49ef7a4e0",
+    "course_session_id": "a62c1a54-06fd-4498-a00f-b3b8ee71bc72",
+    "membership_id": null,
+    "status": "Enrolled",
+    "enrolled_at": "2026-12-21T04:53:35.191Z"
+  },
+  {
+    "id": "19106a2e-45f0-43e9-a6ee-0c3a9c4eb3ea",
+    "user_id": "8e4a85a9-76b9-45fa-9ebb-bb210d3b733b",
+    "course_session_id": "a62c1a54-06fd-4498-a00f-b3b8ee71bc72",
+    "membership_id": null,
+    "status": "Enrolled",
+    "enrolled_at": "2026-09-26T12:34:50.586Z"
+  },
+  {
+    "id": "33a6e59b-7689-4c5a-af4c-dfd9cc1b8ff6",
+    "user_id": "5a578939-bf89-4e5c-8d2a-6d5c25b8169d",
+    "course_session_id": "a62c1a54-06fd-4498-a00f-b3b8ee71bc72",
+    "membership_id": null,
+    "status": "Enrolled",
+    "enrolled_at": "2027-01-21T11:53:26.325Z"
+  },
+  {
+    "id": "73c6c9a0-43af-4b37-9412-6bec46999286",
+    "user_id": "b82bb59c-becc-4c97-a325-6ab1735cb964",
+    "course_session_id": "a586c9fe-ec5c-475f-b8eb-7c78e530aaad",
+    "membership_id": null,
+    "status": "Enrolled",
+    "enrolled_at": "2025-10-28T01:03:22.699Z"
+  },
+  {
+    "id": "42f6106f-8450-4e6d-b98e-b576a54ef9d9",
+    "user_id": "276b5dd4-d4ca-4772-aa14-55d716f025f1",
+    "course_session_id": "a586c9fe-ec5c-475f-b8eb-7c78e530aaad",
+    "membership_id": null,
+    "status": "Enrolled",
+    "enrolled_at": "2026-01-31T18:15:09.118Z"
+  },
+  {
+    "id": "0dc629c4-f8d0-4130-9f2a-b40fa074b7a1",
+    "user_id": "c532e090-614f-4d4b-98de-b2f842bbda21",
+    "course_session_id": "a586c9fe-ec5c-475f-b8eb-7c78e530aaad",
+    "membership_id": null,
+    "status": "Enrolled",
+    "enrolled_at": "2025-11-24T03:14:59.364Z"
+  },
+  {
+    "id": "3913ec23-1661-4cec-a178-2bfd3bdfcf80",
+    "user_id": "532b3ad9-45ce-497b-8da2-d75399474fe0",
+    "course_session_id": "b2b2cb75-bcbb-4e53-8bed-01f6e1f367a0",
+    "membership_id": null,
+    "status": "Enrolled",
+    "enrolled_at": "2026-07-29T08:16:20.569Z"
+  },
+  {
+    "id": "23faa036-1c9c-4fc8-a9b1-c185ca7b336c",
+    "user_id": "08d3abc2-3d3a-4c2e-94e7-9039eb1eea48",
+    "course_session_id": "b2b2cb75-bcbb-4e53-8bed-01f6e1f367a0",
+    "membership_id": null,
+    "status": "Enrolled",
+    "enrolled_at": "2026-07-24T08:48:44.574Z"
+  },
+  {
+    "id": "5e30f16c-37a7-4077-8993-3a4ac9e1656a",
+    "user_id": "7848b498-0806-4843-9c8a-b55d3771b0bb",
+    "course_session_id": "15df7334-653b-4c66-91b2-7e3bcdc61eaf",
+    "membership_id": null,
+    "status": "Enrolled",
+    "enrolled_at": "2027-03-29T00:15:47.299Z"
+  },
+  {
+    "id": "079b63b3-1e98-49e6-8360-e25839a100c4",
+    "user_id": "2309b086-27db-46e7-92aa-9ca87a34913d",
+    "course_session_id": "3216b6cb-4943-4a04-bd34-447bce1bed68",
+    "membership_id": null,
+    "status": "Enrolled",
+    "enrolled_at": "2025-07-01T12:27:05.559Z"
+  },
+  {
+    "id": "adcebab1-0ef0-47e5-8084-7bb7f5029099",
+    "user_id": "57e9731e-815c-45dd-8778-0c55ac2c64c8",
+    "course_session_id": "d3e76cf2-0609-4280-b18c-7be3fdb7933d",
+    "membership_id": null,
+    "status": "Enrolled",
+    "enrolled_at": "2026-05-02T09:49:34.114Z"
+  },
+  {
+    "id": "7d2526ed-b043-4cb9-a9bb-932fc2ee048b",
+    "user_id": "3fa57db7-f8cb-4ff9-8a35-d15a865d82b4",
+    "course_session_id": "58a8c652-199a-4ddc-aabe-f193408c1600",
+    "membership_id": null,
+    "status": "Enrolled",
+    "enrolled_at": "2026-05-24T21:26:17.110Z"
+  },
+  {
+    "id": "1e26405d-c516-4560-92c3-c19059c8d982",
+    "user_id": "3fa57db7-f8cb-4ff9-8a35-d15a865d82b4",
+    "course_session_id": "990dff4c-e603-4bff-9d8a-9f43bb51d525",
+    "membership_id": null,
+    "status": "Enrolled",
+    "enrolled_at": "2026-07-19T02:28:19.339Z"
+  },
+  {
+    "id": "833221c1-67ce-46db-b9da-190dd31859ee",
+    "user_id": "35623e13-469a-4157-9352-6bb49ef7a4e0",
+    "course_session_id": "183c28c8-8905-4147-b0a9-c201bf8cb87e",
+    "membership_id": null,
+    "status": "Enrolled",
+    "enrolled_at": "2026-05-16T05:21:17.197Z"
+  },
+  {
+    "id": "4b145c74-e71e-4c21-84ee-c444c6540503",
+    "user_id": "2309b086-27db-46e7-92aa-9ca87a34913d",
+    "course_session_id": "183c28c8-8905-4147-b0a9-c201bf8cb87e",
+    "membership_id": null,
+    "status": "Enrolled",
+    "enrolled_at": "2026-04-11T03:48:02.145Z"
+  },
+  {
+    "id": "e26660b4-e851-4095-bb73-cb9e716f80f8",
+    "user_id": "5a578939-bf89-4e5c-8d2a-6d5c25b8169d",
+    "course_session_id": "183c28c8-8905-4147-b0a9-c201bf8cb87e",
+    "membership_id": null,
+    "status": "Enrolled",
+    "enrolled_at": "2026-07-22T16:53:12.022Z"
+  },
+  {
+    "id": "e5ffe18b-7c5c-4a70-b656-b6baf4a876b2",
+    "user_id": "b6722aa7-92c5-44d8-aa44-f07126a59731",
+    "course_session_id": "e7707133-8f96-4782-a085-1136b5f2c32b",
+    "membership_id": null,
+    "status": "Enrolled",
+    "enrolled_at": "2026-06-07T03:27:41.723Z"
+  },
+  {
+    "id": "0887d9d5-c5a5-4599-8e47-00e6b13f56a8",
+    "user_id": "7848b498-0806-4843-9c8a-b55d3771b0bb",
+    "course_session_id": "e7707133-8f96-4782-a085-1136b5f2c32b",
+    "membership_id": null,
+    "status": "Enrolled",
+    "enrolled_at": "2026-05-20T06:09:47.605Z"
+  },
+  {
+    "id": "3ed46193-86e3-4fb0-9376-920e23129835",
+    "user_id": "d80ed918-962a-475e-9038-7e52a101f533",
+    "course_session_id": "e7707133-8f96-4782-a085-1136b5f2c32b",
+    "membership_id": null,
+    "status": "Enrolled",
+    "enrolled_at": "2026-01-13T10:42:52.405Z"
+  },
+  {
+    "id": "224da30b-d2f7-40db-89a9-f9de6b1f9a44",
+    "user_id": "532b3ad9-45ce-497b-8da2-d75399474fe0",
+    "course_session_id": "65c39d3c-9db5-4141-9d0b-f7d25a8b092e",
+    "membership_id": null,
+    "status": "Enrolled",
+    "enrolled_at": "2026-05-28T22:59:15.416Z"
+  },
+  {
+    "id": "dae0992e-a794-4737-b8c5-29093edb6fe8",
+    "user_id": "ae3c0fa3-d364-4d7e-8ca1-2b36f237e255",
+    "course_session_id": "02751320-46a2-4b1f-85be-8b4154b49298",
+    "membership_id": null,
+    "status": "Enrolled",
+    "enrolled_at": "2026-09-25T16:34:17.655Z"
+  },
+  {
+    "id": "c24bd94a-8a18-4966-af83-52d1860ba267",
+    "user_id": "8e4a85a9-76b9-45fa-9ebb-bb210d3b733b",
+    "course_session_id": "02751320-46a2-4b1f-85be-8b4154b49298",
+    "membership_id": null,
+    "status": "Enrolled",
+    "enrolled_at": "2026-06-15T13:45:23.619Z"
+  },
+  {
+    "id": "bab3b64f-1364-47c8-a1f0-a73604f1af03",
+    "user_id": "e792d825-42ac-4bf5-85e9-f01e16044372",
+    "course_session_id": "a130b9b6-30fd-4aa4-95a0-260f128e4197",
+    "membership_id": null,
+    "status": "Enrolled",
+    "enrolled_at": "2026-10-19T02:11:40.861Z"
+  },
+  {
+    "id": "85b79854-c26a-418d-940c-02e6cdbfab43",
+    "user_id": "276b5dd4-d4ca-4772-aa14-55d716f025f1",
+    "course_session_id": "a130b9b6-30fd-4aa4-95a0-260f128e4197",
+    "membership_id": null,
+    "status": "Enrolled",
+    "enrolled_at": "2026-07-22T11:01:38.302Z"
+  },
+  {
+    "id": "9f968b72-00d2-49a3-9895-f11dcb2284c7",
+    "user_id": "ae3c0fa3-d364-4d7e-8ca1-2b36f237e255",
+    "course_session_id": "fdb78d42-3f12-453e-8514-b44a28f88613",
+    "membership_id": null,
+    "status": "Enrolled",
+    "enrolled_at": "2026-01-11T06:45:02.925Z"
+  },
+  {
+    "id": "276b435d-32e4-4119-94a8-41c5e1c7cefa",
+    "user_id": "08d3abc2-3d3a-4c2e-94e7-9039eb1eea48",
+    "course_session_id": "fdb78d42-3f12-453e-8514-b44a28f88613",
+    "membership_id": null,
+    "status": "Enrolled",
+    "enrolled_at": "2026-09-12T05:50:51.689Z"
+  },
+  {
+    "id": "4e5db735-73de-4abe-a9d3-ec159e17b54c",
+    "user_id": "32a429a6-d76c-4d9f-947f-5bfedcdbc338",
+    "course_session_id": "fdb78d42-3f12-453e-8514-b44a28f88613",
+    "membership_id": null,
+    "status": "Enrolled",
+    "enrolled_at": "2026-04-02T16:31:31.218Z"
+  },
+  {
+    "id": "b6e9d02c-aece-425d-9f5a-d350b8942c9c",
+    "user_id": "08d3abc2-3d3a-4c2e-94e7-9039eb1eea48",
+    "course_session_id": "edf8e17d-cfaf-47d3-892b-1f5d8e6355d0",
+    "membership_id": null,
+    "status": "Enrolled",
+    "enrolled_at": "2026-02-20T12:25:06.944Z"
+  },
+  {
+    "id": "9fa48d13-ca10-4c12-ba42-7c8825c03b3e",
+    "user_id": "246dc918-cf11-4b5d-9555-d5dd46758595",
+    "course_session_id": "edf8e17d-cfaf-47d3-892b-1f5d8e6355d0",
+    "membership_id": null,
+    "status": "Enrolled",
+    "enrolled_at": "2025-10-10T04:08:27.388Z"
+  },
+  {
+    "id": "7843a7fa-3073-4bf0-8012-a8c4338057c6",
+    "user_id": "3b1eb72a-2e36-4e17-bf24-663567840207",
+    "course_session_id": "39019f35-d7a0-43b3-9455-e95cf421c14b",
+    "membership_id": null,
+    "status": "Enrolled",
+    "enrolled_at": "2025-06-21T22:04:40.165Z"
+  },
+  {
+    "id": "ded2e777-06be-4536-8ad3-c91dd218b57a",
+    "user_id": "1cee369d-a706-4048-90fd-65c6a85e13ef",
+    "course_session_id": "39019f35-d7a0-43b3-9455-e95cf421c14b",
+    "membership_id": null,
+    "status": "Enrolled",
+    "enrolled_at": "2025-04-09T01:13:24.998Z"
+  },
+  {
+    "id": "a06d45aa-bf52-45aa-850a-9e1065326b00",
+    "user_id": "32a429a6-d76c-4d9f-947f-5bfedcdbc338",
+    "course_session_id": "39019f35-d7a0-43b3-9455-e95cf421c14b",
+    "membership_id": null,
+    "status": "Enrolled",
+    "enrolled_at": "2026-01-17T22:31:27.267Z"
+  },
+  {
+    "id": "3420fcba-7c40-4c60-a58f-efcdb77888ac",
+    "user_id": "1977fab3-b903-41f5-9829-6403fbbddb61",
+    "course_session_id": "24e4d8b6-9383-457d-b753-dc096e05ae24",
+    "membership_id": null,
+    "status": "Enrolled",
+    "enrolled_at": "2026-12-10T05:01:08.073Z"
+  },
+  {
+    "id": "4636f816-e42c-459c-89a4-faa99002ca1f",
+    "user_id": "246dc918-cf11-4b5d-9555-d5dd46758595",
+    "course_session_id": "24e4d8b6-9383-457d-b753-dc096e05ae24",
+    "membership_id": null,
+    "status": "Enrolled",
+    "enrolled_at": "2026-07-07T22:09:34.024Z"
+  },
+  {
+    "id": "a62743b7-88b9-49fe-be47-9d67a12e9483",
+    "user_id": "051ad41c-7453-4576-a2e7-f73f5cf85533",
+    "course_session_id": "24e4d8b6-9383-457d-b753-dc096e05ae24",
+    "membership_id": null,
+    "status": "Enrolled",
+    "enrolled_at": "2026-05-10T00:13:42.394Z"
+  },
+  {
+    "id": "c4fe7c74-2b2d-45f7-a556-dff1dad02e38",
+    "user_id": "3fa57db7-f8cb-4ff9-8a35-d15a865d82b4",
+    "course_session_id": "24e4d8b6-9383-457d-b753-dc096e05ae24",
+    "membership_id": null,
+    "status": "Enrolled",
+    "enrolled_at": "2026-03-25T19:27:21.074Z"
+  },
+  {
+    "id": "b83a5db6-fe47-4254-af2b-7ea4d40f8294",
+    "user_id": "3c5d3324-666b-49d6-9840-24f002409a04",
+    "course_session_id": "24e4d8b6-9383-457d-b753-dc096e05ae24",
+    "membership_id": null,
+    "status": "Enrolled",
+    "enrolled_at": "2026-12-19T04:33:47.307Z"
+  },
+  {
+    "id": "162b9861-ff4d-4019-9dd7-338408b893f4",
+    "user_id": "5a578939-bf89-4e5c-8d2a-6d5c25b8169d",
+    "course_session_id": "8cfa3994-d570-4e13-9c92-9cd73131feb2",
+    "membership_id": null,
+    "status": "Enrolled",
+    "enrolled_at": "2027-02-27T09:33:24.033Z"
+  },
+  {
+    "id": "6e83aff1-d9ef-4504-9f1c-3fcede3c4b66",
+    "user_id": "7e66a6eb-08a5-4550-8c3a-c18995dee934",
+    "course_session_id": "8cfa3994-d570-4e13-9c92-9cd73131feb2",
+    "membership_id": null,
+    "status": "Enrolled",
+    "enrolled_at": "2026-11-24T13:21:16.191Z"
+  },
+  {
+    "id": "ff9a10c1-8bf2-4f8b-a9e6-20216704c92d",
+    "user_id": "73fcaa45-a519-452a-8781-ec1e35e0d800",
+    "course_session_id": "8cfa3994-d570-4e13-9c92-9cd73131feb2",
+    "membership_id": null,
+    "status": "Enrolled",
+    "enrolled_at": "2027-02-01T19:58:51.841Z"
+  },
+  {
+    "id": "7327ce3c-9720-4fae-a0f0-ea85c4b1d723",
+    "user_id": "3c5d3324-666b-49d6-9840-24f002409a04",
+    "course_session_id": "8cfa3994-d570-4e13-9c92-9cd73131feb2",
+    "membership_id": null,
+    "status": "Enrolled",
+    "enrolled_at": "2026-09-09T09:29:17.750Z"
+  },
+  {
+    "id": "eb7938cd-0a5f-4f57-8bc3-d832234aba13",
+    "user_id": "be48e2c2-129b-4f06-a70b-4cfe68cf661e",
+    "course_session_id": "8cfa3994-d570-4e13-9c92-9cd73131feb2",
+    "membership_id": null,
+    "status": "Enrolled",
+    "enrolled_at": "2026-05-01T21:52:55.930Z"
+  },
+  {
+    "id": "65445089-6314-4424-a812-6b721aa82096",
+    "user_id": "9ad5f2b9-d18d-498e-a56b-a2f4453e54c0",
+    "course_session_id": "3fb5451b-1699-4227-9cb6-73360d21d6b5",
+    "membership_id": null,
+    "status": "Enrolled",
+    "enrolled_at": "2026-01-07T02:20:07.643Z"
+  },
+  {
+    "id": "468fe33d-024a-4273-911a-454089eba483",
+    "user_id": "be48e2c2-129b-4f06-a70b-4cfe68cf661e",
+    "course_session_id": "3fb5451b-1699-4227-9cb6-73360d21d6b5",
+    "membership_id": null,
+    "status": "Enrolled",
+    "enrolled_at": "2025-08-03T01:24:27.376Z"
+  },
+  {
+    "id": "c3e17995-0f9b-4bb3-868c-37234edfa4e1",
+    "user_id": "b82bb59c-becc-4c97-a325-6ab1735cb964",
+    "course_session_id": "3fb5451b-1699-4227-9cb6-73360d21d6b5",
+    "membership_id": null,
+    "status": "Enrolled",
+    "enrolled_at": "2025-10-16T20:42:29.892Z"
+  },
+  {
+    "id": "889812d7-f9dc-4e93-bf8e-0f517d6badbe",
+    "user_id": "7848b498-0806-4843-9c8a-b55d3771b0bb",
+    "course_session_id": "3fb5451b-1699-4227-9cb6-73360d21d6b5",
+    "membership_id": null,
+    "status": "Enrolled",
+    "enrolled_at": "2025-08-16T21:15:36.056Z"
+  },
+  {
+    "id": "82279432-21e7-4eb8-a5a8-5d2ec948c5ce",
+    "user_id": "57e9731e-815c-45dd-8778-0c55ac2c64c8",
+    "course_session_id": "3fb5451b-1699-4227-9cb6-73360d21d6b5",
+    "membership_id": null,
+    "status": "Enrolled",
+    "enrolled_at": "2025-08-30T04:41:46.003Z"
+  },
+  {
+    "id": "52f738dc-d1cd-48dc-a04c-971fd1c5ab19",
+    "user_id": "ae3c0fa3-d364-4d7e-8ca1-2b36f237e255",
+    "course_session_id": "4b8a8fea-e4c9-4575-806e-24328d1f3d2f",
+    "membership_id": null,
+    "status": "Enrolled",
+    "enrolled_at": "2026-04-19T17:34:40.273Z"
+  },
+  {
+    "id": "633cc842-d3cd-462f-bb91-c1d45a5fc4e1",
+    "user_id": "331964dd-292c-4174-8036-cbe4a081789c",
+    "course_session_id": "4b8a8fea-e4c9-4575-806e-24328d1f3d2f",
+    "membership_id": null,
+    "status": "Enrolled",
+    "enrolled_at": "2026-09-23T02:38:59.646Z"
+  },
+  {
+    "id": "3ee0ca6b-882e-4aa4-8bba-efe6496cb8d0",
+    "user_id": "051ad41c-7453-4576-a2e7-f73f5cf85533",
+    "course_session_id": "4b8a8fea-e4c9-4575-806e-24328d1f3d2f",
+    "membership_id": null,
+    "status": "Enrolled",
+    "enrolled_at": "2026-03-15T17:19:06.465Z"
+  },
+  {
+    "id": "168ef012-c197-488f-8df6-9f35b5c40e0c",
+    "user_id": "3b1eb72a-2e36-4e17-bf24-663567840207",
+    "course_session_id": "3ae25727-ecda-4d4a-a5bc-8a5fd52ae573",
+    "membership_id": null,
+    "status": "Enrolled",
+    "enrolled_at": "2026-04-27T01:57:51.405Z"
+  },
+  {
+    "id": "57f9ac20-044d-4bfe-8e90-ca2823f5445f",
+    "user_id": "be48e2c2-129b-4f06-a70b-4cfe68cf661e",
+    "course_session_id": "a706c1cf-3550-4c4a-b38a-5291b1b54d02",
+    "membership_id": null,
+    "status": "Enrolled",
+    "enrolled_at": "2026-05-20T05:53:10.471Z"
+  },
+  {
+    "id": "fe1e6cde-f935-4989-8c86-62af3ddcb9b9",
+    "user_id": "e792d825-42ac-4bf5-85e9-f01e16044372",
+    "course_session_id": "a706c1cf-3550-4c4a-b38a-5291b1b54d02",
+    "membership_id": null,
+    "status": "Enrolled",
+    "enrolled_at": "2026-05-11T21:20:53.541Z"
+  },
+  {
+    "id": "f99d8b52-472c-4776-9e74-a4520d0356d2",
+    "user_id": "944456d6-5f42-4a1f-ab65-98ad7da0e030",
+    "course_session_id": "a706c1cf-3550-4c4a-b38a-5291b1b54d02",
+    "membership_id": null,
+    "status": "Enrolled",
+    "enrolled_at": "2026-01-08T19:02:23.932Z"
+  },
+  {
+    "id": "a7dc9498-f234-4bbf-a529-df54d28d1cec",
+    "user_id": "3c5d3324-666b-49d6-9840-24f002409a04",
+    "course_session_id": "357158a8-ed74-45cf-a12a-6025a1d52bd6",
+    "membership_id": null,
+    "status": "Enrolled",
+    "enrolled_at": "2026-05-03T02:42:59.160Z"
+  },
+  {
+    "id": "53682d9d-8a1d-4de7-ab6a-700b9aef2c6f",
+    "user_id": "ceab0fa9-dafc-4a20-b19a-f93e2a6b2b5f",
+    "course_session_id": "357158a8-ed74-45cf-a12a-6025a1d52bd6",
+    "membership_id": null,
+    "status": "Enrolled",
+    "enrolled_at": "2026-08-18T00:02:14.705Z"
+  },
+  {
+    "id": "6bb0345f-adef-4d9e-9c70-1a32028f2185",
+    "user_id": "7848b498-0806-4843-9c8a-b55d3771b0bb",
+    "course_session_id": "357158a8-ed74-45cf-a12a-6025a1d52bd6",
+    "membership_id": null,
+    "status": "Enrolled",
+    "enrolled_at": "2026-01-21T16:27:51.280Z"
+  },
+  {
+    "id": "fc1835ef-a367-486a-b246-dbddd736e602",
+    "user_id": "57e9731e-815c-45dd-8778-0c55ac2c64c8",
+    "course_session_id": "357158a8-ed74-45cf-a12a-6025a1d52bd6",
+    "membership_id": null,
+    "status": "Enrolled",
+    "enrolled_at": "2026-02-17T14:24:42.638Z"
+  },
+  {
+    "id": "61f1715b-83d0-417a-a18a-b25d8b825973",
+    "user_id": "3fa57db7-f8cb-4ff9-8a35-d15a865d82b4",
+    "course_session_id": "357158a8-ed74-45cf-a12a-6025a1d52bd6",
+    "membership_id": null,
+    "status": "Enrolled",
+    "enrolled_at": "2026-02-12T20:36:26.674Z"
+  },
+  {
+    "id": "3ae8a771-a9fb-4f54-bdee-2ce8f76aed51",
+    "user_id": "3b1eb72a-2e36-4e17-bf24-663567840207",
+    "course_session_id": "e7df8a08-eadc-4007-8d66-87469e56a482",
+    "membership_id": null,
+    "status": "Enrolled",
+    "enrolled_at": "2026-03-08T11:59:12.316Z"
+  },
+  {
+    "id": "3b3c0060-c99c-4044-b68c-fc11ba011adf",
+    "user_id": "276b5dd4-d4ca-4772-aa14-55d716f025f1",
+    "course_session_id": "e7df8a08-eadc-4007-8d66-87469e56a482",
+    "membership_id": null,
+    "status": "Enrolled",
+    "enrolled_at": "2026-01-22T11:07:03.527Z"
+  },
+  {
+    "id": "160650e0-ac52-41c2-a9a3-fec1dae75095",
+    "user_id": "73fcaa45-a519-452a-8781-ec1e35e0d800",
+    "course_session_id": "2fbae1a7-e268-4cdf-9b2f-cbfbee7efaae",
+    "membership_id": null,
+    "status": "Enrolled",
+    "enrolled_at": "2025-08-31T07:15:11.694Z"
+  },
+  {
+    "id": "0e0e96e0-ce4c-45cc-a677-f974febe5aee",
+    "user_id": "08d3abc2-3d3a-4c2e-94e7-9039eb1eea48",
+    "course_session_id": "d04fc18c-5ae7-4feb-aab5-f331160ba676",
+    "membership_id": null,
+    "status": "Enrolled",
+    "enrolled_at": "2026-04-15T16:41:42.483Z"
+  },
+  {
+    "id": "7be779ce-2821-4335-a259-a80d27c4b951",
+    "user_id": "41ebb534-d9b8-44c0-80c1-00d99d736a58",
+    "course_session_id": "d04fc18c-5ae7-4feb-aab5-f331160ba676",
+    "membership_id": null,
+    "status": "Enrolled",
+    "enrolled_at": "2026-05-29T04:35:31.296Z"
+  },
+  {
+    "id": "e0b0b824-fbdd-4171-8157-a90028fb2896",
+    "user_id": "e792d825-42ac-4bf5-85e9-f01e16044372",
+    "course_session_id": "d04fc18c-5ae7-4feb-aab5-f331160ba676",
+    "membership_id": null,
+    "status": "Enrolled",
+    "enrolled_at": "2026-01-12T09:17:54.432Z"
+  },
+  {
+    "id": "467f0719-058c-4af1-96ed-6a06db9943b4",
+    "user_id": "331964dd-292c-4174-8036-cbe4a081789c",
+    "course_session_id": "d04fc18c-5ae7-4feb-aab5-f331160ba676",
+    "membership_id": null,
+    "status": "Enrolled",
+    "enrolled_at": "2026-05-12T11:28:13.153Z"
+  },
+  {
+    "id": "f3d3230c-4ab1-4897-881d-aaf773663942",
+    "user_id": "55b2c18e-2678-497f-8a14-19f210b80831",
+    "course_session_id": "d04fc18c-5ae7-4feb-aab5-f331160ba676",
+    "membership_id": null,
+    "status": "Enrolled",
+    "enrolled_at": "2026-06-17T11:58:10.047Z"
+  },
+  {
+    "id": "13b5f6e6-18fb-4d29-8823-90b87eccda0c",
+    "user_id": "55b2c18e-2678-497f-8a14-19f210b80831",
+    "course_session_id": "9de2fd27-5955-485a-af0b-c66f2bb8ca1c",
+    "membership_id": null,
+    "status": "Enrolled",
+    "enrolled_at": "2026-01-13T19:16:24.934Z"
+  },
+  {
+    "id": "5f5f7d7d-9c40-4694-98e7-5c0eba616497",
+    "user_id": "0315b829-b342-4bea-af1a-9648234c2602",
+    "course_session_id": "9de2fd27-5955-485a-af0b-c66f2bb8ca1c",
+    "membership_id": null,
+    "status": "Enrolled",
+    "enrolled_at": "2026-03-07T22:21:06.077Z"
+  },
+  {
+    "id": "f680af9b-843a-4c2e-bbb9-3451d0fa85bb",
+    "user_id": "246dc918-cf11-4b5d-9555-d5dd46758595",
+    "course_session_id": "9de2fd27-5955-485a-af0b-c66f2bb8ca1c",
+    "membership_id": null,
+    "status": "Enrolled",
+    "enrolled_at": "2025-12-30T22:32:30.148Z"
+  },
+  {
+    "id": "7206fa8a-becb-45aa-8219-f253292a94dd",
+    "user_id": "73fcaa45-a519-452a-8781-ec1e35e0d800",
+    "course_session_id": "1ecdfbc1-19b3-4907-ab9d-15d269189047",
+    "membership_id": null,
+    "status": "Enrolled",
+    "enrolled_at": "2026-07-21T11:05:46.071Z"
+  },
+  {
+    "id": "26fab611-1d6d-4516-892c-d076383274c7",
+    "user_id": "246dc918-cf11-4b5d-9555-d5dd46758595",
+    "course_session_id": "1ecdfbc1-19b3-4907-ab9d-15d269189047",
+    "membership_id": null,
+    "status": "Enrolled",
+    "enrolled_at": "2026-07-24T12:30:18.159Z"
+  },
+  {
+    "id": "2328e256-2dda-458b-bfd1-56803bc6c75e",
+    "user_id": "684da07a-2986-408b-8f9b-382b7d3ddd39",
+    "course_session_id": "1ecdfbc1-19b3-4907-ab9d-15d269189047",
+    "membership_id": null,
+    "status": "Enrolled",
+    "enrolled_at": "2026-03-17T19:30:54.163Z"
+  },
+  {
+    "id": "a173f139-54e9-4f3c-af30-c6ab2ac8c601",
+    "user_id": "3fa57db7-f8cb-4ff9-8a35-d15a865d82b4",
+    "course_session_id": "1ecdfbc1-19b3-4907-ab9d-15d269189047",
+    "membership_id": null,
+    "status": "Enrolled",
+    "enrolled_at": "2026-09-29T19:43:40.185Z"
+  },
+  {
+    "id": "52f6f63a-51d9-457d-95ba-724debe8608d",
+    "user_id": "c532e090-614f-4d4b-98de-b2f842bbda21",
+    "course_session_id": "04ec0bfd-56d6-4b25-ac06-8b8e0d203442",
+    "membership_id": null,
+    "status": "Enrolled",
+    "enrolled_at": "2025-06-04T21:01:39.140Z"
+  },
+  {
+    "id": "00bab4bd-34c4-4157-bf2a-b54f9c6844b5",
+    "user_id": "d80ed918-962a-475e-9038-7e52a101f533",
+    "course_session_id": "04ec0bfd-56d6-4b25-ac06-8b8e0d203442",
+    "membership_id": null,
+    "status": "Enrolled",
+    "enrolled_at": "2025-08-02T02:42:41.661Z"
+  },
+  {
+    "id": "e1c18045-2160-4bc1-8f3a-b23437d63a0d",
+    "user_id": "3c5d3324-666b-49d6-9840-24f002409a04",
+    "course_session_id": "04ec0bfd-56d6-4b25-ac06-8b8e0d203442",
+    "membership_id": null,
+    "status": "Enrolled",
+    "enrolled_at": "2025-12-01T10:10:18.637Z"
+  },
+  {
+    "id": "a313a969-8afd-47d8-a70a-7e04d4e13c6b",
+    "user_id": "3ecdac3c-def4-4954-ac30-a10116fb8b97",
+    "course_session_id": "04ec0bfd-56d6-4b25-ac06-8b8e0d203442",
+    "membership_id": null,
+    "status": "Enrolled",
+    "enrolled_at": "2025-06-30T06:17:38.486Z"
+  },
+  {
+    "id": "c3530d7d-eb2f-43a5-8ce9-fe0eb0bd7c6b",
+    "user_id": "be48e2c2-129b-4f06-a70b-4cfe68cf661e",
+    "course_session_id": "feef6ff0-102d-4b9f-bf94-0d58133ae8f0",
+    "membership_id": null,
+    "status": "Enrolled",
+    "enrolled_at": "2026-02-28T22:56:49.125Z"
+  },
+  {
+    "id": "8315b92b-0087-4f51-ae58-12f3a0b2ac2a",
+    "user_id": "3fa4dee5-522b-4463-a4b8-b539278d2e22",
+    "course_session_id": "feef6ff0-102d-4b9f-bf94-0d58133ae8f0",
+    "membership_id": null,
+    "status": "Enrolled",
+    "enrolled_at": "2026-09-13T09:34:40.161Z"
+  },
+  {
+    "id": "6e13c0ca-f91f-4bca-957b-f3deff8aa9fb",
+    "user_id": "7e66a6eb-08a5-4550-8c3a-c18995dee934",
+    "course_session_id": "feef6ff0-102d-4b9f-bf94-0d58133ae8f0",
+    "membership_id": null,
+    "status": "Enrolled",
+    "enrolled_at": "2026-01-31T09:52:49.351Z"
+  },
+  {
+    "id": "ed7987d7-dde9-4248-a53e-9a7820257e67",
+    "user_id": "051ad41c-7453-4576-a2e7-f73f5cf85533",
+    "course_session_id": "64c8994a-99d6-4715-b946-c37129dafce3",
+    "membership_id": null,
+    "status": "Enrolled",
+    "enrolled_at": "2026-04-29T20:08:47.354Z"
+  },
+  {
+    "id": "997daf13-5eb8-4e9b-bd55-3f46a904d130",
+    "user_id": "c40632ad-c573-4b6b-ac73-67a2c610654d",
+    "course_session_id": "64c8994a-99d6-4715-b946-c37129dafce3",
+    "membership_id": null,
+    "status": "Enrolled",
+    "enrolled_at": "2026-05-22T23:16:02.829Z"
+  },
+  {
+    "id": "ff09af40-9b7a-40e9-9d34-d82e0cd787fe",
+    "user_id": "3fa57db7-f8cb-4ff9-8a35-d15a865d82b4",
+    "course_session_id": "64c8994a-99d6-4715-b946-c37129dafce3",
+    "membership_id": null,
+    "status": "Enrolled",
+    "enrolled_at": "2026-01-20T04:54:02.070Z"
+  },
+  {
+    "id": "9aaf8f0d-0bb4-4838-b819-168798c5a078",
+    "user_id": "72fdff62-8495-432e-85eb-69604f17c2d4",
+    "course_session_id": "2b0ad0dd-5e8e-47ea-ad83-da84d2553f6f",
+    "membership_id": null,
+    "status": "Enrolled",
+    "enrolled_at": "2026-07-02T00:44:37.686Z"
+  },
+  {
+    "id": "f296e209-f14d-454c-8845-98e0b56c8988",
+    "user_id": "41ebb534-d9b8-44c0-80c1-00d99d736a58",
+    "course_session_id": "2b0ad0dd-5e8e-47ea-ad83-da84d2553f6f",
+    "membership_id": null,
+    "status": "Enrolled",
+    "enrolled_at": "2026-09-24T09:10:54.318Z"
+  },
+  {
+    "id": "869e7966-aac0-4de2-8436-72307758ba11",
+    "user_id": "3b1eb72a-2e36-4e17-bf24-663567840207",
+    "course_session_id": "2b0ad0dd-5e8e-47ea-ad83-da84d2553f6f",
+    "membership_id": null,
+    "status": "Enrolled",
+    "enrolled_at": "2026-04-18T01:00:52.973Z"
+  },
+  {
+    "id": "2df34f3b-b740-4a3d-8f16-d93f0ac33ca8",
+    "user_id": "c40632ad-c573-4b6b-ac73-67a2c610654d",
+    "course_session_id": "2a714cb5-37d4-4f8b-975e-8b8b356a5744",
+    "membership_id": null,
+    "status": "Enrolled",
+    "enrolled_at": "2026-01-02T18:31:48.535Z"
+  },
+  {
+    "id": "c83c0d7d-2aeb-47a7-822d-9f24b69978dc",
+    "user_id": "35623e13-469a-4157-9352-6bb49ef7a4e0",
+    "course_session_id": "2a714cb5-37d4-4f8b-975e-8b8b356a5744",
+    "membership_id": null,
+    "status": "Enrolled",
+    "enrolled_at": "2026-06-10T04:25:16.093Z"
+  },
+  {
+    "id": "f5227dbf-8a4a-4dba-a29e-0b8c61227c68",
+    "user_id": "ae3c0fa3-d364-4d7e-8ca1-2b36f237e255",
+    "course_session_id": "2a714cb5-37d4-4f8b-975e-8b8b356a5744",
+    "membership_id": null,
+    "status": "Enrolled",
+    "enrolled_at": "2026-05-05T14:59:58.247Z"
+  },
+  {
+    "id": "70675548-5166-4b05-9ee8-95c6a99e3edc",
+    "user_id": "be48e2c2-129b-4f06-a70b-4cfe68cf661e",
+    "course_session_id": "2a714cb5-37d4-4f8b-975e-8b8b356a5744",
+    "membership_id": null,
+    "status": "Enrolled",
+    "enrolled_at": "2026-05-29T22:57:25.632Z"
+  },
+  {
+    "id": "946a57c6-f81f-46c2-a1fc-6c9af1e523fd",
+    "user_id": "32a429a6-d76c-4d9f-947f-5bfedcdbc338",
+    "course_session_id": "2a714cb5-37d4-4f8b-975e-8b8b356a5744",
+    "membership_id": null,
+    "status": "Enrolled",
+    "enrolled_at": "2026-01-14T01:16:11.389Z"
+  },
+  {
+    "id": "ce902c10-ea65-4062-8f12-37bc45ddb06e",
+    "user_id": "a8acea85-d91d-4203-85a9-30180cf2d73a",
+    "course_session_id": "ccb18c6f-b068-4238-a708-7aed2ad4fbf5",
+    "membership_id": null,
+    "status": "Enrolled",
+    "enrolled_at": "2026-07-19T11:24:54.237Z"
+  },
+  {
+    "id": "a36c1cf5-6a52-44d5-9769-e41e950881d5",
+    "user_id": "55b2c18e-2678-497f-8a14-19f210b80831",
+    "course_session_id": "ccb18c6f-b068-4238-a708-7aed2ad4fbf5",
+    "membership_id": null,
+    "status": "Enrolled",
+    "enrolled_at": "2025-12-07T14:50:38.574Z"
+  },
+  {
+    "id": "561c8bfb-d3ee-4e57-8b7f-cffa04f114e3",
+    "user_id": "4bc9b12d-82ff-4c0e-9684-84bcd903e569",
+    "course_session_id": "ccb18c6f-b068-4238-a708-7aed2ad4fbf5",
+    "membership_id": null,
+    "status": "Enrolled",
+    "enrolled_at": "2026-08-14T19:26:49.195Z"
+  },
+  {
+    "id": "7d3558f7-9f4f-4fa6-8ef7-77606724fe62",
+    "user_id": "73fcaa45-a519-452a-8781-ec1e35e0d800",
+    "course_session_id": "835b2194-020f-49e1-8cf8-f886a101f1f3",
+    "membership_id": null,
+    "status": "Enrolled",
+    "enrolled_at": "2025-11-02T23:05:12.893Z"
+  },
+  {
+    "id": "3aba555a-0041-431c-a4be-25bf99b9b09b",
+    "user_id": "afb932a6-f877-40ba-b8f7-3988913c1e9b",
+    "course_session_id": "835b2194-020f-49e1-8cf8-f886a101f1f3",
+    "membership_id": null,
+    "status": "Enrolled",
+    "enrolled_at": "2026-02-05T04:08:28.003Z"
+  },
+  {
+    "id": "e948f01d-707c-4bcb-9ce6-73dc1e9dbd7f",
+    "user_id": "3b1eb72a-2e36-4e17-bf24-663567840207",
+    "course_session_id": "835b2194-020f-49e1-8cf8-f886a101f1f3",
+    "membership_id": null,
+    "status": "Enrolled",
+    "enrolled_at": "2025-10-23T03:16:15.163Z"
+  },
+  {
+    "id": "bb0f28aa-d5b2-4a8f-9422-d7bac8290999",
+    "user_id": "ceab0fa9-dafc-4a20-b19a-f93e2a6b2b5f",
+    "course_session_id": "835b2194-020f-49e1-8cf8-f886a101f1f3",
+    "membership_id": null,
+    "status": "Enrolled",
+    "enrolled_at": "2026-03-15T14:40:56.702Z"
+  },
+  {
+    "id": "30632213-f7d5-4022-a424-473092729705",
+    "user_id": "7e66a6eb-08a5-4550-8c3a-c18995dee934",
+    "course_session_id": "a10e9dce-162b-4d4e-b195-55296caff63e",
+    "membership_id": null,
+    "status": "Enrolled",
+    "enrolled_at": "2025-11-08T16:43:45.799Z"
+  },
+  {
+    "id": "69e6335c-40f6-46d6-a78a-6a9ec7dfbbcf",
+    "user_id": "41ebb534-d9b8-44c0-80c1-00d99d736a58",
+    "course_session_id": "a0db2ca9-7701-4495-94d5-11e92e6d6f36",
+    "membership_id": null,
+    "status": "Enrolled",
+    "enrolled_at": "2025-09-19T00:47:37.665Z"
+  },
+  {
+    "id": "c4ae2f4a-1d2d-4d7f-a182-64fe3a34a522",
+    "user_id": "ceab0fa9-dafc-4a20-b19a-f93e2a6b2b5f",
+    "course_session_id": "a0db2ca9-7701-4495-94d5-11e92e6d6f36",
+    "membership_id": null,
+    "status": "Enrolled",
+    "enrolled_at": "2025-12-09T21:50:15.130Z"
+  },
+  {
+    "id": "fcd1d1e2-42fa-46b3-bfc1-9584b5b00520",
+    "user_id": "3fa4dee5-522b-4463-a4b8-b539278d2e22",
+    "course_session_id": "a0db2ca9-7701-4495-94d5-11e92e6d6f36",
+    "membership_id": null,
+    "status": "Enrolled",
+    "enrolled_at": "2025-05-26T13:04:30.813Z"
+  },
+  {
+    "id": "294dd409-614e-49df-9044-8e40bbb6342c",
+    "user_id": "57e9731e-815c-45dd-8778-0c55ac2c64c8",
+    "course_session_id": "a0db2ca9-7701-4495-94d5-11e92e6d6f36",
+    "membership_id": null,
+    "status": "Enrolled",
+    "enrolled_at": "2025-12-09T01:01:41.849Z"
+  },
+  {
+    "id": "73949822-d41a-483a-a056-2b12dc06d23d",
+    "user_id": "051ad41c-7453-4576-a2e7-f73f5cf85533",
+    "course_session_id": "a0db2ca9-7701-4495-94d5-11e92e6d6f36",
+    "membership_id": null,
+    "status": "Enrolled",
+    "enrolled_at": "2025-03-06T02:18:05.857Z"
+  },
+  {
+    "id": "dd992728-be07-49e5-aa4b-7308e5a9fa40",
+    "user_id": "1977fab3-b903-41f5-9829-6403fbbddb61",
+    "course_session_id": "5b5eff89-2f51-478c-92b4-25666a0ed670",
+    "membership_id": null,
+    "status": "Enrolled",
+    "enrolled_at": "2026-04-29T13:11:14.874Z"
+  },
+  {
+    "id": "302c6507-569e-43d4-a91b-5885ab380d71",
+    "user_id": "3b1eb72a-2e36-4e17-bf24-663567840207",
+    "course_session_id": "5b5eff89-2f51-478c-92b4-25666a0ed670",
+    "membership_id": null,
+    "status": "Enrolled",
+    "enrolled_at": "2026-02-09T12:35:55.237Z"
+  },
+  {
+    "id": "bcd3e9f1-8997-46ec-b09d-f9dce907ef25",
+    "user_id": "276b5dd4-d4ca-4772-aa14-55d716f025f1",
+    "course_session_id": "5b5eff89-2f51-478c-92b4-25666a0ed670",
+    "membership_id": null,
+    "status": "Enrolled",
+    "enrolled_at": "2026-04-15T10:20:31.745Z"
+  },
+  {
+    "id": "1a009bbc-63f0-42d5-952b-08be794c088b",
+    "user_id": "d80ed918-962a-475e-9038-7e52a101f533",
+    "course_session_id": "a1f2b044-9b9d-4220-a903-1f8e4ffb2fca",
+    "membership_id": null,
+    "status": "Enrolled",
+    "enrolled_at": "2025-06-17T22:52:36.441Z"
+  },
+  {
+    "id": "e2cfb3f5-b7c9-4fde-8c5a-e8fa02cf5fd9",
+    "user_id": "edbc586e-a3e1-46c3-a803-aec46510b4ff",
+    "course_session_id": "a1f2b044-9b9d-4220-a903-1f8e4ffb2fca",
+    "membership_id": null,
+    "status": "Enrolled",
+    "enrolled_at": "2025-09-08T11:08:19.186Z"
+  },
+  {
+    "id": "c43f1fad-be93-415f-b0a1-41b32ccc9f32",
+    "user_id": "246dc918-cf11-4b5d-9555-d5dd46758595",
+    "course_session_id": "a1f2b044-9b9d-4220-a903-1f8e4ffb2fca",
+    "membership_id": null,
+    "status": "Enrolled",
+    "enrolled_at": "2026-04-24T07:13:05.574Z"
+  },
+  {
+    "id": "50b7c79f-3140-4953-a4f0-333392695c9f",
+    "user_id": "4bc9b12d-82ff-4c0e-9684-84bcd903e569",
+    "course_session_id": "f7e28d9c-6090-4ca6-b00f-d0cad096e073",
+    "membership_id": null,
+    "status": "Enrolled",
+    "enrolled_at": "2025-12-08T18:39:42.557Z"
+  },
+  {
+    "id": "8ed2546e-a836-4775-be1c-c03b1e033ee5",
+    "user_id": "8e4a85a9-76b9-45fa-9ebb-bb210d3b733b",
+    "course_session_id": "4cfc3688-8bab-4c44-9445-8525d6779481",
+    "membership_id": null,
+    "status": "Enrolled",
+    "enrolled_at": "2026-11-15T20:01:03.440Z"
+  },
+  {
+    "id": "f3079281-b7ab-41a8-adc6-7fdff371c323",
+    "user_id": "57e9731e-815c-45dd-8778-0c55ac2c64c8",
+    "course_session_id": "d2adf9c5-b532-4028-9ea4-4b1c0e8f04b3",
+    "membership_id": null,
+    "status": "Enrolled",
+    "enrolled_at": "2026-01-15T16:38:15.144Z"
+  },
+  {
+    "id": "2d99ede5-7f52-4ebe-972c-55cbf8ee7543",
+    "user_id": "be48e2c2-129b-4f06-a70b-4cfe68cf661e",
+    "course_session_id": "d2adf9c5-b532-4028-9ea4-4b1c0e8f04b3",
+    "membership_id": null,
+    "status": "Enrolled",
+    "enrolled_at": "2025-07-04T12:54:00.410Z"
+  },
+  {
+    "id": "4f6639e4-b076-4b6c-ba74-46bffc98c657",
+    "user_id": "35623e13-469a-4157-9352-6bb49ef7a4e0",
+    "course_session_id": "0edf3513-dd9d-4c20-a851-2edbd0c8490a",
+    "membership_id": null,
+    "status": "Enrolled",
+    "enrolled_at": "2025-08-07T05:22:52.040Z"
+  },
+  {
+    "id": "5b2a8770-24ce-4145-96b2-5425a4e95e85",
+    "user_id": "1977fab3-b903-41f5-9829-6403fbbddb61",
+    "course_session_id": "0edf3513-dd9d-4c20-a851-2edbd0c8490a",
+    "membership_id": null,
+    "status": "Enrolled",
+    "enrolled_at": "2025-05-01T00:25:05.961Z"
+  },
+  {
+    "id": "27ae63c9-9cbf-481b-8268-4bf0736865ad",
+    "user_id": "a7c68af4-b74c-490e-991d-efd26cc3b03e",
+    "course_session_id": "0edf3513-dd9d-4c20-a851-2edbd0c8490a",
+    "membership_id": null,
+    "status": "Enrolled",
+    "enrolled_at": "2025-09-16T11:30:54.957Z"
+  },
+  {
+    "id": "e3114c7c-6121-480f-a211-68dc13fb4983",
+    "user_id": "7e66a6eb-08a5-4550-8c3a-c18995dee934",
+    "course_session_id": "0edf3513-dd9d-4c20-a851-2edbd0c8490a",
+    "membership_id": null,
+    "status": "Enrolled",
+    "enrolled_at": "2026-02-03T13:53:12.615Z"
+  },
+  {
+    "id": "aa6ece06-c100-45a1-a80e-bd0115e91742",
+    "user_id": "0315b829-b342-4bea-af1a-9648234c2602",
+    "course_session_id": "0f61de73-c6fe-4162-9351-63a9b40fde07",
+    "membership_id": null,
+    "status": "Enrolled",
+    "enrolled_at": "2025-07-15T08:05:54.980Z"
+  },
+  {
+    "id": "dc6d38d2-eda7-465a-b4c5-acf950da27e0",
+    "user_id": "3b1eb72a-2e36-4e17-bf24-663567840207",
+    "course_session_id": "0f61de73-c6fe-4162-9351-63a9b40fde07",
+    "membership_id": null,
+    "status": "Enrolled",
+    "enrolled_at": "2025-06-04T06:38:41.539Z"
+  },
+  {
+    "id": "79af7a33-9f36-4f27-af84-e78b690e06f0",
+    "user_id": "73fcaa45-a519-452a-8781-ec1e35e0d800",
+    "course_session_id": "0f61de73-c6fe-4162-9351-63a9b40fde07",
+    "membership_id": null,
+    "status": "Enrolled",
+    "enrolled_at": "2026-02-04T00:27:57.700Z"
+  },
+  {
+    "id": "8acde7be-d66e-49e2-8b24-a3a2cc345e16",
+    "user_id": "e792d825-42ac-4bf5-85e9-f01e16044372",
+    "course_session_id": "0f61de73-c6fe-4162-9351-63a9b40fde07",
+    "membership_id": null,
+    "status": "Enrolled",
+    "enrolled_at": "2025-08-05T00:13:30.339Z"
+  },
+  {
+    "id": "da69c8b0-8b68-4573-ac1b-9a65d4b9963f",
+    "user_id": "2309b086-27db-46e7-92aa-9ca87a34913d",
+    "course_session_id": "69c8d7dd-d808-4f4d-9bdc-8fab2074014d",
+    "membership_id": null,
+    "status": "Enrolled",
+    "enrolled_at": "2025-08-07T04:53:30.567Z"
+  },
+  {
+    "id": "42da4812-dd37-44c6-9f27-865e904419b0",
+    "user_id": "b6722aa7-92c5-44d8-aa44-f07126a59731",
+    "course_session_id": "0e217520-0ea0-4c3e-bb77-8b5f905567d1",
+    "membership_id": null,
+    "status": "Enrolled",
+    "enrolled_at": "2026-03-07T16:28:04.513Z"
+  },
+  {
+    "id": "146fa29e-1eb6-4cb3-8238-11738fd29949",
+    "user_id": "35623e13-469a-4157-9352-6bb49ef7a4e0",
+    "course_session_id": "0e217520-0ea0-4c3e-bb77-8b5f905567d1",
+    "membership_id": null,
+    "status": "Enrolled",
+    "enrolled_at": "2026-06-04T19:02:26.590Z"
+  },
+  {
+    "id": "7ee2c37b-460d-4f00-bb17-8ac07c524c0e",
+    "user_id": "a8acea85-d91d-4203-85a9-30180cf2d73a",
+    "course_session_id": "0e217520-0ea0-4c3e-bb77-8b5f905567d1",
+    "membership_id": null,
+    "status": "Enrolled",
+    "enrolled_at": "2025-12-31T23:05:44.488Z"
+  },
+  {
+    "id": "3b2c5897-5d47-4d42-9586-679aee604750",
+    "user_id": "331964dd-292c-4174-8036-cbe4a081789c",
+    "course_session_id": "0e217520-0ea0-4c3e-bb77-8b5f905567d1",
+    "membership_id": null,
+    "status": "Enrolled",
+    "enrolled_at": "2026-02-13T06:02:48.370Z"
+  },
+  {
+    "id": "a69ea3b0-bd51-40fc-bd21-4c8e5517fb00",
+    "user_id": "d80ed918-962a-475e-9038-7e52a101f533",
+    "course_session_id": "0e217520-0ea0-4c3e-bb77-8b5f905567d1",
+    "membership_id": null,
+    "status": "Enrolled",
+    "enrolled_at": "2026-05-21T15:10:56.516Z"
+  },
+  {
+    "id": "8abd8c44-5f20-4bba-91df-bb559c53fd3d",
+    "user_id": "c532e090-614f-4d4b-98de-b2f842bbda21",
+    "course_session_id": "53676119-bc86-489f-a803-622424efeda0",
+    "membership_id": null,
+    "status": "Enrolled",
+    "enrolled_at": "2026-01-30T00:29:45.663Z"
+  },
+  {
+    "id": "0d87ab2b-897b-4d17-9124-56095f827f3c",
+    "user_id": "be48e2c2-129b-4f06-a70b-4cfe68cf661e",
+    "course_session_id": "53676119-bc86-489f-a803-622424efeda0",
+    "membership_id": null,
+    "status": "Enrolled",
+    "enrolled_at": "2026-02-05T03:52:05.319Z"
+  },
+  {
+    "id": "450296b2-c3bb-469a-9984-08641747e0f1",
+    "user_id": "be48e2c2-129b-4f06-a70b-4cfe68cf661e",
+    "course_session_id": "2793407b-233d-42f5-a27c-84776172edf9",
+    "membership_id": null,
+    "status": "Enrolled",
+    "enrolled_at": "2026-03-23T06:57:26.166Z"
+  },
+  {
+    "id": "601fec59-774f-4dd0-9f3a-1f0f34409059",
+    "user_id": "afb932a6-f877-40ba-b8f7-3988913c1e9b",
+    "course_session_id": "2793407b-233d-42f5-a27c-84776172edf9",
+    "membership_id": null,
+    "status": "Enrolled",
+    "enrolled_at": "2026-03-31T02:14:00.152Z"
+  },
+  {
+    "id": "83eb8503-6570-4d77-b47a-5a5494d496e4",
+    "user_id": "4bc9b12d-82ff-4c0e-9684-84bcd903e569",
+    "course_session_id": "2793407b-233d-42f5-a27c-84776172edf9",
+    "membership_id": null,
+    "status": "Enrolled",
+    "enrolled_at": "2026-03-29T09:40:06.407Z"
+  },
+  {
+    "id": "71a2b62e-4e74-4c5b-8d4e-feea9d8a434f",
+    "user_id": "3b1eb72a-2e36-4e17-bf24-663567840207",
+    "course_session_id": "1167a108-f0a6-4650-aaa1-88a7e37ffdd4",
+    "membership_id": null,
+    "status": "Enrolled",
+    "enrolled_at": "2025-05-18T11:39:07.569Z"
+  },
+  {
+    "id": "c2ea29d5-1a05-43e7-883b-d141bc6426f7",
+    "user_id": "28c95fd7-8121-4e24-b6f5-0c57ef82b734",
+    "course_session_id": "1167a108-f0a6-4650-aaa1-88a7e37ffdd4",
+    "membership_id": null,
+    "status": "Enrolled",
+    "enrolled_at": "2025-07-26T05:15:45.562Z"
+  },
+  {
+    "id": "9520d7b0-44eb-4ea5-bba1-c3e1dd6902e7",
+    "user_id": "3c5d3324-666b-49d6-9840-24f002409a04",
+    "course_session_id": "1167a108-f0a6-4650-aaa1-88a7e37ffdd4",
+    "membership_id": null,
+    "status": "Enrolled",
+    "enrolled_at": "2025-04-29T12:07:49.664Z"
+  },
+  {
+    "id": "4b243510-5bf1-4ea1-8bfa-fddb013b71fe",
+    "user_id": "532b3ad9-45ce-497b-8da2-d75399474fe0",
+    "course_session_id": "1167a108-f0a6-4650-aaa1-88a7e37ffdd4",
+    "membership_id": null,
+    "status": "Enrolled",
+    "enrolled_at": "2025-06-20T04:55:23.891Z"
+  },
+  {
+    "id": "8d0ef1cc-95b1-49d5-ba6b-fe5544fd0aef",
+    "user_id": "35623e13-469a-4157-9352-6bb49ef7a4e0",
+    "course_session_id": "1167a108-f0a6-4650-aaa1-88a7e37ffdd4",
+    "membership_id": null,
+    "status": "Enrolled",
+    "enrolled_at": "2025-08-18T11:03:01.802Z"
+  },
+  {
+    "id": "99d7b6e1-d0d8-4c0d-bba9-e26e37bfda27",
+    "user_id": "331964dd-292c-4174-8036-cbe4a081789c",
+    "course_session_id": "2a709969-b464-4367-bffc-1229fea398eb",
+    "membership_id": null,
+    "status": "Enrolled",
+    "enrolled_at": "2026-02-08T13:12:26.964Z"
+  },
+  {
+    "id": "ea005cdd-ea54-434d-86b2-2f179ae6e6f9",
+    "user_id": "28c95fd7-8121-4e24-b6f5-0c57ef82b734",
+    "course_session_id": "2a709969-b464-4367-bffc-1229fea398eb",
+    "membership_id": null,
+    "status": "Enrolled",
+    "enrolled_at": "2026-08-10T12:42:25.964Z"
+  },
+  {
+    "id": "b3025279-486d-4a1c-be10-9232361c740d",
+    "user_id": "41ebb534-d9b8-44c0-80c1-00d99d736a58",
+    "course_session_id": "2a709969-b464-4367-bffc-1229fea398eb",
+    "membership_id": null,
+    "status": "Enrolled",
+    "enrolled_at": "2026-05-29T15:01:39.132Z"
+  },
+  {
+    "id": "364ea615-4965-4842-95f3-715f269033af",
+    "user_id": "b82bb59c-becc-4c97-a325-6ab1735cb964",
+    "course_session_id": "2a709969-b464-4367-bffc-1229fea398eb",
+    "membership_id": null,
+    "status": "Enrolled",
+    "enrolled_at": "2026-07-23T02:43:16.979Z"
+  },
+  {
+    "id": "176d6dd4-0c74-472a-a92f-1302791393b3",
+    "user_id": "e792d825-42ac-4bf5-85e9-f01e16044372",
+    "course_session_id": "2a709969-b464-4367-bffc-1229fea398eb",
+    "membership_id": null,
+    "status": "Enrolled",
+    "enrolled_at": "2025-12-06T07:09:25.718Z"
+  },
+  {
+    "id": "c9692de3-7d65-4cac-ab91-4c9f09e5b1a0",
+    "user_id": "d80ed918-962a-475e-9038-7e52a101f533",
+    "course_session_id": "6534b616-62d7-45ec-9d6a-654b5c6f4700",
+    "membership_id": null,
+    "status": "Enrolled",
+    "enrolled_at": "2026-04-01T15:35:26.254Z"
+  },
+  {
+    "id": "8ce003d0-19e2-4caf-afd2-25adad0c3e05",
+    "user_id": "ae3c0fa3-d364-4d7e-8ca1-2b36f237e255",
+    "course_session_id": "6534b616-62d7-45ec-9d6a-654b5c6f4700",
+    "membership_id": null,
+    "status": "Enrolled",
+    "enrolled_at": "2026-01-11T13:05:22.565Z"
+  },
+  {
+    "id": "3ed5bc21-fbea-452c-ad13-3f9ffcc00e89",
+    "user_id": "684da07a-2986-408b-8f9b-382b7d3ddd39",
+    "course_session_id": "6534b616-62d7-45ec-9d6a-654b5c6f4700",
+    "membership_id": null,
+    "status": "Enrolled",
+    "enrolled_at": "2026-06-10T09:43:18.174Z"
+  },
+  {
+    "id": "401c0f6d-972e-40da-93cb-d069b912e51d",
+    "user_id": "b6722aa7-92c5-44d8-aa44-f07126a59731",
+    "course_session_id": "6534b616-62d7-45ec-9d6a-654b5c6f4700",
+    "membership_id": null,
+    "status": "Enrolled",
+    "enrolled_at": "2026-08-21T13:12:22.337Z"
+  },
+  {
+    "id": "d91016e8-36d9-485e-bab5-459ed553cf26",
+    "user_id": "051ad41c-7453-4576-a2e7-f73f5cf85533",
+    "course_session_id": "ee3b977c-b081-4ad6-939b-7ac88becf8ab",
+    "membership_id": null,
+    "status": "Enrolled",
+    "enrolled_at": "2026-09-05T16:56:18.760Z"
+  },
+  {
+    "id": "6046f391-7730-41e9-90a8-3d96b72ffef9",
+    "user_id": "8e4a85a9-76b9-45fa-9ebb-bb210d3b733b",
+    "course_session_id": "ee3b977c-b081-4ad6-939b-7ac88becf8ab",
+    "membership_id": null,
+    "status": "Enrolled",
+    "enrolled_at": "2026-01-29T14:17:26.212Z"
+  },
+  {
+    "id": "6e3ab358-8ae2-4005-887a-5ef3bb504450",
+    "user_id": "276b5dd4-d4ca-4772-aa14-55d716f025f1",
+    "course_session_id": "ee3b977c-b081-4ad6-939b-7ac88becf8ab",
+    "membership_id": null,
+    "status": "Enrolled",
+    "enrolled_at": "2026-06-23T17:56:40.519Z"
+  },
+  {
+    "id": "65a8938f-fae8-40f4-8dc7-be6632051964",
+    "user_id": "3ecdac3c-def4-4954-ac30-a10116fb8b97",
+    "course_session_id": "3d908cfa-9512-4e70-8649-5d86347003d9",
+    "membership_id": null,
+    "status": "Enrolled",
+    "enrolled_at": "2025-06-02T00:49:29.018Z"
+  },
+  {
+    "id": "bdac9087-be5f-46cb-87af-d6eefba4dd91",
+    "user_id": "7dd17b7d-bea9-433c-95b3-2378cc8c86d4",
+    "course_session_id": "3d908cfa-9512-4e70-8649-5d86347003d9",
+    "membership_id": null,
+    "status": "Enrolled",
+    "enrolled_at": "2026-02-17T05:21:37.636Z"
+  },
+  {
+    "id": "da7cc4f2-7a9c-47c1-9c22-a377185d1b98",
+    "user_id": "4bc9b12d-82ff-4c0e-9684-84bcd903e569",
+    "course_session_id": "3d908cfa-9512-4e70-8649-5d86347003d9",
+    "membership_id": null,
+    "status": "Enrolled",
+    "enrolled_at": "2025-09-02T17:26:31.011Z"
+  },
+  {
+    "id": "958bf3b4-16b4-4a79-9ae0-f9f04c7ceae1",
+    "user_id": "684da07a-2986-408b-8f9b-382b7d3ddd39",
+    "course_session_id": "3d908cfa-9512-4e70-8649-5d86347003d9",
+    "membership_id": null,
+    "status": "Enrolled",
+    "enrolled_at": "2025-07-21T10:57:53.757Z"
+  },
+  {
+    "id": "94b36e53-936d-4e1e-b61d-8facc79bbcda",
+    "user_id": "b82bb59c-becc-4c97-a325-6ab1735cb964",
+    "course_session_id": "a4d4aa5a-3e30-47bd-b99e-0e4113f7c2a4",
+    "membership_id": null,
+    "status": "Enrolled",
+    "enrolled_at": "2026-04-08T08:08:57.136Z"
+  },
+  {
+    "id": "0d0a03ce-3811-4255-9dfd-e894ee66c1e3",
+    "user_id": "2309b086-27db-46e7-92aa-9ca87a34913d",
+    "course_session_id": "a4d4aa5a-3e30-47bd-b99e-0e4113f7c2a4",
+    "membership_id": null,
+    "status": "Enrolled",
+    "enrolled_at": "2025-12-28T23:19:05.232Z"
+  },
+  {
+    "id": "87fa6bf8-fce2-44ce-b4ad-f1ce4c9ca4a4",
+    "user_id": "7dd17b7d-bea9-433c-95b3-2378cc8c86d4",
+    "course_session_id": "9b810cdf-487e-4b9e-8208-00a75defa363",
+    "membership_id": null,
+    "status": "Enrolled",
+    "enrolled_at": "2026-05-17T05:41:14.693Z"
+  },
+  {
+    "id": "874b674d-b12f-4127-9aad-3c9a706c5e9c",
+    "user_id": "ebcec7ea-5698-4146-a791-f31a69787f91",
+    "course_session_id": "9b810cdf-487e-4b9e-8208-00a75defa363",
+    "membership_id": null,
+    "status": "Enrolled",
+    "enrolled_at": "2026-02-21T00:10:59.561Z"
+  },
+  {
+    "id": "e0750fdc-f6be-4309-a076-8dc4a058d75d",
+    "user_id": "684da07a-2986-408b-8f9b-382b7d3ddd39",
+    "course_session_id": "9b810cdf-487e-4b9e-8208-00a75defa363",
+    "membership_id": null,
+    "status": "Enrolled",
+    "enrolled_at": "2026-02-15T11:31:55.057Z"
+  },
+  {
+    "id": "558f1c90-077f-432c-a5df-01756f518e37",
+    "user_id": "3ecdac3c-def4-4954-ac30-a10116fb8b97",
+    "course_session_id": "9b810cdf-487e-4b9e-8208-00a75defa363",
+    "membership_id": null,
+    "status": "Enrolled",
+    "enrolled_at": "2026-07-03T16:41:12.226Z"
+  },
+  {
+    "id": "fa232717-6473-475e-8ee9-660c65e5d6e5",
+    "user_id": "331964dd-292c-4174-8036-cbe4a081789c",
+    "course_session_id": "9b810cdf-487e-4b9e-8208-00a75defa363",
+    "membership_id": null,
+    "status": "Enrolled",
+    "enrolled_at": "2026-05-22T11:39:01.558Z"
+  },
+  {
+    "id": "32be71a5-87de-44c6-9963-5165dc55afd7",
+    "user_id": "3ecdac3c-def4-4954-ac30-a10116fb8b97",
+    "course_session_id": "b5745154-58ed-4fa6-85c0-b5aa3dde95fb",
+    "membership_id": null,
+    "status": "Enrolled",
+    "enrolled_at": "2026-04-07T17:50:07.345Z"
+  },
+  {
+    "id": "ceb9d4a0-98c2-477c-b8ea-11e0636d653c",
+    "user_id": "50fcf391-5f05-4571-9724-c99b50fff565",
+    "course_session_id": "b5745154-58ed-4fa6-85c0-b5aa3dde95fb",
+    "membership_id": null,
+    "status": "Enrolled",
+    "enrolled_at": "2026-02-27T14:49:26.338Z"
+  },
+  {
+    "id": "34ddeae1-e016-4b48-98ca-b36466331ab0",
+    "user_id": "2309b086-27db-46e7-92aa-9ca87a34913d",
+    "course_session_id": "b5745154-58ed-4fa6-85c0-b5aa3dde95fb",
+    "membership_id": null,
+    "status": "Enrolled",
+    "enrolled_at": "2025-09-05T01:15:22.909Z"
+  },
+  {
+    "id": "cd68d99d-3632-4660-bb15-c9c6682ccb3d",
+    "user_id": "051ad41c-7453-4576-a2e7-f73f5cf85533",
+    "course_session_id": "b5745154-58ed-4fa6-85c0-b5aa3dde95fb",
+    "membership_id": null,
+    "status": "Enrolled",
+    "enrolled_at": "2025-07-09T11:36:14.880Z"
+  },
+  {
+    "id": "9729127f-ec56-42bf-85a5-87dbb669521e",
+    "user_id": "edbc586e-a3e1-46c3-a803-aec46510b4ff",
+    "course_session_id": "c9631c79-4de7-4238-9cb3-789d4f7e0644",
+    "membership_id": null,
+    "status": "Enrolled",
+    "enrolled_at": "2025-06-12T15:02:44.487Z"
+  },
+  {
+    "id": "e2110420-bcf6-4957-89bd-bf20d2d25d15",
+    "user_id": "3ecdac3c-def4-4954-ac30-a10116fb8b97",
+    "course_session_id": "c9631c79-4de7-4238-9cb3-789d4f7e0644",
+    "membership_id": null,
+    "status": "Enrolled",
+    "enrolled_at": "2025-11-10T04:39:11.393Z"
+  },
+  {
+    "id": "82ff6f61-8961-45f9-8405-e6fd6f2097f2",
+    "user_id": "b6722aa7-92c5-44d8-aa44-f07126a59731",
+    "course_session_id": "98bc3dc5-a418-4f62-b7cc-b16f03e09849",
+    "membership_id": null,
+    "status": "Enrolled",
+    "enrolled_at": "2025-12-05T17:33:47.274Z"
+  },
+  {
+    "id": "bec1f629-af40-484a-9e8b-5db37b774360",
+    "user_id": "7848b498-0806-4843-9c8a-b55d3771b0bb",
+    "course_session_id": "cb1255d4-65bc-4be4-a738-fadc5dc12c2c",
+    "membership_id": null,
+    "status": "Enrolled",
+    "enrolled_at": "2025-07-14T22:16:23.603Z"
+  },
+  {
+    "id": "1dac741c-6b91-49ef-a5e0-40c88294884c",
+    "user_id": "ebcec7ea-5698-4146-a791-f31a69787f91",
+    "course_session_id": "1f8d6305-dd8e-41ae-99b3-2ab70e3b4bab",
+    "membership_id": null,
+    "status": "Enrolled",
+    "enrolled_at": "2026-03-19T00:15:39.548Z"
+  },
+  {
+    "id": "b13d272c-a80d-46d3-9461-bd2a829ab9f5",
+    "user_id": "276b5dd4-d4ca-4772-aa14-55d716f025f1",
+    "course_session_id": "1f8d6305-dd8e-41ae-99b3-2ab70e3b4bab",
+    "membership_id": null,
+    "status": "Enrolled",
+    "enrolled_at": "2025-12-30T10:35:08.239Z"
+  },
+  {
+    "id": "f8bb0001-e3a0-479c-9d79-eaeb48dae12d",
+    "user_id": "7848b498-0806-4843-9c8a-b55d3771b0bb",
+    "course_session_id": "c84446db-ef7a-47a3-89af-07a2f9ca1c61",
+    "membership_id": null,
+    "status": "Enrolled",
+    "enrolled_at": "2025-11-07T20:35:24.009Z"
+  },
+  {
+    "id": "25f4d1bc-1d46-418c-81b2-8436ce826f5b",
+    "user_id": "35623e13-469a-4157-9352-6bb49ef7a4e0",
+    "course_session_id": "c84446db-ef7a-47a3-89af-07a2f9ca1c61",
+    "membership_id": null,
+    "status": "Enrolled",
+    "enrolled_at": "2025-09-21T14:22:10.867Z"
+  },
+  {
+    "id": "2c90c7e6-574a-4bb6-a438-fa631a31de61",
+    "user_id": "ae3c0fa3-d364-4d7e-8ca1-2b36f237e255",
+    "course_session_id": "9dab189e-6623-42f3-b827-16fd31a13db9",
+    "membership_id": null,
+    "status": "Enrolled",
+    "enrolled_at": "2025-08-02T05:45:24.095Z"
+  },
+  {
+    "id": "b59a3fa2-51f8-4c95-8658-803bf816edf2",
+    "user_id": "944456d6-5f42-4a1f-ab65-98ad7da0e030",
+    "course_session_id": "9dab189e-6623-42f3-b827-16fd31a13db9",
+    "membership_id": null,
+    "status": "Enrolled",
+    "enrolled_at": "2025-07-09T22:31:27.665Z"
+  },
+  {
+    "id": "3b6d94ea-a484-4729-9e1e-6724f0736e2a",
+    "user_id": "41ebb534-d9b8-44c0-80c1-00d99d736a58",
+    "course_session_id": "9dab189e-6623-42f3-b827-16fd31a13db9",
+    "membership_id": null,
+    "status": "Enrolled",
+    "enrolled_at": "2025-02-22T05:55:06.407Z"
+  },
+  {
+    "id": "05cf3f06-888d-464e-bf66-f431d9c4877c",
+    "user_id": "8e4a85a9-76b9-45fa-9ebb-bb210d3b733b",
+    "course_session_id": "90c15e48-c403-403b-96c1-8fff9ea096b5",
+    "membership_id": null,
+    "status": "Enrolled",
+    "enrolled_at": "2026-06-06T16:09:20.949Z"
+  },
+  {
+    "id": "e9b6bdd1-ac2e-4674-a49a-1e2f877d6952",
+    "user_id": "3b1eb72a-2e36-4e17-bf24-663567840207",
+    "course_session_id": "90c15e48-c403-403b-96c1-8fff9ea096b5",
+    "membership_id": null,
+    "status": "Enrolled",
+    "enrolled_at": "2026-06-25T22:49:45.519Z"
+  },
+  {
+    "id": "baca5816-187c-4581-b941-e28cf4abb37f",
+    "user_id": "2309b086-27db-46e7-92aa-9ca87a34913d",
+    "course_session_id": "90c15e48-c403-403b-96c1-8fff9ea096b5",
+    "membership_id": null,
+    "status": "Enrolled",
+    "enrolled_at": "2026-02-05T21:07:06.737Z"
+  },
+  {
+    "id": "8de745b4-fcf5-4b8d-b8ab-8c9f23d7388c",
+    "user_id": "5a578939-bf89-4e5c-8d2a-6d5c25b8169d",
+    "course_session_id": "c276a187-1255-43cc-b194-b1472321873e",
+    "membership_id": null,
+    "status": "Enrolled",
+    "enrolled_at": "2026-07-26T22:41:40.524Z"
+  },
+  {
+    "id": "02291bd7-58c4-45bb-814c-2ebedb87d046",
+    "user_id": "7e66a6eb-08a5-4550-8c3a-c18995dee934",
+    "course_session_id": "c276a187-1255-43cc-b194-b1472321873e",
+    "membership_id": null,
+    "status": "Enrolled",
+    "enrolled_at": "2026-01-21T18:36:55.649Z"
+  },
+  {
+    "id": "9dd69caa-b483-4afc-8e54-34468462d602",
+    "user_id": "532b3ad9-45ce-497b-8da2-d75399474fe0",
+    "course_session_id": "c276a187-1255-43cc-b194-b1472321873e",
+    "membership_id": null,
+    "status": "Enrolled",
+    "enrolled_at": "2026-05-10T18:15:00.118Z"
+  },
+  {
+    "id": "1d6c1c54-ffd1-4e83-a200-f667ea724855",
+    "user_id": "7dd17b7d-bea9-433c-95b3-2378cc8c86d4",
+    "course_session_id": "c276a187-1255-43cc-b194-b1472321873e",
+    "membership_id": null,
+    "status": "Enrolled",
+    "enrolled_at": "2025-12-06T16:04:44.884Z"
+  },
+  {
+    "id": "74aed88d-fed6-45e5-98e2-58707fdcc87c",
+    "user_id": "3fa4dee5-522b-4463-a4b8-b539278d2e22",
+    "course_session_id": "c276a187-1255-43cc-b194-b1472321873e",
+    "membership_id": null,
+    "status": "Enrolled",
+    "enrolled_at": "2025-09-28T08:45:14.008Z"
+  },
+  {
+    "id": "420fa039-8e68-418e-a3a2-a780458e059a",
+    "user_id": "28c95fd7-8121-4e24-b6f5-0c57ef82b734",
+    "course_session_id": "60b59e39-8ba2-41b4-9bd3-ff0b818f544e",
+    "membership_id": null,
+    "status": "Enrolled",
+    "enrolled_at": "2026-05-16T02:18:53.448Z"
+  },
+  {
+    "id": "a36fc19f-c267-4b29-90bc-055328a26d64",
+    "user_id": "051ad41c-7453-4576-a2e7-f73f5cf85533",
+    "course_session_id": "60b59e39-8ba2-41b4-9bd3-ff0b818f544e",
+    "membership_id": null,
+    "status": "Enrolled",
+    "enrolled_at": "2025-12-25T06:01:06.718Z"
+  },
+  {
+    "id": "59fee9d6-5c62-4389-b8ed-769f906d4bdc",
+    "user_id": "35623e13-469a-4157-9352-6bb49ef7a4e0",
+    "course_session_id": "60b59e39-8ba2-41b4-9bd3-ff0b818f544e",
+    "membership_id": null,
+    "status": "Enrolled",
+    "enrolled_at": "2026-03-23T23:42:24.009Z"
+  },
+  {
+    "id": "8be8ac02-ae0d-454c-a8ab-b2e7ac06be28",
+    "user_id": "1cee369d-a706-4048-90fd-65c6a85e13ef",
+    "course_session_id": "60b59e39-8ba2-41b4-9bd3-ff0b818f544e",
+    "membership_id": null,
+    "status": "Enrolled",
+    "enrolled_at": "2025-07-24T23:19:18.905Z"
+  },
+  {
+    "id": "a4da6193-e83b-4d79-b096-3b4bde3c3ab0",
+    "user_id": "32a429a6-d76c-4d9f-947f-5bfedcdbc338",
+    "course_session_id": "60b59e39-8ba2-41b4-9bd3-ff0b818f544e",
+    "membership_id": null,
+    "status": "Enrolled",
+    "enrolled_at": "2026-01-14T22:29:10.505Z"
+  },
+  {
+    "id": "0f01e4be-154c-41b0-a256-bbf496101e6f",
+    "user_id": "e792d825-42ac-4bf5-85e9-f01e16044372",
+    "course_session_id": "2b9dd1cc-43f6-429a-9552-7d16fa899bcd",
+    "membership_id": null,
+    "status": "Enrolled",
+    "enrolled_at": "2026-02-10T06:30:43.576Z"
+  },
+  {
+    "id": "ea2e989f-a78d-40b5-b299-d1d4bc68f0cf",
+    "user_id": "532b3ad9-45ce-497b-8da2-d75399474fe0",
+    "course_session_id": "2b9dd1cc-43f6-429a-9552-7d16fa899bcd",
+    "membership_id": null,
+    "status": "Enrolled",
+    "enrolled_at": "2025-09-20T17:08:25.521Z"
+  },
+  {
+    "id": "d68c589a-8ab0-4462-8680-7511ecf0c656",
+    "user_id": "d80ed918-962a-475e-9038-7e52a101f533",
+    "course_session_id": "2b9dd1cc-43f6-429a-9552-7d16fa899bcd",
+    "membership_id": null,
+    "status": "Enrolled",
+    "enrolled_at": "2026-03-24T06:32:47.012Z"
+  },
+  {
+    "id": "3469a7a5-be4e-4a78-9192-875466267b9f",
+    "user_id": "be48e2c2-129b-4f06-a70b-4cfe68cf661e",
+    "course_session_id": "e1743766-afe6-4e2b-805e-89d2e668e4c0",
+    "membership_id": null,
+    "status": "Enrolled",
+    "enrolled_at": "2025-08-02T16:20:33.592Z"
+  },
+  {
+    "id": "46752b27-94be-41d6-b2fa-1702c1187af0",
+    "user_id": "532b3ad9-45ce-497b-8da2-d75399474fe0",
+    "course_session_id": "65f4e222-7750-433c-a1fc-fb8ed951814d",
+    "membership_id": null,
+    "status": "Enrolled",
+    "enrolled_at": "2026-03-10T11:47:35.352Z"
+  },
+  {
+    "id": "a24f38ef-b05c-4706-b4f0-fa68ae527f4a",
+    "user_id": "7dd17b7d-bea9-433c-95b3-2378cc8c86d4",
+    "course_session_id": "65f4e222-7750-433c-a1fc-fb8ed951814d",
+    "membership_id": null,
+    "status": "Enrolled",
+    "enrolled_at": "2026-02-21T18:43:48.865Z"
+  },
+  {
+    "id": "76b5230d-a0be-4a84-81de-7c3533990ebb",
+    "user_id": "3ecdac3c-def4-4954-ac30-a10116fb8b97",
+    "course_session_id": "65f4e222-7750-433c-a1fc-fb8ed951814d",
+    "membership_id": null,
+    "status": "Enrolled",
+    "enrolled_at": "2026-04-17T18:59:53.348Z"
+  },
+  {
+    "id": "3eb75faf-3540-4620-a761-b6ac12b1e482",
+    "user_id": "a8acea85-d91d-4203-85a9-30180cf2d73a",
+    "course_session_id": "65f4e222-7750-433c-a1fc-fb8ed951814d",
+    "membership_id": null,
+    "status": "Enrolled",
+    "enrolled_at": "2025-11-17T08:02:21.923Z"
+  },
+  {
+    "id": "29ffe0b1-4421-49ca-880f-a98b1250b9eb",
+    "user_id": "051ad41c-7453-4576-a2e7-f73f5cf85533",
+    "course_session_id": "65f4e222-7750-433c-a1fc-fb8ed951814d",
+    "membership_id": null,
+    "status": "Enrolled",
+    "enrolled_at": "2026-03-08T05:59:40.408Z"
+  },
+  {
+    "id": "ab7209d1-bbf8-4322-aeba-3ca717e9f457",
+    "user_id": "ae3c0fa3-d364-4d7e-8ca1-2b36f237e255",
+    "course_session_id": "c9f09a63-fa94-4266-a749-48b32cb280aa",
+    "membership_id": null,
+    "status": "Enrolled",
+    "enrolled_at": "2025-02-15T20:16:01.958Z"
+  },
+  {
+    "id": "b2c950ca-1e59-4380-9369-d3f4760fde73",
+    "user_id": "2309b086-27db-46e7-92aa-9ca87a34913d",
+    "course_session_id": "c9f09a63-fa94-4266-a749-48b32cb280aa",
+    "membership_id": null,
+    "status": "Enrolled",
+    "enrolled_at": "2025-09-25T10:12:24.242Z"
+  },
+  {
+    "id": "bdf84426-c4af-4cbc-a842-a55a105b3a38",
+    "user_id": "41ebb534-d9b8-44c0-80c1-00d99d736a58",
+    "course_session_id": "c9f09a63-fa94-4266-a749-48b32cb280aa",
+    "membership_id": null,
+    "status": "Enrolled",
+    "enrolled_at": "2025-02-09T15:16:12.219Z"
+  },
+  {
+    "id": "ffc7dfda-8ded-4960-8b20-50bf590eb657",
+    "user_id": "7848b498-0806-4843-9c8a-b55d3771b0bb",
+    "course_session_id": "c9f09a63-fa94-4266-a749-48b32cb280aa",
+    "membership_id": null,
+    "status": "Enrolled",
+    "enrolled_at": "2025-08-05T20:03:56.654Z"
+  },
+  {
+    "id": "a01754e4-6a0c-4fe0-97fd-3f1cd95cf264",
+    "user_id": "28c95fd7-8121-4e24-b6f5-0c57ef82b734",
+    "course_session_id": "2e74ed69-eedd-4904-b8ce-19e8e6a2acf8",
+    "membership_id": null,
+    "status": "Enrolled",
+    "enrolled_at": "2026-01-07T19:50:52.812Z"
+  },
+  {
+    "id": "aad0ae8a-fa46-4c3c-b35b-2a6a2fbe2cbe",
+    "user_id": "08d3abc2-3d3a-4c2e-94e7-9039eb1eea48",
+    "course_session_id": "2e74ed69-eedd-4904-b8ce-19e8e6a2acf8",
+    "membership_id": null,
+    "status": "Enrolled",
+    "enrolled_at": "2025-10-24T03:51:39.093Z"
+  }
+]

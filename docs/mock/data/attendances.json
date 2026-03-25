@@ -1,0 +1,352 @@
+[
+  {
+    "id": "4fa007d1-f9db-4213-8cad-de00ded541cf",
+    "attended_at": "2025-12-21T04:28:48.217Z",
+    "is_credit_deducted": true,
+    "enrollment_id": "48337c37-f126-4d73-a8a6-1e4678874c9f",
+    "taken_by_id": "6c648037-a34b-4d76-90b0-67891365e9a9"
+  },
+  {
+    "id": "65e45dea-6b88-49f2-893e-cbd6c8d658d5",
+    "attended_at": "2025-12-21T04:28:48.217Z",
+    "is_credit_deducted": true,
+    "enrollment_id": "b68880fa-287e-45f7-96b4-4b06d889e91d",
+    "taken_by_id": "3e46c897-ecc9-4d48-b162-d3b52d48ae39"
+  },
+  {
+    "id": "f0ccb8cb-e283-4a4e-b619-cb96c902bf46",
+    "attended_at": "2025-12-21T04:28:48.217Z",
+    "is_credit_deducted": true,
+    "enrollment_id": "a332576a-891f-4d12-94ad-b534cbe39e86",
+    "taken_by_id": "2389cb7e-c93c-4966-99bc-2aa1481cdf59"
+  },
+  {
+    "id": "119eeb0e-dc19-4adf-ac96-6b12bbcab74f",
+    "attended_at": "2025-12-21T04:28:48.217Z",
+    "is_credit_deducted": true,
+    "enrollment_id": "cad899dc-7ba5-4bef-8dca-80e29a43e9c7",
+    "taken_by_id": "a1382fe9-fcdb-44c2-bba3-9b73f11e8aa8"
+  },
+  {
+    "id": "86130a1a-3ebf-4a80-a9b0-a39e76718d36",
+    "attended_at": "2025-12-21T04:28:48.217Z",
+    "is_credit_deducted": true,
+    "enrollment_id": "9f9c4500-1386-4591-aa0b-f59e3072b55f",
+    "taken_by_id": "3e46c897-ecc9-4d48-b162-d3b52d48ae39"
+  },
+  {
+    "id": "f8410b27-e662-4ff5-b788-b7ffcdccdce0",
+    "attended_at": "2025-12-21T04:28:48.217Z",
+    "is_credit_deducted": true,
+    "enrollment_id": "f8aa8a14-206f-4f82-ac0e-73c45bf23b9d",
+    "taken_by_id": "a52c830c-d1f7-4507-a0ef-bd7a6f3e860d"
+  },
+  {
+    "id": "0bd3f4c0-8a56-4c01-9463-a17b4b2aada3",
+    "attended_at": "2025-12-21T04:28:48.217Z",
+    "is_credit_deducted": true,
+    "enrollment_id": "cb312e5b-c118-4a04-9d74-828d15c3cd93",
+    "taken_by_id": "a1382fe9-fcdb-44c2-bba3-9b73f11e8aa8"
+  },
+  {
+    "id": "a81a0265-6b0b-4b74-b936-0a33d9c8acdc",
+    "attended_at": "2025-12-21T04:28:48.217Z",
+    "is_credit_deducted": true,
+    "enrollment_id": "f48a0ba4-6074-4dd7-b9e9-7310a7a97f04",
+    "taken_by_id": "c6d275da-dd42-44be-8856-8c265e4092c6"
+  },
+  {
+    "id": "59fa684e-7d4d-45af-b704-aaa555b0d55f",
+    "attended_at": "2025-12-21T04:28:48.217Z",
+    "is_credit_deducted": true,
+    "enrollment_id": "ff8593a4-4016-4afe-9732-b3981c00a753",
+    "taken_by_id": "6c648037-a34b-4d76-90b0-67891365e9a9"
+  },
+  {
+    "id": "70343b61-4ecf-427b-bba3-ffa5fe94747d",
+    "attended_at": "2025-12-21T04:28:48.217Z",
+    "is_credit_deducted": true,
+    "enrollment_id": "3a10ea7c-b77c-4fe5-a9cf-509a4b3ea324",
+    "taken_by_id": "6c648037-a34b-4d76-90b0-67891365e9a9"
+  },
+  {
+    "id": "0f084236-d0ea-41ea-ac79-d3d8e76001e4",
+    "attended_at": "2025-12-21T04:28:48.217Z",
+    "is_credit_deducted": true,
+    "enrollment_id": "63573f96-d0c9-48c5-88f3-7d65658a9eb6",
+    "taken_by_id": "2389cb7e-c93c-4966-99bc-2aa1481cdf59"
+  },
+  {
+    "id": "e3ee7db2-44a3-46cd-9560-e1dd335780b1",
+    "attended_at": "2025-12-21T04:28:48.217Z",
+    "is_credit_deducted": true,
+    "enrollment_id": "de3674fd-b8bb-460f-90fd-dfb28f4d0d5a",
+    "taken_by_id": "6c648037-a34b-4d76-90b0-67891365e9a9"
+  },
+  {
+    "id": "6e47a0e2-fb09-44f3-b91e-41fc7b821e8e",
+    "attended_at": "2025-12-21T04:28:48.217Z",
+    "is_credit_deducted": true,
+    "enrollment_id": "6766116c-6248-4f0d-bea2-743b6f25defa",
+    "taken_by_id": "2389cb7e-c93c-4966-99bc-2aa1481cdf59"
+  },
+  {
+    "id": "c0c61135-5311-478c-aece-c9e3fe4969ff",
+    "attended_at": "2025-12-21T04:28:48.217Z",
+    "is_credit_deducted": true,
+    "enrollment_id": "dec0a282-a180-4488-8936-56e4333ad053",
+    "taken_by_id": "3e46c897-ecc9-4d48-b162-d3b52d48ae39"
+  },
+  {
+    "id": "3729c0ce-7b66-449e-b239-92010d269a4f",
+    "attended_at": "2025-12-21T04:28:48.217Z",
+    "is_credit_deducted": true,
+    "enrollment_id": "4dbd305f-9666-4c86-95a7-483519249120",
+    "taken_by_id": "2389cb7e-c93c-4966-99bc-2aa1481cdf59"
+  },
+  {
+    "id": "f8f19e73-0f81-4aaf-b727-32443fcbaed7",
+    "attended_at": "2025-12-21T04:28:48.217Z",
+    "is_credit_deducted": true,
+    "enrollment_id": "48269ac7-34ca-4f4e-8225-3eb8d8478e44",
+    "taken_by_id": "6c648037-a34b-4d76-90b0-67891365e9a9"
+  },
+  {
+    "id": "6a26761b-802d-4605-9017-38a6f597b7ba",
+    "attended_at": "2025-12-21T04:28:48.217Z",
+    "is_credit_deducted": true,
+    "enrollment_id": "8ee8e319-8350-4385-87b5-6a5000eba330",
+    "taken_by_id": "88fac4fb-2b4d-454b-a208-98bfa16c04bb"
+  },
+  {
+    "id": "21214178-1358-46c2-9b26-61ec4ab2d904",
+    "attended_at": "2025-12-21T04:28:48.217Z",
+    "is_credit_deducted": true,
+    "enrollment_id": "fbcfae7c-5f5e-4efc-b0b9-a6208a6a801e",
+    "taken_by_id": "6c648037-a34b-4d76-90b0-67891365e9a9"
+  },
+  {
+    "id": "42ce514a-e00e-4dfa-b310-7ac6824daca3",
+    "attended_at": "2025-12-21T04:28:48.217Z",
+    "is_credit_deducted": true,
+    "enrollment_id": "e671835f-8797-41ac-b7f8-60084ac17874",
+    "taken_by_id": "2389cb7e-c93c-4966-99bc-2aa1481cdf59"
+  },
+  {
+    "id": "582f6254-91db-45ef-83e1-33c451af8f6d",
+    "attended_at": "2025-12-21T04:28:48.217Z",
+    "is_credit_deducted": true,
+    "enrollment_id": "a3ab4425-343f-4546-b562-3a2f6e45b026",
+    "taken_by_id": "a52c830c-d1f7-4507-a0ef-bd7a6f3e860d"
+  },
+  {
+    "id": "01303b17-fe5e-490a-9adc-f2e8395ef3e7",
+    "attended_at": "2025-12-21T04:28:48.217Z",
+    "is_credit_deducted": true,
+    "enrollment_id": "42d3ac1b-ac75-458f-9199-4a332dedbf65",
+    "taken_by_id": "6c648037-a34b-4d76-90b0-67891365e9a9"
+  },
+  {
+    "id": "b14ef707-4744-4384-9ee5-a1fac3617c23",
+    "attended_at": "2025-12-21T04:28:48.218Z",
+    "is_credit_deducted": true,
+    "enrollment_id": "0bb14079-9be4-4a51-a924-78bee7877ba7",
+    "taken_by_id": "88fac4fb-2b4d-454b-a208-98bfa16c04bb"
+  },
+  {
+    "id": "1707059d-12f6-4f18-984e-e69e0652093b",
+    "attended_at": "2025-12-21T04:28:48.218Z",
+    "is_credit_deducted": true,
+    "enrollment_id": "54863014-29ed-42f1-9c96-009c7caa94da",
+    "taken_by_id": "3e46c897-ecc9-4d48-b162-d3b52d48ae39"
+  },
+  {
+    "id": "d0962ed0-3e0a-4525-a343-f3597f075b7b",
+    "attended_at": "2025-12-21T04:28:48.218Z",
+    "is_credit_deducted": true,
+    "enrollment_id": "1babc7b0-0436-4464-a92f-dfc268296e8c",
+    "taken_by_id": "c6d275da-dd42-44be-8856-8c265e4092c6"
+  },
+  {
+    "id": "e9ee0e83-4dfd-45e7-9b72-6071e8f56df3",
+    "attended_at": "2025-12-21T04:28:48.218Z",
+    "is_credit_deducted": true,
+    "enrollment_id": "739d1bac-3200-4caf-9be6-19bc39d516f3",
+    "taken_by_id": "3e46c897-ecc9-4d48-b162-d3b52d48ae39"
+  },
+  {
+    "id": "00b7713e-fa3d-40e9-8a2a-81c293e70308",
+    "attended_at": "2025-12-21T04:28:48.218Z",
+    "is_credit_deducted": true,
+    "enrollment_id": "3e642c25-a75f-45e7-b9a4-dd584f221398",
+    "taken_by_id": "a52c830c-d1f7-4507-a0ef-bd7a6f3e860d"
+  },
+  {
+    "id": "fc1d5ed6-f85b-4786-8490-d3802465a3be",
+    "attended_at": "2025-12-21T04:28:48.218Z",
+    "is_credit_deducted": true,
+    "enrollment_id": "c69e896c-f2a9-4b2b-be93-be34b08b298b",
+    "taken_by_id": "3e46c897-ecc9-4d48-b162-d3b52d48ae39"
+  },
+  {
+    "id": "504e5dd7-52b1-4868-a61a-18249d77b19f",
+    "attended_at": "2025-12-21T04:28:48.218Z",
+    "is_credit_deducted": true,
+    "enrollment_id": "91b39ff6-bb30-4ff4-b851-759a9931b6d0",
+    "taken_by_id": "3e46c897-ecc9-4d48-b162-d3b52d48ae39"
+  },
+  {
+    "id": "1bbd93dc-40ad-47b2-a3af-8265c4452d90",
+    "attended_at": "2025-12-21T04:28:48.218Z",
+    "is_credit_deducted": true,
+    "enrollment_id": "a74df819-efbc-43c3-a344-8a29f26dda75",
+    "taken_by_id": "a1382fe9-fcdb-44c2-bba3-9b73f11e8aa8"
+  },
+  {
+    "id": "3c47a6c1-cc7b-4328-b89d-82efd3f2061c",
+    "attended_at": "2025-12-21T04:28:48.218Z",
+    "is_credit_deducted": true,
+    "enrollment_id": "b299170c-107f-4c35-bf39-0029150227de",
+    "taken_by_id": "a52c830c-d1f7-4507-a0ef-bd7a6f3e860d"
+  },
+  {
+    "id": "fc239936-15ed-4a76-9ce5-7699a718b633",
+    "attended_at": "2025-12-21T04:28:48.218Z",
+    "is_credit_deducted": true,
+    "enrollment_id": "8d7ebfdc-c5b7-4884-9d3a-f7d06c88e7d0",
+    "taken_by_id": "88fac4fb-2b4d-454b-a208-98bfa16c04bb"
+  },
+  {
+    "id": "be54dac6-4578-44a5-bbed-5e3908d3ff09",
+    "attended_at": "2025-12-21T04:28:48.218Z",
+    "is_credit_deducted": true,
+    "enrollment_id": "51ca4e6f-248d-4330-9a15-c5a6f0c39589",
+    "taken_by_id": "a52c830c-d1f7-4507-a0ef-bd7a6f3e860d"
+  },
+  {
+    "id": "5c2c5ee1-8ab4-43ce-832c-5b0c8116d94b",
+    "attended_at": "2025-12-21T04:28:48.218Z",
+    "is_credit_deducted": true,
+    "enrollment_id": "c604fe65-d6de-4098-8bb7-d970c1d49941",
+    "taken_by_id": "6c648037-a34b-4d76-90b0-67891365e9a9"
+  },
+  {
+    "id": "91990de3-1e93-49c1-8771-9583f47c02a3",
+    "attended_at": "2025-12-21T04:28:48.218Z",
+    "is_credit_deducted": true,
+    "enrollment_id": "9a2560c5-f385-4f59-acb0-6267e3cae02f",
+    "taken_by_id": "c6d275da-dd42-44be-8856-8c265e4092c6"
+  },
+  {
+    "id": "8a91c188-87b4-4956-8d4f-3c518dc9bdd6",
+    "attended_at": "2025-12-21T04:28:48.218Z",
+    "is_credit_deducted": true,
+    "enrollment_id": "0bd5a894-2930-4788-bf2e-1b13cf07d180",
+    "taken_by_id": "3e46c897-ecc9-4d48-b162-d3b52d48ae39"
+  },
+  {
+    "id": "1e684db5-ea5f-4663-9b94-76cad0500862",
+    "attended_at": "2025-12-21T04:28:48.218Z",
+    "is_credit_deducted": true,
+    "enrollment_id": "f3f5f19d-4b27-403a-a52d-2affdfc8b188",
+    "taken_by_id": "c6d275da-dd42-44be-8856-8c265e4092c6"
+  },
+  {
+    "id": "bb16b28d-d503-4407-ab63-c3a646dd8350",
+    "attended_at": "2025-12-21T04:28:48.218Z",
+    "is_credit_deducted": true,
+    "enrollment_id": "9bda6524-16e2-4209-ad50-12eb8b262cd4",
+    "taken_by_id": "88fac4fb-2b4d-454b-a208-98bfa16c04bb"
+  },
+  {
+    "id": "66163815-cead-49c8-98d3-4c6975108467",
+    "attended_at": "2025-12-21T04:28:48.218Z",
+    "is_credit_deducted": true,
+    "enrollment_id": "d57a16d1-4783-4545-a680-c809c87eaff9",
+    "taken_by_id": "2389cb7e-c93c-4966-99bc-2aa1481cdf59"
+  },
+  {
+    "id": "040be0b2-db26-462b-a946-1f028958bd59",
+    "attended_at": "2025-12-21T04:28:48.218Z",
+    "is_credit_deducted": true,
+    "enrollment_id": "51920802-148a-4b38-b553-6a622db3bfa2",
+    "taken_by_id": "c6d275da-dd42-44be-8856-8c265e4092c6"
+  },
+  {
+    "id": "2129ef82-1e59-4269-a07e-6e080b2de35e",
+    "attended_at": "2025-12-21T04:28:48.218Z",
+    "is_credit_deducted": true,
+    "enrollment_id": "836bc3e6-daa4-4590-bf13-747c7e089f52",
+    "taken_by_id": "a1382fe9-fcdb-44c2-bba3-9b73f11e8aa8"
+  },
+  {
+    "id": "043c7c87-0316-472e-9aef-ddf22b5eec35",
+    "attended_at": "2025-12-21T04:28:48.218Z",
+    "is_credit_deducted": true,
+    "enrollment_id": "66199ae5-ed09-4a12-ade6-ca902c0fc225",
+    "taken_by_id": "2389cb7e-c93c-4966-99bc-2aa1481cdf59"
+  },
+  {
+    "id": "e04de251-4920-4030-a69b-a117acfcb440",
+    "attended_at": "2025-12-21T04:28:48.218Z",
+    "is_credit_deducted": true,
+    "enrollment_id": "04ad3837-f064-4518-8005-dd37a74b562d",
+    "taken_by_id": "6c648037-a34b-4d76-90b0-67891365e9a9"
+  },
+  {
+    "id": "4a79a893-90ca-4042-a098-395dd2138587",
+    "attended_at": "2025-12-21T04:28:48.218Z",
+    "is_credit_deducted": true,
+    "enrollment_id": "9c9a93ae-db6b-4171-a190-c869b700b0e8",
+    "taken_by_id": "a1382fe9-fcdb-44c2-bba3-9b73f11e8aa8"
+  },
+  {
+    "id": "0f63fe7e-b574-4d96-9969-e1e9e2bba5f8",
+    "attended_at": "2025-12-21T04:28:48.220Z",
+    "is_credit_deducted": true,
+    "enrollment_id": "53de8cb4-82f3-4d6d-926b-cb4b55d80847",
+    "taken_by_id": "6c648037-a34b-4d76-90b0-67891365e9a9"
+  },
+  {
+    "id": "a7fcfded-bf61-4216-b1e7-1c9536e2cf7f",
+    "attended_at": "2025-12-21T04:28:48.220Z",
+    "is_credit_deducted": true,
+    "enrollment_id": "b88ceba2-52fa-4367-a2e8-6c567b55ceaa",
+    "taken_by_id": "c6d275da-dd42-44be-8856-8c265e4092c6"
+  },
+  {
+    "id": "27a29fa2-9b22-4e2b-878f-b7185326916a",
+    "attended_at": "2025-12-21T04:28:48.220Z",
+    "is_credit_deducted": true,
+    "enrollment_id": "7dafef64-5a42-4c6d-b924-bbe4c70bd160",
+    "taken_by_id": "6c648037-a34b-4d76-90b0-67891365e9a9"
+  },
+  {
+    "id": "73544593-0332-4b08-bdeb-768756af5e51",
+    "attended_at": "2025-12-21T04:28:48.220Z",
+    "is_credit_deducted": true,
+    "enrollment_id": "3437d3a5-8ccc-4366-ba7c-61828cca2fb6",
+    "taken_by_id": "2389cb7e-c93c-4966-99bc-2aa1481cdf59"
+  },
+  {
+    "id": "9d95d7c8-8499-401b-9245-1ec89cf8c2c3",
+    "attended_at": "2025-12-21T04:28:48.220Z",
+    "is_credit_deducted": true,
+    "enrollment_id": "6fec0d66-6385-40ae-b066-1b6f633eb903",
+    "taken_by_id": "a1382fe9-fcdb-44c2-bba3-9b73f11e8aa8"
+  },
+  {
+    "id": "f88b81df-2b3a-41ea-8be2-75c4fcb37684",
+    "attended_at": "2025-12-21T04:28:48.220Z",
+    "is_credit_deducted": true,
+    "enrollment_id": "fe01719d-ab60-43de-9778-bad17ec659ec",
+    "taken_by_id": "3e46c897-ecc9-4d48-b162-d3b52d48ae39"
+  },
+  {
+    "id": "f9df810f-1bdf-4dbe-ae0f-c1b48c8fef1b",
+    "attended_at": "2025-12-21T04:28:48.220Z",
+    "is_credit_deducted": true,
+    "enrollment_id": "1f8d838f-e810-4afa-9ef8-0c9d5bb8265b",
+    "taken_by_id": "a1382fe9-fcdb-44c2-bba3-9b73f11e8aa8"
+  }
+]

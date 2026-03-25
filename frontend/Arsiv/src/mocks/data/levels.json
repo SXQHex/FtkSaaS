@@ -1,0 +1,17 @@
+[
+  {
+    "id": "c7a5d5ad-e864-4dfd-8cd2-5133c56532f0",
+    "name": "Yeni Başlayan",
+    "order": 1
+  },
+  {
+    "id": "d8afb388-4667-4b77-929f-24b3a458263a",
+    "name": "Orta Seviye",
+    "order": 2
+  },
+  {
+    "id": "7f5e342c-a30b-46e0-a13d-476d683316b9",
+    "name": "İleri Seviye",
+    "order": 3
+  }
+]

@@ -1,0 +1,15 @@
+[
+  {
+    "id": "c37c5db8-6a50-4ada-8167-3db3e2446eb3",
+    "group_name": "Sabah Reformer A",
+    "status": "Active",
+    "start_date": "2024-01-01",
+    "end_date": "2024-12-31",
+    "capacity": 12,
+    "price": 2500,
+    "created_at": "2025-12-21T04:28:48.217Z",
+    "updated_at": "2025-12-21T04:28:48.217Z",
+    "definition_id": "a7d2f1a5-31d1-44d9-9bec-a0bc912ced8d",
+    "group_type_definition_id": "2e8cc030-d45f-4b9a-939b-dd12c0aada76"
+  }
+]

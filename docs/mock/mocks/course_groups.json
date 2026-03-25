@@ -1,0 +1,167 @@
+[
+  {
+    "id": "cd6f263b-e146-4949-ac66-c77ecbc4337f",
+    "definition_id": "86f58ade-e981-4500-98ba-8d130780def7",
+    "group_name": "Salsa - İleri Seviye Kursu Grubu 1",
+    "status": "Active",
+    "start_date": "2025-12-13",
+    "end_date": "2026-03-05",
+    "capacity": 12,
+    "price": "925.17",
+    "instructor_id": "d29034db-8564-4050-a64a-3ba6e294cbe3"
+  },
+  {
+    "id": "99ff9287-3886-483e-a3e2-491b51bceee7",
+    "definition_id": "86f58ade-e981-4500-98ba-8d130780def7",
+    "group_name": "Salsa - İleri Seviye Kursu Grubu 2",
+    "status": "Active",
+    "start_date": "2026-06-04",
+    "end_date": "2027-02-23",
+    "capacity": 16,
+    "price": "654.81",
+    "instructor_id": "308e0208-463c-422c-b0e4-cd9027bf39d7"
+  },
+  {
+    "id": "6fefe484-a16d-4487-9bae-a54c3e8017d8",
+    "definition_id": "86f58ade-e981-4500-98ba-8d130780def7",
+    "group_name": "Salsa - İleri Seviye Kursu Grubu 3",
+    "status": "Planned",
+    "start_date": "2026-05-06",
+    "end_date": "2026-05-06",
+    "capacity": 21,
+    "price": "480.29",
+    "instructor_id": "0dbcbfe2-8e4d-4a90-a8ea-4bdf4ce83f4b"
+  },
+  {
+    "id": "266e4083-f092-409d-8583-e615f8ab2c95",
+    "definition_id": "4f9cbe5c-e011-4435-a6cf-cd455a6451be",
+    "group_name": "Bale - Yeni Başlayan Kursu Grubu 1",
+    "status": "Planned",
+    "start_date": "2026-04-06",
+    "end_date": "2026-08-07",
+    "capacity": 25,
+    "price": "988.59",
+    "instructor_id": "d29034db-8564-4050-a64a-3ba6e294cbe3"
+  },
+  {
+    "id": "151fb1a6-888b-4cd0-b44b-4fdb04d725d3",
+    "definition_id": "4f9cbe5c-e011-4435-a6cf-cd455a6451be",
+    "group_name": "Bale - Yeni Başlayan Kursu Grubu 2",
+    "status": "Active",
+    "start_date": "2026-04-04",
+    "end_date": "2026-07-04",
+    "capacity": 11,
+    "price": "976.31",
+    "instructor_id": "bb1b1826-154c-4f6c-914f-340dfc0d49fd"
+  },
+  {
+    "id": "4187d14a-7a92-4efa-b969-c72ba585bcf4",
+    "definition_id": "4f9cbe5c-e011-4435-a6cf-cd455a6451be",
+    "group_name": "Bale - Yeni Başlayan Kursu Grubu 3",
+    "status": "Planned",
+    "start_date": "2026-03-30",
+    "end_date": "2026-05-04",
+    "capacity": 24,
+    "price": "409.19",
+    "instructor_id": "8c9b9a45-15ef-4129-bfc1-af2a60209662"
+  },
+  {
+    "id": "8d5a1f83-e9bd-4047-8f00-381bdad44ddf",
+    "definition_id": "8cfa834a-b6f1-4fe4-9d32-dac891783600",
+    "group_name": "Salsa - Yeni Başlayan Kursu Grubu 1",
+    "status": "Active",
+    "start_date": "2026-05-09",
+    "end_date": "2027-01-16",
+    "capacity": 12,
+    "price": "392.54",
+    "instructor_id": "d2585dcc-0163-4d58-8218-6d4d57f67ada"
+  },
+  {
+    "id": "b8f6a1d6-8723-461c-a41c-08a53432af43",
+    "definition_id": "8cfa834a-b6f1-4fe4-9d32-dac891783600",
+    "group_name": "Salsa - Yeni Başlayan Kursu Grubu 2",
+    "status": "Active",
+    "start_date": "2026-05-02",
+    "end_date": "2026-07-16",
+    "capacity": 14,
+    "price": "895.86",
+    "instructor_id": "8c9b9a45-15ef-4129-bfc1-af2a60209662"
+  },
+  {
+    "id": "cecde2aa-2db9-405d-ae82-0d6192e468f7",
+    "definition_id": "8cfa834a-b6f1-4fe4-9d32-dac891783600",
+    "group_name": "Salsa - Yeni Başlayan Kursu Grubu 3",
+    "status": "Planned",
+    "start_date": "2026-04-02",
+    "end_date": "2026-09-08",
+    "capacity": 22,
+    "price": "653.34",
+    "instructor_id": "308e0208-463c-422c-b0e4-cd9027bf39d7"
+  },
+  {
+    "id": "327ebb53-de86-4a04-9396-3203d239ab08",
+    "definition_id": "e86072a1-1709-4faa-a16e-fa847d93cb0d",
+    "group_name": "Salsa - İleri Seviye Kursu Grubu 1",
+    "status": "Active",
+    "start_date": "2026-03-26",
+    "end_date": "2027-02-12",
+    "capacity": 16,
+    "price": "606.19",
+    "instructor_id": "c14e5b59-4c7c-4f64-93b0-346049e80545"
+  },
+  {
+    "id": "e0e56d59-b221-4f53-973d-e89064df2cbf",
+    "definition_id": "e86072a1-1709-4faa-a16e-fa847d93cb0d",
+    "group_name": "Salsa - İleri Seviye Kursu Grubu 2",
+    "status": "Active",
+    "start_date": "2026-02-04",
+    "end_date": "2026-03-05",
+    "capacity": 19,
+    "price": "850.19",
+    "instructor_id": "c14e5b59-4c7c-4f64-93b0-346049e80545"
+  },
+  {
+    "id": "e5d07e9a-e947-4980-984a-69be0e9878e6",
+    "definition_id": "e86072a1-1709-4faa-a16e-fa847d93cb0d",
+    "group_name": "Salsa - İleri Seviye Kursu Grubu 3",
+    "status": "Planned",
+    "start_date": "2026-01-07",
+    "end_date": "2026-04-06",
+    "capacity": 23,
+    "price": "713.51",
+    "instructor_id": "308e0208-463c-422c-b0e4-cd9027bf39d7"
+  },
+  {
+    "id": "fa6894ff-b1fd-4827-858f-1d7139334c32",
+    "definition_id": "e77243f3-03a5-4ac5-966b-f5f0bc9a31e2",
+    "group_name": "Salsa - Yeni Başlayan Kursu Grubu 1",
+    "status": "Planned",
+    "start_date": "2026-01-08",
+    "end_date": "2026-09-29",
+    "capacity": 19,
+    "price": "794.77",
+    "instructor_id": "c14e5b59-4c7c-4f64-93b0-346049e80545"
+  },
+  {
+    "id": "cd0b1d7b-802e-46a0-8518-53165f068edb",
+    "definition_id": "e77243f3-03a5-4ac5-966b-f5f0bc9a31e2",
+    "group_name": "Salsa - Yeni Başlayan Kursu Grubu 2",
+    "status": "Planned",
+    "start_date": "2025-12-13",
+    "end_date": "2026-05-18",
+    "capacity": 24,
+    "price": "964.06",
+    "instructor_id": "0dbcbfe2-8e4d-4a90-a8ea-4bdf4ce83f4b"
+  },
+  {
+    "id": "dcecc607-5ec8-40cc-a4f1-4dd0dd1b11ec",
+    "definition_id": "e77243f3-03a5-4ac5-966b-f5f0bc9a31e2",
+    "group_name": "Salsa - Yeni Başlayan Kursu Grubu 3",
+    "status": "Planned",
+    "start_date": "2025-12-23",
+    "end_date": "2026-08-19",
+    "capacity": 25,
+    "price": "548.60",
+    "instructor_id": "ab89add0-6b5f-4749-ae4d-3cb33897e3a1"
+  }
+]

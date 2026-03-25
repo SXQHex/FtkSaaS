@@ -1,0 +1,22 @@
+[
+  {
+    "id": "46843ac7-f481-48be-b4ea-06da1b516c02",
+    "name": "Salsa",
+    "description": "Salsa dansı"
+  },
+  {
+    "id": "1d02a466-e219-4e5a-8678-c5948de7bd1e",
+    "name": "Bachata",
+    "description": "Bachata dansı"
+  },
+  {
+    "id": "b98d6aaa-f3d1-4b9e-819d-3ed520608676",
+    "name": "Hip-Hop",
+    "description": "Hip-Hop dansı"
+  },
+  {
+    "id": "24177491-32be-4ea9-89af-56dc580c284b",
+    "name": "Bale",
+    "description": "Klasik Bale"
+  }
+]
