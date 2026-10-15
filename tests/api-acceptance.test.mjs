@@ -1,4 +1,4 @@
-import test from 'node:test';import assert from 'node:assert/strict';import fs from 'node:fs';import {createHash} from 'node:crypto';
+import {deliverDevInvitation} from '../scripts/deliver-dev-invitations.mjs';import test from 'node:test';import assert from 'node:assert/strict';import fs from 'node:fs';import {createHash} from 'node:crypto';
 import {authUser,fixturePlatform,must,call,context} from './api-client.mjs';import {connect} from '../scripts/db.mjs';import {newUuidV7} from '../scripts/uuid.mjs';import {version} from 'uuid';
 const key=()=>newUuidV7();
 test('Real Auth → Edge UUID producer → named RPC → PostgreSQL acceptance',async t=>{
@@ -92,7 +92,7 @@ test('Real Auth → Edge UUID producer → named RPC → PostgreSQL acceptance',
  const ev=await newEvent();
  await t.test('last shared right: event vs lesson named RPC race cannot double spend',async()=>{
   const results=await Promise.all([call(owner,'event_register_v1',scoped({event_id:ev.id,person_id:studentPerson,sale_id:sale}),key()),call(owner,'reservation_create_v1',scoped({session_id:session,person_id:studentPerson,mode:'flexible',source_sale_id:sale}),key())]);
-  assert.equal(results.filter(x=>x.result.ok).length,1,JSON.stringify(results.map(x=>x.result)));assert.equal(results.find(x=>!x.result.ok).result.error.code,'ENTITLEMENT_UNAVAILABLE');
+  assert.equal(results.filter(x=>x.result.ok).length,1,JSON.stringify(results.map(x=>x.result)));assert.equal(results.find(x=>!x.result.ok).result.error?.code,'ENTITLEMENT_UNAVAILABLE',JSON.stringify(results));
   const rows=await db.query("select count(*)::int n from core.entitlement_allocations where org_id=$1 and sale_id=$2 and state='reserved'",[org,sale]);assert.equal(rows.rows[0].n,1);
  });
  await t.test('events never create negative credit, even if normal lesson policy allows it',async()=>{
@@ -101,6 +101,135 @@ test('Real Auth → Edge UUID producer → named RPC → PostgreSQL acceptance',
   await error(owner,'event_register_v1',scoped({event_id:next.id,person_id:studentPerson,sale_id:sale}),'ENTITLEMENT_UNAVAILABLE');
   assert.equal((await db.query('select count(*)::int n from core.credit_deficits where org_id=$1',[org])).rows[0].n,0);
  });
+ await t.test('direct client RPC and private schema access cannot bypass verified gateway context',async()=>{
+  const {env}=context();const res=await fetch(env.API_URL+'/rest/v1/rpc/event_save_v1',{method:'POST',headers:{apikey:env.ANON_KEY,authorization:'Bearer '+owner.jwt,'content-type':'application/json','content-profile':'api_v1'},body:JSON.stringify({p_request:{},p_actor_auth_id:platform.id,p_session_id:platform.session_id,p_ids:[key()],p_aux:null})});assert(res.status>=400);
+  const read=await fetch(env.API_URL+'/rest/v1/accounts?select=*',{headers:{apikey:env.ANON_KEY,authorization:'Bearer '+owner.jwt,'accept-profile':'core'}});assert(read.status>=400);
+ });
+ await t.test('verified-email invitation reaches local SMTP; acceptance grants self access without management roles',async()=>{
+  await error(owner,'role_assign_v1',scoped({person_id:studentPerson,role:'staff',scope:{center_id:center}}),'ACCOUNT_LINK_REQUIRED');
+  const job=await mutate(owner,'account_access_send_v1',{person_id:studentPerson});
+  await deliverDevInvitation(job.job_id);
+  const {env}=context();const messages=await (await fetch(env.MAILPIT_URL+'/api/v1/messages')).json();const message=messages.messages.find(m=>m.To.some(a=>a.Address===student.email));assert(message,'SMTP message exists');
+  const detail=await(await fetch(env.MAILPIT_URL+'/api/v1/message/'+message.ID)).json();const token=detail.Text.match(/Token: ([a-f0-9]{64})/)[1];
+  await error(stranger,'account_access_accept_v1',{token},'INVITATION_UNAVAILABLE');
+  await must(student,'account_access_accept_v1',{token},key());
+  assert.equal((await db.query('select count(*)::int n from core.role_assignments where org_id=$1 and person_id=$2',[org,studentPerson])).rows[0].n,0);
+  assert((await must(student,'entitlements_get_v1',scoped({person_id:studentPerson}))).length>0);
+  await error(student,'event_save_v1',scoped(eventInput()),'FORBIDDEN');
+  const stored=(await db.query('select token_hash from core.invitations where org_id=$1 and person_id=$2',[org,studentPerson])).rows[0];assert.notEqual(stored.token_hash,token);
+ });
+ await t.test('staff grants and revocations are live; a center grant cannot target a different center',async()=>{
+  const assignment=await mutate(owner,'role_assign_v1',{person_id:studentPerson,role:'staff',scope:{center_id:center}});
+  await error(student,'person_create_v1',scoped({display_name:'denied',contacts:[]}),'FORBIDDEN');
+  let personVersion=(await db.query('select version from core.people where id=$1',[studentPerson])).rows[0].version;
+  await mutate(owner,'permission_set_v1',{person_id:studentPerson,permission:'person.manage',enabled:true,expected_version:Number(personVersion)});
+  await mutate(student,'person_create_v1',{display_name:'Allowed by explicit grant',contacts:[]});
+  await mutate(owner,'role_revoke_v1',{assignment_id:assignment.primary_id,expected_version:1,reason:'synthetic'});
+  await error(student,'person_create_v1',scoped({display_name:'revoked',contacts:[]}),'FORBIDDEN');
+  const other=(await must(owner,'center_create_v1',{org_id:org,name:'Other center',timezone:'Europe/Istanbul'},key())).primary_id;
+  await error(student,'role_assign_v1',scoped({person_id:ownerPerson,role:'staff',scope:{center_id:other}}),'FORBIDDEN');
+ });
+ await t.test('organization manager may explicitly assign self to a center; owner transfer remains platform-only',async()=>{
+  await must(owner,'org_manager_assign_v1',{org_id:org,person_id:studentPerson},key());
+  await must(student,'manager_self_assign_center_v1',{org_id:org,target_center_id:center},key());
+  await mutate(student,'person_create_v1',{display_name:'Self assigned CM',contacts:[]});
+  await must(owner,'org_manager_revoke_v1',{org_id:org,person_id:studentPerson,expected_version:1,reason:'synthetic'},key());
+  await mutate(owner,'center_manager_revoke_v1',{person_id:studentPerson,expected_version:1,reason:'synthetic'});
+  await error(owner,'platform_owner_set_v1',scoped({verified_account_id:ownerAccount.id,reason:'forged platform'}),'FORBIDDEN');
+  await error(platform,'platform_owner_remove_v1',scoped({reason:'no replacement'}),'OWNER_TRANSFER_REQUIRED');
+ });
+ await t.test('two real organizations cannot read each other or attach foreign people, disciplines and centers',async()=>{
+  const otherAccount=await must(stranger,'account_get_v1');const other=(await must(platform,'organization_create_v1',{verified_account_id:otherAccount.id,name:'Other tenant',initial_plan_id:plan},key())).primary_id;
+  await error(owner,'organization_get_v1',{org_id:other},'NOT_FOUND');
+  await error(stranger,'event_get_v1',scoped({event_id:eventA}),'NOT_FOUND');
+  await error(stranger,'center_manager_assign_v1',{org_id:other,center_id:center,person_id:ownerPerson},'NOT_FOUND');
+  await error(owner,'event_save_v1',scoped(eventInput({discipline_ids:[key()]})),'NOT_FOUND');
+ });
+ await t.test('capacity race reserves one seat; losing transaction writes no debt, receipt or allocation',async()=>{
+  const one=await newEvent({capacity:{nominal:1,maximum:1}});const twoPeople=[];
+  for(let i=0;i<2;i++){const p=(await mutate(owner,'person_create_v1',{display_name:'Capacity '+i,contacts:[]})).primary_id;await mutate(owner,'student_activate_v1',{person_id:p});twoPeople.push(p);}
+  const keys=[key(),key()];const results=await Promise.all(twoPeople.map((p,i)=>call(owner,'event_register_v1',scoped({event_id:one.id,person_id:p}),keys[i])));
+  assert.equal(results.filter(r=>r.result.ok).length,1,JSON.stringify(results));assert.equal(results.find(r=>!r.result.ok).result.error?.code,'CAPACITY_FULL',JSON.stringify(results));
+  const loser=results.findIndex(r=>!r.result.ok);assert.equal((await db.query('select count(*)::int n from core.operation_receipts where org_id=$1 and key_hash=$2',[org,createHash('sha256').update(keys[loser]).digest('hex')])).rows[0].n,0);
+ });
+ await t.test('event cancellation preview is dependency checked and atomically releases the common right',async()=>{
+  const allocated=(await db.query("select a.*,r.version registration_version from core.entitlement_allocations a left join core.event_registrations r on r.id=a.event_registration_id where a.org_id=$1 and a.sale_id=$2 and a.state='reserved'",[org,sale])).rows[0];
+  if(allocated.event_registration_id)await mutate(owner,'event_registration_cancel_v1',{registration_id:allocated.event_registration_id,expected_version:Number(allocated.registration_version),reason:'prepare cancellation test'});
+  else {const reservation=(await db.query('select version from core.reservations where id=$1',[allocated.reservation_id])).rows[0];await mutate(owner,'reservation_cancel_v1',{reservation_id:allocated.reservation_id,expected_version:Number(reservation.version),reason:'prepare cancellation test'});}
+  const next=await newEvent();const pv=await must(owner,'event_registration_preview_v1',scoped({event_id:next.id,person_id:studentPerson,sale_id:sale}));assert.deepEqual(pv.blockers,[]);
+  const reg=await mutate(owner,'event_register_v1',{event_id:next.id,person_id:studentPerson,sale_id:sale,preview:{id:pv.id,token:pv.token}});
+  const stale=await must(owner,'event_cancel_preview_v1',scoped({event_id:next.id,reason:'synthetic'}));
+  const view=await must(owner,'event_get_v1',scoped({event_id:next.id}));await mutate(owner,'event_save_v1',{...next.input,event_id:next.id,expected_version:view.version,name:'Updated without invalidating rights'});
+  await error(owner,'event_cancel_apply_v1',scoped({preview:{id:stale.id,token:stale.token}}),'PREVIEW_STALE');
+  const valid=await must(owner,'event_cancel_preview_v1',scoped({event_id:next.id,reason:'synthetic'}));const k=key();const done=await mutate(owner,'event_cancel_apply_v1',{preview:{id:valid.id,token:valid.token}},k);const repeat=await mutate(owner,'event_cancel_apply_v1',{preview:{id:valid.id,token:valid.token}},k);assert.equal(done.primary_id,repeat.primary_id);assert.equal(repeat.replayed,true);
+  assert.equal((await must(owner,'entitlements_get_v1',scoped({person_id:studentPerson}))).find(s=>s.sale_id===sale).available,1);
+  assert.equal((await db.query('select state from core.event_registrations where id=$1',[reg.primary_id])).rows[0].state,'cancelled');
+ });
+ await t.test('event duty earnings require occurrence and explicit CM verification; corrections append linked movements',async()=>{
+  const fee=await newEvent({assignments:[{person_id:ownerPerson,duty:'instructor',fee_minor:'500',currency:'TRY'}]});const a=(await db.query('select id from core.event_assignments where org_id=$1 and event_id=$2',[org,fee.id])).rows[0].id;
+  await error(owner,'event_duty_verify_v1',scoped({assignment_id:a,expected_version:1,performed:true}),'INVALID_STATE_TRANSITION');
+  await mutate(owner,'event_complete_v1',{event_id:fee.id});await mutate(owner,'event_duty_verify_v1',{assignment_id:a,expected_version:1,performed:true});
+  await mutate(owner,'event_duty_verify_v1',{assignment_id:a,expected_version:2,performed:false,reason:'did not perform'});
+  const rows=(await db.query('select amount_minor,direction,previous_id from core.earnings where org_id=$1 and event_assignment_id=$2 order by created_at,id',[org,a])).rows;assert.equal(rows.length,2);assert.equal(rows[0].direction,'add');assert.equal(rows[1].direction,'subtract');assert(rows[1].previous_id);
+ });
+
+ await t.test('Q-D01 actual RPC rejects narrow products for zero/multiple tags and requires explicit event usage',async()=>{
+  const second=(await must(owner,'discipline_save_v1',{org_id:org,name:'Yoga',state:'active'},key())).primary_id;
+  async function sell(scopes){const pv=(await mutate(owner,'product_publish_v1',{terms:{...terms,name:'Scope fixture',price_minor:'0',scopes}})).primary_id;const p=await must(owner,'sale_preview_v1',scoped({person_id:studentPerson,product_version_id:pv,...dates}));const s=(await mutate(owner,'sale_apply_v1',{preview:{id:p.id,token:p.token}})).primary_id;return {pv,s};}
+  const narrow=await sell([{scope_kind:'center_discipline',center_id:center,discipline_id:discipline,usage_targets:['event']}]);
+  for(const tags of [[],[discipline,second]]){const e=await newEvent({discipline_ids:tags,terms:{...eventTerms,allowed_product_version_ids:[narrow.pv]}});await error(owner,'event_register_v1',scoped({event_id:e.id,person_id:studentPerson,sale_id:narrow.s}),'CLASS_ACCESS_DENIED');}
+  const matching=await newEvent({terms:{...eventTerms,allowed_product_version_ids:[narrow.pv]}});await mutate(owner,'event_register_v1',{event_id:matching.id,person_id:studentPerson,sale_id:narrow.s});
+  const lesson=await sell([{scope_kind:'organization_all',center_id:null,discipline_id:null,usage_targets:['lesson']}]);const e=await newEvent({terms:{...eventTerms,allowed_product_version_ids:[lesson.pv]}});await error(owner,'event_register_v1',scoped({event_id:e.id,person_id:studentPerson,sale_id:lesson.s}),'CLASS_ACCESS_DENIED');
+ });
+ await t.test('timed weekly quota is one shared bucket across events and cancellation releases it',async()=>{
+  const pv=(await mutate(owner,'product_publish_v1',{terms:{...terms,name:'Weekly fixture',kind:'timed',credits:null,quota:{period:'week',limit:1},price_minor:'0'}})).primary_id;
+  const p=await must(owner,'sale_preview_v1',scoped({person_id:studentPerson,product_version_id:pv,...dates}));const s=(await mutate(owner,'sale_apply_v1',{preview:{id:p.id,token:p.token}})).primary_id;
+  const es=[await newEvent({terms:{...eventTerms,allowed_product_version_ids:[pv]}}),await newEvent({terms:{...eventTerms,allowed_product_version_ids:[pv]}})];
+  const first=await mutate(owner,'event_register_v1',{event_id:es[0].id,person_id:studentPerson,sale_id:s});await error(owner,'event_register_v1',scoped({event_id:es[1].id,person_id:studentPerson,sale_id:s}),'ENTITLEMENT_UNAVAILABLE');
+  await mutate(owner,'event_registration_cancel_v1',{registration_id:first.primary_id,expected_version:1,reason:'synthetic'});await mutate(owner,'event_register_v1',{event_id:es[1].id,person_id:studentPerson,sale_id:s});
+  const buckets=(await db.query('select reserved_count,consumed_count from core.quota_buckets where org_id=$1 and sale_id=$2',[org,s])).rows;assert.equal(buckets.length,1);assert.equal(Number(buckets[0].reserved_count),1);
+ });
+ await t.test('same-key simultaneous requests share a receipt and create exactly one registration',async()=>{
+  const e=await newEvent();const k=key(),b=scoped({event_id:e.id,person_id:studentPerson});const result=await Promise.all([call(owner,'event_register_v1',b,k),call(owner,'event_register_v1',b,k)]);assert(result.every(x=>x.result.ok),JSON.stringify(result));assert.equal(result[0].result.data.primary_id,result[1].result.data.primary_id);assert(result.some(x=>x.result.data.replayed));
+  assert.equal((await db.query('select count(*)::int n from core.event_registrations where org_id=$1 and event_id=$2',[org,e.id])).rows[0].n,1);
+ });
+ await t.test('event list keyset paging is stable and rejects a cursor for another filter',async()=>{
+  const interval={starts_at:'2026-01-01T00:00:00Z',ends_at:'2027-01-01T00:00:00Z'};let cursor=null;const ids=[];
+  do{const page=await must(owner,'event_list_v1',scoped({interval,page:{limit:7,sort:'starts_at_asc',cursor}}));ids.push(...page.items.map(i=>i.id));cursor=page.next_cursor;}while(cursor);
+  assert.equal(new Set(ids).size,ids.length);assert(ids.length>7);
+  const page=await must(owner,'event_list_v1',scoped({interval,page:{limit:1}}));await error(owner,'event_list_v1',scoped({interval:{...interval,ends_at:'2026-12-01T00:00:00Z'},page:{limit:1,cursor:page.next_cursor}}),'VALIDATION_FAILED');
+ });
+ await t.test('manual event creates a separate money debt; partial collection never cancels the registration or changes rights',async()=>{
+  const e=await newEvent({terms:{...eventTerms,fee_minor:'700',allowed_product_version_ids:[]}});const r=await mutate(owner,'event_register_v1',{event_id:e.id,person_id:studentPerson});const debt=(await db.query('select id from core.debts where org_id=$1 and event_registration_id=$2',[org,r.primary_id])).rows[0].id;
+  const movements=(await db.query('select count(*)::int n from core.entitlement_movements where org_id=$1',[org])).rows[0].n;
+  await mutate(owner,'collection_record_v1',{person_id:studentPerson,debt_ids:[debt],amount_minor:'300',currency:'TRY',occurred_at:new Date().toISOString()});
+  assert.equal(Number((await db.query('select private.debt_remaining($1,$2) n',[org,debt])).rows[0].n),400);assert.equal((await db.query('select state from core.event_registrations where id=$1',[r.primary_id])).rows[0].state,'active');assert.equal((await db.query('select count(*)::int n from core.entitlement_movements where org_id=$1',[org])).rows[0].n,movements);
+ });
+ await t.test('new domain writes across all tenant tables use UUIDv7; journals reject edits',async()=>{
+  const tables=(await db.query("select table_name from information_schema.columns where table_schema='core' and column_name='org_id' and table_name<>'organizations'")).rows;
+  for(const {table_name} of tables){assert(/^[a-z_]+$/.test(table_name));const rows=(await db.query('select id from core.'+table_name+' where org_id=$1',[org])).rows;for(const r of rows)assert.equal(version(r.id),7,table_name);}
+  await assert.rejects(db.query('update core.entitlement_movements set quantity=quantity where org_id=$1',[org]),e=>e.message==='INTEGRITY_VIOLATION');
+ });
+
+ await t.test('platform owner transfer updates live authority without implicitly granting center management',async()=>{
+  const studentAccount=await must(student,'account_get_v1');await mutate(platform,'platform_owner_set_v1',{verified_account_id:studentAccount.id,reason:'synthetic transfer'});
+  assert.equal((await db.query('select owner_person_id from core.organizations where id=$1',[org])).rows[0].owner_person_id,studentPerson);
+  await error(owner,'org_manager_assign_v1',{org_id:org,person_id:ownerPerson},'FORBIDDEN');
+  await error(student,'event_save_v1',scoped(eventInput()),'FORBIDDEN');
+  await must(student,'subscription_get_v1',{org_id:org});
+  await mutate(platform,'platform_owner_remove_v1',{replacement_verified_account_id:ownerAccount.id,reason:'restore synthetic owner'});
+  assert.equal((await db.query('select owner_person_id from core.organizations where id=$1',[org])).rows[0].owner_person_id,ownerPerson);
+ });
+ await t.test('invitation acceptance rechecks the inviter after revocation, even with a delivered token',async()=>{
+  const invitee=await authUser('revocation-invitee');const p=(await mutate(owner,'person_create_v1',{display_name:'Revocation invitee',contacts:[{kind:'email',value:invitee.email}]})).primary_id;await mutate(owner,'student_activate_v1',{person_id:p});
+  const job=await mutate(owner,'account_access_send_v1',{person_id:p});await deliverDevInvitation(job.job_id);
+  const {env}=context();const messages=await(await fetch(env.MAILPIT_URL+'/api/v1/messages')).json();const message=messages.messages.find(m=>m.To.some(a=>a.Address===invitee.email));const detail=await(await fetch(env.MAILPIT_URL+'/api/v1/message/'+message.ID)).json();const token=detail.Text.match(/Token: ([a-f0-9]{64})/)[1];
+  await error(owner,'center_manager_revoke_v1',scoped({person_id:ownerPerson,expected_version:99,reason:'wrong version'}),'VERSION_CONFLICT');
+  await mutate(owner,'center_manager_revoke_v1',{person_id:ownerPerson,expected_version:1,reason:'synthetic'});
+  await error(invitee,'account_access_accept_v1',{token},'INVITATION_UNAVAILABLE');assert.equal((await db.query("select count(*)::int n from core.account_links where org_id=$1 and person_id=$2 and state='active'",[org,p])).rows[0].n,0);
+  await mutate(owner,'center_manager_assign_v1',{person_id:ownerPerson});
+ });
+
  await t.test('role revocation invalidates an existing JWT immediately at the next command',async()=>{
   await mutate(owner,'center_manager_revoke_v1',{person_id:ownerPerson,expected_version:1,reason:'synthetic'});
   await error(owner,'event_save_v1',scoped(eventInput()),'FORBIDDEN');

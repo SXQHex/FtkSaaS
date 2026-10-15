@@ -43,6 +43,10 @@
     "event_attendance_mark_v1",
     "event_attendance_close_v1",
     "event_attendance_correct_v1",
-    "event_complete_v1"
+    "event_complete_v1",
+    "permission_set_v1",
+    "event_duty_verify_v1",
+    "event_cancel_preview_v1",
+    "event_cancel_apply_v1"
   ]
 }

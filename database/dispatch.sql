@@ -4,6 +4,11 @@ alter table core.saas_subscriptions alter column period_end drop not null;
 alter table core.saas_payment_verifications add column if not exists period_key timestamptz;
 alter table core.product_versions add column if not exists refund_terms jsonb not null default '{"method":"none"}';
 alter table core.event_assignments add column if not exists performed boolean;
+alter table core.earnings add column if not exists direction text not null default 'add' check(direction in ('add','subtract'));
+create unique index if not exists runtime_permission_scope on core.permission_overrides(org_id,center_id,person_id,permission);
+alter table core.event_registrations add column if not exists terms_snapshot jsonb;
+update core.event_registrations r set terms_snapshot=e.terms from core.events e where e.org_id=r.org_id and e.id=r.event_id and r.terms_snapshot is null;
+alter table core.event_registrations alter column terms_snapshot set not null;
 create table if not exists private.runtime_operations(name text primary key,permission text not null,billing_class text not null,features text[] not null);
 grant select on private.runtime_operations to service_role;
 revoke all on private.runtime_operations from public,anon,authenticated;
@@ -47,7 +52,12 @@ begin
   if center is null and r ? 'event_id' then select center_id into center from core.events where org_id=org and id=(r->>'event_id')::uuid;end if;
   if center is null and r ? 'registration_id' then select center_id into center from core.event_registrations where org_id=org and id=(r->>'registration_id')::uuid;end if;
   if center is null and r ? 'session_id' then select center_id into center from core.sessions where org_id=org and id=(r->>'session_id')::uuid;end if;
+  if center is null and r ? 'assignment_id' then select center_id into center from core.event_assignments where org_id=org and id=(r->>'assignment_id')::uuid;end if;
   if center is null and r ? 'reservation_id' then select center_id into center from core.reservations where org_id=org and id=(r->>'reservation_id')::uuid;end if;
+  if p_operation='role_assign_v1' then
+   center:=(r#>>'{scope,center_id}')::uuid;
+  end if;
+  if center is null and r ? 'preview' then select (v.payload->>'center_id')::uuid into center from private.preview_payloads v join core.previews p on p.id=v.preview_id where p.org_id=org and p.actor_account_id=actor.id and p.id=(r#>>'{preview,id}')::uuid;end if;
   cm:=center is not null and private.is_manager(org,person,center);org_reader:=private.is_org_reader(org,person);
   if center is not null then perform private.assert_center(org,center);end if;
   mode:=private.access_mode(org);
@@ -75,7 +85,7 @@ begin
    if not cm then perform private.fail('FORBIDDEN');end if;
   end if;
  elsif perm_code='invite.student' then
-  if not cm then perform private.fail('FORBIDDEN');end if;
+  if not private.can_invite(org,person,center,(r->>'person_id')::uuid) then perform private.fail('FORBIDDEN');end if;
  elsif perm_code in ('event.register','reservation.write') then
   if not cm and (r->>'person_id')::uuid is distinct from person and not exists(select 1 from core.permission_overrides where org_id=org and center_id=center and person_id=person and permission='reservation.write' and enabled and private.has_role(org,person,'staff',center)) then
    -- Cancellation resolves the target person in its case branch; no target supplied is not broad access.
@@ -155,7 +165,7 @@ begin
    update core.role_assignments set state='inactive',version=version+1 where org_id=org and id=(r->>'assignment_id')::uuid and scope_center_id=center and role in ('staff','instructor','assistant','student') and version=(r->>'expected_version')::bigint and state='active' returning id,version into record_id,version_n;
   else
    role_name:=case when p_operation='org_manager_revoke_v1' then 'org_manager' else 'center_manager' end;
-   update core.role_assignments set state='inactive',version=version+1 where org_id=org and person_id=(r->>'person_id')::uuid and role=role_name and scope_center_id is not distinct from (case when role_name='org_manager' then null else center end) and state='active' returning id,version into record_id,version_n;
+   update core.role_assignments set state='inactive',version=version+1 where org_id=org and person_id=(r->>'person_id')::uuid and role=role_name and scope_center_id is not distinct from (case when role_name='org_manager' then null else center end) and state='active' and version=(r->>'expected_version')::bigint returning id,version into record_id,version_n;
   end if;
   if not found then perform private.fail('VERSION_CONFLICT');end if;subject:='role_assignments';
  when 'discipline_save_v1' then
@@ -207,7 +217,7 @@ begin
   select * into inv from core.invitations where id=inv.id for update;
   if inv.state<>'pending' or inv.expires_at<=now() or lower(inv.email)<>lower(usr.email) then perform private.fail('INVITATION_UNAVAILABLE');end if;
   selected:=private.person_for(org,inv.inviter_account_id);
-  if not private.is_manager(org,selected,inv.center_id) then perform private.fail('INVITATION_UNAVAILABLE');end if;
+  if not private.can_invite(org,selected,inv.center_id,inv.person_id) then perform private.fail('INVITATION_UNAVAILABLE');end if;
   if exists(select 1 from core.account_links where org_id=org and (account_id=actor.id or person_id=inv.person_id) and state='active') then perform private.fail('ACCOUNT_LINK_CONFLICT');end if;
   insert into core.account_links(id,org_id,account_id,person_id,state,verified_at) values(record_id,org,actor.id,inv.person_id,'active',now());
   update core.invitations set state='accepted',version=version+1 where id=inv.id;person:=inv.person_id;subject:='account_links';
@@ -221,7 +231,7 @@ begin
   select * into sub from core.saas_subscriptions where org_id=org order by created_at desc limit 1 for update;
   select * into plan from core.saas_plan_versions where id=sub.plan_version_id;
   if not exists(select 1 from core.saas_payment_verifications where org_id=org and id=(r->>'payment_id')::uuid and state='pending' and currency=plan.currency and period_key=coalesce(sub.period_end,'epoch'::timestamptz)) then perform private.fail('INVALID_STATE_TRANSITION');end if;
-  update core.saas_payment_verifications set state=case when (r->>'accepted')::bool then 'accepted' else 'rejected' end,verified_at=now(),verified_by=actor.id,version=version+1 where org_id=org and id=(r->>'payment_id')::uuid;
+  update core.saas_payment_verifications set state=case when (r->>'accepted')::bool then 'accepted' else 'rejected' end,verified_at=now(),verified_by=person,version=version+1 where org_id=org and id=(r->>'payment_id')::uuid;
   select coalesce(sum(amount_minor),0) into amount from core.saas_payment_verifications where org_id=org and state='accepted' and period_key=coalesce(sub.period_end,'epoch'::timestamptz);
   if amount>=plan.price_minor then
    start_at:=case when sub.starts_at is null then now() else sub.period_end end;
@@ -260,7 +270,7 @@ begin
   scope_hash:=encode(extensions.digest(r::text,'sha256'),'hex');token:=p_aux->>'token';
   dependencies:=jsonb_build_object('versions',jsonb_build_array(jsonb_build_object('entity',jsonb_build_object('type','product_versions','id',pv.id),'version',coalesce(pv.version,1))),'policy_hashes','[]'::jsonb,'permission_hash',actor.id::text);
   out:=jsonb_build_object('id',record_id,'token',token,'scope_hash',scope_hash,'dependencies',dependencies,'effects','[]'::jsonb,'blockers','[]'::jsonb,'expires_at',now()+interval '15 minutes');
-  insert into core.previews(id,org_id,actor_account_id,operation,scope_hash,dependencies,result,state) values(record_id,org,actor.id,'sale_apply_v1',scope_hash,dependencies,out,'current');
+  insert into core.previews(id,org_id,actor_account_id,operation,scope_hash,dependencies,result,state) values(record_id,org,actor.id,'sale_apply_v1',scope_hash,dependencies,jsonb_build_object('effects',out->'effects','blockers',out->'blockers'),'current');
   insert into private.preview_payloads(preview_id,payload,expires_at,token_hash) values(record_id,r,now()+interval '15 minutes',encode(extensions.digest(token,'sha256'),'hex'));
  when 'sale_apply_v1' then
   select * into preview from core.previews where org_id=org and id=(r#>>'{preview,id}')::uuid for update;
@@ -341,7 +351,7 @@ begin
   select * into ses from core.sessions where org_id=org and id=(r->>'session_id')::uuid and center_id=center for update;
   if not found then perform private.fail('NOT_FOUND');end if;if ses.state<>'planned' then perform private.fail('INVALID_STATE_TRANSITION');end if;
   target:=(r->>'person_id')::uuid;
-  if not cm and (target<>person or r->>'mode'<>'flexible') then perform private.fail('FORBIDDEN');end if;
+  if not cm and not private.staff_grant(org,person,center,'reservation.write') and (target<>person or r->>'mode'<>'flexible') then perform private.fail('FORBIDDEN');end if;
   if not exists(select 1 from core.center_relationships where org_id=org and center_id=center and person_id=target and kind='student' and state='active') then perform private.fail('OPEN_OPERATIONS_EXIST');end if;
   if exists(select 1 from core.session_assignments where org_id=org and session_id=ses.id and person_id=target and duty='assistant' and state='active') then perform private.fail('ASSISTANT_PARTICIPANT_CONFLICT');end if;
   if exists(select 1 from core.reservations where org_id=org and session_id=ses.id and person_id=target and state='active') then perform private.fail('RESERVATION_EXISTS');end if;
@@ -352,12 +362,17 @@ begin
   if ses.class_id is not null and not (select external_open from core.classes where org_id=org and id=ses.class_id) and not exists(select 1 from core.product_scopes sc join core.sales s on s.org_id=sc.org_id and s.product_version_id=sc.product_version_id where s.org_id=org and s.person_id=target and sc.class_id=ses.class_id and private.lesson_scope_matches(org,ses.id,s.product_version_id)) then perform private.fail('CLASS_ACCESS_DENIED');end if;
   insert into core.reservations(id,org_id,center_id,session_id,person_id,mode,state,policy_version_id,source_sale_id)
    values(record_id,org,center,ses.id,target,r->>'mode','active',policy,(r->>'source_sale_id')::uuid);
-  selected:=private.reserve_right(org,target,(r->>'source_sale_id')::uuid,ses.id,null,null,record_id,operation_id,p_ids,idx);
+  begin
+   selected:=private.reserve_right(org,target,(r->>'source_sale_id')::uuid,ses.id,null,null,record_id,operation_id,p_ids,idx);
+  exception when sqlstate 'P0001' then
+   if SQLERRM<>'ENTITLEMENT_UNAVAILABLE' then raise;end if;
+   perform private.reserve_negative(org,target,ses.id,record_id,p_ids,idx);selected:=(r->>'source_sale_id')::uuid;
+  end;
   update core.reservations set source_sale_id=selected where id=record_id;subject:='reservations';
  when 'reservation_cancel_v1' then
   select * into row_record from core.reservations where org_id=org and center_id=center and id=(r->>'reservation_id')::uuid for update;
   if not found then perform private.fail('NOT_FOUND');end if;
-  if not cm and row_record.person_id<>person then perform private.fail('FORBIDDEN');end if;
+  if not cm and not private.staff_grant(org,person,center,'reservation.write') and row_record.person_id<>person then perform private.fail('FORBIDDEN');end if;
   if row_record.version<>(r->>'expected_version')::bigint then perform private.fail('VERSION_CONFLICT');end if;
   if row_record.state<>'active' then perform private.fail('INVALID_STATE_TRANSITION');end if;
   select * into ses from core.sessions where org_id=org and id=row_record.session_id;
@@ -366,6 +381,7 @@ begin
   perform private.set_right_state(org,null,row_record.id,do_consume,operation_id,p_ids,idx,false);
   record_id:=row_record.id;update core.reservations set state='cancelled',cancellation_reason=r->>'reason',version=version+1 where id=record_id returning version into version_n;subject:='reservations';
  when 'event_save_v1' then
+  if not exists(select 1 from pg_timezone_names where name=r->>'timezone') or (r#>>'{venue,kind}'='external' and not exists(select 1 from pg_timezone_names where name=r#>>'{venue,timezone}')) then perform private.fail('VALIDATION_FAILED');end if;
   if (r#>>'{capacity,nominal}')::bigint>(r#>>'{capacity,maximum}')::bigint or (r#>>'{interval,starts_at}')::timestamptz>=(r#>>'{interval,ends_at}')::timestamptz then perform private.fail('VALIDATION_FAILED');end if;
   if r#>>'{venue,kind}'='external' and (r#>>'{venue,name}' is null or r#>>'{venue,address}' is null) then perform private.fail('VALIDATION_FAILED');end if;
   if r#>>'{venue,kind}'='internal' and not exists(select 1 from core.rooms where org_id=org and center_id=center and id=(r#>>'{venue,room_id}')::uuid) then perform private.fail('NOT_FOUND');end if;
@@ -380,15 +396,12 @@ begin
    if not found then perform private.fail('NOT_FOUND');end if;
    if e.version<>(r->>'expected_version')::bigint or not r ? 'expected_version' then perform private.fail('VERSION_CONFLICT');end if;
    if e.state not in ('draft','published') or e.attendance_state<>'open' then perform private.fail('INVALID_STATE_TRANSITION');end if;
-   if exists(select 1 from core.event_registrations er join core.entitlement_allocations a on a.org_id=er.org_id and a.event_registration_id=er.id where er.org_id=org and er.event_id=e.id and er.state='active' and
-     (r->'discipline_ids'<>coalesce((select jsonb_agg(d.discipline_id order by d.discipline_id) from core.event_disciplines d where d.org_id=org and d.event_id=e.id),'[]'::jsonb) or e.starts_at<>(r#>>'{interval,starts_at}')::timestamptz or e.terms<>r->'terms')) then
-    perform private.fail('OPEN_OPERATIONS_EXIST');
-   end if;
    update core.events set name=r->>'name',starts_at=(r#>>'{interval,starts_at}')::timestamptz,ends_at=(r#>>'{interval,ends_at}')::timestamptz,timezone=r->>'timezone',venue=r->'venue',nominal=(r#>>'{capacity,nominal}')::int,maximum=(r#>>'{capacity,maximum}')::int,terms=r->'terms',version=version+1 where id=record_id returning version into version_n;
    delete from core.event_disciplines where org_id=org and event_id=record_id;
    delete from core.resource_bookings where org_id=org and event_id=record_id;
    delete from core.event_assignments where org_id=org and event_id=record_id;
   end if;
+  if (select count(*) from core.event_registrations where org_id=org and event_id=record_id and state='active')>(r#>>'{capacity,nominal}')::int then perform private.fail('CAPACITY_FULL');end if;
   for entry in select * from jsonb_array_elements(r->'discipline_ids') loop
    insert into core.event_disciplines(id,org_id,center_id,event_id,discipline_id) values(private.new_id(p_ids,idx),org,center,record_id,(entry#>>'{}')::uuid);idx:=idx+1;
   end loop;
@@ -398,6 +411,14 @@ begin
    if exists(select 1 from core.resource_bookings where org_id=org and resource_kind='person' and resource_id=(entry->>'person_id')::uuid and state='active' and starts_at<(r#>>'{interval,ends_at}')::timestamptz and ends_at>(r#>>'{interval,starts_at}')::timestamptz) then perform private.fail('RESOURCE_CONFLICT');end if;
    insert into core.event_assignments(id,org_id,center_id,event_id,person_id,duty,fee_minor,currency) values(private.new_id(p_ids,idx),org,center,record_id,(entry->>'person_id')::uuid,entry->>'duty',(entry->>'fee_minor')::bigint,entry->>'currency');
    insert into core.resource_bookings(id,org_id,center_id,event_id,resource_kind,resource_id,starts_at,ends_at,state) values(private.new_id(p_ids,idx+1),org,center,record_id,'person',(entry->>'person_id')::uuid,(r#>>'{interval,starts_at}')::timestamptz,(r#>>'{interval,ends_at}')::timestamptz,'active');idx:=idx+2;
+  end loop;
+  -- Revalidate every existing allocation after the proposed atomic edit; never silently cancel it.
+  for row_record in select a.*,er.person_id from core.entitlement_allocations a join core.event_registrations er on er.org_id=a.org_id and er.id=a.event_registration_id where er.org_id=org and er.event_id=record_id and er.state='active' and a.state='reserved' order by a.sale_id,a.id loop
+   select * into sale from core.sales where org_id=org and id=row_record.sale_id;
+   perform 1 from core.entitlement_accounts where org_id=org and sale_id=sale.id for update;
+   if not private.event_package_scope_matches(org,record_id,sale.product_version_id) then perform private.fail('CLASS_ACCESS_DENIED');end if;
+   if sale.state<>'active' or (r#>>'{interval,starts_at}')::timestamptz<sale.valid_from or (sale.valid_until is not null and (r#>>'{interval,starts_at}')::timestamptz>=sale.valid_until) then perform private.fail('ENTITLEMENT_UNAVAILABLE');end if;
+   perform private.sync_quota(org,sale.id,(r#>>'{interval,starts_at}')::timestamptz,private.new_id(p_ids,idx));idx:=idx+1;
   end loop;
   if r#>>'{venue,kind}'='internal' then
    if exists(select 1 from core.resource_bookings where org_id=org and resource_kind='room' and resource_id=(r#>>'{venue,room_id}')::uuid and state='active' and starts_at<(r#>>'{interval,ends_at}')::timestamptz and ends_at>(r#>>'{interval,starts_at}')::timestamptz) then perform private.fail('RESOURCE_CONFLICT');end if;
@@ -413,34 +434,55 @@ begin
   select * into e from core.events where org_id=org and id=(r->>'event_id')::uuid and center_id=center;
   if not found then perform private.fail('NOT_FOUND');end if;
   if not org_reader and not cm and not e.published and not exists(select 1 from core.event_registrations where org_id=org and event_id=e.id and person_id=person) then perform private.fail('NOT_FOUND');end if;
+  perform private.assert_center(org,e.center_id);
   out:=private.event_view(org,e.id);
+  if cm then out:=out||jsonb_build_object('assignment_terms',coalesce((select jsonb_agg(jsonb_build_object('person_id',person_id,'duty',duty,'fee_minor',fee_minor::text,'currency',currency)) from core.event_assignments where org_id=org and event_id=e.id),'[]'::jsonb));end if;
  when 'event_list_v1' then
-  out:=jsonb_build_object('items',coalesce((select jsonb_agg(private.event_view(org,x.id)) from
-   (select e.id from core.events e where e.org_id=org and (center is null or e.center_id=center) and e.starts_at<(r#>>'{interval,ends_at}')::timestamptz and e.ends_at>(r#>>'{interval,starts_at}')::timestamptz
+  if r#>>'{page,sort}' is not null and r#>>'{page,sort}'<>'starts_at_asc' then perform private.fail('VALIDATION_FAILED');end if;
+  scope_hash:=encode(extensions.digest((r-'request_id'-'page')::text,'sha256'),'hex');entry:=null;
+  if r#>>'{page,cursor}' is not null then
+   begin entry:=convert_from(decode(r#>>'{page,cursor}','hex'),'UTF8')::jsonb;
+   exception when others then perform private.fail('VALIDATION_FAILED');end;
+   if entry->>'scope' is distinct from scope_hash then perform private.fail('VALIDATION_FAILED');end if;
+  end if;
+  limit_n:=coalesce((r#>>'{page,limit}')::int,50);
+  select coalesce(jsonb_agg(private.event_view(org,x.id) order by x.starts_at,x.id),'[]'::jsonb) into out from
+   (select e.id,e.starts_at from core.events e where e.org_id=org and (center is null or e.center_id=center)
+    and private.center_accessible(org,e.center_id)
+    and e.starts_at<(r#>>'{interval,ends_at}')::timestamptz and e.ends_at>(r#>>'{interval,starts_at}')::timestamptz
     and (org_reader or private.is_manager(org,person,e.center_id) or e.published or exists(select 1 from core.event_registrations where org_id=org and event_id=e.id and person_id=person))
     and (r->>'discipline_id' is null or exists(select 1 from core.event_disciplines where org_id=org and event_id=e.id and discipline_id=(r->>'discipline_id')::uuid))
-    order by e.starts_at,e.id limit coalesce((r#>>'{page,limit}')::int,50)) x),'[]'::jsonb),'next_cursor',null);
+    and (entry is null or (e.starts_at,e.id)>((entry->>'at')::timestamptz,(entry->>'id')::uuid))
+    order by e.starts_at,e.id limit limit_n+1) x;
+  token:=null;
+  if jsonb_array_length(out)>limit_n then
+   out:=out-(jsonb_array_length(out)-1);entry:=out->(jsonb_array_length(out)-1);
+   token:=encode(convert_to(jsonb_build_object('scope',scope_hash,'at',entry#>>'{interval,starts_at}','id',entry->>'id')::text,'UTF8'),'hex');
+  end if;
+  out:=jsonb_build_object('items',out,'next_cursor',token);
  when 'event_registration_preview_v1' then
   select * into e from core.events where org_id=org and center_id=center and id=(r->>'event_id')::uuid;
   if not found then perform private.fail('NOT_FOUND');end if;
   target:=(r->>'person_id')::uuid;
-  if not cm and target<>person then perform private.fail('FORBIDDEN');end if;
+  if not cm and not private.staff_grant(org,person,center,'reservation.write') and target<>person then perform private.fail('FORBIDDEN');end if;
   scope_hash:=encode(extensions.digest(r::text,'sha256'),'hex');token:=p_aux->>'token';
   dependencies:=jsonb_build_object('versions',jsonb_build_array(jsonb_build_object('entity',jsonb_build_object('type','events','id',e.id),'version',e.version)),'policy_hashes','[]'::jsonb,'permission_hash',actor.id::text);
-  out:=jsonb_build_object('id',record_id,'token',token,'scope_hash',scope_hash,'dependencies',dependencies,'effects','[]'::jsonb,'blockers','[]'::jsonb,'expires_at',now()+interval '15 minutes');
-  if r->>'sale_id' is not null and not exists(select 1 from core.sales s where s.org_id=org and s.person_id=target and s.id=(r->>'sale_id')::uuid and private.event_package_scope_matches(org,e.id,s.product_version_id)) then
-   out:=jsonb_set(out,'{blockers}',jsonb_build_array(jsonb_build_object('code','CLASS_ACCESS_DENIED','retryable',false,'trace_id',trace)));
-  elsif r->>'sale_id' is not null and private.available_for(org,(r->>'sale_id')::uuid,e.starts_at)<1 then
-   out:=jsonb_set(out,'{blockers}',jsonb_build_array(jsonb_build_object('code','ENTITLEMENT_UNAVAILABLE','retryable',false,'trace_id',trace)));
+  if r->>'sale_id' is not null then
+   select * into row_record from core.entitlement_accounts where org_id=org and person_id=target and sale_id=(r->>'sale_id')::uuid;
+   if found then dependencies:=jsonb_set(dependencies,'{versions}',(dependencies->'versions')||jsonb_build_array(jsonb_build_object('entity',jsonb_build_object('type','entitlement_accounts','id',row_record.id),'version',row_record.version)));end if;
   end if;
-  insert into core.previews(id,org_id,actor_account_id,operation,scope_hash,dependencies,result,state) values(record_id,org,actor.id,'event_register_v1',scope_hash,dependencies,out,'current');
+  out:=jsonb_build_object('id',record_id,'token',token,'scope_hash',scope_hash,'dependencies',dependencies,'effects','[]'::jsonb,'blockers','[]'::jsonb,'expires_at',now()+interval '15 minutes');
+  state_name:=private.event_eligibility(org,e.id,target,(r->>'sale_id')::uuid);
+  if state_name is not null then out:=jsonb_set(out,'{blockers}',jsonb_build_array(jsonb_build_object('code',state_name,'retryable',false,'trace_id',trace)));end if;
+  insert into core.previews(id,org_id,actor_account_id,operation,scope_hash,dependencies,result,state) values(record_id,org,actor.id,'event_register_v1',scope_hash,dependencies,jsonb_build_object('effects',out->'effects','blockers',out->'blockers'),'current');
   insert into private.preview_payloads(preview_id,payload,expires_at,token_hash) values(record_id,r,now()+interval '15 minutes',encode(extensions.digest(token,'sha256'),'hex'));
  when 'event_register_v1' then
   select * into e from core.events where org_id=org and center_id=center and id=(r->>'event_id')::uuid for update;
   if not found then perform private.fail('NOT_FOUND');end if;
   if e.state<>'published' then perform private.fail('INVALID_STATE_TRANSITION');end if;
+  if not cm and not e.published then perform private.fail('NOT_FOUND');end if;
   target:=(r->>'person_id')::uuid;
-  if not cm and target<>person then perform private.fail('FORBIDDEN');end if;
+  if not cm and not private.staff_grant(org,person,center,'reservation.write') and target<>person then perform private.fail('FORBIDDEN');end if;
   if not exists(select 1 from core.center_relationships where org_id=org and center_id=center and person_id=target and kind='student' and state='active') then perform private.fail('OPEN_OPERATIONS_EXIST');end if;
   if exists(select 1 from core.event_assignments where org_id=org and event_id=e.id and person_id=target and duty='assistant') then perform private.fail('ASSISTANT_PARTICIPANT_CONFLICT');end if;
   if exists(select 1 from core.event_registrations where org_id=org and event_id=e.id and person_id=target and state='active') then perform private.fail('RESERVATION_EXISTS');end if;
@@ -449,28 +491,32 @@ begin
    select * into preview from core.previews where org_id=org and id=(r#>>'{preview,id}')::uuid for update;
    select * into preview_data from private.preview_payloads where preview_id=preview.id;
    if preview.id is null or preview.actor_account_id<>actor.id or preview.state<>'current' or preview_data.expires_at<=now() or preview_data.token_hash<>encode(extensions.digest(r#>>'{preview,token}','sha256'),'hex') or (preview.dependencies#>>'{versions,0,version}')::bigint<>e.version
+    or exists(select 1 from jsonb_array_elements(preview.dependencies->'versions') dep where dep#>>'{entity,type}'='entitlement_accounts' and not exists(select 1 from core.entitlement_accounts a where a.org_id=org and a.id=(dep#>>'{entity,id}')::uuid and a.version=(dep->>'version')::bigint))
     or (preview_data.payload->>'person_id')::uuid<>target or (preview_data.payload->>'event_id')::uuid<>e.id or preview_data.payload->>'sale_id' is distinct from r->>'sale_id' then perform private.fail('PREVIEW_STALE');end if;
   end if;
+  state_name:=private.event_eligibility(org,e.id,target,(r->>'sale_id')::uuid);if state_name is not null then perform private.fail(state_name);end if;
   amount:=case when r->>'sale_id' is null then (e.terms->>'fee_minor')::bigint else 0 end;
   if r->>'sale_id' is null and coalesce((e.terms->>'full_payment_required')::bool,false) and amount>0 then perform private.fail('ENTITLEMENT_UNAVAILABLE');end if;
-  insert into core.event_registrations(id,org_id,center_id,event_id,person_id,amount_minor,currency,terms_hash,state,attendance_result)
-   values(record_id,org,center,e.id,target,amount,e.terms->>'currency',encode(extensions.digest(e.terms::text,'sha256'),'hex'),'active','unmarked');
+  insert into core.event_registrations(id,org_id,center_id,event_id,person_id,amount_minor,currency,terms_hash,state,attendance_result,terms_snapshot)
+   values(record_id,org,center,e.id,target,amount,e.terms->>'currency',encode(extensions.digest(e.terms::text,'sha256'),'hex'),'active','unmarked',e.terms);
   if r->>'sale_id' is not null then
    selected:=private.reserve_right(org,target,(r->>'sale_id')::uuid,null,e.id,record_id,null,operation_id,p_ids,idx);
   elsif amount>0 then
    insert into core.debts(id,org_id,center_id,person_id,event_registration_id,amount_minor,currency,due_at,state) values(private.new_id(p_ids,idx),org,center,target,record_id,amount,e.terms->>'currency',now(),'open');
   end if;
-  if preview.id is not null then update core.previews set state='applied' where id=preview.id;end if;subject:='event_registrations';
+  if preview.id is not null then update core.previews set state='applied' where id=preview.id;end if;
+  update core.events set version=version+1 where id=e.id;subject:='event_registrations';
  when 'event_registration_cancel_v1' then
   select * into reg from core.event_registrations where org_id=org and center_id=center and id=(r->>'registration_id')::uuid for update;
   if not found then perform private.fail('NOT_FOUND');end if;
-  if not cm and reg.person_id<>person then perform private.fail('FORBIDDEN');end if;
+  if not cm and not private.staff_grant(org,person,center,'reservation.write') and reg.person_id<>person then perform private.fail('FORBIDDEN');end if;
   if reg.version<>(r->>'expected_version')::bigint then perform private.fail('VERSION_CONFLICT');end if;
   if reg.state<>'active' then perform private.fail('INVALID_STATE_TRANSITION');end if;
   select * into e from core.events where org_id=org and id=reg.event_id;
-  do_consume:=case when now()<e.starts_at-make_interval(mins=>coalesce((e.terms#>>'{cancellation,cutoff_minutes}')::int,0)) then e.terms#>>'{cancellation,before_cutoff}'='consume' else e.terms#>>'{cancellation,after_cutoff}'='consume' end;
+  do_consume:=case when now()<e.starts_at-make_interval(mins=>coalesce((reg.terms_snapshot#>>'{cancellation,cutoff_minutes}')::int,0)) then reg.terms_snapshot#>>'{cancellation,before_cutoff}'='consume' else reg.terms_snapshot#>>'{cancellation,after_cutoff}'='consume' end;
   perform private.set_right_state(org,reg.id,null,do_consume,operation_id,p_ids,idx,false);
-  record_id:=reg.id;update core.event_registrations set state='cancelled',version=version+1 where id=record_id returning version into version_n;subject:='event_registrations';
+  record_id:=reg.id;update core.event_registrations set state='cancelled',version=version+1 where id=record_id returning version into version_n;
+  update core.events set version=version+1 where id=e.id;subject:='event_registrations';
  when 'event_attendance_mark_v1' then
   select * into reg from core.event_registrations where org_id=org and center_id=center and id=(r->>'registration_id')::uuid for update;
   if not found then perform private.fail('NOT_FOUND');end if;
@@ -479,7 +525,8 @@ begin
   if reg.state<>'active' then perform private.fail('INVALID_STATE_TRANSITION');end if;
   if r->>'result'='blocked' and not cm then perform private.fail('FORBIDDEN');end if;
   record_id:=reg.id;update core.event_registrations set attendance_result=r->>'result',version=version+1 where id=record_id and version=(r->>'expected_version')::bigint returning version into version_n;
-  if not found then perform private.fail('VERSION_CONFLICT');end if;subject:='event_registrations';
+  if not found then perform private.fail('VERSION_CONFLICT');end if;
+  update core.events set version=version+1 where id=reg.event_id;subject:='event_registrations';
  when 'event_attendance_close_v1' then
   select * into e from core.events where org_id=org and center_id=center and id=(r->>'event_id')::uuid for update;
   if not found then perform private.fail('NOT_FOUND');end if;
@@ -488,8 +535,7 @@ begin
   if now()<e.starts_at then perform private.fail('INVALID_STATE_TRANSITION');end if;
   if exists(select 1 from core.event_registrations where org_id=org and event_id=e.id and state='active' and attendance_result='unmarked') then perform private.fail('ATTENDANCE_INCOMPLETE');end if;
   for reg in select * from core.event_registrations where org_id=org and event_id=e.id and state='active' order by id for update loop
-   if reg.attendance_result='blocked' then perform private.fail('POLICY_NOT_CONFIGURED');end if;
-   do_consume:=reg.attendance_result='attended' or (reg.attendance_result='no_show' and e.terms#>>'{cancellation,no_show}'='consume');
+   do_consume:=private.event_consumes(org,center,reg.attendance_result,reg.terms_snapshot);
    perform private.set_right_state(org,reg.id,null,do_consume,operation_id,p_ids,idx,false);idx:=idx+3;
    update core.event_registrations set state='completed',version=version+1 where id=reg.id;
   end loop;
@@ -500,8 +546,7 @@ begin
   select * into e from core.events where org_id=org and id=reg.event_id;
   if e.attendance_state<>'closed' or reg.state<>'completed' then perform private.fail('INVALID_STATE_TRANSITION');end if;
   if reg.version<>(r->>'expected_version')::bigint then perform private.fail('VERSION_CONFLICT');end if;
-  if r->>'result' not in ('attended','no_show') then perform private.fail('POLICY_NOT_CONFIGURED');end if;
-  do_consume:=r->>'result'='attended' or (r->>'result'='no_show' and e.terms#>>'{cancellation,no_show}'='consume');
+  do_consume:=private.event_consumes(org,center,r->>'result',reg.terms_snapshot);
   perform private.set_right_state(org,reg.id,null,do_consume,operation_id,p_ids,idx,true);
   record_id:=reg.id;update core.event_registrations set attendance_result=r->>'result',version=version+1 where id=record_id returning version into version_n;
   update core.events set attendance_revision=attendance_revision+1,version=version+1 where id=e.id;subject:='event_registrations';
@@ -511,9 +556,62 @@ begin
   if e.state<>'published' or now()<e.starts_at then perform private.fail('INVALID_STATE_TRANSITION');end if;
   record_id:=e.id;update core.events set state='occurred',version=version+1 where id=record_id returning version into version_n;subject:='events';
 
+ when 'permission_set_v1' then
+  target:=(r->>'person_id')::uuid;
+  if not private.has_role(org,target,'staff',center) and not private.has_role(org,target,'instructor',center) then perform private.fail('ACCOUNT_LINK_REQUIRED');end if;
+  if r->>'permission' not in ('person.manage','person.activate','invite.student','reservation.write','attendance.draft','sale.write','finance.collect') then perform private.fail('FORBIDDEN');end if;
+  update core.people set version=version+1 where org_id=org and id=target and version=(r->>'expected_version')::bigint returning version into version_n;
+  if not found then perform private.fail('VERSION_CONFLICT');end if;
+  insert into core.permission_overrides(id,org_id,center_id,person_id,permission,enabled) values(record_id,org,center,target,r->>'permission',(r->>'enabled')::bool)
+  on conflict(org_id,center_id,person_id,permission) do update set enabled=excluded.enabled,version=core.permission_overrides.version+1 returning id into record_id;subject:='permission_overrides';
+ when 'event_duty_verify_v1' then
+  select * into row_record from core.event_assignments where org_id=org and center_id=center and id=(r->>'assignment_id')::uuid for update;
+  if not found then perform private.fail('NOT_FOUND');end if;
+  if row_record.version<>(r->>'expected_version')::bigint then perform private.fail('VERSION_CONFLICT');end if;
+  select * into e from core.events where org_id=org and id=row_record.event_id;
+  if e.state<>'occurred' then perform private.fail('INVALID_STATE_TRANSITION');end if;
+  if row_record.verified_at is not null and row_record.performed is distinct from (r->>'performed')::bool and coalesce(r->>'reason','')='' then perform private.fail('VALIDATION_FAILED');end if;
+  if row_record.performed is distinct from (r->>'performed')::bool then
+   select id into linked from core.earnings where org_id=org and event_assignment_id=row_record.id order by created_at desc,id desc limit 1;
+   if (r->>'performed')::bool or row_record.performed then
+    insert into core.earnings(id,org_id,center_id,person_id,event_assignment_id,amount_minor,currency,basis,previous_id,operation_id,direction)
+    values(private.new_id(p_ids,idx),org,center,row_record.person_id,row_record.id,row_record.fee_minor,row_record.currency,
+     jsonb_build_object('source','event_fee','currency',row_record.currency,'quantity',1,'excluded_blocked',0),linked,operation_id,case when (r->>'performed')::bool then 'add' else 'subtract' end);
+   end if;
+  end if;
+  record_id:=row_record.id;update core.event_assignments set performed=(r->>'performed')::bool,verified_at=now(),verified_by=person,version=version+1 where id=record_id returning version into version_n;subject:='event_assignments';
+ when 'event_cancel_preview_v1' then
+  select * into e from core.events where org_id=org and center_id=center and id=(r->>'event_id')::uuid;
+  if not found then perform private.fail('NOT_FOUND');end if;
+  if e.state not in ('draft','published') then perform private.fail('INVALID_STATE_TRANSITION');end if;
+  scope_hash:=encode(extensions.digest(r::text,'sha256'),'hex');token:=p_aux->>'token';
+  dependencies:=jsonb_build_object('versions',jsonb_build_array(jsonb_build_object('entity',jsonb_build_object('type','events','id',e.id),'version',e.version)),'policy_hashes','[]'::jsonb,'permission_hash',actor.id::text);
+  out:=jsonb_build_object('id',record_id,'token',token,'scope_hash',scope_hash,'dependencies',dependencies,'effects',coalesce((select jsonb_agg(jsonb_build_object('entity',jsonb_build_object('type','event_registrations','id',er.id),'action','cancel','quantity',1)) from core.event_registrations er where er.org_id=org and er.event_id=e.id and er.state='active'),'[]'::jsonb),'blockers','[]'::jsonb,'expires_at',now()+interval '15 minutes');
+  if exists(select 1 from core.event_registrations where org_id=org and event_id=e.id and state='active' and amount_minor>0 and terms_snapshot#>>'{refund,method}'<>'none') then
+   out:=jsonb_set(out,'{blockers}',jsonb_build_array(jsonb_build_object('code','POLICY_NOT_CONFIGURED','retryable',false,'trace_id',trace)));
+  end if;
+  insert into core.previews(id,org_id,actor_account_id,operation,scope_hash,dependencies,result,state) values(record_id,org,actor.id,'event_cancel_apply_v1',scope_hash,dependencies,jsonb_build_object('effects',out->'effects','blockers',out->'blockers'),'current');
+  insert into private.preview_payloads(preview_id,payload,expires_at,token_hash) values(record_id,r,now()+interval '15 minutes',encode(extensions.digest(token,'sha256'),'hex'));
+ when 'event_cancel_apply_v1' then
+  select * into preview from core.previews where org_id=org and id=(r#>>'{preview,id}')::uuid for update;
+  select * into preview_data from private.preview_payloads where preview_id=preview.id;
+  if preview.id is null or preview.operation<>'event_cancel_apply_v1' or preview.actor_account_id<>actor.id or preview.state<>'current' or preview_data.expires_at<=now() or preview_data.token_hash<>encode(extensions.digest(r#>>'{preview,token}','sha256'),'hex') then perform private.fail('PREVIEW_STALE');end if;
+  select * into e from core.events where org_id=org and center_id=center and id=(preview_data.payload->>'event_id')::uuid for update;
+  if not found or e.version<>(preview.dependencies#>>'{versions,0,version}')::bigint then perform private.fail('PREVIEW_STALE');end if;
+  if e.state not in ('draft','published') then perform private.fail('INVALID_STATE_TRANSITION');end if;
+  if jsonb_array_length(preview.result->'blockers')>0 then perform private.fail('POLICY_NOT_CONFIGURED');end if;
+  for reg in select * from core.event_registrations where org_id=org and event_id=e.id and state='active' order by id for update loop
+   perform private.set_right_state(org,reg.id,null,false,operation_id,p_ids,idx,false);idx:=idx+3;
+   update core.event_registrations set state='cancelled',version=version+1 where id=reg.id;
+  end loop;
+  update core.resource_bookings set state='inactive',version=version+1 where org_id=org and event_id=e.id and state='active';
+  record_id:=e.id;update core.events set state='cancelled',published=false,version=version+1 where id=record_id returning version into version_n;
+  update core.previews set state='applied' where id=preview.id;subject:='events';
+
  -- DOMAIN_CASES
  else perform private.fail('NOT_FOUND');
  end case;
+ if out ? 'items' then out:=out||jsonb_build_object('as_of',now());end if;
  if out is null then out:=jsonb_build_object('operation_id',operation_id,'primary_id',record_id,'version',version_n,'replayed',false,'related','[]'::jsonb);end if;
  out:=jsonb_build_object('ok',true,'data',out,'trace_id',trace);
  if mutable then
@@ -528,6 +626,8 @@ begin
   end if;
   update core.operation_receipts set state='succeeded',result=out,business_reference=record_id where id=operation_id;
  end if;
+ set constraints all immediate;
+ set constraints all deferred;
  return out;
 exception when others then
  state_name:=SQLERRM;

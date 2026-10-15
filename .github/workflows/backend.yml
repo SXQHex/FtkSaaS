@@ -19,5 +19,7 @@ jobs:
       - run: npm run verify
       - run: npm run dev:start
       - run: npm run test:db
+      - run: npm run test:api
+      - run: npm run dev:health
       - if: always()
         run: npm run dev:stop

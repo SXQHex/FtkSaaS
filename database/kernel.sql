@@ -1,7 +1,7 @@
 begin;
 create or replace function private.debt_remaining(org uuid,debt uuid) returns bigint language sql stable set search_path='' as $$
  select greatest(0,d.amount_minor-coalesce((select sum(a.amount_minor) from core.debt_allocations a where a.org_id=org and a.debt_id=d.id),0)
- -coalesce((select sum(case when direction='subtract' then amount_minor else -amount_minor end) from core.debt_adjustments a where a.org_id=org and a.debt_id=d.id),0))
+ -coalesce((select sum(case when direction='decrease' then amount_minor else -amount_minor end) from core.debt_adjustments a where a.org_id=org and a.debt_id=d.id),0))
  from core.debts d where d.org_id=org and d.id=debt
 $$;
 create or replace function private.allocation_time(a core.entitlement_allocations) returns timestamptz language sql stable set search_path='' as $$
@@ -87,7 +87,9 @@ create or replace function private.set_right_state(org uuid,registration uuid,re
 declare a core.entitlement_allocations; old_move uuid;person uuid;at_time timestamptz; desired text;done_kind text;
 begin
  select * into a from core.entitlement_allocations where org_id=org and (event_registration_id=registration or reservation_id=reservation) order by created_at desc,id desc limit 1 for update;
- if not found then return;end if;
+ if not found then
+  update core.credit_deficits set state=case when consume then 'consumed' else 'released' end,version=version+1 where org_id=org and reservation_id=reservation and state='reserved';return;
+ end if;
  perform 1 from core.entitlement_accounts where org_id=org and sale_id=a.sale_id for update;
  at_time:=private.allocation_time(a);desired:=case when consume then 'consumed' else 'released' end;
  if a.state=desired then return;end if;
@@ -121,4 +123,38 @@ create or replace function private.event_view(org uuid,event uuid) returns jsonb
  'assignments',coalesce((select jsonb_agg(jsonb_build_object('person_id',a.person_id,'duty',a.duty)) from core.event_assignments a where a.org_id=org and a.event_id=e.id),'[]'::jsonb))
  from core.events e where e.org_id=org and e.id=event
 $$;
+
+create or replace function private.center_accessible(org uuid,center uuid) returns boolean language sql stable set search_path='' as $$
+ select exists(select 1 from core.centers c join core.saas_subscriptions s on s.org_id=c.org_id join core.saas_plan_versions p on p.id=s.plan_version_id
+ where c.org_id=org and c.id=center and c.state='active' and (p.name='business' or c.id=(select id from core.centers where org_id=org and state='active' order by created_at,id limit 1)))
+$$;
+create or replace function private.event_eligibility(org uuid,event uuid,target uuid,source uuid) returns text language plpgsql stable set search_path='' as $$
+#variable_conflict use_column
+declare e core.events;s core.sales;
+begin
+ select * into e from core.events where org_id=org and id=event;
+ if not found then return 'NOT_FOUND';end if;
+ if e.state<>'published' then return 'INVALID_STATE_TRANSITION';end if;
+ if not exists(select 1 from core.center_relationships where org_id=org and center_id=e.center_id and person_id=target and kind='student' and state='active') then return 'OPEN_OPERATIONS_EXIST';end if;
+ if exists(select 1 from core.event_assignments where org_id=org and event_id=event and person_id=target and duty='assistant') then return 'ASSISTANT_PARTICIPANT_CONFLICT';end if;
+ if exists(select 1 from core.event_registrations where org_id=org and event_id=event and person_id=target and state='active') then return 'RESERVATION_EXISTS';end if;
+ if (select count(*) from core.event_registrations where org_id=org and event_id=event and state='active')>=e.nominal then return 'CAPACITY_FULL';end if;
+ if source is null then
+  if coalesce((e.terms->>'full_payment_required')::bool,false) and (e.terms->>'fee_minor')::bigint>0 then return 'POLICY_NOT_CONFIGURED';end if;return null;
+ end if;
+ select * into s from core.sales where org_id=org and id=source and person_id=target;
+ if not found then return 'NOT_FOUND';end if;
+ if not private.event_package_scope_matches(org,event,s.product_version_id) or not e.terms->'allowed_product_version_ids' @> to_jsonb(array[s.product_version_id::text]) then return 'CLASS_ACCESS_DENIED';end if;
+ if private.available_for(org,s.id,e.starts_at)<1 then return 'ENTITLEMENT_UNAVAILABLE';end if;
+ if coalesce((e.terms->>'full_payment_required')::bool,false) and exists(select 1 from core.debts d where d.org_id=org and d.sale_id=s.id and private.debt_remaining(org,d.id)>0) then return 'ENTITLEMENT_UNAVAILABLE';end if;
+ return null;
+end$$;
+create or replace function private.append_only() returns trigger language plpgsql set search_path='' as $$begin raise exception using errcode='P0001',message='INTEGRITY_VIOLATION';end$$;
+do $$declare t text;begin
+ foreach t in array array['entitlement_movements','cash_movements','student_credit_movements','debt_allocations','debt_adjustments','earnings','audit_events'] loop
+  execute format('drop trigger if exists runtime_append_only on core.%I',t);
+  execute format('create trigger runtime_append_only before update or delete on core.%I for each row execute function private.append_only()',t);
+ end loop;
+end$$;
+
 commit;

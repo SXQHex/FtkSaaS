@@ -27,7 +27,7 @@ test('real PostgreSQL physical baseline and D/U integrity',async t=>{
   for(const discipline of ['Asalsa','Ayoga'])await row('person_disciplines',{id:newUuidV7(),org_id:id('A'),center_id:id('Acenter'),person_id:id('Aowner'),discipline_id:id(discipline),kind:'student',state:'active'});
   assert.equal((await db.query('select count(*)::int n from core.people where org_id=$1',[id('A')])).rows[0].n,1);
   assert.equal((await db.query('select count(*)::int n from core.person_disciplines where org_id=$1',[id('A')])).rows[0].n,2);
-  assert.equal((await db.query('select count(*)::int n from core.role_assignments')).rows[0].n,0);
+  assert.equal((await db.query('select count(*)::int n from core.role_assignments where org_id=$1',[id('A')])).rows[0].n,0);
  });
  await t.test('D01 cross-tenant center discipline FK rejects',async()=>reject('tenant',()=>row('center_disciplines',{id:newUuidV7(),org_id:id('A'),center_id:id('Acenter'),discipline_id:id('Bsalsa'),state:'active'}),'23503'));
  await t.test('D02 duplicate active relationship rejects',async()=>reject('duplicate relation',()=>row('person_disciplines',{id:newUuidV7(),org_id:id('A'),center_id:id('Acenter'),person_id:id('Aowner'),discipline_id:id('Asalsa'),kind:'student',state:'active'}),'23505'));

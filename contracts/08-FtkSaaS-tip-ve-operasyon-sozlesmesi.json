@@ -14410,6 +14410,9 @@
               "type": "null"
             }
           ]
+        },
+        "expected_version": {
+          "$ref": "#/$defs/PositiveInt"
         }
       },
       "required": [
@@ -14418,7 +14421,8 @@
         "org_id",
         "operation_key",
         "assignment_id",
-        "performed"
+        "performed",
+        "expected_version"
       ],
       "additionalProperties": false
     },
@@ -19583,6 +19587,9 @@
         },
         "operation_id": {
           "$ref": "#/$defs/FtkUuid"
+        },
+        "direction": {
+          "$ref": "#/$defs/EarningDirection"
         }
       },
       "required": [
@@ -19594,7 +19601,8 @@
         "amount_minor",
         "currency",
         "basis",
-        "operation_id"
+        "operation_id",
+        "direction"
       ],
       "additionalProperties": false
     },
@@ -20757,6 +20765,9 @@
         },
         "attendance_result": {
           "$ref": "#/$defs/AttendanceResult"
+        },
+        "terms_snapshot": {
+          "$ref": "#/$defs/EventTerms"
         }
       },
       "required": [
@@ -20770,7 +20781,8 @@
         "currency",
         "terms_hash",
         "state",
-        "attendance_result"
+        "attendance_result",
+        "terms_snapshot"
       ],
       "additionalProperties": false
     },
@@ -22785,6 +22797,29 @@
         "trace_id"
       ],
       "additionalProperties": false
+    },
+    "EarningDirection": {
+      "type": "string",
+      "enum": [
+        "add",
+        "subtract"
+      ]
+    },
+    "FailureEnvelope": {
+      "type": "object",
+      "properties": {
+        "ok": {
+          "const": false
+        },
+        "error": {
+          "$ref": "#/$defs/SafeError"
+        }
+      },
+      "required": [
+        "ok",
+        "error"
+      ],
+      "additionalProperties": false
     }
   },
   "x-contract": {
@@ -24741,7 +24776,17 @@
           "SUBSCRIPTION_NOT_STARTED",
           "TEMPORARY_FAILURE",
           "VALIDATION_FAILED",
-          "VERSION_CONFLICT"
+          "VERSION_CONFLICT",
+          "INVALID_STATE_TRANSITION",
+          "PREVIEW_STALE",
+          "CAPACITY_FULL",
+          "ENTITLEMENT_UNAVAILABLE",
+          "CLASS_ACCESS_DENIED",
+          "RESERVATION_EXISTS",
+          "ASSISTANT_PARTICIPANT_CONFLICT",
+          "ACCOUNT_ALREADY_LINKED",
+          "INVITATION_UNAVAILABLE",
+          "CREDIT_LIMIT_EXCEEDED"
         ],
         "transaction_class": "read",
         "transaction_guarantee": "Güncel yetki/plan/alan filtresi; okuma finans/hak yaratmaz.",
@@ -25143,7 +25188,17 @@
           "SUBSCRIPTION_NOT_STARTED",
           "TEMPORARY_FAILURE",
           "VALIDATION_FAILED",
-          "VERSION_CONFLICT"
+          "VERSION_CONFLICT",
+          "INVALID_STATE_TRANSITION",
+          "PREVIEW_STALE",
+          "CAPACITY_FULL",
+          "ENTITLEMENT_UNAVAILABLE",
+          "CLASS_ACCESS_DENIED",
+          "RESERVATION_EXISTS",
+          "ASSISTANT_PARTICIPANT_CONFLICT",
+          "ACCOUNT_ALREADY_LINKED",
+          "INVITATION_UNAVAILABLE",
+          "CREDIT_LIMIT_EXCEEDED"
         ],
         "transaction_class": "read",
         "transaction_guarantee": "Güncel yetki/plan/alan filtresi; okuma finans/hak yaratmaz.",
@@ -25216,7 +25271,17 @@
           "SUBSCRIPTION_NOT_STARTED",
           "TEMPORARY_FAILURE",
           "VALIDATION_FAILED",
-          "VERSION_CONFLICT"
+          "VERSION_CONFLICT",
+          "INVALID_STATE_TRANSITION",
+          "PREVIEW_STALE",
+          "CAPACITY_FULL",
+          "ENTITLEMENT_UNAVAILABLE",
+          "CLASS_ACCESS_DENIED",
+          "RESERVATION_EXISTS",
+          "ASSISTANT_PARTICIPANT_CONFLICT",
+          "ACCOUNT_ALREADY_LINKED",
+          "INVITATION_UNAVAILABLE",
+          "CREDIT_LIMIT_EXCEEDED"
         ],
         "transaction_class": "org_limit",
         "transaction_guarantee": "Org erişim/limit + kişi/rol/ilişki + receipt/audit/outbox atomik; kapasite veya merkez kuralı geçilmez.",
@@ -25286,7 +25351,17 @@
           "SUBSCRIPTION_NOT_STARTED",
           "TEMPORARY_FAILURE",
           "VALIDATION_FAILED",
-          "VERSION_CONFLICT"
+          "VERSION_CONFLICT",
+          "INVALID_STATE_TRANSITION",
+          "PREVIEW_STALE",
+          "CAPACITY_FULL",
+          "ENTITLEMENT_UNAVAILABLE",
+          "CLASS_ACCESS_DENIED",
+          "RESERVATION_EXISTS",
+          "ASSISTANT_PARTICIPANT_CONFLICT",
+          "ACCOUNT_ALREADY_LINKED",
+          "INVITATION_UNAVAILABLE",
+          "CREDIT_LIMIT_EXCEEDED"
         ],
         "transaction_class": "read",
         "transaction_guarantee": "Güncel yetki/plan/alan filtresi; okuma finans/hak yaratmaz.",
@@ -25788,7 +25863,17 @@
           "SUBSCRIPTION_NOT_STARTED",
           "TEMPORARY_FAILURE",
           "VALIDATION_FAILED",
-          "VERSION_CONFLICT"
+          "VERSION_CONFLICT",
+          "INVALID_STATE_TRANSITION",
+          "PREVIEW_STALE",
+          "CAPACITY_FULL",
+          "ENTITLEMENT_UNAVAILABLE",
+          "CLASS_ACCESS_DENIED",
+          "RESERVATION_EXISTS",
+          "ASSISTANT_PARTICIPANT_CONFLICT",
+          "ACCOUNT_ALREADY_LINKED",
+          "INVITATION_UNAVAILABLE",
+          "CREDIT_LIMIT_EXCEEDED"
         ],
         "transaction_class": "read",
         "transaction_guarantee": "Güncel yetki/plan/alan filtresi; okuma finans/hak yaratmaz.",
@@ -25860,7 +25945,17 @@
           "SUBSCRIPTION_NOT_STARTED",
           "TEMPORARY_FAILURE",
           "VALIDATION_FAILED",
-          "VERSION_CONFLICT"
+          "VERSION_CONFLICT",
+          "INVALID_STATE_TRANSITION",
+          "PREVIEW_STALE",
+          "CAPACITY_FULL",
+          "ENTITLEMENT_UNAVAILABLE",
+          "CLASS_ACCESS_DENIED",
+          "RESERVATION_EXISTS",
+          "ASSISTANT_PARTICIPANT_CONFLICT",
+          "ACCOUNT_ALREADY_LINKED",
+          "INVITATION_UNAVAILABLE",
+          "CREDIT_LIMIT_EXCEEDED"
         ],
         "transaction_class": "org_limit",
         "transaction_guarantee": "Org erişim/limit + kişi/rol/ilişki + receipt/audit/outbox atomik; kapasite veya merkez kuralı geçilmez.",
@@ -26451,7 +26546,17 @@
           "SUBSCRIPTION_NOT_STARTED",
           "TEMPORARY_FAILURE",
           "VALIDATION_FAILED",
-          "VERSION_CONFLICT"
+          "VERSION_CONFLICT",
+          "INVALID_STATE_TRANSITION",
+          "PREVIEW_STALE",
+          "CAPACITY_FULL",
+          "ENTITLEMENT_UNAVAILABLE",
+          "CLASS_ACCESS_DENIED",
+          "RESERVATION_EXISTS",
+          "ASSISTANT_PARTICIPANT_CONFLICT",
+          "ACCOUNT_ALREADY_LINKED",
+          "INVITATION_UNAVAILABLE",
+          "CREDIT_LIMIT_EXCEEDED"
         ],
         "transaction_class": "org_limit",
         "transaction_guarantee": "Org erişim/limit + kişi/rol/ilişki + receipt/audit/outbox atomik; kapasite veya merkez kuralı geçilmez.",
@@ -26534,7 +26639,17 @@
           "SUBSCRIPTION_NOT_STARTED",
           "TEMPORARY_FAILURE",
           "VALIDATION_FAILED",
-          "VERSION_CONFLICT"
+          "VERSION_CONFLICT",
+          "INVALID_STATE_TRANSITION",
+          "PREVIEW_STALE",
+          "CAPACITY_FULL",
+          "ENTITLEMENT_UNAVAILABLE",
+          "CLASS_ACCESS_DENIED",
+          "RESERVATION_EXISTS",
+          "ASSISTANT_PARTICIPANT_CONFLICT",
+          "ACCOUNT_ALREADY_LINKED",
+          "INVITATION_UNAVAILABLE",
+          "CREDIT_LIMIT_EXCEEDED"
         ],
         "transaction_class": "org_limit",
         "transaction_guarantee": "Org erişim/limit + kişi/rol/ilişki + receipt/audit/outbox atomik; kapasite veya merkez kuralı geçilmez.",
@@ -26616,7 +26731,17 @@
           "SUBSCRIPTION_NOT_STARTED",
           "TEMPORARY_FAILURE",
           "VALIDATION_FAILED",
-          "VERSION_CONFLICT"
+          "VERSION_CONFLICT",
+          "INVALID_STATE_TRANSITION",
+          "PREVIEW_STALE",
+          "CAPACITY_FULL",
+          "ENTITLEMENT_UNAVAILABLE",
+          "CLASS_ACCESS_DENIED",
+          "RESERVATION_EXISTS",
+          "ASSISTANT_PARTICIPANT_CONFLICT",
+          "ACCOUNT_ALREADY_LINKED",
+          "INVITATION_UNAVAILABLE",
+          "CREDIT_LIMIT_EXCEEDED"
         ],
         "transaction_class": "org_limit",
         "transaction_guarantee": "Org erişim/limit + kişi/rol/ilişki + receipt/audit/outbox atomik; kapasite veya merkez kuralı geçilmez.",
@@ -26653,7 +26778,7 @@
           "A55"
         ],
         "configuration_policy": "numeric plan limits/prices and legal approval are deployment configuration, never arbitrary allow/deny",
-        "implementation_status": "contract_only"
+        "implementation_status": "implemented_gateway_rpc_acceptance_pending"
       },
       {
         "name": "org_manager_assign_v1",
@@ -26692,7 +26817,17 @@
           "SUBSCRIPTION_NOT_STARTED",
           "TEMPORARY_FAILURE",
           "VALIDATION_FAILED",
-          "VERSION_CONFLICT"
+          "VERSION_CONFLICT",
+          "INVALID_STATE_TRANSITION",
+          "PREVIEW_STALE",
+          "CAPACITY_FULL",
+          "ENTITLEMENT_UNAVAILABLE",
+          "CLASS_ACCESS_DENIED",
+          "RESERVATION_EXISTS",
+          "ASSISTANT_PARTICIPANT_CONFLICT",
+          "ACCOUNT_ALREADY_LINKED",
+          "INVITATION_UNAVAILABLE",
+          "CREDIT_LIMIT_EXCEEDED"
         ],
         "transaction_class": "org_limit",
         "transaction_guarantee": "Org erişim/limit + kişi/rol/ilişki + receipt/audit/outbox atomik; kapasite veya merkez kuralı geçilmez.",
@@ -26774,7 +26909,17 @@
           "SUBSCRIPTION_NOT_STARTED",
           "TEMPORARY_FAILURE",
           "VALIDATION_FAILED",
-          "VERSION_CONFLICT"
+          "VERSION_CONFLICT",
+          "INVALID_STATE_TRANSITION",
+          "PREVIEW_STALE",
+          "CAPACITY_FULL",
+          "ENTITLEMENT_UNAVAILABLE",
+          "CLASS_ACCESS_DENIED",
+          "RESERVATION_EXISTS",
+          "ASSISTANT_PARTICIPANT_CONFLICT",
+          "ACCOUNT_ALREADY_LINKED",
+          "INVITATION_UNAVAILABLE",
+          "CREDIT_LIMIT_EXCEEDED"
         ],
         "transaction_class": "org_limit",
         "transaction_guarantee": "Org erişim/limit + kişi/rol/ilişki + receipt/audit/outbox atomik; kapasite veya merkez kuralı geçilmez.",
@@ -26856,7 +27001,17 @@
           "SUBSCRIPTION_NOT_STARTED",
           "TEMPORARY_FAILURE",
           "VALIDATION_FAILED",
-          "VERSION_CONFLICT"
+          "VERSION_CONFLICT",
+          "INVALID_STATE_TRANSITION",
+          "PREVIEW_STALE",
+          "CAPACITY_FULL",
+          "ENTITLEMENT_UNAVAILABLE",
+          "CLASS_ACCESS_DENIED",
+          "RESERVATION_EXISTS",
+          "ASSISTANT_PARTICIPANT_CONFLICT",
+          "ACCOUNT_ALREADY_LINKED",
+          "INVITATION_UNAVAILABLE",
+          "CREDIT_LIMIT_EXCEEDED"
         ],
         "transaction_class": "org_limit",
         "transaction_guarantee": "Org erişim/limit + kişi/rol/ilişki + receipt/audit/outbox atomik; kapasite veya merkez kuralı geçilmez.",
@@ -26940,7 +27095,15 @@
           "SUBSCRIPTION_NOT_STARTED",
           "TEMPORARY_FAILURE",
           "VALIDATION_FAILED",
-          "VERSION_CONFLICT"
+          "VERSION_CONFLICT",
+          "INVALID_STATE_TRANSITION",
+          "PREVIEW_STALE",
+          "CAPACITY_FULL",
+          "ENTITLEMENT_UNAVAILABLE",
+          "CLASS_ACCESS_DENIED",
+          "RESERVATION_EXISTS",
+          "ASSISTANT_PARTICIPANT_CONFLICT",
+          "CREDIT_LIMIT_EXCEEDED"
         ],
         "transaction_class": "invitation",
         "transaction_guarantee": "Domain invitation state/bağlantı/roller atomik; Auth ve e-posta dış etkileri kalıcı orkestrasyon, tek DB transaction diye sunulmaz.",
@@ -27108,7 +27271,15 @@
           "SUBSCRIPTION_NOT_STARTED",
           "TEMPORARY_FAILURE",
           "VALIDATION_FAILED",
-          "VERSION_CONFLICT"
+          "VERSION_CONFLICT",
+          "INVALID_STATE_TRANSITION",
+          "PREVIEW_STALE",
+          "CAPACITY_FULL",
+          "ENTITLEMENT_UNAVAILABLE",
+          "CLASS_ACCESS_DENIED",
+          "RESERVATION_EXISTS",
+          "ASSISTANT_PARTICIPANT_CONFLICT",
+          "CREDIT_LIMIT_EXCEEDED"
         ],
         "transaction_class": "invitation",
         "transaction_guarantee": "Domain invitation state/bağlantı/roller atomik; Auth ve e-posta dış etkileri kalıcı orkestrasyon, tek DB transaction diye sunulmaz.",
@@ -27391,7 +27562,17 @@
           "SUBSCRIPTION_NOT_STARTED",
           "TEMPORARY_FAILURE",
           "VALIDATION_FAILED",
-          "VERSION_CONFLICT"
+          "VERSION_CONFLICT",
+          "INVALID_STATE_TRANSITION",
+          "PREVIEW_STALE",
+          "CAPACITY_FULL",
+          "ENTITLEMENT_UNAVAILABLE",
+          "CLASS_ACCESS_DENIED",
+          "RESERVATION_EXISTS",
+          "ASSISTANT_PARTICIPANT_CONFLICT",
+          "ACCOUNT_ALREADY_LINKED",
+          "INVITATION_UNAVAILABLE",
+          "CREDIT_LIMIT_EXCEEDED"
         ],
         "transaction_class": "single",
         "transaction_guarantee": "Domain satırı + sürüm + audit + gerekiyorsa inbox/outbox + receipt tek transaction.",
@@ -27544,7 +27725,17 @@
           "SUBSCRIPTION_NOT_STARTED",
           "TEMPORARY_FAILURE",
           "VALIDATION_FAILED",
-          "VERSION_CONFLICT"
+          "VERSION_CONFLICT",
+          "INVALID_STATE_TRANSITION",
+          "PREVIEW_STALE",
+          "CAPACITY_FULL",
+          "ENTITLEMENT_UNAVAILABLE",
+          "CLASS_ACCESS_DENIED",
+          "RESERVATION_EXISTS",
+          "ASSISTANT_PARTICIPANT_CONFLICT",
+          "ACCOUNT_ALREADY_LINKED",
+          "INVITATION_UNAVAILABLE",
+          "CREDIT_LIMIT_EXCEEDED"
         ],
         "transaction_class": "org_limit",
         "transaction_guarantee": "Org erişim/limit + kişi/rol/ilişki + receipt/audit/outbox atomik; kapasite veya merkez kuralı geçilmez.",
@@ -27982,7 +28173,17 @@
           "SUBSCRIPTION_NOT_STARTED",
           "TEMPORARY_FAILURE",
           "VALIDATION_FAILED",
-          "VERSION_CONFLICT"
+          "VERSION_CONFLICT",
+          "INVALID_STATE_TRANSITION",
+          "PREVIEW_STALE",
+          "CAPACITY_FULL",
+          "ENTITLEMENT_UNAVAILABLE",
+          "CLASS_ACCESS_DENIED",
+          "RESERVATION_EXISTS",
+          "ASSISTANT_PARTICIPANT_CONFLICT",
+          "ACCOUNT_ALREADY_LINKED",
+          "INVITATION_UNAVAILABLE",
+          "CREDIT_LIMIT_EXCEEDED"
         ],
         "transaction_class": "single",
         "transaction_guarantee": "Domain satırı + sürüm + audit + gerekiyorsa inbox/outbox + receipt tek transaction.",
@@ -28226,7 +28427,15 @@
           "SUBSCRIPTION_NOT_STARTED",
           "TEMPORARY_FAILURE",
           "VALIDATION_FAILED",
-          "VERSION_CONFLICT"
+          "VERSION_CONFLICT",
+          "INVALID_STATE_TRANSITION",
+          "PREVIEW_STALE",
+          "CAPACITY_FULL",
+          "CLASS_ACCESS_DENIED",
+          "RESERVATION_EXISTS",
+          "ACCOUNT_ALREADY_LINKED",
+          "INVITATION_UNAVAILABLE",
+          "CREDIT_LIMIT_EXCEEDED"
         ],
         "transaction_class": "resources",
         "transaction_guarantee": "Kaynak ve seans kümesi aynı kilit sırası; rezervasyonları etkiliyorsa hakların uygunluğu da transaction içinde. Kısmi sessiz program yaratılmaz.",
@@ -29573,7 +29782,11 @@
           "SUBSCRIPTION_NOT_STARTED",
           "TEMPORARY_FAILURE",
           "VALIDATION_FAILED",
-          "VERSION_CONFLICT"
+          "VERSION_CONFLICT",
+          "INVALID_STATE_TRANSITION",
+          "PREVIEW_STALE",
+          "ACCOUNT_ALREADY_LINKED",
+          "INVITATION_UNAVAILABLE"
         ],
         "transaction_class": "reservation",
         "transaction_guarantee": "Org/öğrenci limit kapısı + seans/yer + kaynak uygunluğu + belge/politika + allocation/deficit/quota + rezervasyon/teklif + audit/outbox/receipt atomik.",
@@ -29684,7 +29897,11 @@
           "SUBSCRIPTION_NOT_STARTED",
           "TEMPORARY_FAILURE",
           "VALIDATION_FAILED",
-          "VERSION_CONFLICT"
+          "VERSION_CONFLICT",
+          "INVALID_STATE_TRANSITION",
+          "PREVIEW_STALE",
+          "ACCOUNT_ALREADY_LINKED",
+          "INVITATION_UNAVAILABLE"
         ],
         "transaction_class": "reservation",
         "transaction_guarantee": "Org/öğrenci limit kapısı + seans/yer + kaynak uygunluğu + belge/politika + allocation/deficit/quota + rezervasyon/teklif + audit/outbox/receipt atomik.",
@@ -30814,7 +31031,17 @@
           "SUBSCRIPTION_NOT_STARTED",
           "TEMPORARY_FAILURE",
           "VALIDATION_FAILED",
-          "VERSION_CONFLICT"
+          "VERSION_CONFLICT",
+          "INVALID_STATE_TRANSITION",
+          "PREVIEW_STALE",
+          "CAPACITY_FULL",
+          "ENTITLEMENT_UNAVAILABLE",
+          "CLASS_ACCESS_DENIED",
+          "RESERVATION_EXISTS",
+          "ASSISTANT_PARTICIPANT_CONFLICT",
+          "ACCOUNT_ALREADY_LINKED",
+          "INVITATION_UNAVAILABLE",
+          "CREDIT_LIMIT_EXCEEDED"
         ],
         "transaction_class": "single",
         "transaction_guarantee": "Domain satırı + sürüm + audit + gerekiyorsa inbox/outbox + receipt tek transaction.",
@@ -30905,7 +31132,13 @@
           "SUBSCRIPTION_NOT_STARTED",
           "TEMPORARY_FAILURE",
           "VALIDATION_FAILED",
-          "VERSION_CONFLICT"
+          "VERSION_CONFLICT",
+          "INVALID_STATE_TRANSITION",
+          "PREVIEW_STALE",
+          "RESERVATION_EXISTS",
+          "ASSISTANT_PARTICIPANT_CONFLICT",
+          "ACCOUNT_ALREADY_LINKED",
+          "INVITATION_UNAVAILABLE"
         ],
         "transaction_class": "sale",
         "transaction_guarantee": "Satış koşulları + açık kapatma + hak + borç + öncelikli rezervasyon seti veya onaylı change/freeze etkileri + audit/outbox/receipt atomik; dış ödeme yok.",
@@ -31009,7 +31242,12 @@
           "SUBSCRIPTION_NOT_STARTED",
           "TEMPORARY_FAILURE",
           "VALIDATION_FAILED",
-          "VERSION_CONFLICT"
+          "VERSION_CONFLICT",
+          "INVALID_STATE_TRANSITION",
+          "RESERVATION_EXISTS",
+          "ASSISTANT_PARTICIPANT_CONFLICT",
+          "ACCOUNT_ALREADY_LINKED",
+          "INVITATION_UNAVAILABLE"
         ],
         "transaction_class": "sale",
         "transaction_guarantee": "Satış koşulları + açık kapatma + hak + borç + öncelikli rezervasyon seti veya onaylı change/freeze etkileri + audit/outbox/receipt atomik; dış ödeme yok.",
@@ -31106,7 +31344,17 @@
           "SUBSCRIPTION_NOT_STARTED",
           "TEMPORARY_FAILURE",
           "VALIDATION_FAILED",
-          "VERSION_CONFLICT"
+          "VERSION_CONFLICT",
+          "INVALID_STATE_TRANSITION",
+          "PREVIEW_STALE",
+          "CAPACITY_FULL",
+          "ENTITLEMENT_UNAVAILABLE",
+          "CLASS_ACCESS_DENIED",
+          "RESERVATION_EXISTS",
+          "ASSISTANT_PARTICIPANT_CONFLICT",
+          "ACCOUNT_ALREADY_LINKED",
+          "INVITATION_UNAVAILABLE",
+          "CREDIT_LIMIT_EXCEEDED"
         ],
         "transaction_class": "read",
         "transaction_guarantee": "Güncel yetki/plan/alan filtresi; okuma finans/hak yaratmaz.",
@@ -32666,7 +32914,17 @@
           "SUBSCRIPTION_NOT_STARTED",
           "TEMPORARY_FAILURE",
           "VALIDATION_FAILED",
-          "VERSION_CONFLICT"
+          "VERSION_CONFLICT",
+          "INVALID_STATE_TRANSITION",
+          "PREVIEW_STALE",
+          "CAPACITY_FULL",
+          "ENTITLEMENT_UNAVAILABLE",
+          "CLASS_ACCESS_DENIED",
+          "RESERVATION_EXISTS",
+          "ASSISTANT_PARTICIPANT_CONFLICT",
+          "ACCOUNT_ALREADY_LINKED",
+          "INVITATION_UNAVAILABLE",
+          "CREDIT_LIMIT_EXCEEDED"
         ],
         "transaction_class": "money",
         "transaction_guarantee": "Merkez/kişi/currency kilidi + nakit/borç/alacak dağıtımı veya bağlı düzeltmeler + audit/outbox/receipt atomik; eski hareket silinmez.",
@@ -34941,7 +35199,17 @@
           "SUBSCRIPTION_NOT_STARTED",
           "TEMPORARY_FAILURE",
           "VALIDATION_FAILED",
-          "VERSION_CONFLICT"
+          "VERSION_CONFLICT",
+          "INVALID_STATE_TRANSITION",
+          "PREVIEW_STALE",
+          "CAPACITY_FULL",
+          "ENTITLEMENT_UNAVAILABLE",
+          "CLASS_ACCESS_DENIED",
+          "RESERVATION_EXISTS",
+          "ASSISTANT_PARTICIPANT_CONFLICT",
+          "ACCOUNT_ALREADY_LINKED",
+          "INVITATION_UNAVAILABLE",
+          "CREDIT_LIMIT_EXCEEDED"
         ],
         "transaction_class": "read",
         "transaction_guarantee": "Güncel yetki/plan/alan filtresi; okuma finans/hak yaratmaz.",
@@ -35336,7 +35604,17 @@
           "SUBSCRIPTION_NOT_STARTED",
           "TEMPORARY_FAILURE",
           "VALIDATION_FAILED",
-          "VERSION_CONFLICT"
+          "VERSION_CONFLICT",
+          "INVALID_STATE_TRANSITION",
+          "PREVIEW_STALE",
+          "CAPACITY_FULL",
+          "ENTITLEMENT_UNAVAILABLE",
+          "CLASS_ACCESS_DENIED",
+          "RESERVATION_EXISTS",
+          "ASSISTANT_PARTICIPANT_CONFLICT",
+          "ACCOUNT_ALREADY_LINKED",
+          "INVITATION_UNAVAILABLE",
+          "CREDIT_LIMIT_EXCEEDED"
         ],
         "transaction_class": "single",
         "transaction_guarantee": "Domain satırı + sürüm + audit + gerekiyorsa inbox/outbox + receipt tek transaction.",
@@ -35420,7 +35698,17 @@
           "SUBSCRIPTION_NOT_STARTED",
           "TEMPORARY_FAILURE",
           "VALIDATION_FAILED",
-          "VERSION_CONFLICT"
+          "VERSION_CONFLICT",
+          "INVALID_STATE_TRANSITION",
+          "PREVIEW_STALE",
+          "CAPACITY_FULL",
+          "ENTITLEMENT_UNAVAILABLE",
+          "CLASS_ACCESS_DENIED",
+          "RESERVATION_EXISTS",
+          "ASSISTANT_PARTICIPANT_CONFLICT",
+          "ACCOUNT_ALREADY_LINKED",
+          "INVITATION_UNAVAILABLE",
+          "CREDIT_LIMIT_EXCEEDED"
         ],
         "transaction_class": "org_limit",
         "transaction_guarantee": "Org erişim/limit + kişi/rol/ilişki + receipt/audit/outbox atomik; kapasite veya merkez kuralı geçilmez.",
@@ -35586,7 +35874,15 @@
           "SUBSCRIPTION_NOT_STARTED",
           "TEMPORARY_FAILURE",
           "VALIDATION_FAILED",
-          "VERSION_CONFLICT"
+          "VERSION_CONFLICT",
+          "INVALID_STATE_TRANSITION",
+          "PREVIEW_STALE",
+          "CAPACITY_FULL",
+          "CLASS_ACCESS_DENIED",
+          "RESERVATION_EXISTS",
+          "ACCOUNT_ALREADY_LINKED",
+          "INVITATION_UNAVAILABLE",
+          "CREDIT_LIMIT_EXCEEDED"
         ],
         "transaction_class": "resources",
         "transaction_guarantee": "Kaynak ve seans kümesi aynı kilit sırası; rezervasyonları etkiliyorsa hakların uygunluğu da transaction içinde. Kısmi sessiz program yaratılmaz.",
@@ -35683,7 +35979,17 @@
           "SUBSCRIPTION_NOT_STARTED",
           "TEMPORARY_FAILURE",
           "VALIDATION_FAILED",
-          "VERSION_CONFLICT"
+          "VERSION_CONFLICT",
+          "INVALID_STATE_TRANSITION",
+          "PREVIEW_STALE",
+          "CAPACITY_FULL",
+          "ENTITLEMENT_UNAVAILABLE",
+          "CLASS_ACCESS_DENIED",
+          "RESERVATION_EXISTS",
+          "ASSISTANT_PARTICIPANT_CONFLICT",
+          "ACCOUNT_ALREADY_LINKED",
+          "INVITATION_UNAVAILABLE",
+          "CREDIT_LIMIT_EXCEEDED"
         ],
         "transaction_class": "single",
         "transaction_guarantee": "Domain satırı + sürüm + audit + gerekiyorsa inbox/outbox + receipt tek transaction.",
@@ -35788,7 +36094,11 @@
           "SUBSCRIPTION_NOT_STARTED",
           "TEMPORARY_FAILURE",
           "VALIDATION_FAILED",
-          "VERSION_CONFLICT"
+          "VERSION_CONFLICT",
+          "INVALID_STATE_TRANSITION",
+          "PREVIEW_STALE",
+          "ACCOUNT_ALREADY_LINKED",
+          "INVITATION_UNAVAILABLE"
         ],
         "transaction_class": "reservation",
         "transaction_guarantee": "Org/öğrenci limit kapısı + seans/yer + kaynak uygunluğu + belge/politika + allocation/deficit/quota + rezervasyon/teklif + audit/outbox/receipt atomik.",
@@ -35915,7 +36225,11 @@
           "SUBSCRIPTION_NOT_STARTED",
           "TEMPORARY_FAILURE",
           "VALIDATION_FAILED",
-          "VERSION_CONFLICT"
+          "VERSION_CONFLICT",
+          "INVALID_STATE_TRANSITION",
+          "PREVIEW_STALE",
+          "ACCOUNT_ALREADY_LINKED",
+          "INVITATION_UNAVAILABLE"
         ],
         "transaction_class": "reservation",
         "transaction_guarantee": "Org/öğrenci limit kapısı + seans/yer + kaynak uygunluğu + belge/politika + allocation/deficit/quota + rezervasyon/teklif + audit/outbox/receipt atomik.",
@@ -36027,7 +36341,17 @@
           "SUBSCRIPTION_NOT_STARTED",
           "TEMPORARY_FAILURE",
           "VALIDATION_FAILED",
-          "VERSION_CONFLICT"
+          "VERSION_CONFLICT",
+          "INVALID_STATE_TRANSITION",
+          "PREVIEW_STALE",
+          "CAPACITY_FULL",
+          "ENTITLEMENT_UNAVAILABLE",
+          "CLASS_ACCESS_DENIED",
+          "RESERVATION_EXISTS",
+          "ASSISTANT_PARTICIPANT_CONFLICT",
+          "ACCOUNT_ALREADY_LINKED",
+          "INVITATION_UNAVAILABLE",
+          "CREDIT_LIMIT_EXCEEDED"
         ],
         "transaction_class": "attendance",
         "transaction_guarantee": "Seans/yoklama + tüm katılım sonuçları + hak tüketme/serbest bırakma + hakediş/bağlı düzeltme + audit/outbox/receipt atomik.",
@@ -36132,7 +36456,17 @@
           "SUBSCRIPTION_NOT_STARTED",
           "TEMPORARY_FAILURE",
           "VALIDATION_FAILED",
-          "VERSION_CONFLICT"
+          "VERSION_CONFLICT",
+          "INVALID_STATE_TRANSITION",
+          "PREVIEW_STALE",
+          "CAPACITY_FULL",
+          "ENTITLEMENT_UNAVAILABLE",
+          "CLASS_ACCESS_DENIED",
+          "RESERVATION_EXISTS",
+          "ASSISTANT_PARTICIPANT_CONFLICT",
+          "ACCOUNT_ALREADY_LINKED",
+          "INVITATION_UNAVAILABLE",
+          "CREDIT_LIMIT_EXCEEDED"
         ],
         "transaction_class": "attendance",
         "transaction_guarantee": "Seans/yoklama + tüm katılım sonuçları + hak tüketme/serbest bırakma + hakediş/bağlı düzeltme + audit/outbox/receipt atomik.",
@@ -36194,7 +36528,7 @@
           "Q-D01-A08"
         ],
         "configuration_policy": "numeric plan limits/prices and legal approval are deployment configuration, never arbitrary allow/deny",
-        "implementation_status": "contract_only"
+        "implementation_status": "implemented_gateway_rpc_acceptance_pending"
       },
       {
         "name": "event_cancel_preview_v1",
@@ -36230,7 +36564,17 @@
           "SUBSCRIPTION_NOT_STARTED",
           "TEMPORARY_FAILURE",
           "VALIDATION_FAILED",
-          "VERSION_CONFLICT"
+          "VERSION_CONFLICT",
+          "INVALID_STATE_TRANSITION",
+          "PREVIEW_STALE",
+          "CAPACITY_FULL",
+          "ENTITLEMENT_UNAVAILABLE",
+          "CLASS_ACCESS_DENIED",
+          "RESERVATION_EXISTS",
+          "ASSISTANT_PARTICIPANT_CONFLICT",
+          "ACCOUNT_ALREADY_LINKED",
+          "INVITATION_UNAVAILABLE",
+          "CREDIT_LIMIT_EXCEEDED"
         ],
         "transaction_class": "attendance",
         "transaction_guarantee": "Seans/yoklama + tüm katılım sonuçları + hak tüketme/serbest bırakma + hakediş/bağlı düzeltme + audit/outbox/receipt atomik.",
@@ -36285,7 +36629,7 @@
           "Q-D01-A08"
         ],
         "configuration_policy": "numeric plan limits/prices and legal approval are deployment configuration, never arbitrary allow/deny",
-        "implementation_status": "contract_only"
+        "implementation_status": "implemented_gateway_rpc_acceptance_pending"
       },
       {
         "name": "event_cancel_apply_v1",
@@ -36326,7 +36670,16 @@
           "SUBSCRIPTION_NOT_STARTED",
           "TEMPORARY_FAILURE",
           "VALIDATION_FAILED",
-          "VERSION_CONFLICT"
+          "VERSION_CONFLICT",
+          "INVALID_STATE_TRANSITION",
+          "CAPACITY_FULL",
+          "ENTITLEMENT_UNAVAILABLE",
+          "CLASS_ACCESS_DENIED",
+          "RESERVATION_EXISTS",
+          "ASSISTANT_PARTICIPANT_CONFLICT",
+          "ACCOUNT_ALREADY_LINKED",
+          "INVITATION_UNAVAILABLE",
+          "CREDIT_LIMIT_EXCEEDED"
         ],
         "transaction_class": "attendance",
         "transaction_guarantee": "Seans/yoklama + tüm katılım sonuçları + hak tüketme/serbest bırakma + hakediş/bağlı düzeltme + audit/outbox/receipt atomik.",
@@ -36391,7 +36744,7 @@
           "Q-D01-A08"
         ],
         "configuration_policy": "numeric plan limits/prices and legal approval are deployment configuration, never arbitrary allow/deny",
-        "implementation_status": "contract_only"
+        "implementation_status": "implemented_gateway_rpc_acceptance_pending"
       },
       {
         "name": "event_list_v1",
@@ -36423,7 +36776,17 @@
           "SUBSCRIPTION_NOT_STARTED",
           "TEMPORARY_FAILURE",
           "VALIDATION_FAILED",
-          "VERSION_CONFLICT"
+          "VERSION_CONFLICT",
+          "INVALID_STATE_TRANSITION",
+          "PREVIEW_STALE",
+          "CAPACITY_FULL",
+          "ENTITLEMENT_UNAVAILABLE",
+          "CLASS_ACCESS_DENIED",
+          "RESERVATION_EXISTS",
+          "ASSISTANT_PARTICIPANT_CONFLICT",
+          "ACCOUNT_ALREADY_LINKED",
+          "INVITATION_UNAVAILABLE",
+          "CREDIT_LIMIT_EXCEEDED"
         ],
         "transaction_class": "read",
         "transaction_guarantee": "Güncel yetki/plan/alan filtresi; okuma finans/hak yaratmaz.",
@@ -38220,7 +38583,17 @@
           "SUBSCRIPTION_NOT_STARTED",
           "TEMPORARY_FAILURE",
           "VALIDATION_FAILED",
-          "VERSION_CONFLICT"
+          "VERSION_CONFLICT",
+          "INVALID_STATE_TRANSITION",
+          "PREVIEW_STALE",
+          "CAPACITY_FULL",
+          "ENTITLEMENT_UNAVAILABLE",
+          "CLASS_ACCESS_DENIED",
+          "RESERVATION_EXISTS",
+          "ASSISTANT_PARTICIPANT_CONFLICT",
+          "ACCOUNT_ALREADY_LINKED",
+          "INVITATION_UNAVAILABLE",
+          "CREDIT_LIMIT_EXCEEDED"
         ],
         "transaction_class": "single",
         "transaction_guarantee": "Domain satırı + sürüm + audit + gerekiyorsa inbox/outbox + receipt tek transaction.",
@@ -38329,7 +38702,17 @@
           "SUBSCRIPTION_NOT_STARTED",
           "TEMPORARY_FAILURE",
           "VALIDATION_FAILED",
-          "VERSION_CONFLICT"
+          "VERSION_CONFLICT",
+          "INVALID_STATE_TRANSITION",
+          "PREVIEW_STALE",
+          "CAPACITY_FULL",
+          "ENTITLEMENT_UNAVAILABLE",
+          "CLASS_ACCESS_DENIED",
+          "RESERVATION_EXISTS",
+          "ASSISTANT_PARTICIPANT_CONFLICT",
+          "ACCOUNT_ALREADY_LINKED",
+          "INVITATION_UNAVAILABLE",
+          "CREDIT_LIMIT_EXCEEDED"
         ],
         "transaction_class": "org_limit",
         "transaction_guarantee": "Org erişim/limit + kişi/rol/ilişki + receipt/audit/outbox atomik; kapasite veya merkez kuralı geçilmez.",
@@ -38412,7 +38795,17 @@
           "SUBSCRIPTION_NOT_STARTED",
           "TEMPORARY_FAILURE",
           "VALIDATION_FAILED",
-          "VERSION_CONFLICT"
+          "VERSION_CONFLICT",
+          "INVALID_STATE_TRANSITION",
+          "PREVIEW_STALE",
+          "CAPACITY_FULL",
+          "ENTITLEMENT_UNAVAILABLE",
+          "CLASS_ACCESS_DENIED",
+          "RESERVATION_EXISTS",
+          "ASSISTANT_PARTICIPANT_CONFLICT",
+          "ACCOUNT_ALREADY_LINKED",
+          "INVITATION_UNAVAILABLE",
+          "CREDIT_LIMIT_EXCEEDED"
         ],
         "transaction_class": "org_limit",
         "transaction_guarantee": "Org erişim/limit + kişi/rol/ilişki + receipt/audit/outbox atomik; kapasite veya merkez kuralı geçilmez.",
@@ -38495,7 +38888,17 @@
           "SUBSCRIPTION_NOT_STARTED",
           "TEMPORARY_FAILURE",
           "VALIDATION_FAILED",
-          "VERSION_CONFLICT"
+          "VERSION_CONFLICT",
+          "INVALID_STATE_TRANSITION",
+          "PREVIEW_STALE",
+          "CAPACITY_FULL",
+          "ENTITLEMENT_UNAVAILABLE",
+          "CLASS_ACCESS_DENIED",
+          "RESERVATION_EXISTS",
+          "ASSISTANT_PARTICIPANT_CONFLICT",
+          "ACCOUNT_ALREADY_LINKED",
+          "INVITATION_UNAVAILABLE",
+          "CREDIT_LIMIT_EXCEEDED"
         ],
         "transaction_class": "org_limit",
         "transaction_guarantee": "Org erişim/limit + kişi/rol/ilişki + receipt/audit/outbox atomik; kapasite veya merkez kuralı geçilmez.",
@@ -38577,7 +38980,17 @@
           "SUBSCRIPTION_NOT_STARTED",
           "TEMPORARY_FAILURE",
           "VALIDATION_FAILED",
-          "VERSION_CONFLICT"
+          "VERSION_CONFLICT",
+          "INVALID_STATE_TRANSITION",
+          "PREVIEW_STALE",
+          "CAPACITY_FULL",
+          "ENTITLEMENT_UNAVAILABLE",
+          "CLASS_ACCESS_DENIED",
+          "RESERVATION_EXISTS",
+          "ASSISTANT_PARTICIPANT_CONFLICT",
+          "ACCOUNT_ALREADY_LINKED",
+          "INVITATION_UNAVAILABLE",
+          "CREDIT_LIMIT_EXCEEDED"
         ],
         "transaction_class": "org_limit",
         "transaction_guarantee": "Org erişim/limit + kişi/rol/ilişki + receipt/audit/outbox atomik; kapasite veya merkez kuralı geçilmez.",
@@ -38764,7 +39177,17 @@
           "SUBSCRIPTION_NOT_STARTED",
           "TEMPORARY_FAILURE",
           "VALIDATION_FAILED",
-          "VERSION_CONFLICT"
+          "VERSION_CONFLICT",
+          "INVALID_STATE_TRANSITION",
+          "PREVIEW_STALE",
+          "CAPACITY_FULL",
+          "ENTITLEMENT_UNAVAILABLE",
+          "CLASS_ACCESS_DENIED",
+          "RESERVATION_EXISTS",
+          "ASSISTANT_PARTICIPANT_CONFLICT",
+          "ACCOUNT_ALREADY_LINKED",
+          "INVITATION_UNAVAILABLE",
+          "CREDIT_LIMIT_EXCEEDED"
         ],
         "transaction_class": "attendance",
         "transaction_guarantee": "Seans/yoklama + tüm katılım sonuçları + hak tüketme/serbest bırakma + hakediş/bağlı düzeltme + audit/outbox/receipt atomik.",
@@ -38884,7 +39307,17 @@
           "SUBSCRIPTION_NOT_STARTED",
           "TEMPORARY_FAILURE",
           "VALIDATION_FAILED",
-          "VERSION_CONFLICT"
+          "VERSION_CONFLICT",
+          "INVALID_STATE_TRANSITION",
+          "PREVIEW_STALE",
+          "CAPACITY_FULL",
+          "ENTITLEMENT_UNAVAILABLE",
+          "CLASS_ACCESS_DENIED",
+          "RESERVATION_EXISTS",
+          "ASSISTANT_PARTICIPANT_CONFLICT",
+          "ACCOUNT_ALREADY_LINKED",
+          "INVITATION_UNAVAILABLE",
+          "CREDIT_LIMIT_EXCEEDED"
         ],
         "transaction_class": "attendance",
         "transaction_guarantee": "Seans/yoklama + tüm katılım sonuçları + hak tüketme/serbest bırakma + hakediş/bağlı düzeltme + audit/outbox/receipt atomik.",
@@ -39219,7 +39652,17 @@
           "SUBSCRIPTION_NOT_STARTED",
           "TEMPORARY_FAILURE",
           "VALIDATION_FAILED",
-          "VERSION_CONFLICT"
+          "VERSION_CONFLICT",
+          "INVALID_STATE_TRANSITION",
+          "PREVIEW_STALE",
+          "CAPACITY_FULL",
+          "ENTITLEMENT_UNAVAILABLE",
+          "CLASS_ACCESS_DENIED",
+          "RESERVATION_EXISTS",
+          "ASSISTANT_PARTICIPANT_CONFLICT",
+          "ACCOUNT_ALREADY_LINKED",
+          "INVITATION_UNAVAILABLE",
+          "CREDIT_LIMIT_EXCEEDED"
         ],
         "transaction_class": "org_limit",
         "transaction_guarantee": "Domain satırı + sürüm + audit + gerekiyorsa inbox/outbox + receipt tek transaction.",
@@ -39286,7 +39729,17 @@
           "SUBSCRIPTION_NOT_STARTED",
           "TEMPORARY_FAILURE",
           "VALIDATION_FAILED",
-          "VERSION_CONFLICT"
+          "VERSION_CONFLICT",
+          "INVALID_STATE_TRANSITION",
+          "PREVIEW_STALE",
+          "CAPACITY_FULL",
+          "ENTITLEMENT_UNAVAILABLE",
+          "CLASS_ACCESS_DENIED",
+          "RESERVATION_EXISTS",
+          "ASSISTANT_PARTICIPANT_CONFLICT",
+          "ACCOUNT_ALREADY_LINKED",
+          "INVITATION_UNAVAILABLE",
+          "CREDIT_LIMIT_EXCEEDED"
         ],
         "transaction_class": "org_limit",
         "transaction_guarantee": "Domain satırı + sürüm + audit + gerekiyorsa inbox/outbox + receipt tek transaction.",
@@ -39413,7 +39866,17 @@
           "SUBSCRIPTION_NOT_STARTED",
           "TEMPORARY_FAILURE",
           "VALIDATION_FAILED",
-          "VERSION_CONFLICT"
+          "VERSION_CONFLICT",
+          "INVALID_STATE_TRANSITION",
+          "PREVIEW_STALE",
+          "CAPACITY_FULL",
+          "ENTITLEMENT_UNAVAILABLE",
+          "CLASS_ACCESS_DENIED",
+          "RESERVATION_EXISTS",
+          "ASSISTANT_PARTICIPANT_CONFLICT",
+          "ACCOUNT_ALREADY_LINKED",
+          "INVITATION_UNAVAILABLE",
+          "CREDIT_LIMIT_EXCEEDED"
         ],
         "transaction_class": "read",
         "transaction_guarantee": "Güncel yetki/plan/alan filtresi; okuma finans/hak yaratmaz.",
@@ -39489,7 +39952,17 @@
           "SUBSCRIPTION_NOT_STARTED",
           "TEMPORARY_FAILURE",
           "VALIDATION_FAILED",
-          "VERSION_CONFLICT"
+          "VERSION_CONFLICT",
+          "INVALID_STATE_TRANSITION",
+          "PREVIEW_STALE",
+          "CAPACITY_FULL",
+          "ENTITLEMENT_UNAVAILABLE",
+          "CLASS_ACCESS_DENIED",
+          "RESERVATION_EXISTS",
+          "ASSISTANT_PARTICIPANT_CONFLICT",
+          "ACCOUNT_ALREADY_LINKED",
+          "INVITATION_UNAVAILABLE",
+          "CREDIT_LIMIT_EXCEEDED"
         ],
         "transaction_class": "preview",
         "transaction_guarantee": "Güncel yetki/plan/alan filtresi; okuma finans/hak yaratmaz.",

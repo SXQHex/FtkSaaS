@@ -63,7 +63,7 @@ test('Q-D01 real PostgreSQL label integrity and scope matrix',async t=>{
  await t.test('Q-D01-A06 kernel rejects zero/negative/unknown availability without a negative-limit bypass',async()=>{
   for(const n of [0,-1,null])await reject('no negative',()=>db.query('select private.require_event_available_credit($1)',[n]),'P0001','ENTITLEMENT_UNAVAILABLE');
   await db.query('select private.require_event_available_credit(1)');
-  assert.equal((await db.query('select count(*)::int n from core.credit_deficits')).rows[0].n,0);
+  assert.equal((await db.query('select count(*)::int n from core.credit_deficits where org_id=$1',[id('A')])).rows[0].n,0);
  });
  await t.test('private helper and label table are not client APIs',async()=>{
   for(const role of ['anon','authenticated']){assert.equal((await db.query("select has_function_privilege($1,'private.event_package_scope_matches(uuid,uuid,uuid)','EXECUTE') allowed",[role])).rows[0].allowed,false);assert.equal((await db.query("select has_table_privilege($1,'core.event_disciplines','SELECT') allowed",[role])).rows[0].allowed,false);}

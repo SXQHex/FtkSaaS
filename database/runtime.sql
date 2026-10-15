@@ -54,7 +54,7 @@ begin
  return 'closed';
 end$$;
 create or replace function private.plan_limit(org uuid,key_name text) returns bigint language sql stable set search_path='' as $$
- select case when e->>'unlimited'='true' then null else (e->>'value')::bigint end
+ select case when e->>'unlimited'='true' then 9223372036854775807::bigint else (e->>'value')::bigint end
  from core.saas_subscriptions s join core.saas_plan_versions p on p.id=s.plan_version_id cross join lateral jsonb_array_elements(p.limits->'entries') e
  where s.org_id=org and e->>'key'=key_name order by s.created_at desc limit 1
 $$;
@@ -95,4 +95,44 @@ create or replace function private.require_feature(org uuid,feature text) return
 begin
  if not exists(select 1 from core.saas_subscriptions s join core.saas_plan_versions p on p.id=s.plan_version_id where s.org_id=org and feature=any(p.features)) then perform private.fail('PLAN_FEATURE_UNAVAILABLE');end if;
 end$$;
+
+create or replace function private.can_invite(org uuid,person uuid,center uuid,target uuid) returns boolean language sql stable set search_path='' as $$
+ select private.is_manager(org,person,center) or
+ (private.has_role(org,person,'staff',center) and exists(select 1 from core.center_relationships where org_id=org and center_id=center and person_id=target and kind='student' and state='active')
+  and not exists(select 1 from core.permission_overrides where org_id=org and center_id=center and person_id=person and permission='invite.student' and not enabled)) or
+ (private.has_role(org,person,'instructor',center) and exists(select 1 from core.permission_overrides where org_id=org and center_id=center and person_id=person and permission='invite.student' and enabled)
+  and exists(select 1 from core.reservations r join core.session_assignments a on a.org_id=r.org_id and a.session_id=r.session_id where r.org_id=org and r.center_id=center and r.person_id=target and a.person_id=person and a.duty='instructor' and r.state='active'))
+$$;
+create or replace function private.event_consumes(org uuid,center uuid,result text,terms jsonb) returns boolean language plpgsql stable set search_path='' as $$
+declare p jsonb;
+begin
+ if result='attended' then return true;end if;
+ if result='no_show' then return terms#>>'{cancellation,no_show}'='consume';end if;
+ if result<>'blocked' then perform private.fail('ATTENDANCE_INCOMPLETE');end if;
+ select value into p from core.policy_versions where org_id=org and key='participation_block_credit' and effective_at<=now() and (scope_center_id is null or scope_center_id=center) order by (scope_center_id is not null) desc,effective_at desc,id desc limit 1;
+ if p is null or p->>'kind'<>'blocked_credit' then perform private.fail('POLICY_NOT_CONFIGURED');end if;
+ return p->>'effect'='consume';
+end$$;
+
+
+create or replace function private.staff_grant(org uuid,person uuid,center uuid,perm text) returns boolean language sql stable set search_path='' as $$
+ select private.has_role(org,person,'staff',center) and exists(select 1 from core.permission_overrides where org_id=org and center_id=center and person_id=person and permission=perm and enabled)
+$$;
+create or replace function private.reserve_negative(org uuid,target uuid,session uuid,reservation uuid,ids uuid[],offset_i int) returns void language plpgsql set search_path='' as $$
+#variable_conflict use_column
+declare ses core.sessions;lim bigint;upper_n bigint;used bigint;v jsonb;
+begin
+ select * into ses from core.sessions where org_id=org and id=session;
+ select (value->>'value')::bigint into lim from core.policy_versions where org_id=org and key='negative_default' and effective_at<=now() and (scope_center_id is null or scope_center_id=ses.center_id) order by (scope_center_id is not null) desc,effective_at desc,id desc limit 1;
+ if lim is null then perform private.fail('ENTITLEMENT_UNAVAILABLE');end if;
+ select (value->>'value')::bigint into upper_n from core.policy_versions where org_id=org and key='negative_upper' and effective_at<=now() order by mandatory desc,effective_at desc,id desc limit 1;
+ if upper_n is null then perform private.fail('POLICY_NOT_CONFIGURED');end if;
+ select coalesce((select limit_count from core.negative_limit_overrides where org_id=org and person_id=target and center_id=ses.center_id and discipline_id=ses.discipline_id),lim) into lim;
+ select coalesce(sum(quantity),0) into used from core.credit_deficits where org_id=org and person_id=target and center_id=ses.center_id and discipline_id=ses.discipline_id and state in ('reserved','consumed');
+ if used+1>least(lim,upper_n) then perform private.fail('CREDIT_LIMIT_EXCEEDED');end if;
+ insert into core.credit_deficits(id,org_id,person_id,reservation_id,quantity,state,center_id,discipline_id,session_id) values(private.new_id(ids,offset_i),org,target,reservation,1,'reserved',ses.center_id,ses.discipline_id,session);
+ select value into v from core.policy_versions where org_id=org and key='negative_valuation' and effective_at<=now() and (scope_center_id is null or scope_center_id=ses.center_id) order by (scope_center_id is not null) desc,effective_at desc,id desc limit 1;
+ if v is not null then update core.reservations set negative_basis_minor=(v->>'amount_minor')::bigint,negative_basis_currency=v->>'currency',negative_basis_policy_id=(select id from core.policy_versions where org_id=org and key='negative_valuation' and value=v order by effective_at desc,id desc limit 1) where id=reservation and source_sale_id is null;end if;
+end$$;
+
 commit;
