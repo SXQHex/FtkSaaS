@@ -1,5 +1,5 @@
 {
-  "runtime_version": "0.2.0-rc.2",
+  "runtime_version": "0.2.0-rc.3",
   "operations": [
     {
       "name": "account_get_v1",
@@ -1592,9 +1592,7 @@
         "F29"
       ],
       "billing_class": "maintenance",
-      "limits": [
-        "Started or partially occurred event monetary cancellation: POLICY_NOT_CONFIGURED pending a separate product decision."
-      ]
+      "limits": []
     },
     {
       "name": "event_cancel_apply_v1",
@@ -1605,9 +1603,7 @@
         "F29"
       ],
       "billing_class": "maintenance",
-      "limits": [
-        "Started or partially occurred event monetary cancellation: POLICY_NOT_CONFIGURED pending a separate product decision."
-      ]
+      "limits": []
     },
     {
       "name": "event_list_v1",

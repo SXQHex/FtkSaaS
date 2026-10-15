@@ -2728,7 +2728,8 @@
             "adjust",
             "close",
             "unlink",
-            "delete"
+            "delete",
+            "reverse"
           ]
         },
         "quantity": {
@@ -2776,7 +2777,8 @@
         "entity",
         "action"
       ],
-      "additionalProperties": false
+      "additionalProperties": false,
+      "description": "Q-E02: reverse is a full linked entitlement-consumption reversal, never an automatic cash refund."
     },
     "PreviewDependencies": {
       "type": "object",
@@ -14331,7 +14333,8 @@
         "registration_id",
         "reason"
       ],
-      "additionalProperties": false
+      "additionalProperties": false,
+      "description": "Q-E02 final acceptance: center cancellation at any stage fully settles only linked event obligations and rights; participant cancellation has no monetary journal effect."
     },
     "Success_event_registration_cancel": {
       "type": "object",
@@ -14523,7 +14526,8 @@
         "event_id",
         "reason"
       ],
-      "additionalProperties": false
+      "additionalProperties": false,
+      "description": "Q-E02 final acceptance: center cancellation at any stage fully settles only linked event obligations and rights; participant cancellation has no monetary journal effect."
     },
     "Success_event_cancel_preview": {
       "type": "object",
@@ -14581,7 +14585,8 @@
         "operation_key",
         "preview"
       ],
-      "additionalProperties": false
+      "additionalProperties": false,
+      "description": "Q-E02 final acceptance: center cancellation at any stage fully settles only linked event obligations and rights; participant cancellation has no monetary journal effect."
     },
     "Success_event_cancel_apply": {
       "type": "object",
@@ -18887,7 +18892,8 @@
         "quantity",
         "operation_id"
       ],
-      "additionalProperties": false
+      "additionalProperties": false,
+      "description": " Q-E02: center cancellation full linked settlement; existing occurrence/attendance evidence and append-only journals preserved."
     },
     "Table_entitlement_allocations": {
       "type": "object",
@@ -19223,7 +19229,8 @@
         "due_at",
         "state"
       ],
-      "additionalProperties": false
+      "additionalProperties": false,
+      "description": " Q-E02: center cancellation full linked settlement; existing occurrence/attendance evidence and append-only journals preserved."
     },
     "Table_cash_movements": {
       "type": "object",
@@ -19452,7 +19459,8 @@
         "amount_minor",
         "currency"
       ],
-      "additionalProperties": false
+      "additionalProperties": false,
+      "description": " Q-E02: center cancellation full linked settlement; existing occurrence/attendance evidence and append-only journals preserved."
     },
     "Table_debt_adjustments": {
       "type": "object",
@@ -20709,7 +20717,8 @@
         "attendance_state",
         "attendance_revision"
       ],
-      "additionalProperties": false
+      "additionalProperties": false,
+      "description": " Q-E02: center cancellation full linked settlement; existing occurrence/attendance evidence and append-only journals preserved."
     },
     "Table_event_assignments": {
       "type": "object",
@@ -20845,7 +20854,8 @@
         "attendance_result",
         "terms_snapshot"
       ],
-      "additionalProperties": false
+      "additionalProperties": false,
+      "description": " Q-E02: center cancellation full linked settlement; existing occurrence/attendance evidence and append-only journals preserved."
     },
     "Table_documents": {
       "type": "object",
@@ -24150,7 +24160,7 @@
             "same_tenant": true
           }
         ],
-        "invariants": "Append-only; miktar>0, yön kind ile. Tam bir ilgili katılım kaynağı veya açık opening/adjustment. Negatif açık ayrı deficit satırı."
+        "invariants": "Append-only; miktar>0, yön kind ile. Tam bir ilgili katılım kaynağı veya açık opening/adjustment. Negatif açık ayrı deficit satırı. Q-E02: full consumption return is a reverse linked by previous_id plus release, no monetary claim."
       },
       {
         "name": "entitlement_allocations",
@@ -24833,7 +24843,7 @@
           "$ref": "#/$defs/Table_events"
         },
         "foreign_keys": [],
-        "invariants": "Sorumlu merkez vs fiziksel mekân ayrı. En az eğitmen/asistan; koşullar yayından önce tam. Harici mekânda room şart değil."
+        "invariants": "Sorumlu merkez vs fiziksel mekân ayrı. En az eğitmen/asistan; koşullar yayından önce tam. Harici mekânda room şart değil. Q-E02: explicit center cancellation allowed from draft/published/occurred; actual start/partial definition remains open."
       },
       {
         "name": "event_assignments",
@@ -24880,7 +24890,7 @@
             "same_tenant": true
           }
         ],
-        "invariants": "Aktif öğrenci/limit ve kesin yer, ödeme ayrı. İptal edilmemiş tüm katılım sonuçları tamamlanınca yalnız CM kapatır; paket consume/release etkinliğin kayıt koşuluyla. Sonuç düzeltmesi bağlı hareket. Geçen saat otomatik occurred/no_show yapmaz."
+        "invariants": "Aktif öğrenci/limit ve kesin yer, ödeme ayrı. İptal edilmemiş tüm katılım sonuçları tamamlanınca yalnız CM kapatır; paket consume/release etkinliğin kayıt koşuluyla. Sonuç düzeltmesi bağlı hareket. Geçen saat otomatik occurred/no_show yapmaz. Q-E02: center cancellation returns reserved/consumed rights even for previously canceled participant records; preserves attendance history."
       },
       {
         "name": "documents",
@@ -36917,7 +36927,8 @@
           "event_terms_not_lesson_defaults",
           "at_least_one_instructor_or_assistant",
           "active_student_limit_no_candidate_event_exception",
-          "Q_D01_event_labels_same_org_not_grants"
+          "Q_D01_event_labels_same_org_not_grants",
+          "Q_E02_participant_cancel_no_monetary_changes_existing_package_terms"
         ],
         "audit": true,
         "notification": "outbox_if_user_visible_business_result",
@@ -37245,7 +37256,7 @@
           "CREDIT_LIMIT_EXCEEDED"
         ],
         "transaction_class": "attendance",
-        "transaction_guarantee": "Seans/yoklama + tüm katılım sonuçları + hak tüketme/serbest bırakma + hakediş/bağlı düzeltme + audit/outbox/receipt atomik.",
+        "transaction_guarantee": "Operational cancellation + linked event debt reversal/student credit + reserved release/consumption reversal + preview/audit/outbox/receipt in one transaction; no automatic cash refund; unrelated debts and historical attendance/earnings preserved.",
         "transition": {
           "effect": "read_only_business",
           "from": [],
@@ -37262,7 +37273,8 @@
           "Q_D01_event_labels_same_org_not_grants",
           "Q_E01_scoped_payment_preparation",
           "Q_E01_no_duplicate_refund_claim",
-          "Q_E01_prestart_operator_cancel_full_reversal"
+          "Q_E02_center_cancel_all_stages_full_debt_and_right_return",
+          "Q_E02_no_duplicate_or_automatic_cash_refund"
         ],
         "audit": true,
         "notification": "outbox_if_user_visible_business_result",
@@ -37302,9 +37314,7 @@
         "configuration_policy": "numeric plan limits/prices and legal approval are deployment configuration, never arbitrary allow/deny",
         "implementation_status": "operational_development_limited",
         "runtime_external_path": "/functions/v1/backend-v1/event_cancel_preview_v1",
-        "runtime_limits": [
-          "Started or partially occurred event monetary cancellation: POLICY_NOT_CONFIGURED pending a separate product decision."
-        ],
+        "runtime_limits": [],
         "runtime_path": "/functions/v1/backend-v1/event_cancel_preview_v1",
         "runtime_rpc": "api_v1.event_cancel_preview_v1",
         "runtime_transport": "authenticated Edge adapter -> service-only RPC; rules/transaction in PostgreSQL"
@@ -37360,12 +37370,13 @@
           "CREDIT_LIMIT_EXCEEDED"
         ],
         "transaction_class": "attendance",
-        "transaction_guarantee": "Seans/yoklama + tüm katılım sonuçları + hak tüketme/serbest bırakma + hakediş/bağlı düzeltme + audit/outbox/receipt atomik.",
+        "transaction_guarantee": "Operational cancellation + linked event debt reversal/student credit + reserved release/consumption reversal + preview/audit/outbox/receipt in one transaction; no automatic cash refund; unrelated debts and historical attendance/earnings preserved.",
         "transition": {
           "entity": "events",
           "from": [
             "draft",
-            "published"
+            "published",
+            "occurred"
           ],
           "to": [
             "cancelled"
@@ -37387,7 +37398,8 @@
           "Q_D01_event_labels_same_org_not_grants",
           "Q_E01_scoped_payment_preparation",
           "Q_E01_no_duplicate_refund_claim",
-          "Q_E01_prestart_operator_cancel_full_reversal"
+          "Q_E02_center_cancel_all_stages_full_debt_and_right_return",
+          "Q_E02_no_duplicate_or_automatic_cash_refund"
         ],
         "audit": true,
         "notification": "outbox_if_user_visible_business_result",
@@ -37427,9 +37439,7 @@
         "configuration_policy": "numeric plan limits/prices and legal approval are deployment configuration, never arbitrary allow/deny",
         "implementation_status": "operational_development_limited",
         "runtime_external_path": "/functions/v1/backend-v1/event_cancel_apply_v1",
-        "runtime_limits": [
-          "Started or partially occurred event monetary cancellation: POLICY_NOT_CONFIGURED pending a separate product decision."
-        ],
+        "runtime_limits": [],
         "runtime_path": "/functions/v1/backend-v1/event_cancel_apply_v1",
         "runtime_rpc": "api_v1.event_cancel_apply_v1",
         "runtime_transport": "authenticated Edge adapter -> service-only RPC; rules/transaction in PostgreSQL"
@@ -41033,6 +41043,34 @@
           {
             "id": "E03",
             "rule": "Prestart complete operator cancellation removes remaining debt and credits paid amounts once; package rights released without monetary credit. Started/partial monetary cancellation requires a separate decision."
+          }
+        ]
+      },
+      {
+        "id": "Q-E02",
+        "accepted_date": "2026-10-16",
+        "status": "implemented_real_api_acceptance_actual_start_definition_open",
+        "supersedes": "Başlama sonrası merkez iptalinde iade yok/borç korunur; Q-E01 started/partial cancellation blocker",
+        "rules": [
+          {
+            "id": "E02-01",
+            "rule": "Katılımcının başlama sonrası kendi kaydını iptali/ayrılması parasal iade, borç indirimi veya öğrenci alacağı üretmez. Mevcut paket iptal koşulları aynen korunur."
+          },
+          {
+            "id": "E02-02",
+            "rule": "Merkez iptali her aşamada etkinliğe bağlı ücret yükümlülüğünü tamamen kaldırır; kalan borç sıfır, tahsilatın daha önce alacaklaştırılmamış tamamı öğrenci alacağıdır. Nakit iade/mahsup ayrı açık yetkili işlem; otomatik nakit çıkışı yok."
+          },
+          {
+            "id": "E02-03",
+            "rule": "Merkez iptali tüm ayrılmış hakları serbest bırakır, tüketilmiş hakları previous_id bağlı ters hareketle tamamen geri verir; kısmi tüketim ve paket hakkı için parasal alacak yok."
+          },
+          {
+            "id": "E02-04",
+            "rule": "Önceki alacak/iade/mahsup/hak dönüşü tekrar üretilmez. Yalnız iptal edilen etkinliğe bağlı kayıtlar; başka borç/geçmiş değişmez. Önizleme+apply sürüm/finans bağımlılıkları, canlı yetki ve tek transaction audit/outbox/receipt ile korunur."
+          },
+          {
+            "id": "E02-05",
+            "rule": "Fiilî başlangıç/kısmi gerçekleşme ayrı alan veya durum olarak tanımlı değildir; saat geçmesi tek başına gerçekleşme değildir. Bu tanım karar konusu olarak açık. Merkez iptalinin aşamadan bağımsız sonucu bu tanıma ihtiyaç duymaz; mevcut occurred/attendance evidence korunur."
           }
         ]
       }

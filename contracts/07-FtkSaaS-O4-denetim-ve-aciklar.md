@@ -1,5 +1,7 @@
 # FtkSaaS — O4 tamamlanma ve doğrulama kaydı
 
+> **Güncel öncelik: Q-E02 · 0.2.0-rc.3.** Kullanıcının 16 Ekim 2026 son iptal kabulü önceki çelişen merkez iptali hükümlerinin yerine geçer. Güncel davranış/kanıt: docs/decisions/Q-E02.md, docs/claude-handover.md ve reports/qe02-verification.json. Aşağıdaki eski durum/test sayıları tarihsel kayıttır; teknik aktarım bekleyen işler tamamlandı sayılmaz.
+
 > **Güncel 2.2-tech.2 / Q-D01:** Etkinlik 0/1/çok disiplin etiketini destekler. Tek etikette etkinliğe uygun dar/geniş paket, 0/çok etikette yalnız uygun geniş paket; etkinliklerde negatif kredi yok. Q-D01 ürün kararı kapalı, tam olay kayıt/RPC entegrasyonu ve son ortak kredi yarışı açık. Güncel durum 11-FtkSaaS-Q-D01-teknik-aktarim-raporu.md.
 
 Güncel: 17 statik kontrol, 12 sözleşme/UUID testi, 10 gerçek DB alt testi (üst test dahil toplam runner 23), TypeScript typecheck ve advisors geçti. 88 tablo/178 operasyon sözleşmesi/690 tanım. Bütün iş kabulü açık. Ayrıntı ve sınırlamalar: 09-FtkSaaS-teknik-aktarim-raporu.md.
@@ -257,3 +259,17 @@ Yeni immutable migration: event_payment_finance. İlk altı migration değişmez
 Ödeme hazırlığı/tahsilat/kesin kayıt bağı; yanlış borç/kısmi ödeme; ödenmiş iki hazırlığın son kontenjan yarışı; eşzamanlı aynı anahtar; önceki indirim/iade; açık mahsup; tahsilat, kapasite düzeltmesi ve işletme iptalinde geç hata sonrası tam rollback; tenant/merkez/para birimi/canlı rol denetimleri tests/event-payment.test.mjs ile gerçek Auth/Edge/RPC üzerinde sınanır. Paket iptalindeki ortak hak serbest bırakma önceki API kabulünde korunur.
 
 Yetkili kanıt reports/qe01-verification.json ve reports/qe01-acceptance.log. Kalan: 129 yalnız sözleşme işlem, üretim/kalıcı paylaşılan staging, dış e-posta, yük ve restore kabulü. Başlamış/kısmen gerçekleşmiş etkinliğin parasal iptali yeni karar gerektirir.
+
+## Q-E02 — 16 Ekim 2026 son kabul (önceki çelişen hükümlerin yerine)
+
+**E02-01.** Katılımcının başlama sonrası kendi kaydını iptali/ayrılması parasal iade, borç indirimi veya öğrenci alacağı üretmez. Mevcut paket iptal koşulları aynen korunur.
+
+**E02-02.** Merkez iptali her aşamada etkinliğe bağlı ücret yükümlülüğünü tamamen kaldırır; kalan borç sıfır, tahsilatın daha önce alacaklaştırılmamış tamamı öğrenci alacağıdır. Nakit iade/mahsup ayrı açık yetkili işlem; otomatik nakit çıkışı yok.
+
+**E02-03.** Merkez iptali tüm ayrılmış hakları serbest bırakır, tüketilmiş hakları previous_id bağlı ters hareketle tamamen geri verir; kısmi tüketim ve paket hakkı için parasal alacak yok.
+
+**E02-04.** Önceki alacak/iade/mahsup/hak dönüşü tekrar üretilmez. Yalnız iptal edilen etkinliğe bağlı kayıtlar; başka borç/geçmiş değişmez. Önizleme+apply sürüm/finans bağımlılıkları, canlı yetki ve tek transaction audit/outbox/receipt ile korunur.
+
+**E02-05.** Fiilî başlangıç/kısmi gerçekleşme ayrı alan veya durum olarak tanımlı değildir; saat geçmesi tek başına gerçekleşme değildir. Bu tanım karar konusu olarak açık. Merkez iptalinin aşamadan bağımsız sonucu bu tanıma ihtiyaç duymaz; mevcut occurred/attendance evidence korunur.
+
+Teknik aktarım ve test durumu: docs/decisions/Q-E02.md ve reports/qe02-verification.json. Tarihsel test sayıları bu değişikliğin kanıtı değildir.

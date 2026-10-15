@@ -11,3 +11,5 @@ reports/*.log
 !reports/acceptance-verified.log
 !reports/resumed-acceptance.log
 !reports/qe01-acceptance.log
+
+!reports/qe02-acceptance.log

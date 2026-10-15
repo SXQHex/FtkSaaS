@@ -285,11 +285,22 @@ test('Real Auth → Edge UUID producer → named RPC → PostgreSQL acceptance',
   const e=await newEvent({terms:{...eventTerms,full_payment_required:true}});await error(owner,'event_register_v1',scoped({event_id:e.id,person_id:studentPerson,sale_id:s}),'ENTITLEMENT_UNAVAILABLE');
   const debt=(await db.query('select id from core.debts where org_id=$1 and sale_id=$2',[org,s])).rows[0].id;await mutate(owner,'collection_record_v1',{person_id:studentPerson,debt_ids:[debt],amount_minor:'1000',currency:'TRY',occurred_at:new Date().toISOString()});await mutate(owner,'event_register_v1',{event_id:e.id,person_id:studentPerson,sale_id:s});
  });
- await t.test('Q-E01 missing preparation blocks full-payment registration; started-event cancellation stays blocked',async()=>{
+ await t.test('Q-E01 missing preparation blocks full-payment registration; Q-E02 center cancellation overrides refund terms',async()=>{
   const required=await newEvent({terms:{...eventTerms,fee_minor:'500',full_payment_required:true,allowed_product_version_ids:[]}});const preview=await must(owner,'event_registration_preview_v1',scoped({event_id:required.id,person_id:studentPerson}));assert.equal(preview.blockers[0].code,'ENTITLEMENT_UNAVAILABLE');await error(owner,'event_register_v1',scoped({event_id:required.id,person_id:studentPerson}),'ENTITLEMENT_UNAVAILABLE');assert.equal((await db.query('select count(*)::int n from core.event_registrations where org_id=$1 and event_id=$2',[org,required.id])).rows[0].n,0);
-  const refundable=await newEvent({terms:{...eventTerms,fee_minor:'500',allowed_product_version_ids:[],refund:{method:'credit_ratio'}}});await mutate(owner,'event_register_v1',{event_id:refundable.id,person_id:studentPerson});const cancel=await must(owner,'event_cancel_preview_v1',scoped({event_id:refundable.id,reason:'synthetic'}));assert.equal(cancel.blockers[0].code,'POLICY_NOT_CONFIGURED');await error(owner,'event_cancel_apply_v1',scoped({preview:{id:cancel.id,token:cancel.token}}),'POLICY_NOT_CONFIGURED');assert.equal((await must(owner,'event_get_v1',scoped({event_id:refundable.id}))).state,'published');
+  const refundable=await newEvent({terms:{...eventTerms,fee_minor:'500',allowed_product_version_ids:[],refund:{method:'credit_ratio'}}});await mutate(owner,'event_register_v1',{event_id:refundable.id,person_id:studentPerson});const cancel=await must(owner,'event_cancel_preview_v1',scoped({event_id:refundable.id,reason:'synthetic'}));assert.deepEqual(cancel.blockers,[]);await mutate(owner,'event_cancel_apply_v1',{preview:{id:cancel.id,token:cancel.token}});assert.equal((await must(owner,'event_get_v1',scoped({event_id:refundable.id}))).state,'cancelled');
  });
 
+ for(const paid of [0,200,500])await t.test('Q-E02 student cancels own past-planned registration without monetary reversal: '+paid,async()=>{
+  const e=await newEvent({terms:{...eventTerms,fee_minor:'500',allowed_product_version_ids:[]}});
+  const r=await mutate(student,'event_register_v1',{event_id:e.id,person_id:studentPerson});
+  const d=(await db.query('select id from core.debts where org_id=$1 and event_registration_id=$2',[org,r.primary_id])).rows[0].id;
+  if(paid)await mutate(owner,'collection_record_v1',{person_id:studentPerson,debt_ids:[d],amount_minor:String(paid),currency:'TRY',occurred_at:new Date().toISOString()});
+  const k=key(),body={registration_id:r.primary_id,expected_version:1,reason:'self cancellation'};
+  await mutate(student,'event_registration_cancel_v1',body,k);assert.equal((await mutate(student,'event_registration_cancel_v1',body,k)).replayed,true);
+  assert.equal((await db.query('select private.debt_remaining($1,$2) n',[org,d])).rows[0].n,String(500-paid));
+  assert.equal((await db.query('select count(*)::int n from core.student_credit_movements where org_id=$1 and source_debt_id=$2',[org,d])).rows[0].n,0);
+  await error(student,'event_cancel_preview_v1',scoped({event_id:e.id,reason:'no center authority'}),'FORBIDDEN');
+ });
  await t.test('role revocation invalidates an existing JWT immediately at the next command',async()=>{
   await mutate(owner,'center_manager_revoke_v1',{person_id:ownerPerson,expected_version:1,reason:'synthetic'});
   await error(owner,'event_save_v1',scoped(eventInput()),'FORBIDDEN');

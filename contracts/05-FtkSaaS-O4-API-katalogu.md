@@ -1,4 +1,4 @@
-# FtkSaaS — API kataloğu · 0.2.0-rc.2
+# FtkSaaS — API kataloğu · 0.2.0-rc.3
 
 182 sözleşme; 53 geliştirme ortamında çağrılabilir endpoint, 129 yalnız sözleşme. Çağrılabilir olmak bütün ürün özelliklerinin veya üretim kabulünün tamamlandığı anlamına gelmez. Kapsam sınırları ve Q-E01 `docs/claude-handover.md` içindedir.
 

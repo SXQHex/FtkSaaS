@@ -2017,12 +2017,14 @@ retry_after_ms?: Count
 field_paths?: Text[]
 }
 /**
+ * Q-E02: reverse is a full linked entitlement-consumption reversal, never an automatic cash refund.
+ *
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
  * via the `definition` "Effect".
  */
 export interface Effect {
 entity: EntityRef
-action: ("create" | "cancel" | "reserve" | "consume" | "release" | "adjust" | "close" | "unlink" | "delete")
+action: ("create" | "cancel" | "reserve" | "consume" | "release" | "adjust" | "close" | "unlink" | "delete" | "reverse")
 quantity?: (Count | null)
 amount_minor?: (Money | null)
 currency?: (Currency | null)
@@ -7855,6 +7857,8 @@ student_credit_added_minor: Money
 currency: Currency
 }
 /**
+ * Q-E02 final acceptance: center cancellation at any stage fully settles only linked event obligations and rights; participant cancellation has no monetary journal effect.
+ *
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
  * via the `definition` "Request_event_registration_cancel".
  */
@@ -7968,6 +7972,8 @@ data: Mutation
 trace_id: string
 }
 /**
+ * Q-E02 final acceptance: center cancellation at any stage fully settles only linked event obligations and rights; participant cancellation has no monetary journal effect.
+ *
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
  * via the `definition` "Request_event_cancel_preview".
  */
@@ -8001,6 +8007,8 @@ data: Preview
 trace_id: string
 }
 /**
+ * Q-E02 final acceptance: center cancellation at any stage fully settles only linked event obligations and rights; participant cancellation has no monetary journal effect.
+ *
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
  * via the `definition` "Request_event_cancel_apply".
  */
@@ -10193,6 +10201,8 @@ state: EntitlementState
 balance_version: Int
 }
 /**
+ *  Q-E02: center cancellation full linked settlement; existing occurrence/attendance evidence and append-only journals preserved.
+ *
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
  * via the `definition` "Table_entitlement_movements".
  */
@@ -10370,6 +10380,8 @@ center_id: string
 discipline_id: string
 }
 /**
+ *  Q-E02: center cancellation full linked settlement; existing occurrence/attendance evidence and append-only journals preserved.
+ *
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
  * via the `definition` "Table_debts".
  */
@@ -10462,6 +10474,8 @@ amount_minor: Money
 previous_id?: (string | null)
 }
 /**
+ *  Q-E02: center cancellation full linked settlement; existing occurrence/attendance evidence and append-only journals preserved.
+ *
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
  * via the `definition` "Table_student_credit_movements".
  */
@@ -11056,6 +11070,8 @@ reference: Text
 period_key?: (Instant | null)
 }
 /**
+ *  Q-E02: center cancellation full linked settlement; existing occurrence/attendance evidence and append-only journals preserved.
+ *
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
  * via the `definition` "Table_events".
  */
@@ -11122,6 +11138,8 @@ verified_by?: (string | null)
 performed?: (Bool | null)
 }
 /**
+ *  Q-E02: center cancellation full linked settlement; existing occurrence/attendance evidence and append-only journals preserved.
+ *
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
  * via the `definition` "Table_event_registrations".
  */

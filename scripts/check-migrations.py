@@ -15,3 +15,5 @@ assert next(Path('supabase/migrations').glob('*_runtime_read_projection.sql')).r
 qe_parts=['event-payment-schema.sql','event-payment-functions.sql','event-payment-dispatch.sql','runtime-wrappers.sql']
 qe_sql='-- Q-E01 accepted payment preparation and financial cancellation.\nbegin;\n'+'\n'.join('\n'.join(x for x in Path('database',n).read_text().splitlines() if x.strip() not in ['begin;','commit;']) for n in qe_parts)+'\ncommit;\n'
 assert next(Path('supabase/migrations').glob('*_event_payment_finance.sql')).read_text()==qe_sql,'Q-E01 migration source drift'
+
+assert next(Path('supabase/migrations').glob('*_event_operator_cancellation.sql')).read_text()=="-- Q-E02 final center cancellation acceptance; prior seven migrations remain immutable.\nbegin;\n"+Path('database/event-cancellation-dispatch.sql').read_text()+"\ncommit;\n",'Q-E02 migration source drift'

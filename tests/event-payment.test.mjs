@@ -210,10 +210,10 @@ test('Q-E01 real Auth/API payment preparation and financial cancellation accepta
   await fail('collection_record_v1',{person_id:p,debt_ids:[a.debt_id],amount_minor:'1',currency:'TRY',occurred_at:new Date().toISOString()},'FORBIDDEN');
   await mutate('center_manager_assign_v1',{person_id:ownerPerson});assert.equal((await get(a.id)).state,'prepared');
  });
- await t.test('started event operator cancellation stays blocked pending a separate product decision',async()=>{
+ await t.test('past planned time does not block operator cancellation and is not proof of actual start',async()=>{
   const at=Date.now()-3600000,e=await event({interval:{starts_at:new Date(at).toISOString(),ends_at:new Date(at+7200000).toISOString()}});
-  const pv=await preview(e);assert.equal(pv.blockers[0].code,'POLICY_NOT_CONFIGURED');
-  await fail('event_cancel_apply_v1',{preview:{id:pv.id,token:pv.token}},'POLICY_NOT_CONFIGURED');
+  const pv=await preview(e);assert.deepEqual(pv.blockers,[]);await apply(pv);
+  assert.equal((await must(owner,'event_get_v1',scoped({event_id:e}))).state,'cancelled');
  });
  }finally{await removeTrigger();await db.end();}
 });
