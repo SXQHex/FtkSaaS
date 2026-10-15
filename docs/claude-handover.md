@@ -126,3 +126,13 @@ Fiilî başlangıç/kısmi gerçekleşme tanımı Q-E02 karar kaydında açık. 
 RC3 temiz kabul: Node 24.19.0, 8 migration, 20 tutarlılık kontrolü, 124 test (12 sözleşme + 27 DB + 85 gerçek Auth/API). Yeni Q-E02 grubu 25 senaryo; ayrıca gerçek öğrenci oturumuyla 3 iptal senaryosu. Effect.action artık reverse içerir; ortak tipleri yeniden üretin ve bu önizleme eylemini açıkça karşılayın. CI/review son commit için ayrıca denetlenir.
 
 Production dağıtımı yasağı: PR üzerinde etkin Vercel Git bağlantısı gözlendi. vercel.json git.deploymentEnabled.main=false, main merge ile otomatik deployment oluşmasını engeller. Bu ayar production dağıtım izni değildir; frontend tasarımını değiştirmez. Kaynak: https://vercel.com/docs/project-configuration/git-configuration
+
+## RC3 düzeltmesi — tahsilat / merkez iptali yarış kabulü
+
+Merge sonrası main CI #38820160639, tahsilat–iptal testinin yalnız bir işlem sırasını kabul eden yanlış beklentisini ortaya çıkardı. Teknik sözleşme bölüm 8'deki fazla tahsilat kuralı korunur: merkez iptali tamamlandıktan sonra kaydedilen gerçek tahsilat borcu yeniden açmaz; dağıtılamayan tutar source_cash_id bağlı surplus_add olarak öğrenci alacağına yazılır. İptalden önce borca dağıtılmış tahsilat ise source_debt_id bağlı refund_claim_add ile alacaklaşır. İki başarılı işlem aynı anda mümkün olabilir; bu tek başına mükerrer alacak kanıtı değildir.
+
+400 tahsil edilmiş / 1000 bedelli etkinliğe 600 ek tahsilat örneği:
+- İptal önce: borç 0; iptalden 400 refund_claim_add, sonraki tahsilattan 600 surplus_add; toplam alacak 1000.
+- Tahsilat önce: eski iptal önizlemesi PREVIEW_STALE; finans hareketi/receipt yazılmaz. Yeni önizleme ile iptalden 1000 refund_claim_add; toplam alacak 1000.
+
+Her iki sıralama, gerçek eşzamanlı API çağrıları ve aynı anahtarla tekrarlar ayrı denetlenir. Testler toplam nakdi, borç dağıtımlarını, alacak kaynaklarını ve defterlerin tekrarda değişmediğini kontrol eder. Ürün, API, tipler ve sekiz migration değişmedi; 53 çalışan / 129 yalnız sözleşme işlemi envanteri korunur. Önceki RC3 kabul raporları tarihsel kanıttır; bu düzeltmenin CI sonucu ilgili PR ve son commit üzerinden ayrıca doğrulanır.
