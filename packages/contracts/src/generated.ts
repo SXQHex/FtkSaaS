@@ -1325,6 +1325,10 @@ PackageScopeOrganizationAll?: PackageScopeOrganizationAll
 DisciplineRelationshipView?: DisciplineRelationshipView
 EventDisciplineIds?: EventDisciplineIds
 Table_event_disciplines?: TableEventDisciplines
+Request_event_get?: RequestEventGet
+Success_event_get?: SuccessEventGet
+Request_event_registration_preview?: RequestEventRegistrationPreview
+Success_event_registration_preview?: SuccessEventRegistrationPreview
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -2571,6 +2575,7 @@ attendance_state: AttendanceClosure
 assignments: DutyInput[]
 version: PositiveInt
 discipline_ids: EventDisciplineIds
+assignment_terms?: EventDutyInput[]
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -4543,6 +4548,11 @@ interval: Interval
 resources: ResourceRef[]
 assignments: DutyInput[]
 capacity: Capacity
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+discipline_id: string
+format: SessionFormat
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -7692,6 +7702,7 @@ event_id: string
  */
 person_id: string
 sale_id?: (string | null)
+preview?: (PreviewToken | null)
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -8970,7 +8981,7 @@ center_id?: (string | null)
  * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
  */
 operation_key: string
-expected_version?: PositiveInt
+expected_version: PositiveInt
 /**
  * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
  */
@@ -9975,6 +9986,7 @@ refund_method: RefundMethod
 freeze_terms: FreezeTerms
 quota?: (QuotaSpec | null)
 effective_at: Instant
+refund_terms?: RefundTerms
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -10819,8 +10831,8 @@ org_id: string
  * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
  */
 plan_version_id: string
-starts_at: Instant
-period_end: Instant
+starts_at: (Instant | null)
+period_end: (Instant | null)
 grace_until?: (Instant | null)
 state: SubscriptionState
 cancel_at_period_end: Bool
@@ -10899,6 +10911,7 @@ verified_at?: (Instant | null)
 verified_by?: (string | null)
 state: ApprovalState
 reference: Text
+period_key?: (Instant | null)
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -10964,6 +10977,7 @@ fee_minor: Money
 currency: Currency
 verified_at?: (Instant | null)
 verified_by?: (string | null)
+performed?: (Bool | null)
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -11700,4 +11714,73 @@ event_id: string
  * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
  */
 discipline_id: string
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "Request_event_get".
+ */
+export interface RequestEventGet {
+client_api_version: 1
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+request_id: string
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+org_id: string
+center_id?: (string | null)
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+event_id: string
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "Success_event_get".
+ */
+export interface SuccessEventGet {
+ok: true
+data: EventView
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+trace_id: string
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "Request_event_registration_preview".
+ */
+export interface RequestEventRegistrationPreview {
+client_api_version: 1
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+request_id: string
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+org_id: string
+center_id?: (string | null)
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+event_id: string
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+person_id: string
+sale_id?: (string | null)
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "Success_event_registration_preview".
+ */
+export interface SuccessEventRegistrationPreview {
+ok: true
+data: Preview
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+trace_id: string
 }

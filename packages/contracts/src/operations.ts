@@ -179,4 +179,6 @@ export interface Operations {
   discipline_save_v1: {request: T.RequestDisciplineSave; response: T.SuccessDisciplineSave};
   center_discipline_set_v1: {request: T.RequestCenterDisciplineSet; response: T.SuccessCenterDisciplineSet};
   person_discipline_set_v1: {request: T.RequestPersonDisciplineSet; response: T.SuccessPersonDisciplineSet};
+  event_get_v1: {request: T.RequestEventGet; response: T.SuccessEventGet};
+  event_registration_preview_v1: {request: T.RequestEventRegistrationPreview; response: T.SuccessEventRegistrationPreview};
 }
