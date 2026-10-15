@@ -13,7 +13,7 @@ selected=[p for p in files if (
  or p.startswith('packages/contracts/')
  or p.startswith('docs/decisions/')
  or p in ['docs/claude-handover.md','docs/endpoint-inventory.json','docs/development-connection.json',
- 'reports/qe02-verification.json','reports/qe02-acceptance.log','reports/qe02-review.md','examples/event-cancellation-semantics.json']
+ 'vercel.json','reports/qe02-verification.json','reports/qe02-acceptance.log','reports/qe02-review.md','examples/event-cancellation-semantics.json']
 )]
 changed=git('diff','--name-status',base,sha).decode()
 mapping=[]

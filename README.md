@@ -26,3 +26,5 @@ RC2 temiz kabul: 20 statik kontrol, 95 test (12 sözleşme + 27 DB + 56 Auth/API
 Q-E02 merkez iptali her aşamada tam finansal hesaplaşma ve tam hak dönüşü uygular; katılımcı iptalinde parasal sonuç değişmez, mevcut paket koşulları korunur. Fiilî başlangıç/kısmi gerçekleşme tanımı ayrı açık karardır. Güncel entegrasyon: docs/decisions/Q-E02.md ve docs/claude-handover.md. RC2 sayıları tarihsel; RC3 kanıtı qe02 raporundadır.
 
 RC3 temiz kabul: 124/124 test, 20/20 statik kontrol, sekiz migration, Node 24.19.0; reports/qe02-verification.json ve qe02-acceptance.log. PR/CI sonucu yalnız ilgili commit için geçerlidir.
+
+Production dağıtımı yasağı: PR üzerinde etkin Vercel Git bağlantısı gözlendi. vercel.json git.deploymentEnabled.main=false, main merge ile otomatik deployment oluşmasını engeller. Bu ayar production dağıtım izni değildir; frontend tasarımını değiştirmez. Kaynak: https://vercel.com/docs/project-configuration/git-configuration

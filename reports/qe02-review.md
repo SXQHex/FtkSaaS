@@ -20,3 +20,5 @@ Reviewed boundaries:
 - No frontend or production changes.
 
 Evidence: qe02-verification.json and qe02-acceptance.log. Independent review is required before the user-authorized conditional merge.
+
+Production dağıtımı yasağı: PR üzerinde etkin Vercel Git bağlantısı gözlendi. vercel.json git.deploymentEnabled.main=false, main merge ile otomatik deployment oluşmasını engeller. Bu ayar production dağıtım izni değildir; frontend tasarımını değiştirmez. Kaynak: https://vercel.com/docs/project-configuration/git-configuration

@@ -124,3 +124,5 @@ Fiilî başlangıç/kısmi gerçekleşme tanımı Q-E02 karar kaydında açık. 
 53 çağrılabilir geliştirme işlemi / 129 yalnız sözleşme değişmedi. Üretim, kalıcı ortak staging, dış e-posta, yük/restore ve frontend gerçek entegrasyon kabulü bu teslimle tamamlanmaz.
 
 RC3 temiz kabul: Node 24.19.0, 8 migration, 20 tutarlılık kontrolü, 124 test (12 sözleşme + 27 DB + 85 gerçek Auth/API). Yeni Q-E02 grubu 25 senaryo; ayrıca gerçek öğrenci oturumuyla 3 iptal senaryosu. Effect.action artık reverse içerir; ortak tipleri yeniden üretin ve bu önizleme eylemini açıkça karşılayın. CI/review son commit için ayrıca denetlenir.
+
+Production dağıtımı yasağı: PR üzerinde etkin Vercel Git bağlantısı gözlendi. vercel.json git.deploymentEnabled.main=false, main merge ile otomatik deployment oluşmasını engeller. Bu ayar production dağıtım izni değildir; frontend tasarımını değiştirmez. Kaynak: https://vercel.com/docs/project-configuration/git-configuration

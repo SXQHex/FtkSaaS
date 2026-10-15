@@ -66,7 +66,7 @@
   "source_files_sha256": {
     ".github/workflows/backend.yml": "4d14b4c7c2425d9bdef272e8cfb68f61171b420197eec7d1ed77ca809ac95110",
     "CHANGELOG.md": "040adca3bc05e829ea99c01fb7745b89ed94d9e82865fbf7765a23690a431ea5",
-    "README.md": "724f1ecda8e65d2275c2f5135b2cbea522f3ff8bac96e8664a40960b1b8df82e",
+    "README.md": "4959e5b7f5c2dc247c7bc98b1607c759893ed18b90857bf2fce9d8b3b0476eb9",
     "contracts/00-FtkSaaS-yeni-sohbet-devir.md": "12d704e9580a89d38f76e968b5ea42ff192c4340fd10a4b00fa1c9a02e5e9e14",
     "contracts/01-FtkSaaS-urun-kapsam-sozlesmesi.md": "5a68be9719b2c98e7218dbacecbc1a09244d19e90b01e03246466da3e88f0653",
     "contracts/02-FtkSaaS-teknik-sozlesme.md": "f9766c19c7d9dfbc62f8bd6067a0f46d38379de95d141046b7aaefef68588a69",
@@ -93,7 +93,7 @@
     "database/runtime.sql": "a6604816aadf0a2005b2c99f222b34ba10828de80a535d525eef0af5a62d07dd",
     "database/wrappers.sql": "ff1b4e487ff5aba58483f7f1e2c8c6a3412ab4fd6d3916e51caa5fd6c766b592",
     "docs/api-invariants.md": "a62bb20e4c80b2365b7994567ce004afd47524f82d3ebf4b6ab191b21eef1717",
-    "docs/claude-handover.md": "6383510a1f623d3f116241be8069d0036da5bfd73d0900c7080395bcaceb11d9",
+    "docs/claude-handover.md": "0343efc0af69719ec05a720ac47ac575cd32277c3f6d6a80fe0c32518ed9a231",
     "docs/decisions/Q-E01-accepted.md": "2eb066a0684cfdd3c265558b0e436e95ff850cfeaa987bf91f47eaca48c09525",
     "docs/decisions/Q-E01.md": "67bbe8770ae538f1a1c4df3602273bd65a43ca9087c415a1c0470f37cc925d96",
     "docs/decisions/Q-E02.md": "00b5487434ce53e1e2dac78c64924c8c2f9a5c1f3cd2c797dbed445193813f54",
@@ -125,7 +125,7 @@
     "scripts/generate_schema.historical.py": "4f5253e0fa915ec933d62c8824e1336c4d51bf5c2e0c5f2a1fb722fd03737c19",
     "scripts/generate_schema.py": "19c445b33f5740dfbb329bcd022ad5ced17ab1d6fb9cd4130bf28031378e4597",
     "scripts/health.mjs": "318d9e259d91065c624589480eaa9b20d18b22ce472110774ed9b35a90cba4db",
-    "scripts/package-contracts.py": "419b9e685677c491812bc5ac1fb3e04a6a0d06f32d958881be135454021d915d",
+    "scripts/package-contracts.py": "36318eb46dd77b5c587ebd0db9b28be18a95a40517d730feac9825bcd2291e51",
     "scripts/probe-db.mjs": "3343030d1b28289e638cb8fbeb744383edb0c35e24f984b00466db94bf1fe2c4",
     "scripts/render_catalogs.py": "31b0686e9876fecde6782abc0b18c3b1ef28a45e38e7a5787562b4e3e286dd7f",
     "scripts/run-sql.mjs": "9b060e2b2758159537695963bab8c279c99085a019876fe06ac8314c07ae9c92",
@@ -156,6 +156,13 @@
     "tests/event-cancellation.test.mjs": "c1c409cb9eb7fa0153162f6438c282df2d634ab0d222d4991fd7fca60e456c89",
     "tests/event-payment.test.mjs": "488e5740ec566c73110399eeb08800efe08c547d7251fe10e2ca560b7814aa17",
     "tests/event-scope.test.mjs": "ccbabd9bceacdc489789c1545bf66ca9198165b4ef53a281be4d68bf9d304ac8",
-    "tests/types.test.ts": "1e9ee46982cbd809999c6cebd201d01928bf506c7c8742f5c9eb2ce5ab96dd11"
+    "tests/types.test.ts": "1e9ee46982cbd809999c6cebd201d01928bf506c7c8742f5c9eb2ce5ab96dd11",
+    "vercel.json": "2bb97b345ca97ff42b0902d69dbc7d2d1acdd13ab8838fb28cdcf97e43701da2"
+  },
+  "production_deployment_guard": {
+    "file": "vercel.json",
+    "git.deploymentEnabled.main": false,
+    "reason": "Observed active Vercel Git integration; user allows main merge but explicitly excludes production rollout.",
+    "docs": "https://vercel.com/docs/project-configuration/git-configuration"
   }
 }
