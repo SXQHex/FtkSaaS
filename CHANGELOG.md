@@ -1,6 +1,10 @@
 # Changes
 
-## Unreleased — 2026-10-16
+## 0.2.0-rc.2 — 2026-10-16
+
+Implements accepted Q-E01 payment preparation against existing debt/collection/credit journals. Prepared paid registrations atomically register or commit a typed capacity_closed financial resolution. Prestart full operator cancellation reverses obligations and creates only unclaimed student credit; earlier discounts/refunds and explicit offsets/refunds do not duplicate claims. Adds service-only preparation read/write RPCs and activates the existing debt adjustment/student credit refund/offset contracts. Shared DTOs, examples and Claude handover updated. Started/partial event monetary cancellation remains blocked pending a separate product decision.
+
+## Previous continuation — 2026-10-16
 
 Clean acceptance is now one CI command with explicit local migration replay and empty-fixture checks. Race assertions inspect persisted balances, registrations, receipts, debt and allocations. Health JSON output is parsed during clean acceptance. Q-E01 is accepted but its schema/API/shared-type and financial acceptance transfer remains pending.
 

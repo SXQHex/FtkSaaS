@@ -103,3 +103,8 @@ Paket revizyonu: 2.2. D01–D09 disiplin kararları korunur. Bu bölüm önceki 
 **U08.** PostgreSQL alan tipi uuid olarak kalır. UUIDv7 üretim standardı bütün dış UUID girişlerini v7 diye reddetmek anlamına gelmez. FtkSaaS üretimi olan alanlarla sağlayıcı kimliği alanlarının şema/DTO eşlemesi teknik sohbette tamamlanır; yetki ve tenant kontrolü UUID sürümünden bağımsız uygulanır.
 
 **Durum:** Belge ve makine sözleşmesine üretim politikası işlendi. Ortam/üretici seçimi, alan bazlı ortak tip aktarımı, migration ve gerçek üretim/yarış testleri ayrı teknik sohbette yapılacaktır. Kodlama, kurulum veya dağıtım yapılmadı.
+
+
+## Güncel backend devamı — 0.2.0-rc.2
+
+Q-E01 kabul belgesi ana ürün/teknik sözleşmeye, fiziksel şema/API/ortak tiplere aktarıldı. Hazırlık kontenjan tutmaz; güncel borca bağlı tahsilatla kesin kayıt veya capacity_closed finansal düzeltmesi uygulanır. Gerçek kabulün yetkili güncel kaydı reports/qe01-verification.json, entegrasyon notu docs/claude-handover.md. 53 çağrılabilir işlem ve 129 yalnız sözleşme; üretim veya bütün ürün tamamlandı sayılmaz. Eski raporlar tarihsel snapshot olarak kalır.

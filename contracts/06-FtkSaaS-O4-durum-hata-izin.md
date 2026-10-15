@@ -249,3 +249,13 @@ Paket revizyonu: 2.2. D01–D09 disiplin kararları korunur. Bu bölüm önceki 
 - center_all_disciplines/organization_all de event uygunluğu ve merkez/diğer mevcut gate'lere tabidir.
 - Kapsam uyumsuzluğu CLASS_ACCESS_DENIED; kullanılabilir hak yetersizliği ENTITLEMENT_UNAVAILABLE. Normal ders için negatif limit veya override etkinliğe uygulanmaz; yeni hata/rol eklenmedi.
 - private.event_package_scope_matches scope filtresi, private.require_event_available_credit pozitif kullanılabilir hak kapısıdır. Bu yardımcılar yetkilendirilmiş kayıt RPC'si değildir. Authoritative balance/pool lock/atomik allocation henüz bağlı değil.
+
+## Q-E01 çalışma durumları ve izinler
+
+event_payment_preparations: prepared → registered / capacity_closed / event_cancelled; registered → event_cancelled. Hazırlık yer ayırmaz. Merkez/tenant/kişi/borç/registration FK'leri korunur. Eski hazırlık ikinci kesin kaydı finanse etmez.
+
+event_payment_prepare: event.register; event_payment_get: kişi kendisi veya merkez yöneticisi/açık finance.collect personeli. student_credit_refund ve debt_adjust: finance.refund (CM); student_credit_offset: finance.collect. Tahsilat ve açık mahsup yalnız aynı merkez/kişi/para birimindeki borca uygulanır.
+
+event_register başarı verisi outcome üzerinden ayrılır: registered kesin kayıttır; capacity_closed kesin kayıt değildir, ödenmiş hazırlığın kapanması/borcun ters kaydı/öğrenci alacağı commit edilmiştir. capacity_closed HTTP/domain hata zarfına çevrilmez. Aynı anahtar aynı sonucu tekrarlar. Hazırlıksız normal kapasite hatası halen CAPACITY_FULL; eksik tam ödeme ENTITLEMENT_UNAVAILABLE; yanlış kapsam NOT_FOUND; güncel olmayan önizleme PREVIEW_STALE.
+
+İptal önizlemesi kalan borç kaldırma, yeni öğrenci alacağı, hak serbest bırakma ve hazırlık kapatma etkilerini verir. Tahsilat/indirim/alacak veya hazırlık değiştiyse yeniden önizleme gerekir. Başlamış/kısmen gerçekleşmiş etkinlik iptali POLICY_NOT_CONFIGURED; yeni ürün kararı olmadan oransal hesap yapılmaz.

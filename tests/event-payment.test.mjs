@@ -1,0 +1,219 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import {createHash} from 'node:crypto';
+import {authUser,fixturePlatform,must,call} from './api-client.mjs';
+import {connect} from '../scripts/db.mjs';
+import {newUuidV7 as key} from '../scripts/uuid.mjs';
+
+test('Q-E01 real Auth/API payment preparation and financial cancellation acceptance',async t=>{
+ const {platform,plan}=await fixturePlatform(),owner=await authUser('qe01-owner'),outsider=await authUser('qe01-outsider');
+ const account=await must(owner,'account_get_v1');
+ const org=(await must(platform,'organization_create_v1',{verified_account_id:account.id,name:'Q-E01 '+key(),initial_plan_id:plan},key())).primary_id;
+ const center=(await must(owner,'center_create_v1',{org_id:org,name:'Q-E01 center',timezone:'Europe/Istanbul'},key())).primary_id;
+ const db=await connect();
+ const scoped=b=>({org_id:org,center_id:center,...b}),mutate=(op,b,k=key())=>must(owner,op,scoped(b),k);
+ const fail=async(op,b,code,k=key(),user=owner)=>{const r=await call(user,op,scoped(b),k);assert.equal(r.result.ok,false,JSON.stringify(r.result));assert.equal(r.result.error.code,code,JSON.stringify(r.result));return r;};
+ const count=async(sql,args=[])=>(await db.query(sql,args)).rows[0].n;
+ const receiptCount=async k=>count('select count(*)::int n from core.operation_receipts where org_id=$1 and key_hash=$2',[org,createHash('sha256').update(k).digest('hex')]);
+ const ownerPerson=(await db.query('select owner_person_id from core.organizations where id=$1',[org])).rows[0].owner_person_id;
+ let slot=0;
+ const terms={fee_minor:'1000',currency:'TRY',full_payment_required:true,allowed_product_version_ids:[],cancellation:{before_cutoff:'release',after_cutoff:'consume',no_show:'consume'},refund:{method:'none'}};
+ async function person(){const p=(await mutate('person_create_v1',{display_name:'Q-E01 student '+key(),contacts:[]})).primary_id;await mutate('student_activate_v1',{person_id:p});return p;}
+ async function event(extra={}){const at=Date.now()+86400000+(slot++)*7200000;const input={name:'Q-E01 event '+key(),interval:{starts_at:new Date(at).toISOString(),ends_at:new Date(at+3600000).toISOString()},timezone:'Europe/Istanbul',venue:{kind:'external',name:'Test',address:'Synthetic',timezone:'Europe/Istanbul'},capacity:{nominal:10,maximum:10},terms,discipline_ids:[],assignments:[{person_id:ownerPerson,duty:'instructor',fee_minor:'0',currency:'TRY'}],...extra};const id=(await mutate('event_save_v1',input)).primary_id;await mutate('event_publish_v1',{event_id:id,published:true});return id;}
+ const prepare=(e,p,k=key())=>mutate('event_payment_prepare_v1',{event_id:e,person_id:p},k);
+ const get=p=>must(owner,'event_payment_get_v1',scoped({preparation_id:p}));
+ const collect=(p,debt,amount,k=key())=>mutate('collection_record_v1',{person_id:p,debt_ids:[debt],amount_minor:String(amount),currency:'TRY',occurred_at:new Date().toISOString()},k);
+ const register=(e,p,prep,k=key())=>mutate('event_register_v1',{event_id:e,person_id:p,preparation_id:prep},k);
+ const preview=e=>must(owner,'event_cancel_preview_v1',scoped({event_id:e,reason:'Q-E01 operator cancellation'}));
+ const apply=(p,k=key())=>mutate('event_cancel_apply_v1',{preview:{id:p.id,token:p.token}},k);
+ async function debtForRegistration(r){return(await db.query('select * from core.debts where org_id=$1 and event_registration_id=$2',[org,r])).rows[0];}
+ let trigger;
+ async function rejectAudit(action,subject){
+  trigger='qe01_'+key().replaceAll('-','');
+  await db.query("create function private."+trigger+"() returns trigger language plpgsql set search_path='' as $$begin raise exception using errcode='P0001',message='INTEGRITY_VIOLATION';end$$");
+  const condition="new.action='"+action+"' and new.org_id='"+org+"'::uuid"+(subject?" and new.subject_id='"+subject+"'::uuid":"");
+  await db.query("create trigger "+trigger+" before insert on core.audit_events for each row when ("+condition+") execute function private."+trigger+"()");
+ }
+ async function removeTrigger(){if(trigger){await db.query('drop trigger if exists '+trigger+' on core.audit_events');await db.query('drop function private.'+trigger+'()');trigger=null;}}
+ try{
+ await mutate('center_manager_assign_v1',{person_id:ownerPerson});
+ const pay=await mutate('saas_payment_submit_v1',{amount_minor:'1000',currency:'TRY',reference:'SYNTHETIC Q-E01',occurred_at:new Date().toISOString()});
+ await must(platform,'saas_payment_verify_v1',scoped({payment_id:pay.primary_id,accepted:true}),key());
+
+ await t.test('preparation creates one scoped debt and no seat; same and different-key repeats reuse it',async()=>{
+  const e=await event(),p=await person(),k=key(),a=await prepare(e,p,k),b=await prepare(e,p,k),c=await prepare(e,p);
+  assert.equal(a.id,b.id);assert.equal(a.id,c.id);assert.equal(a.debt_id,c.debt_id);assert.equal(a.remaining_minor,'1000');
+  assert.equal(await count('select count(*)::int n from core.event_registrations where org_id=$1 and event_id=$2',[org,e]),0);
+  assert.equal(await count('select count(*)::int n from core.debts where org_id=$1 and person_id=$2',[org,p]),1);
+  await fail('event_payment_prepare_v1',{event_id:e,person_id:await person()},'IDEMPOTENCY_PAYLOAD_MISMATCH',k);
+  const view=await must(owner,'event_get_v1',scoped({event_id:e}));
+  await mutate('event_save_v1',{event_id:e,expected_version:view.version,name:view.name,interval:view.interval,timezone:view.timezone,venue:view.venue,capacity:view.capacity,terms:{...view.terms,full_payment_required:false},discipline_ids:view.discipline_ids,assignments:view.assignment_terms});
+  await fail('event_register_v1',{event_id:e,person_id:p},'ENTITLEMENT_UNAVAILABLE');
+  assert.equal(await count('select count(*)::int n from core.debts where org_id=$1 and person_id=$2',[org,p]),1);
+
+ });
+ await t.test('partial or wrong-debt payment cannot register; explicit full allocation reuses the debt',async()=>{
+  const e=await event(),p=await person(),a=await prepare(e,p),other=await prepare(await event(),p);
+  await collect(p,other.debt_id,1000);await fail('event_register_v1',{event_id:e,person_id:p,preparation_id:a.id},'ENTITLEMENT_UNAVAILABLE');
+  await fail('collection_record_v1',{person_id:p,debt_ids:[a.debt_id],amount_minor:'1000',currency:'EUR',occurred_at:new Date().toISOString()},'CURRENCY_MISMATCH');
+  await collect(p,a.debt_id,400);assert.equal((await get(a.id)).paid_minor,'400');
+  await fail('event_register_v1',{event_id:e,person_id:p,preparation_id:a.id},'ENTITLEMENT_UNAVAILABLE');
+  await collect(p,a.debt_id,600);const pv=await must(owner,'event_registration_preview_v1',scoped({event_id:e,person_id:p,preparation_id:a.id}));assert.deepEqual(pv.blockers,[]);
+  const k=key(),r=await mutate('event_register_v1',{event_id:e,person_id:p,preparation_id:a.id,preview:{id:pv.id,token:pv.token}},k);
+  assert.equal(r.outcome,'registered');assert.equal((await get(a.id)).registration_id,r.primary_id);
+  assert.equal((await debtForRegistration(r.primary_id)).id,a.debt_id);
+  assert.equal((await mutate('event_register_v1',{event_id:e,person_id:p,preparation_id:a.id,preview:{id:pv.id,token:pv.token}},k)).replayed,true);
+  await fail('event_register_v1',{event_id:e,person_id:p,preparation_id:a.id},'RESERVATION_EXISTS');
+ });
+ let raceEvent,racePeople,racePreparations,loserPreparation;
+ await t.test('two fully paid preparations race for the last seat: one registration and one committed credit closure',async()=>{
+  raceEvent=await event({capacity:{nominal:1,maximum:1}});racePeople=[await person(),await person()];
+  racePreparations=await Promise.all(racePeople.map(p=>prepare(raceEvent,p)));
+  for(let i=0;i<2;i++)await collect(racePeople[i],racePreparations[i].debt_id,1000);
+  assert.equal(await count('select count(*)::int n from core.event_registrations where org_id=$1 and event_id=$2',[org,raceEvent]),0);
+  const keys=[key(),key()],rs=await Promise.all(racePeople.map((p,i)=>register(raceEvent,p,racePreparations[i].id,keys[i])));
+  assert.equal(rs.filter(r=>r.outcome==='registered').length,1);assert.equal(rs.filter(r=>r.outcome==='capacity_closed').length,1);
+  const loser=rs.findIndex(r=>r.outcome==='capacity_closed');loserPreparation=racePreparations[loser];
+  const closed=rs[loser];assert.equal(closed.student_credit_added_minor,'1000');assert.equal(closed.remaining_removed_minor,'0');
+  const state=await get(loserPreparation.id);assert.equal(state.state,'capacity_closed');assert.equal(state.registration_id,null);assert.equal(state.remaining_minor,'0');assert.equal(state.student_credit_available_minor,'1000');
+  assert.equal(await count('select count(*)::int n from core.event_registrations where org_id=$1 and event_id=$2',[org,raceEvent]),1);
+  assert.equal(await count('select count(*)::int n from core.debts where org_id=$1 and person_id=any($2::uuid[])',[org,racePeople]),2);
+  assert.equal(await count("select count(*)::int n from core.student_credit_movements where org_id=$1 and source_debt_id=$2 and kind='refund_claim_add'",[org,loserPreparation.debt_id]),1);
+  for(let i=0;i<2;i++){const replay=await register(raceEvent,racePeople[i],racePreparations[i].id,keys[i]);assert.equal(replay.outcome,rs[i].outcome);assert.equal(replay.replayed,true);}
+  await fail('event_register_v1',{event_id:raceEvent,person_id:racePeople[loser],preparation_id:loserPreparation.id},'INVALID_STATE_TRANSITION');
+  assert.equal(await receiptCount(keys[loser]),1);
+ });
+ await t.test('explicit offset and cash refund stay separate, scoped and bounded; later cancellation never credits twice',async()=>{
+  const p=racePeople[racePreparations.findIndex(x=>x.id===loserPreparation.id)];
+  const otherEvent=await event({terms:{...terms,full_payment_required:false,fee_minor:'700'}});
+  const r=await mutate('event_register_v1',{event_id:otherEvent,person_id:p}),d=await debtForRegistration(r.primary_id);
+  const offsetKey=key();await mutate('student_credit_offset_v1',{person_id:p,debt_id:d.id,expected_version:Number(d.version),amount_minor:'300',currency:'TRY'},offsetKey);
+  await mutate('student_credit_offset_v1',{person_id:p,debt_id:d.id,expected_version:Number(d.version),amount_minor:'300',currency:'TRY'},offsetKey);
+  assert.equal((await get(loserPreparation.id)).student_credit_available_minor,'700');
+  const cashBefore=await count('select count(*)::int n from core.cash_movements where org_id=$1 and person_id=$2',[org,p]);
+  await apply(await preview(raceEvent));
+  assert.equal((await get(loserPreparation.id)).student_credit_available_minor,'700');
+  assert.equal(await count('select count(*)::int n from core.cash_movements where org_id=$1 and person_id=$2',[org,p]),cashBefore);
+  assert.equal((await db.query('select private.debt_remaining($1,$2) n',[org,d.id])).rows[0].n,'400');
+  const refundKey=key(),body={person_id:p,amount_minor:'700',currency:'TRY',occurred_at:new Date().toISOString(),reason:'explicit cash refund'};
+  await mutate('student_credit_refund_v1',body,refundKey);await mutate('student_credit_refund_v1',body,refundKey);
+  await fail('student_credit_refund_v1',{...body,amount_minor:'1'},'INSUFFICIENT_STUDENT_CREDIT');
+  assert.equal((await get(loserPreparation.id)).student_credit_available_minor,'0');
+ });
+ for(const paid of [0,400,1000])await t.test('prestart operator cancellation of preparation and manual registration: paid '+paid+' reverses remaining debt and credits exactly paid',async()=>{
+  const e=await event(),p=await person(),a=await prepare(e,p);if(paid)await collect(p,a.debt_id,paid);
+  const pv=await preview(e);assert.deepEqual(pv.blockers,[]);
+  assert.equal(pv.effects.find(x=>x.reason==='remaining_debt_removed').amount_minor,String(1000-paid));
+  assert.equal(pv.effects.find(x=>x.reason==='student_credit_added').amount_minor,String(paid));
+  const k=key();await apply(pv,k);assert.equal((await apply(pv,k)).replayed,true);
+  const state=await get(a.id);assert.equal(state.state,'event_cancelled');assert.equal(state.remaining_minor,'0');assert.equal(state.student_credit_available_minor,String(paid));
+  assert.equal(await count("select count(*)::int n from core.cash_movements where org_id=$1 and person_id=$2 and kind='refund'",[org,p]),0);
+  const manualEvent=await event({terms:{...terms,full_payment_required:false}}),manualPerson=await person();
+  const registration=await mutate('event_register_v1',{event_id:manualEvent,person_id:manualPerson}),manualDebt=await debtForRegistration(registration.primary_id);
+  if(paid)await collect(manualPerson,manualDebt.id,paid);
+  const manualPreview=await preview(manualEvent);
+  assert.equal(manualPreview.effects.find(x=>x.reason==='remaining_debt_removed').amount_minor,String(1000-paid));
+  assert.equal(manualPreview.effects.find(x=>x.reason==='student_credit_added').amount_minor,String(paid));
+  await apply(manualPreview);
+  assert.equal((await db.query('select private.debt_remaining($1,$2) n',[org,manualDebt.id])).rows[0].n,'0');
+  assert.equal((await db.query('select private.student_credit_available($1,$2,$3,$4) n',[org,center,manualPerson,'TRY'])).rows[0].n,String(paid));
+ });
+ await t.test('previous discount, generated credit and explicit cash refund are deducted once for a registered manual attendee',async()=>{
+  const e=await event({terms:{...terms,full_payment_required:false}}),p=await person(),r=await mutate('event_register_v1',{event_id:e,person_id:p}),d=await debtForRegistration(r.primary_id);
+  await collect(p,d.id,1000);
+  await mutate('debt_adjust_v1',{debt_id:d.id,amount_minor:'200',direction:'decrease',reason:'prior discount'});
+  await mutate('student_credit_refund_v1',{person_id:p,amount_minor:'200',currency:'TRY',occurred_at:new Date().toISOString(),reason:'prior explicit refund'});
+  const pv=await preview(e);assert.equal(pv.effects.find(x=>x.reason==='student_credit_added').amount_minor,'800');
+  const k=key();await apply(pv,k);await apply(pv,k);
+  await fail('event_cancel_apply_v1',{preview:{id:pv.id,token:pv.token}},'PREVIEW_STALE');
+  assert.equal((await db.query('select private.student_credit_available($1,$2,$3,$4) n',[org,center,p,'TRY'])).rows[0].n,'800');
+  assert.equal((await db.query('select sum(amount_minor)::text n from core.student_credit_movements where org_id=$1 and source_debt_id=$2 and kind=$3',[org,d.id,'refund_claim_add'])).rows[0].n,'1000');
+  await fail('debt_adjust_v1',{debt_id:d.id,amount_minor:'1',direction:'increase',reason:'must not reopen'},'INVALID_STATE_TRANSITION');
+ });
+ await t.test('financial changes invalidate cancellation and registration previews',async()=>{
+  const e=await event(),p=await person(),a=await prepare(e,p),pv=await preview(e);
+  await collect(p,a.debt_id,400);await fail('event_cancel_apply_v1',{preview:{id:pv.id,token:pv.token}},'PREVIEW_STALE');
+  const registrationPreview=await must(owner,'event_registration_preview_v1',scoped({event_id:e,person_id:p,preparation_id:a.id}));
+  await collect(p,a.debt_id,600);
+  await fail('event_register_v1',{event_id:e,person_id:p,preparation_id:a.id,preview:{id:registrationPreview.id,token:registrationPreview.token}},'PREVIEW_STALE');
+  assert.equal((await register(e,p,a.id)).outcome,'registered');
+ });
+ await t.test('late failure rolls back a paid capacity closure; retry commits its financial resolution exactly once',async()=>{
+  const e=await event({capacity:{nominal:1,maximum:1}}),people=[await person(),await person()],a=await prepare(e,people[0]),b=await prepare(e,people[1]);
+  await collect(people[0],a.debt_id,1000);await collect(people[1],b.debt_id,1000);await register(e,people[0],a.id);
+  await rejectAudit('event_register_v1',b.id);const k=key();
+  await fail('event_register_v1',{event_id:e,person_id:people[1],preparation_id:b.id},'INTEGRITY_VIOLATION',k);
+  assert.equal((await get(b.id)).state,'prepared');assert.equal((await get(b.id)).credited_minor,'0');assert.equal(await receiptCount(k),0);
+  assert.equal(await count('select count(*)::int n from core.debt_adjustments where org_id=$1 and debt_id=$2',[org,b.debt_id]),0);
+  await removeTrigger();const r=await register(e,people[1],b.id,k);assert.equal(r.outcome,'capacity_closed');assert.equal(r.student_credit_added_minor,'1000');assert.equal((await register(e,people[1],b.id,k)).replayed,true);
+ });
+ await t.test('late cancellation failure rolls back debt, credit, preparation, preview and receipt together',async()=>{
+  const e=await event(),p=await person(),a=await prepare(e,p);await collect(p,a.debt_id,400);const pv=await preview(e),k=key();await rejectAudit('event_cancel_apply_v1',e);
+  await fail('event_cancel_apply_v1',{preview:{id:pv.id,token:pv.token}},'INTEGRITY_VIOLATION',k);
+  const state=await get(a.id);assert.equal(state.state,'prepared');assert.equal(state.remaining_minor,'600');assert.equal(state.credited_minor,'0');assert.equal(await receiptCount(k),0);
+  assert.equal((await db.query('select state from core.previews where id=$1',[pv.id])).rows[0].state,'current');
+  await removeTrigger();await apply(pv,k);assert.equal((await get(a.id)).student_credit_available_minor,'400');
+ });
+ await t.test('tenant/person/center mismatches cannot use preparation, collection, refund or cancel authority',async()=>{
+  const e=await event(),p=await person(),a=await prepare(e,p),other=await person();
+  await fail('event_register_v1',{event_id:e,person_id:other,preparation_id:a.id},'NOT_FOUND');
+  await fail('event_register_v1',{event_id:e,person_id:p,preparation_id:a.id,sale_id:key()},'VALIDATION_FAILED');
+  await fail('collection_record_v1',{person_id:other,debt_ids:[a.debt_id],amount_minor:'1000',currency:'TRY',occurred_at:new Date().toISOString()},'NOT_FOUND');
+  await fail('event_payment_get_v1',{preparation_id:a.id},'NOT_FOUND',key(),outsider);
+  const otherCenter=(await must(owner,'center_create_v1',{org_id:org,name:'Other center',timezone:'Europe/Istanbul'},key())).primary_id;
+  await fail('event_payment_get_v1',{preparation_id:a.id,center_id:otherCenter},'NOT_FOUND');
+  await fail('student_credit_refund_v1',{person_id:p,center_id:otherCenter,amount_minor:'1',currency:'TRY',occurred_at:new Date().toISOString(),reason:'wrong center'},'FORBIDDEN');
+  await mutate('center_manager_assign_v1',{person_id:ownerPerson,center_id:otherCenter});
+  await fail('event_register_v1',{event_id:e,person_id:p,preparation_id:a.id,center_id:otherCenter},'NOT_FOUND');
+  await fail('student_credit_refund_v1',{person_id:p,center_id:otherCenter,amount_minor:'1',currency:'TRY',occurred_at:new Date().toISOString(),reason:'no cross-center credit'},'INSUFFICIENT_STUDENT_CREDIT');
+  const foreignAccount=await must(outsider,'account_get_v1');
+  const foreignOrg=(await must(platform,'organization_create_v1',{verified_account_id:foreignAccount.id,name:'Foreign Q-E01',initial_plan_id:plan},key())).primary_id;
+  const foreignCenter=(await must(outsider,'center_create_v1',{org_id:foreignOrg,name:'Foreign',timezone:'Europe/Istanbul'},key())).primary_id;
+  const foreignPerson=(await db.query('select owner_person_id from core.organizations where id=$1',[foreignOrg])).rows[0].owner_person_id;
+  await must(outsider,'center_manager_assign_v1',{org_id:foreignOrg,center_id:foreignCenter,person_id:foreignPerson},key());
+  const payment=await must(outsider,'saas_payment_submit_v1',{org_id:foreignOrg,center_id:foreignCenter,amount_minor:'1000',currency:'TRY',reference:'SYNTHETIC TENANT',occurred_at:new Date().toISOString()},key());
+  await must(platform,'saas_payment_verify_v1',{org_id:foreignOrg,center_id:foreignCenter,payment_id:payment.primary_id,accepted:true},key());
+  await fail('event_payment_get_v1',{org_id:foreignOrg,center_id:foreignCenter,preparation_id:a.id},'NOT_FOUND',key(),outsider);
+  await fail('collection_record_v1',{org_id:foreignOrg,center_id:foreignCenter,person_id:foreignPerson,debt_ids:[a.debt_id],amount_minor:'1000',currency:'TRY',occurred_at:new Date().toISOString()},'NOT_FOUND',key(),outsider);
+  await fail('event_cancel_preview_v1',{org_id:foreignOrg,center_id:foreignCenter,event_id:e,reason:'cross tenant'},'NOT_FOUND',key(),outsider);
+  assert.equal((await get(a.id)).paid_minor,'0');
+ });
+
+ await t.test('discounted preparation uses its current debt and the remaining linked payment, not a client paid flag',async()=>{
+  const e=await event(),p=await person(),a=await prepare(e,p);
+  await collect(p,a.debt_id,400);await mutate('debt_adjust_v1',{debt_id:a.debt_id,amount_minor:'600',direction:'decrease',reason:'explicit authorized discount'});
+  const r=await register(e,p,a.id);assert.equal(r.outcome,'registered');
+  const pv=await preview(e);assert.equal(pv.effects.find(x=>x.reason==='student_credit_added').amount_minor,'400');await apply(pv);
+  assert.equal((await get(a.id)).student_credit_available_minor,'400');
+ });
+ await t.test('same-key concurrent prepared registrations return one registration and never create a second debt',async()=>{
+  const e=await event(),p=await person(),a=await prepare(e,p),k=key();await collect(p,a.debt_id,1000);
+  const rs=await Promise.all([register(e,p,a.id,k),register(e,p,a.id,k)]);
+  assert(rs.every(r=>r.outcome==='registered'));assert.equal(rs[0].primary_id,rs[1].primary_id);assert.equal(rs.filter(r=>r.replayed).length,1);
+  assert.equal(await count('select count(*)::int n from core.debts where org_id=$1 and person_id=$2',[org,p]),1);
+ });
+ await t.test('late collection failure leaves no cash/allocation/receipt; same-key retry records one linked payment',async()=>{
+  const e=await event(),p=await person(),a=await prepare(e,p),k=key();
+  await rejectAudit('collection_record_v1',null);
+  await fail('collection_record_v1',{person_id:p,debt_ids:[a.debt_id],amount_minor:'400',currency:'TRY',occurred_at:'2026-10-16T00:00:00Z'},'INTEGRITY_VIOLATION',k);
+  assert.equal((await get(a.id)).paid_minor,'0');assert.equal(await receiptCount(k),0);
+  assert.equal(await count('select count(*)::int n from core.cash_movements where org_id=$1 and person_id=$2',[org,p]),0);
+  assert.equal(await count('select count(*)::int n from core.debt_allocations where org_id=$1 and debt_id=$2',[org,a.debt_id]),0);
+  await removeTrigger();
+  const body={person_id:p,debt_ids:[a.debt_id],amount_minor:'400',currency:'TRY',occurred_at:'2026-10-16T00:00:00Z'};
+  await mutate('collection_record_v1',body,k);await mutate('collection_record_v1',body,k);assert.equal((await get(a.id)).paid_minor,'400');
+ });
+ await t.test('live center-role revocation blocks collecting or converting a paid preparation with the old JWT',async()=>{
+  const e=await event(),p=await person(),a=await prepare(e,p);await collect(p,a.debt_id,1000);
+  await mutate('center_manager_revoke_v1',{person_id:ownerPerson,expected_version:1,reason:'Q-E01 authority revocation'});
+  await fail('event_register_v1',{event_id:e,person_id:p,preparation_id:a.id},'FORBIDDEN');
+  await fail('collection_record_v1',{person_id:p,debt_ids:[a.debt_id],amount_minor:'1',currency:'TRY',occurred_at:new Date().toISOString()},'FORBIDDEN');
+  await mutate('center_manager_assign_v1',{person_id:ownerPerson});assert.equal((await get(a.id)).state,'prepared');
+ });
+ await t.test('started event operator cancellation stays blocked pending a separate product decision',async()=>{
+  const at=Date.now()-3600000,e=await event({interval:{starts_at:new Date(at).toISOString(),ends_at:new Date(at+7200000).toISOString()}});
+  const pv=await preview(e);assert.equal(pv.blockers[0].code,'POLICY_NOT_CONFIGURED');
+  await fail('event_cancel_apply_v1',{preview:{id:pv.id,token:pv.token}},'POLICY_NOT_CONFIGURED');
+ });
+ }finally{await removeTrigger();await db.end();}
+});

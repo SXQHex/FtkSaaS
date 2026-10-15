@@ -249,3 +249,11 @@ Paket revizyonu: 2.2. D01–D09 disiplin kararları korunur. Bu bölüm önceki 
 **U08.** PostgreSQL alan tipi uuid olarak kalır. UUIDv7 üretim standardı bütün dış UUID girişlerini v7 diye reddetmek anlamına gelmez. FtkSaaS üretimi olan alanlarla sağlayıcı kimliği alanlarının şema/DTO eşlemesi teknik sohbette tamamlanır; yetki ve tenant kontrolü UUID sürümünden bağımsız uygulanır.
 
 **Durum:** Belge ve makine sözleşmesine üretim politikası işlendi. Ortam/üretici seçimi, alan bazlı ortak tip aktarımı, migration ve gerçek üretim/yarış testleri ayrı teknik sohbette yapılacaktır. Kodlama, kurulum veya dağıtım yapılmadı.
+
+## Q-E01 teknik aktarım ve gerçek API kabulü
+
+Yeni immutable migration: event_payment_finance. İlk altı migration değişmez. 90 core tablo, 182 sözleşme, 53 çağrılabilir işlem, 129 yalnız sözleşme.
+
+Ödeme hazırlığı/tahsilat/kesin kayıt bağı; yanlış borç/kısmi ödeme; ödenmiş iki hazırlığın son kontenjan yarışı; eşzamanlı aynı anahtar; önceki indirim/iade; açık mahsup; tahsilat, kapasite düzeltmesi ve işletme iptalinde geç hata sonrası tam rollback; tenant/merkez/para birimi/canlı rol denetimleri tests/event-payment.test.mjs ile gerçek Auth/Edge/RPC üzerinde sınanır. Paket iptalindeki ortak hak serbest bırakma önceki API kabulünde korunur.
+
+Yetkili kanıt reports/qe01-verification.json ve reports/qe01-acceptance.log. Kalan: 129 yalnız sözleşme işlem, üretim/kalıcı paylaşılan staging, dış e-posta, yük ve restore kabulü. Başlamış/kısmen gerçekleşmiş etkinliğin parasal iptali yeni karar gerektirir.

@@ -24,5 +24,24 @@ check('physical table/column coverage',()=>{for(const t of c.tables){const part=
 check('private baseline grants / RLS',()=>{for(const t of c.tables)assert(sql.includes('alter table core."'+t.name+'" enable row level security;'));assert(!/gen_random_uuid|uuid_generate_v4|uuid_generate_v5/i.test(sql));});
 check('Q-D01 product accepted and tags typed',()=>{assert(!c.open_product_decisions.some(x=>x.id==='Q-D01')); assert.equal(c.accepted_product_decisions.find(x=>x.id==='Q-D01').product_status,'accepted_closed');for(const n of ['Request_event_save','EventView'])assert(d[n].required.includes('discipline_ids'));assert(d.EventDisciplineIds.uniqueItems);assert(c.operations.find(o=>o.name==='event_register_v1').semantic_guards.includes('Q_D01_no_event_negative_credit'));});
 check('EntityType covers physical tables exactly',()=>assert.deepEqual(new Set(d.EntityType.enum),new Set(c.tables.map(t=>t.name))));
+check('Q-E01 accepted decision / preparation finance / typed terminal outcome',()=>{
+ assert(!c.open_product_decisions.some(x=>x.id==='Q-E01'));
+ assert.equal(c.accepted_product_decisions.find(x=>x.id==='Q-E01').product_status,'accepted_closed');
+ assert(d.Request_event_register.properties.preparation_id);
+ assert(d.Table_event_payment_preparations.properties.debt_id);
+ assert(d.Table_student_credit_movements.properties.source_debt_id);
+ assert.equal(d.EventCapacityClosed.properties.outcome.const,'capacity_closed');
+ assert(d.Success_event_register.properties.data.$ref.endsWith('/EventRegistrationResult'));
+ for(const example of JSON.parse(fs.readFileSync('examples/runtime-requests.json')).examples){
+  const op=c.operations.find(o=>o.name===example.operation);assert(op,example.operation);
+  const validate=ajv.getSchema('contract'+op.request.$ref);assert(validate(example.request),example.operation+': '+JSON.stringify(validate.errors));
+ }
+
+ for(const example of JSON.parse(fs.readFileSync('examples/event-payment-results.json')).examples){
+  const op=c.operations.find(o=>o.name===example.operation);const validate=ajv.getSchema('contract'+op.success.$ref);
+  assert(validate(example.response),example.operation+': '+JSON.stringify(validate.errors));
+ }
+
+});
 const report={contract:c.version,tables:c.tables.length,operations:c.operations.length,definitions:Object.keys(d).length,uuid_paths:c.uuid_field_map.length,references:refs,checks:results,scope:'static contract + physical source coverage; NOT Auth/RLS business/race/load/restore acceptance'};
 fs.writeFileSync('reports/consistency.json',JSON.stringify(report,null,2)+'\n');console.log(JSON.stringify({checks:results.length,tables:report.tables,operations:report.operations,definitions:report.definitions,status:'passed'}));

@@ -1,0 +1,38 @@
+{
+  "notice": "Synthetic response shapes; capacity_closed commits financial correction but is not a registration.",
+  "examples": [
+    {
+      "operation": "event_register_v1",
+      "response": {
+        "ok": true,
+        "data": {
+          "operation_id": "019a0000-0000-7000-8000-000000000001",
+          "primary_id": "019a0000-0000-7000-8000-000000000002",
+          "version": 1,
+          "replayed": false,
+          "related": [],
+          "outcome": "registered"
+        },
+        "trace_id": "019a0000-0000-7000-8000-000000000005"
+      }
+    },
+    {
+      "operation": "event_register_v1",
+      "response": {
+        "ok": true,
+        "data": {
+          "operation_id": "019a0000-0000-7000-8000-000000000001",
+          "preparation_id": "019a0000-0000-7000-8000-000000000003",
+          "debt_id": "019a0000-0000-7000-8000-000000000004",
+          "version": 2,
+          "replayed": false,
+          "outcome": "capacity_closed",
+          "remaining_removed_minor": "0",
+          "student_credit_added_minor": "1000",
+          "currency": "TRY"
+        },
+        "trace_id": "019a0000-0000-7000-8000-000000000005"
+      }
+    }
+  ]
+}

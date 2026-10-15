@@ -964,7 +964,8 @@
         "disciplines",
         "center_disciplines",
         "person_disciplines",
-        "event_disciplines"
+        "event_disciplines",
+        "event_payment_preparations"
       ]
     },
     "Interval": {
@@ -14226,6 +14227,16 @@
               "type": "null"
             }
           ]
+        },
+        "preparation_id": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/FtkUuid"
+            },
+            {
+              "type": "null"
+            }
+          ]
         }
       },
       "required": [
@@ -14236,7 +14247,25 @@
         "event_id",
         "person_id"
       ],
-      "additionalProperties": false
+      "additionalProperties": false,
+      "allOf": [
+        {
+          "not": {
+            "required": [
+              "sale_id",
+              "preparation_id"
+            ],
+            "properties": {
+              "sale_id": {
+                "type": "string"
+              },
+              "preparation_id": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      ]
     },
     "Success_event_register": {
       "type": "object",
@@ -14245,7 +14274,7 @@
           "const": true
         },
         "data": {
-          "$ref": "#/$defs/Mutation"
+          "$ref": "#/$defs/EventRegistrationResult"
         },
         "trace_id": {
           "$ref": "#/$defs/FtkUuid"
@@ -19391,6 +19420,26 @@
               "type": "null"
             }
           ]
+        },
+        "source_debt_id": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/FtkUuid"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "operation_id": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/FtkUuid"
+            },
+            {
+              "type": "null"
+            }
+          ]
         }
       },
       "required": [
@@ -22779,6 +22828,16 @@
               "type": "null"
             }
           ]
+        },
+        "preparation_id": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/FtkUuid"
+            },
+            {
+              "type": "null"
+            }
+          ]
         }
       },
       "required": [
@@ -22788,7 +22847,25 @@
         "event_id",
         "person_id"
       ],
-      "additionalProperties": false
+      "additionalProperties": false,
+      "allOf": [
+        {
+          "not": {
+            "required": [
+              "sale_id",
+              "preparation_id"
+            ],
+            "properties": {
+              "sale_id": {
+                "type": "string"
+              },
+              "preparation_id": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      ]
     },
     "Success_event_registration_preview": {
       "type": "object",
@@ -22918,10 +22995,361 @@
         "verified_at"
       ],
       "additionalProperties": false
+    },
+    "EventPaymentPreparationState": {
+      "type": "string",
+      "enum": [
+        "prepared",
+        "registered",
+        "capacity_closed",
+        "event_cancelled"
+      ]
+    },
+    "Table_event_payment_preparations": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/FtkUuid"
+        },
+        "created_at": {
+          "$ref": "#/$defs/Instant"
+        },
+        "version": {
+          "$ref": "#/$defs/PositiveInt"
+        },
+        "org_id": {
+          "$ref": "#/$defs/FtkUuid"
+        },
+        "center_id": {
+          "$ref": "#/$defs/FtkUuid"
+        },
+        "person_id": {
+          "$ref": "#/$defs/FtkUuid"
+        },
+        "event_id": {
+          "$ref": "#/$defs/FtkUuid"
+        },
+        "debt_id": {
+          "$ref": "#/$defs/FtkUuid"
+        },
+        "registration_id": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/FtkUuid"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "state": {
+          "$ref": "#/$defs/EventPaymentPreparationState"
+        },
+        "terms_snapshot": {
+          "$ref": "#/$defs/EventTerms"
+        },
+        "terms_hash": {
+          "$ref": "#/$defs/Text"
+        }
+      },
+      "required": [
+        "id",
+        "created_at",
+        "version",
+        "org_id",
+        "center_id",
+        "person_id",
+        "event_id",
+        "debt_id",
+        "registration_id",
+        "state",
+        "terms_snapshot",
+        "terms_hash"
+      ],
+      "additionalProperties": false
+    },
+    "EventPaymentPreparationView": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/FtkUuid"
+        },
+        "event_id": {
+          "$ref": "#/$defs/FtkUuid"
+        },
+        "person_id": {
+          "$ref": "#/$defs/FtkUuid"
+        },
+        "center_id": {
+          "$ref": "#/$defs/FtkUuid"
+        },
+        "debt_id": {
+          "$ref": "#/$defs/FtkUuid"
+        },
+        "registration_id": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/FtkUuid"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "state": {
+          "$ref": "#/$defs/EventPaymentPreparationState"
+        },
+        "version": {
+          "$ref": "#/$defs/PositiveInt"
+        },
+        "amount_minor": {
+          "$ref": "#/$defs/Money"
+        },
+        "currency": {
+          "$ref": "#/$defs/Currency"
+        },
+        "paid_minor": {
+          "$ref": "#/$defs/Money"
+        },
+        "remaining_minor": {
+          "$ref": "#/$defs/Money"
+        },
+        "credited_minor": {
+          "$ref": "#/$defs/Money"
+        },
+        "student_credit_available_minor": {
+          "$ref": "#/$defs/Money"
+        },
+        "terms": {
+          "$ref": "#/$defs/EventTerms"
+        }
+      },
+      "required": [
+        "id",
+        "event_id",
+        "person_id",
+        "center_id",
+        "debt_id",
+        "registration_id",
+        "state",
+        "version",
+        "amount_minor",
+        "currency",
+        "paid_minor",
+        "remaining_minor",
+        "credited_minor",
+        "student_credit_available_minor",
+        "terms"
+      ],
+      "additionalProperties": false
+    },
+    "EventRegistered": {
+      "type": "object",
+      "properties": {
+        "operation_id": {
+          "$ref": "#/$defs/FtkUuid"
+        },
+        "primary_id": {
+          "$ref": "#/$defs/FtkUuid"
+        },
+        "version": {
+          "$ref": "#/$defs/PositiveInt"
+        },
+        "replayed": {
+          "$ref": "#/$defs/Bool"
+        },
+        "related": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/EntityRef"
+          }
+        },
+        "outcome": {
+          "const": "registered"
+        }
+      },
+      "required": [
+        "operation_id",
+        "primary_id",
+        "replayed",
+        "related",
+        "outcome"
+      ],
+      "additionalProperties": false
+    },
+    "EventCapacityClosed": {
+      "type": "object",
+      "properties": {
+        "outcome": {
+          "const": "capacity_closed"
+        },
+        "operation_id": {
+          "$ref": "#/$defs/FtkUuid"
+        },
+        "preparation_id": {
+          "$ref": "#/$defs/FtkUuid"
+        },
+        "debt_id": {
+          "$ref": "#/$defs/FtkUuid"
+        },
+        "version": {
+          "$ref": "#/$defs/PositiveInt"
+        },
+        "replayed": {
+          "$ref": "#/$defs/Bool"
+        },
+        "remaining_removed_minor": {
+          "$ref": "#/$defs/Money"
+        },
+        "student_credit_added_minor": {
+          "$ref": "#/$defs/Money"
+        },
+        "currency": {
+          "$ref": "#/$defs/Currency"
+        }
+      },
+      "required": [
+        "outcome",
+        "operation_id",
+        "preparation_id",
+        "debt_id",
+        "version",
+        "replayed",
+        "remaining_removed_minor",
+        "student_credit_added_minor",
+        "currency"
+      ],
+      "additionalProperties": false
+    },
+    "EventRegistrationResult": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/EventRegistered"
+        },
+        {
+          "$ref": "#/$defs/EventCapacityClosed"
+        }
+      ]
+    },
+    "Request_event_payment_prepare": {
+      "type": "object",
+      "properties": {
+        "client_api_version": {
+          "const": 1
+        },
+        "request_id": {
+          "$ref": "#/$defs/FtkUuid"
+        },
+        "org_id": {
+          "$ref": "#/$defs/FtkUuid"
+        },
+        "center_id": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/FtkUuid"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "operation_key": {
+          "$ref": "#/$defs/FtkUuid"
+        },
+        "event_id": {
+          "$ref": "#/$defs/FtkUuid"
+        },
+        "person_id": {
+          "$ref": "#/$defs/FtkUuid"
+        }
+      },
+      "required": [
+        "client_api_version",
+        "request_id",
+        "org_id",
+        "operation_key",
+        "event_id",
+        "person_id"
+      ],
+      "additionalProperties": false
+    },
+    "Request_event_payment_get": {
+      "type": "object",
+      "properties": {
+        "client_api_version": {
+          "const": 1
+        },
+        "request_id": {
+          "$ref": "#/$defs/FtkUuid"
+        },
+        "org_id": {
+          "$ref": "#/$defs/FtkUuid"
+        },
+        "center_id": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/FtkUuid"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "preparation_id": {
+          "$ref": "#/$defs/FtkUuid"
+        }
+      },
+      "required": [
+        "client_api_version",
+        "request_id",
+        "org_id",
+        "preparation_id"
+      ],
+      "additionalProperties": false
+    },
+    "Success_event_payment_prepare": {
+      "type": "object",
+      "properties": {
+        "ok": {
+          "const": true
+        },
+        "data": {
+          "$ref": "#/$defs/EventPaymentPreparationView"
+        },
+        "trace_id": {
+          "$ref": "#/$defs/FtkUuid"
+        }
+      },
+      "required": [
+        "ok",
+        "data",
+        "trace_id"
+      ],
+      "additionalProperties": false
+    },
+    "Success_event_payment_get": {
+      "type": "object",
+      "properties": {
+        "ok": {
+          "const": true
+        },
+        "data": {
+          "$ref": "#/$defs/EventPaymentPreparationView"
+        },
+        "trace_id": {
+          "$ref": "#/$defs/FtkUuid"
+        }
+      },
+      "required": [
+        "ok",
+        "data",
+        "trace_id"
+      ],
+      "additionalProperties": false
     }
   },
   "x-contract": {
-    "version": "2.2-runtime.1",
+    "version": "2.2-runtime.2",
     "status": "development_runtime_with_declared_limits",
     "source": "02 v2.0, final15October2026 user decisions",
     "transport_codes": {
@@ -23964,6 +24392,16 @@
             "column": "previous_id",
             "target": "student_credit_movements",
             "same_tenant": true
+          },
+          {
+            "column": "source_debt_id",
+            "target": "debts",
+            "same_tenant": true
+          },
+          {
+            "column": "operation_id",
+            "target": "operation_receipts",
+            "same_tenant": true
           }
         ],
         "invariants": "Fazla tahsilat/refund claim, mahsup/iade; kullanılabilir bakiye>=0. İade hesabı önce aynı satış borç indirimi, sonra alacak."
@@ -24841,6 +25279,37 @@
           }
         ],
         "invariants": "Q-D01: zero/one/many labels; UQ(org,event,discipline); same org, no access grant. Exactly one label allows matching narrow scope with explicit event eligibility; zero/many only broad scopes. No event negative credit."
+      },
+      {
+        "name": "event_payment_preparations",
+        "module": "M13",
+        "scope": "C",
+        "schema": {
+          "$ref": "#/$defs/Table_event_payment_preparations"
+        },
+        "foreign_keys": [
+          {
+            "column": "event_id",
+            "target": "events",
+            "same_tenant": true
+          },
+          {
+            "column": "person_id",
+            "target": "people",
+            "same_tenant": true
+          },
+          {
+            "column": "debt_id",
+            "target": "debts",
+            "same_tenant": true
+          },
+          {
+            "column": "registration_id",
+            "target": "event_registrations",
+            "same_tenant": true
+          }
+        ],
+        "invariants": "Q-E01: no capacity held; one open preparation per event/person; unique scoped debt and registration; immutable financial snapshot; terminal closure cannot finance another registration."
       }
     ],
     "operations": [
@@ -24914,7 +25383,7 @@
           "A55"
         ],
         "configuration_policy": "numeric plan limits/prices and legal approval are deployment configuration, never arbitrary allow/deny",
-        "implementation_status": "operational_development",
+        "implementation_status": "operational_development_limited",
         "runtime_path": "/functions/v1/backend-v1/account_get_v1",
         "runtime_rpc": "api_v1.account_get_v1",
         "runtime_transport": "authenticated Edge adapter -> service-only RPC; rules/transaction in PostgreSQL",
@@ -25420,7 +25889,7 @@
           "A55"
         ],
         "configuration_policy": "numeric plan limits/prices and legal approval are deployment configuration, never arbitrary allow/deny",
-        "implementation_status": "operational_development",
+        "implementation_status": "operational_development_limited",
         "runtime_path": "/functions/v1/backend-v1/organization_create_v1",
         "runtime_rpc": "api_v1.organization_create_v1",
         "runtime_transport": "authenticated Edge adapter -> service-only RPC; rules/transaction in PostgreSQL",
@@ -25497,7 +25966,7 @@
           "A55"
         ],
         "configuration_policy": "numeric plan limits/prices and legal approval are deployment configuration, never arbitrary allow/deny",
-        "implementation_status": "operational_development",
+        "implementation_status": "operational_development_limited",
         "runtime_path": "/functions/v1/backend-v1/organization_get_v1",
         "runtime_rpc": "api_v1.organization_get_v1",
         "runtime_transport": "authenticated Edge adapter -> service-only RPC; rules/transaction in PostgreSQL",
@@ -26104,7 +26573,7 @@
           "A55"
         ],
         "configuration_policy": "numeric plan limits/prices and legal approval are deployment configuration, never arbitrary allow/deny",
-        "implementation_status": "operational_development",
+        "implementation_status": "operational_development_limited",
         "runtime_path": "/functions/v1/backend-v1/center_create_v1",
         "runtime_rpc": "api_v1.center_create_v1",
         "runtime_transport": "authenticated Edge adapter -> service-only RPC; rules/transaction in PostgreSQL",
@@ -26710,7 +27179,7 @@
           "A55"
         ],
         "configuration_policy": "numeric plan limits/prices and legal approval are deployment configuration, never arbitrary allow/deny",
-        "implementation_status": "operational_development",
+        "implementation_status": "operational_development_limited",
         "runtime_path": "/functions/v1/backend-v1/role_assign_v1",
         "runtime_rpc": "api_v1.role_assign_v1",
         "runtime_transport": "authenticated Edge adapter -> service-only RPC; rules/transaction in PostgreSQL",
@@ -26805,7 +27274,7 @@
           "A55"
         ],
         "configuration_policy": "numeric plan limits/prices and legal approval are deployment configuration, never arbitrary allow/deny",
-        "implementation_status": "operational_development",
+        "implementation_status": "operational_development_limited",
         "runtime_path": "/functions/v1/backend-v1/role_revoke_v1",
         "runtime_rpc": "api_v1.role_revoke_v1",
         "runtime_transport": "authenticated Edge adapter -> service-only RPC; rules/transaction in PostgreSQL",
@@ -26896,9 +27365,12 @@
           "A55"
         ],
         "configuration_policy": "numeric plan limits/prices and legal approval are deployment configuration, never arbitrary allow/deny",
-        "implementation_status": "operational_development",
+        "implementation_status": "operational_development_limited",
         "runtime_external_path": "/functions/v1/backend-v1/permission_set_v1",
-        "runtime_limits": []
+        "runtime_limits": [],
+        "runtime_path": "/functions/v1/backend-v1/permission_set_v1",
+        "runtime_rpc": "api_v1.permission_set_v1",
+        "runtime_transport": "authenticated Edge adapter -> service-only RPC; rules/transaction in PostgreSQL"
       },
       {
         "name": "org_manager_assign_v1",
@@ -26987,7 +27459,7 @@
           "A55"
         ],
         "configuration_policy": "numeric plan limits/prices and legal approval are deployment configuration, never arbitrary allow/deny",
-        "implementation_status": "operational_development",
+        "implementation_status": "operational_development_limited",
         "runtime_path": "/functions/v1/backend-v1/org_manager_assign_v1",
         "runtime_rpc": "api_v1.org_manager_assign_v1",
         "runtime_transport": "authenticated Edge adapter -> service-only RPC; rules/transaction in PostgreSQL",
@@ -27081,7 +27553,7 @@
           "A55"
         ],
         "configuration_policy": "numeric plan limits/prices and legal approval are deployment configuration, never arbitrary allow/deny",
-        "implementation_status": "operational_development",
+        "implementation_status": "operational_development_limited",
         "runtime_path": "/functions/v1/backend-v1/org_manager_revoke_v1",
         "runtime_rpc": "api_v1.org_manager_revoke_v1",
         "runtime_transport": "authenticated Edge adapter -> service-only RPC; rules/transaction in PostgreSQL",
@@ -27175,7 +27647,7 @@
           "A55"
         ],
         "configuration_policy": "numeric plan limits/prices and legal approval are deployment configuration, never arbitrary allow/deny",
-        "implementation_status": "operational_development",
+        "implementation_status": "operational_development_limited",
         "runtime_path": "/functions/v1/backend-v1/manager_self_assign_center_v1",
         "runtime_rpc": "api_v1.manager_self_assign_center_v1",
         "runtime_transport": "authenticated Edge adapter -> service-only RPC; rules/transaction in PostgreSQL",
@@ -27452,7 +27924,7 @@
           "A55"
         ],
         "configuration_policy": "numeric plan limits/prices and legal approval are deployment configuration, never arbitrary allow/deny",
-        "implementation_status": "operational_development",
+        "implementation_status": "operational_development_limited",
         "runtime_path": "/functions/v1/backend-v1/account_access_accept_v1",
         "runtime_rpc": "api_v1.account_access_accept_v1",
         "runtime_transport": "authenticated Edge adapter -> service-only RPC; rules/transaction in PostgreSQL",
@@ -27741,7 +28213,7 @@
           "A55"
         ],
         "configuration_policy": "numeric plan limits/prices and legal approval are deployment configuration, never arbitrary allow/deny",
-        "implementation_status": "operational_development",
+        "implementation_status": "operational_development_limited",
         "runtime_path": "/functions/v1/backend-v1/person_create_v1",
         "runtime_rpc": "api_v1.person_create_v1",
         "runtime_transport": "authenticated Edge adapter -> service-only RPC; rules/transaction in PostgreSQL",
@@ -27906,7 +28378,7 @@
           "A55"
         ],
         "configuration_policy": "numeric plan limits/prices and legal approval are deployment configuration, never arbitrary allow/deny",
-        "implementation_status": "operational_development",
+        "implementation_status": "operational_development_limited",
         "runtime_path": "/functions/v1/backend-v1/student_activate_v1",
         "runtime_rpc": "api_v1.student_activate_v1",
         "runtime_transport": "authenticated Edge adapter -> service-only RPC; rules/transaction in PostgreSQL",
@@ -28365,7 +28837,7 @@
           "D-A12"
         ],
         "configuration_policy": "numeric plan limits/prices and legal approval are deployment configuration, never arbitrary allow/deny",
-        "implementation_status": "operational_development",
+        "implementation_status": "operational_development_limited",
         "runtime_path": "/functions/v1/backend-v1/class_save_v1",
         "runtime_rpc": "api_v1.class_save_v1",
         "runtime_transport": "authenticated Edge adapter -> service-only RPC; rules/transaction in PostgreSQL",
@@ -28621,7 +29093,7 @@
           "D-A12"
         ],
         "configuration_policy": "numeric plan limits/prices and legal approval are deployment configuration, never arbitrary allow/deny",
-        "implementation_status": "operational_development",
+        "implementation_status": "operational_development_limited",
         "runtime_path": "/functions/v1/backend-v1/session_create_v1",
         "runtime_rpc": "api_v1.session_create_v1",
         "runtime_transport": "authenticated Edge adapter -> service-only RPC; rules/transaction in PostgreSQL",
@@ -30108,7 +30580,7 @@
           "D-A12"
         ],
         "configuration_policy": "numeric plan limits/prices and legal approval are deployment configuration, never arbitrary allow/deny",
-        "implementation_status": "operational_development",
+        "implementation_status": "operational_development_limited",
         "runtime_path": "/functions/v1/backend-v1/reservation_cancel_v1",
         "runtime_rpc": "api_v1.reservation_cancel_v1",
         "runtime_transport": "authenticated Edge adapter -> service-only RPC; rules/transaction in PostgreSQL",
@@ -31233,7 +31705,7 @@
           "D-A12"
         ],
         "configuration_policy": "numeric plan limits/prices and legal approval are deployment configuration, never arbitrary allow/deny",
-        "implementation_status": "operational_development",
+        "implementation_status": "operational_development_limited",
         "runtime_path": "/functions/v1/backend-v1/product_publish_v1",
         "runtime_rpc": "api_v1.product_publish_v1",
         "runtime_transport": "authenticated Edge adapter -> service-only RPC; rules/transaction in PostgreSQL",
@@ -31339,7 +31811,7 @@
           "D-A12"
         ],
         "configuration_policy": "numeric plan limits/prices and legal approval are deployment configuration, never arbitrary allow/deny",
-        "implementation_status": "operational_development",
+        "implementation_status": "operational_development_limited",
         "runtime_path": "/functions/v1/backend-v1/sale_preview_v1",
         "runtime_rpc": "api_v1.sale_preview_v1",
         "runtime_transport": "authenticated Edge adapter -> service-only RPC; rules/transaction in PostgreSQL",
@@ -31457,7 +31929,7 @@
           "D-A12"
         ],
         "configuration_policy": "numeric plan limits/prices and legal approval are deployment configuration, never arbitrary allow/deny",
-        "implementation_status": "operational_development",
+        "implementation_status": "operational_development_limited",
         "runtime_path": "/functions/v1/backend-v1/sale_apply_v1",
         "runtime_rpc": "api_v1.sale_apply_v1",
         "runtime_transport": "authenticated Edge adapter -> service-only RPC; rules/transaction in PostgreSQL",
@@ -31545,7 +32017,7 @@
           "D-A12"
         ],
         "configuration_policy": "numeric plan limits/prices and legal approval are deployment configuration, never arbitrary allow/deny",
-        "implementation_status": "operational_development",
+        "implementation_status": "operational_development_limited",
         "runtime_path": "/functions/v1/backend-v1/entitlements_get_v1",
         "runtime_rpc": "api_v1.entitlements_get_v1",
         "runtime_transport": "authenticated Edge adapter -> service-only RPC; rules/transaction in PostgreSQL",
@@ -33123,7 +33595,7 @@
           "A55"
         ],
         "configuration_policy": "numeric plan limits/prices and legal approval are deployment configuration, never arbitrary allow/deny",
-        "implementation_status": "operational_development",
+        "implementation_status": "operational_development_limited",
         "runtime_path": "/functions/v1/backend-v1/collection_record_v1",
         "runtime_rpc": "api_v1.collection_record_v1",
         "runtime_transport": "authenticated Edge adapter -> service-only RPC; rules/transaction in PostgreSQL",
@@ -33382,7 +33854,12 @@
           "D-A12"
         ],
         "configuration_policy": "numeric plan limits/prices and legal approval are deployment configuration, never arbitrary allow/deny",
-        "implementation_status": "contract_only"
+        "implementation_status": "operational_development_limited",
+        "runtime_path": "/functions/v1/backend-v1/student_credit_refund_v1",
+        "runtime_rpc": "api_v1.student_credit_refund_v1",
+        "runtime_external_path": "/functions/v1/backend-v1/student_credit_refund_v1",
+        "runtime_transport": "authenticated Edge adapter -> service-only RPC; rules/transaction in PostgreSQL",
+        "runtime_limits": []
       },
       {
         "name": "student_credit_offset_v1",
@@ -33474,7 +33951,12 @@
           "D-A12"
         ],
         "configuration_policy": "numeric plan limits/prices and legal approval are deployment configuration, never arbitrary allow/deny",
-        "implementation_status": "contract_only"
+        "implementation_status": "operational_development_limited",
+        "runtime_path": "/functions/v1/backend-v1/student_credit_offset_v1",
+        "runtime_rpc": "api_v1.student_credit_offset_v1",
+        "runtime_external_path": "/functions/v1/backend-v1/student_credit_offset_v1",
+        "runtime_transport": "authenticated Edge adapter -> service-only RPC; rules/transaction in PostgreSQL",
+        "runtime_limits": []
       },
       {
         "name": "debt_adjust_v1",
@@ -33512,7 +33994,8 @@
           "SUBSCRIPTION_NOT_STARTED",
           "TEMPORARY_FAILURE",
           "VALIDATION_FAILED",
-          "VERSION_CONFLICT"
+          "VERSION_CONFLICT",
+          "INVALID_STATE_TRANSITION"
         ],
         "transaction_class": "money",
         "transaction_guarantee": "Merkez/kişi/currency kilidi + nakit/borç/alacak dağıtımı veya bağlı düzeltmeler + audit/outbox/receipt atomik; eski hareket silinmez.",
@@ -33557,7 +34040,12 @@
           "A55"
         ],
         "configuration_policy": "numeric plan limits/prices and legal approval are deployment configuration, never arbitrary allow/deny",
-        "implementation_status": "contract_only"
+        "implementation_status": "operational_development_limited",
+        "runtime_path": "/functions/v1/backend-v1/debt_adjust_v1",
+        "runtime_rpc": "api_v1.debt_adjust_v1",
+        "runtime_external_path": "/functions/v1/backend-v1/debt_adjust_v1",
+        "runtime_transport": "authenticated Edge adapter -> service-only RPC; rules/transaction in PostgreSQL",
+        "runtime_limits": []
       },
       {
         "name": "instructor_agreement_publish_v1",
@@ -35400,7 +35888,7 @@
           "A55"
         ],
         "configuration_policy": "numeric plan limits/prices and legal approval are deployment configuration, never arbitrary allow/deny",
-        "implementation_status": "operational_development",
+        "implementation_status": "operational_development_limited",
         "runtime_path": "/functions/v1/backend-v1/subscription_get_v1",
         "runtime_rpc": "api_v1.subscription_get_v1",
         "runtime_transport": "authenticated Edge adapter -> service-only RPC; rules/transaction in PostgreSQL",
@@ -35814,7 +36302,7 @@
           "A55"
         ],
         "configuration_policy": "numeric plan limits/prices and legal approval are deployment configuration, never arbitrary allow/deny",
-        "implementation_status": "operational_development",
+        "implementation_status": "operational_development_limited",
         "runtime_path": "/functions/v1/backend-v1/saas_payment_submit_v1",
         "runtime_rpc": "api_v1.saas_payment_submit_v1",
         "runtime_transport": "authenticated Edge adapter -> service-only RPC; rules/transaction in PostgreSQL",
@@ -35911,7 +36399,7 @@
           "A55"
         ],
         "configuration_policy": "numeric plan limits/prices and legal approval are deployment configuration, never arbitrary allow/deny",
-        "implementation_status": "operational_development",
+        "implementation_status": "operational_development_limited",
         "runtime_path": "/functions/v1/backend-v1/saas_payment_verify_v1",
         "runtime_rpc": "api_v1.saas_payment_verify_v1",
         "runtime_transport": "authenticated Edge adapter -> service-only RPC; rules/transaction in PostgreSQL",
@@ -36101,7 +36589,7 @@
           "Q-D01-A08"
         ],
         "configuration_policy": "numeric plan limits/prices and legal approval are deployment configuration, never arbitrary allow/deny",
-        "implementation_status": "operational_development",
+        "implementation_status": "operational_development_limited",
         "runtime_path": "/functions/v1/backend-v1/event_save_v1",
         "runtime_rpc": "api_v1.event_save_v1",
         "runtime_transport": "authenticated Edge adapter -> service-only RPC; rules/transaction in PostgreSQL",
@@ -36208,7 +36696,7 @@
           "Q-D01-A08"
         ],
         "configuration_policy": "numeric plan limits/prices and legal approval are deployment configuration, never arbitrary allow/deny",
-        "implementation_status": "operational_development",
+        "implementation_status": "operational_development_limited",
         "runtime_path": "/functions/v1/backend-v1/event_publish_v1",
         "runtime_rpc": "api_v1.event_publish_v1",
         "runtime_transport": "authenticated Edge adapter -> service-only RPC; rules/transaction in PostgreSQL",
@@ -36267,7 +36755,7 @@
           "INVITATION_UNAVAILABLE"
         ],
         "transaction_class": "reservation",
-        "transaction_guarantee": "Org/öğrenci limit kapısı + seans/yer + kaynak uygunluğu + belge/politika + allocation/deficit/quota + rezervasyon/teklif + audit/outbox/receipt atomik.",
+        "transaction_guarantee": "Current authority/org lock + payment allocation/current debt + capacity: register against the existing preparation debt, or commit capacity_closed with linked debt reversal and exactly-once student credit. Receipt/audit/outbox atomic in both success outcomes.",
         "transition": {
           "entity": "event_registrations",
           "from": [],
@@ -36296,12 +36784,15 @@
           "Q_D01_event_labels_same_org_not_grants",
           "Q_D01_no_event_negative_credit",
           "Q_D01_single_label_narrow_or_broad_zero_many_broad_only",
-          "atomic_single_pool_available_entitlement_reservation"
+          "atomic_single_pool_available_entitlement_reservation",
+          "Q_E01_scoped_payment_preparation",
+          "Q_E01_no_duplicate_refund_claim",
+          "Q_E01_prestart_operator_cancel_full_reversal"
         ],
         "audit": true,
         "notification": "outbox_if_user_visible_business_result",
         "concurrency": "global_lock_order_and_current_scope; version on updates; preview dependencies on apply",
-        "expected_version_subject": "sale_id",
+        "expected_version_subject": "event/preparation/entitlement dependencies",
         "acceptance_scenario_ids": [
           "A01",
           "A02",
@@ -36346,9 +36837,7 @@
         "runtime_rpc": "api_v1.event_register_v1",
         "runtime_transport": "authenticated Edge adapter -> service-only RPC; rules/transaction in PostgreSQL",
         "runtime_external_path": "/functions/v1/backend-v1/event_register_v1",
-        "runtime_limits": [
-          "Q-E01: paid manual full-payment pre-registration flow blocked"
-        ]
+        "runtime_limits": []
       },
       {
         "name": "event_registration_cancel_v1",
@@ -36469,7 +36958,7 @@
           "Q-D01-A08"
         ],
         "configuration_policy": "numeric plan limits/prices and legal approval are deployment configuration, never arbitrary allow/deny",
-        "implementation_status": "operational_development",
+        "implementation_status": "operational_development_limited",
         "runtime_path": "/functions/v1/backend-v1/event_registration_cancel_v1",
         "runtime_rpc": "api_v1.event_registration_cancel_v1",
         "runtime_transport": "authenticated Edge adapter -> service-only RPC; rules/transaction in PostgreSQL",
@@ -36585,7 +37074,7 @@
           "Q-D01-A08"
         ],
         "configuration_policy": "numeric plan limits/prices and legal approval are deployment configuration, never arbitrary allow/deny",
-        "implementation_status": "operational_development",
+        "implementation_status": "operational_development_limited",
         "runtime_path": "/functions/v1/backend-v1/event_complete_v1",
         "runtime_rpc": "api_v1.event_complete_v1",
         "runtime_transport": "authenticated Edge adapter -> service-only RPC; rules/transaction in PostgreSQL",
@@ -36702,9 +37191,12 @@
           "Q-D01-A08"
         ],
         "configuration_policy": "numeric plan limits/prices and legal approval are deployment configuration, never arbitrary allow/deny",
-        "implementation_status": "operational_development",
+        "implementation_status": "operational_development_limited",
         "runtime_external_path": "/functions/v1/backend-v1/event_duty_verify_v1",
-        "runtime_limits": []
+        "runtime_limits": [],
+        "runtime_path": "/functions/v1/backend-v1/event_duty_verify_v1",
+        "runtime_rpc": "api_v1.event_duty_verify_v1",
+        "runtime_transport": "authenticated Edge adapter -> service-only RPC; rules/transaction in PostgreSQL"
       },
       {
         "name": "event_cancel_preview_v1",
@@ -36767,7 +37259,10 @@
           "event_terms_not_lesson_defaults",
           "at_least_one_instructor_or_assistant",
           "active_student_limit_no_candidate_event_exception",
-          "Q_D01_event_labels_same_org_not_grants"
+          "Q_D01_event_labels_same_org_not_grants",
+          "Q_E01_scoped_payment_preparation",
+          "Q_E01_no_duplicate_refund_claim",
+          "Q_E01_prestart_operator_cancel_full_reversal"
         ],
         "audit": true,
         "notification": "outbox_if_user_visible_business_result",
@@ -36808,8 +37303,11 @@
         "implementation_status": "operational_development_limited",
         "runtime_external_path": "/functions/v1/backend-v1/event_cancel_preview_v1",
         "runtime_limits": [
-          "Q-E01: manual monetary refund formulas blocked"
-        ]
+          "Started or partially occurred event monetary cancellation: POLICY_NOT_CONFIGURED pending a separate product decision."
+        ],
+        "runtime_path": "/functions/v1/backend-v1/event_cancel_preview_v1",
+        "runtime_rpc": "api_v1.event_cancel_preview_v1",
+        "runtime_transport": "authenticated Edge adapter -> service-only RPC; rules/transaction in PostgreSQL"
       },
       {
         "name": "event_cancel_apply_v1",
@@ -36886,7 +37384,10 @@
           "event_terms_not_lesson_defaults",
           "at_least_one_instructor_or_assistant",
           "active_student_limit_no_candidate_event_exception",
-          "Q_D01_event_labels_same_org_not_grants"
+          "Q_D01_event_labels_same_org_not_grants",
+          "Q_E01_scoped_payment_preparation",
+          "Q_E01_no_duplicate_refund_claim",
+          "Q_E01_prestart_operator_cancel_full_reversal"
         ],
         "audit": true,
         "notification": "outbox_if_user_visible_business_result",
@@ -36927,8 +37428,11 @@
         "implementation_status": "operational_development_limited",
         "runtime_external_path": "/functions/v1/backend-v1/event_cancel_apply_v1",
         "runtime_limits": [
-          "Q-E01: manual monetary refund formulas blocked"
-        ]
+          "Started or partially occurred event monetary cancellation: POLICY_NOT_CONFIGURED pending a separate product decision."
+        ],
+        "runtime_path": "/functions/v1/backend-v1/event_cancel_apply_v1",
+        "runtime_rpc": "api_v1.event_cancel_apply_v1",
+        "runtime_transport": "authenticated Edge adapter -> service-only RPC; rules/transaction in PostgreSQL"
       },
       {
         "name": "event_list_v1",
@@ -38848,7 +39352,7 @@
           "Q-D01-A08"
         ],
         "configuration_policy": "numeric plan limits/prices and legal approval are deployment configuration, never arbitrary allow/deny",
-        "implementation_status": "operational_development",
+        "implementation_status": "operational_development_limited",
         "runtime_path": "/functions/v1/backend-v1/event_attendance_mark_v1",
         "runtime_rpc": "api_v1.event_attendance_mark_v1",
         "runtime_transport": "authenticated Edge adapter -> service-only RPC; rules/transaction in PostgreSQL",
@@ -38943,7 +39447,7 @@
           "A55"
         ],
         "configuration_policy": "numeric plan limits/prices and legal approval are deployment configuration, never arbitrary allow/deny",
-        "implementation_status": "operational_development",
+        "implementation_status": "operational_development_limited",
         "runtime_path": "/functions/v1/backend-v1/platform_owner_set_v1",
         "runtime_rpc": "api_v1.platform_owner_set_v1",
         "runtime_transport": "authenticated Edge adapter -> service-only RPC; rules/transaction in PostgreSQL",
@@ -39038,7 +39542,7 @@
           "A55"
         ],
         "configuration_policy": "numeric plan limits/prices and legal approval are deployment configuration, never arbitrary allow/deny",
-        "implementation_status": "operational_development",
+        "implementation_status": "operational_development_limited",
         "runtime_path": "/functions/v1/backend-v1/platform_owner_remove_v1",
         "runtime_rpc": "api_v1.platform_owner_remove_v1",
         "runtime_transport": "authenticated Edge adapter -> service-only RPC; rules/transaction in PostgreSQL",
@@ -39132,7 +39636,7 @@
           "A55"
         ],
         "configuration_policy": "numeric plan limits/prices and legal approval are deployment configuration, never arbitrary allow/deny",
-        "implementation_status": "operational_development",
+        "implementation_status": "operational_development_limited",
         "runtime_path": "/functions/v1/backend-v1/center_manager_assign_v1",
         "runtime_rpc": "api_v1.center_manager_assign_v1",
         "runtime_transport": "authenticated Edge adapter -> service-only RPC; rules/transaction in PostgreSQL",
@@ -39226,7 +39730,7 @@
           "A55"
         ],
         "configuration_policy": "numeric plan limits/prices and legal approval are deployment configuration, never arbitrary allow/deny",
-        "implementation_status": "operational_development",
+        "implementation_status": "operational_development_limited",
         "runtime_path": "/functions/v1/backend-v1/center_manager_revoke_v1",
         "runtime_rpc": "api_v1.center_manager_revoke_v1",
         "runtime_transport": "authenticated Edge adapter -> service-only RPC; rules/transaction in PostgreSQL",
@@ -39463,7 +39967,7 @@
           "Q-D01-A08"
         ],
         "configuration_policy": "numeric plan limits/prices and legal approval are deployment configuration, never arbitrary allow/deny",
-        "implementation_status": "operational_development",
+        "implementation_status": "operational_development_limited",
         "runtime_path": "/functions/v1/backend-v1/event_attendance_close_v1",
         "runtime_rpc": "api_v1.event_attendance_close_v1",
         "runtime_transport": "authenticated Edge adapter -> service-only RPC; rules/transaction in PostgreSQL",
@@ -39591,7 +40095,7 @@
           "Q-D01-A08"
         ],
         "configuration_policy": "numeric plan limits/prices and legal approval are deployment configuration, never arbitrary allow/deny",
-        "implementation_status": "operational_development",
+        "implementation_status": "operational_development_limited",
         "runtime_path": "/functions/v1/backend-v1/event_attendance_correct_v1",
         "runtime_rpc": "api_v1.event_attendance_correct_v1",
         "runtime_transport": "authenticated Edge adapter -> service-only RPC; rules/transaction in PostgreSQL",
@@ -39892,7 +40396,7 @@
           "A03"
         ],
         "configuration_policy": "numeric plan limits/prices and legal approval are deployment configuration, never arbitrary allow/deny",
-        "implementation_status": "operational_development",
+        "implementation_status": "operational_development_limited",
         "runtime_path": "/functions/v1/backend-v1/discipline_save_v1",
         "runtime_rpc": "api_v1.discipline_save_v1",
         "runtime_transport": "authenticated Edge adapter -> service-only RPC; rules/transaction in PostgreSQL",
@@ -39971,7 +40475,7 @@
           "A03"
         ],
         "configuration_policy": "numeric plan limits/prices and legal approval are deployment configuration, never arbitrary allow/deny",
-        "implementation_status": "operational_development",
+        "implementation_status": "operational_development_limited",
         "runtime_path": "/functions/v1/backend-v1/center_discipline_set_v1",
         "runtime_rpc": "api_v1.center_discipline_set_v1",
         "runtime_transport": "authenticated Edge adapter -> service-only RPC; rules/transaction in PostgreSQL",
@@ -40123,7 +40627,7 @@
           "Q-D01-A08"
         ],
         "configuration_policy": "numeric plan limits/prices and legal approval are deployment configuration, never arbitrary allow/deny",
-        "implementation_status": "operational_development",
+        "implementation_status": "operational_development_limited",
         "runtime_path": "/functions/v1/backend-v1/event_get_v1",
         "runtime_rpc": "api_v1.event_get_v1",
         "runtime_transport": "authenticated Edge adapter -> service-only RPC; rules/transaction in PostgreSQL",
@@ -40182,7 +40686,10 @@
         "semantic_guards": [
           "live_actor_and_scope",
           "Q_D01_no_event_negative_credit",
-          "shared_entitlement_pool_recheck_at_commit"
+          "shared_entitlement_pool_recheck_at_commit",
+          "Q_E01_scoped_payment_preparation",
+          "Q_E01_no_duplicate_refund_claim",
+          "Q_E01_prestart_operator_cancel_full_reversal"
         ],
         "audit": false,
         "notification": "outbox_if_user_visible_business_result",
@@ -40216,9 +40723,170 @@
         "runtime_rpc": "api_v1.event_registration_preview_v1",
         "runtime_transport": "authenticated Edge adapter -> service-only RPC; rules/transaction in PostgreSQL",
         "runtime_external_path": "/functions/v1/backend-v1/event_registration_preview_v1",
-        "runtime_limits": [
-          "Q-E01 blockers are explicit; apply always rechecks current data"
-        ]
+        "runtime_limits": []
+      },
+      {
+        "name": "event_payment_prepare_v1",
+        "module": "M13",
+        "features": [
+          "F29"
+        ],
+        "permission": "event.register",
+        "actor_source": "server_verified",
+        "transport": "W",
+        "billing_class": "new",
+        "request": {
+          "$ref": "#/$defs/Request_event_payment_prepare"
+        },
+        "success": {
+          "$ref": "#/$defs/Success_event_payment_prepare"
+        },
+        "errors": [
+          "ASSISTANT_PARTICIPANT_CONFLICT",
+          "AUTH_REQUIRED",
+          "BILLING_OPERATION_RESTRICTED",
+          "CAPACITY_FULL",
+          "CLASS_ACCESS_DENIED",
+          "CLIENT_UPDATE_REQUIRED",
+          "CREDIT_LIMIT_EXCEEDED",
+          "DOCUMENT_REQUIRED",
+          "ENTITLEMENT_UNAVAILABLE",
+          "FORBIDDEN",
+          "IDEMPOTENCY_PAYLOAD_MISMATCH",
+          "INTEGRITY_VIOLATION",
+          "NOT_FOUND",
+          "OFFER_UNAVAILABLE",
+          "OPERATION_IN_PROGRESS",
+          "OPERATION_RESULT_EXPIRED",
+          "PARTICIPATION_BLOCKED",
+          "PLAN_FEATURE_UNAVAILABLE",
+          "PLAN_LIMIT_REACHED",
+          "POLICY_NOT_CONFIGURED",
+          "QUOTA_EXCEEDED",
+          "RESERVATION_EXISTS",
+          "RESOURCE_CONFLICT",
+          "SERVICE_UNAVAILABLE",
+          "SESSION_REVOKED",
+          "SUBSCRIPTION_NOT_STARTED",
+          "TEMPORARY_FAILURE",
+          "VALIDATION_FAILED",
+          "VERSION_CONFLICT",
+          "INVALID_STATE_TRANSITION",
+          "PREVIEW_STALE",
+          "ACCOUNT_ALREADY_LINKED",
+          "INVITATION_UNAVAILABLE"
+        ],
+        "transaction_class": "money",
+        "transaction_guarantee": "Q-E01: scoped existing debt/finance journal, no seat on preparation; live authorization and atomic receipt/audit/outbox.",
+        "transition": {
+          "entity": "event_payment_preparations",
+          "from": [],
+          "to": [
+            "prepared"
+          ],
+          "condition": "active published paid/manual/full-payment event; no seat or entitlement allocation"
+        },
+        "semantic_guards": [
+          "live_actor_and_scope",
+          "Q_E01_no_capacity_on_preparation",
+          "Q_E01_single_scoped_debt",
+          "same_key_same_payload_replay"
+        ],
+        "audit": true,
+        "notification": "outbox_if_user_visible_business_result",
+        "concurrency": "global_lock_order_and_current_scope; version on updates; preview dependencies on apply",
+        "expected_version_subject": "event_id",
+        "acceptance_scenario_ids": [
+          "Q-E01-A01",
+          "Q-E01-A02",
+          "Q-E01-A03"
+        ],
+        "configuration_policy": "numeric plan limits/prices and legal approval are deployment configuration, never arbitrary allow/deny",
+        "implementation_status": "operational_development_limited",
+        "runtime_path": "/functions/v1/backend-v1/event_payment_prepare_v1",
+        "runtime_rpc": "api_v1.event_payment_prepare_v1",
+        "runtime_transport": "authenticated Edge adapter -> service-only RPC; rules/transaction in PostgreSQL",
+        "runtime_external_path": "/functions/v1/backend-v1/event_payment_prepare_v1",
+        "runtime_limits": []
+      },
+      {
+        "name": "event_payment_get_v1",
+        "module": "M13",
+        "features": [
+          "F29"
+        ],
+        "permission": "person.read",
+        "actor_source": "server_verified",
+        "transport": "R",
+        "billing_class": "read",
+        "request": {
+          "$ref": "#/$defs/Request_event_payment_get"
+        },
+        "success": {
+          "$ref": "#/$defs/Success_event_payment_get"
+        },
+        "errors": [
+          "ASSISTANT_PARTICIPANT_CONFLICT",
+          "AUTH_REQUIRED",
+          "BILLING_OPERATION_RESTRICTED",
+          "CAPACITY_FULL",
+          "CLASS_ACCESS_DENIED",
+          "CLIENT_UPDATE_REQUIRED",
+          "CREDIT_LIMIT_EXCEEDED",
+          "DOCUMENT_REQUIRED",
+          "ENTITLEMENT_UNAVAILABLE",
+          "FORBIDDEN",
+          "IDEMPOTENCY_PAYLOAD_MISMATCH",
+          "INTEGRITY_VIOLATION",
+          "NOT_FOUND",
+          "OFFER_UNAVAILABLE",
+          "OPERATION_IN_PROGRESS",
+          "OPERATION_RESULT_EXPIRED",
+          "PARTICIPATION_BLOCKED",
+          "PLAN_FEATURE_UNAVAILABLE",
+          "PLAN_LIMIT_REACHED",
+          "POLICY_NOT_CONFIGURED",
+          "QUOTA_EXCEEDED",
+          "RESERVATION_EXISTS",
+          "RESOURCE_CONFLICT",
+          "SERVICE_UNAVAILABLE",
+          "SESSION_REVOKED",
+          "SUBSCRIPTION_NOT_STARTED",
+          "TEMPORARY_FAILURE",
+          "VALIDATION_FAILED",
+          "VERSION_CONFLICT",
+          "INVALID_STATE_TRANSITION",
+          "PREVIEW_STALE",
+          "ACCOUNT_ALREADY_LINKED",
+          "INVITATION_UNAVAILABLE"
+        ],
+        "transaction_class": "read",
+        "transaction_guarantee": "Q-E01: scoped existing debt/finance journal, no seat on preparation; live authorization and atomic receipt/audit/outbox.",
+        "transition": {
+          "effect": "read_only_business",
+          "from": [],
+          "to": []
+        },
+        "semantic_guards": [
+          "live_actor_and_scope",
+          "scoped_financial_projection"
+        ],
+        "audit": false,
+        "notification": "outbox_if_user_visible_business_result",
+        "concurrency": "global_lock_order_and_current_scope; version on updates; preview dependencies on apply",
+        "expected_version_subject": "preparation_id",
+        "acceptance_scenario_ids": [
+          "Q-E01-A01",
+          "Q-E01-A02",
+          "Q-E01-A03"
+        ],
+        "configuration_policy": "numeric plan limits/prices and legal approval are deployment configuration, never arbitrary allow/deny",
+        "implementation_status": "operational_development_limited",
+        "runtime_path": "/functions/v1/backend-v1/event_payment_get_v1",
+        "runtime_rpc": "api_v1.event_payment_get_v1",
+        "runtime_transport": "authenticated Edge adapter -> service-only RPC; rules/transaction in PostgreSQL",
+        "runtime_external_path": "/functions/v1/backend-v1/event_payment_get_v1",
+        "runtime_limits": []
       }
     ],
     "policy_value_map": {
@@ -40348,6 +41016,25 @@
           }
         ],
         "technical_catalog_ready": true
+      },
+      {
+        "id": "Q-E01",
+        "accepted_date": "2026-10-16",
+        "status": "implemented_real_api_acceptance",
+        "rules": [
+          {
+            "id": "E01",
+            "rule": "Payment preparation holds no seat; collection explicitly links its scoped debt; full allocated payment and capacity rechecked atomically."
+          },
+          {
+            "id": "E02",
+            "rule": "Paid capacity failure closes preparation, reverses obligation and creates only the unclaimed student credit; successful capacity_closed outcome commits all journals and receipt."
+          },
+          {
+            "id": "E03",
+            "rule": "Prestart complete operator cancellation removes remaining debt and credits paid amounts once; package rights released without monetary credit. Started/partial monetary cancellation requires a separate decision."
+          }
+        ]
       }
     ],
     "uuid_generation_policy": {
@@ -45307,6 +45994,12 @@
         "generation": "uuidv7"
       },
       {
+        "path": "#/$defs/Request_event_register/properties/preparation_id/anyOf/0",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
         "path": "#/$defs/Success_event_register/properties/trace_id",
         "origin": "ftksaas",
         "acceptance": "generic_uuid",
@@ -47989,6 +48682,18 @@
         "generation": "uuidv7"
       },
       {
+        "path": "#/$defs/Table_student_credit_movements/properties/source_debt_id/anyOf/0",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Table_student_credit_movements/properties/operation_id/anyOf/0",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
         "path": "#/$defs/Table_debt_adjustments/properties/id",
         "origin": "ftksaas",
         "acceptance": "generic_uuid",
@@ -49411,6 +50116,12 @@
         "generation": "uuidv7"
       },
       {
+        "path": "#/$defs/Request_event_registration_preview/properties/preparation_id/anyOf/0",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
         "path": "#/$defs/Success_event_registration_preview/properties/trace_id",
         "origin": "ftksaas",
         "acceptance": "generic_uuid",
@@ -49439,21 +50150,189 @@
         "origin": "ftksaas",
         "acceptance": "generic_uuid",
         "generation": "uuidv7"
-      }
-    ],
-    "open_product_decisions": [
+      },
       {
-        "id": "Q-E01",
-        "status": "awaiting_product_decision",
-        "topic": "Manual event prepayment with full-payment gate; operator-cancellation monetary refund terms",
-        "source_gap": "EventTerms has shared product refund formulas; event_register has no prepayment reference or explicit offset choice",
-        "document": "docs/decisions/Q-E01.md",
-        "blocked_paths": [
-          "paid_manual_full_payment_registration",
-          "manual_operator_cancel_requiring_refund_formula"
-        ]
+        "path": "#/$defs/Table_event_payment_preparations/properties/id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Table_event_payment_preparations/properties/org_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Table_event_payment_preparations/properties/center_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Table_event_payment_preparations/properties/person_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Table_event_payment_preparations/properties/event_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Table_event_payment_preparations/properties/debt_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Table_event_payment_preparations/properties/registration_id/anyOf/0",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/EventPaymentPreparationView/properties/id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/EventPaymentPreparationView/properties/event_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/EventPaymentPreparationView/properties/person_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/EventPaymentPreparationView/properties/center_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/EventPaymentPreparationView/properties/debt_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/EventPaymentPreparationView/properties/registration_id/anyOf/0",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/EventRegistered/properties/operation_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/EventRegistered/properties/primary_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/EventCapacityClosed/properties/operation_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/EventCapacityClosed/properties/preparation_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/EventCapacityClosed/properties/debt_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Request_event_payment_prepare/properties/request_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Request_event_payment_prepare/properties/org_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Request_event_payment_prepare/properties/center_id/anyOf/0",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Request_event_payment_prepare/properties/operation_key",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Request_event_payment_prepare/properties/event_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Request_event_payment_prepare/properties/person_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Request_event_payment_get/properties/request_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Request_event_payment_get/properties/org_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Request_event_payment_get/properties/center_id/anyOf/0",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Request_event_payment_get/properties/preparation_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Success_event_payment_prepare/properties/trace_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Success_event_payment_get/properties/trace_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
       }
     ],
+    "open_product_decisions": [],
     "accepted_product_decisions": [
       {
         "id": "Q-D01",
@@ -49464,6 +50343,13 @@
         "single_label": "explicit_event_eligibility_and_matching_narrow_or_broad_scope",
         "zero_or_many_labels": "explicit_event_eligibility_and_broad_scope_only",
         "negative_credit": "never_for_events",
+        "required_followup": []
+      },
+      {
+        "id": "Q-E01",
+        "source": "docs/decisions/Q-E01-accepted.md",
+        "product_status": "accepted_closed",
+        "technical_status": "implemented_real_api_acceptance",
         "required_followup": []
       }
     ],
@@ -49508,7 +50394,7 @@
       }
     ],
     "runtime": {
-      "version": "0.2.0-rc.1",
+      "version": "0.2.0-rc.2",
       "repository": "https://github.com/SXQHex/FtkSaaS",
       "branch": "backend/runtime-v0.2.0",
       "implemented_operations": [
@@ -49559,14 +50445,19 @@
         "permission_set_v1",
         "event_duty_verify_v1",
         "event_cancel_preview_v1",
-        "event_cancel_apply_v1"
+        "event_cancel_apply_v1",
+        "event_payment_prepare_v1",
+        "event_payment_get_v1",
+        "student_credit_refund_v1",
+        "student_credit_offset_v1",
+        "debt_adjust_v1"
       ],
       "auth": "Supabase getUser + live auth.sessions + current account/link/role; no request actor claims",
       "uuid": "backend uuid@14.0.3 v7 for all inserted IDs; DB defaults not required",
       "external_transport": "POST /functions/v1/backend-v1/{operation}; direct typed request body",
       "internal_rpc": "service-only api_v1 named functions; actor/session/UUID bank supplied by verified gateway",
-      "migration_count": 6,
-      "test_evidence": "reports/verification.json",
+      "migration_count": 7,
+      "test_evidence": "reports/qe01-verification.json",
       "frontend_unchanged": true
     }
   }

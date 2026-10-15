@@ -24,7 +24,7 @@ for o in ops:
  sql.append(f"revoke all on function api_v1.{o['name']}(jsonb,uuid,uuid,uuid[],jsonb) from public,anon,authenticated;")
  sql.append(f"grant execute on function api_v1.{o['name']}(jsonb,uuid,uuid,uuid[],jsonb) to service_role;")
 sql += ['revoke all on all functions in schema private from public,anon,authenticated;','grant execute on all functions in schema private to service_role;',"notify pgrst,'reload schema';",'commit;']
-files={'supabase/functions/backend-v1/contract.json':json.dumps(runtime,separators=(',',':'),ensure_ascii=False),'database/wrappers.sql':'\n'.join(sql)+'\n'}
+files={'supabase/functions/backend-v1/contract.json':json.dumps(runtime,separators=(',',':'),ensure_ascii=False),'database/runtime-wrappers.sql':'\n'.join(sql)+'\n'}
 files['packages/contracts/src/runtime.ts']='// Generated callable development operations; see endpoint inventory for limits.\nexport const runtimeOperationNames = '+json.dumps(names,indent=2)+' as const;\nexport type RuntimeOperationName = typeof runtimeOperationNames[number];\n'
 for name,content in files.items():
  f=Path(name)

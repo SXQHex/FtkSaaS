@@ -181,4 +181,6 @@ export interface Operations {
   person_discipline_set_v1: {request: T.RequestPersonDisciplineSet; response: T.SuccessPersonDisciplineSet};
   event_get_v1: {request: T.RequestEventGet; response: T.SuccessEventGet};
   event_registration_preview_v1: {request: T.RequestEventRegistrationPreview; response: T.SuccessEventRegistrationPreview};
+  event_payment_prepare_v1: {request: T.RequestEventPaymentPrepare; response: T.SuccessEventPaymentPrepare};
+  event_payment_get_v1: {request: T.RequestEventPaymentGet; response: T.SuccessEventPaymentGet};
 }

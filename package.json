@@ -1,6 +1,6 @@
 {
   "name": "ftksaas",
-  "version": "0.2.0-rc.1",
+  "version": "0.2.0-rc.2",
   "description": "FtkSaaS backend contracts and isolated development baseline",
   "directories": {
     "doc": "docs",
@@ -16,7 +16,7 @@
     "dev:health": "node scripts/health.mjs",
     "db:advisors": "supabase db advisors --local --type all --level warn --fail-on error",
     "dev:info": "node scripts/dev-info.mjs",
-    "test:api": "node --test tests/api-acceptance.test.mjs",
+    "test:api": "node --test tests/api-acceptance.test.mjs tests/event-payment.test.mjs",
     "dev:seed": "node scripts/dev-seed.mjs",
     "test:clean": "node scripts/test-clean.mjs"
   },

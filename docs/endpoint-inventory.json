@@ -1,9 +1,9 @@
 {
-  "runtime_version": "0.2.0-rc.1",
+  "runtime_version": "0.2.0-rc.2",
   "operations": [
     {
       "name": "account_get_v1",
-      "status": "operational_development",
+      "status": "operational_development_limited",
       "external_path": "/functions/v1/backend-v1/account_get_v1",
       "permission": "account.self",
       "features": [
@@ -82,7 +82,7 @@
     },
     {
       "name": "organization_create_v1",
-      "status": "operational_development",
+      "status": "operational_development_limited",
       "external_path": "/functions/v1/backend-v1/organization_create_v1",
       "permission": "platform.owner",
       "features": [
@@ -94,7 +94,7 @@
     },
     {
       "name": "organization_get_v1",
-      "status": "operational_development",
+      "status": "operational_development_limited",
       "external_path": "/functions/v1/backend-v1/organization_get_v1",
       "permission": "org.read",
       "features": [
@@ -189,7 +189,7 @@
     },
     {
       "name": "center_create_v1",
-      "status": "operational_development",
+      "status": "operational_development_limited",
       "external_path": "/functions/v1/backend-v1/center_create_v1",
       "permission": "org.manage",
       "features": [
@@ -278,7 +278,7 @@
     },
     {
       "name": "role_assign_v1",
-      "status": "operational_development",
+      "status": "operational_development_limited",
       "external_path": "/functions/v1/backend-v1/role_assign_v1",
       "permission": "center.manage",
       "features": [
@@ -290,7 +290,7 @@
     },
     {
       "name": "role_revoke_v1",
-      "status": "operational_development",
+      "status": "operational_development_limited",
       "external_path": "/functions/v1/backend-v1/role_revoke_v1",
       "permission": "center.manage",
       "features": [
@@ -302,7 +302,7 @@
     },
     {
       "name": "permission_set_v1",
-      "status": "operational_development",
+      "status": "operational_development_limited",
       "external_path": "/functions/v1/backend-v1/permission_set_v1",
       "permission": "center.manage",
       "features": [
@@ -313,7 +313,7 @@
     },
     {
       "name": "org_manager_assign_v1",
-      "status": "operational_development",
+      "status": "operational_development_limited",
       "external_path": "/functions/v1/backend-v1/org_manager_assign_v1",
       "permission": "org.owner",
       "features": [
@@ -324,7 +324,7 @@
     },
     {
       "name": "org_manager_revoke_v1",
-      "status": "operational_development",
+      "status": "operational_development_limited",
       "external_path": "/functions/v1/backend-v1/org_manager_revoke_v1",
       "permission": "org.owner",
       "features": [
@@ -335,7 +335,7 @@
     },
     {
       "name": "manager_self_assign_center_v1",
-      "status": "operational_development",
+      "status": "operational_development_limited",
       "external_path": "/functions/v1/backend-v1/manager_self_assign_center_v1",
       "permission": "org.manage",
       "features": [
@@ -371,7 +371,7 @@
     },
     {
       "name": "account_access_accept_v1",
-      "status": "operational_development",
+      "status": "operational_development_limited",
       "external_path": "/functions/v1/backend-v1/account_access_accept_v1",
       "permission": "invite.accept",
       "features": [
@@ -417,7 +417,7 @@
     },
     {
       "name": "person_create_v1",
-      "status": "operational_development",
+      "status": "operational_development_limited",
       "external_path": "/functions/v1/backend-v1/person_create_v1",
       "permission": "person.manage",
       "features": [
@@ -439,7 +439,7 @@
     },
     {
       "name": "student_activate_v1",
-      "status": "operational_development",
+      "status": "operational_development_limited",
       "external_path": "/functions/v1/backend-v1/student_activate_v1",
       "permission": "person.activate",
       "features": [
@@ -507,7 +507,7 @@
     },
     {
       "name": "class_save_v1",
-      "status": "operational_development",
+      "status": "operational_development_limited",
       "external_path": "/functions/v1/backend-v1/class_save_v1",
       "permission": "schedule.manage",
       "features": [
@@ -543,7 +543,7 @@
     },
     {
       "name": "session_create_v1",
-      "status": "operational_development",
+      "status": "operational_development_limited",
       "external_path": "/functions/v1/backend-v1/session_create_v1",
       "permission": "schedule.manage",
       "features": [
@@ -728,7 +728,7 @@
     },
     {
       "name": "reservation_cancel_v1",
-      "status": "operational_development",
+      "status": "operational_development_limited",
       "external_path": "/functions/v1/backend-v1/reservation_cancel_v1",
       "permission": "reservation.write",
       "features": [
@@ -865,7 +865,7 @@
     },
     {
       "name": "product_publish_v1",
-      "status": "operational_development",
+      "status": "operational_development_limited",
       "external_path": "/functions/v1/backend-v1/product_publish_v1",
       "permission": "product.manage",
       "features": [
@@ -879,7 +879,7 @@
     },
     {
       "name": "sale_preview_v1",
-      "status": "operational_development",
+      "status": "operational_development_limited",
       "external_path": "/functions/v1/backend-v1/sale_preview_v1",
       "permission": "sale.write",
       "features": [
@@ -893,7 +893,7 @@
     },
     {
       "name": "sale_apply_v1",
-      "status": "operational_development",
+      "status": "operational_development_limited",
       "external_path": "/functions/v1/backend-v1/sale_apply_v1",
       "permission": "sale.write",
       "features": [
@@ -907,7 +907,7 @@
     },
     {
       "name": "entitlements_get_v1",
-      "status": "operational_development",
+      "status": "operational_development_limited",
       "external_path": "/functions/v1/backend-v1/entitlements_get_v1",
       "permission": "person.read",
       "features": [
@@ -1104,7 +1104,7 @@
     },
     {
       "name": "collection_record_v1",
-      "status": "operational_development",
+      "status": "operational_development_limited",
       "external_path": "/functions/v1/backend-v1/collection_record_v1",
       "permission": "finance.collect",
       "features": [
@@ -1139,8 +1139,8 @@
     },
     {
       "name": "student_credit_refund_v1",
-      "status": "contract_only",
-      "external_path": null,
+      "status": "operational_development_limited",
+      "external_path": "/functions/v1/backend-v1/student_credit_refund_v1",
       "permission": "finance.refund",
       "features": [
         "F19"
@@ -1150,8 +1150,8 @@
     },
     {
       "name": "student_credit_offset_v1",
-      "status": "contract_only",
-      "external_path": null,
+      "status": "operational_development_limited",
+      "external_path": "/functions/v1/backend-v1/student_credit_offset_v1",
       "permission": "finance.collect",
       "features": [
         "F19"
@@ -1161,8 +1161,8 @@
     },
     {
       "name": "debt_adjust_v1",
-      "status": "contract_only",
-      "external_path": null,
+      "status": "operational_development_limited",
+      "external_path": "/functions/v1/backend-v1/debt_adjust_v1",
       "permission": "finance.refund",
       "features": [
         "F19"
@@ -1429,7 +1429,7 @@
     },
     {
       "name": "subscription_get_v1",
-      "status": "operational_development",
+      "status": "operational_development_limited",
       "external_path": "/functions/v1/backend-v1/subscription_get_v1",
       "permission": "subscription.owner",
       "features": [
@@ -1484,7 +1484,7 @@
     },
     {
       "name": "saas_payment_submit_v1",
-      "status": "operational_development",
+      "status": "operational_development_limited",
       "external_path": "/functions/v1/backend-v1/saas_payment_submit_v1",
       "permission": "subscription.owner",
       "features": [
@@ -1495,7 +1495,7 @@
     },
     {
       "name": "saas_payment_verify_v1",
-      "status": "operational_development",
+      "status": "operational_development_limited",
       "external_path": "/functions/v1/backend-v1/saas_payment_verify_v1",
       "permission": "saas.operator",
       "features": [
@@ -1517,7 +1517,7 @@
     },
     {
       "name": "event_save_v1",
-      "status": "operational_development",
+      "status": "operational_development_limited",
       "external_path": "/functions/v1/backend-v1/event_save_v1",
       "permission": "event.manage",
       "features": [
@@ -1528,7 +1528,7 @@
     },
     {
       "name": "event_publish_v1",
-      "status": "operational_development",
+      "status": "operational_development_limited",
       "external_path": "/functions/v1/backend-v1/event_publish_v1",
       "permission": "event.manage",
       "features": [
@@ -1547,13 +1547,11 @@
         "F29"
       ],
       "billing_class": "new",
-      "limits": [
-        "Q-E01: paid manual full-payment pre-registration flow blocked"
-      ]
+      "limits": []
     },
     {
       "name": "event_registration_cancel_v1",
-      "status": "operational_development",
+      "status": "operational_development_limited",
       "external_path": "/functions/v1/backend-v1/event_registration_cancel_v1",
       "permission": "event.register",
       "features": [
@@ -1564,7 +1562,7 @@
     },
     {
       "name": "event_complete_v1",
-      "status": "operational_development",
+      "status": "operational_development_limited",
       "external_path": "/functions/v1/backend-v1/event_complete_v1",
       "permission": "event.manage",
       "features": [
@@ -1575,7 +1573,7 @@
     },
     {
       "name": "event_duty_verify_v1",
-      "status": "operational_development",
+      "status": "operational_development_limited",
       "external_path": "/functions/v1/backend-v1/event_duty_verify_v1",
       "permission": "event.manage",
       "features": [
@@ -1595,7 +1593,7 @@
       ],
       "billing_class": "maintenance",
       "limits": [
-        "Q-E01: manual monetary refund formulas blocked"
+        "Started or partially occurred event monetary cancellation: POLICY_NOT_CONFIGURED pending a separate product decision."
       ]
     },
     {
@@ -1608,7 +1606,7 @@
       ],
       "billing_class": "maintenance",
       "limits": [
-        "Q-E01: manual monetary refund formulas blocked"
+        "Started or partially occurred event monetary cancellation: POLICY_NOT_CONFIGURED pending a separate product decision."
       ]
     },
     {
@@ -1883,7 +1881,7 @@
     },
     {
       "name": "event_attendance_mark_v1",
-      "status": "operational_development",
+      "status": "operational_development_limited",
       "external_path": "/functions/v1/backend-v1/event_attendance_mark_v1",
       "permission": "event.attendance",
       "features": [
@@ -1894,7 +1892,7 @@
     },
     {
       "name": "platform_owner_set_v1",
-      "status": "operational_development",
+      "status": "operational_development_limited",
       "external_path": "/functions/v1/backend-v1/platform_owner_set_v1",
       "permission": "platform.owner",
       "features": [
@@ -1905,7 +1903,7 @@
     },
     {
       "name": "platform_owner_remove_v1",
-      "status": "operational_development",
+      "status": "operational_development_limited",
       "external_path": "/functions/v1/backend-v1/platform_owner_remove_v1",
       "permission": "platform.owner",
       "features": [
@@ -1916,7 +1914,7 @@
     },
     {
       "name": "center_manager_assign_v1",
-      "status": "operational_development",
+      "status": "operational_development_limited",
       "external_path": "/functions/v1/backend-v1/center_manager_assign_v1",
       "permission": "center.manager.assign",
       "features": [
@@ -1927,7 +1925,7 @@
     },
     {
       "name": "center_manager_revoke_v1",
-      "status": "operational_development",
+      "status": "operational_development_limited",
       "external_path": "/functions/v1/backend-v1/center_manager_revoke_v1",
       "permission": "center.manager.assign",
       "features": [
@@ -1950,7 +1948,7 @@
     },
     {
       "name": "event_attendance_close_v1",
-      "status": "operational_development",
+      "status": "operational_development_limited",
       "external_path": "/functions/v1/backend-v1/event_attendance_close_v1",
       "permission": "event.close",
       "features": [
@@ -1961,7 +1959,7 @@
     },
     {
       "name": "event_attendance_correct_v1",
-      "status": "operational_development",
+      "status": "operational_development_limited",
       "external_path": "/functions/v1/backend-v1/event_attendance_correct_v1",
       "permission": "event.close",
       "features": [
@@ -2007,7 +2005,7 @@
     },
     {
       "name": "discipline_save_v1",
-      "status": "operational_development",
+      "status": "operational_development_limited",
       "external_path": "/functions/v1/backend-v1/discipline_save_v1",
       "permission": "org.manage",
       "features": [
@@ -2018,7 +2016,7 @@
     },
     {
       "name": "center_discipline_set_v1",
-      "status": "operational_development",
+      "status": "operational_development_limited",
       "external_path": "/functions/v1/backend-v1/center_discipline_set_v1",
       "permission": "center.manage",
       "features": [
@@ -2040,7 +2038,7 @@
     },
     {
       "name": "event_get_v1",
-      "status": "operational_development",
+      "status": "operational_development_limited",
       "external_path": "/functions/v1/backend-v1/event_get_v1",
       "permission": "person.read",
       "features": [
@@ -2058,9 +2056,29 @@
         "F29"
       ],
       "billing_class": "student",
-      "limits": [
-        "Q-E01 blockers are explicit; apply always rechecks current data"
-      ]
+      "limits": []
+    },
+    {
+      "name": "event_payment_prepare_v1",
+      "status": "operational_development_limited",
+      "external_path": "/functions/v1/backend-v1/event_payment_prepare_v1",
+      "permission": "event.register",
+      "features": [
+        "F29"
+      ],
+      "billing_class": "new",
+      "limits": []
+    },
+    {
+      "name": "event_payment_get_v1",
+      "status": "operational_development_limited",
+      "external_path": "/functions/v1/backend-v1/event_payment_get_v1",
+      "permission": "person.read",
+      "features": [
+        "F29"
+      ],
+      "billing_class": "read",
+      "limits": []
     }
   ]
 }

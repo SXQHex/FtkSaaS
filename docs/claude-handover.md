@@ -1,10 +1,10 @@
-# FtkSaaS backend — Claude devri · 0.2.0-rc.1
+# FtkSaaS backend — Claude devri · 0.2.0-rc.2
 
-Kalıcı kaynak: https://github.com/SXQHex/FtkSaaS · dal: `backend/runtime-v0.2.0` · inceleme: https://github.com/SXQHex/FtkSaaS/pull/1. Frontend tasarımı ve bileşenleri değiştirilmedi. Bu sürüm geliştirme kabulüdür; ürünün 180 operasyonunun tamamının veya üretim dağıtımının bittiği iddia edilmez.
+Kalıcı kaynak: https://github.com/SXQHex/FtkSaaS · dal: `backend/runtime-v0.2.0` · inceleme: https://github.com/SXQHex/FtkSaaS/pull/1. Frontend tasarımı ve bileşenleri değiştirilmedi. Bu sürüm geliştirme kabulüdür; ürünün 182 operasyonunun tamamının veya üretim dağıtımının bittiği iddia edilmez.
 
 ## Çalışan kapsam
 
-48 çağrılabilir gateway/named RPC; 132 işlem yalnız sözleşme. Tam liste ve kapsam sınırları: `docs/endpoint-inventory.json`. `contracts/05-FtkSaaS-O4-API-katalogu.md` her satırda durumu gösterir. Yalnız sözleşme olan bir işlem gateway’de `NOT_FOUND` alır.
+53 çağrılabilir gateway/named RPC; 129 işlem yalnız sözleşme. Tam liste ve kapsam sınırları: `docs/endpoint-inventory.json`. `contracts/05-FtkSaaS-O4-API-katalogu.md` her satırda durumu gösterir. Yalnız sözleşme olan bir işlem gateway’de `NOT_FOUND` alır.
 
 | Alan | Çağrılabilir işlemler |
 |---|---|
@@ -13,9 +13,9 @@ Kalıcı kaynak: https://github.com/SXQHex/FtkSaaS · dal: `backend/runtime-v0.2
 | Kişi/davet | person_create, student_activate, account_access_send/accept |
 | Disiplin | discipline_save, center_discipline_set |
 | Abonelik | saas_payment_submit/verify, subscription_get |
-| Hak/para | product_publish, sale_preview/apply, collection_record, entitlements_get |
+| Hak/para | product_publish, sale_preview/apply, collection_record, entitlements_get, debt_adjust, student_credit_refund/offset |
 | Ders yarışı için yazma | class_save, session_create, reservation_create/cancel |
-| Etkinlik | event_save/publish/get/list, event_registration_preview, event_register, event_registration_cancel, event_attendance_mark/close/correct, event_complete, event_duty_verify, event_cancel_preview/apply |
+| Etkinlik | event_save/publish/get/list, event_payment_prepare/get, event_registration_preview, event_register, event_registration_cancel, event_attendance_mark/close/correct, event_complete, event_duty_verify, event_cancel_preview/apply |
 
 Tablodaki bütün adlar `_v1` ile biter. Dersin tam yoklama/hakediş, ödeme düzeltme, bekleme listesi, dosya upload/download, CRM, rapor/export, kullanıcı belge onayı ve bütün diğer işlemler envanterde ayrıca belirtilmedikçe **yalnız sözleşmedir**. Bu ekranda görünür bir butonun backend’i var sayılmamalı.
 
@@ -63,7 +63,7 @@ Paket tüketen yeni kayıt kimlikleri frontend’den gelmez. `request_id` ve mut
 
 Supabase `/rest/v1/rpc/<operation>` yolu **backend içidir**. Actor/session ve ID bankasını frontend göndermez. Service-role anahtarı, DB URL/parolası veya sentetik kullanıcı parolası frontend public env’e konmaz.
 
-Schema ile doğrulanmış JSON örnekleri: `examples/runtime-requests.json`. Güncel yerel bağlantı snapshot’ı: `docs/development-connection.json`; yeni kurulumda `dev:info` çıktısı esas alınır.
+Schema ile doğrulanmış JSON örnekleri: `examples/runtime-requests.json`. Bağlantı üretim bilgisi: `docs/development-connection.json`; yeni kurulumda `dev:info` çıktısı esas alınır.
 
 ## Etkinlik örnek akışı
 
@@ -77,13 +77,13 @@ Kayıt katılımcı/işletme iptalinde aynı allocation üzerinden serbest bıra
 
 ## Karar ve teknik kapsam sınırları
 
-**Q-E01 kabul edildi; teknik aktarım bekliyor.** Tam karar: docs/decisions/Q-E01-accepted.md; uygulanmayan koşullar: docs/decisions/Q-E01.md. Ödeme hazırlığı/etkinlik borcu bağlantısı, ödeme sonrası kapasite kaybı düzeltmesi ve gerçekleşmeden işletme iptalinde öğrenci alacağı henüz şema/API/ortak tiplere aktarılmadı. Mevcut blocker testi bunların kabul testi değildir. Eski manuel parasal iptal yolları Q-E01 uyumlu sayılmaz. Q-D01 kabul edilmiş ve gerçek RPC/yarış testleriyle doğrulanmıştır.
+**Q-E01 teknik aktarımı bu sürümde uygulandı.** Bağlayıcı kaynak docs/decisions/Q-E01-accepted.md; kapsam/kanıt docs/decisions/Q-E01.md ve reports/qe01-verification.json. Başlamış veya kısmen gerçekleşmiş etkinliğin parasal iptali tanımlı değildir; POLICY_NOT_CONFIGURED ile kapalıdır ve yeni karar gerektirir. Katılımcının kendi iptalindeki yeni parasal formüller bu kararla eklenmez. Q-D01'in ortak pozitif hak ve negatif etkinlik kredisi yasağı korunur.
 
 Merkez ve organizasyon liste projeksiyonları şu aşamada tek sayfadır; event listesi gerçek cursor kullanır. Dev seed’deki ticari sayılar/izinler yalnız test fixture’ıdır. Gerçek sağlayıcı e-posta teslimi, dosya saklama/indirme, hukuki onay, dış ödeme sağlayıcısı, ölçek/yük ve yedekten geri yükleme kabulü bu sürümde tamamlanmış sayılmaz. Bu işler için henüz uygulanmayan özelliklere frontend’den dayanak oluşturulmamalı.
 
 ## Doğrulama ve çalışma düzeni
 
-`reports/verification.json`, `reports/acceptance-verified.log` ve GitHub Actions önceki kabulün kanıtıdır; devam oturumunun temiz kurulum/yarış sonucu reports/resumed-verification.json içindedir. CI her commit için ayrıca denetlenir. Statik tutarlılık ile canlı Auth/RPC testleri ayrı raporlanır. Testler son hak event–event, event–ders, kapasite, aynı anahtarla eşzamanlı tekrar, payload değişimi, rollback, rol/oturum iptali, tenant izolasyonu, Q-D01 ve negatif kredi yasağını içerir.
+Güncel kabul kanıtı reports/qe01-verification.json ve reports/qe01-acceptance.log; CI her commit için ayrıca denetlenir. Testler eski son hak/kapasite/tenant/rol kabulünü ve Q-E01 ödenmiş hazırlıkların son kontenjan yarışı ile finansal rollback senaryolarını içerir.
 
 Önce org kilidi, ardından ilgili kaynak/hak satırları tutulur. Bu kaba kilit rol iptali ve bütün ortak havuz mutasyonlarını sıralar; yük testi sonucu değildir. Domain + allocation/ledger + receipt + audit + outbox tek commit’tir. UUID bankası tükenirse transaction tümüyle rollback olur; gateway aynı işlem anahtarıyla daha geniş doğrulanmış UUIDv7 bankasıyla tekrarlar. Defter/audit güncellenemez veya silinemez; düzeltmeler linked kayıtlarla eklenir.
 
@@ -91,4 +91,18 @@ Yeni değişiklik ayrı migration ve branch/PR ile yapılmalı. `npm run generat
 
 ## Temiz kabulü yeniden çalıştırma
 
-Node 24.19.0 ile npm ci ve npm run test:clean. Komut yalnız checkout'a ait loopback DB üzerinde, sentetik yerel veriyi silerek altı migration'ı yeniden uygular; migration geçmişini ve boş tenant/Auth durumunu denetler. Ardından testleri, sentetik seed'i ve sağlık kontrolünü çalıştırır. Reset logu .dev/clean-reset.log içindedir; paylaşılmaz. CI aynı komutu kullanır. Son hak yarışlarında tek allocation/sıfır kullanılabilir bakiye; ücretli manuel son kontenjanda tek kayıt/tek borç ve kaybedende sıfır receipt/borç/allocation denetlenir. Q-E01 ödemeli hazırlık yarışı bu kapsamda değildir.
+Node 24.19.0 ile npm ci ve npm run test:clean. Yalnız checkout'a ait loopback DB'deki sentetik veriyi siler; yedi migration geçmişini ve boş tenant/Auth durumunu denetler. Sonra 20 statik kontrol, 12 sözleşme, 27 DB ve 56 gerçek Auth/API testi, seed ve sağlık kontrolü çalışır. CI aynı komutu kullanır. Reset logu .dev/clean-reset.log paylaşılmaz. Güncel kanıt: reports/qe01-verification.json ve reports/qe01-acceptance.log. Önceki verification/resumed raporları tarihsel snapshot'tır.
+
+## Q-E01 entegrasyon akışı
+
+1. Ücretli, manuel ve tam ödeme şartlı etkinlikte event_payment_prepare_v1 çağırın (event_id/person_id). Sonuç EventPaymentPreparationView: id, debt_id, paid_minor, remaining_minor, state, registration_id, credited_minor, student_credit_available_minor ve sabitlenmiş terms. Hazırlık kesin kayıt/yer ayırma değildir. Açık hazırlık/borç farklı anahtarla tekrar oluşturulmaz; mevcut kayıt döner.
+2. collection_record_v1 içinde debt_ids:[preparation.debt_id] kullanın. Başka borca bağlı veya dağıtılmamış tahsilat bu hazırlığın tam ödeme şartını karşılamaz. Para birimi/kişi/merkez farklı borç reddedilir. Mevcut açık yetkili indirimler güncel borç hesabına dahildir.
+3. event_payment_get_v1 (preparation_id) güncel finans durumunu verir. event_registration_preview_v1 isteğine preparation_id eklenebilir; sale_id ile birlikte gönderilmez.
+4. event_register_v1 isteği event_id/person_id/preparation_id taşır; aynı kullanıcı işleminin retry'ında operation_key korunur. Sonuç EventRegistrationResult union tipidir. **data.outcome mutlaka kontrol edilir.**
+5. outcome=registered ise primary_id kesin kayıt ID'sidir; ikinci borç veya tahsilat oluşturulmaz. outcome=capacity_closed ise kesin kayıt yoktur: preparation_id/debt_id, remaining_removed_minor/student_credit_added_minor/currency döner. Hazırlık kapanmış, borç ters kaydı ve yalnız daha önce alacaklaştırılmamış tutar aynı transaction'da kaydedilmiştir. Bu ok:true sonucu kayıt başarısı olarak gösterilmemeli; finansal kapanışın başarıyla kaydedildiğini belirtir.
+6. event_cancel_preview/apply, gerçekleşmeden işletme iptalinde tüm ilgili borçları/ödenmiş tutarları/önceki indirim ve alacakları hesaba katar. Önizleme effects.reason=remaining_debt_removed ve student_credit_added parasal tutarlarını; release hak miktarlarını ve close hazırlıkları gösterir. Finans veya event bağımlılıkları değişirse PREVIEW_STALE. Önizleme varken ödeme sonradan değişirse yeniden önizleme gerekir; bu arada otomatik iade yoktur.
+7. student_credit_refund_v1 açık nakit iadedir; student_credit_offset_v1 açık borç mahsubudur (expected_version ilgili debt sürümüdür). Otomatik nakit iade/başka borca dağıtma yapılmaz. debt_adjust_v1 gerekçeli append-only düzeltmedir; terminal etkinlik borcu yeniden açılmaz. Hepsi mevcut merkez/kişi/para birimi ve alacak bakiye sınırlarını kullanır.
+
+Önizleme süresi/sürümü eskiyse kayıt PREVIEW_STALE dönebilir; bu sonuç finansal kapatma değildir. Güncel önizleme/yeniden doğrulama gerekir. Önizleme olmadan da kayıt güncel kapasite ve ödemeyi transaction içinde denetler. Kaynak borç başına daha önce oluşturulmuş refund_claim_add toplamı, sonradan nakit iade edilmiş veya mahsup edilmiş olsa bile yeniden üretilmez.
+
+Yeni işlemler de aynı POST gateway/gerçek Auth/service-only RPC yolundadır. İstek örnekleri examples/runtime-requests.json, iki farklı kayıt sonucu examples/event-payment-results.json içindedir; hepsi kapalı şemayla doğrulanır. Frontend tasarım veya bileşen değişikliği yapılmadı; burada yalnız entegrasyon sözleşmesi tanımlanır.

@@ -26,6 +26,7 @@ try {
 run('npm',['test']);
 run('npm',['run','dev:seed']);
 run('npm',['run','dev:health']);
+run('npm',['run','db:advisors']);
 // Parsing the written report also catches invalid JSON serialization.
 const report=JSON.parse(fs.readFileSync('reports/environment.json','utf8'));
 assert(report.checks.every(x=>x.passed));
