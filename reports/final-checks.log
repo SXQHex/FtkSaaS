@@ -1,0 +1,55 @@
+
+> ftksaas@0.1.0 test
+> npm run verify && npm run test:db
+
+
+> ftksaas@0.1.0 verify
+> node scripts/generate.mjs --check && python3 scripts/generate_schema.py && node scripts/audit.mjs && tsc --noEmit && node --test tests/contract.test.mjs
+
+Generated shared types: 690 operations: 178
+Physical baseline 88 tables 301 catalog FKs; private deny-by-default; business RPCs pending
+{"checks":17,"tables":88,"operations":178,"definitions":690,"status":"passed"}
+✔ UUIDv7 generator: RFC version/variant, uniqueness, current approximate timestamp (106.173591ms)
+✔ retry preserves frozen operation key (0.183932ms)
+✔ external/provider and existing UUIDv4 acceptance retained, v7 production validator distinct (2.261047ms)
+✔ package scope valid center_discipline (13.499942ms)
+✔ package scope valid center_all_disciplines (0.236646ms)
+✔ package scope valid organization_discipline (0.147278ms)
+✔ package scope valid organization_all (0.090339ms)
+✔ event-only scope does not accept class selector (0.129783ms)
+✔ no unknown field / free-text discipline / actor spoof (2.504583ms)
+✔ lesson request target is required separately from request trace (1.608923ms)
+✔ money string and positive collection constraints retained (0.738628ms)
+✔ negative limit requires explicit center and discipline (1.781456ms)
+ℹ tests 12
+ℹ suites 0
+ℹ pass 12
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 261.07141
+
+> ftksaas@0.1.0 test:db
+> node --test tests/database.test.mjs
+
+▶ real PostgreSQL physical baseline and D/U integrity
+  ✔ catalog and DB column coverage / UUID storage / RLS / deny client DML (20.419086ms)
+  ✔ D01/D02 one person, multiple disciplines without person/role duplication (2.291938ms)
+  ✔ D01 cross-tenant center discipline FK rejects (1.497402ms)
+  ✔ D02 duplicate active relationship rejects (1.872754ms)
+  ✔ D07 independent per-center-discipline override unique key (1.917215ms)
+  ✔ D03 session cannot disagree with its class discipline (2.313542ms)
+  ✔ D03/D07 deficit scope is bound to exact reservation/person/session (5.4815ms)
+  ✔ D04/D05 physical package scope variants and explicit target eligibility (4.7524ms)
+  ✔ U03 external UUIDv4 remains unchanged (0.793225ms)
+  ✔ U05 database default generation fails closed with no audited DB generator (1.231653ms)
+✔ real PostgreSQL physical baseline and D/U integrity (739.851865ms)
+ℹ tests 11
+ℹ suites 0
+ℹ pass 11
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 808.787499

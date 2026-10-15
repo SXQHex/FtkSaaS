@@ -1,0 +1,20 @@
+{
+  "runtime": "Supabase native",
+  "database": "PostgreSQL 17.11",
+  "box": "present-bobcat-18604",
+  "ephemeral": true,
+  "expires_at": "2026-10-15T21:28:15+03:00",
+  "checks": [
+    {
+      "name": "auth",
+      "status": 200,
+      "passed": true
+    },
+    {
+      "name": "rest",
+      "status": 200,
+      "passed": true
+    }
+  ],
+  "scope": "service health only; no completed business endpoint or integration acceptance claimed"
+}
