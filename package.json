@@ -1,0 +1,44 @@
+{
+  "name": "ftksaas",
+  "version": "0.2.0-rc.3",
+  "description": "FtkSaaS backend contracts and isolated development baseline",
+  "directories": {
+    "doc": "docs",
+    "test": "tests"
+  },
+  "scripts": {
+    "generate": "python3 scripts/generate-runtime.py && node scripts/generate-validators.mjs && node scripts/build-edge.mjs && node scripts/generate.mjs && python3 scripts/render_catalogs.py",
+    "verify": "python3 scripts/check-migrations.py && python3 scripts/generate-runtime.py --check && node scripts/generate-validators.mjs --check && node scripts/build-edge.mjs --check && node scripts/generate.mjs --check && node scripts/audit.mjs && tsc --noEmit && node --test tests/contract.test.mjs",
+    "test:db": "node --test tests/database.test.mjs tests/event-scope.test.mjs",
+    "test": "npm run verify && npm run test:db && npm run test:api",
+    "dev:start": "node scripts/start-dev.mjs",
+    "dev:stop": "supabase stop",
+    "dev:health": "node scripts/health.mjs",
+    "db:advisors": "supabase db advisors --local --type all --level warn --fail-on error",
+    "dev:info": "node scripts/dev-info.mjs",
+    "test:api": "node --test tests/api-acceptance.test.mjs tests/event-payment.test.mjs tests/event-cancellation.test.mjs",
+    "dev:seed": "node scripts/dev-seed.mjs",
+    "test:clean": "node scripts/test-clean.mjs"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "module",
+  "devDependencies": {
+    "ajv": "8.20.0",
+    "ajv-formats": "3.0.1",
+    "esbuild": "0.28.2",
+    "json-schema-to-typescript": "16.0.0",
+    "nodemailer": "10.1.1",
+    "supabase": "2.121.0",
+    "typescript": "7.0.2"
+  },
+  "dependencies": {
+    "pg": "8.23.1",
+    "uuid": "14.0.3"
+  },
+  "private": true,
+  "engines": {
+    "node": ">=24.19.0 <25"
+  }
+}

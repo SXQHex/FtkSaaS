@@ -1,0 +1,20 @@
+✔ UUIDv7 generator: RFC version/variant, uniqueness, current approximate timestamp (186.871772ms)
+✔ retry preserves frozen operation key (0.207263ms)
+✔ external/provider and existing UUIDv4 acceptance retained, v7 production validator distinct (2.358903ms)
+✔ package scope valid center_discipline (7.008861ms)
+✔ package scope valid center_all_disciplines (0.166253ms)
+✔ package scope valid organization_discipline (0.120169ms)
+✔ package scope valid organization_all (0.082388ms)
+✔ event-only scope does not accept class selector (0.098067ms)
+✔ no unknown field / free-text discipline / actor spoof (2.541627ms)
+✔ lesson request target is required separately from request trace (1.845262ms)
+✔ money string and positive collection constraints retained (0.82262ms)
+✔ negative limit requires explicit center and discipline (2.05282ms)
+ℹ tests 12
+ℹ suites 0
+ℹ pass 12
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 357.86646

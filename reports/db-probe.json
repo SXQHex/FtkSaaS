@@ -1,0 +1,19 @@
+{
+  "version": {
+    "version": "PostgreSQL 17.11 on aarch64-unknown-linux-gnu, compiled by gcc (GCC) 15.2.0, 64-bit",
+    "version_num": "170011"
+  },
+  "extensions": [
+    {
+      "name": "pg_jsonschema",
+      "default_version": "0.3.3"
+    },
+    {
+      "name": "uuid-ossp",
+      "default_version": "1.1"
+    }
+  ],
+  "native": {
+    "native": null
+  }
+}

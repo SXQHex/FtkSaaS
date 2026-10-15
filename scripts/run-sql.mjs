@@ -1,0 +1,1 @@
+import fs from 'node:fs';import {connect} from './db.mjs';const db=await connect();try{for(const f of process.argv.slice(2))await db.query(fs.readFileSync(f,'utf8'));console.log('SQL verified');}finally{await db.end();}

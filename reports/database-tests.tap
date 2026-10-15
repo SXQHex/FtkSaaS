@@ -1,0 +1,19 @@
+▶ real PostgreSQL physical baseline and D/U integrity
+  ✔ catalog and DB column coverage / UUID storage / RLS / deny client DML (20.683817ms)
+  ✔ D01/D02 one person, multiple disciplines without person/role duplication (2.269694ms)
+  ✔ D01 cross-tenant center discipline FK rejects (1.473651ms)
+  ✔ D02 duplicate active relationship rejects (1.966684ms)
+  ✔ D07 independent per-center-discipline override unique key (1.934076ms)
+  ✔ D03/D07 deficit scope is bound to exact reservation/person/session (7.104377ms)
+  ✔ D04/D05 physical package scope variants and explicit target eligibility (5.316891ms)
+  ✔ U03 external UUIDv4 remains unchanged (0.808867ms)
+  ✔ U05 database default generation fails closed with no audited DB generator (1.246791ms)
+✔ real PostgreSQL physical baseline and D/U integrity (752.869269ms)
+ℹ tests 10
+ℹ suites 0
+ℹ pass 10
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 820.810771

@@ -1,0 +1,6 @@
+
+> ftksaas@0.1.0 generate
+> node scripts/generate.mjs && python3 scripts/render_catalogs.py
+
+Generated shared types: 692 operations: 178
+Rendered 04/05 from authoritative manifest

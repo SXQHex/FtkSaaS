@@ -1,0 +1,28 @@
+{
+  "decision": "Q-E02",
+  "version": "0.2.0-rc.3",
+  "operator_flow": [
+    "event_cancel_preview_v1",
+    "event_cancel_apply_v1"
+  ],
+  "participant_flow": [
+    "event_registration_cancel_v1"
+  ],
+  "operator_effect_reasons": [
+    "remaining_debt_removed",
+    "student_credit_added",
+    "center_cancel_full_right_return"
+  ],
+  "entitlement_effect_actions": [
+    "release",
+    "reverse"
+  ],
+  "cash_refund": "student_credit_refund_v1 (separate explicit authorized request)",
+  "offset": "student_credit_offset_v1 (separate explicit authorized request)",
+  "actual_start_definition": "open; no new start/partial state assumed",
+  "occurrence_evidence": "existing event_complete_v1 -> occurred; never inferred from wall clock",
+  "inventory": {
+    "callable": 53,
+    "contract_only": 129
+  }
+}

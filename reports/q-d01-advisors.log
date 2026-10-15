@@ -1,0 +1,6 @@
+
+> ftksaas@0.1.0 db:advisors
+> supabase db advisors --local --type all --level warn --fail-on error
+
+Connecting to local database...
+No issues found

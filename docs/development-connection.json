@@ -1,0 +1,23 @@
+{
+  "runtime_version": "0.2.0-rc.2",
+  "repository": "https://github.com/SXQHex/FtkSaaS",
+  "branch": "backend/runtime-v0.2.0",
+  "environment": "per-checkout isolated native Supabase",
+  "shared_staging_url": null,
+  "setup_commands": [
+    "npm ci",
+    "npm run dev:start",
+    "npm run dev:seed",
+    "npm run dev:info"
+  ],
+  "public_connection_source": "npm run dev:info; API/gateway/Studio/Mailpit ports are generated per checkout",
+  "public_frontend_env": ".dev/frontend.env",
+  "private_synthetic_logins": ".dev/development-users.json",
+  "gateway_path": "/functions/v1/backend-v1/{operation}",
+  "headers": [
+    "Authorization: Bearer <Supabase access token>",
+    "apikey: <local publishable key>",
+    "Content-Type: application/json"
+  ],
+  "notice": "No permanent internet endpoint or shared credentials. Never copy service-role/DB/user passwords into public frontend configuration. Previous Box ports are not current."
+}

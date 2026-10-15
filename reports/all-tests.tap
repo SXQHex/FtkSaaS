@@ -1,0 +1,32 @@
+✔ UUIDv7 generator: RFC version/variant, uniqueness, current approximate timestamp (109.394282ms)
+✔ retry preserves frozen operation key (0.188478ms)
+✔ external/provider and existing UUIDv4 acceptance retained, v7 production validator distinct (2.278427ms)
+✔ package scope valid center_discipline (12.874981ms)
+✔ package scope valid center_all_disciplines (0.224093ms)
+✔ package scope valid organization_discipline (0.16353ms)
+✔ package scope valid organization_all (0.083244ms)
+✔ event-only scope does not accept class selector (0.123667ms)
+✔ no unknown field / free-text discipline / actor spoof (2.436539ms)
+✔ lesson request target is required separately from request trace (1.589575ms)
+✔ money string and positive collection constraints retained (0.740808ms)
+✔ negative limit requires explicit center and discipline (1.763943ms)
+▶ real PostgreSQL physical baseline and D/U integrity
+  ✔ catalog and DB column coverage / UUID storage / RLS / deny client DML (20.841025ms)
+  ✔ D01/D02 one person, multiple disciplines without person/role duplication (2.31786ms)
+  ✔ D01 cross-tenant center discipline FK rejects (1.582086ms)
+  ✔ D02 duplicate active relationship rejects (1.940291ms)
+  ✔ D07 independent per-center-discipline override unique key (2.042667ms)
+  ✔ D03 session cannot disagree with its class discipline (2.655319ms)
+  ✔ D03/D07 deficit scope is bound to exact reservation/person/session (5.44837ms)
+  ✔ D04/D05 physical package scope variants and explicit target eligibility (4.803875ms)
+  ✔ U03 external UUIDv4 remains unchanged (0.809293ms)
+  ✔ U05 database default generation fails closed with no audited DB generator (1.21686ms)
+✔ real PostgreSQL physical baseline and D/U integrity (743.70818ms)
+ℹ tests 23
+ℹ suites 0
+ℹ pass 23
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 1065.667838

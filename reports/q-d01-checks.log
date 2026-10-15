@@ -1,0 +1,72 @@
+
+> ftksaas@0.1.0 test
+> npm run verify && npm run test:db
+
+
+> ftksaas@0.1.0 verify
+> node scripts/generate.mjs --check && python3 scripts/generate_schema.py && node scripts/audit.mjs && tsc --noEmit && node --test tests/contract.test.mjs
+
+Generated shared types: 692 operations: 178
+Physical baseline 88 tables 301 catalog FKs; private deny-by-default; business RPCs pending
+{"checks":19,"tables":89,"operations":178,"definitions":692,"status":"passed"}
+✔ UUIDv7 generator: RFC version/variant, uniqueness, current approximate timestamp (111.754586ms)
+✔ retry preserves frozen operation key (0.277953ms)
+✔ external/provider and existing UUIDv4 acceptance retained, v7 production validator distinct (2.795093ms)
+✔ package scope valid center_discipline (16.150127ms)
+✔ package scope valid center_all_disciplines (0.303141ms)
+✔ package scope valid organization_discipline (0.18103ms)
+✔ package scope valid organization_all (0.094802ms)
+✔ event-only scope does not accept class selector (0.149158ms)
+✔ no unknown field / free-text discipline / actor spoof (3.161895ms)
+✔ lesson request target is required separately from request trace (2.155289ms)
+✔ money string and positive collection constraints retained (1.098229ms)
+✔ negative limit requires explicit center and discipline (2.151215ms)
+ℹ tests 12
+ℹ suites 0
+ℹ pass 12
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 295.791879
+
+> ftksaas@0.1.0 test:db
+> node --test tests/database.test.mjs tests/event-scope.test.mjs
+
+▶ real PostgreSQL physical baseline and D/U integrity
+  ✔ catalog and DB column coverage / UUID storage / RLS / deny client DML (23.505442ms)
+  ✔ D01/D02 one person, multiple disciplines without person/role duplication (2.783548ms)
+  ✔ D01 cross-tenant center discipline FK rejects (2.711103ms)
+  ✔ D02 duplicate active relationship rejects (1.745209ms)
+  ✔ D07 independent per-center-discipline override unique key (2.731971ms)
+  ✔ D03 session cannot disagree with its class discipline (3.110489ms)
+  ✔ D03/D07 deficit scope is bound to exact reservation/person/session (7.375879ms)
+  ✔ D04/D05 physical package scope variants and explicit target eligibility (5.943599ms)
+  ✔ U03 external UUIDv4 remains unchanged (0.993841ms)
+  ✔ U05 database default generation fails closed with no audited DB generator (1.54011ms)
+✔ real PostgreSQL physical baseline and D/U integrity (878.035963ms)
+✔ Q-D01 DTO: explicit empty/single/multiple distinct UUID labels (16.151194ms)
+✔ Q-D01 DTO: no negative-credit override can be submitted by event registration (3.424757ms)
+▶ Q-D01 real PostgreSQL label integrity and scope matrix
+  ✔ Q-D01-A01 single label + matching narrow event-eligible package passes scope filter (2.420756ms)
+  ✔ Q-D01-A02 lesson-only package rejected despite matching label (0.770719ms)
+  ✔ single label + mismatched discipline rejected (0.696403ms)
+  ✔ Q-D01-A03 multi label + both narrow scope kinds rejected (1.139807ms)
+  ✔ Q-D01-A04 multi label + broad event-eligible scope passes filter (1.046257ms)
+  ✔ Q-D01-A05 no labels + broad only (1.926169ms)
+  ✔ center-bound package cannot match another service center (1.067807ms)
+  ✔ explicit event selector remains an AND restriction (1.217844ms)
+  ✔ Q-D01-A08 foreign-organization discipline rejected by physical FK (1.978239ms)
+  ✔ tag duplication and incorrect event center rejected (2.476013ms)
+  ✔ cross-tenant scope filter returns no match (0.692811ms)
+  ✔ Q-D01-A06 kernel rejects zero/negative/unknown availability without a negative-limit bypass (3.66953ms)
+  ✔ private helper and label table are not client APIs (0.98879ms)
+✔ Q-D01 real PostgreSQL label integrity and scope matrix (828.707446ms)
+ℹ tests 27
+ℹ suites 0
+ℹ pass 27
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 1954.699902

@@ -1,0 +1,18 @@
+{
+  "runtime": "Supabase native",
+  "database": "PostgreSQL 17",
+  "ephemeral_services": true,
+  "source_repository": "https://github.com/SXQHex/FtkSaaS",
+  "checks": [
+    {
+      "name": "auth",
+      "status": 200,
+      "passed": true
+    },
+    {
+      "name": "rest",
+      "status": 200,
+      "passed": true
+    }
+  ]
+}

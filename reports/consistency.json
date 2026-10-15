@@ -1,0 +1,91 @@
+{
+  "contract": "2.2-runtime.2",
+  "tables": 90,
+  "operations": 182,
+  "definitions": 710,
+  "uuid_paths": 1545,
+  "references": 3495,
+  "checks": [
+    {
+      "name": "JSON Schema 2020-12 meta-schema",
+      "status": "passed"
+    },
+    {
+      "name": "all definition validators compile",
+      "status": "passed"
+    },
+    {
+      "name": "reference closure",
+      "status": "passed"
+    },
+    {
+      "name": "closed objects and required fields",
+      "status": "passed"
+    },
+    {
+      "name": "unique operations / known permissions",
+      "status": "passed"
+    },
+    {
+      "name": "operation error code closure",
+      "status": "passed"
+    },
+    {
+      "name": "foreign key column / target closure",
+      "status": "passed"
+    },
+    {
+      "name": "no free-text discipline selector",
+      "status": "passed"
+    },
+    {
+      "name": "all UUID paths classified",
+      "status": "passed"
+    },
+    {
+      "name": "provider UUID not narrowed",
+      "status": "passed"
+    },
+    {
+      "name": "deficit and override scope",
+      "status": "passed"
+    },
+    {
+      "name": "bearer token semantics retained",
+      "status": "passed"
+    },
+    {
+      "name": "lesson target / trace identity separated",
+      "status": "passed"
+    },
+    {
+      "name": "feature and module coverage preserved",
+      "status": "passed"
+    },
+    {
+      "name": "no new role or discipline role",
+      "status": "passed"
+    },
+    {
+      "name": "physical table/column coverage",
+      "status": "passed"
+    },
+    {
+      "name": "private baseline grants / RLS",
+      "status": "passed"
+    },
+    {
+      "name": "Q-D01 product accepted and tags typed",
+      "status": "passed"
+    },
+    {
+      "name": "EntityType covers physical tables exactly",
+      "status": "passed"
+    },
+    {
+      "name": "Q-E01 accepted decision / preparation finance / typed terminal outcome",
+      "status": "passed"
+    }
+  ],
+  "scope": "static contract + physical source coverage; NOT Auth/RLS business/race/load/restore acceptance"
+}

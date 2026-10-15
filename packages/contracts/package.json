@@ -1,0 +1,16 @@
+{
+  "name": "@ftksaas/contracts",
+  "version": "0.2.0-rc.2",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./src/index.ts"
+    },
+    "./client": {
+      "types": "./src/client.ts",
+      "import": "./src/client.ts"
+    }
+  },
+  "description": "Generated shared backend contract types; runtime validation uses authoritative 08 JSON"
+}
