@@ -1336,6 +1336,8 @@ Request_event_registration_preview?: RequestEventRegistrationPreview
 Success_event_registration_preview?: SuccessEventRegistrationPreview
 EarningDirection?: EarningDirection
 FailureEnvelope?: FailureEnvelope
+EventRegistrationView?: EventRegistrationView
+EventDutyView?: EventDutyView
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -2583,6 +2585,46 @@ assignments: DutyInput[]
 version: PositiveInt
 discipline_ids: EventDisciplineIds
 assignment_terms?: EventDutyInput[]
+registrations?: EventRegistrationView[]
+duties?: EventDutyView[]
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "EventRegistrationView".
+ */
+export interface EventRegistrationView {
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+id: string
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+person_id: string
+display_name: Text
+state: EventRegistrationState
+attendance_result: AttendanceResult
+version: PositiveInt
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "EventDutyView".
+ */
+export interface EventDutyView {
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+id: string
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+person_id: string
+duty: Duty
+fee_minor: Money
+currency: Currency
+performed: (Bool | null)
+version: PositiveInt
+verified_at: (Instant | null)
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema

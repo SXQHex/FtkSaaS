@@ -9,3 +9,5 @@ for name in ['runtime.sql','kernel.sql','dispatch.sql','wrappers.sql']:
 expected_runtime='-- FtkSaaS authenticated runtime v0.2.0-rc.1; backend-generated UUIDv7.\nbegin;\n'+'\n'.join(parts)+'\ncommit;\n'
 assert next(Path('supabase/migrations').glob('*_runtime_foundation.sql')).read_text()==expected_runtime,'Runtime source and frozen migration differ'
 print('Frozen migration history and runtime source agree:',len(actual),'migrations')
+
+assert next(Path('supabase/migrations').glob('*_runtime_read_projection.sql')).read_text()==Path('database/runtime-read-projection.sql').read_text(),'Read projection migration source drift'

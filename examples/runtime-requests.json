@@ -1,0 +1,195 @@
+{
+  "notice": "Synthetic shape examples only. Replace IDs/tokens with actual API results; keys are per user action. No commercial defaults.",
+  "examples": [
+    {
+      "operation": "account_get_v1",
+      "request": {
+        "client_api_version": 1,
+        "request_id": "019a0000-0000-7000-8000-000000000001"
+      }
+    },
+    {
+      "operation": "event_save_v1",
+      "request": {
+        "client_api_version": 1,
+        "request_id": "019a0000-0000-7000-8000-000000000001",
+        "org_id": "019a0000-0000-7000-8000-000000000003",
+        "center_id": "019a0000-0000-7000-8000-000000000004",
+        "operation_key": "019a0000-0000-7000-8000-000000000002",
+        "name": "Synthetic example event",
+        "discipline_ids": [
+          "019a0000-0000-7000-8000-000000000005"
+        ],
+        "interval": {
+          "starts_at": "2026-10-20T15:00:00Z",
+          "ends_at": "2026-10-20T16:00:00Z"
+        },
+        "timezone": "Europe/Istanbul",
+        "venue": {
+          "kind": "external",
+          "name": "Example venue",
+          "address": "Replace with explicit venue",
+          "timezone": "Europe/Istanbul"
+        },
+        "capacity": {
+          "nominal": 10,
+          "maximum": 10
+        },
+        "terms": {
+          "fee_minor": "0",
+          "currency": "TRY",
+          "full_payment_required": false,
+          "allowed_product_version_ids": [
+            "019a0000-0000-7000-8000-000000000007"
+          ],
+          "cancellation": {
+            "before_cutoff": "release",
+            "after_cutoff": "release",
+            "no_show": "release"
+          },
+          "refund": {
+            "method": "none"
+          }
+        },
+        "assignments": [
+          {
+            "person_id": "019a0000-0000-7000-8000-000000000006",
+            "duty": "instructor",
+            "fee_minor": "0",
+            "currency": "TRY"
+          }
+        ]
+      }
+    },
+    {
+      "operation": "event_get_v1",
+      "request": {
+        "client_api_version": 1,
+        "request_id": "019a0000-0000-7000-8000-000000000001",
+        "org_id": "019a0000-0000-7000-8000-000000000003",
+        "center_id": "019a0000-0000-7000-8000-000000000004",
+        "event_id": "019a0000-0000-7000-8000-000000000009"
+      }
+    },
+    {
+      "operation": "event_registration_preview_v1",
+      "request": {
+        "client_api_version": 1,
+        "request_id": "019a0000-0000-7000-8000-000000000001",
+        "org_id": "019a0000-0000-7000-8000-000000000003",
+        "center_id": "019a0000-0000-7000-8000-000000000004",
+        "event_id": "019a0000-0000-7000-8000-000000000009",
+        "person_id": "019a0000-0000-7000-8000-000000000006",
+        "sale_id": "019a0000-0000-7000-8000-000000000008"
+      }
+    },
+    {
+      "operation": "event_register_v1",
+      "request": {
+        "client_api_version": 1,
+        "request_id": "019a0000-0000-7000-8000-000000000001",
+        "org_id": "019a0000-0000-7000-8000-000000000003",
+        "center_id": "019a0000-0000-7000-8000-000000000004",
+        "operation_key": "019a0000-0000-7000-8000-000000000002",
+        "event_id": "019a0000-0000-7000-8000-000000000009",
+        "person_id": "019a0000-0000-7000-8000-000000000006",
+        "sale_id": "019a0000-0000-7000-8000-000000000008",
+        "preview": {
+          "id": "019a0000-0000-7000-8000-00000000000c",
+          "token": "replace-with-server-preview-token"
+        }
+      }
+    },
+    {
+      "operation": "event_attendance_mark_v1",
+      "request": {
+        "client_api_version": 1,
+        "request_id": "019a0000-0000-7000-8000-000000000001",
+        "org_id": "019a0000-0000-7000-8000-000000000003",
+        "center_id": "019a0000-0000-7000-8000-000000000004",
+        "operation_key": "019a0000-0000-7000-8000-000000000002",
+        "registration_id": "019a0000-0000-7000-8000-00000000000a",
+        "expected_version": 1,
+        "result": "attended"
+      }
+    },
+    {
+      "operation": "event_attendance_close_v1",
+      "request": {
+        "client_api_version": 1,
+        "request_id": "019a0000-0000-7000-8000-000000000001",
+        "org_id": "019a0000-0000-7000-8000-000000000003",
+        "center_id": "019a0000-0000-7000-8000-000000000004",
+        "operation_key": "019a0000-0000-7000-8000-000000000002",
+        "event_id": "019a0000-0000-7000-8000-000000000009",
+        "expected_version": 3
+      }
+    },
+    {
+      "operation": "event_attendance_correct_v1",
+      "request": {
+        "client_api_version": 1,
+        "request_id": "019a0000-0000-7000-8000-000000000001",
+        "org_id": "019a0000-0000-7000-8000-000000000003",
+        "center_id": "019a0000-0000-7000-8000-000000000004",
+        "operation_key": "019a0000-0000-7000-8000-000000000002",
+        "registration_id": "019a0000-0000-7000-8000-00000000000a",
+        "expected_version": 3,
+        "result": "no_show",
+        "reason": "Explicit correction reason"
+      }
+    },
+    {
+      "operation": "event_cancel_preview_v1",
+      "request": {
+        "client_api_version": 1,
+        "request_id": "019a0000-0000-7000-8000-000000000001",
+        "org_id": "019a0000-0000-7000-8000-000000000003",
+        "center_id": "019a0000-0000-7000-8000-000000000004",
+        "event_id": "019a0000-0000-7000-8000-000000000009",
+        "reason": "Explicit cancellation reason"
+      }
+    },
+    {
+      "operation": "event_cancel_apply_v1",
+      "request": {
+        "client_api_version": 1,
+        "request_id": "019a0000-0000-7000-8000-000000000001",
+        "org_id": "019a0000-0000-7000-8000-000000000003",
+        "center_id": "019a0000-0000-7000-8000-000000000004",
+        "operation_key": "019a0000-0000-7000-8000-000000000002",
+        "preview": {
+          "id": "019a0000-0000-7000-8000-00000000000c",
+          "token": "replace-with-server-preview-token"
+        }
+      }
+    },
+    {
+      "operation": "event_duty_verify_v1",
+      "request": {
+        "client_api_version": 1,
+        "request_id": "019a0000-0000-7000-8000-000000000001",
+        "org_id": "019a0000-0000-7000-8000-000000000003",
+        "center_id": "019a0000-0000-7000-8000-000000000004",
+        "operation_key": "019a0000-0000-7000-8000-000000000002",
+        "assignment_id": "019a0000-0000-7000-8000-00000000000b",
+        "expected_version": 1,
+        "performed": true
+      }
+    },
+    {
+      "operation": "reservation_create_v1",
+      "request": {
+        "client_api_version": 1,
+        "request_id": "019a0000-0000-7000-8000-000000000001",
+        "org_id": "019a0000-0000-7000-8000-000000000003",
+        "center_id": "019a0000-0000-7000-8000-000000000004",
+        "operation_key": "019a0000-0000-7000-8000-000000000002",
+        "session_id": "019a0000-0000-7000-8000-00000000000d",
+        "person_id": "019a0000-0000-7000-8000-000000000006",
+        "source_sale_id": "019a0000-0000-7000-8000-000000000008",
+        "mode": "flexible"
+      }
+    }
+  ]
+}

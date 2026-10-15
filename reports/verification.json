@@ -1,0 +1,59 @@
+{
+  "version": "0.2.0-rc.1",
+  "verified_at": "2026-10-15T17:57:47.134Z",
+  "scope": "isolated development; no production/load/backup-restore acceptance",
+  "runtime": {
+    "node": "24.19.0",
+    "supabase_cli": "2.121.0",
+    "postgres": "17.11",
+    "edge_policy": "oneshot",
+    "bundled_dependencies": true
+  },
+  "schema": {
+    "core_tables": 89,
+    "definitions": 700,
+    "operations": 180,
+    "callable": 48,
+    "contract_only": 132,
+    "migrations": [
+      "20261015152146",
+      "20261015153414",
+      "20261015160836",
+      "20261015172815",
+      "20261015174211",
+      "20261015175240"
+    ]
+  },
+  "checks": {
+    "static_consistency": 19,
+    "contract_tests": 12,
+    "database_tests": 27,
+    "auth_api_tests": 38,
+    "total_tests": 77,
+    "failures": 0,
+    "clean_migration_replay": true,
+    "synthetic_seed": true,
+    "service_health": true,
+    "request_examples": 12,
+    "database_advisors_errors": 0,
+    "database_advisors_warnings": 0,
+    "npm_audit_vulnerabilities": 0
+  },
+  "open_product_decisions": [
+    "Q-E01"
+  ],
+  "ci_checks": "https://github.com/SXQHex/FtkSaaS/pull/1/checks",
+  "source_sha256": {
+    "contracts/08-FtkSaaS-tip-ve-operasyon-sozlesmesi.json": "b6e70a0c4a5f9fce0a290306af3baeb62b37380b5ccdc81f7266f7248be88df8",
+    "supabase/functions/backend-v1/index.ts": "f3e13bba7d0dfd9e25e427c3b582f0f1ab6e234291e81e0c401baf70950805fc",
+    "supabase/functions/backend-v1/handler.ts": "cf2c0f5eda325a4f1e844d785c40719c7863efea53174240f0641d4019a4d30f",
+    "tests/api-acceptance.test.mjs": "2298eab85f2e86541835bb9cddb00d799958184e3057e491417587bd30194b0d",
+    "supabase/migrations/20261015152146_discipline_uuidv7_baseline.sql": "4b6353fa9c5052f8fe597edce6f0b81ff2d8320c60822dae24e2044241504874",
+    "supabase/migrations/20261015153414_discipline_reference_integrity.sql": "d5d08b67b29c07838941d5abd88fd7567aaf5ec204b7ac73688eae61a42e9da5",
+    "supabase/migrations/20261015160836_event_discipline_scope.sql": "ab684d302c508eba33ec665bf2c3e91bf7034073b2b21884add7412f3de4794c",
+    "supabase/migrations/20261015172815_runtime_foundation.sql": "215115eb7e66f8ea23cfd33dffd15b0155f4511dd3fea62107000fbf201fec06",
+    "supabase/migrations/20261015174211_runtime_read_projection.sql": "3e2f98633b4f9e879ccee43df2fb622a028e8fa0827ba0a60a34fe20939c1357",
+    "supabase/migrations/20261015175240_runtime_index_cleanup.sql": "283617daf0158bb4bac3f8edccac2a258a4c8091508863717820ea96c2d2890c"
+  },
+  "acceptance_log_sha256": "8b430cfccbe5dc3a89d11bad5f385fcb4434c4ac4c164092afa90d0bd8fff93a"
+}

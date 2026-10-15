@@ -4322,6 +4322,18 @@
           "items": {
             "$ref": "#/$defs/EventDutyInput"
           }
+        },
+        "registrations": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/EventRegistrationView"
+          }
+        },
+        "duties": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/EventDutyView"
+          }
         }
       },
       "required": [
@@ -22820,11 +22832,97 @@
         "error"
       ],
       "additionalProperties": false
+    },
+    "EventRegistrationView": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/FtkUuid"
+        },
+        "person_id": {
+          "$ref": "#/$defs/FtkUuid"
+        },
+        "display_name": {
+          "$ref": "#/$defs/Text"
+        },
+        "state": {
+          "$ref": "#/$defs/EventRegistrationState"
+        },
+        "attendance_result": {
+          "$ref": "#/$defs/AttendanceResult"
+        },
+        "version": {
+          "$ref": "#/$defs/PositiveInt"
+        }
+      },
+      "required": [
+        "id",
+        "person_id",
+        "display_name",
+        "state",
+        "attendance_result",
+        "version"
+      ],
+      "additionalProperties": false
+    },
+    "EventDutyView": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/FtkUuid"
+        },
+        "person_id": {
+          "$ref": "#/$defs/FtkUuid"
+        },
+        "duty": {
+          "$ref": "#/$defs/Duty"
+        },
+        "fee_minor": {
+          "$ref": "#/$defs/Money"
+        },
+        "currency": {
+          "$ref": "#/$defs/Currency"
+        },
+        "performed": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Bool"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "version": {
+          "$ref": "#/$defs/PositiveInt"
+        },
+        "verified_at": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Instant"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "id",
+        "person_id",
+        "duty",
+        "fee_minor",
+        "currency",
+        "performed",
+        "version",
+        "verified_at"
+      ],
+      "additionalProperties": false
     }
   },
   "x-contract": {
-    "version": "0.2.0-runtime",
-    "status": "implementation_in_progress",
+    "version": "2.2-runtime.1",
+    "status": "development_runtime_with_declared_limits",
     "source": "02 v2.0, final15October2026 user decisions",
     "transport_codes": {
       "R": "read RPC or approved projection",
@@ -24816,10 +24914,12 @@
           "A55"
         ],
         "configuration_policy": "numeric plan limits/prices and legal approval are deployment configuration, never arbitrary allow/deny",
-        "implementation_status": "implemented_gateway_rpc_acceptance_pending",
+        "implementation_status": "operational_development",
         "runtime_path": "/functions/v1/backend-v1/account_get_v1",
         "runtime_rpc": "api_v1.account_get_v1",
-        "runtime_transport": "authenticated Edge adapter -> service-only RPC; rules/transaction in PostgreSQL"
+        "runtime_transport": "authenticated Edge adapter -> service-only RPC; rules/transaction in PostgreSQL",
+        "runtime_external_path": "/functions/v1/backend-v1/account_get_v1",
+        "runtime_limits": []
       },
       {
         "name": "account_profile_update_v1",
@@ -25228,10 +25328,14 @@
           "A55"
         ],
         "configuration_policy": "numeric plan limits/prices and legal approval are deployment configuration, never arbitrary allow/deny",
-        "implementation_status": "implemented_gateway_rpc_acceptance_pending",
+        "implementation_status": "operational_development_limited",
         "runtime_path": "/functions/v1/backend-v1/organizations_list_v1",
         "runtime_rpc": "api_v1.organizations_list_v1",
-        "runtime_transport": "authenticated Edge adapter -> service-only RPC; rules/transaction in PostgreSQL"
+        "runtime_transport": "authenticated Edge adapter -> service-only RPC; rules/transaction in PostgreSQL",
+        "runtime_external_path": "/functions/v1/backend-v1/organizations_list_v1",
+        "runtime_limits": [
+          "single-page projection; cursor pagination pending"
+        ]
       },
       {
         "name": "organization_create_v1",
@@ -25316,10 +25420,12 @@
           "A55"
         ],
         "configuration_policy": "numeric plan limits/prices and legal approval are deployment configuration, never arbitrary allow/deny",
-        "implementation_status": "implemented_gateway_rpc_acceptance_pending",
+        "implementation_status": "operational_development",
         "runtime_path": "/functions/v1/backend-v1/organization_create_v1",
         "runtime_rpc": "api_v1.organization_create_v1",
-        "runtime_transport": "authenticated Edge adapter -> service-only RPC; rules/transaction in PostgreSQL"
+        "runtime_transport": "authenticated Edge adapter -> service-only RPC; rules/transaction in PostgreSQL",
+        "runtime_external_path": "/functions/v1/backend-v1/organization_create_v1",
+        "runtime_limits": []
       },
       {
         "name": "organization_get_v1",
@@ -25391,10 +25497,12 @@
           "A55"
         ],
         "configuration_policy": "numeric plan limits/prices and legal approval are deployment configuration, never arbitrary allow/deny",
-        "implementation_status": "implemented_gateway_rpc_acceptance_pending",
+        "implementation_status": "operational_development",
         "runtime_path": "/functions/v1/backend-v1/organization_get_v1",
         "runtime_rpc": "api_v1.organization_get_v1",
-        "runtime_transport": "authenticated Edge adapter -> service-only RPC; rules/transaction in PostgreSQL"
+        "runtime_transport": "authenticated Edge adapter -> service-only RPC; rules/transaction in PostgreSQL",
+        "runtime_external_path": "/functions/v1/backend-v1/organization_get_v1",
+        "runtime_limits": []
       },
       {
         "name": "organization_update_v1",
@@ -25903,10 +26011,14 @@
           "A55"
         ],
         "configuration_policy": "numeric plan limits/prices and legal approval are deployment configuration, never arbitrary allow/deny",
-        "implementation_status": "implemented_gateway_rpc_acceptance_pending",
+        "implementation_status": "operational_development_limited",
         "runtime_path": "/functions/v1/backend-v1/centers_list_v1",
         "runtime_rpc": "api_v1.centers_list_v1",
-        "runtime_transport": "authenticated Edge adapter -> service-only RPC; rules/transaction in PostgreSQL"
+        "runtime_transport": "authenticated Edge adapter -> service-only RPC; rules/transaction in PostgreSQL",
+        "runtime_external_path": "/functions/v1/backend-v1/centers_list_v1",
+        "runtime_limits": [
+          "single-page projection; cursor pagination pending"
+        ]
       },
       {
         "name": "center_create_v1",
@@ -25992,10 +26104,12 @@
           "A55"
         ],
         "configuration_policy": "numeric plan limits/prices and legal approval are deployment configuration, never arbitrary allow/deny",
-        "implementation_status": "implemented_gateway_rpc_acceptance_pending",
+        "implementation_status": "operational_development",
         "runtime_path": "/functions/v1/backend-v1/center_create_v1",
         "runtime_rpc": "api_v1.center_create_v1",
-        "runtime_transport": "authenticated Edge adapter -> service-only RPC; rules/transaction in PostgreSQL"
+        "runtime_transport": "authenticated Edge adapter -> service-only RPC; rules/transaction in PostgreSQL",
+        "runtime_external_path": "/functions/v1/backend-v1/center_create_v1",
+        "runtime_limits": []
       },
       {
         "name": "center_update_v1",
@@ -26596,10 +26710,12 @@
           "A55"
         ],
         "configuration_policy": "numeric plan limits/prices and legal approval are deployment configuration, never arbitrary allow/deny",
-        "implementation_status": "implemented_gateway_rpc_acceptance_pending",
+        "implementation_status": "operational_development",
         "runtime_path": "/functions/v1/backend-v1/role_assign_v1",
         "runtime_rpc": "api_v1.role_assign_v1",
-        "runtime_transport": "authenticated Edge adapter -> service-only RPC; rules/transaction in PostgreSQL"
+        "runtime_transport": "authenticated Edge adapter -> service-only RPC; rules/transaction in PostgreSQL",
+        "runtime_external_path": "/functions/v1/backend-v1/role_assign_v1",
+        "runtime_limits": []
       },
       {
         "name": "role_revoke_v1",
@@ -26689,10 +26805,12 @@
           "A55"
         ],
         "configuration_policy": "numeric plan limits/prices and legal approval are deployment configuration, never arbitrary allow/deny",
-        "implementation_status": "implemented_gateway_rpc_acceptance_pending",
+        "implementation_status": "operational_development",
         "runtime_path": "/functions/v1/backend-v1/role_revoke_v1",
         "runtime_rpc": "api_v1.role_revoke_v1",
-        "runtime_transport": "authenticated Edge adapter -> service-only RPC; rules/transaction in PostgreSQL"
+        "runtime_transport": "authenticated Edge adapter -> service-only RPC; rules/transaction in PostgreSQL",
+        "runtime_external_path": "/functions/v1/backend-v1/role_revoke_v1",
+        "runtime_limits": []
       },
       {
         "name": "permission_set_v1",
@@ -26778,7 +26896,9 @@
           "A55"
         ],
         "configuration_policy": "numeric plan limits/prices and legal approval are deployment configuration, never arbitrary allow/deny",
-        "implementation_status": "implemented_gateway_rpc_acceptance_pending"
+        "implementation_status": "operational_development",
+        "runtime_external_path": "/functions/v1/backend-v1/permission_set_v1",
+        "runtime_limits": []
       },
       {
         "name": "org_manager_assign_v1",
@@ -26867,10 +26987,12 @@
           "A55"
         ],
         "configuration_policy": "numeric plan limits/prices and legal approval are deployment configuration, never arbitrary allow/deny",
-        "implementation_status": "implemented_gateway_rpc_acceptance_pending",
+        "implementation_status": "operational_development",
         "runtime_path": "/functions/v1/backend-v1/org_manager_assign_v1",
         "runtime_rpc": "api_v1.org_manager_assign_v1",
-        "runtime_transport": "authenticated Edge adapter -> service-only RPC; rules/transaction in PostgreSQL"
+        "runtime_transport": "authenticated Edge adapter -> service-only RPC; rules/transaction in PostgreSQL",
+        "runtime_external_path": "/functions/v1/backend-v1/org_manager_assign_v1",
+        "runtime_limits": []
       },
       {
         "name": "org_manager_revoke_v1",
@@ -26959,10 +27081,12 @@
           "A55"
         ],
         "configuration_policy": "numeric plan limits/prices and legal approval are deployment configuration, never arbitrary allow/deny",
-        "implementation_status": "implemented_gateway_rpc_acceptance_pending",
+        "implementation_status": "operational_development",
         "runtime_path": "/functions/v1/backend-v1/org_manager_revoke_v1",
         "runtime_rpc": "api_v1.org_manager_revoke_v1",
-        "runtime_transport": "authenticated Edge adapter -> service-only RPC; rules/transaction in PostgreSQL"
+        "runtime_transport": "authenticated Edge adapter -> service-only RPC; rules/transaction in PostgreSQL",
+        "runtime_external_path": "/functions/v1/backend-v1/org_manager_revoke_v1",
+        "runtime_limits": []
       },
       {
         "name": "manager_self_assign_center_v1",
@@ -27051,10 +27175,12 @@
           "A55"
         ],
         "configuration_policy": "numeric plan limits/prices and legal approval are deployment configuration, never arbitrary allow/deny",
-        "implementation_status": "implemented_gateway_rpc_acceptance_pending",
+        "implementation_status": "operational_development",
         "runtime_path": "/functions/v1/backend-v1/manager_self_assign_center_v1",
         "runtime_rpc": "api_v1.manager_self_assign_center_v1",
-        "runtime_transport": "authenticated Edge adapter -> service-only RPC; rules/transaction in PostgreSQL"
+        "runtime_transport": "authenticated Edge adapter -> service-only RPC; rules/transaction in PostgreSQL",
+        "runtime_external_path": "/functions/v1/backend-v1/manager_self_assign_center_v1",
+        "runtime_limits": []
       },
       {
         "name": "account_access_send_v1",
@@ -27144,10 +27270,14 @@
           "A55"
         ],
         "configuration_policy": "numeric plan limits/prices and legal approval are deployment configuration, never arbitrary allow/deny",
-        "implementation_status": "implemented_gateway_rpc_acceptance_pending",
+        "implementation_status": "operational_development_limited",
         "runtime_path": "/functions/v1/backend-v1/account_access_send_v1",
         "runtime_rpc": "api_v1.account_access_send_v1",
-        "runtime_transport": "authenticated Edge adapter -> service-only RPC; rules/transaction in PostgreSQL"
+        "runtime_transport": "authenticated Edge adapter -> service-only RPC; rules/transaction in PostgreSQL",
+        "runtime_external_path": "/functions/v1/backend-v1/account_access_send_v1",
+        "runtime_limits": [
+          "local_synthetic_SMTP_delivery_only; external provider unconfigured"
+        ]
       },
       {
         "name": "account_access_revoke_v1",
@@ -27322,10 +27452,12 @@
           "A55"
         ],
         "configuration_policy": "numeric plan limits/prices and legal approval are deployment configuration, never arbitrary allow/deny",
-        "implementation_status": "implemented_gateway_rpc_acceptance_pending",
+        "implementation_status": "operational_development",
         "runtime_path": "/functions/v1/backend-v1/account_access_accept_v1",
         "runtime_rpc": "api_v1.account_access_accept_v1",
-        "runtime_transport": "authenticated Edge adapter -> service-only RPC; rules/transaction in PostgreSQL"
+        "runtime_transport": "authenticated Edge adapter -> service-only RPC; rules/transaction in PostgreSQL",
+        "runtime_external_path": "/functions/v1/backend-v1/account_access_accept_v1",
+        "runtime_limits": []
       },
       {
         "name": "account_link_remove_v1",
@@ -27609,10 +27741,12 @@
           "A55"
         ],
         "configuration_policy": "numeric plan limits/prices and legal approval are deployment configuration, never arbitrary allow/deny",
-        "implementation_status": "implemented_gateway_rpc_acceptance_pending",
+        "implementation_status": "operational_development",
         "runtime_path": "/functions/v1/backend-v1/person_create_v1",
         "runtime_rpc": "api_v1.person_create_v1",
-        "runtime_transport": "authenticated Edge adapter -> service-only RPC; rules/transaction in PostgreSQL"
+        "runtime_transport": "authenticated Edge adapter -> service-only RPC; rules/transaction in PostgreSQL",
+        "runtime_external_path": "/functions/v1/backend-v1/person_create_v1",
+        "runtime_limits": []
       },
       {
         "name": "person_update_v1",
@@ -27772,10 +27906,12 @@
           "A55"
         ],
         "configuration_policy": "numeric plan limits/prices and legal approval are deployment configuration, never arbitrary allow/deny",
-        "implementation_status": "implemented_gateway_rpc_acceptance_pending",
+        "implementation_status": "operational_development",
         "runtime_path": "/functions/v1/backend-v1/student_activate_v1",
         "runtime_rpc": "api_v1.student_activate_v1",
-        "runtime_transport": "authenticated Edge adapter -> service-only RPC; rules/transaction in PostgreSQL"
+        "runtime_transport": "authenticated Edge adapter -> service-only RPC; rules/transaction in PostgreSQL",
+        "runtime_external_path": "/functions/v1/backend-v1/student_activate_v1",
+        "runtime_limits": []
       },
       {
         "name": "student_deactivate_v1",
@@ -28229,10 +28365,12 @@
           "D-A12"
         ],
         "configuration_policy": "numeric plan limits/prices and legal approval are deployment configuration, never arbitrary allow/deny",
-        "implementation_status": "implemented_gateway_rpc_acceptance_pending",
+        "implementation_status": "operational_development",
         "runtime_path": "/functions/v1/backend-v1/class_save_v1",
         "runtime_rpc": "api_v1.class_save_v1",
-        "runtime_transport": "authenticated Edge adapter -> service-only RPC; rules/transaction in PostgreSQL"
+        "runtime_transport": "authenticated Edge adapter -> service-only RPC; rules/transaction in PostgreSQL",
+        "runtime_external_path": "/functions/v1/backend-v1/class_save_v1",
+        "runtime_limits": []
       },
       {
         "name": "program_preview_v1",
@@ -28483,10 +28621,12 @@
           "D-A12"
         ],
         "configuration_policy": "numeric plan limits/prices and legal approval are deployment configuration, never arbitrary allow/deny",
-        "implementation_status": "implemented_gateway_rpc_acceptance_pending",
+        "implementation_status": "operational_development",
         "runtime_path": "/functions/v1/backend-v1/session_create_v1",
         "runtime_rpc": "api_v1.session_create_v1",
-        "runtime_transport": "authenticated Edge adapter -> service-only RPC; rules/transaction in PostgreSQL"
+        "runtime_transport": "authenticated Edge adapter -> service-only RPC; rules/transaction in PostgreSQL",
+        "runtime_external_path": "/functions/v1/backend-v1/session_create_v1",
+        "runtime_limits": []
       },
       {
         "name": "session_get_v1",
@@ -29847,10 +29987,14 @@
           "D-A12"
         ],
         "configuration_policy": "numeric plan limits/prices and legal approval are deployment configuration, never arbitrary allow/deny",
-        "implementation_status": "implemented_gateway_rpc_acceptance_pending",
+        "implementation_status": "operational_development_limited",
         "runtime_path": "/functions/v1/backend-v1/reservation_create_v1",
         "runtime_rpc": "api_v1.reservation_create_v1",
-        "runtime_transport": "authenticated Edge adapter -> service-only RPC; rules/transaction in PostgreSQL"
+        "runtime_transport": "authenticated Edge adapter -> service-only RPC; rules/transaction in PostgreSQL",
+        "runtime_external_path": "/functions/v1/backend-v1/reservation_create_v1",
+        "runtime_limits": [
+          "full lesson attendance/earnings and waitlist flows remain contract-only"
+        ]
       },
       {
         "name": "reservation_cancel_v1",
@@ -29964,10 +30108,12 @@
           "D-A12"
         ],
         "configuration_policy": "numeric plan limits/prices and legal approval are deployment configuration, never arbitrary allow/deny",
-        "implementation_status": "implemented_gateway_rpc_acceptance_pending",
+        "implementation_status": "operational_development",
         "runtime_path": "/functions/v1/backend-v1/reservation_cancel_v1",
         "runtime_rpc": "api_v1.reservation_cancel_v1",
-        "runtime_transport": "authenticated Edge adapter -> service-only RPC; rules/transaction in PostgreSQL"
+        "runtime_transport": "authenticated Edge adapter -> service-only RPC; rules/transaction in PostgreSQL",
+        "runtime_external_path": "/functions/v1/backend-v1/reservation_cancel_v1",
+        "runtime_limits": []
       },
       {
         "name": "reservation_list_v1",
@@ -31087,10 +31233,12 @@
           "D-A12"
         ],
         "configuration_policy": "numeric plan limits/prices and legal approval are deployment configuration, never arbitrary allow/deny",
-        "implementation_status": "implemented_gateway_rpc_acceptance_pending",
+        "implementation_status": "operational_development",
         "runtime_path": "/functions/v1/backend-v1/product_publish_v1",
         "runtime_rpc": "api_v1.product_publish_v1",
-        "runtime_transport": "authenticated Edge adapter -> service-only RPC; rules/transaction in PostgreSQL"
+        "runtime_transport": "authenticated Edge adapter -> service-only RPC; rules/transaction in PostgreSQL",
+        "runtime_external_path": "/functions/v1/backend-v1/product_publish_v1",
+        "runtime_limits": []
       },
       {
         "name": "sale_preview_v1",
@@ -31191,10 +31339,12 @@
           "D-A12"
         ],
         "configuration_policy": "numeric plan limits/prices and legal approval are deployment configuration, never arbitrary allow/deny",
-        "implementation_status": "implemented_gateway_rpc_acceptance_pending",
+        "implementation_status": "operational_development",
         "runtime_path": "/functions/v1/backend-v1/sale_preview_v1",
         "runtime_rpc": "api_v1.sale_preview_v1",
-        "runtime_transport": "authenticated Edge adapter -> service-only RPC; rules/transaction in PostgreSQL"
+        "runtime_transport": "authenticated Edge adapter -> service-only RPC; rules/transaction in PostgreSQL",
+        "runtime_external_path": "/functions/v1/backend-v1/sale_preview_v1",
+        "runtime_limits": []
       },
       {
         "name": "sale_apply_v1",
@@ -31307,10 +31457,12 @@
           "D-A12"
         ],
         "configuration_policy": "numeric plan limits/prices and legal approval are deployment configuration, never arbitrary allow/deny",
-        "implementation_status": "implemented_gateway_rpc_acceptance_pending",
+        "implementation_status": "operational_development",
         "runtime_path": "/functions/v1/backend-v1/sale_apply_v1",
         "runtime_rpc": "api_v1.sale_apply_v1",
-        "runtime_transport": "authenticated Edge adapter -> service-only RPC; rules/transaction in PostgreSQL"
+        "runtime_transport": "authenticated Edge adapter -> service-only RPC; rules/transaction in PostgreSQL",
+        "runtime_external_path": "/functions/v1/backend-v1/sale_apply_v1",
+        "runtime_limits": []
       },
       {
         "name": "entitlements_get_v1",
@@ -31393,10 +31545,12 @@
           "D-A12"
         ],
         "configuration_policy": "numeric plan limits/prices and legal approval are deployment configuration, never arbitrary allow/deny",
-        "implementation_status": "implemented_gateway_rpc_acceptance_pending",
+        "implementation_status": "operational_development",
         "runtime_path": "/functions/v1/backend-v1/entitlements_get_v1",
         "runtime_rpc": "api_v1.entitlements_get_v1",
-        "runtime_transport": "authenticated Edge adapter -> service-only RPC; rules/transaction in PostgreSQL"
+        "runtime_transport": "authenticated Edge adapter -> service-only RPC; rules/transaction in PostgreSQL",
+        "runtime_external_path": "/functions/v1/backend-v1/entitlements_get_v1",
+        "runtime_limits": []
       },
       {
         "name": "entitlement_extend_v1",
@@ -32969,10 +33123,12 @@
           "A55"
         ],
         "configuration_policy": "numeric plan limits/prices and legal approval are deployment configuration, never arbitrary allow/deny",
-        "implementation_status": "implemented_gateway_rpc_acceptance_pending",
+        "implementation_status": "operational_development",
         "runtime_path": "/functions/v1/backend-v1/collection_record_v1",
         "runtime_rpc": "api_v1.collection_record_v1",
-        "runtime_transport": "authenticated Edge adapter -> service-only RPC; rules/transaction in PostgreSQL"
+        "runtime_transport": "authenticated Edge adapter -> service-only RPC; rules/transaction in PostgreSQL",
+        "runtime_external_path": "/functions/v1/backend-v1/collection_record_v1",
+        "runtime_limits": []
       },
       {
         "name": "collection_correct_preview_v1",
@@ -35244,10 +35400,12 @@
           "A55"
         ],
         "configuration_policy": "numeric plan limits/prices and legal approval are deployment configuration, never arbitrary allow/deny",
-        "implementation_status": "implemented_gateway_rpc_acceptance_pending",
+        "implementation_status": "operational_development",
         "runtime_path": "/functions/v1/backend-v1/subscription_get_v1",
         "runtime_rpc": "api_v1.subscription_get_v1",
-        "runtime_transport": "authenticated Edge adapter -> service-only RPC; rules/transaction in PostgreSQL"
+        "runtime_transport": "authenticated Edge adapter -> service-only RPC; rules/transaction in PostgreSQL",
+        "runtime_external_path": "/functions/v1/backend-v1/subscription_get_v1",
+        "runtime_limits": []
       },
       {
         "name": "subscription_upgrade_quote_v1",
@@ -35656,10 +35814,12 @@
           "A55"
         ],
         "configuration_policy": "numeric plan limits/prices and legal approval are deployment configuration, never arbitrary allow/deny",
-        "implementation_status": "implemented_gateway_rpc_acceptance_pending",
+        "implementation_status": "operational_development",
         "runtime_path": "/functions/v1/backend-v1/saas_payment_submit_v1",
         "runtime_rpc": "api_v1.saas_payment_submit_v1",
-        "runtime_transport": "authenticated Edge adapter -> service-only RPC; rules/transaction in PostgreSQL"
+        "runtime_transport": "authenticated Edge adapter -> service-only RPC; rules/transaction in PostgreSQL",
+        "runtime_external_path": "/functions/v1/backend-v1/saas_payment_submit_v1",
+        "runtime_limits": []
       },
       {
         "name": "saas_payment_verify_v1",
@@ -35751,10 +35911,12 @@
           "A55"
         ],
         "configuration_policy": "numeric plan limits/prices and legal approval are deployment configuration, never arbitrary allow/deny",
-        "implementation_status": "implemented_gateway_rpc_acceptance_pending",
+        "implementation_status": "operational_development",
         "runtime_path": "/functions/v1/backend-v1/saas_payment_verify_v1",
         "runtime_rpc": "api_v1.saas_payment_verify_v1",
-        "runtime_transport": "authenticated Edge adapter -> service-only RPC; rules/transaction in PostgreSQL"
+        "runtime_transport": "authenticated Edge adapter -> service-only RPC; rules/transaction in PostgreSQL",
+        "runtime_external_path": "/functions/v1/backend-v1/saas_payment_verify_v1",
+        "runtime_limits": []
       },
       {
         "name": "saas_grace_extend_v1",
@@ -35939,10 +36101,12 @@
           "Q-D01-A08"
         ],
         "configuration_policy": "numeric plan limits/prices and legal approval are deployment configuration, never arbitrary allow/deny",
-        "implementation_status": "implemented_gateway_rpc_acceptance_pending",
+        "implementation_status": "operational_development",
         "runtime_path": "/functions/v1/backend-v1/event_save_v1",
         "runtime_rpc": "api_v1.event_save_v1",
-        "runtime_transport": "authenticated Edge adapter -> service-only RPC; rules/transaction in PostgreSQL"
+        "runtime_transport": "authenticated Edge adapter -> service-only RPC; rules/transaction in PostgreSQL",
+        "runtime_external_path": "/functions/v1/backend-v1/event_save_v1",
+        "runtime_limits": []
       },
       {
         "name": "event_publish_v1",
@@ -36044,10 +36208,12 @@
           "Q-D01-A08"
         ],
         "configuration_policy": "numeric plan limits/prices and legal approval are deployment configuration, never arbitrary allow/deny",
-        "implementation_status": "implemented_gateway_rpc_acceptance_pending",
+        "implementation_status": "operational_development",
         "runtime_path": "/functions/v1/backend-v1/event_publish_v1",
         "runtime_rpc": "api_v1.event_publish_v1",
-        "runtime_transport": "authenticated Edge adapter -> service-only RPC; rules/transaction in PostgreSQL"
+        "runtime_transport": "authenticated Edge adapter -> service-only RPC; rules/transaction in PostgreSQL",
+        "runtime_external_path": "/functions/v1/backend-v1/event_publish_v1",
+        "runtime_limits": []
       },
       {
         "name": "event_register_v1",
@@ -36175,10 +36341,14 @@
           "Q-D01-A08"
         ],
         "configuration_policy": "numeric plan limits/prices and legal approval are deployment configuration, never arbitrary allow/deny",
-        "implementation_status": "implemented_gateway_rpc_acceptance_pending",
+        "implementation_status": "operational_development_limited",
         "runtime_path": "/functions/v1/backend-v1/event_register_v1",
         "runtime_rpc": "api_v1.event_register_v1",
-        "runtime_transport": "authenticated Edge adapter -> service-only RPC; rules/transaction in PostgreSQL"
+        "runtime_transport": "authenticated Edge adapter -> service-only RPC; rules/transaction in PostgreSQL",
+        "runtime_external_path": "/functions/v1/backend-v1/event_register_v1",
+        "runtime_limits": [
+          "Q-E01: paid manual full-payment pre-registration flow blocked"
+        ]
       },
       {
         "name": "event_registration_cancel_v1",
@@ -36299,10 +36469,12 @@
           "Q-D01-A08"
         ],
         "configuration_policy": "numeric plan limits/prices and legal approval are deployment configuration, never arbitrary allow/deny",
-        "implementation_status": "implemented_gateway_rpc_acceptance_pending",
+        "implementation_status": "operational_development",
         "runtime_path": "/functions/v1/backend-v1/event_registration_cancel_v1",
         "runtime_rpc": "api_v1.event_registration_cancel_v1",
-        "runtime_transport": "authenticated Edge adapter -> service-only RPC; rules/transaction in PostgreSQL"
+        "runtime_transport": "authenticated Edge adapter -> service-only RPC; rules/transaction in PostgreSQL",
+        "runtime_external_path": "/functions/v1/backend-v1/event_registration_cancel_v1",
+        "runtime_limits": []
       },
       {
         "name": "event_complete_v1",
@@ -36413,10 +36585,12 @@
           "Q-D01-A08"
         ],
         "configuration_policy": "numeric plan limits/prices and legal approval are deployment configuration, never arbitrary allow/deny",
-        "implementation_status": "implemented_gateway_rpc_acceptance_pending",
+        "implementation_status": "operational_development",
         "runtime_path": "/functions/v1/backend-v1/event_complete_v1",
         "runtime_rpc": "api_v1.event_complete_v1",
-        "runtime_transport": "authenticated Edge adapter -> service-only RPC; rules/transaction in PostgreSQL"
+        "runtime_transport": "authenticated Edge adapter -> service-only RPC; rules/transaction in PostgreSQL",
+        "runtime_external_path": "/functions/v1/backend-v1/event_complete_v1",
+        "runtime_limits": []
       },
       {
         "name": "event_duty_verify_v1",
@@ -36528,7 +36702,9 @@
           "Q-D01-A08"
         ],
         "configuration_policy": "numeric plan limits/prices and legal approval are deployment configuration, never arbitrary allow/deny",
-        "implementation_status": "implemented_gateway_rpc_acceptance_pending"
+        "implementation_status": "operational_development",
+        "runtime_external_path": "/functions/v1/backend-v1/event_duty_verify_v1",
+        "runtime_limits": []
       },
       {
         "name": "event_cancel_preview_v1",
@@ -36629,7 +36805,11 @@
           "Q-D01-A08"
         ],
         "configuration_policy": "numeric plan limits/prices and legal approval are deployment configuration, never arbitrary allow/deny",
-        "implementation_status": "implemented_gateway_rpc_acceptance_pending"
+        "implementation_status": "operational_development_limited",
+        "runtime_external_path": "/functions/v1/backend-v1/event_cancel_preview_v1",
+        "runtime_limits": [
+          "Q-E01: manual monetary refund formulas blocked"
+        ]
       },
       {
         "name": "event_cancel_apply_v1",
@@ -36744,7 +36924,11 @@
           "Q-D01-A08"
         ],
         "configuration_policy": "numeric plan limits/prices and legal approval are deployment configuration, never arbitrary allow/deny",
-        "implementation_status": "implemented_gateway_rpc_acceptance_pending"
+        "implementation_status": "operational_development_limited",
+        "runtime_external_path": "/functions/v1/backend-v1/event_cancel_apply_v1",
+        "runtime_limits": [
+          "Q-E01: manual monetary refund formulas blocked"
+        ]
       },
       {
         "name": "event_list_v1",
@@ -36832,10 +37016,14 @@
           "Q-D01-A08"
         ],
         "configuration_policy": "numeric plan limits/prices and legal approval are deployment configuration, never arbitrary allow/deny",
-        "implementation_status": "implemented_gateway_rpc_acceptance_pending",
+        "implementation_status": "operational_development_limited",
         "runtime_path": "/functions/v1/backend-v1/event_list_v1",
         "runtime_rpc": "api_v1.event_list_v1",
-        "runtime_transport": "authenticated Edge adapter -> service-only RPC; rules/transaction in PostgreSQL"
+        "runtime_transport": "authenticated Edge adapter -> service-only RPC; rules/transaction in PostgreSQL",
+        "runtime_external_path": "/functions/v1/backend-v1/event_list_v1",
+        "runtime_limits": [
+          "starts_at_asc keyset paging only"
+        ]
       },
       {
         "name": "document_upload_prepare_v1",
@@ -38660,10 +38848,12 @@
           "Q-D01-A08"
         ],
         "configuration_policy": "numeric plan limits/prices and legal approval are deployment configuration, never arbitrary allow/deny",
-        "implementation_status": "implemented_gateway_rpc_acceptance_pending",
+        "implementation_status": "operational_development",
         "runtime_path": "/functions/v1/backend-v1/event_attendance_mark_v1",
         "runtime_rpc": "api_v1.event_attendance_mark_v1",
-        "runtime_transport": "authenticated Edge adapter -> service-only RPC; rules/transaction in PostgreSQL"
+        "runtime_transport": "authenticated Edge adapter -> service-only RPC; rules/transaction in PostgreSQL",
+        "runtime_external_path": "/functions/v1/backend-v1/event_attendance_mark_v1",
+        "runtime_limits": []
       },
       {
         "name": "platform_owner_set_v1",
@@ -38753,10 +38943,12 @@
           "A55"
         ],
         "configuration_policy": "numeric plan limits/prices and legal approval are deployment configuration, never arbitrary allow/deny",
-        "implementation_status": "implemented_gateway_rpc_acceptance_pending",
+        "implementation_status": "operational_development",
         "runtime_path": "/functions/v1/backend-v1/platform_owner_set_v1",
         "runtime_rpc": "api_v1.platform_owner_set_v1",
-        "runtime_transport": "authenticated Edge adapter -> service-only RPC; rules/transaction in PostgreSQL"
+        "runtime_transport": "authenticated Edge adapter -> service-only RPC; rules/transaction in PostgreSQL",
+        "runtime_external_path": "/functions/v1/backend-v1/platform_owner_set_v1",
+        "runtime_limits": []
       },
       {
         "name": "platform_owner_remove_v1",
@@ -38846,10 +39038,12 @@
           "A55"
         ],
         "configuration_policy": "numeric plan limits/prices and legal approval are deployment configuration, never arbitrary allow/deny",
-        "implementation_status": "implemented_gateway_rpc_acceptance_pending",
+        "implementation_status": "operational_development",
         "runtime_path": "/functions/v1/backend-v1/platform_owner_remove_v1",
         "runtime_rpc": "api_v1.platform_owner_remove_v1",
-        "runtime_transport": "authenticated Edge adapter -> service-only RPC; rules/transaction in PostgreSQL"
+        "runtime_transport": "authenticated Edge adapter -> service-only RPC; rules/transaction in PostgreSQL",
+        "runtime_external_path": "/functions/v1/backend-v1/platform_owner_remove_v1",
+        "runtime_limits": []
       },
       {
         "name": "center_manager_assign_v1",
@@ -38938,10 +39132,12 @@
           "A55"
         ],
         "configuration_policy": "numeric plan limits/prices and legal approval are deployment configuration, never arbitrary allow/deny",
-        "implementation_status": "implemented_gateway_rpc_acceptance_pending",
+        "implementation_status": "operational_development",
         "runtime_path": "/functions/v1/backend-v1/center_manager_assign_v1",
         "runtime_rpc": "api_v1.center_manager_assign_v1",
-        "runtime_transport": "authenticated Edge adapter -> service-only RPC; rules/transaction in PostgreSQL"
+        "runtime_transport": "authenticated Edge adapter -> service-only RPC; rules/transaction in PostgreSQL",
+        "runtime_external_path": "/functions/v1/backend-v1/center_manager_assign_v1",
+        "runtime_limits": []
       },
       {
         "name": "center_manager_revoke_v1",
@@ -39030,10 +39226,12 @@
           "A55"
         ],
         "configuration_policy": "numeric plan limits/prices and legal approval are deployment configuration, never arbitrary allow/deny",
-        "implementation_status": "implemented_gateway_rpc_acceptance_pending",
+        "implementation_status": "operational_development",
         "runtime_path": "/functions/v1/backend-v1/center_manager_revoke_v1",
         "runtime_rpc": "api_v1.center_manager_revoke_v1",
-        "runtime_transport": "authenticated Edge adapter -> service-only RPC; rules/transaction in PostgreSQL"
+        "runtime_transport": "authenticated Edge adapter -> service-only RPC; rules/transaction in PostgreSQL",
+        "runtime_external_path": "/functions/v1/backend-v1/center_manager_revoke_v1",
+        "runtime_limits": []
       },
       {
         "name": "attendance_block_v1",
@@ -39265,10 +39463,12 @@
           "Q-D01-A08"
         ],
         "configuration_policy": "numeric plan limits/prices and legal approval are deployment configuration, never arbitrary allow/deny",
-        "implementation_status": "implemented_gateway_rpc_acceptance_pending",
+        "implementation_status": "operational_development",
         "runtime_path": "/functions/v1/backend-v1/event_attendance_close_v1",
         "runtime_rpc": "api_v1.event_attendance_close_v1",
-        "runtime_transport": "authenticated Edge adapter -> service-only RPC; rules/transaction in PostgreSQL"
+        "runtime_transport": "authenticated Edge adapter -> service-only RPC; rules/transaction in PostgreSQL",
+        "runtime_external_path": "/functions/v1/backend-v1/event_attendance_close_v1",
+        "runtime_limits": []
       },
       {
         "name": "event_attendance_correct_v1",
@@ -39391,10 +39591,12 @@
           "Q-D01-A08"
         ],
         "configuration_policy": "numeric plan limits/prices and legal approval are deployment configuration, never arbitrary allow/deny",
-        "implementation_status": "implemented_gateway_rpc_acceptance_pending",
+        "implementation_status": "operational_development",
         "runtime_path": "/functions/v1/backend-v1/event_attendance_correct_v1",
         "runtime_rpc": "api_v1.event_attendance_correct_v1",
-        "runtime_transport": "authenticated Edge adapter -> service-only RPC; rules/transaction in PostgreSQL"
+        "runtime_transport": "authenticated Edge adapter -> service-only RPC; rules/transaction in PostgreSQL",
+        "runtime_external_path": "/functions/v1/backend-v1/event_attendance_correct_v1",
+        "runtime_limits": []
       },
       {
         "name": "file_upload_complete_v1",
@@ -39690,10 +39892,12 @@
           "A03"
         ],
         "configuration_policy": "numeric plan limits/prices and legal approval are deployment configuration, never arbitrary allow/deny",
-        "implementation_status": "implemented_gateway_rpc_acceptance_pending",
+        "implementation_status": "operational_development",
         "runtime_path": "/functions/v1/backend-v1/discipline_save_v1",
         "runtime_rpc": "api_v1.discipline_save_v1",
-        "runtime_transport": "authenticated Edge adapter -> service-only RPC; rules/transaction in PostgreSQL"
+        "runtime_transport": "authenticated Edge adapter -> service-only RPC; rules/transaction in PostgreSQL",
+        "runtime_external_path": "/functions/v1/backend-v1/discipline_save_v1",
+        "runtime_limits": []
       },
       {
         "name": "center_discipline_set_v1",
@@ -39767,10 +39971,12 @@
           "A03"
         ],
         "configuration_policy": "numeric plan limits/prices and legal approval are deployment configuration, never arbitrary allow/deny",
-        "implementation_status": "implemented_gateway_rpc_acceptance_pending",
+        "implementation_status": "operational_development",
         "runtime_path": "/functions/v1/backend-v1/center_discipline_set_v1",
         "runtime_rpc": "api_v1.center_discipline_set_v1",
-        "runtime_transport": "authenticated Edge adapter -> service-only RPC; rules/transaction in PostgreSQL"
+        "runtime_transport": "authenticated Edge adapter -> service-only RPC; rules/transaction in PostgreSQL",
+        "runtime_external_path": "/functions/v1/backend-v1/center_discipline_set_v1",
+        "runtime_limits": []
       },
       {
         "name": "person_discipline_set_v1",
@@ -39917,10 +40123,12 @@
           "Q-D01-A08"
         ],
         "configuration_policy": "numeric plan limits/prices and legal approval are deployment configuration, never arbitrary allow/deny",
-        "implementation_status": "implemented_gateway_rpc_acceptance_pending",
+        "implementation_status": "operational_development",
         "runtime_path": "/functions/v1/backend-v1/event_get_v1",
         "runtime_rpc": "api_v1.event_get_v1",
-        "runtime_transport": "authenticated Edge adapter -> service-only RPC; rules/transaction in PostgreSQL"
+        "runtime_transport": "authenticated Edge adapter -> service-only RPC; rules/transaction in PostgreSQL",
+        "runtime_external_path": "/functions/v1/backend-v1/event_get_v1",
+        "runtime_limits": []
       },
       {
         "name": "event_registration_preview_v1",
@@ -40003,10 +40211,14 @@
           "Q-D01-A08"
         ],
         "configuration_policy": "numeric plan limits/prices and legal approval are deployment configuration, never arbitrary allow/deny",
-        "implementation_status": "implemented_gateway_rpc_acceptance_pending",
+        "implementation_status": "operational_development_limited",
         "runtime_path": "/functions/v1/backend-v1/event_registration_preview_v1",
         "runtime_rpc": "api_v1.event_registration_preview_v1",
-        "runtime_transport": "authenticated Edge adapter -> service-only RPC; rules/transaction in PostgreSQL"
+        "runtime_transport": "authenticated Edge adapter -> service-only RPC; rules/transaction in PostgreSQL",
+        "runtime_external_path": "/functions/v1/backend-v1/event_registration_preview_v1",
+        "runtime_limits": [
+          "Q-E01 blockers are explicit; apply always rechecks current data"
+        ]
       }
     ],
     "policy_value_map": {
@@ -49203,23 +49415,56 @@
         "origin": "ftksaas",
         "acceptance": "generic_uuid",
         "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/EventRegistrationView/properties/id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/EventRegistrationView/properties/person_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/EventDutyView/properties/id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/EventDutyView/properties/person_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
       }
     ],
-    "open_product_decisions": [],
+    "open_product_decisions": [
+      {
+        "id": "Q-E01",
+        "status": "awaiting_product_decision",
+        "topic": "Manual event prepayment with full-payment gate; operator-cancellation monetary refund terms",
+        "source_gap": "EventTerms has shared product refund formulas; event_register has no prepayment reference or explicit offset choice",
+        "document": "docs/decisions/Q-E01.md",
+        "blocked_paths": [
+          "paid_manual_full_payment_registration",
+          "manual_operator_cancel_requiring_refund_formula"
+        ]
+      }
+    ],
     "accepted_product_decisions": [
       {
         "id": "Q-D01",
         "source": "10-FtkSaaS-Q-D01-kabul-karari.md",
         "product_status": "accepted_closed",
-        "technical_status": "schema_api_types_scope_kernel_verified_full_event_integration_pending",
+        "technical_status": "verified_real_auth_rpc_and_shared_pool_races",
         "event_labels": "zero_one_many_same_org_not_grants",
         "single_label": "explicit_event_eligibility_and_matching_narrow_or_broad_scope",
         "zero_or_many_labels": "explicit_event_eligibility_and_broad_scope_only",
         "negative_credit": "never_for_events",
-        "required_followup": [
-          "complete_authorized_event_register_preview_close_cancel_paths",
-          "last_shared_credit_concurrency_acceptance"
-        ]
+        "required_followup": []
       }
     ],
     "private_components": [
@@ -49244,10 +49489,26 @@
           "pool_lock",
           "atomic_allocation"
         ]
+      },
+      {
+        "function": "private.reserve_right",
+        "kind": "authoritative_shared_entitlement_transaction"
+      },
+      {
+        "function": "private.set_right_state",
+        "kind": "linked_consume_release_correction"
+      },
+      {
+        "function": "private.execute_operation",
+        "kind": "live_auth_tenant_billing_receipt_audit_outbox_transaction"
+      },
+      {
+        "function": "private.event_projection",
+        "kind": "current_scope_participant_and_duty_projection"
       }
     ],
     "runtime": {
-      "version": "0.2.0",
+      "version": "0.2.0-rc.1",
       "repository": "https://github.com/SXQHex/FtkSaaS",
       "branch": "backend/runtime-v0.2.0",
       "implemented_operations": [
@@ -49294,10 +49555,19 @@
         "event_attendance_mark_v1",
         "event_attendance_close_v1",
         "event_attendance_correct_v1",
-        "event_complete_v1"
+        "event_complete_v1",
+        "permission_set_v1",
+        "event_duty_verify_v1",
+        "event_cancel_preview_v1",
+        "event_cancel_apply_v1"
       ],
       "auth": "Supabase getUser + live auth.sessions + current account/link/role; no request actor claims",
-      "uuid": "backend uuid@14.0.3 v7 for all inserted IDs; DB defaults not required"
+      "uuid": "backend uuid@14.0.3 v7 for all inserted IDs; DB defaults not required",
+      "external_transport": "POST /functions/v1/backend-v1/{operation}; direct typed request body",
+      "internal_rpc": "service-only api_v1 named functions; actor/session/UUID bank supplied by verified gateway",
+      "migration_count": 6,
+      "test_evidence": "reports/verification.json",
+      "frontend_unchanged": true
     }
   }
 }

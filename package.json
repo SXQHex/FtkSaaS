@@ -16,7 +16,8 @@
     "dev:health": "node scripts/health.mjs",
     "db:advisors": "supabase db advisors --local --type all --level warn --fail-on error",
     "dev:info": "node scripts/dev-info.mjs",
-    "test:api": "node --test tests/api-acceptance.test.mjs"
+    "test:api": "node --test tests/api-acceptance.test.mjs",
+    "dev:seed": "node scripts/dev-seed.mjs"
   },
   "keywords": [],
   "author": "",

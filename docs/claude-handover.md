@@ -1,0 +1,90 @@
+# FtkSaaS backend — Claude devri · 0.2.0-rc.1
+
+Kalıcı kaynak: https://github.com/SXQHex/FtkSaaS · dal: `backend/runtime-v0.2.0` · inceleme: https://github.com/SXQHex/FtkSaaS/pull/1. Frontend tasarımı ve bileşenleri değiştirilmedi. Bu sürüm geliştirme kabulüdür; ürünün 180 operasyonunun tamamının veya üretim dağıtımının bittiği iddia edilmez.
+
+## Çalışan kapsam
+
+48 çağrılabilir gateway/named RPC; 132 işlem yalnız sözleşme. Tam liste ve kapsam sınırları: `docs/endpoint-inventory.json`. `contracts/05-FtkSaaS-O4-API-katalogu.md` her satırda durumu gösterir. Yalnız sözleşme olan bir işlem gateway’de `NOT_FOUND` alır.
+
+| Alan | Çağrılabilir işlemler |
+|---|---|
+| Hesap/organizasyon | account_get, organizations_list, organization_create/get, platform_owner_set/remove |
+| Merkez/yetki | center_create, centers_list, center_manager_assign/revoke, manager_self_assign_center, org_manager_assign/revoke, role_assign/revoke, permission_set |
+| Kişi/davet | person_create, student_activate, account_access_send/accept |
+| Disiplin | discipline_save, center_discipline_set |
+| Abonelik | saas_payment_submit/verify, subscription_get |
+| Hak/para | product_publish, sale_preview/apply, collection_record, entitlements_get |
+| Ders yarışı için yazma | class_save, session_create, reservation_create/cancel |
+| Etkinlik | event_save/publish/get/list, event_registration_preview, event_register, event_registration_cancel, event_attendance_mark/close/correct, event_complete, event_duty_verify, event_cancel_preview/apply |
+
+Tablodaki bütün adlar `_v1` ile biter. Dersin tam yoklama/hakediş, ödeme düzeltme, bekleme listesi, dosya upload/download, CRM, rapor/export, kullanıcı belge onayı ve bütün diğer işlemler envanterde ayrıca belirtilmedikçe **yalnız sözleşmedir**. Bu ekranda görünür bir butonun backend’i var sayılmamalı.
+
+## Kurulum ve bağlantı
+
+```sh
+git clone --branch backend/runtime-v0.2.0 https://github.com/SXQHex/FtkSaaS.git
+cd FtkSaaS
+# Node 24.19.0; alternatif: repoyu Dev Container içinde açın.
+npm ci
+npm run dev:start
+npm run dev:seed
+npm run dev:info
+npm test
+```
+
+Supabase CLI 2.121.0, PostgreSQL 17 native runtime, npm bağımlılıkları ve Dev Container taban imajı sürüm/hash ile sabittir. Native runtime experimental; yerel geliştirme içindir. Worker policy `oneshot`; npm bağımlılıkları istek sırasında çözülmez, Edge bundle içine önceden paketlenir. Portlar çakışmaması için dinamik seçilir. `dev:info` mevcut API/gateway, Studio ve Mailpit adresini ve yalnız publishable anahtarı gösterir; `.dev/frontend.env` içine yazar. Bunlar geliştiricinin kendi makinesi/container bağlantılarıdır; kalıcı paylaşılan internet endpoint’i değildir.
+
+`dev:seed` yalnız sentetik `@ftksaas.invalid` kullanıcıları ve örnek ticari yapılandırma üretir. Yerel giriş e-posta/parolaları ile org/merkez/disiplin/kişi ID’leri `.dev/development-users.json` içindedir; git’e girmez. Fiyat/limitler ürünün ticari varsayılanı değildir. Production veya başka projeye bağlanan seed/test kabul edilmez. Davet testi yerel Mailpit SMTP’ye teslim eder; gerçek e-posta sağlayıcısı kurulmuş değildir.
+
+Çalışma Box’ı süreli ve yeniden üretilebilirdir. Repo/CI/kurulum kodunun kalıcılığı Box’ın ömrüne bağlı değildir. Yerel veritabanını sıfırlamak için, yalnız sentetik geliştirme verisinin bulunduğu kendi ortamınızda `npx supabase db reset --local --no-seed --yes` çalıştırıp yeniden seed edin. Bu komut yerel veriyi siler.
+
+## Frontend çağrı sözleşmesi
+
+1. Supabase Auth ile giriş yapın; provider access token’ını alın. Hesap e-postası doğrulanmış olmalı.
+2. `POST {API_URL}/functions/v1/backend-v1/{operation}` çağırın. JSON gövdesi doğrudan ortak Request tipidir; dış `p_request` sarmalı yoktur.
+3. Header: `Authorization: Bearer <access_token>`, `apikey: <publishable key>`, `Content-Type: application/json`.
+
+Ortak tipler: `packages/contracts/src/generated.ts`, operasyon eşlemesi `operations.ts`, çağrılabilir adlar `runtime.ts`, tipli adapter `client.ts`. `createBackendClient` transport hatasında `BackendTransportError` fırlatır; domain hataları `{ok:false,error:SafeError}` biçimindedir. Başarı `{ok:true,data,trace_id}`. Bazı domain hataları HTTP 200 zarfıyla döner; her zaman `ok` denetlenmeli.
+
+```ts
+import { createBackendClient } from '@ftksaas/contracts/client';
+import { v7 } from 'uuid';
+const api = createBackendClient({
+  functionsUrl: connection.functions_url,
+  publishableKey: connection.publishable_key,
+  getAccessToken: async () => (await supabase.auth.getSession()).data.session?.access_token ?? null,
+});
+const result = await api.call('event_get_v1', {
+  client_api_version: 1, request_id: v7(), org_id, center_id, event_id,
+});
+```
+
+Paket tüketen yeni kayıt kimlikleri frontend’den gelmez. `request_id` ve mutasyon `operation_key` için `uuid` v7 kullanılır. Tek kullanıcı işleminin retry’ında aynı `operation_key` korunur; `request_id` yenilenebilir. Transport sonucu belirsizken yeni anahtar kullanmak yeni iş yaratabilir. En fazla üç otomatik retry; domain retryable=false sonucunu körlemesine tekrar etmeyin. 30 günlük receipt sonucu sona erse de eski anahtar yeni iş başlatmaz.
+
+Supabase `/rest/v1/rpc/<operation>` yolu **backend içidir**. Actor/session ve ID bankasını frontend göndermez. Service-role anahtarı, DB URL/parolası veya sentetik kullanıcı parolası frontend public env’e konmaz.
+
+Schema ile doğrulanmış JSON örnekleri: `examples/runtime-requests.json`. Güncel yerel bağlantı snapshot’ı: `docs/development-connection.json`; yeni kurulumda `dev:info` çıktısı esas alınır.
+
+## Etkinlik örnek akışı
+
+`event_save` tek transaction’da etkinlik + UUID disiplin etiketleri + görevler + kaynak rezervasyonlarını oluşturur/günceller. Güncellemede `event_id/expected_version` zorunludur. Mevcut hakları bozan zaman/etiket değişikliği atomik reddedilir; mevcut katılımcılar otomatik iptal edilmez. Görev ücretinde ücretsiz değer açık `"0"` olmalıdır.
+
+`event_publish` sonrasında `event_get` güncel version ve typed koşulları verir. `registrations` alanı yönetici/org okuyucusu veya güncel atanmış görevli için gerekli katılımcıları; öğrenci için yalnız kendi kayıtlarını içerir. `duties` yönetici/org okuyucusuna görev ID/sürüm/ücretlerini, ilgili kişiye kendi görevini verir. Böylece mark/cancel/correct ve duty verify için DB’ye erişmeden güncel ID/sürüm alınır. Liste projeksiyonu dar tutulur; `event_list` sıralaması `starts_at_asc`, cursor aynı filtreyle kullanılır.
+
+`event_registration_preview` etkisiz uygunluk incelemesidir. Apply karşılığı `event_register` isteğinde `preview:{id,token}` geçirilebilir. Actor/scope, event ve entitlement-account sürümü değişirse `PREVIEW_STALE`; bakiye/kota/kapasite/yetki/abonelik daima güncel transaction’da yeniden kontrol edilir. `sale_id` açıkça seçilen paket yoludur; verilmezse manuel etkinlik koşulları uygulanır.
+
+Kayıt katılımcı/işletme iptalinde aynı allocation üzerinden serbest bırakılır veya sabitlenmiş koşul tüketme gerektiriyorsa tüketilir. Taslak mark hak tüketmez. `event_attendance_close` bütün aktif sonuçlar girildikten sonra CM tarafından tek transaction’da kapatır; `expected_version` gerekir. Gerekçeli correction geçmiş hareketi silmez, linked reverse/yeni hareket ekler. `event_complete` gerçekleşme bilgisidir; duty ücreti ayrıca gerçekleşme + CM `event_duty_verify` ile oluşur. Katılım kapanışı ile görev hakedişi birbirinden ayrıdır.
+
+## Karar ve teknik kapsam sınırları
+
+**Q-E01 açık:** paketsiz ücretli/tam ödeme şartlı kayıt öncesi ödeme akışı ve etkinlik işletme iptali parasal iade tabanı kaynaklarda tamamlanmamış. Ayrıntı: `docs/decisions/Q-E01.md`. Bu dallar blocker/`POLICY_NOT_CONFIGURED` ile kapalıdır; tahminî ödeme/iade uygulanmadı. Q-D01 kabul edilmiş ve gerçek RPC/yarış testleriyle doğrulanmıştır; yeniden ürün kararı istenmiyor.
+
+Merkez ve organizasyon liste projeksiyonları şu aşamada tek sayfadır; event listesi gerçek cursor kullanır. Dev seed’deki ticari sayılar/izinler yalnız test fixture’ıdır. Gerçek sağlayıcı e-posta teslimi, dosya saklama/indirme, hukuki onay, dış ödeme sağlayıcısı, ölçek/yük ve yedekten geri yükleme kabulü bu sürümde tamamlanmış sayılmaz. Bu işler için henüz uygulanmayan özelliklere frontend’den dayanak oluşturulmamalı.
+
+## Doğrulama ve çalışma düzeni
+
+`reports/verification.json`, `reports/acceptance-verified.log` ve GitHub Actions son commit için kanıttır. Statik tutarlılık ile canlı Auth/RPC testleri ayrı raporlanır. Testler son hak event–event, event–ders, kapasite, aynı anahtarla eşzamanlı tekrar, payload değişimi, rollback, rol/oturum iptali, tenant izolasyonu, Q-D01 ve negatif kredi yasağını içerir.
+
+Önce org kilidi, ardından ilgili kaynak/hak satırları tutulur. Bu kaba kilit rol iptali ve bütün ortak havuz mutasyonlarını sıralar; yük testi sonucu değildir. Domain + allocation/ledger + receipt + audit + outbox tek commit’tir. UUID bankası tükenirse transaction tümüyle rollback olur; gateway aynı işlem anahtarıyla daha geniş doğrulanmış UUIDv7 bankasıyla tekrarlar. Defter/audit güncellenemez veya silinemez; düzeltmeler linked kayıtlarla eklenir.
+
+Yeni değişiklik ayrı migration ve branch/PR ile yapılmalı. `npm run generate` ortak tipleri, yalnız ihtiyaç duyulan şemaları, önceden derlenmiş validatorları, npm bağımlılıksız Edge bundle’ını ve katalogları üretir; `npm run verify` drift’i reddeder. `scripts/*historical*` ve `transfer_contract.py` geçmiş aktarım kaydıdır; güncel sözleşmeyi yeniden üretmek için çalıştırılmaz. Frontend tasarımı Claude’un alanıdır.

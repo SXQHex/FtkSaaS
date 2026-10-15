@@ -12,6 +12,7 @@ test('Real Auth → Edge UUID producer → named RPC → PostgreSQL acceptance',
  try{
  ownerPerson=(await db.query('select owner_person_id from core.organizations where id=$1',[org])).rows[0].owner_person_id;
  await t.test('backend-created records are UUIDv7 and bootstrap starts only after verified payment',async()=>{
+  await error(owner,'account_get_v1',{client_api_version:2},'CLIENT_UPDATE_REQUIRED');
   assert.equal(version(org),7);assert.equal(version(ownerAccount.id),7);assert.equal((await must(owner,'organization_get_v1',{org_id:org})).access_mode,'bootstrap');
   await error(owner,'person_create_v1',scoped({display_name:'blocked',contacts:[]}),'SUBSCRIPTION_NOT_STARTED');
   await error(owner,'organization_create_v1',{verified_account_id:ownerAccount.id,name:'no',initial_plan_id:plan},'FORBIDDEN');
@@ -97,6 +98,7 @@ test('Real Auth → Edge UUID producer → named RPC → PostgreSQL acceptance',
  });
  await t.test('events never create negative credit, even if normal lesson policy allows it',async()=>{
   await db.query("insert into core.policy_versions(id,org_id,key,effective_at,mandatory,value) values($1,$2,'negative_default',now(),false,$3)",[key(),org,{kind:'integer',value:100}]);
+  await db.query("insert into core.policy_versions(id,org_id,key,effective_at,mandatory,value) values($1,$2,'negative_upper',now(),true,$3)",[key(),org,{kind:'integer',value:100}]);
   const next=await newEvent();
   await error(owner,'event_register_v1',scoped({event_id:next.id,person_id:studentPerson,sale_id:sale}),'ENTITLEMENT_UNAVAILABLE');
   assert.equal((await db.query('select count(*)::int n from core.credit_deficits where org_id=$1',[org])).rows[0].n,0);
@@ -228,6 +230,46 @@ test('Real Auth → Edge UUID producer → named RPC → PostgreSQL acceptance',
   await mutate(owner,'center_manager_revoke_v1',{person_id:ownerPerson,expected_version:1,reason:'synthetic'});
   await error(invitee,'account_access_accept_v1',{token},'INVITATION_UNAVAILABLE');assert.equal((await db.query("select count(*)::int n from core.account_links where org_id=$1 and person_id=$2 and state='active'",[org,p])).rows[0].n,0);
   await mutate(owner,'center_manager_assign_v1',{person_id:ownerPerson});
+ });
+
+ await t.test('event read projection supplies registration/duty IDs and versions while restricting participant and fee data',async()=>{
+  const role=await mutate(owner,'role_assign_v1',{person_id:studentPerson,role:'assistant',scope:{center_id:center}});
+  const e=await newEvent({assignments:[{person_id:ownerPerson,duty:'instructor',fee_minor:'100',currency:'TRY'},{person_id:studentPerson,duty:'assistant',fee_minor:'50',currency:'TRY'}]});
+  const p=(await mutate(owner,'person_create_v1',{display_name:'Projected attendee',contacts:[]})).primary_id;await mutate(owner,'student_activate_v1',{person_id:p});const registration=await mutate(owner,'event_register_v1',{event_id:e.id,person_id:p});
+  const manager=await must(owner,'event_get_v1',scoped({event_id:e.id}));assert.equal(manager.registrations[0].id,registration.primary_id);assert.equal(manager.registrations[0].version,1);assert.equal(manager.duties.length,2);
+  const assistant=await must(student,'event_get_v1',scoped({event_id:e.id}));assert.equal(assistant.registrations.length,1);assert.equal(assistant.duties.length,1);assert.equal(assistant.duties[0].person_id,studentPerson);
+  await mutate(student,'event_attendance_mark_v1',{registration_id:registration.primary_id,expected_version:1,result:'attended'});await error(student,'event_attendance_close_v1',scoped({event_id:e.id,expected_version:4}),'FORBIDDEN');
+  await mutate(owner,'role_revoke_v1',{assignment_id:role.primary_id,expected_version:1,reason:'synthetic'});
+  await error(student,'event_attendance_mark_v1',scoped({registration_id:registration.primary_id,expected_version:2,result:'no_show'}),'FORBIDDEN');
+  const revoked=await must(student,'event_get_v1',scoped({event_id:e.id}));assert.deepEqual(revoked.registrations,[]);
+ });
+ await t.test('UUID-bank exhaustion rolls back a late named-RPC write; retry uses the same operation key safely',async()=>{
+  const {env}=context();const input=eventInput();const k=key();const request={client_api_version:1,request_id:key(),operation_key:k,...scoped(input)};
+  const res=await fetch(env.API_URL+'/rest/v1/rpc/event_save_v1',{method:'POST',headers:{apikey:env.SERVICE_ROLE_KEY,authorization:'Bearer '+env.SERVICE_ROLE_KEY,'content-profile':'api_v1','content-type':'application/json'},body:JSON.stringify({p_request:request,p_actor_auth_id:owner.id,p_session_id:owner.session_id,p_ids:Array.from({length:21},key),p_aux:null})});
+  const internal=await res.json();assert.equal(internal._internal_retry,'uuid_bank_exhausted');assert.equal((await db.query('select count(*)::int n from core.events where org_id=$1 and name=$2',[org,input.name])).rows[0].n,0);
+  assert.equal((await db.query('select count(*)::int n from core.operation_receipts where org_id=$1 and key_hash=$2',[org,createHash('sha256').update(k).digest('hex')])).rows[0].n,0);
+  await mutate(owner,'event_save_v1',input,k);assert.equal((await db.query('select count(*)::int n from core.events where org_id=$1 and name=$2',[org,input.name])).rows[0].n,1);
+ });
+ await t.test('configured lesson deficits are scoped by center/discipline and a later sale settles the same pool',async()=>{
+  await db.query("insert into core.policy_versions(id,org_id,key,effective_at,mandatory,value) values($1,$2,'negative_upper',now(),true,$3)",[key(),org,{kind:'integer',value:1}]);
+  const p=(await mutate(owner,'person_create_v1',{display_name:'Scoped deficit student',contacts:[]})).primary_id;await mutate(owner,'student_activate_v1',{person_id:p});
+  const second=(await must(owner,'discipline_save_v1',{org_id:org,name:'Deficit other discipline',state:'active'},key())).primary_id;await mutate(owner,'center_discipline_set_v1',{discipline_id:second,state:'active'});
+  async function sessionFor(d){const c=(await mutate(owner,'class_save_v1',{name:'Deficit class',discipline_id:d,external_open:true})).primary_id;return(await mutate(owner,'session_create_v1',{class_id:c,discipline_id:d,format:'group',interval:eventInput().interval,resources:[],assignments:[],capacity:{nominal:10,maximum:10}})).primary_id;}
+  const sessions=[await sessionFor(discipline),await sessionFor(discipline),await sessionFor(second)];
+  const first=await mutate(owner,'reservation_create_v1',{session_id:sessions[0],person_id:p,mode:'flexible'});await error(owner,'reservation_create_v1',scoped({session_id:sessions[1],person_id:p,mode:'flexible'}),'CREDIT_LIMIT_EXCEEDED');await mutate(owner,'reservation_create_v1',{session_id:sessions[2],person_id:p,mode:'flexible'});
+  await mutate(owner,'reservation_cancel_v1',{reservation_id:first.primary_id,expected_version:1,reason:'synthetic'});await mutate(owner,'reservation_create_v1',{session_id:sessions[1],person_id:p,mode:'flexible'});
+  const pv=(await mutate(owner,'product_publish_v1',{terms:{...terms,name:'Deficit settlement fixture',credits:2,price_minor:'0'}})).primary_id;const preview=await must(owner,'sale_preview_v1',scoped({person_id:p,product_version_id:pv,...dates}));const sale=(await mutate(owner,'sale_apply_v1',{preview:{id:preview.id,token:preview.token}})).primary_id;
+  assert.equal((await db.query("select count(*)::int n from core.credit_deficits where org_id=$1 and person_id=$2 and state in ('reserved','consumed')",[org,p])).rows[0].n,0);assert.equal((await db.query("select count(*)::int n from core.entitlement_allocations where org_id=$1 and sale_id=$2 and state='reserved'",[org,sale])).rows[0].n,2);
+ });
+
+ await t.test('event full-payment gate checks the selected sale debt on the real write path',async()=>{
+  const preview=await must(owner,'sale_preview_v1',scoped({person_id:studentPerson,product_version_id:product,...dates}));const s=(await mutate(owner,'sale_apply_v1',{preview:{id:preview.id,token:preview.token}})).primary_id;
+  const e=await newEvent({terms:{...eventTerms,full_payment_required:true}});await error(owner,'event_register_v1',scoped({event_id:e.id,person_id:studentPerson,sale_id:s}),'ENTITLEMENT_UNAVAILABLE');
+  const debt=(await db.query('select id from core.debts where org_id=$1 and sale_id=$2',[org,s])).rows[0].id;await mutate(owner,'collection_record_v1',{person_id:studentPerson,debt_ids:[debt],amount_minor:'1000',currency:'TRY',occurred_at:new Date().toISOString()});await mutate(owner,'event_register_v1',{event_id:e.id,person_id:studentPerson,sale_id:s});
+ });
+ await t.test('Q-E01 unresolved manual prepayment/refund choices are blocked without monetary or entitlement side effects',async()=>{
+  const required=await newEvent({terms:{...eventTerms,fee_minor:'500',full_payment_required:true,allowed_product_version_ids:[]}});const preview=await must(owner,'event_registration_preview_v1',scoped({event_id:required.id,person_id:studentPerson}));assert.equal(preview.blockers[0].code,'POLICY_NOT_CONFIGURED');await error(owner,'event_register_v1',scoped({event_id:required.id,person_id:studentPerson}),'POLICY_NOT_CONFIGURED');assert.equal((await db.query('select count(*)::int n from core.event_registrations where org_id=$1 and event_id=$2',[org,required.id])).rows[0].n,0);
+  const refundable=await newEvent({terms:{...eventTerms,fee_minor:'500',allowed_product_version_ids:[],refund:{method:'credit_ratio'}}});await mutate(owner,'event_register_v1',{event_id:refundable.id,person_id:studentPerson});const cancel=await must(owner,'event_cancel_preview_v1',scoped({event_id:refundable.id,reason:'synthetic'}));assert.equal(cancel.blockers[0].code,'POLICY_NOT_CONFIGURED');await error(owner,'event_cancel_apply_v1',scoped({preview:{id:cancel.id,token:cancel.token}}),'POLICY_NOT_CONFIGURED');assert.equal((await must(owner,'event_get_v1',scoped({event_id:refundable.id}))).state,'published');
  });
 
  await t.test('role revocation invalidates an existing JWT immediately at the next command',async()=>{

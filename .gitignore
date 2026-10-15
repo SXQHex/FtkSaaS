@@ -6,3 +6,6 @@ supabase/.temp/
 reports/native-start.log
 reports/*raw*
 reports/git-whitespace.log
+
+reports/*.log
+!reports/acceptance-verified.log

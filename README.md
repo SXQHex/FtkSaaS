@@ -1,23 +1,20 @@
-# FtkSaaS — backend teknik temel
+# FtkSaaS backend · 0.2.0-rc.1
 
-Kaynak ürün sözleşmesi v2.2; teknik uygulama revizyonu 2.2-tech.2. Frontend kapsamı yoktur.
+Kalıcı kaynak: https://github.com/SXQHex/FtkSaaS — `backend/runtime-v0.2.0`. İnceleme: https://github.com/SXQHex/FtkSaaS/pull/1. Frontend kapsamı yoktur.
 
-Önce [teknik aktarım raporunu](contracts/11-FtkSaaS-Q-D01-teknik-aktarim-raporu.md) okuyun. Makine sözleşmesi contracts/08; insan okunur şema/API 04/05; ortak TypeScript packages/contracts içindedir. Source-v2.2 JSON arşivi ve transfer scripti dönüşümün izini korur.
-
-## Kurulum
-
-Node >=22, npm ve Supabase CLI’nin desteklediği native platform veya Docker gerekir. npm ci sürümleri lockfile’dan kurar. Native runtime experimental; CLI sürümü package.json/lockfile içinde sabittir.
+Önce [Claude devir notunu](docs/claude-handover.md) okuyun. 180 sözleşmenin 48’i geliştirme ortamında çağrılabilir; kalan 132 işlem yalnız sözleşmedir. [Endpoint envanteri](docs/endpoint-inventory.json) ve [Q-E01 karar konusu](docs/decisions/Q-E01.md) kapsam sınırlarını gösterir. Q-D01 kabul edilmiş ve ortak havuz yarışlarıyla doğrulanmıştır.
 
 ```sh
+# Node 24.19.0; ya da sabit imajlı Dev Container
 npm ci
 npm run dev:start
+npm run dev:seed
+npm run dev:info
 npm test
-npm run dev:health
-npm run db:advisors
 ```
 
-npm run verify yalnız sözleşme/üretim-drift/typecheck/UUID testlerini çalıştırır. npm run test:db çalışan izole local Supabase DB ister. Bütün test verileri sentetik ve rollback kapsamındadır. Üretim ya da uzak DB URL’si test helper tarafından kabul edilmez. npm run generate 08’den ortak tipler ve 04/05 kataloglarını üretir. Uygulanmış baseline migration donuktur; değişiklik için supabase migration new ile yeni migration gerekir.
+Supabase CLI 2.121.0 native runtime experimental; yalnız izole yerel geliştirme. Her checkout kendi stack’ini ve dinamik portlarını oluşturur. Bağlantılar `dev:info`, sentetik kullanıcı bilgileri `.dev/development-users.json` içindedir. `.dev` git/teslimat kapsamına girmez. Dev seed fiyat ve limitleri ticari varsayılan değildir. Kaynak ve CI Box’ın yaşam süresinden bağımsızdır.
 
-Domain endpointler henüz uygulanmadı. İstemci core/private DML/okumaya yetkili değildir. Backend UUIDv7 adaptörü hazır; test edilen PG17’de DB varsayılan üreticisi olmadığı için ilgili default kapalıdır. Q-D01 ürün kararı kabul edildi; şema/tip/private kapsam filtresi ve pozitif hak kapısı uygulandı, tam event RPC entegrasyonu ve son ortak hak yarışı açık. Ayrıntılı RPC/RLS/Auth/yarış/yük/restore kabulü yapılmadan ürün tamamlandı sayılmaz.
+`npm run generate` güncel 08 JSON’dan ortak tip/validator/Edge bundle ve katalog üretir; `npm run verify` migration hash, kaynak/çıktı drift, kapalı tip/ref ve UUID denetimini yapar. `test:db` gerçek PostgreSQL bütünlüğünü, `test:api` gerçek Auth → Edge → named RPC → DB akışını sınar. Altı migration sıfırdan tekrar uygulanır. `scripts/generate_schema.historical.py` ve `transfer_contract.py` tarihsel üreticilerdir; güncel sözleşme bunlarla yeniden oluşturulmaz.
 
-GitHub remote henüz seçilmedi. Bu snapshot ana branch merge veya üretim dağıtımı değildir. Geçici kurulumun sona erme saati ve tekrar kurulum notları 11 raporundadır.
+Paket, JSON kapalı sözleşmesi, migrationlar, ortak TypeScript/adapter, örnekler, CI ve doğrulama kanıtını içerir. Önceki 09/11 teknik raporları tarihsel snapshot’tır; güncel durum `docs/claude-handover.md` ve `reports/verification.json` ile belirlenir. Üretim dağıtımı, bütün ürün kabulü, harici e-posta sağlayıcısı ve yük/restore testleri bu sürümde tamamlanmış sayılmaz.
