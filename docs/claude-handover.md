@@ -77,14 +77,18 @@ Kayıt katılımcı/işletme iptalinde aynı allocation üzerinden serbest bıra
 
 ## Karar ve teknik kapsam sınırları
 
-**Q-E01 açık:** paketsiz ücretli/tam ödeme şartlı kayıt öncesi ödeme akışı ve etkinlik işletme iptali parasal iade tabanı kaynaklarda tamamlanmamış. Ayrıntı: `docs/decisions/Q-E01.md`. Bu dallar blocker/`POLICY_NOT_CONFIGURED` ile kapalıdır; tahminî ödeme/iade uygulanmadı. Q-D01 kabul edilmiş ve gerçek RPC/yarış testleriyle doğrulanmıştır; yeniden ürün kararı istenmiyor.
+**Q-E01 kabul edildi; teknik aktarım bekliyor.** Tam karar: docs/decisions/Q-E01-accepted.md; uygulanmayan koşullar: docs/decisions/Q-E01.md. Ödeme hazırlığı/etkinlik borcu bağlantısı, ödeme sonrası kapasite kaybı düzeltmesi ve gerçekleşmeden işletme iptalinde öğrenci alacağı henüz şema/API/ortak tiplere aktarılmadı. Mevcut blocker testi bunların kabul testi değildir. Eski manuel parasal iptal yolları Q-E01 uyumlu sayılmaz. Q-D01 kabul edilmiş ve gerçek RPC/yarış testleriyle doğrulanmıştır.
 
 Merkez ve organizasyon liste projeksiyonları şu aşamada tek sayfadır; event listesi gerçek cursor kullanır. Dev seed’deki ticari sayılar/izinler yalnız test fixture’ıdır. Gerçek sağlayıcı e-posta teslimi, dosya saklama/indirme, hukuki onay, dış ödeme sağlayıcısı, ölçek/yük ve yedekten geri yükleme kabulü bu sürümde tamamlanmış sayılmaz. Bu işler için henüz uygulanmayan özelliklere frontend’den dayanak oluşturulmamalı.
 
 ## Doğrulama ve çalışma düzeni
 
-`reports/verification.json`, `reports/acceptance-verified.log` ve GitHub Actions son commit için kanıttır. Statik tutarlılık ile canlı Auth/RPC testleri ayrı raporlanır. Testler son hak event–event, event–ders, kapasite, aynı anahtarla eşzamanlı tekrar, payload değişimi, rollback, rol/oturum iptali, tenant izolasyonu, Q-D01 ve negatif kredi yasağını içerir.
+`reports/verification.json`, `reports/acceptance-verified.log` ve GitHub Actions önceki kabulün kanıtıdır; devam oturumunun temiz kurulum/yarış sonucu reports/resumed-verification.json içindedir. CI her commit için ayrıca denetlenir. Statik tutarlılık ile canlı Auth/RPC testleri ayrı raporlanır. Testler son hak event–event, event–ders, kapasite, aynı anahtarla eşzamanlı tekrar, payload değişimi, rollback, rol/oturum iptali, tenant izolasyonu, Q-D01 ve negatif kredi yasağını içerir.
 
 Önce org kilidi, ardından ilgili kaynak/hak satırları tutulur. Bu kaba kilit rol iptali ve bütün ortak havuz mutasyonlarını sıralar; yük testi sonucu değildir. Domain + allocation/ledger + receipt + audit + outbox tek commit’tir. UUID bankası tükenirse transaction tümüyle rollback olur; gateway aynı işlem anahtarıyla daha geniş doğrulanmış UUIDv7 bankasıyla tekrarlar. Defter/audit güncellenemez veya silinemez; düzeltmeler linked kayıtlarla eklenir.
 
 Yeni değişiklik ayrı migration ve branch/PR ile yapılmalı. `npm run generate` ortak tipleri, yalnız ihtiyaç duyulan şemaları, önceden derlenmiş validatorları, npm bağımlılıksız Edge bundle’ını ve katalogları üretir; `npm run verify` drift’i reddeder. `scripts/*historical*` ve `transfer_contract.py` geçmiş aktarım kaydıdır; güncel sözleşmeyi yeniden üretmek için çalıştırılmaz. Frontend tasarımı Claude’un alanıdır.
+
+## Temiz kabulü yeniden çalıştırma
+
+Node 24.19.0 ile npm ci ve npm run test:clean. Komut yalnız checkout'a ait loopback DB üzerinde, sentetik yerel veriyi silerek altı migration'ı yeniden uygular; migration geçmişini ve boş tenant/Auth durumunu denetler. Ardından testleri, sentetik seed'i ve sağlık kontrolünü çalıştırır. Reset logu .dev/clean-reset.log içindedir; paylaşılmaz. CI aynı komutu kullanır. Son hak yarışlarında tek allocation/sıfır kullanılabilir bakiye; ücretli manuel son kontenjanda tek kayıt/tek borç ve kaybedende sıfır receipt/borç/allocation denetlenir. Q-E01 ödemeli hazırlık yarışı bu kapsamda değildir.

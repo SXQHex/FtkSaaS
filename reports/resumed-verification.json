@@ -1,0 +1,73 @@
+{
+  "verified_at": "2026-10-15T21:34:47.714173+00:00",
+  "baseline_commit": "aa147e0b7d2d84027bb4174856ab7c462f033d05",
+  "baseline_ci": {
+    "run_id": 38782131071,
+    "conclusion": "success"
+  },
+  "new_commit_ci": "Check GitHub Actions for the commit containing this report; not inferred from baseline CI.",
+  "runtime": {
+    "node": "24.19.0",
+    "supabase_cli": "2.121.0",
+    "postgres": "17.11",
+    "edge_policy": "oneshot",
+    "bundled_dependencies": true
+  },
+  "clean_install": {
+    "fresh_box_clone": true,
+    "npm_ci_empty_cache": true,
+    "explicit_local_db_reset": true,
+    "migration_count": 6,
+    "ordered_history_matches_manifest": true,
+    "empty_organizations_receipts_auth_users": true,
+    "synthetic_seed": true,
+    "health": true,
+    "health_json_parsed": true
+  },
+  "tests": {
+    "static_checks": 19,
+    "contract": 12,
+    "database": 27,
+    "auth_api": 38,
+    "total": 77,
+    "failures": 0,
+    "independent_auth_api_repeat": {
+      "passed": 38,
+      "failed": 0
+    }
+  },
+  "races": {
+    "event_event_last_right": "passed_twice",
+    "event_lesson_last_right": "passed_twice",
+    "manual_paid_last_seat_no_prepayment_requirement": "passed_twice",
+    "q_e01_paid_preparation_last_seat": "NOT_IMPLEMENTED_NOT_TESTED"
+  },
+  "decisions": {
+    "Q-D01": "implemented_verified",
+    "Q-E01": "accepted_technical_transfer_pending"
+  },
+  "capabilities": {
+    "callable": 48,
+    "contract_only": 132
+  },
+  "pending": [
+    "Q-E01 physical schema/API/shared types and financial acceptance tests",
+    "132 contract-only operations",
+    "main merge and production deployment",
+    "stable shared staging endpoint",
+    "external email delivery",
+    "load and backup-restore acceptance"
+  ],
+  "product_decision_if_needed": "monetary cancellation for started or partly occurred events is outside Q-E01",
+  "frontend_changed": false,
+  "source_sha256": {
+    "scripts/test-clean.mjs": "1894e9e89e8311903721d0bc9d11f87e7084934bf6fde8fc64012c5ea3a08715",
+    "tests/api-acceptance.test.mjs": "ab7f21300b09a2e764f6fd60bb623ff054b76a2ad13cbfa96e090e000b55b258",
+    ".github/workflows/backend.yml": "4d14b4c7c2425d9bdef272e8cfb68f61171b420197eec7d1ed77ca809ac95110",
+    "docs/decisions/Q-E01-accepted.md": "2eb066a0684cfdd3c265558b0e436e95ff850cfeaa987bf91f47eaca48c09525"
+  },
+  "evidence": {
+    "path": "reports/resumed-acceptance.log",
+    "sha256": "1e228ae25eea4974e7dc678d778f3a313c21489a72eff444ead09b2e6a36df1a"
+  }
+}

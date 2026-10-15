@@ -16,10 +16,6 @@ jobs:
           node-version: '24.19.0'
           cache: npm
       - run: npm ci
-      - run: npm run verify
-      - run: npm run dev:start
-      - run: npm run test:db
-      - run: npm run test:api
-      - run: npm run dev:health
+      - run: npm run test:clean
       - if: always()
         run: npm run dev:stop

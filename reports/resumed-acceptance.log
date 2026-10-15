@@ -1,0 +1,202 @@
+
+> ftksaas@0.2.0-rc.1 test:clean
+> node scripts/test-clean.mjs
+
+
+> ftksaas@0.2.0-rc.1 dev:start
+> node scripts/start-dev.mjs
+
+Isolated local backend started. Run npm run dev:info for public connection details.
+Auth, Data API and bundled Edge gateway are ready
+Auth, Data API and bundled Edge gateway are ready
+Clean database confirmed: 6 ordered migrations; no organizations, receipts or Auth users
+
+> ftksaas@0.2.0-rc.1 test
+> npm run verify && npm run test:db && npm run test:api
+
+
+> ftksaas@0.2.0-rc.1 verify
+> python3 scripts/check-migrations.py && python3 scripts/generate-runtime.py --check && node scripts/generate-validators.mjs --check && node scripts/build-edge.mjs --check && node scripts/generate.mjs --check && node scripts/audit.mjs && tsc --noEmit && node --test tests/contract.test.mjs
+
+Frozen migration history and runtime source agree: 6 migrations
+Runtime: 48 entrypoints; 177 referenced definitions
+Generated standalone request/response validators: 96
+Dependency-complete Edge bundle: 523101 bytes
+Generated shared types: 700 operations: 180
+{"checks":19,"tables":89,"operations":180,"definitions":700,"status":"passed"}
+✔ UUIDv7 generator: RFC version/variant, uniqueness, current approximate timestamp (83.53391ms)
+✔ retry preserves frozen operation key (0.194605ms)
+✔ external/provider and existing UUIDv4 acceptance retained, v7 production validator distinct (2.296021ms)
+✔ package scope valid center_discipline (13.68246ms)
+✔ package scope valid center_all_disciplines (0.235417ms)
+✔ package scope valid organization_discipline (0.146032ms)
+✔ package scope valid organization_all (0.084005ms)
+✔ event-only scope does not accept class selector (0.128638ms)
+✔ no unknown field / free-text discipline / actor spoof (2.495271ms)
+✔ lesson request target is required separately from request trace (1.69662ms)
+✔ money string and positive collection constraints retained (0.727592ms)
+✔ negative limit requires explicit center and discipline (1.930974ms)
+ℹ tests 12
+ℹ suites 0
+ℹ pass 12
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 244.445756
+
+> ftksaas@0.2.0-rc.1 test:db
+> node --test tests/database.test.mjs tests/event-scope.test.mjs
+
+▶ real PostgreSQL physical baseline and D/U integrity
+  ✔ catalog and DB column coverage / UUID storage / RLS / deny client DML (21.530952ms)
+  ✔ D01/D02 one person, multiple disciplines without person/role duplication (2.73706ms)
+  ✔ D01 cross-tenant center discipline FK rejects (2.069347ms)
+  ✔ D02 duplicate active relationship rejects (1.13573ms)
+  ✔ D07 independent per-center-discipline override unique key (2.191512ms)
+  ✔ D03 session cannot disagree with its class discipline (2.820566ms)
+  ✔ D03/D07 deficit scope is bound to exact reservation/person/session (6.157489ms)
+  ✔ D04/D05 physical package scope variants and explicit target eligibility (5.205755ms)
+  ✔ U03 external UUIDv4 remains unchanged (0.858452ms)
+  ✔ U05 database default generation fails closed with no audited DB generator (1.275456ms)
+✔ real PostgreSQL physical baseline and D/U integrity (738.28593ms)
+✔ Q-D01 DTO: explicit empty/single/multiple distinct UUID labels (18.249097ms)
+✔ Q-D01 DTO: no negative-credit override can be submitted by event registration (3.133985ms)
+▶ Q-D01 real PostgreSQL label integrity and scope matrix
+  ✔ Q-D01-A01 single label + matching narrow event-eligible package passes scope filter (2.087923ms)
+  ✔ Q-D01-A02 lesson-only package rejected despite matching label (0.632418ms)
+  ✔ single label + mismatched discipline rejected (0.583564ms)
+  ✔ Q-D01-A03 multi label + both narrow scope kinds rejected (1.086209ms)
+  ✔ Q-D01-A04 multi label + broad event-eligible scope passes filter (1.019715ms)
+  ✔ Q-D01-A05 no labels + broad only (1.916651ms)
+  ✔ center-bound package cannot match another service center (0.976079ms)
+  ✔ explicit event selector remains an AND restriction (1.091725ms)
+  ✔ Q-D01-A08 foreign-organization discipline rejected by physical FK (1.627115ms)
+  ✔ tag duplication and incorrect event center rejected (1.831394ms)
+  ✔ cross-tenant scope filter returns no match (0.513777ms)
+  ✔ Q-D01-A06 kernel rejects zero/negative/unknown availability without a negative-limit bypass (3.412579ms)
+  ✔ private helper and label table are not client APIs (0.968101ms)
+✔ Q-D01 real PostgreSQL label integrity and scope matrix (715.301503ms)
+ℹ tests 27
+ℹ suites 0
+ℹ pass 27
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 881.708422
+
+> ftksaas@0.2.0-rc.1 test:api
+> node --test tests/api-acceptance.test.mjs
+
+▶ Real Auth → Edge UUID producer → named RPC → PostgreSQL acceptance
+  ✔ backend-created records are UUIDv7 and bootstrap starts only after verified payment (456.759431ms)
+  ✔ bootstrap retry is idempotent; UUID production does not create a second organization (115.40387ms)
+  ✔ first verified payment activates service; customer cannot verify own SaaS payment (231.313872ms)
+  ✔ tenant isolation through API; request cannot impersonate an actor or platform role (217.730838ms)
+  ✔ sale creates one shared ledger-backed right and a single account (115.794997ms)
+  ✔ event_save is versioned; read projection returns discipline IDs (253.968493ms)
+  ✔ atomic event save rolls back tags, assignments, receipt and event on a late foreign-person failure (141.657116ms)
+  ✔ last shared right: event vs event named RPC race allocates only once (384.170343ms)
+  ✔ cancel releases the same shared pool; payment record is unchanged (232.991482ms)
+  ✔ same idempotency key replay and changed payload; no second reservation or credit allocation (350.33299ms)
+  ✔ draft attendance does not consume; close consumes and correction releases by linked movement (712.680294ms)
+  ✔ last shared right: event vs lesson named RPC race cannot double spend (355.852875ms)
+  ✔ events never create negative credit, even if normal lesson policy allows it (377.47646ms)
+  ✔ direct client RPC and private schema access cannot bypass verified gateway context (21.643898ms)
+  ✔ verified-email invitation reaches local SMTP; acceptance grants self access without management roles (2071.382101ms)
+  ✔ staff grants and revocations are live; a center grant cannot target a different center (940.30399ms)
+  ✔ organization manager may explicitly assign self to a center; owner transfer remains platform-only (816.177163ms)
+  ✔ two real organizations cannot read each other or attach foreign people, disciplines and centers (705.069821ms)
+  ✔ capacity race reserves one seat; losing transaction writes no debt, receipt or allocation (957.503379ms)
+  ✔ event cancellation preview is dependency checked and atomically releases the common right (1591.444198ms)
+  ✔ event duty earnings require occurrence and explicit CM verification; corrections append linked movements (722.164846ms)
+  ✔ Q-D01 actual RPC rejects narrow products for zero/multiple tags and requires explicit event usage (2329.428964ms)
+  ✔ timed weekly quota is one shared bucket across events and cancellation releases it (1347.379978ms)
+  ✔ same-key simultaneous requests share a receipt and create exactly one registration (484.730847ms)
+  ✔ event list keyset paging is stable and rejects a cursor for another filter (463.964534ms)
+  ✔ manual event creates a separate money debt; partial collection never cancels the registration or changes rights (491.012267ms)
+  ✔ new domain writes across all tenant tables use UUIDv7; journals reject edits (33.46773ms)
+  ✔ platform owner transfer updates live authority without implicitly granting center management (690.986087ms)
+  ✔ invitation acceptance rechecks the inviter after revocation, even with a delivered token (2318.774484ms)
+  ✔ event read projection supplies registration/duty IDs and versions while restricting participant and fee data (1545.663541ms)
+  ✔ UUID-bank exhaustion rolls back a late named-RPC write; retry uses the same operation key safely (165.015841ms)
+  ✔ configured lesson deficits are scoped by center/discipline and a later sale settles the same pool (2116.786034ms)
+  ✔ event full-payment gate checks the selected sale debt on the real write path (849.294881ms)
+  ✔ Q-E01 technical transfer pending: unsupported manual prepayment/refund paths remain blocked (1211.416089ms)
+  ✔ role revocation invalidates an existing JWT immediately at the next command (349.882213ms)
+  ✔ revoked Auth session cannot use its unexpired JWT (112.436992ms)
+  ✔ bootstrap, grace and closed subscription boundaries are enforced on actual API calls (343.498504ms)
+✔ Real Auth → Edge UUID producer → named RPC → PostgreSQL acceptance (32331.234572ms)
+ℹ tests 38
+ℹ suites 0
+ℹ pass 38
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 32447.85499
+
+> ftksaas@0.2.0-rc.1 dev:seed
+> node scripts/dev-seed.mjs
+
+Synthetic local tenant ready. Credentials and IDs: .dev/development-users.json; public connection info: npm run dev:info
+
+> ftksaas@0.2.0-rc.1 dev:health
+> node scripts/health.mjs
+
+{"runtime":"Supabase native","database":"PostgreSQL 17","ephemeral_services":true,"source_repository":"https://github.com/SXQHex/FtkSaaS","checks":[{"name":"auth","status":200,"passed":true},{"name":"rest","status":200,"passed":true}]}
+Clean acceptance completed: migrations, tests, synthetic seed and service health
+
+--- Independent Auth/API repeat ---
+
+> ftksaas@0.2.0-rc.1 test:api
+> node --test tests/api-acceptance.test.mjs
+
+▶ Real Auth → Edge UUID producer → named RPC → PostgreSQL acceptance
+  ✔ backend-created records are UUIDv7 and bootstrap starts only after verified payment (459.054046ms)
+  ✔ bootstrap retry is idempotent; UUID production does not create a second organization (115.427169ms)
+  ✔ first verified payment activates service; customer cannot verify own SaaS payment (230.463939ms)
+  ✔ tenant isolation through API; request cannot impersonate an actor or platform role (217.074405ms)
+  ✔ sale creates one shared ledger-backed right and a single account (115.848768ms)
+  ✔ event_save is versioned; read projection returns discipline IDs (255.576093ms)
+  ✔ atomic event save rolls back tags, assignments, receipt and event on a late foreign-person failure (140.923586ms)
+  ✔ last shared right: event vs event named RPC race allocates only once (346.627971ms)
+  ✔ cancel releases the same shared pool; payment record is unchanged (229.91151ms)
+  ✔ same idempotency key replay and changed payload; no second reservation or credit allocation (348.650281ms)
+  ✔ draft attendance does not consume; close consumes and correction releases by linked movement (703.909506ms)
+  ✔ last shared right: event vs lesson named RPC race cannot double spend (349.515407ms)
+  ✔ events never create negative credit, even if normal lesson policy allows it (375.418533ms)
+  ✔ direct client RPC and private schema access cannot bypass verified gateway context (20.878011ms)
+  ✔ verified-email invitation reaches local SMTP; acceptance grants self access without management roles (2081.125261ms)
+  ✔ staff grants and revocations are live; a center grant cannot target a different center (947.478511ms)
+  ✔ organization manager may explicitly assign self to a center; owner transfer remains platform-only (818.825919ms)
+  ✔ two real organizations cannot read each other or attach foreign people, disciplines and centers (707.505568ms)
+  ✔ capacity race reserves one seat; losing transaction writes no debt, receipt or allocation (962.916243ms)
+  ✔ event cancellation preview is dependency checked and atomically releases the common right (1591.223168ms)
+  ✔ event duty earnings require occurrence and explicit CM verification; corrections append linked movements (725.215322ms)
+  ✔ Q-D01 actual RPC rejects narrow products for zero/multiple tags and requires explicit event usage (2345.536721ms)
+  ✔ timed weekly quota is one shared bucket across events and cancellation releases it (1352.314633ms)
+  ✔ same-key simultaneous requests share a receipt and create exactly one registration (488.950884ms)
+  ✔ event list keyset paging is stable and rejects a cursor for another filter (466.427201ms)
+  ✔ manual event creates a separate money debt; partial collection never cancels the registration or changes rights (495.461412ms)
+  ✔ new domain writes across all tenant tables use UUIDv7; journals reject edits (31.276084ms)
+  ✔ platform owner transfer updates live authority without implicitly granting center management (689.500653ms)
+  ✔ invitation acceptance rechecks the inviter after revocation, even with a delivered token (2324.822212ms)
+  ✔ event read projection supplies registration/duty IDs and versions while restricting participant and fee data (1547.380703ms)
+  ✔ UUID-bank exhaustion rolls back a late named-RPC write; retry uses the same operation key safely (164.020558ms)
+  ✔ configured lesson deficits are scoped by center/discipline and a later sale settles the same pool (2110.468862ms)
+  ✔ event full-payment gate checks the selected sale debt on the real write path (845.690831ms)
+  ✔ Q-E01 technical transfer pending: unsupported manual prepayment/refund paths remain blocked (1216.595849ms)
+  ✔ role revocation invalidates an existing JWT immediately at the next command (350.236907ms)
+  ✔ revoked Auth session cannot use its unexpired JWT (112.401602ms)
+  ✔ bootstrap, grace and closed subscription boundaries are enforced on actual API calls (344.469482ms)
+✔ Real Auth → Edge UUID producer → named RPC → PostgreSQL acceptance (32271.715073ms)
+ℹ tests 38
+ℹ suites 0
+ℹ pass 38
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 32388.763117

@@ -67,6 +67,10 @@ test('Real Auth → Edge UUID producer → named RPC → PostgreSQL acceptance',
   const results=await Promise.all([call(owner,'event_register_v1',scoped({event_id:eventA,person_id:studentPerson,sale_id:sale}),key()),call(owner,'event_register_v1',scoped({event_id:eventB,person_id:studentPerson,sale_id:sale}),key())]);
   assert.equal(results.filter(x=>x.result.ok).length,1,JSON.stringify(results.map(x=>x.result)));assert.equal(results.find(x=>!x.result.ok).result.error?.code,'ENTITLEMENT_UNAVAILABLE',JSON.stringify(results.map(x=>x.result)));
   registration=results.find(x=>x.result.ok).result.data.primary_id;
+  assert.equal((await db.query("select count(*)::int n from core.event_registrations where org_id=$1 and event_id=any($2::uuid[]) and state='active'",[org,[eventA,eventB]])).rows[0].n,1);
+  const balance=await must(owner,'entitlements_get_v1',scoped({person_id:studentPerson}));assert.equal(balance.find(x=>x.sale_id===sale).available,0);
+  const loser=results.findIndex(x=>!x.result.ok);
+  assert.equal((await db.query('select count(*)::int n from core.operation_receipts where org_id=$1 and key_hash=$2',[org,createHash('sha256').update(results[loser].request.operation_key).digest('hex')])).rows[0].n,0);
   assert.equal((await db.query("select count(*)::int n from core.entitlement_allocations where org_id=$1 and sale_id=$2 and state='reserved'",[org,sale])).rows[0].n,1);
  });
  await persist();
@@ -95,6 +99,10 @@ test('Real Auth → Edge UUID producer → named RPC → PostgreSQL acceptance',
   const results=await Promise.all([call(owner,'event_register_v1',scoped({event_id:ev.id,person_id:studentPerson,sale_id:sale}),key()),call(owner,'reservation_create_v1',scoped({session_id:session,person_id:studentPerson,mode:'flexible',source_sale_id:sale}),key())]);
   assert.equal(results.filter(x=>x.result.ok).length,1,JSON.stringify(results.map(x=>x.result)));assert.equal(results.find(x=>!x.result.ok).result.error?.code,'ENTITLEMENT_UNAVAILABLE',JSON.stringify(results));
   const rows=await db.query("select count(*)::int n from core.entitlement_allocations where org_id=$1 and sale_id=$2 and state='reserved'",[org,sale]);assert.equal(rows.rows[0].n,1);
+  assert.equal((await db.query("select (select count(*) from core.event_registrations where org_id=$1 and event_id=$2 and state='active')+(select count(*) from core.reservations where org_id=$1 and session_id=$3 and state='active') as n",[org,ev.id,session])).rows[0].n,'1');
+  const balance=await must(owner,'entitlements_get_v1',scoped({person_id:studentPerson}));assert.equal(balance.find(x=>x.sale_id===sale).available,0);
+  const loser=results.findIndex(x=>!x.result.ok);
+  assert.equal((await db.query('select count(*)::int n from core.operation_receipts where org_id=$1 and key_hash=$2',[org,createHash('sha256').update(results[loser].request.operation_key).digest('hex')])).rows[0].n,0);
  });
  await t.test('events never create negative credit, even if normal lesson policy allows it',async()=>{
   await db.query("insert into core.policy_versions(id,org_id,key,effective_at,mandatory,value) values($1,$2,'negative_default',now(),false,$3)",[key(),org,{kind:'integer',value:100}]);
@@ -148,11 +156,18 @@ test('Real Auth → Edge UUID producer → named RPC → PostgreSQL acceptance',
   await error(owner,'event_save_v1',scoped(eventInput({discipline_ids:[key()]})),'NOT_FOUND');
  });
  await t.test('capacity race reserves one seat; losing transaction writes no debt, receipt or allocation',async()=>{
-  const one=await newEvent({capacity:{nominal:1,maximum:1}});const twoPeople=[];
+  const one=await newEvent({capacity:{nominal:1,maximum:1},terms:{...eventTerms,fee_minor:'1000',allowed_product_version_ids:[]}});const twoPeople=[];
   for(let i=0;i<2;i++){const p=(await mutate(owner,'person_create_v1',{display_name:'Capacity '+i,contacts:[]})).primary_id;await mutate(owner,'student_activate_v1',{person_id:p});twoPeople.push(p);}
   const keys=[key(),key()];const results=await Promise.all(twoPeople.map((p,i)=>call(owner,'event_register_v1',scoped({event_id:one.id,person_id:p}),keys[i])));
   assert.equal(results.filter(r=>r.result.ok).length,1,JSON.stringify(results));assert.equal(results.find(r=>!r.result.ok).result.error?.code,'CAPACITY_FULL',JSON.stringify(results));
   const loser=results.findIndex(r=>!r.result.ok);assert.equal((await db.query('select count(*)::int n from core.operation_receipts where org_id=$1 and key_hash=$2',[org,createHash('sha256').update(keys[loser]).digest('hex')])).rows[0].n,0);
+  const winner=results.findIndex(r=>r.result.ok);
+  assert.equal((await db.query('select count(*)::int n from core.event_registrations where org_id=$1 and event_id=$2',[org,one.id])).rows[0].n,1);
+  assert.equal((await db.query('select count(*)::int n from core.event_registrations where org_id=$1 and event_id=$2 and person_id=$3',[org,one.id,twoPeople[loser]])).rows[0].n,0);
+  const debts=(await db.query('select person_id,amount_minor from core.debts where org_id=$1 and person_id=any($2::uuid[])',[org,twoPeople])).rows;
+  assert.deepEqual(debts,[{person_id:twoPeople[winner],amount_minor:'1000'}]);
+  assert.equal((await db.query('select count(*)::int n from core.entitlement_allocations a join core.event_registrations r on r.org_id=a.org_id and r.id=a.event_registration_id where r.org_id=$1 and r.event_id=$2',[org,one.id])).rows[0].n,0);
+  assert.equal((await db.query('select count(*)::int n from core.credit_deficits where org_id=$1 and person_id=any($2::uuid[])',[org,twoPeople])).rows[0].n,0);
  });
  await t.test('event cancellation preview is dependency checked and atomically releases the common right',async()=>{
   const allocated=(await db.query("select a.*,r.version registration_version from core.entitlement_allocations a left join core.event_registrations r on r.id=a.event_registration_id where a.org_id=$1 and a.sale_id=$2 and a.state='reserved'",[org,sale])).rows[0];
@@ -267,7 +282,7 @@ test('Real Auth → Edge UUID producer → named RPC → PostgreSQL acceptance',
   const e=await newEvent({terms:{...eventTerms,full_payment_required:true}});await error(owner,'event_register_v1',scoped({event_id:e.id,person_id:studentPerson,sale_id:s}),'ENTITLEMENT_UNAVAILABLE');
   const debt=(await db.query('select id from core.debts where org_id=$1 and sale_id=$2',[org,s])).rows[0].id;await mutate(owner,'collection_record_v1',{person_id:studentPerson,debt_ids:[debt],amount_minor:'1000',currency:'TRY',occurred_at:new Date().toISOString()});await mutate(owner,'event_register_v1',{event_id:e.id,person_id:studentPerson,sale_id:s});
  });
- await t.test('Q-E01 unresolved manual prepayment/refund choices are blocked without monetary or entitlement side effects',async()=>{
+ await t.test('Q-E01 technical transfer pending: unsupported manual prepayment/refund paths remain blocked',async()=>{
   const required=await newEvent({terms:{...eventTerms,fee_minor:'500',full_payment_required:true,allowed_product_version_ids:[]}});const preview=await must(owner,'event_registration_preview_v1',scoped({event_id:required.id,person_id:studentPerson}));assert.equal(preview.blockers[0].code,'POLICY_NOT_CONFIGURED');await error(owner,'event_register_v1',scoped({event_id:required.id,person_id:studentPerson}),'POLICY_NOT_CONFIGURED');assert.equal((await db.query('select count(*)::int n from core.event_registrations where org_id=$1 and event_id=$2',[org,required.id])).rows[0].n,0);
   const refundable=await newEvent({terms:{...eventTerms,fee_minor:'500',allowed_product_version_ids:[],refund:{method:'credit_ratio'}}});await mutate(owner,'event_register_v1',{event_id:refundable.id,person_id:studentPerson});const cancel=await must(owner,'event_cancel_preview_v1',scoped({event_id:refundable.id,reason:'synthetic'}));assert.equal(cancel.blockers[0].code,'POLICY_NOT_CONFIGURED');await error(owner,'event_cancel_apply_v1',scoped({preview:{id:cancel.id,token:cancel.token}}),'POLICY_NOT_CONFIGURED');assert.equal((await must(owner,'event_get_v1',scoped({event_id:refundable.id}))).state,'published');
  });
