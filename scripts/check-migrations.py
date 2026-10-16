@@ -22,3 +22,17 @@ assert next(Path('supabase/migrations').glob('*_planned_start_cancellation.sql')
 assert next(Path('supabase/migrations').glob('*_planned_start_decision_clock.sql')).read_text()==Path('database/planned-start-decision-clock.sql').read_text(),'Q-E03 decision clock migration source drift'
 
 assert next(Path('supabase/migrations').glob('*_event_actual_start.sql')).read_text()==Path('database/event-actual-start.sql').read_text(),'Actual-start source drift'
+
+assert next(Path('supabase/migrations').glob('*_registry_operations.sql')).read_text()==Path('database/registry-operations.sql').read_text()+Path('database/registry-wrappers.sql').read_text().replace('begin;\n','',1),'Registry source drift'
+
+assert next(Path('supabase/migrations').glob('*_person_registry.sql')).read_text()==Path('database/person-registry.sql').read_text()+Path('database/person-registry-wrappers.sql').read_text().replace('begin;\n','',1),'Person registry source drift'
+
+assert next(Path('supabase/migrations').glob('*_person_scope_guard.sql')).read_text()==Path('database/person-scope-guard.sql').read_text(),'Person scope source drift'
+
+assert next(Path('supabase/migrations').glob('*_registry_read_versions.sql')).read_text()==Path('database/registry-read-versions.sql').read_text()+Path('database/registry-read-versions-wrappers.sql').read_text().replace('begin;\n','',1),'Registry read-version source drift'
+
+assert next(Path('supabase/migrations').glob('*_discipline_read_scope.sql')).read_text()==Path('database/discipline-read-scope.sql').read_text()+Path('database/discipline-read-scope-wrappers.sql').read_text().replace('begin;\n','',1),'Discipline read scope source drift'
+
+assert next(Path('supabase/migrations').glob('*_active_discipline_projection.sql')).read_text()==Path('database/active-discipline-projection.sql').read_text()+Path('database/active-discipline-projection-wrappers.sql').read_text().replace('begin;\n','',1),'Active discipline projection source drift'
+
+assert next(Path('supabase/migrations').glob('*_deactivate_expired_offers.sql')).read_text()==Path('database/deactivate-expired-offers.sql').read_text()+Path('database/deactivate-expired-offers-wrappers.sql').read_text().replace('begin;\n','',1),'Deactivation expiry source drift'

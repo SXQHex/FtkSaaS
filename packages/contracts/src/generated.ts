@@ -2176,6 +2176,7 @@ id: string
 name: Text
 state: OrganizationState
 access_mode: ("bootstrap" | "normal" | "grace" | "closed")
+version: PositiveInt
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -2190,6 +2191,7 @@ name: Text
 timezone: IanaZone
 state: RecordState
 accessible: Bool
+version: PositiveInt
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -2276,6 +2278,7 @@ center_id: string
 discipline_id: string
 kind: DisciplineRelationshipKind
 state: RelationshipState
+version: PositiveInt
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema

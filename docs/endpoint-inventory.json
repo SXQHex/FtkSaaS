@@ -105,8 +105,8 @@
     },
     {
       "name": "organization_update_v1",
-      "status": "contract_only",
-      "external_path": null,
+      "status": "operational_development_limited",
+      "external_path": "/functions/v1/backend-v1/organization_update_v1",
       "permission": "org.manage",
       "features": [
         "F01"
@@ -200,8 +200,8 @@
     },
     {
       "name": "center_update_v1",
-      "status": "contract_only",
-      "external_path": null,
+      "status": "operational_development_limited",
+      "external_path": "/functions/v1/backend-v1/center_update_v1",
       "permission": "center.manage",
       "features": [
         "F01"
@@ -394,26 +394,33 @@
     },
     {
       "name": "people_list_v1",
-      "status": "contract_only",
-      "external_path": null,
+      "status": "operational_development_limited",
+      "external_path": "/functions/v1/backend-v1/people_list_v1",
       "permission": "person.read",
       "features": [
         "F07"
       ],
       "billing_class": "read",
-      "limits": []
+      "limits": [
+        "Operational readers/writers supply center_id; assignment readers receive no contacts or other-center relations.",
+        "Pagination supports created_at_asc; cursor is bound to filters and scope.",
+        "Operational access requires an active center relation or matching creation-center provenance before the first relationship. Historical/unassigned records do not grant cross-center access."
+      ]
     },
     {
       "name": "person_get_v1",
-      "status": "contract_only",
-      "external_path": null,
+      "status": "operational_development_limited",
+      "external_path": "/functions/v1/backend-v1/person_get_v1",
       "permission": "person.read",
       "features": [
         "F06",
         "F07"
       ],
       "billing_class": "read",
-      "limits": []
+      "limits": [
+        "Operational readers/writers supply center_id; assignment readers receive no contacts or other-center relations.",
+        "Operational access requires an active center relation or matching creation-center provenance before the first relationship. Historical/unassigned records do not grant cross-center access."
+      ]
     },
     {
       "name": "person_create_v1",
@@ -428,14 +435,17 @@
     },
     {
       "name": "person_update_v1",
-      "status": "contract_only",
-      "external_path": null,
+      "status": "operational_development_limited",
+      "external_path": "/functions/v1/backend-v1/person_update_v1",
       "permission": "person.manage",
       "features": [
         "F07"
       ],
       "billing_class": "maintenance",
-      "limits": []
+      "limits": [
+        "Operational readers/writers supply center_id; assignment readers receive no contacts or other-center relations.",
+        "Operational access requires an active center relation or matching creation-center provenance before the first relationship. Historical/unassigned records do not grant cross-center access."
+      ]
     },
     {
       "name": "student_activate_v1",
@@ -451,8 +461,8 @@
     },
     {
       "name": "student_deactivate_v1",
-      "status": "contract_only",
-      "external_path": null,
+      "status": "operational_development_limited",
+      "external_path": "/functions/v1/backend-v1/student_deactivate_v1",
       "permission": "person.activate",
       "features": [
         "F07",
@@ -1990,14 +2000,17 @@
     },
     {
       "name": "disciplines_list_v1",
-      "status": "contract_only",
-      "external_path": null,
+      "status": "operational_development_limited",
+      "external_path": "/functions/v1/backend-v1/disciplines_list_v1",
       "permission": "org.read",
       "features": [
         "F01"
       ],
       "billing_class": "read",
-      "limits": []
+      "limits": [
+        "Pagination supports created_at_asc; cursor is bound to request scope.",
+        "Only org readers or center managers; managers receive active disciplines actively offered by their accessible assigned centers."
+      ]
     },
     {
       "name": "discipline_save_v1",
@@ -2023,8 +2036,8 @@
     },
     {
       "name": "person_discipline_set_v1",
-      "status": "contract_only",
-      "external_path": null,
+      "status": "operational_development_limited",
+      "external_path": "/functions/v1/backend-v1/person_discipline_set_v1",
       "permission": "person.manage",
       "features": [
         "F07"

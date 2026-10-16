@@ -4,7 +4,7 @@
   "operations": 184,
   "definitions": 716,
   "uuid_paths": 1559,
-  "references": 3531,
+  "references": 3534,
   "checks": [
     {
       "name": "JSON Schema 2020-12 meta-schema",

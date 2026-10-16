@@ -1,6 +1,6 @@
 # FtkSaaS backend — güncel Claude devri
 
-Kaynak: https://github.com/SXQHex/FtkSaaS · dal: `main`. Fiilî başlangıç uygulaması [PR #4](https://github.com/SXQHex/FtkSaaS/pull/4) ile birleşti. 184 sözleşme içinde **55 çağrılabilir / 129 yalnız sözleşme** işlemi vardır. Frontend tasarımı değiştirilmedi.
+Kaynak: https://github.com/SXQHex/FtkSaaS · dal: `main`. Fiilî başlangıç uygulaması [PR #4](https://github.com/SXQHex/FtkSaaS/pull/4) ile birleşti. 184 sözleşme içinde **63 çağrılabilir / 121 yalnız sözleşme** işlemi vardır. Frontend tasarımı değiştirilmedi.
 
 ## Kurulum ve gerçek bağlantı
 
@@ -18,11 +18,11 @@ npm test
 
 `dev:info` her checkout için gerçek loopback API/functions adresi, publishable key ve Mailpit bağlantısını üretir. Süreli eski Box URL'leri veya sabit ortak staging varsayılmaz. Servis anahtarı/secrets frontend'e veya repository'ye konmaz. Geliştirme sentetik veri kullanır; dış e-posta teslimi tamamlanmış değildir. Yerel davet teslimi için `scripts/deliver-dev-invitations.mjs` ve Mailpit kullanılır.
 
-`npm run test:clean` yalnız checkout'ın loopback DB'sini sıfırlar; 11 migration ve boş tenant/Auth/receipt durumu doğrulanır, ardından testler, sentetik seed, sağlık ve DB advisors çalışır. `npm run dev:stop` ortamı durdurur. Özel bağlantı ve reset logları paylaşılmaz.
+`npm run test:clean` yalnız checkout'ın loopback DB'sini sıfırlar; 18 migration ve boş tenant/Auth/receipt durumu doğrulanır, ardından testler, sentetik seed, sağlık ve DB advisors çalışır. `npm run dev:stop` ortamı durdurur. Özel bağlantı ve reset logları paylaşılmaz.
 
 ## Kanıt ve kapsam
 
-İncelenen uygulama commit'i: `6480f966d361552a24cff13b96a512ffb61e2031`. İki temiz CI çalışmasında 148/148 test geçti: 12 sözleşme, 27 PostgreSQL ve 109 gerçek Auth/API; 11 migration, seed/sağlık/advisors başarılı. [PR CI](https://github.com/SXQHex/FtkSaaS/actions/runs/38906093213) ve [bağımsız inceleme](https://github.com/SXQHex/FtkSaaS/pull/4#issuecomment-6216313969).
+Yeni kişi/merkez/disiplin uygulaması [PR #6](https://github.com/SXQHex/FtkSaaS/pull/6) içindedir. İncelenen uygulama `e4252981871f3aa911257342cde6ebf5f79f82c1`: iki temiz CI çalışmasında 169/169 test (12 sözleşme + 27 DB + 130 gerçek Auth/API), 18 migration, seed/sağlık/advisors başarılı; son inceleme bulgusuz. Kanıt `reports/registry-verification.json` dosyasındadır. Her sonraki belge head’i ve main merge CI’ı ayrıca doğrulanır. Önceki fiilî başlangıç kabulü 148/148 testi kapsıyordu; yeni head için kanıt yerine kullanılamaz.
 
 Her yeni head ve merge için [Actions](https://github.com/SXQHex/FtkSaaS/actions) sonucu ayrıca denetlenir. `reports/actual-start-verification.json` güncel işin kanıt kapsamını, `reports/qe03-verification.json` Q-E03 kapsamını belirtir. Eski verification/resumed/Q-E01/Q-E02/RC3 dosyaları tarihsel snapshot'tır; yeni head kabulünü kanıtlamaz. Makine envanteri `docs/endpoint-inventory.json`, insan okunur API kataloğu `contracts/05-FtkSaaS-O4-API-katalogu.md` ve kapalı tipler `contracts/08-FtkSaaS-tip-ve-operasyon-sozlesmesi.json` esas alınır. Yalnız sözleşme işlemleri gateway'de `NOT_FOUND` döner.
 
@@ -83,6 +83,18 @@ Bu yalnız operasyonel kanıttır. Q-E03 katılımcı sınıflandırması, Q-E02
 
 ## Kaynak üretimi ve kalan işler
 
-`npm run generate` ortak tipleri, minimal Edge contract/validator/bundle ve katalog/endpoint envanterini üretir; `npm run verify` drift'i reddeder. Yeni değişiklik ayrı branch/PR ve append-only migration ile yapılır. Önceki 10 migration korunmuştur; 11. migration fiilî başlangıç aktarımıdır. Eski wrapper kaynağı tarihsel migration ile sabittir; güncel üretilen wrapper `database/runtime-wrappers-current.sql` dosyasındadır. Yeni API'nin DB kurulumu yeni migration ile taşınır. Historical/transfer scriptleri güncel sözleşmeye körlemesine uygulanmaz.
+`npm run generate` ortak tipleri, minimal Edge contract/validator/bundle ve katalog/endpoint envanterini üretir; `npm run verify` drift'i reddeder. Yeni değişiklik ayrı branch/PR ve append-only migration ile yapılır. Önceki 11 migration korunmuştur; 12–18. migration yeni registry işlemleri, kişi görünürlüğü ve okuma sürümlerini taşır. Eski wrapper kaynağı tarihsel migration ile sabittir; güncel üretilen wrapper `database/runtime-wrappers-current.sql` dosyasındadır. Yeni API'nin DB kurulumu yeni migration ile taşınır. Historical/transfer scriptleri güncel sözleşmeye körlemesine uygulanmaz.
 
-129 işlem yalnız sözleşme düzeyindedir. Kalıcı ortak staging, dış e-posta, yük/restore, frontend gerçek entegrasyon kabulü ve production dağıtımı tamamlanmış değildir. Frontend kodu/tasarımı Claude'un alanıdır. `vercel.json` main otomatik dağıtımını kapalı tutar; merge production izni değildir.
+121 işlem yalnız sözleşme düzeyindedir; tam liste ve bağımlılık sırası `docs/remaining-work.md` içindedir. Kalıcı ortak staging, dış e-posta, yük/restore, frontend gerçek entegrasyon kabulü ve production dağıtımı tamamlanmış değildir. Frontend kodu/tasarımı Claude'un alanıdır. `vercel.json` main otomatik dağıtımını kapalı tutar; merge production izni değildir.
+
+## Yeni kişi/merkez/disiplin entegrasyonu
+
+- `organization_update_v1`: org.manage; organizasyonun güncel `expected_version` değeri. `organization_get` ve `organizations_list` artık `version` döndürür.
+- `center_update_v1`: seçili merkez yöneticisi; güncel merkez sürümü, ad ve IANA saat dilimi. `centers_list` artık `version` döndürür. Değişiklik geçmiş seansların UTC zamanlarını veya satış saat dilimi snapshot’larını yeniden hesaplamaz.
+- `disciplines_list_v1`: owner/OM organizasyon kataloğu; CM yalnız erişilebilir atanmış merkezlerinde aktif olarak sunulan aktif disiplinlerin projeksiyonu; diğer roller reddedilir; `page` zorunlu; desteklenen sıralama `created_at_asc`. Yanıt `items/next_cursor`, `as_of` içermez.
+- `person_discipline_set_v1`: aynı organizasyon/merkez/disiplin; aktif ilişki için aynı merkezde eşleşen öğrenci/eğitmen ilişkisi gerekir. Öğrenci aktifleştirme veya login/rol grantı yerine geçmez. Güncelleme güncel ilişki sürümünü ister; `person_get.discipline_relationships[].version` ile okunur.
+- `student_deactivate_v1`: mevcut merkez öğrenci ilişkisini kapatır. Açık talep/alternatif, rezervasyon, bekleme/yer teklifi, etkinlik kaydı veya hazırlanmış ödeme engeldir. Süresi dolmuş aktif yer teklifi ve bağlı offered liste kaydı aynı kilit/transaction içinde kapanır; geciken worker tek başına pasifliği engellemez. Borç/hak ve hesap/rol bağları silinmez. Başka merkez öğrenci ilişkisi bu komutla kapatılmaz.
+- `person_get_v1` / `people_list_v1`: owner/OM organizasyon okumaları; merkez operasyon okuyucuları seçili merkezle ilişkili kişiler; öğrenci yalnız kendi kaydı; canlı görevlendirmesi olan I/A gerekli katılımcı alanları. I/A iletişim alanını alamaz. Merkez seçiliyse başka merkez ilişkileri yanıta konmaz. Mevcut kişilerde aktif merkez ilişkisi aranır. İlk ilişki kurulmadan önce yalnız teknik oluşturma kaydıyla aynı merkeze ait kişi açılır; kökeni bilinmeyen ilişkisiz kayıtlar kapalı kalır. Pasif ilişki operasyon okuma/yazma yetkisi vermez. Kişi listesi `created_at_asc`; cursor aynı filtre/kapsama bağlıdır.
+- `person_update_v1`: CM veya açık person.manage personel grantı; hedef kişinin aktif merkez ilişkisi (ilk ilişki öncesinde aynı oluşturma merkezi) ve güncel kişi sürümü gerekir. Contacts patch’i listeyi değiştirir; aynı kind/value kanıtı korunur, yeni adres doğrulanmış sayılmaz. Auth kimliği veya hesap bağlantısı değiştirilmez.
+
+İşlem adı ortak tiplerden seçilir. Yeni yazmalar da aynı receipt/audit/outbox transaction ve canlı yetki kontrolünden geçer. Görünürlükte rol/bağ geri alma bir sonraki istekte geçerlidir. Yeni bir ürün iptal, para veya hakediş kuralı eklenmedi.
