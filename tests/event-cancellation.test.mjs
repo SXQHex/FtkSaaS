@@ -151,12 +151,63 @@ test('Q-E02 real Auth/API center and participant cancellation acceptance',async 
   const y=await manual(400,{occurred:true}),pv=await preview(y.e),k=key(),same=await Promise.all([apply(pv,k),apply(pv,k)]);
   assert.equal(same.filter(z=>z.replayed).length,1);assert.equal(await claim(y.p),'400');assert.equal(await receiptCount(k),1);
  });
- await t.test('collection racing cancellation is serialized; stale preview or closed debt leaves no duplicate credit',async()=>{
-  const x=await manual(400,{occurred:true}),pv=await preview(x.e),ck=key(),ak=key();
-  const rs=await Promise.all([call(owner,'collection_record_v1',scoped({person_id:x.p,debt_ids:[x.d.id],amount_minor:'600',currency:'TRY',occurred_at:new Date().toISOString()}),ck),call(owner,'event_cancel_apply_v1',scoped({preview:{id:pv.id,token:pv.token}}),ak)]);
-  if(rs[1].result.ok){assert.equal(rs[0].result.ok,false);assert.equal(await claim(x.p),'400');}
-  else {assert.equal(rs[1].result.error.code,'PREVIEW_STALE');assert.equal(rs[0].result.ok,true);await apply(await preview(x.e));assert.equal(await claim(x.p),'1000');}
-  assert.equal((await db.query('select private.debt_net($1,$2) n',[org,x.d.id])).rows[0].n,'0');
+ // Both operations take the same org lock. Collection after cancellation is still a
+ // real cash receipt: the existing surplus rule credits it without reopening debt.
+ const collectionBody=x=>scoped({person_id:x.p,debt_ids:[x.d.id],amount_minor:'600',currency:'TRY',occurred_at:new Date().toISOString()});
+ async function settledCollectionCancellation(x,body,ck,pv,ak,{paid,claimed,surplus}){
+  assert.equal((await view(x.e)).state,'cancelled');
+  const amounts=(await db.query(`select private.debt_net($1,$2)::text net,
+   private.debt_remaining($1,$2)::text remaining,private.debt_paid($1,$2)::text paid,
+   private.debt_claimed($1,$2)::text claimed`,[org,x.d.id])).rows[0];
+  assert.deepEqual(amounts,{net:'0',remaining:'0',paid:String(paid),claimed:String(claimed)});
+  assert.equal(await claim(x.p),'1000');
+  const cash=(await db.query("select id,amount_minor::text amount from core.cash_movements where org_id=$1 and person_id=$2 and kind='collection' order by created_at,id",[org,x.p])).rows;
+  assert.equal(cash.length,2);assert.equal(cash.reduce((sum,m)=>sum+BigInt(m.amount),0n),1000n);
+  const laterCash=(await db.query("select c.id from core.cash_movements c join core.operation_receipts r on r.id=c.operation_id where c.org_id=$1 and r.key_hash=$2",[org,createHash('sha256').update(ck).digest('hex')])).rows[0].id;
+  assert.equal((await db.query('select coalesce(sum(amount_minor),0)::text n from core.debt_allocations where org_id=$1 and cash_movement_id=$2',[org,laterCash])).rows[0].n,String(600-surplus));
+  assert.equal((await db.query("select coalesce(sum(amount_minor),0)::text n from core.student_credit_movements where org_id=$1 and source_cash_id=$2 and kind='surplus_add'",[org,laterCash])).rows[0].n,String(surplus));
+  assert.equal((await db.query("select coalesce(sum(amount_minor),0)::text n from core.student_credit_movements where org_id=$1 and person_id=$2 and kind='surplus_add'",[org,x.p])).rows[0].n,String(surplus));
+  assert.equal(await count("select count(*)::int n from core.cash_movements where org_id=$1 and person_id=$2 and kind='refund'",[org,x.p]),0);
+  assert.equal(await receiptCount(ck),1);assert.equal(await receiptCount(ak),1);
+  const journal=async()=>({
+   cash:(await db.query('select * from core.cash_movements where org_id=$1 and person_id=$2 order by id',[org,x.p])).rows,
+   allocations:(await db.query('select * from core.debt_allocations where org_id=$1 and debt_id=$2 order by id',[org,x.d.id])).rows,
+   credits:(await db.query('select * from core.student_credit_movements where org_id=$1 and person_id=$2 order by id',[org,x.p])).rows,
+   adjustments:(await db.query('select * from core.debt_adjustments where org_id=$1 and debt_id=$2 order by id',[org,x.d.id])).rows
+  });
+  const before=await journal();
+  assert.equal((await must(owner,'collection_record_v1',body,ck)).replayed,true);
+  assert.equal((await apply(pv,ak)).replayed,true);
+  assert.deepEqual(await journal(),before);assert.equal(await claim(x.p),'1000');
+ }
+ await t.test('cancellation before collection credits later cash as surplus without reopening event debt; retries write nothing',async()=>{
+  const x=await manual(400,{occurred:true}),pv=await preview(x.e),ck=key(),ak=key(),body=collectionBody(x);
+  await apply(pv,ak);assert.equal(await claim(x.p),'400');
+  await must(owner,'collection_record_v1',body,ck);
+  await settledCollectionCancellation(x,body,ck,pv,ak,{paid:400,claimed:400,surplus:600});
+ });
+ await t.test('collection before cancellation invalidates preview; failed apply leaves no receipt or adjustment',async()=>{
+  const x=await manual(400,{occurred:true}),pv=await preview(x.e),ck=key(),ak=key(),body=collectionBody(x);
+  await must(owner,'collection_record_v1',body,ck);
+  await fail('event_cancel_apply_v1',{preview:{id:pv.id,token:pv.token}},'PREVIEW_STALE',ak);
+  assert.equal(await receiptCount(ak),0);assert.equal(await claim(x.p),'0');
+  assert.equal(await count('select count(*)::int n from core.debt_adjustments where org_id=$1 and debt_id=$2',[org,x.d.id]),0);
+  assert.equal((await view(x.e)).state,'occurred');
+  const fresh=await preview(x.e);await apply(fresh,ak);
+  await settledCollectionCancellation(x,body,ck,fresh,ak,{paid:1000,claimed:1000,surplus:0});
+ });
+ await t.test('collection racing cancellation conserves cash as linked claim or surplus; both serialized orders are valid',async()=>{
+  const x=await manual(400,{occurred:true}),pv=await preview(x.e),ck=key(),ak=key(),body=collectionBody(x);
+  const rs=await Promise.all([call(owner,'collection_record_v1',body,ck),call(owner,'event_cancel_apply_v1',scoped({preview:{id:pv.id,token:pv.token}}),ak)]);
+  assert.equal(rs[0].result.ok,true,JSON.stringify(rs[0].result));
+  let applied=pv;
+  if(rs[1].result.ok){
+   await settledCollectionCancellation(x,body,ck,applied,ak,{paid:400,claimed:400,surplus:600});
+  }else{
+   assert.equal(rs[1].result.error.code,'PREVIEW_STALE');assert.equal(await receiptCount(ak),0);assert.equal(await claim(x.p),'0');
+   applied=await preview(x.e);await apply(applied,ak);
+   await settledCollectionCancellation(x,body,ck,applied,ak,{paid:1000,claimed:1000,surplus:0});
+  }
  });
  await t.test('late failure rolls back consumed rights, finance, operation, preview and notifications atomically',async()=>{
   const x=await packageRegistration('consumed',{manualPaid:400}),y=x.manual,before=await regView(x.r);
