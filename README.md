@@ -1,8 +1,8 @@
 # FtkSaaS backend · 0.2.0-rc.3
 
-Kalıcı kaynak: https://github.com/SXQHex/FtkSaaS — `backend/runtime-v0.2.0`. İnceleme: https://github.com/SXQHex/FtkSaaS/pull/1. Frontend kapsamı yoktur.
+Kalıcı kaynak: https://github.com/SXQHex/FtkSaaS — `main`. İnceleme: https://github.com/SXQHex/FtkSaaS/pull/4. Frontend kapsamı yoktur.
 
-Önce [Claude devir notunu](docs/claude-handover.md) okuyun. 182 sözleşmenin 53’ü geliştirme ortamında çağrılabilir; kalan 129 işlem yalnız sözleşmedir. [Endpoint envanteri](docs/endpoint-inventory.json) ve [Q-E01 teknik aktarım durumu](docs/decisions/Q-E01.md) kapsam sınırlarını gösterir. Q-D01 kabul edilmiş ve ortak havuz yarışlarıyla doğrulanmıştır. Q-E01 ana sözleşme, şema/API/ortak tip ve finans yazma yoluna aktarıldı. Güncel temiz kabul kanıtı reports/qe02-verification.json içindedir.
+Önce [Claude devir notunu](docs/claude-handover.md) okuyun. 184 sözleşmenin 55’i geliştirme ortamında çağrılabilir; kalan 129 işlem yalnız sözleşmedir. [Endpoint envanteri](docs/endpoint-inventory.json) ve [Q-E01 teknik aktarım durumu](docs/decisions/Q-E01.md) kapsam sınırlarını gösterir. Q-D01 kabul edilmiş ve ortak havuz yarışlarıyla doğrulanmıştır. Q-E01 ana sözleşme, şema/API/ortak tip ve finans yazma yoluna aktarıldı. Güncel kapsam ve kanıt: docs/actual-start-handover.md, reports/actual-start-verification.json ve son commit'in GitHub CI kaydıdır. Fiilî başlangıç kayıt/düzeltmesi dahil 148 test ve 11 migration temiz kabulden geçti. Q-E02 raporları önceki sürümün tarihsel kanıtıdır.
 
 ```sh
 # Node 24.19.0; ya da sabit imajlı Dev Container

@@ -1,10 +1,12 @@
 # FtkSaaS backend — Claude devri · 0.2.0-rc.3
 
-Kalıcı kaynak: https://github.com/SXQHex/FtkSaaS · dal: `backend/runtime-v0.2.0` · inceleme: https://github.com/SXQHex/FtkSaaS/pull/1. Frontend tasarımı ve bileşenleri değiştirilmedi. Bu sürüm geliştirme kabulüdür; ürünün 182 operasyonunun tamamının veya üretim dağıtımının bittiği iddia edilmez.
+Kalıcı kaynak: https://github.com/SXQHex/FtkSaaS · dal: `main` · inceleme: https://github.com/SXQHex/FtkSaaS/pull/4. Frontend tasarımı ve bileşenleri değiştirilmedi. Bu sürüm geliştirme kabulüdür; ürünün 184 operasyonunun tamamının veya üretim dağıtımının bittiği iddia edilmez.
+
+Güncel fiilî başlangıç aktarımı: `docs/actual-start-handover.md`, `reports/actual-start-verification.json` ve PR #4 son commit CI. Temiz kabul: 148 test, 11 migration. Aşağıdaki eski RC3 sayıları/raporları tarihsel snapshot'tır; güncel envanter 55 çağrılabilir / 129 yalnız sözleşmedir.
 
 ## Çalışan kapsam
 
-53 çağrılabilir gateway/named RPC; 129 işlem yalnız sözleşme. Tam liste ve kapsam sınırları: `docs/endpoint-inventory.json`. `contracts/05-FtkSaaS-O4-API-katalogu.md` her satırda durumu gösterir. Yalnız sözleşme olan bir işlem gateway’de `NOT_FOUND` alır.
+55 çağrılabilir gateway/named RPC; 129 işlem yalnız sözleşme. Tam liste ve kapsam sınırları: `docs/endpoint-inventory.json`. `contracts/05-FtkSaaS-O4-API-katalogu.md` her satırda durumu gösterir. Yalnız sözleşme olan bir işlem gateway’de `NOT_FOUND` alır.
 
 | Alan | Çağrılabilir işlemler |
 |---|---|
@@ -15,7 +17,7 @@ Kalıcı kaynak: https://github.com/SXQHex/FtkSaaS · dal: `backend/runtime-v0.2
 | Abonelik | saas_payment_submit/verify, subscription_get |
 | Hak/para | product_publish, sale_preview/apply, collection_record, entitlements_get, debt_adjust, student_credit_refund/offset |
 | Ders yarışı için yazma | class_save, session_create, reservation_create/cancel |
-| Etkinlik | event_save/publish/get/list, event_payment_prepare/get, event_registration_preview, event_register, event_registration_cancel, event_attendance_mark/close/correct, event_complete, event_duty_verify, event_cancel_preview/apply |
+| Etkinlik | event_save/publish/get/list, event_payment_prepare/get, event_registration_preview, event_register, event_registration_cancel, event_attendance_mark/close/correct, event_complete, event_actual_start_record/correct, event_duty_verify, event_cancel_preview/apply |
 
 Tablodaki bütün adlar `_v1` ile biter. Dersin tam yoklama/hakediş, ödeme düzeltme, bekleme listesi, dosya upload/download, CRM, rapor/export, kullanıcı belge onayı ve bütün diğer işlemler envanterde ayrıca belirtilmedikçe **yalnız sözleşmedir**. Bu ekranda görünür bir butonun backend’i var sayılmamalı.
 
