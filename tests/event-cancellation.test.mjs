@@ -51,8 +51,8 @@ test('Q-E02 real Auth/API center and participant cancellation acceptance',async 
  let historicalSlot=0,futureSlot=0;
  const past=()=>{const at=Date.now()-30*86400000+(historicalSlot++)*7200000;return {starts_at:new Date(at).toISOString(),ends_at:new Date(at+3600000).toISOString()};};
  const future=()=>{const at=Date.now()+30*86400000+(futureSlot++)*7200000;return {starts_at:new Date(at).toISOString(),ends_at:new Date(at+3600000).toISOString()};};
- async function manual(paid,{occurred=false,prior=false}={}){
-  const e=await event({interval:prior||occurred?past():future(),terms:{...terms,full_payment_required:false}});
+ async function manual(paid,{occurred=false,prior=false,interval=null}={}){
+  const e=await event({interval:interval??(prior||occurred?past():future()),terms:{...terms,full_payment_required:false}});
   const p=await person(),r=await mutate('event_register_v1',{event_id:e,person_id:p}),d=await debtForRegistration(r.primary_id);
   if(paid)await collect(p,d.id,paid);
   if(occurred)await eventState(e);
@@ -81,12 +81,12 @@ test('Q-E02 real Auth/API center and participant cancellation acceptance',async 
   await eventState(x.e);await apply(await preview(x.e));assert.equal(await claim(x.p),String(paid));
  });
  let product;
- async function packageRegistration(mode,{before='release',after='consume',manualPaid=null,timed=false}={}){
+ async function packageRegistration(mode,{before='release',after='consume',manualPaid=null,timed=false,prior=false}={}){
   if(!product)product=(await mutate('product_publish_v1',{terms:{name:'Q-E02 shared credit',kind:'credits',booking_mode:'flexible',credits:1,price_minor:'1000',currency:'TRY',freeze:{enabled:false,extends_validity:false},refund:{method:'none'},scopes:[{scope_kind:'organization_all',center_id:null,discipline_id:null,usage_targets:['lesson','event']}]}})).primary_id;
   const selectedProduct=timed?(await mutate('product_publish_v1',{terms:{name:'Q-E02 weekly',kind:'timed',booking_mode:'flexible',credits:null,quota:{period:'week',limit:1},price_minor:'1000',currency:'TRY',freeze:{enabled:false,extends_validity:false},refund:{method:'none'},scopes:[{scope_kind:'organization_all',center_id:null,discipline_id:null,usage_targets:['lesson','event']}]}})).primary_id:product;
   const p=await person(),pv=await must(owner,'sale_preview_v1',scoped({person_id:p,product_version_id:selectedProduct,start_date:'2026-01-01',end_date:'2027-01-01'}));
   const sale=(await mutate('sale_apply_v1',{preview:{id:pv.id,token:pv.token}})).primary_id;
-  const e=await event({interval:mode==='reserved'?future():past(),
+  const e=await event({interval:mode==='reserved'&&!prior?future():past(),
    terms:{...terms,fee_minor:'1000',full_payment_required:false,allowed_product_version_ids:[selectedProduct],cancellation:{before_cutoff:before,after_cutoff:after,no_show:'consume'}}});
   const r=(await mutate('event_register_v1',{event_id:e,person_id:p,sale_id:sale})).primary_id;
   let manual=null;
@@ -130,6 +130,117 @@ test('Q-E02 real Auth/API center and participant cancellation acceptance',async 
   assert.equal((await balance(consumed.p)).find(y=>y.sale_id===consumed.sale).consumed,1);
   assert.equal((await balance(released.p)).find(y=>y.sale_id===released.sale).available,1);
   assert.equal(await claim(consumed.p),'0');assert.equal(await claim(released.p),'0');
+ });
+ // Q-E03 uses a pure boundary classifier plus real API paths with server timestamps.
+ const monetaryJournal=async p=>({
+  cash:(await db.query('select * from core.cash_movements where org_id=$1 and person_id=$2 order by id',[org,p])).rows,
+  debts:(await db.query('select * from core.debts where org_id=$1 and person_id=$2 order by id',[org,p])).rows,
+  adjustments:(await db.query('select a.* from core.debt_adjustments a join core.debts d on d.org_id=a.org_id and d.id=a.debt_id where d.org_id=$1 and d.person_id=$2 order by a.id',[org,p])).rows,
+  credits:(await db.query('select * from core.student_credit_movements where org_id=$1 and person_id=$2 order by id',[org,p])).rows
+ });
+ const basis=async r=>(await regView(r)).participant_cancellation;
+ await t.test('Q-E03 exact planned boundary: before, equality, after and 21:00 / 21:15 / delayed 21:30',async()=>{
+  const planned='2026-10-15T21:00:00+03:00';
+  for(const [at,want] of [['2026-10-15T20:59:59.999999+03:00','before_planned_start'],[planned,'at_or_after_planned_start'],['2026-10-15T21:15:00+03:00','at_or_after_planned_start']]){
+   assert.equal((await db.query('select private.participant_cancel_phase($1,$2) phase',[planned,at])).rows[0].phase,want);
+  }
+  // Actual start at 21:30 is deliberately not a classifier input.
+ });
+ for(const prior of [false,true])for(const paid of [0,400,1000])await t.test('Q-E03 API captures planned monetary phase, existing refund=none journals preserved: '+(prior?'after':'before')+' paid '+paid,async()=>{
+  const x=await manual(paid,{prior}),before=await monetaryJournal(x.p),k=key();
+  if(prior){const v=await view(x.e);assert.equal(v.state,'published');assert.equal(v.attendance_state,'open');assert.equal((await regView(x.r)).attendance_result,'unmarked');}
+  const body={registration_id:x.r,expected_version:1,reason:'Q-E03 participant cancellation'};
+  await mutate('event_registration_cancel_v1',body,k);
+  const evidence=await basis(x.r);assert.equal(evidence.phase,prior?'at_or_after_planned_start':'before_planned_start');
+  assert.equal(evidence.rule,'planned_start_v1');assert.equal(new Date(evidence.planned_starts_at).toISOString(),new Date((await view(x.e)).interval.starts_at).toISOString());
+  assert.equal(new Date(evidence.cancelled_at)>=new Date(evidence.planned_starts_at),prior);
+  assert.deepEqual((await view(x.e)).registrations.find(r=>r.id===x.r).participant_cancellation,evidence);
+  assert.deepEqual(await monetaryJournal(x.p),before);
+  await mutate('event_registration_cancel_v1',body,k);assert.deepEqual(await basis(x.r),evidence);assert.equal(await receiptCount(k),1);
+  if(prior){
+   // Delayed recording of occurrence cannot reclassify/reprice the completed cancellation.
+   await eventState(x.e);assert.deepEqual(await basis(x.r),evidence);assert.deepEqual(await monetaryJournal(x.p),before);
+  }
+ });
+ await t.test('Q-E03 no wall-clock auto occurrence/attendance/rights/earnings; package cutoff stays independent',async()=>{
+  const x=await packageRegistration('reserved',{before:'consume',after:'release'});
+  const v=await view(x.e);assert.equal(v.state,'published');assert.equal(v.attendance_state,'open');
+  const k=key();await mutate('event_registration_cancel_v1',{registration_id:x.r,expected_version:1,reason:'existing package rule'},k);
+  // This before-start cancellation consumes only because its accepted package terms say so.
+  assert.equal((await basis(x.r)).phase,'before_planned_start');assert.equal((await balance(x.p)).find(z=>z.sale_id===x.sale).consumed,1);
+  assert.equal((await view(x.e)).state,'published');assert.equal(await claim(x.p),'0');
+  assert.equal(await count('select count(*)::int n from core.earnings where org_id=$1 and event_assignment_id in (select id from core.event_assignments where org_id=$1 and event_id=$2)',[org,x.e]),0);
+  await apply(await preview(x.e));assert.equal((await balance(x.p)).find(z=>z.sale_id===x.sale).available,1);
+ });
+ await t.test('Q-E03 passed planned time alone keeps package reserved and earnings absent; after-cutoff release remains accepted',async()=>{
+  const x=await packageRegistration('reserved',{prior:true,after:'release'}),v=await view(x.e);
+  assert.equal(v.state,'published');assert.equal(v.attendance_state,'open');assert.equal((await regView(x.r)).attendance_result,'unmarked');
+  assert.equal((await balance(x.p)).find(z=>z.sale_id===x.sale).reserved,1);
+  assert.equal(await count('select count(*)::int n from core.earnings where org_id=$1 and event_assignment_id in (select id from core.event_assignments where org_id=$1 and event_id=$2)',[org,x.e]),0);
+  await mutate('event_registration_cancel_v1',{registration_id:x.r,expected_version:1,reason:'accepted release after cutoff'});
+  assert.equal((await basis(x.r)).phase,'at_or_after_planned_start');assert.equal((await balance(x.p)).find(z=>z.sale_id===x.sale).available,1);
+ });
+ await t.test('Q-E03 next-day center cancellation is atomic, returns payment once and preserves participant decision evidence',async()=>{
+  const at=Date.now()-86400000,interval={starts_at:new Date(at).toISOString(),ends_at:new Date(at+3600000).toISOString()};
+  const x=await manual(400,{interval}),body={registration_id:x.r,expected_version:1,reason:'left after planned start'};
+  await mutate('event_registration_cancel_v1',body);const evidence=await basis(x.r),pv=await preview(x.e),k=key();
+  await rejectAudit('event_cancel_apply_v1',x.e);
+  await fail('event_cancel_apply_v1',{preview:{id:pv.id,token:pv.token}},'INTEGRITY_VIOLATION',k);
+  assert.deepEqual(await basis(x.r),evidence);assert.equal(await claim(x.p),'0');assert.equal(await receiptCount(k),0);
+  assert.equal((await db.query('select private.debt_remaining($1,$2)::text n',[org,x.d.id])).rows[0].n,'600');
+  await removeTrigger();await apply(pv,k);await apply(pv,k);
+  assert.equal(await claim(x.p),'400');assert.deepEqual(await basis(x.r),evidence);
+  assert.equal((await db.query('select private.debt_remaining($1,$2)::text n',[org,x.d.id])).rows[0].n,'0');
+  assert.equal(await count("select count(*)::int n from core.cash_movements where org_id=$1 and person_id=$2 and kind='refund'",[org,x.p]),0);
+ });
+ await t.test('Q-E03 late participant failure rolls back phase, package right, journals and receipt; retry is atomic',async()=>{
+  const x=await packageRegistration('reserved',{before:'consume'}),before=await monetaryJournal(x.p),regBefore=await regView(x.r),k=key();
+  const body={registration_id:x.r,expected_version:1,reason:'Q-E03 rollback'};
+  await rejectAudit('event_registration_cancel_v1',x.r);
+  await fail('event_registration_cancel_v1',body,'INTEGRITY_VIOLATION',k);
+  assert.deepEqual(await regView(x.r),regBefore);assert.equal(await basis(x.r),null);assert.equal(await receiptCount(k),0);
+  assert.equal((await balance(x.p)).find(z=>z.sale_id===x.sale).reserved,1);assert.deepEqual(await monetaryJournal(x.p),before);
+  await removeTrigger();await mutate('event_registration_cancel_v1',body,k);const evidence=await basis(x.r);
+  assert.equal(evidence.phase,'before_planned_start');assert.equal((await balance(x.p)).find(z=>z.sale_id===x.sale).consumed,1);
+  await mutate('event_registration_cancel_v1',body,k);assert.deepEqual(await basis(x.r),evidence);assert.deepEqual(await monetaryJournal(x.p),before);
+  await assert.rejects(db.query("update core.event_registrations set participant_cancellation=jsonb_set(participant_cancellation,'{phase}','\"at_or_after_planned_start\"'::jsonb) where id=$1",[x.r]),e=>e.message==='INTEGRITY_VIOLATION');
+ });
+ await t.test('Q-E03 API queued across planned/package cutoff uses one post-lock decision time',async()=>{
+  const x=await packageRegistration('reserved',{before:'consume',after:'release'}),locker=await connect(),k=key();
+  let pending;
+  try{
+   // Synthetic fixture clock, not a client-visible time override. Hold the real shared gate.
+   const planned=(await db.query("update core.events set starts_at=clock_timestamp()+interval '8 seconds',ends_at=clock_timestamp()+interval '1 hour',version=version+1 where id=$1 returning starts_at",[x.e])).rows[0].starts_at;
+   await locker.query('begin');const pid=(await locker.query('select pg_backend_pid() pid')).rows[0].pid;
+   await locker.query('select id from core.organizations where id=$1 for update',[org]);
+   const body={registration_id:x.r,expected_version:1,reason:'queued across cutoff'};
+   pending=call(owner,'event_registration_cancel_v1',scoped(body),k);
+   const deadline=Date.now()+15000;let waited=false;
+   while(Date.now()<deadline){
+    const blocked=(await db.query("select xact_start < $2::timestamptz before_cutoff from pg_stat_activity where $1=any(pg_blocking_pids(pid)) and query like '%event_registration_cancel_v1%'",[pid,planned])).rows;
+    if(blocked.length){assert.equal(blocked[0].before_cutoff,true);waited=true;break;}
+    await new Promise(resolve=>setTimeout(resolve,25));
+   }
+   assert(waited,'must observe the real API transaction waiting on the organization lock before cutoff');
+   while(!(await db.query('select clock_timestamp()>$1::timestamptz passed',[planned])).rows[0].passed){
+    assert(Date.now()<deadline,'bounded cutoff wait');await new Promise(resolve=>setTimeout(resolve,25));
+   }
+   await locker.query('commit');
+   const response=await pending;assert.equal(response.result.ok,true,JSON.stringify(response.result));
+   const evidence=await basis(x.r);assert.equal(evidence.phase,'at_or_after_planned_start');
+   assert(new Date(evidence.cancelled_at)>=new Date(evidence.planned_starts_at));
+   const right=(await balance(x.p)).find(z=>z.sale_id===x.sale);assert.equal(right.available,1);assert.equal(right.consumed,0);assert.equal(right.reserved,0);
+   assert.equal(await claim(x.p),'0');await mutate('event_registration_cancel_v1',body,k);assert.deepEqual(await basis(x.r),evidence);
+  }finally{
+   await locker.query('rollback');await locker.end();if(pending)await pending;
+  }
+ });
+ await t.test('Q-E03 client cannot forge cancel time, planned boundary or actual-start classification',async()=>{
+  const x=await manual(400,{prior:true});
+  for(const extra of [{cancelled_at:'2020-01-01T00:00:00Z'},{actual_starts_at:'2099-01-01T00:00:00Z'},{participant_cancellation:{phase:'before_planned_start'}}]){
+   await fail('event_registration_cancel_v1',{registration_id:x.r,expected_version:1,reason:'forged time',...extra},'VALIDATION_FAILED');
+  }
+  assert.equal(await basis(x.r),null);assert.equal((await regView(x.r)).state,'active');
  });
  await t.test('previous credit, explicit refund and offset are not recreated on occurred center cancellation',async()=>{
   const x=await manual(1000,{occurred:true});

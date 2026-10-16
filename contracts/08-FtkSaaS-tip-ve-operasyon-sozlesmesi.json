@@ -14334,7 +14334,7 @@
         "reason"
       ],
       "additionalProperties": false,
-      "description": "Q-E02 final acceptance: center cancellation at any stage fully settles only linked event obligations and rights; participant cancellation has no monetary journal effect."
+      "description": "Q-E03: planned start is the monetary cutoff, equality is post-start; no client time override. Existing prestart terms/package terms remain. Q-E02 center settlement unchanged."
     },
     "Success_event_registration_cancel": {
       "type": "object",
@@ -20838,6 +20838,16 @@
         },
         "terms_snapshot": {
           "$ref": "#/$defs/EventTerms"
+        },
+        "participant_cancellation": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/ParticipantCancellationBasis"
+            },
+            {
+              "type": "null"
+            }
+          ]
         }
       },
       "required": [
@@ -22940,6 +22950,16 @@
         },
         "version": {
           "$ref": "#/$defs/PositiveInt"
+        },
+        "participant_cancellation": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/ParticipantCancellationBasis"
+            },
+            {
+              "type": "null"
+            }
+          ]
         }
       },
       "required": [
@@ -23356,6 +23376,34 @@
         "trace_id"
       ],
       "additionalProperties": false
+    },
+    "ParticipantCancellationBasis": {
+      "type": "object",
+      "properties": {
+        "cancelled_at": {
+          "$ref": "#/$defs/Instant"
+        },
+        "planned_starts_at": {
+          "$ref": "#/$defs/Instant"
+        },
+        "phase": {
+          "enum": [
+            "before_planned_start",
+            "at_or_after_planned_start"
+          ]
+        },
+        "rule": {
+          "const": "planned_start_v1"
+        }
+      },
+      "required": [
+        "cancelled_at",
+        "planned_starts_at",
+        "phase",
+        "rule"
+      ],
+      "additionalProperties": false,
+      "description": "Immutable backend decision evidence. Planned start is captured at cancellation; actual occurrence recording never reclassifies it."
     }
   },
   "x-contract": {
@@ -36928,7 +36976,8 @@
           "at_least_one_instructor_or_assistant",
           "active_student_limit_no_candidate_event_exception",
           "Q_D01_event_labels_same_org_not_grants",
-          "Q_E02_participant_cancel_no_monetary_changes_existing_package_terms"
+          "Q_E02_participant_cancel_no_monetary_changes_existing_package_terms",
+          "Q_E03_planned_start_inclusive_immutable_backend_cancellation_basis"
         ],
         "audit": true,
         "notification": "outbox_if_user_visible_business_result",
@@ -36966,7 +37015,12 @@
           "Q-D01-A05",
           "Q-D01-A06",
           "Q-D01-A07",
-          "Q-D01-A08"
+          "Q-D01-A08",
+          "Q-E03-A01",
+          "Q-E03-A02",
+          "Q-E03-A03",
+          "Q-E03-A04",
+          "Q-E03-A05"
         ],
         "configuration_policy": "numeric plan limits/prices and legal approval are deployment configuration, never arbitrary allow/deny",
         "implementation_status": "operational_development_limited",
@@ -41071,6 +41125,34 @@
           {
             "id": "E02-05",
             "rule": "Fiilî başlangıç/kısmi gerçekleşme ayrı alan veya durum olarak tanımlı değildir; saat geçmesi tek başına gerçekleşme değildir. Bu tanım karar konusu olarak açık. Merkez iptalinin aşamadan bağımsız sonucu bu tanıma ihtiyaç duymaz; mevcut occurred/attendance evidence korunur."
+          }
+        ]
+      },
+      {
+        "id": "Q-E03",
+        "accepted_date": "2026-10-16",
+        "status": "implemented_exact_head_ci_required",
+        "supersedes": "Q-E02 monetary planned-start boundary left open; actual operational start definition remains separate",
+        "rules": [
+          {
+            "id": "E03-01",
+            "rule": "Katılımcı iptalinin parasal sınırı planlanan başlangıçtır. Başlangıç anı dahil sonrasında iade, borç indirimi veya öğrenci alacağı oluşmaz. Öncesindeki iptaller mevcut kabul edilmiş koşullara tabidir."
+          },
+          {
+            "id": "E03-02",
+            "rule": "Fiilî başlangıcın gecikmesi, sonradan kaydı veya düzeltmesi tamamlanmış katılımcı iptalini yeniden sınıflandırmaz; finansal yeniden hesaplama yapılmaz. Plan 21.00, iptal 21.15, fiilî başlangıç 21.30 başlangıç sonrası iptaldir."
+          },
+          {
+            "id": "E03-03",
+            "rule": "Planlanan saatin gelmesi tek başına yoklama, hak tüketimi, gerçekleşme veya hakediş oluşturmaz. Katılımcı paket iptal koşulları korunur."
+          },
+          {
+            "id": "E03-04",
+            "rule": "Merkez iptalinde Q-E02 aynen geçerlidir; ertesi gün kaydı veya aşama tam borç kaldırma ve bağlı para/hak dönüşlerini değiştirmez."
+          },
+          {
+            "id": "E03-05",
+            "rule": "Başarılı katılımcı iptalinde backend karar zamanı, o andaki planlanan başlangıç ve parasal sınıflandırma participant_cancellation kaydında atomik sabitlenir. Önceki kayıtlara zaman kanıtı uydurulmaz; eski ve merkez iptallerinde alan null kalabilir. İstemci zaman veya sınıflandırma gönderemez."
           }
         ]
       }
@@ -50389,6 +50471,15 @@
         "product_status": "accepted_closed",
         "technical_status": "implemented_real_api_acceptance",
         "required_followup": []
+      },
+      {
+        "id": "Q-E03",
+        "source": "docs/decisions/Q-E03.md",
+        "product_status": "accepted_closed",
+        "technical_status": "implemented_exact_head_ci_required",
+        "required_followup": [
+          "Exact-head CI is authoritative; baseline evidence does not substitute for latest clock regression."
+        ]
       }
     ],
     "private_components": [

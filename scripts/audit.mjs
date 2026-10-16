@@ -43,5 +43,14 @@ check('Q-E01 accepted decision / preparation finance / typed terminal outcome',(
  }
 
 });
+check('Q-E03 planned boundary evidence / no client time override',()=>{
+ assert(d.ParticipantCancellationBasis.required.includes('planned_starts_at'));
+ assert(d.ParticipantCancellationBasis.required.includes('cancelled_at'));
+ assert.equal(d.ParticipantCancellationBasis.properties.rule.const,'planned_start_v1');
+ assert(d.Table_event_registrations.properties.participant_cancellation);
+ assert(d.EventRegistrationView.properties.participant_cancellation);
+ for(const field of ['cancelled_at','actual_starts_at','participant_cancellation'])assert(!d.Request_event_registration_cancel.properties[field]);
+ assert(c.operations.find(o=>o.name==='event_registration_cancel_v1').semantic_guards.includes('Q_E03_planned_start_inclusive_immutable_backend_cancellation_basis'));
+});
 const report={contract:c.version,tables:c.tables.length,operations:c.operations.length,definitions:Object.keys(d).length,uuid_paths:c.uuid_field_map.length,references:refs,checks:results,scope:'static contract + physical source coverage; NOT Auth/RLS business/race/load/restore acceptance'};
 fs.writeFileSync('reports/consistency.json',JSON.stringify(report,null,2)+'\n');console.log(JSON.stringify({checks:results.length,tables:report.tables,operations:report.operations,definitions:report.definitions,status:'passed'}));

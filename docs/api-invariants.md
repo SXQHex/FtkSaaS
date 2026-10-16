@@ -14,3 +14,5 @@
 bootstrap: İlk ödeme öncesi yalnız owner kuruluş/ödeme, merkez oluşturma ve kendini manager atama. Yeni owner ataması yalnız platform. Öğrenci/satış/ders işlemleri pending_payment durumunda yok; ilk ödeme doğrulama anında abonelik başlar, ücretsiz trial veya7gün ilk ödeme ek süresi yok. Aktif abonelik normal capability/limit, grace kabul edilen ilk7gün matrisi, service closed owner subscription dışında kapalıdır.
 
 Owner tek başına merkez invite/rezervasyon/tahsilat yapamaz. Config org scope O/OM; center scope CM. Otomasyon tanımlamak merkez operasyonu yetkisi üretmez; execution actor/scope’u merkez yetkilendirmesinden gelir, rol/plan/zorunlu politika aşılmaz. Satır Fxx minimum plan erişimi01 plan matrisindendir; ayrı plan fiyat/limitleri konfigürasyon, değişmez bütünlük şartları değildir.
+
+Q-E03: `event_registration_cancel_v1` zamanını backend belirler; planlanan başlangıç eşitliği sonrası sayılır. Başarılı iptalin `participant_cancellation` snapshot'ı event_get içinde okunur; sonradan gerçekleşme kaydı/düzeltmesi bu sonucu yeniden hesaplamaz. Para ve paket sonucu ayrı kurallardır. Öncesindeki mevcut iptal koşulları ve Q-E02 merkez iptali korunur.

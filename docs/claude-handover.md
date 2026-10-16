@@ -136,3 +136,13 @@ Merge sonrası main CI #38820160639, tahsilat–iptal testinin yalnız bir işle
 - Tahsilat önce: eski iptal önizlemesi PREVIEW_STALE; finans hareketi/receipt yazılmaz. Yeni önizleme ile iptalden 1000 refund_claim_add; toplam alacak 1000.
 
 Her iki sıralama, gerçek eşzamanlı API çağrıları ve aynı anahtarla tekrarlar ayrı denetlenir. Testler toplam nakdi, borç dağıtımlarını, alacak kaynaklarını ve defterlerin tekrarda değişmediğini kontrol eder. Ürün, API, tipler ve sekiz migration değişmedi; 53 çalışan / 129 yalnız sözleşme işlemi envanteri korunur. Önceki RC3 kabul raporları tarihsel kanıttır; bu düzeltmenin CI sonucu ilgili PR ve son commit üzerinden ayrıca doğrulanır.
+
+## Q-E03 — planlanan başlangıç / parasal iptal sınırı
+
+Katılımcı iptalinde planlanan başlangıç anı dahil sonrası parasal iade, borç indirimi veya öğrenci alacağı üretmez. Fiilî gecikme, sonradan gerçekleşme doğrulaması veya düzeltmesi bu sonucu değiştirmez. Öncesinde mevcut kabul edilmiş koşullar korunur; yeni iade formülü veya paket koşulu eklenmedi. Q-E02 merkez iptalinde gün/aşama bağımsız tam hesaplaşma aynen korunur.
+
+`event_get_v1.data.registrations[].participant_cancellation` null veya `{cancelled_at, planned_starts_at, phase, rule}` döner. `phase`: `before_planned_start` / `at_or_after_planned_start`; `rule`: `planned_start_v1`. Alan opsiyoneldir (eski sonuçlarla uyum), güncel projeksiyon null/nesne döner. Zamanlar backend tarafından ortak kilit alındıktan sonra sabitlenir; istemci iptal zamanı, fiilî başlangıç veya phase gönderemez. Eski ve yalnız merkez tarafından iptal edilen kayıtlara zaman kanıtı uydurulmaz. Başarılı snapshot değiştirilemez; rollback ve replay aynı transaction/receipt kurallarındadır. Paket tüketim sınırı mevcut terms_snapshot cancellation koşulundan gelir; parasal phase'den türetilmez.
+
+Planlanan saatin gelmesi state=occurred, yoklama, hak tüketimi veya hakediş yazmaz. Ayrı fiilî başlangıç kayıt/düzeltme API'si mevcut değildir ve bu teslimle eklenmez; geç `event_complete_v1` doğrulamasının önceki parasal sınıflandırmayı değiştirmediği sınanır. Q-E02'de açık bırakılan parasal başlangıç sınırı bu kararla kapalıdır; operasyonel fiilî başlangıç/kısmi gerçekleşme kaydı ayrı kapsamdır.
+
+Dokuzuncu migration karar kanıtını ekler; onuncu migration incelemede bulunan transaction-start / post-lock saat farkını düzeltir. Paket cutoff formülü değişmez; aynı post-lock cancel_at ile değerlendirilir. Önceki migrationlar değişmez. Envanter 53 çağrılabilir / 129 yalnız sözleşme; frontend, üretim, dış e-posta, kalıcı staging ve yük/restore kabulü bu aktarımla tamamlanmaz. Q-E03 kanıtı: `reports/qe03-verification.json`; önceki RC3 raporları tarihsel kalır.

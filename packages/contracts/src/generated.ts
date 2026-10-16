@@ -1415,6 +1415,7 @@ Request_event_payment_prepare?: RequestEventPaymentPrepare
 Request_event_payment_get?: RequestEventPaymentGet
 Success_event_payment_prepare?: SuccessEventPaymentPrepare
 Success_event_payment_get?: SuccessEventPaymentGet
+ParticipantCancellationBasis?: ParticipantCancellationBasis
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -2684,6 +2685,19 @@ display_name: Text
 state: EventRegistrationState
 attendance_result: AttendanceResult
 version: PositiveInt
+participant_cancellation?: (ParticipantCancellationBasis | null)
+}
+/**
+ * Immutable backend decision evidence. Planned start is captured at cancellation; actual occurrence recording never reclassifies it.
+ *
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "ParticipantCancellationBasis".
+ */
+export interface ParticipantCancellationBasis {
+cancelled_at: Instant
+planned_starts_at: Instant
+phase: ("before_planned_start" | "at_or_after_planned_start")
+rule: "planned_start_v1"
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -7857,7 +7871,7 @@ student_credit_added_minor: Money
 currency: Currency
 }
 /**
- * Q-E02 final acceptance: center cancellation at any stage fully settles only linked event obligations and rights; participant cancellation has no monetary journal effect.
+ * Q-E03: planned start is the monetary cutoff, equality is post-start; no client time override. Existing prestart terms/package terms remain. Q-E02 center settlement unchanged.
  *
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
  * via the `definition` "Request_event_registration_cancel".
@@ -11172,6 +11186,7 @@ terms_hash: Text
 state: EventRegistrationState
 attendance_result: AttendanceResult
 terms_snapshot: EventTerms
+participant_cancellation?: (ParticipantCancellationBasis | null)
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
