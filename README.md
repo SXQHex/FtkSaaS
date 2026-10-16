@@ -1,11 +1,14 @@
-# FtkSaaS backend · 0.2.0-rc.3
+# FtkSaaS backend
 
-Kalıcı kaynak: https://github.com/SXQHex/FtkSaaS — `main`. İnceleme: https://github.com/SXQHex/FtkSaaS/pull/4. Frontend kapsamı yoktur.
+Kalıcı kaynak: https://github.com/SXQHex/FtkSaaS — `main`. Fiilî başlangıç uygulaması: [PR #4](https://github.com/SXQHex/FtkSaaS/pull/4). Frontend tasarımı bu repository görevinin kapsamında değiştirilmedi.
 
-Önce [Claude devir notunu](docs/claude-handover.md) okuyun. 184 sözleşmenin 55’i geliştirme ortamında çağrılabilir; kalan 129 işlem yalnız sözleşmedir. [Endpoint envanteri](docs/endpoint-inventory.json) ve [Q-E01 teknik aktarım durumu](docs/decisions/Q-E01.md) kapsam sınırlarını gösterir. Q-D01 kabul edilmiş ve ortak havuz yarışlarıyla doğrulanmıştır. Q-E01 ana sözleşme, şema/API/ortak tip ve finans yazma yoluna aktarıldı. Güncel kapsam ve kanıt: docs/actual-start-handover.md, reports/actual-start-verification.json ve son commit'in GitHub CI kaydıdır. Fiilî başlangıç kayıt/düzeltmesi dahil 148 test ve 11 migration temiz kabulden geçti. Q-E02 raporları önceki sürümün tarihsel kanıtıdır.
+184 operasyon sözleşmesinin 55'i geliştirme ortamında çağrılabilir; 129'u yalnız sözleşmedir. Güncel liste: [endpoint envanteri](docs/endpoint-inventory.json). Entegrasyon: [Claude devri](docs/claude-handover.md) ve [fiilî başlangıç API'si](docs/actual-start-handover.md).
+
+Node 24.19.0 kullanın:
 
 ```sh
-# Node 24.19.0; ya da sabit imajlı Dev Container
+git clone --branch main https://github.com/SXQHex/FtkSaaS.git
+cd FtkSaaS
 npm ci
 npm run dev:start
 npm run dev:seed
@@ -13,18 +16,10 @@ npm run dev:info
 npm test
 ```
 
-Supabase CLI 2.121.0 native runtime experimental; yalnız izole yerel geliştirme. Her checkout kendi stack’ini ve dinamik portlarını oluşturur. Bağlantılar `dev:info`, sentetik kullanıcı bilgileri `.dev/development-users.json` içindedir. `.dev` git/teslimat kapsamına girmez. Dev seed fiyat ve limitleri ticari varsayılan değildir. Kaynak ve CI Box’ın yaşam süresinden bağımsızdır.
+`npm run test:clean` yalnız checkout'a ait loopback test DB'sini sıfırlar, 11 migration'ı temiz kurar ve test/seed/sağlık/advisors kontrollerini çalıştırır. Son uygulama kabulü: 148 test (12 sözleşme + 27 DB + 109 gerçek Auth/API). İncelenen uygulama commit'i `6480f966d361552a24cff13b96a512ffb61e2031`; o commit'in [PR CI'ı](https://github.com/SXQHex/FtkSaaS/actions/runs/38906093213) başarılıdır.
 
-`npm run generate` güncel 08 JSON’dan ortak tip/validator/Edge bundle ve katalog üretir; `npm run verify` migration hash, kaynak/çıktı drift, kapalı tip/ref ve UUID denetimini yapar. `test:db` gerçek PostgreSQL bütünlüğünü, `test:api` gerçek Auth → Edge → named RPC → DB akışını sınar. Sekiz migration sıfırdan tekrar uygulanır. `scripts/generate_schema.historical.py` ve `transfer_contract.py` tarihsel üreticilerdir; güncel sözleşme bunlarla yeniden oluşturulmaz.
+Her yeni head için [GitHub Actions](https://github.com/SXQHex/FtkSaaS/actions) sonucu ayrıca doğrulanır. [Fiilî başlangıç kanıt kapsamı](reports/actual-start-verification.json) ve [Q-E03 kanıt kapsamı](reports/qe03-verification.json) raporların hangi doğrulamayı temsil ettiğini belirtir. Q-E01/Q-E02 ve önceki RC3 raporları tarihsel snapshot'tır; son head'in CI sonucunun yerine geçmez.
 
-Paket, JSON kapalı sözleşmesi, migrationlar, ortak TypeScript/adapter, örnekler, CI ve doğrulama kanıtını içerir. Önceki 09/11 teknik raporları tarihsel snapshot’tır; güncel durum `docs/claude-handover.md` ve `reports/qe02-verification.json` ile belirlenir. Üretim dağıtımı, bütün ürün kabulü, harici e-posta sağlayıcısı ve yük/restore testleri bu sürümde tamamlanmış sayılmaz.
+Q-E03 parasal sınırı planlanan başlangıçtır; fiilî başlangıç kaydı bunu yeniden hesaplatmaz. Q-E02 merkez iptali tam borç/alacak/hak hesabını korur. Fiilî başlangıç kayıt/düzeltme API'si artık mevcuttur ve append-only audit geçmişini kullanır.
 
-Temiz kabul: Node 24.19.0 ile npm ci ve npm run test:clean. Bu komut checkout'a ait sentetik yerel veriyi silerek migrationları ve bütün kabulü tekrarlar; CI da aynı komutu kullanır.
-
-RC2 temiz kabul: 20 statik kontrol, 95 test (12 sözleşme + 27 DB + 56 Auth/API), yedi migration; Q-E01 için 17 gerçek API kabul senaryosu. Son kanıt reports/qe02-verification.json; CI sonucu ilgili commit üzerinden ayrıca denetlenir.
-
-Q-E02 merkez iptali her aşamada tam finansal hesaplaşma ve tam hak dönüşü uygular; katılımcı iptalinde parasal sonuç değişmez, mevcut paket koşulları korunur. Fiilî başlangıç/kısmi gerçekleşme tanımı ayrı açık karardır. Güncel entegrasyon: docs/decisions/Q-E02.md ve docs/claude-handover.md. RC2 sayıları tarihsel; RC3 kanıtı qe02 raporundadır.
-
-RC3 temiz kabul: 124/124 test, 20/20 statik kontrol, sekiz migration, Node 24.19.0; reports/qe02-verification.json ve qe02-acceptance.log. PR/CI sonucu yalnız ilgili commit için geçerlidir.
-
-Production dağıtımı yasağı: PR üzerinde etkin Vercel Git bağlantısı gözlendi. vercel.json git.deploymentEnabled.main=false, main merge ile otomatik deployment oluşmasını engeller. Bu ayar production dağıtım izni değildir; frontend tasarımını değiştirmez. Kaynak: https://vercel.com/docs/project-configuration/git-configuration
+Production dağıtımı yapılmadı. `vercel.json` main otomatik dağıtımını kapalı tutar. Kalıcı ortak staging, dış e-posta, yük/restore ve frontend gerçek entegrasyon kabulü ayrı açık işlerdir.
