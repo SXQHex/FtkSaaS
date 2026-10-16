@@ -51,6 +51,13 @@ test('Person registry real Auth/API authorization and contact privacy',async t=>
   await fail('people_list_v1',{page:{cursor:'broken'}},'VALIDATION_FAILED');
  });
  const discipline=(await must(owner,'discipline_save_v1',{org_id:org,name:'Salsa',state:'active'},key())).primary_id;await mutate('center_discipline_set_v1',{discipline_id:discipline,state:'active'});
+ await t.test('discipline catalog requires org.read and filters manager center projection',async()=>{
+  const hidden=(await must(owner,'discipline_save_v1',{org_id:org,name:'Other center discipline',state:'active'},key())).primary_id;await mutate('center_discipline_set_v1',{center_id:other,discipline_id:hidden,state:'active'});
+  const b={org_id:org,page:{}};
+  assert.deepEqual((await must(cm,'disciplines_list_v1',b)).items.map(x=>x.id),[discipline]);
+  assert((await must(owner,'disciplines_list_v1',b)).items.some(x=>x.id===hidden));
+  for(const u of [student,instructor]){const r=await call(u,'disciplines_list_v1',b);assert.equal(r.result.ok,false);assert.equal(r.result.error.code,'FORBIDDEN');}
+ });
  const cls=(await mutate('class_save_v1',{name:'People class',discipline_id:discipline,external_open:true})).primary_id;
  const at=Date.now()+86400000,session=(await mutate('session_create_v1',{class_id:cls,discipline_id:discipline,format:'group',interval:{starts_at:new Date(at).toISOString(),ends_at:new Date(at+3600000).toISOString()},resources:[],assignments:[{person_id:instructorPerson,duty:'instructor'}],capacity:{nominal:10,maximum:10}})).primary_id;
  const policy=key();await db.query("insert into core.policy_versions(id,org_id,scope_center_id,key,effective_at,mandatory,value) values($1,$2,$3,'student_cancel_group',now(),false,$4)",[policy,org,center,{kind:'cancellation',cutoff_minutes:0,before_cutoff:'release',after_cutoff:'release',no_show:'consume'}]);

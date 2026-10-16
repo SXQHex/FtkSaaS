@@ -15,7 +15,7 @@
     "callable_development": 63,
     "contract_only": 121
   },
-  "migrations": 15,
+  "migrations": 16,
   "static": {
     "checks": 21,
     "contract_tests": 12,
@@ -44,5 +44,14 @@
     "121 contract-only operations; see docs/remaining-work.md",
     "Final exact-head clean CI and review pending",
     "Production, frontend acceptance, persistent shared staging, external email and load/restore acceptance"
-  ]
+  ],
+  "prior_iteration_verified": {
+    "commit": "9054bd081d0fc9cabbe31563de6a3088ae307d54",
+    "tests": 168,
+    "clean_ci": [
+      38943296567,
+      38943289777
+    ],
+    "review_followup": "Discipline org.read scope correction awaiting final clean CI and review"
+  }
 }

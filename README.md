@@ -16,7 +16,7 @@ npm run dev:info
 npm test
 ```
 
-`npm run test:clean` yalnız checkout'a ait loopback test DB'sini sıfırlar, 15 migration'ı temiz kurar ve test/seed/sağlık/advisors kontrollerini çalıştırır. Yeni kişi/merkez/disiplin uygulaması [PR #6](https://github.com/SXQHex/FtkSaaS/pull/6) içindedir. Güncel test ve inceleme kanıtı [registry raporunda](reports/registry-verification.json); kalan 121 işlem ve bağımlılık sırası [açık iş envanterindedir](docs/remaining-work.md). Teknik aktarım ve gerçek kabul geçmeden tamamlandı sayılmaz.
+`npm run test:clean` yalnız checkout'a ait loopback test DB'sini sıfırlar, 16 migration'ı temiz kurar ve test/seed/sağlık/advisors kontrollerini çalıştırır. Yeni kişi/merkez/disiplin uygulaması [PR #6](https://github.com/SXQHex/FtkSaaS/pull/6) içindedir. Güncel test ve inceleme kanıtı [registry raporunda](reports/registry-verification.json); kalan 121 işlem ve bağımlılık sırası [açık iş envanterindedir](docs/remaining-work.md). Teknik aktarım ve gerçek kabul geçmeden tamamlandı sayılmaz.
 
 Her yeni head için [GitHub Actions](https://github.com/SXQHex/FtkSaaS/actions) sonucu ayrıca doğrulanır. [Fiilî başlangıç kanıt kapsamı](reports/actual-start-verification.json) ve [Q-E03 kanıt kapsamı](reports/qe03-verification.json) raporların hangi doğrulamayı temsil ettiğini belirtir. Q-E01/Q-E02 ve önceki RC3 raporları tarihsel snapshot'tır; son head'in CI sonucunun yerine geçmez.
 

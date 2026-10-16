@@ -1,6 +1,6 @@
 # FtkSaaS — fiziksel şema · 0.2.0-rc.3
 
-90 domain tablosu; on beş sıralı migration. Kanıt ve kapsam: `docs/claude-handover.md`, `reports/qe02-verification.json`. Aşağıdaki alan listesi makine sözleşmesi 08’den üretilir. Kesin PostgreSQL DDL kaynağı `supabase/migrations`; uygulanan migration değiştirilmez.
+90 domain tablosu; on altı sıralı migration. Kanıt ve kapsam: `docs/claude-handover.md`, `reports/qe02-verification.json`. Aşağıdaki alan listesi makine sözleşmesi 08’den üretilir. Kesin PostgreSQL DDL kaynağı `supabase/migrations`; uygulanan migration değiştirilmez.
 
 UUID/FK alanları `uuid`, parasal stringler DB’de `bigint`, Instant `timestamptz`, tarih `date`, kapalı nesneler `jsonb`. Yeni domain kimlikleri Edge içinde doğrulanmış `uuid@14.0.3` v7 üreticisinden gelir. PostgreSQL 17 DB default üreticisi zorunlu değildir; üretici bulunmadığında default kapalıdır ve v4 fallback yoktur. Auth sağlayıcı UUID’leri korunur.
 
@@ -99,7 +99,7 @@ UUID/FK alanları `uuid`, parasal stringler DB’de `bigint`, Instant `timestamp
 | `event_disciplines` | C | id: FtkUuid; created_at: Instant; version: PositiveInt; org_id: FtkUuid; center_id: FtkUuid; event_id: FtkUuid; discipline_id: FtkUuid | Q-D01: zero/one/many labels; UQ(org,event,discipline); same org, no access grant. Exactly one label allows matching narrow scope with explicit event eligibility; zero/many only broad scopes. No event negative credit. |
 | `event_payment_preparations` | C | id: FtkUuid; created_at: Instant; version: PositiveInt; org_id: FtkUuid; center_id: FtkUuid; person_id: FtkUuid; event_id: FtkUuid; debt_id: FtkUuid; registration_id: FtkUuid ∣ null; state: EventPaymentPreparationState; terms_snapshot: EventTerms; terms_hash: Text | Q-E01: no capacity held; one open preparation per event/person; unique scoped debt and registration; immutable financial snapshot; terminal closure cannot finance another registration. |
 
-Teknik private tablolar: `platform_operators`, `preview_payloads`, `invitation_deliveries`, `runtime_operations`. Bunlar müşteriye yeni ürün varlığı veya rol vermez.
+Teknik private tablolar: `platform_operators`, `preview_payloads`, `invitation_deliveries`, `runtime_operations`, `person_origins`. Bunlar müşteriye yeni ürün varlığı veya rol vermez.
 
 Kayıt koşulları `event_registrations.terms_snapshot` ile sabitlenir. Etkinlik etiketi/zamanı değişiminde mevcut hak bağlantıları aynı transaction içinde tekrar doğrulanır; otomatik iptal yoktur. Hareket defterleri ve audit satırları append-only trigger ile korunur.
 

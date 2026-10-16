@@ -2008,7 +2008,8 @@
       ],
       "billing_class": "read",
       "limits": [
-        "Pagination supports created_at_asc; cursor is bound to request scope."
+        "Pagination supports created_at_asc; cursor is bound to request scope.",
+        "Only org readers or center managers; managers receive disciplines offered by their accessible assigned centers."
       ]
     },
     {

@@ -40649,7 +40649,8 @@
           "plan_capabilities_from_features",
           "same_org_discipline",
           "relationship_never_grants_login",
-          "expected_version_on_update"
+          "expected_version_on_update",
+          "org_read_role_and_center_projection"
         ],
         "audit": false,
         "notification": "outbox_if_user_visible_business_result",
@@ -40669,7 +40670,8 @@
         "runtime_external_path": "/functions/v1/backend-v1/disciplines_list_v1",
         "runtime_rpc": "api_v1.disciplines_list_v1",
         "runtime_limits": [
-          "Pagination supports created_at_asc; cursor is bound to request scope."
+          "Pagination supports created_at_asc; cursor is bound to request scope.",
+          "Only org readers or center managers; managers receive disciplines offered by their accessible assigned centers."
         ]
       },
       {
