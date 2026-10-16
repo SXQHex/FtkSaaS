@@ -30,6 +30,8 @@ test('Person registry real Auth/API authorization and contact privacy',async t=>
  const get=(u,id,c=center)=>must(u,'person_get_v1',{org_id:org,center_id:c,person_id:id});
  await t.test('current manager scope, self scope and organization read scope are distinct',async()=>{
   assert.equal((await get(cm,p)).contacts[0].value,'Student one@ftksaas.invalid');
+  const unassigned=(await mutate('person_create_v1',{display_name:'Unassigned',contacts:[]})).primary_id;
+  await fail('person_get_v1',{person_id:unassigned},'NOT_FOUND',cm);await fail('person_update_v1',{person_id:unassigned,expected_version:1,patch:{display_name:'denied'}},'NOT_FOUND',cm);assert.equal((await get(owner,unassigned,null)).id,unassigned);
   await fail('person_get_v1',{person_id:p2},'NOT_FOUND',cm);await fail('person_update_v1',{person_id:p2,expected_version:1,patch:{display_name:'denied'}},'NOT_FOUND',cm);
   assert.equal((await get(owner,p2,null)).id,p2);assert.equal((await get(student,p)).id,p);
   await fail('person_get_v1',{person_id:p2},'NOT_FOUND',student);await fail('person_update_v1',{person_id:p,expected_version:1,patch:{display_name:'denied'}},'FORBIDDEN',student);

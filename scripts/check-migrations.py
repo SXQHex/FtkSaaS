@@ -26,3 +26,5 @@ assert next(Path('supabase/migrations').glob('*_event_actual_start.sql')).read_t
 assert next(Path('supabase/migrations').glob('*_registry_operations.sql')).read_text()==Path('database/registry-operations.sql').read_text()+Path('database/registry-wrappers.sql').read_text().replace('begin;\n','',1),'Registry source drift'
 
 assert next(Path('supabase/migrations').glob('*_person_registry.sql')).read_text()==Path('database/person-registry.sql').read_text()+Path('database/person-registry-wrappers.sql').read_text().replace('begin;\n','',1),'Person registry source drift'
+
+assert next(Path('supabase/migrations').glob('*_person_scope_guard.sql')).read_text()==Path('database/person-scope-guard.sql').read_text(),'Person scope source drift'

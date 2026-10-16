@@ -403,7 +403,8 @@
       "billing_class": "read",
       "limits": [
         "Operational readers/writers supply center_id; assignment readers receive no contacts or other-center relations.",
-        "Pagination supports created_at_asc; cursor is bound to filters and scope."
+        "Pagination supports created_at_asc; cursor is bound to filters and scope.",
+        "Operational person access requires an existing relation in the selected center; unassigned people remain visible to org readers and self only."
       ]
     },
     {
@@ -417,7 +418,8 @@
       ],
       "billing_class": "read",
       "limits": [
-        "Operational readers/writers supply center_id; assignment readers receive no contacts or other-center relations."
+        "Operational readers/writers supply center_id; assignment readers receive no contacts or other-center relations.",
+        "Operational person access requires an existing relation in the selected center; unassigned people remain visible to org readers and self only."
       ]
     },
     {
@@ -441,7 +443,8 @@
       ],
       "billing_class": "maintenance",
       "limits": [
-        "Operational readers/writers supply center_id; assignment readers receive no contacts or other-center relations."
+        "Operational readers/writers supply center_id; assignment readers receive no contacts or other-center relations.",
+        "Operational person access requires an existing relation in the selected center; unassigned people remain visible to org readers and self only."
       ]
     },
     {
