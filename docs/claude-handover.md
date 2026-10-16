@@ -146,3 +146,7 @@ Katılımcı iptalinde planlanan başlangıç anı dahil sonrası parasal iade, 
 Planlanan saatin gelmesi state=occurred, yoklama, hak tüketimi veya hakediş yazmaz. Ayrı fiilî başlangıç kayıt/düzeltme API'si mevcut değildir ve bu teslimle eklenmez; geç `event_complete_v1` doğrulamasının önceki parasal sınıflandırmayı değiştirmediği sınanır. Q-E02'de açık bırakılan parasal başlangıç sınırı bu kararla kapalıdır; operasyonel fiilî başlangıç/kısmi gerçekleşme kaydı ayrı kapsamdır.
 
 Dokuzuncu migration karar kanıtını ekler; onuncu migration incelemede bulunan transaction-start / post-lock saat farkını düzeltir. Paket cutoff formülü değişmez; aynı post-lock cancel_at ile değerlendirilir. Önceki migrationlar değişmez. Envanter 53 çağrılabilir / 129 yalnız sözleşme; frontend, üretim, dış e-posta, kalıcı staging ve yük/restore kabulü bu aktarımla tamamlanmaz. Q-E03 kanıtı: `reports/qe03-verification.json`; önceki RC3 raporları tarihsel kalır.
+
+## Fiilî başlangıç açık işi
+
+`event_actual_start_record_v1` ve `event_actual_start_correct_v1` eklendi. Ortak tipleri yeniden üretin; request alanları, sürüm/tekrar/yetki kuralları ve read projection `docs/actual-start-handover.md` içindedir. `actual_started_at` yalnız operasyonel kanıt; Q-E03 parasal başlangıç sınırını ve Q-E02 iptal hesaplaşmasını değiştirmez. Gerekçeli eski/yeni değerler mevcut append-only audit defterinde kalır. Yeni tablo veya kullanıcı rolü eklenmedi. Güncel envanter: 55 çağrılabilir / 129 yalnız sözleşme. Fiilî başlangıç API'sinin teknik kapanışı için son commit'in temiz CI sonucu esas alınır.

@@ -20,3 +20,5 @@ assert next(Path('supabase/migrations').glob('*_event_operator_cancellation.sql'
 
 assert next(Path('supabase/migrations').glob('*_planned_start_cancellation.sql')).read_text()==Path('database/planned-start-cancellation.sql').read_text(),'Q-E03 migration source drift'
 assert next(Path('supabase/migrations').glob('*_planned_start_decision_clock.sql')).read_text()==Path('database/planned-start-decision-clock.sql').read_text(),'Q-E03 decision clock migration source drift'
+
+assert next(Path('supabase/migrations').glob('*_event_actual_start.sql')).read_text()==Path('database/event-actual-start.sql').read_text(),'Actual-start source drift'

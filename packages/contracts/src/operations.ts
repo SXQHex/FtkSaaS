@@ -183,4 +183,6 @@ export interface Operations {
   event_registration_preview_v1: {request: T.RequestEventRegistrationPreview; response: T.SuccessEventRegistrationPreview};
   event_payment_prepare_v1: {request: T.RequestEventPaymentPrepare; response: T.SuccessEventPaymentPrepare};
   event_payment_get_v1: {request: T.RequestEventPaymentGet; response: T.SuccessEventPaymentGet};
+  event_actual_start_record_v1: {request: T.RequestEventActualStartRecord; response: T.SuccessEventActualStartRecord};
+  event_actual_start_correct_v1: {request: T.RequestEventActualStartCorrect; response: T.SuccessEventActualStartCorrect};
 }

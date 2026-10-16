@@ -52,6 +52,8 @@ export const runtimeOperationNames = [
   "event_payment_get_v1",
   "student_credit_refund_v1",
   "student_credit_offset_v1",
-  "debt_adjust_v1"
+  "debt_adjust_v1",
+  "event_actual_start_record_v1",
+  "event_actual_start_correct_v1"
 ] as const;
 export type RuntimeOperationName = typeof runtimeOperationNames[number];

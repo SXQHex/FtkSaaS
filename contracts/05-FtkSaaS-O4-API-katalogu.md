@@ -1,6 +1,6 @@
 # FtkSaaS — API kataloğu · 0.2.0-rc.3
 
-182 sözleşme; 53 geliştirme ortamında çağrılabilir endpoint, 129 yalnız sözleşme. Çağrılabilir olmak bütün ürün özelliklerinin veya üretim kabulünün tamamlandığı anlamına gelmez. Kapsam sınırları ve Q-E01 `docs/claude-handover.md` içindedir.
+184 sözleşme; 55 geliştirme ortamında çağrılabilir endpoint, 129 yalnız sözleşme. Çağrılabilir olmak bütün ürün özelliklerinin veya üretim kabulünün tamamlandığı anlamına gelmez. Kapsam sınırları ve Q-E01 `docs/claude-handover.md` içindedir.
 
 `POST {API_URL}/functions/v1/backend-v1/{operation}`; JSON gövde doğrudan typed Request nesnesidir. Header: `Authorization: Bearer <Supabase access_token>`, `apikey: <publishable key>`, `Content-Type: application/json`. Başarı: `ok/data/trace_id`; hata: `ok:false/error:SafeError`. Servis anahtarı frontend’e verilmez.
 
@@ -190,6 +190,8 @@ Named `/rest/v1/rpc/{operation}` yalnız backend içindir; imzası p_request + d
 | `event_registration_preview_v1` | çağrılabilir (kapsam notları geçerli) | `event.register` | P / student | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; center_id?: FtkUuid ∣ null; event_id: FtkUuid; person_id: FtkUuid; sale_id?: FtkUuid ∣ null; preparation_id?: FtkUuid ∣ null | Success_event_registration_preview |
 | `event_payment_prepare_v1` | çağrılabilir (kapsam notları geçerli) | `event.register` | W / new | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; center_id?: FtkUuid ∣ null; operation_key: FtkUuid; event_id: FtkUuid; person_id: FtkUuid | Success_event_payment_prepare |
 | `event_payment_get_v1` | çağrılabilir (kapsam notları geçerli) | `person.read` | R / read | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; center_id?: FtkUuid ∣ null; preparation_id: FtkUuid | Success_event_payment_get |
+| `event_actual_start_record_v1` | çağrılabilir (kapsam notları geçerli) | `event.manage` | W / maintenance | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; center_id?: FtkUuid ∣ null; operation_key: FtkUuid; event_id: FtkUuid; expected_version: PositiveInt; actual_started_at: Instant; reason: Text | Success_event_actual_start_record |
+| `event_actual_start_correct_v1` | çağrılabilir (kapsam notları geçerli) | `event.manage` | W / maintenance | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; center_id?: FtkUuid ∣ null; operation_key: FtkUuid; event_id: FtkUuid; expected_version: PositiveInt; actual_started_at: Instant ∣ null; reason: Text | Success_event_actual_start_correct |
 
 Önizleme süre sınırı 15 dakika. Apply canlı aktör/yetki/abonelik ve ilgili satır sürümlerini yeniden denetler. İdempotency kapsamı org + hesap + operasyon; merkez payload içindedir. Aynı anahtar/aynı içerik sonucu tekrarlar, farklı içerik reddedilir. Doğrulanmamış transport sonucunda yeni anahtar üretilmez.
 
