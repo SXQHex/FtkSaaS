@@ -2,9 +2,9 @@
   "contract": "2.2-runtime.2",
   "tables": 90,
   "operations": 182,
-  "definitions": 710,
+  "definitions": 711,
   "uuid_paths": 1545,
-  "references": 3495,
+  "references": 3499,
   "checks": [
     {
       "name": "JSON Schema 2020-12 meta-schema",
@@ -84,6 +84,10 @@
     },
     {
       "name": "Q-E01 accepted decision / preparation finance / typed terminal outcome",
+      "status": "passed"
+    },
+    {
+      "name": "Q-E03 planned boundary evidence / no client time override",
       "status": "passed"
     }
   ],
