@@ -1,10 +1,10 @@
 {
   "contract": "2.2-runtime.2",
   "tables": 90,
-  "operations": 182,
-  "definitions": 711,
-  "uuid_paths": 1545,
-  "references": 3499,
+  "operations": 184,
+  "definitions": 716,
+  "uuid_paths": 1559,
+  "references": 3531,
   "checks": [
     {
       "name": "JSON Schema 2020-12 meta-schema",

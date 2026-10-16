@@ -19,7 +19,7 @@ test('Q-E02 real Auth/API center and participant cancellation acceptance',async 
  let slot=0;
  const terms={fee_minor:'1000',currency:'TRY',full_payment_required:true,allowed_product_version_ids:[],cancellation:{before_cutoff:'release',after_cutoff:'consume',no_show:'consume'},refund:{method:'none'}};
  async function person(){const p=(await mutate('person_create_v1',{display_name:'Q-E01 student '+key(),contacts:[]})).primary_id;await mutate('student_activate_v1',{person_id:p});return p;}
- async function event(extra={}){const at=Date.now()+86400000+(slot++)*7200000;const input={name:'Q-E01 event '+key(),interval:{starts_at:new Date(at).toISOString(),ends_at:new Date(at+3600000).toISOString()},timezone:'Europe/Istanbul',venue:{kind:'external',name:'Test',address:'Synthetic',timezone:'Europe/Istanbul'},capacity:{nominal:10,maximum:10},terms,discipline_ids:[],assignments:[{person_id:ownerPerson,duty:'instructor',fee_minor:'0',currency:'TRY'}],...extra};const id=(await mutate('event_save_v1',input)).primary_id;await mutate('event_publish_v1',{event_id:id,published:true});return id;}
+ async function event(extra={},publish=true){const at=Date.now()+86400000+(slot++)*7200000;const input={name:'Q-E01 event '+key(),interval:{starts_at:new Date(at).toISOString(),ends_at:new Date(at+3600000).toISOString()},timezone:'Europe/Istanbul',venue:{kind:'external',name:'Test',address:'Synthetic',timezone:'Europe/Istanbul'},capacity:{nominal:10,maximum:10},terms,discipline_ids:[],assignments:[{person_id:ownerPerson,duty:'instructor',fee_minor:'0',currency:'TRY'}],...extra};const id=(await mutate('event_save_v1',input)).primary_id;if(publish)await mutate('event_publish_v1',{event_id:id,published:true});return id;}
  const prepare=(e,p,k=key())=>mutate('event_payment_prepare_v1',{event_id:e,person_id:p},k);
  const get=p=>must(owner,'event_payment_get_v1',scoped({preparation_id:p}));
  const collect=(p,debt,amount,k=key())=>mutate('collection_record_v1',{person_id:p,debt_ids:[debt],amount_minor:String(amount),currency:'TRY',occurred_at:new Date().toISOString()},k);
@@ -241,6 +241,95 @@ test('Q-E02 real Auth/API center and participant cancellation acceptance',async 
    await fail('event_registration_cancel_v1',{registration_id:x.r,expected_version:1,reason:'forged time',...extra},'VALIDATION_FAILED');
   }
   assert.equal(await basis(x.r),null);assert.equal((await regView(x.r)).state,'active');
+ });
+ // Actual-start evidence has its own versioned writes; it never reprices participation.
+ const actualRecord=(e,at,k=key(),version=null)=>mutate('event_actual_start_record_v1',{event_id:e,expected_version:version??1,actual_started_at:at,reason:'observed actual start'},k);
+ const actualCorrect=(e,version,at,k=key())=>mutate('event_actual_start_correct_v1',{event_id:e,expected_version:version,actual_started_at:at,reason:'correct observed time'},k);
+ const actualHistory=e=>count("select count(*)::int n from core.audit_events where org_id=$1 and subject_id=$2 and action in ('event_actual_start_record_v1','event_actual_start_correct_v1')",[org,e]);
+ await t.test('actual-start record/correct/clear appends typed audit history, versions and replay without changing event state',async()=>{
+  const x=await manual(400,{prior:true}),v=await view(x.e),before=await monetaryJournal(x.p),at=new Date(Date.now()-60000).toISOString(),k=key();
+  const r=await actualRecord(x.e,at,k,v.version);assert.equal(r.version,v.version+1);
+  const after=await view(x.e);assert.equal(new Date(after.actual_started_at).toISOString(),at);assert.equal(after.state,'published');assert.equal(after.attendance_state,'open');
+  assert.equal(after.actual_start_history.length,1);assert.equal(after.actual_start_history[0].diff.changes[0].field,'actual_started_at');assert.equal(after.actual_start_history[0].diff.changes[0].old_value,null);
+  assert.equal((await actualRecord(x.e,at,k,v.version)).replayed,true);assert.equal(await actualHistory(x.e),1);
+  await fail('event_actual_start_record_v1',{event_id:x.e,expected_version:after.version,actual_started_at:at,reason:'second initial'},'INVALID_STATE_TRANSITION');
+  await actualCorrect(x.e,after.version,new Date(Date.now()-30000).toISOString());
+  await actualCorrect(x.e,(await view(x.e)).version,null);const cleared=await view(x.e);assert.equal(cleared.actual_started_at,null);assert.equal(cleared.actual_start_history.length,3);
+  await actualCorrect(x.e,cleared.version,at);assert.equal(await actualHistory(x.e),4);assert.deepEqual(await monetaryJournal(x.p),before);
+  const audit=cleared.actual_start_history[0];await assert.rejects(db.query('update core.audit_events set reason=$1 where id=$2',['rewrite',audit.id]),e=>e.code==='P0001');
+ });
+ await t.test('actual-start rejects future time, empty reason, correction without record, stale version and draft without writes',async()=>{
+  const x=await manual(0,{prior:true}),v=await view(x.e),at=new Date(Date.now()-60000).toISOString();
+  await fail('event_actual_start_record_v1',{event_id:x.e,expected_version:v.version,actual_started_at:new Date(Date.now()+3600000).toISOString(),reason:'future'},'VALIDATION_FAILED');
+  await fail('event_actual_start_record_v1',{event_id:x.e,expected_version:v.version,actual_started_at:at,reason:'   '},'VALIDATION_FAILED');
+  await fail('event_actual_start_correct_v1',{event_id:x.e,expected_version:v.version,actual_started_at:at,reason:'no first record'},'INVALID_STATE_TRANSITION');
+  await fail('event_actual_start_record_v1',{event_id:x.e,expected_version:v.version+1,actual_started_at:at,reason:'stale'},'VERSION_CONFLICT');
+  assert.equal(await actualHistory(x.e),0);
+  const draft=await event({},false);
+  await fail('event_actual_start_record_v1',{event_id:draft,expected_version:(await view(draft)).version,actual_started_at:at,reason:'draft'},'INVALID_STATE_TRANSITION');
+ });
+ await t.test('actual start recorded after participant cancellation and later corrected never changes Q-E03 phase or finance',async()=>{
+  const x=await manual(1000,{prior:true});await mutate('event_registration_cancel_v1',{registration_id:x.r,expected_version:1,reason:'left after planned start'});
+  const evidence=await basis(x.r),before=await monetaryJournal(x.p);const actual=new Date().toISOString();
+  assert(new Date(actual)>new Date(evidence.cancelled_at));await actualRecord(x.e,actual,key(),(await view(x.e)).version);
+  await actualCorrect(x.e,(await view(x.e)).version,new Date(Date.now()-3600000).toISOString());
+  assert.deepEqual(await basis(x.r),evidence);assert.equal(evidence.phase,'at_or_after_planned_start');assert.deepEqual(await monetaryJournal(x.p),before);
+  assert.equal((await view(x.e)).state,'published');
+ });
+ await t.test('actual start backfill/correction after center cancellation preserves full Q-E02 settlement and returned rights',async()=>{
+  const x=await packageRegistration('consumed',{manualPaid:400});await apply(await preview(x.e));
+  const before=await monetaryJournal(x.manual.p),right=await balance(x.p),v=await view(x.e),at=new Date(Date.now()-86400000).toISOString();
+  await actualRecord(x.e,at,key(),v.version);await actualCorrect(x.e,(await view(x.e)).version,null);
+  assert.equal((await view(x.e)).state,'cancelled');assert.deepEqual(await monetaryJournal(x.manual.p),before);assert.deepEqual(await balance(x.p),right);assert.equal(await claim(x.manual.p),'400');
+ });
+ await t.test('actual-start late failure rolls back timestamp, version, audit, receipt and notification; same-key retry commits once',async()=>{
+  const x=await manual(400,{prior:true}),v=await view(x.e),at=new Date(Date.now()-60000).toISOString(),k=key();
+  const n=()=>count('select count(*)::int n from core.notifications where org_id=$1',[org]);const beforeN=await n();
+  await rejectAudit('event_actual_start_record_v1',x.e);
+  await fail('event_actual_start_record_v1',{event_id:x.e,expected_version:v.version,actual_started_at:at,reason:'observed actual start'},'INTEGRITY_VIOLATION',k);
+  assert.equal((await view(x.e)).actual_started_at,null);assert.equal((await view(x.e)).version,v.version);assert.equal(await actualHistory(x.e),0);assert.equal(await receiptCount(k),0);assert.equal(await n(),beforeN);
+  await removeTrigger();await actualRecord(x.e,at,k,v.version);await actualRecord(x.e,at,k,v.version);assert.equal(await actualHistory(x.e),1);
+ });
+ await t.test('actual-start correction rollback retains previous time and history; occurrence and early cancellation remain independent',async()=>{
+  const x=await manual(400,{occurred:true}),v=await view(x.e),at=new Date(Date.now()-60000).toISOString();
+  await actualRecord(x.e,at,key(),v.version);const before=await view(x.e),journal=await monetaryJournal(x.p),k=key();
+  await rejectAudit('event_actual_start_correct_v1',x.e);
+  await fail('event_actual_start_correct_v1',{event_id:x.e,expected_version:before.version,actual_started_at:null,reason:'correct observed time'},'INTEGRITY_VIOLATION',k);
+  assert.deepEqual(await view(x.e),before);assert.equal(await actualHistory(x.e),1);assert.equal(await receiptCount(k),0);assert.deepEqual(await monetaryJournal(x.p),journal);
+  await removeTrigger();await actualCorrect(x.e,before.version,null,k);assert.equal((await view(x.e)).state,'occurred');assert.equal(await actualHistory(x.e),2);
+  await fail('event_actual_start_correct_v1',{event_id:x.e,expected_version:(await view(x.e)).version,actual_started_at:new Date(Date.now()+3600000).toISOString(),reason:'future correction'},'VALIDATION_FAILED');
+  const early=await manual(400);await mutate('event_registration_cancel_v1',{registration_id:early.r,expected_version:1,reason:'before scheduled time'});
+  const evidence=await basis(early.r);assert.equal(evidence.phase,'before_planned_start');
+  await actualRecord(early.e,new Date().toISOString(),key(),(await view(early.e)).version);
+  assert.deepEqual(await basis(early.r),evidence);assert.equal((await view(early.e)).state,'published');
+ });
+ await t.test('actual-start concurrent first writes cannot overwrite; same key replays and changed payload rejects',async()=>{
+  const x=await manual(0,{prior:true}),v=await view(x.e),at=new Date(Date.now()-60000).toISOString();
+  const body={event_id:x.e,expected_version:v.version,actual_started_at:at,reason:'parallel'};
+  const rs=await Promise.all([call(owner,'event_actual_start_record_v1',scoped(body),key()),call(owner,'event_actual_start_record_v1',scoped(body),key())]);
+  assert.equal(rs.filter(r=>r.result.ok).length,1);assert.equal(rs.find(r=>!r.result.ok).result.error.code,'VERSION_CONFLICT');assert.equal(await actualHistory(x.e),1);
+  const y=await manual(0,{prior:true}),yv=await view(y.e),k=key(),b={event_id:y.e,expected_version:yv.version,actual_started_at:at,reason:'same key'};
+  const same=await Promise.all([mutate('event_actual_start_record_v1',b,k),mutate('event_actual_start_record_v1',b,k)]);assert.equal(same.filter(r=>r.replayed).length,1);
+  await fail('event_actual_start_record_v1',{...b,reason:'different'},'IDEMPOTENCY_PAYLOAD_MISMATCH',k);assert.equal(await actualHistory(y.e),1);
+ });
+ await t.test('actual-start live CM revocation, tenant/center isolation and restricted history are enforced',async()=>{
+  const x=await manual(0,{prior:true}),v=await view(x.e),at=new Date(Date.now()-60000).toISOString();
+  await fail('event_actual_start_record_v1',{event_id:x.e,expected_version:v.version,actual_started_at:at,reason:'outsider'},'NOT_FOUND',key(),outsider);
+  const otherCenter=(await mutate('center_create_v1',{name:'Other actual-start center',timezone:'Europe/Istanbul'})).primary_id;
+  await mutate('center_manager_assign_v1',{center_id:otherCenter,person_id:ownerPerson});
+  await fail('event_actual_start_record_v1',{center_id:otherCenter,event_id:x.e,expected_version:v.version,actual_started_at:at,reason:'wrong center'},'NOT_FOUND');
+  await mutate('center_manager_revoke_v1',{person_id:ownerPerson,expected_version:1,reason:'revoke actual-start authority'});
+  await fail('event_actual_start_record_v1',{event_id:x.e,expected_version:v.version,actual_started_at:at,reason:'revoked'},'FORBIDDEN');await mutate('center_manager_assign_v1',{person_id:ownerPerson});
+  await actualRecord(x.e,at,key(),v.version);
+  const student=await authUser('actual-start-student'),account=await must(student,'account_get_v1');
+  await db.query("insert into core.account_links(id,org_id,account_id,person_id,state,verified_at) values($1,$2,$3,$4,'active',now())",[key(),org,account.id,x.p]);
+  const sv=await must(student,'event_get_v1',scoped({event_id:x.e}));assert.equal('actual_start_history' in sv,false);assert.equal(new Date(sv.actual_started_at).toISOString(),at);
+  await fail('event_actual_start_correct_v1',{event_id:x.e,expected_version:(await view(x.e)).version,actual_started_at:null,reason:'student correction'},'FORBIDDEN',key(),student);
+ });
+ await t.test('actual-start recording invalidates old center-cancel preview but fresh preview still settles unchanged',async()=>{
+  const x=await manual(400,{prior:true}),pv=await preview(x.e),v=await view(x.e);
+  await actualRecord(x.e,new Date(Date.now()-60000).toISOString(),key(),v.version);
+  await fail('event_cancel_apply_v1',{preview:{id:pv.id,token:pv.token}},'PREVIEW_STALE');await apply(await preview(x.e));assert.equal(await claim(x.p),'400');
  });
  await t.test('previous credit, explicit refund and offset are not recreated on occurred center cancellation',async()=>{
   const x=await manual(1000,{occurred:true});

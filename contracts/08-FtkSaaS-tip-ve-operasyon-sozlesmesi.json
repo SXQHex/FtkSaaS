@@ -4337,6 +4337,22 @@
           "items": {
             "$ref": "#/$defs/EventDutyView"
           }
+        },
+        "actual_started_at": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Instant"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "actual_start_history": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/ActualStartHistoryItem"
+          }
         }
       },
       "required": [
@@ -20697,6 +20713,16 @@
         },
         "attendance_revision": {
           "$ref": "#/$defs/Int"
+        },
+        "actual_started_at": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Instant"
+            },
+            {
+              "type": "null"
+            }
+          ]
         }
       },
       "required": [
@@ -23404,6 +23430,202 @@
       ],
       "additionalProperties": false,
       "description": "Immutable backend decision evidence. Planned start is captured at cancellation; actual occurrence recording never reclassifies it."
+    },
+    "ActualStartHistoryItem": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/FtkUuid"
+        },
+        "created_at": {
+          "$ref": "#/$defs/Instant"
+        },
+        "actor_person_id": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/FtkUuid"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "reason": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Text"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "diff": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/AuditDiff"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "id",
+        "created_at",
+        "actor_person_id",
+        "reason",
+        "diff"
+      ],
+      "additionalProperties": false
+    },
+    "Request_event_actual_start_record": {
+      "type": "object",
+      "properties": {
+        "client_api_version": {
+          "const": 1
+        },
+        "request_id": {
+          "$ref": "#/$defs/FtkUuid"
+        },
+        "org_id": {
+          "$ref": "#/$defs/FtkUuid"
+        },
+        "center_id": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/FtkUuid"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "operation_key": {
+          "$ref": "#/$defs/FtkUuid"
+        },
+        "event_id": {
+          "$ref": "#/$defs/FtkUuid"
+        },
+        "expected_version": {
+          "$ref": "#/$defs/PositiveInt"
+        },
+        "actual_started_at": {
+          "$ref": "#/$defs/Instant"
+        },
+        "reason": {
+          "$ref": "#/$defs/Text"
+        }
+      },
+      "required": [
+        "client_api_version",
+        "request_id",
+        "org_id",
+        "operation_key",
+        "event_id",
+        "expected_version",
+        "actual_started_at",
+        "reason"
+      ],
+      "additionalProperties": false
+    },
+    "Success_event_actual_start_record": {
+      "type": "object",
+      "properties": {
+        "ok": {
+          "const": true
+        },
+        "data": {
+          "$ref": "#/$defs/Mutation"
+        },
+        "trace_id": {
+          "$ref": "#/$defs/FtkUuid"
+        }
+      },
+      "required": [
+        "ok",
+        "data",
+        "trace_id"
+      ],
+      "additionalProperties": false
+    },
+    "Request_event_actual_start_correct": {
+      "type": "object",
+      "properties": {
+        "client_api_version": {
+          "const": 1
+        },
+        "request_id": {
+          "$ref": "#/$defs/FtkUuid"
+        },
+        "org_id": {
+          "$ref": "#/$defs/FtkUuid"
+        },
+        "center_id": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/FtkUuid"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "operation_key": {
+          "$ref": "#/$defs/FtkUuid"
+        },
+        "event_id": {
+          "$ref": "#/$defs/FtkUuid"
+        },
+        "expected_version": {
+          "$ref": "#/$defs/PositiveInt"
+        },
+        "actual_started_at": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Instant"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "reason": {
+          "$ref": "#/$defs/Text"
+        }
+      },
+      "required": [
+        "client_api_version",
+        "request_id",
+        "org_id",
+        "operation_key",
+        "event_id",
+        "expected_version",
+        "actual_started_at",
+        "reason"
+      ],
+      "additionalProperties": false
+    },
+    "Success_event_actual_start_correct": {
+      "type": "object",
+      "properties": {
+        "ok": {
+          "const": true
+        },
+        "data": {
+          "$ref": "#/$defs/Mutation"
+        },
+        "trace_id": {
+          "$ref": "#/$defs/FtkUuid"
+        }
+      },
+      "required": [
+        "ok",
+        "data",
+        "trace_id"
+      ],
+      "additionalProperties": false
     }
   },
   "x-contract": {
@@ -40951,6 +41173,192 @@
         "runtime_transport": "authenticated Edge adapter -> service-only RPC; rules/transaction in PostgreSQL",
         "runtime_external_path": "/functions/v1/backend-v1/event_payment_get_v1",
         "runtime_limits": []
+      },
+      {
+        "name": "event_actual_start_record_v1",
+        "module": "M13",
+        "features": [
+          "F29"
+        ],
+        "permission": "event.manage",
+        "actor_source": "server_verified",
+        "transport": "W",
+        "billing_class": "maintenance",
+        "request": {
+          "$ref": "#/$defs/Request_event_actual_start_record"
+        },
+        "success": {
+          "$ref": "#/$defs/Success_event_actual_start_record"
+        },
+        "errors": [
+          "ATTENDANCE_CLOSED",
+          "ATTENDANCE_INCOMPLETE",
+          "AUTH_REQUIRED",
+          "BILLING_OPERATION_RESTRICTED",
+          "CLIENT_UPDATE_REQUIRED",
+          "FORBIDDEN",
+          "IDEMPOTENCY_PAYLOAD_MISMATCH",
+          "INTEGRITY_VIOLATION",
+          "NOT_FOUND",
+          "OPERATION_IN_PROGRESS",
+          "OPERATION_RESULT_EXPIRED",
+          "PARTICIPATION_BLOCKED",
+          "PLAN_FEATURE_UNAVAILABLE",
+          "PLAN_LIMIT_REACHED",
+          "POLICY_NOT_CONFIGURED",
+          "SERVICE_UNAVAILABLE",
+          "SESSION_REVOKED",
+          "SUBSCRIPTION_NOT_STARTED",
+          "TEMPORARY_FAILURE",
+          "VALIDATION_FAILED",
+          "VERSION_CONFLICT",
+          "INVALID_STATE_TRANSITION",
+          "PREVIEW_STALE",
+          "CAPACITY_FULL",
+          "ENTITLEMENT_UNAVAILABLE",
+          "CLASS_ACCESS_DENIED",
+          "RESERVATION_EXISTS",
+          "ASSISTANT_PARTICIPANT_CONFLICT",
+          "ACCOUNT_ALREADY_LINKED",
+          "INVITATION_UNAVAILABLE",
+          "CREDIT_LIMIT_EXCEEDED"
+        ],
+        "transaction_class": "event",
+        "transaction_guarantee": "Seans/yoklama + tüm katılım sonuçları + hak tüketme/serbest bırakma + hakediş/bağlı düzeltme + audit/outbox/receipt atomik.",
+        "transition": {
+          "entity": "events",
+          "from": [
+            "published",
+            "occurred",
+            "cancelled"
+          ],
+          "to": [
+            "published",
+            "occurred",
+            "cancelled"
+          ],
+          "condition": "evidence only; state unchanged"
+        },
+        "semantic_guards": [
+          "live_actor_and_scope",
+          "same_key_same_payload_replay",
+          "receipt_audit_outbox_atomic_domain_commit",
+          "expected_event_version",
+          "actual_start_not_future",
+          "actual_start_evidence_only_no_reprice_no_right_no_earning",
+          "append_only_audit_diff"
+        ],
+        "audit": true,
+        "notification": "outbox_if_user_visible_business_result",
+        "concurrency": "global_lock_order_and_current_scope; version on updates; preview dependencies on apply",
+        "expected_version_subject": "event_id",
+        "acceptance_scenario_ids": [
+          "ACTUAL-START-A01",
+          "ACTUAL-START-A02",
+          "ACTUAL-START-A03"
+        ],
+        "configuration_policy": "numeric plan limits/prices and legal approval are deployment configuration, never arbitrary allow/deny",
+        "implementation_status": "operational_development_limited",
+        "runtime_path": "/functions/v1/backend-v1/event_actual_start_record_v1",
+        "runtime_rpc": "api_v1.event_actual_start_record_v1",
+        "runtime_transport": "authenticated Edge adapter -> service-only RPC; rules/transaction in PostgreSQL",
+        "runtime_external_path": "/functions/v1/backend-v1/event_actual_start_record_v1",
+        "runtime_limits": [
+          "No automatic occurrence/attendance/rights/earnings or monetary reclassification."
+        ]
+      },
+      {
+        "name": "event_actual_start_correct_v1",
+        "module": "M13",
+        "features": [
+          "F29"
+        ],
+        "permission": "event.manage",
+        "actor_source": "server_verified",
+        "transport": "W",
+        "billing_class": "maintenance",
+        "request": {
+          "$ref": "#/$defs/Request_event_actual_start_correct"
+        },
+        "success": {
+          "$ref": "#/$defs/Success_event_actual_start_correct"
+        },
+        "errors": [
+          "ATTENDANCE_CLOSED",
+          "ATTENDANCE_INCOMPLETE",
+          "AUTH_REQUIRED",
+          "BILLING_OPERATION_RESTRICTED",
+          "CLIENT_UPDATE_REQUIRED",
+          "FORBIDDEN",
+          "IDEMPOTENCY_PAYLOAD_MISMATCH",
+          "INTEGRITY_VIOLATION",
+          "NOT_FOUND",
+          "OPERATION_IN_PROGRESS",
+          "OPERATION_RESULT_EXPIRED",
+          "PARTICIPATION_BLOCKED",
+          "PLAN_FEATURE_UNAVAILABLE",
+          "PLAN_LIMIT_REACHED",
+          "POLICY_NOT_CONFIGURED",
+          "SERVICE_UNAVAILABLE",
+          "SESSION_REVOKED",
+          "SUBSCRIPTION_NOT_STARTED",
+          "TEMPORARY_FAILURE",
+          "VALIDATION_FAILED",
+          "VERSION_CONFLICT",
+          "INVALID_STATE_TRANSITION",
+          "PREVIEW_STALE",
+          "CAPACITY_FULL",
+          "ENTITLEMENT_UNAVAILABLE",
+          "CLASS_ACCESS_DENIED",
+          "RESERVATION_EXISTS",
+          "ASSISTANT_PARTICIPANT_CONFLICT",
+          "ACCOUNT_ALREADY_LINKED",
+          "INVITATION_UNAVAILABLE",
+          "CREDIT_LIMIT_EXCEEDED"
+        ],
+        "transaction_class": "event",
+        "transaction_guarantee": "Seans/yoklama + tüm katılım sonuçları + hak tüketme/serbest bırakma + hakediş/bağlı düzeltme + audit/outbox/receipt atomik.",
+        "transition": {
+          "entity": "events",
+          "from": [
+            "published",
+            "occurred",
+            "cancelled"
+          ],
+          "to": [
+            "published",
+            "occurred",
+            "cancelled"
+          ],
+          "condition": "evidence only; state unchanged"
+        },
+        "semantic_guards": [
+          "live_actor_and_scope",
+          "same_key_same_payload_replay",
+          "receipt_audit_outbox_atomic_domain_commit",
+          "expected_event_version",
+          "actual_start_not_future",
+          "actual_start_evidence_only_no_reprice_no_right_no_earning",
+          "append_only_audit_diff"
+        ],
+        "audit": true,
+        "notification": "outbox_if_user_visible_business_result",
+        "concurrency": "global_lock_order_and_current_scope; version on updates; preview dependencies on apply",
+        "expected_version_subject": "event_id",
+        "acceptance_scenario_ids": [
+          "ACTUAL-START-A01",
+          "ACTUAL-START-A02",
+          "ACTUAL-START-A03"
+        ],
+        "configuration_policy": "numeric plan limits/prices and legal approval are deployment configuration, never arbitrary allow/deny",
+        "implementation_status": "operational_development_limited",
+        "runtime_path": "/functions/v1/backend-v1/event_actual_start_correct_v1",
+        "runtime_rpc": "api_v1.event_actual_start_correct_v1",
+        "runtime_transport": "authenticated Edge adapter -> service-only RPC; rules/transaction in PostgreSQL",
+        "runtime_external_path": "/functions/v1/backend-v1/event_actual_start_correct_v1",
+        "runtime_limits": [
+          "No automatic occurrence/attendance/rights/earnings or monetary reclassification."
+        ]
       }
     ],
     "policy_value_map": {
@@ -41153,6 +41561,26 @@
           {
             "id": "E03-05",
             "rule": "Başarılı katılımcı iptalinde backend karar zamanı, o andaki planlanan başlangıç ve parasal sınıflandırma participant_cancellation kaydında atomik sabitlenir. Önceki kayıtlara zaman kanıtı uydurulmaz; eski ve merkez iptallerinde alan null kalabilir. İstemci zaman veya sınıflandırma gönderemez."
+          }
+        ]
+      },
+      {
+        "id": "ACTUAL-START",
+        "accepted_date": "2026-10-16",
+        "status": "implementation_exact_head_ci_required",
+        "source": "User: açık işi bitir; actual-start record/correction follow-up",
+        "rules": [
+          {
+            "id": "AS-01",
+            "rule": "Merkez yöneticisi fiilî başlangıcı expected_version ile kaydeder/düzeltir; aktör ve kayıt zamanı backend, gerçek zaman Instant olarak açık girilir. Gelecek fiilî başlangıç reddedilir. İlk kayıt bir kez; düzeltme gerekçeli audit diff ile geçmişi korur, yanlış bilginin kaldırılması null düzeltmesiyle mümkündür."
+          },
+          {
+            "id": "AS-02",
+            "rule": "Bu kayıt yalnız operasyonel kanıttır; draft kabul edilmez, published/occurred/cancelled durumları değişmeden korunur. Katılımcı iptalinin Q-E03 parasal sınıflandırması, Q-E02 merkez hesaplaşması, yoklama, hak ve hakediş kendiliğinden değişmez."
+          },
+          {
+            "id": "AS-03",
+            "rule": "İptalden sonra geriye dönük kayıt/düzeltme mümkündür; iptal yeniden açılmaz. Etkinlik sürümü artar; eski önizleme geçersizleşir. event_get mevcut actual_started_at değerini; yönetici/organizasyon okuyucusuna append-only actual_start_history geçmişini döndürür."
           }
         ]
       }
@@ -50447,6 +50875,90 @@
       },
       {
         "path": "#/$defs/Success_event_payment_get/properties/trace_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/ActualStartHistoryItem/properties/id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/ActualStartHistoryItem/properties/actor_person_id/anyOf/0",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Request_event_actual_start_record/properties/request_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Request_event_actual_start_record/properties/org_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Request_event_actual_start_record/properties/center_id/anyOf/0",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Request_event_actual_start_record/properties/operation_key",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Request_event_actual_start_record/properties/event_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Success_event_actual_start_record/properties/trace_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Request_event_actual_start_correct/properties/request_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Request_event_actual_start_correct/properties/org_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Request_event_actual_start_correct/properties/center_id/anyOf/0",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Request_event_actual_start_correct/properties/operation_key",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Request_event_actual_start_correct/properties/event_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Success_event_actual_start_correct/properties/trace_id",
         "origin": "ftksaas",
         "acceptance": "generic_uuid",
         "generation": "uuidv7"

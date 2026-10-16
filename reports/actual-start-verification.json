@@ -1,0 +1,26 @@
+{
+  "scope": "actual-start record/correction technical transfer",
+  "baseline_main_commit": "2e21906814c13ea1d0194f6a3d16098441d96bfc",
+  "verification_rule": "Only successful clean CI tied to the latest PR head proves real API acceptance. Read the PR workflow logs for final counts and result.",
+  "local_checks": "type generation and static contract verification passed; real local backend unavailable due to native artifact DNS/download availability",
+  "required_scenarios": [
+    "record/correct/clear with append-only history",
+    "future/empty reason/draft/stale version rejection",
+    "late actual start and corrections preserve Q-E03 participant phase",
+    "post-center-cancel backfill preserves Q-E02 finance and rights",
+    "late failure rollback and replay",
+    "same/different-key concurrency",
+    "live CM revocation, tenant and center isolation",
+    "restricted history projection",
+    "stale cancel preview refresh",
+    "correction rollback retains prior timestamp/history; early cancellation and occurred state remain independent"
+  ],
+  "callable_operations": 55,
+  "contract_only_operations": 129,
+  "migrations": 11,
+  "limits": [
+    "No automatic occurrence, attendance, rights, earnings or monetary recalculation",
+    "No new partial-occurrence financial rule",
+    "No frontend or production deployment"
+  ]
+}

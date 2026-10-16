@@ -2075,6 +2075,32 @@
       ],
       "billing_class": "read",
       "limits": []
+    },
+    {
+      "name": "event_actual_start_record_v1",
+      "status": "operational_development_limited",
+      "external_path": "/functions/v1/backend-v1/event_actual_start_record_v1",
+      "permission": "event.manage",
+      "features": [
+        "F29"
+      ],
+      "billing_class": "maintenance",
+      "limits": [
+        "No automatic occurrence/attendance/rights/earnings or monetary reclassification."
+      ]
+    },
+    {
+      "name": "event_actual_start_correct_v1",
+      "status": "operational_development_limited",
+      "external_path": "/functions/v1/backend-v1/event_actual_start_correct_v1",
+      "permission": "event.manage",
+      "features": [
+        "F29"
+      ],
+      "billing_class": "maintenance",
+      "limits": [
+        "No automatic occurrence/attendance/rights/earnings or monetary reclassification."
+      ]
     }
   ]
 }

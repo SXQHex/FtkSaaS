@@ -1416,6 +1416,11 @@ Request_event_payment_get?: RequestEventPaymentGet
 Success_event_payment_prepare?: SuccessEventPaymentPrepare
 Success_event_payment_get?: SuccessEventPaymentGet
 ParticipantCancellationBasis?: ParticipantCancellationBasis
+ActualStartHistoryItem?: ActualStartHistoryItem
+Request_event_actual_start_record?: RequestEventActualStartRecord
+Success_event_actual_start_record?: SuccessEventActualStartRecord
+Request_event_actual_start_correct?: RequestEventActualStartCorrect
+Success_event_actual_start_correct?: SuccessEventActualStartCorrect
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -2667,6 +2672,8 @@ discipline_ids: EventDisciplineIds
 assignment_terms?: EventDutyInput[]
 registrations?: EventRegistrationView[]
 duties?: EventDutyView[]
+actual_started_at?: (Instant | null)
+actual_start_history?: ActualStartHistoryItem[]
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -2718,6 +2725,36 @@ currency: Currency
 performed: (Bool | null)
 version: PositiveInt
 verified_at: (Instant | null)
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "ActualStartHistoryItem".
+ */
+export interface ActualStartHistoryItem {
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+id: string
+created_at: Instant
+actor_person_id: (string | null)
+reason: (Text | null)
+diff: (AuditDiff | null)
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "AuditDiff".
+ */
+export interface AuditDiff {
+changes: AuditFieldChange[]
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "AuditFieldChange".
+ */
+export interface AuditFieldChange {
+field: Text
+old_value: (string | number | boolean | null)
+new_value: (string | number | boolean | null)
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -2780,22 +2817,6 @@ progress_count: Count
 total_count: (Count | null)
 result_reference: (EntityRef | null)
 safe_error_code: (Text | null)
-}
-/**
- * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
- * via the `definition` "AuditFieldChange".
- */
-export interface AuditFieldChange {
-field: Text
-old_value: (string | number | boolean | null)
-new_value: (string | number | boolean | null)
-}
-/**
- * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
- * via the `definition` "AuditDiff".
- */
-export interface AuditDiff {
-changes: AuditFieldChange[]
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -11116,6 +11137,7 @@ terms: EventTerms
 published: Bool
 attendance_state: AttendanceClosure
 attendance_revision: Int
+actual_started_at?: (Instant | null)
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -12082,6 +12104,84 @@ trace_id: string
 export interface SuccessEventPaymentGet {
 ok: true
 data: EventPaymentPreparationView
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+trace_id: string
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "Request_event_actual_start_record".
+ */
+export interface RequestEventActualStartRecord {
+client_api_version: 1
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+request_id: string
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+org_id: string
+center_id?: (string | null)
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+operation_key: string
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+event_id: string
+expected_version: PositiveInt
+actual_started_at: Instant
+reason: Text
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "Success_event_actual_start_record".
+ */
+export interface SuccessEventActualStartRecord {
+ok: true
+data: Mutation
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+trace_id: string
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "Request_event_actual_start_correct".
+ */
+export interface RequestEventActualStartCorrect {
+client_api_version: 1
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+request_id: string
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+org_id: string
+center_id?: (string | null)
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+operation_key: string
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+event_id: string
+expected_version: PositiveInt
+actual_started_at: (Instant | null)
+reason: Text
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "Success_event_actual_start_correct".
+ */
+export interface SuccessEventActualStartCorrect {
+ok: true
+data: Mutation
 /**
  * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
  */
