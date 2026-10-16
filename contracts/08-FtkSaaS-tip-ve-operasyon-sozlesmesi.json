@@ -26324,7 +26324,12 @@
           "A55"
         ],
         "configuration_policy": "numeric plan limits/prices and legal approval are deployment configuration, never arbitrary allow/deny",
-        "implementation_status": "contract_only"
+        "implementation_status": "operational_development_limited",
+        "runtime_transport": "authenticated Edge adapter -> service-only RPC; rules/transaction in PostgreSQL",
+        "runtime_path": "/functions/v1/backend-v1/organization_update_v1",
+        "runtime_external_path": "/functions/v1/backend-v1/organization_update_v1",
+        "runtime_rpc": "api_v1.organization_update_v1",
+        "runtime_limits": []
       },
       {
         "name": "organization_close_preview_v1",
@@ -26931,7 +26936,12 @@
           "A55"
         ],
         "configuration_policy": "numeric plan limits/prices and legal approval are deployment configuration, never arbitrary allow/deny",
-        "implementation_status": "contract_only"
+        "implementation_status": "operational_development_limited",
+        "runtime_transport": "authenticated Edge adapter -> service-only RPC; rules/transaction in PostgreSQL",
+        "runtime_path": "/functions/v1/backend-v1/center_update_v1",
+        "runtime_external_path": "/functions/v1/backend-v1/center_update_v1",
+        "runtime_rpc": "api_v1.center_update_v1",
+        "runtime_limits": []
       },
       {
         "name": "room_save_v1",
@@ -28722,7 +28732,10 @@
           "plan_capabilities_from_features",
           "billing_gate_maintenance",
           "same_key_same_payload_replay",
-          "receipt_audit_outbox_atomic_domain_commit"
+          "receipt_audit_outbox_atomic_domain_commit",
+          "scoped_open_operations_block_deactivation",
+          "debt_and_unused_rights_preserved",
+          "no_login_grant_change"
         ],
         "audit": true,
         "notification": "outbox_if_user_visible_business_result",
@@ -28740,7 +28753,12 @@
           "A55"
         ],
         "configuration_policy": "numeric plan limits/prices and legal approval are deployment configuration, never arbitrary allow/deny",
-        "implementation_status": "contract_only"
+        "implementation_status": "operational_development_limited",
+        "runtime_transport": "authenticated Edge adapter -> service-only RPC; rules/transaction in PostgreSQL",
+        "runtime_path": "/functions/v1/backend-v1/student_deactivate_v1",
+        "runtime_external_path": "/functions/v1/backend-v1/student_deactivate_v1",
+        "runtime_rpc": "api_v1.student_deactivate_v1",
+        "runtime_limits": []
       },
       {
         "name": "person_merge_preview_v1",
@@ -40608,7 +40626,14 @@
           "A03"
         ],
         "configuration_policy": "numeric plan limits/prices and legal approval are deployment configuration, never arbitrary allow/deny",
-        "implementation_status": "contract_only"
+        "implementation_status": "operational_development_limited",
+        "runtime_transport": "authenticated Edge adapter -> service-only RPC; rules/transaction in PostgreSQL",
+        "runtime_path": "/functions/v1/backend-v1/disciplines_list_v1",
+        "runtime_external_path": "/functions/v1/backend-v1/disciplines_list_v1",
+        "runtime_rpc": "api_v1.disciplines_list_v1",
+        "runtime_limits": [
+          "Pagination supports created_at_asc; cursor is bound to request scope."
+        ]
       },
       {
         "name": "discipline_save_v1",
@@ -40816,7 +40841,9 @@
           "plan_capabilities_from_features",
           "same_org_discipline",
           "relationship_never_grants_login",
-          "expected_version_on_update"
+          "expected_version_on_update",
+          "active_matching_center_relationship_required",
+          "discipline_relation_never_activates_student"
         ],
         "audit": true,
         "notification": "outbox_if_user_visible_business_result",
@@ -40830,7 +40857,12 @@
           "A03"
         ],
         "configuration_policy": "numeric plan limits/prices and legal approval are deployment configuration, never arbitrary allow/deny",
-        "implementation_status": "contract_only"
+        "implementation_status": "operational_development_limited",
+        "runtime_transport": "authenticated Edge adapter -> service-only RPC; rules/transaction in PostgreSQL",
+        "runtime_path": "/functions/v1/backend-v1/person_discipline_set_v1",
+        "runtime_external_path": "/functions/v1/backend-v1/person_discipline_set_v1",
+        "runtime_rpc": "api_v1.person_discipline_set_v1",
+        "runtime_limits": []
       },
       {
         "name": "event_get_v1",
