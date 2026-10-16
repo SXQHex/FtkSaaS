@@ -1,6 +1,6 @@
 # FtkSaaS — API kataloğu · 0.2.0-rc.3
 
-184 sözleşme; 60 geliştirme ortamında çağrılabilir endpoint, 124 yalnız sözleşme. Çağrılabilir olmak bütün ürün özelliklerinin veya üretim kabulünün tamamlandığı anlamına gelmez. Kapsam sınırları ve Q-E01 `docs/claude-handover.md` içindedir.
+184 sözleşme; 63 geliştirme ortamında çağrılabilir endpoint, 121 yalnız sözleşme. Çağrılabilir olmak bütün ürün özelliklerinin veya üretim kabulünün tamamlandığı anlamına gelmez. Kapsam sınırları ve Q-E01 `docs/claude-handover.md` içindedir.
 
 `POST {API_URL}/functions/v1/backend-v1/{operation}`; JSON gövde doğrudan typed Request nesnesidir. Header: `Authorization: Bearer <Supabase access_token>`, `apikey: <publishable key>`, `Content-Type: application/json`. Başarı: `ok/data/trace_id`; hata: `ok:false/error:SafeError`. Servis anahtarı frontend’e verilmez.
 
@@ -42,10 +42,10 @@ Named `/rest/v1/rpc/{operation}` yalnız backend içindir; imzası p_request + d
 | `account_access_revoke_v1` | yalnız sözleşme | `invite.student` | W / invite | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; center_id?: FtkUuid ∣ null; operation_key: FtkUuid; expected_version: PositiveInt; invitation_id: FtkUuid | Success_account_access_revoke |
 | `account_access_accept_v1` | çağrılabilir (kapsam notları geçerli) | `invite.accept` | E / invite | client_api_version: 1; request_id: FtkUuid; operation_key: FtkUuid; token: Secret | Success_account_access_accept |
 | `account_link_remove_v1` | yalnız sözleşme | `center.manage` | W / config | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; center_id?: FtkUuid ∣ null; operation_key: FtkUuid; expected_version: PositiveInt; link_id: FtkUuid; reason: Text | Success_account_link_remove |
-| `people_list_v1` | yalnız sözleşme | `person.read` | R / read | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; center_id?: FtkUuid ∣ null; query?: Text ∣ null; relationship?: RelationshipKind ∣ null; page: Page | Success_people_list |
-| `person_get_v1` | yalnız sözleşme | `person.read` | R / read | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; center_id?: FtkUuid ∣ null; person_id: FtkUuid | Success_person_get |
+| `people_list_v1` | çağrılabilir (kapsam notları geçerli) | `person.read` | R / read | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; center_id?: FtkUuid ∣ null; query?: Text ∣ null; relationship?: RelationshipKind ∣ null; page: Page | Success_people_list |
+| `person_get_v1` | çağrılabilir (kapsam notları geçerli) | `person.read` | R / read | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; center_id?: FtkUuid ∣ null; person_id: FtkUuid | Success_person_get |
 | `person_create_v1` | çağrılabilir (kapsam notları geçerli) | `person.manage` | W / new | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; center_id?: FtkUuid ∣ null; operation_key: FtkUuid; display_name: Text; contacts: ContactInput[] | Success_person_create |
-| `person_update_v1` | yalnız sözleşme | `person.manage` | W / maintenance | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; center_id?: FtkUuid ∣ null; operation_key: FtkUuid; expected_version: PositiveInt; person_id: FtkUuid; patch: PersonPatch | Success_person_update |
+| `person_update_v1` | çağrılabilir (kapsam notları geçerli) | `person.manage` | W / maintenance | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; center_id?: FtkUuid ∣ null; operation_key: FtkUuid; expected_version: PositiveInt; person_id: FtkUuid; patch: PersonPatch | Success_person_update |
 | `student_activate_v1` | çağrılabilir (kapsam notları geçerli) | `person.activate` | W / new | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; center_id?: FtkUuid ∣ null; operation_key: FtkUuid; person_id: FtkUuid | Success_student_activate |
 | `student_deactivate_v1` | çağrılabilir (kapsam notları geçerli) | `person.activate` | W / maintenance | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; center_id?: FtkUuid ∣ null; operation_key: FtkUuid; person_id: FtkUuid; reason: Text | Success_student_deactivate |
 | `person_merge_preview_v1` | yalnız sözleşme | `person.merge` | P / maintenance | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; center_id?: FtkUuid ∣ null; source_id: FtkUuid; target_id: FtkUuid | Success_person_merge_preview |

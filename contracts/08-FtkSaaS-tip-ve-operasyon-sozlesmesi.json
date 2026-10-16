@@ -28357,7 +28357,15 @@
           "A55"
         ],
         "configuration_policy": "numeric plan limits/prices and legal approval are deployment configuration, never arbitrary allow/deny",
-        "implementation_status": "contract_only"
+        "implementation_status": "operational_development_limited",
+        "runtime_transport": "authenticated Edge adapter -> service-only RPC; rules/transaction in PostgreSQL",
+        "runtime_path": "/functions/v1/backend-v1/people_list_v1",
+        "runtime_external_path": "/functions/v1/backend-v1/people_list_v1",
+        "runtime_rpc": "api_v1.people_list_v1",
+        "runtime_limits": [
+          "Operational readers/writers supply center_id; assignment readers receive no contacts or other-center relations.",
+          "Pagination supports created_at_asc; cursor is bound to filters and scope."
+        ]
       },
       {
         "name": "person_get_v1",
@@ -28420,7 +28428,14 @@
           "A55"
         ],
         "configuration_policy": "numeric plan limits/prices and legal approval are deployment configuration, never arbitrary allow/deny",
-        "implementation_status": "contract_only"
+        "implementation_status": "operational_development_limited",
+        "runtime_transport": "authenticated Edge adapter -> service-only RPC; rules/transaction in PostgreSQL",
+        "runtime_path": "/functions/v1/backend-v1/person_get_v1",
+        "runtime_external_path": "/functions/v1/backend-v1/person_get_v1",
+        "runtime_rpc": "api_v1.person_get_v1",
+        "runtime_limits": [
+          "Operational readers/writers supply center_id; assignment readers receive no contacts or other-center relations."
+        ]
       },
       {
         "name": "person_create_v1",
@@ -28581,7 +28596,14 @@
           "A55"
         ],
         "configuration_policy": "numeric plan limits/prices and legal approval are deployment configuration, never arbitrary allow/deny",
-        "implementation_status": "contract_only"
+        "implementation_status": "operational_development_limited",
+        "runtime_transport": "authenticated Edge adapter -> service-only RPC; rules/transaction in PostgreSQL",
+        "runtime_path": "/functions/v1/backend-v1/person_update_v1",
+        "runtime_external_path": "/functions/v1/backend-v1/person_update_v1",
+        "runtime_rpc": "api_v1.person_update_v1",
+        "runtime_limits": [
+          "Operational readers/writers supply center_id; assignment readers receive no contacts or other-center relations."
+        ]
       },
       {
         "name": "student_activate_v1",
