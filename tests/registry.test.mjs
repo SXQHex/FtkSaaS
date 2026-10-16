@@ -28,10 +28,10 @@ test('Registry real Auth/API scope, lifecycle and atomicity',async t=>{
  await mutate('student_activate_v1',{person_id:p});
  await t.test('configuration updates version, replay once and reject stale payload',async()=>{
   const k=key(),b={expected_version:1,name:'Renamed organization'};
-  const a=await mutate('organization_update_v1',b,k);assert.equal(a.primary_id,org);assert.equal(a.version,2);assert.equal((await mutate('organization_update_v1',b,k)).replayed,true);
+  const a=await mutate('organization_update_v1',b,k);assert.equal(a.primary_id,org);assert.equal(a.version,2);assert.equal((await must(owner,'organization_get_v1',{org_id:org})).version,2);assert.equal((await mutate('organization_update_v1',b,k)).replayed,true);
   await fail('organization_update_v1',{...b,name:'changed'},'IDEMPOTENCY_PAYLOAD_MISMATCH',k);
   await fail('organization_update_v1',b,'VERSION_CONFLICT');
-  const c=await mutate('center_update_v1',{expected_version:1,name:'Renamed center',timezone:'Europe/London'});assert.equal(c.primary_id,center);assert.equal(c.version,2);
+  const c=await mutate('center_update_v1',{expected_version:1,name:'Renamed center',timezone:'Europe/London'});assert.equal(c.primary_id,center);assert.equal(c.version,2);assert.equal((await must(owner,'centers_list_v1',{org_id:org,page:{}})).items.find(x=>x.id===center).version,2);
   await fail('center_update_v1',{expected_version:2,name:'Invalid',timezone:'Invalid/Zone'},'VALIDATION_FAILED');
   assert.equal((await rows('select timezone from core.centers where id=$1',[center]))[0].timezone,'Europe/London');
  });
@@ -55,6 +55,7 @@ test('Registry real Auth/API scope, lifecycle and atomicity',async t=>{
   assert.equal((await mutate('person_discipline_set_v1',b,k)).version,2);assert.equal((await mutate('person_discipline_set_v1',b,k)).replayed,true);
   await fail('person_discipline_set_v1',b,'VERSION_CONFLICT');
   await mutate('person_discipline_set_v1',{...b,state:'active',expected_version:2});
+  assert.equal((await must(owner,'person_get_v1',scope({person_id:p}))).discipline_relationships.find(x=>x.discipline_id===discipline).version,3);
   const offline=(await mutate('person_create_v1',{display_name:'No student relationship',contacts:[]})).primary_id;
   await fail('person_discipline_set_v1',{person_id:offline,discipline_id:discipline,kind:'student',state:'active'},'VALIDATION_FAILED');
   await fail('person_discipline_set_v1',{person_id:p,discipline_id:key(),kind:'student',state:'active'},'NOT_FOUND');

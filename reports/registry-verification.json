@@ -1,0 +1,48 @@
+{
+  "status": "pending_final_head_verification",
+  "operations_added": [
+    "organization_update_v1",
+    "center_update_v1",
+    "disciplines_list_v1",
+    "person_discipline_set_v1",
+    "student_deactivate_v1",
+    "person_get_v1",
+    "people_list_v1",
+    "person_update_v1"
+  ],
+  "inventory": {
+    "contracts": 184,
+    "callable_development": 63,
+    "contract_only": 121
+  },
+  "migrations": 15,
+  "static": {
+    "checks": 21,
+    "contract_tests": 12,
+    "result": "passed"
+  },
+  "first_batch_verified": {
+    "commit": "fd4a12276cfbd4febe805339c2c7a692d69c14a9",
+    "tests": 161,
+    "clean_ci": [
+      38941871255,
+      38941864350
+    ],
+    "review": "https://github.com/SXQHex/FtkSaaS/pull/6#issuecomment-6221375604"
+  },
+  "scope": [
+    "Organization and center optimistic updates with live scope and receipt replay",
+    "Discipline pagination and relationship guards without login grants",
+    "Student deactivation checks scoped open operations; finance and rights preserved",
+    "Person reads enforce self/org/current-center/assignment scope and omit assignment-reader contacts",
+    "Person updates preserve matching contact verification and require current version",
+    "Creation-center provenance prevents cross-center access during create/activate gap; inactive relationships revoke operational access",
+    "Read DTO versions for reload-safe optimistic writes",
+    "Actual-start, Q-E02 and Q-E03 regression suite remains required"
+  ],
+  "not_completed": [
+    "121 contract-only operations; see docs/remaining-work.md",
+    "Final exact-head clean CI and review pending",
+    "Production, frontend acceptance, persistent shared staging, external email and load/restore acceptance"
+  ]
+}

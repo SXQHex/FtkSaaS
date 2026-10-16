@@ -30,8 +30,12 @@ test('Person registry real Auth/API authorization and contact privacy',async t=>
  const get=(u,id,c=center)=>must(u,'person_get_v1',{org_id:org,center_id:c,person_id:id});
  await t.test('current manager scope, self scope and organization read scope are distinct',async()=>{
   assert.equal((await get(cm,p)).contacts[0].value,'Student one@ftksaas.invalid');
-  const unassigned=(await mutate('person_create_v1',{display_name:'Unassigned',contacts:[]})).primary_id;
+  const unassigned=(await mutate('person_create_v1',{center_id:other,display_name:'Unassigned',contacts:[]})).primary_id;
   await fail('person_get_v1',{person_id:unassigned},'NOT_FOUND',cm);await fail('person_update_v1',{person_id:unassigned,expected_version:1,patch:{display_name:'denied'}},'NOT_FOUND',cm);assert.equal((await get(owner,unassigned,null)).id,unassigned);
+  const ownNew=(await mutate('person_create_v1',{display_name:'Same center new',contacts:[]})).primary_id;assert.equal((await get(cm,ownNew)).id,ownNew);await mutate('person_update_v1',{person_id:ownNew,expected_version:1,patch:{display_name:'Allowed before activation'}},key(),cm);
+  await mutate('student_activate_v1',{person_id:ownNew});await mutate('student_deactivate_v1',{person_id:ownNew,reason:'synthetic inactive'});
+  await fail('person_get_v1',{person_id:ownNew},'NOT_FOUND',cm);await fail('person_update_v1',{person_id:ownNew,expected_version:2,patch:{display_name:'denied'}},'NOT_FOUND',cm);
+  const hidden=await must(cm,'people_list_v1',scope({query:'Allowed before activation',page:{}}));assert.deepEqual(hidden.items,[]);
   await fail('person_get_v1',{person_id:p2},'NOT_FOUND',cm);await fail('person_update_v1',{person_id:p2,expected_version:1,patch:{display_name:'denied'}},'NOT_FOUND',cm);
   assert.equal((await get(owner,p2,null)).id,p2);assert.equal((await get(student,p)).id,p);
   await fail('person_get_v1',{person_id:p2},'NOT_FOUND',student);await fail('person_update_v1',{person_id:p,expected_version:1,patch:{display_name:'denied'}},'FORBIDDEN',student);
@@ -55,7 +59,7 @@ test('Person registry real Auth/API authorization and contact privacy',async t=>
   const view=await get(instructor,p);assert.equal(view.id,p);assert(!('contacts' in view));assert(view.relationships.every(x=>x.center_id===center));
   await fail('person_get_v1',{person_id:p2},'NOT_FOUND',instructor);
   const list=await must(instructor,'people_list_v1',scope({page:{},query:'Student'}));assert.deepEqual(list.items.map(x=>x.id),[p]);assert(!('contacts' in list.items[0]));
-  await mutate('role_revoke_v1',{assignment_id:instructorGrant.primary_id,expected_version:1});await fail('person_get_v1',{person_id:p},'NOT_FOUND',instructor);
+  await mutate('role_revoke_v1',{assignment_id:instructorGrant.primary_id,expected_version:1,reason:'synthetic revoke'});await fail('person_get_v1',{person_id:p},'NOT_FOUND',instructor);
  });
  await t.test('contact replacement preserves existing verification, clears new evidence and never changes Auth identity',async()=>{
   await db.query('update core.person_contacts set verified_at=$1 where org_id=$2 and person_id=$3',['2026-01-01T00:00:00Z',org,p]);

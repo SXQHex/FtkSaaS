@@ -404,7 +404,7 @@
       "limits": [
         "Operational readers/writers supply center_id; assignment readers receive no contacts or other-center relations.",
         "Pagination supports created_at_asc; cursor is bound to filters and scope.",
-        "Operational person access requires an existing relation in the selected center; unassigned people remain visible to org readers and self only."
+        "Operational access requires an active center relation or matching creation-center provenance before the first relationship. Historical/unassigned records do not grant cross-center access."
       ]
     },
     {
@@ -419,7 +419,7 @@
       "billing_class": "read",
       "limits": [
         "Operational readers/writers supply center_id; assignment readers receive no contacts or other-center relations.",
-        "Operational person access requires an existing relation in the selected center; unassigned people remain visible to org readers and self only."
+        "Operational access requires an active center relation or matching creation-center provenance before the first relationship. Historical/unassigned records do not grant cross-center access."
       ]
     },
     {
@@ -444,7 +444,7 @@
       "billing_class": "maintenance",
       "limits": [
         "Operational readers/writers supply center_id; assignment readers receive no contacts or other-center relations.",
-        "Operational person access requires an existing relation in the selected center; unassigned people remain visible to org readers and self only."
+        "Operational access requires an active center relation or matching creation-center provenance before the first relationship. Historical/unassigned records do not grant cross-center access."
       ]
     },
     {
