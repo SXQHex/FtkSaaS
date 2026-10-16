@@ -290,6 +290,19 @@ test('Q-E02 real Auth/API center and participant cancellation acceptance',async 
   assert.equal((await view(x.e)).actual_started_at,null);assert.equal((await view(x.e)).version,v.version);assert.equal(await actualHistory(x.e),0);assert.equal(await receiptCount(k),0);assert.equal(await n(),beforeN);
   await removeTrigger();await actualRecord(x.e,at,k,v.version);await actualRecord(x.e,at,k,v.version);assert.equal(await actualHistory(x.e),1);
  });
+ await t.test('actual-start correction rollback retains previous time and history; occurrence and early cancellation remain independent',async()=>{
+  const x=await manual(400,{occurred:true}),v=await view(x.e),at=new Date(Date.now()-60000).toISOString();
+  await actualRecord(x.e,at,key(),v.version);const before=await view(x.e),journal=await monetaryJournal(x.p),k=key();
+  await rejectAudit('event_actual_start_correct_v1',x.e);
+  await fail('event_actual_start_correct_v1',{event_id:x.e,expected_version:before.version,actual_started_at:null,reason:'correct observed time'},'INTEGRITY_VIOLATION',k);
+  assert.deepEqual(await view(x.e),before);assert.equal(await actualHistory(x.e),1);assert.equal(await receiptCount(k),0);assert.deepEqual(await monetaryJournal(x.p),journal);
+  await removeTrigger();await actualCorrect(x.e,before.version,null,k);assert.equal((await view(x.e)).state,'occurred');assert.equal(await actualHistory(x.e),2);
+  await fail('event_actual_start_correct_v1',{event_id:x.e,expected_version:(await view(x.e)).version,actual_started_at:new Date(Date.now()+3600000).toISOString(),reason:'future correction'},'VALIDATION_FAILED');
+  const early=await manual(400);await mutate('event_registration_cancel_v1',{registration_id:early.r,expected_version:1,reason:'before scheduled time'});
+  const evidence=await basis(early.r);assert.equal(evidence.phase,'before_planned_start');
+  await actualRecord(early.e,new Date().toISOString(),key(),(await view(early.e)).version);
+  assert.deepEqual(await basis(early.r),evidence);assert.equal((await view(early.e)).state,'published');
+ });
  await t.test('actual-start concurrent first writes cannot overwrite; same key replays and changed payload rejects',async()=>{
   const x=await manual(0,{prior:true}),v=await view(x.e),at=new Date(Date.now()-60000).toISOString();
   const body={event_id:x.e,expected_version:v.version,actual_started_at:at,reason:'parallel'};
