@@ -22,7 +22,7 @@ npm test
 
 ## Kanıt ve kapsam
 
-Yeni kişi/merkez/disiplin uygulaması [PR #6](https://github.com/SXQHex/FtkSaaS/pull/6) içindedir. Son head’in temiz DB, Auth/API ve inceleme kanıtı `reports/registry-verification.json` dosyasındadır. Önceki fiilî başlangıç kabulü 148/148 testi kapsıyordu; yeni head için kanıt yerine kullanılamaz.
+Yeni kişi/merkez/disiplin uygulaması [PR #6](https://github.com/SXQHex/FtkSaaS/pull/6) içindedir. İncelenen uygulama `e4252981871f3aa911257342cde6ebf5f79f82c1`: iki temiz CI çalışmasında 169/169 test (12 sözleşme + 27 DB + 130 gerçek Auth/API), 18 migration, seed/sağlık/advisors başarılı; son inceleme bulgusuz. Kanıt `reports/registry-verification.json` dosyasındadır. Her sonraki belge head’i ve main merge CI’ı ayrıca doğrulanır. Önceki fiilî başlangıç kabulü 148/148 testi kapsıyordu; yeni head için kanıt yerine kullanılamaz.
 
 Her yeni head ve merge için [Actions](https://github.com/SXQHex/FtkSaaS/actions) sonucu ayrıca denetlenir. `reports/actual-start-verification.json` güncel işin kanıt kapsamını, `reports/qe03-verification.json` Q-E03 kapsamını belirtir. Eski verification/resumed/Q-E01/Q-E02/RC3 dosyaları tarihsel snapshot'tır; yeni head kabulünü kanıtlamaz. Makine envanteri `docs/endpoint-inventory.json`, insan okunur API kataloğu `contracts/05-FtkSaaS-O4-API-katalogu.md` ve kapalı tipler `contracts/08-FtkSaaS-tip-ve-operasyon-sozlesmesi.json` esas alınır. Yalnız sözleşme işlemleri gateway'de `NOT_FOUND` döner.
 
