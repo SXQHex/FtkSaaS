@@ -1,0 +1,68 @@
+{
+  "decision": "Q-E03",
+  "baseline_main_commit": "98d62a23284ef6f266034a68614332753be43a00",
+  "implementation_commit": "c935754945b81ee41af4f2ba2564375d24684776",
+  "status": "exact_head_ci_and_review_are_authoritative",
+  "local_verification": {
+    "static_checks": 21,
+    "contract_tests": 12,
+    "typescript": "passed",
+    "frozen_previous_migrations": 8,
+    "new_migrations": 2,
+    "real_api_local": "not_run_native_artifact_download_DNS_blocked"
+  },
+  "planned_acceptance": [
+    "exact DB before/equal/after boundary",
+    "actual API pre/post with zero/partial/full payments and existing refund=none",
+    "late event_complete does not reclassify prior cancellation",
+    "next-day center cancellation, replay and atomic rollback",
+    "participant rollback preserves right and evidence",
+    "client timestamps rejected",
+    "package terms preserved and no automatic occurrence/earning"
+  ],
+  "limits": [
+    "Actual-start record/correction API does not exist and was not added; late occurrence verification is the supported API proxy, not proof of an actual-start write feature.",
+    "No new prestart event-refund formula was defined or introduced. Existing refund=none behavior is covered.",
+    "53 callable / 129 contract-only operations; frontend, production, external mail, load/restore and shared staging remain outside this change."
+  ],
+  "source_sha256": {
+    "contracts/00-FtkSaaS-yeni-sohbet-devir.md": "4d726a0b24414a1dd68ba12c7d6229e186ec5e086aea01d34efedb55c8fd5940",
+    "contracts/01-FtkSaaS-urun-kapsam-sozlesmesi.md": "22d82bf52530ffc59fa0ab86921e770a761ca029aea0d3bf3bc4c29e812d2309",
+    "contracts/02-FtkSaaS-teknik-sozlesme.md": "6acb2044712b34f052b9c040d7807e57734cfd6e6e69bbe7eaebefab5747bac8",
+    "contracts/04-FtkSaaS-O4-veri-semasi.md": "122259039c823f60dd8f1627af5396a3abec40d0240cb2abd1d972df3ae1982d",
+    "contracts/08-FtkSaaS-tip-ve-operasyon-sozlesmesi.json": "371aa661ad68cccc2fef7447ebb8259d399511ecfe4a250885c1e830e669b7d6",
+    "contracts/12-FtkSaaS-Q-E02-kabul-karari.md": "b5ba4749787d289f415ec4e2fe1c076224d509471b40b5c8946af83cdb670b16",
+    "database/migrations.sha256.json": "ccb8749a480573014ef424b56517d5958e16bcefc11bc368582bcd0270b3c824",
+    "database/planned-start-cancellation.sql": "25065e2714247553d72b8396b0ab99bd078c3e15380262e2283d1ea327e86460",
+    "database/planned-start-decision-clock.sql": "79a88d9324f14d5ed8949be693d332d33a6add45743f2207221cdb2ec285918c",
+    "docs/api-invariants.md": "c4c4862141048be22aca7d138ee92c9270dde6fd2622baa9b73d7f78faa0177c",
+    "docs/claude-handover.md": "65b0a00f786b2c6296abe1a21a7e48cc4bf4dffab7191f60d59cffaf5f318daa",
+    "docs/decisions/Q-E03.md": "707a8a381d0f266daa631357677cf03c83705842ba793e2d423c94158740b7f0",
+    "packages/contracts/src/generated.ts": "5d017099b6ee4c1e02c62f65fba950906038b7124a2c67c12839d20d95299f00",
+    "scripts/audit.mjs": "5bfbda6054240c63c732a80d87ee4448d41cdd3f10fc46f0ccac5e715659a427",
+    "scripts/check-migrations.py": "498031ba2af24f2495d43860a5d15280db7c862dac081d1c41e2c841d89eb693",
+    "scripts/render_catalogs.py": "5aff7396bc0638781472edf0fd9ddbaa457e12fa030c211492299d4b409c1e34",
+    "supabase/functions/backend-v1/contract.json": "70b7bae91cec77a124bf3925e272400a174ca3abaef8ccf651e2ce7009eb4248",
+    "supabase/functions/backend-v1/index.ts": "d77b5bae88370d5eaa809e911729b4dade6d754edd79d16fd820f24853c9b7e8",
+    "supabase/functions/backend-v1/validators.js": "4292921d29d6a785bb66d22355a47da4e9d3033eb2d804a114eb0fbba7b1e6b5",
+    "supabase/migrations/20261016122700_planned_start_cancellation.sql": "25065e2714247553d72b8396b0ab99bd078c3e15380262e2283d1ea327e86460",
+    "supabase/migrations/20261016123651_planned_start_decision_clock.sql": "79a88d9324f14d5ed8949be693d332d33a6add45743f2207221cdb2ec285918c",
+    "tests/event-cancellation.test.mjs": "0607c7a0763b367b97d54bc76bda776628a36eca3f7d5de791342becd55d39be"
+  },
+  "baseline_acceptance": {
+    "commit": "c935754945b81ee41af4f2ba2564375d24684776",
+    "tests": 138,
+    "passed": 138,
+    "failed": 0,
+    "migrations": 9,
+    "run": "https://github.com/SXQHex/FtkSaaS/actions/runs/38901226476"
+  },
+  "review_followup": {
+    "P1": "Use captured post-lock cancel_at for package cutoff as well; add actual API blocked on org lock across cutoff.",
+    "P2": "This evidence report is now present.",
+    "latest_expected_tests": 139,
+    "latest_migrations": 10,
+    "latest_result": "Read the workflow run bound to PR #3 latest head SHA; baseline result does not prove the additional regression passed."
+  },
+  "pr": "https://github.com/SXQHex/FtkSaaS/pull/3"
+}

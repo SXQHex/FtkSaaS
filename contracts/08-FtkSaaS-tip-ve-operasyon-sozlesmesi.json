@@ -41131,7 +41131,7 @@
       {
         "id": "Q-E03",
         "accepted_date": "2026-10-16",
-        "status": "technical_transfer_pending_verification",
+        "status": "implemented_exact_head_ci_required",
         "supersedes": "Q-E02 monetary planned-start boundary left open; actual operational start definition remains separate",
         "rules": [
           {
@@ -50476,9 +50476,9 @@
         "id": "Q-E03",
         "source": "docs/decisions/Q-E03.md",
         "product_status": "accepted_closed",
-        "technical_status": "pending_verification",
+        "technical_status": "implemented_exact_head_ci_required",
         "required_followup": [
-          "clean real Auth/API acceptance and exact-head CI"
+          "Exact-head CI is authoritative; baseline evidence does not substitute for latest clock regression."
         ]
       }
     ],

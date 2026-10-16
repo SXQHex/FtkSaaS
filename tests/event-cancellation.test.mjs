@@ -205,6 +205,36 @@ test('Q-E02 real Auth/API center and participant cancellation acceptance',async 
   await mutate('event_registration_cancel_v1',body,k);assert.deepEqual(await basis(x.r),evidence);assert.deepEqual(await monetaryJournal(x.p),before);
   await assert.rejects(db.query("update core.event_registrations set participant_cancellation=jsonb_set(participant_cancellation,'{phase}','\"at_or_after_planned_start\"'::jsonb) where id=$1",[x.r]),e=>e.message==='INTEGRITY_VIOLATION');
  });
+ await t.test('Q-E03 API queued across planned/package cutoff uses one post-lock decision time',async()=>{
+  const x=await packageRegistration('reserved',{before:'consume',after:'release'}),locker=await connect(),k=key();
+  let pending;
+  try{
+   // Synthetic fixture clock, not a client-visible time override. Hold the real shared gate.
+   const planned=(await db.query("update core.events set starts_at=clock_timestamp()+interval '8 seconds',ends_at=clock_timestamp()+interval '1 hour',version=version+1 where id=$1 returning starts_at",[x.e])).rows[0].starts_at;
+   await locker.query('begin');const pid=(await locker.query('select pg_backend_pid() pid')).rows[0].pid;
+   await locker.query('select id from core.organizations where id=$1 for update',[org]);
+   const body={registration_id:x.r,expected_version:1,reason:'queued across cutoff'};
+   pending=call(owner,'event_registration_cancel_v1',scoped(body),k);
+   const deadline=Date.now()+15000;let waited=false;
+   while(Date.now()<deadline){
+    const blocked=(await db.query("select xact_start < $2::timestamptz before_cutoff from pg_stat_activity where $1=any(pg_blocking_pids(pid)) and query like '%event_registration_cancel_v1%'",[pid,planned])).rows;
+    if(blocked.length){assert.equal(blocked[0].before_cutoff,true);waited=true;break;}
+    await new Promise(resolve=>setTimeout(resolve,25));
+   }
+   assert(waited,'must observe the real API transaction waiting on the organization lock before cutoff');
+   while(!(await db.query('select clock_timestamp()>$1::timestamptz passed',[planned])).rows[0].passed){
+    assert(Date.now()<deadline,'bounded cutoff wait');await new Promise(resolve=>setTimeout(resolve,25));
+   }
+   await locker.query('commit');
+   const response=await pending;assert.equal(response.result.ok,true,JSON.stringify(response.result));
+   const evidence=await basis(x.r);assert.equal(evidence.phase,'at_or_after_planned_start');
+   assert(new Date(evidence.cancelled_at)>=new Date(evidence.planned_starts_at));
+   const right=(await balance(x.p)).find(z=>z.sale_id===x.sale);assert.equal(right.available,1);assert.equal(right.consumed,0);assert.equal(right.reserved,0);
+   assert.equal(await claim(x.p),'0');await mutate('event_registration_cancel_v1',body,k);assert.deepEqual(await basis(x.r),evidence);
+  }finally{
+   await locker.query('rollback');await locker.end();if(pending)await pending;
+  }
+ });
  await t.test('Q-E03 client cannot forge cancel time, planned boundary or actual-start classification',async()=>{
   const x=await manual(400,{prior:true});
   for(const extra of [{cancelled_at:'2020-01-01T00:00:00Z'},{actual_starts_at:'2099-01-01T00:00:00Z'},{participant_cancellation:{phase:'before_planned_start'}}]){
