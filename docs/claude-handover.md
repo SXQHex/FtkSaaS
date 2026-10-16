@@ -18,7 +18,7 @@ npm test
 
 `dev:info` her checkout için gerçek loopback API/functions adresi, publishable key ve Mailpit bağlantısını üretir. Süreli eski Box URL'leri veya sabit ortak staging varsayılmaz. Servis anahtarı/secrets frontend'e veya repository'ye konmaz. Geliştirme sentetik veri kullanır; dış e-posta teslimi tamamlanmış değildir. Yerel davet teslimi için `scripts/deliver-dev-invitations.mjs` ve Mailpit kullanılır.
 
-`npm run test:clean` yalnız checkout'ın loopback DB'sini sıfırlar; 16 migration ve boş tenant/Auth/receipt durumu doğrulanır, ardından testler, sentetik seed, sağlık ve DB advisors çalışır. `npm run dev:stop` ortamı durdurur. Özel bağlantı ve reset logları paylaşılmaz.
+`npm run test:clean` yalnız checkout'ın loopback DB'sini sıfırlar; 17 migration ve boş tenant/Auth/receipt durumu doğrulanır, ardından testler, sentetik seed, sağlık ve DB advisors çalışır. `npm run dev:stop` ortamı durdurur. Özel bağlantı ve reset logları paylaşılmaz.
 
 ## Kanıt ve kapsam
 
@@ -83,7 +83,7 @@ Bu yalnız operasyonel kanıttır. Q-E03 katılımcı sınıflandırması, Q-E02
 
 ## Kaynak üretimi ve kalan işler
 
-`npm run generate` ortak tipleri, minimal Edge contract/validator/bundle ve katalog/endpoint envanterini üretir; `npm run verify` drift'i reddeder. Yeni değişiklik ayrı branch/PR ve append-only migration ile yapılır. Önceki 11 migration korunmuştur; 12–16. migration yeni registry işlemleri, kişi görünürlüğü ve okuma sürümlerini taşır. Eski wrapper kaynağı tarihsel migration ile sabittir; güncel üretilen wrapper `database/runtime-wrappers-current.sql` dosyasındadır. Yeni API'nin DB kurulumu yeni migration ile taşınır. Historical/transfer scriptleri güncel sözleşmeye körlemesine uygulanmaz.
+`npm run generate` ortak tipleri, minimal Edge contract/validator/bundle ve katalog/endpoint envanterini üretir; `npm run verify` drift'i reddeder. Yeni değişiklik ayrı branch/PR ve append-only migration ile yapılır. Önceki 11 migration korunmuştur; 12–17. migration yeni registry işlemleri, kişi görünürlüğü ve okuma sürümlerini taşır. Eski wrapper kaynağı tarihsel migration ile sabittir; güncel üretilen wrapper `database/runtime-wrappers-current.sql` dosyasındadır. Yeni API'nin DB kurulumu yeni migration ile taşınır. Historical/transfer scriptleri güncel sözleşmeye körlemesine uygulanmaz.
 
 121 işlem yalnız sözleşme düzeyindedir; tam liste ve bağımlılık sırası `docs/remaining-work.md` içindedir. Kalıcı ortak staging, dış e-posta, yük/restore, frontend gerçek entegrasyon kabulü ve production dağıtımı tamamlanmış değildir. Frontend kodu/tasarımı Claude'un alanıdır. `vercel.json` main otomatik dağıtımını kapalı tutar; merge production izni değildir.
 
@@ -91,7 +91,7 @@ Bu yalnız operasyonel kanıttır. Q-E03 katılımcı sınıflandırması, Q-E02
 
 - `organization_update_v1`: org.manage; organizasyonun güncel `expected_version` değeri. `organization_get` ve `organizations_list` artık `version` döndürür.
 - `center_update_v1`: seçili merkez yöneticisi; güncel merkez sürümü, ad ve IANA saat dilimi. `centers_list` artık `version` döndürür. Değişiklik geçmiş seansların UTC zamanlarını veya satış saat dilimi snapshot’larını yeniden hesaplamaz.
-- `disciplines_list_v1`: owner/OM organizasyon kataloğu; CM yalnız erişilebilir atanmış merkezlerinin disiplin projeksiyonu; diğer roller reddedilir; `page` zorunlu; desteklenen sıralama `created_at_asc`. Yanıt `items/next_cursor`, `as_of` içermez.
+- `disciplines_list_v1`: owner/OM organizasyon kataloğu; CM yalnız erişilebilir atanmış merkezlerinde aktif olarak sunulan aktif disiplinlerin projeksiyonu; diğer roller reddedilir; `page` zorunlu; desteklenen sıralama `created_at_asc`. Yanıt `items/next_cursor`, `as_of` içermez.
 - `person_discipline_set_v1`: aynı organizasyon/merkez/disiplin; aktif ilişki için aynı merkezde eşleşen öğrenci/eğitmen ilişkisi gerekir. Öğrenci aktifleştirme veya login/rol grantı yerine geçmez. Güncelleme güncel ilişki sürümünü ister; `person_get.discipline_relationships[].version` ile okunur.
 - `student_deactivate_v1`: mevcut merkez öğrenci ilişkisini kapatır. Açık talep/alternatif, rezervasyon, bekleme/yer teklifi, etkinlik kaydı veya hazırlanmış ödeme engeldir. Borç/hak ve hesap/rol bağları silinmez. Başka merkez öğrenci ilişkisi bu komutla kapatılmaz.
 - `person_get_v1` / `people_list_v1`: owner/OM organizasyon okumaları; merkez operasyon okuyucuları seçili merkezle ilişkili kişiler; öğrenci yalnız kendi kaydı; canlı görevlendirmesi olan I/A gerekli katılımcı alanları. I/A iletişim alanını alamaz. Merkez seçiliyse başka merkez ilişkileri yanıta konmaz. Mevcut kişilerde aktif merkez ilişkisi aranır. İlk ilişki kurulmadan önce yalnız teknik oluşturma kaydıyla aynı merkeze ait kişi açılır; kökeni bilinmeyen ilişkisiz kayıtlar kapalı kalır. Pasif ilişki operasyon okuma/yazma yetkisi vermez. Kişi listesi `created_at_asc`; cursor aynı filtre/kapsama bağlıdır.

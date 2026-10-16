@@ -56,6 +56,10 @@ test('Person registry real Auth/API authorization and contact privacy',async t=>
   const b={org_id:org,page:{}};
   assert.deepEqual((await must(cm,'disciplines_list_v1',b)).items.map(x=>x.id),[discipline]);
   assert((await must(owner,'disciplines_list_v1',b)).items.some(x=>x.id===hidden));
+  await mutate('center_discipline_set_v1',{discipline_id:discipline,state:'inactive',expected_version:1});assert.deepEqual((await must(cm,'disciplines_list_v1',b)).items,[]);
+  await mutate('center_discipline_set_v1',{discipline_id:discipline,state:'active',expected_version:2});
+  await must(owner,'discipline_save_v1',{org_id:org,discipline_id:discipline,name:'Salsa',state:'inactive',expected_version:1},key());assert.deepEqual((await must(cm,'disciplines_list_v1',b)).items,[]);assert((await must(owner,'disciplines_list_v1',b)).items.some(x=>x.id===discipline&&x.state==='inactive'));
+  await must(owner,'discipline_save_v1',{org_id:org,discipline_id:discipline,name:'Salsa',state:'active',expected_version:2},key());
   for(const u of [student,instructor]){const r=await call(u,'disciplines_list_v1',b);assert.equal(r.result.ok,false);assert.equal(r.result.error.code,'FORBIDDEN');}
  });
  const cls=(await mutate('class_save_v1',{name:'People class',discipline_id:discipline,external_open:true})).primary_id;

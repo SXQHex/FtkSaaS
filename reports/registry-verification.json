@@ -15,7 +15,7 @@
     "callable_development": 63,
     "contract_only": 121
   },
-  "migrations": 16,
+  "migrations": 17,
   "static": {
     "checks": 21,
     "contract_tests": 12,

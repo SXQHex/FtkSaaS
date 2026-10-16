@@ -40671,7 +40671,7 @@
         "runtime_rpc": "api_v1.disciplines_list_v1",
         "runtime_limits": [
           "Pagination supports created_at_asc; cursor is bound to request scope.",
-          "Only org readers or center managers; managers receive disciplines offered by their accessible assigned centers."
+          "Only org readers or center managers; managers receive active disciplines actively offered by their accessible assigned centers."
         ]
       },
       {
