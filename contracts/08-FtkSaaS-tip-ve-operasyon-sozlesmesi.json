@@ -28772,7 +28772,8 @@
           "receipt_audit_outbox_atomic_domain_commit",
           "scoped_open_operations_block_deactivation",
           "debt_and_unused_rights_preserved",
-          "no_login_grant_change"
+          "no_login_grant_change",
+          "elapsed_offers_and_their_offered_entries_close_atomically_before_open_check"
         ],
         "audit": true,
         "notification": "outbox_if_user_visible_business_result",

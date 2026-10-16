@@ -75,10 +75,12 @@ test('Registry real Auth/API scope, lifecycle and atomicity',async t=>{
   await fail('student_deactivate_v1',{person_id:p,reason:'blocked'},'OPEN_OPERATIONS_EXIST');
   await db.query("update core.waitlist_entries set state='closed' where id=$1",[id]);
  });
- await t.test('outstanding seat offer blocks even when worker has not recorded expiry',async()=>{
+ await t.test('live seat offer blocks; elapsed offer and list close atomically without waiting for worker',async()=>{
   const entry=key(),offer=key();await db.query("insert into core.waitlist_entries(id,org_id,center_id,session_id,person_id,joined_at,state) values($1,$2,$3,$4,$5,now(),'closed')",[entry,org,center,session,p]);
   await db.query("insert into core.seat_offers(id,org_id,center_id,entry_id,session_id,person_id,expires_at,state) values($1,$2,$3,$4,$5,$6,now()-interval '1 day','active')",[offer,org,center,entry,session,p]);
-  await fail('student_deactivate_v1',{person_id:p,reason:'blocked'},'OPEN_OPERATIONS_EXIST');await db.query("update core.seat_offers set state='expired' where id=$1",[offer]);
+  await db.query("update core.seat_offers set expires_at=now()+interval '1 hour' where id=$1",[offer]);await db.query("update core.waitlist_entries set state='offered' where id=$1",[entry]);
+  await fail('student_deactivate_v1',{person_id:p,reason:'blocked'},'OPEN_OPERATIONS_EXIST');await db.query("update core.seat_offers set expires_at=now()-interval '1 second' where id=$1",[offer]);
+  await mutate('student_deactivate_v1',{person_id:p,reason:'expired offer no longer open'});assert.equal((await rows('select state from core.seat_offers where id=$1',[offer]))[0].state,'expired');assert.equal((await rows('select state from core.waitlist_entries where id=$1',[entry]))[0].state,'closed');await mutate('student_activate_v1',{person_id:p});
  });
  await t.test('open reservation blocks without altering rights',async()=>{
   const id=key(),policy=key();await db.query("insert into core.policy_versions(id,org_id,scope_center_id,key,effective_at,mandatory,value) values($1,$2,$3,'student_cancel_group',now(),false,$4)",[policy,org,center,{kind:'cancellation',cutoff_minutes:0,before_cutoff:'release',after_cutoff:'release',no_show:'consume'}]);await db.query("insert into core.reservations(id,org_id,center_id,session_id,person_id,mode,state,policy_version_id) values($1,$2,$3,$4,$5,'flexible','active',$6)",[id,org,center,session,p,policy]);
@@ -96,17 +98,18 @@ test('Registry real Auth/API scope, lifecycle and atomicity',async t=>{
   const pv=await must(owner,'event_cancel_preview_v1',scope({event_id:e,reason:'synthetic'}));await mutate('event_cancel_apply_v1',{preview:{id:pv.id,token:pv.token}});
  });
  await t.test('late audit failure rolls back relationship, receipt, notification and outbox; same key retries',async()=>{
+  const expiryEntry=key(),expiryOffer=key();await db.query("insert into core.waitlist_entries(id,org_id,center_id,session_id,person_id,joined_at,state) values($1,$2,$3,$4,$5,now(),'offered')",[expiryEntry,org,center,session,p]);await db.query("insert into core.seat_offers(id,org_id,center_id,entry_id,session_id,person_id,expires_at,state) values($1,$2,$3,$4,$5,$6,now()-interval '1 day','active')",[expiryOffer,org,center,expiryEntry,session,p]);
   trigger='registry_'+key().replaceAll('-','');
   await db.query('create function private.'+trigger+"() returns trigger language plpgsql set search_path='' as $$begin raise exception using errcode='P0001',message='INTEGRITY_VIOLATION';end$$");
   await db.query('create trigger '+trigger+" before insert on core.audit_events for each row when (new.org_id='"+org+"'::uuid and new.action='student_deactivate_v1') execute function private."+trigger+'()');
   const finance=async()=>JSON.stringify(await rows('select id,amount_minor,kind from core.student_credit_movements where org_id=$1 and person_id=$2 order by id',[org,p]));const beforeFinance=await finance();
   const k=key(),b={person_id:p,reason:'synthetic inactive'};
-  await fail('student_deactivate_v1',b,'INTEGRITY_VIOLATION',k);assert.equal(await receipt(k),0);
-  assert.equal((await rows("select state from core.center_relationships where org_id=$1 and center_id=$2 and person_id=$3 and kind='student'",[org,center,p]))[0].state,'active');
+  await fail('student_deactivate_v1',b,'INTEGRITY_VIOLATION',k);assert.equal(await receipt(k),0);assert.equal((await rows('select state from core.seat_offers where id=$1',[expiryOffer]))[0].state,'active');assert.equal((await rows('select state from core.waitlist_entries where id=$1',[expiryEntry]))[0].state,'offered');
+  assert.equal((await rows("select state from core.center_relationships where org_id=$1 and center_id=$2 and person_id=$3 and kind='student' and state='active'",[org,center,p]))[0].state,'active');
   await db.query('drop trigger '+trigger+' on core.audit_events');await db.query('drop function private.'+trigger+'()');trigger=null;
   const a=await mutate('student_deactivate_v1',b,k);assert.equal((await mutate('student_deactivate_v1',b,k)).replayed,true);
   assert.equal(await finance(),beforeFinance);
-  const rel=(await rows('select * from core.center_relationships where id=$1',[a.primary_id]))[0];assert.equal(rel.state,'inactive');assert(rel.ended_at);
+  const rel=(await rows('select * from core.center_relationships where id=$1',[a.primary_id]))[0];assert.equal(rel.state,'inactive');assert(rel.ended_at);assert.equal((await rows('select state from core.seat_offers where id=$1',[expiryOffer]))[0].state,'expired');assert.equal((await rows('select state from core.waitlist_entries where id=$1',[expiryEntry]))[0].state,'closed');
   assert.equal((await rows('select count(*)::int n from core.audit_events where operation_id=$1',[a.operation_id]))[0].n,1);
   assert.equal((await rows('select count(*)::int n from core.outbox_jobs where org_id=$1 and dedupe_key=$2',[org,a.operation_id]))[0].n,1);
   await fail('person_discipline_set_v1',{person_id:p,discipline_id:discipline,kind:'student',state:'active',expected_version:3},'VALIDATION_FAILED');

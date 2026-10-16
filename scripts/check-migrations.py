@@ -34,3 +34,5 @@ assert next(Path('supabase/migrations').glob('*_registry_read_versions.sql')).re
 assert next(Path('supabase/migrations').glob('*_discipline_read_scope.sql')).read_text()==Path('database/discipline-read-scope.sql').read_text()+Path('database/discipline-read-scope-wrappers.sql').read_text().replace('begin;\n','',1),'Discipline read scope source drift'
 
 assert next(Path('supabase/migrations').glob('*_active_discipline_projection.sql')).read_text()==Path('database/active-discipline-projection.sql').read_text()+Path('database/active-discipline-projection-wrappers.sql').read_text().replace('begin;\n','',1),'Active discipline projection source drift'
+
+assert next(Path('supabase/migrations').glob('*_deactivate_expired_offers.sql')).read_text()==Path('database/deactivate-expired-offers.sql').read_text()+Path('database/deactivate-expired-offers-wrappers.sql').read_text().replace('begin;\n','',1),'Deactivation expiry source drift'
