@@ -1,0 +1,59 @@
+{
+  "baseline_sha": "5265a70a0d29f91b9081a1ecbc2a8f0ff78668ee",
+  "previous_reviewed_source_sha": "1307cb85cf7a6a1d409356989b15aa1216f536ce",
+  "previous_success_not_carried": true,
+  "source_binding": {
+    "kind": "sha256_of_final_source_files",
+    "files": {
+      "database/starter-attendance-protection.sql": "e927bc1c89cf99c20e6bab270693c81c56f5a1c4b4ec14e59c9d04cae39e5708",
+      "database/starter-attendance-privacy-legacy.sql": "406eb2ece9665e1a9e1212c6c2b5a21ae95f7359f21024059fcd7dcbf2ed3728",
+      "tests/starter-attendance-protection.test.mjs": "197e7460e7c004c416371d374d37e27f4efcd8373dd62f470fdb118b959e9307",
+      "supabase/functions/backend-v1/handler.ts": "e52f055bd90874b043fa30f69ddc8dc36a50b48c19805b48d12685b0afd1cb5b",
+      ".github/workflows/backend.yml": "05a2c5d2c41f512de85067ae8d3eb4259689a770a7baed909df355fb58dd96ab"
+    },
+    "focused_tested_function_definitions": {
+      "private.lesson_view(uuid,uuid,boolean)": "a9f8f49c73795e58f9f44e32ada275b7a5e3b876336095a3603cc13aab054e67",
+      "private.lesson_dispatch(text,jsonb,uuid,uuid,uuid,uuid,uuid,uuid[],jsonb)": "a6282b6e43af766806599a2cb3f93279a832b627c5ca16fccc638bceeb0cc5cc"
+    },
+    "composition_equivalence": "Applied frozen migration26 plus append-only27; pg_get_functiondef hashes byte-identical to focused-tested functions"
+  },
+  "focused_auth_edge_rpc": {
+    "command": "node --test tests/starter-attendance-protection.test.mjs",
+    "passed_tests": 19,
+    "status": "passed",
+    "includes": [
+      "I/A blocked reason redaction",
+      "legacy draft missing technical metadata closes from pinned reservation terms",
+      "multirow closure rollback",
+      "closed correction rollback",
+      "plan/tenant/center/role/live revoke/stale/race/replay",
+      "causal impact and successive restrictions",
+      "actual-sale blocked policy snapshot"
+    ]
+  },
+  "structural_contract_checks": {
+    "command": "npm run verify",
+    "runtime_behavior_evidence": false
+  },
+  "existing_regression": "Previous41 Auth/API tests are historical source evidence in starter-attendance-protection-verification.json; final-head full CI must reverify all202 baseline API plus27 DB. They are not relabeled as final-head passes here.",
+  "closed_ds_cases": [
+    "DS-PLAN-01"
+  ],
+  "other_ds_cases": "37 pending_runtime; broad protection/start/document and paid financial flows not accepted",
+  "inventory": {
+    "operations": 198,
+    "callable": 89,
+    "contract_only": 109,
+    "core_domain_tables": 90,
+    "private_technical_tables_added": 2,
+    "migrations": 27
+  },
+  "final_clean_ci": "Required npm run test:clean; workflow explicitly checks out and verifies full PR head SHA; final run/review linked externally in PR after commit",
+  "remaining_boundaries": [
+    "paid financial closure/agreements/earnings/settlement",
+    "automatic actual-start observation and mandatory-document lesson consumer",
+    "other nonfinancial right-change protection consumers",
+    "legacy missing blocked effect fails only required blocked branch; no historical backfill",
+    "frontend/load/restore/production/Resend"
+  ]
+}

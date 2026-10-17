@@ -1,6 +1,10 @@
 # Kalan backend işleri
 
-Güncel geliştirme kapsamı: **79 çağrılabilir / 118 yalnız sözleşme**, 25 migration. [Takvim/seans/rezervasyon okuma devri](schedule-read-handover.md) üç okumanın yetki, UTC filtre ve cursor sınırlarını belirtir. Ürün okuması katalog sözleşmesiyle uygun satın alınmış hak seçimini karşılamaz; seans/kişi/sale bağlamı ve DTO aktarımı ayrı teslimdir. [Program/seans devri](program-session-handover.md) uygulanmış akış ve kalan anlaşma/entegrasyon sınırlarını açıklar. Son head CI bağımsız doğrulanır. Aşağıdaki PR #8 başlangıcı tarihsel kanıttır.
+## Starter yoklama/koruma teslimi — güncel kapsam
+
+[Starter devri](starter-attendance-protection-handover.md) zorunlu bağımlılıkları ve kalan tüketicileri tanımlar. 198 işlem / 89 canlı / 109 contract-only; 90 core tablo / 27 migration. Starter program → rezervasyon → etki/onay → korunan katılım → kapanış → gerekçeli düzeltme uygulanır. Ücretli finansal kapanış açıkça kapalı; başlangıç/belge ve diğer hak değişikliği tüketicileri pending. Son SHA’nın kanıtı PR’dedir; eski başarı taşınmaz.
+
+Güncel geliştirme kapsamı: **89 çağrılabilir / 109 yalnız sözleşme**, 27 migration. [Takvim/seans/rezervasyon okuma devri](schedule-read-handover.md) üç okumanın yetki, UTC filtre ve cursor sınırlarını belirtir. Ürün okuması katalog sözleşmesiyle uygun satın alınmış hak seçimini karşılamaz; seans/kişi/sale bağlamı ve DTO aktarımı ayrı teslimdir. [Program/seans devri](program-session-handover.md) uygulanmış akış ve kalan anlaşma/entegrasyon sınırlarını açıklar. Son head CI bağımsız doğrulanır. Aşağıdaki PR #8 başlangıcı tarihsel kanıttır.
 
 ## Doğrulanmış başlangıç — 17 Ekim 2026
 
@@ -10,26 +14,26 @@ Uzak geliştirme/test Auth → Edge → RPC smoke [ayrı rapordadır](../reports
 
 ## DS öncelikli teslim sırası
 
-1. Bu PR: karar/DTO/izin/guard/sürüm-okuma aktarımı, F01–F33 haritası ve yapısal CI denetimleri. Yeni runtime tamamlandı sayılmaz.
-2. Plan kapısı ayrımı + Starter ders yoklama/hak tüketimi; protected reservation obligation/impact approval ve başlangıç/kapanış tüketicileri.
+1. Karar/DTO/izin/guard/sürüm-okuma aktarımı ve F01–F33 yapısal denetimleri korundu; gerçek davranış kanıtı ayrı izlenir.
+2. Starter yoklama/hak kapanışı, politika/kişisel limit etkisi/onayı uygulandı. Otomatik başlangıç, belge ve diğer hak değişikliği tüketicileri açık.
 3. Immutable anlaşma zinciri, yürürlük/başlamış seans snapshot’ı, ürün kimliği override ve mükerrer olmayan hakediş; gerçek Auth→Edge→RPC kabul.
 4. Ayrı merkezler arası ledger, Owner/delege OM grant zinciri ve B onayında atomik ödeme/mahsup/bağlı düzeltme kesinleştirmesi. DS-OPEN-01 karar düzeyinde kapalı; DS-OPEN-02 son merkez yetki kararıyla karar düzeyinde kapalı; aynı hesap A/B yetkileri ayrı doğrulanarak iki adımı yapabilir. Fiziksel depolama/RPC/read/izolasyon ve adım kapsamlı audit bağımlılıkları açık.
 5. Satış kapsam snapshot/değişim, gerekçeli backdate ve geçmiş açık kapatma; yeni ürün davranışı uydurulmadan uçtan uca kabul.
 
-Hedef plan/koruma/anlaşma farkları 08 delivery_gaps içinde açıktır. [38 pending DS davranış senaryosu](decision-sprint-handover.md) statik testten geçmiş kabul edilmez. [Main koruması](branch-protection-review.md) klasik API 403 nedeniyle doğrulanamıyor; gerekli yönetici ayarları teslim edilir, uygulanmış sayılmaz.
+Hedef plan/koruma/anlaşma farkları 08 delivery_gaps içinde açıktır. [38 DS davranış senaryosu: 1 kanıtlı Starter, 37 pending](decision-sprint-handover.md) statik testten geçmiş kabul edilmez. [Main koruması](branch-protection-review.md) klasik API 403 nedeniyle doğrulanamıyor; gerekli yönetici ayarları teslim edilir, uygulanmış sayılmaz.
 
 ## Bağımlılık sırası
 
 1. Uygunluk/politika dört API uygulandı; tüketici sınırları ve eksik iş akışları Claude devrindeki güncel bölümde açıkça ayrılır. Son PR SHA kabulü CI ile ayrıca doğrulanır.
 2. Ürün kataloğu ile uygun satın alınmış paket/hak seçimi bağımlılık aktarımı; talep–bekleme–yer teklifi yaşam döngüleri; program/seans yedi komutu PR #12 ile uygulandı; DS uyarlaması ayrı açık teslimdir, anlaşma yayını ayrı bağımlılıktır. Üç program okuması uygulandı; sınırlar okuma devrindedir.
-3. Ders yoklaması, kapanış/düzeltme, blocked katılım ve eğitmen anlaşması/hakediş.
+3. Starter yoklama/kapanış/düzeltme/blocked dar akışı uygulandı; otomatik başlangıç/belge tüketicisi, ücretli anlaşma/hakediş kapanışı açık.
 4. Paket dondurma/uzatma/değişim/yenileme/sonlandırma ve finans düzeltme/iade önizleme–uygulama çiftleri.
 5. Hesap erişimi geri alma, hesap/organizasyon kapanış/silme ve kişi birleştirme.
 6. CRM, bildirim tercihleri, belgeler, raporlar, import ve worker işlemleri.
 
 Her yeni grup: sözleşme/izin incelemesi → yeni migration → gerçek Auth/API kabulü (sınır, yetki, tekrar, yarış, rollback) → inceleme → temiz CI → main CI. Ürün kararında boşluk varsa teknik varsayımla yeni kural eklenmez.
 
-## Yalnız sözleşme envanteri — güncel 118 işlem
+## Yalnız sözleşme envanteri — güncel 109 işlem
 
 | Modül | Kalan işlem |
 |---|---:|
@@ -37,8 +41,8 @@ Her yeni grup: sözleşme/izin incelemesi → yeni migration → gerçek Auth/AP
 | M02 | 7 |
 | M03 | 3 |
 | M04 | 12 |
-| M05 | 9 |
-| M06 | 17 |
+| M05 | 3 |
+| M06 | 14 |
 | M07 | 14 |
 | M08 | 5 |
 | M09 | 11 |
@@ -78,15 +82,9 @@ Her yeni grup: sözleşme/izin incelemesi → yeni migration → gerçek Auth/AP
 | waitlist_leave_v1 | reservation.write |
 | seat_offer_accept_v1 | reservation.write |
 | seat_offer_reject_v1 | reservation.write |
-| attendance_get_v1 | attendance.draft |
-| attendance_mark_v1 | attendance.draft |
-| attendance_close_v1 | attendance.close |
-| attendance_correct_preview_v1 | attendance.correct |
-| attendance_correct_apply_v1 | attendance.correct |
 | products_list_v1 | person.read |
 | entitlement_extend_v1 | entitlement.correct |
 | credit_adjust_v1 | entitlement.correct |
-| negative_limit_set_v1 | entitlement.correct |
 | freeze_preview_v1 | entitlement.correct |
 | freeze_apply_v1 | entitlement.correct |
 | freeze_end_preview_v1 | entitlement.correct |
@@ -152,13 +150,10 @@ Her yeni grup: sözleşme/izin incelemesi → yeni migration → gerçek Auth/AP
 | report_build_v1 | system.worker |
 | privacy_execute_v1 | system.worker |
 | subscription_boundary_apply_v1 | system.worker |
-| attendance_block_v1 | attendance.block |
 | file_upload_complete_v1 | account.self |
 | negcredit_valuation_set_v1 | product.manage |
 | management_state_get_v1 | management.inspect |
 | instructor_agreements_list_v1 | earnings.manage |
-| reservation_impact_preview_v1 | reservation.protection.manage |
-| reservation_impact_apply_v1 | reservation.protection.manage |
 | settlement_movements_list_v1 | settlement.read |
 | settlement_requests_list_v1 | settlement.read |
 | settlement_request_get_v1 | settlement.read |

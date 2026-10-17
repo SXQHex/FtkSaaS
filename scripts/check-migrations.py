@@ -48,3 +48,7 @@ assert next(Path('supabase/migrations').glob('*_availability_policies.sql')).rea
 assert next(Path('supabase/migrations').glob('*_schedule_reads.sql')).read_text()==Path('database/schedule-reads.sql').read_text()+Path('database/schedule-reads-wrappers.sql').read_text(),'Schedule read source drift'
 
 assert next(Path('supabase/migrations').glob('*_program_session_lifecycle.sql')).read_text()==Path('database/program-session-lifecycle.sql').read_text()+Path('database/program-session-lifecycle-wrappers.sql').read_text(),'Program/session source drift'
+
+assert next(Path('supabase/migrations').glob('*_starter_attendance_protection.sql')).read_text()==Path('database/starter-attendance-protection.sql').read_text()+Path('database/starter-attendance-protection-wrappers.sql').read_text(),'Starter attendance source drift'
+
+assert next(Path('supabase/migrations').glob('*_starter_attendance_privacy_legacy.sql')).read_text()==Path('database/starter-attendance-privacy-legacy.sql').read_text(),'Starter privacy/legacy source drift'

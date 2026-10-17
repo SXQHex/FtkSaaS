@@ -1,0 +1,47 @@
+{
+  "baseline_sha": "5265a70a0d29f91b9081a1ecbc2a8f0ff78668ee",
+  "baseline_ci": "https://github.com/SXQHex/FtkSaaS/actions/runs/39030586306",
+  "source_binding": {
+    "kind": "sha256_of_runtime_and_acceptance_sources",
+    "files": {
+      "database/starter-attendance-protection.sql": "e927bc1c89cf99c20e6bab270693c81c56f5a1c4b4ec14e59c9d04cae39e5708",
+      "tests/starter-attendance-protection.test.mjs": "ab0a830e84aff2aee62a2bc06ea52adf5dfb6428965370df846d6bffc503b7c3",
+      "supabase/functions/backend-v1/handler.ts": "e52f055bd90874b043fa30f69ddc8dc36a50b48c19805b48d12685b0afd1cb5b"
+    },
+    "final_head_ci_review": "Bound externally in PR comment to final full SHA; no previous-SHA evidence transferred"
+  },
+  "structural_contract_checks": {
+    "command": "npm run verify",
+    "passed_tests": 93,
+    "runtime_behavior_evidence": false
+  },
+  "focused_auth_edge_rpc": {
+    "command": "node --test --test-concurrency=2 tests/api-acceptance.test.mjs tests/starter-attendance-protection.test.mjs",
+    "passed_tests": 60,
+    "existing_regression_tests": 41,
+    "new_acceptance_tests": 19,
+    "status": "passed"
+  },
+  "closed_ds_cases": [
+    "DS-PLAN-01"
+  ],
+  "other_ds_cases": "37 pending_runtime; broad protection, document, automatic start and paid financial behaviors not accepted",
+  "inventory": {
+    "registered_operations": 198,
+    "callable_operations": 89,
+    "contract_only_operations": 109,
+    "core_domain_tables": 90,
+    "private_technical_tables_added": 2,
+    "migrations": 26
+  },
+  "required_final_clean_ci": "npm run test:clean on final PR head; result/URL attached to same full SHA in PR",
+  "pending": [
+    "Pro/Business financial attendance closure and paid correction",
+    "automatic actual-start participation observation",
+    "mandatory-document lesson consumer",
+    "credit adjustment/sale scope/validity/freeze/termination protection consumers",
+    "settled deficit correction without actual allocation proof",
+    "legacy missing blocked-policy snapshot has no historical backfill",
+    "frontend integration/load/restore/production/Resend"
+  ]
+}
