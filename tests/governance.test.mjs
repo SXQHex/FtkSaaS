@@ -176,7 +176,7 @@ test('settlement proposal DTO freezes actual payment, explicit paired offset or 
  assert(!valid('Request_settlement_request_submit',{...r,proposal:{kind:'payment',lines:[line],amount_minor:'100'}}));
  assert(valid('Request_settlement_request_submit',{...r,proposal:{kind:'offset',debit_lines:[line],credit_lines:[{...line,movement_id:other}],amount_minor:'100'}}));
  assert(!valid('Request_settlement_request_submit',{...r,proposal:{kind:'offset',debit_lines:[line],amount_minor:'100'}}));
- assert(valid('Request_settlement_request_submit',{...r,proposal:{kind:'correction',original_record_id:id,expected_version:1,amount_minor:'100'}}));
+ assert(valid('Request_settlement_request_submit',{...r,proposal:{kind:'correction',original_record_id:id,expected_version:1,amount_minor:'100',allocations:[{allocation_id:id,expected_version:1,amount_minor:'100'}]}}));
  assert(!valid('Request_settlement_request_submit',{...r,recorder_role:'org_manager'}));
  assert(!valid('Request_settlement_request_submit',{...r,previous_id:other}));
  assert(valid('Request_settlement_request_submit',{...r,previous_id:other,previous_version:1}));
@@ -194,4 +194,15 @@ test('generic permission_set cannot provision reserved settlement authority or o
  const r={client_api_version:1,request_id:id,org_id:id,center_id:id,operation_key:id,expected_version:1,person_id:other,enabled:true};
  for(const permission of ['settlement.authority.manage','settlement.delegation.manage','settlement.request','settlement.decide','settlement.read'])assert(!valid('Request_permission_set',{...r,permission}));
  const p=structuredClone(original);p.$defs.Permission.enum.push('settlement.authority.manage');assert.throws(()=>validateGovernance(p,live),/GENERIC_PERMISSION_ESCALATION/);
+});
+
+test('partial correction names exact original allocations and exposes their reversible versioned scope',()=>{
+ const r={kind:'correction',original_record_id:id,expected_version:1,amount_minor:'100',allocations:[{allocation_id:other,expected_version:1,amount_minor:'100'}]};
+ assert(valid('SettlementCorrectionProposal',r));
+ const {allocations,...missing}=r;assert(!valid('SettlementCorrectionProposal',missing));
+ assert(!valid('SettlementCorrectionProposal',{...r,allocations:[{allocation_id:other,amount_minor:'100'}]}));
+ const p=structuredClone(original);p.$defs.SettlementCorrectionProposal.required=p.$defs.SettlementCorrectionProposal.required.filter(k=>k!=='allocations');
+ assert.throws(()=>validateGovernance(p,live),/CORRECTION_SELECTION_REQUIRED/);
+ const q=structuredClone(original);q.$defs.SettlementRecordAllocationView.required=q.$defs.SettlementRecordAllocationView.required.filter(k=>k!=='unreversed_minor');
+ assert.throws(()=>validateGovernance(q,live),/CORRECTION_ALLOCATION_READ/);
 });

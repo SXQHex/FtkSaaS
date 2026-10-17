@@ -92,3 +92,5 @@ Süre değişikliği etki önizlemesinde entitlement_extend / sale_id / end_date
 ## Son revizyon kanıtı
 
 Başlangıç PR head c1a479c72e98c5a53d949a1eb7e30e1abc6679a3 ve CI 39023254173 yalnız önceki kapsamın kanıtıdır. Son yetki/iki taraflı kesinleştirme revizyonu için yeni kaynak raporu reports/settlement-revision-verification.json; son SHA bağımsız incelemesi ve tek tam temiz CI kanıtı PR #13 konuşmasına ayrıca bağlanır. Tarihsel raporlar değiştirilmez.
+
+Kısmi bağlı düzeltme original_record_id/version yanında özgün allocation_id/version/tutar seçimlerini taşır. request_get finalized record içinde allocation kimliği, hareketi, payment/debit/credit tarafı, özgün tutarı ve güncel unreversed_minor/sürümü gösterir. Ödeme düzeltmesinde seçili toplam; mahsup terslemesinde iki özgün karşı tarafın her toplamı amount_minor ile eşit olmalıdır. Özgün kayıt üyeliği, tekrar etmeyen seçim ve kalan terslenebilir tutar commit içinde doğrulanır; dağıtım varsayılmaz ve eski ödeme geçmişi değişmez.

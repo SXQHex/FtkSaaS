@@ -1952,6 +1952,8 @@ ManagementSelector_settlement_delegation_set_v1?: ManagementSelectorSettlementDe
 ManagementProjection_settlement_delegation_set_v1?: ManagementProjectionSettlementDelegationSetV1
 ManagementSelector_settlement_authority_set_v1?: ManagementSelectorSettlementAuthoritySetV1
 ManagementProjection_settlement_authority_set_v1?: ManagementProjectionSettlementAuthoritySetV1
+SettlementCorrectionAllocation?: SettlementCorrectionAllocation
+SettlementRecordAllocationView?: SettlementRecordAllocationView
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -14885,6 +14887,22 @@ kind: "correction"
 original_record_id: string
 expected_version: PositiveInt
 amount_minor: PositiveMoney
+/**
+ * @minItems 1
+ */
+allocations: [SettlementCorrectionAllocation, ...(SettlementCorrectionAllocation)[]]
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "SettlementCorrectionAllocation".
+ */
+export interface SettlementCorrectionAllocation {
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+allocation_id: string
+expected_version: PositiveInt
+amount_minor: PositiveMoney
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -15067,6 +15085,28 @@ currency: Currency
 approved_by_account_id: string
 original_record_id: (string | null)
 created_at: Instant
+/**
+ * @minItems 1
+ */
+allocations: [SettlementRecordAllocationView, ...(SettlementRecordAllocationView)[]]
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "SettlementRecordAllocationView".
+ */
+export interface SettlementRecordAllocationView {
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+id: string
+version: PositiveInt
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+movement_id: string
+side: ("payment" | "debit" | "credit")
+amount_minor: PositiveMoney
+unreversed_minor: Money
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema

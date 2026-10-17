@@ -163,6 +163,12 @@ export function validateGovernance(p,implemented){
  assert.equal(d.Request_settlement_request_submit.properties.proposal.$ref,'#/$defs/SettlementProposal','MISSING_TYPED_PROPOSAL');
  equalSet(d.SettlementProposal.oneOf.map(v=>d[v.$ref.split('/').at(-1)].properties.kind.const),['payment','offset','correction'],'PROPOSAL_KINDS');
  assert(!d.Request_settlement_request_decide.properties.fallback,'UNAUTHORIZED_FALLBACK_INPUT');
+ assert(d.SettlementCorrectionProposal.required.includes('allocations'),'CORRECTION_SELECTION_REQUIRED');
+ assert.equal(d.SettlementCorrectionProposal.properties.allocations.items.$ref,'#/$defs/SettlementCorrectionAllocation','CORRECTION_SELECTION_TYPED');
+ for(const k of ['allocation_id','expected_version','amount_minor'])assert(d.SettlementCorrectionAllocation.required.includes(k),'CORRECTION_ALLOCATION_KEY '+k);
+ assert(d.SettlementRecordView.required.includes('allocations'),'CORRECTION_READ_PATH');
+ for(const k of ['id','version','movement_id','side','amount_minor','unreversed_minor'])assert(d.SettlementRecordAllocationView.required.includes(k),'CORRECTION_ALLOCATION_READ '+k);
+
  const decide=map.get('settlement_request_decide_v1');
  assert(decide.semantic_guards.includes('B_approval_finalizes_record_and_balances_atomic'),'B_APPROVAL_NOT_FINAL');
  assert(decide.semantic_guards.includes('rejection_reason_in_app_to_A_balance_unchanged'),'REJECTION_BALANCE_EFFECT');

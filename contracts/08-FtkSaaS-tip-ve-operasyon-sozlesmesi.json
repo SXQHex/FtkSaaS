@@ -38892,16 +38892,24 @@
         },
         "amount_minor": {
           "$ref": "#/$defs/PositiveMoney"
+        },
+        "allocations": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/SettlementCorrectionAllocation"
+          },
+          "minItems": 1
         }
       },
       "required": [
         "kind",
         "original_record_id",
         "expected_version",
-        "amount_minor"
+        "amount_minor",
+        "allocations"
       ],
       "additionalProperties": false,
-      "x-invariant": "Linked partial/full reversal of an existing finalized record, bounded by unreversed original amount and original currency/amount allocation. B acceptance appends reversal and residual refund/offset balance, never deletes payment history. Correction does not itself confirm a new cash payment."
+      "x-invariant": "Explicit original allocation selection, unique allocation_id, membership in original_record_id, current versions and each amount <= unreversed_minor. Payment correction selected sum equals amount_minor. Offset correction selects both original opposite sides; each side sums exactly amount_minor in the original same center pair/currency. No implied allocation or redistribution. B freezes/rechecks exact selections; linked reversal appends original recorded amounts and residual refund/offset balance, no payment history deletion or new cash receipt."
     },
     "SettlementProposal": {
       "oneOf": [
@@ -38957,6 +38965,13 @@
         },
         "created_at": {
           "$ref": "#/$defs/Instant"
+        },
+        "allocations": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/SettlementRecordAllocationView"
+          },
+          "minItems": 1
         }
       },
       "required": [
@@ -38968,10 +38983,11 @@
         "currency",
         "approved_by_account_id",
         "original_record_id",
-        "created_at"
+        "created_at",
+        "allocations"
       ],
       "additionalProperties": false,
-      "x-invariant": "Immutable record created only by B approval in the same transaction as selected balance changes. Payment occurred_at and frozen allocation details remain in the linked request proposal. Correction links original record; prior paid history retained."
+      "x-invariant": "Immutable record created only by B approval in the same transaction as selected balance changes. Payment occurred_at and frozen allocation details remain in the linked request proposal. Correction links original record; prior paid history retained. Original amounts/allocations are immutable; view version is current record correction-eligibility aggregate version, not permission to edit history. Read exposes per-allocation current reversible amount/version for explicit partial linked correction."
     },
     "SettlementCenterGrantView": {
       "type": "object",
@@ -39303,6 +39319,64 @@
         "values"
       ],
       "additionalProperties": false
+    },
+    "SettlementCorrectionAllocation": {
+      "type": "object",
+      "properties": {
+        "allocation_id": {
+          "$ref": "#/$defs/FtkUuid"
+        },
+        "expected_version": {
+          "$ref": "#/$defs/PositiveInt"
+        },
+        "amount_minor": {
+          "$ref": "#/$defs/PositiveMoney"
+        }
+      },
+      "required": [
+        "allocation_id",
+        "expected_version",
+        "amount_minor"
+      ],
+      "additionalProperties": false
+    },
+    "SettlementRecordAllocationView": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/FtkUuid"
+        },
+        "version": {
+          "$ref": "#/$defs/PositiveInt"
+        },
+        "movement_id": {
+          "$ref": "#/$defs/FtkUuid"
+        },
+        "side": {
+          "type": "string",
+          "enum": [
+            "payment",
+            "debit",
+            "credit"
+          ]
+        },
+        "amount_minor": {
+          "$ref": "#/$defs/PositiveMoney"
+        },
+        "unreversed_minor": {
+          "$ref": "#/$defs/Money"
+        }
+      },
+      "required": [
+        "id",
+        "version",
+        "movement_id",
+        "side",
+        "amount_minor",
+        "unreversed_minor"
+      ],
+      "additionalProperties": false,
+      "x-invariant": "Original allocation identity/movement/side/amount immutable; version and nonnegative unreversed_minor are current correction eligibility aggregate, updated atomically with linked corrections. Return via finalized request record read; no raw private table access."
     }
   },
   "x-contract": {
@@ -76753,6 +76827,24 @@
         "origin": "ftksaas",
         "acceptance": "generic_uuid",
         "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/SettlementCorrectionAllocation/properties/allocation_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/SettlementRecordAllocationView/properties/id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/SettlementRecordAllocationView/properties/movement_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
       }
     ],
     "open_product_decisions": [],
@@ -77373,7 +77465,7 @@
         {
           "id": "DS-SET-13",
           "delivery_gap": "cross_center_settlement",
-          "expected_flow": "Payment/offset/correction proposal is fully frozen and visible via request_get with request/movement/original-record versions. Partial sums and opposite same-currency offset sides are explicit; no third recording endpoint exists.",
+          "expected_flow": "Payment/offset/correction proposal is fully frozen and visible via request_get with request/movement/original-record versions. Partial sums and opposite same-currency offset sides are explicit; no third recording endpoint exists. Partial linked correction names original allocation IDs, current reversible versions/amounts; a multi-line payment reverses only selected allocations, an offset reversal selects balanced opposite original sides. No implicit distribution; late correction race rolls back both sides.",
           "status": "pending_runtime",
           "evidence_kind": "real_auth_edge_rpc",
           "evidence": []
