@@ -1,0 +1,37 @@
+{
+  "status": "implementation_pending_acceptance",
+  "base_main": "d0ff4efc3b2d578e9dd157ea46257309a31ef051",
+  "implementation_commit": "c8799fe",
+  "operations_added": [
+    "room_save_v1",
+    "roles_list_v1"
+  ],
+  "inventory": {
+    "contracts": 184,
+    "base_verified_callable": 63,
+    "branch_configured_callable": 65,
+    "remaining_unimplemented": 119
+  },
+  "migrations": 19,
+  "static": {
+    "checks": 21,
+    "contract_tests": 12,
+    "result": "passed"
+  },
+  "auth_api_acceptance": {
+    "status": "blocked_local_environment",
+    "test_file": "tests/room-role-registry.test.mjs",
+    "reason": "PostgreSQL archive download failed with DNS ETIMEOUT for GitHub and Supabase artifact fallback. Non-root daemon configuration resolved the root execution restriction; no DB/API tests executed."
+  },
+  "publication": {
+    "status": "blocked_by_automatic_approval_review",
+    "reason": "Explicit approval required to publish new source to the public SXQHex/FtkSaaS repository. No PR or CI created."
+  },
+  "limits": [
+    "Stored role assignments only; ownership remains the organization owner pointer.",
+    "Role list supports created_at_asc and live center scope.",
+    "Room capacities configure the room; existing event/session capacity snapshots are not rewritten.",
+    "Availability and policy operations remain contract-only.",
+    "Frontend, production and operational acceptance remain unchanged."
+  ]
+}

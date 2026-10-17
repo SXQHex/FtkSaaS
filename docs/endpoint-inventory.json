@@ -211,14 +211,16 @@
     },
     {
       "name": "room_save_v1",
-      "status": "contract_only",
-      "external_path": null,
+      "status": "operational_development_limited",
+      "external_path": "/functions/v1/backend-v1/room_save_v1",
       "permission": "center.manage",
       "features": [
         "F01"
       ],
       "billing_class": "config",
-      "limits": []
+      "limits": [
+        "Clean Auth/API acceptance pending on this branch; production acceptance remains open."
+      ]
     },
     {
       "name": "availability_save_v1",
@@ -266,15 +268,19 @@
     },
     {
       "name": "roles_list_v1",
-      "status": "contract_only",
-      "external_path": null,
+      "status": "operational_development_limited",
+      "external_path": "/functions/v1/backend-v1/roles_list_v1",
       "permission": "org.read",
       "features": [
         "F04",
         "F05"
       ],
       "billing_class": "read",
-      "limits": []
+      "limits": [
+        "Clean Auth/API acceptance pending on this branch; production acceptance remains open.",
+        "Lists stored role assignments; ownership is read from organization.owner_person_id, not synthesized as a role assignment.",
+        "Only created_at_asc sorting is supported; cursors bind actor and request scope; live permissions are rechecked."
+      ]
     },
     {
       "name": "role_assign_v1",
