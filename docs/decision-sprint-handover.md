@@ -2,7 +2,7 @@
 
 Başlangıç main: c231ab5526854ed62445613467649e1b0bf960bb; [aynı SHA CI](https://github.com/SXQHex/FtkSaaS/actions/runs/39010419849) başarılı: 25 migration, 241 test (12 sözleşme + 27 DB + 202 Auth/API). Bu geçmiş kanıt yeni PR'nin kabulü değildir.
 
-Kabul edilmiş karar/DTO/izin/guard aktarımı korunur. Son Starter teslimi dar runtime’ı ve 26–27. migration’ı ekler; frontend değişmez. 184 başlangıç işlemine toplam 14 yeni sözleşme adı eklenmiştir: 198 toplam, 89 canlı, 109 yalnız sözleşme. Ayrıntı ve açık tüketiciler Starter devrindedir. İşlem sayısı ürün tamamlanma oranı değildir.
+Kabul edilmiş karar/DTO/izin/guard aktarımı korunur. Son Starter teslimi dar runtime’ı ve 26–27. migration’ı ekler; frontend değişmez. 184 başlangıç işlemine toplam 14 yeni sözleşme adı eklenmiştir: 199 toplam, 95 canlı, 104 yalnız sözleşme; 28 migration. Anlaşma/hakediş ve açık fiilî başlangıç dar yolu güncel devirde tanımlıdır. Ayrıntı ve açık tüketiciler Starter devrindedir. İşlem sayısı ürün tamamlanma oranı değildir.
 
 ## Karar, aktarım, uygulama ve doğrulama ayrımı
 
@@ -10,16 +10,16 @@ Kabul edilmiş karar/DTO/izin/guard aktarımı korunur. Son Starter teslimi dar 
 |---|---|
 | Ürün kararı | [DS-2026-10-17 açık kullanıcı kararları](decisions/DS-2026-10-17.md) kabul edilmiş ve önceki çelişen hükümleri değiştirir |
 | Teknik aktarım | 01/02/06 yaşayan hükümler, 08 DTO/izin/guard/faz/sürüm/etki metaverisi, üretilmiş 04/05/envanter/ortak tipler |
-| Runtime | 89 endpoint/90 core tablo/27 migration. Starter için 10 işlem canlı; DS geniş davranışları ve diğer hedefler tamamlandı sayılmaz |
+| Runtime | 95 endpoint/90 core tablo/28 migration. Starter için 10 işlem canlı; DS geniş davranışları ve diğer hedefler tamamlandı sayılmaz |
 | Sözleşme/CI denetimi | Pozitif şema/tutarlılık ve kasıtlı bozmada gerçekten başarısız olan negatif governance testleri |
-| Gerçek davranış kabulü | Önceki 202 Auth/API testinin regresyonu korunur; DS-PLAN-01 gerçek Starter akışına bağlı; kalan 37 vaka pending_runtime, statik testten geçti çıkarımı yoktur |
+| Gerçek davranış kabulü | Önceki 202 Auth/API testinin regresyonu korunur; DS-PLAN-01 gerçek Starter; DS-PLAN-02 ve DS-AGR-01–05 gerçek anlaşma/hakediş akışına bağlı; kalan 31 vaka pending_runtime, statik testten geçti çıkarımı yoktur |
 | Son head ve merge | Son PR head incelemesi ve CI ayrıca doğrulanır; bu PR için yeni merge yetkisi varsayılmaz |
 
 ## Plan kapıları
 
-features özellik referansıdır; required_features hedef zorunlu kapı; conditional_features yalnız seçilen koşulun kapısıdır. runtime_required_features mevcut migration'ların fiilen kurduğu kapıdır; CI 89 işlem için permission/billing/feature metaverisini migration kaynağındaki son SQL kapı kaydıyla karşılaştırır; bu yapısal eşleme gerçek plan davranışı kabulü değildir. Hedef ile runtime farkları plan_gate_alignment teslimi olarak açıktır.
+features özellik referansıdır; required_features hedef zorunlu kapı; conditional_features yalnız seçilen koşulun kapısıdır. runtime_required_features mevcut migration'ların fiilen kurduğu kapıdır; CI 95 işlem için permission/billing/feature metaverisini migration kaynağındaki son SQL kapı kaydıyla karşılaştırır; bu yapısal eşleme gerçek plan davranışı kabulü değildir. Hedef ile runtime farkları plan_gate_alignment teslimi olarak açıktır.
 
-Starter F14 yoklama kapanışı/hak tüketimi anlaşma gerektirmez ve hakediş üretmez. Pro/Business ücretli görevlendirme/hakediş için açık geçerli anlaşma gerekir. F20 yalnız planın ücretli hakediş yolu seçildiğinde devreye girer. Starter seans/program doğrulayıcısı anlaşma gerektirmez; ders attendance_close Starter’da canlıdır ve gerçek API kabulüne bağlıdır. Ücretli plan finansal kapanışı ayrı anlaşma/hakediş motoruna kadar POLICY_NOT_CONFIGURED; etkinlik kapanışı bunun yerine kanıt sayılmaz.
+Starter F14 yoklama kapanışı/hak tüketimi anlaşma gerektirmez ve hakediş üretmez. Pro/Business ücretli görevlendirme/hakediş için açık geçerli anlaşma gerekir. F20 yalnız planın ücretli hakediş yolu seçildiğinde devreye girer. Starter seans/program doğrulayıcısı anlaşma gerektirmez; ders attendance_close Starter’da canlıdır ve gerçek API kabulüne bağlıdır. Ücretli kapanış explicit gerçekleşme/görev beyanı, immutable anlaşma ve donmuş değerlemeyle ders motorunda çalışır; etkinlik kapanışı bunun yerine kanıt sayılmaz. Ayrıntı: instructor-earnings-handover.md.
 
 Ürün, rezervasyon, sınıf, öğretmen değişimi, bildirim ve dosya/job işlemlerindeki çoklu özellik referansları da koşullara ayrıldı. Bu hedef eşleme mevcut canlı plan kapılarının değiştiği iddiası değildir.
 
@@ -27,7 +27,7 @@ Starter F14 yoklama kapanışı/hak tüketimi anlaşma gerektirmez ve hakediş �
 
 reservation_impact_preview/apply hedef çifti policy, negative_limit, credit_adjust, entitlement_extend ve sale_scope değişikliklerinin somut etkisini ve mevcut obligation kimliklerini taşır. Özgün değişiklik yetkisi (politikada policy.manage + hiyerarşi, hak/limitte ilgili merkez entitlement.correct) korunur; generic CM yetkisi org politikası yetkisine dönüşmez. Yetkili yönetici bütün etkilenen rezervasyonları açıkça onaylar; apply tam aynı listeyi ve güncel dependency/actor/scope'u doğrular. Aynı hak/ayrılmış açık tekrar kullanılmaz; mevcut açık silinmez, yeni hak yaratılmaz. Koruma katılım, kapanış ve hakediş değerlendirmesinde sürer. Yalnız değişiklik nedeniyle iptal/blocked/bildirim yoktur; yeni işlemler güncel hak/limit/mandatory upper kullanır. Kişisel limit default yerine geçer. Kaynak, uygunluk, belge ve bağımsız diğer engeller aşılmaz.
 
-Mevcut canlı policy_publish istek şeması korunur; yeni hedef onayı Target_policy_publish_protected ile ayrı tutulur. Böylece runtime'ın uygulamadığı bir approval alanını kabul ediyormuş gibi göstermeyiz. policy_publish mevcut haliyle DS etki onayını sağlamaz. negative_limit_set/credit_adjust/entitlement_extend sözleşmeleri impact_approval ister; bunlar zaten contract_only'dir. Freeze, non-financial change ve terminate hedefleri korunan yükümlülükleri sessiz silmez; rezervasyon iptali ayrı açık merkez müdahalesidir.
+policy_publish ve negative_limit_set, mevcut kesin rezervasyonlar için gerçek etki/onay akışını uygular. credit_adjust/entitlement_extend ve diğer hak değişikliği tüketicileri contract_only kalır. Freeze, non-financial change ve terminate hedefleri korunan yükümlülükleri sessiz silmez; rezervasyon iptali ayrı açık merkez müdahalesidir.
 
 Açık merkez iptalinde ayrılmış hak/açık serbest bırakılır ve kabul edilmiş iade/düzeltmeler uygulanır. Gerekçeli müdahale uygulama içi bildirilir. Tahsilat kredi üretmez. Hak işlemi geçmiş tüketilmiş açığı, sonra gelecek rezervasyon açığını mevcut kararlı sıra/kapsamla karşılar.
 
@@ -39,7 +39,7 @@ instructor_agreement_publish hedef DTO'su açık valid başlangıcı, reason, su
 
 PayTerms paket özel koşulu product_id kimliğine bağlar; product_version/sale kimliğine bağlayıp eski satışları dışarı atmaz. Paket özel bileşen genel aynı bileşenin yerine geçer. Seans sabiti kişi/paket sayısıyla çoğalmaz. Belirsiz/çakışan bileşen seçimi yayımlama öncesi açık koşulla çözülmelidir; otomatik en yüksek/düşük ücret seçimi icat edilmez. Gerçek satış bedeli ve rezervasyonun source-less negative değerlemesi korunur. Süreli/sınırsız için sabit ücret temel tercih olarak sunulur ama tutar açık onaylıdır; değişken bileşen açık seçimdir, kârlılık garantisi yoktur.
 
-instructor_agreements_list hedef okuması zincir/sürümleri sağlar. Immutable predecessor, fiilî başlangıç/başlangıç snapshot'ı ve ücret seçimi depolaması/runtime'ı ayrı bağımlılıktır; olay başlangıç API'sinin varlığı ders başlangıç snapshot'ının üretildiği kanıtı değildir.
+instructor_agreements_list zincir/sürümleri okur. Immutable predecessor, attendance_start_v1 açık fiilî başlangıç kimlik snapshot'ı, ücret seçimi ve bağlı kapanış/düzeltme uygulanmıştır. Otomatik gözlem tüketicisi yoktur; olay başlangıç API'si ders yerine kullanılmaz.
 
 ## Merkezler arası hesaplaşma — ayrı runtime teslimi
 

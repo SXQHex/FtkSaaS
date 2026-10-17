@@ -1,8 +1,14 @@
+# Eğitmen anlaşması ve hakediş — güncel geliştirme kapsamı
+
+Başlangıç main: `ab3fca4af47b71b34a4a7b6d0df5211ad1e41141`; [aynı SHA CI](https://github.com/SXQHex/FtkSaaS/actions/runs/39042108296) başarılı: 27 migration, 341 test. Yeni kaynak için önceki başarı taşınmaz; son head inceleme/temiz CI ve merge main CI ayrıca doğrulanır.
+
+199 sözleşme, 95 çağrılabilir, 104 contract-only; 90 core tablo, 28 append-only migration. [Güncel anlaşma/hakediş devri](instructor-earnings-handover.md) yeni akışı ve sınırları tanımlar. Eğitmen ödeme komutları ve merkezler arası hesaplaşma runtime'ı bu teslim değildir. Önceki snapshot sayıları aşağıda tarihsel bağlamdır.
+
 # Kalan backend işleri
 
 ## Starter yoklama/koruma teslimi — güncel kapsam
 
-[Starter devri](starter-attendance-protection-handover.md) zorunlu bağımlılıkları ve kalan tüketicileri tanımlar. 198 işlem / 89 canlı / 109 contract-only; 90 core tablo / 27 migration. Starter program → rezervasyon → etki/onay → korunan katılım → kapanış → gerekçeli düzeltme uygulanır. Ücretli finansal kapanış açıkça kapalı; başlangıç/belge ve diğer hak değişikliği tüketicileri pending. Son SHA’nın kanıtı PR’dedir; eski başarı taşınmaz.
+[Starter devri](starter-attendance-protection-handover.md) zorunlu bağımlılıkları ve kalan tüketicileri tanımlar. 198 işlem / 89 canlı / 109 contract-only; 90 core tablo / 27 migration. Starter program → rezervasyon → etki/onay → korunan katılım → kapanış → gerekçeli düzeltme uygulanır. Bu önceki Starter snapshot’ında ücretli finansal kapanış kapalıydı; güncel uygulama yukarıdaki anlaşma/hakediş devrindedir; başlangıç/belge ve diğer hak değişikliği tüketicileri pending. Son SHA’nın kanıtı PR’dedir; eski başarı taşınmaz.
 
 Güncel geliştirme kapsamı: **89 çağrılabilir / 109 yalnız sözleşme**, 27 migration. [Takvim/seans/rezervasyon okuma devri](schedule-read-handover.md) üç okumanın yetki, UTC filtre ve cursor sınırlarını belirtir. Ürün okuması katalog sözleşmesiyle uygun satın alınmış hak seçimini karşılamaz; seans/kişi/sale bağlamı ve DTO aktarımı ayrı teslimdir. [Program/seans devri](program-session-handover.md) uygulanmış akış ve kalan anlaşma/entegrasyon sınırlarını açıklar. Son head CI bağımsız doğrulanır. Aşağıdaki PR #8 başlangıcı tarihsel kanıttır.
 
@@ -16,11 +22,11 @@ Uzak geliştirme/test Auth → Edge → RPC smoke [ayrı rapordadır](../reports
 
 1. Karar/DTO/izin/guard/sürüm-okuma aktarımı ve F01–F33 yapısal denetimleri korundu; gerçek davranış kanıtı ayrı izlenir.
 2. Starter yoklama/hak kapanışı, politika/kişisel limit etkisi/onayı uygulandı. Otomatik başlangıç, belge ve diğer hak değişikliği tüketicileri açık.
-3. Immutable anlaşma zinciri, yürürlük/başlamış seans snapshot’ı, ürün kimliği override ve mükerrer olmayan hakediş; gerçek Auth→Edge→RPC kabul.
+3. Immutable anlaşma/hakediş ve dar gerçek başlangıç yolu uygulandı; son kaynak kabulü/inceleme/CI PR kanıtıyla değerlendirilir. Ödeme komutları açık.
 4. Ayrı merkezler arası ledger, Owner/delege OM grant zinciri ve B onayında atomik ödeme/mahsup/bağlı düzeltme kesinleştirmesi. DS-OPEN-01 karar düzeyinde kapalı; DS-OPEN-02 son merkez yetki kararıyla karar düzeyinde kapalı; aynı hesap A/B yetkileri ayrı doğrulanarak iki adımı yapabilir. Fiziksel depolama/RPC/read/izolasyon ve adım kapsamlı audit bağımlılıkları açık.
 5. Satış kapsam snapshot/değişim, gerekçeli backdate ve geçmiş açık kapatma; yeni ürün davranışı uydurulmadan uçtan uca kabul.
 
-Hedef plan/koruma/anlaşma farkları 08 delivery_gaps içinde açıktır. [38 DS davranış senaryosu: 1 kanıtlı Starter, 37 pending](decision-sprint-handover.md) statik testten geçmiş kabul edilmez. [Main koruması](branch-protection-review.md) klasik API 403 nedeniyle doğrulanamıyor; gerekli yönetici ayarları teslim edilir, uygulanmış sayılmaz.
+Hedef plan/koruma/anlaşma farkları 08 delivery_gaps içinde açıktır. [38 DS davranış senaryosu: 7 kanıtlı, 31 pending](decision-sprint-handover.md) statik testten geçmiş kabul edilmez. [Main koruması](branch-protection-review.md) klasik API 403 nedeniyle doğrulanamıyor; gerekli yönetici ayarları teslim edilir, uygulanmış sayılmaz.
 
 ## Bağımlılık sırası
 
@@ -33,7 +39,7 @@ Hedef plan/koruma/anlaşma farkları 08 delivery_gaps içinde açıktır. [38 DS
 
 Her yeni grup: sözleşme/izin incelemesi → yeni migration → gerçek Auth/API kabulü (sınır, yetki, tekrar, yarış, rollback) → inceleme → temiz CI → main CI. Ürün kararında boşluk varsa teknik varsayımla yeni kural eklenmez.
 
-## Yalnız sözleşme envanteri — güncel 109 işlem
+## Yalnız sözleşme envanteri — güncel 104 işlem
 
 | Modül | Kalan işlem |
 |---|---:|
@@ -42,15 +48,15 @@ Her yeni grup: sözleşme/izin incelemesi → yeni migration → gerçek Auth/AP
 | M03 | 3 |
 | M04 | 12 |
 | M05 | 3 |
-| M06 | 14 |
+| M06 | 13 |
 | M07 | 14 |
-| M08 | 5 |
+| M08 | 2 |
 | M09 | 11 |
 | M10 | 3 |
 | M11 | 3 |
 | M12 | 5 |
 | M14 | 5 |
-| X | 19 |
+| X | 18 |
 
 | İşlem | İzin |
 |---|---|
@@ -100,8 +106,6 @@ Her yeni grup: sözleşme/izin incelemesi → yeni migration → gerçek Auth/AP
 | finance_get_v1 | finance.read |
 | collection_correct_preview_v1 | finance.refund |
 | collection_correct_apply_v1 | finance.refund |
-| instructor_agreement_publish_v1 | earnings.manage |
-| earnings_list_v1 | earnings.read |
 | instructor_payment_record_v1 | earnings.manage |
 | instructor_payment_correct_v1 | earnings.manage |
 | leads_list_v1 | crm.daily |
@@ -151,9 +155,6 @@ Her yeni grup: sözleşme/izin incelemesi → yeni migration → gerçek Auth/AP
 | privacy_execute_v1 | system.worker |
 | subscription_boundary_apply_v1 | system.worker |
 | file_upload_complete_v1 | account.self |
-| negcredit_valuation_set_v1 | product.manage |
-| management_state_get_v1 | management.inspect |
-| instructor_agreements_list_v1 | earnings.manage |
 | settlement_movements_list_v1 | settlement.read |
 | settlement_requests_list_v1 | settlement.read |
 | settlement_request_get_v1 | settlement.read |

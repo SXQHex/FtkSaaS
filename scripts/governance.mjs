@@ -41,7 +41,7 @@ export function validateGovernance(p,implemented){
   else if(!['auth','worker'].includes(k.kind)){
    assert(map.has(k.read_operation),'WRITE_WITHOUT_READ '+o.name);
    const read=map.get(k.read_operation);assert(['read','preview'].includes(read.operation_contract.kind),'WRITE_READ_IS_WRITE '+o.name);
-   assert.equal(k.read_path_status,live.has(read.name)?'implemented':'contract_only','FALSE_READ_AVAILABILITY '+o.name);
+   assert.equal(k.read_path_status,live.has(read.name)&&(read.name!=='management_state_get_v1'||read.runtime_selectors?.includes(o.name))?'implemented':'contract_only','FALSE_READ_AVAILABILITY '+o.name);
    if(k.version_mode==='row_version')assert(props.expected_version&&q.required.includes('expected_version'),'MISSING_ROW_VERSION '+o.name);
    if(k.version_mode==='create_absent_update_requires_version')assert(props.expected_version,'MISSING_OPTIONAL_VERSION '+o.name);
    if(k.version_field)assert(props[k.version_field]||['account_id','org_id','center_id'].includes(k.version_field),'VERSION_FIELD_NOT_READABLE '+o.name);
@@ -51,9 +51,10 @@ export function validateGovernance(p,implemented){
  for(const f of Object.keys(features)){
   const row=features[f];equalSet(row.technical_operations,ops.filter(o=>o.features.includes(f)).map(o=>o.name),'FEATURE_OPERATION_LINK '+f);
   equalSet(row.dependencies,ops.filter(o=>o.features.includes(f)).flatMap(o=>o.decision_delivery.open_dependencies),'FEATURE_DEPENDENCY_LINK '+f);
+  equalSet(row.completed_dependencies??[],ops.filter(o=>o.features.includes(f)).flatMap(o=>o.decision_delivery.completed_dependencies??[]),'FEATURE_COMPLETED_DEPENDENCY_LINK '+f);
   assert(row.decision&&row.owner,'FEATURE_TRACE '+f);
   assert.equal(row.acceptance,'pending_feature_acceptance','FALSE_FEATURE_COMPLETION '+f);
-  equalSet(row.acceptance_case_ids,x.decision_sprint.acceptance_cases.filter(v=>row.dependencies.includes(v.delivery_gap)).map(v=>v.id),'FEATURE_CASE_LINK '+f);
+  equalSet(row.acceptance_case_ids,x.decision_sprint.acceptance_cases.filter(v=>[...row.dependencies,...(row.completed_dependencies??[])].includes(v.delivery_gap)).map(v=>v.id),'FEATURE_CASE_LINK '+f);
   assert.deepEqual(Object.keys(row.plans).sort(),['business','pro','starter'],'PLAN_MATRIX '+f);
  }
  assert.equal(features.F14.plans.starter,true,'STARTER_F14');
@@ -74,6 +75,11 @@ export function validateGovernance(p,implemented){
    assert.equal(v.evidence.length,3,'FAKE_CASE_EVIDENCE '+v.id);
    for(const e of v.evidence){assert(e.startsWith('tests/starter-attendance-protection.test.mjs#'),'FAKE_CASE_EVIDENCE '+v.id);assert(fs.readFileSync(e.split('#')[0],'utf8').includes(e.split('#')[1]),'MISSING_RUNTIME_CASE '+v.id);}
    for(const n of ['attendance_get_v1','attendance_mark_v1','attendance_close_v1','attendance_correct_preview_v1','attendance_correct_apply_v1'])assert(live.has(n),'FALSE_BEHAVIOR_PASS '+v.id);
+  }else if(['DS-PLAN-02','DS-AGR-01','DS-AGR-02','DS-AGR-03','DS-AGR-04','DS-AGR-05'].includes(v.id)){
+   assert.equal(v.status,'passed_runtime','FALSE_BEHAVIOR_PASS '+v.id);
+   assert(v.evidence.length>0,'FAKE_CASE_EVIDENCE '+v.id);
+   for(const e of v.evidence){assert(e.startsWith('tests/instructor-earnings.test.mjs#'),'FAKE_CASE_EVIDENCE '+v.id);assert(fs.readFileSync(e.split('#')[0],'utf8').includes(e.split('#')[1]),'MISSING_RUNTIME_CASE '+v.id);}
+   for(const n of ['instructor_agreement_publish_v1','instructor_agreements_list_v1','attendance_start_v1','earnings_list_v1'])assert(live.has(n),'FALSE_BEHAVIOR_PASS '+v.id);
   }else{
    assert.equal(v.status,'pending_runtime','FALSE_BEHAVIOR_PASS '+v.id);
    assert.equal(v.evidence.length,0,'FAKE_CASE_EVIDENCE '+v.id);
@@ -86,6 +92,11 @@ export function validateGovernance(p,implemented){
  for(const k of requiredTrue)assert.equal(ds.protected_reservations[k],true,'PROTECTION_RULE '+k);
  assert.equal(ds.protected_reservations.cash_mints_credit,false,'CASH_IS_NOT_CREDIT');
  assert.deepEqual(ds.starter_closure,{required_features:['F14'],rights_consumption:true,agreement_required:false,produces_earning:false},'STARTER_CLOSURE');
+ for(const n of ['attendance_close_v1','attendance_correct_preview_v1','attendance_correct_apply_v1']){
+  const o=map.get(n);assert.equal(o.decision_delivery.runtime_conformance,'starter_and_paid_agreement_runtime','PAID_RUNTIME_CONFORMANCE '+n);
+  assert(!o.runtime_limits.some(v=>v.includes('paid F20 engine returns POLICY_NOT_CONFIGURED')),'PAID_RUNTIME_LIMIT '+n);
+  if(o.operation_contract.runtime_outcomes)assert.equal(o.operation_contract.runtime_outcomes.pro_business_closure,'explicit_performance_frozen_agreement_rights_earning_audit_outbox_receipt_atomic','PAID_RUNTIME_OUTCOME '+n);
+ }
  for(const k of ['immutable_published_terms','explicit_supersedes_chain','reject_independent_overlap','effective_start_inclusive','started_session_pinned','product_identity_override_replaces_general','actual_sale_price','session_fixed_once','source_less_negative_general_snapshot','timed_fixed_offered_with_explicit_amount','variable_components_opt_in'])assert.equal(ds.agreements[k],true,'AGREEMENT_RULE '+k);
  assert.equal(ds.agreements.closed_earning_reprice,false,'HISTORICAL_EARNING_REPRICE');
  assert.equal(ds.agreements.profit_guarantee,false,'PROFIT_GUARANTEE');
@@ -133,10 +144,12 @@ export function validateGovernance(p,implemented){
  assert.equal(d.Success_management_state_get.properties.data.$ref,'#/$defs/ManagementStatePage','MANAGEMENT_PAGE_VERSION_READ');
 
  for(const gap of ds.delivery_gaps){
-  assert.equal(gap.status,'pending_runtime_and_auth_edge_rpc_acceptance','NO_FALSE_DS_ACCEPTANCE '+gap.id);
+  const passed=['starter_plan_and_earning_split','agreement_versions_and_selection'].includes(gap.id);
+  assert.equal(gap.status,passed?'passed_runtime':'pending_runtime_and_auth_edge_rpc_acceptance','NO_FALSE_DS_ACCEPTANCE '+gap.id);
   assert.equal(gap.acceptance_kind,'real_auth_edge_rpc','WRONG_ACCEPTANCE_KIND');
-  assert.equal(gap.evidence.length,0,'NO_SYNTHETIC_BEHAVIOR_EVIDENCE');
-  for(const n of gap.operations)assert(map.has(n)&&map.get(n).decision_delivery.open_dependencies.includes(gap.id),'GAP_OPERATION_LINK '+n);
+  if(passed){const cases=ds.acceptance_cases.filter(v=>v.delivery_gap===gap.id);assert(cases.length&&cases.every(v=>v.status==='passed_runtime'),'NO_FALSE_DS_ACCEPTANCE '+gap.id);equalSet(gap.evidence,cases.flatMap(v=>v.evidence),'GAP_EVIDENCE_COVERAGE '+gap.id);}
+  else assert.equal(gap.evidence.length,0,'NO_SYNTHETIC_BEHAVIOR_EVIDENCE');
+  for(const n of gap.operations)assert(map.has(n)&&[...map.get(n).decision_delivery.open_dependencies,...(map.get(n).decision_delivery.completed_dependencies??[])].includes(gap.id),'GAP_OPERATION_LINK '+n);
  }
  assert(ds.closed_product_choices.some(v=>v.id==='DS-OPEN-01'&&v.status==='accepted_contract_runtime_pending'),'GRANTOR_DECISION_NOT_CLOSED');
  assert(!ds.open_product_choices.some(v=>v.id==='DS-OPEN-01'),'GRANTOR_STILL_OPEN');

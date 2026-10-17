@@ -88,6 +88,12 @@
     "attendance_block_v1",
     "attendance_close_v1",
     "attendance_correct_preview_v1",
-    "attendance_correct_apply_v1"
+    "attendance_correct_apply_v1",
+    "instructor_agreement_publish_v1",
+    "instructor_agreements_list_v1",
+    "earnings_list_v1",
+    "negcredit_valuation_set_v1",
+    "management_state_get_v1",
+    "attendance_start_v1"
   ]
 }

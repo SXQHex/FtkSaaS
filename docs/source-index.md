@@ -15,7 +15,7 @@ Repository’nin güncel dalı `main`dir. Başlarken GitHub main SHA’sını ve
 | 7 | [03 sorumluluklar](../contracts/03-FtkSaaS-kodlama-sorumluluklari.md) | Backend/frontend alan sahipliği; güncel çalışma düzeni kök AGENTS’ta |
 | 8 | [04 şema](../contracts/04-FtkSaaS-O4-veri-semasi.md), [05 API](../contracts/05-FtkSaaS-O4-API-katalogu.md), [06 durum/hata/izin](../contracts/06-FtkSaaS-O4-durum-hata-izin.md) | Fiziksel/API sözlükleri; kesin DDL supabase/migrations, işlem tipleri 08 |
 | 9 | [08 makine sözleşmesi](../contracts/08-FtkSaaS-tip-ve-operasyon-sozlesmesi.json) | Tipler, işlem/izin/guard ve implementation_status; katalog varlığı runtime kabulü değildir |
-| 10 | [Endpoint envanteri](endpoint-inventory.json), [runtime listesi](../supabase/functions/backend-v1/implemented.json) | Üretilmiş 198 işlem envanteri ve 89 çağrılabilir işlem; 109 contract_only |
+| 10 | [Endpoint envanteri](endpoint-inventory.json), [runtime listesi](../supabase/functions/backend-v1/implemented.json) | Üretilmiş 199 işlem envanteri ve 95 çağrılabilir işlem; 104 contract_only |
 
 ## Kabul edilmiş kararlar
 
@@ -45,3 +45,5 @@ Her uygulama PR’si etkilediği sözleşmeleri, envanteri, kalan işleri ve dev
 [Son hesaplaşma yetki/iki taraflı akış kararı](decisions/DS-2026-10-17-settlement-revision.md) önceki OM kayıt/fallback hükümlerini değiştirir. DS-OPEN-01 karar düzeyinde kapalı; DS-OPEN-02 [son merkez bazlı yetki kararıyla](decisions/DS-2026-10-17-settlement-center-scope.md) karar düzeyinde kapalıdır. Aynı hesap ayrı A/B yetkileriyle başvuru/onay yapabilir; farklı hesap şartı ve fallback yoktur. Üç contract-only üçüncü-aşama/düzeltme uç çıkarıldı, üç authority read/set sözleşmesi eklendi; toplam 197/79/118 aynı kaldı. Son revizyon raporu: reports/settlement-center-scope-verification.json; eski SHA raporu/CI yeni head kabulü değildir.
 
 [Starter yoklama/koruma devri](starter-attendance-protection-handover.md) yeni runtime sınırını belirtir.
+
+[Anlaşma/hakediş devri](instructor-earnings-handover.md) immutable ücret zinciri, açık fiilî başlangıç kaydı, Pro/Business kapanışı, frozen değerleme ve bağlı düzeltmeyi tanımlar. Son head/merge CI ayrıca doğrulanır; ödeme ve merkezler arası hesaplaşma ayrı teslimdir.

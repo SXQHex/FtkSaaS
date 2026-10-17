@@ -12,6 +12,8 @@ const op=(p,n)=>p['x-contract'].operations.find(o=>o.name===n);
 const ds=p=>p['x-contract'].decision_sprint;
 test('contract governance validates current target, not future runtime behavior',()=>assert.equal(validateGovernance(original,live).decision_behavior_acceptance,'pending'));
 const mutations=[
+ ['paid closure advertises unavailable after runtime acceptance',p=>op(p,'attendance_close_v1').operation_contract.runtime_outcomes.pro_business_closure='POLICY_NOT_CONFIGURED_before_domain_mutation'],
+ ['paid correction still claims Starter-only conformance',p=>op(p,'attendance_correct_apply_v1').decision_delivery.runtime_conformance='starter_runtime_limited_paid_path_pending'],
  ['missing operation enum name',p=>p.$defs.OperationName.enum.pop()],
  ['duplicate operation enum name',p=>p.$defs.OperationName.enum.push(p.$defs.OperationName.enum[0])],
  ['status accepts free operation text',p=>p.$defs.Request_operation_status_get.properties.operation={$ref:'#/$defs/Text'}],
@@ -87,7 +89,7 @@ test('B decision is a closed DTO; frozen proposal cannot be replaced by approval
 
 test('declared runtime gates must match actually applied migration SQL, not target references',()=>{
  const p=structuredClone(original);
- assert.equal(validateAppliedGates(p,live),89);
+ assert.equal(validateAppliedGates(p,live),95);
  op(p,'class_save_v1').runtime_required_features=['F10','F11'];
  assert.throws(()=>validateAppliedGates(p,live),/APPLIED_FEATURE_GATE_DRIFT/);
 });

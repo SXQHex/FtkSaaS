@@ -1,10 +1,10 @@
 {
   "contract": "2.2-tech.4-decision-sprint",
   "tables": 90,
-  "operations": 198,
-  "definitions": 1084,
-  "uuid_paths": 2182,
-  "references": 5056,
+  "operations": 199,
+  "definitions": 1093,
+  "uuid_paths": 2205,
+  "references": 5112,
   "checks": [
     {
       "name": "JSON Schema 2020-12 meta-schema",
