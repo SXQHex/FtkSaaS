@@ -1,3 +1,5 @@
+> Sonraki Starter uyarlaması: [Starter devri](starter-attendance-protection-handover.md). Aşağıdaki 79/105 ve tüm-plan anlaşma sınırı kendi önceki kaynak snapshot’ıdır.
+
 > DS-2026-10-17 kabulü plan/anlaşma ve korunan rezervasyon hedefini değiştirir. Bu dosya önceki runtime kapsamını anlatır; yeni hedef ve açık farklar [sprint devrinde](decision-sprint-handover.md).
 
 # Program ve gelecek seans değişiklikleri

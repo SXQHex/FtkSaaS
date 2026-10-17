@@ -63,14 +63,21 @@ export function validateGovernance(p,implemented){
  }
  const ds=x.decision_sprint;
  assert.equal(ds.baseline_operation_count,184,'BASELINE_REGISTRY_COUNT');
- equalSet(ops.filter(o=>!ds.new_contract_only_operations.includes(o.name)).map(o=>o.name),d.OperationName.enum.filter(n=>!ds.new_contract_only_operations.includes(n)),'LEGACY_OPERATION_COVERAGE');
- assert.equal(ops.length,184+ds.new_contract_only_operations.length,'REGISTRY_COUNT');
+ equalSet(ops.filter(o=>!ds.introduced_operations.includes(o.name)).map(o=>o.name),d.OperationName.enum.filter(n=>!ds.introduced_operations.includes(n)),'LEGACY_OPERATION_COVERAGE');
+ assert.equal(ops.length,184+ds.introduced_operations.length,'REGISTRY_COUNT');
  for(const n of ds.new_contract_only_operations)assert(!live.has(n),'UNIMPLEMENTED_PROMOTED '+n);
  assert.equal(new Set(ds.acceptance_cases.map(v=>v.id)).size,ds.acceptance_cases.length,'DUPLICATE_ACCEPTANCE_CASE');
  for(const v of ds.acceptance_cases){
-  assert.equal(v.status,'pending_runtime','FALSE_BEHAVIOR_PASS '+v.id);
   assert.equal(v.evidence_kind,'real_auth_edge_rpc','CASE_EVIDENCE_KIND '+v.id);
-  assert.equal(v.evidence.length,0,'FAKE_CASE_EVIDENCE '+v.id);
+  if(v.id==='DS-PLAN-01'){
+   assert.equal(v.status,'passed_runtime','FALSE_BEHAVIOR_PASS '+v.id);
+   assert.equal(v.evidence.length,3,'FAKE_CASE_EVIDENCE '+v.id);
+   for(const e of v.evidence){assert(e.startsWith('tests/starter-attendance-protection.test.mjs#'),'FAKE_CASE_EVIDENCE '+v.id);assert(fs.readFileSync(e.split('#')[0],'utf8').includes(e.split('#')[1]),'MISSING_RUNTIME_CASE '+v.id);}
+   for(const n of ['attendance_get_v1','attendance_mark_v1','attendance_close_v1','attendance_correct_preview_v1','attendance_correct_apply_v1'])assert(live.has(n),'FALSE_BEHAVIOR_PASS '+v.id);
+  }else{
+   assert.equal(v.status,'pending_runtime','FALSE_BEHAVIOR_PASS '+v.id);
+   assert.equal(v.evidence.length,0,'FAKE_CASE_EVIDENCE '+v.id);
+  }
   assert(ds.delivery_gaps.some(g=>g.id===v.delivery_gap),'CASE_GAP_MISSING '+v.id);
  }
  for(const g of ds.delivery_gaps)assert(ds.acceptance_cases.some(v=>v.delivery_gap===g.id),'UNTESTED_DELIVERY_GAP '+g.id);

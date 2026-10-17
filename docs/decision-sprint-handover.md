@@ -2,7 +2,7 @@
 
 Başlangıç main: c231ab5526854ed62445613467649e1b0bf960bb; [aynı SHA CI](https://github.com/SXQHex/FtkSaaS/actions/runs/39010419849) başarılı: 25 migration, 241 test (12 sözleşme + 27 DB + 202 Auth/API). Bu geçmiş kanıt yeni PR'nin kabulü değildir.
 
-Bu PR ürün kararlarını, DTO/izin/guard/okuma-yazma bağımlılıklarını ve denetimleri aktarır. Yeni iş akışı runtime'ı, fiziksel tablo/migration ve frontend eklemez. 184 mevcut işlem korunur; OperationName eksik 10 adı tamamlayıp gerçek kayıt/audit adlarıyla aynı tam _v1 isimlerini kullanır. 13 yeni işlem yalnız sözleşmedir: toplam 197, çağrılabilir 79, yalnız sözleşme 118. İşlem sayısı ürün tamamlanma oranı değildir.
+Kabul edilmiş karar/DTO/izin/guard aktarımı korunur. Son Starter teslimi dar runtime’ı ve 26. migration’ı ekler; frontend değişmez. 184 başlangıç işlemine toplam 14 yeni sözleşme adı eklenmiştir: 198 toplam, 89 canlı, 109 yalnız sözleşme. Ayrıntı ve açık tüketiciler Starter devrindedir. İşlem sayısı ürün tamamlanma oranı değildir.
 
 ## Karar, aktarım, uygulama ve doğrulama ayrımı
 
@@ -10,16 +10,16 @@ Bu PR ürün kararlarını, DTO/izin/guard/okuma-yazma bağımlılıklarını ve
 |---|---|
 | Ürün kararı | [DS-2026-10-17 açık kullanıcı kararları](decisions/DS-2026-10-17.md) kabul edilmiş ve önceki çelişen hükümleri değiştirir |
 | Teknik aktarım | 01/02/06 yaşayan hükümler, 08 DTO/izin/guard/faz/sürüm/etki metaverisi, üretilmiş 04/05/envanter/ortak tipler |
-| Runtime | Önceki 79 endpoint/90 tablo/25 migration. 13 yeni hedef endpoint gateway runtime listesine eklenmez; NOT_FOUND kalır. Yeni DS hedefleri tamamlandı sayılmaz |
+| Runtime | 89 endpoint/90 core tablo/26 migration. Starter için 10 işlem canlı; DS geniş davranışları ve diğer hedefler tamamlandı sayılmaz |
 | Sözleşme/CI denetimi | Pozitif şema/tutarlılık ve kasıtlı bozmada gerçekten başarısız olan negatif governance testleri |
-| Gerçek davranış kabulü | Önceki 202 Auth/API testinin regresyonu korunur; DS kabul kataloğundaki yeni akışlar pending_runtime, statik testten geçti çıkarımı yoktur |
+| Gerçek davranış kabulü | Önceki 202 Auth/API testinin regresyonu korunur; DS-PLAN-01 gerçek Starter akışına bağlı; kalan 37 vaka pending_runtime, statik testten geçti çıkarımı yoktur |
 | Son head ve merge | Son PR head incelemesi ve CI ayrıca doğrulanır; bu PR için yeni merge yetkisi varsayılmaz |
 
 ## Plan kapıları
 
-features özellik referansıdır; required_features hedef zorunlu kapı; conditional_features yalnız seçilen koşulun kapısıdır. runtime_required_features mevcut migration'ların fiilen kurduğu kapıdır; CI 79 işlem için permission/billing/feature metaverisini migration kaynağındaki son SQL kapı kaydıyla karşılaştırır; bu yapısal eşleme gerçek plan davranışı kabulü değildir. Hedef ile runtime farkları plan_gate_alignment teslimi olarak açıktır.
+features özellik referansıdır; required_features hedef zorunlu kapı; conditional_features yalnız seçilen koşulun kapısıdır. runtime_required_features mevcut migration'ların fiilen kurduğu kapıdır; CI 89 işlem için permission/billing/feature metaverisini migration kaynağındaki son SQL kapı kaydıyla karşılaştırır; bu yapısal eşleme gerçek plan davranışı kabulü değildir. Hedef ile runtime farkları plan_gate_alignment teslimi olarak açıktır.
 
-Starter F14 yoklama kapanışı/hak tüketimi anlaşma gerektirmez ve hakediş üretmez. Pro/Business ücretli görevlendirme/hakediş için açık geçerli anlaşma gerekir. F20 yalnız planın ücretli hakediş yolu seçildiğinde devreye girer. Mevcut seans/program yazma doğrulayıcısının bütün planlarda anlaşma araması henüz uyarlanmadı. Ders attendance_close da halen yalnız sözleşmedir; mevcut etkinlik kapanışı bunun yerine kanıt sayılmaz.
+Starter F14 yoklama kapanışı/hak tüketimi anlaşma gerektirmez ve hakediş üretmez. Pro/Business ücretli görevlendirme/hakediş için açık geçerli anlaşma gerekir. F20 yalnız planın ücretli hakediş yolu seçildiğinde devreye girer. Starter seans/program doğrulayıcısı anlaşma gerektirmez; ders attendance_close Starter’da canlıdır ve gerçek API kabulüne bağlıdır. Ücretli plan finansal kapanışı ayrı anlaşma/hakediş motoruna kadar POLICY_NOT_CONFIGURED; etkinlik kapanışı bunun yerine kanıt sayılmaz.
 
 Ürün, rezervasyon, sınıf, öğretmen değişimi, bildirim ve dosya/job işlemlerindeki çoklu özellik referansları da koşullara ayrıldı. Bu hedef eşleme mevcut canlı plan kapılarının değiştiği iddiası değildir.
 
@@ -98,3 +98,7 @@ Kısmi bağlı düzeltme original_record_id/version yanında özgün allocation_
 ## Merkez adımı yetkisi ve audit
 
 Son karar: docs/decisions/DS-2026-10-17-settlement-center-scope.md. Submit actor/org/from_center_id, decide actor/stored_request.org_id/stored_request.to_center_id kapsamını bağımsız doğrular. Aynı hesap eşitliği ret nedeni değildir ve B kontrolünü atlatmaz. Yetki rol/grantları eski Auth oturumu, pending request veya receipt ile korunmaz; commit/replay öncesi canlı denetim ve ilgili yarış kilitleri gerekir. Audit ve request read, initiator_authority/decision_authority içinde doğrulanmış account/org/center/permission, CM rol kimlik/sürümü, grant sürümü ve checked_at bilgisini taşır; istemci snapshot sağlayamaz. Yeni rapor reports/settlement-center-scope-verification.json; tarihsel raporlar önceki SHA kurallarını korur.
+
+## Starter runtime aktarımı
+
+[Starter devri](starter-attendance-protection-handover.md) 10 yeni canlı işlem/dar okuma, zorunlu koşullu plan kapıları, gerçek kapanış/düzeltme ve açık başlangıç/belge/diğer hak tüketicilerini gösterir. Ücretli hakediş ve hesaplaşma genişlemez.

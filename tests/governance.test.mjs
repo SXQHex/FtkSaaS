@@ -27,7 +27,7 @@ const mutations=[
  ['closure lacks rights effects',p=>op(p,'attendance_close_v1').operation_contract.atomic_effects=[]],
  ['write lacks current-state reader',p=>op(p,'negative_limit_set_v1').operation_contract.read_operation='missing_get_v1'],
  ['row version points at unknown input',p=>op(p,'session_capacity_set_v1').operation_contract.version_field='invented_id'],
- ['current-state read falsely claimed live',p=>op(p,'negative_limit_set_v1').operation_contract.read_path_status='implemented'],
+ ['current-state read falsely claimed live',p=>op(p,'entitlement_extend_v1').operation_contract.read_path_status='implemented'],
  ['unknown feature reference',p=>op(p,'sale_apply_v1').features.push('F99')],
  ['missing F33 trace',p=>delete p['x-contract'].feature_delivery.F33],
  ['operation count treated as feature completion',p=>p['x-contract'].feature_delivery.F14.acceptance='complete'],
@@ -87,8 +87,8 @@ test('B decision is a closed DTO; frozen proposal cannot be replaced by approval
 
 test('declared runtime gates must match actually applied migration SQL, not target references',()=>{
  const p=structuredClone(original);
- assert.equal(validateAppliedGates(p,live),79);
- op(p,'class_save_v1').runtime_required_features=['F10'];
+ assert.equal(validateAppliedGates(p,live),89);
+ op(p,'class_save_v1').runtime_required_features=['F10','F11'];
  assert.throws(()=>validateAppliedGates(p,live),/APPLIED_FEATURE_GATE_DRIFT/);
 });
 test('a pending behavior case cannot be relabeled passed or supplied a static-test receipt',()=>{
@@ -114,10 +114,11 @@ test('protection routing cannot turn a center entitlement permission into org po
  assert.throws(()=>validateGovernance(p,live),/PROTECTION_ORIGINAL_AUTHORITY/);
 });
 
-test('legacy live policy request stays closed while protected target DTO requires approval',()=>{
+test('live policy accepts only a paired impact token and acknowledgment; protected target requires both',()=>{
  const r={client_api_version:1,request_id:id,org_id:id,operation_key:id,key:'negative_default',value:{kind:'integer',value:2},effective_at:'2027-01-01T00:00:00Z',mandatory:true};
  assert(valid('Request_policy_publish',r));
- assert(!valid('Request_policy_publish',{...r,impact_approval:{id,token:'opaque-token-value'},accepted_reservation_ids:[]}));
+ assert(valid('Request_policy_publish',{...r,impact_approval:{id,token:'opaque-token-value'},accepted_reservation_ids:[]}));
+ assert(!valid('Request_policy_publish',{...r,impact_approval:{id,token:'opaque-token-value'}}));
  assert(!valid('Target_policy_publish_protected',r));
  assert(valid('Target_policy_publish_protected',{...r,impact_approval:{id,token:'opaque-token-value'},accepted_reservation_ids:[]}));
 });

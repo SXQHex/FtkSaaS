@@ -1,6 +1,6 @@
 # FtkSaaS — API kataloğu · 0.2.0-rc.3
 
-197 sözleşme; 79 geliştirme ortamında çağrılabilir endpoint, 118 yalnız sözleşme. Çağrılabilir olmak bütün ürün özelliklerinin veya üretim kabulünün tamamlandığı anlamına gelmez. Kapsam sınırları ve Q-E01 `docs/claude-handover.md` içindedir.
+198 sözleşme; 89 geliştirme ortamında çağrılabilir endpoint, 109 yalnız sözleşme. Çağrılabilir olmak bütün ürün özelliklerinin veya üretim kabulünün tamamlandığı anlamına gelmez. Kapsam sınırları ve Q-E01 `docs/claude-handover.md` içindedir.
 
 `POST {API_URL}/functions/v1/backend-v1/{operation}`; JSON gövde doğrudan typed Request nesnesidir. Header: `Authorization: Bearer <Supabase access_token>`, `apikey: <publishable key>`, `Content-Type: application/json`. Başarı: `ok/data/trace_id`; hata: `ok:false/error:SafeError`. Servis anahtarı frontend’e verilmez.
 
@@ -30,7 +30,7 @@ Named `/rest/v1/rpc/{operation}` yalnız backend içindir; imzası p_request + d
 | `availability_save_v1` | çağrılabilir (kapsam notları geçerli) | `center.manage` | W / config | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; center_id?: FtkUuid ∣ null; operation_key: FtkUuid; expected_version?: PositiveInt; rule_id?: FtkUuid ∣ null; resource: ResourceRef; rule: AvailabilityRule | Success_availability_save |
 | `availability_exception_save_v1` | çağrılabilir (kapsam notları geçerli) | `center.manage` | W / config | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; center_id?: FtkUuid ∣ null; operation_key: FtkUuid; expected_version: PositiveInt; resource: ResourceRef; interval: Interval; reason: Text | Success_availability_exception_save |
 | `policies_get_v1` | çağrılabilir (kapsam notları geçerli) | `org.read` | R / read | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; center_id?: FtkUuid ∣ null; keys: Text[] | Success_policies_get |
-| `policy_publish_v1` | çağrılabilir (kapsam notları geçerli) | `policy.manage` | W / config | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; center_id?: FtkUuid ∣ null; operation_key: FtkUuid; key: PolicyKey; value: PolicyValue; effective_at: Instant; mandatory: Bool | Success_policy_publish |
+| `policy_publish_v1` | çağrılabilir (kapsam notları geçerli) | `policy.manage` | W / config | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; center_id?: FtkUuid ∣ null; operation_key: FtkUuid; key: PolicyKey; value: PolicyValue; effective_at: Instant; mandatory: Bool; impact_approval?: PreviewToken; accepted_reservation_ids?: FtkUuid[] | Success_policy_publish |
 | `roles_list_v1` | çağrılabilir (kapsam notları geçerli) | `org.read` | R / read | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; center_id?: FtkUuid ∣ null; person_id?: FtkUuid ∣ null; page: Page | Success_roles_list |
 | `role_assign_v1` | çağrılabilir (kapsam notları geçerli) | `center.manage` | W / config | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; center_id?: FtkUuid ∣ null; operation_key: FtkUuid; person_id: FtkUuid; role: OperationalRole; scope: RoleScope | Success_role_assign |
 | `role_revoke_v1` | çağrılabilir (kapsam notları geçerli) | `center.manage` | W / config | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; center_id?: FtkUuid ∣ null; operation_key: FtkUuid; expected_version: PositiveInt; assignment_id: FtkUuid; reason: Text | Success_role_revoke |
@@ -77,11 +77,11 @@ Named `/rest/v1/rpc/{operation}` yalnız backend içindir; imzası p_request + d
 | `waitlist_leave_v1` | yalnız sözleşme | `reservation.write` | W / maintenance | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; center_id?: FtkUuid ∣ null; operation_key: FtkUuid; entry_id: FtkUuid | Success_waitlist_leave |
 | `seat_offer_accept_v1` | yalnız sözleşme | `reservation.write` | W / reservation | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; center_id?: FtkUuid ∣ null; operation_key: FtkUuid; offer_id: FtkUuid | Success_seat_offer_accept |
 | `seat_offer_reject_v1` | yalnız sözleşme | `reservation.write` | W / maintenance | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; center_id?: FtkUuid ∣ null; operation_key: FtkUuid; offer_id: FtkUuid | Success_seat_offer_reject |
-| `attendance_get_v1` | yalnız sözleşme | `attendance.draft` | R / read | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; center_id?: FtkUuid ∣ null; session_id: FtkUuid | Success_attendance_get |
-| `attendance_mark_v1` | yalnız sözleşme | `attendance.draft` | W / maintenance | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; center_id?: FtkUuid ∣ null; operation_key: FtkUuid; expected_version: PositiveInt; reservation_id: FtkUuid; result: OrdinaryAttendanceResult | Success_attendance_mark |
-| `attendance_close_v1` | yalnız sözleşme | `attendance.close` | W / maintenance | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; center_id?: FtkUuid ∣ null; operation_key: FtkUuid; expected_version: PositiveInt; session_id: FtkUuid | Success_attendance_close |
-| `attendance_correct_preview_v1` | yalnız sözleşme | `attendance.correct` | P / maintenance | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; center_id?: FtkUuid ∣ null; session_id: FtkUuid; corrections: AttendanceCorrection[]; reason: Text | Success_attendance_correct_preview |
-| `attendance_correct_apply_v1` | yalnız sözleşme | `attendance.correct` | A / maintenance | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; center_id?: FtkUuid ∣ null; operation_key: FtkUuid; preview: PreviewToken | Success_attendance_correct_apply |
+| `attendance_get_v1` | çağrılabilir (kapsam notları geçerli) | `attendance.draft` | R / read | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; center_id?: FtkUuid ∣ null; session_id: FtkUuid | Success_attendance_get |
+| `attendance_mark_v1` | çağrılabilir (kapsam notları geçerli) | `attendance.draft` | W / maintenance | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; center_id?: FtkUuid ∣ null; operation_key: FtkUuid; expected_version: PositiveInt; reservation_id: FtkUuid; result: OrdinaryAttendanceResult | Success_attendance_mark |
+| `attendance_close_v1` | çağrılabilir (kapsam notları geçerli) | `attendance.close` | W / maintenance | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; center_id?: FtkUuid ∣ null; operation_key: FtkUuid; expected_version: PositiveInt; session_id: FtkUuid | Success_attendance_close |
+| `attendance_correct_preview_v1` | çağrılabilir (kapsam notları geçerli) | `attendance.correct` | P / maintenance | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; center_id?: FtkUuid ∣ null; session_id: FtkUuid; corrections: AttendanceCorrection[]; reason: Text | Success_attendance_correct_preview |
+| `attendance_correct_apply_v1` | çağrılabilir (kapsam notları geçerli) | `attendance.correct` | A / maintenance | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; center_id?: FtkUuid ∣ null; operation_key: FtkUuid; preview: PreviewToken | Success_attendance_correct_apply |
 | `products_list_v1` | yalnız sözleşme | `person.read` | R / read | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; center_id?: FtkUuid ∣ null; page: Page | Success_products_list |
 | `product_publish_v1` | çağrılabilir (kapsam notları geçerli) | `product.manage` | W / config | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; center_id?: FtkUuid ∣ null; operation_key: FtkUuid; product_id?: FtkUuid ∣ null; terms: ProductTerms | Success_product_publish |
 | `sale_preview_v1` | çağrılabilir (kapsam notları geçerli) | `sale.write` | P / new | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; center_id?: FtkUuid ∣ null; person_id: FtkUuid; product_version_id: FtkUuid; start_date: Date; net_minor?: Money ∣ null; end_date: Date | Success_sale_preview |
@@ -89,7 +89,7 @@ Named `/rest/v1/rpc/{operation}` yalnız backend içindir; imzası p_request + d
 | `entitlements_get_v1` | çağrılabilir (kapsam notları geçerli) | `person.read` | R / read | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; center_id?: FtkUuid ∣ null; person_id: FtkUuid | Success_entitlements_get |
 | `entitlement_extend_v1` | yalnız sözleşme | `entitlement.correct` | W / maintenance | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; center_id?: FtkUuid ∣ null; operation_key: FtkUuid; expected_version: PositiveInt; sale_id: FtkUuid; end_date: Date; reason: Text; impact_approval: PreviewToken; accepted_reservation_ids: FtkUuid[] | Success_entitlement_extend |
 | `credit_adjust_v1` | yalnız sözleşme | `entitlement.correct` | W / maintenance | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; center_id?: FtkUuid ∣ null; operation_key: FtkUuid; sale_id: FtkUuid; quantity: Int; direction: Direction; reason: Text; impact_approval: PreviewToken; accepted_reservation_ids: FtkUuid[] | Success_credit_adjust |
-| `negative_limit_set_v1` | yalnız sözleşme | `entitlement.correct` | W / config | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; center_id: FtkUuid; operation_key: FtkUuid; expected_version: PositiveInt; person_id: FtkUuid; allowed_negative_credits: Count; reason: Text; discipline_id: FtkUuid; impact_approval: PreviewToken; accepted_reservation_ids: FtkUuid[] | Success_negative_limit_set |
+| `negative_limit_set_v1` | çağrılabilir (kapsam notları geçerli) | `entitlement.correct` | W / config | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; center_id: FtkUuid; operation_key: FtkUuid; expected_version: PositiveInt; person_id: FtkUuid; allowed_negative_credits: Count; reason: Text; discipline_id: FtkUuid; impact_approval: PreviewToken; accepted_reservation_ids: FtkUuid[] | Success_negative_limit_set |
 | `freeze_preview_v1` | yalnız sözleşme | `entitlement.correct` | P / maintenance | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; center_id?: FtkUuid ∣ null; sale_id: FtkUuid; dates: DateInterval; reason: Text | Success_freeze_preview |
 | `freeze_apply_v1` | yalnız sözleşme | `entitlement.correct` | A / maintenance | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; center_id?: FtkUuid ∣ null; operation_key: FtkUuid; preview: PreviewToken | Success_freeze_apply |
 | `freeze_end_preview_v1` | yalnız sözleşme | `entitlement.correct` | P / maintenance | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; center_id?: FtkUuid ∣ null; freeze_id: FtkUuid; end_date: Date | Success_freeze_end_preview |
@@ -177,7 +177,7 @@ Named `/rest/v1/rpc/{operation}` yalnız backend içindir; imzası p_request + d
 | `platform_owner_remove_v1` | çağrılabilir (kapsam notları geçerli) | `platform.owner` | B / exempt | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; center_id?: FtkUuid ∣ null; operation_key: FtkUuid; replacement_verified_account_id?: FtkUuid ∣ null; reason: Text | Success_platform_owner_remove |
 | `center_manager_assign_v1` | çağrılabilir (kapsam notları geçerli) | `center.manager.assign` | W / bootstrap | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; center_id?: FtkUuid ∣ null; operation_key: FtkUuid; person_id: FtkUuid | Success_center_manager_assign |
 | `center_manager_revoke_v1` | çağrılabilir (kapsam notları geçerli) | `center.manager.assign` | W / bootstrap | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; center_id?: FtkUuid ∣ null; operation_key: FtkUuid; expected_version: PositiveInt; person_id: FtkUuid; reason: Text | Success_center_manager_revoke |
-| `attendance_block_v1` | yalnız sözleşme | `attendance.block` | W / maintenance | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; center_id?: FtkUuid ∣ null; operation_key: FtkUuid; expected_version: PositiveInt; reservation_id: FtkUuid; reason: BlockReason | Success_attendance_block |
+| `attendance_block_v1` | çağrılabilir (kapsam notları geçerli) | `attendance.block` | W / maintenance | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; center_id?: FtkUuid ∣ null; operation_key: FtkUuid; expected_version: PositiveInt; reservation_id: FtkUuid; reason: BlockReason | Success_attendance_block |
 | `event_attendance_close_v1` | çağrılabilir (kapsam notları geçerli) | `event.close` | W / maintenance | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; center_id?: FtkUuid ∣ null; operation_key: FtkUuid; expected_version: PositiveInt; event_id: FtkUuid | Success_event_attendance_close |
 | `event_attendance_correct_v1` | çağrılabilir (kapsam notları geçerli) | `event.close` | W / maintenance | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; center_id?: FtkUuid ∣ null; operation_key: FtkUuid; expected_version: PositiveInt; registration_id: FtkUuid; result: AttendanceResult; reason: Text | Success_event_attendance_correct |
 | `file_upload_complete_v1` | yalnız sözleşme | `account.self` | E / maintenance | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; center_id?: FtkUuid ∣ null; operation_key: FtkUuid; file_id: FtkUuid; checksum: Text | Success_file_upload_complete |
@@ -194,8 +194,8 @@ Named `/rest/v1/rpc/{operation}` yalnız backend içindir; imzası p_request + d
 | `event_actual_start_correct_v1` | çağrılabilir (kapsam notları geçerli) | `event.manage` | W / maintenance | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; center_id?: FtkUuid ∣ null; operation_key: FtkUuid; event_id: FtkUuid; expected_version: PositiveInt; actual_started_at: Instant ∣ null; reason: Text | Success_event_actual_start_correct |
 | `management_state_get_v1` | yalnız sözleşme | `management.inspect` | R / read | client_api_version: 1; request_id: FtkUuid; org_id?: FtkUuid ∣ null; center_id?: FtkUuid ∣ null; operation: ManagementOperationName; entity?: EntityRef ∣ null; selector: ManagementSelector; page?: Page | Success_management_state_get |
 | `instructor_agreements_list_v1` | yalnız sözleşme | `earnings.manage` | R / read | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; center_id: FtkUuid; person_id: FtkUuid; page: Page | Success_instructor_agreements_list |
-| `reservation_impact_preview_v1` | yalnız sözleşme | `reservation.protection.manage` | P / config | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; center_id?: FtkUuid ∣ null; change: ReservationProtectionChange; reason: Text | Success_reservation_impact_preview |
-| `reservation_impact_apply_v1` | yalnız sözleşme | `reservation.protection.manage` | A / config | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; center_id?: FtkUuid ∣ null; operation_key: FtkUuid; preview: PreviewToken; accepted_reservation_ids: FtkUuid[] | Success_reservation_impact_apply |
+| `reservation_impact_preview_v1` | çağrılabilir (kapsam notları geçerli) | `reservation.protection.manage` | P / config | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; center_id?: FtkUuid ∣ null; change: ReservationProtectionChange; reason: Text | Success_reservation_impact_preview |
+| `reservation_impact_apply_v1` | çağrılabilir (kapsam notları geçerli) | `reservation.protection.manage` | A / config | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; center_id?: FtkUuid ∣ null; operation_key: FtkUuid; preview: PreviewToken; accepted_reservation_ids: FtkUuid[] | Success_reservation_impact_apply |
 | `settlement_movements_list_v1` | yalnız sözleşme | `settlement.read` | R / read | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; center_id: FtkUuid; page: Page; currency: Currency | Success_settlement_movements_list |
 | `settlement_requests_list_v1` | yalnız sözleşme | `settlement.read` | R / read | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; center_id: FtkUuid; page: Page | Success_settlement_requests_list |
 | `settlement_request_get_v1` | yalnız sözleşme | `settlement.read` | R / read | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; center_id: FtkUuid; settlement_request_id: FtkUuid | Success_settlement_request_get |
@@ -205,6 +205,7 @@ Named `/rest/v1/rpc/{operation}` yalnız backend içindir; imzası p_request + d
 | `settlement_authority_get_v1` | yalnız sözleşme | `settlement.authority.inspect` | R / read | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; person_id: FtkUuid; center_id?: FtkUuid ∣ null | Success_settlement_authority_get |
 | `settlement_delegation_set_v1` | yalnız sözleşme | `settlement.delegation.manage` | W / config | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; operation_key: FtkUuid; person_id: FtkUuid; expected_version: PositiveInt; granted: Bool; reason: Text | Success_settlement_delegation_set |
 | `settlement_authority_set_v1` | yalnız sözleşme | `settlement.authority.manage` | W / config | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; operation_key: FtkUuid; person_id: FtkUuid; expected_version: PositiveInt; granted: Bool; reason: Text; center_id: FtkUuid | Success_settlement_authority_set |
+| `negative_limits_get_v1` | çağrılabilir (kapsam notları geçerli) | `entitlement.correct` | R / read | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; center_id: FtkUuid; person_id: FtkUuid; discipline_id: FtkUuid | Success_negative_limits_get |
 
 ## İşlem bazında hedef sözleşme ve runtime ayrımı
 
@@ -234,10 +235,10 @@ features ürün referanslarıdır. required_features hedef plan kapısı; runtim
 | availability_save_v1 | command | create_absent_update_requires_version / management_state_get_v1 | availability_rules.versioned_domain_change | baseline_only_not_full_product_acceptance |
 | availability_exception_save_v1 | command | row_version / management_state_get_v1 | availability_exceptions.append, centers.configuration_version | baseline_only_not_full_product_acceptance |
 | policies_get_v1 | read | none / None |  | baseline_only_not_full_product_acceptance |
-| policy_publish_v1 | command | append_or_current_scope_lock / management_state_get_v1 | policy_versions.immutable, protected_reservation_obligations_if_affected | pending |
+| policy_publish_v1 | command | append_or_current_scope_lock / policies_get_v1 | policy_versions.immutable, protected_reservation_obligations_if_affected, reservation_protections.append_causal_obligation_proof | pending |
 | roles_list_v1 | read | none / None |  | pending |
-| role_assign_v1 | command | append_or_current_scope_lock / management_state_get_v1 | role_assignments.active, no_account_link_creation | pending |
-| role_revoke_v1 | command | row_version / roles_list_v1 | role_assignments.inactive_live_next_request | pending |
+| role_assign_v1 | command | append_or_current_scope_lock / management_state_get_v1 | role_assignments.active, no_account_link_creation | conditional_plan_gates_aligned_limited_runtime |
+| role_revoke_v1 | command | row_version / roles_list_v1 | role_assignments.inactive_live_next_request | conditional_plan_gates_aligned_limited_runtime |
 | permission_set_v1 | command | row_version / person_get_v1 | permission_overrides, people.permission_aggregate_version | baseline_only_not_full_product_acceptance |
 | org_manager_assign_v1 | command | append_or_current_scope_lock / management_state_get_v1 | role_assignments.org_manager, no_implicit_center_operation_grant | baseline_only_not_full_product_acceptance |
 | org_manager_revoke_v1 | command | row_version / roles_list_v1 | role_assignments.org_manager_inactive | baseline_only_not_full_product_acceptance |
@@ -256,13 +257,13 @@ features ürün referanslarıdır. required_features hedef plan kapısı; runtim
 | person_merge_approve_v1 | command | preview_dependencies / management_state_get_v1 | people.versioned_domain_change | pending |
 | person_merge_apply_v1 | apply | preview_dependencies / person_merge_preview_v1 | people.alias, account_link_resolution, scoped_relationship_references, merge_approvals.consume | pending |
 | calendar_get_v1 | read | none / None |  | baseline_only_not_full_product_acceptance |
-| class_save_v1 | command | create_absent_update_requires_version / management_state_get_v1 | classes.versioned_domain_change | pending |
+| class_save_v1 | command | create_absent_update_requires_version / management_state_get_v1 | classes.versioned_domain_change | conditional_plan_gates_aligned_limited_runtime |
 | program_preview_v1 | preview | preview_dependencies / management_state_get_v1 |  | pending |
 | program_apply_v1 | apply | preview_dependencies / program_preview_v1 | program_versions.immutable, sessions.finite_batch, session_assignments, resource_bookings | pending |
-| session_create_v1 | command | append_or_current_scope_lock / management_state_get_v1 | sessions.planned, session_assignments, resource_bookings | pending |
+| session_create_v1 | command | append_or_current_scope_lock / management_state_get_v1 | sessions.planned, session_assignments, resource_bookings | conditional_plan_gates_aligned_limited_runtime |
 | session_get_v1 | read | none / None |  | baseline_only_not_full_product_acceptance |
-| session_change_preview_v1 | preview | preview_dependencies / management_state_get_v1 |  | pending |
-| session_change_apply_v1 | apply | preview_dependencies / session_change_preview_v1 | sessions.same_identity, session_assignments, resource_bookings, quota_buckets.old_new | pending |
+| session_change_preview_v1 | preview | preview_dependencies / management_state_get_v1 |  | conditional_plan_gates_aligned_limited_runtime |
+| session_change_apply_v1 | apply | preview_dependencies / session_change_preview_v1 | sessions.same_identity, session_assignments, resource_bookings, quota_buckets.old_new | conditional_plan_gates_aligned_limited_runtime |
 | session_capacity_set_v1 | command | row_version / session_get_v1 | sessions.capacity_version | baseline_only_not_full_product_acceptance |
 | session_cancel_preview_v1 | preview | preview_dependencies / management_state_get_v1 |  | pending |
 | session_cancel_apply_v1 | apply | preview_dependencies / session_cancel_preview_v1 | sessions.cancelled, reservations.cancelled_by_explicit_center_action, seat_offers.withdrawn, waitlist_entries.closed, rights.release_or_linked_return, reserved_deficits.release, in_app_center_intervention_notice | pending |
@@ -274,26 +275,26 @@ features ürün referanslarıdır. required_features hedef plan kapısı; runtim
 | lesson_request_offer_alternative_v1 | command | append_or_current_scope_lock / management_state_get_v1 | lesson_requests.versioned_domain_change | pending |
 | lesson_request_accept_alternative_v1 | command | append_or_current_scope_lock / management_state_get_v1 | lesson_requests.versioned_domain_change | pending |
 | lesson_request_approve_v1 | command | append_or_current_scope_lock / management_state_get_v1 | lesson_requests.versioned_domain_change | pending |
-| reservation_create_v1 | command | append_or_current_scope_lock / management_state_get_v1 | reservations.active, rights.reserve_or_deficit | pending |
+| reservation_create_v1 | command | append_or_current_scope_lock / management_state_get_v1 | reservations.active, rights.reserve_or_deficit | conditional_plan_gates_aligned_limited_runtime |
 | reservation_cancel_v1 | command | row_version / reservation_list_v1 | reservations.cancelled, rights.release_consume_from_frozen_policy | baseline_only_not_full_product_acceptance |
 | reservation_list_v1 | read | none / None |  | baseline_only_not_full_product_acceptance |
 | waitlist_join_v1 | command | append_or_current_scope_lock / management_state_get_v1 | waitlist_entries.versioned_domain_change | pending |
 | waitlist_leave_v1 | command | append_or_current_scope_lock / management_state_get_v1 | waitlist_entries.versioned_domain_change | pending |
 | seat_offer_accept_v1 | command | append_or_current_scope_lock / management_state_get_v1 | seat_offers.versioned_domain_change | pending |
 | seat_offer_reject_v1 | command | append_or_current_scope_lock / management_state_get_v1 | seat_offers.versioned_domain_change | pending |
-| attendance_get_v1 | read | none / None |  | pending |
-| attendance_mark_v1 | draft | row_version / management_state_get_v1 | attendance_entries.draft | pending |
-| attendance_close_v1 | closure | row_version / management_state_get_v1 | attendance_closures, sessions.occurred, reservations.completed, rights.consume_release, earnings.if_F20, settlement.accrual_if_eligible | pending |
-| attendance_correct_preview_v1 | preview | preview_dependencies / management_state_get_v1 |  | pending |
-| attendance_correct_apply_v1 | correction | preview_dependencies / attendance_correct_preview_v1 | attendance_entries.linked_revision, rights.linked_correction, earnings.linked_difference_if_F20, settlement.linked_reversal | pending |
+| attendance_get_v1 | read | none / None |  | starter_runtime_limited_paid_path_pending |
+| attendance_mark_v1 | draft | row_version / attendance_get_v1 | attendance_entries.draft, reservations.actual_evaluation_snapshot_and_version, sessions.version | starter_runtime_limited_paid_path_pending |
+| attendance_close_v1 | closure | row_version / attendance_get_v1 | attendance_closures, sessions.occurred, reservations.completed, rights.consume_release, earnings.if_F20, settlement.accrual_if_eligible | starter_runtime_limited_paid_path_pending |
+| attendance_correct_preview_v1 | preview | preview_dependencies / attendance_get_v1 |  | starter_runtime_limited_paid_path_pending |
+| attendance_correct_apply_v1 | correction | preview_dependencies / attendance_correct_preview_v1 | attendance_entries.linked_revision, rights.linked_correction, earnings.linked_difference_if_F20, settlement.linked_reversal | starter_runtime_limited_paid_path_pending |
 | products_list_v1 | read | none / None |  | pending |
-| product_publish_v1 | command | append_or_current_scope_lock / management_state_get_v1 | products.identity, product_versions.immutable, product_scopes.new_version_only | pending |
-| sale_preview_v1 | preview | preview_dependencies / management_state_get_v1 |  | pending |
-| sale_apply_v1 | apply | preview_dependencies / sale_preview_v1 | sales.frozen_terms_scope, rights.issue, deficits.settle_past_then_future, debts, priority_reservations.if_required | pending |
+| product_publish_v1 | command | append_or_current_scope_lock / management_state_get_v1 | products.identity, product_versions.immutable, product_scopes.new_version_only | conditional_plan_gates_aligned_limited_runtime |
+| sale_preview_v1 | preview | preview_dependencies / management_state_get_v1 |  | conditional_plan_gates_aligned_limited_runtime |
+| sale_apply_v1 | apply | preview_dependencies / sale_preview_v1 | sales.frozen_terms_scope, rights.issue, deficits.settle_past_then_future, debts, priority_reservations.if_required | conditional_plan_gates_aligned_limited_runtime |
 | entitlements_get_v1 | read | none / None |  | pending |
 | entitlement_extend_v1 | command | row_version / management_state_get_v1 | sales.explicit_validity_change, protected_reservation_obligations | pending |
 | credit_adjust_v1 | command | append_or_current_scope_lock / management_state_get_v1 | entitlement_movements.linked, protected_reservation_obligations | pending |
-| negative_limit_set_v1 | command | row_version / management_state_get_v1 | negative_limit_overrides.version, protected_reservation_obligations | pending |
+| negative_limit_set_v1 | command | row_version / negative_limits_get_v1 | negative_limit_overrides.version, protected_reservation_obligations, reservation_protections.append_causal_obligation_proof | starter_runtime_limited_paid_path_pending |
 | freeze_preview_v1 | preview | preview_dependencies / management_state_get_v1 |  | pending |
 | freeze_apply_v1 | apply | preview_dependencies / freeze_preview_v1 | freezes.scheduled, rights.suspend_unreserved, protected_reservation_obligations, no_auto_rebooking_or_period_extension | pending |
 | freeze_end_preview_v1 | preview | preview_dependencies / management_state_get_v1 |  | pending |
@@ -381,7 +382,7 @@ features ürün referanslarıdır. required_features hedef plan kapısı; runtim
 | platform_owner_remove_v1 | command | append_or_current_scope_lock / management_state_get_v1 | organizations.owner_person_removed, no_customer_owner_self_transfer | baseline_only_not_full_product_acceptance |
 | center_manager_assign_v1 | command | append_or_current_scope_lock / management_state_get_v1 | role_assignments.center_manager, center_relationship_scope | baseline_only_not_full_product_acceptance |
 | center_manager_revoke_v1 | command | row_version / roles_list_v1 | role_assignments.center_manager_inactive | baseline_only_not_full_product_acceptance |
-| attendance_block_v1 | command | row_version / management_state_get_v1 | reservations.eligibility_snapshot, attendance_entries.blocked | pending |
+| attendance_block_v1 | command | row_version / attendance_get_v1 | reservations.eligibility_snapshot, attendance_entries.blocked, reservations.actual_evaluation_snapshot_and_version, sessions.version | starter_runtime_limited_paid_path_pending |
 | event_attendance_close_v1 | closure | row_version / management_state_get_v1 | event_registrations.completed, rights.consume_release_from_event_terms | baseline_only_not_full_product_acceptance |
 | event_attendance_correct_v1 | correction | row_version / management_state_get_v1 | event_attendance_entries.linked_revision, rights.linked_correction_from_terms | baseline_only_not_full_product_acceptance |
 | file_upload_complete_v1 | command | append_or_current_scope_lock / management_state_get_v1 | files.versioned_domain_change | pending |
@@ -398,8 +399,8 @@ features ürün referanslarıdır. required_features hedef plan kapısı; runtim
 | event_actual_start_correct_v1 | correction | row_version / event_get_v1 | events.linked_actual_start_evidence | baseline_only_not_full_product_acceptance |
 | management_state_get_v1 | read | none / None |  | pending |
 | instructor_agreements_list_v1 | read | none / None |  | pending |
-| reservation_impact_preview_v1 | preview | preview_dependencies / management_state_get_v1 |  | pending |
-| reservation_impact_apply_v1 | apply | preview_dependencies / reservation_impact_preview_v1 | selected_configuration_change, protected_reservation_obligations | pending |
+| reservation_impact_preview_v1 | preview | preview_dependencies / negative_limits_get_v1 |  | starter_runtime_limited_paid_path_pending |
+| reservation_impact_apply_v1 | apply | preview_dependencies / reservation_impact_preview_v1 | selected_configuration_change, protected_reservation_obligations, reservation_protections.append_causal_obligation_proof | starter_runtime_limited_paid_path_pending |
 | settlement_movements_list_v1 | read | none / None |  | pending |
 | settlement_requests_list_v1 | read | none / None |  | pending |
 | settlement_request_get_v1 | read | none / None |  | pending |
@@ -409,6 +410,7 @@ features ürün referanslarıdır. required_features hedef plan kapısı; runtim
 | settlement_authority_get_v1 | read | none / None |  | pending |
 | settlement_delegation_set_v1 | command | row_version / settlement_authority_get_v1 | settlement_authority.grant_or_revoke, org_authority.version_increment, audit.append, outbox.append, receipt.append | pending |
 | settlement_authority_set_v1 | command | row_version / settlement_authority_get_v1 | settlement_authority.grant_or_revoke, org_authority.version_increment, audit.append, outbox.append, receipt.append | pending |
+| negative_limits_get_v1 | read | none / None |  | starter_runtime_limited_paid_path_pending |
 
 Önizleme süre sınırı 15 dakika. Apply canlı aktör/yetki/abonelik ve ilgili satır sürümlerini yeniden denetler. İdempotency kapsamı org + hesap + operasyon; merkez payload içindedir. Aynı anahtar/aynı içerik sonucu tekrarlar, farklı içerik reddedilir. Doğrulanmamış transport sonucunda yeni anahtar üretilmez.
 

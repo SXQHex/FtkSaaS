@@ -571,7 +571,7 @@
           "confirmed_reservation_protection"
         ],
         "target_request": {
-          "$ref": "#/$defs/Target_policy_publish_protected"
+          "$ref": "#/$defs/Request_policy_publish"
         },
         "current_request_status": "legacy direct publish; target protected DTO not accepted by runtime yet"
       },
@@ -624,15 +624,12 @@
         "F04"
       ],
       "runtime_required_features": [
-        "F04",
-        "F05"
+        "F04"
       ],
       "decision_delivery": {
         "accepted_contract": "DS-2026-10-17",
-        "runtime_conformance": "pending",
-        "open_dependencies": [
-          "plan_gate_alignment"
-        ],
+        "runtime_conformance": "conditional_plan_gates_aligned_limited_runtime",
+        "open_dependencies": [],
         "target_request": {
           "$ref": "#/$defs/Request_role_assign"
         }
@@ -653,15 +650,12 @@
         "F04"
       ],
       "runtime_required_features": [
-        "F04",
-        "F05"
+        "F04"
       ],
       "decision_delivery": {
         "accepted_contract": "DS-2026-10-17",
-        "runtime_conformance": "pending",
-        "open_dependencies": [
-          "plan_gate_alignment"
-        ],
+        "runtime_conformance": "conditional_plan_gates_aligned_limited_runtime",
+        "open_dependencies": [],
         "target_request": {
           "$ref": "#/$defs/Request_role_revoke"
         }
@@ -1149,15 +1143,12 @@
         "F10"
       ],
       "runtime_required_features": [
-        "F10",
-        "F11"
+        "F10"
       ],
       "decision_delivery": {
         "accepted_contract": "DS-2026-10-17",
-        "runtime_conformance": "pending",
-        "open_dependencies": [
-          "plan_gate_alignment"
-        ],
+        "runtime_conformance": "conditional_plan_gates_aligned_limited_runtime",
+        "open_dependencies": [],
         "target_request": {
           "$ref": "#/$defs/Request_class_save"
         }
@@ -1238,15 +1229,13 @@
         "F08"
       ],
       "runtime_required_features": [
-        "F08",
-        "F09"
+        "F08"
       ],
       "decision_delivery": {
         "accepted_contract": "DS-2026-10-17",
-        "runtime_conformance": "pending",
+        "runtime_conformance": "conditional_plan_gates_aligned_limited_runtime",
         "open_dependencies": [
-          "starter_plan_and_earning_split",
-          "plan_gate_alignment"
+          "starter_plan_and_earning_split"
         ],
         "target_request": {
           "$ref": "#/$defs/Request_session_create"
@@ -1296,15 +1285,12 @@
       ],
       "runtime_required_features": [
         "F08",
-        "F13",
         "F14"
       ],
       "decision_delivery": {
         "accepted_contract": "DS-2026-10-17",
-        "runtime_conformance": "pending",
-        "open_dependencies": [
-          "plan_gate_alignment"
-        ],
+        "runtime_conformance": "conditional_plan_gates_aligned_limited_runtime",
+        "open_dependencies": [],
         "target_request": {
           "$ref": "#/$defs/Request_session_change_preview"
         }
@@ -1328,15 +1314,13 @@
       ],
       "runtime_required_features": [
         "F08",
-        "F13",
         "F14"
       ],
       "decision_delivery": {
         "accepted_contract": "DS-2026-10-17",
-        "runtime_conformance": "pending",
+        "runtime_conformance": "conditional_plan_gates_aligned_limited_runtime",
         "open_dependencies": [
-          "agreement_versions_and_selection",
-          "plan_gate_alignment"
+          "agreement_versions_and_selection"
         ],
         "target_request": {
           "$ref": "#/$defs/Request_session_change_apply"
@@ -1619,23 +1603,20 @@
         "F15"
       ],
       "runtime_required_features": [
-        "F10",
-        "F11",
         "F15"
       ],
       "decision_delivery": {
         "accepted_contract": "DS-2026-10-17",
-        "runtime_conformance": "pending",
-        "open_dependencies": [
-          "plan_gate_alignment"
-        ],
+        "runtime_conformance": "conditional_plan_gates_aligned_limited_runtime",
+        "open_dependencies": [],
         "target_request": {
           "$ref": "#/$defs/Request_reservation_create"
         }
       },
       "billing_class": "reservation",
       "limits": [
-        "full lesson attendance/earnings and waitlist flows remain contract-only"
+        "Starter lesson attendance supported; paid financial closure and waitlist remain pending",
+        "Automatic actual-start participation observation and mandatory-document lesson consumer remain pending"
       ]
     },
     {
@@ -1785,8 +1766,8 @@
     },
     {
       "name": "attendance_get_v1",
-      "status": "contract_only",
-      "external_path": null,
+      "status": "operational_development_limited",
+      "external_path": "/functions/v1/backend-v1/attendance_get_v1",
       "permission": "attendance.draft",
       "features": [
         "F14"
@@ -1794,10 +1775,12 @@
       "required_features": [
         "F14"
       ],
-      "runtime_required_features": [],
+      "runtime_required_features": [
+        "F14"
+      ],
       "decision_delivery": {
         "accepted_contract": "DS-2026-10-17",
-        "runtime_conformance": "pending",
+        "runtime_conformance": "starter_runtime_limited_paid_path_pending",
         "open_dependencies": [],
         "target_request": {
           "$ref": "#/$defs/Request_attendance_get"
@@ -1808,8 +1791,8 @@
     },
     {
       "name": "attendance_mark_v1",
-      "status": "contract_only",
-      "external_path": null,
+      "status": "operational_development_limited",
+      "external_path": "/functions/v1/backend-v1/attendance_mark_v1",
       "permission": "attendance.draft",
       "features": [
         "F14"
@@ -1817,10 +1800,12 @@
       "required_features": [
         "F14"
       ],
-      "runtime_required_features": [],
+      "runtime_required_features": [
+        "F14"
+      ],
       "decision_delivery": {
         "accepted_contract": "DS-2026-10-17",
-        "runtime_conformance": "pending",
+        "runtime_conformance": "starter_runtime_limited_paid_path_pending",
         "open_dependencies": [],
         "target_request": {
           "$ref": "#/$defs/Request_attendance_mark"
@@ -1831,8 +1816,8 @@
     },
     {
       "name": "attendance_close_v1",
-      "status": "contract_only",
-      "external_path": null,
+      "status": "operational_development_limited",
+      "external_path": "/functions/v1/backend-v1/attendance_close_v1",
       "permission": "attendance.close",
       "features": [
         "F14",
@@ -1841,27 +1826,29 @@
       "required_features": [
         "F14"
       ],
-      "runtime_required_features": [],
+      "runtime_required_features": [
+        "F14"
+      ],
       "decision_delivery": {
         "accepted_contract": "DS-2026-10-17",
-        "runtime_conformance": "pending",
+        "runtime_conformance": "starter_runtime_limited_paid_path_pending",
         "open_dependencies": [
           "starter_plan_and_earning_split",
-          "confirmed_reservation_protection",
-          "agreement_versions_and_selection",
-          "cross_center_settlement"
+          "agreement_versions_and_selection"
         ],
         "target_request": {
           "$ref": "#/$defs/Request_attendance_close"
         }
       },
       "billing_class": "maintenance",
-      "limits": []
+      "limits": [
+        "Starter closure/correction only; paid F20 engine returns POLICY_NOT_CONFIGURED before domain writes"
+      ]
     },
     {
       "name": "attendance_correct_preview_v1",
-      "status": "contract_only",
-      "external_path": null,
+      "status": "operational_development_limited",
+      "external_path": "/functions/v1/backend-v1/attendance_correct_preview_v1",
       "permission": "attendance.correct",
       "features": [
         "F14",
@@ -1870,22 +1857,29 @@
       "required_features": [
         "F14"
       ],
-      "runtime_required_features": [],
+      "runtime_required_features": [
+        "F14"
+      ],
       "decision_delivery": {
         "accepted_contract": "DS-2026-10-17",
-        "runtime_conformance": "pending",
-        "open_dependencies": [],
+        "runtime_conformance": "starter_runtime_limited_paid_path_pending",
+        "open_dependencies": [
+          "starter_plan_and_earning_split",
+          "agreement_versions_and_selection"
+        ],
         "target_request": {
           "$ref": "#/$defs/Request_attendance_correct_preview"
         }
       },
       "billing_class": "maintenance",
-      "limits": []
+      "limits": [
+        "Starter closure/correction only; paid F20 engine returns POLICY_NOT_CONFIGURED before domain writes"
+      ]
     },
     {
       "name": "attendance_correct_apply_v1",
-      "status": "contract_only",
-      "external_path": null,
+      "status": "operational_development_limited",
+      "external_path": "/functions/v1/backend-v1/attendance_correct_apply_v1",
       "permission": "attendance.correct",
       "features": [
         "F14",
@@ -1894,19 +1888,24 @@
       "required_features": [
         "F14"
       ],
-      "runtime_required_features": [],
+      "runtime_required_features": [
+        "F14"
+      ],
       "decision_delivery": {
         "accepted_contract": "DS-2026-10-17",
-        "runtime_conformance": "pending",
+        "runtime_conformance": "starter_runtime_limited_paid_path_pending",
         "open_dependencies": [
-          "cross_center_settlement"
+          "starter_plan_and_earning_split",
+          "agreement_versions_and_selection"
         ],
         "target_request": {
           "$ref": "#/$defs/Request_attendance_correct_apply"
         }
       },
       "billing_class": "maintenance",
-      "limits": []
+      "limits": [
+        "Starter closure/correction only; paid F20 engine returns POLICY_NOT_CONFIGURED before domain writes"
+      ]
     },
     {
       "name": "products_list_v1",
@@ -1947,17 +1946,13 @@
         "F15"
       ],
       "runtime_required_features": [
-        "F15",
-        "F16",
-        "F17",
-        "F18"
+        "F15"
       ],
       "decision_delivery": {
         "accepted_contract": "DS-2026-10-17",
-        "runtime_conformance": "pending",
+        "runtime_conformance": "conditional_plan_gates_aligned_limited_runtime",
         "open_dependencies": [
-          "sale_scope_and_backdating",
-          "plan_gate_alignment"
+          "sale_scope_and_backdating"
         ],
         "target_request": {
           "$ref": "#/$defs/Request_product_publish"
@@ -1982,17 +1977,14 @@
         "F19"
       ],
       "runtime_required_features": [
-        "F10",
         "F15",
-        "F16",
         "F19"
       ],
       "decision_delivery": {
         "accepted_contract": "DS-2026-10-17",
-        "runtime_conformance": "pending",
+        "runtime_conformance": "conditional_plan_gates_aligned_limited_runtime",
         "open_dependencies": [
-          "sale_scope_and_backdating",
-          "plan_gate_alignment"
+          "sale_scope_and_backdating"
         ],
         "target_request": {
           "$ref": "#/$defs/Request_sale_preview"
@@ -2017,18 +2009,15 @@
         "F19"
       ],
       "runtime_required_features": [
-        "F10",
         "F15",
-        "F16",
         "F19"
       ],
       "decision_delivery": {
         "accepted_contract": "DS-2026-10-17",
-        "runtime_conformance": "pending",
+        "runtime_conformance": "conditional_plan_gates_aligned_limited_runtime",
         "open_dependencies": [
           "cross_center_settlement",
-          "sale_scope_and_backdating",
-          "plan_gate_alignment"
+          "sale_scope_and_backdating"
         ],
         "target_request": {
           "$ref": "#/$defs/Request_sale_apply"
@@ -2123,8 +2112,8 @@
     },
     {
       "name": "negative_limit_set_v1",
-      "status": "contract_only",
-      "external_path": null,
+      "status": "operational_development_limited",
+      "external_path": "/functions/v1/backend-v1/negative_limit_set_v1",
       "permission": "entitlement.correct",
       "features": [
         "F15"
@@ -2132,10 +2121,12 @@
       "required_features": [
         "F15"
       ],
-      "runtime_required_features": [],
+      "runtime_required_features": [
+        "F15"
+      ],
       "decision_delivery": {
         "accepted_contract": "DS-2026-10-17",
-        "runtime_conformance": "pending",
+        "runtime_conformance": "starter_runtime_limited_paid_path_pending",
         "open_dependencies": [
           "confirmed_reservation_protection"
         ],
@@ -4242,8 +4233,8 @@
     },
     {
       "name": "attendance_block_v1",
-      "status": "contract_only",
-      "external_path": null,
+      "status": "operational_development_limited",
+      "external_path": "/functions/v1/backend-v1/attendance_block_v1",
       "permission": "attendance.block",
       "features": [
         "F14",
@@ -4252,10 +4243,12 @@
       "required_features": [
         "F14"
       ],
-      "runtime_required_features": [],
+      "runtime_required_features": [
+        "F14"
+      ],
       "decision_delivery": {
         "accepted_contract": "DS-2026-10-17",
-        "runtime_conformance": "pending",
+        "runtime_conformance": "starter_runtime_limited_paid_path_pending",
         "open_dependencies": [
           "confirmed_reservation_protection"
         ],
@@ -4663,8 +4656,8 @@
     },
     {
       "name": "reservation_impact_preview_v1",
-      "status": "contract_only",
-      "external_path": null,
+      "status": "operational_development_limited",
+      "external_path": "/functions/v1/backend-v1/reservation_impact_preview_v1",
       "permission": "reservation.protection.manage",
       "features": [
         "F15"
@@ -4672,22 +4665,28 @@
       "required_features": [
         "F15"
       ],
-      "runtime_required_features": [],
+      "runtime_required_features": [
+        "F15"
+      ],
       "decision_delivery": {
         "accepted_contract": "DS-2026-10-17",
-        "runtime_conformance": "pending",
-        "open_dependencies": [],
+        "runtime_conformance": "starter_runtime_limited_paid_path_pending",
+        "open_dependencies": [
+          "confirmed_reservation_protection"
+        ],
         "target_request": {
           "$ref": "#/$defs/Request_reservation_impact_preview"
         }
       },
       "billing_class": "config",
-      "limits": []
+      "limits": [
+        "Impact runtime supports policy/negative_limit only; other rights-change consumers remain contract-only"
+      ]
     },
     {
       "name": "reservation_impact_apply_v1",
-      "status": "contract_only",
-      "external_path": null,
+      "status": "operational_development_limited",
+      "external_path": "/functions/v1/backend-v1/reservation_impact_apply_v1",
       "permission": "reservation.protection.manage",
       "features": [
         "F15"
@@ -4695,17 +4694,23 @@
       "required_features": [
         "F15"
       ],
-      "runtime_required_features": [],
+      "runtime_required_features": [
+        "F15"
+      ],
       "decision_delivery": {
         "accepted_contract": "DS-2026-10-17",
-        "runtime_conformance": "pending",
-        "open_dependencies": [],
+        "runtime_conformance": "starter_runtime_limited_paid_path_pending",
+        "open_dependencies": [
+          "confirmed_reservation_protection"
+        ],
         "target_request": {
           "$ref": "#/$defs/Request_reservation_impact_apply"
         }
       },
       "billing_class": "config",
-      "limits": []
+      "limits": [
+        "Impact runtime supports policy/negative_limit only; other rights-change consumers remain contract-only"
+      ]
     },
     {
       "name": "settlement_movements_list_v1",
@@ -4999,6 +5004,33 @@
         }
       },
       "billing_class": "config",
+      "limits": []
+    },
+    {
+      "name": "negative_limits_get_v1",
+      "status": "operational_development_limited",
+      "external_path": "/functions/v1/backend-v1/negative_limits_get_v1",
+      "permission": "entitlement.correct",
+      "features": [
+        "F15"
+      ],
+      "required_features": [
+        "F15"
+      ],
+      "runtime_required_features": [
+        "F15"
+      ],
+      "decision_delivery": {
+        "accepted_contract": "DS-2026-10-17",
+        "runtime_conformance": "starter_runtime_limited_paid_path_pending",
+        "open_dependencies": [
+          "confirmed_reservation_protection"
+        ],
+        "target_request": {
+          "$ref": "#/$defs/Request_negative_limits_get"
+        }
+      },
+      "billing_class": "read",
       "limits": []
     }
   ]
