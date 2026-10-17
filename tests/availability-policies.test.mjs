@@ -137,6 +137,16 @@ test('Availability and policies through real Auth -> Edge -> RPC',async t=>{
   await mut('reservation_cancel_v1',{reservation_id:res.primary_id,expected_version:1,reason:'Snapshot'});
   assert.equal((await rows("select count(*)::int n from core.credit_deficits where reservation_id=$1 and state in ('reserved','consumed')",[res.primary_id]))[0].n,0);
  });
+ await t.test('negative valuation policy cannot price another lesson format and its selected version is snapshotted',async()=>{
+  const sid=(await mut('session_create_v1',{...sessionBody,resources:[],interval:{starts_at:new Date(+at+6*86400000).toISOString(),ends_at:new Date(+at+6*86400000+3600000).toISOString()}})).primary_id;
+  await publish('negative_valuation',{kind:'valuation',discipline_id:discipline,format:'private',amount_minor:'500',currency:'TRY'});
+  await fail('reservation_create_v1',{session_id:sid,person_id:student.p,mode:'flexible'},'POLICY_NOT_CONFIGURED');
+  assert.equal((await rows('select count(*)::int n from core.reservations where session_id=$1',[sid]))[0].n,0);
+  const policy=await publish('negative_valuation',{kind:'valuation',discipline_id:discipline,format:'group',amount_minor:'500',currency:'TRY'},false,{effective_at:new Date(Date.now()-50).toISOString()});
+  const reservation=await mut('reservation_create_v1',{session_id:sid,person_id:student.p,mode:'flexible'});
+  const stored=(await rows('select negative_basis_policy_id,negative_basis_minor from core.reservations where id=$1',[reservation.primary_id]))[0];
+  assert.equal(stored.negative_basis_policy_id,policy.primary_id);assert.equal(stored.negative_basis_minor,'500');
+ });
  await t.test('exception versus session creation serializes with no partial resource booking',async()=>{
   const it={starts_at:new Date(+at+8*86400000).toISOString(),ends_at:new Date(+at+8*86400000+3600000).toISOString()};
   const results=await Promise.all([call(owner,'availability_exception_save_v1',scope({resource,interval:it,reason:'Race session',expected_version:await centerVersion()}),key()),call(owner,'session_create_v1',scope({...sessionBody,interval:it}),key())]);

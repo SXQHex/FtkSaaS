@@ -121,8 +121,10 @@ begin
  if strpos(body,old)=0 then raise exception 'cancel snapshot anchor missing';end if;body:=replace(body,old,new);
  old:=$o$for entry in select * from jsonb_array_elements(r->'assignments') loop$o$;
  new:=$n$for entry in select * from jsonb_array_elements(r->'assignments') loop
+   if p_operation='session_create_v1' then
    perform private.assert_resource(org,center,'person',(entry->>'person_id')::uuid);
-   perform private.assert_availability(org,center,'person',(entry->>'person_id')::uuid,(r#>>'{interval,starts_at}')::timestamptz,(r#>>'{interval,ends_at}')::timestamptz);$n$;
+   perform private.assert_availability(org,center,'person',(entry->>'person_id')::uuid,(r#>>'{interval,starts_at}')::timestamptz,(r#>>'{interval,ends_at}')::timestamptz);
+   end if;$n$;
  if strpos(body,old)=0 then raise exception 'assignment anchor missing';end if;body:=replace(body,old,new);
  old:=$o$target:=(r->>'person_id')::uuid;
   if not cm and not private.staff_grant(org,person,center,'reservation.write')$o$;
@@ -154,7 +156,7 @@ begin
  b:=replace(b,$o$select (value->>'value')::bigint into lim from core.policy_versions where org_id=org and key='negative_default' and effective_at<=now() and (scope_center_id is null or scope_center_id=ses.center_id) order by (scope_center_id is not null) desc,effective_at desc,id desc limit 1;$o$,$n$select (p.value->>'value')::bigint into lim from private.policy_at(org,ses.center_id,'negative_default',clock_timestamp()) p;$n$);
  b:=replace(b,$o$select (value->>'value')::bigint into upper_n from core.policy_versions where org_id=org and key='negative_upper' and effective_at<=now() order by mandatory desc,effective_at desc,id desc limit 1;$o$,$n$select (p.value->>'value')::bigint into upper_n from private.policy_at(org,ses.center_id,'negative_upper',clock_timestamp()) p;$n$);
  b:=replace(b,$o$declare ses core.sessions;lim bigint;upper_n bigint;used bigint;v jsonb;$o$,$n$declare ses core.sessions;lim bigint;upper_n bigint;used bigint;v jsonb;valuation_id uuid;$n$);
- b:=replace(b,$o$select value into v from core.policy_versions where org_id=org and key='negative_valuation' and effective_at<=now() and (scope_center_id is null or scope_center_id=ses.center_id) order by (scope_center_id is not null) desc,effective_at desc,id desc limit 1;$o$,$n$select p.value,p.id into v,valuation_id from private.policy_at(org,ses.center_id,'negative_valuation',clock_timestamp()) p;$n$);
+ b:=replace(b,$o$select value into v from core.policy_versions where org_id=org and key='negative_valuation' and effective_at<=now() and (scope_center_id is null or scope_center_id=ses.center_id) order by (scope_center_id is not null) desc,effective_at desc,id desc limit 1;$o$,$n$select p.value,p.id into v,valuation_id from private.policy_at(org,ses.center_id,'negative_valuation',clock_timestamp()) p; if v is not null and ((v->>'discipline_id')::uuid<>ses.discipline_id or v->>'format'<>ses.format) then perform private.fail('POLICY_NOT_CONFIGURED');end if;$n$);
  b:=replace(b,$o$(select id from core.policy_versions where org_id=org and key='negative_valuation' and value=v order by effective_at desc,id desc limit 1)$o$,$n$valuation_id$n$);
  execute b;
 end
