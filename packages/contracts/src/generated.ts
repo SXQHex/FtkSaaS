@@ -429,7 +429,7 @@ export type Permission = ("account.self" | "org.read" | "org.manage" | "org.owne
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
  * via the `definition` "OperationName".
  */
-export type OperationName = ("account_get_v1" | "account_profile_update_v1" | "account_password_change_v1" | "account_password_reset_request_v1" | "account_delete_preview_v1" | "account_delete_apply_v1" | "organizations_list_v1" | "organization_create_v1" | "organization_get_v1" | "organization_update_v1" | "organization_close_preview_v1" | "organization_close_apply_v1" | "organization_reopen_v1" | "organization_delete_preview_v1" | "organization_delete_apply_v1" | "centers_list_v1" | "center_create_v1" | "center_update_v1" | "room_save_v1" | "availability_save_v1" | "availability_exception_save_v1" | "policies_get_v1" | "policy_publish_v1" | "roles_list_v1" | "role_assign_v1" | "role_revoke_v1" | "permission_set_v1" | "org_manager_assign_v1" | "org_manager_revoke_v1" | "manager_self_assign_center_v1" | "account_access_send_v1" | "account_access_revoke_v1" | "account_access_accept_v1" | "account_link_remove_v1" | "people_list_v1" | "person_get_v1" | "person_create_v1" | "person_update_v1" | "student_activate_v1" | "student_deactivate_v1" | "person_merge_preview_v1" | "person_merge_approve_v1" | "person_merge_apply_v1" | "calendar_get_v1" | "class_save_v1" | "program_preview_v1" | "program_apply_v1" | "session_create_v1" | "session_get_v1" | "session_change_preview_v1" | "session_change_apply_v1" | "session_capacity_set_v1" | "session_cancel_preview_v1" | "session_cancel_apply_v1" | "replacement_session_create_v1" | "session_assignment_set_v1" | "lesson_request_create_v1" | "lesson_request_withdraw_v1" | "lesson_request_reject_v1" | "lesson_request_offer_alternative_v1" | "lesson_request_accept_alternative_v1" | "lesson_request_approve_v1" | "reservation_create_v1" | "reservation_cancel_v1" | "reservation_list_v1" | "waitlist_join_v1" | "waitlist_leave_v1" | "seat_offer_accept_v1" | "seat_offer_reject_v1" | "attendance_get_v1" | "attendance_mark_v1" | "attendance_close_v1" | "attendance_correct_preview_v1" | "attendance_correct_apply_v1" | "products_list_v1" | "product_publish_v1" | "sale_preview_v1" | "sale_apply_v1" | "entitlements_get_v1" | "entitlement_extend_v1" | "credit_adjust_v1" | "negative_limit_set_v1" | "freeze_preview_v1" | "freeze_apply_v1" | "freeze_end_preview_v1" | "freeze_end_apply_v1" | "sale_terminate_preview_v1" | "sale_terminate_apply_v1" | "sale_refund_preview_v1" | "sale_refund_apply_v1" | "sale_change_preview_v1" | "sale_change_apply_v1" | "sale_renew_preview_v1" | "sale_renew_apply_v1" | "finance_get_v1" | "collection_record_v1" | "collection_correct_preview_v1" | "collection_correct_apply_v1" | "student_credit_refund_v1" | "student_credit_offset_v1" | "debt_adjust_v1" | "instructor_agreement_publish_v1" | "earnings_list_v1" | "instructor_payment_record_v1" | "instructor_payment_correct_v1" | "leads_list_v1" | "lead_save_v1" | "crm_activity_save_v1" | "trial_offer_create_v1" | "trial_registration_confirm_v1" | "lead_convert_v1" | "crm_followup_list_v1" | "segment_save_v1" | "automation_save_v1" | "notifications_list_v1" | "notification_mark_read_v1" | "notification_preferences_set_v1" | "report_get_v1" | "report_export_start_v1" | "report_file_get_v1" | "import_upload_prepare_v1" | "import_preview_v1" | "import_apply_v1" | "import_rows_list_v1" | "subscription_get_v1" | "subscription_upgrade_quote_v1" | "subscription_downgrade_request_v1" | "subscription_change_cancel_v1" | "subscription_renewal_set_v1" | "saas_payment_submit_v1" | "saas_payment_verify_v1" | "saas_grace_extend_v1" | "event_save_v1" | "event_publish_v1" | "event_register_v1" | "event_registration_cancel_v1" | "event_complete_v1" | "event_duty_verify_v1" | "event_cancel_preview_v1" | "event_cancel_apply_v1" | "event_list_v1" | "document_upload_prepare_v1" | "document_version_publish_v1" | "document_requirements_get_v1" | "document_accept_v1" | "publication_set_v1" | "public_calendar_get_v1" | "public_application_submit_v1" | "public_application_review_v1" | "operation_status_get_v1" | "preview_get_v1" | "job_status_get_v1" | "audit_list_v1" | "seat_offer_issue_v1" | "seat_offer_expire_v1" | "request_expire_v1" | "outbox_deliver_v1" | "reminder_schedule_v1" | "automation_run_v1" | "import_rows_process_v1" | "report_build_v1" | "privacy_execute_v1" | "subscription_boundary_apply_v1" | "class_assignment_set_v1" | "event_attendance_mark_v1" | "platform_owner_set_v1" | "platform_owner_remove_v1" | "center_manager_assign_v1" | "center_manager_revoke_v1" | "attendance_block_v1" | "event_attendance_close_v1" | "event_attendance_correct_v1" | "file_upload_complete_v1" | "negcredit_valuation_set_v1" | "disciplines_list_v1" | "discipline_save_v1" | "center_discipline_set_v1" | "person_discipline_set_v1" | "event_get_v1" | "event_registration_preview_v1" | "event_payment_prepare_v1" | "event_payment_get_v1" | "event_actual_start_record_v1" | "event_actual_start_correct_v1" | "management_state_get_v1" | "instructor_agreements_list_v1" | "reservation_impact_preview_v1" | "reservation_impact_apply_v1" | "settlement_movements_list_v1" | "settlement_requests_list_v1" | "settlement_request_get_v1" | "settlement_request_submit_v1" | "settlement_request_withdraw_v1" | "settlement_request_decide_v1" | "settlement_payment_record_v1" | "settlement_offset_record_v1" | "settlement_adjust_v1")
+export type OperationName = ("account_get_v1" | "account_profile_update_v1" | "account_password_change_v1" | "account_password_reset_request_v1" | "account_delete_preview_v1" | "account_delete_apply_v1" | "organizations_list_v1" | "organization_create_v1" | "organization_get_v1" | "organization_update_v1" | "organization_close_preview_v1" | "organization_close_apply_v1" | "organization_reopen_v1" | "organization_delete_preview_v1" | "organization_delete_apply_v1" | "centers_list_v1" | "center_create_v1" | "center_update_v1" | "room_save_v1" | "availability_save_v1" | "availability_exception_save_v1" | "policies_get_v1" | "policy_publish_v1" | "roles_list_v1" | "role_assign_v1" | "role_revoke_v1" | "permission_set_v1" | "org_manager_assign_v1" | "org_manager_revoke_v1" | "manager_self_assign_center_v1" | "account_access_send_v1" | "account_access_revoke_v1" | "account_access_accept_v1" | "account_link_remove_v1" | "people_list_v1" | "person_get_v1" | "person_create_v1" | "person_update_v1" | "student_activate_v1" | "student_deactivate_v1" | "person_merge_preview_v1" | "person_merge_approve_v1" | "person_merge_apply_v1" | "calendar_get_v1" | "class_save_v1" | "program_preview_v1" | "program_apply_v1" | "session_create_v1" | "session_get_v1" | "session_change_preview_v1" | "session_change_apply_v1" | "session_capacity_set_v1" | "session_cancel_preview_v1" | "session_cancel_apply_v1" | "replacement_session_create_v1" | "session_assignment_set_v1" | "lesson_request_create_v1" | "lesson_request_withdraw_v1" | "lesson_request_reject_v1" | "lesson_request_offer_alternative_v1" | "lesson_request_accept_alternative_v1" | "lesson_request_approve_v1" | "reservation_create_v1" | "reservation_cancel_v1" | "reservation_list_v1" | "waitlist_join_v1" | "waitlist_leave_v1" | "seat_offer_accept_v1" | "seat_offer_reject_v1" | "attendance_get_v1" | "attendance_mark_v1" | "attendance_close_v1" | "attendance_correct_preview_v1" | "attendance_correct_apply_v1" | "products_list_v1" | "product_publish_v1" | "sale_preview_v1" | "sale_apply_v1" | "entitlements_get_v1" | "entitlement_extend_v1" | "credit_adjust_v1" | "negative_limit_set_v1" | "freeze_preview_v1" | "freeze_apply_v1" | "freeze_end_preview_v1" | "freeze_end_apply_v1" | "sale_terminate_preview_v1" | "sale_terminate_apply_v1" | "sale_refund_preview_v1" | "sale_refund_apply_v1" | "sale_change_preview_v1" | "sale_change_apply_v1" | "sale_renew_preview_v1" | "sale_renew_apply_v1" | "finance_get_v1" | "collection_record_v1" | "collection_correct_preview_v1" | "collection_correct_apply_v1" | "student_credit_refund_v1" | "student_credit_offset_v1" | "debt_adjust_v1" | "instructor_agreement_publish_v1" | "earnings_list_v1" | "instructor_payment_record_v1" | "instructor_payment_correct_v1" | "leads_list_v1" | "lead_save_v1" | "crm_activity_save_v1" | "trial_offer_create_v1" | "trial_registration_confirm_v1" | "lead_convert_v1" | "crm_followup_list_v1" | "segment_save_v1" | "automation_save_v1" | "notifications_list_v1" | "notification_mark_read_v1" | "notification_preferences_set_v1" | "report_get_v1" | "report_export_start_v1" | "report_file_get_v1" | "import_upload_prepare_v1" | "import_preview_v1" | "import_apply_v1" | "import_rows_list_v1" | "subscription_get_v1" | "subscription_upgrade_quote_v1" | "subscription_downgrade_request_v1" | "subscription_change_cancel_v1" | "subscription_renewal_set_v1" | "saas_payment_submit_v1" | "saas_payment_verify_v1" | "saas_grace_extend_v1" | "event_save_v1" | "event_publish_v1" | "event_register_v1" | "event_registration_cancel_v1" | "event_complete_v1" | "event_duty_verify_v1" | "event_cancel_preview_v1" | "event_cancel_apply_v1" | "event_list_v1" | "document_upload_prepare_v1" | "document_version_publish_v1" | "document_requirements_get_v1" | "document_accept_v1" | "publication_set_v1" | "public_calendar_get_v1" | "public_application_submit_v1" | "public_application_review_v1" | "operation_status_get_v1" | "preview_get_v1" | "job_status_get_v1" | "audit_list_v1" | "seat_offer_issue_v1" | "seat_offer_expire_v1" | "request_expire_v1" | "outbox_deliver_v1" | "reminder_schedule_v1" | "automation_run_v1" | "import_rows_process_v1" | "report_build_v1" | "privacy_execute_v1" | "subscription_boundary_apply_v1" | "class_assignment_set_v1" | "event_attendance_mark_v1" | "platform_owner_set_v1" | "platform_owner_remove_v1" | "center_manager_assign_v1" | "center_manager_revoke_v1" | "attendance_block_v1" | "event_attendance_close_v1" | "event_attendance_correct_v1" | "file_upload_complete_v1" | "negcredit_valuation_set_v1" | "disciplines_list_v1" | "discipline_save_v1" | "center_discipline_set_v1" | "person_discipline_set_v1" | "event_get_v1" | "event_registration_preview_v1" | "event_payment_prepare_v1" | "event_payment_get_v1" | "event_actual_start_record_v1" | "event_actual_start_correct_v1" | "management_state_get_v1" | "instructor_agreements_list_v1" | "reservation_impact_preview_v1" | "reservation_impact_apply_v1" | "settlement_movements_list_v1" | "settlement_requests_list_v1" | "settlement_request_get_v1" | "settlement_request_submit_v1" | "settlement_request_withdraw_v1" | "settlement_request_decide_v1" | "settlement_authority_get_v1" | "settlement_delegation_set_v1" | "settlement_authority_set_v1")
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
  * via the `definition` "EntityType".
@@ -754,7 +754,7 @@ export type EventPaymentPreparationState = ("prepared" | "registered" | "capacit
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
  * via the `definition` "ManagementProjection".
  */
-export type ManagementProjection = (ManagementProjectionAccountProfileUpdateV1 | ManagementProjectionAccountDeletePreviewV1 | ManagementProjectionAccountDeleteApplyV1 | ManagementProjectionOrganizationCreateV1 | ManagementProjectionOrganizationUpdateV1 | ManagementProjectionOrganizationClosePreviewV1 | ManagementProjectionOrganizationCloseApplyV1 | ManagementProjectionOrganizationReopenV1 | ManagementProjectionOrganizationDeletePreviewV1 | ManagementProjectionOrganizationDeleteApplyV1 | ManagementProjectionCenterCreateV1 | ManagementProjectionCenterUpdateV1 | ManagementProjectionRoomSaveV1 | ManagementProjectionAvailabilitySaveV1 | ManagementProjectionAvailabilityExceptionSaveV1 | ManagementProjectionPolicyPublishV1 | ManagementProjectionRoleAssignV1 | ManagementProjectionRoleRevokeV1 | ManagementProjectionPermissionSetV1 | ManagementProjectionOrgManagerAssignV1 | ManagementProjectionOrgManagerRevokeV1 | ManagementProjectionManagerSelfAssignCenterV1 | ManagementProjectionAccountAccessSendV1 | ManagementProjectionAccountAccessRevokeV1 | ManagementProjectionAccountAccessAcceptV1 | ManagementProjectionAccountLinkRemoveV1 | ManagementProjectionPersonCreateV1 | ManagementProjectionPersonUpdateV1 | ManagementProjectionStudentActivateV1 | ManagementProjectionStudentDeactivateV1 | ManagementProjectionPersonMergePreviewV1 | ManagementProjectionPersonMergeApproveV1 | ManagementProjectionPersonMergeApplyV1 | ManagementProjectionClassSaveV1 | ManagementProjectionProgramPreviewV1 | ManagementProjectionProgramApplyV1 | ManagementProjectionSessionCreateV1 | ManagementProjectionSessionChangePreviewV1 | ManagementProjectionSessionChangeApplyV1 | ManagementProjectionSessionCapacitySetV1 | ManagementProjectionSessionCancelPreviewV1 | ManagementProjectionSessionCancelApplyV1 | ManagementProjectionReplacementSessionCreateV1 | ManagementProjectionSessionAssignmentSetV1 | ManagementProjectionLessonRequestCreateV1 | ManagementProjectionLessonRequestWithdrawV1 | ManagementProjectionLessonRequestRejectV1 | ManagementProjectionLessonRequestOfferAlternativeV1 | ManagementProjectionLessonRequestAcceptAlternativeV1 | ManagementProjectionLessonRequestApproveV1 | ManagementProjectionReservationCreateV1 | ManagementProjectionReservationCancelV1 | ManagementProjectionWaitlistJoinV1 | ManagementProjectionWaitlistLeaveV1 | ManagementProjectionSeatOfferAcceptV1 | ManagementProjectionSeatOfferRejectV1 | ManagementProjectionAttendanceMarkV1 | ManagementProjectionAttendanceCloseV1 | ManagementProjectionAttendanceCorrectPreviewV1 | ManagementProjectionAttendanceCorrectApplyV1 | ManagementProjectionProductPublishV1 | ManagementProjectionSalePreviewV1 | ManagementProjectionSaleApplyV1 | ManagementProjectionEntitlementExtendV1 | ManagementProjectionCreditAdjustV1 | ManagementProjectionNegativeLimitSetV1 | ManagementProjectionFreezePreviewV1 | ManagementProjectionFreezeApplyV1 | ManagementProjectionFreezeEndPreviewV1 | ManagementProjectionFreezeEndApplyV1 | ManagementProjectionSaleTerminatePreviewV1 | ManagementProjectionSaleTerminateApplyV1 | ManagementProjectionSaleRefundPreviewV1 | ManagementProjectionSaleRefundApplyV1 | ManagementProjectionSaleChangePreviewV1 | ManagementProjectionSaleChangeApplyV1 | ManagementProjectionSaleRenewPreviewV1 | ManagementProjectionSaleRenewApplyV1 | ManagementProjectionCollectionRecordV1 | ManagementProjectionCollectionCorrectPreviewV1 | ManagementProjectionCollectionCorrectApplyV1 | ManagementProjectionStudentCreditRefundV1 | ManagementProjectionStudentCreditOffsetV1 | ManagementProjectionDebtAdjustV1 | ManagementProjectionInstructorAgreementPublishV1 | ManagementProjectionInstructorPaymentRecordV1 | ManagementProjectionInstructorPaymentCorrectV1 | ManagementProjectionLeadSaveV1 | ManagementProjectionCrmActivitySaveV1 | ManagementProjectionTrialOfferCreateV1 | ManagementProjectionTrialRegistrationConfirmV1 | ManagementProjectionLeadConvertV1 | ManagementProjectionSegmentSaveV1 | ManagementProjectionAutomationSaveV1 | ManagementProjectionNotificationMarkReadV1 | ManagementProjectionNotificationPreferencesSetV1 | ManagementProjectionReportExportStartV1 | ManagementProjectionImportUploadPrepareV1 | ManagementProjectionImportPreviewV1 | ManagementProjectionImportApplyV1 | ManagementProjectionSubscriptionUpgradeQuoteV1 | ManagementProjectionSubscriptionDowngradeRequestV1 | ManagementProjectionSubscriptionChangeCancelV1 | ManagementProjectionSubscriptionRenewalSetV1 | ManagementProjectionSaasPaymentSubmitV1 | ManagementProjectionSaasPaymentVerifyV1 | ManagementProjectionSaasGraceExtendV1 | ManagementProjectionEventSaveV1 | ManagementProjectionEventPublishV1 | ManagementProjectionEventRegisterV1 | ManagementProjectionEventRegistrationCancelV1 | ManagementProjectionEventCompleteV1 | ManagementProjectionEventDutyVerifyV1 | ManagementProjectionEventCancelPreviewV1 | ManagementProjectionEventCancelApplyV1 | ManagementProjectionDocumentUploadPrepareV1 | ManagementProjectionDocumentVersionPublishV1 | ManagementProjectionDocumentAcceptV1 | ManagementProjectionPublicationSetV1 | ManagementProjectionPublicApplicationSubmitV1 | ManagementProjectionPublicApplicationReviewV1 | ManagementProjectionClassAssignmentSetV1 | ManagementProjectionEventAttendanceMarkV1 | ManagementProjectionPlatformOwnerSetV1 | ManagementProjectionPlatformOwnerRemoveV1 | ManagementProjectionCenterManagerAssignV1 | ManagementProjectionCenterManagerRevokeV1 | ManagementProjectionAttendanceBlockV1 | ManagementProjectionEventAttendanceCloseV1 | ManagementProjectionEventAttendanceCorrectV1 | ManagementProjectionFileUploadCompleteV1 | ManagementProjectionNegcreditValuationSetV1 | ManagementProjectionDisciplineSaveV1 | ManagementProjectionCenterDisciplineSetV1 | ManagementProjectionPersonDisciplineSetV1 | ManagementProjectionEventRegistrationPreviewV1 | ManagementProjectionEventPaymentPrepareV1 | ManagementProjectionEventActualStartRecordV1 | ManagementProjectionEventActualStartCorrectV1 | ManagementProjectionReservationImpactPreviewV1 | ManagementProjectionReservationImpactApplyV1 | ManagementProjectionSettlementRequestSubmitV1 | ManagementProjectionSettlementRequestWithdrawV1 | ManagementProjectionSettlementRequestDecideV1 | ManagementProjectionSettlementPaymentRecordV1 | ManagementProjectionSettlementOffsetRecordV1 | ManagementProjectionSettlementAdjustV1)
+export type ManagementProjection = (ManagementProjectionAccountProfileUpdateV1 | ManagementProjectionAccountDeletePreviewV1 | ManagementProjectionAccountDeleteApplyV1 | ManagementProjectionOrganizationCreateV1 | ManagementProjectionOrganizationUpdateV1 | ManagementProjectionOrganizationClosePreviewV1 | ManagementProjectionOrganizationCloseApplyV1 | ManagementProjectionOrganizationReopenV1 | ManagementProjectionOrganizationDeletePreviewV1 | ManagementProjectionOrganizationDeleteApplyV1 | ManagementProjectionCenterCreateV1 | ManagementProjectionCenterUpdateV1 | ManagementProjectionRoomSaveV1 | ManagementProjectionAvailabilitySaveV1 | ManagementProjectionAvailabilityExceptionSaveV1 | ManagementProjectionPolicyPublishV1 | ManagementProjectionRoleAssignV1 | ManagementProjectionRoleRevokeV1 | ManagementProjectionPermissionSetV1 | ManagementProjectionOrgManagerAssignV1 | ManagementProjectionOrgManagerRevokeV1 | ManagementProjectionManagerSelfAssignCenterV1 | ManagementProjectionAccountAccessSendV1 | ManagementProjectionAccountAccessRevokeV1 | ManagementProjectionAccountAccessAcceptV1 | ManagementProjectionAccountLinkRemoveV1 | ManagementProjectionPersonCreateV1 | ManagementProjectionPersonUpdateV1 | ManagementProjectionStudentActivateV1 | ManagementProjectionStudentDeactivateV1 | ManagementProjectionPersonMergePreviewV1 | ManagementProjectionPersonMergeApproveV1 | ManagementProjectionPersonMergeApplyV1 | ManagementProjectionClassSaveV1 | ManagementProjectionProgramPreviewV1 | ManagementProjectionProgramApplyV1 | ManagementProjectionSessionCreateV1 | ManagementProjectionSessionChangePreviewV1 | ManagementProjectionSessionChangeApplyV1 | ManagementProjectionSessionCapacitySetV1 | ManagementProjectionSessionCancelPreviewV1 | ManagementProjectionSessionCancelApplyV1 | ManagementProjectionReplacementSessionCreateV1 | ManagementProjectionSessionAssignmentSetV1 | ManagementProjectionLessonRequestCreateV1 | ManagementProjectionLessonRequestWithdrawV1 | ManagementProjectionLessonRequestRejectV1 | ManagementProjectionLessonRequestOfferAlternativeV1 | ManagementProjectionLessonRequestAcceptAlternativeV1 | ManagementProjectionLessonRequestApproveV1 | ManagementProjectionReservationCreateV1 | ManagementProjectionReservationCancelV1 | ManagementProjectionWaitlistJoinV1 | ManagementProjectionWaitlistLeaveV1 | ManagementProjectionSeatOfferAcceptV1 | ManagementProjectionSeatOfferRejectV1 | ManagementProjectionAttendanceMarkV1 | ManagementProjectionAttendanceCloseV1 | ManagementProjectionAttendanceCorrectPreviewV1 | ManagementProjectionAttendanceCorrectApplyV1 | ManagementProjectionProductPublishV1 | ManagementProjectionSalePreviewV1 | ManagementProjectionSaleApplyV1 | ManagementProjectionEntitlementExtendV1 | ManagementProjectionCreditAdjustV1 | ManagementProjectionNegativeLimitSetV1 | ManagementProjectionFreezePreviewV1 | ManagementProjectionFreezeApplyV1 | ManagementProjectionFreezeEndPreviewV1 | ManagementProjectionFreezeEndApplyV1 | ManagementProjectionSaleTerminatePreviewV1 | ManagementProjectionSaleTerminateApplyV1 | ManagementProjectionSaleRefundPreviewV1 | ManagementProjectionSaleRefundApplyV1 | ManagementProjectionSaleChangePreviewV1 | ManagementProjectionSaleChangeApplyV1 | ManagementProjectionSaleRenewPreviewV1 | ManagementProjectionSaleRenewApplyV1 | ManagementProjectionCollectionRecordV1 | ManagementProjectionCollectionCorrectPreviewV1 | ManagementProjectionCollectionCorrectApplyV1 | ManagementProjectionStudentCreditRefundV1 | ManagementProjectionStudentCreditOffsetV1 | ManagementProjectionDebtAdjustV1 | ManagementProjectionInstructorAgreementPublishV1 | ManagementProjectionInstructorPaymentRecordV1 | ManagementProjectionInstructorPaymentCorrectV1 | ManagementProjectionLeadSaveV1 | ManagementProjectionCrmActivitySaveV1 | ManagementProjectionTrialOfferCreateV1 | ManagementProjectionTrialRegistrationConfirmV1 | ManagementProjectionLeadConvertV1 | ManagementProjectionSegmentSaveV1 | ManagementProjectionAutomationSaveV1 | ManagementProjectionNotificationMarkReadV1 | ManagementProjectionNotificationPreferencesSetV1 | ManagementProjectionReportExportStartV1 | ManagementProjectionImportUploadPrepareV1 | ManagementProjectionImportPreviewV1 | ManagementProjectionImportApplyV1 | ManagementProjectionSubscriptionUpgradeQuoteV1 | ManagementProjectionSubscriptionDowngradeRequestV1 | ManagementProjectionSubscriptionChangeCancelV1 | ManagementProjectionSubscriptionRenewalSetV1 | ManagementProjectionSaasPaymentSubmitV1 | ManagementProjectionSaasPaymentVerifyV1 | ManagementProjectionSaasGraceExtendV1 | ManagementProjectionEventSaveV1 | ManagementProjectionEventPublishV1 | ManagementProjectionEventRegisterV1 | ManagementProjectionEventRegistrationCancelV1 | ManagementProjectionEventCompleteV1 | ManagementProjectionEventDutyVerifyV1 | ManagementProjectionEventCancelPreviewV1 | ManagementProjectionEventCancelApplyV1 | ManagementProjectionDocumentUploadPrepareV1 | ManagementProjectionDocumentVersionPublishV1 | ManagementProjectionDocumentAcceptV1 | ManagementProjectionPublicationSetV1 | ManagementProjectionPublicApplicationSubmitV1 | ManagementProjectionPublicApplicationReviewV1 | ManagementProjectionClassAssignmentSetV1 | ManagementProjectionEventAttendanceMarkV1 | ManagementProjectionPlatformOwnerSetV1 | ManagementProjectionPlatformOwnerRemoveV1 | ManagementProjectionCenterManagerAssignV1 | ManagementProjectionCenterManagerRevokeV1 | ManagementProjectionAttendanceBlockV1 | ManagementProjectionEventAttendanceCloseV1 | ManagementProjectionEventAttendanceCorrectV1 | ManagementProjectionFileUploadCompleteV1 | ManagementProjectionNegcreditValuationSetV1 | ManagementProjectionDisciplineSaveV1 | ManagementProjectionCenterDisciplineSetV1 | ManagementProjectionPersonDisciplineSetV1 | ManagementProjectionEventRegistrationPreviewV1 | ManagementProjectionEventPaymentPrepareV1 | ManagementProjectionEventActualStartRecordV1 | ManagementProjectionEventActualStartCorrectV1 | ManagementProjectionReservationImpactPreviewV1 | ManagementProjectionReservationImpactApplyV1 | ManagementProjectionSettlementRequestSubmitV1 | ManagementProjectionSettlementRequestWithdrawV1 | ManagementProjectionSettlementRequestDecideV1 | ManagementProjectionSettlementDelegationSetV1 | ManagementProjectionSettlementAuthoritySetV1)
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
  * via the `definition` "ReservationProtectionChange".
@@ -762,9 +762,44 @@ export type ManagementProjection = (ManagementProjectionAccountProfileUpdateV1 |
 export type ReservationProtectionChange = (PolicyProtectionChange | NegativeLimitProtectionChange | CreditProtectionChange | SaleScopeProtectionChange | ValidityProtectionChange)
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "SettlementProposal".
+ */
+export type SettlementProposal = (SettlementPaymentProposal | SettlementOffsetProposal | SettlementCorrectionProposal)
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
  * via the `definition` "SettlementRequestState".
  */
 export type SettlementRequestState = ("pending" | "approved" | "rejected" | "withdrawn" | "superseded")
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "SettlementRequestView".
+ */
+export type SettlementRequestView = {
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+id: string
+version: PositiveInt
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+from_center_id: string
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+to_center_id: string
+currency: Currency
+state: SettlementRequestState
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+initiator_account_id: string
+decision_account_id: (string | null)
+reason: (Text | null)
+previous_id: (string | null)
+proposal: SettlementProposal
+record: (SettlementRecordView | null)
+}
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
  * via the `definition` "Request_management_state_get".
@@ -786,12 +821,45 @@ page?: Page
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
  * via the `definition` "ManagementOperationName".
  */
-export type ManagementOperationName = ("account_profile_update_v1" | "account_delete_preview_v1" | "account_delete_apply_v1" | "organization_create_v1" | "organization_update_v1" | "organization_close_preview_v1" | "organization_close_apply_v1" | "organization_reopen_v1" | "organization_delete_preview_v1" | "organization_delete_apply_v1" | "center_create_v1" | "center_update_v1" | "room_save_v1" | "availability_save_v1" | "availability_exception_save_v1" | "policy_publish_v1" | "role_assign_v1" | "role_revoke_v1" | "permission_set_v1" | "org_manager_assign_v1" | "org_manager_revoke_v1" | "manager_self_assign_center_v1" | "account_access_send_v1" | "account_access_revoke_v1" | "account_access_accept_v1" | "account_link_remove_v1" | "person_create_v1" | "person_update_v1" | "student_activate_v1" | "student_deactivate_v1" | "person_merge_preview_v1" | "person_merge_approve_v1" | "person_merge_apply_v1" | "class_save_v1" | "program_preview_v1" | "program_apply_v1" | "session_create_v1" | "session_change_preview_v1" | "session_change_apply_v1" | "session_capacity_set_v1" | "session_cancel_preview_v1" | "session_cancel_apply_v1" | "replacement_session_create_v1" | "session_assignment_set_v1" | "lesson_request_create_v1" | "lesson_request_withdraw_v1" | "lesson_request_reject_v1" | "lesson_request_offer_alternative_v1" | "lesson_request_accept_alternative_v1" | "lesson_request_approve_v1" | "reservation_create_v1" | "reservation_cancel_v1" | "waitlist_join_v1" | "waitlist_leave_v1" | "seat_offer_accept_v1" | "seat_offer_reject_v1" | "attendance_mark_v1" | "attendance_close_v1" | "attendance_correct_preview_v1" | "attendance_correct_apply_v1" | "product_publish_v1" | "sale_preview_v1" | "sale_apply_v1" | "entitlement_extend_v1" | "credit_adjust_v1" | "negative_limit_set_v1" | "freeze_preview_v1" | "freeze_apply_v1" | "freeze_end_preview_v1" | "freeze_end_apply_v1" | "sale_terminate_preview_v1" | "sale_terminate_apply_v1" | "sale_refund_preview_v1" | "sale_refund_apply_v1" | "sale_change_preview_v1" | "sale_change_apply_v1" | "sale_renew_preview_v1" | "sale_renew_apply_v1" | "collection_record_v1" | "collection_correct_preview_v1" | "collection_correct_apply_v1" | "student_credit_refund_v1" | "student_credit_offset_v1" | "debt_adjust_v1" | "instructor_agreement_publish_v1" | "instructor_payment_record_v1" | "instructor_payment_correct_v1" | "lead_save_v1" | "crm_activity_save_v1" | "trial_offer_create_v1" | "trial_registration_confirm_v1" | "lead_convert_v1" | "segment_save_v1" | "automation_save_v1" | "notification_mark_read_v1" | "notification_preferences_set_v1" | "report_export_start_v1" | "import_upload_prepare_v1" | "import_preview_v1" | "import_apply_v1" | "subscription_upgrade_quote_v1" | "subscription_downgrade_request_v1" | "subscription_change_cancel_v1" | "subscription_renewal_set_v1" | "saas_payment_submit_v1" | "saas_payment_verify_v1" | "saas_grace_extend_v1" | "event_save_v1" | "event_publish_v1" | "event_register_v1" | "event_registration_cancel_v1" | "event_complete_v1" | "event_duty_verify_v1" | "event_cancel_preview_v1" | "event_cancel_apply_v1" | "document_upload_prepare_v1" | "document_version_publish_v1" | "document_accept_v1" | "publication_set_v1" | "public_application_submit_v1" | "public_application_review_v1" | "class_assignment_set_v1" | "event_attendance_mark_v1" | "platform_owner_set_v1" | "platform_owner_remove_v1" | "center_manager_assign_v1" | "center_manager_revoke_v1" | "attendance_block_v1" | "event_attendance_close_v1" | "event_attendance_correct_v1" | "file_upload_complete_v1" | "negcredit_valuation_set_v1" | "discipline_save_v1" | "center_discipline_set_v1" | "person_discipline_set_v1" | "event_registration_preview_v1" | "event_payment_prepare_v1" | "event_actual_start_record_v1" | "event_actual_start_correct_v1" | "reservation_impact_preview_v1" | "reservation_impact_apply_v1" | "settlement_request_submit_v1" | "settlement_request_withdraw_v1" | "settlement_request_decide_v1" | "settlement_payment_record_v1" | "settlement_offset_record_v1" | "settlement_adjust_v1")
+export type ManagementOperationName = ("account_profile_update_v1" | "account_delete_preview_v1" | "account_delete_apply_v1" | "organization_create_v1" | "organization_update_v1" | "organization_close_preview_v1" | "organization_close_apply_v1" | "organization_reopen_v1" | "organization_delete_preview_v1" | "organization_delete_apply_v1" | "center_create_v1" | "center_update_v1" | "room_save_v1" | "availability_save_v1" | "availability_exception_save_v1" | "policy_publish_v1" | "role_assign_v1" | "role_revoke_v1" | "permission_set_v1" | "org_manager_assign_v1" | "org_manager_revoke_v1" | "manager_self_assign_center_v1" | "account_access_send_v1" | "account_access_revoke_v1" | "account_access_accept_v1" | "account_link_remove_v1" | "person_create_v1" | "person_update_v1" | "student_activate_v1" | "student_deactivate_v1" | "person_merge_preview_v1" | "person_merge_approve_v1" | "person_merge_apply_v1" | "class_save_v1" | "program_preview_v1" | "program_apply_v1" | "session_create_v1" | "session_change_preview_v1" | "session_change_apply_v1" | "session_capacity_set_v1" | "session_cancel_preview_v1" | "session_cancel_apply_v1" | "replacement_session_create_v1" | "session_assignment_set_v1" | "lesson_request_create_v1" | "lesson_request_withdraw_v1" | "lesson_request_reject_v1" | "lesson_request_offer_alternative_v1" | "lesson_request_accept_alternative_v1" | "lesson_request_approve_v1" | "reservation_create_v1" | "reservation_cancel_v1" | "waitlist_join_v1" | "waitlist_leave_v1" | "seat_offer_accept_v1" | "seat_offer_reject_v1" | "attendance_mark_v1" | "attendance_close_v1" | "attendance_correct_preview_v1" | "attendance_correct_apply_v1" | "product_publish_v1" | "sale_preview_v1" | "sale_apply_v1" | "entitlement_extend_v1" | "credit_adjust_v1" | "negative_limit_set_v1" | "freeze_preview_v1" | "freeze_apply_v1" | "freeze_end_preview_v1" | "freeze_end_apply_v1" | "sale_terminate_preview_v1" | "sale_terminate_apply_v1" | "sale_refund_preview_v1" | "sale_refund_apply_v1" | "sale_change_preview_v1" | "sale_change_apply_v1" | "sale_renew_preview_v1" | "sale_renew_apply_v1" | "collection_record_v1" | "collection_correct_preview_v1" | "collection_correct_apply_v1" | "student_credit_refund_v1" | "student_credit_offset_v1" | "debt_adjust_v1" | "instructor_agreement_publish_v1" | "instructor_payment_record_v1" | "instructor_payment_correct_v1" | "lead_save_v1" | "crm_activity_save_v1" | "trial_offer_create_v1" | "trial_registration_confirm_v1" | "lead_convert_v1" | "segment_save_v1" | "automation_save_v1" | "notification_mark_read_v1" | "notification_preferences_set_v1" | "report_export_start_v1" | "import_upload_prepare_v1" | "import_preview_v1" | "import_apply_v1" | "subscription_upgrade_quote_v1" | "subscription_downgrade_request_v1" | "subscription_change_cancel_v1" | "subscription_renewal_set_v1" | "saas_payment_submit_v1" | "saas_payment_verify_v1" | "saas_grace_extend_v1" | "event_save_v1" | "event_publish_v1" | "event_register_v1" | "event_registration_cancel_v1" | "event_complete_v1" | "event_duty_verify_v1" | "event_cancel_preview_v1" | "event_cancel_apply_v1" | "document_upload_prepare_v1" | "document_version_publish_v1" | "document_accept_v1" | "publication_set_v1" | "public_application_submit_v1" | "public_application_review_v1" | "class_assignment_set_v1" | "event_attendance_mark_v1" | "platform_owner_set_v1" | "platform_owner_remove_v1" | "center_manager_assign_v1" | "center_manager_revoke_v1" | "attendance_block_v1" | "event_attendance_close_v1" | "event_attendance_correct_v1" | "file_upload_complete_v1" | "negcredit_valuation_set_v1" | "discipline_save_v1" | "center_discipline_set_v1" | "person_discipline_set_v1" | "event_registration_preview_v1" | "event_payment_prepare_v1" | "event_actual_start_record_v1" | "event_actual_start_correct_v1" | "reservation_impact_preview_v1" | "reservation_impact_apply_v1" | "settlement_request_submit_v1" | "settlement_request_withdraw_v1" | "settlement_request_decide_v1" | "settlement_delegation_set_v1" | "settlement_authority_set_v1")
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
  * via the `definition` "ManagementSelector".
  */
-export type ManagementSelector = (ManagementSelectorAccountProfileUpdateV1 | ManagementSelectorAccountDeletePreviewV1 | ManagementSelectorAccountDeleteApplyV1 | ManagementSelectorOrganizationCreateV1 | ManagementSelectorOrganizationUpdateV1 | ManagementSelectorOrganizationClosePreviewV1 | ManagementSelectorOrganizationCloseApplyV1 | ManagementSelectorOrganizationReopenV1 | ManagementSelectorOrganizationDeletePreviewV1 | ManagementSelectorOrganizationDeleteApplyV1 | ManagementSelectorCenterCreateV1 | ManagementSelectorCenterUpdateV1 | ManagementSelectorRoomSaveV1 | ManagementSelectorAvailabilitySaveV1 | ManagementSelectorAvailabilityExceptionSaveV1 | ManagementSelectorPolicyPublishV1 | ManagementSelectorRoleAssignV1 | ManagementSelectorRoleRevokeV1 | ManagementSelectorPermissionSetV1 | ManagementSelectorOrgManagerAssignV1 | ManagementSelectorOrgManagerRevokeV1 | ManagementSelectorManagerSelfAssignCenterV1 | ManagementSelectorAccountAccessSendV1 | ManagementSelectorAccountAccessRevokeV1 | ManagementSelectorAccountAccessAcceptV1 | ManagementSelectorAccountLinkRemoveV1 | ManagementSelectorPersonCreateV1 | ManagementSelectorPersonUpdateV1 | ManagementSelectorStudentActivateV1 | ManagementSelectorStudentDeactivateV1 | ManagementSelectorPersonMergePreviewV1 | ManagementSelectorPersonMergeApproveV1 | ManagementSelectorPersonMergeApplyV1 | ManagementSelectorClassSaveV1 | ManagementSelectorProgramPreviewV1 | ManagementSelectorProgramApplyV1 | ManagementSelectorSessionCreateV1 | ManagementSelectorSessionChangePreviewV1 | ManagementSelectorSessionChangeApplyV1 | ManagementSelectorSessionCapacitySetV1 | ManagementSelectorSessionCancelPreviewV1 | ManagementSelectorSessionCancelApplyV1 | ManagementSelectorReplacementSessionCreateV1 | ManagementSelectorSessionAssignmentSetV1 | ManagementSelectorLessonRequestCreateV1 | ManagementSelectorLessonRequestWithdrawV1 | ManagementSelectorLessonRequestRejectV1 | ManagementSelectorLessonRequestOfferAlternativeV1 | ManagementSelectorLessonRequestAcceptAlternativeV1 | ManagementSelectorLessonRequestApproveV1 | ManagementSelectorReservationCreateV1 | ManagementSelectorReservationCancelV1 | ManagementSelectorWaitlistJoinV1 | ManagementSelectorWaitlistLeaveV1 | ManagementSelectorSeatOfferAcceptV1 | ManagementSelectorSeatOfferRejectV1 | ManagementSelectorAttendanceMarkV1 | ManagementSelectorAttendanceCloseV1 | ManagementSelectorAttendanceCorrectPreviewV1 | ManagementSelectorAttendanceCorrectApplyV1 | ManagementSelectorProductPublishV1 | ManagementSelectorSalePreviewV1 | ManagementSelectorSaleApplyV1 | ManagementSelectorEntitlementExtendV1 | ManagementSelectorCreditAdjustV1 | ManagementSelectorNegativeLimitSetV1 | ManagementSelectorFreezePreviewV1 | ManagementSelectorFreezeApplyV1 | ManagementSelectorFreezeEndPreviewV1 | ManagementSelectorFreezeEndApplyV1 | ManagementSelectorSaleTerminatePreviewV1 | ManagementSelectorSaleTerminateApplyV1 | ManagementSelectorSaleRefundPreviewV1 | ManagementSelectorSaleRefundApplyV1 | ManagementSelectorSaleChangePreviewV1 | ManagementSelectorSaleChangeApplyV1 | ManagementSelectorSaleRenewPreviewV1 | ManagementSelectorSaleRenewApplyV1 | ManagementSelectorCollectionRecordV1 | ManagementSelectorCollectionCorrectPreviewV1 | ManagementSelectorCollectionCorrectApplyV1 | ManagementSelectorStudentCreditRefundV1 | ManagementSelectorStudentCreditOffsetV1 | ManagementSelectorDebtAdjustV1 | ManagementSelectorInstructorAgreementPublishV1 | ManagementSelectorInstructorPaymentRecordV1 | ManagementSelectorInstructorPaymentCorrectV1 | ManagementSelectorLeadSaveV1 | ManagementSelectorCrmActivitySaveV1 | ManagementSelectorTrialOfferCreateV1 | ManagementSelectorTrialRegistrationConfirmV1 | ManagementSelectorLeadConvertV1 | ManagementSelectorSegmentSaveV1 | ManagementSelectorAutomationSaveV1 | ManagementSelectorNotificationMarkReadV1 | ManagementSelectorNotificationPreferencesSetV1 | ManagementSelectorReportExportStartV1 | ManagementSelectorImportUploadPrepareV1 | ManagementSelectorImportPreviewV1 | ManagementSelectorImportApplyV1 | ManagementSelectorSubscriptionUpgradeQuoteV1 | ManagementSelectorSubscriptionDowngradeRequestV1 | ManagementSelectorSubscriptionChangeCancelV1 | ManagementSelectorSubscriptionRenewalSetV1 | ManagementSelectorSaasPaymentSubmitV1 | ManagementSelectorSaasPaymentVerifyV1 | ManagementSelectorSaasGraceExtendV1 | ManagementSelectorEventSaveV1 | ManagementSelectorEventPublishV1 | ManagementSelectorEventRegisterV1 | ManagementSelectorEventRegistrationCancelV1 | ManagementSelectorEventCompleteV1 | ManagementSelectorEventDutyVerifyV1 | ManagementSelectorEventCancelPreviewV1 | ManagementSelectorEventCancelApplyV1 | ManagementSelectorDocumentUploadPrepareV1 | ManagementSelectorDocumentVersionPublishV1 | ManagementSelectorDocumentAcceptV1 | ManagementSelectorPublicationSetV1 | ManagementSelectorPublicApplicationSubmitV1 | ManagementSelectorPublicApplicationReviewV1 | ManagementSelectorClassAssignmentSetV1 | ManagementSelectorEventAttendanceMarkV1 | ManagementSelectorPlatformOwnerSetV1 | ManagementSelectorPlatformOwnerRemoveV1 | ManagementSelectorCenterManagerAssignV1 | ManagementSelectorCenterManagerRevokeV1 | ManagementSelectorAttendanceBlockV1 | ManagementSelectorEventAttendanceCloseV1 | ManagementSelectorEventAttendanceCorrectV1 | ManagementSelectorFileUploadCompleteV1 | ManagementSelectorNegcreditValuationSetV1 | ManagementSelectorDisciplineSaveV1 | ManagementSelectorCenterDisciplineSetV1 | ManagementSelectorPersonDisciplineSetV1 | ManagementSelectorEventRegistrationPreviewV1 | ManagementSelectorEventPaymentPrepareV1 | ManagementSelectorEventActualStartRecordV1 | ManagementSelectorEventActualStartCorrectV1 | ManagementSelectorReservationImpactPreviewV1 | ManagementSelectorReservationImpactApplyV1 | ManagementSelectorSettlementRequestSubmitV1 | ManagementSelectorSettlementRequestWithdrawV1 | ManagementSelectorSettlementRequestDecideV1 | ManagementSelectorSettlementPaymentRecordV1 | ManagementSelectorSettlementOffsetRecordV1 | ManagementSelectorSettlementAdjustV1)
+export type ManagementSelector = (ManagementSelectorAccountProfileUpdateV1 | ManagementSelectorAccountDeletePreviewV1 | ManagementSelectorAccountDeleteApplyV1 | ManagementSelectorOrganizationCreateV1 | ManagementSelectorOrganizationUpdateV1 | ManagementSelectorOrganizationClosePreviewV1 | ManagementSelectorOrganizationCloseApplyV1 | ManagementSelectorOrganizationReopenV1 | ManagementSelectorOrganizationDeletePreviewV1 | ManagementSelectorOrganizationDeleteApplyV1 | ManagementSelectorCenterCreateV1 | ManagementSelectorCenterUpdateV1 | ManagementSelectorRoomSaveV1 | ManagementSelectorAvailabilitySaveV1 | ManagementSelectorAvailabilityExceptionSaveV1 | ManagementSelectorPolicyPublishV1 | ManagementSelectorRoleAssignV1 | ManagementSelectorRoleRevokeV1 | ManagementSelectorPermissionSetV1 | ManagementSelectorOrgManagerAssignV1 | ManagementSelectorOrgManagerRevokeV1 | ManagementSelectorManagerSelfAssignCenterV1 | ManagementSelectorAccountAccessSendV1 | ManagementSelectorAccountAccessRevokeV1 | ManagementSelectorAccountAccessAcceptV1 | ManagementSelectorAccountLinkRemoveV1 | ManagementSelectorPersonCreateV1 | ManagementSelectorPersonUpdateV1 | ManagementSelectorStudentActivateV1 | ManagementSelectorStudentDeactivateV1 | ManagementSelectorPersonMergePreviewV1 | ManagementSelectorPersonMergeApproveV1 | ManagementSelectorPersonMergeApplyV1 | ManagementSelectorClassSaveV1 | ManagementSelectorProgramPreviewV1 | ManagementSelectorProgramApplyV1 | ManagementSelectorSessionCreateV1 | ManagementSelectorSessionChangePreviewV1 | ManagementSelectorSessionChangeApplyV1 | ManagementSelectorSessionCapacitySetV1 | ManagementSelectorSessionCancelPreviewV1 | ManagementSelectorSessionCancelApplyV1 | ManagementSelectorReplacementSessionCreateV1 | ManagementSelectorSessionAssignmentSetV1 | ManagementSelectorLessonRequestCreateV1 | ManagementSelectorLessonRequestWithdrawV1 | ManagementSelectorLessonRequestRejectV1 | ManagementSelectorLessonRequestOfferAlternativeV1 | ManagementSelectorLessonRequestAcceptAlternativeV1 | ManagementSelectorLessonRequestApproveV1 | ManagementSelectorReservationCreateV1 | ManagementSelectorReservationCancelV1 | ManagementSelectorWaitlistJoinV1 | ManagementSelectorWaitlistLeaveV1 | ManagementSelectorSeatOfferAcceptV1 | ManagementSelectorSeatOfferRejectV1 | ManagementSelectorAttendanceMarkV1 | ManagementSelectorAttendanceCloseV1 | ManagementSelectorAttendanceCorrectPreviewV1 | ManagementSelectorAttendanceCorrectApplyV1 | ManagementSelectorProductPublishV1 | ManagementSelectorSalePreviewV1 | ManagementSelectorSaleApplyV1 | ManagementSelectorEntitlementExtendV1 | ManagementSelectorCreditAdjustV1 | ManagementSelectorNegativeLimitSetV1 | ManagementSelectorFreezePreviewV1 | ManagementSelectorFreezeApplyV1 | ManagementSelectorFreezeEndPreviewV1 | ManagementSelectorFreezeEndApplyV1 | ManagementSelectorSaleTerminatePreviewV1 | ManagementSelectorSaleTerminateApplyV1 | ManagementSelectorSaleRefundPreviewV1 | ManagementSelectorSaleRefundApplyV1 | ManagementSelectorSaleChangePreviewV1 | ManagementSelectorSaleChangeApplyV1 | ManagementSelectorSaleRenewPreviewV1 | ManagementSelectorSaleRenewApplyV1 | ManagementSelectorCollectionRecordV1 | ManagementSelectorCollectionCorrectPreviewV1 | ManagementSelectorCollectionCorrectApplyV1 | ManagementSelectorStudentCreditRefundV1 | ManagementSelectorStudentCreditOffsetV1 | ManagementSelectorDebtAdjustV1 | ManagementSelectorInstructorAgreementPublishV1 | ManagementSelectorInstructorPaymentRecordV1 | ManagementSelectorInstructorPaymentCorrectV1 | ManagementSelectorLeadSaveV1 | ManagementSelectorCrmActivitySaveV1 | ManagementSelectorTrialOfferCreateV1 | ManagementSelectorTrialRegistrationConfirmV1 | ManagementSelectorLeadConvertV1 | ManagementSelectorSegmentSaveV1 | ManagementSelectorAutomationSaveV1 | ManagementSelectorNotificationMarkReadV1 | ManagementSelectorNotificationPreferencesSetV1 | ManagementSelectorReportExportStartV1 | ManagementSelectorImportUploadPrepareV1 | ManagementSelectorImportPreviewV1 | ManagementSelectorImportApplyV1 | ManagementSelectorSubscriptionUpgradeQuoteV1 | ManagementSelectorSubscriptionDowngradeRequestV1 | ManagementSelectorSubscriptionChangeCancelV1 | ManagementSelectorSubscriptionRenewalSetV1 | ManagementSelectorSaasPaymentSubmitV1 | ManagementSelectorSaasPaymentVerifyV1 | ManagementSelectorSaasGraceExtendV1 | ManagementSelectorEventSaveV1 | ManagementSelectorEventPublishV1 | ManagementSelectorEventRegisterV1 | ManagementSelectorEventRegistrationCancelV1 | ManagementSelectorEventCompleteV1 | ManagementSelectorEventDutyVerifyV1 | ManagementSelectorEventCancelPreviewV1 | ManagementSelectorEventCancelApplyV1 | ManagementSelectorDocumentUploadPrepareV1 | ManagementSelectorDocumentVersionPublishV1 | ManagementSelectorDocumentAcceptV1 | ManagementSelectorPublicationSetV1 | ManagementSelectorPublicApplicationSubmitV1 | ManagementSelectorPublicApplicationReviewV1 | ManagementSelectorClassAssignmentSetV1 | ManagementSelectorEventAttendanceMarkV1 | ManagementSelectorPlatformOwnerSetV1 | ManagementSelectorPlatformOwnerRemoveV1 | ManagementSelectorCenterManagerAssignV1 | ManagementSelectorCenterManagerRevokeV1 | ManagementSelectorAttendanceBlockV1 | ManagementSelectorEventAttendanceCloseV1 | ManagementSelectorEventAttendanceCorrectV1 | ManagementSelectorFileUploadCompleteV1 | ManagementSelectorNegcreditValuationSetV1 | ManagementSelectorDisciplineSaveV1 | ManagementSelectorCenterDisciplineSetV1 | ManagementSelectorPersonDisciplineSetV1 | ManagementSelectorEventRegistrationPreviewV1 | ManagementSelectorEventPaymentPrepareV1 | ManagementSelectorEventActualStartRecordV1 | ManagementSelectorEventActualStartCorrectV1 | ManagementSelectorReservationImpactPreviewV1 | ManagementSelectorReservationImpactApplyV1 | ManagementSelectorSettlementRequestSubmitV1 | ManagementSelectorSettlementRequestWithdrawV1 | ManagementSelectorSettlementRequestDecideV1 | ManagementSelectorSettlementDelegationSetV1 | ManagementSelectorSettlementAuthoritySetV1)
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "Request_settlement_request_submit".
+ */
+export type RequestSettlementRequestSubmit = {
+client_api_version: 1
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+request_id: string
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+org_id: string
+center_id?: (string | null)
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+operation_key: string
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+from_center_id: string
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+to_center_id: string
+currency: Currency
+reason: Text
+previous_id?: (string | null)
+previous_version?: PositiveInt
+proposal: SettlementProposal
+}
 /**
  * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
  *
@@ -1573,12 +1641,6 @@ Request_settlement_request_withdraw?: RequestSettlementRequestWithdraw
 Success_settlement_request_withdraw?: SuccessSettlementRequestWithdraw
 Request_settlement_request_decide?: RequestSettlementRequestDecide
 Success_settlement_request_decide?: SuccessSettlementRequestDecide
-Request_settlement_payment_record?: RequestSettlementPaymentRecord
-Success_settlement_payment_record?: SuccessSettlementPaymentRecord
-Request_settlement_offset_record?: RequestSettlementOffsetRecord
-Success_settlement_offset_record?: SuccessSettlementOffsetRecord
-Request_settlement_adjust?: RequestSettlementAdjust
-Success_settlement_adjust?: SuccessSettlementAdjust
 ManagementProjection_account_profile_update_v1?: ManagementProjectionAccountProfileUpdateV1
 ManagementProjection_account_delete_preview_v1?: ManagementProjectionAccountDeletePreviewV1
 ManagementProjection_account_delete_apply_v1?: ManagementProjectionAccountDeleteApplyV1
@@ -1723,9 +1785,6 @@ ManagementProjection_reservation_impact_apply_v1?: ManagementProjectionReservati
 ManagementProjection_settlement_request_submit_v1?: ManagementProjectionSettlementRequestSubmitV1
 ManagementProjection_settlement_request_withdraw_v1?: ManagementProjectionSettlementRequestWithdrawV1
 ManagementProjection_settlement_request_decide_v1?: ManagementProjectionSettlementRequestDecideV1
-ManagementProjection_settlement_payment_record_v1?: ManagementProjectionSettlementPaymentRecordV1
-ManagementProjection_settlement_offset_record_v1?: ManagementProjectionSettlementOffsetRecordV1
-ManagementProjection_settlement_adjust_v1?: ManagementProjectionSettlementAdjustV1
 ManagementProjection?: ManagementProjection
 ManagementOperationName?: ManagementOperationName
 ManagementSelector_account_profile_update_v1?: ManagementSelectorAccountProfileUpdateV1
@@ -1872,13 +1931,27 @@ ManagementSelector_reservation_impact_apply_v1?: ManagementSelectorReservationIm
 ManagementSelector_settlement_request_submit_v1?: ManagementSelectorSettlementRequestSubmitV1
 ManagementSelector_settlement_request_withdraw_v1?: ManagementSelectorSettlementRequestWithdrawV1
 ManagementSelector_settlement_request_decide_v1?: ManagementSelectorSettlementRequestDecideV1
-ManagementSelector_settlement_payment_record_v1?: ManagementSelectorSettlementPaymentRecordV1
-ManagementSelector_settlement_offset_record_v1?: ManagementSelectorSettlementOffsetRecordV1
-ManagementSelector_settlement_adjust_v1?: ManagementSelectorSettlementAdjustV1
 ManagementSelector?: ManagementSelector
 ManagementStatePage?: ManagementStatePage
 Target_center_update_identified?: TargetCenterUpdateIdentified
 ValidityProtectionChange?: ValidityProtectionChange
+SettlementPaymentProposal?: SettlementPaymentProposal
+SettlementOffsetProposal?: SettlementOffsetProposal
+SettlementCorrectionProposal?: SettlementCorrectionProposal
+SettlementProposal?: SettlementProposal
+SettlementRecordView?: SettlementRecordView
+SettlementCenterGrantView?: SettlementCenterGrantView
+SettlementAuthorityView?: SettlementAuthorityView
+Request_settlement_authority_get?: RequestSettlementAuthorityGet
+Request_settlement_delegation_set?: RequestSettlementDelegationSet
+Request_settlement_authority_set?: RequestSettlementAuthoritySet
+Success_settlement_authority_get?: SuccessSettlementAuthorityGet
+Success_settlement_delegation_set?: SuccessSettlementDelegationSet
+Success_settlement_authority_set?: SuccessSettlementAuthoritySet
+ManagementSelector_settlement_delegation_set_v1?: ManagementSelectorSettlementDelegationSetV1
+ManagementProjection_settlement_delegation_set_v1?: ManagementProjectionSettlementDelegationSetV1
+ManagementSelector_settlement_authority_set_v1?: ManagementSelectorSettlementAuthoritySetV1
+ManagementProjection_settlement_authority_set_v1?: ManagementProjectionSettlementAuthoritySetV1
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -14754,13 +14827,23 @@ from_center_id?: string
  */
 to_center_id?: string
 currency?: Currency
+previous_id?: (string | null)
+previous_version?: PositiveInt
+proposal?: SettlementProposal
+}
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "SettlementPaymentProposal".
+ */
+export interface SettlementPaymentProposal {
+kind: "payment"
 /**
  * @minItems 1
  */
-lines?: [SettlementLine, ...(SettlementLine)[]]
-previous_id?: (string | null)
-previous_version?: PositiveInt
-}
+lines: [SettlementLine, ...(SettlementLine)[]]
+amount_minor: PositiveMoney
+occurred_at: Instant
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -14771,6 +14854,35 @@ export interface SettlementLine {
  * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
  */
 movement_id: string
+expected_version: PositiveInt
+amount_minor: PositiveMoney
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "SettlementOffsetProposal".
+ */
+export interface SettlementOffsetProposal {
+kind: "offset"
+/**
+ * @minItems 1
+ */
+debit_lines: [SettlementLine, ...(SettlementLine)[]]
+/**
+ * @minItems 1
+ */
+credit_lines: [SettlementLine, ...(SettlementLine)[]]
+amount_minor: PositiveMoney
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "SettlementCorrectionProposal".
+ */
+export interface SettlementCorrectionProposal {
+kind: "correction"
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+original_record_id: string
 expected_version: PositiveInt
 amount_minor: PositiveMoney
 }
@@ -14799,65 +14911,34 @@ values: {
  */
 settlement_request_id?: string
 decision?: ("approve" | "reject")
-fallback?: Bool
 }
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
- * via the `definition` "ManagementProjection_settlement_payment_record_v1".
+ * via the `definition` "ManagementProjection_settlement_delegation_set_v1".
  */
-export interface ManagementProjectionSettlementPaymentRecordV1 {
-operation: "settlement_payment_record_v1"
+export interface ManagementProjectionSettlementDelegationSetV1 {
+operation: "settlement_delegation_set_v1"
 values: {
 /**
  * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
  */
-settlement_request_id?: string
-/**
- * @minItems 1
- */
-lines?: [SettlementLine, ...(SettlementLine)[]]
-amount_minor?: PositiveMoney
-currency?: Currency
-occurred_at?: Instant
+person_id?: string
+granted?: Bool
 }
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
- * via the `definition` "ManagementProjection_settlement_offset_record_v1".
+ * via the `definition` "ManagementProjection_settlement_authority_set_v1".
  */
-export interface ManagementProjectionSettlementOffsetRecordV1 {
-operation: "settlement_offset_record_v1"
+export interface ManagementProjectionSettlementAuthoritySetV1 {
+operation: "settlement_authority_set_v1"
 values: {
 /**
  * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
  */
-settlement_request_id?: string
-/**
- * @minItems 1
- */
-debit_lines?: [SettlementLine, ...(SettlementLine)[]]
-/**
- * @minItems 1
- */
-credit_lines?: [SettlementLine, ...(SettlementLine)[]]
-amount_minor?: PositiveMoney
-currency?: Currency
-occurred_at?: Instant
-}
-}
-/**
- * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
- * via the `definition` "ManagementProjection_settlement_adjust_v1".
- */
-export interface ManagementProjectionSettlementAdjustV1 {
-operation: "settlement_adjust_v1"
-values: {
-/**
- * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
- */
-movement_id?: string
-amount_minor?: PositiveMoney
+person_id?: string
+granted?: Bool
 }
 }
 /**
@@ -14965,9 +15046,9 @@ created_at: Instant
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
- * via the `definition` "SettlementRequestView".
+ * via the `definition` "SettlementRecordView".
  */
-export interface SettlementRequestView {
+export interface SettlementRecordView {
 /**
  * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
  */
@@ -14976,24 +15057,16 @@ version: PositiveInt
 /**
  * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
  */
-from_center_id: string
-/**
- * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
- */
-to_center_id: string
+request_id: string
+kind: ("payment" | "offset" | "correction")
+amount_minor: PositiveMoney
 currency: Currency
 /**
- * @minItems 1
- */
-lines: [SettlementLine, ...(SettlementLine)[]]
-state: SettlementRequestState
-/**
  * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
  */
-initiator_account_id: string
-decision_account_id: (string | null)
-reason: (Text | null)
-previous_id: (string | null)
+approved_by_account_id: string
+original_record_id: (string | null)
+created_at: Instant
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -15052,11 +15125,13 @@ rounding: "half_away_from_zero_largest_remainder_stable_tie_original_amount_on_r
 scope_gate: "same_org_business_accessible_centers_and_source_sale_service_center_discipline_scope"
 dependency_scope: "selected_movement_versions_request_authority_plan"
 self_approval: false
-approval_is_payment: false
-payment_recorder: "org_manager_with_separate_settlement_permission"
-fallback_approval: "different_authorized_org_manager_only_if_no_other_B_manager_with_reason"
+fallback_approval: "disabled_no_implicit_owner_or_org_manager_authority"
 offset: "explicit_approved_same_currency_both_sides_atomic_no_auto_net_no_fx"
 no_double_close: true
+approval_finalizes_record_and_balances: true
+separate_payment_recorder: false
+automatic_bank_transfer: false
+submit_closes_balance: false
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -16962,41 +17037,28 @@ settlement_request_id: string
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
- * via the `definition` "ManagementSelector_settlement_payment_record_v1".
+ * via the `definition` "ManagementSelector_settlement_delegation_set_v1".
  */
-export interface ManagementSelectorSettlementPaymentRecordV1 {
-operation: "settlement_payment_record_v1"
+export interface ManagementSelectorSettlementDelegationSetV1 {
+operation: "settlement_delegation_set_v1"
 key: {
 /**
  * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
  */
-settlement_request_id: string
+person_id: string
 }
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
- * via the `definition` "ManagementSelector_settlement_offset_record_v1".
+ * via the `definition` "ManagementSelector_settlement_authority_set_v1".
  */
-export interface ManagementSelectorSettlementOffsetRecordV1 {
-operation: "settlement_offset_record_v1"
+export interface ManagementSelectorSettlementAuthoritySetV1 {
+operation: "settlement_authority_set_v1"
 key: {
 /**
  * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
  */
-settlement_request_id: string
-}
-}
-/**
- * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
- * via the `definition` "ManagementSelector_settlement_adjust_v1".
- */
-export interface ManagementSelectorSettlementAdjustV1 {
-operation: "settlement_adjust_v1"
-key: {
-/**
- * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
- */
-movement_id: string
+person_id: string
 }
 }
 /**
@@ -17137,7 +17199,10 @@ request_id: string
  * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
  */
 org_id: string
-center_id?: (string | null)
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+center_id: string
 page: Page
 currency: Currency
 }
@@ -17167,7 +17232,10 @@ request_id: string
  * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
  */
 org_id: string
-center_id?: (string | null)
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+center_id: string
 page: Page
 }
 /**
@@ -17196,7 +17264,10 @@ request_id: string
  * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
  */
 org_id: string
-center_id?: (string | null)
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+center_id: string
 /**
  * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
  */
@@ -17213,42 +17284,6 @@ data: SettlementRequestView
  * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
  */
 trace_id: string
-}
-/**
- * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
- * via the `definition` "Request_settlement_request_submit".
- */
-export interface RequestSettlementRequestSubmit {
-client_api_version: 1
-/**
- * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
- */
-request_id: string
-/**
- * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
- */
-org_id: string
-center_id?: (string | null)
-/**
- * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
- */
-operation_key: string
-/**
- * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
- */
-from_center_id: string
-/**
- * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
- */
-to_center_id: string
-currency: Currency
-/**
- * @minItems 1
- */
-lines: [SettlementLine, ...(SettlementLine)[]]
-reason: Text
-previous_id?: (string | null)
-previous_version?: PositiveInt
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -17326,146 +17361,12 @@ settlement_request_id: string
 expected_version: PositiveInt
 decision: ("approve" | "reject")
 reason: Text
-fallback: Bool
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
  * via the `definition` "Success_settlement_request_decide".
  */
 export interface SuccessSettlementRequestDecide {
-ok: true
-data: SettlementCommandResult
-/**
- * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
- */
-trace_id: string
-}
-/**
- * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
- * via the `definition` "Request_settlement_payment_record".
- */
-export interface RequestSettlementPaymentRecord {
-client_api_version: 1
-/**
- * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
- */
-request_id: string
-/**
- * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
- */
-org_id: string
-center_id?: (string | null)
-/**
- * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
- */
-operation_key: string
-/**
- * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
- */
-settlement_request_id: string
-expected_version: PositiveInt
-/**
- * @minItems 1
- */
-lines: [SettlementLine, ...(SettlementLine)[]]
-amount_minor: PositiveMoney
-currency: Currency
-occurred_at: Instant
-reason: Text
-}
-/**
- * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
- * via the `definition` "Success_settlement_payment_record".
- */
-export interface SuccessSettlementPaymentRecord {
-ok: true
-data: SettlementCommandResult
-/**
- * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
- */
-trace_id: string
-}
-/**
- * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
- * via the `definition` "Request_settlement_offset_record".
- */
-export interface RequestSettlementOffsetRecord {
-client_api_version: 1
-/**
- * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
- */
-request_id: string
-/**
- * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
- */
-org_id: string
-center_id?: (string | null)
-/**
- * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
- */
-operation_key: string
-/**
- * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
- */
-settlement_request_id: string
-expected_version: PositiveInt
-/**
- * @minItems 1
- */
-debit_lines: [SettlementLine, ...(SettlementLine)[]]
-/**
- * @minItems 1
- */
-credit_lines: [SettlementLine, ...(SettlementLine)[]]
-amount_minor: PositiveMoney
-currency: Currency
-occurred_at: Instant
-reason: Text
-}
-/**
- * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
- * via the `definition` "Success_settlement_offset_record".
- */
-export interface SuccessSettlementOffsetRecord {
-ok: true
-data: SettlementCommandResult
-/**
- * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
- */
-trace_id: string
-}
-/**
- * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
- * via the `definition` "Request_settlement_adjust".
- */
-export interface RequestSettlementAdjust {
-client_api_version: 1
-/**
- * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
- */
-request_id: string
-/**
- * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
- */
-org_id: string
-center_id?: (string | null)
-/**
- * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
- */
-operation_key: string
-/**
- * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
- */
-movement_id: string
-expected_version: PositiveInt
-amount_minor: PositiveMoney
-reason: Text
-}
-/**
- * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
- * via the `definition` "Success_settlement_adjust".
- */
-export interface SuccessSettlementAdjust {
 ok: true
 data: SettlementCommandResult
 /**
@@ -17498,4 +17399,144 @@ operation_key: string
 expected_version: PositiveInt
 name: Text
 timezone: IanaZone
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "SettlementCenterGrantView".
+ */
+export interface SettlementCenterGrantView {
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+center_id: string
+granted: Bool
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "SettlementAuthorityView".
+ */
+export interface SettlementAuthorityView {
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+org_id: string
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+person_id: string
+version: PositiveInt
+delegation_allowed: Bool
+center_grants: SettlementCenterGrantView[]
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "Request_settlement_authority_get".
+ */
+export interface RequestSettlementAuthorityGet {
+client_api_version: 1
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+request_id: string
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+org_id: string
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+person_id: string
+center_id?: (string | null)
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "Request_settlement_delegation_set".
+ */
+export interface RequestSettlementDelegationSet {
+client_api_version: 1
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+request_id: string
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+org_id: string
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+operation_key: string
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+person_id: string
+expected_version: PositiveInt
+granted: Bool
+reason: Text
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "Request_settlement_authority_set".
+ */
+export interface RequestSettlementAuthoritySet {
+client_api_version: 1
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+request_id: string
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+org_id: string
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+operation_key: string
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+person_id: string
+expected_version: PositiveInt
+granted: Bool
+reason: Text
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+center_id: string
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "Success_settlement_authority_get".
+ */
+export interface SuccessSettlementAuthorityGet {
+ok: true
+data: SettlementAuthorityView
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+trace_id: string
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "Success_settlement_delegation_set".
+ */
+export interface SuccessSettlementDelegationSet {
+ok: true
+data: Mutation
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+trace_id: string
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "Success_settlement_authority_set".
+ */
+export interface SuccessSettlementAuthoritySet {
+ok: true
+data: Mutation
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+trace_id: string
 }

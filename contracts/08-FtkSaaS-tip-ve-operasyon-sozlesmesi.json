@@ -891,9 +891,9 @@
         "settlement_request_submit_v1",
         "settlement_request_withdraw_v1",
         "settlement_request_decide_v1",
-        "settlement_payment_record_v1",
-        "settlement_offset_record_v1",
-        "settlement_adjust_v1"
+        "settlement_authority_get_v1",
+        "settlement_delegation_set_v1",
+        "settlement_authority_set_v1"
       ]
     },
     "EntityType": {
@@ -24582,13 +24582,6 @@
         "currency": {
           "$ref": "#/$defs/Currency"
         },
-        "lines": {
-          "type": "array",
-          "items": {
-            "$ref": "#/$defs/SettlementLine"
-          },
-          "minItems": 1
-        },
         "state": {
           "$ref": "#/$defs/SettlementRequestState"
         },
@@ -24624,6 +24617,19 @@
               "type": "null"
             }
           ]
+        },
+        "proposal": {
+          "$ref": "#/$defs/SettlementProposal"
+        },
+        "record": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/SettlementRecordView"
+            },
+            {
+              "type": "null"
+            }
+          ]
         }
       },
       "required": [
@@ -24632,15 +24638,44 @@
         "from_center_id",
         "to_center_id",
         "currency",
-        "lines",
         "state",
         "initiator_account_id",
         "decision_account_id",
         "reason",
-        "previous_id"
+        "previous_id",
+        "proposal",
+        "record"
       ],
       "additionalProperties": false,
-      "x-invariant": "Lines immutable within version. pending -> approved/rejected/withdrawn only; approved change creates new pending linked version and invalidates changed-scope old approval; payments retained. Exact pair and currency, amounts <= open balances; only selected source changes stale approval. No initiator self approval, including two-center CM. B fallback only separately authorized different org_manager with reason when no other B manager. Approval does not close balances."
+      "x-invariant": "Immutable proposal per version. pending -> approved/rejected/withdrawn. approved includes finalized payment/offset/correction record and selected balance effects atomically; pending/rejected/withdrawn has no record. Relevant selected dependencies stale acceptance, unrelated lessons do not. Only explicitly authorized distinct B CM approves; no OM fallback. Approved revisions use new linked pending request, no overwritten or repeated prior settlement.",
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "state": {
+                "const": "approved"
+              }
+            },
+            "required": [
+              "state"
+            ]
+          },
+          "then": {
+            "properties": {
+              "record": {
+                "$ref": "#/$defs/SettlementRecordView"
+              }
+            }
+          },
+          "else": {
+            "properties": {
+              "record": {
+                "type": "null"
+              }
+            }
+          }
+        }
+      ]
     },
     "SettlementMovementsPage": {
       "type": "object",
@@ -24767,20 +24802,26 @@
         "self_approval": {
           "const": false
         },
-        "approval_is_payment": {
-          "const": false
-        },
-        "payment_recorder": {
-          "const": "org_manager_with_separate_settlement_permission"
-        },
         "fallback_approval": {
-          "const": "different_authorized_org_manager_only_if_no_other_B_manager_with_reason"
+          "const": "disabled_no_implicit_owner_or_org_manager_authority"
         },
         "offset": {
           "const": "explicit_approved_same_currency_both_sides_atomic_no_auto_net_no_fx"
         },
         "no_double_close": {
           "const": true
+        },
+        "approval_finalizes_record_and_balances": {
+          "const": true
+        },
+        "separate_payment_recorder": {
+          "const": false
+        },
+        "automatic_bank_transfer": {
+          "const": false
+        },
+        "submit_closes_balance": {
+          "const": false
         }
       },
       "required": [
@@ -24796,11 +24837,13 @@
         "scope_gate",
         "dependency_scope",
         "self_approval",
-        "approval_is_payment",
-        "payment_recorder",
         "fallback_approval",
         "offset",
-        "no_double_close"
+        "no_double_close",
+        "approval_finalizes_record_and_balances",
+        "separate_payment_recorder",
+        "automatic_bank_transfer",
+        "submit_closes_balance"
       ],
       "additionalProperties": false
     },
@@ -29026,7 +29069,7 @@
           "if": {
             "properties": {
               "operation": {
-                "const": "settlement_payment_record_v1"
+                "const": "settlement_delegation_set_v1"
               }
             },
             "required": [
@@ -29038,7 +29081,7 @@
               "selector": {
                 "properties": {
                   "operation": {
-                    "const": "settlement_payment_record_v1"
+                    "const": "settlement_delegation_set_v1"
                   }
                 }
               },
@@ -29055,7 +29098,7 @@
           "if": {
             "properties": {
               "operation": {
-                "const": "settlement_offset_record_v1"
+                "const": "settlement_authority_set_v1"
               }
             },
             "required": [
@@ -29067,45 +29110,20 @@
               "selector": {
                 "properties": {
                   "operation": {
-                    "const": "settlement_offset_record_v1"
+                    "const": "settlement_authority_set_v1"
                   }
                 }
               },
               "org_id": {
                 "$ref": "#/$defs/FtkUuid"
-              }
-            },
-            "required": [
-              "org_id"
-            ]
-          }
-        },
-        {
-          "if": {
-            "properties": {
-              "operation": {
-                "const": "settlement_adjust_v1"
-              }
-            },
-            "required": [
-              "operation"
-            ]
-          },
-          "then": {
-            "properties": {
-              "selector": {
-                "properties": {
-                  "operation": {
-                    "const": "settlement_adjust_v1"
-                  }
-                }
               },
-              "org_id": {
+              "center_id": {
                 "$ref": "#/$defs/FtkUuid"
               }
             },
             "required": [
-              "org_id"
+              "org_id",
+              "center_id"
             ]
           }
         }
@@ -29322,14 +29340,7 @@
           "$ref": "#/$defs/FtkUuid"
         },
         "center_id": {
-          "anyOf": [
-            {
-              "$ref": "#/$defs/FtkUuid"
-            },
-            {
-              "type": "null"
-            }
-          ]
+          "$ref": "#/$defs/FtkUuid"
         },
         "page": {
           "$ref": "#/$defs/Page"
@@ -29343,9 +29354,11 @@
         "request_id",
         "org_id",
         "page",
-        "currency"
+        "currency",
+        "center_id"
       ],
-      "additionalProperties": false
+      "additionalProperties": false,
+      "x-invariant": "Live active center_manager and explicit current settlement grant for selected center. Filter same-org center pair before pagination/projection. Owner/OM management permission alone does not grant financial access."
     },
     "Success_settlement_movements_list": {
       "type": "object",
@@ -29380,14 +29393,7 @@
           "$ref": "#/$defs/FtkUuid"
         },
         "center_id": {
-          "anyOf": [
-            {
-              "$ref": "#/$defs/FtkUuid"
-            },
-            {
-              "type": "null"
-            }
-          ]
+          "$ref": "#/$defs/FtkUuid"
         },
         "page": {
           "$ref": "#/$defs/Page"
@@ -29397,9 +29403,11 @@
         "client_api_version",
         "request_id",
         "org_id",
-        "page"
+        "page",
+        "center_id"
       ],
-      "additionalProperties": false
+      "additionalProperties": false,
+      "x-invariant": "Live active center_manager and explicit current settlement grant for selected center. Filter same-org center pair before pagination/projection. Owner/OM management permission alone does not grant financial access."
     },
     "Success_settlement_requests_list": {
       "type": "object",
@@ -29434,14 +29442,7 @@
           "$ref": "#/$defs/FtkUuid"
         },
         "center_id": {
-          "anyOf": [
-            {
-              "$ref": "#/$defs/FtkUuid"
-            },
-            {
-              "type": "null"
-            }
-          ]
+          "$ref": "#/$defs/FtkUuid"
         },
         "settlement_request_id": {
           "$ref": "#/$defs/FtkUuid"
@@ -29451,9 +29452,11 @@
         "client_api_version",
         "request_id",
         "org_id",
-        "settlement_request_id"
+        "settlement_request_id",
+        "center_id"
       ],
-      "additionalProperties": false
+      "additionalProperties": false,
+      "x-invariant": "Live active center_manager and explicit current settlement grant for selected center. Filter same-org center pair before pagination/projection. Owner/OM management permission alone does not grant financial access."
     },
     "Success_settlement_request_get": {
       "type": "object",
@@ -29509,13 +29512,6 @@
         "currency": {
           "$ref": "#/$defs/Currency"
         },
-        "lines": {
-          "type": "array",
-          "items": {
-            "$ref": "#/$defs/SettlementLine"
-          },
-          "minItems": 1
-        },
         "reason": {
           "$ref": "#/$defs/Text"
         },
@@ -29531,6 +29527,9 @@
         },
         "previous_version": {
           "$ref": "#/$defs/PositiveInt"
+        },
+        "proposal": {
+          "$ref": "#/$defs/SettlementProposal"
         }
       },
       "required": [
@@ -29541,10 +29540,37 @@
         "from_center_id",
         "to_center_id",
         "currency",
-        "lines",
-        "reason"
+        "reason",
+        "proposal"
       ],
-      "additionalProperties": false
+      "additionalProperties": false,
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "previous_id": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "previous_id"
+            ]
+          },
+          "then": {
+            "required": [
+              "previous_version"
+            ]
+          },
+          "else": {
+            "not": {
+              "required": [
+                "previous_version"
+              ]
+            }
+          }
+        }
+      ],
+      "x-invariant": "A is from_center_id, B is to_center_id, same organization, distinct centers. Freeze exact proposal, currency, selected movement/record versions, actor and relevant authority/plan/scope dependencies. Pending request closes no balance. Previous approved request stays immutable; revision/correction uses linked new pending request with current previous_version and only eligible residual/correction amounts. Never repeat a finalized allocation."
     },
     "Success_settlement_request_submit": {
       "type": "object",
@@ -29672,9 +29698,6 @@
         },
         "reason": {
           "$ref": "#/$defs/Text"
-        },
-        "fallback": {
-          "$ref": "#/$defs/Bool"
         }
       },
       "required": [
@@ -29685,262 +29708,12 @@
         "settlement_request_id",
         "expected_version",
         "decision",
-        "reason",
-        "fallback"
+        "reason"
       ],
-      "additionalProperties": false
+      "additionalProperties": false,
+      "x-invariant": "Only distinct live-authorized B center_manager. Approve confirms received actual payment or explicit offset/correction acceptance and atomically appends the record, closes selected balances, updates request and appends audit/outbox/receipt. Reject requires reason, changes no balance and notifies A in-app. No third writer, no bank transfer, no OM/Owner fallback. Recheck live permission before receipt replay; relevant dependency changes reject stale request."
     },
     "Success_settlement_request_decide": {
-      "type": "object",
-      "properties": {
-        "ok": {
-          "const": true
-        },
-        "data": {
-          "$ref": "#/$defs/SettlementCommandResult"
-        },
-        "trace_id": {
-          "$ref": "#/$defs/FtkUuid"
-        }
-      },
-      "required": [
-        "ok",
-        "data",
-        "trace_id"
-      ],
-      "additionalProperties": false
-    },
-    "Request_settlement_payment_record": {
-      "type": "object",
-      "properties": {
-        "client_api_version": {
-          "const": 1
-        },
-        "request_id": {
-          "$ref": "#/$defs/FtkUuid"
-        },
-        "org_id": {
-          "$ref": "#/$defs/FtkUuid"
-        },
-        "center_id": {
-          "anyOf": [
-            {
-              "$ref": "#/$defs/FtkUuid"
-            },
-            {
-              "type": "null"
-            }
-          ]
-        },
-        "operation_key": {
-          "$ref": "#/$defs/FtkUuid"
-        },
-        "settlement_request_id": {
-          "$ref": "#/$defs/FtkUuid"
-        },
-        "expected_version": {
-          "$ref": "#/$defs/PositiveInt"
-        },
-        "lines": {
-          "type": "array",
-          "items": {
-            "$ref": "#/$defs/SettlementLine"
-          },
-          "minItems": 1
-        },
-        "amount_minor": {
-          "$ref": "#/$defs/PositiveMoney"
-        },
-        "currency": {
-          "$ref": "#/$defs/Currency"
-        },
-        "occurred_at": {
-          "$ref": "#/$defs/Instant"
-        },
-        "reason": {
-          "$ref": "#/$defs/Text"
-        }
-      },
-      "required": [
-        "client_api_version",
-        "request_id",
-        "org_id",
-        "operation_key",
-        "settlement_request_id",
-        "expected_version",
-        "lines",
-        "amount_minor",
-        "currency",
-        "occurred_at",
-        "reason"
-      ],
-      "additionalProperties": false
-    },
-    "Success_settlement_payment_record": {
-      "type": "object",
-      "properties": {
-        "ok": {
-          "const": true
-        },
-        "data": {
-          "$ref": "#/$defs/SettlementCommandResult"
-        },
-        "trace_id": {
-          "$ref": "#/$defs/FtkUuid"
-        }
-      },
-      "required": [
-        "ok",
-        "data",
-        "trace_id"
-      ],
-      "additionalProperties": false
-    },
-    "Request_settlement_offset_record": {
-      "type": "object",
-      "properties": {
-        "client_api_version": {
-          "const": 1
-        },
-        "request_id": {
-          "$ref": "#/$defs/FtkUuid"
-        },
-        "org_id": {
-          "$ref": "#/$defs/FtkUuid"
-        },
-        "center_id": {
-          "anyOf": [
-            {
-              "$ref": "#/$defs/FtkUuid"
-            },
-            {
-              "type": "null"
-            }
-          ]
-        },
-        "operation_key": {
-          "$ref": "#/$defs/FtkUuid"
-        },
-        "settlement_request_id": {
-          "$ref": "#/$defs/FtkUuid"
-        },
-        "expected_version": {
-          "$ref": "#/$defs/PositiveInt"
-        },
-        "debit_lines": {
-          "type": "array",
-          "items": {
-            "$ref": "#/$defs/SettlementLine"
-          },
-          "minItems": 1
-        },
-        "credit_lines": {
-          "type": "array",
-          "items": {
-            "$ref": "#/$defs/SettlementLine"
-          },
-          "minItems": 1
-        },
-        "amount_minor": {
-          "$ref": "#/$defs/PositiveMoney"
-        },
-        "currency": {
-          "$ref": "#/$defs/Currency"
-        },
-        "occurred_at": {
-          "$ref": "#/$defs/Instant"
-        },
-        "reason": {
-          "$ref": "#/$defs/Text"
-        }
-      },
-      "required": [
-        "client_api_version",
-        "request_id",
-        "org_id",
-        "operation_key",
-        "settlement_request_id",
-        "expected_version",
-        "debit_lines",
-        "credit_lines",
-        "amount_minor",
-        "currency",
-        "occurred_at",
-        "reason"
-      ],
-      "additionalProperties": false
-    },
-    "Success_settlement_offset_record": {
-      "type": "object",
-      "properties": {
-        "ok": {
-          "const": true
-        },
-        "data": {
-          "$ref": "#/$defs/SettlementCommandResult"
-        },
-        "trace_id": {
-          "$ref": "#/$defs/FtkUuid"
-        }
-      },
-      "required": [
-        "ok",
-        "data",
-        "trace_id"
-      ],
-      "additionalProperties": false
-    },
-    "Request_settlement_adjust": {
-      "type": "object",
-      "properties": {
-        "client_api_version": {
-          "const": 1
-        },
-        "request_id": {
-          "$ref": "#/$defs/FtkUuid"
-        },
-        "org_id": {
-          "$ref": "#/$defs/FtkUuid"
-        },
-        "center_id": {
-          "anyOf": [
-            {
-              "$ref": "#/$defs/FtkUuid"
-            },
-            {
-              "type": "null"
-            }
-          ]
-        },
-        "operation_key": {
-          "$ref": "#/$defs/FtkUuid"
-        },
-        "movement_id": {
-          "$ref": "#/$defs/FtkUuid"
-        },
-        "expected_version": {
-          "$ref": "#/$defs/PositiveInt"
-        },
-        "amount_minor": {
-          "$ref": "#/$defs/PositiveMoney"
-        },
-        "reason": {
-          "$ref": "#/$defs/Text"
-        }
-      },
-      "required": [
-        "client_api_version",
-        "request_id",
-        "org_id",
-        "operation_key",
-        "movement_id",
-        "expected_version",
-        "amount_minor",
-        "reason"
-      ],
-      "additionalProperties": false
-    },
-    "Success_settlement_adjust": {
       "type": "object",
       "properties": {
         "ok": {
@@ -33963,13 +33736,6 @@
             "currency": {
               "$ref": "#/$defs/Currency"
             },
-            "lines": {
-              "type": "array",
-              "items": {
-                "$ref": "#/$defs/SettlementLine"
-              },
-              "minItems": 1
-            },
             "previous_id": {
               "anyOf": [
                 {
@@ -33982,6 +33748,9 @@
             },
             "previous_version": {
               "$ref": "#/$defs/PositiveInt"
+            },
+            "proposal": {
+              "$ref": "#/$defs/SettlementProposal"
             }
           },
           "required": [],
@@ -34035,120 +33804,6 @@
                 "approve",
                 "reject"
               ]
-            },
-            "fallback": {
-              "$ref": "#/$defs/Bool"
-            }
-          },
-          "required": [],
-          "additionalProperties": false
-        }
-      },
-      "required": [
-        "operation",
-        "values"
-      ],
-      "additionalProperties": false
-    },
-    "ManagementProjection_settlement_payment_record_v1": {
-      "type": "object",
-      "properties": {
-        "operation": {
-          "const": "settlement_payment_record_v1"
-        },
-        "values": {
-          "type": "object",
-          "properties": {
-            "settlement_request_id": {
-              "$ref": "#/$defs/FtkUuid"
-            },
-            "lines": {
-              "type": "array",
-              "items": {
-                "$ref": "#/$defs/SettlementLine"
-              },
-              "minItems": 1
-            },
-            "amount_minor": {
-              "$ref": "#/$defs/PositiveMoney"
-            },
-            "currency": {
-              "$ref": "#/$defs/Currency"
-            },
-            "occurred_at": {
-              "$ref": "#/$defs/Instant"
-            }
-          },
-          "required": [],
-          "additionalProperties": false
-        }
-      },
-      "required": [
-        "operation",
-        "values"
-      ],
-      "additionalProperties": false
-    },
-    "ManagementProjection_settlement_offset_record_v1": {
-      "type": "object",
-      "properties": {
-        "operation": {
-          "const": "settlement_offset_record_v1"
-        },
-        "values": {
-          "type": "object",
-          "properties": {
-            "settlement_request_id": {
-              "$ref": "#/$defs/FtkUuid"
-            },
-            "debit_lines": {
-              "type": "array",
-              "items": {
-                "$ref": "#/$defs/SettlementLine"
-              },
-              "minItems": 1
-            },
-            "credit_lines": {
-              "type": "array",
-              "items": {
-                "$ref": "#/$defs/SettlementLine"
-              },
-              "minItems": 1
-            },
-            "amount_minor": {
-              "$ref": "#/$defs/PositiveMoney"
-            },
-            "currency": {
-              "$ref": "#/$defs/Currency"
-            },
-            "occurred_at": {
-              "$ref": "#/$defs/Instant"
-            }
-          },
-          "required": [],
-          "additionalProperties": false
-        }
-      },
-      "required": [
-        "operation",
-        "values"
-      ],
-      "additionalProperties": false
-    },
-    "ManagementProjection_settlement_adjust_v1": {
-      "type": "object",
-      "properties": {
-        "operation": {
-          "const": "settlement_adjust_v1"
-        },
-        "values": {
-          "type": "object",
-          "properties": {
-            "movement_id": {
-              "$ref": "#/$defs/FtkUuid"
-            },
-            "amount_minor": {
-              "$ref": "#/$defs/PositiveMoney"
             }
           },
           "required": [],
@@ -34596,13 +34251,10 @@
           "$ref": "#/$defs/ManagementProjection_settlement_request_decide_v1"
         },
         {
-          "$ref": "#/$defs/ManagementProjection_settlement_payment_record_v1"
+          "$ref": "#/$defs/ManagementProjection_settlement_delegation_set_v1"
         },
         {
-          "$ref": "#/$defs/ManagementProjection_settlement_offset_record_v1"
-        },
-        {
-          "$ref": "#/$defs/ManagementProjection_settlement_adjust_v1"
+          "$ref": "#/$defs/ManagementProjection_settlement_authority_set_v1"
         }
       ]
     },
@@ -34753,9 +34405,8 @@
         "settlement_request_submit_v1",
         "settlement_request_withdraw_v1",
         "settlement_request_decide_v1",
-        "settlement_payment_record_v1",
-        "settlement_offset_record_v1",
-        "settlement_adjust_v1"
+        "settlement_delegation_set_v1",
+        "settlement_authority_set_v1"
       ]
     },
     "ManagementSelector_account_profile_update_v1": {
@@ -38633,81 +38284,6 @@
       ],
       "additionalProperties": false
     },
-    "ManagementSelector_settlement_payment_record_v1": {
-      "type": "object",
-      "properties": {
-        "operation": {
-          "const": "settlement_payment_record_v1"
-        },
-        "key": {
-          "type": "object",
-          "properties": {
-            "settlement_request_id": {
-              "$ref": "#/$defs/FtkUuid"
-            }
-          },
-          "required": [
-            "settlement_request_id"
-          ],
-          "additionalProperties": false
-        }
-      },
-      "required": [
-        "operation",
-        "key"
-      ],
-      "additionalProperties": false
-    },
-    "ManagementSelector_settlement_offset_record_v1": {
-      "type": "object",
-      "properties": {
-        "operation": {
-          "const": "settlement_offset_record_v1"
-        },
-        "key": {
-          "type": "object",
-          "properties": {
-            "settlement_request_id": {
-              "$ref": "#/$defs/FtkUuid"
-            }
-          },
-          "required": [
-            "settlement_request_id"
-          ],
-          "additionalProperties": false
-        }
-      },
-      "required": [
-        "operation",
-        "key"
-      ],
-      "additionalProperties": false
-    },
-    "ManagementSelector_settlement_adjust_v1": {
-      "type": "object",
-      "properties": {
-        "operation": {
-          "const": "settlement_adjust_v1"
-        },
-        "key": {
-          "type": "object",
-          "properties": {
-            "movement_id": {
-              "$ref": "#/$defs/FtkUuid"
-            }
-          },
-          "required": [
-            "movement_id"
-          ],
-          "additionalProperties": false
-        }
-      },
-      "required": [
-        "operation",
-        "key"
-      ],
-      "additionalProperties": false
-    },
     "ManagementSelector": {
       "oneOf": [
         {
@@ -39143,13 +38719,10 @@
           "$ref": "#/$defs/ManagementSelector_settlement_request_decide_v1"
         },
         {
-          "$ref": "#/$defs/ManagementSelector_settlement_payment_record_v1"
+          "$ref": "#/$defs/ManagementSelector_settlement_delegation_set_v1"
         },
         {
-          "$ref": "#/$defs/ManagementSelector_settlement_offset_record_v1"
-        },
-        {
-          "$ref": "#/$defs/ManagementSelector_settlement_adjust_v1"
+          "$ref": "#/$defs/ManagementSelector_settlement_authority_set_v1"
         }
       ]
     },
@@ -39242,6 +38815,494 @@
         "end_date"
       ],
       "additionalProperties": false
+    },
+    "SettlementPaymentProposal": {
+      "type": "object",
+      "properties": {
+        "kind": {
+          "const": "payment"
+        },
+        "lines": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/SettlementLine"
+          },
+          "minItems": 1
+        },
+        "amount_minor": {
+          "$ref": "#/$defs/PositiveMoney"
+        },
+        "occurred_at": {
+          "$ref": "#/$defs/Instant"
+        }
+      },
+      "required": [
+        "kind",
+        "lines",
+        "amount_minor",
+        "occurred_at"
+      ],
+      "additionalProperties": false,
+      "x-invariant": "Actual payment reported by A; B acknowledges money received. Amount equals selected line sums and does not exceed current selected open balances. No bank transfer is initiated."
+    },
+    "SettlementOffsetProposal": {
+      "type": "object",
+      "properties": {
+        "kind": {
+          "const": "offset"
+        },
+        "debit_lines": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/SettlementLine"
+          },
+          "minItems": 1
+        },
+        "credit_lines": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/SettlementLine"
+          },
+          "minItems": 1
+        },
+        "amount_minor": {
+          "$ref": "#/$defs/PositiveMoney"
+        }
+      },
+      "required": [
+        "kind",
+        "debit_lines",
+        "credit_lines",
+        "amount_minor"
+      ],
+      "additionalProperties": false,
+      "x-invariant": "Explicit opposite directions for the same center pair and currency; each side sums to the same amount. No duplicate movement across sides or automatic netting/FX."
+    },
+    "SettlementCorrectionProposal": {
+      "type": "object",
+      "properties": {
+        "kind": {
+          "const": "correction"
+        },
+        "original_record_id": {
+          "$ref": "#/$defs/FtkUuid"
+        },
+        "expected_version": {
+          "$ref": "#/$defs/PositiveInt"
+        },
+        "amount_minor": {
+          "$ref": "#/$defs/PositiveMoney"
+        }
+      },
+      "required": [
+        "kind",
+        "original_record_id",
+        "expected_version",
+        "amount_minor"
+      ],
+      "additionalProperties": false,
+      "x-invariant": "Linked partial/full reversal of an existing finalized record, bounded by unreversed original amount and original currency/amount allocation. B acceptance appends reversal and residual refund/offset balance, never deletes payment history. Correction does not itself confirm a new cash payment."
+    },
+    "SettlementProposal": {
+      "oneOf": [
+        {
+          "$ref": "#/$defs/SettlementPaymentProposal"
+        },
+        {
+          "$ref": "#/$defs/SettlementOffsetProposal"
+        },
+        {
+          "$ref": "#/$defs/SettlementCorrectionProposal"
+        }
+      ]
+    },
+    "SettlementRecordView": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/FtkUuid"
+        },
+        "version": {
+          "$ref": "#/$defs/PositiveInt"
+        },
+        "request_id": {
+          "$ref": "#/$defs/FtkUuid"
+        },
+        "kind": {
+          "type": "string",
+          "enum": [
+            "payment",
+            "offset",
+            "correction"
+          ]
+        },
+        "amount_minor": {
+          "$ref": "#/$defs/PositiveMoney"
+        },
+        "currency": {
+          "$ref": "#/$defs/Currency"
+        },
+        "approved_by_account_id": {
+          "$ref": "#/$defs/FtkUuid"
+        },
+        "original_record_id": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/FtkUuid"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "created_at": {
+          "$ref": "#/$defs/Instant"
+        }
+      },
+      "required": [
+        "id",
+        "version",
+        "request_id",
+        "kind",
+        "amount_minor",
+        "currency",
+        "approved_by_account_id",
+        "original_record_id",
+        "created_at"
+      ],
+      "additionalProperties": false,
+      "x-invariant": "Immutable record created only by B approval in the same transaction as selected balance changes. Payment occurred_at and frozen allocation details remain in the linked request proposal. Correction links original record; prior paid history retained."
+    },
+    "SettlementCenterGrantView": {
+      "type": "object",
+      "properties": {
+        "center_id": {
+          "$ref": "#/$defs/FtkUuid"
+        },
+        "granted": {
+          "$ref": "#/$defs/Bool"
+        }
+      },
+      "required": [
+        "center_id",
+        "granted"
+      ],
+      "additionalProperties": false
+    },
+    "SettlementAuthorityView": {
+      "type": "object",
+      "properties": {
+        "org_id": {
+          "$ref": "#/$defs/FtkUuid"
+        },
+        "person_id": {
+          "$ref": "#/$defs/FtkUuid"
+        },
+        "version": {
+          "$ref": "#/$defs/PositiveInt"
+        },
+        "delegation_allowed": {
+          "$ref": "#/$defs/Bool"
+        },
+        "center_grants": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/SettlementCenterGrantView"
+          }
+        }
+      },
+      "required": [
+        "org_id",
+        "person_id",
+        "version",
+        "delegation_allowed",
+        "center_grants"
+      ],
+      "additionalProperties": false,
+      "x-invariant": "Version is organization settlement-authority aggregate version, initialized by future storage implementation and incremented on every grant/revoke. Return only authorized administrative projection; no ledger. Missing grant represented false, not a new operational privilege."
+    },
+    "Request_settlement_authority_get": {
+      "type": "object",
+      "properties": {
+        "client_api_version": {
+          "const": 1
+        },
+        "request_id": {
+          "$ref": "#/$defs/FtkUuid"
+        },
+        "org_id": {
+          "$ref": "#/$defs/FtkUuid"
+        },
+        "person_id": {
+          "$ref": "#/$defs/FtkUuid"
+        },
+        "center_id": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/FtkUuid"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "client_api_version",
+        "request_id",
+        "org_id",
+        "person_id"
+      ],
+      "additionalProperties": false,
+      "x-invariant": "Owner inspects same-org administrative targets; delegated OM inspects CM grant targets only (no Owner delegation management); CM can inspect own center grants. center_id narrows projection. Return org authority aggregate version for the corresponding set command."
+    },
+    "Request_settlement_delegation_set": {
+      "type": "object",
+      "properties": {
+        "client_api_version": {
+          "const": 1
+        },
+        "request_id": {
+          "$ref": "#/$defs/FtkUuid"
+        },
+        "org_id": {
+          "$ref": "#/$defs/FtkUuid"
+        },
+        "operation_key": {
+          "$ref": "#/$defs/FtkUuid"
+        },
+        "person_id": {
+          "$ref": "#/$defs/FtkUuid"
+        },
+        "expected_version": {
+          "$ref": "#/$defs/PositiveInt"
+        },
+        "granted": {
+          "$ref": "#/$defs/Bool"
+        },
+        "reason": {
+          "$ref": "#/$defs/Text"
+        }
+      },
+      "required": [
+        "client_api_version",
+        "request_id",
+        "org_id",
+        "operation_key",
+        "person_id",
+        "expected_version",
+        "granted",
+        "reason"
+      ],
+      "additionalProperties": false,
+      "x-invariant": "Owner only; target active org_manager in same org. Compare current org settlement-authority aggregate version, lock actor/target authority and apply grant/revoke + version/audit/outbox/receipt atomically. Check live actor permission before same-key replay. Role alone grants no settlement operation."
+    },
+    "Request_settlement_authority_set": {
+      "type": "object",
+      "properties": {
+        "client_api_version": {
+          "const": 1
+        },
+        "request_id": {
+          "$ref": "#/$defs/FtkUuid"
+        },
+        "org_id": {
+          "$ref": "#/$defs/FtkUuid"
+        },
+        "operation_key": {
+          "$ref": "#/$defs/FtkUuid"
+        },
+        "person_id": {
+          "$ref": "#/$defs/FtkUuid"
+        },
+        "expected_version": {
+          "$ref": "#/$defs/PositiveInt"
+        },
+        "granted": {
+          "$ref": "#/$defs/Bool"
+        },
+        "reason": {
+          "$ref": "#/$defs/Text"
+        },
+        "center_id": {
+          "$ref": "#/$defs/FtkUuid"
+        }
+      },
+      "required": [
+        "client_api_version",
+        "request_id",
+        "org_id",
+        "operation_key",
+        "person_id",
+        "expected_version",
+        "granted",
+        "reason",
+        "center_id"
+      ],
+      "additionalProperties": false,
+      "x-invariant": "Owner OR org_manager with live explicit delegation permission; target active center_manager in exact same-org center. No center-manager delegation. Compare current org settlement-authority aggregate version, lock actor/target authority and apply grant/revoke + version/audit/outbox/receipt atomically. Check live actor permission before same-key replay. Role alone grants no settlement operation."
+    },
+    "Success_settlement_authority_get": {
+      "type": "object",
+      "properties": {
+        "ok": {
+          "const": true
+        },
+        "data": {
+          "$ref": "#/$defs/SettlementAuthorityView"
+        },
+        "trace_id": {
+          "$ref": "#/$defs/FtkUuid"
+        }
+      },
+      "required": [
+        "ok",
+        "data",
+        "trace_id"
+      ],
+      "additionalProperties": false
+    },
+    "Success_settlement_delegation_set": {
+      "type": "object",
+      "properties": {
+        "ok": {
+          "const": true
+        },
+        "data": {
+          "$ref": "#/$defs/Mutation"
+        },
+        "trace_id": {
+          "$ref": "#/$defs/FtkUuid"
+        }
+      },
+      "required": [
+        "ok",
+        "data",
+        "trace_id"
+      ],
+      "additionalProperties": false
+    },
+    "Success_settlement_authority_set": {
+      "type": "object",
+      "properties": {
+        "ok": {
+          "const": true
+        },
+        "data": {
+          "$ref": "#/$defs/Mutation"
+        },
+        "trace_id": {
+          "$ref": "#/$defs/FtkUuid"
+        }
+      },
+      "required": [
+        "ok",
+        "data",
+        "trace_id"
+      ],
+      "additionalProperties": false
+    },
+    "ManagementSelector_settlement_delegation_set_v1": {
+      "type": "object",
+      "properties": {
+        "operation": {
+          "const": "settlement_delegation_set_v1"
+        },
+        "key": {
+          "type": "object",
+          "properties": {
+            "person_id": {
+              "$ref": "#/$defs/FtkUuid"
+            }
+          },
+          "required": [
+            "person_id"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "required": [
+        "operation",
+        "key"
+      ],
+      "additionalProperties": false
+    },
+    "ManagementProjection_settlement_delegation_set_v1": {
+      "type": "object",
+      "properties": {
+        "operation": {
+          "const": "settlement_delegation_set_v1"
+        },
+        "values": {
+          "type": "object",
+          "properties": {
+            "person_id": {
+              "$ref": "#/$defs/FtkUuid"
+            },
+            "granted": {
+              "$ref": "#/$defs/Bool"
+            }
+          },
+          "required": [],
+          "additionalProperties": false
+        }
+      },
+      "required": [
+        "operation",
+        "values"
+      ],
+      "additionalProperties": false
+    },
+    "ManagementSelector_settlement_authority_set_v1": {
+      "type": "object",
+      "properties": {
+        "operation": {
+          "const": "settlement_authority_set_v1"
+        },
+        "key": {
+          "type": "object",
+          "properties": {
+            "person_id": {
+              "$ref": "#/$defs/FtkUuid"
+            }
+          },
+          "required": [
+            "person_id"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "required": [
+        "operation",
+        "key"
+      ],
+      "additionalProperties": false
+    },
+    "ManagementProjection_settlement_authority_set_v1": {
+      "type": "object",
+      "properties": {
+        "operation": {
+          "const": "settlement_authority_set_v1"
+        },
+        "values": {
+          "type": "object",
+          "properties": {
+            "person_id": {
+              "$ref": "#/$defs/FtkUuid"
+            },
+            "granted": {
+              "$ref": "#/$defs/Bool"
+            }
+          },
+          "required": [],
+          "additionalProperties": false
+        }
+      },
+      "required": [
+        "operation",
+        "values"
+      ],
+      "additionalProperties": false
     }
   },
   "x-contract": {
@@ -39308,11 +39369,13 @@
       "event.close": "Yalnız etkinliğin sorumlu merkez yöneticisi; bütün sonuçlar tamam.",
       "attendance.block": "Yalnız merkez yöneticisi; negatif kredi sınırı seans başlangıcı snapshot’ıyla, eğitmen/asistana finans gerekçesi açılmaz.",
       "management.inspect": "Only the live authority of the named management operation and its exact tenant/center/field scope; not account.self or generic table access.",
-      "settlement.read": "Center manager own center bilateral ledger; org_manager all centers. Owner alone, student, instructor and ordinary staff excluded.",
-      "settlement.request": "Center A manager submits/withdraws its pending request, no balance settlement.",
-      "settlement.decide": "Center B manager, different initiating account. Fallback only different org_manager with separate settlement authority, no other B manager and reason.",
-      "settlement.record": "Org_manager with separate explicit settlement permission; records actual payment/offset or linked reversal. Owner alone or approval alone does not grant it.",
-      "reservation.protection.manage": "Resolve live original change authority: policy.manage with org/center mandatory hierarchy for policy; entitlement.correct in the affected center for negative limit/credit/sale-scope. Preview and apply recheck same original permission; no escalation from CM to org policy."
+      "settlement.read": "Active center_manager with explicit current center-scoped settlement grant; own authorized centers only. Owner/OM role or delegation administration alone provides no financial projection.",
+      "settlement.request": "Active A center_manager AND explicit live settlement grant for A; no role-only, Owner, OM or delegation permission shortcut. Withdraw requires original initiator and live A grant.",
+      "settlement.decide": "Active B center_manager AND explicit live settlement grant for B; account must differ from initiator even when managing both centers. No Owner/OM fallback.",
+      "reservation.protection.manage": "Resolve live original change authority: policy.manage with org/center mandatory hierarchy for policy; entitlement.correct in the affected center for negative limit/credit/sale-scope. Preview and apply recheck same original permission; no escalation from CM to org policy.",
+      "settlement.delegation.manage": "Organization Owner only grants/revokes delegation permission to an active org_manager of the same organization; no center operation authority follows.",
+      "settlement.authority.manage": "Organization Owner directly OR active org_manager with explicit live delegation permission grants/revokes settlement authority to an active center_manager in that exact center. Center_manager cannot delegate.",
+      "settlement.authority.inspect": "Owner may inspect delegation/grant administration; org_manager with live delegation permission may inspect manageable CM targets; CM may inspect own grant state. Financial records are excluded."
     },
     "tables": [
       {
@@ -62494,15 +62557,34 @@
           "scope_filter_before_pagination",
           "same_org_business_scope",
           "no_automatic_cash_or_fx",
-          "bilateral_center_or_org_manager_projection",
-          "no_balance_or_approval_mutation"
+          "no_balance_or_approval_mutation",
+          "active_cm_and_explicit_center_grant",
+          "live_authority_before_receipt_replay",
+          "no_owner_or_om_operational_fallback"
         ],
         "audit": false,
         "notification": "none",
         "concurrency": "Live original permission/tenant/field scope on every request; filter/sort/cursor-bound projection; no business writes",
         "expected_version_subject": "none",
         "acceptance_scenario_ids": [
-          "DS-08"
+          "DS-SET-01",
+          "DS-SET-02",
+          "DS-SET-03",
+          "DS-SET-04",
+          "DS-SET-05",
+          "DS-SET-06",
+          "DS-SET-07",
+          "DS-SET-08",
+          "DS-SET-09",
+          "DS-SET-10",
+          "DS-SET-11",
+          "DS-SET-12",
+          "DS-ATOMIC-01",
+          "DS-AUTH-01",
+          "DS-AUTH-02",
+          "DS-AUTH-03",
+          "DS-SET-13",
+          "DS-SET-14"
         ],
         "configuration_policy": "No implicit fee/rate or arbitrary limit. Accepted DS-2026-10-17.",
         "implementation_status": "contract_only",
@@ -62593,15 +62675,34 @@
           "scope_filter_before_pagination",
           "same_org_business_scope",
           "no_automatic_cash_or_fx",
-          "bilateral_center_or_org_manager_projection",
-          "no_balance_or_approval_mutation"
+          "no_balance_or_approval_mutation",
+          "active_cm_and_explicit_center_grant",
+          "live_authority_before_receipt_replay",
+          "no_owner_or_om_operational_fallback"
         ],
         "audit": false,
         "notification": "none",
         "concurrency": "Live original permission/tenant/field scope on every request; filter/sort/cursor-bound projection; no business writes",
         "expected_version_subject": "none",
         "acceptance_scenario_ids": [
-          "DS-08"
+          "DS-SET-01",
+          "DS-SET-02",
+          "DS-SET-03",
+          "DS-SET-04",
+          "DS-SET-05",
+          "DS-SET-06",
+          "DS-SET-07",
+          "DS-SET-08",
+          "DS-SET-09",
+          "DS-SET-10",
+          "DS-SET-11",
+          "DS-SET-12",
+          "DS-ATOMIC-01",
+          "DS-AUTH-01",
+          "DS-AUTH-02",
+          "DS-AUTH-03",
+          "DS-SET-13",
+          "DS-SET-14"
         ],
         "configuration_policy": "No implicit fee/rate or arbitrary limit. Accepted DS-2026-10-17.",
         "implementation_status": "contract_only",
@@ -62692,15 +62793,34 @@
           "same_org_business_scope",
           "no_automatic_cash_or_fx",
           "authorized_projection_only",
-          "bilateral_center_or_org_manager_projection",
-          "no_balance_or_approval_mutation"
+          "no_balance_or_approval_mutation",
+          "active_cm_and_explicit_center_grant",
+          "live_authority_before_receipt_replay",
+          "no_owner_or_om_operational_fallback"
         ],
         "audit": false,
         "notification": "none",
         "concurrency": "Live original permission/tenant/field scope on every request; current authorized projection; no business writes",
         "expected_version_subject": "none",
         "acceptance_scenario_ids": [
-          "DS-08"
+          "DS-SET-01",
+          "DS-SET-02",
+          "DS-SET-03",
+          "DS-SET-04",
+          "DS-SET-05",
+          "DS-SET-06",
+          "DS-SET-07",
+          "DS-SET-08",
+          "DS-SET-09",
+          "DS-SET-10",
+          "DS-SET-11",
+          "DS-SET-12",
+          "DS-ATOMIC-01",
+          "DS-AUTH-01",
+          "DS-AUTH-02",
+          "DS-AUTH-03",
+          "DS-SET-13",
+          "DS-SET-14"
         ],
         "configuration_policy": "No implicit fee/rate or arbitrary limit. Accepted DS-2026-10-17.",
         "implementation_status": "contract_only",
@@ -62793,14 +62913,36 @@
           "selected_dependencies_only",
           "no_automatic_cash_or_fx",
           "no_self_approval",
-          "no_double_balance_close"
+          "no_double_balance_close",
+          "active_cm_and_explicit_center_grant",
+          "live_authority_before_receipt_replay",
+          "no_owner_or_om_operational_fallback",
+          "pending_request_does_not_close_balance",
+          "freeze_selected_proposal_dependencies"
         ],
         "audit": true,
         "notification": "transactional_in_app_outbox",
         "concurrency": "Live original permission/tenant scope on every request; target/aggregate lock; append_or_current_scope_lock; idempotent receipt and all declared effects rollback together",
         "expected_version_subject": "none",
         "acceptance_scenario_ids": [
-          "DS-08"
+          "DS-SET-01",
+          "DS-SET-02",
+          "DS-SET-03",
+          "DS-SET-04",
+          "DS-SET-05",
+          "DS-SET-06",
+          "DS-SET-07",
+          "DS-SET-08",
+          "DS-SET-09",
+          "DS-SET-10",
+          "DS-SET-11",
+          "DS-SET-12",
+          "DS-ATOMIC-01",
+          "DS-AUTH-01",
+          "DS-AUTH-02",
+          "DS-AUTH-03",
+          "DS-SET-13",
+          "DS-SET-14"
         ],
         "configuration_policy": "No implicit fee/rate or arbitrary limit. Accepted DS-2026-10-17.",
         "implementation_status": "contract_only",
@@ -62897,14 +63039,35 @@
           "selected_dependencies_only",
           "no_automatic_cash_or_fx",
           "no_self_approval",
-          "no_double_balance_close"
+          "no_double_balance_close",
+          "active_cm_and_explicit_center_grant",
+          "live_authority_before_receipt_replay",
+          "no_owner_or_om_operational_fallback",
+          "original_initiator_live_A_grant"
         ],
         "audit": true,
         "notification": "transactional_in_app_outbox",
         "concurrency": "Live original permission/tenant scope on every request; target/aggregate lock; row_version; idempotent receipt and all declared effects rollback together",
         "expected_version_subject": "settlement_request_id",
         "acceptance_scenario_ids": [
-          "DS-08"
+          "DS-SET-01",
+          "DS-SET-02",
+          "DS-SET-03",
+          "DS-SET-04",
+          "DS-SET-05",
+          "DS-SET-06",
+          "DS-SET-07",
+          "DS-SET-08",
+          "DS-SET-09",
+          "DS-SET-10",
+          "DS-SET-11",
+          "DS-SET-12",
+          "DS-ATOMIC-01",
+          "DS-AUTH-01",
+          "DS-AUTH-02",
+          "DS-AUTH-03",
+          "DS-SET-13",
+          "DS-SET-14"
         ],
         "configuration_policy": "No implicit fee/rate or arbitrary limit. Accepted DS-2026-10-17.",
         "implementation_status": "contract_only",
@@ -62993,7 +63156,8 @@
           "to": [
             "approved",
             "rejected"
-          ]
+          ],
+          "invariant": "approved means recorded and finalized atomically; rejected means no balance change; no intermediate approved-awaiting-recorder state."
         },
         "semantic_guards": [
           "live_actor_and_scope",
@@ -63002,18 +63166,42 @@
           "selected_dependencies_only",
           "no_automatic_cash_or_fx",
           "no_self_approval",
-          "no_double_balance_close"
+          "no_double_balance_close",
+          "active_cm_and_explicit_center_grant",
+          "live_authority_before_receipt_replay",
+          "no_owner_or_om_operational_fallback",
+          "B_approval_finalizes_record_and_balances_atomic",
+          "same_currency_both_sides_atomic",
+          "linked_history_not_overwrite",
+          "rejection_reason_in_app_to_A_balance_unchanged"
         ],
         "audit": true,
         "notification": "transactional_in_app_outbox",
         "concurrency": "Live original permission/tenant scope on every request; target/aggregate lock; row_version; idempotent receipt and all declared effects rollback together",
         "expected_version_subject": "settlement_request_id",
         "acceptance_scenario_ids": [
-          "DS-08"
+          "DS-SET-01",
+          "DS-SET-02",
+          "DS-SET-03",
+          "DS-SET-04",
+          "DS-SET-05",
+          "DS-SET-06",
+          "DS-SET-07",
+          "DS-SET-08",
+          "DS-SET-09",
+          "DS-SET-10",
+          "DS-SET-11",
+          "DS-SET-12",
+          "DS-ATOMIC-01",
+          "DS-AUTH-01",
+          "DS-AUTH-02",
+          "DS-AUTH-03",
+          "DS-SET-13",
+          "DS-SET-14"
         ],
         "configuration_policy": "No implicit fee/rate or arbitrary limit. Accepted DS-2026-10-17.",
         "implementation_status": "contract_only",
-        "transaction_guarantee": "Atomic settlement_requests.approved_or_rejected, in_app_rejection_to_A; audit + in-app outbox + receipt. External delivery never determines the domain commit.",
+        "transaction_guarantee": "B approve atomically finalizes request, frozen payment/offset/linked correction record, selected balances, audit, in-app outbox and receipt. Reject leaves balances unchanged and sends reason to A. No separate recorder; no bank transfer. All effects rollback together.",
         "operation_contract": {
           "kind": "command",
           "target_entity": "planned.settlement",
@@ -63022,11 +63210,32 @@
           "read_operation": "settlement_request_get_v1",
           "atomic_effects": [
             "settlement_requests.approved_or_rejected",
-            "in_app_rejection_to_A"
+            "approved_record_and_selected_balances.atomic",
+            "audit.append",
+            "outbox.append",
+            "receipt.append"
           ],
           "business_commit": true,
           "read_path_status": "contract_only",
-          "source_decision": "DS-2026-10-17"
+          "source_decision": "DS-2026-10-17",
+          "effects_by_outcome": {
+            "approve": [
+              "request.approved",
+              "settlement_record.append",
+              "selected_balances.reduce_or_linked_reverse",
+              "paired_offset_atomic",
+              "audit.append",
+              "outbox.append",
+              "receipt.append"
+            ],
+            "reject": [
+              "request.rejected_with_reason",
+              "in_app_rejection_to_A",
+              "audit.append",
+              "outbox.append",
+              "receipt.append"
+            ]
+          }
         },
         "decision_delivery": {
           "accepted_contract": "DS-2026-10-17",
@@ -63040,9 +63249,10 @@
         }
       },
       {
-        "name": "settlement_payment_record_v1",
+        "name": "settlement_authority_get_v1",
         "module": "M07",
         "features": [
+          "F04",
           "F18"
         ],
         "required_features": [
@@ -63050,15 +63260,15 @@
         ],
         "runtime_required_features": [],
         "conditional_features": [],
-        "permission": "settlement.record",
+        "permission": "settlement.authority.inspect",
         "actor_source": "server_verified",
-        "transport": "W",
-        "billing_class": "config",
+        "transport": "R",
+        "billing_class": "read",
         "request": {
-          "$ref": "#/$defs/Request_settlement_payment_record"
+          "$ref": "#/$defs/Request_settlement_authority_get"
         },
         "success": {
-          "$ref": "#/$defs/Success_settlement_payment_record"
+          "$ref": "#/$defs/Success_settlement_authority_get"
         },
         "errors": [
           "AUTH_REQUIRED",
@@ -63090,41 +63300,53 @@
           "VALIDATION_FAILED",
           "VERSION_CONFLICT"
         ],
-        "transaction_class": "settlement",
-        "transition": {},
+        "transaction_class": "read",
+        "transition": {
+          "effect": "authorized_administrative_read"
+        },
         "semantic_guards": [
           "live_actor_and_scope",
           "required_feature_gates_separate_from_references",
-          "same_org_business_scope",
-          "selected_dependencies_only",
-          "no_automatic_cash_or_fx",
-          "no_self_approval",
-          "no_double_balance_close",
-          "separate_org_manager_settlement_authority",
-          "approval_not_payment",
-          "preserve_paid_history"
+          "live_authority_before_receipt_replay",
+          "same_org_target_active_role",
+          "no_implicit_operational_authority",
+          "authorized_administrative_projection_only"
         ],
-        "audit": true,
-        "notification": "transactional_in_app_outbox",
-        "concurrency": "Live original permission/tenant scope on every request; target/aggregate lock; row_version; idempotent receipt and all declared effects rollback together",
-        "expected_version_subject": "settlement_request_id",
+        "audit": false,
+        "notification": "none",
+        "concurrency": "Live original permission/tenant/field scope on every request; current authorized projection; no business writes",
+        "expected_version_subject": "none",
         "acceptance_scenario_ids": [
-          "DS-08"
+          "DS-SET-01",
+          "DS-SET-02",
+          "DS-SET-03",
+          "DS-SET-04",
+          "DS-SET-05",
+          "DS-SET-06",
+          "DS-SET-07",
+          "DS-SET-08",
+          "DS-SET-09",
+          "DS-SET-10",
+          "DS-SET-11",
+          "DS-SET-12",
+          "DS-ATOMIC-01",
+          "DS-AUTH-01",
+          "DS-AUTH-02",
+          "DS-AUTH-03",
+          "DS-SET-13",
+          "DS-SET-14"
         ],
         "configuration_policy": "No implicit fee/rate or arbitrary limit. Accepted DS-2026-10-17.",
         "implementation_status": "contract_only",
-        "transaction_guarantee": "Atomic settlement_payments.append, selected_open_balances.partial_reduce; audit + in-app outbox + receipt. External delivery never determines the domain commit.",
+        "transaction_guarantee": "Authorized narrow administrative read; no financial or domain mutation.",
         "operation_contract": {
-          "kind": "command",
-          "target_entity": "planned.settlement",
-          "version_mode": "row_version",
-          "version_field": "settlement_request_id",
-          "read_operation": "settlement_request_get_v1",
-          "atomic_effects": [
-            "settlement_payments.append",
-            "selected_open_balances.partial_reduce"
-          ],
-          "business_commit": true,
+          "kind": "read",
+          "target_entity": "planned.settlement_authority",
+          "version_mode": "none",
+          "version_field": null,
+          "read_operation": null,
+          "atomic_effects": [],
+          "business_commit": false,
           "read_path_status": "contract_only",
           "source_decision": "DS-2026-10-17"
         },
@@ -63135,14 +63357,15 @@
             "cross_center_settlement"
           ],
           "target_request": {
-            "$ref": "#/$defs/Request_settlement_payment_record"
+            "$ref": "#/$defs/Request_settlement_authority_get"
           }
         }
       },
       {
-        "name": "settlement_offset_record_v1",
+        "name": "settlement_delegation_set_v1",
         "module": "M07",
         "features": [
+          "F04",
           "F18"
         ],
         "required_features": [
@@ -63150,15 +63373,15 @@
         ],
         "runtime_required_features": [],
         "conditional_features": [],
-        "permission": "settlement.record",
+        "permission": "settlement.delegation.manage",
         "actor_source": "server_verified",
         "transport": "W",
         "billing_class": "config",
         "request": {
-          "$ref": "#/$defs/Request_settlement_offset_record"
+          "$ref": "#/$defs/Request_settlement_delegation_set"
         },
         "success": {
-          "$ref": "#/$defs/Success_settlement_offset_record"
+          "$ref": "#/$defs/Success_settlement_delegation_set"
         },
         "errors": [
           "AUTH_REQUIRED",
@@ -63191,39 +63414,59 @@
           "VERSION_CONFLICT"
         ],
         "transaction_class": "settlement",
-        "transition": {},
+        "transition": {
+          "effect": "settlement_delegation_set",
+          "invariant": "Explicit grant state; no implied center operation authority"
+        },
         "semantic_guards": [
           "live_actor_and_scope",
           "required_feature_gates_separate_from_references",
-          "same_org_business_scope",
-          "selected_dependencies_only",
-          "no_automatic_cash_or_fx",
-          "no_self_approval",
-          "no_double_balance_close",
-          "separate_org_manager_settlement_authority",
-          "approval_not_payment",
-          "preserve_paid_history",
-          "same_currency_both_sides_atomic"
+          "live_authority_before_receipt_replay",
+          "same_org_target_active_role",
+          "no_implicit_operational_authority",
+          "expected_org_authority_version",
+          "owner_only_delegation_change",
+          "center_manager_cannot_delegate"
         ],
         "audit": true,
         "notification": "transactional_in_app_outbox",
         "concurrency": "Live original permission/tenant scope on every request; target/aggregate lock; row_version; idempotent receipt and all declared effects rollback together",
-        "expected_version_subject": "settlement_request_id",
+        "expected_version_subject": "organization_settlement_authority_aggregate",
         "acceptance_scenario_ids": [
-          "DS-08"
+          "DS-SET-01",
+          "DS-SET-02",
+          "DS-SET-03",
+          "DS-SET-04",
+          "DS-SET-05",
+          "DS-SET-06",
+          "DS-SET-07",
+          "DS-SET-08",
+          "DS-SET-09",
+          "DS-SET-10",
+          "DS-SET-11",
+          "DS-SET-12",
+          "DS-ATOMIC-01",
+          "DS-AUTH-01",
+          "DS-AUTH-02",
+          "DS-AUTH-03",
+          "DS-SET-13",
+          "DS-SET-14"
         ],
         "configuration_policy": "No implicit fee/rate or arbitrary limit. Accepted DS-2026-10-17.",
         "implementation_status": "contract_only",
-        "transaction_guarantee": "Atomic settlement_offsets.append, both_selected_sides.atomic_reduce; audit + in-app outbox + receipt. External delivery never determines the domain commit.",
+        "transaction_guarantee": "Atomic scoped grant/revoke, authority aggregate version, audit, in-app outbox and receipt; rollback all on failure.",
         "operation_contract": {
           "kind": "command",
-          "target_entity": "planned.settlement",
+          "target_entity": "planned.settlement_authority",
           "version_mode": "row_version",
-          "version_field": "settlement_request_id",
-          "read_operation": "settlement_request_get_v1",
+          "version_field": "org_id",
+          "read_operation": "settlement_authority_get_v1",
           "atomic_effects": [
-            "settlement_offsets.append",
-            "both_selected_sides.atomic_reduce"
+            "settlement_authority.grant_or_revoke",
+            "org_authority.version_increment",
+            "audit.append",
+            "outbox.append",
+            "receipt.append"
           ],
           "business_commit": true,
           "read_path_status": "contract_only",
@@ -63236,14 +63479,15 @@
             "cross_center_settlement"
           ],
           "target_request": {
-            "$ref": "#/$defs/Request_settlement_offset_record"
+            "$ref": "#/$defs/Request_settlement_delegation_set"
           }
         }
       },
       {
-        "name": "settlement_adjust_v1",
+        "name": "settlement_authority_set_v1",
         "module": "M07",
         "features": [
+          "F04",
           "F18"
         ],
         "required_features": [
@@ -63251,15 +63495,15 @@
         ],
         "runtime_required_features": [],
         "conditional_features": [],
-        "permission": "settlement.record",
+        "permission": "settlement.authority.manage",
         "actor_source": "server_verified",
         "transport": "W",
         "billing_class": "config",
         "request": {
-          "$ref": "#/$defs/Request_settlement_adjust"
+          "$ref": "#/$defs/Request_settlement_authority_set"
         },
         "success": {
-          "$ref": "#/$defs/Success_settlement_adjust"
+          "$ref": "#/$defs/Success_settlement_authority_set"
         },
         "errors": [
           "AUTH_REQUIRED",
@@ -63292,39 +63536,59 @@
           "VERSION_CONFLICT"
         ],
         "transaction_class": "settlement",
-        "transition": {},
+        "transition": {
+          "effect": "settlement_authority_set",
+          "invariant": "Explicit grant state; no implied center operation authority"
+        },
         "semantic_guards": [
           "live_actor_and_scope",
           "required_feature_gates_separate_from_references",
-          "same_org_business_scope",
-          "selected_dependencies_only",
-          "no_automatic_cash_or_fx",
-          "no_self_approval",
-          "no_double_balance_close",
-          "separate_org_manager_settlement_authority",
-          "approval_not_payment",
-          "preserve_paid_history",
-          "linked_history_not_overwrite"
+          "live_authority_before_receipt_replay",
+          "same_org_target_active_role",
+          "no_implicit_operational_authority",
+          "expected_org_authority_version",
+          "owner_or_live_delegated_om_only",
+          "center_manager_cannot_delegate"
         ],
         "audit": true,
         "notification": "transactional_in_app_outbox",
         "concurrency": "Live original permission/tenant scope on every request; target/aggregate lock; row_version; idempotent receipt and all declared effects rollback together",
-        "expected_version_subject": "movement_id",
+        "expected_version_subject": "organization_settlement_authority_aggregate",
         "acceptance_scenario_ids": [
-          "DS-08"
+          "DS-SET-01",
+          "DS-SET-02",
+          "DS-SET-03",
+          "DS-SET-04",
+          "DS-SET-05",
+          "DS-SET-06",
+          "DS-SET-07",
+          "DS-SET-08",
+          "DS-SET-09",
+          "DS-SET-10",
+          "DS-SET-11",
+          "DS-SET-12",
+          "DS-ATOMIC-01",
+          "DS-AUTH-01",
+          "DS-AUTH-02",
+          "DS-AUTH-03",
+          "DS-SET-13",
+          "DS-SET-14"
         ],
         "configuration_policy": "No implicit fee/rate or arbitrary limit. Accepted DS-2026-10-17.",
         "implementation_status": "contract_only",
-        "transaction_guarantee": "Atomic settlement_movements.linked_reversal, refund_or_offset_balance_preserve_old_payments; audit + in-app outbox + receipt. External delivery never determines the domain commit.",
+        "transaction_guarantee": "Atomic scoped grant/revoke, authority aggregate version, audit, in-app outbox and receipt; rollback all on failure.",
         "operation_contract": {
-          "kind": "correction",
-          "target_entity": "planned.settlement",
+          "kind": "command",
+          "target_entity": "planned.settlement_authority",
           "version_mode": "row_version",
-          "version_field": "movement_id",
-          "read_operation": "settlement_movements_list_v1",
+          "version_field": "org_id",
+          "read_operation": "settlement_authority_get_v1",
           "atomic_effects": [
-            "settlement_movements.linked_reversal",
-            "refund_or_offset_balance_preserve_old_payments"
+            "settlement_authority.grant_or_revoke",
+            "org_authority.version_increment",
+            "audit.append",
+            "outbox.append",
+            "receipt.append"
           ],
           "business_commit": true,
           "read_path_status": "contract_only",
@@ -63337,7 +63601,7 @@
             "cross_center_settlement"
           ],
           "target_request": {
-            "$ref": "#/$defs/Request_settlement_adjust"
+            "$ref": "#/$defs/Request_settlement_authority_set"
           }
         }
       }
@@ -73299,12 +73563,6 @@
         "generation": "uuidv7"
       },
       {
-        "path": "#/$defs/Request_settlement_movements_list/properties/center_id/anyOf/0",
-        "origin": "ftksaas",
-        "acceptance": "generic_uuid",
-        "generation": "uuidv7"
-      },
-      {
         "path": "#/$defs/Success_settlement_movements_list/properties/trace_id",
         "origin": "ftksaas",
         "acceptance": "generic_uuid",
@@ -73323,12 +73581,6 @@
         "generation": "uuidv7"
       },
       {
-        "path": "#/$defs/Request_settlement_requests_list/properties/center_id/anyOf/0",
-        "origin": "ftksaas",
-        "acceptance": "generic_uuid",
-        "generation": "uuidv7"
-      },
-      {
         "path": "#/$defs/Success_settlement_requests_list/properties/trace_id",
         "origin": "ftksaas",
         "acceptance": "generic_uuid",
@@ -73342,12 +73594,6 @@
       },
       {
         "path": "#/$defs/Request_settlement_request_get/properties/org_id",
-        "origin": "ftksaas",
-        "acceptance": "generic_uuid",
-        "generation": "uuidv7"
-      },
-      {
-        "path": "#/$defs/Request_settlement_request_get/properties/center_id/anyOf/0",
         "origin": "ftksaas",
         "acceptance": "generic_uuid",
         "generation": "uuidv7"
@@ -73480,114 +73726,6 @@
       },
       {
         "path": "#/$defs/Success_settlement_request_decide/properties/trace_id",
-        "origin": "ftksaas",
-        "acceptance": "generic_uuid",
-        "generation": "uuidv7"
-      },
-      {
-        "path": "#/$defs/Request_settlement_payment_record/properties/request_id",
-        "origin": "ftksaas",
-        "acceptance": "generic_uuid",
-        "generation": "uuidv7"
-      },
-      {
-        "path": "#/$defs/Request_settlement_payment_record/properties/org_id",
-        "origin": "ftksaas",
-        "acceptance": "generic_uuid",
-        "generation": "uuidv7"
-      },
-      {
-        "path": "#/$defs/Request_settlement_payment_record/properties/center_id/anyOf/0",
-        "origin": "ftksaas",
-        "acceptance": "generic_uuid",
-        "generation": "uuidv7"
-      },
-      {
-        "path": "#/$defs/Request_settlement_payment_record/properties/operation_key",
-        "origin": "ftksaas",
-        "acceptance": "generic_uuid",
-        "generation": "uuidv7"
-      },
-      {
-        "path": "#/$defs/Request_settlement_payment_record/properties/settlement_request_id",
-        "origin": "ftksaas",
-        "acceptance": "generic_uuid",
-        "generation": "uuidv7"
-      },
-      {
-        "path": "#/$defs/Success_settlement_payment_record/properties/trace_id",
-        "origin": "ftksaas",
-        "acceptance": "generic_uuid",
-        "generation": "uuidv7"
-      },
-      {
-        "path": "#/$defs/Request_settlement_offset_record/properties/request_id",
-        "origin": "ftksaas",
-        "acceptance": "generic_uuid",
-        "generation": "uuidv7"
-      },
-      {
-        "path": "#/$defs/Request_settlement_offset_record/properties/org_id",
-        "origin": "ftksaas",
-        "acceptance": "generic_uuid",
-        "generation": "uuidv7"
-      },
-      {
-        "path": "#/$defs/Request_settlement_offset_record/properties/center_id/anyOf/0",
-        "origin": "ftksaas",
-        "acceptance": "generic_uuid",
-        "generation": "uuidv7"
-      },
-      {
-        "path": "#/$defs/Request_settlement_offset_record/properties/operation_key",
-        "origin": "ftksaas",
-        "acceptance": "generic_uuid",
-        "generation": "uuidv7"
-      },
-      {
-        "path": "#/$defs/Request_settlement_offset_record/properties/settlement_request_id",
-        "origin": "ftksaas",
-        "acceptance": "generic_uuid",
-        "generation": "uuidv7"
-      },
-      {
-        "path": "#/$defs/Success_settlement_offset_record/properties/trace_id",
-        "origin": "ftksaas",
-        "acceptance": "generic_uuid",
-        "generation": "uuidv7"
-      },
-      {
-        "path": "#/$defs/Request_settlement_adjust/properties/request_id",
-        "origin": "ftksaas",
-        "acceptance": "generic_uuid",
-        "generation": "uuidv7"
-      },
-      {
-        "path": "#/$defs/Request_settlement_adjust/properties/org_id",
-        "origin": "ftksaas",
-        "acceptance": "generic_uuid",
-        "generation": "uuidv7"
-      },
-      {
-        "path": "#/$defs/Request_settlement_adjust/properties/center_id/anyOf/0",
-        "origin": "ftksaas",
-        "acceptance": "generic_uuid",
-        "generation": "uuidv7"
-      },
-      {
-        "path": "#/$defs/Request_settlement_adjust/properties/operation_key",
-        "origin": "ftksaas",
-        "acceptance": "generic_uuid",
-        "generation": "uuidv7"
-      },
-      {
-        "path": "#/$defs/Request_settlement_adjust/properties/movement_id",
-        "origin": "ftksaas",
-        "acceptance": "generic_uuid",
-        "generation": "uuidv7"
-      },
-      {
-        "path": "#/$defs/Success_settlement_adjust/properties/trace_id",
         "origin": "ftksaas",
         "acceptance": "generic_uuid",
         "generation": "uuidv7"
@@ -74482,24 +74620,6 @@
       },
       {
         "path": "#/$defs/ManagementProjection_settlement_request_decide_v1/properties/values/properties/settlement_request_id",
-        "origin": "ftksaas",
-        "acceptance": "generic_uuid",
-        "generation": "uuidv7"
-      },
-      {
-        "path": "#/$defs/ManagementProjection_settlement_payment_record_v1/properties/values/properties/settlement_request_id",
-        "origin": "ftksaas",
-        "acceptance": "generic_uuid",
-        "generation": "uuidv7"
-      },
-      {
-        "path": "#/$defs/ManagementProjection_settlement_offset_record_v1/properties/values/properties/settlement_request_id",
-        "origin": "ftksaas",
-        "acceptance": "generic_uuid",
-        "generation": "uuidv7"
-      },
-      {
-        "path": "#/$defs/ManagementProjection_settlement_adjust_v1/properties/values/properties/movement_id",
         "origin": "ftksaas",
         "acceptance": "generic_uuid",
         "generation": "uuidv7"
@@ -75501,24 +75621,6 @@
         "generation": "uuidv7"
       },
       {
-        "path": "#/$defs/ManagementSelector_settlement_payment_record_v1/properties/key/properties/settlement_request_id",
-        "origin": "ftksaas",
-        "acceptance": "generic_uuid",
-        "generation": "uuidv7"
-      },
-      {
-        "path": "#/$defs/ManagementSelector_settlement_offset_record_v1/properties/key/properties/settlement_request_id",
-        "origin": "ftksaas",
-        "acceptance": "generic_uuid",
-        "generation": "uuidv7"
-      },
-      {
-        "path": "#/$defs/ManagementSelector_settlement_adjust_v1/properties/key/properties/movement_id",
-        "origin": "ftksaas",
-        "acceptance": "generic_uuid",
-        "generation": "uuidv7"
-      },
-      {
         "path": "#/$defs/Request_management_state_get/allOf/4/then/properties/org_id",
         "origin": "ftksaas",
         "acceptance": "generic_uuid",
@@ -76383,12 +76485,6 @@
         "generation": "uuidv7"
       },
       {
-        "path": "#/$defs/Request_management_state_get/allOf/146/then/properties/org_id",
-        "origin": "ftksaas",
-        "acceptance": "generic_uuid",
-        "generation": "uuidv7"
-      },
-      {
         "path": "#/$defs/Request_entitlement_extend/properties/accepted_reservation_ids/items",
         "origin": "ftksaas",
         "acceptance": "generic_uuid",
@@ -76462,6 +76558,198 @@
       },
       {
         "path": "#/$defs/ValidityProtectionChange/properties/sale_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Request_management_state_get/allOf/145/then/properties/center_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Request_settlement_movements_list/properties/center_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Request_settlement_requests_list/properties/center_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Request_settlement_request_get/properties/center_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/SettlementCorrectionProposal/properties/original_record_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/SettlementRecordView/properties/id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/SettlementRecordView/properties/request_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/SettlementRecordView/properties/approved_by_account_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/SettlementRecordView/properties/original_record_id/anyOf/0",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/SettlementCenterGrantView/properties/center_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/SettlementAuthorityView/properties/org_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/SettlementAuthorityView/properties/person_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Request_settlement_authority_get/properties/request_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Request_settlement_authority_get/properties/org_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Request_settlement_authority_get/properties/person_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Request_settlement_authority_get/properties/center_id/anyOf/0",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Request_settlement_delegation_set/properties/request_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Request_settlement_delegation_set/properties/org_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Request_settlement_delegation_set/properties/operation_key",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Request_settlement_delegation_set/properties/person_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Request_settlement_authority_set/properties/request_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Request_settlement_authority_set/properties/org_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Request_settlement_authority_set/properties/operation_key",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Request_settlement_authority_set/properties/person_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Request_settlement_authority_set/properties/center_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Success_settlement_authority_get/properties/trace_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Success_settlement_delegation_set/properties/trace_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Success_settlement_authority_set/properties/trace_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/ManagementSelector_settlement_delegation_set_v1/properties/key/properties/person_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/ManagementProjection_settlement_delegation_set_v1/properties/values/properties/person_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/ManagementSelector_settlement_authority_set_v1/properties/key/properties/person_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/ManagementProjection_settlement_authority_set_v1/properties/values/properties/person_id",
         "origin": "ftksaas",
         "acceptance": "generic_uuid",
         "generation": "uuidv7"
@@ -76645,9 +76933,9 @@
         "settlement_request_submit_v1",
         "settlement_request_withdraw_v1",
         "settlement_request_decide_v1",
-        "settlement_payment_record_v1",
-        "settlement_offset_record_v1",
-        "settlement_adjust_v1"
+        "settlement_authority_get_v1",
+        "settlement_delegation_set_v1",
+        "settlement_authority_set_v1"
       ],
       "starter_closure": {
         "required_features": [
@@ -76698,11 +76986,13 @@
         "scope_gate": "same_org_business_accessible_centers_and_source_sale_service_center_discipline_scope",
         "dependency_scope": "selected_movement_versions_request_authority_plan",
         "self_approval": false,
-        "approval_is_payment": false,
-        "payment_recorder": "org_manager_with_separate_settlement_permission",
-        "fallback_approval": "different_authorized_org_manager_only_if_no_other_B_manager_with_reason",
+        "fallback_approval": "disabled_no_implicit_owner_or_org_manager_authority",
         "offset": "explicit_approved_same_currency_both_sides_atomic_no_auto_net_no_fx",
-        "no_double_close": true
+        "no_double_close": true,
+        "approval_finalizes_record_and_balances": true,
+        "separate_payment_recorder": false,
+        "automatic_bank_transfer": false,
+        "submit_closes_balance": false
       },
       "sale_scope": {
         "catalog_new_sales_only": true,
@@ -76717,9 +77007,9 @@
       "runtime_behavior_acceptance": "pending DS delivery; existing 241-test baseline is regression evidence only",
       "open_product_choices": [
         {
-          "id": "DS-OPEN-01",
-          "question": "Who may grant/revoke the separate organization-level settlement authority? Existing permission_set is center/staff-scoped; no new grantor authority inferred.",
-          "blocks": "settlement authority provisioning runtime; contract request/read/decision/record scopes are accepted"
+          "id": "DS-OPEN-02",
+          "question": "Previous distinct-OM exception cannot be authorized by the accepted CM-only operational chain. No exception approval route is specified under the new chain; it is disabled, not inferred. A replacement requires an explicit product decision if desired.",
+          "blocks": "exception route only; ordinary distinct authorized B CM flow is fully specified"
         }
       ],
       "delivery_gaps": [
@@ -76775,12 +77065,12 @@
             "settlement_request_submit_v1",
             "settlement_request_withdraw_v1",
             "settlement_request_decide_v1",
-            "settlement_payment_record_v1",
-            "settlement_offset_record_v1",
-            "settlement_adjust_v1",
             "attendance_close_v1",
             "attendance_correct_apply_v1",
-            "sale_apply_v1"
+            "sale_apply_v1",
+            "settlement_authority_get_v1",
+            "settlement_delegation_set_v1",
+            "settlement_authority_set_v1"
           ],
           "status": "pending_runtime_and_auth_edge_rpc_acceptance",
           "evidence": [],
@@ -76963,7 +77253,7 @@
         {
           "id": "DS-SET-06",
           "delivery_gap": "cross_center_settlement",
-          "expected_flow": "A manager submits request, balance stays open; distinct B manager approves/rejects with reason; rejection notifies A in-app.",
+          "expected_flow": "Explicitly authorized A CM submits actual-payment/offset/correction proposal; balance stays open. Distinct explicitly authorized B CM confirms receipt/acceptance and atomically finalizes record and selected balance effects. Reasoned rejection preserves balances and notifies A in-app.",
           "status": "pending_runtime",
           "evidence_kind": "real_auth_edge_rpc",
           "evidence": []
@@ -76971,7 +77261,7 @@
         {
           "id": "DS-SET-07",
           "delivery_gap": "cross_center_settlement",
-          "expected_flow": "Initiator cannot approve even as two-center manager; fallback only distinct separately-authorized OM, no other B manager and explicit reason.",
+          "expected_flow": "Initiator cannot approve even as two-center CM. Owner/OM authority administration never bypasses this; previous OM fallback is disabled under new chain.",
           "status": "pending_runtime",
           "evidence_kind": "real_auth_edge_rpc",
           "evidence": []
@@ -76979,7 +77269,7 @@
         {
           "id": "DS-SET-08",
           "delivery_gap": "cross_center_settlement",
-          "expected_flow": "Approved request is reconciliation, not payment; only separate settlement-authorized OM records actual payment/offset. Owner alone, student, instructor and ordinary staff denied.",
+          "expected_flow": "CM/OM role alone and Owner without explicit CM role/grant cannot read financial data or submit/approve. No separate OM payment stage, and B approval never initiates a bank transfer.",
           "status": "pending_runtime",
           "evidence_kind": "real_auth_edge_rpc",
           "evidence": []
@@ -76987,7 +77277,7 @@
         {
           "id": "DS-SET-09",
           "delivery_gap": "cross_center_settlement",
-          "expected_flow": "Pending A request can be withdrawn; approved changed scope/amount creates linked new version and requires renewed approval; old payments remain.",
+          "expected_flow": "Pending initiator with live A authority may withdraw. Relevant changes require linked new pending scope/version and B reapproval; previously finalized allocations and history remain immutable.",
           "status": "pending_runtime",
           "evidence_kind": "real_auth_edge_rpc",
           "evidence": []
@@ -77051,12 +77341,74 @@
         {
           "id": "DS-ATOMIC-01",
           "delivery_gap": "cross_center_settlement",
-          "expected_flow": "Same-key replay, stale scoped approval and competing partial payment/offset/correction have one valid result; injected late ledger/audit/outbox failure rolls back whole multi-row batch.",
+          "expected_flow": "Concurrent B approvals and competing payment/offset/correction cannot double-close selected shares. Same-key replay rechecks live authority. Injected ledger/balance/audit/outbox/receipt failure rolls back request and entire multi-row batch.",
+          "status": "pending_runtime",
+          "evidence_kind": "real_auth_edge_rpc",
+          "evidence": []
+        },
+        {
+          "id": "DS-AUTH-01",
+          "delivery_gap": "cross_center_settlement",
+          "expected_flow": "Owner grants/revokes OM delegation permission; only live delegated OM or Owner directly grants/revokes exact-center CM settlement authority. Read aggregate version then set with expected_version; conflicting grant versions rollback atomically.",
+          "status": "pending_runtime",
+          "evidence_kind": "real_auth_edge_rpc",
+          "evidence": []
+        },
+        {
+          "id": "DS-AUTH-02",
+          "delivery_gap": "cross_center_settlement",
+          "expected_flow": "OM without delegation, role-only CM, CM attempting delegation, wrong org/center/target role and Owner acting financially without explicit CM authority are denied. Grant administration exposes no ledger.",
+          "status": "pending_runtime",
+          "evidence_kind": "real_auth_edge_rpc",
+          "evidence": []
+        },
+        {
+          "id": "DS-AUTH-03",
+          "delivery_gap": "cross_center_settlement",
+          "expected_flow": "Submit, approve, read and same-key replay check live CM role and exact-center grant. Revoke denies old authenticated session and cached preview/receipt. OM delegation revocation denies further grants/revokes through old session.",
+          "status": "pending_runtime",
+          "evidence_kind": "real_auth_edge_rpc",
+          "evidence": []
+        },
+        {
+          "id": "DS-SET-13",
+          "delivery_gap": "cross_center_settlement",
+          "expected_flow": "Payment/offset/correction proposal is fully frozen and visible via request_get with request/movement/original-record versions. Partial sums and opposite same-currency offset sides are explicit; no third recording endpoint exists.",
+          "status": "pending_runtime",
+          "evidence_kind": "real_auth_edge_rpc",
+          "evidence": []
+        },
+        {
+          "id": "DS-SET-14",
+          "delivery_gap": "cross_center_settlement",
+          "expected_flow": "Reject produces reasoned in-app A notification and receipt/audit without balance/record changes; B approval records exactly once in same transaction. Late outbox/receipt failure rolls back both request and financial effects.",
           "status": "pending_runtime",
           "evidence_kind": "real_auth_edge_rpc",
           "evidence": []
         }
-      ]
+      ],
+      "settlement_authority_chain": {
+        "delegation_grantor": "organization_owner_only",
+        "center_grantor": "organization_owner_or_org_manager_with_live_explicit_delegation",
+        "delegation_target": "same_org_active_org_manager",
+        "center_target": "same_org_active_center_manager_exact_center",
+        "center_manager_delegates": false,
+        "role_implies_settlement": false,
+        "owner_grant_implies_operations": false,
+        "live_check_before_receipt_replay": true,
+        "operation_actor": "active_center_manager_with_live_explicit_center_grant",
+        "authority_version": "organization_settlement_authority_aggregate",
+        "fallback_implies_om_operations": false
+      },
+      "closed_product_choices": [
+        {
+          "id": "DS-OPEN-01",
+          "status": "accepted_contract_runtime_pending",
+          "resolution": "Owner grants/revokes OM delegation permission; Owner directly or live delegated OM grants/revokes exact-center CM settlement authority. Roles and authority administration imply no financial operations.",
+          "source": "docs/decisions/DS-2026-10-17-settlement-revision.md"
+        }
+      ],
+      "latest_settlement_decision": "docs/decisions/DS-2026-10-17-settlement-revision.md"
     },
     "feature_delivery": {
       "F01": {
@@ -77208,9 +77560,13 @@
           "platform_owner_set_v1",
           "platform_owner_remove_v1",
           "center_manager_assign_v1",
-          "center_manager_revoke_v1"
+          "center_manager_revoke_v1",
+          "settlement_authority_get_v1",
+          "settlement_delegation_set_v1",
+          "settlement_authority_set_v1"
         ],
         "dependencies": [
+          "cross_center_settlement",
           "plan_gate_alignment"
         ],
         "implementation": "partial",
@@ -77233,10 +77589,31 @@
         ],
         "contract_only_operations": [
           "account_access_revoke_v1",
-          "account_link_remove_v1"
+          "account_link_remove_v1",
+          "settlement_authority_get_v1",
+          "settlement_delegation_set_v1",
+          "settlement_authority_set_v1"
         ],
         "acceptance_case_ids": [
-          "DS-ACCESS-01"
+          "DS-SET-01",
+          "DS-SET-02",
+          "DS-SET-03",
+          "DS-SET-04",
+          "DS-SET-05",
+          "DS-SET-06",
+          "DS-SET-07",
+          "DS-SET-08",
+          "DS-SET-09",
+          "DS-SET-10",
+          "DS-SET-11",
+          "DS-SET-12",
+          "DS-ACCESS-01",
+          "DS-ATOMIC-01",
+          "DS-AUTH-01",
+          "DS-AUTH-02",
+          "DS-AUTH-03",
+          "DS-SET-13",
+          "DS-SET-14"
         ],
         "baseline_regression": "global baseline 241-test main CI; not per-feature DS acceptance",
         "plan_scope": {
@@ -77550,7 +77927,12 @@
           "DS-SALE-02",
           "DS-SALE-03",
           "DS-ACCESS-01",
-          "DS-ATOMIC-01"
+          "DS-ATOMIC-01",
+          "DS-AUTH-01",
+          "DS-AUTH-02",
+          "DS-AUTH-03",
+          "DS-SET-13",
+          "DS-SET-14"
         ],
         "baseline_regression": "global baseline 241-test main CI; not per-feature DS acceptance",
         "plan_scope": {
@@ -77753,7 +78135,12 @@
           "DS-SET-11",
           "DS-SET-12",
           "DS-ACCESS-01",
-          "DS-ATOMIC-01"
+          "DS-ATOMIC-01",
+          "DS-AUTH-01",
+          "DS-AUTH-02",
+          "DS-AUTH-03",
+          "DS-SET-13",
+          "DS-SET-14"
         ],
         "baseline_regression": "global baseline 241-test main CI; not per-feature DS acceptance",
         "plan_scope": {
@@ -77840,7 +78227,12 @@
           "DS-SALE-02",
           "DS-SALE-03",
           "DS-ACCESS-01",
-          "DS-ATOMIC-01"
+          "DS-ATOMIC-01",
+          "DS-AUTH-01",
+          "DS-AUTH-02",
+          "DS-AUTH-03",
+          "DS-SET-13",
+          "DS-SET-14"
         ],
         "baseline_regression": "global baseline 241-test main CI; not per-feature DS acceptance",
         "plan_scope": {
@@ -77903,7 +78295,12 @@
           "DS-SALE-02",
           "DS-SALE-03",
           "DS-ACCESS-01",
-          "DS-ATOMIC-01"
+          "DS-ATOMIC-01",
+          "DS-AUTH-01",
+          "DS-AUTH-02",
+          "DS-AUTH-03",
+          "DS-SET-13",
+          "DS-SET-14"
         ],
         "baseline_regression": "global baseline 241-test main CI; not per-feature DS acceptance",
         "plan_scope": {
@@ -77988,9 +78385,9 @@
           "settlement_request_submit_v1",
           "settlement_request_withdraw_v1",
           "settlement_request_decide_v1",
-          "settlement_payment_record_v1",
-          "settlement_offset_record_v1",
-          "settlement_adjust_v1"
+          "settlement_authority_get_v1",
+          "settlement_delegation_set_v1",
+          "settlement_authority_set_v1"
         ],
         "dependencies": [
           "cross_center_settlement",
@@ -78010,9 +78407,9 @@
           "settlement_request_submit_v1",
           "settlement_request_withdraw_v1",
           "settlement_request_decide_v1",
-          "settlement_payment_record_v1",
-          "settlement_offset_record_v1",
-          "settlement_adjust_v1"
+          "settlement_authority_get_v1",
+          "settlement_delegation_set_v1",
+          "settlement_authority_set_v1"
         ],
         "acceptance_case_ids": [
           "DS-SET-01",
@@ -78031,7 +78428,12 @@
           "DS-SALE-02",
           "DS-SALE-03",
           "DS-ACCESS-01",
-          "DS-ATOMIC-01"
+          "DS-ATOMIC-01",
+          "DS-AUTH-01",
+          "DS-AUTH-02",
+          "DS-AUTH-03",
+          "DS-SET-13",
+          "DS-SET-14"
         ],
         "baseline_regression": "global baseline 241-test main CI; not per-feature DS acceptance",
         "plan_scope": {
@@ -78112,7 +78514,12 @@
           "DS-SALE-02",
           "DS-SALE-03",
           "DS-ACCESS-01",
-          "DS-ATOMIC-01"
+          "DS-ATOMIC-01",
+          "DS-AUTH-01",
+          "DS-AUTH-02",
+          "DS-AUTH-03",
+          "DS-SET-13",
+          "DS-SET-14"
         ],
         "baseline_regression": "global baseline 241-test main CI; not per-feature DS acceptance",
         "plan_scope": {
@@ -78194,7 +78601,12 @@
           "DS-SET-11",
           "DS-SET-12",
           "DS-ACCESS-01",
-          "DS-ATOMIC-01"
+          "DS-ATOMIC-01",
+          "DS-AUTH-01",
+          "DS-AUTH-02",
+          "DS-AUTH-03",
+          "DS-SET-13",
+          "DS-SET-14"
         ],
         "baseline_regression": "global baseline 241-test main CI; not per-feature DS acceptance",
         "plan_scope": {

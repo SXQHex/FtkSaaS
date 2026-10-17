@@ -44,15 +44,15 @@ const mutations=[
  ['timed package transfers price',p=>ds(p).settlement_rules.timed_transfer=true],
  ['late deficit settlement reprices teacher',p=>ds(p).settlement_rules.late_negative_earning_reprice=true],
  ['initiator approves own request',p=>ds(p).settlement_rules.self_approval=true],
- ['approval closes balance',p=>ds(p).settlement_rules.approval_is_payment=true],
+ ['approval closes balance',p=>ds(p).settlement_rules.approval_finalizes_record_and_balances=false],
  ['unrelated lessons stale settlement approval',p=>ds(p).settlement_rules.dependency_scope='whole_org_hash'],
  ['offset loses paired atomicity',p=>ds(p).settlement_rules.offset='one_side_first'],
- ['payment allowed by ordinary center role',p=>op(p,'settlement_payment_record_v1').permission='center.manage'],
+ ['payment allowed by ordinary center role',p=>op(p,'settlement_request_decide_v1').permission='center.manage'],
  ['old sale scope silently follows catalog',p=>ds(p).sale_scope.catalog_new_sales_only=false],
  ['backdate creates past attendance',p=>ds(p).sale_scope.retro_reservation_attendance_earning=true],
  ['missing runtime declared accepted',p=>ds(p).delivery_gaps[0].status='passed'],
  ['contract test offered as behavior evidence',p=>ds(p).delivery_gaps[0].evidence=['tests/governance.test.mjs']],
- ['undefined authority grantor silently closed',p=>ds(p).open_product_choices=[]]
+ ['incompatible OM fallback silently restored',p=>ds(p).settlement_rules.fallback_approval='org_manager_override']
 ];
 for(const [name,mutate] of mutations)test('contract mutation rejected: '+name,()=>{const p=structuredClone(original);mutate(p);assert.throws(()=>validateGovernance(p,live));});
 const a=new Ajv({strict:false,allErrors:true});addFormats(a);a.addSchema(original,'contract');
@@ -76,11 +76,12 @@ test('impact apply DTO requires explicit affected-reservation acknowledgment and
  const {accepted_reservation_ids,...missing}=r;assert(!valid('Request_reservation_impact_apply',missing));
  assert(!valid('Request_reservation_impact_apply',{...r,actor_role:'owner'}));
 });
-test('settlement decisions/records are closed DTOs; approval is not a payment payload',()=>{
- const r={client_api_version:1,request_id:id,org_id:id,operation_key:id,settlement_request_id:id,expected_version:1,decision:'reject',reason:'Wrong selected scope',fallback:false};
+test('B decision is a closed DTO; frozen proposal cannot be replaced by approval payload',()=>{
+ const r={client_api_version:1,request_id:id,org_id:id,operation_key:id,settlement_request_id:id,expected_version:1,decision:'reject',reason:'Wrong selected scope'};
  assert(valid('Request_settlement_request_decide',r));
  assert(!valid('Request_settlement_request_decide',{...r,decision:'paid'}));
  assert(!valid('Request_settlement_request_decide',{...r,amount_minor:'100'}));
+ assert(!valid('Request_settlement_request_decide',{...r,fallback:true}));
  const {expected_version,...missing}=r;assert(!valid('Request_settlement_request_decide',missing));
 });
 
@@ -152,4 +153,45 @@ test('validity change has a typed sale/end-date preview and explicit affected-re
  const {accepted_reservation_ids,...noAck}=r;assert(!valid('Request_entitlement_extend',noAck));
  const p=structuredClone(original);p.$defs.ReservationProtectionChange.oneOf=p.$defs.ReservationProtectionChange.oneOf.filter(v=>v.$ref!=='#/$defs/ValidityProtectionChange');
  assert.throws(()=>validateGovernance(p,live),/VALIDITY_PREVIEW_PATH/);
+});
+
+const authorityMutations=[
+ ['OM role substitutes for delegation',p=>ds(p).settlement_authority_chain.center_grantor='org_manager_role'],
+ ['CM may delegate',p=>ds(p).settlement_authority_chain.center_manager_delegates=true],
+ ['Owner grant implies operations',p=>ds(p).settlement_authority_chain.owner_grant_implies_operations=true],
+ ['old session bypasses live grant',p=>op(p,'settlement_request_submit_v1').semantic_guards=op(p,'settlement_request_submit_v1').semantic_guards.filter(g=>g!=='live_authority_before_receipt_replay')],
+ ['B approval omits receipt atomicity',p=>op(p,'settlement_request_decide_v1').operation_contract.effects_by_outcome.approve.pop()],
+ ['reject closes balances',p=>op(p,'settlement_request_decide_v1').operation_contract.effects_by_outcome.reject.push('selected_balances.reduce')],
+ ['submission closes balance',p=>op(p,'settlement_request_submit_v1').operation_contract.atomic_effects.push('selected_balances.reduce')],
+ ['grant uses unrelated entity version',p=>op(p,'settlement_authority_set_v1').operation_contract.version_field='person_id'],
+ ['grantor decision still open',p=>ds(p).closed_product_choices=[]],
+ ['third-stage operation restored',p=>{const o=structuredClone(op(p,'settlement_request_decide_v1'));o.name='settlement_payment_record_v1';p['x-contract'].operations.push(o);p.$defs.OperationName.enum.push(o.name);}],
+ ['no fallback conflict disclosed',p=>ds(p).open_product_choices=[]]
+];
+for(const [name,mutate] of authorityMutations)test('settlement revision mutation rejected: '+name,()=>{const p=structuredClone(original);mutate(p);assert.throws(()=>validateGovernance(p,live));});
+test('settlement proposal DTO freezes actual payment, explicit paired offset or linked correction, never recorder actor',()=>{
+ const line={movement_id:id,expected_version:1,amount_minor:'100'};
+ const r={client_api_version:1,request_id:id,org_id:id,operation_key:id,from_center_id:id,to_center_id:other,currency:'TRY',reason:'Actual payment reported',proposal:{kind:'payment',lines:[line],amount_minor:'100',occurred_at:'2026-10-17T10:00:00Z'}};
+ assert(valid('Request_settlement_request_submit',r));
+ assert(!valid('Request_settlement_request_submit',{...r,proposal:{kind:'payment',lines:[line],amount_minor:'100'}}));
+ assert(valid('Request_settlement_request_submit',{...r,proposal:{kind:'offset',debit_lines:[line],credit_lines:[{...line,movement_id:other}],amount_minor:'100'}}));
+ assert(!valid('Request_settlement_request_submit',{...r,proposal:{kind:'offset',debit_lines:[line],amount_minor:'100'}}));
+ assert(valid('Request_settlement_request_submit',{...r,proposal:{kind:'correction',original_record_id:id,expected_version:1,amount_minor:'100'}}));
+ assert(!valid('Request_settlement_request_submit',{...r,recorder_role:'org_manager'}));
+ assert(!valid('Request_settlement_request_submit',{...r,previous_id:other}));
+ assert(valid('Request_settlement_request_submit',{...r,previous_id:other,previous_version:1}));
+});
+test('authority writes have scoped target, current aggregate version and reason; client cannot claim grantor role',()=>{
+ const r={client_api_version:1,request_id:id,org_id:id,operation_key:id,person_id:other,expected_version:1,granted:true,reason:'Approved authority'};
+ assert(valid('Request_settlement_delegation_set',r));
+ assert(!valid('Request_settlement_authority_set',r));
+ assert(valid('Request_settlement_authority_set',{...r,center_id:id}));
+ assert(!valid('Request_settlement_authority_set',{...r,center_id:id,actor_role:'owner'}));
+ const {expected_version,...missing}=r;assert(!valid('Request_settlement_delegation_set',missing));
+});
+
+test('generic permission_set cannot provision reserved settlement authority or operational permissions',()=>{
+ const r={client_api_version:1,request_id:id,org_id:id,center_id:id,operation_key:id,expected_version:1,person_id:other,enabled:true};
+ for(const permission of ['settlement.authority.manage','settlement.delegation.manage','settlement.request','settlement.decide','settlement.read'])assert(!valid('Request_permission_set',{...r,permission}));
+ const p=structuredClone(original);p.$defs.Permission.enum.push('settlement.authority.manage');assert.throws(()=>validateGovernance(p,live),/GENERIC_PERMISSION_ESCALATION/);
 });

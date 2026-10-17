@@ -13,10 +13,10 @@ Uzak geliştirme/test Auth → Edge → RPC smoke [ayrı rapordadır](../reports
 1. Bu PR: karar/DTO/izin/guard/sürüm-okuma aktarımı, F01–F33 haritası ve yapısal CI denetimleri. Yeni runtime tamamlandı sayılmaz.
 2. Plan kapısı ayrımı + Starter ders yoklama/hak tüketimi; protected reservation obligation/impact approval ve başlangıç/kapanış tüketicileri.
 3. Immutable anlaşma zinciri, yürürlük/başlamış seans snapshot’ı, ürün kimliği override ve mükerrer olmayan hakediş; gerçek Auth→Edge→RPC kabul.
-4. Ayrı merkezler arası ledger ve çift onay/ayrı ödeme yetkisi, kısmi ödeme/mahsup/ters kayıt. DS-OPEN-01 grantor kararı ve fiziksel depolama/RPC/read/izolasyon bağımlılıkları açık.
+4. Ayrı merkezler arası ledger, Owner/delege OM grant zinciri ve B onayında atomik ödeme/mahsup/bağlı düzeltme kesinleştirmesi. DS-OPEN-01 karar düzeyinde kapalı; DS-OPEN-02 eski OM fallback çelişkisi ve fiziksel depolama/RPC/read/izolasyon bağımlılıkları açık.
 5. Satış kapsam snapshot/değişim, gerekçeli backdate ve geçmiş açık kapatma; yeni ürün davranışı uydurulmadan uçtan uca kabul.
 
-Hedef plan/koruma/anlaşma farkları 08 delivery_gaps içinde açıktır. [29 pending DS davranış senaryosu](decision-sprint-handover.md) statik testten geçmiş kabul edilmez. [Main koruması](branch-protection-review.md) klasik API 403 nedeniyle doğrulanamıyor; gerekli yönetici ayarları teslim edilir, uygulanmış sayılmaz.
+Hedef plan/koruma/anlaşma farkları 08 delivery_gaps içinde açıktır. [34 pending DS davranış senaryosu](decision-sprint-handover.md) statik testten geçmiş kabul edilmez. [Main koruması](branch-protection-review.md) klasik API 403 nedeniyle doğrulanamıyor; gerekli yönetici ayarları teslim edilir, uygulanmış sayılmaz.
 
 ## Bağımlılık sırası
 
@@ -157,17 +157,17 @@ Her yeni grup: sözleşme/izin incelemesi → yeni migration → gerçek Auth/AP
 | negcredit_valuation_set_v1 | product.manage |
 | management_state_get_v1 | management.inspect |
 | instructor_agreements_list_v1 | earnings.manage |
-| reservation_impact_preview_v1 | entitlement.correct |
-| reservation_impact_apply_v1 | entitlement.correct |
+| reservation_impact_preview_v1 | reservation.protection.manage |
+| reservation_impact_apply_v1 | reservation.protection.manage |
 | settlement_movements_list_v1 | settlement.read |
 | settlement_requests_list_v1 | settlement.read |
 | settlement_request_get_v1 | settlement.read |
 | settlement_request_submit_v1 | settlement.request |
 | settlement_request_withdraw_v1 | settlement.request |
 | settlement_request_decide_v1 | settlement.decide |
-| settlement_payment_record_v1 | settlement.record |
-| settlement_offset_record_v1 | settlement.record |
-| settlement_adjust_v1 | settlement.record |
+| settlement_authority_get_v1 | settlement.authority.inspect |
+| settlement_delegation_set_v1 | settlement.delegation.manage |
+| settlement_authority_set_v1 | settlement.authority.manage |
 
 ## Operasyonel kabul işleri
 

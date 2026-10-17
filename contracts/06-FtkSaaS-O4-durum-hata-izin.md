@@ -294,6 +294,16 @@ Sınıf atama güncellemesi hedef atama satır sürümünü, seans kapasite/gör
 
 Starter F14 kapanış ve hak tüketimi anlaşma gerektirmez, hakediş üretmez. F20 yalnız Pro/Business ücretli hakediş yoludur. Kesin rezervasyon koruması açık etki onayı ve mevcut yükümlülükle sürer; sonraki politika/limit/hak değişimi tek başına blocked/iptal üretmez, bağımsız engelleri kaldırmaz.
 
-SettlementRequestState: pending → approved/rejected/withdrawn. Onaylı kapsam/tutar değişikliği yeni pending sürüm ve yeniden onaydır; eski değişmiş kapsam onayıyla yeni işlem yapılamaz, geçmiş ödeme silinmez. Başvuru veya B onayı bakiye kapatmaz. A başlatır; farklı hesaplı B yöneticisi karar verir. Başka B yöneticisi yoksa farklı, ayrı hesaplaşma yetkili OM gerekçeli onay verebilir. Ayrı yetkili OM gerçek ödeme/mahsup/bağlı düzeltme kaydeder. Kısmi kapama, seçili hareket bağımlılığı, aynı para birimi ve atomik çift taraflı mahsup; mükerrer kapama/kur dönüşümü/otomatik kabul yoktur. Owner tek başına yetkili değildir. Gerekçeli ret A’ya uygulama içi bildirilir.
 
-settlement.read/request/decide/record ve management.inspect izinleri 08’de hedef sözleşmedir; runtime grantı değildir. Ayrı OM hesaplaşma yetkisini kim verebilir/geri alabilir konusu DS-OPEN-01 olarak açık; mevcut merkez-personel permission_set akışından yeni global grant yetkisi türetilmez. DTO/izin/state varlığı uygulama kanıtı değildir.
+
+## Son hesaplaşma revizyonu — DS-2026-10-17
+
+[Yetki ve iki taraflı kesinleştirme kararı](../docs/decisions/DS-2026-10-17-settlement-revision.md) geçerlidir. Owner → OM devretme izni → belirli merkez CM hesaplaşma grantı zinciri uygulanacak hedeftir; Owner CM'ye doğrudan da grant verebilir. OM/CM rolü ve Owner'ın grant yönetimi tek başına merkez finansal operasyon yetkisi değildir. CM yetki devredemez.
+
+A'nın açık yetkili CM'si gerçekleşen ödeme veya önerilen mahsup başvurusu açar; bakiye değişmez. Farklı açık yetkili B CM onayı kayıt, seçili bakiye, request, audit/outbox/receipt'i atomik kesinleştirir. Gerekçeli ret bakiye değiştirmez, A'ya uygulama içi gider. Ayrı OM ödeme/mahsup kayıt aşaması yoktur; onay banka transferi değildir. Kısmi, aynı para birimli karşılıklı mahsup ve geçmişi koruyan bağlı düzeltme aynı başvuru/onay zincirindedir. İlgili sürüm değişimi yeni onay ister, alakasız dersler stale yapmaz. Self-approval ve çift kapama yasaktır; receipt replay dahil canlı yetki aranır.
+
+DS-OPEN-01 karar düzeyinde kapandı; runtime pending. Eski OM fallback yeni CM operasyon zincirinden türetilemez; DS-OPEN-02 istisna çelişkisi açık ve fallback devre dışıdır. Yeni idari grant/read/version DTO'ları ve 34 gerçek kabul senaryosu 08'de yalnız sözleşmedir. Main koruması ayrı yönetici işi; yeni merge/deploy yetkisi yoktur.
+
+SettlementRequestState: pending → approved/rejected/withdrawn. approved = B tarafından record + seçili bakiye etkileri aynı transaction içinde kesinleşmiş; ayrı kayıt bekleyen approved aşaması yok. Onaylı kaydın revizyonu yeni bağlı pending başvuru ve yeniden onaydır; eski kayıt silinmez. Gerekçeli ret bakiye/kayıt üretmez. payment/offset/correction kapalı DTO birleşimidir. OM fallback alanı ve settlement.record izni kaldırıldı.
+
+settlement.delegation.manage Owner'a özgü; settlement.authority.manage Owner veya canlı delege OM'ye özgüdür. settlement.authority.inspect yalnız dar idari grant projeksiyonudur. settlement.read/request/decide aktif CM + açık canlı merkez grantı ister. Yetki setleri org settlement-authority aggregate sürümünü kullanır. B onayında record/balance/request/audit/outbox/receipt ve yetki setinde grant/version/audit/outbox/receipt atomiktir. DTO/guard varlığı çalışan uygulama kanıtı değildir.

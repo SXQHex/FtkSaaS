@@ -10,7 +10,7 @@ Bu PR ürün kararlarını, DTO/izin/guard/okuma-yazma bağımlılıklarını ve
 |---|---|
 | Ürün kararı | [DS-2026-10-17 açık kullanıcı kararları](decisions/DS-2026-10-17.md) kabul edilmiş ve önceki çelişen hükümleri değiştirir |
 | Teknik aktarım | 01/02/06 yaşayan hükümler, 08 DTO/izin/guard/faz/sürüm/etki metaverisi, üretilmiş 04/05/envanter/ortak tipler |
-| Runtime | Önceki 79 endpoint/90 tablo/25 migration. Yeni 13 endpoint gateway runtime listesine eklenmez; NOT_FOUND kalır. Yeni DS hedefleri tamamlandı sayılmaz |
+| Runtime | Önceki 79 endpoint/90 tablo/25 migration. 13 yeni hedef endpoint gateway runtime listesine eklenmez; NOT_FOUND kalır. Yeni DS hedefleri tamamlandı sayılmaz |
 | Sözleşme/CI denetimi | Pozitif şema/tutarlılık ve kasıtlı bozmada gerçekten başarısız olan negatif governance testleri |
 | Gerçek davranış kabulü | Önceki 202 Auth/API testinin regresyonu korunur; DS kabul kataloğundaki yeni akışlar pending_runtime, statik testten geçti çıkarımı yoktur |
 | Son head ve merge | Son PR head incelemesi ve CI ayrıca doğrulanır; bu PR için yeni merge yetkisi varsayılmaz |
@@ -47,11 +47,17 @@ B'nin fiilî eğitmeni B anlaşmasıyla hesaplanır: ilgili ürün kimliğine ö
 
 İade/düzeltme önceki kaydın tutarını bağlı ters hareketle geri alır. Ödenmiş tutar silinmez; fazla ödeme B'nin A'ya iade/mahsup bakiyesidir. Mevcut para hassasiyet kuralı (yarım sıfırdan uzağa, en büyük küsurat/kararlı eşitlik; ters kayıtta orijinal tutar) kullanılır. Otomatik para transferi, otomatik netleştirme veya kur dönüşümü yoktur. Kullanım izni her zaman paket kapsamı, Business, merkez erişimi, disiplin ve diğer kapılardan gelir; hesaplaşma yeni kullanım yetkisi vermez.
 
-Hedef akış: A submit → pending ve bakiye açık → farklı hesaplı B decide (approve/reject) → approved mutabakat → ayrı settlement.record yetkili OM gerçekleşmiş payment/offset kaydeder → yalnız seçilmiş tutarlar kapanır. A pending iken withdraw yapabilir. Onaylı kapsam/tutar revizyonu linked yeni pending sürüm/reapproval ister. Sadece ilgili hareket/tutar/sürüm düzeltmesi stale yapar; alakasız dersler başvuruyu bozmaz.
+[Son kabul edilmiş revizyon](decisions/DS-2026-10-17-settlement-revision.md) önceki üç aşamayı kaldırır. Owner, OM'ye CM hesaplaşma grantını yönetme izni verir/kaldırır. Owner doğrudan veya canlı delege OM, belirli merkezde aktif CM'ye açık grant verir/kaldırır. CM devredemez. Rol veya idari grant yönetimi finansal operasyon hakkı doğurmaz.
 
-Aynı kişi iki merkezi yönetse bile kendi başvurusunu onaylayamaz. B'de başka yetkili yoksa başlatandan farklı, ayrı yetkili OM gerekçeli onay verebilir. Gerekçeli ret A'ya uygulama içi gider. CM kendi merkezinin karşılıklı kayıtlarını, OM bütün merkezleri görür; owner tek başına, öğrenci/eğitmen ve sıradan personel yetkili değildir. Kısmi kapama ve same-currency offset seçili iki tarafı tek transaction'da azaltır. Aynı pay iki kez kapanmaz; eski ödeme düzeltmesi bağlı hareket olarak kalır.
+A'nın açık yetkili CM'si gerçekleşen ödeme / önerilen açık aynı para birimli mahsup / bağlı düzeltme başvurusu açar; bakiye değişmez. Başlatandan farklı açık yetkili B CM onayında başvuru + ödeme/mahsup/bağlı düzeltme kaydı + seçili bakiye etkileri + audit/outbox/receipt tek transaction içinde kesinleşir. Gerekçeli rette bakiye/kayıt değişmez, gerekçe A'ya uygulama içi gider. Ayrı OM kayıt aşaması ve banka transferi yoktur.
 
-Yeni sözleşmeler: settlement_movements_list, settlement_requests_list, settlement_request_get, settlement_request_submit, settlement_request_withdraw, settlement_request_decide, settlement_payment_record, settlement_offset_record, settlement_adjust. Yeni settlement tabloları/ledger/izolasyon/RPC/Edge uygulaması bu PR'nin içinde değildir.
+settlement_payment_record, settlement_offset_record ve tek taraflı settlement_adjust sözleşmeleri kaldırıldı; gövdeleri SettlementProposal üzerinden submit'e, kesinleştirmeleri decide approve dalına taşındı. Böylece kaldırılan üçüncü aşama veya tek taraflı düzeltme ile B onayı aşılamaz. Düzeltme original_record_id/version ile eski kayda bağlanır; geçmiş ödeme korunur. request_get proposal, request version ve onaylandığında immutable record/version sağlar; hareket okuması açık tutar/sürüm verir. İlgili değişiklik stale yapar, alakasız ders yapmaz. Değişmiş onaylı kapsam yeni bağlı pending başvuru ister; önceki kesinleşmiş pay tekrar kapatılamaz.
+
+Yetki sözleşmeleri: settlement_authority_get, settlement_delegation_set, settlement_authority_set. İdari okuma dar grant projeksiyonu ve org settlement-authority aggregate sürümü verir; set bu sürümü atomik artırır. Owner kendi org'unda, delege OM yönetebildiği CM scope'unda, CM yalnız kendi grant durumunda idari okuma yapar. İdari yetki ledger erişimi değildir. Submit/read/approve/withdraw ve receipt replay canlı CM rolü ve seçili merkez grantını yeniden denetler; yetki kaldırma eski Auth oturumuyla aşılamaz. Delege OM grant yönetiminde kendi canlı devretme iznini yeniden kontrol eder. Genel permission_set Permission enumu settlement.* yetkilerini kabul etmez; yalnız özel yetki komutları bu grantları yönetir. Otomatik cascade grant silme icat edilmez.
+
+Eski OM fallback yeni merkez operasyon zincirinde yetkilenemiyor. fallback input'u kaldırıldı; Owner/OM'ye sessiz operasyon yetkisi yoktur. DS-OPEN-02 yalnız eski istisna yerine alternatif istenirse yeni açık karar gerektiğini kaydeder. Self-approval iki merkez CM'si için de yasaktır.
+
+Yeni settlement tabloları/authority depolaması/ledger/izolasyon/RPC/Edge uygulaması bu PR'nin içinde değildir.
 
 ## Satış kapsamı ve geçmiş tarih
 
@@ -65,9 +71,9 @@ Bileşik kimlikler (class/person/duty, person/discipline, resource/rule gibi) ka
 
 ## Açık ürün/teslim sınırı
 
-DS-OPEN-01: ayrı organizasyon seviyeli hesaplaşma yetkisini hangi aktörün verebileceği/geri alabileceği açık talimatta belirtilmedi. Mevcut permission_set merkez-personel kapsamıdır. Owner/CM/OM için yeni grantor yetkisi uydurulmadı; bu yetkiyi provision eden runtime teslimi bu tercihe bağlıdır. Hesaplaşma akışının kabul edilmiş submit/decide/record yetkileri değiştirilmez.
+DS-OPEN-01 grantor konusu [son karar](decisions/DS-2026-10-17-settlement-revision.md) ile karar düzeyinde kapalıdır; yalnız sözleşme aktarılmıştır. DS-OPEN-02 önceki OM fallback'inin yeni zincirle çeliştiğini gösterir; normal farklı yetkili B CM akışını engellemez, istisna operasyon yetkisi türetilmez.
 
-Diğer açıklar ürün tercihi diye yeniden açılmaz: yeni migration, başlangıç/koruma snapshot üreticisi, anlaşma seçicisi, ledger, ilgili okuma/izolasyon ve gerçek yarış/rollback kabulü teknik teslim bağımlılıklarıdır. [F01–F33 haritası](feature-delivery.md) ve 08 içindeki 29 DS kabul senaryosu bu ayrımı taşır.
+Diğer açıklar ürün tercihi diye yeniden açılmaz: yeni migration, başlangıç/koruma snapshot üreticisi, anlaşma seçicisi, ledger, ilgili okuma/izolasyon ve gerçek yarış/rollback kabulü teknik teslim bağımlılıklarıdır. [F01–F33 haritası](feature-delivery.md) ve 08 içindeki 34 DS kabul senaryosu bu ayrımı taşır.
 
 ## CI ve kanıt
 
@@ -82,3 +88,7 @@ Kaynak raporu reports/decision-sprint-verification.json, geliştirici sözleşme
 center_update hedef sürümü centers.center_id üzerinden okunur; yönetim okuması açık merkez UUID ister. Canlı DTO değişmez; Target_center_update_identified gelecekteki açık hedefi gösterir. CRM faaliyet oluşturma activity_id olmadan, güncelleme activity_id + expected_version ile yapılır; lead_id güncellenecek faaliyet kimliği yerine kullanılamaz. Yönetim okuması bu kimliği ve satır sürümünü döndürür.
 
 Süre değişikliği etki önizlemesinde entitlement_extend / sale_id / end_date ile temsil edilir; sale/entitlement sürümleri ve gerekçe tokena bağlanır. Etki önizlemesi onay veya commit değildir. reservation_impact_apply veya özgün korumalı komut (impact_approval + accepted_reservation_ids) aynı önizlemeyi bir kez tüketen alternatif uygulama yollarıdır; art arda iki yazma yapılmaz. Tam etkilenen liste onayı, tam değişiklik eşleşmesi, ilgili sürümler, özgün yetki ve koruma aynı transaction içinde doğrulanır. Bu hedef sözleşme davranışı henüz runtime değildir.
+
+## Son revizyon kanıtı
+
+Başlangıç PR head c1a479c72e98c5a53d949a1eb7e30e1abc6679a3 ve CI 39023254173 yalnız önceki kapsamın kanıtıdır. Son yetki/iki taraflı kesinleştirme revizyonu için yeni kaynak raporu reports/settlement-revision-verification.json; son SHA bağımsız incelemesi ve tek tam temiz CI kanıtı PR #13 konuşmasına ayrıca bağlanır. Tarihsel raporlar değiştirilmez.

@@ -221,7 +221,7 @@ Grup/etkinlik iptali, borçlu katılım, paket bitiş hatırlatması, kayıt pen
 | Aktif öğrenci sayımı ve plan geçişi | Davranış kabul edildi; sayısal limitler ticari açılıştan önce | Aşağıdaki kurallar ve teknik sözleşme uygulanır; veri silinmez. |
 | Dondurmayı erken bitirme; yenilemede kalan hak; ürün değişiminde hak/fiyat farkı | İş kararları kabul edildi | Teknik sözleşme bölüm 17 uygulanır; API ayrıntıları O4’te hazırlanacak. |
 | Etkinlik iptal/iade koşulları | İlgili etkinlik kayda açılmadan önce | Etkinliğe açık politika tanımlanır; özel dersin 12 saat kuralı kopyalanmaz. |
-| Merkezler arası hesaplaşma | DS-2026-10-17 ile kabul edildi; runtime ayrı teslim | Kredili gerçek satış bedeli payı, onaylı kısmi ödeme/mahsup; otomatik para transferi yok. Grantor DS-OPEN-01 açık. |
+| Merkezler arası hesaplaşma | DS-2026-10-17 ile kabul edildi; runtime ayrı teslim | Kredili gerçek satış bedeli payı, onaylı kısmi ödeme/mahsup; otomatik para transferi yok. Grantor DS-OPEN-01 son revizyonla karar düzeyinde kapalı; runtime pending. |
 | Dış bildirim kanalı, sağlayıcı ve kullanım maliyeti | İlgili kanal etkinleştirilmeden önce | Uygulama içi kanal kullanılır; dış kanal teslimatı taahhüt edilmez. |
 
 Bu konuların tamamını şimdi sonuçlandırmak gerekmez. Karar yalnızca ilgili özelliğin belirsiz davranışını engeller; diğer geliştirmeleri durdurmaz.
@@ -453,3 +453,11 @@ Teknik aktarım ve test durumu: docs/decisions/Q-E02.md ve reports/qe02-verifica
 **AS-03.** İptalden sonra geriye dönük kayıt/düzeltme mümkündür; iptal yeniden açılmaz. Etkinlik sürümü artar; eski önizleme geçersizleşir. event_get mevcut actual_started_at değerini; yönetici/organizasyon okuyucusuna append-only actual_start_history geçmişini döndürür.
 
 Teknik kanıt: docs/actual-start-handover.md, PR son commit CI. Bu aktarım kısmi gerçekleşmeye bağlı yeni parasal veya hak kuralı üretmez.
+
+## Son hesaplaşma revizyonu — DS-2026-10-17
+
+[Yetki ve iki taraflı kesinleştirme kararı](../docs/decisions/DS-2026-10-17-settlement-revision.md) geçerlidir. Owner → OM devretme izni → belirli merkez CM hesaplaşma grantı zinciri uygulanacak hedeftir; Owner CM'ye doğrudan da grant verebilir. OM/CM rolü ve Owner'ın grant yönetimi tek başına merkez finansal operasyon yetkisi değildir. CM yetki devredemez.
+
+A'nın açık yetkili CM'si gerçekleşen ödeme veya önerilen mahsup başvurusu açar; bakiye değişmez. Farklı açık yetkili B CM onayı kayıt, seçili bakiye, request, audit/outbox/receipt'i atomik kesinleştirir. Gerekçeli ret bakiye değiştirmez, A'ya uygulama içi gider. Ayrı OM ödeme/mahsup kayıt aşaması yoktur; onay banka transferi değildir. Kısmi, aynı para birimli karşılıklı mahsup ve geçmişi koruyan bağlı düzeltme aynı başvuru/onay zincirindedir. İlgili sürüm değişimi yeni onay ister, alakasız dersler stale yapmaz. Self-approval ve çift kapama yasaktır; receipt replay dahil canlı yetki aranır.
+
+DS-OPEN-01 karar düzeyinde kapandı; runtime pending. Eski OM fallback yeni CM operasyon zincirinden türetilemez; DS-OPEN-02 istisna çelişkisi açık ve fallback devre dışıdır. Yeni idari grant/read/version DTO'ları ve 34 gerçek kabul senaryosu 08'de yalnız sözleşmedir. Main koruması ayrı yönetici işi; yeni merge/deploy yetkisi yoktur.

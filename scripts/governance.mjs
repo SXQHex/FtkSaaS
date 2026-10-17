@@ -86,17 +86,18 @@ export function validateGovernance(p,implemented){
   credit_basis:'actual_sale_price_per_consumed_credit',earning_agreement:'service_center_actual_instructor_package_override_else_general',
   accrual_trigger:'performed_session_and_right_consumed_or_later_eligible_credit_deficit_settlement',cash_payment_required:false,timed_transfer:false,source_less_negative_initial_transfer:false,late_negative_earning_reprice:false,
   reversal:'linked_original_amount_preserving_prior_payments',rounding:'half_away_from_zero_largest_remainder_stable_tie_original_amount_on_reversal',
-  scope_gate:'same_org_business_accessible_centers_and_source_sale_service_center_discipline_scope',dependency_scope:'selected_movement_versions_request_authority_plan',self_approval:false,approval_is_payment:false,
-  payment_recorder:'org_manager_with_separate_settlement_permission',fallback_approval:'different_authorized_org_manager_only_if_no_other_B_manager_with_reason',
+  scope_gate:'same_org_business_accessible_centers_and_source_sale_service_center_discipline_scope',dependency_scope:'selected_movement_versions_request_authority_plan',self_approval:false,
+  approval_finalizes_record_and_balances:true,separate_payment_recorder:false,automatic_bank_transfer:false,submit_closes_balance:false,
+  fallback_approval:'disabled_no_implicit_owner_or_org_manager_authority',
   offset:'explicit_approved_same_currency_both_sides_atomic_no_auto_net_no_fx',no_double_close:true};
  assert.deepEqual(ds.settlement_rules,expectedSettlement,'SETTLEMENT_RULES');
  assert.deepEqual(Object.fromEntries(Object.entries(d.SettlementRuleSet.properties).map(([k,v])=>[k,v.const])),expectedSettlement,'SETTLEMENT_DTO_RULES');
- for(const n of ['settlement_request_submit_v1','settlement_request_withdraw_v1','settlement_request_decide_v1','settlement_payment_record_v1','settlement_offset_record_v1','settlement_adjust_v1']){
+ for(const n of ['settlement_request_submit_v1','settlement_request_withdraw_v1','settlement_request_decide_v1']){
   const o=map.get(n);equalSet(o.required_features,['F18'],'SETTLEMENT_PLAN');
   for(const g of ['same_org_business_scope','selected_dependencies_only','no_self_approval','no_double_balance_close'])assert(o.semantic_guards.includes(g),'SETTLEMENT_GUARD '+n+' '+g);
  }
  assert.equal(map.get('settlement_request_decide_v1').permission,'settlement.decide','DECISION_AUTHORITY');
- for(const n of ['settlement_payment_record_v1','settlement_offset_record_v1','settlement_adjust_v1'])assert.equal(map.get(n).permission,'settlement.record','PAYMENT_AUTHORITY');
+
  const sale=ds.sale_scope;
  for(const k of ['catalog_new_sales_only','existing_sale_change_reason_preview_protection','manager_backdate_reason_real_created_at','past_consumed_deficits_before_future_reserved'])assert.equal(sale[k],true,'SALE_RULE '+k);
  for(const k of ['backdate_required_to_settle_past_deficit','retro_reservation_attendance_earning','timed_past_extension_carry'])assert.equal(sale[k],false,'SALE_RULE '+k);
@@ -130,7 +131,46 @@ export function validateGovernance(p,implemented){
   assert.equal(gap.evidence.length,0,'NO_SYNTHETIC_BEHAVIOR_EVIDENCE');
   for(const n of gap.operations)assert(map.has(n)&&map.get(n).decision_delivery.open_dependencies.includes(gap.id),'GAP_OPERATION_LINK '+n);
  }
- assert(ds.open_product_choices.some(v=>v.id==='DS-OPEN-01'),'UNRESOLVED_GRANTOR_HIDDEN');
+ assert(ds.closed_product_choices.some(v=>v.id==='DS-OPEN-01'&&v.status==='accepted_contract_runtime_pending'),'GRANTOR_DECISION_NOT_CLOSED');
+ assert(!ds.open_product_choices.some(v=>v.id==='DS-OPEN-01'),'GRANTOR_STILL_OPEN');
+ assert(ds.open_product_choices.some(v=>v.id==='DS-OPEN-02'),'INCOMPATIBLE_FALLBACK_HIDDEN');
+ const chain={delegation_grantor:'organization_owner_only',center_grantor:'organization_owner_or_org_manager_with_live_explicit_delegation',delegation_target:'same_org_active_org_manager',center_target:'same_org_active_center_manager_exact_center',center_manager_delegates:false,role_implies_settlement:false,owner_grant_implies_operations:false,live_check_before_receipt_replay:true,operation_actor:'active_center_manager_with_live_explicit_center_grant',authority_version:'organization_settlement_authority_aggregate',fallback_implies_om_operations:false};
+ assert.deepEqual(ds.settlement_authority_chain,chain,'AUTHORITY_CHAIN');
+ for(const n of ['settlement_payment_record_v1','settlement_offset_record_v1','settlement_adjust_v1']){
+  assert(!map.has(n),'REMOVED_THIRD_STAGE '+n);
+  assert(!d['Request_'+n.replace(/_v1$/,'')],'REMOVED_STAGE_DTO '+n);
+ }
+ assert(!x.permissions['settlement.record'],'REMOVED_RECORDER_PERMISSION');
+ assert.equal(d.Request_permission_set.properties.permission.$ref,'#/$defs/Permission','GENERIC_GRANT_ROUTE');
+ assert(!d.Permission.enum.some(v=>v.startsWith('settlement.')),'GENERIC_PERMISSION_ESCALATION');
+ assert.equal(ds.latest_settlement_decision,'docs/decisions/DS-2026-10-17-settlement-revision.md','LATEST_SETTLEMENT_DECISION');
+
+ assert.equal(map.get('settlement_delegation_set_v1').permission,'settlement.delegation.manage','OWNER_DELEGATION_PERMISSION');
+ assert.equal(map.get('settlement_authority_set_v1').permission,'settlement.authority.manage','CENTER_GRANT_PERMISSION');
+ for(const [n,g] of [['settlement_delegation_set_v1','owner_only_delegation_change'],['settlement_authority_set_v1','owner_or_live_delegated_om_only']]){
+  const o=map.get(n);assert(!live.has(n),'AUTHORITY_RUNTIME_CLAIM');
+  for(const v of [g,'center_manager_cannot_delegate','live_authority_before_receipt_replay','same_org_target_active_role','expected_org_authority_version','no_implicit_operational_authority'])assert(o.semantic_guards.includes(v),'AUTHORITY_GUARD '+n+' '+v);
+  assert.equal(o.operation_contract.read_operation,'settlement_authority_get_v1','AUTHORITY_READ_PATH');
+  assert.equal(o.operation_contract.version_field,'org_id','AUTHORITY_VERSION_BINDING');
+  for(const e of ['settlement_authority.grant_or_revoke','org_authority.version_increment','audit.append','outbox.append','receipt.append'])assert(o.operation_contract.atomic_effects.includes(e),'AUTHORITY_ATOMIC '+e);
+ }
+ for(const n of ['settlement_movements_list_v1','settlement_requests_list_v1','settlement_request_get_v1','settlement_request_submit_v1','settlement_request_withdraw_v1','settlement_request_decide_v1']){
+  const o=map.get(n);for(const g of ['active_cm_and_explicit_center_grant','live_authority_before_receipt_replay','no_owner_or_om_operational_fallback'])assert(o.semantic_guards.includes(g),'LIVE_CENTER_AUTHORITY '+n+' '+g);
+  if(o.operation_contract.kind==='read')assert(d[o.request.$ref.split('/').at(-1)].required.includes('center_id'),'SETTLEMENT_READ_CENTER');
+ }
+ const submit=map.get('settlement_request_submit_v1');
+ assert.deepEqual(submit.operation_contract.atomic_effects,['settlement_requests.pending_immutable_scope'],'SUBMIT_CLOSES_BALANCE');
+ assert.equal(d.Request_settlement_request_submit.properties.proposal.$ref,'#/$defs/SettlementProposal','MISSING_TYPED_PROPOSAL');
+ equalSet(d.SettlementProposal.oneOf.map(v=>d[v.$ref.split('/').at(-1)].properties.kind.const),['payment','offset','correction'],'PROPOSAL_KINDS');
+ assert(!d.Request_settlement_request_decide.properties.fallback,'UNAUTHORIZED_FALLBACK_INPUT');
+ const decide=map.get('settlement_request_decide_v1');
+ assert(decide.semantic_guards.includes('B_approval_finalizes_record_and_balances_atomic'),'B_APPROVAL_NOT_FINAL');
+ assert(decide.semantic_guards.includes('rejection_reason_in_app_to_A_balance_unchanged'),'REJECTION_BALANCE_EFFECT');
+ assert.deepEqual(decide.operation_contract.effects_by_outcome,{
+  approve:['request.approved','settlement_record.append','selected_balances.reduce_or_linked_reverse','paired_offset_atomic','audit.append','outbox.append','receipt.append'],
+  reject:['request.rejected_with_reason','in_app_rejection_to_A','audit.append','outbox.append','receipt.append']},'B_APPROVAL_ATOMIC_EFFECTS');
+ for(const id of ['DS-AUTH-01','DS-AUTH-02','DS-AUTH-03','DS-SET-13','DS-SET-14'])assert(ds.acceptance_cases.some(v=>v.id===id&&v.status==='pending_runtime'),'MISSING_PENDING_AUTH_CASE '+id);
+
  return {operation_count:ops.length,feature_count:33,callable_count:live.size,decision_behavior_acceptance:'pending',kind:'structural_contract_policy_not_runtime_behavior'};
 }
 

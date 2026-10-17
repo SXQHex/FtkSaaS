@@ -101,7 +101,7 @@ UUID/FK alanları `uuid`, parasal stringler DB’de `bigint`, Instant `timestamp
 
 ## DS-2026-10-17 hedef depolama bağımlılıkları
 
-Fiziksel 90 tablo/25 migration bu PR’de değişmez. Agreement predecessor/start snapshot ve ürün kimliği override zinciri; protected reservation obligations ve approval dependencies; settlement accrual/reversal, immutable request versions/lines, decisions, payment/offset allocations ayrı append-only migration teslimidir. DTO varlığı bu kolon/tabloların kurulduğunu göstermez. Ayrıntı: docs/decision-sprint-handover.md.
+Fiziksel 90 tablo/25 migration bu PR’de değişmez. Agreement predecessor/start snapshot ve ürün kimliği override zinciri; protected reservation obligations ve approval dependencies; settlement accrual/reversal, immutable request versions/lines, B-confirmed payment/offset/correction records and selected allocations; organization authority aggregate and scoped grants ayrı append-only migration teslimidir. DTO varlığı bu kolon/tabloların kurulduğunu göstermez. Ayrıntı: docs/decision-sprint-handover.md.
 
 Teknik private tablolar: `platform_operators`, `preview_payloads`, `invitation_deliveries`, `runtime_operations`, `person_origins`. Bunlar müşteriye yeni ürün varlığı veya rol vermez.
 

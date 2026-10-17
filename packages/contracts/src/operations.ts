@@ -195,7 +195,7 @@ export interface Operations {
   settlement_request_submit_v1: {request: T.RequestSettlementRequestSubmit; response: T.SuccessSettlementRequestSubmit};
   settlement_request_withdraw_v1: {request: T.RequestSettlementRequestWithdraw; response: T.SuccessSettlementRequestWithdraw};
   settlement_request_decide_v1: {request: T.RequestSettlementRequestDecide; response: T.SuccessSettlementRequestDecide};
-  settlement_payment_record_v1: {request: T.RequestSettlementPaymentRecord; response: T.SuccessSettlementPaymentRecord};
-  settlement_offset_record_v1: {request: T.RequestSettlementOffsetRecord; response: T.SuccessSettlementOffsetRecord};
-  settlement_adjust_v1: {request: T.RequestSettlementAdjust; response: T.SuccessSettlementAdjust};
+  settlement_authority_get_v1: {request: T.RequestSettlementAuthorityGet; response: T.SuccessSettlementAuthorityGet};
+  settlement_delegation_set_v1: {request: T.RequestSettlementDelegationSet; response: T.SuccessSettlementDelegationSet};
+  settlement_authority_set_v1: {request: T.RequestSettlementAuthoritySet; response: T.SuccessSettlementAuthoritySet};
 }

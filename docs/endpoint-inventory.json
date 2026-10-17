@@ -4858,11 +4858,12 @@
       "limits": []
     },
     {
-      "name": "settlement_payment_record_v1",
+      "name": "settlement_authority_get_v1",
       "status": "contract_only",
       "external_path": null,
-      "permission": "settlement.record",
+      "permission": "settlement.authority.inspect",
       "features": [
+        "F04",
         "F18"
       ],
       "required_features": [
@@ -4876,18 +4877,45 @@
           "cross_center_settlement"
         ],
         "target_request": {
-          "$ref": "#/$defs/Request_settlement_payment_record"
+          "$ref": "#/$defs/Request_settlement_authority_get"
+        }
+      },
+      "billing_class": "read",
+      "limits": []
+    },
+    {
+      "name": "settlement_delegation_set_v1",
+      "status": "contract_only",
+      "external_path": null,
+      "permission": "settlement.delegation.manage",
+      "features": [
+        "F04",
+        "F18"
+      ],
+      "required_features": [
+        "F18"
+      ],
+      "runtime_required_features": [],
+      "decision_delivery": {
+        "accepted_contract": "DS-2026-10-17",
+        "runtime_conformance": "pending",
+        "open_dependencies": [
+          "cross_center_settlement"
+        ],
+        "target_request": {
+          "$ref": "#/$defs/Request_settlement_delegation_set"
         }
       },
       "billing_class": "config",
       "limits": []
     },
     {
-      "name": "settlement_offset_record_v1",
+      "name": "settlement_authority_set_v1",
       "status": "contract_only",
       "external_path": null,
-      "permission": "settlement.record",
+      "permission": "settlement.authority.manage",
       "features": [
+        "F04",
         "F18"
       ],
       "required_features": [
@@ -4901,32 +4929,7 @@
           "cross_center_settlement"
         ],
         "target_request": {
-          "$ref": "#/$defs/Request_settlement_offset_record"
-        }
-      },
-      "billing_class": "config",
-      "limits": []
-    },
-    {
-      "name": "settlement_adjust_v1",
-      "status": "contract_only",
-      "external_path": null,
-      "permission": "settlement.record",
-      "features": [
-        "F18"
-      ],
-      "required_features": [
-        "F18"
-      ],
-      "runtime_required_features": [],
-      "decision_delivery": {
-        "accepted_contract": "DS-2026-10-17",
-        "runtime_conformance": "pending",
-        "open_dependencies": [
-          "cross_center_settlement"
-        ],
-        "target_request": {
-          "$ref": "#/$defs/Request_settlement_adjust"
+          "$ref": "#/$defs/Request_settlement_authority_set"
         }
       },
       "billing_class": "config",
