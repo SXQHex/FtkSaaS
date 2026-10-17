@@ -85,7 +85,7 @@ test('Room configuration and scoped role reads through real Auth/API',async t=>{
  const remote=await linked('rooms-other-staff','staff',other);
  const list=(u,b={})=>must(u,'roles_list_v1',{org_id:org,page:{},...b});
  await t.test('organization readers see all assignments; center manager excludes other center and org-level roles',async()=>{
-  const all=await list(owner);assert(all.items.some(x=>x.id===orgManager.grant.primary_id));assert(all.items.some(x=>x.id===remote.grant.primary_id));assert(!('as_of' in all));
+  const all=await list(owner);assert(all.items.some(x=>x.id===orgManager.grant.primary_id));assert(all.items.some(x=>x.id===remote.grant.primary_id));assert(Number.isFinite(Date.parse(all.as_of)));
   assert.deepEqual((await list(orgManager.u)).items,all.items);
   const scoped=await list(manager.u);assert(scoped.items.length>0);assert(scoped.items.every(x=>x.scope_center_id===center));
   assert(!(await list(manager.u,{person_id:remote.p})).items.length);

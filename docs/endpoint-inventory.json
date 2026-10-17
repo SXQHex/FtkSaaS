@@ -219,7 +219,7 @@
       ],
       "billing_class": "config",
       "limits": [
-        "Clean Auth/API acceptance pending on this branch; production acceptance remains open."
+        "Clean Auth/API acceptance evidence is tracked in reports/room-role-verification.json; production acceptance remains open."
       ]
     },
     {
@@ -277,7 +277,7 @@
       ],
       "billing_class": "read",
       "limits": [
-        "Clean Auth/API acceptance pending on this branch; production acceptance remains open.",
+        "Clean Auth/API acceptance evidence is tracked in reports/room-role-verification.json; production acceptance remains open.",
         "Lists stored role assignments; ownership is read from organization.owner_person_id, not synthesized as a role assignment.",
         "Only created_at_asc sorting is supported; cursors bind actor and request scope; live permissions are rechecked."
       ]
