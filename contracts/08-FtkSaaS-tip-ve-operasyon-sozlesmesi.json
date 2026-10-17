@@ -51198,7 +51198,7 @@
       "external_transport": "POST /functions/v1/backend-v1/{operation}; direct typed request body",
       "internal_rpc": "service-only api_v1 named functions; actor/session/UUID bank supplied by verified gateway",
       "migration_count": 23,
-      "test_evidence": "New availability/policy source requires its own clean CI; prior PR8 evidence remains historical, not evidence for this implementation.",
+      "test_evidence": "reports/availability-policy-verification.json; scoped source evidence, final PR/main clean CI verified separately",
       "frontend_unchanged": true
     }
   }

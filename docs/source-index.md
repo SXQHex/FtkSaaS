@@ -32,3 +32,5 @@ Son açık kullanıcı kararı üstündür; sonraki kabul yalnız çelişen hük
 ## Kalıcı kapanış kuralı
 
 Her uygulama PR’si etkilediği sözleşmeleri, envanteri, kalan işleri ve devri aynı PR’de günceller; etkilenmeyen belgelere dokunmaz. [AGENTS.md](../AGENTS.md) kanıt/SHA ve merge sonrası CI teslimini tanımlar. Yeni ürün kararı, teknik aktarım, uygulama ve kabul ayrı izlenir. Dış e-posta ertelendi; Resend başlatılmaz. Yük/restore ve frontend gerçek kabulü açıktır. Production dağıtımı yapılmaz.
+
+[Uygunluk/politika kapsam raporu](../reports/availability-policy-verification.json) yeni kaynak SHA ve odaklı test kapsamını belirtir. Son PR/main temiz CI ve hosted smoke ayrı kanıtlardır.
