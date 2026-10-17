@@ -1,9 +1,9 @@
 {
-  "runtime_version": "0.2.0-rc.2",
+  "runtime_version": "0.2.0-rc.3",
   "repository": "https://github.com/SXQHex/FtkSaaS",
-  "branch": "backend/runtime-v0.2.0",
-  "environment": "per-checkout isolated native Supabase",
-  "shared_staging_url": null,
+  "branch": "main",
+  "environment": "per-checkout isolated native Supabase plus shared development/test project",
+  "shared_staging_url": "https://gwyprhenabtpkbojephw.supabase.co",
   "setup_commands": [
     "npm ci",
     "npm run dev:start",
@@ -19,5 +19,17 @@
     "apikey: <local publishable key>",
     "Content-Type: application/json"
   ],
-  "notice": "No permanent internet endpoint or shared credentials. Never copy service-role/DB/user passwords into public frontend configuration. Previous Box ports are not current."
+  "notice": "Shared target is user-confirmed development/test. Runtime credentials are never committed. test:clean remains loopback-only.",
+  "requested_remote_target": {
+    "project_ref": "gwyprhenabtpkbojephw",
+    "project_url": "https://supabase.com/project/gwyprhenabtpkbojephw",
+    "status": "installed_remote_auth_edge_rpc_smoke_passed",
+    "environment_role": "development_test_confirmed_by_user",
+    "migration_count_observed": 0,
+    "edge_function_count_observed": 0,
+    "migration_count": 22,
+    "edge_function_count": 1,
+    "edge_function": "backend-v1"
+  },
+  "remote_verification_report": "reports/remote-backend-verification.json"
 }
