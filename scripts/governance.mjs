@@ -86,7 +86,7 @@ export function validateGovernance(p,implemented){
   credit_basis:'actual_sale_price_per_consumed_credit',earning_agreement:'service_center_actual_instructor_package_override_else_general',
   accrual_trigger:'performed_session_and_right_consumed_or_later_eligible_credit_deficit_settlement',cash_payment_required:false,timed_transfer:false,source_less_negative_initial_transfer:false,late_negative_earning_reprice:false,
   reversal:'linked_original_amount_preserving_prior_payments',rounding:'half_away_from_zero_largest_remainder_stable_tie_original_amount_on_reversal',
-  scope_gate:'same_org_business_accessible_centers_and_source_sale_service_center_discipline_scope',dependency_scope:'selected_movement_versions_request_authority_plan',self_approval:false,
+  scope_gate:'same_org_business_accessible_centers_and_source_sale_service_center_discipline_scope',dependency_scope:'selected_movement_versions_request_authority_plan',same_account_allowed_with_both_center_authorities:true,
   approval_finalizes_record_and_balances:true,separate_payment_recorder:false,automatic_bank_transfer:false,submit_closes_balance:false,
   fallback_approval:'disabled_no_implicit_owner_or_org_manager_authority',
   offset:'explicit_approved_same_currency_both_sides_atomic_no_auto_net_no_fx',no_double_close:true};
@@ -94,7 +94,7 @@ export function validateGovernance(p,implemented){
  assert.deepEqual(Object.fromEntries(Object.entries(d.SettlementRuleSet.properties).map(([k,v])=>[k,v.const])),expectedSettlement,'SETTLEMENT_DTO_RULES');
  for(const n of ['settlement_request_submit_v1','settlement_request_withdraw_v1','settlement_request_decide_v1']){
   const o=map.get(n);equalSet(o.required_features,['F18'],'SETTLEMENT_PLAN');
-  for(const g of ['same_org_business_scope','selected_dependencies_only','no_self_approval','no_double_balance_close'])assert(o.semantic_guards.includes(g),'SETTLEMENT_GUARD '+n+' '+g);
+  for(const g of ['same_org_business_scope','selected_dependencies_only','independent_step_center_authority','no_double_balance_close'])assert(o.semantic_guards.includes(g),'SETTLEMENT_GUARD '+n+' '+g);
  }
  assert.equal(map.get('settlement_request_decide_v1').permission,'settlement.decide','DECISION_AUTHORITY');
 
@@ -133,8 +133,9 @@ export function validateGovernance(p,implemented){
  }
  assert(ds.closed_product_choices.some(v=>v.id==='DS-OPEN-01'&&v.status==='accepted_contract_runtime_pending'),'GRANTOR_DECISION_NOT_CLOSED');
  assert(!ds.open_product_choices.some(v=>v.id==='DS-OPEN-01'),'GRANTOR_STILL_OPEN');
- assert(ds.open_product_choices.some(v=>v.id==='DS-OPEN-02'),'INCOMPATIBLE_FALLBACK_HIDDEN');
- const chain={delegation_grantor:'organization_owner_only',center_grantor:'organization_owner_or_org_manager_with_live_explicit_delegation',delegation_target:'same_org_active_org_manager',center_target:'same_org_active_center_manager_exact_center',center_manager_delegates:false,role_implies_settlement:false,owner_grant_implies_operations:false,live_check_before_receipt_replay:true,operation_actor:'active_center_manager_with_live_explicit_center_grant',authority_version:'organization_settlement_authority_aggregate',fallback_implies_om_operations:false};
+ assert(ds.closed_product_choices.some(v=>v.id==='DS-OPEN-02'&&v.status==='accepted_contract_runtime_pending'),'CENTER_SCOPE_DECISION_NOT_CLOSED');
+ assert(!ds.open_product_choices.some(v=>v.id==='DS-OPEN-02'),'CENTER_SCOPE_DECISION_STILL_OPEN');
+ const chain={delegation_grantor:'organization_owner_only',center_grantor:'organization_owner_or_org_manager_with_live_explicit_delegation',delegation_target:'same_org_active_org_manager',center_target:'same_org_active_center_manager_exact_center',center_manager_delegates:false,role_implies_settlement:false,owner_grant_implies_operations:false,live_check_before_receipt_replay:true,operation_actor:'active_center_manager_with_live_explicit_center_grant',authority_version:'organization_settlement_authority_aggregate',fallback_implies_om_operations:false,account_separation_required:false,initiator_scope:'from_center_id',decision_scope:'frozen_request.to_center_id',audit_step_scope_required:true};
  assert.deepEqual(ds.settlement_authority_chain,chain,'AUTHORITY_CHAIN');
  for(const n of ['settlement_payment_record_v1','settlement_offset_record_v1','settlement_adjust_v1']){
   assert(!map.has(n),'REMOVED_THIRD_STAGE '+n);
@@ -143,7 +144,7 @@ export function validateGovernance(p,implemented){
  assert(!x.permissions['settlement.record'],'REMOVED_RECORDER_PERMISSION');
  assert.equal(d.Request_permission_set.properties.permission.$ref,'#/$defs/Permission','GENERIC_GRANT_ROUTE');
  assert(!d.Permission.enum.some(v=>v.startsWith('settlement.')),'GENERIC_PERMISSION_ESCALATION');
- assert.equal(ds.latest_settlement_decision,'docs/decisions/DS-2026-10-17-settlement-revision.md','LATEST_SETTLEMENT_DECISION');
+ assert.equal(ds.latest_settlement_decision,'docs/decisions/DS-2026-10-17-settlement-center-scope.md','LATEST_SETTLEMENT_DECISION');
 
  assert.equal(map.get('settlement_delegation_set_v1').permission,'settlement.delegation.manage','OWNER_DELEGATION_PERMISSION');
  assert.equal(map.get('settlement_authority_set_v1').permission,'settlement.authority.manage','CENTER_GRANT_PERMISSION');
@@ -158,6 +159,24 @@ export function validateGovernance(p,implemented){
   const o=map.get(n);for(const g of ['active_cm_and_explicit_center_grant','live_authority_before_receipt_replay','no_owner_or_om_operational_fallback'])assert(o.semantic_guards.includes(g),'LIVE_CENTER_AUTHORITY '+n+' '+g);
   if(o.operation_contract.kind==='read')assert(d[o.request.$ref.split('/').at(-1)].required.includes('center_id'),'SETTLEMENT_READ_CENTER');
  }
+ const auditScopeFields=['actor_account_id','org_id','center_id','permission','manager_role_id','manager_role_version','settlement_grant_version'];
+ for(const [name,center,permission] of [
+  ['settlement_request_submit_v1','request.from_center_id','settlement.request'],
+  ['settlement_request_decide_v1','stored_request.to_center_id','settlement.decide'],
+  ['settlement_request_withdraw_v1','stored_request.from_center_id','settlement.request']]){
+  const o=map.get(name);
+  assert(!o.semantic_guards.includes('no_self_approval'),'RETIRED_ACCOUNT_INEQUALITY '+name);
+  for(const g of ['independent_step_center_authority','account_equality_is_not_rejection','server_derived_step_scope_audit'])assert(o.semantic_guards.includes(g),'CENTER_SCOPE_GUARD '+name+' '+g);
+  assert.deepEqual(o.authority_binding,{actor:'server_verified_account_id',org:center.startsWith('stored_')?'stored_request.org_id':'request.org_id',center,permission,required_checks:['active_center_manager_at_step','explicit_current_center_grant','live_authority_before_receipt_replay','client_center_selection_is_not_authority'],require_distinct_account:false,audit_scope_fields:auditScopeFields},'STEP_AUTHORITY_BINDING '+name);
+ }
+ for(const [n,permission] of [['SettlementSubmitAuthority','settlement.request'],['SettlementDecisionAuthority','settlement.decide']]){
+  assert.equal(d[n].additionalProperties,false,'AUTHORITY_SNAPSHOT_CLOSED');
+  assert.equal(d[n].properties.permission.const,permission,'AUTHORITY_SNAPSHOT_PERMISSION');
+  for(const k of ['account_id','person_id','org_id','center_id','manager_role_id','manager_role_version','settlement_grant_version','checked_at'])assert(d[n].required.includes(k),'AUTHORITY_SNAPSHOT_FIELD '+n+' '+k);
+ }
+ assert.equal(d.SettlementRequestView.properties.initiator_authority.$ref,'#/$defs/SettlementSubmitAuthority','INITIATOR_SCOPE_READ');
+ assert(d.SettlementRequestView.required.includes('initiator_authority')&&d.SettlementRequestView.required.includes('decision_authority'),'AUDIT_SCOPE_READ_REQUIRED');
+ for(const id of ['DS-SCOPE-01','DS-SCOPE-02','DS-SCOPE-03','DS-SCOPE-04'])assert(ds.acceptance_cases.some(v=>v.id===id&&v.status==='pending_runtime'),'MISSING_CENTER_SCOPE_PENDING_CASE '+id);
  const submit=map.get('settlement_request_submit_v1');
  assert.deepEqual(submit.operation_contract.atomic_effects,['settlement_requests.pending_immutable_scope'],'SUBMIT_CLOSES_BALANCE');
  assert.equal(d.Request_settlement_request_submit.properties.proposal.$ref,'#/$defs/SettlementProposal','MISSING_TYPED_PROPOSAL');

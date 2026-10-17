@@ -799,6 +799,8 @@ reason: (Text | null)
 previous_id: (string | null)
 proposal: SettlementProposal
 record: (SettlementRecordView | null)
+initiator_authority: SettlementSubmitAuthority
+decision_authority: (SettlementDecisionAuthority | null)
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -1954,6 +1956,8 @@ ManagementSelector_settlement_authority_set_v1?: ManagementSelectorSettlementAut
 ManagementProjection_settlement_authority_set_v1?: ManagementProjectionSettlementAuthoritySetV1
 SettlementCorrectionAllocation?: SettlementCorrectionAllocation
 SettlementRecordAllocationView?: SettlementRecordAllocationView
+SettlementSubmitAuthority?: SettlementSubmitAuthority
+SettlementDecisionAuthority?: SettlementDecisionAuthority
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -15110,6 +15114,66 @@ unreversed_minor: Money
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "SettlementSubmitAuthority".
+ */
+export interface SettlementSubmitAuthority {
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+account_id: string
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+person_id: string
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+org_id: string
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+center_id: string
+permission: "settlement.request"
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+manager_role_id: string
+manager_role_version: PositiveInt
+settlement_grant_version: PositiveInt
+checked_at: Instant
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "SettlementDecisionAuthority".
+ */
+export interface SettlementDecisionAuthority {
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+account_id: string
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+person_id: string
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+org_id: string
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+center_id: string
+permission: "settlement.decide"
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+manager_role_id: string
+manager_role_version: PositiveInt
+settlement_grant_version: PositiveInt
+checked_at: Instant
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
  * via the `definition` "SettlementMovementsPage".
  */
 export interface SettlementMovementsPage {
@@ -15164,7 +15228,6 @@ reversal: "linked_original_amount_preserving_prior_payments"
 rounding: "half_away_from_zero_largest_remainder_stable_tie_original_amount_on_reversal"
 scope_gate: "same_org_business_accessible_centers_and_source_sale_service_center_discipline_scope"
 dependency_scope: "selected_movement_versions_request_authority_plan"
-self_approval: false
 fallback_approval: "disabled_no_implicit_owner_or_org_manager_authority"
 offset: "explicit_approved_same_currency_both_sides_atomic_no_auto_net_no_fx"
 no_double_close: true
@@ -15172,6 +15235,7 @@ approval_finalizes_record_and_balances: true
 separate_payment_recorder: false
 automatic_bank_transfer: false
 submit_closes_balance: false
+same_account_allowed_with_both_center_authorities: true
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema

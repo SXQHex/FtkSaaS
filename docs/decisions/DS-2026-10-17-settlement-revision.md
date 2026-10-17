@@ -1,5 +1,7 @@
 # DS-2026-10-17 — hesaplaşma yetkisi ve iki taraflı kesinleştirme revizyonu
 
+Bu önceki karar kaydının farklı hesap/self-approval yasağı ve DS-OPEN-02 açık istisna hükümleri [son merkez bazlı yetki kararıyla](DS-2026-10-17-settlement-center-scope.md) yürürlükten kaldırılmıştır. Aşağıdaki metin önceki karar snapshot’ıdır; güncel yetki şartı değildir.
+
 Kaynak: 17 Ekim 2026 son açık kullanıcı kararı. Bu kayıt DS-2026-10-17'nin çelişen hesaplaşma yetki/işlem hükümlerini değiştirir; diğer ürün kuralları korunur. Karar kabulü, sözleşme aktarımı, runtime ve gerçek kabul ayrı durumlardır.
 
 ## Kabul edilen yetki zinciri

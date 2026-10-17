@@ -21,4 +21,6 @@ Geliştirmede odaklı sözleşme denetimi npm run test:governance'dır. Son kaps
 
 Production dağıtımı yapılmaz; vercel.json main otomatik dağıtımını kapalı tutar. Frontend alanına müdahale edilmez. Dış e-posta ertelenmiştir; Resend başlatılmaz. Hosted geliştirme smoke'u, frontend gerçek entegrasyonu ve yük/restore ayrı kanıtlardır. Tarihsel raporlar ait oldukları kaynak snapshot'ını kanıtlar; yeni SHA'nın kabulü yerine geçmez.
 
-Son hesaplaşma revizyonu: [yetki zinciri ve iki taraflı kesinleştirme](docs/decisions/DS-2026-10-17-settlement-revision.md). DS-OPEN-01 karar düzeyinde kapalı; runtime pending. Üç ayrı kayıt/düzeltme taslak ucu üç authority read/set sözleşmesiyle değişti; 197/79/118 toplamı aynı. 34 yeni davranış senaryosu pending; son revizyon SHA/CI/inceleme PR #13 konuşmasından doğrulanır.
+Son hesaplaşma revizyonu: [yetki zinciri ve iki taraflı kesinleştirme](docs/decisions/DS-2026-10-17-settlement-revision.md). DS-OPEN-01 karar düzeyinde kapalı; runtime pending. Üç ayrı kayıt/düzeltme taslak ucu üç authority read/set sözleşmesiyle değişti; 197/79/118 toplamı aynı. 38 yeni davranış senaryosu pending; son revizyon SHA/CI/inceleme PR #13 konuşmasından doğrulanır.
+
+Son düzeltme: [merkez bazlı yetki](docs/decisions/DS-2026-10-17-settlement-center-scope.md). DS-OPEN-02 karar düzeyinde kapalıdır; aynı hesap A ve B’de gerekli güncel CM/grant yetkileriyle başvuru ve onay yapabilir. A-only yetki B’ye taşınmaz; audit adımın merkez/rol/grant kapsamını kaydeder. Runtime ve yeni gerçek davranış kabulü pending kalır.

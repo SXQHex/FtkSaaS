@@ -13,10 +13,10 @@ Uzak geliştirme/test Auth → Edge → RPC smoke [ayrı rapordadır](../reports
 1. Bu PR: karar/DTO/izin/guard/sürüm-okuma aktarımı, F01–F33 haritası ve yapısal CI denetimleri. Yeni runtime tamamlandı sayılmaz.
 2. Plan kapısı ayrımı + Starter ders yoklama/hak tüketimi; protected reservation obligation/impact approval ve başlangıç/kapanış tüketicileri.
 3. Immutable anlaşma zinciri, yürürlük/başlamış seans snapshot’ı, ürün kimliği override ve mükerrer olmayan hakediş; gerçek Auth→Edge→RPC kabul.
-4. Ayrı merkezler arası ledger, Owner/delege OM grant zinciri ve B onayında atomik ödeme/mahsup/bağlı düzeltme kesinleştirmesi. DS-OPEN-01 karar düzeyinde kapalı; DS-OPEN-02 eski OM fallback çelişkisi ve fiziksel depolama/RPC/read/izolasyon bağımlılıkları açık.
+4. Ayrı merkezler arası ledger, Owner/delege OM grant zinciri ve B onayında atomik ödeme/mahsup/bağlı düzeltme kesinleştirmesi. DS-OPEN-01 karar düzeyinde kapalı; DS-OPEN-02 son merkez yetki kararıyla karar düzeyinde kapalı; aynı hesap A/B yetkileri ayrı doğrulanarak iki adımı yapabilir. Fiziksel depolama/RPC/read/izolasyon ve adım kapsamlı audit bağımlılıkları açık.
 5. Satış kapsam snapshot/değişim, gerekçeli backdate ve geçmiş açık kapatma; yeni ürün davranışı uydurulmadan uçtan uca kabul.
 
-Hedef plan/koruma/anlaşma farkları 08 delivery_gaps içinde açıktır. [34 pending DS davranış senaryosu](decision-sprint-handover.md) statik testten geçmiş kabul edilmez. [Main koruması](branch-protection-review.md) klasik API 403 nedeniyle doğrulanamıyor; gerekli yönetici ayarları teslim edilir, uygulanmış sayılmaz.
+Hedef plan/koruma/anlaşma farkları 08 delivery_gaps içinde açıktır. [38 pending DS davranış senaryosu](decision-sprint-handover.md) statik testten geçmiş kabul edilmez. [Main koruması](branch-protection-review.md) klasik API 403 nedeniyle doğrulanamıyor; gerekli yönetici ayarları teslim edilir, uygulanmış sayılmaz.
 
 ## Bağımlılık sırası
 

@@ -18,4 +18,4 @@ Koruma uygulanmış veya mevcut koruma yeterli diye raporlanamaz. Yetkili reposi
 5. Merge sonrası push/main Backend CI aynı yeni SHA için başarıyla tamamlanmadan kabul kapanmamalı.
 6. Production dağıtım yetkisi merge'den türemez. Mevcut vercel.json main otomatik deployment kapısını false tutar.
 
-Bu dosya ayarların uygulanmış olduğuna dair kanıt değildir. Yönetici ayar kaydı/erişilebilir API sonucu ayrı teslim edilmelidir. Yeni merge yetkisi verilmedi.
+Bu dosya ayarların uygulanmış olduğuna dair kanıt değildir. Yönetici ayar kaydı/erişilebilir API sonucu ayrı teslim edilmelidir. Bu denetim repository yönetim yetkisi vermez. Son kullanıcı talimatı PR #13 main merge işlemini yetkilendirmiştir; main koruması ayrı yönetici işi olarak açık kalır.

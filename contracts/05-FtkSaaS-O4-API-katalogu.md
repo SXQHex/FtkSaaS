@@ -413,3 +413,14 @@ features ürün referanslarıdır. required_features hedef plan kapısı; runtim
 Önizleme süre sınırı 15 dakika. Apply canlı aktör/yetki/abonelik ve ilgili satır sürümlerini yeniden denetler. İdempotency kapsamı org + hesap + operasyon; merkez payload içindedir. Aynı anahtar/aynı içerik sonucu tekrarlar, farklı içerik reddedilir. Doğrulanmamış transport sonucunda yeni anahtar üretilmez.
 
 Etkinlik listesinde mevcut desteklenen sıralama `starts_at_asc`; cursor aynı org/merkez/zaman/disiplin filtresine bağlıdır.
+
+
+## Hesaplaşma adımının sunucu yetki kapsamı
+
+Hesapların eşit olması hata değildir. Başvuruda A ve kararda dondurulmuş B merkezinin canlı CM rolü/grantı ayrı doğrulanır; client center seçimi yetki değildir. Aşağıdaki audit scope alanları sunucudan üretilir.
+
+| İşlem | Merkez kaynağı | İzin | Farklı hesap şartı | Audit kapsamı |
+|---|---|---|---|---|
+| settlement_request_submit_v1 | request.from_center_id | settlement.request | False | actor_account_id, org_id, center_id, permission, manager_role_id, manager_role_version, settlement_grant_version |
+| settlement_request_withdraw_v1 | stored_request.from_center_id | settlement.request | False | actor_account_id, org_id, center_id, permission, manager_role_id, manager_role_version, settlement_grant_version |
+| settlement_request_decide_v1 | stored_request.to_center_id | settlement.decide | False | actor_account_id, org_id, center_id, permission, manager_role_id, manager_role_version, settlement_grant_version |

@@ -43,8 +43,8 @@ const mutations=[
  ['settlement waits for collection',p=>ds(p).settlement_rules.cash_payment_required=true],
  ['timed package transfers price',p=>ds(p).settlement_rules.timed_transfer=true],
  ['late deficit settlement reprices teacher',p=>ds(p).settlement_rules.late_negative_earning_reprice=true],
- ['initiator approves own request',p=>ds(p).settlement_rules.self_approval=true],
- ['approval closes balance',p=>ds(p).settlement_rules.approval_finalizes_record_and_balances=false],
+ ['same-account authorization incorrectly prohibited',p=>ds(p).settlement_rules.same_account_allowed_with_both_center_authorities=false],
+ ['B approval fails to finalize balances',p=>ds(p).settlement_rules.approval_finalizes_record_and_balances=false],
  ['unrelated lessons stale settlement approval',p=>ds(p).settlement_rules.dependency_scope='whole_org_hash'],
  ['offset loses paired atomicity',p=>ds(p).settlement_rules.offset='one_side_first'],
  ['payment allowed by ordinary center role',p=>op(p,'settlement_request_decide_v1').permission='center.manage'],
@@ -166,7 +166,7 @@ const authorityMutations=[
  ['grant uses unrelated entity version',p=>op(p,'settlement_authority_set_v1').operation_contract.version_field='person_id'],
  ['grantor decision still open',p=>ds(p).closed_product_choices=[]],
  ['third-stage operation restored',p=>{const o=structuredClone(op(p,'settlement_request_decide_v1'));o.name='settlement_payment_record_v1';p['x-contract'].operations.push(o);p.$defs.OperationName.enum.push(o.name);}],
- ['no fallback conflict disclosed',p=>ds(p).open_product_choices=[]]
+ ['center-scope decision reopening hidden',p=>ds(p).closed_product_choices=ds(p).closed_product_choices.filter(v=>v.id!=='DS-OPEN-02')]
 ];
 for(const [name,mutate] of authorityMutations)test('settlement revision mutation rejected: '+name,()=>{const p=structuredClone(original);mutate(p);assert.throws(()=>validateGovernance(p,live));});
 test('settlement proposal DTO freezes actual payment, explicit paired offset or linked correction, never recorder actor',()=>{
@@ -205,4 +205,28 @@ test('partial correction names exact original allocations and exposes their reve
  assert.throws(()=>validateGovernance(p,live),/CORRECTION_SELECTION_REQUIRED/);
  const q=structuredClone(original);q.$defs.SettlementRecordAllocationView.required=q.$defs.SettlementRecordAllocationView.required.filter(k=>k!=='unreversed_minor');
  assert.throws(()=>validateGovernance(q,live),/CORRECTION_ALLOCATION_READ/);
+});
+
+const centerScopeMutations=[
+ ['B authority replaced by A',p=>op(p,'settlement_request_decide_v1').authority_binding.center='stored_request.from_center_id'],
+ ['client center replaces stored B',p=>op(p,'settlement_request_decide_v1').authority_binding.center='request.center_id'],
+ ['different account required',p=>op(p,'settlement_request_decide_v1').authority_binding.require_distinct_account=true],
+ ['old self approval guard restored',p=>op(p,'settlement_request_decide_v1').semantic_guards.push('no_self_approval')],
+ ['B role check skipped',p=>op(p,'settlement_request_decide_v1').authority_binding.required_checks=op(p,'settlement_request_decide_v1').authority_binding.required_checks.filter(v=>v!=='active_center_manager_at_step')],
+ ['B grant check skipped',p=>op(p,'settlement_request_decide_v1').authority_binding.required_checks=op(p,'settlement_request_decide_v1').authority_binding.required_checks.filter(v=>v!=='explicit_current_center_grant')],
+ ['scope audit omitted',p=>op(p,'settlement_request_decide_v1').authority_binding.audit_scope_fields=[]],
+ ['revoked B authority bypasses receipt',p=>op(p,'settlement_request_decide_v1').semantic_guards=op(p,'settlement_request_decide_v1').semantic_guards.filter(v=>v!=='live_authority_before_receipt_replay')]
+];
+for(const [name,mutate]of centerScopeMutations)test('center-scope contract mutation rejected: '+name,()=>{const p=structuredClone(original);mutate(p);assert.throws(()=>validateGovernance(p,live));});
+test('typed settlement projection permits equal accounts with separate server-derived A and B scope evidence (not runtime authorization)',()=>{
+ const scope={account_id:id,person_id:id,org_id:id,manager_role_id:id,manager_role_version:1,settlement_grant_version:1,checked_at:'2026-10-17T12:00:00Z'};
+ const line={movement_id:id,expected_version:1,amount_minor:'100'};
+ const record={id,version:1,request_id:id,kind:'payment',amount_minor:'100',currency:'TRY',approved_by_account_id:id,original_record_id:null,created_at:scope.checked_at,allocations:[{id,version:1,movement_id:id,side:'payment',amount_minor:'100',unreversed_minor:'100'}]};
+ const r={id,version:1,from_center_id:id,to_center_id:other,currency:'TRY',state:'approved',initiator_account_id:id,decision_account_id:id,reason:'B received payment',previous_id:null,proposal:{kind:'payment',lines:[line],amount_minor:'100',occurred_at:scope.checked_at},record,initiator_authority:{...scope,center_id:id,permission:'settlement.request'},decision_authority:{...scope,center_id:other,permission:'settlement.decide'}};
+ assert(valid('SettlementRequestView',r));
+ assert(!valid('SettlementRequestView',{...r,decision_authority:null}));
+ const {initiator_authority,...missing}=r;assert(!valid('SettlementRequestView',missing));
+ const q={client_api_version:1,request_id:id,org_id:id,operation_key:id,settlement_request_id:id,expected_version:1,decision:'approve',reason:'B received'};
+ assert(valid('Request_settlement_request_decide',q));
+ assert(!valid('Request_settlement_request_decide',{...q,decision_authority:r.decision_authority}));
 });

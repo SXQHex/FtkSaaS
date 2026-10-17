@@ -29,8 +29,15 @@ for o in c['operations']:
  k=o['operation_contract']
  api.append('| '+o['name']+' | '+k['kind']+' | '+k['version_mode']+' / '+str(k['read_operation'])+' | '+', '.join(k['atomic_effects'])+' | '+o['decision_delivery']['runtime_conformance']+' |')
 api+=['','Önizleme süre sınırı 15 dakika. Apply canlı aktör/yetki/abonelik ve ilgili satır sürümlerini yeniden denetler. İdempotency kapsamı org + hesap + operasyon; merkez payload içindedir. Aynı anahtar/aynı içerik sonucu tekrarlar, farklı içerik reddedilir. Doğrulanmamış transport sonucunda yeni anahtar üretilmez.','', 'Etkinlik listesinde mevcut desteklenen sıralama `starts_at_asc`; cursor aynı org/merkez/zaman/disiplin filtresine bağlıdır.','']
+api+=['','## Hesaplaşma adımının sunucu yetki kapsamı','','Hesapların eşit olması hata değildir. Başvuruda A ve kararda dondurulmuş B merkezinin canlı CM rolü/grantı ayrı doğrulanır; client center seçimi yetki değildir. Aşağıdaki audit scope alanları sunucudan üretilir.','','| İşlem | Merkez kaynağı | İzin | Farklı hesap şartı | Audit kapsamı |','|---|---|---|---|---|']
+for o in c['operations']:
+ if 'authority_binding' in o:
+  b=o['authority_binding']
+  api.append('| '+o['name']+' | '+b['center']+' | '+b['permission']+' | '+str(b['require_distinct_account'])+' | '+', '.join(b['audit_scope_fields'])+' |')
 emit('contracts/05-FtkSaaS-O4-API-katalogu.md','\n'.join(api))
 inventory={'runtime_version':'0.2.0-rc.3','operations':[{'name':o['name'],'status':o['implementation_status'],'external_path':'/functions/v1/backend-v1/'+o['name'] if o['name'] in names else None,'permission':o['permission'],'features':o['features'],'required_features':o['required_features'],'runtime_required_features':o['runtime_required_features'],'decision_delivery':o['decision_delivery'],'billing_class':o['billing_class'],'limits':o.get('runtime_limits',[])} for o in c['operations']]}
+for source,entry in zip(c['operations'],inventory['operations']):
+ if 'authority_binding' in source:entry['authority_binding']=source['authority_binding']
 emit('docs/endpoint-inventory.json',json.dumps(inventory,ensure_ascii=False,indent=2)+'\n')
 print('Current schema/API catalogs and explicit endpoint inventory generated')
 

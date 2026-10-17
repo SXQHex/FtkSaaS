@@ -4805,7 +4805,29 @@
         }
       },
       "billing_class": "config",
-      "limits": []
+      "limits": [],
+      "authority_binding": {
+        "actor": "server_verified_account_id",
+        "org": "request.org_id",
+        "center": "request.from_center_id",
+        "permission": "settlement.request",
+        "required_checks": [
+          "active_center_manager_at_step",
+          "explicit_current_center_grant",
+          "live_authority_before_receipt_replay",
+          "client_center_selection_is_not_authority"
+        ],
+        "require_distinct_account": false,
+        "audit_scope_fields": [
+          "actor_account_id",
+          "org_id",
+          "center_id",
+          "permission",
+          "manager_role_id",
+          "manager_role_version",
+          "settlement_grant_version"
+        ]
+      }
     },
     {
       "name": "settlement_request_withdraw_v1",
@@ -4830,7 +4852,29 @@
         }
       },
       "billing_class": "config",
-      "limits": []
+      "limits": [],
+      "authority_binding": {
+        "actor": "server_verified_account_id",
+        "org": "stored_request.org_id",
+        "center": "stored_request.from_center_id",
+        "permission": "settlement.request",
+        "required_checks": [
+          "active_center_manager_at_step",
+          "explicit_current_center_grant",
+          "live_authority_before_receipt_replay",
+          "client_center_selection_is_not_authority"
+        ],
+        "require_distinct_account": false,
+        "audit_scope_fields": [
+          "actor_account_id",
+          "org_id",
+          "center_id",
+          "permission",
+          "manager_role_id",
+          "manager_role_version",
+          "settlement_grant_version"
+        ]
+      }
     },
     {
       "name": "settlement_request_decide_v1",
@@ -4855,7 +4899,29 @@
         }
       },
       "billing_class": "config",
-      "limits": []
+      "limits": [],
+      "authority_binding": {
+        "actor": "server_verified_account_id",
+        "org": "stored_request.org_id",
+        "center": "stored_request.to_center_id",
+        "permission": "settlement.decide",
+        "required_checks": [
+          "active_center_manager_at_step",
+          "explicit_current_center_grant",
+          "live_authority_before_receipt_replay",
+          "client_center_selection_is_not_authority"
+        ],
+        "require_distinct_account": false,
+        "audit_scope_fields": [
+          "actor_account_id",
+          "org_id",
+          "center_id",
+          "permission",
+          "manager_role_id",
+          "manager_role_version",
+          "settlement_grant_version"
+        ]
+      }
     },
     {
       "name": "settlement_authority_get_v1",

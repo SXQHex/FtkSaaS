@@ -24630,6 +24630,19 @@
               "type": "null"
             }
           ]
+        },
+        "initiator_authority": {
+          "$ref": "#/$defs/SettlementSubmitAuthority"
+        },
+        "decision_authority": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/SettlementDecisionAuthority"
+            },
+            {
+              "type": "null"
+            }
+          ]
         }
       },
       "required": [
@@ -24644,10 +24657,12 @@
         "reason",
         "previous_id",
         "proposal",
-        "record"
+        "record",
+        "initiator_authority",
+        "decision_authority"
       ],
       "additionalProperties": false,
-      "x-invariant": "Immutable proposal per version. pending -> approved/rejected/withdrawn. approved includes finalized payment/offset/correction record and selected balance effects atomically; pending/rejected/withdrawn has no record. Relevant selected dependencies stale acceptance, unrelated lessons do not. Only explicitly authorized distinct B CM approves; no OM fallback. Approved revisions use new linked pending request, no overwritten or repeated prior settlement.",
+      "x-invariant": "Immutable proposal per version. pending -> approved/rejected/withdrawn. approved includes finalized payment/offset/correction record and selected balance effects atomically; pending/rejected/withdrawn has no record. Relevant selected dependencies stale acceptance, unrelated lessons do not. Only active CM with explicit current authority for frozen to_center_id approves; same account may submit under A and decide under B. initiator_account_id/decision_account_id must match their server-derived authority account IDs; scopes match from_center_id/to_center_id respectively. No account inequality constraint and no fallback. Approved revisions use new linked pending request, no overwritten or repeated prior settlement.",
       "allOf": [
         {
           "if": {
@@ -24670,6 +24685,41 @@
           "else": {
             "properties": {
               "record": {
+                "type": "null"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "state": {
+                "enum": [
+                  "approved",
+                  "rejected"
+                ]
+              }
+            },
+            "required": [
+              "state"
+            ]
+          },
+          "then": {
+            "properties": {
+              "decision_authority": {
+                "$ref": "#/$defs/SettlementDecisionAuthority"
+              },
+              "decision_account_id": {
+                "$ref": "#/$defs/FtkUuid"
+              }
+            }
+          },
+          "else": {
+            "properties": {
+              "decision_authority": {
+                "type": "null"
+              },
+              "decision_account_id": {
                 "type": "null"
               }
             }
@@ -24799,9 +24849,6 @@
         "dependency_scope": {
           "const": "selected_movement_versions_request_authority_plan"
         },
-        "self_approval": {
-          "const": false
-        },
         "fallback_approval": {
           "const": "disabled_no_implicit_owner_or_org_manager_authority"
         },
@@ -24822,6 +24869,9 @@
         },
         "submit_closes_balance": {
           "const": false
+        },
+        "same_account_allowed_with_both_center_authorities": {
+          "const": true
         }
       },
       "required": [
@@ -24836,16 +24886,17 @@
         "rounding",
         "scope_gate",
         "dependency_scope",
-        "self_approval",
         "fallback_approval",
         "offset",
         "no_double_close",
         "approval_finalizes_record_and_balances",
         "separate_payment_recorder",
         "automatic_bank_transfer",
-        "submit_closes_balance"
+        "submit_closes_balance",
+        "same_account_allowed_with_both_center_authorities"
       ],
-      "additionalProperties": false
+      "additionalProperties": false,
+      "x-invariant": "Accepted center-scoped settlement rules; no distinct-person or distinct-account requirement."
     },
     "Request_management_state_get": {
       "type": "object",
@@ -29570,7 +29621,7 @@
           }
         }
       ],
-      "x-invariant": "A is from_center_id, B is to_center_id, same organization, distinct centers. Freeze exact proposal, currency, selected movement/record versions, actor and relevant authority/plan/scope dependencies. Pending request closes no balance. Previous approved request stays immutable; revision/correction uses linked new pending request with current previous_version and only eligible residual/correction amounts. Never repeat a finalized allocation."
+      "x-invariant": "A is from_center_id, B is to_center_id, same organization, distinct centers. Freeze exact proposal, currency, selected movement/record versions, actor and relevant authority/plan/scope dependencies. Pending request closes no balance. Previous approved request stays immutable; revision/correction uses linked new pending request with current previous_version and only eligible residual/correction amounts. Never repeat a finalized allocation. Server verifies the actor has current CM membership and explicit settlement authority for from_center_id; client center_id cannot grant authority. Record actor and exact A authorization scope in audit/outbox/receipt transaction."
     },
     "Success_settlement_request_submit": {
       "type": "object",
@@ -29711,7 +29762,7 @@
         "reason"
       ],
       "additionalProperties": false,
-      "x-invariant": "Only distinct live-authorized B center_manager. Approve confirms received actual payment or explicit offset/correction acceptance and atomically appends the record, closes selected balances, updates request and appends audit/outbox/receipt. Reject requires reason, changes no balance and notifies A in-app. No third writer, no bank transfer, no OM/Owner fallback. Recheck live permission before receipt replay; relevant dependency changes reject stale request."
+      "x-invariant": "Verify current CM membership and explicit settlement grant at B = stored request.to_center_id independently from submission A scope. Initiator and decision accounts may be equal if both center authorizations hold. Client center_id is not proof and cannot replace stored B. Approve confirms received actual payment or explicit offset/correction acceptance and atomically appends the record, closes selected balances, updates request and appends audit/outbox/receipt. Reject requires reason, changes no balance and notifies A in-app. No third writer, no bank transfer, no fallback route. Audit decision account plus B center/role/grant scope; never reject solely for account equality. Recheck live permission before receipt replay; relevant dependency changes reject stale request."
     },
     "Success_settlement_request_decide": {
       "type": "object",
@@ -39377,6 +39428,96 @@
       ],
       "additionalProperties": false,
       "x-invariant": "Original allocation identity/movement/side/amount immutable; version and nonnegative unreversed_minor are current correction eligibility aggregate, updated atomically with linked corrections. Return via finalized request record read; no raw private table access."
+    },
+    "SettlementSubmitAuthority": {
+      "type": "object",
+      "properties": {
+        "account_id": {
+          "$ref": "#/$defs/FtkUuid"
+        },
+        "person_id": {
+          "$ref": "#/$defs/FtkUuid"
+        },
+        "org_id": {
+          "$ref": "#/$defs/FtkUuid"
+        },
+        "center_id": {
+          "$ref": "#/$defs/FtkUuid"
+        },
+        "permission": {
+          "const": "settlement.request"
+        },
+        "manager_role_id": {
+          "$ref": "#/$defs/FtkUuid"
+        },
+        "manager_role_version": {
+          "$ref": "#/$defs/PositiveInt"
+        },
+        "settlement_grant_version": {
+          "$ref": "#/$defs/PositiveInt"
+        },
+        "checked_at": {
+          "$ref": "#/$defs/Instant"
+        }
+      },
+      "required": [
+        "account_id",
+        "person_id",
+        "org_id",
+        "center_id",
+        "permission",
+        "manager_role_id",
+        "manager_role_version",
+        "settlement_grant_version",
+        "checked_at"
+      ],
+      "additionalProperties": false,
+      "x-invariant": "Server-derived authorization snapshot at this step, never a client authority claim. Active CM membership and explicit live settlement grant in exact org/center. Account equality across steps is allowed; each step checks its own center. Source role/grant versions are audit evidence, not a reusable authorization token."
+    },
+    "SettlementDecisionAuthority": {
+      "type": "object",
+      "properties": {
+        "account_id": {
+          "$ref": "#/$defs/FtkUuid"
+        },
+        "person_id": {
+          "$ref": "#/$defs/FtkUuid"
+        },
+        "org_id": {
+          "$ref": "#/$defs/FtkUuid"
+        },
+        "center_id": {
+          "$ref": "#/$defs/FtkUuid"
+        },
+        "permission": {
+          "const": "settlement.decide"
+        },
+        "manager_role_id": {
+          "$ref": "#/$defs/FtkUuid"
+        },
+        "manager_role_version": {
+          "$ref": "#/$defs/PositiveInt"
+        },
+        "settlement_grant_version": {
+          "$ref": "#/$defs/PositiveInt"
+        },
+        "checked_at": {
+          "$ref": "#/$defs/Instant"
+        }
+      },
+      "required": [
+        "account_id",
+        "person_id",
+        "org_id",
+        "center_id",
+        "permission",
+        "manager_role_id",
+        "manager_role_version",
+        "settlement_grant_version",
+        "checked_at"
+      ],
+      "additionalProperties": false,
+      "x-invariant": "Server-derived authorization snapshot at this step, never a client authority claim. Active CM membership and explicit live settlement grant in exact org/center. Account equality across steps is allowed; each step checks its own center. Source role/grant versions are audit evidence, not a reusable authorization token."
     }
   },
   "x-contract": {
@@ -39445,7 +39586,7 @@
       "management.inspect": "Only the live authority of the named management operation and its exact tenant/center/field scope; not account.self or generic table access.",
       "settlement.read": "Active center_manager with explicit current center-scoped settlement grant; own authorized centers only. Owner/OM role or delegation administration alone provides no financial projection.",
       "settlement.request": "Active A center_manager AND explicit live settlement grant for A; no role-only, Owner, OM or delegation permission shortcut. Withdraw requires original initiator and live A grant.",
-      "settlement.decide": "Active B center_manager AND explicit live settlement grant for B; account must differ from initiator even when managing both centers. No Owner/OM fallback.",
+      "settlement.decide": "Active B center_manager AND explicit live settlement grant for stored request.to_center_id; verified independently of A submission scope. Initiator may be the same account if also authorized at B. A-only authority, client-selected center, Owner/OM administration alone never authorizes B. No fallback.",
       "reservation.protection.manage": "Resolve live original change authority: policy.manage with org/center mandatory hierarchy for policy; entitlement.correct in the affected center for negative limit/credit/sale-scope. Preview and apply recheck same original permission; no escalation from CM to org policy.",
       "settlement.delegation.manage": "Organization Owner only grants/revokes delegation permission to an active org_manager of the same organization; no center operation authority follows.",
       "settlement.authority.manage": "Organization Owner directly OR active org_manager with explicit live delegation permission grants/revokes settlement authority to an active center_manager in that exact center. Center_manager cannot delegate.",
@@ -62658,7 +62799,11 @@
           "DS-AUTH-02",
           "DS-AUTH-03",
           "DS-SET-13",
-          "DS-SET-14"
+          "DS-SET-14",
+          "DS-SCOPE-01",
+          "DS-SCOPE-02",
+          "DS-SCOPE-03",
+          "DS-SCOPE-04"
         ],
         "configuration_policy": "No implicit fee/rate or arbitrary limit. Accepted DS-2026-10-17.",
         "implementation_status": "contract_only",
@@ -62776,7 +62921,11 @@
           "DS-AUTH-02",
           "DS-AUTH-03",
           "DS-SET-13",
-          "DS-SET-14"
+          "DS-SET-14",
+          "DS-SCOPE-01",
+          "DS-SCOPE-02",
+          "DS-SCOPE-03",
+          "DS-SCOPE-04"
         ],
         "configuration_policy": "No implicit fee/rate or arbitrary limit. Accepted DS-2026-10-17.",
         "implementation_status": "contract_only",
@@ -62894,7 +63043,11 @@
           "DS-AUTH-02",
           "DS-AUTH-03",
           "DS-SET-13",
-          "DS-SET-14"
+          "DS-SET-14",
+          "DS-SCOPE-01",
+          "DS-SCOPE-02",
+          "DS-SCOPE-03",
+          "DS-SCOPE-04"
         ],
         "configuration_policy": "No implicit fee/rate or arbitrary limit. Accepted DS-2026-10-17.",
         "implementation_status": "contract_only",
@@ -62986,17 +63139,19 @@
           "same_org_business_scope",
           "selected_dependencies_only",
           "no_automatic_cash_or_fx",
-          "no_self_approval",
           "no_double_balance_close",
           "active_cm_and_explicit_center_grant",
           "live_authority_before_receipt_replay",
           "no_owner_or_om_operational_fallback",
           "pending_request_does_not_close_balance",
-          "freeze_selected_proposal_dependencies"
+          "freeze_selected_proposal_dependencies",
+          "independent_step_center_authority",
+          "account_equality_is_not_rejection",
+          "server_derived_step_scope_audit"
         ],
         "audit": true,
         "notification": "transactional_in_app_outbox",
-        "concurrency": "Live original permission/tenant scope on every request; target/aggregate lock; append_or_current_scope_lock; idempotent receipt and all declared effects rollback together",
+        "concurrency": "Live original permission/tenant scope on every request; target/aggregate lock; append_or_current_scope_lock; idempotent receipt and all declared effects rollback together; lock/recheck relevant live center-role/grant before commit and receipt replay; equality of account IDs never skips target B authorization or ledger/version locks",
         "expected_version_subject": "none",
         "acceptance_scenario_ids": [
           "DS-SET-01",
@@ -63016,7 +63171,11 @@
           "DS-AUTH-02",
           "DS-AUTH-03",
           "DS-SET-13",
-          "DS-SET-14"
+          "DS-SET-14",
+          "DS-SCOPE-01",
+          "DS-SCOPE-02",
+          "DS-SCOPE-03",
+          "DS-SCOPE-04"
         ],
         "configuration_policy": "No implicit fee/rate or arbitrary limit. Accepted DS-2026-10-17.",
         "implementation_status": "contract_only",
@@ -63043,6 +63202,28 @@
           "target_request": {
             "$ref": "#/$defs/Request_settlement_request_submit"
           }
+        },
+        "authority_binding": {
+          "actor": "server_verified_account_id",
+          "org": "request.org_id",
+          "center": "request.from_center_id",
+          "permission": "settlement.request",
+          "required_checks": [
+            "active_center_manager_at_step",
+            "explicit_current_center_grant",
+            "live_authority_before_receipt_replay",
+            "client_center_selection_is_not_authority"
+          ],
+          "require_distinct_account": false,
+          "audit_scope_fields": [
+            "actor_account_id",
+            "org_id",
+            "center_id",
+            "permission",
+            "manager_role_id",
+            "manager_role_version",
+            "settlement_grant_version"
+          ]
         }
       },
       {
@@ -63112,16 +63293,18 @@
           "same_org_business_scope",
           "selected_dependencies_only",
           "no_automatic_cash_or_fx",
-          "no_self_approval",
           "no_double_balance_close",
           "active_cm_and_explicit_center_grant",
           "live_authority_before_receipt_replay",
           "no_owner_or_om_operational_fallback",
-          "original_initiator_live_A_grant"
+          "original_initiator_live_A_grant",
+          "independent_step_center_authority",
+          "account_equality_is_not_rejection",
+          "server_derived_step_scope_audit"
         ],
         "audit": true,
         "notification": "transactional_in_app_outbox",
-        "concurrency": "Live original permission/tenant scope on every request; target/aggregate lock; row_version; idempotent receipt and all declared effects rollback together",
+        "concurrency": "Live original permission/tenant scope on every request; target/aggregate lock; row_version; idempotent receipt and all declared effects rollback together; lock/recheck relevant live center-role/grant before commit and receipt replay; equality of account IDs never skips target B authorization or ledger/version locks",
         "expected_version_subject": "settlement_request_id",
         "acceptance_scenario_ids": [
           "DS-SET-01",
@@ -63141,7 +63324,11 @@
           "DS-AUTH-02",
           "DS-AUTH-03",
           "DS-SET-13",
-          "DS-SET-14"
+          "DS-SET-14",
+          "DS-SCOPE-01",
+          "DS-SCOPE-02",
+          "DS-SCOPE-03",
+          "DS-SCOPE-04"
         ],
         "configuration_policy": "No implicit fee/rate or arbitrary limit. Accepted DS-2026-10-17.",
         "implementation_status": "contract_only",
@@ -63168,6 +63355,28 @@
           "target_request": {
             "$ref": "#/$defs/Request_settlement_request_withdraw"
           }
+        },
+        "authority_binding": {
+          "actor": "server_verified_account_id",
+          "org": "stored_request.org_id",
+          "center": "stored_request.from_center_id",
+          "permission": "settlement.request",
+          "required_checks": [
+            "active_center_manager_at_step",
+            "explicit_current_center_grant",
+            "live_authority_before_receipt_replay",
+            "client_center_selection_is_not_authority"
+          ],
+          "require_distinct_account": false,
+          "audit_scope_fields": [
+            "actor_account_id",
+            "org_id",
+            "center_id",
+            "permission",
+            "manager_role_id",
+            "manager_role_version",
+            "settlement_grant_version"
+          ]
         }
       },
       {
@@ -63239,7 +63448,6 @@
           "same_org_business_scope",
           "selected_dependencies_only",
           "no_automatic_cash_or_fx",
-          "no_self_approval",
           "no_double_balance_close",
           "active_cm_and_explicit_center_grant",
           "live_authority_before_receipt_replay",
@@ -63247,11 +63455,14 @@
           "B_approval_finalizes_record_and_balances_atomic",
           "same_currency_both_sides_atomic",
           "linked_history_not_overwrite",
-          "rejection_reason_in_app_to_A_balance_unchanged"
+          "rejection_reason_in_app_to_A_balance_unchanged",
+          "independent_step_center_authority",
+          "account_equality_is_not_rejection",
+          "server_derived_step_scope_audit"
         ],
         "audit": true,
         "notification": "transactional_in_app_outbox",
-        "concurrency": "Live original permission/tenant scope on every request; target/aggregate lock; row_version; idempotent receipt and all declared effects rollback together",
+        "concurrency": "Live original permission/tenant scope on every request; target/aggregate lock; row_version; idempotent receipt and all declared effects rollback together; lock/recheck relevant live center-role/grant before commit and receipt replay; equality of account IDs never skips target B authorization or ledger/version locks",
         "expected_version_subject": "settlement_request_id",
         "acceptance_scenario_ids": [
           "DS-SET-01",
@@ -63271,11 +63482,15 @@
           "DS-AUTH-02",
           "DS-AUTH-03",
           "DS-SET-13",
-          "DS-SET-14"
+          "DS-SET-14",
+          "DS-SCOPE-01",
+          "DS-SCOPE-02",
+          "DS-SCOPE-03",
+          "DS-SCOPE-04"
         ],
         "configuration_policy": "No implicit fee/rate or arbitrary limit. Accepted DS-2026-10-17.",
         "implementation_status": "contract_only",
-        "transaction_guarantee": "B approve atomically finalizes request, frozen payment/offset/linked correction record, selected balances, audit, in-app outbox and receipt. Reject leaves balances unchanged and sends reason to A. No separate recorder; no bank transfer. All effects rollback together.",
+        "transaction_guarantee": "B approve atomically finalizes request, frozen payment/offset/linked correction record, selected balances, audit, in-app outbox and receipt. Reject leaves balances unchanged and sends reason to A. No separate recorder; no bank transfer. All effects rollback together. Audit records verified decision account and stored B center/role/grant scope; same initiating account allowed only with live B authority.",
         "operation_contract": {
           "kind": "command",
           "target_entity": "planned.settlement",
@@ -63320,6 +63535,28 @@
           "target_request": {
             "$ref": "#/$defs/Request_settlement_request_decide"
           }
+        },
+        "authority_binding": {
+          "actor": "server_verified_account_id",
+          "org": "stored_request.org_id",
+          "center": "stored_request.to_center_id",
+          "permission": "settlement.decide",
+          "required_checks": [
+            "active_center_manager_at_step",
+            "explicit_current_center_grant",
+            "live_authority_before_receipt_replay",
+            "client_center_selection_is_not_authority"
+          ],
+          "require_distinct_account": false,
+          "audit_scope_fields": [
+            "actor_account_id",
+            "org_id",
+            "center_id",
+            "permission",
+            "manager_role_id",
+            "manager_role_version",
+            "settlement_grant_version"
+          ]
         }
       },
       {
@@ -63408,7 +63645,11 @@
           "DS-AUTH-02",
           "DS-AUTH-03",
           "DS-SET-13",
-          "DS-SET-14"
+          "DS-SET-14",
+          "DS-SCOPE-01",
+          "DS-SCOPE-02",
+          "DS-SCOPE-03",
+          "DS-SCOPE-04"
         ],
         "configuration_policy": "No implicit fee/rate or arbitrary limit. Accepted DS-2026-10-17.",
         "implementation_status": "contract_only",
@@ -63524,7 +63765,11 @@
           "DS-AUTH-02",
           "DS-AUTH-03",
           "DS-SET-13",
-          "DS-SET-14"
+          "DS-SET-14",
+          "DS-SCOPE-01",
+          "DS-SCOPE-02",
+          "DS-SCOPE-03",
+          "DS-SCOPE-04"
         ],
         "configuration_policy": "No implicit fee/rate or arbitrary limit. Accepted DS-2026-10-17.",
         "implementation_status": "contract_only",
@@ -63646,7 +63891,11 @@
           "DS-AUTH-02",
           "DS-AUTH-03",
           "DS-SET-13",
-          "DS-SET-14"
+          "DS-SET-14",
+          "DS-SCOPE-01",
+          "DS-SCOPE-02",
+          "DS-SCOPE-03",
+          "DS-SCOPE-04"
         ],
         "configuration_policy": "No implicit fee/rate or arbitrary limit. Accepted DS-2026-10-17.",
         "implementation_status": "contract_only",
@@ -76845,6 +77094,72 @@
         "origin": "ftksaas",
         "acceptance": "generic_uuid",
         "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/SettlementRequestView/allOf/1/then/properties/decision_account_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/SettlementSubmitAuthority/properties/account_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/SettlementSubmitAuthority/properties/person_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/SettlementSubmitAuthority/properties/org_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/SettlementSubmitAuthority/properties/center_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/SettlementSubmitAuthority/properties/manager_role_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/SettlementDecisionAuthority/properties/account_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/SettlementDecisionAuthority/properties/person_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/SettlementDecisionAuthority/properties/org_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/SettlementDecisionAuthority/properties/center_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/SettlementDecisionAuthority/properties/manager_role_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
       }
     ],
     "open_product_decisions": [],
@@ -77077,14 +77392,14 @@
         "rounding": "half_away_from_zero_largest_remainder_stable_tie_original_amount_on_reversal",
         "scope_gate": "same_org_business_accessible_centers_and_source_sale_service_center_discipline_scope",
         "dependency_scope": "selected_movement_versions_request_authority_plan",
-        "self_approval": false,
         "fallback_approval": "disabled_no_implicit_owner_or_org_manager_authority",
         "offset": "explicit_approved_same_currency_both_sides_atomic_no_auto_net_no_fx",
         "no_double_close": true,
         "approval_finalizes_record_and_balances": true,
         "separate_payment_recorder": false,
         "automatic_bank_transfer": false,
-        "submit_closes_balance": false
+        "submit_closes_balance": false,
+        "same_account_allowed_with_both_center_authorities": true
       },
       "sale_scope": {
         "catalog_new_sales_only": true,
@@ -77097,13 +77412,7 @@
       },
       "physical_storage": "pending append-only migration in runtime deliveries; no new table/migration in this contract PR",
       "runtime_behavior_acceptance": "pending DS delivery; existing 241-test baseline is regression evidence only",
-      "open_product_choices": [
-        {
-          "id": "DS-OPEN-02",
-          "question": "Previous distinct-OM exception cannot be authorized by the accepted CM-only operational chain. No exception approval route is specified under the new chain; it is disabled, not inferred. A replacement requires an explicit product decision if desired.",
-          "blocks": "exception route only; ordinary distinct authorized B CM flow is fully specified"
-        }
-      ],
+      "open_product_choices": [],
       "delivery_gaps": [
         {
           "id": "starter_plan_and_earning_split",
@@ -77345,7 +77654,7 @@
         {
           "id": "DS-SET-06",
           "delivery_gap": "cross_center_settlement",
-          "expected_flow": "Explicitly authorized A CM submits actual-payment/offset/correction proposal; balance stays open. Distinct explicitly authorized B CM confirms receipt/acceptance and atomically finalizes record and selected balance effects. Reasoned rejection preserves balances and notifies A in-app.",
+          "expected_flow": "Explicitly authorized A CM submits actual-payment/offset/correction proposal; balance stays open. Independently B-center-authorized CM (same account allowed) confirms receipt/acceptance and atomically finalizes record and selected balance effects. Reasoned rejection preserves balances and notifies A in-app.",
           "status": "pending_runtime",
           "evidence_kind": "real_auth_edge_rpc",
           "evidence": []
@@ -77353,7 +77662,7 @@
         {
           "id": "DS-SET-07",
           "delivery_gap": "cross_center_settlement",
-          "expected_flow": "Initiator cannot approve even as two-center CM. Owner/OM authority administration never bypasses this; previous OM fallback is disabled under new chain.",
+          "expected_flow": "Same account can initiate as authorized A CM and approve as independently authorized B CM; A-only authority never grants B approval. No distinct-account/person restriction or exception/fallback.",
           "status": "pending_runtime",
           "evidence_kind": "real_auth_edge_rpc",
           "evidence": []
@@ -77361,7 +77670,7 @@
         {
           "id": "DS-SET-08",
           "delivery_gap": "cross_center_settlement",
-          "expected_flow": "CM/OM role alone and Owner without explicit CM role/grant cannot read financial data or submit/approve. No separate OM payment stage, and B approval never initiates a bank transfer.",
+          "expected_flow": "CM/OM role alone and Owner without explicit per-center CM role/grant cannot read financial data or submit/approve. No separate OM payment stage, and B approval never initiates a bank transfer.",
           "status": "pending_runtime",
           "evidence_kind": "real_auth_edge_rpc",
           "evidence": []
@@ -77433,7 +77742,7 @@
         {
           "id": "DS-ATOMIC-01",
           "delivery_gap": "cross_center_settlement",
-          "expected_flow": "Concurrent B approvals and competing payment/offset/correction cannot double-close selected shares. Same-key replay rechecks live authority. Injected ledger/balance/audit/outbox/receipt failure rolls back request and entire multi-row batch.",
+          "expected_flow": "Concurrent B approvals and competing payment/offset/correction cannot double-close selected shares. Same-key replay rechecks live authority. Injected ledger/balance/audit/outbox/receipt failure rolls back request and entire multi-row batch. Same-account A/B operation must not bypass idempotency, selected movement versions, race locks or no-double-close rules.",
           "status": "pending_runtime",
           "evidence_kind": "real_auth_edge_rpc",
           "evidence": []
@@ -77477,6 +77786,38 @@
           "status": "pending_runtime",
           "evidence_kind": "real_auth_edge_rpc",
           "evidence": []
+        },
+        {
+          "id": "DS-SCOPE-01",
+          "delivery_gap": "cross_center_settlement",
+          "expected_flow": "Same account holds current active CM membership and explicit settlement grant at both A and B: submit using A scope then approve using B scope succeeds; audit stores account plus independent center/role/grant snapshot for each step, even if account IDs match.",
+          "status": "pending_runtime",
+          "evidence_kind": "real_auth_edge_rpc",
+          "evidence": []
+        },
+        {
+          "id": "DS-SCOPE-02",
+          "delivery_gap": "cross_center_settlement",
+          "expected_flow": "A-only CM/grant cannot approve stored B request. Sending B as client center_id or reusing A authority/audit snapshot never grants B power; no mutation, record or closed balance on rejection.",
+          "status": "pending_runtime",
+          "evidence_kind": "real_auth_edge_rpc",
+          "evidence": []
+        },
+        {
+          "id": "DS-SCOPE-03",
+          "delivery_gap": "cross_center_settlement",
+          "expected_flow": "After B CM role or B explicit settlement grant revocation, old Auth session, pending request and same-key replay cannot authorize B decision. Live B authority is checked before replay and at commit; relevant role/grant concurrency is serialized.",
+          "status": "pending_runtime",
+          "evidence_kind": "real_auth_edge_rpc",
+          "evidence": []
+        },
+        {
+          "id": "DS-SCOPE-04",
+          "delivery_gap": "cross_center_settlement",
+          "expected_flow": "Same-account A/B approval preserves same-key replay semantics, stale relevant versions, concurrent approval/payment/offset/correction locks and exactly-once selected balance closure. Injected audit/outbox/receipt failure rolls back request and all financial effects.",
+          "status": "pending_runtime",
+          "evidence_kind": "real_auth_edge_rpc",
+          "evidence": []
         }
       ],
       "settlement_authority_chain": {
@@ -77490,7 +77831,11 @@
         "live_check_before_receipt_replay": true,
         "operation_actor": "active_center_manager_with_live_explicit_center_grant",
         "authority_version": "organization_settlement_authority_aggregate",
-        "fallback_implies_om_operations": false
+        "fallback_implies_om_operations": false,
+        "account_separation_required": false,
+        "initiator_scope": "from_center_id",
+        "decision_scope": "frozen_request.to_center_id",
+        "audit_step_scope_required": true
       },
       "closed_product_choices": [
         {
@@ -77498,9 +77843,15 @@
           "status": "accepted_contract_runtime_pending",
           "resolution": "Owner grants/revokes OM delegation permission; Owner directly or live delegated OM grants/revokes exact-center CM settlement authority. Roles and authority administration imply no financial operations.",
           "source": "docs/decisions/DS-2026-10-17-settlement-revision.md"
+        },
+        {
+          "id": "DS-OPEN-02",
+          "status": "accepted_contract_runtime_pending",
+          "resolution": "No different-account/person condition. Same account may initiate under live A CM+grant and approve under independently verified live B CM+grant. No separate exception/fallback. Prior self-approval prohibition superseded by latest explicit user decision.",
+          "source": "docs/decisions/DS-2026-10-17-settlement-center-scope.md"
         }
       ],
-      "latest_settlement_decision": "docs/decisions/DS-2026-10-17-settlement-revision.md"
+      "latest_settlement_decision": "docs/decisions/DS-2026-10-17-settlement-center-scope.md"
     },
     "feature_delivery": {
       "F01": {
@@ -77705,7 +78056,11 @@
           "DS-AUTH-02",
           "DS-AUTH-03",
           "DS-SET-13",
-          "DS-SET-14"
+          "DS-SET-14",
+          "DS-SCOPE-01",
+          "DS-SCOPE-02",
+          "DS-SCOPE-03",
+          "DS-SCOPE-04"
         ],
         "baseline_regression": "global baseline 241-test main CI; not per-feature DS acceptance",
         "plan_scope": {
@@ -78024,7 +78379,11 @@
           "DS-AUTH-02",
           "DS-AUTH-03",
           "DS-SET-13",
-          "DS-SET-14"
+          "DS-SET-14",
+          "DS-SCOPE-01",
+          "DS-SCOPE-02",
+          "DS-SCOPE-03",
+          "DS-SCOPE-04"
         ],
         "baseline_regression": "global baseline 241-test main CI; not per-feature DS acceptance",
         "plan_scope": {
@@ -78232,7 +78591,11 @@
           "DS-AUTH-02",
           "DS-AUTH-03",
           "DS-SET-13",
-          "DS-SET-14"
+          "DS-SET-14",
+          "DS-SCOPE-01",
+          "DS-SCOPE-02",
+          "DS-SCOPE-03",
+          "DS-SCOPE-04"
         ],
         "baseline_regression": "global baseline 241-test main CI; not per-feature DS acceptance",
         "plan_scope": {
@@ -78324,7 +78687,11 @@
           "DS-AUTH-02",
           "DS-AUTH-03",
           "DS-SET-13",
-          "DS-SET-14"
+          "DS-SET-14",
+          "DS-SCOPE-01",
+          "DS-SCOPE-02",
+          "DS-SCOPE-03",
+          "DS-SCOPE-04"
         ],
         "baseline_regression": "global baseline 241-test main CI; not per-feature DS acceptance",
         "plan_scope": {
@@ -78392,7 +78759,11 @@
           "DS-AUTH-02",
           "DS-AUTH-03",
           "DS-SET-13",
-          "DS-SET-14"
+          "DS-SET-14",
+          "DS-SCOPE-01",
+          "DS-SCOPE-02",
+          "DS-SCOPE-03",
+          "DS-SCOPE-04"
         ],
         "baseline_regression": "global baseline 241-test main CI; not per-feature DS acceptance",
         "plan_scope": {
@@ -78525,7 +78896,11 @@
           "DS-AUTH-02",
           "DS-AUTH-03",
           "DS-SET-13",
-          "DS-SET-14"
+          "DS-SET-14",
+          "DS-SCOPE-01",
+          "DS-SCOPE-02",
+          "DS-SCOPE-03",
+          "DS-SCOPE-04"
         ],
         "baseline_regression": "global baseline 241-test main CI; not per-feature DS acceptance",
         "plan_scope": {
@@ -78611,7 +78986,11 @@
           "DS-AUTH-02",
           "DS-AUTH-03",
           "DS-SET-13",
-          "DS-SET-14"
+          "DS-SET-14",
+          "DS-SCOPE-01",
+          "DS-SCOPE-02",
+          "DS-SCOPE-03",
+          "DS-SCOPE-04"
         ],
         "baseline_regression": "global baseline 241-test main CI; not per-feature DS acceptance",
         "plan_scope": {
@@ -78698,7 +79077,11 @@
           "DS-AUTH-02",
           "DS-AUTH-03",
           "DS-SET-13",
-          "DS-SET-14"
+          "DS-SET-14",
+          "DS-SCOPE-01",
+          "DS-SCOPE-02",
+          "DS-SCOPE-03",
+          "DS-SCOPE-04"
         ],
         "baseline_regression": "global baseline 241-test main CI; not per-feature DS acceptance",
         "plan_scope": {
