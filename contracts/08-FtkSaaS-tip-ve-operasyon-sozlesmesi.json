@@ -27099,7 +27099,7 @@
         "audit": true,
         "notification": "outbox_if_user_visible_business_result",
         "concurrency": "global_lock_order_and_current_scope; version on updates; preview dependencies on apply",
-        "expected_version_subject": "scope_aggregate",
+        "expected_version_subject": "availability_rules.version on update; absent on create",
         "acceptance_scenario_ids": [
           "A01",
           "A02",
@@ -27116,7 +27116,7 @@
           "A55"
         ],
         "configuration_policy": "numeric plan limits/prices and legal approval are deployment configuration, never arbitrary allow/deny",
-        "implementation_status": "contract_only"
+        "implementation_status": "operational_development_limited"
       },
       {
         "name": "availability_exception_save_v1",
@@ -27179,7 +27179,7 @@
         "audit": true,
         "notification": "outbox_if_user_visible_business_result",
         "concurrency": "global_lock_order_and_current_scope; version on updates; preview dependencies on apply",
-        "expected_version_subject": "scope_aggregate",
+        "expected_version_subject": "selected center configuration aggregate: centers.version; append exception, increment center version",
         "acceptance_scenario_ids": [
           "A01",
           "A02",
@@ -27196,7 +27196,7 @@
           "A55"
         ],
         "configuration_policy": "numeric plan limits/prices and legal approval are deployment configuration, never arbitrary allow/deny",
-        "implementation_status": "contract_only"
+        "implementation_status": "operational_development_limited"
       },
       {
         "name": "policies_get_v1",
@@ -27240,7 +27240,9 @@
         "semantic_guards": [
           "live_actor_and_scope",
           "plan_capabilities_from_features",
-          "billing_gate_read"
+          "billing_gate_read",
+          "latest_effective_per_scope_then_mandatory_org_over_center",
+          "no_recalculation_of_existing_reservation_policy_snapshot"
         ],
         "audit": false,
         "notification": "outbox_if_user_visible_business_result",
@@ -27258,7 +27260,7 @@
           "A55"
         ],
         "configuration_policy": "numeric plan limits/prices and legal approval are deployment configuration, never arbitrary allow/deny",
-        "implementation_status": "contract_only"
+        "implementation_status": "operational_development_limited"
       },
       {
         "name": "policy_publish_v1",
@@ -27313,12 +27315,14 @@
           "plan_capabilities_from_features",
           "billing_gate_config",
           "same_key_same_payload_replay",
-          "receipt_audit_outbox_atomic_domain_commit"
+          "receipt_audit_outbox_atomic_domain_commit",
+          "latest_effective_per_scope_then_mandatory_org_over_center",
+          "no_recalculation_of_existing_reservation_policy_snapshot"
         ],
         "audit": true,
         "notification": "outbox_if_user_visible_business_result",
         "concurrency": "global_lock_order_and_current_scope; version on updates; preview dependencies on apply",
-        "expected_version_subject": "scope_aggregate",
+        "expected_version_subject": "append-only chain per org/center/key; organization lock serializes; request has no expected_version",
         "acceptance_scenario_ids": [
           "A01",
           "A02",
@@ -27331,7 +27335,7 @@
           "A55"
         ],
         "configuration_policy": "numeric plan limits/prices and legal approval are deployment configuration, never arbitrary allow/deny",
-        "implementation_status": "contract_only"
+        "implementation_status": "operational_development_limited"
       },
       {
         "name": "roles_list_v1",
@@ -51183,14 +51187,18 @@
         "person_update_v1",
         "people_list_v1",
         "room_save_v1",
-        "roles_list_v1"
+        "roles_list_v1",
+        "availability_save_v1",
+        "availability_exception_save_v1",
+        "policies_get_v1",
+        "policy_publish_v1"
       ],
       "auth": "Supabase getUser + live auth.sessions + current account/link/role; no request actor claims",
       "uuid": "backend uuid@14.0.3 v7 for all inserted IDs; DB defaults not required",
       "external_transport": "POST /functions/v1/backend-v1/{operation}; direct typed request body",
       "internal_rpc": "service-only api_v1 named functions; actor/session/UUID bank supplied by verified gateway",
-      "migration_count": 22,
-      "test_evidence": "https://github.com/SXQHex/FtkSaaS/actions/runs/38993548576",
+      "migration_count": 23,
+      "test_evidence": "reports/availability-policy-verification.json; scoped source evidence, final PR/main clean CI verified separately",
       "frontend_unchanged": true
     }
   }

@@ -1,0 +1,41 @@
+{
+  "source_commit": "a031f8142da4a2959232644c88fc911278ac5d06",
+  "source_tree": "a850e8e911ad60decdb14386b44e583e636202cf",
+  "base_commit": "b4b2b35569fe4bfb8cac7f7e07b6551681ae616e",
+  "evidence_kind": "developer-run isolated Supabase native stack; independent final PR and main CI must be checked separately",
+  "scope": {
+    "contract_tests": 12,
+    "database_tests": 27,
+    "focused_auth_edge_rpc_tests": 27,
+    "new_configuration_group_tests_including_parent": 19,
+    "person_registry_regression_tests_including_parent": 8,
+    "migrations_cleanly_applied": 23,
+    "static_generation_types_inventory_links": "passed",
+    "database_advisors": "no issues"
+  },
+  "checks": [
+    "tenant/center/live-role and feature boundaries",
+    "typed local/UTC intervals, exception half-open adjacency and validation",
+    "rule version and exception center-aggregate races",
+    "idempotent simultaneous replay, payload mismatch and live revocation before replay",
+    "effective mandatory organization policy versus advisory center exception",
+    "append-only publication version chain under concurrent writes",
+    "existing session resource and assignment availability enforcement",
+    "new reservations recheck availability and explicit booking window",
+    "historical cancellation policy ID and typed terms retained",
+    "negative valuation format and selected policy ID snapshot",
+    "configuration/session race and late audit rollback of domain, versions, receipt, audit, notifications, outbox",
+    "direct authenticated RPC denied"
+  ],
+  "not_evidence_for": [
+    "full final-source npm run test:clean: see final PR/main CI",
+    "hosted Supabase deployment or smoke of these 69 operations",
+    "frontend integration",
+    "load or backup/restore",
+    "unimplemented request/program/waitlist flows",
+    "reasoned manager time-window exception transport",
+    "other policy-consuming features"
+  ],
+  "production_deployed": false,
+  "resend_started": false
+}

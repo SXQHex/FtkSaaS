@@ -42,3 +42,5 @@ assert next(Path('supabase/migrations').glob('*_room_and_role_registry.sql')).re
 assert next(Path('supabase/migrations').glob('*_role_list_snapshot.sql')).read_text()==Path('database/role-list-snapshot.sql').read_text(),'Role list snapshot source drift'
 
 assert next(Path('supabase/migrations').glob('*_role_read_center_access.sql')).read_text()==Path('database/role-read-center-access.sql').read_text(),'Role read center access source drift'
+
+assert next(Path('supabase/migrations').glob('*_availability_policies.sql')).read_text()==Path('database/availability-policies.sql').read_text()+Path('database/availability-policies-wrappers.sql').read_text(),'Availability/policy source drift'

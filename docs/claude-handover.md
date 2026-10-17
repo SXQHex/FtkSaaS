@@ -1,6 +1,30 @@
+## Uygunluk ve politikalar — geliştirme uygulaması
+
+Bu PR dört işlemi ekler: `availability_save_v1`, `availability_exception_save_v1`, `policies_get_v1`, `policy_publish_v1`. Toplam 184 işlemin 69'u geliştirme ortamında çağrılabilir, 115'i yalnız sözleşmedir; 23 append-only migration vardır. Kabul sonucu bu PR'nin son SHA'sının CI'ından ayrıca okunur. [Kaynak kapsam raporu](../reports/availability-policy-verification.json): a031f8142da4a2959232644c88fc911278ac5d06 üzerinde 12 sözleşme + 27 DB + 27 odaklı Auth/API testi, temiz 23 migration ve advisor kontrolü geçti; tam temiz PR/main CI ile aynı kanıt değildir.
+
+- Uygunluk kuralı oluşturma sürümsüz, güncelleme `rule_id + availability_rules.version` ister; kaynak türü/kimliği/merkezi değiştirilemez. Yerel saatler 00:00:00–23:59:59, başlangıç bitişten küçüktür; gece aralığı açıkça bölünür. Günler ISO 1–7; geçerlilik başlangıç dahil/bitiş hariçtir. UTC seans zamanları yerel uygunlukla karşılaştırılır; saat kaydırılmaz.
+- İstisna komutu mevcut istisnayı değiştirmez; yeni [starts_at,ends_at) engeli ekler. `expected_version`, seçili merkezin `centers_list.version` değeridir; merkez yapılandırma aggregate sürümü atomik artırılır. Mutation sürümü bu aggregate'in yeni sürümüdür, yeni istisna satırının sürümü değildir. İstisna mevcut seansı/rezervasyonu kendiliğinden iptal etmez.
+- Organizasyon politikası Owner/OM tarafından yayımlanır. Business merkez istisnası CM veya organizasyon okuyucusu tarafından yalnız mevcut tavsiye organizasyon politikası altında yayımlanabilir; merkez kendini zorunlu üst otorite yapamaz. Değerler açık typed input'tur; sayısal başlangıç uydurulmaz.
+- Politika sürümü org/merkez/key zincirinde append-only'dir. `expected_version` alanı bu istekte yoktur; organizasyon kilidi eşzamanlı yayınları sıralayıp `previous_id/version` zinciri üretir. Etkin zamanda her scope'un en yeni satırı alınır; zorunlu organizasyon sürümü, aksi hâlde merkez sürümü, ardından organizasyon sürümü uygulanır. Hâlen zorunlu organizasyon kuralı geçmiş effective_at ile de merkezden değiştirilemez. Gelecek yayın bugünkü sonucu değiştirmez; eski zorunlu sürüm daha yeni tavsiye sürümünü sonsuza kadar kilitlemez.
+- `policies_get_v1` etkin çözümlenmiş değerleri ve kaynak scope'u döndürür; `keys:[]` mevcut anahtarları listeler. Eksik politika listede yoktur; zorunlu tüketici eksik yapılandırmayı ayrıca reddeder. Owner/OM organizasyon okur, CM yalnız açıkça seçilmiş yetkili merkezi okur; öğrenci/personel için genel politika kataloğu erişimi verilmez.
+
+Mevcut tüketiciler:
+- `session_create_v1` kaynakları ve görevli kişileri uygunluk/istisna açısından denetler. Kaynak yapılandırılmamışsa `POLICY_NOT_CONFIGURED`, uygun değilse `RESOURCE_CONFLICT`; hiçbir kısmi seans/kaynak kaydı oluşmaz.
+- `reservation_create_v1` seansın etkin kaynak/görevlilerinin güncel uygunluğunu tekrar denetler. Esnek rezervasyonun açıkça yayımlanmış kayıt penceresi gerekir; pencere dışı `FORBIDDEN`. İstek ayrı yönetici istisnası/gerekçesi taşımadığı için `manager_exception:true` sessiz bypass açmaz.
+- Yeni rezervasyonun iptal politikası ortak zorunlu/miras çözümleyicisiyle seçilip ID ile sabitlenir. İptal eski snapshot'ı kullanır; typed `cancellation.terms` ve tarihsel düzleştirilmiş fixture biçimi desteklenir. Negatif kredi limitleri ve blocked etkinlik kredi politikası aynı hiyerarşiyi kullanır.
+
+Açık bağımlılıklar ve sınırlar:
+- Program önizleme/uygulama, seans değişiklik/atama ve talep/bekleme/yer teklifi API'leri hâlâ yalnız sözleşmedir; bu PR onları uygulamaz.
+- Yapılandırma değişikliği mevcut rezervasyonu iptal etmez, geçmiş hak/borç/hakediş hesaplamaz. Etkilenen mevcut kayıtları gösterip yetkili düzeltme uygulayan akış henüz yoktur.
+- Süre dışı gerekçeli yönetici rezervasyonu için mevcut istek yetersizdir; ayrı teknik aktarım gerekir. Genel `request_window`, borçlu rezervasyon/katılım, belgeler, bildirim/CRM, dondurma ve hassas işlem eşikleri için tüketici kabulü bu dört API'nin kaydedebilmesinden çıkarılamaz.
+- Yapılandırma okuması politika için mevcuttur; uygunluk listesi/istisna düzenleme API'si bu dört işlem arasında yoktur. Birden fazla kuralın birleştirilmesiyle gece/gün aşan seans uygunluğu bu uygulamada desteklenmez.
+- Hosted geliştirme backend'inin önceki 65 işlem smoke'u tarihsel kanıttır; bu PR'nin 69 işlemli temiz kabulüyle karıştırılmaz. Frontend gerçek entegrasyon ve yük/restore açık; dış e-posta ertelendi, Resend başlatılmadı; production dağıtımı yok.
+
+---
+
 # FtkSaaS backend — güncel Claude devri
 
-## Doğrulanmış başlangıç — 17 Ekim 2026
+## Önceki doğrulanmış başlangıç — PR #8
 
 Kaynak main `b9bd9c110f0cf4a121eac6ef0752945de99b10ac`; [PR #8](https://github.com/SXQHex/FtkSaaS/pull/8) birleşmiş; [aynı SHA’nın main CI’ı](https://github.com/SXQHex/FtkSaaS/actions/runs/38993548576) başarılı. 22 migration, 181 test (12 sözleşme + 27 DB + 142 Auth/API); 184 operasyonun 65’i çalışan geliştirme uygulaması, 119’u yalnız sözleşme. Bu kanıt belirtilen kaynak içindir; sonraki commit’in CI sonucu ayrıca doğrulanır.
 
