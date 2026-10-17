@@ -233,9 +233,9 @@ test('Program lifecycle through real Auth -> Edge -> RPC',async t=>{
   const p2=await preview(foreignClass,spec({starts_on:'2027-02-08',ends_on:'2027-02-09',local_start:'10:00:00',assignments:[{person_id:i1.p,duty:'assistant'}]}),c2);assert.equal(p2.blockers[0].code,'RESOURCE_CONFLICT');
   const noAgreement=await person('program-missing-pay');await available('person',noAgreement.p);
   const p3=await preview(cl,spec({starts_on:'2027-02-15',ends_on:'2027-02-16',assignments:[{person_id:noAgreement.p,duty:'instructor'}]}));assert.equal(p3.blockers[0].code,'POLICY_NOT_CONFIGURED');
-  await db.query("update core.instructor_agreements set valid_until='2027-02-01' where id=$1",[i1.agreement]);
-  const p4=await preview(cl,spec({starts_on:'2027-02-01',ends_on:'2027-02-02',assignments:[{person_id:i1.p,duty:'instructor'}]}));assert.equal(p4.blockers[0].code,'POLICY_NOT_CONFIGURED');
-  await db.query('update core.instructor_agreements set valid_until=null where id=$1',[i1.agreement]);
+  const limited=await person('program-finite-agreement');await available('person',limited.p);
+  await db.query("insert into core.instructor_agreements(id,org_id,center_id,person_id,discipline_id,format,valid_from,valid_until,model,terms,state) select $1,org_id,center_id,$2,discipline_id,format,valid_from,'2027-02-01',model,terms,state from core.instructor_agreements where id=$3",[key(),limited.p,i1.agreement]);
+  const p4=await preview(cl,spec({starts_on:'2027-02-01',ends_on:'2027-02-02',assignments:[{person_id:limited.p,duty:'instructor'}]}));assert.equal(p4.blockers[0].code,'POLICY_NOT_CONFIGURED');
  });
  await t.test('late default conflict leaves no partial class duty or earlier occurrence update',async()=>{
   const cl=await cls('Late class blocker'),p=await preview(cl,spec({local_start:'05:00:00'}));await apply(p);

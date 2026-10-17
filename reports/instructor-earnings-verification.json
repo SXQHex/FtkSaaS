@@ -1,0 +1,55 @@
+{
+  "delivery": "instructor agreement to paid attendance and linked earnings",
+  "base_main_sha": "ab3fca4af47b71b34a4a7b6d0df5211ad1e41141",
+  "base_main_ci": "https://github.com/SXQHex/FtkSaaS/actions/runs/39042108296",
+  "source_sha_note": "Report committed with implementation. Final reviewed head and same-SHA clean CI evidence are recorded on the pull request; no unrun CI is claimed here.",
+  "source_sha256": {
+    "database/instructor-earnings.sql": "ded036b66ed75d232a3130f3a1cd15b51abdbed7d895e14d812d707be40d04d7",
+    "database/instructor-earnings-wrappers.sql": "5173eee5f8ab7c17841f12a3a95b974f69ae0d5515b115337fd0a3c3d778777a",
+    "supabase/migrations/20261017150034_instructor_earnings_workflow.sql": "4e5699d258f5eaa72469c75302b8558c77cd3793a13a24884dab6132457a84c3",
+    "tests/instructor-earnings.test.mjs": "57dab47ddb8cb84e5c1c27d0575e5ce4972edc40ad94e345dcf036fd4df08af2"
+  },
+  "inventory": {
+    "operations": 199,
+    "runtime": 95,
+    "contract_only": 104,
+    "migrations": 28
+  },
+  "verification": {
+    "structural": {
+      "command": "npm run verify",
+      "passed": 93,
+      "failed": 0,
+      "behavioral_acceptance": false
+    },
+    "focused_runtime": {
+      "command": "node --test tests/instructor-earnings.test.mjs",
+      "passed": 20,
+      "failed": 0,
+      "path": "real native Supabase Auth -> Edge -> RPC",
+      "coverage": [
+        "immutable historical publication and package identity overrides",
+        "Pro/Business close and Starter preservation",
+        "explicit real start and historical effective boundaries",
+        "fixed/person/percentage/mixed and room arithmetic",
+        "source-less negative frozen valuation before and after settlement",
+        "live role/center boundaries and receipt replay revocation",
+        "stale preview, competing requests, audit/outbox late rollback",
+        "linked correction preserving prior payment allocation"
+      ]
+    }
+  },
+  "pending_acceptance": [
+    "independent review of final head",
+    "mandatory full clean CI of final source",
+    "same full merged main SHA CI"
+  ],
+  "excluded": [
+    "instructor payment record/correct APIs",
+    "cross-center settlement runtime",
+    "frontend",
+    "production",
+    "Resend",
+    "repository administration"
+  ]
+}

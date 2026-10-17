@@ -25,5 +25,6 @@
   "20261017043309_schedule_reads.sql": "4c52918de8d3078ed41d477001f5ed36bce0a7c1297fca355f989e73ccae50b4",
   "20261017051726_program_session_lifecycle.sql": "b4afab9fb48d390dbdb49f8df22ddd7e209d646ac6562e2a0cb356736a708d59",
   "20261017122121_starter_attendance_protection.sql": "a632266fdc5897fe9a1e247a7be6af38d9192a07214bfd9d4dac9679fd014365",
-  "20261017131221_starter_attendance_privacy_legacy.sql": "406eb2ece9665e1a9e1212c6c2b5a21ae95f7359f21024059fcd7dcbf2ed3728"
+  "20261017131221_starter_attendance_privacy_legacy.sql": "406eb2ece9665e1a9e1212c6c2b5a21ae95f7359f21024059fcd7dcbf2ed3728",
+  "20261017150034_instructor_earnings_workflow.sql": "4e5699d258f5eaa72469c75302b8558c77cd3793a13a24884dab6132457a84c3"
 }

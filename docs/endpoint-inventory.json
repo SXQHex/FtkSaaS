@@ -2607,8 +2607,8 @@
     },
     {
       "name": "instructor_agreement_publish_v1",
-      "status": "contract_only",
-      "external_path": null,
+      "status": "operational_development_limited",
+      "external_path": "/functions/v1/backend-v1/instructor_agreement_publish_v1",
       "permission": "earnings.manage",
       "features": [
         "F20"
@@ -2616,10 +2616,12 @@
       "required_features": [
         "F20"
       ],
-      "runtime_required_features": [],
+      "runtime_required_features": [
+        "F20"
+      ],
       "decision_delivery": {
         "accepted_contract": "DS-2026-10-17",
-        "runtime_conformance": "pending",
+        "runtime_conformance": "implemented_auth_edge_rpc_acceptance",
         "open_dependencies": [
           "agreement_versions_and_selection"
         ],
@@ -2632,8 +2634,8 @@
     },
     {
       "name": "earnings_list_v1",
-      "status": "contract_only",
-      "external_path": null,
+      "status": "operational_development_limited",
+      "external_path": "/functions/v1/backend-v1/earnings_list_v1",
       "permission": "earnings.read",
       "features": [
         "F20"
@@ -2641,10 +2643,12 @@
       "required_features": [
         "F20"
       ],
-      "runtime_required_features": [],
+      "runtime_required_features": [
+        "F20"
+      ],
       "decision_delivery": {
         "accepted_contract": "DS-2026-10-17",
-        "runtime_conformance": "pending",
+        "runtime_conformance": "implemented_auth_edge_rpc_acceptance",
         "open_dependencies": [],
         "target_request": {
           "$ref": "#/$defs/Request_earnings_list"
@@ -4333,8 +4337,8 @@
     },
     {
       "name": "negcredit_valuation_set_v1",
-      "status": "contract_only",
-      "external_path": null,
+      "status": "operational_development_limited",
+      "external_path": "/functions/v1/backend-v1/negcredit_valuation_set_v1",
       "permission": "product.manage",
       "features": [
         "F15",
@@ -4343,10 +4347,12 @@
       "required_features": [
         "F15"
       ],
-      "runtime_required_features": [],
+      "runtime_required_features": [
+        "F15"
+      ],
       "decision_delivery": {
         "accepted_contract": "DS-2026-10-17",
-        "runtime_conformance": "pending",
+        "runtime_conformance": "implemented_auth_edge_rpc_acceptance",
         "open_dependencies": [],
         "target_request": {
           "$ref": "#/$defs/Request_negcredit_valuation_set"
@@ -4614,27 +4620,29 @@
     },
     {
       "name": "management_state_get_v1",
-      "status": "contract_only",
-      "external_path": null,
+      "status": "operational_development_limited",
+      "external_path": "/functions/v1/backend-v1/management_state_get_v1",
       "permission": "management.inspect",
       "features": [],
       "required_features": [],
       "runtime_required_features": [],
       "decision_delivery": {
         "accepted_contract": "DS-2026-10-17",
-        "runtime_conformance": "pending",
+        "runtime_conformance": "implemented_pending_acceptance",
         "open_dependencies": [],
         "target_request": {
           "$ref": "#/$defs/Request_management_state_get"
         }
       },
       "billing_class": "read",
-      "limits": []
+      "limits": [
+        "management_state_get only negcredit_valuation_set selector"
+      ]
     },
     {
       "name": "instructor_agreements_list_v1",
-      "status": "contract_only",
-      "external_path": null,
+      "status": "operational_development_limited",
+      "external_path": "/functions/v1/backend-v1/instructor_agreements_list_v1",
       "permission": "earnings.manage",
       "features": [
         "F20"
@@ -4642,10 +4650,12 @@
       "required_features": [
         "F20"
       ],
-      "runtime_required_features": [],
+      "runtime_required_features": [
+        "F20"
+      ],
       "decision_delivery": {
         "accepted_contract": "DS-2026-10-17",
-        "runtime_conformance": "pending",
+        "runtime_conformance": "implemented_auth_edge_rpc_acceptance",
         "open_dependencies": [],
         "target_request": {
           "$ref": "#/$defs/Request_instructor_agreements_list"
@@ -5031,6 +5041,34 @@
         }
       },
       "billing_class": "read",
+      "limits": []
+    },
+    {
+      "name": "attendance_start_v1",
+      "status": "operational_development_limited",
+      "external_path": "/functions/v1/backend-v1/attendance_start_v1",
+      "permission": "attendance.close",
+      "features": [
+        "F14",
+        "F20"
+      ],
+      "required_features": [
+        "F14"
+      ],
+      "runtime_required_features": [
+        "F14"
+      ],
+      "decision_delivery": {
+        "accepted_contract": "DS-2026-10-17",
+        "runtime_conformance": "implemented_auth_edge_rpc_acceptance",
+        "open_dependencies": [
+          "agreement_versions_and_selection"
+        ],
+        "target_request": {
+          "$ref": "#/$defs/Request_attendance_start"
+        }
+      },
+      "billing_class": "maintenance",
       "limits": []
     }
   ]

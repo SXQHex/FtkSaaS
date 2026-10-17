@@ -182,14 +182,14 @@ test('Starter attendance and protected reservation through Auth -> Edge -> RPC',
   const results=await Promise.all([1,2].map(()=>call(owner,'attendance_close_v1',scope({session_id:ses,expected_version:v.session_version}),key())));
   assert.equal(results.filter(x=>x.result.ok).length,1);assert.equal(results.find(x=>!x.result.ok).result.error.code,'ATTENDANCE_CLOSED');
  });
- await t.test('Pro/Business closure fails explicitly before any rights or financial write',async()=>{
+ await t.test('Pro/Business closure requires explicit occurrence before any rights or financial write',async()=>{
   const p=await linked('paid-boundary-student'),ses=(await makeSession()).primary_id,rv=(await book(ses,p.p)).primary_id;
   await db.query("update core.sessions set starts_at=now()-interval '1 minute',ends_at=now()+interval '59 minutes' where id=$1",[ses]);
   let v=await get(ses);await mut('attendance_mark_v1',{reservation_id:rv,expected_version:v.entries[0].version,result:'attended'});v=await get(ses);
   const sub=(await rows('select id from core.saas_subscriptions where org_id=$1',[org]))[0].id,paid=key();
   await db.query("insert into core.saas_plan_versions(id,name,effective_at,price_minor,currency,period,limits,features) select $1,'pro',now(),price_minor,currency,period,limits,features||array['F20'] from core.saas_plan_versions where id=$2",[paid,plan]);
   await db.query('update core.saas_subscriptions set plan_version_id=$1 where id=$2',[paid,sub]);
-  try{await fail('attendance_close_v1',{session_id:ses,expected_version:v.session_version},'POLICY_NOT_CONFIGURED');assert.equal((await rows('select state from core.credit_deficits where reservation_id=$1',[rv]))[0].state,'reserved');assert.equal((await get(ses)).closure_state,'open');}
+  try{await fail('attendance_close_v1',{session_id:ses,expected_version:v.session_version},'VALIDATION_FAILED');assert.equal((await rows('select state from core.credit_deficits where reservation_id=$1',[rv]))[0].state,'reserved');assert.equal((await get(ses)).closure_state,'open');}
   finally{await db.query('update core.saas_subscriptions set plan_version_id=$1 where id=$2',[plan,sub]);}
  });
 

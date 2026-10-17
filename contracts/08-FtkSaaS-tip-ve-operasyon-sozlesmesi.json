@@ -894,7 +894,8 @@
         "settlement_authority_get_v1",
         "settlement_delegation_set_v1",
         "settlement_authority_set_v1",
-        "negative_limits_get_v1"
+        "negative_limits_get_v1",
+        "attendance_start_v1"
       ]
     },
     "EntityType": {
@@ -3606,6 +3607,16 @@
         },
         "session_version": {
           "$ref": "#/$defs/PositiveInt"
+        },
+        "actual_started_at": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Instant"
+            },
+            {
+              "type": "null"
+            }
+          ]
         }
       },
       "required": [
@@ -3815,7 +3826,8 @@
             "sale_unit",
             "negative_snapshot",
             "agreement_fixed",
-            "event_fee"
+            "event_fee",
+            "lesson_agreement"
           ]
         },
         "sale_id": {
@@ -3909,6 +3921,38 @@
         },
         "basis": {
           "$ref": "#/$defs/EarningBasis"
+        },
+        "center_id": {
+          "$ref": "#/$defs/FtkUuid"
+        },
+        "direction": {
+          "$ref": "#/$defs/EarningDirection"
+        },
+        "previous_id": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/FtkUuid"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "closure_id": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/FtkUuid"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "created_at": {
+          "$ref": "#/$defs/Instant"
+        },
+        "version": {
+          "$ref": "#/$defs/PositiveInt"
         }
       },
       "required": [
@@ -3920,7 +3964,13 @@
         "currency",
         "paid_minor",
         "remaining_minor",
-        "basis"
+        "basis",
+        "center_id",
+        "direction",
+        "previous_id",
+        "closure_id",
+        "created_at",
+        "version"
       ],
       "additionalProperties": false
     },
@@ -10197,6 +10247,16 @@
         },
         "session_id": {
           "$ref": "#/$defs/FtkUuid"
+        },
+        "performed": {
+          "$ref": "#/$defs/Bool"
+        },
+        "performed_instructor_ids": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/FtkUuid"
+          },
+          "uniqueItems": true
         }
       },
       "required": [
@@ -10207,7 +10267,8 @@
         "expected_version",
         "session_id"
       ],
-      "additionalProperties": false
+      "additionalProperties": false,
+      "x-invariant": "Paid closure requires explicit performed and performed_instructor_ids; submitted IDs must be active actual instructor assignments. No clock-only occurrence. Starter remains agreement/earning free."
     },
     "Success_attendance_close": {
       "type": "object",
@@ -10259,10 +10320,20 @@
           "items": {
             "$ref": "#/$defs/AttendanceCorrection"
           },
-          "minItems": 1
+          "minItems": 0
         },
         "reason": {
           "$ref": "#/$defs/Text"
+        },
+        "performed": {
+          "$ref": "#/$defs/Bool"
+        },
+        "performed_instructor_ids": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/FtkUuid"
+          },
+          "uniqueItems": true
         }
       },
       "required": [
@@ -10273,7 +10344,8 @@
         "corrections",
         "reason"
       ],
-      "additionalProperties": false
+      "additionalProperties": false,
+      "x-invariant": "Nonempty attendance corrections or explicit performed+performed_instructor_ids; reason required. Monetary basis/terms remain frozen; only actual performance flags may be corrected within the frozen assignment roster."
     },
     "Success_attendance_correct_preview": {
       "type": "object",
@@ -18042,6 +18114,29 @@
             "inherit",
             "explicit"
           ]
+        },
+        "actual_started_at": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Instant"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "started_agreements": {
+          "anyOf": [
+            {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/LessonStartedAgreement"
+              }
+            },
+            {
+              "type": "null"
+            }
+          ]
         }
       },
       "required": [
@@ -18695,6 +18790,19 @@
               "type": "array",
               "items": {
                 "$ref": "#/$defs/LessonAttendanceEffect"
+              }
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "earnings_snapshot": {
+          "anyOf": [
+            {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/LessonEarningSnapshot"
               }
             },
             {
@@ -19944,6 +20052,26 @@
         },
         "discipline_id": {
           "$ref": "#/$defs/FtkUuid"
+        },
+        "supersedes_id": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/FtkUuid"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "published_at": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Instant"
+            },
+            {
+              "type": "null"
+            }
+          ]
         }
       },
       "required": [
@@ -20036,6 +20164,16 @@
         },
         "direction": {
           "$ref": "#/$defs/EarningDirection"
+        },
+        "closure_id": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/FtkUuid"
+            },
+            {
+              "type": "null"
+            }
+          ]
         }
       },
       "required": [
@@ -24117,7 +24255,7 @@
           "$ref": "#/$defs/SessionFormat"
         },
         "valid": {
-          "$ref": "#/$defs/Interval"
+          "$ref": "#/$defs/AgreementValidity"
         },
         "supersedes_id": {
           "anyOf": [
@@ -24133,7 +24271,14 @@
           "$ref": "#/$defs/PayTerms"
         },
         "published_at": {
-          "$ref": "#/$defs/Instant"
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Instant"
+            },
+            {
+              "type": "null"
+            }
+          ]
         }
       },
       "required": [
@@ -29322,6 +29467,35 @@
               "center_id"
             ]
           }
+        },
+        {
+          "if": {
+            "properties": {
+              "operation": {
+                "const": "attendance_start_v1"
+              }
+            },
+            "required": [
+              "operation"
+            ]
+          },
+          "then": {
+            "properties": {
+              "selector": {
+                "properties": {
+                  "operation": {
+                    "const": "attendance_start_v1"
+                  }
+                }
+              },
+              "org_id": {
+                "$ref": "#/$defs/FtkUuid"
+              }
+            },
+            "required": [
+              "org_id"
+            ]
+          }
         }
       ]
     },
@@ -34451,6 +34625,9 @@
         },
         {
           "$ref": "#/$defs/ManagementProjection_settlement_authority_set_v1"
+        },
+        {
+          "$ref": "#/$defs/ManagementProjection_attendance_start_v1"
         }
       ]
     },
@@ -34602,7 +34779,8 @@
         "settlement_request_withdraw_v1",
         "settlement_request_decide_v1",
         "settlement_delegation_set_v1",
-        "settlement_authority_set_v1"
+        "settlement_authority_set_v1",
+        "attendance_start_v1"
       ]
     },
     "ManagementSelector_account_profile_update_v1": {
@@ -38115,10 +38293,14 @@
           "properties": {
             "discipline_id": {
               "$ref": "#/$defs/FtkUuid"
+            },
+            "format": {
+              "$ref": "#/$defs/SessionFormat"
             }
           },
           "required": [
-            "discipline_id"
+            "discipline_id",
+            "format"
           ],
           "additionalProperties": false
         }
@@ -38919,6 +39101,9 @@
         },
         {
           "$ref": "#/$defs/ManagementSelector_settlement_authority_set_v1"
+        },
+        {
+          "$ref": "#/$defs/ManagementSelector_attendance_start_v1"
         }
       ]
     },
@@ -40010,10 +40195,17 @@
           "$ref": "#/$defs/FtkUuid"
         },
         "name": {
-          "const": "starter"
+          "enum": [
+            "starter",
+            "pro",
+            "business"
+          ]
         },
         "financial_mode": {
-          "const": "starter_no_earning"
+          "enum": [
+            "starter_no_earning",
+            "agreement_earning"
+          ]
         },
         "captured_at": {
           "$ref": "#/$defs/Instant"
@@ -40025,7 +40217,35 @@
         "financial_mode",
         "captured_at"
       ],
-      "additionalProperties": false
+      "additionalProperties": false,
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "name": {
+                "const": "starter"
+              }
+            },
+            "required": [
+              "name"
+            ]
+          },
+          "then": {
+            "properties": {
+              "financial_mode": {
+                "const": "starter_no_earning"
+              }
+            }
+          },
+          "else": {
+            "properties": {
+              "financial_mode": {
+                "const": "agreement_earning"
+              }
+            }
+          }
+        }
+      ]
     },
     "LessonRightTransition": {
       "type": "object",
@@ -40088,6 +40308,279 @@
         "result",
         "policy_snapshot",
         "right"
+      ],
+      "additionalProperties": false
+    },
+    "ExactMinorBasis": {
+      "type": "string",
+      "pattern": "^[0-9]+(\\.[0-9]+)?$",
+      "description": "Exact PostgreSQL numeric intermediate in minor units; never binary floating point."
+    },
+    "LessonEarningParticipant": {
+      "type": "object",
+      "properties": {
+        "reservation_id": {
+          "$ref": "#/$defs/FtkUuid"
+        },
+        "sale_id": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/FtkUuid"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "product_id": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/FtkUuid"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "kind": {
+          "$ref": "#/$defs/EntitlementKind"
+        },
+        "trial": {
+          "$ref": "#/$defs/Bool"
+        },
+        "quantity": {
+          "$ref": "#/$defs/Count"
+        },
+        "unit_minor": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/ExactMinorBasis"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "currency": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Currency"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "negative": {
+          "$ref": "#/$defs/Bool"
+        }
+      },
+      "required": [
+        "reservation_id",
+        "sale_id",
+        "product_id",
+        "kind",
+        "trial",
+        "quantity",
+        "unit_minor",
+        "currency",
+        "negative"
+      ],
+      "additionalProperties": false
+    },
+    "LessonEarningSnapshot": {
+      "type": "object",
+      "properties": {
+        "person_id": {
+          "$ref": "#/$defs/FtkUuid"
+        },
+        "agreement_id": {
+          "$ref": "#/$defs/FtkUuid"
+        },
+        "terms": {
+          "$ref": "#/$defs/PayTerms"
+        },
+        "participants": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/LessonEarningParticipant"
+          }
+        },
+        "format": {
+          "$ref": "#/$defs/SessionFormat"
+        },
+        "performed": {
+          "$ref": "#/$defs/Bool"
+        }
+      },
+      "required": [
+        "person_id",
+        "agreement_id",
+        "terms",
+        "participants",
+        "format",
+        "performed"
+      ],
+      "additionalProperties": false
+    },
+    "AgreementValidity": {
+      "type": "object",
+      "properties": {
+        "starts_at": {
+          "$ref": "#/$defs/Instant"
+        },
+        "ends_at": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Instant"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "starts_at",
+        "ends_at"
+      ],
+      "additionalProperties": false
+    },
+    "LessonStartedAgreement": {
+      "type": "object",
+      "properties": {
+        "person_id": {
+          "$ref": "#/$defs/FtkUuid"
+        },
+        "agreement_id": {
+          "$ref": "#/$defs/FtkUuid"
+        }
+      },
+      "required": [
+        "person_id",
+        "agreement_id"
+      ],
+      "additionalProperties": false
+    },
+    "Request_attendance_start": {
+      "type": "object",
+      "properties": {
+        "client_api_version": {
+          "const": 1
+        },
+        "request_id": {
+          "$ref": "#/$defs/FtkUuid"
+        },
+        "org_id": {
+          "$ref": "#/$defs/FtkUuid"
+        },
+        "center_id": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/FtkUuid"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "operation_key": {
+          "$ref": "#/$defs/FtkUuid"
+        },
+        "expected_version": {
+          "$ref": "#/$defs/PositiveInt"
+        },
+        "session_id": {
+          "$ref": "#/$defs/FtkUuid"
+        },
+        "actual_started_at": {
+          "$ref": "#/$defs/Instant"
+        },
+        "reason": {
+          "$ref": "#/$defs/Text"
+        }
+      },
+      "required": [
+        "client_api_version",
+        "request_id",
+        "org_id",
+        "operation_key",
+        "expected_version",
+        "session_id",
+        "actual_started_at",
+        "reason"
+      ],
+      "additionalProperties": false,
+      "x-invariant": "Explicit real start fact; no future time or repeat start. Current session version and live attendance-close authority. Historical published agreement IDs pinned at the stated fact time."
+    },
+    "Success_attendance_start": {
+      "type": "object",
+      "properties": {
+        "ok": {
+          "const": true
+        },
+        "data": {
+          "$ref": "#/$defs/Mutation"
+        },
+        "trace_id": {
+          "$ref": "#/$defs/FtkUuid"
+        }
+      },
+      "required": [
+        "ok",
+        "data",
+        "trace_id"
+      ],
+      "additionalProperties": false
+    },
+    "ManagementSelector_attendance_start_v1": {
+      "type": "object",
+      "properties": {
+        "operation": {
+          "const": "attendance_start_v1"
+        },
+        "key": {
+          "type": "object",
+          "properties": {
+            "session_id": {
+              "$ref": "#/$defs/FtkUuid"
+            }
+          },
+          "required": [
+            "session_id"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "required": [
+        "operation",
+        "key"
+      ],
+      "additionalProperties": false
+    },
+    "ManagementProjection_attendance_start_v1": {
+      "type": "object",
+      "properties": {
+        "operation": {
+          "const": "attendance_start_v1"
+        },
+        "values": {
+          "type": "object",
+          "properties": {
+            "session_id": {
+              "$ref": "#/$defs/FtkUuid"
+            },
+            "actual_started_at": {
+              "$ref": "#/$defs/Instant"
+            }
+          },
+          "required": [],
+          "additionalProperties": false
+        }
+      },
+      "required": [
+        "operation",
+        "values"
       ],
       "additionalProperties": false
     }
@@ -41208,7 +41701,7 @@
             "same_tenant": true
           }
         ],
-        "invariants": "Published terms immutable. DS target: explicit supersedes chain, inclusive effective boundary, no independent overlapping branch; started snapshots preserved, closed earnings linked corrections only. Chain storage/migration pending."
+        "invariants": "Immutable published terms with explicit same-scope supersedes chain; one successor; inclusive effective start; no independent overlap; started assignments pinned. Linked closure snapshots never repriced."
       },
       {
         "name": "earnings",
@@ -53884,11 +54377,13 @@
           "D-A12"
         ],
         "configuration_policy": "numeric plan limits/prices and legal approval are deployment configuration, never arbitrary allow/deny",
-        "implementation_status": "contract_only",
+        "implementation_status": "operational_development_limited",
         "required_features": [
           "F20"
         ],
-        "runtime_required_features": [],
+        "runtime_required_features": [
+          "F20"
+        ],
         "conditional_features": [],
         "operation_contract": {
           "kind": "command",
@@ -53901,19 +54396,24 @@
             "future_unstarted_assignment_selection"
           ],
           "business_commit": true,
-          "read_path_status": "contract_only",
+          "read_path_status": "implemented",
           "source_decision": "DS-2026-10-17"
         },
         "decision_delivery": {
           "accepted_contract": "DS-2026-10-17",
-          "runtime_conformance": "pending",
+          "runtime_conformance": "implemented_auth_edge_rpc_acceptance",
           "open_dependencies": [
             "agreement_versions_and_selection"
           ],
           "target_request": {
             "$ref": "#/$defs/Request_instructor_agreement_publish"
           }
-        }
+        },
+        "runtime_path": "/functions/v1/backend-v1/instructor_agreement_publish_v1",
+        "runtime_external_path": "/functions/v1/backend-v1/instructor_agreement_publish_v1",
+        "runtime_rpc": "api_v1.instructor_agreement_publish_v1",
+        "runtime_transport": "authenticated Edge adapter -> service-only RPC; rules/transaction in PostgreSQL",
+        "runtime_limits": []
       },
       {
         "name": "earnings_list_v1",
@@ -53981,11 +54481,13 @@
           "A55"
         ],
         "configuration_policy": "numeric plan limits/prices and legal approval are deployment configuration, never arbitrary allow/deny",
-        "implementation_status": "contract_only",
+        "implementation_status": "operational_development_limited",
         "required_features": [
           "F20"
         ],
-        "runtime_required_features": [],
+        "runtime_required_features": [
+          "F20"
+        ],
         "conditional_features": [],
         "operation_contract": {
           "kind": "read",
@@ -53995,17 +54497,22 @@
           "read_operation": null,
           "atomic_effects": [],
           "business_commit": false,
-          "read_path_status": "contract_only",
+          "read_path_status": "operational_development_limited",
           "source_decision": "DS-2026-10-17"
         },
         "decision_delivery": {
           "accepted_contract": "DS-2026-10-17",
-          "runtime_conformance": "pending",
+          "runtime_conformance": "implemented_auth_edge_rpc_acceptance",
           "open_dependencies": [],
           "target_request": {
             "$ref": "#/$defs/Request_earnings_list"
           }
-        }
+        },
+        "runtime_path": "/functions/v1/backend-v1/earnings_list_v1",
+        "runtime_external_path": "/functions/v1/backend-v1/earnings_list_v1",
+        "runtime_rpc": "api_v1.earnings_list_v1",
+        "runtime_transport": "authenticated Edge adapter -> service-only RPC; rules/transaction in PostgreSQL",
+        "runtime_limits": []
       },
       {
         "name": "instructor_payment_record_v1",
@@ -61807,11 +62314,13 @@
           "D-A12"
         ],
         "configuration_policy": "numeric plan limits/prices and legal approval are deployment configuration, never arbitrary allow/deny",
-        "implementation_status": "contract_only",
+        "implementation_status": "operational_development_limited",
         "required_features": [
           "F15"
         ],
-        "runtime_required_features": [],
+        "runtime_required_features": [
+          "F15"
+        ],
         "conditional_features": [
           {
             "feature": "F20",
@@ -61831,17 +62340,22 @@
             "future_reservation_snapshots_only"
           ],
           "business_commit": true,
-          "read_path_status": "contract_only",
+          "read_path_status": "implemented",
           "source_decision": "DS-2026-10-17"
         },
         "decision_delivery": {
           "accepted_contract": "DS-2026-10-17",
-          "runtime_conformance": "pending",
+          "runtime_conformance": "implemented_auth_edge_rpc_acceptance",
           "open_dependencies": [],
           "target_request": {
             "$ref": "#/$defs/Request_negcredit_valuation_set"
           }
-        }
+        },
+        "runtime_path": "/functions/v1/backend-v1/negcredit_valuation_set_v1",
+        "runtime_external_path": "/functions/v1/backend-v1/negcredit_valuation_set_v1",
+        "runtime_rpc": "api_v1.negcredit_valuation_set_v1",
+        "runtime_transport": "authenticated Edge adapter -> service-only RPC; rules/transaction in PostgreSQL",
+        "runtime_limits": []
       },
       {
         "name": "disciplines_list_v1",
@@ -63030,7 +63544,7 @@
           "DS-08"
         ],
         "configuration_policy": "No implicit fee/rate or arbitrary limit. Accepted DS-2026-10-17.",
-        "implementation_status": "contract_only",
+        "implementation_status": "operational_development_limited",
         "transaction_guarantee": "Read authorized management_state_get projection only; no domain/rights/earning/settlement/receipt mutation.",
         "operation_contract": {
           "kind": "read",
@@ -63040,17 +63554,27 @@
           "read_operation": null,
           "atomic_effects": [],
           "business_commit": false,
-          "read_path_status": "contract_only",
+          "read_path_status": "operational_development_limited",
           "source_decision": "DS-2026-10-17"
         },
         "decision_delivery": {
           "accepted_contract": "DS-2026-10-17",
-          "runtime_conformance": "pending",
+          "runtime_conformance": "implemented_pending_acceptance",
           "open_dependencies": [],
           "target_request": {
             "$ref": "#/$defs/Request_management_state_get"
           }
-        }
+        },
+        "runtime_path": "/functions/v1/backend-v1/management_state_get_v1",
+        "runtime_external_path": "/functions/v1/backend-v1/management_state_get_v1",
+        "runtime_rpc": "api_v1.management_state_get_v1",
+        "runtime_transport": "authenticated Edge adapter -> service-only RPC; rules/transaction in PostgreSQL",
+        "runtime_limits": [
+          "management_state_get only negcredit_valuation_set selector"
+        ],
+        "runtime_selectors": [
+          "negcredit_valuation_set_v1"
+        ]
       },
       {
         "name": "instructor_agreements_list_v1",
@@ -63061,7 +63585,9 @@
         "required_features": [
           "F20"
         ],
-        "runtime_required_features": [],
+        "runtime_required_features": [
+          "F20"
+        ],
         "conditional_features": [],
         "permission": "earnings.manage",
         "actor_source": "server_verified",
@@ -63123,7 +63649,7 @@
           "DS-08"
         ],
         "configuration_policy": "No implicit fee/rate or arbitrary limit. Accepted DS-2026-10-17.",
-        "implementation_status": "contract_only",
+        "implementation_status": "operational_development_limited",
         "transaction_guarantee": "Read authorized instructor_agreements_list projection only; no domain/rights/earning/settlement/receipt mutation.",
         "operation_contract": {
           "kind": "read",
@@ -63133,17 +63659,22 @@
           "read_operation": null,
           "atomic_effects": [],
           "business_commit": false,
-          "read_path_status": "contract_only",
+          "read_path_status": "operational_development_limited",
           "source_decision": "DS-2026-10-17"
         },
         "decision_delivery": {
           "accepted_contract": "DS-2026-10-17",
-          "runtime_conformance": "pending",
+          "runtime_conformance": "implemented_auth_edge_rpc_acceptance",
           "open_dependencies": [],
           "target_request": {
             "$ref": "#/$defs/Request_instructor_agreements_list"
           }
-        }
+        },
+        "runtime_path": "/functions/v1/backend-v1/instructor_agreements_list_v1",
+        "runtime_external_path": "/functions/v1/backend-v1/instructor_agreements_list_v1",
+        "runtime_rpc": "api_v1.instructor_agreements_list_v1",
+        "runtime_transport": "authenticated Edge adapter -> service-only RPC; rules/transaction in PostgreSQL",
+        "runtime_limits": []
       },
       {
         "name": "reservation_impact_preview_v1",
@@ -64694,6 +65225,141 @@
         "runtime_external_path": "/functions/v1/backend-v1/negative_limits_get_v1",
         "runtime_rpc": "api_v1.negative_limits_get_v1",
         "runtime_limits": []
+      },
+      {
+        "name": "attendance_start_v1",
+        "module": "M05",
+        "features": [
+          "F14",
+          "F20"
+        ],
+        "permission": "attendance.close",
+        "actor_source": "server_verified",
+        "transport": "W",
+        "billing_class": "maintenance",
+        "request": {
+          "$ref": "#/$defs/Request_attendance_start"
+        },
+        "success": {
+          "$ref": "#/$defs/Success_attendance_start"
+        },
+        "errors": [
+          "ATTENDANCE_CLOSED",
+          "ATTENDANCE_INCOMPLETE",
+          "AUTH_REQUIRED",
+          "BILLING_OPERATION_RESTRICTED",
+          "CLIENT_UPDATE_REQUIRED",
+          "FORBIDDEN",
+          "IDEMPOTENCY_PAYLOAD_MISMATCH",
+          "INTEGRITY_VIOLATION",
+          "NOT_FOUND",
+          "OPERATION_IN_PROGRESS",
+          "OPERATION_RESULT_EXPIRED",
+          "PARTICIPATION_BLOCKED",
+          "PLAN_FEATURE_UNAVAILABLE",
+          "PLAN_LIMIT_REACHED",
+          "POLICY_NOT_CONFIGURED",
+          "SERVICE_UNAVAILABLE",
+          "SESSION_REVOKED",
+          "SUBSCRIPTION_NOT_STARTED",
+          "TEMPORARY_FAILURE",
+          "VALIDATION_FAILED",
+          "VERSION_CONFLICT"
+        ],
+        "transaction_class": "single",
+        "transaction_guarantee": "Explicit start fact and frozen agreement identities; audit/outbox/receipt atomic. No attendance close, right consumption or earning.",
+        "transition": {
+          "effect": "explicit_start_fact_only",
+          "from": [
+            "planned"
+          ],
+          "to": [
+            "planned"
+          ]
+        },
+        "semantic_guards": [
+          "live_actor_and_scope",
+          "same_key_same_payload_replay",
+          "receipt_audit_outbox_atomic_domain_commit",
+          "required_feature_gates_separate_from_references",
+          "explicit_actual_start_no_clock_inference",
+          "historically_known_immutable_agreements"
+        ],
+        "audit": true,
+        "notification": "outbox_if_user_visible_business_result",
+        "concurrency": "Live original permission/tenant scope on every request; target/aggregate lock; row_version; idempotent receipt and all declared effects rollback together",
+        "expected_version_subject": "sessions",
+        "acceptance_scenario_ids": [
+          "A01",
+          "A02",
+          "A03",
+          "A13",
+          "A14",
+          "A15",
+          "A16",
+          "A23",
+          "A24",
+          "A25",
+          "A28",
+          "A29",
+          "A30",
+          "A31",
+          "A46",
+          "A47",
+          "A51",
+          "A52",
+          "A53",
+          "A54",
+          "A55",
+          "D-A02",
+          "D-A07",
+          "D-A09",
+          "D-A12"
+        ],
+        "configuration_policy": "numeric plan limits/prices and legal approval are deployment configuration, never arbitrary allow/deny",
+        "implementation_status": "operational_development_limited",
+        "required_features": [
+          "F14"
+        ],
+        "runtime_required_features": [
+          "F14"
+        ],
+        "conditional_features": [
+          {
+            "feature": "F20",
+            "when": "produce_or_read_paid_instructor_earning",
+            "mode": "only_if_plan_has_feature"
+          }
+        ],
+        "operation_contract": {
+          "kind": "command",
+          "target_entity": "sessions",
+          "version_mode": "row_version",
+          "version_field": "session_id",
+          "read_operation": "attendance_get_v1",
+          "atomic_effects": [
+            "sessions.actual_started_at",
+            "sessions.started_agreements"
+          ],
+          "business_commit": true,
+          "read_path_status": "implemented",
+          "source_decision": "DS-2026-10-17"
+        },
+        "decision_delivery": {
+          "accepted_contract": "DS-2026-10-17",
+          "runtime_conformance": "implemented_auth_edge_rpc_acceptance",
+          "open_dependencies": [
+            "agreement_versions_and_selection"
+          ],
+          "target_request": {
+            "$ref": "#/$defs/Request_attendance_start"
+          }
+        },
+        "runtime_transport": "authenticated Edge adapter -> service-only RPC; rules/transaction in PostgreSQL",
+        "runtime_path": "/functions/v1/backend-v1/attendance_start_v1",
+        "runtime_external_path": "/functions/v1/backend-v1/attendance_start_v1",
+        "runtime_rpc": "api_v1.attendance_start_v1",
+        "runtime_limits": []
       }
     ],
     "policy_value_map": {
@@ -65372,6 +66038,24 @@
       },
       {
         "path": "#/$defs/EarningView/properties/event_assignment_id/anyOf/0",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/EarningView/properties/center_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/EarningView/properties/previous_id/anyOf/0",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/EarningView/properties/closure_id/anyOf/0",
         "origin": "ftksaas",
         "acceptance": "generic_uuid",
         "generation": "uuidv7"
@@ -67759,6 +68443,12 @@
         "generation": "uuidv7"
       },
       {
+        "path": "#/$defs/Request_attendance_close/properties/performed_instructor_ids/items",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
         "path": "#/$defs/Success_attendance_close/properties/trace_id",
         "origin": "ftksaas",
         "acceptance": "generic_uuid",
@@ -67784,6 +68474,12 @@
       },
       {
         "path": "#/$defs/Request_attendance_correct_preview/properties/session_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Request_attendance_correct_preview/properties/performed_instructor_ids/items",
         "origin": "ftksaas",
         "acceptance": "generic_uuid",
         "generation": "uuidv7"
@@ -72685,6 +73381,12 @@
         "generation": "uuidv7"
       },
       {
+        "path": "#/$defs/Table_instructor_agreements/properties/supersedes_id/anyOf/0",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
         "path": "#/$defs/Table_earnings/properties/id",
         "origin": "ftksaas",
         "acceptance": "generic_uuid",
@@ -72734,6 +73436,12 @@
       },
       {
         "path": "#/$defs/Table_earnings/properties/operation_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Table_earnings/properties/closure_id/anyOf/0",
         "origin": "ftksaas",
         "acceptance": "generic_uuid",
         "generation": "uuidv7"
@@ -75475,6 +76183,12 @@
         "generation": "uuidv7"
       },
       {
+        "path": "#/$defs/Request_management_state_get/allOf/146/then/properties/org_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
         "path": "#/$defs/Success_management_state_get/properties/trace_id",
         "origin": "ftksaas",
         "acceptance": "generic_uuid",
@@ -78035,6 +78749,96 @@
         "origin": "ftksaas",
         "acceptance": "generic_uuid",
         "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/LessonEarningParticipant/properties/reservation_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/LessonEarningParticipant/properties/sale_id/anyOf/0",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/LessonEarningParticipant/properties/product_id/anyOf/0",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/LessonEarningSnapshot/properties/person_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/LessonEarningSnapshot/properties/agreement_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/LessonStartedAgreement/properties/person_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/LessonStartedAgreement/properties/agreement_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Request_attendance_start/properties/request_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Request_attendance_start/properties/org_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Request_attendance_start/properties/center_id/anyOf/0",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Request_attendance_start/properties/operation_key",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Request_attendance_start/properties/session_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Success_attendance_start/properties/trace_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/ManagementSelector_attendance_start_v1/properties/key/properties/session_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/ManagementProjection_attendance_start_v1/properties/values/properties/session_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
       }
     ],
     "open_product_decisions": [],
@@ -78216,14 +79020,30 @@
         "session_change_apply_v1",
         "session_capacity_set_v1",
         "session_assignment_set_v1",
-        "class_assignment_set_v1"
+        "class_assignment_set_v1",
+        "reservation_impact_preview_v1",
+        "reservation_impact_apply_v1",
+        "negative_limit_set_v1",
+        "negative_limits_get_v1",
+        "attendance_get_v1",
+        "attendance_mark_v1",
+        "attendance_block_v1",
+        "attendance_close_v1",
+        "attendance_correct_preview_v1",
+        "attendance_correct_apply_v1",
+        "instructor_agreement_publish_v1",
+        "instructor_agreements_list_v1",
+        "earnings_list_v1",
+        "negcredit_valuation_set_v1",
+        "management_state_get_v1",
+        "attendance_start_v1"
       ],
       "auth": "Supabase getUser + live auth.sessions + current account/link/role; no request actor claims",
       "uuid": "backend uuid@14.0.3 v7 for all inserted IDs; DB defaults not required",
       "external_transport": "POST /functions/v1/backend-v1/{operation}; direct typed request body",
       "internal_rpc": "service-only api_v1 named functions; actor/session/UUID bank supplied by verified gateway",
-      "migration_count": 25,
-      "test_evidence": "reports/decision-sprint-verification.json; final PR head CI checked separately; DS business acceptance pending",
+      "migration_count": 28,
+      "test_evidence": "tests/instructor-earnings.test.mjs; reports/instructor-earnings-verification.json; final head/main CI checked separately",
       "frontend_unchanged": true
     },
     "decision_sprint": {
@@ -78231,8 +79051,6 @@
       "source": "docs/decisions/DS-2026-10-17.md",
       "baseline_operation_count": 184,
       "new_contract_only_operations": [
-        "management_state_get_v1",
-        "instructor_agreements_list_v1",
         "settlement_movements_list_v1",
         "settlement_requests_list_v1",
         "settlement_request_get_v1",
@@ -78323,8 +79141,14 @@
             "session_assignment_set_v1",
             "attendance_close_v1"
           ],
-          "status": "pending_runtime_and_auth_edge_rpc_acceptance",
-          "evidence": [],
+          "status": "passed_runtime",
+          "evidence": [
+            "tests/starter-attendance-protection.test.mjs#Starter creates class/program with instructor and no pay agreement",
+            "tests/starter-attendance-protection.test.mjs#draft does not consume; closure and reasoned correction consume/release atomically",
+            "tests/starter-attendance-protection.test.mjs#package-backed closure and correction use the same entitlement ledger",
+            "tests/instructor-earnings.test.mjs#immutable publication and management read use original live authority",
+            "tests/instructor-earnings.test.mjs#Pro uses the explicit agreement path with the same atomic right and earning result"
+          ],
           "acceptance_kind": "real_auth_edge_rpc"
         },
         {
@@ -78350,10 +79174,22 @@
             "instructor_agreement_publish_v1",
             "session_change_apply_v1",
             "session_assignment_set_v1",
-            "attendance_close_v1"
+            "attendance_close_v1",
+            "attendance_start_v1"
           ],
-          "status": "pending_runtime_and_auth_edge_rpc_acceptance",
-          "evidence": [],
+          "status": "passed_runtime",
+          "evidence": [
+            "tests/instructor-earnings.test.mjs#explicit early start pins historically published terms and blocks later schedule edits",
+            "tests/instructor-earnings.test.mjs#started assignments retain old agreement while future sessions select the successor",
+            "tests/instructor-earnings.test.mjs#late start evidence excludes a replacement published after the stated real start",
+            "tests/instructor-earnings.test.mjs#reasoned correction previews and appends a linked difference from the frozen original agreement",
+            "tests/instructor-earnings.test.mjs#late outbox failure rolls back linked correction, earning, rights, audit and receipt",
+            "tests/instructor-earnings.test.mjs#missing occurrence declaration cannot create a paid closure; explicitly unperformed creates no earning",
+            "tests/instructor-earnings.test.mjs#same product override covers old and new sale versions without catalog repricing",
+            "tests/instructor-earnings.test.mjs#immutable publication and management read use original live authority",
+            "tests/instructor-earnings.test.mjs#package identity override replaces variable conditions; fixed fee occurs once; cash is not required",
+            "tests/instructor-earnings.test.mjs#negative valuation writer is versioned, read by format, and frozen at reservation"
+          ],
           "acceptance_kind": "real_auth_edge_rpc"
         },
         {
@@ -78419,9 +79255,12 @@
           "id": "DS-PLAN-02",
           "delivery_gap": "starter_plan_and_earning_split",
           "expected_flow": "Pro/Business paid assignment requires valid explicit agreement; no automatic zero/default fee.",
-          "status": "pending_runtime",
+          "status": "passed_runtime",
           "evidence_kind": "real_auth_edge_rpc",
-          "evidence": []
+          "evidence": [
+            "tests/instructor-earnings.test.mjs#immutable publication and management read use original live authority",
+            "tests/instructor-earnings.test.mjs#Pro uses the explicit agreement path with the same atomic right and earning result"
+          ]
         },
         {
           "id": "DS-PROT-01",
@@ -78467,41 +79306,56 @@
           "id": "DS-AGR-01",
           "delivery_gap": "agreement_versions_and_selection",
           "expected_flow": "Immutable replacement chain applies at inclusive effective boundary only to unstarted qualifying sessions; already started open session keeps old pinned agreement.",
-          "status": "pending_runtime",
+          "status": "passed_runtime",
           "evidence_kind": "real_auth_edge_rpc",
-          "evidence": []
+          "evidence": [
+            "tests/instructor-earnings.test.mjs#explicit early start pins historically published terms and blocks later schedule edits",
+            "tests/instructor-earnings.test.mjs#started assignments retain old agreement while future sessions select the successor",
+            "tests/instructor-earnings.test.mjs#late start evidence excludes a replacement published after the stated real start"
+          ]
         },
         {
           "id": "DS-AGR-02",
           "delivery_gap": "agreement_versions_and_selection",
           "expected_flow": "Closed earning never repriced; correction is linked difference/reversal preserving prior payment.",
-          "status": "pending_runtime",
+          "status": "passed_runtime",
           "evidence_kind": "real_auth_edge_rpc",
-          "evidence": []
+          "evidence": [
+            "tests/instructor-earnings.test.mjs#reasoned correction previews and appends a linked difference from the frozen original agreement",
+            "tests/instructor-earnings.test.mjs#late outbox failure rolls back linked correction, earning, rights, audit and receipt",
+            "tests/instructor-earnings.test.mjs#missing occurrence declaration cannot create a paid closure; explicitly unperformed creates no earning"
+          ]
         },
         {
           "id": "DS-AGR-03",
           "delivery_gap": "agreement_versions_and_selection",
           "expected_flow": "Product identity override replaces general matching component across old/new sales according to agreement effective rule; source actual sale price retained.",
-          "status": "pending_runtime",
+          "status": "passed_runtime",
           "evidence_kind": "real_auth_edge_rpc",
-          "evidence": []
+          "evidence": [
+            "tests/instructor-earnings.test.mjs#same product override covers old and new sale versions without catalog repricing"
+          ]
         },
         {
           "id": "DS-AGR-04",
           "delivery_gap": "agreement_versions_and_selection",
           "expected_flow": "Multiple packages/participants never multiply session fixed fee; variable components explicit, nonambiguous and not duplicated.",
-          "status": "pending_runtime",
+          "status": "passed_runtime",
           "evidence_kind": "real_auth_edge_rpc",
-          "evidence": []
+          "evidence": [
+            "tests/instructor-earnings.test.mjs#immutable publication and management read use original live authority",
+            "tests/instructor-earnings.test.mjs#package identity override replaces variable conditions; fixed fee occurs once; cash is not required"
+          ]
         },
         {
           "id": "DS-AGR-05",
           "delivery_gap": "agreement_versions_and_selection",
           "expected_flow": "Source-less authorized negative attendance uses general agreement plus reservation-frozen valuation; later package cannot reprice historical teacher earning.",
-          "status": "pending_runtime",
+          "status": "passed_runtime",
           "evidence_kind": "real_auth_edge_rpc",
-          "evidence": []
+          "evidence": [
+            "tests/instructor-earnings.test.mjs#negative valuation writer is versioned, read by format, and frozen at reservation"
+          ]
         },
         {
           "id": "DS-SET-01",
@@ -78758,7 +79612,8 @@
         "settlement_authority_get_v1",
         "settlement_delegation_set_v1",
         "settlement_authority_set_v1",
-        "negative_limits_get_v1"
+        "negative_limits_get_v1",
+        "attendance_start_v1"
       ],
       "runtime_deliveries": {
         "starter_attendance_protection": {
@@ -79465,7 +80320,8 @@
           "attendance_correct_preview_v1",
           "attendance_correct_apply_v1",
           "class_assignment_set_v1",
-          "attendance_block_v1"
+          "attendance_block_v1",
+          "attendance_start_v1"
         ],
         "dependencies": [
           "agreement_versions_and_selection",
@@ -79485,7 +80341,8 @@
           "attendance_correct_preview_v1",
           "attendance_correct_apply_v1",
           "class_assignment_set_v1",
-          "attendance_block_v1"
+          "attendance_block_v1",
+          "attendance_start_v1"
         ],
         "contract_only_operations": [
           "session_cancel_preview_v1",
@@ -79557,6 +80414,7 @@
           "sale_apply_v1",
           "entitlements_get_v1",
           "negative_limit_set_v1",
+          "negcredit_valuation_set_v1",
           "reservation_impact_preview_v1",
           "reservation_impact_apply_v1",
           "negative_limits_get_v1"
@@ -79568,8 +80426,7 @@
           "sale_terminate_preview_v1",
           "sale_terminate_apply_v1",
           "sale_renew_preview_v1",
-          "sale_renew_apply_v1",
-          "negcredit_valuation_set_v1"
+          "sale_renew_apply_v1"
         ],
         "acceptance_case_ids": [
           "DS-PROT-01",
@@ -79924,7 +80781,8 @@
           "event_duty_verify_v1",
           "attendance_block_v1",
           "negcredit_valuation_set_v1",
-          "instructor_agreements_list_v1"
+          "instructor_agreements_list_v1",
+          "attendance_start_v1"
         ],
         "dependencies": [
           "starter_plan_and_earning_split",
@@ -79939,16 +80797,17 @@
           "attendance_close_v1",
           "attendance_correct_preview_v1",
           "attendance_correct_apply_v1",
-          "event_duty_verify_v1",
-          "attendance_block_v1"
-        ],
-        "contract_only_operations": [
           "instructor_agreement_publish_v1",
           "earnings_list_v1",
-          "instructor_payment_record_v1",
-          "instructor_payment_correct_v1",
+          "event_duty_verify_v1",
+          "attendance_block_v1",
           "negcredit_valuation_set_v1",
-          "instructor_agreements_list_v1"
+          "instructor_agreements_list_v1",
+          "attendance_start_v1"
+        ],
+        "contract_only_operations": [
+          "instructor_payment_record_v1",
+          "instructor_payment_correct_v1"
         ],
         "acceptance_case_ids": [
           "DS-PLAN-01",

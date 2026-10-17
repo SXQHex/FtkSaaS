@@ -199,4 +199,5 @@ export interface Operations {
   settlement_delegation_set_v1: {request: T.RequestSettlementDelegationSet; response: T.SuccessSettlementDelegationSet};
   settlement_authority_set_v1: {request: T.RequestSettlementAuthoritySet; response: T.SuccessSettlementAuthoritySet};
   negative_limits_get_v1: {request: T.RequestNegativeLimitsGet; response: T.SuccessNegativeLimitsGet};
+  attendance_start_v1: {request: T.RequestAttendanceStart; response: T.SuccessAttendanceStart};
 }
