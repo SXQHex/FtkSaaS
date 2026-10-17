@@ -1,0 +1,127 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import fs from 'node:fs';
+import Ajv from 'ajv/dist/2020.js';
+import addFormats from 'ajv-formats';
+import {validateGovernance,validateAppliedGates,validateProductMatrix} from '../scripts/governance.mjs';
+import {newUuidV7} from '../scripts/uuid.mjs';
+
+const original=JSON.parse(fs.readFileSync('contracts/08-FtkSaaS-tip-ve-operasyon-sozlesmesi.json'));
+const live=JSON.parse(fs.readFileSync('supabase/functions/backend-v1/implemented.json')).operations;
+const op=(p,n)=>p['x-contract'].operations.find(o=>o.name===n);
+const ds=p=>p['x-contract'].decision_sprint;
+test('contract governance validates current target, not future runtime behavior',()=>assert.equal(validateGovernance(original,live).decision_behavior_acceptance,'pending'));
+const mutations=[
+ ['missing operation enum name',p=>p.$defs.OperationName.enum.pop()],
+ ['duplicate operation enum name',p=>p.$defs.OperationName.enum.push(p.$defs.OperationName.enum[0])],
+ ['status accepts free operation text',p=>p.$defs.Request_operation_status_get.properties.operation={$ref:'#/$defs/Text'}],
+ ['audit accepts free action text',p=>p.$defs.AuditView.properties.action={$ref:'#/$defs/Text'}],
+ ['unknown operation permission',p=>op(p,'attendance_close_v1').permission='invented.permission'],
+ ['Starter F14 removed',p=>p['x-contract'].feature_delivery.F14.plans.starter=false],
+ ['Starter F20 incorrectly enabled',p=>p['x-contract'].feature_delivery.F20.plans.starter=true],
+ ['Starter close requires F20',p=>op(p,'attendance_close_v1').required_features.push('F20')],
+ ['read runs closure preconditions',p=>op(p,'attendance_get_v1').semantic_guards.push('all_non_cancelled_results_complete')],
+ ['read advertises ledger mutation',p=>op(p,'calendar_get_v1').operation_contract.atomic_effects=['rights.consume']],
+ ['preview advertises business commit',p=>op(p,'program_preview_v1').operation_contract.business_commit=true],
+ ['draft consumes rights',p=>op(p,'attendance_mark_v1').operation_contract.atomic_effects.push('rights.consume')],
+ ['closure lacks rights effects',p=>op(p,'attendance_close_v1').operation_contract.atomic_effects=[]],
+ ['write lacks current-state reader',p=>op(p,'negative_limit_set_v1').operation_contract.read_operation='missing_get_v1'],
+ ['row version points at unknown input',p=>op(p,'session_capacity_set_v1').operation_contract.version_field='invented_id'],
+ ['current-state read falsely claimed live',p=>op(p,'negative_limit_set_v1').operation_contract.read_path_status='implemented'],
+ ['unknown feature reference',p=>op(p,'sale_apply_v1').features.push('F99')],
+ ['missing F33 trace',p=>delete p['x-contract'].feature_delivery.F33],
+ ['operation count treated as feature completion',p=>p['x-contract'].feature_delivery.F14.acceptance='complete'],
+ ['protected reservation blocked at closure',p=>ds(p).protected_reservations.preserve_participation_closure_earning=false],
+ ['preserved obligation wiped',p=>ds(p).protected_reservations.retain_obligation=false],
+ ['independent conflict bypassed',p=>ds(p).protected_reservations.independent_conflicts_preserved=false],
+ ['cash mints credit',p=>ds(p).protected_reservations.cash_mints_credit=true],
+ ['closed earnings repriced',p=>ds(p).agreements.closed_earning_reprice=true],
+ ['package override adds instead of replaces',p=>ds(p).agreements.product_identity_override_replaces_general=false],
+ ['session fixed counted repeatedly',p=>ds(p).agreements.session_fixed_once=false],
+ ['effective boundary excludes equality',p=>ds(p).agreements.effective_start_inclusive=false],
+ ['started agreement mutable',p=>ds(p).agreements.started_session_pinned=false],
+ ['settlement waits for collection',p=>ds(p).settlement_rules.cash_payment_required=true],
+ ['timed package transfers price',p=>ds(p).settlement_rules.timed_transfer=true],
+ ['late deficit settlement reprices teacher',p=>ds(p).settlement_rules.late_negative_earning_reprice=true],
+ ['initiator approves own request',p=>ds(p).settlement_rules.self_approval=true],
+ ['approval closes balance',p=>ds(p).settlement_rules.approval_is_payment=true],
+ ['unrelated lessons stale settlement approval',p=>ds(p).settlement_rules.dependency_scope='whole_org_hash'],
+ ['offset loses paired atomicity',p=>ds(p).settlement_rules.offset='one_side_first'],
+ ['payment allowed by ordinary center role',p=>op(p,'settlement_payment_record_v1').permission='center.manage'],
+ ['old sale scope silently follows catalog',p=>ds(p).sale_scope.catalog_new_sales_only=false],
+ ['backdate creates past attendance',p=>ds(p).sale_scope.retro_reservation_attendance_earning=true],
+ ['missing runtime declared accepted',p=>ds(p).delivery_gaps[0].status='passed'],
+ ['contract test offered as behavior evidence',p=>ds(p).delivery_gaps[0].evidence=['tests/governance.test.mjs']],
+ ['undefined authority grantor silently closed',p=>ds(p).open_product_choices=[]]
+];
+for(const [name,mutate] of mutations)test('contract mutation rejected: '+name,()=>{const p=structuredClone(original);mutate(p);assert.throws(()=>validateGovernance(p,live));});
+const a=new Ajv({strict:false,allErrors:true});addFormats(a);a.addSchema(original,'contract');
+const valid=(n,v)=>a.getSchema('contract#/$defs/'+n)(v);
+const id=newUuidV7(),other=newUuidV7();
+test('typed OperationName accepts all registered API names and rejects unsuffixed/unknown values',()=>{
+ for(const o of original['x-contract'].operations)assert(valid('OperationName',o.name));
+ assert(!valid('OperationName','attendance_close'));assert(!valid('OperationName','unknown_v1'));
+});
+test('agreement replacement DTO requires an explicit predecessor version, creation does not',()=>{
+ const r={client_api_version:1,request_id:id,org_id:id,center_id:id,operation_key:id,person_id:id,discipline_id:id,format:'group',valid:{starts_at:'2027-01-01T00:00:00Z',ends_at:'2027-02-01T00:00:00Z'},reason:'Explicit new terms',terms:{model:'session_fixed',currency:'TRY',components:[{kind:'session_fixed',amount_minor:'100'}],room_fee:{kind:'free',order:'before_instructor_share'}}};
+ assert(valid('Request_instructor_agreement_publish',r));
+ assert(!valid('Request_instructor_agreement_publish',{...r,expected_version:1}));
+ assert(!valid('Request_instructor_agreement_publish',{...r,supersedes_id:other}));
+ assert(valid('Request_instructor_agreement_publish',{...r,supersedes_id:other,expected_version:1}));
+});
+test('impact apply DTO requires explicit affected-reservation acknowledgment and server preview token',()=>{
+ const r={client_api_version:1,request_id:id,org_id:id,center_id:id,operation_key:id,preview:{id,token:'opaque-preview-token'},accepted_reservation_ids:[id]};
+ assert(valid('Request_reservation_impact_apply',r));
+ assert(!valid('Request_reservation_impact_apply',{...r,accepted_reservation_ids:[id,id]}));
+ const {accepted_reservation_ids,...missing}=r;assert(!valid('Request_reservation_impact_apply',missing));
+ assert(!valid('Request_reservation_impact_apply',{...r,actor_role:'owner'}));
+});
+test('settlement decisions/records are closed DTOs; approval is not a payment payload',()=>{
+ const r={client_api_version:1,request_id:id,org_id:id,operation_key:id,settlement_request_id:id,expected_version:1,decision:'reject',reason:'Wrong selected scope',fallback:false};
+ assert(valid('Request_settlement_request_decide',r));
+ assert(!valid('Request_settlement_request_decide',{...r,decision:'paid'}));
+ assert(!valid('Request_settlement_request_decide',{...r,amount_minor:'100'}));
+ const {expected_version,...missing}=r;assert(!valid('Request_settlement_request_decide',missing));
+});
+
+test('declared runtime gates must match actually applied migration SQL, not target references',()=>{
+ const p=structuredClone(original);
+ assert.equal(validateAppliedGates(p,live),79);
+ op(p,'class_save_v1').runtime_required_features=['F10'];
+ assert.throws(()=>validateAppliedGates(p,live),/APPLIED_FEATURE_GATE_DRIFT/);
+});
+test('a pending behavior case cannot be relabeled passed or supplied a static-test receipt',()=>{
+ const p=structuredClone(original);ds(p).acceptance_cases[0].status='passed';assert.throws(()=>validateGovernance(p,live),/FALSE_BEHAVIOR_PASS/);
+ const q=structuredClone(original);ds(q).acceptance_cases[0].evidence=['tests/governance.test.mjs'];assert.throws(()=>validateGovernance(q,live),/FAKE_CASE_EVIDENCE/);
+});
+
+test('living product plan matrix must match the machine trace, including qualitative access scope',()=>{
+ const source=fs.readFileSync('contracts/01-FtkSaaS-urun-kapsam-sozlesmesi.md','utf8');
+ assert.equal(validateProductMatrix(original,source),33);
+ const bad=source.replace(/(\| F14 \|[^\n]*?\| M05 \|) Var \|/,'$1 — |');
+ assert.notEqual(source,bad);assert.throws(()=>validateProductMatrix(original,bad),/PRODUCT_PLAN_SCOPE|PRODUCT_PLAN_ACCESS/);
+});
+
+test('management read DTO carries the actual composite row key and cannot select a different write authority',()=>{
+ const r={client_api_version:1,request_id:id,org_id:id,center_id:id,operation:'class_assignment_set_v1',selector:{operation:'class_assignment_set_v1',key:{class_id:id,person_id:other,duty:'assistant'}}};
+ assert(valid('Request_management_state_get',r));
+ assert(!valid('Request_management_state_get',{...r,selector:{operation:'class_assignment_set_v1',key:{class_id:id,person_id:other}}}));
+ assert(!valid('Request_management_state_get',{...r,selector:{operation:'permission_set_v1',key:{person_id:other,permission:'reservation.write'}}}));
+});
+test('protection routing cannot turn a center entitlement permission into org policy authority',()=>{
+ const p=structuredClone(original);op(p,'reservation_impact_apply_v1').permission='entitlement.correct';
+ assert.throws(()=>validateGovernance(p,live),/PROTECTION_ORIGINAL_AUTHORITY/);
+});
+
+test('legacy live policy request stays closed while protected target DTO requires approval',()=>{
+ const r={client_api_version:1,request_id:id,org_id:id,operation_key:id,key:'negative_default',value:{kind:'integer',value:2},effective_at:'2027-01-01T00:00:00Z',mandatory:true};
+ assert(valid('Request_policy_publish',r));
+ assert(!valid('Request_policy_publish',{...r,impact_approval:{id,token:'opaque-token-value'}}));
+ assert(!valid('Target_policy_publish_protected',r));
+ assert(valid('Target_policy_publish_protected',{...r,impact_approval:{id,token:'opaque-token-value'}}));
+});
+test('minimal runtime catalog has no dangling target or request/response reference',()=>{
+ const runtime=JSON.parse(fs.readFileSync('supabase/functions/backend-v1/contract.json'));
+ const walk=v=>{if(v&&typeof v==='object'){if(v.$ref)assert(runtime.$defs[v.$ref.split('/').at(-1)],v.$ref);for(const w of Object.values(v))walk(w);}};
+ walk(runtime);
+});

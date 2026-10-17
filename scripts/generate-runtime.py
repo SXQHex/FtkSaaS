@@ -14,12 +14,12 @@ def visit(x):
   for v in x.values():visit(v)
  elif isinstance(x,list):
   for v in x:visit(v)
-for o in ops:visit(o['request']);visit(o['success'])
+for o in ops:visit(o)
 runtime={'$schema':p['$schema'],'$defs':{n:p['$defs'][n] for n in sorted(needed)},'x-contract':{'operations':ops}}
 sql=['begin;']
 for o in ops:
  def literal(s):return "'"+s.replace("'","''")+"'"
- sql.append("insert into private.runtime_operations(name,permission,billing_class,features) values("+','.join([literal(o['name']),literal(o['permission']),literal(o['billing_class']),"array["+','.join(map(literal,o['features']))+"]::text[]"])+") on conflict(name) do update set permission=excluded.permission,billing_class=excluded.billing_class,features=excluded.features;")
+ sql.append("insert into private.runtime_operations(name,permission,billing_class,features) values("+','.join([literal(o['name']),literal(o['permission']),literal(o['billing_class']),"array["+','.join(map(literal,o['runtime_required_features']))+"]::text[]"])+") on conflict(name) do update set permission=excluded.permission,billing_class=excluded.billing_class,features=excluded.features;")
  sql.append(f"create or replace function api_v1.{o['name']}(p_request jsonb,p_actor_auth_id uuid,p_session_id uuid,p_ids uuid[],p_aux jsonb default null) returns jsonb language sql security invoker set search_path='' as $$select private.execute_operation('{o['name']}',p_request,p_actor_auth_id,p_session_id,p_ids,p_aux)$$;")
  sql.append(f"revoke all on function api_v1.{o['name']}(jsonb,uuid,uuid,uuid[],jsonb) from public,anon,authenticated;")
  sql.append(f"grant execute on function api_v1.{o['name']}(jsonb,uuid,uuid,uuid[],jsonb) to service_role;")

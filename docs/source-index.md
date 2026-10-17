@@ -15,7 +15,7 @@ Repository’nin güncel dalı `main`dir. Başlarken GitHub main SHA’sını ve
 | 7 | [03 sorumluluklar](../contracts/03-FtkSaaS-kodlama-sorumluluklari.md) | Backend/frontend alan sahipliği; güncel çalışma düzeni kök AGENTS’ta |
 | 8 | [04 şema](../contracts/04-FtkSaaS-O4-veri-semasi.md), [05 API](../contracts/05-FtkSaaS-O4-API-katalogu.md), [06 durum/hata/izin](../contracts/06-FtkSaaS-O4-durum-hata-izin.md) | Fiziksel/API sözlükleri; kesin DDL supabase/migrations, işlem tipleri 08 |
 | 9 | [08 makine sözleşmesi](../contracts/08-FtkSaaS-tip-ve-operasyon-sozlesmesi.json) | Tipler, işlem/izin/guard ve implementation_status; katalog varlığı runtime kabulü değildir |
-| 10 | [Endpoint envanteri](endpoint-inventory.json), [runtime listesi](../supabase/functions/backend-v1/implemented.json) | Üretilmiş 184 işlem envanteri ve 79 çağrılabilir işlem; 105 contract_only |
+| 10 | [Endpoint envanteri](endpoint-inventory.json), [runtime listesi](../supabase/functions/backend-v1/implemented.json) | Üretilmiş 197 işlem envanteri ve 79 çağrılabilir işlem; 118 contract_only |
 
 ## Kabul edilmiş kararlar
 
@@ -38,3 +38,6 @@ Her uygulama PR’si etkilediği sözleşmeleri, envanteri, kalan işleri ve dev
 [Takvim/seans/rezervasyon okuma devri](schedule-read-handover.md) üç işlemin görünürlük/zaman/cursor sözleşmesini ve ayrı bırakılan ürün/uygun hak seçimi bağımlılığını belirtir. [Okuma kapsam raporu](../reports/schedule-read-verification.json) kaynak ve test kanıtıdır; son head CI ayrıca denetlenir.
 
 [Program/seans devri](program-session-handover.md) yedi yeni komutun immutable program, oluşum değişikliği, miras/override, DST, sürüm ve rezervasyon koruma sözleşmesini açıklar. [Kaynak raporu](../reports/program-session-verification.json) geliştirme kanıtıdır; son head temiz CI ayrıca denetlenir.
+
+
+[DS-2026-10-17](decisions/DS-2026-10-17.md) son kabul edilmiş plan/yoklama, rezervasyon koruması, anlaşma, A→B hesaplaşma ve geçmiş satış hükümleridir. [Sprint devri](decision-sprint-handover.md) hedef sözleşme/runtime/kanıt ayrımını; [F01–F33 haritası](feature-delivery.md) ürün–teknik–bağımlılık–uygulama–kabul eşlemesini; [koruma denetimi](branch-protection-review.md) yönetici erişim sınırını belirtir. Mevcut 184 işlem korunarak enum tam sürümlü isimlerle eşitlendi; 13 yeni contract_only bağımlılık toplamı 197’dir.

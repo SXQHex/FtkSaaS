@@ -1,12 +1,14 @@
+> Güncel öncelik: [DS-2026-10-17](../docs/decisions/DS-2026-10-17.md). Çelişen eski hükümler yalnız belirtilen kapsamda yürürlükten kalkmıştır. [Hedef sözleşme/runtime ayrımı](../docs/decision-sprint-handover.md).
+
 > **Güncel ek: Q-E03.** Parasal iptal sınırı planlanan başlangıçtır (eşitlik dahil sonrası). Q-E02 merkez iptali korunur. Teknik durum: docs/decisions/Q-E03.md; test/CI kanıtı ayrıca doğrulanır.
 
 # FtkSaaS — Ürün kapsam sözleşmesi
 
 > **Güncel öncelik: Q-E02 · 0.2.0-rc.3.** Kullanıcının 16 Ekim 2026 son iptal kabulü önceki çelişen merkez iptali hükümlerinin yerine geçer. Güncel davranış/kanıt: docs/decisions/Q-E02.md, docs/claude-handover.md ve reports/qe02-verification.json. Aşağıdaki eski durum/test sayıları tarihsel kayıttır; teknik aktarım bekleyen işler tamamlandı sayılmaz.
 
-> **Güncel 2.2-tech.2 / Q-D01:** Etkinlik 0/1/çok disiplin etiketini destekler. Tek etikette etkinliğe uygun dar/geniş paket, 0/çok etikette yalnız uygun geniş paket; etkinliklerde negatif kredi yok. Q-D01 ürün kararı kapalı, tam olay kayıt/RPC entegrasyonu ve son ortak kredi yarışı açık. Güncel durum 11-FtkSaaS-Q-D01-teknik-aktarim-raporu.md.
+> **Güncel 2.2-tech.2 / Q-D01:** Etkinlik 0/1/çok disiplin etiketini destekler. Tek etikette etkinliğe uygun dar/geniş paket, 0/çok etikette yalnız uygun geniş paket; etkinliklerde negatif kredi yok. Q-D01 ürün kararı kapalı; ilk aktarım durumları tarihsel, güncel runtime/kabul envanter ve CI’dadır. Güncel durum 11-FtkSaaS-Q-D01-teknik-aktarim-raporu.md.
 
-> **Güncel teknik uygulama kaydı — 2.2-tech.1, 15 Ekim 2026:** D01–D09/U01–U08, 04–08 kataloglarına ve ortak tiplere aktarıldı. İki migration izole geliştirme DB’sinde uygulandı. Aşağıdaki eski “kod/kurulum yapılmadı” ve “teknik aktarım bekliyor” ifadeleri tarihsel kayıt olarak okunur. İş RPC’leri, ayrıntılı izin RLS politikaları ve gerçek iş akışı kabul testleri açık; Q-D01 yeni ürün kararı bekliyor. Güncel durum 09 teknik aktarım raporundadır.
+> **Güncel teknik uygulama kaydı — 2.2-tech.1, 15 Ekim 2026:** D01–D09/U01–U08, 04–08 kataloglarına ve ortak tiplere aktarıldı. İki migration izole geliştirme DB’sinde uygulandı. Aşağıdaki eski “kod/kurulum yapılmadı” ve “teknik aktarım bekliyor” ifadeleri tarihsel kayıt olarak okunur. İş RPC’leri, ayrıntılı izin RLS politikaları ve gerçek iş akışı kabul testleri açık; Bu ilk aktarım notu tarihsel; Q-D01 kapalıdır. Güncel durum 09 teknik aktarım raporundadır.
 
 > Güncel UUID üretim standardı: U01–U08, UUIDv7. Sağlayıcı kimlikleri korunur.
 
@@ -14,7 +16,7 @@
 
 Karar tarihi: 14 Ekim 2026
 
-Son güncelleme: 15 Ekim 2026 — Sürüm 2.0
+Son güncelleme: 17 Ekim 2026 — DS-2026-10-17 sözleşme aktarımı; uygulama/kabul ayrı izlenir
 
 ## Belgenin durumu
 
@@ -23,7 +25,7 @@ Bu belge, yeni FtkSaaS için açıkça kabul edilmiş ürün kapsamını tanıml
 Bu belge, geliştirme için yazılı kapsam sözleşmesi ve esas başvuru kaynağıdır. Eski todo listeleri bu sözleşmenin kaynağı değildir. Sonradan açıkça kabul edilen değişiklikler bu belgeye işlenir; öneriler tek başına kapsam değişikliği sayılmaz. Fiyatlandırma, teslim tarihi veya hukuki hizmet sözleşmesi yerine geçmez.
 
 - Kapsam durumu: Kabul edildi / Sonraki aşama / Kapsam dışı.
-- Uygulama durumu: Bu belgedeki bütün kapsam içi özelliklerde doğrulanmadı. Doğrulama sonrasında tamamlandı, kısmi veya yapılacak olarak güncellenir.
+- Uygulama/kabul durumu özellik bazında docs/feature-delivery.md ve makine feature_delivery eşlemesindedir; işlem sayısı ürün tamamlanma oranı değildir.
 - Planlar: Starter, Pro ve Business aynı backend iş modelini kullanır; plan farkı erişim ve kullanım limitidir.
 - Bu belge fiyat, kesin eğitmen/öğrenci limitleri veya sınırsız kullanım taahhüdü belirlemez. İlk paket şablonundaki sayılar tavsiye olarak kalır.
 - Pro özellikleri Business'a da dahildir. Temel güvenlik, veri bütünlüğü ve kayıt geçmişi bütün planlarda geçerlidir.
@@ -53,7 +55,7 @@ Bu modüller ayrı servis veya ayrı uygulama zorunluluğu değildir. Yeni backe
 
 ## Özellik ve plan matrisi
 
-“Temel” ve “gelişmiş” ifadelerinin sınırları aşağıdaki tamamlanma ölçütleriyle belirlenir. Çizgi o planda kapsam dışında demektir. Her satırın uygulama durumu doğrulanmadıdır.
+“Temel” ve “gelişmiş” ifadelerinin sınırları aşağıdaki tamamlanma ölçütleriyle belirlenir. Çizgi o planda kapsam dışında demektir. Her satırın uygulama/kabul sınırı feature_delivery haritasında ayrıca izlenir.
 
 | ID | Özellik | Sahip | Starter | Pro | Business | Kapsam durumu |
 |---|---|---|---|---|---|---|
@@ -74,7 +76,7 @@ Bu modüller ayrı servis veya ayrı uygulama zorunluluğu değildir. Yeni backe
 | F15 | Ders sayılı paket, geçerlilik ve kredi hareketleri | M06 | Temel | Tam | Tam | Kabul edildi |
 | F16 | Süreli/sınırsız üyelik, dönemsel kullanım sınırı | M06 | — | Var | Var | Kabul edildi |
 | F17 | Üyelik/paket dondurma ve plan değişimi | M06 | — | Var | Var | Kabul edildi |
-| F18 | Merkezler arasında kullanım hakkı | M06 | — | — | Var | Kabul edildi |
+| F18 | Merkezler arasında kullanım hakkı ve onaylı hesaplaşma | M06/M07 | — | — | Var | Kabul edildi |
 | F19 | Manuel tahsilat, kısmi ödeme, iade/düzeltme ve alacak | M07 | Var | Var | Var | Kabul edildi |
 | F20 | Eğitmen hakedişi ve ödeme takibi | M08 | — | Var | Var | Kabul edildi |
 | F21 | Aday, kaynak, ilgi, takip ve dönüşüm | M09 | — | Temel | Gelişmiş | Kabul edildi |
@@ -119,7 +121,7 @@ Bu modüller ayrı servis veya ayrı uygulama zorunluluğu değildir. Yeni backe
 - Öğrenci borcu ile kullanım hakkı ayrı kayıt sahipliklerine sahiptir; ilişkili işlemler ortak akışta yürütülür.
 - Tahsilat tutarı, tarihi, işlemi yapan kişi ve açıklama saklanır. Kısmi ödeme desteklenir; düzeltme ve iade geçmişi silmez.
 - Fazla tahsilat borcu eksi göstermek yerine ayrı öğrenci alacağı olarak izlenir; kalan borç sıfırın altına düşmez.
-- Business'ta paketin geçerli olduğu merkezler, tahsilatın ve kullanımın ait olduğu merkez izlenebilir. İlk kapsamda otomatik merkezler arası para dağıtımı/borç oluşturma yoktur; satış ve hizmet merkezi raporlanır. Gelecekte otomatik dağıtım ayrıca karardır.
+- Business'ta paketin geçerli olduğu merkezler, tahsilatın ve kullanımın ait olduğu merkez izlenebilir. DS-2026-10-17 ile uygun kredili kullanımın A→B payı ve onaylı hesaplaşması kabul edildi; süreli/sınırsız aktarım üretmez. Otomatik para transferi yoktur; runtime ayrı teslimdir.
 
 ### CRM, bildirim ve etkinlik
 
@@ -219,7 +221,7 @@ Grup/etkinlik iptali, borçlu katılım, paket bitiş hatırlatması, kayıt pen
 | Aktif öğrenci sayımı ve plan geçişi | Davranış kabul edildi; sayısal limitler ticari açılıştan önce | Aşağıdaki kurallar ve teknik sözleşme uygulanır; veri silinmez. |
 | Dondurmayı erken bitirme; yenilemede kalan hak; ürün değişiminde hak/fiyat farkı | İş kararları kabul edildi | Teknik sözleşme bölüm 17 uygulanır; API ayrıntıları O4’te hazırlanacak. |
 | Etkinlik iptal/iade koşulları | İlgili etkinlik kayda açılmadan önce | Etkinliğe açık politika tanımlanır; özel dersin 12 saat kuralı kopyalanmaz. |
-| Merkezler arası hesaplaşma formülü | Business finansal hesaplaşması etkinleştirilmeden önce | Tahsilat ve kullanım merkezleri izlenir; otomatik merkezler arası para dağıtımı yapılmaz. |
+| Merkezler arası hesaplaşma | DS-2026-10-17 ile kabul edildi; runtime ayrı teslim | Kredili gerçek satış bedeli payı, onaylı kısmi ödeme/mahsup; otomatik para transferi yok. Grantor DS-OPEN-01 açık. |
 | Dış bildirim kanalı, sağlayıcı ve kullanım maliyeti | İlgili kanal etkinleştirilmeden önce | Uygulama içi kanal kullanılır; dış kanal teslimatı taahhüt edilmez. |
 
 Bu konuların tamamını şimdi sonuçlandırmak gerekmez. Karar yalnızca ilgili özelliğin belirsiz davranışını engeller; diğer geliştirmeleri durdurmaz.
@@ -301,7 +303,7 @@ Bu bölüm önceki açık statülerini günceller; ayrıntı kaynağı teknik s�
 - Pilot RPO 24 saat/RTO tespitten 8 saat; günlük bağımsız veritabanı/dosya yedeği, 30 gün döngü, aylık geri yükleme testi; izleme ve backend performans hedefleri kabul edildi. Üretim garantisi veya çalıştırılmış test değildir.
 - Davet 7 gün/tek kullanım; yeniden gönderim eskisini kapatır. Operasyon personelinde mevcut merkez öğrencilerine davet varsayılan açık ve yönetici kapatabilir; eğitmende kapalı, izinle kendi sınıf/seans öğrencileri; asistanda yok. Davet rol/iletişim değiştirme yetkisi vermez. Güncel kabul kontrolleri ve sıfır organizasyonlu hesap sınırları teknik sözleşmededir.
 - İlk 7 gün SaaS gecikmesinin açık/kapalı işlem matrisi, anahtar/tekrar koruması, 90 günlük önceki ana API sürümü desteği, halka açık başvuru koruması, para/yuvarlama/zaman ve eşzamanlı düzenleme davranışları kabul edildi.
-- Merkezler arası kullanım satış/tahsilat merkezi ile hizmet/hakediş merkezini ayrı izler; rapor otomatik transfer veya merkezler arası borç yaratmaz.
+- Merkezler arası kullanım satış/tahsilat merkezi ile hizmet/hakediş merkezini ayrı izler; uygun kredili tüketim DS-2026-10-17 payını oluşturur; rapor işlemi para transferi yapmaz.
 - Yeni uygun hak önce geçmiş tüketilmiş kredi açığını ders tarihiyle, sonra gelecek rezervasyon açığını seans tarihiyle kapatır. Geçmiş için yeni paket başlangıcının eski dersi kapsaması aranmaz; kapsam/merkez/sınıf kontrolleri sürer. Gelecekte seans tarihinde geçerlilik zorunludur; eski hakediş kendiliğinden yeniden hesaplanmaz.
 - Tek repository, alan sahipliği, mock sınırı, branch/PR, merge/üretim onayı ve öneri → kabul → belge → kod → doğrulama → teslim düzeni kabul edildi. Belge kabulü somut üretim işlemi onayı değildir.
 
@@ -424,7 +426,7 @@ Teknik karşılık: event_payment_preparations, mevcut debts/debt_allocations/de
 
 **E02-04.** Önceki alacak/iade/mahsup/hak dönüşü tekrar üretilmez. Yalnız iptal edilen etkinliğe bağlı kayıtlar; başka borç/geçmiş değişmez. Önizleme+apply sürüm/finans bağımlılıkları, canlı yetki ve tek transaction audit/outbox/receipt ile korunur.
 
-**E02-05.** Fiilî başlangıç/kısmi gerçekleşme ayrı alan veya durum olarak tanımlı değildir; saat geçmesi tek başına gerçekleşme değildir. Bu tanım karar konusu olarak açık. Merkez iptalinin aşamadan bağımsız sonucu bu tanıma ihtiyaç duymaz; mevcut occurred/attendance evidence korunur.
+**E02-05.** Etkinlik fiilî başlangıç kaydı/düzeltmesi güncel runtime’da vardır; saat geçmesi tek başına gerçekleşme değildir. Ders anlaşmasının başlangıçta sabitlenmesi DS teknik teslimidir. Merkez iptalinin aşamadan bağımsız sonucu bu tanıma ihtiyaç duymaz; mevcut occurred/attendance evidence korunur.
 
 Teknik aktarım ve test durumu: docs/decisions/Q-E02.md ve reports/qe02-verification.json. Tarihsel test sayıları bu değişikliğin kanıtı değildir.
 

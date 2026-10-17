@@ -429,7 +429,7 @@ export type Permission = ("account.self" | "org.read" | "org.manage" | "org.owne
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
  * via the `definition` "OperationName".
  */
-export type OperationName = ("account_get" | "account_profile_update" | "account_password_change" | "account_password_reset_request" | "account_delete_preview" | "account_delete_apply" | "organizations_list" | "organization_create" | "organization_get" | "organization_update" | "organization_close_preview" | "organization_close_apply" | "organization_reopen" | "organization_delete_preview" | "organization_delete_apply" | "centers_list" | "center_create" | "center_update" | "room_save" | "availability_save" | "availability_exception_save" | "policies_get" | "policy_publish" | "roles_list" | "role_assign" | "role_revoke" | "permission_set" | "org_manager_assign" | "org_manager_revoke" | "manager_self_assign_center" | "account_access_send" | "account_access_revoke" | "account_access_accept" | "account_link_remove" | "people_list" | "person_get" | "person_create" | "person_update" | "student_activate" | "student_deactivate" | "person_merge_preview" | "person_merge_approve" | "person_merge_apply" | "calendar_get" | "class_save" | "program_preview" | "program_apply" | "session_create" | "session_get" | "session_change_preview" | "session_change_apply" | "session_capacity_set" | "session_cancel_preview" | "session_cancel_apply" | "replacement_session_create" | "session_assignment_set" | "lesson_request_create" | "lesson_request_withdraw" | "lesson_request_reject" | "lesson_request_offer_alternative" | "lesson_request_accept_alternative" | "lesson_request_approve" | "reservation_create" | "reservation_cancel" | "reservation_list" | "waitlist_join" | "waitlist_leave" | "seat_offer_accept" | "seat_offer_reject" | "attendance_get" | "attendance_mark" | "attendance_close" | "attendance_correct_preview" | "attendance_correct_apply" | "products_list" | "product_publish" | "sale_preview" | "sale_apply" | "entitlements_get" | "entitlement_extend" | "credit_adjust" | "negative_limit_set" | "freeze_preview" | "freeze_apply" | "freeze_end_preview" | "freeze_end_apply" | "sale_terminate_preview" | "sale_terminate_apply" | "sale_refund_preview" | "sale_refund_apply" | "sale_change_preview" | "sale_change_apply" | "sale_renew_preview" | "sale_renew_apply" | "finance_get" | "collection_record" | "collection_correct_preview" | "collection_correct_apply" | "student_credit_refund" | "student_credit_offset" | "debt_adjust" | "instructor_agreement_publish" | "earnings_list" | "instructor_payment_record" | "instructor_payment_correct" | "leads_list" | "lead_save" | "crm_activity_save" | "trial_offer_create" | "trial_registration_confirm" | "lead_convert" | "crm_followup_list" | "segment_save" | "automation_save" | "notifications_list" | "notification_mark_read" | "notification_preferences_set" | "report_get" | "report_export_start" | "report_file_get" | "import_upload_prepare" | "import_preview" | "import_apply" | "import_rows_list" | "subscription_get" | "subscription_upgrade_quote" | "subscription_downgrade_request" | "subscription_change_cancel" | "subscription_renewal_set" | "saas_payment_submit" | "saas_payment_verify" | "saas_grace_extend" | "event_save" | "event_publish" | "event_register" | "event_registration_cancel" | "event_complete" | "event_duty_verify" | "event_cancel_preview" | "event_cancel_apply" | "event_list" | "document_upload_prepare" | "document_version_publish" | "document_requirements_get" | "document_accept" | "publication_set" | "public_calendar_get" | "public_application_submit" | "public_application_review" | "operation_status_get" | "preview_get" | "job_status_get" | "audit_list" | "seat_offer_issue" | "seat_offer_expire" | "request_expire" | "outbox_deliver" | "reminder_schedule" | "automation_run" | "import_rows_process" | "report_build" | "privacy_execute" | "subscription_boundary_apply" | "class_assignment_set" | "event_attendance_mark" | "platform_owner_set" | "platform_owner_remove" | "center_manager_assign" | "center_manager_revoke" | "attendance_block" | "event_attendance_close" | "event_attendance_correct" | "file_upload_complete" | "negcredit_valuation_set")
+export type OperationName = ("account_get_v1" | "account_profile_update_v1" | "account_password_change_v1" | "account_password_reset_request_v1" | "account_delete_preview_v1" | "account_delete_apply_v1" | "organizations_list_v1" | "organization_create_v1" | "organization_get_v1" | "organization_update_v1" | "organization_close_preview_v1" | "organization_close_apply_v1" | "organization_reopen_v1" | "organization_delete_preview_v1" | "organization_delete_apply_v1" | "centers_list_v1" | "center_create_v1" | "center_update_v1" | "room_save_v1" | "availability_save_v1" | "availability_exception_save_v1" | "policies_get_v1" | "policy_publish_v1" | "roles_list_v1" | "role_assign_v1" | "role_revoke_v1" | "permission_set_v1" | "org_manager_assign_v1" | "org_manager_revoke_v1" | "manager_self_assign_center_v1" | "account_access_send_v1" | "account_access_revoke_v1" | "account_access_accept_v1" | "account_link_remove_v1" | "people_list_v1" | "person_get_v1" | "person_create_v1" | "person_update_v1" | "student_activate_v1" | "student_deactivate_v1" | "person_merge_preview_v1" | "person_merge_approve_v1" | "person_merge_apply_v1" | "calendar_get_v1" | "class_save_v1" | "program_preview_v1" | "program_apply_v1" | "session_create_v1" | "session_get_v1" | "session_change_preview_v1" | "session_change_apply_v1" | "session_capacity_set_v1" | "session_cancel_preview_v1" | "session_cancel_apply_v1" | "replacement_session_create_v1" | "session_assignment_set_v1" | "lesson_request_create_v1" | "lesson_request_withdraw_v1" | "lesson_request_reject_v1" | "lesson_request_offer_alternative_v1" | "lesson_request_accept_alternative_v1" | "lesson_request_approve_v1" | "reservation_create_v1" | "reservation_cancel_v1" | "reservation_list_v1" | "waitlist_join_v1" | "waitlist_leave_v1" | "seat_offer_accept_v1" | "seat_offer_reject_v1" | "attendance_get_v1" | "attendance_mark_v1" | "attendance_close_v1" | "attendance_correct_preview_v1" | "attendance_correct_apply_v1" | "products_list_v1" | "product_publish_v1" | "sale_preview_v1" | "sale_apply_v1" | "entitlements_get_v1" | "entitlement_extend_v1" | "credit_adjust_v1" | "negative_limit_set_v1" | "freeze_preview_v1" | "freeze_apply_v1" | "freeze_end_preview_v1" | "freeze_end_apply_v1" | "sale_terminate_preview_v1" | "sale_terminate_apply_v1" | "sale_refund_preview_v1" | "sale_refund_apply_v1" | "sale_change_preview_v1" | "sale_change_apply_v1" | "sale_renew_preview_v1" | "sale_renew_apply_v1" | "finance_get_v1" | "collection_record_v1" | "collection_correct_preview_v1" | "collection_correct_apply_v1" | "student_credit_refund_v1" | "student_credit_offset_v1" | "debt_adjust_v1" | "instructor_agreement_publish_v1" | "earnings_list_v1" | "instructor_payment_record_v1" | "instructor_payment_correct_v1" | "leads_list_v1" | "lead_save_v1" | "crm_activity_save_v1" | "trial_offer_create_v1" | "trial_registration_confirm_v1" | "lead_convert_v1" | "crm_followup_list_v1" | "segment_save_v1" | "automation_save_v1" | "notifications_list_v1" | "notification_mark_read_v1" | "notification_preferences_set_v1" | "report_get_v1" | "report_export_start_v1" | "report_file_get_v1" | "import_upload_prepare_v1" | "import_preview_v1" | "import_apply_v1" | "import_rows_list_v1" | "subscription_get_v1" | "subscription_upgrade_quote_v1" | "subscription_downgrade_request_v1" | "subscription_change_cancel_v1" | "subscription_renewal_set_v1" | "saas_payment_submit_v1" | "saas_payment_verify_v1" | "saas_grace_extend_v1" | "event_save_v1" | "event_publish_v1" | "event_register_v1" | "event_registration_cancel_v1" | "event_complete_v1" | "event_duty_verify_v1" | "event_cancel_preview_v1" | "event_cancel_apply_v1" | "event_list_v1" | "document_upload_prepare_v1" | "document_version_publish_v1" | "document_requirements_get_v1" | "document_accept_v1" | "publication_set_v1" | "public_calendar_get_v1" | "public_application_submit_v1" | "public_application_review_v1" | "operation_status_get_v1" | "preview_get_v1" | "job_status_get_v1" | "audit_list_v1" | "seat_offer_issue_v1" | "seat_offer_expire_v1" | "request_expire_v1" | "outbox_deliver_v1" | "reminder_schedule_v1" | "automation_run_v1" | "import_rows_process_v1" | "report_build_v1" | "privacy_execute_v1" | "subscription_boundary_apply_v1" | "class_assignment_set_v1" | "event_attendance_mark_v1" | "platform_owner_set_v1" | "platform_owner_remove_v1" | "center_manager_assign_v1" | "center_manager_revoke_v1" | "attendance_block_v1" | "event_attendance_close_v1" | "event_attendance_correct_v1" | "file_upload_complete_v1" | "negcredit_valuation_set_v1" | "disciplines_list_v1" | "discipline_save_v1" | "center_discipline_set_v1" | "person_discipline_set_v1" | "event_get_v1" | "event_registration_preview_v1" | "event_payment_prepare_v1" | "event_payment_get_v1" | "event_actual_start_record_v1" | "event_actual_start_correct_v1" | "management_state_get_v1" | "instructor_agreements_list_v1" | "reservation_impact_preview_v1" | "reservation_impact_apply_v1" | "settlement_movements_list_v1" | "settlement_requests_list_v1" | "settlement_request_get_v1" | "settlement_request_submit_v1" | "settlement_request_withdraw_v1" | "settlement_request_decide_v1" | "settlement_payment_record_v1" | "settlement_offset_record_v1" | "settlement_adjust_v1")
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
  * via the `definition` "EntityType".
@@ -572,6 +572,40 @@ discipline_ids?: EventDisciplineIds
 export type EventDisciplineIds = string[]
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "Request_instructor_agreement_publish".
+ */
+export type RequestInstructorAgreementPublish = {
+client_api_version: 1
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+request_id: string
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+org_id: string
+center_id?: (string | null)
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+operation_key: string
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+person_id: string
+format: SessionFormat
+valid: Interval
+terms: PayTerms
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+discipline_id: string
+supersedes_id?: (string | null)
+expected_version?: PositiveInt
+reason: Text
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
  * via the `definition` "Request_event_register".
  */
 export type RequestEventRegister = {
@@ -683,6 +717,48 @@ preparation_id?: (string | null)
  * via the `definition` "EventPaymentPreparationState".
  */
 export type EventPaymentPreparationState = ("prepared" | "registered" | "capacity_closed" | "event_cancelled")
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "ManagementProjection".
+ */
+export type ManagementProjection = (ManagementProjectionAccountProfileUpdateV1 | ManagementProjectionAccountDeletePreviewV1 | ManagementProjectionAccountDeleteApplyV1 | ManagementProjectionOrganizationCreateV1 | ManagementProjectionOrganizationUpdateV1 | ManagementProjectionOrganizationClosePreviewV1 | ManagementProjectionOrganizationCloseApplyV1 | ManagementProjectionOrganizationReopenV1 | ManagementProjectionOrganizationDeletePreviewV1 | ManagementProjectionOrganizationDeleteApplyV1 | ManagementProjectionCenterCreateV1 | ManagementProjectionCenterUpdateV1 | ManagementProjectionRoomSaveV1 | ManagementProjectionAvailabilitySaveV1 | ManagementProjectionAvailabilityExceptionSaveV1 | ManagementProjectionPolicyPublishV1 | ManagementProjectionRoleAssignV1 | ManagementProjectionRoleRevokeV1 | ManagementProjectionPermissionSetV1 | ManagementProjectionOrgManagerAssignV1 | ManagementProjectionOrgManagerRevokeV1 | ManagementProjectionManagerSelfAssignCenterV1 | ManagementProjectionAccountAccessSendV1 | ManagementProjectionAccountAccessRevokeV1 | ManagementProjectionAccountAccessAcceptV1 | ManagementProjectionAccountLinkRemoveV1 | ManagementProjectionPersonCreateV1 | ManagementProjectionPersonUpdateV1 | ManagementProjectionStudentActivateV1 | ManagementProjectionStudentDeactivateV1 | ManagementProjectionPersonMergePreviewV1 | ManagementProjectionPersonMergeApproveV1 | ManagementProjectionPersonMergeApplyV1 | ManagementProjectionClassSaveV1 | ManagementProjectionProgramPreviewV1 | ManagementProjectionProgramApplyV1 | ManagementProjectionSessionCreateV1 | ManagementProjectionSessionChangePreviewV1 | ManagementProjectionSessionChangeApplyV1 | ManagementProjectionSessionCapacitySetV1 | ManagementProjectionSessionCancelPreviewV1 | ManagementProjectionSessionCancelApplyV1 | ManagementProjectionReplacementSessionCreateV1 | ManagementProjectionSessionAssignmentSetV1 | ManagementProjectionLessonRequestCreateV1 | ManagementProjectionLessonRequestWithdrawV1 | ManagementProjectionLessonRequestRejectV1 | ManagementProjectionLessonRequestOfferAlternativeV1 | ManagementProjectionLessonRequestAcceptAlternativeV1 | ManagementProjectionLessonRequestApproveV1 | ManagementProjectionReservationCreateV1 | ManagementProjectionReservationCancelV1 | ManagementProjectionWaitlistJoinV1 | ManagementProjectionWaitlistLeaveV1 | ManagementProjectionSeatOfferAcceptV1 | ManagementProjectionSeatOfferRejectV1 | ManagementProjectionAttendanceMarkV1 | ManagementProjectionAttendanceCloseV1 | ManagementProjectionAttendanceCorrectPreviewV1 | ManagementProjectionAttendanceCorrectApplyV1 | ManagementProjectionProductPublishV1 | ManagementProjectionSalePreviewV1 | ManagementProjectionSaleApplyV1 | ManagementProjectionEntitlementExtendV1 | ManagementProjectionCreditAdjustV1 | ManagementProjectionNegativeLimitSetV1 | ManagementProjectionFreezePreviewV1 | ManagementProjectionFreezeApplyV1 | ManagementProjectionFreezeEndPreviewV1 | ManagementProjectionFreezeEndApplyV1 | ManagementProjectionSaleTerminatePreviewV1 | ManagementProjectionSaleTerminateApplyV1 | ManagementProjectionSaleRefundPreviewV1 | ManagementProjectionSaleRefundApplyV1 | ManagementProjectionSaleChangePreviewV1 | ManagementProjectionSaleChangeApplyV1 | ManagementProjectionSaleRenewPreviewV1 | ManagementProjectionSaleRenewApplyV1 | ManagementProjectionCollectionRecordV1 | ManagementProjectionCollectionCorrectPreviewV1 | ManagementProjectionCollectionCorrectApplyV1 | ManagementProjectionStudentCreditRefundV1 | ManagementProjectionStudentCreditOffsetV1 | ManagementProjectionDebtAdjustV1 | ManagementProjectionInstructorAgreementPublishV1 | ManagementProjectionInstructorPaymentRecordV1 | ManagementProjectionInstructorPaymentCorrectV1 | ManagementProjectionLeadSaveV1 | ManagementProjectionCrmActivitySaveV1 | ManagementProjectionTrialOfferCreateV1 | ManagementProjectionTrialRegistrationConfirmV1 | ManagementProjectionLeadConvertV1 | ManagementProjectionSegmentSaveV1 | ManagementProjectionAutomationSaveV1 | ManagementProjectionNotificationMarkReadV1 | ManagementProjectionNotificationPreferencesSetV1 | ManagementProjectionReportExportStartV1 | ManagementProjectionImportUploadPrepareV1 | ManagementProjectionImportPreviewV1 | ManagementProjectionImportApplyV1 | ManagementProjectionSubscriptionUpgradeQuoteV1 | ManagementProjectionSubscriptionDowngradeRequestV1 | ManagementProjectionSubscriptionChangeCancelV1 | ManagementProjectionSubscriptionRenewalSetV1 | ManagementProjectionSaasPaymentSubmitV1 | ManagementProjectionSaasPaymentVerifyV1 | ManagementProjectionSaasGraceExtendV1 | ManagementProjectionEventSaveV1 | ManagementProjectionEventPublishV1 | ManagementProjectionEventRegisterV1 | ManagementProjectionEventRegistrationCancelV1 | ManagementProjectionEventCompleteV1 | ManagementProjectionEventDutyVerifyV1 | ManagementProjectionEventCancelPreviewV1 | ManagementProjectionEventCancelApplyV1 | ManagementProjectionDocumentUploadPrepareV1 | ManagementProjectionDocumentVersionPublishV1 | ManagementProjectionDocumentAcceptV1 | ManagementProjectionPublicationSetV1 | ManagementProjectionPublicApplicationSubmitV1 | ManagementProjectionPublicApplicationReviewV1 | ManagementProjectionClassAssignmentSetV1 | ManagementProjectionEventAttendanceMarkV1 | ManagementProjectionPlatformOwnerSetV1 | ManagementProjectionPlatformOwnerRemoveV1 | ManagementProjectionCenterManagerAssignV1 | ManagementProjectionCenterManagerRevokeV1 | ManagementProjectionAttendanceBlockV1 | ManagementProjectionEventAttendanceCloseV1 | ManagementProjectionEventAttendanceCorrectV1 | ManagementProjectionFileUploadCompleteV1 | ManagementProjectionNegcreditValuationSetV1 | ManagementProjectionDisciplineSaveV1 | ManagementProjectionCenterDisciplineSetV1 | ManagementProjectionPersonDisciplineSetV1 | ManagementProjectionEventRegistrationPreviewV1 | ManagementProjectionEventPaymentPrepareV1 | ManagementProjectionEventActualStartRecordV1 | ManagementProjectionEventActualStartCorrectV1 | ManagementProjectionReservationImpactPreviewV1 | ManagementProjectionReservationImpactApplyV1 | ManagementProjectionSettlementRequestSubmitV1 | ManagementProjectionSettlementRequestWithdrawV1 | ManagementProjectionSettlementRequestDecideV1 | ManagementProjectionSettlementPaymentRecordV1 | ManagementProjectionSettlementOffsetRecordV1 | ManagementProjectionSettlementAdjustV1)
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "ReservationProtectionChange".
+ */
+export type ReservationProtectionChange = (PolicyProtectionChange | NegativeLimitProtectionChange | CreditProtectionChange | SaleScopeProtectionChange)
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "SettlementRequestState".
+ */
+export type SettlementRequestState = ("pending" | "approved" | "rejected" | "withdrawn" | "superseded")
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "Request_management_state_get".
+ */
+export type RequestManagementStateGet = {
+client_api_version: 1
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+request_id: string
+org_id?: (string | null)
+center_id?: (string | null)
+operation: ManagementOperationName
+entity?: (EntityRef | null)
+selector: ManagementSelector
+page?: Page
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "ManagementOperationName".
+ */
+export type ManagementOperationName = ("account_profile_update_v1" | "account_delete_preview_v1" | "account_delete_apply_v1" | "organization_create_v1" | "organization_update_v1" | "organization_close_preview_v1" | "organization_close_apply_v1" | "organization_reopen_v1" | "organization_delete_preview_v1" | "organization_delete_apply_v1" | "center_create_v1" | "center_update_v1" | "room_save_v1" | "availability_save_v1" | "availability_exception_save_v1" | "policy_publish_v1" | "role_assign_v1" | "role_revoke_v1" | "permission_set_v1" | "org_manager_assign_v1" | "org_manager_revoke_v1" | "manager_self_assign_center_v1" | "account_access_send_v1" | "account_access_revoke_v1" | "account_access_accept_v1" | "account_link_remove_v1" | "person_create_v1" | "person_update_v1" | "student_activate_v1" | "student_deactivate_v1" | "person_merge_preview_v1" | "person_merge_approve_v1" | "person_merge_apply_v1" | "class_save_v1" | "program_preview_v1" | "program_apply_v1" | "session_create_v1" | "session_change_preview_v1" | "session_change_apply_v1" | "session_capacity_set_v1" | "session_cancel_preview_v1" | "session_cancel_apply_v1" | "replacement_session_create_v1" | "session_assignment_set_v1" | "lesson_request_create_v1" | "lesson_request_withdraw_v1" | "lesson_request_reject_v1" | "lesson_request_offer_alternative_v1" | "lesson_request_accept_alternative_v1" | "lesson_request_approve_v1" | "reservation_create_v1" | "reservation_cancel_v1" | "waitlist_join_v1" | "waitlist_leave_v1" | "seat_offer_accept_v1" | "seat_offer_reject_v1" | "attendance_mark_v1" | "attendance_close_v1" | "attendance_correct_preview_v1" | "attendance_correct_apply_v1" | "product_publish_v1" | "sale_preview_v1" | "sale_apply_v1" | "entitlement_extend_v1" | "credit_adjust_v1" | "negative_limit_set_v1" | "freeze_preview_v1" | "freeze_apply_v1" | "freeze_end_preview_v1" | "freeze_end_apply_v1" | "sale_terminate_preview_v1" | "sale_terminate_apply_v1" | "sale_refund_preview_v1" | "sale_refund_apply_v1" | "sale_change_preview_v1" | "sale_change_apply_v1" | "sale_renew_preview_v1" | "sale_renew_apply_v1" | "collection_record_v1" | "collection_correct_preview_v1" | "collection_correct_apply_v1" | "student_credit_refund_v1" | "student_credit_offset_v1" | "debt_adjust_v1" | "instructor_agreement_publish_v1" | "instructor_payment_record_v1" | "instructor_payment_correct_v1" | "lead_save_v1" | "crm_activity_save_v1" | "trial_offer_create_v1" | "trial_registration_confirm_v1" | "lead_convert_v1" | "segment_save_v1" | "automation_save_v1" | "notification_mark_read_v1" | "notification_preferences_set_v1" | "report_export_start_v1" | "import_upload_prepare_v1" | "import_preview_v1" | "import_apply_v1" | "subscription_upgrade_quote_v1" | "subscription_downgrade_request_v1" | "subscription_change_cancel_v1" | "subscription_renewal_set_v1" | "saas_payment_submit_v1" | "saas_payment_verify_v1" | "saas_grace_extend_v1" | "event_save_v1" | "event_publish_v1" | "event_register_v1" | "event_registration_cancel_v1" | "event_complete_v1" | "event_duty_verify_v1" | "event_cancel_preview_v1" | "event_cancel_apply_v1" | "document_upload_prepare_v1" | "document_version_publish_v1" | "document_accept_v1" | "publication_set_v1" | "public_application_submit_v1" | "public_application_review_v1" | "class_assignment_set_v1" | "event_attendance_mark_v1" | "platform_owner_set_v1" | "platform_owner_remove_v1" | "center_manager_assign_v1" | "center_manager_revoke_v1" | "attendance_block_v1" | "event_attendance_close_v1" | "event_attendance_correct_v1" | "file_upload_complete_v1" | "negcredit_valuation_set_v1" | "discipline_save_v1" | "center_discipline_set_v1" | "person_discipline_set_v1" | "event_registration_preview_v1" | "event_payment_prepare_v1" | "event_actual_start_record_v1" | "event_actual_start_correct_v1" | "reservation_impact_preview_v1" | "reservation_impact_apply_v1" | "settlement_request_submit_v1" | "settlement_request_withdraw_v1" | "settlement_request_decide_v1" | "settlement_payment_record_v1" | "settlement_offset_record_v1" | "settlement_adjust_v1")
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "ManagementSelector".
+ */
+export type ManagementSelector = (ManagementSelectorAccountProfileUpdateV1 | ManagementSelectorAccountDeletePreviewV1 | ManagementSelectorAccountDeleteApplyV1 | ManagementSelectorOrganizationCreateV1 | ManagementSelectorOrganizationUpdateV1 | ManagementSelectorOrganizationClosePreviewV1 | ManagementSelectorOrganizationCloseApplyV1 | ManagementSelectorOrganizationReopenV1 | ManagementSelectorOrganizationDeletePreviewV1 | ManagementSelectorOrganizationDeleteApplyV1 | ManagementSelectorCenterCreateV1 | ManagementSelectorCenterUpdateV1 | ManagementSelectorRoomSaveV1 | ManagementSelectorAvailabilitySaveV1 | ManagementSelectorAvailabilityExceptionSaveV1 | ManagementSelectorPolicyPublishV1 | ManagementSelectorRoleAssignV1 | ManagementSelectorRoleRevokeV1 | ManagementSelectorPermissionSetV1 | ManagementSelectorOrgManagerAssignV1 | ManagementSelectorOrgManagerRevokeV1 | ManagementSelectorManagerSelfAssignCenterV1 | ManagementSelectorAccountAccessSendV1 | ManagementSelectorAccountAccessRevokeV1 | ManagementSelectorAccountAccessAcceptV1 | ManagementSelectorAccountLinkRemoveV1 | ManagementSelectorPersonCreateV1 | ManagementSelectorPersonUpdateV1 | ManagementSelectorStudentActivateV1 | ManagementSelectorStudentDeactivateV1 | ManagementSelectorPersonMergePreviewV1 | ManagementSelectorPersonMergeApproveV1 | ManagementSelectorPersonMergeApplyV1 | ManagementSelectorClassSaveV1 | ManagementSelectorProgramPreviewV1 | ManagementSelectorProgramApplyV1 | ManagementSelectorSessionCreateV1 | ManagementSelectorSessionChangePreviewV1 | ManagementSelectorSessionChangeApplyV1 | ManagementSelectorSessionCapacitySetV1 | ManagementSelectorSessionCancelPreviewV1 | ManagementSelectorSessionCancelApplyV1 | ManagementSelectorReplacementSessionCreateV1 | ManagementSelectorSessionAssignmentSetV1 | ManagementSelectorLessonRequestCreateV1 | ManagementSelectorLessonRequestWithdrawV1 | ManagementSelectorLessonRequestRejectV1 | ManagementSelectorLessonRequestOfferAlternativeV1 | ManagementSelectorLessonRequestAcceptAlternativeV1 | ManagementSelectorLessonRequestApproveV1 | ManagementSelectorReservationCreateV1 | ManagementSelectorReservationCancelV1 | ManagementSelectorWaitlistJoinV1 | ManagementSelectorWaitlistLeaveV1 | ManagementSelectorSeatOfferAcceptV1 | ManagementSelectorSeatOfferRejectV1 | ManagementSelectorAttendanceMarkV1 | ManagementSelectorAttendanceCloseV1 | ManagementSelectorAttendanceCorrectPreviewV1 | ManagementSelectorAttendanceCorrectApplyV1 | ManagementSelectorProductPublishV1 | ManagementSelectorSalePreviewV1 | ManagementSelectorSaleApplyV1 | ManagementSelectorEntitlementExtendV1 | ManagementSelectorCreditAdjustV1 | ManagementSelectorNegativeLimitSetV1 | ManagementSelectorFreezePreviewV1 | ManagementSelectorFreezeApplyV1 | ManagementSelectorFreezeEndPreviewV1 | ManagementSelectorFreezeEndApplyV1 | ManagementSelectorSaleTerminatePreviewV1 | ManagementSelectorSaleTerminateApplyV1 | ManagementSelectorSaleRefundPreviewV1 | ManagementSelectorSaleRefundApplyV1 | ManagementSelectorSaleChangePreviewV1 | ManagementSelectorSaleChangeApplyV1 | ManagementSelectorSaleRenewPreviewV1 | ManagementSelectorSaleRenewApplyV1 | ManagementSelectorCollectionRecordV1 | ManagementSelectorCollectionCorrectPreviewV1 | ManagementSelectorCollectionCorrectApplyV1 | ManagementSelectorStudentCreditRefundV1 | ManagementSelectorStudentCreditOffsetV1 | ManagementSelectorDebtAdjustV1 | ManagementSelectorInstructorAgreementPublishV1 | ManagementSelectorInstructorPaymentRecordV1 | ManagementSelectorInstructorPaymentCorrectV1 | ManagementSelectorLeadSaveV1 | ManagementSelectorCrmActivitySaveV1 | ManagementSelectorTrialOfferCreateV1 | ManagementSelectorTrialRegistrationConfirmV1 | ManagementSelectorLeadConvertV1 | ManagementSelectorSegmentSaveV1 | ManagementSelectorAutomationSaveV1 | ManagementSelectorNotificationMarkReadV1 | ManagementSelectorNotificationPreferencesSetV1 | ManagementSelectorReportExportStartV1 | ManagementSelectorImportUploadPrepareV1 | ManagementSelectorImportPreviewV1 | ManagementSelectorImportApplyV1 | ManagementSelectorSubscriptionUpgradeQuoteV1 | ManagementSelectorSubscriptionDowngradeRequestV1 | ManagementSelectorSubscriptionChangeCancelV1 | ManagementSelectorSubscriptionRenewalSetV1 | ManagementSelectorSaasPaymentSubmitV1 | ManagementSelectorSaasPaymentVerifyV1 | ManagementSelectorSaasGraceExtendV1 | ManagementSelectorEventSaveV1 | ManagementSelectorEventPublishV1 | ManagementSelectorEventRegisterV1 | ManagementSelectorEventRegistrationCancelV1 | ManagementSelectorEventCompleteV1 | ManagementSelectorEventDutyVerifyV1 | ManagementSelectorEventCancelPreviewV1 | ManagementSelectorEventCancelApplyV1 | ManagementSelectorDocumentUploadPrepareV1 | ManagementSelectorDocumentVersionPublishV1 | ManagementSelectorDocumentAcceptV1 | ManagementSelectorPublicationSetV1 | ManagementSelectorPublicApplicationSubmitV1 | ManagementSelectorPublicApplicationReviewV1 | ManagementSelectorClassAssignmentSetV1 | ManagementSelectorEventAttendanceMarkV1 | ManagementSelectorPlatformOwnerSetV1 | ManagementSelectorPlatformOwnerRemoveV1 | ManagementSelectorCenterManagerAssignV1 | ManagementSelectorCenterManagerRevokeV1 | ManagementSelectorAttendanceBlockV1 | ManagementSelectorEventAttendanceCloseV1 | ManagementSelectorEventAttendanceCorrectV1 | ManagementSelectorFileUploadCompleteV1 | ManagementSelectorNegcreditValuationSetV1 | ManagementSelectorDisciplineSaveV1 | ManagementSelectorCenterDisciplineSetV1 | ManagementSelectorPersonDisciplineSetV1 | ManagementSelectorEventRegistrationPreviewV1 | ManagementSelectorEventPaymentPrepareV1 | ManagementSelectorEventActualStartRecordV1 | ManagementSelectorEventActualStartCorrectV1 | ManagementSelectorReservationImpactPreviewV1 | ManagementSelectorReservationImpactApplyV1 | ManagementSelectorSettlementRequestSubmitV1 | ManagementSelectorSettlementRequestWithdrawV1 | ManagementSelectorSettlementRequestDecideV1 | ManagementSelectorSettlementPaymentRecordV1 | ManagementSelectorSettlementOffsetRecordV1 | ManagementSelectorSettlementAdjustV1)
 /**
  * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
  *
@@ -1424,6 +1500,350 @@ Success_event_actual_start_correct?: SuccessEventActualStartCorrect
 LocalOffsetChoice?: LocalOffsetChoice
 ClassAssignmentView?: ClassAssignmentView
 SchedulePreviewItem?: SchedulePreviewItem
+AgreementPackageTerms?: AgreementPackageTerms
+AgreementVersionView?: AgreementVersionView
+AgreementVersionPage?: AgreementVersionPage
+ManagementStateView?: ManagementStateView
+PolicyProtectionChange?: PolicyProtectionChange
+NegativeLimitProtectionChange?: NegativeLimitProtectionChange
+CreditProtectionChange?: CreditProtectionChange
+SaleScopeProtectionChange?: SaleScopeProtectionChange
+ReservationProtectionChange?: ReservationProtectionChange
+ProtectedObligationView?: ProtectedObligationView
+ReservationProtectionPreview?: ReservationProtectionPreview
+Target_policy_publish_protected?: TargetPolicyPublishProtected
+SettlementRequestState?: SettlementRequestState
+SettlementLine?: SettlementLine
+SettlementMovementView?: SettlementMovementView
+SettlementRequestView?: SettlementRequestView
+SettlementMovementsPage?: SettlementMovementsPage
+SettlementRequestsPage?: SettlementRequestsPage
+SettlementCommandResult?: SettlementCommandResult
+SettlementRuleSet?: SettlementRuleSet
+Request_management_state_get?: RequestManagementStateGet
+Success_management_state_get?: SuccessManagementStateGet
+Request_instructor_agreements_list?: RequestInstructorAgreementsList
+Success_instructor_agreements_list?: SuccessInstructorAgreementsList
+Request_reservation_impact_preview?: RequestReservationImpactPreview
+Success_reservation_impact_preview?: SuccessReservationImpactPreview
+Request_reservation_impact_apply?: RequestReservationImpactApply
+Success_reservation_impact_apply?: SuccessReservationImpactApply
+Request_settlement_movements_list?: RequestSettlementMovementsList
+Success_settlement_movements_list?: SuccessSettlementMovementsList
+Request_settlement_requests_list?: RequestSettlementRequestsList
+Success_settlement_requests_list?: SuccessSettlementRequestsList
+Request_settlement_request_get?: RequestSettlementRequestGet
+Success_settlement_request_get?: SuccessSettlementRequestGet
+Request_settlement_request_submit?: RequestSettlementRequestSubmit
+Success_settlement_request_submit?: SuccessSettlementRequestSubmit
+Request_settlement_request_withdraw?: RequestSettlementRequestWithdraw
+Success_settlement_request_withdraw?: SuccessSettlementRequestWithdraw
+Request_settlement_request_decide?: RequestSettlementRequestDecide
+Success_settlement_request_decide?: SuccessSettlementRequestDecide
+Request_settlement_payment_record?: RequestSettlementPaymentRecord
+Success_settlement_payment_record?: SuccessSettlementPaymentRecord
+Request_settlement_offset_record?: RequestSettlementOffsetRecord
+Success_settlement_offset_record?: SuccessSettlementOffsetRecord
+Request_settlement_adjust?: RequestSettlementAdjust
+Success_settlement_adjust?: SuccessSettlementAdjust
+ManagementProjection_account_profile_update_v1?: ManagementProjectionAccountProfileUpdateV1
+ManagementProjection_account_delete_preview_v1?: ManagementProjectionAccountDeletePreviewV1
+ManagementProjection_account_delete_apply_v1?: ManagementProjectionAccountDeleteApplyV1
+ManagementProjection_organization_create_v1?: ManagementProjectionOrganizationCreateV1
+ManagementProjection_organization_update_v1?: ManagementProjectionOrganizationUpdateV1
+ManagementProjection_organization_close_preview_v1?: ManagementProjectionOrganizationClosePreviewV1
+ManagementProjection_organization_close_apply_v1?: ManagementProjectionOrganizationCloseApplyV1
+ManagementProjection_organization_reopen_v1?: ManagementProjectionOrganizationReopenV1
+ManagementProjection_organization_delete_preview_v1?: ManagementProjectionOrganizationDeletePreviewV1
+ManagementProjection_organization_delete_apply_v1?: ManagementProjectionOrganizationDeleteApplyV1
+ManagementProjection_center_create_v1?: ManagementProjectionCenterCreateV1
+ManagementProjection_center_update_v1?: ManagementProjectionCenterUpdateV1
+ManagementProjection_room_save_v1?: ManagementProjectionRoomSaveV1
+ManagementProjection_availability_save_v1?: ManagementProjectionAvailabilitySaveV1
+ManagementProjection_availability_exception_save_v1?: ManagementProjectionAvailabilityExceptionSaveV1
+ManagementProjection_policy_publish_v1?: ManagementProjectionPolicyPublishV1
+ManagementProjection_role_assign_v1?: ManagementProjectionRoleAssignV1
+ManagementProjection_role_revoke_v1?: ManagementProjectionRoleRevokeV1
+ManagementProjection_permission_set_v1?: ManagementProjectionPermissionSetV1
+ManagementProjection_org_manager_assign_v1?: ManagementProjectionOrgManagerAssignV1
+ManagementProjection_org_manager_revoke_v1?: ManagementProjectionOrgManagerRevokeV1
+ManagementProjection_manager_self_assign_center_v1?: ManagementProjectionManagerSelfAssignCenterV1
+ManagementProjection_account_access_send_v1?: ManagementProjectionAccountAccessSendV1
+ManagementProjection_account_access_revoke_v1?: ManagementProjectionAccountAccessRevokeV1
+ManagementProjection_account_access_accept_v1?: ManagementProjectionAccountAccessAcceptV1
+ManagementProjection_account_link_remove_v1?: ManagementProjectionAccountLinkRemoveV1
+ManagementProjection_person_create_v1?: ManagementProjectionPersonCreateV1
+ManagementProjection_person_update_v1?: ManagementProjectionPersonUpdateV1
+ManagementProjection_student_activate_v1?: ManagementProjectionStudentActivateV1
+ManagementProjection_student_deactivate_v1?: ManagementProjectionStudentDeactivateV1
+ManagementProjection_person_merge_preview_v1?: ManagementProjectionPersonMergePreviewV1
+ManagementProjection_person_merge_approve_v1?: ManagementProjectionPersonMergeApproveV1
+ManagementProjection_person_merge_apply_v1?: ManagementProjectionPersonMergeApplyV1
+ManagementProjection_class_save_v1?: ManagementProjectionClassSaveV1
+ManagementProjection_program_preview_v1?: ManagementProjectionProgramPreviewV1
+ManagementProjection_program_apply_v1?: ManagementProjectionProgramApplyV1
+ManagementProjection_session_create_v1?: ManagementProjectionSessionCreateV1
+ManagementProjection_session_change_preview_v1?: ManagementProjectionSessionChangePreviewV1
+ManagementProjection_session_change_apply_v1?: ManagementProjectionSessionChangeApplyV1
+ManagementProjection_session_capacity_set_v1?: ManagementProjectionSessionCapacitySetV1
+ManagementProjection_session_cancel_preview_v1?: ManagementProjectionSessionCancelPreviewV1
+ManagementProjection_session_cancel_apply_v1?: ManagementProjectionSessionCancelApplyV1
+ManagementProjection_replacement_session_create_v1?: ManagementProjectionReplacementSessionCreateV1
+ManagementProjection_session_assignment_set_v1?: ManagementProjectionSessionAssignmentSetV1
+ManagementProjection_lesson_request_create_v1?: ManagementProjectionLessonRequestCreateV1
+ManagementProjection_lesson_request_withdraw_v1?: ManagementProjectionLessonRequestWithdrawV1
+ManagementProjection_lesson_request_reject_v1?: ManagementProjectionLessonRequestRejectV1
+ManagementProjection_lesson_request_offer_alternative_v1?: ManagementProjectionLessonRequestOfferAlternativeV1
+ManagementProjection_lesson_request_accept_alternative_v1?: ManagementProjectionLessonRequestAcceptAlternativeV1
+ManagementProjection_lesson_request_approve_v1?: ManagementProjectionLessonRequestApproveV1
+ManagementProjection_reservation_create_v1?: ManagementProjectionReservationCreateV1
+ManagementProjection_reservation_cancel_v1?: ManagementProjectionReservationCancelV1
+ManagementProjection_waitlist_join_v1?: ManagementProjectionWaitlistJoinV1
+ManagementProjection_waitlist_leave_v1?: ManagementProjectionWaitlistLeaveV1
+ManagementProjection_seat_offer_accept_v1?: ManagementProjectionSeatOfferAcceptV1
+ManagementProjection_seat_offer_reject_v1?: ManagementProjectionSeatOfferRejectV1
+ManagementProjection_attendance_mark_v1?: ManagementProjectionAttendanceMarkV1
+ManagementProjection_attendance_close_v1?: ManagementProjectionAttendanceCloseV1
+ManagementProjection_attendance_correct_preview_v1?: ManagementProjectionAttendanceCorrectPreviewV1
+ManagementProjection_attendance_correct_apply_v1?: ManagementProjectionAttendanceCorrectApplyV1
+ManagementProjection_product_publish_v1?: ManagementProjectionProductPublishV1
+ManagementProjection_sale_preview_v1?: ManagementProjectionSalePreviewV1
+ManagementProjection_sale_apply_v1?: ManagementProjectionSaleApplyV1
+ManagementProjection_entitlement_extend_v1?: ManagementProjectionEntitlementExtendV1
+ManagementProjection_credit_adjust_v1?: ManagementProjectionCreditAdjustV1
+ManagementProjection_negative_limit_set_v1?: ManagementProjectionNegativeLimitSetV1
+ManagementProjection_freeze_preview_v1?: ManagementProjectionFreezePreviewV1
+ManagementProjection_freeze_apply_v1?: ManagementProjectionFreezeApplyV1
+ManagementProjection_freeze_end_preview_v1?: ManagementProjectionFreezeEndPreviewV1
+ManagementProjection_freeze_end_apply_v1?: ManagementProjectionFreezeEndApplyV1
+ManagementProjection_sale_terminate_preview_v1?: ManagementProjectionSaleTerminatePreviewV1
+ManagementProjection_sale_terminate_apply_v1?: ManagementProjectionSaleTerminateApplyV1
+ManagementProjection_sale_refund_preview_v1?: ManagementProjectionSaleRefundPreviewV1
+ManagementProjection_sale_refund_apply_v1?: ManagementProjectionSaleRefundApplyV1
+ManagementProjection_sale_change_preview_v1?: ManagementProjectionSaleChangePreviewV1
+ManagementProjection_sale_change_apply_v1?: ManagementProjectionSaleChangeApplyV1
+ManagementProjection_sale_renew_preview_v1?: ManagementProjectionSaleRenewPreviewV1
+ManagementProjection_sale_renew_apply_v1?: ManagementProjectionSaleRenewApplyV1
+ManagementProjection_collection_record_v1?: ManagementProjectionCollectionRecordV1
+ManagementProjection_collection_correct_preview_v1?: ManagementProjectionCollectionCorrectPreviewV1
+ManagementProjection_collection_correct_apply_v1?: ManagementProjectionCollectionCorrectApplyV1
+ManagementProjection_student_credit_refund_v1?: ManagementProjectionStudentCreditRefundV1
+ManagementProjection_student_credit_offset_v1?: ManagementProjectionStudentCreditOffsetV1
+ManagementProjection_debt_adjust_v1?: ManagementProjectionDebtAdjustV1
+ManagementProjection_instructor_agreement_publish_v1?: ManagementProjectionInstructorAgreementPublishV1
+ManagementProjection_instructor_payment_record_v1?: ManagementProjectionInstructorPaymentRecordV1
+ManagementProjection_instructor_payment_correct_v1?: ManagementProjectionInstructorPaymentCorrectV1
+ManagementProjection_lead_save_v1?: ManagementProjectionLeadSaveV1
+ManagementProjection_crm_activity_save_v1?: ManagementProjectionCrmActivitySaveV1
+ManagementProjection_trial_offer_create_v1?: ManagementProjectionTrialOfferCreateV1
+ManagementProjection_trial_registration_confirm_v1?: ManagementProjectionTrialRegistrationConfirmV1
+ManagementProjection_lead_convert_v1?: ManagementProjectionLeadConvertV1
+ManagementProjection_segment_save_v1?: ManagementProjectionSegmentSaveV1
+ManagementProjection_automation_save_v1?: ManagementProjectionAutomationSaveV1
+ManagementProjection_notification_mark_read_v1?: ManagementProjectionNotificationMarkReadV1
+ManagementProjection_notification_preferences_set_v1?: ManagementProjectionNotificationPreferencesSetV1
+ManagementProjection_report_export_start_v1?: ManagementProjectionReportExportStartV1
+ManagementProjection_import_upload_prepare_v1?: ManagementProjectionImportUploadPrepareV1
+ManagementProjection_import_preview_v1?: ManagementProjectionImportPreviewV1
+ManagementProjection_import_apply_v1?: ManagementProjectionImportApplyV1
+ManagementProjection_subscription_upgrade_quote_v1?: ManagementProjectionSubscriptionUpgradeQuoteV1
+ManagementProjection_subscription_downgrade_request_v1?: ManagementProjectionSubscriptionDowngradeRequestV1
+ManagementProjection_subscription_change_cancel_v1?: ManagementProjectionSubscriptionChangeCancelV1
+ManagementProjection_subscription_renewal_set_v1?: ManagementProjectionSubscriptionRenewalSetV1
+ManagementProjection_saas_payment_submit_v1?: ManagementProjectionSaasPaymentSubmitV1
+ManagementProjection_saas_payment_verify_v1?: ManagementProjectionSaasPaymentVerifyV1
+ManagementProjection_saas_grace_extend_v1?: ManagementProjectionSaasGraceExtendV1
+ManagementProjection_event_save_v1?: ManagementProjectionEventSaveV1
+ManagementProjection_event_publish_v1?: ManagementProjectionEventPublishV1
+ManagementProjection_event_register_v1?: ManagementProjectionEventRegisterV1
+ManagementProjection_event_registration_cancel_v1?: ManagementProjectionEventRegistrationCancelV1
+ManagementProjection_event_complete_v1?: ManagementProjectionEventCompleteV1
+ManagementProjection_event_duty_verify_v1?: ManagementProjectionEventDutyVerifyV1
+ManagementProjection_event_cancel_preview_v1?: ManagementProjectionEventCancelPreviewV1
+ManagementProjection_event_cancel_apply_v1?: ManagementProjectionEventCancelApplyV1
+ManagementProjection_document_upload_prepare_v1?: ManagementProjectionDocumentUploadPrepareV1
+ManagementProjection_document_version_publish_v1?: ManagementProjectionDocumentVersionPublishV1
+ManagementProjection_document_accept_v1?: ManagementProjectionDocumentAcceptV1
+ManagementProjection_publication_set_v1?: ManagementProjectionPublicationSetV1
+ManagementProjection_public_application_submit_v1?: ManagementProjectionPublicApplicationSubmitV1
+ManagementProjection_public_application_review_v1?: ManagementProjectionPublicApplicationReviewV1
+ManagementProjection_class_assignment_set_v1?: ManagementProjectionClassAssignmentSetV1
+ManagementProjection_event_attendance_mark_v1?: ManagementProjectionEventAttendanceMarkV1
+ManagementProjection_platform_owner_set_v1?: ManagementProjectionPlatformOwnerSetV1
+ManagementProjection_platform_owner_remove_v1?: ManagementProjectionPlatformOwnerRemoveV1
+ManagementProjection_center_manager_assign_v1?: ManagementProjectionCenterManagerAssignV1
+ManagementProjection_center_manager_revoke_v1?: ManagementProjectionCenterManagerRevokeV1
+ManagementProjection_attendance_block_v1?: ManagementProjectionAttendanceBlockV1
+ManagementProjection_event_attendance_close_v1?: ManagementProjectionEventAttendanceCloseV1
+ManagementProjection_event_attendance_correct_v1?: ManagementProjectionEventAttendanceCorrectV1
+ManagementProjection_file_upload_complete_v1?: ManagementProjectionFileUploadCompleteV1
+ManagementProjection_negcredit_valuation_set_v1?: ManagementProjectionNegcreditValuationSetV1
+ManagementProjection_discipline_save_v1?: ManagementProjectionDisciplineSaveV1
+ManagementProjection_center_discipline_set_v1?: ManagementProjectionCenterDisciplineSetV1
+ManagementProjection_person_discipline_set_v1?: ManagementProjectionPersonDisciplineSetV1
+ManagementProjection_event_registration_preview_v1?: ManagementProjectionEventRegistrationPreviewV1
+ManagementProjection_event_payment_prepare_v1?: ManagementProjectionEventPaymentPrepareV1
+ManagementProjection_event_actual_start_record_v1?: ManagementProjectionEventActualStartRecordV1
+ManagementProjection_event_actual_start_correct_v1?: ManagementProjectionEventActualStartCorrectV1
+ManagementProjection_reservation_impact_preview_v1?: ManagementProjectionReservationImpactPreviewV1
+ManagementProjection_reservation_impact_apply_v1?: ManagementProjectionReservationImpactApplyV1
+ManagementProjection_settlement_request_submit_v1?: ManagementProjectionSettlementRequestSubmitV1
+ManagementProjection_settlement_request_withdraw_v1?: ManagementProjectionSettlementRequestWithdrawV1
+ManagementProjection_settlement_request_decide_v1?: ManagementProjectionSettlementRequestDecideV1
+ManagementProjection_settlement_payment_record_v1?: ManagementProjectionSettlementPaymentRecordV1
+ManagementProjection_settlement_offset_record_v1?: ManagementProjectionSettlementOffsetRecordV1
+ManagementProjection_settlement_adjust_v1?: ManagementProjectionSettlementAdjustV1
+ManagementProjection?: ManagementProjection
+ManagementOperationName?: ManagementOperationName
+ManagementSelector_account_profile_update_v1?: ManagementSelectorAccountProfileUpdateV1
+ManagementSelector_account_delete_preview_v1?: ManagementSelectorAccountDeletePreviewV1
+ManagementSelector_account_delete_apply_v1?: ManagementSelectorAccountDeleteApplyV1
+ManagementSelector_organization_create_v1?: ManagementSelectorOrganizationCreateV1
+ManagementSelector_organization_update_v1?: ManagementSelectorOrganizationUpdateV1
+ManagementSelector_organization_close_preview_v1?: ManagementSelectorOrganizationClosePreviewV1
+ManagementSelector_organization_close_apply_v1?: ManagementSelectorOrganizationCloseApplyV1
+ManagementSelector_organization_reopen_v1?: ManagementSelectorOrganizationReopenV1
+ManagementSelector_organization_delete_preview_v1?: ManagementSelectorOrganizationDeletePreviewV1
+ManagementSelector_organization_delete_apply_v1?: ManagementSelectorOrganizationDeleteApplyV1
+ManagementSelector_center_create_v1?: ManagementSelectorCenterCreateV1
+ManagementSelector_center_update_v1?: ManagementSelectorCenterUpdateV1
+ManagementSelector_room_save_v1?: ManagementSelectorRoomSaveV1
+ManagementSelector_availability_save_v1?: ManagementSelectorAvailabilitySaveV1
+ManagementSelector_availability_exception_save_v1?: ManagementSelectorAvailabilityExceptionSaveV1
+ManagementSelector_policy_publish_v1?: ManagementSelectorPolicyPublishV1
+ManagementSelector_role_assign_v1?: ManagementSelectorRoleAssignV1
+ManagementSelector_role_revoke_v1?: ManagementSelectorRoleRevokeV1
+ManagementSelector_permission_set_v1?: ManagementSelectorPermissionSetV1
+ManagementSelector_org_manager_assign_v1?: ManagementSelectorOrgManagerAssignV1
+ManagementSelector_org_manager_revoke_v1?: ManagementSelectorOrgManagerRevokeV1
+ManagementSelector_manager_self_assign_center_v1?: ManagementSelectorManagerSelfAssignCenterV1
+ManagementSelector_account_access_send_v1?: ManagementSelectorAccountAccessSendV1
+ManagementSelector_account_access_revoke_v1?: ManagementSelectorAccountAccessRevokeV1
+ManagementSelector_account_access_accept_v1?: ManagementSelectorAccountAccessAcceptV1
+ManagementSelector_account_link_remove_v1?: ManagementSelectorAccountLinkRemoveV1
+ManagementSelector_person_create_v1?: ManagementSelectorPersonCreateV1
+ManagementSelector_person_update_v1?: ManagementSelectorPersonUpdateV1
+ManagementSelector_student_activate_v1?: ManagementSelectorStudentActivateV1
+ManagementSelector_student_deactivate_v1?: ManagementSelectorStudentDeactivateV1
+ManagementSelector_person_merge_preview_v1?: ManagementSelectorPersonMergePreviewV1
+ManagementSelector_person_merge_approve_v1?: ManagementSelectorPersonMergeApproveV1
+ManagementSelector_person_merge_apply_v1?: ManagementSelectorPersonMergeApplyV1
+ManagementSelector_class_save_v1?: ManagementSelectorClassSaveV1
+ManagementSelector_program_preview_v1?: ManagementSelectorProgramPreviewV1
+ManagementSelector_program_apply_v1?: ManagementSelectorProgramApplyV1
+ManagementSelector_session_create_v1?: ManagementSelectorSessionCreateV1
+ManagementSelector_session_change_preview_v1?: ManagementSelectorSessionChangePreviewV1
+ManagementSelector_session_change_apply_v1?: ManagementSelectorSessionChangeApplyV1
+ManagementSelector_session_capacity_set_v1?: ManagementSelectorSessionCapacitySetV1
+ManagementSelector_session_cancel_preview_v1?: ManagementSelectorSessionCancelPreviewV1
+ManagementSelector_session_cancel_apply_v1?: ManagementSelectorSessionCancelApplyV1
+ManagementSelector_replacement_session_create_v1?: ManagementSelectorReplacementSessionCreateV1
+ManagementSelector_session_assignment_set_v1?: ManagementSelectorSessionAssignmentSetV1
+ManagementSelector_lesson_request_create_v1?: ManagementSelectorLessonRequestCreateV1
+ManagementSelector_lesson_request_withdraw_v1?: ManagementSelectorLessonRequestWithdrawV1
+ManagementSelector_lesson_request_reject_v1?: ManagementSelectorLessonRequestRejectV1
+ManagementSelector_lesson_request_offer_alternative_v1?: ManagementSelectorLessonRequestOfferAlternativeV1
+ManagementSelector_lesson_request_accept_alternative_v1?: ManagementSelectorLessonRequestAcceptAlternativeV1
+ManagementSelector_lesson_request_approve_v1?: ManagementSelectorLessonRequestApproveV1
+ManagementSelector_reservation_create_v1?: ManagementSelectorReservationCreateV1
+ManagementSelector_reservation_cancel_v1?: ManagementSelectorReservationCancelV1
+ManagementSelector_waitlist_join_v1?: ManagementSelectorWaitlistJoinV1
+ManagementSelector_waitlist_leave_v1?: ManagementSelectorWaitlistLeaveV1
+ManagementSelector_seat_offer_accept_v1?: ManagementSelectorSeatOfferAcceptV1
+ManagementSelector_seat_offer_reject_v1?: ManagementSelectorSeatOfferRejectV1
+ManagementSelector_attendance_mark_v1?: ManagementSelectorAttendanceMarkV1
+ManagementSelector_attendance_close_v1?: ManagementSelectorAttendanceCloseV1
+ManagementSelector_attendance_correct_preview_v1?: ManagementSelectorAttendanceCorrectPreviewV1
+ManagementSelector_attendance_correct_apply_v1?: ManagementSelectorAttendanceCorrectApplyV1
+ManagementSelector_product_publish_v1?: ManagementSelectorProductPublishV1
+ManagementSelector_sale_preview_v1?: ManagementSelectorSalePreviewV1
+ManagementSelector_sale_apply_v1?: ManagementSelectorSaleApplyV1
+ManagementSelector_entitlement_extend_v1?: ManagementSelectorEntitlementExtendV1
+ManagementSelector_credit_adjust_v1?: ManagementSelectorCreditAdjustV1
+ManagementSelector_negative_limit_set_v1?: ManagementSelectorNegativeLimitSetV1
+ManagementSelector_freeze_preview_v1?: ManagementSelectorFreezePreviewV1
+ManagementSelector_freeze_apply_v1?: ManagementSelectorFreezeApplyV1
+ManagementSelector_freeze_end_preview_v1?: ManagementSelectorFreezeEndPreviewV1
+ManagementSelector_freeze_end_apply_v1?: ManagementSelectorFreezeEndApplyV1
+ManagementSelector_sale_terminate_preview_v1?: ManagementSelectorSaleTerminatePreviewV1
+ManagementSelector_sale_terminate_apply_v1?: ManagementSelectorSaleTerminateApplyV1
+ManagementSelector_sale_refund_preview_v1?: ManagementSelectorSaleRefundPreviewV1
+ManagementSelector_sale_refund_apply_v1?: ManagementSelectorSaleRefundApplyV1
+ManagementSelector_sale_change_preview_v1?: ManagementSelectorSaleChangePreviewV1
+ManagementSelector_sale_change_apply_v1?: ManagementSelectorSaleChangeApplyV1
+ManagementSelector_sale_renew_preview_v1?: ManagementSelectorSaleRenewPreviewV1
+ManagementSelector_sale_renew_apply_v1?: ManagementSelectorSaleRenewApplyV1
+ManagementSelector_collection_record_v1?: ManagementSelectorCollectionRecordV1
+ManagementSelector_collection_correct_preview_v1?: ManagementSelectorCollectionCorrectPreviewV1
+ManagementSelector_collection_correct_apply_v1?: ManagementSelectorCollectionCorrectApplyV1
+ManagementSelector_student_credit_refund_v1?: ManagementSelectorStudentCreditRefundV1
+ManagementSelector_student_credit_offset_v1?: ManagementSelectorStudentCreditOffsetV1
+ManagementSelector_debt_adjust_v1?: ManagementSelectorDebtAdjustV1
+ManagementSelector_instructor_agreement_publish_v1?: ManagementSelectorInstructorAgreementPublishV1
+ManagementSelector_instructor_payment_record_v1?: ManagementSelectorInstructorPaymentRecordV1
+ManagementSelector_instructor_payment_correct_v1?: ManagementSelectorInstructorPaymentCorrectV1
+ManagementSelector_lead_save_v1?: ManagementSelectorLeadSaveV1
+ManagementSelector_crm_activity_save_v1?: ManagementSelectorCrmActivitySaveV1
+ManagementSelector_trial_offer_create_v1?: ManagementSelectorTrialOfferCreateV1
+ManagementSelector_trial_registration_confirm_v1?: ManagementSelectorTrialRegistrationConfirmV1
+ManagementSelector_lead_convert_v1?: ManagementSelectorLeadConvertV1
+ManagementSelector_segment_save_v1?: ManagementSelectorSegmentSaveV1
+ManagementSelector_automation_save_v1?: ManagementSelectorAutomationSaveV1
+ManagementSelector_notification_mark_read_v1?: ManagementSelectorNotificationMarkReadV1
+ManagementSelector_notification_preferences_set_v1?: ManagementSelectorNotificationPreferencesSetV1
+ManagementSelector_report_export_start_v1?: ManagementSelectorReportExportStartV1
+ManagementSelector_import_upload_prepare_v1?: ManagementSelectorImportUploadPrepareV1
+ManagementSelector_import_preview_v1?: ManagementSelectorImportPreviewV1
+ManagementSelector_import_apply_v1?: ManagementSelectorImportApplyV1
+ManagementSelector_subscription_upgrade_quote_v1?: ManagementSelectorSubscriptionUpgradeQuoteV1
+ManagementSelector_subscription_downgrade_request_v1?: ManagementSelectorSubscriptionDowngradeRequestV1
+ManagementSelector_subscription_change_cancel_v1?: ManagementSelectorSubscriptionChangeCancelV1
+ManagementSelector_subscription_renewal_set_v1?: ManagementSelectorSubscriptionRenewalSetV1
+ManagementSelector_saas_payment_submit_v1?: ManagementSelectorSaasPaymentSubmitV1
+ManagementSelector_saas_payment_verify_v1?: ManagementSelectorSaasPaymentVerifyV1
+ManagementSelector_saas_grace_extend_v1?: ManagementSelectorSaasGraceExtendV1
+ManagementSelector_event_save_v1?: ManagementSelectorEventSaveV1
+ManagementSelector_event_publish_v1?: ManagementSelectorEventPublishV1
+ManagementSelector_event_register_v1?: ManagementSelectorEventRegisterV1
+ManagementSelector_event_registration_cancel_v1?: ManagementSelectorEventRegistrationCancelV1
+ManagementSelector_event_complete_v1?: ManagementSelectorEventCompleteV1
+ManagementSelector_event_duty_verify_v1?: ManagementSelectorEventDutyVerifyV1
+ManagementSelector_event_cancel_preview_v1?: ManagementSelectorEventCancelPreviewV1
+ManagementSelector_event_cancel_apply_v1?: ManagementSelectorEventCancelApplyV1
+ManagementSelector_document_upload_prepare_v1?: ManagementSelectorDocumentUploadPrepareV1
+ManagementSelector_document_version_publish_v1?: ManagementSelectorDocumentVersionPublishV1
+ManagementSelector_document_accept_v1?: ManagementSelectorDocumentAcceptV1
+ManagementSelector_publication_set_v1?: ManagementSelectorPublicationSetV1
+ManagementSelector_public_application_submit_v1?: ManagementSelectorPublicApplicationSubmitV1
+ManagementSelector_public_application_review_v1?: ManagementSelectorPublicApplicationReviewV1
+ManagementSelector_class_assignment_set_v1?: ManagementSelectorClassAssignmentSetV1
+ManagementSelector_event_attendance_mark_v1?: ManagementSelectorEventAttendanceMarkV1
+ManagementSelector_platform_owner_set_v1?: ManagementSelectorPlatformOwnerSetV1
+ManagementSelector_platform_owner_remove_v1?: ManagementSelectorPlatformOwnerRemoveV1
+ManagementSelector_center_manager_assign_v1?: ManagementSelectorCenterManagerAssignV1
+ManagementSelector_center_manager_revoke_v1?: ManagementSelectorCenterManagerRevokeV1
+ManagementSelector_attendance_block_v1?: ManagementSelectorAttendanceBlockV1
+ManagementSelector_event_attendance_close_v1?: ManagementSelectorEventAttendanceCloseV1
+ManagementSelector_event_attendance_correct_v1?: ManagementSelectorEventAttendanceCorrectV1
+ManagementSelector_file_upload_complete_v1?: ManagementSelectorFileUploadCompleteV1
+ManagementSelector_negcredit_valuation_set_v1?: ManagementSelectorNegcreditValuationSetV1
+ManagementSelector_discipline_save_v1?: ManagementSelectorDisciplineSaveV1
+ManagementSelector_center_discipline_set_v1?: ManagementSelectorCenterDisciplineSetV1
+ManagementSelector_person_discipline_set_v1?: ManagementSelectorPersonDisciplineSetV1
+ManagementSelector_event_registration_preview_v1?: ManagementSelectorEventRegistrationPreviewV1
+ManagementSelector_event_payment_prepare_v1?: ManagementSelectorEventPaymentPrepareV1
+ManagementSelector_event_actual_start_record_v1?: ManagementSelectorEventActualStartRecordV1
+ManagementSelector_event_actual_start_correct_v1?: ManagementSelectorEventActualStartCorrectV1
+ManagementSelector_reservation_impact_preview_v1?: ManagementSelectorReservationImpactPreviewV1
+ManagementSelector_reservation_impact_apply_v1?: ManagementSelectorReservationImpactApplyV1
+ManagementSelector_settlement_request_submit_v1?: ManagementSelectorSettlementRequestSubmitV1
+ManagementSelector_settlement_request_withdraw_v1?: ManagementSelectorSettlementRequestWithdrawV1
+ManagementSelector_settlement_request_decide_v1?: ManagementSelectorSettlementRequestDecideV1
+ManagementSelector_settlement_payment_record_v1?: ManagementSelectorSettlementPaymentRecordV1
+ManagementSelector_settlement_offset_record_v1?: ManagementSelectorSettlementOffsetRecordV1
+ManagementSelector_settlement_adjust_v1?: ManagementSelectorSettlementAdjustV1
+ManagementSelector?: ManagementSelector
+ManagementStatePage?: ManagementStatePage
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -1745,8 +2165,29 @@ order: ("before_instructor_share" | "after_instructor_share")
 export interface PayTerms {
 model: PayModel
 currency: Currency
-components: PayComponent[]
+/**
+ * @minItems 1
+ */
+components: [PayComponent, ...(PayComponent)[]]
 room_fee: RoomFee
+/**
+ * @minItems 0
+ */
+package_overrides?: AgreementPackageTerms[]
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "AgreementPackageTerms".
+ */
+export interface AgreementPackageTerms {
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+product_id: string
+/**
+ * @minItems 1
+ */
+components: [PayComponent, ...(PayComponent)[]]
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -5927,6 +6368,7 @@ expected_version: PositiveInt
 sale_id: string
 end_date: Date
 reason: Text
+impact_approval: PreviewToken
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -5966,6 +6408,7 @@ sale_id: string
 quantity: Int
 direction: Direction
 reason: Text
+impact_approval: PreviewToken
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -6012,6 +6455,7 @@ reason: Text
  * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
  */
 discipline_id: string
+impact_approval: PreviewToken
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -6699,37 +7143,6 @@ data: Mutation
  * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
  */
 trace_id: string
-}
-/**
- * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
- * via the `definition` "Request_instructor_agreement_publish".
- */
-export interface RequestInstructorAgreementPublish {
-client_api_version: 1
-/**
- * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
- */
-request_id: string
-/**
- * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
- */
-org_id: string
-center_id?: (string | null)
-/**
- * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
- */
-operation_key: string
-/**
- * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
- */
-person_id: string
-format: SessionFormat
-valid: Interval
-terms: PayTerms
-/**
- * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
- */
-discipline_id: string
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -8454,7 +8867,7 @@ client_api_version: 1
  */
 request_id: string
 org_id?: (string | null)
-operation: Text
+operation: OperationName
 /**
  * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
  */
@@ -11436,7 +11849,7 @@ version?: PositiveInt
 org_id?: (string | null)
 actor_account_id?: (string | null)
 actor_fingerprint: Text
-operation: Text
+operation: OperationName
 key_hash: Text
 payload_hash: Text
 state: OperationState
@@ -11461,7 +11874,7 @@ version?: PositiveInt
 org_id: string
 actor_account_id?: (string | null)
 actor_person_id?: (string | null)
-action: Text
+action: OperationName
 subject_table: Text
 /**
  * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
@@ -12244,6 +12657,4775 @@ reason: Text
 export interface SuccessEventActualStartCorrect {
 ok: true
 data: Mutation
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+trace_id: string
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "AgreementVersionView".
+ */
+export interface AgreementVersionView {
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+id: string
+version: PositiveInt
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+person_id: string
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+center_id: string
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+discipline_id: string
+format: SessionFormat
+valid: Interval
+supersedes_id: (string | null)
+terms: PayTerms
+published_at: Instant
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "AgreementVersionPage".
+ */
+export interface AgreementVersionPage {
+/**
+ * @minItems 0
+ */
+items: AgreementVersionView[]
+next_cursor: (OpaqueToken | null)
+as_of: Instant
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "ManagementStateView".
+ */
+export interface ManagementStateView {
+operation: OperationName
+entity: (EntityRef | null)
+exists: Bool
+state: (("accepted" | "active" | "alternative_offered" | "applied" | "approved" | "cancelled" | "capacity_closed" | "closed" | "completed" | "consumed" | "converted" | "current" | "deleted" | "deletion_pending" | "draft" | "ended" | "event_cancelled" | "expired" | "failed" | "failed_final" | "grace" | "in_progress" | "inactive" | "invalid" | "invalidated" | "left" | "merged" | "occurred" | "offered" | "open" | "partial" | "pending" | "pending_payment" | "pending_upload" | "planned" | "prepared" | "published" | "ready" | "registered" | "rejected" | "released" | "requested" | "reserved" | "result_expired" | "retry_wait" | "reviewed" | "revoked" | "running" | "scheduled" | "settled" | "succeeded" | "superseded" | "suspended" | "terminated" | "valid" | "waiting" | "withdrawn") | null)
+/**
+ * @minItems 0
+ */
+versions: EntityVersion[]
+as_of: Instant
+current: (ManagementProjection | null)
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "ManagementProjection_account_profile_update_v1".
+ */
+export interface ManagementProjectionAccountProfileUpdateV1 {
+operation: "account_profile_update_v1"
+values: {
+display_name?: Text
+}
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "ManagementProjection_account_delete_preview_v1".
+ */
+export interface ManagementProjectionAccountDeletePreviewV1 {
+operation: "account_delete_preview_v1"
+values: {
+
+}
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "ManagementProjection_account_delete_apply_v1".
+ */
+export interface ManagementProjectionAccountDeleteApplyV1 {
+operation: "account_delete_apply_v1"
+values: {
+
+}
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "ManagementProjection_organization_create_v1".
+ */
+export interface ManagementProjectionOrganizationCreateV1 {
+operation: "organization_create_v1"
+values: {
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+verified_account_id?: string
+name?: Text
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+initial_plan_id?: string
+}
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "ManagementProjection_organization_update_v1".
+ */
+export interface ManagementProjectionOrganizationUpdateV1 {
+operation: "organization_update_v1"
+values: {
+name?: Text
+}
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "ManagementProjection_organization_close_preview_v1".
+ */
+export interface ManagementProjectionOrganizationClosePreviewV1 {
+operation: "organization_close_preview_v1"
+values: {
+
+}
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "ManagementProjection_organization_close_apply_v1".
+ */
+export interface ManagementProjectionOrganizationCloseApplyV1 {
+operation: "organization_close_apply_v1"
+values: {
+
+}
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "ManagementProjection_organization_reopen_v1".
+ */
+export interface ManagementProjectionOrganizationReopenV1 {
+operation: "organization_reopen_v1"
+values: {
+
+}
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "ManagementProjection_organization_delete_preview_v1".
+ */
+export interface ManagementProjectionOrganizationDeletePreviewV1 {
+operation: "organization_delete_preview_v1"
+values: {
+all_data?: true
+}
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "ManagementProjection_organization_delete_apply_v1".
+ */
+export interface ManagementProjectionOrganizationDeleteApplyV1 {
+operation: "organization_delete_apply_v1"
+values: {
+all_data?: true
+}
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "ManagementProjection_center_create_v1".
+ */
+export interface ManagementProjectionCenterCreateV1 {
+operation: "center_create_v1"
+values: {
+name?: Text
+timezone?: IanaZone
+}
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "ManagementProjection_center_update_v1".
+ */
+export interface ManagementProjectionCenterUpdateV1 {
+operation: "center_update_v1"
+values: {
+name?: Text
+timezone?: IanaZone
+}
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "ManagementProjection_room_save_v1".
+ */
+export interface ManagementProjectionRoomSaveV1 {
+operation: "room_save_v1"
+values: {
+room_id?: (string | null)
+name?: Text
+capacities?: RoomCapacity[]
+}
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "ManagementProjection_availability_save_v1".
+ */
+export interface ManagementProjectionAvailabilitySaveV1 {
+operation: "availability_save_v1"
+values: {
+rule_id?: (string | null)
+resource?: ResourceRef
+rule?: AvailabilityRule
+}
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "ManagementProjection_availability_exception_save_v1".
+ */
+export interface ManagementProjectionAvailabilityExceptionSaveV1 {
+operation: "availability_exception_save_v1"
+values: {
+resource?: ResourceRef
+interval?: Interval
+}
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "ManagementProjection_policy_publish_v1".
+ */
+export interface ManagementProjectionPolicyPublishV1 {
+operation: "policy_publish_v1"
+values: {
+key?: PolicyKey
+value?: PolicyValue
+effective_at?: Instant
+mandatory?: Bool
+}
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "ManagementProjection_role_assign_v1".
+ */
+export interface ManagementProjectionRoleAssignV1 {
+operation: "role_assign_v1"
+values: {
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+person_id?: string
+role?: OperationalRole
+scope?: RoleScope
+}
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "ManagementProjection_role_revoke_v1".
+ */
+export interface ManagementProjectionRoleRevokeV1 {
+operation: "role_revoke_v1"
+values: {
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+assignment_id?: string
+}
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "ManagementProjection_permission_set_v1".
+ */
+export interface ManagementProjectionPermissionSetV1 {
+operation: "permission_set_v1"
+values: {
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+person_id?: string
+permission?: Permission
+enabled?: Bool
+}
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "ManagementProjection_org_manager_assign_v1".
+ */
+export interface ManagementProjectionOrgManagerAssignV1 {
+operation: "org_manager_assign_v1"
+values: {
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+person_id?: string
+}
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "ManagementProjection_org_manager_revoke_v1".
+ */
+export interface ManagementProjectionOrgManagerRevokeV1 {
+operation: "org_manager_revoke_v1"
+values: {
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+person_id?: string
+}
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "ManagementProjection_manager_self_assign_center_v1".
+ */
+export interface ManagementProjectionManagerSelfAssignCenterV1 {
+operation: "manager_self_assign_center_v1"
+values: {
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+target_center_id?: string
+}
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "ManagementProjection_account_access_send_v1".
+ */
+export interface ManagementProjectionAccountAccessSendV1 {
+operation: "account_access_send_v1"
+values: {
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+person_id?: string
+}
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "ManagementProjection_account_access_revoke_v1".
+ */
+export interface ManagementProjectionAccountAccessRevokeV1 {
+operation: "account_access_revoke_v1"
+values: {
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+invitation_id?: string
+}
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "ManagementProjection_account_access_accept_v1".
+ */
+export interface ManagementProjectionAccountAccessAcceptV1 {
+operation: "account_access_accept_v1"
+values: {
+
+}
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "ManagementProjection_account_link_remove_v1".
+ */
+export interface ManagementProjectionAccountLinkRemoveV1 {
+operation: "account_link_remove_v1"
+values: {
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+link_id?: string
+}
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "ManagementProjection_person_create_v1".
+ */
+export interface ManagementProjectionPersonCreateV1 {
+operation: "person_create_v1"
+values: {
+display_name?: Text
+contacts?: ContactInput[]
+}
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "ManagementProjection_person_update_v1".
+ */
+export interface ManagementProjectionPersonUpdateV1 {
+operation: "person_update_v1"
+values: {
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+person_id?: string
+patch?: PersonPatch
+}
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "ManagementProjection_student_activate_v1".
+ */
+export interface ManagementProjectionStudentActivateV1 {
+operation: "student_activate_v1"
+values: {
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+person_id?: string
+}
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "ManagementProjection_student_deactivate_v1".
+ */
+export interface ManagementProjectionStudentDeactivateV1 {
+operation: "student_deactivate_v1"
+values: {
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+person_id?: string
+}
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "ManagementProjection_person_merge_preview_v1".
+ */
+export interface ManagementProjectionPersonMergePreviewV1 {
+operation: "person_merge_preview_v1"
+values: {
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+source_id?: string
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+target_id?: string
+}
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "ManagementProjection_person_merge_approve_v1".
+ */
+export interface ManagementProjectionPersonMergeApproveV1 {
+operation: "person_merge_approve_v1"
+values: {
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+approval_center_id?: string
+}
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "ManagementProjection_person_merge_apply_v1".
+ */
+export interface ManagementProjectionPersonMergeApplyV1 {
+operation: "person_merge_apply_v1"
+values: {
+
+}
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "ManagementProjection_class_save_v1".
+ */
+export interface ManagementProjectionClassSaveV1 {
+operation: "class_save_v1"
+values: {
+class_id?: (string | null)
+name?: Text
+external_open?: Bool
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+discipline_id?: string
+}
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "ManagementProjection_program_preview_v1".
+ */
+export interface ManagementProjectionProgramPreviewV1 {
+operation: "program_preview_v1"
+values: {
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+class_id?: string
+schedule?: ProgramSpec
+}
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "ManagementProjection_program_apply_v1".
+ */
+export interface ManagementProjectionProgramApplyV1 {
+operation: "program_apply_v1"
+values: {
+
+}
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "ManagementProjection_session_create_v1".
+ */
+export interface ManagementProjectionSessionCreateV1 {
+operation: "session_create_v1"
+values: {
+class_id?: (string | null)
+interval?: Interval
+resources?: ResourceRef[]
+assignments?: DutyInput[]
+capacity?: Capacity
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+discipline_id?: string
+format?: SessionFormat
+inherit_class_assignments?: Bool
+}
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "ManagementProjection_session_change_preview_v1".
+ */
+export interface ManagementProjectionSessionChangePreviewV1 {
+operation: "session_change_preview_v1"
+values: {
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+session_id?: string
+patch?: SessionPatch
+scope?: ChangeScope
+offset_choices?: LocalOffsetChoice[]
+}
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "ManagementProjection_session_change_apply_v1".
+ */
+export interface ManagementProjectionSessionChangeApplyV1 {
+operation: "session_change_apply_v1"
+values: {
+
+}
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "ManagementProjection_session_capacity_set_v1".
+ */
+export interface ManagementProjectionSessionCapacitySetV1 {
+operation: "session_capacity_set_v1"
+values: {
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+session_id?: string
+nominal?: Int
+maximum?: Int
+}
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "ManagementProjection_session_cancel_preview_v1".
+ */
+export interface ManagementProjectionSessionCancelPreviewV1 {
+operation: "session_cancel_preview_v1"
+values: {
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+session_id?: string
+}
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "ManagementProjection_session_cancel_apply_v1".
+ */
+export interface ManagementProjectionSessionCancelApplyV1 {
+operation: "session_cancel_apply_v1"
+values: {
+
+}
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "ManagementProjection_replacement_session_create_v1".
+ */
+export interface ManagementProjectionReplacementSessionCreateV1 {
+operation: "replacement_session_create_v1"
+values: {
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+replaces_id?: string
+interval?: Interval
+resources?: ResourceRef[]
+capacity?: Capacity
+}
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "ManagementProjection_session_assignment_set_v1".
+ */
+export interface ManagementProjectionSessionAssignmentSetV1 {
+operation: "session_assignment_set_v1"
+values: {
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+session_id?: string
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+person_id?: string
+duty?: Duty
+agreement_id?: (string | null)
+state?: RecordState
+}
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "ManagementProjection_lesson_request_create_v1".
+ */
+export interface ManagementProjectionLessonRequestCreateV1 {
+operation: "lesson_request_create_v1"
+values: {
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+person_id?: string
+requested_start?: Instant
+duration_minutes?: Int
+preferred_instructor_id?: (string | null)
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+discipline_id?: string
+}
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "ManagementProjection_lesson_request_withdraw_v1".
+ */
+export interface ManagementProjectionLessonRequestWithdrawV1 {
+operation: "lesson_request_withdraw_v1"
+values: {
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+lesson_request_id?: string
+}
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "ManagementProjection_lesson_request_reject_v1".
+ */
+export interface ManagementProjectionLessonRequestRejectV1 {
+operation: "lesson_request_reject_v1"
+values: {
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+lesson_request_id?: string
+}
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "ManagementProjection_lesson_request_offer_alternative_v1".
+ */
+export interface ManagementProjectionLessonRequestOfferAlternativeV1 {
+operation: "lesson_request_offer_alternative_v1"
+values: {
+alternatives?: RequestAlternative[]
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+lesson_request_id?: string
+}
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "ManagementProjection_lesson_request_accept_alternative_v1".
+ */
+export interface ManagementProjectionLessonRequestAcceptAlternativeV1 {
+operation: "lesson_request_accept_alternative_v1"
+values: {
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+alternative_id?: string
+}
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "ManagementProjection_lesson_request_approve_v1".
+ */
+export interface ManagementProjectionLessonRequestApproveV1 {
+operation: "lesson_request_approve_v1"
+values: {
+session_id?: (string | null)
+session?: (SessionCreate | null)
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+lesson_request_id?: string
+}
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "ManagementProjection_reservation_create_v1".
+ */
+export interface ManagementProjectionReservationCreateV1 {
+operation: "reservation_create_v1"
+values: {
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+person_id?: string
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+session_id?: string
+source_sale_id?: (string | null)
+mode?: BookingMode
+}
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "ManagementProjection_reservation_cancel_v1".
+ */
+export interface ManagementProjectionReservationCancelV1 {
+operation: "reservation_cancel_v1"
+values: {
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+reservation_id?: string
+}
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "ManagementProjection_waitlist_join_v1".
+ */
+export interface ManagementProjectionWaitlistJoinV1 {
+operation: "waitlist_join_v1"
+values: {
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+person_id?: string
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+session_id?: string
+}
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "ManagementProjection_waitlist_leave_v1".
+ */
+export interface ManagementProjectionWaitlistLeaveV1 {
+operation: "waitlist_leave_v1"
+values: {
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+entry_id?: string
+}
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "ManagementProjection_seat_offer_accept_v1".
+ */
+export interface ManagementProjectionSeatOfferAcceptV1 {
+operation: "seat_offer_accept_v1"
+values: {
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+offer_id?: string
+}
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "ManagementProjection_seat_offer_reject_v1".
+ */
+export interface ManagementProjectionSeatOfferRejectV1 {
+operation: "seat_offer_reject_v1"
+values: {
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+offer_id?: string
+}
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "ManagementProjection_attendance_mark_v1".
+ */
+export interface ManagementProjectionAttendanceMarkV1 {
+operation: "attendance_mark_v1"
+values: {
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+reservation_id?: string
+result?: OrdinaryAttendanceResult
+}
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "ManagementProjection_attendance_close_v1".
+ */
+export interface ManagementProjectionAttendanceCloseV1 {
+operation: "attendance_close_v1"
+values: {
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+session_id?: string
+}
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "ManagementProjection_attendance_correct_preview_v1".
+ */
+export interface ManagementProjectionAttendanceCorrectPreviewV1 {
+operation: "attendance_correct_preview_v1"
+values: {
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+session_id?: string
+corrections?: AttendanceCorrection[]
+}
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "ManagementProjection_attendance_correct_apply_v1".
+ */
+export interface ManagementProjectionAttendanceCorrectApplyV1 {
+operation: "attendance_correct_apply_v1"
+values: {
+
+}
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "ManagementProjection_product_publish_v1".
+ */
+export interface ManagementProjectionProductPublishV1 {
+operation: "product_publish_v1"
+values: {
+product_id?: (string | null)
+terms?: ProductTerms
+}
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "ManagementProjection_sale_preview_v1".
+ */
+export interface ManagementProjectionSalePreviewV1 {
+operation: "sale_preview_v1"
+values: {
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+person_id?: string
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+product_version_id?: string
+start_date?: Date
+net_minor?: (Money | null)
+end_date?: Date
+}
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "ManagementProjection_sale_apply_v1".
+ */
+export interface ManagementProjectionSaleApplyV1 {
+operation: "sale_apply_v1"
+values: {
+
+}
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "ManagementProjection_entitlement_extend_v1".
+ */
+export interface ManagementProjectionEntitlementExtendV1 {
+operation: "entitlement_extend_v1"
+values: {
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+sale_id?: string
+end_date?: Date
+}
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "ManagementProjection_credit_adjust_v1".
+ */
+export interface ManagementProjectionCreditAdjustV1 {
+operation: "credit_adjust_v1"
+values: {
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+sale_id?: string
+quantity?: Int
+direction?: Direction
+}
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "ManagementProjection_negative_limit_set_v1".
+ */
+export interface ManagementProjectionNegativeLimitSetV1 {
+operation: "negative_limit_set_v1"
+values: {
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+person_id?: string
+allowed_negative_credits?: Count
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+discipline_id?: string
+}
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "ManagementProjection_freeze_preview_v1".
+ */
+export interface ManagementProjectionFreezePreviewV1 {
+operation: "freeze_preview_v1"
+values: {
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+sale_id?: string
+dates?: DateInterval
+}
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "ManagementProjection_freeze_apply_v1".
+ */
+export interface ManagementProjectionFreezeApplyV1 {
+operation: "freeze_apply_v1"
+values: {
+
+}
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "ManagementProjection_freeze_end_preview_v1".
+ */
+export interface ManagementProjectionFreezeEndPreviewV1 {
+operation: "freeze_end_preview_v1"
+values: {
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+freeze_id?: string
+end_date?: Date
+}
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "ManagementProjection_freeze_end_apply_v1".
+ */
+export interface ManagementProjectionFreezeEndApplyV1 {
+operation: "freeze_end_apply_v1"
+values: {
+
+}
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "ManagementProjection_sale_terminate_preview_v1".
+ */
+export interface ManagementProjectionSaleTerminatePreviewV1 {
+operation: "sale_terminate_preview_v1"
+values: {
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+sale_id?: string
+}
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "ManagementProjection_sale_terminate_apply_v1".
+ */
+export interface ManagementProjectionSaleTerminateApplyV1 {
+operation: "sale_terminate_apply_v1"
+values: {
+
+}
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "ManagementProjection_sale_refund_preview_v1".
+ */
+export interface ManagementProjectionSaleRefundPreviewV1 {
+operation: "sale_refund_preview_v1"
+values: {
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+sale_id?: string
+}
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "ManagementProjection_sale_refund_apply_v1".
+ */
+export interface ManagementProjectionSaleRefundApplyV1 {
+operation: "sale_refund_apply_v1"
+values: {
+
+}
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "ManagementProjection_sale_change_preview_v1".
+ */
+export interface ManagementProjectionSaleChangePreviewV1 {
+operation: "sale_change_preview_v1"
+values: {
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+sale_id?: string
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+new_product_version_id?: string
+/**
+ * Items: Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+keep_reservation_ids?: string[]
+start_date?: Date
+end_date?: Date
+}
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "ManagementProjection_sale_change_apply_v1".
+ */
+export interface ManagementProjectionSaleChangeApplyV1 {
+operation: "sale_change_apply_v1"
+values: {
+
+}
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "ManagementProjection_sale_renew_preview_v1".
+ */
+export interface ManagementProjectionSaleRenewPreviewV1 {
+operation: "sale_renew_preview_v1"
+values: {
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+previous_sale_id?: string
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+product_version_id?: string
+start_date?: Date
+end_date?: Date
+}
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "ManagementProjection_sale_renew_apply_v1".
+ */
+export interface ManagementProjectionSaleRenewApplyV1 {
+operation: "sale_renew_apply_v1"
+values: {
+
+}
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "ManagementProjection_collection_record_v1".
+ */
+export interface ManagementProjectionCollectionRecordV1 {
+operation: "collection_record_v1"
+values: {
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+person_id?: string
+amount_minor?: PositiveMoney
+currency?: Currency
+occurred_at?: Instant
+debt_ids?: (string[] | null)
+note?: (Text | null)
+}
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "ManagementProjection_collection_correct_preview_v1".
+ */
+export interface ManagementProjectionCollectionCorrectPreviewV1 {
+operation: "collection_correct_preview_v1"
+values: {
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+cash_movement_id?: string
+correction?: CashCorrection
+}
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "ManagementProjection_collection_correct_apply_v1".
+ */
+export interface ManagementProjectionCollectionCorrectApplyV1 {
+operation: "collection_correct_apply_v1"
+values: {
+
+}
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "ManagementProjection_student_credit_refund_v1".
+ */
+export interface ManagementProjectionStudentCreditRefundV1 {
+operation: "student_credit_refund_v1"
+values: {
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+person_id?: string
+amount_minor?: PositiveMoney
+currency?: Currency
+occurred_at?: Instant
+}
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "ManagementProjection_student_credit_offset_v1".
+ */
+export interface ManagementProjectionStudentCreditOffsetV1 {
+operation: "student_credit_offset_v1"
+values: {
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+person_id?: string
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+debt_id?: string
+amount_minor?: PositiveMoney
+currency?: Currency
+}
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "ManagementProjection_debt_adjust_v1".
+ */
+export interface ManagementProjectionDebtAdjustV1 {
+operation: "debt_adjust_v1"
+values: {
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+debt_id?: string
+amount_minor?: PositiveMoney
+direction?: Direction
+}
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "ManagementProjection_instructor_agreement_publish_v1".
+ */
+export interface ManagementProjectionInstructorAgreementPublishV1 {
+operation: "instructor_agreement_publish_v1"
+values: {
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+person_id?: string
+format?: SessionFormat
+valid?: Interval
+terms?: PayTerms
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+discipline_id?: string
+supersedes_id?: (string | null)
+}
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "ManagementProjection_instructor_payment_record_v1".
+ */
+export interface ManagementProjectionInstructorPaymentRecordV1 {
+operation: "instructor_payment_record_v1"
+values: {
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+person_id?: string
+/**
+ * Items: Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+earning_ids?: string[]
+amount_minor?: PositiveMoney
+currency?: Currency
+occurred_at?: Instant
+}
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "ManagementProjection_instructor_payment_correct_v1".
+ */
+export interface ManagementProjectionInstructorPaymentCorrectV1 {
+operation: "instructor_payment_correct_v1"
+values: {
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+payment_id?: string
+correction?: CashCorrection
+}
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "ManagementProjection_lead_save_v1".
+ */
+export interface ManagementProjectionLeadSaveV1 {
+operation: "lead_save_v1"
+values: {
+lead_id?: (string | null)
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+person_id?: string
+source?: Text
+interest?: Text
+assigned_to?: (string | null)
+}
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "ManagementProjection_crm_activity_save_v1".
+ */
+export interface ManagementProjectionCrmActivitySaveV1 {
+operation: "crm_activity_save_v1"
+values: {
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+lead_id?: string
+kind?: CrmActivityKind
+due_at?: (Instant | null)
+outcome?: (Text | null)
+note?: (Text | null)
+}
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "ManagementProjection_trial_offer_create_v1".
+ */
+export interface ManagementProjectionTrialOfferCreateV1 {
+operation: "trial_offer_create_v1"
+values: {
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+lead_id?: string
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+product_version_id?: string
+session_id?: (string | null)
+}
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "ManagementProjection_trial_registration_confirm_v1".
+ */
+export interface ManagementProjectionTrialRegistrationConfirmV1 {
+operation: "trial_registration_confirm_v1"
+values: {
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+offer_id?: string
+}
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "ManagementProjection_lead_convert_v1".
+ */
+export interface ManagementProjectionLeadConvertV1 {
+operation: "lead_convert_v1"
+values: {
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+lead_id?: string
+}
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "ManagementProjection_segment_save_v1".
+ */
+export interface ManagementProjectionSegmentSaveV1 {
+operation: "segment_save_v1"
+values: {
+segment_id?: (string | null)
+name?: Text
+definition?: SegmentDefinition
+scope?: ConfigurationScope
+}
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "ManagementProjection_automation_save_v1".
+ */
+export interface ManagementProjectionAutomationSaveV1 {
+operation: "automation_save_v1"
+values: {
+automation_id?: (string | null)
+definition?: AutomationDefinition
+scope?: ConfigurationScope
+}
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "ManagementProjection_notification_mark_read_v1".
+ */
+export interface ManagementProjectionNotificationMarkReadV1 {
+operation: "notification_mark_read_v1"
+values: {
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+notification_id?: string
+}
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "ManagementProjection_notification_preferences_set_v1".
+ */
+export interface ManagementProjectionNotificationPreferencesSetV1 {
+operation: "notification_preferences_set_v1"
+values: {
+channel?: NotificationChannel
+purpose?: NotificationPurpose
+enabled?: Bool
+}
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "ManagementProjection_report_export_start_v1".
+ */
+export interface ManagementProjectionReportExportStartV1 {
+operation: "report_export_start_v1"
+values: {
+report?: ReportKind
+filters?: ReportFilters
+format?: ExportFormat
+}
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "ManagementProjection_import_upload_prepare_v1".
+ */
+export interface ManagementProjectionImportUploadPrepareV1 {
+operation: "import_upload_prepare_v1"
+values: {
+filename?: Text
+mime?: Text
+bytes?: Count
+checksum?: Text
+}
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "ManagementProjection_import_preview_v1".
+ */
+export interface ManagementProjectionImportPreviewV1 {
+operation: "import_preview_v1"
+values: {
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+file_id?: string
+mapping?: ImportMapping
+source_namespace?: Text
+}
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "ManagementProjection_import_apply_v1".
+ */
+export interface ManagementProjectionImportApplyV1 {
+operation: "import_apply_v1"
+values: {
+
+}
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "ManagementProjection_subscription_upgrade_quote_v1".
+ */
+export interface ManagementProjectionSubscriptionUpgradeQuoteV1 {
+operation: "subscription_upgrade_quote_v1"
+values: {
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+target_plan_id?: string
+}
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "ManagementProjection_subscription_downgrade_request_v1".
+ */
+export interface ManagementProjectionSubscriptionDowngradeRequestV1 {
+operation: "subscription_downgrade_request_v1"
+values: {
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+target_plan_id?: string
+kept_center_id?: (string | null)
+}
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "ManagementProjection_subscription_change_cancel_v1".
+ */
+export interface ManagementProjectionSubscriptionChangeCancelV1 {
+operation: "subscription_change_cancel_v1"
+values: {
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+change_id?: string
+}
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "ManagementProjection_subscription_renewal_set_v1".
+ */
+export interface ManagementProjectionSubscriptionRenewalSetV1 {
+operation: "subscription_renewal_set_v1"
+values: {
+renew?: Bool
+}
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "ManagementProjection_saas_payment_submit_v1".
+ */
+export interface ManagementProjectionSaasPaymentSubmitV1 {
+operation: "saas_payment_submit_v1"
+values: {
+amount_minor?: Money
+currency?: Currency
+reference?: Text
+occurred_at?: Instant
+quote_id?: (string | null)
+}
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "ManagementProjection_saas_payment_verify_v1".
+ */
+export interface ManagementProjectionSaasPaymentVerifyV1 {
+operation: "saas_payment_verify_v1"
+values: {
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+payment_id?: string
+accepted?: Bool
+}
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "ManagementProjection_saas_grace_extend_v1".
+ */
+export interface ManagementProjectionSaasGraceExtendV1 {
+operation: "saas_grace_extend_v1"
+values: {
+until?: Instant
+}
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "ManagementProjection_event_save_v1".
+ */
+export interface ManagementProjectionEventSaveV1 {
+operation: "event_save_v1"
+values: {
+event_id?: (string | null)
+name?: Text
+interval?: Interval
+timezone?: IanaZone
+venue?: VenueSpec
+capacity?: Capacity
+terms?: EventTerms
+assignments?: EventDutyInput[]
+discipline_ids?: EventDisciplineIds
+}
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "ManagementProjection_event_publish_v1".
+ */
+export interface ManagementProjectionEventPublishV1 {
+operation: "event_publish_v1"
+values: {
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+event_id?: string
+published?: Bool
+}
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "ManagementProjection_event_register_v1".
+ */
+export interface ManagementProjectionEventRegisterV1 {
+operation: "event_register_v1"
+values: {
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+event_id?: string
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+person_id?: string
+sale_id?: (string | null)
+preparation_id?: (string | null)
+}
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "ManagementProjection_event_registration_cancel_v1".
+ */
+export interface ManagementProjectionEventRegistrationCancelV1 {
+operation: "event_registration_cancel_v1"
+values: {
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+registration_id?: string
+}
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "ManagementProjection_event_complete_v1".
+ */
+export interface ManagementProjectionEventCompleteV1 {
+operation: "event_complete_v1"
+values: {
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+event_id?: string
+}
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "ManagementProjection_event_duty_verify_v1".
+ */
+export interface ManagementProjectionEventDutyVerifyV1 {
+operation: "event_duty_verify_v1"
+values: {
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+assignment_id?: string
+performed?: Bool
+}
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "ManagementProjection_event_cancel_preview_v1".
+ */
+export interface ManagementProjectionEventCancelPreviewV1 {
+operation: "event_cancel_preview_v1"
+values: {
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+event_id?: string
+}
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "ManagementProjection_event_cancel_apply_v1".
+ */
+export interface ManagementProjectionEventCancelApplyV1 {
+operation: "event_cancel_apply_v1"
+values: {
+
+}
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "ManagementProjection_document_upload_prepare_v1".
+ */
+export interface ManagementProjectionDocumentUploadPrepareV1 {
+operation: "document_upload_prepare_v1"
+values: {
+name?: Text
+mime?: Text
+bytes?: Count
+}
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "ManagementProjection_document_version_publish_v1".
+ */
+export interface ManagementProjectionDocumentVersionPublishV1 {
+operation: "document_version_publish_v1"
+values: {
+document_id?: (string | null)
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+file_id?: string
+version_label?: Text
+requirements?: DocumentRequirement[]
+scope?: ConfigurationScope
+}
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "ManagementProjection_document_accept_v1".
+ */
+export interface ManagementProjectionDocumentAcceptV1 {
+operation: "document_accept_v1"
+values: {
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+document_version_id?: string
+context?: AcceptanceContext
+}
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "ManagementProjection_publication_set_v1".
+ */
+export interface ManagementProjectionPublicationSetV1 {
+operation: "publication_set_v1"
+values: {
+session_id?: (string | null)
+event_id?: (string | null)
+published?: Bool
+}
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "ManagementProjection_public_application_submit_v1".
+ */
+export interface ManagementProjectionPublicApplicationSubmitV1 {
+operation: "public_application_submit_v1"
+values: {
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+publication_id?: string
+contact?: Text
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+client_request_key?: string
+}
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "ManagementProjection_public_application_review_v1".
+ */
+export interface ManagementProjectionPublicApplicationReviewV1 {
+operation: "public_application_review_v1"
+values: {
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+application_id?: string
+action?: ApplicationAction
+person_id?: (string | null)
+}
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "ManagementProjection_class_assignment_set_v1".
+ */
+export interface ManagementProjectionClassAssignmentSetV1 {
+operation: "class_assignment_set_v1"
+values: {
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+class_id?: string
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+person_id?: string
+duty?: Duty
+state?: RecordState
+}
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "ManagementProjection_event_attendance_mark_v1".
+ */
+export interface ManagementProjectionEventAttendanceMarkV1 {
+operation: "event_attendance_mark_v1"
+values: {
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+registration_id?: string
+result?: AttendanceResult
+}
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "ManagementProjection_platform_owner_set_v1".
+ */
+export interface ManagementProjectionPlatformOwnerSetV1 {
+operation: "platform_owner_set_v1"
+values: {
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+verified_account_id?: string
+}
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "ManagementProjection_platform_owner_remove_v1".
+ */
+export interface ManagementProjectionPlatformOwnerRemoveV1 {
+operation: "platform_owner_remove_v1"
+values: {
+replacement_verified_account_id?: (string | null)
+}
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "ManagementProjection_center_manager_assign_v1".
+ */
+export interface ManagementProjectionCenterManagerAssignV1 {
+operation: "center_manager_assign_v1"
+values: {
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+person_id?: string
+}
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "ManagementProjection_center_manager_revoke_v1".
+ */
+export interface ManagementProjectionCenterManagerRevokeV1 {
+operation: "center_manager_revoke_v1"
+values: {
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+person_id?: string
+}
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "ManagementProjection_attendance_block_v1".
+ */
+export interface ManagementProjectionAttendanceBlockV1 {
+operation: "attendance_block_v1"
+values: {
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+reservation_id?: string
+}
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "ManagementProjection_event_attendance_close_v1".
+ */
+export interface ManagementProjectionEventAttendanceCloseV1 {
+operation: "event_attendance_close_v1"
+values: {
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+event_id?: string
+}
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "ManagementProjection_event_attendance_correct_v1".
+ */
+export interface ManagementProjectionEventAttendanceCorrectV1 {
+operation: "event_attendance_correct_v1"
+values: {
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+registration_id?: string
+result?: AttendanceResult
+}
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "ManagementProjection_file_upload_complete_v1".
+ */
+export interface ManagementProjectionFileUploadCompleteV1 {
+operation: "file_upload_complete_v1"
+values: {
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+file_id?: string
+checksum?: Text
+}
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "ManagementProjection_negcredit_valuation_set_v1".
+ */
+export interface ManagementProjectionNegcreditValuationSetV1 {
+operation: "negcredit_valuation_set_v1"
+values: {
+format?: SessionFormat
+amount_minor?: Money
+currency?: Currency
+effective_at?: Instant
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+discipline_id?: string
+}
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "ManagementProjection_discipline_save_v1".
+ */
+export interface ManagementProjectionDisciplineSaveV1 {
+operation: "discipline_save_v1"
+values: {
+discipline_id?: (string | null)
+name?: Text
+state?: RecordState
+}
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "ManagementProjection_center_discipline_set_v1".
+ */
+export interface ManagementProjectionCenterDisciplineSetV1 {
+operation: "center_discipline_set_v1"
+values: {
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+discipline_id?: string
+state?: RecordState
+}
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "ManagementProjection_person_discipline_set_v1".
+ */
+export interface ManagementProjectionPersonDisciplineSetV1 {
+operation: "person_discipline_set_v1"
+values: {
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+person_id?: string
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+discipline_id?: string
+kind?: DisciplineRelationshipKind
+state?: RelationshipState
+}
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "ManagementProjection_event_registration_preview_v1".
+ */
+export interface ManagementProjectionEventRegistrationPreviewV1 {
+operation: "event_registration_preview_v1"
+values: {
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+event_id?: string
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+person_id?: string
+sale_id?: (string | null)
+preparation_id?: (string | null)
+}
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "ManagementProjection_event_payment_prepare_v1".
+ */
+export interface ManagementProjectionEventPaymentPrepareV1 {
+operation: "event_payment_prepare_v1"
+values: {
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+event_id?: string
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+person_id?: string
+}
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "ManagementProjection_event_actual_start_record_v1".
+ */
+export interface ManagementProjectionEventActualStartRecordV1 {
+operation: "event_actual_start_record_v1"
+values: {
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+event_id?: string
+actual_started_at?: Instant
+}
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "ManagementProjection_event_actual_start_correct_v1".
+ */
+export interface ManagementProjectionEventActualStartCorrectV1 {
+operation: "event_actual_start_correct_v1"
+values: {
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+event_id?: string
+actual_started_at?: (Instant | null)
+}
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "ManagementProjection_reservation_impact_preview_v1".
+ */
+export interface ManagementProjectionReservationImpactPreviewV1 {
+operation: "reservation_impact_preview_v1"
+values: {
+change?: ReservationProtectionChange
+}
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "PolicyProtectionChange".
+ */
+export interface PolicyProtectionChange {
+kind: "policy"
+key: PolicyKey
+value: PolicyValue
+effective_at: Instant
+mandatory: Bool
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "NegativeLimitProtectionChange".
+ */
+export interface NegativeLimitProtectionChange {
+kind: "negative_limit"
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+person_id: string
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+discipline_id: string
+allowed_negative_credits: Count
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "CreditProtectionChange".
+ */
+export interface CreditProtectionChange {
+kind: "credit_adjust"
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+sale_id: string
+quantity: PositiveInt
+direction: Direction
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "SaleScopeProtectionChange".
+ */
+export interface SaleScopeProtectionChange {
+kind: "sale_scope"
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+sale_id: string
+/**
+ * @minItems 1
+ */
+scopes: [ProductScope, ...(ProductScope)[]]
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "ManagementProjection_reservation_impact_apply_v1".
+ */
+export interface ManagementProjectionReservationImpactApplyV1 {
+operation: "reservation_impact_apply_v1"
+values: {
+/**
+ * Items: Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+accepted_reservation_ids?: string[]
+}
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "ManagementProjection_settlement_request_submit_v1".
+ */
+export interface ManagementProjectionSettlementRequestSubmitV1 {
+operation: "settlement_request_submit_v1"
+values: {
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+from_center_id?: string
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+to_center_id?: string
+currency?: Currency
+/**
+ * @minItems 1
+ */
+lines?: [SettlementLine, ...(SettlementLine)[]]
+previous_id?: (string | null)
+previous_version?: PositiveInt
+}
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "SettlementLine".
+ */
+export interface SettlementLine {
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+movement_id: string
+expected_version: PositiveInt
+amount_minor: PositiveMoney
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "ManagementProjection_settlement_request_withdraw_v1".
+ */
+export interface ManagementProjectionSettlementRequestWithdrawV1 {
+operation: "settlement_request_withdraw_v1"
+values: {
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+settlement_request_id?: string
+}
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "ManagementProjection_settlement_request_decide_v1".
+ */
+export interface ManagementProjectionSettlementRequestDecideV1 {
+operation: "settlement_request_decide_v1"
+values: {
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+settlement_request_id?: string
+decision?: ("approve" | "reject")
+fallback?: Bool
+}
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "ManagementProjection_settlement_payment_record_v1".
+ */
+export interface ManagementProjectionSettlementPaymentRecordV1 {
+operation: "settlement_payment_record_v1"
+values: {
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+settlement_request_id?: string
+/**
+ * @minItems 1
+ */
+lines?: [SettlementLine, ...(SettlementLine)[]]
+amount_minor?: PositiveMoney
+currency?: Currency
+occurred_at?: Instant
+}
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "ManagementProjection_settlement_offset_record_v1".
+ */
+export interface ManagementProjectionSettlementOffsetRecordV1 {
+operation: "settlement_offset_record_v1"
+values: {
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+settlement_request_id?: string
+/**
+ * @minItems 1
+ */
+debit_lines?: [SettlementLine, ...(SettlementLine)[]]
+/**
+ * @minItems 1
+ */
+credit_lines?: [SettlementLine, ...(SettlementLine)[]]
+amount_minor?: PositiveMoney
+currency?: Currency
+occurred_at?: Instant
+}
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "ManagementProjection_settlement_adjust_v1".
+ */
+export interface ManagementProjectionSettlementAdjustV1 {
+operation: "settlement_adjust_v1"
+values: {
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+movement_id?: string
+amount_minor?: PositiveMoney
+}
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "ProtectedObligationView".
+ */
+export interface ProtectedObligationView {
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+reservation_id: string
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+session_id: string
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+person_id: string
+/**
+ * @minItems 0
+ *
+ * Items: Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+allocation_ids: string[]
+/**
+ * @minItems 0
+ *
+ * Items: Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+deficit_ids: string[]
+quantity: Count
+source_sale_id: (string | null)
+existing_version: PositiveInt
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "ReservationProtectionPreview".
+ */
+export interface ReservationProtectionPreview {
+preview: Preview
+change: ReservationProtectionChange
+/**
+ * @minItems 0
+ */
+affected: ProtectedObligationView[]
+preserves_reservations: true
+waives_independent_blocks: false
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "Target_policy_publish_protected".
+ */
+export interface TargetPolicyPublishProtected {
+client_api_version: 1
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+request_id: string
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+org_id: string
+center_id?: (string | null)
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+operation_key: string
+key: PolicyKey
+value: PolicyValue
+effective_at: Instant
+mandatory: Bool
+impact_approval: PreviewToken
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "SettlementMovementView".
+ */
+export interface SettlementMovementView {
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+id: string
+version: PositiveInt
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+debtor_center_id: string
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+creditor_center_id: string
+currency: Currency
+amount_minor: PositiveMoney
+open_minor: Money
+kind: ("accrual" | "reversal" | "payment" | "offset" | "payment_reversal")
+source_allocation_id: (string | null)
+source_sale_id: (string | null)
+previous_id: (string | null)
+created_at: Instant
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "SettlementRequestView".
+ */
+export interface SettlementRequestView {
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+id: string
+version: PositiveInt
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+from_center_id: string
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+to_center_id: string
+currency: Currency
+/**
+ * @minItems 1
+ */
+lines: [SettlementLine, ...(SettlementLine)[]]
+state: SettlementRequestState
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+initiator_account_id: string
+decision_account_id: (string | null)
+reason: (Text | null)
+previous_id: (string | null)
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "SettlementMovementsPage".
+ */
+export interface SettlementMovementsPage {
+/**
+ * @minItems 0
+ */
+items: SettlementMovementView[]
+next_cursor: (OpaqueToken | null)
+as_of: Instant
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "SettlementRequestsPage".
+ */
+export interface SettlementRequestsPage {
+/**
+ * @minItems 0
+ */
+items: SettlementRequestView[]
+next_cursor: (OpaqueToken | null)
+as_of: Instant
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "SettlementCommandResult".
+ */
+export interface SettlementCommandResult {
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+operation_id: string
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+primary_id: string
+version: PositiveInt
+replayed: Bool
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "SettlementRuleSet".
+ */
+export interface SettlementRuleSet {
+credit_basis: "actual_sale_price_per_consumed_credit"
+earning_agreement: "service_center_actual_instructor_package_override_else_general"
+accrual_trigger: "performed_session_and_right_consumed_or_later_eligible_credit_deficit_settlement"
+cash_payment_required: false
+timed_transfer: false
+source_less_negative_initial_transfer: false
+late_negative_earning_reprice: false
+reversal: "linked_original_amount_preserving_prior_payments"
+rounding: "half_away_from_zero_largest_remainder_stable_tie_original_amount_on_reversal"
+scope_gate: "same_org_business_accessible_centers_and_source_sale_service_center_discipline_scope"
+dependency_scope: "selected_movement_versions_request_authority_plan"
+self_approval: false
+approval_is_payment: false
+payment_recorder: "org_manager_with_separate_settlement_permission"
+fallback_approval: "different_authorized_org_manager_only_if_no_other_B_manager_with_reason"
+offset: "explicit_approved_same_currency_both_sides_atomic_no_auto_net_no_fx"
+no_double_close: true
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "ManagementSelector_account_profile_update_v1".
+ */
+export interface ManagementSelectorAccountProfileUpdateV1 {
+operation: "account_profile_update_v1"
+key: {
+
+}
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "ManagementSelector_account_delete_preview_v1".
+ */
+export interface ManagementSelectorAccountDeletePreviewV1 {
+operation: "account_delete_preview_v1"
+key: {
+
+}
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "ManagementSelector_account_delete_apply_v1".
+ */
+export interface ManagementSelectorAccountDeleteApplyV1 {
+operation: "account_delete_apply_v1"
+key: {
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+preview_id: string
+}
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "ManagementSelector_organization_create_v1".
+ */
+export interface ManagementSelectorOrganizationCreateV1 {
+operation: "organization_create_v1"
+key: {
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+verified_account_id: string
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+initial_plan_id: string
+}
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "ManagementSelector_organization_update_v1".
+ */
+export interface ManagementSelectorOrganizationUpdateV1 {
+operation: "organization_update_v1"
+key: {
+
+}
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "ManagementSelector_organization_close_preview_v1".
+ */
+export interface ManagementSelectorOrganizationClosePreviewV1 {
+operation: "organization_close_preview_v1"
+key: {
+
+}
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "ManagementSelector_organization_close_apply_v1".
+ */
+export interface ManagementSelectorOrganizationCloseApplyV1 {
+operation: "organization_close_apply_v1"
+key: {
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+preview_id: string
+}
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "ManagementSelector_organization_reopen_v1".
+ */
+export interface ManagementSelectorOrganizationReopenV1 {
+operation: "organization_reopen_v1"
+key: {
+
+}
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "ManagementSelector_organization_delete_preview_v1".
+ */
+export interface ManagementSelectorOrganizationDeletePreviewV1 {
+operation: "organization_delete_preview_v1"
+key: {
+
+}
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "ManagementSelector_organization_delete_apply_v1".
+ */
+export interface ManagementSelectorOrganizationDeleteApplyV1 {
+operation: "organization_delete_apply_v1"
+key: {
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+preview_id: string
+}
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "ManagementSelector_center_create_v1".
+ */
+export interface ManagementSelectorCenterCreateV1 {
+operation: "center_create_v1"
+key: {
+
+}
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "ManagementSelector_center_update_v1".
+ */
+export interface ManagementSelectorCenterUpdateV1 {
+operation: "center_update_v1"
+key: {
+
+}
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "ManagementSelector_room_save_v1".
+ */
+export interface ManagementSelectorRoomSaveV1 {
+operation: "room_save_v1"
+key: {
+room_id?: (string | null)
+}
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "ManagementSelector_availability_save_v1".
+ */
+export interface ManagementSelectorAvailabilitySaveV1 {
+operation: "availability_save_v1"
+key: {
+rule_id?: (string | null)
+resource: ResourceRef
+}
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "ManagementSelector_availability_exception_save_v1".
+ */
+export interface ManagementSelectorAvailabilityExceptionSaveV1 {
+operation: "availability_exception_save_v1"
+key: {
+resource: ResourceRef
+}
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "ManagementSelector_policy_publish_v1".
+ */
+export interface ManagementSelectorPolicyPublishV1 {
+operation: "policy_publish_v1"
+key: {
+key: PolicyKey
+}
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "ManagementSelector_role_assign_v1".
+ */
+export interface ManagementSelectorRoleAssignV1 {
+operation: "role_assign_v1"
+key: {
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+person_id: string
+role: OperationalRole
+scope: RoleScope
+}
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "ManagementSelector_role_revoke_v1".
+ */
+export interface ManagementSelectorRoleRevokeV1 {
+operation: "role_revoke_v1"
+key: {
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+assignment_id: string
+}
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "ManagementSelector_permission_set_v1".
+ */
+export interface ManagementSelectorPermissionSetV1 {
+operation: "permission_set_v1"
+key: {
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+person_id: string
+permission: Permission
+}
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "ManagementSelector_org_manager_assign_v1".
+ */
+export interface ManagementSelectorOrgManagerAssignV1 {
+operation: "org_manager_assign_v1"
+key: {
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+person_id: string
+}
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "ManagementSelector_org_manager_revoke_v1".
+ */
+export interface ManagementSelectorOrgManagerRevokeV1 {
+operation: "org_manager_revoke_v1"
+key: {
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+person_id: string
+}
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "ManagementSelector_manager_self_assign_center_v1".
+ */
+export interface ManagementSelectorManagerSelfAssignCenterV1 {
+operation: "manager_self_assign_center_v1"
+key: {
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+target_center_id: string
+}
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "ManagementSelector_account_access_send_v1".
+ */
+export interface ManagementSelectorAccountAccessSendV1 {
+operation: "account_access_send_v1"
+key: {
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+person_id: string
+}
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "ManagementSelector_account_access_revoke_v1".
+ */
+export interface ManagementSelectorAccountAccessRevokeV1 {
+operation: "account_access_revoke_v1"
+key: {
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+invitation_id: string
+}
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "ManagementSelector_account_access_accept_v1".
+ */
+export interface ManagementSelectorAccountAccessAcceptV1 {
+operation: "account_access_accept_v1"
+key: {
+
+}
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "ManagementSelector_account_link_remove_v1".
+ */
+export interface ManagementSelectorAccountLinkRemoveV1 {
+operation: "account_link_remove_v1"
+key: {
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+link_id: string
+}
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "ManagementSelector_person_create_v1".
+ */
+export interface ManagementSelectorPersonCreateV1 {
+operation: "person_create_v1"
+key: {
+
+}
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "ManagementSelector_person_update_v1".
+ */
+export interface ManagementSelectorPersonUpdateV1 {
+operation: "person_update_v1"
+key: {
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+person_id: string
+}
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "ManagementSelector_student_activate_v1".
+ */
+export interface ManagementSelectorStudentActivateV1 {
+operation: "student_activate_v1"
+key: {
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+person_id: string
+}
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "ManagementSelector_student_deactivate_v1".
+ */
+export interface ManagementSelectorStudentDeactivateV1 {
+operation: "student_deactivate_v1"
+key: {
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+person_id: string
+}
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "ManagementSelector_person_merge_preview_v1".
+ */
+export interface ManagementSelectorPersonMergePreviewV1 {
+operation: "person_merge_preview_v1"
+key: {
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+source_id: string
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+target_id: string
+}
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "ManagementSelector_person_merge_approve_v1".
+ */
+export interface ManagementSelectorPersonMergeApproveV1 {
+operation: "person_merge_approve_v1"
+key: {
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+approval_center_id: string
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+preview_id: string
+}
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "ManagementSelector_person_merge_apply_v1".
+ */
+export interface ManagementSelectorPersonMergeApplyV1 {
+operation: "person_merge_apply_v1"
+key: {
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+preview_id: string
+}
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "ManagementSelector_class_save_v1".
+ */
+export interface ManagementSelectorClassSaveV1 {
+operation: "class_save_v1"
+key: {
+class_id?: (string | null)
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+discipline_id: string
+}
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "ManagementSelector_program_preview_v1".
+ */
+export interface ManagementSelectorProgramPreviewV1 {
+operation: "program_preview_v1"
+key: {
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+class_id: string
+}
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "ManagementSelector_program_apply_v1".
+ */
+export interface ManagementSelectorProgramApplyV1 {
+operation: "program_apply_v1"
+key: {
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+preview_id: string
+}
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "ManagementSelector_session_create_v1".
+ */
+export interface ManagementSelectorSessionCreateV1 {
+operation: "session_create_v1"
+key: {
+class_id?: (string | null)
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+discipline_id: string
+}
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "ManagementSelector_session_change_preview_v1".
+ */
+export interface ManagementSelectorSessionChangePreviewV1 {
+operation: "session_change_preview_v1"
+key: {
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+session_id: string
+scope: ChangeScope
+}
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "ManagementSelector_session_change_apply_v1".
+ */
+export interface ManagementSelectorSessionChangeApplyV1 {
+operation: "session_change_apply_v1"
+key: {
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+preview_id: string
+}
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "ManagementSelector_session_capacity_set_v1".
+ */
+export interface ManagementSelectorSessionCapacitySetV1 {
+operation: "session_capacity_set_v1"
+key: {
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+session_id: string
+}
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "ManagementSelector_session_cancel_preview_v1".
+ */
+export interface ManagementSelectorSessionCancelPreviewV1 {
+operation: "session_cancel_preview_v1"
+key: {
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+session_id: string
+}
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "ManagementSelector_session_cancel_apply_v1".
+ */
+export interface ManagementSelectorSessionCancelApplyV1 {
+operation: "session_cancel_apply_v1"
+key: {
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+preview_id: string
+}
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "ManagementSelector_replacement_session_create_v1".
+ */
+export interface ManagementSelectorReplacementSessionCreateV1 {
+operation: "replacement_session_create_v1"
+key: {
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+replaces_id: string
+}
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "ManagementSelector_session_assignment_set_v1".
+ */
+export interface ManagementSelectorSessionAssignmentSetV1 {
+operation: "session_assignment_set_v1"
+key: {
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+session_id: string
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+person_id: string
+duty: Duty
+agreement_id?: (string | null)
+}
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "ManagementSelector_lesson_request_create_v1".
+ */
+export interface ManagementSelectorLessonRequestCreateV1 {
+operation: "lesson_request_create_v1"
+key: {
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+person_id: string
+preferred_instructor_id?: (string | null)
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+discipline_id: string
+}
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "ManagementSelector_lesson_request_withdraw_v1".
+ */
+export interface ManagementSelectorLessonRequestWithdrawV1 {
+operation: "lesson_request_withdraw_v1"
+key: {
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+lesson_request_id: string
+}
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "ManagementSelector_lesson_request_reject_v1".
+ */
+export interface ManagementSelectorLessonRequestRejectV1 {
+operation: "lesson_request_reject_v1"
+key: {
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+lesson_request_id: string
+}
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "ManagementSelector_lesson_request_offer_alternative_v1".
+ */
+export interface ManagementSelectorLessonRequestOfferAlternativeV1 {
+operation: "lesson_request_offer_alternative_v1"
+key: {
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+lesson_request_id: string
+}
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "ManagementSelector_lesson_request_accept_alternative_v1".
+ */
+export interface ManagementSelectorLessonRequestAcceptAlternativeV1 {
+operation: "lesson_request_accept_alternative_v1"
+key: {
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+alternative_id: string
+}
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "ManagementSelector_lesson_request_approve_v1".
+ */
+export interface ManagementSelectorLessonRequestApproveV1 {
+operation: "lesson_request_approve_v1"
+key: {
+session_id?: (string | null)
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+lesson_request_id: string
+}
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "ManagementSelector_reservation_create_v1".
+ */
+export interface ManagementSelectorReservationCreateV1 {
+operation: "reservation_create_v1"
+key: {
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+person_id: string
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+session_id: string
+source_sale_id?: (string | null)
+}
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "ManagementSelector_reservation_cancel_v1".
+ */
+export interface ManagementSelectorReservationCancelV1 {
+operation: "reservation_cancel_v1"
+key: {
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+reservation_id: string
+}
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "ManagementSelector_waitlist_join_v1".
+ */
+export interface ManagementSelectorWaitlistJoinV1 {
+operation: "waitlist_join_v1"
+key: {
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+person_id: string
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+session_id: string
+}
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "ManagementSelector_waitlist_leave_v1".
+ */
+export interface ManagementSelectorWaitlistLeaveV1 {
+operation: "waitlist_leave_v1"
+key: {
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+entry_id: string
+}
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "ManagementSelector_seat_offer_accept_v1".
+ */
+export interface ManagementSelectorSeatOfferAcceptV1 {
+operation: "seat_offer_accept_v1"
+key: {
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+offer_id: string
+}
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "ManagementSelector_seat_offer_reject_v1".
+ */
+export interface ManagementSelectorSeatOfferRejectV1 {
+operation: "seat_offer_reject_v1"
+key: {
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+offer_id: string
+}
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "ManagementSelector_attendance_mark_v1".
+ */
+export interface ManagementSelectorAttendanceMarkV1 {
+operation: "attendance_mark_v1"
+key: {
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+reservation_id: string
+}
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "ManagementSelector_attendance_close_v1".
+ */
+export interface ManagementSelectorAttendanceCloseV1 {
+operation: "attendance_close_v1"
+key: {
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+session_id: string
+}
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "ManagementSelector_attendance_correct_preview_v1".
+ */
+export interface ManagementSelectorAttendanceCorrectPreviewV1 {
+operation: "attendance_correct_preview_v1"
+key: {
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+session_id: string
+}
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "ManagementSelector_attendance_correct_apply_v1".
+ */
+export interface ManagementSelectorAttendanceCorrectApplyV1 {
+operation: "attendance_correct_apply_v1"
+key: {
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+preview_id: string
+}
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "ManagementSelector_product_publish_v1".
+ */
+export interface ManagementSelectorProductPublishV1 {
+operation: "product_publish_v1"
+key: {
+product_id?: (string | null)
+}
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "ManagementSelector_sale_preview_v1".
+ */
+export interface ManagementSelectorSalePreviewV1 {
+operation: "sale_preview_v1"
+key: {
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+person_id: string
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+product_version_id: string
+}
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "ManagementSelector_sale_apply_v1".
+ */
+export interface ManagementSelectorSaleApplyV1 {
+operation: "sale_apply_v1"
+key: {
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+preview_id: string
+}
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "ManagementSelector_entitlement_extend_v1".
+ */
+export interface ManagementSelectorEntitlementExtendV1 {
+operation: "entitlement_extend_v1"
+key: {
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+sale_id: string
+}
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "ManagementSelector_credit_adjust_v1".
+ */
+export interface ManagementSelectorCreditAdjustV1 {
+operation: "credit_adjust_v1"
+key: {
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+sale_id: string
+}
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "ManagementSelector_negative_limit_set_v1".
+ */
+export interface ManagementSelectorNegativeLimitSetV1 {
+operation: "negative_limit_set_v1"
+key: {
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+person_id: string
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+discipline_id: string
+}
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "ManagementSelector_freeze_preview_v1".
+ */
+export interface ManagementSelectorFreezePreviewV1 {
+operation: "freeze_preview_v1"
+key: {
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+sale_id: string
+}
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "ManagementSelector_freeze_apply_v1".
+ */
+export interface ManagementSelectorFreezeApplyV1 {
+operation: "freeze_apply_v1"
+key: {
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+preview_id: string
+}
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "ManagementSelector_freeze_end_preview_v1".
+ */
+export interface ManagementSelectorFreezeEndPreviewV1 {
+operation: "freeze_end_preview_v1"
+key: {
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+freeze_id: string
+}
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "ManagementSelector_freeze_end_apply_v1".
+ */
+export interface ManagementSelectorFreezeEndApplyV1 {
+operation: "freeze_end_apply_v1"
+key: {
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+preview_id: string
+}
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "ManagementSelector_sale_terminate_preview_v1".
+ */
+export interface ManagementSelectorSaleTerminatePreviewV1 {
+operation: "sale_terminate_preview_v1"
+key: {
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+sale_id: string
+}
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "ManagementSelector_sale_terminate_apply_v1".
+ */
+export interface ManagementSelectorSaleTerminateApplyV1 {
+operation: "sale_terminate_apply_v1"
+key: {
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+preview_id: string
+}
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "ManagementSelector_sale_refund_preview_v1".
+ */
+export interface ManagementSelectorSaleRefundPreviewV1 {
+operation: "sale_refund_preview_v1"
+key: {
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+sale_id: string
+}
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "ManagementSelector_sale_refund_apply_v1".
+ */
+export interface ManagementSelectorSaleRefundApplyV1 {
+operation: "sale_refund_apply_v1"
+key: {
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+preview_id: string
+}
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "ManagementSelector_sale_change_preview_v1".
+ */
+export interface ManagementSelectorSaleChangePreviewV1 {
+operation: "sale_change_preview_v1"
+key: {
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+sale_id: string
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+new_product_version_id: string
+}
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "ManagementSelector_sale_change_apply_v1".
+ */
+export interface ManagementSelectorSaleChangeApplyV1 {
+operation: "sale_change_apply_v1"
+key: {
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+preview_id: string
+}
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "ManagementSelector_sale_renew_preview_v1".
+ */
+export interface ManagementSelectorSaleRenewPreviewV1 {
+operation: "sale_renew_preview_v1"
+key: {
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+previous_sale_id: string
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+product_version_id: string
+}
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "ManagementSelector_sale_renew_apply_v1".
+ */
+export interface ManagementSelectorSaleRenewApplyV1 {
+operation: "sale_renew_apply_v1"
+key: {
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+preview_id: string
+}
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "ManagementSelector_collection_record_v1".
+ */
+export interface ManagementSelectorCollectionRecordV1 {
+operation: "collection_record_v1"
+key: {
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+person_id: string
+}
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "ManagementSelector_collection_correct_preview_v1".
+ */
+export interface ManagementSelectorCollectionCorrectPreviewV1 {
+operation: "collection_correct_preview_v1"
+key: {
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+cash_movement_id: string
+}
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "ManagementSelector_collection_correct_apply_v1".
+ */
+export interface ManagementSelectorCollectionCorrectApplyV1 {
+operation: "collection_correct_apply_v1"
+key: {
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+preview_id: string
+}
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "ManagementSelector_student_credit_refund_v1".
+ */
+export interface ManagementSelectorStudentCreditRefundV1 {
+operation: "student_credit_refund_v1"
+key: {
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+person_id: string
+}
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "ManagementSelector_student_credit_offset_v1".
+ */
+export interface ManagementSelectorStudentCreditOffsetV1 {
+operation: "student_credit_offset_v1"
+key: {
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+person_id: string
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+debt_id: string
+}
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "ManagementSelector_debt_adjust_v1".
+ */
+export interface ManagementSelectorDebtAdjustV1 {
+operation: "debt_adjust_v1"
+key: {
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+debt_id: string
+}
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "ManagementSelector_instructor_agreement_publish_v1".
+ */
+export interface ManagementSelectorInstructorAgreementPublishV1 {
+operation: "instructor_agreement_publish_v1"
+key: {
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+person_id: string
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+discipline_id: string
+supersedes_id?: (string | null)
+}
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "ManagementSelector_instructor_payment_record_v1".
+ */
+export interface ManagementSelectorInstructorPaymentRecordV1 {
+operation: "instructor_payment_record_v1"
+key: {
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+person_id: string
+}
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "ManagementSelector_instructor_payment_correct_v1".
+ */
+export interface ManagementSelectorInstructorPaymentCorrectV1 {
+operation: "instructor_payment_correct_v1"
+key: {
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+payment_id: string
+}
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "ManagementSelector_lead_save_v1".
+ */
+export interface ManagementSelectorLeadSaveV1 {
+operation: "lead_save_v1"
+key: {
+lead_id?: (string | null)
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+person_id: string
+}
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "ManagementSelector_crm_activity_save_v1".
+ */
+export interface ManagementSelectorCrmActivitySaveV1 {
+operation: "crm_activity_save_v1"
+key: {
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+lead_id: string
+}
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "ManagementSelector_trial_offer_create_v1".
+ */
+export interface ManagementSelectorTrialOfferCreateV1 {
+operation: "trial_offer_create_v1"
+key: {
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+lead_id: string
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+product_version_id: string
+session_id?: (string | null)
+}
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "ManagementSelector_trial_registration_confirm_v1".
+ */
+export interface ManagementSelectorTrialRegistrationConfirmV1 {
+operation: "trial_registration_confirm_v1"
+key: {
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+offer_id: string
+}
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "ManagementSelector_lead_convert_v1".
+ */
+export interface ManagementSelectorLeadConvertV1 {
+operation: "lead_convert_v1"
+key: {
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+lead_id: string
+}
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "ManagementSelector_segment_save_v1".
+ */
+export interface ManagementSelectorSegmentSaveV1 {
+operation: "segment_save_v1"
+key: {
+segment_id?: (string | null)
+scope: ConfigurationScope
+}
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "ManagementSelector_automation_save_v1".
+ */
+export interface ManagementSelectorAutomationSaveV1 {
+operation: "automation_save_v1"
+key: {
+automation_id?: (string | null)
+scope: ConfigurationScope
+}
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "ManagementSelector_notification_mark_read_v1".
+ */
+export interface ManagementSelectorNotificationMarkReadV1 {
+operation: "notification_mark_read_v1"
+key: {
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+notification_id: string
+}
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "ManagementSelector_notification_preferences_set_v1".
+ */
+export interface ManagementSelectorNotificationPreferencesSetV1 {
+operation: "notification_preferences_set_v1"
+key: {
+channel: NotificationChannel
+purpose: NotificationPurpose
+}
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "ManagementSelector_report_export_start_v1".
+ */
+export interface ManagementSelectorReportExportStartV1 {
+operation: "report_export_start_v1"
+key: {
+
+}
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "ManagementSelector_import_upload_prepare_v1".
+ */
+export interface ManagementSelectorImportUploadPrepareV1 {
+operation: "import_upload_prepare_v1"
+key: {
+
+}
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "ManagementSelector_import_preview_v1".
+ */
+export interface ManagementSelectorImportPreviewV1 {
+operation: "import_preview_v1"
+key: {
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+file_id: string
+}
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "ManagementSelector_import_apply_v1".
+ */
+export interface ManagementSelectorImportApplyV1 {
+operation: "import_apply_v1"
+key: {
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+preview_id: string
+}
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "ManagementSelector_subscription_upgrade_quote_v1".
+ */
+export interface ManagementSelectorSubscriptionUpgradeQuoteV1 {
+operation: "subscription_upgrade_quote_v1"
+key: {
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+target_plan_id: string
+}
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "ManagementSelector_subscription_downgrade_request_v1".
+ */
+export interface ManagementSelectorSubscriptionDowngradeRequestV1 {
+operation: "subscription_downgrade_request_v1"
+key: {
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+target_plan_id: string
+kept_center_id?: (string | null)
+}
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "ManagementSelector_subscription_change_cancel_v1".
+ */
+export interface ManagementSelectorSubscriptionChangeCancelV1 {
+operation: "subscription_change_cancel_v1"
+key: {
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+change_id: string
+}
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "ManagementSelector_subscription_renewal_set_v1".
+ */
+export interface ManagementSelectorSubscriptionRenewalSetV1 {
+operation: "subscription_renewal_set_v1"
+key: {
+
+}
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "ManagementSelector_saas_payment_submit_v1".
+ */
+export interface ManagementSelectorSaasPaymentSubmitV1 {
+operation: "saas_payment_submit_v1"
+key: {
+quote_id?: (string | null)
+}
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "ManagementSelector_saas_payment_verify_v1".
+ */
+export interface ManagementSelectorSaasPaymentVerifyV1 {
+operation: "saas_payment_verify_v1"
+key: {
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+payment_id: string
+}
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "ManagementSelector_saas_grace_extend_v1".
+ */
+export interface ManagementSelectorSaasGraceExtendV1 {
+operation: "saas_grace_extend_v1"
+key: {
+
+}
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "ManagementSelector_event_save_v1".
+ */
+export interface ManagementSelectorEventSaveV1 {
+operation: "event_save_v1"
+key: {
+event_id?: (string | null)
+}
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "ManagementSelector_event_publish_v1".
+ */
+export interface ManagementSelectorEventPublishV1 {
+operation: "event_publish_v1"
+key: {
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+event_id: string
+}
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "ManagementSelector_event_register_v1".
+ */
+export interface ManagementSelectorEventRegisterV1 {
+operation: "event_register_v1"
+key: {
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+event_id: string
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+person_id: string
+sale_id?: (string | null)
+preparation_id?: (string | null)
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+preview_id: string
+}
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "ManagementSelector_event_registration_cancel_v1".
+ */
+export interface ManagementSelectorEventRegistrationCancelV1 {
+operation: "event_registration_cancel_v1"
+key: {
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+registration_id: string
+}
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "ManagementSelector_event_complete_v1".
+ */
+export interface ManagementSelectorEventCompleteV1 {
+operation: "event_complete_v1"
+key: {
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+event_id: string
+}
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "ManagementSelector_event_duty_verify_v1".
+ */
+export interface ManagementSelectorEventDutyVerifyV1 {
+operation: "event_duty_verify_v1"
+key: {
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+assignment_id: string
+}
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "ManagementSelector_event_cancel_preview_v1".
+ */
+export interface ManagementSelectorEventCancelPreviewV1 {
+operation: "event_cancel_preview_v1"
+key: {
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+event_id: string
+}
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "ManagementSelector_event_cancel_apply_v1".
+ */
+export interface ManagementSelectorEventCancelApplyV1 {
+operation: "event_cancel_apply_v1"
+key: {
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+preview_id: string
+}
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "ManagementSelector_document_upload_prepare_v1".
+ */
+export interface ManagementSelectorDocumentUploadPrepareV1 {
+operation: "document_upload_prepare_v1"
+key: {
+
+}
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "ManagementSelector_document_version_publish_v1".
+ */
+export interface ManagementSelectorDocumentVersionPublishV1 {
+operation: "document_version_publish_v1"
+key: {
+document_id?: (string | null)
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+file_id: string
+scope: ConfigurationScope
+}
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "ManagementSelector_document_accept_v1".
+ */
+export interface ManagementSelectorDocumentAcceptV1 {
+operation: "document_accept_v1"
+key: {
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+document_version_id: string
+}
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "ManagementSelector_publication_set_v1".
+ */
+export interface ManagementSelectorPublicationSetV1 {
+operation: "publication_set_v1"
+key: {
+session_id?: (string | null)
+event_id?: (string | null)
+}
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "ManagementSelector_public_application_submit_v1".
+ */
+export interface ManagementSelectorPublicApplicationSubmitV1 {
+operation: "public_application_submit_v1"
+key: {
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+publication_id: string
+}
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "ManagementSelector_public_application_review_v1".
+ */
+export interface ManagementSelectorPublicApplicationReviewV1 {
+operation: "public_application_review_v1"
+key: {
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+application_id: string
+person_id?: (string | null)
+}
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "ManagementSelector_class_assignment_set_v1".
+ */
+export interface ManagementSelectorClassAssignmentSetV1 {
+operation: "class_assignment_set_v1"
+key: {
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+class_id: string
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+person_id: string
+duty: Duty
+}
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "ManagementSelector_event_attendance_mark_v1".
+ */
+export interface ManagementSelectorEventAttendanceMarkV1 {
+operation: "event_attendance_mark_v1"
+key: {
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+registration_id: string
+}
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "ManagementSelector_platform_owner_set_v1".
+ */
+export interface ManagementSelectorPlatformOwnerSetV1 {
+operation: "platform_owner_set_v1"
+key: {
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+verified_account_id: string
+}
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "ManagementSelector_platform_owner_remove_v1".
+ */
+export interface ManagementSelectorPlatformOwnerRemoveV1 {
+operation: "platform_owner_remove_v1"
+key: {
+replacement_verified_account_id?: (string | null)
+}
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "ManagementSelector_center_manager_assign_v1".
+ */
+export interface ManagementSelectorCenterManagerAssignV1 {
+operation: "center_manager_assign_v1"
+key: {
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+person_id: string
+}
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "ManagementSelector_center_manager_revoke_v1".
+ */
+export interface ManagementSelectorCenterManagerRevokeV1 {
+operation: "center_manager_revoke_v1"
+key: {
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+person_id: string
+}
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "ManagementSelector_attendance_block_v1".
+ */
+export interface ManagementSelectorAttendanceBlockV1 {
+operation: "attendance_block_v1"
+key: {
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+reservation_id: string
+}
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "ManagementSelector_event_attendance_close_v1".
+ */
+export interface ManagementSelectorEventAttendanceCloseV1 {
+operation: "event_attendance_close_v1"
+key: {
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+event_id: string
+}
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "ManagementSelector_event_attendance_correct_v1".
+ */
+export interface ManagementSelectorEventAttendanceCorrectV1 {
+operation: "event_attendance_correct_v1"
+key: {
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+registration_id: string
+}
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "ManagementSelector_file_upload_complete_v1".
+ */
+export interface ManagementSelectorFileUploadCompleteV1 {
+operation: "file_upload_complete_v1"
+key: {
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+file_id: string
+}
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "ManagementSelector_negcredit_valuation_set_v1".
+ */
+export interface ManagementSelectorNegcreditValuationSetV1 {
+operation: "negcredit_valuation_set_v1"
+key: {
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+discipline_id: string
+}
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "ManagementSelector_discipline_save_v1".
+ */
+export interface ManagementSelectorDisciplineSaveV1 {
+operation: "discipline_save_v1"
+key: {
+discipline_id?: (string | null)
+}
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "ManagementSelector_center_discipline_set_v1".
+ */
+export interface ManagementSelectorCenterDisciplineSetV1 {
+operation: "center_discipline_set_v1"
+key: {
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+discipline_id: string
+}
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "ManagementSelector_person_discipline_set_v1".
+ */
+export interface ManagementSelectorPersonDisciplineSetV1 {
+operation: "person_discipline_set_v1"
+key: {
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+person_id: string
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+discipline_id: string
+}
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "ManagementSelector_event_registration_preview_v1".
+ */
+export interface ManagementSelectorEventRegistrationPreviewV1 {
+operation: "event_registration_preview_v1"
+key: {
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+event_id: string
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+person_id: string
+sale_id?: (string | null)
+preparation_id?: (string | null)
+}
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "ManagementSelector_event_payment_prepare_v1".
+ */
+export interface ManagementSelectorEventPaymentPrepareV1 {
+operation: "event_payment_prepare_v1"
+key: {
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+event_id: string
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+person_id: string
+}
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "ManagementSelector_event_actual_start_record_v1".
+ */
+export interface ManagementSelectorEventActualStartRecordV1 {
+operation: "event_actual_start_record_v1"
+key: {
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+event_id: string
+}
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "ManagementSelector_event_actual_start_correct_v1".
+ */
+export interface ManagementSelectorEventActualStartCorrectV1 {
+operation: "event_actual_start_correct_v1"
+key: {
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+event_id: string
+}
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "ManagementSelector_reservation_impact_preview_v1".
+ */
+export interface ManagementSelectorReservationImpactPreviewV1 {
+operation: "reservation_impact_preview_v1"
+key: {
+change: ReservationProtectionChange
+}
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "ManagementSelector_reservation_impact_apply_v1".
+ */
+export interface ManagementSelectorReservationImpactApplyV1 {
+operation: "reservation_impact_apply_v1"
+key: {
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+preview_id: string
+}
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "ManagementSelector_settlement_request_submit_v1".
+ */
+export interface ManagementSelectorSettlementRequestSubmitV1 {
+operation: "settlement_request_submit_v1"
+key: {
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+from_center_id: string
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+to_center_id: string
+previous_id?: (string | null)
+}
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "ManagementSelector_settlement_request_withdraw_v1".
+ */
+export interface ManagementSelectorSettlementRequestWithdrawV1 {
+operation: "settlement_request_withdraw_v1"
+key: {
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+settlement_request_id: string
+}
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "ManagementSelector_settlement_request_decide_v1".
+ */
+export interface ManagementSelectorSettlementRequestDecideV1 {
+operation: "settlement_request_decide_v1"
+key: {
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+settlement_request_id: string
+}
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "ManagementSelector_settlement_payment_record_v1".
+ */
+export interface ManagementSelectorSettlementPaymentRecordV1 {
+operation: "settlement_payment_record_v1"
+key: {
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+settlement_request_id: string
+}
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "ManagementSelector_settlement_offset_record_v1".
+ */
+export interface ManagementSelectorSettlementOffsetRecordV1 {
+operation: "settlement_offset_record_v1"
+key: {
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+settlement_request_id: string
+}
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "ManagementSelector_settlement_adjust_v1".
+ */
+export interface ManagementSelectorSettlementAdjustV1 {
+operation: "settlement_adjust_v1"
+key: {
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+movement_id: string
+}
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "Success_management_state_get".
+ */
+export interface SuccessManagementStateGet {
+ok: true
+data: ManagementStatePage
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+trace_id: string
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "ManagementStatePage".
+ */
+export interface ManagementStatePage {
+items: ManagementStateView[]
+next_cursor: (OpaqueToken | null)
+as_of: Instant
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "Request_instructor_agreements_list".
+ */
+export interface RequestInstructorAgreementsList {
+client_api_version: 1
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+request_id: string
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+org_id: string
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+center_id: string
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+person_id: string
+page: Page
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "Success_instructor_agreements_list".
+ */
+export interface SuccessInstructorAgreementsList {
+ok: true
+data: AgreementVersionPage
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+trace_id: string
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "Request_reservation_impact_preview".
+ */
+export interface RequestReservationImpactPreview {
+client_api_version: 1
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+request_id: string
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+org_id: string
+center_id?: (string | null)
+change: ReservationProtectionChange
+reason: Text
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "Success_reservation_impact_preview".
+ */
+export interface SuccessReservationImpactPreview {
+ok: true
+data: ReservationProtectionPreview
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+trace_id: string
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "Request_reservation_impact_apply".
+ */
+export interface RequestReservationImpactApply {
+client_api_version: 1
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+request_id: string
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+org_id: string
+center_id?: (string | null)
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+operation_key: string
+preview: PreviewToken
+/**
+ * Items: Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+accepted_reservation_ids: string[]
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "Success_reservation_impact_apply".
+ */
+export interface SuccessReservationImpactApply {
+ok: true
+data: Mutation
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+trace_id: string
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "Request_settlement_movements_list".
+ */
+export interface RequestSettlementMovementsList {
+client_api_version: 1
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+request_id: string
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+org_id: string
+center_id?: (string | null)
+page: Page
+currency: Currency
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "Success_settlement_movements_list".
+ */
+export interface SuccessSettlementMovementsList {
+ok: true
+data: SettlementMovementsPage
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+trace_id: string
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "Request_settlement_requests_list".
+ */
+export interface RequestSettlementRequestsList {
+client_api_version: 1
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+request_id: string
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+org_id: string
+center_id?: (string | null)
+page: Page
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "Success_settlement_requests_list".
+ */
+export interface SuccessSettlementRequestsList {
+ok: true
+data: SettlementRequestsPage
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+trace_id: string
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "Request_settlement_request_get".
+ */
+export interface RequestSettlementRequestGet {
+client_api_version: 1
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+request_id: string
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+org_id: string
+center_id?: (string | null)
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+settlement_request_id: string
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "Success_settlement_request_get".
+ */
+export interface SuccessSettlementRequestGet {
+ok: true
+data: SettlementRequestView
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+trace_id: string
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "Request_settlement_request_submit".
+ */
+export interface RequestSettlementRequestSubmit {
+client_api_version: 1
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+request_id: string
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+org_id: string
+center_id?: (string | null)
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+operation_key: string
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+from_center_id: string
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+to_center_id: string
+currency: Currency
+/**
+ * @minItems 1
+ */
+lines: [SettlementLine, ...(SettlementLine)[]]
+reason: Text
+previous_id?: (string | null)
+previous_version?: PositiveInt
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "Success_settlement_request_submit".
+ */
+export interface SuccessSettlementRequestSubmit {
+ok: true
+data: SettlementCommandResult
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+trace_id: string
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "Request_settlement_request_withdraw".
+ */
+export interface RequestSettlementRequestWithdraw {
+client_api_version: 1
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+request_id: string
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+org_id: string
+center_id?: (string | null)
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+operation_key: string
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+settlement_request_id: string
+expected_version: PositiveInt
+reason: Text
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "Success_settlement_request_withdraw".
+ */
+export interface SuccessSettlementRequestWithdraw {
+ok: true
+data: SettlementCommandResult
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+trace_id: string
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "Request_settlement_request_decide".
+ */
+export interface RequestSettlementRequestDecide {
+client_api_version: 1
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+request_id: string
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+org_id: string
+center_id?: (string | null)
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+operation_key: string
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+settlement_request_id: string
+expected_version: PositiveInt
+decision: ("approve" | "reject")
+reason: Text
+fallback: Bool
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "Success_settlement_request_decide".
+ */
+export interface SuccessSettlementRequestDecide {
+ok: true
+data: SettlementCommandResult
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+trace_id: string
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "Request_settlement_payment_record".
+ */
+export interface RequestSettlementPaymentRecord {
+client_api_version: 1
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+request_id: string
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+org_id: string
+center_id?: (string | null)
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+operation_key: string
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+settlement_request_id: string
+expected_version: PositiveInt
+/**
+ * @minItems 1
+ */
+lines: [SettlementLine, ...(SettlementLine)[]]
+amount_minor: PositiveMoney
+currency: Currency
+occurred_at: Instant
+reason: Text
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "Success_settlement_payment_record".
+ */
+export interface SuccessSettlementPaymentRecord {
+ok: true
+data: SettlementCommandResult
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+trace_id: string
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "Request_settlement_offset_record".
+ */
+export interface RequestSettlementOffsetRecord {
+client_api_version: 1
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+request_id: string
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+org_id: string
+center_id?: (string | null)
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+operation_key: string
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+settlement_request_id: string
+expected_version: PositiveInt
+/**
+ * @minItems 1
+ */
+debit_lines: [SettlementLine, ...(SettlementLine)[]]
+/**
+ * @minItems 1
+ */
+credit_lines: [SettlementLine, ...(SettlementLine)[]]
+amount_minor: PositiveMoney
+currency: Currency
+occurred_at: Instant
+reason: Text
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "Success_settlement_offset_record".
+ */
+export interface SuccessSettlementOffsetRecord {
+ok: true
+data: SettlementCommandResult
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+trace_id: string
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "Request_settlement_adjust".
+ */
+export interface RequestSettlementAdjust {
+client_api_version: 1
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+request_id: string
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+org_id: string
+center_id?: (string | null)
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+operation_key: string
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+movement_id: string
+expected_version: PositiveInt
+amount_minor: PositiveMoney
+reason: Text
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "Success_settlement_adjust".
+ */
+export interface SuccessSettlementAdjust {
+ok: true
+data: SettlementCommandResult
 /**
  * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
  */

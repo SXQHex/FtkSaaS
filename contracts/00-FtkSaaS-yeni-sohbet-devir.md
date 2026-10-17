@@ -1,12 +1,14 @@
-# FtkSaaS — program/seans geliştirme kapsamı
+# DS-2026-10-17 — güncel sözleşme ve CI devri
 
-Program/seans yaşam döngüsü geliştirme kapsamı: **79 çağrılabilir / 105 yalnız sözleşme**, 25 migration. [Program/seans devri](../docs/program-session-handover.md) yedi komutun uçtan uca akışını, sözleşme bağımlılıklarını ve sınırlarını belirtir. Yeni kaynak için tam temiz kabul son PR head CI'ından doğrulanır; önceki test kanıtları yeni SHA'ya taşınmaz.
+Doğrulanmış başlangıç: main c231ab5526854ed62445613467649e1b0bf960bb; [aynı SHA CI](https://github.com/SXQHex/FtkSaaS/actions/runs/39010419849) başarılı, 25 migration ve 241 test. Bu PR sözleşme/DTO/izin/guard/okuma-sürüm bağımlılıklarını ve CI denetimlerini güçlendirir. Yeni runtime veya migration eklemez: 197 sözleşme (184 mevcut + 13 yeni), 79 çağrılabilir / 118 yalnız sözleşme. İşlem sayısı ürün tamamlanma oranı değildir.
 
-Doğrulanmış dal başlangıcı: main `69257f056f593b4b52248e7c9070dada7918344d`, [aynı SHA CI](https://github.com/SXQHex/FtkSaaS/actions/runs/39004791672) başarılı (221 test, 24 migration). Bu PR ayrı daldadır; merge veya production dağıtımı içermez. Geliştirici kaynak ağacı üzerinde son 12 sözleşme + 20 odaklı program Auth/API testi geçti; önceki kapsamda 68 etkilenen API testi geçti. Bağımsız statik incelemenin P2 legacy görev kaldırma bulgusu giderilip yeniden incelendi. [Kaynak/kanıt raporu](../reports/program-session-verification.json). Tam temiz son head CI ayrı kanıttır.
+[Karar sprinti devri](../docs/decision-sprint-handover.md), [kabul edilmiş kararlar](../docs/decisions/DS-2026-10-17.md), [F01–F33 haritası](../docs/feature-delivery.md), [main koruma denetimi](../docs/branch-protection-review.md). Yeni DS davranışları gerçek Auth → Edge → RPC kabulü bekler; sözleşme negatif testleri ve mevcut runtime regresyonu ayrı kanıttır. Kaynak/kanıt raporu: reports/decision-sprint-verification.json; son PR head inceleme ve tam temiz CI ayrıca doğrulanır.
 
-Aşağıdaki önceki kapsam ve kanıtlar kendi kaynak snapshot'larıdır.
+Mevcut runtime anlaşma/plan/koruma farkları açıkça delivery_gaps olarak kaydedildi. Hesaplaşma yetkisini hangi aktörün verebileceği/geri alabileceği DS-OPEN-01; yeni grantor yetkisi uydurulmadı. Klasik main koruması API 403 nedeniyle doğrulanamıyor; rulesets boş, yönetim yazması yapılmadı. Yeni merge/yönetim yetkisi varsayılmaz; frontend, production ve Resend'e müdahale edilmez.
 
 ---
+
+Aşağıdaki önceki teslim kapsamları kendi kaynak snapshot’larıdır; güncel açık iş olarak yorumlanmaz.
 
 # FtkSaaS — güncel başlangıç
 

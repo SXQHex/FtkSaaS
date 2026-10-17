@@ -9,6 +9,20 @@
       "features": [
         "F06"
       ],
+      "required_features": [
+        "F06"
+      ],
+      "runtime_required_features": [
+        "F06"
+      ],
+      "decision_delivery": {
+        "accepted_contract": "DS-2026-10-17",
+        "runtime_conformance": "baseline_only_not_full_product_acceptance",
+        "open_dependencies": [],
+        "target_request": {
+          "$ref": "#/$defs/Request_account_get"
+        }
+      },
       "billing_class": "exempt",
       "limits": []
     },
@@ -20,6 +34,18 @@
       "features": [
         "F06"
       ],
+      "required_features": [
+        "F06"
+      ],
+      "runtime_required_features": [],
+      "decision_delivery": {
+        "accepted_contract": "DS-2026-10-17",
+        "runtime_conformance": "pending",
+        "open_dependencies": [],
+        "target_request": {
+          "$ref": "#/$defs/Request_account_profile_update"
+        }
+      },
       "billing_class": "exempt",
       "limits": []
     },
@@ -31,6 +57,18 @@
       "features": [
         "F06"
       ],
+      "required_features": [
+        "F06"
+      ],
+      "runtime_required_features": [],
+      "decision_delivery": {
+        "accepted_contract": "DS-2026-10-17",
+        "runtime_conformance": "pending",
+        "open_dependencies": [],
+        "target_request": {
+          "$ref": "#/$defs/Request_account_password_change"
+        }
+      },
       "billing_class": "exempt",
       "limits": []
     },
@@ -42,6 +80,18 @@
       "features": [
         "F06"
       ],
+      "required_features": [
+        "F06"
+      ],
+      "runtime_required_features": [],
+      "decision_delivery": {
+        "accepted_contract": "DS-2026-10-17",
+        "runtime_conformance": "pending",
+        "open_dependencies": [],
+        "target_request": {
+          "$ref": "#/$defs/Request_account_password_reset_request"
+        }
+      },
       "billing_class": "exempt",
       "limits": []
     },
@@ -53,6 +103,18 @@
       "features": [
         "F06"
       ],
+      "required_features": [
+        "F06"
+      ],
+      "runtime_required_features": [],
+      "decision_delivery": {
+        "accepted_contract": "DS-2026-10-17",
+        "runtime_conformance": "pending",
+        "open_dependencies": [],
+        "target_request": {
+          "$ref": "#/$defs/Request_account_delete_preview"
+        }
+      },
       "billing_class": "exempt",
       "limits": []
     },
@@ -64,6 +126,18 @@
       "features": [
         "F06"
       ],
+      "required_features": [
+        "F06"
+      ],
+      "runtime_required_features": [],
+      "decision_delivery": {
+        "accepted_contract": "DS-2026-10-17",
+        "runtime_conformance": "pending",
+        "open_dependencies": [],
+        "target_request": {
+          "$ref": "#/$defs/Request_account_delete_apply"
+        }
+      },
       "billing_class": "exempt",
       "limits": []
     },
@@ -75,6 +149,20 @@
       "features": [
         "F04"
       ],
+      "required_features": [
+        "F04"
+      ],
+      "runtime_required_features": [
+        "F04"
+      ],
+      "decision_delivery": {
+        "accepted_contract": "DS-2026-10-17",
+        "runtime_conformance": "baseline_only_not_full_product_acceptance",
+        "open_dependencies": [],
+        "target_request": {
+          "$ref": "#/$defs/Request_organizations_list"
+        }
+      },
       "billing_class": "exempt",
       "limits": [
         "single-page projection; cursor pagination pending"
@@ -89,6 +177,22 @@
         "F01",
         "F32"
       ],
+      "required_features": [
+        "F01",
+        "F32"
+      ],
+      "runtime_required_features": [
+        "F01",
+        "F32"
+      ],
+      "decision_delivery": {
+        "accepted_contract": "DS-2026-10-17",
+        "runtime_conformance": "baseline_only_not_full_product_acceptance",
+        "open_dependencies": [],
+        "target_request": {
+          "$ref": "#/$defs/Request_organization_create"
+        }
+      },
       "billing_class": "bootstrap",
       "limits": []
     },
@@ -100,6 +204,20 @@
       "features": [
         "F01"
       ],
+      "required_features": [
+        "F01"
+      ],
+      "runtime_required_features": [
+        "F01"
+      ],
+      "decision_delivery": {
+        "accepted_contract": "DS-2026-10-17",
+        "runtime_conformance": "baseline_only_not_full_product_acceptance",
+        "open_dependencies": [],
+        "target_request": {
+          "$ref": "#/$defs/Request_organization_get"
+        }
+      },
       "billing_class": "read",
       "limits": []
     },
@@ -111,6 +229,20 @@
       "features": [
         "F01"
       ],
+      "required_features": [
+        "F01"
+      ],
+      "runtime_required_features": [
+        "F01"
+      ],
+      "decision_delivery": {
+        "accepted_contract": "DS-2026-10-17",
+        "runtime_conformance": "baseline_only_not_full_product_acceptance",
+        "open_dependencies": [],
+        "target_request": {
+          "$ref": "#/$defs/Request_organization_update"
+        }
+      },
       "billing_class": "config",
       "limits": []
     },
@@ -123,6 +255,19 @@
         "F01",
         "F32"
       ],
+      "required_features": [
+        "F01",
+        "F32"
+      ],
+      "runtime_required_features": [],
+      "decision_delivery": {
+        "accepted_contract": "DS-2026-10-17",
+        "runtime_conformance": "pending",
+        "open_dependencies": [],
+        "target_request": {
+          "$ref": "#/$defs/Request_organization_close_preview"
+        }
+      },
       "billing_class": "exempt",
       "limits": []
     },
@@ -135,6 +280,19 @@
         "F01",
         "F32"
       ],
+      "required_features": [
+        "F01",
+        "F32"
+      ],
+      "runtime_required_features": [],
+      "decision_delivery": {
+        "accepted_contract": "DS-2026-10-17",
+        "runtime_conformance": "pending",
+        "open_dependencies": [],
+        "target_request": {
+          "$ref": "#/$defs/Request_organization_close_apply"
+        }
+      },
       "billing_class": "exempt",
       "limits": []
     },
@@ -147,6 +305,19 @@
         "F01",
         "F32"
       ],
+      "required_features": [
+        "F01",
+        "F32"
+      ],
+      "runtime_required_features": [],
+      "decision_delivery": {
+        "accepted_contract": "DS-2026-10-17",
+        "runtime_conformance": "pending",
+        "open_dependencies": [],
+        "target_request": {
+          "$ref": "#/$defs/Request_organization_reopen"
+        }
+      },
       "billing_class": "exempt",
       "limits": []
     },
@@ -159,6 +330,19 @@
         "F01",
         "F33"
       ],
+      "required_features": [
+        "F01",
+        "F33"
+      ],
+      "runtime_required_features": [],
+      "decision_delivery": {
+        "accepted_contract": "DS-2026-10-17",
+        "runtime_conformance": "pending",
+        "open_dependencies": [],
+        "target_request": {
+          "$ref": "#/$defs/Request_organization_delete_preview"
+        }
+      },
       "billing_class": "exempt",
       "limits": []
     },
@@ -171,6 +355,19 @@
         "F01",
         "F33"
       ],
+      "required_features": [
+        "F01",
+        "F33"
+      ],
+      "runtime_required_features": [],
+      "decision_delivery": {
+        "accepted_contract": "DS-2026-10-17",
+        "runtime_conformance": "pending",
+        "open_dependencies": [],
+        "target_request": {
+          "$ref": "#/$defs/Request_organization_delete_apply"
+        }
+      },
       "billing_class": "exempt",
       "limits": []
     },
@@ -182,6 +379,20 @@
       "features": [
         "F01"
       ],
+      "required_features": [
+        "F01"
+      ],
+      "runtime_required_features": [
+        "F01"
+      ],
+      "decision_delivery": {
+        "accepted_contract": "DS-2026-10-17",
+        "runtime_conformance": "baseline_only_not_full_product_acceptance",
+        "open_dependencies": [],
+        "target_request": {
+          "$ref": "#/$defs/Request_centers_list"
+        }
+      },
       "billing_class": "read",
       "limits": [
         "single-page projection; cursor pagination pending"
@@ -195,6 +406,20 @@
       "features": [
         "F01"
       ],
+      "required_features": [
+        "F01"
+      ],
+      "runtime_required_features": [
+        "F01"
+      ],
+      "decision_delivery": {
+        "accepted_contract": "DS-2026-10-17",
+        "runtime_conformance": "baseline_only_not_full_product_acceptance",
+        "open_dependencies": [],
+        "target_request": {
+          "$ref": "#/$defs/Request_center_create"
+        }
+      },
       "billing_class": "bootstrap",
       "limits": []
     },
@@ -206,6 +431,20 @@
       "features": [
         "F01"
       ],
+      "required_features": [
+        "F01"
+      ],
+      "runtime_required_features": [
+        "F01"
+      ],
+      "decision_delivery": {
+        "accepted_contract": "DS-2026-10-17",
+        "runtime_conformance": "baseline_only_not_full_product_acceptance",
+        "open_dependencies": [],
+        "target_request": {
+          "$ref": "#/$defs/Request_center_update"
+        }
+      },
       "billing_class": "config",
       "limits": []
     },
@@ -217,6 +456,20 @@
       "features": [
         "F01"
       ],
+      "required_features": [
+        "F01"
+      ],
+      "runtime_required_features": [
+        "F01"
+      ],
+      "decision_delivery": {
+        "accepted_contract": "DS-2026-10-17",
+        "runtime_conformance": "baseline_only_not_full_product_acceptance",
+        "open_dependencies": [],
+        "target_request": {
+          "$ref": "#/$defs/Request_room_save"
+        }
+      },
       "billing_class": "config",
       "limits": [
         "Clean Auth/API acceptance evidence is tracked in reports/room-role-verification.json; production acceptance remains open."
@@ -230,6 +483,20 @@
       "features": [
         "F02"
       ],
+      "required_features": [
+        "F02"
+      ],
+      "runtime_required_features": [
+        "F02"
+      ],
+      "decision_delivery": {
+        "accepted_contract": "DS-2026-10-17",
+        "runtime_conformance": "baseline_only_not_full_product_acceptance",
+        "open_dependencies": [],
+        "target_request": {
+          "$ref": "#/$defs/Request_availability_save"
+        }
+      },
       "billing_class": "config",
       "limits": []
     },
@@ -241,6 +508,20 @@
       "features": [
         "F02"
       ],
+      "required_features": [
+        "F02"
+      ],
+      "runtime_required_features": [
+        "F02"
+      ],
+      "decision_delivery": {
+        "accepted_contract": "DS-2026-10-17",
+        "runtime_conformance": "baseline_only_not_full_product_acceptance",
+        "open_dependencies": [],
+        "target_request": {
+          "$ref": "#/$defs/Request_availability_exception_save"
+        }
+      },
       "billing_class": "config",
       "limits": []
     },
@@ -252,6 +533,20 @@
       "features": [
         "F03"
       ],
+      "required_features": [
+        "F03"
+      ],
+      "runtime_required_features": [
+        "F03"
+      ],
+      "decision_delivery": {
+        "accepted_contract": "DS-2026-10-17",
+        "runtime_conformance": "baseline_only_not_full_product_acceptance",
+        "open_dependencies": [],
+        "target_request": {
+          "$ref": "#/$defs/Request_policies_get"
+        }
+      },
       "billing_class": "read",
       "limits": []
     },
@@ -263,6 +558,23 @@
       "features": [
         "F03"
       ],
+      "required_features": [
+        "F03"
+      ],
+      "runtime_required_features": [
+        "F03"
+      ],
+      "decision_delivery": {
+        "accepted_contract": "DS-2026-10-17",
+        "runtime_conformance": "pending",
+        "open_dependencies": [
+          "confirmed_reservation_protection"
+        ],
+        "target_request": {
+          "$ref": "#/$defs/Target_policy_publish_protected"
+        },
+        "current_request_status": "legacy direct publish; target protected DTO not accepted by runtime yet"
+      },
       "billing_class": "config",
       "limits": []
     },
@@ -275,6 +587,23 @@
         "F04",
         "F05"
       ],
+      "required_features": [
+        "F04"
+      ],
+      "runtime_required_features": [
+        "F04",
+        "F05"
+      ],
+      "decision_delivery": {
+        "accepted_contract": "DS-2026-10-17",
+        "runtime_conformance": "pending",
+        "open_dependencies": [
+          "plan_gate_alignment"
+        ],
+        "target_request": {
+          "$ref": "#/$defs/Request_roles_list"
+        }
+      },
       "billing_class": "read",
       "limits": [
         "Clean Auth/API acceptance evidence is tracked in reports/room-role-verification.json; production acceptance remains open.",
@@ -291,6 +620,23 @@
         "F04",
         "F05"
       ],
+      "required_features": [
+        "F04"
+      ],
+      "runtime_required_features": [
+        "F04",
+        "F05"
+      ],
+      "decision_delivery": {
+        "accepted_contract": "DS-2026-10-17",
+        "runtime_conformance": "pending",
+        "open_dependencies": [
+          "plan_gate_alignment"
+        ],
+        "target_request": {
+          "$ref": "#/$defs/Request_role_assign"
+        }
+      },
       "billing_class": "config",
       "limits": []
     },
@@ -303,6 +649,23 @@
         "F04",
         "F05"
       ],
+      "required_features": [
+        "F04"
+      ],
+      "runtime_required_features": [
+        "F04",
+        "F05"
+      ],
+      "decision_delivery": {
+        "accepted_contract": "DS-2026-10-17",
+        "runtime_conformance": "pending",
+        "open_dependencies": [
+          "plan_gate_alignment"
+        ],
+        "target_request": {
+          "$ref": "#/$defs/Request_role_revoke"
+        }
+      },
       "billing_class": "config",
       "limits": []
     },
@@ -314,6 +677,20 @@
       "features": [
         "F05"
       ],
+      "required_features": [
+        "F05"
+      ],
+      "runtime_required_features": [
+        "F05"
+      ],
+      "decision_delivery": {
+        "accepted_contract": "DS-2026-10-17",
+        "runtime_conformance": "baseline_only_not_full_product_acceptance",
+        "open_dependencies": [],
+        "target_request": {
+          "$ref": "#/$defs/Request_permission_set"
+        }
+      },
       "billing_class": "config",
       "limits": []
     },
@@ -325,6 +702,20 @@
       "features": [
         "F04"
       ],
+      "required_features": [
+        "F04"
+      ],
+      "runtime_required_features": [
+        "F04"
+      ],
+      "decision_delivery": {
+        "accepted_contract": "DS-2026-10-17",
+        "runtime_conformance": "baseline_only_not_full_product_acceptance",
+        "open_dependencies": [],
+        "target_request": {
+          "$ref": "#/$defs/Request_org_manager_assign"
+        }
+      },
       "billing_class": "config",
       "limits": []
     },
@@ -336,6 +727,20 @@
       "features": [
         "F04"
       ],
+      "required_features": [
+        "F04"
+      ],
+      "runtime_required_features": [
+        "F04"
+      ],
+      "decision_delivery": {
+        "accepted_contract": "DS-2026-10-17",
+        "runtime_conformance": "baseline_only_not_full_product_acceptance",
+        "open_dependencies": [],
+        "target_request": {
+          "$ref": "#/$defs/Request_org_manager_revoke"
+        }
+      },
       "billing_class": "config",
       "limits": []
     },
@@ -347,6 +752,20 @@
       "features": [
         "F04"
       ],
+      "required_features": [
+        "F04"
+      ],
+      "runtime_required_features": [
+        "F04"
+      ],
+      "decision_delivery": {
+        "accepted_contract": "DS-2026-10-17",
+        "runtime_conformance": "baseline_only_not_full_product_acceptance",
+        "open_dependencies": [],
+        "target_request": {
+          "$ref": "#/$defs/Request_manager_self_assign_center"
+        }
+      },
       "billing_class": "bootstrap",
       "limits": []
     },
@@ -359,6 +778,22 @@
         "F04",
         "F06"
       ],
+      "required_features": [
+        "F04",
+        "F06"
+      ],
+      "runtime_required_features": [
+        "F04",
+        "F06"
+      ],
+      "decision_delivery": {
+        "accepted_contract": "DS-2026-10-17",
+        "runtime_conformance": "baseline_only_not_full_product_acceptance",
+        "open_dependencies": [],
+        "target_request": {
+          "$ref": "#/$defs/Request_account_access_send"
+        }
+      },
       "billing_class": "invite",
       "limits": [
         "local_synthetic_SMTP_delivery_only; external provider unconfigured"
@@ -372,6 +807,18 @@
       "features": [
         "F04"
       ],
+      "required_features": [
+        "F04"
+      ],
+      "runtime_required_features": [],
+      "decision_delivery": {
+        "accepted_contract": "DS-2026-10-17",
+        "runtime_conformance": "pending",
+        "open_dependencies": [],
+        "target_request": {
+          "$ref": "#/$defs/Request_account_access_revoke"
+        }
+      },
       "billing_class": "invite",
       "limits": []
     },
@@ -384,6 +831,22 @@
         "F04",
         "F06"
       ],
+      "required_features": [
+        "F04",
+        "F06"
+      ],
+      "runtime_required_features": [
+        "F04",
+        "F06"
+      ],
+      "decision_delivery": {
+        "accepted_contract": "DS-2026-10-17",
+        "runtime_conformance": "baseline_only_not_full_product_acceptance",
+        "open_dependencies": [],
+        "target_request": {
+          "$ref": "#/$defs/Request_account_access_accept"
+        }
+      },
       "billing_class": "invite",
       "limits": []
     },
@@ -395,6 +858,18 @@
       "features": [
         "F04"
       ],
+      "required_features": [
+        "F04"
+      ],
+      "runtime_required_features": [],
+      "decision_delivery": {
+        "accepted_contract": "DS-2026-10-17",
+        "runtime_conformance": "pending",
+        "open_dependencies": [],
+        "target_request": {
+          "$ref": "#/$defs/Request_account_link_remove"
+        }
+      },
       "billing_class": "config",
       "limits": []
     },
@@ -406,6 +881,20 @@
       "features": [
         "F07"
       ],
+      "required_features": [
+        "F07"
+      ],
+      "runtime_required_features": [
+        "F07"
+      ],
+      "decision_delivery": {
+        "accepted_contract": "DS-2026-10-17",
+        "runtime_conformance": "baseline_only_not_full_product_acceptance",
+        "open_dependencies": [],
+        "target_request": {
+          "$ref": "#/$defs/Request_people_list"
+        }
+      },
       "billing_class": "read",
       "limits": [
         "Operational readers/writers supply center_id; assignment readers receive no contacts or other-center relations.",
@@ -422,6 +911,22 @@
         "F06",
         "F07"
       ],
+      "required_features": [
+        "F06",
+        "F07"
+      ],
+      "runtime_required_features": [
+        "F06",
+        "F07"
+      ],
+      "decision_delivery": {
+        "accepted_contract": "DS-2026-10-17",
+        "runtime_conformance": "baseline_only_not_full_product_acceptance",
+        "open_dependencies": [],
+        "target_request": {
+          "$ref": "#/$defs/Request_person_get"
+        }
+      },
       "billing_class": "read",
       "limits": [
         "Operational readers/writers supply center_id; assignment readers receive no contacts or other-center relations.",
@@ -436,6 +941,20 @@
       "features": [
         "F07"
       ],
+      "required_features": [
+        "F07"
+      ],
+      "runtime_required_features": [
+        "F07"
+      ],
+      "decision_delivery": {
+        "accepted_contract": "DS-2026-10-17",
+        "runtime_conformance": "baseline_only_not_full_product_acceptance",
+        "open_dependencies": [],
+        "target_request": {
+          "$ref": "#/$defs/Request_person_create"
+        }
+      },
       "billing_class": "new",
       "limits": []
     },
@@ -447,6 +966,20 @@
       "features": [
         "F07"
       ],
+      "required_features": [
+        "F07"
+      ],
+      "runtime_required_features": [
+        "F07"
+      ],
+      "decision_delivery": {
+        "accepted_contract": "DS-2026-10-17",
+        "runtime_conformance": "baseline_only_not_full_product_acceptance",
+        "open_dependencies": [],
+        "target_request": {
+          "$ref": "#/$defs/Request_person_update"
+        }
+      },
       "billing_class": "maintenance",
       "limits": [
         "Operational readers/writers supply center_id; assignment readers receive no contacts or other-center relations.",
@@ -462,6 +995,22 @@
         "F07",
         "F32"
       ],
+      "required_features": [
+        "F07",
+        "F32"
+      ],
+      "runtime_required_features": [
+        "F07",
+        "F32"
+      ],
+      "decision_delivery": {
+        "accepted_contract": "DS-2026-10-17",
+        "runtime_conformance": "baseline_only_not_full_product_acceptance",
+        "open_dependencies": [],
+        "target_request": {
+          "$ref": "#/$defs/Request_student_activate"
+        }
+      },
       "billing_class": "new",
       "limits": []
     },
@@ -474,6 +1023,22 @@
         "F07",
         "F32"
       ],
+      "required_features": [
+        "F07",
+        "F32"
+      ],
+      "runtime_required_features": [
+        "F07",
+        "F32"
+      ],
+      "decision_delivery": {
+        "accepted_contract": "DS-2026-10-17",
+        "runtime_conformance": "baseline_only_not_full_product_acceptance",
+        "open_dependencies": [],
+        "target_request": {
+          "$ref": "#/$defs/Request_student_deactivate"
+        }
+      },
       "billing_class": "maintenance",
       "limits": []
     },
@@ -485,6 +1050,18 @@
       "features": [
         "F07"
       ],
+      "required_features": [
+        "F07"
+      ],
+      "runtime_required_features": [],
+      "decision_delivery": {
+        "accepted_contract": "DS-2026-10-17",
+        "runtime_conformance": "pending",
+        "open_dependencies": [],
+        "target_request": {
+          "$ref": "#/$defs/Request_person_merge_preview"
+        }
+      },
       "billing_class": "maintenance",
       "limits": []
     },
@@ -496,6 +1073,18 @@
       "features": [
         "F07"
       ],
+      "required_features": [
+        "F07"
+      ],
+      "runtime_required_features": [],
+      "decision_delivery": {
+        "accepted_contract": "DS-2026-10-17",
+        "runtime_conformance": "pending",
+        "open_dependencies": [],
+        "target_request": {
+          "$ref": "#/$defs/Request_person_merge_approve"
+        }
+      },
       "billing_class": "maintenance",
       "limits": []
     },
@@ -507,6 +1096,18 @@
       "features": [
         "F07"
       ],
+      "required_features": [
+        "F07"
+      ],
+      "runtime_required_features": [],
+      "decision_delivery": {
+        "accepted_contract": "DS-2026-10-17",
+        "runtime_conformance": "pending",
+        "open_dependencies": [],
+        "target_request": {
+          "$ref": "#/$defs/Request_person_merge_apply"
+        }
+      },
       "billing_class": "maintenance",
       "limits": []
     },
@@ -518,6 +1119,20 @@
       "features": [
         "F08"
       ],
+      "required_features": [
+        "F08"
+      ],
+      "runtime_required_features": [
+        "F08"
+      ],
+      "decision_delivery": {
+        "accepted_contract": "DS-2026-10-17",
+        "runtime_conformance": "baseline_only_not_full_product_acceptance",
+        "open_dependencies": [],
+        "target_request": {
+          "$ref": "#/$defs/Request_calendar_get"
+        }
+      },
       "billing_class": "read",
       "limits": []
     },
@@ -530,6 +1145,23 @@
         "F10",
         "F11"
       ],
+      "required_features": [
+        "F10"
+      ],
+      "runtime_required_features": [
+        "F10",
+        "F11"
+      ],
+      "decision_delivery": {
+        "accepted_contract": "DS-2026-10-17",
+        "runtime_conformance": "pending",
+        "open_dependencies": [
+          "plan_gate_alignment"
+        ],
+        "target_request": {
+          "$ref": "#/$defs/Request_class_save"
+        }
+      },
       "billing_class": "new",
       "limits": []
     },
@@ -542,6 +1174,24 @@
         "F08",
         "F10"
       ],
+      "required_features": [
+        "F08",
+        "F10"
+      ],
+      "runtime_required_features": [
+        "F08",
+        "F10"
+      ],
+      "decision_delivery": {
+        "accepted_contract": "DS-2026-10-17",
+        "runtime_conformance": "pending",
+        "open_dependencies": [
+          "starter_plan_and_earning_split"
+        ],
+        "target_request": {
+          "$ref": "#/$defs/Request_program_preview"
+        }
+      },
       "billing_class": "new",
       "limits": []
     },
@@ -554,6 +1204,24 @@
         "F08",
         "F10"
       ],
+      "required_features": [
+        "F08",
+        "F10"
+      ],
+      "runtime_required_features": [
+        "F08",
+        "F10"
+      ],
+      "decision_delivery": {
+        "accepted_contract": "DS-2026-10-17",
+        "runtime_conformance": "pending",
+        "open_dependencies": [
+          "starter_plan_and_earning_split"
+        ],
+        "target_request": {
+          "$ref": "#/$defs/Request_program_apply"
+        }
+      },
       "billing_class": "new",
       "limits": []
     },
@@ -566,6 +1234,24 @@
         "F08",
         "F09"
       ],
+      "required_features": [
+        "F08"
+      ],
+      "runtime_required_features": [
+        "F08",
+        "F09"
+      ],
+      "decision_delivery": {
+        "accepted_contract": "DS-2026-10-17",
+        "runtime_conformance": "pending",
+        "open_dependencies": [
+          "starter_plan_and_earning_split",
+          "plan_gate_alignment"
+        ],
+        "target_request": {
+          "$ref": "#/$defs/Request_session_create"
+        }
+      },
       "billing_class": "new",
       "limits": []
     },
@@ -577,6 +1263,20 @@
       "features": [
         "F08"
       ],
+      "required_features": [
+        "F08"
+      ],
+      "runtime_required_features": [
+        "F08"
+      ],
+      "decision_delivery": {
+        "accepted_contract": "DS-2026-10-17",
+        "runtime_conformance": "baseline_only_not_full_product_acceptance",
+        "open_dependencies": [],
+        "target_request": {
+          "$ref": "#/$defs/Request_session_get"
+        }
+      },
       "billing_class": "read",
       "limits": []
     },
@@ -590,6 +1290,25 @@
         "F13",
         "F14"
       ],
+      "required_features": [
+        "F08",
+        "F14"
+      ],
+      "runtime_required_features": [
+        "F08",
+        "F13",
+        "F14"
+      ],
+      "decision_delivery": {
+        "accepted_contract": "DS-2026-10-17",
+        "runtime_conformance": "pending",
+        "open_dependencies": [
+          "plan_gate_alignment"
+        ],
+        "target_request": {
+          "$ref": "#/$defs/Request_session_change_preview"
+        }
+      },
       "billing_class": "maintenance",
       "limits": []
     },
@@ -603,6 +1322,26 @@
         "F13",
         "F14"
       ],
+      "required_features": [
+        "F08",
+        "F14"
+      ],
+      "runtime_required_features": [
+        "F08",
+        "F13",
+        "F14"
+      ],
+      "decision_delivery": {
+        "accepted_contract": "DS-2026-10-17",
+        "runtime_conformance": "pending",
+        "open_dependencies": [
+          "agreement_versions_and_selection",
+          "plan_gate_alignment"
+        ],
+        "target_request": {
+          "$ref": "#/$defs/Request_session_change_apply"
+        }
+      },
       "billing_class": "maintenance",
       "limits": []
     },
@@ -614,6 +1353,20 @@
       "features": [
         "F08"
       ],
+      "required_features": [
+        "F08"
+      ],
+      "runtime_required_features": [
+        "F08"
+      ],
+      "decision_delivery": {
+        "accepted_contract": "DS-2026-10-17",
+        "runtime_conformance": "baseline_only_not_full_product_acceptance",
+        "open_dependencies": [],
+        "target_request": {
+          "$ref": "#/$defs/Request_session_capacity_set"
+        }
+      },
       "billing_class": "maintenance",
       "limits": []
     },
@@ -625,6 +1378,18 @@
       "features": [
         "F14"
       ],
+      "required_features": [
+        "F14"
+      ],
+      "runtime_required_features": [],
+      "decision_delivery": {
+        "accepted_contract": "DS-2026-10-17",
+        "runtime_conformance": "pending",
+        "open_dependencies": [],
+        "target_request": {
+          "$ref": "#/$defs/Request_session_cancel_preview"
+        }
+      },
       "billing_class": "maintenance",
       "limits": []
     },
@@ -636,6 +1401,18 @@
       "features": [
         "F14"
       ],
+      "required_features": [
+        "F14"
+      ],
+      "runtime_required_features": [],
+      "decision_delivery": {
+        "accepted_contract": "DS-2026-10-17",
+        "runtime_conformance": "pending",
+        "open_dependencies": [],
+        "target_request": {
+          "$ref": "#/$defs/Request_session_cancel_apply"
+        }
+      },
       "billing_class": "maintenance",
       "limits": []
     },
@@ -647,6 +1424,18 @@
       "features": [
         "F14"
       ],
+      "required_features": [
+        "F14"
+      ],
+      "runtime_required_features": [],
+      "decision_delivery": {
+        "accepted_contract": "DS-2026-10-17",
+        "runtime_conformance": "pending",
+        "open_dependencies": [],
+        "target_request": {
+          "$ref": "#/$defs/Request_replacement_session_create"
+        }
+      },
       "billing_class": "new",
       "limits": []
     },
@@ -658,6 +1447,23 @@
       "features": [
         "F13"
       ],
+      "required_features": [
+        "F13"
+      ],
+      "runtime_required_features": [
+        "F13"
+      ],
+      "decision_delivery": {
+        "accepted_contract": "DS-2026-10-17",
+        "runtime_conformance": "pending",
+        "open_dependencies": [
+          "starter_plan_and_earning_split",
+          "agreement_versions_and_selection"
+        ],
+        "target_request": {
+          "$ref": "#/$defs/Request_session_assignment_set"
+        }
+      },
       "billing_class": "maintenance",
       "limits": []
     },
@@ -669,6 +1475,18 @@
       "features": [
         "F09"
       ],
+      "required_features": [
+        "F09"
+      ],
+      "runtime_required_features": [],
+      "decision_delivery": {
+        "accepted_contract": "DS-2026-10-17",
+        "runtime_conformance": "pending",
+        "open_dependencies": [],
+        "target_request": {
+          "$ref": "#/$defs/Request_lesson_request_create"
+        }
+      },
       "billing_class": "request",
       "limits": []
     },
@@ -680,6 +1498,18 @@
       "features": [
         "F09"
       ],
+      "required_features": [
+        "F09"
+      ],
+      "runtime_required_features": [],
+      "decision_delivery": {
+        "accepted_contract": "DS-2026-10-17",
+        "runtime_conformance": "pending",
+        "open_dependencies": [],
+        "target_request": {
+          "$ref": "#/$defs/Request_lesson_request_withdraw"
+        }
+      },
       "billing_class": "maintenance",
       "limits": []
     },
@@ -691,6 +1521,18 @@
       "features": [
         "F09"
       ],
+      "required_features": [
+        "F09"
+      ],
+      "runtime_required_features": [],
+      "decision_delivery": {
+        "accepted_contract": "DS-2026-10-17",
+        "runtime_conformance": "pending",
+        "open_dependencies": [],
+        "target_request": {
+          "$ref": "#/$defs/Request_lesson_request_reject"
+        }
+      },
       "billing_class": "maintenance",
       "limits": []
     },
@@ -702,6 +1544,18 @@
       "features": [
         "F09"
       ],
+      "required_features": [
+        "F09"
+      ],
+      "runtime_required_features": [],
+      "decision_delivery": {
+        "accepted_contract": "DS-2026-10-17",
+        "runtime_conformance": "pending",
+        "open_dependencies": [],
+        "target_request": {
+          "$ref": "#/$defs/Request_lesson_request_offer_alternative"
+        }
+      },
       "billing_class": "maintenance",
       "limits": []
     },
@@ -713,6 +1567,18 @@
       "features": [
         "F09"
       ],
+      "required_features": [
+        "F09"
+      ],
+      "runtime_required_features": [],
+      "decision_delivery": {
+        "accepted_contract": "DS-2026-10-17",
+        "runtime_conformance": "pending",
+        "open_dependencies": [],
+        "target_request": {
+          "$ref": "#/$defs/Request_lesson_request_accept_alternative"
+        }
+      },
       "billing_class": "request",
       "limits": []
     },
@@ -724,6 +1590,18 @@
       "features": [
         "F09"
       ],
+      "required_features": [
+        "F09"
+      ],
+      "runtime_required_features": [],
+      "decision_delivery": {
+        "accepted_contract": "DS-2026-10-17",
+        "runtime_conformance": "pending",
+        "open_dependencies": [],
+        "target_request": {
+          "$ref": "#/$defs/Request_lesson_request_approve"
+        }
+      },
       "billing_class": "request",
       "limits": []
     },
@@ -737,6 +1615,24 @@
         "F11",
         "F15"
       ],
+      "required_features": [
+        "F15"
+      ],
+      "runtime_required_features": [
+        "F10",
+        "F11",
+        "F15"
+      ],
+      "decision_delivery": {
+        "accepted_contract": "DS-2026-10-17",
+        "runtime_conformance": "pending",
+        "open_dependencies": [
+          "plan_gate_alignment"
+        ],
+        "target_request": {
+          "$ref": "#/$defs/Request_reservation_create"
+        }
+      },
       "billing_class": "reservation",
       "limits": [
         "full lesson attendance/earnings and waitlist flows remain contract-only"
@@ -750,6 +1646,20 @@
       "features": [
         "F14"
       ],
+      "required_features": [
+        "F14"
+      ],
+      "runtime_required_features": [
+        "F14"
+      ],
+      "decision_delivery": {
+        "accepted_contract": "DS-2026-10-17",
+        "runtime_conformance": "baseline_only_not_full_product_acceptance",
+        "open_dependencies": [],
+        "target_request": {
+          "$ref": "#/$defs/Request_reservation_cancel"
+        }
+      },
       "billing_class": "maintenance",
       "limits": []
     },
@@ -762,6 +1672,22 @@
         "F06",
         "F10"
       ],
+      "required_features": [
+        "F06",
+        "F10"
+      ],
+      "runtime_required_features": [
+        "F06",
+        "F10"
+      ],
+      "decision_delivery": {
+        "accepted_contract": "DS-2026-10-17",
+        "runtime_conformance": "baseline_only_not_full_product_acceptance",
+        "open_dependencies": [],
+        "target_request": {
+          "$ref": "#/$defs/Request_reservation_list"
+        }
+      },
       "billing_class": "read",
       "limits": []
     },
@@ -773,6 +1699,18 @@
       "features": [
         "F12"
       ],
+      "required_features": [
+        "F12"
+      ],
+      "runtime_required_features": [],
+      "decision_delivery": {
+        "accepted_contract": "DS-2026-10-17",
+        "runtime_conformance": "pending",
+        "open_dependencies": [],
+        "target_request": {
+          "$ref": "#/$defs/Request_waitlist_join"
+        }
+      },
       "billing_class": "reservation",
       "limits": []
     },
@@ -784,6 +1722,18 @@
       "features": [
         "F12"
       ],
+      "required_features": [
+        "F12"
+      ],
+      "runtime_required_features": [],
+      "decision_delivery": {
+        "accepted_contract": "DS-2026-10-17",
+        "runtime_conformance": "pending",
+        "open_dependencies": [],
+        "target_request": {
+          "$ref": "#/$defs/Request_waitlist_leave"
+        }
+      },
       "billing_class": "maintenance",
       "limits": []
     },
@@ -795,6 +1745,18 @@
       "features": [
         "F12"
       ],
+      "required_features": [
+        "F12"
+      ],
+      "runtime_required_features": [],
+      "decision_delivery": {
+        "accepted_contract": "DS-2026-10-17",
+        "runtime_conformance": "pending",
+        "open_dependencies": [],
+        "target_request": {
+          "$ref": "#/$defs/Request_seat_offer_accept"
+        }
+      },
       "billing_class": "reservation",
       "limits": []
     },
@@ -806,6 +1768,18 @@
       "features": [
         "F12"
       ],
+      "required_features": [
+        "F12"
+      ],
+      "runtime_required_features": [],
+      "decision_delivery": {
+        "accepted_contract": "DS-2026-10-17",
+        "runtime_conformance": "pending",
+        "open_dependencies": [],
+        "target_request": {
+          "$ref": "#/$defs/Request_seat_offer_reject"
+        }
+      },
       "billing_class": "maintenance",
       "limits": []
     },
@@ -817,6 +1791,18 @@
       "features": [
         "F14"
       ],
+      "required_features": [
+        "F14"
+      ],
+      "runtime_required_features": [],
+      "decision_delivery": {
+        "accepted_contract": "DS-2026-10-17",
+        "runtime_conformance": "pending",
+        "open_dependencies": [],
+        "target_request": {
+          "$ref": "#/$defs/Request_attendance_get"
+        }
+      },
       "billing_class": "read",
       "limits": []
     },
@@ -828,6 +1814,18 @@
       "features": [
         "F14"
       ],
+      "required_features": [
+        "F14"
+      ],
+      "runtime_required_features": [],
+      "decision_delivery": {
+        "accepted_contract": "DS-2026-10-17",
+        "runtime_conformance": "pending",
+        "open_dependencies": [],
+        "target_request": {
+          "$ref": "#/$defs/Request_attendance_mark"
+        }
+      },
       "billing_class": "maintenance",
       "limits": []
     },
@@ -840,6 +1838,23 @@
         "F14",
         "F20"
       ],
+      "required_features": [
+        "F14"
+      ],
+      "runtime_required_features": [],
+      "decision_delivery": {
+        "accepted_contract": "DS-2026-10-17",
+        "runtime_conformance": "pending",
+        "open_dependencies": [
+          "starter_plan_and_earning_split",
+          "confirmed_reservation_protection",
+          "agreement_versions_and_selection",
+          "cross_center_settlement"
+        ],
+        "target_request": {
+          "$ref": "#/$defs/Request_attendance_close"
+        }
+      },
       "billing_class": "maintenance",
       "limits": []
     },
@@ -852,6 +1867,18 @@
         "F14",
         "F20"
       ],
+      "required_features": [
+        "F14"
+      ],
+      "runtime_required_features": [],
+      "decision_delivery": {
+        "accepted_contract": "DS-2026-10-17",
+        "runtime_conformance": "pending",
+        "open_dependencies": [],
+        "target_request": {
+          "$ref": "#/$defs/Request_attendance_correct_preview"
+        }
+      },
       "billing_class": "maintenance",
       "limits": []
     },
@@ -864,6 +1891,20 @@
         "F14",
         "F20"
       ],
+      "required_features": [
+        "F14"
+      ],
+      "runtime_required_features": [],
+      "decision_delivery": {
+        "accepted_contract": "DS-2026-10-17",
+        "runtime_conformance": "pending",
+        "open_dependencies": [
+          "cross_center_settlement"
+        ],
+        "target_request": {
+          "$ref": "#/$defs/Request_attendance_correct_apply"
+        }
+      },
       "billing_class": "maintenance",
       "limits": []
     },
@@ -876,6 +1917,18 @@
         "F15",
         "F16"
       ],
+      "required_features": [
+        "F15"
+      ],
+      "runtime_required_features": [],
+      "decision_delivery": {
+        "accepted_contract": "DS-2026-10-17",
+        "runtime_conformance": "pending",
+        "open_dependencies": [],
+        "target_request": {
+          "$ref": "#/$defs/Request_products_list"
+        }
+      },
       "billing_class": "read",
       "limits": []
     },
@@ -890,6 +1943,26 @@
         "F17",
         "F18"
       ],
+      "required_features": [
+        "F15"
+      ],
+      "runtime_required_features": [
+        "F15",
+        "F16",
+        "F17",
+        "F18"
+      ],
+      "decision_delivery": {
+        "accepted_contract": "DS-2026-10-17",
+        "runtime_conformance": "pending",
+        "open_dependencies": [
+          "sale_scope_and_backdating",
+          "plan_gate_alignment"
+        ],
+        "target_request": {
+          "$ref": "#/$defs/Request_product_publish"
+        }
+      },
       "billing_class": "config",
       "limits": []
     },
@@ -904,6 +1977,27 @@
         "F16",
         "F19"
       ],
+      "required_features": [
+        "F15",
+        "F19"
+      ],
+      "runtime_required_features": [
+        "F10",
+        "F15",
+        "F16",
+        "F19"
+      ],
+      "decision_delivery": {
+        "accepted_contract": "DS-2026-10-17",
+        "runtime_conformance": "pending",
+        "open_dependencies": [
+          "sale_scope_and_backdating",
+          "plan_gate_alignment"
+        ],
+        "target_request": {
+          "$ref": "#/$defs/Request_sale_preview"
+        }
+      },
       "billing_class": "new",
       "limits": []
     },
@@ -918,6 +2012,28 @@
         "F16",
         "F19"
       ],
+      "required_features": [
+        "F15",
+        "F19"
+      ],
+      "runtime_required_features": [
+        "F10",
+        "F15",
+        "F16",
+        "F19"
+      ],
+      "decision_delivery": {
+        "accepted_contract": "DS-2026-10-17",
+        "runtime_conformance": "pending",
+        "open_dependencies": [
+          "cross_center_settlement",
+          "sale_scope_and_backdating",
+          "plan_gate_alignment"
+        ],
+        "target_request": {
+          "$ref": "#/$defs/Request_sale_apply"
+        }
+      },
       "billing_class": "new",
       "limits": []
     },
@@ -931,6 +2047,25 @@
         "F15",
         "F16"
       ],
+      "required_features": [
+        "F06",
+        "F15"
+      ],
+      "runtime_required_features": [
+        "F06",
+        "F15",
+        "F16"
+      ],
+      "decision_delivery": {
+        "accepted_contract": "DS-2026-10-17",
+        "runtime_conformance": "pending",
+        "open_dependencies": [
+          "plan_gate_alignment"
+        ],
+        "target_request": {
+          "$ref": "#/$defs/Request_entitlements_get"
+        }
+      },
       "billing_class": "read",
       "limits": []
     },
@@ -942,6 +2077,20 @@
       "features": [
         "F15"
       ],
+      "required_features": [
+        "F15"
+      ],
+      "runtime_required_features": [],
+      "decision_delivery": {
+        "accepted_contract": "DS-2026-10-17",
+        "runtime_conformance": "pending",
+        "open_dependencies": [
+          "confirmed_reservation_protection"
+        ],
+        "target_request": {
+          "$ref": "#/$defs/Request_entitlement_extend"
+        }
+      },
       "billing_class": "maintenance",
       "limits": []
     },
@@ -954,6 +2103,21 @@
         "F15",
         "F33"
       ],
+      "required_features": [
+        "F15",
+        "F33"
+      ],
+      "runtime_required_features": [],
+      "decision_delivery": {
+        "accepted_contract": "DS-2026-10-17",
+        "runtime_conformance": "pending",
+        "open_dependencies": [
+          "confirmed_reservation_protection"
+        ],
+        "target_request": {
+          "$ref": "#/$defs/Request_credit_adjust"
+        }
+      },
       "billing_class": "maintenance",
       "limits": []
     },
@@ -965,6 +2129,20 @@
       "features": [
         "F15"
       ],
+      "required_features": [
+        "F15"
+      ],
+      "runtime_required_features": [],
+      "decision_delivery": {
+        "accepted_contract": "DS-2026-10-17",
+        "runtime_conformance": "pending",
+        "open_dependencies": [
+          "confirmed_reservation_protection"
+        ],
+        "target_request": {
+          "$ref": "#/$defs/Request_negative_limit_set"
+        }
+      },
       "billing_class": "config",
       "limits": []
     },
@@ -976,6 +2154,18 @@
       "features": [
         "F17"
       ],
+      "required_features": [
+        "F17"
+      ],
+      "runtime_required_features": [],
+      "decision_delivery": {
+        "accepted_contract": "DS-2026-10-17",
+        "runtime_conformance": "pending",
+        "open_dependencies": [],
+        "target_request": {
+          "$ref": "#/$defs/Request_freeze_preview"
+        }
+      },
       "billing_class": "maintenance",
       "limits": []
     },
@@ -987,6 +2177,20 @@
       "features": [
         "F17"
       ],
+      "required_features": [
+        "F17"
+      ],
+      "runtime_required_features": [],
+      "decision_delivery": {
+        "accepted_contract": "DS-2026-10-17",
+        "runtime_conformance": "pending",
+        "open_dependencies": [
+          "confirmed_reservation_protection"
+        ],
+        "target_request": {
+          "$ref": "#/$defs/Request_freeze_apply"
+        }
+      },
       "billing_class": "maintenance",
       "limits": []
     },
@@ -998,6 +2202,18 @@
       "features": [
         "F17"
       ],
+      "required_features": [
+        "F17"
+      ],
+      "runtime_required_features": [],
+      "decision_delivery": {
+        "accepted_contract": "DS-2026-10-17",
+        "runtime_conformance": "pending",
+        "open_dependencies": [],
+        "target_request": {
+          "$ref": "#/$defs/Request_freeze_end_preview"
+        }
+      },
       "billing_class": "maintenance",
       "limits": []
     },
@@ -1009,6 +2225,18 @@
       "features": [
         "F17"
       ],
+      "required_features": [
+        "F17"
+      ],
+      "runtime_required_features": [],
+      "decision_delivery": {
+        "accepted_contract": "DS-2026-10-17",
+        "runtime_conformance": "pending",
+        "open_dependencies": [],
+        "target_request": {
+          "$ref": "#/$defs/Request_freeze_end_apply"
+        }
+      },
       "billing_class": "maintenance",
       "limits": []
     },
@@ -1021,6 +2249,19 @@
         "F15",
         "F17"
       ],
+      "required_features": [
+        "F15",
+        "F17"
+      ],
+      "runtime_required_features": [],
+      "decision_delivery": {
+        "accepted_contract": "DS-2026-10-17",
+        "runtime_conformance": "pending",
+        "open_dependencies": [],
+        "target_request": {
+          "$ref": "#/$defs/Request_sale_terminate_preview"
+        }
+      },
       "billing_class": "maintenance",
       "limits": []
     },
@@ -1033,6 +2274,21 @@
         "F15",
         "F17"
       ],
+      "required_features": [
+        "F15",
+        "F17"
+      ],
+      "runtime_required_features": [],
+      "decision_delivery": {
+        "accepted_contract": "DS-2026-10-17",
+        "runtime_conformance": "pending",
+        "open_dependencies": [
+          "confirmed_reservation_protection"
+        ],
+        "target_request": {
+          "$ref": "#/$defs/Request_sale_terminate_apply"
+        }
+      },
       "billing_class": "maintenance",
       "limits": []
     },
@@ -1044,6 +2300,18 @@
       "features": [
         "F19"
       ],
+      "required_features": [
+        "F19"
+      ],
+      "runtime_required_features": [],
+      "decision_delivery": {
+        "accepted_contract": "DS-2026-10-17",
+        "runtime_conformance": "pending",
+        "open_dependencies": [],
+        "target_request": {
+          "$ref": "#/$defs/Request_sale_refund_preview"
+        }
+      },
       "billing_class": "maintenance",
       "limits": []
     },
@@ -1055,6 +2323,18 @@
       "features": [
         "F19"
       ],
+      "required_features": [
+        "F19"
+      ],
+      "runtime_required_features": [],
+      "decision_delivery": {
+        "accepted_contract": "DS-2026-10-17",
+        "runtime_conformance": "pending",
+        "open_dependencies": [],
+        "target_request": {
+          "$ref": "#/$defs/Request_sale_refund_apply"
+        }
+      },
       "billing_class": "maintenance",
       "limits": []
     },
@@ -1067,6 +2347,19 @@
         "F17",
         "F19"
       ],
+      "required_features": [
+        "F17",
+        "F19"
+      ],
+      "runtime_required_features": [],
+      "decision_delivery": {
+        "accepted_contract": "DS-2026-10-17",
+        "runtime_conformance": "pending",
+        "open_dependencies": [],
+        "target_request": {
+          "$ref": "#/$defs/Request_sale_change_preview"
+        }
+      },
       "billing_class": "new",
       "limits": []
     },
@@ -1079,6 +2372,22 @@
         "F17",
         "F19"
       ],
+      "required_features": [
+        "F17",
+        "F19"
+      ],
+      "runtime_required_features": [],
+      "decision_delivery": {
+        "accepted_contract": "DS-2026-10-17",
+        "runtime_conformance": "pending",
+        "open_dependencies": [
+          "confirmed_reservation_protection",
+          "sale_scope_and_backdating"
+        ],
+        "target_request": {
+          "$ref": "#/$defs/Request_sale_change_apply"
+        }
+      },
       "billing_class": "new",
       "limits": []
     },
@@ -1091,6 +2400,18 @@
         "F15",
         "F16"
       ],
+      "required_features": [
+        "F15"
+      ],
+      "runtime_required_features": [],
+      "decision_delivery": {
+        "accepted_contract": "DS-2026-10-17",
+        "runtime_conformance": "pending",
+        "open_dependencies": [],
+        "target_request": {
+          "$ref": "#/$defs/Request_sale_renew_preview"
+        }
+      },
       "billing_class": "new",
       "limits": []
     },
@@ -1103,6 +2424,18 @@
         "F15",
         "F16"
       ],
+      "required_features": [
+        "F15"
+      ],
+      "runtime_required_features": [],
+      "decision_delivery": {
+        "accepted_contract": "DS-2026-10-17",
+        "runtime_conformance": "pending",
+        "open_dependencies": [],
+        "target_request": {
+          "$ref": "#/$defs/Request_sale_renew_apply"
+        }
+      },
       "billing_class": "new",
       "limits": []
     },
@@ -1115,6 +2448,19 @@
         "F06",
         "F19"
       ],
+      "required_features": [
+        "F06",
+        "F19"
+      ],
+      "runtime_required_features": [],
+      "decision_delivery": {
+        "accepted_contract": "DS-2026-10-17",
+        "runtime_conformance": "pending",
+        "open_dependencies": [],
+        "target_request": {
+          "$ref": "#/$defs/Request_finance_get"
+        }
+      },
       "billing_class": "read",
       "limits": []
     },
@@ -1126,6 +2472,20 @@
       "features": [
         "F19"
       ],
+      "required_features": [
+        "F19"
+      ],
+      "runtime_required_features": [
+        "F19"
+      ],
+      "decision_delivery": {
+        "accepted_contract": "DS-2026-10-17",
+        "runtime_conformance": "baseline_only_not_full_product_acceptance",
+        "open_dependencies": [],
+        "target_request": {
+          "$ref": "#/$defs/Request_collection_record"
+        }
+      },
       "billing_class": "collection",
       "limits": []
     },
@@ -1138,6 +2498,19 @@
         "F19",
         "F33"
       ],
+      "required_features": [
+        "F19",
+        "F33"
+      ],
+      "runtime_required_features": [],
+      "decision_delivery": {
+        "accepted_contract": "DS-2026-10-17",
+        "runtime_conformance": "pending",
+        "open_dependencies": [],
+        "target_request": {
+          "$ref": "#/$defs/Request_collection_correct_preview"
+        }
+      },
       "billing_class": "maintenance",
       "limits": []
     },
@@ -1150,6 +2523,19 @@
         "F19",
         "F33"
       ],
+      "required_features": [
+        "F19",
+        "F33"
+      ],
+      "runtime_required_features": [],
+      "decision_delivery": {
+        "accepted_contract": "DS-2026-10-17",
+        "runtime_conformance": "pending",
+        "open_dependencies": [],
+        "target_request": {
+          "$ref": "#/$defs/Request_collection_correct_apply"
+        }
+      },
       "billing_class": "maintenance",
       "limits": []
     },
@@ -1161,6 +2547,20 @@
       "features": [
         "F19"
       ],
+      "required_features": [
+        "F19"
+      ],
+      "runtime_required_features": [
+        "F19"
+      ],
+      "decision_delivery": {
+        "accepted_contract": "DS-2026-10-17",
+        "runtime_conformance": "baseline_only_not_full_product_acceptance",
+        "open_dependencies": [],
+        "target_request": {
+          "$ref": "#/$defs/Request_student_credit_refund"
+        }
+      },
       "billing_class": "collection",
       "limits": []
     },
@@ -1172,6 +2572,20 @@
       "features": [
         "F19"
       ],
+      "required_features": [
+        "F19"
+      ],
+      "runtime_required_features": [
+        "F19"
+      ],
+      "decision_delivery": {
+        "accepted_contract": "DS-2026-10-17",
+        "runtime_conformance": "baseline_only_not_full_product_acceptance",
+        "open_dependencies": [],
+        "target_request": {
+          "$ref": "#/$defs/Request_student_credit_offset"
+        }
+      },
       "billing_class": "collection",
       "limits": []
     },
@@ -1183,6 +2597,20 @@
       "features": [
         "F19"
       ],
+      "required_features": [
+        "F19"
+      ],
+      "runtime_required_features": [
+        "F19"
+      ],
+      "decision_delivery": {
+        "accepted_contract": "DS-2026-10-17",
+        "runtime_conformance": "baseline_only_not_full_product_acceptance",
+        "open_dependencies": [],
+        "target_request": {
+          "$ref": "#/$defs/Request_debt_adjust"
+        }
+      },
       "billing_class": "maintenance",
       "limits": []
     },
@@ -1194,6 +2622,20 @@
       "features": [
         "F20"
       ],
+      "required_features": [
+        "F20"
+      ],
+      "runtime_required_features": [],
+      "decision_delivery": {
+        "accepted_contract": "DS-2026-10-17",
+        "runtime_conformance": "pending",
+        "open_dependencies": [
+          "agreement_versions_and_selection"
+        ],
+        "target_request": {
+          "$ref": "#/$defs/Request_instructor_agreement_publish"
+        }
+      },
       "billing_class": "config",
       "limits": []
     },
@@ -1205,6 +2647,18 @@
       "features": [
         "F20"
       ],
+      "required_features": [
+        "F20"
+      ],
+      "runtime_required_features": [],
+      "decision_delivery": {
+        "accepted_contract": "DS-2026-10-17",
+        "runtime_conformance": "pending",
+        "open_dependencies": [],
+        "target_request": {
+          "$ref": "#/$defs/Request_earnings_list"
+        }
+      },
       "billing_class": "read",
       "limits": []
     },
@@ -1216,6 +2670,18 @@
       "features": [
         "F20"
       ],
+      "required_features": [
+        "F20"
+      ],
+      "runtime_required_features": [],
+      "decision_delivery": {
+        "accepted_contract": "DS-2026-10-17",
+        "runtime_conformance": "pending",
+        "open_dependencies": [],
+        "target_request": {
+          "$ref": "#/$defs/Request_instructor_payment_record"
+        }
+      },
       "billing_class": "collection",
       "limits": []
     },
@@ -1228,6 +2694,19 @@
         "F20",
         "F33"
       ],
+      "required_features": [
+        "F20",
+        "F33"
+      ],
+      "runtime_required_features": [],
+      "decision_delivery": {
+        "accepted_contract": "DS-2026-10-17",
+        "runtime_conformance": "pending",
+        "open_dependencies": [],
+        "target_request": {
+          "$ref": "#/$defs/Request_instructor_payment_correct"
+        }
+      },
       "billing_class": "maintenance",
       "limits": []
     },
@@ -1239,6 +2718,18 @@
       "features": [
         "F21"
       ],
+      "required_features": [
+        "F21"
+      ],
+      "runtime_required_features": [],
+      "decision_delivery": {
+        "accepted_contract": "DS-2026-10-17",
+        "runtime_conformance": "pending",
+        "open_dependencies": [],
+        "target_request": {
+          "$ref": "#/$defs/Request_leads_list"
+        }
+      },
       "billing_class": "read",
       "limits": []
     },
@@ -1250,6 +2741,18 @@
       "features": [
         "F21"
       ],
+      "required_features": [
+        "F21"
+      ],
+      "runtime_required_features": [],
+      "decision_delivery": {
+        "accepted_contract": "DS-2026-10-17",
+        "runtime_conformance": "pending",
+        "open_dependencies": [],
+        "target_request": {
+          "$ref": "#/$defs/Request_lead_save"
+        }
+      },
       "billing_class": "new",
       "limits": []
     },
@@ -1262,6 +2765,19 @@
         "F21",
         "F23"
       ],
+      "required_features": [
+        "F21",
+        "F23"
+      ],
+      "runtime_required_features": [],
+      "decision_delivery": {
+        "accepted_contract": "DS-2026-10-17",
+        "runtime_conformance": "pending",
+        "open_dependencies": [],
+        "target_request": {
+          "$ref": "#/$defs/Request_crm_activity_save"
+        }
+      },
       "billing_class": "maintenance",
       "limits": []
     },
@@ -1273,6 +2789,18 @@
       "features": [
         "F22"
       ],
+      "required_features": [
+        "F22"
+      ],
+      "runtime_required_features": [],
+      "decision_delivery": {
+        "accepted_contract": "DS-2026-10-17",
+        "runtime_conformance": "pending",
+        "open_dependencies": [],
+        "target_request": {
+          "$ref": "#/$defs/Request_trial_offer_create"
+        }
+      },
       "billing_class": "new",
       "limits": []
     },
@@ -1284,6 +2812,18 @@
       "features": [
         "F22"
       ],
+      "required_features": [
+        "F22"
+      ],
+      "runtime_required_features": [],
+      "decision_delivery": {
+        "accepted_contract": "DS-2026-10-17",
+        "runtime_conformance": "pending",
+        "open_dependencies": [],
+        "target_request": {
+          "$ref": "#/$defs/Request_trial_registration_confirm"
+        }
+      },
       "billing_class": "request",
       "limits": []
     },
@@ -1296,6 +2836,19 @@
         "F07",
         "F21"
       ],
+      "required_features": [
+        "F07",
+        "F21"
+      ],
+      "runtime_required_features": [],
+      "decision_delivery": {
+        "accepted_contract": "DS-2026-10-17",
+        "runtime_conformance": "pending",
+        "open_dependencies": [],
+        "target_request": {
+          "$ref": "#/$defs/Request_lead_convert"
+        }
+      },
       "billing_class": "new",
       "limits": []
     },
@@ -1307,6 +2860,18 @@
       "features": [
         "F23"
       ],
+      "required_features": [
+        "F23"
+      ],
+      "runtime_required_features": [],
+      "decision_delivery": {
+        "accepted_contract": "DS-2026-10-17",
+        "runtime_conformance": "pending",
+        "open_dependencies": [],
+        "target_request": {
+          "$ref": "#/$defs/Request_crm_followup_list"
+        }
+      },
       "billing_class": "read",
       "limits": []
     },
@@ -1318,6 +2883,18 @@
       "features": [
         "F24"
       ],
+      "required_features": [
+        "F24"
+      ],
+      "runtime_required_features": [],
+      "decision_delivery": {
+        "accepted_contract": "DS-2026-10-17",
+        "runtime_conformance": "pending",
+        "open_dependencies": [],
+        "target_request": {
+          "$ref": "#/$defs/Request_segment_save"
+        }
+      },
       "billing_class": "config",
       "limits": []
     },
@@ -1329,6 +2906,18 @@
       "features": [
         "F24"
       ],
+      "required_features": [
+        "F24"
+      ],
+      "runtime_required_features": [],
+      "decision_delivery": {
+        "accepted_contract": "DS-2026-10-17",
+        "runtime_conformance": "pending",
+        "open_dependencies": [],
+        "target_request": {
+          "$ref": "#/$defs/Request_automation_save"
+        }
+      },
       "billing_class": "config",
       "limits": []
     },
@@ -1340,6 +2929,18 @@
       "features": [
         "F26"
       ],
+      "required_features": [
+        "F26"
+      ],
+      "runtime_required_features": [],
+      "decision_delivery": {
+        "accepted_contract": "DS-2026-10-17",
+        "runtime_conformance": "pending",
+        "open_dependencies": [],
+        "target_request": {
+          "$ref": "#/$defs/Request_notifications_list"
+        }
+      },
       "billing_class": "read",
       "limits": []
     },
@@ -1351,6 +2952,18 @@
       "features": [
         "F26"
       ],
+      "required_features": [
+        "F26"
+      ],
+      "runtime_required_features": [],
+      "decision_delivery": {
+        "accepted_contract": "DS-2026-10-17",
+        "runtime_conformance": "pending",
+        "open_dependencies": [],
+        "target_request": {
+          "$ref": "#/$defs/Request_notification_mark_read"
+        }
+      },
       "billing_class": "maintenance",
       "limits": []
     },
@@ -1363,6 +2976,18 @@
         "F26",
         "F27"
       ],
+      "required_features": [
+        "F26"
+      ],
+      "runtime_required_features": [],
+      "decision_delivery": {
+        "accepted_contract": "DS-2026-10-17",
+        "runtime_conformance": "pending",
+        "open_dependencies": [],
+        "target_request": {
+          "$ref": "#/$defs/Request_notification_preferences_set"
+        }
+      },
       "billing_class": "maintenance",
       "limits": []
     },
@@ -1374,6 +2999,18 @@
       "features": [
         "F28"
       ],
+      "required_features": [
+        "F28"
+      ],
+      "runtime_required_features": [],
+      "decision_delivery": {
+        "accepted_contract": "DS-2026-10-17",
+        "runtime_conformance": "pending",
+        "open_dependencies": [],
+        "target_request": {
+          "$ref": "#/$defs/Request_report_get"
+        }
+      },
       "billing_class": "read",
       "limits": []
     },
@@ -1385,6 +3022,18 @@
       "features": [
         "F28"
       ],
+      "required_features": [
+        "F28"
+      ],
+      "runtime_required_features": [],
+      "decision_delivery": {
+        "accepted_contract": "DS-2026-10-17",
+        "runtime_conformance": "pending",
+        "open_dependencies": [],
+        "target_request": {
+          "$ref": "#/$defs/Request_report_export_start"
+        }
+      },
       "billing_class": "read",
       "limits": []
     },
@@ -1396,6 +3045,18 @@
       "features": [
         "F28"
       ],
+      "required_features": [
+        "F28"
+      ],
+      "runtime_required_features": [],
+      "decision_delivery": {
+        "accepted_contract": "DS-2026-10-17",
+        "runtime_conformance": "pending",
+        "open_dependencies": [],
+        "target_request": {
+          "$ref": "#/$defs/Request_report_file_get"
+        }
+      },
       "billing_class": "read",
       "limits": []
     },
@@ -1407,6 +3068,18 @@
       "features": [
         "F31"
       ],
+      "required_features": [
+        "F31"
+      ],
+      "runtime_required_features": [],
+      "decision_delivery": {
+        "accepted_contract": "DS-2026-10-17",
+        "runtime_conformance": "pending",
+        "open_dependencies": [],
+        "target_request": {
+          "$ref": "#/$defs/Request_import_upload_prepare"
+        }
+      },
       "billing_class": "import",
       "limits": []
     },
@@ -1418,6 +3091,18 @@
       "features": [
         "F31"
       ],
+      "required_features": [
+        "F31"
+      ],
+      "runtime_required_features": [],
+      "decision_delivery": {
+        "accepted_contract": "DS-2026-10-17",
+        "runtime_conformance": "pending",
+        "open_dependencies": [],
+        "target_request": {
+          "$ref": "#/$defs/Request_import_preview"
+        }
+      },
       "billing_class": "import",
       "limits": []
     },
@@ -1429,6 +3114,18 @@
       "features": [
         "F31"
       ],
+      "required_features": [
+        "F31"
+      ],
+      "runtime_required_features": [],
+      "decision_delivery": {
+        "accepted_contract": "DS-2026-10-17",
+        "runtime_conformance": "pending",
+        "open_dependencies": [],
+        "target_request": {
+          "$ref": "#/$defs/Request_import_apply"
+        }
+      },
       "billing_class": "import",
       "limits": []
     },
@@ -1440,6 +3137,18 @@
       "features": [
         "F31"
       ],
+      "required_features": [
+        "F31"
+      ],
+      "runtime_required_features": [],
+      "decision_delivery": {
+        "accepted_contract": "DS-2026-10-17",
+        "runtime_conformance": "pending",
+        "open_dependencies": [],
+        "target_request": {
+          "$ref": "#/$defs/Request_import_rows_list"
+        }
+      },
       "billing_class": "read",
       "limits": []
     },
@@ -1451,6 +3160,20 @@
       "features": [
         "F32"
       ],
+      "required_features": [
+        "F32"
+      ],
+      "runtime_required_features": [
+        "F32"
+      ],
+      "decision_delivery": {
+        "accepted_contract": "DS-2026-10-17",
+        "runtime_conformance": "baseline_only_not_full_product_acceptance",
+        "open_dependencies": [],
+        "target_request": {
+          "$ref": "#/$defs/Request_subscription_get"
+        }
+      },
       "billing_class": "exempt",
       "limits": []
     },
@@ -1462,6 +3185,18 @@
       "features": [
         "F32"
       ],
+      "required_features": [
+        "F32"
+      ],
+      "runtime_required_features": [],
+      "decision_delivery": {
+        "accepted_contract": "DS-2026-10-17",
+        "runtime_conformance": "pending",
+        "open_dependencies": [],
+        "target_request": {
+          "$ref": "#/$defs/Request_subscription_upgrade_quote"
+        }
+      },
       "billing_class": "exempt",
       "limits": []
     },
@@ -1473,6 +3208,18 @@
       "features": [
         "F32"
       ],
+      "required_features": [
+        "F32"
+      ],
+      "runtime_required_features": [],
+      "decision_delivery": {
+        "accepted_contract": "DS-2026-10-17",
+        "runtime_conformance": "pending",
+        "open_dependencies": [],
+        "target_request": {
+          "$ref": "#/$defs/Request_subscription_downgrade_request"
+        }
+      },
       "billing_class": "exempt",
       "limits": []
     },
@@ -1484,6 +3231,18 @@
       "features": [
         "F32"
       ],
+      "required_features": [
+        "F32"
+      ],
+      "runtime_required_features": [],
+      "decision_delivery": {
+        "accepted_contract": "DS-2026-10-17",
+        "runtime_conformance": "pending",
+        "open_dependencies": [],
+        "target_request": {
+          "$ref": "#/$defs/Request_subscription_change_cancel"
+        }
+      },
       "billing_class": "exempt",
       "limits": []
     },
@@ -1495,6 +3254,18 @@
       "features": [
         "F32"
       ],
+      "required_features": [
+        "F32"
+      ],
+      "runtime_required_features": [],
+      "decision_delivery": {
+        "accepted_contract": "DS-2026-10-17",
+        "runtime_conformance": "pending",
+        "open_dependencies": [],
+        "target_request": {
+          "$ref": "#/$defs/Request_subscription_renewal_set"
+        }
+      },
       "billing_class": "exempt",
       "limits": []
     },
@@ -1506,6 +3277,20 @@
       "features": [
         "F32"
       ],
+      "required_features": [
+        "F32"
+      ],
+      "runtime_required_features": [
+        "F32"
+      ],
+      "decision_delivery": {
+        "accepted_contract": "DS-2026-10-17",
+        "runtime_conformance": "baseline_only_not_full_product_acceptance",
+        "open_dependencies": [],
+        "target_request": {
+          "$ref": "#/$defs/Request_saas_payment_submit"
+        }
+      },
       "billing_class": "exempt",
       "limits": []
     },
@@ -1517,6 +3302,20 @@
       "features": [
         "F32"
       ],
+      "required_features": [
+        "F32"
+      ],
+      "runtime_required_features": [
+        "F32"
+      ],
+      "decision_delivery": {
+        "accepted_contract": "DS-2026-10-17",
+        "runtime_conformance": "baseline_only_not_full_product_acceptance",
+        "open_dependencies": [],
+        "target_request": {
+          "$ref": "#/$defs/Request_saas_payment_verify"
+        }
+      },
       "billing_class": "exempt",
       "limits": []
     },
@@ -1528,6 +3327,18 @@
       "features": [
         "F32"
       ],
+      "required_features": [
+        "F32"
+      ],
+      "runtime_required_features": [],
+      "decision_delivery": {
+        "accepted_contract": "DS-2026-10-17",
+        "runtime_conformance": "pending",
+        "open_dependencies": [],
+        "target_request": {
+          "$ref": "#/$defs/Request_saas_grace_extend"
+        }
+      },
       "billing_class": "exempt",
       "limits": []
     },
@@ -1539,6 +3350,20 @@
       "features": [
         "F29"
       ],
+      "required_features": [
+        "F29"
+      ],
+      "runtime_required_features": [
+        "F29"
+      ],
+      "decision_delivery": {
+        "accepted_contract": "DS-2026-10-17",
+        "runtime_conformance": "baseline_only_not_full_product_acceptance",
+        "open_dependencies": [],
+        "target_request": {
+          "$ref": "#/$defs/Request_event_save"
+        }
+      },
       "billing_class": "new",
       "limits": []
     },
@@ -1551,6 +3376,23 @@
         "F25",
         "F29"
       ],
+      "required_features": [
+        "F29"
+      ],
+      "runtime_required_features": [
+        "F25",
+        "F29"
+      ],
+      "decision_delivery": {
+        "accepted_contract": "DS-2026-10-17",
+        "runtime_conformance": "pending",
+        "open_dependencies": [
+          "plan_gate_alignment"
+        ],
+        "target_request": {
+          "$ref": "#/$defs/Request_event_publish"
+        }
+      },
       "billing_class": "config",
       "limits": []
     },
@@ -1562,6 +3404,20 @@
       "features": [
         "F29"
       ],
+      "required_features": [
+        "F29"
+      ],
+      "runtime_required_features": [
+        "F29"
+      ],
+      "decision_delivery": {
+        "accepted_contract": "DS-2026-10-17",
+        "runtime_conformance": "baseline_only_not_full_product_acceptance",
+        "open_dependencies": [],
+        "target_request": {
+          "$ref": "#/$defs/Request_event_register"
+        }
+      },
       "billing_class": "new",
       "limits": []
     },
@@ -1573,6 +3429,20 @@
       "features": [
         "F29"
       ],
+      "required_features": [
+        "F29"
+      ],
+      "runtime_required_features": [
+        "F29"
+      ],
+      "decision_delivery": {
+        "accepted_contract": "DS-2026-10-17",
+        "runtime_conformance": "baseline_only_not_full_product_acceptance",
+        "open_dependencies": [],
+        "target_request": {
+          "$ref": "#/$defs/Request_event_registration_cancel"
+        }
+      },
       "billing_class": "maintenance",
       "limits": []
     },
@@ -1584,6 +3454,20 @@
       "features": [
         "F29"
       ],
+      "required_features": [
+        "F29"
+      ],
+      "runtime_required_features": [
+        "F29"
+      ],
+      "decision_delivery": {
+        "accepted_contract": "DS-2026-10-17",
+        "runtime_conformance": "baseline_only_not_full_product_acceptance",
+        "open_dependencies": [],
+        "target_request": {
+          "$ref": "#/$defs/Request_event_complete"
+        }
+      },
       "billing_class": "maintenance",
       "limits": []
     },
@@ -1596,6 +3480,23 @@
         "F20",
         "F29"
       ],
+      "required_features": [
+        "F29"
+      ],
+      "runtime_required_features": [
+        "F20",
+        "F29"
+      ],
+      "decision_delivery": {
+        "accepted_contract": "DS-2026-10-17",
+        "runtime_conformance": "pending",
+        "open_dependencies": [
+          "plan_gate_alignment"
+        ],
+        "target_request": {
+          "$ref": "#/$defs/Request_event_duty_verify"
+        }
+      },
       "billing_class": "maintenance",
       "limits": []
     },
@@ -1607,6 +3508,20 @@
       "features": [
         "F29"
       ],
+      "required_features": [
+        "F29"
+      ],
+      "runtime_required_features": [
+        "F29"
+      ],
+      "decision_delivery": {
+        "accepted_contract": "DS-2026-10-17",
+        "runtime_conformance": "baseline_only_not_full_product_acceptance",
+        "open_dependencies": [],
+        "target_request": {
+          "$ref": "#/$defs/Request_event_cancel_preview"
+        }
+      },
       "billing_class": "maintenance",
       "limits": []
     },
@@ -1618,6 +3533,20 @@
       "features": [
         "F29"
       ],
+      "required_features": [
+        "F29"
+      ],
+      "runtime_required_features": [
+        "F29"
+      ],
+      "decision_delivery": {
+        "accepted_contract": "DS-2026-10-17",
+        "runtime_conformance": "baseline_only_not_full_product_acceptance",
+        "open_dependencies": [],
+        "target_request": {
+          "$ref": "#/$defs/Request_event_cancel_apply"
+        }
+      },
       "billing_class": "maintenance",
       "limits": []
     },
@@ -1629,6 +3558,20 @@
       "features": [
         "F29"
       ],
+      "required_features": [
+        "F29"
+      ],
+      "runtime_required_features": [
+        "F29"
+      ],
+      "decision_delivery": {
+        "accepted_contract": "DS-2026-10-17",
+        "runtime_conformance": "baseline_only_not_full_product_acceptance",
+        "open_dependencies": [],
+        "target_request": {
+          "$ref": "#/$defs/Request_event_list"
+        }
+      },
       "billing_class": "read",
       "limits": [
         "starts_at_asc keyset paging only"
@@ -1642,6 +3585,18 @@
       "features": [
         "F30"
       ],
+      "required_features": [
+        "F30"
+      ],
+      "runtime_required_features": [],
+      "decision_delivery": {
+        "accepted_contract": "DS-2026-10-17",
+        "runtime_conformance": "pending",
+        "open_dependencies": [],
+        "target_request": {
+          "$ref": "#/$defs/Request_document_upload_prepare"
+        }
+      },
       "billing_class": "config",
       "limits": []
     },
@@ -1653,6 +3608,18 @@
       "features": [
         "F30"
       ],
+      "required_features": [
+        "F30"
+      ],
+      "runtime_required_features": [],
+      "decision_delivery": {
+        "accepted_contract": "DS-2026-10-17",
+        "runtime_conformance": "pending",
+        "open_dependencies": [],
+        "target_request": {
+          "$ref": "#/$defs/Request_document_version_publish"
+        }
+      },
       "billing_class": "config",
       "limits": []
     },
@@ -1664,6 +3631,18 @@
       "features": [
         "F30"
       ],
+      "required_features": [
+        "F30"
+      ],
+      "runtime_required_features": [],
+      "decision_delivery": {
+        "accepted_contract": "DS-2026-10-17",
+        "runtime_conformance": "pending",
+        "open_dependencies": [],
+        "target_request": {
+          "$ref": "#/$defs/Request_document_requirements_get"
+        }
+      },
       "billing_class": "read",
       "limits": []
     },
@@ -1675,6 +3654,18 @@
       "features": [
         "F30"
       ],
+      "required_features": [
+        "F30"
+      ],
+      "runtime_required_features": [],
+      "decision_delivery": {
+        "accepted_contract": "DS-2026-10-17",
+        "runtime_conformance": "pending",
+        "open_dependencies": [],
+        "target_request": {
+          "$ref": "#/$defs/Request_document_accept"
+        }
+      },
       "billing_class": "maintenance",
       "limits": []
     },
@@ -1686,6 +3677,18 @@
       "features": [
         "F25"
       ],
+      "required_features": [
+        "F25"
+      ],
+      "runtime_required_features": [],
+      "decision_delivery": {
+        "accepted_contract": "DS-2026-10-17",
+        "runtime_conformance": "pending",
+        "open_dependencies": [],
+        "target_request": {
+          "$ref": "#/$defs/Request_publication_set"
+        }
+      },
       "billing_class": "config",
       "limits": []
     },
@@ -1697,6 +3700,18 @@
       "features": [
         "F25"
       ],
+      "required_features": [
+        "F25"
+      ],
+      "runtime_required_features": [],
+      "decision_delivery": {
+        "accepted_contract": "DS-2026-10-17",
+        "runtime_conformance": "pending",
+        "open_dependencies": [],
+        "target_request": {
+          "$ref": "#/$defs/Request_public_calendar_get"
+        }
+      },
       "billing_class": "public",
       "limits": []
     },
@@ -1708,6 +3723,18 @@
       "features": [
         "F25"
       ],
+      "required_features": [
+        "F25"
+      ],
+      "runtime_required_features": [],
+      "decision_delivery": {
+        "accepted_contract": "DS-2026-10-17",
+        "runtime_conformance": "pending",
+        "open_dependencies": [],
+        "target_request": {
+          "$ref": "#/$defs/Request_public_application_submit"
+        }
+      },
       "billing_class": "public",
       "limits": []
     },
@@ -1720,6 +3747,19 @@
         "F21",
         "F25"
       ],
+      "required_features": [
+        "F21",
+        "F25"
+      ],
+      "runtime_required_features": [],
+      "decision_delivery": {
+        "accepted_contract": "DS-2026-10-17",
+        "runtime_conformance": "pending",
+        "open_dependencies": [],
+        "target_request": {
+          "$ref": "#/$defs/Request_public_application_review"
+        }
+      },
       "billing_class": "new",
       "limits": []
     },
@@ -1731,6 +3771,18 @@
       "features": [
         "F33"
       ],
+      "required_features": [
+        "F33"
+      ],
+      "runtime_required_features": [],
+      "decision_delivery": {
+        "accepted_contract": "DS-2026-10-17",
+        "runtime_conformance": "pending",
+        "open_dependencies": [],
+        "target_request": {
+          "$ref": "#/$defs/Request_operation_status_get"
+        }
+      },
       "billing_class": "exempt",
       "limits": []
     },
@@ -1742,6 +3794,18 @@
       "features": [
         "F33"
       ],
+      "required_features": [
+        "F33"
+      ],
+      "runtime_required_features": [],
+      "decision_delivery": {
+        "accepted_contract": "DS-2026-10-17",
+        "runtime_conformance": "pending",
+        "open_dependencies": [],
+        "target_request": {
+          "$ref": "#/$defs/Request_preview_get"
+        }
+      },
       "billing_class": "read",
       "limits": []
     },
@@ -1754,6 +3818,16 @@
         "F31",
         "F28"
       ],
+      "required_features": [],
+      "runtime_required_features": [],
+      "decision_delivery": {
+        "accepted_contract": "DS-2026-10-17",
+        "runtime_conformance": "pending",
+        "open_dependencies": [],
+        "target_request": {
+          "$ref": "#/$defs/Request_job_status_get"
+        }
+      },
       "billing_class": "read",
       "limits": []
     },
@@ -1765,6 +3839,18 @@
       "features": [
         "F33"
       ],
+      "required_features": [
+        "F33"
+      ],
+      "runtime_required_features": [],
+      "decision_delivery": {
+        "accepted_contract": "DS-2026-10-17",
+        "runtime_conformance": "pending",
+        "open_dependencies": [],
+        "target_request": {
+          "$ref": "#/$defs/Request_audit_list"
+        }
+      },
       "billing_class": "read",
       "limits": []
     },
@@ -1776,6 +3862,18 @@
       "features": [
         "F12"
       ],
+      "required_features": [
+        "F12"
+      ],
+      "runtime_required_features": [],
+      "decision_delivery": {
+        "accepted_contract": "DS-2026-10-17",
+        "runtime_conformance": "pending",
+        "open_dependencies": [],
+        "target_request": {
+          "$ref": "#/$defs/Request_seat_offer_issue"
+        }
+      },
       "billing_class": "worker",
       "limits": []
     },
@@ -1787,6 +3885,18 @@
       "features": [
         "F12"
       ],
+      "required_features": [
+        "F12"
+      ],
+      "runtime_required_features": [],
+      "decision_delivery": {
+        "accepted_contract": "DS-2026-10-17",
+        "runtime_conformance": "pending",
+        "open_dependencies": [],
+        "target_request": {
+          "$ref": "#/$defs/Request_seat_offer_expire"
+        }
+      },
       "billing_class": "worker",
       "limits": []
     },
@@ -1798,6 +3908,18 @@
       "features": [
         "F09"
       ],
+      "required_features": [
+        "F09"
+      ],
+      "runtime_required_features": [],
+      "decision_delivery": {
+        "accepted_contract": "DS-2026-10-17",
+        "runtime_conformance": "pending",
+        "open_dependencies": [],
+        "target_request": {
+          "$ref": "#/$defs/Request_request_expire"
+        }
+      },
       "billing_class": "worker",
       "limits": []
     },
@@ -1810,6 +3932,18 @@
         "F26",
         "F27"
       ],
+      "required_features": [
+        "F26"
+      ],
+      "runtime_required_features": [],
+      "decision_delivery": {
+        "accepted_contract": "DS-2026-10-17",
+        "runtime_conformance": "pending",
+        "open_dependencies": [],
+        "target_request": {
+          "$ref": "#/$defs/Request_outbox_deliver"
+        }
+      },
       "billing_class": "worker",
       "limits": []
     },
@@ -1821,6 +3955,18 @@
       "features": [
         "F27"
       ],
+      "required_features": [
+        "F27"
+      ],
+      "runtime_required_features": [],
+      "decision_delivery": {
+        "accepted_contract": "DS-2026-10-17",
+        "runtime_conformance": "pending",
+        "open_dependencies": [],
+        "target_request": {
+          "$ref": "#/$defs/Request_reminder_schedule"
+        }
+      },
       "billing_class": "worker",
       "limits": []
     },
@@ -1832,6 +3978,18 @@
       "features": [
         "F24"
       ],
+      "required_features": [
+        "F24"
+      ],
+      "runtime_required_features": [],
+      "decision_delivery": {
+        "accepted_contract": "DS-2026-10-17",
+        "runtime_conformance": "pending",
+        "open_dependencies": [],
+        "target_request": {
+          "$ref": "#/$defs/Request_automation_run"
+        }
+      },
       "billing_class": "worker",
       "limits": []
     },
@@ -1843,6 +4001,18 @@
       "features": [
         "F31"
       ],
+      "required_features": [
+        "F31"
+      ],
+      "runtime_required_features": [],
+      "decision_delivery": {
+        "accepted_contract": "DS-2026-10-17",
+        "runtime_conformance": "pending",
+        "open_dependencies": [],
+        "target_request": {
+          "$ref": "#/$defs/Request_import_rows_process"
+        }
+      },
       "billing_class": "worker",
       "limits": []
     },
@@ -1854,6 +4024,18 @@
       "features": [
         "F28"
       ],
+      "required_features": [
+        "F28"
+      ],
+      "runtime_required_features": [],
+      "decision_delivery": {
+        "accepted_contract": "DS-2026-10-17",
+        "runtime_conformance": "pending",
+        "open_dependencies": [],
+        "target_request": {
+          "$ref": "#/$defs/Request_report_build"
+        }
+      },
       "billing_class": "worker",
       "limits": []
     },
@@ -1865,6 +4047,18 @@
       "features": [
         "F33"
       ],
+      "required_features": [
+        "F33"
+      ],
+      "runtime_required_features": [],
+      "decision_delivery": {
+        "accepted_contract": "DS-2026-10-17",
+        "runtime_conformance": "pending",
+        "open_dependencies": [],
+        "target_request": {
+          "$ref": "#/$defs/Request_privacy_execute"
+        }
+      },
       "billing_class": "worker",
       "limits": []
     },
@@ -1876,6 +4070,18 @@
       "features": [
         "F32"
       ],
+      "required_features": [
+        "F32"
+      ],
+      "runtime_required_features": [],
+      "decision_delivery": {
+        "accepted_contract": "DS-2026-10-17",
+        "runtime_conformance": "pending",
+        "open_dependencies": [],
+        "target_request": {
+          "$ref": "#/$defs/Request_subscription_boundary_apply"
+        }
+      },
       "billing_class": "worker",
       "limits": []
     },
@@ -1888,6 +4094,24 @@
         "F10",
         "F14"
       ],
+      "required_features": [
+        "F10",
+        "F14"
+      ],
+      "runtime_required_features": [
+        "F10",
+        "F14"
+      ],
+      "decision_delivery": {
+        "accepted_contract": "DS-2026-10-17",
+        "runtime_conformance": "pending",
+        "open_dependencies": [
+          "starter_plan_and_earning_split"
+        ],
+        "target_request": {
+          "$ref": "#/$defs/Request_class_assignment_set"
+        }
+      },
       "billing_class": "config",
       "limits": []
     },
@@ -1899,6 +4123,20 @@
       "features": [
         "F29"
       ],
+      "required_features": [
+        "F29"
+      ],
+      "runtime_required_features": [
+        "F29"
+      ],
+      "decision_delivery": {
+        "accepted_contract": "DS-2026-10-17",
+        "runtime_conformance": "baseline_only_not_full_product_acceptance",
+        "open_dependencies": [],
+        "target_request": {
+          "$ref": "#/$defs/Request_event_attendance_mark"
+        }
+      },
       "billing_class": "maintenance",
       "limits": []
     },
@@ -1910,6 +4148,20 @@
       "features": [
         "F04"
       ],
+      "required_features": [
+        "F04"
+      ],
+      "runtime_required_features": [
+        "F04"
+      ],
+      "decision_delivery": {
+        "accepted_contract": "DS-2026-10-17",
+        "runtime_conformance": "baseline_only_not_full_product_acceptance",
+        "open_dependencies": [],
+        "target_request": {
+          "$ref": "#/$defs/Request_platform_owner_set"
+        }
+      },
       "billing_class": "exempt",
       "limits": []
     },
@@ -1921,6 +4173,20 @@
       "features": [
         "F04"
       ],
+      "required_features": [
+        "F04"
+      ],
+      "runtime_required_features": [
+        "F04"
+      ],
+      "decision_delivery": {
+        "accepted_contract": "DS-2026-10-17",
+        "runtime_conformance": "baseline_only_not_full_product_acceptance",
+        "open_dependencies": [],
+        "target_request": {
+          "$ref": "#/$defs/Request_platform_owner_remove"
+        }
+      },
       "billing_class": "exempt",
       "limits": []
     },
@@ -1932,6 +4198,20 @@
       "features": [
         "F04"
       ],
+      "required_features": [
+        "F04"
+      ],
+      "runtime_required_features": [
+        "F04"
+      ],
+      "decision_delivery": {
+        "accepted_contract": "DS-2026-10-17",
+        "runtime_conformance": "baseline_only_not_full_product_acceptance",
+        "open_dependencies": [],
+        "target_request": {
+          "$ref": "#/$defs/Request_center_manager_assign"
+        }
+      },
       "billing_class": "bootstrap",
       "limits": []
     },
@@ -1943,6 +4223,20 @@
       "features": [
         "F04"
       ],
+      "required_features": [
+        "F04"
+      ],
+      "runtime_required_features": [
+        "F04"
+      ],
+      "decision_delivery": {
+        "accepted_contract": "DS-2026-10-17",
+        "runtime_conformance": "baseline_only_not_full_product_acceptance",
+        "open_dependencies": [],
+        "target_request": {
+          "$ref": "#/$defs/Request_center_manager_revoke"
+        }
+      },
       "billing_class": "bootstrap",
       "limits": []
     },
@@ -1955,6 +4249,20 @@
         "F14",
         "F20"
       ],
+      "required_features": [
+        "F14"
+      ],
+      "runtime_required_features": [],
+      "decision_delivery": {
+        "accepted_contract": "DS-2026-10-17",
+        "runtime_conformance": "pending",
+        "open_dependencies": [
+          "confirmed_reservation_protection"
+        ],
+        "target_request": {
+          "$ref": "#/$defs/Request_attendance_block"
+        }
+      },
       "billing_class": "maintenance",
       "limits": []
     },
@@ -1966,6 +4274,20 @@
       "features": [
         "F29"
       ],
+      "required_features": [
+        "F29"
+      ],
+      "runtime_required_features": [
+        "F29"
+      ],
+      "decision_delivery": {
+        "accepted_contract": "DS-2026-10-17",
+        "runtime_conformance": "baseline_only_not_full_product_acceptance",
+        "open_dependencies": [],
+        "target_request": {
+          "$ref": "#/$defs/Request_event_attendance_close"
+        }
+      },
       "billing_class": "maintenance",
       "limits": []
     },
@@ -1977,6 +4299,20 @@
       "features": [
         "F29"
       ],
+      "required_features": [
+        "F29"
+      ],
+      "runtime_required_features": [
+        "F29"
+      ],
+      "decision_delivery": {
+        "accepted_contract": "DS-2026-10-17",
+        "runtime_conformance": "baseline_only_not_full_product_acceptance",
+        "open_dependencies": [],
+        "target_request": {
+          "$ref": "#/$defs/Request_event_attendance_correct"
+        }
+      },
       "billing_class": "maintenance",
       "limits": []
     },
@@ -1989,6 +4325,16 @@
         "F30",
         "F31"
       ],
+      "required_features": [],
+      "runtime_required_features": [],
+      "decision_delivery": {
+        "accepted_contract": "DS-2026-10-17",
+        "runtime_conformance": "pending",
+        "open_dependencies": [],
+        "target_request": {
+          "$ref": "#/$defs/Request_file_upload_complete"
+        }
+      },
       "billing_class": "maintenance",
       "limits": []
     },
@@ -2001,6 +4347,18 @@
         "F15",
         "F20"
       ],
+      "required_features": [
+        "F15"
+      ],
+      "runtime_required_features": [],
+      "decision_delivery": {
+        "accepted_contract": "DS-2026-10-17",
+        "runtime_conformance": "pending",
+        "open_dependencies": [],
+        "target_request": {
+          "$ref": "#/$defs/Request_negcredit_valuation_set"
+        }
+      },
       "billing_class": "config",
       "limits": []
     },
@@ -2012,6 +4370,20 @@
       "features": [
         "F01"
       ],
+      "required_features": [
+        "F01"
+      ],
+      "runtime_required_features": [
+        "F01"
+      ],
+      "decision_delivery": {
+        "accepted_contract": "DS-2026-10-17",
+        "runtime_conformance": "baseline_only_not_full_product_acceptance",
+        "open_dependencies": [],
+        "target_request": {
+          "$ref": "#/$defs/Request_disciplines_list"
+        }
+      },
       "billing_class": "read",
       "limits": [
         "Pagination supports created_at_asc; cursor is bound to request scope.",
@@ -2026,6 +4398,20 @@
       "features": [
         "F01"
       ],
+      "required_features": [
+        "F01"
+      ],
+      "runtime_required_features": [
+        "F01"
+      ],
+      "decision_delivery": {
+        "accepted_contract": "DS-2026-10-17",
+        "runtime_conformance": "baseline_only_not_full_product_acceptance",
+        "open_dependencies": [],
+        "target_request": {
+          "$ref": "#/$defs/Request_discipline_save"
+        }
+      },
       "billing_class": "config",
       "limits": []
     },
@@ -2037,6 +4423,20 @@
       "features": [
         "F01"
       ],
+      "required_features": [
+        "F01"
+      ],
+      "runtime_required_features": [
+        "F01"
+      ],
+      "decision_delivery": {
+        "accepted_contract": "DS-2026-10-17",
+        "runtime_conformance": "baseline_only_not_full_product_acceptance",
+        "open_dependencies": [],
+        "target_request": {
+          "$ref": "#/$defs/Request_center_discipline_set"
+        }
+      },
       "billing_class": "config",
       "limits": []
     },
@@ -2048,6 +4448,20 @@
       "features": [
         "F07"
       ],
+      "required_features": [
+        "F07"
+      ],
+      "runtime_required_features": [
+        "F07"
+      ],
+      "decision_delivery": {
+        "accepted_contract": "DS-2026-10-17",
+        "runtime_conformance": "baseline_only_not_full_product_acceptance",
+        "open_dependencies": [],
+        "target_request": {
+          "$ref": "#/$defs/Request_person_discipline_set"
+        }
+      },
       "billing_class": "config",
       "limits": []
     },
@@ -2059,6 +4473,20 @@
       "features": [
         "F29"
       ],
+      "required_features": [
+        "F29"
+      ],
+      "runtime_required_features": [
+        "F29"
+      ],
+      "decision_delivery": {
+        "accepted_contract": "DS-2026-10-17",
+        "runtime_conformance": "baseline_only_not_full_product_acceptance",
+        "open_dependencies": [],
+        "target_request": {
+          "$ref": "#/$defs/Request_event_get"
+        }
+      },
       "billing_class": "read",
       "limits": []
     },
@@ -2070,6 +4498,20 @@
       "features": [
         "F29"
       ],
+      "required_features": [
+        "F29"
+      ],
+      "runtime_required_features": [
+        "F29"
+      ],
+      "decision_delivery": {
+        "accepted_contract": "DS-2026-10-17",
+        "runtime_conformance": "baseline_only_not_full_product_acceptance",
+        "open_dependencies": [],
+        "target_request": {
+          "$ref": "#/$defs/Request_event_registration_preview"
+        }
+      },
       "billing_class": "student",
       "limits": []
     },
@@ -2081,6 +4523,20 @@
       "features": [
         "F29"
       ],
+      "required_features": [
+        "F29"
+      ],
+      "runtime_required_features": [
+        "F29"
+      ],
+      "decision_delivery": {
+        "accepted_contract": "DS-2026-10-17",
+        "runtime_conformance": "baseline_only_not_full_product_acceptance",
+        "open_dependencies": [],
+        "target_request": {
+          "$ref": "#/$defs/Request_event_payment_prepare"
+        }
+      },
       "billing_class": "new",
       "limits": []
     },
@@ -2092,6 +4548,20 @@
       "features": [
         "F29"
       ],
+      "required_features": [
+        "F29"
+      ],
+      "runtime_required_features": [
+        "F29"
+      ],
+      "decision_delivery": {
+        "accepted_contract": "DS-2026-10-17",
+        "runtime_conformance": "baseline_only_not_full_product_acceptance",
+        "open_dependencies": [],
+        "target_request": {
+          "$ref": "#/$defs/Request_event_payment_get"
+        }
+      },
       "billing_class": "read",
       "limits": []
     },
@@ -2103,6 +4573,20 @@
       "features": [
         "F29"
       ],
+      "required_features": [
+        "F29"
+      ],
+      "runtime_required_features": [
+        "F29"
+      ],
+      "decision_delivery": {
+        "accepted_contract": "DS-2026-10-17",
+        "runtime_conformance": "baseline_only_not_full_product_acceptance",
+        "open_dependencies": [],
+        "target_request": {
+          "$ref": "#/$defs/Request_event_actual_start_record"
+        }
+      },
       "billing_class": "maintenance",
       "limits": [
         "No automatic occurrence/attendance/rights/earnings or monetary reclassification."
@@ -2116,10 +4600,337 @@
       "features": [
         "F29"
       ],
+      "required_features": [
+        "F29"
+      ],
+      "runtime_required_features": [
+        "F29"
+      ],
+      "decision_delivery": {
+        "accepted_contract": "DS-2026-10-17",
+        "runtime_conformance": "baseline_only_not_full_product_acceptance",
+        "open_dependencies": [],
+        "target_request": {
+          "$ref": "#/$defs/Request_event_actual_start_correct"
+        }
+      },
       "billing_class": "maintenance",
       "limits": [
         "No automatic occurrence/attendance/rights/earnings or monetary reclassification."
       ]
+    },
+    {
+      "name": "management_state_get_v1",
+      "status": "contract_only",
+      "external_path": null,
+      "permission": "management.inspect",
+      "features": [],
+      "required_features": [],
+      "runtime_required_features": [],
+      "decision_delivery": {
+        "accepted_contract": "DS-2026-10-17",
+        "runtime_conformance": "pending",
+        "open_dependencies": [],
+        "target_request": {
+          "$ref": "#/$defs/Request_management_state_get"
+        }
+      },
+      "billing_class": "read",
+      "limits": []
+    },
+    {
+      "name": "instructor_agreements_list_v1",
+      "status": "contract_only",
+      "external_path": null,
+      "permission": "earnings.manage",
+      "features": [
+        "F20"
+      ],
+      "required_features": [
+        "F20"
+      ],
+      "runtime_required_features": [],
+      "decision_delivery": {
+        "accepted_contract": "DS-2026-10-17",
+        "runtime_conformance": "pending",
+        "open_dependencies": [],
+        "target_request": {
+          "$ref": "#/$defs/Request_instructor_agreements_list"
+        }
+      },
+      "billing_class": "read",
+      "limits": []
+    },
+    {
+      "name": "reservation_impact_preview_v1",
+      "status": "contract_only",
+      "external_path": null,
+      "permission": "reservation.protection.manage",
+      "features": [
+        "F15"
+      ],
+      "required_features": [
+        "F15"
+      ],
+      "runtime_required_features": [],
+      "decision_delivery": {
+        "accepted_contract": "DS-2026-10-17",
+        "runtime_conformance": "pending",
+        "open_dependencies": [],
+        "target_request": {
+          "$ref": "#/$defs/Request_reservation_impact_preview"
+        }
+      },
+      "billing_class": "config",
+      "limits": []
+    },
+    {
+      "name": "reservation_impact_apply_v1",
+      "status": "contract_only",
+      "external_path": null,
+      "permission": "reservation.protection.manage",
+      "features": [
+        "F15"
+      ],
+      "required_features": [
+        "F15"
+      ],
+      "runtime_required_features": [],
+      "decision_delivery": {
+        "accepted_contract": "DS-2026-10-17",
+        "runtime_conformance": "pending",
+        "open_dependencies": [],
+        "target_request": {
+          "$ref": "#/$defs/Request_reservation_impact_apply"
+        }
+      },
+      "billing_class": "config",
+      "limits": []
+    },
+    {
+      "name": "settlement_movements_list_v1",
+      "status": "contract_only",
+      "external_path": null,
+      "permission": "settlement.read",
+      "features": [
+        "F18"
+      ],
+      "required_features": [
+        "F18"
+      ],
+      "runtime_required_features": [],
+      "decision_delivery": {
+        "accepted_contract": "DS-2026-10-17",
+        "runtime_conformance": "pending",
+        "open_dependencies": [
+          "cross_center_settlement"
+        ],
+        "target_request": {
+          "$ref": "#/$defs/Request_settlement_movements_list"
+        }
+      },
+      "billing_class": "read",
+      "limits": []
+    },
+    {
+      "name": "settlement_requests_list_v1",
+      "status": "contract_only",
+      "external_path": null,
+      "permission": "settlement.read",
+      "features": [
+        "F18"
+      ],
+      "required_features": [
+        "F18"
+      ],
+      "runtime_required_features": [],
+      "decision_delivery": {
+        "accepted_contract": "DS-2026-10-17",
+        "runtime_conformance": "pending",
+        "open_dependencies": [
+          "cross_center_settlement"
+        ],
+        "target_request": {
+          "$ref": "#/$defs/Request_settlement_requests_list"
+        }
+      },
+      "billing_class": "read",
+      "limits": []
+    },
+    {
+      "name": "settlement_request_get_v1",
+      "status": "contract_only",
+      "external_path": null,
+      "permission": "settlement.read",
+      "features": [
+        "F18"
+      ],
+      "required_features": [
+        "F18"
+      ],
+      "runtime_required_features": [],
+      "decision_delivery": {
+        "accepted_contract": "DS-2026-10-17",
+        "runtime_conformance": "pending",
+        "open_dependencies": [
+          "cross_center_settlement"
+        ],
+        "target_request": {
+          "$ref": "#/$defs/Request_settlement_request_get"
+        }
+      },
+      "billing_class": "read",
+      "limits": []
+    },
+    {
+      "name": "settlement_request_submit_v1",
+      "status": "contract_only",
+      "external_path": null,
+      "permission": "settlement.request",
+      "features": [
+        "F18"
+      ],
+      "required_features": [
+        "F18"
+      ],
+      "runtime_required_features": [],
+      "decision_delivery": {
+        "accepted_contract": "DS-2026-10-17",
+        "runtime_conformance": "pending",
+        "open_dependencies": [
+          "cross_center_settlement"
+        ],
+        "target_request": {
+          "$ref": "#/$defs/Request_settlement_request_submit"
+        }
+      },
+      "billing_class": "config",
+      "limits": []
+    },
+    {
+      "name": "settlement_request_withdraw_v1",
+      "status": "contract_only",
+      "external_path": null,
+      "permission": "settlement.request",
+      "features": [
+        "F18"
+      ],
+      "required_features": [
+        "F18"
+      ],
+      "runtime_required_features": [],
+      "decision_delivery": {
+        "accepted_contract": "DS-2026-10-17",
+        "runtime_conformance": "pending",
+        "open_dependencies": [
+          "cross_center_settlement"
+        ],
+        "target_request": {
+          "$ref": "#/$defs/Request_settlement_request_withdraw"
+        }
+      },
+      "billing_class": "config",
+      "limits": []
+    },
+    {
+      "name": "settlement_request_decide_v1",
+      "status": "contract_only",
+      "external_path": null,
+      "permission": "settlement.decide",
+      "features": [
+        "F18"
+      ],
+      "required_features": [
+        "F18"
+      ],
+      "runtime_required_features": [],
+      "decision_delivery": {
+        "accepted_contract": "DS-2026-10-17",
+        "runtime_conformance": "pending",
+        "open_dependencies": [
+          "cross_center_settlement"
+        ],
+        "target_request": {
+          "$ref": "#/$defs/Request_settlement_request_decide"
+        }
+      },
+      "billing_class": "config",
+      "limits": []
+    },
+    {
+      "name": "settlement_payment_record_v1",
+      "status": "contract_only",
+      "external_path": null,
+      "permission": "settlement.record",
+      "features": [
+        "F18"
+      ],
+      "required_features": [
+        "F18"
+      ],
+      "runtime_required_features": [],
+      "decision_delivery": {
+        "accepted_contract": "DS-2026-10-17",
+        "runtime_conformance": "pending",
+        "open_dependencies": [
+          "cross_center_settlement"
+        ],
+        "target_request": {
+          "$ref": "#/$defs/Request_settlement_payment_record"
+        }
+      },
+      "billing_class": "config",
+      "limits": []
+    },
+    {
+      "name": "settlement_offset_record_v1",
+      "status": "contract_only",
+      "external_path": null,
+      "permission": "settlement.record",
+      "features": [
+        "F18"
+      ],
+      "required_features": [
+        "F18"
+      ],
+      "runtime_required_features": [],
+      "decision_delivery": {
+        "accepted_contract": "DS-2026-10-17",
+        "runtime_conformance": "pending",
+        "open_dependencies": [
+          "cross_center_settlement"
+        ],
+        "target_request": {
+          "$ref": "#/$defs/Request_settlement_offset_record"
+        }
+      },
+      "billing_class": "config",
+      "limits": []
+    },
+    {
+      "name": "settlement_adjust_v1",
+      "status": "contract_only",
+      "external_path": null,
+      "permission": "settlement.record",
+      "features": [
+        "F18"
+      ],
+      "required_features": [
+        "F18"
+      ],
+      "runtime_required_features": [],
+      "decision_delivery": {
+        "accepted_contract": "DS-2026-10-17",
+        "runtime_conformance": "pending",
+        "open_dependencies": [
+          "cross_center_settlement"
+        ],
+        "target_request": {
+          "$ref": "#/$defs/Request_settlement_adjust"
+        }
+      },
+      "billing_class": "config",
+      "limits": []
     }
   ]
 }

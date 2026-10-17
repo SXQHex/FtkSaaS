@@ -1,6 +1,6 @@
 # FtkSaaS — API kataloğu · 0.2.0-rc.3
 
-184 sözleşme; 79 geliştirme ortamında çağrılabilir endpoint, 105 yalnız sözleşme. Çağrılabilir olmak bütün ürün özelliklerinin veya üretim kabulünün tamamlandığı anlamına gelmez. Kapsam sınırları ve Q-E01 `docs/claude-handover.md` içindedir.
+197 sözleşme; 79 geliştirme ortamında çağrılabilir endpoint, 118 yalnız sözleşme. Çağrılabilir olmak bütün ürün özelliklerinin veya üretim kabulünün tamamlandığı anlamına gelmez. Kapsam sınırları ve Q-E01 `docs/claude-handover.md` içindedir.
 
 `POST {API_URL}/functions/v1/backend-v1/{operation}`; JSON gövde doğrudan typed Request nesnesidir. Header: `Authorization: Bearer <Supabase access_token>`, `apikey: <publishable key>`, `Content-Type: application/json`. Başarı: `ok/data/trace_id`; hata: `ok:false/error:SafeError`. Servis anahtarı frontend’e verilmez.
 
@@ -87,9 +87,9 @@ Named `/rest/v1/rpc/{operation}` yalnız backend içindir; imzası p_request + d
 | `sale_preview_v1` | çağrılabilir (kapsam notları geçerli) | `sale.write` | P / new | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; center_id?: FtkUuid ∣ null; person_id: FtkUuid; product_version_id: FtkUuid; start_date: Date; net_minor?: Money ∣ null; end_date: Date | Success_sale_preview |
 | `sale_apply_v1` | çağrılabilir (kapsam notları geçerli) | `sale.write` | A / new | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; center_id?: FtkUuid ∣ null; operation_key: FtkUuid; preview: PreviewToken | Success_sale_apply |
 | `entitlements_get_v1` | çağrılabilir (kapsam notları geçerli) | `person.read` | R / read | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; center_id?: FtkUuid ∣ null; person_id: FtkUuid | Success_entitlements_get |
-| `entitlement_extend_v1` | yalnız sözleşme | `entitlement.correct` | W / maintenance | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; center_id?: FtkUuid ∣ null; operation_key: FtkUuid; expected_version: PositiveInt; sale_id: FtkUuid; end_date: Date; reason: Text | Success_entitlement_extend |
-| `credit_adjust_v1` | yalnız sözleşme | `entitlement.correct` | W / maintenance | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; center_id?: FtkUuid ∣ null; operation_key: FtkUuid; sale_id: FtkUuid; quantity: Int; direction: Direction; reason: Text | Success_credit_adjust |
-| `negative_limit_set_v1` | yalnız sözleşme | `entitlement.correct` | W / config | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; center_id: FtkUuid; operation_key: FtkUuid; expected_version: PositiveInt; person_id: FtkUuid; allowed_negative_credits: Count; reason: Text; discipline_id: FtkUuid | Success_negative_limit_set |
+| `entitlement_extend_v1` | yalnız sözleşme | `entitlement.correct` | W / maintenance | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; center_id?: FtkUuid ∣ null; operation_key: FtkUuid; expected_version: PositiveInt; sale_id: FtkUuid; end_date: Date; reason: Text; impact_approval: PreviewToken | Success_entitlement_extend |
+| `credit_adjust_v1` | yalnız sözleşme | `entitlement.correct` | W / maintenance | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; center_id?: FtkUuid ∣ null; operation_key: FtkUuid; sale_id: FtkUuid; quantity: Int; direction: Direction; reason: Text; impact_approval: PreviewToken | Success_credit_adjust |
+| `negative_limit_set_v1` | yalnız sözleşme | `entitlement.correct` | W / config | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; center_id: FtkUuid; operation_key: FtkUuid; expected_version: PositiveInt; person_id: FtkUuid; allowed_negative_credits: Count; reason: Text; discipline_id: FtkUuid; impact_approval: PreviewToken | Success_negative_limit_set |
 | `freeze_preview_v1` | yalnız sözleşme | `entitlement.correct` | P / maintenance | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; center_id?: FtkUuid ∣ null; sale_id: FtkUuid; dates: DateInterval; reason: Text | Success_freeze_preview |
 | `freeze_apply_v1` | yalnız sözleşme | `entitlement.correct` | A / maintenance | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; center_id?: FtkUuid ∣ null; operation_key: FtkUuid; preview: PreviewToken | Success_freeze_apply |
 | `freeze_end_preview_v1` | yalnız sözleşme | `entitlement.correct` | P / maintenance | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; center_id?: FtkUuid ∣ null; freeze_id: FtkUuid; end_date: Date | Success_freeze_end_preview |
@@ -109,7 +109,7 @@ Named `/rest/v1/rpc/{operation}` yalnız backend içindir; imzası p_request + d
 | `student_credit_refund_v1` | çağrılabilir (kapsam notları geçerli) | `finance.refund` | W / collection | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; center_id?: FtkUuid ∣ null; operation_key: FtkUuid; person_id: FtkUuid; amount_minor: PositiveMoney; currency: Currency; occurred_at: Instant; reason: Text | Success_student_credit_refund |
 | `student_credit_offset_v1` | çağrılabilir (kapsam notları geçerli) | `finance.collect` | W / collection | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; center_id?: FtkUuid ∣ null; operation_key: FtkUuid; expected_version: PositiveInt; person_id: FtkUuid; debt_id: FtkUuid; amount_minor: PositiveMoney; currency: Currency | Success_student_credit_offset |
 | `debt_adjust_v1` | çağrılabilir (kapsam notları geçerli) | `finance.refund` | W / maintenance | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; center_id?: FtkUuid ∣ null; operation_key: FtkUuid; debt_id: FtkUuid; amount_minor: PositiveMoney; direction: Direction; reason: Text | Success_debt_adjust |
-| `instructor_agreement_publish_v1` | yalnız sözleşme | `earnings.manage` | W / config | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; center_id?: FtkUuid ∣ null; operation_key: FtkUuid; person_id: FtkUuid; format: SessionFormat; valid: Interval; terms: PayTerms; discipline_id: FtkUuid | Success_instructor_agreement_publish |
+| `instructor_agreement_publish_v1` | yalnız sözleşme | `earnings.manage` | W / config | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; center_id?: FtkUuid ∣ null; operation_key: FtkUuid; person_id: FtkUuid; format: SessionFormat; valid: Interval; terms: PayTerms; discipline_id: FtkUuid; supersedes_id?: FtkUuid ∣ null; expected_version?: PositiveInt; reason: Text | Success_instructor_agreement_publish |
 | `earnings_list_v1` | yalnız sözleşme | `earnings.read` | R / read | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; center_id?: FtkUuid ∣ null; person_id: FtkUuid; interval: Interval; page: Page | Success_earnings_list |
 | `instructor_payment_record_v1` | yalnız sözleşme | `earnings.manage` | W / collection | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; center_id?: FtkUuid ∣ null; operation_key: FtkUuid; person_id: FtkUuid; earning_ids: FtkUuid[]; amount_minor: PositiveMoney; currency: Currency; occurred_at: Instant | Success_instructor_payment_record |
 | `instructor_payment_correct_v1` | yalnız sözleşme | `earnings.manage` | W / maintenance | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; center_id?: FtkUuid ∣ null; operation_key: FtkUuid; expected_version: PositiveInt; payment_id: FtkUuid; correction: CashCorrection; reason: Text | Success_instructor_payment_correct |
@@ -157,7 +157,7 @@ Named `/rest/v1/rpc/{operation}` yalnız backend içindir; imzası p_request + d
 | `public_calendar_get_v1` | yalnız sözleşme | `public.apply` | R / public | client_api_version: 1; request_id: FtkUuid; center_id?: FtkUuid ∣ null; slug: Text; interval: Interval; page: Page | Success_public_calendar_get |
 | `public_application_submit_v1` | yalnız sözleşme | `public.apply` | E / public | client_api_version: 1; request_id: FtkUuid; center_id?: FtkUuid ∣ null; publication_id: FtkUuid; contact: Text; bot_proof: Secret; client_request_key: FtkUuid | Success_public_application_submit |
 | `public_application_review_v1` | yalnız sözleşme | `crm.daily` | W / new | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; center_id?: FtkUuid ∣ null; operation_key: FtkUuid; application_id: FtkUuid; action: ApplicationAction; person_id?: FtkUuid ∣ null | Success_public_application_review |
-| `operation_status_get_v1` | yalnız sözleşme | `account.self` | R / exempt | client_api_version: 1; request_id: FtkUuid; org_id?: FtkUuid ∣ null; operation: Text; key: FtkUuid | Success_operation_status_get |
+| `operation_status_get_v1` | yalnız sözleşme | `account.self` | R / exempt | client_api_version: 1; request_id: FtkUuid; org_id?: FtkUuid ∣ null; operation: OperationName; key: FtkUuid | Success_operation_status_get |
 | `preview_get_v1` | yalnız sözleşme | `account.self` | R / read | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; center_id?: FtkUuid ∣ null; preview_id: FtkUuid | Success_preview_get |
 | `job_status_get_v1` | yalnız sözleşme | `account.self` | R / read | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; center_id?: FtkUuid ∣ null; job_id: FtkUuid | Success_job_status_get |
 | `audit_list_v1` | yalnız sözleşme | `report.read` | R / read | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; center_id?: FtkUuid ∣ null; subject: SubjectRef; interval: Interval; page: Page | Success_audit_list |
@@ -192,6 +192,223 @@ Named `/rest/v1/rpc/{operation}` yalnız backend içindir; imzası p_request + d
 | `event_payment_get_v1` | çağrılabilir (kapsam notları geçerli) | `person.read` | R / read | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; center_id?: FtkUuid ∣ null; preparation_id: FtkUuid | Success_event_payment_get |
 | `event_actual_start_record_v1` | çağrılabilir (kapsam notları geçerli) | `event.manage` | W / maintenance | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; center_id?: FtkUuid ∣ null; operation_key: FtkUuid; event_id: FtkUuid; expected_version: PositiveInt; actual_started_at: Instant; reason: Text | Success_event_actual_start_record |
 | `event_actual_start_correct_v1` | çağrılabilir (kapsam notları geçerli) | `event.manage` | W / maintenance | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; center_id?: FtkUuid ∣ null; operation_key: FtkUuid; event_id: FtkUuid; expected_version: PositiveInt; actual_started_at: Instant ∣ null; reason: Text | Success_event_actual_start_correct |
+| `management_state_get_v1` | yalnız sözleşme | `management.inspect` | R / read | client_api_version: 1; request_id: FtkUuid; org_id?: FtkUuid ∣ null; center_id?: FtkUuid ∣ null; operation: ManagementOperationName; entity?: EntityRef ∣ null; selector: ManagementSelector; page?: Page | Success_management_state_get |
+| `instructor_agreements_list_v1` | yalnız sözleşme | `earnings.manage` | R / read | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; center_id: FtkUuid; person_id: FtkUuid; page: Page | Success_instructor_agreements_list |
+| `reservation_impact_preview_v1` | yalnız sözleşme | `reservation.protection.manage` | P / config | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; center_id?: FtkUuid ∣ null; change: ReservationProtectionChange; reason: Text | Success_reservation_impact_preview |
+| `reservation_impact_apply_v1` | yalnız sözleşme | `reservation.protection.manage` | A / config | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; center_id?: FtkUuid ∣ null; operation_key: FtkUuid; preview: PreviewToken; accepted_reservation_ids: FtkUuid[] | Success_reservation_impact_apply |
+| `settlement_movements_list_v1` | yalnız sözleşme | `settlement.read` | R / read | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; center_id?: FtkUuid ∣ null; page: Page; currency: Currency | Success_settlement_movements_list |
+| `settlement_requests_list_v1` | yalnız sözleşme | `settlement.read` | R / read | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; center_id?: FtkUuid ∣ null; page: Page | Success_settlement_requests_list |
+| `settlement_request_get_v1` | yalnız sözleşme | `settlement.read` | R / read | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; center_id?: FtkUuid ∣ null; settlement_request_id: FtkUuid | Success_settlement_request_get |
+| `settlement_request_submit_v1` | yalnız sözleşme | `settlement.request` | W / config | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; center_id?: FtkUuid ∣ null; operation_key: FtkUuid; from_center_id: FtkUuid; to_center_id: FtkUuid; currency: Currency; lines: SettlementLine[]; reason: Text; previous_id?: FtkUuid ∣ null; previous_version?: PositiveInt | Success_settlement_request_submit |
+| `settlement_request_withdraw_v1` | yalnız sözleşme | `settlement.request` | W / config | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; center_id?: FtkUuid ∣ null; operation_key: FtkUuid; settlement_request_id: FtkUuid; expected_version: PositiveInt; reason: Text | Success_settlement_request_withdraw |
+| `settlement_request_decide_v1` | yalnız sözleşme | `settlement.decide` | W / config | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; center_id?: FtkUuid ∣ null; operation_key: FtkUuid; settlement_request_id: FtkUuid; expected_version: PositiveInt; decision: approve / reject; reason: Text; fallback: Bool | Success_settlement_request_decide |
+| `settlement_payment_record_v1` | yalnız sözleşme | `settlement.record` | W / config | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; center_id?: FtkUuid ∣ null; operation_key: FtkUuid; settlement_request_id: FtkUuid; expected_version: PositiveInt; lines: SettlementLine[]; amount_minor: PositiveMoney; currency: Currency; occurred_at: Instant; reason: Text | Success_settlement_payment_record |
+| `settlement_offset_record_v1` | yalnız sözleşme | `settlement.record` | W / config | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; center_id?: FtkUuid ∣ null; operation_key: FtkUuid; settlement_request_id: FtkUuid; expected_version: PositiveInt; debit_lines: SettlementLine[]; credit_lines: SettlementLine[]; amount_minor: PositiveMoney; currency: Currency; occurred_at: Instant; reason: Text | Success_settlement_offset_record |
+| `settlement_adjust_v1` | yalnız sözleşme | `settlement.record` | W / config | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; center_id?: FtkUuid ∣ null; operation_key: FtkUuid; movement_id: FtkUuid; expected_version: PositiveInt; amount_minor: PositiveMoney; reason: Text | Success_settlement_adjust |
+
+## İşlem bazında hedef sözleşme ve runtime ayrımı
+
+features ürün referanslarıdır. required_features hedef plan kapısı; runtime_required_features halen uygulanan kapıdır. Karar sprintinin davranış kabulü tamamlanmış değildir.
+
+| İşlem | Faz | Hedef sürüm / okuma | Atomik etkiler | DS durumu |
+|---|---|---|---|---|
+| account_get_v1 | read | none / None |  | baseline_only_not_full_product_acceptance |
+| account_profile_update_v1 | command | row_version / management_state_get_v1 | accounts.versioned_domain_change | pending |
+| account_password_change_v1 | auth | none / None | accounts.versioned_domain_change | pending |
+| account_password_reset_request_v1 | auth | none / None | accounts.versioned_domain_change | pending |
+| account_delete_preview_v1 | preview | preview_dependencies / management_state_get_v1 |  | pending |
+| account_delete_apply_v1 | apply | preview_dependencies / account_delete_preview_v1 | accounts.versioned_domain_change | pending |
+| organizations_list_v1 | read | none / None |  | baseline_only_not_full_product_acceptance |
+| organization_create_v1 | command | append_or_current_scope_lock / management_state_get_v1 | organizations.versioned_domain_change | baseline_only_not_full_product_acceptance |
+| organization_get_v1 | read | none / None |  | baseline_only_not_full_product_acceptance |
+| organization_update_v1 | command | row_version / organization_get_v1 | organizations.versioned_domain_change | baseline_only_not_full_product_acceptance |
+| organization_close_preview_v1 | preview | preview_dependencies / management_state_get_v1 |  | pending |
+| organization_close_apply_v1 | apply | preview_dependencies / organization_close_preview_v1 | organizations.versioned_domain_change | pending |
+| organization_reopen_v1 | command | append_or_current_scope_lock / management_state_get_v1 | organizations.versioned_domain_change | pending |
+| organization_delete_preview_v1 | preview | preview_dependencies / management_state_get_v1 |  | pending |
+| organization_delete_apply_v1 | apply | preview_dependencies / organization_delete_preview_v1 | organizations.versioned_domain_change | pending |
+| centers_list_v1 | read | none / None |  | baseline_only_not_full_product_acceptance |
+| center_create_v1 | command | append_or_current_scope_lock / management_state_get_v1 | centers.versioned_domain_change | baseline_only_not_full_product_acceptance |
+| center_update_v1 | command | row_version / centers_list_v1 | centers.versioned_domain_change | baseline_only_not_full_product_acceptance |
+| room_save_v1 | command | create_absent_update_requires_version / centers_list_v1 | rooms.versioned_domain_change | baseline_only_not_full_product_acceptance |
+| availability_save_v1 | command | create_absent_update_requires_version / management_state_get_v1 | availability_rules.versioned_domain_change | baseline_only_not_full_product_acceptance |
+| availability_exception_save_v1 | command | row_version / management_state_get_v1 | availability_exceptions.append, centers.configuration_version | baseline_only_not_full_product_acceptance |
+| policies_get_v1 | read | none / None |  | baseline_only_not_full_product_acceptance |
+| policy_publish_v1 | command | append_or_current_scope_lock / management_state_get_v1 | policy_versions.immutable, protected_reservation_obligations_if_affected | pending |
+| roles_list_v1 | read | none / None |  | pending |
+| role_assign_v1 | command | append_or_current_scope_lock / management_state_get_v1 | role_assignments.active, no_account_link_creation | pending |
+| role_revoke_v1 | command | row_version / roles_list_v1 | role_assignments.inactive_live_next_request | pending |
+| permission_set_v1 | command | row_version / person_get_v1 | permission_overrides, people.permission_aggregate_version | baseline_only_not_full_product_acceptance |
+| org_manager_assign_v1 | command | append_or_current_scope_lock / management_state_get_v1 | role_assignments.org_manager, no_implicit_center_operation_grant | baseline_only_not_full_product_acceptance |
+| org_manager_revoke_v1 | command | row_version / roles_list_v1 | role_assignments.org_manager_inactive | baseline_only_not_full_product_acceptance |
+| manager_self_assign_center_v1 | command | append_or_current_scope_lock / management_state_get_v1 | manager_self_assign_center.authorized_result | baseline_only_not_full_product_acceptance |
+| account_access_send_v1 | command | append_or_current_scope_lock / management_state_get_v1 | invitations.versioned_domain_change | baseline_only_not_full_product_acceptance |
+| account_access_revoke_v1 | command | row_version / management_state_get_v1 | invitations.versioned_domain_change | pending |
+| account_access_accept_v1 | command | append_or_current_scope_lock / management_state_get_v1 | account_links.active, student_self_role_only, invitations.accepted | baseline_only_not_full_product_acceptance |
+| account_link_remove_v1 | command | row_version / management_state_get_v1 | account_links.versioned_domain_change | pending |
+| people_list_v1 | read | none / None |  | baseline_only_not_full_product_acceptance |
+| person_get_v1 | read | none / None |  | baseline_only_not_full_product_acceptance |
+| person_create_v1 | command | append_or_current_scope_lock / management_state_get_v1 | people.versioned_domain_change | baseline_only_not_full_product_acceptance |
+| person_update_v1 | command | row_version / person_get_v1 | people.versioned_domain_change | baseline_only_not_full_product_acceptance |
+| student_activate_v1 | command | append_or_current_scope_lock / management_state_get_v1 | center_relationships.active, organization_unique_student_limit | baseline_only_not_full_product_acceptance |
+| student_deactivate_v1 | command | append_or_current_scope_lock / management_state_get_v1 | center_relationships.inactive, preserved_history_finance, reject_open_operations | baseline_only_not_full_product_acceptance |
+| person_merge_preview_v1 | preview | preview_dependencies / management_state_get_v1 |  | pending |
+| person_merge_approve_v1 | command | preview_dependencies / management_state_get_v1 | people.versioned_domain_change | pending |
+| person_merge_apply_v1 | apply | preview_dependencies / person_merge_preview_v1 | people.alias, account_link_resolution, scoped_relationship_references, merge_approvals.consume | pending |
+| calendar_get_v1 | read | none / None |  | baseline_only_not_full_product_acceptance |
+| class_save_v1 | command | create_absent_update_requires_version / management_state_get_v1 | classes.versioned_domain_change | pending |
+| program_preview_v1 | preview | preview_dependencies / management_state_get_v1 |  | pending |
+| program_apply_v1 | apply | preview_dependencies / program_preview_v1 | program_versions.immutable, sessions.finite_batch, session_assignments, resource_bookings | pending |
+| session_create_v1 | command | append_or_current_scope_lock / management_state_get_v1 | sessions.planned, session_assignments, resource_bookings | pending |
+| session_get_v1 | read | none / None |  | baseline_only_not_full_product_acceptance |
+| session_change_preview_v1 | preview | preview_dependencies / management_state_get_v1 |  | pending |
+| session_change_apply_v1 | apply | preview_dependencies / session_change_preview_v1 | sessions.same_identity, session_assignments, resource_bookings, quota_buckets.old_new | pending |
+| session_capacity_set_v1 | command | row_version / session_get_v1 | sessions.capacity_version | baseline_only_not_full_product_acceptance |
+| session_cancel_preview_v1 | preview | preview_dependencies / management_state_get_v1 |  | pending |
+| session_cancel_apply_v1 | apply | preview_dependencies / session_cancel_preview_v1 | sessions.cancelled, reservations.cancelled_by_explicit_center_action, seat_offers.withdrawn, waitlist_entries.closed, rights.release_or_linked_return, reserved_deficits.release, in_app_center_intervention_notice | pending |
+| replacement_session_create_v1 | command | append_or_current_scope_lock / management_state_get_v1 | replacement_session_create.authorized_result | pending |
+| session_assignment_set_v1 | command | row_version / session_get_v1 | session_assignments.explicit_override, resource_bookings | pending |
+| lesson_request_create_v1 | command | append_or_current_scope_lock / management_state_get_v1 | lesson_requests.versioned_domain_change | pending |
+| lesson_request_withdraw_v1 | command | append_or_current_scope_lock / management_state_get_v1 | lesson_requests.versioned_domain_change | pending |
+| lesson_request_reject_v1 | command | append_or_current_scope_lock / management_state_get_v1 | lesson_requests.versioned_domain_change | pending |
+| lesson_request_offer_alternative_v1 | command | append_or_current_scope_lock / management_state_get_v1 | lesson_requests.versioned_domain_change | pending |
+| lesson_request_accept_alternative_v1 | command | append_or_current_scope_lock / management_state_get_v1 | lesson_requests.versioned_domain_change | pending |
+| lesson_request_approve_v1 | command | append_or_current_scope_lock / management_state_get_v1 | lesson_requests.versioned_domain_change | pending |
+| reservation_create_v1 | command | append_or_current_scope_lock / management_state_get_v1 | reservations.active, rights.reserve_or_deficit | pending |
+| reservation_cancel_v1 | command | row_version / reservation_list_v1 | reservations.cancelled, rights.release_consume_from_frozen_policy | baseline_only_not_full_product_acceptance |
+| reservation_list_v1 | read | none / None |  | baseline_only_not_full_product_acceptance |
+| waitlist_join_v1 | command | append_or_current_scope_lock / management_state_get_v1 | waitlist_entries.versioned_domain_change | pending |
+| waitlist_leave_v1 | command | append_or_current_scope_lock / management_state_get_v1 | waitlist_entries.versioned_domain_change | pending |
+| seat_offer_accept_v1 | command | append_or_current_scope_lock / management_state_get_v1 | seat_offers.versioned_domain_change | pending |
+| seat_offer_reject_v1 | command | append_or_current_scope_lock / management_state_get_v1 | seat_offers.versioned_domain_change | pending |
+| attendance_get_v1 | read | none / None |  | pending |
+| attendance_mark_v1 | draft | row_version / management_state_get_v1 | attendance_entries.draft | pending |
+| attendance_close_v1 | closure | row_version / management_state_get_v1 | attendance_closures, sessions.occurred, reservations.completed, rights.consume_release, earnings.if_F20, settlement.accrual_if_eligible | pending |
+| attendance_correct_preview_v1 | preview | preview_dependencies / management_state_get_v1 |  | pending |
+| attendance_correct_apply_v1 | correction | preview_dependencies / attendance_correct_preview_v1 | attendance_entries.linked_revision, rights.linked_correction, earnings.linked_difference_if_F20, settlement.linked_reversal | pending |
+| products_list_v1 | read | none / None |  | pending |
+| product_publish_v1 | command | append_or_current_scope_lock / management_state_get_v1 | products.identity, product_versions.immutable, product_scopes.new_version_only | pending |
+| sale_preview_v1 | preview | preview_dependencies / management_state_get_v1 |  | pending |
+| sale_apply_v1 | apply | preview_dependencies / sale_preview_v1 | sales.frozen_terms_scope, rights.issue, deficits.settle_past_then_future, debts, priority_reservations.if_required | pending |
+| entitlements_get_v1 | read | none / None |  | pending |
+| entitlement_extend_v1 | command | row_version / management_state_get_v1 | sales.explicit_validity_change, protected_reservation_obligations | pending |
+| credit_adjust_v1 | command | append_or_current_scope_lock / management_state_get_v1 | entitlement_movements.linked, protected_reservation_obligations | pending |
+| negative_limit_set_v1 | command | row_version / management_state_get_v1 | negative_limit_overrides.version, protected_reservation_obligations | pending |
+| freeze_preview_v1 | preview | preview_dependencies / management_state_get_v1 |  | pending |
+| freeze_apply_v1 | apply | preview_dependencies / freeze_preview_v1 | freezes.scheduled, rights.suspend_unreserved, protected_reservation_obligations, no_auto_rebooking_or_period_extension | pending |
+| freeze_end_preview_v1 | preview | preview_dependencies / management_state_get_v1 |  | pending |
+| freeze_end_apply_v1 | apply | preview_dependencies / freeze_end_preview_v1 | freezes.explicit_end, rights.resume_current_validity, no_auto_rebooking | pending |
+| sale_terminate_preview_v1 | preview | preview_dependencies / management_state_get_v1 |  | pending |
+| sale_terminate_apply_v1 | apply | preview_dependencies / sale_terminate_preview_v1 | sales.terminated, unreserved_rights.close, protected_reservation_obligations, explicit_center_reservation_cancellation_only_if_selected | pending |
+| sale_refund_preview_v1 | preview | preview_dependencies / management_state_get_v1 |  | pending |
+| sale_refund_apply_v1 | apply | preview_dependencies / sale_refund_preview_v1 | student_credit_or_cash_approved_refund, debt_adjustment_if_previewed, linked_financial_history | pending |
+| sale_change_preview_v1 | preview | preview_dependencies / management_state_get_v1 |  | pending |
+| sale_change_apply_v1 | apply | preview_dependencies / sale_change_preview_v1 | sales.new_accepted_version, rights.linked_change, protected_reservation_obligations, explicit_reservation_cancellations_only_if_separately_authorized, financial_preview_effects_if_selected | pending |
+| sale_renew_preview_v1 | preview | preview_dependencies / management_state_get_v1 |  | pending |
+| sale_renew_apply_v1 | apply | preview_dependencies / sale_renew_preview_v1 | sales.new_sale, rights.issue, deficits.settle_past_then_future, debts, new_priority_reservations_if_selected | pending |
+| finance_get_v1 | read | none / None |  | pending |
+| collection_record_v1 | command | append_or_current_scope_lock / management_state_get_v1 | cash_movements, debt_allocations, student_credit_excess | baseline_only_not_full_product_acceptance |
+| collection_correct_preview_v1 | preview | preview_dependencies / management_state_get_v1 |  | pending |
+| collection_correct_apply_v1 | correction | preview_dependencies / collection_correct_preview_v1 | cash_movements.linked_correction, debt_allocations.reverse_adjust, student_credit_if_overpaid | pending |
+| student_credit_refund_v1 | command | append_or_current_scope_lock / management_state_get_v1 | student_credit_movements, cash_refund_movement | baseline_only_not_full_product_acceptance |
+| student_credit_offset_v1 | command | row_version / management_state_get_v1 | student_credit_movements, debt_allocations | baseline_only_not_full_product_acceptance |
+| debt_adjust_v1 | command | append_or_current_scope_lock / management_state_get_v1 | debt_adjustments, student_credit_if_accepted_policy | baseline_only_not_full_product_acceptance |
+| instructor_agreement_publish_v1 | command | create_absent_update_requires_version / instructor_agreements_list_v1 | instructor_agreements.new_immutable_version, future_unstarted_assignment_selection | pending |
+| earnings_list_v1 | read | none / None |  | pending |
+| instructor_payment_record_v1 | command | append_or_current_scope_lock / management_state_get_v1 | instructor_payments, earning_allocations.partial | pending |
+| instructor_payment_correct_v1 | correction | row_version / management_state_get_v1 | instructor_payments.linked_correction, earning_allocations.linked_adjustment | pending |
+| leads_list_v1 | read | none / None |  | pending |
+| lead_save_v1 | command | create_absent_update_requires_version / management_state_get_v1 | leads.versioned_domain_change | pending |
+| crm_activity_save_v1 | command | create_absent_update_requires_version / management_state_get_v1 | crm_activities.versioned_domain_change | pending |
+| trial_offer_create_v1 | command | append_or_current_scope_lock / management_state_get_v1 | trial_offers.versioned_domain_change | pending |
+| trial_registration_confirm_v1 | command | append_or_current_scope_lock / management_state_get_v1 | trial_offers.versioned_domain_change | pending |
+| lead_convert_v1 | command | append_or_current_scope_lock / management_state_get_v1 | leads.versioned_domain_change | pending |
+| crm_followup_list_v1 | read | none / None |  | pending |
+| segment_save_v1 | command | create_absent_update_requires_version / management_state_get_v1 | segments.versioned_domain_change | pending |
+| automation_save_v1 | command | create_absent_update_requires_version / management_state_get_v1 | automations.versioned_domain_change | pending |
+| notifications_list_v1 | read | none / None |  | pending |
+| notification_mark_read_v1 | command | row_version / management_state_get_v1 | notifications.versioned_domain_change | pending |
+| notification_preferences_set_v1 | command | row_version / management_state_get_v1 | notification_preferences.versioned_domain_change | pending |
+| report_get_v1 | read | none / None |  | pending |
+| report_export_start_v1 | command | append_or_current_scope_lock / management_state_get_v1 | report_jobs.versioned_domain_change | pending |
+| report_file_get_v1 | read | none / None |  | pending |
+| import_upload_prepare_v1 | command | append_or_current_scope_lock / management_state_get_v1 | import_jobs.versioned_domain_change | pending |
+| import_preview_v1 | preview | preview_dependencies / management_state_get_v1 |  | pending |
+| import_apply_v1 | apply | preview_dependencies / import_preview_v1 | import_jobs.versioned_domain_change | pending |
+| import_rows_list_v1 | read | none / None |  | pending |
+| subscription_get_v1 | read | none / None |  | baseline_only_not_full_product_acceptance |
+| subscription_upgrade_quote_v1 | command | append_or_current_scope_lock / management_state_get_v1 | saas_subscriptions.versioned_domain_change | pending |
+| subscription_downgrade_request_v1 | command | append_or_current_scope_lock / management_state_get_v1 | saas_subscriptions.versioned_domain_change | pending |
+| subscription_change_cancel_v1 | command | row_version / management_state_get_v1 | saas_change_requests.versioned_domain_change | pending |
+| subscription_renewal_set_v1 | command | row_version / management_state_get_v1 | saas_subscriptions.versioned_domain_change | pending |
+| saas_payment_submit_v1 | command | append_or_current_scope_lock / management_state_get_v1 | saas_payment_verifications.versioned_domain_change | baseline_only_not_full_product_acceptance |
+| saas_payment_verify_v1 | command | append_or_current_scope_lock / management_state_get_v1 | saas_payment_verifications.versioned_domain_change | baseline_only_not_full_product_acceptance |
+| saas_grace_extend_v1 | command | append_or_current_scope_lock / management_state_get_v1 | saas_subscriptions.versioned_domain_change | pending |
+| event_save_v1 | command | create_absent_update_requires_version / event_get_v1 | events.draft_or_version, event_disciplines, event_assignments.explicit_fees, resource_bookings | baseline_only_not_full_product_acceptance |
+| event_publish_v1 | command | append_or_current_scope_lock / event_get_v1 | events.versioned_domain_change | pending |
+| event_register_v1 | command | preview_dependencies / management_state_get_v1 | event_registrations.or_capacity_closed_outcome, resource_capacity, rights.reserve, payment_preparation.bind_or_reverse, debts.student_credit_from_frozen_terms | baseline_only_not_full_product_acceptance |
+| event_registration_cancel_v1 | command | row_version / management_state_get_v1 | event_registrations.cancelled, rights.from_frozen_terms, Q_E03_planned_boundary_finance, student_credit.if_pre_start_policy | baseline_only_not_full_product_acceptance |
+| event_complete_v1 | command | append_or_current_scope_lock / event_get_v1 | events.occurred | baseline_only_not_full_product_acceptance |
+| event_duty_verify_v1 | command | row_version / management_state_get_v1 | event_assignments.performed, earnings.event_fee_linked | pending |
+| event_cancel_preview_v1 | preview | preview_dependencies / management_state_get_v1 |  | baseline_only_not_full_product_acceptance |
+| event_cancel_apply_v1 | apply | preview_dependencies / event_cancel_preview_v1 | events.cancelled, event_registrations.cancelled, rights.full_linked_return_Q_E02, debts.zero_Q_E02, student_credit.collected_amount_Q_E02, paid_preparations.cancelled | baseline_only_not_full_product_acceptance |
+| event_list_v1 | read | none / None |  | baseline_only_not_full_product_acceptance |
+| document_upload_prepare_v1 | command | append_or_current_scope_lock / management_state_get_v1 | documents.versioned_domain_change | pending |
+| document_version_publish_v1 | command | append_or_current_scope_lock / management_state_get_v1 | document_versions.versioned_domain_change | pending |
+| document_requirements_get_v1 | read | none / None |  | pending |
+| document_accept_v1 | command | append_or_current_scope_lock / management_state_get_v1 | documents.versioned_domain_change | pending |
+| publication_set_v1 | command | create_absent_update_requires_version / management_state_get_v1 | publications.versioned_domain_change | pending |
+| public_calendar_get_v1 | read | none / None |  | pending |
+| public_application_submit_v1 | command | append_or_current_scope_lock / management_state_get_v1 | public_applications.versioned_domain_change | pending |
+| public_application_review_v1 | command | append_or_current_scope_lock / management_state_get_v1 | public_applications.versioned_domain_change | pending |
+| operation_status_get_v1 | read | none / None |  | pending |
+| preview_get_v1 | read | none / None |  | pending |
+| job_status_get_v1 | read | none / None |  | pending |
+| audit_list_v1 | read | none / None |  | pending |
+| seat_offer_issue_v1 | worker | append_or_current_scope_lock / management_state_get_v1 | seat_offers.versioned_domain_change | pending |
+| seat_offer_expire_v1 | worker | append_or_current_scope_lock / management_state_get_v1 | seat_offers.versioned_domain_change | pending |
+| request_expire_v1 | worker | append_or_current_scope_lock / management_state_get_v1 | request_expire.authorized_result | pending |
+| outbox_deliver_v1 | worker | append_or_current_scope_lock / management_state_get_v1 | outbox_deliver.authorized_result | pending |
+| reminder_schedule_v1 | worker | append_or_current_scope_lock / management_state_get_v1 | reminder_schedule.authorized_result | pending |
+| automation_run_v1 | worker | append_or_current_scope_lock / management_state_get_v1 | automations.versioned_domain_change | pending |
+| import_rows_process_v1 | worker | append_or_current_scope_lock / management_state_get_v1 | import_jobs.versioned_domain_change | pending |
+| report_build_v1 | worker | append_or_current_scope_lock / management_state_get_v1 | report_jobs.versioned_domain_change | pending |
+| privacy_execute_v1 | worker | append_or_current_scope_lock / management_state_get_v1 | privacy_execute.authorized_result | pending |
+| subscription_boundary_apply_v1 | worker | append_or_current_scope_lock / subscription_get_v1 | saas_subscriptions.versioned_domain_change | pending |
+| class_assignment_set_v1 | command | create_absent_update_requires_version / management_state_get_v1 | class_assignments.version, eligible_future_inherited_session_duties, resource_bookings | pending |
+| event_attendance_mark_v1 | draft | row_version / management_state_get_v1 | event_registrations.versioned_domain_change | baseline_only_not_full_product_acceptance |
+| platform_owner_set_v1 | command | append_or_current_scope_lock / management_state_get_v1 | organizations.owner_person, verified_target_link | baseline_only_not_full_product_acceptance |
+| platform_owner_remove_v1 | command | append_or_current_scope_lock / management_state_get_v1 | organizations.owner_person_removed, no_customer_owner_self_transfer | baseline_only_not_full_product_acceptance |
+| center_manager_assign_v1 | command | append_or_current_scope_lock / management_state_get_v1 | role_assignments.center_manager, center_relationship_scope | baseline_only_not_full_product_acceptance |
+| center_manager_revoke_v1 | command | row_version / roles_list_v1 | role_assignments.center_manager_inactive | baseline_only_not_full_product_acceptance |
+| attendance_block_v1 | command | row_version / management_state_get_v1 | reservations.eligibility_snapshot, attendance_entries.blocked | pending |
+| event_attendance_close_v1 | closure | row_version / management_state_get_v1 | event_registrations.completed, rights.consume_release_from_event_terms | baseline_only_not_full_product_acceptance |
+| event_attendance_correct_v1 | correction | row_version / management_state_get_v1 | event_attendance_entries.linked_revision, rights.linked_correction_from_terms | baseline_only_not_full_product_acceptance |
+| file_upload_complete_v1 | command | append_or_current_scope_lock / management_state_get_v1 | files.versioned_domain_change | pending |
+| negcredit_valuation_set_v1 | command | row_version / management_state_get_v1 | policy_versions.negative_valuation, centers.configuration_version, future_reservation_snapshots_only | pending |
+| disciplines_list_v1 | read | none / None |  | baseline_only_not_full_product_acceptance |
+| discipline_save_v1 | command | create_absent_update_requires_version / management_state_get_v1 | disciplines.versioned_domain_change | baseline_only_not_full_product_acceptance |
+| center_discipline_set_v1 | command | create_absent_update_requires_version / management_state_get_v1 | center_disciplines.versioned_domain_change | baseline_only_not_full_product_acceptance |
+| person_discipline_set_v1 | command | create_absent_update_requires_version / management_state_get_v1 | person_disciplines.versioned_domain_change | baseline_only_not_full_product_acceptance |
+| event_get_v1 | read | none / None |  | baseline_only_not_full_product_acceptance |
+| event_registration_preview_v1 | preview | preview_dependencies / management_state_get_v1 |  | baseline_only_not_full_product_acceptance |
+| event_payment_prepare_v1 | command | append_or_current_scope_lock / management_state_get_v1 | event_payment_preparations, debts.no_capacity_reservation | baseline_only_not_full_product_acceptance |
+| event_payment_get_v1 | read | none / None |  | baseline_only_not_full_product_acceptance |
+| event_actual_start_record_v1 | command | row_version / event_get_v1 | events.actual_start_evidence | baseline_only_not_full_product_acceptance |
+| event_actual_start_correct_v1 | correction | row_version / event_get_v1 | events.linked_actual_start_evidence | baseline_only_not_full_product_acceptance |
+| management_state_get_v1 | read | none / None |  | pending |
+| instructor_agreements_list_v1 | read | none / None |  | pending |
+| reservation_impact_preview_v1 | preview | preview_dependencies / management_state_get_v1 |  | pending |
+| reservation_impact_apply_v1 | apply | preview_dependencies / reservation_impact_preview_v1 | selected_configuration_change, protected_reservation_obligations | pending |
+| settlement_movements_list_v1 | read | none / None |  | pending |
+| settlement_requests_list_v1 | read | none / None |  | pending |
+| settlement_request_get_v1 | read | none / None |  | pending |
+| settlement_request_submit_v1 | command | append_or_current_scope_lock / settlement_request_get_v1 | settlement_requests.pending_immutable_scope | pending |
+| settlement_request_withdraw_v1 | command | row_version / settlement_request_get_v1 | settlement_requests.withdrawn | pending |
+| settlement_request_decide_v1 | command | row_version / settlement_request_get_v1 | settlement_requests.approved_or_rejected, in_app_rejection_to_A | pending |
+| settlement_payment_record_v1 | command | row_version / settlement_request_get_v1 | settlement_payments.append, selected_open_balances.partial_reduce | pending |
+| settlement_offset_record_v1 | command | row_version / settlement_request_get_v1 | settlement_offsets.append, both_selected_sides.atomic_reduce | pending |
+| settlement_adjust_v1 | correction | row_version / settlement_movements_list_v1 | settlement_movements.linked_reversal, refund_or_offset_balance_preserve_old_payments | pending |
 
 Önizleme süre sınırı 15 dakika. Apply canlı aktör/yetki/abonelik ve ilgili satır sürümlerini yeniden denetler. İdempotency kapsamı org + hesap + operasyon; merkez payload içindedir. Aynı anahtar/aynı içerik sonucu tekrarlar, farklı içerik reddedilir. Doğrulanmamış transport sonucunda yeni anahtar üretilmez.
 

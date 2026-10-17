@@ -185,4 +185,17 @@ export interface Operations {
   event_payment_get_v1: {request: T.RequestEventPaymentGet; response: T.SuccessEventPaymentGet};
   event_actual_start_record_v1: {request: T.RequestEventActualStartRecord; response: T.SuccessEventActualStartRecord};
   event_actual_start_correct_v1: {request: T.RequestEventActualStartCorrect; response: T.SuccessEventActualStartCorrect};
+  management_state_get_v1: {request: T.RequestManagementStateGet; response: T.SuccessManagementStateGet};
+  instructor_agreements_list_v1: {request: T.RequestInstructorAgreementsList; response: T.SuccessInstructorAgreementsList};
+  reservation_impact_preview_v1: {request: T.RequestReservationImpactPreview; response: T.SuccessReservationImpactPreview};
+  reservation_impact_apply_v1: {request: T.RequestReservationImpactApply; response: T.SuccessReservationImpactApply};
+  settlement_movements_list_v1: {request: T.RequestSettlementMovementsList; response: T.SuccessSettlementMovementsList};
+  settlement_requests_list_v1: {request: T.RequestSettlementRequestsList; response: T.SuccessSettlementRequestsList};
+  settlement_request_get_v1: {request: T.RequestSettlementRequestGet; response: T.SuccessSettlementRequestGet};
+  settlement_request_submit_v1: {request: T.RequestSettlementRequestSubmit; response: T.SuccessSettlementRequestSubmit};
+  settlement_request_withdraw_v1: {request: T.RequestSettlementRequestWithdraw; response: T.SuccessSettlementRequestWithdraw};
+  settlement_request_decide_v1: {request: T.RequestSettlementRequestDecide; response: T.SuccessSettlementRequestDecide};
+  settlement_payment_record_v1: {request: T.RequestSettlementPaymentRecord; response: T.SuccessSettlementPaymentRecord};
+  settlement_offset_record_v1: {request: T.RequestSettlementOffsetRecord; response: T.SuccessSettlementOffsetRecord};
+  settlement_adjust_v1: {request: T.RequestSettlementAdjust; response: T.SuccessSettlementAdjust};
 }
