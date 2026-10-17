@@ -46,3 +46,5 @@ assert next(Path('supabase/migrations').glob('*_role_read_center_access.sql')).r
 assert next(Path('supabase/migrations').glob('*_availability_policies.sql')).read_text()==Path('database/availability-policies.sql').read_text()+Path('database/availability-policies-wrappers.sql').read_text(),'Availability/policy source drift'
 
 assert next(Path('supabase/migrations').glob('*_schedule_reads.sql')).read_text()==Path('database/schedule-reads.sql').read_text()+Path('database/schedule-reads-wrappers.sql').read_text(),'Schedule read source drift'
+
+assert next(Path('supabase/migrations').glob('*_program_session_lifecycle.sql')).read_text()==Path('database/program-session-lifecycle.sql').read_text()+Path('database/program-session-lifecycle-wrappers.sql').read_text(),'Program/session source drift'

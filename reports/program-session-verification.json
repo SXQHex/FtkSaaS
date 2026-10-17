@@ -1,0 +1,71 @@
+{
+  "source_commit": "a152477853637342d7e7b7e3ebbaff1764c5ec4a",
+  "source_tree": "0d2f23cec7eb30de89e08e9dc39485b21e7b5bfa",
+  "local_tested_source_commit": "30e3e89dc9531c3184801cccdf940fcfa3bbca28",
+  "base_commit": "69257f056f593b4b52248e7c9070dada7918344d",
+  "base_ci": "https://github.com/SXQHex/FtkSaaS/actions/runs/39004791672",
+  "evidence_kind": "Developer-run focused real Auth -> Edge -> RPC tests in isolated native Supabase stack. No full clean acceptance claimed here; final PR-head Backend CI runs mandatory npm run test:clean independently.",
+  "source_transfer": "GitHub source commit and locally tested commit have identical tree 0d2f23cec7eb30de89e08e9dc39485b21e7b5bfa; only commit metadata differs. Evidence/handover are a subsequent documentation commit.",
+  "scope": {
+    "implemented_operations": [
+      "program_preview_v1",
+      "program_apply_v1",
+      "session_change_preview_v1",
+      "session_change_apply_v1",
+      "session_capacity_set_v1",
+      "session_assignment_set_v1",
+      "class_assignment_set_v1"
+    ],
+    "callable_operations": 79,
+    "contract_only_operations": 105,
+    "migration_source_count": 25,
+    "contract_tests": 12,
+    "final_program_auth_edge_rpc_tests_including_parent": 20,
+    "failed_tests": 0
+  },
+  "developer_checks": [
+    {
+      "source_commit": "7a453801c1483cd5b48db3abe406c0a2cc65a754",
+      "command": "npm run generate && npm run verify && node --test --test-concurrency=2 tests/program-session-lifecycle.test.mjs tests/availability-policies.test.mjs tests/schedule-reads.test.mjs tests/person-registry.test.mjs",
+      "result": "12 contract and 68 focused API tests passed; isolated schema had helper definitions applied, not a fresh 25-migration reset."
+    },
+    {
+      "source_commit": "30e3e89dc9531c3184801cccdf940fcfa3bbca28",
+      "command": "npm run verify && node --test tests/program-session-lifecycle.test.mjs",
+      "result": "12 contract and 20 focused API tests passed after review fix; frozen prior 24 checksums preserved and new migration/source equality verified."
+    }
+  ],
+  "checks": [
+    "Preview produces only technical preview records; concrete finite UTC occurrences and no program/reservation/rights/finance/audit/outbox mutations",
+    "Atomic program -> calendar_get/session_get/reservation_list with live self/instructor/CM visibility",
+    "Tenant/center/actor isolation; owner needs CM; role revocation blocks successful receipt replay; provider logout and direct authenticated RPC denied",
+    "Availability, exceptions, resource adjacency, legacy physical/class duties, cross-center person conflicts and common session_create guard",
+    "Local half-open dates, DST gap rejection, explicit fold offsets, anchor offset consistency, wall-clock this-and-future transitions",
+    "Reservations, allocations, sale/policy identity preserved; capacity may drop below existing occupancy; new booking honors limit; invalid date rights cannot be silently reselected",
+    "Shared timed quota proposed-batch validation, old/new bucket recomputation and allocation identity preservation",
+    "Class defaults, per-key explicit removals, full occurrence overrides, agreement validity and offline assignment without login grants",
+    "Preview expiration/config/version staleness, same-key replay, payload mismatch, competing preview apply and session version race",
+    "Concurrent configuration/apply serializes; late occurrence conflict and injected late audit fault restore all batch data, receipts/outbox and preview state",
+    "Legacy class-only removal leaves inactive explicit tombstone and immediately removes read scope; later class reactivation cannot resurrect it"
+  ],
+  "review": {
+    "kind": "Independent agent static read-only review; no tests run by reviewer",
+    "initial_source": "7a453801c1483cd5b48db3abe406c0a2cc65a754",
+    "finding": "P2 legacy class-only duty removal incorrectly returned NOT_FOUND",
+    "fixed_source": "30e3e89dc9531c3184801cccdf940fcfa3bbca28",
+    "result": "Fix re-reviewed; finding resolved and no additional substantive findings."
+  },
+  "dependencies": [
+    "Existing valid instructor agreements are required; instructor_agreement_publish_v1 remains contract_only. No pay-model defaults invented; explicit synthetic agreement fixtures used in tests.",
+    "Existing single-session creation and schedule read projections share required inheritance/conflict/version visibility changes; no additional workflow endpoint implemented."
+  ],
+  "not_evidence_for": [
+    "Final PR-head full clean CI before it runs, merge or main CI",
+    "Hosted deployment/smoke, frontend integration, load/backup/restore",
+    "Cancellation, replacement, waitlist/offer lifecycle, lesson attendance, eligible purchased package selection or agreement publication",
+    "Unbounded batch scalability or merged overnight availability rules"
+  ],
+  "production_deployed": false,
+  "resend_started": false,
+  "frontend_changed": false
+}

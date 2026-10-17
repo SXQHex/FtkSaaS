@@ -279,3 +279,10 @@ Teknik aktarım ve test durumu: docs/decisions/Q-E02.md ve reports/qe02-verifica
 ## Takvim/seans/rezervasyon okuma aktarımı
 
 `schedule.read` satırı yeni genel merkez yetkisi değildir. Üç okuma için öğrenci self kayıtları, canlı seans/sınıf görevi + I/A login rolü, CM veya açık reservation.write/attendance.draft personel grantı ve organizasyon okuyucusu kapsamı satır bazında uygulanır. Aktif hesap bağı, plan/merkez/abonelik ve Auth oturumu her sayfada denetlenir. Yönetim dışındaki seans görevlerinde agreement_id gösterilmez. Zaman/cursor/alan ayrıntıları: [okuma devri](../docs/schedule-read-handover.md). Ürün/uygun satış seçimi bu aktarımda kapatılmadı.
+
+
+## Program/seans teknik aktarımı — 17 Ekim 2026
+
+Yeni ürün kuralı eklemeden mevcut program/saat/kaynak/kapasite/görev kuralları sonlu materialize edilmiş oluşumlara aktarılır. Ayrıntılı DTO, bağımlılık, miras/override ve hata davranışı [program/seans devrindedir](../docs/program-session-handover.md). Yerel tarihler [başlangıç,bitiş), DST çift saatinde açık date/offset_minutes; gap reddi. this_and_future aynı programın gelecekteki planned/open oluşumlarını kapsar; geçmiş/sonuçlanmış korunur. Mevcut rezervasyon/hak kimliği kapasite indirimiyle iptal edilmez; saat değişikliği mevcut sabit hakkı geçersiz kılıyorsa transaction reddedilir. Eğitmen görevi açık geçerli anlaşma gerektirir, ücret modeli türetilmez.
+
+Sınıf atama güncellemesi hedef atama satır sürümünü, seans kapasite/görev güncellemesi seans sürümünü ister. Inactive açık görev kaldırmasıdır; sınıf varsayılanı açık oluşum override'ını geri getirmez. Önizleme dependency değişimi PREVIEW_STALE, komut sürüm yarışı VERSION_CONFLICT, kaynak/uygunluk çakışması RESOURCE_CONFLICT, eksik yapılandırma POLICY_NOT_CONFIGURED üretir. Yetki geri alınması receipt replay öncesinde denetlenir. İptal/yerine seans/bekleme/yoklama/paket seçimi bu aktarımın kapsamı değildir.

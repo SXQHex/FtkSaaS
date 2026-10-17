@@ -71,6 +71,13 @@ export const runtimeOperationNames = [
   "policy_publish_v1",
   "calendar_get_v1",
   "session_get_v1",
-  "reservation_list_v1"
+  "reservation_list_v1",
+  "program_preview_v1",
+  "program_apply_v1",
+  "session_change_preview_v1",
+  "session_change_apply_v1",
+  "session_capacity_set_v1",
+  "session_assignment_set_v1",
+  "class_assignment_set_v1"
 ] as const;
 export type RuntimeOperationName = typeof runtimeOperationNames[number];
