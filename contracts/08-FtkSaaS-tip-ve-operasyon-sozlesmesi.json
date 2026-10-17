@@ -51115,9 +51115,9 @@
       }
     ],
     "runtime": {
-      "version": "0.2.0-rc.2",
+      "version": "0.2.0-rc.3",
       "repository": "https://github.com/SXQHex/FtkSaaS",
-      "branch": "backend/runtime-v0.2.0",
+      "branch": "main",
       "implemented_operations": [
         "account_get_v1",
         "organizations_list_v1",
@@ -51171,14 +51171,26 @@
         "event_payment_get_v1",
         "student_credit_refund_v1",
         "student_credit_offset_v1",
-        "debt_adjust_v1"
+        "debt_adjust_v1",
+        "event_actual_start_record_v1",
+        "event_actual_start_correct_v1",
+        "organization_update_v1",
+        "center_update_v1",
+        "disciplines_list_v1",
+        "person_discipline_set_v1",
+        "student_deactivate_v1",
+        "person_get_v1",
+        "person_update_v1",
+        "people_list_v1",
+        "room_save_v1",
+        "roles_list_v1"
       ],
       "auth": "Supabase getUser + live auth.sessions + current account/link/role; no request actor claims",
       "uuid": "backend uuid@14.0.3 v7 for all inserted IDs; DB defaults not required",
       "external_transport": "POST /functions/v1/backend-v1/{operation}; direct typed request body",
       "internal_rpc": "service-only api_v1 named functions; actor/session/UUID bank supplied by verified gateway",
-      "migration_count": 7,
-      "test_evidence": "reports/qe01-verification.json",
+      "migration_count": 22,
+      "test_evidence": "https://github.com/SXQHex/FtkSaaS/actions/runs/38993548576",
       "frontend_unchanged": true
     }
   }

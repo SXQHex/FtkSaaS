@@ -1,5 +1,7 @@
 # FtkSaaS backend
 
+Başlangıç: [kaynak indeksi](docs/source-index.md) ve [ajan çalışma kuralları](AGENTS.md). Güncel devir, sözleşme/karar önceliği, envanter ve tarihsel kanıtların okuma sırası burada tanımlıdır.
+
 Kalıcı kaynak: https://github.com/SXQHex/FtkSaaS — `main`. Fiilî başlangıç uygulaması: [PR #4](https://github.com/SXQHex/FtkSaaS/pull/4). Frontend tasarımı bu repository görevinin kapsamında değiştirilmedi.
 
 184 operasyon sözleşmesinin 65'i geliştirme ortamında çağrılabilir; 119'u yalnız sözleşmedir. Güncel liste: [endpoint envanteri](docs/endpoint-inventory.json). Entegrasyon: [Claude devri](docs/claude-handover.md) ve [fiilî başlangıç API'si](docs/actual-start-handover.md).
@@ -16,10 +18,10 @@ npm run dev:info
 npm test
 ```
 
-`npm run test:clean` yalnız checkout'a ait loopback test DB'sini sıfırlar, 22 migration'ı temiz kurar ve test/seed/sağlık/advisors kontrollerini çalıştırır. Oda/rol uygulaması [PR #7](https://github.com/SXQHex/FtkSaaS/pull/7) ile main’e birleşti. Son uygulama head’i `1c84730`: 181/181 test (12 sözleşme + 27 DB + 142 gerçek Auth/API), seed/sağlık/advisors başarılı. Kanıt [oda/rol raporunda](reports/room-role-verification.json); kalan 119 işlem [açık iş envanterindedir](docs/remaining-work.md). Merge sonrası main CI ayrıca doğrulanır.
+`npm run test:clean` yalnız checkout'a ait loopback test DB'sini sıfırlar, 22 migration'ı temiz kurar ve test/seed/sağlık/advisors kontrollerini çalıştırır. Oda/rol uygulaması [PR #7](https://github.com/SXQHex/FtkSaaS/pull/7) ile main’e birleşti. Son uygulama head’i `1c84730`: 181/181 test (12 sözleşme + 27 DB + 142 gerçek Auth/API), seed/sağlık/advisors başarılı. Kanıt [oda/rol raporunda](reports/room-role-verification.json); kalan 119 işlem [açık iş envanterindedir](docs/remaining-work.md). PR #8 sonrası kaynak main `b9bd9c110f0cf4a121eac6ef0752945de99b10ac`; [aynı SHA’nın CI’ı](https://github.com/SXQHex/FtkSaaS/actions/runs/38993548576) başarılıdır. Sonraki belge/uygulama commit’lerinin CI’ı ayrıca doğrulanır.
 
 Her yeni head için [GitHub Actions](https://github.com/SXQHex/FtkSaaS/actions) sonucu ayrıca doğrulanır. [Fiilî başlangıç kanıt kapsamı](reports/actual-start-verification.json) ve [Q-E03 kanıt kapsamı](reports/qe03-verification.json) raporların hangi doğrulamayı temsil ettiğini belirtir. Q-E01/Q-E02 ve önceki RC3 raporları tarihsel snapshot'tır; son head'in CI sonucunun yerine geçmez.
 
 Q-E03 parasal sınırı planlanan başlangıçtır; fiilî başlangıç kaydı bunu yeniden hesaplatmaz. Q-E02 merkez iptali tam borç/alacak/hak hesabını korur. Fiilî başlangıç kayıt/düzeltme API'si artık mevcuttur ve append-only audit geçmişini kullanır.
 
-Production dağıtımı yapılmadı. `vercel.json` main otomatik dağıtımını kapalı tutar. Kalıcı geliştirme/test backend’i `gwyprhenabtpkbojephw` üzerine kuruldu; bağlantı smoke kapsamı [uzak kurulum belgesinde](docs/remote-backend-setup.md). Dış e-posta, yük/restore ve frontend gerçek entegrasyon kabulü ayrı açık işlerdir.
+Production dağıtımı yapılmadı. `vercel.json` main otomatik dağıtımını kapalı tutar. Kalıcı geliştirme/test backend’i `gwyprhenabtpkbojephw` üzerine kuruldu; bağlantı smoke kapsamı [uzak kurulum belgesinde](docs/remote-backend-setup.md). Dış e-posta ertelendi; Resend entegrasyonu başlatılmaz. Yük/restore ve frontend gerçek entegrasyon kabulü ayrı açık işlerdir.
