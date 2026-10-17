@@ -1,7 +1,6 @@
 # Kalan backend işleri
 
-Güncel geliştirme kapsamı: **69 çağrılabilir / 115 yalnız sözleşme**, 23 migration. [Uygunluk/politika devri](claude-handover.md) tüketici bağımlılıklarını ve açık sınırları belirtir. Yeni SHA kabulü bağımsız CI ile doğrulanır. Aşağıdaki PR #8 başlangıcı tarihsel kanıttır.
-
+Güncel geliştirme kapsamı: **72 çağrılabilir / 112 yalnız sözleşme**, 24 migration. [Takvim/seans/rezervasyon okuma devri](schedule-read-handover.md) üç okumanın yetki, UTC filtre ve cursor sınırlarını belirtir. Ürün okuması katalog sözleşmesiyle uygun satın alınmış hak seçimini karşılamaz; seans/kişi/sale bağlamı ve DTO aktarımı ayrı teslimdir. Son head CI bağımsız doğrulanır. Aşağıdaki PR #8 başlangıcı tarihsel kanıttır.
 
 ## Doğrulanmış başlangıç — 17 Ekim 2026
 
@@ -12,7 +11,7 @@ Uzak geliştirme/test Auth → Edge → RPC smoke [ayrı rapordadır](../reports
 ## Bağımlılık sırası
 
 1. Uygunluk/politika dört API uygulandı; tüketici sınırları ve eksik iş akışları Claude devrindeki güncel bölümde açıkça ayrılır. Son PR SHA kabulü CI ile ayrıca doğrulanır.
-2. Takvim/seans/rezervasyon okumaları, program önizleme/uygulama ve talep–bekleme–yer teklifi yaşam döngüleri.
+2. Ürün kataloğu ile uygun satın alınmış paket/hak seçimi bağımlılık aktarımı; program önizleme/uygulama ve talep–bekleme–yer teklifi yaşam döngüleri. Üç program okuması uygulandı; sınırlar okuma devrindedir.
 3. Ders yoklaması, kapanış/düzeltme, blocked katılım ve eğitmen anlaşması/hakediş.
 4. Paket dondurma/uzatma/değişim/yenileme/sonlandırma ve finans düzeltme/iade önizleme–uygulama çiftleri.
 5. Hesap erişimi geri alma, hesap/organizasyon kapanış/silme ve kişi birleştirme.
@@ -20,14 +19,14 @@ Uzak geliştirme/test Auth → Edge → RPC smoke [ayrı rapordadır](../reports
 
 Her yeni grup: sözleşme/izin incelemesi → yeni migration → gerçek Auth/API kabulü (sınır, yetki, tekrar, yarış, rollback) → inceleme → temiz CI → main CI. Ürün kararında boşluk varsa teknik varsayımla yeni kural eklenmez.
 
-## Yalnız sözleşme envanteri — güncel 115 işlem
+## Yalnız sözleşme envanteri — güncel 112 işlem
 
 | Modül | Kalan işlem |
 |---|---:|
 | M01 | 6 |
 | M02 | 7 |
 | M03 | 2 |
-| M04 | 22 |
+| M04 | 19 |
 | M05 | 9 |
 | M06 | 15 |
 | M07 | 5 |
@@ -56,10 +55,8 @@ Her yeni grup: sözleşme/izin incelemesi → yeni migration → gerçek Auth/AP
 | `person_merge_preview_v1` | `person.merge` |
 | `person_merge_approve_v1` | `person.merge` |
 | `person_merge_apply_v1` | `person.merge` |
-| `calendar_get_v1` | `schedule.read` |
 | `program_preview_v1` | `schedule.manage` |
 | `program_apply_v1` | `schedule.manage` |
-| `session_get_v1` | `schedule.read` |
 | `session_change_preview_v1` | `schedule.manage` |
 | `session_change_apply_v1` | `schedule.manage` |
 | `session_capacity_set_v1` | `schedule.manage` |
@@ -73,7 +70,6 @@ Her yeni grup: sözleşme/izin incelemesi → yeni migration → gerçek Auth/AP
 | `lesson_request_offer_alternative_v1` | `request.resolve` |
 | `lesson_request_accept_alternative_v1` | `request.write` |
 | `lesson_request_approve_v1` | `request.resolve` |
-| `reservation_list_v1` | `schedule.read` |
 | `waitlist_join_v1` | `reservation.write` |
 | `waitlist_leave_v1` | `reservation.write` |
 | `seat_offer_accept_v1` | `reservation.write` |

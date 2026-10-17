@@ -29074,7 +29074,10 @@
         "semantic_guards": [
           "live_actor_and_scope",
           "plan_capabilities_from_features",
-          "billing_gate_read"
+          "billing_gate_read",
+          "row_scope_before_pagination",
+          "live_role_assignment_and_account_link_on_every_page",
+          "no_agreement_details_for_non_management_readers"
         ],
         "audit": false,
         "notification": "outbox_if_user_visible_business_result",
@@ -29092,7 +29095,15 @@
           "A55"
         ],
         "configuration_policy": "numeric plan limits/prices and legal approval are deployment configuration, never arbitrary allow/deny",
-        "implementation_status": "contract_only"
+        "implementation_status": "operational_development_limited",
+        "read_contract": {
+          "visibility": "org readers; authorized center staff; live assigned instructor/assistant; self reservations only",
+          "interval": "UTC offset instants; half-open overlap: starts_at < end AND ends_at > start",
+          "sorts": [
+            "starts_at_asc"
+          ],
+          "as_of": "response evaluation time; no cross-page frozen snapshot"
+        }
       },
       {
         "name": "class_save_v1",
@@ -29495,7 +29506,10 @@
           "scope_filter_before_entitlement_order",
           "single_sale_pool_lock_across_disciplines",
           "negative_limit_by_person_center_discipline",
-          "start_snapshot_no_retroactive_earning"
+          "start_snapshot_no_retroactive_earning",
+          "row_scope_before_pagination",
+          "live_role_assignment_and_account_link_on_every_page",
+          "no_agreement_details_for_non_management_readers"
         ],
         "audit": false,
         "notification": "outbox_if_user_visible_business_result",
@@ -29517,7 +29531,13 @@
           "D-A12"
         ],
         "configuration_policy": "numeric plan limits/prices and legal approval are deployment configuration, never arbitrary allow/deny",
-        "implementation_status": "contract_only"
+        "implementation_status": "operational_development_limited",
+        "read_contract": {
+          "visibility": "org readers; authorized center staff; live assigned instructor/assistant; self reservations only",
+          "interval": "UTC offset instants; half-open overlap: starts_at < end AND ends_at > start",
+          "sorts": [],
+          "as_of": "response evaluation time; no cross-page frozen snapshot"
+        }
       },
       {
         "name": "session_change_preview_v1",
@@ -30983,7 +31003,10 @@
           "scope_filter_before_entitlement_order",
           "single_sale_pool_lock_across_disciplines",
           "negative_limit_by_person_center_discipline",
-          "start_snapshot_no_retroactive_earning"
+          "start_snapshot_no_retroactive_earning",
+          "row_scope_before_pagination",
+          "live_role_assignment_and_account_link_on_every_page",
+          "no_agreement_details_for_non_management_readers"
         ],
         "audit": false,
         "notification": "outbox_if_user_visible_business_result",
@@ -31005,7 +31028,17 @@
           "D-A12"
         ],
         "configuration_policy": "numeric plan limits/prices and legal approval are deployment configuration, never arbitrary allow/deny",
-        "implementation_status": "contract_only"
+        "implementation_status": "operational_development_limited",
+        "read_contract": {
+          "visibility": "org readers; authorized center staff; live assigned instructor/assistant; self reservations only",
+          "interval": "UTC offset instants; half-open overlap: starts_at < end AND ends_at > start",
+          "sorts": [
+            "created_at_asc",
+            "created_at_desc",
+            "starts_at_asc"
+          ],
+          "as_of": "response evaluation time; no cross-page frozen snapshot"
+        }
       },
       {
         "name": "waitlist_join_v1",
@@ -51191,14 +51224,17 @@
         "availability_save_v1",
         "availability_exception_save_v1",
         "policies_get_v1",
-        "policy_publish_v1"
+        "policy_publish_v1",
+        "calendar_get_v1",
+        "session_get_v1",
+        "reservation_list_v1"
       ],
       "auth": "Supabase getUser + live auth.sessions + current account/link/role; no request actor claims",
       "uuid": "backend uuid@14.0.3 v7 for all inserted IDs; DB defaults not required",
       "external_transport": "POST /functions/v1/backend-v1/{operation}; direct typed request body",
       "internal_rpc": "service-only api_v1 named functions; actor/session/UUID bank supplied by verified gateway",
-      "migration_count": 23,
-      "test_evidence": "reports/availability-policy-verification.json; scoped source evidence, final PR/main clean CI verified separately",
+      "migration_count": 24,
+      "test_evidence": "reports/schedule-read-verification.json; final head clean CI verified separately",
       "frontend_unchanged": true
     }
   }

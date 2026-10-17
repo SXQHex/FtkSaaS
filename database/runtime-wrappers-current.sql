@@ -111,6 +111,10 @@ insert into private.runtime_operations(name,permission,billing_class,features) v
 create or replace function api_v1.student_deactivate_v1(p_request jsonb,p_actor_auth_id uuid,p_session_id uuid,p_ids uuid[],p_aux jsonb default null) returns jsonb language sql security invoker set search_path='' as $$select private.execute_operation('student_deactivate_v1',p_request,p_actor_auth_id,p_session_id,p_ids,p_aux)$$;
 revoke all on function api_v1.student_deactivate_v1(jsonb,uuid,uuid,uuid[],jsonb) from public,anon,authenticated;
 grant execute on function api_v1.student_deactivate_v1(jsonb,uuid,uuid,uuid[],jsonb) to service_role;
+insert into private.runtime_operations(name,permission,billing_class,features) values('calendar_get_v1','schedule.read','read',array['F08']::text[]) on conflict(name) do update set permission=excluded.permission,billing_class=excluded.billing_class,features=excluded.features;
+create or replace function api_v1.calendar_get_v1(p_request jsonb,p_actor_auth_id uuid,p_session_id uuid,p_ids uuid[],p_aux jsonb default null) returns jsonb language sql security invoker set search_path='' as $$select private.execute_operation('calendar_get_v1',p_request,p_actor_auth_id,p_session_id,p_ids,p_aux)$$;
+revoke all on function api_v1.calendar_get_v1(jsonb,uuid,uuid,uuid[],jsonb) from public,anon,authenticated;
+grant execute on function api_v1.calendar_get_v1(jsonb,uuid,uuid,uuid[],jsonb) to service_role;
 insert into private.runtime_operations(name,permission,billing_class,features) values('class_save_v1','schedule.manage','new',array['F10','F11']::text[]) on conflict(name) do update set permission=excluded.permission,billing_class=excluded.billing_class,features=excluded.features;
 create or replace function api_v1.class_save_v1(p_request jsonb,p_actor_auth_id uuid,p_session_id uuid,p_ids uuid[],p_aux jsonb default null) returns jsonb language sql security invoker set search_path='' as $$select private.execute_operation('class_save_v1',p_request,p_actor_auth_id,p_session_id,p_ids,p_aux)$$;
 revoke all on function api_v1.class_save_v1(jsonb,uuid,uuid,uuid[],jsonb) from public,anon,authenticated;
@@ -119,6 +123,10 @@ insert into private.runtime_operations(name,permission,billing_class,features) v
 create or replace function api_v1.session_create_v1(p_request jsonb,p_actor_auth_id uuid,p_session_id uuid,p_ids uuid[],p_aux jsonb default null) returns jsonb language sql security invoker set search_path='' as $$select private.execute_operation('session_create_v1',p_request,p_actor_auth_id,p_session_id,p_ids,p_aux)$$;
 revoke all on function api_v1.session_create_v1(jsonb,uuid,uuid,uuid[],jsonb) from public,anon,authenticated;
 grant execute on function api_v1.session_create_v1(jsonb,uuid,uuid,uuid[],jsonb) to service_role;
+insert into private.runtime_operations(name,permission,billing_class,features) values('session_get_v1','schedule.read','read',array['F08']::text[]) on conflict(name) do update set permission=excluded.permission,billing_class=excluded.billing_class,features=excluded.features;
+create or replace function api_v1.session_get_v1(p_request jsonb,p_actor_auth_id uuid,p_session_id uuid,p_ids uuid[],p_aux jsonb default null) returns jsonb language sql security invoker set search_path='' as $$select private.execute_operation('session_get_v1',p_request,p_actor_auth_id,p_session_id,p_ids,p_aux)$$;
+revoke all on function api_v1.session_get_v1(jsonb,uuid,uuid,uuid[],jsonb) from public,anon,authenticated;
+grant execute on function api_v1.session_get_v1(jsonb,uuid,uuid,uuid[],jsonb) to service_role;
 insert into private.runtime_operations(name,permission,billing_class,features) values('reservation_create_v1','reservation.write','reservation',array['F10','F11','F15']::text[]) on conflict(name) do update set permission=excluded.permission,billing_class=excluded.billing_class,features=excluded.features;
 create or replace function api_v1.reservation_create_v1(p_request jsonb,p_actor_auth_id uuid,p_session_id uuid,p_ids uuid[],p_aux jsonb default null) returns jsonb language sql security invoker set search_path='' as $$select private.execute_operation('reservation_create_v1',p_request,p_actor_auth_id,p_session_id,p_ids,p_aux)$$;
 revoke all on function api_v1.reservation_create_v1(jsonb,uuid,uuid,uuid[],jsonb) from public,anon,authenticated;
@@ -127,6 +135,10 @@ insert into private.runtime_operations(name,permission,billing_class,features) v
 create or replace function api_v1.reservation_cancel_v1(p_request jsonb,p_actor_auth_id uuid,p_session_id uuid,p_ids uuid[],p_aux jsonb default null) returns jsonb language sql security invoker set search_path='' as $$select private.execute_operation('reservation_cancel_v1',p_request,p_actor_auth_id,p_session_id,p_ids,p_aux)$$;
 revoke all on function api_v1.reservation_cancel_v1(jsonb,uuid,uuid,uuid[],jsonb) from public,anon,authenticated;
 grant execute on function api_v1.reservation_cancel_v1(jsonb,uuid,uuid,uuid[],jsonb) to service_role;
+insert into private.runtime_operations(name,permission,billing_class,features) values('reservation_list_v1','schedule.read','read',array['F06','F10']::text[]) on conflict(name) do update set permission=excluded.permission,billing_class=excluded.billing_class,features=excluded.features;
+create or replace function api_v1.reservation_list_v1(p_request jsonb,p_actor_auth_id uuid,p_session_id uuid,p_ids uuid[],p_aux jsonb default null) returns jsonb language sql security invoker set search_path='' as $$select private.execute_operation('reservation_list_v1',p_request,p_actor_auth_id,p_session_id,p_ids,p_aux)$$;
+revoke all on function api_v1.reservation_list_v1(jsonb,uuid,uuid,uuid[],jsonb) from public,anon,authenticated;
+grant execute on function api_v1.reservation_list_v1(jsonb,uuid,uuid,uuid[],jsonb) to service_role;
 insert into private.runtime_operations(name,permission,billing_class,features) values('product_publish_v1','product.manage','config',array['F15','F16','F17','F18']::text[]) on conflict(name) do update set permission=excluded.permission,billing_class=excluded.billing_class,features=excluded.features;
 create or replace function api_v1.product_publish_v1(p_request jsonb,p_actor_auth_id uuid,p_session_id uuid,p_ids uuid[],p_aux jsonb default null) returns jsonb language sql security invoker set search_path='' as $$select private.execute_operation('product_publish_v1',p_request,p_actor_auth_id,p_session_id,p_ids,p_aux)$$;
 revoke all on function api_v1.product_publish_v1(jsonb,uuid,uuid,uuid[],jsonb) from public,anon,authenticated;
