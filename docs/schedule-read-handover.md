@@ -1,3 +1,5 @@
+> DS-2026-10-17 kabulü plan/anlaşma ve korunan rezervasyon hedefini değiştirir. Bu dosya önceki runtime kapsamını anlatır; yeni hedef ve açık farklar [sprint devrinde](decision-sprint-handover.md).
+
 # Takvim, seans ve rezervasyon okumaları
 
 Kapsam: `calendar_get_v1`, `session_get_v1`, `reservation_list_v1`. Başlangıç main: `a681f9c37858bd0fdb64a2d24785096adfd35d8e`; aynı SHA [Backend #84](https://github.com/SXQHex/FtkSaaS/actions/runs/39001670914) başarılıdır. Yeni uygulama kabulü son PR head CI'ından ayrıca okunur. 72 çağrılabilir / 112 yalnız sözleşme; 24 append-only migration.

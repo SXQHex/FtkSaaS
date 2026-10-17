@@ -1,0 +1,63 @@
+{
+  "scope": "PR #13 latest center-scoped settlement authority correction; contract/CI only",
+  "baseline": {
+    "main_sha": "c231ab5526854ed62445613467649e1b0bf960bb",
+    "main_ci": "https://github.com/SXQHex/FtkSaaS/actions/runs/39010419849",
+    "previous_pr_head": "dbdb7b9a10c4eba8aafb9dd66708d63af2b42ba1",
+    "previous_pr_ci": "https://github.com/SXQHex/FtkSaaS/actions/runs/39026810898",
+    "evidence_scope": "previous source only; not acceptance of this new correction"
+  },
+  "reviewed_local_source_sha": "4ec0092ef8dde621e9eb1c6aaebe2056e3080720",
+  "published_equivalent_source_sha": "e222ae937dbadfac5ac49beea403b10abeea2a5d",
+  "source_tree_sha": "8795fd7d7e969d959e2145ca70d677e6f751ffd8",
+  "accepted": "No distinct account/person requirement. Same account can submit at A and approve at B if current CM membership and explicit settlement grant exist independently at each required center. A-only authority cannot approve B.",
+  "closed_decisions": {
+    "DS_OPEN_01": "accepted authority grant chain; runtime pending",
+    "DS_OPEN_02": "closed by latest user correction; prior self-approval/account inequality prohibition superseded; no exception/fallback route"
+  },
+  "transferred": [
+    "decision/product/technical/permission contracts",
+    "same-account rule and per-step server authority bindings",
+    "server-derived account/org/center/permission/role/grant audit snapshots",
+    "generated API and endpoint inventory with step scope",
+    "F01-F33 trace and 38 pending cases",
+    "governance mutation checks and living-document parity",
+    "handover and remaining work"
+  ],
+  "implemented": "structural contracts/governance checks only; no settlement runtime/RPC/Edge/storage/migration implementation",
+  "focused_verification": {
+    "command": "npm run generate; npm run verify",
+    "node": "24.19.0",
+    "tests": 93,
+    "result": "passed",
+    "kind": "structural_not_real_settlement_behavior"
+  },
+  "independent_review": {
+    "initial_source": "998479daf6d80aedd160b245f297c55f4c369b93",
+    "finding": "Three living clauses still showed DS-OPEN-02 open and 34 cases",
+    "fixed_source": "4ec0092ef8dde621e9eb1c6aaebe2056e3080720",
+    "findings_closed": 1,
+    "open_findings": 0,
+    "mode": "read-only static review; no test rerun"
+  },
+  "inventory": {
+    "total": 197,
+    "callable": 79,
+    "contract_only": 118,
+    "migrations": 25,
+    "new_operations": 0,
+    "behavior_cases": 38,
+    "behavior_status": "pending_runtime"
+  },
+  "final_head_evidence": "New final SHA independent review and mandatory clean PR CI are attached to PR #13 after execution. The user authorized merge after verification; merge main SHA and same-SHA push CI are recorded separately. No previous SHA success is inherited.",
+  "boundaries": {
+    "historical_reports_unchanged": true,
+    "main_protection": "separate administrator work remains open",
+    "production_deployment_enabled_for_main": false,
+    "frontend": false,
+    "production": false,
+    "resend": false,
+    "merge_authorized_by_latest_user": true,
+    "repository_admin_authorized": false
+  }
+}

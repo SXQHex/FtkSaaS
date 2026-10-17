@@ -1,16 +1,18 @@
+> Güncel öncelik: [DS-2026-10-17](../docs/decisions/DS-2026-10-17.md). Çelişen eski hükümler yalnız belirtilen kapsamda yürürlükten kalkmıştır. [Hedef sözleşme/runtime ayrımı](../docs/decision-sprint-handover.md).
+
 # FtkSaaS — O4 durum, hata ve izin sözleşmesi
 
 > **Güncel öncelik: Q-E02 · 0.2.0-rc.3.** Kullanıcının 16 Ekim 2026 son iptal kabulü önceki çelişen merkez iptali hükümlerinin yerine geçer. Güncel davranış/kanıt: docs/decisions/Q-E02.md, docs/claude-handover.md ve reports/qe02-verification.json. Aşağıdaki eski durum/test sayıları tarihsel kayıttır; teknik aktarım bekleyen işler tamamlandı sayılmaz.
 
-> **Güncel 2.2-tech.2 / Q-D01:** Etkinlik 0/1/çok disiplin etiketini destekler. Tek etikette etkinliğe uygun dar/geniş paket, 0/çok etikette yalnız uygun geniş paket; etkinliklerde negatif kredi yok. Q-D01 ürün kararı kapalı, tam olay kayıt/RPC entegrasyonu ve son ortak kredi yarışı açık. Güncel durum 11-FtkSaaS-Q-D01-teknik-aktarim-raporu.md.
+> **Güncel 2.2-tech.2 / Q-D01:** Etkinlik 0/1/çok disiplin etiketini destekler. Tek etikette etkinliğe uygun dar/geniş paket, 0/çok etikette yalnız uygun geniş paket; etkinliklerde negatif kredi yok. Q-D01 ürün kararı kapalı; ilk aktarım durumları tarihsel, güncel runtime/kabul envanter ve CI’dadır. Güncel durum 11-FtkSaaS-Q-D01-teknik-aktarim-raporu.md.
 
-> **Güncel teknik uygulama kaydı — 2.2-tech.1, 15 Ekim 2026:** D01–D09/U01–U08, 04–08 kataloglarına ve ortak tiplere aktarıldı. İki migration izole geliştirme DB’sinde uygulandı. Aşağıdaki eski “kod/kurulum yapılmadı” ve “teknik aktarım bekliyor” ifadeleri tarihsel kayıt olarak okunur. İş RPC’leri, ayrıntılı izin RLS politikaları ve gerçek iş akışı kabul testleri açık; Q-D01 yeni ürün kararı bekliyor. Güncel durum 09 teknik aktarım raporundadır.
+> **Güncel teknik uygulama kaydı — 2.2-tech.1, 15 Ekim 2026:** D01–D09/U01–U08, 04–08 kataloglarına ve ortak tiplere aktarıldı. İki migration izole geliştirme DB’sinde uygulandı. Aşağıdaki eski “kod/kurulum yapılmadı” ve “teknik aktarım bekliyor” ifadeleri tarihsel kayıt olarak okunur. İş RPC’leri, ayrıntılı izin RLS politikaları ve gerçek iş akışı kabul testleri açık; Bu ilk aktarım notu tarihsel; Q-D01 kapalıdır. Güncel durum 09 teknik aktarım raporundadır.
 
 > Güncel UUID üretim standardı: U01–U08, UUIDv7. Sağlayıcı kimlikleri korunur.
 
 > Güncel ek: D01–D09 disiplin revizyonu kabul edilmiştir; aşağıdaki tarihsel teknik tamamlanma ifadeleri yeni kapsamı içermez. Ayrıntı ve açık teknik aktarım listesi belgenin sonundadır.
 
-15 Ekim 2026 · v1.0 · Yazılı sözlük. Uygulanmış RLS/endpoint değildir.08 JSON enum ve request/response yapıları makine kaynağı; aşağıdaki rol ve durum anlamları kabul edilmiş02 hükümlerini uygular.
+17 Ekim 2026 · DS-2026-10-17 aktarımı · Yazılı hedef sözlük. Uygulanmış RLS/endpoint değildir.08 JSON enum ve request/response yapıları makine kaynağı; aşağıdaki rol ve durum anlamları kabul edilmiş02 hükümlerini uygular.
 
 ## Durum aileleri
 
@@ -28,7 +30,7 @@
 | `AlternativeState` | `offered, accepted, rejected, superseded, expired` | Öğrenci seçimi niyet kaydı; request alternative_offered kalır. Kesin onay merkez approve, güncel kaynak/hak kontrolü; offered alternatif resource ayırmaz. |
 | `ReservationState` | `active, cancelled, completed` | active→cancelled (politika); active→completed yoklama kapandığında. cancelled yeniden active olmaz; yeni kayıt linked previous. completed seansa yeniden kayıt  |
 | `SessionState` | `planned, occurred, cancelled` | planned→occurred yoklama kapanışı; planned→cancelled yönetici. Zaman geçmesi occurred/no_show üretmez. occurred düzeltme revizyonudur, eski kayıt silinmez. |
-| `AttendanceResult` | `unmarked, attended, no_show, blocked` | Draft ordinary mark yetkili görevli; blocked CM tarafından. Kapanış unmarked kabul etmez. Başlangıçta limit aşılmışsa blocked ve bu öğrenci yüzde/kişi hakedişine girmez; sonradan ödeme geriye değiştirmez. |
+| `AttendanceResult` | `unmarked, attended, no_show, blocked` | Draft ordinary mark yetkili görevli; blocked CM tarafından. Kapanış unmarked kabul etmez. DS etki onayıyla korunan kesin rezervasyon dışında başlangıçta limit aşılmışsa blocked ve bu öğrenci yüzde/kişi hakedişine girmez; sonradan ödeme geriye değiştirmez. |
 | `AttendanceClosure` | `open, closed` | open→closed eğitmen/merkez yönetici; asistan/personel yok. closed düzeltme yalnız manager yeni revision, sessiz reopen değil. |
 | `WaitState` | `waiting, offered, converted, left, closed` | waiting→offered/left/closed; offered→converted/closed; ret/expiry listeden çıkış. Yeni giriş yeni sıra. Seans iptalinde açık kayıtlar closed. |
 | `OfferState` | `active, accepted, rejected, expired, withdrawn` | active→tek terminal; seat_offer kabul ve expiry race tek sonuç. Quote/trial aynı enum etiketini paylaşabilir fakat koşullar farklıdır. |
@@ -240,7 +242,7 @@ Paket revizyonu: 2.2. D01–D09 disiplin kararları korunur. Bu bölüm önceki 
 - EligibilitySnapshot merkez ve disiplini taşır; başlangıç snapshot ve geç ödeme/no retro earning kuralları korunur.
 - FtkUuid yeni üretimi UUIDv7 şart koşar, var olan UUID girişini sürümü yüzünden reddetmez. ProviderUuid sağlayıcı UUID'sidir. Üretim kontrolü FtkGeneratedUuidV7 tanımıyla ayrıca sınanır.
 - DB UUID üreticisi yoksa private default teknik hata 0A000/UUIDV7_GENERATOR_UNAVAILABLE ile kapalıdır; bu müşteri domain hata sözlüğüne yeni ürün davranışı eklemez. İlgili domain create endpoint henüz açık değildir.
-- Q-D01: etkinlik disiplin sınıflaması ve dar kapsamlı event hakkı/negatif kapsamı kararı yok; çıkarım yapılmaz.
+- Q-D01 karar/uygulama güncel kaynakta kapalıdır; bu ilk aktarım notu tarihsel kalır.
 
 ## Q-D01 — güncel izin/hata eşlemesi
 
@@ -260,7 +262,7 @@ event_payment_prepare: event.register; event_payment_get: kişi kendisi veya mer
 
 event_register başarı verisi outcome üzerinden ayrılır: registered kesin kayıttır; capacity_closed kesin kayıt değildir, ödenmiş hazırlığın kapanması/borcun ters kaydı/öğrenci alacağı commit edilmiştir. capacity_closed HTTP/domain hata zarfına çevrilmez. Aynı anahtar aynı sonucu tekrarlar. Hazırlıksız normal kapasite hatası halen CAPACITY_FULL; eksik tam ödeme ENTITLEMENT_UNAVAILABLE; yanlış kapsam NOT_FOUND; güncel olmayan önizleme PREVIEW_STALE.
 
-İptal önizlemesi kalan borç kaldırma, yeni öğrenci alacağı, hak serbest bırakma ve hazırlık kapatma etkilerini verir. Tahsilat/indirim/alacak veya hazırlık değiştiyse yeniden önizleme gerekir. Başlamış/kısmen gerçekleşmiş etkinlik iptali POLICY_NOT_CONFIGURED; yeni ürün kararı olmadan oransal hesap yapılmaz.
+İptal önizlemesi kalan borç kaldırma, yeni öğrenci alacağı, hak serbest bırakma ve hazırlık kapatma etkilerini verir. Tahsilat/indirim/alacak veya hazırlık değiştiyse yeniden önizleme gerekir. Q-E02 merkez iptalinde aşamadan bağımsız tam hak/para sonucu; Q-E03 katılımcı iptalinde planlanan başlangıç sınırı uygulanır. Oransal yeni iade kuralı türetilmez.
 
 ## Q-E02 — 16 Ekim 2026 son kabul (önceki çelişen hükümlerin yerine)
 
@@ -272,7 +274,7 @@ event_register başarı verisi outcome üzerinden ayrılır: registered kesin ka
 
 **E02-04.** Önceki alacak/iade/mahsup/hak dönüşü tekrar üretilmez. Yalnız iptal edilen etkinliğe bağlı kayıtlar; başka borç/geçmiş değişmez. Önizleme+apply sürüm/finans bağımlılıkları, canlı yetki ve tek transaction audit/outbox/receipt ile korunur.
 
-**E02-05.** Fiilî başlangıç/kısmi gerçekleşme ayrı alan veya durum olarak tanımlı değildir; saat geçmesi tek başına gerçekleşme değildir. Bu tanım karar konusu olarak açık. Merkez iptalinin aşamadan bağımsız sonucu bu tanıma ihtiyaç duymaz; mevcut occurred/attendance evidence korunur.
+**E02-05.** Etkinlik fiilî başlangıç kaydı/düzeltmesi güncel runtime’da vardır; saat geçmesi tek başına gerçekleşme değildir. Ders anlaşmasının başlangıçta sabitlenmesi DS teknik teslimidir. Merkez iptalinin aşamadan bağımsız sonucu bu tanıma ihtiyaç duymaz; mevcut occurred/attendance evidence korunur.
 
 Teknik aktarım ve test durumu: docs/decisions/Q-E02.md ve reports/qe02-verification.json. Tarihsel test sayıları bu değişikliğin kanıtı değildir.
 
@@ -283,6 +285,25 @@ Teknik aktarım ve test durumu: docs/decisions/Q-E02.md ve reports/qe02-verifica
 
 ## Program/seans teknik aktarımı — 17 Ekim 2026
 
-Yeni ürün kuralı eklemeden mevcut program/saat/kaynak/kapasite/görev kuralları sonlu materialize edilmiş oluşumlara aktarılır. Ayrıntılı DTO, bağımlılık, miras/override ve hata davranışı [program/seans devrindedir](../docs/program-session-handover.md). Yerel tarihler [başlangıç,bitiş), DST çift saatinde açık date/offset_minutes; gap reddi. this_and_future aynı programın gelecekteki planned/open oluşumlarını kapsar; geçmiş/sonuçlanmış korunur. Mevcut rezervasyon/hak kimliği kapasite indirimiyle iptal edilmez; saat değişikliği mevcut sabit hakkı geçersiz kılıyorsa transaction reddedilir. Eğitmen görevi açık geçerli anlaşma gerektirir, ücret modeli türetilmez.
+Yeni ürün kuralı eklemeden mevcut program/saat/kaynak/kapasite/görev kuralları sonlu materialize edilmiş oluşumlara aktarılır. Ayrıntılı DTO, bağımlılık, miras/override ve hata davranışı [program/seans devrindedir](../docs/program-session-handover.md). Yerel tarihler [başlangıç,bitiş), DST çift saatinde açık date/offset_minutes; gap reddi. this_and_future aynı programın gelecekteki planned/open oluşumlarını kapsar; geçmiş/sonuçlanmış korunur. Mevcut rezervasyon/hak kimliği kapasite indirimiyle iptal edilmez; saat değişikliği mevcut sabit hakkı geçersiz kılıyorsa transaction reddedilir. DS hedefinde Starter kapanışı F20/anlaşma istemez ve hakediş üretmez; Pro/Business ücretli görev için açık anlaşma gerekir. Runtime uyarlaması ayrı teslimdir.
 
 Sınıf atama güncellemesi hedef atama satır sürümünü, seans kapasite/görev güncellemesi seans sürümünü ister. Inactive açık görev kaldırmasıdır; sınıf varsayılanı açık oluşum override'ını geri getirmez. Önizleme dependency değişimi PREVIEW_STALE, komut sürüm yarışı VERSION_CONFLICT, kaynak/uygunluk çakışması RESOURCE_CONFLICT, eksik yapılandırma POLICY_NOT_CONFIGURED üretir. Yetki geri alınması receipt replay öncesinde denetlenir. İptal/yerine seans/bekleme/yoklama/paket seçimi bu aktarımın kapsamı değildir.
+
+
+## DS-2026-10-17 durum ve izin aktarımı
+
+Starter F14 kapanış ve hak tüketimi anlaşma gerektirmez, hakediş üretmez. F20 yalnız Pro/Business ücretli hakediş yoludur. Kesin rezervasyon koruması açık etki onayı ve mevcut yükümlülükle sürer; sonraki politika/limit/hak değişimi tek başına blocked/iptal üretmez, bağımsız engelleri kaldırmaz.
+
+
+
+## Son hesaplaşma revizyonu — DS-2026-10-17
+
+[Yetki ve iki taraflı kesinleştirme kararı](../docs/decisions/DS-2026-10-17-settlement-revision.md) geçerlidir. Owner → OM devretme izni → belirli merkez CM hesaplaşma grantı zinciri uygulanacak hedeftir; Owner CM'ye doğrudan da grant verebilir. OM/CM rolü ve Owner'ın grant yönetimi tek başına merkez finansal operasyon yetkisi değildir. CM yetki devredemez.
+
+A'nın açık yetkili CM'si gerçekleşen ödeme veya önerilen mahsup başvurusu açar; bakiye değişmez. B merkezinde ayrı doğrulanmış güncel CM rolü ve açık hesaplaşma yetkisi olan kişi (başlatanla aynı hesap olabilir) onayı kayıt, seçili bakiye, request, audit/outbox/receipt'i atomik kesinleştirir. Gerekçeli ret bakiye değiştirmez, A'ya uygulama içi gider. Ayrı OM ödeme/mahsup kayıt aşaması yoktur; onay banka transferi değildir. Kısmi, aynı para birimli karşılıklı mahsup ve geçmişi koruyan bağlı düzeltme aynı başvuru/onay zincirindedir. İlgili sürüm değişimi yeni onay ister, alakasız dersler stale yapmaz. Farklı kişi/hesap veya kendi başvurusunu onaylama yasağı yoktur. A’da başvuru ve dondurulmuş B merkezinde onay yetkisi ayrı aranır; istemci center seçimi yetki değildir. Audit her adımın hesap/merkez/CM rol/grant kapsamını kaydeder. Aynı hesap kullanımı çift kapama/sürüm/yarış korumasını aşmaz; receipt replay ve commit dahil canlı yetki aranır.
+
+DS-OPEN-01 karar düzeyinde kapalıdır; runtime pending. [Son merkez yetki düzeltmesi](../docs/decisions/DS-2026-10-17-settlement-center-scope.md) farklı hesap şartını kaldırır; DS-OPEN-02 karar düzeyinde kapalıdır, ayrı istisna/fallback yolu yoktur. Yeni idari grant/read/version/audit scope DTO’ları ve 38 gerçek kabul senaryosu 08’de yalnız sözleşmedir. Main koruması ayrı yönetici işidir. Bu görevde PR #13 main merge yetkisi verilmiştir; production dağıtım yetkisi verilmemiştir.
+
+SettlementRequestState: pending → approved/rejected/withdrawn. approved = B tarafından record + seçili bakiye etkileri aynı transaction içinde kesinleşmiş; ayrı kayıt bekleyen approved aşaması yok. Onaylı kaydın revizyonu yeni bağlı pending başvuru ve yeniden onaydır; eski kayıt silinmez. Gerekçeli ret bakiye/kayıt üretmez. payment/offset/correction kapalı DTO birleşimidir. OM fallback alanı ve settlement.record izni kaldırıldı.
+
+settlement.delegation.manage Owner'a özgü; settlement.authority.manage Owner veya canlı delege OM'ye özgüdür. settlement.authority.inspect yalnız dar idari grant projeksiyonudur. settlement.read/request/decide aktif CM + açık canlı merkez grantı ister. Yetki setleri org settlement-authority aggregate sürümünü kullanır. B onayında record/balance/request/audit/outbox/receipt ve yetki setinde grant/version/audit/outbox/receipt atomiktir. DTO/guard varlığı çalışan uygulama kanıtı değildir.
