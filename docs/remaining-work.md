@@ -1,5 +1,8 @@
 # Kalan backend işleri
 
+Güncel geliştirme kapsamı: **69 çağrılabilir / 115 yalnız sözleşme**, 23 migration. [Uygunluk/politika devri](claude-handover.md) tüketici bağımlılıklarını ve açık sınırları belirtir. Yeni SHA kabulü bağımsız CI ile doğrulanır. Aşağıdaki PR #8 başlangıcı tarihsel kanıttır.
+
+
 ## Doğrulanmış başlangıç — 17 Ekim 2026
 
 Kaynak main `b9bd9c110f0cf4a121eac6ef0752945de99b10ac`; [PR #8](https://github.com/SXQHex/FtkSaaS/pull/8) birleşmiş; [aynı SHA’nın main CI’ı](https://github.com/SXQHex/FtkSaaS/actions/runs/38993548576) başarılı. 22 migration, 181 test (12 sözleşme + 27 DB + 142 Auth/API); 184 operasyonun 65’i çalışan geliştirme uygulaması, 119’u yalnız sözleşme. Bu kanıt belirtilen kaynak içindir; sonraki commit’in CI sonucu ayrıca doğrulanır.
@@ -8,7 +11,7 @@ Uzak geliştirme/test Auth → Edge → RPC smoke [ayrı rapordadır](../reports
 
 ## Bağımlılık sırası
 
-1. Merkez uygunluk/istisna yapılandırması ve politika yayınlama/okuma. Oda kaydı/güncelleme ve rol listeleme tamamlandı; yeniden açık sayılmaz.
+1. Uygunluk/politika dört API uygulandı; tüketici sınırları ve eksik iş akışları Claude devrindeki güncel bölümde açıkça ayrılır. Son PR SHA kabulü CI ile ayrıca doğrulanır.
 2. Takvim/seans/rezervasyon okumaları, program önizleme/uygulama ve talep–bekleme–yer teklifi yaşam döngüleri.
 3. Ders yoklaması, kapanış/düzeltme, blocked katılım ve eğitmen anlaşması/hakediş.
 4. Paket dondurma/uzatma/değişim/yenileme/sonlandırma ve finans düzeltme/iade önizleme–uygulama çiftleri.
@@ -17,11 +20,11 @@ Uzak geliştirme/test Auth → Edge → RPC smoke [ayrı rapordadır](../reports
 
 Her yeni grup: sözleşme/izin incelemesi → yeni migration → gerçek Auth/API kabulü (sınır, yetki, tekrar, yarış, rollback) → inceleme → temiz CI → main CI. Ürün kararında boşluk varsa teknik varsayımla yeni kural eklenmez.
 
-## Yalnız sözleşme envanteri
+## Yalnız sözleşme envanteri — güncel 115 işlem
 
 | Modül | Kalan işlem |
 |---|---:|
-| M01 | 10 |
+| M01 | 6 |
 | M02 | 7 |
 | M03 | 2 |
 | M04 | 22 |
@@ -48,10 +51,6 @@ Her yeni grup: sözleşme/izin incelemesi → yeni migration → gerçek Auth/AP
 | `organization_reopen_v1` | `org.owner` |
 | `organization_delete_preview_v1` | `org.owner` |
 | `organization_delete_apply_v1` | `org.owner` |
-| `availability_save_v1` | `center.manage` |
-| `availability_exception_save_v1` | `center.manage` |
-| `policies_get_v1` | `org.read` |
-| `policy_publish_v1` | `policy.manage` |
 | `account_access_revoke_v1` | `invite.student` |
 | `account_link_remove_v1` | `center.manage` |
 | `person_merge_preview_v1` | `person.merge` |

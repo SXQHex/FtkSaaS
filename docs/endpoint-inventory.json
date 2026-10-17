@@ -224,8 +224,8 @@
     },
     {
       "name": "availability_save_v1",
-      "status": "contract_only",
-      "external_path": null,
+      "status": "operational_development_limited",
+      "external_path": "/functions/v1/backend-v1/availability_save_v1",
       "permission": "center.manage",
       "features": [
         "F02"
@@ -235,8 +235,8 @@
     },
     {
       "name": "availability_exception_save_v1",
-      "status": "contract_only",
-      "external_path": null,
+      "status": "operational_development_limited",
+      "external_path": "/functions/v1/backend-v1/availability_exception_save_v1",
       "permission": "center.manage",
       "features": [
         "F02"
@@ -246,8 +246,8 @@
     },
     {
       "name": "policies_get_v1",
-      "status": "contract_only",
-      "external_path": null,
+      "status": "operational_development_limited",
+      "external_path": "/functions/v1/backend-v1/policies_get_v1",
       "permission": "org.read",
       "features": [
         "F03"
@@ -257,8 +257,8 @@
     },
     {
       "name": "policy_publish_v1",
-      "status": "contract_only",
-      "external_path": null,
+      "status": "operational_development_limited",
+      "external_path": "/functions/v1/backend-v1/policy_publish_v1",
       "permission": "policy.manage",
       "features": [
         "F03"

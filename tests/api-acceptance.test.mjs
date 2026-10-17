@@ -33,6 +33,7 @@ test('Real Auth → Edge UUID producer → named RPC → PostgreSQL acceptance',
  discipline=(await must(owner,'discipline_save_v1',{org_id:org,name:'Salsa',state:'active'},key())).primary_id;
  await mutate(owner,'center_discipline_set_v1',{discipline_id:discipline,state:'active'});
  await db.query("insert into core.policy_versions(id,org_id,scope_center_id,key,effective_at,mandatory,value) values($1,$2,$3,'student_cancel_group',now(),false,$4)",[key(),org,center,{kind:'cancellation',cutoff_minutes:0,before_cutoff:'release',after_cutoff:'release',no_show:'consume'}]);
+ await must(owner,'policy_publish_v1',{org_id:org,key:'reservation_window',value:{kind:'window',opens_minutes_before:10080,closes_minutes_before:0,manager_exception:false},effective_at:new Date(Date.now()-1000).toISOString(),mandatory:false},key());
  await persist();
  await t.test('tenant isolation through API; request cannot impersonate an actor or platform role',async()=>{
   await error(stranger,'organization_get_v1',{org_id:org},'NOT_FOUND',undefined);
