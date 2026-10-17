@@ -16,10 +16,10 @@ npm run dev:info
 npm test
 ```
 
-`npm run test:clean` yalnız checkout'a ait loopback test DB'sini sıfırlar, 21 migration'ı temiz kurar ve test/seed/sağlık/advisors kontrollerini çalıştırır. Oda/rol uygulaması [PR #7](https://github.com/SXQHex/FtkSaaS/pull/7) ile main’e birleşti. Son uygulama head’i `1c84730`: 181/181 test (12 sözleşme + 27 DB + 142 gerçek Auth/API), seed/sağlık/advisors başarılı. Kanıt [oda/rol raporunda](reports/room-role-verification.json); kalan 119 işlem [açık iş envanterindedir](docs/remaining-work.md). Merge sonrası main CI ayrıca doğrulanır.
+`npm run test:clean` yalnız checkout'a ait loopback test DB'sini sıfırlar, 22 migration'ı temiz kurar ve test/seed/sağlık/advisors kontrollerini çalıştırır. Oda/rol uygulaması [PR #7](https://github.com/SXQHex/FtkSaaS/pull/7) ile main’e birleşti. Son uygulama head’i `1c84730`: 181/181 test (12 sözleşme + 27 DB + 142 gerçek Auth/API), seed/sağlık/advisors başarılı. Kanıt [oda/rol raporunda](reports/room-role-verification.json); kalan 119 işlem [açık iş envanterindedir](docs/remaining-work.md). Merge sonrası main CI ayrıca doğrulanır.
 
 Her yeni head için [GitHub Actions](https://github.com/SXQHex/FtkSaaS/actions) sonucu ayrıca doğrulanır. [Fiilî başlangıç kanıt kapsamı](reports/actual-start-verification.json) ve [Q-E03 kanıt kapsamı](reports/qe03-verification.json) raporların hangi doğrulamayı temsil ettiğini belirtir. Q-E01/Q-E02 ve önceki RC3 raporları tarihsel snapshot'tır; son head'in CI sonucunun yerine geçmez.
 
 Q-E03 parasal sınırı planlanan başlangıçtır; fiilî başlangıç kaydı bunu yeniden hesaplatmaz. Q-E02 merkez iptali tam borç/alacak/hak hesabını korur. Fiilî başlangıç kayıt/düzeltme API'si artık mevcuttur ve append-only audit geçmişini kullanır.
 
-Production dağıtımı yapılmadı. `vercel.json` main otomatik dağıtımını kapalı tutar. Kalıcı ortak staging, dış e-posta, yük/restore ve frontend gerçek entegrasyon kabulü ayrı açık işlerdir.
+Production dağıtımı yapılmadı. `vercel.json` main otomatik dağıtımını kapalı tutar. Kalıcı geliştirme/test backend’i `gwyprhenabtpkbojephw` üzerine kuruldu; bağlantı smoke kapsamı [uzak kurulum belgesinde](docs/remote-backend-setup.md). Dış e-posta, yük/restore ve frontend gerçek entegrasyon kabulü ayrı açık işlerdir.

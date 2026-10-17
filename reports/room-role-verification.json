@@ -35,7 +35,7 @@
     "pr": 7,
     "main_commit": "4d47d75e4a337378cfcc65f727c67abcac310303",
     "main_ci_run": 38991612240,
-    "main_ci_status": "pending_at_report_write"
+    "main_ci_status": "passed"
   },
   "limits": [
     "Stored role assignments only; ownership remains the organization owner pointer.",

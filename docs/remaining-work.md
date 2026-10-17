@@ -156,7 +156,7 @@ Her yeni grup: sözleşme/izin incelemesi → yeni migration → gerçek Auth/AP
 
 ## Operasyonel kabul işleri
 
-- Kalıcı ortak test backend’i ve frontend’in gerçek bağlantı kabulü.
+- Ortak test backend’i kuruldu; frontend’in gerçek bağlantı/iş akışı kabulü açık.
 - Dış e-posta sağlayıcısı/teslimi (yerel Mailpit kabulü vardır).
 - Yük, yedek ve geri yükleme doğrulaması.
 - Production hazırlığı ve ayrı dağıtım yetkisi. Main merge production izni değildir.

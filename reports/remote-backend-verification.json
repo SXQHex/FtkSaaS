@@ -1,0 +1,62 @@
+{
+  "project_ref": "gwyprhenabtpkbojephw",
+  "environment": "user_confirmed_development_test",
+  "application_source_commit": "4d47d75e4a337378cfcc65f727c67abcac310303",
+  "application_main_ci": {
+    "run": 38991612240,
+    "status": "success"
+  },
+  "migrations": {
+    "application": 21,
+    "configuration": 1,
+    "total": 22,
+    "versions_match_repository": true,
+    "note": "MCP-generated deployment timestamps were aligned to exact source versions after successful ordered application; SQL bodies unchanged."
+  },
+  "edge": {
+    "name": "backend-v1",
+    "version": 1,
+    "verify_jwt": true,
+    "source_sha256": "abe1b2e9c3e0094c9fe6a72c2fcb2d65c4e1b9e9057f6cbc8a96e4a7ca232e50"
+  },
+  "database": {
+    "core_tables": 90,
+    "core_tables_without_rls": 0,
+    "api_wrappers": 65,
+    "service_role_executable": 65,
+    "anon_executable": 0,
+    "authenticated_executable": 0,
+    "exposed_schema": "api_v1"
+  },
+  "remote_smoke": {
+    "real_auth_login": "passed",
+    "edge_account_get": "passed",
+    "edge_organizations_list": "passed",
+    "invalid_token_rejected": 401,
+    "direct_authenticated_rpc_rejected": 403,
+    "direct_error_code": "42501",
+    "revoked_session_with_old_jwt": "AUTH_REQUIRED"
+  },
+  "fixture_cleanup": {
+    "auth_users": 0,
+    "accounts": 0,
+    "organizations": 0
+  },
+  "advisors": {
+    "security_warnings": [
+      "Platform public.rls_auto_enable() EXECUTE inherited by anon/authenticated; public is excluded by the authenticator API schema setting.",
+      "Leaked password protection disabled in Auth."
+    ],
+    "errors": 0,
+    "notes": [
+      "95 RLS-enabled tables without direct-user policies: service-only RPC design.",
+      "7 unindexed FK and 286 unused-index INFO findings; no load acceptance claimed."
+    ]
+  },
+  "limits": [
+    "Remote smoke does not repeat the full 181-test local/CI suite.",
+    "No shared tenant/user login provisioned; temporary smoke fixture was deleted.",
+    "Frontend integration, external email, load/backup/restore remain open.",
+    "Production deployment not authorized or performed."
+  ]
+}

@@ -8,7 +8,8 @@ Oda/rol uygulaması [PR #7](https://github.com/SXQHex/FtkSaaS/pull/7) ile main�
 
 ## Kullanıcının bildirdiği kalıcı backend hedefi
 
-Supabase `gwyprhenabtpkbojephw` (FtkSaaS, eu-central-1) sağlıklı. Bu devirde uzaktan denetlenen migration listesi, core/private/api_v1 şemaları ve Edge Function listesi boştu. Bu nedenle yerel/CI kabulü bu hedefe kurulmuş backend anlamına gelmez. Kullanıcı hedefi geliştirme/test olarak doğruladı; kurulum bu kapsamda yürütülür. Production dağıtımı yasağı sürer. Kalıcı bağlantı, Auth/API kabulü, dış e-posta ve yük/restore açıktır.
+Supabase `gwyprhenabtpkbojephw` (FtkSaaS, eu-central-1) kullanıcı tarafından geliştirme/test olarak doğrulandı. 21 uygulama migration’ı kuruldu; 22. migration hosted PostgREST’i yerel `api_v1` şema ayarıyla eşleştirir. `core/private` dışarı açılmaz; 65 wrapper yalnız service_role içindir. `backend-v1` Edge Function, doğrulanan main bundle’ından JWT kontrolü açık olarak kuruldu. 90 core tabloda RLS açık; anon/authenticated EXECUTE sıfır. Gerçek Auth → Edge → RPC smoke sonuçları `reports/remote-backend-verification.json` içindedir. Bu smoke 181 testlik yerel/CI kabulünün uzaktan tekrarı değildir; frontend, dış e-posta ve yük/restore kabulü açıktır. Production dağıtımı yasağı sürer. Ayrıntı: `docs/remote-backend-setup.md`.
+
 
 ## Kurulum ve gerçek bağlantı
 
@@ -26,7 +27,7 @@ npm test
 
 `dev:info` her checkout için gerçek loopback API/functions adresi, publishable key ve Mailpit bağlantısını üretir. Süreli eski Box URL'leri veya sabit ortak staging varsayılmaz. Servis anahtarı/secrets frontend'e veya repository'ye konmaz. Geliştirme sentetik veri kullanır; dış e-posta teslimi tamamlanmış değildir. Yerel davet teslimi için `scripts/deliver-dev-invitations.mjs` ve Mailpit kullanılır.
 
-`npm run test:clean` yalnız checkout'ın loopback DB'sini sıfırlar; 21 migration ve boş tenant/Auth/receipt durumu doğrulanır, ardından testler, sentetik seed, sağlık ve DB advisors çalışır. `npm run dev:stop` ortamı durdurur. Özel bağlantı ve reset logları paylaşılmaz.
+`npm run test:clean` yalnız checkout'ın loopback DB'sini sıfırlar; 22 migration ve boş tenant/Auth/receipt durumu doğrulanır, ardından testler, sentetik seed, sağlık ve DB advisors çalışır. `npm run dev:stop` ortamı durdurur. Özel bağlantı ve reset logları paylaşılmaz.
 
 ## Kanıt ve kapsam
 
