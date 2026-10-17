@@ -4,7 +4,7 @@ Başlangıç: [kaynak indeksi](docs/source-index.md) ve [ajan çalışma kuralla
 
 Kalıcı kaynak: https://github.com/SXQHex/FtkSaaS — `main`. Fiilî başlangıç uygulaması: [PR #4](https://github.com/SXQHex/FtkSaaS/pull/4). Frontend tasarımı bu repository görevinin kapsamında değiştirilmedi.
 
-184 operasyon sözleşmesinin 69'u geliştirme ortamında çağrılabilir; 115'i yalnız sözleşmedir. Güncel liste: [endpoint envanteri](docs/endpoint-inventory.json). Entegrasyon: [Claude devri](docs/claude-handover.md) ve [fiilî başlangıç API'si](docs/actual-start-handover.md).
+184 operasyon sözleşmesinin 72'si geliştirme ortamında çağrılabilir; 112'si yalnız sözleşmedir. Güncel liste: [endpoint envanteri](docs/endpoint-inventory.json). Entegrasyon: [Claude devri](docs/claude-handover.md) ve [fiilî başlangıç API'si](docs/actual-start-handover.md).
 
 Node 24.19.0 kullanın:
 

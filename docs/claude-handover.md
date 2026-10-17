@@ -1,3 +1,9 @@
+# Takvim/seans/rezervasyon okumaları — geliştirme uygulaması
+
+72 çağrılabilir / 112 yalnız sözleşme; 24 migration. `calendar_get_v1`, `session_get_v1`, `reservation_list_v1` kapsamı, canlı görünürlük, UTC aralık, cursor ve entegrasyon sınırları [okuma devrinde](schedule-read-handover.md). `products_list_v1` ürün kataloğudur; uygun satın alınmış paket seçimi için seans/kişi/sale bağlamı ayrıca aktarılmalıdır ve bu teslimin dışında kalır. Son head temiz CI ayrıca doğrulanır. Aşağıdaki uygunluk/politika uygulama sayıları kendi kaynak snapshot'ıdır.
+
+---
+
 ## Uygunluk ve politikalar — geliştirme uygulaması
 
 Bu PR dört işlemi ekler: `availability_save_v1`, `availability_exception_save_v1`, `policies_get_v1`, `policy_publish_v1`. Toplam 184 işlemin 69'u geliştirme ortamında çağrılabilir, 115'i yalnız sözleşmedir; 23 append-only migration vardır. Kabul sonucu bu PR'nin son SHA'sının CI'ından ayrıca okunur. [Kaynak kapsam raporu](../reports/availability-policy-verification.json): a031f8142da4a2959232644c88fc911278ac5d06 üzerinde 12 sözleşme + 27 DB + 27 odaklı Auth/API testi, temiz 23 migration ve advisor kontrolü geçti; tam temiz PR/main CI ile aynı kanıt değildir.

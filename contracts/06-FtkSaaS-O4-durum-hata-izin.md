@@ -275,3 +275,7 @@ event_register başarı verisi outcome üzerinden ayrılır: registered kesin ka
 **E02-05.** Fiilî başlangıç/kısmi gerçekleşme ayrı alan veya durum olarak tanımlı değildir; saat geçmesi tek başına gerçekleşme değildir. Bu tanım karar konusu olarak açık. Merkez iptalinin aşamadan bağımsız sonucu bu tanıma ihtiyaç duymaz; mevcut occurred/attendance evidence korunur.
 
 Teknik aktarım ve test durumu: docs/decisions/Q-E02.md ve reports/qe02-verification.json. Tarihsel test sayıları bu değişikliğin kanıtı değildir.
+
+## Takvim/seans/rezervasyon okuma aktarımı
+
+`schedule.read` satırı yeni genel merkez yetkisi değildir. Üç okuma için öğrenci self kayıtları, canlı seans/sınıf görevi + I/A login rolü, CM veya açık reservation.write/attendance.draft personel grantı ve organizasyon okuyucusu kapsamı satır bazında uygulanır. Aktif hesap bağı, plan/merkez/abonelik ve Auth oturumu her sayfada denetlenir. Yönetim dışındaki seans görevlerinde agreement_id gösterilmez. Zaman/cursor/alan ayrıntıları: [okuma devri](../docs/schedule-read-handover.md). Ürün/uygun satış seçimi bu aktarımda kapatılmadı.

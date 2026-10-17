@@ -1,5 +1,7 @@
 # FtkSaaS — güncel başlangıç
 
+Takvim/seans/rezervasyon okuma geliştirme kapsamı: **72/112**, 24 migration. [Okuma devri](../docs/schedule-read-handover.md); ürün kataloğu/uygun hak seçimi ayrı açık iştir. Son head CI ayrıca doğrulanır. Aşağıdaki 69/115 ve PR #8 sayıları tarihsel snapshot'tır.
+
 Uygunluk/politika geliştirme kapsamı: **69/115**, 23 migration. [Güncel entegrasyon devri](../docs/claude-handover.md) bu dört işlemin sürüm/yetki/tüketici sınırlarını ve açık bağımlılıkları tanımlar. Bu yeni kaynak kabulü son PR/main SHA CI sonucundan ayrıca doğrulanır. Aşağıdaki PR #8 kanıtı tarihsel başlangıçtır.
 
 Önce [kaynak indeksi](../docs/source-index.md), [AGENTS](../AGENTS.md), [kalan işler](../docs/remaining-work.md) ve [entegrasyon devrini](../docs/claude-handover.md) okuyun.
