@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import Ajv from 'ajv/dist/2020.js';
 import addFormats from 'ajv-formats';
-import {validateGovernance,validateAppliedGates,validateProductMatrix} from '../scripts/governance.mjs';
+import {validateGovernance,validateAppliedGates,validateProductMatrix,validateSettlementLivingDocs} from '../scripts/governance.mjs';
 import {newUuidV7} from '../scripts/uuid.mjs';
 
 const original=JSON.parse(fs.readFileSync('contracts/08-FtkSaaS-tip-ve-operasyon-sozlesmesi.json'));
@@ -229,4 +229,16 @@ test('typed settlement projection permits equal accounts with separate server-de
  const q={client_api_version:1,request_id:id,org_id:id,operation_key:id,settlement_request_id:id,expected_version:1,decision:'approve',reason:'B received'};
  assert(valid('Request_settlement_request_decide',q));
  assert(!valid('Request_settlement_request_decide',{...q,decision_authority:r.decision_authority}));
+});
+
+test('living settlement product/technical/permission clauses cannot reopen the closed decision or retain a stale case count',()=>{
+ const paths=['contracts/01-FtkSaaS-urun-kapsam-sozlesmesi.md','contracts/02-FtkSaaS-teknik-sozlesme.md','contracts/06-FtkSaaS-O4-durum-hata-izin.md'];
+ const sources=Object.fromEntries(paths.map(path=>[path,fs.readFileSync(path,'utf8')]));
+ assert.equal(validateSettlementLivingDocs(original,sources),3);
+ for(const path of paths){
+  const changed={...sources,[path]:sources[path].replace('DS-OPEN-02 karar düzeyinde kapalıdır','DS-OPEN-02 istisna çelişkisi açık')};
+  assert.throws(()=>validateSettlementLivingDocs(original,changed),/LIVING_CENTER_SCOPE_CLOSURE/);
+  const stale={...sources,[path]:sources[path].replace('38 gerçek kabul senaryosu','34 gerçek kabul senaryosu')};
+  assert.throws(()=>validateSettlementLivingDocs(original,stale),/LIVING_ACCEPTANCE_COUNT/);
+ }
 });

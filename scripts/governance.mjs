@@ -213,6 +213,19 @@ export function validateProductMatrix(p,source=fs.readFileSync('contracts/01-Ftk
  }
  return rows.length;
 }
+export function validateSettlementLivingDocs(p,sources){
+ const paths=['contracts/01-FtkSaaS-urun-kapsam-sozlesmesi.md','contracts/02-FtkSaaS-teknik-sozlesme.md','contracts/06-FtkSaaS-O4-durum-hata-izin.md'];
+ for(const path of paths){
+  const source=sources?.[path]??fs.readFileSync(path,'utf8');
+  const start=source.lastIndexOf('## Son hesaplaşma revizyonu');
+  assert(start>=0,'LIVING_SETTLEMENT_SECTION '+path);
+  const current=source.slice(start);
+  assert(/DS-OPEN-02[^.\\n]*karar düzeyinde kapalı/.test(current),'LIVING_CENTER_SCOPE_CLOSURE '+path);
+  assert(current.includes(p['x-contract'].decision_sprint.acceptance_cases.length+' gerçek kabul senaryosu'),'LIVING_ACCEPTANCE_COUNT '+path);
+  assert(!/Self-approval ve çift kapama yasaktır|Farklı açık yetkili B CM/.test(current),'LIVING_RETIRED_ACCOUNT_RULE '+path);
+ }
+ return paths.length;
+}
 export function validateAppliedGates(p,live,sql=fs.readdirSync('supabase/migrations').sort().map(n=>fs.readFileSync('supabase/migrations/'+n,'utf8')).join('\n')){
  const actual=new Map();
  const rx=/insert into private\.runtime_operations\(name,permission,billing_class,features\) values\('([^']+)','([^']+)','([^']+)',array\[([^\]]*)\]::text\[\]\)/g;
@@ -232,5 +245,6 @@ if(process.argv[1]?.endsWith('/governance.mjs')){
  const result=validateGovernance(p,live);
  validateAppliedGates(p,live);
  validateProductMatrix(p);
+ validateSettlementLivingDocs(p);
  console.log(JSON.stringify({...result,applied_runtime_gates_verified:live.length}));
 }
