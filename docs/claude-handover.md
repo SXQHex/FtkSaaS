@@ -1,6 +1,6 @@
 # Takvim/seans/rezervasyon okumaları — geliştirme uygulaması
 
-72 çağrılabilir / 112 yalnız sözleşme; 24 migration. `calendar_get_v1`, `session_get_v1`, `reservation_list_v1` kapsamı, canlı görünürlük, UTC aralık, cursor ve entegrasyon sınırları [okuma devrinde](schedule-read-handover.md). `products_list_v1` ürün kataloğudur; uygun satın alınmış paket seçimi için seans/kişi/sale bağlamı ayrıca aktarılmalıdır ve bu teslimin dışında kalır. Son head temiz CI ayrıca doğrulanır. Aşağıdaki uygunluk/politika uygulama sayıları kendi kaynak snapshot'ıdır.
+72 çağrılabilir / 112 yalnız sözleşme; 24 migration. `calendar_get_v1`, `session_get_v1`, `reservation_list_v1` kapsamı, canlı görünürlük, UTC aralık, cursor ve entegrasyon sınırları [okuma devrinde](schedule-read-handover.md). `products_list_v1` ürün kataloğudur; uygun satın alınmış paket seçimi için seans/kişi/sale bağlamı ayrıca aktarılmalıdır ve bu teslimin dışında kalır. Kaynak `9a5b2bd7ba71d25a259bf96851c2829bc4782c7c` üzerinde tam `npm run test:clean` geçti: 12 sözleşme + 27 DB + 182 Auth/API = 221 test, 24 migration, seed/health/advisors başarılı. [Kaynak raporu](../reports/schedule-read-verification.json). Son head temiz CI ayrıca doğrulanır. Aşağıdaki uygunluk/politika uygulama sayıları kendi kaynak snapshot'ıdır.
 
 ---
 

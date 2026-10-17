@@ -1,0 +1,62 @@
+{
+  "source_commit": "9a5b2bd7ba71d25a259bf96851c2829bc4782c7c",
+  "source_tree": "9e896bd43000c0161419e8cd7390c78cb48df8f5",
+  "base_commit": "a681f9c37858bd0fdb64a2d24785096adfd35d8e",
+  "base_ci": "https://github.com/SXQHex/FtkSaaS/actions/runs/39001670914",
+  "evidence_kind": "Developer-run full npm run test:clean in isolated Supabase native stack; final PR head independent CI is checked separately.",
+  "scope": {
+    "implemented_operations": [
+      "calendar_get_v1",
+      "session_get_v1",
+      "reservation_list_v1"
+    ],
+    "deferred_operation": "products_list_v1",
+    "callable_operations": 72,
+    "contract_only_operations": 112,
+    "migrations_cleanly_applied": 24,
+    "contract_tests": 12,
+    "database_tests": 27,
+    "auth_edge_rpc_tests": 182,
+    "schedule_read_group_tests_including_parent": 21,
+    "total_tests": 221,
+    "failed_tests": 0,
+    "synthetic_seed": "passed",
+    "auth_and_rest_health": "passed",
+    "database_advisors": "No issues found"
+  },
+  "checks": [
+    "Live verified Auth/account/link/role/permission, tenant and active/plan-accessible center boundaries",
+    "Self active/cancelled history, no other student roster; history retained after student deactivation",
+    "Current instructor/assistant login role plus active session/class duty; no unrelated program",
+    "CM and explicitly granted staff limited to current authorized center; owner organization reads do not grant center operations",
+    "Resource/person/session/center/interval filters intersect before pagination",
+    "Stable tied ordering, all supported sorts, limits, operation/actor/scope/filter/sort-bound cursors",
+    "Half-open UTC overlap, Istanbul midnight crossing, equivalent offsets and Berlin DST fold; missing offset rejected",
+    "Same JWT and saved cursor after staff permission, role, duty and account-link revocation",
+    "Concurrent role revoke/read followed by mandatory denial on subsequent reads",
+    "Current feature/subscription/provider-session gates and direct authenticated RPC denial",
+    "Current session_create command -> same-version session_get and calendar projection",
+    "Session assignments mask agreement IDs for non-management readers; calendar excludes participant/finance/audit fields",
+    "Unified event calendar projection and F29 feature gate",
+    "No financial, entitlement, audit, receipt or outbox writes from reads",
+    "Frozen prior migration checksums, source generation, types, endpoint/remaining-work/runtime consistency and self-review"
+  ],
+  "product_read_dependency": "products_list_v1 has only org/center/page input and catalog ProductTerms output. It cannot represent per-person, target-session, purchased-sale eligibility. Reservation source is sale_id. Catalog read and eligible purchased rights selection remain separate pending contract/DTO integration; no product or entitlement-selection acceptance claimed.",
+  "not_evidence_for": [
+    "Final PR head or merge CI before it runs",
+    "Hosted Supabase deployment or smoke of these 72 operations",
+    "Frontend real integration",
+    "Public published-session discovery or unimplemented publication APIs",
+    "Load, backup or restore acceptance",
+    "Unimplemented program/request/waitlist/lesson-attendance write flows",
+    "Frozen cross-page data snapshot; as_of is per-request server transaction time"
+  ],
+  "review": {
+    "kind": "self-review",
+    "result": "No blocking finding after scope, projection, keyset and inventory checks. No independent human/agent review claimed."
+  },
+  "production_deployed": false,
+  "resend_started": false,
+  "local_tested_source_commit": "9687a99a142c3edda1168ecea08b1672779f6251",
+  "source_transfer": "GitHub connector commit has the exact tested local source tree 9e896bd43000c0161419e8cd7390c78cb48df8f5. Only commit metadata differs; final report/handover are a subsequent documentation commit."
+}
