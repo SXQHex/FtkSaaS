@@ -4,10 +4,10 @@
   "base_main_ci": "https://github.com/SXQHex/FtkSaaS/actions/runs/39042108296",
   "source_sha_note": "Report committed with implementation. Final reviewed head and same-SHA clean CI evidence are recorded on the pull request; no unrun CI is claimed here.",
   "source_sha256": {
-    "database/instructor-earnings.sql": "ded036b66ed75d232a3130f3a1cd15b51abdbed7d895e14d812d707be40d04d7",
+    "database/instructor-earnings.sql": "b85e70213891012050fac955864b3985c8420248fd6f234e1b6119ee93daaf0e",
     "database/instructor-earnings-wrappers.sql": "5173eee5f8ab7c17841f12a3a95b974f69ae0d5515b115337fd0a3c3d778777a",
-    "supabase/migrations/20261017150034_instructor_earnings_workflow.sql": "4e5699d258f5eaa72469c75302b8558c77cd3793a13a24884dab6132457a84c3",
-    "tests/instructor-earnings.test.mjs": "57dab47ddb8cb84e5c1c27d0575e5ce4972edc40ad94e345dcf036fd4df08af2"
+    "supabase/migrations/20261017150034_instructor_earnings_workflow.sql": "699a0c962ffbc24a7057acb2e187ed798d47bbf670e924618d24900ce78747b9",
+    "tests/instructor-earnings.test.mjs": "8df2e40098b2e6cd550f12d5851f8da1bed6c0bde4c591312c4e1b1fe4c0954d"
   },
   "inventory": {
     "operations": 199,
@@ -24,7 +24,7 @@
     },
     "focused_runtime": {
       "command": "node --test tests/instructor-earnings.test.mjs",
-      "passed": 20,
+      "passed": 21,
       "failed": 0,
       "path": "real native Supabase Auth -> Edge -> RPC",
       "coverage": [
@@ -35,7 +35,8 @@
         "source-less negative frozen valuation before and after settlement",
         "live role/center boundaries and receipt replay revocation",
         "stale preview, competing requests, audit/outbox late rollback",
-        "linked correction preserving prior payment allocation"
+        "linked correction preserving prior payment allocation",
+        "P1 independent review regression: successor versus independent chains, ancestor lineage exclusion and exact adjacent boundary"
       ]
     }
   },
@@ -51,5 +52,10 @@
     "production",
     "Resend",
     "repository administration"
-  ]
+  ],
+  "review_correction": {
+    "reviewed_head": "d611e44d4a634c2871f6ef4188c5079865a5c1e8",
+    "finding": "https://github.com/SXQHex/FtkSaaS/pull/15#discussion_r4303338542",
+    "fix": "All publications check effective overlap against other chains, excluding only own predecessor lineage; other intervals clipped by their immutable successor."
+  }
 }

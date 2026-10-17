@@ -69,6 +69,23 @@ test('Instructor agreement and earnings through Auth -> Edge -> RPC',async t=>{
   await assert.rejects(db.query("update core.instructor_agreements set model='session_fixed' where id=$1",[first.primary_id]),/INTEGRITY_VIOLATION/);
   await fail('instructor_agreement_publish_v1',agreementRequest(terms([fixed(200)])),'VERSION_CONFLICT');
  });
+ await t.test('successor publication rejects independent-chain overlap and permits exact adjacent boundaries',async()=>{
+  const other=await linked('earning-independent-chains','instructor');
+  const publishChain=(valid,extra={})=>agree(terms([fixed(10)]),{person_id:other.p,valid,...extra});
+  const a=await publishChain({starts_at:'2027-01-01T00:00:00Z',ends_at:'2027-06-01T00:00:00Z'});
+  const b=await publishChain({starts_at:'2027-06-01T00:00:00Z',ends_at:'2027-12-01T00:00:00Z'});
+  const count=Number((await rows('select count(*) n from core.instructor_agreements where person_id=$1',[other.p]))[0].n);
+  await fail('instructor_agreement_publish_v1',agreementRequest(terms([fixed(99)]),{person_id:other.p,supersedes_id:a.primary_id,expected_version:a.version,valid:{starts_at:'2027-03-01T00:00:00Z',ends_at:'2027-09-01T00:00:00Z'}}),'VERSION_CONFLICT');
+  assert.equal(Number((await rows('select count(*) n from core.instructor_agreements where person_id=$1',[other.p]))[0].n),count);
+  const replacement=await publishChain({starts_at:'2027-03-01T00:00:00Z',ends_at:'2027-05-01T00:00:00Z'},{supersedes_id:a.primary_id,expected_version:a.version});
+  const next=await publishChain({starts_at:'2027-04-01T00:00:00Z',ends_at:'2027-06-01T00:00:00Z'},{supersedes_id:replacement.primary_id,expected_version:replacement.version});
+  assert.equal(next.version,3);
+  const view=await must(owner,'instructor_agreements_list_v1',scope({person_id:other.p,page:{}}));
+  assert.equal(view.items.find(x=>x.id===b.primary_id).supersedes_id,null);
+  // Multi-generation replacement still permits an exact independent-chain boundary.
+  const gap=await publishChain({starts_at:'2027-05-01T00:00:00Z',ends_at:'2027-06-01T00:00:00Z'},{supersedes_id:next.primary_id,expected_version:next.version});
+  assert.equal(gap.version,4);
+ });
  let pa,pb,saleA;
  await t.test('package identity override replaces variable conditions; fixed fee occurs once; cash is not required',async()=>{
   pa=await product('credits',{price_minor:'800'});pb=await product('credits',{price_minor:'1001'});

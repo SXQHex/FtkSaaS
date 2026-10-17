@@ -89,7 +89,21 @@ begin
    if prior.version<>(r->>'expected_version')::bigint or exists(select 1 from core.instructor_agreements x where x.org_id=org and x.supersedes_id=prior.id) then perform private.fail('VERSION_CONFLICT');end if;
    if (r#>>'{valid,starts_at}')::timestamptz<=prior.valid_from then perform private.fail('VALIDATION_FAILED');end if;
    ver:=prior.version+1;
-  elsif exists(select 1 from core.instructor_agreements x where x.org_id=org and x.center_id=center and x.person_id=(r->>'person_id')::uuid and x.discipline_id=(r->>'discipline_id')::uuid and x.format=r->>'format' and x.valid_from<(r#>>'{valid,ends_at}')::timestamptz and coalesce(x.valid_until,'infinity')>(r#>>'{valid,starts_at}')::timestamptz) then perform private.fail('VERSION_CONFLICT');end if;
+  end if;
+  -- A replacement may only overlap its own predecessor lineage. Other chains
+  -- occupy their effective interval, clipped at the next immutable successor.
+  if exists(
+   with recursive lineage as (
+    select q.id,q.supersedes_id from core.instructor_agreements q where q.org_id=org and q.id=prior.id
+    union all
+    select q.id,q.supersedes_id from core.instructor_agreements q join lineage l on l.supersedes_id=q.id where q.org_id=org
+   )
+   select 1 from core.instructor_agreements x where x.org_id=org and x.center_id=center and x.person_id=(r->>'person_id')::uuid
+    and x.discipline_id=(r->>'discipline_id')::uuid and x.format=r->>'format' and x.state='active'
+    and not exists(select 1 from lineage l where l.id=x.id)
+    and x.valid_from<(r#>>'{valid,ends_at}')::timestamptz
+    and least(coalesce(x.valid_until,'infinity'),coalesce((select n.valid_from from core.instructor_agreements n where n.org_id=org and n.supersedes_id=x.id),'infinity'))>(r#>>'{valid,starts_at}')::timestamptz
+  ) then perform private.fail('VERSION_CONFLICT');end if;
   insert into core.instructor_agreements(id,org_id,center_id,person_id,discipline_id,format,valid_from,valid_until,model,terms,state,supersedes_id,version,published_at)
    values(primary_id,org,center,(r->>'person_id')::uuid,(r->>'discipline_id')::uuid,r->>'format',(r#>>'{valid,starts_at}')::timestamptz,(r#>>'{valid,ends_at}')::timestamptz,terms->>'model',terms,'active',prior.id,ver,clock_timestamp());
   update core.session_assignments x set agreement_id=primary_id,version=x.version+1 from core.sessions ss
