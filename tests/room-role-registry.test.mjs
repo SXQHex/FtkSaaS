@@ -113,7 +113,7 @@ test('Room configuration and scoped role reads through real Auth/API',async t=>{
  await t.test('reads create no domain mutations and revoked manager cannot reuse cursor',async()=>{
   const count=async()=>JSON.stringify(await rows('select (select count(*) from core.audit_events where org_id=$1) a,(select count(*) from core.operation_receipts where org_id=$1) r,(select count(*) from core.outbox_jobs where org_id=$1) o',[org]));
   const before=await count();const first=await list(manager.u,{page:{limit:1}});assert(first.next_cursor);assert.equal(await count(),before);
-  await mutate('role_revoke_v1',{assignment_id:manager.grant.primary_id,expected_version:1,reason:'synthetic revoke'});
+  await mutate('center_manager_revoke_v1',{person_id:manager.p,expected_version:1,reason:'synthetic revoke'});
   await fail('roles_list_v1',{center_id:null,page:{cursor:first.next_cursor}},'FORBIDDEN',manager.u);
   await fail('room_save_v1',{room_id:room,expected_version:4,name:'denied',capacities:[]},'FORBIDDEN',manager.u);
   assert.equal((await list(owner,{person_id:manager.p})).items[0].state,'inactive');
