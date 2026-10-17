@@ -606,6 +606,39 @@ reason: Text
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "Request_crm_activity_save".
+ */
+export type RequestCrmActivitySave = {
+client_api_version: 1
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+request_id: string
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+org_id: string
+center_id?: (string | null)
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+operation_key: string
+expected_version?: PositiveInt
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+lead_id: string
+kind: CrmActivityKind
+due_at?: (Instant | null)
+outcome?: (Text | null)
+note?: (Text | null)
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+activity_id?: string
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
  * via the `definition` "Request_event_register".
  */
 export type RequestEventRegister = {
@@ -726,7 +759,7 @@ export type ManagementProjection = (ManagementProjectionAccountProfileUpdateV1 |
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
  * via the `definition` "ReservationProtectionChange".
  */
-export type ReservationProtectionChange = (PolicyProtectionChange | NegativeLimitProtectionChange | CreditProtectionChange | SaleScopeProtectionChange)
+export type ReservationProtectionChange = (PolicyProtectionChange | NegativeLimitProtectionChange | CreditProtectionChange | SaleScopeProtectionChange | ValidityProtectionChange)
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
  * via the `definition` "SettlementRequestState".
@@ -1844,6 +1877,8 @@ ManagementSelector_settlement_offset_record_v1?: ManagementSelectorSettlementOff
 ManagementSelector_settlement_adjust_v1?: ManagementSelectorSettlementAdjustV1
 ManagementSelector?: ManagementSelector
 ManagementStatePage?: ManagementStatePage
+Target_center_update_identified?: TargetCenterUpdateIdentified
+ValidityProtectionChange?: ValidityProtectionChange
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -6369,6 +6404,10 @@ sale_id: string
 end_date: Date
 reason: Text
 impact_approval: PreviewToken
+/**
+ * Items: Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+accepted_reservation_ids: string[]
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -6409,6 +6448,10 @@ quantity: Int
 direction: Direction
 reason: Text
 impact_approval: PreviewToken
+/**
+ * Items: Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+accepted_reservation_ids: string[]
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -6456,6 +6499,10 @@ reason: Text
  */
 discipline_id: string
 impact_approval: PreviewToken
+/**
+ * Items: Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+accepted_reservation_ids: string[]
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -7342,35 +7389,6 @@ data: Mutation
  * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
  */
 trace_id: string
-}
-/**
- * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
- * via the `definition` "Request_crm_activity_save".
- */
-export interface RequestCrmActivitySave {
-client_api_version: 1
-/**
- * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
- */
-request_id: string
-/**
- * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
- */
-org_id: string
-center_id?: (string | null)
-/**
- * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
- */
-operation_key: string
-expected_version?: PositiveInt
-/**
- * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
- */
-lead_id: string
-kind: CrmActivityKind
-due_at?: (Instant | null)
-outcome?: (Text | null)
-note?: (Text | null)
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -13928,6 +13946,10 @@ kind?: CrmActivityKind
 due_at?: (Instant | null)
 outcome?: (Text | null)
 note?: (Text | null)
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+activity_id?: string
 }
 }
 /**
@@ -14693,6 +14715,18 @@ scopes: [ProductScope, ...(ProductScope)[]]
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "ValidityProtectionChange".
+ */
+export interface ValidityProtectionChange {
+kind: "entitlement_extend"
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+sale_id: string
+end_date: Date
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
  * via the `definition` "ManagementProjection_reservation_impact_apply_v1".
  */
 export interface ManagementProjectionReservationImpactApplyV1 {
@@ -14897,6 +14931,10 @@ value: PolicyValue
 effective_at: Instant
 mandatory: Bool
 impact_approval: PreviewToken
+/**
+ * Items: Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+accepted_reservation_ids: string[]
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -16196,6 +16234,10 @@ key: {
  * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
  */
 lead_id: string
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+activity_id?: string
 }
 }
 /**
@@ -17430,4 +17472,30 @@ data: SettlementCommandResult
  * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
  */
 trace_id: string
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "Target_center_update_identified".
+ */
+export interface TargetCenterUpdateIdentified {
+client_api_version: 1
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+request_id: string
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+org_id: string
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+center_id: string
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+operation_key: string
+expected_version: PositiveInt
+name: Text
+timezone: IanaZone
 }

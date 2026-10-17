@@ -10644,6 +10644,13 @@
         },
         "impact_approval": {
           "$ref": "#/$defs/PreviewToken"
+        },
+        "accepted_reservation_ids": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/FtkUuid"
+          },
+          "uniqueItems": true
         }
       },
       "required": [
@@ -10655,9 +10662,11 @@
         "sale_id",
         "end_date",
         "reason",
-        "impact_approval"
+        "impact_approval",
+        "accepted_reservation_ids"
       ],
-      "additionalProperties": false
+      "additionalProperties": false,
+      "x-invariant": "impact_approval is the unconsumed reservation_impact_preview token, bound to this exact change payload, reason, scope, actor and dependency versions. accepted_reservation_ids must equal all affected reservations. This command is an alternative to reservation_impact_apply, never a second commit; token consumption, original change, protection, audit/outbox/receipt are atomic. Reject mismatched/stale/already-consumed preview except identical operation-key replay."
     },
     "Success_entitlement_extend": {
       "type": "object",
@@ -10718,6 +10727,13 @@
         },
         "impact_approval": {
           "$ref": "#/$defs/PreviewToken"
+        },
+        "accepted_reservation_ids": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/FtkUuid"
+          },
+          "uniqueItems": true
         }
       },
       "required": [
@@ -10729,9 +10745,11 @@
         "quantity",
         "direction",
         "reason",
-        "impact_approval"
+        "impact_approval",
+        "accepted_reservation_ids"
       ],
-      "additionalProperties": false
+      "additionalProperties": false,
+      "x-invariant": "impact_approval is the unconsumed reservation_impact_preview token, bound to this exact change payload, reason, scope, actor and dependency versions. accepted_reservation_ids must equal all affected reservations. This command is an alternative to reservation_impact_apply, never a second commit; token consumption, original change, protection, audit/outbox/receipt are atomic. Reject mismatched/stale/already-consumed preview except identical operation-key replay."
     },
     "Success_credit_adjust": {
       "type": "object",
@@ -10788,6 +10806,13 @@
         },
         "impact_approval": {
           "$ref": "#/$defs/PreviewToken"
+        },
+        "accepted_reservation_ids": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/FtkUuid"
+          },
+          "uniqueItems": true
         }
       },
       "required": [
@@ -10801,9 +10826,11 @@
         "reason",
         "center_id",
         "discipline_id",
-        "impact_approval"
+        "impact_approval",
+        "accepted_reservation_ids"
       ],
-      "additionalProperties": false
+      "additionalProperties": false,
+      "x-invariant": "impact_approval is the unconsumed reservation_impact_preview token, bound to this exact change payload, reason, scope, actor and dependency versions. accepted_reservation_ids must equal all affected reservations. This command is an alternative to reservation_impact_apply, never a second commit; token consumption, original change, protection, audit/outbox/receipt are atomic. Reject mismatched/stale/already-consumed preview except identical operation-key replay."
     },
     "Success_negative_limit_set": {
       "type": "object",
@@ -12585,6 +12612,9 @@
               "type": "null"
             }
           ]
+        },
+        "activity_id": {
+          "$ref": "#/$defs/FtkUuid"
         }
       },
       "required": [
@@ -12596,7 +12626,28 @@
         "kind"
       ],
       "additionalProperties": false,
-      "x-invariant": "Existing target needs expected_version; create rejects expected_version. No silent upsert."
+      "x-invariant": "No activity_id creates a new activity under lead_id and rejects expected_version; activity_id updates exactly that activity and requires its version and matching lead/org/center. Never silently upsert.",
+      "allOf": [
+        {
+          "if": {
+            "required": [
+              "activity_id"
+            ]
+          },
+          "then": {
+            "required": [
+              "expected_version"
+            ]
+          },
+          "else": {
+            "not": {
+              "required": [
+                "expected_version"
+              ]
+            }
+          }
+        }
+      ]
     },
     "Success_crm_activity_save": {
       "type": "object",
@@ -24240,6 +24291,9 @@
         },
         {
           "$ref": "#/$defs/SaleScopeProtectionChange"
+        },
+        {
+          "$ref": "#/$defs/ValidityProtectionChange"
         }
       ]
     },
@@ -24370,6 +24424,13 @@
         },
         "impact_approval": {
           "$ref": "#/$defs/PreviewToken"
+        },
+        "accepted_reservation_ids": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/FtkUuid"
+          },
+          "uniqueItems": true
         }
       },
       "required": [
@@ -24381,9 +24442,11 @@
         "value",
         "effective_at",
         "mandatory",
-        "impact_approval"
+        "impact_approval",
+        "accepted_reservation_ids"
       ],
-      "additionalProperties": false
+      "additionalProperties": false,
+      "x-invariant": "impact_approval is the unconsumed reservation_impact_preview token, bound to this exact change payload, reason, scope, actor and dependency versions. accepted_reservation_ids must equal all affected reservations. This command is an alternative to reservation_impact_apply, never a second commit; token consumption, original change, protection, audit/outbox/receipt are atomic. Reject mismatched/stale/already-consumed preview except identical operation-key replay."
     },
     "SettlementRequestState": {
       "type": "string",
@@ -25116,10 +25179,14 @@
               },
               "org_id": {
                 "$ref": "#/$defs/FtkUuid"
+              },
+              "center_id": {
+                "$ref": "#/$defs/FtkUuid"
               }
             },
             "required": [
-              "org_id"
+              "org_id",
+              "center_id"
             ]
           }
         },
@@ -29152,7 +29219,8 @@
         "change",
         "reason"
       ],
-      "additionalProperties": false
+      "additionalProperties": false,
+      "x-invariant": "Freeze exact change payload, reason, actor, org/center, all affected reservation/allocation/deficit IDs and relevant entity/aggregate versions. For entitlement_extend bind sale_id and end_date plus sale/entitlement versions. A token is not approval or a committed change; apply or the protected original command requires explicit complete reservation acknowledgment and consumes it once."
     },
     "Success_reservation_impact_preview": {
       "type": "object",
@@ -29218,7 +29286,8 @@
         "preview",
         "accepted_reservation_ids"
       ],
-      "additionalProperties": false
+      "additionalProperties": false,
+      "x-invariant": "Consumes an unconsumed reservation_impact_preview token and atomically applies its frozen change plus protection. Alternative to the original protected command with impact_approval; never follow this apply with a second domain write. Same-key replay returns receipt; another key cannot consume again."
     },
     "Success_reservation_impact_apply": {
       "type": "object",
@@ -32334,6 +32403,9 @@
                   "type": "null"
                 }
               ]
+            },
+            "activity_id": {
+              "$ref": "#/$defs/FtkUuid"
             }
           },
           "required": [],
@@ -37009,6 +37081,9 @@
           "properties": {
             "lead_id": {
               "$ref": "#/$defs/FtkUuid"
+            },
+            "activity_id": {
+              "$ref": "#/$defs/FtkUuid"
             }
           },
           "required": [
@@ -37021,7 +37096,8 @@
         "operation",
         "key"
       ],
-      "additionalProperties": false
+      "additionalProperties": false,
+      "x-invariant": "With activity_id return that activity under the specified lead; without it return paginated activities for the lead, each with activity identity/version. Missing activity never upserts."
     },
     "ManagementSelector_trial_offer_create_v1": {
       "type": "object",
@@ -39104,6 +39180,66 @@
         "items",
         "next_cursor",
         "as_of"
+      ],
+      "additionalProperties": false
+    },
+    "Target_center_update_identified": {
+      "type": "object",
+      "properties": {
+        "client_api_version": {
+          "const": 1
+        },
+        "request_id": {
+          "$ref": "#/$defs/FtkUuid"
+        },
+        "org_id": {
+          "$ref": "#/$defs/FtkUuid"
+        },
+        "center_id": {
+          "$ref": "#/$defs/FtkUuid"
+        },
+        "operation_key": {
+          "$ref": "#/$defs/FtkUuid"
+        },
+        "expected_version": {
+          "$ref": "#/$defs/PositiveInt"
+        },
+        "name": {
+          "$ref": "#/$defs/Text"
+        },
+        "timezone": {
+          "$ref": "#/$defs/IanaZone"
+        }
+      },
+      "required": [
+        "client_api_version",
+        "request_id",
+        "org_id",
+        "operation_key",
+        "expected_version",
+        "name",
+        "timezone",
+        "center_id"
+      ],
+      "additionalProperties": false
+    },
+    "ValidityProtectionChange": {
+      "type": "object",
+      "properties": {
+        "kind": {
+          "const": "entitlement_extend"
+        },
+        "sale_id": {
+          "$ref": "#/$defs/FtkUuid"
+        },
+        "end_date": {
+          "$ref": "#/$defs/Date"
+        }
+      },
+      "required": [
+        "kind",
+        "sale_id",
+        "end_date"
       ],
       "additionalProperties": false
     }
@@ -42890,7 +43026,7 @@
           "kind": "command",
           "target_entity": "centers",
           "version_mode": "row_version",
-          "version_field": "org_id",
+          "version_field": "center_id",
           "read_operation": "centers_list_v1",
           "atomic_effects": [
             "centers.versioned_domain_change"
@@ -42904,7 +43040,7 @@
           "runtime_conformance": "baseline_only_not_full_product_acceptance",
           "open_dependencies": [],
           "target_request": {
-            "$ref": "#/$defs/Request_center_update"
+            "$ref": "#/$defs/Target_center_update_identified"
           }
         }
       },
@@ -50206,7 +50342,11 @@
           "same_key_same_payload_replay",
           "receipt_audit_outbox_atomic_domain_commit",
           "same_org_center_discipline",
-          "required_feature_gates_separate_from_references"
+          "required_feature_gates_separate_from_references",
+          "revalidate_relevant_preview_and_versions",
+          "exact_preview_change_binding",
+          "complete_affected_reservation_acknowledgment",
+          "single_preview_consumption_atomic"
         ],
         "audit": true,
         "notification": "outbox_if_user_visible_business_result",
@@ -50330,7 +50470,11 @@
           "manager_impact_acknowledgment",
           "preserve_confirmed_reservations_and_obligations",
           "no_automatic_cancel_notification",
-          "new_operations_current_limits"
+          "new_operations_current_limits",
+          "revalidate_relevant_preview_and_versions",
+          "exact_preview_change_binding",
+          "complete_affected_reservation_acknowledgment",
+          "single_preview_consumption_atomic"
         ],
         "audit": true,
         "notification": "outbox_if_user_visible_business_result",
@@ -50454,7 +50598,11 @@
           "manager_impact_acknowledgment",
           "preserve_confirmed_reservations_and_obligations",
           "no_automatic_cancel_notification",
-          "new_operations_current_limits"
+          "new_operations_current_limits",
+          "revalidate_relevant_preview_and_versions",
+          "exact_preview_change_binding",
+          "complete_affected_reservation_acknowledgment",
+          "single_preview_consumption_atomic"
         ],
         "audit": true,
         "notification": "outbox_if_user_visible_business_result",
@@ -53443,7 +53591,7 @@
           "kind": "command",
           "target_entity": "crm_activities",
           "version_mode": "create_absent_update_requires_version",
-          "version_field": "lead_id",
+          "version_field": "activity_id",
           "read_operation": "management_state_get_v1",
           "atomic_effects": [
             "crm_activities.versioned_domain_change"
@@ -62149,7 +62297,8 @@
           "required_feature_gates_separate_from_references",
           "no_business_commit",
           "scope_filter_before_pagination",
-          "authorize_original_change_not_generic_center_power"
+          "authorize_original_change_not_generic_center_power",
+          "exact_preview_change_binding"
         ],
         "audit": false,
         "notification": "none",
@@ -62243,7 +62392,10 @@
           "preserve_confirmed_reservations_and_obligations",
           "no_automatic_cancel_notification",
           "new_operations_current_limits",
-          "authorize_original_change_not_generic_center_power"
+          "authorize_original_change_not_generic_center_power",
+          "exact_preview_change_binding",
+          "complete_affected_reservation_acknowledgment",
+          "single_preview_consumption_atomic"
         ],
         "audit": true,
         "notification": "transactional_in_app_outbox",
@@ -76232,6 +76384,84 @@
       },
       {
         "path": "#/$defs/Request_management_state_get/allOf/146/then/properties/org_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Request_entitlement_extend/properties/accepted_reservation_ids/items",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Request_credit_adjust/properties/accepted_reservation_ids/items",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Request_negative_limit_set/properties/accepted_reservation_ids/items",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Request_crm_activity_save/properties/activity_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Target_policy_publish_protected/properties/accepted_reservation_ids/items",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Request_management_state_get/allOf/11/then/properties/center_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/ManagementProjection_crm_activity_save_v1/properties/values/properties/activity_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/ManagementSelector_crm_activity_save_v1/properties/key/properties/activity_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Target_center_update_identified/properties/request_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Target_center_update_identified/properties/org_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Target_center_update_identified/properties/center_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Target_center_update_identified/properties/operation_key",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/ValidityProtectionChange/properties/sale_id",
         "origin": "ftksaas",
         "acceptance": "generic_uuid",
         "generation": "uuidv7"

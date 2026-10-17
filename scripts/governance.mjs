@@ -105,6 +105,19 @@ export function validateGovernance(p,implemented){
   assert.equal(map.get(n).permission,'reservation.protection.manage','PROTECTION_ORIGINAL_AUTHORITY');
   assert(map.get(n).semantic_guards.includes('authorize_original_change_not_generic_center_power'),'PROTECTION_AUTHORITY_GUARD');
  }
+ assert.equal(map.get('center_update_v1').operation_contract.version_field,'center_id','CENTER_VERSION_BINDING');
+ assert.equal(map.get('crm_activity_save_v1').operation_contract.version_field,'activity_id','ACTIVITY_VERSION_BINDING');
+ const centerRead=d.Request_management_state_get.allOf.find(v=>v.if.properties.operation.const==='center_update_v1').then;
+ assert(centerRead.required.includes('center_id')&&centerRead.properties.center_id.$ref==='#/$defs/FtkUuid','CENTER_READ_IDENTITY');
+ assert(d.Request_crm_activity_save.properties.activity_id?.$ref==='#/$defs/FtkUuid','ACTIVITY_UPDATE_IDENTITY');
+ assert(d.ManagementSelector_crm_activity_save_v1.properties.key.properties.activity_id,'ACTIVITY_READ_IDENTITY');
+ assert(d.ReservationProtectionChange.oneOf.some(r=>r.$ref==='#/$defs/ValidityProtectionChange'),'VALIDITY_PREVIEW_PATH');
+ for(const k of ['sale_id','end_date'])assert(d.ValidityProtectionChange.required.includes(k),'VALIDITY_PREVIEW_BINDING '+k);
+ for(const n of ['Target_policy_publish_protected','Request_negative_limit_set','Request_credit_adjust','Request_entitlement_extend'])
+  assert(d[n].required.includes('impact_approval')&&d[n].required.includes('accepted_reservation_ids'),'PROTECTED_WRITE_ACK '+n);
+ for(const n of ['entitlement_extend_v1','negative_limit_set_v1','credit_adjust_v1','reservation_impact_apply_v1'])
+  for(const g of ['exact_preview_change_binding','complete_affected_reservation_acknowledgment','single_preview_consumption_atomic'])
+   assert(map.get(n).semantic_guards.includes(g),'PROTECTED_WRITE_BINDING '+n+' '+g);
  const managementNames=ops.filter(o=>!['read','auth','worker'].includes(o.operation_contract.kind)).map(o=>o.name);
  equalSet(d.ManagementOperationName.enum,managementNames,'MANAGEMENT_SELECTOR_COVERAGE');
  equalSet(d.ManagementSelector.oneOf.map(r=>d[r.$ref.split('/').at(-1)].properties.operation.const),managementNames,'MANAGEMENT_KEY_COVERAGE');

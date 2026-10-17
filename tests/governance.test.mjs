@@ -116,12 +116,40 @@ test('protection routing cannot turn a center entitlement permission into org po
 test('legacy live policy request stays closed while protected target DTO requires approval',()=>{
  const r={client_api_version:1,request_id:id,org_id:id,operation_key:id,key:'negative_default',value:{kind:'integer',value:2},effective_at:'2027-01-01T00:00:00Z',mandatory:true};
  assert(valid('Request_policy_publish',r));
- assert(!valid('Request_policy_publish',{...r,impact_approval:{id,token:'opaque-token-value'}}));
+ assert(!valid('Request_policy_publish',{...r,impact_approval:{id,token:'opaque-token-value'},accepted_reservation_ids:[]}));
  assert(!valid('Target_policy_publish_protected',r));
- assert(valid('Target_policy_publish_protected',{...r,impact_approval:{id,token:'opaque-token-value'}}));
+ assert(valid('Target_policy_publish_protected',{...r,impact_approval:{id,token:'opaque-token-value'},accepted_reservation_ids:[]}));
 });
 test('minimal runtime catalog has no dangling target or request/response reference',()=>{
  const runtime=JSON.parse(fs.readFileSync('supabase/functions/backend-v1/contract.json'));
  const walk=v=>{if(v&&typeof v==='object'){if(v.$ref)assert(runtime.$defs[v.$ref.split('/').at(-1)],v.$ref);for(const w of Object.values(v))walk(w);}};
  walk(runtime);
+});
+
+test('center read requires a concrete center identity and metadata binds its row version',()=>{
+ const r={client_api_version:1,request_id:id,org_id:id,center_id:id,operation:'center_update_v1',selector:{operation:'center_update_v1',key:{}}};
+ assert(valid('Request_management_state_get',r));
+ const {center_id,...missing}=r;assert(!valid('Request_management_state_get',missing));
+ assert(!valid('Request_management_state_get',{...r,center_id:null}));
+ const p=structuredClone(original);op(p,'center_update_v1').operation_contract.version_field='org_id';
+ assert.throws(()=>validateGovernance(p,live),/CENTER_VERSION_BINDING/);
+});
+test('CRM update selects the activity row, creation never silently upserts',()=>{
+ const r={client_api_version:1,request_id:id,org_id:id,operation_key:id,lead_id:id,kind:original.$defs.CrmActivityKind.enum[0]};
+ assert(valid('Request_crm_activity_save',r));
+ assert(!valid('Request_crm_activity_save',{...r,expected_version:1}));
+ assert(!valid('Request_crm_activity_save',{...r,activity_id:other}));
+ assert(valid('Request_crm_activity_save',{...r,activity_id:other,expected_version:1}));
+ const p=structuredClone(original);op(p,'crm_activity_save_v1').operation_contract.version_field='lead_id';
+ assert.throws(()=>validateGovernance(p,live),/ACTIVITY_VERSION_BINDING/);
+});
+test('validity change has a typed sale/end-date preview and explicit affected-reservation acknowledgment',()=>{
+ const change={kind:'entitlement_extend',sale_id:id,end_date:'2027-02-01'};
+ assert(valid('ReservationProtectionChange',change));
+ const {end_date,...missing}=change;assert(!valid('ReservationProtectionChange',missing));
+ const r={client_api_version:1,request_id:id,org_id:id,operation_key:id,expected_version:1,sale_id:id,end_date:change.end_date,reason:'Correct validity',impact_approval:{id,token:'opaque-preview-token'},accepted_reservation_ids:[]};
+ assert(valid('Request_entitlement_extend',r));
+ const {accepted_reservation_ids,...noAck}=r;assert(!valid('Request_entitlement_extend',noAck));
+ const p=structuredClone(original);p.$defs.ReservationProtectionChange.oneOf=p.$defs.ReservationProtectionChange.oneOf.filter(v=>v.$ref!=='#/$defs/ValidityProtectionChange');
+ assert.throws(()=>validateGovernance(p,live),/VALIDITY_PREVIEW_PATH/);
 });
