@@ -1,0 +1,86 @@
+{
+  "scope": "PR #13 latest accepted settlement authority and bilateral atomic finalization; contract/CI only",
+  "baseline": {
+    "main_sha": "c231ab5526854ed62445613467649e1b0bf960bb",
+    "main_ci": "https://github.com/SXQHex/FtkSaaS/actions/runs/39010419849",
+    "previous_pr_head": "c1a479c72e98c5a53d949a1eb7e30e1abc6679a3",
+    "previous_pr_ci": "https://github.com/SXQHex/FtkSaaS/actions/runs/39023254173",
+    "evidence_scope": "historical baseline only, not acceptance of the revised source"
+  },
+  "reviewed_local_source_sha": "6f8ef9952705a9272d17f511ea9dcbb3ccc6cf67",
+  "published_equivalent_source_sha": "66d66b5149e85ba6d0113a7c29adfffa61f6f7d9",
+  "source_tree_sha": "b9456d327f1e24c1676f5c3a1a72fdbc4d997e9f",
+  "accepted": "Owner controls OM delegation; Owner or explicitly delegated live OM controls exact-center CM grants; distinct live authorized B CM approval atomically finalizes records and selected balances",
+  "transferred": [
+    "accepted revision decision",
+    "product/technical/permission contracts",
+    "typed payment/offset/correction proposal and original allocation selection",
+    "dedicated grant read/set contracts",
+    "live scope/replay guards",
+    "conditional approve/reject atomic effects",
+    "read/version projections",
+    "F01-F33 dependencies and pending acceptance",
+    "generated catalogs/inventory/shared types",
+    "handover and remaining work"
+  ],
+  "implemented": "structural contract/governance checks only; no new settlement Auth/Edge/RPC runtime, storage or migrations",
+  "focused_verification": {
+    "command": "npm run generate && npm run verify",
+    "node": "24.19.0",
+    "result": "passed",
+    "tests": 83,
+    "behavior_acceptance_of_new_settlement": false
+  },
+  "independent_review": {
+    "initial_local_source": "f3cd7d7d307524a84fa205f033aeea340f81a333",
+    "finding": "P2 partial correction lacked explicit original allocation selection",
+    "rechecked_local_source": "6f8ef9952705a9272d17f511ea9dcbb3ccc6cf67",
+    "findings_closed": 1,
+    "open_findings": 0,
+    "mode": "read-only static review; reviewer did not rerun tests"
+  },
+  "inventory": {
+    "total": 197,
+    "callable": 79,
+    "contract_only": 118,
+    "migrations": 25,
+    "removed_contract_only": [
+      "settlement_payment_record_v1",
+      "settlement_offset_record_v1",
+      "settlement_adjust_v1"
+    ],
+    "added_contract_only": [
+      "settlement_authority_get_v1",
+      "settlement_delegation_set_v1",
+      "settlement_authority_set_v1"
+    ],
+    "reorganization": "all payment/offset/linked correction proposals submitted by A, finalized only by distinct authorized B approval"
+  },
+  "decisions": {
+    "DS_OPEN_01": "closed at accepted-contract level; runtime pending",
+    "DS_OPEN_02": "old OM fallback has no authority under new CM operational chain; disabled, no implicit Owner/OM operation authority; replacement requires explicit decision if wanted"
+  },
+  "pending_behavior_acceptance": {
+    "count": 34,
+    "status": "pending_runtime",
+    "kind": "real_auth_edge_rpc",
+    "evidence": []
+  },
+  "final_head_evidence": {
+    "policy": "Exact final SHA independent review and one mandatory clean CI are attached to PR #13 conversation after execution; previous SHA success is not inherited",
+    "required_jobs": [
+      "contract-governance",
+      "contracts-and-database"
+    ],
+    "full_clean_command": "npm run test:clean"
+  },
+  "boundaries": {
+    "merge": false,
+    "repository_admin": false,
+    "main_protection": "separate administrator work remains open",
+    "frontend": false,
+    "production": false,
+    "resend": false,
+    "historical_reports_rewritten": false
+  }
+}
