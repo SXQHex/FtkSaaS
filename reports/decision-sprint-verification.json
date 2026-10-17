@@ -1,0 +1,58 @@
+{
+  "scope": "DS-2026-10-17 contract transfer and CI governance; no new runtime behavior",
+  "base_main_sha": "c231ab5526854ed62445613467649e1b0bf960bb",
+  "reviewed_local_source_sha": "36f0e672f5bb290f6105b5d95dfdbede8a14e220",
+  "published_equivalent_source_sha": "e02a9e5f4e24de614ab6b52df845d75818e465d8",
+  "source_tree_sha": "2df4188a739dba5d71cc6fff42255aecec5a68f6",
+  "independent_review": {
+    "initial_source_sha": "10f507bed3af253215140bb3bcb4b10a43eb7bd7",
+    "findings": 3,
+    "severity": "P2",
+    "rechecked_source_sha": "36f0e672f5bb290f6105b5d95dfdbede8a14e220",
+    "closed": 3,
+    "open": 0,
+    "mode": "read-only static review; no independent test rerun",
+    "coverage": [
+      "center version and read identity",
+      "CRM activity update identity",
+      "sale validity impact preview binding and one-time application"
+    ]
+  },
+  "focused_verification": {
+    "command": "npm run verify",
+    "node": "24.19.0",
+    "result": "passed",
+    "tests": 68,
+    "runtime_behavior_acceptance": false
+  },
+  "inventory": {
+    "registered": 197,
+    "callable": 79,
+    "contract_only": 118,
+    "new_contract_only": 13,
+    "immutable_migrations": 25,
+    "features_traced": 33,
+    "pending_ds_behavior_cases": 29
+  },
+  "full_clean_acceptance": {
+    "required_check": "contracts-and-database",
+    "command": "npm run test:clean",
+    "execution": "GitHub PR CI on final head; attach exact SHA/run result in PR evidence",
+    "new_ds_runtime_cases": "pending; structural tests are not Auth -> Edge -> RPC evidence"
+  },
+  "admin_governance": {
+    "classic_protection_read": "403 Resource not accessible by integration",
+    "rulesets_read": [],
+    "protection_applied": false,
+    "settings_handoff": "docs/branch-protection-review.md"
+  },
+  "remaining_product_choice": "DS-OPEN-01 separate settlement authority grantor not specified; future runtime blocked on decision",
+  "boundaries": [
+    "no new RPC/runtime workflow",
+    "no production deployment",
+    "no frontend change",
+    "no Resend",
+    "no new merge/admin authority"
+  ],
+  "evidence_update_rule": "This report records the source checks. Final head review and full clean CI evidence belong to the PR conversation and do not claim tests passed before execution."
+}
