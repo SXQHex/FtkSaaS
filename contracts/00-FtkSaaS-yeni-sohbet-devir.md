@@ -2,7 +2,7 @@
 
 Program/seans yaşam döngüsü geliştirme kapsamı: **79 çağrılabilir / 105 yalnız sözleşme**, 25 migration. [Program/seans devri](../docs/program-session-handover.md) yedi komutun uçtan uca akışını, sözleşme bağımlılıklarını ve sınırlarını belirtir. Yeni kaynak için tam temiz kabul son PR head CI'ından doğrulanır; önceki test kanıtları yeni SHA'ya taşınmaz.
 
-Doğrulanmış dal başlangıcı: main `69257f056f593b4b52248e7c9070dada7918344d`, [aynı SHA CI](https://github.com/SXQHex/FtkSaaS/actions/runs/39004791672) başarılı (221 test, 24 migration). Bu PR ayrı daldadır; merge veya production dağıtımı içermez.
+Doğrulanmış dal başlangıcı: main `69257f056f593b4b52248e7c9070dada7918344d`, [aynı SHA CI](https://github.com/SXQHex/FtkSaaS/actions/runs/39004791672) başarılı (221 test, 24 migration). Bu PR ayrı daldadır; merge veya production dağıtımı içermez. Geliştirici kaynak ağacı üzerinde son 12 sözleşme + 20 odaklı program Auth/API testi geçti; önceki kapsamda 68 etkilenen API testi geçti. Bağımsız statik incelemenin P2 legacy görev kaldırma bulgusu giderilip yeniden incelendi. [Kaynak/kanıt raporu](../reports/program-session-verification.json). Tam temiz son head CI ayrı kanıttır.
 
 Aşağıdaki önceki kapsam ve kanıtlar kendi kaynak snapshot'larıdır.
 

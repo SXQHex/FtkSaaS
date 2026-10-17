@@ -8,6 +8,21 @@ Yetkili merkez yöneticisi sınıf için sonlu programı önizler; somut UTC sea
 
 Seans önizleme/uygulama aynı seans kimliğini koruyarak saat/kaynak/görev/kapasite değiştirir. `single` tek oluşumdur. `this_and_future` aynı `program_id` içindeki seçili ve sonraki materialize edilmiş, gelecekteki planned/open oluşumlardır; farklı program ve geçmiş/sonuçlanmış oluşumlar korunur. Programı olmayan tekil seans için seri kapsamı `POLICY_NOT_CONFIGURED` döner. Başlangıç merkez yerel saatindeki fark kadar ötelenir; süre açık interval'dan alınır. Sonlu immutable `program_versions.spec_snapshot/timezone` ilk üretimi kaydeder; sonradan oluşum değişiklikleri audit'te izlenir. Otomatik sonsuz program üretimi veya yeni program sürümleme akışı yoktur.
 
+## İstemci çağrı sırası ve sürümler
+
+Transport mevcut `POST /functions/v1/backend-v1/{operation}` ve typed JSON istek/zarfıdır; `org_id`, seçili `center_id`, her denemede `request_id` ve mutasyonlarda sabit `operation_key` kullanılır. Frontend service-role RPC'ye doğrudan çağrı yapmaz.
+
+| Adım | İstek / sonuç |
+|---|---|
+| Program önizle | `class_id + schedule`; `sessions[]` somut UTC interval, görev, kaynak, kapasite; `blockers[]` boş olmadan uygulama yapılmaz |
+| Program uygula | Yalnız aynı preview `{id,token}`; Mutation.primary_id program sürümü, related[] oluşan seans kimlikleri |
+| Oku | calendar interval/page; session_get session_id; reservation_list session_id/page; görünürlük her istekte canlı |
+| Seans önizle/uygula | `session_id + patch + scope + reason`, gerekirse offset_choices; apply yalnız preview token; Mutation.primary_id seçili seans, version onun yeni sürümü, related[] bütün etkilenen seanslar |
+| Kapasite/görev | session_get.version ile expected_version; görevde person_id/duty, gerekirse agreement_id/state; Mutation seans kimliği/sürümü |
+| Sınıf görevi | class_id/person_id/duty; create expected_version içermez; update class_assignments içindeki hedef satır version'ını kullanır; Mutation atama satırı kimliği/sürümü |
+
+Preview token yalnız onu alan aktöre aittir. Stale sonucunda yeni preview alınır; başarısızlığı gizlemek için farklı sale veya tarih seçilmez. Sınıf görevi kaldırma/tekrar etkinleştirmesi açık seans kaldırma override'ını geri getirmez; legacy yalnız-sınıf görevinin doğrudan kaldırılması da kalıcı inactive override bırakır.
+
 ## Sözleşme aktarımı ve zorunlu bağımlılıklar
 
 - `ProgramSpec` merkez yerel tarihleri `[starts_on,ends_on)` ve ISO 1–7 günleri kullanır. `LocalOffsetChoice {date,offset_minutes}` DTO'su DST çift saatini açık seçmek için eklendi. Geçersiz yerel saat reddedilir; çift saatte sessiz erken/geç seçim yoktur. UTC interval açık anı belirler; sağlanan offset onunla da uyuşmalıdır. Takip eden oluşumların çift saatleri ayrıca açık seçim ister.
@@ -27,6 +42,6 @@ Kapasite indirimi mevcut rezervasyonları veya süresi dolmamış yer teklifleri
 
 ## Kabul ve açık sınırlar
 
-Odaklı geliştirme testleri `tests/program-session-lifecycle.test.mjs` ve etkilenen eski tüketici testleridir; gerçek Supabase Auth → Edge → service-only RPC yolunu kullanır. Son kapsam tam temiz CI'ında sözleşme, DB, tüm API testleri, 25 migration reset, seed, health ve advisors birlikte çalışır. Kaynak ve kanıt ayrımı [raporda](../reports/program-session-verification.json) belirtilir. Başarısızlık veya kaynak değişikliği dışında aynı kabul geliştirici tarafından gereksiz tekrarlanmaz.
+Odaklı geliştirme testleri `tests/program-session-lifecycle.test.mjs` ve etkilenen eski tüketici testleridir; gerçek Supabase Auth → Edge → service-only RPC yolunu kullanır. Son kapsam tam temiz CI'ında sözleşme, DB, tüm API testleri, 25 migration reset, seed, health ve advisors birlikte çalışır. Son geliştirici kaynak ağacında 12 sözleşme ve 20 program Auth/API testi geçti; önceki kaynakta 68 etkilenen API testi geçti. Bağımsız statik incelemede bulunan legacy sınıf-only görev kaldırma P2'si düzeltildi ve yeniden inceleme bulgusuz tamamlandı. Kaynak ve kanıt ayrımı [raporda](../reports/program-session-verification.json) belirtilir. Başarısızlık veya kaynak değişikliği dışında aynı kabul geliştirici tarafından gereksiz tekrarlanmaz.
 
 İptal, yerine seans, bekleme listesi/teklif yaşam döngüsü, ders yoklaması, uygun satın alınmış paket seçimi, anlaşma yayın API'si bu PR'nin dışındadır. Yeni program planlanan seans yaratır; gerçekleşme/hakediş yaratmaz. Birden fazla uygunluk kuralını birleştirerek gece/gün aşan uygunluk hâlen ayrı sınırdır. Hosted geliştirme deployment/smoke, frontend gerçek entegrasyonu ve yük/restore bu PR kabulü değildir. Frontend, production ve Resend değişikliği yoktur.
