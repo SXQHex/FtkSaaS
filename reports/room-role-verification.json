@@ -1,31 +1,41 @@
 {
-  "status": "implementation_pending_acceptance",
+  "status": "clean_ci_passed_merged_main",
   "base_main": "d0ff4efc3b2d578e9dd157ea46257309a31ef051",
-  "implementation_commit": "c8799fe",
+  "implementation_commit": "1c84730cee87933780a86545251df6e6d07acbfa",
   "operations_added": [
     "room_save_v1",
     "roles_list_v1"
   ],
   "inventory": {
     "contracts": 184,
-    "base_verified_callable": 63,
-    "branch_configured_callable": 65,
+    "verified_callable": 65,
     "remaining_unimplemented": 119
   },
-  "migrations": 19,
+  "migrations": 21,
   "static": {
     "checks": 21,
     "contract_tests": 12,
     "result": "passed"
   },
   "auth_api_acceptance": {
-    "status": "blocked_local_environment",
+    "status": "passed_ci",
     "test_file": "tests/room-role-registry.test.mjs",
-    "reason": "PostgreSQL archive download failed with DNS ETIMEOUT for GitHub and Supabase artifact fallback. Non-root daemon configuration resolved the root execution restriction; no DB/API tests executed."
+    "contract_tests": 12,
+    "database_tests": 27,
+    "auth_api_tests": 142,
+    "total_tests": 181,
+    "pr_runs": [
+      38990682049,
+      38990679472
+    ],
+    "seed_health_advisors": "passed"
   },
   "publication": {
-    "status": "blocked_by_automatic_approval_review",
-    "reason": "Explicit approval required to publish new source to the public SXQHex/FtkSaaS repository. No PR or CI created."
+    "status": "merged",
+    "pr": 7,
+    "main_commit": "4d47d75e4a337378cfcc65f727c67abcac310303",
+    "main_ci_run": 38991612240,
+    "main_ci_status": "pending_at_report_write"
   },
   "limits": [
     "Stored role assignments only; ownership remains the organization owner pointer.",

@@ -1,7 +1,7 @@
 {
-  "runtime_version": "0.2.0-rc.2",
+  "runtime_version": "0.2.0-rc.3",
   "repository": "https://github.com/SXQHex/FtkSaaS",
-  "branch": "backend/runtime-v0.2.0",
+  "branch": "main",
   "environment": "per-checkout isolated native Supabase",
   "shared_staging_url": null,
   "setup_commands": [
@@ -19,5 +19,13 @@
     "apikey: <local publishable key>",
     "Content-Type: application/json"
   ],
-  "notice": "No permanent internet endpoint or shared credentials. Never copy service-role/DB/user passwords into public frontend configuration. Previous Box ports are not current."
+  "notice": "No permanent internet endpoint or shared credentials. Never copy service-role/DB/user passwords into public frontend configuration. Previous Box ports are not current.",
+  "requested_remote_target": {
+    "project_ref": "gwyprhenabtpkbojephw",
+    "project_url": "https://supabase.com/project/gwyprhenabtpkbojephw",
+    "status": "healthy_empty_not_deployed",
+    "environment_role": "development_test_confirmed_by_user",
+    "migration_count_observed": 0,
+    "edge_function_count_observed": 0
+  }
 }

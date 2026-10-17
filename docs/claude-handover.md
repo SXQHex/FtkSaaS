@@ -1,16 +1,14 @@
 # FtkSaaS backend — güncel Claude devri
 
-## Devam eden dal: oda ve rol kayıtları
+## Son doğrulanmış uygulama
 
-`backend/room-and-role-registry`, temel main `d0ff4ef`. `room_save_v1` oda/disiplin kapasite tanımını atomik ve sürümlü kaydeder; `roles_list_v1` canlı organizasyon/merkez yetkisiyle sayfalar. 19. migration eklendi, önceki 18 migration değişmedi. Dalda 65 endpoint yapılandırılmıştır; main’in 63 doğrulanmış işlemi yeni test kanıtı gelene kadar referans kalır. Durum ve engeller `reports/room-role-verification.json` içindedir.
+Oda/rol uygulaması [PR #7](https://github.com/SXQHex/FtkSaaS/pull/7) ile main’e birleşti: `4d47d75e4a337378cfcc65f727c67abcac310303`. Uygulama head’i `1c84730cee87933780a86545251df6e6d07acbfa`; iki temiz PR/push CI başarılı: 38990682049 ve 38990679472. Toplam 181 test: 12 sözleşme, 27 DB, 142 gerçek Auth/API; 21 migration, seed/sağlık/advisors başarılı. Her sonraki head ve main CI ayrıca doğrulanır.
 
-Rol listesi kalıcı rol atamalarını döndürür; owner atamasını sanal bir rol satırına dönüştürmez. Oda tanımı mevcut seans/etkinlik kapasitesini veya hak/finans defterini değiştirmez. Uygunluk ve politika işlemleri ayrı açık iştir.
+184 sözleşmeden **65 çağrılabilir / 119 yalnız sözleşme**. `room_save_v1` atomik kapasite, sürüm, tekrar ve rollback; `roles_list_v1` canlı organizasyon/merkez yetkisi, plan erişimi, cursor kapsamı ve `as_of` snapshot sözleşmesiyle çalışır. Owner sanal rol satırı değildir. Mevcut seans/etkinlik kapasitesi yeniden yazılmaz. Önceki 18 migration korunur; 19–21 oda/rol uygulaması ve iki düzeltmedir. Kanıt: `reports/room-role-verification.json`.
 
-GitHub push otomatik onay denetimince, bu herkese açık hedefe yeni kod yayımlamak için açık onay istenerek engellendi. PR/CI oluşturulmadı. Frontend ve production değişmedi.
+## Kullanıcının bildirdiği kalıcı backend hedefi
 
-## Son doğrulanmış main temeli
-
-Kaynak: https://github.com/SXQHex/FtkSaaS · dal: `main`. Fiilî başlangıç uygulaması [PR #4](https://github.com/SXQHex/FtkSaaS/pull/4) ile birleşti. 184 sözleşme içinde **63 çağrılabilir / 121 yalnız sözleşme** işlemi vardır. Frontend tasarımı değiştirilmedi.
+Supabase `gwyprhenabtpkbojephw` (FtkSaaS, eu-central-1) sağlıklı. Bu devirde uzaktan denetlenen migration listesi, core/private/api_v1 şemaları ve Edge Function listesi boştu. Bu nedenle yerel/CI kabulü bu hedefe kurulmuş backend anlamına gelmez. Kullanıcı hedefi geliştirme/test olarak doğruladı; kurulum bu kapsamda yürütülür. Production dağıtımı yasağı sürer. Kalıcı bağlantı, Auth/API kabulü, dış e-posta ve yük/restore açıktır.
 
 ## Kurulum ve gerçek bağlantı
 
@@ -28,7 +26,7 @@ npm test
 
 `dev:info` her checkout için gerçek loopback API/functions adresi, publishable key ve Mailpit bağlantısını üretir. Süreli eski Box URL'leri veya sabit ortak staging varsayılmaz. Servis anahtarı/secrets frontend'e veya repository'ye konmaz. Geliştirme sentetik veri kullanır; dış e-posta teslimi tamamlanmış değildir. Yerel davet teslimi için `scripts/deliver-dev-invitations.mjs` ve Mailpit kullanılır.
 
-`npm run test:clean` yalnız checkout'ın loopback DB'sini sıfırlar; 18 migration ve boş tenant/Auth/receipt durumu doğrulanır, ardından testler, sentetik seed, sağlık ve DB advisors çalışır. `npm run dev:stop` ortamı durdurur. Özel bağlantı ve reset logları paylaşılmaz.
+`npm run test:clean` yalnız checkout'ın loopback DB'sini sıfırlar; 21 migration ve boş tenant/Auth/receipt durumu doğrulanır, ardından testler, sentetik seed, sağlık ve DB advisors çalışır. `npm run dev:stop` ortamı durdurur. Özel bağlantı ve reset logları paylaşılmaz.
 
 ## Kanıt ve kapsam
 
@@ -95,7 +93,7 @@ Bu yalnız operasyonel kanıttır. Q-E03 katılımcı sınıflandırması, Q-E02
 
 `npm run generate` ortak tipleri, minimal Edge contract/validator/bundle ve katalog/endpoint envanterini üretir; `npm run verify` drift'i reddeder. Yeni değişiklik ayrı branch/PR ve append-only migration ile yapılır. Önceki 11 migration korunmuştur; 12–18. migration yeni registry işlemleri, kişi görünürlüğü ve okuma sürümlerini taşır. Eski wrapper kaynağı tarihsel migration ile sabittir; güncel üretilen wrapper `database/runtime-wrappers-current.sql` dosyasındadır. Yeni API'nin DB kurulumu yeni migration ile taşınır. Historical/transfer scriptleri güncel sözleşmeye körlemesine uygulanmaz.
 
-121 işlem yalnız sözleşme düzeyindedir; tam liste ve bağımlılık sırası `docs/remaining-work.md` içindedir. Kalıcı ortak staging, dış e-posta, yük/restore, frontend gerçek entegrasyon kabulü ve production dağıtımı tamamlanmış değildir. Frontend kodu/tasarımı Claude'un alanıdır. `vercel.json` main otomatik dağıtımını kapalı tutar; merge production izni değildir.
+119 işlem yalnız sözleşme düzeyindedir; tam liste ve bağımlılık sırası `docs/remaining-work.md` içindedir. Kalıcı ortak staging, dış e-posta, yük/restore, frontend gerçek entegrasyon kabulü ve production dağıtımı tamamlanmış değildir. Frontend kodu/tasarımı Claude'un alanıdır. `vercel.json` main otomatik dağıtımını kapalı tutar; merge production izni değildir.
 
 ## Yeni kişi/merkez/disiplin entegrasyonu
 

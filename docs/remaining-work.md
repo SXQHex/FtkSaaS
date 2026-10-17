@@ -1,8 +1,6 @@
 # Kalan backend işleri
 
-Dal adayı: oda kaydı/güncelleme ve rol listesi eklendi (`room_save_v1`, `roles_list_v1`). Dalda 65 endpoint yapılandırılmıştır; aşağıdaki 63/121 sayıları son doğrulanmış main temelini gösterir. Yeni iki işlem gerçek Auth/API kabulü ve CI bitene kadar doğrulanmış sayılmaz. Kanıt: `reports/room-role-verification.json`.
-
-Makine sözleşmesindeki 184 işlemden 63 işlem geliştirme ortamında çağrılabilir; 121 işlem yalnız sözleşmedir. Çağrılabilir envanteri üretim kabulü anlamına gelmez. Son doğrulama kanıtı `reports/registry-verification.json` içindedir.
+184 işlemden **65 çağrılabilir / 119 yalnız sözleşme**. Oda ve rol işlemleri PR #7 ile main’e birleşti; 21 migration, 181 test (12 sözleşme + 27 DB + 142 gerçek Auth/API) PR CI’da geçti. Son head ve merge kanıtı `reports/room-role-verification.json` içindedir.
 
 ## Bağımlılık sırası
 
@@ -20,8 +18,8 @@ Her yeni grup: sözleşme/izin incelemesi → yeni migration → gerçek Auth/AP
 | Modül | Kalan işlem |
 |---|---:|
 | M01 | 10 |
-| M02 | 8 |
-| M03 | 3 |
+| M02 | 7 |
+| M03 | 2 |
 | M04 | 22 |
 | M05 | 9 |
 | M06 | 15 |
@@ -46,12 +44,10 @@ Her yeni grup: sözleşme/izin incelemesi → yeni migration → gerçek Auth/AP
 | `organization_reopen_v1` | `org.owner` |
 | `organization_delete_preview_v1` | `org.owner` |
 | `organization_delete_apply_v1` | `org.owner` |
-| `room_save_v1` | `center.manage` |
 | `availability_save_v1` | `center.manage` |
 | `availability_exception_save_v1` | `center.manage` |
 | `policies_get_v1` | `org.read` |
 | `policy_publish_v1` | `policy.manage` |
-| `roles_list_v1` | `org.read` |
 | `account_access_revoke_v1` | `invite.student` |
 | `account_link_remove_v1` | `center.manage` |
 | `person_merge_preview_v1` | `person.merge` |
