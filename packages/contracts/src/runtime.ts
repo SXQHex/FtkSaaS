@@ -62,6 +62,8 @@ export const runtimeOperationNames = [
   "student_deactivate_v1",
   "person_get_v1",
   "person_update_v1",
-  "people_list_v1"
+  "people_list_v1",
+  "room_save_v1",
+  "roles_list_v1"
 ] as const;
 export type RuntimeOperationName = typeof runtimeOperationNames[number];

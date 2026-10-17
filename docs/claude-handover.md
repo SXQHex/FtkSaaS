@@ -1,5 +1,15 @@
 # FtkSaaS backend — güncel Claude devri
 
+## Devam eden dal: oda ve rol kayıtları
+
+`backend/room-and-role-registry`, temel main `d0ff4ef`. `room_save_v1` oda/disiplin kapasite tanımını atomik ve sürümlü kaydeder; `roles_list_v1` canlı organizasyon/merkez yetkisiyle sayfalar. 19. migration eklendi, önceki 18 migration değişmedi. Dalda 65 endpoint yapılandırılmıştır; main’in 63 doğrulanmış işlemi yeni test kanıtı gelene kadar referans kalır. Durum ve engeller `reports/room-role-verification.json` içindedir.
+
+Rol listesi kalıcı rol atamalarını döndürür; owner atamasını sanal bir rol satırına dönüştürmez. Oda tanımı mevcut seans/etkinlik kapasitesini veya hak/finans defterini değiştirmez. Uygunluk ve politika işlemleri ayrı açık iştir.
+
+GitHub push otomatik onay denetimince, bu herkese açık hedefe yeni kod yayımlamak için açık onay istenerek engellendi. PR/CI oluşturulmadı. Frontend ve production değişmedi.
+
+## Son doğrulanmış main temeli
+
 Kaynak: https://github.com/SXQHex/FtkSaaS · dal: `main`. Fiilî başlangıç uygulaması [PR #4](https://github.com/SXQHex/FtkSaaS/pull/4) ile birleşti. 184 sözleşme içinde **63 çağrılabilir / 121 yalnız sözleşme** işlemi vardır. Frontend tasarımı değiştirilmedi.
 
 ## Kurulum ve gerçek bağlantı

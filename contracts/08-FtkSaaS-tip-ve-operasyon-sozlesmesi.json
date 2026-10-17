@@ -27033,7 +27033,10 @@
           "A55"
         ],
         "configuration_policy": "numeric plan limits/prices and legal approval are deployment configuration, never arbitrary allow/deny",
-        "implementation_status": "contract_only"
+        "implementation_status": "operational_development_limited",
+        "runtime_limits": [
+          "Clean Auth/API acceptance evidence is tracked in reports/room-role-verification.json; production acceptance remains open."
+        ]
       },
       {
         "name": "availability_save_v1",
@@ -27391,7 +27394,12 @@
           "A55"
         ],
         "configuration_policy": "numeric plan limits/prices and legal approval are deployment configuration, never arbitrary allow/deny",
-        "implementation_status": "contract_only"
+        "implementation_status": "operational_development_limited",
+        "runtime_limits": [
+          "Clean Auth/API acceptance evidence is tracked in reports/room-role-verification.json; production acceptance remains open.",
+          "Lists stored role assignments; ownership is read from organization.owner_person_id, not synthesized as a role assignment.",
+          "Only created_at_asc sorting is supported; cursors bind actor and request scope; live permissions are rechecked."
+        ]
       },
       {
         "name": "role_assign_v1",

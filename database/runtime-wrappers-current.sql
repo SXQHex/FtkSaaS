@@ -31,6 +31,14 @@ insert into private.runtime_operations(name,permission,billing_class,features) v
 create or replace function api_v1.center_update_v1(p_request jsonb,p_actor_auth_id uuid,p_session_id uuid,p_ids uuid[],p_aux jsonb default null) returns jsonb language sql security invoker set search_path='' as $$select private.execute_operation('center_update_v1',p_request,p_actor_auth_id,p_session_id,p_ids,p_aux)$$;
 revoke all on function api_v1.center_update_v1(jsonb,uuid,uuid,uuid[],jsonb) from public,anon,authenticated;
 grant execute on function api_v1.center_update_v1(jsonb,uuid,uuid,uuid[],jsonb) to service_role;
+insert into private.runtime_operations(name,permission,billing_class,features) values('room_save_v1','center.manage','config',array['F01']::text[]) on conflict(name) do update set permission=excluded.permission,billing_class=excluded.billing_class,features=excluded.features;
+create or replace function api_v1.room_save_v1(p_request jsonb,p_actor_auth_id uuid,p_session_id uuid,p_ids uuid[],p_aux jsonb default null) returns jsonb language sql security invoker set search_path='' as $$select private.execute_operation('room_save_v1',p_request,p_actor_auth_id,p_session_id,p_ids,p_aux)$$;
+revoke all on function api_v1.room_save_v1(jsonb,uuid,uuid,uuid[],jsonb) from public,anon,authenticated;
+grant execute on function api_v1.room_save_v1(jsonb,uuid,uuid,uuid[],jsonb) to service_role;
+insert into private.runtime_operations(name,permission,billing_class,features) values('roles_list_v1','org.read','read',array['F04','F05']::text[]) on conflict(name) do update set permission=excluded.permission,billing_class=excluded.billing_class,features=excluded.features;
+create or replace function api_v1.roles_list_v1(p_request jsonb,p_actor_auth_id uuid,p_session_id uuid,p_ids uuid[],p_aux jsonb default null) returns jsonb language sql security invoker set search_path='' as $$select private.execute_operation('roles_list_v1',p_request,p_actor_auth_id,p_session_id,p_ids,p_aux)$$;
+revoke all on function api_v1.roles_list_v1(jsonb,uuid,uuid,uuid[],jsonb) from public,anon,authenticated;
+grant execute on function api_v1.roles_list_v1(jsonb,uuid,uuid,uuid[],jsonb) to service_role;
 insert into private.runtime_operations(name,permission,billing_class,features) values('role_assign_v1','center.manage','config',array['F04','F05']::text[]) on conflict(name) do update set permission=excluded.permission,billing_class=excluded.billing_class,features=excluded.features;
 create or replace function api_v1.role_assign_v1(p_request jsonb,p_actor_auth_id uuid,p_session_id uuid,p_ids uuid[],p_aux jsonb default null) returns jsonb language sql security invoker set search_path='' as $$select private.execute_operation('role_assign_v1',p_request,p_actor_auth_id,p_session_id,p_ids,p_aux)$$;
 revoke all on function api_v1.role_assign_v1(jsonb,uuid,uuid,uuid[],jsonb) from public,anon,authenticated;

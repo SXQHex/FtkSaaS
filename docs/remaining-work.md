@@ -1,5 +1,7 @@
 # Kalan backend işleri
 
+Dal adayı: oda kaydı/güncelleme ve rol listesi eklendi (`room_save_v1`, `roles_list_v1`). Dalda 65 endpoint yapılandırılmıştır; aşağıdaki 63/121 sayıları son doğrulanmış main temelini gösterir. Yeni iki işlem gerçek Auth/API kabulü ve CI bitene kadar doğrulanmış sayılmaz. Kanıt: `reports/room-role-verification.json`.
+
 Makine sözleşmesindeki 184 işlemden 63 işlem geliştirme ortamında çağrılabilir; 121 işlem yalnız sözleşmedir. Çağrılabilir envanteri üretim kabulü anlamına gelmez. Son doğrulama kanıtı `reports/registry-verification.json` içindedir.
 
 ## Bağımlılık sırası
