@@ -13,3 +13,4 @@ reports/*.log
 !reports/qe01-acceptance.log
 
 !reports/qe02-acceptance.log
+.DS_Store
