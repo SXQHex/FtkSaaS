@@ -535,8 +535,8 @@
     },
     {
       "name": "program_preview_v1",
-      "status": "contract_only",
-      "external_path": null,
+      "status": "operational_development_limited",
+      "external_path": "/functions/v1/backend-v1/program_preview_v1",
       "permission": "schedule.manage",
       "features": [
         "F08",
@@ -547,8 +547,8 @@
     },
     {
       "name": "program_apply_v1",
-      "status": "contract_only",
-      "external_path": null,
+      "status": "operational_development_limited",
+      "external_path": "/functions/v1/backend-v1/program_apply_v1",
       "permission": "schedule.manage",
       "features": [
         "F08",
@@ -582,8 +582,8 @@
     },
     {
       "name": "session_change_preview_v1",
-      "status": "contract_only",
-      "external_path": null,
+      "status": "operational_development_limited",
+      "external_path": "/functions/v1/backend-v1/session_change_preview_v1",
       "permission": "schedule.manage",
       "features": [
         "F08",
@@ -595,8 +595,8 @@
     },
     {
       "name": "session_change_apply_v1",
-      "status": "contract_only",
-      "external_path": null,
+      "status": "operational_development_limited",
+      "external_path": "/functions/v1/backend-v1/session_change_apply_v1",
       "permission": "schedule.manage",
       "features": [
         "F08",
@@ -608,8 +608,8 @@
     },
     {
       "name": "session_capacity_set_v1",
-      "status": "contract_only",
-      "external_path": null,
+      "status": "operational_development_limited",
+      "external_path": "/functions/v1/backend-v1/session_capacity_set_v1",
       "permission": "schedule.manage",
       "features": [
         "F08"
@@ -652,8 +652,8 @@
     },
     {
       "name": "session_assignment_set_v1",
-      "status": "contract_only",
-      "external_path": null,
+      "status": "operational_development_limited",
+      "external_path": "/functions/v1/backend-v1/session_assignment_set_v1",
       "permission": "schedule.manage",
       "features": [
         "F13"
@@ -1881,8 +1881,8 @@
     },
     {
       "name": "class_assignment_set_v1",
-      "status": "contract_only",
-      "external_path": null,
+      "status": "operational_development_limited",
+      "external_path": "/functions/v1/backend-v1/class_assignment_set_v1",
       "permission": "schedule.manage",
       "features": [
         "F10",

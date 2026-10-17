@@ -1421,6 +1421,9 @@ Request_event_actual_start_record?: RequestEventActualStartRecord
 Success_event_actual_start_record?: SuccessEventActualStartRecord
 Request_event_actual_start_correct?: RequestEventActualStartCorrect
 Success_event_actual_start_correct?: SuccessEventActualStartCorrect
+LocalOffsetChoice?: LocalOffsetChoice
+ClassAssignmentView?: ClassAssignmentView
+SchedulePreviewItem?: SchedulePreviewItem
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -1553,6 +1556,16 @@ ends_on: Date
 room_id?: (string | null)
 assignments: DutyInput[]
 capacity: Capacity
+offset_choices?: LocalOffsetChoice[]
+inherit_class_assignments?: Bool
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "LocalOffsetChoice".
+ */
+export interface LocalOffsetChoice {
+date: Date
+offset_minutes: number
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -2068,6 +2081,41 @@ dependencies: PreviewDependencies
 effects: Effect[]
 blockers: SafeError[]
 expires_at: Instant
+sessions?: SchedulePreviewItem[]
+class_assignments?: ClassAssignmentView[]
+class_version?: PositiveInt
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "SchedulePreviewItem".
+ */
+export interface SchedulePreviewItem {
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+session_id: string
+expected_version?: PositiveInt
+interval: Interval
+resources: ResourceRef[]
+assignments: DutyInput[]
+capacity: Capacity
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "ClassAssignmentView".
+ */
+export interface ClassAssignmentView {
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+id: string
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+person_id: string
+duty: Duty
+state: RecordState
+version: PositiveInt
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -2303,6 +2351,8 @@ version: PositiveInt
  * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
  */
 discipline_id: string
+class_assignments?: ClassAssignmentView[]
+class_version?: PositiveInt
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -4719,6 +4769,7 @@ capacity: Capacity
  */
 discipline_id: string
 format: SessionFormat
+inherit_class_assignments?: Bool
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -4786,6 +4837,7 @@ session_id: string
 patch: SessionPatch
 scope: ChangeScope
 reason: Text
+offset_choices?: LocalOffsetChoice[]
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -5007,6 +5059,7 @@ session_id: string
 person_id: string
 duty: Duty
 agreement_id?: (string | null)
+state?: RecordState
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -8913,6 +8966,7 @@ class_id: string
  */
 person_id: string
 duty: Duty
+state?: RecordState
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -9793,6 +9847,8 @@ duration_minutes: Int
 starts_on: Date
 ends_on: Date
 state: RecordState
+timezone?: (IanaZone | null)
+spec_snapshot?: (ProgramSpec | null)
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -9827,6 +9883,7 @@ replaces_id?: (string | null)
  * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
  */
 discipline_id: string
+assignment_mode?: ("legacy" | "inherit" | "explicit")
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -9858,6 +9915,7 @@ person_id: string
 duty: Duty
 agreement_id?: (string | null)
 state: RecordState
+origin_class_assignment_id?: (string | null)
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -9888,6 +9946,7 @@ resource_id: string
 starts_at: Instant
 ends_at: Instant
 state: RecordState
+duty_assignment?: Bool
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema

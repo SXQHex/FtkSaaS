@@ -23,8 +23,8 @@ Deno.serve(async req=>{
   const claims=JSON.parse(atob(part));if(claims.sub!==user.id||!claims.session_id)return failure("SESSION_REVOKED",401);
   // Authenticated input never controls internal IDs or actor context.
   const readOnly=operation.endsWith("_get_v1")||operation.endsWith("_list_v1")||operation.endsWith("_preview_v1");
-  const bulk=["event_attendance_close_v1","event_cancel_apply_v1","sale_apply_v1"].includes(operation);
-  const count=(readOnly?32:bulk?4096:512)+2*(request.discipline_ids?.length??0)+3*(request.assignments?.length??0)+2*(request.contacts?.length??0)+2*(request.terms?.scopes?.length??0);
+  const bulk=["event_attendance_close_v1","event_cancel_apply_v1","sale_apply_v1","program_preview_v1","program_apply_v1","session_change_preview_v1","session_change_apply_v1","class_assignment_set_v1"].includes(operation);
+  const count=(bulk?4096:readOnly?32:512)+2*(request.discipline_ids?.length??0)+3*(request.assignments?.length??0)+2*(request.contacts?.length??0)+2*(request.terms?.scopes?.length??0);
   
   let invite:null|Record<string,string>=null;
   if(operation==="account_access_send_v1"||operation.endsWith("_preview_v1")||operation==="sale_preview_v1"){

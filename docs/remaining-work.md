@@ -1,6 +1,6 @@
 # Kalan backend işleri
 
-Güncel geliştirme kapsamı: **72 çağrılabilir / 112 yalnız sözleşme**, 24 migration. [Takvim/seans/rezervasyon okuma devri](schedule-read-handover.md) üç okumanın yetki, UTC filtre ve cursor sınırlarını belirtir. Ürün okuması katalog sözleşmesiyle uygun satın alınmış hak seçimini karşılamaz; seans/kişi/sale bağlamı ve DTO aktarımı ayrı teslimdir. Son head CI bağımsız doğrulanır. Aşağıdaki PR #8 başlangıcı tarihsel kanıttır.
+Güncel geliştirme kapsamı: **79 çağrılabilir / 105 yalnız sözleşme**, 25 migration. [Takvim/seans/rezervasyon okuma devri](schedule-read-handover.md) üç okumanın yetki, UTC filtre ve cursor sınırlarını belirtir. Ürün okuması katalog sözleşmesiyle uygun satın alınmış hak seçimini karşılamaz; seans/kişi/sale bağlamı ve DTO aktarımı ayrı teslimdir. [Program/seans devri](program-session-handover.md) uygulanmış akış ve kalan anlaşma/entegrasyon sınırlarını açıklar. Son head CI bağımsız doğrulanır. Aşağıdaki PR #8 başlangıcı tarihsel kanıttır.
 
 ## Doğrulanmış başlangıç — 17 Ekim 2026
 
@@ -11,7 +11,7 @@ Uzak geliştirme/test Auth → Edge → RPC smoke [ayrı rapordadır](../reports
 ## Bağımlılık sırası
 
 1. Uygunluk/politika dört API uygulandı; tüketici sınırları ve eksik iş akışları Claude devrindeki güncel bölümde açıkça ayrılır. Son PR SHA kabulü CI ile ayrıca doğrulanır.
-2. Ürün kataloğu ile uygun satın alınmış paket/hak seçimi bağımlılık aktarımı; program önizleme/uygulama ve talep–bekleme–yer teklifi yaşam döngüleri. Üç program okuması uygulandı; sınırlar okuma devrindedir.
+2. Ürün kataloğu ile uygun satın alınmış paket/hak seçimi bağımlılık aktarımı; talep–bekleme–yer teklifi yaşam döngüleri; program/seans yedi komutu bu PR’de uygulanır, anlaşma yayını ayrı bağımlılıktır. Üç program okuması uygulandı; sınırlar okuma devrindedir.
 3. Ders yoklaması, kapanış/düzeltme, blocked katılım ve eğitmen anlaşması/hakediş.
 4. Paket dondurma/uzatma/değişim/yenileme/sonlandırma ve finans düzeltme/iade önizleme–uygulama çiftleri.
 5. Hesap erişimi geri alma, hesap/organizasyon kapanış/silme ve kişi birleştirme.
@@ -19,14 +19,14 @@ Uzak geliştirme/test Auth → Edge → RPC smoke [ayrı rapordadır](../reports
 
 Her yeni grup: sözleşme/izin incelemesi → yeni migration → gerçek Auth/API kabulü (sınır, yetki, tekrar, yarış, rollback) → inceleme → temiz CI → main CI. Ürün kararında boşluk varsa teknik varsayımla yeni kural eklenmez.
 
-## Yalnız sözleşme envanteri — güncel 112 işlem
+## Yalnız sözleşme envanteri — güncel 105 işlem
 
 | Modül | Kalan işlem |
 |---|---:|
-| M01 | 6 |
+| M01 | 5 |
 | M02 | 7 |
-| M03 | 2 |
-| M04 | 19 |
+| M03 | 3 |
+| M04 | 12 |
 | M05 | 9 |
 | M06 | 15 |
 | M07 | 5 |
@@ -55,15 +55,9 @@ Her yeni grup: sözleşme/izin incelemesi → yeni migration → gerçek Auth/AP
 | `person_merge_preview_v1` | `person.merge` |
 | `person_merge_approve_v1` | `person.merge` |
 | `person_merge_apply_v1` | `person.merge` |
-| `program_preview_v1` | `schedule.manage` |
-| `program_apply_v1` | `schedule.manage` |
-| `session_change_preview_v1` | `schedule.manage` |
-| `session_change_apply_v1` | `schedule.manage` |
-| `session_capacity_set_v1` | `schedule.manage` |
 | `session_cancel_preview_v1` | `schedule.manage` |
 | `session_cancel_apply_v1` | `schedule.manage` |
 | `replacement_session_create_v1` | `schedule.manage` |
-| `session_assignment_set_v1` | `schedule.manage` |
 | `lesson_request_create_v1` | `request.write` |
 | `lesson_request_withdraw_v1` | `request.write` |
 | `lesson_request_reject_v1` | `request.resolve` |
@@ -148,7 +142,6 @@ Her yeni grup: sözleşme/izin incelemesi → yeni migration → gerçek Auth/AP
 | `report_build_v1` | `system.worker` |
 | `privacy_execute_v1` | `system.worker` |
 | `subscription_boundary_apply_v1` | `system.worker` |
-| `class_assignment_set_v1` | `schedule.manage` |
 | `attendance_block_v1` | `attendance.block` |
 | `file_upload_complete_v1` | `account.self` |
 | `negcredit_valuation_set_v1` | `product.manage` |

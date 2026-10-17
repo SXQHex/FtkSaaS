@@ -1,3 +1,13 @@
+# FtkSaaS — program/seans geliştirme kapsamı
+
+Program/seans yaşam döngüsü geliştirme kapsamı: **79 çağrılabilir / 105 yalnız sözleşme**, 25 migration. [Program/seans devri](../docs/program-session-handover.md) yedi komutun uçtan uca akışını, sözleşme bağımlılıklarını ve sınırlarını belirtir. Yeni kaynak için tam temiz kabul son PR head CI'ından doğrulanır; önceki test kanıtları yeni SHA'ya taşınmaz.
+
+Doğrulanmış dal başlangıcı: main `69257f056f593b4b52248e7c9070dada7918344d`, [aynı SHA CI](https://github.com/SXQHex/FtkSaaS/actions/runs/39004791672) başarılı (221 test, 24 migration). Bu PR ayrı daldadır; merge veya production dağıtımı içermez.
+
+Aşağıdaki önceki kapsam ve kanıtlar kendi kaynak snapshot'larıdır.
+
+---
+
 # FtkSaaS — güncel başlangıç
 
 Takvim/seans/rezervasyon okuma geliştirme kapsamı: **72/112**, 24 migration. [Okuma devri](../docs/schedule-read-handover.md); ürün kataloğu/uygun hak seçimi ayrı açık iştir. Son head CI ayrıca doğrulanır. Aşağıdaki 69/115 ve PR #8 sayıları tarihsel snapshot'tır.

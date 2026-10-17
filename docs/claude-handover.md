@@ -1,3 +1,13 @@
+# Program/seans yaşam döngüsü — güncel geliştirme devri
+
+Program/seans yaşam döngüsü geliştirme kapsamı: **79 çağrılabilir / 105 yalnız sözleşme**, 25 migration. [Program/seans devri](program-session-handover.md) yedi komutun uçtan uca akışını, sözleşme bağımlılıklarını ve sınırlarını belirtir. Yeni kaynak için tam temiz kabul son PR head CI'ından doğrulanır; önceki test kanıtları yeni SHA'ya taşınmaz.
+
+Doğrulanmış dal başlangıcı: main `69257f056f593b4b52248e7c9070dada7918344d`, [aynı SHA CI](https://github.com/SXQHex/FtkSaaS/actions/runs/39004791672) başarılı (221 test, 24 migration). Bu PR ayrı daldadır; merge veya production dağıtımı içermez.
+
+Aşağıdaki önceki kapsam ve kanıtlar kendi kaynak snapshot'larıdır.
+
+---
+
 # Takvim/seans/rezervasyon okumaları — geliştirme uygulaması
 
 72 çağrılabilir / 112 yalnız sözleşme; 24 migration. `calendar_get_v1`, `session_get_v1`, `reservation_list_v1` kapsamı, canlı görünürlük, UTC aralık, cursor ve entegrasyon sınırları [okuma devrinde](schedule-read-handover.md). `products_list_v1` ürün kataloğudur; uygun satın alınmış paket seçimi için seans/kişi/sale bağlamı ayrıca aktarılmalıdır ve bu teslimin dışında kalır. Kaynak `9a5b2bd7ba71d25a259bf96851c2829bc4782c7c` üzerinde tam `npm run test:clean` geçti: 12 sözleşme + 27 DB + 182 Auth/API = 221 test, 24 migration, seed/health/advisors başarılı. [Kaynak raporu](../reports/schedule-read-verification.json). Son head temiz CI ayrıca doğrulanır. Aşağıdaki uygunluk/politika uygulama sayıları kendi kaynak snapshot'ıdır.
