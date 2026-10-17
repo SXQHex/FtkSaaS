@@ -2,9 +2,9 @@
 
 ## Starter yoklama/koruma teslimi — güncel kapsam
 
-[Starter devri](starter-attendance-protection-handover.md) zorunlu bağımlılıkları ve kalan tüketicileri tanımlar. 198 işlem / 89 canlı / 109 contract-only; 90 core tablo / 26 migration. Starter program → rezervasyon → etki/onay → korunan katılım → kapanış → gerekçeli düzeltme uygulanır. Ücretli finansal kapanış açıkça kapalı; başlangıç/belge ve diğer hak değişikliği tüketicileri pending. Son SHA’nın kanıtı PR’dedir; eski başarı taşınmaz.
+[Starter devri](starter-attendance-protection-handover.md) zorunlu bağımlılıkları ve kalan tüketicileri tanımlar. 198 işlem / 89 canlı / 109 contract-only; 90 core tablo / 27 migration. Starter program → rezervasyon → etki/onay → korunan katılım → kapanış → gerekçeli düzeltme uygulanır. Ücretli finansal kapanış açıkça kapalı; başlangıç/belge ve diğer hak değişikliği tüketicileri pending. Son SHA’nın kanıtı PR’dedir; eski başarı taşınmaz.
 
-Güncel geliştirme kapsamı: **89 çağrılabilir / 109 yalnız sözleşme**, 26 migration. [Takvim/seans/rezervasyon okuma devri](schedule-read-handover.md) üç okumanın yetki, UTC filtre ve cursor sınırlarını belirtir. Ürün okuması katalog sözleşmesiyle uygun satın alınmış hak seçimini karşılamaz; seans/kişi/sale bağlamı ve DTO aktarımı ayrı teslimdir. [Program/seans devri](program-session-handover.md) uygulanmış akış ve kalan anlaşma/entegrasyon sınırlarını açıklar. Son head CI bağımsız doğrulanır. Aşağıdaki PR #8 başlangıcı tarihsel kanıttır.
+Güncel geliştirme kapsamı: **89 çağrılabilir / 109 yalnız sözleşme**, 27 migration. [Takvim/seans/rezervasyon okuma devri](schedule-read-handover.md) üç okumanın yetki, UTC filtre ve cursor sınırlarını belirtir. Ürün okuması katalog sözleşmesiyle uygun satın alınmış hak seçimini karşılamaz; seans/kişi/sale bağlamı ve DTO aktarımı ayrı teslimdir. [Program/seans devri](program-session-handover.md) uygulanmış akış ve kalan anlaşma/entegrasyon sınırlarını açıklar. Son head CI bağımsız doğrulanır. Aşağıdaki PR #8 başlangıcı tarihsel kanıttır.
 
 ## Doğrulanmış başlangıç — 17 Ekim 2026
 

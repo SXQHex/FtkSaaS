@@ -2,9 +2,9 @@
 
 ## Starter yoklama/koruma teslimi — güncel kapsam
 
-[Starter devri](../docs/starter-attendance-protection-handover.md) zorunlu bağımlılıkları ve kalan tüketicileri tanımlar. 198 işlem / 89 canlı / 109 contract-only; 90 core tablo / 26 migration. Starter program → rezervasyon → etki/onay → korunan katılım → kapanış → gerekçeli düzeltme uygulanır. Ücretli finansal kapanış açıkça kapalı; başlangıç/belge ve diğer hak değişikliği tüketicileri pending. Son SHA’nın kanıtı PR’dedir; eski başarı taşınmaz.
+[Starter devri](../docs/starter-attendance-protection-handover.md) zorunlu bağımlılıkları ve kalan tüketicileri tanımlar. 198 işlem / 89 canlı / 109 contract-only; 90 core tablo / 27 migration. Starter program → rezervasyon → etki/onay → korunan katılım → kapanış → gerekçeli düzeltme uygulanır. Ücretli finansal kapanış açıkça kapalı; başlangıç/belge ve diğer hak değişikliği tüketicileri pending. Son SHA’nın kanıtı PR’dedir; eski başarı taşınmaz.
 
-Doğrulanmış başlangıç: main `5265a70a0d29f91b9081a1ecbc2a8f0ff78668ee`; [aynı SHA CI](https://github.com/SXQHex/FtkSaaS/actions/runs/39030586306) başarılı: 322 test, 25 migration. Bu teslim yeni Starter runtime ve 26. migration’ı ekler; 198 sözleşmeli işlem, 89 canlı / 109 yalnız sözleşme. Başlangıcın başarısı yeni head’e taşınmaz; son CI/inceleme PR üzerinde aynı tam SHA’ya bağlıdır.
+Doğrulanmış başlangıç: main `5265a70a0d29f91b9081a1ecbc2a8f0ff78668ee`; [aynı SHA CI](https://github.com/SXQHex/FtkSaaS/actions/runs/39030586306) başarılı: 322 test, 25 migration. Bu teslim yeni Starter runtime ve 26–27. migration’ı ekler; 198 sözleşmeli işlem, 89 canlı / 109 yalnız sözleşme. Başlangıcın başarısı yeni head’e taşınmaz; son CI/inceleme PR üzerinde aynı tam SHA’ya bağlıdır.
 
 [Karar sprinti devri](../docs/decision-sprint-handover.md), [kabul edilmiş kararlar](../docs/decisions/DS-2026-10-17.md), [F01–F33 haritası](../docs/feature-delivery.md), [main koruma denetimi](../docs/branch-protection-review.md). Yeni DS davranışları gerçek Auth → Edge → RPC kabulü bekler; sözleşme negatif testleri ve mevcut runtime regresyonu ayrı kanıttır. Son revizyon: docs/decisions/DS-2026-10-17-settlement-center-scope.md; kaynak/kanıt raporu: reports/settlement-center-scope-verification.json; son PR head inceleme ve tam temiz CI ayrıca doğrulanır.
 

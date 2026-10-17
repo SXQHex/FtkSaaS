@@ -36,6 +36,10 @@ Yapısal kontroller davranış kabulü değildir. Mevcut 202 API/27 DB regresyon
 
 Mevcut DST/fold/gap testi `tests/program-session-lifecycle.test.mjs` regresyonudur; yeni başlangıç anı kabulü değildir. DS-PLAN-01’in gerçek Starter kabulü bu dosyaya bağlıdır; F14/F15/F03 veya geniş DS-PROT/DS-ACCESS vakaları topluca kapatılmaz. Son SHA’nın CI/inceleme bağlantıları PR üzerindedir.
 
-198 sözleşmeli işlem, 89 çağrılabilir, 109 contract-only; 90 core domain tablosu, 26 migration, iki yeni private teknik tablo. F01–F33 özellikleri partial/pending kalır.
+198 sözleşmeli işlem, 89 çağrılabilir, 109 contract-only; 90 core domain tablosu, 27 migration, iki yeni private teknik tablo. F01–F33 özellikleri partial/pending kalır.
 
-[Odaklı kaynak raporu](../reports/starter-attendance-protection-verification.json): 93 yapısal test ve 60 gerçek API testi (41 mevcut regresyon + 19 yeni kabul). Tam temiz final CI ayrı kanıttır.
+[Önceki geliştirme kaynak raporu](../reports/starter-attendance-protection-verification.json): 93 yapısal test ve 60 gerçek API testi (41 mevcut regresyon + 19 yeni kabul). Bu rapor önceki kaynak snapshot’ıdır; yeni head’e taşınmaz. Tam temiz final CI ayrı kanıttır.
+
+CI iki işte PR head SHA’sını açıkça checkout eder ve gerçek git HEAD eşitliğini denetler. I/A yanıtında blocked sonucu kalır, finans gerekçesi açılmaz. Eski taslağın teknik tüketim alanı boşsa sabit rezervasyon koşulundan belirlenir; genel kapanış engeli eklenmez. Eski blocked koşulu yoksa yalnız o etki açık yapılandırma hatasıdır.
+
+[Son odaklı kaynak raporu](../reports/starter-attendance-protection-final-verification.json): redaksiyon/legacy düzeltmesiyle 19 gerçek API kabulü; 26+27 ile yeniden kurulan fonksiyonlar test edilen tanımlarla byte-identical. 26 değiştirilmedi; 27 append-only düzeltmedir. Yeni son head’in CI/inceleme kanıtı PR’de ayrıca bağlanır.

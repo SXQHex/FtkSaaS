@@ -33,6 +33,7 @@ test('Starter attendance and protected reservation through Auth -> Edge -> RPC',
  await mut('availability_save_v1',{resource:{kind:'person',id:instructor.p},rule:{weekdays:[1,2,3,4,5,6,7],local_start:'00:00:00',local_end:'23:59:59',valid_from:'2020-01-01'}});
  const effective_at=new Date(Date.now()-10000).toISOString();
  const publish=(k,value)=>mut('policy_publish_v1',{center_id:null,key:k,value,effective_at:new Date().toISOString(),mandatory:false});
+ await publish('participation_block_credit',{kind:'blocked_credit',effect:'release'});
  await publish('negative_default',{kind:'integer',value:2});await publish('negative_upper',{kind:'integer',value:2});
  await publish('student_cancel_group',{kind:'cancellation',terms:{cutoff_minutes:0,before_cutoff:'release',after_cutoff:'release',no_show:'release'}});
  await publish('reservation_window',{kind:'window',opens_minutes_before:10080,closes_minutes_before:0,manager_exception:false});
@@ -123,6 +124,13 @@ test('Starter attendance and protected reservation through Auth -> Edge -> RPC',
   await db.query("update core.sessions set starts_at=now()-interval '1 minute',ends_at=now()+interval '59 minutes' where id=$1",[assigned]);
   let v=await get(assigned);await mut('attendance_mark_v1',{reservation_id:own,expected_version:v.entries[0].version,result:'attended'},key(),instructor.u);
   v=await must(instructor.u,'attendance_get_v1',scope({session_id:assigned}));assert.equal(v.entries[0].eligibility_snapshot,null);
+  await publish('debt_participation',{kind:'boolean',value:true});
+  await db.query("insert into core.debts(id,org_id,center_id,person_id,amount_minor,currency,due_at,state) select $1,$2,$3,person_id,100,'TRY',now(),'open' from core.reservations where id=$4",[key(),org,center,own]);
+  const draft=await get(assigned);await mut('attendance_block_v1',{reservation_id:own,expected_version:draft.entries[0].version,reason:'debt_policy'});
+  const redacted=await must(instructor.u,'attendance_get_v1',scope({session_id:assigned}));
+  assert.equal(redacted.entries[0].result,'blocked');assert(!('blocked_reason' in redacted.entries[0]));assert.equal(redacted.entries[0].eligibility_snapshot,null);
+  assert.equal((await get(assigned)).entries[0].blocked_reason,'debt_policy');
+  await publish('debt_participation',{kind:'boolean',value:false});
   await fail('attendance_get_v1',{session_id:assigned},'FORBIDDEN',student.u);
   await fail('attendance_get_v1',{session_id:assigned},'NOT_FOUND',outsider);
   await fail('attendance_get_v1',{session_id:assigned,center_id:key()},'NOT_FOUND');
@@ -164,6 +172,7 @@ test('Starter attendance and protected reservation through Auth -> Edge -> RPC',
   const p=await linked('rollback-student'),p2=await linked('rollback-student-two'),ses=(await makeSession()).primary_id,rv=(await book(ses,p.p)).primary_id;await book(ses,p2.p);
   await db.query("update core.sessions set starts_at=now()-interval '1 minute',ends_at=now()+interval '59 minutes' where id=$1",[ses]);
   let v=await get(ses);for(const entry of v.entries)await mut('attendance_mark_v1',{reservation_id:entry.reservation_id,expected_version:entry.version,result:'attended'});v=await get(ses);
+  await db.query('update core.attendance_entries set consumes_on_close=null,policy_snapshot=null where reservation_id=$1',[rv]);
   const snapshot=async()=>{const out={};for(const table of ['reservations','sessions','credit_deficits','attendance_entries','attendance_closures','operation_receipts','audit_events','outbox_jobs'])out[table]=await rows('select to_jsonb(q) v from core.'+table+' q where org_id=$1 order by id',[org]);out.history=await rows('select to_jsonb(q) v from private.lesson_deficit_movements q where org_id=$1 order by id',[org]);return out;};
   const before=await snapshot(),fn='lesson_fault_'+key().replaceAll('-','');
   await db.query('create function private.'+fn+"() returns trigger language plpgsql set search_path='' as $$begin raise exception using errcode='P0001',message='INTEGRITY_VIOLATION';end$$");
@@ -203,7 +212,10 @@ test('Starter attendance and protected reservation through Auth -> Edge -> RPC',
   await publish('participation_block_credit',{kind:'blocked_credit',effect:'release'});
   // Independent debt fixture. No historical start balance is inferred.
   const p=await linked('blocked-student'),ses=(await makeSession()).primary_id,rv=(await book(ses,p.p)).primary_id;
-  await publish('debt_participation',{kind:'boolean',value:true});
+  const debtChange={kind:'policy',key:'debt_participation',value:{kind:'boolean',value:true},effective_at:new Date().toISOString(),mandatory:false};
+  const approval=await must(owner,'reservation_impact_preview_v1',scope({center_id:null,change:debtChange,reason:'Explicit debt participation impact'}));
+  await mut('reservation_impact_apply_v1',{center_id:null,preview:token(approval.preview),accepted_reservation_ids:approval.affected.map(x=>x.reservation_id)});
+
   await db.query("insert into core.debts(id,org_id,center_id,person_id,amount_minor,currency,due_at,state) values($1,$2,$3,$4,100,'TRY',now(),'open')",[key(),org,center,p.p]);
   // Re-publishing true is not a cause of the debt and must not waive it.
   await publish('debt_participation',{kind:'boolean',value:true});

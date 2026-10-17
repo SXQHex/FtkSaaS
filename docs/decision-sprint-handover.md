@@ -2,7 +2,7 @@
 
 Başlangıç main: c231ab5526854ed62445613467649e1b0bf960bb; [aynı SHA CI](https://github.com/SXQHex/FtkSaaS/actions/runs/39010419849) başarılı: 25 migration, 241 test (12 sözleşme + 27 DB + 202 Auth/API). Bu geçmiş kanıt yeni PR'nin kabulü değildir.
 
-Kabul edilmiş karar/DTO/izin/guard aktarımı korunur. Son Starter teslimi dar runtime’ı ve 26. migration’ı ekler; frontend değişmez. 184 başlangıç işlemine toplam 14 yeni sözleşme adı eklenmiştir: 198 toplam, 89 canlı, 109 yalnız sözleşme. Ayrıntı ve açık tüketiciler Starter devrindedir. İşlem sayısı ürün tamamlanma oranı değildir.
+Kabul edilmiş karar/DTO/izin/guard aktarımı korunur. Son Starter teslimi dar runtime’ı ve 26–27. migration’ı ekler; frontend değişmez. 184 başlangıç işlemine toplam 14 yeni sözleşme adı eklenmiştir: 198 toplam, 89 canlı, 109 yalnız sözleşme. Ayrıntı ve açık tüketiciler Starter devrindedir. İşlem sayısı ürün tamamlanma oranı değildir.
 
 ## Karar, aktarım, uygulama ve doğrulama ayrımı
 
@@ -10,7 +10,7 @@ Kabul edilmiş karar/DTO/izin/guard aktarımı korunur. Son Starter teslimi dar 
 |---|---|
 | Ürün kararı | [DS-2026-10-17 açık kullanıcı kararları](decisions/DS-2026-10-17.md) kabul edilmiş ve önceki çelişen hükümleri değiştirir |
 | Teknik aktarım | 01/02/06 yaşayan hükümler, 08 DTO/izin/guard/faz/sürüm/etki metaverisi, üretilmiş 04/05/envanter/ortak tipler |
-| Runtime | 89 endpoint/90 core tablo/26 migration. Starter için 10 işlem canlı; DS geniş davranışları ve diğer hedefler tamamlandı sayılmaz |
+| Runtime | 89 endpoint/90 core tablo/27 migration. Starter için 10 işlem canlı; DS geniş davranışları ve diğer hedefler tamamlandı sayılmaz |
 | Sözleşme/CI denetimi | Pozitif şema/tutarlılık ve kasıtlı bozmada gerçekten başarısız olan negatif governance testleri |
 | Gerçek davranış kabulü | Önceki 202 Auth/API testinin regresyonu korunur; DS-PLAN-01 gerçek Starter akışına bağlı; kalan 37 vaka pending_runtime, statik testten geçti çıkarımı yoktur |
 | Son head ve merge | Son PR head incelemesi ve CI ayrıca doğrulanır; bu PR için yeni merge yetkisi varsayılmaz |
