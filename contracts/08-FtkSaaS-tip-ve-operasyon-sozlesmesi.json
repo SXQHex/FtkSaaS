@@ -47474,12 +47474,13 @@
         "decision_delivery": {
           "accepted_contract": "DS-2026-10-17",
           "runtime_conformance": "pending",
-          "open_dependencies": [
-            "starter_plan_and_earning_split"
-          ],
+          "open_dependencies": [],
           "target_request": {
             "$ref": "#/$defs/Request_program_preview"
-          }
+          },
+          "completed_dependencies": [
+            "starter_plan_and_earning_split"
+          ]
         }
       },
       {
@@ -47607,12 +47608,13 @@
         "decision_delivery": {
           "accepted_contract": "DS-2026-10-17",
           "runtime_conformance": "pending",
-          "open_dependencies": [
-            "starter_plan_and_earning_split"
-          ],
+          "open_dependencies": [],
           "target_request": {
             "$ref": "#/$defs/Request_program_apply"
-          }
+          },
+          "completed_dependencies": [
+            "starter_plan_and_earning_split"
+          ]
         }
       },
       {
@@ -47747,12 +47749,13 @@
         "decision_delivery": {
           "accepted_contract": "DS-2026-10-17",
           "runtime_conformance": "conditional_plan_gates_aligned_limited_runtime",
-          "open_dependencies": [
-            "starter_plan_and_earning_split"
-          ],
+          "open_dependencies": [],
           "target_request": {
             "$ref": "#/$defs/Request_session_create"
-          }
+          },
+          "completed_dependencies": [
+            "starter_plan_and_earning_split"
+          ]
         }
       },
       {
@@ -48122,12 +48125,13 @@
         "decision_delivery": {
           "accepted_contract": "DS-2026-10-17",
           "runtime_conformance": "conditional_plan_gates_aligned_limited_runtime",
-          "open_dependencies": [
-            "agreement_versions_and_selection"
-          ],
+          "open_dependencies": [],
           "target_request": {
             "$ref": "#/$defs/Request_session_change_apply"
-          }
+          },
+          "completed_dependencies": [
+            "agreement_versions_and_selection"
+          ]
         }
       },
       {
@@ -48733,13 +48737,14 @@
         "decision_delivery": {
           "accepted_contract": "DS-2026-10-17",
           "runtime_conformance": "pending",
-          "open_dependencies": [
-            "starter_plan_and_earning_split",
-            "agreement_versions_and_selection"
-          ],
+          "open_dependencies": [],
           "target_request": {
             "$ref": "#/$defs/Request_session_assignment_set"
-          }
+          },
+          "completed_dependencies": [
+            "agreement_versions_and_selection",
+            "starter_plan_and_earning_split"
+          ]
         }
       },
       {
@@ -50425,7 +50430,7 @@
         },
         "decision_delivery": {
           "accepted_contract": "DS-2026-10-17",
-          "runtime_conformance": "starter_runtime_limited_paid_path_pending",
+          "runtime_conformance": "starter_and_paid_agreement_runtime",
           "open_dependencies": [],
           "target_request": {
             "$ref": "#/$defs/Request_attendance_get"
@@ -50435,7 +50440,9 @@
         "runtime_path": "/functions/v1/backend-v1/attendance_get_v1",
         "runtime_external_path": "/functions/v1/backend-v1/attendance_get_v1",
         "runtime_rpc": "api_v1.attendance_get_v1",
-        "runtime_limits": []
+        "runtime_limits": [
+          "Cross-center settlement accrual/reversal remains a separate delivery; instructor payment commands remain contract-only."
+        ]
       },
       {
         "name": "attendance_mark_v1",
@@ -50693,27 +50700,29 @@
           "source_decision": "DS-2026-10-17",
           "runtime_outcomes": {
             "starter": "rights_reservation_closure_audit_outbox_receipt_atomic_no_earning",
-            "pro_business_closure": "POLICY_NOT_CONFIGURED_before_domain_mutation",
-            "recorded_starter_correction": "linked_prior_starter_snapshot_and_right_effects"
+            "pro_business_closure": "explicit_performance_frozen_agreement_rights_earning_audit_outbox_receipt_atomic",
+            "recorded_starter_correction": "linked_prior_starter_snapshot_and_right_effects",
+            "recorded_paid_correction": "linked_frozen_agreement_and_right_difference_preserving_payments"
           }
         },
         "decision_delivery": {
           "accepted_contract": "DS-2026-10-17",
-          "runtime_conformance": "starter_runtime_limited_paid_path_pending",
-          "open_dependencies": [
-            "starter_plan_and_earning_split",
-            "agreement_versions_and_selection"
-          ],
+          "runtime_conformance": "starter_and_paid_agreement_runtime",
+          "open_dependencies": [],
           "target_request": {
             "$ref": "#/$defs/Request_attendance_close"
-          }
+          },
+          "completed_dependencies": [
+            "agreement_versions_and_selection",
+            "starter_plan_and_earning_split"
+          ]
         },
         "runtime_transport": "authenticated Edge adapter -> service-only RPC; rules/transaction in PostgreSQL",
         "runtime_path": "/functions/v1/backend-v1/attendance_close_v1",
         "runtime_external_path": "/functions/v1/backend-v1/attendance_close_v1",
         "runtime_rpc": "api_v1.attendance_close_v1",
         "runtime_limits": [
-          "Starter closure/correction only; paid F20 engine returns POLICY_NOT_CONFIGURED before domain writes"
+          "Cross-center settlement accrual/reversal remains a separate delivery; instructor payment commands remain contract-only."
         ]
       },
       {
@@ -50827,21 +50836,22 @@
         },
         "decision_delivery": {
           "accepted_contract": "DS-2026-10-17",
-          "runtime_conformance": "starter_runtime_limited_paid_path_pending",
-          "open_dependencies": [
-            "starter_plan_and_earning_split",
-            "agreement_versions_and_selection"
-          ],
+          "runtime_conformance": "starter_and_paid_agreement_runtime",
+          "open_dependencies": [],
           "target_request": {
             "$ref": "#/$defs/Request_attendance_correct_preview"
-          }
+          },
+          "completed_dependencies": [
+            "agreement_versions_and_selection",
+            "starter_plan_and_earning_split"
+          ]
         },
         "runtime_transport": "authenticated Edge adapter -> service-only RPC; rules/transaction in PostgreSQL",
         "runtime_path": "/functions/v1/backend-v1/attendance_correct_preview_v1",
         "runtime_external_path": "/functions/v1/backend-v1/attendance_correct_preview_v1",
         "runtime_rpc": "api_v1.attendance_correct_preview_v1",
         "runtime_limits": [
-          "Starter closure/correction only; paid F20 engine returns POLICY_NOT_CONFIGURED before domain writes"
+          "Cross-center settlement accrual/reversal remains a separate delivery; instructor payment commands remain contract-only."
         ]
       },
       {
@@ -50976,27 +50986,29 @@
           "source_decision": "DS-2026-10-17",
           "runtime_outcomes": {
             "starter": "rights_reservation_closure_audit_outbox_receipt_atomic_no_earning",
-            "pro_business_closure": "POLICY_NOT_CONFIGURED_before_domain_mutation",
-            "recorded_starter_correction": "linked_prior_starter_snapshot_and_right_effects"
+            "pro_business_closure": "explicit_performance_frozen_agreement_rights_earning_audit_outbox_receipt_atomic",
+            "recorded_starter_correction": "linked_prior_starter_snapshot_and_right_effects",
+            "recorded_paid_correction": "linked_frozen_agreement_and_right_difference_preserving_payments"
           }
         },
         "decision_delivery": {
           "accepted_contract": "DS-2026-10-17",
-          "runtime_conformance": "starter_runtime_limited_paid_path_pending",
-          "open_dependencies": [
-            "starter_plan_and_earning_split",
-            "agreement_versions_and_selection"
-          ],
+          "runtime_conformance": "starter_and_paid_agreement_runtime",
+          "open_dependencies": [],
           "target_request": {
             "$ref": "#/$defs/Request_attendance_correct_apply"
-          }
+          },
+          "completed_dependencies": [
+            "agreement_versions_and_selection",
+            "starter_plan_and_earning_split"
+          ]
         },
         "runtime_transport": "authenticated Edge adapter -> service-only RPC; rules/transaction in PostgreSQL",
         "runtime_path": "/functions/v1/backend-v1/attendance_correct_apply_v1",
         "runtime_external_path": "/functions/v1/backend-v1/attendance_correct_apply_v1",
         "runtime_rpc": "api_v1.attendance_correct_apply_v1",
         "runtime_limits": [
-          "Starter closure/correction only; paid F20 engine returns POLICY_NOT_CONFIGURED before domain writes"
+          "Cross-center settlement accrual/reversal remains a separate delivery; instructor payment commands remain contract-only."
         ]
       },
       {
@@ -54402,12 +54414,13 @@
         "decision_delivery": {
           "accepted_contract": "DS-2026-10-17",
           "runtime_conformance": "implemented_auth_edge_rpc_acceptance",
-          "open_dependencies": [
-            "agreement_versions_and_selection"
-          ],
+          "open_dependencies": [],
           "target_request": {
             "$ref": "#/$defs/Request_instructor_agreement_publish"
-          }
+          },
+          "completed_dependencies": [
+            "agreement_versions_and_selection"
+          ]
         },
         "runtime_path": "/functions/v1/backend-v1/instructor_agreement_publish_v1",
         "runtime_external_path": "/functions/v1/backend-v1/instructor_agreement_publish_v1",
@@ -61066,12 +61079,13 @@
         "decision_delivery": {
           "accepted_contract": "DS-2026-10-17",
           "runtime_conformance": "pending",
-          "open_dependencies": [
-            "starter_plan_and_earning_split"
-          ],
+          "open_dependencies": [],
           "target_request": {
             "$ref": "#/$defs/Request_class_assignment_set"
-          }
+          },
+          "completed_dependencies": [
+            "starter_plan_and_earning_split"
+          ]
         }
       },
       {
@@ -65348,12 +65362,13 @@
         "decision_delivery": {
           "accepted_contract": "DS-2026-10-17",
           "runtime_conformance": "implemented_auth_edge_rpc_acceptance",
-          "open_dependencies": [
-            "agreement_versions_and_selection"
-          ],
+          "open_dependencies": [],
           "target_request": {
             "$ref": "#/$defs/Request_attendance_start"
-          }
+          },
+          "completed_dependencies": [
+            "agreement_versions_and_selection"
+          ]
         },
         "runtime_transport": "authenticated Edge adapter -> service-only RPC; rules/transaction in PostgreSQL",
         "runtime_path": "/functions/v1/backend-v1/attendance_start_v1",
@@ -79710,7 +79725,8 @@
           "starter": "Tek merkez",
           "pro": "Tek merkez",
           "business": "Çoklu merkez"
-        }
+        },
+        "completed_dependencies": []
       },
       "F02": {
         "name": "Çalışma saatleri, izin ve uygunluk",
@@ -79740,7 +79756,8 @@
           "starter": "Temel",
           "pro": "Tam",
           "business": "Tam"
-        }
+        },
+        "completed_dependencies": []
       },
       "F03": {
         "name": "İşletme kuralları ve merkez istisnaları",
@@ -79778,7 +79795,8 @@
           "starter": "İşletme ayarları",
           "pro": "İşletme ayarları",
           "business": "Zorunlu/tavsiye merkez hiyerarşisi"
-        }
+        },
+        "completed_dependencies": []
       },
       "F04": {
         "name": "Hesap eşleştirme, çoklu rol, kapsamlı yetkilendirme",
@@ -79810,8 +79828,8 @@
           "settlement_authority_set_v1"
         ],
         "dependencies": [
-          "plan_gate_alignment",
-          "cross_center_settlement"
+          "cross_center_settlement",
+          "plan_gate_alignment"
         ],
         "implementation": "partial",
         "acceptance": "pending_feature_acceptance",
@@ -79868,7 +79886,8 @@
           "starter": "Var",
           "pro": "Var",
           "business": "Merkez kapsamlarıyla"
-        }
+        },
+        "completed_dependencies": []
       },
       "F05": {
         "name": "Resepsiyon/operasyon personeli izinleri",
@@ -79906,7 +79925,8 @@
           "starter": "—",
           "pro": "Var",
           "business": "Var"
-        }
+        },
+        "completed_dependencies": []
       },
       "F06": {
         "name": "Öğrenci/eğitmen panelleri, profil ve şifre işlemleri",
@@ -79961,7 +79981,8 @@
           "starter": "Var",
           "pro": "Var",
           "business": "Var"
-        }
+        },
+        "completed_dependencies": []
       },
       "F07": {
         "name": "Tek kişi kaydı, adaydan öğrenciye dönüşüm",
@@ -80010,7 +80031,8 @@
           "starter": "Tek kişi altyapısı",
           "pro": "CRM dönüşümü",
           "business": "CRM dönüşümü"
-        }
+        },
+        "completed_dependencies": []
       },
       "F08": {
         "name": "Birleşik takvim ve kaynak çakışma kontrolü",
@@ -80031,10 +80053,7 @@
           "session_change_apply_v1",
           "session_capacity_set_v1"
         ],
-        "dependencies": [
-          "starter_plan_and_earning_split",
-          "agreement_versions_and_selection"
-        ],
+        "dependencies": [],
         "implementation": "partial",
         "acceptance": "pending_feature_acceptance",
         "acceptance_evidence": [],
@@ -80063,7 +80082,11 @@
           "starter": "Temel",
           "pro": "Tam",
           "business": "Merkez bazlı"
-        }
+        },
+        "completed_dependencies": [
+          "agreement_versions_and_selection",
+          "starter_plan_and_earning_split"
+        ]
       },
       "F09": {
         "name": "Özel ders talep, onay, ret ve alternatif saat",
@@ -80084,9 +80107,7 @@
           "lesson_request_approve_v1",
           "request_expire_v1"
         ],
-        "dependencies": [
-          "starter_plan_and_earning_split"
-        ],
+        "dependencies": [],
         "implementation": "partial",
         "acceptance": "pending_feature_acceptance",
         "acceptance_evidence": [],
@@ -80111,7 +80132,10 @@
           "starter": "Var",
           "pro": "Var",
           "business": "Var"
-        }
+        },
+        "completed_dependencies": [
+          "starter_plan_and_earning_split"
+        ]
       },
       "F10": {
         "name": "Tekrarlayan grup programı ve sabit gruba kayıt",
@@ -80133,9 +80157,8 @@
           "class_assignment_set_v1"
         ],
         "dependencies": [
-          "starter_plan_and_earning_split",
-          "sale_scope_and_backdating",
-          "cross_center_settlement"
+          "cross_center_settlement",
+          "sale_scope_and_backdating"
         ],
         "implementation": "partial",
         "acceptance": "pending_feature_acceptance",
@@ -80185,7 +80208,10 @@
           "starter": "Var",
           "pro": "Var",
           "business": "Var"
-        }
+        },
+        "completed_dependencies": [
+          "starter_plan_and_earning_split"
+        ]
       },
       "F11": {
         "name": "Kontenjanlı açık grup dersine öğrencinin kaydolması",
@@ -80215,7 +80241,8 @@
           "starter": "—",
           "pro": "Var",
           "business": "Var"
-        }
+        },
+        "completed_dependencies": []
       },
       "F12": {
         "name": "Bekleme listesi ve süreli yer teklifi",
@@ -80253,7 +80280,8 @@
           "starter": "—",
           "pro": "Var",
           "business": "Var"
-        }
+        },
+        "completed_dependencies": []
       },
       "F13": {
         "name": "Eğitmen değişikliği",
@@ -80269,10 +80297,7 @@
           "session_change_apply_v1",
           "session_assignment_set_v1"
         ],
-        "dependencies": [
-          "agreement_versions_and_selection",
-          "starter_plan_and_earning_split"
-        ],
+        "dependencies": [],
         "implementation": "partial",
         "acceptance": "pending_feature_acceptance",
         "acceptance_evidence": [],
@@ -80296,7 +80321,11 @@
           "starter": "—",
           "pro": "Var",
           "business": "Var"
-        }
+        },
+        "completed_dependencies": [
+          "agreement_versions_and_selection",
+          "starter_plan_and_earning_split"
+        ]
       },
       "F14": {
         "name": "Yoklama, gelmeme, iptal, erteleme ve yerine seans düzenleme",
@@ -80324,8 +80353,6 @@
           "attendance_start_v1"
         ],
         "dependencies": [
-          "agreement_versions_and_selection",
-          "starter_plan_and_earning_split",
           "confirmed_reservation_protection"
         ],
         "implementation": "partial",
@@ -80368,7 +80395,11 @@
           "starter": "Var",
           "pro": "Var",
           "business": "Var"
-        }
+        },
+        "completed_dependencies": [
+          "agreement_versions_and_selection",
+          "starter_plan_and_earning_split"
+        ]
       },
       "F15": {
         "name": "Ders sayılı paket, geçerlilik ve kredi hareketleri",
@@ -80399,10 +80430,10 @@
           "negative_limits_get_v1"
         ],
         "dependencies": [
-          "sale_scope_and_backdating",
+          "confirmed_reservation_protection",
           "cross_center_settlement",
           "plan_gate_alignment",
-          "confirmed_reservation_protection"
+          "sale_scope_and_backdating"
         ],
         "implementation": "partial",
         "acceptance": "pending_feature_acceptance",
@@ -80466,7 +80497,8 @@
           "starter": "Temel",
           "pro": "Tam",
           "business": "Tam"
-        }
+        },
+        "completed_dependencies": []
       },
       "F16": {
         "name": "Süreli/sınırsız üyelik, dönemsel kullanım sınırı",
@@ -80487,9 +80519,9 @@
           "sale_renew_apply_v1"
         ],
         "dependencies": [
-          "sale_scope_and_backdating",
           "cross_center_settlement",
-          "plan_gate_alignment"
+          "plan_gate_alignment",
+          "sale_scope_and_backdating"
         ],
         "implementation": "partial",
         "acceptance": "pending_feature_acceptance",
@@ -80538,7 +80570,8 @@
           "starter": "—",
           "pro": "Var",
           "business": "Var"
-        }
+        },
+        "completed_dependencies": []
       },
       "F17": {
         "name": "Üyelik/paket dondurma ve plan değişimi",
@@ -80561,8 +80594,8 @@
           "sale_change_apply_v1"
         ],
         "dependencies": [
-          "sale_scope_and_backdating",
-          "confirmed_reservation_protection"
+          "confirmed_reservation_protection",
+          "sale_scope_and_backdating"
         ],
         "implementation": "partial",
         "acceptance": "pending_feature_acceptance",
@@ -80595,7 +80628,8 @@
           "starter": "—",
           "pro": "Var",
           "business": "Var"
-        }
+        },
+        "completed_dependencies": []
       },
       "F18": {
         "name": "Merkezler arasında kullanım hakkı ve onaylı hesaplaşma",
@@ -80619,8 +80653,8 @@
           "settlement_authority_set_v1"
         ],
         "dependencies": [
-          "sale_scope_and_backdating",
-          "cross_center_settlement"
+          "cross_center_settlement",
+          "sale_scope_and_backdating"
         ],
         "implementation": "partial",
         "acceptance": "pending_feature_acceptance",
@@ -80671,7 +80705,8 @@
           "starter": "—",
           "pro": "—",
           "business": "Var"
-        }
+        },
+        "completed_dependencies": []
       },
       "F19": {
         "name": "Manuel tahsilat, kısmi ödeme, iade/düzeltme ve alacak",
@@ -80698,9 +80733,9 @@
           "debt_adjust_v1"
         ],
         "dependencies": [
-          "sale_scope_and_backdating",
+          "confirmed_reservation_protection",
           "cross_center_settlement",
-          "confirmed_reservation_protection"
+          "sale_scope_and_backdating"
         ],
         "implementation": "partial",
         "acceptance": "pending_feature_acceptance",
@@ -80759,7 +80794,8 @@
           "starter": "Var",
           "pro": "Var",
           "business": "Var"
-        }
+        },
+        "completed_dependencies": []
       },
       "F20": {
         "name": "Eğitmen hakedişi ve ödeme takibi",
@@ -80785,10 +80821,8 @@
           "attendance_start_v1"
         ],
         "dependencies": [
-          "starter_plan_and_earning_split",
-          "agreement_versions_and_selection",
-          "plan_gate_alignment",
-          "confirmed_reservation_protection"
+          "confirmed_reservation_protection",
+          "plan_gate_alignment"
         ],
         "implementation": "partial",
         "acceptance": "pending_feature_acceptance",
@@ -80829,7 +80863,11 @@
           "starter": "—",
           "pro": "Var",
           "business": "Var"
-        }
+        },
+        "completed_dependencies": [
+          "agreement_versions_and_selection",
+          "starter_plan_and_earning_split"
+        ]
       },
       "F21": {
         "name": "Aday, kaynak, ilgi, takip ve dönüşüm",
@@ -80865,7 +80903,8 @@
           "starter": "—",
           "pro": "Temel",
           "business": "Gelişmiş"
-        }
+        },
+        "completed_dependencies": []
       },
       "F22": {
         "name": "Deneme teklifi ve kontrollü indirim",
@@ -80895,7 +80934,8 @@
           "starter": "—",
           "pro": "Var",
           "business": "Var"
-        }
+        },
+        "completed_dependencies": []
       },
       "F23": {
         "name": "Yenileme ve hareketsiz öğrenci takip listeleri",
@@ -80925,7 +80965,8 @@
           "starter": "—",
           "pro": "Var",
           "business": "Var"
-        }
+        },
+        "completed_dependencies": []
       },
       "F24": {
         "name": "Davranışa dayalı segmentler ve takip otomasyonu",
@@ -80957,7 +80998,8 @@
           "starter": "—",
           "pro": "—",
           "business": "Var"
-        }
+        },
+        "completed_dependencies": []
       },
       "F25": {
         "name": "Paylaşılabilir işletme takvimi ve başvuru/kayıt sayfası",
@@ -80998,7 +81040,8 @@
           "starter": "—",
           "pro": "Var",
           "business": "Var"
-        }
+        },
+        "completed_dependencies": []
       },
       "F26": {
         "name": "Talep sonucu, ders değişikliği ve benzeri işlemsel bildirimler",
@@ -81032,7 +81075,8 @@
           "starter": "Uygulama içi",
           "pro": "Var",
           "business": "Var"
-        }
+        },
+        "completed_dependencies": []
       },
       "F27": {
         "name": "Otomatik yaklaşan ders/paket bitiş hatırlatmaları",
@@ -81064,7 +81108,8 @@
           "starter": "—",
           "pro": "Var",
           "business": "Var"
-        }
+        },
+        "completed_dependencies": []
       },
       "F28": {
         "name": "Operasyon ve finans raporları, tarih filtresi, dışa aktarım",
@@ -81100,7 +81145,8 @@
           "starter": "Temel",
           "pro": "Tam",
           "business": "Birleşik ve merkez bazlı"
-        }
+        },
+        "completed_dependencies": []
       },
       "F29": {
         "name": "Atölye/etkinlik, kontenjan, kayıt ve katılım",
@@ -81166,7 +81212,8 @@
           "starter": "—",
           "pro": "Var",
           "business": "Var"
-        }
+        },
+        "completed_dependencies": []
       },
       "F30": {
         "name": "Temel form ve sürümlü belge onayı",
@@ -81202,7 +81249,8 @@
           "starter": "Var",
           "pro": "Var",
           "business": "Var"
-        }
+        },
+        "completed_dependencies": []
       },
       "F31": {
         "name": "Öğrenci, kalan kredi ve borç için veri içe aktarma",
@@ -81242,7 +81290,8 @@
           "starter": "Var",
           "pro": "Var",
           "business": "Var"
-        }
+        },
+        "completed_dependencies": []
       },
       "F32": {
         "name": "İşletme aboneliği, erişim ve kullanım limitleri",
@@ -81299,7 +81348,8 @@
           "starter": "Var",
           "pro": "Var",
           "business": "Var"
-        }
+        },
+        "completed_dependencies": []
       },
       "F33": {
         "name": "Denetlenebilir geçmiş ve yinelenen işlem koruması",
@@ -81353,7 +81403,8 @@
           "starter": "Var",
           "pro": "Var",
           "business": "Var"
-        }
+        },
+        "completed_dependencies": []
       }
     }
   }

@@ -1176,12 +1176,13 @@
       "decision_delivery": {
         "accepted_contract": "DS-2026-10-17",
         "runtime_conformance": "pending",
-        "open_dependencies": [
-          "starter_plan_and_earning_split"
-        ],
+        "open_dependencies": [],
         "target_request": {
           "$ref": "#/$defs/Request_program_preview"
-        }
+        },
+        "completed_dependencies": [
+          "starter_plan_and_earning_split"
+        ]
       },
       "billing_class": "new",
       "limits": []
@@ -1206,12 +1207,13 @@
       "decision_delivery": {
         "accepted_contract": "DS-2026-10-17",
         "runtime_conformance": "pending",
-        "open_dependencies": [
-          "starter_plan_and_earning_split"
-        ],
+        "open_dependencies": [],
         "target_request": {
           "$ref": "#/$defs/Request_program_apply"
-        }
+        },
+        "completed_dependencies": [
+          "starter_plan_and_earning_split"
+        ]
       },
       "billing_class": "new",
       "limits": []
@@ -1234,12 +1236,13 @@
       "decision_delivery": {
         "accepted_contract": "DS-2026-10-17",
         "runtime_conformance": "conditional_plan_gates_aligned_limited_runtime",
-        "open_dependencies": [
-          "starter_plan_and_earning_split"
-        ],
+        "open_dependencies": [],
         "target_request": {
           "$ref": "#/$defs/Request_session_create"
-        }
+        },
+        "completed_dependencies": [
+          "starter_plan_and_earning_split"
+        ]
       },
       "billing_class": "new",
       "limits": []
@@ -1319,12 +1322,13 @@
       "decision_delivery": {
         "accepted_contract": "DS-2026-10-17",
         "runtime_conformance": "conditional_plan_gates_aligned_limited_runtime",
-        "open_dependencies": [
-          "agreement_versions_and_selection"
-        ],
+        "open_dependencies": [],
         "target_request": {
           "$ref": "#/$defs/Request_session_change_apply"
-        }
+        },
+        "completed_dependencies": [
+          "agreement_versions_and_selection"
+        ]
       },
       "billing_class": "maintenance",
       "limits": []
@@ -1440,13 +1444,14 @@
       "decision_delivery": {
         "accepted_contract": "DS-2026-10-17",
         "runtime_conformance": "pending",
-        "open_dependencies": [
-          "starter_plan_and_earning_split",
-          "agreement_versions_and_selection"
-        ],
+        "open_dependencies": [],
         "target_request": {
           "$ref": "#/$defs/Request_session_assignment_set"
-        }
+        },
+        "completed_dependencies": [
+          "agreement_versions_and_selection",
+          "starter_plan_and_earning_split"
+        ]
       },
       "billing_class": "maintenance",
       "limits": []
@@ -1780,14 +1785,16 @@
       ],
       "decision_delivery": {
         "accepted_contract": "DS-2026-10-17",
-        "runtime_conformance": "starter_runtime_limited_paid_path_pending",
+        "runtime_conformance": "starter_and_paid_agreement_runtime",
         "open_dependencies": [],
         "target_request": {
           "$ref": "#/$defs/Request_attendance_get"
         }
       },
       "billing_class": "read",
-      "limits": []
+      "limits": [
+        "Cross-center settlement accrual/reversal remains a separate delivery; instructor payment commands remain contract-only."
+      ]
     },
     {
       "name": "attendance_mark_v1",
@@ -1831,18 +1838,19 @@
       ],
       "decision_delivery": {
         "accepted_contract": "DS-2026-10-17",
-        "runtime_conformance": "starter_runtime_limited_paid_path_pending",
-        "open_dependencies": [
-          "starter_plan_and_earning_split",
-          "agreement_versions_and_selection"
-        ],
+        "runtime_conformance": "starter_and_paid_agreement_runtime",
+        "open_dependencies": [],
         "target_request": {
           "$ref": "#/$defs/Request_attendance_close"
-        }
+        },
+        "completed_dependencies": [
+          "agreement_versions_and_selection",
+          "starter_plan_and_earning_split"
+        ]
       },
       "billing_class": "maintenance",
       "limits": [
-        "Starter closure/correction only; paid F20 engine returns POLICY_NOT_CONFIGURED before domain writes"
+        "Cross-center settlement accrual/reversal remains a separate delivery; instructor payment commands remain contract-only."
       ]
     },
     {
@@ -1862,18 +1870,19 @@
       ],
       "decision_delivery": {
         "accepted_contract": "DS-2026-10-17",
-        "runtime_conformance": "starter_runtime_limited_paid_path_pending",
-        "open_dependencies": [
-          "starter_plan_and_earning_split",
-          "agreement_versions_and_selection"
-        ],
+        "runtime_conformance": "starter_and_paid_agreement_runtime",
+        "open_dependencies": [],
         "target_request": {
           "$ref": "#/$defs/Request_attendance_correct_preview"
-        }
+        },
+        "completed_dependencies": [
+          "agreement_versions_and_selection",
+          "starter_plan_and_earning_split"
+        ]
       },
       "billing_class": "maintenance",
       "limits": [
-        "Starter closure/correction only; paid F20 engine returns POLICY_NOT_CONFIGURED before domain writes"
+        "Cross-center settlement accrual/reversal remains a separate delivery; instructor payment commands remain contract-only."
       ]
     },
     {
@@ -1893,18 +1902,19 @@
       ],
       "decision_delivery": {
         "accepted_contract": "DS-2026-10-17",
-        "runtime_conformance": "starter_runtime_limited_paid_path_pending",
-        "open_dependencies": [
-          "starter_plan_and_earning_split",
-          "agreement_versions_and_selection"
-        ],
+        "runtime_conformance": "starter_and_paid_agreement_runtime",
+        "open_dependencies": [],
         "target_request": {
           "$ref": "#/$defs/Request_attendance_correct_apply"
-        }
+        },
+        "completed_dependencies": [
+          "agreement_versions_and_selection",
+          "starter_plan_and_earning_split"
+        ]
       },
       "billing_class": "maintenance",
       "limits": [
-        "Starter closure/correction only; paid F20 engine returns POLICY_NOT_CONFIGURED before domain writes"
+        "Cross-center settlement accrual/reversal remains a separate delivery; instructor payment commands remain contract-only."
       ]
     },
     {
@@ -2622,12 +2632,13 @@
       "decision_delivery": {
         "accepted_contract": "DS-2026-10-17",
         "runtime_conformance": "implemented_auth_edge_rpc_acceptance",
-        "open_dependencies": [
-          "agreement_versions_and_selection"
-        ],
+        "open_dependencies": [],
         "target_request": {
           "$ref": "#/$defs/Request_instructor_agreement_publish"
-        }
+        },
+        "completed_dependencies": [
+          "agreement_versions_and_selection"
+        ]
       },
       "billing_class": "config",
       "limits": []
@@ -4100,12 +4111,13 @@
       "decision_delivery": {
         "accepted_contract": "DS-2026-10-17",
         "runtime_conformance": "pending",
-        "open_dependencies": [
-          "starter_plan_and_earning_split"
-        ],
+        "open_dependencies": [],
         "target_request": {
           "$ref": "#/$defs/Request_class_assignment_set"
-        }
+        },
+        "completed_dependencies": [
+          "starter_plan_and_earning_split"
+        ]
       },
       "billing_class": "config",
       "limits": []
@@ -5061,12 +5073,13 @@
       "decision_delivery": {
         "accepted_contract": "DS-2026-10-17",
         "runtime_conformance": "implemented_auth_edge_rpc_acceptance",
-        "open_dependencies": [
-          "agreement_versions_and_selection"
-        ],
+        "open_dependencies": [],
         "target_request": {
           "$ref": "#/$defs/Request_attendance_start"
-        }
+        },
+        "completed_dependencies": [
+          "agreement_versions_and_selection"
+        ]
       },
       "billing_class": "maintenance",
       "limits": []

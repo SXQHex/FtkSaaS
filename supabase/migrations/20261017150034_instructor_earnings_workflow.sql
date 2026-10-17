@@ -272,7 +272,7 @@ begin
  return result;
 end$$;
 create or replace function private.lesson_finance_write(org uuid,session uuid,closure uuid,snapshot jsonb,op uuid,ids uuid[],offset_i int) returns void language plpgsql security invoker set search_path='' as $$
-declare d jsonb;amount bigint;old_total bigint;prior uuid;idx int:=offset_i;center uuid;
+declare d jsonb;amount bigint;old_total bigint;prior uuid;idx int:=offset_i;center uuid;eligible bigint;blocked bigint;
 begin
  select s.center_id into center from core.sessions s where s.org_id=org and s.id=session;
  for d in select x from jsonb_array_elements(snapshot) x loop
@@ -280,9 +280,20 @@ begin
   select coalesce(sum(case when e.direction='add' then e.amount_minor else -e.amount_minor end),0) into old_total from core.earnings e where e.org_id=org and e.session_id=session and e.person_id=(d->>'person_id')::uuid;
   if amount=old_total then continue;end if;
   select e.id into prior from core.earnings e where e.org_id=org and e.session_id=session and e.person_id=(d->>'person_id')::uuid order by e.created_at desc,e.id desc limit 1;
+  -- Resolve each attendance result from the immutable closure chain at this
+  -- revision, including unchanged participants in a partial correction.
+  select count(*) filter(where coalesce((d->>'performed')::bool,false) and not (p->>'trial')::bool and facts->>'result'<>'blocked'
+    and private.lesson_consumes(org,(p->>'reservation_id')::uuid,facts->>'result',facts->'policy_snapshot')),
+    count(*) filter(where not (p->>'trial')::bool and facts->>'result'='blocked')
+   into eligible,blocked from jsonb_array_elements(d->'participants') p
+   cross join lateral(
+    select f as facts from core.attendance_closures cl cross join lateral jsonb_array_elements(cl.rights_snapshot) f
+    where cl.org_id=org and cl.session_id=session and cl.revision<=(select revision from core.attendance_closures z where z.org_id=org and z.id=closure)
+      and f->>'reservation_id'=p->>'reservation_id' order by cl.revision desc limit 1
+   ) frozen;
   insert into core.earnings(id,org_id,center_id,person_id,session_id,agreement_id,amount_minor,currency,basis,previous_id,operation_id,direction,closure_id)
    values(private.new_id(ids,idx),org,center,(d->>'person_id')::uuid,session,(d->>'agreement_id')::uuid,abs(amount-old_total),d#>>'{terms,currency}',
-   jsonb_build_object('source','lesson_agreement','currency',d#>>'{terms,currency}','quantity',jsonb_array_length(d->'participants'),'excluded_blocked',0,'agreement_id',d->'agreement_id'),
+   jsonb_build_object('source','lesson_agreement','currency',d#>>'{terms,currency}','quantity',eligible,'excluded_blocked',blocked,'agreement_id',d->'agreement_id'),
    prior,op,case when amount>old_total then 'add' else 'subtract' end,closure);idx:=idx+1;
  end loop;
 end$$;
@@ -315,7 +326,7 @@ declare b text;
 begin
  b:=pg_get_functiondef('private.reserve_negative(uuid,uuid,uuid,uuid,uuid[],integer)'::regprocedure);
  b:=replace(b,$o$select p.value,p.id into v,valuation_id from private.policy_at(org,ses.center_id,'negative_valuation',clock_timestamp()) p; if v is not null and ((v->>'discipline_id')::uuid<>ses.discipline_id or v->>'format'<>ses.format) then perform private.fail('POLICY_NOT_CONFIGURED');end if;$o$,
- $n$select p.value,p.id into v,valuation_id from private.valuation_at(org,ses.center_id,ses.discipline_id,ses.format,clock_timestamp()) p;$n$);
+ $n$select p.value,p.id into v,valuation_id from private.valuation_at(org,ses.center_id,ses.discipline_id,ses.format,clock_timestamp()) p; if v is null and exists(select 1 from private.policy_at(org,ses.center_id,'negative_valuation',clock_timestamp()) configured where configured.id is not null) then perform private.fail('POLICY_NOT_CONFIGURED');end if;$n$);
  execute b;
 end$patch$;
 -- Patch the existing transaction entrypoints; all authorization precedes receipt replay.

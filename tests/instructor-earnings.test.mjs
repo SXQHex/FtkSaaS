@@ -254,11 +254,17 @@ test('Instructor agreement and earnings through Auth -> Edge -> RPC',async t=>{
    const oldPrivate=(await list()).items.find(x=>x.format==='private');
    await agree(terms([fixed(25),percent(5000)]),{format:'private',supersedes_id:oldPrivate.id,expected_version:oldPrivate.version,valid:{starts_at:'2021-01-01T00:00:00Z',ends_at:'2030-01-01T00:00:00Z'}});
    await publish('student_cancel_private',{kind:'cancellation',terms:{cutoff_minutes:0,before_cutoff:'release',after_cutoff:'release',no_show:'release'}});
+   await publish('negative_valuation',{kind:'valuation',discipline_id:discipline,format:'private',amount_minor:'100',currency:'TRY'});
    const p=await linked('earning-blocked'),ses=(await makeSession({format:'private'})).primary_id,rv=(await book(ses,p.p)).primary_id;
    const prod=await product('timed');await sell(p.p,prod.primary_id,'1000');
    await db.query("update core.sessions set starts_at=now()-interval '1 second',ends_at=now()+interval '59 minutes' where id=$1",[ses]);
    const v=await get(ses);await mut('attendance_block_v1',{reservation_id:rv,expected_version:v.entries[0].version,reason:'debt_policy'});
-   await close(ses);assert.equal((await earningRows(ses))[0].amount_minor,'25');
+   await close(ses);const beforeEarning=(await earningRows(ses))[0];assert.equal(beforeEarning.amount_minor,'25');
+   const projected=(await earningRead()).items.find(x=>x.id===beforeEarning.id);assert.equal(projected.basis.quantity,0);assert.equal(projected.basis.excluded_blocked,1);
+   const cp=await must(owner,'attendance_correct_preview_v1',scope({session_id:ses,corrections:[{reservation_id:rv,result:'attended'}],reason:'Correct blocked observation'}));
+   await mut('attendance_correct_apply_v1',{preview:token(cp)});
+   const corrected=await earningRead();assert.equal(corrected.items.find(x=>x.id===beforeEarning.id).basis.excluded_blocked,1);
+   const newRow=corrected.items.find(x=>x.session_id===ses&&x.id!==beforeEarning.id);assert.equal(newRow.basis.quantity,1);assert.equal(newRow.basis.excluded_blocked,0);
    assert.equal((await rows('select state from core.credit_deficits where reservation_id=$1',[rv]))[0].state,'consumed');
   }finally{await publish('debt_participation',{kind:'boolean',value:false});await publish('participation_block_credit',{kind:'blocked_credit',effect:'release'});}
  });

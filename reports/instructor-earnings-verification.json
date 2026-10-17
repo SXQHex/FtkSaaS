@@ -4,10 +4,10 @@
   "base_main_ci": "https://github.com/SXQHex/FtkSaaS/actions/runs/39042108296",
   "source_sha_note": "Report committed with implementation. Final reviewed head and same-SHA clean CI evidence are recorded on the pull request; no unrun CI is claimed here.",
   "source_sha256": {
-    "database/instructor-earnings.sql": "b85e70213891012050fac955864b3985c8420248fd6f234e1b6119ee93daaf0e",
+    "database/instructor-earnings.sql": "21f7dd89c69c3c442b229ea5fec408957623040ab137c6fd806d40296a830156",
     "database/instructor-earnings-wrappers.sql": "5173eee5f8ab7c17841f12a3a95b974f69ae0d5515b115337fd0a3c3d778777a",
-    "supabase/migrations/20261017150034_instructor_earnings_workflow.sql": "699a0c962ffbc24a7057acb2e187ed798d47bbf670e924618d24900ce78747b9",
-    "tests/instructor-earnings.test.mjs": "8df2e40098b2e6cd550f12d5851f8da1bed6c0bde4c591312c4e1b1fe4c0954d"
+    "supabase/migrations/20261017150034_instructor_earnings_workflow.sql": "f7efe3cc9830170f81849fe6ad40b0079942bf4476ab61609704e2ee4f54eacc",
+    "tests/instructor-earnings.test.mjs": "f227df989e8db6bf5aaddbe9355c1812dac96828984afff981f9e28f2fa4d6b4"
   },
   "inventory": {
     "operations": 199,
@@ -18,7 +18,7 @@
   "verification": {
     "structural": {
       "command": "npm run verify",
-      "passed": 93,
+      "passed": 95,
       "failed": 0,
       "behavioral_acceptance": false
     },
@@ -36,8 +36,16 @@
         "live role/center boundaries and receipt replay revocation",
         "stale preview, competing requests, audit/outbox late rollback",
         "linked correction preserving prior payment allocation",
-        "P1 independent review regression: successor versus independent chains, ancestor lineage exclusion and exact adjacent boundary"
+        "P1 independent review regression: successor versus independent chains, ancestor lineage exclusion and exact adjacent boundary",
+        "Frozen closure-chain participant counts; blocked -> attended correction preserves old earning basis"
       ]
+    },
+    "policy_regression": {
+      "command": "node --test tests/availability-policies.test.mjs",
+      "passed": 19,
+      "failed": 0,
+      "path": "real Auth -> Edge -> RPC",
+      "scope": "No-policy reservation behavior preserved; configured wrong-format valuation rejects; matching policy identity/value frozen"
     }
   },
   "pending_acceptance": [
@@ -57,5 +65,22 @@
     "reviewed_head": "d611e44d4a634c2871f6ef4188c5079865a5c1e8",
     "finding": "https://github.com/SXQHex/FtkSaaS/pull/15#discussion_r4303338542",
     "fix": "All publications check effective overlap against other chains, excluding only own predecessor lineage; other intervals clipped by their immutable successor."
+  },
+  "review_corrections": [
+    {
+      "finding": "https://github.com/SXQHex/FtkSaaS/pull/15#discussion_r4303377364",
+      "fix": "Paid close/correction runtime outcomes and conformance aligned; completed dependencies separated from open dependencies while F01–F33 acceptance trace retained; mutation guards added."
+    },
+    {
+      "finding": "https://github.com/SXQHex/FtkSaaS/pull/15#discussion_r4303377367",
+      "fix": "Earning basis quantity/excluded_blocked derive from immutable closure chain; real blocked correction/read test preserves prior basis."
+    }
+  ],
+  "prior_ci_attempt": {
+    "head": "d611e44d4a634c2871f6ef4188c5079865a5c1e8",
+    "url": "https://github.com/SXQHex/FtkSaaS/actions/runs/39046591722",
+    "result": "cancelled_at_20_minute_job_budget",
+    "acceptance": false,
+    "action": "Retained wrong-scope valuation fail-closed regression, verified policy suite 19/19; clean job budget increased to 40 minutes with identical checks and no skipped tests."
   }
 }

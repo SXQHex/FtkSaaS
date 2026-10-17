@@ -283,11 +283,11 @@ features ürün referanslarıdır. required_features hedef plan kapısı; runtim
 | waitlist_leave_v1 | command | append_or_current_scope_lock / management_state_get_v1 | waitlist_entries.versioned_domain_change | pending |
 | seat_offer_accept_v1 | command | append_or_current_scope_lock / management_state_get_v1 | seat_offers.versioned_domain_change | pending |
 | seat_offer_reject_v1 | command | append_or_current_scope_lock / management_state_get_v1 | seat_offers.versioned_domain_change | pending |
-| attendance_get_v1 | read | none / None |  | starter_runtime_limited_paid_path_pending |
+| attendance_get_v1 | read | none / None |  | starter_and_paid_agreement_runtime |
 | attendance_mark_v1 | draft | row_version / attendance_get_v1 | attendance_entries.draft, reservations.actual_evaluation_snapshot_and_version, sessions.version | starter_runtime_limited_paid_path_pending |
-| attendance_close_v1 | closure | row_version / attendance_get_v1 | attendance_closures, sessions.occurred, reservations.completed, rights.consume_release, earnings.if_F20, settlement.accrual_if_eligible | starter_runtime_limited_paid_path_pending |
-| attendance_correct_preview_v1 | preview | preview_dependencies / attendance_get_v1 |  | starter_runtime_limited_paid_path_pending |
-| attendance_correct_apply_v1 | correction | preview_dependencies / attendance_correct_preview_v1 | attendance_entries.linked_revision, rights.linked_correction, earnings.linked_difference_if_F20, settlement.linked_reversal | starter_runtime_limited_paid_path_pending |
+| attendance_close_v1 | closure | row_version / attendance_get_v1 | attendance_closures, sessions.occurred, reservations.completed, rights.consume_release, earnings.if_F20, settlement.accrual_if_eligible | starter_and_paid_agreement_runtime |
+| attendance_correct_preview_v1 | preview | preview_dependencies / attendance_get_v1 |  | starter_and_paid_agreement_runtime |
+| attendance_correct_apply_v1 | correction | preview_dependencies / attendance_correct_preview_v1 | attendance_entries.linked_revision, rights.linked_correction, earnings.linked_difference_if_F20, settlement.linked_reversal | starter_and_paid_agreement_runtime |
 | products_list_v1 | read | none / None |  | pending |
 | product_publish_v1 | command | append_or_current_scope_lock / management_state_get_v1 | products.identity, product_versions.immutable, product_scopes.new_version_only | conditional_plan_gates_aligned_limited_runtime |
 | sale_preview_v1 | preview | preview_dependencies / management_state_get_v1 |  | conditional_plan_gates_aligned_limited_runtime |
