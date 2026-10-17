@@ -110,6 +110,19 @@ test('Room configuration and scoped role reads through real Auth/API',async t=>{
   await fail('roles_list_v1',{center_id:null,page:{sort:'display_name_asc'}},'VALIDATION_FAILED');
   const single=await list(owner,{person_id:student.p});assert(single.items.every(x=>x.person_id===student.p));assert.equal(single.items.length,1);
  });
+ await t.test('unscoped CM list excludes inactive and plan-inaccessible centers',async()=>{
+  await db.query("update core.centers set state='inactive' where id=$1",[center]);
+  try {await fail('roles_list_v1',{center_id:null,page:{}},'FORBIDDEN',manager.u);}
+  finally {await db.query("update core.centers set state='active' where id=$1",[center]);}
+  assert((await list(manager.u)).items.every(x=>x.scope_center_id===center));
+  const otherManager=await linked('rooms-other-manager','center_manager',other);
+  await db.query("update core.saas_plan_versions set name='starter' where id=$1",[plan]);
+  try {
+   await fail('roles_list_v1',{center_id:null,page:{}},'FORBIDDEN',otherManager.u);
+   assert((await list(owner)).items.some(x=>x.id===otherManager.grant.primary_id));
+   assert((await list(manager.u)).items.every(x=>x.scope_center_id===center));
+  }finally {await db.query("update core.saas_plan_versions set name='business' where id=$1",[plan]);}
+ });
  await t.test('reads create no domain mutations and revoked manager cannot reuse cursor',async()=>{
   const count=async()=>JSON.stringify(await rows('select (select count(*) from core.audit_events where org_id=$1) a,(select count(*) from core.operation_receipts where org_id=$1) r,(select count(*) from core.outbox_jobs where org_id=$1) o',[org]));
   const before=await count();const first=await list(manager.u,{page:{limit:1}});assert(first.next_cursor);assert.equal(await count(),before);

@@ -40,3 +40,5 @@ assert next(Path('supabase/migrations').glob('*_deactivate_expired_offers.sql'))
 assert next(Path('supabase/migrations').glob('*_room_and_role_registry.sql')).read_text()==Path('database/room-and-role-registry.sql').read_text()+Path('database/room-and-role-registry-wrappers.sql').read_text().replace('begin;\n','',1),'Room and role registry source drift'
 
 assert next(Path('supabase/migrations').glob('*_role_list_snapshot.sql')).read_text()==Path('database/role-list-snapshot.sql').read_text(),'Role list snapshot source drift'
+
+assert next(Path('supabase/migrations').glob('*_role_read_center_access.sql')).read_text()==Path('database/role-read-center-access.sql').read_text(),'Role read center access source drift'
