@@ -1,3 +1,19 @@
+# FtkSaaS — güncel başlangıç
+
+Önce [kaynak indeksi](../docs/source-index.md), [AGENTS](../AGENTS.md), [kalan işler](../docs/remaining-work.md) ve [entegrasyon devrini](../docs/claude-handover.md) okuyun.
+
+## Doğrulanmış başlangıç — 17 Ekim 2026
+
+Kaynak main `b9bd9c110f0cf4a121eac6ef0752945de99b10ac`; [PR #8](https://github.com/SXQHex/FtkSaaS/pull/8) birleşmiş; [aynı SHA’nın main CI’ı](https://github.com/SXQHex/FtkSaaS/actions/runs/38993548576) başarılı. 22 migration, 181 test (12 sözleşme + 27 DB + 142 Auth/API); 184 operasyonun 65’i çalışan geliştirme uygulaması, 119’u yalnız sözleşme. Bu kanıt belirtilen kaynak içindir; sonraki commit’in CI sonucu ayrıca doğrulanır.
+
+Uzak geliştirme/test Auth → Edge → RPC smoke [ayrı rapordadır](../reports/remote-backend-verification.json); 181 testin uzak projede tekrarı değildir. Geçici fixture temizlendi; ortak tenant/kullanıcı girişi sağlanmadı. Dış e-posta ertelendi; Resend entegrasyonu başlatılmayacak. Yük/restore ve frontend gerçek entegrasyon kabulü açık; production dağıtımı yok.
+
+Q-D01 atomik kayıt/ortak hak yarışları ve fiilî başlangıç kayıt/düzeltme artık uygulanmıştır; aşağıdaki eski açık ifadeleri güncel açığa dönüştürmeyin. D01–D09, U01–U08, Q-D01, Q-E02, Q-E03 hükümleri korunur.
+
+## Tarihsel devir ve kabul metinleri
+
+Aşağıdaki metin önceki teslimlerden korunmuştur. “Güncel” başlıkları, eski sayılar ve kurulum/uygulama açıkları kendi tarihine aittir; bugünkü durum yukarıdaki kaynaklar ve yeni SHA’nın kanıtıyla belirlenir. Sonraki kabul yalnız çelişen hükümleri değiştirir.
+
 > **Güncel ek: Q-E03.** Parasal iptal sınırı planlanan başlangıçtır (eşitlik dahil sonrası). Q-E02 merkez iptali korunur. Teknik durum: docs/decisions/Q-E03.md; test/CI kanıtı ayrıca doğrulanır.
 
 # FtkSaaS —Yeni sohbet devir paketi

@@ -1,10 +1,14 @@
 # Kalan backend işleri
 
-184 işlemden **65 çağrılabilir / 119 yalnız sözleşme**. Oda ve rol işlemleri PR #7 ile main’e birleşti; 21 migration, 181 test (12 sözleşme + 27 DB + 142 gerçek Auth/API) PR CI’da geçti. Son head ve merge kanıtı `reports/room-role-verification.json` içindedir.
+## Doğrulanmış başlangıç — 17 Ekim 2026
+
+Kaynak main `b9bd9c110f0cf4a121eac6ef0752945de99b10ac`; [PR #8](https://github.com/SXQHex/FtkSaaS/pull/8) birleşmiş; [aynı SHA’nın main CI’ı](https://github.com/SXQHex/FtkSaaS/actions/runs/38993548576) başarılı. 22 migration, 181 test (12 sözleşme + 27 DB + 142 Auth/API); 184 operasyonun 65’i çalışan geliştirme uygulaması, 119’u yalnız sözleşme. Bu kanıt belirtilen kaynak içindir; sonraki commit’in CI sonucu ayrıca doğrulanır.
+
+Uzak geliştirme/test Auth → Edge → RPC smoke [ayrı rapordadır](../reports/remote-backend-verification.json); 181 testin uzak projede tekrarı değildir. Geçici fixture temizlendi; ortak tenant/kullanıcı girişi sağlanmadı. Dış e-posta ertelendi; Resend entegrasyonu başlatılmayacak. Yük/restore ve frontend gerçek entegrasyon kabulü açık; production dağıtımı yok.
 
 ## Bağımlılık sırası
 
-1. Merkez odaları/uygunluk, politika yayınlama/okuma ve rol okumaları.
+1. Merkez uygunluk/istisna yapılandırması ve politika yayınlama/okuma. Oda kaydı/güncelleme ve rol listeleme tamamlandı; yeniden açık sayılmaz.
 2. Takvim/seans/rezervasyon okumaları, program önizleme/uygulama ve talep–bekleme–yer teklifi yaşam döngüleri.
 3. Ders yoklaması, kapanış/düzeltme, blocked katılım ve eğitmen anlaşması/hakediş.
 4. Paket dondurma/uzatma/değişim/yenileme/sonlandırma ve finans düzeltme/iade önizleme–uygulama çiftleri.
@@ -157,7 +161,7 @@ Her yeni grup: sözleşme/izin incelemesi → yeni migration → gerçek Auth/AP
 ## Operasyonel kabul işleri
 
 - Ortak test backend’i kuruldu; frontend’in gerçek bağlantı/iş akışı kabulü açık.
-- Dış e-posta sağlayıcısı/teslimi (yerel Mailpit kabulü vardır).
+- Dış e-posta ertelendi; uygulanmış değildir, Resend entegrasyonu başlatılmayacak. Yerel Mailpit kabulü dış teslim kanıtı değildir.
 - Yük, yedek ve geri yükleme doğrulaması.
 - Production hazırlığı ve ayrı dağıtım yetkisi. Main merge production izni değildir.
 

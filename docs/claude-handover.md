@@ -1,8 +1,10 @@
 # FtkSaaS backend — güncel Claude devri
 
-## Son doğrulanmış uygulama
+## Doğrulanmış başlangıç — 17 Ekim 2026
 
-Oda/rol uygulaması [PR #7](https://github.com/SXQHex/FtkSaaS/pull/7) ile main’e birleşti: `4d47d75e4a337378cfcc65f727c67abcac310303`. Uygulama head’i `1c84730cee87933780a86545251df6e6d07acbfa`; iki temiz PR/push CI başarılı: 38990682049 ve 38990679472. Toplam 181 test: 12 sözleşme, 27 DB, 142 gerçek Auth/API; 21 migration, seed/sağlık/advisors başarılı. Her sonraki head ve main CI ayrıca doğrulanır.
+Kaynak main `b9bd9c110f0cf4a121eac6ef0752945de99b10ac`; [PR #8](https://github.com/SXQHex/FtkSaaS/pull/8) birleşmiş; [aynı SHA’nın main CI’ı](https://github.com/SXQHex/FtkSaaS/actions/runs/38993548576) başarılı. 22 migration, 181 test (12 sözleşme + 27 DB + 142 Auth/API); 184 operasyonun 65’i çalışan geliştirme uygulaması, 119’u yalnız sözleşme. Bu kanıt belirtilen kaynak içindir; sonraki commit’in CI sonucu ayrıca doğrulanır.
+
+Uzak geliştirme/test Auth → Edge → RPC smoke [ayrı rapordadır](../reports/remote-backend-verification.json); 181 testin uzak projede tekrarı değildir. Geçici fixture temizlendi; ortak tenant/kullanıcı girişi sağlanmadı. Dış e-posta ertelendi; Resend entegrasyonu başlatılmayacak. Yük/restore ve frontend gerçek entegrasyon kabulü açık; production dağıtımı yok.
 
 184 sözleşmeden **65 çağrılabilir / 119 yalnız sözleşme**. `room_save_v1` atomik kapasite, sürüm, tekrar ve rollback; `roles_list_v1` canlı organizasyon/merkez yetkisi, plan erişimi, cursor kapsamı ve `as_of` snapshot sözleşmesiyle çalışır. Owner sanal rol satırı değildir. Mevcut seans/etkinlik kapasitesi yeniden yazılmaz. Önceki 18 migration korunur; 19–21 oda/rol uygulaması ve iki düzeltmedir. Kanıt: `reports/room-role-verification.json`.
 
@@ -29,7 +31,7 @@ npm test
 
 `npm run test:clean` yalnız checkout'ın loopback DB'sini sıfırlar; 22 migration ve boş tenant/Auth/receipt durumu doğrulanır, ardından testler, sentetik seed, sağlık ve DB advisors çalışır. `npm run dev:stop` ortamı durdurur. Özel bağlantı ve reset logları paylaşılmaz.
 
-## Kanıt ve kapsam
+## Tarihsel uygulama kanıtları ve kapsam
 
 Yeni kişi/merkez/disiplin uygulaması [PR #6](https://github.com/SXQHex/FtkSaaS/pull/6) içindedir. İncelenen uygulama `e4252981871f3aa911257342cde6ebf5f79f82c1`: iki temiz CI çalışmasında 169/169 test (12 sözleşme + 27 DB + 130 gerçek Auth/API), 18 migration, seed/sağlık/advisors başarılı; son inceleme bulgusuz. Kanıt `reports/registry-verification.json` dosyasındadır. Her sonraki belge head’i ve main merge CI’ı ayrıca doğrulanır. Önceki fiilî başlangıç kabulü 148/148 testi kapsıyordu; yeni head için kanıt yerine kullanılamaz.
 
@@ -94,7 +96,7 @@ Bu yalnız operasyonel kanıttır. Q-E03 katılımcı sınıflandırması, Q-E02
 
 `npm run generate` ortak tipleri, minimal Edge contract/validator/bundle ve katalog/endpoint envanterini üretir; `npm run verify` drift'i reddeder. Yeni değişiklik ayrı branch/PR ve append-only migration ile yapılır. Önceki 11 migration korunmuştur; 12–18. migration yeni registry işlemleri, kişi görünürlüğü ve okuma sürümlerini taşır. Eski wrapper kaynağı tarihsel migration ile sabittir; güncel üretilen wrapper `database/runtime-wrappers-current.sql` dosyasındadır. Yeni API'nin DB kurulumu yeni migration ile taşınır. Historical/transfer scriptleri güncel sözleşmeye körlemesine uygulanmaz.
 
-119 işlem yalnız sözleşme düzeyindedir; tam liste ve bağımlılık sırası `docs/remaining-work.md` içindedir. Kalıcı ortak staging, dış e-posta, yük/restore, frontend gerçek entegrasyon kabulü ve production dağıtımı tamamlanmış değildir. Frontend kodu/tasarımı Claude'un alanıdır. `vercel.json` main otomatik dağıtımını kapalı tutar; merge production izni değildir.
+119 işlem yalnız sözleşme düzeyindedir; tam liste ve bağımlılık sırası `docs/remaining-work.md` içindedir. Kalıcı geliştirme/test backend kurulmuştur; ortak tenant/kullanıcı erişimi sağlanmadı. Dış e-posta ertelendi; Resend başlatılmayacak. Yük/restore ve frontend gerçek entegrasyon kabulü açıktır; production dağıtımı yapılmadı. Frontend kodu/tasarımı Claude'un alanıdır. `vercel.json` main otomatik dağıtımını kapalı tutar; merge production izni değildir.
 
 ## Yeni kişi/merkez/disiplin entegrasyonu
 
