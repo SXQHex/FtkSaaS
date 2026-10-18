@@ -1,6 +1,6 @@
 # Eğitmen anlaşması, ücretli yoklama kapanışı ve hakediş
 
-Başlangıç main `ab3fca4af47b71b34a4a7b6d0df5211ad1e41141`, [başlangıç temiz CI](https://github.com/SXQHex/FtkSaaS/actions/runs/39042108296). Bu başlangıcın başarısı yeni kaynağın kabulü değildir. Son head bağımsız inceleme/temiz CI ve merge sonrası aynı main SHA CI kanıtları PR üzerinde bağlanır.
+PR #15 main’e birleşmiştir. Güncel uygulama SHA’sı, bağımsız son-head incelemesi, head CI ve merge sonrası temiz CI kanıtları [doğrulanmış devirde](../contracts/00-FtkSaaS-yeni-sohbet-devir.md) birlikte bulunur. Başlangıç main ab3fca4af47b71b34a4a7b6d0df5211ad1e41141 önceki teslim referansıdır.
 
 ## Uçtan uca akış
 

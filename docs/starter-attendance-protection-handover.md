@@ -1,5 +1,7 @@
 # Starter yoklama ve kesin rezervasyon koruması devri
 
+Güncel durum ve kaynak/CI: [doğrulanmış devir](../contracts/00-FtkSaaS-yeni-sohbet-devir.md). Aşağıdaki 198/89/109 ve 27 migration sayıları PR #14 teslim snapshot’ıdır; güncel envanter 199/95/104 ve 28 migration’dır.
+
 Başlangıç: main `5265a70a0d29f91b9081a1ecbc2a8f0ff78668ee`; aynı SHA’nın başarılı [CI çalışması](https://github.com/SXQHex/FtkSaaS/actions/runs/39030586306). Başlangıcın 322 testi yeni head’in kabulü değildir. Son PR head/inceleme/temiz CI kanıtı PR üzerinde aynı tam SHA’ya bağlanır.
 
 ## Sözleşme ve zorunlu bağımlılıklar
@@ -8,7 +10,7 @@ Kabul edilmiş DS kararları değişmedi. F14 Starter’da hak tüketir; F20 anl
 
 Gerçek Starter akışı için referans feature listesinin topluca kapı olması giderildi: eğitmen rolü F04, personel ataması ayrıca F05; ders F08 ve özel ders F09; sınıf F10 ve dışa açık seçilirse F11; rezervasyon F15, öncelikli sınıf F10 ve öğrencinin esnek grup kaydı F11; kredi ürünü F15, süreli F16, dondurma F17 ve başka merkez kapsamı F18; satış F15/F19 ve süreli ürün F16. Oturum görev değişikliği F13; açık ücret anlaşması referansı F20 kalır. Starter eğitmen görevi ücret anlaşması seçmez/üretmez. Bu dar kapı düzeltmeleri yeni ürün davranışı değildir.
 
-Pro/Business kapanışı, henüz uygulanmayan kabul edilmiş anlaşma/hakediş motoruna bağımlıdır: hak/kapalı yoklama/audit/outbox/receipt yazmadan `POLICY_NOT_CONFIGURED`. Ücretli yolu atlayarak başarı dönmez. Kaydedilmiş Starter kapanışının gerekçeli düzeltmesi kendi `starter_no_earning` snapshot’ını kullanır. Anlaşma sürümleme, ürün override, hakediş ve hesaplaşma bu teslimde yoktur.
+PR #14 kapsamındaki Pro/Business kapalı yol sınırı PR #15 ile aşılmıştır: [güncel anlaşma/hakediş devri](instructor-earnings-handover.md) ücretli kapanışı ve bağlı düzeltmeyi tanımlar. Kaydedilmiş Starter kapanışının gerekçeli düzeltmesi kendi `starter_no_earning` snapshot’ını kullanır. Anlaşma sürümleme, ürün override ve hakediş PR #15 ile uygulanmıştır; hesaplaşma ayrı açık teslimdir.
 
 ## Uçtan uca yol
 
@@ -25,10 +27,10 @@ Koruma yalnız değişikliğin neden olduğu olumsuz etkiye bağlıdır. Öncede
 - Politika/kişisel limit dışındaki `credit_adjust`, `sale_scope`, `entitlement_extend` impact türleri `POLICY_NOT_CONFIGURED`; altyapı kurulması uygulama değildir.
 - Kredi düzeltme, satışın kabul edilmiş kapsam değişikliği, geçerlilik uzatma, dondurma/erken bitirme, hak sonlandırma koruma tüketicileri pending. Satışla geçmiş açık kapama ve settled deficit’in sonradan yoklama düzeltmesi ayrı teslimdir; allocation kanıtı olmayan settled deficit correction başarı göstermez.
 - Başlangıç anını otomatik gözlemleyen ders katılım tüketicisi henüz yok. Taslağın `evaluated_for` değeri gerçek değerlendirme zamanıdır; başlangıç snapshot’ı değildir. Geç kapanışta bugünkü bakiyeden geçmiş başlangıç türetilmez; kanıt eksik diye kabul edilmemiş toplu kapanış engeli konmaz. Başlangıç öncesi taslak ile başlangıç arasındaki bağımsız uygunluk değişiminin tam kabulü pending.
-- Pro/Business finansal kapanış/düzeltme, anlaşma zinciri ve hakediş/hesaplaşma pending. F14/F20 ayrımı bunların tamamlandığını söylemez.
+- Pro/Business finansal kapanış/düzeltme, anlaşma zinciri ve hakediş PR #15 ile uygulanmıştır. Hesaplaşma ve eğitmen ödeme komutları açıktır.
 - Eski satış/rezervasyona blocked-policy snapshot’ı geri doldurulmaz. Eksik tarihsel koşulda ilgili blocked sonucu POLICY_NOT_CONFIGURED; diğer katıldı/no_show yolu koşulları varsa çalışır.
 - Zorunlu belge kapısının ders tüketicisi bu koruma ile tamamlanmadı; geniş DS-PROT-03 kabulü açık.
-- Frontend, production, Resend ve main koruması değişmedi. Bu yeni PR için merge yapılmaz.
+- Frontend, production, Resend ve main koruması değişmedi. Bu kapsam notu güncel merge yetkisi belirlemez; son açık kullanıcı talimatı esas alınır.
 
 ## Kanıt ayrımı
 

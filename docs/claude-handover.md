@@ -1,3 +1,28 @@
+# FtkSaaS — güncel entegrasyon devri
+
+Durum ve doğrulanmış kaynak/CI için [tek güncel devir özetini](../contracts/00-FtkSaaS-yeni-sohbet-devir.md) esas alın: 199 sözleşme, 95 çağrılabilir, 104 yalnız sözleşme; 28 migration. Bu belge hosted backend'in aynı seviyeye güncellendiği iddiasını taşımaz; hosted 65 işlem smoke'u tarihsel ve ayrı kanıttır.
+
+## İstemci entegrasyonu için yaşayan kaynaklar
+
+- [Starter yoklama/koruma](starter-attendance-protection-handover.md): anlaşmasız Starter, etki/onay, kapanış ve düzeltme.
+- [Anlaşma/hakediş](instructor-earnings-handover.md): güncel Pro/Business kapanışı, açık fiilî başlangıç, immutable ücret ve bağlı fark.
+- [Takvim/seans/rezervasyon okumaları](schedule-read-handover.md) ve [program/seans](program-session-handover.md): DTO, zaman, görünürlük ve sürüm sınırları; eski teslim açıkları güncel envanterle karşılaştırılır.
+- [API kataloğu](../contracts/05-FtkSaaS-O4-API-katalogu.md), [makine sözleşmesi](../contracts/08-FtkSaaS-tip-ve-operasyon-sozlesmesi.json) ve [endpoint envanteri](endpoint-inventory.json): kesin işlem adları ve uygulama durumları.
+- [Kalan işler](remaining-work.md): hesaplaşma, ödeme komutları ve tamamlanmamış tüketiciler.
+
+Transport: POST {API_URL}/functions/v1/backend-v1/{operation}; typed request JSON, Authorization: Bearer Supabase access_token ve apikey: publishable key kullanılır. Yanıt ok/data/trace_id veya ok:false/error zarfıdır. Service-only RPC/core/private doğrudan istemci erişimi değildir. Tekrar gönderimde aynı business işlem anahtarı korunur; sürüm ve önizleme bağımlılıkları yeniden doğrulanır.
+
+Yerel bağlantı: Node 24.19.0, npm ci, npm run dev:start, npm run dev:seed, npm run dev:info. Adres ve publishable key bu checkout'tan alınır; eski Box adresleri ortak ortam değildir. npm run test:clean yalnız izole loopback kabul ortamı içindir. [Hosted kurulum kaydı](remote-backend-setup.md) eski kapsamını korur.
+
+Frontend gerçek uçtan uca kabulü ve yük/restore açık; mock kabul değildir. Dış e-posta ertelendi; Resend başlatılmaz. Production dağıtımı yapılmaz.
+
+## Tarihsel entegrasyon notları
+
+Aşağıdaki metinler önceki teslim snapshot'larıdır. Kurulum/transport ayrıntıları güncel typed sözleşmeyle doğrulanır; eski işlem sayıları ve kapanmış açıklar bugünkü durum değildir.
+
+<details>
+<summary>Önceki entegrasyon notları (tarihsel)</summary>
+
 # Eğitmen anlaşması ve hakediş — güncel geliştirme kapsamı
 
 Başlangıç main: `ab3fca4af47b71b34a4a7b6d0df5211ad1e41141`; [aynı SHA CI](https://github.com/SXQHex/FtkSaaS/actions/runs/39042108296) başarılı: 27 migration, 341 test. Yeni kaynak için önceki başarı taşınmaz; son head inceleme/temiz CI ve merge main CI ayrıca doğrulanır.
@@ -161,3 +186,5 @@ Bu yalnız operasyonel kanıttır. Q-E03 katılımcı sınıflandırması, Q-E02
 - `person_update_v1`: CM veya açık person.manage personel grantı; hedef kişinin aktif merkez ilişkisi (ilk ilişki öncesinde aynı oluşturma merkezi) ve güncel kişi sürümü gerekir. Contacts patch’i listeyi değiştirir; aynı kind/value kanıtı korunur, yeni adres doğrulanmış sayılmaz. Auth kimliği veya hesap bağlantısı değiştirilmez.
 
 İşlem adı ortak tiplerden seçilir. Yeni yazmalar da aynı receipt/audit/outbox transaction ve canlı yetki kontrolünden geçer. Görünürlükte rol/bağ geri alma bir sonraki istekte geçerlidir. Yeni bir ürün iptal, para veya hakediş kuralı eklenmedi.
+
+</details>

@@ -1,8 +1,10 @@
 # DS-2026-10-17 sözleşme ve CI devri
 
+Güncel uygulama SHA/CI ve teslim kanıtı: [doğrulanmış devir](../contracts/00-FtkSaaS-yeni-sohbet-devir.md). Aşağıdaki başlangıç SHA’sı tarihsel referanstır; güncel kabul yerine geçmez.
+
 Başlangıç main: c231ab5526854ed62445613467649e1b0bf960bb; [aynı SHA CI](https://github.com/SXQHex/FtkSaaS/actions/runs/39010419849) başarılı: 25 migration, 241 test (12 sözleşme + 27 DB + 202 Auth/API). Bu geçmiş kanıt yeni PR'nin kabulü değildir.
 
-Kabul edilmiş karar/DTO/izin/guard aktarımı korunur. Son Starter teslimi dar runtime’ı ve 26–27. migration’ı ekler; frontend değişmez. 184 başlangıç işlemine toplam 14 yeni sözleşme adı eklenmiştir: 199 toplam, 95 canlı, 104 yalnız sözleşme; 28 migration. Anlaşma/hakediş ve açık fiilî başlangıç dar yolu güncel devirde tanımlıdır. Ayrıntı ve açık tüketiciler Starter devrindedir. İşlem sayısı ürün tamamlanma oranı değildir.
+Kabul edilmiş karar/DTO/izin/guard aktarımı korunur. Son Starter teslimi dar runtime’ı ve 26–27. migration’ı ekler; frontend değişmez. 184 başlangıç işlemine net 15 yeni sözleşme adı eklenmiştir: 199 toplam, 95 canlı, 104 yalnız sözleşme; 28 migration. Anlaşma/hakediş ve açık fiilî başlangıç dar yolu güncel devirde tanımlıdır. Ayrıntı ve açık tüketiciler Starter devrindedir. İşlem sayısı ürün tamamlanma oranı değildir.
 
 ## Karar, aktarım, uygulama ve doğrulama ayrımı
 
@@ -31,7 +33,7 @@ policy_publish ve negative_limit_set, mevcut kesin rezervasyonlar için gerçek 
 
 Açık merkez iptalinde ayrılmış hak/açık serbest bırakılır ve kabul edilmiş iade/düzeltmeler uygulanır. Gerekçeli müdahale uygulama içi bildirilir. Tahsilat kredi üretmez. Hak işlemi geçmiş tüketilmiş açığı, sonra gelecek rezervasyon açığını mevcut kararlı sıra/kapsamla karşılar.
 
-Koruma kaydı, yükümlülük rezervasyonu ve etkilerin sabitlenmesi için yeni fiziksel depolama/migration ve gerçek kapanış tüketicisi ayrı teslimdir. Kanıt eksikliğini bütün seans kapanışını durdurmaya dönüştüren yeni kural eklenmedi.
+Koruma kaydı, yükümlülük rezervasyonu ve kapanış tüketicisi PR #14 ile uygulanmıştır; diğer hak değişikliği ve belge tüketicileri ayrı açıktır. Kanıt eksikliğini bütün seans kapanışını durdurmaya dönüştüren yeni kural eklenmedi.
 
 ## Anlaşma zinciri ve paket seçimi
 
@@ -73,7 +75,7 @@ Bileşik kimlikler (class/person/duty, person/discipline, resource/rule gibi) ka
 
 DS-OPEN-01 grantor konusu [son karar](decisions/DS-2026-10-17-settlement-revision.md) ile karar düzeyinde kapalıdır; yalnız sözleşme aktarılmıştır. DS-OPEN-02 [son merkez yetki kararı](decisions/DS-2026-10-17-settlement-center-scope.md) ile karar düzeyinde kapalıdır: aynı hesap iki merkezde de açık canlı yetkiliyse iki adımı yapabilir; ayrı istisna/fallback yoktur.
 
-Diğer açıklar ürün tercihi diye yeniden açılmaz: yeni migration, başlangıç/koruma snapshot üreticisi, anlaşma seçicisi, ledger, ilgili okuma/izolasyon ve gerçek yarış/rollback kabulü teknik teslim bağımlılıklarıdır. [F01–F33 haritası](feature-delivery.md) ve 08 içindeki 38 DS kabul senaryosu bu ayrımı taşır.
+Diğer açıklar ürün tercihi diye yeniden açılmaz: yeni migration, otomatik başlangıç gözlemi, diğer hak değişikliği koruma tüketicileri, hesaplaşma ledger’ı ve ilgili okuma/izolasyon/yarış/rollback kabulü teknik teslim bağımlılıklarıdır. Açık başlangıç kaydı, anlaşma seçicisi ve ücretli kapanış PR #15 ile uygulanmıştır. [F01–F33 haritası](feature-delivery.md) ve 08 içindeki 38 DS kabul senaryosu bu ayrımı taşır.
 
 ## CI ve kanıt
 
@@ -87,7 +89,7 @@ Kaynak raporu reports/decision-sprint-verification.json, geliştirici sözleşme
 
 center_update hedef sürümü centers.center_id üzerinden okunur; yönetim okuması açık merkez UUID ister. Canlı DTO değişmez; Target_center_update_identified gelecekteki açık hedefi gösterir. CRM faaliyet oluşturma activity_id olmadan, güncelleme activity_id + expected_version ile yapılır; lead_id güncellenecek faaliyet kimliği yerine kullanılamaz. Yönetim okuması bu kimliği ve satır sürümünü döndürür.
 
-Süre değişikliği etki önizlemesinde entitlement_extend / sale_id / end_date ile temsil edilir; sale/entitlement sürümleri ve gerekçe tokena bağlanır. Etki önizlemesi onay veya commit değildir. reservation_impact_apply veya özgün korumalı komut (impact_approval + accepted_reservation_ids) aynı önizlemeyi bir kez tüketen alternatif uygulama yollarıdır; art arda iki yazma yapılmaz. Tam etkilenen liste onayı, tam değişiklik eşleşmesi, ilgili sürümler, özgün yetki ve koruma aynı transaction içinde doğrulanır. Bu hedef sözleşme davranışı henüz runtime değildir.
+Süre değişikliği etki önizlemesinde entitlement_extend / sale_id / end_date ile temsil edilir; sale/entitlement sürümleri ve gerekçe tokena bağlanır. Etki önizlemesi onay veya commit değildir. reservation_impact_apply veya özgün korumalı komut (impact_approval + accepted_reservation_ids) aynı önizlemeyi bir kez tüketen alternatif uygulama yollarıdır; art arda iki yazma yapılmaz. Tam etkilenen liste onayı, tam değişiklik eşleşmesi, ilgili sürümler, özgün yetki ve koruma aynı transaction içinde doğrulanır. Politika/kişisel limit türleri PR #14 ile runtime’dır; entitlement_extend ve diğer hak değişikliği türleri açık kalır.
 
 ## Son revizyon kanıtı
 
@@ -101,4 +103,4 @@ Son karar: docs/decisions/DS-2026-10-17-settlement-center-scope.md. Submit actor
 
 ## Starter runtime aktarımı
 
-[Starter devri](starter-attendance-protection-handover.md) 10 yeni canlı işlem/dar okuma, zorunlu koşullu plan kapıları, gerçek kapanış/düzeltme ve açık başlangıç/belge/diğer hak tüketicilerini gösterir. Ücretli hakediş ve hesaplaşma genişlemez.
+[Starter devri](starter-attendance-protection-handover.md) 10 yeni canlı işlem/dar okuma, zorunlu koşullu plan kapıları, gerçek kapanış/düzeltme ve açık başlangıç/belge/diğer hak tüketicilerini gösterir. Ücretli hakediş PR #15 ile ayrıca uygulanmıştır; hesaplaşma açık kalır.

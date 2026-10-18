@@ -2,6 +2,8 @@
 
 Repository’nin güncel dalı `main`dir. Başlarken GitHub main SHA’sını ve aynı SHA’nın CI’ını doğrulayın; bu dosyalardaki son doğrulanmış snapshot yeni commit’e otomatik başarı vermez. Yerel/ZIP kopyaları alındıkları SHA’nın snapshot’ıdır. İkinci belge ağacı kullanılmaz.
 
+Güncel uygulama SHA/CI ve teslim durumu için [tek devir özeti](../contracts/00-FtkSaaS-yeni-sohbet-devir.md) esas alınır. Önceki teslim sayıları tarihsel bağlamdır.
+
 ## Okuma sırası ve roller
 
 | Sıra | Kaynak | Rol |
@@ -40,9 +42,9 @@ Her uygulama PR’si etkilediği sözleşmeleri, envanteri, kalan işleri ve dev
 [Program/seans devri](program-session-handover.md) yedi yeni komutun immutable program, oluşum değişikliği, miras/override, DST, sürüm ve rezervasyon koruma sözleşmesini açıklar. [Kaynak raporu](../reports/program-session-verification.json) geliştirme kanıtıdır; son head temiz CI ayrıca denetlenir.
 
 
-[DS-2026-10-17](decisions/DS-2026-10-17.md) son kabul edilmiş plan/yoklama, rezervasyon koruması, anlaşma, A→B hesaplaşma ve geçmiş satış hükümleridir. [Sprint devri](decision-sprint-handover.md) hedef sözleşme/runtime/kanıt ayrımını; [F01–F33 haritası](feature-delivery.md) ürün–teknik–bağımlılık–uygulama–kabul eşlemesini; [koruma denetimi](branch-protection-review.md) yönetici erişim sınırını belirtir. Mevcut 184 işlem korunarak enum tam sürümlü isimlerle eşitlendi; 13 yeni contract_only bağımlılık toplamı 197’dir.
+[DS-2026-10-17](decisions/DS-2026-10-17.md) son kabul edilmiş plan/yoklama, rezervasyon koruması, anlaşma, A→B hesaplaşma ve geçmiş satış hükümleridir. [Sprint devri](decision-sprint-handover.md) hedef sözleşme/runtime/kanıt ayrımını; [F01–F33 haritası](feature-delivery.md) ürün–teknik–bağımlılık–uygulama–kabul eşlemesini; [koruma denetimi](branch-protection-review.md) yönetici erişim sınırını belirtir. İlk DS aktarımında 184 başlangıç işlemine 13 sözleşme eklenerek toplam 197 olmuştu; bu tarihsel aktarım sayısıdır. Güncel envanter 199/95/104’tür.
 
-[Son hesaplaşma yetki/iki taraflı akış kararı](decisions/DS-2026-10-17-settlement-revision.md) önceki OM kayıt/fallback hükümlerini değiştirir. DS-OPEN-01 karar düzeyinde kapalı; DS-OPEN-02 [son merkez bazlı yetki kararıyla](decisions/DS-2026-10-17-settlement-center-scope.md) karar düzeyinde kapalıdır. Aynı hesap ayrı A/B yetkileriyle başvuru/onay yapabilir; farklı hesap şartı ve fallback yoktur. Üç contract-only üçüncü-aşama/düzeltme uç çıkarıldı, üç authority read/set sözleşmesi eklendi; toplam 197/79/118 aynı kaldı. Son revizyon raporu: reports/settlement-center-scope-verification.json; eski SHA raporu/CI yeni head kabulü değildir.
+[Son hesaplaşma yetki/iki taraflı akış kararı](decisions/DS-2026-10-17-settlement-revision.md) önceki OM kayıt/fallback hükümlerini değiştirir. DS-OPEN-01 karar düzeyinde kapalı; DS-OPEN-02 [son merkez bazlı yetki kararıyla](decisions/DS-2026-10-17-settlement-center-scope.md) karar düzeyinde kapalıdır. Aynı hesap ayrı A/B yetkileriyle başvuru/onay yapabilir; farklı hesap şartı ve fallback yoktur. Üç contract-only üçüncü-aşama/düzeltme uç çıkarıldı, üç authority read/set sözleşmesi eklendi; o revizyonun tarihsel toplamı 197/79/118 olarak aynı kalmıştı; güncel toplam değildir. Son revizyon raporu: reports/settlement-center-scope-verification.json; eski SHA raporu/CI yeni head kabulü değildir.
 
 [Starter yoklama/koruma devri](starter-attendance-protection-handover.md) yeni runtime sınırını belirtir.
 

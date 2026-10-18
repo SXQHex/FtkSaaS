@@ -1,3 +1,27 @@
+# FtkSaaS — doğrulanmış güncel devir
+
+Doğrulanan uygulama kaynağı: main SHA bd4b6335904047f071556e5df35a982a71012c6e ([PR #15](https://github.com/SXQHex/FtkSaaS/pull/15)). [Aynı SHA'nın temiz CI'ı](https://github.com/SXQHex/FtkSaaS/actions/runs/39055469993), 2. çalıştırma: başarılı; **364 test = 95 yapısal/sözleşme + 27 DB + 242 gerçek Auth/API**, 28 migration, sentetik seed, sağlık ve advisors başarılı. [Son PR head incelemesi](https://github.com/SXQHex/FtkSaaS/pull/15#issuecomment-6236501886) ve [head CI](https://github.com/SXQHex/FtkSaaS/actions/runs/39048632900) ayrı kanıtlardır.
+
+**199 sözleşme / 95 çağrılabilir / 104 yalnız sözleşme; 90 core tablo / 28 migration.** Bu sayılar ürün tamamlanma yüzdesi değildir. Kanıt belirtilen uygulama SHA'sına aittir; sonraki belge veya uygulama commit'inin kendi CI'ı ayrıca doğrulanır. Uzak hosted smoke, bu temiz kabulün yerine geçmez.
+
+## Uygulanmış kapsam ve sonraki teslim
+
+- İlk teslim: Starter anlaşmasız program/seans, rezervasyon koruması, yoklama/hak kapanışı ve bağlı düzeltme.
+- İkinci teslim: immutable eğitmen anlaşma zinciri, paket özel/genel seçimi, açık fiilî başlangıç, Pro/Business ücretli kapanış, hakediş okuma ve donmuş koşullardan bağlı düzeltme. [Anlaşma/hakediş devri](../docs/instructor-earnings-handover.md).
+- Üçüncü teslim açık: A→B hesaplaşma ledger'ı, Owner/delege OM/CM yetkileri, başvuru ve B onayında atomik ödeme/mahsup/bağlı düzeltme. Kararlar kabul edilmiş; runtime tamamlanmış değildir.
+- Eğitmen ödeme kayıt/düzeltme komutları; otomatik başlangıç gözlemi, belge ve diğer hak değişikliği koruma tüketicileri ayrıca açıktır.
+
+Başlangıç sırası: [AGENTS](../AGENTS.md) → [kaynak indeksi](../docs/source-index.md) → bu devir → [kalan işler](../docs/remaining-work.md) → [entegrasyon devri](../docs/claude-handover.md). Güncel işlem durumu makine sözleşmesi, runtime listesi ve üretilmiş envanterle karşılaştırılır.
+
+Son açık kullanıcı kararı üstündür. D01–D09, U01–U08, Q-D01, Q-E02, Q-E03 ve sonraki kabul edilmiş DS kararları korunur. Dış e-posta ertelendi; Resend başlatılmaz. Frontend gerçek entegrasyonu ve yük/restore kabulü açık; production dağıtımı yapılmaz.
+
+## Tarihsel devir kayıtları
+
+Aşağıdaki önceki teslim metinleri yalnız ait oldukları kaynak snapshot'ını anlatır. İçlerindeki “güncel”, “açık” veya “merge yetkisi” ifadeleri bugünkü durum/yetki değildir. Güncel durum yukarıda, açık işler bağlantılı listededir; tarihsel reports/ dosyaları değiştirilmez.
+
+<details>
+<summary>Önceki devir metinleri (tarihsel)</summary>
+
 # Eğitmen anlaşması ve hakediş — güncel geliştirme kapsamı
 
 Başlangıç main: `ab3fca4af47b71b34a4a7b6d0df5211ad1e41141`; [aynı SHA CI](https://github.com/SXQHex/FtkSaaS/actions/runs/39042108296) başarılı: 27 migration, 341 test. Yeni kaynak için önceki başarı taşınmaz; son head inceleme/temiz CI ve merge main CI ayrıca doğrulanır.
@@ -192,3 +216,5 @@ Teknik aktarım ve test durumu: docs/decisions/Q-E02.md ve reports/qe02-verifica
 **AS-03.** İptalden sonra geriye dönük kayıt/düzeltme mümkündür; iptal yeniden açılmaz. Etkinlik sürümü artar; eski önizleme geçersizleşir. event_get mevcut actual_started_at değerini; yönetici/organizasyon okuyucusuna append-only actual_start_history geçmişini döndürür.
 
 Teknik kanıt: docs/actual-start-handover.md, PR son commit CI. Bu aktarım kısmi gerçekleşmeye bağlı yeni parasal veya hak kuralı üretmez.
+
+</details>
