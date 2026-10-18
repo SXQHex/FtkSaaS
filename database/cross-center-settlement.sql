@@ -295,7 +295,7 @@ begin
    'next_cursor',token,'as_of',clock_timestamp());
  end if;
  if result is null then result:=jsonb_build_object('operation_id',operation,'primary_id',primary_id,'version',ver,'replayed',false)||case when op in('settlement_authority_set_v1','settlement_delegation_set_v1') then jsonb_build_object('related','[]'::jsonb) else '{}'::jsonb end;end if;
- return jsonb_build_object('data',result,'primary_id',primary_id,'subject','organizations','audit',jsonb_build_object('step_authority',scope||jsonb_build_object('actor_account_id',account),'request_id',primary_id),
+ return jsonb_build_object('data',result,'primary_id',primary_id,'subject','organizations','audit',jsonb_build_object('step_authority',scope||jsonb_build_object('actor_account_id',account),'settlement_request_id',case when op like 'settlement_request_%' then primary_id end),
  'notify_person',case when op='settlement_request_decide_v1' then private.person_for(org,q.initiator_account_id) else person end);
 end$$;
 
@@ -413,7 +413,14 @@ do $patch$declare b text;begin
  b:=pg_get_functiondef('private.execute_operation(text,jsonb,uuid,uuid,uuid[],jsonb)'::regprocedure);
  b:=replace(b,$o$jsonb_build_object('template_key',p_operation,'subject',jsonb_build_object('type',subject,'id',record_id))$o$,
  $n$jsonb_build_object('template_key',p_operation,'subject',jsonb_build_object('type',subject,'id',record_id))||
- case when p_operation like 'settlement_%' then jsonb_build_object('reason',r->'reason','decision',r->'decision','step_authority',terms#>'{audit,step_authority}') else '{}'::jsonb end$n$);
+ case when p_operation like 'settlement_%' then jsonb_build_object('reason',r->'reason','decision',r->'decision','settlement_request_id',terms#>'{audit,settlement_request_id}','step_authority',terms#>'{audit,step_authority}') else '{}'::jsonb end$n$);
+ -- Typed organizational subject remains a real entity. Request routing is explicit.
+ b:=replace(b,$o$p_operation,subject,record_id,r->>'reason'$o$,
+ $n$p_operation,subject,case when p_operation like 'settlement_%' then org else record_id end,r->>'reason'$n$);
+ b:=replace(b,$o$p_operation,record_id,jsonb_build_object('template_key'$o$,
+ $n$p_operation,case when p_operation like 'settlement_%' then org else record_id end,jsonb_build_object('template_key'$n$);
+ b:=replace(b,$o$jsonb_build_object('type',subject,'id',record_id)$o$,
+ $n$jsonb_build_object('type',subject,'id',case when p_operation like 'settlement_%' then org else record_id end)$n$);
  execute b;
 end$patch$;
 

@@ -145,7 +145,11 @@ test('Cross-center settlement Auth -> Edge -> RPC',async t=>{
   await decide(await get(b.primary_id),'reject',manager.u);
   assert.equal((await get(a.primary_id)).record,null);assert.equal((await get(b.primary_id)).record,null);
   assert.equal((await movements()).items.find(x=>x.id===m1.id).open_minor,before);
-  const n=await rows("select recipient_person_id from core.notifications where org_id=$1 and subject_id=$2 and kind='settlement_request_decide_v1'",[org,b.primary_id]);assert.equal(n[0].recipient_person_id,person);
+  const n=await rows("select recipient_person_id,subject_id,payload from core.notifications where org_id=$1 and payload->>'settlement_request_id'=$2 and kind='settlement_request_decide_v1'",[org,b.primary_id]);assert.equal(n[0].recipient_person_id,person);
+  assert.equal(n[0].subject_id,org);assert.equal(n[0].payload.subject.id,org);
+  assert.equal(n[0].payload.reason,'B decision');assert.equal(n[0].payload.step_authority.center_id,B);
+  const audit=(await rows("select subject_table,subject_id,diff from core.audit_events where org_id=$1 and action='settlement_request_decide_v1' and diff->>'settlement_request_id'=$2",[org,b.primary_id]))[0];
+  assert.equal(audit.subject_table,'organizations');assert.equal(audit.subject_id,org);assert.equal(audit.diff.step_authority.center_id,B);
  });
  await t.test('DS-SET explicit partial correction preserves original payment and uses exact original allocation versions',async()=>{
   const q=await get(approved.id),rec=q.record,al=rec.allocations[0];
