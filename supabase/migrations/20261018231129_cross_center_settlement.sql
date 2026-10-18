@@ -166,7 +166,8 @@ begin
    if al.id is null then perform private.fail('NOT_FOUND');end if;
    if al.version<>(line->>'expected_version')::bigint or (line->>'amount_minor')::numeric>al.unreversed_minor then perform private.fail('PREVIEW_STALE');end if;
    if (line->>'amount_minor')::numeric<=0 then perform private.fail('VALIDATION_FAILED');end if;
-   selected:=selected||jsonb_build_array(jsonb_build_object('allocation_id',al.id,'version',al.version,'side',al.side,'movement_id',al.movement_id,'amount_minor',line->>'amount_minor'));
+   select * into m from private.settlement_movements x where x.org_id=org and x.id=al.movement_id;
+   selected:=selected||jsonb_build_array(jsonb_build_object('movement_version',m.version,'allocation_id',al.id,'version',al.version,'side',al.side,'movement_id',al.movement_id,'amount_minor',line->>'amount_minor'));
   end loop;
   if rec.kind='payment' then
    select sum((e->>'amount_minor')::numeric) into total from jsonb_array_elements(selected) e;
@@ -408,6 +409,9 @@ do $patch$declare b text;old text;begin
   end if;
  elsif perm_code='event.attendance' then$n$);
  if b=old then raise exception 'settlement authorization patch failed';end if;old:=b;
+ -- Cancellation policies are typed envelopes; preserve the frozen terms when deciding consumption.
+ b:=replace(b,'select value into terms from core.policy_versions where id=row_record.policy_version_id and org_id=org;',
+ 'select coalesce(value->''terms'',value) into terms from core.policy_versions where id=row_record.policy_version_id and org_id=org;');
  b:=replace(b,' -- DOMAIN_CASES',$n$
  when 'settlement_movements_list_v1','settlement_requests_list_v1','settlement_request_get_v1',
  'settlement_request_submit_v1','settlement_request_withdraw_v1','settlement_request_decide_v1',

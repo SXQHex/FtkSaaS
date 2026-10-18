@@ -78,13 +78,14 @@ test('Cross-center settlement Auth -> Edge -> RPC',async t=>{
   return (await mut('sale_apply_v1',{preview:{id:pr.id,token:pr.token}},c)).primary_id;
  }
  let seq=0;
- async function lesson(sale,performed=true,result='attended',p=student.p,c=B){
+ async function lesson(sale,performed=true,result='attended',p=student.p,c=B,cancel=false){
   seq++;const start=new Date(Date.now()+seq*3600000+86400000);
   const ss=await mut('session_create_v1',{discipline_id:D,format:'group',interval:{starts_at:start.toISOString(),ends_at:new Date(+start+1800000).toISOString()},resources:[],assignments:[{person_id:teacher.p,duty:'instructor'}],capacity:{nominal:10,maximum:12}},c);
   const rid=(await mut('reservation_create_v1',{session_id:ss.primary_id,person_id:p,mode:'flexible',...(sale?{source_sale_id:sale}:{})},c)).primary_id;
   await db.query("update core.sessions set starts_at=now()-interval '1 second',ends_at=now()+interval '29 minutes' where id=$1",[ss.primary_id]);
+  if(cancel){const rv=(await rows('select version from core.reservations where id=$1',[rid]))[0];await mut('reservation_cancel_v1',{reservation_id:rid,expected_version:Number(rv.version),reason:'Late consuming cancellation'},c);}
   let v=await read('attendance_get_v1',{session_id:ss.primary_id},c);
-  await mut('attendance_mark_v1',{reservation_id:rid,expected_version:v.entries[0].version,result},c);
+  if(!cancel)await mut('attendance_mark_v1',{reservation_id:rid,expected_version:v.entries[0].version,result},c);
   v=await read('attendance_get_v1',{session_id:ss.primary_id},c);
   const k=key(),payload={session_id:ss.primary_id,expected_version:v.session_version,performed,performed_instructor_ids:performed?[teacher.p]:[]};
   await mut('attendance_close_v1',payload,c,owner,k);
@@ -194,7 +195,7 @@ test('Cross-center settlement Auth -> Edge -> RPC',async t=>{
  });
  await t.test('DS-SET timed, same-center, released and not performed consumption create no transfer',async()=>{
   const before=(await movements()).items.filter(x=>x.kind==='accrual').length;
-  const timed=await sell(await product(A,'timed'));await lesson(timed);
+  const timed=await sell(await product(A,'timed'));const tl=await lesson(timed);assert.equal((await rows('select amount_minor from core.earnings where session_id=$1',[tl.sid]))[0].amount_minor,'75');
   const own=await sell(await product(B),B);await lesson(own);
   const p=await sell(await product());await lesson(p,false);
   const q=await sell(await product());await lesson(q,true,'no_show');
@@ -231,6 +232,9 @@ test('Cross-center settlement Auth -> Edge -> RPC',async t=>{
   const s=await sell(await product()),l=await lesson(s,true,'no_show');
   const a=(await rows('select id from core.entitlement_allocations where reservation_id=$1',[l.rid]))[0];
   assert((await movements()).items.some(x=>x.source_allocation_id===a.id&&x.kind==='accrual'));
+  const cancelled=await lesson(await sell(await product()),true,'attended',student.p,B,true);
+  assert.equal((await rows('select state from core.entitlement_allocations where reservation_id=$1',[cancelled.rid]))[0].state,'consumed');
+  const ca=(await rows('select id from core.entitlement_allocations where reservation_id=$1',[cancelled.rid]))[0];assert((await movements()).items.some(x=>x.kind==='accrual'&&x.source_allocation_id===ca.id));
   await mut('policy_publish_v1',{key:'student_cancel_group',value:{kind:'cancellation',terms:{cutoff_minutes:0,before_cutoff:'release',after_cutoff:'release',no_show:'release'}},effective_at:new Date(Date.now()-100).toISOString(),mandatory:false},null);
  });
  await t.test('DS-AUTH revoke versus approve serializes and cannot commit after lost live B authority',async()=>{
@@ -305,6 +309,59 @@ test('Cross-center settlement Auth -> Edge -> RPC',async t=>{
    await fail('settlement_movements_list_v1',{currency:'TRY',page:{}},'PLAN_FEATURE_UNAVAILABLE');
   }finally{await db.query('update core.saas_subscriptions set plan_version_id=$2,version=version+1 where id=$1',[sub.id,sub.plan_version_id]);}
   await fail('settlement_request_decide_v1',{settlement_request_id:old.id,expected_version:old.version,decision:'approve',reason:'ABA plan'},'PREVIEW_STALE',B);
+ });
+ await t.test('DS-SET B package override applies to A source sale independently of share',async()=>{
+  const prod=await product(),identity=(await rows('select product_id from core.product_versions where id=$1',[prod.primary_id]))[0].product_id;
+  const prev=(await read('instructor_agreements_list_v1',{person_id:teacher.p,page:{}},B)).items[0];
+  await mut('instructor_agreement_publish_v1',{person_id:teacher.p,discipline_id:D,format:'group',supersedes_id:prev.id,expected_version:prev.version,valid:{starts_at:'2021-01-01T00:00:00Z',ends_at:'2030-01-01T00:00:00Z'},terms:{model:'explicit_mixed',currency:'TRY',components:[{kind:'session_fixed',amount_minor:'75'},{kind:'per_person',amount_minor:'50'}],package_overrides:[{product_id:identity,components:[{kind:'percentage',rate_bps:2000,basis:{mode:'sale_unit'},entitlement_kind:'credits'}]}],room_fee:{kind:'free',order:'before_instructor_share'}},reason:'B explicit product override'},B);
+  const sale=await sell(prod),l=await lesson(sale);
+  assert.equal((await rows('select amount_minor from core.earnings where session_id=$1',[l.sid]))[0].amount_minor,'125');
+  assert.equal((await movements()).items.find(x=>x.source_sale_id===sale&&x.kind==='accrual').amount_minor,'250');
+ });
+ await t.test('DS-SET B source settles its past deficit without any cross-center share',async()=>{
+  const p=await linked('settlement-b-negative'),l=await lesson(null,true,'attended',p.p),before=await rows('select id,amount_minor,basis from core.earnings where session_id=$1',[l.sid]);
+  const s=await sell(await product(B),B,p.p);
+  assert.equal((await rows('select state from core.credit_deficits where reservation_id=$1',[l.rid]))[0].state,'settled');
+  assert.equal((await movements()).items.some(x=>x.source_sale_id===s),false);
+  assert.deepEqual(await rows('select id,amount_minor,basis from core.earnings where session_id=$1',[l.sid]),before);
+ });
+ await t.test('DS-SET linked replacement freezes changed scope and requires a new B approval',async()=>{
+  const m=(await movements()).items.find(x=>x.kind==='accrual'&&BigInt(x.open_minor)>=2n),old=await get((await submit(proposal([line(m,1)],1))).primary_id);
+  await mut('settlement_request_withdraw_v1',{settlement_request_id:old.id,expected_version:old.version,reason:'Revise proposal'});
+  const prior=await get(old.id),before=m.open_minor;
+  const replacement=await get((await submit(proposal([line(m,2)],2),A,B,owner,{previous_id:prior.id,previous_version:prior.version})).primary_id);
+  assert.equal(replacement.previous_id,prior.id);assert.equal(replacement.state,'pending');assert.equal(replacement.record,null);
+  assert.equal((await movements()).items.find(x=>x.id===m.id).open_minor,before);
+  await decide(replacement);assert.equal((await get(replacement.id)).record.amount_minor,'2');assert.equal((await get(prior.id)).state,'withdrawn');
+ });
+ await t.test('DS-SET multi-line payment correction reverses only selected original allocation',async()=>{
+  const ms=(await movements()).items.filter(x=>x.kind==='accrual'&&BigInt(x.open_minor)>=2n).slice(0,2);assert.equal(ms.length,2);
+  const q=await get((await submit(proposal(ms.map(m=>line(m,2)),4))).primary_id);await decide(q);const rec=(await get(q.id)).record;
+  const a=rec.allocations[0],other=rec.allocations[1],before=(await movements()).items.find(x=>x.id===other.movement_id).open_minor;
+  const correction=await get((await submit({kind:'correction',original_record_id:rec.id,expected_version:rec.version,amount_minor:'1',allocations:[{allocation_id:a.id,expected_version:a.version,amount_minor:'1'}]})).primary_id);await decide(correction);
+  const after=(await get(q.id)).record;assert.equal(after.amount_minor,'4');assert.equal(after.allocations.find(x=>x.id===a.id).unreversed_minor,'1');assert.equal(after.allocations.find(x=>x.id===other.id).unreversed_minor,'2');assert.equal((await movements()).items.find(x=>x.id===other.movement_id).open_minor,before);
+ });
+ await t.test('DS-ATOMIC distinct payment offset and correction requests serialize competing dependencies',async()=>{
+  const debit=(await movements()).items.find(x=>x.kind==='accrual'&&BigInt(x.open_minor)>=6n),credit=(await movements()).items.find(x=>x.kind==='reversal'&&BigInt(x.open_minor)>=2n);assert(credit);
+  const initial=await get((await submit(proposal([line(debit,2)],2))).primary_id);await decide(initial);const rec=(await get(initial.id)).record,al=rec.allocations[0];
+  const m=(await movements()).items.find(x=>x.id===debit.id);
+  const proposals=[proposal([line(m,2)],2),{kind:'offset',debit_lines:[line(m,2)],credit_lines:[line(credit,2)],amount_minor:'2'},{kind:'correction',original_record_id:rec.id,expected_version:rec.version,amount_minor:'1',allocations:[{allocation_id:al.id,expected_version:al.version,amount_minor:'1'}]}];
+  const qs=[];for(const p of proposals)qs.push(await get((await submit(p)).primary_id));
+  const outcomes=await Promise.all(qs.map(q=>call(owner,'settlement_request_decide_v1',body({settlement_request_id:q.id,expected_version:q.version,decision:'approve',reason:'competing commands'},B),key())));
+  assert.equal(outcomes.filter(x=>x.result.ok).length,1);for(const x of outcomes.filter(x=>!x.result.ok))assert.equal(x.result.error.code,'PREVIEW_STALE');
+  const winner=outcomes.findIndex(x=>x.result.ok),after=(await movements()).items.find(x=>x.id===m.id);assert.equal(BigInt(after.open_minor),BigInt(m.open_minor)+(winner===2?1n:-2n));
+  assert.equal((await rows('select count(*) n from private.settlement_records where request_id=any($1::uuid[])',[qs.map(q=>q.id)]))[0].n,'1');
+ });
+ await t.test('DS-ATOMIC ledger audit and receipt failures rollback the entire multi-line batch',async()=>{
+  const snapshot=async()=>rows("select name,(select coalesce(jsonb_agg(row_data order by row_data->>'id'),'[]'::jsonb) from (select to_jsonb(t) row_data from private.settlement_movements t where org_id=$1) z) data from (values('movements')) n(name) union all select 'records',coalesce(jsonb_agg(to_jsonb(t) order by id),'[]') from private.settlement_records t where org_id=$1 union all select 'allocations',coalesce(jsonb_agg(to_jsonb(t) order by id),'[]') from private.settlement_allocations t where org_id=$1 union all select 'requests',coalesce(jsonb_agg(to_jsonb(t) order by id),'[]') from private.settlement_requests t where org_id=$1 union all select 'audit',coalesce(jsonb_agg(to_jsonb(t) order by id),'[]') from core.audit_events t where org_id=$1 union all select 'outbox',coalesce(jsonb_agg(to_jsonb(t) order by id),'[]') from core.outbox_jobs t where org_id=$1 union all select 'notifications',coalesce(jsonb_agg(to_jsonb(t) order by id),'[]') from core.notifications t where org_id=$1 union all select 'receipts',coalesce(jsonb_agg(to_jsonb(t) order by id),'[]') from core.operation_receipts t where org_id=$1",[org]);
+  for(const table of ['private.settlement_allocations','core.audit_events','core.operation_receipts']){
+   const ms=(await movements()).items.filter(x=>x.kind==='accrual'&&BigInt(x.open_minor)>=1n).slice(0,2),q=await get((await submit(proposal(ms.map(m=>line(m,1)),2))).primary_id),before=await snapshot();
+   const filter=table==='core.audit_events'?" and new.action='settlement_request_decide_v1'":table==='core.operation_receipts'?" and new.operation='settlement_request_decide_v1' and new.state='succeeded'":"";
+   await db.query("create function private.settlement_batch_fail() returns trigger language plpgsql as $$begin if TG_TABLE_NAME='settlement_allocations' and not exists(select 1 from private.settlement_allocations where record_id=(to_jsonb(new)->>'record_id')::uuid) then return new;end if;raise exception using errcode='P0001',message='INTEGRITY_VIOLATION';end$$;create trigger settlement_batch_fail before "+(table==='core.operation_receipts'?'update':'insert')+" on "+table+" for each row when(new.org_id='"+org+"'::uuid"+filter+") execute function private.settlement_batch_fail()");
+   try{await fail('settlement_request_decide_v1',{settlement_request_id:q.id,expected_version:q.version,decision:'approve',reason:'rollback all selected lines'},'INTEGRITY_VIOLATION',B);assert.deepEqual(await snapshot(),before);}
+   finally{await db.query('drop trigger settlement_batch_fail on '+table+';drop function private.settlement_batch_fail()');}
+   await decide(q);assert.equal((await get(q.id)).record.allocations.length,2);
+  }
  });
  await t.test('DS-SCOPE cursor bound to actor center currency filters; unrelated center and student reads denied',async()=>{
   const page=await movements(A,owner,{limit:1});assert(page.next_cursor);
