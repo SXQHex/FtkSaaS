@@ -30,7 +30,7 @@ test('Cross-center settlement Auth -> Edge -> RPC',async t=>{
   for(const c of centers){await mut('student_activate_v1',{person_id:p},c);if(role==='center_manager')await mut('center_manager_assign_v1',{person_id:p},c);else if(role)await mut('role_assign_v1',{person_id:p,role,scope:{center_id:c}},c);}
   return {p,u,a};
  }
- const manager=await linked('settlement-manager','center_manager'),student=await linked('settlement-student'),teacher=await linked('settlement-teacher','instructor',[A,B,C]);
+ const manager=await linked('settlement-manager','center_manager'),student=await linked('settlement-student',null,[A,B,C]),teacher=await linked('settlement-teacher','instructor',[A,B,C]);
  const om=await linked('settlement-org-manager',null);
  await mut('org_manager_assign_v1',{person_id:om.p},null);
  const authority=(p=person,c=null,u=owner)=>read('settlement_authority_get_v1',{person_id:p},c,u);
@@ -47,7 +47,7 @@ test('Cross-center settlement Auth -> Edge -> RPC',async t=>{
   await fail('settlement_movements_list_v1',{currency:'TRY',page:{}},'FORBIDDEN');
   await fail('settlement_authority_get_v1',{person_id:person},'FORBIDDEN',A,student.u);
   await fail('settlement_authority_get_v1',{person_id:person},'NOT_FOUND',A,outside);
-  await grant(person,A);await grant(person,B);await grant(manager.p,A);
+  await grant(person,A);await grant(person,B);await grant(person,C);await grant(manager.p,A);
   assert.equal((await movements()).items.length,0);
   await fail('settlement_authority_set_v1',{person_id:student.p,expected_version:(await authority()).version,granted:true,reason:'invalid target'},'NOT_FOUND');
   await fail('settlement_delegation_set_v1',{person_id:om.p,expected_version:(await authority()).version,granted:true,reason:'forbidden'},'FORBIDDEN',null,manager.u);
@@ -68,7 +68,7 @@ test('Cross-center settlement Auth -> Edge -> RPC',async t=>{
  }
  for(const c of [A,B,C]){
  await mut('availability_save_v1',{resource:{kind:'person',id:teacher.p},rule:{weekdays:[1,2,3,4,5,6,7],local_start:'00:00:00',local_end:'23:59:59',valid_from:'2020-01-01'}},c);
- await mut('instructor_agreement_publish_v1',{person_id:teacher.p,discipline_id:D,format:'group',valid:{starts_at:'2020-01-01T00:00:00Z',ends_at:'2030-01-01T00:00:00Z'},terms:{model:'session_fixed',currency:'TRY',components:[{kind:'session_fixed',amount_minor:'75'}],room_fee:{kind:'free',order:'before_instructor_share'}},reason:'B agreement'},c);
+ await mut('instructor_agreement_publish_v1',{person_id:teacher.p,discipline_id:D,format:'group',valid:{starts_at:'2020-01-01T00:00:00Z',ends_at:'2030-01-01T00:00:00Z'},terms:{model:'session_fixed',currency:'TRY',components:[{kind:'session_fixed',amount_minor:c===A?'999':'75'}],room_fee:{kind:'free',order:'before_instructor_share'}},reason:'B agreement'},c);
  }
  async function product(c=A,kind='credits',price='1000',credits=4,scopes=[{scope_kind:'organization_all',center_id:null,discipline_id:null,usage_targets:['lesson']}]){
   return mut('product_publish_v1',{terms:{name:'Cross center actual sale',kind,booking_mode:'flexible',...(kind==='credits'?{credits}:{}),price_minor:price,currency:'TRY',freeze:{enabled:false,extends_validity:false},refund:{method:'none'},scopes}},c);
@@ -294,7 +294,7 @@ test('Cross-center settlement Auth -> Edge -> RPC',async t=>{
   const page=await movements(A,owner,{limit:1});assert(page.next_cursor);
   await fail('settlement_movements_list_v1',{currency:'TRY',page:{limit:1,cursor:page.next_cursor}},'VALIDATION_FAILED',B);
   await fail('settlement_movements_list_v1',{currency:'TRY',page:{}},'FORBIDDEN',A,student.u);
-  await fail('settlement_request_get_v1',{settlement_request_id:approved.id},'FORBIDDEN',C);
+  await fail('settlement_request_get_v1',{settlement_request_id:approved.id},'NOT_FOUND',C);
   assert((await requests()).items.length>0);
  });
  }finally{await db.end();}
