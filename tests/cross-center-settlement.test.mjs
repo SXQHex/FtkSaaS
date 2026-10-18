@@ -290,6 +290,22 @@ test('Cross-center settlement Auth -> Edge -> RPC',async t=>{
   const unknown=key();await fail('settlement_request_get_v1',{settlement_request_id:unknown},'NOT_FOUND');
   await fail('settlement_request_submit_v1',{from_center_id:A,to_center_id:B,currency:'TRY',proposal:proposal([{movement_id:unknown,expected_version:1,amount_minor:'1'}],1),reason:'unknown movement'},'NOT_FOUND');
  });
+ await t.test('DS-SET frozen plan rejects version transitions and ABA but ignores billing bookkeeping',async()=>{
+  const sub=(await rows('select id,plan_version_id from core.saas_subscriptions where org_id=$1 order by created_at desc,id desc limit 1',[org]))[0];
+  const clone=async(features)=>{const id=key();await db.query("insert into core.saas_plan_versions(id,name,effective_at,price_minor,currency,period,limits,features) select $1,name,now(),price_minor,currency,period,limits,"+(features?"array_remove(features,'F18')":"features")+" from core.saas_plan_versions where id=$2",[id,sub.plan_version_id]);return id;};
+  const business=await clone(false),pro=await clone(true);
+  const pending=async()=>{const m=(await movements()).items.find(x=>x.kind==='accrual'&&BigInt(x.open_minor)>=1n);return get((await submit(proposal([line(m,1)],1))).primary_id);};
+  const first=await pending();await db.query('update core.saas_subscriptions set version=version+1 where id=$1',[sub.id]);await decide(first);
+  const old=await pending();
+  try{
+   await db.query('update core.saas_subscriptions set plan_version_id=$2,version=version+1 where id=$1',[sub.id,business]);
+   await fail('settlement_request_decide_v1',{settlement_request_id:old.id,expected_version:old.version,decision:'approve',reason:'stale plan'},'PREVIEW_STALE',B);
+   await decide(await pending());
+   await db.query('update core.saas_subscriptions set plan_version_id=$2,version=version+1 where id=$1',[sub.id,pro]);
+   await fail('settlement_movements_list_v1',{currency:'TRY',page:{}},'PLAN_FEATURE_UNAVAILABLE');
+  }finally{await db.query('update core.saas_subscriptions set plan_version_id=$2,version=version+1 where id=$1',[sub.id,sub.plan_version_id]);}
+  await fail('settlement_request_decide_v1',{settlement_request_id:old.id,expected_version:old.version,decision:'approve',reason:'ABA plan'},'PREVIEW_STALE',B);
+ });
  await t.test('DS-SCOPE cursor bound to actor center currency filters; unrelated center and student reads denied',async()=>{
   const page=await movements(A,owner,{limit:1});assert(page.next_cursor);
   await fail('settlement_movements_list_v1',{currency:'TRY',page:{limit:1,cursor:page.next_cursor}},'VALIDATION_FAILED',B);

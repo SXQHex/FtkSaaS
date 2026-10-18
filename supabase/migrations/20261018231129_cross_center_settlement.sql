@@ -2,7 +2,18 @@
 begin;
 -- Private settlement ledger: original facts immutable, only eligibility aggregates change.
 create table private.settlement_authority_versions(
- org_id uuid primary key references core.organizations(id),version bigint not null default 1 check(version>0));
+ org_id uuid primary key references core.organizations(id),version bigint not null default 1 check(version>0),plan_generation bigint not null default 1);
+-- Only relevant plan/state transitions invalidate frozen requests; billing bookkeeping does not.
+create function private.settlement_plan_changed() returns trigger language plpgsql security invoker set search_path='' as $$
+begin
+ if new.plan_version_id is distinct from old.plan_version_id or new.state is distinct from old.state then
+  insert into private.settlement_authority_versions(org_id,plan_generation) values(new.org_id,2)
+  on conflict(org_id) do update set plan_generation=private.settlement_authority_versions.plan_generation+1;
+ end if;
+ return new;
+end$$;
+create trigger settlement_plan_changed after update of plan_version_id,state on core.saas_subscriptions
+ for each row execute function private.settlement_plan_changed();
 create table private.settlement_grants(
  org_id uuid not null,person_id uuid not null,center_id uuid,granted boolean not null,version bigint not null check(version>0),
  foreign key(org_id,person_id) references core.people(org_id,id),
@@ -26,7 +37,7 @@ create table private.settlement_requests(
  id uuid primary key,org_id uuid not null references core.organizations(id),version bigint not null default 1,
  from_center_id uuid not null,to_center_id uuid not null,currency text not null,state text not null check(state in('pending','approved','rejected','withdrawn')),
  initiator_account_id uuid not null references core.accounts(id),decision_account_id uuid references core.accounts(id),
- reason text not null,previous_id uuid,proposal jsonb not null,dependencies jsonb not null,
+ reason text not null,previous_id uuid,proposal jsonb not null,dependencies jsonb not null,plan_snapshot jsonb not null,
  initiator_authority jsonb not null,decision_authority jsonb,created_at timestamptz not null default clock_timestamp(),
  unique(org_id,id),check(from_center_id<>to_center_id),
  foreign key(org_id,from_center_id) references core.centers(org_id,id),
@@ -131,6 +142,11 @@ create function private.settlement_request_view(org uuid,request uuid) returns j
  from private.settlement_records z where z.org_id=org and z.request_id=q.id))
  from private.settlement_requests q where q.org_id=org and q.id=request
 $$;
+create function private.settlement_plan_dependency(org uuid,a uuid,b uuid) returns jsonb language sql stable security invoker set search_path='' as $$
+ select jsonb_build_object('subscription_id',s.id,'plan_generation',coalesce((select v.plan_generation from private.settlement_authority_versions v where v.org_id=org),1),'plan_version_id',s.plan_version_id,
+ 'access_mode',private.access_mode(org),'from_accessible',private.center_accessible(org,a),'to_accessible',private.center_accessible(org,b))
+ from core.saas_subscriptions s where s.org_id=org order by s.created_at desc,s.id desc limit 1
+$$;
 -- Validate exact selected lines at submission and approval. No unrelated movement participates.
 create function private.settlement_validate(org uuid,a uuid,b uuid,currency_name text,proposal jsonb) returns jsonb
 language plpgsql stable security invoker set search_path='' as $$
@@ -220,14 +236,16 @@ begin
    if prior.state='pending' then perform private.fail('INVALID_STATE_TRANSITION');end if;
   end if;
   selected:=private.settlement_validate(org,(r->>'from_center_id')::uuid,(r->>'to_center_id')::uuid,r->>'currency',proposal);
-  insert into private.settlement_requests(id,org_id,from_center_id,to_center_id,currency,state,initiator_account_id,reason,previous_id,proposal,dependencies,initiator_authority)
-   values(primary_id,org,(r->>'from_center_id')::uuid,(r->>'to_center_id')::uuid,r->>'currency','pending',account,r->>'reason',prior.id,proposal,selected,scope);
+  insert into private.settlement_requests(id,org_id,from_center_id,to_center_id,currency,state,initiator_account_id,reason,previous_id,proposal,dependencies,plan_snapshot,initiator_authority)
+   values(primary_id,org,(r->>'from_center_id')::uuid,(r->>'to_center_id')::uuid,r->>'currency','pending',account,r->>'reason',prior.id,proposal,selected,
+   private.settlement_plan_dependency(org,(r->>'from_center_id')::uuid,(r->>'to_center_id')::uuid),scope);
  elsif op in('settlement_request_withdraw_v1','settlement_request_decide_v1') then
   select * into q from private.settlement_requests x where x.org_id=org and x.id=(r->>'settlement_request_id')::uuid for update;
   if q.version<>(r->>'expected_version')::bigint then perform private.fail('VERSION_CONFLICT');end if;
   if q.state<>'pending' then perform private.fail('INVALID_STATE_TRANSITION');end if;
   if op='settlement_request_decide_v1' and r->>'decision'='approve' then
    if not private.center_accessible(org,q.from_center_id) then perform private.fail('PLAN_FEATURE_UNAVAILABLE');end if;
+   if q.plan_snapshot is distinct from private.settlement_plan_dependency(org,q.from_center_id,q.to_center_id) then perform private.fail('PREVIEW_STALE');end if;
    if not exists(select 1 from core.role_assignments ar join core.account_links lk on lk.id=ar.account_link_id and lk.org_id=ar.org_id
      join private.settlement_grants ag on ag.org_id=ar.org_id and ag.person_id=ar.person_id and ag.center_id=ar.scope_center_id
      where ar.org_id=org and ar.id=(q.initiator_authority->>'manager_role_id')::uuid and ar.version=(q.initiator_authority->>'manager_role_version')::bigint
