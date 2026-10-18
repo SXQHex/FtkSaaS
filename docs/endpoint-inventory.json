@@ -4736,8 +4736,8 @@
     },
     {
       "name": "settlement_movements_list_v1",
-      "status": "contract_only",
-      "external_path": null,
+      "status": "operational_development_limited",
+      "external_path": "/functions/v1/backend-v1/settlement_movements_list_v1",
       "permission": "settlement.read",
       "features": [
         "F18"
@@ -4745,24 +4745,27 @@
       "required_features": [
         "F18"
       ],
-      "runtime_required_features": [],
+      "runtime_required_features": [
+        "F18"
+      ],
       "decision_delivery": {
         "accepted_contract": "DS-2026-10-17",
-        "runtime_conformance": "pending",
-        "open_dependencies": [
-          "cross_center_settlement"
-        ],
+        "runtime_conformance": "implemented_pending_final_acceptance",
+        "open_dependencies": [],
         "target_request": {
           "$ref": "#/$defs/Request_settlement_movements_list"
-        }
+        },
+        "completed_dependencies": [
+          "cross_center_settlement"
+        ]
       },
       "billing_class": "read",
       "limits": []
     },
     {
       "name": "settlement_requests_list_v1",
-      "status": "contract_only",
-      "external_path": null,
+      "status": "operational_development_limited",
+      "external_path": "/functions/v1/backend-v1/settlement_requests_list_v1",
       "permission": "settlement.read",
       "features": [
         "F18"
@@ -4770,24 +4773,27 @@
       "required_features": [
         "F18"
       ],
-      "runtime_required_features": [],
+      "runtime_required_features": [
+        "F18"
+      ],
       "decision_delivery": {
         "accepted_contract": "DS-2026-10-17",
-        "runtime_conformance": "pending",
-        "open_dependencies": [
-          "cross_center_settlement"
-        ],
+        "runtime_conformance": "implemented_pending_final_acceptance",
+        "open_dependencies": [],
         "target_request": {
           "$ref": "#/$defs/Request_settlement_requests_list"
-        }
+        },
+        "completed_dependencies": [
+          "cross_center_settlement"
+        ]
       },
       "billing_class": "read",
       "limits": []
     },
     {
       "name": "settlement_request_get_v1",
-      "status": "contract_only",
-      "external_path": null,
+      "status": "operational_development_limited",
+      "external_path": "/functions/v1/backend-v1/settlement_request_get_v1",
       "permission": "settlement.read",
       "features": [
         "F18"
@@ -4795,24 +4801,27 @@
       "required_features": [
         "F18"
       ],
-      "runtime_required_features": [],
+      "runtime_required_features": [
+        "F18"
+      ],
       "decision_delivery": {
         "accepted_contract": "DS-2026-10-17",
-        "runtime_conformance": "pending",
-        "open_dependencies": [
-          "cross_center_settlement"
-        ],
+        "runtime_conformance": "implemented_pending_final_acceptance",
+        "open_dependencies": [],
         "target_request": {
           "$ref": "#/$defs/Request_settlement_request_get"
-        }
+        },
+        "completed_dependencies": [
+          "cross_center_settlement"
+        ]
       },
       "billing_class": "read",
       "limits": []
     },
     {
       "name": "settlement_request_submit_v1",
-      "status": "contract_only",
-      "external_path": null,
+      "status": "operational_development_limited",
+      "external_path": "/functions/v1/backend-v1/settlement_request_submit_v1",
       "permission": "settlement.request",
       "features": [
         "F18"
@@ -4820,16 +4829,19 @@
       "required_features": [
         "F18"
       ],
-      "runtime_required_features": [],
+      "runtime_required_features": [
+        "F18"
+      ],
       "decision_delivery": {
         "accepted_contract": "DS-2026-10-17",
-        "runtime_conformance": "pending",
-        "open_dependencies": [
-          "cross_center_settlement"
-        ],
+        "runtime_conformance": "implemented_pending_final_acceptance",
+        "open_dependencies": [],
         "target_request": {
           "$ref": "#/$defs/Request_settlement_request_submit"
-        }
+        },
+        "completed_dependencies": [
+          "cross_center_settlement"
+        ]
       },
       "billing_class": "config",
       "limits": [],
@@ -4858,8 +4870,8 @@
     },
     {
       "name": "settlement_request_withdraw_v1",
-      "status": "contract_only",
-      "external_path": null,
+      "status": "operational_development_limited",
+      "external_path": "/functions/v1/backend-v1/settlement_request_withdraw_v1",
       "permission": "settlement.request",
       "features": [
         "F18"
@@ -4867,16 +4879,19 @@
       "required_features": [
         "F18"
       ],
-      "runtime_required_features": [],
+      "runtime_required_features": [
+        "F18"
+      ],
       "decision_delivery": {
         "accepted_contract": "DS-2026-10-17",
-        "runtime_conformance": "pending",
-        "open_dependencies": [
-          "cross_center_settlement"
-        ],
+        "runtime_conformance": "implemented_pending_final_acceptance",
+        "open_dependencies": [],
         "target_request": {
           "$ref": "#/$defs/Request_settlement_request_withdraw"
-        }
+        },
+        "completed_dependencies": [
+          "cross_center_settlement"
+        ]
       },
       "billing_class": "config",
       "limits": [],
@@ -4905,8 +4920,8 @@
     },
     {
       "name": "settlement_request_decide_v1",
-      "status": "contract_only",
-      "external_path": null,
+      "status": "operational_development_limited",
+      "external_path": "/functions/v1/backend-v1/settlement_request_decide_v1",
       "permission": "settlement.decide",
       "features": [
         "F18"
@@ -4914,16 +4929,19 @@
       "required_features": [
         "F18"
       ],
-      "runtime_required_features": [],
+      "runtime_required_features": [
+        "F18"
+      ],
       "decision_delivery": {
         "accepted_contract": "DS-2026-10-17",
-        "runtime_conformance": "pending",
-        "open_dependencies": [
-          "cross_center_settlement"
-        ],
+        "runtime_conformance": "implemented_pending_final_acceptance",
+        "open_dependencies": [],
         "target_request": {
           "$ref": "#/$defs/Request_settlement_request_decide"
-        }
+        },
+        "completed_dependencies": [
+          "cross_center_settlement"
+        ]
       },
       "billing_class": "config",
       "limits": [],
@@ -4952,8 +4970,8 @@
     },
     {
       "name": "settlement_authority_get_v1",
-      "status": "contract_only",
-      "external_path": null,
+      "status": "operational_development_limited",
+      "external_path": "/functions/v1/backend-v1/settlement_authority_get_v1",
       "permission": "settlement.authority.inspect",
       "features": [
         "F04",
@@ -4962,24 +4980,27 @@
       "required_features": [
         "F18"
       ],
-      "runtime_required_features": [],
+      "runtime_required_features": [
+        "F18"
+      ],
       "decision_delivery": {
         "accepted_contract": "DS-2026-10-17",
-        "runtime_conformance": "pending",
-        "open_dependencies": [
-          "cross_center_settlement"
-        ],
+        "runtime_conformance": "implemented_pending_final_acceptance",
+        "open_dependencies": [],
         "target_request": {
           "$ref": "#/$defs/Request_settlement_authority_get"
-        }
+        },
+        "completed_dependencies": [
+          "cross_center_settlement"
+        ]
       },
       "billing_class": "read",
       "limits": []
     },
     {
       "name": "settlement_delegation_set_v1",
-      "status": "contract_only",
-      "external_path": null,
+      "status": "operational_development_limited",
+      "external_path": "/functions/v1/backend-v1/settlement_delegation_set_v1",
       "permission": "settlement.delegation.manage",
       "features": [
         "F04",
@@ -4988,24 +5009,27 @@
       "required_features": [
         "F18"
       ],
-      "runtime_required_features": [],
+      "runtime_required_features": [
+        "F18"
+      ],
       "decision_delivery": {
         "accepted_contract": "DS-2026-10-17",
-        "runtime_conformance": "pending",
-        "open_dependencies": [
-          "cross_center_settlement"
-        ],
+        "runtime_conformance": "implemented_pending_final_acceptance",
+        "open_dependencies": [],
         "target_request": {
           "$ref": "#/$defs/Request_settlement_delegation_set"
-        }
+        },
+        "completed_dependencies": [
+          "cross_center_settlement"
+        ]
       },
       "billing_class": "config",
       "limits": []
     },
     {
       "name": "settlement_authority_set_v1",
-      "status": "contract_only",
-      "external_path": null,
+      "status": "operational_development_limited",
+      "external_path": "/functions/v1/backend-v1/settlement_authority_set_v1",
       "permission": "settlement.authority.manage",
       "features": [
         "F04",
@@ -5014,16 +5038,19 @@
       "required_features": [
         "F18"
       ],
-      "runtime_required_features": [],
+      "runtime_required_features": [
+        "F18"
+      ],
       "decision_delivery": {
         "accepted_contract": "DS-2026-10-17",
-        "runtime_conformance": "pending",
-        "open_dependencies": [
-          "cross_center_settlement"
-        ],
+        "runtime_conformance": "implemented_pending_final_acceptance",
+        "open_dependencies": [],
         "target_request": {
           "$ref": "#/$defs/Request_settlement_authority_set"
-        }
+        },
+        "completed_dependencies": [
+          "cross_center_settlement"
+        ]
       },
       "billing_class": "config",
       "limits": []

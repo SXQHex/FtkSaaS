@@ -39,12 +39,18 @@ Deno.serve(async req=>{
     invite={token_hash,sealed_token:JSON.stringify({iv:b64(iv),cipher:b64(new Uint8Array(cipher))})};
    }
   }
+  let requiredCount=count;
   for(let attempt=0;attempt<4;attempt++){
-  const ids=Array.from({length:count*2**attempt},()=>v7());
+  const ids=Array.from({length:Math.max(count*2**attempt,requiredCount)},()=>v7());
   const rpc=await fetch(base+"/rest/v1/rpc/"+operation,{method:"POST",headers:{authorization:"Bearer "+key,apikey:key,"content-type":"application/json","Content-Profile":"api_v1"},
    body:JSON.stringify({p_request:request,p_actor_auth_id:user.id,p_session_id:claims.session_id,p_ids:ids,p_aux:invite})});
   if(!rpc.ok)return failure("TEMPORARY_FAILURE",503);
-  const result=await rpc.json();if(result._internal_retry==="uuid_bank_exhausted")continue;if(result.ok){const success=(validators as any)["success_"+operation];if(!success?.(result))return failure("INTEGRITY_VIOLATION",500);}
+  const result=await rpc.json();if(result._internal_retry==="uuid_bank_exhausted"){
+   // Trusted RPC preflight derives size from the stored immutable selection.
+   const n=result.required_uuid_count;
+   if(n!==undefined){if(!Number.isSafeInteger(n)||n<1||n>2*Math.ceil(2097152/36)+64)return failure("INTEGRITY_VIOLATION",500);requiredCount=Math.max(requiredCount,n);}
+   continue;
+  }if(result.ok){const success=(validators as any)["success_"+operation];if(!success?.(result))return failure("INTEGRITY_VIOLATION",500);}
   return json(result);
   }
   return failure("TEMPORARY_FAILURE",503);

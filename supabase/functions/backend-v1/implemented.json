@@ -94,6 +94,15 @@
     "earnings_list_v1",
     "negcredit_valuation_set_v1",
     "management_state_get_v1",
-    "attendance_start_v1"
+    "attendance_start_v1",
+    "settlement_movements_list_v1",
+    "settlement_requests_list_v1",
+    "settlement_request_get_v1",
+    "settlement_request_submit_v1",
+    "settlement_request_withdraw_v1",
+    "settlement_request_decide_v1",
+    "settlement_authority_get_v1",
+    "settlement_delegation_set_v1",
+    "settlement_authority_set_v1"
   ]
 }

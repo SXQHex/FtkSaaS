@@ -89,7 +89,7 @@ test('B decision is a closed DTO; frozen proposal cannot be replaced by approval
 
 test('declared runtime gates must match actually applied migration SQL, not target references',()=>{
  const p=structuredClone(original);
- assert.equal(validateAppliedGates(p,live),95);
+ assert.equal(validateAppliedGates(p,live),104);
  op(p,'class_save_v1').runtime_required_features=['F10','F11'];
  assert.throws(()=>validateAppliedGates(p,live),/APPLIED_FEATURE_GATE_DRIFT/);
 });

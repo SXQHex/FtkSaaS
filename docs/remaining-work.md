@@ -1,45 +1,31 @@
-# Eğitmen anlaşması ve hakediş — güncel geliştirme kapsamı
-
-Başlangıç main: `ab3fca4af47b71b34a4a7b6d0df5211ad1e41141`; [aynı SHA CI](https://github.com/SXQHex/FtkSaaS/actions/runs/39042108296) başarılı: 27 migration, 341 test. Yeni kaynak için önceki başarı taşınmaz; son head inceleme/temiz CI ve merge main CI ayrıca doğrulanır.
-
-199 sözleşme, 95 çağrılabilir, 104 contract-only; 90 core tablo, 28 append-only migration. [Güncel anlaşma/hakediş devri](instructor-earnings-handover.md) yeni akışı ve sınırları tanımlar. Eğitmen ödeme komutları ve merkezler arası hesaplaşma runtime'ı bu teslim değildir. Önceki snapshot sayıları aşağıda tarihsel bağlamdır.
-
 # Kalan backend işleri
 
-## Starter yoklama/koruma teslimi — güncel kapsam
+Güncel kaynak ve CI: [doğrulanmış devir](../contracts/00-FtkSaaS-yeni-sohbet-devir.md). **199 işlem: 104 çağrılabilir, 95 yalnız sözleşme; 29 migration.** Önceki teslimlerde kapanmış işler burada yeniden açık ilan edilmez. Uygulama kapsamı [Starter](starter-attendance-protection-handover.md) ve [anlaşma/hakediş](instructor-earnings-handover.md) devirlerindedir.
 
-[Starter devri](starter-attendance-protection-handover.md) zorunlu bağımlılıkları ve kalan tüketicileri tanımlar. 198 işlem / 89 canlı / 109 contract-only; 90 core tablo / 27 migration. Starter program → rezervasyon → etki/onay → korunan katılım → kapanış → gerekçeli düzeltme uygulanır. Bu önceki Starter snapshot’ında ücretli finansal kapanış kapalıydı; güncel uygulama yukarıdaki anlaşma/hakediş devrindedir; başlangıç/belge ve diğer hak değişikliği tüketicileri pending. Son SHA’nın kanıtı PR’dedir; eski başarı taşınmaz.
-
-Güncel geliştirme kapsamı: **89 çağrılabilir / 109 yalnız sözleşme**, 27 migration. [Takvim/seans/rezervasyon okuma devri](schedule-read-handover.md) üç okumanın yetki, UTC filtre ve cursor sınırlarını belirtir. Ürün okuması katalog sözleşmesiyle uygun satın alınmış hak seçimini karşılamaz; seans/kişi/sale bağlamı ve DTO aktarımı ayrı teslimdir. [Program/seans devri](program-session-handover.md) uygulanmış akış ve kalan anlaşma/entegrasyon sınırlarını açıklar. Son head CI bağımsız doğrulanır. Aşağıdaki PR #8 başlangıcı tarihsel kanıttır.
-
-## Doğrulanmış başlangıç — 17 Ekim 2026
-
-Kaynak main `b9bd9c110f0cf4a121eac6ef0752945de99b10ac`; [PR #8](https://github.com/SXQHex/FtkSaaS/pull/8) birleşmiş; [aynı SHA’nın main CI’ı](https://github.com/SXQHex/FtkSaaS/actions/runs/38993548576) başarılı. 22 migration, 181 test (12 sözleşme + 27 DB + 142 Auth/API); 184 operasyonun 65’i çalışan geliştirme uygulaması, 119’u yalnız sözleşme. Bu kanıt belirtilen kaynak içindir; sonraki commit’in CI sonucu ayrıca doğrulanır.
-
-Uzak geliştirme/test Auth → Edge → RPC smoke [ayrı rapordadır](../reports/remote-backend-verification.json); 181 testin uzak projede tekrarı değildir. Geçici fixture temizlendi; ortak tenant/kullanıcı girişi sağlanmadı. Dış e-posta ertelendi; Resend entegrasyonu başlatılmayacak. Yük/restore ve frontend gerçek entegrasyon kabulü açık; production dağıtımı yok.
+Ürün kataloğu okuması uygun satın alınmış hak seçimi değildir; seans/kişi/sale bağlamı ve DTO aktarımı ayrıca açıktır. Hosted eski smoke, güncel 104 işlemin uzaktan kabulü sayılmaz.
 
 ## DS öncelikli teslim sırası
 
 1. Karar/DTO/izin/guard/sürüm-okuma aktarımı ve F01–F33 yapısal denetimleri korundu; gerçek davranış kanıtı ayrı izlenir.
 2. Starter yoklama/hak kapanışı, politika/kişisel limit etkisi/onayı uygulandı. Otomatik başlangıç, belge ve diğer hak değişikliği tüketicileri açık.
 3. Immutable anlaşma/hakediş ve dar gerçek başlangıç yolu uygulandı; son kaynak kabulü/inceleme/CI PR kanıtıyla değerlendirilir. Ödeme komutları açık.
-4. Ayrı merkezler arası ledger, Owner/delege OM grant zinciri ve B onayında atomik ödeme/mahsup/bağlı düzeltme kesinleştirmesi. DS-OPEN-01 karar düzeyinde kapalı; DS-OPEN-02 son merkez yetki kararıyla karar düzeyinde kapalı; aynı hesap A/B yetkileri ayrı doğrulanarak iki adımı yapabilir. Fiziksel depolama/RPC/read/izolasyon ve adım kapsamlı audit bağımlılıkları açık.
+4. Ayrı merkezler arası ledger, Owner/delege OM grant zinciri ve B onayında atomik ödeme/mahsup/bağlı düzeltme kesinleştirmesi. DS-OPEN-01 karar düzeyinde kapalı; DS-OPEN-02 son merkez yetki kararıyla karar düzeyinde kapalı; aynı hesap A/B yetkileri ayrı doğrulanarak iki adımı yapabilir. Fiziksel depolama, dokuz RPC/read ve adım kapsamlı audit uygulandı; [hesaplaşma devri](settlement-handover.md) ve son head temiz CI kabulü esas alınır.
 5. Satış kapsam snapshot/değişim, gerekçeli backdate ve geçmiş açık kapatma; yeni ürün davranışı uydurulmadan uçtan uca kabul.
 
-Hedef plan/koruma/anlaşma farkları 08 delivery_gaps içinde açıktır. [38 DS davranış senaryosu: 7 kanıtlı, 31 pending](decision-sprint-handover.md) statik testten geçmiş kabul edilmez. [Main koruması](branch-protection-review.md) klasik API 403 nedeniyle doğrulanamıyor; gerekli yönetici ayarları teslim edilir, uygulanmış sayılmaz.
+Kalan delivery_gaps ve vaka bazlı durumlar [08 makine sözleşmesi](../contracts/08-FtkSaaS-tip-ve-operasyon-sozlesmesi.json) ile [üretilmiş F01–F33 haritasından](feature-delivery.md) okunur; yapısal test başarısı davranış kabulü değildir. [Main koruması](branch-protection-review.md) klasik API 403 nedeniyle doğrulanamıyor; gerekli yönetici ayarları teslim edilir, uygulanmış sayılmaz.
 
 ## Bağımlılık sırası
 
 1. Uygunluk/politika dört API uygulandı; tüketici sınırları ve eksik iş akışları Claude devrindeki güncel bölümde açıkça ayrılır. Son PR SHA kabulü CI ile ayrıca doğrulanır.
-2. Ürün kataloğu ile uygun satın alınmış paket/hak seçimi bağımlılık aktarımı; talep–bekleme–yer teklifi yaşam döngüleri; program/seans yedi komutu PR #12 ile uygulandı; DS uyarlaması ayrı açık teslimdir, anlaşma yayını ayrı bağımlılıktır. Üç program okuması uygulandı; sınırlar okuma devrindedir.
-3. Starter yoklama/kapanış/düzeltme/blocked dar akışı uygulandı; otomatik başlangıç/belge tüketicisi, ücretli anlaşma/hakediş kapanışı açık.
+2. Ürün kataloğu ile uygun satın alınmış paket/hak seçimi bağımlılık aktarımı; talep–bekleme–yer teklifi yaşam döngüleri; program/seans yedi komutu PR #12 ile, Starter uyarlaması PR #14 ve anlaşma yayını PR #15 ile uygulandı; kalan tüketiciler ilgili devirlerde belirtilir. Üç program okuması uygulandı; sınırlar okuma devrindedir.
+3. Starter ve Pro/Business yoklama/kapanış/bağlı düzeltme ile ücretli anlaşma/hakediş uygulandı. Otomatik başlangıç gözlemi, belge ve diğer hak değişikliği koruma tüketicileri açık.
 4. Paket dondurma/uzatma/değişim/yenileme/sonlandırma ve finans düzeltme/iade önizleme–uygulama çiftleri.
 5. Hesap erişimi geri alma, hesap/organizasyon kapanış/silme ve kişi birleştirme.
 6. CRM, bildirim tercihleri, belgeler, raporlar, import ve worker işlemleri.
 
 Her yeni grup: sözleşme/izin incelemesi → yeni migration → gerçek Auth/API kabulü (sınır, yetki, tekrar, yarış, rollback) → inceleme → temiz CI → main CI. Ürün kararında boşluk varsa teknik varsayımla yeni kural eklenmez.
 
-## Yalnız sözleşme envanteri — güncel 104 işlem
+## Yalnız sözleşme envanteri — güncel 95 işlem
 
 | Modül | Kalan işlem |
 |---|---:|
@@ -49,7 +35,7 @@ Her yeni grup: sözleşme/izin incelemesi → yeni migration → gerçek Auth/AP
 | M04 | 12 |
 | M05 | 3 |
 | M06 | 13 |
-| M07 | 14 |
+| M07 | 5 |
 | M08 | 2 |
 | M09 | 11 |
 | M10 | 3 |
@@ -155,15 +141,6 @@ Her yeni grup: sözleşme/izin incelemesi → yeni migration → gerçek Auth/AP
 | privacy_execute_v1 | system.worker |
 | subscription_boundary_apply_v1 | system.worker |
 | file_upload_complete_v1 | account.self |
-| settlement_movements_list_v1 | settlement.read |
-| settlement_requests_list_v1 | settlement.read |
-| settlement_request_get_v1 | settlement.read |
-| settlement_request_submit_v1 | settlement.request |
-| settlement_request_withdraw_v1 | settlement.request |
-| settlement_request_decide_v1 | settlement.decide |
-| settlement_authority_get_v1 | settlement.authority.inspect |
-| settlement_delegation_set_v1 | settlement.delegation.manage |
-| settlement_authority_set_v1 | settlement.authority.manage |
 
 ## Operasyonel kabul işleri
 

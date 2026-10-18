@@ -63921,7 +63921,9 @@
         "required_features": [
           "F18"
         ],
-        "runtime_required_features": [],
+        "runtime_required_features": [
+          "F18"
+        ],
         "conditional_features": [],
         "permission": "settlement.read",
         "actor_source": "server_verified",
@@ -64010,7 +64012,7 @@
           "DS-SCOPE-04"
         ],
         "configuration_policy": "No implicit fee/rate or arbitrary limit. Accepted DS-2026-10-17.",
-        "implementation_status": "contract_only",
+        "implementation_status": "operational_development_limited",
         "transaction_guarantee": "Read authorized settlement_movements_list projection only; no domain/rights/earning/settlement/receipt mutation.",
         "operation_contract": {
           "kind": "read",
@@ -64020,19 +64022,25 @@
           "read_operation": null,
           "atomic_effects": [],
           "business_commit": false,
-          "read_path_status": "contract_only",
+          "read_path_status": "not_applicable",
           "source_decision": "DS-2026-10-17"
         },
         "decision_delivery": {
           "accepted_contract": "DS-2026-10-17",
-          "runtime_conformance": "pending",
-          "open_dependencies": [
-            "cross_center_settlement"
-          ],
+          "runtime_conformance": "implemented_pending_final_acceptance",
+          "open_dependencies": [],
           "target_request": {
             "$ref": "#/$defs/Request_settlement_movements_list"
-          }
-        }
+          },
+          "completed_dependencies": [
+            "cross_center_settlement"
+          ]
+        },
+        "runtime_path": "/functions/v1/backend-v1/settlement_movements_list_v1",
+        "runtime_external_path": "/functions/v1/backend-v1/settlement_movements_list_v1",
+        "runtime_rpc": "api_v1.settlement_movements_list_v1",
+        "runtime_transport": "authenticated Edge adapter -> service-only RPC; rules/transaction in PostgreSQL",
+        "runtime_limits": []
       },
       {
         "name": "settlement_requests_list_v1",
@@ -64043,7 +64051,9 @@
         "required_features": [
           "F18"
         ],
-        "runtime_required_features": [],
+        "runtime_required_features": [
+          "F18"
+        ],
         "conditional_features": [],
         "permission": "settlement.read",
         "actor_source": "server_verified",
@@ -64132,7 +64142,7 @@
           "DS-SCOPE-04"
         ],
         "configuration_policy": "No implicit fee/rate or arbitrary limit. Accepted DS-2026-10-17.",
-        "implementation_status": "contract_only",
+        "implementation_status": "operational_development_limited",
         "transaction_guarantee": "Read authorized settlement_requests_list projection only; no domain/rights/earning/settlement/receipt mutation.",
         "operation_contract": {
           "kind": "read",
@@ -64142,19 +64152,25 @@
           "read_operation": null,
           "atomic_effects": [],
           "business_commit": false,
-          "read_path_status": "contract_only",
+          "read_path_status": "not_applicable",
           "source_decision": "DS-2026-10-17"
         },
         "decision_delivery": {
           "accepted_contract": "DS-2026-10-17",
-          "runtime_conformance": "pending",
-          "open_dependencies": [
-            "cross_center_settlement"
-          ],
+          "runtime_conformance": "implemented_pending_final_acceptance",
+          "open_dependencies": [],
           "target_request": {
             "$ref": "#/$defs/Request_settlement_requests_list"
-          }
-        }
+          },
+          "completed_dependencies": [
+            "cross_center_settlement"
+          ]
+        },
+        "runtime_path": "/functions/v1/backend-v1/settlement_requests_list_v1",
+        "runtime_external_path": "/functions/v1/backend-v1/settlement_requests_list_v1",
+        "runtime_rpc": "api_v1.settlement_requests_list_v1",
+        "runtime_transport": "authenticated Edge adapter -> service-only RPC; rules/transaction in PostgreSQL",
+        "runtime_limits": []
       },
       {
         "name": "settlement_request_get_v1",
@@ -64165,7 +64181,9 @@
         "required_features": [
           "F18"
         ],
-        "runtime_required_features": [],
+        "runtime_required_features": [
+          "F18"
+        ],
         "conditional_features": [],
         "permission": "settlement.read",
         "actor_source": "server_verified",
@@ -64254,7 +64272,7 @@
           "DS-SCOPE-04"
         ],
         "configuration_policy": "No implicit fee/rate or arbitrary limit. Accepted DS-2026-10-17.",
-        "implementation_status": "contract_only",
+        "implementation_status": "operational_development_limited",
         "transaction_guarantee": "Read authorized settlement_request_get projection only; no domain/rights/earning/settlement/receipt mutation.",
         "operation_contract": {
           "kind": "read",
@@ -64264,19 +64282,25 @@
           "read_operation": null,
           "atomic_effects": [],
           "business_commit": false,
-          "read_path_status": "contract_only",
+          "read_path_status": "not_applicable",
           "source_decision": "DS-2026-10-17"
         },
         "decision_delivery": {
           "accepted_contract": "DS-2026-10-17",
-          "runtime_conformance": "pending",
-          "open_dependencies": [
-            "cross_center_settlement"
-          ],
+          "runtime_conformance": "implemented_pending_final_acceptance",
+          "open_dependencies": [],
           "target_request": {
             "$ref": "#/$defs/Request_settlement_request_get"
-          }
-        }
+          },
+          "completed_dependencies": [
+            "cross_center_settlement"
+          ]
+        },
+        "runtime_path": "/functions/v1/backend-v1/settlement_request_get_v1",
+        "runtime_external_path": "/functions/v1/backend-v1/settlement_request_get_v1",
+        "runtime_rpc": "api_v1.settlement_request_get_v1",
+        "runtime_transport": "authenticated Edge adapter -> service-only RPC; rules/transaction in PostgreSQL",
+        "runtime_limits": []
       },
       {
         "name": "settlement_request_submit_v1",
@@ -64287,7 +64311,9 @@
         "required_features": [
           "F18"
         ],
-        "runtime_required_features": [],
+        "runtime_required_features": [
+          "F18"
+        ],
         "conditional_features": [],
         "permission": "settlement.request",
         "actor_source": "server_verified",
@@ -64382,7 +64408,7 @@
           "DS-SCOPE-04"
         ],
         "configuration_policy": "No implicit fee/rate or arbitrary limit. Accepted DS-2026-10-17.",
-        "implementation_status": "contract_only",
+        "implementation_status": "operational_development_limited",
         "transaction_guarantee": "Atomic settlement_requests.pending_immutable_scope; audit + in-app outbox + receipt. External delivery never determines the domain commit.",
         "operation_contract": {
           "kind": "command",
@@ -64394,18 +64420,19 @@
             "settlement_requests.pending_immutable_scope"
           ],
           "business_commit": true,
-          "read_path_status": "contract_only",
+          "read_path_status": "implemented",
           "source_decision": "DS-2026-10-17"
         },
         "decision_delivery": {
           "accepted_contract": "DS-2026-10-17",
-          "runtime_conformance": "pending",
-          "open_dependencies": [
-            "cross_center_settlement"
-          ],
+          "runtime_conformance": "implemented_pending_final_acceptance",
+          "open_dependencies": [],
           "target_request": {
             "$ref": "#/$defs/Request_settlement_request_submit"
-          }
+          },
+          "completed_dependencies": [
+            "cross_center_settlement"
+          ]
         },
         "authority_binding": {
           "actor": "server_verified_account_id",
@@ -64428,7 +64455,12 @@
             "manager_role_version",
             "settlement_grant_version"
           ]
-        }
+        },
+        "runtime_path": "/functions/v1/backend-v1/settlement_request_submit_v1",
+        "runtime_external_path": "/functions/v1/backend-v1/settlement_request_submit_v1",
+        "runtime_rpc": "api_v1.settlement_request_submit_v1",
+        "runtime_transport": "authenticated Edge adapter -> service-only RPC; rules/transaction in PostgreSQL",
+        "runtime_limits": []
       },
       {
         "name": "settlement_request_withdraw_v1",
@@ -64439,7 +64471,9 @@
         "required_features": [
           "F18"
         ],
-        "runtime_required_features": [],
+        "runtime_required_features": [
+          "F18"
+        ],
         "conditional_features": [],
         "permission": "settlement.request",
         "actor_source": "server_verified",
@@ -64535,7 +64569,7 @@
           "DS-SCOPE-04"
         ],
         "configuration_policy": "No implicit fee/rate or arbitrary limit. Accepted DS-2026-10-17.",
-        "implementation_status": "contract_only",
+        "implementation_status": "operational_development_limited",
         "transaction_guarantee": "Atomic settlement_requests.withdrawn; audit + in-app outbox + receipt. External delivery never determines the domain commit.",
         "operation_contract": {
           "kind": "command",
@@ -64547,18 +64581,19 @@
             "settlement_requests.withdrawn"
           ],
           "business_commit": true,
-          "read_path_status": "contract_only",
+          "read_path_status": "implemented",
           "source_decision": "DS-2026-10-17"
         },
         "decision_delivery": {
           "accepted_contract": "DS-2026-10-17",
-          "runtime_conformance": "pending",
-          "open_dependencies": [
-            "cross_center_settlement"
-          ],
+          "runtime_conformance": "implemented_pending_final_acceptance",
+          "open_dependencies": [],
           "target_request": {
             "$ref": "#/$defs/Request_settlement_request_withdraw"
-          }
+          },
+          "completed_dependencies": [
+            "cross_center_settlement"
+          ]
         },
         "authority_binding": {
           "actor": "server_verified_account_id",
@@ -64581,7 +64616,12 @@
             "manager_role_version",
             "settlement_grant_version"
           ]
-        }
+        },
+        "runtime_path": "/functions/v1/backend-v1/settlement_request_withdraw_v1",
+        "runtime_external_path": "/functions/v1/backend-v1/settlement_request_withdraw_v1",
+        "runtime_rpc": "api_v1.settlement_request_withdraw_v1",
+        "runtime_transport": "authenticated Edge adapter -> service-only RPC; rules/transaction in PostgreSQL",
+        "runtime_limits": []
       },
       {
         "name": "settlement_request_decide_v1",
@@ -64592,7 +64632,9 @@
         "required_features": [
           "F18"
         ],
-        "runtime_required_features": [],
+        "runtime_required_features": [
+          "F18"
+        ],
         "conditional_features": [],
         "permission": "settlement.decide",
         "actor_source": "server_verified",
@@ -64693,7 +64735,7 @@
           "DS-SCOPE-04"
         ],
         "configuration_policy": "No implicit fee/rate or arbitrary limit. Accepted DS-2026-10-17.",
-        "implementation_status": "contract_only",
+        "implementation_status": "operational_development_limited",
         "transaction_guarantee": "B approve atomically finalizes request, frozen payment/offset/linked correction record, selected balances, audit, in-app outbox and receipt. Reject leaves balances unchanged and sends reason to A. No separate recorder; no bank transfer. All effects rollback together. Audit records verified decision account and stored B center/role/grant scope; same initiating account allowed only with live B authority.",
         "operation_contract": {
           "kind": "command",
@@ -64709,7 +64751,7 @@
             "receipt.append"
           ],
           "business_commit": true,
-          "read_path_status": "contract_only",
+          "read_path_status": "implemented",
           "source_decision": "DS-2026-10-17",
           "effects_by_outcome": {
             "approve": [
@@ -64732,13 +64774,14 @@
         },
         "decision_delivery": {
           "accepted_contract": "DS-2026-10-17",
-          "runtime_conformance": "pending",
-          "open_dependencies": [
-            "cross_center_settlement"
-          ],
+          "runtime_conformance": "implemented_pending_final_acceptance",
+          "open_dependencies": [],
           "target_request": {
             "$ref": "#/$defs/Request_settlement_request_decide"
-          }
+          },
+          "completed_dependencies": [
+            "cross_center_settlement"
+          ]
         },
         "authority_binding": {
           "actor": "server_verified_account_id",
@@ -64761,7 +64804,12 @@
             "manager_role_version",
             "settlement_grant_version"
           ]
-        }
+        },
+        "runtime_path": "/functions/v1/backend-v1/settlement_request_decide_v1",
+        "runtime_external_path": "/functions/v1/backend-v1/settlement_request_decide_v1",
+        "runtime_rpc": "api_v1.settlement_request_decide_v1",
+        "runtime_transport": "authenticated Edge adapter -> service-only RPC; rules/transaction in PostgreSQL",
+        "runtime_limits": []
       },
       {
         "name": "settlement_authority_get_v1",
@@ -64773,7 +64821,9 @@
         "required_features": [
           "F18"
         ],
-        "runtime_required_features": [],
+        "runtime_required_features": [
+          "F18"
+        ],
         "conditional_features": [],
         "permission": "settlement.authority.inspect",
         "actor_source": "server_verified",
@@ -64856,7 +64906,7 @@
           "DS-SCOPE-04"
         ],
         "configuration_policy": "No implicit fee/rate or arbitrary limit. Accepted DS-2026-10-17.",
-        "implementation_status": "contract_only",
+        "implementation_status": "operational_development_limited",
         "transaction_guarantee": "Authorized narrow administrative read; no financial or domain mutation.",
         "operation_contract": {
           "kind": "read",
@@ -64866,19 +64916,25 @@
           "read_operation": null,
           "atomic_effects": [],
           "business_commit": false,
-          "read_path_status": "contract_only",
+          "read_path_status": "not_applicable",
           "source_decision": "DS-2026-10-17"
         },
         "decision_delivery": {
           "accepted_contract": "DS-2026-10-17",
-          "runtime_conformance": "pending",
-          "open_dependencies": [
-            "cross_center_settlement"
-          ],
+          "runtime_conformance": "implemented_pending_final_acceptance",
+          "open_dependencies": [],
           "target_request": {
             "$ref": "#/$defs/Request_settlement_authority_get"
-          }
-        }
+          },
+          "completed_dependencies": [
+            "cross_center_settlement"
+          ]
+        },
+        "runtime_path": "/functions/v1/backend-v1/settlement_authority_get_v1",
+        "runtime_external_path": "/functions/v1/backend-v1/settlement_authority_get_v1",
+        "runtime_rpc": "api_v1.settlement_authority_get_v1",
+        "runtime_transport": "authenticated Edge adapter -> service-only RPC; rules/transaction in PostgreSQL",
+        "runtime_limits": []
       },
       {
         "name": "settlement_delegation_set_v1",
@@ -64890,7 +64946,9 @@
         "required_features": [
           "F18"
         ],
-        "runtime_required_features": [],
+        "runtime_required_features": [
+          "F18"
+        ],
         "conditional_features": [],
         "permission": "settlement.delegation.manage",
         "actor_source": "server_verified",
@@ -64976,7 +65034,7 @@
           "DS-SCOPE-04"
         ],
         "configuration_policy": "No implicit fee/rate or arbitrary limit. Accepted DS-2026-10-17.",
-        "implementation_status": "contract_only",
+        "implementation_status": "operational_development_limited",
         "transaction_guarantee": "Atomic scoped grant/revoke, authority aggregate version, audit, in-app outbox and receipt; rollback all on failure.",
         "operation_contract": {
           "kind": "command",
@@ -64992,19 +65050,25 @@
             "receipt.append"
           ],
           "business_commit": true,
-          "read_path_status": "contract_only",
+          "read_path_status": "implemented",
           "source_decision": "DS-2026-10-17"
         },
         "decision_delivery": {
           "accepted_contract": "DS-2026-10-17",
-          "runtime_conformance": "pending",
-          "open_dependencies": [
-            "cross_center_settlement"
-          ],
+          "runtime_conformance": "implemented_pending_final_acceptance",
+          "open_dependencies": [],
           "target_request": {
             "$ref": "#/$defs/Request_settlement_delegation_set"
-          }
-        }
+          },
+          "completed_dependencies": [
+            "cross_center_settlement"
+          ]
+        },
+        "runtime_path": "/functions/v1/backend-v1/settlement_delegation_set_v1",
+        "runtime_external_path": "/functions/v1/backend-v1/settlement_delegation_set_v1",
+        "runtime_rpc": "api_v1.settlement_delegation_set_v1",
+        "runtime_transport": "authenticated Edge adapter -> service-only RPC; rules/transaction in PostgreSQL",
+        "runtime_limits": []
       },
       {
         "name": "settlement_authority_set_v1",
@@ -65016,7 +65080,9 @@
         "required_features": [
           "F18"
         ],
-        "runtime_required_features": [],
+        "runtime_required_features": [
+          "F18"
+        ],
         "conditional_features": [],
         "permission": "settlement.authority.manage",
         "actor_source": "server_verified",
@@ -65102,7 +65168,7 @@
           "DS-SCOPE-04"
         ],
         "configuration_policy": "No implicit fee/rate or arbitrary limit. Accepted DS-2026-10-17.",
-        "implementation_status": "contract_only",
+        "implementation_status": "operational_development_limited",
         "transaction_guarantee": "Atomic scoped grant/revoke, authority aggregate version, audit, in-app outbox and receipt; rollback all on failure.",
         "operation_contract": {
           "kind": "command",
@@ -65118,19 +65184,25 @@
             "receipt.append"
           ],
           "business_commit": true,
-          "read_path_status": "contract_only",
+          "read_path_status": "implemented",
           "source_decision": "DS-2026-10-17"
         },
         "decision_delivery": {
           "accepted_contract": "DS-2026-10-17",
-          "runtime_conformance": "pending",
-          "open_dependencies": [
-            "cross_center_settlement"
-          ],
+          "runtime_conformance": "implemented_pending_final_acceptance",
+          "open_dependencies": [],
           "target_request": {
             "$ref": "#/$defs/Request_settlement_authority_set"
-          }
-        }
+          },
+          "completed_dependencies": [
+            "cross_center_settlement"
+          ]
+        },
+        "runtime_path": "/functions/v1/backend-v1/settlement_authority_set_v1",
+        "runtime_external_path": "/functions/v1/backend-v1/settlement_authority_set_v1",
+        "runtime_rpc": "api_v1.settlement_authority_set_v1",
+        "runtime_transport": "authenticated Edge adapter -> service-only RPC; rules/transaction in PostgreSQL",
+        "runtime_limits": []
       },
       {
         "name": "negative_limits_get_v1",
@@ -79051,21 +79123,7 @@
         "earnings_list_v1",
         "negcredit_valuation_set_v1",
         "management_state_get_v1",
-        "attendance_start_v1"
-      ],
-      "auth": "Supabase getUser + live auth.sessions + current account/link/role; no request actor claims",
-      "uuid": "backend uuid@14.0.3 v7 for all inserted IDs; DB defaults not required",
-      "external_transport": "POST /functions/v1/backend-v1/{operation}; direct typed request body",
-      "internal_rpc": "service-only api_v1 named functions; actor/session/UUID bank supplied by verified gateway",
-      "migration_count": 28,
-      "test_evidence": "tests/instructor-earnings.test.mjs; reports/instructor-earnings-verification.json; final head/main CI checked separately",
-      "frontend_unchanged": true
-    },
-    "decision_sprint": {
-      "id": "DS-2026-10-17",
-      "source": "docs/decisions/DS-2026-10-17.md",
-      "baseline_operation_count": 184,
-      "new_contract_only_operations": [
+        "attendance_start_v1",
         "settlement_movements_list_v1",
         "settlement_requests_list_v1",
         "settlement_request_get_v1",
@@ -79076,6 +79134,19 @@
         "settlement_delegation_set_v1",
         "settlement_authority_set_v1"
       ],
+      "auth": "Supabase getUser + live auth.sessions + current account/link/role; no request actor claims",
+      "uuid": "backend uuid@14.0.3 v7 for all inserted IDs; DB defaults not required",
+      "external_transport": "POST /functions/v1/backend-v1/{operation}; direct typed request body",
+      "internal_rpc": "service-only api_v1 named functions; actor/session/UUID bank supplied by verified gateway",
+      "migration_count": 29,
+      "test_evidence": "tests/cross-center-settlement.test.mjs; final head/main clean CI checked separately",
+      "frontend_unchanged": true
+    },
+    "decision_sprint": {
+      "id": "DS-2026-10-17",
+      "source": "docs/decisions/DS-2026-10-17.md",
+      "baseline_operation_count": 184,
+      "new_contract_only_operations": [],
       "starter_closure": {
         "required_features": [
           "F14"
@@ -79828,7 +79899,6 @@
           "settlement_authority_set_v1"
         ],
         "dependencies": [
-          "cross_center_settlement",
           "plan_gate_alignment"
         ],
         "implementation": "partial",
@@ -79847,14 +79917,14 @@
           "platform_owner_set_v1",
           "platform_owner_remove_v1",
           "center_manager_assign_v1",
-          "center_manager_revoke_v1"
-        ],
-        "contract_only_operations": [
-          "account_access_revoke_v1",
-          "account_link_remove_v1",
+          "center_manager_revoke_v1",
           "settlement_authority_get_v1",
           "settlement_delegation_set_v1",
           "settlement_authority_set_v1"
+        ],
+        "contract_only_operations": [
+          "account_access_revoke_v1",
+          "account_link_remove_v1"
         ],
         "acceptance_case_ids": [
           "DS-SET-01",
@@ -79887,7 +79957,9 @@
           "pro": "Var",
           "business": "Merkez kapsamlarıyla"
         },
-        "completed_dependencies": []
+        "completed_dependencies": [
+          "cross_center_settlement"
+        ]
       },
       "F05": {
         "name": "Resepsiyon/operasyon personeli izinleri",
@@ -80653,16 +80725,13 @@
           "settlement_authority_set_v1"
         ],
         "dependencies": [
-          "cross_center_settlement",
           "sale_scope_and_backdating"
         ],
         "implementation": "partial",
         "acceptance": "pending_feature_acceptance",
         "acceptance_evidence": [],
         "implemented_operations": [
-          "product_publish_v1"
-        ],
-        "contract_only_operations": [
+          "product_publish_v1",
           "settlement_movements_list_v1",
           "settlement_requests_list_v1",
           "settlement_request_get_v1",
@@ -80673,6 +80742,7 @@
           "settlement_delegation_set_v1",
           "settlement_authority_set_v1"
         ],
+        "contract_only_operations": [],
         "acceptance_case_ids": [
           "DS-SET-01",
           "DS-SET-02",
@@ -80706,7 +80776,9 @@
           "pro": "—",
           "business": "Var"
         },
-        "completed_dependencies": []
+        "completed_dependencies": [
+          "cross_center_settlement"
+        ]
       },
       "F19": {
         "name": "Manuel tahsilat, kısmi ödeme, iade/düzeltme ve alacak",

@@ -1,3 +1,20 @@
+# FtkSaaS — güncel devir
+
+Üçüncü teslimin uygulama kapsamı: **199 sözleşme / 104 çağrılabilir / 95 yalnız sözleşme; 90 core tablo / 29 migration**. [Hesaplaşma devri](../docs/settlement-handover.md) çalışan akışı ve kabul sınırlarını tanımlar. Son head incelemesi ve tam temiz CI aynı SHA için ayrıca doğrulanır; işlem sayısı ürün tamamlanma yüzdesi değildir.
+
+Başlangıç main: `bd4b6335904047f071556e5df35a982a71012c6e`; [aynı SHA CI](https://github.com/SXQHex/FtkSaaS/actions/runs/39055469993) başarılıydı: 364 test, 28 migration. Bu eski başarı yeni teslimin CI kanıtı değildir. Son PR head/merge kanıtı PR üzerinde bağlanır.
+
+Starter anlaşmasız program/yoklama/koruma ve Pro/Business immutable anlaşma, açık başlangıç, hakediş/bağlı düzeltme korunur. Üçüncü teslim ayrı hesaplaşma ledger'ı, dokuz API, Owner/delege OM/CM grant zinciri, A başvurusu/B onayı ve ders/satış tüketicilerini ekler. [Anlaşma/hakediş devri](../docs/instructor-earnings-handover.md), [kalan işler](../docs/remaining-work.md), [entegrasyon devri](../docs/claude-handover.md).
+
+Eğitmen ödeme komutları; otomatik başlangıç gözlemi, belge ve diğer hak değişikliği koruma tüketicileri açıktır. Dış e-posta ertelendi; frontend gerçek entegrasyonu ve yük/restore kanıtsız kapatılmaz. Production dağıtımı yapılmaz. Son açık kullanıcı kararı ve AGENTS.md kuralları geçerlidir.
+
+## Tarihsel devir kayıtları
+
+Aşağıdaki önceki teslim metinleri yalnız ait oldukları kaynak snapshot'ını anlatır. İçlerindeki “güncel”, “açık” veya “merge yetkisi” ifadeleri bugünkü durum/yetki değildir. Güncel durum yukarıda, açık işler bağlantılı listededir; tarihsel reports/ dosyaları değiştirilmez.
+
+<details>
+<summary>Önceki devir metinleri (tarihsel)</summary>
+
 # Eğitmen anlaşması ve hakediş — güncel geliştirme kapsamı
 
 Başlangıç main: `ab3fca4af47b71b34a4a7b6d0df5211ad1e41141`; [aynı SHA CI](https://github.com/SXQHex/FtkSaaS/actions/runs/39042108296) başarılı: 27 migration, 341 test. Yeni kaynak için önceki başarı taşınmaz; son head inceleme/temiz CI ve merge main CI ayrıca doğrulanır.
@@ -192,3 +209,5 @@ Teknik aktarım ve test durumu: docs/decisions/Q-E02.md ve reports/qe02-verifica
 **AS-03.** İptalden sonra geriye dönük kayıt/düzeltme mümkündür; iptal yeniden açılmaz. Etkinlik sürümü artar; eski önizleme geçersizleşir. event_get mevcut actual_started_at değerini; yönetici/organizasyon okuyucusuna append-only actual_start_history geçmişini döndürür.
 
 Teknik kanıt: docs/actual-start-handover.md, PR son commit CI. Bu aktarım kısmi gerçekleşmeye bağlı yeni parasal veya hak kuralı üretmez.
+
+</details>
