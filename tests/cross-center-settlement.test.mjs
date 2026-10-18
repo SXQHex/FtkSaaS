@@ -79,7 +79,7 @@ test('Cross-center settlement Auth -> Edge -> RPC',async t=>{
  }
  let seq=0;
  async function lesson(sale,performed=true,result='attended',p=student.p,c=B,cancel=false){
-  seq++;const start=new Date(Date.now()+seq*3600000+86400000);
+  seq++;const start=new Date(Date.now()+seq*3600000+86400000);start.setUTCMinutes(10,0,0);
   const ss=await mut('session_create_v1',{discipline_id:D,format:'group',interval:{starts_at:start.toISOString(),ends_at:new Date(+start+1800000).toISOString()},resources:[],assignments:[{person_id:teacher.p,duty:'instructor'}],capacity:{nominal:10,maximum:12}},c);
   const rid=(await mut('reservation_create_v1',{session_id:ss.primary_id,person_id:p,mode:'flexible',...(sale?{source_sale_id:sale}:{})},c)).primary_id;
   await db.query("update core.sessions set starts_at=now()-interval '1 second',ends_at=now()+interval '29 minutes' where id=$1",[ss.primary_id]);
