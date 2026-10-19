@@ -245,3 +245,9 @@ test('living settlement product/technical/permission clauses cannot reopen the c
   assert.throws(()=>validateSettlementLivingDocs(original,stale),/LIVING_ACCEPTANCE_COUNT/);
  }
 });
+
+ test('settlement runtime acceptance requires executable evidence and every live operation',()=>{
+ const p=structuredClone(original);ds(p).acceptance_cases.find(v=>v.id==='DS-SET-01').evidence=['tests/governance.test.mjs#static'];assert.throws(()=>validateGovernance(p,live),/FAKE_CASE_EVIDENCE/);
+ const q=structuredClone(original);ds(q).acceptance_cases.find(v=>v.id==='DS-SCOPE-01').evidence=['tests/cross-center-settlement.test.mjs#missing runtime test'];assert.throws(()=>validateGovernance(q,live),/MISSING_RUNTIME_CASE/);
+ const r=structuredClone(original);ds(r).acceptance_cases.find(v=>v.id==='DS-SET-01').status='pending_runtime';assert.throws(()=>validateGovernance(r,live),/FALSE_BEHAVIOR_PASS/);
+ });

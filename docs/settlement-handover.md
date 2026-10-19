@@ -20,9 +20,13 @@ Kredi iadesi özgün payın tam tutarına bağlı reversal ekler. Açık kısım
 - `settlement_request_withdraw_v1`: başlatan, güncel A yetkisiyle yalnız pending başvuruyu geri çeker.
 - `settlement_request_decide_v1`: B saklanan `to_center_id` üzerinden bağımsız doğrulanır. Aynı hesap iki merkezde yetkiliyse iki adımı yapabilir; istemci merkez seçimi yetki değildir. Onay kayıt/dağıtım/bakiye/request/audit/outbox/receipt'i atomik kesinleştirir. Ret gerekçesi A'ya uygulama içi gider; bakiye değişmez.
 
-Owner/OM rolü veya idari grant yönetimi operasyon yetkisi yaratmaz. Organizasyon kilidi canlı rol/grant geri alma ve finansal işlemleri sıralar; eski oturum, pending başvuru ve receipt yetkiyi korumaz. B onayında özgün A rol/grant sürümü de doğrulanır. İlgisiz yeni ders başvuruyu stale yapmaz; seçilen hareket/record/allocation değişikliği yeni onay gerektirir.
+Owner/OM rolü veya idari grant yönetimi operasyon yetkisi yaratmaz. Organizasyon kilidi canlı rol/grant geri alma ve finansal işlemleri sıralar; eski oturum, pending başvuru ve receipt yetkiyi korumaz. B onayında özgün A rol/grant sürümü de doğrulanır. Başvuruda abonelik kimliği, plan sürümü, plan/state geçiş sayacı, erişim modu ve A/B erişimi dondurulur. Planın değiştirilip eski sürüme döndürülmesi de başvuruyu stale yapar; yalnız ödeme muhasebesinin abonelik sürümünü artırması yapmaz. İlgisiz yeni ders başvuruyu stale yapmaz; seçilen hareket/record/allocation değişikliği yeni onay gerektirir.
 
 Ödeme seçili açık hareket toplamına eşittir. Mahsup açıkça seçilen aynı para birimindeki karşıt iki toplamı eşit azaltır. Bağlı düzeltme özgün record ve allocation kimlik/sürüm/kalan terslenebilir tutarını ister; dağıtım varsayılmaz. Ödeme geçmişi korunur, yeni nakit teslimi veya otomatik netleme yapılmaz. Saklanan çok satırlı kapsamın UUID ihtiyacı DB'de yetki kontrolünden sonra hesaplanır; Edge bu güvenilir boyutla receipt yazılmadan tekrarlar.
+
+## Doğrulanmış kaynak kabulü
+
+`3aa5effa0fe48ab7dc4c8d4ca97754b5392fa0ad` için [tam temiz CI](https://github.com/SXQHex/FtkSaaS/actions/runs/39198323012) başarılı: **394 test (95 yapısal/sözleşme + 27 DB + 272 Auth/API)**, 29 migration, sentetik seed, Auth/REST sağlık ve advisors başarılı; atlanan test yok. Hesaplaşma dosyasında 29 gerçek Auth → Edge → RPC senaryosu vardır. Bu kanıt belirtilen SHA içindir; sonraki belge/metaveri commit'i ve merge main CI ayrıca doğrulanır.
 
 ## Kabul ve sınırlar
 

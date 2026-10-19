@@ -2,7 +2,7 @@
 
 Üçüncü teslimin uygulama kapsamı: **199 sözleşme / 104 çağrılabilir / 95 yalnız sözleşme; 90 core tablo / 29 migration**. [Hesaplaşma devri](../docs/settlement-handover.md) çalışan akışı ve kabul sınırlarını tanımlar. Son head incelemesi ve tam temiz CI aynı SHA için ayrıca doğrulanır; işlem sayısı ürün tamamlanma yüzdesi değildir.
 
-Başlangıç main: `bd4b6335904047f071556e5df35a982a71012c6e`; [aynı SHA CI](https://github.com/SXQHex/FtkSaaS/actions/runs/39055469993) başarılıydı: 364 test, 28 migration. Bu eski başarı yeni teslimin CI kanıtı değildir. Son PR head/merge kanıtı PR üzerinde bağlanır.
+Başlangıç main: `bd4b6335904047f071556e5df35a982a71012c6e`; [aynı SHA CI](https://github.com/SXQHex/FtkSaaS/actions/runs/39055469993) başarılıydı: 364 test, 28 migration. Bu eski başarı yeni teslimin CI kanıtı değildir. Son PR head/merge kanıtı PR üzerinde bağlanır. Hesaplaşma kaynak SHA’sı `3aa5effa0fe48ab7dc4c8d4ca97754b5392fa0ad` için [temiz CI](https://github.com/SXQHex/FtkSaaS/actions/runs/39198323012) başarılı: 394 test (95 yapısal/sözleşme + 27 DB + 272 Auth/API), 29 migration, seed/sağlık/advisors. Sonraki commit ve merge main CI ayrıca doğrulanır.
 
 Starter anlaşmasız program/yoklama/koruma ve Pro/Business immutable anlaşma, açık başlangıç, hakediş/bağlı düzeltme korunur. Üçüncü teslim ayrı hesaplaşma ledger'ı, dokuz API, Owner/delege OM/CM grant zinciri, A başvurusu/B onayı ve ders/satış tüketicilerini ekler. [Anlaşma/hakediş devri](../docs/instructor-earnings-handover.md), [kalan işler](../docs/remaining-work.md), [entegrasyon devri](../docs/claude-handover.md).
 

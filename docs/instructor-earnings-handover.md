@@ -21,7 +21,7 @@ Gerekçeli correction preview, sabit orijinal koşullardan hak ve finans farkın
 ## Ayrı kalanlar ve üçüncü teslim bağlantısı
 
 - `instructor_payment_record_v1` / `instructor_payment_correct_v1` contract_only; okuma mevcut dağıtım verisini gösterebilir. Kabul fixture'ındaki geçmiş ödeme, bu iki API'nin uygulanmışlığı değildir.
-- A→B ledger ve Owner/delege OM/CM yetki, başvuru/onay, mahsup/bağlı düzeltme runtime'ı ayrı PR'dir. Bu teslim yeni merkezler arası hareket üretmez.
+- A→B ledger ve Owner/delege OM/CM yetki, başvuru/onay, mahsup/bağlı düzeltme runtime'ı üçüncü teslimde uygulanır; [hesaplaşma devri](settlement-handover.md) güncel davranış ve kabul sınırıdır. Eğitmen hakedişi ve merkez payı ayrı kayıtlardır.
 - Üçüncü teslim satış net tutarı/product credits paydası, tüketim allocation/reservation/closure, hizmet merkezi, gerçekleşme beyanı ve settled deficit allocation kanıtını kullanır. Orijinal earning snapshot'ı sonradan satışla değiştirilmez.
 - Generic management_state diğer selector'ları; otomatik başlangıç gözlemi, zorunlu belge tüketicileri ve diğer finansal olmayan hak değişikliği koruma tüketicileri pending kalır.
 - Frontend, production, Resend ve repository yönetimi değişmez. Yük/restore ve frontend gerçek entegrasyon kanıtsız kapatılmaz.

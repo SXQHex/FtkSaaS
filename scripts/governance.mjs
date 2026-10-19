@@ -80,6 +80,12 @@ export function validateGovernance(p,implemented){
    assert(v.evidence.length>0,'FAKE_CASE_EVIDENCE '+v.id);
    for(const e of v.evidence){assert(e.startsWith('tests/instructor-earnings.test.mjs#'),'FAKE_CASE_EVIDENCE '+v.id);assert(fs.readFileSync(e.split('#')[0],'utf8').includes(e.split('#')[1]),'MISSING_RUNTIME_CASE '+v.id);}
    for(const n of ['instructor_agreement_publish_v1','instructor_agreements_list_v1','attendance_start_v1','earnings_list_v1'])assert(live.has(n),'FALSE_BEHAVIOR_PASS '+v.id);
+  }else if(v.delivery_gap==='cross_center_settlement'){
+   assert.equal(v.status,'passed_runtime','FALSE_BEHAVIOR_PASS '+v.id);
+   assert(v.evidence.length>0,'FAKE_CASE_EVIDENCE '+v.id);
+   const source=fs.readFileSync('tests/cross-center-settlement.test.mjs','utf8');
+   for(const e of v.evidence){assert(e.startsWith('tests/cross-center-settlement.test.mjs#'),'FAKE_CASE_EVIDENCE '+v.id);const title=e.split('#')[1];assert(title&&source.includes("await t.test('"+title+"'"),'MISSING_RUNTIME_CASE '+v.id);}
+   for(const n of ['settlement_authority_get_v1','settlement_delegation_set_v1','settlement_authority_set_v1','settlement_movements_list_v1','settlement_requests_list_v1','settlement_request_get_v1','settlement_request_submit_v1','settlement_request_withdraw_v1','settlement_request_decide_v1'])assert(live.has(n),'FALSE_BEHAVIOR_PASS '+v.id);
   }else{
    assert.equal(v.status,'pending_runtime','FALSE_BEHAVIOR_PASS '+v.id);
    assert.equal(v.evidence.length,0,'FAKE_CASE_EVIDENCE '+v.id);
@@ -144,16 +150,16 @@ export function validateGovernance(p,implemented){
  assert.equal(d.Success_management_state_get.properties.data.$ref,'#/$defs/ManagementStatePage','MANAGEMENT_PAGE_VERSION_READ');
 
  for(const gap of ds.delivery_gaps){
-  const passed=['starter_plan_and_earning_split','agreement_versions_and_selection'].includes(gap.id);
+  const passed=['starter_plan_and_earning_split','agreement_versions_and_selection','cross_center_settlement'].includes(gap.id);
   assert.equal(gap.status,passed?'passed_runtime':'pending_runtime_and_auth_edge_rpc_acceptance','NO_FALSE_DS_ACCEPTANCE '+gap.id);
   assert.equal(gap.acceptance_kind,'real_auth_edge_rpc','WRONG_ACCEPTANCE_KIND');
   if(passed){const cases=ds.acceptance_cases.filter(v=>v.delivery_gap===gap.id);assert(cases.length&&cases.every(v=>v.status==='passed_runtime'),'NO_FALSE_DS_ACCEPTANCE '+gap.id);equalSet(gap.evidence,cases.flatMap(v=>v.evidence),'GAP_EVIDENCE_COVERAGE '+gap.id);}
   else assert.equal(gap.evidence.length,0,'NO_SYNTHETIC_BEHAVIOR_EVIDENCE');
   for(const n of gap.operations)assert(map.has(n)&&[...map.get(n).decision_delivery.open_dependencies,...(map.get(n).decision_delivery.completed_dependencies??[])].includes(gap.id),'GAP_OPERATION_LINK '+n);
  }
- assert(ds.closed_product_choices.some(v=>v.id==='DS-OPEN-01'&&v.status==='accepted_contract_runtime_pending'),'GRANTOR_DECISION_NOT_CLOSED');
+ assert(ds.closed_product_choices.some(v=>v.id==='DS-OPEN-01'&&v.status==='accepted_runtime_verified'),'GRANTOR_DECISION_NOT_CLOSED');
  assert(!ds.open_product_choices.some(v=>v.id==='DS-OPEN-01'),'GRANTOR_STILL_OPEN');
- assert(ds.closed_product_choices.some(v=>v.id==='DS-OPEN-02'&&v.status==='accepted_contract_runtime_pending'),'CENTER_SCOPE_DECISION_NOT_CLOSED');
+ assert(ds.closed_product_choices.some(v=>v.id==='DS-OPEN-02'&&v.status==='accepted_runtime_verified'),'CENTER_SCOPE_DECISION_NOT_CLOSED');
  assert(!ds.open_product_choices.some(v=>v.id==='DS-OPEN-02'),'CENTER_SCOPE_DECISION_STILL_OPEN');
  const chain={delegation_grantor:'organization_owner_only',center_grantor:'organization_owner_or_org_manager_with_live_explicit_delegation',delegation_target:'same_org_active_org_manager',center_target:'same_org_active_center_manager_exact_center',center_manager_delegates:false,role_implies_settlement:false,owner_grant_implies_operations:false,live_check_before_receipt_replay:true,operation_actor:'active_center_manager_with_live_explicit_center_grant',authority_version:'organization_settlement_authority_aggregate',fallback_implies_om_operations:false,account_separation_required:false,initiator_scope:'from_center_id',decision_scope:'frozen_request.to_center_id',audit_step_scope_required:true};
  assert.deepEqual(ds.settlement_authority_chain,chain,'AUTHORITY_CHAIN');
@@ -196,7 +202,7 @@ export function validateGovernance(p,implemented){
  }
  assert.equal(d.SettlementRequestView.properties.initiator_authority.$ref,'#/$defs/SettlementSubmitAuthority','INITIATOR_SCOPE_READ');
  assert(d.SettlementRequestView.required.includes('initiator_authority')&&d.SettlementRequestView.required.includes('decision_authority'),'AUDIT_SCOPE_READ_REQUIRED');
- for(const id of ['DS-SCOPE-01','DS-SCOPE-02','DS-SCOPE-03','DS-SCOPE-04'])assert(ds.acceptance_cases.some(v=>v.id===id&&v.status==='pending_runtime'),'MISSING_CENTER_SCOPE_PENDING_CASE '+id);
+ for(const id of ['DS-SCOPE-01','DS-SCOPE-02','DS-SCOPE-03','DS-SCOPE-04'])assert(ds.acceptance_cases.some(v=>v.id===id&&v.status==='passed_runtime'),'MISSING_CENTER_SCOPE_RUNTIME_CASE '+id);
  const submit=map.get('settlement_request_submit_v1');
  assert.deepEqual(submit.operation_contract.atomic_effects,['settlement_requests.pending_immutable_scope'],'SUBMIT_CLOSES_BALANCE');
  assert.equal(d.Request_settlement_request_submit.properties.proposal.$ref,'#/$defs/SettlementProposal','MISSING_TYPED_PROPOSAL');
@@ -214,7 +220,7 @@ export function validateGovernance(p,implemented){
  assert.deepEqual(decide.operation_contract.effects_by_outcome,{
   approve:['request.approved','settlement_record.append','selected_balances.reduce_or_linked_reverse','paired_offset_atomic','audit.append','outbox.append','receipt.append'],
   reject:['request.rejected_with_reason','in_app_rejection_to_A','audit.append','outbox.append','receipt.append']},'B_APPROVAL_ATOMIC_EFFECTS');
- for(const id of ['DS-AUTH-01','DS-AUTH-02','DS-AUTH-03','DS-SET-13','DS-SET-14'])assert(ds.acceptance_cases.some(v=>v.id===id&&v.status==='pending_runtime'),'MISSING_PENDING_AUTH_CASE '+id);
+ for(const id of ['DS-AUTH-01','DS-AUTH-02','DS-AUTH-03','DS-SET-13','DS-SET-14'])assert(ds.acceptance_cases.some(v=>v.id===id&&v.status==='passed_runtime'),'MISSING_RUNTIME_AUTH_CASE '+id);
 
  return {operation_count:ops.length,feature_count:33,callable_count:live.size,decision_behavior_acceptance:'pending',kind:'structural_contract_policy_not_runtime_behavior'};
 }
