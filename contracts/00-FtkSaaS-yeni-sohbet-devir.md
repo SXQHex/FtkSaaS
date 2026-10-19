@@ -8,6 +8,8 @@ Main 9ce0a5639417f959111b11f70157156733e3de18 ve [aynı SHA clean 39252687560](h
 
 PR #22 ilk head 635e148651b2a85b18f5d40fe1fdea938ea94bf2, run 39270054878: başarısız. Tek başarısız alt vaka Auth reddinin hata-kodu beklentisidir; test ve hedefli seçim düzeltiliyor. [Teşhis](../reports/p01-a-targeted-diagnosis.json), [CI politika düzeltmesi](../docs/ci-policy.md). Yeni kaynak runtime kabulü ve aday/main clean henüz yoktur.
 
+İkinci koşu 39278529991 / head 85e25ec48cfc8f204392a757d333e284b02b6149 logunda P01 10/10, DB 27/27, yapı 96+23 geçti; ortak API weekly quota fixture assertion'ı başarısızdır. Logdaki yürütme yaklaşık 3:34; metadata durum gecikmesi ayrı engeldir. Aynı satış haftasını garanti eden fixture ve sonraki hafta bağımsız kota kontrolü uygulandı; runtime değişmedi. [Güncel teşhis](../docs/p01-handover.md). Yeni head hedefli kabul ve aday/main clean bekliyor.
+
 P01 öncesi snapshot:
 
 Üçüncü teslimin uygulama kapsamı: **199 sözleşme / 104 çağrılabilir / 95 yalnız sözleşme; 90 core tablo / 29 migration**. [Hesaplaşma devri](../docs/settlement-handover.md) çalışan akışı ve kabul sınırlarını tanımlar. Son head incelemesi ve tam temiz CI aynı SHA için ayrıca doğrulanır; işlem sayısı ürün tamamlanma yüzdesi değildir.
