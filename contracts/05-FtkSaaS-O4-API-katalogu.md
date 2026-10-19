@@ -1,6 +1,6 @@
 # FtkSaaS — API kataloğu · 0.2.0-rc.3
 
-199 sözleşme; 95 geliştirme ortamında çağrılabilir endpoint, 104 yalnız sözleşme. Çağrılabilir olmak bütün ürün özelliklerinin veya üretim kabulünün tamamlandığı anlamına gelmez. Kapsam sınırları ve Q-E01 `docs/claude-handover.md` içindedir.
+199 sözleşme; 104 geliştirme ortamında çağrılabilir endpoint, 95 yalnız sözleşme. Çağrılabilir olmak bütün ürün özelliklerinin veya üretim kabulünün tamamlandığı anlamına gelmez. Kapsam sınırları ve Q-E01 `docs/claude-handover.md` içindedir.
 
 `POST {API_URL}/functions/v1/backend-v1/{operation}`; JSON gövde doğrudan typed Request nesnesidir. Header: `Authorization: Bearer <Supabase access_token>`, `apikey: <publishable key>`, `Content-Type: application/json`. Başarı: `ok/data/trace_id`; hata: `ok:false/error:SafeError`. Servis anahtarı frontend’e verilmez.
 
@@ -196,15 +196,15 @@ Named `/rest/v1/rpc/{operation}` yalnız backend içindir; imzası p_request + d
 | `instructor_agreements_list_v1` | çağrılabilir (kapsam notları geçerli) | `earnings.manage` | R / read | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; center_id: FtkUuid; person_id: FtkUuid; page: Page | Success_instructor_agreements_list |
 | `reservation_impact_preview_v1` | çağrılabilir (kapsam notları geçerli) | `reservation.protection.manage` | P / config | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; center_id?: FtkUuid ∣ null; change: ReservationProtectionChange; reason: Text | Success_reservation_impact_preview |
 | `reservation_impact_apply_v1` | çağrılabilir (kapsam notları geçerli) | `reservation.protection.manage` | A / config | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; center_id?: FtkUuid ∣ null; operation_key: FtkUuid; preview: PreviewToken; accepted_reservation_ids: FtkUuid[] | Success_reservation_impact_apply |
-| `settlement_movements_list_v1` | yalnız sözleşme | `settlement.read` | R / read | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; center_id: FtkUuid; page: Page; currency: Currency | Success_settlement_movements_list |
-| `settlement_requests_list_v1` | yalnız sözleşme | `settlement.read` | R / read | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; center_id: FtkUuid; page: Page | Success_settlement_requests_list |
-| `settlement_request_get_v1` | yalnız sözleşme | `settlement.read` | R / read | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; center_id: FtkUuid; settlement_request_id: FtkUuid | Success_settlement_request_get |
-| `settlement_request_submit_v1` | yalnız sözleşme | `settlement.request` | W / config | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; center_id?: FtkUuid ∣ null; operation_key: FtkUuid; from_center_id: FtkUuid; to_center_id: FtkUuid; currency: Currency; reason: Text; previous_id?: FtkUuid ∣ null; previous_version?: PositiveInt; proposal: SettlementProposal | Success_settlement_request_submit |
-| `settlement_request_withdraw_v1` | yalnız sözleşme | `settlement.request` | W / config | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; center_id?: FtkUuid ∣ null; operation_key: FtkUuid; settlement_request_id: FtkUuid; expected_version: PositiveInt; reason: Text | Success_settlement_request_withdraw |
-| `settlement_request_decide_v1` | yalnız sözleşme | `settlement.decide` | W / config | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; center_id?: FtkUuid ∣ null; operation_key: FtkUuid; settlement_request_id: FtkUuid; expected_version: PositiveInt; decision: approve / reject; reason: Text | Success_settlement_request_decide |
-| `settlement_authority_get_v1` | yalnız sözleşme | `settlement.authority.inspect` | R / read | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; person_id: FtkUuid; center_id?: FtkUuid ∣ null | Success_settlement_authority_get |
-| `settlement_delegation_set_v1` | yalnız sözleşme | `settlement.delegation.manage` | W / config | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; operation_key: FtkUuid; person_id: FtkUuid; expected_version: PositiveInt; granted: Bool; reason: Text | Success_settlement_delegation_set |
-| `settlement_authority_set_v1` | yalnız sözleşme | `settlement.authority.manage` | W / config | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; operation_key: FtkUuid; person_id: FtkUuid; expected_version: PositiveInt; granted: Bool; reason: Text; center_id: FtkUuid | Success_settlement_authority_set |
+| `settlement_movements_list_v1` | çağrılabilir (kapsam notları geçerli) | `settlement.read` | R / read | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; center_id: FtkUuid; page: Page; currency: Currency | Success_settlement_movements_list |
+| `settlement_requests_list_v1` | çağrılabilir (kapsam notları geçerli) | `settlement.read` | R / read | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; center_id: FtkUuid; page: Page | Success_settlement_requests_list |
+| `settlement_request_get_v1` | çağrılabilir (kapsam notları geçerli) | `settlement.read` | R / read | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; center_id: FtkUuid; settlement_request_id: FtkUuid | Success_settlement_request_get |
+| `settlement_request_submit_v1` | çağrılabilir (kapsam notları geçerli) | `settlement.request` | W / config | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; center_id?: FtkUuid ∣ null; operation_key: FtkUuid; from_center_id: FtkUuid; to_center_id: FtkUuid; currency: Currency; reason: Text; previous_id?: FtkUuid ∣ null; previous_version?: PositiveInt; proposal: SettlementProposal | Success_settlement_request_submit |
+| `settlement_request_withdraw_v1` | çağrılabilir (kapsam notları geçerli) | `settlement.request` | W / config | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; center_id?: FtkUuid ∣ null; operation_key: FtkUuid; settlement_request_id: FtkUuid; expected_version: PositiveInt; reason: Text | Success_settlement_request_withdraw |
+| `settlement_request_decide_v1` | çağrılabilir (kapsam notları geçerli) | `settlement.decide` | W / config | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; center_id?: FtkUuid ∣ null; operation_key: FtkUuid; settlement_request_id: FtkUuid; expected_version: PositiveInt; decision: approve / reject; reason: Text | Success_settlement_request_decide |
+| `settlement_authority_get_v1` | çağrılabilir (kapsam notları geçerli) | `settlement.authority.inspect` | R / read | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; person_id: FtkUuid; center_id?: FtkUuid ∣ null | Success_settlement_authority_get |
+| `settlement_delegation_set_v1` | çağrılabilir (kapsam notları geçerli) | `settlement.delegation.manage` | W / config | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; operation_key: FtkUuid; person_id: FtkUuid; expected_version: PositiveInt; granted: Bool; reason: Text | Success_settlement_delegation_set |
+| `settlement_authority_set_v1` | çağrılabilir (kapsam notları geçerli) | `settlement.authority.manage` | W / config | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; operation_key: FtkUuid; person_id: FtkUuid; expected_version: PositiveInt; granted: Bool; reason: Text; center_id: FtkUuid | Success_settlement_authority_set |
 | `negative_limits_get_v1` | çağrılabilir (kapsam notları geçerli) | `entitlement.correct` | R / read | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; center_id: FtkUuid; person_id: FtkUuid; discipline_id: FtkUuid | Success_negative_limits_get |
 | `attendance_start_v1` | çağrılabilir (kapsam notları geçerli) | `attendance.close` | W / maintenance | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; center_id?: FtkUuid ∣ null; operation_key: FtkUuid; expected_version: PositiveInt; session_id: FtkUuid; actual_started_at: Instant; reason: Text | Success_attendance_start |
 
@@ -402,15 +402,15 @@ features ürün referanslarıdır. required_features hedef plan kapısı; runtim
 | instructor_agreements_list_v1 | read | none / None |  | implemented_auth_edge_rpc_acceptance |
 | reservation_impact_preview_v1 | preview | preview_dependencies / negative_limits_get_v1 |  | starter_runtime_limited_paid_path_pending |
 | reservation_impact_apply_v1 | apply | preview_dependencies / reservation_impact_preview_v1 | selected_configuration_change, protected_reservation_obligations, reservation_protections.append_causal_obligation_proof | starter_runtime_limited_paid_path_pending |
-| settlement_movements_list_v1 | read | none / None |  | pending |
-| settlement_requests_list_v1 | read | none / None |  | pending |
-| settlement_request_get_v1 | read | none / None |  | pending |
-| settlement_request_submit_v1 | command | append_or_current_scope_lock / settlement_request_get_v1 | settlement_requests.pending_immutable_scope | pending |
-| settlement_request_withdraw_v1 | command | row_version / settlement_request_get_v1 | settlement_requests.withdrawn | pending |
-| settlement_request_decide_v1 | command | row_version / settlement_request_get_v1 | settlement_requests.approved_or_rejected, approved_record_and_selected_balances.atomic, audit.append, outbox.append, receipt.append | pending |
-| settlement_authority_get_v1 | read | none / None |  | pending |
-| settlement_delegation_set_v1 | command | row_version / settlement_authority_get_v1 | settlement_authority.grant_or_revoke, org_authority.version_increment, audit.append, outbox.append, receipt.append | pending |
-| settlement_authority_set_v1 | command | row_version / settlement_authority_get_v1 | settlement_authority.grant_or_revoke, org_authority.version_increment, audit.append, outbox.append, receipt.append | pending |
+| settlement_movements_list_v1 | read | none / None |  | implemented_pending_final_acceptance |
+| settlement_requests_list_v1 | read | none / None |  | implemented_pending_final_acceptance |
+| settlement_request_get_v1 | read | none / None |  | implemented_pending_final_acceptance |
+| settlement_request_submit_v1 | command | append_or_current_scope_lock / settlement_request_get_v1 | settlement_requests.pending_immutable_scope | implemented_pending_final_acceptance |
+| settlement_request_withdraw_v1 | command | row_version / settlement_request_get_v1 | settlement_requests.withdrawn | implemented_pending_final_acceptance |
+| settlement_request_decide_v1 | command | row_version / settlement_request_get_v1 | settlement_requests.approved_or_rejected, approved_record_and_selected_balances.atomic, audit.append, outbox.append, receipt.append | implemented_pending_final_acceptance |
+| settlement_authority_get_v1 | read | none / None |  | implemented_pending_final_acceptance |
+| settlement_delegation_set_v1 | command | row_version / settlement_authority_get_v1 | settlement_authority.grant_or_revoke, org_authority.version_increment, audit.append, outbox.append, receipt.append | implemented_pending_final_acceptance |
+| settlement_authority_set_v1 | command | row_version / settlement_authority_get_v1 | settlement_authority.grant_or_revoke, org_authority.version_increment, audit.append, outbox.append, receipt.append | implemented_pending_final_acceptance |
 | negative_limits_get_v1 | read | none / None |  | starter_runtime_limited_paid_path_pending |
 | attendance_start_v1 | command | row_version / attendance_get_v1 | sessions.actual_started_at, sessions.started_agreements | implemented_auth_edge_rpc_acceptance |
 

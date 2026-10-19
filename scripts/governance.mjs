@@ -169,7 +169,7 @@ export function validateGovernance(p,implemented){
  assert.equal(map.get('settlement_delegation_set_v1').permission,'settlement.delegation.manage','OWNER_DELEGATION_PERMISSION');
  assert.equal(map.get('settlement_authority_set_v1').permission,'settlement.authority.manage','CENTER_GRANT_PERMISSION');
  for(const [n,g] of [['settlement_delegation_set_v1','owner_only_delegation_change'],['settlement_authority_set_v1','owner_or_live_delegated_om_only']]){
-  const o=map.get(n);assert(!live.has(n),'AUTHORITY_RUNTIME_CLAIM');
+  const o=map.get(n);assert(live.has(n),'MISSING_AUTHORITY_RUNTIME');
   for(const v of [g,'center_manager_cannot_delegate','live_authority_before_receipt_replay','same_org_target_active_role','expected_org_authority_version','no_implicit_operational_authority'])assert(o.semantic_guards.includes(v),'AUTHORITY_GUARD '+n+' '+v);
   assert.equal(o.operation_contract.read_operation,'settlement_authority_get_v1','AUTHORITY_READ_PATH');
   assert.equal(o.operation_contract.version_field,'org_id','AUTHORITY_VERSION_BINDING');

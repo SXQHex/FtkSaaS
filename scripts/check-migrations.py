@@ -54,3 +54,5 @@ assert next(Path('supabase/migrations').glob('*_starter_attendance_protection.sq
 assert next(Path('supabase/migrations').glob('*_starter_attendance_privacy_legacy.sql')).read_text()==Path('database/starter-attendance-privacy-legacy.sql').read_text(),'Starter privacy/legacy source drift'
 
 assert next(Path('supabase/migrations').glob('*_instructor_earnings_workflow.sql')).read_text()==Path('database/instructor-earnings.sql').read_text()+Path('database/instructor-earnings-wrappers.sql').read_text(),'Instructor earnings source drift'
+
+assert next(Path('supabase/migrations').glob('*_cross_center_settlement.sql')).read_text()==Path('database/cross-center-settlement.sql').read_text()+Path('database/cross-center-settlement-wrappers.sql').read_text(),'Cross-center settlement source drift'
