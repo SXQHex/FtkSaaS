@@ -1,5 +1,10 @@
 # CI çalışma politikası — 19 Ekim 2026
 
+## P01 teslim sınırı — son kullanıcı kararı
+
+P01 bütünü `feature/p01-request-reservation-flow` dalında ve mevcut PR #22 içinde geliştirilir. Her uygulama commit'i hedefli doğrulanır; A/B/C ara dilimleri için aday full clean veya merge yapılmaz. P01'in bütün kalan API ve worker kabulü tamamlandığında son head bağımsız incelenir, toplu aday full clean alınır ve normal kaynak bağlı kapıyla merge edilir. Main full clean kabulü ayrıca gerekir. Full clean başlayınca aşağıdaki kullanıcıya devir kuralı korunur.
+
+
 Son kullanıcı talimatı eski her commit/PR güncellemesinde tam temiz kabul kuralının yerini alır. Ürün, runtime, migration, frontend ve deployment davranışı değişmez.
 
 ## Tetikleyiciler ve kapsam
@@ -37,6 +42,8 @@ Label’ın sürekli durması başarı veya yeni head’e kabul vermez. Tekrar k
 Değişen modül/ilgili test dosyaları öncelikli fazda çalışır; başarısızsa ertelenmiş regresyonlar başlatılmaz ve job başarısız kalır. Başarılı faz bütün seçilmiş kalan testleri tam bir kez çalıştırır. Bu fazlama kabul testlerini eksiltmez; tam aday/main clean bütün envanteri çalıştırmaya devam eder. Bu düzeltme workflow tetikleyicilerini, paralellik=2 sınırını ve kaynak bağlı merge kapısını değiştirmez.
 
 CI özeti her dosyanın gerekçesini ve seçilen bütün suite’leri yazar. Test listesi package.json test:api listesiyle birebir denetlenir. Hedefli DB yolu ayrı hosted runner’da native backend başlatır, loopback dışında reseti reddeder, bütün migration’ları ve boş tenant/Auth/receipt durumunu doğrular. Önceki job’dan veri veya DB cache’i kullanılmaz. Full clean ayrıca seed, sağlık ve advisors içerir; hedefli kabul full yerine sunulmaz.
+
+P01-B talep SQL/sözleşme ve birebir migration farkı talep suite'i, katalog/hak okuması ve ortak API regresyonunu seçer. Paylaşılan management_state_get_v1 modüle bütünüyle sahiplenilmez: yalnız talep selector/projection ekleri, değişmeyen diğer alan/required/izin/selector hükümleri kanıtlanırsa dar seçim yapılır. İlgisiz management değişikliği geniş geri dönüş verir; pozitif ve negatif CI testleri bunu denetler.
 
 ## Kaynak bağlı merge kapısı
 

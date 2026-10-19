@@ -5,10 +5,11 @@ import {analyzeDelta} from './delta-analysis.mjs';
 export const apiSuites = [
  'api-acceptance','event-payment','event-cancellation','registry','person-registry',
  'room-role-registry','availability-policies','schedule-reads','program-session-lifecycle',
- 'starter-attendance-protection','instructor-earnings','cross-center-settlement','p01-catalog-entitlement-reads'
+ 'starter-attendance-protection','instructor-earnings','cross-center-settlement','p01-catalog-entitlement-reads','p01-lesson-requests'
 ].map(n=>'tests/'+n+'.test.mjs');
 // Economic consumers and reservation readers are explicit dependencies, not filename guesses.
 export const modules = [
+ {id:'p01-requests', sources:['p01-lesson-requests'], operations:['lesson_request_create_v1','lesson_request_withdraw_v1','lesson_request_reject_v1','lesson_request_offer_alternative_v1','lesson_request_accept_alternative_v1','lesson_request_approve_v1'], managementRequestProjection:true, migrationCheckLabel:'P01 requests source drift', suites:['p01-lesson-requests','p01-catalog-entitlement-reads']},
  {id:'p01-reads', sources:['p01-catalog-entitlement-reads'], operations:['products_list_v1','entitlements_get_v1'], migrationCheckLabel:'P01 reads source drift', suites:['p01-catalog-entitlement-reads']},
  {id:'settlement', sources:['cross-center-settlement'], suites:['cross-center-settlement','instructor-earnings','starter-attendance-protection']},
  {id:'earnings', sources:['instructor-earnings'], suites:['instructor-earnings','cross-center-settlement','program-session-lifecycle','starter-attendance-protection']},

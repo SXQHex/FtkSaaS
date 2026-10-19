@@ -9259,14 +9259,7 @@
           "$ref": "#/$defs/FtkUuid"
         },
         "center_id": {
-          "anyOf": [
-            {
-              "$ref": "#/$defs/FtkUuid"
-            },
-            {
-              "type": "null"
-            }
-          ]
+          "$ref": "#/$defs/FtkUuid"
         },
         "operation_key": {
           "$ref": "#/$defs/FtkUuid"
@@ -9278,7 +9271,7 @@
           "$ref": "#/$defs/Instant"
         },
         "duration_minutes": {
-          "$ref": "#/$defs/Int"
+          "$ref": "#/$defs/PositiveInt"
         },
         "preferred_instructor_id": {
           "anyOf": [
@@ -9302,7 +9295,8 @@
         "person_id",
         "requested_start",
         "duration_minutes",
-        "discipline_id"
+        "discipline_id",
+        "center_id"
       ],
       "additionalProperties": false
     },
@@ -9339,20 +9333,16 @@
           "$ref": "#/$defs/FtkUuid"
         },
         "center_id": {
-          "anyOf": [
-            {
-              "$ref": "#/$defs/FtkUuid"
-            },
-            {
-              "type": "null"
-            }
-          ]
+          "$ref": "#/$defs/FtkUuid"
         },
         "operation_key": {
           "$ref": "#/$defs/FtkUuid"
         },
         "lesson_request_id": {
           "$ref": "#/$defs/FtkUuid"
+        },
+        "expected_version": {
+          "$ref": "#/$defs/PositiveInt"
         }
       },
       "required": [
@@ -9360,7 +9350,9 @@
         "request_id",
         "org_id",
         "operation_key",
-        "lesson_request_id"
+        "lesson_request_id",
+        "center_id",
+        "expected_version"
       ],
       "additionalProperties": false
     },
@@ -9397,14 +9389,7 @@
           "$ref": "#/$defs/FtkUuid"
         },
         "center_id": {
-          "anyOf": [
-            {
-              "$ref": "#/$defs/FtkUuid"
-            },
-            {
-              "type": "null"
-            }
-          ]
+          "$ref": "#/$defs/FtkUuid"
         },
         "operation_key": {
           "$ref": "#/$defs/FtkUuid"
@@ -9414,6 +9399,9 @@
         },
         "lesson_request_id": {
           "$ref": "#/$defs/FtkUuid"
+        },
+        "expected_version": {
+          "$ref": "#/$defs/PositiveInt"
         }
       },
       "required": [
@@ -9422,7 +9410,9 @@
         "org_id",
         "operation_key",
         "reason",
-        "lesson_request_id"
+        "lesson_request_id",
+        "center_id",
+        "expected_version"
       ],
       "additionalProperties": false
     },
@@ -9459,14 +9449,7 @@
           "$ref": "#/$defs/FtkUuid"
         },
         "center_id": {
-          "anyOf": [
-            {
-              "$ref": "#/$defs/FtkUuid"
-            },
-            {
-              "type": "null"
-            }
-          ]
+          "$ref": "#/$defs/FtkUuid"
         },
         "operation_key": {
           "$ref": "#/$defs/FtkUuid"
@@ -9479,6 +9462,9 @@
         },
         "lesson_request_id": {
           "$ref": "#/$defs/FtkUuid"
+        },
+        "expected_version": {
+          "$ref": "#/$defs/PositiveInt"
         }
       },
       "required": [
@@ -9487,7 +9473,9 @@
         "org_id",
         "operation_key",
         "alternatives",
-        "lesson_request_id"
+        "lesson_request_id",
+        "center_id",
+        "expected_version"
       ],
       "additionalProperties": false
     },
@@ -9524,19 +9512,18 @@
           "$ref": "#/$defs/FtkUuid"
         },
         "center_id": {
-          "anyOf": [
-            {
-              "$ref": "#/$defs/FtkUuid"
-            },
-            {
-              "type": "null"
-            }
-          ]
+          "$ref": "#/$defs/FtkUuid"
         },
         "operation_key": {
           "$ref": "#/$defs/FtkUuid"
         },
         "alternative_id": {
+          "$ref": "#/$defs/FtkUuid"
+        },
+        "expected_version": {
+          "$ref": "#/$defs/PositiveInt"
+        },
+        "lesson_request_id": {
           "$ref": "#/$defs/FtkUuid"
         }
       },
@@ -9545,7 +9532,10 @@
         "request_id",
         "org_id",
         "operation_key",
-        "alternative_id"
+        "alternative_id",
+        "center_id",
+        "expected_version",
+        "lesson_request_id"
       ],
       "additionalProperties": false
     },
@@ -9582,14 +9572,7 @@
           "$ref": "#/$defs/FtkUuid"
         },
         "center_id": {
-          "anyOf": [
-            {
-              "$ref": "#/$defs/FtkUuid"
-            },
-            {
-              "type": "null"
-            }
-          ]
+          "$ref": "#/$defs/FtkUuid"
         },
         "operation_key": {
           "$ref": "#/$defs/FtkUuid"
@@ -9616,6 +9599,9 @@
         },
         "lesson_request_id": {
           "$ref": "#/$defs/FtkUuid"
+        },
+        "expected_version": {
+          "$ref": "#/$defs/PositiveInt"
         }
       },
       "required": [
@@ -9623,7 +9609,9 @@
         "request_id",
         "org_id",
         "operation_key",
-        "lesson_request_id"
+        "lesson_request_id",
+        "center_id",
+        "expected_version"
       ],
       "additionalProperties": false
     },
@@ -24474,6 +24462,9 @@
               "type": "null"
             }
           ]
+        },
+        "request_detail": {
+          "$ref": "#/$defs/LessonRequestView"
         }
       },
       "required": [
@@ -26559,10 +26550,14 @@
               },
               "org_id": {
                 "$ref": "#/$defs/FtkUuid"
+              },
+              "center_id": {
+                "$ref": "#/$defs/FtkUuid"
               }
             },
             "required": [
-              "org_id"
+              "org_id",
+              "center_id"
             ]
           }
         },
@@ -26588,10 +26583,14 @@
               },
               "org_id": {
                 "$ref": "#/$defs/FtkUuid"
+              },
+              "center_id": {
+                "$ref": "#/$defs/FtkUuid"
               }
             },
             "required": [
-              "org_id"
+              "org_id",
+              "center_id"
             ]
           }
         },
@@ -26617,10 +26616,14 @@
               },
               "org_id": {
                 "$ref": "#/$defs/FtkUuid"
+              },
+              "center_id": {
+                "$ref": "#/$defs/FtkUuid"
               }
             },
             "required": [
-              "org_id"
+              "org_id",
+              "center_id"
             ]
           }
         },
@@ -26646,10 +26649,14 @@
               },
               "org_id": {
                 "$ref": "#/$defs/FtkUuid"
+              },
+              "center_id": {
+                "$ref": "#/$defs/FtkUuid"
               }
             },
             "required": [
-              "org_id"
+              "org_id",
+              "center_id"
             ]
           }
         },
@@ -26675,10 +26682,14 @@
               },
               "org_id": {
                 "$ref": "#/$defs/FtkUuid"
+              },
+              "center_id": {
+                "$ref": "#/$defs/FtkUuid"
               }
             },
             "required": [
-              "org_id"
+              "org_id",
+              "center_id"
             ]
           }
         },
@@ -26704,10 +26715,14 @@
               },
               "org_id": {
                 "$ref": "#/$defs/FtkUuid"
+              },
+              "center_id": {
+                "$ref": "#/$defs/FtkUuid"
               }
             },
             "required": [
-              "org_id"
+              "org_id",
+              "center_id"
             ]
           }
         },
@@ -35971,10 +35986,7 @@
               "$ref": "#/$defs/FtkUuid"
             }
           },
-          "required": [
-            "person_id",
-            "discipline_id"
-          ],
+          "required": [],
           "additionalProperties": false
         }
       },
@@ -36070,10 +36082,14 @@
           "properties": {
             "alternative_id": {
               "$ref": "#/$defs/FtkUuid"
+            },
+            "lesson_request_id": {
+              "$ref": "#/$defs/FtkUuid"
             }
           },
           "required": [
-            "alternative_id"
+            "alternative_id",
+            "lesson_request_id"
           ],
           "additionalProperties": false
         }
@@ -40622,6 +40638,147 @@
       "required": [
         "operation",
         "values"
+      ],
+      "additionalProperties": false
+    },
+    "LessonRequestView": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/FtkUuid"
+        },
+        "created_at": {
+          "$ref": "#/$defs/Instant"
+        },
+        "version": {
+          "$ref": "#/$defs/PositiveInt"
+        },
+        "center_id": {
+          "$ref": "#/$defs/FtkUuid"
+        },
+        "person_id": {
+          "$ref": "#/$defs/FtkUuid"
+        },
+        "format": {
+          "$ref": "#/$defs/SessionFormat"
+        },
+        "requested_start": {
+          "$ref": "#/$defs/Instant"
+        },
+        "duration_minutes": {
+          "$ref": "#/$defs/Int"
+        },
+        "preferred_instructor_id": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/FtkUuid"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "state": {
+          "$ref": "#/$defs/RequestState"
+        },
+        "reservation_id": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/FtkUuid"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "expires_at": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Instant"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "discipline_id": {
+          "$ref": "#/$defs/FtkUuid"
+        },
+        "alternatives": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/LessonRequestAlternativeView"
+          }
+        }
+      },
+      "required": [
+        "id",
+        "created_at",
+        "center_id",
+        "person_id",
+        "format",
+        "requested_start",
+        "duration_minutes",
+        "state",
+        "discipline_id",
+        "version",
+        "alternatives"
+      ],
+      "additionalProperties": false
+    },
+    "LessonRequestAlternativeView": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/FtkUuid"
+        },
+        "created_at": {
+          "$ref": "#/$defs/Instant"
+        },
+        "version": {
+          "$ref": "#/$defs/PositiveInt"
+        },
+        "request_id": {
+          "$ref": "#/$defs/FtkUuid"
+        },
+        "starts_at": {
+          "$ref": "#/$defs/Instant"
+        },
+        "ends_at": {
+          "$ref": "#/$defs/Instant"
+        },
+        "instructor_id": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/FtkUuid"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "state": {
+          "$ref": "#/$defs/AlternativeState"
+        },
+        "selected_at": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Instant"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "id",
+        "created_at",
+        "request_id",
+        "starts_at",
+        "ends_at",
+        "state",
+        "version"
       ],
       "additionalProperties": false
     }
@@ -48805,21 +48962,36 @@
           "$ref": "#/$defs/Success_lesson_request_create"
         },
         "errors": [
+          "ACCOUNT_ALREADY_LINKED",
           "ACCOUNT_LINK_CONFLICT",
           "ACCOUNT_LINK_REQUIRED",
+          "ASSISTANT_PARTICIPANT_CONFLICT",
           "AUTH_REQUIRED",
           "BILLING_OPERATION_RESTRICTED",
+          "CAPACITY_FULL",
+          "CLASS_ACCESS_DENIED",
           "CLIENT_UPDATE_REQUIRED",
+          "CREDIT_LIMIT_EXCEEDED",
+          "DOCUMENT_REQUIRED",
+          "ENTITLEMENT_UNAVAILABLE",
           "FORBIDDEN",
           "IDEMPOTENCY_PAYLOAD_MISMATCH",
           "INTEGRITY_VIOLATION",
+          "INVALID_STATE_TRANSITION",
+          "INVITATION_UNAVAILABLE",
           "NOT_FOUND",
+          "OFFER_UNAVAILABLE",
           "OPEN_OPERATIONS_EXIST",
           "OPERATION_IN_PROGRESS",
           "OPERATION_RESULT_EXPIRED",
+          "PARTICIPATION_BLOCKED",
           "PLAN_FEATURE_UNAVAILABLE",
           "PLAN_LIMIT_REACHED",
           "POLICY_NOT_CONFIGURED",
+          "PREVIEW_STALE",
+          "QUOTA_EXCEEDED",
+          "RESERVATION_EXISTS",
+          "RESOURCE_CONFLICT",
           "SERVICE_UNAVAILABLE",
           "SESSION_REVOKED",
           "SUBSCRIPTION_NOT_STARTED",
@@ -48865,11 +49037,13 @@
           "D-A12"
         ],
         "configuration_policy": "numeric plan limits/prices and legal approval are deployment configuration, never arbitrary allow/deny",
-        "implementation_status": "contract_only",
+        "implementation_status": "operational_development_limited",
         "required_features": [
           "F09"
         ],
-        "runtime_required_features": [],
+        "runtime_required_features": [
+          "F09"
+        ],
         "conditional_features": [],
         "operation_contract": {
           "kind": "command",
@@ -48881,17 +49055,24 @@
             "lesson_requests.versioned_domain_change"
           ],
           "business_commit": true,
-          "read_path_status": "contract_only",
+          "read_path_status": "implemented",
           "source_decision": "DS-2026-10-17"
         },
         "decision_delivery": {
           "accepted_contract": "DS-2026-10-17",
-          "runtime_conformance": "pending",
+          "runtime_conformance": "p01_request_workflow_runtime_pending",
           "open_dependencies": [],
           "target_request": {
             "$ref": "#/$defs/Request_lesson_request_create"
           }
-        }
+        },
+        "runtime_path": "/functions/v1/backend-v1/lesson_request_create_v1",
+        "runtime_external_path": "/functions/v1/backend-v1/lesson_request_create_v1",
+        "runtime_rpc": "api_v1.lesson_request_create_v1",
+        "runtime_transport": "authenticated Edge adapter -> service-only RPC; rules/transaction in PostgreSQL",
+        "runtime_limits": [
+          "P01-B implemented; runtime acceptance pending. Worker expiration and waitlist are separate unfinished P01 work."
+        ]
       },
       {
         "name": "lesson_request_withdraw_v1",
@@ -48910,18 +49091,34 @@
           "$ref": "#/$defs/Success_lesson_request_withdraw"
         },
         "errors": [
+          "ACCOUNT_ALREADY_LINKED",
+          "ASSISTANT_PARTICIPANT_CONFLICT",
           "AUTH_REQUIRED",
           "BILLING_OPERATION_RESTRICTED",
+          "CAPACITY_FULL",
+          "CLASS_ACCESS_DENIED",
           "CLIENT_UPDATE_REQUIRED",
+          "CREDIT_LIMIT_EXCEEDED",
+          "DOCUMENT_REQUIRED",
+          "ENTITLEMENT_UNAVAILABLE",
           "FORBIDDEN",
           "IDEMPOTENCY_PAYLOAD_MISMATCH",
           "INTEGRITY_VIOLATION",
+          "INVALID_STATE_TRANSITION",
+          "INVITATION_UNAVAILABLE",
           "NOT_FOUND",
+          "OFFER_UNAVAILABLE",
+          "OPEN_OPERATIONS_EXIST",
           "OPERATION_IN_PROGRESS",
           "OPERATION_RESULT_EXPIRED",
+          "PARTICIPATION_BLOCKED",
           "PLAN_FEATURE_UNAVAILABLE",
           "PLAN_LIMIT_REACHED",
           "POLICY_NOT_CONFIGURED",
+          "PREVIEW_STALE",
+          "QUOTA_EXCEEDED",
+          "RESERVATION_EXISTS",
+          "RESOURCE_CONFLICT",
           "SERVICE_UNAVAILABLE",
           "SESSION_REVOKED",
           "SUBSCRIPTION_NOT_STARTED",
@@ -48953,7 +49150,7 @@
         "audit": true,
         "notification": "outbox_if_user_visible_business_result",
         "concurrency": "Live original permission/tenant scope on every request; target/aggregate lock; append_or_current_scope_lock; idempotent receipt and all declared effects rollback together",
-        "expected_version_subject": "lesson_requests: append_or_current_scope_lock; captured target/scope dependencies, no client row version",
+        "expected_version_subject": "lesson_request_id",
         "acceptance_scenario_ids": [
           "A01",
           "A02",
@@ -48970,33 +49167,42 @@
           "D-A12"
         ],
         "configuration_policy": "numeric plan limits/prices and legal approval are deployment configuration, never arbitrary allow/deny",
-        "implementation_status": "contract_only",
+        "implementation_status": "operational_development_limited",
         "required_features": [
           "F09"
         ],
-        "runtime_required_features": [],
+        "runtime_required_features": [
+          "F09"
+        ],
         "conditional_features": [],
         "operation_contract": {
           "kind": "command",
           "target_entity": "lesson_requests",
-          "version_mode": "append_or_current_scope_lock",
-          "version_field": null,
+          "version_mode": "row_version",
+          "version_field": "lesson_request_id",
           "read_operation": "management_state_get_v1",
           "atomic_effects": [
             "lesson_requests.versioned_domain_change"
           ],
           "business_commit": true,
-          "read_path_status": "contract_only",
+          "read_path_status": "implemented",
           "source_decision": "DS-2026-10-17"
         },
         "decision_delivery": {
           "accepted_contract": "DS-2026-10-17",
-          "runtime_conformance": "pending",
+          "runtime_conformance": "p01_request_workflow_runtime_pending",
           "open_dependencies": [],
           "target_request": {
             "$ref": "#/$defs/Request_lesson_request_withdraw"
           }
-        }
+        },
+        "runtime_path": "/functions/v1/backend-v1/lesson_request_withdraw_v1",
+        "runtime_external_path": "/functions/v1/backend-v1/lesson_request_withdraw_v1",
+        "runtime_rpc": "api_v1.lesson_request_withdraw_v1",
+        "runtime_transport": "authenticated Edge adapter -> service-only RPC; rules/transaction in PostgreSQL",
+        "runtime_limits": [
+          "P01-B implemented; runtime acceptance pending. Worker expiration and waitlist are separate unfinished P01 work."
+        ]
       },
       {
         "name": "lesson_request_reject_v1",
@@ -49015,18 +49221,34 @@
           "$ref": "#/$defs/Success_lesson_request_reject"
         },
         "errors": [
+          "ACCOUNT_ALREADY_LINKED",
+          "ASSISTANT_PARTICIPANT_CONFLICT",
           "AUTH_REQUIRED",
           "BILLING_OPERATION_RESTRICTED",
+          "CAPACITY_FULL",
+          "CLASS_ACCESS_DENIED",
           "CLIENT_UPDATE_REQUIRED",
+          "CREDIT_LIMIT_EXCEEDED",
+          "DOCUMENT_REQUIRED",
+          "ENTITLEMENT_UNAVAILABLE",
           "FORBIDDEN",
           "IDEMPOTENCY_PAYLOAD_MISMATCH",
           "INTEGRITY_VIOLATION",
+          "INVALID_STATE_TRANSITION",
+          "INVITATION_UNAVAILABLE",
           "NOT_FOUND",
+          "OFFER_UNAVAILABLE",
+          "OPEN_OPERATIONS_EXIST",
           "OPERATION_IN_PROGRESS",
           "OPERATION_RESULT_EXPIRED",
+          "PARTICIPATION_BLOCKED",
           "PLAN_FEATURE_UNAVAILABLE",
           "PLAN_LIMIT_REACHED",
           "POLICY_NOT_CONFIGURED",
+          "PREVIEW_STALE",
+          "QUOTA_EXCEEDED",
+          "RESERVATION_EXISTS",
+          "RESOURCE_CONFLICT",
           "SERVICE_UNAVAILABLE",
           "SESSION_REVOKED",
           "SUBSCRIPTION_NOT_STARTED",
@@ -49058,7 +49280,7 @@
         "audit": true,
         "notification": "outbox_if_user_visible_business_result",
         "concurrency": "Live original permission/tenant scope on every request; target/aggregate lock; append_or_current_scope_lock; idempotent receipt and all declared effects rollback together",
-        "expected_version_subject": "lesson_requests: append_or_current_scope_lock; captured target/scope dependencies, no client row version",
+        "expected_version_subject": "lesson_request_id",
         "acceptance_scenario_ids": [
           "A01",
           "A02",
@@ -49075,33 +49297,42 @@
           "D-A12"
         ],
         "configuration_policy": "numeric plan limits/prices and legal approval are deployment configuration, never arbitrary allow/deny",
-        "implementation_status": "contract_only",
+        "implementation_status": "operational_development_limited",
         "required_features": [
           "F09"
         ],
-        "runtime_required_features": [],
+        "runtime_required_features": [
+          "F09"
+        ],
         "conditional_features": [],
         "operation_contract": {
           "kind": "command",
           "target_entity": "lesson_requests",
-          "version_mode": "append_or_current_scope_lock",
-          "version_field": null,
+          "version_mode": "row_version",
+          "version_field": "lesson_request_id",
           "read_operation": "management_state_get_v1",
           "atomic_effects": [
             "lesson_requests.versioned_domain_change"
           ],
           "business_commit": true,
-          "read_path_status": "contract_only",
+          "read_path_status": "implemented",
           "source_decision": "DS-2026-10-17"
         },
         "decision_delivery": {
           "accepted_contract": "DS-2026-10-17",
-          "runtime_conformance": "pending",
+          "runtime_conformance": "p01_request_workflow_runtime_pending",
           "open_dependencies": [],
           "target_request": {
             "$ref": "#/$defs/Request_lesson_request_reject"
           }
-        }
+        },
+        "runtime_path": "/functions/v1/backend-v1/lesson_request_reject_v1",
+        "runtime_external_path": "/functions/v1/backend-v1/lesson_request_reject_v1",
+        "runtime_rpc": "api_v1.lesson_request_reject_v1",
+        "runtime_transport": "authenticated Edge adapter -> service-only RPC; rules/transaction in PostgreSQL",
+        "runtime_limits": [
+          "P01-B implemented; runtime acceptance pending. Worker expiration and waitlist are separate unfinished P01 work."
+        ]
       },
       {
         "name": "lesson_request_offer_alternative_v1",
@@ -49120,18 +49351,34 @@
           "$ref": "#/$defs/Success_lesson_request_offer_alternative"
         },
         "errors": [
+          "ACCOUNT_ALREADY_LINKED",
+          "ASSISTANT_PARTICIPANT_CONFLICT",
           "AUTH_REQUIRED",
           "BILLING_OPERATION_RESTRICTED",
+          "CAPACITY_FULL",
+          "CLASS_ACCESS_DENIED",
           "CLIENT_UPDATE_REQUIRED",
+          "CREDIT_LIMIT_EXCEEDED",
+          "DOCUMENT_REQUIRED",
+          "ENTITLEMENT_UNAVAILABLE",
           "FORBIDDEN",
           "IDEMPOTENCY_PAYLOAD_MISMATCH",
           "INTEGRITY_VIOLATION",
+          "INVALID_STATE_TRANSITION",
+          "INVITATION_UNAVAILABLE",
           "NOT_FOUND",
+          "OFFER_UNAVAILABLE",
+          "OPEN_OPERATIONS_EXIST",
           "OPERATION_IN_PROGRESS",
           "OPERATION_RESULT_EXPIRED",
+          "PARTICIPATION_BLOCKED",
           "PLAN_FEATURE_UNAVAILABLE",
           "PLAN_LIMIT_REACHED",
           "POLICY_NOT_CONFIGURED",
+          "PREVIEW_STALE",
+          "QUOTA_EXCEEDED",
+          "RESERVATION_EXISTS",
+          "RESOURCE_CONFLICT",
           "SERVICE_UNAVAILABLE",
           "SESSION_REVOKED",
           "SUBSCRIPTION_NOT_STARTED",
@@ -49163,7 +49410,7 @@
         "audit": true,
         "notification": "outbox_if_user_visible_business_result",
         "concurrency": "Live original permission/tenant scope on every request; target/aggregate lock; append_or_current_scope_lock; idempotent receipt and all declared effects rollback together",
-        "expected_version_subject": "lesson_requests: append_or_current_scope_lock; captured target/scope dependencies, no client row version",
+        "expected_version_subject": "lesson_request_id",
         "acceptance_scenario_ids": [
           "A01",
           "A02",
@@ -49180,33 +49427,42 @@
           "D-A12"
         ],
         "configuration_policy": "numeric plan limits/prices and legal approval are deployment configuration, never arbitrary allow/deny",
-        "implementation_status": "contract_only",
+        "implementation_status": "operational_development_limited",
         "required_features": [
           "F09"
         ],
-        "runtime_required_features": [],
+        "runtime_required_features": [
+          "F09"
+        ],
         "conditional_features": [],
         "operation_contract": {
           "kind": "command",
           "target_entity": "lesson_requests",
-          "version_mode": "append_or_current_scope_lock",
-          "version_field": null,
+          "version_mode": "row_version",
+          "version_field": "lesson_request_id",
           "read_operation": "management_state_get_v1",
           "atomic_effects": [
             "lesson_requests.versioned_domain_change"
           ],
           "business_commit": true,
-          "read_path_status": "contract_only",
+          "read_path_status": "implemented",
           "source_decision": "DS-2026-10-17"
         },
         "decision_delivery": {
           "accepted_contract": "DS-2026-10-17",
-          "runtime_conformance": "pending",
+          "runtime_conformance": "p01_request_workflow_runtime_pending",
           "open_dependencies": [],
           "target_request": {
             "$ref": "#/$defs/Request_lesson_request_offer_alternative"
           }
-        }
+        },
+        "runtime_path": "/functions/v1/backend-v1/lesson_request_offer_alternative_v1",
+        "runtime_external_path": "/functions/v1/backend-v1/lesson_request_offer_alternative_v1",
+        "runtime_rpc": "api_v1.lesson_request_offer_alternative_v1",
+        "runtime_transport": "authenticated Edge adapter -> service-only RPC; rules/transaction in PostgreSQL",
+        "runtime_limits": [
+          "P01-B implemented; runtime acceptance pending. Worker expiration and waitlist are separate unfinished P01 work."
+        ]
       },
       {
         "name": "lesson_request_accept_alternative_v1",
@@ -49225,18 +49481,34 @@
           "$ref": "#/$defs/Success_lesson_request_accept_alternative"
         },
         "errors": [
+          "ACCOUNT_ALREADY_LINKED",
+          "ASSISTANT_PARTICIPANT_CONFLICT",
           "AUTH_REQUIRED",
           "BILLING_OPERATION_RESTRICTED",
+          "CAPACITY_FULL",
+          "CLASS_ACCESS_DENIED",
           "CLIENT_UPDATE_REQUIRED",
+          "CREDIT_LIMIT_EXCEEDED",
+          "DOCUMENT_REQUIRED",
+          "ENTITLEMENT_UNAVAILABLE",
           "FORBIDDEN",
           "IDEMPOTENCY_PAYLOAD_MISMATCH",
           "INTEGRITY_VIOLATION",
+          "INVALID_STATE_TRANSITION",
+          "INVITATION_UNAVAILABLE",
           "NOT_FOUND",
+          "OFFER_UNAVAILABLE",
+          "OPEN_OPERATIONS_EXIST",
           "OPERATION_IN_PROGRESS",
           "OPERATION_RESULT_EXPIRED",
+          "PARTICIPATION_BLOCKED",
           "PLAN_FEATURE_UNAVAILABLE",
           "PLAN_LIMIT_REACHED",
           "POLICY_NOT_CONFIGURED",
+          "PREVIEW_STALE",
+          "QUOTA_EXCEEDED",
+          "RESERVATION_EXISTS",
+          "RESOURCE_CONFLICT",
           "SERVICE_UNAVAILABLE",
           "SESSION_REVOKED",
           "SUBSCRIPTION_NOT_STARTED",
@@ -49267,7 +49539,7 @@
         "audit": true,
         "notification": "outbox_if_user_visible_business_result",
         "concurrency": "Live original permission/tenant scope on every request; target/aggregate lock; append_or_current_scope_lock; idempotent receipt and all declared effects rollback together",
-        "expected_version_subject": "lesson_requests: append_or_current_scope_lock; captured target/scope dependencies, no client row version",
+        "expected_version_subject": "lesson_request_id",
         "acceptance_scenario_ids": [
           "A01",
           "A02",
@@ -49284,33 +49556,42 @@
           "D-A12"
         ],
         "configuration_policy": "numeric plan limits/prices and legal approval are deployment configuration, never arbitrary allow/deny",
-        "implementation_status": "contract_only",
+        "implementation_status": "operational_development_limited",
         "required_features": [
           "F09"
         ],
-        "runtime_required_features": [],
+        "runtime_required_features": [
+          "F09"
+        ],
         "conditional_features": [],
         "operation_contract": {
           "kind": "command",
           "target_entity": "lesson_requests",
-          "version_mode": "append_or_current_scope_lock",
-          "version_field": null,
+          "version_mode": "row_version",
+          "version_field": "lesson_request_id",
           "read_operation": "management_state_get_v1",
           "atomic_effects": [
             "lesson_requests.versioned_domain_change"
           ],
           "business_commit": true,
-          "read_path_status": "contract_only",
+          "read_path_status": "implemented",
           "source_decision": "DS-2026-10-17"
         },
         "decision_delivery": {
           "accepted_contract": "DS-2026-10-17",
-          "runtime_conformance": "pending",
+          "runtime_conformance": "p01_request_workflow_runtime_pending",
           "open_dependencies": [],
           "target_request": {
             "$ref": "#/$defs/Request_lesson_request_accept_alternative"
           }
-        }
+        },
+        "runtime_path": "/functions/v1/backend-v1/lesson_request_accept_alternative_v1",
+        "runtime_external_path": "/functions/v1/backend-v1/lesson_request_accept_alternative_v1",
+        "runtime_rpc": "api_v1.lesson_request_accept_alternative_v1",
+        "runtime_transport": "authenticated Edge adapter -> service-only RPC; rules/transaction in PostgreSQL",
+        "runtime_limits": [
+          "P01-B implemented; runtime acceptance pending. Worker expiration and waitlist are separate unfinished P01 work."
+        ]
       },
       {
         "name": "lesson_request_approve_v1",
@@ -49329,6 +49610,7 @@
           "$ref": "#/$defs/Success_lesson_request_approve"
         },
         "errors": [
+          "ACCOUNT_ALREADY_LINKED",
           "ASSISTANT_PARTICIPANT_CONFLICT",
           "AUTH_REQUIRED",
           "BILLING_OPERATION_RESTRICTED",
@@ -49341,14 +49623,18 @@
           "FORBIDDEN",
           "IDEMPOTENCY_PAYLOAD_MISMATCH",
           "INTEGRITY_VIOLATION",
+          "INVALID_STATE_TRANSITION",
+          "INVITATION_UNAVAILABLE",
           "NOT_FOUND",
           "OFFER_UNAVAILABLE",
+          "OPEN_OPERATIONS_EXIST",
           "OPERATION_IN_PROGRESS",
           "OPERATION_RESULT_EXPIRED",
           "PARTICIPATION_BLOCKED",
           "PLAN_FEATURE_UNAVAILABLE",
           "PLAN_LIMIT_REACHED",
           "POLICY_NOT_CONFIGURED",
+          "PREVIEW_STALE",
           "QUOTA_EXCEEDED",
           "RESERVATION_EXISTS",
           "RESOURCE_CONFLICT",
@@ -49360,7 +49646,7 @@
           "VERSION_CONFLICT"
         ],
         "transaction_class": "reservation",
-        "transaction_guarantee": "Atomic lesson_requests.versioned_domain_change; audit + in-app outbox + receipt. External delivery never determines the domain commit.",
+        "transaction_guarantee": "Atomic request approval, optional existing guarded session creation and guarded reservation/right allocation, linked receipts/audit/outbox; nested failure rolls back every effect.",
         "transition": {
           "entity": "lesson_requests",
           "from": [
@@ -49390,7 +49676,7 @@
         "audit": true,
         "notification": "outbox_if_user_visible_business_result",
         "concurrency": "Live original permission/tenant scope on every request; target/aggregate lock; append_or_current_scope_lock; idempotent receipt and all declared effects rollback together",
-        "expected_version_subject": "session_id",
+        "expected_version_subject": "lesson_request_id",
         "acceptance_scenario_ids": [
           "A01",
           "A02",
@@ -49419,33 +49705,45 @@
           "D-A12"
         ],
         "configuration_policy": "numeric plan limits/prices and legal approval are deployment configuration, never arbitrary allow/deny",
-        "implementation_status": "contract_only",
+        "implementation_status": "operational_development_limited",
         "required_features": [
           "F09"
         ],
-        "runtime_required_features": [],
+        "runtime_required_features": [
+          "F09"
+        ],
         "conditional_features": [],
         "operation_contract": {
           "kind": "command",
           "target_entity": "lesson_requests",
-          "version_mode": "append_or_current_scope_lock",
-          "version_field": null,
+          "version_mode": "row_version",
+          "version_field": "lesson_request_id",
           "read_operation": "management_state_get_v1",
           "atomic_effects": [
-            "lesson_requests.versioned_domain_change"
+            "lesson_requests.versioned_domain_change",
+            "sessions.optional_atomic_create",
+            "reservations.active",
+            "rights.reserve_or_deficit"
           ],
           "business_commit": true,
-          "read_path_status": "contract_only",
+          "read_path_status": "implemented",
           "source_decision": "DS-2026-10-17"
         },
         "decision_delivery": {
           "accepted_contract": "DS-2026-10-17",
-          "runtime_conformance": "pending",
+          "runtime_conformance": "p01_request_workflow_runtime_pending",
           "open_dependencies": [],
           "target_request": {
             "$ref": "#/$defs/Request_lesson_request_approve"
           }
-        }
+        },
+        "runtime_path": "/functions/v1/backend-v1/lesson_request_approve_v1",
+        "runtime_external_path": "/functions/v1/backend-v1/lesson_request_approve_v1",
+        "runtime_rpc": "api_v1.lesson_request_approve_v1",
+        "runtime_transport": "authenticated Edge adapter -> service-only RPC; rules/transaction in PostgreSQL",
+        "runtime_limits": [
+          "P01-B implemented; runtime acceptance pending. Worker expiration and waitlist are separate unfinished P01 work."
+        ]
       },
       {
         "name": "reservation_create_v1",
@@ -63547,10 +63845,18 @@
       {
         "name": "management_state_get_v1",
         "module": "X",
-        "features": [],
+        "features": [
+          "F09"
+        ],
         "required_features": [],
         "runtime_required_features": [],
-        "conditional_features": [],
+        "conditional_features": [
+          {
+            "feature": "F09",
+            "when": "lesson_request_selector",
+            "mode": "required_if_selected"
+          }
+        ],
         "permission": "management.inspect",
         "actor_source": "server_verified",
         "transport": "R",
@@ -63641,10 +63947,16 @@
         "runtime_rpc": "api_v1.management_state_get_v1",
         "runtime_transport": "authenticated Edge adapter -> service-only RPC; rules/transaction in PostgreSQL",
         "runtime_limits": [
-          "management_state_get only negcredit_valuation_set selector"
+          "Narrow live original-write authority: negative valuation and P01 lesson request selectors only; other selectors remain unavailable. Request workflow runtime acceptance pending."
         ],
         "runtime_selectors": [
-          "negcredit_valuation_set_v1"
+          "negcredit_valuation_set_v1",
+          "lesson_request_create_v1",
+          "lesson_request_withdraw_v1",
+          "lesson_request_reject_v1",
+          "lesson_request_offer_alternative_v1",
+          "lesson_request_accept_alternative_v1",
+          "lesson_request_approve_v1"
         ]
       },
       {
@@ -66133,6 +66445,12 @@
         "generation": "uuidv7"
       },
       {
+        "path": "#/$defs/EntitlementView/properties/product_version_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
         "path": "#/$defs/DebtSummary/properties/id",
         "origin": "ftksaas",
         "acceptance": "generic_uuid",
@@ -67999,7 +68317,7 @@
         "generation": "uuidv7"
       },
       {
-        "path": "#/$defs/Request_lesson_request_create/properties/center_id/anyOf/0",
+        "path": "#/$defs/Request_lesson_request_create/properties/center_id",
         "origin": "ftksaas",
         "acceptance": "generic_uuid",
         "generation": "uuidv7"
@@ -68047,7 +68365,7 @@
         "generation": "uuidv7"
       },
       {
-        "path": "#/$defs/Request_lesson_request_withdraw/properties/center_id/anyOf/0",
+        "path": "#/$defs/Request_lesson_request_withdraw/properties/center_id",
         "origin": "ftksaas",
         "acceptance": "generic_uuid",
         "generation": "uuidv7"
@@ -68083,7 +68401,7 @@
         "generation": "uuidv7"
       },
       {
-        "path": "#/$defs/Request_lesson_request_reject/properties/center_id/anyOf/0",
+        "path": "#/$defs/Request_lesson_request_reject/properties/center_id",
         "origin": "ftksaas",
         "acceptance": "generic_uuid",
         "generation": "uuidv7"
@@ -68119,7 +68437,7 @@
         "generation": "uuidv7"
       },
       {
-        "path": "#/$defs/Request_lesson_request_offer_alternative/properties/center_id/anyOf/0",
+        "path": "#/$defs/Request_lesson_request_offer_alternative/properties/center_id",
         "origin": "ftksaas",
         "acceptance": "generic_uuid",
         "generation": "uuidv7"
@@ -68155,7 +68473,7 @@
         "generation": "uuidv7"
       },
       {
-        "path": "#/$defs/Request_lesson_request_accept_alternative/properties/center_id/anyOf/0",
+        "path": "#/$defs/Request_lesson_request_accept_alternative/properties/center_id",
         "origin": "ftksaas",
         "acceptance": "generic_uuid",
         "generation": "uuidv7"
@@ -68168,6 +68486,12 @@
       },
       {
         "path": "#/$defs/Request_lesson_request_accept_alternative/properties/alternative_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Request_lesson_request_accept_alternative/properties/lesson_request_id",
         "origin": "ftksaas",
         "acceptance": "generic_uuid",
         "generation": "uuidv7"
@@ -68191,7 +68515,7 @@
         "generation": "uuidv7"
       },
       {
-        "path": "#/$defs/Request_lesson_request_approve/properties/center_id/anyOf/0",
+        "path": "#/$defs/Request_lesson_request_approve/properties/center_id",
         "origin": "ftksaas",
         "acceptance": "generic_uuid",
         "generation": "uuidv7"
@@ -68810,6 +69134,12 @@
       },
       {
         "path": "#/$defs/Request_entitlements_get/properties/person_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Request_entitlements_get/properties/session_id",
         "origin": "ftksaas",
         "acceptance": "generic_uuid",
         "generation": "uuidv7"
@@ -75697,7 +76027,19 @@
         "generation": "uuidv7"
       },
       {
+        "path": "#/$defs/Request_management_state_get/allOf/44/then/properties/center_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
         "path": "#/$defs/Request_management_state_get/allOf/45/then/properties/org_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Request_management_state_get/allOf/45/then/properties/center_id",
         "origin": "ftksaas",
         "acceptance": "generic_uuid",
         "generation": "uuidv7"
@@ -75709,7 +76051,19 @@
         "generation": "uuidv7"
       },
       {
+        "path": "#/$defs/Request_management_state_get/allOf/46/then/properties/center_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
         "path": "#/$defs/Request_management_state_get/allOf/47/then/properties/org_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Request_management_state_get/allOf/47/then/properties/center_id",
         "origin": "ftksaas",
         "acceptance": "generic_uuid",
         "generation": "uuidv7"
@@ -75721,7 +76075,19 @@
         "generation": "uuidv7"
       },
       {
+        "path": "#/$defs/Request_management_state_get/allOf/48/then/properties/center_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
         "path": "#/$defs/Request_management_state_get/allOf/49/then/properties/org_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Request_management_state_get/allOf/49/then/properties/center_id",
         "origin": "ftksaas",
         "acceptance": "generic_uuid",
         "generation": "uuidv7"
@@ -77803,6 +78169,12 @@
         "generation": "uuidv7"
       },
       {
+        "path": "#/$defs/ManagementSelector_lesson_request_accept_alternative_v1/properties/key/properties/lesson_request_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
         "path": "#/$defs/ManagementSelector_lesson_request_approve_v1/properties/key/properties/session_id/anyOf/0",
         "origin": "ftksaas",
         "acceptance": "generic_uuid",
@@ -78985,13 +79357,55 @@
         "generation": "uuidv7"
       },
       {
-        "path": "#/$defs/Request_entitlements_get/properties/session_id",
+        "path": "#/$defs/LessonRequestView/properties/id",
         "origin": "ftksaas",
         "acceptance": "generic_uuid",
         "generation": "uuidv7"
       },
       {
-        "path": "#/$defs/EntitlementView/properties/product_version_id",
+        "path": "#/$defs/LessonRequestView/properties/center_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/LessonRequestView/properties/person_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/LessonRequestView/properties/preferred_instructor_id/anyOf/0",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/LessonRequestView/properties/reservation_id/anyOf/0",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/LessonRequestView/properties/discipline_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/LessonRequestAlternativeView/properties/id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/LessonRequestAlternativeView/properties/request_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/LessonRequestAlternativeView/properties/instructor_id/anyOf/0",
         "origin": "ftksaas",
         "acceptance": "generic_uuid",
         "generation": "uuidv7"
@@ -80085,7 +80499,7 @@
           "availability_exception_save_v1"
         ],
         "dependencies": [],
-        "implementation": "partial",
+        "implementation": "implemented_acceptance_pending",
         "acceptance": "pending_feature_acceptance",
         "acceptance_evidence": [],
         "implemented_operations": [
@@ -80118,7 +80532,7 @@
         "dependencies": [
           "confirmed_reservation_protection"
         ],
-        "implementation": "partial",
+        "implementation": "implemented_acceptance_pending",
         "acceptance": "pending_feature_acceptance",
         "acceptance_evidence": [],
         "implemented_operations": [
@@ -80251,7 +80665,7 @@
         "dependencies": [
           "plan_gate_alignment"
         ],
-        "implementation": "partial",
+        "implementation": "implemented_acceptance_pending",
         "acceptance": "pending_feature_acceptance",
         "acceptance_evidence": [],
         "implemented_operations": [
@@ -80398,7 +80812,7 @@
           "session_capacity_set_v1"
         ],
         "dependencies": [],
-        "implementation": "partial",
+        "implementation": "implemented_acceptance_pending",
         "acceptance": "pending_feature_acceptance",
         "acceptance_evidence": [],
         "implemented_operations": [
@@ -80449,22 +80863,24 @@
           "lesson_request_offer_alternative_v1",
           "lesson_request_accept_alternative_v1",
           "lesson_request_approve_v1",
-          "request_expire_v1"
+          "request_expire_v1",
+          "management_state_get_v1"
         ],
         "dependencies": [],
         "implementation": "partial",
         "acceptance": "pending_feature_acceptance",
         "acceptance_evidence": [],
         "implemented_operations": [
-          "session_create_v1"
-        ],
-        "contract_only_operations": [
+          "session_create_v1",
           "lesson_request_create_v1",
           "lesson_request_withdraw_v1",
           "lesson_request_reject_v1",
           "lesson_request_offer_alternative_v1",
           "lesson_request_accept_alternative_v1",
           "lesson_request_approve_v1",
+          "management_state_get_v1"
+        ],
+        "contract_only_operations": [
           "request_expire_v1"
         ],
         "acceptance_case_ids": [
@@ -80504,7 +80920,7 @@
           "cross_center_settlement",
           "sale_scope_and_backdating"
         ],
-        "implementation": "partial",
+        "implementation": "implemented_acceptance_pending",
         "acceptance": "pending_feature_acceptance",
         "acceptance_evidence": [],
         "implemented_operations": [
@@ -80571,7 +80987,7 @@
           "reservation_create_v1"
         ],
         "dependencies": [],
-        "implementation": "partial",
+        "implementation": "implemented_acceptance_pending",
         "acceptance": "pending_feature_acceptance",
         "acceptance_evidence": [],
         "implemented_operations": [
@@ -80606,7 +81022,7 @@
           "seat_offer_expire_v1"
         ],
         "dependencies": [],
-        "implementation": "contract_only",
+        "implementation": "partial",
         "acceptance": "pending_feature_acceptance",
         "acceptance_evidence": [],
         "implemented_operations": [],
@@ -80642,7 +81058,7 @@
           "session_assignment_set_v1"
         ],
         "dependencies": [],
-        "implementation": "partial",
+        "implementation": "implemented_acceptance_pending",
         "acceptance": "pending_feature_acceptance",
         "acceptance_evidence": [],
         "implemented_operations": [
@@ -80999,7 +81415,7 @@
         "dependencies": [
           "sale_scope_and_backdating"
         ],
-        "implementation": "partial",
+        "implementation": "implemented_acceptance_pending",
         "acceptance": "pending_feature_acceptance",
         "acceptance_evidence": [],
         "implemented_operations": [
@@ -81230,7 +81646,7 @@
           "public_application_review_v1"
         ],
         "dependencies": [],
-        "implementation": "contract_only",
+        "implementation": "partial",
         "acceptance": "pending_feature_acceptance",
         "acceptance_evidence": [],
         "implemented_operations": [],
@@ -81264,7 +81680,7 @@
           "trial_registration_confirm_v1"
         ],
         "dependencies": [],
-        "implementation": "contract_only",
+        "implementation": "partial",
         "acceptance": "pending_feature_acceptance",
         "acceptance_evidence": [],
         "implemented_operations": [],
@@ -81295,7 +81711,7 @@
           "crm_followup_list_v1"
         ],
         "dependencies": [],
-        "implementation": "contract_only",
+        "implementation": "partial",
         "acceptance": "pending_feature_acceptance",
         "acceptance_evidence": [],
         "implemented_operations": [],
@@ -81327,7 +81743,7 @@
           "automation_run_v1"
         ],
         "dependencies": [],
-        "implementation": "contract_only",
+        "implementation": "partial",
         "acceptance": "pending_feature_acceptance",
         "acceptance_evidence": [],
         "implemented_operations": [],
@@ -81403,7 +81819,7 @@
           "outbox_deliver_v1"
         ],
         "dependencies": [],
-        "implementation": "contract_only",
+        "implementation": "partial",
         "acceptance": "pending_feature_acceptance",
         "acceptance_evidence": [],
         "implemented_operations": [],
@@ -81437,7 +81853,7 @@
           "reminder_schedule_v1"
         ],
         "dependencies": [],
-        "implementation": "contract_only",
+        "implementation": "partial",
         "acceptance": "pending_feature_acceptance",
         "acceptance_evidence": [],
         "implemented_operations": [],
@@ -81472,7 +81888,7 @@
           "report_build_v1"
         ],
         "dependencies": [],
-        "implementation": "contract_only",
+        "implementation": "partial",
         "acceptance": "pending_feature_acceptance",
         "acceptance_evidence": [],
         "implemented_operations": [],
@@ -81524,7 +81940,7 @@
         "dependencies": [
           "plan_gate_alignment"
         ],
-        "implementation": "partial",
+        "implementation": "implemented_acceptance_pending",
         "acceptance": "pending_feature_acceptance",
         "acceptance_evidence": [],
         "implemented_operations": [
@@ -81576,7 +81992,7 @@
           "file_upload_complete_v1"
         ],
         "dependencies": [],
-        "implementation": "contract_only",
+        "implementation": "partial",
         "acceptance": "pending_feature_acceptance",
         "acceptance_evidence": [],
         "implemented_operations": [],
@@ -81615,7 +82031,7 @@
           "file_upload_complete_v1"
         ],
         "dependencies": [],
-        "implementation": "contract_only",
+        "implementation": "partial",
         "acceptance": "pending_feature_acceptance",
         "acceptance_evidence": [],
         "implemented_operations": [],
@@ -81719,7 +82135,7 @@
         "dependencies": [
           "confirmed_reservation_protection"
         ],
-        "implementation": "contract_only",
+        "implementation": "partial",
         "acceptance": "pending_feature_acceptance",
         "acceptance_evidence": [],
         "implemented_operations": [],

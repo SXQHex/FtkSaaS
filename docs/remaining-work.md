@@ -1,8 +1,8 @@
 # Kalan backend işleri
 
-Güncel kaynak ve CI: [doğrulanmış devir](../contracts/00-FtkSaaS-yeni-sohbet-devir.md). **199 işlem: 105 çağrılabilir, 94 yalnız sözleşme; 30 migration.** Önceki teslimlerde kapanmış işler burada yeniden açık ilan edilmez. Uygulama kapsamı [Starter](starter-attendance-protection-handover.md) ve [anlaşma/hakediş](instructor-earnings-handover.md) devirlerindedir.
+Güncel kaynak ve CI: [doğrulanmış devir](../contracts/00-FtkSaaS-yeni-sohbet-devir.md). **199 işlem: 111 çağrılabilir, 88 yalnız sözleşme; 31 migration.** Önceki teslimlerde kapanmış işler burada yeniden açık ilan edilmez. Uygulama kapsamı [Starter](starter-attendance-protection-handover.md) ve [anlaşma/hakediş](instructor-earnings-handover.md) devirlerindedir.
 
-[P01-A](p01-handover.md) katalog ve seans/kişi/sale hak okumasını uygular; yeni kaynak kabulü bekliyor. Kalan 13 P01 komutu ve worker işletimi açıktır. PR #23 CI bakımı main 24007212005d07938fb1265a9f42891f18d7fa09 / clean 39298247595 ile kapandı; mevcut PR #22 bu tabana taşınarak yeni kaynak kabulünden geçer. Hosted eski smoke, güncel 104 işlemin uzaktan kabulü sayılmaz.
+[P01 devri](p01-handover.md): A katalog/hak okuması b8d9adc kaynağında hedefli/adayı geçti, merge edilmedi. B altı talep komutu ve sürüm/alternatif okuması uygulandı; yeni runtime kabulü bekliyor. Kalan C yedi API ve gerçek worker işletimidir. P01 aynı feature dalı/PR #22 içinde tamamlanır; commit başına hedefli test, bütün P01 sonunda toplu clean/merge. Main 24007212005d07938fb1265a9f42891f18d7fa09 / clean 39298247595 başarılıdır. Hosted eski smoke yeni kaynak kabulü değildir.
 
 ## Aktif seri üretim
 
@@ -29,14 +29,14 @@ Kalan delivery_gaps ve vaka bazlı durumlar [08 makine sözleşmesi](../contract
 
 Her yeni grup: sözleşme/izin incelemesi → yeni migration → gerçek Auth/API kabulü (sınır, yetki, tekrar, yarış, rollback) → inceleme → temiz CI → main CI. Ürün kararında boşluk varsa teknik varsayımla yeni kural eklenmez.
 
-## Yalnız sözleşme envanteri — güncel 94 işlem
+## Yalnız sözleşme envanteri — güncel 88 işlem
 
 | Modül | Kalan işlem |
 |---|---:|
 | M01 | 5 |
 | M02 | 7 |
 | M03 | 3 |
-| M04 | 12 |
+| M04 | 6 |
 | M05 | 3 |
 | M06 | 12 |
 | M07 | 5 |
@@ -68,12 +68,6 @@ Her yeni grup: sözleşme/izin incelemesi → yeni migration → gerçek Auth/AP
 | session_cancel_preview_v1 | schedule.manage |
 | session_cancel_apply_v1 | schedule.manage |
 | replacement_session_create_v1 | schedule.manage |
-| lesson_request_create_v1 | request.write |
-| lesson_request_withdraw_v1 | request.write |
-| lesson_request_reject_v1 | request.resolve |
-| lesson_request_offer_alternative_v1 | request.resolve |
-| lesson_request_accept_alternative_v1 | request.write |
-| lesson_request_approve_v1 | request.resolve |
 | waitlist_join_v1 | reservation.write |
 | waitlist_leave_v1 | reservation.write |
 | seat_offer_accept_v1 | reservation.write |

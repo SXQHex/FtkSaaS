@@ -677,3 +677,7 @@ Kabul edilmiş ücret kuralları immutable zincir, açık fiilî başlangıç ki
 ## P01-A teknik okuma aktarımı — 19 Ekim 2026
 
 Katalog ürün sürümü rezervasyon kaynak satışı değildir. products_list_v1 etkin son katalog sürümünü canlı yetkili merkez kapsamında sayfalar. entitlements_get_v1 optional session_id/booking_mode ile mevcut lesson_scope_matches ve available_for kurallarına göre uygun satın alınmış kaynak satışlarını okur; hak veya yer ayırmaz. include_timed_products/include_timed_rights açık seçimi F16 gerektirir; varsayılan kredili projeksiyondur. Geçerlilik ve en erken bitiş/satın alma/id sırası değişmez. Kesin kayıt guardları yazma anında yeniden çalışır. P01 talep/bekleme/worker kabulü bu okuma dilimiyle tamamlanmaz. DTO ve sınırlar: docs/p01-handover.md.
+
+## P01-B talep akışı teknik aktarımı — 19 Ekim 2026
+
+Talep/alternatif niyettir; yer, kaynak veya hak ayırmaz. Alternatif seçimi merkez onayı değildir. Altı komut açık center_id; create dışındakiler lesson_request_id/expected_version ister. management_state_get_v1 aynı işlem selector'ıyla ebeveyn/alternatif sürümünü canlı kapsamda okur. Kesin onay var olan session_create/reservation_create guardlarını yeniden çalıştırır; mevcut yayımlanmış rezervasyon belge kabulünü de tüketir. Geç hata tüm talep/seans/rezervasyon/hak ve iç receipt/audit sonuçlarını atomik geri alır. Belge API'leri P05, bekleme/teklif/worker P01-C'de açıktır. Sayısal expiry politikası eklenmedi. Uygulama ve runtime kabul sınırları docs/p01-handover.md içindedir.

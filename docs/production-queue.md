@@ -4,16 +4,16 @@
 
 ## Şimdi yapılacak iş
 
-**P00, PR #21 kurtarması ve PR #23 CI bakımı kapalı; P01-A in_progress.** Güncel main 24007212005d07938fb1265a9f42891f18d7fa09; [aynı SHA main clean 39298247595](https://github.com/SXQHex/FtkSaaS/actions/runs/39298247595) başarılı: 409 test, sıfır annotation warning/error, merged-candidate relation doğrulandı. Node24 Action kurulumu tek seferlik açık kullanıcı onayıyla yapıldı; bu yetki P01'in normal merge kapısına istisna vermez.
+**P00, PR #21 kurtarması ve PR #23 CI bakımı kapalı; P01 in_progress.** Güncel main 24007212005d07938fb1265a9f42891f18d7fa09; [aynı SHA main clean 39298247595](https://github.com/SXQHex/FtkSaaS/actions/runs/39298247595) başarılı: 409 test, sıfır annotation warning/error, merged-candidate relation doğrulandı. Node24 Action kurulumu tek seferlik açık kullanıcı onayıyla yapıldı; bu yetki P01'in normal merge kapısına istisna vermez.
 
-[P01 devri](p01-handover.md): A katalog/seans bağlamlı hak okuması uygulanmış; B talep/alternatif/onay; C bekleme/yer teklifi/worker açıktır. Mevcut PR #22 güncel main'e taşınır; mükerrer teslim açılmaz. Eski head 580239075b16f6ac6893d5ac01975d32133d0757 hedefli run 39281409902: 119 yapı/politika + 27 DB + 51 API başarılıdır. Yeni birleşik head için hedefli kabul, bağımsız son inceleme ve aday/main clean bekler; önceki başarı yeni kaynağa taşınmaz.
+[P01 devri](p01-handover.md): A okuma dilimi head b8d9adcff3607d7e055c5c71a9d4f8d5ca3a6013 hedefli 39303865804 ve aday 39304797200 ile geçti; merge edilmedi. B altı talep komutu ve yönetim sürüm okumaları uygulandı, yeni runtime kabulü bekliyor. C yedi API ve gerçek worker açık. Son kullanıcı kararıyla P01 bütünü aynı ayrı dal/PR #22 içinde geliştirilir: commit başına hedefli test; ara aday clean/merge yok; bütün P01 sonunda son inceleme ve toplu aday/main kabulü. Önceki clean yeni kaynağın kanıtı değildir.
 
 Bu planın başlangıç envanteri 199 toplam / 104 çağrılabilir / 95 contract_only / 29 migration'dır. Yedi grup başlangıçtaki 95 işlemi birer kez kapsar. Yeni sözleşme ihtiyacı ayrıca açıklanır; sayılar başarı hedefi değildir.
 
 | Sıra | Teslim | Başlangıç işlem sayısı | Durum | PR/head | Devam |
 |---|---|---:|---|---|---|
 | P00 | CI ayrımı | — | done | #19 / main b4a704a6897353bb0d54355903267b62d8d72496 | main clean 39242063000 başarılı; koruma yönetici sınırı açık |
-| P01 | Talep, rezervasyon ve bekleme | 14 | in_progress | #22 / feature/p01-request-reservation-flow | CI bakımı main kabulü tamam; güncel main ile birleşik P01-A hedefli/adayı/main kabulü bekliyor; B/C 13 API açık |
+| P01 | Talep, rezervasyon ve bekleme | 14 | in_progress | #22 / feature/p01-request-reservation-flow | A kaynak kabulü geçti, merge edilmedi; B uygulandı/runtime bekliyor; C 7 API/worker açık; toplu clean P01 sonunda |
 | P02 | Paket ve seans yaşam döngüsü | 15 | queued | — | önceki teslimin main kabulünden sonra |
 | P03 | Finans ve eğitmen ödemeleri | 7 | queued | — | önceki teslimin main kabulünden sonra |
 | P04 | CRM ve public başvuru | 11 | queued | — | önceki teslimin main kabulünden sonra |
@@ -65,16 +65,10 @@ Aşağıdaki kurallarla sıradaki açık teslimi uygula; kullanıcı her teslim 
 
 ### P01 — Talep, rezervasyon ve bekleme
 
-Ortak üretim promptunu uygula. Durum: in_progress — A okuma dilimi uygulandı, kabul bekliyor. B/C 13 API açık.
+Ortak üretim promptunu uygula. Durum: in_progress — A kaynak kabulü geçti, merge edilmedi. B uygulandı; hedefli runtime kabulü bekliyor. C 7 API ve worker açık.
 
-**Kalan sözleşme API'leri (13):**
+**Kalan sözleşme API'leri (7):**
 
-- `lesson_request_create_v1`
-- `lesson_request_withdraw_v1`
-- `lesson_request_reject_v1`
-- `lesson_request_offer_alternative_v1`
-- `lesson_request_accept_alternative_v1`
-- `lesson_request_approve_v1`
 - `waitlist_join_v1`
 - `waitlist_leave_v1`
 - `seat_offer_accept_v1`
@@ -83,7 +77,7 @@ Ortak üretim promptunu uygula. Durum: in_progress — A okuma dilimi uygulandı
 - `seat_offer_expire_v1`
 - `request_expire_v1`
 
-P01-A: products_list_v1 ve entitlements_get_v1 seans bağlamı uygulandı; hedefli/son aday/main kabulü bekliyor. Bu dilim yeniden geliştirilmez; kalan akışla entegrasyon devam eder.
+P01-A: products_list_v1 ve entitlements_get_v1 seans bağlamı uygulandı ve b8d9adc kaynağında hedefli/adayı geçti; main kabulü yok. P01-B: altı talep komutu ve management_state_get_v1 üzerinden kapsamlı sürüm/alternatif okuması uygulandı; hedefli runtime kabulü bekliyor. Bitmiş uygulama yeniden yazılmaz. P01 bütünü son hedefli kabul ve bağımsız incelemeden önce merge edilmez; ara aday clean başlatılmaz.
 
 **Görev ve kabul:**
 

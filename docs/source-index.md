@@ -17,7 +17,7 @@ Güncel uygulama SHA/CI ve teslim durumu için [tek devir özeti](../contracts/0
 | 7 | [03 sorumluluklar](../contracts/03-FtkSaaS-kodlama-sorumluluklari.md) | Backend/frontend alan sahipliği; güncel çalışma düzeni kök AGENTS’ta |
 | 8 | [04 şema](../contracts/04-FtkSaaS-O4-veri-semasi.md), [05 API](../contracts/05-FtkSaaS-O4-API-katalogu.md), [06 durum/hata/izin](../contracts/06-FtkSaaS-O4-durum-hata-izin.md) | Fiziksel/API sözlükleri; kesin DDL supabase/migrations, işlem tipleri 08 |
 | 9 | [08 makine sözleşmesi](../contracts/08-FtkSaaS-tip-ve-operasyon-sozlesmesi.json) | Tipler, işlem/izin/guard ve implementation_status; katalog varlığı runtime kabulü değildir |
-| 10 | [Endpoint envanteri](endpoint-inventory.json), [runtime listesi](../supabase/functions/backend-v1/implemented.json) | Üretilmiş 199 işlem envanteri ve 105 çağrılabilir işlem; 94 contract_only |
+| 10 | [Endpoint envanteri](endpoint-inventory.json), [runtime listesi](../supabase/functions/backend-v1/implemented.json) | Üretilmiş 199 işlem envanteri ve 111 çağrılabilir işlem; 88 contract_only |
 
 ## Kabul edilmiş kararlar
 
@@ -42,7 +42,7 @@ Her uygulama PR’si etkilediği sözleşmeleri, envanteri, kalan işleri ve dev
 [Program/seans devri](program-session-handover.md) yedi yeni komutun immutable program, oluşum değişikliği, miras/override, DST, sürüm ve rezervasyon koruma sözleşmesini açıklar. [Kaynak raporu](../reports/program-session-verification.json) geliştirme kanıtıdır; son head temiz CI ayrıca denetlenir.
 
 
-[DS-2026-10-17](decisions/DS-2026-10-17.md) son kabul edilmiş plan/yoklama, rezervasyon koruması, anlaşma, A→B hesaplaşma ve geçmiş satış hükümleridir. [Sprint devri](decision-sprint-handover.md) hedef sözleşme/runtime/kanıt ayrımını; [F01–F33 haritası](feature-delivery.md) ürün–teknik–bağımlılık–uygulama–kabul eşlemesini; [koruma denetimi](branch-protection-review.md) yönetici erişim sınırını belirtir. İlk DS aktarımında 184 başlangıç işlemine 13 sözleşme eklenerek toplam 197 olmuştu; bu tarihsel aktarım sayısıdır. Güncel envanter 199/105/94’tir.
+[DS-2026-10-17](decisions/DS-2026-10-17.md) son kabul edilmiş plan/yoklama, rezervasyon koruması, anlaşma, A→B hesaplaşma ve geçmiş satış hükümleridir. [Sprint devri](decision-sprint-handover.md) hedef sözleşme/runtime/kanıt ayrımını; [F01–F33 haritası](feature-delivery.md) ürün–teknik–bağımlılık–uygulama–kabul eşlemesini; [koruma denetimi](branch-protection-review.md) yönetici erişim sınırını belirtir. İlk DS aktarımında 184 başlangıç işlemine 13 sözleşme eklenerek toplam 197 olmuştu; bu tarihsel aktarım sayısıdır. Güncel envanter 199/111/88’tir.
 
 [Son hesaplaşma yetki/iki taraflı akış kararı](decisions/DS-2026-10-17-settlement-revision.md) önceki OM kayıt/fallback hükümlerini değiştirir. DS-OPEN-01 karar düzeyinde kapalı; DS-OPEN-02 [son merkez bazlı yetki kararıyla](decisions/DS-2026-10-17-settlement-center-scope.md) karar düzeyinde kapalıdır. Aynı hesap ayrı A/B yetkileriyle başvuru/onay yapabilir; farklı hesap şartı ve fallback yoktur. Üç contract-only üçüncü-aşama/düzeltme uç çıkarıldı, üç authority read/set sözleşmesi eklendi; o revizyonun tarihsel toplamı 197/79/118 olarak aynı kalmıştı; güncel toplam değildir. Son revizyon raporu: reports/settlement-center-scope-verification.json; eski SHA raporu/CI yeni head kabulü değildir.
 
@@ -58,4 +58,4 @@ Her uygulama PR’si etkilediği sözleşmeleri, envanteri, kalan işleri ve dev
 
 [Sıralı üretim kuyruğu](production-queue.md) yedi teslimin API grupları, ortak üretim promptu, durum ve kapanan promptların kaldırılma kuralıdır. Her geliştirme görevinde devir/kalan işlerden sonra okunur. Full clean başlayınca ajan run/kaynak/sonraki adımı bildirip turu bitirir; kullanıcı sonucu getirene kadar polling/izleme yapmaz. Başarı kullanıcı dönüşünde GitHub kanıtıyla doğrulanır.
 
-[P01-A devri](p01-handover.md): katalog/seans bağlamlı satın alınmış hak okuması; yeni kaynak kabulü ve kalan talep/bekleme/worker akışı açık.
+[P01 devri](p01-handover.md): katalog/hak okuması ve altı talep komutu/sürüm okuması uygulandı; B runtime kabulü, bekleme/teklif/worker ve bütün P01 main kabulü açık.

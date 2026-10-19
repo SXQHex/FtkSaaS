@@ -1,6 +1,6 @@
 # FtkSaaS — güncel entegrasyon devri
 
-Durum ve doğrulanmış kaynak/CI için [tek güncel devir özetini](../contracts/00-FtkSaaS-yeni-sohbet-devir.md) esas alın: 199 sözleşme, 105 çağrılabilir, 94 yalnız sözleşme; 30 migration. Bu belge hosted backend'in aynı seviyeye güncellendiği iddiasını taşımaz; hosted 65 işlem smoke'u tarihsel ve ayrı kanıttır.
+Durum ve doğrulanmış kaynak/CI için [tek güncel devir özetini](../contracts/00-FtkSaaS-yeni-sohbet-devir.md) esas alın: 199 sözleşme, 111 çağrılabilir, 88 yalnız sözleşme; 31 migration. Bu belge hosted backend'in aynı seviyeye güncellendiği iddiasını taşımaz; hosted 65 işlem smoke'u tarihsel ve ayrı kanıttır.
 
 [Hesaplaşma entegrasyonu](settlement-handover.md): dokuz yeni API, ayrı A/B yetki kapsamı, yalnız B onayında finansal commit ve bağlı düzeltme.
 
@@ -23,7 +23,7 @@ Frontend gerçek uçtan uca kabulü ve yük/restore açık; mock kabul değildir
 Aşağıdaki metinler önceki teslim snapshot'larıdır. Kurulum/transport ayrıntıları güncel typed sözleşmeyle doğrulanır; eski işlem sayıları ve kapanmış açıklar bugünkü durum değildir.
 
 
-[P01-A devri](p01-handover.md): katalog/seans bağlamlı satın alınmış hak okuması; yeni kaynak kabulü ve kalan talep/bekleme/worker akışı açık.
+[P01 devri](p01-handover.md): katalog/hak okuması ve altı talep komutu/sürüm okuması uygulandı; B runtime kabulü, bekleme/teklif/worker ve bütün P01 main kabulü açık.
 
 <details>
 <summary>Önceki entegrasyon notları (tarihsel)</summary>

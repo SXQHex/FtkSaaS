@@ -25,6 +25,26 @@ function references(op,defs){
  visit(op);return found;
 }
 
+// Shared management is never owned wholesale by a module. Only additive P01
+// request projection/selector changes may use its focused regression profile.
+function managementRequestDelta(base,head,oldOp,newOp,changed,profile){
+ if(!profile?.managementRequestProjection||!oldOp||!newOp)return false;
+ const ops=profile.operations;
+ const allowed=new Set(['Request_management_state_get','ManagementStateView','LessonRequestView','LessonRequestAlternativeView',...ops.map(n=>'ManagementSelector_'+n),...ops.map(n=>'Request_'+n.replace(/_v1$/,''))]);
+ if(changed.some(n=>!allowed.has(n)))return false;
+ const normalizeOp=o=>({...omit(o,['runtime_limits']),runtime_selectors:o.runtime_selectors?.filter(n=>!ops.includes(n)),features:o.features?.filter(n=>n!=='F09'),conditional_features:o.conditional_features?.filter(x=>!(x.feature==='F09'&&x.when==='lesson_request_selector'&&x.mode==='required_if_selected'))});
+ if(!same(normalizeOp(oldOp),normalizeOp(newOp)))return false;
+ // Existing management fields and non-request selector clauses must be equal.
+ const view=d=>({...d,properties:omit(d.properties,['request_detail'])});
+ if(!same(view(base.$defs.ManagementStateView),view(head.$defs.ManagementStateView)))return false;
+ const projection=head.$defs.ManagementStateView.properties.request_detail;
+ if(projection&&!same(projection,{$ref:'#/$defs/LessonRequestView'}))return false;
+ const request=d=>({...d,allOf:d.allOf.filter(x=>!ops.includes(x.if?.properties?.operation?.const))});
+ if(!same(request(base.$defs.Request_management_state_get),request(head.$defs.Request_management_state_get)))return false;
+ // Request-specific arms may evolve; no unrelated referenced definitions may.
+ return true;
+}
+
 // Evidence is derived from BOTH git snapshots. A filename alone never narrows
 // contracts, bundles, package scripts, manifests or appended migrations.
 export function analyzeDelta(changes,read,profiles){
@@ -62,7 +82,7 @@ export function analyzeDelta(changes,read,profiles){
    ]);
    const changed=[...changedDefs].filter(d=>refs.has(d));for(const d of changed)covered.add(d);
    if(!same(oldOps[n],newOps[n])||changed.length){
-    const owner=moduleForOperation(n);if(!owner)throw Error('Unmapped operation/definition consumer '+n);
+    const owner=moduleForOperation(n)??(n==='management_state_get_v1'?profiles.find(p=>managementRequestDelta(base,head,oldOps[n],newOps[n],changed,p)):null);if(!owner)throw Error('Unmapped operation/definition consumer '+n);
     affected.push(n);touched.set(owner.id,owner);
    }
   }

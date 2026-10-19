@@ -1,5 +1,14 @@
 # FtkSaaS — güncel devir
 
+## 19 Ekim 2026 — P01 ayrı dalda bütün olarak geliştiriliyor
+
+Main `24007212005d07938fb1265a9f42891f18d7fa09` ve main clean [39298247595](https://github.com/SXQHex/FtkSaaS/actions/runs/39298247595) başarılıdır. Mevcut ayrı dal `feature/p01-request-reservation-flow`, draft PR #22 korunur; mükerrer dal/PR açılmaz. P01-A head `b8d9adcff3607d7e055c5c71a9d4f8d5ca3a6013` hedefli [39303865804](https://github.com/SXQHex/FtkSaaS/actions/runs/39303865804) ve aday [39304797200](https://github.com/SXQHex/FtkSaaS/actions/runs/39304797200) başarılıdır; henüz merge edilmedi. Bu başarı sonraki kaynak değişikliklerine taşınmaz.
+
+Son kullanıcı kararı: her commit hedefli doğrulanır; ara P01 dilimlerinde aday clean/merge yoktur. Bütün P01 bittiğinde son-head bağımsız incelemesi, toplu aday full clean ve merge; ardından aynı main kabulü gerekir. P01 done değildir.
+
+P01-B altı talep komutu, ebeveyn sürüm okumaları ve dar rezervasyon-belge tüketicisi uygulandı; geliştirme kaynakları 199 sözleşme / 111 çağrılabilir / 88 contract_only / 31 migration içerir. Yerel generation/TypeScript ve 120 yapı/politika testi geçti; yeni Auth→Edge→RPC kabulü bekliyor. B'nin çalışma zamanı kabulü veya main kurulumu tamamlandı sayılmaz. Kalan P01-C yedi bekleme/teklif/expiry API'si ve gerçek worker işletimidir. [Ayrıntılı devir](../docs/p01-handover.md).
+
+
 ## 19 Ekim 2026 — CI bakımı kapalı, P01-A yeni aday
 
 PR #23 tek seferlik güvenilir workflow kurulumu kullanıcı onayıyla normal merge yolundan 24007212005d07938fb1265a9f42891f18d7fa09 main SHA'sına alındı. [Aynı main clean 39298247595](https://github.com/SXQHex/FtkSaaS/actions/runs/39298247595) başarılı: 409 test (110 yapı/politika + 27 DB + 272 API), sıfır annotation warning/error; Verify merged candidate relation başarılı. Aday clean 39282766184 ile main tree 2b7a76e73ca1e2efd201b0d9a18bea4afe12007b ve iki parent ilişkisi doğrulandı. Repository ayarı, sahte başarı status'u veya required-check bypass yapılmadı; tek seferlik kurulum yetkisi sıradan P01 kabulüne taşınmaz.

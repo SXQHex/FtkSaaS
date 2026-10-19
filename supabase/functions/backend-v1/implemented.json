@@ -104,6 +104,12 @@
     "settlement_authority_get_v1",
     "settlement_delegation_set_v1",
     "settlement_authority_set_v1",
-    "products_list_v1"
+    "products_list_v1",
+    "lesson_request_create_v1",
+    "lesson_request_withdraw_v1",
+    "lesson_request_reject_v1",
+    "lesson_request_offer_alternative_v1",
+    "lesson_request_accept_alternative_v1",
+    "lesson_request_approve_v1"
   ]
 }

@@ -1458,8 +1458,8 @@
     },
     {
       "name": "lesson_request_create_v1",
-      "status": "contract_only",
-      "external_path": null,
+      "status": "operational_development_limited",
+      "external_path": "/functions/v1/backend-v1/lesson_request_create_v1",
       "permission": "request.write",
       "features": [
         "F09"
@@ -1467,22 +1467,26 @@
       "required_features": [
         "F09"
       ],
-      "runtime_required_features": [],
+      "runtime_required_features": [
+        "F09"
+      ],
       "decision_delivery": {
         "accepted_contract": "DS-2026-10-17",
-        "runtime_conformance": "pending",
+        "runtime_conformance": "p01_request_workflow_runtime_pending",
         "open_dependencies": [],
         "target_request": {
           "$ref": "#/$defs/Request_lesson_request_create"
         }
       },
       "billing_class": "request",
-      "limits": []
+      "limits": [
+        "P01-B implemented; runtime acceptance pending. Worker expiration and waitlist are separate unfinished P01 work."
+      ]
     },
     {
       "name": "lesson_request_withdraw_v1",
-      "status": "contract_only",
-      "external_path": null,
+      "status": "operational_development_limited",
+      "external_path": "/functions/v1/backend-v1/lesson_request_withdraw_v1",
       "permission": "request.write",
       "features": [
         "F09"
@@ -1490,22 +1494,26 @@
       "required_features": [
         "F09"
       ],
-      "runtime_required_features": [],
+      "runtime_required_features": [
+        "F09"
+      ],
       "decision_delivery": {
         "accepted_contract": "DS-2026-10-17",
-        "runtime_conformance": "pending",
+        "runtime_conformance": "p01_request_workflow_runtime_pending",
         "open_dependencies": [],
         "target_request": {
           "$ref": "#/$defs/Request_lesson_request_withdraw"
         }
       },
       "billing_class": "maintenance",
-      "limits": []
+      "limits": [
+        "P01-B implemented; runtime acceptance pending. Worker expiration and waitlist are separate unfinished P01 work."
+      ]
     },
     {
       "name": "lesson_request_reject_v1",
-      "status": "contract_only",
-      "external_path": null,
+      "status": "operational_development_limited",
+      "external_path": "/functions/v1/backend-v1/lesson_request_reject_v1",
       "permission": "request.resolve",
       "features": [
         "F09"
@@ -1513,22 +1521,26 @@
       "required_features": [
         "F09"
       ],
-      "runtime_required_features": [],
+      "runtime_required_features": [
+        "F09"
+      ],
       "decision_delivery": {
         "accepted_contract": "DS-2026-10-17",
-        "runtime_conformance": "pending",
+        "runtime_conformance": "p01_request_workflow_runtime_pending",
         "open_dependencies": [],
         "target_request": {
           "$ref": "#/$defs/Request_lesson_request_reject"
         }
       },
       "billing_class": "maintenance",
-      "limits": []
+      "limits": [
+        "P01-B implemented; runtime acceptance pending. Worker expiration and waitlist are separate unfinished P01 work."
+      ]
     },
     {
       "name": "lesson_request_offer_alternative_v1",
-      "status": "contract_only",
-      "external_path": null,
+      "status": "operational_development_limited",
+      "external_path": "/functions/v1/backend-v1/lesson_request_offer_alternative_v1",
       "permission": "request.resolve",
       "features": [
         "F09"
@@ -1536,22 +1548,26 @@
       "required_features": [
         "F09"
       ],
-      "runtime_required_features": [],
+      "runtime_required_features": [
+        "F09"
+      ],
       "decision_delivery": {
         "accepted_contract": "DS-2026-10-17",
-        "runtime_conformance": "pending",
+        "runtime_conformance": "p01_request_workflow_runtime_pending",
         "open_dependencies": [],
         "target_request": {
           "$ref": "#/$defs/Request_lesson_request_offer_alternative"
         }
       },
       "billing_class": "maintenance",
-      "limits": []
+      "limits": [
+        "P01-B implemented; runtime acceptance pending. Worker expiration and waitlist are separate unfinished P01 work."
+      ]
     },
     {
       "name": "lesson_request_accept_alternative_v1",
-      "status": "contract_only",
-      "external_path": null,
+      "status": "operational_development_limited",
+      "external_path": "/functions/v1/backend-v1/lesson_request_accept_alternative_v1",
       "permission": "request.write",
       "features": [
         "F09"
@@ -1559,22 +1575,26 @@
       "required_features": [
         "F09"
       ],
-      "runtime_required_features": [],
+      "runtime_required_features": [
+        "F09"
+      ],
       "decision_delivery": {
         "accepted_contract": "DS-2026-10-17",
-        "runtime_conformance": "pending",
+        "runtime_conformance": "p01_request_workflow_runtime_pending",
         "open_dependencies": [],
         "target_request": {
           "$ref": "#/$defs/Request_lesson_request_accept_alternative"
         }
       },
       "billing_class": "request",
-      "limits": []
+      "limits": [
+        "P01-B implemented; runtime acceptance pending. Worker expiration and waitlist are separate unfinished P01 work."
+      ]
     },
     {
       "name": "lesson_request_approve_v1",
-      "status": "contract_only",
-      "external_path": null,
+      "status": "operational_development_limited",
+      "external_path": "/functions/v1/backend-v1/lesson_request_approve_v1",
       "permission": "request.resolve",
       "features": [
         "F09"
@@ -1582,17 +1602,21 @@
       "required_features": [
         "F09"
       ],
-      "runtime_required_features": [],
+      "runtime_required_features": [
+        "F09"
+      ],
       "decision_delivery": {
         "accepted_contract": "DS-2026-10-17",
-        "runtime_conformance": "pending",
+        "runtime_conformance": "p01_request_workflow_runtime_pending",
         "open_dependencies": [],
         "target_request": {
           "$ref": "#/$defs/Request_lesson_request_approve"
         }
       },
       "billing_class": "request",
-      "limits": []
+      "limits": [
+        "P01-B implemented; runtime acceptance pending. Worker expiration and waitlist are separate unfinished P01 work."
+      ]
     },
     {
       "name": "reservation_create_v1",
@@ -4640,7 +4664,9 @@
       "status": "operational_development_limited",
       "external_path": "/functions/v1/backend-v1/management_state_get_v1",
       "permission": "management.inspect",
-      "features": [],
+      "features": [
+        "F09"
+      ],
       "required_features": [],
       "runtime_required_features": [],
       "decision_delivery": {
@@ -4653,7 +4679,7 @@
       },
       "billing_class": "read",
       "limits": [
-        "management_state_get only negcredit_valuation_set selector"
+        "Narrow live original-write authority: negative valuation and P01 lesson request selectors only; other selectors remain unavailable. Request workflow runtime acceptance pending."
       ]
     },
     {

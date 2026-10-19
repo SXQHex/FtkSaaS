@@ -133,3 +133,20 @@ test('actual P01-A branch delta selects two suites even with accumulated generat
  const p=select(changes,{evidence:analyzeDelta(changes,read,[profile])});
  assert.equal(p.broad,false);assert.deepEqual(p.api,['tests/api-acceptance.test.mjs',p01Suite]);assert.deepEqual(p.priority,[p01Suite]);
 });
+
+test('request projection focus cannot own unrelated shared management contract changes',()=>{
+ const path=contractPath,owned='lesson_request_create_v1',suite='tests/p01-lesson-requests.test.mjs';
+ const p={id:'requests',sources:[],operations:[owned],managementRequestProjection:true,suites:[suite]};
+ const snapshot={$defs:{ManagementStateView:{type:'object',properties:{current:{type:'string'}},required:['current']},Request_management_state_get:{type:'object',properties:{page:{type:'string'}},allOf:[]}},'x-contract':{operations:[{name:'management_state_get_v1',request:{$ref:'#/$defs/Request_management_state_get'},success:{$ref:'#/$defs/ManagementStateView'},features:[],conditional_features:[],runtime_selectors:['negcredit_valuation_set_v1'],permission:'management.inspect'}]}};
+ const focused=structuredClone(snapshot);focused.$defs.ManagementStateView.properties.request_detail={$ref:'#/$defs/LessonRequestView'};focused.$defs.LessonRequestView={type:'object',properties:{id:{type:'string'}}};
+ focused['x-contract'].operations[0].runtime_selectors.push(owned);
+ const changes=[{status:'M',path}],run=head=>select(changes,{evidence:analyzeDelta(changes,(side,file)=>file===path?JSON.stringify(side==='base'?snapshot:head):null,[p])});
+ assert.equal(run(focused).broad,false);
+ for(const mutate of [
+  h=>h.$defs.ManagementStateView.properties.current.type='number',
+  h=>h.$defs.Request_management_state_get.properties.page.type='number',
+  h=>h['x-contract'].operations[0].permission='account.self',
+  h=>h['x-contract'].operations[0].runtime_selectors.push('unrelated_v1'),
+  h=>h.$defs.ManagementStateView.required.push('request_detail')
+ ]){const h=structuredClone(focused);mutate(h);assert.equal(run(h).broad,true);}
+});

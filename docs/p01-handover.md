@@ -1,3 +1,21 @@
+# P01 — talep, rezervasyon ve bekleme devri
+
+## B uygulama dilimi — runtime kabulü bekliyor
+
+A için b8d9adcff3607d7e055c5c71a9d4f8d5ca3a6013 kaynaklı hedefli 39303865804 ve aday 39304797200 başarılıdır. Main 24007212005d07938fb1265a9f42891f18d7fa09; PR #22 draft tutulur. Son kullanıcı kararına göre P01 bütünü aynı feature dalında tamamlanır; ara clean/merge yok, commit başına hedefli test vardır. A clean'i B kaynağını doğrulamaz.
+
+199 sözleşme / 111 geliştirme ortamında çağrılabilir / 88 contract_only / 31 migration. Altı lesson_request komutu create/withdraw/reject/offer_alternative/accept_alternative/approve uygulandı. Yeni ebeveyn/alternatif görünümü management_state_get_v1 selector'larıyla alınır; yeni liste API'si eklenmedi. Yerel generation/TypeScript ve 120 yapı/politika testi geçti; yeni runtime kabulü bekliyor.
+
+- Bütün komutlar açık merkez kapsamı ister. Create dışındakiler ebeveyn lesson_request_id ve expected_version ister; alternatif seçimi ayrıca alternative_id alır. Okuma request_detail ve alternatives içinde sürümleri verir; cursor aktör/filtre/sort kapsamına bağlıdır. Canlı CM veya açık request.write/request.resolve staff yetkisi ilgili komuta göre denetlenir; öğrenci yalnız kendi talebini yazar.
+- Talep ve alternatifler yer/kaynak/hak ayırmaz. Aynı açık talep yeni işlem anahtarıyla çoğaltılamaz. Alternatif seçmek kesin kayıt veya merkez onayı değildir. Değişiklikler ebeveyn satırı kilidi ve sürümüyle yarışır; eski sürüm reddedilir.
+- Merkez onayı mevcut tam eşleşen özel seansa veya istenen zaman/disiplin için yeni özel seansa bağlanır. Mevcut session_create/reservation_create yazarları kullanılır; plan, kaynak, kapasite, pencere, katılım ve hak guardları yeniden çalışır. Başarılı rezervasyon ve talep durumu atomiktir; geç hata yeni seans, kaynak, hak, receipt/audit dahil bütün iç adımları geri alır.
+- Dar P05 bağımlılığı mevcut yayımlanmış reservation belge gerekliliklerini ve hedef kişinin kabul kanıtını tüketir. Belge yükleme/yayımlama/kabul API'leri P05'te açıktır; bu dilimde tamamlanmış sayılmaz.
+- Sayısal talep TTL'i uydurulmadı. expires_at doluysa geç onay/alternatif yazması reddedilir; otomatik expiry/worker P01-C'de açıktır. C: waitlist_join/leave, seat_offer_accept/reject/issue/expire, request_expire ve gerçek dar sistem kimliği/claim/lease/tekrar yolu.
+
+Kaynak kabulü: tests/p01-lesson-requests.test.mjs. SQL çalışma zamanı henüz GitHub hedefli kabulü bekler; static testler runtime passed değildir. Hosted güncelleme, frontend veya production dağıtımı yapılmadı.
+
+## Önceki A uygulama ve teşhis kayıtları
+
 # P01-A — katalog ve seans bağlamında satın alınmış hak okuması
 
 Başlangıç main: 9ce0a5639417f959111b11f70157156733e3de18. Aynı SHA [main clean 39252687560](https://github.com/SXQHex/FtkSaaS/actions/runs/39252687560) başarılı; PR #21 kabul kurtarması kapalıdır. Eski PR #20'nin belge istisnası runtime'a taşınmadı. Bu başarı yeni kaynak kabulü değildir.
