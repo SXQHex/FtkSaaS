@@ -158,7 +158,7 @@ test('P01-A catalog and purchased-right reads through real Auth -> Edge -> RPC',
  });
  await t.test('read paths do not allocate, create receipts or mutate finance/audit/outbox',async()=>{
   const names=['entitlement_allocations','entitlement_movements','operation_receipts','audit_events','outbox_jobs','notifications','cash_movements'];
-  const counts=async()=>Promise.all(names.map(async n=>(await rows('select count(*)::int n from core.'+n+' where org_id=$1',[org]))[0].n));
+  const counts=async()=>{const result=[];for(const n of names)result.push((await rows('select count(*)::int n from core.'+n+' where org_id=$1',[org]))[0].n);return result;};
   const before=await counts();await catalog();await read(self.u,{session_id:ses});await read(self.u,{include_timed_rights:true});assert.deepEqual(await counts(),before);
  });
  await t.test('role, student link and Auth session revocations apply on the next read',async()=>{

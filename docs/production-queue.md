@@ -2,6 +2,8 @@
 
 19 Ekim 2026 kullanıcı talimatı. Tek aktif üretim prompt kaynağı bu dosyadır; [kalan işler](remaining-work.md) ve [F01–F33](feature-delivery.md) ürün/uygulama durumunu tutmaya devam eder. İkinci sözleşme ağacı değildir.
 
+P01-B hedefli run [39317251796](https://github.com/SXQHex/FtkSaaS/actions/runs/39317251796) / 7ef51f2 başarısız: org-only discipline_save fixture'ına center_id eklenmesi nedeniyle hazırlık reddedildi; B davranış vakaları çalışmadı. Fixture ve pg sayaç uyarısı düzeltildi; yeni hedefli kabul bekliyor. [Teşhis](p01-handover.md).
+
 ## Şimdi yapılacak iş
 
 **P00, PR #21 kurtarması ve PR #23 CI bakımı kapalı; P01 in_progress.** Güncel main 24007212005d07938fb1265a9f42891f18d7fa09; [aynı SHA main clean 39298247595](https://github.com/SXQHex/FtkSaaS/actions/runs/39298247595) başarılı: 409 test, sıfır annotation warning/error, merged-candidate relation doğrulandı. Node24 Action kurulumu tek seferlik açık kullanıcı onayıyla yapıldı; bu yetki P01'in normal merge kapısına istisna vermez.

@@ -4,6 +4,8 @@ Güncel kaynak ve CI: [doğrulanmış devir](../contracts/00-FtkSaaS-yeni-sohbet
 
 [P01 devri](p01-handover.md): A katalog/hak okuması b8d9adc kaynağında hedefli/adayı geçti, merge edilmedi. B altı talep komutu ve sürüm/alternatif okuması uygulandı; yeni runtime kabulü bekliyor. Kalan C yedi API ve gerçek worker işletimidir. P01 aynı feature dalı/PR #22 içinde tamamlanır; commit başına hedefli test, bütün P01 sonunda toplu clean/merge. Main 24007212005d07938fb1265a9f42891f18d7fa09 / clean 39298247595 başarılıdır. Hosted eski smoke yeni kaynak kabulü değildir.
 
+P01-B hedefli run [39317251796](https://github.com/SXQHex/FtkSaaS/actions/runs/39317251796) / 7ef51f2 başarısız: org-only discipline_save fixture'ına center_id eklenmesi nedeniyle hazırlık reddedildi; B davranış vakaları çalışmadı. Fixture ve pg sayaç uyarısı düzeltildi; yeni hedefli kabul bekliyor. [Teşhis](p01-handover.md).
+
 ## Aktif seri üretim
 
 [Üretim kuyruğu](production-queue.md), aşağıdaki mevcut envanteri P01–P07 sırasıyla gruplar ve ajan promptlarını taşır. İlk önkoşul P00 CI kabulüdür. Tamamlayan ajan kuyruktaki aktif promptu kısaltır/kaldırır ve bu envanterle eşitler. Full clean başladıktan sonra ajan izlemeyi bırakıp run/head/sonraki adımla kullanıcıya devreder; kullanıcı sonucunu getirince doğrular ve devam eder.

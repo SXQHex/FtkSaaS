@@ -1,5 +1,12 @@
 # P01 — talep, rezervasyon ve bekleme devri
 
+## P01-B ilk hedefli kabul hatası ve odaklı düzeltme
+
+Kaynak `7ef51f2b3c6b791eec27acbfb648b7c23b6e2b74` / [run 39317251796](https://github.com/SXQHex/FtkSaaS/actions/runs/39317251796) başarısızdır. 31 migration uygulandı, 120 yapı/politika ve 27 DB testi geçti; P01-A 10 test düğümü geçti. P01-B hazırlığı discipline_save_v1 isteğine merkez kapsamı eklediği için kapalı DTO VALIDATION_FAILED döndürdü; talep davranış alt vakalarına ulaşılmadı. Organizasyon disiplini fixture'ı açık org-only istek kullanacak şekilde düzeltildi. Runtime/DTO gevşetilmedi.
+
+P01-A'nın aynı pg.Client üzerindeki Promise.all sayaç sorguları pg istemci deprecation uyarısı üretiyordu; sayaç okumaları sırayla await edilir. Gerçek yarış API istekleri paralel kalır. Yeni kaynağın hedefli runtime kabulü bekler. P01-C yedi API/worker açık; ara full clean/merge yoktur.
+
+
 ## B uygulama dilimi — runtime kabulü bekliyor
 
 A için b8d9adcff3607d7e055c5c71a9d4f8d5ca3a6013 kaynaklı hedefli 39303865804 ve aday 39304797200 başarılıdır. Main 24007212005d07938fb1265a9f42891f18d7fa09; PR #22 draft tutulur. Son kullanıcı kararına göre P01 bütünü aynı feature dalında tamamlanır; ara clean/merge yok, commit başına hedefli test vardır. A clean'i B kaynağını doğrulamaz.

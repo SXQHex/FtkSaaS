@@ -1,5 +1,7 @@
 # FtkSaaS — güncel devir
 
+P01-B son hedefli kaynak 7ef51f2b3c6b791eec27acbfb648b7c23b6e2b74 / run 39317251796 başarısızdır: organizasyon disiplini fixture'ının fazladan center_id alanı DTO reddi verdi; B davranış vakaları başlamadı. 31 migration, 120 yapı/politika ve 27 DB testi geçti. Fixture ve pg sayaç sorgusu uyarısı odaklı düzeltildi; yeni head hedefli kabulü bekler. Runtime sözleşmesi gevşetilmedi; [teşhis](../docs/p01-handover.md).
+
 ## 19 Ekim 2026 — P01 ayrı dalda bütün olarak geliştiriliyor
 
 Main `24007212005d07938fb1265a9f42891f18d7fa09` ve main clean [39298247595](https://github.com/SXQHex/FtkSaaS/actions/runs/39298247595) başarılıdır. Mevcut ayrı dal `feature/p01-request-reservation-flow`, draft PR #22 korunur; mükerrer dal/PR açılmaz. P01-A head `b8d9adcff3607d7e055c5c71a9d4f8d5ca3a6013` hedefli [39303865804](https://github.com/SXQHex/FtkSaaS/actions/runs/39303865804) ve aday [39304797200](https://github.com/SXQHex/FtkSaaS/actions/runs/39304797200) başarılıdır; henüz merge edilmedi. Bu başarı sonraki kaynak değişikliklerine taşınmaz.

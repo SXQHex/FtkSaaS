@@ -17,7 +17,7 @@ test('P01-B request intent, alternatives and atomic guarded approval through Aut
  await mut('center_manager_assign_v1',{person_id:ownerPerson});
  const pay=await mut('saas_payment_submit_v1',{amount_minor:'1000',currency:'TRY',reference:'synthetic requests',occurred_at:new Date().toISOString()});
  await mut('saas_payment_verify_v1',{payment_id:pay.primary_id,accepted:true},platform);
- const discipline=(await mut('discipline_save_v1',{name:'Private',state:'active'})).primary_id;
+ const discipline=(await must(owner,'discipline_save_v1',{org_id:org,name:'Private',state:'active'},key())).primary_id;
  await mut('center_discipline_set_v1',{discipline_id:discipline,state:'active'});
  async function linked(label){
   const p=(await mut('person_create_v1',{display_name:label,contacts:[]})).primary_id;await mut('student_activate_v1',{person_id:p});
