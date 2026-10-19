@@ -10,7 +10,7 @@ Durum ve doğrulanmış kaynak/CI için [tek güncel devir özetini](../contract
 - [Anlaşma/hakediş](instructor-earnings-handover.md): güncel Pro/Business kapanışı, açık fiilî başlangıç, immutable ücret ve bağlı fark.
 - [Takvim/seans/rezervasyon okumaları](schedule-read-handover.md) ve [program/seans](program-session-handover.md): DTO, zaman, görünürlük ve sürüm sınırları; eski teslim açıkları güncel envanterle karşılaştırılır.
 - [API kataloğu](../contracts/05-FtkSaaS-O4-API-katalogu.md), [makine sözleşmesi](../contracts/08-FtkSaaS-tip-ve-operasyon-sozlesmesi.json) ve [endpoint envanteri](endpoint-inventory.json): kesin işlem adları ve uygulama durumları.
-- [Kalan işler](remaining-work.md): hesaplaşma, ödeme komutları ve tamamlanmamış tüketiciler.
+- [Kalan işler](remaining-work.md): eğitmen ödeme komutları ve tamamlanmamış tüketiciler.
 
 Transport: POST {API_URL}/functions/v1/backend-v1/{operation}; typed request JSON, Authorization: Bearer Supabase access_token ve apikey: publishable key kullanılır. Yanıt ok/data/trace_id veya ok:false/error zarfıdır. Service-only RPC/core/private doğrudan istemci erişimi değildir. Tekrar gönderimde aynı business işlem anahtarı korunur; sürüm ve önizleme bağımlılıkları yeniden doğrulanır.
 

@@ -64016,7 +64016,7 @@
         "transaction_guarantee": "Read authorized settlement_movements_list projection only; no domain/rights/earning/settlement/receipt mutation.",
         "operation_contract": {
           "kind": "read",
-          "target_entity": "planned.settlement",
+          "target_entity": "private.settlement_movements",
           "version_mode": "none",
           "version_field": null,
           "read_operation": null,
@@ -64146,7 +64146,7 @@
         "transaction_guarantee": "Read authorized settlement_requests_list projection only; no domain/rights/earning/settlement/receipt mutation.",
         "operation_contract": {
           "kind": "read",
-          "target_entity": "planned.settlement",
+          "target_entity": "private.settlement_requests",
           "version_mode": "none",
           "version_field": null,
           "read_operation": null,
@@ -64276,7 +64276,7 @@
         "transaction_guarantee": "Read authorized settlement_request_get projection only; no domain/rights/earning/settlement/receipt mutation.",
         "operation_contract": {
           "kind": "read",
-          "target_entity": "planned.settlement",
+          "target_entity": "private.settlement_requests",
           "version_mode": "none",
           "version_field": null,
           "read_operation": null,
@@ -64412,7 +64412,7 @@
         "transaction_guarantee": "Atomic settlement_requests.pending_immutable_scope; audit + in-app outbox + receipt. External delivery never determines the domain commit.",
         "operation_contract": {
           "kind": "command",
-          "target_entity": "planned.settlement",
+          "target_entity": "private.settlement_requests",
           "version_mode": "append_or_current_scope_lock",
           "version_field": null,
           "read_operation": "settlement_request_get_v1",
@@ -64573,7 +64573,7 @@
         "transaction_guarantee": "Atomic settlement_requests.withdrawn; audit + in-app outbox + receipt. External delivery never determines the domain commit.",
         "operation_contract": {
           "kind": "command",
-          "target_entity": "planned.settlement",
+          "target_entity": "private.settlement_requests",
           "version_mode": "row_version",
           "version_field": "settlement_request_id",
           "read_operation": "settlement_request_get_v1",
@@ -64739,7 +64739,7 @@
         "transaction_guarantee": "B approve atomically finalizes request, frozen payment/offset/linked correction record, selected balances, audit, in-app outbox and receipt. Reject leaves balances unchanged and sends reason to A. No separate recorder; no bank transfer. All effects rollback together. Audit records verified decision account and stored B center/role/grant scope; same initiating account allowed only with live B authority.",
         "operation_contract": {
           "kind": "command",
-          "target_entity": "planned.settlement",
+          "target_entity": "private.settlement_requests",
           "version_mode": "row_version",
           "version_field": "settlement_request_id",
           "read_operation": "settlement_request_get_v1",
@@ -64910,7 +64910,7 @@
         "transaction_guarantee": "Authorized narrow administrative read; no financial or domain mutation.",
         "operation_contract": {
           "kind": "read",
-          "target_entity": "planned.settlement_authority",
+          "target_entity": "organizations",
           "version_mode": "none",
           "version_field": null,
           "read_operation": null,
@@ -65038,7 +65038,7 @@
         "transaction_guarantee": "Atomic scoped grant/revoke, authority aggregate version, audit, in-app outbox and receipt; rollback all on failure.",
         "operation_contract": {
           "kind": "command",
-          "target_entity": "planned.settlement_authority",
+          "target_entity": "organizations",
           "version_mode": "row_version",
           "version_field": "org_id",
           "read_operation": "settlement_authority_get_v1",
@@ -65172,7 +65172,7 @@
         "transaction_guarantee": "Atomic scoped grant/revoke, authority aggregate version, audit, in-app outbox and receipt; rollback all on failure.",
         "operation_contract": {
           "kind": "command",
-          "target_entity": "planned.settlement_authority",
+          "target_entity": "organizations",
           "version_mode": "row_version",
           "version_field": "org_id",
           "read_operation": "settlement_authority_get_v1",
@@ -79022,6 +79022,53 @@
         "table": "private.lesson_deficit_movements",
         "kind": "append_only_linked_starter_deficit_state_history",
         "client_access": false
+      },
+      {
+        "table": "private.settlement_authority_versions",
+        "kind": "independent_authority_and_relevant_plan_generations",
+        "client_access": false
+      },
+      {
+        "table": "private.settlement_grants",
+        "kind": "exact_center_explicit_authority",
+        "client_access": false
+      },
+      {
+        "table": "private.settlement_movements",
+        "kind": "append_only_economics_versioned_open_balance",
+        "client_access": false
+      },
+      {
+        "table": "private.settlement_requests",
+        "kind": "immutable_selected_proposal_and_dependency_snapshots",
+        "client_access": false
+      },
+      {
+        "table": "private.settlement_records",
+        "kind": "immutable_approved_financial_facts",
+        "client_access": false
+      },
+      {
+        "table": "private.settlement_allocations",
+        "kind": "original_selection_and_versioned_reversible_amount",
+        "client_access": false
+      },
+      {
+        "table": "private.settlement_credit_units",
+        "kind": "stable_sale_minor_unit_distribution",
+        "client_access": false
+      },
+      {
+        "function": "private.settlement_dispatch",
+        "kind": "live_authorized_atomic_settlement_dispatch"
+      },
+      {
+        "function": "private.settlement_sync",
+        "kind": "source_right_and_performed_closure_share_and_reversal"
+      },
+      {
+        "function": "private.settlement_plan_dependency",
+        "kind": "frozen_relevant_plan_and_center_access_dependency"
       }
     ],
     "runtime": {
@@ -79213,8 +79260,8 @@
         "retro_reservation_attendance_earning": false,
         "timed_past_extension_carry": false
       },
-      "physical_storage": "pending append-only migration in runtime deliveries; no new table/migration in this contract PR",
-      "runtime_behavior_acceptance": "pending DS delivery; existing 241-test baseline is regression evidence only",
+      "physical_storage": "Runtime migrations through 29 include private settlement authority, grants, credit slices, movements, requests, records and allocations; exact DDL in supabase/migrations.",
+      "runtime_behavior_acceptance": "Starter plan/earning split, immutable agreements and cross-center settlement have named real Auth -> Edge -> RPC evidence; remaining gap cases stay pending. Final source SHA CI is verified separately.",
       "open_product_choices": [],
       "delivery_gaps": [
         {
@@ -79292,8 +79339,36 @@
             "settlement_delegation_set_v1",
             "settlement_authority_set_v1"
           ],
-          "status": "pending_runtime_and_auth_edge_rpc_acceptance",
-          "evidence": [],
+          "status": "passed_runtime",
+          "evidence": [
+            "tests/cross-center-settlement.test.mjs#DS-SET actual credited sale consumption creates A to B share independent of cash and B earning cost",
+            "tests/cross-center-settlement.test.mjs#DS-SET B package override applies to A source sale independently of share",
+            "tests/cross-center-settlement.test.mjs#DS-SET timed, same-center, released and not performed consumption create no transfer",
+            "tests/cross-center-settlement.test.mjs#DS-SET consuming no-show accrues share; pure release does not",
+            "tests/cross-center-settlement.test.mjs#DS-SET source-less negative initially creates no transfer; later eligible A sale settles past deficit without reprice",
+            "tests/cross-center-settlement.test.mjs#DS-SET B source settles its past deficit without any cross-center share",
+            "tests/cross-center-settlement.test.mjs#DS-SET explicit partial correction preserves original payment and uses exact original allocation versions",
+            "tests/cross-center-settlement.test.mjs#DS-SET correction rejects foreign and duplicated allocations; later correction after rights reversal preserves history",
+            "tests/cross-center-settlement.test.mjs#DS-SET rights reversal retains actual paid history and creates B to A refund residual at original amount",
+            "tests/cross-center-settlement.test.mjs#DS-SCOPE same account may submit under A and approve under independently verified B; partial payment closes only on approval",
+            "tests/cross-center-settlement.test.mjs#DS-SET withdrawal and reasoned rejection have no balance record and rejection notifies A",
+            "tests/cross-center-settlement.test.mjs#DS-SET explicit opposite-direction offset reduces both selected sides atomically and can be corrected",
+            "tests/cross-center-settlement.test.mjs#DS-AUTH A-only authority cannot decide; revoked B grant blocks same-key replay",
+            "tests/cross-center-settlement.test.mjs#DS-AUTH owner delegation and exact center grant chain does not imply operational authority",
+            "tests/cross-center-settlement.test.mjs#DS-SET linked replacement freezes changed scope and requires a new B approval",
+            "tests/cross-center-settlement.test.mjs#DS-SET selected-only stale; unrelated new lesson does not invalidate a pending request",
+            "tests/cross-center-settlement.test.mjs#DS-SET concurrent approvals and distinct requests never double-close selected balance",
+            "tests/cross-center-settlement.test.mjs#DS-ATOMIC distinct payment offset and correction requests serialize competing dependencies",
+            "tests/cross-center-settlement.test.mjs#DS-SET malformed offset, duplicate lines, cross-currency and foreign pair cannot close balances",
+            "tests/cross-center-settlement.test.mjs#DS-SET local-only sale cannot settle B deficit and unknown selection stays hidden",
+            "tests/cross-center-settlement.test.mjs#DS-SET frozen plan rejects version transitions and ABA but ignores billing bookkeeping",
+            "tests/cross-center-settlement.test.mjs#DS-AUTH revoke versus approve serializes and cannot commit after lost live B authority",
+            "tests/cross-center-settlement.test.mjs#DS-ATOMIC late outbox failure rolls back request record allocations balances and receipt",
+            "tests/cross-center-settlement.test.mjs#DS-ATOMIC ledger audit and receipt failures rollback the entire multi-line batch",
+            "tests/cross-center-settlement.test.mjs#DS-AUTH revoked delegation and B role reject old session and receipt",
+            "tests/cross-center-settlement.test.mjs#DS-SCOPE cursor bound to actor center currency filters; unrelated center and student reads denied",
+            "tests/cross-center-settlement.test.mjs#DS-SET multi-line payment correction reverses only selected original allocation"
+          ],
           "acceptance_kind": "real_auth_edge_rpc"
         },
         {
@@ -79321,7 +79396,7 @@
           "acceptance_kind": "real_auth_edge_rpc"
         }
       ],
-      "schema_status": "typed target DTOs and operation metadata only; physical schema unchanged",
+      "schema_status": "Typed DTOs and operation metadata are backed by runtime migrations for Starter, immutable agreements/earnings and cross-center settlement; remaining delivery gaps are explicitly pending.",
       "runtime_required_features_policy": "Frozen baseline live gates; required_features expresses DS target. Differences are delivery gaps, never reported as Starter runtime acceptance.",
       "acceptance_cases": [
         {
@@ -79447,97 +79522,137 @@
           "id": "DS-SET-01",
           "delivery_gap": "cross_center_settlement",
           "expected_flow": "A sale consumed at B resolves B actual instructor product override or B general agreement, never A agreement; credit price share follows real sale independently of teacher cost or cash collection.",
-          "status": "pending_runtime",
+          "status": "passed_runtime",
           "evidence_kind": "real_auth_edge_rpc",
-          "evidence": []
+          "evidence": [
+            "tests/cross-center-settlement.test.mjs#DS-SET actual credited sale consumption creates A to B share independent of cash and B earning cost",
+            "tests/cross-center-settlement.test.mjs#DS-SET B package override applies to A source sale independently of share"
+          ]
         },
         {
           "id": "DS-SET-02",
           "delivery_gap": "cross_center_settlement",
           "expected_flow": "B performed session plus consumed right creates A-to-B share, including consuming no-show/late cancellation; released right creates none.",
-          "status": "pending_runtime",
+          "status": "passed_runtime",
           "evidence_kind": "real_auth_edge_rpc",
-          "evidence": []
+          "evidence": [
+            "tests/cross-center-settlement.test.mjs#DS-SET actual credited sale consumption creates A to B share independent of cash and B earning cost",
+            "tests/cross-center-settlement.test.mjs#DS-SET timed, same-center, released and not performed consumption create no transfer",
+            "tests/cross-center-settlement.test.mjs#DS-SET consuming no-show accrues share; pure release does not"
+          ]
         },
         {
           "id": "DS-SET-03",
           "delivery_gap": "cross_center_settlement",
           "expected_flow": "Timed/unlimited use produces no A-to-B price transfer; B instructor cost still follows explicit B agreement.",
-          "status": "pending_runtime",
+          "status": "passed_runtime",
           "evidence_kind": "real_auth_edge_rpc",
-          "evidence": []
+          "evidence": [
+            "tests/cross-center-settlement.test.mjs#DS-SET timed, same-center, released and not performed consumption create no transfer"
+          ]
         },
         {
           "id": "DS-SET-04",
           "delivery_gap": "cross_center_settlement",
           "expected_flow": "Initial source-less negative closure creates no share; later eligible A credit deficit settlement creates share without earning reprice; B source creates no cross-center share.",
-          "status": "pending_runtime",
+          "status": "passed_runtime",
           "evidence_kind": "real_auth_edge_rpc",
-          "evidence": []
+          "evidence": [
+            "tests/cross-center-settlement.test.mjs#DS-SET source-less negative initially creates no transfer; later eligible A sale settles past deficit without reprice",
+            "tests/cross-center-settlement.test.mjs#DS-SET B source settles its past deficit without any cross-center share"
+          ]
         },
         {
           "id": "DS-SET-05",
           "delivery_gap": "cross_center_settlement",
           "expected_flow": "Linked credit return reverses original recorded share; prior payment preserved, excess creates B-to-A refund/offset balance.",
-          "status": "pending_runtime",
+          "status": "passed_runtime",
           "evidence_kind": "real_auth_edge_rpc",
-          "evidence": []
+          "evidence": [
+            "tests/cross-center-settlement.test.mjs#DS-SET explicit partial correction preserves original payment and uses exact original allocation versions",
+            "tests/cross-center-settlement.test.mjs#DS-SET correction rejects foreign and duplicated allocations; later correction after rights reversal preserves history",
+            "tests/cross-center-settlement.test.mjs#DS-SET rights reversal retains actual paid history and creates B to A refund residual at original amount"
+          ]
         },
         {
           "id": "DS-SET-06",
           "delivery_gap": "cross_center_settlement",
           "expected_flow": "Explicitly authorized A CM submits actual-payment/offset/correction proposal; balance stays open. Independently B-center-authorized CM (same account allowed) confirms receipt/acceptance and atomically finalizes record and selected balance effects. Reasoned rejection preserves balances and notifies A in-app.",
-          "status": "pending_runtime",
+          "status": "passed_runtime",
           "evidence_kind": "real_auth_edge_rpc",
-          "evidence": []
+          "evidence": [
+            "tests/cross-center-settlement.test.mjs#DS-SCOPE same account may submit under A and approve under independently verified B; partial payment closes only on approval",
+            "tests/cross-center-settlement.test.mjs#DS-SET withdrawal and reasoned rejection have no balance record and rejection notifies A",
+            "tests/cross-center-settlement.test.mjs#DS-SET explicit partial correction preserves original payment and uses exact original allocation versions",
+            "tests/cross-center-settlement.test.mjs#DS-SET explicit opposite-direction offset reduces both selected sides atomically and can be corrected"
+          ]
         },
         {
           "id": "DS-SET-07",
           "delivery_gap": "cross_center_settlement",
           "expected_flow": "Same account can initiate as authorized A CM and approve as independently authorized B CM; A-only authority never grants B approval. No distinct-account/person restriction or exception/fallback.",
-          "status": "pending_runtime",
+          "status": "passed_runtime",
           "evidence_kind": "real_auth_edge_rpc",
-          "evidence": []
+          "evidence": [
+            "tests/cross-center-settlement.test.mjs#DS-SCOPE same account may submit under A and approve under independently verified B; partial payment closes only on approval",
+            "tests/cross-center-settlement.test.mjs#DS-AUTH A-only authority cannot decide; revoked B grant blocks same-key replay"
+          ]
         },
         {
           "id": "DS-SET-08",
           "delivery_gap": "cross_center_settlement",
           "expected_flow": "CM/OM role alone and Owner without explicit per-center CM role/grant cannot read financial data or submit/approve. No separate OM payment stage, and B approval never initiates a bank transfer.",
-          "status": "pending_runtime",
+          "status": "passed_runtime",
           "evidence_kind": "real_auth_edge_rpc",
-          "evidence": []
+          "evidence": [
+            "tests/cross-center-settlement.test.mjs#DS-AUTH owner delegation and exact center grant chain does not imply operational authority",
+            "tests/cross-center-settlement.test.mjs#DS-AUTH A-only authority cannot decide; revoked B grant blocks same-key replay"
+          ]
         },
         {
           "id": "DS-SET-09",
           "delivery_gap": "cross_center_settlement",
           "expected_flow": "Pending initiator with live A authority may withdraw. Relevant changes require linked new pending scope/version and B reapproval; previously finalized allocations and history remain immutable.",
-          "status": "pending_runtime",
+          "status": "passed_runtime",
           "evidence_kind": "real_auth_edge_rpc",
-          "evidence": []
+          "evidence": [
+            "tests/cross-center-settlement.test.mjs#DS-SET withdrawal and reasoned rejection have no balance record and rejection notifies A",
+            "tests/cross-center-settlement.test.mjs#DS-SET linked replacement freezes changed scope and requires a new B approval"
+          ]
         },
         {
           "id": "DS-SET-10",
           "delivery_gap": "cross_center_settlement",
           "expected_flow": "Request freezes selected movement/amount/version; related correction stales it, unrelated new lesson does not; partial and concurrent closures cannot double-spend a share.",
-          "status": "pending_runtime",
+          "status": "passed_runtime",
           "evidence_kind": "real_auth_edge_rpc",
-          "evidence": []
+          "evidence": [
+            "tests/cross-center-settlement.test.mjs#DS-SET selected-only stale; unrelated new lesson does not invalidate a pending request",
+            "tests/cross-center-settlement.test.mjs#DS-SET concurrent approvals and distinct requests never double-close selected balance",
+            "tests/cross-center-settlement.test.mjs#DS-ATOMIC distinct payment offset and correction requests serialize competing dependencies"
+          ]
         },
         {
           "id": "DS-SET-11",
           "delivery_gap": "cross_center_settlement",
           "expected_flow": "Explicit approved same-currency offset reduces both selected sides atomically; no FX, automatic net or automatic cash transfer.",
-          "status": "pending_runtime",
+          "status": "passed_runtime",
           "evidence_kind": "real_auth_edge_rpc",
-          "evidence": []
+          "evidence": [
+            "tests/cross-center-settlement.test.mjs#DS-SET explicit opposite-direction offset reduces both selected sides atomically and can be corrected",
+            "tests/cross-center-settlement.test.mjs#DS-SET malformed offset, duplicate lines, cross-currency and foreign pair cannot close balances"
+          ]
         },
         {
           "id": "DS-SET-12",
           "delivery_gap": "cross_center_settlement",
           "expected_flow": "Business access and source-sale center/discipline scope checked before transfer/negative settlement; local-only A package cannot cover B current or past deficit.",
-          "status": "pending_runtime",
+          "status": "passed_runtime",
           "evidence_kind": "real_auth_edge_rpc",
-          "evidence": []
+          "evidence": [
+            "tests/cross-center-settlement.test.mjs#DS-SET local-only sale cannot settle B deficit and unknown selection stays hidden",
+            "tests/cross-center-settlement.test.mjs#DS-SET frozen plan rejects version transitions and ABA but ignores billing bookkeeping"
+          ]
         },
         {
           "id": "DS-SALE-01",
@@ -79575,81 +79690,128 @@
           "id": "DS-ATOMIC-01",
           "delivery_gap": "cross_center_settlement",
           "expected_flow": "Concurrent B approvals and competing payment/offset/correction cannot double-close selected shares. Same-key replay rechecks live authority. Injected ledger/balance/audit/outbox/receipt failure rolls back request and entire multi-row batch. Same-account A/B operation must not bypass idempotency, selected movement versions, race locks or no-double-close rules.",
-          "status": "pending_runtime",
+          "status": "passed_runtime",
           "evidence_kind": "real_auth_edge_rpc",
-          "evidence": []
+          "evidence": [
+            "tests/cross-center-settlement.test.mjs#DS-SCOPE same account may submit under A and approve under independently verified B; partial payment closes only on approval",
+            "tests/cross-center-settlement.test.mjs#DS-AUTH A-only authority cannot decide; revoked B grant blocks same-key replay",
+            "tests/cross-center-settlement.test.mjs#DS-AUTH revoke versus approve serializes and cannot commit after lost live B authority",
+            "tests/cross-center-settlement.test.mjs#DS-SET concurrent approvals and distinct requests never double-close selected balance",
+            "tests/cross-center-settlement.test.mjs#DS-ATOMIC late outbox failure rolls back request record allocations balances and receipt",
+            "tests/cross-center-settlement.test.mjs#DS-ATOMIC distinct payment offset and correction requests serialize competing dependencies",
+            "tests/cross-center-settlement.test.mjs#DS-ATOMIC ledger audit and receipt failures rollback the entire multi-line batch"
+          ]
         },
         {
           "id": "DS-AUTH-01",
           "delivery_gap": "cross_center_settlement",
           "expected_flow": "Owner grants/revokes OM delegation permission; only live delegated OM or Owner directly grants/revokes exact-center CM settlement authority. Read aggregate version then set with expected_version; conflicting grant versions rollback atomically.",
-          "status": "pending_runtime",
+          "status": "passed_runtime",
           "evidence_kind": "real_auth_edge_rpc",
-          "evidence": []
+          "evidence": [
+            "tests/cross-center-settlement.test.mjs#DS-AUTH owner delegation and exact center grant chain does not imply operational authority",
+            "tests/cross-center-settlement.test.mjs#DS-AUTH revoke versus approve serializes and cannot commit after lost live B authority",
+            "tests/cross-center-settlement.test.mjs#DS-AUTH revoked delegation and B role reject old session and receipt"
+          ]
         },
         {
           "id": "DS-AUTH-02",
           "delivery_gap": "cross_center_settlement",
           "expected_flow": "OM without delegation, role-only CM, CM attempting delegation, wrong org/center/target role and Owner acting financially without explicit CM authority are denied. Grant administration exposes no ledger.",
-          "status": "pending_runtime",
+          "status": "passed_runtime",
           "evidence_kind": "real_auth_edge_rpc",
-          "evidence": []
+          "evidence": [
+            "tests/cross-center-settlement.test.mjs#DS-AUTH owner delegation and exact center grant chain does not imply operational authority",
+            "tests/cross-center-settlement.test.mjs#DS-AUTH A-only authority cannot decide; revoked B grant blocks same-key replay",
+            "tests/cross-center-settlement.test.mjs#DS-SCOPE cursor bound to actor center currency filters; unrelated center and student reads denied"
+          ]
         },
         {
           "id": "DS-AUTH-03",
           "delivery_gap": "cross_center_settlement",
           "expected_flow": "Submit, approve, read and same-key replay check live CM role and exact-center grant. Revoke denies old authenticated session and cached preview/receipt. OM delegation revocation denies further grants/revokes through old session.",
-          "status": "pending_runtime",
+          "status": "passed_runtime",
           "evidence_kind": "real_auth_edge_rpc",
-          "evidence": []
+          "evidence": [
+            "tests/cross-center-settlement.test.mjs#DS-AUTH A-only authority cannot decide; revoked B grant blocks same-key replay",
+            "tests/cross-center-settlement.test.mjs#DS-AUTH revoke versus approve serializes and cannot commit after lost live B authority",
+            "tests/cross-center-settlement.test.mjs#DS-AUTH revoked delegation and B role reject old session and receipt"
+          ]
         },
         {
           "id": "DS-SET-13",
           "delivery_gap": "cross_center_settlement",
           "expected_flow": "Payment/offset/correction proposal is fully frozen and visible via request_get with request/movement/original-record versions. Partial sums and opposite same-currency offset sides are explicit; no third recording endpoint exists. Partial linked correction names original allocation IDs, current reversible versions/amounts; a multi-line payment reverses only selected allocations, an offset reversal selects balanced opposite original sides. No implicit distribution; late correction race rolls back both sides.",
-          "status": "pending_runtime",
+          "status": "passed_runtime",
           "evidence_kind": "real_auth_edge_rpc",
-          "evidence": []
+          "evidence": [
+            "tests/cross-center-settlement.test.mjs#DS-SCOPE same account may submit under A and approve under independently verified B; partial payment closes only on approval",
+            "tests/cross-center-settlement.test.mjs#DS-SET explicit partial correction preserves original payment and uses exact original allocation versions",
+            "tests/cross-center-settlement.test.mjs#DS-SET explicit opposite-direction offset reduces both selected sides atomically and can be corrected",
+            "tests/cross-center-settlement.test.mjs#DS-SET correction rejects foreign and duplicated allocations; later correction after rights reversal preserves history",
+            "tests/cross-center-settlement.test.mjs#DS-SET multi-line payment correction reverses only selected original allocation",
+            "tests/cross-center-settlement.test.mjs#DS-ATOMIC distinct payment offset and correction requests serialize competing dependencies"
+          ]
         },
         {
           "id": "DS-SET-14",
           "delivery_gap": "cross_center_settlement",
           "expected_flow": "Reject produces reasoned in-app A notification and receipt/audit without balance/record changes; B approval records exactly once in same transaction. Late outbox/receipt failure rolls back both request and financial effects.",
-          "status": "pending_runtime",
+          "status": "passed_runtime",
           "evidence_kind": "real_auth_edge_rpc",
-          "evidence": []
+          "evidence": [
+            "tests/cross-center-settlement.test.mjs#DS-SET withdrawal and reasoned rejection have no balance record and rejection notifies A",
+            "tests/cross-center-settlement.test.mjs#DS-ATOMIC late outbox failure rolls back request record allocations balances and receipt",
+            "tests/cross-center-settlement.test.mjs#DS-ATOMIC ledger audit and receipt failures rollback the entire multi-line batch"
+          ]
         },
         {
           "id": "DS-SCOPE-01",
           "delivery_gap": "cross_center_settlement",
           "expected_flow": "Same account holds current active CM membership and explicit settlement grant at both A and B: submit using A scope then approve using B scope succeeds; audit stores account plus independent center/role/grant snapshot for each step, even if account IDs match.",
-          "status": "pending_runtime",
+          "status": "passed_runtime",
           "evidence_kind": "real_auth_edge_rpc",
-          "evidence": []
+          "evidence": [
+            "tests/cross-center-settlement.test.mjs#DS-SCOPE same account may submit under A and approve under independently verified B; partial payment closes only on approval"
+          ]
         },
         {
           "id": "DS-SCOPE-02",
           "delivery_gap": "cross_center_settlement",
           "expected_flow": "A-only CM/grant cannot approve stored B request. Sending B as client center_id or reusing A authority/audit snapshot never grants B power; no mutation, record or closed balance on rejection.",
-          "status": "pending_runtime",
+          "status": "passed_runtime",
           "evidence_kind": "real_auth_edge_rpc",
-          "evidence": []
+          "evidence": [
+            "tests/cross-center-settlement.test.mjs#DS-SCOPE same account may submit under A and approve under independently verified B; partial payment closes only on approval",
+            "tests/cross-center-settlement.test.mjs#DS-AUTH A-only authority cannot decide; revoked B grant blocks same-key replay"
+          ]
         },
         {
           "id": "DS-SCOPE-03",
           "delivery_gap": "cross_center_settlement",
           "expected_flow": "After B CM role or B explicit settlement grant revocation, old Auth session, pending request and same-key replay cannot authorize B decision. Live B authority is checked before replay and at commit; relevant role/grant concurrency is serialized.",
-          "status": "pending_runtime",
+          "status": "passed_runtime",
           "evidence_kind": "real_auth_edge_rpc",
-          "evidence": []
+          "evidence": [
+            "tests/cross-center-settlement.test.mjs#DS-AUTH A-only authority cannot decide; revoked B grant blocks same-key replay",
+            "tests/cross-center-settlement.test.mjs#DS-AUTH revoke versus approve serializes and cannot commit after lost live B authority",
+            "tests/cross-center-settlement.test.mjs#DS-AUTH revoked delegation and B role reject old session and receipt"
+          ]
         },
         {
           "id": "DS-SCOPE-04",
           "delivery_gap": "cross_center_settlement",
           "expected_flow": "Same-account A/B approval preserves same-key replay semantics, stale relevant versions, concurrent approval/payment/offset/correction locks and exactly-once selected balance closure. Injected audit/outbox/receipt failure rolls back request and all financial effects.",
-          "status": "pending_runtime",
+          "status": "passed_runtime",
           "evidence_kind": "real_auth_edge_rpc",
-          "evidence": []
+          "evidence": [
+            "tests/cross-center-settlement.test.mjs#DS-SCOPE same account may submit under A and approve under independently verified B; partial payment closes only on approval",
+            "tests/cross-center-settlement.test.mjs#DS-SET selected-only stale; unrelated new lesson does not invalidate a pending request",
+            "tests/cross-center-settlement.test.mjs#DS-SET concurrent approvals and distinct requests never double-close selected balance",
+            "tests/cross-center-settlement.test.mjs#DS-ATOMIC late outbox failure rolls back request record allocations balances and receipt",
+            "tests/cross-center-settlement.test.mjs#DS-ATOMIC distinct payment offset and correction requests serialize competing dependencies",
+            "tests/cross-center-settlement.test.mjs#DS-ATOMIC ledger audit and receipt failures rollback the entire multi-line batch"
+          ]
         }
       ],
       "settlement_authority_chain": {
@@ -79672,13 +79834,13 @@
       "closed_product_choices": [
         {
           "id": "DS-OPEN-01",
-          "status": "accepted_contract_runtime_pending",
+          "status": "accepted_runtime_verified",
           "resolution": "Owner grants/revokes OM delegation permission; Owner directly or live delegated OM grants/revokes exact-center CM settlement authority. Roles and authority administration imply no financial operations.",
           "source": "docs/decisions/DS-2026-10-17-settlement-revision.md"
         },
         {
           "id": "DS-OPEN-02",
-          "status": "accepted_contract_runtime_pending",
+          "status": "accepted_runtime_verified",
           "resolution": "No different-account/person condition. Same account may initiate under live A CM+grant and approve under independently verified live B CM+grant. No separate exception/fallback. Prior self-approval prohibition superseded by latest explicit user decision.",
           "source": "docs/decisions/DS-2026-10-17-settlement-center-scope.md"
         }
@@ -79736,7 +79898,48 @@
             "automatic_actual_start_participation_observation",
             "mandatory_document_lesson_consumer",
             "other_nonfinancial_right_change_consumers"
-          ]
+          ],
+          "snapshot_scope": "Historical first Starter delivery boundary; later paid agreement and settlement implementation is reflected in delivery_gaps, not this snapshot."
+        },
+        "cross_center_settlement": {
+          "status": "implemented_named_auth_edge_rpc_evidence_pending_final_source_ci",
+          "operations": [
+            "settlement_movements_list_v1",
+            "settlement_requests_list_v1",
+            "settlement_request_get_v1",
+            "settlement_request_submit_v1",
+            "settlement_request_withdraw_v1",
+            "settlement_request_decide_v1",
+            "settlement_authority_get_v1",
+            "settlement_delegation_set_v1",
+            "settlement_authority_set_v1"
+          ],
+          "covered_acceptance_cases": [
+            "DS-SET-01",
+            "DS-SET-02",
+            "DS-SET-03",
+            "DS-SET-04",
+            "DS-SET-05",
+            "DS-SET-06",
+            "DS-SET-07",
+            "DS-SET-08",
+            "DS-SET-09",
+            "DS-SET-10",
+            "DS-SET-11",
+            "DS-SET-12",
+            "DS-ATOMIC-01",
+            "DS-AUTH-01",
+            "DS-AUTH-02",
+            "DS-AUTH-03",
+            "DS-SET-13",
+            "DS-SET-14",
+            "DS-SCOPE-01",
+            "DS-SCOPE-02",
+            "DS-SCOPE-03",
+            "DS-SCOPE-04"
+          ],
+          "evidence_suite": "tests/cross-center-settlement.test.mjs",
+          "source_ci_policy": "Verify final head CI independently; test-path metadata alone is not a CI receipt."
         }
       }
     },
