@@ -1,5 +1,12 @@
 # FtkSaaS — güncel devir
 
+## 19 Ekim 2026 — seri üretim başlangıç kapısı
+
+19 Ekim 2026 üretim başlangıcında main `41f922a01d05eff90f272d69496bf4c5c833e77c` doğrulandı. PR #20 birleşmiştir; [main clean 39247703349](https://github.com/SXQHex/FtkSaaS/actions/runs/39247703349) başarısızdır. `Verify merged candidate relation` adımı `No source-bound full clean evidence for merged tree` ile durdu; `npm ci` ve `test:clean` çalışmadı. Son cleanup'taki `supabase: not found` ikincil hatadır. PR #20'nin belgeye özel aday-clean istisnası runtime kabulü veya başarılı main clean değildir; P00'ın eski başarısı bu SHA'ya taşınmaz.
+
+İlk açık teslim [P01](../docs/production-queue.md) olup uygulamaya başlanmadı. Başlangıçta açık PR ve P01 branch'i bulunmadı. Önce normal aday/main clean yoluyla kabul zinciri yeniden kurulacak; başarılı yeni main kabulü sonrasında P01'e devam edilecek. Bu kurtarma yalnız yaşayan kuyruk/devir bilgisini günceller; runtime, envanter, F01–F33, migration ve tarihsel raporlar değişmez. Yeni adayın inceleme/test sonucu ve merge/main kabulü henüz tamamlanmış değildir.
+
+
 Üçüncü teslimin uygulama kapsamı: **199 sözleşme / 104 çağrılabilir / 95 yalnız sözleşme; 90 core tablo / 29 migration**. [Hesaplaşma devri](../docs/settlement-handover.md) çalışan akışı ve kabul sınırlarını tanımlar. Son head incelemesi ve tam temiz CI aynı SHA için ayrıca doğrulanır; işlem sayısı ürün tamamlanma yüzdesi değildir.
 
 Başlangıç main: `bd4b6335904047f071556e5df35a982a71012c6e`; [aynı SHA CI](https://github.com/SXQHex/FtkSaaS/actions/runs/39055469993) başarılıydı: 364 test, 28 migration. Bu eski başarı yeni teslimin CI kanıtı değildir. Son PR head/merge kanıtı PR üzerinde bağlanır. Hesaplaşma kaynak SHA’sı `3aa5effa0fe48ab7dc4c8d4ca97754b5392fa0ad` için [temiz CI](https://github.com/SXQHex/FtkSaaS/actions/runs/39198323012) başarılı: 394 test (95 yapısal/sözleşme + 27 DB + 272 Auth/API), 29 migration, seed/sağlık/advisors. Sonraki commit ve merge main CI ayrıca doğrulanır.
