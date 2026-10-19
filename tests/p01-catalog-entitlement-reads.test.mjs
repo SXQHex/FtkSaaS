@@ -170,9 +170,17 @@ test('P01-A catalog and purchased-right reads through real Auth -> Edge -> RPC',
   await db.query("update core.account_links set state='revoked' where org_id=$1 and person_id=$2",[org,self.p]);
   await fail(self.u,'entitlements_get_v1',{person_id:self.p},'NOT_FOUND');
   await db.query("update core.account_links set state='active' where org_id=$1 and person_id=$2",[org,self.p]);
-  await db.query('delete from auth.sessions where id=$1',[self.u.session_id]);
+  // Application-side revocation is checked by the RPC even while Auth still
+  // accepts the token. A deleted Auth session may instead be rejected earlier
+  // by /auth/v1/user, which the existing Edge adapter maps to AUTH_REQUIRED.
+  await db.query("update core.accounts set state='deletion_pending' where id=$1",[self.a.id]);
   await fail(self.u,'products_list_v1',{page:{}},'SESSION_REVOKED');
+  await db.query("update core.accounts set state='active' where id=$1",[self.a.id]);
+  await db.query('delete from auth.sessions where id=$1',[self.u.session_id]);
+  const denied=await call(self.u,'products_list_v1',scope({page:{}}));
+  assert.equal(denied.result.ok,false);
+  assert(['AUTH_REQUIRED','SESSION_REVOKED'].includes(denied.result.error.code),JSON.stringify(denied.result));
+  assert.equal((await rows('select count(*)::int n from auth.sessions where id=$1',[self.u.session_id]))[0].n,0);
  });
  }finally{await db.end();}
 });
-

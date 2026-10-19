@@ -6,14 +6,14 @@
 
 **P00 ve PR #21 kabul kurtarması kapalı; P01-A in_progress.** Başlangıç main 9ce0a5639417f959111b11f70157156733e3de18; [aynı SHA main clean](https://github.com/SXQHex/FtkSaaS/actions/runs/39252687560) başarılı. Önceki PR #20 başarısızlığı normal aday/merge/main clean zinciriyle kapandı; istisna runtime'a taşınmadı.
 
-[P01 devri](p01-handover.md): A katalog/seans bağlamlı satın alınmış hak okuma; B talep/alternatif/onay; C bekleme/yer teklifi/gerçek worker. A dilimi uygulandı; hedefli doğrulama ve son aday kabulü bekliyor. Main kabul kurtarması kanıtı bu doğal uygulama commit'inde eşitlendi.
+[P01 devri](p01-handover.md): A katalog/seans bağlamlı satın alınmış hak okuma; B talep/alternatif/onay; C bekleme/yer teklifi/gerçek worker. A dilimi uygulandı; ilk hedefli CI 39270054878 hata-kodu beklentisinde başarısız. Test ve kaynak farkı seçimi düzeltmesi uygulanıyor; yeni runtime kabulü ve son aday clean bekliyor. Main kabul kurtarması kanıtı bu doğal uygulama commit'inde eşitlendi.
 
 Bu planın başlangıç envanteri 199 toplam / 104 çağrılabilir / 95 contract_only / 29 migration'dır. Yedi grup başlangıçtaki 95 işlemi birer kez kapsar. Yeni sözleşme ihtiyacı ayrıca açıklanır; sayılar başarı hedefi değildir.
 
 | Sıra | Teslim | Başlangıç işlem sayısı | Durum | PR/head | Devam |
 |---|---|---:|---|---|---|
 | P00 | CI ayrımı | — | done | #19 / main b4a704a6897353bb0d54355903267b62d8d72496 | main clean 39242063000 başarılı; koruma yönetici sınırı açık |
-| P01 | Talep, rezervasyon ve bekleme | 14 | in_progress | feature/p01-request-reservation-flow | A okuma dilimi doğrulama; B/C 13 API açık |
+| P01 | Talep, rezervasyon ve bekleme | 14 | in_progress | #22 / feature/p01-request-reservation-flow | İlk CI başarısız; test/seçici düzeltmesi sonrası yeni hedefli kabul bekliyor; B/C 13 API açık |
 | P02 | Paket ve seans yaşam döngüsü | 15 | queued | — | önceki teslimin main kabulünden sonra |
 | P03 | Finans ve eğitmen ödemeleri | 7 | queued | — | önceki teslimin main kabulünden sonra |
 | P04 | CRM ve public başvuru | 11 | queued | — | önceki teslimin main kabulünden sonra |

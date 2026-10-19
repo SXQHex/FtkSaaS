@@ -1,0 +1,56 @@
+{
+  "source_sha": "635e148651b2a85b18f5d40fe1fdea938ea94bf2",
+  "base_sha": "9ce0a5639417f959111b11f70157156733e3de18",
+  "run_id": 39270054878,
+  "job_id": 118119671799,
+  "run_url": "https://github.com/SXQHex/FtkSaaS/actions/runs/39270054878",
+  "conclusion": "failure",
+  "observed": {
+    "job_wall_seconds": 2152,
+    "targeted_step_seconds": 2127,
+    "api_wall_seconds": 2077.165236126,
+    "selected_api_suites": 13,
+    "p01_suite_wall_seconds": 145.180754052,
+    "new_schema_migrations_applied": 30,
+    "api_runner_counts": {
+      "tests": 282,
+      "passed": 280,
+      "failed_nodes": 2,
+      "distinct_failed_assertions": 1
+    }
+  },
+  "failure": {
+    "suite": "tests/p01-catalog-entitlement-reads.test.mjs",
+    "case": "role, student link and Auth session revocations apply on the next read",
+    "expected": "SESSION_REVOKED",
+    "actual": "AUTH_REQUIRED",
+    "authorization_result": "denied",
+    "cause": "Existing Edge maps failed /auth/v1/user to AUTH_REQUIRED before named RPC session checks. Parent + child test failure are one assertion, not two defects."
+  },
+  "selection_cause": "Contract, generated artifacts, API inventory and migration paths unconditionally expanded to all 13 API suites. API work dominated wall time; installing/resetting isolated backend was under one minute after selector.",
+  "corrective_scope": {
+    "runtime_changed": false,
+    "test": "Separate non-active application-account RPC rejection from Auth-provider session deletion; both still require denial.",
+    "selection": "Map known operation/transitive definition consumers, exact new migration/source pair and additive test inventory; retain broad fallback for unmapped/shared deltas.",
+    "priority": "Changed module behavior first; on failure remaining regressions are not run and job remains failed.",
+    "full_candidate_and_main_gates": "unchanged"
+  },
+  "validation": {
+    "selector_snapshot_tests": "23 passed locally; independent review repeated",
+    "actual_p01_cumulative_delta": {
+      "broad": false,
+      "suites": [
+        "tests/api-acceptance.test.mjs",
+        "tests/p01-catalog-entitlement-reads.test.mjs"
+      ],
+      "priority": [
+        "tests/p01-catalog-entitlement-reads.test.mjs"
+      ]
+    },
+    "new_head_runtime_result": "pending",
+    "new_elapsed_speedup": "not measured; no timing promise",
+    "main_acceptance": "pending; PR22 remains draft",
+    "structural_verification": "npm run verify passed: generation, TypeScript, 96 contract/governance + 21 selector tests; final two regression additions separately passed in 23-test selector run",
+    "independent_review": "Initial table-transitive consumer finding fixed; re-review found no blocking findings"
+  }
+}

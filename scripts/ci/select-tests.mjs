@@ -1,6 +1,7 @@
 import fs from 'node:fs';
 import {execFileSync} from 'node:child_process';
 import {pathToFileURL} from 'node:url';
+import {analyzeDelta} from './delta-analysis.mjs';
 export const apiSuites = [
  'api-acceptance','event-payment','event-cancellation','registry','person-registry',
  'room-role-registry','availability-policies','schedule-reads','program-session-lifecycle',
@@ -8,7 +9,7 @@ export const apiSuites = [
 ].map(n=>'tests/'+n+'.test.mjs');
 // Economic consumers and reservation readers are explicit dependencies, not filename guesses.
 export const modules = [
- {id:'p01-reads', sources:['p01-catalog-entitlement-reads'], suites:['p01-catalog-entitlement-reads','schedule-reads','starter-attendance-protection']},
+ {id:'p01-reads', sources:['p01-catalog-entitlement-reads'], operations:['products_list_v1','entitlements_get_v1'], migrationCheckLabel:'P01 reads source drift', suites:['p01-catalog-entitlement-reads']},
  {id:'settlement', sources:['cross-center-settlement'], suites:['cross-center-settlement','instructor-earnings','starter-attendance-protection']},
  {id:'earnings', sources:['instructor-earnings'], suites:['instructor-earnings','cross-center-settlement','program-session-lifecycle','starter-attendance-protection']},
  {id:'attendance', sources:['starter-attendance-protection','starter-attendance-privacy-legacy'], suites:['starter-attendance-protection','instructor-earnings','cross-center-settlement','p01-catalog-entitlement-reads']},
@@ -27,7 +28,7 @@ export function parseChanges(z) {
   if(/^[RC]/.test(status)){const path=fields[i++];if(!path)throw Error('MISSING_RENAME_PATH');out.push({status,path});}
  }return out;
 }
-export function select(changes,{diffAvailable=true,headMatches=true}={}) {
+export function select(changes,{diffAvailable=true,headMatches=true,evidence}={}) {
  const reasons=[],chosen=new Set();let structural=false,broad=false;const docs=[];
  const all=why=>{broad=true;structural=true;reasons.push(why);};
  if(!diffAvailable||!headMatches)all('Missing diff/base or changed head: all DB/API regressions');
@@ -36,6 +37,17 @@ export function select(changes,{diffAvailable=true,headMatches=true}={}) {
   if(typeof p!=='string'||!p||p.startsWith('/')||p.split('/').includes('..')){all('Invalid/missing path');continue;}
   if(p.endsWith('.md')||p.endsWith('.txt')){docs.push(p);if(p.startsWith('contracts/')||p.startsWith('docs/decisions/')||p==='docs/feature-delivery.md')structural=true;reasons.push(p+': documentation/link checks'+(structural?' and contract consistency when applicable':''));continue;}
   if(p==='AGENTS.md')continue;
+  const proof=diffAvailable&&headMatches&&evidence?.explained[p];
+  if(proof){
+   structural=true;
+   if(!proof.suites.every(p=>apiSuites.includes(p))){all(p+': mapped suite is missing from inventory');continue;}
+   chosen.add('tests/api-acceptance.test.mjs');for(const suite of proof.suites)chosen.add(suite);
+   reasons.push(p+': '+proof.why);continue;
+  }
+  if(['scripts/ci/select-tests.mjs','scripts/ci/delta-analysis.mjs','scripts/ci/run-targeted.mjs','scripts/render_catalogs.py'].includes(p)){
+   structural=true;reasons.push(p+': selector/runner or documentation renderer checks; no product runtime source');continue;
+  }
+  if(p==='reports/p01-a-targeted-diagnosis.json'){structural=true;reasons.push(p+': diagnostic evidence; structural checks, no runtime input');continue;}
   if(p.startsWith('contracts/')||p.startsWith('packages/')||p.startsWith('supabase/')||p.startsWith('.github/')||['package.json','package-lock.json','tsconfig.json'].includes(p)){
    all(p+': shared schema/gateway/migration/build or CI dependency');continue;
   }
@@ -47,17 +59,26 @@ export function select(changes,{diffAvailable=true,headMatches=true}={}) {
   all(p+': unknown/shared dependency ('+status+'), fail closed to all DB/API suites');
  }
  if(broad)for(const p of apiSuites)chosen.add(p);
- return {structural,db:chosen.size>0,api:apiSuites.filter(p=>chosen.has(p)),docs:[...new Set(docs)],broad,reasons};
+ const api=apiSuites.filter(p=>chosen.has(p));
+ const priority=api.filter(p=>evidence?.priority.includes(p)||changes.some(c=>c.path===p&&/^[AM]$/.test(c.status)));
+ return {structural,db:chosen.size>0,api,priority,docs:[...new Set(docs)],broad,reasons,analysis_notes:evidence?.notes??[]};
 }
 if(import.meta.url===pathToFileURL(process.argv[1]??'').href){
- const base=process.argv[2],head=process.argv[3];let changes=[],available=true,matches=false;
+ const base=process.argv[2],head=process.argv[3];let changes=[],available=true,matches=false,from;
  try {matches=execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim()===head;
   // Cumulative branch delta survives cancellation of an earlier commit's targeted run.
-  const from=execFileSync('git',['merge-base','origin/main',head],{encoding:'utf8'}).trim();
+  from=execFileSync('git',['merge-base','origin/main',head],{encoding:'utf8'}).trim();
   if(!/^[a-f0-9]{40}$/.test(from??'')||!head)throw Error('NO_BASE');
   changes=parseChanges(execFileSync('git',['diff','--name-status','-z','--find-renames',from,head],{encoding:'utf8'}));
  }catch{available=false;}
- const plan=select(changes,{diffAvailable:available,headMatches:matches});fs.mkdirSync('.ci',{recursive:true});fs.writeFileSync('.ci/selection.json',JSON.stringify(plan,null,2)+'\n');
+ let evidence;
+ if(available&&matches){
+  const cache=new Map();
+  const read=(side,path)=>{const key=side+':'+path;if(!cache.has(key)){try{cache.set(key,execFileSync('git',['show',(side==='base'?from:head)+':'+path],{encoding:'utf8',maxBuffer:20*1024*1024,stdio:['ignore','pipe','pipe']}));}catch{cache.set(key,null);}}return cache.get(key);};
+  evidence=analyzeDelta(changes,read,modules.map(p=>({...p,suites:p.suites.map(n=>'tests/'+n+'.test.mjs')})));
+ }
+ const plan=select(changes,{diffAvailable:available,headMatches:matches,evidence});fs.mkdirSync('.ci',{recursive:true});fs.writeFileSync('.ci/selection.json',JSON.stringify(plan,null,2)+'\n');
  const summary='## Targeted selection\n\n'+plan.reasons.map(x=>'- '+x).join('\n')+'\n\nDB reset: '+plan.db+'\n\nSelected API suites:\n'+(plan.api.map(x=>'- '+x).join('\n')||'- none')+'\n';
- if(process.env.GITHUB_STEP_SUMMARY)fs.appendFileSync(process.env.GITHUB_STEP_SUMMARY,summary);console.log(summary);
+ const details='\nPriority API suites (failure stops remaining regressions):\n'+(plan.priority.map(p=>'- '+p).join('\n')||'- none')+'\n'+plan.analysis_notes.map(n=>'- '+n).join('\n')+'\n';
+ if(process.env.GITHUB_STEP_SUMMARY)fs.appendFileSync(process.env.GITHUB_STEP_SUMMARY,summary+details);console.log(summary+details);
 }

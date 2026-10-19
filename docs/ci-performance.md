@@ -18,3 +18,11 @@ Eski loglarda Q-E02 iptal suite’i yaklaşık 942.220 sn, hesaplaşma 695.537 s
 İnceleme: authUser her kullanıcı için admin create + password login yapar; fixturePlatform ayrıca Auth + DB kuruluşu yapar. Suite’ler çok sayıda sıralı Edge çağrısı ve bazı kasıtlı kilit/bekleme senaryoları içerir. Ortak global trigger/function enjekte eden testler bulunur. Eski loglar istek/fixture ayrımı içermediğinden Auth’un veya çekişmenin payına sayısal neden atfedilemez.
 
 Yeni helper ölçümü her operation’ın count/total/max değerini; Auth create/login başlık gecikmesini; authUser/fixturePlatform tam süresini; suite process wall süresini CI özetine yazar. İlk final CI sonuçları API/fixture dağılımını sağlayacaktır. Bu PR Auth’u cache’lemez, iş davranışını/timeout’ları değiştirmez ve paralelliği artırmaz. Sonraki optimizasyon işi, gerçek ölçümle en pahalı hazırlıkları ve ardışık çağrıları seçmeli; test izolasyonunu bozmamalıdır.
+
+## PR #22 geliştirme koşusu — 19 Ekim 2026
+
+Kaynak 635e148651b2a85b18f5d40fe1fdea938ea94bf2; [run 39270054878](https://github.com/SXQHex/FtkSaaS/actions/runs/39270054878). Bu çalışma hedefli adını taşımasına rağmen 13 API dosyasının tamamını seçti. Job 35:52; test adımı 35:27; API runner 34:37.165 sürdü. Başlatma/reset/30 migration doğrulaması seçimin ardından bir dakikadan kısaydı. API özeti 282 düğüm, 280 pass/2 fail; iki fail düğümü aynı hatalı Auth hata-kodu beklentisinin alt test+üst test sonucudur.
+
+P01-A suite'i 2:25.181; ortak api-acceptance 5:31.146 idi. Bu süreler önceki iki paralel süreçteki gözlemdir; yeni sıralı fazların süresi veya kazancı diye toplanmaz. Yeni kaynak seçimi P01-A + api-acceptance olarak iki suite'e iner; yeni modül öncelikli çalışır ve hata olursa sonraki regresyon başlamaz. Sağlıklı yeni koşunun süresi ölçülmeden dakika kazancı iddia edilmez. Bilinmeyen/paylaşılan kaynak geniş geri dönüşü, tam aday/main clean, izolasyon ve paralellik=2 korunur.
+
+[Teşhis kaydı](../reports/p01-a-targeted-diagnosis.json) eski başarısız SHA'yı ve henüz bekleyen yeni runtime kabulünü ayırır.

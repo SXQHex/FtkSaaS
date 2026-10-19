@@ -15,7 +15,7 @@ Label’ın sürekli durması başarı veya yeni head’e kabul vermez. Tekrar k
 
 ## Denetlenebilir seçim
 
-[Seçici](../scripts/ci/select-tests.mjs) açık `modules` kaynak–tüketici haritasını taşır. Yalnız isim benzerliği kullanılmaz. Diff, `origin/main` ile güncel head’in **merge-base’inden itibaren tüm branch değişiklikleridir**; böylece önceki commit işi iptal edildiğinde kapsam sonraki belge commit’inde kaybolmaz. Eksik git geçmişi/head uyuşmazlığı/eşlenmeyen yol tüm DB/API kapsamına düşer. Rename’in eski ve yeni yolu birlikte değerlendirilir; silinen kaynak da kapsamdadır.
+[Seçici](../scripts/ci/select-tests.mjs) açık `modules` kaynak–tüketici haritasını taşır. Yalnız isim benzerliği kullanılmaz. Diff, `origin/main` ile güncel head’in **merge-base’inden itibaren tüm branch değişiklikleridir**; böylece önceki commit işi iptal edildiğinde kapsam sonraki belge commit’inde kaybolmaz. Eksik git geçmişi/head uyuşmazlığı/eşlenmeyen yol tüm DB/API kapsamına düşer. Bilinen modülün sözleşme/üretilmiş çıktı/migration farkı aşağıdaki kaynak kanıtıyla açıklanabiliyorsa bütün API dosyaları yerine o modül ve ortak Auth/hak regresyonu seçilir. Rename’in eski ve yeni yolu birlikte değerlendirilir; silinen kaynak da kapsamdadır.
 
 | Örnek | Seçim |
 |---|---|
@@ -24,7 +24,17 @@ Label’ın sürekli durması başarı veya yeni head’e kabul vermez. Tekrar k
 | database/instructor-earnings.sql | API acceptance, eğitmen hakedişi, hesaplaşma, program/seans ve Starter regresyonları + DB testleri/verify |
 | database/cross-center-settlement.sql | API acceptance, hesaplaşma, hakediş, Starter + DB testleri/verify |
 | tests/cross-center-settlement.test.mjs | İlgili suite + ortak API acceptance; verify/DB |
-| contracts, üreticiler, ortak tipler, Auth/tenant, kernel/finans/hak, gateway, migration, test/CI altyapısı veya bilinmeyen dosya | Geniş güvenli DB/API kapsamı + verify |
+| P01-A okuma SQL + ona bağlı sözleşme/tip/bundle/envanter ve birebir kaynak+wrapper yeni migration | Önce p01-catalog-entitlement-reads; geçerse api-acceptance; DB + verify |
+| Açıklanamayan sözleşme/tip/bundle/migration; çalışma zamanı üreticileri; Auth/tenant, kernel/finans/hak, handler; bilinmeyen kaynak | Geniş güvenli DB/API kapsamı + verify |
+| Bilinen seçici/runner ve yalnız belge üreten render_catalogs.py | Seçici/runner negatif testleri + verify; diğer değişiklikler ayrıca seçilir |
+
+### Bilinen modülün kaynak farkı kanıtı — 19 Ekim 2026 düzeltmesi
+
+[delta-analysis.mjs](../scripts/ci/delta-analysis.mjs) aynı merge-base/head git snapshot'larını okur. $defs referanslarının eski ve yeni transitive tüketicileri bulunur; her etkilenen operasyon açık modül haritasında yoksa geniş kapsam korunur. Paylaşılan izin/sözleşme kökü/tablo tipi veya eski/yeni kalıcı tablodan dolaylı erişilen tanım değişimi daraltılmaz. Yeni migration yalnız A durumunda, base'te yokken ve içeriği bilinen SQL+wrapper ile birebir eşleşirken açıklanır. Eski migration veya hash değişimi, tanınmayan kardeş dosya ve silme/rename geniş geri dönüşü korur. Migration manifesti yalnız aynı eşlenmiş eklemeleri içerebilir; gerçek tüm SHA-256 değerleri zorunlu check-migrations kontrolünde ayrıca doğrulanır.
+
+Üretilmiş dosya adı tek başına gerekçe değildir: bilinen modül kaynağı/operasyon farkı gerekir; generation/schema/TypeScript kontrolleri API testinden önce geçmelidir. Yalnız package.json test:api envanterine eşlenmiş suite eklemesi dar açıklamadır; dependency, runner flag, test silme veya başka komut değişimi geniştir. Handler/çalışma zamanı üreticileri ve bilinmeyen yollar geniş kalır. Yeni üretim modülü eşlemesi yapılmadıysa ucuz kabul varsayılmaz.
+
+Değişen modül/ilgili test dosyaları öncelikli fazda çalışır; başarısızsa ertelenmiş regresyonlar başlatılmaz ve job başarısız kalır. Başarılı faz bütün seçilmiş kalan testleri tam bir kez çalıştırır. Bu fazlama kabul testlerini eksiltmez; tam aday/main clean bütün envanteri çalıştırmaya devam eder. Bu düzeltme workflow tetikleyicilerini, paralellik=2 sınırını ve kaynak bağlı merge kapısını değiştirmez.
 
 CI özeti her dosyanın gerekçesini ve seçilen bütün suite’leri yazar. Test listesi package.json test:api listesiyle birebir denetlenir. Hedefli DB yolu ayrı hosted runner’da native backend başlatır, loopback dışında reseti reddeder, bütün migration’ları ve boş tenant/Auth/receipt durumunu doğrular. Önceki job’dan veri veya DB cache’i kullanılmaz. Full clean ayrıca seed, sağlık ve advisors içerir; hedefli kabul full yerine sunulmaz.
 

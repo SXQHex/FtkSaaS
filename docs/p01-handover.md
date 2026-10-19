@@ -17,3 +17,11 @@ Kaynak testleri: tests/p01-catalog-entitlement-reads.test.mjs. Geliştirme testl
 Katalog adı mevcut products.name kimlik alanından gelir. Mevcut product_publish güncellemesi farklı bir terms.name saklamaz; yeni okuma bunu yeniden adlandırma yetkisine dönüştürmez. Fiyat/hak/kapsam etkin sürümden gelir; satışın sürüm bağı değişmez.
 
 Altyapı sınırı: Upstash Box aylık compute kotası doldu (5 CPU-saat); checkpoint alındı ve aynı kaynak yerelde yeniden kuruldu. Yerel Supabase bileşen indirmesi DNS/ağ hatası nedeniyle başlatılamadı. 110 yapısal test geçti; Auth/API davranış testleri GitHub geliştirme doğrulamasında bekliyor. Tam aday clean tetiklenmedi.
+
+## İlk geliştirme CI sonucu ve düzeltme
+
+PR #22 head 635e148651b2a85b18f5d40fe1fdea938ea94bf2 için run 39270054878 başarısızdır. 30 migration, yapı/DB ve diğer runtime vakaları geçti; P01-A'nın sekiz alt vakası geçti, son Auth oturum geri alma vakası mevcut Edge AUTH_REQUIRED döndürürken SESSION_REVOKED bekledi. Bu sonuç P01-A'nın tüm kabulü değildir.
+
+Test iki reddi ayırır: aktif Auth altında uygulama hesabı deletion_pending olduğunda RPC SESSION_REVOKED verir; Auth oturumu silindiğinde provider'ın erken AUTH_REQUIRED reddi veya RPC'nin SESSION_REVOKED reddi kabul edilir, başarı asla kabul edilmez. Uygulama davranışı değiştirilmedi. [Teşhis](../reports/p01-a-targeted-diagnosis.json).
+
+Aynı doğal düzeltme diliminde seçici kaynak farkı kanıtıyla bu modülü ve ortak regresyonu seçer (13 dosya yerine 2); yeni modül önce çalışır. Bilinmeyen/paylaşılan değişiklikler ve aday/main full clean korunur. Yeni head'in runtime sonucu bekleniyor; gerçek hızlanma henüz ölçülmedi. P01'in diğer 13 API'si açık kalır.
