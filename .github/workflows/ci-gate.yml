@@ -1,0 +1,31 @@
+name: Candidate merge gate
+on:
+  pull_request_target:
+    types: [opened, synchronize, reopened, edited, labeled, unlabeled, ready_for_review]
+  workflow_run:
+    workflows: ['Candidate full clean']
+    types: [completed]
+  push:
+    branches: [main]
+permissions:
+  contents: read
+  actions: read
+  pull-requests: read
+  statuses: write
+concurrency:
+  group: merge-gate-${{ github.event.pull_request.number || github.event.workflow_run.id || github.sha }}
+  cancel-in-progress: false
+jobs:
+  verify:
+    runs-on: ubuntu-24.04
+    steps:
+      # Privileged verifier executes default-branch code only, never candidate code.
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          ref: main
+          persist-credentials: false
+      - uses: actions/github-script@ed597411d8f924073f98dfc5c65a23a2325f34cd
+        with:
+          script: |
+            const gate=await import(`${process.env.GITHUB_WORKSPACE}/scripts/ci/gate.mjs`);
+            await gate.main(github,context,core);
