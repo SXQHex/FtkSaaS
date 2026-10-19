@@ -62,3 +62,5 @@ assert next(Path('supabase/migrations').glob('*_p01_catalog_entitlement_reads.sq
 assert next(Path('supabase/migrations').glob('*_p01_lesson_requests.sql')).read_text()==Path('database/p01-lesson-requests.sql').read_text()+Path('database/p01-lesson-requests-wrappers.sql').read_text(),'P01 requests source drift'
 
 assert next(Path('supabase/migrations').glob('*_p01_waitlist_workers.sql')).read_text()==Path('database/p01-waitlist-workers.sql').read_text()+Path('database/p01-waitlist-workers-wrappers.sql').read_text(),'P01 waitlist source drift'
+
+assert next(Path('supabase/migrations').glob('*_p01_worker_transport.sql')).read_text()==Path('database/p01-worker-transport.sql').read_text()+Path('database/p01-worker-transport-wrappers.sql').read_text(),'P01 worker transport source drift'

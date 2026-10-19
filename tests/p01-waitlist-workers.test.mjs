@@ -30,8 +30,8 @@ test('P01-C waitlist -> scoped worker -> held offer -> guarded reservation and c
  const workerUrl=new URL(context().env.DB_URL);workerUrl.username=role;workerUrl.password=password;
  worker=new pg.Client({connectionString:workerUrl.toString()});await worker.connect();
  const drain=async(n=6)=>{for(let i=0;i<n;i++){const results=await tick(worker,org);assert(results.every(r=>r.ok),JSON.stringify(results));if(!results.length)break;}};
- const invoke=async(op,r)=>(await worker.query(`select api_v1.${op}($1,null,null,$2,null) result`,[r,ids()])).rows[0].result;
- const deniedResult=async promise=>{const r=await promise;assert.equal(r.ok,false,JSON.stringify(r));assert.equal(r.error.code,'FORBIDDEN');};
+ const invoke=async(op,r)=>(await worker.query('select private.p01_worker_execute($1,$2,$3) result',[op,r,ids()])).rows[0].result;
+ const deniedResult=promise=>assert.rejects(promise,/FORBIDDEN/);
  await t.test('join is intent, scoped and duplicate-safe; worker identity is not a human grant',async()=>{
   const sid=await session(),w=await join(sid);await join(sid,second);assert.equal(await holds(sid),0);
   const duplicate=await call(first.u,'waitlist_join_v1',scope({session_id:sid,person_id:first.p}),key());assert.equal(duplicate.result.error.code,'OPEN_OPERATIONS_EXIST');
@@ -39,6 +39,9 @@ test('P01-C waitlist -> scoped worker -> held offer -> guarded reservation and c
   const hidden=await call(foreign,'waitlist_join_v1',scope({session_id:sid,person_id:first.p}),key());assert.equal(hidden.result.error.code,'NOT_FOUND');
   const human=await call(owner,'seat_offer_issue_v1',{org_id:org,job_id:key(),lease_token:'synthetic-worker-lease'},key());assert.equal(human.result.error.code,'FORBIDDEN');
   await assert.rejects(worker.query('select * from core.people'),/permission denied/);
+  const minimal=(await worker.query("select has_schema_privilege(current_user,'auth','usage') auth_usage,has_schema_privilege(current_user,'core','usage') core_usage,has_function_privilege(current_user,'private.execute_operation(text,jsonb,uuid,uuid,uuid[],jsonb)','execute') human_dispatch")).rows[0];
+  assert.deepEqual(minimal,{auth_usage:false,core_usage:false,human_dispatch:false});
+  await assert.rejects(worker.query('select api_v1.seat_offer_issue_v1($1,null,null,$2,null)',[{org_id:org},ids()]),/permission denied/);
   await assert.rejects(worker.query('select api_v1.p01_jobs_claim($1,$2,1)',[key(),ids()]),/FORBIDDEN/);
   const cli=await execute(process.execPath,['scripts/p01-worker.mjs'],{env:{...process.env,P01_WORKER_DATABASE_URL:workerUrl.toString(),P01_WORKER_ORG_ID:org}});assert.match(cli.stdout,/"succeeded":1/);
   const entries=await view(sid);assert.equal(entries[0].id,w.primary_id);assert.equal(entries[0].state,'offered');assert.equal(await holds(sid),1);assert.equal((await view(sid,second))[0].state,'waiting');

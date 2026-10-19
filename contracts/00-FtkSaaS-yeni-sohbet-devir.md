@@ -1,5 +1,14 @@
 # FtkSaaS — güncel devir
 
+## P01-C worker transport düzeltmesi — hedefli kabul bekliyor
+
+Kaynak `4e3c5f11bd70e0e99885beffa41849727f170379` / [run 39322550067](https://github.com/SXQHex/FtkSaaS/actions/runs/39322550067) başarısızdır. 32 migration ve 120 yapı/politika + 27 DB + önceki A/B'nin 17 API test düğümü geçti. C'nin sekiz alt vakası aynı worker giriş hatasında kırıldı: genel execute_operation fonksiyonunun auth.users türünü içeren DECLARE bölümü, worker yönlendirmesinden önce derlenir; dar DB worker rolünün Auth şema erişimi yoktur. Bu, C davranış kabulü değildir.
+
+Runner ve worker kabul testleri doğrudan mevcut private.p01_worker_execute(operation,request,ids) girişini kullanır; parametreler bound SQL'dir. Mevcut org/rol/job/op/lease/payload ve replay kontrolleri korunur. Yeni append-only migration 33 worker'ın gereksiz insan dispatcher/named API wrapper EXECUTE ve core USAGE yetkilerini kaldırır. Auth erişimi veya tablo DML yetkisi verilmez; uygulanmış önceki migration'lar değişmez. Negatif privilege testi Auth/core/human dispatcher erişiminin kapalı kaldığını, gerçek CLI/loop testleri doğru yolu doğrular. Doğrudan private helper yetki hataları SQL exception'dır; insan Edge zarfıyla karıştırılmaz.
+
+Envanter 199 / 118 çağrılabilir / 81 contract_only / 33 migration; üretilmiş katalogdaki worker transport açıklaması eşitlendi. Yeni runtime kabulü bekler; P01 son bağımsız inceleme ve toplu aday/main clean henüz yapılmadı.
+
+
 ## P01-C uygulama dilimi — runtime kabulü bekliyor
 
 P01-B kaynak `78d68653e903d9764264f1fe8d73dfb9d9de7f49` için [hedefli CI 39319195689](https://github.com/SXQHex/FtkSaaS/actions/runs/39319195689) başarılı: 120 yapı/politika + 27 DB + 58 API test düğümü (A/B 17, ortak 41); pg concurrent-query uyarısı logda yok. Bu sonuç yeni C kaynağına taşınmaz. P01-C yedi API, kapsamlı okuma ve gerçek worker runner uygulandı; yeni runtime kabulü bekliyor. Geliştirme envanteri 199 sözleşme / 118 çağrılabilir / 81 contract_only / 32 migration. P01 merge/main kabulü yok; bütün P01 sonunda toplu clean alınır.

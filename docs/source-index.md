@@ -59,3 +59,5 @@ Her uygulama PR’si etkilediği sözleşmeleri, envanteri, kalan işleri ve dev
 [Sıralı üretim kuyruğu](production-queue.md) yedi teslimin API grupları, ortak üretim promptu, durum ve kapanan promptların kaldırılma kuralıdır. Her geliştirme görevinde devir/kalan işlerden sonra okunur. Full clean başlayınca ajan run/kaynak/sonraki adımı bildirip turu bitirir; kullanıcı sonucu getirene kadar polling/izleme yapmaz. Başarı kullanıcı dönüşünde GitHub kanıtıyla doğrulanır.
 
 [P01 devri](p01-handover.md): katalog/hak okuması ve altı talep komutu/sürüm okuması uygulandı; B hedefli kabulü geçti; bekleme/teklif/worker C uygulandı, yeni runtime kabulü ve bütün P01 main kabulü açık.
+
+P01 sistem worker transport'u insan Auth dispatcher'ından bağımsız private.p01_worker_execute girişidir; aynı scope/job/lease kapıları korunur. Düzeltme ve bekleyen hedefli runtime kabulü docs/p01-handover.md içindedir.

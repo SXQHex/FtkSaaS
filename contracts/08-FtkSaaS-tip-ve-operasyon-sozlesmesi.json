@@ -60539,10 +60539,10 @@
         },
         "runtime_path": "/functions/v1/backend-v1/seat_offer_issue_v1",
         "runtime_external_path": "/functions/v1/backend-v1/seat_offer_issue_v1",
-        "runtime_rpc": "api_v1.seat_offer_issue_v1",
-        "runtime_transport": "dedicated database worker role -> scoped claim/lease -> RPC; human Edge callers denied",
+        "runtime_rpc": "private.p01_worker_execute",
+        "runtime_transport": "dedicated DB worker -> private.p01_worker_execute(operation,request,ids); human/API dispatcher grants excluded",
         "runtime_limits": [
-          "P01-C implementation; runtime acceptance pending. Dedicated DB worker LOGIN/org binding and runner required; no production installation performed."
+          "P01-C worker transport corrected; new runtime acceptance pending. Dedicated DB LOGIN/org binding and runner required; no production installation. API/Edge worker routes do not grant worker authority."
         ]
       },
       {
@@ -60684,10 +60684,10 @@
         },
         "runtime_path": "/functions/v1/backend-v1/seat_offer_expire_v1",
         "runtime_external_path": "/functions/v1/backend-v1/seat_offer_expire_v1",
-        "runtime_rpc": "api_v1.seat_offer_expire_v1",
-        "runtime_transport": "dedicated database worker role -> scoped claim/lease -> RPC; human Edge callers denied",
+        "runtime_rpc": "private.p01_worker_execute",
+        "runtime_transport": "dedicated DB worker -> private.p01_worker_execute(operation,request,ids); human/API dispatcher grants excluded",
         "runtime_limits": [
-          "P01-C implementation; runtime acceptance pending. Dedicated DB worker LOGIN/org binding and runner required; no production installation performed."
+          "P01-C worker transport corrected; new runtime acceptance pending. Dedicated DB LOGIN/org binding and runner required; no production installation. API/Edge worker routes do not grant worker authority."
         ]
       },
       {
@@ -60797,10 +60797,10 @@
         },
         "runtime_path": "/functions/v1/backend-v1/request_expire_v1",
         "runtime_external_path": "/functions/v1/backend-v1/request_expire_v1",
-        "runtime_rpc": "api_v1.request_expire_v1",
-        "runtime_transport": "dedicated database worker role -> scoped claim/lease -> RPC; human Edge callers denied",
+        "runtime_rpc": "private.p01_worker_execute",
+        "runtime_transport": "dedicated DB worker -> private.p01_worker_execute(operation,request,ids); human/API dispatcher grants excluded",
         "runtime_limits": [
-          "P01-C implementation; runtime acceptance pending. Dedicated DB worker LOGIN/org binding and runner required; no production installation performed."
+          "P01-C worker transport corrected; new runtime acceptance pending. Dedicated DB LOGIN/org binding and runner required; no production installation. API/Edge worker routes do not grant worker authority."
         ]
       },
       {

@@ -3929,7 +3929,7 @@
       },
       "billing_class": "worker",
       "limits": [
-        "P01-C implementation; runtime acceptance pending. Dedicated DB worker LOGIN/org binding and runner required; no production installation performed."
+        "P01-C worker transport corrected; new runtime acceptance pending. Dedicated DB LOGIN/org binding and runner required; no production installation. API/Edge worker routes do not grant worker authority."
       ]
     },
     {
@@ -3956,7 +3956,7 @@
       },
       "billing_class": "worker",
       "limits": [
-        "P01-C implementation; runtime acceptance pending. Dedicated DB worker LOGIN/org binding and runner required; no production installation performed."
+        "P01-C worker transport corrected; new runtime acceptance pending. Dedicated DB LOGIN/org binding and runner required; no production installation. API/Edge worker routes do not grant worker authority."
       ]
     },
     {
@@ -3983,7 +3983,7 @@
       },
       "billing_class": "worker",
       "limits": [
-        "P01-C implementation; runtime acceptance pending. Dedicated DB worker LOGIN/org binding and runner required; no production installation performed."
+        "P01-C worker transport corrected; new runtime acceptance pending. Dedicated DB LOGIN/org binding and runner required; no production installation. API/Edge worker routes do not grant worker authority."
       ]
     },
     {
