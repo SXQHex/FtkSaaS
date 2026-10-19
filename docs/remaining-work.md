@@ -4,6 +4,10 @@ Güncel kaynak ve CI: [doğrulanmış devir](../contracts/00-FtkSaaS-yeni-sohbet
 
 Ürün kataloğu okuması uygun satın alınmış hak seçimi değildir; seans/kişi/sale bağlamı ve DTO aktarımı ayrıca açıktır. Hosted eski smoke, güncel 104 işlemin uzaktan kabulü sayılmaz.
 
+## Aktif seri üretim
+
+[Üretim kuyruğu](production-queue.md), aşağıdaki mevcut envanteri P01–P07 sırasıyla gruplar ve ajan promptlarını taşır. İlk önkoşul P00 CI kabulüdür. Tamamlayan ajan kuyruktaki aktif promptu kısaltır/kaldırır ve bu envanterle eşitler. Full clean başladıktan sonra ajan izlemeyi bırakıp run/head/sonraki adımla kullanıcıya devreder; kullanıcı sonucunu getirince doğrular ve devam eder.
+
 ## DS öncelikli teslim sırası
 
 1. Karar/DTO/izin/guard/sürüm-okuma aktarımı ve F01–F33 yapısal denetimleri korundu; gerçek davranış kanıtı ayrı izlenir.
