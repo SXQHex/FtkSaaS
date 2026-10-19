@@ -1919,8 +1919,8 @@
     },
     {
       "name": "products_list_v1",
-      "status": "contract_only",
-      "external_path": null,
+      "status": "operational_development_limited",
+      "external_path": "/functions/v1/backend-v1/products_list_v1",
       "permission": "person.read",
       "features": [
         "F15",
@@ -1929,17 +1929,21 @@
       "required_features": [
         "F15"
       ],
-      "runtime_required_features": [],
+      "runtime_required_features": [
+        "F15"
+      ],
       "decision_delivery": {
         "accepted_contract": "DS-2026-10-17",
-        "runtime_conformance": "pending",
+        "runtime_conformance": "p01_catalog_and_context_reads",
         "open_dependencies": [],
         "target_request": {
           "$ref": "#/$defs/Request_products_list"
         }
       },
       "billing_class": "read",
-      "limits": []
+      "limits": [
+        "P01-A pool/catalog read only; no seat/right/booking guarantee. Request/waitlist/workers pending."
+      ]
     },
     {
       "name": "product_publish_v1",
@@ -2052,12 +2056,11 @@
       ],
       "runtime_required_features": [
         "F06",
-        "F15",
-        "F16"
+        "F15"
       ],
       "decision_delivery": {
         "accepted_contract": "DS-2026-10-17",
-        "runtime_conformance": "pending",
+        "runtime_conformance": "p01_catalog_and_context_reads",
         "open_dependencies": [
           "plan_gate_alignment"
         ],
@@ -2066,7 +2069,9 @@
         }
       },
       "billing_class": "read",
-      "limits": []
+      "limits": [
+        "P01-A pool/catalog read only; no seat/right/booking guarantee. Request/waitlist/workers pending."
+      ]
     },
     {
       "name": "entitlement_extend_v1",

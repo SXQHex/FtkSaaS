@@ -1,11 +1,12 @@
 # FtkSaaS — güncel devir
 
-## 19 Ekim 2026 — seri üretim başlangıç kapısı
+## 19 Ekim 2026 — P01-A geliştirme
 
-19 Ekim 2026 üretim başlangıcında main `41f922a01d05eff90f272d69496bf4c5c833e77c` doğrulandı. PR #20 birleşmiştir; [main clean 39247703349](https://github.com/SXQHex/FtkSaaS/actions/runs/39247703349) başarısızdır. `Verify merged candidate relation` adımı `No source-bound full clean evidence for merged tree` ile durdu; `npm ci` ve `test:clean` çalışmadı. Son cleanup'taki `supabase: not found` ikincil hatadır. PR #20'nin belgeye özel aday-clean istisnası runtime kabulü veya başarılı main clean değildir; P00'ın eski başarısı bu SHA'ya taşınmaz.
+Main 9ce0a5639417f959111b11f70157156733e3de18 ve [aynı SHA clean 39252687560](https://github.com/SXQHex/FtkSaaS/actions/runs/39252687560) başarılıdır. PR #21 kurtarması kapandı; PR #20'nin eski başarısızlığı yeni kabul yerine sunulmaz.
 
-İlk açık teslim [P01](../docs/production-queue.md) olup uygulamaya başlanmadı. Başlangıçta açık PR ve P01 branch'i bulunmadı. Önce normal aday/main clean yoluyla kabul zinciri yeniden kurulacak; başarılı yeni main kabulü sonrasında P01'e devam edilecek. Bu kurtarma yalnız yaşayan kuyruk/devir bilgisini günceller; runtime, envanter, F01–F33, migration ve tarihsel raporlar değişmez. Yeni adayın inceleme/test sonucu ve merge/main kabulü henüz tamamlanmış değildir.
+[P01-A devri](../docs/p01-handover.md): katalog ve seans bağlamında satın alınmış hak okuması uygulandı. 199 sözleşme / 105 çağrılabilir / 94 yalnız sözleşme; 30 migration. Yeni kaynak hedefli test/son inceleme/adayı ve main kabulü henüz bekliyor. P01'in 13 komutu, gerçek worker ve talep/bekleme uçtan uca kabulü açık.
 
+P01 öncesi snapshot:
 
 Üçüncü teslimin uygulama kapsamı: **199 sözleşme / 104 çağrılabilir / 95 yalnız sözleşme; 90 core tablo / 29 migration**. [Hesaplaşma devri](../docs/settlement-handover.md) çalışan akışı ve kabul sınırlarını tanımlar. Son head incelemesi ve tam temiz CI aynı SHA için ayrıca doğrulanır; işlem sayısı ürün tamamlanma yüzdesi değildir.
 

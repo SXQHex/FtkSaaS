@@ -103,6 +103,7 @@ export const runtimeOperationNames = [
   "settlement_request_decide_v1",
   "settlement_authority_get_v1",
   "settlement_delegation_set_v1",
-  "settlement_authority_set_v1"
+  "settlement_authority_set_v1",
+  "products_list_v1"
 ] as const;
 export type RuntimeOperationName = typeof runtimeOperationNames[number];

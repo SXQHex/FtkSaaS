@@ -16,7 +16,7 @@
     "dev:health": "node scripts/health.mjs",
     "db:advisors": "supabase db advisors --local --type all --level warn --fail-on error",
     "dev:info": "node scripts/dev-info.mjs",
-    "test:api": "node --test --test-concurrency=2 tests/cross-center-settlement.test.mjs tests/api-acceptance.test.mjs tests/event-payment.test.mjs tests/event-cancellation.test.mjs tests/registry.test.mjs tests/person-registry.test.mjs tests/room-role-registry.test.mjs tests/availability-policies.test.mjs tests/schedule-reads.test.mjs tests/program-session-lifecycle.test.mjs tests/starter-attendance-protection.test.mjs tests/instructor-earnings.test.mjs",
+    "test:api": "node --test --test-concurrency=2 tests/cross-center-settlement.test.mjs tests/api-acceptance.test.mjs tests/event-payment.test.mjs tests/event-cancellation.test.mjs tests/registry.test.mjs tests/person-registry.test.mjs tests/room-role-registry.test.mjs tests/availability-policies.test.mjs tests/schedule-reads.test.mjs tests/program-session-lifecycle.test.mjs tests/starter-attendance-protection.test.mjs tests/instructor-earnings.test.mjs tests/p01-catalog-entitlement-reads.test.mjs",
     "dev:seed": "node scripts/dev-seed.mjs",
     "test:clean": "node scripts/test-clean.mjs",
     "test:governance": "node scripts/governance.mjs && node --test tests/governance.test.mjs"

@@ -1,8 +1,8 @@
 # Kalan backend işleri
 
-Güncel kaynak ve CI: [doğrulanmış devir](../contracts/00-FtkSaaS-yeni-sohbet-devir.md). **199 işlem: 104 çağrılabilir, 95 yalnız sözleşme; 29 migration.** Önceki teslimlerde kapanmış işler burada yeniden açık ilan edilmez. Uygulama kapsamı [Starter](starter-attendance-protection-handover.md) ve [anlaşma/hakediş](instructor-earnings-handover.md) devirlerindedir.
+Güncel kaynak ve CI: [doğrulanmış devir](../contracts/00-FtkSaaS-yeni-sohbet-devir.md). **199 işlem: 105 çağrılabilir, 94 yalnız sözleşme; 30 migration.** Önceki teslimlerde kapanmış işler burada yeniden açık ilan edilmez. Uygulama kapsamı [Starter](starter-attendance-protection-handover.md) ve [anlaşma/hakediş](instructor-earnings-handover.md) devirlerindedir.
 
-Ürün kataloğu okuması uygun satın alınmış hak seçimi değildir; seans/kişi/sale bağlamı ve DTO aktarımı ayrıca açıktır. Hosted eski smoke, güncel 104 işlemin uzaktan kabulü sayılmaz.
+[P01-A](p01-handover.md) katalog ve seans/kişi/sale hak okumasını uygular; yeni kaynak kabulü bekliyor. Kalan 13 P01 komutu ve worker işletimi açıktır. Hosted eski smoke, güncel 104 işlemin uzaktan kabulü sayılmaz.
 
 ## Aktif seri üretim
 
@@ -29,7 +29,7 @@ Kalan delivery_gaps ve vaka bazlı durumlar [08 makine sözleşmesi](../contract
 
 Her yeni grup: sözleşme/izin incelemesi → yeni migration → gerçek Auth/API kabulü (sınır, yetki, tekrar, yarış, rollback) → inceleme → temiz CI → main CI. Ürün kararında boşluk varsa teknik varsayımla yeni kural eklenmez.
 
-## Yalnız sözleşme envanteri — güncel 95 işlem
+## Yalnız sözleşme envanteri — güncel 94 işlem
 
 | Modül | Kalan işlem |
 |---|---:|
@@ -38,7 +38,7 @@ Her yeni grup: sözleşme/izin incelemesi → yeni migration → gerçek Auth/AP
 | M03 | 3 |
 | M04 | 12 |
 | M05 | 3 |
-| M06 | 13 |
+| M06 | 12 |
 | M07 | 5 |
 | M08 | 2 |
 | M09 | 11 |
@@ -78,7 +78,6 @@ Her yeni grup: sözleşme/izin incelemesi → yeni migration → gerçek Auth/AP
 | waitlist_leave_v1 | reservation.write |
 | seat_offer_accept_v1 | reservation.write |
 | seat_offer_reject_v1 | reservation.write |
-| products_list_v1 | person.read |
 | entitlement_extend_v1 | entitlement.correct |
 | credit_adjust_v1 | entitlement.correct |
 | freeze_preview_v1 | entitlement.correct |
@@ -154,3 +153,5 @@ Her yeni grup: sözleşme/izin incelemesi → yeni migration → gerçek Auth/AP
 - Production hazırlığı ve ayrı dağıtım yetkisi. Main merge production izni değildir.
 
 Bu maddeler ve yalnız sözleşme işlemleri kapanmış sayılmaz. Frontend tasarımı ayrı alan sahibindedir.
+
+[P01-A devri](p01-handover.md): katalog/seans bağlamlı satın alınmış hak okuması; yeni kaynak kabulü ve kalan talep/bekleme/worker akışı açık.

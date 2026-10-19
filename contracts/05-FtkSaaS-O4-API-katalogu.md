@@ -1,6 +1,6 @@
 # FtkSaaS — API kataloğu · 0.2.0-rc.3
 
-199 sözleşme; 104 geliştirme ortamında çağrılabilir endpoint, 95 yalnız sözleşme. Çağrılabilir olmak bütün ürün özelliklerinin veya üretim kabulünün tamamlandığı anlamına gelmez. Kapsam sınırları ve Q-E01 `docs/claude-handover.md` içindedir.
+199 sözleşme; 105 geliştirme ortamında çağrılabilir endpoint, 94 yalnız sözleşme. Çağrılabilir olmak bütün ürün özelliklerinin veya üretim kabulünün tamamlandığı anlamına gelmez. Kapsam sınırları ve Q-E01 `docs/claude-handover.md` içindedir.
 
 `POST {API_URL}/functions/v1/backend-v1/{operation}`; JSON gövde doğrudan typed Request nesnesidir. Header: `Authorization: Bearer <Supabase access_token>`, `apikey: <publishable key>`, `Content-Type: application/json`. Başarı: `ok/data/trace_id`; hata: `ok:false/error:SafeError`. Servis anahtarı frontend’e verilmez.
 
@@ -82,11 +82,11 @@ Named `/rest/v1/rpc/{operation}` yalnız backend içindir; imzası p_request + d
 | `attendance_close_v1` | çağrılabilir (kapsam notları geçerli) | `attendance.close` | W / maintenance | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; center_id?: FtkUuid ∣ null; operation_key: FtkUuid; expected_version: PositiveInt; session_id: FtkUuid; performed?: Bool; performed_instructor_ids?: FtkUuid[] | Success_attendance_close |
 | `attendance_correct_preview_v1` | çağrılabilir (kapsam notları geçerli) | `attendance.correct` | P / maintenance | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; center_id?: FtkUuid ∣ null; session_id: FtkUuid; corrections: AttendanceCorrection[]; reason: Text; performed?: Bool; performed_instructor_ids?: FtkUuid[] | Success_attendance_correct_preview |
 | `attendance_correct_apply_v1` | çağrılabilir (kapsam notları geçerli) | `attendance.correct` | A / maintenance | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; center_id?: FtkUuid ∣ null; operation_key: FtkUuid; preview: PreviewToken | Success_attendance_correct_apply |
-| `products_list_v1` | yalnız sözleşme | `person.read` | R / read | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; center_id?: FtkUuid ∣ null; page: Page | Success_products_list |
+| `products_list_v1` | çağrılabilir (kapsam notları geçerli) | `person.read` | R / read | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; center_id?: FtkUuid ∣ null; page: Page; include_timed_products?: boolean | Success_products_list |
 | `product_publish_v1` | çağrılabilir (kapsam notları geçerli) | `product.manage` | W / config | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; center_id?: FtkUuid ∣ null; operation_key: FtkUuid; product_id?: FtkUuid ∣ null; terms: ProductTerms | Success_product_publish |
 | `sale_preview_v1` | çağrılabilir (kapsam notları geçerli) | `sale.write` | P / new | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; center_id?: FtkUuid ∣ null; person_id: FtkUuid; product_version_id: FtkUuid; start_date: Date; net_minor?: Money ∣ null; end_date: Date | Success_sale_preview |
 | `sale_apply_v1` | çağrılabilir (kapsam notları geçerli) | `sale.write` | A / new | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; center_id?: FtkUuid ∣ null; operation_key: FtkUuid; preview: PreviewToken | Success_sale_apply |
-| `entitlements_get_v1` | çağrılabilir (kapsam notları geçerli) | `person.read` | R / read | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; center_id?: FtkUuid ∣ null; person_id: FtkUuid | Success_entitlements_get |
+| `entitlements_get_v1` | çağrılabilir (kapsam notları geçerli) | `person.read` | R / read | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; center_id?: FtkUuid ∣ null; person_id: FtkUuid; include_timed_rights?: boolean; session_id?: FtkUuid; booking_mode?: BookingMode | Success_entitlements_get |
 | `entitlement_extend_v1` | yalnız sözleşme | `entitlement.correct` | W / maintenance | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; center_id?: FtkUuid ∣ null; operation_key: FtkUuid; expected_version: PositiveInt; sale_id: FtkUuid; end_date: Date; reason: Text; impact_approval: PreviewToken; accepted_reservation_ids: FtkUuid[] | Success_entitlement_extend |
 | `credit_adjust_v1` | yalnız sözleşme | `entitlement.correct` | W / maintenance | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; center_id?: FtkUuid ∣ null; operation_key: FtkUuid; sale_id: FtkUuid; quantity: Int; direction: Direction; reason: Text; impact_approval: PreviewToken; accepted_reservation_ids: FtkUuid[] | Success_credit_adjust |
 | `negative_limit_set_v1` | çağrılabilir (kapsam notları geçerli) | `entitlement.correct` | W / config | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; center_id: FtkUuid; operation_key: FtkUuid; expected_version: PositiveInt; person_id: FtkUuid; allowed_negative_credits: Count; reason: Text; discipline_id: FtkUuid; impact_approval: PreviewToken; accepted_reservation_ids: FtkUuid[] | Success_negative_limit_set |
@@ -288,11 +288,11 @@ features ürün referanslarıdır. required_features hedef plan kapısı; runtim
 | attendance_close_v1 | closure | row_version / attendance_get_v1 | attendance_closures, sessions.occurred, reservations.completed, rights.consume_release, earnings.if_F20, settlement.accrual_if_eligible | starter_and_paid_agreement_runtime |
 | attendance_correct_preview_v1 | preview | preview_dependencies / attendance_get_v1 |  | starter_and_paid_agreement_runtime |
 | attendance_correct_apply_v1 | correction | preview_dependencies / attendance_correct_preview_v1 | attendance_entries.linked_revision, rights.linked_correction, earnings.linked_difference_if_F20, settlement.linked_reversal | starter_and_paid_agreement_runtime |
-| products_list_v1 | read | none / None |  | pending |
+| products_list_v1 | read | none / None |  | p01_catalog_and_context_reads |
 | product_publish_v1 | command | append_or_current_scope_lock / management_state_get_v1 | products.identity, product_versions.immutable, product_scopes.new_version_only | conditional_plan_gates_aligned_limited_runtime |
 | sale_preview_v1 | preview | preview_dependencies / management_state_get_v1 |  | conditional_plan_gates_aligned_limited_runtime |
 | sale_apply_v1 | apply | preview_dependencies / sale_preview_v1 | sales.frozen_terms_scope, rights.issue, deficits.settle_past_then_future, debts, priority_reservations.if_required | conditional_plan_gates_aligned_limited_runtime |
-| entitlements_get_v1 | read | none / None |  | pending |
+| entitlements_get_v1 | read | none / None |  | p01_catalog_and_context_reads |
 | entitlement_extend_v1 | command | row_version / management_state_get_v1 | sales.explicit_validity_change, protected_reservation_obligations | pending |
 | credit_adjust_v1 | command | append_or_current_scope_lock / management_state_get_v1 | entitlement_movements.linked, protected_reservation_obligations | pending |
 | negative_limit_set_v1 | command | row_version / negative_limits_get_v1 | negative_limit_overrides.version, protected_reservation_obligations, reservation_protections.append_causal_obligation_proof | starter_runtime_limited_paid_path_pending |

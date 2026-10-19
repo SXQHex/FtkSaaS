@@ -41,7 +41,7 @@ for source,entry in zip(c['operations'],inventory['operations']):
 emit('docs/endpoint-inventory.json',json.dumps(inventory,ensure_ascii=False,indent=2)+'\n')
 print('Current schema/API catalogs and explicit endpoint inventory generated')
 
-feature_doc=['# F01–F33 karar, teknik bağımlılık, runtime ve kabul haritası','','Bu harita 08 makine sözleşmesinden üretilir. İşlem sayısı ürün tamamlanma yüzdesi değildir. 104 çağrılabilir işlem DS davranışlarının tamamlandığını göstermez. Yeni ürün kararlarının gerçek Auth → Edge → RPC kabulü aşağıdaki açık teslim bağımlılıklarında bekler.','','| Özellik / ürün kararı | Plan erişimi | Teknik karşılık | Açık bağımlılıklar | Uygulama | Kabul |','|---|---|---|---|---|---|']
+feature_doc=['# F01–F33 karar, teknik bağımlılık, runtime ve kabul haritası','','Bu harita 08 makine sözleşmesinden üretilir. İşlem sayısı ürün tamamlanma yüzdesi değildir. 105 çağrılabilir işlem DS davranışlarının tamamlandığını göstermez. Yeni ürün kararlarının gerçek Auth → Edge → RPC kabulü aşağıdaki açık teslim bağımlılıklarında bekler.','','| Özellik / ürün kararı | Plan erişimi | Teknik karşılık | Açık bağımlılıklar | Uygulama | Kabul |','|---|---|---|---|---|---|']
 for fid,row in c['feature_delivery'].items():
  plans=', '.join(k for k,v in row['plans'].items() if v)
  ops=', '.join(row['technical_operations']) or 'İlgili modül teslimi'

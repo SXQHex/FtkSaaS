@@ -4,14 +4,15 @@ import {pathToFileURL} from 'node:url';
 export const apiSuites = [
  'api-acceptance','event-payment','event-cancellation','registry','person-registry',
  'room-role-registry','availability-policies','schedule-reads','program-session-lifecycle',
- 'starter-attendance-protection','instructor-earnings','cross-center-settlement'
+ 'starter-attendance-protection','instructor-earnings','cross-center-settlement','p01-catalog-entitlement-reads'
 ].map(n=>'tests/'+n+'.test.mjs');
 // Economic consumers and reservation readers are explicit dependencies, not filename guesses.
 export const modules = [
+ {id:'p01-reads', sources:['p01-catalog-entitlement-reads'], suites:['p01-catalog-entitlement-reads','schedule-reads','starter-attendance-protection']},
  {id:'settlement', sources:['cross-center-settlement'], suites:['cross-center-settlement','instructor-earnings','starter-attendance-protection']},
  {id:'earnings', sources:['instructor-earnings'], suites:['instructor-earnings','cross-center-settlement','program-session-lifecycle','starter-attendance-protection']},
- {id:'attendance', sources:['starter-attendance-protection','starter-attendance-privacy-legacy'], suites:['starter-attendance-protection','instructor-earnings','cross-center-settlement']},
- {id:'program', sources:['program-session-lifecycle'], suites:['program-session-lifecycle','schedule-reads','starter-attendance-protection','instructor-earnings','cross-center-settlement']},
+ {id:'attendance', sources:['starter-attendance-protection','starter-attendance-privacy-legacy'], suites:['starter-attendance-protection','instructor-earnings','cross-center-settlement','p01-catalog-entitlement-reads']},
+ {id:'program', sources:['program-session-lifecycle'], suites:['program-session-lifecycle','schedule-reads','starter-attendance-protection','instructor-earnings','cross-center-settlement','p01-catalog-entitlement-reads']},
  {id:'policy', sources:['availability-policies'], suites:['availability-policies','program-session-lifecycle','starter-attendance-protection','schedule-reads']},
  {id:'schedule', sources:['schedule-reads','runtime-read-projection'], suites:['schedule-reads','program-session-lifecycle','starter-attendance-protection']},
  {id:'people', sources:['person-registry','person-scope-guard'], suites:['person-registry','registry','schedule-reads','instructor-earnings']},

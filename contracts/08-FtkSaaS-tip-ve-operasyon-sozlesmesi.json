@@ -3720,6 +3720,18 @@
           "items": {
             "$ref": "#/$defs/DeficitScopeView"
           }
+        },
+        "product_version_id": {
+          "$ref": "#/$defs/FtkUuid"
+        },
+        "booking_mode": {
+          "$ref": "#/$defs/BookingMode"
+        },
+        "kind": {
+          "$ref": "#/$defs/EntitlementKind"
+        },
+        "available_at_session": {
+          "$ref": "#/$defs/Count"
         }
       },
       "required": [
@@ -3737,7 +3749,7 @@
         "deficit_scopes"
       ],
       "additionalProperties": false,
-      "x-invariant": "available/reserved/consumed are sale pool totals, never duplicated by discipline. deficit aggregate is display-only; limits use deficit_scopes."
+      "x-invariant": "available/reserved/consumed are sale pool totals, never duplicated by discipline. deficit aggregate is display-only; limits use deficit_scopes. available_at_session is present only with session_id; unlimited timed rights use 1 as an eligibility indicator, not a numeric credit balance."
     },
     "DebtSummary": {
       "type": "object",
@@ -10449,6 +10461,10 @@
         },
         "page": {
           "$ref": "#/$defs/Page"
+        },
+        "include_timed_products": {
+          "type": "boolean",
+          "default": false
         }
       },
       "required": [
@@ -10705,6 +10721,16 @@
         },
         "person_id": {
           "$ref": "#/$defs/FtkUuid"
+        },
+        "include_timed_rights": {
+          "type": "boolean",
+          "default": false
+        },
+        "session_id": {
+          "$ref": "#/$defs/FtkUuid"
+        },
+        "booking_mode": {
+          "$ref": "#/$defs/BookingMode"
         }
       },
       "required": [
@@ -10713,7 +10739,22 @@
         "org_id",
         "person_id"
       ],
-      "additionalProperties": false
+      "additionalProperties": false,
+      "allOf": [
+        {
+          "if": {
+            "required": [
+              "booking_mode"
+            ]
+          },
+          "then": {
+            "required": [
+              "session_id"
+            ]
+          }
+        }
+      ],
+      "x-invariant": "With session_id: purchased rights matching session start, lesson scope and positive pool/quota, ordered by valid_until/created_at/id. Read does not reserve or authorize booking; write guards always recheck. Without session: authorized pool history. Timed rights require explicit include_timed_rights and F16."
     },
     "Success_entitlements_get": {
       "type": "object",
@@ -51056,7 +51097,10 @@
           "billing_gate_read",
           "required_feature_gates_separate_from_references",
           "no_business_commit",
-          "scope_filter_before_pagination"
+          "scope_filter_before_pagination",
+          "catalog_not_purchased_right_selection",
+          "live_center_scope_before_projection",
+          "conditional_timed_read_gate"
         ],
         "audit": false,
         "notification": "none",
@@ -51074,11 +51118,13 @@
           "A55"
         ],
         "configuration_policy": "numeric plan limits/prices and legal approval are deployment configuration, never arbitrary allow/deny",
-        "implementation_status": "contract_only",
+        "implementation_status": "operational_development_limited",
         "required_features": [
           "F15"
         ],
-        "runtime_required_features": [],
+        "runtime_required_features": [
+          "F15"
+        ],
         "conditional_features": [
           {
             "feature": "F16",
@@ -51094,17 +51140,24 @@
           "read_operation": null,
           "atomic_effects": [],
           "business_commit": false,
-          "read_path_status": "contract_only",
+          "read_path_status": "implemented",
           "source_decision": "DS-2026-10-17"
         },
         "decision_delivery": {
           "accepted_contract": "DS-2026-10-17",
-          "runtime_conformance": "pending",
+          "runtime_conformance": "p01_catalog_and_context_reads",
           "open_dependencies": [],
           "target_request": {
             "$ref": "#/$defs/Request_products_list"
           }
-        }
+        },
+        "runtime_path": "/functions/v1/backend-v1/products_list_v1",
+        "runtime_external_path": "/functions/v1/backend-v1/products_list_v1",
+        "runtime_rpc": "api_v1.products_list_v1",
+        "runtime_transport": "authenticated Edge adapter -> service-only RPC; rules/transaction in PostgreSQL",
+        "runtime_limits": [
+          "P01-A pool/catalog read only; no seat/right/booking guarantee. Request/waitlist/workers pending."
+        ]
       },
       {
         "name": "product_publish_v1",
@@ -51612,7 +51665,10 @@
           "same_org_center_discipline",
           "required_feature_gates_separate_from_references",
           "no_business_commit",
-          "authorized_projection_only"
+          "authorized_projection_only",
+          "catalog_not_purchased_right_selection",
+          "live_center_scope_before_projection",
+          "conditional_timed_read_gate"
         ],
         "audit": false,
         "notification": "none",
@@ -51639,15 +51695,16 @@
         "runtime_rpc": "api_v1.entitlements_get_v1",
         "runtime_transport": "authenticated Edge adapter -> service-only RPC; rules/transaction in PostgreSQL",
         "runtime_external_path": "/functions/v1/backend-v1/entitlements_get_v1",
-        "runtime_limits": [],
+        "runtime_limits": [
+          "P01-A pool/catalog read only; no seat/right/booking guarantee. Request/waitlist/workers pending."
+        ],
         "required_features": [
           "F06",
           "F15"
         ],
         "runtime_required_features": [
           "F06",
-          "F15",
-          "F16"
+          "F15"
         ],
         "conditional_features": [
           {
@@ -51664,12 +51721,12 @@
           "read_operation": null,
           "atomic_effects": [],
           "business_commit": false,
-          "read_path_status": "contract_only",
+          "read_path_status": "implemented",
           "source_decision": "DS-2026-10-17"
         },
         "decision_delivery": {
           "accepted_contract": "DS-2026-10-17",
-          "runtime_conformance": "pending",
+          "runtime_conformance": "p01_catalog_and_context_reads",
           "open_dependencies": [
             "plan_gate_alignment"
           ],
@@ -78926,6 +78983,18 @@
         "origin": "ftksaas",
         "acceptance": "generic_uuid",
         "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Request_entitlements_get/properties/session_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/EntitlementView/properties/product_version_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
       }
     ],
     "open_product_decisions": [],
@@ -80715,6 +80784,7 @@
         "acceptance_evidence": [],
         "implemented_operations": [
           "reservation_create_v1",
+          "products_list_v1",
           "product_publish_v1",
           "sale_preview_v1",
           "sale_apply_v1",
@@ -80726,7 +80796,6 @@
           "negative_limits_get_v1"
         ],
         "contract_only_operations": [
-          "products_list_v1",
           "entitlement_extend_v1",
           "credit_adjust_v1",
           "sale_terminate_preview_v1",
@@ -80802,13 +80871,13 @@
         "acceptance": "pending_feature_acceptance",
         "acceptance_evidence": [],
         "implemented_operations": [
+          "products_list_v1",
           "product_publish_v1",
           "sale_preview_v1",
           "sale_apply_v1",
           "entitlements_get_v1"
         ],
         "contract_only_operations": [
-          "products_list_v1",
           "sale_renew_preview_v1",
           "sale_renew_apply_v1"
         ],

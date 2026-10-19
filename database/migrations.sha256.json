@@ -27,5 +27,6 @@
   "20261017122121_starter_attendance_protection.sql": "a632266fdc5897fe9a1e247a7be6af38d9192a07214bfd9d4dac9679fd014365",
   "20261017131221_starter_attendance_privacy_legacy.sql": "406eb2ece9665e1a9e1212c6c2b5a21ae95f7359f21024059fcd7dcbf2ed3728",
   "20261017150034_instructor_earnings_workflow.sql": "f7efe3cc9830170f81849fe6ad40b0079942bf4476ab61609704e2ee4f54eacc",
-  "20261018231129_cross_center_settlement.sql": "7f5d990e00946a8ecab59dcb9b4c75fc260a5801df537634fd8dd6974a062500"
+  "20261018231129_cross_center_settlement.sql": "7f5d990e00946a8ecab59dcb9b4c75fc260a5801df537634fd8dd6974a062500",
+  "20261019131628_p01_catalog_entitlement_reads.sql": "d91d15dc7c2becd92316da8ee335b63f836f799edeaabed780b31fa86d39b832"
 }

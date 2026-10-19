@@ -4,18 +4,16 @@
 
 ## Şimdi yapılacak iş
 
-**P00 tamamlandı; ilk üretim teslimi P01, güncel main kabulü nedeniyle blocked.** CI PR #19 main'e `b4a704a6897353bb0d54355903267b62d8d72496` olarak birleşti; [aynı main SHA clean'i](https://github.com/SXQHex/FtkSaaS/actions/runs/39242063000) başarılıdır. PR head `11fa31180b7ca4792ea73875713df87c5ed499dc` ve [aday clean kanıtı](https://github.com/SXQHex/FtkSaaS/actions/runs/39233169767) ayrı kaynak kanıtıdır. Repository korumasının yönetici tarafından uygulanması ayrı açık sınırdır. Bu üretim kuyruğunun belge PR #20 kabulü/merge'i ayrıca doğrulanır; P01'e başlamadan güncel kuyruk ve mevcut çalışma branch'leri kontrol edilir.
+**P00 ve PR #21 kabul kurtarması kapalı; P01-A in_progress.** Başlangıç main 9ce0a5639417f959111b11f70157156733e3de18; [aynı SHA main clean](https://github.com/SXQHex/FtkSaaS/actions/runs/39252687560) başarılı. Önceki PR #20 başarısızlığı normal aday/merge/main clean zinciriyle kapandı; istisna runtime'a taşınmadı.
 
-19 Ekim 2026 üretim başlangıcında main `41f922a01d05eff90f272d69496bf4c5c833e77c` doğrulandı. PR #20 birleşmiştir; [main clean 39247703349](https://github.com/SXQHex/FtkSaaS/actions/runs/39247703349) başarısızdır. `Verify merged candidate relation` adımı `No source-bound full clean evidence for merged tree` ile durdu; `npm ci` ve `test:clean` çalışmadı. Son cleanup'taki `supabase: not found` ikincil hatadır. PR #20'nin belgeye özel aday-clean istisnası runtime kabulü veya başarılı main clean değildir; P00'ın eski başarısı bu SHA'ya taşınmaz.
-
-Kurtarma yolu: bu engeli kaydeden dar belge PR'si normal kaynak bağlı aday full clean, koşullu merge ve aynı main SHA full clean yolundan geçer. Kapı/workflow/required-check değiştirilmez; istisna veya sahte kanıt eklenmez. Başarılı yeni main kabulü doğrulanmadan P01 runtime geliştirmesi başlamaz. Aday clean başlatılınca kullanıcıya devir kuralı uygulanır; sonuçlar sonraki doğal uygulama commit'inde eşitlenir.
+[P01 devri](p01-handover.md): A katalog/seans bağlamlı satın alınmış hak okuma; B talep/alternatif/onay; C bekleme/yer teklifi/gerçek worker. A dilimi uygulandı; hedefli doğrulama ve son aday kabulü bekliyor. Main kabul kurtarması kanıtı bu doğal uygulama commit'inde eşitlendi.
 
 Bu planın başlangıç envanteri 199 toplam / 104 çağrılabilir / 95 contract_only / 29 migration'dır. Yedi grup başlangıçtaki 95 işlemi birer kez kapsar. Yeni sözleşme ihtiyacı ayrıca açıklanır; sayılar başarı hedefi değildir.
 
 | Sıra | Teslim | Başlangıç işlem sayısı | Durum | PR/head | Devam |
 |---|---|---:|---|---|---|
 | P00 | CI ayrımı | — | done | #19 / main b4a704a6897353bb0d54355903267b62d8d72496 | main clean 39242063000 başarılı; koruma yönetici sınırı açık |
-| P01 | Talep, rezervasyon ve bekleme | 14 | blocked | — | main 41f922a01d05eff90f272d69496bf4c5c833e77c kabul kanıtı yok; normal aday/main clean ile kurtarma |
+| P01 | Talep, rezervasyon ve bekleme | 14 | in_progress | feature/p01-request-reservation-flow | A okuma dilimi doğrulama; B/C 13 API açık |
 | P02 | Paket ve seans yaşam döngüsü | 15 | queued | — | önceki teslimin main kabulünden sonra |
 | P03 | Finans ve eğitmen ödemeleri | 7 | queued | — | önceki teslimin main kabulünden sonra |
 | P04 | CRM ve public başvuru | 11 | queued | — | önceki teslimin main kabulünden sonra |
@@ -67,11 +65,10 @@ Aşağıdaki kurallarla sıradaki açık teslimi uygula; kullanıcı her teslim 
 
 ### P01 — Talep, rezervasyon ve bekleme
 
-Ortak üretim promptunu uygula. Durum: blocked — yukarıdaki main kabul kurtarması bekleniyor.
+Ortak üretim promptunu uygula. Durum: in_progress — A okuma dilimi uygulandı, kabul bekliyor. B/C 13 API açık.
 
-**Mevcut sözleşme API'leri (14):**
+**Kalan sözleşme API'leri (13):**
 
-- `products_list_v1`
 - `lesson_request_create_v1`
 - `lesson_request_withdraw_v1`
 - `lesson_request_reject_v1`
@@ -85,6 +82,8 @@ Ortak üretim promptunu uygula. Durum: blocked — yukarıdaki main kabul kurtar
 - `seat_offer_issue_v1`
 - `seat_offer_expire_v1`
 - `request_expire_v1`
+
+P01-A: products_list_v1 ve entitlements_get_v1 seans bağlamı uygulandı; hedefli/son aday/main kabulü bekliyor. Bu dilim yeniden geliştirilmez; kalan akışla entegrasyon devam eder.
 
 **Görev ve kabul:**
 
