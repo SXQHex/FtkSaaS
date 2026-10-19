@@ -4,16 +4,16 @@
 
 ## Şimdi yapılacak iş
 
-**P00 ve PR #21 kabul kurtarması kapalı; P01-A in_progress.** Başlangıç main 9ce0a5639417f959111b11f70157156733e3de18; [aynı SHA main clean](https://github.com/SXQHex/FtkSaaS/actions/runs/39252687560) başarılı. Önceki PR #20 başarısızlığı normal aday/merge/main clean zinciriyle kapandı; istisna runtime'a taşınmadı.
+**P00, PR #21 kurtarması ve PR #23 CI bakımı kapalı; P01-A in_progress.** Güncel main 24007212005d07938fb1265a9f42891f18d7fa09; [aynı SHA main clean 39298247595](https://github.com/SXQHex/FtkSaaS/actions/runs/39298247595) başarılı: 409 test, sıfır annotation warning/error, merged-candidate relation doğrulandı. Node24 Action kurulumu tek seferlik açık kullanıcı onayıyla yapıldı; bu yetki P01'in normal merge kapısına istisna vermez.
 
-[P01 devri](p01-handover.md): A katalog/seans bağlamlı satın alınmış hak okuma; B talep/alternatif/onay; C bekleme/yer teklifi/gerçek worker. A dilimi uygulandı; ilk hedefli CI 39270054878 hata-kodu beklentisinde başarısız. Test ve kaynak farkı seçimi düzeltmesi uygulandı; ikinci koşunun logunda P01 10/10 geçti, ortak API haftalık kota fixture'ı saat sınırında başarısız oldu. Fixture düzeltmesi uygulandı; yeni runtime kabulü ve son aday clean bekliyor. Main kabul kurtarması kanıtı bu doğal uygulama commit'inde eşitlendi.
+[P01 devri](p01-handover.md): A katalog/seans bağlamlı hak okuması uygulanmış; B talep/alternatif/onay; C bekleme/yer teklifi/worker açıktır. Mevcut PR #22 güncel main'e taşınır; mükerrer teslim açılmaz. Eski head 580239075b16f6ac6893d5ac01975d32133d0757 hedefli run 39281409902: 119 yapı/politika + 27 DB + 51 API başarılıdır. Yeni birleşik head için hedefli kabul, bağımsız son inceleme ve aday/main clean bekler; önceki başarı yeni kaynağa taşınmaz.
 
 Bu planın başlangıç envanteri 199 toplam / 104 çağrılabilir / 95 contract_only / 29 migration'dır. Yedi grup başlangıçtaki 95 işlemi birer kez kapsar. Yeni sözleşme ihtiyacı ayrıca açıklanır; sayılar başarı hedefi değildir.
 
 | Sıra | Teslim | Başlangıç işlem sayısı | Durum | PR/head | Devam |
 |---|---|---:|---|---|---|
 | P00 | CI ayrımı | — | done | #19 / main b4a704a6897353bb0d54355903267b62d8d72496 | main clean 39242063000 başarılı; koruma yönetici sınırı açık |
-| P01 | Talep, rezervasyon ve bekleme | 14 | in_progress | #22 / feature/p01-request-reservation-flow | P01 10/10 log kanıtı; ortak API saat bağımlı kota fixture düzeltmesi sonrası yeni hedefli kabul bekliyor; B/C 13 API açık |
+| P01 | Talep, rezervasyon ve bekleme | 14 | in_progress | #22 / feature/p01-request-reservation-flow | CI bakımı main kabulü tamam; güncel main ile birleşik P01-A hedefli/adayı/main kabulü bekliyor; B/C 13 API açık |
 | P02 | Paket ve seans yaşam döngüsü | 15 | queued | — | önceki teslimin main kabulünden sonra |
 | P03 | Finans ve eğitmen ödemeleri | 7 | queued | — | önceki teslimin main kabulünden sonra |
 | P04 | CRM ve public başvuru | 11 | queued | — | önceki teslimin main kabulünden sonra |

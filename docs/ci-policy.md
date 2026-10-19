@@ -69,3 +69,25 @@ Bu kural önceki otomatik devam/CI izleme talimatlarını yalnız bekleme davran
 - CI kendi kendine çalışmaya devam eder; duracak olan Work ajanının aktif izlemesidir. Bu talimat workflow iptal etme veya testleri atlama talimatı değildir.
 
 Aktif teslim ve devam noktası [üretim kuyruğunda](production-queue.md) tutulur.
+
+## Action runtime bakım adayı — 19 Ekim 2026
+
+Son hedefli run 39281409902 / P01 head 580239075b16f6ac6893d5ac01975d32133d0757 logları 96 sözleşme/yönetişim, 23 CI politika, 27 DB ve 51 API testini başarılı gösterdi. Bu branch dışındaki P01 kaynak kanıtıdır; main kabulü değildir. Önceki Auth/kota assertion hataları bu kaynakta geçmiştir. Geriye kalan Annotations warning'i checkout/setup-node Action'larının Node 20 hedeflemesidir; uygulamanın node-version:24.19.0 ayarı Action'ın kendi runtime'ını değiştirmez.
+
+Bakım branch'i maintenance/actions-node24, main 9ce0a5639417f959111b11f70157156733e3de18 tabanındadır. Ürün/runtime değişikliği içermez. Main'deki aynı saat bağımlı ortak kota fixture'ının düzeltmesi P01 PR'sinden birebir alınır; CI bakımının full clean'i bilinen mevcut fixture hatasında boşa çalıştırılmaz. Yeniden ürün uygulaması yapılmaz. Dört workflow'da yalnız Node 20 Action bağımlılıkları Node 24 kullanan resmi sürümlerin değişmez commit SHA'larına yükseltilir:
+
+| Action | Resmi sürüm | Yeni commit | Runtime |
+|---|---|---|---|
+| checkout | [v7.0.1](https://github.com/actions/checkout/releases/tag/v7.0.1) | 3d3c42e5aac5ba805825da76410c181273ba90b1 | node24 |
+| setup-node | [v7.1.0](https://github.com/actions/setup-node/releases/tag/v7.1.0) | 949feb2413d6458794dcd2491c4babbbce0c15c1 | node24 |
+| upload-artifact | [v7.0.2](https://github.com/actions/upload-artifact/releases/tag/v7.0.2) | cf430e030ddbb5b0abf93d22962f4752f3646cd9 | node24 |
+
+Her resmi tag'in commit'i ve action.yml runs.using değeri doğrulandı. Mevcut github-script ed597411d8f924073f98dfc5c65a23a2325f34cd zaten node24; gereksiz major yükseltmesi yapılmadı. Checkout persist-credentials:false, uygulama Node24.19.0, npm cache, event/permissions/concurrency/test komutları ve gate/binding kodu korunur. upload-artifact v7'nin varsayılan archive:true davranışı açık yazılır; gizli .ci/binding.json, candidate-binding adı ve ZIP receipt uyumu korunur. Uyarı gizleme veya FORCE_* ortam bayrağı yoktur.
+
+ci-full.yml blob'u değiştiği için mevcut güvenilir base denetimi bakım PR'sinin otomatik ftksaas/merge-clean kabulünü reddedecektir. Bu beklenen güven sınırıdır: bağımsız son-head incelemesi ve gerçek aday clean çalıştırılır; normal kabul/merge veya güvenilir politika kurulumunun tamamlandığı iddia edilmez. Gate gevşetilmez, başarı status'u elle yazılmaz, required check bypass edilmez ve repository yönetim ayarı değiştirilmez. Yeni runtime/annotation sonucu ve main kabulü henüz bekler.
+
+### Bakım kurulumu ve main kabulü tamamlandı
+
+PR #23, kullanıcı tarafından açıkça onaylanan tek seferlik güvenilir workflow kurulumu olarak normal merge API'siyle 24007212005d07938fb1265a9f42891f18d7fa09 SHA'sına alındı. Aday full clean 39282766184 / eab732f17d0e2955fb88c5e46354c785da89d845 / base9ce0a5639417f959111b11f70157156733e3de18 başarılıydı: 409 test, sıfır aday annotation warning/error; aday tree2b7a76e73ca1e2efd201b0d9a18bea4afe12007b gerçek merge ile aynıydı. [Main clean 39298247595](https://github.com/SXQHex/FtkSaaS/actions/runs/39298247595) Verify merged candidate relation ve test:clean ile 409 testi geçti; main'de de sıfır annotation warning/error. Önceki bakım adayı kurulum engeli kapanmıştır.
+
+Repository ayarları ve required-check bypass kullanılmadı; gate kodu veya kaynak bağı zayıflatılmadı, sahte status yazılmadı. Tek seferlik kullanıcı yetkisi yeni workflow değişiklikleri veya P01 runtime'ı için otomatik istisna değildir. Güncel main'le aynı ci-full.yml blob'u taşıyan P01 son adayı normal kaynak bağlı kabul kapısından geçer; yeni head/base için eski clean geçerli sayılmaz.

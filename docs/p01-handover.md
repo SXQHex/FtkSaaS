@@ -2,6 +2,7 @@
 
 Başlangıç main: 9ce0a5639417f959111b11f70157156733e3de18. Aynı SHA [main clean 39252687560](https://github.com/SXQHex/FtkSaaS/actions/runs/39252687560) başarılı; PR #21 kabul kurtarması kapalıdır. Eski PR #20'nin belge istisnası runtime'a taşınmadı. Bu başarı yeni kaynak kabulü değildir.
 
+Güncel kabul tabanı: main 24007212005d07938fb1265a9f42891f18d7fa09 ve [main clean 39298247595](https://github.com/SXQHex/FtkSaaS/actions/runs/39298247595) başarılı: 409 test, sıfır annotation warning/error ve merged-candidate relation. PR #23 Node24 Action bakımı kapalıdır. Eski P01 head 580239075b16f6ac6893d5ac01975d32133d0757 / run 39281409902 119 yapı/politika + 27 DB + 51 API geçti; ilk hata-kodu ve ortak saat bağımlı kota fixture hataları o kaynakta kapanmıştır. Mevcut PR #22 aynı main ile birleştirilir; yeni kaynak kabulü yeniden doğrulanır.
 P01 üç inceleme dilimiyle ilerler: A katalog/hak okuma bağımlılığı; B talep/alternatif/onay ve sürüm okumaları; C bekleme/yer teklifi ve gerçek worker işletimi. A geliştirme kapsamı 199 sözleşme / 105 çağrılabilir / 94 contract_only / 30 migration'dır. Yeni kaynak hedefli doğrulama, bağımsız son-head incelemesi ve aday/main kabulü bekler. P01 bütünü tamamlanmadı.
 
 - products_list_v1 yalnız katalogdur: yetkili satış merkezlerinin aktif ürünleri, backend zamanında etkin son sürüm, created_at/id sırası, aktör/filtre/sort bağlı cursor. F15 temel kapı; include_timed_products:true ayrıca F16 ister. Varsayılan kredili ürünlerdir.

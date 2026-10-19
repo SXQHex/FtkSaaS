@@ -1,6 +1,12 @@
 # FtkSaaS — güncel devir
 
-## 19 Ekim 2026 — P01-A geliştirme
+## 19 Ekim 2026 — CI bakımı kapalı, P01-A yeni aday
+
+PR #23 tek seferlik güvenilir workflow kurulumu kullanıcı onayıyla normal merge yolundan 24007212005d07938fb1265a9f42891f18d7fa09 main SHA'sına alındı. [Aynı main clean 39298247595](https://github.com/SXQHex/FtkSaaS/actions/runs/39298247595) başarılı: 409 test (110 yapı/politika + 27 DB + 272 API), sıfır annotation warning/error; Verify merged candidate relation başarılı. Aday clean 39282766184 ile main tree 2b7a76e73ca1e2efd201b0d9a18bea4afe12007b ve iki parent ilişkisi doğrulandı. Repository ayarı, sahte başarı status'u veya required-check bypass yapılmadı; tek seferlik kurulum yetkisi sıradan P01 kabulüne taşınmaz.
+
+Mevcut PR #22 aynı main ile birleştirilir; Node24 Action pinleri ve deterministik ortak kota fixture'ı korunur. P01 önceki head 580239075b16f6ac6893d5ac01975d32133d0757 / hedefli run 39281409902: 119 yapı/politika + 27 DB + 51 API geçti. Bu eski head kanıtıdır; yeni birleşik head hedefli/son inceleme/adayı ve main kabulü bekler. P01-A uygulanmış, P01-B/C 13 API açık; P01 done değildir.
+
+## P01-A başlangıç ve önceki geliştirme kanıtları
 
 Main 9ce0a5639417f959111b11f70157156733e3de18 ve [aynı SHA clean 39252687560](https://github.com/SXQHex/FtkSaaS/actions/runs/39252687560) başarılıdır. PR #21 kurtarması kapandı; PR #20'nin eski başarısızlığı yeni kabul yerine sunulmaz.
 

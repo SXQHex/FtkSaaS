@@ -2,7 +2,7 @@
 
 Güncel kaynak ve CI: [doğrulanmış devir](../contracts/00-FtkSaaS-yeni-sohbet-devir.md). **199 işlem: 105 çağrılabilir, 94 yalnız sözleşme; 30 migration.** Önceki teslimlerde kapanmış işler burada yeniden açık ilan edilmez. Uygulama kapsamı [Starter](starter-attendance-protection-handover.md) ve [anlaşma/hakediş](instructor-earnings-handover.md) devirlerindedir.
 
-[P01-A](p01-handover.md) katalog ve seans/kişi/sale hak okumasını uygular; yeni kaynak kabulü bekliyor. Kalan 13 P01 komutu ve worker işletimi açıktır. Hosted eski smoke, güncel 104 işlemin uzaktan kabulü sayılmaz.
+[P01-A](p01-handover.md) katalog ve seans/kişi/sale hak okumasını uygular; yeni kaynak kabulü bekliyor. Kalan 13 P01 komutu ve worker işletimi açıktır. PR #23 CI bakımı main 24007212005d07938fb1265a9f42891f18d7fa09 / clean 39298247595 ile kapandı; mevcut PR #22 bu tabana taşınarak yeni kaynak kabulünden geçer. Hosted eski smoke, güncel 104 işlemin uzaktan kabulü sayılmaz.
 
 ## Aktif seri üretim
 

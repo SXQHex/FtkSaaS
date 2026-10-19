@@ -26,7 +26,7 @@ jobs:
             if(commit.parents.length!==2||commit.parents[0].sha!==p.base.sha||commit.parents[1].sha!==p.head.sha)throw Error('Merge parents mismatch');
             core.setOutput('merge',merge);
             core.setOutput('binding',JSON.stringify({pr:p.number,head:p.head.sha,base:p.base.sha,merge,tree:commit.tree.sha,run_id:context.runId,attempt:Number(process.env.GITHUB_RUN_ATTEMPT)}));
-      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1; Node 24
         with:
           ref: ${{ steps.candidate.outputs.merge }}
           persist-credentials: false
@@ -34,7 +34,7 @@ jobs:
         env:
           EXPECTED: ${{ steps.candidate.outputs.merge }}
         run: test "$(git rev-parse HEAD)" = "$EXPECTED"
-      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0; Node 24
         with:
           node-version: '24.19.0'
           cache: npm
@@ -50,12 +50,13 @@ jobs:
           mkdir -p .ci
           node -e "require('fs').writeFileSync('.ci/binding.json',process.env.BINDING)"
           cat .ci/binding.json >> "$GITHUB_STEP_SUMMARY"
-      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2; Node 24
         with:
           name: candidate-binding-${{ github.run_attempt }}
           path: .ci/binding.json
           if-no-files-found: error
           include-hidden-files: true
+          archive: true
       - if: always()
         run: node scripts/ci/summarize-timings.mjs
       - if: always()
