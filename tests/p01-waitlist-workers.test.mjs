@@ -18,7 +18,7 @@ test('P01-C waitlist -> scoped worker -> held offer -> guarded reservation and c
  const discipline=(await must(owner,'discipline_save_v1',{org_id:org,name:'Queue',state:'active'},key())).primary_id;await mut('center_discipline_set_v1',{discipline_id:discipline,state:'active'});
  const pub=(k,value)=>mut('policy_publish_v1',{center_id:null,key:k,value,effective_at:new Date(Date.now()-1000).toISOString(),mandatory:false});
  const policy=(await pub('student_cancel_group',{kind:'cancellation',terms:{cutoff_minutes:0,before_cutoff:'release',after_cutoff:'release',no_show:'release'}})).primary_id;
- await pub('reservation_window',{kind:'window',opens_minutes_before:10080,closes_minutes_before:0,manager_exception:false});await pub('negative_default',{kind:'integer',value:0});await pub('negative_upper',{kind:'integer',value:0});
+ await pub('reservation_window',{kind:'window',opens_minutes_before:10080,closes_minutes_before:0,manager_exception:false});await pub('request_window',{kind:'window',opens_minutes_before:10080,closes_minutes_before:0,manager_exception:false});await pub('negative_default',{kind:'integer',value:0});await pub('negative_upper',{kind:'integer',value:0});
  async function person(label){const p=(await mut('person_create_v1',{display_name:label,contacts:[]})).primary_id;await mut('student_activate_v1',{person_id:p});const u=await authUser(label),a=await must(u,'account_get_v1');await db.query("insert into core.account_links(id,org_id,account_id,person_id,state,verified_at) values($1,$2,$3,$4,'active',now())",[key(),org,a.id,p]);return {p,u};}
  const first=await person('wait-first'),second=await person('wait-second'),third=await person('wait-third');
  let slot=0;async function session({full=false,at=new Date(Date.now()+2*86400000+slot++*7200000)}={}){const id=key();await db.query("insert into core.sessions(id,org_id,center_id,discipline_id,format,starts_at,ends_at,nominal,maximum,state,attendance_state) values($1,$2,$3,$4,'group',$5,$6,1,1,'planned','open')",[id,org,center,discipline,at,new Date(+at+3600000)]);if(full)await db.query("insert into core.reservations(id,org_id,center_id,session_id,person_id,mode,state,policy_version_id) values($1,$2,$3,$4,$5,'flexible','active',$6)",[key(),org,center,id,third.p,policy]);return id;}
@@ -73,6 +73,40 @@ test('P01-C waitlist -> scoped worker -> held offer -> guarded reservation and c
   const sid2=await session();await join(sid2);await db.query("update core.sessions set state='cancelled' where id=$1",[sid2]);await drain();assert.equal((await view(sid2))[0].state,'closed');
   const sid3=await session();await join(sid3);await drain();const offer=(await view(sid3))[0].offers[0];await db.query("update core.seat_offers set expires_at=clock_timestamp()-interval '1 second' where id=$1",[offer.id]);
   const answers=await Promise.all([call(first.u,'seat_offer_accept_v1',scope({offer_id:offer.id,expected_version:offer.version}),key()),tick(worker,org)]);assert.equal(answers[0].result.ok,false);await drain();assert.equal((await view(sid3))[0].offers[0].state,'expired');
+ });
+ await t.test('accepted offer survives the late expiry ordering without duplicate booking',async()=>{
+  const sid=await session();await join(sid);await drain();const offer=(await view(sid))[0].offers[0];
+  const accepted=await mut('seat_offer_accept_v1',{offer_id:offer.id,expected_version:offer.version},first.u);assert(accepted.related.some(v=>v.type==='reservations'));
+  const job=key();await db.query("insert into core.outbox_jobs(id,org_id,kind,dedupe_key,state,attempts,next_attempt_at) values($1,$2,'p01.seat_offer_expire_v1',$3,'pending',0,clock_timestamp())",[job,org,'synthetic-late-expiry:'+job]);
+  await db.query("insert into private.p01_jobs(job_id,org_id,operation,target_id) values($1,$2,'seat_offer_expire_v1',$3)",[job,org,offer.id]);
+  await db.query("update core.seat_offers set expires_at=clock_timestamp()-interval '1 second' where id=$1",[offer.id]);await drain();
+  assert.equal((await view(sid))[0].offers[0].state,'accepted');assert.equal((await rows("select count(*)::int n from core.reservations where org_id=$1 and session_id=$2 and state='active'",[org,sid]))[0].n,1);
+ });
+ await t.test('expired running lease is reclaimed and fences the crashed worker',async()=>{
+  const sid=await session();await join(sid);
+  const old=(await worker.query('select api_v1.p01_jobs_claim($1,$2,1) jobs',[org,ids()])).rows[0].jobs[0];assert(old);
+  await db.query("update core.outbox_jobs set lease_until=clock_timestamp()-interval '1 second' where id=$1",[old.request.job_id]);
+  const fresh=(await worker.query('select api_v1.p01_jobs_claim($1,$2,1) jobs',[org,ids()])).rows[0].jobs[0];assert.equal(fresh.request.job_id,old.request.job_id);assert.notEqual(fresh.request.lease_token,old.request.lease_token);
+  await deniedResult(invoke(old.operation,old.request));const result=await invoke(fresh.operation,fresh.request);assert(result.ok,JSON.stringify(result));assert.equal(await holds(sid),1);
+  assert.equal(Number((await rows('select attempts from core.outbox_jobs where id=$1',[old.request.job_id]))[0].attempts),2);
+ });
+ await t.test('live center state and plan exclusion prevent discovery, execution and replay; cleanup remains available',async()=>{
+  const sid=await session();await join(sid);const claim=(await worker.query('select api_v1.p01_jobs_claim($1,$2,1) jobs',[org,ids()])).rows[0].jobs[0];assert(claim);
+  const pending=await session();await join(pending);
+  const otherCenter=(await must(owner,'center_create_v1',{org_id:org,name:'Earlier visible center',timezone:'UTC'},key())).primary_id;
+  await db.query("update core.centers set created_at='2020-01-01' where id=$1",[otherCenter]);
+  try{
+   await db.query("update core.centers set state='inactive' where id=$1",[center]);
+   await assert.rejects(invoke(claim.operation,claim.request),/NOT_FOUND/);await worker.query('select api_v1.p01_jobs_claim($1,$2,1)',[org,ids()]);assert.equal(await holds(sid),0);
+   assert.equal((await rows('select count(*)::int n from private.p01_jobs where org_id=$1 and target_id=$2',[org,pending]))[0].n,0);
+   await db.query("update core.centers set state='active' where id=$1",[center]);await db.query("update core.saas_plan_versions set name='pro' where id=$1",[plan]);
+   await assert.rejects(invoke(claim.operation,claim.request),/NOT_FOUND/);await worker.query('select api_v1.p01_jobs_claim($1,$2,1)',[org,ids()]);assert.equal(await holds(sid),0);
+   assert.equal((await rows('select count(*)::int n from private.p01_jobs where org_id=$1 and target_id=$2',[org,pending]))[0].n,0);
+   await db.query("update core.saas_plan_versions set name='business' where id=$1",[plan]);const result=await invoke(claim.operation,claim.request);assert(result.ok,JSON.stringify(result));
+   await db.query("update core.centers set state='inactive' where id=$1",[center]);await assert.rejects(invoke(claim.operation,claim.request),/NOT_FOUND/);
+   await db.query("update core.seat_offers set expires_at=clock_timestamp()-interval '1 second' where session_id=$1 and state='active'",[sid]);await drain();assert.equal(await holds(sid),0);
+  }finally{await db.query("update core.centers set state='active' where id=$1",[center]);await db.query("update core.saas_plan_versions set name='business' where id=$1",[plan]);}
+  await drain();assert.equal(await holds(pending),1);
  });
  await t.test('request expiry uses stored/intrinsic deadline, never turns elapsed time into attendance',async()=>{
   const request=(await mut('lesson_request_create_v1',{person_id:first.p,discipline_id:discipline,requested_start:new Date(Date.now()+86400000).toISOString(),duration_minutes:60},first.u)).primary_id;

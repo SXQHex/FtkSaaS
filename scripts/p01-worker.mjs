@@ -12,7 +12,14 @@ export async function tick(client,org,{limit=1}={}){
  for(const {operation,request} of claimed){
   if(!['seat_offer_issue_v1','seat_offer_expire_v1','request_expire_v1'].includes(operation))throw Error('UNEXPECTED_WORKER_OPERATION');
   if(!validators['request_'+operation](request))throw Error('INVALID_WORKER_CLAIM');
-  const result=(await client.query('select private.p01_worker_execute($1,$2,$3) result',[operation,request,ids()])).rows[0].result;
+  let result;
+  try{result=(await client.query('select private.p01_worker_execute($1,$2,$3) result',[operation,request,ids()])).rows[0].result;}
+  catch(error){
+   // A center can close after claim. Keep that lease fenced for bounded reclaim,
+   // and let the loop serve other live centers. Revoked worker identity still stops.
+   if(error.code!=='P0001'||error.message!=='NOT_FOUND')throw error;
+   result={ok:false,error:{code:'NOT_FOUND',retryable:false}};
+  }
   if(result.ok&&!validators['success_'+operation](result))throw Error('INVALID_WORKER_RESULT');
   results.push(result);
  }

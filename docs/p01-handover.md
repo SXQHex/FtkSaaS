@@ -1,5 +1,16 @@
 # P01 — talep, rezervasyon ve bekleme devri
 
+## 20 Ekim 2026 — son kapsam incelemesi düzeltmeleri
+
+Kaynak `c62106b77717d6c1b1129fe7fa8eca6060d05826` / [hedefli CI 39323812801](https://github.com/SXQHex/FtkSaaS/actions/runs/39323812801) başarılıdır: 120 yapı/politika + 27 DB + 67 API test düğümü (P01 26, ortak 41), toplam 214. Worker CLI/loop, minimal DB yetkileri ve üç denemelik hata yolu bu kaynakta geçti; önceki Auth transport hatası kapandı. Bu başarı yeni kaynağa taşınmaz.
+
+Bütün P01 son incelemesi iki sözleşme eksiği buldu; yeni append-only migration34 ile düzeltildi: ayrı request_window tüketicisi ve worker'ın canlı merkez erişimi. Yeni hedefli runtime kabulü bekliyor; full clean/merge/main kabulü yapılmadı. Güncel geliştirme envanteri 199 / 118 çağrılabilir / 81 contract_only / 34 migration.
+
+Talep oluşturma, alternatif sunma ve alternatif kabulü etkin org/merkez request_window politikasını private.policy_at ile okur; eksik yapılandırma kapalıdır, açılış dahil/kapanış hariçtir. Mevcut kabul edilmiş yönetici süre istisnasının DTO karşılığı window_exception:true ve nonempty reason'dır: politika manager_exception izni + canlı CM yetkisi + açık seçim/gerekçe birlikte gerekir. Sırf CM olmak veya politika bayrağı tek başına bypass değildir; gerekçe mevcut audit'te tutulur, CM yetkisi receipt replay öncesi tekrar denetlenir. Rezervasyon onayı kendi reservation_window kapısını korur; geri çekme/ret gibi temizleme bu yeni niyet kapısından bağımsızdır. Yeni sayısal politika veya ürün yetkisi eklenmedi.
+
+Worker yeni teklif için merkez erişimini discovery limitinden önce ve executor/replay'de yeniden denetler; kapalı/plan dışında merkezde yeni hold/bildirim oluşmaz. Expiry temizliği açık kalır. Claim sonrası merkez kapanırsa runner NOT_FOUND için o fenced lease'i bounded reclaim'e bırakıp diğer merkezleri işlemeye devam eder; gerçek worker yetkisi iptalinde durur. Testler ayrıca çökmüş running lease geri alma ve kabulden sonra geç gelen expiry sırasını, önceki expiry-kazanır vakasına ekler.
+
+
 ## P01-C worker transport düzeltmesi — hedefli kabul bekliyor
 
 Kaynak `4e3c5f11bd70e0e99885beffa41849727f170379` / [run 39322550067](https://github.com/SXQHex/FtkSaaS/actions/runs/39322550067) başarısızdır. 32 migration ve 120 yapı/politika + 27 DB + önceki A/B'nin 17 API test düğümü geçti. C'nin sekiz alt vakası aynı worker giriş hatasında kırıldı: genel execute_operation fonksiyonunun auth.users türünü içeren DECLARE bölümü, worker yönlendirmesinden önce derlenir; dar DB worker rolünün Auth şema erişimi yoktur. Bu, C davranış kabulü değildir.

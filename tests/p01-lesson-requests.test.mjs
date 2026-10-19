@@ -36,6 +36,31 @@ test('P01-B request intent, alternatives and atomic guarded approval through Aut
  const view=async(id,u=student.u,operation='lesson_request_withdraw_v1')=>(await must(u,'management_state_get_v1',scope({operation,selector:{operation,key:{lesson_request_id:id}}}))).items[0]?.request_detail;
  const session=async(start)=>{const id=key();await db.query("insert into core.sessions(id,org_id,center_id,discipline_id,format,starts_at,ends_at,nominal,maximum,state,attendance_state) values($1,$2,$3,$4,'private',$5,$6,1,1,'planned','open')",[id,org,center,discipline,start,new Date(Date.parse(start)+3600000)]);return id;};
  const domainCounts=async()=>(await rows("select jsonb_build_object('requests',(select count(*) from core.lesson_requests where org_id=$1),'sessions',(select count(*) from core.sessions where org_id=$1),'resources',(select count(*) from core.resource_bookings where org_id=$1),'reservations',(select count(*) from core.reservations where org_id=$1),'allocations',(select count(*) from core.entitlement_allocations where org_id=$1),'receipts',(select count(*) from core.operation_receipts where org_id=$1),'audit',(select count(*) from core.audit_events where org_id=$1),'jobs',(select count(*) from core.outbox_jobs where org_id=$1)) n",[org]))[0].n;
+ await t.test('request window is separate, required, scope-effective and exception requires explicit CM reason',async()=>{
+  const body=start=>({person_id:student.p,discipline_id:discipline,requested_start:start,duration_minutes:60});
+  const future=()=>new Date(Date.now()+120*60000).toISOString();const before=await domainCounts();
+  await fail('lesson_request_create_v1',body(future()),'POLICY_NOT_CONFIGURED',student.u);assert.deepEqual(await domainCounts(),before);
+  const window=(opens,closes=0,exception=false)=>({kind:'window',opens_minutes_before:opens,closes_minutes_before:closes,manager_exception:exception});
+  await pub('request_window',window(60));await fail('lesson_request_create_v1',body(future()),'FORBIDDEN',student.u);
+  await fail('lesson_request_create_v1',{...body(future()),window_exception:true,reason:'synthetic exception'},'FORBIDDEN');
+  await pub('request_window',window(10080,180));await fail('lesson_request_create_v1',body(future()),'FORBIDDEN',student.u);
+  await pub('request_window',window(60,0,true));
+  await fail('lesson_request_create_v1',body(future()),'FORBIDDEN');
+  await fail('lesson_request_create_v1',{...body(future()),window_exception:true,reason:'synthetic exception'},'FORBIDDEN',student.u);
+  const r=await request(new Date(Date.now()+30*60000).toISOString()),altAt=future(),alternatives=[{interval:{starts_at:altAt,ends_at:new Date(Date.parse(altAt)+3600000).toISOString()}}];
+  await fail('lesson_request_offer_alternative_v1',{lesson_request_id:r.primary_id,expected_version:1,alternatives},'FORBIDDEN');
+  const offered=await mut('lesson_request_offer_alternative_v1',{lesson_request_id:r.primary_id,expected_version:1,alternatives,window_exception:true,reason:'synthetic CM window approval'});
+  assert.equal((await rows('select reason from core.audit_events where org_id=$1 and operation_id=$2',[org,offered.operation_id]))[0].reason,'synthetic CM window approval');
+  const alt=(await view(r.primary_id)).alternatives[0];
+  await fail('lesson_request_accept_alternative_v1',{lesson_request_id:r.primary_id,alternative_id:alt.id,expected_version:2},'FORBIDDEN',student.u);
+  await pub('request_window',window(180));await mut('lesson_request_accept_alternative_v1',{lesson_request_id:r.primary_id,alternative_id:alt.id,expected_version:2},student.u);
+  await mut('lesson_request_withdraw_v1',{lesson_request_id:r.primary_id,expected_version:3},student.u);
+  await mut('policy_publish_v1',{key:'request_window',value:window(20000),effective_at:new Date(Date.now()-1000).toISOString(),mandatory:false});
+  await mut('policy_publish_v1',{center_id:null,key:'request_window',value:window(60),effective_at:new Date(Date.now()-1000).toISOString(),mandatory:true});
+  await fail('lesson_request_create_v1',body(future()),'FORBIDDEN',student.u);
+  await fail('policy_publish_v1',{key:'request_window',value:window(20000),effective_at:new Date(Date.now()-1000).toISOString(),mandatory:false},'FORBIDDEN');
+  await pub('request_window',window(10080));
+ });
  await t.test('different keys cannot duplicate an open intent; no seat, resource or right is held',async()=>{
   const start=next(),r=await request(start),after=await domainCounts();
   await fail('lesson_request_create_v1',{person_id:student.p,discipline_id:discipline,requested_start:start,duration_minutes:60},'OPEN_OPERATIONS_EXIST',student.u);

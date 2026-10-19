@@ -1,6 +1,6 @@
 # FtkSaaS — güncel entegrasyon devri
 
-Durum ve doğrulanmış kaynak/CI için [tek güncel devir özetini](../contracts/00-FtkSaaS-yeni-sohbet-devir.md) esas alın: 199 sözleşme, 118 çağrılabilir, 81 yalnız sözleşme; 33 migration. Bu belge hosted backend'in aynı seviyeye güncellendiği iddiasını taşımaz; hosted 65 işlem smoke'u tarihsel ve ayrı kanıttır.
+Durum ve doğrulanmış kaynak/CI için [tek güncel devir özetini](../contracts/00-FtkSaaS-yeni-sohbet-devir.md) esas alın: 199 sözleşme, 118 çağrılabilir, 81 yalnız sözleşme; 34 migration. Bu belge hosted backend'in aynı seviyeye güncellendiği iddiasını taşımaz; hosted 65 işlem smoke'u tarihsel ve ayrı kanıttır.
 
 [Hesaplaşma entegrasyonu](settlement-handover.md): dokuz yeni API, ayrı A/B yetki kapsamı, yalnız B onayında finansal commit ve bağlı düzeltme.
 
@@ -193,3 +193,5 @@ Bu yalnız operasyonel kanıttır. Q-E03 katılımcı sınıflandırması, Q-E02
 İşlem adı ortak tiplerden seçilir. Yeni yazmalar da aynı receipt/audit/outbox transaction ve canlı yetki kontrolünden geçer. Görünürlükte rol/bağ geri alma bir sonraki istekte geçerlidir. Yeni bir ürün iptal, para veya hakediş kuralı eklenmedi.
 
 </details>
+
+P01 request_window istisna DTO'su create/offer_alternative/accept_alternative için optional window_exception ve reason içerir. True yalnız politika izinli canlı CM'nin açık, gerekçeli işlemidir; varsayılan false, eksik politika kapalı. Son kapsam ve yeni runtime kabulü docs/p01-handover.md içindedir.

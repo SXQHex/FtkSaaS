@@ -1,5 +1,7 @@
 # FtkSaaS sıralı üretim kuyruğu
 
+Son doğrulanmış kaynak c62106b / [hedefli 39323812801](https://github.com/SXQHex/FtkSaaS/actions/runs/39323812801) başarılı (214 test düğümü). Son bütün-P01 incelemesi request_window tüketimi ve canlı worker merkez erişimini eksik buldu; migration34/DTO/audit/gerçek test düzeltmeleri uygulandı, yeni hedefli kabul bekliyor. Running-lease crash kurtarma ve kabul-kazanır/geç-expiry kabul kanıtı da genişletildi. P01 in_progress; yeni kaynak geçmeden toplu clean/merge yok. [Güncel kabul ve sınırlar](p01-handover.md).
+
 Son C kaynağı 4e3c5f1 / [hedefli 39322550067](https://github.com/SXQHex/FtkSaaS/actions/runs/39322550067) başarısız: worker yanlış insan Auth dispatcher'ına girdi; sekiz C alt vakası geçti sayılmaz. Runner dar private worker girişine alındı, gereksiz dispatcher/core yetkileri yeni migration33 ile kaldırıldı; Auth yetkisi eklenmedi. Yeni hedefli runtime kabulü bekliyor. [Teşhis ve kalan kabul](p01-handover.md).
 
 19 Ekim 2026 kullanıcı talimatı. Tek aktif üretim prompt kaynağı bu dosyadır; [kalan işler](remaining-work.md) ve [F01–F33](feature-delivery.md) ürün/uygulama durumunu tutmaya devam eder. İkinci sözleşme ağacı değildir.

@@ -1480,7 +1480,7 @@
       },
       "billing_class": "request",
       "limits": [
-        "P01-B implemented; runtime acceptance pending. Worker expiration and waitlist are separate unfinished P01 work."
+        "Separate effective request_window required. Outside-window exception needs enabled policy, live CM, explicit window_exception:true and nonempty reason; final guard runtime acceptance pending."
       ]
     },
     {
@@ -1561,7 +1561,7 @@
       },
       "billing_class": "maintenance",
       "limits": [
-        "P01-B implemented; runtime acceptance pending. Worker expiration and waitlist are separate unfinished P01 work."
+        "Separate effective request_window required. Outside-window exception needs enabled policy, live CM, explicit window_exception:true and nonempty reason; final guard runtime acceptance pending."
       ]
     },
     {
@@ -1588,7 +1588,7 @@
       },
       "billing_class": "request",
       "limits": [
-        "P01-B implemented; runtime acceptance pending. Worker expiration and waitlist are separate unfinished P01 work."
+        "Separate effective request_window required. Outside-window exception needs enabled policy, live CM, explicit window_exception:true and nonempty reason; final guard runtime acceptance pending."
       ]
     },
     {
