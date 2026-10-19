@@ -30,15 +30,16 @@ function references(op,defs){
 function managementRequestDelta(base,head,oldOp,newOp,changed,profile){
  if(!profile?.managementRequestProjection||!oldOp||!newOp)return false;
  const ops=profile.operations;
- const allowed=new Set(['Request_management_state_get','ManagementStateView','LessonRequestView','LessonRequestAlternativeView',...ops.map(n=>'ManagementSelector_'+n),...ops.map(n=>'Request_'+n.replace(/_v1$/,''))]);
+ const allowed=new Set(['Request_management_state_get','ManagementStateView','LessonRequestView','LessonRequestAlternativeView','WaitlistEntryView','SeatOfferView',...ops.map(n=>'ManagementSelector_'+n),...ops.map(n=>'Request_'+n.replace(/_v1$/,''))]);
  if(changed.some(n=>!allowed.has(n)))return false;
- const normalizeOp=o=>({...omit(o,['runtime_limits']),runtime_selectors:o.runtime_selectors?.filter(n=>!ops.includes(n)),features:o.features?.filter(n=>n!=='F09'),conditional_features:o.conditional_features?.filter(x=>!(x.feature==='F09'&&x.when==='lesson_request_selector'&&x.mode==='required_if_selected'))});
+ const normalizeOp=o=>({...omit(o,['runtime_limits']),runtime_selectors:o.runtime_selectors?.filter(n=>!ops.includes(n)),features:o.features?.filter(n=>n!=='F09'&&!(ops.includes('waitlist_join_v1')&&n==='F12')),conditional_features:o.conditional_features?.filter(x=>!(((x.feature==='F09'&&x.when==='lesson_request_selector')||(ops.includes('waitlist_join_v1')&&x.feature==='F12'&&x.when==='waitlist_selector'))&&x.mode==='required_if_selected'))});
  if(!same(normalizeOp(oldOp),normalizeOp(newOp)))return false;
  // Existing management fields and non-request selector clauses must be equal.
- const view=d=>({...d,properties:omit(d.properties,['request_detail'])});
+ const view=d=>({...d,properties:omit(d.properties,ops.includes('waitlist_join_v1')?['request_detail','waitlist_detail']:['request_detail'])});
  if(!same(view(base.$defs.ManagementStateView),view(head.$defs.ManagementStateView)))return false;
  const projection=head.$defs.ManagementStateView.properties.request_detail;
  if(projection&&!same(projection,{$ref:'#/$defs/LessonRequestView'}))return false;
+ if(ops.includes('waitlist_join_v1')&&head.$defs.ManagementStateView.properties.waitlist_detail&&!same(head.$defs.ManagementStateView.properties.waitlist_detail,{$ref:'#/$defs/WaitlistEntryView'}))return false;
  const request=d=>({...d,allOf:d.allOf.filter(x=>!ops.includes(x.if?.properties?.operation?.const))});
  if(!same(request(base.$defs.Request_management_state_get),request(head.$defs.Request_management_state_get)))return false;
  // Request-specific arms may evolve; no unrelated referenced definitions may.
@@ -120,7 +121,7 @@ export function analyzeDelta(changes,read,profiles){
   const tails=[...migrations].map(([file,p])=>{
    if(!p.migrationCheckLabel)return null;
    const source=p.sources.find(s=>file.endsWith('_'+s.replaceAll('-','_')+'.sql'));
-   return "\nassert next(Path('supabase/migrations').glob('*_"+source.replaceAll('-','_')+".sql')).read_text()==Path('database/"+source+".sql').read_text()+Path('database/"+source+"-wrappers.sql').read_text(),'"+p.migrationCheckLabel+"'\n";
+   return "\nassert next(Path('supabase/migrations').glob('*_"+source.replaceAll('-','_')+".sql')).read_text()==Path('database/"+source+".sql').read_text()+Path('database/"+source+"-wrappers.sql').read_text(),'"+(p.migrationCheckLabels?.[source]??p.migrationCheckLabel)+"'\n";
   });
   if(old!=null&&tails.every(t=>t!=null)&&head===old+tails.join(''))explain('scripts/check-migrations.py','only append exact mapped migration/source check',[...new Set(migrations.values())]);
  }

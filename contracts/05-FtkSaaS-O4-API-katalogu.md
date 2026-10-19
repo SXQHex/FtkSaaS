@@ -1,6 +1,6 @@
 # FtkSaaS — API kataloğu · 0.2.0-rc.3
 
-199 sözleşme; 111 geliştirme ortamında çağrılabilir endpoint, 88 yalnız sözleşme. Çağrılabilir olmak bütün ürün özelliklerinin veya üretim kabulünün tamamlandığı anlamına gelmez. Kapsam sınırları ve Q-E01 `docs/claude-handover.md` içindedir.
+199 sözleşme; 118 geliştirme ortamında çağrılabilir endpoint, 81 yalnız sözleşme. Çağrılabilir olmak bütün ürün özelliklerinin veya üretim kabulünün tamamlandığı anlamına gelmez. Kapsam sınırları ve Q-E01 `docs/claude-handover.md` içindedir.
 
 `POST {API_URL}/functions/v1/backend-v1/{operation}`; JSON gövde doğrudan typed Request nesnesidir. Header: `Authorization: Bearer <Supabase access_token>`, `apikey: <publishable key>`, `Content-Type: application/json`. Başarı: `ok/data/trace_id`; hata: `ok:false/error:SafeError`. Servis anahtarı frontend’e verilmez.
 
@@ -73,10 +73,10 @@ Named `/rest/v1/rpc/{operation}` yalnız backend içindir; imzası p_request + d
 | `reservation_create_v1` | çağrılabilir (kapsam notları geçerli) | `reservation.write` | W / reservation | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; center_id?: FtkUuid ∣ null; operation_key: FtkUuid; person_id: FtkUuid; session_id: FtkUuid; source_sale_id?: FtkUuid ∣ null; mode: BookingMode | Success_reservation_create |
 | `reservation_cancel_v1` | çağrılabilir (kapsam notları geçerli) | `reservation.write` | W / maintenance | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; center_id?: FtkUuid ∣ null; operation_key: FtkUuid; expected_version: PositiveInt; reservation_id: FtkUuid; reason: Text | Success_reservation_cancel |
 | `reservation_list_v1` | çağrılabilir (kapsam notları geçerli) | `schedule.read` | R / read | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; center_id?: FtkUuid ∣ null; person_id?: FtkUuid ∣ null; session_id?: FtkUuid ∣ null; interval?: Interval ∣ null; page: Page | Success_reservation_list |
-| `waitlist_join_v1` | yalnız sözleşme | `reservation.write` | W / reservation | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; center_id?: FtkUuid ∣ null; operation_key: FtkUuid; person_id: FtkUuid; session_id: FtkUuid | Success_waitlist_join |
-| `waitlist_leave_v1` | yalnız sözleşme | `reservation.write` | W / maintenance | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; center_id?: FtkUuid ∣ null; operation_key: FtkUuid; entry_id: FtkUuid | Success_waitlist_leave |
-| `seat_offer_accept_v1` | yalnız sözleşme | `reservation.write` | W / reservation | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; center_id?: FtkUuid ∣ null; operation_key: FtkUuid; offer_id: FtkUuid | Success_seat_offer_accept |
-| `seat_offer_reject_v1` | yalnız sözleşme | `reservation.write` | W / maintenance | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; center_id?: FtkUuid ∣ null; operation_key: FtkUuid; offer_id: FtkUuid | Success_seat_offer_reject |
+| `waitlist_join_v1` | çağrılabilir (kapsam notları geçerli) | `reservation.write` | W / reservation | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; center_id: FtkUuid; operation_key: FtkUuid; person_id: FtkUuid; session_id: FtkUuid | Success_waitlist_join |
+| `waitlist_leave_v1` | çağrılabilir (kapsam notları geçerli) | `reservation.write` | W / maintenance | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; center_id: FtkUuid; operation_key: FtkUuid; entry_id: FtkUuid; expected_version: PositiveInt | Success_waitlist_leave |
+| `seat_offer_accept_v1` | çağrılabilir (kapsam notları geçerli) | `reservation.write` | W / reservation | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; center_id: FtkUuid; operation_key: FtkUuid; offer_id: FtkUuid; expected_version: PositiveInt | Success_seat_offer_accept |
+| `seat_offer_reject_v1` | çağrılabilir (kapsam notları geçerli) | `reservation.write` | W / maintenance | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; center_id: FtkUuid; operation_key: FtkUuid; offer_id: FtkUuid; expected_version: PositiveInt | Success_seat_offer_reject |
 | `attendance_get_v1` | çağrılabilir (kapsam notları geçerli) | `attendance.draft` | R / read | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; center_id?: FtkUuid ∣ null; session_id: FtkUuid | Success_attendance_get |
 | `attendance_mark_v1` | çağrılabilir (kapsam notları geçerli) | `attendance.draft` | W / maintenance | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; center_id?: FtkUuid ∣ null; operation_key: FtkUuid; expected_version: PositiveInt; reservation_id: FtkUuid; result: OrdinaryAttendanceResult | Success_attendance_mark |
 | `attendance_close_v1` | çağrılabilir (kapsam notları geçerli) | `attendance.close` | W / maintenance | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; center_id?: FtkUuid ∣ null; operation_key: FtkUuid; expected_version: PositiveInt; session_id: FtkUuid; performed?: Bool; performed_instructor_ids?: FtkUuid[] | Success_attendance_close |
@@ -161,9 +161,9 @@ Named `/rest/v1/rpc/{operation}` yalnız backend içindir; imzası p_request + d
 | `preview_get_v1` | yalnız sözleşme | `account.self` | R / read | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; center_id?: FtkUuid ∣ null; preview_id: FtkUuid | Success_preview_get |
 | `job_status_get_v1` | yalnız sözleşme | `account.self` | R / read | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; center_id?: FtkUuid ∣ null; job_id: FtkUuid | Success_job_status_get |
 | `audit_list_v1` | yalnız sözleşme | `report.read` | R / read | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; center_id?: FtkUuid ∣ null; subject: SubjectRef; interval: Interval; page: Page | Success_audit_list |
-| `seat_offer_issue_v1` | yalnız sözleşme | `system.worker` | B / worker | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; center_id?: FtkUuid ∣ null; operation_key: FtkUuid; job_id: FtkUuid; lease_token: Secret | Success_seat_offer_issue |
-| `seat_offer_expire_v1` | yalnız sözleşme | `system.worker` | B / worker | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; center_id?: FtkUuid ∣ null; operation_key: FtkUuid; job_id: FtkUuid; lease_token: Secret | Success_seat_offer_expire |
-| `request_expire_v1` | yalnız sözleşme | `system.worker` | B / worker | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; center_id?: FtkUuid ∣ null; operation_key: FtkUuid; job_id: FtkUuid; lease_token: Secret | Success_request_expire |
+| `seat_offer_issue_v1` | çağrılabilir (kapsam notları geçerli) | `system.worker` | B / worker | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; center_id?: FtkUuid ∣ null; operation_key: FtkUuid; job_id: FtkUuid; lease_token: Secret | Success_seat_offer_issue |
+| `seat_offer_expire_v1` | çağrılabilir (kapsam notları geçerli) | `system.worker` | B / worker | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; center_id?: FtkUuid ∣ null; operation_key: FtkUuid; job_id: FtkUuid; lease_token: Secret | Success_seat_offer_expire |
+| `request_expire_v1` | çağrılabilir (kapsam notları geçerli) | `system.worker` | B / worker | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; center_id?: FtkUuid ∣ null; operation_key: FtkUuid; job_id: FtkUuid; lease_token: Secret | Success_request_expire |
 | `outbox_deliver_v1` | yalnız sözleşme | `system.worker` | B / worker | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; center_id?: FtkUuid ∣ null; operation_key: FtkUuid; job_id: FtkUuid; lease_token: Secret | Success_outbox_deliver |
 | `reminder_schedule_v1` | yalnız sözleşme | `system.worker` | B / worker | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; center_id?: FtkUuid ∣ null; operation_key: FtkUuid; job_id: FtkUuid; lease_token: Secret | Success_reminder_schedule |
 | `automation_run_v1` | yalnız sözleşme | `system.worker` | B / worker | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; center_id?: FtkUuid ∣ null; operation_key: FtkUuid; job_id: FtkUuid; lease_token: Secret | Success_automation_run |
@@ -279,10 +279,10 @@ features ürün referanslarıdır. required_features hedef plan kapısı; runtim
 | reservation_create_v1 | command | append_or_current_scope_lock / management_state_get_v1 | reservations.active, rights.reserve_or_deficit | conditional_plan_gates_aligned_limited_runtime |
 | reservation_cancel_v1 | command | row_version / reservation_list_v1 | reservations.cancelled, rights.release_consume_from_frozen_policy | baseline_only_not_full_product_acceptance |
 | reservation_list_v1 | read | none / None |  | baseline_only_not_full_product_acceptance |
-| waitlist_join_v1 | command | append_or_current_scope_lock / management_state_get_v1 | waitlist_entries.versioned_domain_change | pending |
-| waitlist_leave_v1 | command | append_or_current_scope_lock / management_state_get_v1 | waitlist_entries.versioned_domain_change | pending |
-| seat_offer_accept_v1 | command | append_or_current_scope_lock / management_state_get_v1 | seat_offers.versioned_domain_change | pending |
-| seat_offer_reject_v1 | command | append_or_current_scope_lock / management_state_get_v1 | seat_offers.versioned_domain_change | pending |
+| waitlist_join_v1 | command | append_or_current_scope_lock / management_state_get_v1 | waitlist_entries.versioned_domain_change | p01_waitlist_worker_runtime_pending |
+| waitlist_leave_v1 | command | row_version / management_state_get_v1 | waitlist_entries.versioned_domain_change | p01_waitlist_worker_runtime_pending |
+| seat_offer_accept_v1 | command | row_version / management_state_get_v1 | seat_offers.versioned_domain_change | p01_waitlist_worker_runtime_pending |
+| seat_offer_reject_v1 | command | row_version / management_state_get_v1 | seat_offers.versioned_domain_change | p01_waitlist_worker_runtime_pending |
 | attendance_get_v1 | read | none / None |  | starter_and_paid_agreement_runtime |
 | attendance_mark_v1 | draft | row_version / attendance_get_v1 | attendance_entries.draft, reservations.actual_evaluation_snapshot_and_version, sessions.version | starter_runtime_limited_paid_path_pending |
 | attendance_close_v1 | closure | row_version / attendance_get_v1 | attendance_closures, sessions.occurred, reservations.completed, rights.consume_release, earnings.if_F20, settlement.accrual_if_eligible | starter_and_paid_agreement_runtime |
@@ -367,9 +367,9 @@ features ürün referanslarıdır. required_features hedef plan kapısı; runtim
 | preview_get_v1 | read | none / None |  | pending |
 | job_status_get_v1 | read | none / None |  | pending |
 | audit_list_v1 | read | none / None |  | pending |
-| seat_offer_issue_v1 | worker | append_or_current_scope_lock / management_state_get_v1 | seat_offers.versioned_domain_change | pending |
-| seat_offer_expire_v1 | worker | append_or_current_scope_lock / management_state_get_v1 | seat_offers.versioned_domain_change | pending |
-| request_expire_v1 | worker | append_or_current_scope_lock / management_state_get_v1 | request_expire.authorized_result | pending |
+| seat_offer_issue_v1 | worker | append_or_current_scope_lock / management_state_get_v1 | scoped_job.domain_change, worker_receipt.audit.inbox.atomic, job.succeeded_or_bounded_retry | p01_waitlist_worker_runtime_pending |
+| seat_offer_expire_v1 | worker | append_or_current_scope_lock / management_state_get_v1 | scoped_job.domain_change, worker_receipt.audit.inbox.atomic, job.succeeded_or_bounded_retry | p01_waitlist_worker_runtime_pending |
+| request_expire_v1 | worker | append_or_current_scope_lock / management_state_get_v1 | scoped_job.domain_change, worker_receipt.audit.inbox.atomic, job.succeeded_or_bounded_retry | p01_waitlist_worker_runtime_pending |
 | outbox_deliver_v1 | worker | append_or_current_scope_lock / management_state_get_v1 | outbox_deliver.authorized_result | pending |
 | reminder_schedule_v1 | worker | append_or_current_scope_lock / management_state_get_v1 | reminder_schedule.authorized_result | pending |
 | automation_run_v1 | worker | append_or_current_scope_lock / management_state_get_v1 | automations.versioned_domain_change | pending |

@@ -1,10 +1,10 @@
 # Kalan backend işleri
 
-Güncel kaynak ve CI: [doğrulanmış devir](../contracts/00-FtkSaaS-yeni-sohbet-devir.md). **199 işlem: 111 çağrılabilir, 88 yalnız sözleşme; 31 migration.** Önceki teslimlerde kapanmış işler burada yeniden açık ilan edilmez. Uygulama kapsamı [Starter](starter-attendance-protection-handover.md) ve [anlaşma/hakediş](instructor-earnings-handover.md) devirlerindedir.
+Güncel kaynak ve CI: [doğrulanmış devir](../contracts/00-FtkSaaS-yeni-sohbet-devir.md). **199 işlem: 118 çağrılabilir, 81 yalnız sözleşme; 32 migration.** Önceki teslimlerde kapanmış işler burada yeniden açık ilan edilmez. Uygulama kapsamı [Starter](starter-attendance-protection-handover.md) ve [anlaşma/hakediş](instructor-earnings-handover.md) devirlerindedir.
 
-[P01 devri](p01-handover.md): A katalog/hak okuması b8d9adc kaynağında hedefli/adayı geçti, merge edilmedi. B altı talep komutu ve sürüm/alternatif okuması uygulandı; yeni runtime kabulü bekliyor. Kalan C yedi API ve gerçek worker işletimidir. P01 aynı feature dalı/PR #22 içinde tamamlanır; commit başına hedefli test, bütün P01 sonunda toplu clean/merge. Main 24007212005d07938fb1265a9f42891f18d7fa09 / clean 39298247595 başarılıdır. Hosted eski smoke yeni kaynak kabulü değildir.
+P01-B kaynak `78d68653e903d9764264f1fe8d73dfb9d9de7f49` için [hedefli CI 39319195689](https://github.com/SXQHex/FtkSaaS/actions/runs/39319195689) başarılı: 120 yapı/politika + 27 DB + 58 API test düğümü (A/B 17, ortak 41); pg concurrent-query uyarısı logda yok. Bu sonuç yeni C kaynağına taşınmaz. P01-C yedi API, kapsamlı okuma ve gerçek worker runner uygulandı; yeni runtime kabulü bekliyor. Geliştirme envanteri 199 sözleşme / 118 çağrılabilir / 81 contract_only / 32 migration. P01 merge/main kabulü yok; bütün P01 sonunda toplu clean alınır.
 
-P01-B hedefli run [39317251796](https://github.com/SXQHex/FtkSaaS/actions/runs/39317251796) / 7ef51f2 başarısız: org-only discipline_save fixture'ına center_id eklenmesi nedeniyle hazırlık reddedildi; B davranış vakaları çalışmadı. Fixture ve pg sayaç uyarısı düzeltildi; yeni hedefli kabul bekliyor. [Teşhis](p01-handover.md).
+[P01 devri](p01-handover.md), [tek üretim kuyruğu](production-queue.md). Belge yükleme/yayımlama/kabul API ve genel rezervasyon/yoklama tüketici kapsamı P05'te açıktır; P01 mevcut yayımlanmış rezervasyon gerekliliklerini dar olarak tüketir.
 
 ## Aktif seri üretim
 
@@ -31,14 +31,14 @@ Kalan delivery_gaps ve vaka bazlı durumlar [08 makine sözleşmesi](../contract
 
 Her yeni grup: sözleşme/izin incelemesi → yeni migration → gerçek Auth/API kabulü (sınır, yetki, tekrar, yarış, rollback) → inceleme → temiz CI → main CI. Ürün kararında boşluk varsa teknik varsayımla yeni kural eklenmez.
 
-## Yalnız sözleşme envanteri — güncel 88 işlem
+## Yalnız sözleşme envanteri — güncel 81 işlem
 
 | Modül | Kalan işlem |
 |---|---:|
 | M01 | 5 |
 | M02 | 7 |
 | M03 | 3 |
-| M04 | 6 |
+| M04 | 2 |
 | M05 | 3 |
 | M06 | 12 |
 | M07 | 5 |
@@ -48,7 +48,7 @@ Her yeni grup: sözleşme/izin incelemesi → yeni migration → gerçek Auth/AP
 | M11 | 3 |
 | M12 | 5 |
 | M14 | 5 |
-| X | 18 |
+| X | 15 |
 
 | İşlem | İzin |
 |---|---|
@@ -70,10 +70,6 @@ Her yeni grup: sözleşme/izin incelemesi → yeni migration → gerçek Auth/AP
 | session_cancel_preview_v1 | schedule.manage |
 | session_cancel_apply_v1 | schedule.manage |
 | replacement_session_create_v1 | schedule.manage |
-| waitlist_join_v1 | reservation.write |
-| waitlist_leave_v1 | reservation.write |
-| seat_offer_accept_v1 | reservation.write |
-| seat_offer_reject_v1 | reservation.write |
 | entitlement_extend_v1 | entitlement.correct |
 | credit_adjust_v1 | entitlement.correct |
 | freeze_preview_v1 | entitlement.correct |
@@ -129,9 +125,6 @@ Her yeni grup: sözleşme/izin incelemesi → yeni migration → gerçek Auth/AP
 | preview_get_v1 | account.self |
 | job_status_get_v1 | account.self |
 | audit_list_v1 | report.read |
-| seat_offer_issue_v1 | system.worker |
-| seat_offer_expire_v1 | system.worker |
-| request_expire_v1 | system.worker |
 | outbox_deliver_v1 | system.worker |
 | reminder_schedule_v1 | system.worker |
 | automation_run_v1 | system.worker |

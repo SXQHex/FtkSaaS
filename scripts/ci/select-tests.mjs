@@ -5,11 +5,11 @@ import {analyzeDelta} from './delta-analysis.mjs';
 export const apiSuites = [
  'api-acceptance','event-payment','event-cancellation','registry','person-registry',
  'room-role-registry','availability-policies','schedule-reads','program-session-lifecycle',
- 'starter-attendance-protection','instructor-earnings','cross-center-settlement','p01-catalog-entitlement-reads','p01-lesson-requests'
+ 'starter-attendance-protection','instructor-earnings','cross-center-settlement','p01-catalog-entitlement-reads','p01-lesson-requests','p01-waitlist-workers'
 ].map(n=>'tests/'+n+'.test.mjs');
 // Economic consumers and reservation readers are explicit dependencies, not filename guesses.
 export const modules = [
- {id:'p01-requests', sources:['p01-lesson-requests'], operations:['lesson_request_create_v1','lesson_request_withdraw_v1','lesson_request_reject_v1','lesson_request_offer_alternative_v1','lesson_request_accept_alternative_v1','lesson_request_approve_v1'], managementRequestProjection:true, migrationCheckLabel:'P01 requests source drift', suites:['p01-lesson-requests','p01-catalog-entitlement-reads']},
+ {id:'p01-requests', sources:['p01-lesson-requests','p01-waitlist-workers'], runtimeSources:['scripts/p01-worker.mjs'], operations:['lesson_request_create_v1','lesson_request_withdraw_v1','lesson_request_reject_v1','lesson_request_offer_alternative_v1','lesson_request_accept_alternative_v1','lesson_request_approve_v1','waitlist_join_v1','waitlist_leave_v1','seat_offer_accept_v1','seat_offer_reject_v1','seat_offer_issue_v1','seat_offer_expire_v1','request_expire_v1'], managementRequestProjection:true, migrationCheckLabel:'P01 requests source drift', migrationCheckLabels:{'p01-waitlist-workers':'P01 waitlist source drift'}, suites:['p01-lesson-requests','p01-catalog-entitlement-reads','p01-waitlist-workers']},
  {id:'p01-reads', sources:['p01-catalog-entitlement-reads'], operations:['products_list_v1','entitlements_get_v1'], migrationCheckLabel:'P01 reads source drift', suites:['p01-catalog-entitlement-reads']},
  {id:'settlement', sources:['cross-center-settlement'], suites:['cross-center-settlement','instructor-earnings','starter-attendance-protection']},
  {id:'earnings', sources:['instructor-earnings'], suites:['instructor-earnings','cross-center-settlement','program-session-lifecycle','starter-attendance-protection']},
@@ -54,7 +54,7 @@ export function select(changes,{diffAvailable=true,headMatches=true,evidence}={}
   }
   if(/^tests\/(contract|governance|ci-policy)\.test\.mjs$/.test(p)||p==='tests/types.test.ts'){structural=true;reasons.push(p+': structural checks');continue;}
   if(apiSuites.includes(p)){structural=true;chosen.add(p);chosen.add(apiSuites[0]);reasons.push(p+': explicit API suite + shared authorization/rights regressions');continue;}
-  const m=modules.find(m=>m.sources.some(n=>p==='database/'+n+'.sql'||p==='database/'+n+'-wrappers.sql'));
+  const m=modules.find(m=>(m.sources.some(n=>p==='database/'+n+'.sql'||p==='database/'+n+'-wrappers.sql')||m.runtimeSources?.includes(p)));
   if(m){structural=true;chosen.add(apiSuites[0]);for(const n of m.suites)chosen.add('tests/'+n+'.test.mjs');reasons.push(p+': '+m.id+' dependency graph + shared authorization/rights regressions');continue;}
   if(p.startsWith('docs/')&&p.endsWith('.json')){structural=true;reasons.push(p+': generated inventory consistency');continue;}
   all(p+': unknown/shared dependency ('+status+'), fail closed to all DB/API suites');

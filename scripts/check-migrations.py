@@ -60,3 +60,5 @@ assert next(Path('supabase/migrations').glob('*_cross_center_settlement.sql')).r
 assert next(Path('supabase/migrations').glob('*_p01_catalog_entitlement_reads.sql')).read_text()==Path('database/p01-catalog-entitlement-reads.sql').read_text()+Path('database/p01-catalog-entitlement-reads-wrappers.sql').read_text(),'P01 reads source drift'
 
 assert next(Path('supabase/migrations').glob('*_p01_lesson_requests.sql')).read_text()==Path('database/p01-lesson-requests.sql').read_text()+Path('database/p01-lesson-requests-wrappers.sql').read_text(),'P01 requests source drift'
+
+assert next(Path('supabase/migrations').glob('*_p01_waitlist_workers.sql')).read_text()==Path('database/p01-waitlist-workers.sql').read_text()+Path('database/p01-waitlist-workers-wrappers.sql').read_text(),'P01 waitlist source drift'

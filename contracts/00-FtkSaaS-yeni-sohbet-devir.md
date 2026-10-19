@@ -1,5 +1,11 @@
 # FtkSaaS — güncel devir
 
+## P01-C uygulama dilimi — runtime kabulü bekliyor
+
+P01-B kaynak `78d68653e903d9764264f1fe8d73dfb9d9de7f49` için [hedefli CI 39319195689](https://github.com/SXQHex/FtkSaaS/actions/runs/39319195689) başarılı: 120 yapı/politika + 27 DB + 58 API test düğümü (A/B 17, ortak 41); pg concurrent-query uyarısı logda yok. Bu sonuç yeni C kaynağına taşınmaz. P01-C yedi API, kapsamlı okuma ve gerçek worker runner uygulandı; yeni runtime kabulü bekliyor. Geliştirme envanteri 199 sözleşme / 118 çağrılabilir / 81 contract_only / 32 migration. P01 merge/main kabulü yok; bütün P01 sonunda toplu clean alınır.
+
+Sistem worker DB kimliği/claim/lease/tekrar ve kabul sınırları [P01 devrinde](../docs/p01-handover.md); seri üretimin sonraki adımı [kuyruktadır](../docs/production-queue.md). Aşağıdaki eski pending/hata notları ait oldukları önceki kaynakların kayıtlarıdır.
+
 P01-B son hedefli kaynak 7ef51f2b3c6b791eec27acbfb648b7c23b6e2b74 / run 39317251796 başarısızdır: organizasyon disiplini fixture'ının fazladan center_id alanı DTO reddi verdi; B davranış vakaları başlamadı. 31 migration, 120 yapı/politika ve 27 DB testi geçti. Fixture ve pg sayaç sorgusu uyarısı odaklı düzeltildi; yeni head hedefli kabulü bekler. Runtime sözleşmesi gevşetilmedi; [teşhis](../docs/p01-handover.md).
 
 ## 19 Ekim 2026 — P01 ayrı dalda bütün olarak geliştiriliyor

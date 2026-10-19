@@ -2,20 +2,20 @@
 
 19 Ekim 2026 kullanıcı talimatı. Tek aktif üretim prompt kaynağı bu dosyadır; [kalan işler](remaining-work.md) ve [F01–F33](feature-delivery.md) ürün/uygulama durumunu tutmaya devam eder. İkinci sözleşme ağacı değildir.
 
-P01-B hedefli run [39317251796](https://github.com/SXQHex/FtkSaaS/actions/runs/39317251796) / 7ef51f2 başarısız: org-only discipline_save fixture'ına center_id eklenmesi nedeniyle hazırlık reddedildi; B davranış vakaları çalışmadı. Fixture ve pg sayaç uyarısı düzeltildi; yeni hedefli kabul bekliyor. [Teşhis](p01-handover.md).
+P01-B kaynak `78d68653e903d9764264f1fe8d73dfb9d9de7f49` için [hedefli CI 39319195689](https://github.com/SXQHex/FtkSaaS/actions/runs/39319195689) başarılı: 120 yapı/politika + 27 DB + 58 API test düğümü (A/B 17, ortak 41); pg concurrent-query uyarısı logda yok. Bu sonuç yeni C kaynağına taşınmaz. P01-C yedi API, kapsamlı okuma ve gerçek worker runner uygulandı; yeni runtime kabulü bekliyor. Geliştirme envanteri 199 sözleşme / 118 çağrılabilir / 81 contract_only / 32 migration. P01 merge/main kabulü yok; bütün P01 sonunda toplu clean alınır.
 
 ## Şimdi yapılacak iş
 
 **P00, PR #21 kurtarması ve PR #23 CI bakımı kapalı; P01 in_progress.** Güncel main 24007212005d07938fb1265a9f42891f18d7fa09; [aynı SHA main clean 39298247595](https://github.com/SXQHex/FtkSaaS/actions/runs/39298247595) başarılı: 409 test, sıfır annotation warning/error, merged-candidate relation doğrulandı. Node24 Action kurulumu tek seferlik açık kullanıcı onayıyla yapıldı; bu yetki P01'in normal merge kapısına istisna vermez.
 
-[P01 devri](p01-handover.md): A okuma dilimi head b8d9adcff3607d7e055c5c71a9d4f8d5ca3a6013 hedefli 39303865804 ve aday 39304797200 ile geçti; merge edilmedi. B altı talep komutu ve yönetim sürüm okumaları uygulandı, yeni runtime kabulü bekliyor. C yedi API ve gerçek worker açık. Son kullanıcı kararıyla P01 bütünü aynı ayrı dal/PR #22 içinde geliştirilir: commit başına hedefli test; ara aday clean/merge yok; bütün P01 sonunda son inceleme ve toplu aday/main kabulü. Önceki clean yeni kaynağın kanıtı değildir.
+[P01 devri](p01-handover.md): A okuma dilimi head b8d9adcff3607d7e055c5c71a9d4f8d5ca3a6013 hedefli 39303865804 ve aday 39304797200 ile geçti; merge edilmedi. B altı talep komutu/sürüm okuması 78d6865 hedefli kabulünü geçti. C yedi API/okuma ve dar worker uygulandı; yeni hedefli runtime kabulü bekliyor. Son kullanıcı kararıyla P01 bütünü aynı ayrı dal/PR #22 içinde geliştirilir: commit başına hedefli test; ara aday clean/merge yok; bütün P01 sonunda son inceleme ve toplu aday/main kabulü. Önceki clean yeni kaynağın kanıtı değildir.
 
 Bu planın başlangıç envanteri 199 toplam / 104 çağrılabilir / 95 contract_only / 29 migration'dır. Yedi grup başlangıçtaki 95 işlemi birer kez kapsar. Yeni sözleşme ihtiyacı ayrıca açıklanır; sayılar başarı hedefi değildir.
 
 | Sıra | Teslim | Başlangıç işlem sayısı | Durum | PR/head | Devam |
 |---|---|---:|---|---|---|
 | P00 | CI ayrımı | — | done | #19 / main b4a704a6897353bb0d54355903267b62d8d72496 | main clean 39242063000 başarılı; koruma yönetici sınırı açık |
-| P01 | Talep, rezervasyon ve bekleme | 14 | in_progress | #22 / feature/p01-request-reservation-flow | A kaynak kabulü geçti, merge edilmedi; B uygulandı/runtime bekliyor; C 7 API/worker açık; toplu clean P01 sonunda |
+| P01 | Talep, rezervasyon ve bekleme | 14 | in_progress | #22 / feature/p01-request-reservation-flow | A/B hedefli kabulü geçti; C uygulandı/runtime bekliyor; son inceleme/toplu aday/main kabulü açık |
 | P02 | Paket ve seans yaşam döngüsü | 15 | queued | — | önceki teslimin main kabulünden sonra |
 | P03 | Finans ve eğitmen ödemeleri | 7 | queued | — | önceki teslimin main kabulünden sonra |
 | P04 | CRM ve public başvuru | 11 | queued | — | önceki teslimin main kabulünden sonra |
@@ -67,28 +67,13 @@ Aşağıdaki kurallarla sıradaki açık teslimi uygula; kullanıcı her teslim 
 
 ### P01 — Talep, rezervasyon ve bekleme
 
-Ortak üretim promptunu uygula. Durum: in_progress — A kaynak kabulü geçti, merge edilmedi. B uygulandı; hedefli runtime kabulü bekliyor. C 7 API ve worker açık.
+Durum: in_progress. Katalog/hak okuması ve altı talep komutu hedefli kabulü geçti; C yedi bekleme/teklif/expiry API'si, management okumaları ve dar worker runner uygulandı. Bu uygulama alt promptları yeniden geliştirilmez. [Kaynak ve kabul sınırı](p01-handover.md).
 
-**Kalan sözleşme API'leri (7):**
+**Kalan P01 kabul işleri:**
 
-- `waitlist_join_v1`
-- `waitlist_leave_v1`
-- `seat_offer_accept_v1`
-- `seat_offer_reject_v1`
-- `seat_offer_issue_v1`
-- `seat_offer_expire_v1`
-- `request_expire_v1`
-
-P01-A: products_list_v1 ve entitlements_get_v1 seans bağlamı uygulandı ve b8d9adc kaynağında hedefli/adayı geçti; main kabulü yok. P01-B: altı talep komutu ve management_state_get_v1 üzerinden kapsamlı sürüm/alternatif okuması uygulandı; hedefli runtime kabulü bekliyor. Bitmiş uygulama yeniden yazılmaz. P01 bütünü son hedefli kabul ve bağımsız incelemeden önce merge edilmez; ara aday clean başlatılmaz.
-
-**Görev ve kabul:**
-
-Öğrenci/merkez uygun hakla talep oluşturabilsin; merkez alternatif sunup onaylayabilsin; bekleme ve süreli teklif kesin rezervasyona dönüşebilsin.
-products_list yalnız katalogdur; uygun satın alınmış hak seçimini onunla eşitleme. Mevcut entitlements_get/reservation_create ile seans–kişi–sale bağlamının eksik DTO/okuma karşılığını incele ve gereken teknik aktarımı açıkça yap.
-Talep/alternatif yer veya hak tutmasın. Öğrencinin alternatif kabulü merkez onayı yerine geçmesin. Kesin onayda kaynak, hak, plan, belge ve katılım şartları yeniden denetlensin.
-Teklif ortak kapasitede yer tutsun, hak ayırmasın; kabul/ret/expiry/seans iptali yarışları tek sonuç versin. Süre kayıt kapanışını/seans başlangıcını aşmasın; otomatik kesin kayıt ekleme.
-Worker'ları dar sistem kimliğiyle ve gerçek çalıştırma yolu ile bağla. Yalnız elle çağırmayı işletim kabulü sayma.
-Kabul: talep→alternatif→merkez onayı→rezervasyon okuması ve bekleme→teklif→kabul/expiry→yer/hak sonucu.
+1. C kaynağında Auth/API + gerçek worker döngüsü, kira/fencing/retry, nominal kapasite, belge/hak rollback, canlı scope ve iptal/expiry yarış hedefli kabulünü doğrula; hata varsa aynı dalda odaklı düzelt.
+2. İlgili bütün P01 hedefli davranışlar geçince son head'i bağımsız incele. Test edilmemiş vaka, worker kurulumu veya yeni ürün belirsizliği varsa somut engel olarak tut; uygulanmış olmayı tested/done yapma.
+3. Bütün P01 hazırken toplu aday full clean başlat ve kullanıcıya devret. Kaynak bağlı kabul sonrası normal merge, aynı main full clean ve kullanıcıya devir; main kabulü doğrulanınca P01'i kapat ve P02'ye geç. Ara clean/merge yok.
 
 ### P02 — Paket ve seans yaşam döngüsü
 

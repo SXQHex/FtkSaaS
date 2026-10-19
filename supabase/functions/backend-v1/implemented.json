@@ -110,6 +110,13 @@
     "lesson_request_reject_v1",
     "lesson_request_offer_alternative_v1",
     "lesson_request_accept_alternative_v1",
-    "lesson_request_approve_v1"
+    "lesson_request_approve_v1",
+    "waitlist_join_v1",
+    "waitlist_leave_v1",
+    "seat_offer_accept_v1",
+    "seat_offer_reject_v1",
+    "seat_offer_issue_v1",
+    "seat_offer_expire_v1",
+    "request_expire_v1"
   ]
 }

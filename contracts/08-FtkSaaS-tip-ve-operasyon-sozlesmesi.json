@@ -9874,14 +9874,7 @@
           "$ref": "#/$defs/FtkUuid"
         },
         "center_id": {
-          "anyOf": [
-            {
-              "$ref": "#/$defs/FtkUuid"
-            },
-            {
-              "type": "null"
-            }
-          ]
+          "$ref": "#/$defs/FtkUuid"
         },
         "operation_key": {
           "$ref": "#/$defs/FtkUuid"
@@ -9899,7 +9892,8 @@
         "org_id",
         "operation_key",
         "person_id",
-        "session_id"
+        "session_id",
+        "center_id"
       ],
       "additionalProperties": false
     },
@@ -9936,20 +9930,16 @@
           "$ref": "#/$defs/FtkUuid"
         },
         "center_id": {
-          "anyOf": [
-            {
-              "$ref": "#/$defs/FtkUuid"
-            },
-            {
-              "type": "null"
-            }
-          ]
+          "$ref": "#/$defs/FtkUuid"
         },
         "operation_key": {
           "$ref": "#/$defs/FtkUuid"
         },
         "entry_id": {
           "$ref": "#/$defs/FtkUuid"
+        },
+        "expected_version": {
+          "$ref": "#/$defs/PositiveInt"
         }
       },
       "required": [
@@ -9957,7 +9947,9 @@
         "request_id",
         "org_id",
         "operation_key",
-        "entry_id"
+        "entry_id",
+        "center_id",
+        "expected_version"
       ],
       "additionalProperties": false
     },
@@ -9994,20 +9986,16 @@
           "$ref": "#/$defs/FtkUuid"
         },
         "center_id": {
-          "anyOf": [
-            {
-              "$ref": "#/$defs/FtkUuid"
-            },
-            {
-              "type": "null"
-            }
-          ]
+          "$ref": "#/$defs/FtkUuid"
         },
         "operation_key": {
           "$ref": "#/$defs/FtkUuid"
         },
         "offer_id": {
           "$ref": "#/$defs/FtkUuid"
+        },
+        "expected_version": {
+          "$ref": "#/$defs/PositiveInt"
         }
       },
       "required": [
@@ -10015,7 +10003,9 @@
         "request_id",
         "org_id",
         "operation_key",
-        "offer_id"
+        "offer_id",
+        "center_id",
+        "expected_version"
       ],
       "additionalProperties": false
     },
@@ -10052,20 +10042,16 @@
           "$ref": "#/$defs/FtkUuid"
         },
         "center_id": {
-          "anyOf": [
-            {
-              "$ref": "#/$defs/FtkUuid"
-            },
-            {
-              "type": "null"
-            }
-          ]
+          "$ref": "#/$defs/FtkUuid"
         },
         "operation_key": {
           "$ref": "#/$defs/FtkUuid"
         },
         "offer_id": {
           "$ref": "#/$defs/FtkUuid"
+        },
+        "expected_version": {
+          "$ref": "#/$defs/PositiveInt"
         }
       },
       "required": [
@@ -10073,7 +10059,9 @@
         "request_id",
         "org_id",
         "operation_key",
-        "offer_id"
+        "offer_id",
+        "center_id",
+        "expected_version"
       ],
       "additionalProperties": false
     },
@@ -24465,6 +24453,9 @@
         },
         "request_detail": {
           "$ref": "#/$defs/LessonRequestView"
+        },
+        "waitlist_detail": {
+          "$ref": "#/$defs/WaitlistEntryView"
         }
       },
       "required": [
@@ -26806,10 +26797,14 @@
               },
               "org_id": {
                 "$ref": "#/$defs/FtkUuid"
+              },
+              "center_id": {
+                "$ref": "#/$defs/FtkUuid"
               }
             },
             "required": [
-              "org_id"
+              "org_id",
+              "center_id"
             ]
           }
         },
@@ -26835,10 +26830,14 @@
               },
               "org_id": {
                 "$ref": "#/$defs/FtkUuid"
+              },
+              "center_id": {
+                "$ref": "#/$defs/FtkUuid"
               }
             },
             "required": [
-              "org_id"
+              "org_id",
+              "center_id"
             ]
           }
         },
@@ -26864,10 +26863,14 @@
               },
               "org_id": {
                 "$ref": "#/$defs/FtkUuid"
+              },
+              "center_id": {
+                "$ref": "#/$defs/FtkUuid"
               }
             },
             "required": [
-              "org_id"
+              "org_id",
+              "center_id"
             ]
           }
         },
@@ -26893,10 +26896,14 @@
               },
               "org_id": {
                 "$ref": "#/$defs/FtkUuid"
+              },
+              "center_id": {
+                "$ref": "#/$defs/FtkUuid"
               }
             },
             "required": [
-              "org_id"
+              "org_id",
+              "center_id"
             ]
           }
         },
@@ -40781,6 +40788,93 @@
         "version"
       ],
       "additionalProperties": false
+    },
+    "SeatOfferView": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/FtkUuid"
+        },
+        "created_at": {
+          "$ref": "#/$defs/Instant"
+        },
+        "version": {
+          "$ref": "#/$defs/PositiveInt"
+        },
+        "entry_id": {
+          "$ref": "#/$defs/FtkUuid"
+        },
+        "session_id": {
+          "$ref": "#/$defs/FtkUuid"
+        },
+        "person_id": {
+          "$ref": "#/$defs/FtkUuid"
+        },
+        "expires_at": {
+          "$ref": "#/$defs/Instant"
+        },
+        "state": {
+          "$ref": "#/$defs/OfferState"
+        }
+      },
+      "required": [
+        "id",
+        "created_at",
+        "entry_id",
+        "session_id",
+        "person_id",
+        "expires_at",
+        "state",
+        "version"
+      ],
+      "additionalProperties": false
+    },
+    "WaitlistEntryView": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/FtkUuid"
+        },
+        "created_at": {
+          "$ref": "#/$defs/Instant"
+        },
+        "version": {
+          "$ref": "#/$defs/PositiveInt"
+        },
+        "center_id": {
+          "$ref": "#/$defs/FtkUuid"
+        },
+        "session_id": {
+          "$ref": "#/$defs/FtkUuid"
+        },
+        "person_id": {
+          "$ref": "#/$defs/FtkUuid"
+        },
+        "joined_at": {
+          "$ref": "#/$defs/Instant"
+        },
+        "state": {
+          "$ref": "#/$defs/WaitState"
+        },
+        "offers": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/SeatOfferView"
+          }
+        }
+      },
+      "required": [
+        "id",
+        "created_at",
+        "center_id",
+        "session_id",
+        "person_id",
+        "joined_at",
+        "state",
+        "version",
+        "offers"
+      ],
+      "additionalProperties": false
     }
   },
   "x-contract": {
@@ -50187,8 +50281,10 @@
           "FORBIDDEN",
           "IDEMPOTENCY_PAYLOAD_MISMATCH",
           "INTEGRITY_VIOLATION",
+          "INVALID_STATE_TRANSITION",
           "NOT_FOUND",
           "OFFER_UNAVAILABLE",
+          "OPEN_OPERATIONS_EXIST",
           "OPERATION_IN_PROGRESS",
           "OPERATION_RESULT_EXPIRED",
           "PARTICIPATION_BLOCKED",
@@ -50255,11 +50351,13 @@
           "A55"
         ],
         "configuration_policy": "numeric plan limits/prices and legal approval are deployment configuration, never arbitrary allow/deny",
-        "implementation_status": "contract_only",
+        "implementation_status": "operational_development_limited",
         "required_features": [
           "F12"
         ],
-        "runtime_required_features": [],
+        "runtime_required_features": [
+          "F12"
+        ],
         "conditional_features": [],
         "operation_contract": {
           "kind": "command",
@@ -50271,17 +50369,24 @@
             "waitlist_entries.versioned_domain_change"
           ],
           "business_commit": true,
-          "read_path_status": "contract_only",
+          "read_path_status": "implemented",
           "source_decision": "DS-2026-10-17"
         },
         "decision_delivery": {
           "accepted_contract": "DS-2026-10-17",
-          "runtime_conformance": "pending",
+          "runtime_conformance": "p01_waitlist_worker_runtime_pending",
           "open_dependencies": [],
           "target_request": {
             "$ref": "#/$defs/Request_waitlist_join"
           }
-        }
+        },
+        "runtime_path": "/functions/v1/backend-v1/waitlist_join_v1",
+        "runtime_external_path": "/functions/v1/backend-v1/waitlist_join_v1",
+        "runtime_rpc": "api_v1.waitlist_join_v1",
+        "runtime_transport": "authenticated Edge -> service-only RPC",
+        "runtime_limits": [
+          "P01-C implementation; runtime acceptance pending. Dedicated DB worker LOGIN/org binding and runner required; no production installation performed."
+        ]
       },
       {
         "name": "waitlist_leave_v1",
@@ -50312,8 +50417,10 @@
           "FORBIDDEN",
           "IDEMPOTENCY_PAYLOAD_MISMATCH",
           "INTEGRITY_VIOLATION",
+          "INVALID_STATE_TRANSITION",
           "NOT_FOUND",
           "OFFER_UNAVAILABLE",
+          "OPEN_OPERATIONS_EXIST",
           "OPERATION_IN_PROGRESS",
           "OPERATION_RESULT_EXPIRED",
           "PARTICIPATION_BLOCKED",
@@ -50383,33 +50490,42 @@
           "A55"
         ],
         "configuration_policy": "numeric plan limits/prices and legal approval are deployment configuration, never arbitrary allow/deny",
-        "implementation_status": "contract_only",
+        "implementation_status": "operational_development_limited",
         "required_features": [
           "F12"
         ],
-        "runtime_required_features": [],
+        "runtime_required_features": [
+          "F12"
+        ],
         "conditional_features": [],
         "operation_contract": {
           "kind": "command",
           "target_entity": "waitlist_entries",
-          "version_mode": "append_or_current_scope_lock",
-          "version_field": null,
+          "version_mode": "row_version",
+          "version_field": "entry_id",
           "read_operation": "management_state_get_v1",
           "atomic_effects": [
             "waitlist_entries.versioned_domain_change"
           ],
           "business_commit": true,
-          "read_path_status": "contract_only",
+          "read_path_status": "implemented",
           "source_decision": "DS-2026-10-17"
         },
         "decision_delivery": {
           "accepted_contract": "DS-2026-10-17",
-          "runtime_conformance": "pending",
+          "runtime_conformance": "p01_waitlist_worker_runtime_pending",
           "open_dependencies": [],
           "target_request": {
             "$ref": "#/$defs/Request_waitlist_leave"
           }
-        }
+        },
+        "runtime_path": "/functions/v1/backend-v1/waitlist_leave_v1",
+        "runtime_external_path": "/functions/v1/backend-v1/waitlist_leave_v1",
+        "runtime_rpc": "api_v1.waitlist_leave_v1",
+        "runtime_transport": "authenticated Edge -> service-only RPC",
+        "runtime_limits": [
+          "P01-C implementation; runtime acceptance pending. Dedicated DB worker LOGIN/org binding and runner required; no production installation performed."
+        ]
       },
       {
         "name": "seat_offer_accept_v1",
@@ -50440,8 +50556,10 @@
           "FORBIDDEN",
           "IDEMPOTENCY_PAYLOAD_MISMATCH",
           "INTEGRITY_VIOLATION",
+          "INVALID_STATE_TRANSITION",
           "NOT_FOUND",
           "OFFER_UNAVAILABLE",
+          "OPEN_OPERATIONS_EXIST",
           "OPERATION_IN_PROGRESS",
           "OPERATION_RESULT_EXPIRED",
           "PARTICIPATION_BLOCKED",
@@ -50515,33 +50633,42 @@
           "D-A12"
         ],
         "configuration_policy": "numeric plan limits/prices and legal approval are deployment configuration, never arbitrary allow/deny",
-        "implementation_status": "contract_only",
+        "implementation_status": "operational_development_limited",
         "required_features": [
           "F12"
         ],
-        "runtime_required_features": [],
+        "runtime_required_features": [
+          "F12"
+        ],
         "conditional_features": [],
         "operation_contract": {
           "kind": "command",
           "target_entity": "seat_offers",
-          "version_mode": "append_or_current_scope_lock",
-          "version_field": null,
+          "version_mode": "row_version",
+          "version_field": "offer_id",
           "read_operation": "management_state_get_v1",
           "atomic_effects": [
             "seat_offers.versioned_domain_change"
           ],
           "business_commit": true,
-          "read_path_status": "contract_only",
+          "read_path_status": "implemented",
           "source_decision": "DS-2026-10-17"
         },
         "decision_delivery": {
           "accepted_contract": "DS-2026-10-17",
-          "runtime_conformance": "pending",
+          "runtime_conformance": "p01_waitlist_worker_runtime_pending",
           "open_dependencies": [],
           "target_request": {
             "$ref": "#/$defs/Request_seat_offer_accept"
           }
-        }
+        },
+        "runtime_path": "/functions/v1/backend-v1/seat_offer_accept_v1",
+        "runtime_external_path": "/functions/v1/backend-v1/seat_offer_accept_v1",
+        "runtime_rpc": "api_v1.seat_offer_accept_v1",
+        "runtime_transport": "authenticated Edge -> service-only RPC",
+        "runtime_limits": [
+          "P01-C implementation; runtime acceptance pending. Dedicated DB worker LOGIN/org binding and runner required; no production installation performed."
+        ]
       },
       {
         "name": "seat_offer_reject_v1",
@@ -50572,8 +50699,10 @@
           "FORBIDDEN",
           "IDEMPOTENCY_PAYLOAD_MISMATCH",
           "INTEGRITY_VIOLATION",
+          "INVALID_STATE_TRANSITION",
           "NOT_FOUND",
           "OFFER_UNAVAILABLE",
+          "OPEN_OPERATIONS_EXIST",
           "OPERATION_IN_PROGRESS",
           "OPERATION_RESULT_EXPIRED",
           "PARTICIPATION_BLOCKED",
@@ -50647,33 +50776,42 @@
           "D-A12"
         ],
         "configuration_policy": "numeric plan limits/prices and legal approval are deployment configuration, never arbitrary allow/deny",
-        "implementation_status": "contract_only",
+        "implementation_status": "operational_development_limited",
         "required_features": [
           "F12"
         ],
-        "runtime_required_features": [],
+        "runtime_required_features": [
+          "F12"
+        ],
         "conditional_features": [],
         "operation_contract": {
           "kind": "command",
           "target_entity": "seat_offers",
-          "version_mode": "append_or_current_scope_lock",
-          "version_field": null,
+          "version_mode": "row_version",
+          "version_field": "offer_id",
           "read_operation": "management_state_get_v1",
           "atomic_effects": [
             "seat_offers.versioned_domain_change"
           ],
           "business_commit": true,
-          "read_path_status": "contract_only",
+          "read_path_status": "implemented",
           "source_decision": "DS-2026-10-17"
         },
         "decision_delivery": {
           "accepted_contract": "DS-2026-10-17",
-          "runtime_conformance": "pending",
+          "runtime_conformance": "p01_waitlist_worker_runtime_pending",
           "open_dependencies": [],
           "target_request": {
             "$ref": "#/$defs/Request_seat_offer_reject"
           }
-        }
+        },
+        "runtime_path": "/functions/v1/backend-v1/seat_offer_reject_v1",
+        "runtime_external_path": "/functions/v1/backend-v1/seat_offer_reject_v1",
+        "runtime_rpc": "api_v1.seat_offer_reject_v1",
+        "runtime_transport": "authenticated Edge -> service-only RPC",
+        "runtime_limits": [
+          "P01-C implementation; runtime acceptance pending. Dedicated DB worker LOGIN/org binding and runner required; no production installation performed."
+        ]
       },
       {
         "name": "attendance_get_v1",
@@ -60293,8 +60431,10 @@
           "FORBIDDEN",
           "IDEMPOTENCY_PAYLOAD_MISMATCH",
           "INTEGRITY_VIOLATION",
+          "INVALID_STATE_TRANSITION",
           "NOT_FOUND",
           "OFFER_UNAVAILABLE",
+          "OPEN_OPERATIONS_EXIST",
           "OPERATION_IN_PROGRESS",
           "OPERATION_RESULT_EXPIRED",
           "PARTICIPATION_BLOCKED",
@@ -60312,7 +60452,7 @@
           "VERSION_CONFLICT"
         ],
         "transaction_class": "reservation",
-        "transaction_guarantee": "Atomic seat_offers.versioned_domain_change; audit + in-app outbox + receipt. External delivery never determines the domain commit.",
+        "transaction_guarantee": "Bound worker DB principal/org/job/operation/lease; domain, receipt, audit, inbox and successful job completion atomic. Failure rolls back domain then records bounded retry/terminal status.",
         "transition": {
           "entity": "seat_offers",
           "from": [],
@@ -60366,11 +60506,13 @@
           "D-A12"
         ],
         "configuration_policy": "numeric plan limits/prices and legal approval are deployment configuration, never arbitrary allow/deny",
-        "implementation_status": "contract_only",
+        "implementation_status": "operational_development_limited",
         "required_features": [
           "F12"
         ],
-        "runtime_required_features": [],
+        "runtime_required_features": [
+          "F12"
+        ],
         "conditional_features": [],
         "operation_contract": {
           "kind": "worker",
@@ -60379,7 +60521,9 @@
           "version_field": null,
           "read_operation": "management_state_get_v1",
           "atomic_effects": [
-            "seat_offers.versioned_domain_change"
+            "scoped_job.domain_change",
+            "worker_receipt.audit.inbox.atomic",
+            "job.succeeded_or_bounded_retry"
           ],
           "business_commit": true,
           "read_path_status": "contract_only",
@@ -60387,12 +60531,19 @@
         },
         "decision_delivery": {
           "accepted_contract": "DS-2026-10-17",
-          "runtime_conformance": "pending",
+          "runtime_conformance": "p01_waitlist_worker_runtime_pending",
           "open_dependencies": [],
           "target_request": {
             "$ref": "#/$defs/Request_seat_offer_issue"
           }
-        }
+        },
+        "runtime_path": "/functions/v1/backend-v1/seat_offer_issue_v1",
+        "runtime_external_path": "/functions/v1/backend-v1/seat_offer_issue_v1",
+        "runtime_rpc": "api_v1.seat_offer_issue_v1",
+        "runtime_transport": "dedicated database worker role -> scoped claim/lease -> RPC; human Edge callers denied",
+        "runtime_limits": [
+          "P01-C implementation; runtime acceptance pending. Dedicated DB worker LOGIN/org binding and runner required; no production installation performed."
+        ]
       },
       {
         "name": "seat_offer_expire_v1",
@@ -60423,8 +60574,10 @@
           "FORBIDDEN",
           "IDEMPOTENCY_PAYLOAD_MISMATCH",
           "INTEGRITY_VIOLATION",
+          "INVALID_STATE_TRANSITION",
           "NOT_FOUND",
           "OFFER_UNAVAILABLE",
+          "OPEN_OPERATIONS_EXIST",
           "OPERATION_IN_PROGRESS",
           "OPERATION_RESULT_EXPIRED",
           "PARTICIPATION_BLOCKED",
@@ -60442,7 +60595,7 @@
           "VERSION_CONFLICT"
         ],
         "transaction_class": "reservation",
-        "transaction_guarantee": "Atomic seat_offers.versioned_domain_change; audit + in-app outbox + receipt. External delivery never determines the domain commit.",
+        "transaction_guarantee": "Bound worker DB principal/org/job/operation/lease; domain, receipt, audit, inbox and successful job completion atomic. Failure rolls back domain then records bounded retry/terminal status.",
         "transition": {
           "entity": "seat_offers",
           "from": [
@@ -60498,11 +60651,13 @@
           "D-A12"
         ],
         "configuration_policy": "numeric plan limits/prices and legal approval are deployment configuration, never arbitrary allow/deny",
-        "implementation_status": "contract_only",
+        "implementation_status": "operational_development_limited",
         "required_features": [
           "F12"
         ],
-        "runtime_required_features": [],
+        "runtime_required_features": [
+          "F12"
+        ],
         "conditional_features": [],
         "operation_contract": {
           "kind": "worker",
@@ -60511,7 +60666,9 @@
           "version_field": null,
           "read_operation": "management_state_get_v1",
           "atomic_effects": [
-            "seat_offers.versioned_domain_change"
+            "scoped_job.domain_change",
+            "worker_receipt.audit.inbox.atomic",
+            "job.succeeded_or_bounded_retry"
           ],
           "business_commit": true,
           "read_path_status": "contract_only",
@@ -60519,12 +60676,19 @@
         },
         "decision_delivery": {
           "accepted_contract": "DS-2026-10-17",
-          "runtime_conformance": "pending",
+          "runtime_conformance": "p01_waitlist_worker_runtime_pending",
           "open_dependencies": [],
           "target_request": {
             "$ref": "#/$defs/Request_seat_offer_expire"
           }
-        }
+        },
+        "runtime_path": "/functions/v1/backend-v1/seat_offer_expire_v1",
+        "runtime_external_path": "/functions/v1/backend-v1/seat_offer_expire_v1",
+        "runtime_rpc": "api_v1.seat_offer_expire_v1",
+        "runtime_transport": "dedicated database worker role -> scoped claim/lease -> RPC; human Edge callers denied",
+        "runtime_limits": [
+          "P01-C implementation; runtime acceptance pending. Dedicated DB worker LOGIN/org binding and runner required; no production installation performed."
+        ]
       },
       {
         "name": "request_expire_v1",
@@ -60549,7 +60713,9 @@
           "FORBIDDEN",
           "IDEMPOTENCY_PAYLOAD_MISMATCH",
           "INTEGRITY_VIOLATION",
+          "INVALID_STATE_TRANSITION",
           "NOT_FOUND",
+          "OPEN_OPERATIONS_EXIST",
           "OPERATION_IN_PROGRESS",
           "OPERATION_RESULT_EXPIRED",
           "PLAN_FEATURE_UNAVAILABLE",
@@ -60563,7 +60729,7 @@
           "VERSION_CONFLICT"
         ],
         "transaction_class": "single",
-        "transaction_guarantee": "Atomic request_expire.authorized_result; audit + in-app outbox + receipt. External delivery never determines the domain commit.",
+        "transaction_guarantee": "Bound worker DB principal/org/job/operation/lease; domain, receipt, audit, inbox and successful job completion atomic. Failure rolls back domain then records bounded retry/terminal status.",
         "transition": {
           "entity": "lesson_requests",
           "from": [
@@ -60598,11 +60764,13 @@
           "A55"
         ],
         "configuration_policy": "numeric plan limits/prices and legal approval are deployment configuration, never arbitrary allow/deny",
-        "implementation_status": "contract_only",
+        "implementation_status": "operational_development_limited",
         "required_features": [
           "F09"
         ],
-        "runtime_required_features": [],
+        "runtime_required_features": [
+          "F09"
+        ],
         "conditional_features": [],
         "operation_contract": {
           "kind": "worker",
@@ -60611,7 +60779,9 @@
           "version_field": null,
           "read_operation": "management_state_get_v1",
           "atomic_effects": [
-            "request_expire.authorized_result"
+            "scoped_job.domain_change",
+            "worker_receipt.audit.inbox.atomic",
+            "job.succeeded_or_bounded_retry"
           ],
           "business_commit": true,
           "read_path_status": "contract_only",
@@ -60619,12 +60789,19 @@
         },
         "decision_delivery": {
           "accepted_contract": "DS-2026-10-17",
-          "runtime_conformance": "pending",
+          "runtime_conformance": "p01_waitlist_worker_runtime_pending",
           "open_dependencies": [],
           "target_request": {
             "$ref": "#/$defs/Request_request_expire"
           }
-        }
+        },
+        "runtime_path": "/functions/v1/backend-v1/request_expire_v1",
+        "runtime_external_path": "/functions/v1/backend-v1/request_expire_v1",
+        "runtime_rpc": "api_v1.request_expire_v1",
+        "runtime_transport": "dedicated database worker role -> scoped claim/lease -> RPC; human Edge callers denied",
+        "runtime_limits": [
+          "P01-C implementation; runtime acceptance pending. Dedicated DB worker LOGIN/org binding and runner required; no production installation performed."
+        ]
       },
       {
         "name": "outbox_deliver_v1",
@@ -63846,7 +64023,8 @@
         "name": "management_state_get_v1",
         "module": "X",
         "features": [
-          "F09"
+          "F09",
+          "F12"
         ],
         "required_features": [],
         "runtime_required_features": [],
@@ -63854,6 +64032,11 @@
           {
             "feature": "F09",
             "when": "lesson_request_selector",
+            "mode": "required_if_selected"
+          },
+          {
+            "feature": "F12",
+            "when": "waitlist_selector",
             "mode": "required_if_selected"
           }
         ],
@@ -63947,7 +64130,7 @@
         "runtime_rpc": "api_v1.management_state_get_v1",
         "runtime_transport": "authenticated Edge adapter -> service-only RPC; rules/transaction in PostgreSQL",
         "runtime_limits": [
-          "Narrow live original-write authority: negative valuation and P01 lesson request selectors only; other selectors remain unavailable. Request workflow runtime acceptance pending."
+          "Original live write authority; negative valuation, P01 request and person/session waitlist selectors only. Other selectors unavailable."
         ],
         "runtime_selectors": [
           "negcredit_valuation_set_v1",
@@ -63956,7 +64139,11 @@
           "lesson_request_reject_v1",
           "lesson_request_offer_alternative_v1",
           "lesson_request_accept_alternative_v1",
-          "lesson_request_approve_v1"
+          "lesson_request_approve_v1",
+          "waitlist_join_v1",
+          "waitlist_leave_v1",
+          "seat_offer_accept_v1",
+          "seat_offer_reject_v1"
         ]
       },
       {
@@ -68677,7 +68864,7 @@
         "generation": "uuidv7"
       },
       {
-        "path": "#/$defs/Request_waitlist_join/properties/center_id/anyOf/0",
+        "path": "#/$defs/Request_waitlist_join/properties/center_id",
         "origin": "ftksaas",
         "acceptance": "generic_uuid",
         "generation": "uuidv7"
@@ -68719,7 +68906,7 @@
         "generation": "uuidv7"
       },
       {
-        "path": "#/$defs/Request_waitlist_leave/properties/center_id/anyOf/0",
+        "path": "#/$defs/Request_waitlist_leave/properties/center_id",
         "origin": "ftksaas",
         "acceptance": "generic_uuid",
         "generation": "uuidv7"
@@ -68755,7 +68942,7 @@
         "generation": "uuidv7"
       },
       {
-        "path": "#/$defs/Request_seat_offer_accept/properties/center_id/anyOf/0",
+        "path": "#/$defs/Request_seat_offer_accept/properties/center_id",
         "origin": "ftksaas",
         "acceptance": "generic_uuid",
         "generation": "uuidv7"
@@ -68791,7 +68978,7 @@
         "generation": "uuidv7"
       },
       {
-        "path": "#/$defs/Request_seat_offer_reject/properties/center_id/anyOf/0",
+        "path": "#/$defs/Request_seat_offer_reject/properties/center_id",
         "origin": "ftksaas",
         "acceptance": "generic_uuid",
         "generation": "uuidv7"
@@ -76111,7 +76298,19 @@
         "generation": "uuidv7"
       },
       {
+        "path": "#/$defs/Request_management_state_get/allOf/52/then/properties/center_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
         "path": "#/$defs/Request_management_state_get/allOf/53/then/properties/org_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Request_management_state_get/allOf/53/then/properties/center_id",
         "origin": "ftksaas",
         "acceptance": "generic_uuid",
         "generation": "uuidv7"
@@ -76123,7 +76322,19 @@
         "generation": "uuidv7"
       },
       {
+        "path": "#/$defs/Request_management_state_get/allOf/54/then/properties/center_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
         "path": "#/$defs/Request_management_state_get/allOf/55/then/properties/org_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Request_management_state_get/allOf/55/then/properties/center_id",
         "origin": "ftksaas",
         "acceptance": "generic_uuid",
         "generation": "uuidv7"
@@ -79409,6 +79620,54 @@
         "origin": "ftksaas",
         "acceptance": "generic_uuid",
         "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/SeatOfferView/properties/id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/SeatOfferView/properties/entry_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/SeatOfferView/properties/session_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/SeatOfferView/properties/person_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/WaitlistEntryView/properties/id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/WaitlistEntryView/properties/center_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/WaitlistEntryView/properties/session_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/WaitlistEntryView/properties/person_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
       }
     ],
     "open_product_decisions": [],
@@ -80867,7 +81126,7 @@
           "management_state_get_v1"
         ],
         "dependencies": [],
-        "implementation": "partial",
+        "implementation": "implemented_acceptance_pending",
         "acceptance": "pending_feature_acceptance",
         "acceptance_evidence": [],
         "implemented_operations": [
@@ -80878,11 +81137,10 @@
           "lesson_request_offer_alternative_v1",
           "lesson_request_accept_alternative_v1",
           "lesson_request_approve_v1",
+          "request_expire_v1",
           "management_state_get_v1"
         ],
-        "contract_only_operations": [
-          "request_expire_v1"
-        ],
+        "contract_only_operations": [],
         "acceptance_case_ids": [
           "DS-PLAN-01",
           "DS-PLAN-02"
@@ -81019,21 +81277,23 @@
           "seat_offer_accept_v1",
           "seat_offer_reject_v1",
           "seat_offer_issue_v1",
-          "seat_offer_expire_v1"
+          "seat_offer_expire_v1",
+          "management_state_get_v1"
         ],
         "dependencies": [],
-        "implementation": "partial",
+        "implementation": "implemented_acceptance_pending",
         "acceptance": "pending_feature_acceptance",
         "acceptance_evidence": [],
-        "implemented_operations": [],
-        "contract_only_operations": [
+        "implemented_operations": [
           "waitlist_join_v1",
           "waitlist_leave_v1",
           "seat_offer_accept_v1",
           "seat_offer_reject_v1",
           "seat_offer_issue_v1",
-          "seat_offer_expire_v1"
+          "seat_offer_expire_v1",
+          "management_state_get_v1"
         ],
+        "contract_only_operations": [],
         "acceptance_case_ids": [],
         "baseline_regression": "no callable operation; no behavior acceptance claimed",
         "plan_scope": {
