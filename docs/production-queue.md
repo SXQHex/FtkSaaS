@@ -4,13 +4,13 @@
 
 ## Şimdi yapılacak iş
 
-**P00: CI ayrımının kurulumu/kabulü tamamlanmalı; ardından P01.** Kontrol edilen main: `d2e84fe3ec5da0d2f6f7796f5852a9a2fd4d13b6`. CI PR #19'un incelenen head'i `11fa31180b7ca4792ea73875713df87c5ed499dc`; main'e alınmış veya clean'i başarılı sayılmaz. Bu belge PR #19 üzerine ayrı bağımlı belge branch'inde hazırlanmıştır; devamda güncel main/PR doğrulanır.
+**P00 tamamlandı; sıradaki üretim teslimi P01.** CI PR #19 main'e `b4a704a6897353bb0d54355903267b62d8d72496` olarak birleşti; [aynı main SHA clean'i](https://github.com/SXQHex/FtkSaaS/actions/runs/39242063000) başarılıdır. PR head `11fa31180b7ca4792ea73875713df87c5ed499dc` ve [aday clean kanıtı](https://github.com/SXQHex/FtkSaaS/actions/runs/39233169767) ayrı kaynak kanıtıdır. Repository korumasının yönetici tarafından uygulanması ayrı açık sınırdır. Bu üretim kuyruğunun belge PR #20 kabulü/merge'i ayrıca doğrulanır; P01'e başlamadan güncel kuyruk ve mevcut çalışma branch'leri kontrol edilir.
 
 Bu planın başlangıç envanteri 199 toplam / 104 çağrılabilir / 95 contract_only / 29 migration'dır. Yedi grup başlangıçtaki 95 işlemi birer kez kapsar. Yeni sözleşme ihtiyacı ayrıca açıklanır; sayılar başarı hedefi değildir.
 
 | Sıra | Teslim | Başlangıç işlem sayısı | Durum | PR/head | Devam |
 |---|---|---:|---|---|---|
-| P00 | CI ayrımı | — | aday clean sonucu kullanıcıdan bekleniyor; merge doğrulanmadı | #19 / 11fa31180b7ca4792ea73875713df87c5ed499dc | kullanıcı clean sonucunu getirince kaynak bağlı doğrulama |
+| P00 | CI ayrımı | — | done | #19 / main b4a704a6897353bb0d54355903267b62d8d72496 | main clean 39242063000 başarılı; koruma yönetici sınırı açık |
 | P01 | Talep, rezervasyon ve bekleme | 14 | queued | — | önceki teslimin main kabulünden sonra |
 | P02 | Paket ve seans yaşam döngüsü | 15 | queued | — | önceki teslimin main kabulünden sonra |
 | P03 | Finans ve eğitmen ödemeleri | 7 | queued | — | önceki teslimin main kabulünden sonra |
