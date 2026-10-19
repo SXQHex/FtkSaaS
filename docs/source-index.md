@@ -53,3 +53,7 @@ Her uygulama PR’si etkilediği sözleşmeleri, envanteri, kalan işleri ve dev
 [Hesaplaşma devri](settlement-handover.md) dokuz API, sabit kredi dilimi, geç kaynak bağlama, ayrı A/B yetkisi ve atomik onayı tanımlar. Son kaynak kabulü PR head/merge CI ile doğrulanır.
 
 [CI çalışma politikası](ci-policy.md): hızlı/hedefli geliştirme, açık son aday clean’i, kaynak bağlı merge kapısı ve main clean. [Performans ölçümü](ci-performance.md) eski log temeli ile yeni ölçüm alanlarını ayırır. Bu politika önceki otomatik her commit/PR clean ifadelerinin yerine geçer.
+
+## Aktif üretim sırası
+
+[Sıralı üretim kuyruğu](production-queue.md) yedi teslimin API grupları, ortak üretim promptu, durum ve kapanan promptların kaldırılma kuralıdır. Her geliştirme görevinde devir/kalan işlerden sonra okunur. Full clean başlayınca ajan run/kaynak/sonraki adımı bildirip turu bitirir; kullanıcı sonucu getirene kadar polling/izleme yapmaz. Başarı kullanıcı dönüşünde GitHub kanıtıyla doğrulanır.
