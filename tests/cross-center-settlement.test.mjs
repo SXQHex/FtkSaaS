@@ -35,7 +35,10 @@ test('Cross-center settlement Auth -> Edge -> RPC',async t=>{
  await mut('org_manager_assign_v1',{person_id:om.p},null);
  const authority=(p=person,c=null,u=owner)=>read('settlement_authority_get_v1',{person_id:p},c,u);
  async function grant(p,c,granted=true,u=owner){const v=await authority(p,c,u);return mut('settlement_authority_set_v1',{person_id:p,expected_version:v.version,granted,reason:'Explicit settlement authority'},c,u);}
- const movements=(c=A,u=owner,page={})=>read('settlement_movements_list_v1',{currency:'TRY',page},c,u);
+ const movements=async(c=A,u=owner,page)=>{
+  if(page!==undefined)return read('settlement_movements_list_v1',{currency:'TRY',page},c,u);
+  const items=[];let cursor;do{const p=await read('settlement_movements_list_v1',{currency:'TRY',page:{limit:100,...(cursor?{cursor}:{})}},c,u);items.push(...p.items);cursor=p.next_cursor;}while(cursor);return {items,next_cursor:null};
+ };
  const requests=(c=A,u=owner,page={})=>read('settlement_requests_list_v1',{page},c,u);
  const get=(id,c=A,u=owner)=>read('settlement_request_get_v1',{settlement_request_id:id},c,u);
  const line=(m,n=m.open_minor)=>({movement_id:m.id,expected_version:m.version,amount_minor:String(n)});
@@ -238,7 +241,7 @@ test('Cross-center settlement Auth -> Edge -> RPC',async t=>{
   await mut('policy_publish_v1',{key:'student_cancel_group',value:{kind:'cancellation',terms:{cutoff_minutes:0,before_cutoff:'release',after_cutoff:'release',no_show:'release'}},effective_at:new Date(Date.now()-100).toISOString(),mandatory:false},null);
  });
  await t.test('DS-AUTH revoke versus approve serializes and cannot commit after lost live B authority',async()=>{
-  const m=(await movements()).items.find(x=>x.kind==='accrual'&&BigInt(x.open_minor)>=1n);
+  const m=(await movements()).items.find(x=>x.kind==='accrual'&&x.debtor_center_id===A&&x.creditor_center_id===B&&BigInt(x.open_minor)>=1n);
   const p=await submit(proposal([line(m,1)],1)),q=await get(p.primary_id),v=await authority(manager.p,B);
   const [decision,revoke]=await Promise.all([
    call(manager.u,'settlement_request_decide_v1',body({settlement_request_id:q.id,expected_version:q.version,decision:'approve',reason:'concurrent B decision'},B),key()),
@@ -251,14 +254,14 @@ test('Cross-center settlement Auth -> Edge -> RPC',async t=>{
  });
 
  await t.test('DS-SET concurrent approvals and distinct requests never double-close selected balance',async()=>{
-  const m=(await movements()).items.find(x=>x.kind==='accrual'&&BigInt(x.open_minor)>=10n);
+  const m=(await movements()).items.find(x=>x.kind==='accrual'&&x.debtor_center_id===A&&x.creditor_center_id===B&&BigInt(x.open_minor)>=10n);
   const p=await submit(proposal([line(m,10)],10)),q=await get(p.primary_id);
   const answers=await Promise.all([call(owner,'settlement_request_decide_v1',body({settlement_request_id:q.id,expected_version:q.version,decision:'approve',reason:'race'},B),key()),call(owner,'settlement_request_decide_v1',body({settlement_request_id:q.id,expected_version:q.version,decision:'approve',reason:'race'},B),key())]);
   assert.equal(answers.filter(x=>x.result.ok).length,1);
   assert.equal((await rows('select count(*) n from private.settlement_records where request_id=$1',[q.id]))[0].n,'1');
  });
  await t.test('DS-ATOMIC late outbox failure rolls back request record allocations balances and receipt',async()=>{
-  const m=(await movements()).items.find(x=>x.kind==='accrual'&&BigInt(x.open_minor)>=1n);
+  const m=(await movements()).items.find(x=>x.kind==='accrual'&&x.debtor_center_id===A&&x.creditor_center_id===B&&BigInt(x.open_minor)>=1n);
   const p=await submit(proposal([line(m,1)],1)),q=await get(p.primary_id),k=key();
   await db.query("create function private.settlement_test_fail() returns trigger language plpgsql as $$begin if new.org_id='"+org+"'::uuid then raise exception 'late synthetic';end if;return new;end$$;create trigger settlement_test_fail before insert on core.outbox_jobs for each row execute function private.settlement_test_fail()");
   try{const x=await call(owner,'settlement_request_decide_v1',body({settlement_request_id:q.id,expected_version:q.version,decision:'approve',reason:'rollback'},B),k);assert.equal(x.result.ok,false);}
@@ -279,7 +282,7 @@ test('Cross-center settlement Auth -> Edge -> RPC',async t=>{
   const version=(await authority(om.p)).version;
   await mut('settlement_delegation_set_v1',{person_id:om.p,expected_version:version,granted:false,reason:'Owner revokes delegation'},null);
   await fail('settlement_authority_set_v1',{person_id:manager.p,expected_version:(await authority()).version,granted:true,reason:'revoked OM'},'FORBIDDEN',B,om.u);
-  const m=(await movements()).items.find(x=>x.kind==='accrual'&&BigInt(x.open_minor)>=1n);
+  const m=(await movements()).items.find(x=>x.kind==='accrual'&&x.debtor_center_id===A&&x.creditor_center_id===B&&BigInt(x.open_minor)>=1n);
   const p=await submit(proposal([line(m,1)],1)),q=await get(p.primary_id),k=key();await decide(q,'approve',manager.u,k);
   const role=(await rows("select id,version from core.role_assignments where org_id=$1 and person_id=$2 and scope_center_id=$3 and role='center_manager' and state='active'",[org,manager.p,B]))[0];
   await mut('center_manager_revoke_v1',{person_id:manager.p,expected_version:Number(role.version),reason:'Revoke live B role'},B);
@@ -298,7 +301,7 @@ test('Cross-center settlement Auth -> Edge -> RPC',async t=>{
   const sub=(await rows('select id,plan_version_id from core.saas_subscriptions where org_id=$1 order by created_at desc,id desc limit 1',[org]))[0];
   const clone=async(features)=>{const id=key();await db.query("insert into core.saas_plan_versions(id,name,effective_at,price_minor,currency,period,limits,features) select $1,name,now(),price_minor,currency,period,limits,"+(features?"array_remove(features,'F18')":"features")+" from core.saas_plan_versions where id=$2",[id,sub.plan_version_id]);return id;};
   const business=await clone(false),pro=await clone(true);
-  const pending=async()=>{const m=(await movements()).items.find(x=>x.kind==='accrual'&&BigInt(x.open_minor)>=1n);return get((await submit(proposal([line(m,1)],1))).primary_id);};
+  const pending=async()=>{const m=(await movements()).items.find(x=>x.kind==='accrual'&&x.debtor_center_id===A&&x.creditor_center_id===B&&BigInt(x.open_minor)>=1n);return get((await submit(proposal([line(m,1)],1))).primary_id);};
   const first=await pending();await db.query('update core.saas_subscriptions set version=version+1 where id=$1',[sub.id]);await decide(first);
   const old=await pending();
   try{
@@ -326,7 +329,7 @@ test('Cross-center settlement Auth -> Edge -> RPC',async t=>{
   assert.deepEqual(await rows('select id,amount_minor,basis from core.earnings where session_id=$1',[l.sid]),before);
  });
  await t.test('DS-SET linked replacement freezes changed scope and requires a new B approval',async()=>{
-  const m=(await movements()).items.find(x=>x.kind==='accrual'&&BigInt(x.open_minor)>=2n),old=await get((await submit(proposal([line(m,1)],1))).primary_id);
+  const m=(await movements()).items.find(x=>x.kind==='accrual'&&x.debtor_center_id===A&&x.creditor_center_id===B&&BigInt(x.open_minor)>=2n),old=await get((await submit(proposal([line(m,1)],1))).primary_id);
   await mut('settlement_request_withdraw_v1',{settlement_request_id:old.id,expected_version:old.version,reason:'Revise proposal'});
   const prior=await get(old.id),before=m.open_minor;
   const replacement=await get((await submit(proposal([line(m,2)],2),A,B,owner,{previous_id:prior.id,previous_version:prior.version})).primary_id);
@@ -335,14 +338,14 @@ test('Cross-center settlement Auth -> Edge -> RPC',async t=>{
   await decide(replacement);assert.equal((await get(replacement.id)).record.amount_minor,'2');assert.equal((await get(prior.id)).state,'withdrawn');
  });
  await t.test('DS-SET multi-line payment correction reverses only selected original allocation',async()=>{
-  const ms=(await movements()).items.filter(x=>x.kind==='accrual'&&BigInt(x.open_minor)>=2n).slice(0,2);assert.equal(ms.length,2);
+  const ms=(await movements()).items.filter(x=>x.kind==='accrual'&&x.debtor_center_id===A&&x.creditor_center_id===B&&BigInt(x.open_minor)>=2n).slice(0,2);assert.equal(ms.length,2);
   const q=await get((await submit(proposal(ms.map(m=>line(m,2)),4))).primary_id);await decide(q);const rec=(await get(q.id)).record;
   const a=rec.allocations[0],other=rec.allocations[1],before=(await movements()).items.find(x=>x.id===other.movement_id).open_minor;
   const correction=await get((await submit({kind:'correction',original_record_id:rec.id,expected_version:rec.version,amount_minor:'1',allocations:[{allocation_id:a.id,expected_version:a.version,amount_minor:'1'}]})).primary_id);await decide(correction);
   const after=(await get(q.id)).record;assert.equal(after.amount_minor,'4');assert.equal(after.allocations.find(x=>x.id===a.id).unreversed_minor,'1');assert.equal(after.allocations.find(x=>x.id===other.id).unreversed_minor,'2');assert.equal((await movements()).items.find(x=>x.id===other.movement_id).open_minor,before);
  });
  await t.test('DS-ATOMIC distinct payment offset and correction requests serialize competing dependencies',async()=>{
-  const debit=(await movements()).items.find(x=>x.kind==='accrual'&&BigInt(x.open_minor)>=6n),credit=(await movements()).items.find(x=>x.kind==='reversal'&&BigInt(x.open_minor)>=2n);assert(credit);
+  const debit=(await movements()).items.find(x=>x.kind==='accrual'&&x.debtor_center_id===A&&x.creditor_center_id===B&&BigInt(x.open_minor)>=6n),credit=(await movements()).items.find(x=>x.kind==='reversal'&&BigInt(x.open_minor)>=2n);assert(credit);
   const initial=await get((await submit(proposal([line(debit,2)],2))).primary_id);await decide(initial);const rec=(await get(initial.id)).record,al=rec.allocations[0];
   const m=(await movements()).items.find(x=>x.id===debit.id);
   const proposals=[proposal([line(m,2)],2),{kind:'offset',debit_lines:[line(m,2)],credit_lines:[line(credit,2)],amount_minor:'2'},{kind:'correction',original_record_id:rec.id,expected_version:rec.version,amount_minor:'1',allocations:[{allocation_id:al.id,expected_version:al.version,amount_minor:'1'}]}];
@@ -355,7 +358,7 @@ test('Cross-center settlement Auth -> Edge -> RPC',async t=>{
  await t.test('DS-ATOMIC ledger audit and receipt failures rollback the entire multi-line batch',async()=>{
   const snapshot=async()=>rows("select name,(select coalesce(jsonb_agg(row_data order by row_data->>'id'),'[]'::jsonb) from (select to_jsonb(t) row_data from private.settlement_movements t where org_id=$1) z) data from (values('movements')) n(name) union all select 'records',coalesce(jsonb_agg(to_jsonb(t) order by id),'[]') from private.settlement_records t where org_id=$1 union all select 'allocations',coalesce(jsonb_agg(to_jsonb(t) order by id),'[]') from private.settlement_allocations t where org_id=$1 union all select 'requests',coalesce(jsonb_agg(to_jsonb(t) order by id),'[]') from private.settlement_requests t where org_id=$1 union all select 'audit',coalesce(jsonb_agg(to_jsonb(t) order by id),'[]') from core.audit_events t where org_id=$1 union all select 'outbox',coalesce(jsonb_agg(to_jsonb(t) order by id),'[]') from core.outbox_jobs t where org_id=$1 union all select 'notifications',coalesce(jsonb_agg(to_jsonb(t) order by id),'[]') from core.notifications t where org_id=$1 union all select 'receipts',coalesce(jsonb_agg(to_jsonb(t) order by id),'[]') from core.operation_receipts t where org_id=$1",[org]);
   for(const table of ['private.settlement_allocations','core.audit_events','core.operation_receipts']){
-   const ms=(await movements()).items.filter(x=>x.kind==='accrual'&&BigInt(x.open_minor)>=1n).slice(0,2),q=await get((await submit(proposal(ms.map(m=>line(m,1)),2))).primary_id),before=await snapshot();
+   const ms=(await movements()).items.filter(x=>x.kind==='accrual'&&x.debtor_center_id===A&&x.creditor_center_id===B&&BigInt(x.open_minor)>=1n).slice(0,2),q=await get((await submit(proposal(ms.map(m=>line(m,1)),2))).primary_id),before=await snapshot();
    const filter=table==='core.audit_events'?" and new.action='settlement_request_decide_v1'":table==='core.operation_receipts'?" and new.operation='settlement_request_decide_v1' and new.state='succeeded'":"";
    await db.query("create function private.settlement_batch_fail() returns trigger language plpgsql as $$begin if TG_TABLE_NAME='settlement_allocations' and not exists(select 1 from private.settlement_allocations where record_id=(to_jsonb(new)->>'record_id')::uuid) then return new;end if;raise exception using errcode='P0001',message='INTEGRITY_VIOLATION';end$$;create trigger settlement_batch_fail before "+(table==='core.operation_receipts'?'update':'insert')+" on "+table+" for each row when(new.org_id='"+org+"'::uuid"+filter+") execute function private.settlement_batch_fail()");
    try{await fail('settlement_request_decide_v1',{settlement_request_id:q.id,expected_version:q.version,decision:'approve',reason:'rollback all selected lines'},'INTEGRITY_VIOLATION',B);assert.deepEqual(await snapshot(),before);}
