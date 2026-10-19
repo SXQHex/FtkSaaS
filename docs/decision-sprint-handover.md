@@ -4,7 +4,7 @@ Güncel uygulama SHA/CI ve teslim kanıtı: [doğrulanmış devir](../contracts/
 
 Başlangıç main: c231ab5526854ed62445613467649e1b0bf960bb; [aynı SHA CI](https://github.com/SXQHex/FtkSaaS/actions/runs/39010419849) başarılı: 25 migration, 241 test (12 sözleşme + 27 DB + 202 Auth/API). Bu geçmiş kanıt yeni PR'nin kabulü değildir.
 
-Kabul edilmiş karar/DTO/izin/guard aktarımı korunur. Son Starter teslimi dar runtime’ı ve 26–27. migration’ı ekler; frontend değişmez. 184 başlangıç işlemine net 15 yeni sözleşme adı eklenmiştir: 199 toplam, 104 canlı, 95 yalnız sözleşme; 29 migration. Anlaşma/hakediş ve açık fiilî başlangıç dar yolu güncel devirde tanımlıdır. Ayrıntı ve açık tüketiciler Starter devrindedir. İşlem sayısı ürün tamamlanma oranı değildir.
+Kabul edilmiş karar/DTO/izin/guard aktarımı korunur. Starter ve anlaşma/hakediş teslimlerinden sonra üçüncü teslim hesaplaşma runtime’ını ve 29. migration’ı ekler; frontend değişmez. 184 başlangıç işlemine net 15 yeni sözleşme adı eklenmiştir: 199 toplam, 104 canlı, 95 yalnız sözleşme; 29 migration. Anlaşma/hakediş ve açık fiilî başlangıç dar yolu güncel devirde tanımlıdır. Ayrıntı ve açık tüketiciler Starter devrindedir. İşlem sayısı ürün tamamlanma oranı değildir.
 
 ## Karar, aktarım, uygulama ve doğrulama ayrımı
 
@@ -12,10 +12,10 @@ Kabul edilmiş karar/DTO/izin/guard aktarımı korunur. Son Starter teslimi dar 
 |---|---|
 | Ürün kararı | [DS-2026-10-17 açık kullanıcı kararları](decisions/DS-2026-10-17.md) kabul edilmiş ve önceki çelişen hükümleri değiştirir |
 | Teknik aktarım | 01/02/06 yaşayan hükümler, 08 DTO/izin/guard/faz/sürüm/etki metaverisi, üretilmiş 04/05/envanter/ortak tipler |
-| Runtime | 104 endpoint/90 core tablo/29 migration. Starter için 10 işlem canlı; DS geniş davranışları ve diğer hedefler tamamlandı sayılmaz |
+| Runtime | 104 endpoint/90 core tablo/29 migration. Starter, anlaşma/hakediş ve dokuz hesaplaşma API’si uygulanmıştır; açık tüketiciler kalan işlerde ayrılır |
 | Sözleşme/CI denetimi | Pozitif şema/tutarlılık ve kasıtlı bozmada gerçekten başarısız olan negatif governance testleri |
-| Gerçek davranış kabulü | Önceki 202 Auth/API testinin regresyonu korunur; DS-PLAN-01 gerçek Starter; DS-PLAN-02 ve DS-AGR-01–05 gerçek anlaşma/hakediş akışına bağlı; kalan 31 vaka pending_runtime, statik testten geçti çıkarımı yoktur |
-| Son head ve merge | Son PR head incelemesi ve CI ayrıca doğrulanır; bu PR için yeni merge yetkisi varsayılmaz |
+| Gerçek davranış kabulü | 394 testlik kaynak kabulünde 272 Auth/API testi başarılıdır. DS-PLAN-01, DS-PLAN-02 ve DS-AGR-01–05 ile 22 hesaplaşma kabul maddesi gerçek testlere bağlıdır; diğer 9 madde pending_runtime kalır. Kaynak SHA/CI kanıtı hesaplaşma devrindedir; yapısal testten davranış kabulü çıkarılmaz |
+| Son head ve merge | Son PR head incelemesi ve CI ayrıca doğrulanır; koşullu merge yetkisi son kullanıcı talimatından okunur |
 
 ## Plan kapıları
 
@@ -59,7 +59,7 @@ Yetki sözleşmeleri: settlement_authority_get, settlement_delegation_set, settl
 
 DS-OPEN-02 son kullanıcı düzeltmesiyle karar düzeyinde kapalıdır. Farklı kişi/hesap veya self-approval yasağı yoktur: aynı hesap A ve B'de gerekli güncel yetkilere sahipse A kapsamıyla başvuru açıp B kapsamıyla onaylayabilir. A-only yetki B'ye taşınmaz. B, istemci center seçimi yerine dondurulmuş başvurunun to_center_id alanından çözülür. Fallback input'u/yolu yoktur; Owner/OM'ye sessiz operasyon yetkisi doğmaz.
 
-Yeni settlement tabloları/authority depolaması/ledger/izolasyon/RPC/Edge uygulaması bu PR'nin içinde değildir.
+Üçüncü teslim özel hesaplaşma tablolarını, yetki depolamasını, ledger ve dokuz RPC/Edge işlemini uygular. Güncel kaynak ve kabul kanıtı [hesaplaşma devrindedir](settlement-handover.md).
 
 ## Satış kapsamı ve geçmiş tarih
 
@@ -73,9 +73,9 @@ Bileşik kimlikler (class/person/duty, person/discipline, resource/rule gibi) ka
 
 ## Açık ürün/teslim sınırı
 
-DS-OPEN-01 grantor konusu [son karar](decisions/DS-2026-10-17-settlement-revision.md) ile karar düzeyinde kapalıdır; yalnız sözleşme aktarılmıştır. DS-OPEN-02 [son merkez yetki kararı](decisions/DS-2026-10-17-settlement-center-scope.md) ile karar düzeyinde kapalıdır: aynı hesap iki merkezde de açık canlı yetkiliyse iki adımı yapabilir; ayrı istisna/fallback yoktur.
+DS-OPEN-01 grantor konusu [son karar](decisions/DS-2026-10-17-settlement-revision.md) ile karar düzeyinde kapalıdır; grant yönetimi ve finansal adım yetkisi üçüncü teslimde uygulanmıştır. DS-OPEN-02 [son merkez yetki kararı](decisions/DS-2026-10-17-settlement-center-scope.md) ile karar düzeyinde kapalıdır: aynı hesap iki merkezde de açık canlı yetkiliyse iki adımı yapabilir; ayrı istisna/fallback yoktur.
 
-Diğer açıklar ürün tercihi diye yeniden açılmaz: yeni migration, otomatik başlangıç gözlemi, diğer hak değişikliği koruma tüketicileri, hesaplaşma ledger’ı ve ilgili okuma/izolasyon/yarış/rollback kabulü teknik teslim bağımlılıklarıdır. Açık başlangıç kaydı, anlaşma seçicisi ve ücretli kapanış PR #15 ile uygulanmıştır. [F01–F33 haritası](feature-delivery.md) ve 08 içindeki 38 DS kabul senaryosu bu ayrımı taşır.
+Diğer açıklar ürün tercihi diye yeniden açılmaz: otomatik başlangıç gözlemi ve diğer hak değişikliği koruma tüketicileri teknik teslim bağımlılıklarıdır. Hesaplaşma ledger’ı ve ilgili okuma/izolasyon/yarış/rollback kapsamı üçüncü teslimdedir; kabul kanıtı güncel hesaplaşma devrinden okunur. Açık başlangıç kaydı, anlaşma seçicisi ve ücretli kapanış PR #15 ile uygulanmıştır. [F01–F33 haritası](feature-delivery.md) ve 08 içindeki 38 DS kabul senaryosu bu ayrımı taşır.
 
 ## CI ve kanıt
 
@@ -83,7 +83,7 @@ npm run verify artık üretilmiş 04/05/envanter drift'ini, işlem enum/status/a
 
 Backend workflow iki zorunlu aday job içerir: contract-governance (hızlı verify) ve contracts-and-database (tam npm run test:clean). Tam temiz kabul atlanmaz veya yalnız smoke'a indirilmez. Geliştirmede odaklı verify kullanılır; son PR kapsamı için tam temiz CI çalışır. [Main koruması denetimi](branch-protection-review.md) gerçek erişim sınırını kaydeder.
 
-Kaynak raporu reports/decision-sprint-verification.json, geliştirici sözleşme kontrolleri ile son head CI ve yeni davranış kabulünü ayrı belirtir. Tarihsel raporlar yeniden yazılmaz. Frontend/production/Resend değişikliği yoktur; yeni merge veya yönetim yetkisi varsayılmaz.
+Kaynak raporu reports/decision-sprint-verification.json, geliştirici sözleşme kontrolleri ile son head CI ve yeni davranış kabulünü ayrı belirtir. Tarihsel raporlar yeniden yazılmaz. Frontend/production/Resend değişikliği yoktur; repository yönetim yetkisi varsayılmaz.
 
 ## İnceleme düzeltmeleri
 
@@ -103,6 +103,6 @@ Son karar: docs/decisions/DS-2026-10-17-settlement-center-scope.md. Submit actor
 
 ## Starter runtime aktarımı
 
-[Starter devri](starter-attendance-protection-handover.md) 10 yeni canlı işlem/dar okuma, zorunlu koşullu plan kapıları, gerçek kapanış/düzeltme ve açık başlangıç/belge/diğer hak tüketicilerini gösterir. Ücretli hakediş PR #15 ile ayrıca uygulanmıştır; hesaplaşma açık kalır.
+[Starter devri](starter-attendance-protection-handover.md) 10 yeni canlı işlem/dar okuma, zorunlu koşullu plan kapıları, gerçek kapanış/düzeltme ve açık başlangıç/belge/diğer hak tüketicilerini gösterir. Ücretli hakediş PR #15 ile ayrıca uygulanmıştır; hesaplaşma üçüncü teslimin ayrı ledger ve yetki akışındadır.
 
 [Hesaplaşma runtime devri](settlement-handover.md) uygulanmış tüketicileri ve gerçek kabul kapsamını belirtir. Önceki pending ifadeleri tarihsel sözleşme aktarım sınırlarıdır; kalan işler yaşayan listeden okunur.

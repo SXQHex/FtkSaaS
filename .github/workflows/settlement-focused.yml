@@ -1,0 +1,33 @@
+name: Settlement focused acceptance
+on:
+  push:
+    branches: ['validation/settlement-scope']
+permissions:
+  contents: read
+jobs:
+  settlement-focused:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          ref: ${{ github.sha }}
+      - name: Verify exact source SHA
+        env:
+          FTK_EXPECTED_SOURCE_SHA: ${{ github.sha }}
+        run: test "$(git rev-parse HEAD)" = "$FTK_EXPECTED_SOURCE_SHA"
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version: '24.19.0'
+          cache: npm
+      - run: npm ci
+      - run: npm run verify
+      - run: npm run dev:start
+      - name: Prepare isolated database
+        run: |
+          node_modules/.bin/supabase db reset --local --no-seed --yes > .dev/focused-reset.log 2>&1
+          node scripts/wait-local.mjs
+      - name: Run settlement suite including discipline isolation
+        run: node --test tests/cross-center-settlement.test.mjs
+      - if: always()
+        run: npm run dev:stop

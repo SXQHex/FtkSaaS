@@ -292,8 +292,15 @@ test('Cross-center settlement Auth -> Edge -> RPC',async t=>{
  await t.test('DS-SET local-only sale cannot settle B deficit and unknown selection stays hidden',async()=>{
   const p=await linked('settlement-local-only'),negative=await lesson(null,true,'attended',p.p);
   const prod=await product(A,'credits','100',2,[{scope_kind:'center_all_disciplines',center_id:A,discipline_id:null,usage_targets:['lesson']}]);
-  await sell(prod,A,p.p);
+  const localSale=await sell(prod,A,p.p);
   assert.equal((await rows('select state from core.credit_deficits where org_id=$1 and reservation_id=$2',[org,negative.rid]))[0].state,'consumed');
+  assert.equal((await movements()).items.some(x=>x.source_sale_id===localSale),false);
+  const otherDiscipline=(await must(owner,'discipline_save_v1',{org_id:org,name:'Settlement unrelated discipline',state:'active'},key())).primary_id;
+  for(const c of [A,B])await mut('center_discipline_set_v1',{discipline_id:otherDiscipline,state:'active'},c);
+  const wrongDiscipline=await product(A,'credits','100',2,[{scope_kind:'organization_discipline',center_id:null,discipline_id:otherDiscipline,usage_targets:['lesson']}]);
+  const wrongSale=await sell(wrongDiscipline,A,p.p);
+  assert.equal((await rows('select state from core.credit_deficits where org_id=$1 and reservation_id=$2',[org,negative.rid]))[0].state,'consumed');
+  assert.equal((await movements()).items.some(x=>x.source_sale_id===wrongSale),false);
   const unknown=key();await fail('settlement_request_get_v1',{settlement_request_id:unknown},'NOT_FOUND');
   await fail('settlement_request_submit_v1',{from_center_id:A,to_center_id:B,currency:'TRY',proposal:proposal([{movement_id:unknown,expected_version:1,amount_minor:'1'}],1),reason:'unknown movement'},'NOT_FOUND');
  });
