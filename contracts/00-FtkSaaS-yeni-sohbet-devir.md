@@ -1,5 +1,10 @@
 # FtkSaaS — güncel devir
 
+## 19 Ekim 2026 — CI Action runtime bakım adayı
+
+Ayrı maintenance/actions-node24 adayı dört workflow içindeki Node20 Action pinlerini Node24 sürümlerine yükseltir ve PR #22'nin aynı deterministik kota test düzeltmesini main tabanına taşır; ürün/P01 runtime değişikliği içermez. [Kapsam ve güvenilir politika kurulum sınırı](../docs/ci-policy.md). P01 PR #22 head 580239075b16f6ac6893d5ac01975d32133d0757 run 39281409902 loglarında 119 yapısal/politika + 27 DB + 51 API başarılıdır; bu dış branch kanıtı main kabulü değildir. Bakım adayının son inceleme/full clean/annotation ve main kabulü bekler; full-workflow blob değişimi mevcut otomatik kapıdan sıradan kabul alamaz.
+
+
 ## 19 Ekim 2026 — seri üretim başlangıç kapısı
 
 19 Ekim 2026 üretim başlangıcında main `41f922a01d05eff90f272d69496bf4c5c833e77c` doğrulandı. PR #20 birleşmiştir; [main clean 39247703349](https://github.com/SXQHex/FtkSaaS/actions/runs/39247703349) başarısızdır. `Verify merged candidate relation` adımı `No source-bound full clean evidence for merged tree` ile durdu; `npm ci` ve `test:clean` çalışmadı. Son cleanup'taki `supabase: not found` ikincil hatadır. PR #20'nin belgeye özel aday-clean istisnası runtime kabulü veya başarılı main clean değildir; P00'ın eski başarısı bu SHA'ya taşınmaz.

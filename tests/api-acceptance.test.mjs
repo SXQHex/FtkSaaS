@@ -206,10 +206,17 @@ test('Real Auth → Edge UUID producer → named RPC → PostgreSQL acceptance',
  await t.test('timed weekly quota is one shared bucket across events and cancellation releases it',async()=>{
   const pv=(await mutate(owner,'product_publish_v1',{terms:{...terms,name:'Weekly fixture',kind:'timed',credits:null,quota:{period:'week',limit:1},price_minor:'0'}})).primary_id;
   const p=await must(owner,'sale_preview_v1',scoped({person_id:studentPerson,product_version_id:pv,...dates}));const s=(await mutate(owner,'sale_apply_v1',{preview:{id:p.id,token:p.token}})).primary_id;
-  const es=[await newEvent({terms:{...eventTerms,allowed_product_version_ids:[pv]}}),await newEvent({terms:{...eventTerms,allowed_product_version_ids:[pv]}})];
+  // Sale starts on 2026-01-01; both fixtures must stay inside its first
+  // seven-day bucket. The general Date.now()/slot helper can cross midnight
+  // into the next sale-anchored week, where a second reservation is valid.
+  const weeklyEvent=async starts_at=>newEvent({interval:{starts_at,ends_at:new Date(Date.parse(starts_at)+3600000).toISOString()},terms:{...eventTerms,allowed_product_version_ids:[pv]}});
+  const es=[await weeklyEvent('2026-01-02T09:00:00Z'),await weeklyEvent('2026-01-02T11:00:00Z')];
   const first=await mutate(owner,'event_register_v1',{event_id:es[0].id,person_id:studentPerson,sale_id:s});await error(owner,'event_register_v1',scoped({event_id:es[1].id,person_id:studentPerson,sale_id:s}),'ENTITLEMENT_UNAVAILABLE');
   await mutate(owner,'event_registration_cancel_v1',{registration_id:first.primary_id,expected_version:1,reason:'synthetic'});await mutate(owner,'event_register_v1',{event_id:es[1].id,person_id:studentPerson,sale_id:s});
   const buckets=(await db.query('select reserved_count,consumed_count from core.quota_buckets where org_id=$1 and sale_id=$2',[org,s])).rows;assert.equal(buckets.length,1);assert.equal(Number(buckets[0].reserved_count),1);
+  const nextWeek=await weeklyEvent('2026-01-09T09:00:00Z');await mutate(owner,'event_register_v1',{event_id:nextWeek.id,person_id:studentPerson,sale_id:s});
+  const separate=(await db.query('select reserved_count,consumed_count from core.quota_buckets where org_id=$1 and sale_id=$2',[org,s])).rows;
+  assert.equal(separate.length,2);assert(separate.every(b=>Number(b.reserved_count)===1&&Number(b.consumed_count)===0));
  });
  await t.test('same-key simultaneous requests share a receipt and create exactly one registration',async()=>{
   const e=await newEvent();const k=key(),b=scoped({event_id:e.id,person_id:studentPerson});const result=await Promise.all([call(owner,'event_register_v1',b,k),call(owner,'event_register_v1',b,k)]);assert(result.every(x=>x.result.ok),JSON.stringify(result));assert.equal(result[0].result.data.primary_id,result[1].result.data.primary_id);assert(result.some(x=>x.result.data.replayed));
