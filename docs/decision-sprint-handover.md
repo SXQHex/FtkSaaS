@@ -81,7 +81,7 @@ Diğer açıklar ürün tercihi diye yeniden açılmaz: otomatik başlangıç g�
 
 npm run verify artık üretilmiş 04/05/envanter drift'ini, işlem enum/status/audit/izin referanslarını, plan hedefini, faz/sürüm/okuma/atomik etki tutarlılığını ve gerçek migration runtime kapılarını denetler. tests/governance.test.mjs kasıtlı bozmaları doğrulayıcının reddettiğini kanıtlar. Bu testler sözleşme bozulmasını saptar; yeni runtime iş davranışını çalıştırmaz.
 
-Backend workflow iki zorunlu aday job içerir: contract-governance (hızlı verify) ve contracts-and-database (tam npm run test:clean). Tam temiz kabul atlanmaz veya yalnız smoke'a indirilmez. Geliştirmede odaklı verify kullanılır; son PR kapsamı için tam temiz CI çalışır. [Main koruması denetimi](branch-protection-review.md) gerçek erişim sınırını kaydeder.
+[Yeni CI politikası](ci-policy.md) otomatik push/PR mükerrer clean yerine hedefli geliştirme ve açık son aday full clean kullanır. Merge kapısı head/base/tested merge ağacını doğrular; main full clean korunur. [Main koruması denetimi](branch-protection-review.md) gerçek erişim sınırını kaydeder.
 
 Kaynak raporu reports/decision-sprint-verification.json, geliştirici sözleşme kontrolleri ile son head CI ve yeni davranış kabulünü ayrı belirtir. Tarihsel raporlar yeniden yazılmaz. Frontend/production/Resend değişikliği yoktur; repository yönetim yetkisi varsayılmaz.
 

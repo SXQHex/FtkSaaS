@@ -51,3 +51,5 @@ Her uygulama PR’si etkilediği sözleşmeleri, envanteri, kalan işleri ve dev
 [Anlaşma/hakediş devri](instructor-earnings-handover.md) immutable ücret zinciri, açık fiilî başlangıç kaydı, Pro/Business kapanışı, frozen değerleme ve bağlı düzeltmeyi tanımlar. Son head/merge CI ayrıca doğrulanır; ödeme ve merkezler arası hesaplaşma ayrı teslimdir.
 
 [Hesaplaşma devri](settlement-handover.md) dokuz API, sabit kredi dilimi, geç kaynak bağlama, ayrı A/B yetkisi ve atomik onayı tanımlar. Son kaynak kabulü PR head/merge CI ile doğrulanır.
+
+[CI çalışma politikası](ci-policy.md): hızlı/hedefli geliştirme, açık son aday clean’i, kaynak bağlı merge kapısı ve main clean. [Performans ölçümü](ci-performance.md) eski log temeli ile yeni ölçüm alanlarını ayırır. Bu politika önceki otomatik her commit/PR clean ifadelerinin yerine geçer.

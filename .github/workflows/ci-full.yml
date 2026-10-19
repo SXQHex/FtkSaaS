@@ -1,0 +1,62 @@
+name: Candidate full clean
+on:
+  pull_request:
+    types: [labeled]
+permissions:
+  contents: read
+  pull-requests: read
+concurrency:
+  group: candidate-full-${{ github.event.pull_request.number }}-${{ github.event.pull_request.head.sha }}
+  cancel-in-progress: false
+jobs:
+  full-clean:
+    if: github.event.label.name == 'ci:full-clean'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 50
+    steps:
+      - name: Resolve candidate
+        id: candidate
+        uses: actions/github-script@ed597411d8f924073f98dfc5c65a23a2325f34cd
+        with:
+          script: |
+            const p=(await github.rest.pulls.get({...context.repo,pull_number:context.issue.number})).data;
+            if(p.state!=='open'||p.head.sha!==context.payload.pull_request.head.sha)throw Error('Candidate changed');
+            const merge=(await github.rest.git.getRef({...context.repo,ref:`pull/${p.number}/merge`})).data.object.sha;
+            const commit=(await github.rest.git.getCommit({...context.repo,commit_sha:merge})).data;
+            if(commit.parents.length!==2||commit.parents[0].sha!==p.base.sha||commit.parents[1].sha!==p.head.sha)throw Error('Merge parents mismatch');
+            core.setOutput('merge',merge);
+            core.setOutput('binding',JSON.stringify({pr:p.number,head:p.head.sha,base:p.base.sha,merge,tree:commit.tree.sha,run_id:context.runId,attempt:Number(process.env.GITHUB_RUN_ATTEMPT)}));
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          ref: ${{ steps.candidate.outputs.merge }}
+          persist-credentials: false
+      - name: Verify tested merge
+        env:
+          EXPECTED: ${{ steps.candidate.outputs.merge }}
+        run: test "$(git rev-parse HEAD)" = "$EXPECTED"
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version: '24.19.0'
+          cache: npm
+      - run: npm ci
+      - name: Full clean acceptance
+        run: npm run test:clean
+        env:
+          FTK_TEST_TIMINGS: '1'
+      - name: Record tested binding
+        env:
+          BINDING: ${{ steps.candidate.outputs.binding }}
+        run: |
+          mkdir -p .ci
+          node -e "require('fs').writeFileSync('.ci/binding.json',process.env.BINDING)"
+          cat .ci/binding.json >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: candidate-binding-${{ github.run_attempt }}
+          path: .ci/binding.json
+          if-no-files-found: error
+          include-hidden-files: true
+      - if: always()
+        run: node scripts/ci/summarize-timings.mjs
+      - if: always()
+        run: npm run dev:stop

@@ -1,0 +1,34 @@
+name: Development targeted
+on:
+  push:
+    branches-ignore: [main]
+permissions:
+  contents: read
+concurrency:
+  group: development-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  targeted:
+    if: github.event.deleted == false
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version: '24.19.0'
+          cache: npm
+      - run: npm ci
+      - name: Select dependencies
+        env:
+          BEFORE: ${{ github.event.before }}
+          HEAD: ${{ github.sha }}
+        run: node scripts/ci/select-tests.mjs "$BEFORE" "$HEAD"
+      - run: node scripts/ci/run-targeted.mjs
+      - if: always()
+        run: node scripts/ci/summarize-timings.mjs
+      - if: always()
+        run: npm run dev:stop
