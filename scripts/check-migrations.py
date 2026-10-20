@@ -76,3 +76,5 @@ assert next(Path('supabase/migrations').glob('*_p02_freeze_lifecycle.sql')).read
 assert next(Path('supabase/migrations').glob('*_p02_sale_lifecycle.sql')).read_text()==Path('database/p02-sale-lifecycle.sql').read_text()+Path('database/p02-sale-lifecycle-wrappers.sql').read_text(),'P02 sales source drift'
 
 assert next(Path('supabase/migrations').glob('*_p02_runtime_guards.sql')).read_text()==Path('database/p02-runtime-guards.sql').read_text()+Path('database/p02-runtime-guards-wrappers.sql').read_text(),'P02 runtime guards source drift'
+
+assert next(Path('supabase/migrations').glob('*_p02_renewal_currency.sql')).read_text()==Path('database/p02-renewal-currency.sql').read_text()+Path('database/p02-renewal-currency-wrappers.sql').read_text(),'P02 renewal currency source drift'

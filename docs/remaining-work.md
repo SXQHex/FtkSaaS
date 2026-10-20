@@ -1,6 +1,7 @@
 # Kalan backend işleri
 
-Hedefli39444715078 P02-A testini geçirdi; B/C iki hata yakaladı: etki işleminden önceki özgün yetki kapısı yeni credit/validity türlerini henüz tanımıyordu; kaynak fingerprint listesinde fiziksel olmayan collections adı vardı. Yeni39. migration özgün CM yetkisini ekliyor, cash_movements ve bağlı event/attendance kaynaklarını hashliyor. Eski35–37 migration değişmedi. Bütün15 API uygulama adayıdır; 133/66/39; yeni hedefli sonucu ve son inceleme bekliyor, passed/done değildir.
+P02 PR #28 Draft/development: bütün15 API uygulama adayı, 199 / 133 runtime / 66 contract_only / 40 migration. Hedefli39443588849 test beklentisini,39444715078 özgün etki yetkisi/fiziksel tablo adını,39445926760 ortak dependency fonksiyonundaki sale_id parametre/kolon belirsizliğini yakaladı. Düzeltmeler yeni migrationlarda; son kaynakta hedefli doğrulama henüz bekleniyor. Bağımsız inceleme yenilemede gereksiz currency eşitliğini kaldırttı; yalnız ürün değişimi/mahsup aynı currency ister. Son kaynak incelemesi ve bütün P02 için tek aday/main clean açık; P02 done değildir.
+
 
 
 P02-D uygulaması eklendi; hedefli runtime kabulü bekliyor: sale_terminate/change/renew preview/apply. Sonlandırma serbest hakları kapatır; mevcut rezervasyon ve borç/finans geçmişi korunur. Değişimde bütün gelecek rezervasyonlar açık keep/cancel seçimiyle kapsanır; yeni hak yeterliliği rollback-only simülasyonla önizlenir. Sabit eski iade yöntemi önce borcu azaltır, tahsil edilmiş kalan öğrenci alacağına geçer; offset_minor açık mahsup, nakit iade yok. Immutable private.p02_sale_settlements alacağı ikinci kez üretmeyi engeller; P03 iadesi bunu ve debt/claim hareketlerini hesaba katmalıdır. Yenileme linked yeni satıştır; eski süre/kredi/kayıt taşınmaz, gap/overlap gösterilir, mevcut consumed→reserved deficit kapatma yolu yeniden kullanılır. 133 runtime / 66 contract_only / 38 migration; uygulama listesi15/15, hedefli test ve son inceleme açık. Draft/development korunuyor; aday full clean henüz yok.
@@ -48,7 +49,9 @@ Kalan delivery_gaps ve vaka bazlı durumlar [08 makine sözleşmesi](../contract
 
 Her yeni runtime/CI grubu: sözleşme/izin incelemesi → gerekli yeni migration → geliştirmede hedefli gerçek Auth/API kabulü (sınır, yetki, tekrar, yarış, rollback) → son inceleme → açık aday full clean → merge → main full clean. Güvenli yalnız-belge kabul yolu CI-02 içinde ayrıca uygulanacaktır. Ürün kararında boşluk varsa teknik varsayımla yeni kural eklenmez.
 
-## Yalnız sözleşme envanteri — güncel 81 işlem
+## Yalnız sözleşme envanteri — dalda 66 işlem
+
+P02’nin15 API’si uygulama adayıdır; hedefli/aday/main kabulü bekler. Aşağıdaki liste dalın runtime envanteridir, main kabulü değildir.
 
 | Modül | Kalan işlem |
 |---|---:|
@@ -56,8 +59,6 @@ Her yeni runtime/CI grubu: sözleşme/izin incelemesi → gerekli yeni migration
 | M02 | 7 |
 | M03 | 3 |
 | M04 | 2 |
-| M05 | 3 |
-| M06 | 12 |
 | M07 | 5 |
 | M08 | 2 |
 | M09 | 11 |
@@ -84,23 +85,8 @@ Her yeni runtime/CI grubu: sözleşme/izin incelemesi → gerekli yeni migration
 | person_merge_preview_v1 | person.merge |
 | person_merge_approve_v1 | person.merge |
 | person_merge_apply_v1 | person.merge |
-| session_cancel_preview_v1 | schedule.manage |
-| session_cancel_apply_v1 | schedule.manage |
-| replacement_session_create_v1 | schedule.manage |
-| entitlement_extend_v1 | entitlement.correct |
-| credit_adjust_v1 | entitlement.correct |
-| freeze_preview_v1 | entitlement.correct |
-| freeze_apply_v1 | entitlement.correct |
-| freeze_end_preview_v1 | entitlement.correct |
-| freeze_end_apply_v1 | entitlement.correct |
-| sale_terminate_preview_v1 | entitlement.correct |
-| sale_terminate_apply_v1 | entitlement.correct |
 | sale_refund_preview_v1 | finance.refund |
 | sale_refund_apply_v1 | finance.refund |
-| sale_change_preview_v1 | entitlement.correct |
-| sale_change_apply_v1 | entitlement.correct |
-| sale_renew_preview_v1 | sale.write |
-| sale_renew_apply_v1 | sale.write |
 | finance_get_v1 | finance.read |
 | collection_correct_preview_v1 | finance.refund |
 | collection_correct_apply_v1 | finance.refund |
