@@ -1,5 +1,24 @@
 # CI ölçüm temeli ve sonraki performans işi
 
+## CI-02 yeni ölçüm düzeni — sonuç bekliyor
+
+[PR25](https://github.com/SXQHex/FtkSaaS/pull/25) dört bağımsız runner/backend/DB uygular. Ölçüm girdisi 7577b2f / 39401570751 logundaki 15 suite process wall süresidir. Deterministik azalan süre dağıtımı:
+
+| Shard | Suite sayısı | Eski ölçüm ağırlığı (saniye; wall tahmini değil) |
+|---|---:|---:|
+| 1 | 2 | 1073.99 |
+| 2 | 4 | 1133.62 |
+| 3 | 5 | 1139.87 |
+| 4 | 4 | 1064.18 |
+
+En büyük/küçük ağırlık oranı 1.0712. Suite içi yarışlar bütün kalır; process concurrency=2. Eski suite süreleri örtüşür; bu toplamlar runner veya kullanıcı bekleme süresi değildir. Uzun event-cancellation suite'i parçalanmadığı için ideal 4 kat hızlanma iddiası yoktur.
+
+Açık `ci:measure-serial` son adayda aynı tested merge/tree ve kapsamla ek seri reference koşar. Toplayıcı her iş için created→start kuyruk, start→Clean acceptance kurulum, acceptance süresi, runner süresi; en uzun API shard'ı ve sharded run beklemesini `.ci/measurements.json` artifact/özetinde verir. Seri reference ve shard runner dakikaları ayrı tutulur; core ve dört API toplamı full sharded maliyettir. Collector/source overhead ve workflow bitişi ancak run tamamlandıktan sonra Jobs API ile tam ölçülebilir; ilk artifact'in job toplamı bu tamamlanmamış overhead'i içermez. Nihai raporda tüm işler ayrıca sayılır.
+
+68bb98f / 39411398475 targeted job 10:56:39–10:57:01 UTC = 22 saniye, hedefli runner 7 saniye; verify/34 politika testli CI-only kapsamdır, full runtime karşılaştırması değildir. O kaynağın recovery404 hatası27fe070 ile düzeltildi; 39411888033 targeted32 saniye ve recovery42 saniye başarılı. Bu belge kabulüdür; full runtime değildir.
+
+Yeni kaynakta seri/parçalı gerçek koşu henüz yok; kuyruk, kurulum, en uzun shard, toplam bekleme ve toplam runner dakikası bekliyor. 39:00 eski P01 koşusu yeni kaynakta hız kazancı veya kabul kanıtı değildir.
+
 ## 20 Ekim 2026 — yeni performans kararı
 
 P01 main [39401570751](https://github.com/SXQHex/FtkSaaS/actions/runs/39401570751), kaynak `7577b2f1873c6b1fcf83390bfa94a34374c44082`, completed/success doğrulandı. GitHub job/step zamanları: main-clean 09:33:46–10:12:46 UTC = **39:00**; test:clean 09:34:04–10:12:41 = **38:37**; run oluşturma–son güncelleme aralığı **39:04**. Kullanıcının yaklaşık 40 dakika bildirimiyle uyumludur. Önceki 30'ar dakika öngörüsü main için bu gerçek ölçümle değiştirildi; aday süre burada yeniden ölçülmedi. [CI-2026-10-20](decisions/CI-2026-10-20.md) ile dört ayrı runner/backend/DB shard'ı kabul edildi; uygulama/ölçüm CI-02'de bekliyor. Bu seri koşu süresi shard hız kazancı değildir. Aynı kaynak ve kapsamda seri/parçalı wall süre, shard dağılımı, kurulum/kuyruk ve toplam runner dakikası ölçülmeden 4 kat hızlanma vaat edilmez.

@@ -1,5 +1,7 @@
 # FtkSaaS sıralı üretim kuyruğu
 
+CI-02 geliştirmesi [PR25](https://github.com/SXQHex/FtkSaaS/pull/25), `ci/ci02-source-bound-shards` dalında. Başlangıç main `d544efe9f88f34edd7d6ce3055ed46d291a55f2c` / 39408606736 test öncesi kaynak kabulünde başarısızdır. Dar belge/PR24 AST kanıtı, ayrı belge recovery, Draft/development ve dört izole shard/toplayıcı uygulandı; yeni kaynak uzak hedefli, bağımsız son inceleme, aday/main kabulü ve güvenilir politika kurulumu bekliyor. P01 done; P02 başlamaz.
+
 ## Şimdi yapılacak iş — 20 Ekim 2026
 
 P01 PR #22 main `7577b2f1873c6b1fcf83390bfa94a34374c44082` ile birleşti. Son hedefli, aday ve aynı main clean 39401570751 başarılıdır; gerçek completed/success ve merged-candidate relation doğrulandı. P01 done. [Kaynak ve kanıt](../contracts/00-FtkSaaS-yeni-sohbet-devir.md), [P01 devri](p01-handover.md).
@@ -10,7 +12,7 @@ Güncel envanter **199 / 118 çağrılabilir / 81 contract_only / 34 migration**
 |---|---|---:|---|---|
 | P00 | İlk CI ayrımı | — | done | #19; sonraki Action bakımı #23 kapalı |
 | P01 | Talep, rezervasyon ve bekleme | 14 | done | #22; aday 39327134872 ve aynı main 39401570751 completed/success doğrulandı |
-| CI-02 | Dört shard, bölüm/Draft/development, yalnız-belge kabulü | — | queued | Sıradaki iş; [karar ve kabul](decisions/CI-2026-10-20.md); uygulama BackendCoder |
+| CI-02 | Dört shard, bölüm/Draft/development, yalnız-belge kabulü | — | in_progress | [PR25](https://github.com/SXQHex/FtkSaaS/pull/25); [karar ve kabul](decisions/CI-2026-10-20.md); uygulama BackendCoder |
 | P02 | Paket ve seans yaşam döngüsü | 15 | queued | CI-02 kabulünden sonra |
 | P03 | Finans ve eğitmen ödemeleri | 7 | queued | P02 sonrası |
 | P04 | CRM ve public başvuru | 11 | queued | P03 sonrası |
@@ -65,9 +67,11 @@ Aşağıdaki kurallarla sıradaki açık teslimi uygula; kullanıcı her teslim 
 
 14 API ve dar sistem worker zinciri PR #22 ile main'e alındı. Hedefli 39325878582 ve aday 39327134872 başarılıdır. Aynı main clean 39401570751 completed/success doğrulandı; P01 done, geçici kabul varsayımı kaldırıldı. Aktif uygulama promptu kaldırıldı; eski prompt Git geçmişindedir. Hosted/production worker işletimi ve P05 genel belge/bildirim işleri kapanmadı.
 
-### CI-02 — sıradaki üretim promptu
+### CI-02 — uygulandı; kabul ve güvenilir kurulum bekliyor
 
-[CI-2026-10-20](decisions/CI-2026-10-20.md) kararını, [CI politikasındaki](ci-policy.md) uygulama farklarını ve mevcut PR'leri kontrol et; mükerrer dal açma. P01 main clean 39401570751 aynı 7577b2f kaynağında başarılı doğrulandı; kapanmış P01’i yeniden geliştirme. Ayrı CI PR'sinde dört izole shard, eksiksiz envanter ve kaynak bağlı sonuç toplayıcıyı; Draft/development engeli ve açık aday tetiklemesini; güvenli yalnız-belge PR/main kabulünü uygula. Runtime/CI karma farkı, bilinmeyen yol, rename/silme, head/base değişimi ve eksik/skipped/başarısız shard negatiflerini doğrula. Aynı kaynak seri/parçalı kapsamı ve gerçek süre/runner dakikasını ölç. Güvenilir workflow kurulumu ve normal kapı korunur; repository yönetim ayarı yetkisi varsayılmaz. Yaşayan belgeleri her biten dilimde eşitle. Son aday/main full clean başlayınca kullanıcıya devret; polling yapma. CI-02 kapanmadan P02'ye geçme. Frontend/production/Resend yok.
+[PR25](https://github.com/SXQHex/FtkSaaS/pull/25) içinde dar belge/PR24 AST kanıtı, ayrı kaynak bağlı belge recovery ve aday/main yolu, Draft/development engeli, açık tetikleme, dört bağımsız shard ve zorunlu toplayıcı uygulandı. Ürün/runtime envanteri değişmedi. [Teknik devir](ci02-handover.md) kaynak, test ve kurulum sınırıdır.
+
+Kalan sıra: son head hedefli + gerçek PR24 recovery kabulünü doğrula → exact-head bağımsız inceleme → ci:measure-serial ile aynı kaynak kıyasını iste, ci:full-clean ile bütün adayı başlat ve kullanıcıya devret → gerçek sonucu/source binding'i doğrula → bu somut politika kurulumu için gerekli ayrı yetkiyi değerlendir (PR23 yetkisini taşıma) → normal merge → aynı main kabulü ve ölçüm → CI-02 kapanışı. Eski d544efe başarısız main run'ı değiştirilmez; yeni kaynakta geçiş doğrulanır. Eksik/skipped/failure veya eski attempt kanıtı kabul değildir. P02 CI-02 kapanmadan başlamaz.
 
 ### P02 — Paket ve seans yaşam döngüsü
 

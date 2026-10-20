@@ -1,0 +1,22 @@
+{
+  "source": "7577b2f1873c6b1fcf83390bfa94a34374c44082",
+  "run_id": 39401570751,
+  "kind": "measured suite process wall seconds; overlapping at concurrency=2, not additive wall time",
+  "seconds": {
+    "api-acceptance": 347.84,
+    "availability-policies": 144.62,
+    "cross-center-settlement": 735.77,
+    "event-cancellation": 958.13,
+    "event-payment": 340.65,
+    "instructor-earnings": 382.42,
+    "p01-catalog-entitlement-reads": 147.86,
+    "p01-lesson-requests": 115.86,
+    "p01-waitlist-workers": 105.37,
+    "person-registry": 115.88,
+    "program-session-lifecycle": 362.26,
+    "registry": 86.53,
+    "room-role-registry": 126.95,
+    "schedule-reads": 227.13,
+    "starter-attendance-protection": 214.39
+  }
+}

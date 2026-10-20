@@ -1,5 +1,5 @@
 import fs from 'node:fs';
-const dir='.ci/timings';const suites=fs.existsSync(dir)?fs.readdirSync(dir).filter(p=>p.endsWith('.json')).map(p=>JSON.parse(fs.readFileSync(dir+'/'+p))):[];
+const dir='.ci/timings';const suites=fs.existsSync(dir)?fs.readdirSync(dir).filter(p=>p.endsWith('.json')).map(p=>JSON.parse(fs.readFileSync(dir+'/'+p))).filter(s=>s.suite):[];
 let s='## API measurements\n\n';
 if(!suites.length)s+='No API request timing sample in this run. No speedup is claimed.\n';
 for(const suite of suites){s+='### '+suite.suite+'\n\nProcess wall: '+(suite.wall_ms/1000).toFixed(2)+' s (includes setup/waits); sums overlap across fixtures/HTTP.\n\n| Kind | Operation | Count | Sum ms | Max ms |\n|---|---|---:|---:|---:|\n';
