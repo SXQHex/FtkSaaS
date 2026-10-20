@@ -1,5 +1,8 @@
 # FtkSaaS — güncel entegrasyon devri
 
+20 Ekim 2026: uygulama main `7577b2f1873c6b1fcf83390bfa94a34374c44082`, 199/118/81 ve 34 migration. P01 birleşti; main clean için kullanıcı kabul varsayımı [güncel devirde](../contracts/00-FtkSaaS-yeni-sohbet-devir.md) ayrı yazılıdır. Sırada CI-02 → P02 vardır. [CI-2026-10-20](decisions/CI-2026-10-20.md): dört izole shard, Draft/development ve yalnız-belge clean istisnası kabul edildi; workflow uygulaması bekliyor. Eski snapshot/hosted sayıları güncel uygulama değildir.
+
+
 Durum ve doğrulanmış kaynak/CI için [tek güncel devir özetini](../contracts/00-FtkSaaS-yeni-sohbet-devir.md) esas alın: 199 sözleşme, 118 çağrılabilir, 81 yalnız sözleşme; 34 migration. Bu belge hosted backend'in aynı seviyeye güncellendiği iddiasını taşımaz; hosted 65 işlem smoke'u tarihsel ve ayrı kanıttır.
 
 [Hesaplaşma entegrasyonu](settlement-handover.md): dokuz yeni API, ayrı A/B yetki kapsamı, yalnız B onayında finansal commit ve bağlı düzeltme.
@@ -23,7 +26,7 @@ Frontend gerçek uçtan uca kabulü ve yük/restore açık; mock kabul değildir
 Aşağıdaki metinler önceki teslim snapshot'larıdır. Kurulum/transport ayrıntıları güncel typed sözleşmeyle doğrulanır; eski işlem sayıları ve kapanmış açıklar bugünkü durum değildir.
 
 
-[P01 devri](p01-handover.md): katalog/hak okuması ve altı talep komutu/sürüm okuması uygulandı; B hedefli kabulü geçti; bekleme/teklif/worker C uygulandı, yeni runtime kabulü ve bütün P01 main kabulü açık.
+[P01 devri](p01-handover.md): bütün P01 PR #22 ile main’e alındı; son hedefli ve aday clean başarılı. Main clean yalnız belge görevi için kullanıcı varsayımıdır; gerçek takip BackendCoder’da. Hosted/production worker kabulü ayrıdır.
 
 <details>
 <summary>Önceki entegrasyon notları (tarihsel)</summary>
@@ -195,3 +198,4 @@ Bu yalnız operasyonel kanıttır. Q-E03 katılımcı sınıflandırması, Q-E02
 </details>
 
 P01 request_window istisna DTO'su create/offer_alternative/accept_alternative için optional window_exception ve reason içerir. True yalnız politika izinli canlı CM'nin açık, gerekçeli işlemidir; varsayılan false, eksik politika kapalı. Son kapsam ve yeni runtime kabulü docs/p01-handover.md içindedir.
+

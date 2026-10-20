@@ -1,9 +1,10 @@
 # FtkSaaS çalışma kuralları
 
-## P01 teslim sınırı — son kullanıcı kararı
+## Güncel üretim ve kabul — 20 Ekim 2026
 
-P01 bütünü `feature/p01-request-reservation-flow` dalında ve mevcut PR #22 içinde geliştirilir. Her uygulama commit'i hedefli doğrulanır; A/B/C ara dilimleri için aday full clean veya merge yapılmaz. P01'in bütün kalan API ve worker kabulü tamamlandığında son head bağımsız incelenir, toplu aday full clean alınır ve normal kaynak bağlı kapıyla merge edilir. Main full clean kabulü ayrıca gerekir. Full clean başlayınca aşağıdaki kullanıcıya devir kuralı korunur.
+P01 [PR #22](https://github.com/SXQHex/FtkSaaS/pull/22) ile main'e birleşti; kaynak ve kabul varsayımı güncel devirde. Sırada CI-02, ardından P02 vardır. [CI-2026-10-20 kararı](docs/decisions/CI-2026-10-20.md) bağlayıcıdır: bölüm boyunca tek Draft/development PR ve hedefli CI; bitince açık aday full clean, merge sonrası main full clean. Güvenli yalnız-belge farkları belge kabulüyle kapanır ve clean başlatmaz; karma/bilinmeyen veya runtime girdisi değişiklikleri istisna değildir. Dört shard ayrı backend/DB kullanır; bütün zorunlu işlerin kaynak bağlı başarısı gerekir.
 
+Bu yeni otomasyon CI-02'de uygulanacaktır; mevcut main workflow/kapısı hâlâ her main push için full clean ister ve Draft/development veya genel belge kabulünü uygulamış sayılmaz. Bu belge görevi workflow/kapı değiştirmez; yeni clean tetikleme veya mevcut kontrolü bypass etme yetkisi çıkarılmaz. Güncel durum güncellemesi P01 main kabulünü yalnız kullanıcı talimatıyla varsayar; gerçek sonuç BackendCoder'da izlenir.
 
 ## Başlangıç ve kaynak önceliği
 
@@ -21,7 +22,7 @@ Frontend tasarımına/istemci koduna müdahale etme. Production dağıtımı yap
 
 Etkilenen sözleşme/karar aktarımını, işlem envanterini, kalan işleri ve devir notlarını aynı PR içinde güncelle. Etkilenmeyen belgeleri gereksiz değiştirme; ikinci paralel belge ağacı oluşturma. İşlem durumunu makine sözleşmesi, runtime listesi ve üretilmiş endpoint envanteriyle karşılaştır. Üretilen dosyalar için mevcut üretim komutlarını kullan.
 
-Belge bağlantılarını, kaynak önceliğini ve envanter tutarlılığını kontrol et. [CI politikası](docs/ci-policy.md) geçerlidir: geliştirme push’unda hızlı doğrulama ve merge-base’ten itibaren birikimli değişikliklere göre hedefli testler; PR açılışı/güncellemesi full clean tetiklemez. Son merge adayında `ci:full-clean` label’ını açıkça ekleyerek tam `npm run test:clean` çalıştır. Label varlığı/skipped job kabul değildir. `ftksaas/merge-clean` başarılı kaynak-head/base/merge-tree ve gerçek full-clean kanıtına dayanır; head/base değişimi kabulü düşürür. Bağımsız incelemeyi son adayda doğrula. Merge sonrası aynı main SHA’sı ve full clean sonucunu paylaş. Yönetici erişimi olmayan required-check/strict-base ayarını uygulanmış sayma; mevcut required check’i bypass etme. İlk güvenilir workflow politika kurulumu ve koruma sınırı CI belgesinde açıkça ayrılır.
+Belge bağlantılarını, kaynak önceliğini ve envanter tutarlılığını kontrol et. [CI politikası](docs/ci-policy.md) geçerlidir: geliştirme push’unda hızlı doğrulama ve merge-base’ten itibaren birikimli değişikliklere göre hedefli testler; PR açılışı/güncellemesi full clean tetiklemez. Runtime/CI içeren son merge adayında `ci:full-clean` label’ını açıkça ekleyerek tam `npm run test:clean` çalıştır. Label varlığı/skipped job kabul değildir. Mevcut `ftksaas/merge-clean` başarılı kaynak-head/base/merge-tree ve gerçek full-clean kanıtına dayanır; CI-02 genel yalnız-belge kabul yolunu ayrıca uygulayacaktır; head/base değişimi kabulü düşürür. Bağımsız incelemeyi son adayda doğrula. Merge sonrası aynı main SHA’sı ve full clean sonucunu paylaş. Yönetici erişimi olmayan required-check/strict-base ayarını uygulanmış sayma; mevcut required check’i bypass etme. İlk güvenilir workflow politika kurulumu ve koruma sınırı CI belgesinde açıkça ayrılır.
 
 Test raporu doğrulanan kaynak SHA’sını ve kapsamını belirtir. Raporun bulunduğu commit’in kendi SHA’sını içine yazması veya henüz çalışmamış merge CI’ını başarılı göstermesi gerekmez. Merge kanıtı gerekiyorsa sonraki doğal belge güncellemesinde kaydedilir; sırf CI bağlantısı için sonsuz belge commit’i döngüsü oluşturma. Önceki tarihsel raporları yeniden yazma.
 
@@ -40,3 +41,4 @@ Bu kural önceki otomatik devam/CI izleme talimatlarını yalnız bekleme davran
 - Run hâlâ çalışıyorsa yeniden izlemeye geçme; durumunu bildir ve turu bitir. Başarısızsa ilgili hatayı incele, odaklı düzeltme yap; kaynak değişince eski clean'i yeni kaynağa taşıma.
 - Aday kabulü ve inceleme geçerliyse mevcut yetki kapsamında merge et. Main clean başlarsa yeniden aynı kullanıcıya devir kuralını uygula; main kabulü doğrulanmadan işi tamamlandı sayma.
 - CI kendi kendine çalışmaya devam eder; duracak olan Work ajanının aktif izlemesidir. Bu talimat workflow iptal etme veya testleri atlama talimatı değildir.
+

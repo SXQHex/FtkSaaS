@@ -1,6 +1,6 @@
 # F01–F33 karar, teknik bağımlılık, runtime ve kabul haritası
 
-Bu harita 08 makine sözleşmesinden üretilir. İşlem sayısı ürün tamamlanma yüzdesi değildir. 105 çağrılabilir işlem DS davranışlarının tamamlandığını göstermez. Yeni ürün kararlarının gerçek Auth → Edge → RPC kabulü aşağıdaki açık teslim bağımlılıklarında bekler.
+Bu harita 08 makine sözleşmesinden üretilir. İşlem sayısı ürün tamamlanma yüzdesi değildir. Çağrılabilir işlem sayısı DS davranışlarının tamamlandığını göstermez. Yeni ürün kararlarının gerçek Auth → Edge → RPC kabulü aşağıdaki açık teslim bağımlılıklarında bekler.
 
 | Özellik / ürün kararı | Plan erişimi | Teknik karşılık | Açık bağımlılıklar | Uygulama | Kabul |
 |---|---|---|---|---|---|

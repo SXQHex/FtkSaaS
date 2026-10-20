@@ -1,5 +1,12 @@
 # Changes
 
+## 2026-10-20 — P01 main ve CI kararı belge eşitlemesi
+
+P01 PR #22 main 7577b2f1873c6b1fcf83390bfa94a34374c44082 ile birleşti: katalog/seans bağlamlı hak okuması, talep/alternatif/onay, bekleme/teklif/expiry ve dar sistem worker zinciri. 199/118/81 işlem; 34 migration. Son head hedefli 39325878582 ve aday 39327134872 başarılıdır; main 39401570751 belge eşitlemesinde kullanıcı kararıyla başarılı varsayıldı, gerçek sonuç/hata takibi BackendCoder'dadır.
+
+CI-2026-10-20: bölüm boyunca Draft/development ve hedefli CI, bitince açık aday + merge sonrası main full clean; güvenli yalnız-belge farkına clean yerine belge kabulü; dört bağımsız backend/DB shard'ı. Karar kabul edildi, otomasyon CI-02'de bekliyor. Workflow/runtime/ürün davranışı bu belge tesliminde değiştirilmedi. Önceki sürüm notları tarihsel kayıttır.
+
+
 ## 0.2.0-rc.3 — 2026-10-16
 
 Q-E02 supersedes the post-start operator cancellation blocker. Center cancellation fully removes linked event obligations, creates only unclaimed student credit, releases reservations and reverses consumed package rights at every existing event stage. Participant cancellation preserves existing package terms and has no monetary journal effect. Preview Effect adds reverse; generated clients and Claude integration notes are updated. Historical occurrence/attendance and unrelated debts remain intact. Actual-start/partial-occurrence classification is still an explicit open decision. No production deployment.
@@ -22,3 +29,4 @@ Persistent GitHub development branch, pinned CI/devcontainer and reproducible lo
 Historical static contracts, UUID/discipline schema transfer and private Q-D01 scope predicates. No operational endpoint claim for that snapshot.
 
 RC3 temiz kabul: 124/124 test, 20/20 statik kontrol, sekiz migration, Node 24.19.0; reports/qe02-verification.json ve qe02-acceptance.log. PR/CI sonucu yalnız ilgili commit için geçerlidir.
+

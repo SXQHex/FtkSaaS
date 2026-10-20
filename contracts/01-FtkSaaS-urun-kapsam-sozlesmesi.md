@@ -1,3 +1,5 @@
+> **20 Ekim güncel durum:** P01 PR #22 main `7577b2f1873c6b1fcf83390bfa94a34374c44082` ile birleşti; 199 sözleşme / 118 çağrılabilir / 81 yalnız sözleşme / 34 migration. Eski teslim sayıları ve pending notları kendi kapsamına aittir. [Tek güncel devir](../contracts/00-FtkSaaS-yeni-sohbet-devir.md) main clean için kullanıcı varsayımını ve gerçek kanıtı ayırır. [CI-2026-10-20](../docs/decisions/CI-2026-10-20.md) dört shard, Draft/development ve belge-only kararını içerir; otomasyon CI-02’de bekliyor. Bu karar ürün/izin/finans davranışını değiştirmez.
+
 > Güncel öncelik: [DS-2026-10-17](../docs/decisions/DS-2026-10-17.md). Çelişen eski hükümler yalnız belirtilen kapsamda yürürlükten kalkmıştır. [Hedef sözleşme/runtime ayrımı](../docs/decision-sprint-handover.md).
 
 > **Güncel ek: Q-E03.** Parasal iptal sınırı planlanan başlangıçtır (eşitlik dahil sonrası). Q-E02 merkez iptali korunur. Teknik durum: docs/decisions/Q-E03.md; test/CI kanıtı ayrıca doğrulanır.
@@ -465,3 +467,4 @@ DS-OPEN-01 karar düzeyinde kapalıdır; hesaplaşma runtime aktarımı uygulanm
 ## Starter yoklama/koruma runtime aktarımı
 
 [Starter devri](../docs/starter-attendance-protection-handover.md) kabul edilmiş kararları değiştirmeden dar runtime kapsamını belirtir. Starter F14 kapanışı ve bağlı düzeltme hak hareketi + audit/outbox/receipt ile atomiktir; hakediş üretmez. Ücretli finansal kapanış ve bağlı hakediş düzeltmesi PR #15 ile uygulanmıştır. Koruma yalnız yeni olumsuz etkiye bağlıdır; bağımsız engelleri veya yeni rezervasyon koşullarını kaldırmaz. Taslak başlangıç kanıtı değildir; başlangıç/belge ve diğer hak değişikliği tüketicileri pending. 198 işlem/89 canlı/109 contract-only özellik tamamlama oranı değildir.
+

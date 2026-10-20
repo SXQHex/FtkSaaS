@@ -1,5 +1,14 @@
 # FtkSaaS — Kodlama sorumlulukları ve model yetki sınırları
 
+## 20 Ekim 2026 — yürürlükteki çalışma kararı
+
+[AGENTS.md](../AGENTS.md), [CI-2026-10-20](../docs/decisions/CI-2026-10-20.md) ve [üretim kuyruğu](../docs/production-queue.md) aşağıdaki eski kurulum/durum notlarının üstündedir. Güncel kaynak main 7577b2f1873c6b1fcf83390bfa94a34374c44082; P01 birleşti, main clean belge görevi için kullanıcı varsayımıyla ele alındı; gerçek hata takibi BackendCoder'dadır. CI-02 otomasyonu henüz uygulanmadı.
+
+Bölüm boyunca tek Draft/development PR ve hedefli CI; bitince son-head incelemesi/açık aday full clean, merge sonrası main full clean esastır. Güvenli yalnız-belge farkları belge kabulüyle clean olmadan kapanacaktır; karma/runtime/CI farkı istisna değildir. Dört shard ayrı backend/DB ve eksiksiz sonuç doğrulaması kullanır. Her biten dilimde etkilenen belgeler aynı PR'de güncellenir; çalışan clean'in SHA'sı sırf durum için değiştirilmez.
+
+Bu sohbet karar/denetim ve açıkça istenen belge eşitlemesi içindir; uygulama ve CI değişiklikleri BackendCoder'dadır. Mevcut açık koşullu merge yetkisi kendi kapsamıyla geçerlidir; üretim kuyruğu tek başına yeni merge/production veya repository yönetim yetkisi vermez. Tarihsel raporlar yeniden yazılmaz.
+
+
 > **Güncel öncelik: Q-E02 · 0.2.0-rc.3.** Kullanıcının 16 Ekim 2026 son iptal kabulü önceki çelişen merkez iptali hükümlerinin yerine geçer. Güncel davranış/kanıt: docs/decisions/Q-E02.md, docs/claude-handover.md ve reports/qe02-verification.json. Aşağıdaki eski durum/test sayıları tarihsel kayıttır; teknik aktarım bekleyen işler tamamlandı sayılmaz.
 
 > **Güncel 2.2-tech.2 / Q-D01:** Etkinlik 0/1/çok disiplin etiketini destekler. Tek etikette etkinliğe uygun dar/geniş paket, 0/çok etikette yalnız uygun geniş paket; etkinliklerde negatif kredi yok. Q-D01 ürün kararı kapalı, tam olay kayıt/RPC entegrasyonu ve son ortak kredi yarışı açık. Güncel durum 11-FtkSaaS-Q-D01-teknik-aktarim-raporu.md.
@@ -46,7 +55,7 @@ Claude yalnız yayımlanmış API sözleşmesine uyan mock ile ilerleyebilir; is
 
 Tek onay açıkça belirtilmiş PR/sürüm için merge + migration + dağıtımı birlikte kapsayabilir; aynı kapsam tekrar onaylatılmaz. Somut işlem kapsamı dışındaki genel kabul üretim izni değildir. Önce incelemeye hazır sonuç hazırlanır, onay son adımdır. Üretim öncesi migration testte denenir; yedek/kurtarma doğrulanır. Uygulanmış migration dosyası değiştirilmez, yeni düzeltme migration’ı yazılır. Kod sürümüne dönüş veritabanını otomatik geri almaz; ikisi kurtarma planında ayrı ele alınır.
 
-Geliştirme/test ve üretim kimlik bilgileri ayrılır. Gizli anahtar repository veya frontend’e konmaz. Sağlayıcı hesapları, ortam kimlikleri, secret deposu ve CI araçları ayrıca teknik kurulumda seçilecektir; şu anda oluşturulmuş/bağlanmış sayılmaz.
+Geliştirme/test ve üretim kimlik bilgileri ayrılır. Gizli anahtar repository veya frontend’e konmaz. İlk kurulumun bu eski notu tarihsel durumdur; güncel bağlantı/CI ve eksik ortam işleri yaşayan devirden okunur, hosted/production kurulumu varsayılmaz.
 
 ## 5. Kabul edilmiş değişiklik ve teslim süreci
 
@@ -111,3 +120,4 @@ Paket revizyonu: 2.2. D01–D09 disiplin kararları korunur. Bu bölüm önceki 
 **U08.** PostgreSQL alan tipi uuid olarak kalır. UUIDv7 üretim standardı bütün dış UUID girişlerini v7 diye reddetmek anlamına gelmez. FtkSaaS üretimi olan alanlarla sağlayıcı kimliği alanlarının şema/DTO eşlemesi teknik sohbette tamamlanır; yetki ve tenant kontrolü UUID sürümünden bağımsız uygulanır.
 
 **Durum:** Belge ve makine sözleşmesine üretim politikası işlendi. Ortam/üretici seçimi, alan bazlı ortak tip aktarımı, migration ve gerçek üretim/yarış testleri ayrı teknik sohbette yapılacaktır. Kodlama, kurulum veya dağıtım yapılmadı.
+

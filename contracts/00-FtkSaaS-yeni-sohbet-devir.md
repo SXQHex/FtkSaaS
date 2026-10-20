@@ -1,5 +1,22 @@
 # FtkSaaS — güncel devir
 
+## 20 Ekim 2026 — P01 birleşti; belge senkronizasyonu
+
+Uygulama kaynağı main `7577b2f1873c6b1fcf83390bfa94a34374c44082`, [PR #22](https://github.com/SXQHex/FtkSaaS/pull/22); aday head `97f0b46d2277791339398aa47a1882630787dba9`. Envanter **199 sözleşme / 118 çağrılabilir / 81 yalnız sözleşme; 34 migration**. Çağrılabilirlik bütün ürün/hosted/production kabulü değildir.
+
+- [Son head hedefli CI 39325878582](https://github.com/SXQHex/FtkSaaS/actions/runs/39325878582): başarılı; 218 test düğümü (120 yapı/politika + 27 DB + 71 API); bu dağılım hedefli koşuya aittir.
+- [Bütün P01 aday full clean 39327134872](https://github.com/SXQHex/FtkSaaS/actions/runs/39327134872): GitHub sonucu completed/success. [Aday kapısı 39327135216](https://github.com/SXQHex/FtkSaaS/actions/runs/39327135216): başarılı. PR son-head bağımsız inceleme kaydı aday hazırlığını onaylar; geliştirici/inceleme beyanı ile CI ayrı kanıtlardır.
+- [Aynı main clean 39401570751](https://github.com/SXQHex/FtkSaaS/actions/runs/39401570751): belge çalışmasının tek seferlik GitHub kontrolünde in_progress, conclusion null. **Kullanıcının 20 Ekim talimatıyla yalnız bu belge eşitlemesinde başarılı kabul varsayımı kullanılır; doğrulanmış CI başarısı iddia edilmez.** Olası hatanın takibi/düzeltmesi BackendCoder'dadır. Bu varsayım yeni kaynak/PR için kabul veya merge kapısı istisnası değildir; izleme/yeniden tetikleme yapılmaz.
+
+P01'in talep→alternatif→merkez onayı→rezervasyon ve bekleme→FIFO yer teklifi→kabul/ret/expiry zinciri main'e alındı. Request-window/CM gerekçeli istisna, canlı worker merkez/plan erişimi, fenced lease/crash kurtarma ve yarış düzeltmeleri son hedefli kaynakta kabul edildi. Eski A/B/C “runtime bekliyor / merge edilmedi” ifadeleri aşağıda veya Git geçmişinde tarihsel teşhistir; güncel açık iş değildir.
+
+Sıradaki iş **CI-02: dört bağımsız shard + Draft/development + yalnız-belge kabulü**, ardından P02. Yeni politika karar düzeyinde kabul edildi, workflow/merge kapısı uygulaması bekliyor. P01 için hosted worker kurulumu, frontend gerçek entegrasyonu, dış e-posta, yük/restore ve production kapsamı tamamlanmış sayılmaz.
+
+[CI kararı](../docs/decisions/CI-2026-10-20.md), [CI politikası](../docs/ci-policy.md), [üretim kuyruğu](../docs/production-queue.md), [kalan işler](../docs/remaining-work.md), [P01 teknik devri](../docs/p01-handover.md).
+
+<details>
+<summary>Önceki uygulama ve teşhis kayıtları — tarihsel</summary>
+
 ## 20 Ekim 2026 — son kapsam incelemesi düzeltmeleri
 
 Kaynak `c62106b77717d6c1b1129fe7fa8eca6060d05826` / [hedefli CI 39323812801](https://github.com/SXQHex/FtkSaaS/actions/runs/39323812801) başarılıdır: 120 yapı/politika + 27 DB + 67 API test düğümü (P01 26, ortak 41), toplam 214. Worker CLI/loop, minimal DB yetkileri ve üç denemelik hata yolu bu kaynakta geçti; önceki Auth transport hatası kapandı. Bu başarı yeni kaynağa taşınmaz.
@@ -264,5 +281,8 @@ Teknik aktarım ve test durumu: docs/decisions/Q-E02.md ve reports/qe02-verifica
 **AS-03.** İptalden sonra geriye dönük kayıt/düzeltme mümkündür; iptal yeniden açılmaz. Etkinlik sürümü artar; eski önizleme geçersizleşir. event_get mevcut actual_started_at değerini; yönetici/organizasyon okuyucusuna append-only actual_start_history geçmişini döndürür.
 
 Teknik kanıt: docs/actual-start-handover.md, PR son commit CI. Bu aktarım kısmi gerçekleşmeye bağlı yeni parasal veya hak kuralı üretmez.
+
+</details>
+
 
 </details>

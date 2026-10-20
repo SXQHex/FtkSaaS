@@ -1,3 +1,5 @@
+> **20 Ekim güncel durum:** P01 PR #22 main `7577b2f1873c6b1fcf83390bfa94a34374c44082` ile birleşti; 199 sözleşme / 118 çağrılabilir / 81 yalnız sözleşme / 34 migration. Eski teslim sayıları ve pending notları kendi kapsamına aittir. [Tek güncel devir](../contracts/00-FtkSaaS-yeni-sohbet-devir.md) main clean için kullanıcı varsayımını ve gerçek kanıtı ayırır. [CI-2026-10-20](../docs/decisions/CI-2026-10-20.md) dört shard, Draft/development ve belge-only kararını içerir; otomasyon CI-02’de bekliyor. Bu karar ürün/izin/finans davranışını değiştirmez.
+
 > Güncel öncelik: [DS-2026-10-17](../docs/decisions/DS-2026-10-17.md). Çelişen eski hükümler yalnız belirtilen kapsamda yürürlükten kalkmıştır. [Hedef sözleşme/runtime ayrımı](../docs/decision-sprint-handover.md).
 
 # FtkSaaS — O4 durum, hata ve izin sözleşmesi
@@ -313,3 +315,4 @@ settlement.delegation.manage Owner'a özgü; settlement.authority.manage Owner v
 [Starter devri](../docs/starter-attendance-protection-handover.md) kabul edilmiş kararları değiştirmeden dar runtime kapsamını belirtir. Starter F14 kapanışı ve bağlı düzeltme hak hareketi + audit/outbox/receipt ile atomiktir; hakediş üretmez. Ücretli finansal kapanış ve bağlı hakediş düzeltmesi PR #15 ile uygulanmıştır. Koruma yalnız yeni olumsuz etkiye bağlıdır; bağımsız engelleri veya yeni rezervasyon koşullarını kaldırmaz. Taslak başlangıç kanıtı değildir; başlangıç/belge ve diğer hak değişikliği tüketicileri pending. 198 işlem/89 canlı/109 contract-only özellik tamamlama oranı değildir.
 
 Anlaşma/hakediş teslimi: earnings.manage yalnız seçili CM; earnings.read org okuyucusu / seçili CM / kendi canlı merkez rolündeki eğitmen projeksiyonu. attendance_start_v1 attendance.close yetkisiyle explicit olgu kaydıdır; taslak/tüketim/kapanış değildir. management.inspect runtime yalnız negcredit_valuation_set_v1 selector'ını ve özgün CM/F15 kapısını uygular; genel tablo okuması sağlamaz. Ayrıntı: docs/instructor-earnings-handover.md.
+
