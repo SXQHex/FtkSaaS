@@ -330,7 +330,7 @@ test('Program lifecycle through real Auth -> Edge -> RPC',async t=>{
   await mut('attendance_start_v1',{session_id:sid,expected_version:(await get(sid)).version,actual_started_at:new Date(Date.now()-1000).toISOString(),reason:'Explicit start of protected frozen obligation'});
   await mut('attendance_mark_v1',{reservation_id:rid,expected_version:Number((await rows('select version from core.reservations where id=$1',[rid]))[0].version),result:'attended'});await mut('attendance_close_v1',{session_id:sid,expected_version:(await get(sid)).version,performed:false,performed_instructor_ids:[]});assert.equal((await rows('select state from core.entitlement_allocations where reservation_id=$1',[rid]))[0].state,'consumed');
   const reopened=(await session(null,'2027-03-16T11:00:00Z')).primary_id;await mut('reservation_create_v1',{session_id:reopened,person_id:learner.p,mode:'flexible',source_sale_id:sold});
-  assert.equal((await rows('select paid_days from core.sales where id=$1',[sold]))[0].paid_days,31);await fail('freeze_end_apply_v1',{preview:token(e)},'PREVIEW_STALE');
+  assert.equal(Number((await rows('select paid_days from core.sales where id=$1',[sold]))[0].paid_days),31);await fail('freeze_end_apply_v1',{preview:token(e)},'PREVIEW_STALE');
   await fail('freeze_preview_v1',{...request,dates:{start_date:'2020-01-01',end_date:'2020-01-02'}},'VALIDATION_FAILED');
  });
  await t.test('P02 standalone termination preserves reservations and debt; linked renewal carries no old rights',async()=>{

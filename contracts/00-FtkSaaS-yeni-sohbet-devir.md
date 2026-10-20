@@ -1,5 +1,8 @@
 # FtkSaaS — güncel devir
 
+Hedefli39447440608 (d313538):27 DB testi ve P02 seans/hak/sonlandırma-yenileme/değişim/bekleme-iade vakaları geçti. Dondurma vakası, başarılı korunan attendance tüketiminden sonra doğrudan node-pg bigint sonucu "31" ile31 karşılaştırmasında durdu; Number(...) test düzeltmesi eklendi. Runtime kaynağı değişmedi. Yeni head hedefli sonucu, tek aday clean ve main kabulü hâlâ bekler; eski koşu genel başarı değildir.
+
+
 P02 PR #28 Draft/development: bütün15 API uygulama adayı, 199 / 133 runtime / 66 contract_only / 40 migration. Hedefli39443588849 test beklentisini,39444715078 özgün etki yetkisi/fiziksel tablo adını,39445926760 ortak dependency fonksiyonundaki sale_id parametre/kolon belirsizliğini yakaladı. Düzeltmeler yeni migrationlarda; son kaynakta hedefli doğrulama henüz bekleniyor. Bağımsız inceleme yenilemede gereksiz currency eşitliğini kaldırttı; yalnız ürün değişimi/mahsup aynı currency ister. Son kaynak incelemesi ve bütün P02 için tek aday/main clean açık; P02 done değildir.
 
 
