@@ -1,0 +1,50 @@
+name: P03 temporary development workbench
+on:
+  push:
+    branches: [feature/p03-finance-payments]
+permissions:
+  contents: write
+concurrency:
+  group: p03-workbench
+  cancel-in-progress: true
+jobs:
+  prepare-and-targeted:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          ref: feature/p03-finance-payments
+          fetch-depth: 0
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1
+        with:
+          node-version: '24.19.0'
+          cache: npm
+      - run: npm ci
+      - name: Generate reviewed P03 contract and source artifacts
+        run: |
+          python3 .github/p03-bootstrap.py
+          npm run generate
+          git restore reports/
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          if ! git diff --cached --quiet; then
+            git commit -m "P03: synchronize generated contracts, catalogs and living handover"
+            git push origin HEAD:feature/p03-finance-payments
+          fi
+          git rev-parse HEAD
+          git rev-parse HEAD^{tree}
+      - name: Structural validation
+        run: npm run verify
+      - name: Isolated backend and clean migrations
+        run: |
+          npm run dev:start
+          node_modules/.bin/supabase db reset --local --no-seed --yes
+          node scripts/wait-local.mjs
+      - name: P03 targeted finance and dependent regression
+        run: |
+          npm run test:db
+          node --test --test-concurrency=1 tests/event-payment.test.mjs tests/instructor-earnings.test.mjs tests/program-session-lifecycle.test.mjs
+      - if: always()
+        run: node scripts/ci/cleanup.mjs
