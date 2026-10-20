@@ -33,6 +33,11 @@ for name,column,target in [('instructor_payments','previous_id','instructor_paym
 if 'direction' not in d['Table_instructor_payments']['required']:d['Table_instructor_payments']['required'].append('direction')
 live=json.loads(Path('supabase/functions/backend-v1/implemented.json').read_text())['operations']
 live=list(dict.fromkeys(live+names))
+for row in x['feature_delivery'].values():
+ if not set(row['technical_operations']).intersection(names):continue
+ row['implemented_operations']=[n for n in row['technical_operations'] if n in live]
+ row['contract_only_operations']=[n for n in row['technical_operations'] if n not in live]
+ row['implementation']='implemented_acceptance_pending' if not row['contract_only_operations'] else ('partial' if row['implemented_operations'] else 'contract_only')
 for o in x['operations']:
  k=o['operation_contract']
  if k['kind'] not in ['read','auth','worker'] and k.get('read_operation') in names:k['read_path_status']='implemented'
@@ -97,7 +102,7 @@ p=Path('docs/production-queue.md');s=p.read_text().replace('7 API uygulaması ve
 p=Path('contracts/02-FtkSaaS-teknik-sozlesme.md');s=p.read_text().split('\n## P03 uygulama aktarımı')[0]
 s=s.replace('PR #28 Draft/development içinde15 API uygulama adayıdır; hedefli/aday/main kabulü ayrı beklenir.','P02 PR #28 main cc4878d kaynağında15 API ve aynı main39461804543 kabulüyle tamamlandı.')
 s+='\n## P03 uygulama aktarımı — kabul bekliyor\n\n'+note
-s+='CashCorrection.amount_minor yeni toplam değil, direction yönünde açık farktır. Artış özgün tahsilat borç kapsamını korur; azalış kaynak alacağı/dağıtımlarını bağlı hareketle geri alır. Harcanmış alacak silinemez. Kalan borç=max(0,net−gross_paid+claimed); alacağa taşınmış ödeme ikinci kez borç ödeme sayılmaz. Alacak geri alımı ilgili allocation azalışını aşamaz. Ters debt/earning allocation SignedMoney, API bakiye toplamları nonnegative Money kalır. Tam finans geçmişi orgreader/CM/self kapsamındadır; finance.collect personel grantı tam geçmiş vermez. Paket iadesi nakit/hak/rezervasyon işlemi değildir; önizlemede borç ve öğrenci alacağı ayrı gösterilir. Eğitmen correction sonucu kök payment ID ve aggregate version döndürür; yeni fact related içindedir. Önceki fact kayıtları immutable kalır.\n'
+s+='CashCorrection.amount_minor yeni toplam değil, direction yönünde açık farktır. Artış özgün tahsilat borç kapsamını korur; azalış kaynak alacağı/dağıtımlarını bağlı hareketle geri alır. Harcanmış alacak silinemez. Kalan borç=max(0,net−gross_paid+claimed); alacağa taşınmış ödeme ikinci kez borç ödeme sayılmaz. Alacak geri alımı ilgili allocation azalışını aşamaz. Ters tahsisler her pozitif kaynak satırının açık kalanına kadar deterministic bölünür; previous_id tam o kaynağı gösterir. Ters debt/earning allocation SignedMoney, API bakiye toplamları nonnegative Money kalır. Tam finans geçmişi orgreader/CM/self kapsamındadır; finance.collect personel grantı tam geçmiş vermez. Paket iadesi nakit/hak/rezervasyon işlemi değildir; önizlemede borç ve öğrenci alacağı ayrı gösterilir. Eğitmen correction sonucu kök payment ID ve aggregate version döndürür; yeni fact related içindedir. Önceki fact kayıtları immutable kalır.\n'
 p.write_text(s)
 p=Path('docs/p02-handover.md');s=p.read_text()
 mark='P02 kapanış: PR28 main cc4878d09e45204dbc13ccfe1324b38b14548167 ve aynı main39461804543 completed/success ile done;469 test,40 migration. Aşağıdaki geliştirme kaynaklarının pending notları tarihsel snapshot’tır. Güncel P03 değişiklikleri ve kabulü üretim kuyruğunda ayrı izlenir.\n\n'
@@ -114,4 +119,9 @@ s=s[:start]+section+s[end:]
 s=s.replace('P03–P07 toplam66 contract_only işlem sırada.','P03 dalında7 API uygulandı; hedefli/aday/main kabulü açık. P04–P07 toplam59 contract_only işlem sırada.')
 s=s.replace('Ödeme komutları açık.','P03 ödeme komutları dalda uygulandı; runtime ve aday/main kabulü ayrı bekler.')
 s=s.replace('P03 finans düzeltme/iade çiftleri açık.','P03 finans düzeltme/iade çiftleri dalda uygulandı; hedefli/aday/main kabulü açık.')
+p.write_text(s)
+
+p=Path('docs/source-index.md');s=p.read_text()
+link='[P03 çalışma devri](p03-handover.md): finans/iade/eğitmen ödeme kapsamı ve son kabul sırası.\n\n'
+if link not in s:s=s.replace('## Okuma sırası ve roller',link+'## Okuma sırası ve roller')
 p.write_text(s)

@@ -44,13 +44,10 @@ jobs:
           node scripts/wait-local.mjs
       - name: P03 targeted finance and dependent regression
         run: |
-          node .github/p03-diagnose.mjs
           npm run test:db
           node --test --test-name-pattern='P03 linked' tests/event-payment.test.mjs
       - name: Dependent finance entitlement and earnings regressions
         run: |
           node --test --test-concurrency=1 tests/event-payment.test.mjs tests/instructor-earnings.test.mjs tests/program-session-lifecycle.test.mjs
-      - if: always()
-        run: node .github/p03-diagnose.mjs --read
       - if: always()
         run: node scripts/ci/cleanup.mjs

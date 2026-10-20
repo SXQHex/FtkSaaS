@@ -339,6 +339,26 @@ test('P03 linked finance corrections, frozen refunds and instructor payments',as
   assert.equal((await read({person_id:p})).credit_available_minor,before);
   assert.equal((await row('select private.debt_claimed($1,$2)::text claimed',[org,debt])).claimed,'1000');
  });
+
+ await t.test('collection correction updates event payment preparation without cancelling an active registration',async()=>{
+  const student=(await m('person_create_v1',{display_name:'P03 event finance student',contacts:[]})).primary_id;await m('student_activate_v1',{person_id:student});
+  const starts=Date.now()+86400000;
+  const event=(await m('event_save_v1',{name:'P03 financial correction event',interval:{starts_at:new Date(starts).toISOString(),ends_at:new Date(starts+3600000).toISOString()},timezone:'Europe/Istanbul',
+   venue:{kind:'external',name:'P03 synthetic',address:'Synthetic',timezone:'Europe/Istanbul'},capacity:{nominal:10,maximum:10},discipline_ids:[],
+   assignments:[{person_id:operson,duty:'instructor',fee_minor:'0',currency:'TRY'}],
+   terms:{fee_minor:'1000',currency:'TRY',full_payment_required:true,allowed_product_version_ids:[],cancellation:{before_cutoff:'release',after_cutoff:'consume',no_show:'consume'},refund:{method:'none'}}})).primary_id;
+  await m('event_publish_v1',{event_id:event,published:true});
+  const prepared=await m('event_payment_prepare_v1',{event_id:event,person_id:student});
+  const original=(await m('collection_record_v1',{person_id:student,debt_ids:[prepared.debt_id],amount_minor:'1000',currency:'TRY',occurred_at:now()})).primary_id;
+  const registration=(await m('event_register_v1',{event_id:event,person_id:student,preparation_id:prepared.id})).primary_id;
+  const preview=await must(owner,'collection_correct_preview_v1',scope({cash_movement_id:original,correction:{amount_minor:'100',currency:'TRY',occurred_at:now(),direction:'decrease'},reason:'P03 linked event correction'}));
+  await m('collection_correct_apply_v1',pvref(preview));
+  const current=await must(owner,'event_payment_get_v1',scope({preparation_id:prepared.id}));
+  assert.equal(current.paid_minor,'900');assert.equal(current.remaining_minor,'100');
+  assert.equal((await row('select state from core.event_registrations where id=$1',[registration])).state,'active');
+  assert.equal((await row('select count(*)::int n from core.student_credit_movements where org_id=$1 and person_id=$2',[org,student])).n,0);
+ });
+
  await t.test('instructor payment selected net earnings; concurrent overpay, correction version and separate cash',async()=>{
   // Financial-only synthetic earning facts; actual attendance earning creation remains in instructor suite.
   const earning=key(),receipt=(await row('select id from core.operation_receipts where org_id=$1 order by created_at,id limit 1',[org])).id;
