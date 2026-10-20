@@ -82,3 +82,7 @@ assert next(Path('supabase/migrations').glob('*_p02_renewal_currency.sql')).read
 assert next(Path('supabase/migrations').glob('*_p03_finance_payments.sql')).read_text()==Path('database/p03-finance-payments.sql').read_text()+Path('database/p03-finance-payments-wrappers.sql').read_text(),'P03 finance source drift'
 
 assert next(Path('supabase/migrations').glob('*_p03_finance_guardrails.sql')).read_text()==Path('database/p03-finance-guardrails.sql').read_text(),'P03 finance guardrails source drift'
+
+assert next(Path('supabase/migrations').glob('*_p03_finance_acceptance.sql')).read_text()==Path('database/p03-finance-acceptance.sql').read_text(),'P03 acceptance source drift'
+
+assert next(Path('supabase/migrations').glob('*_p03_finance_scope.sql')).read_text()==Path('database/p03-finance-scope.sql').read_text(),'P03 finance scope source drift'

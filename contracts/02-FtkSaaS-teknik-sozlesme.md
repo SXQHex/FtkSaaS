@@ -702,6 +702,6 @@ PR #28 Draft/development içinde15 API uygulama adayıdır; hedefli/aday/main ka
 
 ## P03 uygulama aktarımı — kabul bekliyor
 
-P03 ilk uygulama dilimi:7 API uygulandı;199/140 runtime/59 contract_only,41 migration. Tahsilat düzeltmesi ve eğitmen ödemesi geçmişi silmeden bağlı fark hareketi kullanır. Paket iadesi satışta sabit yöntemle borç indirimi ve öğrenci alacağıdır; nakit/hak işlemi değildir. P02/P03 önceki hesaplaşması tekrar üretilmez. Hedefli runtime, bağımsız inceleme ve aday/main kabulü açık; Draft/development PR30 korunur.
+P03 ilk uygulama dilimi:7 API uygulandı;199/140 runtime/59 contract_only,44 migration. Tahsilat düzeltmesi ve eğitmen ödemesi geçmişi silmeden bağlı fark hareketi kullanır. Paket iadesi satışta sabit yöntemle borç indirimi ve öğrenci alacağıdır; nakit/hak işlemi değildir. P02/P03 önceki hesaplaşması tekrar üretilmez. Hedefli runtime, bağımsız inceleme ve aday/main kabulü açık; Draft/development PR30 korunur.
 
 CashCorrection.amount_minor yeni toplam değil, direction yönünde açık farktır. Tahsilat artışı özgün borç kapsamını korur; azalış kaynak alacağı ve dağıtımlarını geri alır, harcanmış alacağı silemez. Genel iade hak veya rezervasyonu değiştirmez. Eğitmen düzeltmesi kök ödeme ve earnings_list içindeki güncel payment version ister.

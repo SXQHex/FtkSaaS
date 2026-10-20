@@ -1,6 +1,6 @@
 # FtkSaaS — fiziksel şema · 0.2.0-rc.3
 
-90 domain tablosu; 42 sıralı migration. Güncel kaynak/kabul ve kapsam: `contracts/00-FtkSaaS-yeni-sohbet-devir.md`, `docs/claude-handover.md`. `reports/qe02-verification.json` yalnız tarihsel Q-E02 snapshot’ının kanıtıdır. Aşağıdaki alan listesi makine sözleşmesi 08’den üretilir. Kesin PostgreSQL DDL kaynağı `supabase/migrations`; uygulanan migration değiştirilmez.
+90 domain tablosu; 44 sıralı migration. Güncel kaynak/kabul ve kapsam: `contracts/00-FtkSaaS-yeni-sohbet-devir.md`, `docs/claude-handover.md`. `reports/qe02-verification.json` yalnız tarihsel Q-E02 snapshot’ının kanıtıdır. Aşağıdaki alan listesi makine sözleşmesi 08’den üretilir. Kesin PostgreSQL DDL kaynağı `supabase/migrations`; uygulanan migration değiştirilmez.
 
 UUID/FK alanları `uuid`, parasal stringler DB’de `bigint`, Instant `timestamptz`, tarih `date`, kapalı nesneler `jsonb`. Yeni domain kimlikleri Edge içinde doğrulanmış `uuid@14.0.3` v7 üreticisinden gelir. PostgreSQL 17 DB default üreticisi zorunlu değildir; üretici bulunmadığında default kapalıdır ve v4 fallback yoktur. Auth sağlayıcı UUID’leri korunur.
 
