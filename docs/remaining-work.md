@@ -1,6 +1,6 @@
 # Kalan backend işleri
 
-P03 ilk uygulama dilimi:7 API uygulandı; dal envanteri199/140 runtime/59 contract_only,47 migration. Tahsilat düzeltmesi ve eğitmen ödemesi geçmişi silmeden bağlı fark hareketi kullanır. Paket iadesi satışta sabit yöntemle borç indirimi ve öğrenci alacağıdır; nakit/hak işlemi değildir. P02/P03 önceki hesaplaşması tekrar üretilmez. Hedefli runtime, bağımsız son inceleme ve aday/main kabulü açık; Draft/development PR30 korunur.
+P03 ilk uygulama dilimi:7 API uygulandı; dal envanteri199/140 runtime/59 contract_only,48 migration. Tahsilat düzeltmesi ve eğitmen ödemesi geçmişi silmeden bağlı fark hareketi kullanır. Paket iadesi satışta sabit yöntemle borç indirimi ve öğrenci alacağıdır; nakit/hak işlemi değildir. P02/P03 önceki hesaplaşması tekrar üretilmez. Hedefli runtime, bağımsız son inceleme ve aday/main kabulü açık; Draft/development PR30 korunur.
 
 P03 başladı: tek feature/p03-finance-payments Draft/development PR,7 API. Başlangıç main ce95a9d0d960a201b0488071802dc5db7741caf1 / belge kabulü39487599217; P02 runtime kabulü ve hosted eşleşmesi korunur. Uygulama ve yeni runtime kabulü açık; bütün P03 sonunda tek aday clean alınır.
 
@@ -10,7 +10,7 @@ Geliştirme/test Supabase `gwyprhenabtpkbojephw`, aynı kabul edilmiş main `cc4
 
 ## Aktif seri üretim
 
-**P01, CI-02 ve P02 kapandı.** P03–P07 toplam66 contract_only işlem sırada. [Tek kuyruk](production-queue.md) sıralama ve prompt kaynağıdır; [CI-2026-10-20](decisions/CI-2026-10-20.md) dört izole shard, Draft/development ve belge-only kabulünün gerçek main kabulünü ve kapanış kanıtlarını belirtir. Belge-only yolu main’e kuruldu; yeni kaynak kabulünün yerine eski başarı taşınmaz.
+**P01, CI-02 ve P02 kapandı.** P03 dalında7 API uygulandı; hedefli/aday/main kabulü açık. P04–P07 toplam59 contract_only işlem sırada. [Tek kuyruk](production-queue.md) sıralama ve prompt kaynağıdır; [CI-2026-10-20](decisions/CI-2026-10-20.md) dört izole shard, Draft/development ve belge-only kabulünün gerçek main kabulünü ve kapanış kanıtlarını belirtir. Belge-only yolu main’e kuruldu; yeni kaynak kabulünün yerine eski başarı taşınmaz.
 
 [P01 devri](p01-handover.md): katalog/hak okuması, talep/alternatif/onay, bekleme/teklif/expiry ve gerçek dar worker döngüsü uygulandı. Genel belge upload/yayın/kabul ve bildirim API'leri P05'te açıktır; mevcut yayımlanmış rezervasyon gerekliliklerinin dar tüketicisi bunları kapatmaz. Hosted worker provisioning/işletim kabulü CI'daki gerçek CLI/loop testinden ayrıdır.
 
@@ -18,7 +18,7 @@ Geliştirme/test Supabase `gwyprhenabtpkbojephw`, aynı kabul edilmiş main `cc4
 
 1. Karar/DTO/izin/guard/sürüm-okuma aktarımı ve F01–F33 yapısal denetimleri korundu; gerçek davranış kanıtı ayrı izlenir.
 2. Starter yoklama/hak kapanışı, politika/kişisel limit etkisi/onayı uygulandı. Otomatik başlangıç, belge ve diğer hak değişikliği tüketicileri açık.
-3. Immutable anlaşma/hakediş ve dar gerçek başlangıç yolu uygulandı; son kaynak kabulü/inceleme/CI PR kanıtıyla değerlendirilir. Ödeme komutları açık.
+3. Immutable anlaşma/hakediş ve dar gerçek başlangıç yolu uygulandı; son kaynak kabulü/inceleme/CI PR kanıtıyla değerlendirilir. P03 ödeme komutları dalda uygulandı; runtime ve aday/main kabulü ayrı bekler.
 4. Ayrı merkezler arası ledger, Owner/delege OM grant zinciri ve B onayında atomik ödeme/mahsup/bağlı düzeltme kesinleştirmesi. DS-OPEN-01 karar düzeyinde kapalı; DS-OPEN-02 son merkez yetki kararıyla karar düzeyinde kapalı; aynı hesap A/B yetkileri ayrı doğrulanarak iki adımı yapabilir. Fiziksel depolama, dokuz RPC/read ve adım kapsamlı audit uygulandı; [hesaplaşma devri](settlement-handover.md) ve son head temiz CI kabulü esas alınır.
 5. Satış kapsam snapshot/değişim, gerekçeli backdate ve geçmiş açık kapatma; yeni ürün davranışı uydurulmadan uçtan uca kabul.
 
@@ -29,30 +29,22 @@ Kalan delivery_gaps ve vaka bazlı durumlar [08 makine sözleşmesi](../contract
 1. Uygunluk/politika dört API uygulandı; tüketici sınırları ve eksik iş akışları Claude devrindeki güncel bölümde açıkça ayrılır. Son PR SHA kabulü CI ile ayrıca doğrulanır.
 2. Ürün kataloğu, seans bağlamında uygun satın alınmış hak seçimi ve talep–bekleme–yer teklifi yaşam döngüleri P01 PR #22 ile uygulandı; program/seans yedi komutu PR #12 ile, Starter uyarlaması PR #14 ve anlaşma yayını PR #15 ile uygulandı; kalan tüketiciler ilgili devirlerde belirtilir. Üç program okuması uygulandı; sınırlar okuma devrindedir.
 3. Starter ve Pro/Business yoklama/kapanış/bağlı düzeltme ile ücretli anlaşma/hakediş uygulandı. Otomatik başlangıç gözlemi, belge ve diğer hak değişikliği koruma tüketicileri açık.
-4. P02 paket dondurma/uzatma/değişim/yenileme/sonlandırma tamamlandı; P03 finans düzeltme/iade çiftleri açık. Genel iade private.p02_sale_settlements ve önceki borç/alacak hareketlerini tüketmeli.
+4. P02 paket dondurma/uzatma/değişim/yenileme/sonlandırma tamamlandı; P03 finans düzeltme/iade çiftleri dalda uygulandı; hedefli/aday/main kabulü açık. Genel iade private.p02_sale_settlements ve önceki borç/alacak hareketlerini tüketmeli.
 5. Hesap erişimi geri alma, hesap/organizasyon kapanış/silme ve kişi birleştirme.
 6. CRM, bildirim tercihleri, belgeler, raporlar, import ve worker işlemleri.
 
 Her yeni runtime/CI grubu: sözleşme/izin incelemesi → gerekli yeni migration → geliştirmede hedefli gerçek Auth/API kabulü (sınır, yetki, tekrar, yarış, rollback) → son inceleme → açık aday full clean → merge → main full clean. Güvenli yalnız-belge kabul yolu CI-02 ile kuruldu; full clean’den ayrı kaynak bağlı kabul kullanır. Ürün kararında boşluk varsa teknik varsayımla yeni kural eklenmez.
 
-## Yalnız sözleşme envanteri — kabul edilmiş main’de 66 işlem
+## Yalnız sözleşme envanteri — dalda 59 işlem
 
-P02’nin15 API’si hedefli, aday ve aynı main kabulünden geçti. Aşağıdaki66 işlem P03–P07 kapsamındadır.
+Kabul edilmiş main P02 kaynağında133 runtime/66 contract_only kalır. P03 dalında7 API uygulandı,140 runtime/59 contract_only; hedefli/aday/main kabulü ayrıdır. P04–P07 toplam59 işlem uygulama bekler.
 
-| Modül | Kalan işlem |
+| Teslim | Kalan işlem |
 |---|---:|
-| M01 | 5 |
-| M02 | 7 |
-| M03 | 3 |
-| M04 | 2 |
-| M07 | 5 |
-| M08 | 2 |
-| M09 | 11 |
-| M10 | 3 |
-| M11 | 3 |
-| M12 | 5 |
-| M14 | 5 |
-| X | 15 |
+| P04 | 11 |
+| P05 | 13 |
+| P06 | 13 |
+| P07 | 22 |
 
 | İşlem | İzin |
 |---|---|
@@ -71,13 +63,6 @@ P02’nin15 API’si hedefli, aday ve aynı main kabulünden geçti. Aşağıdak
 | person_merge_preview_v1 | person.merge |
 | person_merge_approve_v1 | person.merge |
 | person_merge_apply_v1 | person.merge |
-| sale_refund_preview_v1 | finance.refund |
-| sale_refund_apply_v1 | finance.refund |
-| finance_get_v1 | finance.read |
-| collection_correct_preview_v1 | finance.refund |
-| collection_correct_apply_v1 | finance.refund |
-| instructor_payment_record_v1 | earnings.manage |
-| instructor_payment_correct_v1 | earnings.manage |
 | leads_list_v1 | crm.daily |
 | lead_save_v1 | crm.daily |
 | crm_activity_save_v1 | crm.daily |
