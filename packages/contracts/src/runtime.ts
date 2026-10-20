@@ -132,6 +132,13 @@ export const runtimeOperationNames = [
   "sale_change_preview_v1",
   "sale_change_apply_v1",
   "sale_renew_preview_v1",
-  "sale_renew_apply_v1"
+  "sale_renew_apply_v1",
+  "finance_get_v1",
+  "collection_correct_preview_v1",
+  "collection_correct_apply_v1",
+  "sale_refund_preview_v1",
+  "sale_refund_apply_v1",
+  "instructor_payment_record_v1",
+  "instructor_payment_correct_v1"
 ] as const;
 export type RuntimeOperationName = typeof runtimeOperationNames[number];

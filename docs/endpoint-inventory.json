@@ -2348,8 +2348,8 @@
     },
     {
       "name": "sale_refund_preview_v1",
-      "status": "contract_only",
-      "external_path": null,
+      "status": "operational_development_limited",
+      "external_path": "/functions/v1/backend-v1/sale_refund_preview_v1",
       "permission": "finance.refund",
       "features": [
         "F19"
@@ -2357,10 +2357,12 @@
       "required_features": [
         "F19"
       ],
-      "runtime_required_features": [],
+      "runtime_required_features": [
+        "F19"
+      ],
       "decision_delivery": {
         "accepted_contract": "DS-2026-10-17",
-        "runtime_conformance": "pending",
+        "runtime_conformance": "p03_implemented_acceptance_pending",
         "open_dependencies": [],
         "target_request": {
           "$ref": "#/$defs/Request_sale_refund_preview"
@@ -2371,8 +2373,8 @@
     },
     {
       "name": "sale_refund_apply_v1",
-      "status": "contract_only",
-      "external_path": null,
+      "status": "operational_development_limited",
+      "external_path": "/functions/v1/backend-v1/sale_refund_apply_v1",
       "permission": "finance.refund",
       "features": [
         "F19"
@@ -2380,10 +2382,12 @@
       "required_features": [
         "F19"
       ],
-      "runtime_required_features": [],
+      "runtime_required_features": [
+        "F19"
+      ],
       "decision_delivery": {
         "accepted_contract": "DS-2026-10-17",
-        "runtime_conformance": "pending",
+        "runtime_conformance": "p03_implemented_acceptance_pending",
         "open_dependencies": [],
         "target_request": {
           "$ref": "#/$defs/Request_sale_refund_apply"
@@ -2495,8 +2499,8 @@
     },
     {
       "name": "finance_get_v1",
-      "status": "contract_only",
-      "external_path": null,
+      "status": "operational_development_limited",
+      "external_path": "/functions/v1/backend-v1/finance_get_v1",
       "permission": "finance.read",
       "features": [
         "F06",
@@ -2506,10 +2510,13 @@
         "F06",
         "F19"
       ],
-      "runtime_required_features": [],
+      "runtime_required_features": [
+        "F06",
+        "F19"
+      ],
       "decision_delivery": {
         "accepted_contract": "DS-2026-10-17",
-        "runtime_conformance": "pending",
+        "runtime_conformance": "p03_implemented_acceptance_pending",
         "open_dependencies": [],
         "target_request": {
           "$ref": "#/$defs/Request_finance_get"
@@ -2545,8 +2552,8 @@
     },
     {
       "name": "collection_correct_preview_v1",
-      "status": "contract_only",
-      "external_path": null,
+      "status": "operational_development_limited",
+      "external_path": "/functions/v1/backend-v1/collection_correct_preview_v1",
       "permission": "finance.refund",
       "features": [
         "F19",
@@ -2556,10 +2563,13 @@
         "F19",
         "F33"
       ],
-      "runtime_required_features": [],
+      "runtime_required_features": [
+        "F19",
+        "F33"
+      ],
       "decision_delivery": {
         "accepted_contract": "DS-2026-10-17",
-        "runtime_conformance": "pending",
+        "runtime_conformance": "p03_implemented_acceptance_pending",
         "open_dependencies": [],
         "target_request": {
           "$ref": "#/$defs/Request_collection_correct_preview"
@@ -2570,8 +2580,8 @@
     },
     {
       "name": "collection_correct_apply_v1",
-      "status": "contract_only",
-      "external_path": null,
+      "status": "operational_development_limited",
+      "external_path": "/functions/v1/backend-v1/collection_correct_apply_v1",
       "permission": "finance.refund",
       "features": [
         "F19",
@@ -2581,10 +2591,13 @@
         "F19",
         "F33"
       ],
-      "runtime_required_features": [],
+      "runtime_required_features": [
+        "F19",
+        "F33"
+      ],
       "decision_delivery": {
         "accepted_contract": "DS-2026-10-17",
-        "runtime_conformance": "pending",
+        "runtime_conformance": "p03_implemented_acceptance_pending",
         "open_dependencies": [],
         "target_request": {
           "$ref": "#/$defs/Request_collection_correct_apply"
@@ -2723,8 +2736,8 @@
     },
     {
       "name": "instructor_payment_record_v1",
-      "status": "contract_only",
-      "external_path": null,
+      "status": "operational_development_limited",
+      "external_path": "/functions/v1/backend-v1/instructor_payment_record_v1",
       "permission": "earnings.manage",
       "features": [
         "F20"
@@ -2732,10 +2745,12 @@
       "required_features": [
         "F20"
       ],
-      "runtime_required_features": [],
+      "runtime_required_features": [
+        "F20"
+      ],
       "decision_delivery": {
         "accepted_contract": "DS-2026-10-17",
-        "runtime_conformance": "pending",
+        "runtime_conformance": "p03_implemented_acceptance_pending",
         "open_dependencies": [],
         "target_request": {
           "$ref": "#/$defs/Request_instructor_payment_record"
@@ -2746,8 +2761,8 @@
     },
     {
       "name": "instructor_payment_correct_v1",
-      "status": "contract_only",
-      "external_path": null,
+      "status": "operational_development_limited",
+      "external_path": "/functions/v1/backend-v1/instructor_payment_correct_v1",
       "permission": "earnings.manage",
       "features": [
         "F20",
@@ -2757,10 +2772,13 @@
         "F20",
         "F33"
       ],
-      "runtime_required_features": [],
+      "runtime_required_features": [
+        "F20",
+        "F33"
+      ],
       "decision_delivery": {
         "accepted_contract": "DS-2026-10-17",
-        "runtime_conformance": "pending",
+        "runtime_conformance": "p03_implemented_acceptance_pending",
         "open_dependencies": [],
         "target_request": {
           "$ref": "#/$defs/Request_instructor_payment_correct"

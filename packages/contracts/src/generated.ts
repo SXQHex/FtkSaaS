@@ -314,7 +314,7 @@ export type CashMove = ("collection" | "refund" | "correction_in" | "correction_
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
  * via the `definition` "StudentCreditMove".
  */
-export type StudentCreditMove = ("surplus_add" | "refund_claim_add" | "offset_subtract" | "refund_subtract" | "reverse")
+export type StudentCreditMove = ("surplus_add" | "refund_claim_add" | "offset_subtract" | "refund_subtract" | "reverse" | "correction_subtract")
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
  * via the `definition` "Direction".
@@ -2188,6 +2188,8 @@ SeatOfferView?: SeatOfferView
 WaitlistEntryView?: WaitlistEntryView
 SaleRefundQuote?: SaleRefundQuote
 SaleLifecyclePreviewDetails?: SaleLifecyclePreviewDetails
+P03PaymentCorrectionView?: P03PaymentCorrectionView
+P03PaymentView?: P03PaymentView
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -3384,6 +3386,14 @@ export interface DebtSummary {
 id: string
 due_at: Instant
 remaining_minor: Money
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+center_id?: string
+version?: PositiveInt
+net_minor?: Money
+paid_minor?: Money
+claimed_minor?: Money
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -3398,6 +3408,12 @@ kind: CashMove
 amount_minor: Money
 currency: Currency
 occurred_at: Instant
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+center_id?: string
+version?: PositiveInt
+previous_id?: (string | null)
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -3464,6 +3480,42 @@ previous_id: (string | null)
 closure_id: (string | null)
 created_at: Instant
 version: PositiveInt
+overpaid_minor?: Money
+payments?: P03PaymentView[]
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "P03PaymentView".
+ */
+export interface P03PaymentView {
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+id: string
+version: PositiveInt
+amount_minor: Money
+net_minor: Money
+currency: Currency
+occurred_at: Instant
+corrections: P03PaymentCorrectionView[]
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "P03PaymentCorrectionView".
+ */
+export interface P03PaymentCorrectionView {
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+id: string
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+previous_id: string
+direction: Direction
+amount_minor: Money
+occurred_at: Instant
+reason: Text
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -11633,6 +11685,9 @@ amount_minor: Money
 currency: Currency
 occurred_at: Instant
 reason?: (Text | null)
+previous_id?: (string | null)
+operation_id?: (string | null)
+direction?: Direction
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -11662,6 +11717,7 @@ payment_id: string
  */
 earning_id: string
 amount_minor: Money
+previous_id?: (string | null)
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema

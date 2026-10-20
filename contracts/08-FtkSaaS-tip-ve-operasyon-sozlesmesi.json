@@ -472,7 +472,8 @@
         "refund_claim_add",
         "offset_subtract",
         "refund_subtract",
-        "reverse"
+        "reverse",
+        "correction_subtract"
       ]
     },
     "Direction": {
@@ -3783,6 +3784,21 @@
         },
         "remaining_minor": {
           "$ref": "#/$defs/Money"
+        },
+        "center_id": {
+          "$ref": "#/$defs/FtkUuid"
+        },
+        "version": {
+          "$ref": "#/$defs/PositiveInt"
+        },
+        "net_minor": {
+          "$ref": "#/$defs/Money"
+        },
+        "paid_minor": {
+          "$ref": "#/$defs/Money"
+        },
+        "claimed_minor": {
+          "$ref": "#/$defs/Money"
         }
       },
       "required": [
@@ -3809,6 +3825,22 @@
         },
         "occurred_at": {
           "$ref": "#/$defs/Instant"
+        },
+        "center_id": {
+          "$ref": "#/$defs/FtkUuid"
+        },
+        "version": {
+          "$ref": "#/$defs/PositiveInt"
+        },
+        "previous_id": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/FtkUuid"
+            },
+            {
+              "type": "null"
+            }
+          ]
         }
       },
       "required": [
@@ -3986,6 +4018,15 @@
         },
         "version": {
           "$ref": "#/$defs/PositiveInt"
+        },
+        "overpaid_minor": {
+          "$ref": "#/$defs/Money"
+        },
+        "payments": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/P03PaymentView"
+          }
         }
       },
       "required": [
@@ -20362,6 +20403,29 @@
               "type": "null"
             }
           ]
+        },
+        "previous_id": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/FtkUuid"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "operation_id": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/FtkUuid"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "direction": {
+          "$ref": "#/$defs/Direction"
         }
       },
       "required": [
@@ -20402,6 +20466,16 @@
         },
         "amount_minor": {
           "$ref": "#/$defs/Money"
+        },
+        "previous_id": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/FtkUuid"
+            },
+            {
+              "type": "null"
+            }
+          ]
         }
       },
       "required": [
@@ -41102,6 +41176,77 @@
         "offset_minor"
       ],
       "additionalProperties": false
+    },
+    "P03PaymentCorrectionView": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/FtkUuid"
+        },
+        "previous_id": {
+          "$ref": "#/$defs/FtkUuid"
+        },
+        "direction": {
+          "$ref": "#/$defs/Direction"
+        },
+        "amount_minor": {
+          "$ref": "#/$defs/Money"
+        },
+        "occurred_at": {
+          "$ref": "#/$defs/Instant"
+        },
+        "reason": {
+          "$ref": "#/$defs/Text"
+        }
+      },
+      "required": [
+        "id",
+        "previous_id",
+        "direction",
+        "amount_minor",
+        "occurred_at",
+        "reason"
+      ],
+      "additionalProperties": false
+    },
+    "P03PaymentView": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/FtkUuid"
+        },
+        "version": {
+          "$ref": "#/$defs/PositiveInt"
+        },
+        "amount_minor": {
+          "$ref": "#/$defs/Money"
+        },
+        "net_minor": {
+          "$ref": "#/$defs/Money"
+        },
+        "currency": {
+          "$ref": "#/$defs/Currency"
+        },
+        "occurred_at": {
+          "$ref": "#/$defs/Instant"
+        },
+        "corrections": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/P03PaymentCorrectionView"
+          }
+        }
+      },
+      "required": [
+        "id",
+        "version",
+        "amount_minor",
+        "net_minor",
+        "currency",
+        "occurred_at",
+        "corrections"
+      ],
+      "additionalProperties": false
     }
   },
   "x-contract": {
@@ -53619,31 +53764,34 @@
           "D-A12"
         ],
         "configuration_policy": "numeric plan limits/prices and legal approval are deployment configuration, never arbitrary allow/deny",
-        "implementation_status": "contract_only",
+        "implementation_status": "operational_development_limited",
         "required_features": [
           "F19"
         ],
-        "runtime_required_features": [],
+        "runtime_required_features": [
+          "F19"
+        ],
         "conditional_features": [],
         "operation_contract": {
           "kind": "preview",
           "target_entity": "sales",
           "version_mode": "preview_dependencies",
           "version_field": null,
-          "read_operation": "management_state_get_v1",
+          "read_operation": "entitlements_get_v1",
           "atomic_effects": [],
           "business_commit": false,
-          "read_path_status": "contract_only",
+          "read_path_status": "implemented",
           "source_decision": "DS-2026-10-17"
         },
         "decision_delivery": {
           "accepted_contract": "DS-2026-10-17",
-          "runtime_conformance": "pending",
+          "runtime_conformance": "p03_implemented_acceptance_pending",
           "open_dependencies": [],
           "target_request": {
             "$ref": "#/$defs/Request_sale_refund_preview"
           }
-        }
+        },
+        "runtime_notes": "P03 linked finance implementation; targeted and final source acceptance tracked separately in production-queue."
       },
       {
         "name": "sale_refund_apply_v1",
@@ -53733,11 +53881,13 @@
           "D-A12"
         ],
         "configuration_policy": "numeric plan limits/prices and legal approval are deployment configuration, never arbitrary allow/deny",
-        "implementation_status": "contract_only",
+        "implementation_status": "operational_development_limited",
         "required_features": [
           "F19"
         ],
-        "runtime_required_features": [],
+        "runtime_required_features": [
+          "F19"
+        ],
         "conditional_features": [],
         "operation_contract": {
           "kind": "apply",
@@ -53751,17 +53901,18 @@
             "linked_financial_history"
           ],
           "business_commit": true,
-          "read_path_status": "contract_only",
+          "read_path_status": "implemented",
           "source_decision": "DS-2026-10-17"
         },
         "decision_delivery": {
           "accepted_contract": "DS-2026-10-17",
-          "runtime_conformance": "pending",
+          "runtime_conformance": "p03_implemented_acceptance_pending",
           "open_dependencies": [],
           "target_request": {
             "$ref": "#/$defs/Request_sale_refund_apply"
           }
-        }
+        },
+        "runtime_notes": "P03 linked finance implementation; targeted and final source acceptance tracked separately in production-queue."
       },
       {
         "name": "sale_change_preview_v1",
@@ -54360,12 +54511,15 @@
           "A55"
         ],
         "configuration_policy": "numeric plan limits/prices and legal approval are deployment configuration, never arbitrary allow/deny",
-        "implementation_status": "contract_only",
+        "implementation_status": "operational_development_limited",
         "required_features": [
           "F06",
           "F19"
         ],
-        "runtime_required_features": [],
+        "runtime_required_features": [
+          "F06",
+          "F19"
+        ],
         "conditional_features": [],
         "operation_contract": {
           "kind": "read",
@@ -54380,12 +54534,13 @@
         },
         "decision_delivery": {
           "accepted_contract": "DS-2026-10-17",
-          "runtime_conformance": "pending",
+          "runtime_conformance": "p03_implemented_acceptance_pending",
           "open_dependencies": [],
           "target_request": {
             "$ref": "#/$defs/Request_finance_get"
           }
-        }
+        },
+        "runtime_notes": "P03 linked finance implementation; targeted and final source acceptance tracked separately in production-queue."
       },
       {
         "name": "collection_record_v1",
@@ -54585,32 +54740,36 @@
           "A55"
         ],
         "configuration_policy": "numeric plan limits/prices and legal approval are deployment configuration, never arbitrary allow/deny",
-        "implementation_status": "contract_only",
+        "implementation_status": "operational_development_limited",
         "required_features": [
           "F19",
           "F33"
         ],
-        "runtime_required_features": [],
+        "runtime_required_features": [
+          "F19",
+          "F33"
+        ],
         "conditional_features": [],
         "operation_contract": {
           "kind": "preview",
           "target_entity": "cash_movements",
           "version_mode": "preview_dependencies",
           "version_field": null,
-          "read_operation": "management_state_get_v1",
+          "read_operation": "finance_get_v1",
           "atomic_effects": [],
           "business_commit": false,
-          "read_path_status": "contract_only",
+          "read_path_status": "implemented",
           "source_decision": "DS-2026-10-17"
         },
         "decision_delivery": {
           "accepted_contract": "DS-2026-10-17",
-          "runtime_conformance": "pending",
+          "runtime_conformance": "p03_implemented_acceptance_pending",
           "open_dependencies": [],
           "target_request": {
             "$ref": "#/$defs/Request_collection_correct_preview"
           }
-        }
+        },
+        "runtime_notes": "P03 linked finance implementation; targeted and final source acceptance tracked separately in production-queue."
       },
       {
         "name": "collection_correct_apply_v1",
@@ -54696,12 +54855,15 @@
           "A55"
         ],
         "configuration_policy": "numeric plan limits/prices and legal approval are deployment configuration, never arbitrary allow/deny",
-        "implementation_status": "contract_only",
+        "implementation_status": "operational_development_limited",
         "required_features": [
           "F19",
           "F33"
         ],
-        "runtime_required_features": [],
+        "runtime_required_features": [
+          "F19",
+          "F33"
+        ],
         "conditional_features": [],
         "operation_contract": {
           "kind": "correction",
@@ -54715,17 +54877,18 @@
             "student_credit_if_overpaid"
           ],
           "business_commit": true,
-          "read_path_status": "contract_only",
+          "read_path_status": "implemented",
           "source_decision": "DS-2026-10-17"
         },
         "decision_delivery": {
           "accepted_contract": "DS-2026-10-17",
-          "runtime_conformance": "pending",
+          "runtime_conformance": "p03_implemented_acceptance_pending",
           "open_dependencies": [],
           "target_request": {
             "$ref": "#/$defs/Request_collection_correct_apply"
           }
-        }
+        },
+        "runtime_notes": "P03 linked finance implementation; targeted and final source acceptance tracked separately in production-queue."
       },
       {
         "name": "student_credit_refund_v1",
@@ -55378,34 +55541,37 @@
           "A55"
         ],
         "configuration_policy": "numeric plan limits/prices and legal approval are deployment configuration, never arbitrary allow/deny",
-        "implementation_status": "contract_only",
+        "implementation_status": "operational_development_limited",
         "required_features": [
           "F20"
         ],
-        "runtime_required_features": [],
+        "runtime_required_features": [
+          "F20"
+        ],
         "conditional_features": [],
         "operation_contract": {
           "kind": "command",
           "target_entity": "instructor_payments",
           "version_mode": "append_or_current_scope_lock",
           "version_field": null,
-          "read_operation": "management_state_get_v1",
+          "read_operation": "earnings_list_v1",
           "atomic_effects": [
             "instructor_payments",
             "earning_allocations.partial"
           ],
           "business_commit": true,
-          "read_path_status": "contract_only",
+          "read_path_status": "implemented",
           "source_decision": "DS-2026-10-17"
         },
         "decision_delivery": {
           "accepted_contract": "DS-2026-10-17",
-          "runtime_conformance": "pending",
+          "runtime_conformance": "p03_implemented_acceptance_pending",
           "open_dependencies": [],
           "target_request": {
             "$ref": "#/$defs/Request_instructor_payment_record"
           }
-        }
+        },
+        "runtime_notes": "P03 linked finance implementation; targeted and final source acceptance tracked separately in production-queue."
       },
       {
         "name": "instructor_payment_correct_v1",
@@ -55490,35 +55656,39 @@
           "A55"
         ],
         "configuration_policy": "numeric plan limits/prices and legal approval are deployment configuration, never arbitrary allow/deny",
-        "implementation_status": "contract_only",
+        "implementation_status": "operational_development_limited",
         "required_features": [
           "F20",
           "F33"
         ],
-        "runtime_required_features": [],
+        "runtime_required_features": [
+          "F20",
+          "F33"
+        ],
         "conditional_features": [],
         "operation_contract": {
           "kind": "correction",
           "target_entity": "instructor_payments",
           "version_mode": "row_version",
           "version_field": "payment_id",
-          "read_operation": "management_state_get_v1",
+          "read_operation": "earnings_list_v1",
           "atomic_effects": [
             "instructor_payments.linked_correction",
             "earning_allocations.linked_adjustment"
           ],
           "business_commit": true,
-          "read_path_status": "contract_only",
+          "read_path_status": "implemented",
           "source_decision": "DS-2026-10-17"
         },
         "decision_delivery": {
           "accepted_contract": "DS-2026-10-17",
-          "runtime_conformance": "pending",
+          "runtime_conformance": "p03_implemented_acceptance_pending",
           "open_dependencies": [],
           "target_request": {
             "$ref": "#/$defs/Request_instructor_payment_correct"
           }
-        }
+        },
+        "runtime_notes": "P03 linked finance implementation; targeted and final source acceptance tracked separately in production-queue."
       },
       {
         "name": "leads_list_v1",

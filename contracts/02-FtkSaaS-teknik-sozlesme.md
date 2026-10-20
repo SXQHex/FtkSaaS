@@ -699,3 +699,9 @@ Ayrı request_window, talep create/alternatif offer/accept sırasında etkin org
 ### P02 geliştirme aktarımı — 20 Ekim 2026
 
 PR #28 Draft/development içinde15 API uygulama adayıdır; hedefli/aday/main kabulü ayrı beklenir. `entitlements_get_v1` account sürümü/id, satış sürümü/durumu ve freeze kayıtlarını sağlar. `freeze_end_preview_v1` gerekçe ister. `sale_change_preview_v1` bütün gelecek rezervasyonların açık `keep_reservation_ids` ve `cancel_reservation_ids` seçimini, gerekçeyi ve isteğe bağlı açık `offset_minor` tutarını alır. Yeni ürüne uygun olmayan seçili kayıt blocker üretir; aktif gelecek etkinlik kaydı ayrı açık iptal edilmeden ürün değişimi tamamlanmaz. Önizlemede gerçek satış/hak yazarının rollback-only simülasyonu çalışır; kalıcı satış/borç/receipt/katılım üretmez. `Preview.sale_lifecycle` açık tarihler, boşluk/örtüşme ve dondurulmuş iade hesabını gösterir. Sonlandırma ve hak düzeltme otomatik rezervasyon/para işlemi değildir. P03 genel iade uygulaması private.p02_sale_settlements ve bağlı borç/alacak kayıtlarını yeniden alacak üretmemek için tüketmelidir.
+
+## P03 uygulama aktarımı — kabul bekliyor
+
+P03 ilk uygulama dilimi:7 API uygulandı;199/140 runtime/59 contract_only,41 migration. Tahsilat düzeltmesi ve eğitmen ödemesi geçmişi silmeden bağlı fark hareketi kullanır. Paket iadesi satışta sabit yöntemle borç indirimi ve öğrenci alacağıdır; nakit/hak işlemi değildir. P02/P03 önceki hesaplaşması tekrar üretilmez. Hedefli runtime, bağımsız inceleme ve aday/main kabulü açık; Draft/development PR30 korunur.
+
+CashCorrection.amount_minor yeni toplam değil, direction yönünde açık farktır. Tahsilat artışı özgün borç kapsamını korur; azalış kaynak alacağı ve dağıtımlarını geri alır, harcanmış alacağı silemez. Genel iade hak veya rezervasyonu değiştirmez. Eğitmen düzeltmesi kök ödeme ve earnings_list içindeki güncel payment version ister.
