@@ -1,26 +1,8 @@
 # FtkSaaS — güncel entegrasyon devri
 
-P02 PR #28 Draft/development: bütün15 API uygulama adayı, 199 / 133 runtime / 66 contract_only / 40 migration. Hedefli39443588849 test beklentisini,39444715078 özgün etki yetkisi/fiziksel tablo adını,39445926760 ortak dependency fonksiyonundaki sale_id parametre/kolon belirsizliğini yakaladı. Düzeltmeler yeni migrationlarda; son kaynakta hedefli doğrulama henüz bekleniyor. Bağımsız inceleme yenilemede gereksiz currency eşitliğini kaldırttı; yalnız ürün değişimi/mahsup aynı currency ister. Son kaynak incelemesi ve bütün P02 için tek aday/main clean açık; P02 done değildir.
+P02 **done**: [PR #28](https://github.com/SXQHex/FtkSaaS/pull/28), kabul edilmiş main `cc4878d09e45204dbc13ccfe1324b38b14548167`. Envanter **199 sözleşme / 133 runtime / 66 contract_only / 40 migration / 90 core tablo**. Son head `35816cc30a9b28e273e94e6cef86e8b402dbaad0` bağımsız incelemeden geçti; [hedefli39448566998](https://github.com/SXQHex/FtkSaaS/actions/runs/39448566998), [aday39455462417](https://github.com/SXQHex/FtkSaaS/actions/runs/39455462417) ve [aynı main39461804543](https://github.com/SXQHex/FtkSaaS/actions/runs/39461804543) completed/success. Full kapsam:96 sözleşme/yönetişim +37 CI politika +27 DB +309 API =469 test düğümü; fail/skipped0. Core, dört izole API shard, toplayıcı,40 migration, seed/health/advisors geçti. Main clean14:43; önceki43:33 hedefli koşu seri tüm-suite fallback kullandı, aynı çalışma profili değildir. Eski başarı yeni kaynağa taşınmaz.
 
-
-
-P02-C uygulandı; hedefli runtime kabulü bekliyor: freeze_preview/apply ve freeze_end_preview/apply. Satış saat dilimindeki açık aralık, plan/ürün/max_days/çakışma/bağımlılık kontrolleri; eski rezervasyonlar aynı allocation ile korunur, dondurulan tarihte yeni hak kullanılamaz. Erken bitirme gerekçeli ve ileri tarihli; yalnız fiilî yerel günler kadar ücretsiz uzatma kalır, paid_days değişmez. 127 runtime / 72 contract_only / 37 migration. Kalan6 satış API açık; aday clean henüz yok.
-
-
-P02-B uygulandı; hedefli runtime doğrulaması bekliyor: credit_adjust/entitlement_extend tam etki tokeniyle, actor/center/reason/change/dependency ve bütün etkilenen kayıt onayıyla atomik çalışır. reservation_impact_apply alternatif tek tüketim yoludur. Kredi düşüşü mevcut allocation/rezervasyonu iptal etmez; kullanılabilir yeni hak negatife düşse de yeni kayıt açılmaz. Uzatma açık ileri tarihli00:00 ve entitlement account sürümü ister; tarihi yoklama/hakediş üretmez. entitlements_get account/sale sürümü ve freeze okuması taşır. 123 runtime / 76 contract_only / 36 migration; kalan10 P02 API açık.
-
-
-P02-A uygulaması PR #28 Draft/development dalında: session_cancel_preview/apply ve replacement_session_create eklendi (121 runtime / 78 contract_only / 35 migration). Önizleme aktör/merkez/token/bağımlılıkları; açık seans iptali hak serbest bırakma, bekleme/teklif kapama ve uygulama içi bildirimle atomiktir. Yerine seans yalnız linked yeni kayıttır. Yeni Auth→Edge→RPC negatif/replay/yarış/rollback testleri eklendi; runtime sonucu henüz doğrulanmadı. Kalan12 P02 API açık; bütün P02 bitmeden aday clean/merge yok.
-
-
-P02 başladı: `feature/p02-package-session-lifecycle`, tek Draft/development PR. Başlangıç main f6afef4bdc4ef1bcbf37697ae771fef04a9fb455 / belge kabulü39440690219 başarılı; runtime tam kabulü0ade787 / 39425915555 ayrı kanıttır. Kuyruktaki15 API tamamlanmadan aday full clean/merge yok; geliştirme commitleri birikimli hedefli doğrulanır. Seans iptali/yerine seans → hak/koruma → dondurma/erken bitirme → sonlandırma/değişim/yenileme sırası; kabul edilmemiş ürün varsayımı yok. Uygulama ve yeni runtime kabulü henüz tamamlanmadı.
-
-CI-02 tamamlandı: PR25 ve dar ölçüm düzeltmesi PR26, açık kaynak bazlı kurulum onaylarıyla main’e alındı. Tam kabul kaynağı `0ade7877cc16fc121095decbc276f2fbc868607e`; [main39425915555](https://github.com/SXQHex/FtkSaaS/actions/runs/39425915555) completed/success: gerçek merge ilişkisi + core + dört API shard + toplayıcı, 462 test düğümü (96 yapı + 37 CI politika + 27 DB + 302 API), sıfır fail/skipped; 34 migration, seed/health/advisors geçti. Main-binding artifact12266003219 source/run/attempt kanıtıdır. P01 ve CI-02 done; P02 son kullanıcı talimatıyla Draft/development olarak başladı. Yeni kaynak kabulü ayrıca doğrulanır.
-
-20 Ekim 2026: son başarılı P01 runtime kabulü main `7577b2f1873c6b1fcf83390bfa94a34374c44082`, 199/118/81 ve 34 migration. P01 birleşti; aynı main clean 39401570751 completed/success kanıtı [güncel devirde](../contracts/00-FtkSaaS-yeni-sohbet-devir.md) yazılıdır; P01 done. CI-02 kapandı; P02 Draft/development geliştirmesinde. [CI-2026-10-20](decisions/CI-2026-10-20.md): dört izole shard, Draft/development ve yalnız-belge clean istisnası kabul edildi; PR25/26 ile main’e kuruldu ve 0ade787 main kabulü tamamlandı. Eski snapshot/hosted sayıları güncel uygulama değildir.
-
-
-Durum ve doğrulanmış kaynak/CI için [tek güncel devir özetini](../contracts/00-FtkSaaS-yeni-sohbet-devir.md) esas alın: 199 sözleşme, 118 çağrılabilir, 81 yalnız sözleşme; 34 migration. Bu belge hosted backend'in aynı seviyeye güncellendiği iddiasını taşımaz; hosted 65 işlem smoke'u tarihsel ve ayrı kanıttır.
+Geliştirme/test Supabase `gwyprhenabtpkbojephw`, aynı kabul edilmiş main `cc4878d09e45204dbc13ccfe1324b38b14548167` kaynağına eşitlendi:40 migration, Edge backend-v1 sürüm2, verify_jwt=true,133 runtime API. Uzak smoke ve geçici fixture temizliği başarılı; ayrıntılar docs/remote-backend-setup.md içindedir. Hosted worker zamanlayıcısı, ortak tenant/kullanıcı kurulumu, frontend gerçek entegrasyonu, yük/restore, dış e-posta ve production kabulü ayrı açık kalır.
 
 [Hesaplaşma entegrasyonu](settlement-handover.md): dokuz yeni API, ayrı A/B yetki kapsamı, yalnız B onayında finansal commit ve bağlı düzeltme.
 
@@ -34,7 +16,7 @@ Durum ve doğrulanmış kaynak/CI için [tek güncel devir özetini](../contract
 
 Transport: POST {API_URL}/functions/v1/backend-v1/{operation}; typed request JSON, Authorization: Bearer Supabase access_token ve apikey: publishable key kullanılır. Yanıt ok/data/trace_id veya ok:false/error zarfıdır. Service-only RPC/core/private doğrudan istemci erişimi değildir. Tekrar gönderimde aynı business işlem anahtarı korunur; sürüm ve önizleme bağımlılıkları yeniden doğrulanır.
 
-Yerel bağlantı: Node 24.19.0, npm ci, npm run dev:start, npm run dev:seed, npm run dev:info. Adres ve publishable key bu checkout'tan alınır; eski Box adresleri ortak ortam değildir. npm run test:clean yalnız izole loopback kabul ortamı içindir. [Hosted kurulum kaydı](remote-backend-setup.md) eski kapsamını korur.
+Yerel bağlantı: Node 24.19.0, npm ci, npm run dev:start, npm run dev:seed, npm run dev:info. Adres ve publishable key bu checkout'tan alınır; eski Box adresleri ortak ortam değildir. npm run test:clean yalnız izole loopback kabul ortamı içindir. [Hosted kurulum kaydı](remote-backend-setup.md) aynı P02 main kaynağının40 migration/Edge2 eşleşmesini ve ayrı smoke kapsamını gösterir.
 
 Frontend gerçek uçtan uca kabulü ve yük/restore açık; mock kabul değildir. Dış e-posta ertelendi; Resend başlatılmaz. Production dağıtımı yapılmaz.
 

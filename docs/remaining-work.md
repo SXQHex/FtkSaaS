@@ -1,33 +1,12 @@
 # Kalan backend işleri
 
-Hedefli39447440608 (d313538):27 DB testi ve P02 seans/hak/sonlandırma-yenileme/değişim/bekleme-iade vakaları geçti. Dondurma vakası, başarılı korunan attendance tüketiminden sonra doğrudan node-pg bigint sonucu "31" ile31 karşılaştırmasında durdu; Number(...) test düzeltmesi eklendi. Runtime kaynağı değişmedi. Yeni head hedefli sonucu, tek aday clean ve main kabulü hâlâ bekler; eski koşu genel başarı değildir.
+P02 **done**: [PR #28](https://github.com/SXQHex/FtkSaaS/pull/28), kabul edilmiş main `cc4878d09e45204dbc13ccfe1324b38b14548167`. Envanter **199 sözleşme / 133 runtime / 66 contract_only / 40 migration / 90 core tablo**. Son head `35816cc30a9b28e273e94e6cef86e8b402dbaad0` bağımsız incelemeden geçti; [hedefli39448566998](https://github.com/SXQHex/FtkSaaS/actions/runs/39448566998), [aday39455462417](https://github.com/SXQHex/FtkSaaS/actions/runs/39455462417) ve [aynı main39461804543](https://github.com/SXQHex/FtkSaaS/actions/runs/39461804543) completed/success. Full kapsam:96 sözleşme/yönetişim +37 CI politika +27 DB +309 API =469 test düğümü; fail/skipped0. Core, dört izole API shard, toplayıcı,40 migration, seed/health/advisors geçti. Main clean14:43; önceki43:33 hedefli koşu seri tüm-suite fallback kullandı, aynı çalışma profili değildir. Eski başarı yeni kaynağa taşınmaz.
 
-
-P02 PR #28 Draft/development: bütün15 API uygulama adayı, 199 / 133 runtime / 66 contract_only / 40 migration. Hedefli39443588849 test beklentisini,39444715078 özgün etki yetkisi/fiziksel tablo adını,39445926760 ortak dependency fonksiyonundaki sale_id parametre/kolon belirsizliğini yakaladı. Düzeltmeler yeni migrationlarda; son kaynakta hedefli doğrulama henüz bekleniyor. Bağımsız inceleme yenilemede gereksiz currency eşitliğini kaldırttı; yalnız ürün değişimi/mahsup aynı currency ister. Son kaynak incelemesi ve bütün P02 için tek aday/main clean açık; P02 done değildir.
-
-
-
-P02-D uygulaması eklendi; hedefli runtime kabulü bekliyor: sale_terminate/change/renew preview/apply. Sonlandırma serbest hakları kapatır; mevcut rezervasyon ve borç/finans geçmişi korunur. Değişimde bütün gelecek rezervasyonlar açık keep/cancel seçimiyle kapsanır; yeni hak yeterliliği rollback-only simülasyonla önizlenir. Sabit eski iade yöntemi önce borcu azaltır, tahsil edilmiş kalan öğrenci alacağına geçer; offset_minor açık mahsup, nakit iade yok. Immutable private.p02_sale_settlements alacağı ikinci kez üretmeyi engeller; P03 iadesi bunu ve debt/claim hareketlerini hesaba katmalıdır. Yenileme linked yeni satıştır; eski süre/kredi/kayıt taşınmaz, gap/overlap gösterilir, mevcut consumed→reserved deficit kapatma yolu yeniden kullanılır. 133 runtime / 66 contract_only / 38 migration; uygulama listesi15/15, hedefli test ve son inceleme açık. Draft/development korunuyor; aday full clean henüz yok.
-
-
-P02-C uygulandı; hedefli runtime kabulü bekliyor: freeze_preview/apply ve freeze_end_preview/apply. Satış saat dilimindeki açık aralık, plan/ürün/max_days/çakışma/bağımlılık kontrolleri; eski rezervasyonlar aynı allocation ile korunur, dondurulan tarihte yeni hak kullanılamaz. Erken bitirme gerekçeli ve ileri tarihli; yalnız fiilî yerel günler kadar ücretsiz uzatma kalır, paid_days değişmez. 127 runtime / 72 contract_only / 37 migration. Kalan6 satış API açık; aday clean henüz yok.
-
-
-P02-B uygulandı; hedefli runtime doğrulaması bekliyor: credit_adjust/entitlement_extend tam etki tokeniyle, actor/center/reason/change/dependency ve bütün etkilenen kayıt onayıyla atomik çalışır. reservation_impact_apply alternatif tek tüketim yoludur. Kredi düşüşü mevcut allocation/rezervasyonu iptal etmez; kullanılabilir yeni hak negatife düşse de yeni kayıt açılmaz. Uzatma açık ileri tarihli00:00 ve entitlement account sürümü ister; tarihi yoklama/hakediş üretmez. entitlements_get account/sale sürümü ve freeze okuması taşır. 123 runtime / 76 contract_only / 36 migration; kalan10 P02 API açık.
-
-
-P02-A uygulaması PR #28 Draft/development dalında: session_cancel_preview/apply ve replacement_session_create eklendi (121 runtime / 78 contract_only / 35 migration). Önizleme aktör/merkez/token/bağımlılıkları; açık seans iptali hak serbest bırakma, bekleme/teklif kapama ve uygulama içi bildirimle atomiktir. Yerine seans yalnız linked yeni kayıttır. Yeni Auth→Edge→RPC negatif/replay/yarış/rollback testleri eklendi; runtime sonucu henüz doğrulanmadı. Kalan12 P02 API açık; bütün P02 bitmeden aday clean/merge yok.
-
-
-P02 başladı: `feature/p02-package-session-lifecycle`, tek Draft/development PR. Başlangıç main f6afef4bdc4ef1bcbf37697ae771fef04a9fb455 / belge kabulü39440690219 başarılı; runtime tam kabulü0ade787 / 39425915555 ayrı kanıttır. Kuyruktaki15 API tamamlanmadan aday full clean/merge yok; geliştirme commitleri birikimli hedefli doğrulanır. Seans iptali/yerine seans → hak/koruma → dondurma/erken bitirme → sonlandırma/değişim/yenileme sırası; kabul edilmemiş ürün varsayımı yok. Uygulama ve yeni runtime kabulü henüz tamamlanmadı.
-
-CI-02 tamamlandı: PR25 ve dar ölçüm düzeltmesi PR26, açık kaynak bazlı kurulum onaylarıyla main’e alındı. Tam kabul kaynağı `0ade7877cc16fc121095decbc276f2fbc868607e`; [main39425915555](https://github.com/SXQHex/FtkSaaS/actions/runs/39425915555) completed/success: gerçek merge ilişkisi + core + dört API shard + toplayıcı, 462 test düğümü (96 yapı + 37 CI politika + 27 DB + 302 API), sıfır fail/skipped; 34 migration, seed/health/advisors geçti. Main-binding artifact12266003219 source/run/attempt kanıtıdır. P01 ve CI-02 done; P02 son kullanıcı talimatıyla Draft/development olarak başladı. Yeni kaynak kabulü ayrıca doğrulanır.
-
-P01 runtime kabul kaynağı main `7577b2f1873c6b1fcf83390bfa94a34374c44082`: **199 işlem / 118 çağrılabilir / 81 yalnız sözleşme / 34 migration**. [Tek devir](../contracts/00-FtkSaaS-yeni-sohbet-devir.md) gerçek hedefli/aday ve aynı main completed/success sonuçlarını gösterir. P01 PR #22 birleşti; eski A/B/C runtime ve merge bekleme notları güncel açık değildir. P01 ve CI-02 main kabulü tamamlandı; sonraki kaynak ayrıca doğrulanır.
+Geliştirme/test Supabase `gwyprhenabtpkbojephw`, aynı kabul edilmiş main `cc4878d09e45204dbc13ccfe1324b38b14548167` kaynağına eşitlendi:40 migration, Edge backend-v1 sürüm2, verify_jwt=true,133 runtime API. Uzak smoke ve geçici fixture temizliği başarılı; ayrıntılar docs/remote-backend-setup.md içindedir. Hosted worker zamanlayıcısı, ortak tenant/kullanıcı kurulumu, frontend gerçek entegrasyonu, yük/restore, dış e-posta ve production kabulü ayrı açık kalır.
 
 ## Aktif seri üretim
 
-**CI-02 kapandı.** P02–P07 sırada; P02 Draft/development geliştirmesinde. [Tek kuyruk](production-queue.md) sıralama ve prompt kaynağıdır; [CI-2026-10-20](decisions/CI-2026-10-20.md) dört izole shard, Draft/development ve belge-only kabulünün gerçek main kabulünü ve kapanış kanıtlarını belirtir. Belge-only yolu main’e kuruldu; yeni kaynak kabulünün yerine eski başarı taşınmaz.
+**P01, CI-02 ve P02 kapandı.** P03–P07 toplam66 contract_only işlem sırada. [Tek kuyruk](production-queue.md) sıralama ve prompt kaynağıdır; [CI-2026-10-20](decisions/CI-2026-10-20.md) dört izole shard, Draft/development ve belge-only kabulünün gerçek main kabulünü ve kapanış kanıtlarını belirtir. Belge-only yolu main’e kuruldu; yeni kaynak kabulünün yerine eski başarı taşınmaz.
 
 [P01 devri](p01-handover.md): katalog/hak okuması, talep/alternatif/onay, bekleme/teklif/expiry ve gerçek dar worker döngüsü uygulandı. Genel belge upload/yayın/kabul ve bildirim API'leri P05'te açıktır; mevcut yayımlanmış rezervasyon gerekliliklerinin dar tüketicisi bunları kapatmaz. Hosted worker provisioning/işletim kabulü CI'daki gerçek CLI/loop testinden ayrıdır.
 
@@ -46,15 +25,15 @@ Kalan delivery_gaps ve vaka bazlı durumlar [08 makine sözleşmesi](../contract
 1. Uygunluk/politika dört API uygulandı; tüketici sınırları ve eksik iş akışları Claude devrindeki güncel bölümde açıkça ayrılır. Son PR SHA kabulü CI ile ayrıca doğrulanır.
 2. Ürün kataloğu, seans bağlamında uygun satın alınmış hak seçimi ve talep–bekleme–yer teklifi yaşam döngüleri P01 PR #22 ile uygulandı; program/seans yedi komutu PR #12 ile, Starter uyarlaması PR #14 ve anlaşma yayını PR #15 ile uygulandı; kalan tüketiciler ilgili devirlerde belirtilir. Üç program okuması uygulandı; sınırlar okuma devrindedir.
 3. Starter ve Pro/Business yoklama/kapanış/bağlı düzeltme ile ücretli anlaşma/hakediş uygulandı. Otomatik başlangıç gözlemi, belge ve diğer hak değişikliği koruma tüketicileri açık.
-4. Paket dondurma/uzatma/değişim/yenileme/sonlandırma ve finans düzeltme/iade önizleme–uygulama çiftleri.
+4. P02 paket dondurma/uzatma/değişim/yenileme/sonlandırma tamamlandı; P03 finans düzeltme/iade çiftleri açık. Genel iade private.p02_sale_settlements ve önceki borç/alacak hareketlerini tüketmeli.
 5. Hesap erişimi geri alma, hesap/organizasyon kapanış/silme ve kişi birleştirme.
 6. CRM, bildirim tercihleri, belgeler, raporlar, import ve worker işlemleri.
 
-Her yeni runtime/CI grubu: sözleşme/izin incelemesi → gerekli yeni migration → geliştirmede hedefli gerçek Auth/API kabulü (sınır, yetki, tekrar, yarış, rollback) → son inceleme → açık aday full clean → merge → main full clean. Güvenli yalnız-belge kabul yolu CI-02 içinde ayrıca uygulanacaktır. Ürün kararında boşluk varsa teknik varsayımla yeni kural eklenmez.
+Her yeni runtime/CI grubu: sözleşme/izin incelemesi → gerekli yeni migration → geliştirmede hedefli gerçek Auth/API kabulü (sınır, yetki, tekrar, yarış, rollback) → son inceleme → açık aday full clean → merge → main full clean. Güvenli yalnız-belge kabul yolu CI-02 ile kuruldu; full clean’den ayrı kaynak bağlı kabul kullanır. Ürün kararında boşluk varsa teknik varsayımla yeni kural eklenmez.
 
-## Yalnız sözleşme envanteri — dalda 66 işlem
+## Yalnız sözleşme envanteri — kabul edilmiş main’de 66 işlem
 
-P02’nin15 API’si uygulama adayıdır; hedefli/aday/main kabulü bekler. Aşağıdaki liste dalın runtime envanteridir, main kabulü değildir.
+P02’nin15 API’si hedefli, aday ve aynı main kabulünden geçti. Aşağıdaki66 işlem P03–P07 kapsamındadır.
 
 | Modül | Kalan işlem |
 |---|---:|
@@ -151,3 +130,7 @@ Bu maddeler ve yalnız sözleşme işlemleri kapanmış sayılmaz. Frontend tasa
 
 [P01 devri](p01-handover.md): uygulama main’de; gerçek main sonucu ve hosted worker işletim sınırı güncel devirde ayrıdır.
 
+
+## Geliştirme CI süresi
+
+P02 kaynak modülleri hedefli profil haritasında tanımlı olmadığı için39448566998 güvenli fallback ile15 API suite’inin tamamını seri çalıştırdı (43:33). Dar ve kanıtlı P02 seçici profili ayrı CI bakımı olarak açıktır; güvenilir politika kurulumu için önceki tek seferlik izinler yeniden kullanılamaz. Test kapsamını azaltmak veya hosted smoke’u full clean yerine geçirmek çözüm değildir.

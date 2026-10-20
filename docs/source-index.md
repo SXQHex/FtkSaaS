@@ -1,11 +1,8 @@
 # FtkSaaS kaynak indeksi
 
-P02 tek Draft/development PR #28 üzerinde: feature/p02-package-session-lifecycle;15 API uygulama adayı (133 runtime /66 contract_only /40 migration). Başlangıç main f6afef4 / belge kabulü39440690219, runtime kabulü0ade787 /39425915555 ayrı kanıtlardır. Son hedefli doğrulama ve bağımsız inceleme bitmeden aday clean/merge yok; bütün P02 için tek son aday clean kullanılacak. Durum/kanıt/sınırlar docs/p02-handover.md ve üretim kuyruğunda; P02 done değildir.
+P02 **done**: [PR #28](https://github.com/SXQHex/FtkSaaS/pull/28), kabul edilmiş main `cc4878d09e45204dbc13ccfe1324b38b14548167`. Envanter **199 sözleşme / 133 runtime / 66 contract_only / 40 migration / 90 core tablo**. Son head `35816cc30a9b28e273e94e6cef86e8b402dbaad0` bağımsız incelemeden geçti; [hedefli39448566998](https://github.com/SXQHex/FtkSaaS/actions/runs/39448566998), [aday39455462417](https://github.com/SXQHex/FtkSaaS/actions/runs/39455462417) ve [aynı main39461804543](https://github.com/SXQHex/FtkSaaS/actions/runs/39461804543) completed/success. Full kapsam:96 sözleşme/yönetişim +37 CI politika +27 DB +309 API =469 test düğümü; fail/skipped0. Core, dört izole API shard, toplayıcı,40 migration, seed/health/advisors geçti. Main clean14:43; önceki43:33 hedefli koşu seri tüm-suite fallback kullandı, aynı çalışma profili değildir. Eski başarı yeni kaynağa taşınmaz.
 
-CI-02 tamamlandı: PR25 ve dar ölçüm düzeltmesi PR26, açık kaynak bazlı kurulum onaylarıyla main’e alındı. Tam kabul kaynağı `0ade7877cc16fc121095decbc276f2fbc868607e`; [main39425915555](https://github.com/SXQHex/FtkSaaS/actions/runs/39425915555) completed/success: gerçek merge ilişkisi + core + dört API shard + toplayıcı, 462 test düğümü (96 yapı + 37 CI politika + 27 DB + 302 API), sıfır fail/skipped; 34 migration, seed/health/advisors geçti. Main-binding artifact12266003219 source/run/attempt kanıtıdır. P01 ve CI-02 done; P02 son kullanıcı talimatıyla Draft/development olarak başladı. Yeni kaynak kabulü ayrıca doğrulanır.
-
-20 Ekim 2026: son başarılı P01 runtime kabulü main `7577b2f1873c6b1fcf83390bfa94a34374c44082`, 199/118/81 ve 34 migration. P01 birleşti; aynı main clean 39401570751 completed/success kanıtı [güncel devirde](../contracts/00-FtkSaaS-yeni-sohbet-devir.md) yazılıdır; P01 done. CI-02 kapandı; P02 Draft/development geliştirmesinde. [CI-2026-10-20](decisions/CI-2026-10-20.md): dört izole shard, Draft/development ve yalnız-belge clean istisnası kabul edildi; PR25/26 ile main’e kuruldu ve 0ade787 main kabulü tamamlandı. Eski snapshot/hosted sayıları güncel uygulama değildir.
-
+Geliştirme/test Supabase `gwyprhenabtpkbojephw`, aynı kabul edilmiş main `cc4878d09e45204dbc13ccfe1324b38b14548167` kaynağına eşitlendi:40 migration, Edge backend-v1 sürüm2, verify_jwt=true,133 runtime API. Uzak smoke ve geçici fixture temizliği başarılı; ayrıntılar docs/remote-backend-setup.md içindedir. Hosted worker zamanlayıcısı, ortak tenant/kullanıcı kurulumu, frontend gerçek entegrasyonu, yük/restore, dış e-posta ve production kabulü ayrı açık kalır.
 
 Repository’nin güncel dalı `main`dir. Başlarken GitHub main SHA’sını ve aynı SHA’nın CI’ını doğrulayın; bu dosyalardaki son doğrulanmış snapshot yeni commit’e otomatik başarı vermez. Yerel/ZIP kopyaları alındıkları SHA’nın snapshot’ıdır. İkinci belge ağacı kullanılmaz.
 
@@ -24,7 +21,7 @@ Güncel uygulama SHA/CI ve teslim durumu için [tek devir özeti](../contracts/0
 | 7 | [03 sorumluluklar](../contracts/03-FtkSaaS-kodlama-sorumluluklari.md) | Backend/frontend alan sahipliği; güncel çalışma düzeni kök AGENTS’ta |
 | 8 | [04 şema](../contracts/04-FtkSaaS-O4-veri-semasi.md), [05 API](../contracts/05-FtkSaaS-O4-API-katalogu.md), [06 durum/hata/izin](../contracts/06-FtkSaaS-O4-durum-hata-izin.md) | Fiziksel/API sözlükleri; kesin DDL supabase/migrations, işlem tipleri 08 |
 | 9 | [08 makine sözleşmesi](../contracts/08-FtkSaaS-tip-ve-operasyon-sozlesmesi.json) | Tipler, işlem/izin/guard ve implementation_status; katalog varlığı runtime kabulü değildir |
-| 10 | [Endpoint envanteri](endpoint-inventory.json), [runtime listesi](../supabase/functions/backend-v1/implemented.json) | Üretilmiş 199 işlem envanteri ve 118 çağrılabilir işlem; 81 contract_only |
+| 10 | [Endpoint envanteri](endpoint-inventory.json), [runtime listesi](../supabase/functions/backend-v1/implemented.json) | Üretilmiş 199 işlem envanteri ve 133 çağrılabilir işlem; 66 contract_only |
 
 ## Kabul edilmiş kararlar
 
@@ -32,7 +29,7 @@ Son açık kullanıcı kararı üstündür; sonraki kabul yalnız çelişen hük
 
 ## Kanıtlar ve tarihsel kayıtlar
 
-[Uzak backend kurulumu](remote-backend-setup.md) ve [smoke raporu](../reports/remote-backend-verification.json) bağlantı/erişim kanıtıdır; temiz CI’daki 181 testi uzak projede tekrar etmez. Geliştirici beyanı, repository raporu ve bağımsız CI sonucu farklı kanıt türleridir. Tam kaynak SHA’sı ve test kapsamı birlikte okunur.
+[Uzak backend kurulumu](remote-backend-setup.md) güncel40 migration/Edge2 smoke kanıtını taşır; [eski smoke raporu](../reports/remote-backend-verification.json)22 migration/65 API snapshot’ıdır. Güncel uzak smoke469 testlik CI’ın tekrarı değildir. Geliştirici beyanı, repository raporu ve bağımsız CI sonucu farklı kanıt türleridir. Tam kaynak SHA’sı ve test kapsamı birlikte okunur.
 
 [Oda/rol raporu](../reports/room-role-verification.json), [registry raporu](../reports/registry-verification.json), [fiilî başlangıç raporu](../reports/actual-start-verification.json), [Q-E03 raporu](../reports/qe03-verification.json), [Q-E02 raporu](../reports/qe02-verification.json), [Q-E01 raporu](../reports/qe01-verification.json) ait oldukları uygulama snapshot’larının kayıtlarıdır. Son main CI yerine kullanılmaz.
 
@@ -49,7 +46,7 @@ Her uygulama PR’si etkilediği sözleşmeleri, envanteri, kalan işleri ve dev
 [Program/seans devri](program-session-handover.md) yedi yeni komutun immutable program, oluşum değişikliği, miras/override, DST, sürüm ve rezervasyon koruma sözleşmesini açıklar. [Kaynak raporu](../reports/program-session-verification.json) geliştirme kanıtıdır; son head temiz CI ayrıca denetlenir.
 
 
-[DS-2026-10-17](decisions/DS-2026-10-17.md) son kabul edilmiş plan/yoklama, rezervasyon koruması, anlaşma, A→B hesaplaşma ve geçmiş satış hükümleridir. [Sprint devri](decision-sprint-handover.md) hedef sözleşme/runtime/kanıt ayrımını; [F01–F33 haritası](feature-delivery.md) ürün–teknik–bağımlılık–uygulama–kabul eşlemesini; [koruma denetimi](branch-protection-review.md) yönetici erişim sınırını belirtir. İlk DS aktarımında 184 başlangıç işlemine 13 sözleşme eklenerek toplam 197 olmuştu; bu tarihsel aktarım sayısıdır. Güncel envanter 199/118/81’tir.
+[DS-2026-10-17](decisions/DS-2026-10-17.md) son kabul edilmiş plan/yoklama, rezervasyon koruması, anlaşma, A→B hesaplaşma ve geçmiş satış hükümleridir. [Sprint devri](decision-sprint-handover.md) hedef sözleşme/runtime/kanıt ayrımını; [F01–F33 haritası](feature-delivery.md) ürün–teknik–bağımlılık–uygulama–kabul eşlemesini; [koruma denetimi](branch-protection-review.md) yönetici erişim sınırını belirtir. İlk DS aktarımında 184 başlangıç işlemine 13 sözleşme eklenerek toplam 197 olmuştu; bu tarihsel aktarım sayısıdır. Güncel envanter 199/133/66’dır.
 
 [Son hesaplaşma yetki/iki taraflı akış kararı](decisions/DS-2026-10-17-settlement-revision.md) önceki OM kayıt/fallback hükümlerini değiştirir. DS-OPEN-01 karar düzeyinde kapalı; DS-OPEN-02 [son merkez bazlı yetki kararıyla](decisions/DS-2026-10-17-settlement-center-scope.md) karar düzeyinde kapalıdır. Aynı hesap ayrı A/B yetkileriyle başvuru/onay yapabilir; farklı hesap şartı ve fallback yoktur. Üç contract-only üçüncü-aşama/düzeltme uç çıkarıldı, üç authority read/set sözleşmesi eklendi; o revizyonun tarihsel toplamı 197/79/118 olarak aynı kalmıştı; güncel toplam değildir. Son revizyon raporu: reports/settlement-center-scope-verification.json; eski SHA raporu/CI yeni head kabulü değildir.
 

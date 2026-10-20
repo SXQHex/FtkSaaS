@@ -1,19 +1,15 @@
 # FtkSaaS sıralı üretim kuyruğu
 
-CI-02 tamamlandı: PR25 ve dar ölçüm düzeltmesi PR26, açık kaynak bazlı kurulum onaylarıyla main’e alındı. Tam kabul kaynağı `0ade7877cc16fc121095decbc276f2fbc868607e`; [main39425915555](https://github.com/SXQHex/FtkSaaS/actions/runs/39425915555) completed/success: gerçek merge ilişkisi + core + dört API shard + toplayıcı, 462 test düğümü (96 yapı + 37 CI politika + 27 DB + 302 API), sıfır fail/skipped; 34 migration, seed/health/advisors geçti. Main-binding artifact12266003219 source/run/attempt kanıtıdır. P01 ve CI-02 done; P02 tek Draft/development PR #28 üzerinde başladı. Yeni kaynak kabulü ayrıca doğrulanır.
+P02 **done**: [PR #28](https://github.com/SXQHex/FtkSaaS/pull/28), kabul edilmiş main `cc4878d09e45204dbc13ccfe1324b38b14548167`. Envanter **199 sözleşme / 133 runtime / 66 contract_only / 40 migration / 90 core tablo**. Son head `35816cc30a9b28e273e94e6cef86e8b402dbaad0` bağımsız incelemeden geçti; [hedefli39448566998](https://github.com/SXQHex/FtkSaaS/actions/runs/39448566998), [aday39455462417](https://github.com/SXQHex/FtkSaaS/actions/runs/39455462417) ve [aynı main39461804543](https://github.com/SXQHex/FtkSaaS/actions/runs/39461804543) completed/success. Full kapsam:96 sözleşme/yönetişim +37 CI politika +27 DB +309 API =469 test düğümü; fail/skipped0. Core, dört izole API shard, toplayıcı,40 migration, seed/health/advisors geçti. Main clean14:43; önceki43:33 hedefli koşu seri tüm-suite fallback kullandı, aynı çalışma profili değildir. Eski başarı yeni kaynağa taşınmaz.
 
-## Şimdi yapılacak iş — 20 Ekim 2026
-
-P01 PR #22 main `7577b2f1873c6b1fcf83390bfa94a34374c44082` ile birleşti. Son hedefli, aday ve aynı main clean 39401570751 başarılıdır; gerçek completed/success ve merged-candidate relation doğrulandı. P01 done. [Kaynak ve kanıt](../contracts/00-FtkSaaS-yeni-sohbet-devir.md), [P01 devri](p01-handover.md).
-
-Son kabul edilmiş main runtime envanteri **199 / 118 çağrılabilir / 81 contract_only / 34 migration**. P02 dalı **133 çağrılabilir / 66 contract_only / 40 migration** uygulama adayıdır; yeni runtime kabulü bekler. Başlangıçtaki 95 sözleşme-only işlemin 14'ü P01 ile uygulandı; kalan P02–P07 toplamı 81'dir. Sayılar ürün tamamlanma yüzdesi değildir.
+Geliştirme/test Supabase `gwyprhenabtpkbojephw`, aynı kabul edilmiş main `cc4878d09e45204dbc13ccfe1324b38b14548167` kaynağına eşitlendi:40 migration, Edge backend-v1 sürüm2, verify_jwt=true,133 runtime API. Uzak smoke ve geçici fixture temizliği başarılı; ayrıntılar docs/remote-backend-setup.md içindedir. Hosted worker zamanlayıcısı, ortak tenant/kullanıcı kurulumu, frontend gerçek entegrasyonu, yük/restore, dış e-posta ve production kabulü ayrı açık kalır.
 
 | Sıra | Teslim | İşlem | Durum | Kanıt / sonraki adım |
 |---|---|---:|---|---|
 | P00 | İlk CI ayrımı | — | done | #19; sonraki Action bakımı #23 kapalı |
 | P01 | Talep, rezervasyon ve bekleme | 14 | done | #22; aday 39327134872 ve aynı main 39401570751 completed/success doğrulandı |
 | CI-02 | Dört shard, bölüm/Draft/development, yalnız-belge kabulü | — | done | #25/#26; main0ade787 / 39425915555 completed/success; 462 test, 34 migration |
-| P02 | Paket ve seans yaşam döngüsü | 15 | in_progress | PR #28 Draft/development;15 API uygulama adayı, son hedefli/inceleme açık, ardından tek aday clean |
+| P02 | Paket ve seans yaşam döngüsü | 15 | done | #28; main cc4878d /39461804543 completed/success;469 test,40 migration; hosted Edge2 eşitlendi |
 | P03 | Finans ve eğitmen ödemeleri | 7 | queued | P02 sonrası |
 | P04 | CRM ve public başvuru | 11 | queued | P03 sonrası |
 | P05 | Belge, bildirim ve otomasyon | 13 | queued | P04 sonrası |
@@ -46,9 +42,12 @@ Bu kural önceki otomatik devam/CI izleme talimatlarını yalnız bekleme davran
 
 ## Ortak üretim promptu
 
+20 Ekim son kullanıcı talimatı: her main birleşmesinin aynı kaynak kabulü doğrulandıktan sonra `gwyprhenabtpkbojephw` FtkSaaS **geliştirme/test** ortamını da o main ile eşitle. Önce migration geçmişi ve içerik eşleşmesini doğrula; yalnız eksik migration’ları sırasıyla uygula, değişen Edge bundle’ını yayımla, JWT/izin kapılarını koru; aynı içerik varsa yeniden kurulum yapmadan eşleşmeyi kaydet. Ardından uzak Auth→Edge→RPC smoke, RLS/EXECUTE ve advisors doğrulaması yap; kaynak SHA/migration/Edge sürümü/sonucu kaydet. Bu, ajanın teslim kapanış adımıdır; otomatik CD workflow’u kurulduğu anlamına gelmez. Production yetkisi değildir. Testler yalnız ayrılmış sentetik verilerle yapılır; mevcut gerçek veriyi reset etme. `npm run test:clean` loopback kabulünde kalır; hosted smoke onun yerine geçmez. Full clean çalışırken izleme/yayın devamı durur; kullanıcı dönüşünde gerçek main kabulü sonrası bu adıma geçilir.
+
+
 Aşağıdaki kurallarla sıradaki açık teslimi uygula; kullanıcı her teslim için yeniden “devam” demek zorunda değildir. **Full clean bekleme noktasında kullanıcıya devir bunun açık istisnasıdır.**
 
-- Bölümün Draft/development, açık son aday ve yalnız-belge kuralları için CI-2026-10-20 kararını uygula; otomasyonun henüz kurulmadığını kontrol et.
+- Bölümün Draft/development, açık son aday ve yalnız-belge kuralları için CI-2026-10-20 kararını uygula; kurulmuş otomasyonun güncel kaynakta bu kuralları koruduğunu doğrula.
 - AGENTS.md ve docs/source-index.md okuma sırasını izle; güncel main SHA/CI, PR, ilgili sözleşme/DS kararları ve envanteri doğrula. Kaynak durumunu önceki sohbetten varsayma.
 - Bağımlılık incelemesi → uygulama → hedefli test → bağımsız inceleme → açık son aday full clean → kullanıcıya devir → doğrulanmış merge → main clean → kullanıcıya devir → doğrulanmış kapanış.
 - Rutin teknik karar/uygulama hatasını bağımsız çöz. Yalnız gerçek yeni ürün belirsizliğini somut senaryo/seçenek/etkiyle bildir; clean bekleme dışında bağımsız işleri sürdürebilirsin.
@@ -71,26 +70,9 @@ Aşağıdaki kurallarla sıradaki açık teslimi uygula; kullanıcı her teslim 
 
 PR25 dört izole shard/belge kabulü/Draft-development politikasını kurdu; PR26 skipped optional serial ölçüm hatasını kapattı. Kaynak bazlı bağımsız incelemeler ve açık kurulum onayları alındı. Son aday39423719153 başarılı; aynı actual main0ade7877cc16fc121095decbc276f2fbc868607e / [39425915555](https://github.com/SXQHex/FtkSaaS/actions/runs/39425915555) completed/success: gerçek merge kanıtı, core/dört shard/toplayıcı ve 462 test, 34 migration, seed/health/advisors. CI-02 done; aktif uygulama promptu kaldırıldı. [Devir](ci02-handover.md), [ölçüm](ci-performance.md). Repository yönetim ayarları, production/Resend/frontend/yük-restore ve P02 geliştirmesi bu kapanışa dahil değildir.
 
-### P02 — Paket ve seans yaşam döngüsü
+### P02 — kapanış kaydı
 
-Ortak üretim promptunu uygula. Durum: in_progress; tek Draft/development PR. Bütün P02 bitmeden aday full clean veya merge yok.
-
-**P02-A uygulandı; hedefli runtime kabulü bekliyor:** `session_cancel_preview_v1`, `session_cancel_apply_v1`, `replacement_session_create_v1`.
-
-**P02-B uygulandı; hedefli runtime kabulü bekliyor:** `credit_adjust_v1`, `entitlement_extend_v1`; tam etki onayı tek tüketim.
-
-**P02-C uygulandı; hedefli runtime kabulü bekliyor:** `freeze_preview/apply_v1`, `freeze_end_preview/apply_v1`; kalan6 satış API.
-
-**P02-D uygulandı; hedefli runtime kabulü bekliyor:** `sale_terminate_preview/apply_v1`, `sale_change_preview/apply_v1`, `sale_renew_preview/apply_v1`. Kalan uygulama API’si yok; son bigint test beklentisi düzeltmesi sonrası hedefli kabul, son kaynak incelemesi, bütün P02 için tek aday clean ve main kabulü açık.
-
-**Görev ve kabul:**
-
-Yönetici paket ve seans değişikliklerini önizleyip geçmişi ve kesin rezervasyon korumasını bozmadan uygulayabilsin.
-Son DS kararları eski çelişen hükümlerden üstündür. Korunan rezervasyonu, açık yönetici iptalini ve yeni kayıt koşullarını ayır. Eski freeze/terminate metninden sessiz otomatik iptal yetkisi çıkarma.
-Uzatma, erken dondurma bitişi, bağlantılı yeni satışla değişim ve yenilemenin kabul edilmiş tarih/hak/hesaplaşma kurallarını uygula; otomatik geçmiş canlandırma/hak devri/yeniden rezervasyon üretme.
-Merkez seans iptali öğrenci rezervasyon iptalinden ayrıdır. Yerine seans eskiye bağlı yeni kayıttır; otomatik katılımcı taşıma veya telafi kredisi icat etme.
-Ürün değişiminin parasal hesabı için mevcut finans altyapısını kullan; P03'ün genel iade/tahsilat yönetimini zorunlu olmadıkça ekleme.
-Kabul: önizleme→açık onay→atomik değişiklik→hak/rezervasyon sonucu; çift kullanım, eşzamanlı rezervasyon, stale ve geç hata rollback.
+15 API PR #28 ile kabul edilmiş main cc4878d09e45204dbc13ccfe1324b38b14548167 kaynağına birleşti. Son-head bağımsız inceleme, hedefli39448566998, tek son aday39455462417 ve aynı main39461804543 completed/success doğrulandı;469 test düğümü,40 migration, seed/health/advisors. Hosted geliştirme/test ortamı aynı migration/Edge kaynağına eşitlendi; uzak smoke ayrı geçti. P02 done; aktif prompt kaldırıldı, eski prompt Git geçmişindedir. P03 genel iadesinde immutable private.p02_sale_settlements ve önceki borç/alacak hareketleri zorunlu bağımlılıktır. Hosted worker işletimi, frontend, dış e-posta ve yük/restore kapanmadı.
 
 ### P03 — Finans ve eğitmen ödemeleri
 
