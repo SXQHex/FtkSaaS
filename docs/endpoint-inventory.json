@@ -1360,8 +1360,8 @@
     },
     {
       "name": "session_cancel_preview_v1",
-      "status": "contract_only",
-      "external_path": null,
+      "status": "operational_development_limited",
+      "external_path": "/functions/v1/backend-v1/session_cancel_preview_v1",
       "permission": "schedule.manage",
       "features": [
         "F14"
@@ -1372,7 +1372,7 @@
       "runtime_required_features": [],
       "decision_delivery": {
         "accepted_contract": "DS-2026-10-17",
-        "runtime_conformance": "pending",
+        "runtime_conformance": "p02_session_runtime_pending_acceptance",
         "open_dependencies": [],
         "target_request": {
           "$ref": "#/$defs/Request_session_cancel_preview"
@@ -1383,8 +1383,8 @@
     },
     {
       "name": "session_cancel_apply_v1",
-      "status": "contract_only",
-      "external_path": null,
+      "status": "operational_development_limited",
+      "external_path": "/functions/v1/backend-v1/session_cancel_apply_v1",
       "permission": "schedule.manage",
       "features": [
         "F14"
@@ -1395,7 +1395,7 @@
       "runtime_required_features": [],
       "decision_delivery": {
         "accepted_contract": "DS-2026-10-17",
-        "runtime_conformance": "pending",
+        "runtime_conformance": "p02_session_runtime_pending_acceptance",
         "open_dependencies": [],
         "target_request": {
           "$ref": "#/$defs/Request_session_cancel_apply"
@@ -1406,8 +1406,8 @@
     },
     {
       "name": "replacement_session_create_v1",
-      "status": "contract_only",
-      "external_path": null,
+      "status": "operational_development_limited",
+      "external_path": "/functions/v1/backend-v1/replacement_session_create_v1",
       "permission": "schedule.manage",
       "features": [
         "F14"
@@ -1418,7 +1418,7 @@
       "runtime_required_features": [],
       "decision_delivery": {
         "accepted_contract": "DS-2026-10-17",
-        "runtime_conformance": "pending",
+        "runtime_conformance": "p02_session_runtime_pending_acceptance",
         "open_dependencies": [],
         "target_request": {
           "$ref": "#/$defs/Request_replacement_session_create"
@@ -2115,8 +2115,8 @@
     },
     {
       "name": "entitlement_extend_v1",
-      "status": "contract_only",
-      "external_path": null,
+      "status": "operational_development_limited",
+      "external_path": "/functions/v1/backend-v1/entitlement_extend_v1",
       "permission": "entitlement.correct",
       "features": [
         "F15"
@@ -2127,7 +2127,7 @@
       "runtime_required_features": [],
       "decision_delivery": {
         "accepted_contract": "DS-2026-10-17",
-        "runtime_conformance": "pending",
+        "runtime_conformance": "p02_rights_runtime_pending_acceptance",
         "open_dependencies": [
           "confirmed_reservation_protection"
         ],
@@ -2140,8 +2140,8 @@
     },
     {
       "name": "credit_adjust_v1",
-      "status": "contract_only",
-      "external_path": null,
+      "status": "operational_development_limited",
+      "external_path": "/functions/v1/backend-v1/credit_adjust_v1",
       "permission": "entitlement.correct",
       "features": [
         "F15",
@@ -2154,7 +2154,7 @@
       "runtime_required_features": [],
       "decision_delivery": {
         "accepted_contract": "DS-2026-10-17",
-        "runtime_conformance": "pending",
+        "runtime_conformance": "p02_rights_runtime_pending_acceptance",
         "open_dependencies": [
           "confirmed_reservation_protection"
         ],
@@ -2194,8 +2194,8 @@
     },
     {
       "name": "freeze_preview_v1",
-      "status": "contract_only",
-      "external_path": null,
+      "status": "operational_development_limited",
+      "external_path": "/functions/v1/backend-v1/freeze_preview_v1",
       "permission": "entitlement.correct",
       "features": [
         "F17"
@@ -2203,10 +2203,12 @@
       "required_features": [
         "F17"
       ],
-      "runtime_required_features": [],
+      "runtime_required_features": [
+        "F17"
+      ],
       "decision_delivery": {
         "accepted_contract": "DS-2026-10-17",
-        "runtime_conformance": "pending",
+        "runtime_conformance": "p02_freeze_runtime_pending_acceptance",
         "open_dependencies": [],
         "target_request": {
           "$ref": "#/$defs/Request_freeze_preview"
@@ -2217,8 +2219,8 @@
     },
     {
       "name": "freeze_apply_v1",
-      "status": "contract_only",
-      "external_path": null,
+      "status": "operational_development_limited",
+      "external_path": "/functions/v1/backend-v1/freeze_apply_v1",
       "permission": "entitlement.correct",
       "features": [
         "F17"
@@ -2226,10 +2228,12 @@
       "required_features": [
         "F17"
       ],
-      "runtime_required_features": [],
+      "runtime_required_features": [
+        "F17"
+      ],
       "decision_delivery": {
         "accepted_contract": "DS-2026-10-17",
-        "runtime_conformance": "pending",
+        "runtime_conformance": "p02_freeze_runtime_pending_acceptance",
         "open_dependencies": [
           "confirmed_reservation_protection"
         ],
@@ -2242,8 +2246,8 @@
     },
     {
       "name": "freeze_end_preview_v1",
-      "status": "contract_only",
-      "external_path": null,
+      "status": "operational_development_limited",
+      "external_path": "/functions/v1/backend-v1/freeze_end_preview_v1",
       "permission": "entitlement.correct",
       "features": [
         "F17"
@@ -2251,10 +2255,12 @@
       "required_features": [
         "F17"
       ],
-      "runtime_required_features": [],
+      "runtime_required_features": [
+        "F17"
+      ],
       "decision_delivery": {
         "accepted_contract": "DS-2026-10-17",
-        "runtime_conformance": "pending",
+        "runtime_conformance": "p02_freeze_runtime_pending_acceptance",
         "open_dependencies": [],
         "target_request": {
           "$ref": "#/$defs/Request_freeze_end_preview"
@@ -2265,8 +2271,8 @@
     },
     {
       "name": "freeze_end_apply_v1",
-      "status": "contract_only",
-      "external_path": null,
+      "status": "operational_development_limited",
+      "external_path": "/functions/v1/backend-v1/freeze_end_apply_v1",
       "permission": "entitlement.correct",
       "features": [
         "F17"
@@ -2274,10 +2280,12 @@
       "required_features": [
         "F17"
       ],
-      "runtime_required_features": [],
+      "runtime_required_features": [
+        "F17"
+      ],
       "decision_delivery": {
         "accepted_contract": "DS-2026-10-17",
-        "runtime_conformance": "pending",
+        "runtime_conformance": "p02_freeze_runtime_pending_acceptance",
         "open_dependencies": [],
         "target_request": {
           "$ref": "#/$defs/Request_freeze_end_apply"
@@ -2288,8 +2296,8 @@
     },
     {
       "name": "sale_terminate_preview_v1",
-      "status": "contract_only",
-      "external_path": null,
+      "status": "operational_development_limited",
+      "external_path": "/functions/v1/backend-v1/sale_terminate_preview_v1",
       "permission": "entitlement.correct",
       "features": [
         "F15",
@@ -2302,7 +2310,7 @@
       "runtime_required_features": [],
       "decision_delivery": {
         "accepted_contract": "DS-2026-10-17",
-        "runtime_conformance": "pending",
+        "runtime_conformance": "p02_sale_runtime_pending_acceptance",
         "open_dependencies": [],
         "target_request": {
           "$ref": "#/$defs/Request_sale_terminate_preview"
@@ -2313,8 +2321,8 @@
     },
     {
       "name": "sale_terminate_apply_v1",
-      "status": "contract_only",
-      "external_path": null,
+      "status": "operational_development_limited",
+      "external_path": "/functions/v1/backend-v1/sale_terminate_apply_v1",
       "permission": "entitlement.correct",
       "features": [
         "F15",
@@ -2327,7 +2335,7 @@
       "runtime_required_features": [],
       "decision_delivery": {
         "accepted_contract": "DS-2026-10-17",
-        "runtime_conformance": "pending",
+        "runtime_conformance": "p02_sale_runtime_pending_acceptance",
         "open_dependencies": [
           "confirmed_reservation_protection"
         ],
@@ -2386,8 +2394,8 @@
     },
     {
       "name": "sale_change_preview_v1",
-      "status": "contract_only",
-      "external_path": null,
+      "status": "operational_development_limited",
+      "external_path": "/functions/v1/backend-v1/sale_change_preview_v1",
       "permission": "entitlement.correct",
       "features": [
         "F17",
@@ -2400,7 +2408,7 @@
       "runtime_required_features": [],
       "decision_delivery": {
         "accepted_contract": "DS-2026-10-17",
-        "runtime_conformance": "pending",
+        "runtime_conformance": "p02_sale_runtime_pending_acceptance",
         "open_dependencies": [],
         "target_request": {
           "$ref": "#/$defs/Request_sale_change_preview"
@@ -2411,8 +2419,8 @@
     },
     {
       "name": "sale_change_apply_v1",
-      "status": "contract_only",
-      "external_path": null,
+      "status": "operational_development_limited",
+      "external_path": "/functions/v1/backend-v1/sale_change_apply_v1",
       "permission": "entitlement.correct",
       "features": [
         "F17",
@@ -2425,7 +2433,7 @@
       "runtime_required_features": [],
       "decision_delivery": {
         "accepted_contract": "DS-2026-10-17",
-        "runtime_conformance": "pending",
+        "runtime_conformance": "p02_sale_runtime_pending_acceptance",
         "open_dependencies": [
           "confirmed_reservation_protection",
           "sale_scope_and_backdating"
@@ -2439,8 +2447,8 @@
     },
     {
       "name": "sale_renew_preview_v1",
-      "status": "contract_only",
-      "external_path": null,
+      "status": "operational_development_limited",
+      "external_path": "/functions/v1/backend-v1/sale_renew_preview_v1",
       "permission": "sale.write",
       "features": [
         "F15",
@@ -2452,7 +2460,7 @@
       "runtime_required_features": [],
       "decision_delivery": {
         "accepted_contract": "DS-2026-10-17",
-        "runtime_conformance": "pending",
+        "runtime_conformance": "p02_sale_runtime_pending_acceptance",
         "open_dependencies": [],
         "target_request": {
           "$ref": "#/$defs/Request_sale_renew_preview"
@@ -2463,8 +2471,8 @@
     },
     {
       "name": "sale_renew_apply_v1",
-      "status": "contract_only",
-      "external_path": null,
+      "status": "operational_development_limited",
+      "external_path": "/functions/v1/backend-v1/sale_renew_apply_v1",
       "permission": "sale.write",
       "features": [
         "F15",
@@ -2476,7 +2484,7 @@
       "runtime_required_features": [],
       "decision_delivery": {
         "accepted_contract": "DS-2026-10-17",
-        "runtime_conformance": "pending",
+        "runtime_conformance": "p02_sale_runtime_pending_acceptance",
         "open_dependencies": [],
         "target_request": {
           "$ref": "#/$defs/Request_sale_renew_apply"

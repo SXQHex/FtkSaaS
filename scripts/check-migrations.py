@@ -66,3 +66,15 @@ assert next(Path('supabase/migrations').glob('*_p01_waitlist_workers.sql')).read
 assert next(Path('supabase/migrations').glob('*_p01_worker_transport.sql')).read_text()==Path('database/p01-worker-transport.sql').read_text()+Path('database/p01-worker-transport-wrappers.sql').read_text(),'P01 worker transport source drift'
 
 assert next(Path('supabase/migrations').glob('*_p01_final_scope_guards.sql')).read_text()==Path('database/p01-final-scope-guards.sql').read_text()+Path('database/p01-final-scope-guards-wrappers.sql').read_text(),'P01 final scope guards source drift'
+
+assert next(Path('supabase/migrations').glob('*_p02_sessions.sql')).read_text()==Path('database/p02-sessions.sql').read_text()+Path('database/p02-sessions-wrappers.sql').read_text(),'P02 sessions source drift'
+
+assert next(Path('supabase/migrations').glob('*_p02_entitlement_corrections.sql')).read_text()==Path('database/p02-entitlement-corrections.sql').read_text()+Path('database/p02-entitlement-corrections-wrappers.sql').read_text(),'P02 corrections source drift'
+
+assert next(Path('supabase/migrations').glob('*_p02_freeze_lifecycle.sql')).read_text()==Path('database/p02-freeze-lifecycle.sql').read_text()+Path('database/p02-freeze-lifecycle-wrappers.sql').read_text(),'P02 freeze source drift'
+
+assert next(Path('supabase/migrations').glob('*_p02_sale_lifecycle.sql')).read_text()==Path('database/p02-sale-lifecycle.sql').read_text()+Path('database/p02-sale-lifecycle-wrappers.sql').read_text(),'P02 sales source drift'
+
+assert next(Path('supabase/migrations').glob('*_p02_runtime_guards.sql')).read_text()==Path('database/p02-runtime-guards.sql').read_text()+Path('database/p02-runtime-guards-wrappers.sql').read_text(),'P02 runtime guards source drift'
+
+assert next(Path('supabase/migrations').glob('*_p02_renewal_currency.sql')).read_text()==Path('database/p02-renewal-currency.sql').read_text()+Path('database/p02-renewal-currency-wrappers.sql').read_text(),'P02 renewal currency source drift'

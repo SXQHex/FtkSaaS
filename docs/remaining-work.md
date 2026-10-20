@@ -1,12 +1,33 @@
 # Kalan backend işleri
 
-CI-02 tamamlandı: PR25 ve dar ölçüm düzeltmesi PR26, açık kaynak bazlı kurulum onaylarıyla main’e alındı. Tam kabul kaynağı `0ade7877cc16fc121095decbc276f2fbc868607e`; [main39425915555](https://github.com/SXQHex/FtkSaaS/actions/runs/39425915555) completed/success: gerçek merge ilişkisi + core + dört API shard + toplayıcı, 462 test düğümü (96 yapı + 37 CI politika + 27 DB + 302 API), sıfır fail/skipped; 34 migration, seed/health/advisors geçti. Main-binding artifact12266003219 source/run/attempt kanıtıdır. P01 ve CI-02 done; P02 kullanıcı talimatı gereği henüz başlamadı. Yeni kaynak kabulü ayrıca doğrulanır.
+Hedefli39447440608 (d313538):27 DB testi ve P02 seans/hak/sonlandırma-yenileme/değişim/bekleme-iade vakaları geçti. Dondurma vakası, başarılı korunan attendance tüketiminden sonra doğrudan node-pg bigint sonucu "31" ile31 karşılaştırmasında durdu; Number(...) test düzeltmesi eklendi. Runtime kaynağı değişmedi. Yeni head hedefli sonucu, tek aday clean ve main kabulü hâlâ bekler; eski koşu genel başarı değildir.
+
+
+P02 PR #28 Draft/development: bütün15 API uygulama adayı, 199 / 133 runtime / 66 contract_only / 40 migration. Hedefli39443588849 test beklentisini,39444715078 özgün etki yetkisi/fiziksel tablo adını,39445926760 ortak dependency fonksiyonundaki sale_id parametre/kolon belirsizliğini yakaladı. Düzeltmeler yeni migrationlarda; son kaynakta hedefli doğrulama henüz bekleniyor. Bağımsız inceleme yenilemede gereksiz currency eşitliğini kaldırttı; yalnız ürün değişimi/mahsup aynı currency ister. Son kaynak incelemesi ve bütün P02 için tek aday/main clean açık; P02 done değildir.
+
+
+
+P02-D uygulaması eklendi; hedefli runtime kabulü bekliyor: sale_terminate/change/renew preview/apply. Sonlandırma serbest hakları kapatır; mevcut rezervasyon ve borç/finans geçmişi korunur. Değişimde bütün gelecek rezervasyonlar açık keep/cancel seçimiyle kapsanır; yeni hak yeterliliği rollback-only simülasyonla önizlenir. Sabit eski iade yöntemi önce borcu azaltır, tahsil edilmiş kalan öğrenci alacağına geçer; offset_minor açık mahsup, nakit iade yok. Immutable private.p02_sale_settlements alacağı ikinci kez üretmeyi engeller; P03 iadesi bunu ve debt/claim hareketlerini hesaba katmalıdır. Yenileme linked yeni satıştır; eski süre/kredi/kayıt taşınmaz, gap/overlap gösterilir, mevcut consumed→reserved deficit kapatma yolu yeniden kullanılır. 133 runtime / 66 contract_only / 38 migration; uygulama listesi15/15, hedefli test ve son inceleme açık. Draft/development korunuyor; aday full clean henüz yok.
+
+
+P02-C uygulandı; hedefli runtime kabulü bekliyor: freeze_preview/apply ve freeze_end_preview/apply. Satış saat dilimindeki açık aralık, plan/ürün/max_days/çakışma/bağımlılık kontrolleri; eski rezervasyonlar aynı allocation ile korunur, dondurulan tarihte yeni hak kullanılamaz. Erken bitirme gerekçeli ve ileri tarihli; yalnız fiilî yerel günler kadar ücretsiz uzatma kalır, paid_days değişmez. 127 runtime / 72 contract_only / 37 migration. Kalan6 satış API açık; aday clean henüz yok.
+
+
+P02-B uygulandı; hedefli runtime doğrulaması bekliyor: credit_adjust/entitlement_extend tam etki tokeniyle, actor/center/reason/change/dependency ve bütün etkilenen kayıt onayıyla atomik çalışır. reservation_impact_apply alternatif tek tüketim yoludur. Kredi düşüşü mevcut allocation/rezervasyonu iptal etmez; kullanılabilir yeni hak negatife düşse de yeni kayıt açılmaz. Uzatma açık ileri tarihli00:00 ve entitlement account sürümü ister; tarihi yoklama/hakediş üretmez. entitlements_get account/sale sürümü ve freeze okuması taşır. 123 runtime / 76 contract_only / 36 migration; kalan10 P02 API açık.
+
+
+P02-A uygulaması PR #28 Draft/development dalında: session_cancel_preview/apply ve replacement_session_create eklendi (121 runtime / 78 contract_only / 35 migration). Önizleme aktör/merkez/token/bağımlılıkları; açık seans iptali hak serbest bırakma, bekleme/teklif kapama ve uygulama içi bildirimle atomiktir. Yerine seans yalnız linked yeni kayıttır. Yeni Auth→Edge→RPC negatif/replay/yarış/rollback testleri eklendi; runtime sonucu henüz doğrulanmadı. Kalan12 P02 API açık; bütün P02 bitmeden aday clean/merge yok.
+
+
+P02 başladı: `feature/p02-package-session-lifecycle`, tek Draft/development PR. Başlangıç main f6afef4bdc4ef1bcbf37697ae771fef04a9fb455 / belge kabulü39440690219 başarılı; runtime tam kabulü0ade787 / 39425915555 ayrı kanıttır. Kuyruktaki15 API tamamlanmadan aday full clean/merge yok; geliştirme commitleri birikimli hedefli doğrulanır. Seans iptali/yerine seans → hak/koruma → dondurma/erken bitirme → sonlandırma/değişim/yenileme sırası; kabul edilmemiş ürün varsayımı yok. Uygulama ve yeni runtime kabulü henüz tamamlanmadı.
+
+CI-02 tamamlandı: PR25 ve dar ölçüm düzeltmesi PR26, açık kaynak bazlı kurulum onaylarıyla main’e alındı. Tam kabul kaynağı `0ade7877cc16fc121095decbc276f2fbc868607e`; [main39425915555](https://github.com/SXQHex/FtkSaaS/actions/runs/39425915555) completed/success: gerçek merge ilişkisi + core + dört API shard + toplayıcı, 462 test düğümü (96 yapı + 37 CI politika + 27 DB + 302 API), sıfır fail/skipped; 34 migration, seed/health/advisors geçti. Main-binding artifact12266003219 source/run/attempt kanıtıdır. P01 ve CI-02 done; P02 son kullanıcı talimatıyla Draft/development olarak başladı. Yeni kaynak kabulü ayrıca doğrulanır.
 
 P01 runtime kabul kaynağı main `7577b2f1873c6b1fcf83390bfa94a34374c44082`: **199 işlem / 118 çağrılabilir / 81 yalnız sözleşme / 34 migration**. [Tek devir](../contracts/00-FtkSaaS-yeni-sohbet-devir.md) gerçek hedefli/aday ve aynı main completed/success sonuçlarını gösterir. P01 PR #22 birleşti; eski A/B/C runtime ve merge bekleme notları güncel açık değildir. P01 ve CI-02 main kabulü tamamlandı; sonraki kaynak ayrıca doğrulanır.
 
 ## Aktif seri üretim
 
-**CI-02 kapandı.** P02–P07 sırada; P02 henüz başlamadı. [Tek kuyruk](production-queue.md) sıralama ve prompt kaynağıdır; [CI-2026-10-20](decisions/CI-2026-10-20.md) dört izole shard, Draft/development ve belge-only kabulünün gerçek main kabulünü ve kapanış kanıtlarını belirtir. Belge-only yolu main’e kuruldu; yeni kaynak kabulünün yerine eski başarı taşınmaz.
+**CI-02 kapandı.** P02–P07 sırada; P02 Draft/development geliştirmesinde. [Tek kuyruk](production-queue.md) sıralama ve prompt kaynağıdır; [CI-2026-10-20](decisions/CI-2026-10-20.md) dört izole shard, Draft/development ve belge-only kabulünün gerçek main kabulünü ve kapanış kanıtlarını belirtir. Belge-only yolu main’e kuruldu; yeni kaynak kabulünün yerine eski başarı taşınmaz.
 
 [P01 devri](p01-handover.md): katalog/hak okuması, talep/alternatif/onay, bekleme/teklif/expiry ve gerçek dar worker döngüsü uygulandı. Genel belge upload/yayın/kabul ve bildirim API'leri P05'te açıktır; mevcut yayımlanmış rezervasyon gerekliliklerinin dar tüketicisi bunları kapatmaz. Hosted worker provisioning/işletim kabulü CI'daki gerçek CLI/loop testinden ayrıdır.
 
@@ -31,7 +52,9 @@ Kalan delivery_gaps ve vaka bazlı durumlar [08 makine sözleşmesi](../contract
 
 Her yeni runtime/CI grubu: sözleşme/izin incelemesi → gerekli yeni migration → geliştirmede hedefli gerçek Auth/API kabulü (sınır, yetki, tekrar, yarış, rollback) → son inceleme → açık aday full clean → merge → main full clean. Güvenli yalnız-belge kabul yolu CI-02 içinde ayrıca uygulanacaktır. Ürün kararında boşluk varsa teknik varsayımla yeni kural eklenmez.
 
-## Yalnız sözleşme envanteri — güncel 81 işlem
+## Yalnız sözleşme envanteri — dalda 66 işlem
+
+P02’nin15 API’si uygulama adayıdır; hedefli/aday/main kabulü bekler. Aşağıdaki liste dalın runtime envanteridir, main kabulü değildir.
 
 | Modül | Kalan işlem |
 |---|---:|
@@ -39,8 +62,6 @@ Her yeni runtime/CI grubu: sözleşme/izin incelemesi → gerekli yeni migration
 | M02 | 7 |
 | M03 | 3 |
 | M04 | 2 |
-| M05 | 3 |
-| M06 | 12 |
 | M07 | 5 |
 | M08 | 2 |
 | M09 | 11 |
@@ -67,23 +88,8 @@ Her yeni runtime/CI grubu: sözleşme/izin incelemesi → gerekli yeni migration
 | person_merge_preview_v1 | person.merge |
 | person_merge_approve_v1 | person.merge |
 | person_merge_apply_v1 | person.merge |
-| session_cancel_preview_v1 | schedule.manage |
-| session_cancel_apply_v1 | schedule.manage |
-| replacement_session_create_v1 | schedule.manage |
-| entitlement_extend_v1 | entitlement.correct |
-| credit_adjust_v1 | entitlement.correct |
-| freeze_preview_v1 | entitlement.correct |
-| freeze_apply_v1 | entitlement.correct |
-| freeze_end_preview_v1 | entitlement.correct |
-| freeze_end_apply_v1 | entitlement.correct |
-| sale_terminate_preview_v1 | entitlement.correct |
-| sale_terminate_apply_v1 | entitlement.correct |
 | sale_refund_preview_v1 | finance.refund |
 | sale_refund_apply_v1 | finance.refund |
-| sale_change_preview_v1 | entitlement.correct |
-| sale_change_apply_v1 | entitlement.correct |
-| sale_renew_preview_v1 | sale.write |
-| sale_renew_apply_v1 | sale.write |
 | finance_get_v1 | finance.read |
 | collection_correct_preview_v1 | finance.refund |
 | collection_correct_apply_v1 | finance.refund |

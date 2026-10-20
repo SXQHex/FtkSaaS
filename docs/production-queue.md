@@ -1,19 +1,19 @@
 # FtkSaaS sıralı üretim kuyruğu
 
-CI-02 tamamlandı: PR25 ve dar ölçüm düzeltmesi PR26, açık kaynak bazlı kurulum onaylarıyla main’e alındı. Tam kabul kaynağı `0ade7877cc16fc121095decbc276f2fbc868607e`; [main39425915555](https://github.com/SXQHex/FtkSaaS/actions/runs/39425915555) completed/success: gerçek merge ilişkisi + core + dört API shard + toplayıcı, 462 test düğümü (96 yapı + 37 CI politika + 27 DB + 302 API), sıfır fail/skipped; 34 migration, seed/health/advisors geçti. Main-binding artifact12266003219 source/run/attempt kanıtıdır. P01 ve CI-02 done; P02 kullanıcı talimatı gereği henüz başlamadı. Yeni kaynak kabulü ayrıca doğrulanır.
+CI-02 tamamlandı: PR25 ve dar ölçüm düzeltmesi PR26, açık kaynak bazlı kurulum onaylarıyla main’e alındı. Tam kabul kaynağı `0ade7877cc16fc121095decbc276f2fbc868607e`; [main39425915555](https://github.com/SXQHex/FtkSaaS/actions/runs/39425915555) completed/success: gerçek merge ilişkisi + core + dört API shard + toplayıcı, 462 test düğümü (96 yapı + 37 CI politika + 27 DB + 302 API), sıfır fail/skipped; 34 migration, seed/health/advisors geçti. Main-binding artifact12266003219 source/run/attempt kanıtıdır. P01 ve CI-02 done; P02 tek Draft/development PR #28 üzerinde başladı. Yeni kaynak kabulü ayrıca doğrulanır.
 
 ## Şimdi yapılacak iş — 20 Ekim 2026
 
 P01 PR #22 main `7577b2f1873c6b1fcf83390bfa94a34374c44082` ile birleşti. Son hedefli, aday ve aynı main clean 39401570751 başarılıdır; gerçek completed/success ve merged-candidate relation doğrulandı. P01 done. [Kaynak ve kanıt](../contracts/00-FtkSaaS-yeni-sohbet-devir.md), [P01 devri](p01-handover.md).
 
-Güncel envanter **199 / 118 çağrılabilir / 81 contract_only / 34 migration**. Başlangıçtaki 95 sözleşme-only işlemin 14'ü P01 ile uygulandı; kalan P02–P07 toplamı 81'dir. Sayılar ürün tamamlanma yüzdesi değildir.
+Son kabul edilmiş main runtime envanteri **199 / 118 çağrılabilir / 81 contract_only / 34 migration**. P02 dalı **133 çağrılabilir / 66 contract_only / 40 migration** uygulama adayıdır; yeni runtime kabulü bekler. Başlangıçtaki 95 sözleşme-only işlemin 14'ü P01 ile uygulandı; kalan P02–P07 toplamı 81'dir. Sayılar ürün tamamlanma yüzdesi değildir.
 
 | Sıra | Teslim | İşlem | Durum | Kanıt / sonraki adım |
 |---|---|---:|---|---|
 | P00 | İlk CI ayrımı | — | done | #19; sonraki Action bakımı #23 kapalı |
 | P01 | Talep, rezervasyon ve bekleme | 14 | done | #22; aday 39327134872 ve aynı main 39401570751 completed/success doğrulandı |
 | CI-02 | Dört shard, bölüm/Draft/development, yalnız-belge kabulü | — | done | #25/#26; main0ade787 / 39425915555 completed/success; 462 test, 34 migration |
-| P02 | Paket ve seans yaşam döngüsü | 15 | queued | CI-02 kapandı; kullanıcı talimatıyla henüz başlanmadı |
+| P02 | Paket ve seans yaşam döngüsü | 15 | in_progress | PR #28 Draft/development;15 API uygulama adayı, son hedefli/inceleme açık, ardından tek aday clean |
 | P03 | Finans ve eğitmen ödemeleri | 7 | queued | P02 sonrası |
 | P04 | CRM ve public başvuru | 11 | queued | P03 sonrası |
 | P05 | Belge, bildirim ve otomasyon | 13 | queued | P04 sonrası |
@@ -73,25 +73,15 @@ PR25 dört izole shard/belge kabulü/Draft-development politikasını kurdu; PR2
 
 ### P02 — Paket ve seans yaşam döngüsü
 
-Ortak üretim promptunu uygula. Durum: queued.
+Ortak üretim promptunu uygula. Durum: in_progress; tek Draft/development PR. Bütün P02 bitmeden aday full clean veya merge yok.
 
-**Mevcut sözleşme API'leri (15):**
+**P02-A uygulandı; hedefli runtime kabulü bekliyor:** `session_cancel_preview_v1`, `session_cancel_apply_v1`, `replacement_session_create_v1`.
 
-- `session_cancel_preview_v1`
-- `session_cancel_apply_v1`
-- `replacement_session_create_v1`
-- `entitlement_extend_v1`
-- `credit_adjust_v1`
-- `freeze_preview_v1`
-- `freeze_apply_v1`
-- `freeze_end_preview_v1`
-- `freeze_end_apply_v1`
-- `sale_terminate_preview_v1`
-- `sale_terminate_apply_v1`
-- `sale_change_preview_v1`
-- `sale_change_apply_v1`
-- `sale_renew_preview_v1`
-- `sale_renew_apply_v1`
+**P02-B uygulandı; hedefli runtime kabulü bekliyor:** `credit_adjust_v1`, `entitlement_extend_v1`; tam etki onayı tek tüketim.
+
+**P02-C uygulandı; hedefli runtime kabulü bekliyor:** `freeze_preview/apply_v1`, `freeze_end_preview/apply_v1`; kalan6 satış API.
+
+**P02-D uygulandı; hedefli runtime kabulü bekliyor:** `sale_terminate_preview/apply_v1`, `sale_change_preview/apply_v1`, `sale_renew_preview/apply_v1`. Kalan uygulama API’si yok; son bigint test beklentisi düzeltmesi sonrası hedefli kabul, son kaynak incelemesi, bütün P02 için tek aday clean ve main kabulü açık.
 
 **Görev ve kabul:**
 
