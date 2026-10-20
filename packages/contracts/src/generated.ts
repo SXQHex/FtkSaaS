@@ -11693,7 +11693,7 @@ occurred_at: Instant
 reason?: (Text | null)
 previous_id?: (string | null)
 operation_id?: (string | null)
-direction?: Direction
+direction: Direction
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema

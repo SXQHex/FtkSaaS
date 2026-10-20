@@ -1,6 +1,6 @@
 # Kalan backend işleri
 
-P03 ilk uygulama dilimi:7 API uygulandı; dal envanteri199/140 runtime/59 contract_only,46 migration. Tahsilat düzeltmesi ve eğitmen ödemesi geçmişi silmeden bağlı fark hareketi kullanır. Paket iadesi satışta sabit yöntemle borç indirimi ve öğrenci alacağıdır; nakit/hak işlemi değildir. P02/P03 önceki hesaplaşması tekrar üretilmez. Hedefli runtime, bağımsız son inceleme ve aday/main kabulü açık; Draft/development PR30 korunur.
+P03 ilk uygulama dilimi:7 API uygulandı; dal envanteri199/140 runtime/59 contract_only,47 migration. Tahsilat düzeltmesi ve eğitmen ödemesi geçmişi silmeden bağlı fark hareketi kullanır. Paket iadesi satışta sabit yöntemle borç indirimi ve öğrenci alacağıdır; nakit/hak işlemi değildir. P02/P03 önceki hesaplaşması tekrar üretilmez. Hedefli runtime, bağımsız son inceleme ve aday/main kabulü açık; Draft/development PR30 korunur.
 
 P03 başladı: tek feature/p03-finance-payments Draft/development PR,7 API. Başlangıç main ce95a9d0d960a201b0488071802dc5db7741caf1 / belge kabulü39487599217; P02 runtime kabulü ve hosted eşleşmesi korunur. Uygulama ve yeni runtime kabulü açık; bütün P03 sonunda tek aday clean alınır.
 

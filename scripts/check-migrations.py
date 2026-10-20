@@ -98,3 +98,5 @@ assert next(Path('supabase/migrations').glob('*_p03_finance_scope.sql')).read_te
 assert next(Path('supabase/migrations').glob('*_p03_finance_balances.sql')).read_text()==Path('database/p03-finance-balances.sql').read_text(),'P03 source drift p03_finance_balances'
 
 assert next(Path('supabase/migrations').glob('*_p03_finance_results.sql')).read_text()==Path('database/p03-finance-results.sql').read_text(),'P03 source drift p03_finance_results'
+
+assert next(Path('supabase/migrations').glob('*_p03_finance_integrity.sql')).read_text()==Path('database/p03-finance-integrity.sql').read_text(),'P03 source drift p03_finance_integrity'

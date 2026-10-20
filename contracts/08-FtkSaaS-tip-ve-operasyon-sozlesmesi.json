@@ -20436,7 +20436,8 @@
         "person_id",
         "amount_minor",
         "currency",
-        "occurred_at"
+        "occurred_at",
+        "direction"
       ],
       "additionalProperties": false
     },
@@ -42425,6 +42426,16 @@
             "column": "person_id",
             "target": "people",
             "same_tenant": true
+          },
+          {
+            "column": "previous_id",
+            "target": "instructor_payments",
+            "same_tenant": true
+          },
+          {
+            "column": "operation_id",
+            "target": "operation_receipts",
+            "same_tenant": true
           }
         ],
         "invariants": "Hakedişten ayrı; düzeltme ödeme geçmişini silmez. Seçilen hakedişlere aynı merkez/currency."
@@ -42445,6 +42456,11 @@
           {
             "column": "earning_id",
             "target": "earnings",
+            "same_tenant": true
+          },
+          {
+            "column": "previous_id",
+            "target": "earning_allocations",
             "same_tenant": true
           }
         ],
