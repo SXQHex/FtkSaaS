@@ -14,7 +14,7 @@ Cleanup ancak start denenmiş ve CLI mevcutsa çalışır. Draft/development ada
 
 ## Son karar ve uygulama sınırı
 
-[CI-2026-10-20](decisions/CI-2026-10-20.md) kabul edilmiş hedeftir; **CI-02 PR25 uygulandı; hedefli/aday/main ve güvenilir kurulum kabulü bekliyor**. Bu belge eşitlemesi workflow/gate değiştirmez. P01 PR #22 birleşmiştir; durum/kanıt [güncel devirde](../contracts/00-FtkSaaS-yeni-sohbet-devir.md). Yeni politika önceki her-main-clean ve tek PR'ye özgü belge istisnasını belirtilen kapsamda değiştirir; uygulanmamış kontrol etkin gösterilmez.
+[CI-2026-10-20](decisions/CI-2026-10-20.md) kabul edilmiş hedeftir; **CI-02 PR25 uygulandı; hedefli/aday/main ve güvenilir kurulum kabulü bekliyor**. Önceki PR24 belge eşitlemesi workflow/gate değiştirmedi; PR25 aşağıdaki yeni uygulamayı getirir. P01 PR #22 birleşmiştir; durum/kanıt [güncel devirde](../contracts/00-FtkSaaS-yeni-sohbet-devir.md). Yeni politika önceki her-main-clean ve tek PR'ye özgü belge istisnasını belirtilen kapsamda değiştirir; uygulanmamış kontrol etkin gösterilmez.
 
 | Olay/durum | Kabul edilmiş hedef | Main 7577b2f uygulaması |
 |---|---|---|

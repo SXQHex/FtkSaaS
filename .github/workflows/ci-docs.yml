@@ -26,6 +26,11 @@ jobs:
         uses: actions/github-script@ed597411d8f924073f98dfc5c65a23a2325f34cd
         with:
           script: |
+            if(!require('fs').existsSync(`${process.env.GITHUB_WORKSPACE}/scripts/ci/source.mjs`)){
+              core.setOutput('eligible','false');
+              await core.summary.addRaw('Documentation policy not installed on trusted base; no documentation acceptance granted.').write();
+              return;
+            }
             const source=await import(`${process.env.GITHUB_WORKSPACE}/scripts/ci/source.mjs`);
             await source.resolveCandidate(github,context,core,'documentation');
   documentation:

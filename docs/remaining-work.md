@@ -6,7 +6,7 @@ Güncel kaynak main `7577b2f1873c6b1fcf83390bfa94a34374c44082`: **199 işlem / 1
 
 ## Aktif seri üretim
 
-Önce **CI-02**, ardından P02–P07. [Tek kuyruk](production-queue.md) sıralama ve prompt kaynağıdır; [CI-2026-10-20](decisions/CI-2026-10-20.md) dört izole shard, Draft/development ve belge-only kabulünün henüz uygulanmamış olduğunu belirtir. Belge-only merge/main clean istisnası workflow'a aktarılmadan etkin sayılmaz.
+Önce **CI-02**, ardından P02–P07. [Tek kuyruk](production-queue.md) sıralama ve prompt kaynağıdır; [CI-2026-10-20](decisions/CI-2026-10-20.md) dört izole shard, Draft/development ve belge-only kabulünün main kurulumunun henüz tamamlanmadığını belirtir. Belge-only merge/main clean istisnası workflow'a aktarılmadan etkin sayılmaz.
 
 [P01 devri](p01-handover.md): katalog/hak okuması, talep/alternatif/onay, bekleme/teklif/expiry ve gerçek dar worker döngüsü uygulandı. Genel belge upload/yayın/kabul ve bildirim API'leri P05'te açıktır; mevcut yayımlanmış rezervasyon gerekliliklerinin dar tüketicisi bunları kapatmaz. Hosted worker provisioning/işletim kabulü CI'daki gerçek CLI/loop testinden ayrıdır.
 
