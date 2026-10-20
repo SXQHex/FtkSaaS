@@ -606,6 +606,133 @@ accepted_reservation_ids?: string[]
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "Request_lesson_request_create".
+ */
+export type RequestLessonRequestCreate = {
+client_api_version: 1
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+request_id: string
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+org_id: string
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+center_id: string
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+operation_key: string
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+person_id: string
+requested_start: Instant
+duration_minutes: PositiveInt
+preferred_instructor_id?: (string | null)
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+discipline_id: string
+window_exception?: boolean
+reason?: Text
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "Request_lesson_request_offer_alternative".
+ */
+export type RequestLessonRequestOfferAlternative = {
+client_api_version: 1
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+request_id: string
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+org_id: string
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+center_id: string
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+operation_key: string
+alternatives: RequestAlternative[]
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+lesson_request_id: string
+expected_version: PositiveInt
+window_exception?: boolean
+reason?: Text
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "Request_lesson_request_accept_alternative".
+ */
+export type RequestLessonRequestAcceptAlternative = {
+client_api_version: 1
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+request_id: string
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+org_id: string
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+center_id: string
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+operation_key: string
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+alternative_id: string
+expected_version: PositiveInt
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+lesson_request_id: string
+window_exception?: boolean
+reason?: Text
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "Request_entitlements_get".
+ */
+export type RequestEntitlementsGet = {
+client_api_version: 1
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+request_id: string
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+org_id: string
+center_id?: (string | null)
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+person_id: string
+include_timed_rights?: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+session_id?: string
+booking_mode?: BookingMode
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
  * via the `definition` "Request_instructor_agreement_publish".
  */
 export type RequestInstructorAgreementPublish = {
@@ -2055,6 +2182,10 @@ Request_attendance_start?: RequestAttendanceStart
 Success_attendance_start?: SuccessAttendanceStart
 ManagementSelector_attendance_start_v1?: ManagementSelectorAttendanceStartV1
 ManagementProjection_attendance_start_v1?: ManagementProjectionAttendanceStartV1
+LessonRequestView?: LessonRequestView
+LessonRequestAlternativeView?: LessonRequestAlternativeView
+SeatOfferView?: SeatOfferView
+WaitlistEntryView?: WaitlistEntryView
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -3136,6 +3267,13 @@ consumed: Count
 deficit: Count
 quotas: QuotaView[]
 deficit_scopes: DeficitScopeView[]
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+product_version_id?: string
+booking_mode?: BookingMode
+kind?: EntitlementKind
+available_at_session?: Count
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -5716,37 +5854,6 @@ trace_id: string
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
- * via the `definition` "Request_lesson_request_create".
- */
-export interface RequestLessonRequestCreate {
-client_api_version: 1
-/**
- * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
- */
-request_id: string
-/**
- * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
- */
-org_id: string
-center_id?: (string | null)
-/**
- * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
- */
-operation_key: string
-/**
- * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
- */
-person_id: string
-requested_start: Instant
-duration_minutes: Int
-preferred_instructor_id?: (string | null)
-/**
- * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
- */
-discipline_id: string
-}
-/**
- * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
  * via the `definition` "Success_lesson_request_create".
  */
 export interface SuccessLessonRequestCreate {
@@ -5771,7 +5878,10 @@ request_id: string
  * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
  */
 org_id: string
-center_id?: (string | null)
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+center_id: string
 /**
  * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
  */
@@ -5780,6 +5890,7 @@ operation_key: string
  * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
  */
 lesson_request_id: string
+expected_version: PositiveInt
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -5807,7 +5918,10 @@ request_id: string
  * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
  */
 org_id: string
-center_id?: (string | null)
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+center_id: string
 /**
  * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
  */
@@ -5817,6 +5931,7 @@ reason: Text
  * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
  */
 lesson_request_id: string
+expected_version: PositiveInt
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -5832,31 +5947,6 @@ trace_id: string
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
- * via the `definition` "Request_lesson_request_offer_alternative".
- */
-export interface RequestLessonRequestOfferAlternative {
-client_api_version: 1
-/**
- * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
- */
-request_id: string
-/**
- * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
- */
-org_id: string
-center_id?: (string | null)
-/**
- * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
- */
-operation_key: string
-alternatives: RequestAlternative[]
-/**
- * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
- */
-lesson_request_id: string
-}
-/**
- * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
  * via the `definition` "Success_lesson_request_offer_alternative".
  */
 export interface SuccessLessonRequestOfferAlternative {
@@ -5866,30 +5956,6 @@ data: Mutation
  * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
  */
 trace_id: string
-}
-/**
- * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
- * via the `definition` "Request_lesson_request_accept_alternative".
- */
-export interface RequestLessonRequestAcceptAlternative {
-client_api_version: 1
-/**
- * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
- */
-request_id: string
-/**
- * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
- */
-org_id: string
-center_id?: (string | null)
-/**
- * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
- */
-operation_key: string
-/**
- * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
- */
-alternative_id: string
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -5917,7 +5983,10 @@ request_id: string
  * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
  */
 org_id: string
-center_id?: (string | null)
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+center_id: string
 /**
  * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
  */
@@ -5928,6 +5997,7 @@ session?: (SessionCreate | null)
  * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
  */
 lesson_request_id: string
+expected_version: PositiveInt
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -6067,7 +6137,10 @@ request_id: string
  * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
  */
 org_id: string
-center_id?: (string | null)
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+center_id: string
 /**
  * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
  */
@@ -6107,7 +6180,10 @@ request_id: string
  * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
  */
 org_id: string
-center_id?: (string | null)
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+center_id: string
 /**
  * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
  */
@@ -6116,6 +6192,7 @@ operation_key: string
  * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
  */
 entry_id: string
+expected_version: PositiveInt
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -6143,7 +6220,10 @@ request_id: string
  * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
  */
 org_id: string
-center_id?: (string | null)
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+center_id: string
 /**
  * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
  */
@@ -6152,6 +6232,7 @@ operation_key: string
  * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
  */
 offer_id: string
+expected_version: PositiveInt
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -6179,7 +6260,10 @@ request_id: string
  * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
  */
 org_id: string
-center_id?: (string | null)
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+center_id: string
 /**
  * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
  */
@@ -6188,6 +6272,7 @@ operation_key: string
  * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
  */
 offer_id: string
+expected_version: PositiveInt
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -6404,6 +6489,7 @@ request_id: string
 org_id: string
 center_id?: (string | null)
 page: Page
+include_timed_products?: boolean
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -6522,26 +6608,6 @@ data: Mutation
  * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
  */
 trace_id: string
-}
-/**
- * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
- * via the `definition` "Request_entitlements_get".
- */
-export interface RequestEntitlementsGet {
-client_api_version: 1
-/**
- * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
- */
-request_id: string
-/**
- * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
- */
-org_id: string
-center_id?: (string | null)
-/**
- * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
- */
-person_id: string
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -13086,6 +13152,8 @@ state: (("accepted" | "active" | "alternative_offered" | "applied" | "approved" 
 versions: EntityVersion[]
 as_of: Instant
 current: (ManagementProjection | null)
+request_detail?: LessonRequestView
+waitlist_detail?: WaitlistEntryView
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -15251,6 +15319,112 @@ actual_started_at?: Instant
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "LessonRequestView".
+ */
+export interface LessonRequestView {
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+id: string
+created_at: Instant
+version: PositiveInt
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+center_id: string
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+person_id: string
+format: SessionFormat
+requested_start: Instant
+duration_minutes: Int
+preferred_instructor_id?: (string | null)
+state: RequestState
+reservation_id?: (string | null)
+expires_at?: (Instant | null)
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+discipline_id: string
+alternatives: LessonRequestAlternativeView[]
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "LessonRequestAlternativeView".
+ */
+export interface LessonRequestAlternativeView {
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+id: string
+created_at: Instant
+version: PositiveInt
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+request_id: string
+starts_at: Instant
+ends_at: Instant
+instructor_id?: (string | null)
+state: AlternativeState
+selected_at?: (Instant | null)
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "WaitlistEntryView".
+ */
+export interface WaitlistEntryView {
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+id: string
+created_at: Instant
+version: PositiveInt
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+center_id: string
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+session_id: string
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+person_id: string
+joined_at: Instant
+state: WaitState
+offers: SeatOfferView[]
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "SeatOfferView".
+ */
+export interface SeatOfferView {
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+id: string
+created_at: Instant
+version: PositiveInt
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+entry_id: string
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+session_id: string
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+person_id: string
+expires_at: Instant
+state: OfferState
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
  * via the `definition` "ReservationProtectionPreview".
  */
 export interface ReservationProtectionPreview {
@@ -16026,12 +16200,12 @@ key: {
 /**
  * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
  */
-person_id: string
+person_id?: string
 preferred_instructor_id?: (string | null)
 /**
  * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
  */
-discipline_id: string
+discipline_id?: string
 }
 }
 /**
@@ -16084,6 +16258,10 @@ key: {
  * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
  */
 alternative_id: string
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+lesson_request_id: string
 }
 }
 /**

@@ -1,8 +1,14 @@
 # Kalan backend işleri
 
-Güncel kaynak ve CI: [doğrulanmış devir](../contracts/00-FtkSaaS-yeni-sohbet-devir.md). **199 işlem: 104 çağrılabilir, 95 yalnız sözleşme; 29 migration.** Önceki teslimlerde kapanmış işler burada yeniden açık ilan edilmez. Uygulama kapsamı [Starter](starter-attendance-protection-handover.md) ve [anlaşma/hakediş](instructor-earnings-handover.md) devirlerindedir.
+Son doğrulanmış kaynak c62106b / [hedefli 39323812801](https://github.com/SXQHex/FtkSaaS/actions/runs/39323812801) başarılı (214 test düğümü). Son bütün-P01 incelemesi request_window tüketimi ve canlı worker merkez erişimini eksik buldu; migration34/DTO/audit/gerçek test düzeltmeleri uygulandı, yeni hedefli kabul bekliyor. Running-lease crash kurtarma ve kabul-kazanır/geç-expiry kabul kanıtı da genişletildi. P01 in_progress; yeni kaynak geçmeden toplu clean/merge yok. [Güncel kabul ve sınırlar](p01-handover.md).
 
-Ürün kataloğu okuması uygun satın alınmış hak seçimi değildir; seans/kişi/sale bağlamı ve DTO aktarımı ayrıca açıktır. Hosted eski smoke, güncel 104 işlemin uzaktan kabulü sayılmaz.
+Son C kaynağı 4e3c5f1 / [hedefli 39322550067](https://github.com/SXQHex/FtkSaaS/actions/runs/39322550067) başarısız: worker yanlış insan Auth dispatcher'ına girdi; sekiz C alt vakası geçti sayılmaz. Runner dar private worker girişine alındı, gereksiz dispatcher/core yetkileri yeni migration33 ile kaldırıldı; Auth yetkisi eklenmedi. Yeni hedefli runtime kabulü bekliyor. [Teşhis ve kalan kabul](p01-handover.md).
+
+Güncel kaynak ve CI: [doğrulanmış devir](../contracts/00-FtkSaaS-yeni-sohbet-devir.md). **199 işlem: 118 çağrılabilir, 81 yalnız sözleşme; 34 migration.** Önceki teslimlerde kapanmış işler burada yeniden açık ilan edilmez. Uygulama kapsamı [Starter](starter-attendance-protection-handover.md) ve [anlaşma/hakediş](instructor-earnings-handover.md) devirlerindedir.
+
+P01-B kaynak `78d68653e903d9764264f1fe8d73dfb9d9de7f49` için [hedefli CI 39319195689](https://github.com/SXQHex/FtkSaaS/actions/runs/39319195689) başarılı: 120 yapı/politika + 27 DB + 58 API test düğümü (A/B 17, ortak 41); pg concurrent-query uyarısı logda yok. Bu sonuç yeni C kaynağına taşınmaz. P01-C yedi API, kapsamlı okuma ve gerçek worker runner uygulandı; yeni runtime kabulü bekliyor. Geliştirme envanteri 199 sözleşme / 118 çağrılabilir / 81 contract_only / 32 migration. P01 merge/main kabulü yok; bütün P01 sonunda toplu clean alınır.
+
+[P01 devri](p01-handover.md), [tek üretim kuyruğu](production-queue.md). Belge yükleme/yayımlama/kabul API ve genel rezervasyon/yoklama tüketici kapsamı P05'te açıktır; P01 mevcut yayımlanmış rezervasyon gerekliliklerini dar olarak tüketir.
 
 ## Aktif seri üretim
 
@@ -29,16 +35,16 @@ Kalan delivery_gaps ve vaka bazlı durumlar [08 makine sözleşmesi](../contract
 
 Her yeni grup: sözleşme/izin incelemesi → yeni migration → gerçek Auth/API kabulü (sınır, yetki, tekrar, yarış, rollback) → inceleme → temiz CI → main CI. Ürün kararında boşluk varsa teknik varsayımla yeni kural eklenmez.
 
-## Yalnız sözleşme envanteri — güncel 95 işlem
+## Yalnız sözleşme envanteri — güncel 81 işlem
 
 | Modül | Kalan işlem |
 |---|---:|
 | M01 | 5 |
 | M02 | 7 |
 | M03 | 3 |
-| M04 | 12 |
+| M04 | 2 |
 | M05 | 3 |
-| M06 | 13 |
+| M06 | 12 |
 | M07 | 5 |
 | M08 | 2 |
 | M09 | 11 |
@@ -46,7 +52,7 @@ Her yeni grup: sözleşme/izin incelemesi → yeni migration → gerçek Auth/AP
 | M11 | 3 |
 | M12 | 5 |
 | M14 | 5 |
-| X | 18 |
+| X | 15 |
 
 | İşlem | İzin |
 |---|---|
@@ -68,17 +74,6 @@ Her yeni grup: sözleşme/izin incelemesi → yeni migration → gerçek Auth/AP
 | session_cancel_preview_v1 | schedule.manage |
 | session_cancel_apply_v1 | schedule.manage |
 | replacement_session_create_v1 | schedule.manage |
-| lesson_request_create_v1 | request.write |
-| lesson_request_withdraw_v1 | request.write |
-| lesson_request_reject_v1 | request.resolve |
-| lesson_request_offer_alternative_v1 | request.resolve |
-| lesson_request_accept_alternative_v1 | request.write |
-| lesson_request_approve_v1 | request.resolve |
-| waitlist_join_v1 | reservation.write |
-| waitlist_leave_v1 | reservation.write |
-| seat_offer_accept_v1 | reservation.write |
-| seat_offer_reject_v1 | reservation.write |
-| products_list_v1 | person.read |
 | entitlement_extend_v1 | entitlement.correct |
 | credit_adjust_v1 | entitlement.correct |
 | freeze_preview_v1 | entitlement.correct |
@@ -134,9 +129,6 @@ Her yeni grup: sözleşme/izin incelemesi → yeni migration → gerçek Auth/AP
 | preview_get_v1 | account.self |
 | job_status_get_v1 | account.self |
 | audit_list_v1 | report.read |
-| seat_offer_issue_v1 | system.worker |
-| seat_offer_expire_v1 | system.worker |
-| request_expire_v1 | system.worker |
 | outbox_deliver_v1 | system.worker |
 | reminder_schedule_v1 | system.worker |
 | automation_run_v1 | system.worker |
@@ -154,3 +146,5 @@ Her yeni grup: sözleşme/izin incelemesi → yeni migration → gerçek Auth/AP
 - Production hazırlığı ve ayrı dağıtım yetkisi. Main merge production izni değildir.
 
 Bu maddeler ve yalnız sözleşme işlemleri kapanmış sayılmaz. Frontend tasarımı ayrı alan sahibindedir.
+
+[P01-A devri](p01-handover.md): katalog/seans bağlamlı satın alınmış hak okuması; yeni kaynak kabulü ve kalan talep/bekleme/worker akışı açık.

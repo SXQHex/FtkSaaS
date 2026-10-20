@@ -1,0 +1,11 @@
+begin;
+insert into private.runtime_operations(name,permission,billing_class,features) values('products_list_v1','person.read','read',array['F15']::text[]) on conflict(name) do update set permission=excluded.permission,billing_class=excluded.billing_class,features=excluded.features;
+create or replace function api_v1.products_list_v1(p_request jsonb,p_actor_auth_id uuid,p_session_id uuid,p_ids uuid[],p_aux jsonb default null) returns jsonb language sql security invoker set search_path='' as $$select private.execute_operation('products_list_v1',p_request,p_actor_auth_id,p_session_id,p_ids,p_aux)$$;
+revoke all on function api_v1.products_list_v1(jsonb,uuid,uuid,uuid[],jsonb) from public,anon,authenticated;
+grant execute on function api_v1.products_list_v1(jsonb,uuid,uuid,uuid[],jsonb) to service_role;
+insert into private.runtime_operations(name,permission,billing_class,features) values('entitlements_get_v1','person.read','read',array['F06','F15']::text[]) on conflict(name) do update set permission=excluded.permission,billing_class=excluded.billing_class,features=excluded.features;
+create or replace function api_v1.entitlements_get_v1(p_request jsonb,p_actor_auth_id uuid,p_session_id uuid,p_ids uuid[],p_aux jsonb default null) returns jsonb language sql security invoker set search_path='' as $$select private.execute_operation('entitlements_get_v1',p_request,p_actor_auth_id,p_session_id,p_ids,p_aux)$$;
+revoke all on function api_v1.entitlements_get_v1(jsonb,uuid,uuid,uuid[],jsonb) from public,anon,authenticated;
+grant execute on function api_v1.entitlements_get_v1(jsonb,uuid,uuid,uuid[],jsonb) to service_role;
+notify pgrst,'reload schema';
+commit;

@@ -673,3 +673,19 @@ DS-OPEN-01 karar düzeyinde kapalıdır; hesaplaşma runtime aktarımı uygulanm
 ## Eğitmen anlaşması/hakediş teknik aktarımı
 
 Kabul edilmiş ücret kuralları immutable zincir, açık fiilî başlangıç kimlik snapshot'ı ve ücretli kapanışa aktarılmıştır. Yeni ürün ücreti/politika değeri türetilmedi. CM yayımlar; canlı görevlendirilmiş eğitmen/CM gerçek başlangıcı açıkça kaydeder. Kapanış gerçekleşme ve fiilî görev beyanını ister; saat tek başına hakediş değildir. Gerekçeli düzeltme sabit eski koşuldan bağlı fark üretir, ödemeyi silmez. Uygulama/kabul sınırları: [güncel devir](../docs/instructor-earnings-handover.md).
+
+## P01-A teknik okuma aktarımı — 19 Ekim 2026
+
+Katalog ürün sürümü rezervasyon kaynak satışı değildir. products_list_v1 etkin son katalog sürümünü canlı yetkili merkez kapsamında sayfalar. entitlements_get_v1 optional session_id/booking_mode ile mevcut lesson_scope_matches ve available_for kurallarına göre uygun satın alınmış kaynak satışlarını okur; hak veya yer ayırmaz. include_timed_products/include_timed_rights açık seçimi F16 gerektirir; varsayılan kredili projeksiyondur. Geçerlilik ve en erken bitiş/satın alma/id sırası değişmez. Kesin kayıt guardları yazma anında yeniden çalışır. P01 talep/bekleme/worker kabulü bu okuma dilimiyle tamamlanmaz. DTO ve sınırlar: docs/p01-handover.md.
+
+## P01-B talep akışı teknik aktarımı — 19 Ekim 2026
+
+Talep/alternatif niyettir; yer, kaynak veya hak ayırmaz. Alternatif seçimi merkez onayı değildir. Altı komut açık center_id; create dışındakiler lesson_request_id/expected_version ister. management_state_get_v1 aynı işlem selector'ıyla ebeveyn/alternatif sürümünü canlı kapsamda okur. Kesin onay var olan session_create/reservation_create guardlarını yeniden çalıştırır; mevcut yayımlanmış rezervasyon belge kabulünü de tüketir. Geç hata tüm talep/seans/rezervasyon/hak ve iç receipt/audit sonuçlarını atomik geri alır. Belge API'leri P05, bekleme/teklif/worker P01-C'de açıktır. Sayısal expiry politikası eklenmedi. Uygulama ve runtime kabul sınırları docs/p01-handover.md içindedir.
+
+## P01-C teknik aktarımı — bekleme ve worker
+
+Bekleme niyeti yer/hak ayırmaz; FIFO joined_at/id, nominal boşluk ve aktif rezervasyon+geçerli teklif ortak kapasitesi korunur. Kabul held seat'i aynı transaction'da guarded rezervasyona dönüştürür; geç hata teklif süresini uzatmaz/bitirmez. Ret/expiry kapanmış entry sonrasında yeniden giriş yeni sıradır. İptal durumu teklifleri ve waiting-only entry'leri kapatır. Etkin waitlist_offer_minutes veya kabul edilmiş başlangıç 30 dakika, kayıt kapanışı/seans başlangıcı sınırına tabidir. Worker insan yetkisinden bağımsız DB rol+org bağında, değişmez iş/op/target, lease ve bounded retry ile yürür. Request expiry kayıtlı son tarih veya geçerli gelecek alternatifi kalmamış başlangıç üzerinden; keyfi TTL/otomatik katılım yoktur. Uygulama/runtime/production işletim sınırları docs/p01-handover.md içindedir.
+
+## P01 son pencere/merkez teknik aktarımı
+
+Ayrı request_window, talep create/alternatif offer/accept sırasında etkin org/merkez politikasından tüketilir. Açılış dahil/kapanış hariç; eksik yapılandırma POLICY_NOT_CONFIGURED. Kabul edilmiş yönetici süre dışı yetkisinin teknik isteği window_exception:true + nonempty reason, politika manager_exception:true ve canlı CM kontrolüdür; gerekçe audit'e yazılır. İşaretli istekte CM receipt replay öncesi de denetlenir; otomatik CM bypass yoktur. Worker yeni teklif discovery ve executor/replay'inde center_accessible uygular; kapalı veya plan dışı merkezde hold üretmez, expiry temizliği engellenmez. Kaynak/runtime kabul sınırları docs/p01-handover.md içindedir.

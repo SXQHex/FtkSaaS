@@ -1458,8 +1458,8 @@
     },
     {
       "name": "lesson_request_create_v1",
-      "status": "contract_only",
-      "external_path": null,
+      "status": "operational_development_limited",
+      "external_path": "/functions/v1/backend-v1/lesson_request_create_v1",
       "permission": "request.write",
       "features": [
         "F09"
@@ -1467,22 +1467,26 @@
       "required_features": [
         "F09"
       ],
-      "runtime_required_features": [],
+      "runtime_required_features": [
+        "F09"
+      ],
       "decision_delivery": {
         "accepted_contract": "DS-2026-10-17",
-        "runtime_conformance": "pending",
+        "runtime_conformance": "p01_request_workflow_runtime_pending",
         "open_dependencies": [],
         "target_request": {
           "$ref": "#/$defs/Request_lesson_request_create"
         }
       },
       "billing_class": "request",
-      "limits": []
+      "limits": [
+        "Separate effective request_window required. Outside-window exception needs enabled policy, live CM, explicit window_exception:true and nonempty reason; final guard runtime acceptance pending."
+      ]
     },
     {
       "name": "lesson_request_withdraw_v1",
-      "status": "contract_only",
-      "external_path": null,
+      "status": "operational_development_limited",
+      "external_path": "/functions/v1/backend-v1/lesson_request_withdraw_v1",
       "permission": "request.write",
       "features": [
         "F09"
@@ -1490,22 +1494,26 @@
       "required_features": [
         "F09"
       ],
-      "runtime_required_features": [],
+      "runtime_required_features": [
+        "F09"
+      ],
       "decision_delivery": {
         "accepted_contract": "DS-2026-10-17",
-        "runtime_conformance": "pending",
+        "runtime_conformance": "p01_request_workflow_runtime_pending",
         "open_dependencies": [],
         "target_request": {
           "$ref": "#/$defs/Request_lesson_request_withdraw"
         }
       },
       "billing_class": "maintenance",
-      "limits": []
+      "limits": [
+        "P01-B implemented; runtime acceptance pending. Worker expiration and waitlist are separate unfinished P01 work."
+      ]
     },
     {
       "name": "lesson_request_reject_v1",
-      "status": "contract_only",
-      "external_path": null,
+      "status": "operational_development_limited",
+      "external_path": "/functions/v1/backend-v1/lesson_request_reject_v1",
       "permission": "request.resolve",
       "features": [
         "F09"
@@ -1513,22 +1521,26 @@
       "required_features": [
         "F09"
       ],
-      "runtime_required_features": [],
+      "runtime_required_features": [
+        "F09"
+      ],
       "decision_delivery": {
         "accepted_contract": "DS-2026-10-17",
-        "runtime_conformance": "pending",
+        "runtime_conformance": "p01_request_workflow_runtime_pending",
         "open_dependencies": [],
         "target_request": {
           "$ref": "#/$defs/Request_lesson_request_reject"
         }
       },
       "billing_class": "maintenance",
-      "limits": []
+      "limits": [
+        "P01-B implemented; runtime acceptance pending. Worker expiration and waitlist are separate unfinished P01 work."
+      ]
     },
     {
       "name": "lesson_request_offer_alternative_v1",
-      "status": "contract_only",
-      "external_path": null,
+      "status": "operational_development_limited",
+      "external_path": "/functions/v1/backend-v1/lesson_request_offer_alternative_v1",
       "permission": "request.resolve",
       "features": [
         "F09"
@@ -1536,22 +1548,26 @@
       "required_features": [
         "F09"
       ],
-      "runtime_required_features": [],
+      "runtime_required_features": [
+        "F09"
+      ],
       "decision_delivery": {
         "accepted_contract": "DS-2026-10-17",
-        "runtime_conformance": "pending",
+        "runtime_conformance": "p01_request_workflow_runtime_pending",
         "open_dependencies": [],
         "target_request": {
           "$ref": "#/$defs/Request_lesson_request_offer_alternative"
         }
       },
       "billing_class": "maintenance",
-      "limits": []
+      "limits": [
+        "Separate effective request_window required. Outside-window exception needs enabled policy, live CM, explicit window_exception:true and nonempty reason; final guard runtime acceptance pending."
+      ]
     },
     {
       "name": "lesson_request_accept_alternative_v1",
-      "status": "contract_only",
-      "external_path": null,
+      "status": "operational_development_limited",
+      "external_path": "/functions/v1/backend-v1/lesson_request_accept_alternative_v1",
       "permission": "request.write",
       "features": [
         "F09"
@@ -1559,22 +1575,26 @@
       "required_features": [
         "F09"
       ],
-      "runtime_required_features": [],
+      "runtime_required_features": [
+        "F09"
+      ],
       "decision_delivery": {
         "accepted_contract": "DS-2026-10-17",
-        "runtime_conformance": "pending",
+        "runtime_conformance": "p01_request_workflow_runtime_pending",
         "open_dependencies": [],
         "target_request": {
           "$ref": "#/$defs/Request_lesson_request_accept_alternative"
         }
       },
       "billing_class": "request",
-      "limits": []
+      "limits": [
+        "Separate effective request_window required. Outside-window exception needs enabled policy, live CM, explicit window_exception:true and nonempty reason; final guard runtime acceptance pending."
+      ]
     },
     {
       "name": "lesson_request_approve_v1",
-      "status": "contract_only",
-      "external_path": null,
+      "status": "operational_development_limited",
+      "external_path": "/functions/v1/backend-v1/lesson_request_approve_v1",
       "permission": "request.resolve",
       "features": [
         "F09"
@@ -1582,17 +1602,21 @@
       "required_features": [
         "F09"
       ],
-      "runtime_required_features": [],
+      "runtime_required_features": [
+        "F09"
+      ],
       "decision_delivery": {
         "accepted_contract": "DS-2026-10-17",
-        "runtime_conformance": "pending",
+        "runtime_conformance": "p01_request_workflow_runtime_pending",
         "open_dependencies": [],
         "target_request": {
           "$ref": "#/$defs/Request_lesson_request_approve"
         }
       },
       "billing_class": "request",
-      "limits": []
+      "limits": [
+        "P01-B implemented; runtime acceptance pending. Worker expiration and waitlist are separate unfinished P01 work."
+      ]
     },
     {
       "name": "reservation_create_v1",
@@ -1679,8 +1703,8 @@
     },
     {
       "name": "waitlist_join_v1",
-      "status": "contract_only",
-      "external_path": null,
+      "status": "operational_development_limited",
+      "external_path": "/functions/v1/backend-v1/waitlist_join_v1",
       "permission": "reservation.write",
       "features": [
         "F12"
@@ -1688,22 +1712,26 @@
       "required_features": [
         "F12"
       ],
-      "runtime_required_features": [],
+      "runtime_required_features": [
+        "F12"
+      ],
       "decision_delivery": {
         "accepted_contract": "DS-2026-10-17",
-        "runtime_conformance": "pending",
+        "runtime_conformance": "p01_waitlist_worker_runtime_pending",
         "open_dependencies": [],
         "target_request": {
           "$ref": "#/$defs/Request_waitlist_join"
         }
       },
       "billing_class": "reservation",
-      "limits": []
+      "limits": [
+        "P01-C implementation; runtime acceptance pending. Dedicated DB worker LOGIN/org binding and runner required; no production installation performed."
+      ]
     },
     {
       "name": "waitlist_leave_v1",
-      "status": "contract_only",
-      "external_path": null,
+      "status": "operational_development_limited",
+      "external_path": "/functions/v1/backend-v1/waitlist_leave_v1",
       "permission": "reservation.write",
       "features": [
         "F12"
@@ -1711,22 +1739,26 @@
       "required_features": [
         "F12"
       ],
-      "runtime_required_features": [],
+      "runtime_required_features": [
+        "F12"
+      ],
       "decision_delivery": {
         "accepted_contract": "DS-2026-10-17",
-        "runtime_conformance": "pending",
+        "runtime_conformance": "p01_waitlist_worker_runtime_pending",
         "open_dependencies": [],
         "target_request": {
           "$ref": "#/$defs/Request_waitlist_leave"
         }
       },
       "billing_class": "maintenance",
-      "limits": []
+      "limits": [
+        "P01-C implementation; runtime acceptance pending. Dedicated DB worker LOGIN/org binding and runner required; no production installation performed."
+      ]
     },
     {
       "name": "seat_offer_accept_v1",
-      "status": "contract_only",
-      "external_path": null,
+      "status": "operational_development_limited",
+      "external_path": "/functions/v1/backend-v1/seat_offer_accept_v1",
       "permission": "reservation.write",
       "features": [
         "F12"
@@ -1734,22 +1766,26 @@
       "required_features": [
         "F12"
       ],
-      "runtime_required_features": [],
+      "runtime_required_features": [
+        "F12"
+      ],
       "decision_delivery": {
         "accepted_contract": "DS-2026-10-17",
-        "runtime_conformance": "pending",
+        "runtime_conformance": "p01_waitlist_worker_runtime_pending",
         "open_dependencies": [],
         "target_request": {
           "$ref": "#/$defs/Request_seat_offer_accept"
         }
       },
       "billing_class": "reservation",
-      "limits": []
+      "limits": [
+        "P01-C implementation; runtime acceptance pending. Dedicated DB worker LOGIN/org binding and runner required; no production installation performed."
+      ]
     },
     {
       "name": "seat_offer_reject_v1",
-      "status": "contract_only",
-      "external_path": null,
+      "status": "operational_development_limited",
+      "external_path": "/functions/v1/backend-v1/seat_offer_reject_v1",
       "permission": "reservation.write",
       "features": [
         "F12"
@@ -1757,17 +1793,21 @@
       "required_features": [
         "F12"
       ],
-      "runtime_required_features": [],
+      "runtime_required_features": [
+        "F12"
+      ],
       "decision_delivery": {
         "accepted_contract": "DS-2026-10-17",
-        "runtime_conformance": "pending",
+        "runtime_conformance": "p01_waitlist_worker_runtime_pending",
         "open_dependencies": [],
         "target_request": {
           "$ref": "#/$defs/Request_seat_offer_reject"
         }
       },
       "billing_class": "maintenance",
-      "limits": []
+      "limits": [
+        "P01-C implementation; runtime acceptance pending. Dedicated DB worker LOGIN/org binding and runner required; no production installation performed."
+      ]
     },
     {
       "name": "attendance_get_v1",
@@ -1919,8 +1959,8 @@
     },
     {
       "name": "products_list_v1",
-      "status": "contract_only",
-      "external_path": null,
+      "status": "operational_development_limited",
+      "external_path": "/functions/v1/backend-v1/products_list_v1",
       "permission": "person.read",
       "features": [
         "F15",
@@ -1929,17 +1969,21 @@
       "required_features": [
         "F15"
       ],
-      "runtime_required_features": [],
+      "runtime_required_features": [
+        "F15"
+      ],
       "decision_delivery": {
         "accepted_contract": "DS-2026-10-17",
-        "runtime_conformance": "pending",
+        "runtime_conformance": "p01_catalog_and_context_reads",
         "open_dependencies": [],
         "target_request": {
           "$ref": "#/$defs/Request_products_list"
         }
       },
       "billing_class": "read",
-      "limits": []
+      "limits": [
+        "P01-A pool/catalog read only; no seat/right/booking guarantee. Request/waitlist/workers pending."
+      ]
     },
     {
       "name": "product_publish_v1",
@@ -2052,12 +2096,11 @@
       ],
       "runtime_required_features": [
         "F06",
-        "F15",
-        "F16"
+        "F15"
       ],
       "decision_delivery": {
         "accepted_contract": "DS-2026-10-17",
-        "runtime_conformance": "pending",
+        "runtime_conformance": "p01_catalog_and_context_reads",
         "open_dependencies": [
           "plan_gate_alignment"
         ],
@@ -2066,7 +2109,9 @@
         }
       },
       "billing_class": "read",
-      "limits": []
+      "limits": [
+        "P01-A pool/catalog read only; no seat/right/booking guarantee. Request/waitlist/workers pending."
+      ]
     },
     {
       "name": "entitlement_extend_v1",
@@ -3862,8 +3907,8 @@
     },
     {
       "name": "seat_offer_issue_v1",
-      "status": "contract_only",
-      "external_path": null,
+      "status": "operational_development_limited",
+      "external_path": "/functions/v1/backend-v1/seat_offer_issue_v1",
       "permission": "system.worker",
       "features": [
         "F12"
@@ -3871,22 +3916,26 @@
       "required_features": [
         "F12"
       ],
-      "runtime_required_features": [],
+      "runtime_required_features": [
+        "F12"
+      ],
       "decision_delivery": {
         "accepted_contract": "DS-2026-10-17",
-        "runtime_conformance": "pending",
+        "runtime_conformance": "p01_waitlist_worker_runtime_pending",
         "open_dependencies": [],
         "target_request": {
           "$ref": "#/$defs/Request_seat_offer_issue"
         }
       },
       "billing_class": "worker",
-      "limits": []
+      "limits": [
+        "P01-C worker transport corrected; new runtime acceptance pending. Dedicated DB LOGIN/org binding and runner required; no production installation. API/Edge worker routes do not grant worker authority."
+      ]
     },
     {
       "name": "seat_offer_expire_v1",
-      "status": "contract_only",
-      "external_path": null,
+      "status": "operational_development_limited",
+      "external_path": "/functions/v1/backend-v1/seat_offer_expire_v1",
       "permission": "system.worker",
       "features": [
         "F12"
@@ -3894,22 +3943,26 @@
       "required_features": [
         "F12"
       ],
-      "runtime_required_features": [],
+      "runtime_required_features": [
+        "F12"
+      ],
       "decision_delivery": {
         "accepted_contract": "DS-2026-10-17",
-        "runtime_conformance": "pending",
+        "runtime_conformance": "p01_waitlist_worker_runtime_pending",
         "open_dependencies": [],
         "target_request": {
           "$ref": "#/$defs/Request_seat_offer_expire"
         }
       },
       "billing_class": "worker",
-      "limits": []
+      "limits": [
+        "P01-C worker transport corrected; new runtime acceptance pending. Dedicated DB LOGIN/org binding and runner required; no production installation. API/Edge worker routes do not grant worker authority."
+      ]
     },
     {
       "name": "request_expire_v1",
-      "status": "contract_only",
-      "external_path": null,
+      "status": "operational_development_limited",
+      "external_path": "/functions/v1/backend-v1/request_expire_v1",
       "permission": "system.worker",
       "features": [
         "F09"
@@ -3917,17 +3970,21 @@
       "required_features": [
         "F09"
       ],
-      "runtime_required_features": [],
+      "runtime_required_features": [
+        "F09"
+      ],
       "decision_delivery": {
         "accepted_contract": "DS-2026-10-17",
-        "runtime_conformance": "pending",
+        "runtime_conformance": "p01_waitlist_worker_runtime_pending",
         "open_dependencies": [],
         "target_request": {
           "$ref": "#/$defs/Request_request_expire"
         }
       },
       "billing_class": "worker",
-      "limits": []
+      "limits": [
+        "P01-C worker transport corrected; new runtime acceptance pending. Dedicated DB LOGIN/org binding and runner required; no production installation. API/Edge worker routes do not grant worker authority."
+      ]
     },
     {
       "name": "outbox_deliver_v1",
@@ -4635,7 +4692,10 @@
       "status": "operational_development_limited",
       "external_path": "/functions/v1/backend-v1/management_state_get_v1",
       "permission": "management.inspect",
-      "features": [],
+      "features": [
+        "F09",
+        "F12"
+      ],
       "required_features": [],
       "runtime_required_features": [],
       "decision_delivery": {
@@ -4648,7 +4708,7 @@
       },
       "billing_class": "read",
       "limits": [
-        "management_state_get only negcredit_valuation_set selector"
+        "Original live write authority; negative valuation, P01 request and person/session waitlist selectors only. Other selectors unavailable."
       ]
     },
     {

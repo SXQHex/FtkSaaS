@@ -1,16 +1,59 @@
 # FtkSaaS — güncel devir
 
-## 19 Ekim 2026 — CI Action runtime bakım adayı
+## 20 Ekim 2026 — son kapsam incelemesi düzeltmeleri
 
-Ayrı maintenance/actions-node24 adayı dört workflow içindeki Node20 Action pinlerini Node24 sürümlerine yükseltir ve PR #22'nin aynı deterministik kota test düzeltmesini main tabanına taşır; ürün/P01 runtime değişikliği içermez. [Kapsam ve güvenilir politika kurulum sınırı](../docs/ci-policy.md). P01 PR #22 head 580239075b16f6ac6893d5ac01975d32133d0757 run 39281409902 loglarında 119 yapısal/politika + 27 DB + 51 API başarılıdır; bu dış branch kanıtı main kabulü değildir. Bakım adayının son inceleme/full clean/annotation ve main kabulü bekler; full-workflow blob değişimi mevcut otomatik kapıdan sıradan kabul alamaz.
+Kaynak `c62106b77717d6c1b1129fe7fa8eca6060d05826` / [hedefli CI 39323812801](https://github.com/SXQHex/FtkSaaS/actions/runs/39323812801) başarılıdır: 120 yapı/politika + 27 DB + 67 API test düğümü (P01 26, ortak 41), toplam 214. Worker CLI/loop, minimal DB yetkileri ve üç denemelik hata yolu bu kaynakta geçti; önceki Auth transport hatası kapandı. Bu başarı yeni kaynağa taşınmaz.
+
+Bütün P01 son incelemesi iki sözleşme eksiği buldu; yeni append-only migration34 ile düzeltildi: ayrı request_window tüketicisi ve worker'ın canlı merkez erişimi. Yeni hedefli runtime kabulü bekliyor; full clean/merge/main kabulü yapılmadı. Güncel geliştirme envanteri 199 / 118 çağrılabilir / 81 contract_only / 34 migration.
+
+Talep oluşturma, alternatif sunma ve alternatif kabulü etkin org/merkez request_window politikasını private.policy_at ile okur; eksik yapılandırma kapalıdır, açılış dahil/kapanış hariçtir. Mevcut kabul edilmiş yönetici süre istisnasının DTO karşılığı window_exception:true ve nonempty reason'dır: politika manager_exception izni + canlı CM yetkisi + açık seçim/gerekçe birlikte gerekir. Sırf CM olmak veya politika bayrağı tek başına bypass değildir; gerekçe mevcut audit'te tutulur, CM yetkisi receipt replay öncesi tekrar denetlenir. Rezervasyon onayı kendi reservation_window kapısını korur; geri çekme/ret gibi temizleme bu yeni niyet kapısından bağımsızdır. Yeni sayısal politika veya ürün yetkisi eklenmedi.
+
+Worker yeni teklif için merkez erişimini discovery limitinden önce ve executor/replay'de yeniden denetler; kapalı/plan dışında merkezde yeni hold/bildirim oluşmaz. Expiry temizliği açık kalır. Claim sonrası merkez kapanırsa runner NOT_FOUND için o fenced lease'i bounded reclaim'e bırakıp diğer merkezleri işlemeye devam eder; gerçek worker yetkisi iptalinde durur. Testler ayrıca çökmüş running lease geri alma ve kabulden sonra geç gelen expiry sırasını, önceki expiry-kazanır vakasına ekler.
 
 
-## 19 Ekim 2026 — seri üretim başlangıç kapısı
+## P01-C worker transport düzeltmesi — hedefli kabul bekliyor
 
-19 Ekim 2026 üretim başlangıcında main `41f922a01d05eff90f272d69496bf4c5c833e77c` doğrulandı. PR #20 birleşmiştir; [main clean 39247703349](https://github.com/SXQHex/FtkSaaS/actions/runs/39247703349) başarısızdır. `Verify merged candidate relation` adımı `No source-bound full clean evidence for merged tree` ile durdu; `npm ci` ve `test:clean` çalışmadı. Son cleanup'taki `supabase: not found` ikincil hatadır. PR #20'nin belgeye özel aday-clean istisnası runtime kabulü veya başarılı main clean değildir; P00'ın eski başarısı bu SHA'ya taşınmaz.
+Kaynak `4e3c5f11bd70e0e99885beffa41849727f170379` / [run 39322550067](https://github.com/SXQHex/FtkSaaS/actions/runs/39322550067) başarısızdır. 32 migration ve 120 yapı/politika + 27 DB + önceki A/B'nin 17 API test düğümü geçti. C'nin sekiz alt vakası aynı worker giriş hatasında kırıldı: genel execute_operation fonksiyonunun auth.users türünü içeren DECLARE bölümü, worker yönlendirmesinden önce derlenir; dar DB worker rolünün Auth şema erişimi yoktur. Bu, C davranış kabulü değildir.
 
-İlk açık teslim [P01](../docs/production-queue.md) olup uygulamaya başlanmadı. Başlangıçta açık PR ve P01 branch'i bulunmadı. Önce normal aday/main clean yoluyla kabul zinciri yeniden kurulacak; başarılı yeni main kabulü sonrasında P01'e devam edilecek. Bu kurtarma yalnız yaşayan kuyruk/devir bilgisini günceller; runtime, envanter, F01–F33, migration ve tarihsel raporlar değişmez. Yeni adayın inceleme/test sonucu ve merge/main kabulü henüz tamamlanmış değildir.
+Runner ve worker kabul testleri doğrudan mevcut private.p01_worker_execute(operation,request,ids) girişini kullanır; parametreler bound SQL'dir. Mevcut org/rol/job/op/lease/payload ve replay kontrolleri korunur. Yeni append-only migration 33 worker'ın gereksiz insan dispatcher/named API wrapper EXECUTE ve core USAGE yetkilerini kaldırır. Auth erişimi veya tablo DML yetkisi verilmez; uygulanmış önceki migration'lar değişmez. Negatif privilege testi Auth/core/human dispatcher erişiminin kapalı kaldığını, gerçek CLI/loop testleri doğru yolu doğrular. Doğrudan private helper yetki hataları SQL exception'dır; insan Edge zarfıyla karıştırılmaz.
 
+Envanter 199 / 118 çağrılabilir / 81 contract_only / 33 migration; üretilmiş katalogdaki worker transport açıklaması eşitlendi. Yeni runtime kabulü bekler; P01 son bağımsız inceleme ve toplu aday/main clean henüz yapılmadı.
+
+
+## P01-C uygulama dilimi — runtime kabulü bekliyor
+
+P01-B kaynak `78d68653e903d9764264f1fe8d73dfb9d9de7f49` için [hedefli CI 39319195689](https://github.com/SXQHex/FtkSaaS/actions/runs/39319195689) başarılı: 120 yapı/politika + 27 DB + 58 API test düğümü (A/B 17, ortak 41); pg concurrent-query uyarısı logda yok. Bu sonuç yeni C kaynağına taşınmaz. P01-C yedi API, kapsamlı okuma ve gerçek worker runner uygulandı; yeni runtime kabulü bekliyor. Geliştirme envanteri 199 sözleşme / 118 çağrılabilir / 81 contract_only / 32 migration. P01 merge/main kabulü yok; bütün P01 sonunda toplu clean alınır.
+
+Sistem worker DB kimliği/claim/lease/tekrar ve kabul sınırları [P01 devrinde](../docs/p01-handover.md); seri üretimin sonraki adımı [kuyruktadır](../docs/production-queue.md). Aşağıdaki eski pending/hata notları ait oldukları önceki kaynakların kayıtlarıdır.
+
+P01-B son hedefli kaynak 7ef51f2b3c6b791eec27acbfb648b7c23b6e2b74 / run 39317251796 başarısızdır: organizasyon disiplini fixture'ının fazladan center_id alanı DTO reddi verdi; B davranış vakaları başlamadı. 31 migration, 120 yapı/politika ve 27 DB testi geçti. Fixture ve pg sayaç sorgusu uyarısı odaklı düzeltildi; yeni head hedefli kabulü bekler. Runtime sözleşmesi gevşetilmedi; [teşhis](../docs/p01-handover.md).
+
+## 19 Ekim 2026 — P01 ayrı dalda bütün olarak geliştiriliyor
+
+Main `24007212005d07938fb1265a9f42891f18d7fa09` ve main clean [39298247595](https://github.com/SXQHex/FtkSaaS/actions/runs/39298247595) başarılıdır. Mevcut ayrı dal `feature/p01-request-reservation-flow`, draft PR #22 korunur; mükerrer dal/PR açılmaz. P01-A head `b8d9adcff3607d7e055c5c71a9d4f8d5ca3a6013` hedefli [39303865804](https://github.com/SXQHex/FtkSaaS/actions/runs/39303865804) ve aday [39304797200](https://github.com/SXQHex/FtkSaaS/actions/runs/39304797200) başarılıdır; henüz merge edilmedi. Bu başarı sonraki kaynak değişikliklerine taşınmaz.
+
+Son kullanıcı kararı: her commit hedefli doğrulanır; ara P01 dilimlerinde aday clean/merge yoktur. Bütün P01 bittiğinde son-head bağımsız incelemesi, toplu aday full clean ve merge; ardından aynı main kabulü gerekir. P01 done değildir.
+
+P01-B altı talep komutu, ebeveyn sürüm okumaları ve dar rezervasyon-belge tüketicisi uygulandı; geliştirme kaynakları 199 sözleşme / 111 çağrılabilir / 88 contract_only / 31 migration içerir. Yerel generation/TypeScript ve 120 yapı/politika testi geçti; yeni Auth→Edge→RPC kabulü bekliyor. B'nin çalışma zamanı kabulü veya main kurulumu tamamlandı sayılmaz. Kalan P01-C yedi bekleme/teklif/expiry API'si ve gerçek worker işletimidir. [Ayrıntılı devir](../docs/p01-handover.md).
+
+
+## 19 Ekim 2026 — CI bakımı kapalı, P01-A yeni aday
+
+PR #23 tek seferlik güvenilir workflow kurulumu kullanıcı onayıyla normal merge yolundan 24007212005d07938fb1265a9f42891f18d7fa09 main SHA'sına alındı. [Aynı main clean 39298247595](https://github.com/SXQHex/FtkSaaS/actions/runs/39298247595) başarılı: 409 test (110 yapı/politika + 27 DB + 272 API), sıfır annotation warning/error; Verify merged candidate relation başarılı. Aday clean 39282766184 ile main tree 2b7a76e73ca1e2efd201b0d9a18bea4afe12007b ve iki parent ilişkisi doğrulandı. Repository ayarı, sahte başarı status'u veya required-check bypass yapılmadı; tek seferlik kurulum yetkisi sıradan P01 kabulüne taşınmaz.
+
+Mevcut PR #22 aynı main ile birleştirilir; Node24 Action pinleri ve deterministik ortak kota fixture'ı korunur. P01 önceki head 580239075b16f6ac6893d5ac01975d32133d0757 / hedefli run 39281409902: 119 yapı/politika + 27 DB + 51 API geçti. Bu eski head kanıtıdır; yeni birleşik head hedefli/son inceleme/adayı ve main kabulü bekler. P01-A uygulanmış, P01-B/C 13 API açık; P01 done değildir.
+
+## P01-A başlangıç ve önceki geliştirme kanıtları
+
+Main 9ce0a5639417f959111b11f70157156733e3de18 ve [aynı SHA clean 39252687560](https://github.com/SXQHex/FtkSaaS/actions/runs/39252687560) başarılıdır. PR #21 kurtarması kapandı; PR #20'nin eski başarısızlığı yeni kabul yerine sunulmaz.
+
+[P01-A devri](../docs/p01-handover.md): katalog ve seans bağlamında satın alınmış hak okuması uygulandı. 199 sözleşme / 105 çağrılabilir / 94 yalnız sözleşme; 30 migration. Yeni kaynak hedefli test/son inceleme/adayı ve main kabulü henüz bekliyor. P01'in 13 komutu, gerçek worker ve talep/bekleme uçtan uca kabulü açık.
+
+PR #22 ilk head 635e148651b2a85b18f5d40fe1fdea938ea94bf2, run 39270054878: başarısız. Tek başarısız alt vaka Auth reddinin hata-kodu beklentisidir; test ve hedefli seçim düzeltiliyor. [Teşhis](../reports/p01-a-targeted-diagnosis.json), [CI politika düzeltmesi](../docs/ci-policy.md). Yeni kaynak runtime kabulü ve aday/main clean henüz yoktur.
+
+İkinci koşu 39278529991 / head 85e25ec48cfc8f204392a757d333e284b02b6149 logunda P01 10/10, DB 27/27, yapı 96+23 geçti; ortak API weekly quota fixture assertion'ı başarısızdır. Logdaki yürütme yaklaşık 3:34; metadata durum gecikmesi ayrı engeldir. Aynı satış haftasını garanti eden fixture ve sonraki hafta bağımsız kota kontrolü uygulandı; runtime değişmedi. [Güncel teşhis](../docs/p01-handover.md). Yeni head hedefli kabul ve aday/main clean bekliyor.
+
+P01 öncesi snapshot:
 
 Üçüncü teslimin uygulama kapsamı: **199 sözleşme / 104 çağrılabilir / 95 yalnız sözleşme; 90 core tablo / 29 migration**. [Hesaplaşma devri](../docs/settlement-handover.md) çalışan akışı ve kabul sınırlarını tanımlar. Son head incelemesi ve tam temiz CI aynı SHA için ayrıca doğrulanır; işlem sayısı ürün tamamlanma yüzdesi değildir.
 

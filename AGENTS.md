@@ -1,5 +1,10 @@
 # FtkSaaS çalışma kuralları
 
+## P01 teslim sınırı — son kullanıcı kararı
+
+P01 bütünü `feature/p01-request-reservation-flow` dalında ve mevcut PR #22 içinde geliştirilir. Her uygulama commit'i hedefli doğrulanır; A/B/C ara dilimleri için aday full clean veya merge yapılmaz. P01'in bütün kalan API ve worker kabulü tamamlandığında son head bağımsız incelenir, toplu aday full clean alınır ve normal kaynak bağlı kapıyla merge edilir. Main full clean kabulü ayrıca gerekir. Full clean başlayınca aşağıdaki kullanıcıya devir kuralı korunur.
+
+
 ## Başlangıç ve kaynak önceliği
 
 İşe başlarken çalışılan tam SHA’yı belirt. Önce [kaynak indeksini](docs/source-index.md), [güncel devri](contracts/00-FtkSaaS-yeni-sohbet-devir.md), [kalan işleri](docs/remaining-work.md), [entegrasyon devrini](docs/claude-handover.md), sonra görevle ilgili sözleşme ve kararları oku. GitHub’dan güncel main/PR ve aynı SHA’nın CI durumunu doğrula; eski başarıyı yeni SHA’ya taşıma.
