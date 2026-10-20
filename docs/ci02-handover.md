@@ -1,5 +1,20 @@
 # CI-02 — kaynak bağlı belge kabulü ve dört bağımsız shard
 
+## Kapanış — 20 Ekim 2026
+
+CI-02 done. PR25 head150d9fa/tree4b1d49b için kaynak incelemesi + aday39412474187 ve açık kullanıcı politika kurulum onayı; PR26 head01d5cbc/tree25e8b3b için yeni bağımsız inceleme + aday39423719153 ve ayrı açık kurulum onayı tamamlandı. Her ikisi normal iki-parent merge ile alındı; sahte status, bypass, yönetim ayarı veya direct push yok.
+
+Son actual main **0ade7877cc16fc121095decbc276f2fbc868607e**, basea0325d7cdace18e3dfbb51691e631de53400724f, head01d5cbc8f8015e4293403d625bbebd51c7a2c31e. Tested merge51c0fc67228177f9694a160bc59cc5a7e70db4f4 ile actual main aynı iki parent ve tree25e8b3bdb0045a6aa21e84657830571ae9717aa1 taşır. [Main39425915555](https://github.com/SXQHex/FtkSaaS/actions/runs/39425915555) attempt1 completed/success: source, core, api-1…4, full-clean collector başarılı; optional serial-reference doğru biçimde skipped, hiçbir zorunlu iş atlanmadı. Main-binding-1 artifact12266003219 actual/head/base/tested merge/tree/run/attempt/coverage/profile bağını taşır.
+
+462 benzersiz test düğümü: yapı96, CI politika37, DB27, API302 (shard58/71/79/94); sıfır fail ve sıfır test skipped. Her backend temiz34 migration ve boş Auth/tenant/receipt ile başladı; core sentetik seed, Auth/REST health ve advisors geçti. Source scope/type/runtime envanteri 199/118/81,34 migration olarak değişmedi. Full clean ile ayrı belge kabulü karıştırılmaz; sonraki belge main SHA'sı bu eski full clean'in çalıştığı kaynak sayılmaz.
+
+[Performans](ci-performance.md) aynı kaynak seri/dört-shard ölçümünü ve yeni main sürelerini ayırır. Rutin geliştirmede hızlı/birikimli hedefli, son hazır runtime/CI adayı için açık full clean, merge sonrası aynı main full clean; güvenli yalnız-belge için ayrı source-bound belge kabulü aktiftir. Unknown/mixed/runtime girdisi, Draft/development ve eksik/skipped/başarısız zorunlu iş kapalıdır. Yeni trusted CI politika değişikliği otomatik kabul almaz; mevcut kaynak bazlı kurulum izinleri başka kaynağa taşınmaz.
+
+P01 ve CI-02 done; P02 henüz başlamadı. Hosted worker, frontend/production, Resend, yük/restore ve repository yönetim ayarları bu teslimin kabulü değildir. Sonraki kaynak kabulü ayrıca doğrulanır.
+
+<details>
+<summary>Önceki dilimler ve hata teşhisleri — kaynaklarına ait tarihsel süreç</summary>
+
 ## Main kabul düzeltmesi — 20 Ekim 2026
 
 PR25 son head150d9fafd38f19d990dd29019698d5a72fb62b60 bağımsız incelendi ve aday39412474187/attempt1 başarıyla geçti. Kullanıcı exact kaynak için güvenilir kurulum onayı verdi; normal merge ile main a0325d7cdace18e3dfbb51691e631de53400724f oluştu. Required check bypass, sahte status, yönetim ayarı veya direct push yoktu.
@@ -50,3 +65,5 @@ CI-only geliştirme seçimi yalnız son commit'e bakmaz: main merge-base'ten bir
 Güven yüzeyi artık full workflow dışında tüm workflow'lar, scripts/ci ve clean/start runner'larının kaynak blob/mode kümesini de kapsar. Policy değişikliği normal otomatik merge kapısından geçmez. CI-02 bu sınırı kendisi gevşetmez. PR23'ün tek seferlik kullanıcı kurulum izni bu teslimi kapsamaz. Son-head bağımsız inceleme ve gerçek aday kanıtından sonra bu somut CI-02 politika kurulumu için açık yetki değerlendirilir; normal merge API dışında status/bypass/ayar/direct push yoktur. Repository yönetim ayarları doğrulanmış/değiştirilmiş sayılmaz.
 
 Aday veya main full clean tetiklenince ajan kaynak/run/sonraki adımı bildirip durur. Kullanıcı dönmeden polling/log izleme yoktur. CI-02 main kabulü tamamlanmadan P02'ye geçilmez.
+
+</details>
