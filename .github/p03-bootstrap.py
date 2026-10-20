@@ -54,20 +54,22 @@ wr+=["notify pgrst,'reload schema';",'commit;']
 Path('database/p03-finance-payments-wrappers.sql').write_text('\n'.join(wr)+'\n')
 migration=Path('supabase/migrations/20261020200347_p03_finance_payments.sql');migration.write_text(Path('database/p03-finance-payments.sql').read_text()+Path('database/p03-finance-payments-wrappers.sql').read_text())
 # Guardrail migration is created by the CLI and frozen on first source commit.
-import subprocess
+import subprocess,time
 guard_source=Path('database/p03-finance-guardrails.sql')
 if guard_source.exists():
  guards=list(Path('supabase/migrations').glob('*_p03_finance_guardrails.sql'))
  if not guards:
+  time.sleep(1.1)
   subprocess.run(['node_modules/.bin/supabase','migration','new','p03_finance_guardrails'],check=True)
   guards=list(Path('supabase/migrations').glob('*_p03_finance_guardrails.sql'))
  assert len(guards)==1
  guards[0].write_text(guard_source.read_text())
-for suffix,source in [('p03_finance_acceptance','database/p03-finance-acceptance.sql'),('p03_finance_scope','database/p03-finance-scope.sql'),('p03_finance_balances','database/p03-finance-balances.sql')]:
+for suffix,source in [('p03_finance_acceptance','database/p03-finance-acceptance.sql'),('p03_finance_scope','database/p03-finance-scope.sql'),('p03_finance_balances','database/p03-finance-balances.sql'),('p03_finance_results','database/p03-finance-results.sql')]:
  source_path=Path(source)
  if source_path.exists():
   found=list(Path('supabase/migrations').glob('*_'+suffix+'.sql'))
   if not found:
+   time.sleep(1.1)
    subprocess.run(['node_modules/.bin/supabase','migration','new',suffix],check=True)
    found=list(Path('supabase/migrations').glob('*_'+suffix+'.sql'))
   assert len(found)==1
@@ -143,6 +145,7 @@ guard_source=Path('database/p03-finance-guardrails.sql')
 if guard_source.exists():
  guards=list(Path('supabase/migrations').glob('*_p03_finance_guardrails.sql'))
  if not guards:
+  time.sleep(1.1)
   subprocess.run(['node_modules/.bin/supabase','migration','new','p03_finance_guardrails'],check=True)
   guards=list(Path('supabase/migrations').glob('*_p03_finance_guardrails.sql'))
  assert len(guards)==1
@@ -152,7 +155,8 @@ for suffix,source in [('p03_finance_acceptance','database/p03-finance-acceptance
  if source_path.exists():
   found=list(Path('supabase/migrations').glob('*_'+suffix+'.sql'))
   if not found:
-   subprocess.run(['node_modules/.bin/supabase','migration','new',suffix],check=True)
+   time.sleep(1.1)
+  subprocess.run(['node_modules/.bin/supabase','migration','new',suffix],check=True)
    found=list(Path('supabase/migrations').glob('*_'+suffix+'.sql'))
   assert len(found)==1
   found[0].write_text(source_path.read_text())
@@ -192,3 +196,9 @@ for name in ['docs/production-queue.md','docs/remaining-work.md','docs/claude-ha
  p=Path(name);s=p.read_text().replace('199/140 runtime/59 contract_only,44 migration','199/140 runtime/59 contract_only,45 migration');p.write_text(s)
 p=Path('contracts/02-FtkSaaS-teknik-sozlesme.md')
 if 'P03 gross allocation' not in p.read_text():p.write_text(p.read_text()+'\nP03 gross allocation, borç neti ve daha önce alacağa çevrilmiş claim ayrı izlenir: kalan=max(0,net−gross_paid+claimed). Yeni borç artışı alacağa çevrilmiş eski ödemeyle kendiliğinden kapanmaz. Tahsilat düzeltmesinin alacak geri alımı ilgili allocation azalışını aşamaz. Bağlı ters debt/earning allocation tutarı SignedMoney; kullanıcıya dönen para/bakiye toplamları nonnegative Money kalır. Tam finans geçmişi orgreader/CM/self içindir, finance.collect personel grantı tam geçmiş açmaz.\n')
+
+p=Path('scripts/check-migrations.py')
+line="\nassert next(Path('supabase/migrations').glob('*_p03_finance_results.sql')).read_text()==Path('database/p03-finance-results.sql').read_text(),'P03 result source drift'\n"
+if line not in p.read_text():p.write_text(p.read_text()+line)
+for name in ['docs/production-queue.md','docs/remaining-work.md','docs/claude-handover.md','contracts/00-FtkSaaS-yeni-sohbet-devir.md','docs/source-index.md','contracts/02-FtkSaaS-teknik-sozlesme.md']:
+ p=Path(name);s=p.read_text().replace('199/140 runtime/59 contract_only,45 migration','199/140 runtime/59 contract_only,46 migration');p.write_text(s)

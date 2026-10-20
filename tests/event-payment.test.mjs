@@ -335,7 +335,7 @@ test('P03 linked finance corrections, frozen refunds and instructor payments',as
   assert.equal(results.filter(x=>x.result.ok).length,1,JSON.stringify(results));const payment=results.find(x=>x.result.ok).result.data.primary_id;
   const paid=await row('select sum(amount_minor)::text paid from core.earning_allocations where org_id=$1 and earning_id=$2',[org,earning]);assert.equal(paid.paid,'600');
   const correct={payment_id:payment,expected_version:1,correction:{amount_minor:'200',currency:'TRY',occurred_at:now(),direction:'decrease'},reason:'P03 payment correction'};
-  const k=key();await m('instructor_payment_correct_v1',correct,k);await m('instructor_payment_correct_v1',correct,k);
+  const k=key(),correctionResult=await m('instructor_payment_correct_v1',correct,k);assert.equal(correctionResult.primary_id,payment);assert.equal(correctionResult.version,2);assert(correctionResult.related.some(x=>x.type==='instructor_payments'&&x.id!==payment));await m('instructor_payment_correct_v1',correct,k);
   await bad('instructor_payment_correct_v1',correct,'VERSION_CONFLICT');
   assert.equal((await row('select private.p03_payment_net($1,$2)::text net',[org,payment])).net,'400');
   assert.equal((await row('select amount_minor::text amount from core.instructor_payments where id=$1',[payment])).amount,'600');
