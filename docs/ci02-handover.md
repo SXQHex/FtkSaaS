@@ -1,12 +1,20 @@
 # CI-02 — kaynak bağlı belge kabulü ve dört bağımsız shard
 
+## Main kabul düzeltmesi — 20 Ekim 2026
+
+PR25 son head150d9fafd38f19d990dd29019698d5a72fb62b60 bağımsız incelendi ve aday39412474187/attempt1 başarıyla geçti. Kullanıcı exact kaynak için güvenilir kurulum onayı verdi; normal merge ile main a0325d7cdace18e3dfbb51691e631de53400724f oluştu. Required check bypass, sahte status, yönetim ayarı veya direct push yoktu.
+
+[Main39421388153](https://github.com/SXQHex/FtkSaaS/actions/runs/39421388153) gerçek merge/head/base/tree kanıtını doğruladı; core ve api-1…4 başarıyla geçti. İsteğe bağlı serial-reference main’de benchmark=false ile doğru biçimde skipped oldu. Toplayıcının ölçüm kodu bu işin olmayan Clean acceptance adımını okumaya çalışıp TypeError: Cannot read properties of undefined (reading started_at) verdi. Bu hata main kabulünü kapatır; önceki shard başarıları yeni SHA’ya taşınmaz.
+
+Dar düzeltme yalnız gerçekten completed/success olmuş rolleri ölçer. Ölçümden ÖNCE zorunlu core/dört shard ve istenmişse serial-reference validateJobs tarafından aynı kaynak/run/attempt ve başarılı step koşuluyla denetlenmeye devam eder. Zorunlu skipped/cancelled/failure kabul edilmez. Gerçek main Jobs API metadata’sı önce hatayı üretti, sonra beş gerçek rolü finite sürelerle ölçtü. Yeni regresyon routine main skipped serial + zorunlu negatifleri kapsar; yerel37 politika testi geçti. Yeni branch fix/ci02-main-optional-measurement, hedefli/son inceleme/aday/main kabulü bekliyor; P02 başlamadı.
+
 ## Kaynak ve gerçek durum
 
 Başlangıç main `d544efe9f88f34edd7d6ce3055ed46d291a55f2c`; [PR24](https://github.com/SXQHex/FtkSaaS/pull/24) birleşti. Aynı kaynak [39408606736](https://github.com/SXQHex/FtkSaaS/actions/runs/39408606736) `Verify merged candidate relation` içinde `No source-bound full clean evidence for merged tree` ile durdu; test çalışmadı. Kurulumdan önce koşulsuz cleanup ayrıca `supabase: not found` üretti. Eski run yeniden başarı gösterilmez.
 
 P01 PR22 / `7577b2f1873c6b1fcf83390bfa94a34374c44082` / [39401570751](https://github.com/SXQHex/FtkSaaS/actions/runs/39401570751) completed/success ve P01 done korunur; başarı yeni SHA'ya taşınmaz. Ürün/runtime/migration/118 callable/81 contract_only/F01–F33 değişmedi. P02 başlamadı.
 
-Tek geliştirme [Draft PR25](https://github.com/SXQHex/FtkSaaS/pull/25), `ci/ci02-source-bound-shards`, `development`. İlk dilim `fc074566643ac07afd00a82aa34d6f3cccf36452`: dar belge kabulü, source binding, recovery ve cleanup; yerel verify + 28 politika testi geçti. Yeni dört-shard dilimi yerel 36 politika testinden geçti; son 27fe070 kaynağının bağımsız incelemesi aday hazırlığını onayladı; uzak hedefli, bağımsız son-head incelemesi, aday/main kabulü ve kurulum henüz bekler. Geliştirme durumundan çıkış kendiliğinden clean değildir. Trusted base henüz yeni belge modülünü içermiyorsa docs classify kabul vermeden eligible=false ile kapanır; CI-02 kurulumu için belge istisnası açılmaz.
+İlk geliştirme [PR25](https://github.com/SXQHex/FtkSaaS/pull/25), `ci/ci02-source-bound-shards` üzerinde Draft/development ile ilerledi; hazır geçişi sonrası birleşti. İlk dilim `fc074566643ac07afd00a82aa34d6f3cccf36452`: dar belge kabulü, source binding, recovery ve cleanup; yerel verify + 28 politika testi geçti. Yeni dört-shard dilimi yerel 36 politika testinden geçti; son 27fe070 kaynağının bağımsız incelemesi aday hazırlığını onayladı; uzak hedefli, bağımsız son-head incelemesi, aday/main kabulü ve kurulum henüz bekler. Geliştirme durumundan çıkış kendiliğinden clean değildir. Trusted base henüz yeni belge modülünü içermiyorsa docs classify kabul vermeden eligible=false ile kapanır; CI-02 kurulumu için belge istisnası açılmaz.
 
 ## PR24 için somut belge kanıtı
 

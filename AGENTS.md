@@ -1,12 +1,14 @@
 # FtkSaaS çalışma kuralları
 
-CI-02 PR25 geliştirmesi ve açık kabul sınırı [teknik devirde](docs/ci02-handover.md) tutulur. Yeni otomasyon dalda uygulanmıştır; trusted main kurulumu, aday/main ve ölçüm tamamlanmadan etkin kabul edilmez. P02 CI-02 kabulünden sonra.
+CI-02 PR25 açık kullanıcı kurulum onayıyla main `a0325d7cdace18e3dfbb51691e631de53400724f` kaynağına birleşti. Aday39412474187 başarılı ve gerçek merge ilişkisi main'de doğrulandı. Main39421388153 kaynak/core/dört API başarılıyken yalnız ölçüm toplayıcısında atlanan isteğe bağlı serial-reference nedeniyle çöktü; main kabulü tamamlanmadı. Dar düzeltme `fix/ci02-main-optional-measurement` dalında; 37 politika testi ve gerçek main job metadata regresyonu geçti, yeni hedefli/aday/main kabulü bekliyor. P01 done; P02 başlamaz.
+
 
 ## Güncel üretim ve kabul — 20 Ekim 2026
 
 P01 [PR #22](https://github.com/SXQHex/FtkSaaS/pull/22) ile main'e birleşti; aynı main SHA’sının gerçek başarılı kabulü güncel devirde; P01 done. Sırada CI-02, ardından P02 vardır. [CI-2026-10-20 kararı](docs/decisions/CI-2026-10-20.md) bağlayıcıdır: bölüm boyunca tek Draft/development PR ve hedefli CI; bitince açık aday full clean, merge sonrası main full clean. Güvenli yalnız-belge farkları belge kabulüyle kapanır ve clean başlatmaz; karma/bilinmeyen veya runtime girdisi değişiklikleri istisna değildir. Dört shard ayrı backend/DB kullanır; bütün zorunlu işlerin kaynak bağlı başarısı gerekir.
 
-Yeni otomasyon CI-02 PR25 dalında uygulanmıştır; trusted main kurulumu tamamlanmadığından mevcut main workflow/kapısı hâlâ her main push için full clean ister ve Draft/development veya genel belge kabulünü uygulamış sayılmaz. Bu belge görevi workflow/kapı değiştirmez; yeni clean tetikleme veya mevcut kontrolü bypass etme yetkisi çıkarılmaz. P01 main clean 39401570751 completed/success doğrulandı; geçici kabul varsayımı kaldırıldı. Başarı yalnız aynı kaynak içindir, yeni kaynak kabulüne istisna oluşturmaz.
+CI-02 otomasyonu PR25 ile main’e kurulmuştur; kaynak bağlı belge kabulü ve dört izole shard aktiftir. Main kabulü atlanan isteğe bağlı seri kıyas ölçüm hatası nedeniyle açık; düzeltme sonrası gerçek yeni aday/main kabulü gerekir. Eski başarı yeni SHA’ya taşınmaz.
+
 
 ## Başlangıç ve kaynak önceliği
 

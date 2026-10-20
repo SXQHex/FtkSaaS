@@ -1,12 +1,12 @@
 # Kalan backend işleri
 
-CI-02 geliştirmesi [PR25](https://github.com/SXQHex/FtkSaaS/pull/25), `ci/ci02-source-bound-shards` dalında. Başlangıç main `d544efe9f88f34edd7d6ce3055ed46d291a55f2c` / 39408606736 test öncesi kaynak kabulünde başarısızdır. Dar belge/PR24 AST kanıtı, ayrı belge recovery, Draft/development ve dört izole shard/toplayıcı uygulandı; yeni kaynak uzak hedefli, bağımsız son inceleme, aday/main kabulü ve güvenilir politika kurulumu bekliyor. P01 done; P02 başlamaz.
+CI-02 PR25 açık kullanıcı kurulum onayıyla main `a0325d7cdace18e3dfbb51691e631de53400724f` kaynağına birleşti. Aday39412474187 başarılı ve gerçek merge ilişkisi main'de doğrulandı. Main39421388153 kaynak/core/dört API başarılıyken yalnız ölçüm toplayıcısında atlanan isteğe bağlı serial-reference nedeniyle çöktü; main kabulü tamamlanmadı. Dar düzeltme `fix/ci02-main-optional-measurement` dalında; 37 politika testi ve gerçek main job metadata regresyonu geçti, yeni hedefli/aday/main kabulü bekliyor. P01 done; P02 başlamaz.
 
-Güncel kaynak main `7577b2f1873c6b1fcf83390bfa94a34374c44082`: **199 işlem / 118 çağrılabilir / 81 yalnız sözleşme / 34 migration**. [Tek devir](../contracts/00-FtkSaaS-yeni-sohbet-devir.md) gerçek hedefli/aday ve aynı main completed/success sonuçlarını gösterir. P01 PR #22 birleşti; eski A/B/C runtime ve merge bekleme notları güncel açık değildir. P01 main kabulü tamamlandı; sonraki CI-02 kaynağı ayrıca doğrulanacaktır.
+P01 runtime kabul kaynağı main `7577b2f1873c6b1fcf83390bfa94a34374c44082`: **199 işlem / 118 çağrılabilir / 81 yalnız sözleşme / 34 migration**. [Tek devir](../contracts/00-FtkSaaS-yeni-sohbet-devir.md) gerçek hedefli/aday ve aynı main completed/success sonuçlarını gösterir. P01 PR #22 birleşti; eski A/B/C runtime ve merge bekleme notları güncel açık değildir. P01 main kabulü tamamlandı; sonraki CI-02 kaynağı ayrıca doğrulanacaktır.
 
 ## Aktif seri üretim
 
-Önce **CI-02**, ardından P02–P07. [Tek kuyruk](production-queue.md) sıralama ve prompt kaynağıdır; [CI-2026-10-20](decisions/CI-2026-10-20.md) dört izole shard, Draft/development ve belge-only kabulünün main kurulumunun henüz tamamlanmadığını belirtir. Belge-only merge/main clean istisnası workflow'a aktarılmadan etkin sayılmaz.
+Önce **CI-02**, ardından P02–P07. [Tek kuyruk](production-queue.md) sıralama ve prompt kaynağıdır; [CI-2026-10-20](decisions/CI-2026-10-20.md) dört izole shard, Draft/development ve belge-only kabulünün main kabulünün henüz tamamlanmadığını belirtir. Belge-only yolu main’e kuruldu; yeni kaynak kabulünün yerine eski başarı taşınmaz.
 
 [P01 devri](p01-handover.md): katalog/hak okuması, talep/alternatif/onay, bekleme/teklif/expiry ve gerçek dar worker döngüsü uygulandı. Genel belge upload/yayın/kabul ve bildirim API'leri P05'te açıktır; mevcut yayımlanmış rezervasyon gerekliliklerinin dar tüketicisi bunları kapatmaz. Hosted worker provisioning/işletim kabulü CI'daki gerçek CLI/loop testinden ayrıdır.
 

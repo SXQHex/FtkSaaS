@@ -1,8 +1,10 @@
 # CI çalışma politikası — 20 Ekim 2026
 
+CI-02 PR25 kullanıcı onayıyla main a0325d7 kaynağına kuruldu. Aday39412474187 başarılı; main39421388153 yalnız ölçüm toplayıcısında skipped optional serial job nedeniyle başarısız. Dar düzeltme ve yeni kabul bekliyor; belge kabulü/full clean veya required job kapısı gevşetilmez.
+
 ## CI-02 belge kabulü dilimi — kurulum bekliyor
 
-Yeni politika kodu ayrı dalda uygulanıyor; main henüz eski kapıyı kullanır. İncelenmiş tam belge yolları + normal dosya modu zorunlu; makine/envanter/tip/workflow/dependency ve bilinmeyen yollar kapalıdır. Renderer yalnız üç açıklama paragrafının AST string sabitleri değişirse belge sayılır; ifade, import, fonksiyon, emit ve envanter mantığının tamamı aynı kalmalıdır. PR24 bu dar kanıtı sağlar. Belge kabulü `npm run verify` ve bütün yaşayan inbound/outgoing bağlantıları denetler; full clean değildir.
+Yeni politika kodu ayrı dalda uygulanıyor; main yeni kapıyı kullanır; main kabulü ölçüm düzeltmesini bekler. İncelenmiş tam belge yolları + normal dosya modu zorunlu; makine/envanter/tip/workflow/dependency ve bilinmeyen yollar kapalıdır. Renderer yalnız üç açıklama paragrafının AST string sabitleri değişirse belge sayılır; ifade, import, fonksiyon, emit ve envanter mantığının tamamı aynı kalmalıdır. PR24 bu dar kanıtı sağlar. Belge kabulü `npm run verify` ve bütün yaşayan inbound/outgoing bağlantıları denetler; full clean değildir.
 
 Yeni kaynakta açık `backend.yml` workflow_dispatch + exact `merge_sha`, geçmiş belge merge’ini iki gerçek parent/tree ve birikimli base–head sınıflandırmasıyla ayrıca denetler; salt okuma izinlidir, eski başarısız run/status değiştirilmez. Bu kurtarma kanıtı normal aday proof’un yerine genel fallback değildir. Sonraki belge PR’leri ayrı candidate receipt ve actual main ilişkisi gerektirir. Push main tüm açık PR kapılarını yeniden değerlendirir.
 
@@ -71,7 +73,7 @@ Merge için normal iki-parent merge commit kullanılır. Main kontrolü artifact
 
 [Ölçüm değerlendirmesi](ci-performance.md) eski logların sayısal temelini ve ölçülmemiş alanları ayırır. `FTK_TEST_TIMINGS=1`, yalnız test helper’ında API operation/Auth/fixture toplam–maksimum sürelerini, sayıları ve suite process wall süresini kaydeder. Body, token, e-posta, kişi/tenant kimliği kaydedilmez. İstek başlığına kadar süre ayrıca belirtilir; API/fixture süresi body decode’u kapsar; iç içe süreler toplanıp toplam duvar süresi diye sunulmaz.
 
-Main kurulumunda henüz shard etkin değildir; PR25 dört izole shard uygulamasını içerir. Mevcut test-concurrency=2 korunur. Ortak PostgreSQL üzerinde global trigger/function kuran fixture’lar nedeniyle CI-02 dört ayrı runner/backend/DB kullanacaktır. Suite envanterinin eksiksiz ve tekrarsız bölünmesi, bütün clean yükümlülükleri ve kaynak bağlı toplayıcı zorunludur. Aday/main aynı kapsamı kullanır; ölçülmemiş hız kazancı vaat edilmez.
+PR25 ile dört izole shard main’de kuruludur; ana dal kabulü henüz tamamlanmadı. Mevcut test-concurrency=2 korunur. Ortak PostgreSQL üzerinde global trigger/function kuran fixture’lar nedeniyle CI-02 dört ayrı runner/backend/DB kullanacaktır. Suite envanterinin eksiksiz ve tekrarsız bölünmesi, bütün clean yükümlülükleri ve kaynak bağlı toplayıcı zorunludur. Aday/main aynı kapsamı kullanır; ölçülmemiş hız kazancı vaat edilmez.
 
 ## Full clean sırasında kullanıcıya devir — 19 Ekim 2026 son talimatı
 
