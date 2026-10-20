@@ -27,6 +27,10 @@ d['Table_earning_allocations']['properties']['amount_minor']=ref('SignedMoney')
 d['EarningView']['properties'].update({'overpaid_minor':ref('Money'),'payments':{'type':'array','items':ref('P03PaymentView')}})
 d['Table_instructor_payments']['properties'].update({'previous_id':nullable('FtkUuid'),'operation_id':nullable('FtkUuid'),'direction':ref('Direction')})
 d['Table_earning_allocations']['properties']['previous_id']=nullable('FtkUuid')
+for name,column,target in [('instructor_payments','previous_id','instructor_payments'),('instructor_payments','operation_id','operation_receipts'),('earning_allocations','previous_id','earning_allocations')]:
+ table=next(t for t in x['tables'] if t['name']==name)
+ if not any(f['column']==column for f in table['foreign_keys']):table['foreign_keys'].append({'column':column,'target':target,'same_tenant':True})
+if 'direction' not in d['Table_instructor_payments']['required']:d['Table_instructor_payments']['required'].append('direction')
 live=json.loads(Path('supabase/functions/backend-v1/implemented.json').read_text())['operations']
 live=list(dict.fromkeys(live+names))
 for o in x['operations']:
@@ -62,7 +66,8 @@ sources=[
  ('p03_finance_acceptance','database/p03-finance-acceptance.sql',None),
  ('p03_finance_scope','database/p03-finance-scope.sql',None),
  ('p03_finance_balances','database/p03-finance-balances.sql',None),
- ('p03_finance_results','database/p03-finance-results.sql',None)]
+ ('p03_finance_results','database/p03-finance-results.sql',None),
+ ('p03_finance_integrity','database/p03-finance-integrity.sql',None)]
 checks=Path('scripts/check-migrations.py').read_text()
 for suffix,source,wrapper in sources:
  content=Path(source).read_text()+(Path(wrapper).read_text() if wrapper else '')

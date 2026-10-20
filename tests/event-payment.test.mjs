@@ -329,7 +329,7 @@ test('P03 linked finance corrections, frozen refunds and instructor payments',as
  await t.test('instructor payment selected net earnings; concurrent overpay, correction version and separate cash',async()=>{
   // Financial-only synthetic earning facts; actual attendance earning creation remains in instructor suite.
   const earning=key(),receipt=(await row('select id from core.operation_receipts where org_id=$1 order by created_at,id limit 1',[org])).id;
-  await db.query("insert into core.earnings(id,org_id,center_id,person_id,amount_minor,currency,basis,operation_id,direction) values($1,$2,$3,$4,1000,'TRY',$5,$6,'add')",[earning,org,center,operson,{source:'event_assignment',currency:'TRY',quantity:1},receipt]);
+  await db.query("insert into core.earnings(id,org_id,center_id,person_id,amount_minor,currency,basis,operation_id,direction) values($1,$2,$3,$4,1000,'TRY',$5,$6,'add')",[earning,org,center,operson,{source:'event_fee',currency:'TRY',quantity:1,excluded_blocked:0},receipt]);
   const body={person_id:operson,earning_ids:[earning],amount_minor:'600',currency:'TRY',occurred_at:now()};
   const results=await Promise.all([call(owner,'instructor_payment_record_v1',scope(body),key()),call(owner,'instructor_payment_record_v1',scope(body),key())]);
   assert.equal(results.filter(x=>x.result.ok).length,1,JSON.stringify(results));const payment=results.find(x=>x.result.ok).result.data.primary_id;
@@ -343,7 +343,7 @@ test('P03 linked finance corrections, frozen refunds and instructor payments',as
   const reads=await must(owner,'earnings_list_v1',scope({person_id:operson,interval:{starts_at:'2026-01-01T00:00:00Z',ends_at:'2027-01-01T00:00:00Z'},page:{}}));
   const view=reads.items.find(x=>x.id===earning);assert(view);assert.equal(view.paid_minor,'400');assert.equal(view.remaining_minor,'600');assert.equal(view.payments[0].version,2);
   await bad('instructor_payment_record_v1',{...body,currency:'EUR'},'CURRENCY_MISMATCH');
-  await db.query("insert into core.earnings(id,org_id,center_id,person_id,amount_minor,currency,basis,operation_id,direction,previous_id) values($1,$2,$3,$4,800,'TRY',$5,$6,'subtract',$7)",[key(),org,center,operson,{source:'event_assignment',currency:'TRY',quantity:1},receipt,earning]);
+  await db.query("insert into core.earnings(id,org_id,center_id,person_id,amount_minor,currency,basis,operation_id,direction,previous_id) values($1,$2,$3,$4,800,'TRY',$5,$6,'subtract',$7)",[key(),org,center,operson,{source:'event_fee',currency:'TRY',quantity:1,excluded_blocked:0},receipt,earning]);
   const revised=await must(owner,'earnings_list_v1',scope({person_id:operson,interval:{starts_at:'2026-01-01T00:00:00Z',ends_at:'2027-01-01T00:00:00Z'},page:{}}));
   assert.equal(revised.items.find(x=>x.id===earning).overpaid_minor,'200');
  });
