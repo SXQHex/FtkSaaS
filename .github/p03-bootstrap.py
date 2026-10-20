@@ -29,29 +29,18 @@ for o in c['x-contract']['operations']:
  k=o['operation_contract']
  if k['kind'] not in ['read','auth','worker'] and k.get('read_operation') in names:k['read_path_status']='implemented'
 c['x-contract']['decision_sprint']['new_contract_only_operations']=[n for n in c['x-contract']['decision_sprint']['new_contract_only_operations'] if n not in names]
-# Synchronize all newly introduced UUID reference paths with existing classification shapes.
-print('UUID classification example',json.dumps(c['x-contract']['uuid_field_map'][:2]))
-uuid_refs={'#/$defs/FtkUuid','#/$defs/ProviderUuid','#/$defs/FtkGeneratedUuidV7'}
+# Preserve prior classifications and classify new backend-produced/reference UUIDs.
 paths=[]
 def walk(v,path=''):
  if isinstance(v,dict):
-  if v.get('$ref') in uuid_refs:paths.append((path,v['$ref']))
+  if v.get('$ref') in {'#/$defs/FtkUuid','#/$defs/ProviderUuid','#/$defs/FtkGeneratedUuidV7'}:paths.append(('#/$defs'+path,v['$ref']))
   for k,x in v.items():walk(x,path+'/'+k)
  elif isinstance(v,list):
   for k,x in enumerate(v):walk(x,path+'/'+str(k))
 walk(d)
-old=c['x-contract']['uuid_field_map']
-key=next((k for k,v in old[0].items() if isinstance(v,str) and ('properties' in v or v.startswith('/'))),None)
-if key is None:raise RuntimeError('UUID map path field needs explicit source review: '+repr(old[0]))
-oldpaths={x[key] for x in old}
-for path,ref_value in paths:
- candidate=path if path in oldpaths or not any(x.startswith('/$defs/') for x in oldpaths) else '/$defs'+path
- if candidate not in oldpaths:
-  field=path.split('/properties/')[-1].split('/')[0]
-  template=next((x for x in old if '/properties/'+field in x[key] and any(v==ref_value for v in x.values())),None)
-  if template is None:template=next((x for x in old if '/properties/'+field in x[key]),old[0])
-  item=dict(template);item[key]=candidate;old.append(item);oldpaths.add(candidate)
-assert len(old)==len(paths),(len(old),len(paths))
+old={x['path']:x for x in c['x-contract']['uuid_field_map']}
+c['x-contract']['uuid_field_map']=[old.get(path,{'path':path,'origin':'provider' if ref_value=='#/$defs/ProviderUuid' else 'ftksaas','acceptance':'generic_uuid','generation':'external' if ref_value=='#/$defs/ProviderUuid' else 'uuidv7'}) for path,ref_value in paths]
+assert len(c['x-contract']['uuid_field_map'])==len(paths)
 p.write_text(json.dumps(c,ensure_ascii=False,indent=2)+'\n')
 Path('supabase/functions/backend-v1/implemented.json').write_text(json.dumps({'operations':live},ensure_ascii=False,indent=2)+'\n')
 wr=['begin;']
@@ -64,6 +53,16 @@ for o in c['x-contract']['operations']:
 wr+=["notify pgrst,'reload schema';",'commit;']
 Path('database/p03-finance-payments-wrappers.sql').write_text('\n'.join(wr)+'\n')
 migration=Path('supabase/migrations/20261020200347_p03_finance_payments.sql');migration.write_text(Path('database/p03-finance-payments.sql').read_text()+Path('database/p03-finance-payments-wrappers.sql').read_text())
+# Guardrail migration is created by the CLI and frozen on first source commit.
+import subprocess
+guard_source=Path('database/p03-finance-guardrails.sql')
+if guard_source.exists():
+ guards=list(Path('supabase/migrations').glob('*_p03_finance_guardrails.sql'))
+ if not guards:
+  subprocess.run(['node_modules/.bin/supabase','migration','new','p03_finance_guardrails'],check=True)
+  guards=list(Path('supabase/migrations').glob('*_p03_finance_guardrails.sql'))
+ assert len(guards)==1
+ guards[0].write_text(guard_source.read_text())
 Path('database/migrations.sha256.json').write_text(json.dumps({p.name:hashlib.sha256(p.read_bytes()).hexdigest() for p in sorted(Path('supabase/migrations').glob('*.sql'))},indent=2)+'\n')
 p=Path('scripts/check-migrations.py');line="\nassert next(Path('supabase/migrations').glob('*_p03_finance_payments.sql')).read_text()==Path('database/p03-finance-payments.sql').read_text()+Path('database/p03-finance-payments-wrappers.sql').read_text(),'P03 finance source drift'\n"
 if line not in p.read_text():p.write_text(p.read_text()+line)
@@ -75,3 +74,7 @@ for n in ['docs/production-queue.md','docs/remaining-work.md','docs/claude-hando
 p=Path('docs/production-queue.md');s=p.read_text().replace('7 API uygulaması ve hedefli kabul açık','7 API uygulandı;hedefli runtime/son inceleme/aday-main kabulü açık');p.write_text(s)
 p=Path('contracts/02-FtkSaaS-teknik-sozlesme.md')
 if '## P03 uygulama aktarımı' not in p.read_text():p.write_text(p.read_text()+'\n## P03 uygulama aktarımı — kabul bekliyor\n\n'+note+'CashCorrection.amount_minor yeni toplam değil, direction yönünde açık farktır. Tahsilat artışı özgün borç kapsamını korur; azalış kaynak alacağı ve dağıtımlarını geri alır, harcanmış alacağı silemez. Genel iade hak veya rezervasyonu değiştirmez. Eğitmen düzeltmesi kök ödeme ve earnings_list içindeki güncel payment version ister.\n')
+
+p=Path('scripts/check-migrations.py')
+line="\nassert next(Path('supabase/migrations').glob('*_p03_finance_guardrails.sql')).read_text()==Path('database/p03-finance-guardrails.sql').read_text(),'P03 finance guardrails source drift'\n"
+if line not in p.read_text():p.write_text(p.read_text()+line)
