@@ -63,7 +63,7 @@ if guard_source.exists():
   guards=list(Path('supabase/migrations').glob('*_p03_finance_guardrails.sql'))
  assert len(guards)==1
  guards[0].write_text(guard_source.read_text())
-for suffix,source in [('p03_finance_acceptance','database/p03-finance-acceptance.sql')]:
+for suffix,source in [('p03_finance_acceptance','database/p03-finance-acceptance.sql'),('p03_finance_scope','database/p03-finance-scope.sql')]:
  source_path=Path(source)
  if source_path.exists():
   found=list(Path('supabase/migrations').glob('*_'+suffix+'.sql'))
@@ -94,3 +94,9 @@ line="\nassert next(Path('supabase/migrations').glob('*_p03_finance_acceptance.s
 if line not in p.read_text():p.write_text(p.read_text()+line)
 for name in ['docs/production-queue.md','docs/remaining-work.md','docs/claude-handover.md','contracts/00-FtkSaaS-yeni-sohbet-devir.md','docs/source-index.md','contracts/02-FtkSaaS-teknik-sozlesme.md']:
  p=Path(name);s=p.read_text().replace('199/140 runtime/59 contract_only,41 migration','199/140 runtime/59 contract_only,43 migration');p.write_text(s)
+
+p=Path('scripts/check-migrations.py')
+line="\nassert next(Path('supabase/migrations').glob('*_p03_finance_scope.sql')).read_text()==Path('database/p03-finance-scope.sql').read_text(),'P03 finance scope source drift'\n"
+if line not in p.read_text():p.write_text(p.read_text()+line)
+for name in ['docs/production-queue.md','docs/remaining-work.md','docs/claude-handover.md','contracts/00-FtkSaaS-yeni-sohbet-devir.md','docs/source-index.md','contracts/02-FtkSaaS-teknik-sozlesme.md']:
+ p=Path(name);s=p.read_text().replace('199/140 runtime/59 contract_only,43 migration','199/140 runtime/59 contract_only,44 migration');p.write_text(s)

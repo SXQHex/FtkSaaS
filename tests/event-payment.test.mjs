@@ -240,6 +240,13 @@ test('P03 linked finance corrections, frozen refunds and instructor payments',as
   cash=(await m('collection_record_v1',{person_id:person,amount_minor:'500',currency:'TRY',occurred_at:now()})).primary_id;
   assert.equal((await read({person_id:person})).credit_available_minor,'500');
   await bad('finance_get_v1',{person_id:person,currency:'TRY',page:{}},'NOT_FOUND',stranger);
+  const staff=await authUser('p03-collection-staff'),staffAccount=await must(staff,'account_get_v1');
+  const staffPerson=(await m('person_create_v1',{display_name:'P03 collection staff',contacts:[]})).primary_id;
+  await db.query("insert into core.account_links(id,org_id,account_id,person_id,state,verified_at) values($1,$2,$3,$4,'active',now())",[key(),org,staffAccount.id,staffPerson]);
+  await m('role_assign_v1',{person_id:staffPerson,role:'staff',scope:{center_id:center}});
+  await m('permission_set_v1',{person_id:staffPerson,permission:'finance.collect',expected_version:1,enabled:true});
+  await bad('finance_get_v1',{person_id:person,currency:'TRY',page:{}},'FORBIDDEN',staff);
+
   const q={cash_movement_id:cash,correction:{amount_minor:'100',currency:'TRY',occurred_at:now(),direction:'decrease'},reason:'P03 amount correction'};
   const p=await must(owner,'collection_correct_preview_v1',scope(q));assert.deepEqual(p.blockers,[]);
   assert.equal((await read({person_id:person})).credit_available_minor,'500');
