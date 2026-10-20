@@ -1,10 +1,12 @@
 -- P03: linked finance corrections and isolated instructor payment ledger.
 begin;
-alter table core.instructor_payments add column previous_id uuid, add column direction text not null default 'increase', add column operation_id uuid;
+alter table core.instructor_payments add column if not exists previous_id uuid;
+alter table core.instructor_payments add column if not exists direction text not null default 'increase';
+alter table core.instructor_payments add column if not exists operation_id uuid;
 alter table core.instructor_payments add constraint p03_payment_previous foreign key(org_id,center_id,previous_id) references core.instructor_payments(org_id,center_id,id);
 alter table core.instructor_payments add constraint p03_payment_operation foreign key(org_id,operation_id) references core.operation_receipts(org_id,id);
 alter table core.instructor_payments add constraint p03_payment_direction check(direction in ('increase','decrease'));
-alter table core.earning_allocations add column previous_id uuid;
+alter table core.earning_allocations add column if not exists previous_id uuid;
 alter table core.earning_allocations add constraint p03_allocation_previous foreign key(org_id,center_id,previous_id) references core.earning_allocations(org_id,center_id,id);
 create index p03_payment_chain on core.instructor_payments(org_id,previous_id);
 create index p03_earning_payment on core.earning_allocations(org_id,payment_id);

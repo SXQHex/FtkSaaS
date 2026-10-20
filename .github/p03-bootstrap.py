@@ -29,6 +29,29 @@ for o in c['x-contract']['operations']:
  k=o['operation_contract']
  if k['kind'] not in ['read','auth','worker'] and k.get('read_operation') in names:k['read_path_status']='implemented'
 c['x-contract']['decision_sprint']['new_contract_only_operations']=[n for n in c['x-contract']['decision_sprint']['new_contract_only_operations'] if n not in names]
+# Synchronize all newly introduced UUID reference paths with existing classification shapes.
+print('UUID classification example',json.dumps(c['x-contract']['uuid_field_map'][:2]))
+uuid_refs={'#/$defs/FtkUuid','#/$defs/ProviderUuid','#/$defs/FtkGeneratedUuidV7'}
+paths=[]
+def walk(v,path=''):
+ if isinstance(v,dict):
+  if v.get('$ref') in uuid_refs:paths.append((path,v['$ref']))
+  for k,x in v.items():walk(x,path+'/'+k)
+ elif isinstance(v,list):
+  for k,x in enumerate(v):walk(x,path+'/'+str(k))
+walk(d)
+old=c['x-contract']['uuid_field_map']
+key=next((k for k,v in old[0].items() if isinstance(v,str) and ('properties' in v or v.startswith('/'))),None)
+if key is None:raise RuntimeError('UUID map path field needs explicit source review: '+repr(old[0]))
+oldpaths={x[key] for x in old}
+for path,ref_value in paths:
+ candidate=path if path in oldpaths or not any(x.startswith('/$defs/') for x in oldpaths) else '/$defs'+path
+ if candidate not in oldpaths:
+  field=path.split('/properties/')[-1].split('/')[0]
+  template=next((x for x in old if '/properties/'+field in x[key] and any(v==ref_value for v in x.values())),None)
+  if template is None:template=next((x for x in old if '/properties/'+field in x[key]),old[0])
+  item=dict(template);item[key]=candidate;old.append(item);oldpaths.add(candidate)
+assert len(old)==len(paths),(len(old),len(paths))
 p.write_text(json.dumps(c,ensure_ascii=False,indent=2)+'\n')
 Path('supabase/functions/backend-v1/implemented.json').write_text(json.dumps({'operations':live},ensure_ascii=False,indent=2)+'\n')
 wr=['begin;']
