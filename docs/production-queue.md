@@ -1,6 +1,6 @@
 # FtkSaaS sıralı üretim kuyruğu
 
-CI-02 PR25 açık kullanıcı kurulum onayıyla main `a0325d7cdace18e3dfbb51691e631de53400724f` kaynağına birleşti. Aday39412474187 başarılı ve gerçek merge ilişkisi main'de doğrulandı. Main39421388153 kaynak/core/dört API başarılıyken yalnız ölçüm toplayıcısında atlanan isteğe bağlı serial-reference nedeniyle çöktü; main kabulü tamamlanmadı. Dar düzeltme `fix/ci02-main-optional-measurement` dalında; 37 politika testi ve gerçek main job metadata regresyonu geçti, yeni hedefli/aday/main kabulü bekliyor. P01 done; P02 başlamaz.
+CI-02 tamamlandı: PR25 ve dar ölçüm düzeltmesi PR26, açık kaynak bazlı kurulum onaylarıyla main’e alındı. Tam kabul kaynağı `0ade7877cc16fc121095decbc276f2fbc868607e`; [main39425915555](https://github.com/SXQHex/FtkSaaS/actions/runs/39425915555) completed/success: gerçek merge ilişkisi + core + dört API shard + toplayıcı, 462 test düğümü (96 yapı + 37 CI politika + 27 DB + 302 API), sıfır fail/skipped; 34 migration, seed/health/advisors geçti. Main-binding artifact12266003219 source/run/attempt kanıtıdır. P01 ve CI-02 done; P02 kullanıcı talimatı gereği henüz başlamadı. Yeni kaynak kabulü ayrıca doğrulanır.
 
 ## Şimdi yapılacak iş — 20 Ekim 2026
 
@@ -12,8 +12,8 @@ Güncel envanter **199 / 118 çağrılabilir / 81 contract_only / 34 migration**
 |---|---|---:|---|---|
 | P00 | İlk CI ayrımı | — | done | #19; sonraki Action bakımı #23 kapalı |
 | P01 | Talep, rezervasyon ve bekleme | 14 | done | #22; aday 39327134872 ve aynı main 39401570751 completed/success doğrulandı |
-| CI-02 | Dört shard, bölüm/Draft/development, yalnız-belge kabulü | — | in_progress | #25 kuruldu; main39421388153 ölçüm hatası; dar düzeltme/yeniden kabul bekliyor |
-| P02 | Paket ve seans yaşam döngüsü | 15 | queued | CI-02 kabulünden sonra |
+| CI-02 | Dört shard, bölüm/Draft/development, yalnız-belge kabulü | — | done | #25/#26; main0ade787 / 39425915555 completed/success; 462 test, 34 migration |
+| P02 | Paket ve seans yaşam döngüsü | 15 | queued | CI-02 kapandı; kullanıcı talimatıyla henüz başlanmadı |
 | P03 | Finans ve eğitmen ödemeleri | 7 | queued | P02 sonrası |
 | P04 | CRM ve public başvuru | 11 | queued | P03 sonrası |
 | P05 | Belge, bildirim ve otomasyon | 13 | queued | P04 sonrası |
@@ -67,11 +67,9 @@ Aşağıdaki kurallarla sıradaki açık teslimi uygula; kullanıcı her teslim 
 
 14 API ve dar sistem worker zinciri PR #22 ile main'e alındı. Hedefli 39325878582 ve aday 39327134872 başarılıdır. Aynı main clean 39401570751 completed/success doğrulandı; P01 done, geçici kabul varsayımı kaldırıldı. Aktif uygulama promptu kaldırıldı; eski prompt Git geçmişindedir. Hosted/production worker işletimi ve P05 genel belge/bildirim işleri kapanmadı.
 
-### CI-02 — uygulandı; kabul ve güvenilir kurulum bekliyor
+### CI-02 — kapanış kaydı
 
-[PR25](https://github.com/SXQHex/FtkSaaS/pull/25) içinde dar belge/PR24 AST kanıtı, ayrı kaynak bağlı belge recovery ve aday/main yolu, Draft/development engeli, açık tetikleme, dört bağımsız shard ve zorunlu toplayıcı uygulandı. Ürün/runtime envanteri değişmedi. [Teknik devir](ci02-handover.md) kaynak, test ve kurulum sınırıdır.
-
-Kalan sıra: son head hedefli + gerçek PR24 recovery kabulünü doğrula → exact-head bağımsız inceleme → ci:measure-serial ile aynı kaynak kıyasını iste, ci:full-clean ile bütün adayı başlat ve kullanıcıya devret → gerçek sonucu/source binding'i doğrula → bu somut politika kurulumu için gerekli ayrı yetkiyi değerlendir (PR23 yetkisini taşıma) → normal merge → aynı main kabulü ve ölçüm → CI-02 kapanışı. Eski d544efe başarısız main run'ı değiştirilmez; yeni kaynakta geçiş doğrulanır. Eksik/skipped/failure veya eski attempt kanıtı kabul değildir. P02 CI-02 kapanmadan başlamaz.
+PR25 dört izole shard/belge kabulü/Draft-development politikasını kurdu; PR26 skipped optional serial ölçüm hatasını kapattı. Kaynak bazlı bağımsız incelemeler ve açık kurulum onayları alındı. Son aday39423719153 başarılı; aynı actual main0ade7877cc16fc121095decbc276f2fbc868607e / [39425915555](https://github.com/SXQHex/FtkSaaS/actions/runs/39425915555) completed/success: gerçek merge kanıtı, core/dört shard/toplayıcı ve 462 test, 34 migration, seed/health/advisors. CI-02 done; aktif uygulama promptu kaldırıldı. [Devir](ci02-handover.md), [ölçüm](ci-performance.md). Repository yönetim ayarları, production/Resend/frontend/yük-restore ve P02 geliştirmesi bu kapanışa dahil değildir.
 
 ### P02 — Paket ve seans yaşam döngüsü
 

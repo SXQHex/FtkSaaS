@@ -1,5 +1,9 @@
 # CI ölçüm temeli ve sonraki performans işi
 
+## Son main kabulü — CI-02 kapandı
+
+Main0ade7877cc16fc121095decbc276f2fbc868607e / [39425915555](https://github.com/SXQHex/FtkSaaS/actions/runs/39425915555) completed/success. Source ilişkisi, core, dört shard ve toplayıcı geçti; 462 test, sıfır fail/skipped. Core1:38; API rollerinin job süreleri9:58 / 10:03 / 11:28 / 9:37. Main'de seri kıyas istenmedi; optional skip artık ölçümü bozmadı. Bu yeni main'deki süreler önceki aynı-kaynak seri karşılaştırmasının yerine karıştırılmaz. İlk başarısız main39421388153 teşhisi ve eski 'bekliyor' notları aşağıda ait oldukları kaynakların tarihsel süreç kayıtlarıdır; güncel açık değildir.
+
 ## CI-02 aynı kaynakta gerçek sonuç — 20 Ekim 2026
 
 Aday [39412474187](https://github.com/SXQHex/FtkSaaS/actions/runs/39412474187), head150d9fa / tested merge5148558 / tree4b1d49b, attempt1 completed/success. Artifact12262122881 binding + ölçüm içerir; source değişmedi.
