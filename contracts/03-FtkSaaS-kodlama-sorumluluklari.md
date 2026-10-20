@@ -2,7 +2,7 @@
 
 ## 20 Ekim 2026 — yürürlükteki çalışma kararı
 
-[AGENTS.md](../AGENTS.md), [CI-2026-10-20](../docs/decisions/CI-2026-10-20.md) ve [üretim kuyruğu](../docs/production-queue.md) aşağıdaki eski kurulum/durum notlarının üstündedir. Güncel kaynak main 7577b2f1873c6b1fcf83390bfa94a34374c44082; P01 birleşti, main clean belge görevi için kullanıcı varsayımıyla ele alındı; gerçek hata takibi BackendCoder'dadır. CI-02 otomasyonu henüz uygulanmadı.
+[AGENTS.md](../AGENTS.md), [CI-2026-10-20](../docs/decisions/CI-2026-10-20.md) ve [üretim kuyruğu](../docs/production-queue.md) aşağıdaki eski kurulum/durum notlarının üstündedir. Güncel kaynak main 7577b2f1873c6b1fcf83390bfa94a34374c44082; P01 birleşti; aynı main clean 39401570751 completed/success doğrulandı, P01 done. CI-02 otomasyonu henüz uygulanmadı.
 
 Bölüm boyunca tek Draft/development PR ve hedefli CI; bitince son-head incelemesi/açık aday full clean, merge sonrası main full clean esastır. Güvenli yalnız-belge farkları belge kabulüyle clean olmadan kapanacaktır; karma/runtime/CI farkı istisna değildir. Dört shard ayrı backend/DB ve eksiksiz sonuç doğrulaması kullanır. Her biten dilimde etkilenen belgeler aynı PR'de güncellenir; çalışan clean'in SHA'sı sırf durum için değiştirilmez.
 

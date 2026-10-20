@@ -2,16 +2,16 @@
 
 ## Şimdi yapılacak iş — 20 Ekim 2026
 
-P01 PR #22 main `7577b2f1873c6b1fcf83390bfa94a34374c44082` ile birleşti. Son hedefli ve aday clean başarılıdır; main clean yalnız bu belge eşitlemesinde kullanıcı kararıyla başarılı varsayılır, gerçek sonuç/hata takibi BackendCoder'dadır. [Kaynak ve kanıt](../contracts/00-FtkSaaS-yeni-sohbet-devir.md), [P01 devri](p01-handover.md).
+P01 PR #22 main `7577b2f1873c6b1fcf83390bfa94a34374c44082` ile birleşti. Son hedefli, aday ve aynı main clean 39401570751 başarılıdır; gerçek completed/success ve merged-candidate relation doğrulandı. P01 done. [Kaynak ve kanıt](../contracts/00-FtkSaaS-yeni-sohbet-devir.md), [P01 devri](p01-handover.md).
 
 Güncel envanter **199 / 118 çağrılabilir / 81 contract_only / 34 migration**. Başlangıçtaki 95 sözleşme-only işlemin 14'ü P01 ile uygulandı; kalan P02–P07 toplamı 81'dir. Sayılar ürün tamamlanma yüzdesi değildir.
 
 | Sıra | Teslim | İşlem | Durum | Kanıt / sonraki adım |
 |---|---|---:|---|---|
 | P00 | İlk CI ayrımı | — | done | #19; sonraki Action bakımı #23 kapalı |
-| P01 | Talep, rezervasyon ve bekleme | 14 | merged_main_acceptance_assumed | #22; aday 39327134872 başarılı; main 39401570751 kullanıcı varsayımı, doğrulanmış başarı değil |
+| P01 | Talep, rezervasyon ve bekleme | 14 | done | #22; aday 39327134872 ve aynı main 39401570751 completed/success doğrulandı |
 | CI-02 | Dört shard, bölüm/Draft/development, yalnız-belge kabulü | — | queued | Sıradaki iş; [karar ve kabul](decisions/CI-2026-10-20.md); uygulama BackendCoder |
-| P02 | Paket ve seans yaşam döngüsü | 15 | queued | CI-02 kabulü ve P01 gerçek hata kontrolünden sonra |
+| P02 | Paket ve seans yaşam döngüsü | 15 | queued | CI-02 kabulünden sonra |
 | P03 | Finans ve eğitmen ödemeleri | 7 | queued | P02 sonrası |
 | P04 | CRM ve public başvuru | 11 | queued | P03 sonrası |
 | P05 | Belge, bildirim ve otomasyon | 13 | queued | P04 sonrası |
@@ -22,7 +22,7 @@ Güncel envanter **199 / 118 çağrılabilir / 81 contract_only / 34 migration**
 
 1. Başlangıçta bu dosyayı, kaynak indeksini, güncel devir/kalan işleri ve envanteri oku. İlk açık satırı al; kapanmış promptu yeniden çalıştırma. Aynı teslimin ikinci branch/PR'sini mükerrer açma.
 2. Başlarken durum/PR/head ve gerçek teknik engeli güncelle. Sözleşme adı var diye uygulanmış varsayma.
-3. Durumlar: queued → in_progress → awaiting_candidate_clean → awaiting_main_clean → done. P01 için yalnız bu belge eşitlemesinde merged_main_acceptance_assumed kullanılır; gerçek başarılı sonuç veya hata BackendCoder tarafından sonraki doğal commit’te eşitlenir. Aynı SHA/run completed/success ise P01 done yapılır ve geçici kabul-varsayımı ifadeleri güncel durumdan çıkarılır; yeni clean tetiklenmez. blocked gerçek bağımlılık için; failed test başarısızlığı için. Clean başlatıldığında aşağıdaki devir kuralıyla turu bitir.
+3. Durumlar: queued → in_progress → awaiting_candidate_clean → awaiting_main_clean → done. blocked gerçek bağımlılık için; failed test başarısızlığı için. Clean başlatıldığında aşağıdaki devir kuralıyla turu bitir.
 4. Kaynak dondurulmadan önce kuyruk değişikliğini ilgili uygulama PR'sine dahil et. Çalışan clean'in head'ini sırf durum yazmak için değiştirme; run/head/base/sonraki eylemi sohbet kapanışında kaydet. Kullanıcı döndüğünde bu kanıtı kullan.
 5. Uygulama PR'si incelemeye hazır olduğunda biten alt promptları kısa “uygulandı, main kabulü bekliyor” notuna indir; kalan API/görevleri aktif bırak. Kabul tamamlanmadan done veya promptun bütünü silindi durumu verme.
 6. Merge ve aynı main kabulü doğrulanınca bitiren ajan aktif prompt gövdesini kaldırır, tabloyu done yapar; yalnız PR, kaynak/main SHA, CI ve kalan istisnaların kısa kapanış kaydını tutar. Bunu sonraki doğal kuyruk/uygulama commit'inde yapabilir; sırf kanıt yazmak için sonsuz belge commit/clean döngüsü kurma. Aradaki doğrulanmış kapanışı sohbette bildir; sonraki ajan kanıttan teyit edip kuyruğu eşitler.
@@ -63,11 +63,11 @@ Aşağıdaki kurallarla sıradaki açık teslimi uygula; kullanıcı her teslim 
 
 ### P01 — kapanış kaydı
 
-14 API ve dar sistem worker zinciri PR #22 ile main'e alındı. Hedefli 39325878582 ve aday 39327134872 başarılıdır. Main 39401570751 bu belge görevinde kullanıcı kararıyla başarılı varsayılmıştır; gerçek sonuç BackendCoder sorumluluğundadır. Aktif uygulama promptu kaldırıldı; eski prompt Git geçmişindedir. Hosted/production worker işletimi ve P05 genel belge/bildirim işleri kapanmadı.
+14 API ve dar sistem worker zinciri PR #22 ile main'e alındı. Hedefli 39325878582 ve aday 39327134872 başarılıdır. Aynı main clean 39401570751 completed/success doğrulandı; P01 done, geçici kabul varsayımı kaldırıldı. Aktif uygulama promptu kaldırıldı; eski prompt Git geçmişindedir. Hosted/production worker işletimi ve P05 genel belge/bildirim işleri kapanmadı.
 
 ### CI-02 — sıradaki üretim promptu
 
-[CI-2026-10-20](decisions/CI-2026-10-20.md) kararını, [CI politikasındaki](ci-policy.md) uygulama farklarını ve mevcut PR'leri kontrol et; mükerrer dal açma. P01 gerçek main sonucunu bir kez doğrula; hata varsa önce çöz. Ayrı CI PR'sinde dört izole shard, eksiksiz envanter ve kaynak bağlı sonuç toplayıcıyı; Draft/development engeli ve açık aday tetiklemesini; güvenli yalnız-belge PR/main kabulünü uygula. Runtime/CI karma farkı, bilinmeyen yol, rename/silme, head/base değişimi ve eksik/skipped/başarısız shard negatiflerini doğrula. Aynı kaynak seri/parçalı kapsamı ve gerçek süre/runner dakikasını ölç. Güvenilir workflow kurulumu ve normal kapı korunur; repository yönetim ayarı yetkisi varsayılmaz. Yaşayan belgeleri her biten dilimde eşitle. Son aday/main full clean başlayınca kullanıcıya devret; polling yapma. CI-02 kapanmadan P02'ye geçme. Frontend/production/Resend yok.
+[CI-2026-10-20](decisions/CI-2026-10-20.md) kararını, [CI politikasındaki](ci-policy.md) uygulama farklarını ve mevcut PR'leri kontrol et; mükerrer dal açma. P01 main clean 39401570751 aynı 7577b2f kaynağında başarılı doğrulandı; kapanmış P01’i yeniden geliştirme. Ayrı CI PR'sinde dört izole shard, eksiksiz envanter ve kaynak bağlı sonuç toplayıcıyı; Draft/development engeli ve açık aday tetiklemesini; güvenli yalnız-belge PR/main kabulünü uygula. Runtime/CI karma farkı, bilinmeyen yol, rename/silme, head/base değişimi ve eksik/skipped/başarısız shard negatiflerini doğrula. Aynı kaynak seri/parçalı kapsamı ve gerçek süre/runner dakikasını ölç. Güvenilir workflow kurulumu ve normal kapı korunur; repository yönetim ayarı yetkisi varsayılmaz. Yaşayan belgeleri her biten dilimde eşitle. Son aday/main full clean başlayınca kullanıcıya devret; polling yapma. CI-02 kapanmadan P02'ye geçme. Frontend/production/Resend yok.
 
 ### P02 — Paket ve seans yaşam döngüsü
 

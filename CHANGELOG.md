@@ -2,7 +2,7 @@
 
 ## 2026-10-20 — P01 main ve CI kararı belge eşitlemesi
 
-P01 PR #22 main 7577b2f1873c6b1fcf83390bfa94a34374c44082 ile birleşti: katalog/seans bağlamlı hak okuması, talep/alternatif/onay, bekleme/teklif/expiry ve dar sistem worker zinciri. 199/118/81 işlem; 34 migration. Son head hedefli 39325878582 ve aday 39327134872 başarılıdır; main 39401570751 belge eşitlemesinde kullanıcı kararıyla başarılı varsayıldı, gerçek sonuç/hata takibi BackendCoder'dadır.
+P01 PR #22 main 7577b2f1873c6b1fcf83390bfa94a34374c44082 ile birleşti: katalog/seans bağlamlı hak okuması, talep/alternatif/onay, bekleme/teklif/expiry ve dar sistem worker zinciri. 199/118/81 işlem; 34 migration. Son head hedefli 39325878582 ve aday 39327134872 başarılıdır; aynı main clean 39401570751 completed/success doğrulandı; P01 done. Geçici kabul varsayımı kaldırıldı.
 
 CI-2026-10-20: bölüm boyunca Draft/development ve hedefli CI, bitince açık aday + merge sonrası main full clean; güvenli yalnız-belge farkına clean yerine belge kabulü; dört bağımsız backend/DB shard'ı. Karar kabul edildi, otomasyon CI-02'de bekliyor. Workflow/runtime/ürün davranışı bu belge tesliminde değiştirilmedi. Önceki sürüm notları tarihsel kayıttır.
 

@@ -2,7 +2,7 @@
 
 Güncel kaynak merkezi [SXQHex/FtkSaaS main](https://github.com/SXQHex/FtkSaaS). Önce [AGENTS.md](AGENTS.md), [kaynak indeksi](docs/source-index.md), [güncel devir](contracts/00-FtkSaaS-yeni-sohbet-devir.md), [kalan işler](docs/remaining-work.md) ve [üretim kuyruğu](docs/production-queue.md) okunur.
 
-20 Ekim uygulama kaynağı main `7577b2f1873c6b1fcf83390bfa94a34374c44082`: **199 sözleşme / 118 çağrılabilir / 81 yalnız sözleşme / 34 migration**. P01 [PR #22](https://github.com/SXQHex/FtkSaaS/pull/22) ile birleşti; talep/rezervasyon/bekleme/yer teklifi ve dar worker zinciri eklendi. Hedefli ve aday CI başarılıdır; main clean bu belge görevinde kullanıcı kararıyla başarılı varsayılmıştır, gerçek sonuç/hata takibi BackendCoder'dadır. Kanıtlar ve hosted/production sınırı güncel devirdedir; varsayım doğrulanmış CI başarısı değildir.
+20 Ekim uygulama kaynağı main `7577b2f1873c6b1fcf83390bfa94a34374c44082`: **199 sözleşme / 118 çağrılabilir / 81 yalnız sözleşme / 34 migration**. P01 [PR #22](https://github.com/SXQHex/FtkSaaS/pull/22) ile birleşti; talep/rezervasyon/bekleme/yer teklifi ve dar worker zinciri eklendi. Hedefli, aday ve aynı main CI başarılıdır; P01 done. Main clean 39401570751 gerçek completed/success sonucu ve kaynak ilişkisi doğrulandı. Kanıtlar ve hosted/production sınırı güncel devirdedir.
 
 Starter anlaşmasız yoklama/hak tüketimi, Pro/Business immutable eğitmen anlaşması/hakedişi ve ayrı merkezler arası hesaplaşma uygulanmıştır. Paket/seans yaşam döngüsü, finans düzeltme/ödemeler, CRM, genel belge/bildirim, rapor/import ve hesap/abonelik yaşam döngüsünün açık işlemleri kuyruktadır. İşlem sayısı ürün tamamlanma oranı değildir; [F01–F33](docs/feature-delivery.md) özellik kabulünü ayrı gösterir.
 

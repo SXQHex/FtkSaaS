@@ -2,7 +2,7 @@
 
 ## 20 Ekim 2026 — yeni performans kararı
 
-Kullanıcı P01 aday ve main full clean sürelerini yaklaşık 30'ar dakika olarak bildirdi; bunlar bu belge çalışmasında loglardan yeniden ölçülmüş süre değildir. [CI-2026-10-20](decisions/CI-2026-10-20.md) ile dört ayrı runner/backend/DB shard'ı kabul edildi; uygulama/ölçüm CI-02'de bekliyor. Eski süreler yeni hız kazancı değildir. Aynı kaynak ve kapsamda seri/parçalı wall süre, shard dağılımı, kurulum/kuyruk ve toplam runner dakikası ölçülmeden 4 kat hızlanma vaat edilmez.
+P01 main [39401570751](https://github.com/SXQHex/FtkSaaS/actions/runs/39401570751), kaynak `7577b2f1873c6b1fcf83390bfa94a34374c44082`, completed/success doğrulandı. GitHub job/step zamanları: main-clean 09:33:46–10:12:46 UTC = **39:00**; test:clean 09:34:04–10:12:41 = **38:37**; run oluşturma–son güncelleme aralığı **39:04**. Kullanıcının yaklaşık 40 dakika bildirimiyle uyumludur. Önceki 30'ar dakika öngörüsü main için bu gerçek ölçümle değiştirildi; aday süre burada yeniden ölçülmedi. [CI-2026-10-20](decisions/CI-2026-10-20.md) ile dört ayrı runner/backend/DB shard'ı kabul edildi; uygulama/ölçüm CI-02'de bekliyor. Bu seri koşu süresi shard hız kazancı değildir. Aynı kaynak ve kapsamda seri/parçalı wall süre, shard dağılımı, kurulum/kuyruk ve toplam runner dakikası ölçülmeden 4 kat hızlanma vaat edilmez.
 
 
 Kaynak: main d4eff4f00d897364d5f46ee637533deae9adbc29, [39225823561](https://github.com/SXQHex/FtkSaaS/actions/runs/39225823561). Bu eski çalışmanın loglarından ölçülenler; yeni workflow süreleri değildir.
