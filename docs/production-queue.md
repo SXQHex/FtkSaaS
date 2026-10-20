@@ -10,7 +10,7 @@ Geliştirme/test Supabase `gwyprhenabtpkbojephw`, aynı kabul edilmiş main `cc4
 | P01 | Talep, rezervasyon ve bekleme | 14 | done | #22; aday 39327134872 ve aynı main 39401570751 completed/success doğrulandı |
 | CI-02 | Dört shard, bölüm/Draft/development, yalnız-belge kabulü | — | done | #25/#26; main0ade787 / 39425915555 completed/success; 462 test, 34 migration |
 | P02 | Paket ve seans yaşam döngüsü | 15 | done | #28; main cc4878d /39461804543 completed/success;469 test,40 migration; hosted Edge2 eşitlendi |
-| P03 | Finans ve eğitmen ödemeleri | 7 | queued | P02 sonrası |
+| P03 | Finans ve eğitmen ödemeleri | 7 | in_progress | Tek feature/p03-finance-payments Draft/development PR;7 API uygulaması ve hedefli kabul açık |
 | P04 | CRM ve public başvuru | 11 | queued | P03 sonrası |
 | P05 | Belge, bildirim ve otomasyon | 13 | queued | P04 sonrası |
 | P06 | Rapor, import ve işlem izleme | 13 | queued | P05 sonrası |
@@ -76,7 +76,7 @@ PR25 dört izole shard/belge kabulü/Draft-development politikasını kurdu; PR2
 
 ### P03 — Finans ve eğitmen ödemeleri
 
-Ortak üretim promptunu uygula. Durum: queued.
+Ortak üretim promptunu uygula. Durum: in_progress; tek Draft/development PR. Başlangıç main ce95a9d / belge kabulü39487599217 başarılı. Bütün7 API ve son kaynak incelemesi bitmeden aday full clean yok.
 
 **Mevcut sözleşme API'leri (7):**
 
