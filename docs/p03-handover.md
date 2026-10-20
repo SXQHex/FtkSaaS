@@ -10,12 +10,12 @@ Yedi API: `finance_get_v1`, `collection_correct_preview_v1`, `collection_correct
 - Tahsilat düzeltmesinde tutar yeni toplam değil, yönlü farktır. Önizleme kaynak, yetki, borç ve alacak bağımlılıklarını dondurur. Uygulama nakit ve dağıtımları bağlı hareketle değiştirir; harcanmış alacak silinemez ve rezervasyon kendiliğinden iptal edilmez.
 - Borç kalanı `max(0,net−gross_paid+claimed)`: alacağa taşınmış brüt ödeme ikinci kez borç ödemesi sayılmaz. Bağlı alacak geri alma, ilgili dağıtım azalışını aşmaz.
 - Ters debt/earning allocation negatif SignedMoney kullanır; API bakiye toplamları nonnegative Money kalır. Her ters tahsis pozitif kaynak satırının açık kalanına kadar bölünür ve previous_id o kaynağı gösterir.
-- Paket iadesi satışta sabit yöntemle borç indirimi ve ayrı öğrenci alacağı üretir. Nakit/hak/rezervasyon işlemi değildir. Immutable P02 hesaplaşması veya P03 iadesi ikinci kez üretilmez; hesaplanan teklif hash'i tarih sınırında da stale kontrolüne bağlıdır.
+- Paket iadesi satışta sabit yöntemle borç indirimi ve ayrı öğrenci alacağı üretir. Nakit/hak/rezervasyon işlemi değildir. Refund Mutation/audit/receipt gerçek satış ID’sini ve değişmemiş satış sürümünü taşır; private immutable refund fact audit içindeki ayrı refund_fact_id ile izlenir. Immutable P02 hesaplaşması veya P03 iadesi ikinci kez üretilmez; hesaplanan teklif hash'i tarih sınırında da stale kontrolüne bağlıdır.
 - Eğitmen ödemesi seçili özgün hakedişlerin düzeltmeler dahil net kalanına dağıtılır. Kısmi ödeme, aggregate version, bağlı düzeltme ve fazla ödeme okunur. Eski ödeme/hakediş silinmez; öğrenci nakdi ayrı kalır. Correction Mutation kök payment ID/version döndürür, yeni immutable fact related içindedir.
 
 ## Kaynak ve doğrulama
 
-P03 migration41–48 append-only: finance-payments, guardrails, acceptance, scope, balances, results, integrity, provenance. Önceki migration içerikleri dondurulmuştur; manifest ve source+wrapper eşitlik denetimleri korunur. Makine sözleşmesi, tipler, validator/bundle, katalog/envanter ve etkilenen F01–F33 runtime izi aynı PR'de üretilir. Feature kabulü otomatik tamamlandı sayılmaz.
+P03 migration41–49 append-only: finance-payments, guardrails, acceptance, scope, balances, results, integrity, provenance, refund-identity. Önceki migration içerikleri dondurulmuştur; manifest ve source+wrapper eşitlik denetimleri korunur. Makine sözleşmesi, tipler, validator/bundle, katalog/envanter ve etkilenen F01–F33 runtime izi aynı PR'de üretilir. Feature kabulü otomatik tamamlandı sayılmaz.
 
 İzole geliştirme runner'ında yapısal kontroller ve temiz migration kurulumu geçti. 48 migration kaynağında P03 altı test düğümü başarılı (39493630092, priority adımı20:39:16–20:40:25); bağımlı regresyonlar son ek etkinlik senaryosuyla yeniden çalıştırılıyor. Son kaynak hedefli kabulü bekleniyor. Paket değişimi→genel iade çift alacak üretmeme senaryosu önceki ara kaynakta geçti; bu kanıt yeni son kaynağın kabulü değildir.
 

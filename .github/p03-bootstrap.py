@@ -73,7 +73,8 @@ sources=[
  ('p03_finance_balances','database/p03-finance-balances.sql',None),
  ('p03_finance_results','database/p03-finance-results.sql',None),
  ('p03_finance_integrity','database/p03-finance-integrity.sql',None),
- ('p03_finance_provenance','database/p03-finance-provenance.sql',None)]
+ ('p03_finance_provenance','database/p03-finance-provenance.sql',None),
+ ('p03_refund_identity','database/p03-refund-identity.sql',None)]
 checks=Path('scripts/check-migrations.py').read_text()
 for suffix,source,wrapper in sources:
  content=Path(source).read_text()+(Path(wrapper).read_text() if wrapper else '')
@@ -124,4 +125,7 @@ p.write_text(s)
 p=Path('docs/source-index.md');s=p.read_text()
 link='[P03 çalışma devri](p03-handover.md): finans/iade/eğitmen ödeme kapsamı ve son kabul sırası.\n\n'
 if link not in s:s=s.replace('## Okuma sırası ve roller',link+'## Okuma sırası ve roller')
+p.write_text(s)
+
+p=Path('docs/source-index.md');s=p.read_text().replace('Üretilmiş 199 işlem envanteri ve 133 çağrılabilir işlem; 66 contract_only','Dal:199 işlem/140 çağrılabilir/59 contract_only; main kabulü ayrı').replace('Güncel envanter 199/133/66’dır.','P03 dal envanteri199/140/59; kabul edilmiş P02 main snapshot’ı199/133/66’dır.')
 p.write_text(s)

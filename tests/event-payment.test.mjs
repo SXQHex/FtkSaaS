@@ -291,7 +291,10 @@ test('P03 linked finance corrections, frozen refunds and instructor payments',as
   const keys=[key(),key()],attempts=await Promise.all(keys.map(k=>call(owner,'sale_refund_apply_v1',scope(pvref(refund)),k)));
   assert.equal(attempts.filter(x=>x.result.ok).length,1,JSON.stringify(attempts));
   assert.equal(attempts.find(x=>!x.result.ok).result.error.code,'PREVIEW_STALE');
-  await m('sale_refund_apply_v1',pvref(refund),keys[attempts.findIndex(x=>x.result.ok)]);
+  const winner=attempts.find(x=>x.result.ok).result.data;assert.equal(winner.primary_id,sale);
+  const replay=await m('sale_refund_apply_v1',pvref(refund),keys[attempts.findIndex(x=>x.result.ok)]);assert.equal(replay.primary_id,sale);assert.equal(replay.version,winner.version);
+  const audit=await row('select subject_table,subject_id from core.audit_events where org_id=$1 and operation_id=$2',[org,winner.operation_id]);assert.equal(audit.subject_table,'sales');assert.equal(audit.subject_id,sale);
+  assert.equal((await row('select business_reference from core.operation_receipts where id=$1',[winner.operation_id])).business_reference,sale);
   assert.equal((await row('select private.debt_net($1,$2)::text net,private.debt_claimed($1,$2)::text claimed',[org,debt])).net,'0');
   assert.equal((await row('select private.debt_claimed($1,$2)::text claimed',[org,debt])).claimed,'600');
   assert.equal((await row('select count(*)::int n from core.entitlement_movements where org_id=$1 and sale_id=$2',[org,sale])).n,before.n);
