@@ -102,3 +102,5 @@ assert next(Path('supabase/migrations').glob('*_p03_finance_results.sql')).read_
 assert next(Path('supabase/migrations').glob('*_p03_finance_integrity.sql')).read_text()==Path('database/p03-finance-integrity.sql').read_text(),'P03 source drift p03_finance_integrity'
 
 assert next(Path('supabase/migrations').glob('*_p03_finance_provenance.sql')).read_text()==Path('database/p03-finance-provenance.sql').read_text(),'P03 source drift p03_finance_provenance'
+
+assert next(Path('supabase/migrations').glob('*_p03_refund_identity.sql')).read_text()==Path('database/p03-refund-identity.sql').read_text(),'P03 source drift p03_refund_identity'
