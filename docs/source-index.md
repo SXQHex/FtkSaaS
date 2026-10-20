@@ -10,6 +10,8 @@ Repository’nin güncel dalı `main`dir. Başlarken GitHub main SHA’sını ve
 
 Güncel uygulama SHA/CI ve teslim durumu için [tek devir özeti](../contracts/00-FtkSaaS-yeni-sohbet-devir.md) esas alınır. Önceki teslim sayıları tarihsel bağlamdır.
 
+[P03 çalışma devri](p03-handover.md): finans/iade/eğitmen ödeme kapsamı ve son kabul sırası.
+
 ## Okuma sırası ve roller
 
 | Sıra | Kaynak | Rol |

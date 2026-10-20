@@ -81541,15 +81541,15 @@
           "account_access_accept_v1",
           "person_get_v1",
           "reservation_list_v1",
-          "entitlements_get_v1"
+          "entitlements_get_v1",
+          "finance_get_v1"
         ],
         "contract_only_operations": [
           "account_profile_update_v1",
           "account_password_change_v1",
           "account_password_reset_request_v1",
           "account_delete_preview_v1",
-          "account_delete_apply_v1",
-          "finance_get_v1"
+          "account_delete_apply_v1"
         ],
         "acceptance_case_ids": [
           "DS-ACCESS-01"
@@ -82314,26 +82314,25 @@
           "cross_center_settlement",
           "sale_scope_and_backdating"
         ],
-        "implementation": "partial",
+        "implementation": "implemented_acceptance_pending",
         "acceptance": "pending_feature_acceptance",
         "acceptance_evidence": [],
         "implemented_operations": [
           "sale_preview_v1",
           "sale_apply_v1",
-          "collection_record_v1",
-          "student_credit_refund_v1",
-          "student_credit_offset_v1",
-          "debt_adjust_v1",
-          "sale_change_preview_v1",
-          "sale_change_apply_v1"
-        ],
-        "contract_only_operations": [
           "sale_refund_preview_v1",
           "sale_refund_apply_v1",
+          "sale_change_preview_v1",
+          "sale_change_apply_v1",
           "finance_get_v1",
+          "collection_record_v1",
           "collection_correct_preview_v1",
-          "collection_correct_apply_v1"
+          "collection_correct_apply_v1",
+          "student_credit_refund_v1",
+          "student_credit_offset_v1",
+          "debt_adjust_v1"
         ],
+        "contract_only_operations": [],
         "acceptance_case_ids": [
           "DS-PROT-01",
           "DS-PROT-02",
@@ -82401,7 +82400,7 @@
           "confirmed_reservation_protection",
           "plan_gate_alignment"
         ],
-        "implementation": "partial",
+        "implementation": "implemented_acceptance_pending",
         "acceptance": "pending_feature_acceptance",
         "acceptance_evidence": [],
         "implemented_operations": [
@@ -82410,16 +82409,15 @@
           "attendance_correct_apply_v1",
           "instructor_agreement_publish_v1",
           "earnings_list_v1",
+          "instructor_payment_record_v1",
+          "instructor_payment_correct_v1",
           "event_duty_verify_v1",
           "attendance_block_v1",
           "negcredit_valuation_set_v1",
           "instructor_agreements_list_v1",
           "attendance_start_v1"
         ],
-        "contract_only_operations": [
-          "instructor_payment_record_v1",
-          "instructor_payment_correct_v1"
-        ],
+        "contract_only_operations": [],
         "acceptance_case_ids": [
           "DS-PLAN-01",
           "DS-PLAN-02",
@@ -82956,14 +82954,14 @@
         "acceptance": "pending_feature_acceptance",
         "acceptance_evidence": [],
         "implemented_operations": [
-          "credit_adjust_v1"
+          "credit_adjust_v1",
+          "collection_correct_preview_v1",
+          "collection_correct_apply_v1",
+          "instructor_payment_correct_v1"
         ],
         "contract_only_operations": [
           "organization_delete_preview_v1",
           "organization_delete_apply_v1",
-          "collection_correct_preview_v1",
-          "collection_correct_apply_v1",
-          "instructor_payment_correct_v1",
           "operation_status_get_v1",
           "preview_get_v1",
           "audit_list_v1",
