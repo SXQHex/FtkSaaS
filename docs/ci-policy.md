@@ -1,5 +1,13 @@
 # CI çalışma politikası — 20 Ekim 2026
 
+## CI-02 belge kabulü dilimi — kurulum bekliyor
+
+Yeni politika kodu ayrı dalda uygulanıyor; main henüz eski kapıyı kullanır. İncelenmiş tam belge yolları + normal dosya modu zorunlu; makine/envanter/tip/workflow/dependency ve bilinmeyen yollar kapalıdır. Renderer yalnız üç açıklama paragrafının AST string sabitleri değişirse belge sayılır; ifade, import, fonksiyon, emit ve envanter mantığının tamamı aynı kalmalıdır. PR24 bu dar kanıtı sağlar. Belge kabulü `npm run verify` ve bütün yaşayan inbound/outgoing bağlantıları denetler; full clean değildir.
+
+Yeni kaynakta açık `backend.yml` workflow_dispatch + exact `merge_sha`, geçmiş belge merge’ini iki gerçek parent/tree ve birikimli base–head sınıflandırmasıyla ayrıca denetler; salt okuma izinlidir, eski başarısız run/status değiştirilmez. Bu kurtarma kanıtı normal aday proof’un yerine genel fallback değildir. Sonraki belge PR’leri ayrı candidate receipt ve actual main ilişkisi gerektirir. Push main tüm açık PR kapılarını yeniden değerlendirir.
+
+Cleanup ancak start denenmiş ve CLI mevcutsa çalışır. Draft/development aday/merge kapısı kapalıdır; durumdan çıkış kendiliğinden full clean değildir.
+
 ## Son karar ve uygulama sınırı
 
 [CI-2026-10-20](decisions/CI-2026-10-20.md) kabul edilmiş hedeftir; **CI-02 uygulaması bekliyor**. Bu belge eşitlemesi workflow/gate değiştirmez. P01 PR #22 birleşmiştir; durum/kanıt [güncel devirde](../contracts/00-FtkSaaS-yeni-sohbet-devir.md). Yeni politika önceki her-main-clean ve tek PR'ye özgü belge istisnasını belirtilen kapsamda değiştirir; uygulanmamış kontrol etkin gösterilmez.

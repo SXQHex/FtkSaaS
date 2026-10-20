@@ -22,7 +22,7 @@ test('cumulative selector retains canceled API commit coverage when next commit 
 test('deleting or renaming referenced documentation is detected through unchanged inbound links',()=>fixture((dir,git)=>{writeFileSync(join(dir,'README.md'),'[Target](target.md)\n');writeFileSync(join(dir,'target.md'),'Target\n');git('add','.');git('commit','-m','links');fs.renameSync(join(dir,'target.md'),join(dir,'renamed.md'));assert.throws(()=>execFileSync(process.execPath,[resolve('scripts/ci/docs-check.mjs'),'target.md'],{cwd:dir,stdio:'pipe'}),/Command failed/);}));
 
 import {verifyMerged} from '../scripts/ci/gate.mjs';
-test('main verification rejects missing proof before running expensive acceptance',async()=>{const g={rest:{repos:{listPullRequestsAssociatedWithCommit:'prs'},actions:{listWorkflowRuns:'runs'}},paginate:async method=>method==='prs'?[{number:1,merged_at:'now',merge_commit_sha:'M',head:{sha:'H'},base:{sha:'B'}}]:[]};g.rest.git={getCommit:async()=>({data:{sha:'M',tree:{sha:'T'},parents:[{sha:'B'},{sha:'H'}]}})};await assert.rejects(()=>verifyMerged(g,{repo:{owner:'synthetic',repo:'test'},sha:'M'},{summary:{}}),/No source-bound full clean evidence/);});
+test('main verification rejects missing proof before running expensive acceptance',async()=>{const g={rest:{repos:{listPullRequestsAssociatedWithCommit:'prs'},actions:{listWorkflowRuns:'runs'}},paginate:async method=>method==='prs'?[{number:1,merged_at:'now',merge_commit_sha:'M',head:{sha:'H'},base:{sha:'B'}}]:[]};g.rest.git={getTree:async()=>({data:{tree:[],truncated:false}}),getCommit:async()=>({data:{sha:'M',tree:{sha:'T'},parents:[{sha:'B'},{sha:'H'}]}})};await assert.rejects(()=>verifyMerged(g,{repo:{owner:'synthetic',repo:'test'},sha:'M'},{summary:{}}),/No source-bound full clean evidence/);});
 test('main verification rejects direct push without a merged PR proof',async()=>{const g={rest:{repos:{listPullRequestsAssociatedWithCommit:'prs'}},paginate:async()=>[]};await assert.rejects(()=>verifyMerged(g,{repo:{},sha:'direct'},{}),/PR merge/);});
 const p01Suite='tests/p01-catalog-entitlement-reads.test.mjs';
 const profile={id:'p01-reads',sources:['p01-catalog-entitlement-reads'],operations:['products_list_v1','entitlements_get_v1'],migrationCheckLabel:'P01 reads source drift',suites:[p01Suite]};
@@ -149,4 +149,33 @@ test('request projection focus cannot own unrelated shared management contract c
   h=>h['x-contract'].operations[0].runtime_selectors.push('unrelated_v1'),
   h=>h.$defs.ManagementStateView.required.push('request_detail')
  ]){const h=structuredClone(focused);mutate(h);assert.equal(run(h).broad,true);}
+});
+
+import {documentScope,rendererOnlyProse,gitDocumentScope} from '../scripts/ci/document-scope.mjs';
+import {assertReady,assertParents,policyPath} from '../scripts/ci/source.mjs';
+import {validateDocumentBinding} from '../scripts/ci/gate.mjs';
+test('reviewed documentation scope excludes runtime with document-looking paths or labels',()=>{
+ const read=()=>'',mode=()=>'100644';
+ assert(documentScope([{path:'README.md',status:'M'}],read,mode).safe);
+ for(const path of ['docs/runtime.md','docs/endpoint-inventory.json','contracts/08-FtkSaaS-tip-ve-operasyon-sozlesmesi.json','packages/api-contracts/index.ts','scripts/ci/gate.mjs','.github/workflows/ci-full.yml','package-lock.json','supabase/migrations/document.md'])assert(!documentScope([{path,status:'M'}],read,mode).safe,path);
+ assert(!documentScope([{path:'README.md',status:'M'}],read,()=>'120000').safe);
+ assert(!documentScope([{path:'README.md',status:'M'},{path:'database/kernel.sql',status:'M'}],read,mode).safe);
+ assert(!documentScope([],read,mode).safe);
+});
+test('PR24 cumulative delta is documentation; all other renderer logic remains executable scope',()=>{
+ const base='7577b2f1873c6b1fcf83390bfa94a34374c44082',head='4e80716fdd6f12c3972635903c9435f253b34905';
+ const old=execFileSync('git',['show',base+':scripts/render_catalogs.py'],{encoding:'utf8'}),now=fs.readFileSync('scripts/render_catalogs.py','utf8');
+ assert(rendererOnlyProse(old,now));assert(gitDocumentScope(base,head).safe);
+ for(const source of [now.replace("inventory={'runtime_version'","inventory={'injected':True,'runtime_version'"),now.replace("emit('docs/endpoint-inventory.json'","emit('docs/runtime.json'"),now+"\nimport os\nos.system('false')\n",now.replace("len(c['tables'])","len(c['operations'])")])assert(!rendererOnlyProse(old,source));
+});
+test('draft/development cannot receive acceptance even if full clean is green',()=>{
+ for(const p of [{state:'open',draft:true,labels:[]},{state:'open',draft:false,labels:[{name:'development'}]},{state:'closed',draft:false,labels:[]}])assert.throws(()=>assertReady(p));
+ assertReady({state:'open',draft:false,labels:[]});
+ assert.throws(()=>assertParents({parents:[{sha:'B'},{sha:'X'}]},'B','H'));
+ assert(policyPath('scripts/ci/document-paths.json'));assert(policyPath('.github/workflows/ci-docs.yml'));
+});
+test('documentation proof is separate, source bound and rejects stale/missing/skipped evidence',()=>{
+ const v=valid();v.binding.kind='documentation';v.run.path='.github/workflows/ci-docs.yml';v.jobs[0].name='documentation';v.jobs[0].steps[0].name='Documentation acceptance';
+ assert(validateDocumentBinding(v));
+ for(const mutate of [x=>x.binding.kind='full',x=>x.pr.base.sha='new',x=>x.binding.attempt=2,x=>x.currentTree='new',x=>x.workflowMatches=false,x=>x.jobs=[],x=>x.jobs[0].steps[0].conclusion='skipped']){const x=structuredClone(v);mutate(x);assert.throws(()=>validateDocumentBinding(x));}
 });

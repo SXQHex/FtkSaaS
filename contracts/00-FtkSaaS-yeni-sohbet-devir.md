@@ -1,5 +1,7 @@
 # FtkSaaS — güncel devir
 
+CI-02 geliştirmesi `ci/ci02-source-bound-shards` dalında: başlangıç main `d544efe9f88f34edd7d6ce3055ed46d291a55f2c`, main run 39408606736 kaynak kanıtı adımında başarısız; test çalışmadı. P01 done kalır. Dar belge sınıflandırması/PR24 renderer AST kanıtı, ayrı belge kabulü ve koşullu cleanup uygulandı; yeni kaynak hedefli/uzak kabulü ve güvenilir politika kurulumu bekliyor. Dört shard henüz bu dilimde uygulanmadı; P02 başlamaz.
+
 ## 20 Ekim 2026 — P01 birleşti; belge senkronizasyonu
 
 Uygulama kaynağı main `7577b2f1873c6b1fcf83390bfa94a34374c44082`, [PR #22](https://github.com/SXQHex/FtkSaaS/pull/22); aday head `97f0b46d2277791339398aa47a1882630787dba9`. Envanter **199 sözleşme / 118 çağrılabilir / 81 yalnız sözleşme; 34 migration**. Çağrılabilirlik bütün ürün/hosted/production kabulü değildir.

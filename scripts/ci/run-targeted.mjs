@@ -12,5 +12,5 @@ if(import.meta.url===pathToFileURL(process.argv[1]??'').href){
  if(plan.structural)run('npm',['run','verify']);
  if(plan.db){run('npm',['run','dev:start']);try{
   run('node',['scripts/ci/reset-local.mjs']);run('npm',['run','test:db']);runApiPhases(plan,run);
- }finally{run('npm',['run','dev:stop']);}}
+ }finally{run('node',['scripts/ci/cleanup.mjs']);}}
 }

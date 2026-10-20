@@ -31,4 +31,4 @@ jobs:
       - if: always()
         run: node scripts/ci/summarize-timings.mjs
       - if: always()
-        run: npm run dev:stop
+        run: node scripts/ci/cleanup.mjs
