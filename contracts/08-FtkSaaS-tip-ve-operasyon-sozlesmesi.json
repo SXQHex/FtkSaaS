@@ -3732,6 +3732,24 @@
         },
         "available_at_session": {
           "$ref": "#/$defs/Count"
+        },
+        "version": {
+          "$ref": "#/$defs/PositiveInt"
+        },
+        "account_id": {
+          "$ref": "#/$defs/FtkUuid"
+        },
+        "sale_version": {
+          "$ref": "#/$defs/PositiveInt"
+        },
+        "sale_state": {
+          "$ref": "#/$defs/SaleState"
+        },
+        "freezes": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Table_freezes"
+          }
         }
       },
       "required": [
@@ -10942,7 +10960,7 @@
           "$ref": "#/$defs/FtkUuid"
         },
         "quantity": {
-          "$ref": "#/$defs/Int"
+          "$ref": "#/$defs/PositiveInt"
         },
         "direction": {
           "$ref": "#/$defs/Direction"
@@ -11224,6 +11242,9 @@
         },
         "end_date": {
           "$ref": "#/$defs/Date"
+        },
+        "reason": {
+          "$ref": "#/$defs/Text"
         }
       },
       "required": [
@@ -11231,7 +11252,8 @@
         "request_id",
         "org_id",
         "freeze_id",
-        "end_date"
+        "end_date",
+        "reason"
       ],
       "additionalProperties": false
     },
@@ -52283,12 +52305,14 @@
           "FORBIDDEN",
           "IDEMPOTENCY_PAYLOAD_MISMATCH",
           "INTEGRITY_VIOLATION",
+          "INVALID_STATE_TRANSITION",
           "NOT_FOUND",
           "OPERATION_IN_PROGRESS",
           "OPERATION_RESULT_EXPIRED",
           "PLAN_FEATURE_UNAVAILABLE",
           "PLAN_LIMIT_REACHED",
           "POLICY_NOT_CONFIGURED",
+          "PREVIEW_STALE",
           "QUOTA_EXCEEDED",
           "RESOURCE_CONFLICT",
           "SERVICE_UNAVAILABLE",
@@ -52347,7 +52371,7 @@
           "D-A12"
         ],
         "configuration_policy": "numeric plan limits/prices and legal approval are deployment configuration, never arbitrary allow/deny",
-        "implementation_status": "contract_only",
+        "implementation_status": "operational_development_limited",
         "required_features": [
           "F15"
         ],
@@ -52358,18 +52382,18 @@
           "target_entity": "entitlement_accounts",
           "version_mode": "row_version",
           "version_field": "sale_id",
-          "read_operation": "management_state_get_v1",
+          "read_operation": "entitlements_get_v1",
           "atomic_effects": [
             "sales.explicit_validity_change",
             "protected_reservation_obligations"
           ],
           "business_commit": true,
-          "read_path_status": "contract_only",
+          "read_path_status": "implemented",
           "source_decision": "DS-2026-10-17"
         },
         "decision_delivery": {
           "accepted_contract": "DS-2026-10-17",
-          "runtime_conformance": "pending",
+          "runtime_conformance": "p02_rights_runtime_pending_acceptance",
           "open_dependencies": [
             "confirmed_reservation_protection"
           ],
@@ -52407,12 +52431,14 @@
           "FORBIDDEN",
           "IDEMPOTENCY_PAYLOAD_MISMATCH",
           "INTEGRITY_VIOLATION",
+          "INVALID_STATE_TRANSITION",
           "NOT_FOUND",
           "OPERATION_IN_PROGRESS",
           "OPERATION_RESULT_EXPIRED",
           "PLAN_FEATURE_UNAVAILABLE",
           "PLAN_LIMIT_REACHED",
           "POLICY_NOT_CONFIGURED",
+          "PREVIEW_STALE",
           "QUOTA_EXCEEDED",
           "RESOURCE_CONFLICT",
           "SERVICE_UNAVAILABLE",
@@ -52475,7 +52501,7 @@
           "D-A12"
         ],
         "configuration_policy": "numeric plan limits/prices and legal approval are deployment configuration, never arbitrary allow/deny",
-        "implementation_status": "contract_only",
+        "implementation_status": "operational_development_limited",
         "required_features": [
           "F15",
           "F33"
@@ -52487,18 +52513,18 @@
           "target_entity": "entitlement_movements",
           "version_mode": "append_or_current_scope_lock",
           "version_field": null,
-          "read_operation": "management_state_get_v1",
+          "read_operation": "entitlements_get_v1",
           "atomic_effects": [
             "entitlement_movements.linked",
             "protected_reservation_obligations"
           ],
           "business_commit": true,
-          "read_path_status": "contract_only",
+          "read_path_status": "implemented",
           "source_decision": "DS-2026-10-17"
         },
         "decision_delivery": {
           "accepted_contract": "DS-2026-10-17",
-          "runtime_conformance": "pending",
+          "runtime_conformance": "p02_rights_runtime_pending_acceptance",
           "open_dependencies": [
             "confirmed_reservation_protection"
           ],
@@ -52673,10 +52699,12 @@
           "DOCUMENT_REQUIRED",
           "ENTITLEMENT_UNAVAILABLE",
           "FORBIDDEN",
+          "INVALID_STATE_TRANSITION",
           "NOT_FOUND",
           "PLAN_FEATURE_UNAVAILABLE",
           "PLAN_LIMIT_REACHED",
           "POLICY_NOT_CONFIGURED",
+          "PREVIEW_STALE",
           "QUOTA_EXCEEDED",
           "RESOURCE_CONFLICT",
           "SERVICE_UNAVAILABLE",
@@ -52725,26 +52753,28 @@
           "A55"
         ],
         "configuration_policy": "numeric plan limits/prices and legal approval are deployment configuration, never arbitrary allow/deny",
-        "implementation_status": "contract_only",
+        "implementation_status": "operational_development_limited",
         "required_features": [
           "F17"
         ],
-        "runtime_required_features": [],
+        "runtime_required_features": [
+          "F17"
+        ],
         "conditional_features": [],
         "operation_contract": {
           "kind": "preview",
           "target_entity": "freezes",
           "version_mode": "preview_dependencies",
           "version_field": null,
-          "read_operation": "management_state_get_v1",
+          "read_operation": "entitlements_get_v1",
           "atomic_effects": [],
           "business_commit": false,
-          "read_path_status": "contract_only",
+          "read_path_status": "implemented",
           "source_decision": "DS-2026-10-17"
         },
         "decision_delivery": {
           "accepted_contract": "DS-2026-10-17",
-          "runtime_conformance": "pending",
+          "runtime_conformance": "p02_freeze_runtime_pending_acceptance",
           "open_dependencies": [],
           "target_request": {
             "$ref": "#/$defs/Request_freeze_preview"
@@ -52780,6 +52810,7 @@
           "FORBIDDEN",
           "IDEMPOTENCY_PAYLOAD_MISMATCH",
           "INTEGRITY_VIOLATION",
+          "INVALID_STATE_TRANSITION",
           "NOT_FOUND",
           "OPERATION_IN_PROGRESS",
           "OPERATION_RESULT_EXPIRED",
@@ -52846,18 +52877,20 @@
           "A55"
         ],
         "configuration_policy": "numeric plan limits/prices and legal approval are deployment configuration, never arbitrary allow/deny",
-        "implementation_status": "contract_only",
+        "implementation_status": "operational_development_limited",
         "required_features": [
           "F17"
         ],
-        "runtime_required_features": [],
+        "runtime_required_features": [
+          "F17"
+        ],
         "conditional_features": [],
         "operation_contract": {
           "kind": "apply",
           "target_entity": "freezes",
           "version_mode": "preview_dependencies",
           "version_field": null,
-          "read_operation": "freeze_preview_v1",
+          "read_operation": "entitlements_get_v1",
           "atomic_effects": [
             "freezes.scheduled",
             "rights.suspend_unreserved",
@@ -52865,12 +52898,12 @@
             "no_auto_rebooking_or_period_extension"
           ],
           "business_commit": true,
-          "read_path_status": "contract_only",
+          "read_path_status": "implemented",
           "source_decision": "DS-2026-10-17"
         },
         "decision_delivery": {
           "accepted_contract": "DS-2026-10-17",
-          "runtime_conformance": "pending",
+          "runtime_conformance": "p02_freeze_runtime_pending_acceptance",
           "open_dependencies": [
             "confirmed_reservation_protection"
           ],
@@ -52905,10 +52938,12 @@
           "DOCUMENT_REQUIRED",
           "ENTITLEMENT_UNAVAILABLE",
           "FORBIDDEN",
+          "INVALID_STATE_TRANSITION",
           "NOT_FOUND",
           "PLAN_FEATURE_UNAVAILABLE",
           "PLAN_LIMIT_REACHED",
           "POLICY_NOT_CONFIGURED",
+          "PREVIEW_STALE",
           "QUOTA_EXCEEDED",
           "RESOURCE_CONFLICT",
           "SERVICE_UNAVAILABLE",
@@ -52957,26 +52992,28 @@
           "A55"
         ],
         "configuration_policy": "numeric plan limits/prices and legal approval are deployment configuration, never arbitrary allow/deny",
-        "implementation_status": "contract_only",
+        "implementation_status": "operational_development_limited",
         "required_features": [
           "F17"
         ],
-        "runtime_required_features": [],
+        "runtime_required_features": [
+          "F17"
+        ],
         "conditional_features": [],
         "operation_contract": {
           "kind": "preview",
           "target_entity": "freezes",
           "version_mode": "preview_dependencies",
           "version_field": null,
-          "read_operation": "management_state_get_v1",
+          "read_operation": "entitlements_get_v1",
           "atomic_effects": [],
           "business_commit": false,
-          "read_path_status": "contract_only",
+          "read_path_status": "implemented",
           "source_decision": "DS-2026-10-17"
         },
         "decision_delivery": {
           "accepted_contract": "DS-2026-10-17",
-          "runtime_conformance": "pending",
+          "runtime_conformance": "p02_freeze_runtime_pending_acceptance",
           "open_dependencies": [],
           "target_request": {
             "$ref": "#/$defs/Request_freeze_end_preview"
@@ -53012,6 +53049,7 @@
           "FORBIDDEN",
           "IDEMPOTENCY_PAYLOAD_MISMATCH",
           "INTEGRITY_VIOLATION",
+          "INVALID_STATE_TRANSITION",
           "NOT_FOUND",
           "OPERATION_IN_PROGRESS",
           "OPERATION_RESULT_EXPIRED",
@@ -53076,30 +53114,32 @@
           "A55"
         ],
         "configuration_policy": "numeric plan limits/prices and legal approval are deployment configuration, never arbitrary allow/deny",
-        "implementation_status": "contract_only",
+        "implementation_status": "operational_development_limited",
         "required_features": [
           "F17"
         ],
-        "runtime_required_features": [],
+        "runtime_required_features": [
+          "F17"
+        ],
         "conditional_features": [],
         "operation_contract": {
           "kind": "apply",
           "target_entity": "freezes",
           "version_mode": "preview_dependencies",
           "version_field": null,
-          "read_operation": "freeze_end_preview_v1",
+          "read_operation": "entitlements_get_v1",
           "atomic_effects": [
             "freezes.explicit_end",
             "rights.resume_current_validity",
             "no_auto_rebooking"
           ],
           "business_commit": true,
-          "read_path_status": "contract_only",
+          "read_path_status": "implemented",
           "source_decision": "DS-2026-10-17"
         },
         "decision_delivery": {
           "accepted_contract": "DS-2026-10-17",
-          "runtime_conformance": "pending",
+          "runtime_conformance": "p02_freeze_runtime_pending_acceptance",
           "open_dependencies": [],
           "target_request": {
             "$ref": "#/$defs/Request_freeze_end_apply"
@@ -66718,6 +66758,12 @@
       },
       {
         "path": "#/$defs/EntitlementView/properties/product_version_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/EntitlementView/properties/account_id",
         "origin": "ftksaas",
         "acceptance": "generic_uuid",
         "generation": "uuidv7"
@@ -81553,11 +81599,11 @@
           "negcredit_valuation_set_v1",
           "reservation_impact_preview_v1",
           "reservation_impact_apply_v1",
-          "negative_limits_get_v1"
+          "negative_limits_get_v1",
+          "credit_adjust_v1",
+          "entitlement_extend_v1"
         ],
         "contract_only_operations": [
-          "entitlement_extend_v1",
-          "credit_adjust_v1",
           "sale_terminate_preview_v1",
           "sale_terminate_apply_v1",
           "sale_renew_preview_v1",
@@ -81705,13 +81751,13 @@
         "acceptance": "pending_feature_acceptance",
         "acceptance_evidence": [],
         "implemented_operations": [
-          "product_publish_v1"
-        ],
-        "contract_only_operations": [
+          "product_publish_v1",
           "freeze_preview_v1",
           "freeze_apply_v1",
           "freeze_end_preview_v1",
-          "freeze_end_apply_v1",
+          "freeze_end_apply_v1"
+        ],
+        "contract_only_operations": [
           "sale_terminate_preview_v1",
           "sale_terminate_apply_v1",
           "sale_change_preview_v1",
@@ -82482,11 +82528,12 @@
         "implementation": "partial",
         "acceptance": "pending_feature_acceptance",
         "acceptance_evidence": [],
-        "implemented_operations": [],
+        "implemented_operations": [
+          "credit_adjust_v1"
+        ],
         "contract_only_operations": [
           "organization_delete_preview_v1",
           "organization_delete_apply_v1",
-          "credit_adjust_v1",
           "collection_correct_preview_v1",
           "collection_correct_apply_v1",
           "instructor_payment_correct_v1",

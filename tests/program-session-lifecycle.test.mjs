@@ -285,12 +285,12 @@ test('Program lifecycle through real Auth -> Edge -> RPC',async t=>{
   const id=sids[0],request={session_id:id,reason:'Center explicit cancellation'},cp=()=>must(owner,'session_cancel_preview_v1',scope(request)),applyCancel=(p,k=key(),u=owner)=>mut('session_cancel_apply_v1',{preview:token(p)},k,u);
   await fail('session_cancel_preview_v1',request,'FORBIDDEN',staff.u);
   const before=await counts(),p=await cp();assert.deepEqual(await counts(),before);assert(p.effects.some(e=>e.entity.id===reservation&&e.action==='cancel'));
-  await fail('session_cancel_apply_v1',{preview:token(p)},'PREVIEW_STALE',cm.u);
+  await fail('session_cancel_apply_v1',{preview:token(p)},'FORBIDDEN',cm.u);
   await fail('session_cancel_apply_v1',{center_id:c2,preview:token(p)},'PREVIEW_STALE');
   await db.query('update core.reservations set version=version+1 where id=$1',[reservation]);await fail('session_cancel_apply_v1',{preview:token(p)},'PREVIEW_STALE');
   const p2=await cp(),k=key(),beforeFault=await counts();await inject('session_cancel_apply_v1');
   await fail('session_cancel_apply_v1',{preview:token(p2)},'INTEGRITY_VIOLATION',owner,k);assert.deepEqual(await counts(),beforeFault);assert.equal((await get(id)).state,'planned');await clearFault();
-  const outcomes=await Promise.all([req('session_cancel_apply_v1',{preview:token(p2)},owner,k),req('session_cancel_apply_v1',{preview:token(p2)})]);assert.equal(outcomes[0].result.ok,true,JSON.stringify(outcomes));assert.equal(outcomes[1].result.error.code,'PREVIEW_STALE');
+  const outcomes=await Promise.all([req('session_cancel_apply_v1',{preview:token(p2)},owner,k),req('session_cancel_apply_v1',{preview:token(p2)},owner,k)]);assert.equal(outcomes[0].result.ok,true,JSON.stringify(outcomes));assert.equal(outcomes[1].result.ok,true,JSON.stringify(outcomes));
   assert.equal((await applyCancel(p2,k)).replayed,true);assert.equal((await get(id)).state,'cancelled');
   assert.equal((await rows('select state from core.reservations where id=$1',[reservation]))[0].state,'cancelled');assert((await ledger()).filter(a=>a.reservation_id===reservation).every(a=>a.state==='released'));
   assert.equal((await rows("select count(*)::int n from core.notifications where org_id=$1 and subject_id=$2 and recipient_person_id=$3 and kind='session_cancelled_by_center'",[org,id,student.p]))[0].n,1);
@@ -299,6 +299,35 @@ test('Program lifecycle through real Auth -> Edge -> RPC',async t=>{
   const made=await mut('replacement_session_create_v1',replacement,rk);assert.equal((await mut('replacement_session_create_v1',replacement,rk)).replayed,true);
   assert.equal((await rows('select replaces_id from core.sessions where id=$1',[made.primary_id]))[0].replaces_id,id);assert.equal((await rows('select count(*)::int n from core.reservations where session_id=$1',[made.primary_id]))[0].n,0);
   await fail('replacement_session_create_v1',{...replacement,replaces_id:made.primary_id},'INVALID_STATE_TRANSITION');
+ });
+ await t.test('P02 credit correction and explicit extension consume exact impact approval once and keep confirmed obligations',async()=>{
+  const sid=(await session(null,'2027-02-11T11:00:00Z')).primary_id,rid=(await mut('reservation_create_v1',{session_id:sid,person_id:student.p,mode:'flexible',source_sale_id:sale})).primary_id;
+  const reason='Explicit synthetic correction',change={kind:'credit_adjust',sale_id:sale,quantity:10,direction:'decrease'},previewImpact=change=>must(owner,'reservation_impact_preview_v1',scope({change,reason}));
+  const p=await previewImpact(change);assert(p.affected.some(x=>x.reservation_id===rid));assert.equal(p.preserves_reservations,true);
+  const request={sale_id:sale,quantity:10,direction:'decrease',reason,impact_approval:token(p.preview),accepted_reservation_ids:p.affected.map(x=>x.reservation_id)};
+  await fail('credit_adjust_v1',{...request,quantity:9},'PREVIEW_STALE');await fail('credit_adjust_v1',{...request,accepted_reservation_ids:[]},'VALIDATION_FAILED');
+  const k=key(),before=await counts();await inject('credit_adjust_v1');await fail('credit_adjust_v1',request,'INTEGRITY_VIOLATION',owner,k);assert.deepEqual(await counts(),before);await clearFault();await mut('credit_adjust_v1',request,k);assert.equal((await mut('credit_adjust_v1',request,k)).replayed,true);
+  await fail('reservation_impact_apply_v1',{preview:token(p.preview),accepted_reservation_ids:request.accepted_reservation_ids},'PREVIEW_STALE');assert.equal((await rows('select state from core.reservations where id=$1',[rid]))[0].state,'active');
+  const increase=await previewImpact({...change,quantity:3,direction:'increase'});await mut('reservation_impact_apply_v1',{preview:token(increase.preview),accepted_reservation_ids:[]});
+  const ext={kind:'entitlement_extend',sale_id:sale,end_date:'2027-03-01'},e=await previewImpact(ext),view=(await must(owner,'entitlements_get_v1',scope({person_id:student.p}))).find(x=>x.sale_id===sale);assert.equal(view.version>1,true);
+  const extend={sale_id:sale,expected_version:view.version,end_date:ext.end_date,reason,impact_approval:token(e.preview),accepted_reservation_ids:[]};
+  await fail('entitlement_extend_v1',{...extend,expected_version:1},'VERSION_CONFLICT');await mut('entitlement_extend_v1',extend);
+  const after=(await must(owner,'entitlements_get_v1',scope({person_id:student.p}))).find(x=>x.sale_id===sale);assert.equal(after.end_date,'2027-03-01');assert.equal(after.available,2);assert.equal(after.reserved,1);assert.equal(after.sale_state,'active');
+  await fail('reservation_impact_preview_v1',{change:{...ext,end_date:'2026-01-01'},reason},'VALIDATION_FAILED');
+ });
+ await t.test('P02 freeze and reasoned early end preserve reservations, block new rights and extend only local frozen days',async()=>{
+  const learner=await person('p02-freeze-student'),terms={name:'Freeze credits',kind:'credits',booking_mode:'flexible',credits:8,price_minor:'800',currency:'TRY',freeze:{enabled:true,extends_validity:true,max_days:30},refund:{method:'credit_ratio'},scopes:[{scope_kind:'organization_all',center_id:null,discipline_id:null,usage_targets:['lesson']}]};
+  const pv=(await mut('product_publish_v1',{terms})).primary_id,sp=await must(owner,'sale_preview_v1',scope({person_id:learner.p,product_version_id:pv,start_date:'2027-03-01',end_date:'2027-04-01'})),sold=(await mut('sale_apply_v1',{preview:token(sp)})).primary_id;
+  const sid=(await session(null,'2027-03-12T11:00:00Z')).primary_id,rid=(await mut('reservation_create_v1',{session_id:sid,person_id:learner.p,mode:'flexible',source_sale_id:sold})).primary_id;
+  const request={sale_id:sold,dates:{start_date:'2027-03-10',end_date:'2027-03-20'},reason:'Explicit freeze'},before=await ledger(),p=await must(owner,'freeze_preview_v1',scope(request));assert(p.effects.some(x=>x.entity.id===rid));assert.deepEqual(await ledger(),before);
+  await fail('freeze_preview_v1',{...request,center_id:c2},'NOT_FOUND');await fail('freeze_preview_v1',request,'FORBIDDEN',staff.u);
+  const k=key(),f=await mut('freeze_apply_v1',{preview:token(p)},k);assert.equal((await mut('freeze_apply_v1',{preview:token(p)},k)).replayed,true);assert.deepEqual(await ledger(),before);assert.equal((await rows('select state from core.reservations where id=$1',[rid]))[0].state,'active');
+  const view=()=>must(owner,'entitlements_get_v1',scope({person_id:learner.p}));let v=(await view()).find(x=>x.sale_id===sold);assert.equal(v.end_date,'2027-04-11');assert.equal(v.freezes[0].id,f.primary_id);
+  const blocked=(await session(null,'2027-03-13T11:00:00Z')).primary_id;await fail('reservation_create_v1',{session_id:blocked,person_id:learner.p,mode:'flexible',source_sale_id:sold},'ENTITLEMENT_UNAVAILABLE');
+  const end={freeze_id:f.primary_id,end_date:'2027-03-15',reason:'Explicit early end'},e=await must(owner,'freeze_end_preview_v1',scope(end));await mut('freeze_end_apply_v1',{preview:token(e)});v=(await view()).find(x=>x.sale_id===sold);assert.equal(v.end_date,'2027-04-06');assert.equal(v.freezes[0].actual_end,'2027-03-14T21:00:00+00:00');assert.deepEqual(await ledger(),before);
+  const reopened=(await session(null,'2027-03-16T11:00:00Z')).primary_id;await mut('reservation_create_v1',{session_id:reopened,person_id:learner.p,mode:'flexible',source_sale_id:sold});
+  assert.equal((await rows('select paid_days from core.sales where id=$1',[sold]))[0].paid_days,31);await fail('freeze_end_apply_v1',{preview:token(e)},'PREVIEW_STALE');
+  await fail('freeze_preview_v1',{...request,dates:{start_date:'2020-01-01',end_date:'2020-01-02'}},'VALIDATION_FAILED');
  });
  await t.test('revoked Auth session and direct authenticated RPC cannot bypass Edge',async()=>{
   const u=await authUser('program-revoked'),{env}=context();const response=await fetch(env.API_URL+'/auth/v1/logout?scope=global',{method:'POST',headers:{apikey:env.ANON_KEY,authorization:'Bearer '+u.jwt}});assert(response.ok);

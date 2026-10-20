@@ -77,14 +77,12 @@ Ortak üretim promptunu uygula. Durum: in_progress; tek Draft/development PR. B�
 
 **P02-A uygulandı; hedefli runtime kabulü bekliyor:** `session_cancel_preview_v1`, `session_cancel_apply_v1`, `replacement_session_create_v1`.
 
-**Kalan sözleşme API'leri (12):**
+**P02-B uygulandı; hedefli runtime kabulü bekliyor:** `credit_adjust_v1`, `entitlement_extend_v1`; tam etki onayı tek tüketim.
 
-- `entitlement_extend_v1`
-- `credit_adjust_v1`
-- `freeze_preview_v1`
-- `freeze_apply_v1`
-- `freeze_end_preview_v1`
-- `freeze_end_apply_v1`
+**P02-C uygulandı; hedefli runtime kabulü bekliyor:** `freeze_preview/apply_v1`, `freeze_end_preview/apply_v1`; kalan6 satış API.
+
+**Kalan sözleşme API'leri (6):**
+
 - `sale_terminate_preview_v1`
 - `sale_terminate_apply_v1`
 - `sale_change_preview_v1`

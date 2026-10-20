@@ -68,3 +68,7 @@ assert next(Path('supabase/migrations').glob('*_p01_worker_transport.sql')).read
 assert next(Path('supabase/migrations').glob('*_p01_final_scope_guards.sql')).read_text()==Path('database/p01-final-scope-guards.sql').read_text()+Path('database/p01-final-scope-guards-wrappers.sql').read_text(),'P01 final scope guards source drift'
 
 assert next(Path('supabase/migrations').glob('*_p02_sessions.sql')).read_text()==Path('database/p02-sessions.sql').read_text()+Path('database/p02-sessions-wrappers.sql').read_text(),'P02 sessions source drift'
+
+assert next(Path('supabase/migrations').glob('*_p02_entitlement_corrections.sql')).read_text()==Path('database/p02-entitlement-corrections.sql').read_text()+Path('database/p02-entitlement-corrections-wrappers.sql').read_text(),'P02 corrections source drift'
+
+assert next(Path('supabase/migrations').glob('*_p02_freeze_lifecycle.sql')).read_text()==Path('database/p02-freeze-lifecycle.sql').read_text()+Path('database/p02-freeze-lifecycle-wrappers.sql').read_text(),'P02 freeze source drift'

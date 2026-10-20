@@ -3274,6 +3274,14 @@ product_version_id?: string
 booking_mode?: BookingMode
 kind?: EntitlementKind
 available_at_session?: Count
+version?: PositiveInt
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+account_id?: string
+sale_version?: PositiveInt
+sale_state?: SaleState
+freezes?: TableFreezes[]
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -3290,6 +3298,35 @@ center_id: string
 discipline_id: string
 reserved: Count
 consumed: Count
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "Table_freezes".
+ */
+export interface TableFreezes {
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+id: string
+created_at: Instant
+version?: PositiveInt
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+org_id: string
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+sale_id: string
+starts_at: Instant
+planned_end: Instant
+actual_end?: (Instant | null)
+state: FreezeState
+extension_until?: (Instant | null)
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+preview_id: string
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -6688,7 +6725,7 @@ operation_key: string
  * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
  */
 sale_id: string
-quantity: Int
+quantity: PositiveInt
 direction: Direction
 reason: Text
 impact_approval: PreviewToken
@@ -6847,6 +6884,7 @@ center_id?: (string | null)
  */
 freeze_id: string
 end_date: Date
+reason: Text
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -11253,35 +11291,6 @@ ends_at: Instant
 limit_count: Int
 reserved_count: Int
 consumed_count: Int
-}
-/**
- * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
- * via the `definition` "Table_freezes".
- */
-export interface TableFreezes {
-/**
- * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
- */
-id: string
-created_at: Instant
-version?: PositiveInt
-/**
- * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
- */
-org_id: string
-/**
- * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
- */
-sale_id: string
-starts_at: Instant
-planned_end: Instant
-actual_end?: (Instant | null)
-state: FreezeState
-extension_until?: (Instant | null)
-/**
- * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
- */
-preview_id: string
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema

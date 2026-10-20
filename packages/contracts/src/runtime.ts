@@ -120,6 +120,12 @@ export const runtimeOperationNames = [
   "request_expire_v1",
   "session_cancel_preview_v1",
   "session_cancel_apply_v1",
-  "replacement_session_create_v1"
+  "replacement_session_create_v1",
+  "credit_adjust_v1",
+  "entitlement_extend_v1",
+  "freeze_preview_v1",
+  "freeze_apply_v1",
+  "freeze_end_preview_v1",
+  "freeze_end_apply_v1"
 ] as const;
 export type RuntimeOperationName = typeof runtimeOperationNames[number];
