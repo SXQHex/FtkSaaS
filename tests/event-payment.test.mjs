@@ -280,7 +280,7 @@ test('P03 linked finance corrections, frozen refunds and instructor payments',as
  await t.test('frozen sale refund decreases debt once, credits only collected excess and preserves rights',async()=>{
   const terms={name:'P03 refundable',kind:'credits',booking_mode:'flexible',credits:10,price_minor:'1000',currency:'TRY',freeze:{enabled:false,extends_validity:false},refund:{method:'credit_ratio'},scopes:[{scope_kind:'organization_all',center_id:null,discipline_id:null,usage_targets:['lesson','event']}]};
   const product=(await m('product_publish_v1',{terms})).primary_id;
-  const p=await must(owner,'sale_preview_v1',scope({person_id:person,product_version_id:product,start_date:'2026-10-20',end_date:'2027-10-20'}));
+  const p=await must(owner,'sale_preview_v1',scope({person_id:person,product_version_id:product,start_date:new Date(Date.now()+86400000).toISOString().slice(0,10),end_date:new Date(Date.now()+366*86400000).toISOString().slice(0,10)}));
   sale=(await m('sale_apply_v1',pvref(p))).primary_id;
   const debt=(await row('select id from core.debts where org_id=$1 and sale_id=$2',[org,sale])).id;
   const paid=(await m('collection_record_v1',{person_id:person,debt_ids:[debt],amount_minor:'600',currency:'TRY',occurred_at:now()})).primary_id;
@@ -294,6 +294,37 @@ test('P03 linked finance corrections, frozen refunds and instructor payments',as
   assert.equal((await row('select private.debt_claimed($1,$2)::text claimed',[org,debt])).claimed,'600');
   const corrected=await must(owner,'collection_correct_preview_v1',scope({cash_movement_id:paid,correction:{amount_minor:'100',currency:'TRY',occurred_at:now(),direction:'decrease'},reason:'P03 linked prior claim'}));
   await m('collection_correct_apply_v1',pvref(corrected));assert.equal((await row('select private.debt_claimed($1,$2)::text claimed',[org,debt])).claimed,'500');
+  const debtVersion=(await row('select version from core.debts where id=$1',[debt])).version;
+  await m('debt_adjust_v1',{debt_id:debt,expected_version:Number(debtVersion),amount_minor:'1000',currency:'TRY',direction:'increase',reason:'P03 later independent charge'});
+  assert.equal((await row('select private.debt_remaining($1,$2)::text remaining',[org,debt])).remaining,'1000');
+  const creditBefore=(await read({person_id:person})).credit_available_minor;
+  const next=await must(owner,'collection_correct_preview_v1',scope({cash_movement_id:paid,correction:{amount_minor:'100',currency:'TRY',occurred_at:now(),direction:'decrease'},reason:'P03 bounded reverse after new debt'}));
+  const creditEffect=next.effects.filter(x=>x.entity.type==='people').reduce((n,x)=>n+BigInt(x.amount_minor),0n);assert(creditEffect<=100n);
+  await m('collection_correct_apply_v1',pvref(next));
+  assert.equal(BigInt(creditBefore)-BigInt((await read({person_id:person})).credit_available_minor),100n);
+  assert.equal((await row('select private.debt_remaining($1,$2)::text remaining',[org,debt])).remaining,'1000');
+
+ });
+
+ await t.test('actual P02 product change settlement is consumed by P03 refund without a second claim',async()=>{
+  const p=(await m('person_create_v1',{display_name:'P03 P02 chain student',contacts:[]})).primary_id;await m('student_activate_v1',{person_id:p});
+  const terms={name:'P03 chain old',kind:'credits',booking_mode:'flexible',credits:4,price_minor:'1000',currency:'TRY',freeze:{enabled:false,extends_validity:false},refund:{method:'credit_ratio'},scopes:[{scope_kind:'organization_all',center_id:null,discipline_id:null,usage_targets:['lesson','event']}]};
+  const oldProduct=(await m('product_publish_v1',{terms})).primary_id;
+  const newProduct=(await m('product_publish_v1',{terms:{...terms,name:'P03 chain new',price_minor:'500'}})).primary_id;
+  const dates={start_date:new Date(Date.now()+86400000).toISOString().slice(0,10),end_date:new Date(Date.now()+366*86400000).toISOString().slice(0,10)};
+  const pre=await must(owner,'sale_preview_v1',scope({person_id:p,product_version_id:oldProduct,...dates}));
+  const oldSale=(await m('sale_apply_v1',pvref(pre))).primary_id;
+  const debt=(await row('select id from core.debts where org_id=$1 and sale_id=$2',[org,oldSale])).id;
+  await m('collection_record_v1',{person_id:p,debt_ids:[debt],amount_minor:'1000',currency:'TRY',occurred_at:now()});
+  const change=await must(owner,'sale_change_preview_v1',scope({sale_id:oldSale,new_product_version_id:newProduct,...dates,keep_reservation_ids:[],cancel_reservation_ids:[],offset_minor:'0',reason:'P03 real P02 linked change'}));
+  assert.deepEqual(change.blockers,[]);await m('sale_change_apply_v1',pvref(change));
+  assert.equal((await row('select private.debt_claimed($1,$2)::text claimed',[org,debt])).claimed,'1000');
+  assert.equal((await row('select count(*)::int n from private.p02_sale_settlements where org_id=$1 and sale_id=$2',[org,oldSale])).n,1);
+  const before=(await read({person_id:p})).credit_available_minor;
+  const refund=await must(owner,'sale_refund_preview_v1',scope({sale_id:oldSale,reason:'P03 cannot duplicate P02 claim'}));
+  assert(refund.effects.every(x=>BigInt(x.amount_minor??'0')===0n));await m('sale_refund_apply_v1',pvref(refund));
+  assert.equal((await read({person_id:p})).credit_available_minor,before);
+  assert.equal((await row('select private.debt_claimed($1,$2)::text claimed',[org,debt])).claimed,'1000');
  });
  await t.test('instructor payment selected net earnings; concurrent overpay, correction version and separate cash',async()=>{
   // Financial-only synthetic earning facts; actual attendance earning creation remains in instructor suite.

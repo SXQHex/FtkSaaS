@@ -45,6 +45,7 @@ jobs:
       - name: P03 targeted finance and dependent regression
         run: |
           npm run test:db
+          node --test --test-name-pattern='P03 linked' tests/event-payment.test.mjs
           node --test --test-concurrency=1 tests/event-payment.test.mjs tests/instructor-earnings.test.mjs tests/program-session-lifecycle.test.mjs
       - if: always()
         run: node scripts/ci/cleanup.mjs
