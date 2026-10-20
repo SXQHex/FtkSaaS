@@ -1,5 +1,22 @@
 # P01 — talep, rezervasyon ve bekleme devri
 
+## 20 Ekim 2026 — P01 birleşti; belge senkronizasyonu
+
+Uygulama kaynağı main `7577b2f1873c6b1fcf83390bfa94a34374c44082`, [PR #22](https://github.com/SXQHex/FtkSaaS/pull/22); aday head `97f0b46d2277791339398aa47a1882630787dba9`. Envanter **199 sözleşme / 118 çağrılabilir / 81 yalnız sözleşme; 34 migration**. Çağrılabilirlik bütün ürün/hosted/production kabulü değildir.
+
+- [Son head hedefli CI 39325878582](https://github.com/SXQHex/FtkSaaS/actions/runs/39325878582): başarılı; 218 test düğümü (120 yapı/politika + 27 DB + 71 API); bu dağılım hedefli koşuya aittir.
+- [Bütün P01 aday full clean 39327134872](https://github.com/SXQHex/FtkSaaS/actions/runs/39327134872): GitHub sonucu completed/success. [Aday kapısı 39327135216](https://github.com/SXQHex/FtkSaaS/actions/runs/39327135216): başarılı. PR son-head bağımsız inceleme kaydı aday hazırlığını onaylar; geliştirici/inceleme beyanı ile CI ayrı kanıtlardır.
+- [Main clean 39401570751](https://github.com/SXQHex/FtkSaaS/actions/runs/39401570751) aynı main SHA’sında completed/success olarak doğrulandı; main-clean job’u ve Verify merged candidate relation adımı başarılıdır. Job süresi 39:00, test:clean adımı 38:37; run zaman aralığı 39:04’tür. P01 done; geçici kabul varsayımı kaldırıldı. Bu başarı sonraki kaynak SHA’sına taşınmaz.
+
+P01'in talep→alternatif→merkez onayı→rezervasyon ve bekleme→FIFO yer teklifi→kabul/ret/expiry zinciri main'e alındı. Request-window/CM gerekçeli istisna, canlı worker merkez/plan erişimi, fenced lease/crash kurtarma ve yarış düzeltmeleri son hedefli kaynakta kabul edildi. Eski A/B/C “runtime bekliyor / merge edilmedi” ifadeleri aşağıda veya Git geçmişinde tarihsel teşhistir; güncel açık iş değildir.
+
+Sıradaki iş **CI-02: dört bağımsız shard + Draft/development + yalnız-belge kabulü**, ardından P02. Yeni politika karar düzeyinde kabul edildi, workflow/merge kapısı uygulaması bekliyor. P01 için hosted worker kurulumu, frontend gerçek entegrasyonu, dış e-posta, yük/restore ve production kapsamı tamamlanmış sayılmaz.
+
+[CI-02 kararı](decisions/CI-2026-10-20.md). Aşağıdaki kayıtlar kaynak tarihine göre okunur; son hedefli/aday kabulü geçmiş pending notlarını kapatmıştır.
+
+<details>
+<summary>P01 teknik uygulama ayrıntıları ve önceki teşhisler — tarihsel kaynak sırası</summary>
+
 ## 20 Ekim 2026 — son kapsam incelemesi düzeltmeleri
 
 Kaynak `c62106b77717d6c1b1129fe7fa8eca6060d05826` / [hedefli CI 39323812801](https://github.com/SXQHex/FtkSaaS/actions/runs/39323812801) başarılıdır: 120 yapı/politika + 27 DB + 67 API test düğümü (P01 26, ortak 41), toplam 214. Worker CLI/loop, minimal DB yetkileri ve üç denemelik hata yolu bu kaynakta geçti; önceki Auth transport hatası kapandı. Bu başarı yeni kaynağa taşınmaz.
@@ -94,3 +111,6 @@ Aynı doğal düzeltme diliminde seçici kaynak farkı kanıtıyla bu modülü v
 Kaynak 85e25ec48cfc8f204392a757d333e284b02b6149, run [39278529991](https://github.com/SXQHex/FtkSaaS/actions/runs/39278529991), job 118148506287 logları: P01 10/10, DB 27/27, yapısal 96+23 geçti. Ortak API suite 41 düğümden 39 başarılı/2 başarısız (parent+child, tek assertion): weekly quota testinde ikinci kayıt beklenmedik şekilde kabul edildi. Logun sonu exit 1 ve cleanup içerirken run metadata hâlâ in_progress gösterdi; kuyruk/runner durumu tek başına test sonucu kabul edilmez.
 
 Kök neden genel Date.now/slot fixture'ının 14 ve 15'inci slotlarının Europe/Istanbul'da 30 Eylül gecesi ile 1 Ekim başına düşmesi; 1 Ocak satış başlangıcına bağlı ayrı yedi günlük kotalarda ikisinin kabulü doğrudur. Ortak test aynı ilk kota haftasında 2 Ocak 09:00/11:00 UTC zamanlarına sabitlendi; 9 Ocak'ta bağımsız kota kabulü de kontrol edilir. Kota/runtime/sözleşme değişmedi. Yeni head runtime kabulü, son aday ve main clean hâlâ bekliyor. Kullanıcının yeniden tetiklemesi için gönderilen 09c9cc3 boş commit'i aynı kaynak tree'sidir; onun metadata'sı da önceki kaynağa yeni kabul sağlamaz. Aynı tree'nin run 39280209729 / job 118152807472 logu da 15:44:08–15:49:07 UTC arasında yaklaşık 4:59 yürütme ve aynı tek kota assertion hatasını doğrular; P01 10/10 geçmiştir.
+
+
+</details>

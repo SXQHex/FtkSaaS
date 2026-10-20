@@ -1,5 +1,8 @@
 # FtkSaaS kaynak indeksi
 
+20 Ekim 2026: uygulama main `7577b2f1873c6b1fcf83390bfa94a34374c44082`, 199/118/81 ve 34 migration. P01 birleşti; aynı main clean 39401570751 completed/success kanıtı [güncel devirde](../contracts/00-FtkSaaS-yeni-sohbet-devir.md) yazılıdır; P01 done. Sırada CI-02 → P02 vardır. [CI-2026-10-20](decisions/CI-2026-10-20.md): dört izole shard, Draft/development ve yalnız-belge clean istisnası kabul edildi; workflow uygulaması bekliyor. Eski snapshot/hosted sayıları güncel uygulama değildir.
+
+
 Repository’nin güncel dalı `main`dir. Başlarken GitHub main SHA’sını ve aynı SHA’nın CI’ını doğrulayın; bu dosyalardaki son doğrulanmış snapshot yeni commit’e otomatik başarı vermez. Yerel/ZIP kopyaları alındıkları SHA’nın snapshot’ıdır. İkinci belge ağacı kullanılmaz.
 
 Güncel uygulama SHA/CI ve teslim durumu için [tek devir özeti](../contracts/00-FtkSaaS-yeni-sohbet-devir.md) esas alınır. Önceki teslim sayıları tarihsel bağlamdır.
@@ -58,6 +61,7 @@ Her uygulama PR’si etkilediği sözleşmeleri, envanteri, kalan işleri ve dev
 
 [Sıralı üretim kuyruğu](production-queue.md) yedi teslimin API grupları, ortak üretim promptu, durum ve kapanan promptların kaldırılma kuralıdır. Her geliştirme görevinde devir/kalan işlerden sonra okunur. Full clean başlayınca ajan run/kaynak/sonraki adımı bildirip turu bitirir; kullanıcı sonucu getirene kadar polling/izleme yapmaz. Başarı kullanıcı dönüşünde GitHub kanıtıyla doğrulanır.
 
-[P01 devri](p01-handover.md): katalog/hak okuması ve altı talep komutu/sürüm okuması uygulandı; B hedefli kabulü geçti; bekleme/teklif/worker C uygulandı, yeni runtime kabulü ve bütün P01 main kabulü açık.
+[P01 devri](p01-handover.md): bütün P01 PR #22 ile main’e alındı; son hedefli ve aday clean başarılı. Aynı main clean 39401570751 completed/success doğrulandı; P01 done. Hosted/production worker kabulü ayrıdır.
 
-P01 sistem worker transport'u insan Auth dispatcher'ından bağımsız private.p01_worker_execute girişidir; aynı scope/job/lease kapıları korunur. Düzeltme ve bekleyen hedefli runtime kabulü docs/p01-handover.md içindedir.
+P01 sistem worker transport'u insan Auth dispatcher'ından bağımsız private.p01_worker_execute girişidir; aynı scope/job/lease kapıları korunur. Son düzeltmelerin kabulü ve işletim sınırları docs/p01-handover.md içindedir.
+

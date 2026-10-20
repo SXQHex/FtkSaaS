@@ -1,22 +1,20 @@
-# CI çalışma politikası — 19 Ekim 2026
+# CI çalışma politikası — 20 Ekim 2026
 
-## P01 teslim sınırı — son kullanıcı kararı
+## Son karar ve uygulama sınırı
 
-P01 bütünü `feature/p01-request-reservation-flow` dalında ve mevcut PR #22 içinde geliştirilir. Her uygulama commit'i hedefli doğrulanır; A/B/C ara dilimleri için aday full clean veya merge yapılmaz. P01'in bütün kalan API ve worker kabulü tamamlandığında son head bağımsız incelenir, toplu aday full clean alınır ve normal kaynak bağlı kapıyla merge edilir. Main full clean kabulü ayrıca gerekir. Full clean başlayınca aşağıdaki kullanıcıya devir kuralı korunur.
+[CI-2026-10-20](decisions/CI-2026-10-20.md) kabul edilmiş hedeftir; **CI-02 uygulaması bekliyor**. Bu belge eşitlemesi workflow/gate değiştirmez. P01 PR #22 birleşmiştir; durum/kanıt [güncel devirde](../contracts/00-FtkSaaS-yeni-sohbet-devir.md). Yeni politika önceki her-main-clean ve tek PR'ye özgü belge istisnasını belirtilen kapsamda değiştirir; uygulanmamış kontrol etkin gösterilmez.
 
-
-Son kullanıcı talimatı eski her commit/PR güncellemesinde tam temiz kabul kuralının yerini alır. Ürün, runtime, migration, frontend ve deployment davranışı değişmez.
-
-## Tetikleyiciler ve kapsam
-
-| Olay | İş | İptal politikası |
+| Olay/durum | Kabul edilmiş hedef | Main 7577b2f uygulaması |
 |---|---|---|
-| Main dışı branch push | Development targeted: selector testleri, yaşayan belge/bağlantı kontrolü; gerekiyorsa verify ve seçilen DB/API regresyonları | Aynı branch’in eski hızlı işi iptal; diğer branch’ler ayrı |
-| PR açılışı/güncellemesi | Ucuz güvenilir merge-kapısı kontrolü; otomatik full clean yok | PR başına değerlendirme; pahalı test tetiklemez |
-| Hazır adaya `ci:full-clean` label’ının **eklenmesi** | Candidate full clean: güncel head + base birleşimi üzerinde tam test:clean | PR/head grubu; başka PR/main etkilenmez |
-| Main push | Tam temiz kabul ve test edilen birleşim–gerçek merge ilişkisi | Her main SHA ayrı; çalışan kabul iptal edilmez |
+| Bölüm geliştirmesi | Tek Draft + development PR; birikimli hedefli CI | Hedefli CI var; Draft/development engeli CI-02'de |
+| Push / PR güncellemesi / Draft veya development kaldırma | Otomatik full clean yok | Push hedefli, PR ucuz kapı; durum geçişi clean değildir |
+| Draft veya development üstünde aday isteği | Clean ve merge kabulü engelli | Yeni engel CI-02'de |
+| Hazır runtime/CI adayı | ci:full-clean eklenmesiyle bütün kapsam, dört bağımsız shard | Açık label ile tek full-clean job'u; shard yok |
+| Runtime/CI merge'i | Aynı main SHA'sında bütün kapsam, dört bağımsız shard | Main tek clean job'u çalıştırır |
+| Güvenli yalnız-belge PR/merge | Belge kabulü; aday/main full clean yok | Hedefli belge yolu var; genel belge merge/main kabulü CI-02'de |
+| Karma/bilinmeyen/runtime girdisi | Belge istisnası yok; birikimli kod kapsamı korunur | Mevcut güvenli geniş geri dönüş korunur |
 
-Label’ın sürekli durması başarı veya yeni head’e kabul vermez. Tekrar kabul için label kaldırılıp yeniden eklenir. Aynı kaynakta push hedefli test, label son aday full çalıştırır; PR açılışı/synchronize ikinci pahalı kopya başlatmaz. Eski settlement-focused workflow kaldırılmıştır. Başka label’lar full-clean job’unu atlayabilir; atlanmış job merge kapısını açmaz.
+Aynı branch'in eski hızlı işi iptal edilir; farklı PR'ler ve her main SHA ayrı gruptadır. Label'ın sürekli bulunması yeni kabul vermez; skipped job başarı değildir. Head/base değişimi kaynak kanıtını düşürür. Geçişte eski kapı bypass edilmez; yeni belge kabulü ve shard toplayıcısı güvenilir politika kurulumunda doğrulanır.
 
 ## Denetlenebilir seçim
 
@@ -39,7 +37,7 @@ Label’ın sürekli durması başarı veya yeni head’e kabul vermez. Tekrar k
 
 Üretilmiş dosya adı tek başına gerekçe değildir: bilinen modül kaynağı/operasyon farkı gerekir; generation/schema/TypeScript kontrolleri API testinden önce geçmelidir. Yalnız package.json test:api envanterine eşlenmiş suite eklemesi dar açıklamadır; dependency, runner flag, test silme veya başka komut değişimi geniştir. Handler/çalışma zamanı üreticileri ve bilinmeyen yollar geniş kalır. Yeni üretim modülü eşlemesi yapılmadıysa ucuz kabul varsayılmaz.
 
-Değişen modül/ilgili test dosyaları öncelikli fazda çalışır; başarısızsa ertelenmiş regresyonlar başlatılmaz ve job başarısız kalır. Başarılı faz bütün seçilmiş kalan testleri tam bir kez çalıştırır. Bu fazlama kabul testlerini eksiltmez; tam aday/main clean bütün envanteri çalıştırmaya devam eder. Bu düzeltme workflow tetikleyicilerini, paralellik=2 sınırını ve kaynak bağlı merge kapısını değiştirmez.
+Değişen modül/ilgili test dosyaları öncelikli fazda çalışır; başarısızsa ertelenmiş regresyonlar başlatılmaz ve job başarısız kalır. Başarılı faz bütün seçilmiş kalan testleri tam bir kez çalıştırır. Bu fazlama kabul testlerini eksiltmez; runtime/CI aday ve main clean bütün envanteri çalıştırmaya devam eder. Bu düzeltme workflow tetikleyicilerini, paralellik=2 sınırını ve kaynak bağlı merge kapısını değiştirmez.
 
 CI özeti her dosyanın gerekçesini ve seçilen bütün suite’leri yazar. Test listesi package.json test:api listesiyle birebir denetlenir. Hedefli DB yolu ayrı hosted runner’da native backend başlatır, loopback dışında reseti reddeder, bütün migration’ları ve boş tenant/Auth/receipt durumunu doğrular. Önceki job’dan veri veya DB cache’i kullanılmaz. Full clean ayrıca seed, sağlık ve advisors içerir; hedefli kabul full yerine sunulmaz.
 
@@ -61,7 +59,7 @@ Merge için normal iki-parent merge commit kullanılır. Main kontrolü artifact
 
 [Ölçüm değerlendirmesi](ci-performance.md) eski logların sayısal temelini ve ölçülmemiş alanları ayırır. `FTK_TEST_TIMINGS=1`, yalnız test helper’ında API operation/Auth/fixture toplam–maksimum sürelerini, sayıları ve suite process wall süresini kaydeder. Body, token, e-posta, kişi/tenant kimliği kaydedilmez. İstek başlığına kadar süre ayrıca belirtilir; API/fixture süresi body decode’u kapsar; iç içe süreler toplanıp toplam duvar süresi diye sunulmaz.
 
-Mevcut test-concurrency=2 korunur. Ortak PostgreSQL üzerinde global trigger/function kuran fixture’lar vardır; daha fazla paralellik veya paylaşılan DB shard’ı eklenmedi. İleride shard ancak her shard’a ayrı backend/DB ve suite envanterinin kayıpsız bölündüğünün doğrulanmasıyla değerlendirilebilir.
+Mevcut test-concurrency=2 korunur; shard henüz etkin değildir. Ortak PostgreSQL üzerinde global trigger/function kuran fixture’lar nedeniyle CI-02 dört ayrı runner/backend/DB kullanacaktır. Suite envanterinin eksiksiz ve tekrarsız bölünmesi, bütün clean yükümlülükleri ve kaynak bağlı toplayıcı zorunludur. Aday/main aynı kapsamı kullanır; ölçülmemiş hız kazancı vaat edilmez.
 
 ## Full clean sırasında kullanıcıya devir — 19 Ekim 2026 son talimatı
 
@@ -77,7 +75,7 @@ Bu kural önceki otomatik devam/CI izleme talimatlarını yalnız bekleme davran
 
 Aktif teslim ve devam noktası [üretim kuyruğunda](production-queue.md) tutulur.
 
-## Action runtime bakım adayı — 19 Ekim 2026
+## Tarihsel Action runtime bakım kaydı — 19 Ekim 2026
 
 Son hedefli run 39281409902 / P01 head 580239075b16f6ac6893d5ac01975d32133d0757 logları 96 sözleşme/yönetişim, 23 CI politika, 27 DB ve 51 API testini başarılı gösterdi. Bu branch dışındaki P01 kaynak kanıtıdır; main kabulü değildir. Önceki Auth/kota assertion hataları bu kaynakta geçmiştir. Geriye kalan Annotations warning'i checkout/setup-node Action'larının Node 20 hedeflemesidir; uygulamanın node-version:24.19.0 ayarı Action'ın kendi runtime'ını değiştirmez.
 
@@ -98,3 +96,4 @@ ci-full.yml blob'u değiştiği için mevcut güvenilir base denetimi bakım PR'
 PR #23, kullanıcı tarafından açıkça onaylanan tek seferlik güvenilir workflow kurulumu olarak normal merge API'siyle 24007212005d07938fb1265a9f42891f18d7fa09 SHA'sına alındı. Aday full clean 39282766184 / eab732f17d0e2955fb88c5e46354c785da89d845 / base9ce0a5639417f959111b11f70157156733e3de18 başarılıydı: 409 test, sıfır aday annotation warning/error; aday tree2b7a76e73ca1e2efd201b0d9a18bea4afe12007b gerçek merge ile aynıydı. [Main clean 39298247595](https://github.com/SXQHex/FtkSaaS/actions/runs/39298247595) Verify merged candidate relation ve test:clean ile 409 testi geçti; main'de de sıfır annotation warning/error. Önceki bakım adayı kurulum engeli kapanmıştır.
 
 Repository ayarları ve required-check bypass kullanılmadı; gate kodu veya kaynak bağı zayıflatılmadı, sahte status yazılmadı. Tek seferlik kullanıcı yetkisi yeni workflow değişiklikleri veya P01 runtime'ı için otomatik istisna değildir. Güncel main'le aynı ci-full.yml blob'u taşıyan P01 son adayı normal kaynak bağlı kabul kapısından geçer; yeni head/base için eski clean geçerli sayılmaz.
+

@@ -1,5 +1,10 @@
 # CI ölçüm temeli ve sonraki performans işi
 
+## 20 Ekim 2026 — yeni performans kararı
+
+P01 main [39401570751](https://github.com/SXQHex/FtkSaaS/actions/runs/39401570751), kaynak `7577b2f1873c6b1fcf83390bfa94a34374c44082`, completed/success doğrulandı. GitHub job/step zamanları: main-clean 09:33:46–10:12:46 UTC = **39:00**; test:clean 09:34:04–10:12:41 = **38:37**; run oluşturma–son güncelleme aralığı **39:04**. Kullanıcının yaklaşık 40 dakika bildirimiyle uyumludur. Önceki 30'ar dakika öngörüsü main için bu gerçek ölçümle değiştirildi; aday süre burada yeniden ölçülmedi. [CI-2026-10-20](decisions/CI-2026-10-20.md) ile dört ayrı runner/backend/DB shard'ı kabul edildi; uygulama/ölçüm CI-02'de bekliyor. Bu seri koşu süresi shard hız kazancı değildir. Aynı kaynak ve kapsamda seri/parçalı wall süre, shard dağılımı, kurulum/kuyruk ve toplam runner dakikası ölçülmeden 4 kat hızlanma vaat edilmez.
+
+
 Kaynak: main d4eff4f00d897364d5f46ee637533deae9adbc29, [39225823561](https://github.com/SXQHex/FtkSaaS/actions/runs/39225823561). Bu eski çalışmanın loglarından ölçülenler; yeni workflow süreleri değildir.
 
 | Ölçüm | Önce, gözlenen | Yeni politika |
@@ -32,3 +37,4 @@ P01-A suite'i 2:25.181; ortak api-acceptance 5:31.146 idi. Bu süreler önceki i
 Run 39278529991 / head 85e25ec48cfc8f204392a757d333e284b02b6149 loglarında runner 15:30:38 UTC'de başlar, cleanup 15:34:12'de biter: yaklaşık **3 dakika 34 saniye**; önceki 35:52 koşusuyla aynı kapsam değildir (13 yerine 2 API suite). P01 50,18 saniye ve 10/10; ortak API 112,64 saniye ve 39/41 düğüm. Ortak suite'in tek ayrı weekly quota fixture assertion'ı başarısız; hızlanma başarı kabulü değildir. Aynı logda exit 1 varken API run metadata'sı in_progress/öncesinde queued döndü; durum gecikmesi testin hiç başlamadığına kanıt sayılmaz. Yeni saat bağımsız fixture'ın CI sonucu henüz yoktur.
 
 Aynı tree'nin boş commit head 09c9cc321204ca6a1bd3a93866d97d0ed819036e / run 39280209729 logu: 15:44:08–15:49:07 UTC, yaklaşık **4:59**. P01 72,43 saniye/10 başarılı; ortak API 163,33 saniye/aynı tek kota assertion hatası. Bu iki gerçek örnek süre değişkenliğini gösterir; sabit süre garantisi verilmez.
+

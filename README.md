@@ -1,12 +1,12 @@
 # FtkSaaS backend
 
-Kalıcı kaynak [SXQHex/FtkSaaS main](https://github.com/SXQHex/FtkSaaS). Başlangıç sırası ve kaynak önceliği: [AGENTS.md](AGENTS.md), [kaynak indeksi](docs/source-index.md), [güncel devir](contracts/00-FtkSaaS-yeni-sohbet-devir.md).
+Güncel kaynak merkezi [SXQHex/FtkSaaS main](https://github.com/SXQHex/FtkSaaS). Önce [AGENTS.md](AGENTS.md), [kaynak indeksi](docs/source-index.md), [güncel devir](contracts/00-FtkSaaS-yeni-sohbet-devir.md), [kalan işler](docs/remaining-work.md) ve [üretim kuyruğu](docs/production-queue.md) okunur.
 
-Son doğrulanmış başlangıç main c231ab5526854ed62445613467649e1b0bf960bb; [aynı SHA CI](https://github.com/SXQHex/FtkSaaS/actions/runs/39010419849) başarılı: 25 migration, 241 test (12 sözleşme + 27 DB + 202 Auth/API). Sonraki kaynak için CI ayrıca doğrulanır.
+20 Ekim uygulama kaynağı main `7577b2f1873c6b1fcf83390bfa94a34374c44082`: **199 sözleşme / 118 çağrılabilir / 81 yalnız sözleşme / 34 migration**. P01 [PR #22](https://github.com/SXQHex/FtkSaaS/pull/22) ile birleşti; talep/rezervasyon/bekleme/yer teklifi ve dar worker zinciri eklendi. Hedefli, aday ve aynı main CI başarılıdır; P01 done. Main clean 39401570751 gerçek completed/success sonucu ve kaynak ilişkisi doğrulandı. Kanıtlar ve hosted/production sınırı güncel devirdedir.
 
-Bu PR [karar sprintini](docs/decisions/DS-2026-10-17.md) sözleşme/DTO/izin/guard/sürüm-okuma bağımlılıklarına aktarır ve CI denetimini güçlendirir. 197 sözleşme = 184 mevcut + 13 yeni contract_only; 79 çağrılabilir, 118 yalnız sözleşme. Yeni runtime veya migration eklenmez. İşlem sayısı ürün tamamlanma oranı değildir.
+Starter anlaşmasız yoklama/hak tüketimi, Pro/Business immutable eğitmen anlaşması/hakedişi ve ayrı merkezler arası hesaplaşma uygulanmıştır. Paket/seans yaşam döngüsü, finans düzeltme/ödemeler, CRM, genel belge/bildirim, rapor/import ve hesap/abonelik yaşam döngüsünün açık işlemleri kuyruktadır. İşlem sayısı ürün tamamlanma oranı değildir; [F01–F33](docs/feature-delivery.md) özellik kabulünü ayrı gösterir.
 
-[Karar/teknik/runtime/kabul ayrımı](docs/decision-sprint-handover.md), [F01–F33 teslim haritası](docs/feature-delivery.md), [endpoint envanteri](docs/endpoint-inventory.json), [açık işler](docs/remaining-work.md), [main koruma denetimi](docs/branch-protection-review.md) ve [entegrasyon devri](docs/claude-handover.md) güncel kapsamı belirtir.
+## Geliştirme ve CI
 
 Node 24.19.0 ve sabit lockfile kullanılır:
 
@@ -17,10 +17,8 @@ Node 24.19.0 ve sabit lockfile kullanılır:
     npm run test:clean
     npm run dev:stop
 
-Geliştirmede odaklı sözleşme denetimi npm run test:governance'dır. Son kapsam CI'ında npm run test:clean, yalnız checkout loopback DB'sini sıfırlayıp bütün migration/test/seed/health/advisors adımlarını çalıştırır. Sözleşme bozma testleri yeni iş akışlarının gerçek Auth → Edge → RPC kabulü değildir; DS davranış kataloğu pending_runtime olarak açıktır.
+Yerel test:clean yalnız izole loopback DB'sini sıfırlar. Geliştirme push'ları birikimli hedefli CI kullanır; aday clean açık tetiklenir. [CI-2026-10-20](docs/decisions/CI-2026-10-20.md) kararıyla sıradaki **CI-02** dört bağımsız shard, bölüm boyunca Draft/development engeli ve güvenli yalnız-belge PR/main kabulünü uygulayacaktır; bu otomasyon henüz etkin değildir. Mevcut main workflow her main push için tek full clean çalıştırır. Yeni hız kazancı ölçülmedi. Full clean başlayınca ajan sonucu izlemeyi bırakıp kullanıcıya devreder.
 
-Production dağıtımı yapılmaz; vercel.json main otomatik dağıtımını kapalı tutar. Frontend alanına müdahale edilmez. Dış e-posta ertelenmiştir; Resend başlatılmaz. Hosted geliştirme smoke'u, frontend gerçek entegrasyonu ve yük/restore ayrı kanıtlardır. Tarihsel raporlar ait oldukları kaynak snapshot'ını kanıtlar; yeni SHA'nın kabulü yerine geçmez.
+[Endpoint envanteri](docs/endpoint-inventory.json), [entegrasyon devri](docs/claude-handover.md), [CI politikası](docs/ci-policy.md), [ölçümler](docs/ci-performance.md) ve [koruma sınırı](docs/branch-protection-review.md) ayrıntıları taşır. Tarihsel reports/ yeni SHA'nın kabulü yerine geçmez.
 
-Son hesaplaşma revizyonu: [yetki zinciri ve iki taraflı kesinleştirme](docs/decisions/DS-2026-10-17-settlement-revision.md). DS-OPEN-01 karar düzeyinde kapalı; runtime pending. Üç ayrı kayıt/düzeltme taslak ucu üç authority read/set sözleşmesiyle değişti; 197/79/118 toplamı aynı. 38 yeni davranış senaryosu pending; son revizyon SHA/CI/inceleme PR #13 konuşmasından doğrulanır.
-
-Son düzeltme: [merkez bazlı yetki](docs/decisions/DS-2026-10-17-settlement-center-scope.md). DS-OPEN-02 karar düzeyinde kapalıdır; aynı hesap A ve B’de gerekli güncel CM/grant yetkileriyle başvuru ve onay yapabilir. A-only yetki B’ye taşınmaz; audit adımın merkez/rol/grant kapsamını kaydeder. Runtime ve yeni gerçek davranış kabulü pending kalır.
+Frontend tasarımına/istemci koduna müdahale edilmez; production dağıtımı yapılmaz. Dış e-posta ertelenmiştir; Resend başlatılmaz. Hosted güncelleme, frontend gerçek entegrasyonu ve yük/restore ayrı kabul işleridir.

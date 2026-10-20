@@ -1,18 +1,12 @@
 # Kalan backend işleri
 
-Son doğrulanmış kaynak c62106b / [hedefli 39323812801](https://github.com/SXQHex/FtkSaaS/actions/runs/39323812801) başarılı (214 test düğümü). Son bütün-P01 incelemesi request_window tüketimi ve canlı worker merkez erişimini eksik buldu; migration34/DTO/audit/gerçek test düzeltmeleri uygulandı, yeni hedefli kabul bekliyor. Running-lease crash kurtarma ve kabul-kazanır/geç-expiry kabul kanıtı da genişletildi. P01 in_progress; yeni kaynak geçmeden toplu clean/merge yok. [Güncel kabul ve sınırlar](p01-handover.md).
-
-Son C kaynağı 4e3c5f1 / [hedefli 39322550067](https://github.com/SXQHex/FtkSaaS/actions/runs/39322550067) başarısız: worker yanlış insan Auth dispatcher'ına girdi; sekiz C alt vakası geçti sayılmaz. Runner dar private worker girişine alındı, gereksiz dispatcher/core yetkileri yeni migration33 ile kaldırıldı; Auth yetkisi eklenmedi. Yeni hedefli runtime kabulü bekliyor. [Teşhis ve kalan kabul](p01-handover.md).
-
-Güncel kaynak ve CI: [doğrulanmış devir](../contracts/00-FtkSaaS-yeni-sohbet-devir.md). **199 işlem: 118 çağrılabilir, 81 yalnız sözleşme; 34 migration.** Önceki teslimlerde kapanmış işler burada yeniden açık ilan edilmez. Uygulama kapsamı [Starter](starter-attendance-protection-handover.md) ve [anlaşma/hakediş](instructor-earnings-handover.md) devirlerindedir.
-
-P01-B kaynak `78d68653e903d9764264f1fe8d73dfb9d9de7f49` için [hedefli CI 39319195689](https://github.com/SXQHex/FtkSaaS/actions/runs/39319195689) başarılı: 120 yapı/politika + 27 DB + 58 API test düğümü (A/B 17, ortak 41); pg concurrent-query uyarısı logda yok. Bu sonuç yeni C kaynağına taşınmaz. P01-C yedi API, kapsamlı okuma ve gerçek worker runner uygulandı; yeni runtime kabulü bekliyor. Geliştirme envanteri 199 sözleşme / 118 çağrılabilir / 81 contract_only / 32 migration. P01 merge/main kabulü yok; bütün P01 sonunda toplu clean alınır.
-
-[P01 devri](p01-handover.md), [tek üretim kuyruğu](production-queue.md). Belge yükleme/yayımlama/kabul API ve genel rezervasyon/yoklama tüketici kapsamı P05'te açıktır; P01 mevcut yayımlanmış rezervasyon gerekliliklerini dar olarak tüketir.
+Güncel kaynak main `7577b2f1873c6b1fcf83390bfa94a34374c44082`: **199 işlem / 118 çağrılabilir / 81 yalnız sözleşme / 34 migration**. [Tek devir](../contracts/00-FtkSaaS-yeni-sohbet-devir.md) gerçek hedefli/aday ve aynı main completed/success sonuçlarını gösterir. P01 PR #22 birleşti; eski A/B/C runtime ve merge bekleme notları güncel açık değildir. P01 main kabulü tamamlandı; sonraki CI-02 kaynağı ayrıca doğrulanacaktır.
 
 ## Aktif seri üretim
 
-[Üretim kuyruğu](production-queue.md), aşağıdaki mevcut envanteri P01–P07 sırasıyla gruplar ve ajan promptlarını taşır. İlk önkoşul P00 CI kabulüdür. Tamamlayan ajan kuyruktaki aktif promptu kısaltır/kaldırır ve bu envanterle eşitler. Full clean başladıktan sonra ajan izlemeyi bırakıp run/head/sonraki adımla kullanıcıya devreder; kullanıcı sonucunu getirince doğrular ve devam eder.
+Önce **CI-02**, ardından P02–P07. [Tek kuyruk](production-queue.md) sıralama ve prompt kaynağıdır; [CI-2026-10-20](decisions/CI-2026-10-20.md) dört izole shard, Draft/development ve belge-only kabulünün henüz uygulanmamış olduğunu belirtir. Belge-only merge/main clean istisnası workflow'a aktarılmadan etkin sayılmaz.
+
+[P01 devri](p01-handover.md): katalog/hak okuması, talep/alternatif/onay, bekleme/teklif/expiry ve gerçek dar worker döngüsü uygulandı. Genel belge upload/yayın/kabul ve bildirim API'leri P05'te açıktır; mevcut yayımlanmış rezervasyon gerekliliklerinin dar tüketicisi bunları kapatmaz. Hosted worker provisioning/işletim kabulü CI'daki gerçek CLI/loop testinden ayrıdır.
 
 ## DS öncelikli teslim sırası
 
@@ -27,13 +21,13 @@ Kalan delivery_gaps ve vaka bazlı durumlar [08 makine sözleşmesi](../contract
 ## Bağımlılık sırası
 
 1. Uygunluk/politika dört API uygulandı; tüketici sınırları ve eksik iş akışları Claude devrindeki güncel bölümde açıkça ayrılır. Son PR SHA kabulü CI ile ayrıca doğrulanır.
-2. Ürün kataloğu ile uygun satın alınmış paket/hak seçimi bağımlılık aktarımı; talep–bekleme–yer teklifi yaşam döngüleri; program/seans yedi komutu PR #12 ile, Starter uyarlaması PR #14 ve anlaşma yayını PR #15 ile uygulandı; kalan tüketiciler ilgili devirlerde belirtilir. Üç program okuması uygulandı; sınırlar okuma devrindedir.
+2. Ürün kataloğu, seans bağlamında uygun satın alınmış hak seçimi ve talep–bekleme–yer teklifi yaşam döngüleri P01 PR #22 ile uygulandı; program/seans yedi komutu PR #12 ile, Starter uyarlaması PR #14 ve anlaşma yayını PR #15 ile uygulandı; kalan tüketiciler ilgili devirlerde belirtilir. Üç program okuması uygulandı; sınırlar okuma devrindedir.
 3. Starter ve Pro/Business yoklama/kapanış/bağlı düzeltme ile ücretli anlaşma/hakediş uygulandı. Otomatik başlangıç gözlemi, belge ve diğer hak değişikliği koruma tüketicileri açık.
 4. Paket dondurma/uzatma/değişim/yenileme/sonlandırma ve finans düzeltme/iade önizleme–uygulama çiftleri.
 5. Hesap erişimi geri alma, hesap/organizasyon kapanış/silme ve kişi birleştirme.
 6. CRM, bildirim tercihleri, belgeler, raporlar, import ve worker işlemleri.
 
-Her yeni grup: sözleşme/izin incelemesi → yeni migration → gerçek Auth/API kabulü (sınır, yetki, tekrar, yarış, rollback) → inceleme → temiz CI → main CI. Ürün kararında boşluk varsa teknik varsayımla yeni kural eklenmez.
+Her yeni runtime/CI grubu: sözleşme/izin incelemesi → gerekli yeni migration → geliştirmede hedefli gerçek Auth/API kabulü (sınır, yetki, tekrar, yarış, rollback) → son inceleme → açık aday full clean → merge → main full clean. Güvenli yalnız-belge kabul yolu CI-02 içinde ayrıca uygulanacaktır. Ürün kararında boşluk varsa teknik varsayımla yeni kural eklenmez.
 
 ## Yalnız sözleşme envanteri — güncel 81 işlem
 
@@ -147,4 +141,5 @@ Her yeni grup: sözleşme/izin incelemesi → yeni migration → gerçek Auth/AP
 
 Bu maddeler ve yalnız sözleşme işlemleri kapanmış sayılmaz. Frontend tasarımı ayrı alan sahibindedir.
 
-[P01-A devri](p01-handover.md): katalog/seans bağlamlı satın alınmış hak okuması; yeni kaynak kabulü ve kalan talep/bekleme/worker akışı açık.
+[P01 devri](p01-handover.md): uygulama main’de; gerçek main sonucu ve hosted worker işletim sınırı güncel devirde ayrıdır.
+

@@ -1,3 +1,5 @@
+> **Güncel kaynak sınırı:** Bu dosyanın eski teslim sayıları kendi kaynak snapshot’ıdır. Güncel main 7577b2f1873c6b1fcf83390bfa94a34374c44082, 199/118/81 ve 34 migration; kaynak/CI [tek devirde](../contracts/00-FtkSaaS-yeni-sohbet-devir.md), güncel açık işler [kalan işlerde](remaining-work.md) izlenir.
+
 # Fiilî başlangıç kayıt ve düzeltme
 
 Bu, kullanıcının açık kalan fiilî başlangıç API'sini tamamlama talebinin teknik aktarımıdır. Yeni parasal veya paket tüketim kuralı tanımlanmaz.
@@ -12,3 +14,4 @@ Bu, kullanıcının açık kalan fiilî başlangıç API'sini tamamlama talebini
 - Domain güncellemesi + append-only audit diff + receipt + notification/outbox aynı transaction'dır. Eski cancel preview sürüm değişiminde stale olur, yeni preview aynı kabul edilmiş hesaplaşmayı uygular.
 
 55 çağrılabilir / 129 yalnız sözleşme işlemi. On birinci migration eklendi; önceki on migration korunur. Nihai kanıt PR'ın son commit CI kaydıdır. Yerel tip/sözleşme kontrolü gerçek API kabulünün yerine geçmez. Frontend, production, kalıcı staging, dış e-posta ve yük/restore bu değişiklikle tamamlanmaz.
+

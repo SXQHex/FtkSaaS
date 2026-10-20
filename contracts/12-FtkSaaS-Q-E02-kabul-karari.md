@@ -9,7 +9,7 @@ Bu kabul önceki “başlama sonrası merkez iptalinde iade yok, borç korunur�
 - Paketle katılımda merkez iptali ayrılmış hakları tamamen serbest bırakır. Tüketilmiş haklar bağlı ters hareketlerle tamamen geri verilir. Kısmi tüketim uygulanmaz; aynı hak için ayrıca parasal alacak oluşturulmaz.
 - Önceki iade, alacak ve hak dönüşleri hesaba katılır; mükerrer sonuç üretilmez. Başka borçlar ve geçmiş kayıtlar değiştirilmez.
 
-Başlangıç sınırı: mevcut model ayrı fiilî başlangıç/kısmi gerçekleşme kaydı tanımlamıyor. Saat geçmesi gerçekleşme kabul edilmez. Bu tanım karar konusu olarak açık; merkez iptalinin aşamadan bağımsız tam sonucu uygulanmıştır. Teknik durum ve test kanıtı docs/decisions/Q-E02.md ve reports/qe02-verification.json içindedir.
+Başlangıç sınırı: ilk Q-E02 kararının ayrı fiilî başlangıç kaydı yoktu; sonraki kabul edilmiş aktarım kayıt/düzeltme API’lerini ve actual_started_at geçmişini ekledi. [Fiilî başlangıç devri](../docs/actual-start-handover.md) güncel operasyonel karşılıktır. Saat geçmesi gerçekleşme değildir; kısmi gerçekleşmeye yeni oran/para/hak kuralı eklenmez. Q-E03 parasal sınırı ve merkez iptalinin aşamadan bağımsız tam sonucu korunur. Teknik durum ve test kanıtı docs/decisions/Q-E02.md ve reports/qe02-verification.json içindedir.
 
 
 ## Q-E03 — Planlanan başlangıç ve iptalin parasal sınırı · 16 Ekim 2026
@@ -23,3 +23,4 @@ Başlangıç sınırı: mevcut model ayrı fiilî başlangıç/kısmi gerçekle�
 **E03-04.** Merkez iptalinde Q-E02 aynen geçerlidir; ertesi gün kaydı veya aşama tam borç kaldırma ve bağlı para/hak dönüşlerini değiştirmez.
 
 **E03-05.** Başarılı katılımcı iptalinde backend karar zamanı, o andaki planlanan başlangıç ve parasal sınıflandırma participant_cancellation kaydında atomik sabitlenir. Önceki kayıtlara zaman kanıtı uydurulmaz; eski ve merkez iptallerinde alan null kalabilir. İstemci zaman veya sınıflandırma gönderemez.
+

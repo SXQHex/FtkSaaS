@@ -1,3 +1,5 @@
+> **20 Ekim güncel durum:** P01 PR #22 main `7577b2f1873c6b1fcf83390bfa94a34374c44082` ile birleşti; 199 sözleşme / 118 çağrılabilir / 81 yalnız sözleşme / 34 migration. Eski teslim sayıları ve pending notları kendi kapsamına aittir. [Tek güncel devir](../contracts/00-FtkSaaS-yeni-sohbet-devir.md) aynı SHA’nın gerçek başarılı main CI kanıtını gösterir; P01 done. [CI-2026-10-20](../docs/decisions/CI-2026-10-20.md) dört shard, Draft/development ve belge-only kararını içerir; otomasyon CI-02’de bekliyor. Bu karar ürün/izin/finans davranışını değiştirmez.
+
 > Güncel öncelik: [DS-2026-10-17](../docs/decisions/DS-2026-10-17.md). Çelişen eski hükümler yalnız belirtilen kapsamda yürürlükten kalkmıştır. [Hedef sözleşme/runtime ayrımı](../docs/decision-sprint-handover.md).
 
 > **Güncel ek: Q-E03.** Parasal iptal sınırı planlanan başlangıçtır (eşitlik dahil sonrası). Q-E02 merkez iptali korunur. Teknik durum: docs/decisions/Q-E03.md; test/CI kanıtı ayrıca doğrulanır.
@@ -6,13 +8,13 @@
 
 > **Güncel öncelik: Q-E02 · 0.2.0-rc.3.** Kullanıcının 16 Ekim 2026 son iptal kabulü önceki çelişen merkez iptali hükümlerinin yerine geçer. Güncel davranış/kanıt: docs/decisions/Q-E02.md, docs/claude-handover.md ve reports/qe02-verification.json. Aşağıdaki eski durum/test sayıları tarihsel kayıttır; teknik aktarım bekleyen işler tamamlandı sayılmaz.
 
-> **Güncel 2.2-tech.2 / Q-D01:** Etkinlik 0/1/çok disiplin etiketini destekler. Tek etikette etkinliğe uygun dar/geniş paket, 0/çok etikette yalnız uygun geniş paket; etkinliklerde negatif kredi yok. Q-D01 ürün kararı kapalı; ilk aktarım durumları tarihsel, güncel runtime/kabul envanter ve CI’dadır. Güncel durum 11-FtkSaaS-Q-D01-teknik-aktarim-raporu.md.
+> **Q-D01 durumu:** Etkinlik disiplin/kapsam matrisi ve negatif kredi yasağı kabul edilmiş ve runtime’a aktarılmıştır. İlk teknik aktarım raporları tarihsel kanıttır; güncel kaynak/kabul [tek devirde](00-FtkSaaS-yeni-sohbet-devir.md) ve işlem envanterindedir.
 
-> **Güncel teknik uygulama kaydı — 2.2-tech.1, 15 Ekim 2026:** D01–D09/U01–U08, 04–08 kataloglarına ve ortak tiplere aktarıldı. İki migration izole geliştirme DB’sinde uygulandı. Aşağıdaki eski “kod/kurulum yapılmadı” ve “teknik aktarım bekliyor” ifadeleri tarihsel kayıt olarak okunur. İş RPC’leri, ayrıntılı izin RLS politikaları ve gerçek iş akışı kabul testleri açık; Bu ilk aktarım notu tarihsel; Q-D01 kapalıdır. Güncel durum 09 teknik aktarım raporundadır.
+> **İlk aktarımın tarihsel sınırı:** 2.2-tech.1 döneminin iki migration ve kurulum bekleme notları bugünkü uygulama açığı değildir. D01–D09/U01–U08 aktarımı mevcuttur; bütün ürünün kabulü, hosted ve production durumu bundan çıkarılmaz.
 
 > Güncel UUID üretim standardı: U01–U08, UUIDv7. Sağlayıcı kimlikleri korunur.
 
-> Güncel ek: D01–D09 disiplin revizyonu kabul edilmiştir; aşağıdaki tarihsel teknik tamamlanma ifadeleri yeni kapsamı içermez. Ayrıntı ve açık teknik aktarım listesi belgenin sonundadır.
+> Güncel ek: D01–D09 disiplin revizyonu kabul edilmiştir; aşağıdaki tarihsel teknik tamamlanma ifadeleri yeni kapsamı içermez. Kabul hükümleri belgenin sonundadır; güncel kalan uygulama listesi docs/remaining-work.md üzerinden okunur.
 
 Karar tarihi: 14 Ekim 2026
 
@@ -221,7 +223,7 @@ Grup/etkinlik iptali, borçlu katılım, paket bitiş hatırlatması, kayıt pen
 | Aktif öğrenci sayımı ve plan geçişi | Davranış kabul edildi; sayısal limitler ticari açılıştan önce | Aşağıdaki kurallar ve teknik sözleşme uygulanır; veri silinmez. |
 | Dondurmayı erken bitirme; yenilemede kalan hak; ürün değişiminde hak/fiyat farkı | İş kararları kabul edildi | Teknik sözleşme bölüm 17 uygulanır; API ayrıntıları O4’te hazırlanacak. |
 | Etkinlik iptal/iade koşulları | İlgili etkinlik kayda açılmadan önce | Etkinliğe açık politika tanımlanır; özel dersin 12 saat kuralı kopyalanmaz. |
-| Merkezler arası hesaplaşma | DS-2026-10-17 ile kabul edildi; runtime ayrı teslim | Kredili gerçek satış bedeli payı, onaylı kısmi ödeme/mahsup; otomatik para transferi yok. Grantor DS-OPEN-01 son revizyonla karar düzeyinde kapalı; runtime pending. |
+| Merkezler arası hesaplaşma | DS-2026-10-17 ile kabul edildi; runtime ayrı teslim | Kredili gerçek satış bedeli payı, onaylı kısmi ödeme/mahsup; otomatik para transferi yok. Grantor DS-OPEN-01 kapalı; merkez bazlı grant ve iki taraflı hesaplaşma runtime’ı uygulanmıştır; vaka bazlı gerçek kabul hesaplaşma devri ve F01–F33’te ayrılır. |
 | Dış bildirim kanalı, sağlayıcı ve kullanım maliyeti | İlgili kanal etkinleştirilmeden önce | Uygulama içi kanal kullanılır; dış kanal teslimatı taahhüt edilmez. |
 
 Bu konuların tamamını şimdi sonuçlandırmak gerekmez. Karar yalnızca ilgili özelliğin belirsiz davranışını engeller; diğer geliştirmeleri durdurmaz.
@@ -247,7 +249,7 @@ Bu bölüm önceki sürümdeki çelişen hükümlerin yerini alır. Uygulama ayr
 - Esnek kayıtta uygun kullanılabilir haklardan önce en erken bitecek, eşitlikte önce alınan paket seçilir. Öncelikli kayıt kaynak paketine bağlıdır. Negatif kredi limiti ayrılmış ve tüketilmiş açığı birlikte kapsar; kişisel değer varsayılanın yerine geçer, zorunlu üst sınır korunur. Yeni uygun hak önce açığı kapatır.
 - Para borcu ve negatif kredi ayrıdır. Borçlu rezervasyon ve katılım ayrı politikalardır. Borçla katılım engeli ayrı gerekçedir; kredi etkisi tanımlanır, otomatik noShow değildir.
 - Bütün öğrenci tahsilatını merkez yapar. Seçilmiş borca, seçim yoksa aynı merkez/para birimindeki en eski vadeli borca dağıtılır. Fazla tahsilat öğrenci alacağıdır. Alacak yönetici tarafından kısmi/tam iade edilebilir veya yetkili personelin açık işlemiyle aynı merkez/para birimindeki borca mahsup edilebilir; mahsup nakit değildir.
-- Paket sonlandırmada gelecek rezervasyon ve kullanılmamış haklar açık işlemle kapatılır; para iadesi ve borç indirimi ayrı koşullara bağlıdır. Geçmiş silinmez.
+- Paket sonlandırmada kullanılmamış serbest haklar açık işlemle kapatılır; DS kararına göre korunan kesin rezervasyon yükümlülükleri korunur. Rezervasyon iptali ayrıca açık ve gerekçeli merkez müdahalesidir. Para iadesi ve borç indirimi ayrı koşullara bağlıdır; geçmiş silinmez.
 
 ### Hakediş ve etkinlik
 
@@ -348,7 +350,7 @@ Belge paketi revizyonu: 2.1. Bu bölüm önceki çelişen disiplin, paket kapsam
 
 **D09.** Seans başlangıcındaki limit kontrolü ve sonradan ödemenin geçmiş katılım/hakedişi değiştirmemesi korunur; kontrol artık ilgili merkez–disiplin kapsamındadır. Para borcu ile kredi açığı ayrı kavramlardır.
 
-**Teknik aktarım durumu:** Ürün kararı kabul edildi; kaynak karar sohbetinde kurulum, fiziksel tablo/API dönüşümü veya kodlama yapılmamıştı. Kaynak v2.2 katalogları o tarihte bu revizyonu bütünüyle temsil etmiyordu; güncel aktarım 09 raporundadır. Disiplin kimlikleri/merkez ilişkileri, öğrenci-eğitmen disiplin ilişkileri, paket kapsam tipleri, kredi açığı anahtarı, işlem izinleri ve ortak tiplerin dönüşümü ayrı teknik sohbette tamamlanıp doğrulanacaktır. Önceki 31 kontrol ve 55 senaryo bu yeni revizyonun geçtiği testler değildir. Disiplin revizyonu için O4 teknik katalog kapanışı yeniden açıktır.
+**Teknik aktarım durumu:** D01–D09 kapsamı şema, API, izin ve ortak tiplerde mevcuttur; Q-D01 etkinlik kapsamı/negatif kredi ve ortak hak akışı uygulanmıştır. İlk aktarım tarihindeki açık listesi güncel iş listesi değildir; bugün kalanlar docs/remaining-work.md ve kaynak bağlı kabul kayıtlarında izlenir.
 
 ## 15 Ekim 2026 — U01–U08 UUIDv7 standardı (kabul edildi)
 
@@ -370,7 +372,7 @@ Paket revizyonu: 2.2. D01–D09 disiplin kararları korunur. Bu bölüm önceki 
 
 **U08.** PostgreSQL alan tipi uuid olarak kalır. UUIDv7 üretim standardı bütün dış UUID girişlerini v7 diye reddetmek anlamına gelmez. FtkSaaS üretimi olan alanlarla sağlayıcı kimliği alanlarının şema/DTO eşlemesi teknik sohbette tamamlanır; yetki ve tenant kontrolü UUID sürümünden bağımsız uygulanır.
 
-**Durum:** Belge ve makine sözleşmesine üretim politikası işlendi. Ortam/üretici seçimi, alan bazlı ortak tip aktarımı, migration ve gerçek üretim/yarış testleri ayrı teknik sohbette yapılacaktır. Kodlama, kurulum veya dağıtım yapılmadı.
+**Güncel teknik durum:** UUIDv7 üretim politikası ortak tip, backend üreticisi ve migration/çalışma zamanı yollarına aktarılmıştır. PostgreSQL default üreticisinin kapalı olması doğrulanmış backend UUIDv7 üretimini yok saydırmaz; v4 fallback yoktur. İlk aktarım tarihinin kurulum bekleme notları tarihsel kayıttır. Güncel CI/hosted/production kabulü tek devirde ayrı izlenir.
 
 
 ## Q-D01 — 15 Ekim 2026 kabul edilen etkinlik kuralı
@@ -464,4 +466,5 @@ DS-OPEN-01 karar düzeyinde kapalıdır; hesaplaşma runtime aktarımı uygulanm
 
 ## Starter yoklama/koruma runtime aktarımı
 
-[Starter devri](../docs/starter-attendance-protection-handover.md) kabul edilmiş kararları değiştirmeden dar runtime kapsamını belirtir. Starter F14 kapanışı ve bağlı düzeltme hak hareketi + audit/outbox/receipt ile atomiktir; hakediş üretmez. Ücretli finansal kapanış ve bağlı hakediş düzeltmesi PR #15 ile uygulanmıştır. Koruma yalnız yeni olumsuz etkiye bağlıdır; bağımsız engelleri veya yeni rezervasyon koşullarını kaldırmaz. Taslak başlangıç kanıtı değildir; başlangıç/belge ve diğer hak değişikliği tüketicileri pending. 198 işlem/89 canlı/109 contract-only özellik tamamlama oranı değildir.
+[Starter devri](../docs/starter-attendance-protection-handover.md) kabul edilmiş kararları değiştirmeden dar runtime kapsamını belirtir. Starter F14 kapanışı ve bağlı düzeltme hak hareketi + audit/outbox/receipt ile atomiktir; hakediş üretmez. Ücretli finansal kapanış ve bağlı hakediş düzeltmesi PR #15 ile uygulanmıştır. Koruma yalnız yeni olumsuz etkiye bağlıdır; bağımsız engelleri veya yeni rezervasyon koşullarını kaldırmaz. Taslak başlangıç kanıtı değildir; başlangıç/belge ve diğer hak değişikliği tüketicileri pending. 198 işlem/89 canlı/109 contract-only bu Starter tesliminin tarihsel sayısıdır; güncel envanter 199/118/81 ve 34 migration’dır. İşlem sayısı özellik tamamlama oranı değildir.
+

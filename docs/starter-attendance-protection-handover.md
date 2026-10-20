@@ -1,6 +1,6 @@
 # Starter yoklama ve kesin rezervasyon koruması devri
 
-Güncel durum ve kaynak/CI: [doğrulanmış devir](../contracts/00-FtkSaaS-yeni-sohbet-devir.md). Aşağıdaki 198/89/109 ve 27 migration sayıları PR #14 teslim snapshot’ıdır; güncel envanter 199/95/104 ve 28 migration’dır.
+Güncel durum ve kaynak/CI: [doğrulanmış devir](../contracts/00-FtkSaaS-yeni-sohbet-devir.md). Aşağıdaki 198/89/109 ve 27 migration sayıları PR #14 teslim snapshot’ıdır; güncel envanter P01 sonrasında 199/118/81 ve 34 migration’dır.
 
 Başlangıç: main `5265a70a0d29f91b9081a1ecbc2a8f0ff78668ee`; aynı SHA’nın başarılı [CI çalışması](https://github.com/SXQHex/FtkSaaS/actions/runs/39030586306). Başlangıcın 322 testi yeni head’in kabulü değildir. Son PR head/inceleme/temiz CI kanıtı PR üzerinde aynı tam SHA’ya bağlanır.
 
@@ -10,7 +10,7 @@ Kabul edilmiş DS kararları değişmedi. F14 Starter’da hak tüketir; F20 anl
 
 Gerçek Starter akışı için referans feature listesinin topluca kapı olması giderildi: eğitmen rolü F04, personel ataması ayrıca F05; ders F08 ve özel ders F09; sınıf F10 ve dışa açık seçilirse F11; rezervasyon F15, öncelikli sınıf F10 ve öğrencinin esnek grup kaydı F11; kredi ürünü F15, süreli F16, dondurma F17 ve başka merkez kapsamı F18; satış F15/F19 ve süreli ürün F16. Oturum görev değişikliği F13; açık ücret anlaşması referansı F20 kalır. Starter eğitmen görevi ücret anlaşması seçmez/üretmez. Bu dar kapı düzeltmeleri yeni ürün davranışı değildir.
 
-PR #14 kapsamındaki Pro/Business kapalı yol sınırı PR #15 ile aşılmıştır: [güncel anlaşma/hakediş devri](instructor-earnings-handover.md) ücretli kapanışı ve bağlı düzeltmeyi tanımlar. Kaydedilmiş Starter kapanışının gerekçeli düzeltmesi kendi `starter_no_earning` snapshot’ını kullanır. Anlaşma sürümleme, ürün override ve hakediş PR #15 ile uygulanmıştır; hesaplaşma ayrı açık teslimdir.
+PR #14 kapsamındaki Pro/Business kapalı yol sınırı PR #15 ile aşılmıştır: [güncel anlaşma/hakediş devri](instructor-earnings-handover.md) ücretli kapanışı ve bağlı düzeltmeyi tanımlar. Kaydedilmiş Starter kapanışının gerekçeli düzeltmesi kendi `starter_no_earning` snapshot’ını kullanır. Anlaşma sürümleme, ürün override ve hakediş PR #15 ile uygulanmıştır; hesaplaşma sonraki teslimde uygulanmıştır; [hesaplaşma devri](settlement-handover.md) güncel sınırı belirtir.
 
 ## Uçtan uca yol
 
@@ -27,9 +27,9 @@ Koruma yalnız değişikliğin neden olduğu olumsuz etkiye bağlıdır. Öncede
 - Politika/kişisel limit dışındaki `credit_adjust`, `sale_scope`, `entitlement_extend` impact türleri `POLICY_NOT_CONFIGURED`; altyapı kurulması uygulama değildir.
 - Kredi düzeltme, satışın kabul edilmiş kapsam değişikliği, geçerlilik uzatma, dondurma/erken bitirme, hak sonlandırma koruma tüketicileri pending. Satışla geçmiş açık kapama ve settled deficit’in sonradan yoklama düzeltmesi ayrı teslimdir; allocation kanıtı olmayan settled deficit correction başarı göstermez.
 - Başlangıç anını otomatik gözlemleyen ders katılım tüketicisi henüz yok. Taslağın `evaluated_for` değeri gerçek değerlendirme zamanıdır; başlangıç snapshot’ı değildir. Geç kapanışta bugünkü bakiyeden geçmiş başlangıç türetilmez; kanıt eksik diye kabul edilmemiş toplu kapanış engeli konmaz. Başlangıç öncesi taslak ile başlangıç arasındaki bağımsız uygunluk değişiminin tam kabulü pending.
-- Pro/Business finansal kapanış/düzeltme, anlaşma zinciri ve hakediş PR #15 ile uygulanmıştır. Hesaplaşma ve eğitmen ödeme komutları açıktır.
+- Pro/Business finansal kapanış/düzeltme, anlaşma zinciri ve hakediş PR #15 ile uygulanmıştır. Merkezler arası hesaplaşma uygulanmıştır; eğitmen ödeme komutları P03’te açıktır.
 - Eski satış/rezervasyona blocked-policy snapshot’ı geri doldurulmaz. Eksik tarihsel koşulda ilgili blocked sonucu POLICY_NOT_CONFIGURED; diğer katıldı/no_show yolu koşulları varsa çalışır.
-- Zorunlu belge kapısının ders tüketicisi bu koruma ile tamamlanmadı; geniş DS-PROT-03 kabulü açık.
+- P01 mevcut yayımlanmış rezervasyon belge gerekliliklerini dar olarak tüketir. Genel belge API’leri/yoklama tüketicileri ve geniş DS-PROT-03 kabulü açık kalır; P05 kapsamı P01 ile tamamlandı sayılmaz.
 - Frontend, production, Resend ve main koruması değişmedi. Bu kapsam notu güncel merge yetkisi belirlemez; son açık kullanıcı talimatı esas alınır.
 
 ## Kanıt ayrımı
@@ -42,6 +42,7 @@ Mevcut DST/fold/gap testi `tests/program-session-lifecycle.test.mjs` regresyonud
 
 [Önceki geliştirme kaynak raporu](../reports/starter-attendance-protection-verification.json): 93 yapısal test ve 60 gerçek API testi (41 mevcut regresyon + 19 yeni kabul). Bu rapor önceki kaynak snapshot’ıdır; yeni head’e taşınmaz. Tam temiz final CI ayrı kanıttır.
 
-CI iki işte PR head SHA’sını açıkça checkout eder ve gerçek git HEAD eşitliğini denetler. I/A yanıtında blocked sonucu kalır, finans gerekçesi açılmaz. Eski taslağın teknik tüketim alanı boşsa sabit rezervasyon koşulundan belirlenir; genel kapanış engeli eklenmez. Eski blocked koşulu yoksa yalnız o etki açık yapılandırma hatasıdır.
+PR #14 tesliminin tarihsel CI’ı iki işte head SHA’sını checkout ederdi. Güncel hedefli/açık aday/main ayrımı ve CI-02 uygulama farkı [CI politikasında](ci-policy.md) izlenir. I/A yanıtında blocked sonucu kalır, finans gerekçesi açılmaz. Eski taslağın teknik tüketim alanı boşsa sabit rezervasyon koşulundan belirlenir; genel kapanış engeli eklenmez. Eski blocked koşulu yoksa yalnız o etki açık yapılandırma hatasıdır.
 
 [Son odaklı kaynak raporu](../reports/starter-attendance-protection-final-verification.json): redaksiyon/legacy düzeltmesiyle 19 gerçek API kabulü; 26+27 ile yeniden kurulan fonksiyonlar test edilen tanımlarla byte-identical. 26 değiştirilmedi; 27 append-only düzeltmedir. Yeni son head’in CI/inceleme kanıtı PR’de ayrıca bağlanır.
+

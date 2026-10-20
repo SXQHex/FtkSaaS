@@ -1,3 +1,5 @@
+> **Güncel kaynak sınırı:** Bu dosyanın eski teslim sayıları kendi kaynak snapshot’ıdır. Güncel main 7577b2f1873c6b1fcf83390bfa94a34374c44082, 199/118/81 ve 34 migration; kaynak/CI [tek devirde](../contracts/00-FtkSaaS-yeni-sohbet-devir.md), güncel açık işler [kalan işlerde](remaining-work.md) izlenir.
+
 # Merkezler arası hesaplaşma — üçüncü teslim
 
 Başlangıç main `bd4b6335904047f071556e5df35a982a71012c6e`; önceki temiz CI 364 test/28 migration idi. Bu teslim 29. migration ve dokuz API ekler: 199 toplam / 104 çağrılabilir / 95 yalnız sözleşme. Son head incelemesi ve temiz CI, ardından aynı merge SHA CI sonucu PR üzerinde ayrıca doğrulanır. Geliştirmedeki odaklı kabul final kaynak kabulünün yerine geçmez.
@@ -32,4 +34,5 @@ Owner/OM rolü veya idari grant yönetimi operasyon yetkisi yaratmaz. Organizasy
 
 `tests/cross-center-settlement.test.mjs` gerçek Auth → Edge → RPC testidir; büyük kapsam testindeki sentetik ledger fixture'ı tahakkuk üretim kanıtı değildir, onay kapasitesi testidir. Ayrı ders/satış testleri gerçek tahakkuk ve terslemeyi doğrular. Yapısal governance/AJV/enum kontrolleri davranış kabulü değildir. Nihai kaynak kabulü tam `npm run test:clean` ve son head bağımsız incelemesiyle bağlanır.
 
-Eğitmen ödeme API'leri, satış kapsam değişimi/backdate yönetim akışı, diğer hak koruma tüketicileri, frontend gerçek entegrasyonu ve yük/restore ayrı açık işlerdir. Hosted eski smoke güncel 104 işlemin uzaktan kabulü değildir. Dış e-posta ertelendi; Resend başlatılmaz. Production dağıtımı yapılmaz.
+Eğitmen ödeme API'leri, satış kapsam değişimi/backdate yönetim akışı, diğer hak koruma tüketicileri, frontend gerçek entegrasyonu ve yük/restore ayrı açık işlerdir. Hosted eski smoke ne bu teslimin 104 işlem snapshot’ının ne P01 sonrası 118 işlemin uzaktan kabulüdür. Dış e-posta ertelendi; Resend başlatılmaz. Production dağıtımı yapılmaz.
+

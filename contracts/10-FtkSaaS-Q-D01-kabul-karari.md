@@ -1,6 +1,6 @@
 # FtkSaaS — Q-D01 kabul kararı
 
-Tarih: 15 Ekim 2026. Durum: Kullanıcı tarafından kabul edildi; teknik aktarım bekliyor.
+Tarih: 15 Ekim 2026 kabulü. Güncel durum: karar ve teknik/runtime aktarımı mevcut; ilk “teknik aktarım bekliyor” notu tarihsel aşamadır. [Tek güncel devir](00-FtkSaaS-yeni-sohbet-devir.md) kaynak/CI’ı, [kalan işler](../docs/remaining-work.md) gerçek açıkları belirtir.
 Dayanak: v2.2 D01–D09 ve U01–U08; 2.2-tech.1 paketindeki Q-D01 açığı.
 
 ## Kabul edilen davranış
@@ -13,7 +13,7 @@ Dayanak: v2.2 D01–D09 ve U01–U08; 2.2-tech.1 paketindeki Q-D01 açığı.
 6. Manuel ödeme ve etkinliğe özel satış kuralları korunur. Bu karar tahsilat ile kredi üretimini birleştirmez ve yeni bir ödeme zorunluluğu tanımlamaz.
 7. Organizasyon izolasyonu, merkez erişimi, kapasite, geçerlilik ve mevcut katılım/iptal/kapanış koşulları korunur. Geniş kapsamlı paket toplam ortak havuzunu kullanır; disiplin başına hak çoğaltılmaz.
 
-## Teknik sohbete aktarılacak işler
+## İlk teknik aktarım kapsamı — tarihsel kontrol listesi
 
 - Etkinlik–disiplin ilişkisini sıfır/bir/çok disiplin destekleyecek şekilde fiziksel şema, API ve okuma/yazma tiplerine aktar.
 - Disiplin kimliklerinin aynı organizasyona ait olduğunu doğrula.
@@ -36,3 +36,4 @@ Dayanak: v2.2 D01–D09 ve U01–U08; 2.2-tech.1 paketindeki Q-D01 açığı.
 | Başka organizasyona ait disiplin kimliği | Reddedilir. |
 
 Frontend tasarım kararı alınmadı. Şema/API/RPC uygulaması bu belgede yapılmadı.
+

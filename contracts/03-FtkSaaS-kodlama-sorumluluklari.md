@@ -1,20 +1,29 @@
 # FtkSaaS — Kodlama sorumlulukları ve model yetki sınırları
 
+## 20 Ekim 2026 — yürürlükteki çalışma kararı
+
+[AGENTS.md](../AGENTS.md), [CI-2026-10-20](../docs/decisions/CI-2026-10-20.md) ve [üretim kuyruğu](../docs/production-queue.md) aşağıdaki eski kurulum/durum notlarının üstündedir. Güncel kaynak main 7577b2f1873c6b1fcf83390bfa94a34374c44082; P01 birleşti; aynı main clean 39401570751 completed/success doğrulandı, P01 done. CI-02 otomasyonu henüz uygulanmadı.
+
+Bölüm boyunca tek Draft/development PR ve hedefli CI; bitince son-head incelemesi/açık aday full clean, merge sonrası main full clean esastır. Güvenli yalnız-belge farkları belge kabulüyle clean olmadan kapanacaktır; karma/runtime/CI farkı istisna değildir. Dört shard ayrı backend/DB ve eksiksiz sonuç doğrulaması kullanır. Her biten dilimde etkilenen belgeler aynı PR'de güncellenir; çalışan clean'in SHA'sı sırf durum için değiştirilmez.
+
+Bu sohbet karar/denetim ve açıkça istenen belge eşitlemesi içindir; uygulama ve CI değişiklikleri BackendCoder'dadır. Mevcut açık koşullu merge yetkisi kendi kapsamıyla geçerlidir; üretim kuyruğu tek başına yeni merge/production veya repository yönetim yetkisi vermez. Tarihsel raporlar yeniden yazılmaz.
+
+
 > **Güncel öncelik: Q-E02 · 0.2.0-rc.3.** Kullanıcının 16 Ekim 2026 son iptal kabulü önceki çelişen merkez iptali hükümlerinin yerine geçer. Güncel davranış/kanıt: docs/decisions/Q-E02.md, docs/claude-handover.md ve reports/qe02-verification.json. Aşağıdaki eski durum/test sayıları tarihsel kayıttır; teknik aktarım bekleyen işler tamamlandı sayılmaz.
 
-> **Güncel 2.2-tech.2 / Q-D01:** Etkinlik 0/1/çok disiplin etiketini destekler. Tek etikette etkinliğe uygun dar/geniş paket, 0/çok etikette yalnız uygun geniş paket; etkinliklerde negatif kredi yok. Q-D01 ürün kararı kapalı, tam olay kayıt/RPC entegrasyonu ve son ortak kredi yarışı açık. Güncel durum 11-FtkSaaS-Q-D01-teknik-aktarim-raporu.md.
+> **Q-D01 durumu:** Etkinlik disiplin/kapsam matrisi ve negatif kredi yasağı kabul edilmiş ve runtime’a aktarılmıştır. İlk teknik aktarım raporları tarihsel kanıttır; güncel kaynak/kabul [tek devirde](00-FtkSaaS-yeni-sohbet-devir.md) ve işlem envanterindedir.
 
-> **Güncel teknik uygulama kaydı — 2.2-tech.1, 15 Ekim 2026:** D01–D09/U01–U08, 04–08 kataloglarına ve ortak tiplere aktarıldı. İki migration izole geliştirme DB’sinde uygulandı. Aşağıdaki eski “kod/kurulum yapılmadı” ve “teknik aktarım bekliyor” ifadeleri tarihsel kayıt olarak okunur. İş RPC’leri, ayrıntılı izin RLS politikaları ve gerçek iş akışı kabul testleri açık; Q-D01 yeni ürün kararı bekliyor. Güncel durum 09 teknik aktarım raporundadır.
+> **İlk aktarımın tarihsel sınırı:** 2.2-tech.1 döneminin iki migration ve kurulum bekleme notları bugünkü uygulama açığı değildir. D01–D09/U01–U08 aktarımı mevcuttur; bütün ürünün kabulü, hosted ve production durumu bundan çıkarılmaz.
 
 > Güncel UUID üretim standardı: U01–U08, UUIDv7. Sağlayıcı kimlikleri korunur.
 
-> Güncel ek: D01–D09 disiplin revizyonu kabul edilmiştir; aşağıdaki tarihsel teknik tamamlanma ifadeleri yeni kapsamı içermez. Ayrıntı ve açık teknik aktarım listesi belgenin sonundadır.
+> Güncel ek: D01–D09 disiplin revizyonu kabul edilmiştir; aşağıdaki tarihsel teknik tamamlanma ifadeleri yeni kapsamı içermez. Kabul hükümleri belgenin sonundadır; güncel kalan uygulama listesi docs/remaining-work.md üzerinden okunur.
 
 Tarih: 15 Ekim 2026 · Sürüm: 1.0 · Durum: Çalışma düzeni kabul edildi; belirli kodlama/merge/üretim işlemi başlatılmadı
 
 ## 1. Sorumluluk ve dosya sahipliği
 
-FtkSaaS bağımsız yeni projedir. Eski studioSaaS kodu/tablosu/kuralları incelenmez, devralınmaz, karşılaştırılmaz veya yamalanmaz. Tek yeni repository kullanılacaktır; adresi henüz seçilmemiştir. İlk istemci mobil öncelikli web/PWA, sonra platform istemcileri ortak backend sözleşmesini kullanır.
+FtkSaaS bağımsız yeni projedir. Eski studioSaaS kodu/tablosu/kuralları incelenmez, devralınmaz, karşılaştırılmaz veya yamalanmaz. Tek güncel repository SXQHex/FtkSaaS, kaynak dalı main’dir. İlk istemci mobil öncelikli web/PWA, sonra platform istemcileri ortak backend sözleşmesini kullanır.
 
 | Alan | Sorumlu |
 |---|---|
@@ -46,7 +55,7 @@ Claude yalnız yayımlanmış API sözleşmesine uyan mock ile ilerleyebilir; is
 
 Tek onay açıkça belirtilmiş PR/sürüm için merge + migration + dağıtımı birlikte kapsayabilir; aynı kapsam tekrar onaylatılmaz. Somut işlem kapsamı dışındaki genel kabul üretim izni değildir. Önce incelemeye hazır sonuç hazırlanır, onay son adımdır. Üretim öncesi migration testte denenir; yedek/kurtarma doğrulanır. Uygulanmış migration dosyası değiştirilmez, yeni düzeltme migration’ı yazılır. Kod sürümüne dönüş veritabanını otomatik geri almaz; ikisi kurtarma planında ayrı ele alınır.
 
-Geliştirme/test ve üretim kimlik bilgileri ayrılır. Gizli anahtar repository veya frontend’e konmaz. Sağlayıcı hesapları, ortam kimlikleri, secret deposu ve CI araçları ayrıca teknik kurulumda seçilecektir; şu anda oluşturulmuş/bağlanmış sayılmaz.
+Geliştirme/test ve üretim kimlik bilgileri ayrılır. Gizli anahtar repository veya frontend’e konmaz. İlk kurulumun bu eski notu tarihsel durumdur; güncel bağlantı/CI ve eksik ortam işleri yaşayan devirden okunur, hosted/production kurulumu varsayılmaz.
 
 ## 5. Kabul edilmiş değişiklik ve teslim süreci
 
@@ -86,7 +95,7 @@ Belge paketi revizyonu: 2.1. Bu bölüm önceki çelişen disiplin, paket kapsam
 
 **D09.** Seans başlangıcındaki limit kontrolü ve sonradan ödemenin geçmiş katılım/hakedişi değiştirmemesi korunur; kontrol artık ilgili merkez–disiplin kapsamındadır. Para borcu ile kredi açığı ayrı kavramlardır.
 
-**Teknik aktarım durumu:** Ürün kararı kabul edildi; kaynak karar sohbetinde kurulum, fiziksel tablo/API dönüşümü veya kodlama yapılmamıştı. Kaynak v2.2 katalogları o tarihte bu revizyonu bütünüyle temsil etmiyordu; güncel aktarım 09 raporundadır. Disiplin kimlikleri/merkez ilişkileri, öğrenci-eğitmen disiplin ilişkileri, paket kapsam tipleri, kredi açığı anahtarı, işlem izinleri ve ortak tiplerin dönüşümü ayrı teknik sohbette tamamlanıp doğrulanacaktır. Önceki 31 kontrol ve 55 senaryo bu yeni revizyonun geçtiği testler değildir. Disiplin revizyonu için O4 teknik katalog kapanışı yeniden açıktır.
+**Teknik aktarım durumu:** D01–D09 kapsamı şema, API, izin ve ortak tiplerde mevcuttur; Q-D01 etkinlik kapsamı/negatif kredi ve ortak hak akışı uygulanmıştır. İlk aktarım tarihindeki açık listesi güncel iş listesi değildir; bugün kalanlar docs/remaining-work.md ve kaynak bağlı kabul kayıtlarında izlenir.
 
 Bu sohbet uygulama kararları içindir. Kurulum, tablo/API dönüşümü, migration ve test uygulaması ayrı teknik sohbette yürütülür. Claude frontend, ChatGPT backend sorumluluğu korunur.
 
@@ -110,4 +119,5 @@ Paket revizyonu: 2.2. D01–D09 disiplin kararları korunur. Bu bölüm önceki 
 
 **U08.** PostgreSQL alan tipi uuid olarak kalır. UUIDv7 üretim standardı bütün dış UUID girişlerini v7 diye reddetmek anlamına gelmez. FtkSaaS üretimi olan alanlarla sağlayıcı kimliği alanlarının şema/DTO eşlemesi teknik sohbette tamamlanır; yetki ve tenant kontrolü UUID sürümünden bağımsız uygulanır.
 
-**Durum:** Belge ve makine sözleşmesine üretim politikası işlendi. Ortam/üretici seçimi, alan bazlı ortak tip aktarımı, migration ve gerçek üretim/yarış testleri ayrı teknik sohbette yapılacaktır. Kodlama, kurulum veya dağıtım yapılmadı.
+**Güncel teknik durum:** UUIDv7 üretim politikası ortak tip, backend üreticisi ve migration/çalışma zamanı yollarına aktarılmıştır. PostgreSQL default üreticisinin kapalı olması doğrulanmış backend UUIDv7 üretimini yok saydırmaz; v4 fallback yoktur. İlk aktarım tarihinin kurulum bekleme notları tarihsel kayıttır. Güncel CI/hosted/production kabulü tek devirde ayrı izlenir.
+
