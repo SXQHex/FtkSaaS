@@ -21,11 +21,12 @@ Gerekçeli correction preview, sabit orijinal koşullardan hak ve finans farkın
 ## Ayrı kalanlar ve üçüncü teslim bağlantısı
 
 - `instructor_payment_record_v1` / `instructor_payment_correct_v1` contract_only; okuma mevcut dağıtım verisini gösterebilir. Kabul fixture'ındaki geçmiş ödeme, bu iki API'nin uygulanmışlığı değildir.
-- A→B ledger ve Owner/delege OM/CM yetki, başvuru/onay, mahsup/bağlı düzeltme runtime'ı üçüncü teslimde uygulanır; [hesaplaşma devri](settlement-handover.md) güncel davranış ve kabul sınırıdır. Eğitmen hakedişi ve merkez payı ayrı kayıtlardır.
+- A→B ledger ve Owner/delege OM/CM yetki, başvuru/onay, mahsup/bağlı düzeltme runtime’ı sonraki hesaplaşma tesliminde uygulanmıştır; [hesaplaşma devri](settlement-handover.md) güncel davranış ve kabul sınırıdır. Eğitmen hakedişi ve merkez payı ayrı kayıtlardır.
 - Üçüncü teslim satış net tutarı/product credits paydası, tüketim allocation/reservation/closure, hizmet merkezi, gerçekleşme beyanı ve settled deficit allocation kanıtını kullanır. Orijinal earning snapshot'ı sonradan satışla değiştirilmez.
-- Generic management_state diğer selector'ları; otomatik başlangıç gözlemi, zorunlu belge tüketicileri ve diğer finansal olmayan hak değişikliği koruma tüketicileri pending kalır.
+- management_state_get_v1 P01 talep/alternatif/bekleme/teklif sürüm okumalarını da destekler; diğer eşlenmemiş selector’lar uygulanmış sayılmaz. P01 dar rezervasyon belge kapısı mevcut; genel belge/yoklama tüketicileri, otomatik başlangıç gözlemi ve diğer hak değişikliği koruma tüketicileri açık kalır.
 - Frontend, production, Resend ve repository yönetimi değişmez. Yük/restore ve frontend gerçek entegrasyon kanıtsız kapatılmaz.
 
 ## Kabul ayrımı
 
 `tests/instructor-earnings.test.mjs` gerçek Auth → Edge → RPC testidir. Yapısal governance/AJV/enum/üretilmiş envanter kontrolleri davranış kabulü değildir. Önceki raporlar tarihsel kalır. Son kaynak odaklı sonuç, tam temiz CI ve bağımsız inceleme ayrı raporlanır.
+

@@ -1,3 +1,5 @@
+> **Güncel kaynak sınırı:** Bu dosyanın eski teslim sayıları kendi kaynak snapshot’ıdır. Güncel main 7577b2f1873c6b1fcf83390bfa94a34374c44082, 199/118/81 ve 34 migration; kaynak/CI [tek devirde](../contracts/00-FtkSaaS-yeni-sohbet-devir.md), güncel açık işler [kalan işlerde](remaining-work.md) izlenir.
+
 > DS-2026-10-17 kabulü plan/anlaşma ve korunan rezervasyon hedefini değiştirir. Bu dosya önceki runtime kapsamını anlatır; yeni hedef ve açık farklar [sprint devrinde](decision-sprint-handover.md).
 
 # Takvim, seans ve rezervasyon okumaları
@@ -8,7 +10,7 @@ Kapsam: `calendar_get_v1`, `session_get_v1`, `reservation_list_v1`. Başlangıç
 
 Mevcut seans/rezervasyon yazmaları, merkez/rol/hesap bağı, sınıf ve seans görevleri, etkinlik takvimi ve abonelik kapıları kullanılır. Yeni rezervasyon/program/yoklama yazma davranışı eklenmez.
 
-`products_list_v1` bu teslimde **yalnız sözleşme** kalır. Request yalnız org/center/page; response ürün sürümü ve ProductTerms kataloğudur. Öğrenci, hedef seans, satın alınmış sale ve kullanılabilir hak/uygunluk bağlamı yoktur. `reservation_create_v1` ise kaynak olarak `sale_id` kullanır. Ürün kataloğu ile uygun satın alınmış hak seçimini eşitlemek yanlıştır. Mevcut `entitlements_get_v1` hak okuması ve `lesson_scope_matches` / `available_for` yazma guardları ayrı bağımlılıklardır. Uygun satışları seans/kişi bağlamında listeleme, öğrenci/CM görünürlüğü ve gerekli DTO aktarımı ayrı teslimde doğrulanacaktır; bu PR uygun paket seçimini tamamlandı saymaz.
+İlk okuma tesliminde products_list_v1 yalnız sözleşmeydi; **P01 ile katalog okuması uygulanmıştır**. Ürün kataloğu satın alınmış hak değildir; seans/kişi/source-sale bağlamı entitlements_get_v1’in P01 teknik aktarımıyla sağlanır. `reservation_create_v1` ise kaynak olarak `sale_id` kullanır. Ürün kataloğu ile uygun satın alınmış hak seçimini eşitlemek yanlıştır. Mevcut `entitlements_get_v1` hak okuması ve `lesson_scope_matches` / `available_for` yazma guardları ayrı bağımlılıklardır. Uygun satışları seans/kişi bağlamında listeleme, öğrenci/CM görünürlüğü ve DTO aktarımı P01’de uygulanıp hedefli/aday kabulünden geçmiştir; [P01 devri](p01-handover.md) güncel kapsamı açıklar. Okuma yazma anındaki hak/kapasite kabulünün yerine geçmez.
 
 ## Görünürlük
 
@@ -41,4 +43,5 @@ Cursor keyset'tir; aktör/işlem/tenant/merkez/filtre/sort bağını doğrular; 
 
 `tests/schedule-reads.test.mjs` gerçek Supabase Auth → Edge → service-only RPC zincirini kullanır; sentetik ilişki/seans/rezervasyon fixture'ları DB'de kurulur, ayrıca güncel seans yazma → okuma bağlantısı doğrulanır. DB/Auth yetki kaldırma fixture'ı kullanılması, henüz uygulanmayan hesap erişimi veya görev kaldırma komutunun kabul edildiği anlamına gelmez.
 
-Sözleşme/tip/envanter kontrolleri, temiz migration, tüm regresyon, seed/health/advisors ve son head CI ayrı kanıttır. Kaynak raporu: [schedule-read-verification](../reports/schedule-read-verification.json). Hosted geliştirme backend'ine bu 72 işlem kurulmuş sayılmaz. Frontend gerçek entegrasyon, ürün/uygun hak seçimi, public discovery, program/talep/bekleme/yoklama devamı ve yük/restore açıktır. Production dağıtımı yok; dış e-posta ertelendi.
+Sözleşme/tip/envanter kontrolleri, temiz migration, tüm regresyon, seed/health/advisors ve son head CI ayrı kanıttır. Kaynak raporu: [schedule-read-verification](../reports/schedule-read-verification.json). Hosted geliştirme backend'ine bu 72 işlem kurulmuş sayılmaz. Program/seans, yoklama/hakediş ve P01 talep/bekleme/uygun hak seçimi sonraki teslimlerde uygulanmıştır. Public discovery, frontend gerçek entegrasyon ve yük/restore açık kalır; bu eski okuma raporu onların güncel kabulü değildir. Production dağıtımı yok; dış e-posta ertelendi.
+

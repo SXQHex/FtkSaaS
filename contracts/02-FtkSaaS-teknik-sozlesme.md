@@ -1,4 +1,4 @@
-> **20 Ekim güncel durum:** P01 PR #22 main `7577b2f1873c6b1fcf83390bfa94a34374c44082` ile birleşti; 199 sözleşme / 118 çağrılabilir / 81 yalnız sözleşme / 34 migration. Eski teslim sayıları ve pending notları kendi kapsamına aittir. [Tek güncel devir](../contracts/00-FtkSaaS-yeni-sohbet-devir.md) main clean için kullanıcı varsayımını ve gerçek kanıtı ayırır. [CI-2026-10-20](../docs/decisions/CI-2026-10-20.md) dört shard, Draft/development ve belge-only kararını içerir; otomasyon CI-02’de bekliyor. Bu karar ürün/izin/finans davranışını değiştirmez.
+> **20 Ekim güncel durum:** P01 PR #22 main `7577b2f1873c6b1fcf83390bfa94a34374c44082` ile birleşti; 199 sözleşme / 118 çağrılabilir / 81 yalnız sözleşme / 34 migration. Eski teslim sayıları ve pending notları kendi kapsamına aittir. [Tek güncel devir](../contracts/00-FtkSaaS-yeni-sohbet-devir.md) güncel CI kanıtı ile geçici kabul varsayımını tek yerde ayırır; gerçek başarı doğrulanınca varsayım kaldırılır. [CI-2026-10-20](../docs/decisions/CI-2026-10-20.md) dört shard, Draft/development ve belge-only kararını içerir; otomasyon CI-02’de bekliyor. Bu karar ürün/izin/finans davranışını değiştirmez.
 
 > Güncel öncelik: [DS-2026-10-17](../docs/decisions/DS-2026-10-17.md). Çelişen eski hükümler yalnız belirtilen kapsamda yürürlükten kalkmıştır. [Hedef sözleşme/runtime ayrımı](../docs/decision-sprint-handover.md).
 
@@ -8,13 +8,13 @@
 
 > **Güncel öncelik: Q-E02 · 0.2.0-rc.3.** Kullanıcının 16 Ekim 2026 son iptal kabulü önceki çelişen merkez iptali hükümlerinin yerine geçer. Güncel davranış/kanıt: docs/decisions/Q-E02.md, docs/claude-handover.md ve reports/qe02-verification.json. Aşağıdaki eski durum/test sayıları tarihsel kayıttır; teknik aktarım bekleyen işler tamamlandı sayılmaz.
 
-> **Güncel 2.2-tech.2 / Q-D01:** Etkinlik 0/1/çok disiplin etiketini destekler. Tek etikette etkinliğe uygun dar/geniş paket, 0/çok etikette yalnız uygun geniş paket; etkinliklerde negatif kredi yok. Q-D01 ürün kararı kapalı; ilk aktarım durumları tarihsel, güncel runtime/kabul envanter ve CI’dadır. Güncel durum 11-FtkSaaS-Q-D01-teknik-aktarim-raporu.md.
+> **Q-D01 durumu:** Etkinlik disiplin/kapsam matrisi ve negatif kredi yasağı kabul edilmiş ve runtime’a aktarılmıştır. İlk teknik aktarım raporları tarihsel kanıttır; güncel kaynak/kabul [tek devirde](00-FtkSaaS-yeni-sohbet-devir.md) ve işlem envanterindedir.
 
-> **Güncel teknik uygulama kaydı — 2.2-tech.1, 15 Ekim 2026:** D01–D09/U01–U08, 04–08 kataloglarına ve ortak tiplere aktarıldı. İki migration izole geliştirme DB’sinde uygulandı. Aşağıdaki eski “kod/kurulum yapılmadı” ve “teknik aktarım bekliyor” ifadeleri tarihsel kayıt olarak okunur. İş RPC’leri, ayrıntılı izin RLS politikaları ve gerçek iş akışı kabul testleri açık; Bu ilk aktarım notu tarihsel; Q-D01 kapalıdır. Güncel durum 09 teknik aktarım raporundadır.
+> **İlk aktarımın tarihsel sınırı:** 2.2-tech.1 döneminin iki migration ve kurulum bekleme notları bugünkü uygulama açığı değildir. D01–D09/U01–U08 aktarımı mevcuttur; bütün ürünün kabulü, hosted ve production durumu bundan çıkarılmaz.
 
 > Güncel UUID üretim standardı: U01–U08, UUIDv7. Sağlayıcı kimlikleri korunur.
 
-> Güncel ek: D01–D09 disiplin revizyonu kabul edilmiştir; aşağıdaki tarihsel teknik tamamlanma ifadeleri yeni kapsamı içermez. Ayrıntı ve açık teknik aktarım listesi belgenin sonundadır.
+> Güncel ek: D01–D09 disiplin revizyonu kabul edilmiştir; aşağıdaki tarihsel teknik tamamlanma ifadeleri yeni kapsamı içermez. Kabul hükümleri belgenin sonundadır; güncel kalan uygulama listesi docs/remaining-work.md üzerinden okunur.
 
 Tarih: 17 Ekim 2026 · Sürüm: DS-2026-10-17 aktarımı · Durum: İş kararları ve O4 yazılı teknik sözleşmesi tamamlandı; uygulama/üretim ve hukuki doğrulama açık
 
@@ -43,7 +43,7 @@ FtkSaaS bağımsız yeni projedir. Eski studioSaaS kodu, tabloları, frontendler
 | T11 | Operasyonların tam tipli istek/yanıtları, sabit hata kodları ve sürüm uyumu tanımlanır. Frontend yerelleştirilmiş hata metnini ayrıştırmaz. Eski istemciyi bozan değişiklik sessizce yapılmaz. |
 | T12 | Hak kapsamı/geçerliliği dersin gerçekleşeceği tarih/saat için değerlendirilir. Tarih değişiminde uygunluk tekrar kontrol edilir; mevcut rezervasyon otomatik iptal edilmez. İşletme iptali nedeniyle kullanılamayan hak yöneticiye gösterilir; yetkili yönetici süre uzatabilir, sistem kendiliğinden uzatmaz. |
 
-Free plan limitlerinin güncel rakamları değişebilir; kalıcı iş kuralı olarak sabitlenmez. Ücretli altyapıya geçiş mimariyi değiştirmez. FtkSaaS'ın Starter/Pro/Business planları ile Supabase altyapı planı farklı kavramlardır. Tek yeni repository ve dosya sahipliği 03 sözleşmesinde kabul edilmiştir. Repository adresi, frontend frameworkü ve frontend hosting seçimi henüz belirlenmemiştir.
+Free plan limitlerinin güncel rakamları değişebilir; kalıcı iş kuralı olarak sabitlenmez. Ücretli altyapıya geçiş mimariyi değiştirmez. FtkSaaS'ın Starter/Pro/Business planları ile Supabase altyapı planı farklı kavramlardır. Tek yeni repository ve dosya sahipliği 03 sözleşmesinde kabul edilmiştir. Repository kaynağı SXQHex/FtkSaaS main’dir. Frontend framework/hosting durumu backend kurulumu veya bu sözleşme güncellemesinden türetilmez; istemci kapsamı ayrıdır.
 
 ## 3. Kimlik, davet ve erişim yaşam döngüsü
 
@@ -279,20 +279,22 @@ Asgari doğrulama konuları:
 - Aktif öğrenci tekil sayılır; deneme istisnası etkinliğe taşınmaz; açık işlem pasife almayı engeller.
 - Bildirim hatası işi geri almaz; politika/anlaşma değişikliği geçmişi yeniden hesaplamaz.
 
-Bunlar henüz çalıştırılmış testler değildir.
+Bu liste hedef kabul başlıklarıdır; maddelerin tamamı topluca passed veya hiç çalıştırılmadı sayılmaz. Gerçek vaka bazlı durum makine sözleşmesi/F01–F33’te, son kaynak CI’ı güncel devirde izlenir.
 
 ## 15. Güncel tamamlanma ve açık doğrulama listesi
+
+20 Ekim uygulama envanteri 199/118/81, 34 migration’dır. Aşağıdaki başlıklar hedef/kalan iş ayrımıdır; ilk O4 yazılı teslimindeki tüm SQL/RPC/Edge uygulamasının beklediği yorumu geçerli değildir. P01 sonrası sıra CI-02 → P02–P07; kaynak ve CI tek devirdedir.
 
 | Alan | Yazılı karar/sözleşme | Kalan |
 |---|---|---|
 | O1 — Paket yaşam döngüsü | Kabul edildi;17,23 ve04–08 | Gerçek uygulama/kabul testleri |
 | O2 — Veri yaşam döngüsü | Hesap/organizasyon/imha ayrımı kabul;18–19 | Hukuki uzman saklama teyidi, sözleşme, gerçek imha/yedek testi |
 | O3 — İşletim | Pilot hedefler kabul;20 | Yedek/sorumlu/kanal kurulumu, restore/load testi, ücretli üretim hedefi |
-| O4 — Teknik sözleşme |04–08 v1.0 yazılı şema/tip/API/durum/hata/izin/atomiklik/guard/kabul envanteri tamamlandı | SQL/RLS/RPC/Edge uygulaması ve gerçek doğrulama; yazılı tamamlama uygulanmış garanti değildir |
+| O4 — Teknik sözleşme |04–08 v1.0 yazılı şema/tip/API/durum/hata/izin/atomiklik/guard/kabul envanteri tamamlandı | 118 çağrılabilir işlemde uygulama vardır; kalan 81 sözleşme işlemi ve açık vaka/işletim kabulleri envanter/kuyrukta izlenir; yazılı tamamlama tüm ürün garantisi değildir |
 
 İki son iş tercihi de kabul: ilk ödeme doğrulamasında hizmet/dönem başlangıcı ve ücretsiz deneme olmaması; org belge/segment/automation Owner/OM konfigürasyonu, yerel CM kapsamı ve ayrı operasyon yetkisi. K01–K16’nın karar/teknik kapanışı07’de; K06 hukuki inceleme daha önce ertelendiği statüde kalır. Yeni varsayılmış ürün kararı yoktur; son kullanıcı düzeltmeleri eski hükmün üstündedir.
 
-Fiyatlar, kesin ticari öğrenci/eğitmen/merkez sayıları, deneme tekrar sayısı, gerekli diğer politika değerleri, aylık/yıllık SaaS dönüşümü, dış kanal/provider-maliyeti, repository adresi ve ortam/CI/secrets seçimleri yapılandırma/sonraki kapsam işidir. Gerekli değer yokken ilgili operasyon açılmaz, keyfî izin/ret icat edilmez. Pilot yük sayıları ticari plan limitleri değildir. Merkezler arası kullanım payı/hesaplaşma DS-2026-10-17 ile kabul edildi; otomatik para transferi veya kur dönüşümü yoktur.
+Fiyatlar, kesin ticari öğrenci/eğitmen/merkez sayıları, deneme tekrar sayısı, gerekli diğer politika değerleri, aylık/yıllık SaaS dönüşümü, dış kanal/provider-maliyeti, henüz eksik ortam/provider ve güvenli secret işletimi yapılandırma/sonraki kapsam işidir; repository ve mevcut CI kurulmuştur. Gerekli değer yokken ilgili operasyon açılmaz, keyfî izin/ret icat edilmez. Pilot yük sayıları ticari plan limitleri değildir. Merkezler arası kullanım payı/hesaplaşma DS-2026-10-17 ile kabul edildi; otomatik para transferi veya kur dönüşümü yoktur.
 
 03’teki çalışma düzeni kabul edilmiştir. Bu belge somut repository oluşturma, kodlama, merge veya üretim dağıtımı emri değildir.
 
@@ -547,7 +549,7 @@ Belge paketi revizyonu: 2.1. Bu bölüm önceki çelişen disiplin, paket kapsam
 
 **D09.** Seans başlangıcındaki limit kontrolü ve sonradan ödemenin geçmiş katılım/hakedişi değiştirmemesi korunur; kontrol artık ilgili merkez–disiplin kapsamındadır. Para borcu ile kredi açığı ayrı kavramlardır.
 
-**Teknik aktarım durumu:** Ürün kararı kabul edildi; kaynak karar sohbetinde kurulum, fiziksel tablo/API dönüşümü veya kodlama yapılmamıştı. Kaynak v2.2 katalogları o tarihte bu revizyonu bütünüyle temsil etmiyordu; güncel aktarım 09 raporundadır. Disiplin kimlikleri/merkez ilişkileri, öğrenci-eğitmen disiplin ilişkileri, paket kapsam tipleri, kredi açığı anahtarı, işlem izinleri ve ortak tiplerin dönüşümü ayrı teknik sohbette tamamlanıp doğrulanacaktır. Önceki 31 kontrol ve 55 senaryo bu yeni revizyonun geçtiği testler değildir. Disiplin revizyonu için O4 teknik katalog kapanışı yeniden açıktır.
+**Teknik aktarım durumu:** D01–D09 kapsamı şema, API, izin ve ortak tiplerde mevcuttur; Q-D01 etkinlik kapsamı/negatif kredi ve ortak hak akışı uygulanmıştır. İlk aktarım tarihindeki açık listesi güncel iş listesi değildir; bugün kalanlar docs/remaining-work.md ve kaynak bağlı kabul kayıtlarında izlenir.
 
 ## 15 Ekim 2026 — U01–U08 UUIDv7 standardı (kabul edildi)
 
@@ -569,7 +571,7 @@ Paket revizyonu: 2.2. D01–D09 disiplin kararları korunur. Bu bölüm önceki 
 
 **U08.** PostgreSQL alan tipi uuid olarak kalır. UUIDv7 üretim standardı bütün dış UUID girişlerini v7 diye reddetmek anlamına gelmez. FtkSaaS üretimi olan alanlarla sağlayıcı kimliği alanlarının şema/DTO eşlemesi teknik sohbette tamamlanır; yetki ve tenant kontrolü UUID sürümünden bağımsız uygulanır.
 
-**Durum:** Belge ve makine sözleşmesine üretim politikası işlendi. Ortam/üretici seçimi, alan bazlı ortak tip aktarımı, migration ve gerçek üretim/yarış testleri ayrı teknik sohbette yapılacaktır. Kodlama, kurulum veya dağıtım yapılmadı.
+**Güncel teknik durum:** UUIDv7 üretim politikası ortak tip, backend üreticisi ve migration/çalışma zamanı yollarına aktarılmıştır. PostgreSQL default üreticisinin kapalı olması doğrulanmış backend UUIDv7 üretimini yok saydırmaz; v4 fallback yoktur. İlk aktarım tarihinin kurulum bekleme notları tarihsel kayıttır. Güncel CI/hosted/production kabulü tek devirde ayrı izlenir.
 
 
 ## Q-D01 — 15 Ekim 2026 kabul edilen etkinlik kuralı
@@ -582,7 +584,7 @@ Paket revizyonu: 2.2. D01–D09 disiplin kararları korunur. Bu bölüm önceki 
 6. Manuel ödeme ve etkinliğe özel satış kuralları korunur. Bu karar tahsilat ile kredi üretimini birleştirmez ve yeni bir ödeme zorunluluğu tanımlamaz.
 7. Organizasyon izolasyonu, merkez erişimi, kapasite, geçerlilik ve mevcut katılım/iptal/kapanış koşulları korunur. Geniş kapsamlı paket toplam ortak havuzunu kullanır; disiplin başına hak çoğaltılmaz.
 
-Ürün kararı kapalıdır. Teknik aktarımın güncel kanıtı 11 raporundadır; tam kayıt/RPC ve son ortak kredi yarışı henüz tamamlanmadı.
+Ürün kararı ve Q-D01 çalışma zamanı aktarımı kapalıdır; tam etkinlik kayıt/RPC ve ortak hak yarışlarının kaynak kanıtları tek devir ve ilgili CI’dadır. 11 raporu ilk aktarımın tarihsel snapshot’ıdır; güncel açık iş kaynağı değildir.
 
 
 ## Q-E01 — Kabul edilmiş etkinlik ödeme ve işletme iptali eki
@@ -670,7 +672,7 @@ DS-OPEN-01 karar düzeyinde kapalıdır; hesaplaşma runtime aktarımı uygulanm
 
 ## Starter yoklama/koruma runtime aktarımı
 
-[Starter devri](../docs/starter-attendance-protection-handover.md) kabul edilmiş kararları değiştirmeden dar runtime kapsamını belirtir. Starter F14 kapanışı ve bağlı düzeltme hak hareketi + audit/outbox/receipt ile atomiktir; hakediş üretmez. Ücretli finansal kapanış ve bağlı hakediş düzeltmesi PR #15 ile uygulanmıştır. Koruma yalnız yeni olumsuz etkiye bağlıdır; bağımsız engelleri veya yeni rezervasyon koşullarını kaldırmaz. Taslak başlangıç kanıtı değildir; başlangıç/belge ve diğer hak değişikliği tüketicileri pending. 198 işlem/89 canlı/109 contract-only özellik tamamlama oranı değildir.
+[Starter devri](../docs/starter-attendance-protection-handover.md) kabul edilmiş kararları değiştirmeden dar runtime kapsamını belirtir. Starter F14 kapanışı ve bağlı düzeltme hak hareketi + audit/outbox/receipt ile atomiktir; hakediş üretmez. Ücretli finansal kapanış ve bağlı hakediş düzeltmesi PR #15 ile uygulanmıştır. Koruma yalnız yeni olumsuz etkiye bağlıdır; bağımsız engelleri veya yeni rezervasyon koşullarını kaldırmaz. Taslak başlangıç kanıtı değildir; başlangıç/belge ve diğer hak değişikliği tüketicileri pending. 198 işlem/89 canlı/109 contract-only bu Starter tesliminin tarihsel sayısıdır; güncel envanter 199/118/81 ve 34 migration’dır. İşlem sayısı özellik tamamlama oranı değildir.
 
 ## Eğitmen anlaşması/hakediş teknik aktarımı
 

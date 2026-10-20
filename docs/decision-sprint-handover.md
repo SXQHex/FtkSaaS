@@ -12,7 +12,7 @@ Kabul edilmiş karar/DTO/izin/guard aktarımı korunur. Starter ve anlaşma/hake
 |---|---|
 | Ürün kararı | [DS-2026-10-17 açık kullanıcı kararları](decisions/DS-2026-10-17.md) kabul edilmiş ve önceki çelişen hükümleri değiştirir |
 | Teknik aktarım | 01/02/06 yaşayan hükümler, 08 DTO/izin/guard/faz/sürüm/etki metaverisi, üretilmiş 04/05/envanter/ortak tipler |
-| Runtime | 104 endpoint/90 core tablo/29 migration. Starter, anlaşma/hakediş ve dokuz hesaplaşma API’si uygulanmıştır; açık tüketiciler kalan işlerde ayrılır |
+| Runtime | P01 sonrası 118 çağrılabilir işlem/90 core tablo/34 migration. Starter, anlaşma/hakediş ve dokuz hesaplaşma API’si uygulanmıştır; açık tüketiciler kalan işlerde ayrılır |
 | Sözleşme/CI denetimi | Pozitif şema/tutarlılık ve kasıtlı bozmada gerçekten başarısız olan negatif governance testleri |
 | Gerçek davranış kabulü | 394 testlik kaynak kabulünde 272 Auth/API testi başarılıdır. DS-PLAN-01, DS-PLAN-02 ve DS-AGR-01–05 ile 22 hesaplaşma kabul maddesi gerçek testlere bağlıdır; diğer 9 madde pending_runtime kalır. Kaynak SHA/CI kanıtı hesaplaşma devrindedir; yapısal testten davranış kabulü çıkarılmaz |
 | Son head ve merge | Son PR head incelemesi ve CI ayrıca doğrulanır; koşullu merge yetkisi son kullanıcı talimatından okunur |

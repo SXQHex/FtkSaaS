@@ -4,7 +4,7 @@
 
 P01 [PR #22](https://github.com/SXQHex/FtkSaaS/pull/22) ile main'e birleşti; kaynak ve kabul varsayımı güncel devirde. Sırada CI-02, ardından P02 vardır. [CI-2026-10-20 kararı](docs/decisions/CI-2026-10-20.md) bağlayıcıdır: bölüm boyunca tek Draft/development PR ve hedefli CI; bitince açık aday full clean, merge sonrası main full clean. Güvenli yalnız-belge farkları belge kabulüyle kapanır ve clean başlatmaz; karma/bilinmeyen veya runtime girdisi değişiklikleri istisna değildir. Dört shard ayrı backend/DB kullanır; bütün zorunlu işlerin kaynak bağlı başarısı gerekir.
 
-Bu yeni otomasyon CI-02'de uygulanacaktır; mevcut main workflow/kapısı hâlâ her main push için full clean ister ve Draft/development veya genel belge kabulünü uygulamış sayılmaz. Bu belge görevi workflow/kapı değiştirmez; yeni clean tetikleme veya mevcut kontrolü bypass etme yetkisi çıkarılmaz. Güncel durum güncellemesi P01 main kabulünü yalnız kullanıcı talimatıyla varsayar; gerçek sonuç BackendCoder'da izlenir.
+Bu yeni otomasyon CI-02'de uygulanacaktır; mevcut main workflow/kapısı hâlâ her main push için full clean ister ve Draft/development veya genel belge kabulünü uygulamış sayılmaz. Bu belge görevi workflow/kapı değiştirmez; yeni clean tetikleme veya mevcut kontrolü bypass etme yetkisi çıkarılmaz. P01 main kabulünün geçici varsayımı yalnız güncel devirdeki bekleme notudur; aynı SHA/run gerçek completed/success doğrulanınca sonraki doğal belge güncellemesinde kaldırılır ve kuyruk done olur. Kalıcı yeni CI politikasına veya yeni kaynak kabulüne istisna oluşturmaz.
 
 ## Başlangıç ve kaynak önceliği
 

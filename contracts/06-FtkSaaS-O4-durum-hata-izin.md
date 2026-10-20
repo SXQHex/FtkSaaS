@@ -1,4 +1,4 @@
-> **20 Ekim güncel durum:** P01 PR #22 main `7577b2f1873c6b1fcf83390bfa94a34374c44082` ile birleşti; 199 sözleşme / 118 çağrılabilir / 81 yalnız sözleşme / 34 migration. Eski teslim sayıları ve pending notları kendi kapsamına aittir. [Tek güncel devir](../contracts/00-FtkSaaS-yeni-sohbet-devir.md) main clean için kullanıcı varsayımını ve gerçek kanıtı ayırır. [CI-2026-10-20](../docs/decisions/CI-2026-10-20.md) dört shard, Draft/development ve belge-only kararını içerir; otomasyon CI-02’de bekliyor. Bu karar ürün/izin/finans davranışını değiştirmez.
+> **20 Ekim güncel durum:** P01 PR #22 main `7577b2f1873c6b1fcf83390bfa94a34374c44082` ile birleşti; 199 sözleşme / 118 çağrılabilir / 81 yalnız sözleşme / 34 migration. Eski teslim sayıları ve pending notları kendi kapsamına aittir. [Tek güncel devir](../contracts/00-FtkSaaS-yeni-sohbet-devir.md) güncel CI kanıtı ile geçici kabul varsayımını tek yerde ayırır; gerçek başarı doğrulanınca varsayım kaldırılır. [CI-2026-10-20](../docs/decisions/CI-2026-10-20.md) dört shard, Draft/development ve belge-only kararını içerir; otomasyon CI-02’de bekliyor. Bu karar ürün/izin/finans davranışını değiştirmez.
 
 > Güncel öncelik: [DS-2026-10-17](../docs/decisions/DS-2026-10-17.md). Çelişen eski hükümler yalnız belirtilen kapsamda yürürlükten kalkmıştır. [Hedef sözleşme/runtime ayrımı](../docs/decision-sprint-handover.md).
 
@@ -6,13 +6,13 @@
 
 > **Güncel öncelik: Q-E02 · 0.2.0-rc.3.** Kullanıcının 16 Ekim 2026 son iptal kabulü önceki çelişen merkez iptali hükümlerinin yerine geçer. Güncel davranış/kanıt: docs/decisions/Q-E02.md, docs/claude-handover.md ve reports/qe02-verification.json. Aşağıdaki eski durum/test sayıları tarihsel kayıttır; teknik aktarım bekleyen işler tamamlandı sayılmaz.
 
-> **Güncel 2.2-tech.2 / Q-D01:** Etkinlik 0/1/çok disiplin etiketini destekler. Tek etikette etkinliğe uygun dar/geniş paket, 0/çok etikette yalnız uygun geniş paket; etkinliklerde negatif kredi yok. Q-D01 ürün kararı kapalı; ilk aktarım durumları tarihsel, güncel runtime/kabul envanter ve CI’dadır. Güncel durum 11-FtkSaaS-Q-D01-teknik-aktarim-raporu.md.
+> **Q-D01 durumu:** Etkinlik disiplin/kapsam matrisi ve negatif kredi yasağı kabul edilmiş ve runtime’a aktarılmıştır. İlk teknik aktarım raporları tarihsel kanıttır; güncel kaynak/kabul [tek devirde](00-FtkSaaS-yeni-sohbet-devir.md) ve işlem envanterindedir.
 
-> **Güncel teknik uygulama kaydı — 2.2-tech.1, 15 Ekim 2026:** D01–D09/U01–U08, 04–08 kataloglarına ve ortak tiplere aktarıldı. İki migration izole geliştirme DB’sinde uygulandı. Aşağıdaki eski “kod/kurulum yapılmadı” ve “teknik aktarım bekliyor” ifadeleri tarihsel kayıt olarak okunur. İş RPC’leri, ayrıntılı izin RLS politikaları ve gerçek iş akışı kabul testleri açık; Bu ilk aktarım notu tarihsel; Q-D01 kapalıdır. Güncel durum 09 teknik aktarım raporundadır.
+> **İlk aktarımın tarihsel sınırı:** 2.2-tech.1 döneminin iki migration ve kurulum bekleme notları bugünkü uygulama açığı değildir. D01–D09/U01–U08 aktarımı mevcuttur; bütün ürünün kabulü, hosted ve production durumu bundan çıkarılmaz.
 
 > Güncel UUID üretim standardı: U01–U08, UUIDv7. Sağlayıcı kimlikleri korunur.
 
-> Güncel ek: D01–D09 disiplin revizyonu kabul edilmiştir; aşağıdaki tarihsel teknik tamamlanma ifadeleri yeni kapsamı içermez. Ayrıntı ve açık teknik aktarım listesi belgenin sonundadır.
+> Güncel ek: D01–D09 disiplin revizyonu kabul edilmiştir; aşağıdaki tarihsel teknik tamamlanma ifadeleri yeni kapsamı içermez. Kabul hükümleri belgenin sonundadır; güncel kalan uygulama listesi docs/remaining-work.md üzerinden okunur.
 
 17 Ekim 2026 · DS-2026-10-17 aktarımı · Yazılı hedef sözlük. Uygulanmış RLS/endpoint değildir.08 JSON enum ve request/response yapıları makine kaynağı; aşağıdaki rol ve durum anlamları kabul edilmiş02 hükümlerini uygular.
 
@@ -207,7 +207,7 @@ Belge paketi revizyonu: 2.1. Bu bölüm önceki çelişen disiplin, paket kapsam
 
 **D09.** Seans başlangıcındaki limit kontrolü ve sonradan ödemenin geçmiş katılım/hakedişi değiştirmemesi korunur; kontrol artık ilgili merkez–disiplin kapsamındadır. Para borcu ile kredi açığı ayrı kavramlardır.
 
-**Teknik aktarım durumu:** Ürün kararı kabul edildi; kaynak karar sohbetinde kurulum, fiziksel tablo/API dönüşümü veya kodlama yapılmamıştı. Kaynak v2.2 katalogları o tarihte bu revizyonu bütünüyle temsil etmiyordu; güncel aktarım 09 raporundadır. Disiplin kimlikleri/merkez ilişkileri, öğrenci-eğitmen disiplin ilişkileri, paket kapsam tipleri, kredi açığı anahtarı, işlem izinleri ve ortak tiplerin dönüşümü ayrı teknik sohbette tamamlanıp doğrulanacaktır. Önceki 31 kontrol ve 55 senaryo bu yeni revizyonun geçtiği testler değildir. Disiplin revizyonu için O4 teknik katalog kapanışı yeniden açıktır.
+**Teknik aktarım durumu:** D01–D09 kapsamı şema, API, izin ve ortak tiplerde mevcuttur; Q-D01 etkinlik kapsamı/negatif kredi ve ortak hak akışı uygulanmıştır. İlk aktarım tarihindeki açık listesi güncel iş listesi değildir; bugün kalanlar docs/remaining-work.md ve kaynak bağlı kabul kayıtlarında izlenir.
 
 Teknik aktarım listesi: disiplin ilişki durumları ve yaşam döngüsü, işlem bazlı yetki/hata eşleşmeleri ve merkez–disiplin kapsam kontrolleri mevcut yetki modeline göre hazırlanır. Disiplin katmanı yeni yönetici rolü oluşturmaz.
 
@@ -231,7 +231,7 @@ Paket revizyonu: 2.2. D01–D09 disiplin kararları korunur. Bu bölüm önceki 
 
 **U08.** PostgreSQL alan tipi uuid olarak kalır. UUIDv7 üretim standardı bütün dış UUID girişlerini v7 diye reddetmek anlamına gelmez. FtkSaaS üretimi olan alanlarla sağlayıcı kimliği alanlarının şema/DTO eşlemesi teknik sohbette tamamlanır; yetki ve tenant kontrolü UUID sürümünden bağımsız uygulanır.
 
-**Durum:** Belge ve makine sözleşmesine üretim politikası işlendi. Ortam/üretici seçimi, alan bazlı ortak tip aktarımı, migration ve gerçek üretim/yarış testleri ayrı teknik sohbette yapılacaktır. Kodlama, kurulum veya dağıtım yapılmadı.
+**Güncel teknik durum:** UUIDv7 üretim politikası ortak tip, backend üreticisi ve migration/çalışma zamanı yollarına aktarılmıştır. PostgreSQL default üreticisinin kapalı olması doğrulanmış backend UUIDv7 üretimini yok saydırmaz; v4 fallback yoktur. İlk aktarım tarihinin kurulum bekleme notları tarihsel kayıttır. Güncel CI/hosted/production kabulü tek devirde ayrı izlenir.
 
 
 ## 2.2-tech.1 — alan/izin aktarımı
@@ -243,18 +243,18 @@ Paket revizyonu: 2.2. D01–D09 disiplin kararları korunur. Bu bölüm önceki 
 - Kapsam dışı hak CLASS_ACCESS_DENIED/ENTITLEMENT_UNAVAILABLE; tenant görünürlüğü NOT_FOUND; biçim/eksik alan VALIDATION_FAILED. Yeni hata kodu icat edilmedi.
 - EligibilitySnapshot merkez ve disiplini taşır; başlangıç snapshot ve geç ödeme/no retro earning kuralları korunur.
 - FtkUuid yeni üretimi UUIDv7 şart koşar, var olan UUID girişini sürümü yüzünden reddetmez. ProviderUuid sağlayıcı UUID'sidir. Üretim kontrolü FtkGeneratedUuidV7 tanımıyla ayrıca sınanır.
-- DB UUID üreticisi yoksa private default teknik hata 0A000/UUIDV7_GENERATOR_UNAVAILABLE ile kapalıdır; bu müşteri domain hata sözlüğüne yeni ürün davranışı eklemez. İlgili domain create endpoint henüz açık değildir.
+- DB UUID üreticisi yoksa private default teknik hata 0A000/UUIDV7_GENERATOR_UNAVAILABLE ile kapalıdır; bu müşteri domain hata sözlüğüne yeni ürün davranışı eklemez. Bu ilk aktarımın eski endpoint bekleme notu geçerli değildir; çağrılabilir create yolları runtime/envanterde gösterilir ve kimliklerini backend UUIDv7 üreticisinden alır.
 - Q-D01 karar/uygulama güncel kaynakta kapalıdır; bu ilk aktarım notu tarihsel kalır.
 
 ## Q-D01 — güncel izin/hata eşlemesi
 
 - event_disciplines yalnız organizasyona ait etiket ilişkisidir; rol, plan, merkez erişimi veya paket yetkisi vermez.
-- event_save event.manage kapsamında discipline_ids listesini sürüm kontrollü atomik kaydeder; boş liste disiplinsiz etkinliktir. Bu API uygulaması henüz tamamlanmadı.
+- event_save event.manage kapsamında discipline_ids listesini sürüm kontrollü atomik kaydeder; boş liste disiplinsiz etkinliktir. event_save_v1 çağrılabilir runtime içindedir; son kaynak kabulü güncel devir/CI’dan doğrulanır.
 - EventView/CalendarItem/PublicCalendarItem disiplin UUID listesini döndürür. event_list discipline_id filtresi etiket üyeliğidir; diğer görünürlük kurallarını değiştirmez.
 - Tam bir disiplin etiketinde center_discipline/organization_discipline ancak aynı disiplin ve açık usage_targets:event ile eşleşir. 0 veya birden çok etikette bu iki dar scope kullanılamaz.
 - center_all_disciplines/organization_all de event uygunluğu ve merkez/diğer mevcut gate'lere tabidir.
 - Kapsam uyumsuzluğu CLASS_ACCESS_DENIED; kullanılabilir hak yetersizliği ENTITLEMENT_UNAVAILABLE. Normal ders için negatif limit veya override etkinliğe uygulanmaz; yeni hata/rol eklenmedi.
-- private.event_package_scope_matches scope filtresi, private.require_event_available_credit pozitif kullanılabilir hak kapısıdır. Bu yardımcılar yetkilendirilmiş kayıt RPC'si değildir. Authoritative balance/pool lock/atomik allocation henüz bağlı değil.
+- private.event_package_scope_matches scope filtresi, private.require_event_available_credit pozitif kullanılabilir hak kapısıdır. Bu yardımcılar tek başına kayıt RPC’si değildir; güncel event_register_v1 yolu yetki/kapasite ve ortak hak havuzu kilidi/atomik allocation ile birlikte bunları tüketir. Negatif kredi yasağı korunur.
 
 ## Q-E01 çalışma durumları ve izinler
 
@@ -312,7 +312,7 @@ settlement.delegation.manage Owner'a özgü; settlement.authority.manage Owner v
 
 ## Starter yoklama/koruma runtime aktarımı
 
-[Starter devri](../docs/starter-attendance-protection-handover.md) kabul edilmiş kararları değiştirmeden dar runtime kapsamını belirtir. Starter F14 kapanışı ve bağlı düzeltme hak hareketi + audit/outbox/receipt ile atomiktir; hakediş üretmez. Ücretli finansal kapanış ve bağlı hakediş düzeltmesi PR #15 ile uygulanmıştır. Koruma yalnız yeni olumsuz etkiye bağlıdır; bağımsız engelleri veya yeni rezervasyon koşullarını kaldırmaz. Taslak başlangıç kanıtı değildir; başlangıç/belge ve diğer hak değişikliği tüketicileri pending. 198 işlem/89 canlı/109 contract-only özellik tamamlama oranı değildir.
+[Starter devri](../docs/starter-attendance-protection-handover.md) kabul edilmiş kararları değiştirmeden dar runtime kapsamını belirtir. Starter F14 kapanışı ve bağlı düzeltme hak hareketi + audit/outbox/receipt ile atomiktir; hakediş üretmez. Ücretli finansal kapanış ve bağlı hakediş düzeltmesi PR #15 ile uygulanmıştır. Koruma yalnız yeni olumsuz etkiye bağlıdır; bağımsız engelleri veya yeni rezervasyon koşullarını kaldırmaz. Taslak başlangıç kanıtı değildir; başlangıç/belge ve diğer hak değişikliği tüketicileri pending. 198 işlem/89 canlı/109 contract-only bu Starter tesliminin tarihsel sayısıdır; güncel envanter 199/118/81 ve 34 migration’dır. İşlem sayısı özellik tamamlama oranı değildir.
 
 Anlaşma/hakediş teslimi: earnings.manage yalnız seçili CM; earnings.read org okuyucusu / seçili CM / kendi canlı merkez rolündeki eğitmen projeksiyonu. attendance_start_v1 attendance.close yetkisiyle explicit olgu kaydıdır; taslak/tüketim/kapanış değildir. management.inspect runtime yalnız negcredit_valuation_set_v1 selector'ını ve özgün CM/F15 kapısını uygular; genel tablo okuması sağlamaz. Ayrıntı: docs/instructor-earnings-handover.md.
 

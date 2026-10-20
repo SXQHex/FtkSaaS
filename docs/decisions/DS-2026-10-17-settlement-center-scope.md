@@ -16,6 +16,7 @@ A başvurusu bakiyeyi kapatmaz. B onayı payment/offset/bağlı düzeltme kaydı
 
 ## Aktarım ve teslim sınırı
 
-01/02/06/08 sözleşmeleri, permission/guard/step authority_binding/audit DTO'ları, F01–F33 izi, kabul kataloğu, katalog/tip/envanter ve devirler bu kararla eşitlenir. 197 sözleşme / 79 çağrılabilir / 118 contract_only, 25 migration korunur. 38 DS gerçek davranış senaryosu pending_runtime kalır; yapısal şema/governance testleri gerçek Auth → Edge → RPC kabulü değildir.
+01/02/06/08 sözleşmeleri, permission/guard/step authority_binding/audit DTO'ları, F01–F33 izi, kabul kataloğu, katalog/tip/envanter ve devirler bu kararla eşitlenir. Kararın ilk aktarım snapshot’ı 197/79/118 ve 25 migration idi. Sonraki hesaplaşma runtime’ı ile merkez yetki zinciri/iki taraflı akış uygulanmıştır; tüm 38 vakanın pending olduğu eski durum geçerli değildir. Güncel 199/118/81 ve 34 migration kaynağı tek devirde, vaka bazlı passed/pending ayrımı 08 ve F01–F33’te izlenir. Yapısal şema/governance testi gerçek Auth → Edge → RPC kabulü değildir.
 
 Tarihsel raporlar eski kuralları kendi kaynak SHA'sında korur. Yeni son head için odaklı doğrulama, bağımsız inceleme ve zorunlu tam temiz CI gerekir; eski SHA başarısı taşınmaz. Kullanıcı PR #13'ün main'e merge edilmesini bu görevde yetkilendirmiştir. Merge sonrası aynı tam main SHA'sının CI sonucu ayrıca doğrulanır. Repository yönetimi/main koruması ayrı yönetici işidir. Frontend, production ve Resend'e müdahale edilmez.
+
