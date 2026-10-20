@@ -19,7 +19,10 @@ for k,v in {'center_id':ref('FtkUuid'),'version':ref('PositiveInt'),'net_minor':
 for k,v in {'center_id':ref('FtkUuid'),'version':ref('PositiveInt'),'previous_id':nullable('FtkUuid')}.items():d['CashSummary']['properties'][k]=v
 d['P03PaymentCorrectionView']={'type':'object','properties':{'id':ref('FtkUuid'),'previous_id':ref('FtkUuid'),'direction':ref('Direction'),'amount_minor':ref('Money'),'occurred_at':ref('Instant'),'reason':ref('Text')},'required':['id','previous_id','direction','amount_minor','occurred_at','reason'],'additionalProperties':False}
 d['P03PaymentView']={'type':'object','properties':{'id':ref('FtkUuid'),'version':ref('PositiveInt'),'amount_minor':ref('Money'),'net_minor':ref('Money'),'currency':ref('Currency'),'occurred_at':ref('Instant'),'corrections':{'type':'array','items':ref('P03PaymentCorrectionView')}},'required':['id','version','amount_minor','net_minor','currency','occurred_at','corrections'],'additionalProperties':False}
-d['SignedMoney']={'type':'string','pattern':'^(0|-?[1-9][0-9]{0,18})({'overpaid_minor':ref('Money'),'payments':{'type':'array','items':ref('P03PaymentView')}})
+d['SignedMoney']={'type':'string','pattern':'^(0|-?[1-9][0-9]{0,18})$','x-validation':'-9223372036854775808<=int(value)<=9223372036854775807'}
+d['Table_debt_allocations']['properties']['amount_minor']=ref('SignedMoney')
+d['Table_earning_allocations']['properties']['amount_minor']=ref('SignedMoney')
+d['EarningView']['properties'].update({'overpaid_minor':ref('Money'),'payments':{'type':'array','items':ref('P03PaymentView')}})
 d['Table_instructor_payments']['properties'].update({'previous_id':nullable('FtkUuid'),'operation_id':nullable('FtkUuid'),'direction':ref('Direction')})
 d['Table_earning_allocations']['properties']['previous_id']=nullable('FtkUuid')
 # A read is now implemented; recompute actual read-path availability without declaring behavior passed.
@@ -202,3 +205,12 @@ line="\nassert next(Path('supabase/migrations').glob('*_p03_finance_results.sql'
 if line not in p.read_text():p.write_text(p.read_text()+line)
 for name in ['docs/production-queue.md','docs/remaining-work.md','docs/claude-handover.md','contracts/00-FtkSaaS-yeni-sohbet-devir.md','docs/source-index.md','contracts/02-FtkSaaS-teknik-sozlesme.md']:
  p=Path(name);s=p.read_text().replace('199/140 runtime/59 contract_only,45 migration','199/140 runtime/59 contract_only,46 migration');p.write_text(s)
+
+# Keep one current P03 slice summary instead of stacking generation status duplicates.
+import re
+for name in ['docs/production-queue.md','docs/remaining-work.md','docs/claude-handover.md','contracts/00-FtkSaaS-yeni-sohbet-devir.md','docs/source-index.md']:
+ p=Path(name);s=p.read_text();matches=list(re.finditer(r'^P03 ilk uygulama dilimi:.*?\n\n',s,re.M|re.S))
+ if matches:
+  keep=matches[0].group(0)
+  s=re.sub(r'^P03 ilk uygulama dilimi:.*?\n\n','',s,flags=re.M|re.S)
+  at=s.index('\n\n')+2;s=s[:at]+keep+s[at:];p.write_text(s)
