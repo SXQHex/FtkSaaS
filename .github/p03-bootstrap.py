@@ -67,7 +67,8 @@ sources=[
  ('p03_finance_scope','database/p03-finance-scope.sql',None),
  ('p03_finance_balances','database/p03-finance-balances.sql',None),
  ('p03_finance_results','database/p03-finance-results.sql',None),
- ('p03_finance_integrity','database/p03-finance-integrity.sql',None)]
+ ('p03_finance_integrity','database/p03-finance-integrity.sql',None),
+ ('p03_finance_provenance','database/p03-finance-provenance.sql',None)]
 checks=Path('scripts/check-migrations.py').read_text()
 for suffix,source,wrapper in sources:
  content=Path(source).read_text()+(Path(wrapper).read_text() if wrapper else '')
@@ -102,3 +103,15 @@ p=Path('docs/p02-handover.md');s=p.read_text()
 mark='P02 kapanış: PR28 main cc4878d09e45204dbc13ccfe1324b38b14548167 ve aynı main39461804543 completed/success ile done;469 test,40 migration. Aşağıdaki geliştirme kaynaklarının pending notları tarihsel snapshot’tır. Güncel P03 değişiklikleri ve kabulü üretim kuyruğunda ayrı izlenir.\n\n'
 if mark not in s:
  at=s.index('\n\n')+2;p.write_text(s[:at]+mark+s[at:])
+
+p=Path('docs/remaining-work.md');s=p.read_text()
+start=s.index('## Yalnız sözleşme envanteri')
+end=s.index('## Operasyonel kabul işleri',start)
+pending=[o for o in x['operations'] if o['name'] not in live]
+section='## Yalnız sözleşme envanteri — dalda '+str(len(pending))+' işlem\n\nKabul edilmiş main P02 kaynağında133 runtime/66 contract_only kalır. P03 dalında7 API uygulandı,140 runtime/59 contract_only; hedefli/aday/main kabulü ayrıdır. P04–P07 toplam59 işlem uygulama bekler.\n\n| Teslim | Kalan işlem |\n|---|---:|\n| P04 | 11 |\n| P05 | 13 |\n| P06 | 13 |\n| P07 | 22 |\n\n| İşlem | İzin |\n|---|---|\n'
+section+=''.join('| '+o['name']+' | '+o['permission']+' |\n' for o in pending)+'\n'
+s=s[:start]+section+s[end:]
+s=s.replace('P03–P07 toplam66 contract_only işlem sırada.','P03 dalında7 API uygulandı; hedefli/aday/main kabulü açık. P04–P07 toplam59 contract_only işlem sırada.')
+s=s.replace('Ödeme komutları açık.','P03 ödeme komutları dalda uygulandı; runtime ve aday/main kabulü ayrı bekler.')
+s=s.replace('P03 finans düzeltme/iade çiftleri açık.','P03 finans düzeltme/iade çiftleri dalda uygulandı; hedefli/aday/main kabulü açık.')
+p.write_text(s)
