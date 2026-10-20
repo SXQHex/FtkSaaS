@@ -66,3 +66,5 @@ assert next(Path('supabase/migrations').glob('*_p01_waitlist_workers.sql')).read
 assert next(Path('supabase/migrations').glob('*_p01_worker_transport.sql')).read_text()==Path('database/p01-worker-transport.sql').read_text()+Path('database/p01-worker-transport-wrappers.sql').read_text(),'P01 worker transport source drift'
 
 assert next(Path('supabase/migrations').glob('*_p01_final_scope_guards.sql')).read_text()==Path('database/p01-final-scope-guards.sql').read_text()+Path('database/p01-final-scope-guards-wrappers.sql').read_text(),'P01 final scope guards source drift'
+
+assert next(Path('supabase/migrations').glob('*_p02_sessions.sql')).read_text()==Path('database/p02-sessions.sql').read_text()+Path('database/p02-sessions-wrappers.sql').read_text(),'P02 sessions source drift'

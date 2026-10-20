@@ -1,5 +1,8 @@
 # FtkSaaS — güncel devir
 
+P02-A uygulaması PR #28 Draft/development dalında: session_cancel_preview/apply ve replacement_session_create eklendi (121 runtime / 78 contract_only / 35 migration). Önizleme aktör/merkez/token/bağımlılıkları; açık seans iptali hak serbest bırakma, bekleme/teklif kapama ve uygulama içi bildirimle atomiktir. Yerine seans yalnız linked yeni kayıttır. Yeni Auth→Edge→RPC negatif/replay/yarış/rollback testleri eklendi; runtime sonucu henüz doğrulanmadı. Kalan12 P02 API açık; bütün P02 bitmeden aday clean/merge yok.
+
+
 P02 başladı: `feature/p02-package-session-lifecycle`, tek Draft/development PR. Başlangıç main f6afef4bdc4ef1bcbf37697ae771fef04a9fb455 / belge kabulü39440690219 başarılı; runtime tam kabulü0ade787 / 39425915555 ayrı kanıttır. Kuyruktaki15 API tamamlanmadan aday full clean/merge yok; geliştirme commitleri birikimli hedefli doğrulanır. Seans iptali/yerine seans → hak/koruma → dondurma/erken bitirme → sonlandırma/değişim/yenileme sırası; kabul edilmemiş ürün varsayımı yok. Uygulama ve yeni runtime kabulü henüz tamamlanmadı.
 
 CI-02 tamamlandı: PR25 ve dar ölçüm düzeltmesi PR26, açık kaynak bazlı kurulum onaylarıyla main’e alındı. Tam kabul kaynağı `0ade7877cc16fc121095decbc276f2fbc868607e`; [main39425915555](https://github.com/SXQHex/FtkSaaS/actions/runs/39425915555) completed/success: gerçek merge ilişkisi + core + dört API shard + toplayıcı, 462 test düğümü (96 yapı + 37 CI politika + 27 DB + 302 API), sıfır fail/skipped; 34 migration, seed/health/advisors geçti. Main-binding artifact12266003219 source/run/attempt kanıtıdır. P01 ve CI-02 done; P02 son kullanıcı talimatıyla Draft/development olarak başladı. Yeni kaynak kabulü ayrıca doğrulanır.

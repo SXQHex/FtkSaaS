@@ -1,6 +1,6 @@
 # FtkSaaS sıralı üretim kuyruğu
 
-CI-02 tamamlandı: PR25 ve dar ölçüm düzeltmesi PR26, açık kaynak bazlı kurulum onaylarıyla main’e alındı. Tam kabul kaynağı `0ade7877cc16fc121095decbc276f2fbc868607e`; [main39425915555](https://github.com/SXQHex/FtkSaaS/actions/runs/39425915555) completed/success: gerçek merge ilişkisi + core + dört API shard + toplayıcı, 462 test düğümü (96 yapı + 37 CI politika + 27 DB + 302 API), sıfır fail/skipped; 34 migration, seed/health/advisors geçti. Main-binding artifact12266003219 source/run/attempt kanıtıdır. P01 ve CI-02 done; P02 kullanıcı talimatı gereği henüz başlamadı. Yeni kaynak kabulü ayrıca doğrulanır.
+CI-02 tamamlandı: PR25 ve dar ölçüm düzeltmesi PR26, açık kaynak bazlı kurulum onaylarıyla main’e alındı. Tam kabul kaynağı `0ade7877cc16fc121095decbc276f2fbc868607e`; [main39425915555](https://github.com/SXQHex/FtkSaaS/actions/runs/39425915555) completed/success: gerçek merge ilişkisi + core + dört API shard + toplayıcı, 462 test düğümü (96 yapı + 37 CI politika + 27 DB + 302 API), sıfır fail/skipped; 34 migration, seed/health/advisors geçti. Main-binding artifact12266003219 source/run/attempt kanıtıdır. P01 ve CI-02 done; P02 tek Draft/development PR #28 üzerinde başladı. Yeni kaynak kabulü ayrıca doğrulanır.
 
 ## Şimdi yapılacak iş — 20 Ekim 2026
 
@@ -75,11 +75,10 @@ PR25 dört izole shard/belge kabulü/Draft-development politikasını kurdu; PR2
 
 Ortak üretim promptunu uygula. Durum: in_progress; tek Draft/development PR. Bütün P02 bitmeden aday full clean veya merge yok.
 
-**Mevcut sözleşme API'leri (15):**
+**P02-A uygulandı; hedefli runtime kabulü bekliyor:** `session_cancel_preview_v1`, `session_cancel_apply_v1`, `replacement_session_create_v1`.
 
-- `session_cancel_preview_v1`
-- `session_cancel_apply_v1`
-- `replacement_session_create_v1`
+**Kalan sözleşme API'leri (12):**
+
 - `entitlement_extend_v1`
 - `credit_adjust_v1`
 - `freeze_preview_v1`

@@ -281,6 +281,25 @@ test('Program lifecycle through real Auth -> Edge -> RPC',async t=>{
   const explicit=await change(id,{assignments:[]});await applyChange(explicit);await fail('session_get_v1',{session_id:id},'NOT_FOUND',i1.u);
   const cal=await must(owner,'calendar_get_v1',scope({interval:interval('2027-02-22T00:00:00Z','2027-02-23T00:00:00Z'),resource:{kind:'person',id:i1.p},page:{}}));assert(!cal.items.some(x=>x.id===id));
  });
+ await t.test('P02 center cancellation previews, protects source freshness, releases rights atomically and creates an empty linked replacement',async()=>{
+  const id=sids[0],request={session_id:id,reason:'Center explicit cancellation'},cp=()=>must(owner,'session_cancel_preview_v1',scope(request)),applyCancel=(p,k=key(),u=owner)=>mut('session_cancel_apply_v1',{preview:token(p)},k,u);
+  await fail('session_cancel_preview_v1',request,'FORBIDDEN',staff.u);
+  const before=await counts(),p=await cp();assert.deepEqual(await counts(),before);assert(p.effects.some(e=>e.entity.id===reservation&&e.action==='cancel'));
+  await fail('session_cancel_apply_v1',{preview:token(p)},'PREVIEW_STALE',cm.u);
+  await fail('session_cancel_apply_v1',{center_id:c2,preview:token(p)},'PREVIEW_STALE');
+  await db.query('update core.reservations set version=version+1 where id=$1',[reservation]);await fail('session_cancel_apply_v1',{preview:token(p)},'PREVIEW_STALE');
+  const p2=await cp(),k=key(),beforeFault=await counts();await inject('session_cancel_apply_v1');
+  await fail('session_cancel_apply_v1',{preview:token(p2)},'INTEGRITY_VIOLATION',owner,k);assert.deepEqual(await counts(),beforeFault);assert.equal((await get(id)).state,'planned');await clearFault();
+  const outcomes=await Promise.all([req('session_cancel_apply_v1',{preview:token(p2)},owner,k),req('session_cancel_apply_v1',{preview:token(p2)})]);assert.equal(outcomes[0].result.ok,true,JSON.stringify(outcomes));assert.equal(outcomes[1].result.error.code,'PREVIEW_STALE');
+  assert.equal((await applyCancel(p2,k)).replayed,true);assert.equal((await get(id)).state,'cancelled');
+  assert.equal((await rows('select state from core.reservations where id=$1',[reservation]))[0].state,'cancelled');assert((await ledger()).filter(a=>a.reservation_id===reservation).every(a=>a.state==='released'));
+  assert.equal((await rows("select count(*)::int n from core.notifications where org_id=$1 and subject_id=$2 and recipient_person_id=$3 and kind='session_cancelled_by_center'",[org,id,student.p]))[0].n,1);
+  const replacement={replaces_id:id,interval:interval('2027-02-10T11:00:00Z','2027-02-10T12:00:00Z'),resources:[],capacity:{nominal:8,maximum:10}},rk=key();
+  await fail('replacement_session_create_v1',{...replacement,center_id:c2},'NOT_FOUND');
+  const made=await mut('replacement_session_create_v1',replacement,rk);assert.equal((await mut('replacement_session_create_v1',replacement,rk)).replayed,true);
+  assert.equal((await rows('select replaces_id from core.sessions where id=$1',[made.primary_id]))[0].replaces_id,id);assert.equal((await rows('select count(*)::int n from core.reservations where session_id=$1',[made.primary_id]))[0].n,0);
+  await fail('replacement_session_create_v1',{...replacement,replaces_id:made.primary_id},'INVALID_STATE_TRANSITION');
+ });
  await t.test('revoked Auth session and direct authenticated RPC cannot bypass Edge',async()=>{
   const u=await authUser('program-revoked'),{env}=context();const response=await fetch(env.API_URL+'/auth/v1/logout?scope=global',{method:'POST',headers:{apikey:env.ANON_KEY,authorization:'Bearer '+u.jwt}});assert(response.ok);
   const r=await req('program_preview_v1',{class_id:class1,schedule:spec()},u);assert.equal(r.result.ok,false);assert(['SESSION_REVOKED','AUTH_REQUIRED'].includes(r.result.error.code));

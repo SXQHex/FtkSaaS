@@ -1360,8 +1360,8 @@
     },
     {
       "name": "session_cancel_preview_v1",
-      "status": "contract_only",
-      "external_path": null,
+      "status": "operational_development_limited",
+      "external_path": "/functions/v1/backend-v1/session_cancel_preview_v1",
       "permission": "schedule.manage",
       "features": [
         "F14"
@@ -1372,7 +1372,7 @@
       "runtime_required_features": [],
       "decision_delivery": {
         "accepted_contract": "DS-2026-10-17",
-        "runtime_conformance": "pending",
+        "runtime_conformance": "p02_session_runtime_pending_acceptance",
         "open_dependencies": [],
         "target_request": {
           "$ref": "#/$defs/Request_session_cancel_preview"
@@ -1383,8 +1383,8 @@
     },
     {
       "name": "session_cancel_apply_v1",
-      "status": "contract_only",
-      "external_path": null,
+      "status": "operational_development_limited",
+      "external_path": "/functions/v1/backend-v1/session_cancel_apply_v1",
       "permission": "schedule.manage",
       "features": [
         "F14"
@@ -1395,7 +1395,7 @@
       "runtime_required_features": [],
       "decision_delivery": {
         "accepted_contract": "DS-2026-10-17",
-        "runtime_conformance": "pending",
+        "runtime_conformance": "p02_session_runtime_pending_acceptance",
         "open_dependencies": [],
         "target_request": {
           "$ref": "#/$defs/Request_session_cancel_apply"
@@ -1406,8 +1406,8 @@
     },
     {
       "name": "replacement_session_create_v1",
-      "status": "contract_only",
-      "external_path": null,
+      "status": "operational_development_limited",
+      "external_path": "/functions/v1/backend-v1/replacement_session_create_v1",
       "permission": "schedule.manage",
       "features": [
         "F14"
@@ -1418,7 +1418,7 @@
       "runtime_required_features": [],
       "decision_delivery": {
         "accepted_contract": "DS-2026-10-17",
-        "runtime_conformance": "pending",
+        "runtime_conformance": "p02_session_runtime_pending_acceptance",
         "open_dependencies": [],
         "target_request": {
           "$ref": "#/$defs/Request_replacement_session_create"
