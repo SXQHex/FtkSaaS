@@ -1,5 +1,25 @@
 # CI ölçüm temeli ve sonraki performans işi
 
+## CI-02 aynı kaynakta gerçek sonuç — 20 Ekim 2026
+
+Aday [39412474187](https://github.com/SXQHex/FtkSaaS/actions/runs/39412474187), head150d9fa / tested merge5148558 / tree4b1d49b, attempt1 completed/success. Artifact12262122881 binding + ölçüm içerir; source değişmedi.
+
+| Aynı kaynak/kapsam | Ölçüm |
+|---|---:|
+| Core+dört shard, run oluşturma→son rol bitişi | 11:48 |
+| En uzun API clean adımı | 11:14 |
+| Seri reference job | 38:33 |
+| Seri clean adımı | 38:07 |
+| Her rol için kuyruk | 3 saniye |
+| Checkout/Node/npm hazırlığı | 15–21 saniye |
+| Core+dört shard runner toplamı | 43,60 dakika |
+| Seri reference runner toplamı | 38,55 dakika |
+| Bütün tanısal workflow, resolver/collector/seri dahil | 82,40 runner dakikası; 38:59 elapsed |
+
+Bu tek aynı-kaynak gözleminde bekleme azalırken rol runner maliyeti yaklaşık %13,1 artmıştır. Normal aday/main seri reference istemez. Eski P01 sürelerinden yeni kaynak kazancı çıkarılmadı. Backend reset/migration ve test/seed-health-advisors fazları ayrıca her rolün timings artifact/özetinde tutulur; yukarıdaki hazırlık yalnız checkout/npm'dir.
+
+Main a0325d7 / 39421388153 core+dört shard başarılı, collector ölçümü skipped optional serial job'un olmayan test step'ini okuyarak çöktü. Bu main kabulü değildir. Dar ölçüm filtresi gerçek main metadata’sıyla regresyona alındı; yeni kaynak kabulü bekliyor.
+
 ## CI-02 yeni ölçüm düzeni — sonuç bekliyor
 
 [PR25](https://github.com/SXQHex/FtkSaaS/pull/25) dört bağımsız runner/backend/DB uygular. Ölçüm girdisi 7577b2f / 39401570751 logundaki 15 suite process wall süresidir. Deterministik azalan süre dağıtımı:

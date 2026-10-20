@@ -217,7 +217,7 @@ test('CI-only cumulative proof cannot hide runtime or unknown markdown in later 
  writeFileSync(join(dir,'README.md'),'Final docs');git('add','README.md');git('commit','-m','final docs');assert.equal(run().api.length,apiSuites.length);
 }));
 test('measurement distinguishes queue setup test wall and runner time',()=>{
- const rows=measurements([{name:'clean / api-1',created_at:'2026-01-01T00:00:00Z',started_at:'2026-01-01T00:00:10Z',completed_at:'2026-01-01T00:02:00Z',steps:[{name:'Clean acceptance',started_at:'2026-01-01T00:00:30Z',completed_at:'2026-01-01T00:01:50Z'}]}],'2026-01-01T00:00:00Z');
+ const rows=measurements([{name:'clean / api-1',status:'completed',conclusion:'success',created_at:'2026-01-01T00:00:00Z',started_at:'2026-01-01T00:00:10Z',completed_at:'2026-01-01T00:02:00Z',steps:[{name:'Clean acceptance',started_at:'2026-01-01T00:00:30Z',completed_at:'2026-01-01T00:01:50Z'}]}],'2026-01-01T00:00:00Z');
  assert.equal(rows[0].queue_s,10);assert.equal(rows[0].setup_s,20);assert.equal(rows[0].test_s,80);assert.equal(rows[0].runner_s,110);
 });
 
@@ -239,4 +239,19 @@ test('new-source documentation recovery preserves github-script context getters 
  }},paginate:async(method,args)=>{assert.equal(args.owner,'synthetic');assert.equal(args.repo,'test');return [pr];}};
  await resolveRecovery(g,context,{setOutput:(k,v)=>out[k]=v});
  const b=JSON.parse(out.binding);assert.equal(b.actual,sha);assert.equal(b.head,'H');assert.equal(b.base,'B');assert.equal(b.tree,'T');assert.equal(b.policy_sha,'new-policy');assert.equal(b.kind,'documentation-recovery');
+});
+
+test('routine main collector measures five executed roles and excludes skipped optional serial without weakening mandatory jobs',()=>{
+ const v=valid(),time={created_at:'2026-01-01T00:00:00Z',started_at:'2026-01-01T00:00:03Z',completed_at:'2026-01-01T00:01:00Z'};
+ const jobs=v.jobs.filter(j=>j.name!=='full-clean').map(j=>({...j,...time,steps:j.steps.map(s=>({...s,started_at:'2026-01-01T00:00:10Z',completed_at:'2026-01-01T00:00:50Z'}))}));
+ jobs.push({name:'clean / serial-reference',status:'completed',conclusion:'skipped',run_id:5,run_attempt:1,head_sha:'H',started_at:null,completed_at:null,steps:[]});
+ assert(validateJobs(jobs,v.run,{benchmark:false}));
+ const rows=measurements(jobs,time.created_at);
+ assert.equal(rows.length,5);assert(!rows.some(r=>r.role==='serial-reference'));
+ assert(rows.every(r=>Number.isFinite(r.setup_s)&&Number.isFinite(r.test_s)&&Number.isFinite(r.runner_s)));
+ assert.throws(()=>validateJobs(jobs,v.run,{benchmark:true}),/serial-reference/);
+ for(const conclusion of ['skipped','cancelled','failure']){
+  const broken=structuredClone(jobs);broken[1].conclusion=conclusion;broken[1].steps=[];
+  assert.throws(()=>validateJobs(broken,v.run,{benchmark:false}),/api-1/);
+ }
 });

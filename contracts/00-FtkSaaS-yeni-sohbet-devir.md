@@ -1,6 +1,6 @@
 # FtkSaaS — güncel devir
 
-CI-02 geliştirmesi [PR25](https://github.com/SXQHex/FtkSaaS/pull/25), `ci/ci02-source-bound-shards` dalında. Başlangıç main `d544efe9f88f34edd7d6ce3055ed46d291a55f2c` / 39408606736 test öncesi kaynak kabulünde başarısızdır. Dar belge/PR24 AST kanıtı, ayrı belge recovery, Draft/development ve dört izole shard/toplayıcı uygulandı; yeni kaynak uzak hedefli, bağımsız son inceleme, aday/main kabulü ve güvenilir politika kurulumu bekliyor. P01 done; P02 başlamaz.
+CI-02 PR25 açık kullanıcı kurulum onayıyla main `a0325d7cdace18e3dfbb51691e631de53400724f` kaynağına birleşti. Aday39412474187 başarılı ve gerçek merge ilişkisi main'de doğrulandı. Main39421388153 kaynak/core/dört API başarılıyken yalnız ölçüm toplayıcısında atlanan isteğe bağlı serial-reference nedeniyle çöktü; main kabulü tamamlanmadı. Dar düzeltme `fix/ci02-main-optional-measurement` dalında; 37 politika testi ve gerçek main job metadata regresyonu geçti, yeni hedefli/aday/main kabulü bekliyor. P01 done; P02 başlamaz.
 
 ## 20 Ekim 2026 — P01 birleşti; belge senkronizasyonu
 

@@ -3,7 +3,10 @@ import {validateJobs,coverageHash,roleName,shardPlan} from './shards.mjs';
 
 export function measurements(jobs,created){
  const seconds=(a,b)=>(Date.parse(b)-Date.parse(a))/1000;
- return jobs.filter(j=>['core','api-1','api-2','api-3','api-4','serial-reference'].includes(roleName(j))).map(j=>{
+ // validateJobs runs first and rejects every skipped/failed required role.
+ // An optional serial-reference is intentionally skipped on routine main runs;
+ // it has neither a Clean acceptance step nor an execution duration to measure.
+ return jobs.filter(j=>j.status==='completed'&&j.conclusion==='success'&&['core','api-1','api-2','api-3','api-4','serial-reference'].includes(roleName(j))).map(j=>{
   const step=j.steps.find(s=>s.name==='Clean acceptance');
   return {role:roleName(j),queue_s:seconds(j.created_at,j.started_at),since_run_s:seconds(created,j.started_at),setup_s:seconds(j.started_at,step.started_at),test_s:seconds(step.started_at,step.completed_at),runner_s:seconds(j.started_at,j.completed_at),finished:j.completed_at};
  });
