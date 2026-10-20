@@ -20004,7 +20004,7 @@
           ]
         },
         "amount_minor": {
-          "$ref": "#/$defs/Money"
+          "$ref": "#/$defs/SignedMoney"
         },
         "previous_id": {
           "anyOf": [
@@ -20465,7 +20465,7 @@
           "$ref": "#/$defs/FtkUuid"
         },
         "amount_minor": {
-          "$ref": "#/$defs/Money"
+          "$ref": "#/$defs/SignedMoney"
         },
         "previous_id": {
           "anyOf": [
@@ -41247,6 +41247,11 @@
         "corrections"
       ],
       "additionalProperties": false
+    },
+    "SignedMoney": {
+      "type": "string",
+      "pattern": "^(0|-?[1-9][0-9]{0,18})$",
+      "x-validation": "-9223372036854775808<=int(value)<=9223372036854775807"
     }
   },
   "x-contract": {
@@ -53791,7 +53796,7 @@
             "$ref": "#/$defs/Request_sale_refund_preview"
           }
         },
-        "runtime_notes": "P03 linked finance implementation; targeted and final source acceptance tracked separately in production-queue."
+        "runtime_notes": "P03 source implementation; runtime acceptance, candidate and main are tracked separately in docs/production-queue.md."
       },
       {
         "name": "sale_refund_apply_v1",
@@ -53912,7 +53917,7 @@
             "$ref": "#/$defs/Request_sale_refund_apply"
           }
         },
-        "runtime_notes": "P03 linked finance implementation; targeted and final source acceptance tracked separately in production-queue."
+        "runtime_notes": "P03 source implementation; runtime acceptance, candidate and main are tracked separately in docs/production-queue.md."
       },
       {
         "name": "sale_change_preview_v1",
@@ -54540,7 +54545,7 @@
             "$ref": "#/$defs/Request_finance_get"
           }
         },
-        "runtime_notes": "P03 linked finance implementation; targeted and final source acceptance tracked separately in production-queue."
+        "runtime_notes": "P03 source implementation; runtime acceptance, candidate and main are tracked separately in docs/production-queue.md."
       },
       {
         "name": "collection_record_v1",
@@ -54769,7 +54774,7 @@
             "$ref": "#/$defs/Request_collection_correct_preview"
           }
         },
-        "runtime_notes": "P03 linked finance implementation; targeted and final source acceptance tracked separately in production-queue."
+        "runtime_notes": "P03 source implementation; runtime acceptance, candidate and main are tracked separately in docs/production-queue.md."
       },
       {
         "name": "collection_correct_apply_v1",
@@ -54888,7 +54893,7 @@
             "$ref": "#/$defs/Request_collection_correct_apply"
           }
         },
-        "runtime_notes": "P03 linked finance implementation; targeted and final source acceptance tracked separately in production-queue."
+        "runtime_notes": "P03 source implementation; runtime acceptance, candidate and main are tracked separately in docs/production-queue.md."
       },
       {
         "name": "student_credit_refund_v1",
@@ -55571,7 +55576,7 @@
             "$ref": "#/$defs/Request_instructor_payment_record"
           }
         },
-        "runtime_notes": "P03 linked finance implementation; targeted and final source acceptance tracked separately in production-queue."
+        "runtime_notes": "P03 source implementation; runtime acceptance, candidate and main are tracked separately in docs/production-queue.md."
       },
       {
         "name": "instructor_payment_correct_v1",
@@ -55688,7 +55693,7 @@
             "$ref": "#/$defs/Request_instructor_payment_correct"
           }
         },
-        "runtime_notes": "P03 linked finance implementation; targeted and final source acceptance tracked separately in production-queue."
+        "runtime_notes": "P03 source implementation; runtime acceptance, candidate and main are tracked separately in docs/production-queue.md."
       },
       {
         "name": "leads_list_v1",

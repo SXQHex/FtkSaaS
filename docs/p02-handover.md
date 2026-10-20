@@ -1,5 +1,7 @@
 # P02 paket ve seans yaşam döngüsü
 
+P02 kapanış: PR28 main cc4878d09e45204dbc13ccfe1324b38b14548167 ve aynı main39461804543 completed/success ile done;469 test,40 migration. Aşağıdaki geliştirme kaynaklarının pending notları tarihsel snapshot’tır. Güncel P03 değişiklikleri ve kabulü üretim kuyruğunda ayrı izlenir.
+
 Hedefli39447440608 (d313538):27 DB testi ve P02 seans/hak/sonlandırma-yenileme/değişim/bekleme-iade vakaları geçti. Dondurma vakası, başarılı korunan attendance tüketiminden sonra doğrudan node-pg bigint sonucu "31" ile31 karşılaştırmasında durdu; Number(...) test düzeltmesi eklendi. Runtime kaynağı değişmedi. Yeni head hedefli sonucu, tek aday clean ve main kabulü hâlâ bekler; eski koşu genel başarı değildir.
 
 
