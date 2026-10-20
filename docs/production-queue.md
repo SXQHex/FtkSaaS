@@ -13,7 +13,7 @@ Güncel envanter **199 / 118 çağrılabilir / 81 contract_only / 34 migration**
 | P00 | İlk CI ayrımı | — | done | #19; sonraki Action bakımı #23 kapalı |
 | P01 | Talep, rezervasyon ve bekleme | 14 | done | #22; aday 39327134872 ve aynı main 39401570751 completed/success doğrulandı |
 | CI-02 | Dört shard, bölüm/Draft/development, yalnız-belge kabulü | — | done | #25/#26; main0ade787 / 39425915555 completed/success; 462 test, 34 migration |
-| P02 | Paket ve seans yaşam döngüsü | 15 | queued | CI-02 kapandı; kullanıcı talimatıyla henüz başlanmadı |
+| P02 | Paket ve seans yaşam döngüsü | 15 | in_progress | feature/p02-package-session-lifecycle; bütün15 API bitince tek aday clean |
 | P03 | Finans ve eğitmen ödemeleri | 7 | queued | P02 sonrası |
 | P04 | CRM ve public başvuru | 11 | queued | P03 sonrası |
 | P05 | Belge, bildirim ve otomasyon | 13 | queued | P04 sonrası |
@@ -73,7 +73,7 @@ PR25 dört izole shard/belge kabulü/Draft-development politikasını kurdu; PR2
 
 ### P02 — Paket ve seans yaşam döngüsü
 
-Ortak üretim promptunu uygula. Durum: queued.
+Ortak üretim promptunu uygula. Durum: in_progress; tek Draft/development PR. Bütün P02 bitmeden aday full clean veya merge yok.
 
 **Mevcut sözleşme API'leri (15):**
 
