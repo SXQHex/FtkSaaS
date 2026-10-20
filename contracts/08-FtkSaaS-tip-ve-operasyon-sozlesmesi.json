@@ -67098,7 +67098,25 @@
         "generation": "uuidv7"
       },
       {
+        "path": "#/$defs/DebtSummary/properties/center_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
         "path": "#/$defs/CashSummary/properties/id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/CashSummary/properties/center_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/CashSummary/properties/previous_id/anyOf/0",
         "origin": "ftksaas",
         "acceptance": "generic_uuid",
         "generation": "uuidv7"
@@ -74592,6 +74610,18 @@
         "generation": "uuidv7"
       },
       {
+        "path": "#/$defs/Table_instructor_payments/properties/previous_id/anyOf/0",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Table_instructor_payments/properties/operation_id/anyOf/0",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
         "path": "#/$defs/Table_earning_allocations/properties/id",
         "origin": "ftksaas",
         "acceptance": "generic_uuid",
@@ -74617,6 +74647,12 @@
       },
       {
         "path": "#/$defs/Table_earning_allocations/properties/earning_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Table_earning_allocations/properties/previous_id/anyOf/0",
         "origin": "ftksaas",
         "acceptance": "generic_uuid",
         "generation": "uuidv7"
@@ -80143,6 +80179,24 @@
       },
       {
         "path": "#/$defs/SaleLifecyclePreviewDetails/properties/product_version_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/P03PaymentCorrectionView/properties/id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/P03PaymentCorrectionView/properties/previous_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/P03PaymentView/properties/id",
         "origin": "ftksaas",
         "acceptance": "generic_uuid",
         "generation": "uuidv7"
