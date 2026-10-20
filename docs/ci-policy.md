@@ -8,9 +8,13 @@ Yeni kaynakta açık `backend.yml` workflow_dispatch + exact `merge_sha`, geçmi
 
 Cleanup ancak start denenmiş ve CLI mevcutsa çalışır. Draft/development aday/merge kapısı kapalıdır; durumdan çıkış kendiliğinden full clean değildir.
 
+## CI-02 dört shard dilimi
+
+[CI-02 devri](ci02-handover.md) güncel uygulama ve açık kabul kaynağıdır. core + api-1…4 ayrı runner/backend/DB kullanır; full-clean toplayıcısı gerçek job/step, head/run/attempt ve coverage kanıtı ister. Aday/main aynı reusable workflow kapsamındadır. Açık ci:measure-serial aynı kaynakta karşılaştırma ekler; istenmişse zorunlu sonuçtur. Eksik/skipped/failure ve önceki attempt karışımı kapalıdır. CI-only hedefli seçim yalnız sonlu incelenmiş harness + kaynak bağlı güvenli belge farkı için verify/politika negatiflerine iner; karma/bilinmeyen fark daraltılmaz.
+
 ## Son karar ve uygulama sınırı
 
-[CI-2026-10-20](decisions/CI-2026-10-20.md) kabul edilmiş hedeftir; **CI-02 uygulaması bekliyor**. Bu belge eşitlemesi workflow/gate değiştirmez. P01 PR #22 birleşmiştir; durum/kanıt [güncel devirde](../contracts/00-FtkSaaS-yeni-sohbet-devir.md). Yeni politika önceki her-main-clean ve tek PR'ye özgü belge istisnasını belirtilen kapsamda değiştirir; uygulanmamış kontrol etkin gösterilmez.
+[CI-2026-10-20](decisions/CI-2026-10-20.md) kabul edilmiş hedeftir; **CI-02 PR25 uygulandı; hedefli/aday/main ve güvenilir kurulum kabulü bekliyor**. Bu belge eşitlemesi workflow/gate değiştirmez. P01 PR #22 birleşmiştir; durum/kanıt [güncel devirde](../contracts/00-FtkSaaS-yeni-sohbet-devir.md). Yeni politika önceki her-main-clean ve tek PR'ye özgü belge istisnasını belirtilen kapsamda değiştirir; uygulanmamış kontrol etkin gösterilmez.
 
 | Olay/durum | Kabul edilmiş hedef | Main 7577b2f uygulaması |
 |---|---|---|
@@ -67,7 +71,7 @@ Merge için normal iki-parent merge commit kullanılır. Main kontrolü artifact
 
 [Ölçüm değerlendirmesi](ci-performance.md) eski logların sayısal temelini ve ölçülmemiş alanları ayırır. `FTK_TEST_TIMINGS=1`, yalnız test helper’ında API operation/Auth/fixture toplam–maksimum sürelerini, sayıları ve suite process wall süresini kaydeder. Body, token, e-posta, kişi/tenant kimliği kaydedilmez. İstek başlığına kadar süre ayrıca belirtilir; API/fixture süresi body decode’u kapsar; iç içe süreler toplanıp toplam duvar süresi diye sunulmaz.
 
-Mevcut test-concurrency=2 korunur; shard henüz etkin değildir. Ortak PostgreSQL üzerinde global trigger/function kuran fixture’lar nedeniyle CI-02 dört ayrı runner/backend/DB kullanacaktır. Suite envanterinin eksiksiz ve tekrarsız bölünmesi, bütün clean yükümlülükleri ve kaynak bağlı toplayıcı zorunludur. Aday/main aynı kapsamı kullanır; ölçülmemiş hız kazancı vaat edilmez.
+Main kurulumunda henüz shard etkin değildir; PR25 dört izole shard uygulamasını içerir. Mevcut test-concurrency=2 korunur. Ortak PostgreSQL üzerinde global trigger/function kuran fixture’lar nedeniyle CI-02 dört ayrı runner/backend/DB kullanacaktır. Suite envanterinin eksiksiz ve tekrarsız bölünmesi, bütün clean yükümlülükleri ve kaynak bağlı toplayıcı zorunludur. Aday/main aynı kapsamı kullanır; ölçülmemiş hız kazancı vaat edilmez.
 
 ## Full clean sırasında kullanıcıya devir — 19 Ekim 2026 son talimatı
 

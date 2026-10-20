@@ -4,6 +4,7 @@ on:
     branches-ignore: [main]
 permissions:
   contents: read
+  pull-requests: read
 concurrency:
   group: development-${{ github.ref }}
   cancel-in-progress: true
@@ -32,3 +33,48 @@ jobs:
         run: node scripts/ci/summarize-timings.mjs
       - if: always()
         run: node scripts/ci/cleanup.mjs
+
+  documentation-recovery:
+    if: github.ref == 'refs/heads/ci/ci02-source-bound-shards'
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          persist-credentials: false
+      - id: recovery
+        uses: actions/github-script@ed597411d8f924073f98dfc5c65a23a2325f34cd
+        with:
+          script: |
+            const audit=await import(`${process.env.GITHUB_WORKSPACE}/scripts/ci/recovery.mjs`);
+            await audit.resolveRecovery(github,{...context,payload:{inputs:{merge_sha:'d544efe9f88f34edd7d6ce3055ed46d291a55f2c'}}},core);
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          ref: ${{ steps.recovery.outputs.merge }}
+          persist-credentials: false
+      - name: Verify tested merge
+        env:
+          EXPECTED: ${{ steps.recovery.outputs.merge }}
+        run: test "$(git rev-parse HEAD)" = "$EXPECTED"
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1
+        with:
+          node-version: '24.19.0'
+          cache: npm
+      - run: npm ci
+      - name: Documentation recovery acceptance
+        run: |
+          node scripts/ci/docs-check.mjs README.md
+          npm run verify
+      - env:
+          BINDING: ${{ steps.recovery.outputs.binding }}
+        run: |
+          mkdir -p .ci
+          node -e "require('fs').writeFileSync('.ci/binding.json',process.env.BINDING)"
+          echo 'Source-bound documentation recovery; no full clean; original failed run unchanged.' >> "$GITHUB_STEP_SUMMARY"
+          cat .ci/binding.json >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9
+        with:
+          name: documentation-recovery-${{ github.run_attempt }}
+          path: .ci/binding.json
+          if-no-files-found: error
+          include-hidden-files: true
+          archive: true

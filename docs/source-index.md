@@ -1,6 +1,6 @@
 # FtkSaaS kaynak indeksi
 
-CI-02 geliştirmesi `ci/ci02-source-bound-shards` dalında: başlangıç main `d544efe9f88f34edd7d6ce3055ed46d291a55f2c`, main run 39408606736 kaynak kanıtı adımında başarısız; test çalışmadı. P01 done kalır. Dar belge sınıflandırması/PR24 renderer AST kanıtı, ayrı belge kabulü ve koşullu cleanup uygulandı; yeni kaynak hedefli/uzak kabulü ve güvenilir politika kurulumu bekliyor. Dört shard henüz bu dilimde uygulanmadı; P02 başlamaz.
+CI-02 geliştirmesi [PR25](https://github.com/SXQHex/FtkSaaS/pull/25), `ci/ci02-source-bound-shards` dalında. Başlangıç main `d544efe9f88f34edd7d6ce3055ed46d291a55f2c` / 39408606736 test öncesi kaynak kabulünde başarısızdır. Dar belge/PR24 AST kanıtı, ayrı belge recovery, Draft/development ve dört izole shard/toplayıcı uygulandı; yeni kaynak uzak hedefli, bağımsız son inceleme, aday/main kabulü ve güvenilir politika kurulumu bekliyor. P01 done; P02 başlamaz.
 
 20 Ekim 2026: uygulama main `7577b2f1873c6b1fcf83390bfa94a34374c44082`, 199/118/81 ve 34 migration. P01 birleşti; aynı main clean 39401570751 completed/success kanıtı [güncel devirde](../contracts/00-FtkSaaS-yeni-sohbet-devir.md) yazılıdır; P01 done. Sırada CI-02 → P02 vardır. [CI-2026-10-20](decisions/CI-2026-10-20.md): dört izole shard, Draft/development ve yalnız-belge clean istisnası kabul edildi; workflow uygulaması bekliyor. Eski snapshot/hosted sayıları güncel uygulama değildir.
 
@@ -58,6 +58,8 @@ Her uygulama PR’si etkilediği sözleşmeleri, envanteri, kalan işleri ve dev
 [Hesaplaşma devri](settlement-handover.md) dokuz API, sabit kredi dilimi, geç kaynak bağlama, ayrı A/B yetkisi ve atomik onayı tanımlar. Son kaynak kabulü PR head/merge CI ile doğrulanır.
 
 [CI çalışma politikası](ci-policy.md): hızlı/hedefli geliştirme, açık son aday clean’i, kaynak bağlı merge kapısı ve main clean. [Performans ölçümü](ci-performance.md) eski log temeli ile yeni ölçüm alanlarını ayırır. Bu politika önceki otomatik her commit/PR clean ifadelerinin yerine geçer.
+
+[CI-02 teknik devri](ci02-handover.md) belge kurtarma, dar renderer kanıtı, dört shard/toplayıcı, ölçüm ve güvenilir kurulum sınırını taşır.
 
 ## Aktif üretim sırası
 

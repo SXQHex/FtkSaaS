@@ -1,12 +1,19 @@
 import fs from 'node:fs';
 import assert from 'node:assert/strict';
 import {spawnSync} from 'node:child_process';
+import {apiSuites} from './ci/select-tests.mjs';
+import {shardPlan,coverageHash} from './ci/shards.mjs';
 import {stackStatus,connect} from './db.mjs';
 function run(command,args,options={}) {
  const r=spawnSync(command,args,{stdio:'inherit',...options});
  if(r.error)throw r.error;
  if(r.status!==0)throw new Error('CLEAN_ACCEPTANCE_STEP_FAILED: '+command+' '+args.join(' '));
 }
+const args=process.argv.slice(2),role=args[0]??'serial';
+if(!['serial','core','api'].includes(role)||args.length>(role==='api'?2:1))throw Error('Unknown clean role/arguments');
+const shard=role==='api'?shardPlan().find(b=>String(b.shard)===args[1]):null;
+if(role==='api'&&!shard)throw Error('Unknown shard');
+console.log('Clean coverage:',coverageHash(),'role:',role,'shard:',shard?.shard??'none');
 run('npm',['run','dev:start']);
 const url=stackStatus().env?.DB_URL;
 if(!url||!['127.0.0.1','localhost'].includes(new URL(url).hostname))throw new Error('LOCAL_DB_REQUIRED');
@@ -23,7 +30,13 @@ try {
  for(const table of ['core.organizations','core.operation_receipts','auth.users'])assert.equal((await db.query('select count(*)::int n from '+table)).rows[0].n,0,'Reset must remove fixture data: '+table);
  console.log('Clean database confirmed: '+actual.length+' ordered migrations; no organizations, receipts or Auth users');
 } finally { await db.end(); }
-run('npm',['test']);
+if(role!=='api'){
+ run('node',['scripts/ci/docs-check.mjs','README.md']);
+ run('npm',['run','verify']);
+ run('npm',['run','test:db']);
+}
+if(role!=='core')run('node',['--test','--test-concurrency=2',...(shard?.suites??apiSuites)]);
+if(role!=='api'){
 run('npm',['run','dev:seed']);
 run('npm',['run','dev:health']);
 run('npm',['run','db:advisors']);
@@ -31,3 +44,6 @@ run('npm',['run','db:advisors']);
 const report=JSON.parse(fs.readFileSync('reports/environment.json','utf8'));
 assert(report.checks.every(x=>x.passed));
 console.log('Clean acceptance completed: migrations, tests, synthetic seed and service health');
+
+}
+console.log('Completed clean role:',role,shard?.shard??'',coverageHash());

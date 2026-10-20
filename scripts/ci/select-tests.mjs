@@ -2,6 +2,7 @@ import fs from 'node:fs';
 import {execFileSync} from 'node:child_process';
 import {pathToFileURL} from 'node:url';
 import {analyzeDelta} from './delta-analysis.mjs';
+import {documentScope} from './document-scope.mjs';
 export const apiSuites = [
  'api-acceptance','event-payment','event-cancellation','registry','person-registry',
  'room-role-registry','availability-policies','schedule-reads','program-session-lifecycle',
@@ -29,8 +30,16 @@ export function parseChanges(z) {
   if(/^[RC]/.test(status)){const path=fields[i++];if(!path)throw Error('MISSING_RENAME_PATH');out.push({status,path});}
  }return out;
 }
-export function select(changes,{diffAvailable=true,headMatches=true,evidence}={}) {
+// Finite reviewed CI harness surface. A mixed runtime delta still takes the
+// normal dependency graph; an unknown CI-looking path still expands safely.
+export const ciSources=new Set([
+ '.github/workflows/backend.yml','.github/workflows/ci-fast.yml','.github/workflows/ci-full.yml','.github/workflows/ci-gate.yml','.github/workflows/ci-docs.yml','.github/workflows/clean-suite.yml',
+ 'scripts/ci/select-tests.mjs','scripts/ci/delta-analysis.mjs','scripts/ci/run-targeted.mjs','scripts/ci/gate.mjs','scripts/ci/source.mjs','scripts/ci/document-scope.mjs','scripts/ci/document-paths.json','scripts/ci/renderer-proof.py','scripts/ci/recovery.mjs','scripts/ci/cleanup.mjs','scripts/ci/shards.mjs','scripts/ci/suite-durations.json','scripts/ci/collect.mjs','scripts/ci/timings.mjs','scripts/ci/summarize-timings.mjs','scripts/ci/reset-local.mjs','scripts/ci/docs-check.mjs',
+ 'scripts/test-clean.mjs','scripts/start-dev.mjs','tests/ci-policy.test.mjs'
+]);
+export function select(changes,{diffAvailable=true,headMatches=true,evidence,ciOnly=false}={}) {
  const reasons=[],chosen=new Set();let structural=false,broad=false;const docs=[];
+ if(ciOnly&&diffAvailable&&headMatches&&changes.length)return {structural:true,db:false,api:[],priority:[],docs:changes.filter(c=>c.path.endsWith('.md')).map(c=>c.path),broad:false,reasons:['Cumulative source proof: only finite reviewed CI harness and documentation; policy/structural negatives, full runtime acceptance at explicit final candidate'],analysis_notes:[]};
  const all=why=>{broad=true;structural=true;reasons.push(why);};
  if(!diffAvailable||!headMatches)all('Missing diff/base or changed head: all DB/API regressions');
  if(!Array.isArray(changes)||!changes.length)all('Empty/unknown change set: all DB/API regressions');
@@ -72,13 +81,16 @@ if(import.meta.url===pathToFileURL(process.argv[1]??'').href){
   if(!/^[a-f0-9]{40}$/.test(from??'')||!head)throw Error('NO_BASE');
   changes=parseChanges(execFileSync('git',['diff','--name-status','-z','--find-renames',from,head],{encoding:'utf8'}));
  }catch{available=false;}
- let evidence;
+ let evidence,ciOnly=false;
  if(available&&matches){
   const cache=new Map();
   const read=(side,path)=>{const key=side+':'+path;if(!cache.has(key)){try{cache.set(key,execFileSync('git',['show',(side==='base'?from:head)+':'+path],{encoding:'utf8',maxBuffer:20*1024*1024,stdio:['ignore','pipe','pipe']}));}catch{cache.set(key,null);}}return cache.get(key);};
+  const remainder=changes.filter(c=>!ciSources.has(c.path));
+  const mode=(side,path)=>{try{return execFileSync('git',['ls-tree',side==='base'?from:head,'--',path],{encoding:'utf8'}).split(' ')[0];}catch{return null;}};
+  ciOnly=changes.some(c=>ciSources.has(c.path))&&(!remainder.length||documentScope(remainder,read,mode).safe);
   evidence=analyzeDelta(changes,read,modules.map(p=>({...p,suites:p.suites.map(n=>'tests/'+n+'.test.mjs')})));
  }
- const plan=select(changes,{diffAvailable:available,headMatches:matches,evidence});fs.mkdirSync('.ci',{recursive:true});fs.writeFileSync('.ci/selection.json',JSON.stringify(plan,null,2)+'\n');
+ const plan=select(changes,{diffAvailable:available,headMatches:matches,evidence,ciOnly});fs.mkdirSync('.ci',{recursive:true});fs.writeFileSync('.ci/selection.json',JSON.stringify(plan,null,2)+'\n');
  const summary='## Targeted selection\n\n'+plan.reasons.map(x=>'- '+x).join('\n')+'\n\nDB reset: '+plan.db+'\n\nSelected API suites:\n'+(plan.api.map(x=>'- '+x).join('\n')||'- none')+'\n';
  const details='\nPriority API suites (failure stops remaining regressions):\n'+(plan.priority.map(p=>'- '+p).join('\n')||'- none')+'\n'+plan.analysis_notes.map(n=>'- '+n).join('\n')+'\n';
  if(process.env.GITHUB_STEP_SUMMARY)fs.appendFileSync(process.env.GITHUB_STEP_SUMMARY,summary+details);console.log(summary+details);

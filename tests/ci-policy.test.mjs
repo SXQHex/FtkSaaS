@@ -11,7 +11,7 @@ test('contract generator/shared types cannot silently omit structural coverage',
 test('rename and deletion cover both source and destination; malformed diffs reject',()=>{const c=parseChanges('R100\0database/instructor-earnings.sql\0docs/moved.md\0D\0tests/api-client.mjs\0');assert.equal(c.length,3);assert.deepEqual(select(c).api,apiSuites);assert.throws(()=>parseChanges('R100\0one\0'));});
 test('missing diff, empty set, missing path and moved checkout expand to all suites',()=>{for(const p of [select([]),select([{status:'M'}]),select([{path:'docs/a.md'}],{diffAvailable:false}),select([{path:'docs/a.md'}],{headMatches:false})])assert.deepEqual(p.api,apiSuites);});
 test('API suite inventory exactly matches package test command; no shard loses tests',()=>{const command=JSON.parse(fs.readFileSync('package.json')).scripts['test:api'];assert.deepEqual([...command.matchAll(/tests\/[\w-]+\.test\.mjs/g)].map(m=>m[0]).sort(),[...apiSuites].sort());});
-const valid=()=>({binding:{pr:1,head:'H',base:'B',merge:'M',tree:'T',run_id:5,attempt:1},pr:{number:1,head:{sha:'H'},base:{sha:'B'}},run:{id:5,run_attempt:1,head_sha:'H',event:'pull_request',path:'.github/workflows/ci-full.yml',status:'completed',conclusion:'success'},tested:{sha:'M',tree:{sha:'T'},parents:[{sha:'B'},{sha:'H'}]},currentTree:'T',workflowMatches:true,jobs:[{name:'full-clean',conclusion:'success',steps:[{name:'Full clean acceptance',conclusion:'success'},{name:'Verify tested merge',conclusion:'success'}]}]});
+const valid=()=>({binding:{kind:'full',profile:'four-isolated-v1',coverage:coverageHash(),pr:1,head:'H',base:'B',merge:'M',tree:'T',run_id:5,attempt:1},pr:{number:1,head:{sha:'H'},base:{sha:'B'}},run:{id:5,run_attempt:1,head_sha:'H',event:'pull_request',path:'.github/workflows/ci-full.yml',status:'completed',conclusion:'success'},tested:{sha:'M',tree:{sha:'T'},parents:[{sha:'B'},{sha:'H'}]},currentTree:'T',workflowMatches:true,jobs:['core','api-1','api-2','api-3','api-4','full-clean'].map(name=>({name,status:'completed',conclusion:'success',run_id:5,run_attempt:1,head_sha:'H',steps:[{name:name==='full-clean'?'Verify all required jobs':'Clean acceptance',conclusion:'success'},{name:'Verify tested merge',conclusion:'success'}]}))});
 test('merge acceptance binds live head base merge tree workflow and attempt',()=>{assert(validateBinding(valid()));for(const mutate of [v=>v.pr.head.sha='new',v=>v.pr.base.sha='new',v=>v.currentTree='new',v=>v.binding.attempt=2,v=>v.run.event='push',v=>v.workflowMatches=false,v=>v.tested.parents[1].sha='other']){const v=valid();mutate(v);assert.throws(()=>validateBinding(v));}});
 test('label, skipped job or skipped clean step never constitutes acceptance',()=>{for(const mutate of [v=>v.jobs=[],v=>v.jobs[0].conclusion='skipped',v=>v.jobs[0].steps[0].conclusion='skipped',v=>v.run.conclusion='cancelled']){const v=valid();mutate(v);assert.throws(()=>validateBinding(v));}});
 test('workflow event boundaries prevent duplicate expensive runs and cross-PR cancellation',()=>{const fast=fs.readFileSync('.github/workflows/ci-fast.yml','utf8'),full=fs.readFileSync('.github/workflows/ci-full.yml','utf8'),main=fs.readFileSync('.github/workflows/backend.yml','utf8');assert(!fast.includes('pull_request:'));assert(full.includes('types: [labeled]'));assert(full.includes("github.event.label.name == 'ci:full-clean'"));assert(fast.includes('development-${{ github.ref }}'));assert(main.includes('main-acceptance-${{ github.sha }}'));assert(main.includes('cancel-in-progress: false'));});
@@ -179,3 +179,46 @@ test('documentation proof is separate, source bound and rejects stale/missing/sk
  assert(validateDocumentBinding(v));
  for(const mutate of [x=>x.binding.kind='full',x=>x.pr.base.sha='new',x=>x.binding.attempt=2,x=>x.currentTree='new',x=>x.workflowMatches=false,x=>x.jobs=[],x=>x.jobs[0].steps[0].conclusion='skipped']){const x=structuredClone(v);mutate(x);assert.throws(()=>validateDocumentBinding(x));}
 });
+
+import {shardPlan,coverageHash,validateJobs} from '../scripts/ci/shards.mjs';
+import {measurements} from '../scripts/ci/collect.mjs';
+test('four deterministic measured shards partition every suite exactly once with bounded weight imbalance',()=>{
+ const bins=shardPlan();assert.equal(bins.length,4);
+ assert.deepEqual(bins.flatMap(b=>b.suites).sort(),[...apiSuites].sort());
+ assert.equal(new Set(bins.flatMap(b=>b.suites)).size,apiSuites.length);
+ assert.deepEqual(bins,shardPlan([...apiSuites].reverse()));
+ assert(Math.max(...bins.map(b=>b.weight))/Math.min(...bins.map(b=>b.weight))<1.08);
+ assert.throws(()=>shardPlan([...apiSuites,apiSuites[0]]));
+ assert.throws(()=>shardPlan([...apiSuites,'tests/unknown.test.mjs']));
+ assert.throws(()=>shardPlan(apiSuites.slice(1)));
+});
+test('all required shard jobs must execute in the same run attempt and head; benchmark cannot be omitted',()=>{
+ const v=valid();assert(validateJobs(v.jobs,v.run,{collector:true}));
+ for(const mutate of [x=>x.jobs.splice(2,1),x=>x.jobs.push(structuredClone(x.jobs[1])),x=>x.jobs[1].conclusion='skipped',x=>x.jobs[2].conclusion='cancelled',x=>x.jobs[3].conclusion='failure',x=>x.jobs[4].run_attempt=2,x=>x.jobs[4].run_id=6,x=>x.jobs[4].head_sha='other',x=>x.jobs[4].steps[0].conclusion='skipped',x=>x.binding.coverage='other',x=>x.binding.benchmark=true]){
+  const x=valid();mutate(x);assert.throws(()=>validateBinding(x));
+ }
+});
+test('reusable full clean retains all obligations and isolated setup; final trigger never comes from readiness',()=>{
+ const clean=fs.readFileSync('.github/workflows/clean-suite.yml','utf8'),runner=fs.readFileSync('scripts/test-clean.mjs','utf8');
+ assert(clean.includes('shard: [1, 2, 3, 4]'));assert(clean.includes('fail-fast: false'));assert(!clean.includes('max-parallel: 1'));
+ assert(clean.includes('needs: [core, api, serial-reference]'));assert(clean.includes('if: always()'));assert(clean.includes('Verify all required jobs'));
+ for(const op of ['verify','test:db','dev:seed','dev:health','db:advisors'])assert(runner.includes("['run','"+op+"']"));
+ assert(runner.includes("['db','reset','--local','--no-seed','--yes']"));assert(runner.includes("'auth.users'"));
+ const full=fs.readFileSync('.github/workflows/ci-full.yml','utf8'),docs=fs.readFileSync('.github/workflows/ci-docs.yml','utf8'),gate=fs.readFileSync('.github/workflows/ci-gate.yml','utf8');
+ assert(full.includes("github.event.pull_request.draft == false"));assert(full.includes("'development'"));assert(!full.includes('ready_for_review'));assert(!full.includes('synchronize'));
+ assert(!docs.includes('test:clean'));assert(gate.includes('converted_to_draft'));assert(gate.includes("branches: [main]"));assert(gate.includes("ref: main"));
+});
+test('CI-only cumulative proof cannot hide runtime or unknown markdown in later documentation commits',()=>fixture((dir,git)=>{
+ mkdirSync(join(dir,'.github/workflows'),{recursive:true});writeFileSync(join(dir,'.github/workflows/ci-full.yml'),'# synthetic harness');git('add','.');git('commit','-m','ci');
+ const run=()=>{execFileSync(process.execPath,[resolve('scripts/ci/select-tests.mjs'),'unused',git('rev-parse','HEAD')],{cwd:dir});return JSON.parse(fs.readFileSync(join(dir,'.ci/selection.json')));};
+ assert.equal(run().db,false);assert(run().structural);
+ writeFileSync(join(dir,'README.md'),'Later docs');git('add','README.md');git('commit','-m','docs');assert.equal(run().db,false);
+ mkdirSync(join(dir,'database'));writeFileSync(join(dir,'database/kernel.sql'),'-- runtime');git('add','database');git('commit','-m','runtime');assert.equal(run().db,true);
+ writeFileSync(join(dir,'README.md'),'Final docs');git('add','README.md');git('commit','-m','final docs');assert.equal(run().api.length,apiSuites.length);
+}));
+test('measurement distinguishes queue setup test wall and runner time',()=>{
+ const rows=measurements([{name:'clean / api-1',created_at:'2026-01-01T00:00:00Z',started_at:'2026-01-01T00:00:10Z',completed_at:'2026-01-01T00:02:00Z',steps:[{name:'Clean acceptance',started_at:'2026-01-01T00:00:30Z',completed_at:'2026-01-01T00:01:50Z'}]}],'2026-01-01T00:00:00Z');
+ assert.equal(rows[0].queue_s,10);assert.equal(rows[0].setup_s,20);assert.equal(rows[0].test_s,80);assert.equal(rows[0].runner_s,110);
+});
+
+test('every test file is accounted for in structural DB or API clean obligations',()=>{const actual=fs.readdirSync('tests').filter(p=>p.endsWith('.test.mjs')).map(p=>'tests/'+p).sort();assert.deepEqual(actual,[...apiSuites,...['contract','governance','ci-policy','database','event-scope'].map(n=>'tests/'+n+'.test.mjs')].sort());});

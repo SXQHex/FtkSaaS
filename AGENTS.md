@@ -1,5 +1,7 @@
 # FtkSaaS çalışma kuralları
 
+CI-02 PR25 geliştirmesi ve açık kabul sınırı [teknik devirde](docs/ci02-handover.md) tutulur. Yeni otomasyon dalda uygulanmıştır; trusted main kurulumu, aday/main ve ölçüm tamamlanmadan etkin kabul edilmez. P02 CI-02 kabulünden sonra.
+
 ## Güncel üretim ve kabul — 20 Ekim 2026
 
 P01 [PR #22](https://github.com/SXQHex/FtkSaaS/pull/22) ile main'e birleşti; aynı main SHA’sının gerçek başarılı kabulü güncel devirde; P01 done. Sırada CI-02, ardından P02 vardır. [CI-2026-10-20 kararı](docs/decisions/CI-2026-10-20.md) bağlayıcıdır: bölüm boyunca tek Draft/development PR ve hedefli CI; bitince açık aday full clean, merge sonrası main full clean. Güvenli yalnız-belge farkları belge kabulüyle kapanır ve clean başlatmaz; karma/bilinmeyen veya runtime girdisi değişiklikleri istisna değildir. Dört shard ayrı backend/DB kullanır; bütün zorunlu işlerin kaynak bağlı başarısı gerekir.

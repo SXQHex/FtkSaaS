@@ -1,3 +1,4 @@
+import {validateJobs,coverageHash,roleName} from './shards.mjs';
 import {assertReady,assertParents,remoteDocumentScope,policyMatches,resolveMerged} from './source.mjs';
 import {mkdtempSync,writeFileSync,rmSync} from 'node:fs';import {tmpdir} from 'node:os';import {join} from 'node:path';import {execFileSync} from 'node:child_process';
 export const gateContext='ftksaas/merge-clean';
@@ -7,13 +8,13 @@ export function validateBinding({binding,pr,run,jobs,tested,currentTree,workflow
  if(run.event!=='pull_request'||run.path!=='.github/workflows/ci-full.yml'||run.conclusion!=='success'||run.status!=='completed')throw Error('No successful candidate workflow');
  if(binding.run_id!==run.id||binding.attempt!==run.run_attempt||binding.pr!==pr.number||binding.head!==pr.head.sha||binding.base!==pr.base.sha||run.head_sha!==binding.head)throw Error('Stale head/base/attempt');
  if(binding.merge!==tested.sha||binding.tree!==tested.tree.sha||binding.tree!==currentTree||tested.parents.length!==2||tested.parents[0].sha!==binding.base||tested.parents[1].sha!==binding.head)throw Error('Tested merge parents/tree mismatch');
- const job=jobs.find(j=>j.name==='full-clean');
- if(!job||job.conclusion!=='success'||!job.steps.some(s=>s.name==='Full clean acceptance'&&s.conclusion==='success')||!job.steps.some(s=>s.name==='Verify tested merge'&&s.conclusion==='success'))throw Error('Full clean job/steps did not succeed');
+ if(binding.kind!=='full'||binding.profile!=='four-isolated-v1'||binding.coverage!==coverageHash())throw Error('Unrecognized/incomplete full coverage');
+ validateJobs(jobs,run,{benchmark:binding.benchmark,collector:true});
  return true;
 }
 export async function receipt(github,repo,run,kind="full"){
  const artifacts=await github.paginate(github.rest.actions.listWorkflowRunArtifacts,{...repo,run_id:run.id,per_page:100});
- const a=artifacts.find(a=>a.name===(kind==='documentation'?'document-binding-':'candidate-binding-')+run.run_attempt&&!a.expired);if(!a)throw Error('Missing source binding');
+ const matches=artifacts.filter(a=>a.name===(kind==='documentation'?'document-binding-':'candidate-binding-')+run.run_attempt&&!a.expired);const a=matches[0];if(matches.length!==1)throw Error('Missing source binding');
  const zip=await github.rest.actions.downloadArtifact({...repo,artifact_id:a.id,archive_format:'zip'});const dir=mkdtempSync(join(tmpdir(),'ftk-binding-'));
  try{const file=join(dir,'receipt.zip');writeFileSync(file,Buffer.from(zip.data));return JSON.parse(execFileSync('unzip',['-p',file,'binding.json'],{encoding:'utf8',maxBuffer:16000}));}finally{rmSync(dir,{recursive:true,force:true});}
 }
@@ -29,7 +30,7 @@ export async function checkPr(github,context,number){
   const runs=await github.paginate(github.rest.actions.listWorkflowRuns,{...repo,workflow_id:kind==='documentation'?'ci-docs.yml':'ci-full.yml',head_sha:pr.head.sha,event:'pull_request',per_page:100});
   for(const run of runs){
    const jobs=await github.paginate(github.rest.actions.listJobsForWorkflowRun,{...repo,run_id:run.id,filter:'latest',per_page:100});
-   if(!jobs.some(j=>j.name===(kind==='documentation'?'documentation':'full-clean')&&j.conclusion!=='skipped'))continue;
+   if(!jobs.some(j=>roleName(j)===(kind==='documentation'?'documentation':'full-clean')&&j.conclusion!=='skipped'))continue;
    const binding=await receipt(github,repo,run,kind);
    const tested=(await github.rest.git.getCommit({...repo,commit_sha:binding.merge})).data;
    const workflowMatches=await policyMatches(github,repo,pr.base.sha,pr.head.sha);
@@ -61,7 +62,7 @@ export function validateDocumentBinding(v){
  assertParents(tested,binding.base,binding.head);
  if(binding.merge!==tested.sha||binding.tree!==tested.tree.sha||binding.tree!==currentTree)throw Error('Documentation merge tree mismatch');
  const job=jobs.find(j=>j.name==='documentation');
- if(!job||job.conclusion!=='success'||!['Verify tested merge','Documentation acceptance'].every(n=>job.steps.some(s=>s.name===n&&s.conclusion==='success')))throw Error('Documentation job/steps did not succeed');
+ if(!job||job.conclusion!=='success'||job.status!=='completed'||job.run_id!==run.id||job.run_attempt!==run.run_attempt||job.head_sha!==run.head_sha||!['Verify tested merge','Documentation acceptance'].every(n=>job.steps.some(s=>s.name===n&&s.conclusion==='success')))throw Error('Documentation job/steps did not succeed');
  return true;
 }
 export async function verifyMerged(github,context,core){
@@ -73,7 +74,7 @@ export async function verifyMerged(github,context,core){
  let accepted;
  for(const run of runs){
   const jobs=await github.paginate(github.rest.actions.listJobsForWorkflowRun,{...repo,run_id:run.id,filter:'latest',per_page:100});
-  if(!jobs.some(j=>j.name===(kind==='documentation'?'documentation':'full-clean')&&j.conclusion!=='skipped'))continue;
+  if(!jobs.some(j=>roleName(j)===(kind==='documentation'?'documentation':'full-clean')&&j.conclusion!=='skipped'))continue;
   const binding=await receipt(github,repo,run,kind),tested=(await github.rest.git.getCommit({...repo,commit_sha:binding.merge})).data;
   // The actual installed tree must match the reviewed/tested candidate. This
   // does not authorize policy installation: normal PR gate rejects policy deltas.

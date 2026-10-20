@@ -1,3 +1,4 @@
+import {coverageHash} from './shards.mjs';
 import {documentScope} from './document-scope.mjs';
 export function assertReady(pr){
  if(pr.state!=='open'||pr.draft||pr.labels?.some(l=>l.name==='development'))throw Error('Draft/development candidate cannot run or merge');
@@ -20,7 +21,16 @@ export async function remoteDocumentScope(github,repo,base,head){
    if(b.encoding!=='base64')throw Error('Unknown blob encoding');contents.set(i+':'+c.path,Buffer.from(b.content,'base64').toString('utf8'));
   }else contents.set(i+':'+c.path,'regular document');
  }
- return documentScope(changes,(s,p)=>contents.get((s==='base'?0:1)+':'+p)??null,(s,p)=>trees[s==='base'?0:1].get(p)?.mode);
+ const read=(s,p)=>contents.get((s==='base'?0:1)+':'+p)??null,mode=(s,p)=>trees[s==='base'?0:1].get(p)?.mode;
+ const preliminary=documentScope(changes,read,mode);
+ if(!preliminary.safe)return preliminary;
+ for(const c of changes)for(let i=0;i<2;i++){
+  const f=trees[i].get(c.path);if(!f||c.path==='scripts/render_catalogs.py')continue;
+  const b=(await github.rest.git.getBlob({...repo,file_sha:f.sha})).data;
+  if(b.encoding!=='base64')throw Error('Unknown document encoding');
+  contents.set(i+':'+c.path,new TextDecoder('utf-8',{fatal:true}).decode(Buffer.from(b.content,'base64')));
+ }
+ return documentScope(changes,read,mode);
 }
 export const policyPath=p=>p.startsWith('.github/workflows/')||p.startsWith('scripts/ci/')||['scripts/test-clean.mjs','scripts/start-dev.mjs'].includes(p);
 export async function policyMatches(github,repo,base,head){
@@ -41,7 +51,7 @@ export async function resolveCandidate(github,context,core,kind){
  const scope=await remoteDocumentScope(github,context.repo,p.base.sha,p.head.sha);
  if(kind==='full'&&scope.safe)throw Error('Documentation-only source uses documentation acceptance, not full clean');
  if(kind==='documentation'&&!scope.safe){core.setOutput('eligible','false');return;}
- const binding={kind,pr:p.number,head:p.head.sha,base:p.base.sha,merge,tree:commit.tree.sha,run_id:context.runId,attempt:Number(process.env.GITHUB_RUN_ATTEMPT),benchmark:kind==='full'&&p.labels.some(l=>l.name==='ci:measure-serial')};
+ const binding={kind,coverage:kind==='full'?coverageHash():undefined,pr:p.number,head:p.head.sha,base:p.base.sha,merge,tree:commit.tree.sha,run_id:context.runId,attempt:Number(process.env.GITHUB_RUN_ATTEMPT),benchmark:kind==='full'&&p.labels.some(l=>l.name==='ci:measure-serial')};
  core.setOutput('eligible','true');core.setOutput('merge',merge);core.setOutput('binding',JSON.stringify(binding));
 }
 export async function resolveMerged(github,context){

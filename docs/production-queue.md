@@ -1,6 +1,6 @@
 # FtkSaaS sıralı üretim kuyruğu
 
-CI-02 geliştirmesi `ci/ci02-source-bound-shards` dalında: başlangıç main `d544efe9f88f34edd7d6ce3055ed46d291a55f2c`, main run 39408606736 kaynak kanıtı adımında başarısız; test çalışmadı. P01 done kalır. Dar belge sınıflandırması/PR24 renderer AST kanıtı, ayrı belge kabulü ve koşullu cleanup uygulandı; yeni kaynak hedefli/uzak kabulü ve güvenilir politika kurulumu bekliyor. Dört shard henüz bu dilimde uygulanmadı; P02 başlamaz.
+CI-02 geliştirmesi [PR25](https://github.com/SXQHex/FtkSaaS/pull/25), `ci/ci02-source-bound-shards` dalında. Başlangıç main `d544efe9f88f34edd7d6ce3055ed46d291a55f2c` / 39408606736 test öncesi kaynak kabulünde başarısızdır. Dar belge/PR24 AST kanıtı, ayrı belge recovery, Draft/development ve dört izole shard/toplayıcı uygulandı; yeni kaynak uzak hedefli, bağımsız son inceleme, aday/main kabulü ve güvenilir politika kurulumu bekliyor. P01 done; P02 başlamaz.
 
 ## Şimdi yapılacak iş — 20 Ekim 2026
 
@@ -12,7 +12,7 @@ Güncel envanter **199 / 118 çağrılabilir / 81 contract_only / 34 migration**
 |---|---|---:|---|---|
 | P00 | İlk CI ayrımı | — | done | #19; sonraki Action bakımı #23 kapalı |
 | P01 | Talep, rezervasyon ve bekleme | 14 | done | #22; aday 39327134872 ve aynı main 39401570751 completed/success doğrulandı |
-| CI-02 | Dört shard, bölüm/Draft/development, yalnız-belge kabulü | — | in_progress | `ci/ci02-source-bound-shards`; [karar ve kabul](decisions/CI-2026-10-20.md); uygulama BackendCoder |
+| CI-02 | Dört shard, bölüm/Draft/development, yalnız-belge kabulü | — | in_progress | [PR25](https://github.com/SXQHex/FtkSaaS/pull/25); [karar ve kabul](decisions/CI-2026-10-20.md); uygulama BackendCoder |
 | P02 | Paket ve seans yaşam döngüsü | 15 | queued | CI-02 kabulünden sonra |
 | P03 | Finans ve eğitmen ödemeleri | 7 | queued | P02 sonrası |
 | P04 | CRM ve public başvuru | 11 | queued | P03 sonrası |

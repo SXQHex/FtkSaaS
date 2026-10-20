@@ -1,6 +1,6 @@
 # Kalan backend işleri
 
-CI-02 geliştirmesi `ci/ci02-source-bound-shards` dalında: başlangıç main `d544efe9f88f34edd7d6ce3055ed46d291a55f2c`, main run 39408606736 kaynak kanıtı adımında başarısız; test çalışmadı. P01 done kalır. Dar belge sınıflandırması/PR24 renderer AST kanıtı, ayrı belge kabulü ve koşullu cleanup uygulandı; yeni kaynak hedefli/uzak kabulü ve güvenilir politika kurulumu bekliyor. Dört shard henüz bu dilimde uygulanmadı; P02 başlamaz.
+CI-02 geliştirmesi [PR25](https://github.com/SXQHex/FtkSaaS/pull/25), `ci/ci02-source-bound-shards` dalında. Başlangıç main `d544efe9f88f34edd7d6ce3055ed46d291a55f2c` / 39408606736 test öncesi kaynak kabulünde başarısızdır. Dar belge/PR24 AST kanıtı, ayrı belge recovery, Draft/development ve dört izole shard/toplayıcı uygulandı; yeni kaynak uzak hedefli, bağımsız son inceleme, aday/main kabulü ve güvenilir politika kurulumu bekliyor. P01 done; P02 başlamaz.
 
 Güncel kaynak main `7577b2f1873c6b1fcf83390bfa94a34374c44082`: **199 işlem / 118 çağrılabilir / 81 yalnız sözleşme / 34 migration**. [Tek devir](../contracts/00-FtkSaaS-yeni-sohbet-devir.md) gerçek hedefli/aday ve aynı main completed/success sonuçlarını gösterir. P01 PR #22 birleşti; eski A/B/C runtime ve merge bekleme notları güncel açık değildir. P01 main kabulü tamamlandı; sonraki CI-02 kaynağı ayrıca doğrulanacaktır.
 
