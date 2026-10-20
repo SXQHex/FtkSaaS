@@ -15,6 +15,8 @@ En büyük/küçük ağırlık oranı 1.0712. Suite içi yarışlar bütün kal�
 
 Açık `ci:measure-serial` son adayda aynı tested merge/tree ve kapsamla ek seri reference koşar. Toplayıcı her iş için created→start kuyruk, start→Clean acceptance kurulum, acceptance süresi, runner süresi; en uzun API shard'ı ve sharded run beklemesini `.ci/measurements.json` artifact/özetinde verir. Seri reference ve shard runner dakikaları ayrı tutulur; core ve dört API toplamı full sharded maliyettir. Collector/source overhead ve workflow bitişi ancak run tamamlandıktan sonra Jobs API ile tam ölçülebilir; ilk artifact'in job toplamı bu tamamlanmamış overhead'i içermez. Nihai raporda tüm işler ayrıca sayılır.
 
+68bb98f / 39411398475 targeted job 10:56:39–10:57:01 UTC = 22 saniye, hedefli runner 7 saniye; verify/34 politika testli CI-only kapsamdır, full runtime karşılaştırması değildir. Aynı run recovery 404 hatası ayrı düzeltilmektedir.
+
 Yeni kaynakta seri/parçalı gerçek koşu henüz yok; kuyruk, kurulum, en uzun shard, toplam bekleme ve toplam runner dakikası bekliyor. 39:00 eski P01 koşusu yeni kaynakta hız kazancı veya kabul kanıtı değildir.
 
 ## 20 Ekim 2026 — yeni performans kararı

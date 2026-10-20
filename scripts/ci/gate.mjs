@@ -8,6 +8,7 @@ export function validateBinding({binding,pr,run,jobs,tested,currentTree,workflow
  if(run.event!=='pull_request'||run.path!=='.github/workflows/ci-full.yml'||run.conclusion!=='success'||run.status!=='completed')throw Error('No successful candidate workflow');
  if(binding.run_id!==run.id||binding.attempt!==run.run_attempt||binding.pr!==pr.number||binding.head!==pr.head.sha||binding.base!==pr.base.sha||run.head_sha!==binding.head)throw Error('Stale head/base/attempt');
  if(binding.merge!==tested.sha||binding.tree!==tested.tree.sha||binding.tree!==currentTree||tested.parents.length!==2||tested.parents[0].sha!==binding.base||tested.parents[1].sha!==binding.head)throw Error('Tested merge parents/tree mismatch');
+ if(pr.labels?.some(l=>l.name==='ci:measure-serial')&&!binding.benchmark)throw Error('Requested serial comparison missing from candidate');
  if(binding.kind!=='full'||binding.profile!=='four-isolated-v1'||binding.coverage!==coverageHash())throw Error('Unrecognized/incomplete full coverage');
  validateJobs(jobs,run,{benchmark:binding.benchmark,collector:true});
  return true;
@@ -37,6 +38,8 @@ export async function checkPr(github,context,number){
    const validate=kind==='documentation'?validateDocumentBinding:validateBinding;
    validate({binding,pr,run,jobs,tested,currentTree:currentCommit.tree.sha,workflowMatches});
    const live=(await github.rest.pulls.get({...repo,pull_number:number})).data;
+   assertReady(live);
+   if(live.labels?.some(l=>l.name==='ci:measure-serial')&&!binding.benchmark&&kind==='full')throw Error('Serial comparison requested during verification');
    if(live.head.sha!==pr.head.sha||live.base.sha!==pr.base.sha)throw Error('Head/base moved during verification');
    state='success';description=kind==='documentation'?'Verified source-bound documentation acceptance (no full clean)':'Verified head/base/merge tree and executed full clean';target_url=run.html_url;break;
   }

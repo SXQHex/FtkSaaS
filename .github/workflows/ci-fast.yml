@@ -46,7 +46,7 @@ jobs:
         with:
           script: |
             const audit=await import(`${process.env.GITHUB_WORKSPACE}/scripts/ci/recovery.mjs`);
-            await audit.resolveRecovery(github,{...context,payload:{inputs:{merge_sha:'d544efe9f88f34edd7d6ce3055ed46d291a55f2c'}}},core);
+            await audit.resolveRecovery(github,context,core,'d544efe9f88f34edd7d6ce3055ed46d291a55f2c');
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
         with:
           ref: ${{ steps.recovery.outputs.merge }}

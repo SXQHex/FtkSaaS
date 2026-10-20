@@ -6,7 +6,7 @@ Başlangıç main `d544efe9f88f34edd7d6ce3055ed46d291a55f2c`; [PR24](https://git
 
 P01 PR22 / `7577b2f1873c6b1fcf83390bfa94a34374c44082` / [39401570751](https://github.com/SXQHex/FtkSaaS/actions/runs/39401570751) completed/success ve P01 done korunur; başarı yeni SHA'ya taşınmaz. Ürün/runtime/migration/118 callable/81 contract_only/F01–F33 değişmedi. P02 başlamadı.
 
-Tek geliştirme [Draft PR25](https://github.com/SXQHex/FtkSaaS/pull/25), `ci/ci02-source-bound-shards`, `development`. İlk dilim `fc074566643ac07afd00a82aa34d6f3cccf36452`: dar belge kabulü, source binding, recovery ve cleanup; yerel verify + 28 politika testi geçti. Yeni dört-shard dilimi yerel 33 politika testinden geçti; uzak hedefli, bağımsız son-head incelemesi, aday/main kabulü ve kurulum henüz bekler. Geliştirme durumundan çıkış kendiliğinden clean değildir.
+Tek geliştirme [Draft PR25](https://github.com/SXQHex/FtkSaaS/pull/25), `ci/ci02-source-bound-shards`, `development`. İlk dilim `fc074566643ac07afd00a82aa34d6f3cccf36452`: dar belge kabulü, source binding, recovery ve cleanup; yerel verify + 28 politika testi geçti. Yeni dört-shard dilimi yerel 36 politika testinden geçti; uzak hedefli, bağımsız son-head incelemesi, aday/main kabulü ve kurulum henüz bekler. Geliştirme durumundan çıkış kendiliğinden clean değildir.
 
 ## PR24 için somut belge kanıtı
 
@@ -16,7 +16,7 @@ Renderer değişikliği yalnız `schema[2]` giriş paragrafı, `schema +=` DS ba
 
 Belge yolları uzantıdan türetilmez: CI politikasındaki tam incelenmiş yol listesi, normal 100644 dosya ve UTF8/NUL kontrolü gerekir. Yeni bilinmeyen `.md`, runtime tarafından tüketilen JSON/tip, symlink veya karma kaynak tam yola gider. Rename iki uçtan, silme bütün yaşayan inbound linklerden kontrol edilir. Belge kabulü `docs-check` + `verify` çalıştırır; DB/API/full clean çalışmış sayılmaz.
 
-`ci-fast` CI-02 dalında salt-okuma documentation-recovery işi yeni politika kaynağıyla eski merge'in iki parent/tree ve birikimli belge farkını kanıtlar, sonra exact d544efe checkout'unda belge kontrollerini çalıştırır. Artifact policy SHA + actual SHA + PR/head/base/tree + run/attempt taşır. Genel merge proof fallback'i, sahte commit status veya eski başarısız run'ın rerun'ı değildir. Elle çağrılan aynı dar audit için backend workflow_dispatch exact merge_sha kabul eder. Uzak kabul henüz bekler; ana dalın eski başarısız run'ı değişmeden kalır.
+`ci-fast` CI-02 dalında salt-okuma documentation-recovery işi yeni politika kaynağıyla eski merge'in iki parent/tree ve birikimli belge farkını kanıtlar, sonra exact d544efe checkout'unda belge kontrollerini çalıştırır. Artifact policy SHA + actual SHA + PR/head/base/tree + run/attempt taşır. Genel merge proof fallback'i, sahte commit status veya eski başarısız run'ın rerun'ı değildir. Elle çağrılan aynı dar audit için backend workflow_dispatch exact merge_sha kabul eder. İlk uzak kaynak 68bb98f / run39411398475 targeted işi 22 saniyede başarılı; recovery job'u context.repo getter'ının object spread ile kaybolması nedeniyle /repos/// URL'sinde 404 aldı. Getter'ı koruyan explicit repo context ve sentetik regresyon eklendi; yeni uzak recovery kabulü henüz bekler. Ana dalın eski başarısız run'ı değişmeden kalır.
 
 ## Zorunlu clean kapsamı
 

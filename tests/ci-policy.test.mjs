@@ -222,3 +222,21 @@ test('measurement distinguishes queue setup test wall and runner time',()=>{
 });
 
 test('every test file is accounted for in structural DB or API clean obligations',()=>{const actual=fs.readdirSync('tests').filter(p=>p.endsWith('.test.mjs')).map(p=>'tests/'+p).sort();assert.deepEqual(actual,[...apiSuites,...['contract','governance','ci-policy','database','event-scope'].map(n=>'tests/'+n+'.test.mjs')].sort());});
+test('requesting serial comparison invalidates a prior candidate that never ran it',()=>{
+ const v=valid();v.pr.labels=[{name:'ci:measure-serial'}];assert.throws(()=>validateBinding(v),/serial comparison/);
+});
+
+import {resolveRecovery} from '../scripts/ci/recovery.mjs';
+test('new-source documentation recovery preserves github-script context getters and binds actual merge',async()=>{
+ const sha='d'.repeat(40),repo={owner:'synthetic',repo:'test'},out={};
+ // actions/github context.repo is a prototype getter, not an own property.
+ const context=Object.assign(Object.create({get repo(){return repo;}}),{sha:'new-policy',runId:7,payload:{inputs:{merge_sha:sha}}});
+ const pr={number:24,merged_at:'now',merge_commit_sha:sha,base:{sha:'B'},head:{sha:'H'}};
+ const g={rest:{repos:{listPullRequestsAssociatedWithCommit:'prs'},git:{
+  getCommit:async args=>{assert.equal(args.owner,'synthetic');return {data:{sha,tree:{sha:'T'},parents:[{sha:'B'},{sha:'H'}]}};},
+  getTree:async args=>({data:{tree:[{path:'README.md',mode:'100644',type:'blob',sha:args.tree_sha+'-doc'}]}}),
+  getBlob:async()=>({data:{encoding:'base64',content:Buffer.from('Regular documentation').toString('base64')}})
+ }},paginate:async(method,args)=>{assert.equal(args.owner,'synthetic');assert.equal(args.repo,'test');return [pr];}};
+ await resolveRecovery(g,context,{setOutput:(k,v)=>out[k]=v});
+ const b=JSON.parse(out.binding);assert.equal(b.actual,sha);assert.equal(b.head,'H');assert.equal(b.base,'B');assert.equal(b.tree,'T');assert.equal(b.policy_sha,'new-policy');assert.equal(b.kind,'documentation-recovery');
+});

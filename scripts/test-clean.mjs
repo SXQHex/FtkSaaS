@@ -1,5 +1,6 @@
 import fs from 'node:fs';
 import assert from 'node:assert/strict';
+import {performance} from 'node:perf_hooks';
 import {spawnSync} from 'node:child_process';
 import {apiSuites} from './ci/select-tests.mjs';
 import {shardPlan,coverageHash} from './ci/shards.mjs';
@@ -14,6 +15,7 @@ if(!['serial','core','api'].includes(role)||args.length>(role==='api'?2:1))throw
 const shard=role==='api'?shardPlan().find(b=>String(b.shard)===args[1]):null;
 if(role==='api'&&!shard)throw Error('Unknown shard');
 console.log('Clean coverage:',coverageHash(),'role:',role,'shard:',shard?.shard??'none');
+const phaseStart=performance.now();
 run('npm',['run','dev:start']);
 const url=stackStatus().env?.DB_URL;
 if(!url||!['127.0.0.1','localhost'].includes(new URL(url).hostname))throw new Error('LOCAL_DB_REQUIRED');
@@ -30,12 +32,14 @@ try {
  for(const table of ['core.organizations','core.operation_receipts','auth.users'])assert.equal((await db.query('select count(*)::int n from '+table)).rows[0].n,0,'Reset must remove fixture data: '+table);
  console.log('Clean database confirmed: '+actual.length+' ordered migrations; no organizations, receipts or Auth users');
 } finally { await db.end(); }
+const preparedAt=performance.now();
 if(role!=='api'){
  run('node',['scripts/ci/docs-check.mjs','README.md']);
  run('npm',['run','verify']);
  run('npm',['run','test:db']);
 }
 if(role!=='core')run('node',['--test','--test-concurrency=2',...(shard?.suites??apiSuites)]);
+const testsAt=performance.now();
 if(role!=='api'){
 run('npm',['run','dev:seed']);
 run('npm',['run','dev:health']);
@@ -47,3 +51,8 @@ console.log('Clean acceptance completed: migrations, tests, synthetic seed and s
 
 }
 console.log('Completed clean role:',role,shard?.shard??'',coverageHash());
+
+const phases={role,shard:shard?.shard??null,coverage:coverageHash(),backend_setup_s:(preparedAt-phaseStart)/1000,tests_s:(testsAt-preparedAt)/1000,seed_health_advisors_s:(performance.now()-testsAt)/1000};
+fs.mkdirSync('.ci/timings',{recursive:true});fs.writeFileSync('.ci/timings/clean-'+role+(shard?.shard??'')+'.json',JSON.stringify({clean_phases:phases}));
+console.log('Clean phase timings:',JSON.stringify(phases));
+if(process.env.GITHUB_STEP_SUMMARY)fs.appendFileSync(process.env.GITHUB_STEP_SUMMARY,'\nClean phase timings (backend setup separate from tests):\n```json\n'+JSON.stringify(phases,null,2)+'\n```\n');
