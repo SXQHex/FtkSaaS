@@ -72,3 +72,7 @@ assert next(Path('supabase/migrations').glob('*_p02_sessions.sql')).read_text()=
 assert next(Path('supabase/migrations').glob('*_p02_entitlement_corrections.sql')).read_text()==Path('database/p02-entitlement-corrections.sql').read_text()+Path('database/p02-entitlement-corrections-wrappers.sql').read_text(),'P02 corrections source drift'
 
 assert next(Path('supabase/migrations').glob('*_p02_freeze_lifecycle.sql')).read_text()==Path('database/p02-freeze-lifecycle.sql').read_text()+Path('database/p02-freeze-lifecycle-wrappers.sql').read_text(),'P02 freeze source drift'
+
+assert next(Path('supabase/migrations').glob('*_p02_sale_lifecycle.sql')).read_text()==Path('database/p02-sale-lifecycle.sql').read_text()+Path('database/p02-sale-lifecycle-wrappers.sql').read_text(),'P02 sales source drift'
+
+assert next(Path('supabase/migrations').glob('*_p02_runtime_guards.sql')).read_text()==Path('database/p02-runtime-guards.sql').read_text()+Path('database/p02-runtime-guards-wrappers.sql').read_text(),'P02 runtime guards source drift'

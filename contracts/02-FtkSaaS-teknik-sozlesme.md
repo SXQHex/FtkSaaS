@@ -694,3 +694,8 @@ Bekleme niyeti yer/hak ayırmaz; FIFO joined_at/id, nominal boşluk ve aktif rez
 
 Ayrı request_window, talep create/alternatif offer/accept sırasında etkin org/merkez politikasından tüketilir. Açılış dahil/kapanış hariç; eksik yapılandırma POLICY_NOT_CONFIGURED. Kabul edilmiş yönetici süre dışı yetkisinin teknik isteği window_exception:true + nonempty reason, politika manager_exception:true ve canlı CM kontrolüdür; gerekçe audit'e yazılır. İşaretli istekte CM receipt replay öncesi de denetlenir; otomatik CM bypass yoktur. Worker yeni teklif discovery ve executor/replay'inde center_accessible uygular; kapalı veya plan dışı merkezde hold üretmez, expiry temizliği engellenmez. Kaynak/runtime kabul sınırları docs/p01-handover.md içindedir.
 
+
+
+### P02 geliştirme aktarımı — 20 Ekim 2026
+
+PR #28 Draft/development içinde15 API uygulama adayıdır; hedefli/aday/main kabulü ayrı beklenir. `entitlements_get_v1` account sürümü/id, satış sürümü/durumu ve freeze kayıtlarını sağlar. `freeze_end_preview_v1` gerekçe ister. `sale_change_preview_v1` bütün gelecek rezervasyonların açık `keep_reservation_ids` ve `cancel_reservation_ids` seçimini, gerekçeyi ve isteğe bağlı açık `offset_minor` tutarını alır. Yeni ürüne uygun olmayan seçili kayıt blocker üretir; aktif gelecek etkinlik kaydı ayrı açık iptal edilmeden ürün değişimi tamamlanmaz. Önizlemede gerçek satış/hak yazarının rollback-only simülasyonu çalışır; kalıcı satış/borç/receipt/katılım üretmez. `Preview.sale_lifecycle` açık tarihler, boşluk/örtüşme ve dondurulmuş iade hesabını gösterir. Sonlandırma ve hak düzeltme otomatik rezervasyon/para işlemi değildir. P03 genel iade uygulaması private.p02_sale_settlements ve bağlı borç/alacak kayıtlarını yeniden alacak üretmemek için tüketmelidir.

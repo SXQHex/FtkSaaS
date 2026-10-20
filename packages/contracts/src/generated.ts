@@ -2186,6 +2186,8 @@ LessonRequestView?: LessonRequestView
 LessonRequestAlternativeView?: LessonRequestAlternativeView
 SeatOfferView?: SeatOfferView
 WaitlistEntryView?: WaitlistEntryView
+SaleRefundQuote?: SaleRefundQuote
+SaleLifecyclePreviewDetails?: SaleLifecyclePreviewDetails
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -2867,6 +2869,7 @@ expires_at: Instant
 sessions?: SchedulePreviewItem[]
 class_assignments?: ClassAssignmentView[]
 class_version?: PositiveInt
+sale_lifecycle?: SaleLifecyclePreviewDetails
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -2899,6 +2902,48 @@ person_id: string
 duty: Duty
 state: RecordState
 version: PositiveInt
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "SaleLifecyclePreviewDetails".
+ */
+export interface SaleLifecyclePreviewDetails {
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+previous_sale_id: string
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+product_version_id: string
+start_date: Date
+end_date: Date
+previous_end_date: Date
+gap_days: Count
+overlap_days: Count
+refund: (SaleRefundQuote | null)
+offset_minor: Money
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "SaleRefundQuote".
+ */
+export interface SaleRefundQuote {
+method: RefundMethod
+calculated_minor: Money
+debt_reduction_minor: Money
+credit_added_minor: Money
+currency: Currency
+consumed: Count
+unused: Count
+paid_days: Count
+debts: {
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+debt_id: string
+reduction_minor: Money
+}[]
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -7092,6 +7137,12 @@ new_product_version_id: string
 keep_reservation_ids: string[]
 start_date: Date
 end_date: Date
+/**
+ * Items: Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+cancel_reservation_ids: string[]
+reason: Text
+offset_minor?: Money
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema

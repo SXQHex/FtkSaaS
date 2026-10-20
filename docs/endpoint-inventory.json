@@ -2296,8 +2296,8 @@
     },
     {
       "name": "sale_terminate_preview_v1",
-      "status": "contract_only",
-      "external_path": null,
+      "status": "operational_development_limited",
+      "external_path": "/functions/v1/backend-v1/sale_terminate_preview_v1",
       "permission": "entitlement.correct",
       "features": [
         "F15",
@@ -2310,7 +2310,7 @@
       "runtime_required_features": [],
       "decision_delivery": {
         "accepted_contract": "DS-2026-10-17",
-        "runtime_conformance": "pending",
+        "runtime_conformance": "p02_sale_runtime_pending_acceptance",
         "open_dependencies": [],
         "target_request": {
           "$ref": "#/$defs/Request_sale_terminate_preview"
@@ -2321,8 +2321,8 @@
     },
     {
       "name": "sale_terminate_apply_v1",
-      "status": "contract_only",
-      "external_path": null,
+      "status": "operational_development_limited",
+      "external_path": "/functions/v1/backend-v1/sale_terminate_apply_v1",
       "permission": "entitlement.correct",
       "features": [
         "F15",
@@ -2335,7 +2335,7 @@
       "runtime_required_features": [],
       "decision_delivery": {
         "accepted_contract": "DS-2026-10-17",
-        "runtime_conformance": "pending",
+        "runtime_conformance": "p02_sale_runtime_pending_acceptance",
         "open_dependencies": [
           "confirmed_reservation_protection"
         ],
@@ -2394,8 +2394,8 @@
     },
     {
       "name": "sale_change_preview_v1",
-      "status": "contract_only",
-      "external_path": null,
+      "status": "operational_development_limited",
+      "external_path": "/functions/v1/backend-v1/sale_change_preview_v1",
       "permission": "entitlement.correct",
       "features": [
         "F17",
@@ -2408,7 +2408,7 @@
       "runtime_required_features": [],
       "decision_delivery": {
         "accepted_contract": "DS-2026-10-17",
-        "runtime_conformance": "pending",
+        "runtime_conformance": "p02_sale_runtime_pending_acceptance",
         "open_dependencies": [],
         "target_request": {
           "$ref": "#/$defs/Request_sale_change_preview"
@@ -2419,8 +2419,8 @@
     },
     {
       "name": "sale_change_apply_v1",
-      "status": "contract_only",
-      "external_path": null,
+      "status": "operational_development_limited",
+      "external_path": "/functions/v1/backend-v1/sale_change_apply_v1",
       "permission": "entitlement.correct",
       "features": [
         "F17",
@@ -2433,7 +2433,7 @@
       "runtime_required_features": [],
       "decision_delivery": {
         "accepted_contract": "DS-2026-10-17",
-        "runtime_conformance": "pending",
+        "runtime_conformance": "p02_sale_runtime_pending_acceptance",
         "open_dependencies": [
           "confirmed_reservation_protection",
           "sale_scope_and_backdating"
@@ -2447,8 +2447,8 @@
     },
     {
       "name": "sale_renew_preview_v1",
-      "status": "contract_only",
-      "external_path": null,
+      "status": "operational_development_limited",
+      "external_path": "/functions/v1/backend-v1/sale_renew_preview_v1",
       "permission": "sale.write",
       "features": [
         "F15",
@@ -2460,7 +2460,7 @@
       "runtime_required_features": [],
       "decision_delivery": {
         "accepted_contract": "DS-2026-10-17",
-        "runtime_conformance": "pending",
+        "runtime_conformance": "p02_sale_runtime_pending_acceptance",
         "open_dependencies": [],
         "target_request": {
           "$ref": "#/$defs/Request_sale_renew_preview"
@@ -2471,8 +2471,8 @@
     },
     {
       "name": "sale_renew_apply_v1",
-      "status": "contract_only",
-      "external_path": null,
+      "status": "operational_development_limited",
+      "external_path": "/functions/v1/backend-v1/sale_renew_apply_v1",
       "permission": "sale.write",
       "features": [
         "F15",
@@ -2484,7 +2484,7 @@
       "runtime_required_features": [],
       "decision_delivery": {
         "accepted_contract": "DS-2026-10-17",
-        "runtime_conformance": "pending",
+        "runtime_conformance": "p02_sale_runtime_pending_acceptance",
         "open_dependencies": [],
         "target_request": {
           "$ref": "#/$defs/Request_sale_renew_apply"

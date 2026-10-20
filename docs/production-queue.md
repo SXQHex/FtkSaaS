@@ -81,14 +81,7 @@ Ortak üretim promptunu uygula. Durum: in_progress; tek Draft/development PR. B�
 
 **P02-C uygulandı; hedefli runtime kabulü bekliyor:** `freeze_preview/apply_v1`, `freeze_end_preview/apply_v1`; kalan6 satış API.
 
-**Kalan sözleşme API'leri (6):**
-
-- `sale_terminate_preview_v1`
-- `sale_terminate_apply_v1`
-- `sale_change_preview_v1`
-- `sale_change_apply_v1`
-- `sale_renew_preview_v1`
-- `sale_renew_apply_v1`
+**P02-D uygulandı; hedefli runtime kabulü bekliyor:** `sale_terminate_preview/apply_v1`, `sale_change_preview/apply_v1`, `sale_renew_preview/apply_v1`. Kalan uygulama API’si yok; hedefli kabul, son kaynak incelemesi, bütün P02 için tek aday clean ve main kabulü açık.
 
 **Görev ve kabul:**
 

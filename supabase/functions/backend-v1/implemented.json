@@ -126,6 +126,12 @@
     "freeze_preview_v1",
     "freeze_apply_v1",
     "freeze_end_preview_v1",
-    "freeze_end_apply_v1"
+    "freeze_end_apply_v1",
+    "sale_terminate_preview_v1",
+    "sale_terminate_apply_v1",
+    "sale_change_preview_v1",
+    "sale_change_apply_v1",
+    "sale_renew_preview_v1",
+    "sale_renew_apply_v1"
   ]
 }
