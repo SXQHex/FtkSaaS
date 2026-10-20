@@ -63,6 +63,16 @@ if guard_source.exists():
   guards=list(Path('supabase/migrations').glob('*_p03_finance_guardrails.sql'))
  assert len(guards)==1
  guards[0].write_text(guard_source.read_text())
+for suffix,source in [('p03_finance_acceptance','database/p03-finance-acceptance.sql')]:
+ source_path=Path(source)
+ if source_path.exists():
+  found=list(Path('supabase/migrations').glob('*_'+suffix+'.sql'))
+  if not found:
+   subprocess.run(['node_modules/.bin/supabase','migration','new',suffix],check=True)
+   found=list(Path('supabase/migrations').glob('*_'+suffix+'.sql'))
+  assert len(found)==1
+  found[0].write_text(source_path.read_text())
+print('P03 earning fixture contract',json.dumps(d['EarningBasis']))
 Path('database/migrations.sha256.json').write_text(json.dumps({p.name:hashlib.sha256(p.read_bytes()).hexdigest() for p in sorted(Path('supabase/migrations').glob('*.sql'))},indent=2)+'\n')
 p=Path('scripts/check-migrations.py');line="\nassert next(Path('supabase/migrations').glob('*_p03_finance_payments.sql')).read_text()==Path('database/p03-finance-payments.sql').read_text()+Path('database/p03-finance-payments-wrappers.sql').read_text(),'P03 finance source drift'\n"
 if line not in p.read_text():p.write_text(p.read_text()+line)
@@ -78,3 +88,9 @@ if '## P03 uygulama aktarımı' not in p.read_text():p.write_text(p.read_text()+
 p=Path('scripts/check-migrations.py')
 line="\nassert next(Path('supabase/migrations').glob('*_p03_finance_guardrails.sql')).read_text()==Path('database/p03-finance-guardrails.sql').read_text(),'P03 finance guardrails source drift'\n"
 if line not in p.read_text():p.write_text(p.read_text()+line)
+
+p=Path('scripts/check-migrations.py')
+line="\nassert next(Path('supabase/migrations').glob('*_p03_finance_acceptance.sql')).read_text()==Path('database/p03-finance-acceptance.sql').read_text(),'P03 acceptance source drift'\n"
+if line not in p.read_text():p.write_text(p.read_text()+line)
+for name in ['docs/production-queue.md','docs/remaining-work.md','docs/claude-handover.md','contracts/00-FtkSaaS-yeni-sohbet-devir.md','docs/source-index.md','contracts/02-FtkSaaS-teknik-sozlesme.md']:
+ p=Path(name);s=p.read_text().replace('199/140 runtime/59 contract_only,41 migration','199/140 runtime/59 contract_only,43 migration');p.write_text(s)
