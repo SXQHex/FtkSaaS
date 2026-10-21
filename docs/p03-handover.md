@@ -1,5 +1,7 @@
 # P03 finans ve eğitmen ödemeleri devri
 
+Tarihsel geliştirme notudur. P03 PR30/main10710ffa90747a7e35c452c4c07ba59522f50ce3 ve aday39527260056/main39529992556 başarılarıyla kapandı; güncel P04 ve CD durumu source-index.md ile p04-handover.md içindedir. Aşağıdaki Draft/pending ifadeleri o geliştirme snapshot’ını anlatır.
+
 P03, [PR #30](https://github.com/SXQHex/FtkSaaS/pull/30) ve `feature/p03-finance-payments` dalında geliştirilir. Başlangıç main `ce95a9d0d960a201b0488071802dc5db7741caf1`; P02'nin kabulü yeni kaynak için kabul değildir. Üretim kaynağı [kuyruk](production-queue.md).
 
 ## Uygulanan kapsam

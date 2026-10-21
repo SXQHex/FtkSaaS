@@ -4095,6 +4095,9 @@
               "type": "null"
             }
           ]
+        },
+        "version": {
+          "$ref": "#/$defs/PositiveInt"
         }
       },
       "required": [
@@ -4105,7 +4108,8 @@
         "assigned_to",
         "state",
         "last_contact",
-        "due_followup"
+        "due_followup",
+        "version"
       ],
       "additionalProperties": false
     },
@@ -13219,7 +13223,7 @@
           "const": true
         },
         "data": {
-          "$ref": "#/$defs/Page_LeadView"
+          "$ref": "#/$defs/Page_CrmFollowupView"
         },
         "trace_id": {
           "$ref": "#/$defs/FtkUuid"
@@ -15514,6 +15518,9 @@
         },
         "published": {
           "$ref": "#/$defs/Bool"
+        },
+        "public_details": {
+          "$ref": "#/$defs/PublicPublicationDetails"
         }
       },
       "required": [
@@ -20667,6 +20674,16 @@
         },
         "expires_at": {
           "$ref": "#/$defs/Instant"
+        },
+        "terms_snapshot": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/TrialOfferTerms"
+            },
+            {
+              "type": "null"
+            }
+          ]
         }
       },
       "required": [
@@ -22246,6 +22263,16 @@
         },
         "published": {
           "$ref": "#/$defs/Bool"
+        },
+        "public_details": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/PublicPublicationDetails"
+            },
+            {
+              "type": "null"
+            }
+          ]
         }
       },
       "required": [
@@ -22292,6 +22319,16 @@
           "$ref": "#/$defs/Instant"
         },
         "request_reference": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/FtkUuid"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "person_id": {
           "anyOf": [
             {
               "$ref": "#/$defs/FtkUuid"
@@ -32839,6 +32876,12 @@
                   "type": "null"
                 }
               ]
+            },
+            "offer_id": {
+              "$ref": "#/$defs/FtkUuid"
+            },
+            "expires_at": {
+              "$ref": "#/$defs/Instant"
             }
           },
           "required": [],
@@ -33700,6 +33743,16 @@
             },
             "published": {
               "$ref": "#/$defs/Bool"
+            },
+            "public_details": {
+              "anyOf": [
+                {
+                  "$ref": "#/$defs/PublicPublicationDetails"
+                },
+                {
+                  "type": "null"
+                }
+              ]
             }
           },
           "required": [],
@@ -33765,6 +33818,12 @@
                   "type": "null"
                 }
               ]
+            },
+            "contact": {
+              "$ref": "#/$defs/Text"
+            },
+            "publication_id": {
+              "$ref": "#/$defs/FtkUuid"
             }
           },
           "required": [],
@@ -38262,9 +38321,7 @@
               ]
             }
           },
-          "required": [
-            "application_id"
-          ],
+          "required": [],
           "additionalProperties": false
         }
       },
@@ -41253,6 +41310,133 @@
       "type": "string",
       "pattern": "^(0|-?[1-9][0-9]{0,18})$",
       "x-validation": "-9223372036854775808<=int(value)<=9223372036854775807"
+    },
+    "PublicPublicationDetails": {
+      "type": "object",
+      "properties": {
+        "title": {
+          "$ref": "#/$defs/Text"
+        },
+        "venue_public_label": {
+          "$ref": "#/$defs/Text"
+        },
+        "fee_minor": {
+          "$ref": "#/$defs/Money"
+        },
+        "currency": {
+          "$ref": "#/$defs/Currency"
+        },
+        "public_conditions": {
+          "$ref": "#/$defs/Text"
+        }
+      },
+      "required": [
+        "title",
+        "venue_public_label",
+        "fee_minor",
+        "currency",
+        "public_conditions"
+      ],
+      "additionalProperties": false
+    },
+    "TrialOfferTerms": {
+      "type": "object",
+      "properties": {
+        "price_minor": {
+          "$ref": "#/$defs/Money"
+        },
+        "currency": {
+          "$ref": "#/$defs/Currency"
+        },
+        "product_version_id": {
+          "$ref": "#/$defs/FtkUuid"
+        }
+      },
+      "required": [
+        "price_minor",
+        "currency",
+        "product_version_id"
+      ],
+      "additionalProperties": false
+    },
+    "CrmFollowupView": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/FtkUuid"
+        },
+        "person_id": {
+          "$ref": "#/$defs/FtkUuid"
+        },
+        "center_id": {
+          "$ref": "#/$defs/FtkUuid"
+        },
+        "lead_id": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/FtkUuid"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "assigned_to": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/FtkUuid"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "kind": {
+          "$ref": "#/$defs/FollowupKind"
+        },
+        "due_at": {
+          "$ref": "#/$defs/Instant"
+        }
+      },
+      "required": [
+        "id",
+        "person_id",
+        "center_id",
+        "lead_id",
+        "assigned_to",
+        "kind",
+        "due_at"
+      ],
+      "additionalProperties": false
+    },
+    "Page_CrmFollowupView": {
+      "type": "object",
+      "properties": {
+        "items": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/CrmFollowupView"
+          }
+        },
+        "next_cursor": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/OpaqueToken"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "as_of": {
+          "$ref": "#/$defs/Instant"
+        }
+      },
+      "required": [
+        "items",
+        "as_of"
+      ],
+      "additionalProperties": false
     }
   },
   "x-contract": {
@@ -43059,6 +43243,11 @@
           {
             "column": "publication_id",
             "target": "publications",
+            "same_tenant": true
+          },
+          {
+            "column": "person_id",
+            "target": "people",
             "same_tenant": true
           }
         ],
@@ -55773,11 +55962,13 @@
           "A55"
         ],
         "configuration_policy": "numeric plan limits/prices and legal approval are deployment configuration, never arbitrary allow/deny",
-        "implementation_status": "contract_only",
+        "implementation_status": "operational_development_limited",
         "required_features": [
           "F21"
         ],
-        "runtime_required_features": [],
+        "runtime_required_features": [
+          "F21"
+        ],
         "conditional_features": [],
         "operation_contract": {
           "kind": "read",
@@ -55792,7 +55983,7 @@
         },
         "decision_delivery": {
           "accepted_contract": "DS-2026-10-17",
-          "runtime_conformance": "pending",
+          "runtime_conformance": "implemented_pending_ci",
           "open_dependencies": [],
           "target_request": {
             "$ref": "#/$defs/Request_leads_list"
@@ -55833,7 +56024,9 @@
           "SUBSCRIPTION_NOT_STARTED",
           "TEMPORARY_FAILURE",
           "VALIDATION_FAILED",
-          "VERSION_CONFLICT"
+          "VERSION_CONFLICT",
+          "INVALID_STATE_TRANSITION",
+          "ACCOUNT_LINK_CONFLICT"
         ],
         "transaction_class": "single",
         "transaction_guarantee": "Atomic leads.versioned_domain_change; audit + in-app outbox + receipt. External delivery never determines the domain commit.",
@@ -55866,11 +56059,13 @@
           "A55"
         ],
         "configuration_policy": "numeric plan limits/prices and legal approval are deployment configuration, never arbitrary allow/deny",
-        "implementation_status": "contract_only",
+        "implementation_status": "operational_development_limited",
         "required_features": [
           "F21"
         ],
-        "runtime_required_features": [],
+        "runtime_required_features": [
+          "F21"
+        ],
         "conditional_features": [],
         "operation_contract": {
           "kind": "command",
@@ -55882,12 +56077,12 @@
             "leads.versioned_domain_change"
           ],
           "business_commit": true,
-          "read_path_status": "contract_only",
+          "read_path_status": "implemented",
           "source_decision": "DS-2026-10-17"
         },
         "decision_delivery": {
           "accepted_contract": "DS-2026-10-17",
-          "runtime_conformance": "pending",
+          "runtime_conformance": "implemented_pending_ci",
           "open_dependencies": [],
           "target_request": {
             "$ref": "#/$defs/Request_lead_save"
@@ -55929,7 +56124,9 @@
           "SUBSCRIPTION_NOT_STARTED",
           "TEMPORARY_FAILURE",
           "VALIDATION_FAILED",
-          "VERSION_CONFLICT"
+          "VERSION_CONFLICT",
+          "INVALID_STATE_TRANSITION",
+          "ACCOUNT_LINK_CONFLICT"
         ],
         "transaction_class": "single",
         "transaction_guarantee": "Atomic crm_activities.versioned_domain_change; audit + in-app outbox + receipt. External delivery never determines the domain commit.",
@@ -55962,12 +56159,15 @@
           "A55"
         ],
         "configuration_policy": "numeric plan limits/prices and legal approval are deployment configuration, never arbitrary allow/deny",
-        "implementation_status": "contract_only",
+        "implementation_status": "operational_development_limited",
         "required_features": [
           "F21",
           "F23"
         ],
-        "runtime_required_features": [],
+        "runtime_required_features": [
+          "F21",
+          "F23"
+        ],
         "conditional_features": [],
         "operation_contract": {
           "kind": "command",
@@ -55979,12 +56179,12 @@
             "crm_activities.versioned_domain_change"
           ],
           "business_commit": true,
-          "read_path_status": "contract_only",
+          "read_path_status": "implemented",
           "source_decision": "DS-2026-10-17"
         },
         "decision_delivery": {
           "accepted_contract": "DS-2026-10-17",
-          "runtime_conformance": "pending",
+          "runtime_conformance": "implemented_pending_ci",
           "open_dependencies": [],
           "target_request": {
             "$ref": "#/$defs/Request_crm_activity_save"
@@ -56036,7 +56236,9 @@
           "SUBSCRIPTION_NOT_STARTED",
           "TEMPORARY_FAILURE",
           "VALIDATION_FAILED",
-          "VERSION_CONFLICT"
+          "VERSION_CONFLICT",
+          "INVALID_STATE_TRANSITION",
+          "ACCOUNT_LINK_CONFLICT"
         ],
         "transaction_class": "reservation",
         "transaction_guarantee": "Atomic trial_offers.versioned_domain_change; audit + in-app outbox + receipt. External delivery never determines the domain commit.",
@@ -56086,11 +56288,13 @@
           "A55"
         ],
         "configuration_policy": "numeric plan limits/prices and legal approval are deployment configuration, never arbitrary allow/deny",
-        "implementation_status": "contract_only",
+        "implementation_status": "operational_development_limited",
         "required_features": [
           "F22"
         ],
-        "runtime_required_features": [],
+        "runtime_required_features": [
+          "F22"
+        ],
         "conditional_features": [],
         "operation_contract": {
           "kind": "command",
@@ -56102,13 +56306,15 @@
             "trial_offers.versioned_domain_change"
           ],
           "business_commit": true,
-          "read_path_status": "contract_only",
+          "read_path_status": "implemented",
           "source_decision": "DS-2026-10-17"
         },
         "decision_delivery": {
           "accepted_contract": "DS-2026-10-17",
-          "runtime_conformance": "pending",
-          "open_dependencies": [],
+          "runtime_conformance": "implemented_pending_ci",
+          "open_dependencies": [
+            "Explicit trial product/offer duration and trial_repeat_limit deployment configuration."
+          ],
           "target_request": {
             "$ref": "#/$defs/Request_trial_offer_create"
           }
@@ -56159,7 +56365,9 @@
           "SUBSCRIPTION_NOT_STARTED",
           "TEMPORARY_FAILURE",
           "VALIDATION_FAILED",
-          "VERSION_CONFLICT"
+          "VERSION_CONFLICT",
+          "INVALID_STATE_TRANSITION",
+          "ACCOUNT_LINK_CONFLICT"
         ],
         "transaction_class": "reservation",
         "transaction_guarantee": "Atomic trial_offers.versioned_domain_change; audit + in-app outbox + receipt. External delivery never determines the domain commit.",
@@ -56209,11 +56417,13 @@
           "A55"
         ],
         "configuration_policy": "numeric plan limits/prices and legal approval are deployment configuration, never arbitrary allow/deny",
-        "implementation_status": "contract_only",
+        "implementation_status": "operational_development_limited",
         "required_features": [
           "F22"
         ],
-        "runtime_required_features": [],
+        "runtime_required_features": [
+          "F22"
+        ],
         "conditional_features": [],
         "operation_contract": {
           "kind": "command",
@@ -56225,13 +56435,15 @@
             "trial_offers.versioned_domain_change"
           ],
           "business_commit": true,
-          "read_path_status": "contract_only",
+          "read_path_status": "implemented",
           "source_decision": "DS-2026-10-17"
         },
         "decision_delivery": {
           "accepted_contract": "DS-2026-10-17",
-          "runtime_conformance": "pending",
-          "open_dependencies": [],
+          "runtime_conformance": "implemented_pending_ci",
+          "open_dependencies": [
+            "Explicit trial product/offer duration and trial_repeat_limit deployment configuration."
+          ],
           "target_request": {
             "$ref": "#/$defs/Request_trial_registration_confirm"
           }
@@ -56275,7 +56487,8 @@
           "SUBSCRIPTION_NOT_STARTED",
           "TEMPORARY_FAILURE",
           "VALIDATION_FAILED",
-          "VERSION_CONFLICT"
+          "VERSION_CONFLICT",
+          "INVALID_STATE_TRANSITION"
         ],
         "transaction_class": "org_limit",
         "transaction_guarantee": "Atomic leads.versioned_domain_change; audit + in-app outbox + receipt. External delivery never determines the domain commit.",
@@ -56312,12 +56525,15 @@
           "A55"
         ],
         "configuration_policy": "numeric plan limits/prices and legal approval are deployment configuration, never arbitrary allow/deny",
-        "implementation_status": "contract_only",
+        "implementation_status": "operational_development_limited",
         "required_features": [
           "F07",
           "F21"
         ],
-        "runtime_required_features": [],
+        "runtime_required_features": [
+          "F07",
+          "F21"
+        ],
         "conditional_features": [],
         "operation_contract": {
           "kind": "command",
@@ -56329,12 +56545,12 @@
             "leads.versioned_domain_change"
           ],
           "business_commit": true,
-          "read_path_status": "contract_only",
+          "read_path_status": "implemented",
           "source_decision": "DS-2026-10-17"
         },
         "decision_delivery": {
           "accepted_contract": "DS-2026-10-17",
-          "runtime_conformance": "pending",
+          "runtime_conformance": "implemented_pending_ci",
           "open_dependencies": [],
           "target_request": {
             "$ref": "#/$defs/Request_lead_convert"
@@ -56403,11 +56619,13 @@
           "A55"
         ],
         "configuration_policy": "numeric plan limits/prices and legal approval are deployment configuration, never arbitrary allow/deny",
-        "implementation_status": "contract_only",
+        "implementation_status": "operational_development_limited",
         "required_features": [
           "F23"
         ],
-        "runtime_required_features": [],
+        "runtime_required_features": [
+          "F23"
+        ],
         "conditional_features": [],
         "operation_contract": {
           "kind": "read",
@@ -56422,7 +56640,7 @@
         },
         "decision_delivery": {
           "accepted_contract": "DS-2026-10-17",
-          "runtime_conformance": "pending",
+          "runtime_conformance": "implemented_pending_ci",
           "open_dependencies": [],
           "target_request": {
             "$ref": "#/$defs/Request_crm_followup_list"
@@ -60183,7 +60401,9 @@
           "SUBSCRIPTION_NOT_STARTED",
           "TEMPORARY_FAILURE",
           "VALIDATION_FAILED",
-          "VERSION_CONFLICT"
+          "VERSION_CONFLICT",
+          "INVALID_STATE_TRANSITION",
+          "ACCOUNT_LINK_CONFLICT"
         ],
         "transaction_class": "single",
         "transaction_guarantee": "Atomic publications.versioned_domain_change; audit + in-app outbox + receipt. External delivery never determines the domain commit.",
@@ -60216,11 +60436,13 @@
           "A55"
         ],
         "configuration_policy": "numeric plan limits/prices and legal approval are deployment configuration, never arbitrary allow/deny",
-        "implementation_status": "contract_only",
+        "implementation_status": "operational_development_limited",
         "required_features": [
           "F25"
         ],
-        "runtime_required_features": [],
+        "runtime_required_features": [
+          "F25"
+        ],
         "conditional_features": [],
         "operation_contract": {
           "kind": "command",
@@ -60232,12 +60454,12 @@
             "publications.versioned_domain_change"
           ],
           "business_commit": true,
-          "read_path_status": "contract_only",
+          "read_path_status": "implemented",
           "source_decision": "DS-2026-10-17"
         },
         "decision_delivery": {
           "accepted_contract": "DS-2026-10-17",
-          "runtime_conformance": "pending",
+          "runtime_conformance": "implemented_pending_ci",
           "open_dependencies": [],
           "target_request": {
             "$ref": "#/$defs/Request_publication_set"
@@ -60265,7 +60487,9 @@
           "RATE_LIMITED",
           "SERVICE_UNAVAILABLE",
           "TEMPORARY_FAILURE",
-          "VALIDATION_FAILED"
+          "VALIDATION_FAILED",
+          "CLIENT_UPDATE_REQUIRED",
+          "INTEGRITY_VIOLATION"
         ],
         "transaction_class": "read",
         "transaction_guarantee": "Read authorized public_calendar_get projection only; no domain/rights/earning/settlement/receipt mutation.",
@@ -60298,11 +60522,13 @@
           "A55"
         ],
         "configuration_policy": "numeric plan limits/prices and legal approval are deployment configuration, never arbitrary allow/deny",
-        "implementation_status": "contract_only",
+        "implementation_status": "operational_development_limited",
         "required_features": [
           "F25"
         ],
-        "runtime_required_features": [],
+        "runtime_required_features": [
+          "F25"
+        ],
         "conditional_features": [],
         "operation_contract": {
           "kind": "read",
@@ -60317,7 +60543,7 @@
         },
         "decision_delivery": {
           "accepted_contract": "DS-2026-10-17",
-          "runtime_conformance": "pending",
+          "runtime_conformance": "implemented_pending_ci",
           "open_dependencies": [],
           "target_request": {
             "$ref": "#/$defs/Request_public_calendar_get"
@@ -60345,7 +60571,9 @@
           "RATE_LIMITED",
           "SERVICE_UNAVAILABLE",
           "TEMPORARY_FAILURE",
-          "VALIDATION_FAILED"
+          "VALIDATION_FAILED",
+          "CLIENT_UPDATE_REQUIRED",
+          "INTEGRITY_VIOLATION"
         ],
         "transaction_class": "public",
         "transaction_guarantee": "Atomic public_applications.versioned_domain_change; trusted actor and scoped provider/job result. External delivery never determines the domain commit.",
@@ -60380,11 +60608,13 @@
           "A55"
         ],
         "configuration_policy": "numeric plan limits/prices and legal approval are deployment configuration, never arbitrary allow/deny",
-        "implementation_status": "contract_only",
+        "implementation_status": "operational_development_limited",
         "required_features": [
           "F25"
         ],
-        "runtime_required_features": [],
+        "runtime_required_features": [
+          "F25"
+        ],
         "conditional_features": [],
         "operation_contract": {
           "kind": "command",
@@ -60401,8 +60631,10 @@
         },
         "decision_delivery": {
           "accepted_contract": "DS-2026-10-17",
-          "runtime_conformance": "pending",
-          "open_dependencies": [],
+          "runtime_conformance": "implemented_pending_ci",
+          "open_dependencies": [
+            "Configured signed ingress, Turnstile secret/hostname and real provider acceptance; no bypass."
+          ],
           "target_request": {
             "$ref": "#/$defs/Request_public_application_submit"
           }
@@ -60443,7 +60675,9 @@
           "SUBSCRIPTION_NOT_STARTED",
           "TEMPORARY_FAILURE",
           "VALIDATION_FAILED",
-          "VERSION_CONFLICT"
+          "VERSION_CONFLICT",
+          "INVALID_STATE_TRANSITION",
+          "ACCOUNT_LINK_CONFLICT"
         ],
         "transaction_class": "single",
         "transaction_guarantee": "Atomic public_applications.versioned_domain_change; audit + in-app outbox + receipt. External delivery never determines the domain commit.",
@@ -60476,12 +60710,15 @@
           "A55"
         ],
         "configuration_policy": "numeric plan limits/prices and legal approval are deployment configuration, never arbitrary allow/deny",
-        "implementation_status": "contract_only",
+        "implementation_status": "operational_development_limited",
         "required_features": [
           "F21",
           "F25"
         ],
-        "runtime_required_features": [],
+        "runtime_required_features": [
+          "F21",
+          "F25"
+        ],
         "conditional_features": [],
         "operation_contract": {
           "kind": "command",
@@ -60493,12 +60730,12 @@
             "public_applications.versioned_domain_change"
           ],
           "business_commit": true,
-          "read_path_status": "contract_only",
+          "read_path_status": "implemented",
           "source_decision": "DS-2026-10-17"
         },
         "decision_delivery": {
           "accepted_contract": "DS-2026-10-17",
-          "runtime_conformance": "pending",
+          "runtime_conformance": "implemented_pending_ci",
           "open_dependencies": [],
           "target_request": {
             "$ref": "#/$defs/Request_public_application_review"
@@ -64612,7 +64849,14 @@
           "waitlist_join_v1",
           "waitlist_leave_v1",
           "seat_offer_accept_v1",
-          "seat_offer_reject_v1"
+          "seat_offer_reject_v1",
+          "lead_save_v1",
+          "crm_activity_save_v1",
+          "trial_offer_create_v1",
+          "trial_registration_confirm_v1",
+          "lead_convert_v1",
+          "publication_set_v1",
+          "public_application_review_v1"
         ]
       },
       {
@@ -80221,6 +80465,60 @@
         "origin": "ftksaas",
         "acceptance": "generic_uuid",
         "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/ManagementProjection_trial_offer_create_v1/properties/values/properties/offer_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/ManagementProjection_public_application_review_v1/properties/values/properties/publication_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Table_public_applications/properties/person_id/anyOf/0",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/TrialOfferTerms/properties/product_version_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/CrmFollowupView/properties/id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/CrmFollowupView/properties/person_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/CrmFollowupView/properties/center_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/CrmFollowupView/properties/lead_id/anyOf/0",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/CrmFollowupView/properties/assigned_to/anyOf/0",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
       }
     ],
     "open_product_decisions": [],
@@ -81595,13 +81893,13 @@
           "person_update_v1",
           "student_activate_v1",
           "student_deactivate_v1",
+          "lead_convert_v1",
           "person_discipline_set_v1"
         ],
         "contract_only_operations": [
           "person_merge_preview_v1",
           "person_merge_approve_v1",
-          "person_merge_apply_v1",
-          "lead_convert_v1"
+          "person_merge_apply_v1"
         ],
         "acceptance_case_ids": [],
         "baseline_regression": "global baseline 241-test main CI; not per-feature DS acceptance",
@@ -81942,6 +82240,9 @@
         "implemented_operations": [
           "session_change_preview_v1",
           "session_change_apply_v1",
+          "session_cancel_preview_v1",
+          "session_cancel_apply_v1",
+          "replacement_session_create_v1",
           "reservation_cancel_v1",
           "attendance_get_v1",
           "attendance_mark_v1",
@@ -81950,10 +82251,7 @@
           "attendance_correct_apply_v1",
           "class_assignment_set_v1",
           "attendance_block_v1",
-          "attendance_start_v1",
-          "session_cancel_preview_v1",
-          "session_cancel_apply_v1",
-          "replacement_session_create_v1"
+          "attendance_start_v1"
         ],
         "contract_only_operations": [],
         "acceptance_case_ids": [
@@ -82025,17 +82323,17 @@
           "sale_preview_v1",
           "sale_apply_v1",
           "entitlements_get_v1",
-          "negative_limit_set_v1",
-          "negcredit_valuation_set_v1",
-          "reservation_impact_preview_v1",
-          "reservation_impact_apply_v1",
-          "negative_limits_get_v1",
-          "credit_adjust_v1",
           "entitlement_extend_v1",
+          "credit_adjust_v1",
+          "negative_limit_set_v1",
           "sale_terminate_preview_v1",
           "sale_terminate_apply_v1",
           "sale_renew_preview_v1",
-          "sale_renew_apply_v1"
+          "sale_renew_apply_v1",
+          "negcredit_valuation_set_v1",
+          "reservation_impact_preview_v1",
+          "reservation_impact_apply_v1",
+          "negative_limits_get_v1"
         ],
         "contract_only_operations": [],
         "acceptance_case_ids": [
@@ -82464,14 +82762,14 @@
         "implementation": "partial",
         "acceptance": "pending_feature_acceptance",
         "acceptance_evidence": [],
-        "implemented_operations": [],
-        "contract_only_operations": [
+        "implemented_operations": [
           "leads_list_v1",
           "lead_save_v1",
           "crm_activity_save_v1",
           "lead_convert_v1",
           "public_application_review_v1"
         ],
+        "contract_only_operations": [],
         "acceptance_case_ids": [],
         "baseline_regression": "no callable operation; no behavior acceptance claimed",
         "plan_scope": {
@@ -82494,15 +82792,17 @@
           "trial_offer_create_v1",
           "trial_registration_confirm_v1"
         ],
-        "dependencies": [],
+        "dependencies": [
+          "Explicit trial product/offer duration and trial_repeat_limit deployment configuration."
+        ],
         "implementation": "partial",
         "acceptance": "pending_feature_acceptance",
         "acceptance_evidence": [],
-        "implemented_operations": [],
-        "contract_only_operations": [
+        "implemented_operations": [
           "trial_offer_create_v1",
           "trial_registration_confirm_v1"
         ],
+        "contract_only_operations": [],
         "acceptance_case_ids": [],
         "baseline_regression": "no callable operation; no behavior acceptance claimed",
         "plan_scope": {
@@ -82529,11 +82829,11 @@
         "implementation": "partial",
         "acceptance": "pending_feature_acceptance",
         "acceptance_evidence": [],
-        "implemented_operations": [],
-        "contract_only_operations": [
+        "implemented_operations": [
           "crm_activity_save_v1",
           "crm_followup_list_v1"
         ],
+        "contract_only_operations": [],
         "acceptance_case_ids": [],
         "baseline_regression": "no callable operation; no behavior acceptance claimed",
         "plan_scope": {
@@ -82593,20 +82893,20 @@
           "public_application_review_v1"
         ],
         "dependencies": [
+          "Configured signed ingress, Turnstile secret/hostname and real provider acceptance; no bypass.",
           "plan_gate_alignment"
         ],
         "implementation": "partial",
         "acceptance": "pending_feature_acceptance",
         "acceptance_evidence": [],
         "implemented_operations": [
-          "event_publish_v1"
-        ],
-        "contract_only_operations": [
+          "event_publish_v1",
           "publication_set_v1",
           "public_calendar_get_v1",
           "public_application_submit_v1",
           "public_application_review_v1"
         ],
+        "contract_only_operations": [],
         "acceptance_case_ids": [
           "DS-ACCESS-01"
         ],
@@ -82982,6 +83282,28 @@
         },
         "completed_dependencies": []
       }
+    },
+    "p04_delivery": {
+      "status": "implemented_pending_ci",
+      "scope": [
+        "leads_list_v1",
+        "lead_save_v1",
+        "crm_activity_save_v1",
+        "trial_offer_create_v1",
+        "trial_registration_confirm_v1",
+        "lead_convert_v1",
+        "crm_followup_list_v1",
+        "publication_set_v1",
+        "public_calendar_get_v1",
+        "public_application_submit_v1",
+        "public_application_review_v1"
+      ],
+      "public_transport": "backend-v1 keeps verify_jwt=true; legacy anon JWT gateway credential, no human account; submit additionally requires body-bound signed ingress IP and provider-verified Turnstile hostname/action",
+      "public_slug": "organization UUID, grouped across its published targets",
+      "public_contact": "normalized email; unverified until separate account linking",
+      "trial_config": "private.p04_trial_configuration plus existing trial_repeat_limit policy; no default trial duration/cap",
+      "followup_config": "existing entitlement_reminder_days and inactive_student_days; no automatic segmentation or messaging",
+      "acceptance": "local verification and independent review pending; candidate/main clean unchanged"
     }
   }
 }

@@ -2789,8 +2789,8 @@
     },
     {
       "name": "leads_list_v1",
-      "status": "contract_only",
-      "external_path": null,
+      "status": "operational_development_limited",
+      "external_path": "/functions/v1/backend-v1/leads_list_v1",
       "permission": "crm.daily",
       "features": [
         "F21"
@@ -2798,10 +2798,12 @@
       "required_features": [
         "F21"
       ],
-      "runtime_required_features": [],
+      "runtime_required_features": [
+        "F21"
+      ],
       "decision_delivery": {
         "accepted_contract": "DS-2026-10-17",
-        "runtime_conformance": "pending",
+        "runtime_conformance": "implemented_pending_ci",
         "open_dependencies": [],
         "target_request": {
           "$ref": "#/$defs/Request_leads_list"
@@ -2812,8 +2814,8 @@
     },
     {
       "name": "lead_save_v1",
-      "status": "contract_only",
-      "external_path": null,
+      "status": "operational_development_limited",
+      "external_path": "/functions/v1/backend-v1/lead_save_v1",
       "permission": "crm.daily",
       "features": [
         "F21"
@@ -2821,10 +2823,12 @@
       "required_features": [
         "F21"
       ],
-      "runtime_required_features": [],
+      "runtime_required_features": [
+        "F21"
+      ],
       "decision_delivery": {
         "accepted_contract": "DS-2026-10-17",
-        "runtime_conformance": "pending",
+        "runtime_conformance": "implemented_pending_ci",
         "open_dependencies": [],
         "target_request": {
           "$ref": "#/$defs/Request_lead_save"
@@ -2835,8 +2839,8 @@
     },
     {
       "name": "crm_activity_save_v1",
-      "status": "contract_only",
-      "external_path": null,
+      "status": "operational_development_limited",
+      "external_path": "/functions/v1/backend-v1/crm_activity_save_v1",
       "permission": "crm.daily",
       "features": [
         "F21",
@@ -2846,10 +2850,13 @@
         "F21",
         "F23"
       ],
-      "runtime_required_features": [],
+      "runtime_required_features": [
+        "F21",
+        "F23"
+      ],
       "decision_delivery": {
         "accepted_contract": "DS-2026-10-17",
-        "runtime_conformance": "pending",
+        "runtime_conformance": "implemented_pending_ci",
         "open_dependencies": [],
         "target_request": {
           "$ref": "#/$defs/Request_crm_activity_save"
@@ -2860,8 +2867,8 @@
     },
     {
       "name": "trial_offer_create_v1",
-      "status": "contract_only",
-      "external_path": null,
+      "status": "operational_development_limited",
+      "external_path": "/functions/v1/backend-v1/trial_offer_create_v1",
       "permission": "crm.daily",
       "features": [
         "F22"
@@ -2869,11 +2876,15 @@
       "required_features": [
         "F22"
       ],
-      "runtime_required_features": [],
+      "runtime_required_features": [
+        "F22"
+      ],
       "decision_delivery": {
         "accepted_contract": "DS-2026-10-17",
-        "runtime_conformance": "pending",
-        "open_dependencies": [],
+        "runtime_conformance": "implemented_pending_ci",
+        "open_dependencies": [
+          "Explicit trial product/offer duration and trial_repeat_limit deployment configuration."
+        ],
         "target_request": {
           "$ref": "#/$defs/Request_trial_offer_create"
         }
@@ -2883,8 +2894,8 @@
     },
     {
       "name": "trial_registration_confirm_v1",
-      "status": "contract_only",
-      "external_path": null,
+      "status": "operational_development_limited",
+      "external_path": "/functions/v1/backend-v1/trial_registration_confirm_v1",
       "permission": "crm.daily",
       "features": [
         "F22"
@@ -2892,11 +2903,15 @@
       "required_features": [
         "F22"
       ],
-      "runtime_required_features": [],
+      "runtime_required_features": [
+        "F22"
+      ],
       "decision_delivery": {
         "accepted_contract": "DS-2026-10-17",
-        "runtime_conformance": "pending",
-        "open_dependencies": [],
+        "runtime_conformance": "implemented_pending_ci",
+        "open_dependencies": [
+          "Explicit trial product/offer duration and trial_repeat_limit deployment configuration."
+        ],
         "target_request": {
           "$ref": "#/$defs/Request_trial_registration_confirm"
         }
@@ -2906,8 +2921,8 @@
     },
     {
       "name": "lead_convert_v1",
-      "status": "contract_only",
-      "external_path": null,
+      "status": "operational_development_limited",
+      "external_path": "/functions/v1/backend-v1/lead_convert_v1",
       "permission": "crm.daily",
       "features": [
         "F07",
@@ -2917,10 +2932,13 @@
         "F07",
         "F21"
       ],
-      "runtime_required_features": [],
+      "runtime_required_features": [
+        "F07",
+        "F21"
+      ],
       "decision_delivery": {
         "accepted_contract": "DS-2026-10-17",
-        "runtime_conformance": "pending",
+        "runtime_conformance": "implemented_pending_ci",
         "open_dependencies": [],
         "target_request": {
           "$ref": "#/$defs/Request_lead_convert"
@@ -2931,8 +2949,8 @@
     },
     {
       "name": "crm_followup_list_v1",
-      "status": "contract_only",
-      "external_path": null,
+      "status": "operational_development_limited",
+      "external_path": "/functions/v1/backend-v1/crm_followup_list_v1",
       "permission": "crm.daily",
       "features": [
         "F23"
@@ -2940,10 +2958,12 @@
       "required_features": [
         "F23"
       ],
-      "runtime_required_features": [],
+      "runtime_required_features": [
+        "F23"
+      ],
       "decision_delivery": {
         "accepted_contract": "DS-2026-10-17",
-        "runtime_conformance": "pending",
+        "runtime_conformance": "implemented_pending_ci",
         "open_dependencies": [],
         "target_request": {
           "$ref": "#/$defs/Request_crm_followup_list"
@@ -3748,8 +3768,8 @@
     },
     {
       "name": "publication_set_v1",
-      "status": "contract_only",
-      "external_path": null,
+      "status": "operational_development_limited",
+      "external_path": "/functions/v1/backend-v1/publication_set_v1",
       "permission": "schedule.manage",
       "features": [
         "F25"
@@ -3757,10 +3777,12 @@
       "required_features": [
         "F25"
       ],
-      "runtime_required_features": [],
+      "runtime_required_features": [
+        "F25"
+      ],
       "decision_delivery": {
         "accepted_contract": "DS-2026-10-17",
-        "runtime_conformance": "pending",
+        "runtime_conformance": "implemented_pending_ci",
         "open_dependencies": [],
         "target_request": {
           "$ref": "#/$defs/Request_publication_set"
@@ -3771,8 +3793,8 @@
     },
     {
       "name": "public_calendar_get_v1",
-      "status": "contract_only",
-      "external_path": null,
+      "status": "operational_development_limited",
+      "external_path": "/functions/v1/backend-v1/public_calendar_get_v1",
       "permission": "public.apply",
       "features": [
         "F25"
@@ -3780,10 +3802,12 @@
       "required_features": [
         "F25"
       ],
-      "runtime_required_features": [],
+      "runtime_required_features": [
+        "F25"
+      ],
       "decision_delivery": {
         "accepted_contract": "DS-2026-10-17",
-        "runtime_conformance": "pending",
+        "runtime_conformance": "implemented_pending_ci",
         "open_dependencies": [],
         "target_request": {
           "$ref": "#/$defs/Request_public_calendar_get"
@@ -3794,8 +3818,8 @@
     },
     {
       "name": "public_application_submit_v1",
-      "status": "contract_only",
-      "external_path": null,
+      "status": "operational_development_limited",
+      "external_path": "/functions/v1/backend-v1/public_application_submit_v1",
       "permission": "public.apply",
       "features": [
         "F25"
@@ -3803,11 +3827,15 @@
       "required_features": [
         "F25"
       ],
-      "runtime_required_features": [],
+      "runtime_required_features": [
+        "F25"
+      ],
       "decision_delivery": {
         "accepted_contract": "DS-2026-10-17",
-        "runtime_conformance": "pending",
-        "open_dependencies": [],
+        "runtime_conformance": "implemented_pending_ci",
+        "open_dependencies": [
+          "Configured signed ingress, Turnstile secret/hostname and real provider acceptance; no bypass."
+        ],
         "target_request": {
           "$ref": "#/$defs/Request_public_application_submit"
         }
@@ -3817,8 +3845,8 @@
     },
     {
       "name": "public_application_review_v1",
-      "status": "contract_only",
-      "external_path": null,
+      "status": "operational_development_limited",
+      "external_path": "/functions/v1/backend-v1/public_application_review_v1",
       "permission": "crm.daily",
       "features": [
         "F21",
@@ -3828,10 +3856,13 @@
         "F21",
         "F25"
       ],
-      "runtime_required_features": [],
+      "runtime_required_features": [
+        "F21",
+        "F25"
+      ],
       "decision_delivery": {
         "accepted_contract": "DS-2026-10-17",
-        "runtime_conformance": "pending",
+        "runtime_conformance": "implemented_pending_ci",
         "open_dependencies": [],
         "target_request": {
           "$ref": "#/$defs/Request_public_application_review"

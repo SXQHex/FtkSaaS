@@ -1,6 +1,6 @@
 # FtkSaaS — API kataloğu · 0.2.0-rc.3
 
-199 sözleşme; 140 geliştirme ortamında çağrılabilir endpoint, 59 yalnız sözleşme. Çağrılabilir olmak bütün ürün özelliklerinin veya üretim kabulünün tamamlandığı anlamına gelmez. Kapsam sınırları ve Q-E01 `docs/claude-handover.md` içindedir.
+199 sözleşme; 151 geliştirme ortamında çağrılabilir endpoint, 48 yalnız sözleşme. Çağrılabilir olmak bütün ürün özelliklerinin veya üretim kabulünün tamamlandığı anlamına gelmez. Kapsam sınırları ve Q-E01 `docs/claude-handover.md` içindedir.
 
 `POST {API_URL}/functions/v1/backend-v1/{operation}`; JSON gövde doğrudan typed Request nesnesidir. Header: `Authorization: Bearer <Supabase access_token>`, `apikey: <publishable key>`, `Content-Type: application/json`. Başarı: `ok/data/trace_id`; hata: `ok:false/error:SafeError`. Servis anahtarı frontend’e verilmez.
 
@@ -113,13 +113,13 @@ Named `/rest/v1/rpc/{operation}` yalnız backend içindir; imzası p_request + d
 | `earnings_list_v1` | çağrılabilir (kapsam notları geçerli) | `earnings.read` | R / read | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; center_id?: FtkUuid ∣ null; person_id: FtkUuid; interval: Interval; page: Page | Success_earnings_list |
 | `instructor_payment_record_v1` | çağrılabilir (kapsam notları geçerli) | `earnings.manage` | W / collection | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; center_id?: FtkUuid ∣ null; operation_key: FtkUuid; person_id: FtkUuid; earning_ids: FtkUuid[]; amount_minor: PositiveMoney; currency: Currency; occurred_at: Instant | Success_instructor_payment_record |
 | `instructor_payment_correct_v1` | çağrılabilir (kapsam notları geçerli) | `earnings.manage` | W / maintenance | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; center_id?: FtkUuid ∣ null; operation_key: FtkUuid; expected_version: PositiveInt; payment_id: FtkUuid; correction: CashCorrection; reason: Text | Success_instructor_payment_correct |
-| `leads_list_v1` | yalnız sözleşme | `crm.daily` | R / read | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; center_id?: FtkUuid ∣ null; page: Page; query?: Text ∣ null | Success_leads_list |
-| `lead_save_v1` | yalnız sözleşme | `crm.daily` | W / new | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; center_id?: FtkUuid ∣ null; operation_key: FtkUuid; expected_version?: PositiveInt; lead_id?: FtkUuid ∣ null; person_id: FtkUuid; source: Text; interest: Text; assigned_to?: FtkUuid ∣ null | Success_lead_save |
-| `crm_activity_save_v1` | yalnız sözleşme | `crm.daily` | W / maintenance | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; center_id?: FtkUuid ∣ null; operation_key: FtkUuid; expected_version?: PositiveInt; lead_id: FtkUuid; kind: CrmActivityKind; due_at?: Instant ∣ null; outcome?: Text ∣ null; note?: Text ∣ null; activity_id?: FtkUuid | Success_crm_activity_save |
-| `trial_offer_create_v1` | yalnız sözleşme | `crm.daily` | W / new | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; center_id?: FtkUuid ∣ null; operation_key: FtkUuid; lead_id: FtkUuid; product_version_id: FtkUuid; session_id?: FtkUuid ∣ null | Success_trial_offer_create |
-| `trial_registration_confirm_v1` | yalnız sözleşme | `crm.daily` | W / request | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; center_id?: FtkUuid ∣ null; operation_key: FtkUuid; offer_id: FtkUuid | Success_trial_registration_confirm |
-| `lead_convert_v1` | yalnız sözleşme | `crm.daily` | W / new | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; center_id?: FtkUuid ∣ null; operation_key: FtkUuid; lead_id: FtkUuid | Success_lead_convert |
-| `crm_followup_list_v1` | yalnız sözleşme | `crm.daily` | R / read | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; center_id?: FtkUuid ∣ null; kind: FollowupKind; interval?: Interval ∣ null; page: Page | Success_crm_followup_list |
+| `leads_list_v1` | çağrılabilir (kapsam notları geçerli) | `crm.daily` | R / read | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; center_id?: FtkUuid ∣ null; page: Page; query?: Text ∣ null | Success_leads_list |
+| `lead_save_v1` | çağrılabilir (kapsam notları geçerli) | `crm.daily` | W / new | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; center_id?: FtkUuid ∣ null; operation_key: FtkUuid; expected_version?: PositiveInt; lead_id?: FtkUuid ∣ null; person_id: FtkUuid; source: Text; interest: Text; assigned_to?: FtkUuid ∣ null | Success_lead_save |
+| `crm_activity_save_v1` | çağrılabilir (kapsam notları geçerli) | `crm.daily` | W / maintenance | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; center_id?: FtkUuid ∣ null; operation_key: FtkUuid; expected_version?: PositiveInt; lead_id: FtkUuid; kind: CrmActivityKind; due_at?: Instant ∣ null; outcome?: Text ∣ null; note?: Text ∣ null; activity_id?: FtkUuid | Success_crm_activity_save |
+| `trial_offer_create_v1` | çağrılabilir (kapsam notları geçerli) | `crm.daily` | W / new | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; center_id?: FtkUuid ∣ null; operation_key: FtkUuid; lead_id: FtkUuid; product_version_id: FtkUuid; session_id?: FtkUuid ∣ null | Success_trial_offer_create |
+| `trial_registration_confirm_v1` | çağrılabilir (kapsam notları geçerli) | `crm.daily` | W / request | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; center_id?: FtkUuid ∣ null; operation_key: FtkUuid; offer_id: FtkUuid | Success_trial_registration_confirm |
+| `lead_convert_v1` | çağrılabilir (kapsam notları geçerli) | `crm.daily` | W / new | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; center_id?: FtkUuid ∣ null; operation_key: FtkUuid; lead_id: FtkUuid | Success_lead_convert |
+| `crm_followup_list_v1` | çağrılabilir (kapsam notları geçerli) | `crm.daily` | R / read | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; center_id?: FtkUuid ∣ null; kind: FollowupKind; interval?: Interval ∣ null; page: Page | Success_crm_followup_list |
 | `segment_save_v1` | yalnız sözleşme | `crm.manage` | W / config | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; center_id?: FtkUuid ∣ null; operation_key: FtkUuid; expected_version?: PositiveInt; segment_id?: FtkUuid ∣ null; name: Text; definition: SegmentDefinition; scope: ConfigurationScope | Success_segment_save |
 | `automation_save_v1` | yalnız sözleşme | `crm.manage` | W / config | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; center_id?: FtkUuid ∣ null; operation_key: FtkUuid; expected_version?: PositiveInt; automation_id?: FtkUuid ∣ null; definition: AutomationDefinition; scope: ConfigurationScope | Success_automation_save |
 | `notifications_list_v1` | yalnız sözleşme | `notification.self` | R / read | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; center_id?: FtkUuid ∣ null; page: Page; unread_only: Bool | Success_notifications_list |
@@ -153,10 +153,10 @@ Named `/rest/v1/rpc/{operation}` yalnız backend içindir; imzası p_request + d
 | `document_version_publish_v1` | yalnız sözleşme | `document.manage` | W / config | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; center_id?: FtkUuid ∣ null; operation_key: FtkUuid; document_id?: FtkUuid ∣ null; file_id: FtkUuid; version_label: Text; requirements: DocumentRequirement[]; scope: ConfigurationScope | Success_document_version_publish |
 | `document_requirements_get_v1` | yalnız sözleşme | `person.read` | R / read | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; center_id?: FtkUuid ∣ null; person_id: FtkUuid; context: AcceptanceContext | Success_document_requirements_get |
 | `document_accept_v1` | yalnız sözleşme | `document.accept` | W / maintenance | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; center_id?: FtkUuid ∣ null; operation_key: FtkUuid; document_version_id: FtkUuid; context: AcceptanceContext | Success_document_accept |
-| `publication_set_v1` | yalnız sözleşme | `schedule.manage` | W / config | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; center_id?: FtkUuid ∣ null; operation_key: FtkUuid; expected_version?: PositiveInt; session_id?: FtkUuid ∣ null; event_id?: FtkUuid ∣ null; published: Bool | Success_publication_set |
-| `public_calendar_get_v1` | yalnız sözleşme | `public.apply` | R / public | client_api_version: 1; request_id: FtkUuid; center_id?: FtkUuid ∣ null; slug: Text; interval: Interval; page: Page | Success_public_calendar_get |
-| `public_application_submit_v1` | yalnız sözleşme | `public.apply` | E / public | client_api_version: 1; request_id: FtkUuid; center_id?: FtkUuid ∣ null; publication_id: FtkUuid; contact: Text; bot_proof: Secret; client_request_key: FtkUuid | Success_public_application_submit |
-| `public_application_review_v1` | yalnız sözleşme | `crm.daily` | W / new | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; center_id?: FtkUuid ∣ null; operation_key: FtkUuid; application_id: FtkUuid; action: ApplicationAction; person_id?: FtkUuid ∣ null | Success_public_application_review |
+| `publication_set_v1` | çağrılabilir (kapsam notları geçerli) | `schedule.manage` | W / config | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; center_id?: FtkUuid ∣ null; operation_key: FtkUuid; expected_version?: PositiveInt; session_id?: FtkUuid ∣ null; event_id?: FtkUuid ∣ null; published: Bool; public_details?: PublicPublicationDetails | Success_publication_set |
+| `public_calendar_get_v1` | çağrılabilir (kapsam notları geçerli) | `public.apply` | R / public | client_api_version: 1; request_id: FtkUuid; center_id?: FtkUuid ∣ null; slug: Text; interval: Interval; page: Page | Success_public_calendar_get |
+| `public_application_submit_v1` | çağrılabilir (kapsam notları geçerli) | `public.apply` | E / public | client_api_version: 1; request_id: FtkUuid; center_id?: FtkUuid ∣ null; publication_id: FtkUuid; contact: Text; bot_proof: Secret; client_request_key: FtkUuid | Success_public_application_submit |
+| `public_application_review_v1` | çağrılabilir (kapsam notları geçerli) | `crm.daily` | W / new | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; center_id?: FtkUuid ∣ null; operation_key: FtkUuid; application_id: FtkUuid; action: ApplicationAction; person_id?: FtkUuid ∣ null | Success_public_application_review |
 | `operation_status_get_v1` | yalnız sözleşme | `account.self` | R / exempt | client_api_version: 1; request_id: FtkUuid; org_id?: FtkUuid ∣ null; operation: OperationName; key: FtkUuid | Success_operation_status_get |
 | `preview_get_v1` | yalnız sözleşme | `account.self` | R / read | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; center_id?: FtkUuid ∣ null; preview_id: FtkUuid | Success_preview_get |
 | `job_status_get_v1` | yalnız sözleşme | `account.self` | R / read | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; center_id?: FtkUuid ∣ null; job_id: FtkUuid | Success_job_status_get |
@@ -319,13 +319,13 @@ features ürün referanslarıdır. required_features hedef plan kapısı; runtim
 | earnings_list_v1 | read | none / None |  | implemented_auth_edge_rpc_acceptance |
 | instructor_payment_record_v1 | command | append_or_current_scope_lock / earnings_list_v1 | instructor_payments, earning_allocations.partial | p03_implemented_acceptance_pending |
 | instructor_payment_correct_v1 | correction | row_version / earnings_list_v1 | instructor_payments.linked_correction, earning_allocations.linked_adjustment | p03_implemented_acceptance_pending |
-| leads_list_v1 | read | none / None |  | pending |
-| lead_save_v1 | command | create_absent_update_requires_version / management_state_get_v1 | leads.versioned_domain_change | pending |
-| crm_activity_save_v1 | command | create_absent_update_requires_version / management_state_get_v1 | crm_activities.versioned_domain_change | pending |
-| trial_offer_create_v1 | command | append_or_current_scope_lock / management_state_get_v1 | trial_offers.versioned_domain_change | pending |
-| trial_registration_confirm_v1 | command | append_or_current_scope_lock / management_state_get_v1 | trial_offers.versioned_domain_change | pending |
-| lead_convert_v1 | command | append_or_current_scope_lock / management_state_get_v1 | leads.versioned_domain_change | pending |
-| crm_followup_list_v1 | read | none / None |  | pending |
+| leads_list_v1 | read | none / None |  | implemented_pending_ci |
+| lead_save_v1 | command | create_absent_update_requires_version / management_state_get_v1 | leads.versioned_domain_change | implemented_pending_ci |
+| crm_activity_save_v1 | command | create_absent_update_requires_version / management_state_get_v1 | crm_activities.versioned_domain_change | implemented_pending_ci |
+| trial_offer_create_v1 | command | append_or_current_scope_lock / management_state_get_v1 | trial_offers.versioned_domain_change | implemented_pending_ci |
+| trial_registration_confirm_v1 | command | append_or_current_scope_lock / management_state_get_v1 | trial_offers.versioned_domain_change | implemented_pending_ci |
+| lead_convert_v1 | command | append_or_current_scope_lock / management_state_get_v1 | leads.versioned_domain_change | implemented_pending_ci |
+| crm_followup_list_v1 | read | none / None |  | implemented_pending_ci |
 | segment_save_v1 | command | create_absent_update_requires_version / management_state_get_v1 | segments.versioned_domain_change | pending |
 | automation_save_v1 | command | create_absent_update_requires_version / management_state_get_v1 | automations.versioned_domain_change | pending |
 | notifications_list_v1 | read | none / None |  | pending |
@@ -359,10 +359,10 @@ features ürün referanslarıdır. required_features hedef plan kapısı; runtim
 | document_version_publish_v1 | command | append_or_current_scope_lock / management_state_get_v1 | document_versions.versioned_domain_change | pending |
 | document_requirements_get_v1 | read | none / None |  | pending |
 | document_accept_v1 | command | append_or_current_scope_lock / management_state_get_v1 | documents.versioned_domain_change | pending |
-| publication_set_v1 | command | create_absent_update_requires_version / management_state_get_v1 | publications.versioned_domain_change | pending |
-| public_calendar_get_v1 | read | none / None |  | pending |
-| public_application_submit_v1 | command | append_or_current_scope_lock / management_state_get_v1 | public_applications.versioned_domain_change | pending |
-| public_application_review_v1 | command | append_or_current_scope_lock / management_state_get_v1 | public_applications.versioned_domain_change | pending |
+| publication_set_v1 | command | create_absent_update_requires_version / management_state_get_v1 | publications.versioned_domain_change | implemented_pending_ci |
+| public_calendar_get_v1 | read | none / None |  | implemented_pending_ci |
+| public_application_submit_v1 | command | append_or_current_scope_lock / management_state_get_v1 | public_applications.versioned_domain_change | implemented_pending_ci |
+| public_application_review_v1 | command | append_or_current_scope_lock / management_state_get_v1 | public_applications.versioned_domain_change | implemented_pending_ci |
 | operation_status_get_v1 | read | none / None |  | pending |
 | preview_get_v1 | read | none / None |  | pending |
 | job_status_get_v1 | read | none / None |  | pending |
