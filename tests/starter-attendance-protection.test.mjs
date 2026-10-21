@@ -228,16 +228,27 @@ test('Starter attendance and protected reservation through Auth -> Edge -> RPC',
  });
 
  await t.test('future-effective policy honors actual booking evidence across the UTC activation boundary',async()=>{
+  await publish('negative_upper',{kind:'integer',value:10});
+  try{
   const p=await linked('future-policy-student');
-  const change={kind:'policy',key:'negative_upper',value:{kind:'integer',value:0},effective_at:new Date(Date.now()+3000).toISOString(),mandatory:false};
+  // Schedule through the API without racing its own HTTP setup. Advance only
+  // this fixture's activation after the real booking; never invent its evidence.
+  const [{scheduled}]=await rows("select clock_timestamp()+interval '1 day' as scheduled");
+  const change={kind:'policy',key:'negative_upper',value:{kind:'integer',value:0},effective_at:scheduled.toISOString(),mandatory:false};
   const pv=await must(owner,'reservation_impact_preview_v1',scope({center_id:null,change,reason:'Future UTC boundary'}));
-  await mut('reservation_impact_apply_v1',{center_id:null,preview:token(pv.preview),accepted_reservation_ids:pv.affected.map(x=>x.reservation_id)});
+  const policy=await mut('reservation_impact_apply_v1',{center_id:null,preview:token(pv.preview),accepted_reservation_ids:pv.affected.map(x=>x.reservation_id)});
   const ses=(await makeSession()).primary_id,rv=(await book(ses,p.p)).primary_id;
-  await new Promise(resolve=>setTimeout(resolve,Math.max(0,Date.parse(change.effective_at)-Date.now()+50)));
+  const [before]=await rows("select r.booking_obligation, p.created_at<=(r.booking_obligation->>'captured_at')::timestamptz and (r.booking_obligation->>'captured_at')::timestamptz<p.effective_at and p.effective_at>clock_timestamp() and r.booking_obligation#>>'{policies,negative_upper}' is distinct from p.id::text as ordered from core.reservations r join core.policy_versions p on p.org_id=r.org_id where r.org_id=$1 and r.id=$2 and p.id=$3",[org,rv,policy.primary_id]);
+  assert.equal(before.ordered,true);assert(before.booking_obligation);
+  const activated=await rows("update core.policy_versions set effective_at=clock_timestamp() where org_id=$1 and id=$2 returning id",[org,policy.primary_id]);
+  assert.equal(activated.length,1);assert.equal(activated[0].id,policy.primary_id);
+  const [after]=await rows("select r.booking_obligation, p.created_at<=(r.booking_obligation->>'captured_at')::timestamptz and (r.booking_obligation->>'captured_at')::timestamptz<p.effective_at and p.effective_at<=clock_timestamp() as ordered, (select count(*)::int from private.reservation_protections x where x.org_id=r.org_id and x.reservation_id=r.id) as explicit_protections from core.reservations r join core.policy_versions p on p.org_id=r.org_id where r.org_id=$1 and r.id=$2 and p.id=$3",[org,rv,policy.primary_id]);
+  assert.equal(after.ordered,true);assert.deepEqual(after.booking_obligation,before.booking_obligation);assert.equal(after.explicit_protections,0);
+  const limits=await must(owner,'negative_limits_get_v1',scope({person_id:p.p,discipline_id:discipline}));assert.equal(limits.effective_limit,0);
   const v=await get(ses);assert(v.entries[0].protected);
   await mut('attendance_mark_v1',{reservation_id:rv,expected_version:v.entries[0].version,result:'attended'});
   await fail('reservation_create_v1',{session_id:(await makeSession()).primary_id,person_id:p.p,mode:'flexible'},'CREDIT_LIMIT_EXCEEDED');
-  await publish('negative_upper',{kind:'integer',value:10});
+  }finally{await publish('negative_upper',{kind:'integer',value:10});}
  });
  await t.test('late correction outbox failure rolls back linked revision, rights, audit and receipt',async()=>{
   const pv=await must(owner,'attendance_correct_preview_v1',scope({session_id:sid,corrections:[{reservation_id:rid,result:'no_show'}],reason:'Late failure correction'}));
@@ -251,6 +262,8 @@ test('Starter attendance and protected reservation through Auth -> Edge -> RPC',
  });
 
  await t.test('a second adverse restriction still requires exact approval of already protected reservations',async()=>{
+  await publish('negative_upper',{kind:'integer',value:10});
+  try{
   const p=await linked('successive-limits');
   const own=await preview({kind:'negative_limit',person_id:p.p,discipline_id:discipline,allowed_negative_credits:5});
   await mut('reservation_impact_apply_v1',{preview:token(own.preview),accepted_reservation_ids:[]});
@@ -262,6 +275,7 @@ test('Starter attendance and protected reservation through Auth -> Edge -> RPC',
   await fail('policy_publish_v1',{center_id:null,key:next.key,value:next.value,effective_at:next.effective_at,mandatory:false},'PREVIEW_STALE');
   const pv2=await must(owner,'reservation_impact_preview_v1',scope({center_id:null,change:next,reason:'Second restriction'}));
   assert(rs.every(id=>pv2.affected.some(x=>x.reservation_id===id)));await mut('reservation_impact_apply_v1',{center_id:null,preview:token(pv2.preview),accepted_reservation_ids:pv2.affected.map(x=>x.reservation_id)});
+  }finally{await publish('negative_upper',{kind:'integer',value:10});}
  });
 
  await t.test('blocked credit effect is frozen at actual sale; later policy cannot reprice it',async()=>{
