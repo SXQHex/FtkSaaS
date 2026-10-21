@@ -1,7 +1,7 @@
 # Kalıcı geliştirme/test backend’i
 
 
-## CD-01 — 21 Ekim 2026, hazırlanıyor
+## CD-01 — 21 Ekim 2026, main’e kuruldu; kabul bekliyor
 
 PR31 normal merge ile `1c9c8b5552d4f810654bef7915d1fb404e1cd464` main kaynağına alındı; aynı main [39533805184](https://github.com/SXQHex/FtkSaaS/actions/runs/39533805184) completed/success. Bu yalnız-belge kabulüdür; yeni full clean veya yeni hosted dağıtım değildir. P03 uygulama kabulü aşağıdaki 10710ffa kaynağıdır.
 
@@ -22,7 +22,7 @@ Dağıtım sonrası core RLS, anon/authenticated doğrudan RPC EXECUTE reddi, se
 3. İlk head5fc9ca6 hedefli39535381934 completed/success. Bağımsız incelemede belge merge’iyle dağıtımın atlanması ve kabul attempt’inin kuyruğa alınma sonrası değişmesi bulundu; kaynak dondurulmadan düzeltildi, yarış regresyonları eklendi. Güncel son kaynak incelemesi, hedefli ve açık aday full clean; trusted CI yüzeyi değiştiğinden mevcut kapı otomatik kurulumu reddeder. [CI politikası](ci-policy.md) gereği somut son kaynağa bağımsız inceleme/gerçek aday kanıtından sonra açık kurulum onayı gerekir. Önceki PR’lerin izni taşınmaz; kapı gevşetilmez.
 4. Normal merge ve aynı main full kabulü sonrasında ilk CD koşusu canlı doğrulanmalı. Eksik secret sessiz skip değildir; CD başarısız olur. Sonuç `.ci/development-delivery.json` artifact’inde kaynak/main kabul run’ı/migration sayısı/Edge sürümü/hash/izinsiz erişim/smoke/cleanup/advisor özeti olarak tutulur; token/parola/fixture kişisel verisi raporlanmaz. Artifact saklama 14 gündür; sonraki doğal devir güncellemesi kabul run bağlantısını kaydeder.
 
-CD-01 henüz etkin veya done değildir. P04 başlamadı. Hosted worker zamanlayıcısı, frontend, dış e-posta ve yük/restore bu CD kapsamıyla kapanmaz.
+CD-01 PR32 ile kullanıcının exact head4e1e25c5 kurulum onayı sonrası normal merge3e2fcd7a2836b0067e1d7ba3fa95215d89482c80 olarak kuruldu; tested merge1a2110e5/treeffa1c79f ile aynı ağaç doğrulandı. Aday39580259901 core/dört shard/toplayıcı successful ve bağımsız review5597902305 kaynak bloklayıcısı yok. Aynı main39582760620 API3’te future-effective Starter testinin3 saniyelik kurulum yarışı ve sonraki teste sızan upper0 yüzünden başarısız; diğer shard/core başarılı. CD39584677756, başarısız main nedeniyle doğru biçimde skipped; hosted dağıtımı denenmedi. Ayrı test-only düzeltme API yayınlama/rezervasyon ve kabul sonuçlarını korur; yalnız tam org/policy ID’sindeki etkinleşme fixture zamanı ilerletilir. SQL timestamp sırası, değişmeyen gerçek booking_obligation, explicit protection üretilmemesi ve yeni rezervasyon reddi ek olarak doğrulanır; üst limit finally ile geri yüklenir. Runtime, migration ve CI kapıları değişmez. Yerelde Docker olmadığı için bu düzeltmenin gerçek Auth/API çalışması uzak hedefli CI’da doğrulanacaktır. CD-01 done değildir. P04 başlamadı. Hosted worker zamanlayıcısı, frontend, dış e-posta ve yük/restore bu CD kapsamıyla kapanmaz.
 
 Proje `gwyprhenabtpkbojephw`, FtkSaaS, eu-central-1; kullanıcı tarafından geliştirme/test olarak doğrulandı. Son açık talimat20 Ekim2026: her main birleşmesinin aynı kaynak kabulü sonrası bu ortam da güncellenir.
 

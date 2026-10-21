@@ -73,3 +73,6 @@ Repository ayarları ve required-check bypass kullanılmadı; gate kodu veya kay
 ## CD-01 hazırlığı — geliştirme/test hedefi
 
 [Uzak backend kurulumu](remote-backend-setup.md) yeni main kabulü sonrası CD tasarımını ve iki secret/native entegrasyon kontrolünü tanımlar. Kullanıcı kurulumların tamamlandığını bildirdi; ilk canlı CD kanıtı henüz yoktur. Kabul edilmiş runtime ile araya giren yalnız-belge main’in SHA’ları ayrı bağlanır; her yazma aşamasında kabul run/attempt/işleri yeniden doğrulanır. CD mevcut full kabulünü kullanır; aday veya main test kapsamını azaltmaz. Workflow ve scripts/ci farkı trusted politika yüzeyidir; normal otomatik merge kapısı bu yeni kaynağa yetki vermez. Son-head bağımsız inceleme, gerçek aday kabulü ve exact kaynak için kurulum yetkisi bekler. Eski kurulum izinleri kullanılmaz. Etkinleştirme ve ilk canlı CD kabulü henüz yapılmadı.
+
+
+CD-01 PR32, head4e1e25c5 için açık kullanıcı kurulum onayı, bağımsız review5597902305 ve aday39580259901 sonrası normal merge3e2fcd7 ile kuruldu; status uydurma/bypass/ayar değişikliği yok. Aynı main39582760620 Starter zaman fixture’ı nedeniyle API3 başarısızdır; yeni CD39584677756 bu nedenle skipped. Test-only düzeltme CI politika yüzeyini değiştirmez; normal hedefli/aday/main kabulü ve ilk canlı CD bekler. Önceki başarısız run geçmişi değiştirilmez.
