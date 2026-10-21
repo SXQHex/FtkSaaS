@@ -202,6 +202,9 @@ test('P04 CRM/public intent -> review -> trial -> student, real Auth/Edge and is
   const reservations=await rows('select * from core.reservations where org_id=$1 and person_id=$2',[org,person]);assert.equal(reservations.length,1);assert.equal(reservations[0].trial_offer_id,offer);assert.equal(reservations[0].source_sale_id,null);
   assert.equal((await rows('select count(*)::int n from core.trial_usages where org_id=$1 and person_id=$2',[org,person]))[0].n,1);
   assert.equal((await rows('select count(*)::int n from core.debts where org_id=$1 and person_id=$2',[org,person]))[0].n,0);
+  // The authenticated instructor needs an active center relationship as well as a role.
+  await mut('student_activate_v1',{person_id:ownerPerson});
+  assert.equal((await rows("select count(*)::int n from core.center_relationships where org_id=$1 and center_id=$2 and person_id=$3 and kind='student' and state='active'",[org,center,ownerPerson]))[0].n,1);
   // Close real attendance before conversion: a per-person fee must still exclude the free trial.
   await mut('role_assign_v1',{person_id:ownerPerson,role:'instructor',scope:{center_id:center}});
   await mut('availability_save_v1',{resource:{kind:'person',id:ownerPerson},rule:{weekdays:[1,2,3,4,5,6,7],local_start:'00:00:00',local_end:'23:59:59',valid_from:'2020-01-01'}});
