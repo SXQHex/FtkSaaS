@@ -1,6 +1,8 @@
 # P04 CRM ve public başvuru devri
 
-Başlangıç main: `920cdbb486d9dddb81b183ac92c5d4fe5ad6c819` (PR34 belge kabulü başarılı; CD source başarılı/deploy skipped). Bu dalda 11 P04 API geliştirme runtime'ına eklendi: toplam199 sözleşme /151 runtime /48 contract_only,52 append-only migration,90 core tablo. Aday/main clean ve gerçek hosted sağlayıcı kabulü henüz yoktur; P04 done değildir.
+P04 kodu [PR35](https://github.com/SXQHex/FtkSaaS/pull/35) ile main `7b96d8866abb2c056d1b59a96afee0696a1187d6` kaynağına alındı.199 sözleşme/151 runtime/48 contract_only,52 migration/90 core tablo. Son kaynak incelemesi, [aday39630534660](https://github.com/SXQHex/FtkSaaS/actions/runs/39630534660), [aynı main39633243405](https://github.com/SXQHex/FtkSaaS/actions/runs/39633243405) ve [CD39635569033 attempt2](https://github.com/SXQHex/FtkSaaS/actions/runs/39635569033/attempts/2) başarılıdır. Geliştirme/test Supabase52/52 migration, Edge5 ACTIVE/JWT zorunlu;17 kontrol geçti,0 organizasyon/hesap/Auth kullanıcısı kaldı. En son hedefli koşu39622903892 geniş regresyon sırasında iptal edildi; P04 person-registry16 düğümü geçmişti, aday/main tam kabulü ayrıca başarılıdır.
+
+Kullanıcı21 Ekim'de bot ve deneme için henüz hedef olmadığını seçti. Gerçek alan adı, tenant, ürün ve ticari config olmadan etkinleştirme ertelendi; eksik config kapıları korunur. Bu erteleme backend kod kabulünü veya199/151/48 envanterini değiştirmez. Frontend/gerçek Turnstile kabulü yapılmış sayılmaz.
 
 ## Davranış
 
@@ -26,9 +28,19 @@ Anonim submit doğrudan istemcinin bildirdiği X-Forwarded-For'a güvenmez. Güv
 - İlk DB preflight kapalı hizmeti veri toplamadan reddeder, IP denemesini provider başarısızlığında da kalıcı sayar. İkinci aşama yalnız sunucunun doğruladığı bot bağlamıyla intent yazar. IP düz metni DB'ye girmez; keyed hash ve org/hedef hash kullanılır. Başlangıç5/15 dakika IP ve3/saat org/hedef limiti `private.p04_public_security` üzerinden ayarlanabilir. Pencere sınırında iki patlamaya izin vermeyen muhafazakar kayan pencere uygulanır.
 - Contact normalize edilmiş e-posta adresidir; doğrulanmış sayılmaz. client_request_key aynı payload replay eder, başka payload reddedilir. Aynı açık hedef/yayında ikinci application olmaz; yanıt yalnız accepted=true'dur. Yer/hak/kişi/hesap bağı/rol oluşturulmaz. Bilinen iletişim create_candidate ile ikinci kişiye çevrilmez; manager match_existing seçer, eski iletişim güncellenmez.
 
-Bu PR sağlayıcı/gateway secret'larını kurmaz veya frontend geliştirmez. Gerçek signed ingress→Turnstile→Edge kabulü dış bağımlılık olarak açık kalır; unit mock başarı kanıtı bunun yerine geçmez.
+### Hedef belirlendiğinde uygulanacak kurulum
 
-## Doğrulama ve bekleyen kabul
+1. Yetkili API'lerle gerçek organizasyon/merkez ve immutable ürün sürümü kurulur; `policy_publish_v1` ile onaylı `trial_repeat_limit` yayımlanır. Ürün fiyatı/kapsamı ve cap ayrıca belirlenir; kurulum aracı bunları değiştirmez.
+2. [Deneme hazırlayıcısı](../scripts/p04-trial-config.mjs) altı alanın tamamını içeren JSON dosyasından SQL üretir: `org_id`, `center_id`, `product_version_id`, `offer_minutes`, `expected_repeat_limit`, `enabled`. Komut: `node scripts/p04-trial-config.mjs explicit-config.json`. Ağ isteği yapmaz; çıkan SQL operator tarafından geliştirme/test DB'de uygulanmadan önce incelenir. Aktif org/merkez, aynı merkeze ait aktif/effective ürün ve etkin cap'in onaylanan değere birebir eşleşmesi gerekir; org kilidi altında upsert/readback yapılır. Eksik politika kapalı kalır. Ürün/politika/para/hak veya kullanıcı oluşturmaz.
+3. Gerçek başvuru hostname'i için Turnstile widget kurulur. Site key istemcide; secret yalnız backend secret store'da tutulur. Dört zorunlu secret ayrı güvenli kanaldan yerleştirilir; kaynak/sohbet/log'a yazılmaz. `FTK_TURNSTILE_HOSTNAME` tam hostname'dir; URL/path/wildcard değildir.
+4. Mevcut güvenilir sunucu/gateway [sunucu imzalama yardımcısını](../scripts/p04-public-ingress.mjs) kullanır: `signPublicApplication(rawBody, verifiedConnectionIp, ingressSecret)`. IP platformun doğrulanmış bağlantı bilgisinden gelir; kullanıcı body/header'ından alınmaz. Yardımcı yalnız sabit POST submit path'ini imzalar, IPv6'yı normalize eder ve en az32 bayt secret ister. Dışarıdan gelen tüm `x-ftk-*` başlıkları atılır; yardımcının ürettiği üç başlık konur. Body byte'ları korunur; service role istemciye verilmez. Bu dosya tek başına gateway dağıtımı değildir.
+5. Gerçek widget'tan taze `action=public_application` tokenı ile signed ingress→Turnstile→Edge→DB accepted akışı doğrulanır. Aynı tokenın yeni request key ile replay'i, bozuk imza/body, yanlış hostname/action, eksik secret ve limit reddi ayrıca denenir. Oluşturulan fixture'lar temizlenir; gerçek sağlayıcı kabulü ancak bu kanıtla kapanır. Mock testleri bunun yerine geçmez.
+
+Hedef henüz bulunmadığı için yukarıdaki canlı adımlar ertelenmiştir; frontend eklenmedi, sahte tenant veya ticari varsayılan yaratılmadı. Cloudflare connector keşfi iki kez iç hata verdi; widget/secret okunmadı veya oluşturulmadı.
+
+## Tarihsel geliştirme doğrulamaları
+
+Aşağıdaki pending/49 migration/Edge4 ifadeleri geliştirme anına aittir; güncel P04 kabulü yukarıdadır. Yeni operasyonel CD değişikliğinin aday/main/CD kabulü ayrıca bekler.
 
 Yerel `npm run verify`: generation/migration hash/katalog/type/governance,97 yapısal ve42 CI politika düğümü başarılı. Yeni testler mevcut `contract.test.mjs` ve `person-registry.test.mjs` suite'lerine eklendi; CI workflow/shard/full-main kapsamı değiştirilmedi. Gerçek Auth→Edge→RPC P04 suite'i ilk geliştirme CI'ında çalışacak; yerelde Docker olmadığı için bu sonucu başarılı diye yazmıyoruz.
 

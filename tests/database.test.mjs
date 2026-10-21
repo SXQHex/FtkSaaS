@@ -1,5 +1,37 @@
 import test from 'node:test';import assert from 'node:assert/strict';import fs from 'node:fs';import {connect} from '../scripts/db.mjs';import {newUuidV7} from '../scripts/uuid.mjs';
 const p=JSON.parse(fs.readFileSync('contracts/08-FtkSaaS-tip-ve-operasyon-sozlesmesi.json'));
+import {migrationBatch,migrationBody,migrationPlan,migrationTransportProbe} from '../scripts/ci/deploy-development.mjs';
+import {trialConfigurationSQL} from '../scripts/p04-trial-config.mjs';
+test('atomic migration transport applies exact SQL/history together and rolls back late failures',async()=>{
+ const db=await connect();
+ const history=async()=>(await db.query('select version,name,statements from supabase_migrations.schema_migrations order by version')).rows;
+ const migration=(version,sql)=>({version,name:version+'_delivery_probe.sql',sql:'begin;\n'+sql+'\ncommit;\n'});
+ try{
+  await db.query('begin');
+  const before=await history(),known=before.map(r=>({version:r.version,sql:r.statements.join(';\n')}));
+  // Preserve the actual CLI statement representation for preflight matching.
+  for(const m of known)m.sql=fs.readFileSync('supabase/migrations/'+fs.readdirSync('supabase/migrations').find(n=>n.startsWith(m.version+'_')),'utf8');
+  await db.query(migrationTransportProbe(known,before));assert.deepEqual(await history(),before);
+  const first=migration('20990101000001',"create temporary table ftk_delivery_probe(value text);insert into ftk_delivery_probe values ('quoted ; commit; \\n');");
+  const second=migration('20990101000002','insert into ftk_delivery_probe values (\'second\');');
+  await db.query(migrationBatch([...known,first,second],before));
+  assert.deepEqual((await db.query('select value from ftk_delivery_probe order by value')).rows.map(r=>r.value),['quoted ; commit; \\n','second']);
+  const after=await history();assert.deepEqual(migrationPlan([...known,first,second],after),[]);
+  assert.deepEqual(after.find(r=>r.version===first.version).statements,[first.sql]);
+  assert.equal(migrationBatch([...known,first,second],after),null);
+  const third=migration('20990101000003',"insert into ftk_delivery_probe values ('must roll back');");
+  const fail=migration('20990101000004',"select 1/0;");
+  await db.query('savepoint failed_delivery');
+  await assert.rejects(db.query(migrationBatch([...known,first,second,third,fail],after)),e=>e.code==='22012');
+  await db.query('rollback to failed_delivery');
+  assert.deepEqual(await history(),after);
+  assert.equal((await db.query("select count(*)::int n from ftk_delivery_probe where value='must roll back'")).rows[0].n,0);
+  await db.query('savepoint changed_history');
+  await assert.rejects(db.query(migrationBatch([...known,third],before)),/history changed/);
+  await db.query('rollback to changed_history');
+  assert.deepEqual(await history(),after);
+ }finally{await db.query('rollback');await db.end();}
+});
 test('real PostgreSQL physical baseline and D/U integrity',async t=>{
  const db=await connect();const ids={};const id=k=>ids[k]??=newUuidV7();const results=[];
  async function row(table,props){const keys=Object.keys(props);await db.query('insert into core."'+table+'" ('+keys.map(x=>'"'+x+'"').join(',')+') values ('+keys.map((_,i)=>'$'+(i+1)).join(',')+')',Object.values(props));}
@@ -52,6 +84,15 @@ test('real PostgreSQL physical baseline and D/U integrity',async t=>{
  await t.test('D04/D05 physical package scope variants and explicit target eligibility',async()=>{
   await row('products',{id:id('product'),org_id:id('A'),center_id:id('Acenter'),name:'10 shared credits',state:'active'});
   await row('product_versions',{id:id('productversion'),org_id:id('A'),center_id:id('Acenter'),product_id:id('product'),kind:'credits',booking_mode:'flexible',credits:10,price_minor:'1000',currency:'TRY',refund_method:'none',freeze_terms:{enabled:false,extends_validity:false},effective_at:'2026-01-01T00:00:00Z'});
+  const trial={org_id:id('A'),center_id:id('Acenter'),product_version_id:id('productversion'),offer_minutes:15,expected_repeat_limit:1,enabled:true};
+  const setup=c=>db.query(migrationBody(trialConfigurationSQL(c)));
+  await reject('missing trial policy',()=>setup(trial),'P0001');
+  await row('policy_versions',{id:newUuidV7(),org_id:id('A'),key:'trial_repeat_limit',effective_at:'2026-01-01T00:00:00Z',mandatory:false,value:{kind:'integer',value:1}});
+  await reject('wrong repeat approval',()=>setup({...trial,expected_repeat_limit:2}),'P0001');
+  await reject('cross tenant product',()=>setup({...trial,center_id:id('Bcenter')}),'P0001');
+  await setup(trial);await setup(trial);
+  const configured=(await db.query('select offer_minutes,enabled from private.p04_trial_configuration where org_id=$1 and product_version_id=$2',[trial.org_id,trial.product_version_id])).rows;
+  assert.deepEqual(configured,[{offer_minutes:15,enabled:true}]);
   const base={org_id:id('A'),product_version_id:id('productversion'),class_id:null,event_id:null,usage_targets:['lesson']};
   for(const [scope_kind,center_id,discipline_id] of [['center_discipline',id('Acenter'),id('Asalsa')],['center_all_disciplines',id('Acenter'),null],['organization_discipline',null,id('Asalsa')],['organization_all',null,null]])await row('product_scopes',{...base,id:newUuidV7(),scope_kind,center_id,discipline_id});
   await reject('scope discriminator',()=>row('product_scopes',{...base,id:newUuidV7(),scope_kind:'organization_all',center_id:id('Acenter'),discipline_id:null}),'23514');
