@@ -19,6 +19,8 @@ P03 migration41–49 append-only: finance-payments, guardrails, acceptance, scop
 
 İzole geliştirme runner'ında yapısal kontroller ve temiz migration kurulumu geçti. 48 migration kaynağında P03 altı test düğümü başarılı (39493630092, priority adımı20:39:16–20:40:25); bağımlı regresyonlar son ek etkinlik senaryosuyla yeniden çalıştırılıyor. Son kaynak hedefli kabulü bekleniyor. Paket değişimi→genel iade çift alacak üretmeme senaryosu önceki ara kaynakta geçti; bu kanıt yeni son kaynağın kabulü değildir.
 
+Son hedefli workbench39494418030, üretilmiş head `38af062325959f2e47ed4fe42c10b7e2c776a4cf`:49 migration kurulumu, yapısal kontroller ve yeni P03 testleri geçti; bağımlı regresyon73 düğümde60 pass/13 fail. Eğitmen fixture yardımcısı planlı aralığı now−1s → now+59m yapınca23:52 TSİ aralığı yerel gece yarısını aştı; assert_availability aynı yerel gün koşulunu doğru olarak reddetti. Çoğu hata attendance_mark RESOURCE_CONFLICT, kalanlar ilk kapanışın oluşmamasına bağlıydı. Yardımcı artık planlı saatleri değiştirmeden mevcut attendance_start_v1 ile açık sentetik başlangıç kaydediyor; saatlerin korunması da assert ediliyor. Runtime/uygunluk kapısı değiştirilmedi. Bu düzeltmenin yeni hedefli CI kabulü bekliyor; P03 tamamlanmış sayılmaz.
+
 Yerel executor kullanılamadığı için branch'e geçici generation/test workbench'i eklendi. Son adaydan önce `.github/p03-bootstrap.py`, `.github/p03-diagnose.mjs` ve `.github/workflows/p03-workbench.yml` kaldırılmalı; final trusted policy blob/mode seti main ile birebir doğrulanmalıdır. Geçici SQL tanı aracı yalnız izole DB'de çalışır; runtime hata gizleme veya yetki kapısı değiştirilmez.
 
 ## Açık kabul sırası
