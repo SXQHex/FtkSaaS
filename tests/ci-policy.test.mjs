@@ -1,6 +1,6 @@
 import test from 'node:test';import assert from 'node:assert/strict';import fs from 'node:fs';
 import {deploymentSource,resolveAcceptedSource,revalidateDeployment} from '../scripts/ci/deployment-source.mjs';
-import {sameMigration,migrationPlan,hostedSmoke,unchangedEdge,project} from '../scripts/ci/deploy-development.mjs';
+import {sameMigration,migrationPlan,migrationBody,migrationBatch,hostedSmoke,unchangedEdge,project} from '../scripts/ci/deploy-development.mjs';
 
 test('unchanged Edge requires both trusted source receipt and live version/JWT match',()=>{
  const previous={success:true,project,edge_version:3,edge_source_sha256:'hash'},edge={version:3,status:'ACTIVE',verify_jwt:true};
@@ -80,6 +80,21 @@ test('migration readback accepts verbatim CLI chunks and MCP file but rejects dr
  assert.throws(()=>migrationPlan(local,[{version:'3',statements:['select 3']}]),/mismatch/);
  assert.throws(()=>migrationPlan(local,[{version:'1',statements:['select 2']}]),/mismatch/);
  assert.throws(()=>migrationPlan(local,[{version:'1',statements:[sql]},{version:'1',statements:[sql]}]),/mismatch/);
+});
+test('atomic migration preparation keeps source bytes and rejects missing envelopes or changed history',()=>{
+ const sql="-- frozen\nbegin;\nselect 'commit; and \\n';\ncommit;\n";
+ assert.equal(migrationBody(sql),"-- frozen\n      \nselect 'commit; and \\n';\n       \n");
+ for(const s of ['select 1;','begin;select 1;','select 1;commit;'])assert.throws(()=>migrationBody(s),/envelope/);
+ const local=[{name:'20261021190000_probe.sql',version:'20261021190000',sql}];
+ assert.equal(migrationBatch(local,[{version:local[0].version,name:'probe',statements:[sql]}]),null);
+ assert.throws(()=>migrationBatch(local,[{version:local[0].version,statements:['select 2']}]),/mismatch/);
+ assert.throws(()=>migrationBatch([{...local[0],name:'other.sql'}],[]),/identity/);
+ // Every frozen repository migration must support the atomic transport.
+ for(const name of fs.readdirSync('supabase/migrations'))if(name.endsWith('.sql'))assert(migrationBody(fs.readFileSync('supabase/migrations/'+name,'utf8')).trim(),name);
+ const complex="-- 😀 Türkçe\nbegin;select 'begin;commit;it''s';commit;/* nested /* commit; */ begin; */begin;do $tag$begin perform 'commit;';end$tag$;select E'escaped\\\'commit;', \"commit;\";commit;";
+ const transformed=migrationBody(complex);
+ for(const preserved of ["-- 😀 Türkçe","'begin;commit;it''s'","/* nested /* commit; */ begin; */",'do $tag$begin perform \'commit;\';end$tag$;',"E'escaped\\\'commit;'",'"commit;"'])assert(transformed.includes(preserved),preserved);
+ for(const invalid of ['begin;begin;commit;commit;','commit;','begin;select 1;commit;select 2;','begin;select $$unterminated;commit;','begin;/* unfinished','begin;select \'unfinished'])assert.throws(()=>migrationBody(invalid));
 });
 import {select,parseChanges,apiSuites} from '../scripts/ci/select-tests.mjs';
 import {validateBinding} from '../scripts/ci/gate.mjs';

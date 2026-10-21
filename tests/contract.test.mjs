@@ -30,4 +30,19 @@ test('P04 public ingress binds exact body/path/IP and provider hostname/action; 
  for(const proof of [{success:false},{success:true,hostname:'foreign.invalid',action:'public_application'},{success:true,hostname:cfg.FTK_TURNSTILE_HOSTNAME,action:'other'}])assert.equal(await verifyPublicBot('proof',ip,env,provider(proof)),false);
  assert.equal(await verifyPublicBot('proof',ip,()=>undefined,()=>{throw Error('must not call provider');}),false);
  assert.equal(await verifyPublicBot('proof',ip,env,async()=>{throw Error('provider unavailable');}),false);
+ const {signPublicApplication}=await import('../scripts/p04-public-ingress.mjs');
+ cfg.FTK_PUBLIC_INGRESS_SECRET='synthetic-32-byte-ingress-secret-for-tests';
+ for(const clientIp of [ip,'2001:0DB8:0000:0000:0000:0000:0000:0001']){
+  const signed=signPublicApplication(body,clientIp,cfg.FTK_PUBLIC_INGRESS_SECRET,now);
+  assert(await publicIngress(new Request(req.url,{method:'POST',headers:signed}),body,env,now));
+ }
+ for(const invalid of ['192.0.2.15, 192.0.2.16','not-an-ip','192.0.2.999','[2001:db8::1]'])assert.throws(()=>signPublicApplication(body,invalid,cfg.FTK_PUBLIC_INGRESS_SECRET,now),/IP/);
+ assert.throws(()=>signPublicApplication(body,ip,'short',now),/32 bytes/);
+});
+test('P04 trial setup has explicit limits and no implicit product or repeat policy mutation',async()=>{
+ const {trialConfigurationSQL}=await import('../scripts/p04-trial-config.mjs');
+ const cfg={org_id:id,center_id:newUuidV7(),product_version_id:newUuidV7(),offer_minutes:15,expected_repeat_limit:1,enabled:true};
+ assert.match(trialConfigurationSQL(cfg),/Effective repeat policy differs/);
+ for(const key of Object.keys(cfg)){const missing={...cfg};delete missing[key];assert.throws(()=>trialConfigurationSQL(missing),/explicit/);}
+ for(const bad of [{offer_minutes:0},{expected_repeat_limit:-1},{enabled:'true'},{org_id:"';drop table core.people;--"}])assert.throws(()=>trialConfigurationSQL({...cfg,...bad}));
 });

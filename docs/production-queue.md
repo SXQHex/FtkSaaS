@@ -1,5 +1,7 @@
 # FtkSaaS sıralı üretim kuyruğu
 
+P04 kod kabulü kapandı: PR35/main `7b96d8866abb2c056d1b59a96afee0696a1187d6`, aday39630534660/main39633243405/CD39635569033 attempt2 success;52 migration/151 runtime/Edge5. Aktif dar takip CD migration transport düzeltmesidir; yeni kaynak kabulü bekler. Bot/deneme hedefi henüz yok: kullanıcı21 Ekim'de kurulumları hedef oluşana kadar erteledi. Aşağıdaki eski geliştirme snapshot'ları bu kapanışı değiştirmez. P05 başlamadı.
+
 CD-01 **done**: PR32 kurulum + PR33 test fixture düzeltmesi sonrası kabul edilmiş main `0fabf3a4a605dd6be5a1d358c660021f59406e20`. [Main39588975421](https://github.com/SXQHex/FtkSaaS/actions/runs/39588975421) ve [ilk canlı CD39590690817/attempt2](https://github.com/SXQHex/FtkSaaS/actions/runs/39590690817/attempts/2) completed/success. CD receipt aynı source/main/run kabulünü bağlar;17 kontrol başarılı,49 migration içerik eşleşmesi,90 core tablo/RLS, anon/authenticated EXECUTE0, Edge backend-v1 v4 ACTIVE/verify_jwt=true. Gerçek Auth→Edge→RPC, oturum reddi ve fixture temizliği geçti; ayrıca uzak son0 hesap/0 Auth kullanıcısı/0 organizasyon doğrulandı. Envanter199/140 runtime/59 contract_only değişmedi. P04 CRM/public başvuru queued; başlamadı. Hosted worker işletimi, frontend, dış e-posta ve yük/restore bu kapanışla tamamlanmaz.
 
 P03 **done**: [PR #30](https://github.com/SXQHex/FtkSaaS/pull/30), kabul edilmiş main `10710ffa90747a7e35c452c4c07ba59522f50ce3`. Son head2526347 / basece95a9d / tested merge1768fc2 / tree9ac328b aynı kaynak zinciridir. Bağımsız kaynak incelemesi PR review5594023911 içinde kayıtlı; [aday39527260056](https://github.com/SXQHex/FtkSaaS/actions/runs/39527260056) ve [aynı main39529992556](https://github.com/SXQHex/FtkSaaS/actions/runs/39529992556) completed/success.96 yapı +37 CI politika +27 DB +316 API =476 test düğümü; fail/skipped0,49 migration. Main13:18; aday13:34. Envanter199 sözleşme/140 runtime/59 contract_only,90 core tablo. Geliştirme/test Supabase aynı49 migration/Edge3 kaynağına eşitlendi; ayrı dokuz kontrollü Auth→Edge→RPC smoke ve fixture temizliği başarılı. P04 queued, başlamadı.
@@ -16,7 +18,7 @@ Geliştirme/test Supabase `gwyprhenabtpkbojephw`, kabul edilmiş main `10710ffa9
 | P02 | Paket ve seans yaşam döngüsü | 15 | done | #28; main cc4878d /39461804543 completed/success;469 test,40 migration; hosted Edge2 eşitlendi |
 | P03 | Finans ve eğitmen ödemeleri | 7 | done | #30; main10710ffa /39529992556 completed/success;476 test,49 migration; hosted Edge3 ve ayrı smoke başarılı |
 | CD-01 | Geliştirme/test Supabase CD | — | done | PR32+33; main0fabf3a /39588975421 success; CD39590690817 attempt2 success,49 migration/Edge4/17 kontrol, fixture temiz |
-| P04 | CRM ve public başvuru | 11 | in_progress |11 API uygulandı; yerel verify/rollback DB başarılı, son inceleme ve Auth/API CI bekler; p04-handover.md |
+| P04 | CRM ve public başvuru | 11 | done | PR35; main7b96d88, aday39630534660/main39633243405/CD39635569033 attempt2 success; hedef gerektiren kurulumlar kullanıcı kararıyla ertelendi |
 | P05 | Belge, bildirim ve otomasyon | 13 | queued | P04 sonrası |
 | P06 | Rapor, import ve işlem izleme | 13 | queued | P05 sonrası |
 | P07 | Hesap, organizasyon ve abonelik yaşam döngüsü | 22 | queued | P06 sonrası |
@@ -83,32 +85,11 @@ PR25 dört izole shard/belge kabulü/Draft-development politikasını kurdu; PR2
 
 Yedi API PR30 ile main10710ffa90747a7e35c452c4c07ba59522f50ce3 kaynağına alındı. Son head2526347 bağımsız incelemesi review5594023911 içinde kayıtlıdır; aday39527260056 ve aynı main39529992556 completed/success.476 test düğümü,49 migration, dört izole API shard ve kaynak bağlı toplayıcı geçti. Geliştirme/test Supabase49/49 migration içerik eşleşmesi,140 runtime API, Edge3/JWT ve ayrı dokuz kontrollü Auth→Edge→RPC smoke ile eşitlendi; sentetik fixture temizlendi. Aktif P03 promptu kaldırıldı; eski metin Git geçmişindedir. Bloklayıcı olmayan seçili hakediş doğrulama takip notu remaining-work.md içinde açık kalır. P04 queued; frontend, hosted worker işletimi, dış e-posta, yük/restore ve production açık kalır.
 
-### P04 — CRM ve public başvuru
+### P04 — kapanış kaydı ve operasyonel takip
 
-Ortak üretim promptunu uygula. Durum: in_progress.11 API kaynakta uygulandı; gerçek Auth/API CI ve aday/main kabulü bekler. Zorunlu provider/deneme config kurulumu ayrı açık; ayrıntı [P04 devrinde](p04-handover.md).
+11 API PR35 ile main7b96d8866abb2c056d1b59a96afee0696a1187d6 kaynağında kabul edildi; son inceleme, aday39630534660 ve aynı main39633243405 başarılı. CD39635569033 attempt2:52 migration, Edge5/JWT ve17 kontrol başarılı; sentetik fixture temiz. Aktif P04 ürün promptu kaldırıldı; eski metin Git geçmişindedir.
 
-**Mevcut sözleşme API'leri (11):**
-
-- `leads_list_v1`
-- `lead_save_v1`
-- `crm_activity_save_v1`
-- `trial_offer_create_v1`
-- `trial_registration_confirm_v1`
-- `lead_convert_v1`
-- `crm_followup_list_v1`
-- `publication_set_v1`
-- `public_calendar_get_v1`
-- `public_application_submit_v1`
-- `public_application_review_v1`
-
-**Görev ve kabul:**
-
-Public veya merkez adayı takip/deneme üzerinden ücretli öğrenciye dönüşebilsin.
-Hazır CRM veya ikinci kişi modeli ekleme; mevcut kişi/öğrenci/satış/hak/rezervasyon altyapısını kullan.
-Operasyon personeli merkez/atanmış aday sınırında kalsın; CRM izni indirim/fiyat/satış/tahsilat/export yetkisi vermesin.
-Deneme koşulları ve tekrar sınırı açık yapılandırmadan gelsin; değer icat etme. Dönüşüm öğrenci limitine tabi olsun; geçmiş bedelsiz denemeye hakediş üretmesin.
-Public başvuru yer/hak/hesap bağı oluşturmasın. Yalnız yayımlanmış alanlar açılsın; kişi/borç/kredi/iç not sızmasın. Bot/hız/mükerrer korumalarını uygula; eksik sağlayıcı için bypass açma, bağımlılığı bildir.
-Kabul: başvuru→inceleme→takip→deneme→ücretli öğrenci; çift kişi/dönüşüm ve plan/rol sınırları. Segment/otomasyon P05'tedir.
+21 Ekim kullanıcı kararı: henüz başvuru alan adı/tenant/ürün/config hedefi yok; bot/gateway ve gerçek deneme kurulumu hedef oluşana kadar ertelenir, kapılar gevşetilmez. Kurulum yordamı p04-handover.md'dedir. Aktif dar takip CD migration transport düzeltmesidir; kaynak incelemesi, aday/main clean, exact-source trusted kurulum izni ve gerçek CD kabulü bekler. P05 bu takip kapanmadan başlatılmadı.
 
 ### P05 — Belge, bildirim ve otomasyon
 
