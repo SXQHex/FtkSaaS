@@ -1,12 +1,10 @@
 # FtkSaaS — güncel entegrasyon devri
 
-P03:7 API uygulandı; dal envanteri199/140 runtime/59 contract_only,49 migration. Kaynak `d3d5ae65d4ed226573cfb7e163cf2be8e0500c5a` hedefli39522543011 ve izole P03 workbench39522543060 completed/success:96 yapı +37 politika +27 DB +316 API düğümü, sıfır fail/skipped. Geçici runner araçları son adaydan çıkarıldı; başlangıç kaydı olmadan ücretli kapanış yoluna açık null assertion eklendi. Bu son farkın hedefli kabulü, bağımsız son inceleme, aday/main clean ve hosted eşitlemesi açık; PR30 Draft/development, P03 done değildir.
-
-P03 tek Draft/development PR30 içindedir. Başlangıç main ce95a9d0d960a201b0488071802dc5db7741caf1 / belge kabulü39487599217 doğrulandı. Yedi API’nin geliştirme kabulü yukarıdaki kaynağa aittir; son aday/main ve hosted kabulü ayrıca gerekir.
+P03 **done**: [PR #30](https://github.com/SXQHex/FtkSaaS/pull/30), kabul edilmiş main `10710ffa90747a7e35c452c4c07ba59522f50ce3`. Son head2526347 / basece95a9d / tested merge1768fc2 / tree9ac328b aynı kaynak zinciridir. Bağımsız kaynak incelemesi PR review5594023911 içinde kayıtlı; [aday39527260056](https://github.com/SXQHex/FtkSaaS/actions/runs/39527260056) ve [aynı main39529992556](https://github.com/SXQHex/FtkSaaS/actions/runs/39529992556) completed/success.96 yapı +37 CI politika +27 DB +316 API =476 test düğümü; fail/skipped0,49 migration. Main13:18; aday13:34. Envanter199 sözleşme/140 runtime/59 contract_only,90 core tablo. Geliştirme/test Supabase aynı49 migration/Edge3 kaynağına eşitlendi; ayrı dokuz kontrollü Auth→Edge→RPC smoke ve fixture temizliği başarılı. P04 queued, başlamadı.
 
 P02 **done**: [PR #28](https://github.com/SXQHex/FtkSaaS/pull/28), kabul edilmiş main `cc4878d09e45204dbc13ccfe1324b38b14548167`. Envanter **199 sözleşme / 133 runtime / 66 contract_only / 40 migration / 90 core tablo**. Son head `35816cc30a9b28e273e94e6cef86e8b402dbaad0` bağımsız incelemeden geçti; [hedefli39448566998](https://github.com/SXQHex/FtkSaaS/actions/runs/39448566998), [aday39455462417](https://github.com/SXQHex/FtkSaaS/actions/runs/39455462417) ve [aynı main39461804543](https://github.com/SXQHex/FtkSaaS/actions/runs/39461804543) completed/success. Full kapsam:96 sözleşme/yönetişim +37 CI politika +27 DB +309 API =469 test düğümü; fail/skipped0. Core, dört izole API shard, toplayıcı,40 migration, seed/health/advisors geçti. Main clean14:43; önceki43:33 hedefli koşu seri tüm-suite fallback kullandı, aynı çalışma profili değildir. Eski başarı yeni kaynağa taşınmaz.
 
-Geliştirme/test Supabase `gwyprhenabtpkbojephw`, aynı kabul edilmiş main `cc4878d09e45204dbc13ccfe1324b38b14548167` kaynağına eşitlendi:40 migration, Edge backend-v1 sürüm2, verify_jwt=true,133 runtime API. Uzak smoke ve geçici fixture temizliği başarılı; ayrıntılar docs/remote-backend-setup.md içindedir. Hosted worker zamanlayıcısı, ortak tenant/kullanıcı kurulumu, frontend gerçek entegrasyonu, yük/restore, dış e-posta ve production kabulü ayrı açık kalır.
+Geliştirme/test Supabase `gwyprhenabtpkbojephw`, kabul edilmiş main `10710ffa90747a7e35c452c4c07ba59522f50ce3` kaynağına eşitlendi:49 migration, Edge backend-v1 sürüm3, verify_jwt=true,140 runtime API. Uzak smoke ve geçici fixture temizliği başarılı; ayrıntılar docs/remote-backend-setup.md içindedir. Hosted worker zamanlayıcısı, ortak tenant/kullanıcı kurulumu, frontend gerçek entegrasyonu, yük/restore, dış e-posta ve production kabulü ayrı açık kalır.
 
 [Hesaplaşma entegrasyonu](settlement-handover.md): dokuz yeni API, ayrı A/B yetki kapsamı, yalnız B onayında finansal commit ve bağlı düzeltme.
 
@@ -16,11 +14,11 @@ Geliştirme/test Supabase `gwyprhenabtpkbojephw`, aynı kabul edilmiş main `cc4
 - [Anlaşma/hakediş](instructor-earnings-handover.md): güncel Pro/Business kapanışı, açık fiilî başlangıç, immutable ücret ve bağlı fark.
 - [Takvim/seans/rezervasyon okumaları](schedule-read-handover.md) ve [program/seans](program-session-handover.md): DTO, zaman, görünürlük ve sürüm sınırları; eski teslim açıkları güncel envanterle karşılaştırılır.
 - [API kataloğu](../contracts/05-FtkSaaS-O4-API-katalogu.md), [makine sözleşmesi](../contracts/08-FtkSaaS-tip-ve-operasyon-sozlesmesi.json) ve [endpoint envanteri](endpoint-inventory.json): kesin işlem adları ve uygulama durumları.
-- [Kalan işler](remaining-work.md): eğitmen ödeme komutları ve tamamlanmamış tüketiciler.
+- [Kalan işler](remaining-work.md): tamamlanmamış tüketiciler ve P03 inceleme takip notu.
 
 Transport: POST {API_URL}/functions/v1/backend-v1/{operation}; typed request JSON, Authorization: Bearer Supabase access_token ve apikey: publishable key kullanılır. Yanıt ok/data/trace_id veya ok:false/error zarfıdır. Service-only RPC/core/private doğrudan istemci erişimi değildir. Tekrar gönderimde aynı business işlem anahtarı korunur; sürüm ve önizleme bağımlılıkları yeniden doğrulanır.
 
-Yerel bağlantı: Node 24.19.0, npm ci, npm run dev:start, npm run dev:seed, npm run dev:info. Adres ve publishable key bu checkout'tan alınır; eski Box adresleri ortak ortam değildir. npm run test:clean yalnız izole loopback kabul ortamı içindir. [Hosted kurulum kaydı](remote-backend-setup.md) aynı P02 main kaynağının40 migration/Edge2 eşleşmesini ve ayrı smoke kapsamını gösterir.
+Yerel bağlantı: Node 24.19.0, npm ci, npm run dev:start, npm run dev:seed, npm run dev:info. Adres ve publishable key bu checkout'tan alınır; eski Box adresleri ortak ortam değildir. npm run test:clean yalnız izole loopback kabul ortamı içindir. [Hosted kurulum kaydı](remote-backend-setup.md) aynı P03 main kaynağının49 migration/Edge3 eşleşmesini ve ayrı smoke kapsamını gösterir.
 
 Frontend gerçek uçtan uca kabulü ve yük/restore açık; mock kabul değildir. Dış e-posta ertelendi; Resend başlatılmaz. Production dağıtımı yapılmaz.
 

@@ -1,10 +1,10 @@
 # FtkSaaS sıralı üretim kuyruğu
 
-P03:7 API uygulandı; dal envanteri199/140 runtime/59 contract_only,49 migration. Kaynak `d3d5ae65d4ed226573cfb7e163cf2be8e0500c5a` hedefli39522543011 ve izole P03 workbench39522543060 completed/success:96 yapı +37 politika +27 DB +316 API düğümü, sıfır fail/skipped. Geçici runner araçları son adaydan çıkarıldı; başlangıç kaydı olmadan ücretli kapanış yoluna açık null assertion eklendi. Bu son farkın hedefli kabulü, bağımsız son inceleme, aday/main clean ve hosted eşitlemesi açık; PR30 Draft/development, P03 done değildir.
+P03 **done**: [PR #30](https://github.com/SXQHex/FtkSaaS/pull/30), kabul edilmiş main `10710ffa90747a7e35c452c4c07ba59522f50ce3`. Son head2526347 / basece95a9d / tested merge1768fc2 / tree9ac328b aynı kaynak zinciridir. Bağımsız kaynak incelemesi PR review5594023911 içinde kayıtlı; [aday39527260056](https://github.com/SXQHex/FtkSaaS/actions/runs/39527260056) ve [aynı main39529992556](https://github.com/SXQHex/FtkSaaS/actions/runs/39529992556) completed/success.96 yapı +37 CI politika +27 DB +316 API =476 test düğümü; fail/skipped0,49 migration. Main13:18; aday13:34. Envanter199 sözleşme/140 runtime/59 contract_only,90 core tablo. Geliştirme/test Supabase aynı49 migration/Edge3 kaynağına eşitlendi; ayrı dokuz kontrollü Auth→Edge→RPC smoke ve fixture temizliği başarılı. P04 queued, başlamadı.
 
 P02 **done**: [PR #28](https://github.com/SXQHex/FtkSaaS/pull/28), kabul edilmiş main `cc4878d09e45204dbc13ccfe1324b38b14548167`. Envanter **199 sözleşme / 133 runtime / 66 contract_only / 40 migration / 90 core tablo**. Son head `35816cc30a9b28e273e94e6cef86e8b402dbaad0` bağımsız incelemeden geçti; [hedefli39448566998](https://github.com/SXQHex/FtkSaaS/actions/runs/39448566998), [aday39455462417](https://github.com/SXQHex/FtkSaaS/actions/runs/39455462417) ve [aynı main39461804543](https://github.com/SXQHex/FtkSaaS/actions/runs/39461804543) completed/success. Full kapsam:96 sözleşme/yönetişim +37 CI politika +27 DB +309 API =469 test düğümü; fail/skipped0. Core, dört izole API shard, toplayıcı,40 migration, seed/health/advisors geçti. Main clean14:43; önceki43:33 hedefli koşu seri tüm-suite fallback kullandı, aynı çalışma profili değildir. Eski başarı yeni kaynağa taşınmaz.
 
-Geliştirme/test Supabase `gwyprhenabtpkbojephw`, aynı kabul edilmiş main `cc4878d09e45204dbc13ccfe1324b38b14548167` kaynağına eşitlendi:40 migration, Edge backend-v1 sürüm2, verify_jwt=true,133 runtime API. Uzak smoke ve geçici fixture temizliği başarılı; ayrıntılar docs/remote-backend-setup.md içindedir. Hosted worker zamanlayıcısı, ortak tenant/kullanıcı kurulumu, frontend gerçek entegrasyonu, yük/restore, dış e-posta ve production kabulü ayrı açık kalır.
+Geliştirme/test Supabase `gwyprhenabtpkbojephw`, kabul edilmiş main `10710ffa90747a7e35c452c4c07ba59522f50ce3` kaynağına eşitlendi:49 migration, Edge backend-v1 sürüm3, verify_jwt=true,140 runtime API. Uzak smoke ve geçici fixture temizliği başarılı; ayrıntılar docs/remote-backend-setup.md içindedir. Hosted worker zamanlayıcısı, ortak tenant/kullanıcı kurulumu, frontend gerçek entegrasyonu, yük/restore, dış e-posta ve production kabulü ayrı açık kalır.
 
 | Sıra | Teslim | İşlem | Durum | Kanıt / sonraki adım |
 |---|---|---:|---|---|
@@ -12,7 +12,7 @@ Geliştirme/test Supabase `gwyprhenabtpkbojephw`, aynı kabul edilmiş main `cc4
 | P01 | Talep, rezervasyon ve bekleme | 14 | done | #22; aday 39327134872 ve aynı main 39401570751 completed/success doğrulandı |
 | CI-02 | Dört shard, bölüm/Draft/development, yalnız-belge kabulü | — | done | #25/#26; main0ade787 / 39425915555 completed/success; 462 test, 34 migration |
 | P02 | Paket ve seans yaşam döngüsü | 15 | done | #28; main cc4878d /39461804543 completed/success;469 test,40 migration; hosted Edge2 eşitlendi |
-| P03 | Finans ve eğitmen ödemeleri | 7 | in_progress | Tek feature/p03-finance-payments Draft/development PR;7 API uygulandı;hedefli runtime/son inceleme/aday-main kabulü açık |
+| P03 | Finans ve eğitmen ödemeleri | 7 | done | #30; main10710ffa /39529992556 completed/success;476 test,49 migration; hosted Edge3 ve ayrı smoke başarılı |
 | P04 | CRM ve public başvuru | 11 | queued | P03 sonrası |
 | P05 | Belge, bildirim ve otomasyon | 13 | queued | P04 sonrası |
 | P06 | Rapor, import ve işlem izleme | 13 | queued | P05 sonrası |
@@ -76,28 +76,9 @@ PR25 dört izole shard/belge kabulü/Draft-development politikasını kurdu; PR2
 
 15 API PR #28 ile kabul edilmiş main cc4878d09e45204dbc13ccfe1324b38b14548167 kaynağına birleşti. Son-head bağımsız inceleme, hedefli39448566998, tek son aday39455462417 ve aynı main39461804543 completed/success doğrulandı;469 test düğümü,40 migration, seed/health/advisors. Hosted geliştirme/test ortamı aynı migration/Edge kaynağına eşitlendi; uzak smoke ayrı geçti. P02 done; aktif prompt kaldırıldı, eski prompt Git geçmişindedir. P03 genel iadesinde immutable private.p02_sale_settlements ve önceki borç/alacak hareketleri zorunlu bağımlılıktır. Hosted worker işletimi, frontend, dış e-posta ve yük/restore kapanmadı.
 
-### P03 — Finans ve eğitmen ödemeleri
+### P03 — kapanış kaydı
 
-Ortak üretim promptunu uygula. Durum: in_progress; tek Draft/development PR. Başlangıç main ce95a9d / belge kabulü39487599217 başarılı. Bütün7 API ve son kaynak incelemesi bitmeden aday full clean yok.
-
-**Mevcut sözleşme API'leri (7):**
-
-- `finance_get_v1`
-- `collection_correct_preview_v1`
-- `collection_correct_apply_v1`
-- `sale_refund_preview_v1`
-- `sale_refund_apply_v1`
-- `instructor_payment_record_v1`
-- `instructor_payment_correct_v1`
-
-**Görev ve kabul:**
-
-Öğrenci finansı ve eğitmen ödeme hesabı yetkili kapsamda okunsun; iade/düzeltmeler geçmişi silmeden uygulansın.
-Borç/alacak, nakit, hak ve eğitmen hesabı ayrı kalsın; aynı merkez/para birimi ve alan görünürlüğü korunsun.
-Paket iadesi satışta sabitlenmiş yöntemle hesaplansın; hak değişimi/sonlandırma/nakit iade birbirinin yerine geçmesin; tutar iki kez iade/alacaklaştırılmasın.
-Eğitmen ödemesi seçili hakedişlere dağıtılsın, kısmi ödeme/kalan okunsun; hakediş düzeltmesi eski ödemeyi silmesin.
-Tahsilat düzeltmesinin etkinlik hazırlığına, borç dağıtımlarına ve öğrenci alacağına etkisini doğrula. Merkezler arası ledger'ı öğrenci finansı gibi değiştirme.
-Kabul: okuma→önizleme→uygulama→bağlı hareket/bakiye; paralel iade/mahsup/ödeme, tekrar ve rollback.
+Yedi API PR30 ile main10710ffa90747a7e35c452c4c07ba59522f50ce3 kaynağına alındı. Son head2526347 bağımsız incelemesi review5594023911 içinde kayıtlıdır; aday39527260056 ve aynı main39529992556 completed/success.476 test düğümü,49 migration, dört izole API shard ve kaynak bağlı toplayıcı geçti. Geliştirme/test Supabase49/49 migration içerik eşleşmesi,140 runtime API, Edge3/JWT ve ayrı dokuz kontrollü Auth→Edge→RPC smoke ile eşitlendi; sentetik fixture temizlendi. Aktif P03 promptu kaldırıldı; eski metin Git geçmişindedir. Bloklayıcı olmayan seçili hakediş doğrulama takip notu remaining-work.md içinde açık kalır. P04 queued; frontend, hosted worker işletimi, dış e-posta, yük/restore ve production açık kalır.
 
 ### P04 — CRM ve public başvuru
 
