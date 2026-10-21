@@ -1,5 +1,11 @@
 # CI ölçüm temeli ve sonraki performans işi
 
+## P03 geliştirme ölçümü — 21 Ekim 2026
+
+Kaynak `d3d5ae65d4ed226573cfb7e163cf2be8e0500c5a`, [39522543011](https://github.com/SXQHex/FtkSaaS/actions/runs/39522543011) completed/success. Run00:38:33–01:11:14 UTC=32:41; öncelikli2 API suite’i6:13.468, kalan13 suite25:17.243. Seçici P03 SQL, ortak borç hesabı, migration/manifest ve üretilmiş gateway girdilerinde fail-closed geniş geri dönüş kullandı;15 API suite’i seçildi. P03 için yalnız dosya adı eşlemek, paylaşılan finans tüketicilerinin kapsandığını tek başına kanıtlamaz. Hedefli süreç tek backend/DB’de concurrency2 kullanır; aday/main dört izole DB shard’ı ile aynı çalışma profili değildir.
+
+Geçici workbench39522543060 aynı anda19:14 elapsed ile tamamlandı; P03 ve bağımlı suite’leri tekrar çalıştırdı. Temizlikte geçici workflow kaldırıldı. Bu kaldırma ek runner tüketimini önler; normal hedefli32:41 süresinin aynı oranda azalacağı iddiası değildir. Auth/cache veya paralellik/kapsam politikasında değişiklik yapılmadı. Geniş hedefli fallback’in shard ile yürütülmesi ayrı güvenilir CI incelemesi/ölçümü gerektirir; P03 finans tesliminde CI kapısı gevşetilmez.
+
 ## Son main kabulü — CI-02 kapandı
 
 Main0ade7877cc16fc121095decbc276f2fbc868607e / [39425915555](https://github.com/SXQHex/FtkSaaS/actions/runs/39425915555) completed/success. Source ilişkisi, core, dört shard ve toplayıcı geçti; 462 test, sıfır fail/skipped. Core1:38; API rollerinin job süreleri9:58 / 10:03 / 11:28 / 9:37. Main'de seri kıyas istenmedi; optional skip artık ölçümü bozmadı. Bu yeni main'deki süreler önceki aynı-kaynak seri karşılaştırmasının yerine karıştırılmaz. İlk başarısız main39421388153 teşhisi ve eski 'bekliyor' notları aşağıda ait oldukları kaynakların tarihsel süreç kayıtlarıdır; güncel açık değildir.
