@@ -106,3 +106,5 @@ assert next(Path('supabase/migrations').glob('*_p03_finance_provenance.sql')).re
 assert next(Path('supabase/migrations').glob('*_p03_refund_identity.sql')).read_text()==Path('database/p03-refund-identity.sql').read_text(),'P03 source drift p03_refund_identity'
 
 assert next(Path('supabase/migrations').glob('*_p04_crm_public.sql')).read_text()==Path('database/p04-crm-public.sql').read_text()+Path('database/p04-crm-public-wrappers.sql').read_text(),'P04 source drift'
+
+assert next(Path('supabase/migrations').glob('*_p04_free_trial_attendance.sql')).read_text()==Path('database/p04-free-trial-attendance.sql').read_text(),'P04 trial attendance source drift'

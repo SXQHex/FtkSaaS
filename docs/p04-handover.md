@@ -1,6 +1,6 @@
 # P04 CRM ve public başvuru devri
 
-Başlangıç main: `920cdbb486d9dddb81b183ac92c5d4fe5ad6c819` (PR34 belge kabulü başarılı; CD source başarılı/deploy skipped). Bu dalda 11 P04 API geliştirme runtime'ına eklendi: toplam199 sözleşme /151 runtime /48 contract_only,50 append-only migration,90 core tablo. Aday/main clean ve gerçek hosted sağlayıcı kabulü henüz yoktur; P04 done değildir.
+Başlangıç main: `920cdbb486d9dddb81b183ac92c5d4fe5ad6c819` (PR34 belge kabulü başarılı; CD source başarılı/deploy skipped). Bu dalda 11 P04 API geliştirme runtime'ına eklendi: toplam199 sözleşme /151 runtime /48 contract_only,51 append-only migration,90 core tablo. Aday/main clean ve gerçek hosted sağlayıcı kabulü henüz yoktur; P04 done değildir.
 
 ## Davranış
 
@@ -37,3 +37,7 @@ Geliştirme/test Supabase üzerinde modül+wrapper aynı transaction'da derlendi
 Bağımsız ilk inceleme public hash/key değişken çakışmasını ve lead'siz öğrencinin takip dışında kalmasını buldu; düzeltildi, regresyonlar eklendi. İkinci geçiş bloklayıcı kaynak hatası bulmadı; önerdiği gerçek yoklama kapanışı sonrası bedelsiz hakediş/dönüşüm ve önceden satın alınmış ücretli deneme allocation kontrolleri aynı API suite’ine eklendi, CI’da çalışacak. Son kaynak incelemesi ve aday/main clean ayrı bekler. Merge sonrası mevcut CD normal akışı uygulanır. Full clean veya main clean atlanmaz, daraltılmaz; CI başlayınca kullanıcıya devir yapılır.
 
 İlk hedefli CI39597246182 başarısız:97 yapısal/42 CI politika/27 DB geçti; yeni P04 free-trial kapanış fixture’ında Owner’a instructor rolü verilmesine rağmen aktif merkez ilişkisi kurulmamıştı. `availability_save_v1` doğru biçimde NOT_FOUND döndü; sonraki earnings_snapshot kontrolü kapanış oluşmadığı için zincirleme düştü. Fixture mevcut `student_activate_v1` ile merkez ilişkisini kurar ve bunu açıkça doğrular. Ürün izinleri, kapanış/hakediş assertion’ları ve clean kapıları değiştirilmedi. Yeni kaynak CI kabulü ayrıca bekler.
+
+İkinci hedefli CI39599003841 aynı yeni kapanışta INTEGRITY_VIOLATION buldu: eski private.lesson_right yalnız satın alınmış allocation veya negatif deficit tanıyordu; bedelsiz aday denemesinde ikisi de bulunmaz. Yeni51. migration yalnız accepted teklif + aynı org/merkez/kişi/seans/usage + sabit0 fiyat + source_sale_id yok kanıtıyla free_trial kapanışını destekler. Eksik kanıt ve sıradan eksik hak yine INTEGRITY_VIOLATION’dır. İlk used_at kanıtı düzeltmede silinmez; hak/deficit/borç/hakediş üretilmez. Test önce usage kanıtını kaldırınca kapanış reddini, geri koyunca gerçek kapanışı doğrular. Aday/main clean değişmedi; yeni kaynak CI bekler.
+
+Yeni düzeltme odaklı gerçek PostgreSQL transaction testinde geçti: kullanım kanıtı yokken gerçek kapanış reddi, kanıt geri geldiğinde gerçek private.lesson_dispatch kapanışı, frozen trial=true/0 hakediş, used_at kaydı ve düzeltmede ilk kullanımın korunması. Modül+51. migration+sentetik fixture bütünü ROLLBACK edildi; hosted migration geçmişine eklenmedi. Bu doğrulama gerçek Auth→Edge CI veya aday/main clean yerine geçmez.

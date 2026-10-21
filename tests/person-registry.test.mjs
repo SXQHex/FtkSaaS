@@ -215,7 +215,14 @@ test('P04 CRM/public intent -> review -> trial -> student, real Auth/Edge and is
   attendance=await must(owner,'attendance_get_v1',scope({session_id:ses}));
   for(const e of attendance.entries)await mut('attendance_mark_v1',{reservation_id:e.reservation_id,expected_version:e.version,result:'attended'});
   attendance=await must(owner,'attendance_get_v1',scope({session_id:ses}));
-  await mut('attendance_close_v1',{session_id:ses,expected_version:attendance.session_version,performed:true,performed_instructor_ids:[ownerPerson]});
+  const closeBody={session_id:ses,expected_version:attendance.session_version,performed:true,performed_instructor_ids:[ownerPerson]};
+  const usage=(await rows('select * from core.trial_usages where org_id=$1 and offer_id=$2',[org,offer]))[0];assert.equal(usage.used_at,null);
+  await db.query('delete from core.trial_usages where id=$1',[usage.id]);
+  try{await fail('attendance_close_v1',closeBody,'INTEGRITY_VIOLATION');}
+  finally{await db.query('insert into core.trial_usages select * from jsonb_populate_record(null::core.trial_usages,$1::jsonb)',[usage]);}
+  await mut('attendance_close_v1',closeBody);
+  assert((await rows('select used_at from core.trial_usages where id=$1',[usage.id]))[0].used_at);
+
   const frozen=(await rows('select earnings_snapshot from core.attendance_closures where org_id=$1 and session_id=$2',[org,ses]))[0].earnings_snapshot;
   assert.equal(frozen[0].participants[0].trial,true);assert.equal((await rows('select count(*)::int n from core.earnings where org_id=$1 and session_id=$2',[org,ses]))[0].n,0);
  });
