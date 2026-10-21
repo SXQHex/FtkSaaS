@@ -1,4 +1,62 @@
 import test from 'node:test';import assert from 'node:assert/strict';import fs from 'node:fs';
+import {deploymentSource} from '../scripts/ci/deployment-source.mjs';
+import {sameMigration,migrationPlan,hostedSmoke,unchangedEdge,project} from '../scripts/ci/deploy-development.mjs';
+
+test('unchanged Edge requires both trusted source receipt and live version/JWT match',()=>{
+ const previous={success:true,project,edge_version:3,edge_source_sha256:'hash'},edge={version:3,status:'ACTIVE',verify_jwt:true};
+ assert(unchangedEdge(previous,edge,'hash'));
+ for(const [p,e,h] of [[null,edge,'hash'],[{...previous,success:false},edge,'hash'],[{...previous,project:'other'},edge,'hash'],[previous,{...edge,version:4},'hash'],[previous,{...edge,verify_jwt:false},'hash'],[previous,edge,'changed']])assert(!unchangedEdge(p,e,h));
+});
+test('hosted smoke checks real request sequence and cleans its exact UUID even on a failed assertion',async()=>{
+ const original=globalThis.fetch;
+ try{for(const failure of [false,true]){
+  let id,deleted=false,loggedOut=false,accountRemoved=false;const checks=[];
+  globalThis.fetch=async(url,options)=>{
+   const body=options.body?JSON.parse(options.body):null;
+   const response=(status,data)=>({status,text:async()=>status===204?'':JSON.stringify(data)});
+   if(url.endsWith('/auth/v1/admin/users')){id=body.id;assert.equal(body.email_confirm,true);return response(200,{id});}
+   if(url.includes('/auth/v1/admin/users/')){assert(url.endsWith(id));assert(accountRemoved);deleted=true;return response(200,{});}
+   if(url.includes('/auth/v1/token?'))return response(200,{access_token:'synthetic-jwt'});
+   if(url.endsWith('/auth/v1/logout')){loggedOut=true;return response(204,{});}
+   if(url.includes('/rest/v1/rpc/'))return response(403,{code:'42501'});
+   if(options.headers.Authorization==='Bearer invalid-jwt')return response(401,{});
+   if(url.endsWith('/account_get_v1'))return failure?response(500,{}):loggedOut?response(401,{ok:false,error:{code:'AUTH_REQUIRED'}}):response(200,{ok:true,data:{id:'synthetic-account'}});
+   if(url.endsWith('/organizations_list_v1'))return response(200,{ok:true});
+   if(url.endsWith('/finance_get_v1'))return response(200,{ok:false,error:{code:'NOT_FOUND'}});
+   throw Error('Unexpected hosted request');
+  };
+  const api=async()=>[{type:'publishable',api_key:'synthetic-public'},{name:'service_role',api_key:'synthetic-admin'}];
+  const sql=async(query)=>{assert(query.includes(id));if(query.startsWith('delete')){accountRemoved=true;return [];}assert(deleted);return [{accounts:0,users:0}];};
+  const record=(name,passed)=>{checks.push({name,passed});assert(passed,name);};
+  if(failure)await assert.rejects(hostedSmoke(api,sql,record),/auth_edge_rpc_account/);else await hostedSmoke(api,sql,record);
+  assert(accountRemoved&&deleted);assert(checks.some(c=>c.name==='synthetic_fixture_removed'&&c.passed));
+  if(!failure)assert(checks.some(c=>c.name==='revoked_session_rejected'&&c.passed));
+ }}finally{globalThis.fetch=original;}
+});
+
+test('CD accepts only current successful main full acceptance with every executed job',()=>{
+ const v=valid();v.run={...v.run,path:'.github/workflows/backend.yml',event:'push',head_branch:'main',head_sha:'a'.repeat(40),repository:{full_name:'SXQHex/FtkSaaS'},head_repository:{full_name:'SXQHex/FtkSaaS'}};
+ v.jobs=v.jobs.map(j=>({...j,head_sha:v.run.head_sha}));
+ v.jobs.push({name:'source',status:'completed',conclusion:'success',run_id:5,run_attempt:1,head_sha:v.run.head_sha});
+ const x={run:v.run,jobs:v.jobs,currentMain:v.run.head_sha,repository:'SXQHex/FtkSaaS',attempt:1};
+ assert.equal(deploymentSource(x).deploy,true);
+ assert.equal(deploymentSource({...x,currentMain:'b'.repeat(40)}).deploy,false);
+ for(const mutate of [z=>z.run.event='pull_request',z=>z.run.path='.github/workflows/ci-full.yml',z=>z.run.head_repository.full_name='fork/repo',z=>z.run.conclusion='failure',z=>z.run.head_branch='feature',z=>z.attempt=2,z=>z.jobs.splice(2,1),z=>z.jobs[0].conclusion='skipped',z=>z.jobs.at(-1).head_sha='other']){const z=structuredClone(x);mutate(z);assert.throws(()=>deploymentSource(z));}
+ const doc={name:'documentation',status:'completed',conclusion:'success',run_id:5,run_attempt:1,head_sha:v.run.head_sha,steps:[{name:'Documentation main acceptance (no full clean)',conclusion:'success'}]};
+ assert.equal(deploymentSource({...x,jobs:[v.jobs.at(-1),doc]}).deploy,false);
+});
+test('migration readback accepts verbatim CLI chunks and MCP file but rejects drift or hidden SQL',()=>{
+ const sql="-- frozen\nbegin;\nselect 'a; b';\n/* between */ select 2;\ncommit;\n";
+ assert(sameMigration(sql,[sql]));
+ const chunks=["-- frozen\nbegin","select 'a; b'","/* between */ select 2","commit"];
+ assert(sameMigration(sql,chunks));
+ for(const changed of [["begin","select 'a;b'","select 2","commit"],["begin","select 'a; b'","commit"],["begin","select 'a; b'","select 2","drop table x","commit"],[],null])assert(!sameMigration(sql,changed));
+ const local=[{version:'1',sql},{version:'2',sql:'select 3;'}];
+ assert.deepEqual(migrationPlan(local,[{version:'1',statements:chunks}]),[local[1]]);
+ assert.throws(()=>migrationPlan(local,[{version:'3',statements:['select 3']}]),/mismatch/);
+ assert.throws(()=>migrationPlan(local,[{version:'1',statements:['select 2']}]),/mismatch/);
+ assert.throws(()=>migrationPlan(local,[{version:'1',statements:[sql]},{version:'1',statements:[sql]}]),/mismatch/);
+});
 import {select,parseChanges,apiSuites} from '../scripts/ci/select-tests.mjs';
 import {validateBinding} from '../scripts/ci/gate.mjs';
 import {analyzeDelta} from '../scripts/ci/delta-analysis.mjs';

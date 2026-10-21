@@ -13,7 +13,8 @@ Geliştirme/test Supabase `gwyprhenabtpkbojephw`, kabul edilmiş main `10710ffa9
 | CI-02 | Dört shard, bölüm/Draft/development, yalnız-belge kabulü | — | done | #25/#26; main0ade787 / 39425915555 completed/success; 462 test, 34 migration |
 | P02 | Paket ve seans yaşam döngüsü | 15 | done | #28; main cc4878d /39461804543 completed/success;469 test,40 migration; hosted Edge2 eşitlendi |
 | P03 | Finans ve eğitmen ödemeleri | 7 | done | #30; main10710ffa /39529992556 completed/success;476 test,49 migration; hosted Edge3 ve ayrı smoke başarılı |
-| P04 | CRM ve public başvuru | 11 | queued | P03 sonrası |
+| CD-01 | Geliştirme/test Supabase CD | — | in_progress | Main1c9c8b5 /39533805184 completed/success; ayrı altyapı PR’sı, etkinleştirme ve canlı kabul bekler |
+| P04 | CRM ve public başvuru | 11 | queued | CD-01 sonrası |
 | P05 | Belge, bildirim ve otomasyon | 13 | queued | P04 sonrası |
 | P06 | Rapor, import ve işlem izleme | 13 | queued | P05 sonrası |
 | P07 | Hesap, organizasyon ve abonelik yaşam döngüsü | 22 | queued | P06 sonrası |

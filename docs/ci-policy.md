@@ -68,3 +68,8 @@ PR #23, kullanıcı tarafından açıkça onaylanan tek seferlik güvenilir work
 
 Repository ayarları ve required-check bypass kullanılmadı; gate kodu veya kaynak bağı zayıflatılmadı, sahte status yazılmadı. Tek seferlik kullanıcı yetkisi yeni workflow değişiklikleri veya P01 runtime'ı için otomatik istisna değildir. Güncel main'le aynı ci-full.yml blob'u taşıyan P01 son adayı normal kaynak bağlı kabul kapısından geçer; yeni head/base için eski clean geçerli sayılmaz.
 
+
+
+## CD-01 hazırlığı — geliştirme/test hedefi
+
+[Uzak backend kurulumu](remote-backend-setup.md) yeni main kabulü sonrası CD tasarımını ve iki secret/native entegrasyon kontrolü gereğini tanımlar. CD mevcut full kabulünü kullanır; aday veya main test kapsamını azaltmaz. Workflow ve scripts/ci farkı trusted politika yüzeyidir; normal otomatik merge kapısı bu yeni kaynağa yetki vermez. Son-head bağımsız inceleme, gerçek aday kabulü ve exact kaynak için kurulum yetkisi bekler. Eski kurulum izinleri kullanılmaz. Etkinleştirme ve ilk canlı CD kabulü henüz yapılmadı.
