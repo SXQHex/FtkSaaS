@@ -93,7 +93,12 @@ test('P05 actual Auth/Storage/documents/inbox/scoped worker acceptance',async t=
  });
  await t.test('organization catalog sale document is available before purchase and gate commits only after self consent',async()=>{
   const terms={name:'Organization catalog',kind:'credits',booking_mode:'flexible',credits:1,price_minor:'0',currency:'TRY',freeze:{enabled:false,extends_validity:false},refund:{method:'none'},scopes:[{scope_kind:'organization_all',center_id:null,discipline_id:null,usage_targets:['lesson']}]};
-  const pv=(await mut('product_publish_v1',{center_id:null,terms})).primary_id;
+  // Organization-level catalog rows are a supported data shape; product_publish
+  // remains center-managed. Seed this shape without broadening that API's authority.
+  const pid=key(),pv=key();
+  await db.query("insert into core.products(id,org_id,name,state) values($1,$2,'Organization catalog','active')",[pid,org]);
+  await db.query("insert into core.product_versions(id,org_id,product_id,kind,booking_mode,credits,price_minor,currency,refund_method,freeze_terms,refund_terms,effective_at) values($1,$2,$3,'credits','flexible',1,0,'TRY','none',$4,$5,clock_timestamp())",[pv,org,pid,terms.freeze,terms.refund]);
+  await db.query("insert into core.product_scopes(id,org_id,product_version_id,scope_kind,usage_targets) values($1,$2,$3,'organization_all',array['lesson'])",[key(),org,pv]);
   const f=await upload('Sale terms');await mut('file_upload_complete_v1',{file_id:f.file_id,checksum});
   const published=await mut('document_version_publish_v1',{file_id:f.file_id,version_label:'sale-v1',scope:{kind:'center',center_id:center},requirements:[{gate:'sale',scope:{center_ids:[center],product_version_ids:[pv]},renewed_acceptance:true}]});
   const saleContext={gate:'sale',subject:{type:'product_versions',id:pv}},list=await requirements(saleContext);assert(list.some(x=>x.version_id===published.primary_id&&!x.accepted));
@@ -115,6 +120,7 @@ test('P05 actual Auth/Storage/documents/inbox/scoped worker acceptance',async t=
  const url=new URL(context().env.DB_URL);url.username=role;url.password=password;worker=new pg.Client({connectionString:url.toString()});await worker.connect();const ids=()=>Array.from({length:4096},key);
  const claim=async()=>(await worker.query('select private.p05_jobs_claim($1,$2,50) jobs',[org,ids()])).rows[0].jobs;
  const invoke=async({operation,request})=>(await worker.query('select private.p05_worker_execute($1,$2,$3) result',[operation,request,ids()])).rows[0].result;
+ const inspect=async jobs=>{const result=[];for(const j of jobs)result.push({j,c:(await rows('select * from private.p05_jobs where job_id=$1',[j.request.job_id]))[0]});return result;};
  const drain=async()=>{for(let i=0;i<10;i++){const results=await tick(worker,org,{limit:50});assert(results.every(r=>r.ok),JSON.stringify(results));if(!results.length)break;}};
  await t.test('dedicated worker cannot read business/Auth tables or change org/operation/token; outbox once',async()=>{
   await assert.rejects(worker.query('select * from core.people'),/permission denied/);await assert.rejects(worker.query('select * from auth.users'),/permission denied/);
@@ -130,7 +136,7 @@ test('P05 actual Auth/Storage/documents/inbox/scoped worker acceptance',async t=
  await t.test('optional reminder prefs, lease reclaim/fence, repeat and cancellation recheck',async()=>{
   await mut('notification_preferences_set_v1',{channel:'in_app',purpose:'reminder',enabled:true,expected_version:1},student);
   const newSid=await session(10);const booking=(await mut('reservation_create_v1',{session_id:newSid,person_id:person,mode:'flexible'},student)).primary_id;
-  let jobs=await claim();const reminder=(await Promise.all(jobs.map(async j=>({j,c:(await rows('select * from private.p05_jobs where job_id=$1',[j.request.job_id]))[0]})))).find(x=>x.c.target_id===booking)?.j;assert(reminder);
+  let jobs=await claim();const reminder=(await inspect(jobs)).find(x=>x.c.target_id===booking)?.j;assert(reminder);
   for(const j of jobs.filter(x=>x!==reminder))assert((await invoke(j)).ok);
   await db.query("update core.outbox_jobs set lease_until=clock_timestamp()-interval '1 second' where id=$1",[reminder.request.job_id]);
   const fresh=(await claim()).find(j=>j.request.job_id===reminder.request.job_id);assert(fresh);await assert.rejects(invoke(reminder),/FORBIDDEN/);
@@ -139,7 +145,7 @@ test('P05 actual Auth/Storage/documents/inbox/scoped worker acceptance',async t=
  });
  await t.test('worker late failure rolls back effects and receipt, then fresh fenced retry recovers',async()=>{
   const booking=(await mut('reservation_create_v1',{session_id:await session(8),person_id:person,mode:'flexible'},student)).primary_id;
-  const jobs=await claim(),job=(await Promise.all(jobs.map(async j=>({j,c:(await rows('select * from private.p05_jobs where job_id=$1',[j.request.job_id]))[0]})))).find(x=>x.c.target_id===booking)?.j;assert(job);
+  const jobs=await claim(),job=(await inspect(jobs)).find(x=>x.c.target_id===booking)?.j;assert(job);
   for(const j of jobs.filter(x=>x!==job))assert((await invoke(j)).ok);
   const fixture='p05_fail_'+key().replaceAll('-','');
   await db.query(`create function private.${fixture}() returns trigger language plpgsql as $$begin if new.org_id='${org}'::uuid and new.action='reminder_schedule_v1' then raise exception 'fixture late failure' using errcode='23514';end if;return new;end$$`);
@@ -159,7 +165,7 @@ test('P05 actual Auth/Storage/documents/inbox/scoped worker acceptance',async t=
   const secondCenter=(await must(owner,'center_create_v1',{org_id:org,name:'No CM assignment',timezone:'UTC'},key())).primary_id;
   await db.query("insert into core.center_relationships(id,org_id,center_id,person_id,kind,state,started_at) values($1,$2,$3,$4,'student','active',now()-interval '2 days')",[key(),org,secondCenter,person]);
   const automation=(await mut('automation_save_v1',{scope:{kind:'organization'},center_id:null,definition:{name:'Follow inactive',trigger:{kind:'student_inactive',offset_days:0},segment_id:segment,action:{kind:'create_followup',channel:'in_app',template_key:'followup'},execution_center_ids:[center,secondCenter],enabled:true}})).primary_id;
-  let jobs=await claim();const auto=(await Promise.all(jobs.map(async j=>({j,c:(await rows('select * from private.p05_jobs where job_id=$1',[j.request.job_id]))[0]})))).find(x=>x.c.automation_id===automation)?.j;assert(auto);
+  let jobs=await claim();const auto=(await inspect(jobs)).find(x=>x.c.automation_id===automation)?.j;assert(auto);
   const result=await invoke(auto);assert(result.ok,JSON.stringify(result));assert.deepEqual(await invoke(auto),result);for(const j of jobs.filter(x=>x!==auto))assert((await invoke(j)).ok);
   const followups=await must(owner,'crm_followup_list_v1',scope({kind:'automation_followup',page:{}}));const task=followups.items.find(x=>x.person_id===person);assert(task);assert.equal(task.lead_id,null);
   assert.equal((await rows('select count(*)::int n from core.leads where org_id=$1 and person_id=$2',[org,person]))[0].n,0);

@@ -609,7 +609,7 @@ declare b text:=pg_get_functiondef('private.execute_operation(text,jsonb,uuid,uu
 begin
  old:=' -- Central permission mapping; no user_metadata or request actor/role can grant access.';
  if strpos(b,old)=0 then raise exception 'P05 access anchor missing';end if;
- b:=replace(b,old,old||' if p_operation in ('||ops||') then perform private.p05_access(p_operation,r,org,center,person,actor.id);end if;');
+ b:=replace(b,old,old||E'\n'||' if p_operation in ('||ops||') then perform private.p05_access(p_operation,r,org,center,person,actor.id);end if;');
  old:=$a$ elsif perm_code='invite.student' then$a$;
  if strpos(b,old)=0 then raise exception 'P05 permission anchor missing';end if;
  b:=replace(b,old,' elsif p_operation in ('||ops||') then null;'||old);
