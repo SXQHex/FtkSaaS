@@ -5,6 +5,7 @@ import {createHash,randomBytes} from 'node:crypto';
 import {spawnSync} from 'node:child_process';
 import {pathToFileURL} from 'node:url';
 import {v7 as uuid} from 'uuid';
+import {revalidateDeployment} from './deployment-source.mjs';
 
 export const project='gwyprhenabtpkbojephw';
 export const sha256=s=>createHash('sha256').update(s).digest('hex');
@@ -35,7 +36,7 @@ export function migrationPlan(local,remote){
 const literal=s=>"'"+s.replaceAll("'","''")+"'";
 
 export async function deliver(){
- const receipt={project,environment:'development/test (Supabase production branch)',source:process.env.ACCEPTED_SHA,acceptance_run_id:process.env.ACCEPTANCE_RUN_ID,checks:[],success:false};
+ const receipt={project,environment:'development/test (Supabase production branch)',source:process.env.ACCEPTED_SHA,expected_main:process.env.EXPECTED_MAIN_SHA,acceptance_run_id:process.env.ACCEPTANCE_RUN_ID,acceptance_attempt:Number(process.env.ACCEPTANCE_ATTEMPT),checks:[],success:false};
  const record=(name,passed)=>{receipt.checks.push({name,passed:!!passed});if(!passed)throw Error('Verification failed: '+name);};
  let stage='configuration',temp;
  const api=async(route,{method='GET',body}={})=>{
@@ -43,16 +44,21 @@ export async function deliver(){
   if(!r.ok)throw Error('Supabase Management API HTTP '+r.status);return r.status===204?null:r.json();
  };
  const sql=query=>api('/database/query',{method:'POST',body:{query}});
- const current=async()=>{
-  const r=await fetch('https://api.github.com/repos/SXQHex/FtkSaaS/git/ref/heads/main',{headers:{Authorization:'Bearer '+process.env.GH_TOKEN,Accept:'application/vnd.github+json'},signal:AbortSignal.timeout(30000)});
-  if(!r.ok)throw Error('Cannot verify live main');
-  if((await r.json()).object.sha!==receipt.source)throw Error('Main moved; superseded delivery stopped');
+ const gh=async route=>{
+  const r=await fetch('https://api.github.com/repos/SXQHex/FtkSaaS/'+route,{headers:{Authorization:'Bearer '+process.env.GH_TOKEN,Accept:'application/vnd.github+json'},signal:AbortSignal.timeout(30000)});
+  if(!r.ok)throw Error('Cannot revalidate GitHub acceptance: HTTP '+r.status);return r.json();
  };
+ const github={rest:{
+  git:{getRef:async()=>({data:await gh('git/ref/heads/main')}),getTree:async a=>({data:await gh('git/trees/'+a.tree_sha+'?recursive=1')}),getBlob:async a=>({data:await gh('git/blobs/'+a.file_sha)})},
+  repos:{compareCommitsWithBasehead:async a=>({data:await gh('compare/'+a.basehead)})},
+  actions:{getWorkflowRun:async a=>({data:await gh('actions/runs/'+a.run_id)}),listJobsForWorkflowRun:async a=>({data:await gh('actions/runs/'+a.run_id+'/jobs?filter=latest&per_page=100&page='+a.page)})}
+ },paginate:async(method,args)=>{const all=[];for(let page=1;;page++){const rows=(await method({...args,page})).data.jobs;all.push(...rows);if(rows.length<100)return all;}}};
+ const current=()=>revalidateDeployment(github,{owner:'SXQHex',repo:'FtkSaaS'},{sha:receipt.source,expected_main:receipt.expected_main,run_id:Number(receipt.acceptance_run_id),attempt:receipt.acceptance_attempt});
  const cli=(args)=>{const r=spawnSync(path.resolve('node_modules/.bin/supabase'),args,{encoding:'utf8',timeout:600000,maxBuffer:20*1024*1024,env:process.env});if(r.error||r.status!==0)throw Error('Supabase CLI failed in '+stage+'; output withheld to protect credentials/SQL');};
  try{
-  for(const key of ['SUPABASE_ACCESS_TOKEN','SUPABASE_DB_PASSWORD','GH_TOKEN','ACCEPTED_SHA','ACCEPTANCE_RUN_ID'])if(!process.env[key])throw Error('Missing required secret/input: '+key);
+  for(const key of ['SUPABASE_ACCESS_TOKEN','SUPABASE_DB_PASSWORD','GH_TOKEN','ACCEPTED_SHA','ACCEPTANCE_RUN_ID','ACCEPTANCE_ATTEMPT','EXPECTED_MAIN_SHA'])if(!process.env[key])throw Error('Missing required secret/input: '+key);
   if(process.env.SUPABASE_NATIVE_DEPLOY_DISABLED!=='true')throw Error('Native integration deployment must be verified disabled and SUPABASE_NATIVE_DEPLOY_DISABLED=true recorded');
-  if(process.env.GITHUB_REPOSITORY!=='SXQHex/FtkSaaS'||!/^\d+$/.test(receipt.acceptance_run_id)||!/^[a-f0-9]{40}$/.test(receipt.source))throw Error('Unexpected repository/source');
+  if(process.env.GITHUB_REPOSITORY!=='SXQHex/FtkSaaS'||!/^\d+$/.test(receipt.acceptance_run_id)||!Number.isSafeInteger(receipt.acceptance_attempt)||receipt.acceptance_attempt<1||!/^[a-f0-9]{40}$/.test(receipt.source)||!/^[a-f0-9]{40}$/.test(receipt.expected_main))throw Error('Unexpected repository/source');
   const head=spawnSync('git',['rev-parse','HEAD'],{encoding:'utf8'});record('checked_out_accepted_source',head.status===0&&head.stdout.trim()===receipt.source);
   await current();
   const manifest=JSON.parse(fs.readFileSync('database/migrations.sha256.json'));
@@ -88,7 +94,7 @@ export async function deliver(){
   stage='database permissions';
   const [permissions]=await sql("select (select count(*)::int from pg_class c join pg_namespace n on n.oid=c.relnamespace where n.nspname='core' and c.relkind='r') as core_tables, (select count(*)::int from pg_class c join pg_namespace n on n.oid=c.relnamespace where n.nspname='core' and c.relkind='r' and not c.relrowsecurity) as missing_rls, (select count(*)::int from pg_proc p join pg_namespace n on n.oid=p.pronamespace where n.nspname='api_v1' and (has_function_privilege('anon',p.oid,'EXECUTE') or has_function_privilege('authenticated',p.oid,'EXECUTE'))) as exposed_rpc");
   record('core_rls_and_direct_rpc_denied',permissions.core_tables>0&&permissions.missing_rls===0&&permissions.exposed_rpc===0);receipt.permissions=permissions;
-  stage='hosted smoke';await hostedSmoke(api,sql,record);
+  stage='hosted smoke';await current();await hostedSmoke(api,sql,record);
   stage='advisors';receipt.advisors={};
   for(const type of ['security','performance']){const data=await api('/advisors/'+type),lints=data.lints;if(!Array.isArray(lints))throw Error('Unknown advisors response');receipt.advisors[type]=lints.reduce((out,l)=>{out[l.level]=(out[l.level]??0)+1;return out;},{});record(type+'_advisors_no_errors',!lints.some(l=>l.level==='ERROR'));}
   await current();receipt.success=true;

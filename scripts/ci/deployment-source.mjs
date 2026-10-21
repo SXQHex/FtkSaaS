@@ -1,4 +1,5 @@
 import {validateJobs} from './shards.mjs';
+import {remoteDocumentScope} from './source.mjs';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
@@ -17,6 +18,41 @@ export function deploymentSource({run,jobs,currentMain,repository,attempt}) {
  return {deploy:true,sha:run.head_sha,run_id:run.id,attempt:run.run_attempt};
 }
 
+async function fullProof(github,repo,run,jobs,currentMain,attempt){
+ const proof=deploymentSource({run,jobs,currentMain:run.head_sha,repository:repo.owner+'/'+repo.repo,attempt});
+ if(!proof.deploy)return null;
+ if(run.head_sha!==currentMain){
+  const comparison=(await github.rest.repos.compareCommitsWithBasehead({...repo,basehead:run.head_sha+'...'+currentMain})).data;
+  if(comparison.status!=='ahead'||!(await remoteDocumentScope(github,repo,run.head_sha,currentMain)).safe)return null;
+ }
+ return {...proof,expected_main:currentMain};
+}
+export async function resolveAcceptedSource(github,repo,run,jobs,currentMain,attempt){
+ const initial=deploymentSource({run,jobs,currentMain:run.head_sha,repository:repo.owner+'/'+repo.repo,attempt});
+ if(initial.deploy)return await fullProof(github,repo,run,jobs,currentMain,attempt)??{deploy:false,reason:'Superseded runtime source'};
+ if(run.head_sha!==currentMain)return {deploy:false,reason:'Superseded documentation source'};
+ // A docs-only main may have overtaken an accepted runtime before CD ran.
+ // Its own documentation proof never substitutes for the full runtime proof.
+ const runs=(await github.rest.actions.listWorkflowRuns({...repo,workflow_id:'backend.yml',branch:'main',event:'push',status:'success',per_page:100})).data.workflow_runs;
+ for(const candidate of runs){
+  if(candidate.id===run.id)continue;
+  const current=(await github.rest.actions.getWorkflowRun({...repo,run_id:candidate.id})).data;
+  if(current.status!=='completed'||current.conclusion!=='success')continue;
+  const candidateJobs=await github.paginate(github.rest.actions.listJobsForWorkflowRun,{...repo,run_id:current.id,filter:'latest',per_page:100});
+  const proof=await fullProof(github,repo,current,candidateJobs,currentMain);
+  if(proof)return {...proof,documentation_run_id:run.id};
+ }
+ return {deploy:false,reason:'Awaiting full runtime acceptance; its completion will trigger delivery'};
+}
+export async function revalidateDeployment(github,repo,expected){
+ const run=(await github.rest.actions.getWorkflowRun({...repo,run_id:expected.run_id})).data;
+ const jobs=await github.paginate(github.rest.actions.listJobsForWorkflowRun,{...repo,run_id:run.id,filter:'latest',per_page:100});
+ const currentMain=(await github.rest.git.getRef({...repo,ref:'heads/main'})).data.object.sha;
+ if(currentMain!==expected.expected_main||run.head_sha!==expected.sha||run.run_attempt!==expected.attempt)throw Error('Accepted source/main/attempt changed before delivery');
+ const proof=await fullProof(github,repo,run,jobs,currentMain,expected.attempt);
+ if(!proof)throw Error('Runtime acceptance or documentation equivalence no longer valid');
+ return proof;
+}
 export async function resolveDeployment(github,context,core) {
  const id=context.payload.workflow_run?.id??Number(context.payload.inputs?.acceptance_run_id);
  if(!Number.isSafeInteger(id)||id<=0)throw Error('Exact main acceptance run ID required');
@@ -24,9 +60,13 @@ export async function resolveDeployment(github,context,core) {
  const run=(await github.rest.actions.getWorkflowRun({...repo,run_id:id})).data;
  const jobs=await github.paginate(github.rest.actions.listJobsForWorkflowRun,{...repo,run_id:id,filter:'latest',per_page:100});
  const currentMain=(await github.rest.git.getRef({...repo,ref:'heads/main'})).data.object.sha;
- const proof=deploymentSource({run,jobs,currentMain,repository:repo.owner+'/'+repo.repo,attempt:context.payload.workflow_run?.run_attempt});
+ let proof=await resolveAcceptedSource(github,repo,run,jobs,currentMain,context.payload.workflow_run?.run_attempt);
+ if(proof.documentation_run_id){
+  const previous=await previousReceipt(github,context);
+  if(previous?.source===proof.sha)proof={deploy:false,reason:'Documentation-only main; accepted runtime already delivered'};
+ }
  core.setOutput('deploy',String(proof.deploy));
- if(proof.deploy){core.setOutput('sha',proof.sha);core.setOutput('acceptance_run_id',String(id));}
+ if(proof.deploy){core.setOutput('sha',proof.sha);core.setOutput('expected_main',proof.expected_main);core.setOutput('acceptance_run_id',String(proof.run_id));core.setOutput('acceptance_attempt',String(proof.attempt));}
  await core.summary.addRaw(JSON.stringify(proof)+'\n').write();
 }
 
@@ -42,7 +82,7 @@ export async function previousReceipt(github,context){
    const file=path.join(dir,'receipt.zip');fs.writeFileSync(file,Buffer.from(zip.data));
    const receipt=JSON.parse(execFileSync('unzip',['-p',file,'development-delivery.json'],{encoding:'utf8',maxBuffer:100000}));
    if(receipt.success===true&&receipt.project==='gwyprhenabtpkbojephw'){
-    fs.mkdirSync('.ci',{recursive:true});fs.writeFileSync('.ci/previous-development-delivery.json',JSON.stringify(receipt));return;
+    fs.mkdirSync('.ci',{recursive:true});fs.writeFileSync('.ci/previous-development-delivery.json',JSON.stringify(receipt));return receipt;
    }
   }finally{fs.rmSync(dir,{recursive:true,force:true});}
  }

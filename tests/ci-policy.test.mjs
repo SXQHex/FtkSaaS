@@ -1,5 +1,5 @@
 import test from 'node:test';import assert from 'node:assert/strict';import fs from 'node:fs';
-import {deploymentSource} from '../scripts/ci/deployment-source.mjs';
+import {deploymentSource,resolveAcceptedSource,revalidateDeployment} from '../scripts/ci/deployment-source.mjs';
 import {sameMigration,migrationPlan,hostedSmoke,unchangedEdge,project} from '../scripts/ci/deploy-development.mjs';
 
 test('unchanged Edge requires both trusted source receipt and live version/JWT match',()=>{
@@ -44,6 +44,30 @@ test('CD accepts only current successful main full acceptance with every execute
  for(const mutate of [z=>z.run.event='pull_request',z=>z.run.path='.github/workflows/ci-full.yml',z=>z.run.head_repository.full_name='fork/repo',z=>z.run.conclusion='failure',z=>z.run.head_branch='feature',z=>z.attempt=2,z=>z.jobs.splice(2,1),z=>z.jobs[0].conclusion='skipped',z=>z.jobs.at(-1).head_sha='other']){const z=structuredClone(x);mutate(z);assert.throws(()=>deploymentSource(z));}
  const doc={name:'documentation',status:'completed',conclusion:'success',run_id:5,run_attempt:1,head_sha:v.run.head_sha,steps:[{name:'Documentation main acceptance (no full clean)',conclusion:'success'}]};
  assert.equal(deploymentSource({...x,jobs:[v.jobs.at(-1),doc]}).deploy,false);
+});
+test('CD catches up accepted runtime through docs-only main in either completion order and rejects runtime supersession',async()=>{
+ const repo={owner:'SXQHex',repo:'FtkSaaS'},a='a'.repeat(40),b='b'.repeat(40),v=valid();
+ const run={...v.run,path:'.github/workflows/backend.yml',event:'push',head_branch:'main',head_sha:a,repository:{full_name:'SXQHex/FtkSaaS'},head_repository:{full_name:'SXQHex/FtkSaaS'}};
+ const source={name:'source',status:'completed',conclusion:'success',run_id:5,run_attempt:1,head_sha:a};
+ const jobs=[...v.jobs.map(j=>({...j,head_sha:a})),source];
+ const docs={...run,id:6,head_sha:b},docJobs=[{...source,run_id:6,head_sha:b},{name:'documentation',status:'completed',conclusion:'success',run_id:6,run_attempt:1,head_sha:b,steps:[{name:'Documentation main acceptance (no full clean)',conclusion:'success'}]}];
+ let fullFinished=false,runtimeChanged=false,liveAttempt=1,conclusion='success';
+ const github={rest:{
+  git:{getRef:async()=>({data:{object:{sha:b}}}),getTree:async({tree_sha})=>({data:{tree:[{path:'README.md',mode:'100644',type:'blob',sha:tree_sha+'doc'},{path:'database/kernel.sql',mode:'100644',type:'blob',sha:runtimeChanged&&tree_sha===b?'changed':'same'}]}}),getBlob:async()=>({data:{encoding:'base64',content:Buffer.from('Safe documentation').toString('base64')}})},
+  repos:{compareCommitsWithBasehead:async()=>({data:{status:'ahead'}})},
+  actions:{getWorkflowRun:async()=>({data:{...run,run_attempt:liveAttempt,conclusion}}),listJobsForWorkflowRun:'jobs',listWorkflowRuns:async()=>({data:{workflow_runs:fullFinished?[run]:[]}})}},paginate:async()=>jobs};
+ assert.equal((await resolveAcceptedSource(github,repo,docs,docJobs,b)).deploy,false);
+ fullFinished=true;
+ const afterFull=await resolveAcceptedSource(github,repo,run,jobs,b,1);
+ assert.equal(afterFull.deploy,true);assert.equal(afterFull.sha,a);assert.equal(afterFull.expected_main,b);
+ const afterDocs=await resolveAcceptedSource(github,repo,docs,docJobs,b);
+ assert.equal(afterDocs.deploy,true);assert.equal(afterDocs.run_id,5);assert.equal(afterDocs.documentation_run_id,6);
+ assert.equal((await revalidateDeployment(github,repo,afterDocs)).sha,a);
+ liveAttempt=2;await assert.rejects(revalidateDeployment(github,repo,afterDocs),/attempt changed/);
+ liveAttempt=1;conclusion='failure';await assert.rejects(revalidateDeployment(github,repo,afterDocs),/acceptance failed/);
+ conclusion='success';runtimeChanged=true;
+ assert.equal((await resolveAcceptedSource(github,repo,run,jobs,b,1)).deploy,false);
+ await assert.rejects(revalidateDeployment(github,repo,afterDocs),/equivalence/);
 });
 test('migration readback accepts verbatim CLI chunks and MCP file but rejects drift or hidden SQL',()=>{
  const sql="-- frozen\nbegin;\nselect 'a; b';\n/* between */ select 2;\ncommit;\n";

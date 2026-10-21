@@ -24,6 +24,8 @@ jobs:
       deploy: ${{ steps.source.outputs.deploy }}
       sha: ${{ steps.source.outputs.sha }}
       acceptance_run_id: ${{ steps.source.outputs.acceptance_run_id }}
+      acceptance_attempt: ${{ steps.source.outputs.acceptance_attempt }}
+      expected_main: ${{ steps.source.outputs.expected_main }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
         with:
@@ -62,6 +64,8 @@ jobs:
           GH_TOKEN: ${{ github.token }}
           ACCEPTED_SHA: ${{ needs.source.outputs.sha }}
           ACCEPTANCE_RUN_ID: ${{ needs.source.outputs.acceptance_run_id }}
+          ACCEPTANCE_ATTEMPT: ${{ needs.source.outputs.acceptance_attempt }}
+          EXPECTED_MAIN_SHA: ${{ needs.source.outputs.expected_main }}
           SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
           SUPABASE_DB_PASSWORD: ${{ secrets.SUPABASE_DB_PASSWORD }}
           SUPABASE_NATIVE_DEPLOY_DISABLED: ${{ vars.SUPABASE_NATIVE_DEPLOY_DISABLED }}
