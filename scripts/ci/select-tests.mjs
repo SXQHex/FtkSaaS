@@ -33,6 +33,7 @@ export function parseChanges(z) {
 // Finite reviewed CI harness surface. A mixed runtime delta still takes the
 // normal dependency graph; an unknown CI-looking path still expands safely.
 export const ciSources=new Set([
+ '.github/workflows/cd-development.yml','scripts/ci/deployment-source.mjs','scripts/ci/deploy-development.mjs',
  '.github/workflows/backend.yml','.github/workflows/ci-fast.yml','.github/workflows/ci-full.yml','.github/workflows/ci-gate.yml','.github/workflows/ci-docs.yml','.github/workflows/clean-suite.yml',
  'scripts/ci/select-tests.mjs','scripts/ci/delta-analysis.mjs','scripts/ci/run-targeted.mjs','scripts/ci/gate.mjs','scripts/ci/source.mjs','scripts/ci/document-scope.mjs','scripts/ci/document-paths.json','scripts/ci/renderer-proof.py','scripts/ci/recovery.mjs','scripts/ci/cleanup.mjs','scripts/ci/shards.mjs','scripts/ci/suite-durations.json','scripts/ci/collect.mjs','scripts/ci/timings.mjs','scripts/ci/summarize-timings.mjs','scripts/ci/reset-local.mjs','scripts/ci/docs-check.mjs',
  'scripts/test-clean.mjs','scripts/start-dev.mjs','tests/ci-policy.test.mjs'

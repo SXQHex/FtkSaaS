@@ -1,0 +1,81 @@
+name: Development Supabase delivery
+on:
+  workflow_run:
+    workflows: [Main clean acceptance]
+    types: [completed]
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      acceptance_run_id:
+        description: Successful full main acceptance run for current main (never a PR run)
+        required: true
+        type: string
+permissions:
+  contents: read
+  actions: read
+concurrency:
+  group: supabase-development-gwyprhenabtpkbojephw
+  cancel-in-progress: false
+jobs:
+  source:
+    if: github.ref == 'refs/heads/main' && (github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success')
+    runs-on: ubuntu-24.04
+    outputs:
+      deploy: ${{ steps.source.outputs.deploy }}
+      sha: ${{ steps.source.outputs.sha }}
+      acceptance_run_id: ${{ steps.source.outputs.acceptance_run_id }}
+      acceptance_attempt: ${{ steps.source.outputs.acceptance_attempt }}
+      expected_main: ${{ steps.source.outputs.expected_main }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          ref: main
+          persist-credentials: false
+      - id: source
+        uses: actions/github-script@ed597411d8f924073f98dfc5c65a23a2325f34cd
+        with:
+          script: |
+            const cd=await import(`${process.env.GITHUB_WORKSPACE}/scripts/ci/deployment-source.mjs`);
+            await cd.resolveDeployment(github,context,core);
+  deploy:
+    needs: source
+    if: needs.source.outputs.deploy == 'true'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    environment: development
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          ref: ${{ needs.source.outputs.sha }}
+          persist-credentials: false
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1
+        with:
+          node-version: '24.19.0'
+          cache: npm
+      - run: npm ci
+      - name: Read previous successful delivery receipt
+        uses: actions/github-script@ed597411d8f924073f98dfc5c65a23a2325f34cd
+        with:
+          script: |
+            const cd=await import(`${process.env.GITHUB_WORKSPACE}/scripts/ci/deployment-source.mjs`);
+            await cd.previousReceipt(github,context);
+      - name: Deliver accepted source and verify hosted backend
+        env:
+          GH_TOKEN: ${{ github.token }}
+          ACCEPTED_SHA: ${{ needs.source.outputs.sha }}
+          ACCEPTANCE_RUN_ID: ${{ needs.source.outputs.acceptance_run_id }}
+          ACCEPTANCE_ATTEMPT: ${{ needs.source.outputs.acceptance_attempt }}
+          EXPECTED_MAIN_SHA: ${{ needs.source.outputs.expected_main }}
+          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+          SUPABASE_DB_PASSWORD: ${{ secrets.SUPABASE_DB_PASSWORD }}
+          SUPABASE_NATIVE_DEPLOY_DISABLED: ${{ vars.SUPABASE_NATIVE_DEPLOY_DISABLED }}
+        run: node scripts/ci/deploy-development.mjs
+      - if: always()
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9
+        with:
+          name: development-delivery-${{ github.run_id }}-${{ github.run_attempt }}
+          path: .ci/development-delivery.json
+          if-no-files-found: warn
+          include-hidden-files: true
+          retention-days: 14
+          archive: true
