@@ -251,7 +251,9 @@ test('P04 CRM/public intent -> review -> trial -> student, real Auth/Edge and is
   await db.query("update core.saas_plan_versions set features=array_remove(features,'F21') where id=$1",[plan]);
   try{await fail('leads_list_v1',{page:{}},'PLAN_FEATURE_UNAVAILABLE');}finally{await db.query("update core.saas_plan_versions set features=array_append(features,'F21') where id=$1",[plan]);}
   await fail('crm_followup_list_v1',{kind:'inactive_student',page:{}},'POLICY_NOT_CONFIGURED');
+  await fail('crm_followup_list_v1',{kind:'renewal_due',page:{}},'POLICY_NOT_CONFIGURED');
   await db.query("insert into core.policy_versions(id,org_id,key,effective_at,mandatory,value) values($1,$2,'inactive_student_days',now(),false,$3)",[key(),org,{kind:'integer',value:0}]);
+  await fail('crm_followup_list_v1',{kind:'renewal_due',page:{}},'POLICY_NOT_CONFIGURED');
   const followup=await must(owner,'crm_followup_list_v1',scope({kind:'inactive_student',page:{}}));assert(followup.items.some(x=>x.person_id===person));assert(followup.items.some(x=>x.lead_id===null));
  });
  }finally{await db.end();}

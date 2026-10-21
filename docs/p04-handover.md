@@ -1,6 +1,6 @@
 # P04 CRM ve public başvuru devri
 
-Başlangıç main: `920cdbb486d9dddb81b183ac92c5d4fe5ad6c819` (PR34 belge kabulü başarılı; CD source başarılı/deploy skipped). Bu dalda 11 P04 API geliştirme runtime'ına eklendi: toplam199 sözleşme /151 runtime /48 contract_only,51 append-only migration,90 core tablo. Aday/main clean ve gerçek hosted sağlayıcı kabulü henüz yoktur; P04 done değildir.
+Başlangıç main: `920cdbb486d9dddb81b183ac92c5d4fe5ad6c819` (PR34 belge kabulü başarılı; CD source başarılı/deploy skipped). Bu dalda 11 P04 API geliştirme runtime'ına eklendi: toplam199 sözleşme /151 runtime /48 contract_only,52 append-only migration,90 core tablo. Aday/main clean ve gerçek hosted sağlayıcı kabulü henüz yoktur; P04 done değildir.
 
 ## Davranış
 
@@ -43,3 +43,7 @@ Bağımsız ilk inceleme public hash/key değişken çakışmasını ve lead'siz
 Yeni düzeltme odaklı gerçek PostgreSQL transaction testinde geçti: kullanım kanıtı yokken gerçek kapanış reddi, kanıt geri geldiğinde gerçek private.lesson_dispatch kapanışı, frozen trial=true/0 hakediş, used_at kaydı ve düzeltmede ilk kullanımın korunması. Modül+51. migration+sentetik fixture bütünü ROLLBACK edildi; hosted migration geçmişine eklenmedi. Bu doğrulama gerçek Auth→Edge CI veya aday/main clean yerine geçmez.
 
 Üçüncü hedefli CI39600987178 API testlerine geçmeden üretilmiş şema kataloğu tutarlılığında durdu:51. migration eklendikten sonra renderer çıktısındaki migration envanteri yeniden üretilmemişti. Mevcut scripts/render_catalogs.py çıktısı güncellendi; renderer/check veya test kapıları değiştirilmedi. Bu koşu yeni kapanış düzeltmesinin API sonucu değildir.
+
+Dördüncü hedefli CI39621597773 gerçek bedelsiz yoklama kapanışı/kanıt reddi/frozen0 hakediş ve ücretli deneme allocation testlerini geçti. Son dönüşüm/takip alt testinde politika yokken boş liste dönüldü: scalar composite private.policy_at yoklukta null alanlı tek satır üretir; EXISTS satır varlığı tek başına yeterli değildir.52. append-only migration configured.id IS NOT NULL arar. Mevcut POLICY_NOT_CONFIGURED beklentisi korunur; iki takip türünün ayrı config kapıları ayrıca doğrulanır. Yeni kaynağın CI kabulü bekler.
+
+52. migration odaklı gerçek PostgreSQL transaction kontrolünde iki eksik politikayı ayrı reddetti; yalnız inactive yapılandırıldıktan sonra renewal kapalı kaldı, kendi politikası eklendiğinde açıldı. Test tamamı ROLLBACK edildi. Yerel npm run verify97 yapısal+42 CI politika kontrolü geçti; yeni kaynak gerçek Auth/API CI ayrıca bekler.
