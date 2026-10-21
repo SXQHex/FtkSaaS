@@ -16,7 +16,7 @@ Geliştirme/test Supabase `gwyprhenabtpkbojephw`, kabul edilmiş main `10710ffa9
 | P02 | Paket ve seans yaşam döngüsü | 15 | done | #28; main cc4878d /39461804543 completed/success;469 test,40 migration; hosted Edge2 eşitlendi |
 | P03 | Finans ve eğitmen ödemeleri | 7 | done | #30; main10710ffa /39529992556 completed/success;476 test,49 migration; hosted Edge3 ve ayrı smoke başarılı |
 | CD-01 | Geliştirme/test Supabase CD | — | done | PR32+33; main0fabf3a /39588975421 success; CD39590690817 attempt2 success,49 migration/Edge4/17 kontrol, fixture temiz |
-| P04 | CRM ve public başvuru | 11 | queued | Sıradaki teslim; CD-01 kapandı |
+| P04 | CRM ve public başvuru | 11 | in_progress |11 API uygulandı; yerel verify/rollback DB başarılı, son inceleme ve Auth/API CI bekler; p04-handover.md |
 | P05 | Belge, bildirim ve otomasyon | 13 | queued | P04 sonrası |
 | P06 | Rapor, import ve işlem izleme | 13 | queued | P05 sonrası |
 | P07 | Hesap, organizasyon ve abonelik yaşam döngüsü | 22 | queued | P06 sonrası |
@@ -85,7 +85,7 @@ Yedi API PR30 ile main10710ffa90747a7e35c452c4c07ba59522f50ce3 kaynağına alın
 
 ### P04 — CRM ve public başvuru
 
-Ortak üretim promptunu uygula. Durum: queued.
+Ortak üretim promptunu uygula. Durum: in_progress.11 API kaynakta uygulandı; gerçek Auth/API CI ve aday/main kabulü bekler. Zorunlu provider/deneme config kurulumu ayrı açık; ayrıntı [P04 devrinde](p04-handover.md).
 
 **Mevcut sözleşme API'leri (11):**
 

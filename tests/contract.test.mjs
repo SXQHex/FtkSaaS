@@ -11,3 +11,23 @@ test('no unknown field / free-text discipline / actor spoof',()=>{const r={clien
 test('lesson request target is required separately from request trace',()=>{const r={client_api_version:1,request_id:id,org_id:id,center_id:id,operation_key:id,lesson_request_id:id,expected_version:1};assert(valid('Request_lesson_request_withdraw',r));delete r.lesson_request_id;assert(!valid('Request_lesson_request_withdraw',r));});
 test('money string and positive collection constraints retained',()=>{assert(valid('Money','100'));assert(!valid('Money',100));assert(!valid('PositiveMoney','0'));});
 test('negative limit requires explicit center and discipline',()=>{const r={client_api_version:1,request_id:id,org_id:id,operation_key:id,expected_version:1,person_id:id,allowed_negative_credits:2,impact_approval:{id,token:'test-opaque-token'},accepted_reservation_ids:[],reason:'test',center_id:id,discipline_id:id};assert(valid('Request_negative_limit_set',r));delete r.discipline_id;assert(!valid('Request_negative_limit_set',r));});
+
+test('P04 public ingress binds exact body/path/IP and provider hostname/action; no missing-secret bypass',async()=>{
+ const {build}=await import('esbuild');
+ const compiled=await build({entryPoints:['supabase/functions/backend-v1/public-ingress.ts'],bundle:true,platform:'browser',format:'esm',write:false});
+ const {publicIngress,keyedHash,verifyPublicBot}=await import('data:text/javascript;base64,'+Buffer.from(compiled.outputFiles[0].text).toString('base64'));
+ const cfg={FTK_PUBLIC_INGRESS_SECRET:'synthetic-ingress',FTK_PUBLIC_HASH_SECRET:'synthetic-hash',FTK_TURNSTILE_SECRET:'synthetic-provider',FTK_TURNSTILE_HOSTNAME:'public.ftksaas.invalid'},env=k=>cfg[k];
+ const now=Date.now(),time=String(Math.floor(now/1000)),body=JSON.stringify({contact:'prospect@ftksaas.invalid'}),ip='192.0.2.15',path='/functions/v1/backend-v1/public_application_submit_v1';
+ const digest=(await import('node:crypto')).createHash('sha256').update(body).digest('hex');
+ const signature=await keyedHash(cfg.FTK_PUBLIC_INGRESS_SECRET,['POST',path,time,ip,digest].join('\n'));
+ const headers={'x-ftk-client-ip':ip,'x-ftk-ingress-time':time,'x-ftk-ingress-signature':signature};
+ const req=new Request('https://example.invalid'+path,{method:'POST',headers});
+ const accepted=await publicIngress(req,body,env,now);assert(accepted);assert.equal(accepted.ip,ip);assert.match(accepted.ip_hash,/^[a-f0-9]{64}$/);
+ assert.equal(await accepted.targetHash(' X@EXAMPLE.INVALID '),await accepted.targetHash('x@example.invalid'));
+ for(const [r,b,e,n] of [[req,body,()=>undefined,now],[req,body+' ',env,now],[req,body,env,now+61000],[new Request('https://example.invalid/other',{method:'POST',headers}),body,env,now],[new Request(req,{headers:{...headers,'x-ftk-client-ip':'192.0.2.16'}}),body,env,now]])assert.equal(await publicIngress(r,b,e,n),null);
+ const provider=proof=>async(url,options)=>{assert.equal(url,'https://challenges.cloudflare.com/turnstile/v0/siteverify');assert.equal(options.body.get('remoteip'),ip);return Response.json(proof);};
+ assert.equal(await verifyPublicBot('proof',ip,env,provider({success:true,hostname:cfg.FTK_TURNSTILE_HOSTNAME,action:'public_application'})),true);
+ for(const proof of [{success:false},{success:true,hostname:'foreign.invalid',action:'public_application'},{success:true,hostname:cfg.FTK_TURNSTILE_HOSTNAME,action:'other'}])assert.equal(await verifyPublicBot('proof',ip,env,provider(proof)),false);
+ assert.equal(await verifyPublicBot('proof',ip,()=>undefined,()=>{throw Error('must not call provider');}),false);
+ assert.equal(await verifyPublicBot('proof',ip,env,async()=>{throw Error('provider unavailable');}),false);
+});

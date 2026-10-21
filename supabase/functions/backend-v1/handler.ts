@@ -1,3 +1,4 @@
+import {publicIngress,verifyPublicBot} from "./public-ingress.ts";
 import implementation from "./implemented.json" with {type:"json"};
 import { v7 } from "uuid";
 import * as validators from "./validators.js";
@@ -15,6 +16,27 @@ Deno.serve(async req=>{
   const request=JSON.parse(body);if(request.client_api_version!==1)return failure("CLIENT_UPDATE_REQUIRED",426);const validate=(validators as any)["request_"+operation];
   if(!validate?.(request))return failure("VALIDATION_FAILED");
   const base=Deno.env.get("SUPABASE_URL")!,key=Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
+  if(operation==='public_calendar_get_v1'||operation==='public_application_submit_v1'){
+   const env=(name:string)=>Deno.env.get(name);
+   const rpcPublic=async(aux:unknown)=>{
+    const rpc=await fetch(base+'/rest/v1/rpc/'+operation,{method:'POST',headers:{authorization:'Bearer '+key,apikey:key,'content-type':'application/json','Content-Profile':'api_v1'},body:JSON.stringify({p_request:request,p_actor_auth_id:null,p_session_id:null,p_ids:Array.from({length:64},()=>v7()),p_aux:aux})});
+    if(!rpc.ok)throw new Error('Public RPC unavailable');return rpc.json();
+   };
+   let aux:Record<string,unknown>|null=null;
+   if(operation==='public_application_submit_v1'){
+    if(!env('FTK_TURNSTILE_SECRET')||!env('FTK_TURNSTILE_HOSTNAME'))return failure('SERVICE_UNAVAILABLE',503);
+    const ingress=await publicIngress(req,body,env);if(!ingress)return failure('SERVICE_UNAVAILABLE',503);
+    aux={phase:'preflight',ip_hash:ingress.ip_hash,target_hash:await ingress.targetHash(request.contact)};
+    const preflight=await rpcPublic(aux);
+    if(!preflight.ok)return json(preflight);
+    if(preflight.data?.accepted===true)return json(preflight);
+    if(!await verifyPublicBot(request.bot_proof,ingress.ip,env))return failure('BOT_VERIFICATION_FAILED');
+    aux={...aux,phase:'submit',bot_verified:true};
+   }
+   const result=await rpcPublic(aux);
+   if(result.ok&&!(validators as any)['success_'+operation]?.(result))return failure('INTEGRITY_VIOLATION',500);
+   return json(result);
+  }
   const authorization=req.headers.get("authorization");if(!authorization?.startsWith("Bearer "))return failure("AUTH_REQUIRED",401);
   const userResponse=await fetch(base+"/auth/v1/user",{headers:{authorization,apikey:key}});
   if(!userResponse.ok)return failure("AUTH_REQUIRED",401);

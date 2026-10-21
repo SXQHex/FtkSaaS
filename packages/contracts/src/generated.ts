@@ -2196,6 +2196,10 @@ SaleLifecyclePreviewDetails?: SaleLifecyclePreviewDetails
 P03PaymentCorrectionView?: P03PaymentCorrectionView
 P03PaymentView?: P03PaymentView
 SignedMoney?: SignedMoney
+PublicPublicationDetails?: PublicPublicationDetails
+TrialOfferTerms?: TrialOfferTerms
+CrmFollowupView?: CrmFollowupView
+Page_CrmFollowupView?: Page_CrmFollowupView
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -3542,6 +3546,7 @@ assigned_to: (string | null)
 state: LeadState
 last_contact: (Instant | null)
 due_followup: (Instant | null)
+version: PositiveInt
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -7931,11 +7936,42 @@ page: Page
  */
 export interface SuccessCrmFollowupList {
 ok: true
-data: Page_LeadView
+data: Page_CrmFollowupView
 /**
  * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
  */
 trace_id: string
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "Page_CrmFollowupView".
+ */
+export interface Page_CrmFollowupView {
+items: CrmFollowupView[]
+next_cursor?: (OpaqueToken | null)
+as_of: Instant
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "CrmFollowupView".
+ */
+export interface CrmFollowupView {
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+id: string
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+person_id: string
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+center_id: string
+lead_id: (string | null)
+assigned_to: (string | null)
+kind: FollowupKind
+due_at: Instant
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -9153,6 +9189,18 @@ expected_version?: PositiveInt
 session_id?: (string | null)
 event_id?: (string | null)
 published: Bool
+public_details?: PublicPublicationDetails
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "PublicPublicationDetails".
+ */
+export interface PublicPublicationDetails {
+title: Text
+venue_public_label: Text
+fee_minor: Money
+currency: Currency
+public_conditions: Text
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -11813,6 +11861,19 @@ product_version_id: string
 session_id?: (string | null)
 state: OfferState
 expires_at: Instant
+terms_snapshot?: (TrialOfferTerms | null)
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "TrialOfferTerms".
+ */
+export interface TrialOfferTerms {
+price_minor: Money
+currency: Currency
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+product_version_id: string
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -12523,6 +12584,7 @@ slug: Text
 session_id?: (string | null)
 event_id?: (string | null)
 published: Bool
+public_details?: (PublicPublicationDetails | null)
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -12552,6 +12614,7 @@ target_hash: Text
 state: ApplicationState
 bot_verified_at: Instant
 request_reference?: (string | null)
+person_id?: (string | null)
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -14509,6 +14572,11 @@ lead_id?: string
  */
 product_version_id?: string
 session_id?: (string | null)
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+offer_id?: string
+expires_at?: Instant
 }
 }
 /**
@@ -14892,6 +14960,7 @@ values: {
 session_id?: (string | null)
 event_id?: (string | null)
 published?: Bool
+public_details?: (PublicPublicationDetails | null)
 }
 }
 /**
@@ -14925,6 +14994,11 @@ values: {
 application_id?: string
 action?: ApplicationAction
 person_id?: (string | null)
+contact?: Text
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+publication_id?: string
 }
 }
 /**
@@ -17345,7 +17419,7 @@ key: {
 /**
  * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
  */
-application_id: string
+application_id?: string
 person_id?: (string | null)
 }
 }
