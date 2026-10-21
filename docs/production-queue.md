@@ -1,5 +1,7 @@
 # FtkSaaS sıralı üretim kuyruğu
 
+P03:7 API uygulandı; dal envanteri199/140 runtime/59 contract_only,49 migration. Kaynak `d3d5ae65d4ed226573cfb7e163cf2be8e0500c5a` hedefli39522543011 ve izole P03 workbench39522543060 completed/success:96 yapı +37 politika +27 DB +316 API düğümü, sıfır fail/skipped. Geçici runner araçları son adaydan çıkarıldı; başlangıç kaydı olmadan ücretli kapanış yoluna açık null assertion eklendi. Bu son farkın hedefli kabulü, bağımsız son inceleme, aday/main clean ve hosted eşitlemesi açık; PR30 Draft/development, P03 done değildir.
+
 P02 **done**: [PR #28](https://github.com/SXQHex/FtkSaaS/pull/28), kabul edilmiş main `cc4878d09e45204dbc13ccfe1324b38b14548167`. Envanter **199 sözleşme / 133 runtime / 66 contract_only / 40 migration / 90 core tablo**. Son head `35816cc30a9b28e273e94e6cef86e8b402dbaad0` bağımsız incelemeden geçti; [hedefli39448566998](https://github.com/SXQHex/FtkSaaS/actions/runs/39448566998), [aday39455462417](https://github.com/SXQHex/FtkSaaS/actions/runs/39455462417) ve [aynı main39461804543](https://github.com/SXQHex/FtkSaaS/actions/runs/39461804543) completed/success. Full kapsam:96 sözleşme/yönetişim +37 CI politika +27 DB +309 API =469 test düğümü; fail/skipped0. Core, dört izole API shard, toplayıcı,40 migration, seed/health/advisors geçti. Main clean14:43; önceki43:33 hedefli koşu seri tüm-suite fallback kullandı, aynı çalışma profili değildir. Eski başarı yeni kaynağa taşınmaz.
 
 Geliştirme/test Supabase `gwyprhenabtpkbojephw`, aynı kabul edilmiş main `cc4878d09e45204dbc13ccfe1324b38b14548167` kaynağına eşitlendi:40 migration, Edge backend-v1 sürüm2, verify_jwt=true,133 runtime API. Uzak smoke ve geçici fixture temizliği başarılı; ayrıntılar docs/remote-backend-setup.md içindedir. Hosted worker zamanlayıcısı, ortak tenant/kullanıcı kurulumu, frontend gerçek entegrasyonu, yük/restore, dış e-posta ve production kabulü ayrı açık kalır.
@@ -10,7 +12,7 @@ Geliştirme/test Supabase `gwyprhenabtpkbojephw`, aynı kabul edilmiş main `cc4
 | P01 | Talep, rezervasyon ve bekleme | 14 | done | #22; aday 39327134872 ve aynı main 39401570751 completed/success doğrulandı |
 | CI-02 | Dört shard, bölüm/Draft/development, yalnız-belge kabulü | — | done | #25/#26; main0ade787 / 39425915555 completed/success; 462 test, 34 migration |
 | P02 | Paket ve seans yaşam döngüsü | 15 | done | #28; main cc4878d /39461804543 completed/success;469 test,40 migration; hosted Edge2 eşitlendi |
-| P03 | Finans ve eğitmen ödemeleri | 7 | queued | P02 sonrası |
+| P03 | Finans ve eğitmen ödemeleri | 7 | in_progress | Tek feature/p03-finance-payments Draft/development PR;7 API uygulandı;hedefli runtime/son inceleme/aday-main kabulü açık |
 | P04 | CRM ve public başvuru | 11 | queued | P03 sonrası |
 | P05 | Belge, bildirim ve otomasyon | 13 | queued | P04 sonrası |
 | P06 | Rapor, import ve işlem izleme | 13 | queued | P05 sonrası |
@@ -76,7 +78,7 @@ PR25 dört izole shard/belge kabulü/Draft-development politikasını kurdu; PR2
 
 ### P03 — Finans ve eğitmen ödemeleri
 
-Ortak üretim promptunu uygula. Durum: queued.
+Ortak üretim promptunu uygula. Durum: in_progress; tek Draft/development PR. Başlangıç main ce95a9d / belge kabulü39487599217 başarılı. Bütün7 API ve son kaynak incelemesi bitmeden aday full clean yok.
 
 **Mevcut sözleşme API'leri (7):**
 

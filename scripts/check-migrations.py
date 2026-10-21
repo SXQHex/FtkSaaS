@@ -78,3 +78,29 @@ assert next(Path('supabase/migrations').glob('*_p02_sale_lifecycle.sql')).read_t
 assert next(Path('supabase/migrations').glob('*_p02_runtime_guards.sql')).read_text()==Path('database/p02-runtime-guards.sql').read_text()+Path('database/p02-runtime-guards-wrappers.sql').read_text(),'P02 runtime guards source drift'
 
 assert next(Path('supabase/migrations').glob('*_p02_renewal_currency.sql')).read_text()==Path('database/p02-renewal-currency.sql').read_text()+Path('database/p02-renewal-currency-wrappers.sql').read_text(),'P02 renewal currency source drift'
+
+assert next(Path('supabase/migrations').glob('*_p03_finance_payments.sql')).read_text()==Path('database/p03-finance-payments.sql').read_text()+Path('database/p03-finance-payments-wrappers.sql').read_text(),'P03 finance source drift'
+
+assert next(Path('supabase/migrations').glob('*_p03_finance_guardrails.sql')).read_text()==Path('database/p03-finance-guardrails.sql').read_text(),'P03 finance guardrails source drift'
+
+assert next(Path('supabase/migrations').glob('*_p03_finance_acceptance.sql')).read_text()==Path('database/p03-finance-acceptance.sql').read_text(),'P03 acceptance source drift'
+
+assert next(Path('supabase/migrations').glob('*_p03_finance_scope.sql')).read_text()==Path('database/p03-finance-scope.sql').read_text(),'P03 finance scope source drift'
+
+assert next(Path('supabase/migrations').glob('*_p03_finance_payments.sql')).read_text()==Path('database/p03-finance-payments.sql').read_text()+Path('database/p03-finance-payments-wrappers.sql').read_text(),'P03 source drift p03_finance_payments'
+
+assert next(Path('supabase/migrations').glob('*_p03_finance_guardrails.sql')).read_text()==Path('database/p03-finance-guardrails.sql').read_text(),'P03 source drift p03_finance_guardrails'
+
+assert next(Path('supabase/migrations').glob('*_p03_finance_acceptance.sql')).read_text()==Path('database/p03-finance-acceptance.sql').read_text(),'P03 source drift p03_finance_acceptance'
+
+assert next(Path('supabase/migrations').glob('*_p03_finance_scope.sql')).read_text()==Path('database/p03-finance-scope.sql').read_text(),'P03 source drift p03_finance_scope'
+
+assert next(Path('supabase/migrations').glob('*_p03_finance_balances.sql')).read_text()==Path('database/p03-finance-balances.sql').read_text(),'P03 source drift p03_finance_balances'
+
+assert next(Path('supabase/migrations').glob('*_p03_finance_results.sql')).read_text()==Path('database/p03-finance-results.sql').read_text(),'P03 source drift p03_finance_results'
+
+assert next(Path('supabase/migrations').glob('*_p03_finance_integrity.sql')).read_text()==Path('database/p03-finance-integrity.sql').read_text(),'P03 source drift p03_finance_integrity'
+
+assert next(Path('supabase/migrations').glob('*_p03_finance_provenance.sql')).read_text()==Path('database/p03-finance-provenance.sql').read_text(),'P03 source drift p03_finance_provenance'
+
+assert next(Path('supabase/migrations').glob('*_p03_refund_identity.sql')).read_text()==Path('database/p03-refund-identity.sql').read_text(),'P03 source drift p03_refund_identity'

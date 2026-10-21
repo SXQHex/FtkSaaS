@@ -88,6 +88,7 @@ test('Cross-center settlement Auth -> Edge -> RPC',async t=>{
   await db.query("update core.sessions set starts_at=now()-interval '1 second',ends_at=now()+interval '29 minutes' where id=$1",[ss.primary_id]);
   if(cancel){const rv=(await rows('select version from core.reservations where id=$1',[rid]))[0];await mut('reservation_cancel_v1',{reservation_id:rid,expected_version:Number(rv.version),reason:'Late consuming cancellation'},c);}
   let v=await read('attendance_get_v1',{session_id:ss.primary_id},c);
+  assert.equal(v.actual_started_at,null,'Legacy closure acceptance must not use an explicit start record');
   if(!cancel)await mut('attendance_mark_v1',{reservation_id:rid,expected_version:v.entries[0].version,result},c);
   v=await read('attendance_get_v1',{session_id:ss.primary_id},c);
   const k=key(),payload={session_id:ss.primary_id,expected_version:v.session_version,performed,performed_instructor_ids:performed?[teacher.p]:[]};
@@ -102,6 +103,7 @@ test('Cross-center settlement Auth -> Edge -> RPC',async t=>{
  await t.test('DS-SET actual credited sale consumption creates A to B share independent of cash and B earning cost',async()=>{
   baseProduct=await product();sale=await sell(baseProduct);
   l1=await lesson(sale);
+  assert.equal((await rows('select actual_started_at from core.sessions where id=$1',[l1.sid]))[0].actual_started_at,null);
   const list=await movements();m1=list.items.find(x=>x.kind==='accrual');
   assert(m1);assert.equal(m1.amount_minor,'250');assert.equal(m1.open_minor,'250');assert.equal(m1.debtor_center_id,A);assert.equal(m1.creditor_center_id,B);
   assert.equal((await rows('select count(*) n from core.cash_movements where org_id=$1 and person_id=$2',[org,student.p]))[0].n,'0');

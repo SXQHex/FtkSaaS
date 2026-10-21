@@ -50,7 +50,17 @@ test('Instructor agreement and earnings through Auth -> Edge -> RPC',async t=>{
  const list=()=>must(owner,'instructor_agreements_list_v1',scope({person_id:instructor.p,page:{}}));
  const product=async(kind='credits',extras={})=>mut('product_publish_v1',{terms:{name:'Earning source',kind,booking_mode:'flexible',...(kind==='credits'?{credits:2}:{}),price_minor:'1000',currency:'TRY',freeze:{enabled:false,extends_validity:false},refund:{method:'none'},scopes:[{scope_kind:'organization_all',center_id:null,discipline_id:null,usage_targets:['lesson']}],...extras}});
  const sell=async(p,version,net_minor)=>{const pr=await must(owner,'sale_preview_v1',scope({person_id:p,product_version_id:version,start_date:'2026-01-01',end_date:'2027-01-01',net_minor}));return (await mut('sale_apply_v1',{preview:token(pr)})).primary_id;};
- const mark=async(sid)=>{await db.query("update core.sessions set starts_at=now()-interval '1 second',ends_at=now()+interval '59 minutes' where id=$1",[sid]);const v=await get(sid);for(const e of v.entries)await mut('attendance_mark_v1',{reservation_id:e.reservation_id,expected_version:e.version,result:'attended'});return get(sid);};
+ // Keep the scheduled interval inside configured availability even when CI runs
+ // across local midnight. Record the synthetic early start through the real API.
+ const mark=async(sid)=>{
+  const scheduled=(await rows('select starts_at,ends_at from core.sessions where id=$1',[sid]))[0];
+  let v=await get(sid);
+  await mut('attendance_start_v1',{session_id:sid,expected_version:v.session_version,actual_started_at:new Date().toISOString(),reason:'Synthetic explicit start for earnings acceptance'});
+  v=await get(sid);assert(v.actual_started_at);
+  assert.deepEqual((await rows('select starts_at,ends_at from core.sessions where id=$1',[sid]))[0],scheduled);
+  for(const e of v.entries)await mut('attendance_mark_v1',{reservation_id:e.reservation_id,expected_version:e.version,result:'attended'});
+  return get(sid);
+ };
  const close=async(sid,k=key(),u=owner,performed=true)=>{const v=await get(sid);return mut('attendance_close_v1',{session_id:sid,expected_version:v.session_version,performed,performed_instructor_ids:performed?[instructor.p]:[]},k,u);};
  const earningRows=sid=>rows('select * from core.earnings where session_id=$1 order by created_at,id',[sid]);
  const earningRead=(u=owner)=>must(u,'earnings_list_v1',scope({person_id:instructor.p,interval:{starts_at:'2020-01-01T00:00:00Z',ends_at:'2030-01-01T00:00:00Z'},page:{}}));
