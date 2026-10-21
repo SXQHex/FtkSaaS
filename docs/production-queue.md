@@ -1,6 +1,10 @@
 # FtkSaaS sıralı üretim kuyruğu
 
-P04 kod kabulü kapandı: PR35/main `7b96d8866abb2c056d1b59a96afee0696a1187d6`, aday39630534660/main39633243405/CD39635569033 attempt2 success;52 migration/151 runtime/Edge5. Aktif dar takip CD migration transport düzeltmesidir; yeni kaynak kabulü bekler. Bot/deneme hedefi henüz yok: kullanıcı21 Ekim'de kurulumları hedef oluşana kadar erteledi. Aşağıdaki eski geliştirme snapshot'ları bu kapanışı değiştirmez. P05 başlamadı.
+P05 **uygulandı; son kaynak kabulü bekliyor**. Branch `feature/p05-documents-notifications`, taban main `16cb570eb45381ce41a509a7d2d954f929de9e6b` (PR36). Yeni belge etki önizlemesiyle14 P05 API; **200 sözleşme/165 runtime/35 contract_only/53 migration/90 core tablo**. [P05 devri](p05-handover.md) dosya/katılım koruması, özel inbox, scoped worker ve kabul sınırını açıklar. Aday/main full clean ve P05 geliştirme CD kabulü henüz yoktur; aşağıdaki P04 ve eski sayılar tarihsel snapshot'tır.
+
+PR36 operasyonel takip kapandı: aynı main [39644044693](https://github.com/SXQHex/FtkSaaS/actions/runs/39644044693) success; [CD39646391222](https://github.com/SXQHex/FtkSaaS/actions/runs/39646391222) success,18 kontrol,52/52 migration, pending[], Edge5 değişmeden ACTIVE/verify_jwt=true. Atomik Management API transport yeni migration olmadan da rollback probe ile doğrulandı. Bot/deneme hedefi hâlâ kullanıcı kararıyla ertelendi; hosted P05 worker kurulmuş değildir.
+
+P04/PR36 kabulü kapandı; P05 aktif teslimdir. P06/P07 queued kalır.
 
 CD-01 **done**: PR32 kurulum + PR33 test fixture düzeltmesi sonrası kabul edilmiş main `0fabf3a4a605dd6be5a1d358c660021f59406e20`. [Main39588975421](https://github.com/SXQHex/FtkSaaS/actions/runs/39588975421) ve [ilk canlı CD39590690817/attempt2](https://github.com/SXQHex/FtkSaaS/actions/runs/39590690817/attempts/2) completed/success. CD receipt aynı source/main/run kabulünü bağlar;17 kontrol başarılı,49 migration içerik eşleşmesi,90 core tablo/RLS, anon/authenticated EXECUTE0, Edge backend-v1 v4 ACTIVE/verify_jwt=true. Gerçek Auth→Edge→RPC, oturum reddi ve fixture temizliği geçti; ayrıca uzak son0 hesap/0 Auth kullanıcısı/0 organizasyon doğrulandı. Envanter199/140 runtime/59 contract_only değişmedi. P04 CRM/public başvuru queued; başlamadı. Hosted worker işletimi, frontend, dış e-posta ve yük/restore bu kapanışla tamamlanmaz.
 
@@ -19,7 +23,7 @@ Geliştirme/test Supabase `gwyprhenabtpkbojephw`, kabul edilmiş main `10710ffa9
 | P03 | Finans ve eğitmen ödemeleri | 7 | done | #30; main10710ffa /39529992556 completed/success;476 test,49 migration; hosted Edge3 ve ayrı smoke başarılı |
 | CD-01 | Geliştirme/test Supabase CD | — | done | PR32+33; main0fabf3a /39588975421 success; CD39590690817 attempt2 success,49 migration/Edge4/17 kontrol, fixture temiz |
 | P04 | CRM ve public başvuru | 11 | done | PR35; main7b96d88, aday39630534660/main39633243405/CD39635569033 attempt2 success; hedef gerektiren kurulumlar kullanıcı kararıyla ertelendi |
-| P05 | Belge, bildirim ve otomasyon | 13 | queued | P04 sonrası |
+| P05 | Belge, bildirim ve otomasyon | 14 | awaiting_candidate_clean | Kod ve devir hazır; son bağımsız kaynak incelemesi + aday/main clean bekliyor |
 | P06 | Rapor, import ve işlem izleme | 13 | queued | P05 sonrası |
 | P07 | Hesap, organizasyon ve abonelik yaşam döngüsü | 22 | queued | P06 sonrası |
 
@@ -89,36 +93,11 @@ Yedi API PR30 ile main10710ffa90747a7e35c452c4c07ba59522f50ce3 kaynağına alın
 
 11 API PR35 ile main7b96d8866abb2c056d1b59a96afee0696a1187d6 kaynağında kabul edildi; son inceleme, aday39630534660 ve aynı main39633243405 başarılı. CD39635569033 attempt2:52 migration, Edge5/JWT ve17 kontrol başarılı; sentetik fixture temiz. Aktif P04 ürün promptu kaldırıldı; eski metin Git geçmişindedir.
 
-21 Ekim kullanıcı kararı: henüz başvuru alan adı/tenant/ürün/config hedefi yok; bot/gateway ve gerçek deneme kurulumu hedef oluşana kadar ertelenir, kapılar gevşetilmez. Kurulum yordamı p04-handover.md'dedir. Aktif dar takip CD migration transport düzeltmesidir; kaynak incelemesi, aday/main clean, exact-source trusted kurulum izni ve gerçek CD kabulü bekler. P05 bu takip kapanmadan başlatılmadı.
+21 Ekim kullanıcı kararı: henüz başvuru alan adı/tenant/ürün/config hedefi yok; bot/gateway ve gerçek deneme kurulumu hedef oluşana kadar ertelenir, kapılar gevşetilmez. Kurulum yordamı p04-handover.md'dedir. PR36 transport düzeltmesi kabul edildi; yukarıdaki main/CD kanıtı geçerlidir. P05 bu kabulden sonra başlatıldı.
 
 ### P05 — Belge, bildirim ve otomasyon
 
-Ortak üretim promptunu uygula. Durum: queued.
-
-**Mevcut sözleşme API'leri (13):**
-
-- `document_upload_prepare_v1`
-- `document_version_publish_v1`
-- `document_requirements_get_v1`
-- `document_accept_v1`
-- `file_upload_complete_v1`
-- `notifications_list_v1`
-- `notification_mark_read_v1`
-- `notification_preferences_set_v1`
-- `segment_save_v1`
-- `automation_save_v1`
-- `outbox_deliver_v1`
-- `reminder_schedule_v1`
-- `automation_run_v1`
-
-**Görev ve kabul:**
-
-Sürümlü belgeler işlem kapılarında uygulansın; uygulama içi bildirim ve izinli otomasyon gerçek worker yolunda çalışsın.
-Upload hazırlığı hazır dosya değildir; dosya tamamlama/erişim kontrollerini bağla. Belge sürüm/kişi/zaman/işlem kanıtı korunsun; eski onay silinmesin, yeniden kabul noktası açık olsun. Rezervasyon/katılım tüketicilerini bağlamadan tamamlandı sayma.
-İşlemsel bildirim ile isteğe bağlı hatırlatma/pazarlamayı ayır. Teslim hatası kesinleşmiş domain işini geri almasın; tekrar mükerrer kullanıcı sonucu üretmesin.
-Org tanımı merkez operasyon yetkisi vermez; executor canlı rol/plan/merkez/zorunlu politika sınırlarını aşamaz. Business dışına otomasyon açma.
-Dış e-posta/Resend yok. Dosya/bildirim/worker altyapısındaki eksik zorunlu bağımlılığı açık bildir.
-Kabul: dosya→belge→onay→işlem kapısı; domain→outbox→inbox; hatırlatma/otomasyon tekrar/lease/hata kurtarma.
+13 sözleşme API'si + DS belge yayın etki önizlemesi uygulandı, main kabulü bekliyor. Aktif uygulama ayrıntısı [P05 devrinde](p05-handover.md); artık uygulanan promptun tam gövdesi Git geçmişindedir. Kalan kabul: son-head bağımsız inceleme, aday full clean, aynı actual main full clean, geliştirme/test CD receipt ve sentetik fixture temizliği. Hosted worker işletimi/dış e-posta/frontend ayrı açık kalır.
 
 ### P06 — Rapor, import ve işlem izleme
 

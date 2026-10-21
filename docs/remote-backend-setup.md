@@ -1,5 +1,9 @@
 # Kalıcı geliştirme/test backend’i
 
+## PR36 — kabul edilmiş güncel geliştirme kaynağı
+
+Main `16cb570eb45381ce41a509a7d2d954f929de9e6b`; aynı main39644044693 ve CD39646391222 attempt1 completed/success. Receipt artifact12368500165 SHA256 `97fdfe9e877f2aa0b67dc88e5a7fc1c126041d776791629ced28807b9c10f27c`:18 kontrol passed, transport management-api-atomic-v1, pending[],52 içerik eşleşmesi; Edge5 değişmeden ACTIVE/verify_jwt=true, RLS kapalı0/client RPC EXECUTE0 ve sentetik temizliği. Bu bölüm aşağıdaki PR36 pending ifadelerinin yerine geçer. P05 SQL denemeleri rollback içindedir; uzak P05 migration/Edge kalıcı kurulmadı. [P05 devri](p05-handover.md) kabul sınırını açıklar.
+
 ## P04 güncel kabulü ve migration transport takibi
 
 Kabul edilmiş main `7b96d8866abb2c056d1b59a96afee0696a1187d6`; [aynı main39633243405](https://github.com/SXQHex/FtkSaaS/actions/runs/39633243405) ve [CD39635569033 attempt2](https://github.com/SXQHex/FtkSaaS/actions/runs/39635569033/attempts/2) successful. Receipt artifact12362171004, digest `b2063f2744f3c0b8d5c31be6ddb8f595aade684e9abf9284c54c73e8c3be23c0`; source=expected_main7b96d88, acceptance39633243405/attempt1,17 kontrol passed.52/52 migration içeriği tam eşleşiyor,151 runtime,90 core tablo/RLS, client RPC EXECUTE0, Edge5 ACTIVE/verify_jwt=true; Edge kaynak SHA256 `709540edcb17f17ac660d3125bce3014ae90ec110d7f8e042bfc5599f45c8051`, EZBR `10f3a3e1959cba9fe9030d3bd2b72717d23310097c002626c53740409626ad55`. Gerçek Auth→Edge→RPC/ret/cleanup başarılı; son0 organizasyon/hesap/Auth kullanıcısı.

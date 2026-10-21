@@ -150,6 +150,20 @@
     "publication_set_v1",
     "public_calendar_get_v1",
     "public_application_submit_v1",
-    "public_application_review_v1"
+    "public_application_review_v1",
+    "document_upload_prepare_v1",
+    "document_version_publish_v1",
+    "document_requirements_get_v1",
+    "document_accept_v1",
+    "file_upload_complete_v1",
+    "notifications_list_v1",
+    "notification_mark_read_v1",
+    "notification_preferences_set_v1",
+    "segment_save_v1",
+    "automation_save_v1",
+    "outbox_deliver_v1",
+    "reminder_schedule_v1",
+    "automation_run_v1",
+    "document_publication_preview_v1"
   ]
 }
