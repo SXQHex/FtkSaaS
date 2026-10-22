@@ -105,4 +105,4 @@ P02 kaynak modülleri hedefli profil haritasında tanımlı olmadığı için394
 
 Adlandırma düzeltmesi: “Pratik” etkinliğin adıdır; mevcut etkinlik modeli kullanılır. Ayrı pratik modülü/türü geliştirme işi yoktur.
 
-P08 tartışılacaklar: sınırsız Business limitlerinde private.plan_limit ile kapalı PlanLimit API sözleşmesi arasındaki uyumsuzluk. Şimdilik kurulumda aktif öğrenci1000/eğitmen50/merkez5 kullanılır; sınırsız kullanım uygulanmış sayılmaz. Owner Auth e-posta onayı doğrulandı; Business fiyat/dönem/sonlu limit girdileri alındı, plan ve organizasyon kurulumu henüz uygulanmadı.
+P08 tartışılacaklar: sınırsız Business limitlerinde private.plan_limit ile kapalı PlanLimit API sözleşmesi arasındaki uyumsuzluk. Şimdilik kurulumda aktif öğrenci1000/eğitmen50/merkez5 kullanılır; sınırsız kullanım uygulanmış sayılmaz. Owner Auth e-posta onayı doğrulandı; Business fiyat/dönem/sonlu limit girdileri alındı, Business aylık/yıllık katalog sürümleri hosted oluşturuldu ve geri okundu; organizasyon/abonelik kurulumu henüz uygulanmadı. API ilk ödeme onayında now() başlangıcı kullandığı için1 Eylül2026 başlangıcı ilk kurulum veri aktarımı gerektirir; henüz yapılmadı.
