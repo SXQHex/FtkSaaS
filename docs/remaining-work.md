@@ -1,8 +1,12 @@
 # Kalan backend işleri
 
+P05 **uygulandı; son kaynak kabulü bekliyor**. Branch `feature/p05-documents-notifications`, taban main `16cb570eb45381ce41a509a7d2d954f929de9e6b` (PR36). Yeni belge etki önizlemesiyle14 P05 API; **200 sözleşme/165 runtime/35 contract_only/53 migration/90 core tablo**. [P05 devri](p05-handover.md) dosya/katılım koruması, özel inbox, scoped worker ve kabul sınırını açıklar. Aday/main full clean ve P05 geliştirme CD kabulü henüz yoktur; aşağıdaki P04 ve eski sayılar tarihsel snapshot'tır.
+
+PR36 operasyonel takip kapandı: aynı main [39644044693](https://github.com/SXQHex/FtkSaaS/actions/runs/39644044693) success; [CD39646391222](https://github.com/SXQHex/FtkSaaS/actions/runs/39646391222) success,18 kontrol,52/52 migration, pending[], Edge5 değişmeden ACTIVE/verify_jwt=true. Atomik Management API transport yeni migration olmadan da rollback probe ile doğrulandı. Bot/deneme hedefi hâlâ kullanıcı kararıyla ertelendi; hosted P05 worker kurulmuş değildir.
+
 P04 **done (kod ve kaynak kabulü)**: [PR35](https://github.com/SXQHex/FtkSaaS/pull/35), kabul edilmiş main `7b96d8866abb2c056d1b59a96afee0696a1187d6`;199 sözleşme/151 runtime/48 contract_only,52 migration/90 core tablo. Son head55c23dd, base920cdbb, tested merge901c64a, treee2011a6 kaynak zinciri; bağımsız son kaynak incelemesi ve [aday39630534660](https://github.com/SXQHex/FtkSaaS/actions/runs/39630534660) ile [aynı main39633243405](https://github.com/SXQHex/FtkSaaS/actions/runs/39633243405) completed/success doğrulandı. [CD39635569033 attempt2](https://github.com/SXQHex/FtkSaaS/actions/runs/39635569033/attempts/2) success:52/52 içerik eşleşmesi, Edge5 ACTIVE/verify_jwt=true,17 kontrol ve sentetik fixture temizliği. İlk CD'deki CLI migration hatası aşağıdaki operasyonel takipten ayrıdır; ikinci denemede eksik migration kalmadığı için o yol sınanmadı.
 
-21 Ekim operasyonel takip: kullanıcı henüz bot/deneme hedefi olmadığını seçti; alan adı/tenant/ürün/süre/tekrar limiti uydurulmaz, bu kurulumlar ve gerçek sağlayıcı kabulü hedef oluşana kadar ertelendi. Signed ingress yardımcısı ve açık değerli deneme SQL hazırlayıcısı kaynakta var; canlı sağlayıcı/gateway kurulu diye sunulmaz. CD için atomik Management API migration yolu ve kalıcı iz bırakmayan gerçek SQL/history/rollback probe'u hazırlanıyor; yeni aday/main/CD kabulü ve exact-source trusted kurulum yetkisi henüz yoktur. P05 başlamadı. [P04 devri](p04-handover.md) kurulum sınırını açıklar. Aşağıdaki P03/CD-01 kayıtları tarihsel snapshot'tır.
+21 Ekim bot/deneme hedefi kararı sürer: alan adı/tenant/ürün/süre/tekrar limiti uydurulmaz. PR36 transport kapanışı ve yeni P05 kabul sınırı yukarıdadır; eski P04/CD-01 metinleri yeni kaynağa başarı taşımaz.
 
 CD-01 **done**: PR32 kurulum + PR33 test fixture düzeltmesi sonrası kabul edilmiş main `0fabf3a4a605dd6be5a1d358c660021f59406e20`. [Main39588975421](https://github.com/SXQHex/FtkSaaS/actions/runs/39588975421) ve [ilk canlı CD39590690817/attempt2](https://github.com/SXQHex/FtkSaaS/actions/runs/39590690817/attempts/2) completed/success. CD receipt aynı source/main/run kabulünü bağlar;17 kontrol başarılı,49 migration içerik eşleşmesi,90 core tablo/RLS, anon/authenticated EXECUTE0, Edge backend-v1 v4 ACTIVE/verify_jwt=true. Gerçek Auth→Edge→RPC, oturum reddi ve fixture temizliği geçti; ayrıca uzak son0 hesap/0 Auth kullanıcısı/0 organizasyon doğrulandı. Envanter199/140 runtime/59 contract_only değişmedi. P04 CRM/public başvuru queued; başlamadı. Hosted worker işletimi, frontend, dış e-posta ve yük/restore bu kapanışla tamamlanmaz.
 
@@ -14,9 +18,9 @@ Geliştirme/test Supabase `gwyprhenabtpkbojephw`, kabul edilmiş main `0fabf3a4a
 
 ## Aktif seri üretim
 
-**P01, CI-02, P02, P03 ve P04 kod kabulü kapandı.** P04 PR35 aynı main clean ve uzak eşitlemeyle tamamlandı. Aktif dar takip CD migration transport düzeltmesidir; P04 canlı bot/deneme kurulumu kullanıcı hedefi oluşana kadar ertelendi. P05–P07 toplam48 contract_only işlem sırada. [Tek kuyruk](production-queue.md) sıralama ve prompt kaynağıdır; [CI-2026-10-20](decisions/CI-2026-10-20.md) dört izole shard, Draft/development ve belge-only kabulünün gerçek main kabulünü ve kapanış kanıtlarını belirtir. Belge-only yolu main’e kuruldu; yeni kaynak kabulünün yerine eski başarı taşınmaz.
+**P01, CI-02, P02, P03, P04 ve PR36 kod kabulü kapandı.** P05 uygulandı; aday/main/CD kabulü bekler. P06/P07 toplam35 contract_only işlem sırada. [Tek kuyruk](production-queue.md) ve [P05 devri](p05-handover.md) güncel kapsamdır. Bot/deneme canlı kurulumu kullanıcı hedefi oluşana kadar ertelendi.
 
-[P01 devri](p01-handover.md): katalog/hak okuması, talep/alternatif/onay, bekleme/teklif/expiry ve gerçek dar worker döngüsü uygulandı. Genel belge upload/yayın/kabul ve bildirim API'leri P05'te açıktır; mevcut yayımlanmış rezervasyon gerekliliklerinin dar tüketicisi bunları kapatmaz. Hosted worker provisioning/işletim kabulü CI'daki gerçek CLI/loop testinden ayrıdır.
+[P01 devri](p01-handover.md): katalog/hak okuması, talep/alternatif/onay, bekleme/teklif/expiry ve gerçek dar worker döngüsü uygulandı. Genel belge upload/yayın/kabul ve bildirim API'leri P05'te uygulandı; yeni kaynak kabulü henüz yoktur. Hosted worker provisioning/işletim kabulü CI'daki gerçek CLI/loop testinden ayrıdır.
 
 ## DS öncelikli teslim sırası
 
@@ -43,14 +47,13 @@ Her yeni runtime/CI grubu: sözleşme/izin incelemesi → gerekli yeni migration
 
 Bloklayıcı sayılmayan doğrulama iyileştirmesi: instructor_payment_record_v1 tutarı karşılandıktan sonra kullanılmayan trailing earning_ids satırlarının kişi/merkez/para birimi kontrolü atlanabiliyor. Fiilen yazılan allocation’lar kapsamlıdır; inceleme başka kapsama yazma veya para sızıntısı bulmadı. Tüm seçili listeyi allocation’dan önce doğrula ve karışık kapsamlı kullanılmayan son ID regresyonu ekle. Kaynak review5594023911; P03 kabulünü veya diğer59 contract_only API’yi değiştirmez. Henüz düzeltilmiş sayılmaz.
 
-## Yalnız sözleşme envanteri — 48 işlem
+## Yalnız sözleşme envanteri — 35 işlem
 
-Kabul edilmiş main snapshot’ı140/59’dur; bu geliştirme dalı151 runtime/48 contract_only taşır. Aşağıdaki liste yalnız P05–P07 işlemleridir; P04 kabulü bekler.
+Kabul edilmiş main151 runtime/48 contract_only; P05 adayı165 runtime/35 contract_only taşır. P05'in14 API'si uygulandı, CI kabulü bekler. Aşağıdaki35 işlem P06/P07'dir.
 
 | Teslim | Kalan işlem |
 |---|---:|
-| P04 | 0 (CI kabulü bekler) |
-| P05 | 13 |
+| P05 | 0 (aday/main/CD kabulü bekler) |
 | P06 | 13 |
 | P07 | 22 |
 
@@ -71,11 +74,6 @@ Kabul edilmiş main snapshot’ı140/59’dur; bu geliştirme dalı151 runtime/4
 | person_merge_preview_v1 | person.merge |
 | person_merge_approve_v1 | person.merge |
 | person_merge_apply_v1 | person.merge |
-| segment_save_v1 | crm.manage |
-| automation_save_v1 | crm.manage |
-| notifications_list_v1 | notification.self |
-| notification_mark_read_v1 | notification.self |
-| notification_preferences_set_v1 | notification.self |
 | report_get_v1 | report.read |
 | report_export_start_v1 | report.export |
 | report_file_get_v1 | report.export |
@@ -88,22 +86,14 @@ Kabul edilmiş main snapshot’ı140/59’dur; bu geliştirme dalı151 runtime/4
 | subscription_change_cancel_v1 | subscription.owner |
 | subscription_renewal_set_v1 | subscription.owner |
 | saas_grace_extend_v1 | saas.operator |
-| document_upload_prepare_v1 | document.manage |
-| document_version_publish_v1 | document.manage |
-| document_requirements_get_v1 | person.read |
-| document_accept_v1 | document.accept |
 | operation_status_get_v1 | account.self |
 | preview_get_v1 | account.self |
 | job_status_get_v1 | account.self |
 | audit_list_v1 | report.read |
-| outbox_deliver_v1 | system.worker |
-| reminder_schedule_v1 | system.worker |
-| automation_run_v1 | system.worker |
 | import_rows_process_v1 | system.worker |
 | report_build_v1 | system.worker |
 | privacy_execute_v1 | system.worker |
 | subscription_boundary_apply_v1 | system.worker |
-| file_upload_complete_v1 | account.self |
 
 ## Operasyonel kabul işleri
 

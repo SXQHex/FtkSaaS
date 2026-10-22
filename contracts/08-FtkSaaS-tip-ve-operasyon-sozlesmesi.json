@@ -571,7 +571,8 @@
       "type": "string",
       "enum": [
         "renewal_due",
-        "inactive_student"
+        "inactive_student",
+        "automation_followup"
       ]
     },
     "ReportKind": {
@@ -896,7 +897,8 @@
         "settlement_delegation_set_v1",
         "settlement_authority_set_v1",
         "negative_limits_get_v1",
-        "attendance_start_v1"
+        "attendance_start_v1",
+        "document_publication_preview_v1"
       ]
     },
     "EntityType": {
@@ -2072,6 +2074,9 @@
               "type": "null"
             }
           ]
+        },
+        "product_version_id": {
+          "$ref": "#/$defs/FtkUuid"
         }
       },
       "required": [
@@ -4617,6 +4622,29 @@
         },
         "file": {
           "$ref": "#/$defs/EntityRef"
+        },
+        "content": {
+          "type": "object",
+          "properties": {
+            "mime": {
+              "enum": [
+                "application/pdf",
+                "text/plain"
+              ]
+            },
+            "encoding": {
+              "const": "base64"
+            },
+            "data": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "mime",
+            "encoding",
+            "data"
+          ],
+          "additionalProperties": false
         }
       },
       "required": [
@@ -12889,7 +12917,14 @@
           "$ref": "#/$defs/PositiveInt"
         },
         "lead_id": {
-          "$ref": "#/$defs/FtkUuid"
+          "anyOf": [
+            {
+              "$ref": "#/$defs/FtkUuid"
+            },
+            {
+              "type": "null"
+            }
+          ]
         },
         "kind": {
           "$ref": "#/$defs/CrmActivityKind"
@@ -12926,6 +12961,9 @@
         },
         "activity_id": {
           "$ref": "#/$defs/FtkUuid"
+        },
+        "person_id": {
+          "$ref": "#/$defs/FtkUuid"
         }
       },
       "required": [
@@ -12933,7 +12971,6 @@
         "request_id",
         "org_id",
         "operation_key",
-        "lead_id",
         "kind"
       ],
       "additionalProperties": false,
@@ -12955,6 +12992,36 @@
               "required": [
                 "expected_version"
               ]
+            }
+          }
+        }
+      ],
+      "oneOf": [
+        {
+          "required": [
+            "lead_id"
+          ],
+          "properties": {
+            "lead_id": {
+              "$ref": "#/$defs/FtkUuid"
+            }
+          },
+          "not": {
+            "required": [
+              "person_id"
+            ]
+          }
+        },
+        {
+          "required": [
+            "person_id"
+          ],
+          "properties": {
+            "lead_id": {
+              "type": "null"
+            },
+            "person_id": {
+              "$ref": "#/$defs/FtkUuid"
             }
           }
         }
@@ -15311,6 +15378,9 @@
         },
         "scope": {
           "$ref": "#/$defs/ConfigurationScope"
+        },
+        "impact_approval": {
+          "$ref": "#/$defs/DocumentImpactApproval"
         }
       },
       "required": [
@@ -15372,6 +15442,9 @@
         },
         "context": {
           "$ref": "#/$defs/AcceptanceContext"
+        },
+        "content_file_id": {
+          "$ref": "#/$defs/FtkUuid"
         }
       },
       "required": [
@@ -20579,7 +20652,14 @@
           "$ref": "#/$defs/FtkUuid"
         },
         "lead_id": {
-          "$ref": "#/$defs/FtkUuid"
+          "anyOf": [
+            {
+              "$ref": "#/$defs/FtkUuid"
+            },
+            {
+              "type": "null"
+            }
+          ]
         },
         "kind": {
           "$ref": "#/$defs/CrmActivityKind"
@@ -20618,6 +20698,16 @@
           "anyOf": [
             {
               "$ref": "#/$defs/Text"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "person_id": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/FtkUuid"
             },
             {
               "type": "null"
@@ -24632,6 +24722,7 @@
                 "planned",
                 "prepared",
                 "published",
+                "read",
                 "ready",
                 "registered",
                 "rejected",
@@ -24649,6 +24740,7 @@
                 "superseded",
                 "suspended",
                 "terminated",
+                "unread",
                 "valid",
                 "waiting",
                 "withdrawn"
@@ -32803,7 +32895,14 @@
           "type": "object",
           "properties": {
             "lead_id": {
-              "$ref": "#/$defs/FtkUuid"
+              "anyOf": [
+                {
+                  "$ref": "#/$defs/FtkUuid"
+                },
+                {
+                  "type": "null"
+                }
+              ]
             },
             "kind": {
               "$ref": "#/$defs/CrmActivityKind"
@@ -32839,6 +32938,9 @@
               ]
             },
             "activity_id": {
+              "$ref": "#/$defs/FtkUuid"
+            },
+            "person_id": {
               "$ref": "#/$defs/FtkUuid"
             }
           },
@@ -34941,6 +35043,9 @@
         },
         {
           "$ref": "#/$defs/ManagementProjection_attendance_start_v1"
+        },
+        {
+          "$ref": "#/$defs/ManagementProjection_document_publication_preview_v1"
         }
       ]
     },
@@ -35093,7 +35198,8 @@
         "settlement_request_decide_v1",
         "settlement_delegation_set_v1",
         "settlement_authority_set_v1",
-        "attendance_start_v1"
+        "attendance_start_v1",
+        "document_publication_preview_v1"
       ]
     },
     "ManagementSelector_account_profile_update_v1": {
@@ -37419,16 +37525,54 @@
           "type": "object",
           "properties": {
             "lead_id": {
-              "$ref": "#/$defs/FtkUuid"
+              "anyOf": [
+                {
+                  "$ref": "#/$defs/FtkUuid"
+                },
+                {
+                  "type": "null"
+                }
+              ]
             },
             "activity_id": {
               "$ref": "#/$defs/FtkUuid"
+            },
+            "person_id": {
+              "$ref": "#/$defs/FtkUuid"
             }
           },
-          "required": [
-            "lead_id"
-          ],
-          "additionalProperties": false
+          "required": [],
+          "additionalProperties": false,
+          "oneOf": [
+            {
+              "required": [
+                "lead_id"
+              ],
+              "properties": {
+                "lead_id": {
+                  "$ref": "#/$defs/FtkUuid"
+                }
+              },
+              "not": {
+                "required": [
+                  "person_id"
+                ]
+              }
+            },
+            {
+              "required": [
+                "person_id"
+              ],
+              "properties": {
+                "lead_id": {
+                  "type": "null"
+                },
+                "person_id": {
+                  "$ref": "#/$defs/FtkUuid"
+                }
+              }
+            }
+          ]
         }
       },
       "required": [
@@ -39416,6 +39560,9 @@
         },
         {
           "$ref": "#/$defs/ManagementSelector_attendance_start_v1"
+        },
+        {
+          "$ref": "#/$defs/ManagementSelector_document_publication_preview_v1"
         }
       ]
     },
@@ -41435,6 +41582,233 @@
       "required": [
         "items",
         "as_of"
+      ],
+      "additionalProperties": false
+    },
+    "Request_document_publication_preview": {
+      "type": "object",
+      "properties": {
+        "client_api_version": {
+          "const": 1
+        },
+        "request_id": {
+          "$ref": "#/$defs/FtkUuid"
+        },
+        "org_id": {
+          "$ref": "#/$defs/FtkUuid"
+        },
+        "center_id": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/FtkUuid"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "document_id": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/FtkUuid"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "file_id": {
+          "$ref": "#/$defs/FtkUuid"
+        },
+        "version_label": {
+          "$ref": "#/$defs/Text"
+        },
+        "requirements": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/DocumentRequirement"
+          }
+        },
+        "scope": {
+          "$ref": "#/$defs/ConfigurationScope"
+        }
+      },
+      "required": [
+        "client_api_version",
+        "request_id",
+        "org_id",
+        "file_id",
+        "version_label",
+        "requirements",
+        "scope"
+      ],
+      "additionalProperties": false
+    },
+    "DocumentImpactApproval": {
+      "type": "object",
+      "properties": {
+        "preview": {
+          "$ref": "#/$defs/PreviewToken"
+        },
+        "accepted_subjects": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/EntityRef"
+          },
+          "uniqueItems": true
+        }
+      },
+      "required": [
+        "preview",
+        "accepted_subjects"
+      ],
+      "additionalProperties": false
+    },
+    "DocumentPublicationAffected": {
+      "type": "object",
+      "properties": {
+        "subject": {
+          "$ref": "#/$defs/EntityRef"
+        },
+        "version": {
+          "$ref": "#/$defs/PositiveInt"
+        },
+        "person_id": {
+          "$ref": "#/$defs/FtkUuid"
+        },
+        "center_id": {
+          "$ref": "#/$defs/FtkUuid"
+        }
+      },
+      "required": [
+        "subject",
+        "version",
+        "person_id",
+        "center_id"
+      ],
+      "additionalProperties": false
+    },
+    "Success_document_publication_preview": {
+      "type": "object",
+      "properties": {
+        "ok": {
+          "const": true
+        },
+        "data": {
+          "type": "object",
+          "properties": {
+            "preview": {
+              "$ref": "#/$defs/Preview"
+            },
+            "affected": {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/DocumentPublicationAffected"
+              }
+            },
+            "preserves_reservations": {
+              "const": true
+            }
+          },
+          "required": [
+            "preview",
+            "affected",
+            "preserves_reservations"
+          ],
+          "additionalProperties": false
+        },
+        "trace_id": {
+          "$ref": "#/$defs/FtkUuid"
+        }
+      },
+      "required": [
+        "ok",
+        "data",
+        "trace_id"
+      ],
+      "additionalProperties": false
+    },
+    "ManagementSelector_document_publication_preview_v1": {
+      "type": "object",
+      "properties": {
+        "operation": {
+          "const": "document_publication_preview_v1"
+        },
+        "key": {
+          "type": "object",
+          "properties": {
+            "document_id": {
+              "anyOf": [
+                {
+                  "$ref": "#/$defs/FtkUuid"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "file_id": {
+              "$ref": "#/$defs/FtkUuid"
+            },
+            "scope": {
+              "$ref": "#/$defs/ConfigurationScope"
+            }
+          },
+          "required": [
+            "file_id",
+            "scope"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "required": [
+        "operation",
+        "key"
+      ],
+      "additionalProperties": false
+    },
+    "ManagementProjection_document_publication_preview_v1": {
+      "type": "object",
+      "properties": {
+        "operation": {
+          "const": "document_publication_preview_v1"
+        },
+        "values": {
+          "type": "object",
+          "properties": {
+            "document_id": {
+              "anyOf": [
+                {
+                  "$ref": "#/$defs/FtkUuid"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "file_id": {
+              "$ref": "#/$defs/FtkUuid"
+            },
+            "version_label": {
+              "$ref": "#/$defs/Text"
+            },
+            "requirements": {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/DocumentRequirement"
+              }
+            },
+            "scope": {
+              "$ref": "#/$defs/ConfigurationScope"
+            }
+          },
+          "required": [],
+          "additionalProperties": false
+        }
+      },
+      "required": [
+        "operation",
+        "values"
       ],
       "additionalProperties": false
     }
@@ -56716,11 +57090,13 @@
           "A55"
         ],
         "configuration_policy": "numeric plan limits/prices and legal approval are deployment configuration, never arbitrary allow/deny",
-        "implementation_status": "contract_only",
+        "implementation_status": "operational_development_limited",
         "required_features": [
           "F24"
         ],
-        "runtime_required_features": [],
+        "runtime_required_features": [
+          "F24"
+        ],
         "conditional_features": [],
         "operation_contract": {
           "kind": "command",
@@ -56732,17 +57108,21 @@
             "segments.versioned_domain_change"
           ],
           "business_commit": true,
-          "read_path_status": "contract_only",
+          "read_path_status": "implemented",
           "source_decision": "DS-2026-10-17"
         },
         "decision_delivery": {
           "accepted_contract": "DS-2026-10-17",
-          "runtime_conformance": "pending",
+          "runtime_conformance": "implemented_pending_ci",
           "open_dependencies": [],
           "target_request": {
             "$ref": "#/$defs/Request_segment_save"
           }
-        }
+        },
+        "runtime_limits": [
+          "Development/test only; final source candidate/main clean required.",
+          "No external email; dedicated scoped DB worker; hosted scheduling remains separate."
+        ]
       },
       {
         "name": "automation_save_v1",
@@ -56813,11 +57193,13 @@
           "A55"
         ],
         "configuration_policy": "numeric plan limits/prices and legal approval are deployment configuration, never arbitrary allow/deny",
-        "implementation_status": "contract_only",
+        "implementation_status": "operational_development_limited",
         "required_features": [
           "F24"
         ],
-        "runtime_required_features": [],
+        "runtime_required_features": [
+          "F24"
+        ],
         "conditional_features": [],
         "operation_contract": {
           "kind": "command",
@@ -56829,17 +57211,21 @@
             "automations.versioned_domain_change"
           ],
           "business_commit": true,
-          "read_path_status": "contract_only",
+          "read_path_status": "implemented",
           "source_decision": "DS-2026-10-17"
         },
         "decision_delivery": {
           "accepted_contract": "DS-2026-10-17",
-          "runtime_conformance": "pending",
+          "runtime_conformance": "implemented_pending_ci",
           "open_dependencies": [],
           "target_request": {
             "$ref": "#/$defs/Request_automation_save"
           }
-        }
+        },
+        "runtime_limits": [
+          "Development/test only; final source candidate/main clean required.",
+          "No external email; dedicated scoped DB worker; hosted scheduling remains separate."
+        ]
       },
       {
         "name": "notifications_list_v1",
@@ -56903,11 +57289,13 @@
           "A55"
         ],
         "configuration_policy": "numeric plan limits/prices and legal approval are deployment configuration, never arbitrary allow/deny",
-        "implementation_status": "contract_only",
+        "implementation_status": "operational_development_limited",
         "required_features": [
           "F26"
         ],
-        "runtime_required_features": [],
+        "runtime_required_features": [
+          "F26"
+        ],
         "conditional_features": [],
         "operation_contract": {
           "kind": "read",
@@ -56922,12 +57310,16 @@
         },
         "decision_delivery": {
           "accepted_contract": "DS-2026-10-17",
-          "runtime_conformance": "pending",
+          "runtime_conformance": "implemented_pending_ci",
           "open_dependencies": [],
           "target_request": {
             "$ref": "#/$defs/Request_notifications_list"
           }
-        }
+        },
+        "runtime_limits": [
+          "Development/test only; final source candidate/main clean required.",
+          "No external email; dedicated scoped DB worker; hosted scheduling remains separate."
+        ]
       },
       {
         "name": "notification_mark_read_v1",
@@ -56996,11 +57388,13 @@
           "A55"
         ],
         "configuration_policy": "numeric plan limits/prices and legal approval are deployment configuration, never arbitrary allow/deny",
-        "implementation_status": "contract_only",
+        "implementation_status": "operational_development_limited",
         "required_features": [
           "F26"
         ],
-        "runtime_required_features": [],
+        "runtime_required_features": [
+          "F26"
+        ],
         "conditional_features": [],
         "operation_contract": {
           "kind": "command",
@@ -57012,17 +57406,21 @@
             "notifications.versioned_domain_change"
           ],
           "business_commit": true,
-          "read_path_status": "contract_only",
+          "read_path_status": "implemented",
           "source_decision": "DS-2026-10-17"
         },
         "decision_delivery": {
           "accepted_contract": "DS-2026-10-17",
-          "runtime_conformance": "pending",
+          "runtime_conformance": "implemented_pending_ci",
           "open_dependencies": [],
           "target_request": {
             "$ref": "#/$defs/Request_notification_mark_read"
           }
-        }
+        },
+        "runtime_limits": [
+          "Development/test only; final source candidate/main clean required.",
+          "No external email; dedicated scoped DB worker; hosted scheduling remains separate."
+        ]
       },
       {
         "name": "notification_preferences_set_v1",
@@ -57092,11 +57490,13 @@
           "A55"
         ],
         "configuration_policy": "numeric plan limits/prices and legal approval are deployment configuration, never arbitrary allow/deny",
-        "implementation_status": "contract_only",
+        "implementation_status": "operational_development_limited",
         "required_features": [
           "F26"
         ],
-        "runtime_required_features": [],
+        "runtime_required_features": [
+          "F26"
+        ],
         "conditional_features": [
           {
             "feature": "F27",
@@ -57114,17 +57514,21 @@
             "notification_preferences.versioned_domain_change"
           ],
           "business_commit": true,
-          "read_path_status": "contract_only",
+          "read_path_status": "implemented",
           "source_decision": "DS-2026-10-17"
         },
         "decision_delivery": {
           "accepted_contract": "DS-2026-10-17",
-          "runtime_conformance": "pending",
+          "runtime_conformance": "implemented_pending_ci",
           "open_dependencies": [],
           "target_request": {
             "$ref": "#/$defs/Request_notification_preferences_set"
           }
-        }
+        },
+        "runtime_limits": [
+          "Development/test only; final source candidate/main clean required.",
+          "No external email; dedicated scoped DB worker; hosted scheduling remains separate."
+        ]
       },
       {
         "name": "report_get_v1",
@@ -60056,11 +60460,13 @@
           "A55"
         ],
         "configuration_policy": "numeric plan limits/prices and legal approval are deployment configuration, never arbitrary allow/deny",
-        "implementation_status": "contract_only",
+        "implementation_status": "operational_development_limited",
         "required_features": [
           "F30"
         ],
-        "runtime_required_features": [],
+        "runtime_required_features": [
+          "F30"
+        ],
         "conditional_features": [],
         "operation_contract": {
           "kind": "command",
@@ -60072,17 +60478,21 @@
             "documents.versioned_domain_change"
           ],
           "business_commit": true,
-          "read_path_status": "contract_only",
+          "read_path_status": "implemented",
           "source_decision": "DS-2026-10-17"
         },
         "decision_delivery": {
           "accepted_contract": "DS-2026-10-17",
-          "runtime_conformance": "pending",
+          "runtime_conformance": "implemented_pending_ci",
           "open_dependencies": [],
           "target_request": {
             "$ref": "#/$defs/Request_document_upload_prepare"
           }
-        }
+        },
+        "runtime_limits": [
+          "Development/test only; final source candidate/main clean required.",
+          "No external email; dedicated scoped DB worker; hosted scheduling remains separate."
+        ]
       },
       {
         "name": "document_version_publish_v1",
@@ -60113,6 +60523,7 @@
           "PLAN_FEATURE_UNAVAILABLE",
           "PLAN_LIMIT_REACHED",
           "POLICY_NOT_CONFIGURED",
+          "PREVIEW_STALE",
           "SERVICE_UNAVAILABLE",
           "SESSION_REVOKED",
           "SUBSCRIPTION_NOT_STARTED",
@@ -60135,7 +60546,8 @@
           "receipt_audit_outbox_atomic_domain_commit",
           "configuration_scope_org_owner_or_org_manager_else_center_manager",
           "automation_execution_separate_current_center_authority",
-          "required_feature_gates_separate_from_references"
+          "required_feature_gates_separate_from_references",
+          "confirmed_reservation_protection"
         ],
         "audit": true,
         "notification": "outbox_if_user_visible_business_result",
@@ -60154,33 +60566,39 @@
           "A55"
         ],
         "configuration_policy": "numeric plan limits/prices and legal approval are deployment configuration, never arbitrary allow/deny",
-        "implementation_status": "contract_only",
+        "implementation_status": "operational_development_limited",
         "required_features": [
           "F30"
         ],
-        "runtime_required_features": [],
+        "runtime_required_features": [
+          "F30"
+        ],
         "conditional_features": [],
         "operation_contract": {
           "kind": "command",
           "target_entity": "document_versions",
           "version_mode": "append_or_current_scope_lock",
           "version_field": null,
-          "read_operation": "management_state_get_v1",
+          "read_operation": "document_publication_preview_v1",
           "atomic_effects": [
             "document_versions.versioned_domain_change"
           ],
           "business_commit": true,
-          "read_path_status": "contract_only",
+          "read_path_status": "implemented",
           "source_decision": "DS-2026-10-17"
         },
         "decision_delivery": {
           "accepted_contract": "DS-2026-10-17",
-          "runtime_conformance": "pending",
+          "runtime_conformance": "implemented_pending_ci",
           "open_dependencies": [],
           "target_request": {
             "$ref": "#/$defs/Request_document_version_publish"
           }
-        }
+        },
+        "runtime_limits": [
+          "Development/test only; final source candidate/main clean required.",
+          "No external email; dedicated scoped DB worker; hosted scheduling remains separate."
+        ]
       },
       {
         "name": "document_requirements_get_v1",
@@ -60245,11 +60663,13 @@
           "A55"
         ],
         "configuration_policy": "numeric plan limits/prices and legal approval are deployment configuration, never arbitrary allow/deny",
-        "implementation_status": "contract_only",
+        "implementation_status": "operational_development_limited",
         "required_features": [
           "F30"
         ],
-        "runtime_required_features": [],
+        "runtime_required_features": [
+          "F30"
+        ],
         "conditional_features": [],
         "operation_contract": {
           "kind": "read",
@@ -60264,12 +60684,16 @@
         },
         "decision_delivery": {
           "accepted_contract": "DS-2026-10-17",
-          "runtime_conformance": "pending",
+          "runtime_conformance": "implemented_pending_ci",
           "open_dependencies": [],
           "target_request": {
             "$ref": "#/$defs/Request_document_requirements_get"
           }
-        }
+        },
+        "runtime_limits": [
+          "Development/test only; final source candidate/main clean required.",
+          "No external email; dedicated scoped DB worker; hosted scheduling remains separate."
+        ]
       },
       {
         "name": "document_accept_v1",
@@ -60339,11 +60763,13 @@
           "A55"
         ],
         "configuration_policy": "numeric plan limits/prices and legal approval are deployment configuration, never arbitrary allow/deny",
-        "implementation_status": "contract_only",
+        "implementation_status": "operational_development_limited",
         "required_features": [
           "F30"
         ],
-        "runtime_required_features": [],
+        "runtime_required_features": [
+          "F30"
+        ],
         "conditional_features": [],
         "operation_contract": {
           "kind": "command",
@@ -60355,17 +60781,21 @@
             "documents.versioned_domain_change"
           ],
           "business_commit": true,
-          "read_path_status": "contract_only",
+          "read_path_status": "implemented",
           "source_decision": "DS-2026-10-17"
         },
         "decision_delivery": {
           "accepted_contract": "DS-2026-10-17",
-          "runtime_conformance": "pending",
+          "runtime_conformance": "implemented_pending_ci",
           "open_dependencies": [],
           "target_request": {
             "$ref": "#/$defs/Request_document_accept"
           }
-        }
+        },
+        "runtime_limits": [
+          "Development/test only; final source candidate/main clean required.",
+          "No external email; dedicated scoped DB worker; hosted scheduling remains separate."
+        ]
       },
       {
         "name": "publication_set_v1",
@@ -61577,11 +62007,13 @@
           "A55"
         ],
         "configuration_policy": "numeric plan limits/prices and legal approval are deployment configuration, never arbitrary allow/deny",
-        "implementation_status": "contract_only",
+        "implementation_status": "operational_development_limited",
         "required_features": [
           "F26"
         ],
-        "runtime_required_features": [],
+        "runtime_required_features": [
+          "F26"
+        ],
         "conditional_features": [
           {
             "feature": "F27",
@@ -61604,12 +62036,16 @@
         },
         "decision_delivery": {
           "accepted_contract": "DS-2026-10-17",
-          "runtime_conformance": "pending",
+          "runtime_conformance": "implemented_pending_ci",
           "open_dependencies": [],
           "target_request": {
             "$ref": "#/$defs/Request_outbox_deliver"
           }
-        }
+        },
+        "runtime_limits": [
+          "Development/test only; final source candidate/main clean required.",
+          "No external email; dedicated scoped DB worker; hosted scheduling remains separate."
+        ]
       },
       {
         "name": "reminder_schedule_v1",
@@ -61678,11 +62114,13 @@
           "A55"
         ],
         "configuration_policy": "numeric plan limits/prices and legal approval are deployment configuration, never arbitrary allow/deny",
-        "implementation_status": "contract_only",
+        "implementation_status": "operational_development_limited",
         "required_features": [
           "F27"
         ],
-        "runtime_required_features": [],
+        "runtime_required_features": [
+          "F27"
+        ],
         "conditional_features": [],
         "operation_contract": {
           "kind": "worker",
@@ -61699,12 +62137,16 @@
         },
         "decision_delivery": {
           "accepted_contract": "DS-2026-10-17",
-          "runtime_conformance": "pending",
+          "runtime_conformance": "implemented_pending_ci",
           "open_dependencies": [],
           "target_request": {
             "$ref": "#/$defs/Request_reminder_schedule"
           }
-        }
+        },
+        "runtime_limits": [
+          "Development/test only; final source candidate/main clean required.",
+          "No external email; dedicated scoped DB worker; hosted scheduling remains separate."
+        ]
       },
       {
         "name": "automation_run_v1",
@@ -61773,11 +62215,13 @@
           "A55"
         ],
         "configuration_policy": "numeric plan limits/prices and legal approval are deployment configuration, never arbitrary allow/deny",
-        "implementation_status": "contract_only",
+        "implementation_status": "operational_development_limited",
         "required_features": [
           "F24"
         ],
-        "runtime_required_features": [],
+        "runtime_required_features": [
+          "F24"
+        ],
         "conditional_features": [],
         "operation_contract": {
           "kind": "worker",
@@ -61794,12 +62238,16 @@
         },
         "decision_delivery": {
           "accepted_contract": "DS-2026-10-17",
-          "runtime_conformance": "pending",
+          "runtime_conformance": "implemented_pending_ci",
           "open_dependencies": [],
           "target_request": {
             "$ref": "#/$defs/Request_automation_run"
           }
-        }
+        },
+        "runtime_limits": [
+          "Development/test only; final source candidate/main clean required.",
+          "No external email; dedicated scoped DB worker; hosted scheduling remains separate."
+        ]
       },
       {
         "name": "import_rows_process_v1",
@@ -63456,7 +63904,7 @@
           "A55"
         ],
         "configuration_policy": "numeric plan limits/prices and legal approval are deployment configuration, never arbitrary allow/deny",
-        "implementation_status": "contract_only",
+        "implementation_status": "operational_development_limited",
         "required_features": [],
         "runtime_required_features": [],
         "conditional_features": [
@@ -63481,17 +63929,21 @@
             "files.versioned_domain_change"
           ],
           "business_commit": true,
-          "read_path_status": "contract_only",
+          "read_path_status": "implemented",
           "source_decision": "DS-2026-10-17"
         },
         "decision_delivery": {
           "accepted_contract": "DS-2026-10-17",
-          "runtime_conformance": "pending",
+          "runtime_conformance": "implemented_pending_ci",
           "open_dependencies": [],
           "target_request": {
             "$ref": "#/$defs/Request_file_upload_complete"
           }
-        }
+        },
+        "runtime_limits": [
+          "Development/test only; final source candidate/main clean required.",
+          "No external email; dedicated scoped DB worker; hosted scheduling remains separate."
+        ]
       },
       {
         "name": "negcredit_valuation_set_v1",
@@ -64856,7 +65308,16 @@
           "trial_registration_confirm_v1",
           "lead_convert_v1",
           "publication_set_v1",
-          "public_application_review_v1"
+          "public_application_review_v1",
+          "document_upload_prepare_v1",
+          "document_version_publish_v1",
+          "document_accept_v1",
+          "file_upload_complete_v1",
+          "notification_mark_read_v1",
+          "notification_preferences_set_v1",
+          "segment_save_v1",
+          "automation_save_v1",
+          "document_publication_preview_v1"
         ]
       },
       {
@@ -66716,6 +67177,106 @@
         "runtime_external_path": "/functions/v1/backend-v1/attendance_start_v1",
         "runtime_rpc": "api_v1.attendance_start_v1",
         "runtime_limits": []
+      },
+      {
+        "name": "document_publication_preview_v1",
+        "module": "M14",
+        "features": [
+          "F30"
+        ],
+        "permission": "document.manage",
+        "actor_source": "server_verified",
+        "transport": "R",
+        "billing_class": "config",
+        "request": {
+          "$ref": "#/$defs/Request_document_publication_preview"
+        },
+        "success": {
+          "$ref": "#/$defs/Success_document_publication_preview"
+        },
+        "errors": [
+          "AUTH_REQUIRED",
+          "BILLING_OPERATION_RESTRICTED",
+          "CLIENT_UPDATE_REQUIRED",
+          "FORBIDDEN",
+          "IDEMPOTENCY_PAYLOAD_MISMATCH",
+          "INTEGRITY_VIOLATION",
+          "NOT_FOUND",
+          "OPERATION_IN_PROGRESS",
+          "OPERATION_RESULT_EXPIRED",
+          "PLAN_FEATURE_UNAVAILABLE",
+          "PLAN_LIMIT_REACHED",
+          "POLICY_NOT_CONFIGURED",
+          "PREVIEW_STALE",
+          "SERVICE_UNAVAILABLE",
+          "SESSION_REVOKED",
+          "SUBSCRIPTION_NOT_STARTED",
+          "TEMPORARY_FAILURE",
+          "VALIDATION_FAILED",
+          "VERSION_CONFLICT"
+        ],
+        "transaction_class": "preview",
+        "transaction_guarantee": "Source-bound preview; no booking or document mutation.",
+        "transition": {
+          "effect": "preview_only",
+          "from": [],
+          "to": [],
+          "invariant": "Explicit source-bound approval preserves only existing affected bookings."
+        },
+        "semantic_guards": [
+          "live_actor_and_scope",
+          "billing_gate_config",
+          "configuration_scope_org_owner_or_org_manager_else_center_manager",
+          "confirmed_reservation_protection"
+        ],
+        "audit": false,
+        "notification": "none",
+        "concurrency": "Live original permission/tenant scope on every request; target/aggregate lock; append_or_current_scope_lock; idempotent receipt and all declared effects rollback together",
+        "expected_version_subject": null,
+        "acceptance_scenario_ids": [
+          "A01",
+          "A02",
+          "A03",
+          "A23",
+          "A24",
+          "A25",
+          "A39",
+          "A46",
+          "A47",
+          "A55"
+        ],
+        "configuration_policy": "numeric plan limits/prices and legal approval are deployment configuration, never arbitrary allow/deny",
+        "implementation_status": "operational_development_limited",
+        "required_features": [
+          "F30"
+        ],
+        "runtime_required_features": [
+          "F30"
+        ],
+        "conditional_features": [],
+        "operation_contract": {
+          "kind": "preview",
+          "target_entity": "document_versions",
+          "version_mode": "preview_dependencies",
+          "version_field": null,
+          "read_operation": "document_publication_preview_v1",
+          "atomic_effects": [],
+          "business_commit": false,
+          "read_path_status": "implemented",
+          "source_decision": "DS-2026-10-17"
+        },
+        "decision_delivery": {
+          "accepted_contract": "DS-2026-10-17",
+          "runtime_conformance": "implemented_pending_ci",
+          "open_dependencies": [],
+          "target_request": {
+            "$ref": "#/$defs/Request_document_publication_preview"
+          }
+        },
+        "runtime_limits": [
+          "Development/test only; final source candidate/main clean required.",
+          "No external email; dedicated scoped DB worker; hosted scheduling remains separate."
+        ]
       }
     ],
     "policy_value_map": {
@@ -67094,6 +67655,12 @@
       },
       {
         "path": "#/$defs/AcceptanceContext/properties/on_behalf_of_person_id/anyOf/0",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/AcceptanceContext/properties/product_version_id",
         "origin": "ftksaas",
         "acceptance": "generic_uuid",
         "generation": "uuidv7"
@@ -71089,13 +71656,31 @@
         "generation": "uuidv7"
       },
       {
-        "path": "#/$defs/Request_crm_activity_save/properties/lead_id",
+        "path": "#/$defs/Request_crm_activity_save/properties/lead_id/anyOf/0",
         "origin": "ftksaas",
         "acceptance": "generic_uuid",
         "generation": "uuidv7"
       },
       {
         "path": "#/$defs/Request_crm_activity_save/properties/activity_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Request_crm_activity_save/properties/person_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Request_crm_activity_save/oneOf/0/properties/lead_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Request_crm_activity_save/oneOf/1/properties/person_id",
         "origin": "ftksaas",
         "acceptance": "generic_uuid",
         "generation": "uuidv7"
@@ -72314,6 +72899,12 @@
       },
       {
         "path": "#/$defs/Request_document_requirements_get/properties/person_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Request_document_requirements_get/properties/content_file_id",
         "origin": "ftksaas",
         "acceptance": "generic_uuid",
         "generation": "uuidv7"
@@ -74971,7 +75562,13 @@
         "generation": "uuidv7"
       },
       {
-        "path": "#/$defs/Table_crm_activities/properties/lead_id",
+        "path": "#/$defs/Table_crm_activities/properties/lead_id/anyOf/0",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Table_crm_activities/properties/person_id/anyOf/0",
         "origin": "ftksaas",
         "acceptance": "generic_uuid",
         "generation": "uuidv7"
@@ -75680,6 +76277,12 @@
       },
       {
         "path": "#/$defs/Table_public_applications/properties/request_reference/anyOf/0",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Table_public_applications/properties/person_id/anyOf/0",
         "origin": "ftksaas",
         "acceptance": "generic_uuid",
         "generation": "uuidv7"
@@ -78469,13 +79072,19 @@
         "generation": "uuidv7"
       },
       {
-        "path": "#/$defs/ManagementProjection_crm_activity_save_v1/properties/values/properties/lead_id",
+        "path": "#/$defs/ManagementProjection_crm_activity_save_v1/properties/values/properties/lead_id/anyOf/0",
         "origin": "ftksaas",
         "acceptance": "generic_uuid",
         "generation": "uuidv7"
       },
       {
         "path": "#/$defs/ManagementProjection_crm_activity_save_v1/properties/values/properties/activity_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/ManagementProjection_crm_activity_save_v1/properties/values/properties/person_id",
         "origin": "ftksaas",
         "acceptance": "generic_uuid",
         "generation": "uuidv7"
@@ -78494,6 +79103,12 @@
       },
       {
         "path": "#/$defs/ManagementProjection_trial_offer_create_v1/properties/values/properties/session_id/anyOf/0",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/ManagementProjection_trial_offer_create_v1/properties/values/properties/offer_id",
         "origin": "ftksaas",
         "acceptance": "generic_uuid",
         "generation": "uuidv7"
@@ -78680,6 +79295,12 @@
       },
       {
         "path": "#/$defs/ManagementProjection_public_application_review_v1/properties/values/properties/person_id/anyOf/0",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/ManagementProjection_public_application_review_v1/properties/values/properties/publication_id",
         "origin": "ftksaas",
         "acceptance": "generic_uuid",
         "generation": "uuidv7"
@@ -79453,13 +80074,31 @@
         "generation": "uuidv7"
       },
       {
-        "path": "#/$defs/ManagementSelector_crm_activity_save_v1/properties/key/properties/lead_id",
+        "path": "#/$defs/ManagementSelector_crm_activity_save_v1/properties/key/properties/lead_id/anyOf/0",
         "origin": "ftksaas",
         "acceptance": "generic_uuid",
         "generation": "uuidv7"
       },
       {
         "path": "#/$defs/ManagementSelector_crm_activity_save_v1/properties/key/properties/activity_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/ManagementSelector_crm_activity_save_v1/properties/key/properties/person_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/ManagementSelector_crm_activity_save_v1/properties/key/oneOf/0/properties/lead_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/ManagementSelector_crm_activity_save_v1/properties/key/oneOf/1/properties/person_id",
         "origin": "ftksaas",
         "acceptance": "generic_uuid",
         "generation": "uuidv7"
@@ -80467,24 +81106,6 @@
         "generation": "uuidv7"
       },
       {
-        "path": "#/$defs/ManagementProjection_trial_offer_create_v1/properties/values/properties/offer_id",
-        "origin": "ftksaas",
-        "acceptance": "generic_uuid",
-        "generation": "uuidv7"
-      },
-      {
-        "path": "#/$defs/ManagementProjection_public_application_review_v1/properties/values/properties/publication_id",
-        "origin": "ftksaas",
-        "acceptance": "generic_uuid",
-        "generation": "uuidv7"
-      },
-      {
-        "path": "#/$defs/Table_public_applications/properties/person_id/anyOf/0",
-        "origin": "ftksaas",
-        "acceptance": "generic_uuid",
-        "generation": "uuidv7"
-      },
-      {
         "path": "#/$defs/TrialOfferTerms/properties/product_version_id",
         "origin": "ftksaas",
         "acceptance": "generic_uuid",
@@ -80516,6 +81137,78 @@
       },
       {
         "path": "#/$defs/CrmFollowupView/properties/assigned_to/anyOf/0",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Request_document_publication_preview/properties/request_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Request_document_publication_preview/properties/org_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Request_document_publication_preview/properties/center_id/anyOf/0",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Request_document_publication_preview/properties/document_id/anyOf/0",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Request_document_publication_preview/properties/file_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/DocumentPublicationAffected/properties/person_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/DocumentPublicationAffected/properties/center_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Success_document_publication_preview/properties/trace_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/ManagementSelector_document_publication_preview_v1/properties/key/properties/document_id/anyOf/0",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/ManagementSelector_document_publication_preview_v1/properties/key/properties/file_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/ManagementProjection_document_publication_preview_v1/properties/values/properties/document_id/anyOf/0",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/ManagementProjection_document_publication_preview_v1/properties/values/properties/file_id",
         "origin": "ftksaas",
         "acceptance": "generic_uuid",
         "generation": "uuidv7"
@@ -80780,14 +81473,75 @@
         "settlement_request_decide_v1",
         "settlement_authority_get_v1",
         "settlement_delegation_set_v1",
-        "settlement_authority_set_v1"
+        "settlement_authority_set_v1",
+        "products_list_v1",
+        "lesson_request_create_v1",
+        "lesson_request_withdraw_v1",
+        "lesson_request_reject_v1",
+        "lesson_request_offer_alternative_v1",
+        "lesson_request_accept_alternative_v1",
+        "lesson_request_approve_v1",
+        "waitlist_join_v1",
+        "waitlist_leave_v1",
+        "seat_offer_accept_v1",
+        "seat_offer_reject_v1",
+        "seat_offer_issue_v1",
+        "seat_offer_expire_v1",
+        "request_expire_v1",
+        "session_cancel_preview_v1",
+        "session_cancel_apply_v1",
+        "replacement_session_create_v1",
+        "credit_adjust_v1",
+        "entitlement_extend_v1",
+        "freeze_preview_v1",
+        "freeze_apply_v1",
+        "freeze_end_preview_v1",
+        "freeze_end_apply_v1",
+        "sale_terminate_preview_v1",
+        "sale_terminate_apply_v1",
+        "sale_change_preview_v1",
+        "sale_change_apply_v1",
+        "sale_renew_preview_v1",
+        "sale_renew_apply_v1",
+        "finance_get_v1",
+        "collection_correct_preview_v1",
+        "collection_correct_apply_v1",
+        "sale_refund_preview_v1",
+        "sale_refund_apply_v1",
+        "instructor_payment_record_v1",
+        "instructor_payment_correct_v1",
+        "leads_list_v1",
+        "lead_save_v1",
+        "crm_activity_save_v1",
+        "trial_offer_create_v1",
+        "trial_registration_confirm_v1",
+        "lead_convert_v1",
+        "crm_followup_list_v1",
+        "publication_set_v1",
+        "public_calendar_get_v1",
+        "public_application_submit_v1",
+        "public_application_review_v1",
+        "document_upload_prepare_v1",
+        "document_version_publish_v1",
+        "document_requirements_get_v1",
+        "document_accept_v1",
+        "file_upload_complete_v1",
+        "notifications_list_v1",
+        "notification_mark_read_v1",
+        "notification_preferences_set_v1",
+        "segment_save_v1",
+        "automation_save_v1",
+        "outbox_deliver_v1",
+        "reminder_schedule_v1",
+        "automation_run_v1",
+        "document_publication_preview_v1"
       ],
       "auth": "Supabase getUser + live auth.sessions + current account/link/role; no request actor claims",
       "uuid": "backend uuid@14.0.3 v7 for all inserted IDs; DB defaults not required",
       "external_transport": "POST /functions/v1/backend-v1/{operation}; direct typed request body",
       "internal_rpc": "service-only api_v1 named functions; actor/session/UUID bank supplied by verified gateway",
-      "migration_count": 29,
-      "test_evidence": "tests/cross-center-settlement.test.mjs; final head/main clean CI checked separately",
+      "migration_count": 53,
+      "test_evidence": "tests/registry.test.mjs includes P05 acceptance; final candidate/main CI separately required",
       "frontend_unchanged": true
     },
     "decision_sprint": {
@@ -81462,7 +82216,8 @@
         "settlement_delegation_set_v1",
         "settlement_authority_set_v1",
         "negative_limits_get_v1",
-        "attendance_start_v1"
+        "attendance_start_v1",
+        "document_publication_preview_v1"
       ],
       "runtime_deliveries": {
         "starter_attendance_protection": {
@@ -82861,14 +83616,14 @@
         "implementation": "partial",
         "acceptance": "pending_feature_acceptance",
         "acceptance_evidence": [],
-        "implemented_operations": [],
-        "contract_only_operations": [
+        "implemented_operations": [
           "segment_save_v1",
           "automation_save_v1",
           "automation_run_v1"
         ],
+        "contract_only_operations": [],
         "acceptance_case_ids": [],
-        "baseline_regression": "no callable operation; no behavior acceptance claimed",
+        "baseline_regression": "P05 source implemented; real Auth/Storage/worker acceptance pending CI",
         "plan_scope": {
           "starter": "—",
           "pro": "—",
@@ -82937,15 +83692,15 @@
         "implementation": "partial",
         "acceptance": "pending_feature_acceptance",
         "acceptance_evidence": [],
-        "implemented_operations": [],
-        "contract_only_operations": [
+        "implemented_operations": [
           "notifications_list_v1",
           "notification_mark_read_v1",
           "notification_preferences_set_v1",
           "outbox_deliver_v1"
         ],
+        "contract_only_operations": [],
         "acceptance_case_ids": [],
-        "baseline_regression": "no callable operation; no behavior acceptance claimed",
+        "baseline_regression": "P05 source implemented; real Auth/Storage/worker acceptance pending CI",
         "plan_scope": {
           "starter": "Uygulama içi",
           "pro": "Var",
@@ -82971,14 +83726,14 @@
         "implementation": "partial",
         "acceptance": "pending_feature_acceptance",
         "acceptance_evidence": [],
-        "implemented_operations": [],
-        "contract_only_operations": [
+        "implemented_operations": [
           "notification_preferences_set_v1",
           "outbox_deliver_v1",
           "reminder_schedule_v1"
         ],
+        "contract_only_operations": [],
         "acceptance_case_ids": [],
-        "baseline_regression": "no callable operation; no behavior acceptance claimed",
+        "baseline_regression": "P05 source implemented; real Auth/Storage/worker acceptance pending CI",
         "plan_scope": {
           "starter": "—",
           "pro": "Var",
@@ -83104,22 +83859,24 @@
           "document_version_publish_v1",
           "document_requirements_get_v1",
           "document_accept_v1",
-          "file_upload_complete_v1"
+          "file_upload_complete_v1",
+          "document_publication_preview_v1"
         ],
         "dependencies": [],
         "implementation": "partial",
         "acceptance": "pending_feature_acceptance",
         "acceptance_evidence": [],
-        "implemented_operations": [],
-        "contract_only_operations": [
+        "implemented_operations": [
           "document_upload_prepare_v1",
           "document_version_publish_v1",
           "document_requirements_get_v1",
           "document_accept_v1",
-          "file_upload_complete_v1"
+          "file_upload_complete_v1",
+          "document_publication_preview_v1"
         ],
+        "contract_only_operations": [],
         "acceptance_case_ids": [],
-        "baseline_regression": "no callable operation; no behavior acceptance claimed",
+        "baseline_regression": "P05 source implemented; real Auth/Storage/worker acceptance pending CI",
         "plan_scope": {
           "starter": "Var",
           "pro": "Var",
@@ -83149,18 +83906,19 @@
         "implementation": "partial",
         "acceptance": "pending_feature_acceptance",
         "acceptance_evidence": [],
-        "implemented_operations": [],
+        "implemented_operations": [
+          "file_upload_complete_v1"
+        ],
         "contract_only_operations": [
           "import_upload_prepare_v1",
           "import_preview_v1",
           "import_apply_v1",
           "import_rows_list_v1",
           "job_status_get_v1",
-          "import_rows_process_v1",
-          "file_upload_complete_v1"
+          "import_rows_process_v1"
         ],
         "acceptance_case_ids": [],
-        "baseline_regression": "no callable operation; no behavior acceptance claimed",
+        "baseline_regression": "P05 source implemented; real Auth/Storage/worker acceptance pending CI",
         "plan_scope": {
           "starter": "Var",
           "pro": "Var",
@@ -83304,6 +84062,30 @@
       "trial_config": "private.p04_trial_configuration plus existing trial_repeat_limit policy; no default trial duration/cap",
       "followup_config": "existing entitlement_reminder_days and inactive_student_days; no automatic segmentation or messaging",
       "acceptance": "local verification and independent review pending; candidate/main clean unchanged"
+    },
+    "p05_delivery": {
+      "status": "implemented_pending_ci",
+      "scope": [
+        "document_upload_prepare_v1",
+        "document_version_publish_v1",
+        "document_requirements_get_v1",
+        "document_accept_v1",
+        "file_upload_complete_v1",
+        "notifications_list_v1",
+        "notification_mark_read_v1",
+        "notification_preferences_set_v1",
+        "segment_save_v1",
+        "automation_save_v1",
+        "outbox_deliver_v1",
+        "reminder_schedule_v1",
+        "automation_run_v1",
+        "document_publication_preview_v1"
+      ],
+      "storage": "private ftksaas-documents; explicit private.p05_upload_configuration; actual bytes SHA256 verified by Edge; optional content_file_id on authorized requirements read; no public URLs",
+      "worker": "private.p05_worker_execute + p05_jobs_claim; dedicated LOGIN granted ftk_p05_worker with explicit org binding; human Auth cannot execute jobs",
+      "gates": "reservation/sale/event registration deferred insert checks; attended transition check; append-only version/acceptance evidence; no automatic existing booking cancellation",
+      "external_email": "deferred; no provider integration",
+      "acceptance": "new source CI and independent final review pending"
     }
   }
 }

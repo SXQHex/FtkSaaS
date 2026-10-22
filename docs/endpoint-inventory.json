@@ -2974,8 +2974,8 @@
     },
     {
       "name": "segment_save_v1",
-      "status": "contract_only",
-      "external_path": null,
+      "status": "operational_development_limited",
+      "external_path": "/functions/v1/backend-v1/segment_save_v1",
       "permission": "crm.manage",
       "features": [
         "F24"
@@ -2983,22 +2983,27 @@
       "required_features": [
         "F24"
       ],
-      "runtime_required_features": [],
+      "runtime_required_features": [
+        "F24"
+      ],
       "decision_delivery": {
         "accepted_contract": "DS-2026-10-17",
-        "runtime_conformance": "pending",
+        "runtime_conformance": "implemented_pending_ci",
         "open_dependencies": [],
         "target_request": {
           "$ref": "#/$defs/Request_segment_save"
         }
       },
       "billing_class": "config",
-      "limits": []
+      "limits": [
+        "Development/test only; final source candidate/main clean required.",
+        "No external email; dedicated scoped DB worker; hosted scheduling remains separate."
+      ]
     },
     {
       "name": "automation_save_v1",
-      "status": "contract_only",
-      "external_path": null,
+      "status": "operational_development_limited",
+      "external_path": "/functions/v1/backend-v1/automation_save_v1",
       "permission": "crm.manage",
       "features": [
         "F24"
@@ -3006,22 +3011,27 @@
       "required_features": [
         "F24"
       ],
-      "runtime_required_features": [],
+      "runtime_required_features": [
+        "F24"
+      ],
       "decision_delivery": {
         "accepted_contract": "DS-2026-10-17",
-        "runtime_conformance": "pending",
+        "runtime_conformance": "implemented_pending_ci",
         "open_dependencies": [],
         "target_request": {
           "$ref": "#/$defs/Request_automation_save"
         }
       },
       "billing_class": "config",
-      "limits": []
+      "limits": [
+        "Development/test only; final source candidate/main clean required.",
+        "No external email; dedicated scoped DB worker; hosted scheduling remains separate."
+      ]
     },
     {
       "name": "notifications_list_v1",
-      "status": "contract_only",
-      "external_path": null,
+      "status": "operational_development_limited",
+      "external_path": "/functions/v1/backend-v1/notifications_list_v1",
       "permission": "notification.self",
       "features": [
         "F26"
@@ -3029,22 +3039,27 @@
       "required_features": [
         "F26"
       ],
-      "runtime_required_features": [],
+      "runtime_required_features": [
+        "F26"
+      ],
       "decision_delivery": {
         "accepted_contract": "DS-2026-10-17",
-        "runtime_conformance": "pending",
+        "runtime_conformance": "implemented_pending_ci",
         "open_dependencies": [],
         "target_request": {
           "$ref": "#/$defs/Request_notifications_list"
         }
       },
       "billing_class": "read",
-      "limits": []
+      "limits": [
+        "Development/test only; final source candidate/main clean required.",
+        "No external email; dedicated scoped DB worker; hosted scheduling remains separate."
+      ]
     },
     {
       "name": "notification_mark_read_v1",
-      "status": "contract_only",
-      "external_path": null,
+      "status": "operational_development_limited",
+      "external_path": "/functions/v1/backend-v1/notification_mark_read_v1",
       "permission": "notification.self",
       "features": [
         "F26"
@@ -3052,22 +3067,27 @@
       "required_features": [
         "F26"
       ],
-      "runtime_required_features": [],
+      "runtime_required_features": [
+        "F26"
+      ],
       "decision_delivery": {
         "accepted_contract": "DS-2026-10-17",
-        "runtime_conformance": "pending",
+        "runtime_conformance": "implemented_pending_ci",
         "open_dependencies": [],
         "target_request": {
           "$ref": "#/$defs/Request_notification_mark_read"
         }
       },
       "billing_class": "maintenance",
-      "limits": []
+      "limits": [
+        "Development/test only; final source candidate/main clean required.",
+        "No external email; dedicated scoped DB worker; hosted scheduling remains separate."
+      ]
     },
     {
       "name": "notification_preferences_set_v1",
-      "status": "contract_only",
-      "external_path": null,
+      "status": "operational_development_limited",
+      "external_path": "/functions/v1/backend-v1/notification_preferences_set_v1",
       "permission": "notification.self",
       "features": [
         "F26",
@@ -3076,17 +3096,22 @@
       "required_features": [
         "F26"
       ],
-      "runtime_required_features": [],
+      "runtime_required_features": [
+        "F26"
+      ],
       "decision_delivery": {
         "accepted_contract": "DS-2026-10-17",
-        "runtime_conformance": "pending",
+        "runtime_conformance": "implemented_pending_ci",
         "open_dependencies": [],
         "target_request": {
           "$ref": "#/$defs/Request_notification_preferences_set"
         }
       },
       "billing_class": "maintenance",
-      "limits": []
+      "limits": [
+        "Development/test only; final source candidate/main clean required.",
+        "No external email; dedicated scoped DB worker; hosted scheduling remains separate."
+      ]
     },
     {
       "name": "report_get_v1",
@@ -3676,8 +3701,8 @@
     },
     {
       "name": "document_upload_prepare_v1",
-      "status": "contract_only",
-      "external_path": null,
+      "status": "operational_development_limited",
+      "external_path": "/functions/v1/backend-v1/document_upload_prepare_v1",
       "permission": "document.manage",
       "features": [
         "F30"
@@ -3685,22 +3710,27 @@
       "required_features": [
         "F30"
       ],
-      "runtime_required_features": [],
+      "runtime_required_features": [
+        "F30"
+      ],
       "decision_delivery": {
         "accepted_contract": "DS-2026-10-17",
-        "runtime_conformance": "pending",
+        "runtime_conformance": "implemented_pending_ci",
         "open_dependencies": [],
         "target_request": {
           "$ref": "#/$defs/Request_document_upload_prepare"
         }
       },
       "billing_class": "config",
-      "limits": []
+      "limits": [
+        "Development/test only; final source candidate/main clean required.",
+        "No external email; dedicated scoped DB worker; hosted scheduling remains separate."
+      ]
     },
     {
       "name": "document_version_publish_v1",
-      "status": "contract_only",
-      "external_path": null,
+      "status": "operational_development_limited",
+      "external_path": "/functions/v1/backend-v1/document_version_publish_v1",
       "permission": "document.manage",
       "features": [
         "F30"
@@ -3708,22 +3738,27 @@
       "required_features": [
         "F30"
       ],
-      "runtime_required_features": [],
+      "runtime_required_features": [
+        "F30"
+      ],
       "decision_delivery": {
         "accepted_contract": "DS-2026-10-17",
-        "runtime_conformance": "pending",
+        "runtime_conformance": "implemented_pending_ci",
         "open_dependencies": [],
         "target_request": {
           "$ref": "#/$defs/Request_document_version_publish"
         }
       },
       "billing_class": "config",
-      "limits": []
+      "limits": [
+        "Development/test only; final source candidate/main clean required.",
+        "No external email; dedicated scoped DB worker; hosted scheduling remains separate."
+      ]
     },
     {
       "name": "document_requirements_get_v1",
-      "status": "contract_only",
-      "external_path": null,
+      "status": "operational_development_limited",
+      "external_path": "/functions/v1/backend-v1/document_requirements_get_v1",
       "permission": "person.read",
       "features": [
         "F30"
@@ -3731,22 +3766,27 @@
       "required_features": [
         "F30"
       ],
-      "runtime_required_features": [],
+      "runtime_required_features": [
+        "F30"
+      ],
       "decision_delivery": {
         "accepted_contract": "DS-2026-10-17",
-        "runtime_conformance": "pending",
+        "runtime_conformance": "implemented_pending_ci",
         "open_dependencies": [],
         "target_request": {
           "$ref": "#/$defs/Request_document_requirements_get"
         }
       },
       "billing_class": "read",
-      "limits": []
+      "limits": [
+        "Development/test only; final source candidate/main clean required.",
+        "No external email; dedicated scoped DB worker; hosted scheduling remains separate."
+      ]
     },
     {
       "name": "document_accept_v1",
-      "status": "contract_only",
-      "external_path": null,
+      "status": "operational_development_limited",
+      "external_path": "/functions/v1/backend-v1/document_accept_v1",
       "permission": "document.accept",
       "features": [
         "F30"
@@ -3754,17 +3794,22 @@
       "required_features": [
         "F30"
       ],
-      "runtime_required_features": [],
+      "runtime_required_features": [
+        "F30"
+      ],
       "decision_delivery": {
         "accepted_contract": "DS-2026-10-17",
-        "runtime_conformance": "pending",
+        "runtime_conformance": "implemented_pending_ci",
         "open_dependencies": [],
         "target_request": {
           "$ref": "#/$defs/Request_document_accept"
         }
       },
       "billing_class": "maintenance",
-      "limits": []
+      "limits": [
+        "Development/test only; final source candidate/main clean required.",
+        "No external email; dedicated scoped DB worker; hosted scheduling remains separate."
+      ]
     },
     {
       "name": "publication_set_v1",
@@ -4045,8 +4090,8 @@
     },
     {
       "name": "outbox_deliver_v1",
-      "status": "contract_only",
-      "external_path": null,
+      "status": "operational_development_limited",
+      "external_path": "/functions/v1/backend-v1/outbox_deliver_v1",
       "permission": "system.worker",
       "features": [
         "F26",
@@ -4055,22 +4100,27 @@
       "required_features": [
         "F26"
       ],
-      "runtime_required_features": [],
+      "runtime_required_features": [
+        "F26"
+      ],
       "decision_delivery": {
         "accepted_contract": "DS-2026-10-17",
-        "runtime_conformance": "pending",
+        "runtime_conformance": "implemented_pending_ci",
         "open_dependencies": [],
         "target_request": {
           "$ref": "#/$defs/Request_outbox_deliver"
         }
       },
       "billing_class": "worker",
-      "limits": []
+      "limits": [
+        "Development/test only; final source candidate/main clean required.",
+        "No external email; dedicated scoped DB worker; hosted scheduling remains separate."
+      ]
     },
     {
       "name": "reminder_schedule_v1",
-      "status": "contract_only",
-      "external_path": null,
+      "status": "operational_development_limited",
+      "external_path": "/functions/v1/backend-v1/reminder_schedule_v1",
       "permission": "system.worker",
       "features": [
         "F27"
@@ -4078,22 +4128,27 @@
       "required_features": [
         "F27"
       ],
-      "runtime_required_features": [],
+      "runtime_required_features": [
+        "F27"
+      ],
       "decision_delivery": {
         "accepted_contract": "DS-2026-10-17",
-        "runtime_conformance": "pending",
+        "runtime_conformance": "implemented_pending_ci",
         "open_dependencies": [],
         "target_request": {
           "$ref": "#/$defs/Request_reminder_schedule"
         }
       },
       "billing_class": "worker",
-      "limits": []
+      "limits": [
+        "Development/test only; final source candidate/main clean required.",
+        "No external email; dedicated scoped DB worker; hosted scheduling remains separate."
+      ]
     },
     {
       "name": "automation_run_v1",
-      "status": "contract_only",
-      "external_path": null,
+      "status": "operational_development_limited",
+      "external_path": "/functions/v1/backend-v1/automation_run_v1",
       "permission": "system.worker",
       "features": [
         "F24"
@@ -4101,17 +4156,22 @@
       "required_features": [
         "F24"
       ],
-      "runtime_required_features": [],
+      "runtime_required_features": [
+        "F24"
+      ],
       "decision_delivery": {
         "accepted_contract": "DS-2026-10-17",
-        "runtime_conformance": "pending",
+        "runtime_conformance": "implemented_pending_ci",
         "open_dependencies": [],
         "target_request": {
           "$ref": "#/$defs/Request_automation_run"
         }
       },
       "billing_class": "worker",
-      "limits": []
+      "limits": [
+        "Development/test only; final source candidate/main clean required.",
+        "No external email; dedicated scoped DB worker; hosted scheduling remains separate."
+      ]
     },
     {
       "name": "import_rows_process_v1",
@@ -4441,8 +4501,8 @@
     },
     {
       "name": "file_upload_complete_v1",
-      "status": "contract_only",
-      "external_path": null,
+      "status": "operational_development_limited",
+      "external_path": "/functions/v1/backend-v1/file_upload_complete_v1",
       "permission": "account.self",
       "features": [
         "F30",
@@ -4452,14 +4512,17 @@
       "runtime_required_features": [],
       "decision_delivery": {
         "accepted_contract": "DS-2026-10-17",
-        "runtime_conformance": "pending",
+        "runtime_conformance": "implemented_pending_ci",
         "open_dependencies": [],
         "target_request": {
           "$ref": "#/$defs/Request_file_upload_complete"
         }
       },
       "billing_class": "maintenance",
-      "limits": []
+      "limits": [
+        "Development/test only; final source candidate/main clean required.",
+        "No external email; dedicated scoped DB worker; hosted scheduling remains separate."
+      ]
     },
     {
       "name": "negcredit_valuation_set_v1",
@@ -5227,6 +5290,34 @@
       },
       "billing_class": "maintenance",
       "limits": []
+    },
+    {
+      "name": "document_publication_preview_v1",
+      "status": "operational_development_limited",
+      "external_path": "/functions/v1/backend-v1/document_publication_preview_v1",
+      "permission": "document.manage",
+      "features": [
+        "F30"
+      ],
+      "required_features": [
+        "F30"
+      ],
+      "runtime_required_features": [
+        "F30"
+      ],
+      "decision_delivery": {
+        "accepted_contract": "DS-2026-10-17",
+        "runtime_conformance": "implemented_pending_ci",
+        "open_dependencies": [],
+        "target_request": {
+          "$ref": "#/$defs/Request_document_publication_preview"
+        }
+      },
+      "billing_class": "config",
+      "limits": [
+        "Development/test only; final source candidate/main clean required.",
+        "No external email; dedicated scoped DB worker; hosted scheduling remains separate."
+      ]
     }
   ]
 }

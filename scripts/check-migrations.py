@@ -110,3 +110,5 @@ assert next(Path('supabase/migrations').glob('*_p04_crm_public.sql')).read_text(
 assert next(Path('supabase/migrations').glob('*_p04_free_trial_attendance.sql')).read_text()==Path('database/p04-free-trial-attendance.sql').read_text(),'P04 trial attendance source drift'
 
 assert next(Path('supabase/migrations').glob('*_p04_followup_policy_guard.sql')).read_text()==Path('database/p04-followup-policy-guard.sql').read_text(),'P04 followup policy source drift'
+
+assert next(Path('supabase/migrations').glob('*_p05_documents_notifications.sql')).read_text()==''.join(Path('database/p05-'+n+'.sql').read_text() for n in ['documents', 'document-protection', 'notifications', 'followups', 'workers', 'bind', 'wrappers']),'P05 source drift'

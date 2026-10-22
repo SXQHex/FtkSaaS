@@ -38,7 +38,7 @@ test('Starter attendance and protected reservation through Auth -> Edge -> RPC',
  await publish('student_cancel_group',{kind:'cancellation',terms:{cutoff_minutes:0,before_cutoff:'release',after_cutoff:'release',no_show:'release'}});
  await publish('reservation_window',{kind:'window',opens_minutes_before:10080,closes_minutes_before:0,manager_exception:false});
  await publish('negative_valuation',{kind:'valuation',discipline_id:discipline,format:'group',amount_minor:'100',currency:'TRY'});
- const makeSession=async(extra={})=>mut('session_create_v1',{discipline_id:discipline,format:'group',interval:{starts_at:new Date(Date.now()+60000).toISOString(),ends_at:new Date(Date.now()+3660000).toISOString()},resources:[],assignments:[],capacity:{nominal:8,maximum:10},...extra});
+ const makeSession=async(extra={})=>{const start=new Date(Date.now()+86400000);start.setUTCHours(9,0,0,0);return mut('session_create_v1',{discipline_id:discipline,format:'group',interval:{starts_at:start.toISOString(),ends_at:new Date(+start+3600000).toISOString()},resources:[],assignments:[],capacity:{nominal:8,maximum:10},...extra});};
  const book=(sid,p=student.p,k=key())=>mut('reservation_create_v1',{session_id:sid,person_id:p,mode:'flexible'},k);
  const get=sid=>must(owner,'attendance_get_v1',scope({session_id:sid}));
  const token=p=>({id:p.id,token:p.token});
@@ -121,7 +121,9 @@ test('Starter attendance and protected reservation through Auth -> Edge -> RPC',
  await t.test('assigned instructor reads redacted draft; student, outsider and wrong center cannot mutate',async()=>{
   const assigned=(await makeSession({assignments:[{person_id:instructor.p,duty:'instructor'}]})).primary_id;
   const own=(await book(assigned,(await linked('assigned-student')).p)).primary_id;
-  await db.query("update core.sessions set starts_at=now()-interval '1 minute',ends_at=now()+interval '59 minutes' where id=$1",[assigned]);
+  // Keep the full elapsed lesson inside configured Istanbul availability at any runner time.
+  const elapsed=new Date();elapsed.setUTCHours(9,0,0,0);if(+elapsed>=Date.now())elapsed.setUTCDate(elapsed.getUTCDate()-1);
+  await db.query('update core.sessions set starts_at=$1,ends_at=$2 where id=$3',[elapsed,new Date(+elapsed+3600000),assigned]);
   let v=await get(assigned);await mut('attendance_mark_v1',{reservation_id:own,expected_version:v.entries[0].version,result:'attended'},key(),instructor.u);
   v=await must(instructor.u,'attendance_get_v1',scope({session_id:assigned}));assert.equal(v.entries[0].eligibility_snapshot,null);
   await publish('debt_participation',{kind:'boolean',value:true});

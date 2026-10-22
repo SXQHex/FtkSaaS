@@ -1,4 +1,20 @@
 import test from 'node:test';import assert from 'node:assert/strict';import fs from 'node:fs';import Ajv from 'ajv/dist/2020.js';import addFormats from 'ajv-formats';import {validate,version} from 'uuid';import {newUuidV7,newOperation} from '../scripts/uuid.mjs';
+test('P05 Storage adapter checks actual bytes/hash/mime/size and returns no internal origin',async()=>{
+ const {build}=await import('esbuild');const built=await build({entryPoints:['supabase/functions/backend-v1/document-storage.ts'],bundle:true,platform:'browser',format:'esm',write:false});
+ const {documentStorage,contentHash}=await import('data:text/javascript;base64,'+Buffer.from(built.outputFiles[0].text).toString('base64'));
+ const bytes=new TextEncoder().encode('P05 synthetic body'),checksum=await contentHash(bytes),object=newUuidV7()+'/'+newUuidV7();
+ const storage=documentStorage('http://private-kong.invalid','synthetic-service-key',async(url,options)=>{
+  assert.equal(options.headers.authorization,'Bearer synthetic-service-key');
+  if(options.method==='POST'){assert.equal(JSON.parse(options.body).upsert,false);return Response.json({url:'/object/upload/sign/ftksaas-documents/'+object+'?token=synthetic-upload-token'});}
+  return new Response(bytes,{headers:{'content-type':'text/plain'}});
+ });
+ assert((await storage.upload(object)).startsWith('/storage/v1/object/upload/sign/'));assert.equal((await storage.download(object,{bytes:bytes.length,mime:'text/plain',checksum})).checksum,checksum);
+ await assert.rejects(storage.download(object,{bytes:1,mime:'text/plain'}),/SIZE/);
+ await assert.rejects(storage.download(object,{bytes:bytes.length,mime:'text/plain',checksum:'0'.repeat(64)}),/CHECKSUM/);
+ await assert.rejects(storage.download(object,{bytes:bytes.length,mime:'application/pdf'}),/MIME/);
+ await assert.rejects(storage.upload('../other-org'),/PATH/);
+ const fakePdf=documentStorage('http://private-kong.invalid','synthetic',async()=>new Response('not a pdf',{headers:{'content-type':'application/pdf'}}));await assert.rejects(fakePdf.download(object),/MIME/);
+});
 const p=JSON.parse(fs.readFileSync('contracts/08-FtkSaaS-tip-ve-operasyon-sozlesmesi.json'));const a=new Ajv({strict:false,allErrors:true});addFormats(a);a.addSchema(p,'contract');const valid=(n,x)=>a.getSchema('contract#/$defs/'+n)(x);const id=newUuidV7();
 test('UUIDv7 generator: RFC version/variant, uniqueness, current approximate timestamp',()=>{const before=Date.now();const ids=Array.from({length:20000},newUuidV7);const after=Date.now();assert.equal(new Set(ids).size,ids.length);for(const x of ids){assert(validate(x));assert.equal(version(x),7);const ms=parseInt(x.replaceAll('-','').slice(0,12),16);assert(ms>=before&&ms<=after);}});
 test('retry preserves frozen operation key',()=>{const operation=newOperation();const attempt2={...operation,request_id:newUuidV7()};assert.equal(operation.operation_key,attempt2.operation_key);assert.notEqual(operation.request_id,attempt2.request_id);});
