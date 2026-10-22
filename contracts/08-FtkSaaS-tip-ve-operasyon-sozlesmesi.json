@@ -69,7 +69,8 @@
     "ReauthProof": {
       "type": "string",
       "minLength": 1,
-      "writeOnly": true
+      "writeOnly": true,
+      "description": "Native Supabase access token from a fresh authenticated session. Edge verifies same user; SQL validates session freshness using explicit deployment config. Refreshing an old session is insufficient. Never retained in audit/request context."
     },
     "RateBps": {
       "type": "integer",
@@ -2997,6 +2998,9 @@
             "linked_history"
           ],
           "additionalProperties": false
+        },
+        "lifecycle_impact": {
+          "$ref": "#/$defs/LifecycleImpact"
         }
       },
       "required": [
@@ -4895,6 +4899,9 @@
               "type": "null"
             }
           ]
+        },
+        "privacy": {
+          "$ref": "#/$defs/PrivacyProgress"
         }
       },
       "required": [
@@ -16057,7 +16064,14 @@
           "$ref": "#/$defs/FtkUuid"
         },
         "org_id": {
-          "$ref": "#/$defs/FtkUuid"
+          "anyOf": [
+            {
+              "$ref": "#/$defs/FtkUuid"
+            },
+            {
+              "type": "null"
+            }
+          ]
         },
         "center_id": {
           "anyOf": [
@@ -16079,7 +16093,8 @@
         "org_id",
         "job_id"
       ],
-      "additionalProperties": false
+      "additionalProperties": false,
+      "x-invariant": "org_id null is only for the separate global account privacy queue; actual session and explicit worker/account scope required. Ordinary tenant jobs still require a real org."
     },
     "Success_job_status_get": {
       "type": "object",
@@ -16669,7 +16684,14 @@
           "$ref": "#/$defs/FtkUuid"
         },
         "org_id": {
-          "$ref": "#/$defs/FtkUuid"
+          "anyOf": [
+            {
+              "$ref": "#/$defs/FtkUuid"
+            },
+            {
+              "type": "null"
+            }
+          ]
         },
         "center_id": {
           "anyOf": [
@@ -16699,7 +16721,8 @@
         "job_id",
         "lease_token"
       ],
-      "additionalProperties": false
+      "additionalProperties": false,
+      "x-invariant": "org_id null is only for the separate global account privacy queue; actual session and explicit worker/account scope required. Ordinary tenant jobs still require a real org."
     },
     "Success_privacy_execute": {
       "type": "object",
@@ -42003,6 +42026,95 @@
         "opening_debt_totals",
         "original_credit_basis_totals"
       ]
+    },
+    "LifecycleImpact": {
+      "type": "object",
+      "properties": {
+        "active_account_links": {
+          "$ref": "#/$defs/Count"
+        },
+        "open_sessions": {
+          "$ref": "#/$defs/Count"
+        },
+        "open_requests": {
+          "$ref": "#/$defs/Count"
+        },
+        "active_reservations": {
+          "$ref": "#/$defs/Count"
+        },
+        "active_event_registrations": {
+          "$ref": "#/$defs/Count"
+        },
+        "open_debts": {
+          "$ref": "#/$defs/Count"
+        },
+        "student_credit_accounts": {
+          "$ref": "#/$defs/Count"
+        },
+        "export_operation": {
+          "const": "report_export_start_v1"
+        },
+        "export_requires_scope_check": {
+          "const": true
+        },
+        "export_before_closure": {
+          "const": true
+        },
+        "physical_erasure_complete": {
+          "const": false
+        }
+      },
+      "required": [
+        "active_account_links",
+        "open_sessions",
+        "open_requests",
+        "active_reservations",
+        "active_event_registrations",
+        "open_debts",
+        "student_credit_accounts",
+        "export_operation",
+        "export_requires_scope_check",
+        "export_before_closure",
+        "physical_erasure_complete"
+      ],
+      "additionalProperties": false
+    },
+    "PrivacyProgress": {
+      "type": "object",
+      "properties": {
+        "request_state": {
+          "$ref": "#/$defs/PrivacyState"
+        },
+        "completed_at": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Instant"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "pending_scopes": {
+          "type": "array",
+          "items": {
+            "enum": [
+              "database",
+              "auth",
+              "storage",
+              "exports",
+              "backups"
+            ]
+          },
+          "uniqueItems": true
+        }
+      },
+      "required": [
+        "request_state",
+        "completed_at",
+        "pending_scopes"
+      ],
+      "additionalProperties": false
     }
   },
   "x-contract": {
@@ -44432,7 +44544,7 @@
           "A55"
         ],
         "configuration_policy": "numeric plan limits/prices and legal approval are deployment configuration, never arbitrary allow/deny",
-        "implementation_status": "contract_only",
+        "implementation_status": "operational_development_limited",
         "required_features": [
           "F06"
         ],
@@ -44446,12 +44558,12 @@
           "read_operation": "management_state_get_v1",
           "atomic_effects": [],
           "business_commit": false,
-          "read_path_status": "contract_only",
+          "read_path_status": "implemented",
           "source_decision": "DS-2026-10-17"
         },
         "decision_delivery": {
           "accepted_contract": "DS-2026-10-17",
-          "runtime_conformance": "pending",
+          "runtime_conformance": "implemented_pending_ci",
           "open_dependencies": [],
           "target_request": {
             "$ref": "#/$defs/Request_account_delete_preview"
@@ -44534,7 +44646,7 @@
           "A55"
         ],
         "configuration_policy": "numeric plan limits/prices and legal approval are deployment configuration, never arbitrary allow/deny",
-        "implementation_status": "contract_only",
+        "implementation_status": "operational_development_limited",
         "required_features": [
           "F06"
         ],
@@ -44550,12 +44662,12 @@
             "accounts.versioned_domain_change"
           ],
           "business_commit": true,
-          "read_path_status": "contract_only",
+          "read_path_status": "implemented",
           "source_decision": "DS-2026-10-17"
         },
         "decision_delivery": {
           "accepted_contract": "DS-2026-10-17",
-          "runtime_conformance": "pending",
+          "runtime_conformance": "implemented_pending_ci",
           "open_dependencies": [],
           "target_request": {
             "$ref": "#/$defs/Request_account_delete_apply"
@@ -45062,7 +45174,7 @@
           "A55"
         ],
         "configuration_policy": "numeric plan limits/prices and legal approval are deployment configuration, never arbitrary allow/deny",
-        "implementation_status": "contract_only",
+        "implementation_status": "operational_development_limited",
         "required_features": [
           "F01",
           "F32"
@@ -45077,12 +45189,12 @@
           "read_operation": "management_state_get_v1",
           "atomic_effects": [],
           "business_commit": false,
-          "read_path_status": "contract_only",
+          "read_path_status": "implemented",
           "source_decision": "DS-2026-10-17"
         },
         "decision_delivery": {
           "accepted_contract": "DS-2026-10-17",
-          "runtime_conformance": "pending",
+          "runtime_conformance": "implemented_pending_ci",
           "open_dependencies": [],
           "target_request": {
             "$ref": "#/$defs/Request_organization_close_preview"
@@ -45166,7 +45278,7 @@
           "A55"
         ],
         "configuration_policy": "numeric plan limits/prices and legal approval are deployment configuration, never arbitrary allow/deny",
-        "implementation_status": "contract_only",
+        "implementation_status": "operational_development_limited",
         "required_features": [
           "F01",
           "F32"
@@ -45183,12 +45295,12 @@
             "organizations.versioned_domain_change"
           ],
           "business_commit": true,
-          "read_path_status": "contract_only",
+          "read_path_status": "implemented",
           "source_decision": "DS-2026-10-17"
         },
         "decision_delivery": {
           "accepted_contract": "DS-2026-10-17",
-          "runtime_conformance": "pending",
+          "runtime_conformance": "implemented_pending_ci",
           "open_dependencies": [],
           "target_request": {
             "$ref": "#/$defs/Request_organization_close_apply"
@@ -45270,7 +45382,7 @@
           "A55"
         ],
         "configuration_policy": "numeric plan limits/prices and legal approval are deployment configuration, never arbitrary allow/deny",
-        "implementation_status": "contract_only",
+        "implementation_status": "operational_development_limited",
         "required_features": [
           "F01",
           "F32"
@@ -45287,12 +45399,12 @@
             "organizations.versioned_domain_change"
           ],
           "business_commit": true,
-          "read_path_status": "contract_only",
+          "read_path_status": "implemented",
           "source_decision": "DS-2026-10-17"
         },
         "decision_delivery": {
           "accepted_contract": "DS-2026-10-17",
-          "runtime_conformance": "pending",
+          "runtime_conformance": "implemented_pending_ci",
           "open_dependencies": [],
           "target_request": {
             "$ref": "#/$defs/Request_organization_reopen"
@@ -45365,7 +45477,7 @@
           "A55"
         ],
         "configuration_policy": "numeric plan limits/prices and legal approval are deployment configuration, never arbitrary allow/deny",
-        "implementation_status": "contract_only",
+        "implementation_status": "operational_development_limited",
         "required_features": [
           "F01",
           "F33"
@@ -45380,12 +45492,12 @@
           "read_operation": "management_state_get_v1",
           "atomic_effects": [],
           "business_commit": false,
-          "read_path_status": "contract_only",
+          "read_path_status": "implemented",
           "source_decision": "DS-2026-10-17"
         },
         "decision_delivery": {
           "accepted_contract": "DS-2026-10-17",
-          "runtime_conformance": "pending",
+          "runtime_conformance": "implemented_pending_ci",
           "open_dependencies": [],
           "target_request": {
             "$ref": "#/$defs/Request_organization_delete_preview"
@@ -45470,7 +45582,7 @@
           "A55"
         ],
         "configuration_policy": "numeric plan limits/prices and legal approval are deployment configuration, never arbitrary allow/deny",
-        "implementation_status": "contract_only",
+        "implementation_status": "operational_development_limited",
         "required_features": [
           "F01",
           "F33"
@@ -45487,12 +45599,12 @@
             "organizations.versioned_domain_change"
           ],
           "business_commit": true,
-          "read_path_status": "contract_only",
+          "read_path_status": "implemented",
           "source_decision": "DS-2026-10-17"
         },
         "decision_delivery": {
           "accepted_contract": "DS-2026-10-17",
-          "runtime_conformance": "pending",
+          "runtime_conformance": "implemented_pending_ci",
           "open_dependencies": [],
           "target_request": {
             "$ref": "#/$defs/Request_organization_delete_apply"
@@ -58768,7 +58880,7 @@
           "A55"
         ],
         "configuration_policy": "numeric plan limits/prices and legal approval are deployment configuration, never arbitrary allow/deny",
-        "implementation_status": "contract_only",
+        "implementation_status": "operational_development_limited",
         "required_features": [
           "F32"
         ],
@@ -58784,12 +58896,12 @@
             "saas_subscriptions.versioned_domain_change"
           ],
           "business_commit": true,
-          "read_path_status": "contract_only",
+          "read_path_status": "implemented",
           "source_decision": "DS-2026-10-17"
         },
         "decision_delivery": {
           "accepted_contract": "DS-2026-10-17",
-          "runtime_conformance": "pending",
+          "runtime_conformance": "implemented_pending_ci",
           "open_dependencies": [],
           "target_request": {
             "$ref": "#/$defs/Request_subscription_upgrade_quote"
@@ -58871,7 +58983,7 @@
           "A55"
         ],
         "configuration_policy": "numeric plan limits/prices and legal approval are deployment configuration, never arbitrary allow/deny",
-        "implementation_status": "contract_only",
+        "implementation_status": "operational_development_limited",
         "required_features": [
           "F32"
         ],
@@ -58887,12 +58999,12 @@
             "saas_subscriptions.versioned_domain_change"
           ],
           "business_commit": true,
-          "read_path_status": "contract_only",
+          "read_path_status": "implemented",
           "source_decision": "DS-2026-10-17"
         },
         "decision_delivery": {
           "accepted_contract": "DS-2026-10-17",
-          "runtime_conformance": "pending",
+          "runtime_conformance": "implemented_pending_ci",
           "open_dependencies": [],
           "target_request": {
             "$ref": "#/$defs/Request_subscription_downgrade_request"
@@ -58974,7 +59086,7 @@
           "A55"
         ],
         "configuration_policy": "numeric plan limits/prices and legal approval are deployment configuration, never arbitrary allow/deny",
-        "implementation_status": "contract_only",
+        "implementation_status": "operational_development_limited",
         "required_features": [
           "F32"
         ],
@@ -58990,12 +59102,12 @@
             "saas_change_requests.versioned_domain_change"
           ],
           "business_commit": true,
-          "read_path_status": "contract_only",
+          "read_path_status": "implemented",
           "source_decision": "DS-2026-10-17"
         },
         "decision_delivery": {
           "accepted_contract": "DS-2026-10-17",
-          "runtime_conformance": "pending",
+          "runtime_conformance": "implemented_pending_ci",
           "open_dependencies": [],
           "target_request": {
             "$ref": "#/$defs/Request_subscription_change_cancel"
@@ -59077,7 +59189,7 @@
           "A55"
         ],
         "configuration_policy": "numeric plan limits/prices and legal approval are deployment configuration, never arbitrary allow/deny",
-        "implementation_status": "contract_only",
+        "implementation_status": "operational_development_limited",
         "required_features": [
           "F32"
         ],
@@ -59093,12 +59205,12 @@
             "saas_subscriptions.versioned_domain_change"
           ],
           "business_commit": true,
-          "read_path_status": "contract_only",
+          "read_path_status": "implemented",
           "source_decision": "DS-2026-10-17"
         },
         "decision_delivery": {
           "accepted_contract": "DS-2026-10-17",
-          "runtime_conformance": "pending",
+          "runtime_conformance": "implemented_pending_ci",
           "open_dependencies": [],
           "target_request": {
             "$ref": "#/$defs/Request_subscription_renewal_set"
@@ -59422,7 +59534,7 @@
           "A55"
         ],
         "configuration_policy": "numeric plan limits/prices and legal approval are deployment configuration, never arbitrary allow/deny",
-        "implementation_status": "contract_only",
+        "implementation_status": "operational_development_limited",
         "required_features": [
           "F32"
         ],
@@ -59438,12 +59550,12 @@
             "saas_subscriptions.versioned_domain_change"
           ],
           "business_commit": true,
-          "read_path_status": "contract_only",
+          "read_path_status": "implemented",
           "source_decision": "DS-2026-10-17"
         },
         "decision_delivery": {
           "accepted_contract": "DS-2026-10-17",
-          "runtime_conformance": "pending",
+          "runtime_conformance": "implemented_pending_ci",
           "open_dependencies": [],
           "target_request": {
             "$ref": "#/$defs/Request_saas_grace_extend"
@@ -62959,7 +63071,7 @@
           "VERSION_CONFLICT"
         ],
         "transaction_class": "privacy",
-        "transaction_guarantee": "Atomic privacy_execute.authorized_result; audit + in-app outbox + receipt. External delivery never determines the domain commit.",
+        "transaction_guarantee": "Atomic scoped privacy stage, receipt and private lifecycle audit. Missing retention/hold, Auth, Storage, export or backup purge evidence remains partial; no physical completion is asserted.",
         "transition": {
           "effect": "privacy_execute_append_or_explicit_update",
           "from": [],
@@ -62990,7 +63102,7 @@
           "A55"
         ],
         "configuration_policy": "numeric plan limits/prices and legal approval are deployment configuration, never arbitrary allow/deny",
-        "implementation_status": "contract_only",
+        "implementation_status": "operational_development_limited",
         "required_features": [
           "F33"
         ],
@@ -63001,17 +63113,17 @@
           "target_entity": "account_or_job_scope",
           "version_mode": "append_or_current_scope_lock",
           "version_field": null,
-          "read_operation": "management_state_get_v1",
+          "read_operation": "job_status_get_v1",
           "atomic_effects": [
             "privacy_execute.authorized_result"
           ],
           "business_commit": true,
-          "read_path_status": "contract_only",
+          "read_path_status": "implemented",
           "source_decision": "DS-2026-10-17"
         },
         "decision_delivery": {
           "accepted_contract": "DS-2026-10-17",
-          "runtime_conformance": "pending",
+          "runtime_conformance": "implemented_pending_ci",
           "open_dependencies": [],
           "target_request": {
             "$ref": "#/$defs/Request_privacy_execute"
@@ -63088,7 +63200,7 @@
           "A55"
         ],
         "configuration_policy": "numeric plan limits/prices and legal approval are deployment configuration, never arbitrary allow/deny",
-        "implementation_status": "contract_only",
+        "implementation_status": "operational_development_limited",
         "required_features": [
           "F32"
         ],
@@ -63109,7 +63221,7 @@
         },
         "decision_delivery": {
           "accepted_contract": "DS-2026-10-17",
-          "runtime_conformance": "pending",
+          "runtime_conformance": "implemented_pending_ci",
           "open_dependencies": [],
           "target_request": {
             "$ref": "#/$defs/Request_subscription_boundary_apply"
@@ -65801,7 +65913,16 @@
           "account_link_remove_v1",
           "account_profile_update_v1",
           "person_merge_preview_v1",
-          "person_merge_approve_v1"
+          "person_merge_approve_v1",
+          "subscription_upgrade_quote_v1",
+          "subscription_downgrade_request_v1",
+          "subscription_change_cancel_v1",
+          "subscription_renewal_set_v1",
+          "saas_grace_extend_v1",
+          "account_delete_preview_v1",
+          "organization_close_preview_v1",
+          "organization_reopen_v1",
+          "organization_delete_preview_v1"
         ]
       },
       {

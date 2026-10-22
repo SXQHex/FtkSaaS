@@ -29,7 +29,7 @@ const mutations=[
  ['closure lacks rights effects',p=>op(p,'attendance_close_v1').operation_contract.atomic_effects=[]],
  ['write lacks current-state reader',p=>op(p,'negative_limit_set_v1').operation_contract.read_operation='missing_get_v1'],
  ['row version points at unknown input',p=>op(p,'session_capacity_set_v1').operation_contract.version_field='invented_id'],
- ['current-state read falsely claimed live',p=>op(p,'account_delete_preview_v1').operation_contract.read_path_status='implemented'],
+ ['current-state read falsely claimed live',p=>{op(p,'management_state_get_v1').runtime_selectors=op(p,'management_state_get_v1').runtime_selectors.filter(n=>n!=='account_delete_preview_v1');op(p,'account_delete_preview_v1').operation_contract.read_path_status='implemented';}],
  ['unknown feature reference',p=>op(p,'sale_apply_v1').features.push('F99')],
  ['missing F33 trace',p=>delete p['x-contract'].feature_delivery.F33],
  ['operation count treated as feature completion',p=>p['x-contract'].feature_delivery.F14.acceptance='complete'],

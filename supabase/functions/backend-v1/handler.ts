@@ -1,3 +1,4 @@
+import {lifecycleReauth} from './lifecycle-auth.ts';
 import {passwordChallenge,passwordRecovery} from './account-auth.ts';
 import {publicIngress,verifyPublicBot} from "./public-ingress.ts";
 import {importStorage,parseImportCsv} from "./import-file.ts";
@@ -71,6 +72,9 @@ Deno.serve(async req=>{
     const b64=(x:Uint8Array)=>btoa(String.fromCharCode(...x));
     invite={token_hash,sealed_token:JSON.stringify({iv:b64(iv),cipher:b64(new Uint8Array(cipher))})};
    }
+  }
+  if(operation==='account_delete_apply_v1'||operation==='organization_delete_apply_v1'||(operation==='job_status_get_v1'&&request.org_id===null)){
+   const proof=await lifecycleReauth(base,key,(operation==='job_status_get_v1'?authorization.slice(7):request.reauth),user.id);if(proof.error)return failure(proof.error,proof.error==='AUTH_REQUIRED'?401:503);invite=proof.context!;
   }
   const storage=documentStorage(base,key);
   const imports=importStorage(base,key);

@@ -11,6 +11,7 @@ create function private.p07_boundary(org uuid,sub_id uuid,operation_id uuid,ids 
 #variable_conflict use_column
 declare s core.saas_subscriptions;c core.saas_change_requests;p core.saas_plan_versions;owner uuid;changed bool:=false;at timestamptz:=clock_timestamp();
 begin
+ if not exists(select 1 from core.organizations where id=org and state='active') then return jsonb_build_object('type','saas_subscriptions','id',sub_id);end if;
  select * into s from core.saas_subscriptions where org_id=org and id=sub_id for update;if s.id is null then perform private.fail('NOT_FOUND');end if;
  select * into c from core.saas_change_requests where org_id=org and state='scheduled' and effective_at<=at order by effective_at,id limit 1 for update;
  if c.id is not null then
@@ -42,7 +43,7 @@ create function private.p07_jobs_claim(org uuid,ids uuid[],lim int default 1) re
 declare j core.outbox_jobs;s core.saas_subscriptions;c private.p07_jobs;id uuid;token text;idx int:=20;data jsonb:='[]';
 begin
  perform private.p07_worker_scope(org);if lim not between 1 and 50 then perform private.fail('VALIDATION_FAILED');end if;
- perform 1 from core.organizations where id=org for update;
+ perform 1 from core.organizations where id=org and state='active' for update;if not found then return '[]'::jsonb;end if;
  for s in select x.* from core.saas_subscriptions x where x.org_id=org and ((x.period_end<=clock_timestamp() and x.state not in ('pending_payment','ended') and (x.state='active' or (x.state='grace' and coalesce(x.grace_until,x.period_end+interval '7 days')<=clock_timestamp()))) or exists(select 1 from core.saas_change_requests z where z.org_id=org and z.state='scheduled' and z.effective_at<=clock_timestamp())) order by x.created_at,x.id desc limit 1 loop
   id:=private.new_id(ids,idx);idx:=idx+1;
   insert into core.outbox_jobs(id,org_id,kind,dedupe_key,state,attempts,next_attempt_at) values(id,org,'p07.boundary','p07.boundary:'||s.id::text||':'||s.version::text,'pending',0,clock_timestamp()) on conflict(org_id,dedupe_key) do nothing;

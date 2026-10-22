@@ -9,12 +9,13 @@ create function private.p07_subscription_management(r jsonb,org uuid,actor uuid,
 #variable_conflict use_column
 declare s core.saas_subscriptions;c core.saas_change_requests;op text:=r->>'operation';vals jsonb:='{}';id uuid;typ text;v bigint;state text;
 begin
+ if r#>>'{selector,operation}' is distinct from op then perform private.fail('VALIDATION_FAILED');end if;
  if op='saas_grace_extend_v1' then if not platform then perform private.fail('FORBIDDEN');end if;
  elsif actor is distinct from (select owner_person_id from core.organizations where id=org) then perform private.fail('FORBIDDEN');end if;
  select * into s from core.saas_subscriptions where org_id=org order by created_at desc,id desc limit 1;
  id:=s.id;typ:='saas_subscriptions';v:=s.version;state:=s.state;
  if op='subscription_change_cancel_v1' then
-  select * into c from core.saas_change_requests where org_id=org and id=(r#>>'{entity,id}')::uuid;if c.id is null then perform private.fail('NOT_FOUND');end if;id:=c.id;typ:='saas_change_requests';v:=c.version;state:=c.state;vals:=jsonb_build_object('change_id',id);
+  select * into c from core.saas_change_requests where org_id=org and id=(r#>>'{selector,key,change_id}')::uuid;if c.id is null then perform private.fail('NOT_FOUND');end if;id:=c.id;typ:='saas_change_requests';v:=c.version;state:=c.state;vals:=jsonb_build_object('change_id',id);
  elsif op='subscription_renewal_set_v1' then vals:=jsonb_build_object('renew',not s.cancel_at_period_end);
  elsif op='saas_grace_extend_v1' then vals:=jsonb_build_object('until',s.grace_until);
  elsif op in ('subscription_upgrade_quote_v1','subscription_downgrade_request_v1') then

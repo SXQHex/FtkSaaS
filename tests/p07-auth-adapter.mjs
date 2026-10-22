@@ -27,3 +27,19 @@ test('P07 recovery requires signed ingress and correct single-purpose bot proof 
  const unavailable=async(url,options)=>String(url).includes('turnstile')?provider(url,options):Response.json({message:'private provider detail'},{status:500});
  assert.deepEqual(await passwordRecovery(request(),body,JSON.parse(body),'http://kong:8000','synthetic',env,rpc,unavailable),{error:'TEMPORARY_FAILURE'});
 });
+const lifecycle=await build({entryPoints:['supabase/functions/backend-v1/lifecycle-auth.ts'],bundle:true,platform:'browser',format:'esm',write:false});
+const {lifecycleReauth}=await import('data:text/javascript;base64,'+Buffer.from(lifecycle.outputFiles[0].text).toString('base64'));
+test('P07 deletion reauth trusts native verification, binds the same user/session and returns no bearer proof',async()=>{
+ const id='01900000-0000-7000-8000-000000000001',session='01900000-0000-7000-8000-000000000002';
+ const token=claims=>'header.'+Buffer.from(JSON.stringify(claims)).toString('base64url')+'.signature';
+ const proof=token({sub:id,session_id:session});let calls=0;
+ const provider=async(url,options)=>{calls++;assert.equal(url,'https://synthetic.supabase.co/auth/v1/user');assert.equal(options.headers.authorization,'Bearer '+proof);return Response.json({id});};
+ const result=await lifecycleReauth('https://synthetic.supabase.co','synthetic',proof,id,provider);
+ assert.deepEqual(result,{context:{reauth_verified:true,reauth_auth_id:id,reauth_session_id:session}});assert(!JSON.stringify(result).includes(proof));assert.equal(calls,1);
+ assert.deepEqual(await lifecycleReauth('x','k',proof,id,async()=>Response.json({}, {status:401})),{error:'AUTH_REQUIRED'});
+ assert.deepEqual(await lifecycleReauth('x','k',proof,id,async()=>Response.json({id:session})),{error:'AUTH_REQUIRED'});
+ assert.deepEqual(await lifecycleReauth('x','k',token({sub:session,session_id:session}),id,async()=>Response.json({id})),{error:'AUTH_REQUIRED'});
+ assert.deepEqual(await lifecycleReauth('x','k',token({sub:id}),id,async()=>Response.json({id})),{error:'AUTH_REQUIRED'});
+ assert.deepEqual(await lifecycleReauth('x','k',proof,id,async()=>Response.json({message:'private detail'}, {status:500})),{error:'TEMPORARY_FAILURE'});
+ assert.deepEqual(await lifecycleReauth('x','k','x'.repeat(16385),id,()=>{throw Error('must not call provider');}),{error:'AUTH_REQUIRED'});
+});

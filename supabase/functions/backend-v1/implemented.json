@@ -185,6 +185,20 @@
     "account_password_reset_request_v1",
     "person_merge_preview_v1",
     "person_merge_approve_v1",
-    "person_merge_apply_v1"
+    "person_merge_apply_v1",
+    "account_delete_preview_v1",
+    "account_delete_apply_v1",
+    "organization_close_preview_v1",
+    "organization_close_apply_v1",
+    "organization_reopen_v1",
+    "organization_delete_preview_v1",
+    "organization_delete_apply_v1",
+    "subscription_upgrade_quote_v1",
+    "subscription_downgrade_request_v1",
+    "subscription_change_cancel_v1",
+    "subscription_renewal_set_v1",
+    "saas_grace_extend_v1",
+    "privacy_execute_v1",
+    "subscription_boundary_apply_v1"
   ]
 }
