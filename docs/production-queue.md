@@ -33,6 +33,7 @@ Geliştirme/test Supabase `gwyprhenabtpkbojephw`, kabul edilmiş main `006ad3691
 | P06 | Rapor, import ve işlem izleme | 13 | done | PR38/main006ad36; aday39779013518/main39782197422/CD39785146645 success;54 migration/Edge7 |
 | OPS-W01 | Hosted worker işletimi | — | done | d1830c8 main/CD kabulü; Cron2/3/4 healthy idle ve disable-restart geçti; tenant binding0 |
 | P07 | Hesap, organizasyon ve abonelik yaşam döngüsü | 22 | in_progress (Draft P07-A 8/8 kaynak) | PR39 kabulü sonrası PR40 clean |
+| P08 | Geliştirmeler | — | queued | Ayrı kontenjanlar, sınırsız etkinlik ve paket ders/etkinlik kapsamları; mevcut kurulum20 kontenjan/4 etkinlik katılımı/100 tekrar |
 
 ## Ajanın kuyruk bakımı
 
@@ -156,3 +157,16 @@ Dış e-posta sağlayıcısı gerektiren parola sıfırlama akışında erteleme
 Kabul: eski oturumun reddi; abonelik sınır anları; kapatma/izinli geri dönüş; silme sonrası yeniden canlanmama/tenant izolasyonu.
 
 
+
+### P08 — Geliştirmeler
+
+22 Ekim kullanıcı kararı: mevcut kurulum mevcut API’lerle ilerler; aşağıdaki genişletmeler P08 kapsamındadır, şimdi uygulanmaz ve P07’ye eklenmez. API sayısı/DTO/runtime/migration bu kayıtla değişmez.
+
+- Cinsiyete göre ayrı ders kontenjanı: istenen10 erkek+10 kadın sınırları, toplam/oda kapasitesiyle birlikte yetkili rezervasyon ve yarış kapılarında uygulanmalı. Mevcut kurulumda kategori ayrımı yok, toplam kontenjan20.
+- Sınırsız etkinlik kapasitesinin açık temsili: sihirli büyük sayı veya0 ile taklit edilmemeli. Mevcut kurulumda etkinlik dahil sonlu kontenjan20 kullanılır.
+- Tek pakette ders ve etkinlik katılım haklarının açık ilişkisi:4 ders+4 etkinlik katılımı talebi, ders bakiyesinden etkinlik katılımı düşmeden ayrı izlenmeli. “Pratik” yalnız etkinliğin adıdır; mevcut core.events/event API modeli kullanılır, ayrı pratik modülü veya kayıt türü açılmaz. Ders hakkı bittiğinde veya paket geçerliliği bittiğinde pakete bağlı ücretsiz pratik uygunluğu kapanır; geçmiş hareket silinmez. Ders/pratik kullanımını aynı mevcut4 kredilik ortak havuzla eşitleme. Mevcut API’de ayrı ürün/satış hakları varsa yalnız açık kaynak bağlarıyla kullanılabilir; tek paket/bundle ve ortak sona erme desteği uygulanmış sayılmaz.
+- İlk kurulumdaki doğrulanmış owner Auth hesabı ve Business planının fiyat/dönem/limit tanımı operasyonel ön koşullardır; yeni geliştirme gibi veya hazırmış gibi gösterilmez. Gerçek doğrulama/konfigürasyon olmadan hesap doğrulanmış, ödeme yapılmış veya ücretsiz Business planı var sayılmaz.
+
+Mevcut kurulum kararı: sonlu100 haftalık tekrar, toplam kontenjan20, paket başına4 ders/4 etkinlik katılımı; paket geçerliliği2 ay. Bu kurulumdaki ikinci paket henüz sipariş aşamasındadır; kendiliğinden ikinci satış/borç/hak değildir. Bu örnek mevcut borçlu satış kurallarını genel olarak kaldırmaz. Gerçek ödenmemiş borç katılımı engeller; ders için negatif hak alt sınırı−2, etkinlikte negatif kredi yasağı korunur. Kapalı grupta öğrenci iptali hak iadesi sağlamaz; fiilî yoklama gerçeği kaydedilir.
+
+“Sonraki hafta” ek pratik süresi kaldırılmıştır ve açık iş değildir. Süresiz tekrar isteği mevcut kurulumda100 tekrar ile karşılanır; bu nedenle ayrıca süresiz program geliştirmesi açılmaz. Son kaynak incelemesi ve full/main clean kapıları hiçbir P08 maddesiyle gevşetilmez.

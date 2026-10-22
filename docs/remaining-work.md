@@ -98,3 +98,9 @@ Bu maddeler ve yalnız sözleşme işlemleri kapanmış sayılmaz. Frontend tasa
 ## Geliştirme CI süresi
 
 P02 kaynak modülleri hedefli profil haritasında tanımlı olmadığı için39448566998 güvenli fallback ile15 API suite’inin tamamını seri çalıştırdı (43:33). Dar ve kanıtlı P02 seçici profili ayrı CI bakımı olarak açıktır; güvenilir politika kurulumu için önceki tek seferlik izinler yeniden kullanılamaz. Test kapsamını azaltmak veya hosted smoke’u full clean yerine geçirmek çözüm değildir.
+
+## P08 — Geliştirmeler
+
+[Üretim kuyruğundaki P08](production-queue.md#p08--geliştirmeler): ayrı kadın/erkek kontenjanı, açık sınırsız etkinlik kapasitesi ve tek paket altında ders/etkinlik katılım haklarının ayrı takibi ile ders hakkı bitince pratik uygunluğunun kapanması. Şimdilik toplam kontenjan20,4 etkinlik katılım hakkı ve100 haftalık tekrar kararı geçerlidir. Ortak4 kredilik havuz,4 ders+4 bağımsız etkinlik katılımı demek değildir; mevcut API’de ayrı ürün kullanımı varsa kaynak bağlarıyla değerlendirilir. Auth hesabı doğrulaması/Business plan konfigürasyonu operasyonel kurulum ön koşullarıdır. Yeni runtime terfisi yok. Kaldırılan “sonraki hafta” kuralı ve süresiz program bu açık listeye eklenmez.
+
+Adlandırma düzeltmesi: “Pratik” etkinliğin adıdır; mevcut etkinlik modeli kullanılır. Ayrı pratik modülü/türü geliştirme işi yoktur.
