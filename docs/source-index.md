@@ -1,5 +1,7 @@
 # FtkSaaS kaynak indeksi
 
+P08 tartışılacaklara sınırsız Business limitlerinin sözleşme/runtime uyumsuzluğu eklendi. Mevcut kurulum sonlu aktif öğrenci1000/eğitmen50/merkez5 ile ilerler; ayrıntı üretim kuyruğundadır.
+
 P08 — Geliştirmeler kuyruğa eklendi: [kapsam ve mevcut kurulum değerleri](production-queue.md#p08--geliştirmeler). Yeni özellikler P07 kabulüne eklenmez; kontenjan20/etkinlik katılımı4/tekrar100, runtime terfisi yok.
 
 22 Ekim son kullanıcı kararı: P07-A+B+C tek Draft PR40 içinde bağımlılık sırasıyla geliştirilir ve birlikte merge edilir. Ayrı A/B/C merge/kabul döngüleri kaldırıldı. GitHub servisleri normale dönene kadar manuel CI, rerun, aday label ve merge başlatılmaz; geliştirme commitlerinde geçici `[skip ci]` kullanılarak push kaynaklı pahalı CI ertelenir. Workflow veya kabul kapısı değiştirilmez. Yerel odaklı doğrulamalar sürer. Servisler normale dönünce PR39 main39809302120 attempt6/CD39820836027 attempt2/OPS hosted kapanışı doğrulanmıştır; sırada tamamlanmış P07 için son kaynak bağımsız inceleme, tek aday full clean, merge ve aynı main clean/CD sırasıyla yapılır. Eski/skipped CI kabul değildir; bütün22 API tamamlanmış sayılmaz: A8 kaynak hazır, B6/C8 geliştirme sırasındadır.
