@@ -47307,7 +47307,7 @@
           "A55"
         ],
         "configuration_policy": "numeric plan limits/prices and legal approval are deployment configuration, never arbitrary allow/deny",
-        "implementation_status": "contract_only",
+        "implementation_status": "operational_development_limited",
         "required_features": [
           "F04"
         ],
@@ -47323,12 +47323,12 @@
             "invitations.versioned_domain_change"
           ],
           "business_commit": true,
-          "read_path_status": "contract_only",
+          "read_path_status": "implemented",
           "source_decision": "DS-2026-10-17"
         },
         "decision_delivery": {
           "accepted_contract": "DS-2026-10-17",
-          "runtime_conformance": "pending",
+          "runtime_conformance": "implemented_pending_ci",
           "open_dependencies": [],
           "target_request": {
             "$ref": "#/$defs/Request_account_access_revoke"
@@ -47534,7 +47534,7 @@
           "A55"
         ],
         "configuration_policy": "numeric plan limits/prices and legal approval are deployment configuration, never arbitrary allow/deny",
-        "implementation_status": "contract_only",
+        "implementation_status": "operational_development_limited",
         "required_features": [
           "F04"
         ],
@@ -47547,15 +47547,18 @@
           "version_field": "link_id",
           "read_operation": "management_state_get_v1",
           "atomic_effects": [
-            "account_links.versioned_domain_change"
+            "account_links.versioned_domain_change",
+            "role_assignments.revoke_link_roles",
+            "permission_overrides.disable",
+            "settlement_grants.disable"
           ],
           "business_commit": true,
-          "read_path_status": "contract_only",
+          "read_path_status": "implemented",
           "source_decision": "DS-2026-10-17"
         },
         "decision_delivery": {
           "accepted_contract": "DS-2026-10-17",
-          "runtime_conformance": "pending",
+          "runtime_conformance": "implemented_pending_ci",
           "open_dependencies": [],
           "target_request": {
             "$ref": "#/$defs/Request_account_link_remove"
@@ -65720,7 +65723,9 @@
           "report_export_start_v1",
           "import_upload_prepare_v1",
           "import_preview_v1",
-          "import_apply_v1"
+          "import_apply_v1",
+          "account_access_revoke_v1",
+          "account_link_remove_v1"
         ]
       },
       {

@@ -1,6 +1,6 @@
 # FtkSaaS — API kataloğu · 0.2.0-rc.3
 
-200 sözleşme; 178 geliştirme ortamında çağrılabilir endpoint, 22 yalnız sözleşme. Çağrılabilir olmak bütün ürün özelliklerinin veya üretim kabulünün tamamlandığı anlamına gelmez. Kapsam sınırları ve Q-E01 `docs/claude-handover.md` içindedir.
+200 sözleşme; 180 geliştirme ortamında çağrılabilir endpoint, 20 yalnız sözleşme. Çağrılabilir olmak bütün ürün özelliklerinin veya üretim kabulünün tamamlandığı anlamına gelmez. Kapsam sınırları ve Q-E01 `docs/claude-handover.md` içindedir.
 
 `POST {API_URL}/functions/v1/backend-v1/{operation}`; JSON gövde doğrudan typed Request nesnesidir. Header: `Authorization: Bearer <Supabase access_token>`, `apikey: <publishable key>`, `Content-Type: application/json`. Başarı: `ok/data/trace_id`; hata: `ok:false/error:SafeError`. Servis anahtarı frontend’e verilmez.
 
@@ -39,9 +39,9 @@ Named `/rest/v1/rpc/{operation}` yalnız backend içindir; imzası p_request + d
 | `org_manager_revoke_v1` | çağrılabilir (kapsam notları geçerli) | `org.owner` | W / config | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; center_id?: FtkUuid ∣ null; operation_key: FtkUuid; expected_version: PositiveInt; person_id: FtkUuid; reason: Text | Success_org_manager_revoke |
 | `manager_self_assign_center_v1` | çağrılabilir (kapsam notları geçerli) | `org.manage` | W / bootstrap | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; center_id?: FtkUuid ∣ null; operation_key: FtkUuid; target_center_id: FtkUuid | Success_manager_self_assign_center |
 | `account_access_send_v1` | çağrılabilir (kapsam notları geçerli) | `invite.student` | E / invite | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; center_id?: FtkUuid ∣ null; operation_key: FtkUuid; person_id: FtkUuid | Success_account_access_send |
-| `account_access_revoke_v1` | yalnız sözleşme | `invite.student` | W / invite | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; center_id?: FtkUuid ∣ null; operation_key: FtkUuid; expected_version: PositiveInt; invitation_id: FtkUuid | Success_account_access_revoke |
+| `account_access_revoke_v1` | çağrılabilir (kapsam notları geçerli) | `invite.student` | W / invite | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; center_id?: FtkUuid ∣ null; operation_key: FtkUuid; expected_version: PositiveInt; invitation_id: FtkUuid | Success_account_access_revoke |
 | `account_access_accept_v1` | çağrılabilir (kapsam notları geçerli) | `invite.accept` | E / invite | client_api_version: 1; request_id: FtkUuid; operation_key: FtkUuid; token: Secret | Success_account_access_accept |
-| `account_link_remove_v1` | yalnız sözleşme | `center.manage` | W / config | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; center_id?: FtkUuid ∣ null; operation_key: FtkUuid; expected_version: PositiveInt; link_id: FtkUuid; reason: Text | Success_account_link_remove |
+| `account_link_remove_v1` | çağrılabilir (kapsam notları geçerli) | `center.manage` | W / config | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; center_id?: FtkUuid ∣ null; operation_key: FtkUuid; expected_version: PositiveInt; link_id: FtkUuid; reason: Text | Success_account_link_remove |
 | `people_list_v1` | çağrılabilir (kapsam notları geçerli) | `person.read` | R / read | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; center_id?: FtkUuid ∣ null; query?: Text ∣ null; relationship?: RelationshipKind ∣ null; page: Page | Success_people_list |
 | `person_get_v1` | çağrılabilir (kapsam notları geçerli) | `person.read` | R / read | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; center_id?: FtkUuid ∣ null; person_id: FtkUuid | Success_person_get |
 | `person_create_v1` | çağrılabilir (kapsam notları geçerli) | `person.manage` | W / new | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; center_id?: FtkUuid ∣ null; operation_key: FtkUuid; display_name: Text; contacts: ContactInput[] | Success_person_create |
@@ -246,9 +246,9 @@ features ürün referanslarıdır. required_features hedef plan kapısı; runtim
 | org_manager_revoke_v1 | command | row_version / roles_list_v1 | role_assignments.org_manager_inactive | baseline_only_not_full_product_acceptance |
 | manager_self_assign_center_v1 | command | append_or_current_scope_lock / management_state_get_v1 | manager_self_assign_center.authorized_result | baseline_only_not_full_product_acceptance |
 | account_access_send_v1 | command | append_or_current_scope_lock / management_state_get_v1 | invitations.versioned_domain_change | baseline_only_not_full_product_acceptance |
-| account_access_revoke_v1 | command | row_version / management_state_get_v1 | invitations.versioned_domain_change | pending |
+| account_access_revoke_v1 | command | row_version / management_state_get_v1 | invitations.versioned_domain_change | implemented_pending_ci |
 | account_access_accept_v1 | command | append_or_current_scope_lock / management_state_get_v1 | account_links.active, student_self_role_only, invitations.accepted | baseline_only_not_full_product_acceptance |
-| account_link_remove_v1 | command | row_version / management_state_get_v1 | account_links.versioned_domain_change | pending |
+| account_link_remove_v1 | command | row_version / management_state_get_v1 | account_links.versioned_domain_change, role_assignments.revoke_link_roles, permission_overrides.disable, settlement_grants.disable | implemented_pending_ci |
 | people_list_v1 | read | none / None |  | baseline_only_not_full_product_acceptance |
 | person_get_v1 | read | none / None |  | baseline_only_not_full_product_acceptance |
 | person_create_v1 | command | append_or_current_scope_lock / management_state_get_v1 | people.versioned_domain_change | baseline_only_not_full_product_acceptance |

@@ -177,6 +177,8 @@ export const runtimeOperationNames = [
   "operation_status_get_v1",
   "preview_get_v1",
   "job_status_get_v1",
-  "audit_list_v1"
+  "audit_list_v1",
+  "account_access_revoke_v1",
+  "account_link_remove_v1"
 ] as const;
 export type RuntimeOperationName = typeof runtimeOperationNames[number];

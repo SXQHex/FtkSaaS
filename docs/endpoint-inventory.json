@@ -795,8 +795,8 @@
     },
     {
       "name": "account_access_revoke_v1",
-      "status": "contract_only",
-      "external_path": null,
+      "status": "operational_development_limited",
+      "external_path": "/functions/v1/backend-v1/account_access_revoke_v1",
       "permission": "invite.student",
       "features": [
         "F04"
@@ -807,7 +807,7 @@
       "runtime_required_features": [],
       "decision_delivery": {
         "accepted_contract": "DS-2026-10-17",
-        "runtime_conformance": "pending",
+        "runtime_conformance": "implemented_pending_ci",
         "open_dependencies": [],
         "target_request": {
           "$ref": "#/$defs/Request_account_access_revoke"
@@ -846,8 +846,8 @@
     },
     {
       "name": "account_link_remove_v1",
-      "status": "contract_only",
-      "external_path": null,
+      "status": "operational_development_limited",
+      "external_path": "/functions/v1/backend-v1/account_link_remove_v1",
       "permission": "center.manage",
       "features": [
         "F04"
@@ -858,7 +858,7 @@
       "runtime_required_features": [],
       "decision_delivery": {
         "accepted_contract": "DS-2026-10-17",
-        "runtime_conformance": "pending",
+        "runtime_conformance": "implemented_pending_ci",
         "open_dependencies": [],
         "target_request": {
           "$ref": "#/$defs/Request_account_link_remove"

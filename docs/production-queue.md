@@ -6,7 +6,7 @@ P06 **done (kod, main ve geliştirme/test kabulü)**: [PR38](https://github.com/
 
 PR36 operasyonel takip kapandı: aynı main [39644044693](https://github.com/SXQHex/FtkSaaS/actions/runs/39644044693) success; [CD39646391222](https://github.com/SXQHex/FtkSaaS/actions/runs/39646391222) success,18 kontrol,52/52 migration, pending[], Edge5 değişmeden ACTIVE/verify_jwt=true. Atomik Management API transport yeni migration olmadan da rollback probe ile doğrulandı. Bot/deneme hedefi hâlâ kullanıcı kararıyla ertelendi; hosted P05 worker kurulmuş değildir.
 
-P01–P06 ve PR36 kabulü kapandı. Aktif OPS-W01 kaynak adayı; P07 queued.
+P01–P06 ve PR36 kabulü kapandı. OPS-W01 PR39 kaynak kabulü bekler; kullanıcı22 Ekim talimatıyla P07-A ilk2 API onun üzerine Draft PR40 olarak geliştirilir; kabul sırası PR39→PR40.
 
 CD-01 **done**: PR32 kurulum + PR33 test fixture düzeltmesi sonrası kabul edilmiş main `0fabf3a4a605dd6be5a1d358c660021f59406e20`. [Main39588975421](https://github.com/SXQHex/FtkSaaS/actions/runs/39588975421) ve [ilk canlı CD39590690817/attempt2](https://github.com/SXQHex/FtkSaaS/actions/runs/39590690817/attempts/2) completed/success. CD receipt aynı source/main/run kabulünü bağlar;17 kontrol başarılı,49 migration içerik eşleşmesi,90 core tablo/RLS, anon/authenticated EXECUTE0, Edge backend-v1 v4 ACTIVE/verify_jwt=true. Gerçek Auth→Edge→RPC, oturum reddi ve fixture temizliği geçti; ayrıca uzak son0 hesap/0 Auth kullanıcısı/0 organizasyon doğrulandı. Envanter199/140 runtime/59 contract_only değişmedi. P04 CRM/public başvuru queued; başlamadı. Hosted worker işletimi, frontend, dış e-posta ve yük/restore bu kapanışla tamamlanmaz.
 
@@ -28,7 +28,7 @@ Geliştirme/test Supabase `gwyprhenabtpkbojephw`, kabul edilmiş main `006ad3691
 | P05 | Belge, bildirim ve otomasyon | 14 | done | PR37; main8364144, aday39745672815/main39748053581/CD39750264949 success; Edge6/53 migration |
 | P06 | Rapor, import ve işlem izleme | 13 | done | PR38/main006ad36; aday39779013518/main39782197422/CD39785146645 success;54 migration/Edge7 |
 | OPS-W01 | Hosted worker işletimi | — | in_progress | Supabase Cron seçildi; native kaynak55 migration; son kaynak/hosted işletim kabulü beklenir |
-| P07 | Hesap, organizasyon ve abonelik yaşam döngüsü | 22 | queued | P06 sonrası |
+| P07 | Hesap, organizasyon ve abonelik yaşam döngüsü | 22 | in_progress (Draft P07-A 2/8) | PR39 kabulü sonrası PR40 clean |
 
 ## Ajanın kuyruk bakımı
 
@@ -108,9 +108,11 @@ PR38/main006ad36, aday39779013518/main39782197422/CD39785146645 başarılarıyla
 
 ### OPS-W01 — Supabase Cron worker işletimi
 
-Kullanıcı22 Ekim Supabase içi barındırmayı seçti. Native p01/p05/p06 dedicated session_user, açık tenant binding, ayrı claim/execute commit'leri, sınırlı bank/retry, heartbeat/durdurma ve kesinti sonrası lease reclaim. [OPS devri](ops-w01-handover.md). Önce son kaynak bağımsız inceleme ve full/main clean/CD; sonra kabul edilmiş install SQL ve hosted heartbeat/durdurma/yeniden başlatma doğrulaması.0 tenant için izin/ürün/config uydurulmaz; işletim boş kuyrukta idle olabilir. P07 bu kapanıştan sonra.
+Kullanıcı22 Ekim Supabase içi barındırmayı seçti. Native p01/p05/p06 dedicated session_user, açık tenant binding, ayrı claim/execute commit'leri, sınırlı bank/retry, heartbeat/durdurma ve kesinti sonrası lease reclaim. [OPS devri](ops-w01-handover.md). Önce son kaynak bağımsız inceleme ve full/main clean/CD; sonra kabul edilmiş install SQL ve hosted heartbeat/durdurma/yeniden başlatma doğrulaması.0 tenant için izin/ürün/config uydurulmaz; işletim boş kuyrukta idle olabilir. P07 kabulü bu kapanıştan sonradır. Kullanıcı22 Ekim istisnasıyla geliştirme Draft PR40 altında ilerler; full clean/merge bekletilir.
 
 ### P07 — Hesap, organizasyon ve abonelik yaşam döngüsü
+
+İlk Draft PR40 dilimi2/8: davet iptali, org hesap bağlantısını kaldırma ve yönetim sürüm okumaları. Profil/parola/parola kurtarma/üç kişi birleştirme API’si contract_only kalır; A tamamlanmadı. B/C queued. [Taslak devir](p07-a-handover.md).
 
 Ortak üretim promptunu uygula. Durum: queued.
 
