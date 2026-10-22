@@ -2,11 +2,11 @@
 
 P05 **done (kod, main ve geliştirme/test kabulü)**: [PR37](https://github.com/SXQHex/FtkSaaS/pull/37), kabul edilmiş main `83641447b29e459236aea1a9a4379b5d19825af6`;200 sözleşme/165 runtime/35 contract_only,53 migration/90 core tablo. Son head15e2126/base16cb570/tested merge2ebe087/tree736a75b; bağımsız son kaynak incelemesi5611074233, [aday39745672815](https://github.com/SXQHex/FtkSaaS/actions/runs/39745672815) ve [aynı main39748053581](https://github.com/SXQHex/FtkSaaS/actions/runs/39748053581) completed/success. [CD39750264949 attempt1](https://github.com/SXQHex/FtkSaaS/actions/runs/39750264949) success:18 kontrol,53/53 içerik eşleşmesi, P05 migration uygulandı, Edge6 ACTIVE/verify_jwt=true, RLS kapalı0/client RPC EXECUTE0 ve sentetik fixture temizliği. Receipt artifact12412499512 SHA256 `a41a8448c0a1b9dfdf853b58bea7cd56525fd8ede14812684b12619c3c8ee04e`. Eski aday hata kayıtları tarihsel kanıttır; bu kabulün kaynağı değildir.
 
-P06 **kod hazır; aday/main/CD kabulü bekleniyor**: branch `feature/p06-reports-imports`, taban kabul edilmiş main `83641447b29e459236aea1a9a4379b5d19825af6`. Bu adayın envanteri200 sözleşme/178 runtime/22 contract_only,54 migration/90 core tablodur. [P06 devri](p06-handover.md) rapor, CSV import, işlem/önizleme/job/audit okumalarını ve doğrulama sınırını açıklar. P05'in eski başarıları yeni P06 kaynağının kabulü değildir. Ardından OPS-W01 hosted worker kurulumu/kesinti kabulü, sonra P07; barındırma hedefi/dedicated kimlik/tenant config henüz kurulmuş sayılmaz.
+P06 **done (kod, main ve geliştirme/test kabulü)**: [PR38](https://github.com/SXQHex/FtkSaaS/pull/38), main `006ad36918ae823bc10fbdefa2d48901e193121c`;200 sözleşme/178 runtime/22 contract_only,54 migration/90 core tablo. Son headf2f9d6c/base8364144/tested merge1901fc6/treeb486ffe; bağımsız review5614150102, [aday39779013518](https://github.com/SXQHex/FtkSaaS/actions/runs/39779013518), [aynı main39782197422](https://github.com/SXQHex/FtkSaaS/actions/runs/39782197422) ve [CD39785146645 attempt1](https://github.com/SXQHex/FtkSaaS/actions/runs/39785146645) success. CD18 kontrol/54 içerik eşleşmesi/Edge7 ACTIVE/verify_jwt=true/RLS kapalı0/client RPC EXECUTE0 ve fixture temizliği geçti; receipt12428881259 SHA256 `bcd1ab3255c1808982de76c3d09d47d5eaa95c5fb2e8f9f870d3fedc9ce93b65`. Önceki aday hataları tarihsel kanıttır. Aktif OPS-W01 adayı Supabase Cron içindir;55 migration/aynı178 runtime, kaynak ve hosted işletim kabulü beklenir. Tenant config/binding uydurulmaz; P07 queued kalır.
 
 PR36 operasyonel takip kapandı: aynı main [39644044693](https://github.com/SXQHex/FtkSaaS/actions/runs/39644044693) success; [CD39646391222](https://github.com/SXQHex/FtkSaaS/actions/runs/39646391222) success,18 kontrol,52/52 migration, pending[], Edge5 değişmeden ACTIVE/verify_jwt=true. Atomik Management API transport yeni migration olmadan da rollback probe ile doğrulandı. Bot/deneme hedefi hâlâ kullanıcı kararıyla ertelendi; hosted P05 worker kurulmuş değildir.
 
-P01–P05 ve PR36 kabulü kapandı. Aktif aday P06; OPS-W01 ardından P07 queued kalır.
+P01–P06 ve PR36 kabulü kapandı. Aktif OPS-W01 kaynak adayı; P07 queued.
 
 CD-01 **done**: PR32 kurulum + PR33 test fixture düzeltmesi sonrası kabul edilmiş main `0fabf3a4a605dd6be5a1d358c660021f59406e20`. [Main39588975421](https://github.com/SXQHex/FtkSaaS/actions/runs/39588975421) ve [ilk canlı CD39590690817/attempt2](https://github.com/SXQHex/FtkSaaS/actions/runs/39590690817/attempts/2) completed/success. CD receipt aynı source/main/run kabulünü bağlar;17 kontrol başarılı,49 migration içerik eşleşmesi,90 core tablo/RLS, anon/authenticated EXECUTE0, Edge backend-v1 v4 ACTIVE/verify_jwt=true. Gerçek Auth→Edge→RPC, oturum reddi ve fixture temizliği geçti; ayrıca uzak son0 hesap/0 Auth kullanıcısı/0 organizasyon doğrulandı. Envanter199/140 runtime/59 contract_only değişmedi. P04 CRM/public başvuru queued; başlamadı. Hosted worker işletimi, frontend, dış e-posta ve yük/restore bu kapanışla tamamlanmaz.
 
@@ -14,7 +14,7 @@ P03 **done**: [PR #30](https://github.com/SXQHex/FtkSaaS/pull/30), kabul edilmi�
 
 P02 **done**: [PR #28](https://github.com/SXQHex/FtkSaaS/pull/28), kabul edilmiş main `cc4878d09e45204dbc13ccfe1324b38b14548167`. Envanter **199 sözleşme / 133 runtime / 66 contract_only / 40 migration / 90 core tablo**. Son head `35816cc30a9b28e273e94e6cef86e8b402dbaad0` bağımsız incelemeden geçti; [hedefli39448566998](https://github.com/SXQHex/FtkSaaS/actions/runs/39448566998), [aday39455462417](https://github.com/SXQHex/FtkSaaS/actions/runs/39455462417) ve [aynı main39461804543](https://github.com/SXQHex/FtkSaaS/actions/runs/39461804543) completed/success. Full kapsam:96 sözleşme/yönetişim +37 CI politika +27 DB +309 API =469 test düğümü; fail/skipped0. Core, dört izole API shard, toplayıcı,40 migration, seed/health/advisors geçti. Main clean14:43; önceki43:33 hedefli koşu seri tüm-suite fallback kullandı, aynı çalışma profili değildir. Eski başarı yeni kaynağa taşınmaz.
 
-Geliştirme/test Supabase `gwyprhenabtpkbojephw`, kabul edilmiş main `10710ffa90747a7e35c452c4c07ba59522f50ce3` kaynağına eşitlendi:49 migration, Edge backend-v1 sürüm3, verify_jwt=true,140 runtime API. Uzak smoke ve geçici fixture temizliği başarılı; ayrıntılar docs/remote-backend-setup.md içindedir. Hosted worker zamanlayıcısı, ortak tenant/kullanıcı kurulumu, frontend gerçek entegrasyonu, yük/restore, dış e-posta ve production kabulü ayrı açık kalır.
+Geliştirme/test Supabase `gwyprhenabtpkbojephw`, kabul edilmiş main `006ad36918ae823bc10fbdefa2d48901e193121c` kaynağına CD39785146645 ile eşitlendi:54 migration/Edge7/178 runtime,18 kontrol ve fixture temizliği. OPS-W01 native worker kaynağı55 migration taşır; kaynak ve hosted kabulü henüz beklenir. Frontend/dış e-posta/yük/restore ayrı kalır.
 
 | Sıra | Teslim | İşlem | Durum | Kanıt / sonraki adım |
 |---|---|---:|---|---|
@@ -26,8 +26,8 @@ Geliştirme/test Supabase `gwyprhenabtpkbojephw`, kabul edilmiş main `10710ffa9
 | CD-01 | Geliştirme/test Supabase CD | — | done | PR32+33; main0fabf3a /39588975421 success; CD39590690817 attempt2 success,49 migration/Edge4/17 kontrol, fixture temiz |
 | P04 | CRM ve public başvuru | 11 | done | PR35; main7b96d88, aday39630534660/main39633243405/CD39635569033 attempt2 success; hedef gerektiren kurulumlar kullanıcı kararıyla ertelendi |
 | P05 | Belge, bildirim ve otomasyon | 14 | done | PR37; main8364144, aday39745672815/main39748053581/CD39750264949 success; Edge6/53 migration |
-| P06 | Rapor, import ve işlem izleme | 13 | candidate_pending_acceptance | feature/p06-reports-imports;200/178/22,54 migration |
-| OPS-W01 | Hosted worker işletimi | — | queued | P06 sonunda; dedicated kimlik/zamanlama, kesinti sonrası toparlanma; P07 öncesi |
+| P06 | Rapor, import ve işlem izleme | 13 | done | PR38/main006ad36; aday39779013518/main39782197422/CD39785146645 success;54 migration/Edge7 |
+| OPS-W01 | Hosted worker işletimi | — | in_progress | Supabase Cron seçildi; native kaynak55 migration; son kaynak/hosted işletim kabulü beklenir |
 | P07 | Hesap, organizasyon ve abonelik yaşam döngüsü | 22 | queued | P06 sonrası |
 
 ## Ajanın kuyruk bakımı
@@ -104,32 +104,11 @@ Yedi API PR30 ile main10710ffa90747a7e35c452c4c07ba59522f50ce3 kaynağına alın
 
 ### P06 — Rapor, import ve işlem izleme
 
-Kod adayı hazır; bağımsız son kaynak incelemesi + aynı head/base/merge-tree full clean → merge → aynı main clean → development CD kabulü bekleniyor. [P06 devri](p06-handover.md) kapsam ve sınırları taşır.
+PR38/main006ad36, aday39779013518/main39782197422/CD39785146645 başarılarıyla13 API kabul edildi.178 runtime/22 contract_only,54 migration/Edge7. Aktif eski prompt Git geçmişindedir. [P06 devri](p06-handover.md).
 
-**Mevcut sözleşme API'leri (13):**
+### OPS-W01 — Supabase Cron worker işletimi
 
-- `report_get_v1`
-- `report_export_start_v1`
-- `report_file_get_v1`
-- `import_upload_prepare_v1`
-- `import_preview_v1`
-- `import_apply_v1`
-- `import_rows_list_v1`
-- `import_rows_process_v1`
-- `report_build_v1`
-- `operation_status_get_v1`
-- `preview_get_v1`
-- `job_status_get_v1`
-- `audit_list_v1`
-
-**Görev ve kabul:**
-
-Yetkili kullanıcı veri içe/dışa aktarabilsin; uzun veya sonucu belirsiz işi yeniden üretmeden izlesin.
-Önceki teslim için zorunlu olup öne alınmış status/preview/job okumalarını yeniden geliştirme; gerçek durumunu doğrula.
-Rapor/export güncel alan/merkez/plan yetkisine tabi olsun ve bütün yetkili filtreli sonucu kapsasın. Dosya linki yetki yerine geçmesin; audit hassas/başka tenant verisi açmasın.
-Import eşleme/önizleme/doğrulama/satır hatasını tamamla; kişi ve açılış kredi/borçları ilgili modülde izlenebilir oluştur. Aynı kaynak/satır çift kayıt üretmesin, başarılı satırlar yeniden işlenmesin.
-Worker dar yetki/claim/lease/sınırlı retry kullansın. Bağlantı kopması yeni iş başlatmasın. Sonuç okuması özgün işlemin güncel scope yetkisini denetlesin.
-Kabul: upload→preview→apply→satır sonucu; rapor→worker→yetkili indirme; tekrar/hata kurtarma/ilgili iptal ve yetki geri alma.
+Kullanıcı22 Ekim Supabase içi barındırmayı seçti. Native p01/p05/p06 dedicated session_user, açık tenant binding, ayrı claim/execute commit'leri, sınırlı bank/retry, heartbeat/durdurma ve kesinti sonrası lease reclaim. [OPS devri](ops-w01-handover.md). Önce son kaynak bağımsız inceleme ve full/main clean/CD; sonra kabul edilmiş install SQL ve hosted heartbeat/durdurma/yeniden başlatma doğrulaması.0 tenant için izin/ürün/config uydurulmaz; işletim boş kuyrukta idle olabilir. P07 bu kapanıştan sonra.
 
 ### P07 — Hesap, organizasyon ve abonelik yaşam döngüsü
 

@@ -1,5 +1,9 @@
 # P06 — rapor, CSV import ve sonuç kurtarma
 
+P06 **done (kod, main ve geliştirme/test kabulü)**: [PR38](https://github.com/SXQHex/FtkSaaS/pull/38), main `006ad36918ae823bc10fbdefa2d48901e193121c`;200 sözleşme/178 runtime/22 contract_only,54 migration/90 core tablo. Son headf2f9d6c/base8364144/tested merge1901fc6/treeb486ffe; bağımsız review5614150102, [aday39779013518](https://github.com/SXQHex/FtkSaaS/actions/runs/39779013518), [aynı main39782197422](https://github.com/SXQHex/FtkSaaS/actions/runs/39782197422) ve [CD39785146645 attempt1](https://github.com/SXQHex/FtkSaaS/actions/runs/39785146645) success. CD18 kontrol/54 içerik eşleşmesi/Edge7 ACTIVE/verify_jwt=true/RLS kapalı0/client RPC EXECUTE0 ve fixture temizliği geçti; receipt12428881259 SHA256 `bcd1ab3255c1808982de76c3d09d47d5eaa95c5fb2e8f9f870d3fedc9ce93b65`. Önceki aday hataları tarihsel kanıttır. Aktif OPS-W01 adayı Supabase Cron içindir;55 migration/aynı178 runtime, kaynak ve hosted işletim kabulü beklenir. Tenant config/binding uydurulmaz; P07 queued kalır.
+
+Aşağıdaki geliştirme/aday-pending ve hata kayıtları tarihsel kaynak snapshotlarıdır; güncel kabul yukarıdadır. Hosted işletim OPS-W01 ayrı kalır.
+
 Kaynak: `feature/p06-reports-imports`, taban kabul edilmiş main `83641447b29e459236aea1a9a4379b5d19825af6`. Durum **kod adayı; aynı kaynak aday/main clean ve development CD kabulü bekleniyor**.200 sözleşme/178 runtime/22 contract_only,54 migration/90 core tablo. P07'nin22 API'si yalnız sözleşmedir. P05/PR37'nin kabul ve CD receipt'i güncel devirde kapatıldı; bu eski başarı yeni P06 kaynağının kabulü değildir.
 
 ## Teslim edilen akış

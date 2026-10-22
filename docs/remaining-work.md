@@ -2,7 +2,7 @@
 
 P05 **done (kod, main ve geliştirme/test kabulü)**: [PR37](https://github.com/SXQHex/FtkSaaS/pull/37), kabul edilmiş main `83641447b29e459236aea1a9a4379b5d19825af6`;200 sözleşme/165 runtime/35 contract_only,53 migration/90 core tablo. Son head15e2126/base16cb570/tested merge2ebe087/tree736a75b; bağımsız son kaynak incelemesi5611074233, [aday39745672815](https://github.com/SXQHex/FtkSaaS/actions/runs/39745672815) ve [aynı main39748053581](https://github.com/SXQHex/FtkSaaS/actions/runs/39748053581) completed/success. [CD39750264949 attempt1](https://github.com/SXQHex/FtkSaaS/actions/runs/39750264949) success:18 kontrol,53/53 içerik eşleşmesi, P05 migration uygulandı, Edge6 ACTIVE/verify_jwt=true, RLS kapalı0/client RPC EXECUTE0 ve sentetik fixture temizliği. Receipt artifact12412499512 SHA256 `a41a8448c0a1b9dfdf853b58bea7cd56525fd8ede14812684b12619c3c8ee04e`. Eski aday hata kayıtları tarihsel kanıttır; bu kabulün kaynağı değildir.
 
-P06 **kod hazır; aday/main/CD kabulü bekleniyor**: branch `feature/p06-reports-imports`, taban kabul edilmiş main `83641447b29e459236aea1a9a4379b5d19825af6`. Bu adayın envanteri200 sözleşme/178 runtime/22 contract_only,54 migration/90 core tablodur. [P06 devri](p06-handover.md) rapor, CSV import, işlem/önizleme/job/audit okumalarını ve doğrulama sınırını açıklar. P05'in eski başarıları yeni P06 kaynağının kabulü değildir. Ardından OPS-W01 hosted worker kurulumu/kesinti kabulü, sonra P07; barındırma hedefi/dedicated kimlik/tenant config henüz kurulmuş sayılmaz.
+P06 **done (kod, main ve geliştirme/test kabulü)**: [PR38](https://github.com/SXQHex/FtkSaaS/pull/38), main `006ad36918ae823bc10fbdefa2d48901e193121c`;200 sözleşme/178 runtime/22 contract_only,54 migration/90 core tablo. Son headf2f9d6c/base8364144/tested merge1901fc6/treeb486ffe; bağımsız review5614150102, [aday39779013518](https://github.com/SXQHex/FtkSaaS/actions/runs/39779013518), [aynı main39782197422](https://github.com/SXQHex/FtkSaaS/actions/runs/39782197422) ve [CD39785146645 attempt1](https://github.com/SXQHex/FtkSaaS/actions/runs/39785146645) success. CD18 kontrol/54 içerik eşleşmesi/Edge7 ACTIVE/verify_jwt=true/RLS kapalı0/client RPC EXECUTE0 ve fixture temizliği geçti; receipt12428881259 SHA256 `bcd1ab3255c1808982de76c3d09d47d5eaa95c5fb2e8f9f870d3fedc9ce93b65`. Önceki aday hataları tarihsel kanıttır. Aktif OPS-W01 adayı Supabase Cron içindir;55 migration/aynı178 runtime, kaynak ve hosted işletim kabulü beklenir. Tenant config/binding uydurulmaz; P07 queued kalır.
 
 PR36 operasyonel takip kapandı: aynı main [39644044693](https://github.com/SXQHex/FtkSaaS/actions/runs/39644044693) success; [CD39646391222](https://github.com/SXQHex/FtkSaaS/actions/runs/39646391222) success,18 kontrol,52/52 migration, pending[], Edge5 değişmeden ACTIVE/verify_jwt=true. Atomik Management API transport yeni migration olmadan da rollback probe ile doğrulandı. Bot/deneme hedefi hâlâ kullanıcı kararıyla ertelendi; hosted P05 worker kurulmuş değildir.
 
@@ -16,11 +16,11 @@ P03 **done**: [PR #30](https://github.com/SXQHex/FtkSaaS/pull/30), kabul edilmi�
 
 P02 **done**: [PR #28](https://github.com/SXQHex/FtkSaaS/pull/28), kabul edilmiş main `cc4878d09e45204dbc13ccfe1324b38b14548167`. Envanter **199 sözleşme / 133 runtime / 66 contract_only / 40 migration / 90 core tablo**. Son head `35816cc30a9b28e273e94e6cef86e8b402dbaad0` bağımsız incelemeden geçti; [hedefli39448566998](https://github.com/SXQHex/FtkSaaS/actions/runs/39448566998), [aday39455462417](https://github.com/SXQHex/FtkSaaS/actions/runs/39455462417) ve [aynı main39461804543](https://github.com/SXQHex/FtkSaaS/actions/runs/39461804543) completed/success. Full kapsam:96 sözleşme/yönetişim +37 CI politika +27 DB +309 API =469 test düğümü; fail/skipped0. Core, dört izole API shard, toplayıcı,40 migration, seed/health/advisors geçti. Main clean14:43; önceki43:33 hedefli koşu seri tüm-suite fallback kullandı, aynı çalışma profili değildir. Eski başarı yeni kaynağa taşınmaz.
 
-Geliştirme/test Supabase `gwyprhenabtpkbojephw`, kabul edilmiş main `0fabf3a4a605dd6be5a1d358c660021f59406e20` kaynağına otomatik CD ile eşitlendi:49 migration, Edge backend-v1 sürüm4, verify_jwt=true,140 runtime API. Uzak smoke ve geçici fixture temizliği başarılı; ayrıntılar docs/remote-backend-setup.md içindedir. Hosted worker zamanlayıcısı, ortak tenant/kullanıcı kurulumu, frontend gerçek entegrasyonu, yük/restore, dış e-posta ve production kabulü ayrı açık kalır.
+Geliştirme/test Supabase `gwyprhenabtpkbojephw`, kabul edilmiş main `006ad36918ae823bc10fbdefa2d48901e193121c` kaynağına CD39785146645 ile eşitlendi:54 migration/Edge7/178 runtime,18 kontrol ve fixture temizliği. OPS-W01 native worker kaynağı55 migration taşır; kaynak ve hosted kabulü henüz beklenir. Frontend/dış e-posta/yük/restore ayrı kalır.
 
 ## Aktif seri üretim
 
-**P01, CI-02, P02, P03, P04 ve PR36 kod kabulü kapandı.** P05 aday/main/CD kabulü kapandı. P06 adayı13 API ekler; aday envanteri178 runtime/22 contract_only olur. P07'nin22 işlemi yalnız sözleşmedir. P06'nın kaynak kabulü henüz kapanmadı. [Tek kuyruk](production-queue.md) ve [P06 devri](p06-handover.md) güncel aday kapsamıdır. Bot/deneme canlı kurulumu kullanıcı hedefi oluşana kadar ertelendi.
+**P01, CI-02, P02, P03, P04 ve PR36 kod kabulü kapandı.** P05 aday/main/CD kabulü kapandı. P06 PR38 kabulü13 API ekledi;178 runtime/22 contract_only. P07'nin22 işlemi yalnız sözleşmedir. P06 kaynak/main/CD kabulü kapandı; aktif OPS-W01 Supabase Cron adayının kabulü beklenir. [Tek kuyruk](production-queue.md) ve [P06 devri](p06-handover.md) kabul edilmiş kapsamdır. Bot/deneme canlı kurulumu kullanıcı hedefi oluşana kadar ertelendi.
 
 [P01 devri](p01-handover.md): katalog/hak okuması, talep/alternatif/onay, bekleme/teklif/expiry ve gerçek dar worker döngüsü uygulandı. Genel belge upload/yayın/kabul ve bildirim API'leri P05/PR37 kabulüyle kapandı. Hosted worker provisioning/işletim kabulü CI'daki gerçek CLI/loop testinden ayrıdır.
 
@@ -41,7 +41,7 @@ Kalan delivery_gaps ve vaka bazlı durumlar [08 makine sözleşmesi](../contract
 3. Starter ve Pro/Business yoklama/kapanış/bağlı düzeltme ile ücretli anlaşma/hakediş uygulandı. Belge kapıları P05 ile uygulandı; otomatik başlangıç gözlemi ve diğer hak değişikliği koruma tüketicileri kendi kapsamlarında izlenir.
 4. P02 paket dondurma/uzatma/değişim/yenileme/sonlandırma tamamlandı; P03 finans düzeltme/iade çiftleri tamamlandı; genel iade private.p02_sale_settlements ve önceki borç/alacak hareketlerini tüketerek çift alacağı engelliyor.
 5. Hesap erişimi geri alma, hesap/organizasyon kapanış/silme ve kişi birleştirme.
-6. CRM, bildirim tercihleri ve belgeler P04/P05 kabulünde; rapor, import ve izleme P06 kaynak adayında. Hosted worker işletimi OPS-W01'dir.
+6. CRM, bildirim tercihleri ve belgeler P04/P05 kabulünde; rapor, import ve izleme P06 kabulünde. Hosted worker işletimi OPS-W01'dir.
 
 Her yeni runtime/CI grubu: sözleşme/izin incelemesi → gerekli yeni migration → geliştirmede hedefli gerçek Auth/API kabulü (sınır, yetki, tekrar, yarış, rollback) → son inceleme → açık aday full clean → merge → main full clean. Güvenli yalnız-belge kabul yolu CI-02 ile kuruldu; full clean’den ayrı kaynak bağlı kabul kullanır. Ürün kararında boşluk varsa teknik varsayımla yeni kural eklenmez.
 
@@ -51,7 +51,7 @@ Bloklayıcı sayılmayan doğrulama iyileştirmesi: instructor_payment_record_v1
 
 ## Yalnız sözleşme envanteri — adayda22 işlem
 
-Kabul edilmiş P05 main165 runtime/35 contract_only taşır. P06 kaynak adayı178 runtime/22 contract_only taşır; kabulü bekleniyor. P07 kapsamı:
+Kabul edilmiş P05 main165 runtime/35 contract_only taşır. P06 kabul edilmiş main178 runtime/22 contract_only taşır. P07 kapsamı:
 
 | İşlem | İzin |
 |---|---|
@@ -80,7 +80,7 @@ Kabul edilmiş P05 main165 runtime/35 contract_only taşır. P06 kaynak adayı17
 
 ## Operasyonel kabul işleri
 
-- OPS-W01: dedicated hosted worker hedefi/kimliği, açık tenant config ve kesinti sonrası lease toparlanma kabulü; P06 sonunda/P07 öncesi.
+- OPS-W01: Supabase Cron hedefi seçildi; native dedicated kimlik, heartbeat, açık tenant binding/config ve kesinti sonrası lease toparlanma kaynak/hosted kabulü; P07 öncesi.
 - Ortak test backend’i kuruldu; frontend’in gerçek bağlantı/iş akışı kabulü açık.
 - Dış e-posta ertelendi; uygulanmış değildir, Resend entegrasyonu başlatılmayacak. Yerel Mailpit kabulü dış teslim kanıtı değildir.
 - Yük, yedek ve geri yükleme doğrulaması.

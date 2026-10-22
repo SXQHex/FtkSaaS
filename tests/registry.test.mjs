@@ -120,3 +120,5 @@ test('Registry real Auth/API scope, lifecycle and atomicity',async t=>{
  });
  }finally{if(trigger){await db.query('drop trigger if exists '+trigger+' on core.audit_events');await db.query('drop function if exists private.'+trigger+'()');}await db.end();}
 });
+
+import './ops-hosted-acceptance.mjs';
