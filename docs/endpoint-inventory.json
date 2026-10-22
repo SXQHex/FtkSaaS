@@ -3115,77 +3115,107 @@
     },
     {
       "name": "report_get_v1",
-      "status": "contract_only",
-      "external_path": null,
+      "status": "operational_development_limited",
+      "external_path": "/functions/v1/backend-v1/report_get_v1",
       "permission": "report.read",
       "features": [
-        "F28"
+        "F28",
+        "F06",
+        "F19",
+        "F20",
+        "F21",
+        "F18"
       ],
       "required_features": [
         "F28"
       ],
-      "runtime_required_features": [],
+      "runtime_required_features": [
+        "F28"
+      ],
       "decision_delivery": {
         "accepted_contract": "DS-2026-10-17",
-        "runtime_conformance": "pending",
+        "runtime_conformance": "implemented_pending_ci",
         "open_dependencies": [],
         "target_request": {
           "$ref": "#/$defs/Request_report_get"
         }
       },
       "billing_class": "read",
-      "limits": []
+      "limits": [
+        "Development/test only; final source candidate/main clean required.",
+        "Explicit tenant limits and dedicated scoped worker; hosted scheduling remains OPS-W01."
+      ]
     },
     {
       "name": "report_export_start_v1",
-      "status": "contract_only",
-      "external_path": null,
+      "status": "operational_development_limited",
+      "external_path": "/functions/v1/backend-v1/report_export_start_v1",
       "permission": "report.export",
       "features": [
-        "F28"
+        "F28",
+        "F06",
+        "F19",
+        "F20",
+        "F21",
+        "F18"
       ],
       "required_features": [
         "F28"
       ],
-      "runtime_required_features": [],
+      "runtime_required_features": [
+        "F28"
+      ],
       "decision_delivery": {
         "accepted_contract": "DS-2026-10-17",
-        "runtime_conformance": "pending",
+        "runtime_conformance": "implemented_pending_ci",
         "open_dependencies": [],
         "target_request": {
           "$ref": "#/$defs/Request_report_export_start"
         }
       },
       "billing_class": "read",
-      "limits": []
+      "limits": [
+        "Development/test only; final source candidate/main clean required.",
+        "Explicit tenant limits and dedicated scoped worker; hosted scheduling remains OPS-W01."
+      ]
     },
     {
       "name": "report_file_get_v1",
-      "status": "contract_only",
-      "external_path": null,
+      "status": "operational_development_limited",
+      "external_path": "/functions/v1/backend-v1/report_file_get_v1",
       "permission": "report.export",
       "features": [
-        "F28"
+        "F28",
+        "F06",
+        "F19",
+        "F20",
+        "F21",
+        "F18"
       ],
       "required_features": [
         "F28"
       ],
-      "runtime_required_features": [],
+      "runtime_required_features": [
+        "F28"
+      ],
       "decision_delivery": {
         "accepted_contract": "DS-2026-10-17",
-        "runtime_conformance": "pending",
+        "runtime_conformance": "implemented_pending_ci",
         "open_dependencies": [],
         "target_request": {
           "$ref": "#/$defs/Request_report_file_get"
         }
       },
       "billing_class": "read",
-      "limits": []
+      "limits": [
+        "Development/test only; final source candidate/main clean required.",
+        "Explicit tenant limits and dedicated scoped worker; hosted scheduling remains OPS-W01."
+      ]
     },
     {
       "name": "import_upload_prepare_v1",
-      "status": "contract_only",
-      "external_path": null,
+      "status": "operational_development_limited",
+      "external_path": "/functions/v1/backend-v1/import_upload_prepare_v1",
       "permission": "import.execute",
       "features": [
         "F31"
@@ -3193,68 +3223,91 @@
       "required_features": [
         "F31"
       ],
-      "runtime_required_features": [],
+      "runtime_required_features": [
+        "F31"
+      ],
       "decision_delivery": {
         "accepted_contract": "DS-2026-10-17",
-        "runtime_conformance": "pending",
+        "runtime_conformance": "implemented_pending_ci",
         "open_dependencies": [],
         "target_request": {
           "$ref": "#/$defs/Request_import_upload_prepare"
         }
       },
       "billing_class": "import",
-      "limits": []
+      "limits": [
+        "Development/test only; final source candidate/main clean required.",
+        "Explicit tenant limits and dedicated scoped worker; hosted scheduling remains OPS-W01."
+      ]
     },
     {
       "name": "import_preview_v1",
-      "status": "contract_only",
-      "external_path": null,
+      "status": "operational_development_limited",
+      "external_path": "/functions/v1/backend-v1/import_preview_v1",
       "permission": "import.execute",
       "features": [
-        "F31"
+        "F31",
+        "F07",
+        "F15",
+        "F19",
+        "F18"
       ],
       "required_features": [
         "F31"
       ],
-      "runtime_required_features": [],
+      "runtime_required_features": [
+        "F31"
+      ],
       "decision_delivery": {
         "accepted_contract": "DS-2026-10-17",
-        "runtime_conformance": "pending",
+        "runtime_conformance": "implemented_pending_ci",
         "open_dependencies": [],
         "target_request": {
           "$ref": "#/$defs/Request_import_preview"
         }
       },
       "billing_class": "import",
-      "limits": []
+      "limits": [
+        "Development/test only; final source candidate/main clean required.",
+        "Explicit tenant limits and dedicated scoped worker; hosted scheduling remains OPS-W01."
+      ]
     },
     {
       "name": "import_apply_v1",
-      "status": "contract_only",
-      "external_path": null,
+      "status": "operational_development_limited",
+      "external_path": "/functions/v1/backend-v1/import_apply_v1",
       "permission": "import.execute",
       "features": [
-        "F31"
+        "F31",
+        "F07",
+        "F15",
+        "F19",
+        "F18"
       ],
       "required_features": [
         "F31"
       ],
-      "runtime_required_features": [],
+      "runtime_required_features": [
+        "F31"
+      ],
       "decision_delivery": {
         "accepted_contract": "DS-2026-10-17",
-        "runtime_conformance": "pending",
+        "runtime_conformance": "implemented_pending_ci",
         "open_dependencies": [],
         "target_request": {
           "$ref": "#/$defs/Request_import_apply"
         }
       },
       "billing_class": "import",
-      "limits": []
+      "limits": [
+        "Development/test only; final source candidate/main clean required.",
+        "Explicit tenant limits and dedicated scoped worker; hosted scheduling remains OPS-W01."
+      ]
     },
     {
       "name": "import_rows_list_v1",
-      "status": "contract_only",
-      "external_path": null,
+      "status": "operational_development_limited",
+      "external_path": "/functions/v1/backend-v1/import_rows_list_v1",
       "permission": "import.execute",
       "features": [
         "F31"
@@ -3262,17 +3315,22 @@
       "required_features": [
         "F31"
       ],
-      "runtime_required_features": [],
+      "runtime_required_features": [
+        "F31"
+      ],
       "decision_delivery": {
         "accepted_contract": "DS-2026-10-17",
-        "runtime_conformance": "pending",
+        "runtime_conformance": "implemented_pending_ci",
         "open_dependencies": [],
         "target_request": {
           "$ref": "#/$defs/Request_import_rows_list"
         }
       },
       "billing_class": "read",
-      "limits": []
+      "limits": [
+        "Development/test only; final source candidate/main clean required.",
+        "Explicit tenant limits and dedicated scoped worker; hosted scheduling remains OPS-W01."
+      ]
     },
     {
       "name": "subscription_get_v1",
@@ -3918,8 +3976,8 @@
     },
     {
       "name": "operation_status_get_v1",
-      "status": "contract_only",
-      "external_path": null,
+      "status": "operational_development_limited",
+      "external_path": "/functions/v1/backend-v1/operation_status_get_v1",
       "permission": "account.self",
       "features": [
         "F33"
@@ -3927,22 +3985,27 @@
       "required_features": [
         "F33"
       ],
-      "runtime_required_features": [],
+      "runtime_required_features": [
+        "F33"
+      ],
       "decision_delivery": {
         "accepted_contract": "DS-2026-10-17",
-        "runtime_conformance": "pending",
+        "runtime_conformance": "implemented_pending_ci",
         "open_dependencies": [],
         "target_request": {
           "$ref": "#/$defs/Request_operation_status_get"
         }
       },
       "billing_class": "exempt",
-      "limits": []
+      "limits": [
+        "Development/test only; final source candidate/main clean required.",
+        "Explicit tenant limits and dedicated scoped worker; hosted scheduling remains OPS-W01."
+      ]
     },
     {
       "name": "preview_get_v1",
-      "status": "contract_only",
-      "external_path": null,
+      "status": "operational_development_limited",
+      "external_path": "/functions/v1/backend-v1/preview_get_v1",
       "permission": "account.self",
       "features": [
         "F33"
@@ -3950,22 +4013,27 @@
       "required_features": [
         "F33"
       ],
-      "runtime_required_features": [],
+      "runtime_required_features": [
+        "F33"
+      ],
       "decision_delivery": {
         "accepted_contract": "DS-2026-10-17",
-        "runtime_conformance": "pending",
+        "runtime_conformance": "implemented_pending_ci",
         "open_dependencies": [],
         "target_request": {
           "$ref": "#/$defs/Request_preview_get"
         }
       },
       "billing_class": "read",
-      "limits": []
+      "limits": [
+        "Development/test only; final source candidate/main clean required.",
+        "Explicit tenant limits and dedicated scoped worker; hosted scheduling remains OPS-W01."
+      ]
     },
     {
       "name": "job_status_get_v1",
-      "status": "contract_only",
-      "external_path": null,
+      "status": "operational_development_limited",
+      "external_path": "/functions/v1/backend-v1/job_status_get_v1",
       "permission": "account.self",
       "features": [
         "F31",
@@ -3975,19 +4043,22 @@
       "runtime_required_features": [],
       "decision_delivery": {
         "accepted_contract": "DS-2026-10-17",
-        "runtime_conformance": "pending",
+        "runtime_conformance": "implemented_pending_ci",
         "open_dependencies": [],
         "target_request": {
           "$ref": "#/$defs/Request_job_status_get"
         }
       },
       "billing_class": "read",
-      "limits": []
+      "limits": [
+        "Development/test only; final source candidate/main clean required.",
+        "Explicit tenant limits and dedicated scoped worker; hosted scheduling remains OPS-W01."
+      ]
     },
     {
       "name": "audit_list_v1",
-      "status": "contract_only",
-      "external_path": null,
+      "status": "operational_development_limited",
+      "external_path": "/functions/v1/backend-v1/audit_list_v1",
       "permission": "report.read",
       "features": [
         "F33"
@@ -3995,17 +4066,22 @@
       "required_features": [
         "F33"
       ],
-      "runtime_required_features": [],
+      "runtime_required_features": [
+        "F33"
+      ],
       "decision_delivery": {
         "accepted_contract": "DS-2026-10-17",
-        "runtime_conformance": "pending",
+        "runtime_conformance": "implemented_pending_ci",
         "open_dependencies": [],
         "target_request": {
           "$ref": "#/$defs/Request_audit_list"
         }
       },
       "billing_class": "read",
-      "limits": []
+      "limits": [
+        "Development/test only; final source candidate/main clean required.",
+        "Explicit tenant limits and dedicated scoped worker; hosted scheduling remains OPS-W01."
+      ]
     },
     {
       "name": "seat_offer_issue_v1",
@@ -4175,49 +4251,68 @@
     },
     {
       "name": "import_rows_process_v1",
-      "status": "contract_only",
-      "external_path": null,
+      "status": "operational_development_limited",
+      "external_path": "/functions/v1/backend-v1/import_rows_process_v1",
       "permission": "system.worker",
       "features": [
-        "F31"
+        "F31",
+        "F07",
+        "F15",
+        "F19",
+        "F18"
       ],
       "required_features": [
         "F31"
       ],
-      "runtime_required_features": [],
+      "runtime_required_features": [
+        "F31"
+      ],
       "decision_delivery": {
         "accepted_contract": "DS-2026-10-17",
-        "runtime_conformance": "pending",
+        "runtime_conformance": "implemented_pending_ci",
         "open_dependencies": [],
         "target_request": {
           "$ref": "#/$defs/Request_import_rows_process"
         }
       },
       "billing_class": "worker",
-      "limits": []
+      "limits": [
+        "Development/test only; final source candidate/main clean required.",
+        "Explicit tenant limits and dedicated scoped worker; hosted scheduling remains OPS-W01."
+      ]
     },
     {
       "name": "report_build_v1",
-      "status": "contract_only",
-      "external_path": null,
+      "status": "operational_development_limited",
+      "external_path": "/functions/v1/backend-v1/report_build_v1",
       "permission": "system.worker",
       "features": [
-        "F28"
+        "F28",
+        "F06",
+        "F19",
+        "F20",
+        "F21",
+        "F18"
       ],
       "required_features": [
         "F28"
       ],
-      "runtime_required_features": [],
+      "runtime_required_features": [
+        "F28"
+      ],
       "decision_delivery": {
         "accepted_contract": "DS-2026-10-17",
-        "runtime_conformance": "pending",
+        "runtime_conformance": "implemented_pending_ci",
         "open_dependencies": [],
         "target_request": {
           "$ref": "#/$defs/Request_report_build"
         }
       },
       "billing_class": "worker",
-      "limits": []
+      "limits": [
+        "Development/test only; final source candidate/main clean required.",
+        "Explicit tenant limits and dedicated scoped worker; hosted scheduling remains OPS-W01."
+      ]
     },
     {
       "name": "privacy_execute_v1",

@@ -1,6 +1,8 @@
 # P05 — belge, bildirim ve otomasyon devri
 
-Kaynak tabanı `16cb570eb45381ce41a509a7d2d954f929de9e6b` (PR36). P05 branch `feature/p05-documents-notifications`: uygulandı, son aday/main full clean ve geliştirme CD kabulü bekliyor. Envanter **200 sözleşme /165 runtime /35 contract_only /53 migration /90 core tablo**. Önceki199 sözleşmeye eklenen dar `document_publication_preview_v1`, kabul edilmiş DS mevcut rezervasyon korumasının belge tüketicisidir. P06/P07 başlatılmadı.
+P05 **done (kod, main ve geliştirme/test kabulü)**: [PR37](https://github.com/SXQHex/FtkSaaS/pull/37), kabul edilmiş main `83641447b29e459236aea1a9a4379b5d19825af6`;200 sözleşme/165 runtime/35 contract_only,53 migration/90 core tablo. Son head15e2126/base16cb570/tested merge2ebe087/tree736a75b; bağımsız son kaynak incelemesi5611074233, [aday39745672815](https://github.com/SXQHex/FtkSaaS/actions/runs/39745672815) ve [aynı main39748053581](https://github.com/SXQHex/FtkSaaS/actions/runs/39748053581) completed/success. [CD39750264949 attempt1](https://github.com/SXQHex/FtkSaaS/actions/runs/39750264949) success:18 kontrol,53/53 içerik eşleşmesi, P05 migration uygulandı, Edge6 ACTIVE/verify_jwt=true, RLS kapalı0/client RPC EXECUTE0 ve sentetik fixture temizliği. Receipt artifact12412499512 SHA256 `a41a8448c0a1b9dfdf853b58bea7cd56525fd8ede14812684b12619c3c8ee04e`. Eski aday hata kayıtları tarihsel kanıttır; bu kabulün kaynağı değildir.
+
+13 planlı API + dar belge yayın etki önizlemesi kabul edildi. Hosted worker zamanlayıcısı ayrı OPS-W01'dir; P06 sonunda/P07 öncesinde kurulup işletim kabulü yapılacaktır.
 
 ## Dosya ve belge akışı
 
@@ -26,9 +28,11 @@ Pro/Business lesson24 saat hatırlatması ve açık entitlement_reminder_days po
 
 Yerel `npm run verify`:99 yapı/sözleşme/yönetişim +43 CI politika testi geçti; TypeScript/generation/53 migration içerik kontrolü geçti. Mevcut52 migration byte'ı değişmedi; workflow/scripts/ci/test-clean ve shard kapsamı değişmedi. API fixture mevcut registry suite'e eklendi; full clean15 suite'i çalıştırmaya devam eder.
 
-Geliştirme/test Supabase üzerinde yeni SQL modülleri + sentetik Auth/account/org/rol/konfigürasyon ile gerçek dispatcher/private worker denemeleri BEGIN/ROLLBACK içinde geçti: prepare/verified completion/publish/requirements/acceptance, yayın önizlemesi/exact onay/koruma, inbox/tercih/okundu, segment/otomasyon, leadless görev read/complete, worker claim/execute/replay. Bu DB probe gerçek Storage upload veya Auth→Edge uçtan uca kanıtı değildir; bütün deneme değişiklikleri geri alındı. Hosted kabul edilmiş kaynak halen PR36/52 migration/Edge5'tir.
+Geliştirme/test Supabase üzerinde yeni SQL modülleri + sentetik Auth/account/org/rol/konfigürasyon ile gerçek dispatcher/private worker denemeleri BEGIN/ROLLBACK içinde geçti: prepare/verified completion/publish/requirements/acceptance, yayın önizlemesi/exact onay/koruma, inbox/tercih/okundu, segment/otomasyon, leadless görev read/complete, worker claim/execute/replay. Bu DB probe gerçek Storage upload veya Auth→Edge uçtan uca kanıtı değildir; bütün deneme değişiklikleri geri alındı. Bu eski rollback probe'u kalıcı dağıtım yapmadı; güncel kalıcı kabul yukarıdaki PR37/53 migration/Edge6 zinciridir.
 
-Gerçek Auth→Storage→Edge→RPC kabulü, ingress limit/overwrite/private access, mevcut ve yeni rezervasyon belge kapıları, stale/exact yayın onayı, geçmiş yoklama düzeltmesi, inbox izolasyonu, scoped role/lease/retry/late rollback ve Business yetki senaryoları `tests/p05-acceptance.mjs` üzerinden CI'da çalışacaktır. Docker olmayan bu çalışma ortamında API testleri çalışmış gösterilmez. Aynı son kaynakta bağımsız inceleme ve aday full clean, merge sonrası aynı main full clean ve geliştirme CD receipt'i doğrulanmadan P05 done değildir.
+Gerçek Auth→Storage→Edge→RPC, ingress limit/overwrite/private access, mevcut/yeni rezervasyon kapıları, stale/exact yayın onayı, geçmiş yoklama düzeltmesi, inbox izolasyonu, scoped role/lease/retry/geç hata rollback ve Business yetki vakaları aday39745672815 ve aynı main39748053581 tam temiz CI içinde geçti. Yerel çalışma ortamında Docker yoktu; uzak DB probe'u bu kabulün yerine geçirilmedi. Geliştirme CD receipt'i aynı main/source/acceptance run'a bağlıdır;53 içerik ve Edge6 doğrulandı, son0 organizasyon/hesap/Auth kullanıcısı teyit edildi. P05 done.
+
+Aşağıdaki iki başarısız aday kaydı tarihsel teşhistir; yukarıdaki son kaynak kabulü bu pending ifadelerinin yerini alır.
 
 ## İlk aday CI teşhisi ve düzeltme
 

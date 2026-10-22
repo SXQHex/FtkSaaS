@@ -1,6 +1,8 @@
 # Kalan backend işleri
 
-P05 **uygulandı; son kaynak kabulü bekliyor**. Branch `feature/p05-documents-notifications`, taban main `16cb570eb45381ce41a509a7d2d954f929de9e6b` (PR36). Yeni belge etki önizlemesiyle14 P05 API; **200 sözleşme/165 runtime/35 contract_only/53 migration/90 core tablo**. [P05 devri](p05-handover.md) dosya/katılım koruması, özel inbox, scoped worker ve kabul sınırını açıklar. Aday/main full clean ve P05 geliştirme CD kabulü henüz yoktur; aşağıdaki P04 ve eski sayılar tarihsel snapshot'tır.
+P05 **done (kod, main ve geliştirme/test kabulü)**: [PR37](https://github.com/SXQHex/FtkSaaS/pull/37), kabul edilmiş main `83641447b29e459236aea1a9a4379b5d19825af6`;200 sözleşme/165 runtime/35 contract_only,53 migration/90 core tablo. Son head15e2126/base16cb570/tested merge2ebe087/tree736a75b; bağımsız son kaynak incelemesi5611074233, [aday39745672815](https://github.com/SXQHex/FtkSaaS/actions/runs/39745672815) ve [aynı main39748053581](https://github.com/SXQHex/FtkSaaS/actions/runs/39748053581) completed/success. [CD39750264949 attempt1](https://github.com/SXQHex/FtkSaaS/actions/runs/39750264949) success:18 kontrol,53/53 içerik eşleşmesi, P05 migration uygulandı, Edge6 ACTIVE/verify_jwt=true, RLS kapalı0/client RPC EXECUTE0 ve sentetik fixture temizliği. Receipt artifact12412499512 SHA256 `a41a8448c0a1b9dfdf853b58bea7cd56525fd8ede14812684b12619c3c8ee04e`. Eski aday hata kayıtları tarihsel kanıttır; bu kabulün kaynağı değildir.
+
+P06 **kod hazır; aday/main/CD kabulü bekleniyor**: branch `feature/p06-reports-imports`, taban kabul edilmiş main `83641447b29e459236aea1a9a4379b5d19825af6`. Bu adayın envanteri200 sözleşme/178 runtime/22 contract_only,54 migration/90 core tablodur. [P06 devri](p06-handover.md) rapor, CSV import, işlem/önizleme/job/audit okumalarını ve doğrulama sınırını açıklar. P05'in eski başarıları yeni P06 kaynağının kabulü değildir. Ardından OPS-W01 hosted worker kurulumu/kesinti kabulü, sonra P07; barındırma hedefi/dedicated kimlik/tenant config henüz kurulmuş sayılmaz.
 
 PR36 operasyonel takip kapandı: aynı main [39644044693](https://github.com/SXQHex/FtkSaaS/actions/runs/39644044693) success; [CD39646391222](https://github.com/SXQHex/FtkSaaS/actions/runs/39646391222) success,18 kontrol,52/52 migration, pending[], Edge5 değişmeden ACTIVE/verify_jwt=true. Atomik Management API transport yeni migration olmadan da rollback probe ile doğrulandı. Bot/deneme hedefi hâlâ kullanıcı kararıyla ertelendi; hosted P05 worker kurulmuş değildir.
 
@@ -18,14 +20,14 @@ Geliştirme/test Supabase `gwyprhenabtpkbojephw`, kabul edilmiş main `0fabf3a4a
 
 ## Aktif seri üretim
 
-**P01, CI-02, P02, P03, P04 ve PR36 kod kabulü kapandı.** P05 uygulandı; aday/main/CD kabulü bekler. P06/P07 toplam35 contract_only işlem sırada. [Tek kuyruk](production-queue.md) ve [P05 devri](p05-handover.md) güncel kapsamdır. Bot/deneme canlı kurulumu kullanıcı hedefi oluşana kadar ertelendi.
+**P01, CI-02, P02, P03, P04 ve PR36 kod kabulü kapandı.** P05 aday/main/CD kabulü kapandı. P06 adayı13 API ekler; aday envanteri178 runtime/22 contract_only olur. P07'nin22 işlemi yalnız sözleşmedir. P06'nın kaynak kabulü henüz kapanmadı. [Tek kuyruk](production-queue.md) ve [P06 devri](p06-handover.md) güncel aday kapsamıdır. Bot/deneme canlı kurulumu kullanıcı hedefi oluşana kadar ertelendi.
 
-[P01 devri](p01-handover.md): katalog/hak okuması, talep/alternatif/onay, bekleme/teklif/expiry ve gerçek dar worker döngüsü uygulandı. Genel belge upload/yayın/kabul ve bildirim API'leri P05'te uygulandı; yeni kaynak kabulü henüz yoktur. Hosted worker provisioning/işletim kabulü CI'daki gerçek CLI/loop testinden ayrıdır.
+[P01 devri](p01-handover.md): katalog/hak okuması, talep/alternatif/onay, bekleme/teklif/expiry ve gerçek dar worker döngüsü uygulandı. Genel belge upload/yayın/kabul ve bildirim API'leri P05/PR37 kabulüyle kapandı. Hosted worker provisioning/işletim kabulü CI'daki gerçek CLI/loop testinden ayrıdır.
 
 ## DS öncelikli teslim sırası
 
 1. Karar/DTO/izin/guard/sürüm-okuma aktarımı ve F01–F33 yapısal denetimleri korundu; gerçek davranış kanıtı ayrı izlenir.
-2. Starter yoklama/hak kapanışı, politika/kişisel limit etkisi/onayı uygulandı. Otomatik başlangıç, belge ve diğer hak değişikliği tüketicileri açık.
+2. Starter yoklama/hak kapanışı, politika/kişisel limit etkisi/onayı uygulandı. Belge tüketicileri P05 ile kapandı; otomatik başlangıç gözlemi ve diğer hak değişikliği tüketicileri kendi devirlerindeki sınırda izlenir.
 3. Immutable anlaşma/hakediş ve dar gerçek başlangıç yolu uygulandı; son kaynak kabulü/inceleme/CI PR kanıtıyla değerlendirilir. P03 ödeme komutları PR30 ve aynı main39529992556 kabulüyle tamamlandı.
 4. Ayrı merkezler arası ledger, Owner/delege OM grant zinciri ve B onayında atomik ödeme/mahsup/bağlı düzeltme kesinleştirmesi. DS-OPEN-01 karar düzeyinde kapalı; DS-OPEN-02 son merkez yetki kararıyla karar düzeyinde kapalı; aynı hesap A/B yetkileri ayrı doğrulanarak iki adımı yapabilir. Fiziksel depolama, dokuz RPC/read ve adım kapsamlı audit uygulandı; [hesaplaşma devri](settlement-handover.md) ve son head temiz CI kabulü esas alınır.
 5. Satış kapsam snapshot/değişim, gerekçeli backdate ve geçmiş açık kapatma; yeni ürün davranışı uydurulmadan uçtan uca kabul.
@@ -36,10 +38,10 @@ Kalan delivery_gaps ve vaka bazlı durumlar [08 makine sözleşmesi](../contract
 
 1. Uygunluk/politika dört API uygulandı; tüketici sınırları ve eksik iş akışları Claude devrindeki güncel bölümde açıkça ayrılır. Son PR SHA kabulü CI ile ayrıca doğrulanır.
 2. Ürün kataloğu, seans bağlamında uygun satın alınmış hak seçimi ve talep–bekleme–yer teklifi yaşam döngüleri P01 PR #22 ile uygulandı; program/seans yedi komutu PR #12 ile, Starter uyarlaması PR #14 ve anlaşma yayını PR #15 ile uygulandı; kalan tüketiciler ilgili devirlerde belirtilir. Üç program okuması uygulandı; sınırlar okuma devrindedir.
-3. Starter ve Pro/Business yoklama/kapanış/bağlı düzeltme ile ücretli anlaşma/hakediş uygulandı. Otomatik başlangıç gözlemi, belge ve diğer hak değişikliği koruma tüketicileri açık.
+3. Starter ve Pro/Business yoklama/kapanış/bağlı düzeltme ile ücretli anlaşma/hakediş uygulandı. Belge kapıları P05 ile uygulandı; otomatik başlangıç gözlemi ve diğer hak değişikliği koruma tüketicileri kendi kapsamlarında izlenir.
 4. P02 paket dondurma/uzatma/değişim/yenileme/sonlandırma tamamlandı; P03 finans düzeltme/iade çiftleri tamamlandı; genel iade private.p02_sale_settlements ve önceki borç/alacak hareketlerini tüketerek çift alacağı engelliyor.
 5. Hesap erişimi geri alma, hesap/organizasyon kapanış/silme ve kişi birleştirme.
-6. CRM, bildirim tercihleri, belgeler, raporlar, import ve worker işlemleri.
+6. CRM, bildirim tercihleri ve belgeler P04/P05 kabulünde; rapor, import ve izleme P06 kaynak adayında. Hosted worker işletimi OPS-W01'dir.
 
 Her yeni runtime/CI grubu: sözleşme/izin incelemesi → gerekli yeni migration → geliştirmede hedefli gerçek Auth/API kabulü (sınır, yetki, tekrar, yarış, rollback) → son inceleme → açık aday full clean → merge → main full clean. Güvenli yalnız-belge kabul yolu CI-02 ile kuruldu; full clean’den ayrı kaynak bağlı kabul kullanır. Ürün kararında boşluk varsa teknik varsayımla yeni kural eklenmez.
 
@@ -47,15 +49,9 @@ Her yeni runtime/CI grubu: sözleşme/izin incelemesi → gerekli yeni migration
 
 Bloklayıcı sayılmayan doğrulama iyileştirmesi: instructor_payment_record_v1 tutarı karşılandıktan sonra kullanılmayan trailing earning_ids satırlarının kişi/merkez/para birimi kontrolü atlanabiliyor. Fiilen yazılan allocation’lar kapsamlıdır; inceleme başka kapsama yazma veya para sızıntısı bulmadı. Tüm seçili listeyi allocation’dan önce doğrula ve karışık kapsamlı kullanılmayan son ID regresyonu ekle. Kaynak review5594023911; P03 kabulünü veya diğer59 contract_only API’yi değiştirmez. Henüz düzeltilmiş sayılmaz.
 
-## Yalnız sözleşme envanteri — 35 işlem
+## Yalnız sözleşme envanteri — adayda22 işlem
 
-Kabul edilmiş main151 runtime/48 contract_only; P05 adayı165 runtime/35 contract_only taşır. P05'in14 API'si uygulandı, CI kabulü bekler. Aşağıdaki35 işlem P06/P07'dir.
-
-| Teslim | Kalan işlem |
-|---|---:|
-| P05 | 0 (aday/main/CD kabulü bekler) |
-| P06 | 13 |
-| P07 | 22 |
+Kabul edilmiş P05 main165 runtime/35 contract_only taşır. P06 kaynak adayı178 runtime/22 contract_only taşır; kabulü bekleniyor. P07 kapsamı:
 
 | İşlem | İzin |
 |---|---|
@@ -74,29 +70,17 @@ Kabul edilmiş main151 runtime/48 contract_only; P05 adayı165 runtime/35 contra
 | person_merge_preview_v1 | person.merge |
 | person_merge_approve_v1 | person.merge |
 | person_merge_apply_v1 | person.merge |
-| report_get_v1 | report.read |
-| report_export_start_v1 | report.export |
-| report_file_get_v1 | report.export |
-| import_upload_prepare_v1 | import.execute |
-| import_preview_v1 | import.execute |
-| import_apply_v1 | import.execute |
-| import_rows_list_v1 | import.execute |
 | subscription_upgrade_quote_v1 | subscription.owner |
 | subscription_downgrade_request_v1 | subscription.owner |
 | subscription_change_cancel_v1 | subscription.owner |
 | subscription_renewal_set_v1 | subscription.owner |
 | saas_grace_extend_v1 | saas.operator |
-| operation_status_get_v1 | account.self |
-| preview_get_v1 | account.self |
-| job_status_get_v1 | account.self |
-| audit_list_v1 | report.read |
-| import_rows_process_v1 | system.worker |
-| report_build_v1 | system.worker |
 | privacy_execute_v1 | system.worker |
 | subscription_boundary_apply_v1 | system.worker |
 
 ## Operasyonel kabul işleri
 
+- OPS-W01: dedicated hosted worker hedefi/kimliği, açık tenant config ve kesinti sonrası lease toparlanma kabulü; P06 sonunda/P07 öncesi.
 - Ortak test backend’i kuruldu; frontend’in gerçek bağlantı/iş akışı kabulü açık.
 - Dış e-posta ertelendi; uygulanmış değildir, Resend entegrasyonu başlatılmayacak. Yerel Mailpit kabulü dış teslim kanıtı değildir.
 - Yük, yedek ve geri yükleme doğrulaması.

@@ -1,5 +1,11 @@
 # Kalıcı geliştirme/test backend’i
 
+## PR37 — güncel kabul edilmiş geliştirme kaynağı
+
+P05 **done (kod, main ve geliştirme/test kabulü)**: [PR37](https://github.com/SXQHex/FtkSaaS/pull/37), kabul edilmiş main `83641447b29e459236aea1a9a4379b5d19825af6`;200 sözleşme/165 runtime/35 contract_only,53 migration/90 core tablo. Son head15e2126/base16cb570/tested merge2ebe087/tree736a75b; bağımsız son kaynak incelemesi5611074233, [aday39745672815](https://github.com/SXQHex/FtkSaaS/actions/runs/39745672815) ve [aynı main39748053581](https://github.com/SXQHex/FtkSaaS/actions/runs/39748053581) completed/success. [CD39750264949 attempt1](https://github.com/SXQHex/FtkSaaS/actions/runs/39750264949) success:18 kontrol,53/53 içerik eşleşmesi, P05 migration uygulandı, Edge6 ACTIVE/verify_jwt=true, RLS kapalı0/client RPC EXECUTE0 ve sentetik fixture temizliği. Receipt artifact12412499512 SHA256 `a41a8448c0a1b9dfdf853b58bea7cd56525fd8ede14812684b12619c3c8ee04e`. Eski aday hata kayıtları tarihsel kanıttır; bu kabulün kaynağı değildir.
+
+CD receipt'teki pending_migrations alanı uygulama öncesi farktır:20261021181208_p05_documents_notifications.sql uygulandı. Son SQL history okuması53 migration/P05 mevcut;0 organizasyon,0 hesap,0 Auth kullanıcısı. Doküman bucket private,2097152 byte/text/plain+application/pdf. Edge source SHA256 b3a953555393c88471755ea187043613d55af23ecd117de44fc7ec3f41da29f6; deploy EZBR5dc25091617607c0ecbff5b3999178fad5dc4e166cd6fbb238089400ff71a53f metadata ile eşleşir. Aşağıdaki PR36/52/Edge5 ve eski pending kayıtları tarihsel snapshot'tır.
+
 ## PR36 — kabul edilmiş güncel geliştirme kaynağı
 
 Main `16cb570eb45381ce41a509a7d2d954f929de9e6b`; aynı main39644044693 ve CD39646391222 attempt1 completed/success. Receipt artifact12368500165 SHA256 `97fdfe9e877f2aa0b67dc88e5a7fc1c126041d776791629ced28807b9c10f27c`:18 kontrol passed, transport management-api-atomic-v1, pending[],52 içerik eşleşmesi; Edge5 değişmeden ACTIVE/verify_jwt=true, RLS kapalı0/client RPC EXECUTE0 ve sentetik temizliği. Bu bölüm aşağıdaki PR36 pending ifadelerinin yerine geçer. P05 SQL denemeleri rollback içindedir; uzak P05 migration/Edge kalıcı kurulmadı. [P05 devri](p05-handover.md) kabul sınırını açıklar.

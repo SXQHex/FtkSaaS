@@ -1,6 +1,8 @@
 # FtkSaaS kaynak indeksi
 
-P05 **uygulandı; son kaynak kabulü bekliyor**. Branch `feature/p05-documents-notifications`, taban main `16cb570eb45381ce41a509a7d2d954f929de9e6b` (PR36). Yeni belge etki önizlemesiyle14 P05 API; **200 sözleşme/165 runtime/35 contract_only/53 migration/90 core tablo**. [P05 devri](p05-handover.md) dosya/katılım koruması, özel inbox, scoped worker ve kabul sınırını açıklar. Aday/main full clean ve P05 geliştirme CD kabulü henüz yoktur; aşağıdaki P04 ve eski sayılar tarihsel snapshot'tır.
+P05 **done (kod, main ve geliştirme/test kabulü)**: [PR37](https://github.com/SXQHex/FtkSaaS/pull/37), kabul edilmiş main `83641447b29e459236aea1a9a4379b5d19825af6`;200 sözleşme/165 runtime/35 contract_only,53 migration/90 core tablo. Son head15e2126/base16cb570/tested merge2ebe087/tree736a75b; bağımsız son kaynak incelemesi5611074233, [aday39745672815](https://github.com/SXQHex/FtkSaaS/actions/runs/39745672815) ve [aynı main39748053581](https://github.com/SXQHex/FtkSaaS/actions/runs/39748053581) completed/success. [CD39750264949 attempt1](https://github.com/SXQHex/FtkSaaS/actions/runs/39750264949) success:18 kontrol,53/53 içerik eşleşmesi, P05 migration uygulandı, Edge6 ACTIVE/verify_jwt=true, RLS kapalı0/client RPC EXECUTE0 ve sentetik fixture temizliği. Receipt artifact12412499512 SHA256 `a41a8448c0a1b9dfdf853b58bea7cd56525fd8ede14812684b12619c3c8ee04e`. Eski aday hata kayıtları tarihsel kanıttır; bu kabulün kaynağı değildir.
+
+P06 **kod hazır; aday/main/CD kabulü bekleniyor**: branch `feature/p06-reports-imports`, taban kabul edilmiş main `83641447b29e459236aea1a9a4379b5d19825af6`. Bu adayın envanteri200 sözleşme/178 runtime/22 contract_only,54 migration/90 core tablodur. [P06 devri](p06-handover.md) rapor, CSV import, işlem/önizleme/job/audit okumalarını ve doğrulama sınırını açıklar. P05'in eski başarıları yeni P06 kaynağının kabulü değildir. Ardından OPS-W01 hosted worker kurulumu/kesinti kabulü, sonra P07; barındırma hedefi/dedicated kimlik/tenant config henüz kurulmuş sayılmaz.
 
 PR36 operasyonel takip kapandı: aynı main [39644044693](https://github.com/SXQHex/FtkSaaS/actions/runs/39644044693) success; [CD39646391222](https://github.com/SXQHex/FtkSaaS/actions/runs/39646391222) success,18 kontrol,52/52 migration, pending[], Edge5 değişmeden ACTIVE/verify_jwt=true. Atomik Management API transport yeni migration olmadan da rollback probe ile doğrulandı. Bot/deneme hedefi hâlâ kullanıcı kararıyla ertelendi; hosted P05 worker kurulmuş değildir.
 
@@ -35,7 +37,7 @@ Güncel uygulama SHA/CI ve teslim durumu için [tek devir özeti](../contracts/0
 | 7 | [03 sorumluluklar](../contracts/03-FtkSaaS-kodlama-sorumluluklari.md) | Backend/frontend alan sahipliği; güncel çalışma düzeni kök AGENTS’ta |
 | 8 | [04 şema](../contracts/04-FtkSaaS-O4-veri-semasi.md), [05 API](../contracts/05-FtkSaaS-O4-API-katalogu.md), [06 durum/hata/izin](../contracts/06-FtkSaaS-O4-durum-hata-izin.md) | Fiziksel/API sözlükleri; kesin DDL supabase/migrations, işlem tipleri 08 |
 | 9 | [08 makine sözleşmesi](../contracts/08-FtkSaaS-tip-ve-operasyon-sozlesmesi.json) | Tipler, işlem/izin/guard ve implementation_status; katalog varlığı runtime kabulü değildir |
-| 10 | [Endpoint envanteri](endpoint-inventory.json), [runtime listesi](../supabase/functions/backend-v1/implemented.json) | P05 aday:200 işlem/165 çağrılabilir/35 contract_only; main kabulü bekliyor |
+| 10 | [Endpoint envanteri](endpoint-inventory.json), [runtime listesi](../supabase/functions/backend-v1/implemented.json) | Kabul edilmiş P05 main200/165/35; P06 adayı200/178/22 ve54 migration, aynı kaynak clean/CD kabulü beklenir |
 
 ## Kabul edilmiş kararlar
 
@@ -43,7 +45,7 @@ Son açık kullanıcı kararı üstündür; sonraki kabul yalnız çelişen hük
 
 ## Kanıtlar ve tarihsel kayıtlar
 
-[Uzak backend kurulumu](remote-backend-setup.md) güncel49 migration/Edge4 ve otomatik CD smoke kanıtını taşır; [eski smoke raporu](../reports/remote-backend-verification.json)22 migration/65 API snapshot’ıdır. Güncel uzak smoke476 testlik CI’ın tekrarı değildir. Geliştirici beyanı, repository raporu ve bağımsız CI sonucu farklı kanıt türleridir. Tam kaynak SHA’sı ve test kapsamı birlikte okunur.
+[Uzak backend kurulumu](remote-backend-setup.md) kabul edilmiş P05 main53 migration/Edge6 ve18 kontrollü CD receipt kanıtını taşır; [eski smoke raporu](../reports/remote-backend-verification.json)22 migration/65 API snapshot’ıdır. Güncel uzak smoke476 testlik CI’ın tekrarı değildir. Geliştirici beyanı, repository raporu ve bağımsız CI sonucu farklı kanıt türleridir. Tam kaynak SHA’sı ve test kapsamı birlikte okunur.
 
 [Oda/rol raporu](../reports/room-role-verification.json), [registry raporu](../reports/registry-verification.json), [fiilî başlangıç raporu](../reports/actual-start-verification.json), [Q-E03 raporu](../reports/qe03-verification.json), [Q-E02 raporu](../reports/qe02-verification.json), [Q-E01 raporu](../reports/qe01-verification.json) ait oldukları uygulama snapshot’larının kayıtlarıdır. Son main CI yerine kullanılmaz.
 
@@ -82,3 +84,5 @@ Her uygulama PR’si etkilediği sözleşmeleri, envanteri, kalan işleri ve dev
 
 P01 sistem worker transport'u insan Auth dispatcher'ından bağımsız private.p01_worker_execute girişidir; aynı scope/job/lease kapıları korunur. Son düzeltmelerin kabulü ve işletim sınırları docs/p01-handover.md içindedir.
 
+
+[P06 devri](p06-handover.md) sekiz raporun metriklerini, özel import/izleme güvenlik sınırlarını, yerel/rollback doğrulamasını ve bekleyen kaynak kabulünü taşır.

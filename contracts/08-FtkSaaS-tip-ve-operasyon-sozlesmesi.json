@@ -2254,7 +2254,8 @@
         "currency",
         "product_version_ref",
         "start_date",
-        "end_date"
+        "end_date",
+        "opening_credit_value_minor"
       ]
     },
     "ImportColumn": {
@@ -2387,13 +2388,47 @@
               "type": "null"
             }
           ]
+        },
+        "opening_credit_value_minor": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Money"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "contacts": {
+          "type": "array",
+          "maxItems": 100,
+          "items": {
+            "type": "object",
+            "properties": {
+              "kind": {
+                "enum": [
+                  "email",
+                  "phone"
+                ]
+              },
+              "value": {
+                "$ref": "#/$defs/Text"
+              }
+            },
+            "required": [
+              "kind",
+              "value"
+            ],
+            "additionalProperties": false
+          }
         }
       },
       "required": [
         "source_key",
         "display_name"
       ],
-      "additionalProperties": false
+      "additionalProperties": false,
+      "x-invariant": "source_namespace/source_key dedupe across files/jobs. No email merge. opening_credit_value_minor is the explicit original full-package net basis (not cash or automatic debt); remaining credits cannot exceed original product credits. Opening debt is separately declared."
     },
     "ReportFilters": {
       "type": "object",
@@ -2925,6 +2960,9 @@
         },
         "sale_lifecycle": {
           "$ref": "#/$defs/SaleLifecyclePreviewDetails"
+        },
+        "import_summary": {
+          "$ref": "#/$defs/ImportPreviewSummary"
         }
       },
       "required": [
@@ -4245,7 +4283,17 @@
         "ratio_bps": {
           "anyOf": [
             {
-              "$ref": "#/$defs/RateBps"
+              "$ref": "#/$defs/ReportRatioBps"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "basis_count": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Count"
             },
             {
               "type": "null"
@@ -4283,6 +4331,9 @@
               "type": "null"
             }
           ]
+        },
+        "group_key": {
+          "$ref": "#/$defs/Text"
         }
       },
       "required": [
@@ -41811,6 +41862,77 @@
         "values"
       ],
       "additionalProperties": false
+    },
+    "ReportRatioBps": {
+      "type": "integer",
+      "minimum": 0,
+      "description": "Utilization basis points may exceed 10000 when occupancy exceeds nominal capacity."
+    },
+    "ImportMoneyTotal": {
+      "type": "object",
+      "properties": {
+        "currency": {
+          "$ref": "#/$defs/Currency"
+        },
+        "amount_minor": {
+          "$ref": "#/$defs/Money"
+        }
+      },
+      "required": [
+        "currency",
+        "amount_minor"
+      ],
+      "additionalProperties": false
+    },
+    "ImportPreviewSummary": {
+      "type": "object",
+      "properties": {
+        "total_rows": {
+          "$ref": "#/$defs/Count"
+        },
+        "valid_rows": {
+          "$ref": "#/$defs/Count"
+        },
+        "invalid_rows": {
+          "$ref": "#/$defs/Count"
+        },
+        "new_people": {
+          "$ref": "#/$defs/Count"
+        },
+        "replayed_rows": {
+          "$ref": "#/$defs/Count"
+        },
+        "opening_credits": {
+          "$ref": "#/$defs/Count"
+        },
+        "existing_negative_credits": {
+          "$ref": "#/$defs/Count"
+        },
+        "opening_debt_totals": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/ImportMoneyTotal"
+          }
+        },
+        "original_credit_basis_totals": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/ImportMoneyTotal"
+          }
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "total_rows",
+        "valid_rows",
+        "invalid_rows",
+        "new_people",
+        "replayed_rows",
+        "opening_credits",
+        "existing_negative_credits",
+        "opening_debt_totals",
+        "original_credit_basis_totals"
+      ]
     }
   },
   "x-contract": {
@@ -41859,7 +41981,7 @@
       "notification.self": "Alıcı kendi inbox/tercihleri; yönetici başkasının inbox’ını bu izinle okuyamaz.",
       "report.read": "Owner/organizasyon yöneticisi org, merkez yöneticisi merkez; personel yalnız açık dar rapor izni. Finans alanı ayrıca.",
       "report.export": "report.read alan/kapsamına ek dışa aktarım izni; CRM personeline toplu export yok.",
-      "import.execute": "Merkez yönetici veya merkez kapsamlı özel imports.write izni; people.write tek başına yetmez.",
+      "import.execute": "Merkez yöneticisi veya merkez kapsamlı açık import.execute override (ürün kararındaki özel imports.write); person.manage tek başına yetmez.",
       "subscription.owner": "Owner yalnız org SaaS teklif/değişim/ödeme yönetimi.",
       "saas.operator": "Platform SaaS yöneticisi; müşteri rolü değil, müşteri hesapları bu actor türünü seçemez.",
       "event.manage": "İlgili merkez yöneticisi; en az eğitmen/asistan görevi.",
@@ -57534,7 +57656,12 @@
         "name": "report_get_v1",
         "module": "M11",
         "features": [
-          "F28"
+          "F28",
+          "F06",
+          "F19",
+          "F20",
+          "F21",
+          "F18"
         ],
         "permission": "report.read",
         "actor_source": "server_verified",
@@ -57592,12 +57719,40 @@
           "A55"
         ],
         "configuration_policy": "numeric plan limits/prices and legal approval are deployment configuration, never arbitrary allow/deny",
-        "implementation_status": "contract_only",
+        "implementation_status": "operational_development_limited",
         "required_features": [
           "F28"
         ],
-        "runtime_required_features": [],
-        "conditional_features": [],
+        "runtime_required_features": [
+          "F28"
+        ],
+        "conditional_features": [
+          {
+            "feature": "F06",
+            "when": "selected_financial_report",
+            "mode": "required_if_selected"
+          },
+          {
+            "feature": "F19",
+            "when": "selected_financial_report",
+            "mode": "required_if_selected"
+          },
+          {
+            "feature": "F20",
+            "when": "earnings_report",
+            "mode": "required_if_selected"
+          },
+          {
+            "feature": "F21",
+            "when": "crm_conversion_report",
+            "mode": "required_if_selected"
+          },
+          {
+            "feature": "F18",
+            "when": "cross_center_usage_report",
+            "mode": "required_if_selected"
+          }
+        ],
         "operation_contract": {
           "kind": "read",
           "target_entity": "report_jobs",
@@ -57606,23 +57761,32 @@
           "read_operation": null,
           "atomic_effects": [],
           "business_commit": false,
-          "read_path_status": "contract_only",
+          "read_path_status": "not_required",
           "source_decision": "DS-2026-10-17"
         },
         "decision_delivery": {
           "accepted_contract": "DS-2026-10-17",
-          "runtime_conformance": "pending",
+          "runtime_conformance": "implemented_pending_ci",
           "open_dependencies": [],
           "target_request": {
             "$ref": "#/$defs/Request_report_get"
           }
-        }
+        },
+        "runtime_limits": [
+          "Development/test only; final source candidate/main clean required.",
+          "Explicit tenant limits and dedicated scoped worker; hosted scheduling remains OPS-W01."
+        ]
       },
       {
         "name": "report_export_start_v1",
         "module": "M11",
         "features": [
-          "F28"
+          "F28",
+          "F06",
+          "F19",
+          "F20",
+          "F21",
+          "F18"
         ],
         "permission": "report.export",
         "actor_source": "server_verified",
@@ -57686,39 +57850,76 @@
           "A55"
         ],
         "configuration_policy": "numeric plan limits/prices and legal approval are deployment configuration, never arbitrary allow/deny",
-        "implementation_status": "contract_only",
+        "implementation_status": "operational_development_limited",
         "required_features": [
           "F28"
         ],
-        "runtime_required_features": [],
-        "conditional_features": [],
+        "runtime_required_features": [
+          "F28"
+        ],
+        "conditional_features": [
+          {
+            "feature": "F06",
+            "when": "selected_financial_report",
+            "mode": "required_if_selected"
+          },
+          {
+            "feature": "F19",
+            "when": "selected_financial_report",
+            "mode": "required_if_selected"
+          },
+          {
+            "feature": "F20",
+            "when": "earnings_report",
+            "mode": "required_if_selected"
+          },
+          {
+            "feature": "F21",
+            "when": "crm_conversion_report",
+            "mode": "required_if_selected"
+          },
+          {
+            "feature": "F18",
+            "when": "cross_center_usage_report",
+            "mode": "required_if_selected"
+          }
+        ],
         "operation_contract": {
           "kind": "command",
           "target_entity": "report_jobs",
           "version_mode": "append_or_current_scope_lock",
           "version_field": null,
-          "read_operation": "management_state_get_v1",
+          "read_operation": "job_status_get_v1",
           "atomic_effects": [
             "report_jobs.versioned_domain_change"
           ],
           "business_commit": true,
-          "read_path_status": "contract_only",
+          "read_path_status": "implemented",
           "source_decision": "DS-2026-10-17"
         },
         "decision_delivery": {
           "accepted_contract": "DS-2026-10-17",
-          "runtime_conformance": "pending",
+          "runtime_conformance": "implemented_pending_ci",
           "open_dependencies": [],
           "target_request": {
             "$ref": "#/$defs/Request_report_export_start"
           }
-        }
+        },
+        "runtime_limits": [
+          "Development/test only; final source candidate/main clean required.",
+          "Explicit tenant limits and dedicated scoped worker; hosted scheduling remains OPS-W01."
+        ]
       },
       {
         "name": "report_file_get_v1",
         "module": "M11",
         "features": [
-          "F28"
+          "F28",
+          "F06",
+          "F19",
+          "F20",
+          "F21",
+          "F18"
         ],
         "permission": "report.export",
         "actor_source": "server_verified",
@@ -57783,12 +57984,40 @@
           "A55"
         ],
         "configuration_policy": "numeric plan limits/prices and legal approval are deployment configuration, never arbitrary allow/deny",
-        "implementation_status": "contract_only",
+        "implementation_status": "operational_development_limited",
         "required_features": [
           "F28"
         ],
-        "runtime_required_features": [],
-        "conditional_features": [],
+        "runtime_required_features": [
+          "F28"
+        ],
+        "conditional_features": [
+          {
+            "feature": "F06",
+            "when": "selected_financial_report",
+            "mode": "required_if_selected"
+          },
+          {
+            "feature": "F19",
+            "when": "selected_financial_report",
+            "mode": "required_if_selected"
+          },
+          {
+            "feature": "F20",
+            "when": "earnings_report",
+            "mode": "required_if_selected"
+          },
+          {
+            "feature": "F21",
+            "when": "crm_conversion_report",
+            "mode": "required_if_selected"
+          },
+          {
+            "feature": "F18",
+            "when": "cross_center_usage_report",
+            "mode": "required_if_selected"
+          }
+        ],
         "operation_contract": {
           "kind": "read",
           "target_entity": "report_jobs",
@@ -57797,17 +58026,21 @@
           "read_operation": null,
           "atomic_effects": [],
           "business_commit": false,
-          "read_path_status": "contract_only",
+          "read_path_status": "not_required",
           "source_decision": "DS-2026-10-17"
         },
         "decision_delivery": {
           "accepted_contract": "DS-2026-10-17",
-          "runtime_conformance": "pending",
+          "runtime_conformance": "implemented_pending_ci",
           "open_dependencies": [],
           "target_request": {
             "$ref": "#/$defs/Request_report_file_get"
           }
-        }
+        },
+        "runtime_limits": [
+          "Development/test only; final source candidate/main clean required.",
+          "Explicit tenant limits and dedicated scoped worker; hosted scheduling remains OPS-W01."
+        ]
       },
       {
         "name": "import_upload_prepare_v1",
@@ -57864,7 +58097,7 @@
         "audit": true,
         "notification": "outbox_if_user_visible_business_result",
         "concurrency": "Live original permission/tenant scope on every request; target/aggregate lock; append_or_current_scope_lock; idempotent receipt and all declared effects rollback together",
-        "expected_version_subject": "import_jobs: append_or_current_scope_lock; captured target/scope dependencies, no client row version",
+        "expected_version_subject": "files: append_or_current_scope_lock; uploader and center scope",
         "acceptance_scenario_ids": [
           "A01",
           "A02",
@@ -57881,39 +58114,49 @@
           "D-A12"
         ],
         "configuration_policy": "numeric plan limits/prices and legal approval are deployment configuration, never arbitrary allow/deny",
-        "implementation_status": "contract_only",
+        "implementation_status": "operational_development_limited",
         "required_features": [
           "F31"
         ],
-        "runtime_required_features": [],
+        "runtime_required_features": [
+          "F31"
+        ],
         "conditional_features": [],
         "operation_contract": {
           "kind": "command",
-          "target_entity": "import_jobs",
+          "target_entity": "files",
           "version_mode": "append_or_current_scope_lock",
           "version_field": null,
           "read_operation": "management_state_get_v1",
           "atomic_effects": [
-            "import_jobs.versioned_domain_change"
+            "files.private_import_upload"
           ],
           "business_commit": true,
-          "read_path_status": "contract_only",
+          "read_path_status": "implemented",
           "source_decision": "DS-2026-10-17"
         },
         "decision_delivery": {
           "accepted_contract": "DS-2026-10-17",
-          "runtime_conformance": "pending",
+          "runtime_conformance": "implemented_pending_ci",
           "open_dependencies": [],
           "target_request": {
             "$ref": "#/$defs/Request_import_upload_prepare"
           }
-        }
+        },
+        "runtime_limits": [
+          "Development/test only; final source candidate/main clean required.",
+          "Explicit tenant limits and dedicated scoped worker; hosted scheduling remains OPS-W01."
+        ]
       },
       {
         "name": "import_preview_v1",
         "module": "X",
         "features": [
-          "F31"
+          "F31",
+          "F07",
+          "F15",
+          "F19",
+          "F18"
         ],
         "permission": "import.execute",
         "actor_source": "server_verified",
@@ -57946,7 +58189,7 @@
           "VERSION_CONFLICT"
         ],
         "transaction_class": "preview",
-        "transaction_guarantee": "Compute import_preview impact and dependency-bound technical preview only; no business mutation.",
+        "transaction_guarantee": "Idempotent technical validation job and receipt only; no person, rights, debt or cash mutation. Apply requires a live dependency-bound preview.",
         "transition": {
           "effect": "technical_preview_only",
           "from": [],
@@ -57980,37 +58223,68 @@
           "D-A12"
         ],
         "configuration_policy": "numeric plan limits/prices and legal approval are deployment configuration, never arbitrary allow/deny",
-        "implementation_status": "contract_only",
+        "implementation_status": "operational_development_limited",
         "required_features": [
           "F31"
         ],
-        "runtime_required_features": [],
-        "conditional_features": [],
+        "runtime_required_features": [
+          "F31"
+        ],
+        "conditional_features": [
+          {
+            "feature": "F07",
+            "when": "row_person_student_activation",
+            "mode": "required_if_selected"
+          },
+          {
+            "feature": "F15",
+            "when": "row_opening_credit",
+            "mode": "required_if_selected"
+          },
+          {
+            "feature": "F19",
+            "when": "row_opening_credit_or_debt",
+            "mode": "required_if_selected"
+          },
+          {
+            "feature": "F18",
+            "when": "eligible_late_cross_center_deficit_settlement",
+            "mode": "required_if_selected"
+          }
+        ],
         "operation_contract": {
           "kind": "preview",
           "target_entity": "import_jobs",
           "version_mode": "preview_dependencies",
           "version_field": null,
-          "read_operation": "management_state_get_v1",
+          "read_operation": "job_status_get_v1",
           "atomic_effects": [],
           "business_commit": false,
-          "read_path_status": "contract_only",
+          "read_path_status": "implemented",
           "source_decision": "DS-2026-10-17"
         },
         "decision_delivery": {
           "accepted_contract": "DS-2026-10-17",
-          "runtime_conformance": "pending",
+          "runtime_conformance": "implemented_pending_ci",
           "open_dependencies": [],
           "target_request": {
             "$ref": "#/$defs/Request_import_preview"
           }
-        }
+        },
+        "runtime_limits": [
+          "Development/test only; final source candidate/main clean required.",
+          "Explicit tenant limits and dedicated scoped worker; hosted scheduling remains OPS-W01."
+        ]
       },
       {
         "name": "import_apply_v1",
         "module": "X",
         "features": [
-          "F31"
+          "F31",
+          "F07",
+          "F15",
+          "F19",
+          "F18"
         ],
         "permission": "import.execute",
         "actor_source": "server_verified",
@@ -58035,6 +58309,7 @@
           "PLAN_FEATURE_UNAVAILABLE",
           "PLAN_LIMIT_REACHED",
           "POLICY_NOT_CONFIGURED",
+          "PREVIEW_STALE",
           "SERVICE_UNAVAILABLE",
           "SESSION_REVOKED",
           "SUBSCRIPTION_NOT_STARTED",
@@ -58081,33 +58356,60 @@
           "D-A12"
         ],
         "configuration_policy": "numeric plan limits/prices and legal approval are deployment configuration, never arbitrary allow/deny",
-        "implementation_status": "contract_only",
+        "implementation_status": "operational_development_limited",
         "required_features": [
           "F31"
         ],
-        "runtime_required_features": [],
-        "conditional_features": [],
+        "runtime_required_features": [
+          "F31"
+        ],
+        "conditional_features": [
+          {
+            "feature": "F07",
+            "when": "row_person_student_activation",
+            "mode": "required_if_selected"
+          },
+          {
+            "feature": "F15",
+            "when": "row_opening_credit",
+            "mode": "required_if_selected"
+          },
+          {
+            "feature": "F19",
+            "when": "row_opening_credit_or_debt",
+            "mode": "required_if_selected"
+          },
+          {
+            "feature": "F18",
+            "when": "eligible_late_cross_center_deficit_settlement",
+            "mode": "required_if_selected"
+          }
+        ],
         "operation_contract": {
           "kind": "apply",
           "target_entity": "import_jobs",
           "version_mode": "preview_dependencies",
           "version_field": null,
-          "read_operation": "import_preview_v1",
+          "read_operation": "job_status_get_v1",
           "atomic_effects": [
             "import_jobs.versioned_domain_change"
           ],
           "business_commit": true,
-          "read_path_status": "contract_only",
+          "read_path_status": "implemented",
           "source_decision": "DS-2026-10-17"
         },
         "decision_delivery": {
           "accepted_contract": "DS-2026-10-17",
-          "runtime_conformance": "pending",
+          "runtime_conformance": "implemented_pending_ci",
           "open_dependencies": [],
           "target_request": {
             "$ref": "#/$defs/Request_import_apply"
           }
-        }
+        },
+        "runtime_limits": [
+          "Development/test only; final source candidate/main clean required.",
+          "Explicit tenant limits and dedicated scoped worker; hosted scheduling remains OPS-W01."
+        ]
       },
       {
         "name": "import_rows_list_v1",
@@ -58176,11 +58478,13 @@
           "D-A12"
         ],
         "configuration_policy": "numeric plan limits/prices and legal approval are deployment configuration, never arbitrary allow/deny",
-        "implementation_status": "contract_only",
+        "implementation_status": "operational_development_limited",
         "required_features": [
           "F31"
         ],
-        "runtime_required_features": [],
+        "runtime_required_features": [
+          "F31"
+        ],
         "conditional_features": [],
         "operation_contract": {
           "kind": "read",
@@ -58190,17 +58494,21 @@
           "read_operation": null,
           "atomic_effects": [],
           "business_commit": false,
-          "read_path_status": "contract_only",
+          "read_path_status": "not_required",
           "source_decision": "DS-2026-10-17"
         },
         "decision_delivery": {
           "accepted_contract": "DS-2026-10-17",
-          "runtime_conformance": "pending",
+          "runtime_conformance": "implemented_pending_ci",
           "open_dependencies": [],
           "target_request": {
             "$ref": "#/$defs/Request_import_rows_list"
           }
-        }
+        },
+        "runtime_limits": [
+          "Development/test only; final source candidate/main clean required.",
+          "Explicit tenant limits and dedicated scoped worker; hosted scheduling remains OPS-W01."
+        ]
       },
       {
         "name": "subscription_get_v1",
@@ -61235,11 +61543,13 @@
           "A55"
         ],
         "configuration_policy": "numeric plan limits/prices and legal approval are deployment configuration, never arbitrary allow/deny",
-        "implementation_status": "contract_only",
+        "implementation_status": "operational_development_limited",
         "required_features": [
           "F33"
         ],
-        "runtime_required_features": [],
+        "runtime_required_features": [
+          "F33"
+        ],
         "conditional_features": [],
         "operation_contract": {
           "kind": "read",
@@ -61249,17 +61559,21 @@
           "read_operation": null,
           "atomic_effects": [],
           "business_commit": false,
-          "read_path_status": "contract_only",
+          "read_path_status": "not_required",
           "source_decision": "DS-2026-10-17"
         },
         "decision_delivery": {
           "accepted_contract": "DS-2026-10-17",
-          "runtime_conformance": "pending",
+          "runtime_conformance": "implemented_pending_ci",
           "open_dependencies": [],
           "target_request": {
             "$ref": "#/$defs/Request_operation_status_get"
           }
-        }
+        },
+        "runtime_limits": [
+          "Development/test only; final source candidate/main clean required.",
+          "Explicit tenant limits and dedicated scoped worker; hosted scheduling remains OPS-W01."
+        ]
       },
       {
         "name": "preview_get_v1",
@@ -61324,11 +61638,13 @@
           "A55"
         ],
         "configuration_policy": "numeric plan limits/prices and legal approval are deployment configuration, never arbitrary allow/deny",
-        "implementation_status": "contract_only",
+        "implementation_status": "operational_development_limited",
         "required_features": [
           "F33"
         ],
-        "runtime_required_features": [],
+        "runtime_required_features": [
+          "F33"
+        ],
         "conditional_features": [],
         "operation_contract": {
           "kind": "read",
@@ -61338,17 +61654,21 @@
           "read_operation": null,
           "atomic_effects": [],
           "business_commit": false,
-          "read_path_status": "contract_only",
+          "read_path_status": "not_required",
           "source_decision": "DS-2026-10-17"
         },
         "decision_delivery": {
           "accepted_contract": "DS-2026-10-17",
-          "runtime_conformance": "pending",
+          "runtime_conformance": "implemented_pending_ci",
           "open_dependencies": [],
           "target_request": {
             "$ref": "#/$defs/Request_preview_get"
           }
-        }
+        },
+        "runtime_limits": [
+          "Development/test only; final source candidate/main clean required.",
+          "Explicit tenant limits and dedicated scoped worker; hosted scheduling remains OPS-W01."
+        ]
       },
       {
         "name": "job_status_get_v1",
@@ -61414,7 +61734,7 @@
           "A55"
         ],
         "configuration_policy": "numeric plan limits/prices and legal approval are deployment configuration, never arbitrary allow/deny",
-        "implementation_status": "contract_only",
+        "implementation_status": "operational_development_limited",
         "required_features": [],
         "runtime_required_features": [],
         "conditional_features": [
@@ -61437,17 +61757,21 @@
           "read_operation": null,
           "atomic_effects": [],
           "business_commit": false,
-          "read_path_status": "contract_only",
+          "read_path_status": "not_required",
           "source_decision": "DS-2026-10-17"
         },
         "decision_delivery": {
           "accepted_contract": "DS-2026-10-17",
-          "runtime_conformance": "pending",
+          "runtime_conformance": "implemented_pending_ci",
           "open_dependencies": [],
           "target_request": {
             "$ref": "#/$defs/Request_job_status_get"
           }
-        }
+        },
+        "runtime_limits": [
+          "Development/test only; final source candidate/main clean required.",
+          "Explicit tenant limits and dedicated scoped worker; hosted scheduling remains OPS-W01."
+        ]
       },
       {
         "name": "audit_list_v1",
@@ -61511,11 +61835,13 @@
           "A55"
         ],
         "configuration_policy": "numeric plan limits/prices and legal approval are deployment configuration, never arbitrary allow/deny",
-        "implementation_status": "contract_only",
+        "implementation_status": "operational_development_limited",
         "required_features": [
           "F33"
         ],
-        "runtime_required_features": [],
+        "runtime_required_features": [
+          "F33"
+        ],
         "conditional_features": [],
         "operation_contract": {
           "kind": "read",
@@ -61525,17 +61851,21 @@
           "read_operation": null,
           "atomic_effects": [],
           "business_commit": false,
-          "read_path_status": "contract_only",
+          "read_path_status": "not_required",
           "source_decision": "DS-2026-10-17"
         },
         "decision_delivery": {
           "accepted_contract": "DS-2026-10-17",
-          "runtime_conformance": "pending",
+          "runtime_conformance": "implemented_pending_ci",
           "open_dependencies": [],
           "target_request": {
             "$ref": "#/$defs/Request_audit_list"
           }
-        }
+        },
+        "runtime_limits": [
+          "Development/test only; final source candidate/main clean required.",
+          "Explicit tenant limits and dedicated scoped worker; hosted scheduling remains OPS-W01."
+        ]
       },
       {
         "name": "seat_offer_issue_v1",
@@ -62253,7 +62583,11 @@
         "name": "import_rows_process_v1",
         "module": "X",
         "features": [
-          "F31"
+          "F31",
+          "F07",
+          "F15",
+          "F19",
+          "F18"
         ],
         "permission": "system.worker",
         "actor_source": "server_worker_claim",
@@ -62278,6 +62612,7 @@
           "PLAN_FEATURE_UNAVAILABLE",
           "PLAN_LIMIT_REACHED",
           "POLICY_NOT_CONFIGURED",
+          "PREVIEW_STALE",
           "SERVICE_UNAVAILABLE",
           "SESSION_REVOKED",
           "SUBSCRIPTION_NOT_STARTED",
@@ -62322,12 +62657,35 @@
           "D-A12"
         ],
         "configuration_policy": "numeric plan limits/prices and legal approval are deployment configuration, never arbitrary allow/deny",
-        "implementation_status": "contract_only",
+        "implementation_status": "operational_development_limited",
         "required_features": [
           "F31"
         ],
-        "runtime_required_features": [],
-        "conditional_features": [],
+        "runtime_required_features": [
+          "F31"
+        ],
+        "conditional_features": [
+          {
+            "feature": "F07",
+            "when": "row_person_student_activation",
+            "mode": "required_if_selected"
+          },
+          {
+            "feature": "F15",
+            "when": "row_opening_credit",
+            "mode": "required_if_selected"
+          },
+          {
+            "feature": "F19",
+            "when": "row_opening_credit_or_debt",
+            "mode": "required_if_selected"
+          },
+          {
+            "feature": "F18",
+            "when": "eligible_late_cross_center_deficit_settlement",
+            "mode": "required_if_selected"
+          }
+        ],
         "operation_contract": {
           "kind": "worker",
           "target_entity": "import_jobs",
@@ -62338,23 +62696,32 @@
             "import_jobs.versioned_domain_change"
           ],
           "business_commit": true,
-          "read_path_status": "contract_only",
+          "read_path_status": "implemented",
           "source_decision": "DS-2026-10-17"
         },
         "decision_delivery": {
           "accepted_contract": "DS-2026-10-17",
-          "runtime_conformance": "pending",
+          "runtime_conformance": "implemented_pending_ci",
           "open_dependencies": [],
           "target_request": {
             "$ref": "#/$defs/Request_import_rows_process"
           }
-        }
+        },
+        "runtime_limits": [
+          "Development/test only; final source candidate/main clean required.",
+          "Explicit tenant limits and dedicated scoped worker; hosted scheduling remains OPS-W01."
+        ]
       },
       {
         "name": "report_build_v1",
         "module": "X",
         "features": [
-          "F28"
+          "F28",
+          "F06",
+          "F19",
+          "F20",
+          "F21",
+          "F18"
         ],
         "permission": "system.worker",
         "actor_source": "server_worker_claim",
@@ -62417,12 +62784,40 @@
           "A55"
         ],
         "configuration_policy": "numeric plan limits/prices and legal approval are deployment configuration, never arbitrary allow/deny",
-        "implementation_status": "contract_only",
+        "implementation_status": "operational_development_limited",
         "required_features": [
           "F28"
         ],
-        "runtime_required_features": [],
-        "conditional_features": [],
+        "runtime_required_features": [
+          "F28"
+        ],
+        "conditional_features": [
+          {
+            "feature": "F06",
+            "when": "selected_financial_report",
+            "mode": "required_if_selected"
+          },
+          {
+            "feature": "F19",
+            "when": "selected_financial_report",
+            "mode": "required_if_selected"
+          },
+          {
+            "feature": "F20",
+            "when": "earnings_report",
+            "mode": "required_if_selected"
+          },
+          {
+            "feature": "F21",
+            "when": "crm_conversion_report",
+            "mode": "required_if_selected"
+          },
+          {
+            "feature": "F18",
+            "when": "cross_center_usage_report",
+            "mode": "required_if_selected"
+          }
+        ],
         "operation_contract": {
           "kind": "worker",
           "target_entity": "report_jobs",
@@ -62433,17 +62828,21 @@
             "report_jobs.versioned_domain_change"
           ],
           "business_commit": true,
-          "read_path_status": "contract_only",
+          "read_path_status": "implemented",
           "source_decision": "DS-2026-10-17"
         },
         "decision_delivery": {
           "accepted_contract": "DS-2026-10-17",
-          "runtime_conformance": "pending",
+          "runtime_conformance": "implemented_pending_ci",
           "open_dependencies": [],
           "target_request": {
             "$ref": "#/$defs/Request_report_build"
           }
-        }
+        },
+        "runtime_limits": [
+          "Development/test only; final source candidate/main clean required.",
+          "Explicit tenant limits and dedicated scoped worker; hosted scheduling remains OPS-W01."
+        ]
       },
       {
         "name": "privacy_execute_v1",
@@ -65317,7 +65716,11 @@
           "notification_preferences_set_v1",
           "segment_save_v1",
           "automation_save_v1",
-          "document_publication_preview_v1"
+          "document_publication_preview_v1",
+          "report_export_start_v1",
+          "import_upload_prepare_v1",
+          "import_preview_v1",
+          "import_apply_v1"
         ]
       },
       {
@@ -81534,14 +81937,27 @@
         "outbox_deliver_v1",
         "reminder_schedule_v1",
         "automation_run_v1",
-        "document_publication_preview_v1"
+        "document_publication_preview_v1",
+        "report_get_v1",
+        "report_export_start_v1",
+        "report_file_get_v1",
+        "import_upload_prepare_v1",
+        "import_preview_v1",
+        "import_apply_v1",
+        "import_rows_list_v1",
+        "import_rows_process_v1",
+        "report_build_v1",
+        "operation_status_get_v1",
+        "preview_get_v1",
+        "job_status_get_v1",
+        "audit_list_v1"
       ],
       "auth": "Supabase getUser + live auth.sessions + current account/link/role; no request actor claims",
       "uuid": "backend uuid@14.0.3 v7 for all inserted IDs; DB defaults not required",
       "external_transport": "POST /functions/v1/backend-v1/{operation}; direct typed request body",
       "internal_rpc": "service-only api_v1 named functions; actor/session/UUID bank supplied by verified gateway",
-      "migration_count": 53,
-      "test_evidence": "tests/registry.test.mjs includes P05 acceptance; final candidate/main CI separately required",
+      "migration_count": 54,
+      "test_evidence": "P06 acceptance is registered through registry.test.mjs; candidate/main full clean evidence is pending",
       "frontend_unchanged": true
     },
     "decision_sprint": {
@@ -82580,7 +82996,11 @@
           "person_get_v1",
           "reservation_list_v1",
           "entitlements_get_v1",
-          "finance_get_v1"
+          "finance_get_v1",
+          "report_get_v1",
+          "report_export_start_v1",
+          "report_file_get_v1",
+          "report_build_v1"
         ],
         "dependencies": [
           "plan_gate_alignment"
@@ -82595,7 +83015,11 @@
           "person_get_v1",
           "reservation_list_v1",
           "entitlements_get_v1",
-          "finance_get_v1"
+          "finance_get_v1",
+          "report_get_v1",
+          "report_export_start_v1",
+          "report_file_get_v1",
+          "report_build_v1"
         ],
         "contract_only_operations": [
           "account_profile_update_v1",
@@ -82635,6 +83059,9 @@
           "person_merge_approve_v1",
           "person_merge_apply_v1",
           "lead_convert_v1",
+          "import_preview_v1",
+          "import_apply_v1",
+          "import_rows_process_v1",
           "person_discipline_set_v1"
         ],
         "dependencies": [],
@@ -82649,6 +83076,9 @@
           "student_activate_v1",
           "student_deactivate_v1",
           "lead_convert_v1",
+          "import_preview_v1",
+          "import_apply_v1",
+          "import_rows_process_v1",
           "person_discipline_set_v1"
         ],
         "contract_only_operations": [
@@ -82715,8 +83145,8 @@
           "business": "Merkez bazlı"
         },
         "completed_dependencies": [
-          "agreement_versions_and_selection",
-          "starter_plan_and_earning_split"
+          "starter_plan_and_earning_split",
+          "agreement_versions_and_selection"
         ]
       },
       "F09": {
@@ -82789,8 +83219,8 @@
           "class_assignment_set_v1"
         ],
         "dependencies": [
-          "cross_center_settlement",
-          "sale_scope_and_backdating"
+          "sale_scope_and_backdating",
+          "cross_center_settlement"
         ],
         "implementation": "implemented_acceptance_pending",
         "acceptance": "pending_feature_acceptance",
@@ -83057,16 +83487,19 @@
           "sale_terminate_apply_v1",
           "sale_renew_preview_v1",
           "sale_renew_apply_v1",
+          "import_preview_v1",
+          "import_apply_v1",
+          "import_rows_process_v1",
           "negcredit_valuation_set_v1",
           "reservation_impact_preview_v1",
           "reservation_impact_apply_v1",
           "negative_limits_get_v1"
         ],
         "dependencies": [
-          "confirmed_reservation_protection",
+          "sale_scope_and_backdating",
           "cross_center_settlement",
           "plan_gate_alignment",
-          "sale_scope_and_backdating"
+          "confirmed_reservation_protection"
         ],
         "implementation": "partial",
         "acceptance": "pending_feature_acceptance",
@@ -83085,6 +83518,9 @@
           "sale_terminate_apply_v1",
           "sale_renew_preview_v1",
           "sale_renew_apply_v1",
+          "import_preview_v1",
+          "import_apply_v1",
+          "import_rows_process_v1",
           "negcredit_valuation_set_v1",
           "reservation_impact_preview_v1",
           "reservation_impact_apply_v1",
@@ -83151,9 +83587,9 @@
           "sale_renew_apply_v1"
         ],
         "dependencies": [
+          "sale_scope_and_backdating",
           "cross_center_settlement",
-          "plan_gate_alignment",
-          "sale_scope_and_backdating"
+          "plan_gate_alignment"
         ],
         "implementation": "partial",
         "acceptance": "pending_feature_acceptance",
@@ -83225,8 +83661,8 @@
           "sale_change_apply_v1"
         ],
         "dependencies": [
-          "confirmed_reservation_protection",
-          "sale_scope_and_backdating"
+          "sale_scope_and_backdating",
+          "confirmed_reservation_protection"
         ],
         "implementation": "partial",
         "acceptance": "pending_feature_acceptance",
@@ -83272,6 +83708,13 @@
         "decision": "contracts/01-FtkSaaS-urun-kapsam-sozlesmesi.md",
         "technical_operations": [
           "product_publish_v1",
+          "report_get_v1",
+          "report_export_start_v1",
+          "report_file_get_v1",
+          "import_preview_v1",
+          "import_apply_v1",
+          "import_rows_process_v1",
+          "report_build_v1",
           "settlement_movements_list_v1",
           "settlement_requests_list_v1",
           "settlement_request_get_v1",
@@ -83290,6 +83733,13 @@
         "acceptance_evidence": [],
         "implemented_operations": [
           "product_publish_v1",
+          "report_get_v1",
+          "report_export_start_v1",
+          "report_file_get_v1",
+          "import_preview_v1",
+          "import_apply_v1",
+          "import_rows_process_v1",
+          "report_build_v1",
           "settlement_movements_list_v1",
           "settlement_requests_list_v1",
           "settlement_request_get_v1",
@@ -83360,12 +83810,19 @@
           "collection_correct_apply_v1",
           "student_credit_refund_v1",
           "student_credit_offset_v1",
-          "debt_adjust_v1"
+          "debt_adjust_v1",
+          "report_get_v1",
+          "report_export_start_v1",
+          "report_file_get_v1",
+          "import_preview_v1",
+          "import_apply_v1",
+          "import_rows_process_v1",
+          "report_build_v1"
         ],
         "dependencies": [
-          "confirmed_reservation_protection",
+          "sale_scope_and_backdating",
           "cross_center_settlement",
-          "sale_scope_and_backdating"
+          "confirmed_reservation_protection"
         ],
         "implementation": "implemented_acceptance_pending",
         "acceptance": "pending_feature_acceptance",
@@ -83383,7 +83840,14 @@
           "collection_correct_apply_v1",
           "student_credit_refund_v1",
           "student_credit_offset_v1",
-          "debt_adjust_v1"
+          "debt_adjust_v1",
+          "report_get_v1",
+          "report_export_start_v1",
+          "report_file_get_v1",
+          "import_preview_v1",
+          "import_apply_v1",
+          "import_rows_process_v1",
+          "report_build_v1"
         ],
         "contract_only_operations": [],
         "acceptance_case_ids": [
@@ -83443,15 +83907,19 @@
           "earnings_list_v1",
           "instructor_payment_record_v1",
           "instructor_payment_correct_v1",
+          "report_get_v1",
+          "report_export_start_v1",
+          "report_file_get_v1",
           "event_duty_verify_v1",
+          "report_build_v1",
           "attendance_block_v1",
           "negcredit_valuation_set_v1",
           "instructor_agreements_list_v1",
           "attendance_start_v1"
         ],
         "dependencies": [
-          "confirmed_reservation_protection",
-          "plan_gate_alignment"
+          "plan_gate_alignment",
+          "confirmed_reservation_protection"
         ],
         "implementation": "implemented_acceptance_pending",
         "acceptance": "pending_feature_acceptance",
@@ -83464,7 +83932,11 @@
           "earnings_list_v1",
           "instructor_payment_record_v1",
           "instructor_payment_correct_v1",
+          "report_get_v1",
+          "report_export_start_v1",
+          "report_file_get_v1",
           "event_duty_verify_v1",
+          "report_build_v1",
           "attendance_block_v1",
           "negcredit_valuation_set_v1",
           "instructor_agreements_list_v1",
@@ -83511,7 +83983,11 @@
           "lead_save_v1",
           "crm_activity_save_v1",
           "lead_convert_v1",
-          "public_application_review_v1"
+          "report_get_v1",
+          "report_export_start_v1",
+          "report_file_get_v1",
+          "public_application_review_v1",
+          "report_build_v1"
         ],
         "dependencies": [],
         "implementation": "partial",
@@ -83522,7 +83998,11 @@
           "lead_save_v1",
           "crm_activity_save_v1",
           "lead_convert_v1",
-          "public_application_review_v1"
+          "report_get_v1",
+          "report_export_start_v1",
+          "report_file_get_v1",
+          "public_application_review_v1",
+          "report_build_v1"
         ],
         "contract_only_operations": [],
         "acceptance_case_ids": [],
@@ -83648,8 +84128,8 @@
           "public_application_review_v1"
         ],
         "dependencies": [
-          "Configured signed ingress, Turnstile secret/hostname and real provider acceptance; no bypass.",
-          "plan_gate_alignment"
+          "plan_gate_alignment",
+          "Configured signed ingress, Turnstile secret/hostname and real provider acceptance; no bypass."
         ],
         "implementation": "partial",
         "acceptance": "pending_feature_acceptance",
@@ -83761,16 +84241,16 @@
         "implementation": "partial",
         "acceptance": "pending_feature_acceptance",
         "acceptance_evidence": [],
-        "implemented_operations": [],
-        "contract_only_operations": [
+        "implemented_operations": [
           "report_get_v1",
           "report_export_start_v1",
           "report_file_get_v1",
           "job_status_get_v1",
           "report_build_v1"
         ],
+        "contract_only_operations": [],
         "acceptance_case_ids": [],
-        "baseline_regression": "no callable operation; no behavior acceptance claimed",
+        "baseline_regression": "P06 source implementation; 20 real PostgreSQL projections + worker validated in rollback; final real Auth/Storage/Edge candidate/main clean remains required",
         "plan_scope": {
           "starter": "Temel",
           "pro": "Tam",
@@ -83907,18 +84387,17 @@
         "acceptance": "pending_feature_acceptance",
         "acceptance_evidence": [],
         "implemented_operations": [
-          "file_upload_complete_v1"
-        ],
-        "contract_only_operations": [
           "import_upload_prepare_v1",
           "import_preview_v1",
           "import_apply_v1",
           "import_rows_list_v1",
           "job_status_get_v1",
-          "import_rows_process_v1"
+          "import_rows_process_v1",
+          "file_upload_complete_v1"
         ],
+        "contract_only_operations": [],
         "acceptance_case_ids": [],
-        "baseline_regression": "P05 source implemented; real Auth/Storage/worker acceptance pending CI",
+        "baseline_regression": "P06 source implementation; 20 real PostgreSQL projections + worker validated in rollback; final real Auth/Storage/Edge candidate/main clean remains required",
         "plan_scope": {
           "starter": "Var",
           "pro": "Var",
@@ -84015,14 +84494,14 @@
           "credit_adjust_v1",
           "collection_correct_preview_v1",
           "collection_correct_apply_v1",
-          "instructor_payment_correct_v1"
+          "instructor_payment_correct_v1",
+          "operation_status_get_v1",
+          "preview_get_v1",
+          "audit_list_v1"
         ],
         "contract_only_operations": [
           "organization_delete_preview_v1",
           "organization_delete_apply_v1",
-          "operation_status_get_v1",
-          "preview_get_v1",
-          "audit_list_v1",
           "privacy_execute_v1"
         ],
         "acceptance_case_ids": [
@@ -84032,7 +84511,7 @@
           "DS-PROT-04",
           "DS-PROT-05"
         ],
-        "baseline_regression": "no callable operation; no behavior acceptance claimed",
+        "baseline_regression": "P06 source implementation; 20 real PostgreSQL projections + worker validated in rollback; final real Auth/Storage/Edge candidate/main clean remains required",
         "plan_scope": {
           "starter": "Var",
           "pro": "Var",
@@ -84064,7 +84543,7 @@
       "acceptance": "local verification and independent review pending; candidate/main clean unchanged"
     },
     "p05_delivery": {
-      "status": "implemented_pending_ci",
+      "status": "accepted_main_and_development",
       "scope": [
         "document_upload_prepare_v1",
         "document_version_publish_v1",
@@ -84085,7 +84564,47 @@
       "worker": "private.p05_worker_execute + p05_jobs_claim; dedicated LOGIN granted ftk_p05_worker with explicit org binding; human Auth cannot execute jobs",
       "gates": "reservation/sale/event registration deferred insert checks; attended transition check; append-only version/acceptance evidence; no automatic existing booking cancellation",
       "external_email": "deferred; no provider integration",
-      "acceptance": "new source CI and independent final review pending"
+      "acceptance": {
+        "main": "83641447b29e459236aea1a9a4379b5d19825af6",
+        "candidate_run": 39745672815,
+        "main_run": 39748053581,
+        "development_run": 39750264949,
+        "artifact": 12412499512,
+        "tree": "736a75bb7a7b429ac8506f2676c8d2601ec48f54",
+        "hosted_worker": "separate OPS-W01 after P06 before P07"
+      }
+    },
+    "p06_delivery": {
+      "status": "implemented_pending_acceptance",
+      "base_main": "83641447b29e459236aea1a9a4379b5d19825af6",
+      "operations": [
+        "report_get_v1",
+        "report_export_start_v1",
+        "report_file_get_v1",
+        "import_upload_prepare_v1",
+        "import_preview_v1",
+        "import_apply_v1",
+        "import_rows_list_v1",
+        "import_rows_process_v1",
+        "report_build_v1",
+        "operation_status_get_v1",
+        "preview_get_v1",
+        "job_status_get_v1",
+        "audit_list_v1"
+      ],
+      "hosted_workers": "OPS-W01 pending dedicated hosting target, scoped LOGIN and explicit tenant configuration; do not claim deployment",
+      "report_files": "private database byte objects, authenticated Edge POST on every download; seven-day expiry, no signed read URL",
+      "import_file": "private Storage CSV; explicit tenant byte/row limits, 2MiB/5000 technical ceilings",
+      "import_credit_basis": "explicit full original package value, remaining quantity <= product original credits; no cash movement or implicit debt",
+      "historical_tracking": "P06 captures accepted business request contexts and short-lived preview responses from this migration onward; absent legacy authorization context fails closed",
+      "opening_history_limits": "No historical use or cent-slot reconstruction. Only none/credit_ratio refunds; partial opening value must divide exactly by original package quantity, otherwise POLICY_NOT_CONFIGURED.",
+      "source_verification": {
+        "kind": "local structural + hosted rollback SQL, not clean acceptance",
+        "projection_schemas": 20,
+        "worker_schema": true,
+        "business_flow": "28-row preview/apply, original job replay, opening credit/debt without cash, config-stale apply denial, late audit full-batch rollback, full export, revoked linkage denial",
+        "accepted_main_still": "83641447b29e459236aea1a9a4379b5d19825af6"
+      }
     }
   }
 }
