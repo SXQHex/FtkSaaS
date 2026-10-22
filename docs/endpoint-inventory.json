@@ -28,8 +28,8 @@
     },
     {
       "name": "account_profile_update_v1",
-      "status": "contract_only",
-      "external_path": null,
+      "status": "operational_development_limited",
+      "external_path": "/functions/v1/backend-v1/account_profile_update_v1",
       "permission": "account.self",
       "features": [
         "F06"
@@ -40,7 +40,7 @@
       "runtime_required_features": [],
       "decision_delivery": {
         "accepted_contract": "DS-2026-10-17",
-        "runtime_conformance": "pending",
+        "runtime_conformance": "implemented_pending_ci",
         "open_dependencies": [],
         "target_request": {
           "$ref": "#/$defs/Request_account_profile_update"
@@ -51,8 +51,8 @@
     },
     {
       "name": "account_password_change_v1",
-      "status": "contract_only",
-      "external_path": null,
+      "status": "operational_development_limited",
+      "external_path": "/functions/v1/backend-v1/account_password_change_v1",
       "permission": "account.self",
       "features": [
         "F06"
@@ -63,7 +63,7 @@
       "runtime_required_features": [],
       "decision_delivery": {
         "accepted_contract": "DS-2026-10-17",
-        "runtime_conformance": "pending",
+        "runtime_conformance": "implemented_pending_ci",
         "open_dependencies": [],
         "target_request": {
           "$ref": "#/$defs/Request_account_password_change"
@@ -74,8 +74,8 @@
     },
     {
       "name": "account_password_reset_request_v1",
-      "status": "contract_only",
-      "external_path": null,
+      "status": "operational_development_limited",
+      "external_path": "/functions/v1/backend-v1/account_password_reset_request_v1",
       "permission": "auth.recover",
       "features": [
         "F06"
@@ -86,7 +86,7 @@
       "runtime_required_features": [],
       "decision_delivery": {
         "accepted_contract": "DS-2026-10-17",
-        "runtime_conformance": "pending",
+        "runtime_conformance": "implemented_pending_ci",
         "open_dependencies": [],
         "target_request": {
           "$ref": "#/$defs/Request_account_password_reset_request"
@@ -1038,8 +1038,8 @@
     },
     {
       "name": "person_merge_preview_v1",
-      "status": "contract_only",
-      "external_path": null,
+      "status": "operational_development_limited",
+      "external_path": "/functions/v1/backend-v1/person_merge_preview_v1",
       "permission": "person.merge",
       "features": [
         "F07"
@@ -1050,7 +1050,7 @@
       "runtime_required_features": [],
       "decision_delivery": {
         "accepted_contract": "DS-2026-10-17",
-        "runtime_conformance": "pending",
+        "runtime_conformance": "implemented_pending_ci",
         "open_dependencies": [],
         "target_request": {
           "$ref": "#/$defs/Request_person_merge_preview"
@@ -1061,8 +1061,8 @@
     },
     {
       "name": "person_merge_approve_v1",
-      "status": "contract_only",
-      "external_path": null,
+      "status": "operational_development_limited",
+      "external_path": "/functions/v1/backend-v1/person_merge_approve_v1",
       "permission": "person.merge",
       "features": [
         "F07"
@@ -1073,7 +1073,7 @@
       "runtime_required_features": [],
       "decision_delivery": {
         "accepted_contract": "DS-2026-10-17",
-        "runtime_conformance": "pending",
+        "runtime_conformance": "implemented_pending_ci",
         "open_dependencies": [],
         "target_request": {
           "$ref": "#/$defs/Request_person_merge_approve"
@@ -1084,8 +1084,8 @@
     },
     {
       "name": "person_merge_apply_v1",
-      "status": "contract_only",
-      "external_path": null,
+      "status": "operational_development_limited",
+      "external_path": "/functions/v1/backend-v1/person_merge_apply_v1",
       "permission": "person.merge",
       "features": [
         "F07"
@@ -1096,7 +1096,7 @@
       "runtime_required_features": [],
       "decision_delivery": {
         "accepted_contract": "DS-2026-10-17",
-        "runtime_conformance": "pending",
+        "runtime_conformance": "implemented_pending_ci",
         "open_dependencies": [],
         "target_request": {
           "$ref": "#/$defs/Request_person_merge_apply"

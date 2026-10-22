@@ -1,12 +1,14 @@
 # FtkSaaS sıralı üretim kuyruğu
 
+22 Ekim güncel durum: OPS-W01 PR39, `d1830c89e3d5e7f3c90db7ef0953cc264b35205f` ile main’e birleşti. Aday39795678387 attempt5 kabulü doğrulandı; aynı main [39809302120](https://github.com/SXQHex/FtkSaaS/actions/runs/39809302120) başarısızdır. Kullanıcının son talimatıyla bu SHA için yeniden çalıştırma **açık iş** tutulur, şimdi tetiklenmez; main/CD ve hosted worker kabulü kapanmadı. Son kabul edilmiş hosted kaynak P06 `006ad36918ae823bc10fbdefa2d48901e193121c`,54 migration/Edge7 olarak kalır. P07-A Draft PR40 geliştirmesi sürer: **200 sözleşme/186 geliştirme runtime/14 contract_only/57 migration/90 core tablo**. Sekiz A işleminin kaynağı uygulandı; gerçek Auth→Edge/aday/main kabulü bekler. B6 ve C8 queued. Full clean/merge şimdi tetiklenmez; kapılar gevşetilmez.
+
 P05 **done (kod, main ve geliştirme/test kabulü)**: [PR37](https://github.com/SXQHex/FtkSaaS/pull/37), kabul edilmiş main `83641447b29e459236aea1a9a4379b5d19825af6`;200 sözleşme/165 runtime/35 contract_only,53 migration/90 core tablo. Son head15e2126/base16cb570/tested merge2ebe087/tree736a75b; bağımsız son kaynak incelemesi5611074233, [aday39745672815](https://github.com/SXQHex/FtkSaaS/actions/runs/39745672815) ve [aynı main39748053581](https://github.com/SXQHex/FtkSaaS/actions/runs/39748053581) completed/success. [CD39750264949 attempt1](https://github.com/SXQHex/FtkSaaS/actions/runs/39750264949) success:18 kontrol,53/53 içerik eşleşmesi, P05 migration uygulandı, Edge6 ACTIVE/verify_jwt=true, RLS kapalı0/client RPC EXECUTE0 ve sentetik fixture temizliği. Receipt artifact12412499512 SHA256 `a41a8448c0a1b9dfdf853b58bea7cd56525fd8ede14812684b12619c3c8ee04e`. Eski aday hata kayıtları tarihsel kanıttır; bu kabulün kaynağı değildir.
 
-P06 **done (kod, main ve geliştirme/test kabulü)**: [PR38](https://github.com/SXQHex/FtkSaaS/pull/38), main `006ad36918ae823bc10fbdefa2d48901e193121c`;200 sözleşme/178 runtime/22 contract_only,54 migration/90 core tablo. Son headf2f9d6c/base8364144/tested merge1901fc6/treeb486ffe; bağımsız review5614150102, [aday39779013518](https://github.com/SXQHex/FtkSaaS/actions/runs/39779013518), [aynı main39782197422](https://github.com/SXQHex/FtkSaaS/actions/runs/39782197422) ve [CD39785146645 attempt1](https://github.com/SXQHex/FtkSaaS/actions/runs/39785146645) success. CD18 kontrol/54 içerik eşleşmesi/Edge7 ACTIVE/verify_jwt=true/RLS kapalı0/client RPC EXECUTE0 ve fixture temizliği geçti; receipt12428881259 SHA256 `bcd1ab3255c1808982de76c3d09d47d5eaa95c5fb2e8f9f870d3fedc9ce93b65`. Önceki aday hataları tarihsel kanıttır. Aktif OPS-W01 adayı Supabase Cron içindir;55 migration/aynı178 runtime, kaynak ve hosted işletim kabulü beklenir. Tenant config/binding uydurulmaz; P07 queued kalır.
+P06 **done (kod, main ve geliştirme/test kabulü)**: [PR38](https://github.com/SXQHex/FtkSaaS/pull/38), main `006ad36918ae823bc10fbdefa2d48901e193121c`;200 sözleşme/178 runtime/22 contract_only,54 migration/90 core tablo. Son headf2f9d6c/base8364144/tested merge1901fc6/treeb486ffe; bağımsız review5614150102, [aday39779013518](https://github.com/SXQHex/FtkSaaS/actions/runs/39779013518), [aynı main39782197422](https://github.com/SXQHex/FtkSaaS/actions/runs/39782197422) ve [CD39785146645 attempt1](https://github.com/SXQHex/FtkSaaS/actions/runs/39785146645) success. CD18 kontrol/54 içerik eşleşmesi/Edge7 ACTIVE/verify_jwt=true/RLS kapalı0/client RPC EXECUTE0 ve fixture temizliği geçti; receipt12428881259 SHA256 `bcd1ab3255c1808982de76c3d09d47d5eaa95c5fb2e8f9f870d3fedc9ce93b65`. Önceki aday hataları tarihsel kanıttır. OPS-W01 PR39 main’e birleşti; aynı main clean başarısız, retry/CD/hosted kabulü açıktır. P07-A Draft geliştirmesi son kullanıcı talimatıyla sürer; tenant config/binding uydurulmaz.
 
 PR36 operasyonel takip kapandı: aynı main [39644044693](https://github.com/SXQHex/FtkSaaS/actions/runs/39644044693) success; [CD39646391222](https://github.com/SXQHex/FtkSaaS/actions/runs/39646391222) success,18 kontrol,52/52 migration, pending[], Edge5 değişmeden ACTIVE/verify_jwt=true. Atomik Management API transport yeni migration olmadan da rollback probe ile doğrulandı. Bot/deneme hedefi hâlâ kullanıcı kararıyla ertelendi; hosted P05 worker kurulmuş değildir.
 
-P01–P06 ve PR36 kabulü kapandı. OPS-W01 PR39 kaynak kabulü bekler; kullanıcı22 Ekim talimatıyla P07-A ilk2 API onun üzerine Draft PR40 olarak geliştirilir; kabul sırası PR39→PR40.
+P01–P06 ve PR36 kabulü kapandı. OPS-W01 PR39 birleşti; main retry/CD/hosted kabulü açık. P07-A sekiz API Draft PR40 altında geliştirilir; kabul sırası PR39 kapanışı→PR40.
 
 CD-01 **done**: PR32 kurulum + PR33 test fixture düzeltmesi sonrası kabul edilmiş main `0fabf3a4a605dd6be5a1d358c660021f59406e20`. [Main39588975421](https://github.com/SXQHex/FtkSaaS/actions/runs/39588975421) ve [ilk canlı CD39590690817/attempt2](https://github.com/SXQHex/FtkSaaS/actions/runs/39590690817/attempts/2) completed/success. CD receipt aynı source/main/run kabulünü bağlar;17 kontrol başarılı,49 migration içerik eşleşmesi,90 core tablo/RLS, anon/authenticated EXECUTE0, Edge backend-v1 v4 ACTIVE/verify_jwt=true. Gerçek Auth→Edge→RPC, oturum reddi ve fixture temizliği geçti; ayrıca uzak son0 hesap/0 Auth kullanıcısı/0 organizasyon doğrulandı. Envanter199/140 runtime/59 contract_only değişmedi. P04 CRM/public başvuru queued; başlamadı. Hosted worker işletimi, frontend, dış e-posta ve yük/restore bu kapanışla tamamlanmaz.
 
@@ -28,7 +30,7 @@ Geliştirme/test Supabase `gwyprhenabtpkbojephw`, kabul edilmiş main `006ad3691
 | P05 | Belge, bildirim ve otomasyon | 14 | done | PR37; main8364144, aday39745672815/main39748053581/CD39750264949 success; Edge6/53 migration |
 | P06 | Rapor, import ve işlem izleme | 13 | done | PR38/main006ad36; aday39779013518/main39782197422/CD39785146645 success;54 migration/Edge7 |
 | OPS-W01 | Hosted worker işletimi | — | in_progress | Supabase Cron seçildi; native kaynak55 migration; son kaynak/hosted işletim kabulü beklenir |
-| P07 | Hesap, organizasyon ve abonelik yaşam döngüsü | 22 | in_progress (Draft P07-A 2/8) | PR39 kabulü sonrası PR40 clean |
+| P07 | Hesap, organizasyon ve abonelik yaşam döngüsü | 22 | in_progress (Draft P07-A 8/8 kaynak) | PR39 kabulü sonrası PR40 clean |
 
 ## Ajanın kuyruk bakımı
 
@@ -112,7 +114,7 @@ Kullanıcı22 Ekim Supabase içi barındırmayı seçti. Native p01/p05/p06 dedi
 
 ### P07 — Hesap, organizasyon ve abonelik yaşam döngüsü
 
-İlk Draft PR40 dilimi2/8: davet iptali, org hesap bağlantısını kaldırma ve yönetim sürüm okumaları. Profil/parola/parola kurtarma/üç kişi birleştirme API’si contract_only kalır; A tamamlanmadı. B/C queued. [Taslak devir](p07-a-handover.md).
+Draft PR40 A kapsamının sekiz API kaynağını ve yönetim okumalarını taşır. Parola API’si gerçek sağlayıcı challenge başlatıcısıdır; parola tamamlaması native Supabase Auth yoludur. A kabulü bekler; B/C queued. [Taslak devir](p07-a-handover.md).
 
 Ortak üretim promptunu uygula. Durum: queued.
 

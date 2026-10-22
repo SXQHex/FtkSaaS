@@ -2963,6 +2963,40 @@
         },
         "import_summary": {
           "$ref": "#/$defs/ImportPreviewSummary"
+        },
+        "merge_summary": {
+          "type": "object",
+          "properties": {
+            "source_id": {
+              "$ref": "#/$defs/FtkUuid"
+            },
+            "target_id": {
+              "$ref": "#/$defs/FtkUuid"
+            },
+            "affected_center_ids": {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/FtkUuid"
+              }
+            },
+            "required_approval_center_ids": {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/FtkUuid"
+              }
+            },
+            "linked_history": {
+              "const": true
+            }
+          },
+          "required": [
+            "source_id",
+            "target_id",
+            "affected_center_ids",
+            "required_approval_center_ids",
+            "linked_history"
+          ],
+          "additionalProperties": false
         }
       },
       "required": [
@@ -3145,6 +3179,30 @@
         },
         "display_name": {
           "$ref": "#/$defs/Text"
+        },
+        "profile_notices": {
+          "type": "array",
+          "maxItems": 20,
+          "items": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "$ref": "#/$defs/FtkUuid"
+              },
+              "kind": {
+                "const": "account_profile_updated"
+              },
+              "created_at": {
+                "$ref": "#/$defs/Instant"
+              }
+            },
+            "required": [
+              "id",
+              "kind",
+              "created_at"
+            ],
+            "additionalProperties": false
+          }
         }
       },
       "required": [
@@ -3330,6 +3388,12 @@
           "items": {
             "$ref": "#/$defs/ContactView"
           }
+        },
+        "linked_person_ids": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/FtkUuid"
+          }
         }
       },
       "required": [
@@ -3367,6 +3431,12 @@
           "type": "array",
           "items": {
             "$ref": "#/$defs/DisciplineRelationshipView"
+          }
+        },
+        "linked_person_ids": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/FtkUuid"
           }
         }
       },
@@ -44105,7 +44175,7 @@
           "A55"
         ],
         "configuration_policy": "numeric plan limits/prices and legal approval are deployment configuration, never arbitrary allow/deny",
-        "implementation_status": "contract_only",
+        "implementation_status": "operational_development_limited",
         "required_features": [
           "F06"
         ],
@@ -44121,12 +44191,12 @@
             "accounts.versioned_domain_change"
           ],
           "business_commit": true,
-          "read_path_status": "contract_only",
+          "read_path_status": "implemented",
           "source_decision": "DS-2026-10-17"
         },
         "decision_delivery": {
           "accepted_contract": "DS-2026-10-17",
-          "runtime_conformance": "pending",
+          "runtime_conformance": "implemented_pending_ci",
           "open_dependencies": [],
           "target_request": {
             "$ref": "#/$defs/Request_account_profile_update"
@@ -44194,7 +44264,7 @@
           "A55"
         ],
         "configuration_policy": "numeric plan limits/prices and legal approval are deployment configuration, never arbitrary allow/deny",
-        "implementation_status": "contract_only",
+        "implementation_status": "operational_development_limited",
         "required_features": [
           "F06"
         ],
@@ -44206,16 +44276,14 @@
           "version_mode": "none",
           "version_field": null,
           "read_operation": null,
-          "atomic_effects": [
-            "accounts.versioned_domain_change"
-          ],
+          "atomic_effects": [],
           "business_commit": false,
           "read_path_status": "implemented",
           "source_decision": "DS-2026-10-17"
         },
         "decision_delivery": {
           "accepted_contract": "DS-2026-10-17",
-          "runtime_conformance": "pending",
+          "runtime_conformance": "implemented_pending_ci",
           "open_dependencies": [],
           "target_request": {
             "$ref": "#/$defs/Request_account_password_change"
@@ -44273,7 +44341,7 @@
           "A55"
         ],
         "configuration_policy": "numeric plan limits/prices and legal approval are deployment configuration, never arbitrary allow/deny",
-        "implementation_status": "contract_only",
+        "implementation_status": "operational_development_limited",
         "required_features": [
           "F06"
         ],
@@ -44285,16 +44353,14 @@
           "version_mode": "none",
           "version_field": null,
           "read_operation": null,
-          "atomic_effects": [
-            "accounts.versioned_domain_change"
-          ],
+          "atomic_effects": [],
           "business_commit": false,
           "read_path_status": "implemented",
           "source_decision": "DS-2026-10-17"
         },
         "decision_delivery": {
           "accepted_contract": "DS-2026-10-17",
-          "runtime_conformance": "pending",
+          "runtime_conformance": "implemented_pending_ci",
           "open_dependencies": [],
           "target_request": {
             "$ref": "#/$defs/Request_account_password_reset_request"
@@ -48238,11 +48304,14 @@
           "BILLING_OPERATION_RESTRICTED",
           "CLIENT_UPDATE_REQUIRED",
           "FORBIDDEN",
+          "INTEGRITY_VIOLATION",
           "NOT_FOUND",
           "PLAN_FEATURE_UNAVAILABLE",
           "PLAN_LIMIT_REACHED",
           "POLICY_NOT_CONFIGURED",
           "PREVIEW_STALE",
+          "RESERVATION_EXISTS",
+          "RESOURCE_CONFLICT",
           "SERVICE_UNAVAILABLE",
           "SESSION_REVOKED",
           "SUBSCRIPTION_NOT_STARTED",
@@ -48281,7 +48350,7 @@
           "A55"
         ],
         "configuration_policy": "numeric plan limits/prices and legal approval are deployment configuration, never arbitrary allow/deny",
-        "implementation_status": "contract_only",
+        "implementation_status": "operational_development_limited",
         "required_features": [
           "F07"
         ],
@@ -48295,12 +48364,12 @@
           "read_operation": "management_state_get_v1",
           "atomic_effects": [],
           "business_commit": false,
-          "read_path_status": "contract_only",
+          "read_path_status": "implemented",
           "source_decision": "DS-2026-10-17"
         },
         "decision_delivery": {
           "accepted_contract": "DS-2026-10-17",
-          "runtime_conformance": "pending",
+          "runtime_conformance": "implemented_pending_ci",
           "open_dependencies": [],
           "target_request": {
             "$ref": "#/$defs/Request_person_merge_preview"
@@ -48339,6 +48408,8 @@
           "PLAN_LIMIT_REACHED",
           "POLICY_NOT_CONFIGURED",
           "PREVIEW_STALE",
+          "RESERVATION_EXISTS",
+          "RESOURCE_CONFLICT",
           "SERVICE_UNAVAILABLE",
           "SESSION_REVOKED",
           "SUBSCRIPTION_NOT_STARTED",
@@ -48378,7 +48449,7 @@
           "A55"
         ],
         "configuration_policy": "numeric plan limits/prices and legal approval are deployment configuration, never arbitrary allow/deny",
-        "implementation_status": "contract_only",
+        "implementation_status": "operational_development_limited",
         "required_features": [
           "F07"
         ],
@@ -48394,12 +48465,12 @@
             "people.versioned_domain_change"
           ],
           "business_commit": true,
-          "read_path_status": "contract_only",
+          "read_path_status": "implemented",
           "source_decision": "DS-2026-10-17"
         },
         "decision_delivery": {
           "accepted_contract": "DS-2026-10-17",
-          "runtime_conformance": "pending",
+          "runtime_conformance": "implemented_pending_ci",
           "open_dependencies": [],
           "target_request": {
             "$ref": "#/$defs/Request_person_merge_approve"
@@ -48438,6 +48509,8 @@
           "PLAN_LIMIT_REACHED",
           "POLICY_NOT_CONFIGURED",
           "PREVIEW_STALE",
+          "RESERVATION_EXISTS",
+          "RESOURCE_CONFLICT",
           "SERVICE_UNAVAILABLE",
           "SESSION_REVOKED",
           "SUBSCRIPTION_NOT_STARTED",
@@ -48481,7 +48554,7 @@
           "A55"
         ],
         "configuration_policy": "numeric plan limits/prices and legal approval are deployment configuration, never arbitrary allow/deny",
-        "implementation_status": "contract_only",
+        "implementation_status": "operational_development_limited",
         "required_features": [
           "F07"
         ],
@@ -48500,12 +48573,12 @@
             "merge_approvals.consume"
           ],
           "business_commit": true,
-          "read_path_status": "contract_only",
+          "read_path_status": "implemented",
           "source_decision": "DS-2026-10-17"
         },
         "decision_delivery": {
           "accepted_contract": "DS-2026-10-17",
-          "runtime_conformance": "pending",
+          "runtime_conformance": "implemented_pending_ci",
           "open_dependencies": [],
           "target_request": {
             "$ref": "#/$defs/Request_person_merge_apply"
@@ -65725,7 +65798,10 @@
           "import_preview_v1",
           "import_apply_v1",
           "account_access_revoke_v1",
-          "account_link_remove_v1"
+          "account_link_remove_v1",
+          "account_profile_update_v1",
+          "person_merge_preview_v1",
+          "person_merge_approve_v1"
         ]
       },
       {
@@ -68128,6 +68204,30 @@
         "generation": "uuidv7"
       },
       {
+        "path": "#/$defs/Preview/properties/merge_summary/properties/source_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Preview/properties/merge_summary/properties/target_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Preview/properties/merge_summary/properties/affected_center_ids/items",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Preview/properties/merge_summary/properties/required_approval_center_ids/items",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
         "path": "#/$defs/Mutation/properties/operation_id",
         "origin": "ftksaas",
         "acceptance": "generic_uuid",
@@ -68165,6 +68265,12 @@
       },
       {
         "path": "#/$defs/AccountView/properties/id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/AccountView/properties/profile_notices/items/properties/id",
         "origin": "ftksaas",
         "acceptance": "generic_uuid",
         "generation": "uuidv7"
@@ -68212,7 +68318,19 @@
         "generation": "uuidv7"
       },
       {
+        "path": "#/$defs/PersonSummary/properties/linked_person_ids/items",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
         "path": "#/$defs/PersonView/properties/id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/PersonView/properties/linked_person_ids/items",
         "origin": "ftksaas",
         "acceptance": "generic_uuid",
         "generation": "uuidv7"

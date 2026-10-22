@@ -1,0 +1,29 @@
+import test from 'node:test';import assert from 'node:assert/strict';import {build} from 'esbuild';import {createHash} from 'node:crypto';
+const compiled=await build({entryPoints:['supabase/functions/backend-v1/account-auth.ts'],bundle:true,platform:'browser',format:'esm',write:false});
+const {authDeliveryEnabled,passwordChallenge,passwordRecovery}=await import('data:text/javascript;base64,'+Buffer.from(compiled.outputFiles[0].text).toString('base64'));
+const ingress=await build({entryPoints:['supabase/functions/backend-v1/public-ingress.ts'],bundle:true,platform:'browser',format:'esm',write:false});
+const {keyedHash}=await import('data:text/javascript;base64,'+Buffer.from(ingress.outputFiles[0].text).toString('base64'));
+test('P07 Auth handoff preserves live session rejection, delivery pause and provider outcomes',async()=>{
+ let calls=0;const fetcher=async(url,options)=>{calls++;assert.equal(url,'http://kong:8000/auth/v1/reauthenticate');assert.equal(options.headers.authorization,'Bearer synthetic-user');return Response.json({});};
+ const denied={ok:false,error:{code:'SESSION_REVOKED'}};
+ assert.deepEqual(await passwordChallenge('http://kong:8000','synthetic-key','Bearer synthetic-user',()=>undefined,async()=>denied,fetcher),denied);assert.equal(calls,0);
+ assert.deepEqual(await passwordChallenge('https://hosted.supabase.co','synthetic-key','Bearer synthetic-user',()=>undefined,async()=>({_internal_auth_ready:true}),fetcher),{error:'TEMPORARY_FAILURE'});assert.equal(calls,0);
+ assert.equal(authDeliveryEnabled('https://hosted.supabase.co',k=>k==='FTK_P07_AUTH_DELIVERY_ENABLED'?'TRUE':undefined),false);
+ assert.deepEqual(await passwordChallenge('http://kong:8000','synthetic-key','Bearer synthetic-user',()=>undefined,async()=>({_internal_auth_ready:true}),fetcher),{data:{provider:'supabase_auth',status:'challenge_required'}});assert.equal(calls,1);
+ assert.deepEqual(await passwordChallenge('http://kong:8000','synthetic-key','Bearer synthetic-user',()=>undefined,async()=>({_internal_auth_ready:true}),async()=>Response.json({}, {status:500})),{error:'TEMPORARY_FAILURE'});
+});
+test('P07 recovery requires signed ingress and correct single-purpose bot proof before rate/provider calls',async()=>{
+ const cfg={FTK_PUBLIC_INGRESS_SECRET:'synthetic-ingress',FTK_PUBLIC_HASH_SECRET:'synthetic-hash',FTK_TURNSTILE_SECRET:'synthetic-bot',FTK_TURNSTILE_HOSTNAME:'app.ftksaas.invalid'},env=k=>cfg[k];
+ const time=String(Math.floor(Date.now()/1000)),ip='192.0.2.77',path='/functions/v1/backend-v1/account_password_reset_request_v1',body=JSON.stringify({email:' USER@ftksaas.invalid '}),digest=createHash('sha256').update(body).digest('hex');
+ const signature=await keyedHash(cfg.FTK_PUBLIC_INGRESS_SECRET,['POST',path,time,ip,digest].join('\n'));
+ const request=()=>new Request('http://kong:8000'+path,{method:'POST',body,headers:{'x-ftk-client-ip':ip,'x-ftk-ingress-time':time,'x-ftk-ingress-signature':signature,'x-ftk-bot-proof':'synthetic-proof'}});
+ let rates=0,recoveries=0;const rpc=async aux=>{rates++;assert.equal(aux.bot_verified,true);assert.match(aux.ip_hash,/^[a-f0-9]{64}$/);assert.equal(JSON.stringify(aux).includes('USER'),false);return {_internal_recovery_ready:true};};
+ const provider=async(url,options)=>{if(String(url).includes('turnstile'))return Response.json({success:true,hostname:cfg.FTK_TURNSTILE_HOSTNAME,action:'password_recovery'});recoveries++;assert.equal(url,'http://kong:8000/auth/v1/recover');assert.deepEqual(JSON.parse(options.body),{email:'user@ftksaas.invalid'});return Response.json({});};
+ const unsigned=new Request('http://kong:8000'+path,{method:'POST',body});assert.deepEqual(await passwordRecovery(unsigned,body,JSON.parse(body),'http://kong:8000','synthetic',env,rpc,provider),{error:'TEMPORARY_FAILURE'});assert.equal(rates,0);
+ const wrongBot=async()=>Response.json({success:true,hostname:cfg.FTK_TURNSTILE_HOSTNAME,action:'public_application'});
+ assert.deepEqual(await passwordRecovery(request(),body,JSON.parse(body),'http://kong:8000','synthetic',env,rpc,wrongBot),{error:'VALIDATION_FAILED'});assert.equal(rates,0);
+ assert.deepEqual(await passwordRecovery(request(),body,JSON.parse(body),'http://kong:8000','synthetic',env,rpc,provider),{data:{accepted:true}});assert.equal(rates,1);assert.equal(recoveries,1);
+ const limited={ok:false,error:{code:'RATE_LIMITED'}};assert.deepEqual(await passwordRecovery(request(),body,JSON.parse(body),'http://kong:8000','synthetic',env,async()=>limited,provider),limited);assert.equal(recoveries,1);
+ const unavailable=async(url,options)=>String(url).includes('turnstile')?provider(url,options):Response.json({message:'private provider detail'},{status:500});
+ assert.deepEqual(await passwordRecovery(request(),body,JSON.parse(body),'http://kong:8000','synthetic',env,rpc,unavailable),{error:'TEMPORARY_FAILURE'});
+});

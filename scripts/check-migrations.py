@@ -118,3 +118,5 @@ assert next(Path('supabase/migrations').glob('*_p06_reports_imports_tracking.sql
 assert next(Path('supabase/migrations').glob('*_ops_w01_hosted_scheduler.sql')).read_text()==Path('database/ops-hosted-workers.sql').read_text(),'Hosted worker source drift'
 
 assert next(Path('supabase/migrations').glob('*_p07_account_revocation.sql')).read_text()==Path('database/p07-account-revocation.sql').read_text()+Path('database/p07-account-revocation-wrappers.sql').read_text(),'P07 revocation source drift'
+
+assert next(Path('supabase/migrations').glob('*_p07_account_profile_auth_merge.sql')).read_text()==''.join(Path('database',n).read_text() for n in ['p07-account-profile.sql','p07-account-auth.sql','p07-person-merge.sql','p07-person-merge-bind.sql','p07-account-profile-auth-merge-wrappers.sql']),'P07 completion source drift'

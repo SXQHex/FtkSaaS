@@ -21,6 +21,8 @@ for o in ops:
  def literal(s):return "'"+s.replace("'","''")+"'"
  sql.append("insert into private.runtime_operations(name,permission,billing_class,features) values("+','.join([literal(o['name']),literal(o['permission']),literal(o['billing_class']),"array["+','.join(map(literal,o['runtime_required_features']))+"]::text[]"])+") on conflict(name) do update set permission=excluded.permission,billing_class=excluded.billing_class,features=excluded.features;")
  entry=f"private.p04_public('{o['name']}',p_request,p_ids,p_aux)" if o['name'] in ('public_calendar_get_v1','public_application_submit_v1') else f"private.execute_operation('{o['name']}',p_request,p_actor_auth_id,p_session_id,p_ids,p_aux)"
+ if o['name']=='account_password_change_v1':entry='private.p07_password_preflight(p_request,p_actor_auth_id,p_session_id,p_ids,p_aux)'
+ if o['name']=='account_password_reset_request_v1':entry='private.p07_recovery_gate(p_request,p_ids,p_aux)'
  sql.append(f"create or replace function api_v1.{o['name']}(p_request jsonb,p_actor_auth_id uuid,p_session_id uuid,p_ids uuid[],p_aux jsonb default null) returns jsonb language sql security invoker set search_path='' as $$select {entry}$$;")
  sql.append(f"revoke all on function api_v1.{o['name']}(jsonb,uuid,uuid,uuid[],jsonb) from public,anon,authenticated;")
  sql.append(f"grant execute on function api_v1.{o['name']}(jsonb,uuid,uuid,uuid[],jsonb) to service_role;")

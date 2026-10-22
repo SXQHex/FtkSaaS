@@ -1,3 +1,4 @@
+import {passwordChallenge,passwordRecovery} from './account-auth.ts';
 import {publicIngress,verifyPublicBot} from "./public-ingress.ts";
 import {importStorage,parseImportCsv} from "./import-file.ts";
 import {documentStorage} from "./document-storage.ts";
@@ -8,16 +9,24 @@ const implemented=new Set(implementation.operations);
 const json=(x:unknown,status=200)=>new Response(JSON.stringify(x),{status,headers:{"content-type":"application/json","access-control-allow-origin":"*"}});
 const failure=(code:string,status=400)=>json({ok:false,error:{code,retryable:code==="TEMPORARY_FAILURE"||code==="OPERATION_IN_PROGRESS",trace_id:v7()}},status);
 Deno.serve(async req=>{
- if(req.method==="OPTIONS")return new Response("",{headers:{"access-control-allow-origin":"*","access-control-allow-headers":"authorization,apikey,content-type","access-control-allow-methods":"POST,OPTIONS"}});
+ if(req.method==="OPTIONS")return new Response("",{headers:{"access-control-allow-origin":"*","access-control-allow-headers":"authorization,apikey,content-type,x-ftk-client-ip,x-ftk-ingress-time,x-ftk-ingress-signature,x-ftk-bot-proof","access-control-allow-methods":"POST,OPTIONS"}});
  if(req.method!=="POST")return failure("VALIDATION_FAILED");
  try{
   const operation=new URL(req.url).pathname.split("/").filter(Boolean).at(-1)!;
   
   if(!implemented.has(operation))return failure("NOT_FOUND",404);
   const body=await req.text();if(body.length>2097152)return failure("VALIDATION_FAILED");
-  const request=JSON.parse(body);if(request.client_api_version!==1)return failure("CLIENT_UPDATE_REQUIRED",426);const validate=(validators as any)["request_"+operation];
+  const request=JSON.parse(body);if(request.client_api_version!==1)return operation==='account_password_reset_request_v1'?failure("VALIDATION_FAILED"):failure("CLIENT_UPDATE_REQUIRED",426);const validate=(validators as any)["request_"+operation];
   if(!validate?.(request))return failure("VALIDATION_FAILED");
   const base=Deno.env.get("SUPABASE_URL")!,key=Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
+  if(operation==='account_password_reset_request_v1'){
+   const result=await passwordRecovery(req,body,request,base,key,n=>Deno.env.get(n),async aux=>{
+    const rpc=await fetch(base+'/rest/v1/rpc/'+operation,{method:'POST',headers:{authorization:'Bearer '+key,apikey:key,'content-type':'application/json','Content-Profile':'api_v1'},body:JSON.stringify({p_request:request,p_actor_auth_id:null,p_session_id:null,p_ids:Array.from({length:32},()=>v7()),p_aux:aux})});
+    if(!rpc.ok)throw Error('RECOVERY_RPC_UNAVAILABLE');return rpc.json();
+   });
+   if(result.error)return failure(result.error);if(result.ok===false)return json(result);
+   const out={ok:true,data:result.data,trace_id:v7()};if(!(validators as any)['success_'+operation](out))return failure('INTEGRITY_VIOLATION',500);return json(out);
+  }
   if(operation==='public_calendar_get_v1'||operation==='public_application_submit_v1'){
    const env=(name:string)=>Deno.env.get(name);
    const rpcPublic=async(aux:unknown)=>{
@@ -83,6 +92,11 @@ Deno.serve(async req=>{
    const r=await fetch(base+'/rest/v1/rpc/'+operation,{method:'POST',headers:{authorization:'Bearer '+key,apikey:key,'content-type':'application/json','Content-Profile':'api_v1'},body:JSON.stringify({p_request:request,p_actor_auth_id:user.id,p_session_id:claims.session_id,p_ids:Array.from({length:count},()=>v7()),p_aux:aux})});
    if(!r.ok)throw Error('RPC_UNAVAILABLE');return r.json();
   };
+  if(operation==='account_password_change_v1'){
+   const result=await passwordChallenge(base,key,authorization,n=>Deno.env.get(n),rpcContext);
+   if(result.error)return failure(result.error);if(result.ok===false)return json(result);
+   const out={ok:true,data:result.data,trace_id:v7()};if(!(validators as any)['success_'+operation](out))return failure('INTEGRITY_VIOLATION',500);return json(out);
+  }
   if(operation==='import_preview_v1'){
    const context=await rpcContext({phase:'p06_import_file'});
    if(!context._internal_import){if(context.ok&&!(validators as any)['success_'+operation](context))return failure('INTEGRITY_VIOLATION',500);return json(context);}

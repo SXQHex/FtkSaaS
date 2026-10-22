@@ -1,6 +1,6 @@
 # FtkSaaS — API kataloğu · 0.2.0-rc.3
 
-200 sözleşme; 180 geliştirme ortamında çağrılabilir endpoint, 20 yalnız sözleşme. Çağrılabilir olmak bütün ürün özelliklerinin veya üretim kabulünün tamamlandığı anlamına gelmez. Kapsam sınırları ve Q-E01 `docs/claude-handover.md` içindedir.
+200 sözleşme; 186 geliştirme ortamında çağrılabilir endpoint, 14 yalnız sözleşme. Çağrılabilir olmak bütün ürün özelliklerinin veya üretim kabulünün tamamlandığı anlamına gelmez. Kapsam sınırları ve Q-E01 `docs/claude-handover.md` içindedir.
 
 `POST {API_URL}/functions/v1/backend-v1/{operation}`; JSON gövde doğrudan typed Request nesnesidir. Header: `Authorization: Bearer <Supabase access_token>`, `apikey: <publishable key>`, `Content-Type: application/json`. Başarı: `ok/data/trace_id`; hata: `ok:false/error:SafeError`. Servis anahtarı frontend’e verilmez.
 
@@ -9,9 +9,9 @@ Named `/rest/v1/rpc/{operation}` yalnız backend içindir; imzası p_request + d
 | İşlem | Durum | İzin | Tür / abonelik | İstek | Yanıt |
 |---|---|---|---|---|---|
 | `account_get_v1` | çağrılabilir (kapsam notları geçerli) | `account.self` | R / exempt | client_api_version: 1; request_id: FtkUuid | Success_account_get |
-| `account_profile_update_v1` | yalnız sözleşme | `account.self` | W / exempt | client_api_version: 1; request_id: FtkUuid; operation_key: FtkUuid; expected_version: PositiveInt; display_name: Text | Success_account_profile_update |
-| `account_password_change_v1` | yalnız sözleşme | `account.self` | H / exempt | client_api_version: 1; request_id: FtkUuid | Success_account_password_change |
-| `account_password_reset_request_v1` | yalnız sözleşme | `auth.recover` | H / exempt | client_api_version: 1; request_id: FtkUuid; email: Text | Success_account_password_reset_request |
+| `account_profile_update_v1` | çağrılabilir (kapsam notları geçerli) | `account.self` | W / exempt | client_api_version: 1; request_id: FtkUuid; operation_key: FtkUuid; expected_version: PositiveInt; display_name: Text | Success_account_profile_update |
+| `account_password_change_v1` | çağrılabilir (kapsam notları geçerli) | `account.self` | H / exempt | client_api_version: 1; request_id: FtkUuid | Success_account_password_change |
+| `account_password_reset_request_v1` | çağrılabilir (kapsam notları geçerli) | `auth.recover` | H / exempt | client_api_version: 1; request_id: FtkUuid; email: Text | Success_account_password_reset_request |
 | `account_delete_preview_v1` | yalnız sözleşme | `account.self` | P / exempt | client_api_version: 1; request_id: FtkUuid | Success_account_delete_preview |
 | `account_delete_apply_v1` | yalnız sözleşme | `account.self` | E / exempt | client_api_version: 1; request_id: FtkUuid; operation_key: FtkUuid; preview: PreviewToken; reauth: ReauthProof | Success_account_delete_apply |
 | `organizations_list_v1` | çağrılabilir (kapsam notları geçerli) | `account.self` | R / exempt | client_api_version: 1; request_id: FtkUuid; page: Page | Success_organizations_list |
@@ -48,9 +48,9 @@ Named `/rest/v1/rpc/{operation}` yalnız backend içindir; imzası p_request + d
 | `person_update_v1` | çağrılabilir (kapsam notları geçerli) | `person.manage` | W / maintenance | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; center_id?: FtkUuid ∣ null; operation_key: FtkUuid; expected_version: PositiveInt; person_id: FtkUuid; patch: PersonPatch | Success_person_update |
 | `student_activate_v1` | çağrılabilir (kapsam notları geçerli) | `person.activate` | W / new | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; center_id?: FtkUuid ∣ null; operation_key: FtkUuid; person_id: FtkUuid | Success_student_activate |
 | `student_deactivate_v1` | çağrılabilir (kapsam notları geçerli) | `person.activate` | W / maintenance | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; center_id?: FtkUuid ∣ null; operation_key: FtkUuid; person_id: FtkUuid; reason: Text | Success_student_deactivate |
-| `person_merge_preview_v1` | yalnız sözleşme | `person.merge` | P / maintenance | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; center_id?: FtkUuid ∣ null; source_id: FtkUuid; target_id: FtkUuid | Success_person_merge_preview |
-| `person_merge_approve_v1` | yalnız sözleşme | `person.merge` | W / maintenance | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; center_id?: FtkUuid ∣ null; operation_key: FtkUuid; preview: PreviewToken; approval_center_id: FtkUuid | Success_person_merge_approve |
-| `person_merge_apply_v1` | yalnız sözleşme | `person.merge` | A / maintenance | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; center_id?: FtkUuid ∣ null; operation_key: FtkUuid; preview: PreviewToken | Success_person_merge_apply |
+| `person_merge_preview_v1` | çağrılabilir (kapsam notları geçerli) | `person.merge` | P / maintenance | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; center_id?: FtkUuid ∣ null; source_id: FtkUuid; target_id: FtkUuid | Success_person_merge_preview |
+| `person_merge_approve_v1` | çağrılabilir (kapsam notları geçerli) | `person.merge` | W / maintenance | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; center_id?: FtkUuid ∣ null; operation_key: FtkUuid; preview: PreviewToken; approval_center_id: FtkUuid | Success_person_merge_approve |
+| `person_merge_apply_v1` | çağrılabilir (kapsam notları geçerli) | `person.merge` | A / maintenance | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; center_id?: FtkUuid ∣ null; operation_key: FtkUuid; preview: PreviewToken | Success_person_merge_apply |
 | `calendar_get_v1` | çağrılabilir (kapsam notları geçerli) | `schedule.read` | R / read | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; center_id?: FtkUuid ∣ null; interval: Interval; resource?: ResourceRef ∣ null; page: Page | Success_calendar_get |
 | `class_save_v1` | çağrılabilir (kapsam notları geçerli) | `schedule.manage` | W / new | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; center_id?: FtkUuid ∣ null; operation_key: FtkUuid; expected_version?: PositiveInt; class_id?: FtkUuid ∣ null; name: Text; external_open: Bool; discipline_id: FtkUuid | Success_class_save |
 | `program_preview_v1` | çağrılabilir (kapsam notları geçerli) | `schedule.manage` | P / new | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; center_id?: FtkUuid ∣ null; class_id: FtkUuid; schedule: ProgramSpec | Success_program_preview |
@@ -216,9 +216,9 @@ features ürün referanslarıdır. required_features hedef plan kapısı; runtim
 | İşlem | Faz | Hedef sürüm / okuma | Atomik etkiler | DS durumu |
 |---|---|---|---|---|
 | account_get_v1 | read | none / None |  | baseline_only_not_full_product_acceptance |
-| account_profile_update_v1 | command | row_version / management_state_get_v1 | accounts.versioned_domain_change | pending |
-| account_password_change_v1 | auth | none / None | accounts.versioned_domain_change | pending |
-| account_password_reset_request_v1 | auth | none / None | accounts.versioned_domain_change | pending |
+| account_profile_update_v1 | command | row_version / management_state_get_v1 | accounts.versioned_domain_change | implemented_pending_ci |
+| account_password_change_v1 | auth | none / None |  | implemented_pending_ci |
+| account_password_reset_request_v1 | auth | none / None |  | implemented_pending_ci |
 | account_delete_preview_v1 | preview | preview_dependencies / management_state_get_v1 |  | pending |
 | account_delete_apply_v1 | apply | preview_dependencies / account_delete_preview_v1 | accounts.versioned_domain_change | pending |
 | organizations_list_v1 | read | none / None |  | baseline_only_not_full_product_acceptance |
@@ -255,9 +255,9 @@ features ürün referanslarıdır. required_features hedef plan kapısı; runtim
 | person_update_v1 | command | row_version / person_get_v1 | people.versioned_domain_change | baseline_only_not_full_product_acceptance |
 | student_activate_v1 | command | append_or_current_scope_lock / management_state_get_v1 | center_relationships.active, organization_unique_student_limit | baseline_only_not_full_product_acceptance |
 | student_deactivate_v1 | command | append_or_current_scope_lock / management_state_get_v1 | center_relationships.inactive, preserved_history_finance, reject_open_operations | baseline_only_not_full_product_acceptance |
-| person_merge_preview_v1 | preview | preview_dependencies / management_state_get_v1 |  | pending |
-| person_merge_approve_v1 | command | preview_dependencies / management_state_get_v1 | people.versioned_domain_change | pending |
-| person_merge_apply_v1 | apply | preview_dependencies / person_merge_preview_v1 | people.alias, account_link_resolution, scoped_relationship_references, merge_approvals.consume | pending |
+| person_merge_preview_v1 | preview | preview_dependencies / management_state_get_v1 |  | implemented_pending_ci |
+| person_merge_approve_v1 | command | preview_dependencies / management_state_get_v1 | people.versioned_domain_change | implemented_pending_ci |
+| person_merge_apply_v1 | apply | preview_dependencies / person_merge_preview_v1 | people.alias, account_link_resolution, scoped_relationship_references, merge_approvals.consume | implemented_pending_ci |
 | calendar_get_v1 | read | none / None |  | baseline_only_not_full_product_acceptance |
 | class_save_v1 | command | create_absent_update_requires_version / management_state_get_v1 | classes.versioned_domain_change | conditional_plan_gates_aligned_limited_runtime |
 | program_preview_v1 | preview | preview_dependencies / management_state_get_v1 |  | pending |

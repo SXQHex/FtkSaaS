@@ -179,6 +179,12 @@ export const runtimeOperationNames = [
   "job_status_get_v1",
   "audit_list_v1",
   "account_access_revoke_v1",
-  "account_link_remove_v1"
+  "account_link_remove_v1",
+  "account_profile_update_v1",
+  "account_password_change_v1",
+  "account_password_reset_request_v1",
+  "person_merge_preview_v1",
+  "person_merge_approve_v1",
+  "person_merge_apply_v1"
 ] as const;
 export type RuntimeOperationName = typeof runtimeOperationNames[number];
