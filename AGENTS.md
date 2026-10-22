@@ -1,5 +1,7 @@
 # FtkSaaS çalışma kuralları
 
+22 Ekim güncel kullanıcı talimatı: kalan P07 profil/merge test hatalarını düzelt, dar native suite ve bağımsız son kaynak incelemesi sonrası güncel SHA için tek aday full clean başlat. Eski iptal edilen run eski kaynak ve hatalı testleri kullanır; yeni kaynağa kabul taşımaz. Full clean başladıktan sonra aşağıdaki kullanıcıya devir kuralı sürer.
+
 22 Ekim son kullanıcı kararı: Vercel Sandbox kotası sınırlıdır; yalnız yerelde çalıştırmanın mümkün olmadığı zorunlu doğrulamalarda kullan. İlgili en dar suite ile sınırla, kanıtları al ve işi biter bitmez Sandbox’ı durdur. Yeni full clean teşhis öncesi başlatılmaz; kabul kapıları korunur.
 
 22 Ekim son kullanıcı kararı: P07-A+B+C tek Draft PR40 içinde bağımlılık sırasıyla geliştirilir ve birlikte merge edilir. Ayrı A/B/C merge/kabul döngüleri kaldırıldı. GitHub servisleri normale dönene kadar manuel CI, rerun, aday label ve merge başlatılmaz; geliştirme commitlerinde geçici `[skip ci]` kullanılarak push kaynaklı pahalı CI ertelenir. Workflow veya kabul kapısı değiştirilmez. Yerel odaklı doğrulamalar sürer. Servisler normale dönünce PR39 main39809302120 attempt6/CD39820836027 attempt2/OPS hosted kapanışı doğrulanmıştır; sırada tamamlanmış P07 için son kaynak bağımsız inceleme, tek aday full clean, merge ve aynı main clean/CD sırasıyla yapılır. Eski/skipped CI kabul değildir; P07 A8+B6+C8 kaynakları aynı Draft PR40 içinde uygulanmıştır. Son kaynak bağımsız inceleme ve gerçek Auth/Edge/worker aday/main clean kabulü ayrıca bekler; kaynak tamamlanması işletim kabulü değildir.

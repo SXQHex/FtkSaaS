@@ -1,12 +1,13 @@
 // Existing registry shard: native Auth -> Edge -> service-only RPC.
-import test from 'node:test';import assert from 'node:assert/strict';import {createHash} from 'node:crypto';
-import {authUser,fixturePlatform,must,call,context} from './api-client.mjs';import {connect} from '../scripts/db.mjs';import {newUuidV7 as key} from '../scripts/uuid.mjs';
+import test,{resources} from './p07-diagnostics.mjs';import assert from 'node:assert/strict';import {createHash} from 'node:crypto';
+import {authUser,fixturePlatform,must,call,context} from './api-client.mjs';import {timedFetch} from './request-diagnostics.mjs';import {newUuidV7 as key} from '../scripts/uuid.mjs';
 test('P07 account profile and manual cross-center alias merge',async t=>{
+ const guard=resources(t);
  const {platform,plan}=await fixturePlatform(),owner=await authUser('p07-a2-owner'),second=await authUser('p07-a2-manager'),member=await authUser('p07-a2-member');
  const account=await must(owner,'account_get_v1'),secondAccount=await must(second,'account_get_v1'),memberAccount=await must(member,'account_get_v1');
  const org=(await must(platform,'organization_create_v1',{verified_account_id:account.id,name:'P07 A completion',initial_plan_id:plan},key())).primary_id;
  const c1=(await must(owner,'center_create_v1',{org_id:org,name:'P07 first',timezone:'UTC'},key())).primary_id,c2=(await must(owner,'center_create_v1',{org_id:org,name:'P07 second',timezone:'UTC'},key())).primary_id;
- const db=await connect();let trigger;
+ const db=await guard.connect(context().env.DB_URL);let trigger;
  const rows=async(q,a=[])=>(await db.query(q,a)).rows,scope=b=>({org_id:org,center_id:c1,...b});
  const mut=(op,b={},k=key(),u=owner)=>must(u,op,scope(b),k);
  const fail=async(op,b,code,k=key(),u=owner)=>{const r=await call(u,op,scope(b),k);assert.equal(r.result.ok,false,JSON.stringify(r.result));assert.equal(r.result.error.code,code,JSON.stringify(r.result));};
@@ -92,7 +93,7 @@ test('P07 account profile and manual cross-center alias merge',async t=>{
    await fail('person_merge_apply_v1',body,'PREVIEW_STALE');
   });
   await t.test('old debt continues to block participation/booking; old paid right and credit remain actionable',async()=>{
-   assert.equal((await rows('select limit_count from core.negative_limit_overrides where org_id=$1 and center_id=$2 and person_id=$3 and discipline_id=$4',[org,c1,target,discipline]))[0].limit_count,0);
+   assert.equal((await rows('select limit_count from core.negative_limit_overrides where org_id=$1 and center_id=$2 and person_id=$3 and discipline_id=$4',[org,c1,target,discipline]))[0].limit_count,'0');
    const eligibility=(await rows('select private.lesson_eligibility($1,$2) code',[org,existingReservation]))[0].code;assert.equal(eligibility.eligible,false);assert.equal(eligibility.reason,'debt_policy');
    const personBefore=await must(owner,'person_get_v1',scope({person_id:target}));assert(personBefore.contacts.some(x=>x.value==='p07-old@ftksaas.invalid'));
    await mut('person_update_v1',{person_id:target,expected_version:personBefore.version,patch:{contacts:[]}});
@@ -105,7 +106,7 @@ test('P07 account profile and manual cross-center alias merge',async t=>{
   });
   await t.test('recovery rate gates are atomic under concurrent callers and do not store addresses',async()=>{
    await db.query('insert into private.p07_recovery_config values(true,86400,1,1)');
-   const clients=[await connect(),await connect()],request={client_api_version:1,request_id:key(),email:'synthetic@ftksaas.invalid'},aux={ip_hash:createHash('sha256').update(key()).digest('hex'),target_hash:createHash('sha256').update(key()).digest('hex'),bot_verified:true};
+   const clients=[await guard.connect(context().env.DB_URL),await guard.connect(context().env.DB_URL)],request={client_api_version:1,request_id:key(),email:'synthetic@ftksaas.invalid'},aux={ip_hash:createHash('sha256').update(key()).digest('hex'),target_hash:createHash('sha256').update(key()).digest('hex'),bot_verified:true};
    try{
     for(const c of clients)await c.query("select set_config('request.jwt.claim.role','service_role',false)");
     const results=await Promise.all(clients.map(c=>c.query('select api_v1.account_password_reset_request_v1($1::jsonb,null,null,$2::uuid[],$3::jsonb) result',[request,Array.from({length:32},key),aux])));
@@ -116,9 +117,20 @@ test('P07 account profile and manual cross-center alias merge',async t=>{
   await t.test('Auth handoff uses live original session; public recovery stays closed without ingress/config',async()=>{
    const challenge=await must(member,'account_password_change_v1');assert.equal(challenge.provider,'supabase_auth');assert.equal(challenge.status,'challenge_required');
    const unknown=await call({jwt:context().env.ANON_KEY},'account_password_reset_request_v1',{email:'unknown-'+key()+'@ftksaas.invalid'});assert.equal(unknown.result.error.code,'TEMPORARY_FAILURE');
-   const {env}=context(),nextPassword='P07-Changed-'+key();const updated=await fetch(env.API_URL+'/auth/v1/user',{method:'PUT',headers:{apikey:env.ANON_KEY,authorization:'Bearer '+member.jwt,'content-type':'application/json'},body:JSON.stringify({password:nextPassword})});assert.equal(updated.ok,true,'native provider password completion');
-   const login=await fetch(env.API_URL+'/auth/v1/token?grant_type=password',{method:'POST',headers:{apikey:env.ANON_KEY,'content-type':'application/json'},body:JSON.stringify({email:member.email,password:nextPassword})});assert.equal(login.ok,true,'new password accepted by real Auth');
-   await db.query('delete from auth.sessions where id=$1',[member.session_id]);const denied=await call(member,'account_password_change_v1');assert.equal(denied.result.error.code,'SESSION_REVOKED');
+   const {env}=context(),nextPassword='P07-Changed-'+key();const updated=await timedFetch('auth.password_update',env.API_URL+'/auth/v1/user',{method:'PUT',headers:{apikey:env.ANON_KEY,authorization:'Bearer '+member.jwt,'content-type':'application/json'},body:JSON.stringify({password:nextPassword})});assert.equal(updated.ok,true,'native provider password completion');await updated.arrayBuffer();
+   const login=await timedFetch('auth.changed_password_login',env.API_URL+'/auth/v1/token?grant_type=password',{method:'POST',headers:{apikey:env.ANON_KEY,'content-type':'application/json'},body:JSON.stringify({email:member.email,password:nextPassword})});assert.equal(login.ok,true,'new password accepted by real Auth');await login.arrayBuffer();
+   assert.equal((await db.query('delete from auth.sessions where id=$1',[member.session_id])).rowCount,1);
+   assert.equal((await rows('select count(*)::int n from auth.sessions where id=$1',[member.session_id]))[0].n,0);
+   // Native Auth rejects this revoked JWT before the Edge can reach the SQL gate.
+   const stale=await timedFetch('auth.revoked_session',env.API_URL+'/auth/v1/user',{headers:{apikey:env.ANON_KEY,authorization:'Bearer '+member.jwt}});assert.equal(stale.status,403);assert.equal((await stale.json()).error_code,'session_not_found');
+   const denied=await call(member,'account_password_change_v1');assert.equal(denied.status,401);assert.equal(denied.result.ok,false);assert.equal(denied.result.error.code,'AUTH_REQUIRED');
+   // Keep the independent SQL live-session fence exact: a service-only handoff
+   // with the original verified user/session must still yield SESSION_REVOKED.
+   await db.query('begin');try{
+    await db.query("select set_config('request.jwt.claim.role','service_role',true)");
+    const result=(await rows('select api_v1.account_password_change_v1($1::jsonb,$2::uuid,$3::uuid,$4::uuid[]) result',[{client_api_version:1,request_id:key()},member.id,member.session_id,Array.from({length:32},key)]))[0].result;
+    assert.equal(result.ok,false);assert.equal(result.error.code,'SESSION_REVOKED');
+   }finally{await db.query('rollback');}
   });
  }finally{
   if(trigger){const table=trigger.startsWith('p07_profile_')?'private.p07_account_inbox':'core.audit_events';await db.query(`drop trigger if exists ${trigger} on ${table}`);await db.query(`drop function if exists private.${trigger}()`);}await db.end();
