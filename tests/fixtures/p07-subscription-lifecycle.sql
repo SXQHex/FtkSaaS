@@ -1,4 +1,5 @@
 -- Synthetic fixtures only. Caller MUST use BEGIN and ROLLBACK.
+create temporary table p07_response_samples(operation text not null,response jsonb not null) on commit drop;
 create function pg_temp.bank(n int) returns uuid[] language plpgsql volatile security invoker set search_path='' as $$
 declare result uuid[]:='{}';b bytea;ms bigint;i int;j int;
 begin
@@ -15,7 +16,7 @@ declare data jsonb;req jsonb:=body||jsonb_build_object('client_api_version',1,'r
 begin
  if op not like '%_preview_v1' and op not like '%_get_v1' then req:=req||jsonb_build_object('operation_key',(pg_temp.bank(1))[1]);end if;
  data:=private.execute_operation(op,req,actor_auth,actor_session,pg_temp.bank(512),jsonb_build_object('token',encode(extensions.gen_random_bytes(32),'hex')));
- if data->>'ok' is distinct from 'true' then raise exception 'NATIVE_OPERATION_FAILED %: %',op,data;end if;return data->'data';
+ if data->>'ok' is distinct from 'true' then raise exception 'NATIVE_OPERATION_FAILED %: %',op,data;end if;insert into pg_temp.p07_response_samples values(op,data);return data->'data';
 end$$;
 do $probe$
 declare u uuid[]:=array['01a16438-8521-72aa-a411-73f9919135a5'::uuid,'01a16438-8522-75c9-9f1a-a1b6a0d7ca1e'::uuid,'01a16438-8522-75c9-9f1a-a55663bb6768'::uuid,'01a16438-8522-75c9-9f1a-aa90222c600a'::uuid,'01a16438-8522-75c9-9f1a-ae82bddf7ca7'::uuid,'01a16438-8522-75c9-9f1a-b31bce5de6cf'::uuid,'01a16438-8522-75c9-9f1a-b43e50f89b06'::uuid,'01a16438-8522-75c9-9f1a-bb2675adcc8b'::uuid,'01a16438-8522-75c9-9f1a-bda762d23b8f'::uuid,'01a16438-8522-75c9-9f1a-c08607bbe124'::uuid,'01a16438-8523-7530-9292-72f32040eb39'::uuid,'01a16438-8523-7530-9292-77ab0dadfc27'::uuid,'01a16438-8523-7530-9292-796303ac438b'::uuid,'01a16438-8523-7530-9292-7f4a074c342d'::uuid,'01a16438-8523-7530-9292-83c9b012b1af'::uuid,'01a16438-8523-7530-9292-8575487d9651'::uuid,'01a16438-8523-7530-9292-8876c66e06b1'::uuid,'01a16438-8523-7530-9292-8c5f87a7cc43'::uuid,'01a16438-8523-7530-9292-92968dc33526'::uuid,'01a16438-8523-7530-9292-97f3388c0e94'::uuid,'01a16438-8523-7530-9292-9b4b8731a40c'::uuid,'01a16438-8523-7530-9292-9dd82c42f01f'::uuid,'01a16438-8523-7530-9292-a19855bbb1d2'::uuid,'01a16438-8523-7530-9292-a6806d876269'::uuid,'01a16438-8523-7530-9292-a868f2f94b4a'::uuid,'01a16438-8523-7530-9292-ac3e8e0c03d6'::uuid,'01a16438-8523-7530-9292-b1f9d030f5f7'::uuid,'01a16438-8523-7530-9292-b7d0266466d7'::uuid,'01a16438-8523-7530-9292-b9747df1d0b4'::uuid,'01a16438-8523-7530-9292-bead186010d0'::uuid,'01a16438-8523-7530-9292-c3d9354f4662'::uuid,'01a16438-8523-7530-9292-c4bee8a4dd31'::uuid,'01a16438-8523-7530-9292-c81a01817fdb'::uuid,'01a16438-8523-7530-9292-cf157367c93d'::uuid,'01a16438-8523-7530-9292-d13b41fa2928'::uuid,'01a16438-8523-7530-9292-d573cde22556'::uuid,'01a16438-8523-7530-9292-d8668cbd8eaa'::uuid,'01a16438-8523-7530-9292-dda53733514b'::uuid,'01a16438-8523-7530-9292-e3c7c681d8bb'::uuid,'01a16438-8523-7530-9292-e7aba847e66f'::uuid,'01a16438-8523-7530-9292-eb9bc7a2c965'::uuid,'01a16438-8523-7530-9292-ec582c1aa391'::uuid,'01a16438-8523-7530-9292-f04b1c4b8e55'::uuid,'01a16438-8523-7530-9292-f594e0a9ad7f'::uuid,'01a16438-8523-7530-9292-fa236e503c1c'::uuid,'01a16438-8523-7530-9292-fccf610a4323'::uuid,'01a16438-8523-7530-9293-01b4f1a978b7'::uuid,'01a16438-8523-7530-9293-059737ee4351'::uuid];answer jsonb;preview jsonb;fresh jsonb;before_debt jsonb;w uuid[]:=pg_temp.bank(64);disc uuid;cls uuid;product uuid;sold uuid;sp jsonb;rv uuid;quote_id uuid;due bigint;sub_id uuid;original_end timestamptz;payment_id uuid;change_id uuid;result_data jsonb;proof jsonb;period_row core.saas_subscriptions;
@@ -81,6 +82,9 @@ begin
   raise exception 'P07_ZERO_CASE_ROLLBACK';
  exception when SQLSTATE 'P0001' then if SQLERRM<>'P07_ZERO_CASE_ROLLBACK' then raise;end if;
  end;
+ -- Surviving normal-payment responses must reach the Node Edge validators as well.
+ answer:=pg_temp.invoke('saas_payment_submit_v1',jsonb_build_object('org_id',u[5],'amount_minor','10','currency','TRY','reference','normal response sample','occurred_at',clock_timestamp()),u[1],w[1]);payment_id:=(answer->>'primary_id')::uuid;
+ perform pg_temp.invoke('saas_payment_verify_v1',jsonb_build_object('org_id',u[5],'payment_id',payment_id,'accepted',false),u[1],w[1]);
  answer:=pg_temp.invoke('subscription_downgrade_request_v1',jsonb_build_object('org_id',u[5],'target_plan_id',w[30],'kept_center_id',u[29]),u[1],w[1]);change_id:=(answer->>'primary_id')::uuid;
  if not exists(select 1 from core.saas_change_requests where id=change_id and effective_at=original_end and state='scheduled') then raise exception 'DOWNGRADE_NOT_PERIOD_BOUND';end if;
  answer:=pg_temp.invoke('management_state_get_v1',jsonb_build_object('org_id',u[5],'operation','subscription_change_cancel_v1','selector',jsonb_build_object('operation','subscription_change_cancel_v1','key',jsonb_build_object('change_id',change_id))),u[1],w[1]);

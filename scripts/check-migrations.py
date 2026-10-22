@@ -122,3 +122,5 @@ assert next(Path('supabase/migrations').glob('*_p07_account_revocation.sql')).re
 assert next(Path('supabase/migrations').glob('*_p07_account_profile_auth_merge.sql')).read_text()==''.join(Path('database',n).read_text() for n in ['p07-account-profile.sql','p07-account-auth.sql','p07-person-merge.sql','p07-person-merge-bind.sql','p07-account-profile-auth-merge-wrappers.sql']),'P07 completion source drift'
 
 assert next(Path('supabase/migrations').glob('*_p07_subscription_lifecycle.sql')).read_text()==''.join(Path('database',n).read_text() for n in ['p07-subscriptions.sql', 'p07-subscription-payments.sql', 'p07-subscription-workers.sql', 'p07-subscription-bind.sql', 'p07-lifecycle.sql', 'p07-privacy-workers.sql', 'p07-lifecycle-bind.sql', 'p07-reopen-workers.sql', 'p07-hosted-workers.sql', 'p07-subscription-lifecycle-wrappers.sql']),'P07 subscription/lifecycle source drift'
+
+assert next(Path('supabase/migrations').glob('*_p07_payment_response_contract.sql')).read_text()==Path('database/p07-payment-response.sql').read_text(),'P07 payment response source drift'
