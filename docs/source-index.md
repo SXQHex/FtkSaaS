@@ -1,5 +1,7 @@
 # FtkSaaS kaynak indeksi
 
+Operasyonel ilk kurulum: açık kullanıcı onayıyla1 organizasyon/owner bağlantısı ve1 Eylül2026–1 Eylül2027 aktif yıllık Business abonelik yönetici aktarımıyla oluşturuldu; normal erişim ve1000 öğrenci/50 eğitmen/5 merkez doğrulandı. Katalog2 sürüm, yönetici makbuzu/audit1; merkez/oda/program/öğrenci henüz yok. P07 kod kabulü veya yeni API/dağıtım değildir. Ayrıntı üretim kuyruğundadır.
+
 P08 tartışılacaklara sınırsız Business limitlerinin sözleşme/runtime uyumsuzluğu eklendi. Mevcut kurulum sonlu aktif öğrenci1000/eğitmen50/merkez5 ile ilerler; ayrıntı üretim kuyruğundadır.
 
 P08 — Geliştirmeler kuyruğa eklendi: [kapsam ve mevcut kurulum değerleri](production-queue.md#p08--geliştirmeler). Yeni özellikler P07 kabulüne eklenmez; kontenjan20/etkinlik katılımı4/tekrar100, runtime terfisi yok.
