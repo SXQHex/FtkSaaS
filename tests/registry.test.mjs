@@ -122,3 +122,7 @@ test('Registry real Auth/API scope, lifecycle and atomicity',async t=>{
 });
 
 import './ops-hosted-acceptance.mjs';
+import './p07-account-revocation-acceptance.mjs';
+import './p07-account-profile-merge-acceptance.mjs';
+import './p07-subscription-lifecycle-acceptance.mjs';
+import './p07-lifecycle-acceptance.mjs';

@@ -19,13 +19,13 @@ export async function publicIngress(req:Request,body:string,env:PublicEnv,now=Da
  if(diff)return null;
  return {ip,ip_hash:await keyedHash(salt,'ip:'+ip),targetHash:(contact:string)=>keyedHash(salt,'target:'+contact.trim().toLowerCase())};
 }
-export async function verifyPublicBot(token:string,ip:string,env:PublicEnv,fetcher:typeof fetch=fetch):Promise<boolean>{
+export async function verifyPublicBot(token:string,ip:string,env:PublicEnv,fetcher:typeof fetch=fetch,action:string='public_application'):Promise<boolean>{
  const secret=env('FTK_TURNSTILE_SECRET'),hostname=env('FTK_TURNSTILE_HOSTNAME');
  if(!secret||!hostname)return false;
  try{
   const res=await fetcher('https://challenges.cloudflare.com/turnstile/v0/siteverify',{method:'POST',body:new URLSearchParams({secret,response:token,remoteip:ip}),signal:AbortSignal.timeout(10000)});
   if(!res.ok)return false;
   const proof=await res.json();
-  return proof.success===true&&proof.hostname===hostname&&proof.action==='public_application';
+  return proof.success===true&&proof.hostname===hostname&&proof.action===action;
  }catch{return false;}
 }

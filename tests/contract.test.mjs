@@ -63,3 +63,4 @@ test('P04 trial setup has explicit limits and no implicit product or repeat poli
  for(const key of Object.keys(cfg)){const missing={...cfg};delete missing[key];assert.throws(()=>trialConfigurationSQL(missing),/explicit/);}
  for(const bad of [{offer_minutes:0},{expected_repeat_limit:-1},{enabled:'true'},{org_id:"';drop table core.people;--"}])assert.throws(()=>trialConfigurationSQL({...cfg,...bad}));
 });
+import './p07-auth-adapter.mjs';

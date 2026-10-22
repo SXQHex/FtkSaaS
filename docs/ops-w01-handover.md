@@ -1,5 +1,7 @@
 # OPS-W01 — Supabase içi hosted worker
 
+22 Ekim güncel kabul: **OPS-W01 done (kaynak/main/CD ve boş kuyruk hosted işletim kabulü)**. PR39 main `d1830c89e3d5e7f3c90db7ef0953cc264b35205f`; aday39795678387 attempt5/main39809302120 attempt6/CD39820836027 attempt2 completed/success. CD18 kontrol/55 içerik eşleşmesi/Edge7 ACTIVE verify_jwt=true/Auth→Edge→RPC/advisors/fixture temizliği geçti. Receipt artifact12445920610 SHA256 `a1261502037363f5bf77fdc2a714eb780f9ec42012484104bd53f6e922d87cb5`. Önceki CD attempt1 HTTP500 tarihsel hata kaydıdır.22 Ekim20:32–20:33 Türkiye saatinde kabul edilmiş install SQL uygulandı; üç Cron job sağlıklı.0 org/0 tenant binding/0 claim olduğundan bu hosted kabul boş kuyruk içindir; tenant iş yükü/ölçek veya henüz kabul edilmemiş P07 worker’ları için başarı taşımaz. Aşağıdaki ilk hazırlık snapshot’ı tarihsel bağlamdır; kurulum öncesi pending cümleleri bu kapanışı geri almaz. P07 A+B+C tek Draft PR40 altında geliştirilir.
+
 Kaynak tabanı kabul edilmiş main `006ad36918ae823bc10fbdefa2d48901e193121c`, PR38. P06 aday39779013518/main39782197422/CD39785146645 başarılı;178 runtime/22 contract_only,54 migration/Edge7. Bu yeni OPS kaynağı55 migration taşır, API sayısını değiştirmez. Durum **kaynak ve hosted işletim kabulü bekleniyor**. P07 queued.
 
 22 Ekim kullanıcı tercihi: Supabase içinde barındırma. Ek sunucu, dış servis, insan JWT'si veya service-role worker kimliği yoktur. Supabase becerisi ve güncel Cron belgeleri incelendi. Platformda pg_cron etkinleştirildi; yalnız teknik canary ayrı LOGIN session_user ile iki başarılı tick yaptı ve job/table/role temizlendi. Üretim worker görevleri henüz kurulmadı; accepted-source CI ve CD sonrası kurulur. Geliştirme DB'sinde0 organizasyon ve0 worker binding görüldü; sentetik veya gerçek tenant/config uydurulmaz.
@@ -35,3 +37,19 @@ Durdurma: `update private.ops_worker_health set enabled=false where lane='p06'` 
 Yeni `tests/ops-hosted-acceptance.mjs` mevcut registry shard'ına bağlıdır; yeni suite/shard veya temiz kabul gevşetmesi yoktur. Gerçek dedicated LOGIN oturumları: boş binding heartbeat; başka lane/tabloların reddi; UUID bankı; gerçek Auth→report job; geç audit sleep sırasında CALL iptalinin kalıcı claim/domain rollback sınırı; oturum kapama/lease expiry/yeni session reclaim/tek dosya; güncel authorized job sonucu; disable ve binding kaldırma.
 
 Yerel Docker bulunmadığından gerçek Auth/native CALL testinin başarı kanıtı henüz yoktur; final CI gerekir. Platform canary ve SQL rollback UUID testi bunun yerine geçmez. Kaynak kabulü + development kurulum/işletim doğrulanmadan OPS-W01 done değildir. Dış e-posta, frontend, yük/restore ve production müşteri kabulü kapsam dışıdır.
+
+## Hosted kurulum kanıtı — 22 Ekim 2026
+
+Kabul edilmiş main’deki `scripts/ops-cron-install.sql` birebir uygulandı. Uzak55. migration SHA256 `f43952f01f12589a38e10527859227c0c340f5455bcbcbcc9237063115fd635c` manifest ile eşleşti. Yeni migration/Edge yayını yapılmadı.
+
+| Cron job | ID | Gerçek LOGIN | Aralık | Durum |
+|---|---|---|---|---|
+| ftksaas-ops-p01 | 2 | ftk_ops_p01 | 5 saniye | active / healthy / idle |
+| ftksaas-ops-p05 | 3 | ftk_ops_p05 | 5 saniye | active / healthy / idle |
+| ftksaas-ops-p06 | 4 | ftk_ops_p06 | 5 saniye | active / healthy / idle |
+
+İlk sağlık kanıtında p01/p05 tick11, p06 tick6 ve hata0/claim0 görüldü. Sonraki Cron readback’te her job18 başarılı CALL, failed0 idi. P06 enabled=false iken12 saniye boyunca tick4 ve last_finished_at sabit kaldı; p01/p05 ilerledi. Enabled=true sonrası p06 tick6’ya çıktı. Durdurma/yeniden başlatma kullanıcı işi uydurmadan doğrulandı.
+
+Worker rollerinde superuser/createdb/createrole/replication/bypassrls yok; connection limit2 ve kendi worker grup üyeliği korunur. Doğrudan core SELECT0, kurulum sonrası cron schema USAGE0, postgres’in kullanılabilir geçici SET/INHERIT üyeliği0. Supabase’in role creator için verdiği admin_option=true/SET=false/INHERIT=false üç idari üyelik çalışma kimliği değildir. Admin session_user ile ops_identity FORBIDDEN verdi. Son security/performance advisor taramasında ERROR0; mevcut3 security WARN bu kurulumla kapanmış sayılmaz.
+
+Tenant yaratıldığında ilgili private.p01/p05/p06_worker_scopes kaydı **açıkça** gerçek organizasyon ve lane LOGIN rolüne bağlanmalıdır. Yetki/plan/config yoksa worker o işi çalıştıramaz; otomatik tenant/config uydurulmaz. P01: talep/yer teklifi expiry ve uygun sıradaki kişiye yer teklifi. P05: in-app outbox, izin/politika/plan koşullu hatırlatma ve Business otomasyonu. P06: talep edilen CSV raporu ve onaylı içe aktarma doğrulama/uygulama batch’leri. Dış e-posta ve P07 abonelik/gizlilik işleri bu üç lane kurulumunda yoktur.
