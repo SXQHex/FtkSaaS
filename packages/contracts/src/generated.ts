@@ -13369,7 +13369,7 @@ export interface ManagementStateView {
 operation: OperationName
 entity: (EntityRef | null)
 exists: Bool
-state: (("accepted" | "active" | "alternative_offered" | "applied" | "approved" | "cancelled" | "capacity_closed" | "closed" | "completed" | "consumed" | "converted" | "current" | "deleted" | "deletion_pending" | "draft" | "ended" | "event_cancelled" | "expired" | "failed" | "failed_final" | "grace" | "in_progress" | "inactive" | "invalid" | "invalidated" | "left" | "merged" | "occurred" | "offered" | "open" | "partial" | "pending" | "pending_payment" | "pending_upload" | "planned" | "prepared" | "published" | "ready" | "registered" | "rejected" | "released" | "requested" | "reserved" | "result_expired" | "retry_wait" | "reviewed" | "revoked" | "running" | "scheduled" | "settled" | "succeeded" | "superseded" | "suspended" | "terminated" | "valid" | "waiting" | "withdrawn") | null)
+state: (("accepted" | "active" | "alternative_offered" | "applied" | "approved" | "cancelled" | "capacity_closed" | "closed" | "completed" | "consumed" | "converted" | "current" | "deleted" | "deletion_pending" | "draft" | "ended" | "event_cancelled" | "expired" | "failed" | "failed_final" | "grace" | "in_progress" | "inactive" | "invalid" | "invalidated" | "left" | "merged" | "occurred" | "offered" | "open" | "partial" | "pending" | "pending_payment" | "pending_upload" | "planned" | "prepared" | "published" | "read" | "ready" | "registered" | "rejected" | "released" | "requested" | "reserved" | "result_expired" | "retry_wait" | "reviewed" | "revoked" | "running" | "scheduled" | "settled" | "succeeded" | "superseded" | "suspended" | "terminated" | "unread" | "valid" | "waiting" | "withdrawn") | null)
 /**
  * @minItems 0
  */

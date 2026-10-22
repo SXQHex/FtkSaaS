@@ -34,7 +34,7 @@ begin
  elsif typ='reservations' and ctx->>'gate' in ('reservation','attendance') then select center_id,session_id,person_id into c,s,p from core.reservations where org_id=org and id=sid;
  elsif typ='events' and ctx->>'gate' in ('event_registration','attendance') then select center_id,id into c,e from core.events where org_id=org and id=sid;
  elsif typ='event_registrations' and ctx->>'gate' in ('event_registration','attendance') then select center_id,event_id,person_id into c,e,p from core.event_registrations where org_id=org and id=sid;
- elsif typ='product_versions' and ctx->>'gate'='sale' then select coalesce(v.center_id,center),v.id into c,pv from core.product_versions v where v.org_id=org and v.id=sid;
+ elsif typ='product_versions' and ctx->>'gate'='sale' then select v.center_id,v.id into c,pv from core.product_versions v where v.org_id=org and v.id=sid;
  elsif typ='sales' and ctx->>'gate'='sale' then select center_id,product_version_id,person_id into c,pv,p from core.sales where org_id=org and id=sid;
  else perform private.fail('VALIDATION_FAILED');end if;
  if c is null or (center is not null and c<>center) or (p is not null and p<>target) then perform private.fail('NOT_FOUND');end if;
@@ -153,7 +153,7 @@ begin
     if kv not in ('center_ids','product_version_ids','session_ids','event_ids') then perform private.fail('VALIDATION_FAILED');end if;
     if exists(select 1 from jsonb_array_elements_text(entry) x where case kv
      when 'center_ids' then not exists(select 1 from core.centers where org_id=org and id=x::uuid and (c is null or id=c))
-     when 'product_version_ids' then not exists(select 1 from core.product_versions where org_id=org and id=x::uuid and (c is null or center_id is null or center_id=c))
+     when 'product_version_ids' then not exists(select 1 from core.product_versions where org_id=org and id=x::uuid and (c is null or center_id=c))
      when 'session_ids' then not exists(select 1 from core.sessions where org_id=org and id=x::uuid and (c is null or center_id=c))
      when 'event_ids' then not exists(select 1 from core.events where org_id=org and id=x::uuid and (c is null or center_id=c)) end) then perform private.fail('NOT_FOUND');end if;
    end loop;

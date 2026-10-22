@@ -34,7 +34,7 @@ begin
  elsif typ='reservations' and ctx->>'gate' in ('reservation','attendance') then select center_id,session_id,person_id into c,s,p from core.reservations where org_id=org and id=sid;
  elsif typ='events' and ctx->>'gate' in ('event_registration','attendance') then select center_id,id into c,e from core.events where org_id=org and id=sid;
  elsif typ='event_registrations' and ctx->>'gate' in ('event_registration','attendance') then select center_id,event_id,person_id into c,e,p from core.event_registrations where org_id=org and id=sid;
- elsif typ='product_versions' and ctx->>'gate'='sale' then select coalesce(v.center_id,center),v.id into c,pv from core.product_versions v where v.org_id=org and v.id=sid;
+ elsif typ='product_versions' and ctx->>'gate'='sale' then select v.center_id,v.id into c,pv from core.product_versions v where v.org_id=org and v.id=sid;
  elsif typ='sales' and ctx->>'gate'='sale' then select center_id,product_version_id,person_id into c,pv,p from core.sales where org_id=org and id=sid;
  else perform private.fail('VALIDATION_FAILED');end if;
  if c is null or (center is not null and c<>center) or (p is not null and p<>target) then perform private.fail('NOT_FOUND');end if;
@@ -153,7 +153,7 @@ begin
     if kv not in ('center_ids','product_version_ids','session_ids','event_ids') then perform private.fail('VALIDATION_FAILED');end if;
     if exists(select 1 from jsonb_array_elements_text(entry) x where case kv
      when 'center_ids' then not exists(select 1 from core.centers where org_id=org and id=x::uuid and (c is null or id=c))
-     when 'product_version_ids' then not exists(select 1 from core.product_versions where org_id=org and id=x::uuid and (c is null or center_id is null or center_id=c))
+     when 'product_version_ids' then not exists(select 1 from core.product_versions where org_id=org and id=x::uuid and (c is null or center_id=c))
      when 'session_ids' then not exists(select 1 from core.sessions where org_id=org and id=x::uuid and (c is null or center_id=c))
      when 'event_ids' then not exists(select 1 from core.events where org_id=org and id=x::uuid and (c is null or center_id=c)) end) then perform private.fail('NOT_FOUND');end if;
    end loop;
@@ -591,7 +591,7 @@ begin
  with rows as(
  select f.id,f.created_at,f.version,f.state,'files'::text subject,jsonb_build_object('name',p.name,'mime',f.mime,'bytes',f.size_bytes) vals from core.files f join private.p05_files p on p.file_id=f.id where op='document_upload_prepare_v1' and f.org_id=org and f.center_id is not distinct from center and p.account_id=account
  union all select v.id,v.created_at,v.version,'published','document_versions',jsonb_build_object('document_id',v.document_id,'file_id',v.file_id,'version_label',v.version_label,'requirements',coalesce((select jsonb_agg(jsonb_build_object('gate',q.operation,'scope',q.scope,'renewed_acceptance',q.renewed_acceptance) order by q.id) from core.document_requirements q where q.org_id=org and q.document_version_id=v.id),'[]'::jsonb),'scope',k->'scope') from core.document_versions v join core.documents d on d.org_id=v.org_id and d.id=v.document_id where op in ('document_version_publish_v1','document_publication_preview_v1') and v.org_id=org and v.file_id=(k->>'file_id')::uuid and d.scope_center_id is not distinct from (k#>>'{scope,center_id}')::uuid and (k->>'document_id' is null or v.document_id=(k->>'document_id')::uuid)
- union all select f.id,f.created_at,f.version,f.state,'files',jsonb_build_object('file_id',f.id,'checksum',f.checksum) from core.files f join private.p05_files p on p.file_id=f.id where op='file_upload_complete_v1' and f.org_id=org and f.id=(k->>'file_id')::uuid and p.account_id=account
+ union all select f.id,f.created_at,f.version,f.state,'files',jsonb_strip_nulls(jsonb_build_object('file_id',f.id,'checksum',f.checksum)) from core.files f join private.p05_files p on p.file_id=f.id where op='file_upload_complete_v1' and f.org_id=org and f.id=(k->>'file_id')::uuid and p.account_id=account
  union all select n.id,n.created_at,n.version,case when n.read_at is null then 'unread' else 'read' end,'notifications',jsonb_build_object('notification_id',n.id) from core.notifications n where op='notification_mark_read_v1' and n.org_id=org and n.id=(k->>'notification_id')::uuid and n.recipient_person_id=actor
  union all select n.id,n.created_at,n.version,'active','notification_preferences',jsonb_build_object('channel',n.channel,'purpose',n.purpose,'enabled',n.enabled) from core.notification_preferences n where op='notification_preferences_set_v1' and n.org_id=org and n.person_id=actor and n.channel=k->>'channel' and n.purpose=k->>'purpose'
  union all select s.id,s.created_at,s.version,s.state,'segments',jsonb_build_object('segment_id',s.id,'name',s.name,'definition',s.definition,'scope',k->'scope') from core.segments s join private.p05_configuration_scopes x on x.entity_id=s.id where op='segment_save_v1' and s.org_id=org and x.center_id is not distinct from (k#>>'{scope,center_id}')::uuid and (k->>'segment_id' is null or s.id=(k->>'segment_id')::uuid)

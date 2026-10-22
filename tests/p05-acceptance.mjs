@@ -39,10 +39,12 @@ test('P05 actual Auth/Storage/documents/inbox/scoped worker acceptance',async t=
   const huge=await mut('document_upload_prepare_v1',{name:'Oversized ingress',mime:'text/plain',bytes:1});prepared.push(huge.file_id);
   const oversized=await fetch(new URL(huge.upload_url,context().env.API_URL),{method:'PUT',headers:{'content-type':'text/plain',apikey:context().env.ANON_KEY},body:'x'.repeat(2097153)});assert.equal(oversized.ok,false,'Storage must reject bytes above the system ceiling');
   file=await upload();assert.equal((await rows('select state from core.files where id=$1',[file.file_id]))[0].state,'pending_upload');
+  const pending=await must(owner,'management_state_get_v1',scope({operation:'file_upload_complete_v1',selector:{operation:'file_upload_complete_v1',key:{file_id:file.file_id}}}));assert.equal(pending.items[0].state,'pending_upload');assert.equal('checksum' in pending.items[0].current.values,false);
   await fail('document_version_publish_v1',{file_id:file.file_id,version_label:'pending',scope:{kind:'center',center_id:center},requirements:required()},'VALIDATION_FAILED');
   await fail('file_upload_complete_v1',{file_id:file.file_id,checksum},'NOT_FOUND',otherUser);
   await fail('file_upload_complete_v1',{file_id:file.file_id,checksum:'0'.repeat(64)},'VALIDATION_FAILED');
   const k=key();const done=await mut('file_upload_complete_v1',{file_id:file.file_id,checksum},owner,k);assert.equal(done.primary_id,file.file_id);assert.equal((await mut('file_upload_complete_v1',{file_id:file.file_id,checksum},owner,k)).replayed,true);
+  const ready=await must(owner,'management_state_get_v1',scope({operation:'file_upload_complete_v1',selector:{operation:'file_upload_complete_v1',key:{file_id:file.file_id}}}));assert.equal(ready.items[0].state,'ready');assert.equal(ready.items[0].current.values.checksum,checksum);
   const overwritten=await fetch(new URL(file.upload_url,context().env.API_URL),{method:'PUT',headers:{'content-type':'text/plain',apikey:context().env.ANON_KEY},body:'replacement'});assert.equal(overwritten.ok,false);
   const direct=await fetch(context().env.API_URL+'/storage/v1/object/authenticated/ftksaas-documents/'+org+'/'+file.file_id,{headers:{apikey:context().env.ANON_KEY,authorization:'Bearer '+student.jwt}});assert.equal(direct.ok,false);
  });
@@ -91,14 +93,9 @@ test('P05 actual Auth/Storage/documents/inbox/scoped worker acceptance',async t=
   await assert.rejects(db.query('select private.p05_assert_documents($1,$2,$3,$4)',[org,center,person,attendance(next)]),/DOCUMENT_REQUIRED/);
   assert.equal((await rows('select count(*)::int n from private.p05_document_protections where org_id=$1 and document_version_id=$2',[org,published.primary_id]))[0].n,preview.affected.length);
  });
- await t.test('organization catalog sale document is available before purchase and gate commits only after self consent',async()=>{
-  const terms={name:'Organization catalog',kind:'credits',booking_mode:'flexible',credits:1,price_minor:'0',currency:'TRY',freeze:{enabled:false,extends_validity:false},refund:{method:'none'},scopes:[{scope_kind:'organization_all',center_id:null,discipline_id:null,usage_targets:['lesson']}]};
-  // Organization-level catalog rows are a supported data shape; product_publish
-  // remains center-managed. Seed this shape without broadening that API's authority.
-  const pid=key(),pv=key();
-  await db.query("insert into core.products(id,org_id,name,state) values($1,$2,'Organization catalog','active')",[pid,org]);
-  await db.query("insert into core.product_versions(id,org_id,product_id,kind,booking_mode,credits,price_minor,currency,refund_method,freeze_terms,refund_terms,effective_at) values($1,$2,$3,'credits','flexible',1,0,'TRY','none',$4,$5,clock_timestamp())",[pv,org,pid,terms.freeze,terms.refund]);
-  await db.query("insert into core.product_scopes(id,org_id,product_version_id,scope_kind,usage_targets) values($1,$2,$3,'organization_all',array['lesson'])",[key(),org,pv]);
+ await t.test('organization-wide product sale document is available before purchase and gate commits only after self consent',async()=>{
+  const terms={name:'Organization-wide rights',kind:'credits',booking_mode:'flexible',credits:1,price_minor:'0',currency:'TRY',freeze:{enabled:false,extends_validity:false},refund:{method:'none'},scopes:[{scope_kind:'organization_all',center_id:null,discipline_id:null,usage_targets:['lesson']}]};
+  const pv=(await mut('product_publish_v1',{terms})).primary_id;
   const f=await upload('Sale terms');await mut('file_upload_complete_v1',{file_id:f.file_id,checksum});
   const published=await mut('document_version_publish_v1',{file_id:f.file_id,version_label:'sale-v1',scope:{kind:'center',center_id:center},requirements:[{gate:'sale',scope:{center_ids:[center],product_version_ids:[pv]},renewed_acceptance:true}]});
   const saleContext={gate:'sale',subject:{type:'product_versions',id:pv}},list=await requirements(saleContext);assert(list.some(x=>x.version_id===published.primary_id&&!x.accepted));
@@ -109,9 +106,10 @@ test('P05 actual Auth/Storage/documents/inbox/scoped worker acceptance',async t=
  });
  await t.test('self inbox/version read/replay; transactional notice cannot be disabled; optional default off',async()=>{
   const list=await must(student,'notifications_list_v1',scope({page:{limit:1},unread_only:false}));assert.equal(list.items.length,1);
-  const n=list.items[0],state=await must(student,'management_state_get_v1',scope({operation:'notification_mark_read_v1',selector:{operation:'notification_mark_read_v1',key:{notification_id:n.id}}}));const v=state.items[0].versions[0].version;
+  const n=list.items[0],state=await must(student,'management_state_get_v1',scope({operation:'notification_mark_read_v1',selector:{operation:'notification_mark_read_v1',key:{notification_id:n.id}}}));const v=state.items[0].versions[0].version;assert.equal(state.items[0].state,'unread');
   await fail('notification_mark_read_v1',{notification_id:n.id,expected_version:v},'NOT_FOUND');
   const k=key();await mut('notification_mark_read_v1',{notification_id:n.id,expected_version:v},student,k);assert.equal((await mut('notification_mark_read_v1',{notification_id:n.id,expected_version:v},student,k)).replayed,true);
+  const after=await must(student,'management_state_get_v1',scope({operation:'notification_mark_read_v1',selector:{operation:'notification_mark_read_v1',key:{notification_id:n.id}}}));assert.equal(after.items[0].state,'read');assert.equal(after.items[0].versions[0].version,v+1);
   await fail('notification_preferences_set_v1',{channel:'in_app',purpose:'transactional',enabled:false,expected_version:1},'FORBIDDEN',student);
   await fail('notification_preferences_set_v1',{channel:'email',purpose:'reminder',enabled:true,expected_version:1},'SERVICE_UNAVAILABLE',student);
   if(list.next_cursor){const changed=await call(student,'notifications_list_v1',scope({page:{cursor:list.next_cursor},unread_only:true}));assert.equal(changed.result.error.code,'VALIDATION_FAILED');}

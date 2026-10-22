@@ -121,7 +121,9 @@ test('Starter attendance and protected reservation through Auth -> Edge -> RPC',
  await t.test('assigned instructor reads redacted draft; student, outsider and wrong center cannot mutate',async()=>{
   const assigned=(await makeSession({assignments:[{person_id:instructor.p,duty:'instructor'}]})).primary_id;
   const own=(await book(assigned,(await linked('assigned-student')).p)).primary_id;
-  await db.query("update core.sessions set starts_at=now()-interval '1 minute',ends_at=now()+interval '59 minutes' where id=$1",[assigned]);
+  // Keep the full elapsed lesson inside configured Istanbul availability at any runner time.
+  const elapsed=new Date();elapsed.setUTCHours(9,0,0,0);if(+elapsed>=Date.now())elapsed.setUTCDate(elapsed.getUTCDate()-1);
+  await db.query('update core.sessions set starts_at=$1,ends_at=$2 where id=$3',[elapsed,new Date(+elapsed+3600000),assigned]);
   let v=await get(assigned);await mut('attendance_mark_v1',{reservation_id:own,expected_version:v.entries[0].version,result:'attended'},key(),instructor.u);
   v=await must(instructor.u,'attendance_get_v1',scope({session_id:assigned}));assert.equal(v.entries[0].eligibility_snapshot,null);
   await publish('debt_participation',{kind:'boolean',value:true});

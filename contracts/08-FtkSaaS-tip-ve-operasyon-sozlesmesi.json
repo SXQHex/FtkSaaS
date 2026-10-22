@@ -24722,6 +24722,7 @@
                 "planned",
                 "prepared",
                 "published",
+                "read",
                 "ready",
                 "registered",
                 "rejected",
@@ -24739,6 +24740,7 @@
                 "superseded",
                 "suspended",
                 "terminated",
+                "unread",
                 "valid",
                 "waiting",
                 "withdrawn"
