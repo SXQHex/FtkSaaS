@@ -164,6 +164,19 @@
     "outbox_deliver_v1",
     "reminder_schedule_v1",
     "automation_run_v1",
-    "document_publication_preview_v1"
+    "document_publication_preview_v1",
+    "report_get_v1",
+    "report_export_start_v1",
+    "report_file_get_v1",
+    "import_upload_prepare_v1",
+    "import_preview_v1",
+    "import_apply_v1",
+    "import_rows_list_v1",
+    "import_rows_process_v1",
+    "report_build_v1",
+    "operation_status_get_v1",
+    "preview_get_v1",
+    "job_status_get_v1",
+    "audit_list_v1"
   ]
 }

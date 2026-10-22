@@ -523,7 +523,7 @@ usage_targets: [UsageTarget, ...(UsageTarget)[]]
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
  * via the `definition` "ImportTarget".
  */
-export type ImportTarget = ("display_name" | "email" | "phone" | "source_key" | "person_ref" | "opening_credits" | "opening_debt_minor" | "currency" | "product_version_ref" | "start_date" | "end_date")
+export type ImportTarget = ("display_name" | "email" | "phone" | "source_key" | "person_ref" | "opening_credits" | "opening_debt_minor" | "currency" | "product_version_ref" | "start_date" | "end_date" | "opening_credit_value_minor")
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
  * via the `definition` "PolicyKey".
@@ -575,6 +575,13 @@ export type EventDisciplineIds = string[]
  * via the `definition` "EarningDirection".
  */
 export type EarningDirection = ("add" | "subtract")
+/**
+ * Utilization basis points may exceed 10000 when occupancy exceeds nominal capacity.
+ *
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "ReportRatioBps".
+ */
+export type ReportRatioBps = number
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
  * via the `definition` "Request_policy_publish".
@@ -2219,6 +2226,9 @@ DocumentPublicationAffected?: DocumentPublicationAffected
 Success_document_publication_preview?: SuccessDocumentPublicationPreview
 ManagementSelector_document_publication_preview_v1?: ManagementSelectorDocumentPublicationPreviewV1
 ManagementProjection_document_publication_preview_v1?: ManagementProjectionDocumentPublicationPreviewV1
+ReportRatioBps?: ReportRatioBps
+ImportMoneyTotal?: ImportMoneyTotal
+ImportPreviewSummary?: ImportPreviewSummary
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -2739,6 +2749,14 @@ currency?: (Currency | null)
 product_version_ref?: (string | null)
 start_date?: (Date | null)
 end_date?: (Date | null)
+opening_credit_value_minor?: (Money | null)
+/**
+ * @maxItems 100
+ */
+contacts?: {
+kind: ("email" | "phone")
+value: Text
+}[]
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -2905,6 +2923,7 @@ sessions?: SchedulePreviewItem[]
 class_assignments?: ClassAssignmentView[]
 class_version?: PositiveInt
 sale_lifecycle?: SaleLifecyclePreviewDetails
+import_summary?: ImportPreviewSummary
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -2979,6 +2998,29 @@ debts: {
 debt_id: string
 reduction_minor: Money
 }[]
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "ImportPreviewSummary".
+ */
+export interface ImportPreviewSummary {
+total_rows: Count
+valid_rows: Count
+invalid_rows: Count
+new_people: Count
+replayed_rows: Count
+opening_credits: Count
+existing_negative_credits: Count
+opening_debt_totals: ImportMoneyTotal[]
+original_credit_basis_totals: ImportMoneyTotal[]
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "ImportMoneyTotal".
+ */
+export interface ImportMoneyTotal {
+currency: Currency
+amount_minor: Money
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -3607,7 +3649,8 @@ currency?: (Currency | null)
 count?: (Count | null)
 amount_minor?: (Money | null)
 credits?: (Count | null)
-ratio_bps?: (RateBps | null)
+ratio_bps?: (ReportRatioBps | null)
+basis_count?: (Count | null)
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -3617,6 +3660,7 @@ export interface ReportTotal {
 currency?: (Currency | null)
 count: Count
 amount_minor?: (Money | null)
+group_key?: Text
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema

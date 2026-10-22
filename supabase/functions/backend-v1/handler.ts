@@ -1,4 +1,5 @@
 import {publicIngress,verifyPublicBot} from "./public-ingress.ts";
+import {importStorage,parseImportCsv} from "./import-file.ts";
 import {documentStorage} from "./document-storage.ts";
 import implementation from "./implemented.json" with {type:"json"};
 import { v7 } from "uuid";
@@ -63,6 +64,7 @@ Deno.serve(async req=>{
    }
   }
   const storage=documentStorage(base,key);
+  const imports=importStorage(base,key);
   if(operation==='file_upload_complete_v1'){
    const contextResponse=await fetch(base+'/rest/v1/rpc/'+operation,{method:'POST',headers:{authorization:'Bearer '+key,apikey:key,'content-type':'application/json','Content-Profile':'api_v1'},body:JSON.stringify({p_request:request,p_actor_auth_id:user.id,p_session_id:claims.session_id,p_ids:Array.from({length:count},()=>v7()),p_aux:{phase:'storage_context'}})});
    if(!contextResponse.ok)return failure('TEMPORARY_FAILURE',503);const context=await contextResponse.json();
@@ -70,9 +72,29 @@ Deno.serve(async req=>{
    const meta=context._internal_storage;
    if(meta.state==='ready')invite={storage_verified:true,object_key:meta.object_key,bytes:meta.bytes,mime:meta.mime,checksum:meta.checksum};
    else{
-    try{const file=await storage.download(meta.object_key,{bytes:meta.bytes,mime:meta.mime});invite={storage_verified:true,object_key:meta.object_key,bytes:file.size,mime:file.mime,checksum:file.checksum};}
+    try{
+     if(meta.purpose==='import'){await imports.read(meta);invite={storage_verified:true,object_key:meta.object_key,bytes:meta.bytes,mime:meta.mime,checksum:meta.checksum};}
+     else{const file=await storage.download(meta.object_key,{bytes:meta.bytes,mime:meta.mime});invite={storage_verified:true,object_key:meta.object_key,bytes:file.size,mime:file.mime,checksum:file.checksum};}
+    }
     catch{return failure('VALIDATION_FAILED');}
    }
+  }
+  const rpcContext=async(aux:unknown)=>{
+   const r=await fetch(base+'/rest/v1/rpc/'+operation,{method:'POST',headers:{authorization:'Bearer '+key,apikey:key,'content-type':'application/json','Content-Profile':'api_v1'},body:JSON.stringify({p_request:request,p_actor_auth_id:user.id,p_session_id:claims.session_id,p_ids:Array.from({length:count},()=>v7()),p_aux:aux})});
+   if(!r.ok)throw Error('RPC_UNAVAILABLE');return r.json();
+  };
+  if(operation==='import_preview_v1'){
+   const context=await rpcContext({phase:'p06_import_file'});
+   if(!context._internal_import){if(context.ok&&!(validators as any)['success_'+operation](context))return failure('INTEGRITY_VIOLATION',500);return json(context);}
+   const meta=context._internal_import;
+   try{const text=await imports.read(meta);const rows=parseImportCsv(text,request.mapping,meta.max_rows);invite={import_verified:true,checksum:meta.checksum,rows};}
+   catch{return failure('VALIDATION_FAILED');}
+  }
+  if(operation==='report_file_get_v1'&&new URL(req.url).searchParams.get('download')==='csv'){
+   const context=await rpcContext({phase:'p06_download'});if(!context._internal_download)return json(context);
+   const file=context._internal_download;if(typeof file.body!=='string'||file.body.length>24*1024*1024||!/^report-[a-f0-9-]{36}\.csv$/.test(file.filename))return failure('INTEGRITY_VIOLATION',500);
+   const bytes=Uint8Array.from(atob(file.body),x=>x.charCodeAt(0));
+   return new Response(bytes,{headers:{'content-type':'text/csv; charset=utf-8','content-disposition':'attachment; filename="'+file.filename+'"','cache-control':'no-store','x-content-type-options':'nosniff','access-control-allow-origin':'*'}});
   }
   let requiredCount=count;
   for(let attempt=0;attempt<4;attempt++){
@@ -86,6 +108,10 @@ Deno.serve(async req=>{
    if(n!==undefined){if(!Number.isSafeInteger(n)||n<1||n>2*Math.ceil(2097152/36)+64)return failure("INTEGRITY_VIOLATION",500);requiredCount=Math.max(requiredCount,n);}
    continue;
   }if(result.ok){
+   if(operation==='import_upload_prepare_v1'){
+    if(Date.parse(result.data.expires_at)<=Date.now())return failure('VALIDATION_FAILED');
+    result.data.upload_url=await imports.upload(result.data.upload_url);
+   }
    if(operation==='document_upload_prepare_v1'){
     if(Date.parse(result.data.expires_at)<=Date.now())return failure('VALIDATION_FAILED');
     result.data.upload_url=await storage.upload(result.data.upload_url);

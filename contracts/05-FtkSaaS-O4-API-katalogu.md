@@ -1,6 +1,6 @@
 # FtkSaaS — API kataloğu · 0.2.0-rc.3
 
-200 sözleşme; 165 geliştirme ortamında çağrılabilir endpoint, 35 yalnız sözleşme. Çağrılabilir olmak bütün ürün özelliklerinin veya üretim kabulünün tamamlandığı anlamına gelmez. Kapsam sınırları ve Q-E01 `docs/claude-handover.md` içindedir.
+200 sözleşme; 178 geliştirme ortamında çağrılabilir endpoint, 22 yalnız sözleşme. Çağrılabilir olmak bütün ürün özelliklerinin veya üretim kabulünün tamamlandığı anlamına gelmez. Kapsam sınırları ve Q-E01 `docs/claude-handover.md` içindedir.
 
 `POST {API_URL}/functions/v1/backend-v1/{operation}`; JSON gövde doğrudan typed Request nesnesidir. Header: `Authorization: Bearer <Supabase access_token>`, `apikey: <publishable key>`, `Content-Type: application/json`. Başarı: `ok/data/trace_id`; hata: `ok:false/error:SafeError`. Servis anahtarı frontend’e verilmez.
 
@@ -125,13 +125,13 @@ Named `/rest/v1/rpc/{operation}` yalnız backend içindir; imzası p_request + d
 | `notifications_list_v1` | çağrılabilir (kapsam notları geçerli) | `notification.self` | R / read | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; center_id?: FtkUuid ∣ null; page: Page; unread_only: Bool | Success_notifications_list |
 | `notification_mark_read_v1` | çağrılabilir (kapsam notları geçerli) | `notification.self` | W / maintenance | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; center_id?: FtkUuid ∣ null; operation_key: FtkUuid; expected_version: PositiveInt; notification_id: FtkUuid | Success_notification_mark_read |
 | `notification_preferences_set_v1` | çağrılabilir (kapsam notları geçerli) | `notification.self` | W / maintenance | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; center_id?: FtkUuid ∣ null; operation_key: FtkUuid; expected_version: PositiveInt; channel: NotificationChannel; purpose: NotificationPurpose; enabled: Bool | Success_notification_preferences_set |
-| `report_get_v1` | yalnız sözleşme | `report.read` | R / read | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; center_id?: FtkUuid ∣ null; report: ReportKind; filters: ReportFilters; page: Page | Success_report_get |
-| `report_export_start_v1` | yalnız sözleşme | `report.export` | E / read | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; center_id?: FtkUuid ∣ null; operation_key: FtkUuid; report: ReportKind; filters: ReportFilters; format: ExportFormat | Success_report_export_start |
-| `report_file_get_v1` | yalnız sözleşme | `report.export` | E / read | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; center_id?: FtkUuid ∣ null; operation_key: FtkUuid; job_id: FtkUuid | Success_report_file_get |
-| `import_upload_prepare_v1` | yalnız sözleşme | `import.execute` | E / import | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; center_id?: FtkUuid ∣ null; operation_key: FtkUuid; filename: Text; mime: Text; bytes: Count; checksum: Text | Success_import_upload_prepare |
-| `import_preview_v1` | yalnız sözleşme | `import.execute` | E / import | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; center_id?: FtkUuid ∣ null; operation_key: FtkUuid; file_id: FtkUuid; mapping: ImportMapping; source_namespace: Text | Success_import_preview |
-| `import_apply_v1` | yalnız sözleşme | `import.execute` | E / import | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; center_id?: FtkUuid ∣ null; operation_key: FtkUuid; preview: PreviewToken | Success_import_apply |
-| `import_rows_list_v1` | yalnız sözleşme | `import.execute` | R / read | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; center_id?: FtkUuid ∣ null; job_id: FtkUuid; page: Page | Success_import_rows_list |
+| `report_get_v1` | çağrılabilir (kapsam notları geçerli) | `report.read` | R / read | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; center_id?: FtkUuid ∣ null; report: ReportKind; filters: ReportFilters; page: Page | Success_report_get |
+| `report_export_start_v1` | çağrılabilir (kapsam notları geçerli) | `report.export` | E / read | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; center_id?: FtkUuid ∣ null; operation_key: FtkUuid; report: ReportKind; filters: ReportFilters; format: ExportFormat | Success_report_export_start |
+| `report_file_get_v1` | çağrılabilir (kapsam notları geçerli) | `report.export` | E / read | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; center_id?: FtkUuid ∣ null; operation_key: FtkUuid; job_id: FtkUuid | Success_report_file_get |
+| `import_upload_prepare_v1` | çağrılabilir (kapsam notları geçerli) | `import.execute` | E / import | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; center_id?: FtkUuid ∣ null; operation_key: FtkUuid; filename: Text; mime: Text; bytes: Count; checksum: Text | Success_import_upload_prepare |
+| `import_preview_v1` | çağrılabilir (kapsam notları geçerli) | `import.execute` | E / import | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; center_id?: FtkUuid ∣ null; operation_key: FtkUuid; file_id: FtkUuid; mapping: ImportMapping; source_namespace: Text | Success_import_preview |
+| `import_apply_v1` | çağrılabilir (kapsam notları geçerli) | `import.execute` | E / import | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; center_id?: FtkUuid ∣ null; operation_key: FtkUuid; preview: PreviewToken | Success_import_apply |
+| `import_rows_list_v1` | çağrılabilir (kapsam notları geçerli) | `import.execute` | R / read | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; center_id?: FtkUuid ∣ null; job_id: FtkUuid; page: Page | Success_import_rows_list |
 | `subscription_get_v1` | çağrılabilir (kapsam notları geçerli) | `subscription.owner` | R / exempt | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; center_id?: FtkUuid ∣ null | Success_subscription_get |
 | `subscription_upgrade_quote_v1` | yalnız sözleşme | `subscription.owner` | W / exempt | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; center_id?: FtkUuid ∣ null; operation_key: FtkUuid; target_plan_id: FtkUuid | Success_subscription_upgrade_quote |
 | `subscription_downgrade_request_v1` | yalnız sözleşme | `subscription.owner` | W / exempt | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; center_id?: FtkUuid ∣ null; operation_key: FtkUuid; target_plan_id: FtkUuid; kept_center_id?: FtkUuid ∣ null | Success_subscription_downgrade_request |
@@ -157,18 +157,18 @@ Named `/rest/v1/rpc/{operation}` yalnız backend içindir; imzası p_request + d
 | `public_calendar_get_v1` | çağrılabilir (kapsam notları geçerli) | `public.apply` | R / public | client_api_version: 1; request_id: FtkUuid; center_id?: FtkUuid ∣ null; slug: Text; interval: Interval; page: Page | Success_public_calendar_get |
 | `public_application_submit_v1` | çağrılabilir (kapsam notları geçerli) | `public.apply` | E / public | client_api_version: 1; request_id: FtkUuid; center_id?: FtkUuid ∣ null; publication_id: FtkUuid; contact: Text; bot_proof: Secret; client_request_key: FtkUuid | Success_public_application_submit |
 | `public_application_review_v1` | çağrılabilir (kapsam notları geçerli) | `crm.daily` | W / new | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; center_id?: FtkUuid ∣ null; operation_key: FtkUuid; application_id: FtkUuid; action: ApplicationAction; person_id?: FtkUuid ∣ null | Success_public_application_review |
-| `operation_status_get_v1` | yalnız sözleşme | `account.self` | R / exempt | client_api_version: 1; request_id: FtkUuid; org_id?: FtkUuid ∣ null; operation: OperationName; key: FtkUuid | Success_operation_status_get |
-| `preview_get_v1` | yalnız sözleşme | `account.self` | R / read | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; center_id?: FtkUuid ∣ null; preview_id: FtkUuid | Success_preview_get |
-| `job_status_get_v1` | yalnız sözleşme | `account.self` | R / read | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; center_id?: FtkUuid ∣ null; job_id: FtkUuid | Success_job_status_get |
-| `audit_list_v1` | yalnız sözleşme | `report.read` | R / read | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; center_id?: FtkUuid ∣ null; subject: SubjectRef; interval: Interval; page: Page | Success_audit_list |
+| `operation_status_get_v1` | çağrılabilir (kapsam notları geçerli) | `account.self` | R / exempt | client_api_version: 1; request_id: FtkUuid; org_id?: FtkUuid ∣ null; operation: OperationName; key: FtkUuid | Success_operation_status_get |
+| `preview_get_v1` | çağrılabilir (kapsam notları geçerli) | `account.self` | R / read | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; center_id?: FtkUuid ∣ null; preview_id: FtkUuid | Success_preview_get |
+| `job_status_get_v1` | çağrılabilir (kapsam notları geçerli) | `account.self` | R / read | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; center_id?: FtkUuid ∣ null; job_id: FtkUuid | Success_job_status_get |
+| `audit_list_v1` | çağrılabilir (kapsam notları geçerli) | `report.read` | R / read | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; center_id?: FtkUuid ∣ null; subject: SubjectRef; interval: Interval; page: Page | Success_audit_list |
 | `seat_offer_issue_v1` | çağrılabilir (kapsam notları geçerli) | `system.worker` | B / worker | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; center_id?: FtkUuid ∣ null; operation_key: FtkUuid; job_id: FtkUuid; lease_token: Secret | Success_seat_offer_issue |
 | `seat_offer_expire_v1` | çağrılabilir (kapsam notları geçerli) | `system.worker` | B / worker | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; center_id?: FtkUuid ∣ null; operation_key: FtkUuid; job_id: FtkUuid; lease_token: Secret | Success_seat_offer_expire |
 | `request_expire_v1` | çağrılabilir (kapsam notları geçerli) | `system.worker` | B / worker | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; center_id?: FtkUuid ∣ null; operation_key: FtkUuid; job_id: FtkUuid; lease_token: Secret | Success_request_expire |
 | `outbox_deliver_v1` | çağrılabilir (kapsam notları geçerli) | `system.worker` | B / worker | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; center_id?: FtkUuid ∣ null; operation_key: FtkUuid; job_id: FtkUuid; lease_token: Secret | Success_outbox_deliver |
 | `reminder_schedule_v1` | çağrılabilir (kapsam notları geçerli) | `system.worker` | B / worker | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; center_id?: FtkUuid ∣ null; operation_key: FtkUuid; job_id: FtkUuid; lease_token: Secret | Success_reminder_schedule |
 | `automation_run_v1` | çağrılabilir (kapsam notları geçerli) | `system.worker` | B / worker | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; center_id?: FtkUuid ∣ null; operation_key: FtkUuid; job_id: FtkUuid; lease_token: Secret | Success_automation_run |
-| `import_rows_process_v1` | yalnız sözleşme | `system.worker` | B / worker | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; center_id?: FtkUuid ∣ null; operation_key: FtkUuid; job_id: FtkUuid; lease_token: Secret | Success_import_rows_process |
-| `report_build_v1` | yalnız sözleşme | `system.worker` | B / worker | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; center_id?: FtkUuid ∣ null; operation_key: FtkUuid; job_id: FtkUuid; lease_token: Secret | Success_report_build |
+| `import_rows_process_v1` | çağrılabilir (kapsam notları geçerli) | `system.worker` | B / worker | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; center_id?: FtkUuid ∣ null; operation_key: FtkUuid; job_id: FtkUuid; lease_token: Secret | Success_import_rows_process |
+| `report_build_v1` | çağrılabilir (kapsam notları geçerli) | `system.worker` | B / worker | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; center_id?: FtkUuid ∣ null; operation_key: FtkUuid; job_id: FtkUuid; lease_token: Secret | Success_report_build |
 | `privacy_execute_v1` | yalnız sözleşme | `system.worker` | B / worker | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; center_id?: FtkUuid ∣ null; operation_key: FtkUuid; job_id: FtkUuid; lease_token: Secret | Success_privacy_execute |
 | `subscription_boundary_apply_v1` | yalnız sözleşme | `system.worker` | B / worker | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; center_id?: FtkUuid ∣ null; operation_key: FtkUuid; job_id: FtkUuid; lease_token: Secret | Success_subscription_boundary_apply |
 | `class_assignment_set_v1` | çağrılabilir (kapsam notları geçerli) | `schedule.manage` | W / config | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; center_id?: FtkUuid ∣ null; operation_key: FtkUuid; expected_version?: PositiveInt; class_id: FtkUuid; person_id: FtkUuid; duty: Duty; state?: RecordState | Success_class_assignment_set |
@@ -332,13 +332,13 @@ features ürün referanslarıdır. required_features hedef plan kapısı; runtim
 | notifications_list_v1 | read | none / None |  | implemented_pending_ci |
 | notification_mark_read_v1 | command | row_version / management_state_get_v1 | notifications.versioned_domain_change | implemented_pending_ci |
 | notification_preferences_set_v1 | command | row_version / management_state_get_v1 | notification_preferences.versioned_domain_change | implemented_pending_ci |
-| report_get_v1 | read | none / None |  | pending |
-| report_export_start_v1 | command | append_or_current_scope_lock / management_state_get_v1 | report_jobs.versioned_domain_change | pending |
-| report_file_get_v1 | read | none / None |  | pending |
-| import_upload_prepare_v1 | command | append_or_current_scope_lock / management_state_get_v1 | import_jobs.versioned_domain_change | pending |
-| import_preview_v1 | preview | preview_dependencies / management_state_get_v1 |  | pending |
-| import_apply_v1 | apply | preview_dependencies / import_preview_v1 | import_jobs.versioned_domain_change | pending |
-| import_rows_list_v1 | read | none / None |  | pending |
+| report_get_v1 | read | none / None |  | implemented_pending_ci |
+| report_export_start_v1 | command | append_or_current_scope_lock / job_status_get_v1 | report_jobs.versioned_domain_change | implemented_pending_ci |
+| report_file_get_v1 | read | none / None |  | implemented_pending_ci |
+| import_upload_prepare_v1 | command | append_or_current_scope_lock / management_state_get_v1 | files.private_import_upload | implemented_pending_ci |
+| import_preview_v1 | preview | preview_dependencies / job_status_get_v1 |  | implemented_pending_ci |
+| import_apply_v1 | apply | preview_dependencies / job_status_get_v1 | import_jobs.versioned_domain_change | implemented_pending_ci |
+| import_rows_list_v1 | read | none / None |  | implemented_pending_ci |
 | subscription_get_v1 | read | none / None |  | baseline_only_not_full_product_acceptance |
 | subscription_upgrade_quote_v1 | command | append_or_current_scope_lock / management_state_get_v1 | saas_subscriptions.versioned_domain_change | pending |
 | subscription_downgrade_request_v1 | command | append_or_current_scope_lock / management_state_get_v1 | saas_subscriptions.versioned_domain_change | pending |
@@ -364,18 +364,18 @@ features ürün referanslarıdır. required_features hedef plan kapısı; runtim
 | public_calendar_get_v1 | read | none / None |  | implemented_pending_ci |
 | public_application_submit_v1 | command | append_or_current_scope_lock / management_state_get_v1 | public_applications.versioned_domain_change | implemented_pending_ci |
 | public_application_review_v1 | command | append_or_current_scope_lock / management_state_get_v1 | public_applications.versioned_domain_change | implemented_pending_ci |
-| operation_status_get_v1 | read | none / None |  | pending |
-| preview_get_v1 | read | none / None |  | pending |
-| job_status_get_v1 | read | none / None |  | pending |
-| audit_list_v1 | read | none / None |  | pending |
+| operation_status_get_v1 | read | none / None |  | implemented_pending_ci |
+| preview_get_v1 | read | none / None |  | implemented_pending_ci |
+| job_status_get_v1 | read | none / None |  | implemented_pending_ci |
+| audit_list_v1 | read | none / None |  | implemented_pending_ci |
 | seat_offer_issue_v1 | worker | append_or_current_scope_lock / management_state_get_v1 | scoped_job.domain_change, worker_receipt.audit.inbox.atomic, job.succeeded_or_bounded_retry | p01_waitlist_worker_runtime_pending |
 | seat_offer_expire_v1 | worker | append_or_current_scope_lock / management_state_get_v1 | scoped_job.domain_change, worker_receipt.audit.inbox.atomic, job.succeeded_or_bounded_retry | p01_waitlist_worker_runtime_pending |
 | request_expire_v1 | worker | append_or_current_scope_lock / management_state_get_v1 | scoped_job.domain_change, worker_receipt.audit.inbox.atomic, job.succeeded_or_bounded_retry | p01_waitlist_worker_runtime_pending |
 | outbox_deliver_v1 | worker | append_or_current_scope_lock / management_state_get_v1 | outbox_deliver.authorized_result | implemented_pending_ci |
 | reminder_schedule_v1 | worker | append_or_current_scope_lock / management_state_get_v1 | reminder_schedule.authorized_result | implemented_pending_ci |
 | automation_run_v1 | worker | append_or_current_scope_lock / management_state_get_v1 | automations.versioned_domain_change | implemented_pending_ci |
-| import_rows_process_v1 | worker | append_or_current_scope_lock / management_state_get_v1 | import_jobs.versioned_domain_change | pending |
-| report_build_v1 | worker | append_or_current_scope_lock / management_state_get_v1 | report_jobs.versioned_domain_change | pending |
+| import_rows_process_v1 | worker | append_or_current_scope_lock / management_state_get_v1 | import_jobs.versioned_domain_change | implemented_pending_ci |
+| report_build_v1 | worker | append_or_current_scope_lock / management_state_get_v1 | report_jobs.versioned_domain_change | implemented_pending_ci |
 | privacy_execute_v1 | worker | append_or_current_scope_lock / management_state_get_v1 | privacy_execute.authorized_result | pending |
 | subscription_boundary_apply_v1 | worker | append_or_current_scope_lock / subscription_get_v1 | saas_subscriptions.versioned_domain_change | pending |
 | class_assignment_set_v1 | command | create_absent_update_requires_version / management_state_get_v1 | class_assignments.version, eligible_future_inherited_session_duties, resource_bookings | pending |
