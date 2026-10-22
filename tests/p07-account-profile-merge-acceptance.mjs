@@ -45,8 +45,8 @@ test('P07 account profile and manual cross-center alias merge',async t=>{
   await db.query("insert into core.person_contacts(id,org_id,person_id,kind,value) values($1,$2,$3,'email','p07-old@ftksaas.invalid')",[key(),org,source]);
   const debt=key();await db.query("insert into core.debts(id,org_id,center_id,person_id,amount_minor,currency,due_at,state) values($1,$2,$3,$4,1700,'TRY',now(),'open')",[debt,org,c1,source]);
   const discipline=(await must(owner,'discipline_save_v1',{org_id:org,name:'P07 old right',state:'active'},key())).primary_id;
-  await db.query("insert into core.negative_limit_overrides(id,org_id,center_id,person_id,discipline_id,limit_count,reason) values($1,$2,$3,$4,$5,0,'synthetic restriction')",[key(),org,c1,source,discipline]);
   await mut('center_discipline_set_v1',{discipline_id:discipline,state:'active'});
+  await db.query("insert into core.negative_limit_overrides(id,org_id,center_id,person_id,discipline_id,limit_count,reason) values($1,$2,$3,$4,$5,0,'synthetic restriction')",[key(),org,c1,source,discipline]);
   const cls=(await mut('class_save_v1',{name:'P07 closed class',discipline_id:discipline,external_open:false})).primary_id;
   const terms={name:'P07 prior paid right',kind:'credits',booking_mode:'flexible',credits:3,price_minor:'1000',currency:'TRY',freeze:{enabled:false,extends_validity:false},refund:{method:'none'},scopes:[{scope_kind:'organization_all',center_id:null,discipline_id:null,class_id:cls,usage_targets:['lesson']}]};
   const productVersion=(await mut('product_publish_v1',{terms})).primary_id;

@@ -32,3 +32,7 @@ Yerel verify102 sözleşme/yönetişim +43 CI politika kontrolünü kapsar. Auth
 Yeni senaryolar mevcut registry shard’ındadır; ayrı full suite eklenmez. Docker olmadığı için yeni gerçek Auth→Edge kabul senaryoları yerelde çalıştırılmış sayılmaz; CI bekler. Kaynak bağımsız incelemesi son tree’ye bağlanır. Hosted kalıcı migration/Edge dağıtımı ve full clean şimdi yapılmaz.
 
 Açık işler: d1830c8 main39809302120 retry → aynı main clean/CD → OPS hosted işletim kabulü; ardından PR40 son kaynak full clean → merge → aynı main clean/CD. PR39 veya eski head başarısı PR40’a taşınmaz. P07-B6 abonelik ve P07-C8 gizlilik/organizasyon API’si aynı Draft PR40 içinde tamamlanır; tek son kaynak kabulü bekler.
+
+## Hedefli koşu39814844176 — df3772b
+
+Bu koşu önceki runtime push’undan otomatik başladı; CI erteleme kararı sonrasındaki26b07e4 commit’i `[skip ci]` taşır. Hedefli koşuda yapısal/CI politika ve28 DB kontrolü geçti. Registry fazında51 testten50 geçti,1 hata oluştu; sonraki regresyon fazı başlamadı. P07 davet/link geri alma ve profil sürüm/yarış/geç hata rollback testleri gerçek Auth→Edge yolunda geçti. Merge fixture’ında negatif limit satırı, center_discipline_set çağrısından önce yazıldığı için cd_negative_limit_overrides FK23503 oluştu. Test verisi sırası düzeltildi; constraint ve bütün negatif limit/borç/rollback assertion’ları korunur. Sonraki merge/Auth senaryoları çalışmış veya başarılı sayılmaz. Yeni CI/rerun tetiklenmez; düzeltmenin uçtan uca kabulü GitHub sonrası birleşik P07 kabulünde yapılır.
