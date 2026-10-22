@@ -1,6 +1,8 @@
 # FtkSaaS sıralı üretim kuyruğu
 
-22 Ekim güncel durum: OPS-W01 PR39, `d1830c89e3d5e7f3c90db7ef0953cc264b35205f` ile main’e birleşti. Aday39795678387 attempt5 kabulü doğrulandı; aynı main [39809302120](https://github.com/SXQHex/FtkSaaS/actions/runs/39809302120) başarısızdır. Kullanıcının son talimatıyla bu SHA için yeniden çalıştırma **açık iş** tutulur, şimdi tetiklenmez; main/CD ve hosted worker kabulü kapanmadı. Son kabul edilmiş hosted kaynak P06 `006ad36918ae823bc10fbdefa2d48901e193121c`,54 migration/Edge7 olarak kalır. P07-A Draft PR40 geliştirmesi sürer: **200 sözleşme/186 geliştirme runtime/14 contract_only/57 migration/90 core tablo**. Sekiz A işleminin kaynağı uygulandı; gerçek Auth→Edge/aday/main kabulü bekler. B6 ve C8 queued. Full clean/merge şimdi tetiklenmez; kapılar gevşetilmez.
+22 Ekim son kullanıcı kararı: P07-A+B+C tek Draft PR40 içinde bağımlılık sırasıyla geliştirilir ve birlikte merge edilir. Ayrı A/B/C merge/kabul döngüleri kaldırıldı. GitHub servisleri normale dönene kadar manuel CI, rerun, aday label ve merge başlatılmaz; geliştirme commitlerinde geçici `[skip ci]` kullanılarak push kaynaklı pahalı CI ertelenir. Workflow veya kabul kapısı değiştirilmez. Yerel odaklı doğrulamalar sürer. Servisler normale dönünce önce d1830c8 main39809302120 retry ve PR39 main/CD/OPS kapanışı, ardından tamamlanmış P07 için son kaynak bağımsız inceleme, tek aday full clean, merge ve aynı main clean/CD sırasıyla yapılır. Eski/skipped CI kabul değildir; bütün22 API tamamlanmış sayılmaz: A8 kaynak hazır, B6/C8 geliştirme sırasındadır.
+
+22 Ekim güncel durum: OPS-W01 PR39, `d1830c89e3d5e7f3c90db7ef0953cc264b35205f` ile main’e birleşti. Aday39795678387 attempt5 kabulü doğrulandı; aynı main [39809302120](https://github.com/SXQHex/FtkSaaS/actions/runs/39809302120) başarısızdır. Kullanıcının son talimatıyla bu SHA için yeniden çalıştırma **açık iş** tutulur, şimdi tetiklenmez; main/CD ve hosted worker kabulü kapanmadı. Son kabul edilmiş hosted kaynak P06 `006ad36918ae823bc10fbdefa2d48901e193121c`,54 migration/Edge7 olarak kalır. P07-A Draft PR40 geliştirmesi sürer: **200 sözleşme/186 geliştirme runtime/14 contract_only/57 migration/90 core tablo**. Sekiz A işleminin kaynağı uygulandı; gerçek Auth→Edge/aday/main kabulü bekler. B6 ve C8 aynı Draft PR40 geliştirme sırasındadır. Full clean/merge şimdi tetiklenmez; kapılar gevşetilmez.
 
 P05 **done (kod, main ve geliştirme/test kabulü)**: [PR37](https://github.com/SXQHex/FtkSaaS/pull/37), kabul edilmiş main `83641447b29e459236aea1a9a4379b5d19825af6`;200 sözleşme/165 runtime/35 contract_only,53 migration/90 core tablo. Son head15e2126/base16cb570/tested merge2ebe087/tree736a75b; bağımsız son kaynak incelemesi5611074233, [aday39745672815](https://github.com/SXQHex/FtkSaaS/actions/runs/39745672815) ve [aynı main39748053581](https://github.com/SXQHex/FtkSaaS/actions/runs/39748053581) completed/success. [CD39750264949 attempt1](https://github.com/SXQHex/FtkSaaS/actions/runs/39750264949) success:18 kontrol,53/53 içerik eşleşmesi, P05 migration uygulandı, Edge6 ACTIVE/verify_jwt=true, RLS kapalı0/client RPC EXECUTE0 ve sentetik fixture temizliği. Receipt artifact12412499512 SHA256 `a41a8448c0a1b9dfdf853b58bea7cd56525fd8ede14812684b12619c3c8ee04e`. Eski aday hata kayıtları tarihsel kanıttır; bu kabulün kaynağı değildir.
 
@@ -114,9 +116,9 @@ Kullanıcı22 Ekim Supabase içi barındırmayı seçti. Native p01/p05/p06 dedi
 
 ### P07 — Hesap, organizasyon ve abonelik yaşam döngüsü
 
-Draft PR40 A kapsamının sekiz API kaynağını ve yönetim okumalarını taşır. Parola API’si gerçek sağlayıcı challenge başlatıcısıdır; parola tamamlaması native Supabase Auth yoludur. A kabulü bekler; B/C queued. [Taslak devir](p07-a-handover.md).
+Draft PR40 A kapsamının sekiz API kaynağını ve yönetim okumalarını taşır. Parola API’si gerçek sağlayıcı challenge başlatıcısıdır; parola tamamlaması native Supabase Auth yoludur. A kaynak kabulü bekler; B/C aynı PR40 içinde tamamlanır. [Taslak devir](p07-a-handover.md).
 
-Ortak üretim promptunu uygula. Durum: queued.
+Ortak üretim promptunu uygula. Durum: in_progress; A kaynak hazır, B/C aynı Draft PR40 içinde sıradadır.
 
 **Mevcut sözleşme API'leri (22):**
 
@@ -145,7 +147,7 @@ Ortak üretim promptunu uygula. Durum: queued.
 
 **Görev ve kabul:**
 
-Bu grubu bağımlılık sıralı üç PR'ye ayır.
+Bu grubu bağımlılık sıralı A→B→C geliştir; son kullanıcı kararıyla üçü tek Draft PR40 ve tek merge/kabul zinciridir.
 A: account_profile_update/password_change/password_reset_request, account_access_revoke, account_link_remove, person_merge_preview/approve/apply. Canlı geri alma/oturum, yeniden bağlamada eski grantın canlanmaması ve etkilenen merkez onayları. Profil değişimi rol/iletişim yetkisini aşmasın.
 B: subscription_upgrade_quote/downgrade_request/change_cancel/renewal_set, saas_grace_extend, subscription_boundary_apply. Kabul edilmiş fiyat farkı/dönem sonu düşürme/merkez seçimi/yenilememe/gecikme ayrımı; sayısal değer icat etme, aylık-yıllık dönüşüm ekleme, kaçırılmış otomasyonu topluca çalıştırma.
 C: account_delete_preview/apply, organization_close_preview/apply/reopen/delete_preview/delete_apply, privacy_execute. Hesap silme, org kapatma, abonelik bitişi ve imha ayrı kalsın. Owner engelleri, reauth ve kapsam onayı uygulansın; borç/alacak/hukuki kanıt kendiliğinden silinmesin.
