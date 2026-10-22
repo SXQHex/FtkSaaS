@@ -84575,7 +84575,7 @@
       }
     },
     "p06_delivery": {
-      "status": "implemented_pending_acceptance",
+      "status": "done_code_main_development_acceptance",
       "base_main": "83641447b29e459236aea1a9a4379b5d19825af6",
       "operations": [
         "report_get_v1",
@@ -84592,7 +84592,7 @@
         "job_status_get_v1",
         "audit_list_v1"
       ],
-      "hosted_workers": "OPS-W01 pending dedicated hosting target, scoped LOGIN and explicit tenant configuration; do not claim deployment",
+      "hosted_workers": "OPS-W01 Supabase Cron selected; native adapter source/operational acceptance pending; explicit tenant bindings/config remain required",
       "report_files": "private database byte objects, authenticated Edge POST on every download; seven-day expiry, no signed read URL",
       "import_file": "private Storage CSV; explicit tenant byte/row limits, 2MiB/5000 technical ceilings",
       "import_credit_basis": "explicit full original package value, remaining quantity <= product original credits; no cash movement or implicit debt",
@@ -84604,7 +84604,26 @@
         "worker_schema": true,
         "business_flow": "28-row preview/apply, original job replay, opening credit/debt without cash, config-stale apply denial, late audit full-batch rollback, full export, revoked linkage denial",
         "accepted_main_still": "83641447b29e459236aea1a9a4379b5d19825af6"
+      },
+      "accepted_main": "006ad36918ae823bc10fbdefa2d48901e193121c",
+      "candidate_run": 39779013518,
+      "main_run": 39782197422,
+      "development_cd_run": 39785146645,
+      "acceptance_receipt": {
+        "artifact": 12428881259,
+        "sha256": "bcd1ab3255c1808982de76c3d09d47d5eaa95c5fb2e8f9f870d3fedc9ce93b65",
+        "checks": 18,
+        "migrations": 54,
+        "edge_version": 7
       }
+    },
+    "ops_w01_delivery": {
+      "status": "implemented_pending_source_and_hosted_acceptance",
+      "base_main": "006ad36918ae823bc10fbdefa2d48901e193121c",
+      "hosting": "Supabase Cron; real dedicated DB session per worker lane",
+      "tenant_policy": "explicit existing org binding/config only; empty scope heartbeats idle",
+      "source_acceptance": "candidate/main full clean and development CD pending",
+      "operational_acceptance": "accepted-source install, heartbeat/disable/restart and lease recovery pending"
     }
   }
 }

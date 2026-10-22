@@ -1,6 +1,6 @@
 > **20 Ekim güncel durum:** P01 PR #22 main `7577b2f1873c6b1fcf83390bfa94a34374c44082` ile birleşti; 199 sözleşme / 118 çağrılabilir / 81 yalnız sözleşme / 34 migration. Eski teslim sayıları ve pending notları kendi kapsamına aittir. [Tek güncel devir](../contracts/00-FtkSaaS-yeni-sohbet-devir.md) aynı SHA’nın gerçek başarılı main CI kanıtını gösterir; P01 done. [CI-2026-10-20](../docs/decisions/CI-2026-10-20.md) dört shard, Draft/development ve belge-only kararını içerir; otomasyon CI-02’de bekliyor. Bu karar ürün/izin/finans davranışını değiştirmez.
 
-> 22 Ekim güncel uygulama kabulü: P01–P05/PR37 kapalı; main8364144,200 sözleşme/165 runtime/35 contract_only,53 migration/Edge6. Aday39745672815/main39748053581/CD39750264949 başarılı. P06 geliştirmesi ve hosted worker işletim kabulü sırada; [tek devir](00-FtkSaaS-yeni-sohbet-devir.md) güncel kanıttır. Aşağıdaki eski envanter ve geliştirme snapshot'ları tarihsel bağlamdır.
+> 22 Ekim güncel uygulama kabulü: P01–P06/PR38 kapalı; main006ad36,200 sözleşme/178 runtime/22 contract_only,54 migration/Edge7. Aday39779013518/main39782197422/CD39785146645 başarılı. OPS-W01 Supabase Cron kaynak adayı55 migration taşır; native hosted işletim kabulü beklenir. [Tek devir](00-FtkSaaS-yeni-sohbet-devir.md) güncel kanıttır; eski snapshotlar tarihsel bağlamdır.
 
 > Güncel öncelik: [DS-2026-10-17](../docs/decisions/DS-2026-10-17.md). Çelişen eski hükümler yalnız belirtilen kapsamda yürürlükten kalkmıştır. [Hedef sözleşme/runtime ayrımı](../docs/decision-sprint-handover.md).
 

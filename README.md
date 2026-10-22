@@ -4,7 +4,7 @@ Güncel kaynak merkezi [SXQHex/FtkSaaS main](https://github.com/SXQHex/FtkSaaS).
 
 P05 **done (kod, main ve geliştirme/test kabulü)**: [PR37](https://github.com/SXQHex/FtkSaaS/pull/37), kabul edilmiş main `83641447b29e459236aea1a9a4379b5d19825af6`;200 sözleşme/165 runtime/35 contract_only,53 migration/90 core tablo. Son head15e2126/base16cb570/tested merge2ebe087/tree736a75b; bağımsız son kaynak incelemesi5611074233, [aday39745672815](https://github.com/SXQHex/FtkSaaS/actions/runs/39745672815) ve [aynı main39748053581](https://github.com/SXQHex/FtkSaaS/actions/runs/39748053581) completed/success. [CD39750264949 attempt1](https://github.com/SXQHex/FtkSaaS/actions/runs/39750264949) success:18 kontrol,53/53 içerik eşleşmesi, P05 migration uygulandı, Edge6 ACTIVE/verify_jwt=true, RLS kapalı0/client RPC EXECUTE0 ve sentetik fixture temizliği. Receipt artifact12412499512 SHA256 `a41a8448c0a1b9dfdf853b58bea7cd56525fd8ede14812684b12619c3c8ee04e`. Eski aday hata kayıtları tarihsel kanıttır; bu kabulün kaynağı değildir.
 
-P01–P05 kod kabulü kapandı. P06 rapor/import/izleme kod adayı hazır, son kaynak clean/CD kabulü bekleniyor; P07 hesap/organizasyon/abonelik yaşam döngüsü sırada. P06 sonunda hosted worker işletim kabulü planlanır. İşlem sayısı ürün tamamlanma oranı değildir; [F01–F33](docs/feature-delivery.md) kabulü ayrı gösterir.
+P01–P06 kod/main/development kabulü kapandı (PR38/main006ad36). Aktif OPS-W01, Supabase içi Cron worker işletimidir; kaynak/hosted kabulü beklenir. P07 hesap/organizasyon/abonelik yaşam döngüsü ardından gelir. İşlem sayısı ürün tamamlanma oranı değildir; [F01–F33](docs/feature-delivery.md) kabulü ayrı gösterir.
 
 ## Geliştirme ve CI
 
@@ -23,4 +23,4 @@ Yerel test:clean yalnız izole loopback DB'sini sıfırlar. Geliştirme push'lar
 
 Frontend tasarımına/istemci koduna müdahale edilmez; production dağıtımı yapılmaz. Dış e-posta ertelenmiştir; Resend başlatılmaz. Hosted güncelleme, frontend gerçek entegrasyonu ve yük/restore ayrı kabul işleridir.
 
-[P06 rapor/import/izleme devri](docs/p06-handover.md):200 sözleşme,178 runtime,22 yalnız sözleşme; final clean/CD kabulü beklenir. Hosted worker işletimi OPS-W01 olarak ayrıca izlenir.
+[P06 rapor/import/izleme devri](docs/p06-handover.md):200 sözleşme,178 runtime,22 yalnız sözleşme; aday/main/CD kabulü PR38 ile kapandı. [Hosted worker devri](docs/ops-w01-handover.md) OPS-W01 kaynak/işletim kabulünü ayrıca izler.
