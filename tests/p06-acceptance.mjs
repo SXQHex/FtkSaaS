@@ -104,12 +104,6 @@ test('P06 actual Auth/private CSV/preview/ledger/report/recovery/scoped worker a
   const response=await fetch(context().env.API_URL+ref.download_path,{method:'POST',headers:{apikey:context().env.ANON_KEY,authorization:'Bearer '+owner.jwt,'content-type':'application/json'},body:JSON.stringify({client_api_version:1,request_id:key(),org_id:org,center_id:center,operation_key:key(),job_id:exportJob})});assert(response.ok);assert.match(response.headers.get('content-type'),/^text\/csv/);const csv=await response.text();assert.equal(csv.split('\r\n').filter(Boolean).length,29);assert.match(response.headers.get('cache-control'),/no-store/);
   assert.equal((await rows("select private.p06_csv_cell('=1+1') cell"))[0].cell,"\"'=1+1\"");
   const audit=await must(owner,'audit_list_v1',scope({subject:{type:'import_jobs',id:job},interval,page:{}}));assert(audit.items.length);assert(audit.items.every(x=>!JSON.stringify(x).includes('worker_role')));
-  const cashIds=[key(),key()];
-  try{
-   await db.query("insert into core.cash_movements(id,org_id,center_id,person_id,kind,amount_minor,currency,occurred_at,operation_id) values($1,$3,$4,$5,'collection',150,'TRY',clock_timestamp(),$6),($2,$3,$4,$5,'refund',20,'TRY',clock_timestamp(),$6)",[...cashIds,org,center,person,(await rows('select id from core.operation_receipts where org_id=$1 order by id limit 1',[org]))[0].id]);
-   const money=await must(owner,'report_get_v1',scope({report:'collections_debts',filters,page:{}}));
-   assert.equal(money.totals.find(x=>x.group_key==='collections').amount_minor,'150');assert.equal(money.totals.find(x=>x.group_key==='refunds').amount_minor,'20');assert.equal(money.totals.find(x=>x.group_key==='outstanding_debt').amount_minor,'2900');
-  }finally{await db.query('delete from core.cash_movements where org_id=$1 and id=any($2::uuid[])',[org,cashIds]);}
  });
  await t.test('opening credits settle consumed negative balances first without recreating attendance, earning or cash',async()=>{
   const target=(await rows("select person_id from private.p06_sources where org_id=$1 and source_namespace='p06-fixture' and source_key='r0'",[org]))[0].person_id,discipline=key();
@@ -140,6 +134,13 @@ test('P06 actual Auth/private CSV/preview/ledger/report/recovery/scoped worker a
 await fail('report_file_get_v1',{job_id:s},'FORBIDDEN',staff);await fail('job_status_get_v1',{job_id:s},'FORBIDDEN',staff);await fail('operation_status_get_v1',{center_id:undefined,operation:'report_export_start_v1',key:k},'FORBIDDEN',staff);
   await db.query("update core.saas_plan_versions set name='starter' where id=$1",[plan]);await fail('report_get_v1',{report:'renewal',filters,page:{}},'PLAN_FEATURE_UNAVAILABLE');await db.query("update core.saas_plan_versions set name='business' where id=$1",[plan]);
   await db.query('delete from private.p06_worker_scopes where db_role=$1',[role]);await assert.rejects(claim(),/FORBIDDEN/);await db.query('insert into private.p06_worker_scopes values($1,$2)',[role,org]);
+ });
+ await t.test('cash reports expose separate collection and refund totals on the append-only ledger',async()=>{
+  // Last fixture: append-only ledger rows stay in the disposable clean-test DB.
+  const cashIds=[key(),key()];
+   await db.query("insert into core.cash_movements(id,org_id,center_id,person_id,kind,amount_minor,currency,occurred_at,operation_id) values($1,$3,$4,$5,'collection',150,'TRY',clock_timestamp(),$6),($2,$3,$4,$5,'refund',20,'TRY',clock_timestamp(),$6)",[...cashIds,org,center,person,(await rows('select id from core.operation_receipts where org_id=$1 order by id limit 1',[org]))[0].id]);
+   const money=await must(owner,'report_get_v1',scope({report:'collections_debts',filters,page:{}}));
+   assert.equal(money.totals.find(x=>x.group_key==='collections').amount_minor,'150');assert.equal(money.totals.find(x=>x.group_key==='refunds').amount_minor,'20');assert.equal(money.totals.find(x=>x.group_key==='outstanding_debt').amount_minor,'3000');
  });
  }finally{
   if(trigger){await db.query(`drop trigger if exists ${trigger} on core.audit_events`);await db.query(`drop function if exists private.${trigger}()`);}
