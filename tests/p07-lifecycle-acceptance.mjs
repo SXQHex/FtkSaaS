@@ -1,9 +1,10 @@
 // Existing registry shard. Native Auth -> Edge -> RPC plus real dedicated LOGIN sessions.
-import test from 'node:test';import assert from 'node:assert/strict';import pg from 'pg';import {randomBytes} from 'node:crypto';
-import {connect} from '../scripts/db.mjs';import {newUuidV7 as key} from '../scripts/uuid.mjs';import {authUser,fixturePlatform,must,call,context} from './api-client.mjs';
+import test,{resources,step} from './p07-diagnostics.mjs';import assert from 'node:assert/strict';import {randomBytes} from 'node:crypto';
+import {newUuidV7 as key} from '../scripts/uuid.mjs';import {authUser,fixturePlatform,must,call,context} from './api-client.mjs';
 test('P07 billing and privacy use live Auth, atomic receipts and scoped native workers',async t=>{
+ const guard=resources(t);
  const {platform,plan}=await fixturePlatform(),owner=await authUser('p07-bc-owner'),member=await authUser('p07-c-member');
- const account=await must(owner,'account_get_v1'),memberAccount=await must(member,'account_get_v1'),db=await connect();
+ const account=await must(owner,'account_get_v1'),memberAccount=await must(member,'account_get_v1'),db=await guard.connect(context().env.DB_URL);
  const q=async(sql,args=[])=>(await db.query(sql,args)).rows;const org=(await must(platform,'organization_create_v1',{verified_account_id:account.id,name:'P07 B/C native acceptance',initial_plan_id:plan},key())).primary_id;
  const center=(await must(owner,'center_create_v1',{org_id:org,name:'P07 B/C',timezone:'UTC'},key())).primary_id;
  const roles=[],clients=[],hostedRoles=[];let trigger,triggerTable='core.audit_events';
@@ -11,7 +12,7 @@ test('P07 billing and privacy use live Auth, atomic receipts and scoped native w
   const role='p07_'+key().replaceAll('-',''),password=randomBytes(24).toString('hex');roles.push(role);
   await db.query(`create role ${role} login password '${password}'`);await db.query(`grant ${group} to ${role}`);
   if(group==='ftk_p07_worker')await db.query('insert into private.p07_worker_scopes values($1,$2)',[role,org]);else{await db.query('insert into private.p07_privacy_worker_scopes values($1,$2)',[role,org]);if(global)await db.query('insert into private.p07_privacy_worker_scopes values($1,null)',[role]);}
-  const url=new URL(context().env.DB_URL);url.username=role;url.password=password;const c=new pg.Client({connectionString:url.href});await c.connect();clients.push(c);assert.equal((await c.query('select session_user role')).rows[0].role,role);return c;
+  const url=new URL(context().env.DB_URL);url.username=role;url.password=password;const c=await guard.connect(url.href);clients.push(c);assert.equal((await c.query('select session_user role')).rows[0].role,role);return c;
  };
  const bank=()=>Array.from({length:512},key);
  const claim=async(c,privacy=false,scope=org)=>(await c.query(`select private.${privacy?'p07_privacy_claim':'p07_jobs_claim'}($1,$2,1) jobs`,[scope,bank()])).rows[0].jobs;
@@ -54,7 +55,7 @@ test('P07 billing and privacy use live Auth, atomic receipts and scoped native w
    const k=key();globalJob=(await must(member,'account_delete_apply_v1',{...body,reauth:member.jwt},k)).job_id;
    assert.equal((await q('select count(*)::int n from auth.sessions where user_id=$1',[member.id]))[0].n,0);
    const old=await call(member,'account_get_v1');assert.equal(old.result.ok,false);assert(['AUTH_REQUIRED','SESSION_REVOKED'].includes(old.result.error.code));
-   const {env}=context();const login=await fetch(env.API_URL+'/auth/v1/token?grant_type=password',{method:'POST',headers:{apikey:env.ANON_KEY,'content-type':'application/json'},body:JSON.stringify({email:member.email,password:member.password})});assert.equal(login.ok,true);member.jwt=(await login.json()).access_token;
+   const {env}=context();const login=await fetch(env.API_URL+'/auth/v1/token?grant_type=password',{method:'POST',headers:{apikey:env.ANON_KEY,'content-type':'application/json'},body:JSON.stringify({email:member.email,password:member.password}),signal:AbortSignal.timeout(60000)});assert.equal(login.ok,true);member.jwt=(await login.json()).access_token;
    const replay=await must(member,'account_delete_apply_v1',{preview:{id:p.id,token:p.token},reauth:member.jwt},k);assert.equal(replay.job_id,globalJob);
    const own=await must(member,'job_status_get_v1',{org_id:null,job_id:globalJob});assert.equal(own.privacy.request_state,'requested');assert.equal(own.privacy.completed_at,null);
    const foreign=await call(owner,'job_status_get_v1',{org_id:null,job_id:globalJob});assert.equal(foreign.result.error.code,'NOT_FOUND');assert.equal((await call(member,'account_get_v1')).result.error.code,'SESSION_REVOKED');
@@ -85,7 +86,7 @@ test('P07 billing and privacy use live Auth, atomic receipts and scoped native w
    assert.equal((await q('select state from core.accounts where id=$1',[account.id]))[0].state,'active');assert.equal((await call(owner,'organization_reopen_v1',{org_id:org},key())).result.ok,false);
   });
   await t.test('P07 hosted lanes use separate native identities, rotate global/tenant privacy fairly and stop when disabled',async()=>{
-   const login=async lane=>{const role='ftk_ops_'+lane,password=randomBytes(24).toString('hex');hostedRoles.push(role);await db.query(`alter role ${role} password '${password}'`);const u=new URL(context().env.DB_URL);u.username=role;u.password=password;const c=new pg.Client({connectionString:u.href});await c.connect();clients.push(c);return c;};
+   const login=async lane=>{const role='ftk_ops_'+lane,password=randomBytes(24).toString('hex');hostedRoles.push(role);await db.query(`alter role ${role} password '${password}'`);const u=new URL(context().env.DB_URL);u.username=role;u.password=password;const c=await guard.connect(u.href);clients.push(c);return c;};
    await db.query("insert into private.p07_worker_scopes values('ftk_ops_p07',$1)",[org]);await db.query("insert into private.p07_privacy_worker_scopes values('ftk_ops_p07_privacy',null),('ftk_ops_p07_privacy',$1)",[org]);await db.query("update private.ops_worker_health set enabled=true where lane in ('p07','p07_privacy')");
    const billing=await login('p07'),privacy=await login('p07_privacy');await assert.rejects(billing.query("call private.ops_run('p07_privacy')"),/FORBIDDEN/);await assert.rejects(privacy.query('select * from private.ops_worker_health'),/permission denied/);
    await billing.query("call private.ops_run('p07')");assert.equal((await q("select last_status from private.ops_worker_health where lane='p07'"))[0].last_status,'idle');
@@ -100,7 +101,8 @@ test('P07 billing and privacy use live Auth, atomic receipts and scoped native w
   for(const c of clients)if(!c._ending)await c.end();
   for(const role of hostedRoles){await db.query('delete from private.p07_worker_scopes where db_role=$1',[role]);await db.query('delete from private.p07_privacy_worker_scopes where db_role=$1',[role]);await db.query(`alter role ${role} password null`);}
   await db.query("update private.ops_worker_health set enabled=false where lane in ('p07','p07_privacy')");
-  for(const role of roles){await db.query('delete from private.p07_worker_scopes where db_role=$1',[role]);await db.query('delete from private.p07_privacy_worker_scopes where db_role=$1',[role]);await db.query(`drop owned by ${role}`);await db.query(`drop role ${role}`);}
+  // These roles only receive group membership. DROP ROLE rejects unexpected owned objects/direct grants.
+  for(const role of roles){await db.query('delete from private.p07_worker_scopes where db_role=$1',[role]);await db.query('delete from private.p07_privacy_worker_scopes where db_role=$1',[role]);await step('cleanup.drop-role',()=>db.query(`drop role ${role}`));}
   await db.end();
  }
 });
