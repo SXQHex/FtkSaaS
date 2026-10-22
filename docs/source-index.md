@@ -1,10 +1,12 @@
 # FtkSaaS kaynak indeksi
 
+Son karar: ders tüketmeyen Pratik katılımı ve paket hareketlerinde güncel uygunluk P08’e ertelendi; ayrı4 etkinlik sayacı bu paket için kaldırıldı. Hosted p01/p05/p06 worker tenant bağlantıları tamam, Cron5sn ve healthy/idle/hata0 doğrulandı. Worker kurulumu kapandı; sıradaki geliştirme P07-B/C, Draft PR40 ve CI erteleme kuralı sürer.
+
 Operasyonel ilk kurulum: açık kullanıcı onayıyla1 organizasyon/owner bağlantısı ve1 Eylül2026–1 Eylül2027 aktif yıllık Business abonelik yönetici aktarımıyla oluşturuldu; normal erişim ve1000 öğrenci/50 eğitmen/5 merkez doğrulandı. Katalog2 sürüm, yönetici makbuzu/audit1; devam aktarımıyla2 merkez/1 oda/1 aktif öğrenci/2 kapalı sınıf/3 rol oluşturuldu. Program2 ve ürün kimliği inactive; seans/satış/etkinlik/anlaşma henüz yok. P07 kod kabulü veya yeni API/dağıtım değildir. Ayrıntı üretim kuyruğundadır.
 
 P08 tartışılacaklara sınırsız Business limitlerinin sözleşme/runtime uyumsuzluğu eklendi. Mevcut kurulum sonlu aktif öğrenci1000/eğitmen50/merkez5 ile ilerler; ayrıntı üretim kuyruğundadır.
 
-P08 — Geliştirmeler kuyruğa eklendi: [kapsam ve mevcut kurulum değerleri](production-queue.md#p08--geliştirmeler). Yeni özellikler P07 kabulüne eklenmez; kontenjan20/etkinlik katılımı4/tekrar100, runtime terfisi yok.
+P08 — Geliştirmeler kuyruğa eklendi: [kapsam ve mevcut kurulum değerleri](production-queue.md#p08--geliştirmeler). Yeni özellikler P07 kabulüne eklenmez; kontenjan20/tekrar100; etkinlikte ayrı sayaç yerine paket süresi+bakiye uygunluğu, runtime terfisi yok.
 
 22 Ekim son kullanıcı kararı: P07-A+B+C tek Draft PR40 içinde bağımlılık sırasıyla geliştirilir ve birlikte merge edilir. Ayrı A/B/C merge/kabul döngüleri kaldırıldı. GitHub servisleri normale dönene kadar manuel CI, rerun, aday label ve merge başlatılmaz; geliştirme commitlerinde geçici `[skip ci]` kullanılarak push kaynaklı pahalı CI ertelenir. Workflow veya kabul kapısı değiştirilmez. Yerel odaklı doğrulamalar sürer. Servisler normale dönünce PR39 main39809302120 attempt6/CD39820836027 attempt2/OPS hosted kapanışı doğrulanmıştır; sırada tamamlanmış P07 için son kaynak bağımsız inceleme, tek aday full clean, merge ve aynı main clean/CD sırasıyla yapılır. Eski/skipped CI kabul değildir; bütün22 API tamamlanmış sayılmaz: A8 kaynak hazır, B6/C8 geliştirme sırasındadır.
 

@@ -33,10 +33,10 @@ begin
  b:=replace(b,old,' if p_operation=''subscription_boundary_apply_v1'' then return private.p07_worker_execute(p_operation,r,p_ids);end if;'||E'\n'||old);
  old:=$a$p_operation in ('subscription_get_v1','saas_payment_submit_v1')$a$;
  if strpos(b,old)=0 then raise exception 'P07 owner billing closed anchor mismatch';end if;
- b:=replace(b,old,$a$p_operation in ('subscription_get_v1','saas_payment_submit_v1','subscription_upgrade_quote_v1','subscription_downgrade_request_v1','subscription_change_cancel_v1','subscription_renewal_set_v1')$a$);
+ b:=replace(b,old,$a$(p_operation in ('subscription_get_v1','saas_payment_submit_v1','subscription_upgrade_quote_v1','subscription_downgrade_request_v1','subscription_change_cancel_v1','subscription_renewal_set_v1') or (p_operation='management_state_get_v1' and coalesce(r->>'operation','') in ('subscription_upgrade_quote_v1','subscription_downgrade_request_v1','subscription_change_cancel_v1','subscription_renewal_set_v1')))$a$);
  old:='  mode:=private.access_mode(org);';if array_length(string_to_array(b,old),1)<>2 then raise exception 'P07 due guard anchor mismatch';end if;
  -- Until the fenced boundary job executes, never expose the expired old plan.
- new:=$a$  if exists(select 1 from core.saas_change_requests where org_id=org and state='scheduled' and effective_at<=clock_timestamp()) and p_operation not in ('subscription_get_v1','subscription_change_cancel_v1','saas_grace_extend_v1') then perform private.fail('OPERATION_IN_PROGRESS');end if;
+ new:=$a$  if exists(select 1 from core.saas_change_requests where org_id=org and state='scheduled' and effective_at<=clock_timestamp()) and p_operation not in ('subscription_get_v1','subscription_change_cancel_v1','saas_grace_extend_v1') and not (p_operation='management_state_get_v1' and coalesce(r->>'operation','') in ('subscription_upgrade_quote_v1','subscription_downgrade_request_v1','subscription_change_cancel_v1','subscription_renewal_set_v1','saas_grace_extend_v1')) then perform private.fail('OPERATION_IN_PROGRESS');end if;
 $a$||old;b:=replace(b,old,new);
  old:=$a$elsif perm_code='management.inspect' then$a$;if array_length(string_to_array(b,old),1)<>2 then raise exception 'P07 subscription management permission anchor mismatch';end if;
  b:=replace(b,old,'elsif perm_code=''management.inspect'' and r->>''operation'' in ('||ops||') then perform private.p07_subscription_management(r,org,person,platform);'||old);
