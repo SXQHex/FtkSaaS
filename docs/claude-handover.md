@@ -113,3 +113,54 @@ Ayrıntılı request/response ve kurallar: `docs/actual-start-handover.md`. İki
 
 Bu yalnız operasyonel kanıttır. Q-E03 katılımcı sınıflandırması, Q-E02 hesaplaşması, yoklama, haklar ve earning kendiliğinden değişmez. Kısmi gerçekleşmeden yeni parasal kural türetilmez.
 
+
+## Organizasyon renk ve font paketleri — frontend ihtiyaç notu
+
+23 Ekim 2026, SaaSPT frontend oturumunda kullanıcı tarafından kabul edildi. İncelenen backend main: `702063807b0a0d09f559f070ffde1b1ae3e7563b`. Bu kayıt backend'e iletilen ürün kararı ve entegrasyon ihtiyacıdır; callable API/DTO, migration veya runtime teslimi değildir. Settings davranış sprinti tamamlanmadan yeni settings runtime/DTO/API geliştirmeme talimatı korunur. Bu dar kabul, diğer aday C/O/P ayar ailelerini topluca onaylamaz.
+
+### Kabul edilen davranış
+
+- Organizasyon kendi marka renk paleti ile başlık/gövde font paketini, sistemin sunduğu hazır paketler arasından seçebilir. Logo marka öğesidir; yükleme/değiştirme hattının mevcut desteği ayrıca eşlenir.
+- İlk kapsam serbest renk girişi, rastgele font/CSS/HTML veya özel font yükleme değildir. Paketler kontrast ve desteklenen dillerin glifleri, Türkçe karakterler, LTR/RTL düzeni açısından kontrol edilmiş olmalıdır.
+- Hata, uyarı, başarı ve klavye odağı gibi semantik durumların renk/işaretleri sistem denetimindedir. Organizasyon markası erişilebilirliği veya durumun anlamını bozamaz; yalnız renkle bilgi verilmez.
+- Organizasyon markası ile kullanıcının açık/koyu/sistem görünüm tercihi ayrı tutulur. Kullanıcının yüksek kontrast, yazı ölçeği ve azaltılmış hareket gereksinimleri marka seçimiyle devre dışı bırakılamaz. S08 hesap/cihaz ayrımı korunur.
+- Organizasyon seçimi organizasyona aittir; kişisel tema tercihi başka organizasyonların marka ayarlarını değiştirmez.
+- SaaSPT'deki Akış/Sahne/Atölye yalnız yerel tasarım önerileridir. Bu kabul bu isimleri, kesin renkleri veya fontları yayımlanmış katalog olarak onaylamaz.
+
+### Backend'den beklenen sözleşme eşlemesi
+
+Aşağıdaki isimler ihtiyacı anlatan öneri alan adlarıdır; mevcut DTO, enum, tablo veya endpoint adı olarak kullanılmaz.
+
+| İhtiyaç | Beklenen anlam / sınır |
+| --- | --- |
+| Paket kataloğu | İzin verilen renk ve font paketlerinin kararlı kimliği, görüntüleme adı, sürümü/uyumluluk bilgisi, seçilebilirlik durumu ve güvenli varsayılanı. Renk-font eşleşmelerinin serbest mi yoksa uyumlu kombinasyonlarla mı sınırlı olduğu netleştirilmeli. |
+| Organizasyon marka okuması | Yetkili org bağlamında seçili renk paketi (`theme_package_id`), font paketi (`font_package_id`), varsa güvenli logo asset referansı, ayar sürümü ve etkin fallback bilgisi. ID ile bütünlüğü doğrulanan katalog kullanılır; istemci keyfi CSS/font URL'si çalıştırmaz. |
+| Marka yazma / sıfırlama | Seçili paketi değiştirme ve sistem varsayılanına dönme ihtiyacı. Null, belirtilmedi ve sıfırlama anlamları açıkça ayrılmalı; kimlik/yetki canlı backend bağlamından alınmalı. |
+| Kişisel görünüm okuma / yazma | Açık/koyu/sistem tercihi ve mevcut S08 kapsamı org markasından ayrı; kişisel tercih sıfırlaması org markasını, org marka sıfırlaması kişisel erişilebilirlik/tema tercihini değiştirmez. |
+| Sürüm ve çakışma | Eşzamanlı iki yöneticinin değişiklikleri sessizce birbirini ezmemeli. Mevcut sözleşme modeline uygun sürüm/çakışma semantiği belirlenmeli. Kim değiştirdi/ne zaman/sürüm bilgisi ve yetkili audit okuması eşlenmeli. |
+| İstemciye yayılım | Yenileme/yeniden giriş ve org değiştirmede doğru marka çözülmeli. Org A'nın önbelleği B'ye taşınmamalı. Cache anahtarı/invalidasyon ve eski istemcinin tanımadığı paket sürümü için güvenli fallback tanımlanmalı; WebSocket zorunluluğu veya anlık yayılım SLA'sı kabul edilmedi. |
+| Logo | Mevcut asset/Storage hattı bulunup alan/izin eşlenmeli. Uygun tür/boyut sınırları, kaldırma, tenant sahipliği ve güvenli sunum belirlenmeli; keyfi harici kaynak veya özel font yükleme yetkisi türetilmez. |
+| Ortak tipler ve hatalar | Kesin operasyon, Request/Response/Error, permission/scope ve sürüm kaynağı backend'in makine sözleşmesinde belirlenip `packages/contracts` tiplerine üretilmeli. Frontend elle paralel API tipi yazmaz. Geçersiz/kullanımdan kalkmış paket, yetkisiz erişim ve stale sürüm durumları ayırt edilmeli. |
+
+Frontend paketlerin token/font eşlemesini, responsive yerleşimi ve erişilebilir render'ı üstlenir. Backend kalıcı seçimin ve izinli kataloğun sözleşmesini, canlı yetkiyi, tenant izolasyonunu ve sürüm/denetim davranışını sağlar. Katalog dosyasının nerede tutulacağı ve nasıl sürümleneceği uygulama analizinde netleştirilir; yeni veri modeli bu notla dayatılmaz.
+
+### Yetki ve kapsam — backend'de kesinleştirilecek
+
+- Marka değiştirme organizasyon kapsamındadır. Mevcut sözleşmeye göre Owner veya açıkça yetkilendirilmiş OM/ilgili permission eşlemesi backend tarafından belirlenmeli; yeni izin anahtarı bu notta icat edilmez.
+- Merkez yöneticisi, öğrenci veya eğitmen rolü tek başına org markasını değiştirmez. Owner'ın marka yetkisi merkez operasyon yetkisi yaratmaz.
+- Kişinin yalnız kendi kişisel görünümünü değiştirmesi, başka hesabın tercihlerini değiştirme yetkisi vermez.
+- Okuma kitlesi, erişimi geri alınmış bağlamın temizlenmesi ve girişsiz sayfalarda marka gösterimi ayrı karara bağlanmalı. Merkez override'ı, planlara göre paket kilidi ve platform operatörünün org adına değişikliği bu kabulle onaylanmadı.
+- Hazır fontların lisans/dağıtım ve dil desteği doğrulanmalı; somut font listesi ile desteklenen dil listesi henüz seçilmedi.
+
+### Kabul senaryoları — uygulama tesliminde kanıtlanacak
+
+1. Yetkili aktör izinli bir paketi seçer; yeniden okuma/yenilemede aynı org markası görülür. Kullanıcının koyu/açık/sistem tercihi korunur.
+2. Yetkisiz veya yetkisi geri alınmış aktör kaydı değiştiremez; başka org'un seçimi/logosu okunamaz veya değiştirilemez.
+3. A ve B orgları arasında geçişte doğru paket/font/logo gösterilir; önbellek başka org'un markasını taşımadan güncellenir.
+4. Eşzamanlı eski sürümlü yazma sessiz veri kaybı üretmez; istemci yeniden okuyarak çakışmayı çözer. Aynı işlem retry'si sözleşmenin operation_key/idempotency kurallarını korur.
+5. Geçersiz/kullanımdan kalkmış veya eski istemcinin tanımadığı paket güvenli biçimde ele alınır; okunamayan font yerine erişilebilir fallback kullanılır.
+6. Uzun metin, Türkçe karakter, seçilen diller, LTR/RTL, klavye odağı, yüksek kontrast ve büyütme paket kombinasyonlarında korunur.
+7. Org varsayılanına dönüş ile kişisel görünüm sıfırlaması birbirinin verisini değiştirmez; logo kaldırma başka org varlığını etkilemez.
+8. Desteklenmeyen kayıt yolu frontend'de sahte başarılı kayıt üretmez. Katalog/okuma/yazma/izin/ortak tip eşlemesi yayımlanana kadar yerel önizleme açıkça yerel kalır.
+
+Açık teslim: mevcut alan/API analizi, kesin yetki eşlemesi, katalog yaşam döngüsü ve fallback, logo hattı, ortak tipler, backend kabul testleri ve gerçek frontend entegrasyonu. Bu belgeyle settings API geliştirmesi başlatılmaz; runtime ve üretim kabulü iddia edilmez.
