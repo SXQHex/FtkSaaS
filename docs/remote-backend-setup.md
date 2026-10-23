@@ -1,5 +1,22 @@
 # Kalıcı geliştirme/test backend’i
 
+## 23 Ekim güncel geliştirme kaynağı ve hosted kontrol
+
+Geliştirme/test proje `gwyprhenabtpkbojephw`; gerçek ilk kurulum verisi içerir. Reset/clean/seed yalnız izole loopback ortamında yapılır. Son runtime kabulü main4cfc9a55/PR40:59 migration içeriği eşleşti,200 runtime,90 core tablo,Edge backend-v1 v8 ACTIVE/verify_jwt=true. [CD39869023193](https://github.com/SXQHex/FtkSaaS/actions/runs/39869023193) 18 kontrol ve fixture temizliği geçti; receipt/source bağları [tek devirdedir](../contracts/00-FtkSaaS-yeni-sohbet-devir.md).
+
+Son belge mainbfb8ccb2/PR41 source-bound belge kabulünden geçti; CD39873101014 deploy skipped. Bu, yeni Edge veya runtime full-clean icrası değildir. Eski migration22 ve Edge4/5/6/7 snapshotlarını güncel ortam ölçümü diye kullanma.
+
+23 Ekim05:04 Türkiye salt-okuma: beş Cron5sn active, beş dedicated LOGIN enabled/idle; failed0/claimed0. p07 scope1 (mevcut org), privacy scope2 (aynı org+global null). Kullanıcının seçtiği quote3600sn ve reauth900sn kuruldu. Bunlar ilk kurulum config'idir; yeni platform ayar API'si veya bütün tenantlar için varsayılan ilanı değildir. Temel kurulum/heartbeat kapandı; yeni P07 hatlarının gerçek iş yükü/hosted kesinti ve fiziksel imha kabulü ayrıca açık.
+
+Son advisor incelemesindeki ops_run search_path ve rls_auto_enable EXECUTE sertleştirmeleri henüz yayımlanmadı. Parola koruması uyarısı Free plan nedeniyle kullanıcı tarafından kapsam dışında bırakıldı. Uygulama RPC EXECUTE0 ölçümü, public yardımcı event-trigger fonksiyonu uyarısını kapsıyor gibi sunulmaz.
+
+İstemci bağlantı ve sınırları [Claude talimatındadır](claude-handover.md). Secret değerler bu belgeye yazılmaz. PAT30-gün rotasyonu ayrı işletim sorumluluğudur; otomatik yenileme varsayılmaz. Production, dış e-posta/Resend, frontend E2E, yük/restore ve fiziksel erasure tamamlanmış değildir.
+
+## Önceki dağıtım kaynaklarının tarihsel kayıtları
+
+Aşağıdaki source/CI/envanter/kurulum sayıları kendi teslim tarihine aittir; yukarıdaki güncel durumun yerine kullanılmaz. İlk kurulum adımları boş DB varsayar; mevcut gerçek ortamda körlemesine uygulanmaz.
+
+
 P06 **done (kod, main ve geliştirme/test kabulü)**: [PR38](https://github.com/SXQHex/FtkSaaS/pull/38), main `006ad36918ae823bc10fbdefa2d48901e193121c`;200 sözleşme/178 runtime/22 contract_only,54 migration/90 core tablo. Son headf2f9d6c/base8364144/tested merge1901fc6/treeb486ffe; bağımsız review5614150102, [aday39779013518](https://github.com/SXQHex/FtkSaaS/actions/runs/39779013518), [aynı main39782197422](https://github.com/SXQHex/FtkSaaS/actions/runs/39782197422) ve [CD39785146645 attempt1](https://github.com/SXQHex/FtkSaaS/actions/runs/39785146645) success. CD18 kontrol/54 içerik eşleşmesi/Edge7 ACTIVE/verify_jwt=true/RLS kapalı0/client RPC EXECUTE0 ve fixture temizliği geçti; receipt12428881259 SHA256 `bcd1ab3255c1808982de76c3d09d47d5eaa95c5fb2e8f9f870d3fedc9ce93b65`. Önceki aday hataları tarihsel kanıttır. Aktif OPS-W01 adayı Supabase Cron içindir;55 migration/aynı178 runtime, kaynak ve hosted işletim kabulü beklenir. Tenant config/binding uydurulmaz; P07 queued kalır.
 
 [OPS-W01 native kurulum/sağlık devri](ops-w01-handover.md) yeni işletim adayını açıklar; henüz aktif worker kurulmuş sayılmaz.

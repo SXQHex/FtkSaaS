@@ -1,3 +1,5 @@
+> 23 Ekim 2026 güncel durum: P01–P07 kod/main/geliştirme-test kabulü kapandı; yayımlanmış kapsam **200 API / 0 contract_only / 59 migration / 90 core tablo / Edge8**. P07 runtime kaynağı `4cfc9a55`; güncel belge tabanı `bfb8ccb2`. Beş Cron hattı aktif ve boş kuyrukta healthy/idle; fiziksel imha ve gerçek yük kabulü tamamlanmış değildir. Ayar davranış sprinti ve güncel entegrasyon sınırları [tek devir](../contracts/00-FtkSaaS-yeni-sohbet-devir.md) ve [ayarlar sözleşmesinde](../contracts/02-FtkSaaS-teknik-sozlesme.md#ayarlar-sozlesmesi-ve-davranis-sprinti). Eski tarih/CI/pending snapshotları yeni durum kanıtı değildir; ürün kuralları yalnız son açık kararla değişir.
+
 # CI ölçüm temeli ve sonraki performans işi
 
 ## P03 geliştirme ölçümü — 21 Ekim 2026
@@ -87,3 +89,7 @@ Run 39278529991 / head 85e25ec48cfc8f204392a757d333e284b02b6149 loglarında runn
 
 Aynı tree'nin boş commit head 09c9cc321204ca6a1bd3a93866d97d0ed819036e / run 39280209729 logu: 15:44:08–15:49:07 UTC, yaklaşık **4:59**. P01 72,43 saniye/10 başarılı; ortak API 163,33 saniye/aynı tek kota assertion hatası. Bu iki gerçek örnek süre değişkenliğini gösterir; sabit süre garantisi verilmez.
 
+
+## 23 Ekim P07 ve belge kabulü ayrımı
+
+P07 aday39863852941 yaklaşık18dk59sn workflow wall ile başarılıdır (22 Ekim22:17:30–22:36:29 UTC); bu tüm job CPU/runner dakikalarının toplamı değildir. PR41 belge39872819806/main39873010292 ayrı hafif belge kabulüdür, runtime hızlandırma kıyası değildir. Eski Registry sonrası asıl açık bağlantı P07 lifecycle cleanup DROP OWNED yetki hatasıydı; dar test düzeltmesi ve son gerçek full/main kabulüyle kapandı. P02 dar seçici bakım işi açık; kapsam azaltarak süre kazanılmaz.

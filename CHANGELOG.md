@@ -1,5 +1,12 @@
 # Changes
 
+## 23 Ekim 2026 frontend başlangıcı ve settings karar eşitlemesi
+
+P01–P07 kaynak/full-clean/main/development CD kapanışı güncel devir ve istemci talimatlarına aktarıldı:200 API/59 migration/Edge8. PR41 belge kabulü, gerçek runtime kabulü ve CD deploy skipped ayrıldı. Beş Cron temel kurulum/idle heartbeat ile3600sn quote/900sn reauth kullanıcı config'i kaydedildi; gerçek yük/fiziksel imha açık.
+
+Settings sözleşmesi teknik sözleşmede Markdown olarak tek otoriteye alındı. On ayrı kabul edilmiş kullanıcı grubu; kalan aday U/C/O/P aileleri; mevcut API alanları ve yayımlanmamış settings taslakları ayrı gösterildi. P08 abone numarası/ortak CRM ve mevcut diğer geliştirmeler korundu. Claude başlangıç talimatları, kaynak önceliği, DTO/rol/zaman/secret/mock sınırları dosya bazında düzeltildi. Runtime, machine DTO, migration, üretilmiş paket ve CI politikası değişmedi; frontend tasarımına müdahale edilmedi.
+
+
 ## 2026-10-20 — P01 main ve CI kararı belge eşitlemesi
 
 P01 PR #22 main 7577b2f1873c6b1fcf83390bfa94a34374c44082 ile birleşti: katalog/seans bağlamlı hak okuması, talep/alternatif/onay, bekleme/teklif/expiry ve dar sistem worker zinciri. 199/118/81 işlem; 34 migration. Son head hedefli 39325878582 ve aday 39327134872 başarılıdır; aynı main clean 39401570751 completed/success doğrulandı; P01 done. Geçici kabul varsayımı kaldırıldı.

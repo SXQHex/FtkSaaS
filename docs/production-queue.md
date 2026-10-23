@@ -1,26 +1,6 @@
 # FtkSaaS sıralı üretim kuyruğu
 
-22 Ekim API-3 teşhisi: [aday39852699702](https://github.com/SXQHex/FtkSaaS/actions/runs/39852699702) kullanıcı tarafından iptal edildi; kabul değildir. Registry sonrasında açık kalan PostgreSQL bağlantısının nedeni P07 lifecycle fixture cleanup’ındaki `DROP OWNED` yetki hatasıdır. Dar düzeltme ve süre sınırlı tanılama yalnız ilgili suite üzerinde doğrulanır; [kanıt ve kapsam](p07-a-handover.md#api-3-registry-sonrası-kapanış-teşhisi). Profil/merge iki test beklentisi de ürün/SQL kodu değiştirilmeden düzeltildi; temiz59 migration ve gerçek Auth→Edge→RPC ile9/9 native test95.887s’de geçti, kalan PG bağlantısı0. Kullanıcı yeni aday full clean istedi; son kaynak incelemesi sonrası tek koşu başlatılır, merge/main clean/CD kabulü ayrıca bekler. Eski iptal edilmiş koşuyu rerun etmek yeni test kaynağını kullanmaz.
-
-22 Ekim son kullanıcı kararı: P07-A+B+C tek Draft PR40 içinde bağımlılık sırasıyla geliştirilir ve birlikte merge edilir. Ayrı A/B/C merge/kabul döngüleri kaldırıldı. GitHub servisleri normale dönene kadar manuel CI, rerun, aday label ve merge başlatılmaz; geliştirme commitlerinde geçici `[skip ci]` kullanılarak push kaynaklı pahalı CI ertelenir. Workflow veya kabul kapısı değiştirilmez. Yerel odaklı doğrulamalar sürer. Servisler normale dönünce PR39 main39809302120 attempt6/CD39820836027 attempt2/OPS hosted kapanışı doğrulanmıştır; sırada tamamlanmış P07 için son kaynak bağımsız inceleme, tek aday full clean, merge ve aynı main clean/CD sırasıyla yapılır. Eski/skipped CI kabul değildir; P07 A8+B6+C8 kaynakları aynı Draft PR40 içinde uygulanmıştır. Son kaynak bağımsız inceleme ve gerçek Auth/Edge/worker aday/main clean kabulü ayrıca bekler; kaynak tamamlanması işletim kabulü değildir.
-
-22 Ekim güncel durum: OPS-W01 PR39, `d1830c89e3d5e7f3c90db7ef0953cc264b35205f` ile main’e birleşti. Aday39795678387 attempt5 kabulü doğrulandı; aynı main [39809302120 attempt6](https://github.com/SXQHex/FtkSaaS/actions/runs/39809302120/attempts/6) completed/success: source, core, API1–4 ve toplayıcı gerçek kabul adımları başarılıdır. Main retry işi kapandı. [CD39820836027 attempt2](https://github.com/SXQHex/FtkSaaS/actions/runs/39820836027/attempts/2) completed/success:18 kontrol,55/55 migration içeriği, pending[], Edge7 değişmeden ACTIVE/verify_jwt=true, RLS/EXECUTE, gerçek Auth→Edge→RPC smoke/advisors ve fixture temizliği geçti. Receipt artifact12445920610 SHA256 `a1261502037363f5bf77fdc2a714eb780f9ec42012484104bd53f6e922d87cb5`. Kullanıcı yetkisiyle22 Ekim20:32–20:33 (Türkiye) Cron2/3/4 kuruldu: p01/p05/p06 kendi LOGIN kimlikleriyle5sn çalışır; üçü healthy/idle, hata0. P06 disable sırasında tick4 sabit kaldı, enable sonrası6 oldu; açık tenant binding0/org0 olduğundan iş claim0. OPS-W01 kaynak/main/CD ve boş kuyruk hosted işletim kabulü kapandı. P07 taslak kaynakları hosted uygulanmadı. Yeni CI/CD koşusu şimdi tetiklenmez. P07 Draft PR40 kaynak envanteri: **200 sözleşme/200 geliştirme runtime/0 contract_only/59 migration/90 core tablo**. A8+B6+C8 kod yolları, typed DTO/validator/Edge ve append-only migration içinde uygulanmıştır. Fiziksel imha kanıtı eksikse gizlilik partial kalır; gerçek Auth→Edge/dedicated LOGIN/aday/main kabulü ayrıca bekler. Full clean/merge şimdi tetiklenmez; kapılar gevşetilmez.
-
-P05 **done (kod, main ve geliştirme/test kabulü)**: [PR37](https://github.com/SXQHex/FtkSaaS/pull/37), kabul edilmiş main `83641447b29e459236aea1a9a4379b5d19825af6`;200 sözleşme/165 runtime/35 contract_only,53 migration/90 core tablo. Son head15e2126/base16cb570/tested merge2ebe087/tree736a75b; bağımsız son kaynak incelemesi5611074233, [aday39745672815](https://github.com/SXQHex/FtkSaaS/actions/runs/39745672815) ve [aynı main39748053581](https://github.com/SXQHex/FtkSaaS/actions/runs/39748053581) completed/success. [CD39750264949 attempt1](https://github.com/SXQHex/FtkSaaS/actions/runs/39750264949) success:18 kontrol,53/53 içerik eşleşmesi, P05 migration uygulandı, Edge6 ACTIVE/verify_jwt=true, RLS kapalı0/client RPC EXECUTE0 ve sentetik fixture temizliği. Receipt artifact12412499512 SHA256 `a41a8448c0a1b9dfdf853b58bea7cd56525fd8ede14812684b12619c3c8ee04e`. Eski aday hata kayıtları tarihsel kanıttır; bu kabulün kaynağı değildir.
-
-P06 **done (kod, main ve geliştirme/test kabulü)**: [PR38](https://github.com/SXQHex/FtkSaaS/pull/38), main `006ad36918ae823bc10fbdefa2d48901e193121c`;200 sözleşme/178 runtime/22 contract_only,54 migration/90 core tablo. Son headf2f9d6c/base8364144/tested merge1901fc6/treeb486ffe; bağımsız review5614150102, [aday39779013518](https://github.com/SXQHex/FtkSaaS/actions/runs/39779013518), [aynı main39782197422](https://github.com/SXQHex/FtkSaaS/actions/runs/39782197422) ve [CD39785146645 attempt1](https://github.com/SXQHex/FtkSaaS/actions/runs/39785146645) success. CD18 kontrol/54 içerik eşleşmesi/Edge7 ACTIVE/verify_jwt=true/RLS kapalı0/client RPC EXECUTE0 ve fixture temizliği geçti; receipt12428881259 SHA256 `bcd1ab3255c1808982de76c3d09d47d5eaa95c5fb2e8f9f870d3fedc9ce93b65`. Önceki aday hataları tarihsel kanıttır. OPS-W01 PR39 main’e birleşti; aynı main clean attempt6/CD attempt2 ve hosted boş kuyruk işletim kabulü kapandı. P07-A Draft geliştirmesi son kullanıcı talimatıyla sürer; tenant config/binding uydurulmaz.
-
-PR36 operasyonel takip kapandı: aynı main [39644044693](https://github.com/SXQHex/FtkSaaS/actions/runs/39644044693) success; [CD39646391222](https://github.com/SXQHex/FtkSaaS/actions/runs/39646391222) success,18 kontrol,52/52 migration, pending[], Edge5 değişmeden ACTIVE/verify_jwt=true. Atomik Management API transport yeni migration olmadan da rollback probe ile doğrulandı. Bot/deneme hedefi hâlâ kullanıcı kararıyla ertelendi; hosted P05 worker kurulmuş değildir.
-
-P01–P06 ve PR36 kabulü kapandı. OPS-W01 PR39 birleşti; main clean/CD ve hosted boş kuyruk işletim kabulü kapandı. P07 A8+B6+C8 Draft PR40 altında kaynak olarak uygulanmıştır; son kabul bekler; kabul sırası PR39 kapanışı→PR40.
-
-CD-01 **done**: PR32 kurulum + PR33 test fixture düzeltmesi sonrası kabul edilmiş main `0fabf3a4a605dd6be5a1d358c660021f59406e20`. [Main39588975421](https://github.com/SXQHex/FtkSaaS/actions/runs/39588975421) ve [ilk canlı CD39590690817/attempt2](https://github.com/SXQHex/FtkSaaS/actions/runs/39590690817/attempts/2) completed/success. CD receipt aynı source/main/run kabulünü bağlar;17 kontrol başarılı,49 migration içerik eşleşmesi,90 core tablo/RLS, anon/authenticated EXECUTE0, Edge backend-v1 v4 ACTIVE/verify_jwt=true. Gerçek Auth→Edge→RPC, oturum reddi ve fixture temizliği geçti; ayrıca uzak son0 hesap/0 Auth kullanıcısı/0 organizasyon doğrulandı. Envanter199/140 runtime/59 contract_only değişmedi. P04 CRM/public başvuru queued; başlamadı. Hosted worker işletimi, frontend, dış e-posta ve yük/restore bu kapanışla tamamlanmaz.
-
-P03 **done**: [PR #30](https://github.com/SXQHex/FtkSaaS/pull/30), kabul edilmiş main `10710ffa90747a7e35c452c4c07ba59522f50ce3`. Son head2526347 / basece95a9d / tested merge1768fc2 / tree9ac328b aynı kaynak zinciridir. Bağımsız kaynak incelemesi PR review5594023911 içinde kayıtlı; [aday39527260056](https://github.com/SXQHex/FtkSaaS/actions/runs/39527260056) ve [aynı main39529992556](https://github.com/SXQHex/FtkSaaS/actions/runs/39529992556) completed/success.96 yapı +37 CI politika +27 DB +316 API =476 test düğümü; fail/skipped0,49 migration. Main13:18; aday13:34. Envanter199 sözleşme/140 runtime/59 contract_only,90 core tablo. Geliştirme/test Supabase aynı49 migration/Edge3 kaynağına eşitlendi; ayrı dokuz kontrollü Auth→Edge→RPC smoke ve fixture temizliği başarılı. P04 queued, başlamadı.
-
-P02 **done**: [PR #28](https://github.com/SXQHex/FtkSaaS/pull/28), kabul edilmiş main `cc4878d09e45204dbc13ccfe1324b38b14548167`. Envanter **199 sözleşme / 133 runtime / 66 contract_only / 40 migration / 90 core tablo**. Son head `35816cc30a9b28e273e94e6cef86e8b402dbaad0` bağımsız incelemeden geçti; [hedefli39448566998](https://github.com/SXQHex/FtkSaaS/actions/runs/39448566998), [aday39455462417](https://github.com/SXQHex/FtkSaaS/actions/runs/39455462417) ve [aynı main39461804543](https://github.com/SXQHex/FtkSaaS/actions/runs/39461804543) completed/success. Full kapsam:96 sözleşme/yönetişim +37 CI politika +27 DB +309 API =469 test düğümü; fail/skipped0. Core, dört izole API shard, toplayıcı,40 migration, seed/health/advisors geçti. Main clean14:43; önceki43:33 hedefli koşu seri tüm-suite fallback kullandı, aynı çalışma profili değildir. Eski başarı yeni kaynağa taşınmaz.
-
-Geliştirme/test Supabase `gwyprhenabtpkbojephw`, kabul edilmiş main `006ad36918ae823bc10fbdefa2d48901e193121c` kaynağına CD39785146645 ile eşitlendi:54 migration/Edge7/178 runtime,18 kontrol ve fixture temizliği. OPS-W01 main d1830c8/CD39820836027 attempt2 kabulü55 migration/Edge7 kaynağını doğruladı; Cron2/3/4 kurulumu ve boş kuyruk health/disable-restart kabulü geçti. Frontend/dış e-posta/yük/restore ayrı kalır.
+23 Ekim güncel durum: P01–P07 kod/main/geliştirme-test kabulü kapandı. Yayımlanmış200 API/59 migration; kaynak ve run kanıtı [tek devirdedir](../contracts/00-FtkSaaS-yeni-sohbet-devir.md). Beş hosted worker kurulu/idle/hata0; gerçek yük ve fiziksel imha ayrı açık. Yeni settings uygulaması kullanıcı kararıyla durduruldu; frontend için belgeler eşitleniyor. [Davranış sprinti](../contracts/02-FtkSaaS-teknik-sozlesme.md#ayarlar-sozlesmesi-ve-davranis-sprinti) S01–S10 kabulünü ve kalan grupları taşır.
 
 | Sıra | Teslim | İşlem | Durum | Kanıt / sonraki adım |
 |---|---|---:|---|---|
@@ -34,8 +14,8 @@ Geliştirme/test Supabase `gwyprhenabtpkbojephw`, kabul edilmiş main `006ad3691
 | P05 | Belge, bildirim ve otomasyon | 14 | done | PR37; main8364144, aday39745672815/main39748053581/CD39750264949 success; Edge6/53 migration |
 | P06 | Rapor, import ve işlem izleme | 13 | done | PR38/main006ad36; aday39779013518/main39782197422/CD39785146645 success;54 migration/Edge7 |
 | OPS-W01 | Hosted worker işletimi | — | done | d1830c8 main/CD kabulü; Cron2/3/4 healthy idle ve disable-restart geçti; tenant kapsamı3 bağlı |
-| P07 | Hesap, organizasyon ve abonelik yaşam döngüsü | 22 | source_ready (Draft A8+B6+C8, kabul bekler) | PR39 kabulü sonrası PR40 clean |
-| P08 | Geliştirmeler | — | queued | Ayrı kontenjanlar, sınırsız etkinlik ve paket ders/etkinlik kapsamları; mevcut kurulum20 kontenjan/100 tekrar; paket süresi+bakiye ile ücretsiz etkinlik uygunluğu |
+| P07 | Hesap, organizasyon ve abonelik yaşam döngüsü | 22 | done (kod/main/development) | PR40/main4cfc9a55; aday39863852941/main39866466608/CD39869023193 success; hosted temel kurulum ve idle heartbeat geçti; fiziksel imha/yük ayrı |
+| P08 | Geliştirmeler | — | queued | Ayrı kontenjanlar, sınırsız etkinlik ve paket ders/etkinlik kapsamları; mevcut kurulum20 kontenjan/100 tekrar; paket süresi+bakiye ile ücretsiz etkinlik uygunluğu; sabit abone no ve ortak çok kaynaklı CRM |
 
 ## Ajanın kuyruk bakımı
 
@@ -63,7 +43,7 @@ Bu kural önceki otomatik devam/CI izleme talimatlarını yalnız bekleme davran
 
 ## Ortak üretim promptu
 
-20 Ekim son kullanıcı talimatı: her main birleşmesinin aynı kaynak kabulü doğrulandıktan sonra `gwyprhenabtpkbojephw` FtkSaaS **geliştirme/test** ortamını da o main ile eşitle. Önce migration geçmişi ve içerik eşleşmesini doğrula; yalnız eksik migration’ları sırasıyla uygula, değişen Edge bundle’ını yayımla, JWT/izin kapılarını koru; aynı içerik varsa yeniden kurulum yapmadan eşleşmeyi kaydet. Ardından uzak Auth→Edge→RPC smoke, RLS/EXECUTE ve advisors doğrulaması yap; kaynak SHA/migration/Edge sürümü/sonucu kaydet. Bu, ajanın teslim kapanış adımıdır; otomatik CD workflow’u kurulduğu anlamına gelmez. Production yetkisi değildir. Testler yalnız ayrılmış sentetik verilerle yapılır; mevcut gerçek veriyi reset etme. `npm run test:clean` loopback kabulünde kalır; hosted smoke onun yerine geçmez. Full clean çalışırken izleme/yayın devamı durur; kullanıcı dönüşünde gerçek main kabulü sonrası bu adıma geçilir.
+20 Ekim son kullanıcı talimatı: her main birleşmesinin aynı kaynak kabulü doğrulandıktan sonra `gwyprhenabtpkbojephw` FtkSaaS **geliştirme/test** ortamını da o main ile eşitle. Önce migration geçmişi ve içerik eşleşmesini doğrula; yalnız eksik migration’ları sırasıyla uygula, değişen Edge bundle’ını yayımla, JWT/izin kapılarını koru; aynı içerik varsa yeniden kurulum yapmadan eşleşmeyi kaydet. Ardından uzak Auth→Edge→RPC smoke, RLS/EXECUTE ve advisors doğrulaması yap; kaynak SHA/migration/Edge sürümü/sonucu kaydet. Bu talimat başlangıçta manuel teslim kapanışıydı; sonraki CD-01 ile otomatik gelişim/test CD workflow’u kurulup kabul edildi. Kabul edilmiş aynı içerik yeniden uygulanmaz; güvenli yalnız-belge main’i deploy skipped sonucuyla kapanabilir. Production yetkisi değildir. Testler yalnız ayrılmış sentetik verilerle yapılır; mevcut gerçek veriyi reset etme. `npm run test:clean` loopback kabulünde kalır; hosted smoke onun yerine geçmez. Full clean çalışırken izleme/yayın devamı durur; kullanıcı dönüşünde gerçek main kabulü sonrası bu adıma geçilir.
 
 
 Aşağıdaki kurallarla sıradaki açık teslimi uygula; kullanıcı her teslim için yeniden “devam” demek zorunda değildir. **Full clean bekleme noktasında kullanıcıya devir bunun açık istisnasıdır.**
@@ -115,52 +95,20 @@ PR38/main006ad36, aday39779013518/main39782197422/CD39785146645 başarılarıyla
 
 ### OPS-W01 — Supabase Cron worker işletimi
 
-Kullanıcı22 Ekim Supabase içi barındırmayı seçti. Native p01/p05/p06 dedicated session_user, açık tenant binding, ayrı claim/execute commit'leri, sınırlı bank/retry, heartbeat/durdurma ve kesinti sonrası lease reclaim. [OPS devri](ops-w01-handover.md). Önce son kaynak bağımsız inceleme ve full/main clean/CD; sonra kabul edilmiş install SQL ve hosted heartbeat/durdurma/yeniden başlatma doğrulaması.0 tenant için izin/ürün/config uydurulmaz; işletim boş kuyrukta idle olabilir. P07 kabulü bu kapanıştan sonradır. Kullanıcı22 Ekim istisnasıyla geliştirme Draft PR40 altında ilerler; full clean/merge bekletilir.
+22 Ekim Supabase içi p01/p05/p06 dedicated LOGIN kurulum/kaynak/main/CD kabulü tamamlandı. Üç lane için boş kuyruk heartbeat ve p06 disable-restart kanıtı [OPS devrindedir](ops-w01-handover.md). Gerçek organizasyona üç binding sonradan bağlandı. P07 lane/privacy kurulumu ise PR40 kabulünden sonra yapıldı; eski Draft/CI bekletme talimatı kapanmış kaynak geçmişidir. Gerçek iş yükü ve fiziksel imha ayrıca açıktır.
 
-### P07 — Hesap, organizasyon ve abonelik yaşam döngüsü
+### P07 kapanış kaydı
 
-Draft PR40 A kapsamının sekiz API kaynağını ve yönetim okumalarını taşır. Parola API’si gerçek sağlayıcı challenge başlatıcısıdır; parola tamamlaması native Supabase Auth yoludur. A kaynak kabulü bekler; B/C aynı PR40 içinde tamamlanır. [Taslak devir](p07-a-handover.md).
-
-Ortak üretim promptunu uygula. Durum: in_progress; A kaynak hazır, B/C aynı Draft PR40 içinde sıradadır.
-
-**Mevcut sözleşme API'leri (22):**
-
-- `account_profile_update_v1`
-- `account_password_change_v1`
-- `account_password_reset_request_v1`
-- `account_access_revoke_v1`
-- `account_link_remove_v1`
-- `person_merge_preview_v1`
-- `person_merge_approve_v1`
-- `person_merge_apply_v1`
-- `subscription_upgrade_quote_v1`
-- `subscription_downgrade_request_v1`
-- `subscription_change_cancel_v1`
-- `subscription_renewal_set_v1`
-- `saas_grace_extend_v1`
-- `subscription_boundary_apply_v1`
-- `account_delete_preview_v1`
-- `account_delete_apply_v1`
-- `organization_close_preview_v1`
-- `organization_close_apply_v1`
-- `organization_reopen_v1`
-- `organization_delete_preview_v1`
-- `organization_delete_apply_v1`
-- `privacy_execute_v1`
-
-**Görev ve kabul:**
-
-Bu grubu bağımlılık sıralı A→B→C geliştir; son kullanıcı kararıyla üçü tek Draft PR40 ve tek merge/kabul zinciridir.
-A: account_profile_update/password_change/password_reset_request, account_access_revoke, account_link_remove, person_merge_preview/approve/apply. Canlı geri alma/oturum, yeniden bağlamada eski grantın canlanmaması ve etkilenen merkez onayları. Profil değişimi rol/iletişim yetkisini aşmasın.
-B: subscription_upgrade_quote/downgrade_request/change_cancel/renewal_set, saas_grace_extend, subscription_boundary_apply. Kabul edilmiş fiyat farkı/dönem sonu düşürme/merkez seçimi/yenilememe/gecikme ayrımı; sayısal değer icat etme, aylık-yıllık dönüşüm ekleme, kaçırılmış otomasyonu topluca çalıştırma.
-C: account_delete_preview/apply, organization_close_preview/apply/reopen/delete_preview/delete_apply, privacy_execute. Hesap silme, org kapatma, abonelik bitişi ve imha ayrı kalsın. Owner engelleri, reauth ve kapsam onayı uygulansın; borç/alacak/hukuki kanıt kendiliğinden silinmesin.
-Saklama süreleri geçici/hukuk teyidi açık kalır. DB/dosya/rapor/geçici kopya/yedek gerçek imhası doğrulanmadan completed verme; eksik altyapıda partial/pending açık kalsın.
-Dış e-posta sağlayıcısı gerektiren parola sıfırlama akışında erteleme sınırını aşma; mevcut güvenli test yolu ile dış teslim kanıtını ayır.
-Kabul: eski oturumun reddi; abonelik sınır anları; kapatma/izinli geri dönüş; silme sonrası yeniden canlanmama/tenant izolasyonu.
-
-
+22 API PR40/main4cfc9a55 ile kabul edildi; aday39863852941/main39866466608/CD39869023193 success.200 runtime/0 contract_only/59 migration/Edge8. Aktif A→B→C promptu kaldırıldı; önceki hali Git geçmişinde. Beş Cron ve scope kurulumu tamam; quote3600sn/reauth900sn kullanıcı seçimi. Gerçek P07 iş yükü/kesinti/kalıcı imha kanıtları [kalan işlerde](remaining-work.md). [P07 geliştirme devri](p07-a-handover.md) kendi source snapshotıdır; eski pending sınırları kapanışı yeniden açmaz.
 
 ### P08 — Geliştirmeler
+
+#### Organizasyon bazında sabit abone numarası
+
+23 Ekim kullanıcı kararı: organizasyonun ekran/arama/rapor ve tarihsel takip anahtarı abone numarasıdır; platform UUID kimliği ve ilişkileri korunur. Numara organizasyon içinde benzersiz, değişmez ve yeniden kullanılmaz. Aynı kişinin başka organizasyondaki numarası farklı olabilir; global izleme numarası değildir. Ad veya doğrulanmış iletişim değişikliği numarayı, üyeliği, hakları veya finans bağlantılarını değiştirmez. Numara tek başına kimlik doğrulama/erişim yetkisi sağlamaz.
+
+Format, başlangıç, adaya hangi aşamada tahsis, mevcut kayıt aktarımı ve kişi birleşiminde geçerli/eski numara alias davranışı uygulamadan önce netleştirilir. Eşzamanlı tekillik, idempotent tahsis, tenant izolasyonu, silme/yeniden katılımda yeniden kullanmama ve tarihsel izlenebilirlik kabul edilir. Bu yalnız P08 kaydıdır; migration/API/canlı veri değişmez.
+
 
 22 Ekim kullanıcı kararı: mevcut kurulum mevcut API’lerle ilerler; aşağıdaki genişletmeler P08 kapsamındadır, şimdi uygulanmaz ve P07’ye eklenmez. API sayısı/DTO/runtime/migration bu kayıtla değişmez.
 
@@ -190,13 +138,7 @@ Mevcut kurulum kararı: sonlu100 haftalık tekrar, toplam kontenjan20, paket ba�
 
 Güncel operasyonel kurulum girdileri: Business aylık5000 TRY/yıllık50000 TRY; kullanıcı yıllık satın aldığını bildirdi. Dönem Europe/Istanbul ile1 Eylül2026–1 Eylül2027; mevcut kurulum limitleri aktif öğrenci1000/eğitmen50/merkez5. Owner Auth hesabının e-posta onayı hosted okuma ile doğrulandı. Hosted ilerleme: aylık5000 TRY ve yıllık50000 TRY Business katalog sürümleri1000 aktif öğrenci/50 eğitmen/5 merkez limiti veF01–F33 kapsamıyla oluşturuldu, geri okuma doğrulandı. Plan effective_at1 Eylül2026 00:00 Europe/Istanbul; bu bir abonelik başlangıcı değildir. Son açık kullanıcı onayıyla tek işlemde1 organizasyon, doğrulanmış Auth’a bağlı1 aktif owner hesabı/kişi/bağlantısı ve1 aktif yıllık abonelik oluşturuldu. Abonelik1 Eylül2026 00:00–1 Eylül2027 00:00 Europe/Istanbul; access_mode=normal ve üç limit geri okundu. Satın alma kullanıcı beyanından tarihsel abonelik hakkı olarak aktarıldı; ödeme tarihi/referansı bilinmediğinden ayrı tahsilat/ödeme doğrulaması kaydı uydurulmadı. Mevcut ilk ödeme onayı dönemi now() ile başlatır; istenen1 Eylül2026–1 Eylül2027 dönemi mevcut API ile geriye tarihli başlatılamaz. Owner Auth onaylı olsa da canlı uygulama oturumu yok; platform operatör kaydı yok. Kullanıcı kimliği/oturumu taklit edilmez, kişiye kendiliğinden platform yetkisi verilmez. Bu işlem kullanıcı tarafından mevcut API talimatına verilen açık, tek seferlik yönetici aktarımı istisnasıdır. admin_initial_organization_subscription_import makbuzu succeeded ve append-only audit1; aktör database-admin:postgres, owner gibi davranılmış sayılmaz. Oturum0/platform operatörü0, core RLS kapalı0/client RPC EXECUTE0. Kök aktarım sonrası son kullanıcı oluştur talimatıyla idempotency makbuzu ve audit içeren ikinci yönetici aktarımı yapıldı:2 aktif merkez/1 Tango disiplini/1 merkez-disiplin bağı/1 oda (Tango kapasitesi50), OM+FTK CM+FTK eğitmen rolleri (aynı mevcut owner kişisi),1 aktif öğrenci ilişkisi ve2 kapalı sınıf oluşturuldu. İki haftalık program100 tekrar/20 kontenjan ile inactive; ürün kimliği inactive, ürün sürümü0/seans0/etkinlik0/satış0. Anlaşma için oda ücreti seçimi eksik; ders kredisi tüketmeyen pakete bağlı etkinlik uygunluğu P08 sınırı; etkinliğin gerçek dış mekânı ve kayıt koşulları tamam değil. Yüzde60,2600 TRY/2 ay ve bilinen katılım/ödeme geçmişi audit pending_configuration içinde korundu; finansal satış/yoklama/hakediş olarak uygulanmış sayılmaz. Negatif varsayılan/üst sınır2 ve borçlu katılım engeli=true organizasyon politikaları doğrulandı. Migration/Edge/runtime/CI değişmedi.
 
-Worker işletim kapanışı: son kullanıcı talimatıyla mevcut organizasyon p01/p05/p06 kapsamlarına yalnız kendi LOGIN karşılıklarıyla bağlandı (gerçek rol adları ftk_ops_p01/ftk_ops_p05/ftk_ops_p06). Üç Cron5sn/active, üç lane enabled/healthy ve last_org gerçek organizasyona bağlı; ticks1397/1397/1392 okumasında hata0. Kuyruk boş olduğundan idle/claim0; bu gerçek iş yükü veya henüz oluşturulmamış satış/seans/etkinlik kabulü değildir. Tenant worker kurulumu P07’yi bekletmez. P07-B/C kaynakları aynı Draft PR40 içinde tamamlandı; son kaynak/uçtan uca kabul ve CI erteleme/full-main clean kuralları korunur.
+Worker işletim kapanışı: son kullanıcı talimatıyla mevcut organizasyon p01/p05/p06 kapsamlarına yalnız kendi LOGIN karşılıklarıyla bağlandı (gerçek rol adları ftk_ops_p01/ftk_ops_p05/ftk_ops_p06). Üç Cron5sn/active, üç lane enabled/healthy ve last_org gerçek organizasyona bağlı; ticks1397/1397/1392 okumasında hata0. Kuyruk boş olduğundan idle/claim0; bu gerçek iş yükü veya henüz oluşturulmamış satış/seans/etkinlik kabulü değildir. Tenant worker kurulumu P07’yi bekletmez. P07-B/C kaynakları PR40 ile kabul edildi; ayrıntılı source/CI tek devirdedir. Fiziksel imha ve gerçek iş yükü kabulü ayrı kalır.
 
 
-P07 kaynak kapanışı: A8+B6+C8 aynı Draft PR40 içinde,200 runtime/0 contract_only/59 migration. Birleşik devir [P07](p07-a-handover.md). Kod hazır; son tree kaynak incelemesi ve gerçek Auth/Edge/dedicated LOGIN full/main clean kabulü bekler. Gizlilikte gerçek fiziksel imha kanıtı eksik kapsamlar partial/pending kalır;200 API tüm ürün/işletim kabulü değildir. P07 worker/config hosted kurulumu yapılmadı. P08 kapsamı geliştirilmedi. CI erteleme kuralı sürer.
-
-
-P07 zamanlayıcı kaynakları58. migration’a dahildir: ftk_ops_p07 ve ftk_ops_p07_privacy ayrı LOGIN/grup kimlikleri, kapalı health satırları ve boş scope ile kurulur. Mevcut OPS commit’li claim/execute, lease reclaim ve heartbeat zinciri kullanılır. Gizlilik global null kapsamı ile hiç binding olmaması ayırt edilir; global/tenant adil sırayla dolaşılır. Kabul edilmiş main/CD sonrasında scripts/ops-cron-install.sql beş hattı kurar; health script beşini gösterir. Bu değişiklik canlı Cron’a uygulanmadı; mevcut üç hat çalışmayı sürdürür. Quote TTL/reauth tazelik config’i ve yeni scope binding’leri açık kurulum girdileridir.
-
-
-P07 adayı39850715102 ödeme yanıtı sözleşme hatası nedeniyle kabul edilmedi. Append-only59. migration düzeltmesi ve21 gerçek SQL yanıtının mevcut Edge validator kontrolü [birleşik devirde](p07-a-handover.md#p07-aday39850715102--ödeme-yanıtı-düzeltmesi) kayıtlıdır; son kaynak aday full clean → merge → aynı main clean/CD bekler.
+P07'nin sonraki tamamlanmış kaynak ve hosted temel kurulum kanıtı yukarıdaki kapanış kaydındadır. Gizlilik partial/pending ve fiziksel imha kanıtı sınırı sürer. Kullanıcının yeni ayar API geliştirmesini durdurma kararı geçerlidir; önce settings davranışları netleştirilecektir.

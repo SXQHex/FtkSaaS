@@ -1,26 +1,33 @@
 # FtkSaaS backend
 
-Güncel kaynak merkezi [SXQHex/FtkSaaS main](https://github.com/SXQHex/FtkSaaS). Önce [AGENTS.md](AGENTS.md), [kaynak indeksi](docs/source-index.md), [güncel devir](contracts/00-FtkSaaS-yeni-sohbet-devir.md), [kalan işler](docs/remaining-work.md) ve [üretim kuyruğu](docs/production-queue.md) okunur.
+Güncel kaynak merkezi [SXQHex/FtkSaaS main](https://github.com/SXQHex/FtkSaaS). Önce [AGENTS](AGENTS.md), [kaynak indeksi](docs/source-index.md) ve [güncel devir](contracts/00-FtkSaaS-yeni-sohbet-devir.md) okunur.
 
-P05 **done (kod, main ve geliştirme/test kabulü)**: [PR37](https://github.com/SXQHex/FtkSaaS/pull/37), kabul edilmiş main `83641447b29e459236aea1a9a4379b5d19825af6`;200 sözleşme/165 runtime/35 contract_only,53 migration/90 core tablo. Son head15e2126/base16cb570/tested merge2ebe087/tree736a75b; bağımsız son kaynak incelemesi5611074233, [aday39745672815](https://github.com/SXQHex/FtkSaaS/actions/runs/39745672815) ve [aynı main39748053581](https://github.com/SXQHex/FtkSaaS/actions/runs/39748053581) completed/success. [CD39750264949 attempt1](https://github.com/SXQHex/FtkSaaS/actions/runs/39750264949) success:18 kontrol,53/53 içerik eşleşmesi, P05 migration uygulandı, Edge6 ACTIVE/verify_jwt=true, RLS kapalı0/client RPC EXECUTE0 ve sentetik fixture temizliği. Receipt artifact12412499512 SHA256 `a41a8448c0a1b9dfdf853b58bea7cd56525fd8ede14812684b12619c3c8ee04e`. Eski aday hata kayıtları tarihsel kanıttır; bu kabulün kaynağı değildir.
+## Frontend için başlangıç
 
-P01–P06 kod/main/development kabulü kapandı (PR38/main006ad36). Aktif OPS-W01, Supabase içi Cron worker işletimidir; kaynak/hosted kabulü beklenir. P07 hesap/organizasyon/abonelik yaşam döngüsü ardından gelir. İşlem sayısı ürün tamamlanma oranı değildir; [F01–F33](docs/feature-delivery.md) kabulü ayrı gösterir.
+- [Settings sözleşmesi ve davranış sprinti](contracts/02-FtkSaaS-teknik-sozlesme.md#ayarlar-sozlesmesi-ve-davranis-sprinti): kabul edilen kullanıcı grupları, aday merkez/org/platform ayarları ve açık kararlar.
+- [İstemci entegrasyon devri](docs/claude-handover.md): hangi alan/API mevcut, hangi davranış henüz uygulama gerektiriyor; Auth, hata, erişim ve sağlayıcı sınırları.
+- [Makine sözleşmesi](contracts/08-FtkSaaS-tip-ve-operasyon-sozlesmesi.json), [TypeScript API](packages/contracts/src/operations.ts), [endpoint envanteri](docs/endpoint-inventory.json): yalnız yayımlanmış200 operasyonun çağrı sözleşmesi.
+- [Kalan işler](docs/remaining-work.md) ve [üretim kuyruğu](docs/production-queue.md): P08 abone numarası/ortak CRM ve diğer bağımlılıklar.
+
+## Doğrulanmış durum
+
+P01–P07/PR40 kod/main/geliştirme-test kabulü kapalı:200 sözleşme/200 runtime/0 contract_only,59 migration,90 core tablo/Edge8. Runtime main `4cfc9a55`; son belge tabanı `bfb8ccb2`. PR41 yalnız belge kabulüdür; yeni runtime tam test veya deploy değildir. Tam run/source zinciri güncel devirdedir.
+
+Beş hosted Cron aktif; temel heartbeat/idle kontrolü geçti. Fiziksel imha, gerçek yük/restore, dış e-posta ve frontend uçtan uca kabulü ayrıdır. Yeni settings API taslağı yayımlanmadı; ayar davranış kararları tamamlanmadan geliştirme durduruldu. Arayüz tasarımı bu belge tesliminin dışında kalır.
 
 ## Geliştirme ve CI
 
-Node 24.19.0 ve sabit lockfile kullanılır:
+Node24.19.0 ve sabit lockfile ile:
 
-    npm ci
-    npm run generate
-    npm run verify
-    npm run dev:start
-    npm run test:clean
-    npm run dev:stop
+```bash
+npm ci
+npm run generate
+npm run verify
+npm run dev:start
+npm run test:clean
+npm run dev:stop
+```
 
-Yerel test:clean yalnız izole loopback DB'sini sıfırlar. Geliştirme push'ları birikimli hedefli CI kullanır; aday clean açık tetiklenir. [CI-2026-10-20](docs/decisions/CI-2026-10-20.md) dört bağımsız shard, bölüm boyunca Draft/development engeli ve kaynak bağlı yalnız-belge PR/main kabulüyle uygulanmıştır. Runtime/CI son aday ve main tam kapsamdan geçer; güvenli belge değişimi ayrı kabul kullanır. Her kabul edilmiş main sonrası [geliştirme/test Supabase eşitlemesi](docs/remote-backend-setup.md) teslim kapanışının parçasıdır. Full clean başlayınca ajan sonucu izlemeyi bırakıp kullanıcıya devreder.
+`test:clean` yalnız izole loopback DB'sini sıfırlar; hosted gerçek veriyi reset etme. Geliştirmede birikimli hedefli, runtime/CI son aday ve aynı main'de full clean; incelenmiş güvenli yalnız-belge farkında ayrı kaynak bağlı belge kabulü. [CI politikası](docs/ci-policy.md) ve full-clean kullanıcıya devir kuralı geçerlidir.
 
-[Endpoint envanteri](docs/endpoint-inventory.json), [entegrasyon devri](docs/claude-handover.md), [CI politikası](docs/ci-policy.md), [ölçümler](docs/ci-performance.md) ve [koruma sınırı](docs/branch-protection-review.md) ayrıntıları taşır. Tarihsel reports/ yeni SHA'nın kabulü yerine geçmez.
-
-Frontend tasarımına/istemci koduna müdahale edilmez; production dağıtımı yapılmaz. Dış e-posta ertelenmiştir; Resend başlatılmaz. Hosted güncelleme, frontend gerçek entegrasyonu ve yük/restore ayrı kabul işleridir.
-
-[P06 rapor/import/izleme devri](docs/p06-handover.md):200 sözleşme,178 runtime,22 yalnız sözleşme; aday/main/CD kabulü PR38 ile kapandı. [Hosted worker devri](docs/ops-w01-handover.md) OPS-W01 kaynak/işletim kabulünü ayrıca izler.
+[Hosted kurulum](docs/remote-backend-setup.md) geliştirme/test içindir. Production dağıtımı, frontend tasarımı veya dış e-posta/Resend kurulumu bu görevle yetkilendirilmez. Eski raporlar tarihsel kaynak snapshotlarıdır.

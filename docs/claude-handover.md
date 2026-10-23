@@ -1,168 +1,85 @@
-# FtkSaaS — güncel entegrasyon devri
+# Claude frontend entegrasyon talimatları
 
-22 Ekim API-3 teşhisi: [aday39852699702](https://github.com/SXQHex/FtkSaaS/actions/runs/39852699702) kullanıcı tarafından iptal edildi; kabul değildir. Registry sonrasında açık kalan PostgreSQL bağlantısının nedeni P07 lifecycle fixture cleanup’ındaki `DROP OWNED` yetki hatasıdır. Dar düzeltme ve süre sınırlı tanılama yalnız ilgili suite üzerinde doğrulanır; [kanıt ve kapsam](p07-a-handover.md#api-3-registry-sonrası-kapanış-teşhisi). Profil/merge iki test beklentisi de ürün/SQL kodu değiştirilmeden düzeltildi; temiz59 migration ve gerçek Auth→Edge→RPC ile9/9 native test95.887s’de geçti, kalan PG bağlantısı0. Kullanıcı yeni aday full clean istedi; son kaynak incelemesi sonrası tek koşu başlatılır, merge/main clean/CD kabulü ayrıca bekler. Eski iptal edilmiş koşuyu rerun etmek yeni test kaynağını kullanmaz.
+23 Ekim 2026. Belge tabanı main `bfb8ccb29a1e0ca9efde7813dc3af4bbbad8768d`. Frontend tasarım/istemci kodu Claude'un alanıdır; backend bu teslimde tasarıma müdahale etmez. Bu dosya Claude'un açıkça okutulacak başlangıç talimatıdır; repository'de kök `CLAUDE.md` veya `.claude` yapılandırması bulunmuyor. Dosyanın Claude tarafından kendiliğinden yüklendiğini varsayma.
 
-22 Ekim son kullanıcı kararı: P07-A+B+C tek Draft PR40 içinde bağımlılık sırasıyla geliştirilir ve birlikte merge edilir. Ayrı A/B/C merge/kabul döngüleri kaldırıldı. GitHub servisleri normale dönene kadar manuel CI, rerun, aday label ve merge başlatılmaz; geliştirme commitlerinde geçici `[skip ci]` kullanılarak push kaynaklı pahalı CI ertelenir. Workflow veya kabul kapısı değiştirilmez. Yerel odaklı doğrulamalar sürer. Servisler normale dönünce PR39 main39809302120 attempt6/CD39820836027 attempt2/OPS hosted kapanışı doğrulanmıştır; sırada tamamlanmış P07 için son kaynak bağımsız inceleme, tek aday full clean, merge ve aynı main clean/CD sırasıyla yapılır. Eski/skipped CI kabul değildir; P07 A8+B6+C8 kaynakları aynı Draft PR40 içinde uygulanmıştır. Son kaynak bağımsız inceleme ve gerçek Auth/Edge/worker aday/main clean kabulü ayrıca bekler; kaynak tamamlanması işletim kabulü değildir.
+## Önce okunacak kaynaklar
 
-22 Ekim güncel durum: OPS-W01 PR39, `d1830c89e3d5e7f3c90db7ef0953cc264b35205f` ile main’e birleşti. Aday39795678387 attempt5 kabulü doğrulandı; aynı main [39809302120 attempt6](https://github.com/SXQHex/FtkSaaS/actions/runs/39809302120/attempts/6) completed/success: source, core, API1–4 ve toplayıcı gerçek kabul adımları başarılıdır. Main retry işi kapandı. [CD39820836027 attempt2](https://github.com/SXQHex/FtkSaaS/actions/runs/39820836027/attempts/2) completed/success:18 kontrol,55/55 migration içeriği, pending[], Edge7 değişmeden ACTIVE/verify_jwt=true, RLS/EXECUTE, gerçek Auth→Edge→RPC smoke/advisors ve fixture temizliği geçti. Receipt artifact12445920610 SHA256 `a1261502037363f5bf77fdc2a714eb780f9ec42012484104bd53f6e922d87cb5`. Kullanıcı yetkisiyle22 Ekim20:32–20:33 (Türkiye) Cron2/3/4 kuruldu: p01/p05/p06 kendi LOGIN kimlikleriyle5sn çalışır; üçü healthy/idle, hata0. P06 disable sırasında tick4 sabit kaldı, enable sonrası6 oldu; açık tenant binding0/org0 olduğundan iş claim0. OPS-W01 kaynak/main/CD ve boş kuyruk hosted işletim kabulü kapandı. P07 taslak kaynakları hosted uygulanmadı. Yeni CI/CD koşusu şimdi tetiklenmez. P07 Draft PR40 kaynak envanteri: **200 sözleşme/200 geliştirme runtime/0 contract_only/59 migration/90 core tablo**. A8+B6+C8 kod yolları, typed DTO/validator/Edge ve append-only migration içinde uygulanmıştır. Fiziksel imha kanıtı eksikse gizlilik partial kalır; gerçek Auth→Edge/dedicated LOGIN/aday/main kabulü ayrıca bekler. Full clean/merge şimdi tetiklenmez; kapılar gevşetilmez. [P07-A devri](p07-a-handover.md).
+1. [AGENTS](../AGENTS.md), [kaynak indeksi](source-index.md), [tek güncel devir](../contracts/00-FtkSaaS-yeni-sohbet-devir.md).
+2. [Ürün](../contracts/01-FtkSaaS-urun-kapsam-sozlesmesi.md), [teknik sözleşme ve settings](../contracts/02-FtkSaaS-teknik-sozlesme.md#ayarlar-sozlesmesi-ve-davranis-sprinti), [alan sahipliği](../contracts/03-FtkSaaS-kodlama-sorumluluklari.md), [durum/hata/izin](../contracts/06-FtkSaaS-O4-durum-hata-izin.md).
+3. [08 makine sözleşmesi](../contracts/08-FtkSaaS-tip-ve-operasyon-sozlesmesi.json), [üretilmiş TypeScript operasyonları](../packages/contracts/src/operations.ts), [runtime adları](../packages/contracts/src/runtime.ts), [endpoint envanteri](endpoint-inventory.json).
+4. [Kalan işler](remaining-work.md), [üretim kuyruğu](production-queue.md), [hosted kurulum](remote-backend-setup.md). Modül devirleri işlem ayrıntısı için kullanılır; eski source/pending etiketleri güncel teslim durumunu belirlemez.
 
-P05 **done (kod, main ve geliştirme/test kabulü)**: [PR37](https://github.com/SXQHex/FtkSaaS/pull/37), kabul edilmiş main `83641447b29e459236aea1a9a4379b5d19825af6`;200 sözleşme/165 runtime/35 contract_only,53 migration/90 core tablo. Son head15e2126/base16cb570/tested merge2ebe087/tree736a75b; bağımsız son kaynak incelemesi5611074233, [aday39745672815](https://github.com/SXQHex/FtkSaaS/actions/runs/39745672815) ve [aynı main39748053581](https://github.com/SXQHex/FtkSaaS/actions/runs/39748053581) completed/success. [CD39750264949 attempt1](https://github.com/SXQHex/FtkSaaS/actions/runs/39750264949) success:18 kontrol,53/53 içerik eşleşmesi, P05 migration uygulandı, Edge6 ACTIVE/verify_jwt=true, RLS kapalı0/client RPC EXECUTE0 ve sentetik fixture temizliği. Receipt artifact12412499512 SHA256 `a41a8448c0a1b9dfdf853b58bea7cd56525fd8ede14812684b12619c3c8ee04e`. Eski aday hata kayıtları tarihsel kanıttır; bu kabulün kaynağı değildir.
+## Mevcut backend ve ortam
 
-P06 **done (kod, main ve geliştirme/test kabulü)**: [PR38](https://github.com/SXQHex/FtkSaaS/pull/38), main `006ad36918ae823bc10fbdefa2d48901e193121c`;200 sözleşme/178 runtime/22 contract_only,54 migration/90 core tablo. Son headf2f9d6c/base8364144/tested merge1901fc6/treeb486ffe; bağımsız review5614150102, [aday39779013518](https://github.com/SXQHex/FtkSaaS/actions/runs/39779013518), [aynı main39782197422](https://github.com/SXQHex/FtkSaaS/actions/runs/39782197422) ve [CD39785146645 attempt1](https://github.com/SXQHex/FtkSaaS/actions/runs/39785146645) success. CD18 kontrol/54 içerik eşleşmesi/Edge7 ACTIVE/verify_jwt=true/RLS kapalı0/client RPC EXECUTE0 ve fixture temizliği geçti; receipt12428881259 SHA256 `bcd1ab3255c1808982de76c3d09d47d5eaa95c5fb2e8f9f870d3fedc9ce93b65`. Önceki aday hataları tarihsel kanıttır. OPS-W01 PR39 main’e birleşti; aynı main clean attempt6/CD attempt2 ve hosted boş kuyruk işletim kabulü kapandı. P07-A Draft geliştirmesi son kullanıcı talimatıyla sürer; tenant config/binding uydurulmaz.
+200 sözleşme/200 callable runtime/0 contract_only;59 migration/90 core tablo/Edge8. P01–P07'nin kaynak/full-clean/main/CD kabulü kapandı. Son runtime main `4cfc9a55`; PR41 belge main `bfb8ccb2` yalnız belge kabulünden geçti, CD deploy skipped. Ayrıntılı run/tree/receipt kanıtları tek devirdedir. Yerel, henüz yayımlanmamış 208 API/60. migration settings taslağı kullanılmaz.
 
-PR36 operasyonel takip kapandı: aynı main [39644044693](https://github.com/SXQHex/FtkSaaS/actions/runs/39644044693) success; [CD39646391222](https://github.com/SXQHex/FtkSaaS/actions/runs/39646391222) success,18 kontrol,52/52 migration, pending[], Edge5 değişmeden ACTIVE/verify_jwt=true. Atomik Management API transport yeni migration olmadan da rollback probe ile doğrulandı. Bot/deneme hedefi hâlâ kullanıcı kararıyla ertelendi; hosted P05 worker kurulmuş değildir.
+Paylaşılan **geliştirme/test** hedefi `https://gwyprhenabtpkbojephw.supabase.co`; Edge yolu `/functions/v1/backend-v1/{operation}`. Bu ortamda gerçek ilk kurulum verileri var; reset/seed/test:clean çalıştırma ve gerçek kişiyi test fixture'ı yapma. İzole yerel ortam `npm run dev:start`, sentetik `npm run dev:seed`, bağlantı `npm run dev:info` ile hazırlanır. `docs/development-connection.json` içindeki eski22-migration ve report sayıları ilk kurulum snapshotıdır; güncel durum için kullanılmaz.
 
-P04 **done (kod ve kaynak kabulü)**: [PR35](https://github.com/SXQHex/FtkSaaS/pull/35), kabul edilmiş main `7b96d8866abb2c056d1b59a96afee0696a1187d6`;199 sözleşme/151 runtime/48 contract_only,52 migration/90 core tablo. Son head55c23dd, base920cdbb, tested merge901c64a, treee2011a6 kaynak zinciri; bağımsız son kaynak incelemesi ve [aday39630534660](https://github.com/SXQHex/FtkSaaS/actions/runs/39630534660) ile [aynı main39633243405](https://github.com/SXQHex/FtkSaaS/actions/runs/39633243405) completed/success doğrulandı. [CD39635569033 attempt2](https://github.com/SXQHex/FtkSaaS/actions/runs/39635569033/attempts/2) success:52/52 içerik eşleşmesi, Edge5 ACTIVE/verify_jwt=true,17 kontrol ve sentetik fixture temizliği. İlk CD'deki CLI migration hatası aşağıdaki operasyonel takipten ayrıdır; ikinci denemede eksik migration kalmadığı için o yol sınanmadı.
+İstemciye yalnız proje publishable key ve kullanıcı access tokenı verilir. Publishable key bu belgede yayımlanmaz; ortamın güvenli yapılandırmasından alınır. `service_role`, Management PAT, DB parolası ve public ingress/Turnstile secret'ı istemciye, kaynak koduna veya rapora konmaz. `.dev/frontend.env` ve sentetik giriş dosyaları yerel üretilir; gerçek parola/tokenlar paylaşılmaz.
 
-21 Ekim bot/deneme hedefi kararı sürer: alan adı/tenant/ürün/süre/tekrar limiti uydurulmaz. PR36 transport kapanışı ve yeni P05 kabul sınırı yukarıdadır; eski P04/CD-01 metinleri yeni kaynağa başarı taşımaz.
+## Tasarım kararı ile mevcut API ayrımı
 
-CD-01 **done**: PR32 kurulum + PR33 test fixture düzeltmesi sonrası kabul edilmiş main `0fabf3a4a605dd6be5a1d358c660021f59406e20`. [Main39588975421](https://github.com/SXQHex/FtkSaaS/actions/runs/39588975421) ve [ilk canlı CD39590690817/attempt2](https://github.com/SXQHex/FtkSaaS/actions/runs/39590690817/attempts/2) completed/success. CD receipt aynı source/main/run kabulünü bağlar;17 kontrol başarılı,49 migration içerik eşleşmesi,90 core tablo/RLS, anon/authenticated EXECUTE0, Edge backend-v1 v4 ACTIVE/verify_jwt=true. Gerçek Auth→Edge→RPC, oturum reddi ve fixture temizliği geçti; ayrıca uzak son0 hesap/0 Auth kullanıcısı/0 organizasyon doğrulandı. Envanter199/140 runtime/59 contract_only değişmedi. P04 CRM/public başvuru queued; başlamadı. Hosted worker işletimi, frontend, dış e-posta ve yük/restore bu kapanışla tamamlanmaz.
+| Ayar alanı | Kabul edilmiş hedef | Bugün kullanılabilen yol ve açık sınır |
+|---|---|---|
+| S01 Profil | Görünen ad, hitap, fotoğraf ve ayrı görünürlük | `account_get_v1` ve `account_profile_update_v1` yalnız display_name; yazma sürümü `management_state_get_v1` ile okunur. Hitap/fotoğraf/görünürlük alanları bu DTO'da yok. |
+| S02 Kimlik iletişim | Ad ve doğrulanmış iletişimin aktif bağlı orglara onaysız yansıması | Mevcut display_name komutu bu akışın bütünü değildir. Global yasal ad, e-posta/telefon doğrulama ve yayılma için alan bazlı API/sağlayıcı analizi bekler. |
+| S03 Bağlantılar | Güvenli mevcut kişiye bağlama, kaldırma ve yeni yetkiyle yeniden bağlama | `account_access_send/accept/revoke_v1`, `account_link_remove_v1`, `person_merge_*` mevcut komutlarıdır; her biri kendi yetkisine tabidir. Kullanıcının kendi bağlantısını kaldırma hedefi mevcut CM komutuna otomatik eşitlenmez. Abone numarası P08'dir. |
+| S04 Şifre | Ekle/değiştir/kurtarma ve kabul edilmiş oturum kapatma | `account_password_change_v1` challenge başlatır; tamamlama native Auth'tadır. `account_password_reset_request_v1` korumalı recover başlatıcısıdır. Kabul edilmiş tüm oturum temizliği ve dış teslim hazır varsayılmaz. |
+| S05 Sağlayıcı MFA | Güvenli ekleme/kaldırma, son giriş yöntemi koruması | Google/Apple/passkey/MFA yöntem seçimi ve gerçek sağlayıcı entegrasyonu açık; katalogdaki varlık destek kanıtı değil. |
+| S06 Oturumlar | Kendi oturumlarını gör/kapat; güven kaydını ayrı yönet | Mevcut canlı session kapıları oturum listeleme/etiketleme/tüm cihaz yönetimi API'si var anlamına gelmez. Yeni alanlar/sağlayıcı eşlemesi bekler. |
+| S07 Dil bölge saat | Hesap manuel/cihaz otomatik tercihleri; iş zamanı sabit | Genel tercih saklama DTO'su yok. İşlem saatleri mevcut Instant ve merkez saat dilimi kurallarıyla okunur; istemci görünüm tercihi iş zamanını değiştiremez. |
+| S08–S10 Görünüm ve bağlam | Erişilebilirlik, başlangıç, ekran/takvim tercihleri | Yerel görünüm tasarımı yapılabilir; hesapta kalıcı tercih senkronizasyonu mevcut200 API'de var sayılmaz. Yetki/alan filtreleri backend'den gelir. |
+| Bildirim tercihi | Ayrıntılı olay/kanal/sessiz saat grupları henüz açık | `notification_preferences_set_v1` ve yetkili management okuması mevcut. Amaçlar transactional/reminder/marketing; mevcut yol in_app, transactional=false ret. Enum'da email olması dış teslim kanıtı değildir; push/SMS yeni enum gibi eklenmez. |
+| Reklam ölçüm ve analitik | Üç ayrı tercih varsayılan açık/kapatılabilir; ayrıntılar açık | Tercih değeri rıza/dayanak değildir. Yeni SDK/toplama entegrasyonu bu belgeyle etkinleştirilmez. İzin, teknik etkinlik ve sağlayıcı desteği ayrı. |
+| Merkez/org/platform | Katalog aileleri aday; mevcut ürün korumaları kesin | Mevcut `policies_get/policy_publish`, availability, registry, belge/otomasyon ve abonelik komutları kullanılır. Generic settings read/write endpoint'i yayımlanmadı. |
 
-P03 **done**: [PR #30](https://github.com/SXQHex/FtkSaaS/pull/30), kabul edilmiş main `10710ffa90747a7e35c452c4c07ba59522f50ce3`. Son head2526347 / basece95a9d / tested merge1768fc2 / tree9ac328b aynı kaynak zinciridir. Bağımsız kaynak incelemesi PR review5594023911 içinde kayıtlı; [aday39527260056](https://github.com/SXQHex/FtkSaaS/actions/runs/39527260056) ve [aynı main39529992556](https://github.com/SXQHex/FtkSaaS/actions/runs/39529992556) completed/success.96 yapı +37 CI politika +27 DB +316 API =476 test düğümü; fail/skipped0,49 migration. Main13:18; aday13:34. Envanter199 sözleşme/140 runtime/59 contract_only,90 core tablo. Geliştirme/test Supabase aynı49 migration/Edge3 kaynağına eşitlendi; ayrı dokuz kontrollü Auth→Edge→RPC smoke ve fixture temizliği başarılı. P04 queued, başlamadı.
+S01–S10 ürün davranışları kabul edilmiş olmakla birlikte tüm alanlar uygulanmış değildir. Kalan altı kullanıcı teması ve C/O/P grupları tamamlanmadan yeni API alanı, değer veya sağlayıcı davranışı uydurma. Aynı durumun tasarım prototipi ile gerçek API kaydetme başarısını ayır; desteklenmeyen alan için sahte başarılı kayıt üretme.
 
-P02 **done**: [PR #28](https://github.com/SXQHex/FtkSaaS/pull/28), kabul edilmiş main `cc4878d09e45204dbc13ccfe1324b38b14548167`. Envanter **199 sözleşme / 133 runtime / 66 contract_only / 40 migration / 90 core tablo**. Son head `35816cc30a9b28e273e94e6cef86e8b402dbaad0` bağımsız incelemeden geçti; [hedefli39448566998](https://github.com/SXQHex/FtkSaaS/actions/runs/39448566998), [aday39455462417](https://github.com/SXQHex/FtkSaaS/actions/runs/39455462417) ve [aynı main39461804543](https://github.com/SXQHex/FtkSaaS/actions/runs/39461804543) completed/success. Full kapsam:96 sözleşme/yönetişim +37 CI politika +27 DB +309 API =469 test düğümü; fail/skipped0. Core, dört izole API shard, toplayıcı,40 migration, seed/health/advisors geçti. Main clean14:43; önceki43:33 hedefli koşu seri tüm-suite fallback kullandı, aynı çalışma profili değildir. Eski başarı yeni kaynağa taşınmaz.
+## İstek yanıt ve sürüm kuralları
 
-Geliştirme/test Supabase `gwyprhenabtpkbojephw`, kabul edilmiş main `0fabf3a4a605dd6be5a1d358c660021f59406e20` kaynağına otomatik CD ile eşitlendi:49 migration, Edge backend-v1 sürüm4, verify_jwt=true,140 runtime API. Uzak smoke ve geçici fixture temizliği başarılı; ayrıntılar docs/remote-backend-setup.md içindedir. Hosted worker zamanlayıcısı, ortak tenant/kullanıcı kurulumu, frontend gerçek entegrasyonu, yük/restore, dış e-posta ve production kabulü ayrı açık kalır.
+İnsan işlemleri `POST {API_URL}/functions/v1/backend-v1/{operation}` üzerinden doğrudan typed Request JSON ile yapılır. Başlıklar `Authorization: Bearer <Supabase access_token>`, `apikey: <publishable key>`, `Content-Type: application/json`. Named `/rest/v1/rpc` backend/service-only'dir; `core/private` tablolara doğrudan yazma veya SQL yoktur. `backend-v1 verify_jwt=true` korunur.
 
-[Hesaplaşma entegrasyonu](settlement-handover.md): dokuz yeni API, ayrı A/B yetki kapsamı, yalnız B onayında finansal commit ve bağlı düzeltme.
+- `request_id` ve gereken `operation_key` doğrulanmış UUIDv7; domain kimliklerini backend üretir, Auth sağlayıcı kimliği aynen kalır. Kullanıcı işlemi retry edildiğinde operation_key korunur; transport request_id değişebilir.
+- `expected_version` yalnız ilgili komut istiyorsa kullanılır. Okuma projeksiyonu ve hedef entity bağlamı tamdır. `account_get` bir profil write-version kaynağı değildir; management okuması kullanılır. Append-only policy_publish'e rastgele expected_version eklenmez.
+- Başarı yalnız HTTP200 değildir; `ok`, typed `data` ve iş sonucunu kontrol et. Hata `{ok:false,error:{code,retryable,trace_id}}`; metin parse etme. Timeout sonucu bilinmiyor demektir: aynı anahtar/status/replay yolu kullanılır. Yeni anahtarla kör tekrar yoktur.
+- Eski preview/sürüm, değişen yetki/plan/tenant, yetersiz hak/kontenjan/politika durumları ayrı ele alınır. Kural hatası otomatik retry ile çözülmez. Page/sort/cursor mevcut DTO sınırlarındadır.
+- Tanınmayan alanlar reddedilir; null/optional/false/sıfır aynı değildir. Backend'in döndürmediği yetkisiz alanı istemcide varmış gibi üretme. Sütun gizleme güvenlik değildir.
 
-## İstemci entegrasyonu için yaşayan kaynaklar
+Profil güncellemenin mevcut örneği (UUID alanları çalışma anında gerçek değerlerle doldurulur):
 
-- [Starter yoklama/koruma](starter-attendance-protection-handover.md): anlaşmasız Starter, etki/onay, kapanış ve düzeltme.
-- [Anlaşma/hakediş](instructor-earnings-handover.md): güncel Pro/Business kapanışı, açık fiilî başlangıç, immutable ücret ve bağlı fark.
-- [Takvim/seans/rezervasyon okumaları](schedule-read-handover.md) ve [program/seans](program-session-handover.md): DTO, zaman, görünürlük ve sürüm sınırları; eski teslim açıkları güncel envanterle karşılaştırılır.
-- [API kataloğu](../contracts/05-FtkSaaS-O4-API-katalogu.md), [makine sözleşmesi](../contracts/08-FtkSaaS-tip-ve-operasyon-sozlesmesi.json) ve [endpoint envanteri](endpoint-inventory.json): kesin işlem adları ve uygulama durumları.
-- [Kalan işler](remaining-work.md): tamamlanmamış tüketiciler ve P03 inceleme takip notu.
-
-Transport: POST {API_URL}/functions/v1/backend-v1/{operation}; typed request JSON, Authorization: Bearer Supabase access_token ve apikey: publishable key kullanılır. Yanıt ok/data/trace_id veya ok:false/error zarfıdır. Service-only RPC/core/private doğrudan istemci erişimi değildir. Tekrar gönderimde aynı business işlem anahtarı korunur; sürüm ve önizleme bağımlılıkları yeniden doğrulanır.
-
-Yerel bağlantı: Node 24.19.0, npm ci, npm run dev:start, npm run dev:seed, npm run dev:info. Adres ve publishable key bu checkout'tan alınır; eski Box adresleri ortak ortam değildir. npm run test:clean yalnız izole loopback kabul ortamı içindir. [Hosted kurulum kaydı](remote-backend-setup.md) aynı P03 main kaynağının49 migration/Edge3 eşleşmesini ve ayrı smoke kapsamını gösterir.
-
-Frontend gerçek uçtan uca kabulü ve yük/restore açık; mock kabul değildir. Dış e-posta ertelendi; Resend başlatılmaz. Production dağıtımı yapılmaz.
-
-## Tarihsel entegrasyon notları
-
-Aşağıdaki metinler önceki teslim snapshot'larıdır. Kurulum/transport ayrıntıları güncel typed sözleşmeyle doğrulanır; eski işlem sayıları ve kapanmış açıklar bugünkü durum değildir.
-
-
-[P01 devri](p01-handover.md): bütün P01 PR #22 ile main’e alındı; son hedefli ve aday clean başarılı. Aynı main clean 39401570751 completed/success doğrulandı; P01 done. Hosted/production worker kabulü ayrıdır.
-
-<details>
-<summary>Önceki entegrasyon notları (tarihsel)</summary>
-
-# Eğitmen anlaşması ve hakediş — güncel geliştirme kapsamı
-
-Başlangıç main: `ab3fca4af47b71b34a4a7b6d0df5211ad1e41141`; [aynı SHA CI](https://github.com/SXQHex/FtkSaaS/actions/runs/39042108296) başarılı: 27 migration, 341 test. Yeni kaynak için önceki başarı taşınmaz; son head inceleme/temiz CI ve merge main CI ayrıca doğrulanır.
-
-199 sözleşme, 95 çağrılabilir, 104 contract-only; 90 core tablo, 28 append-only migration. [Güncel anlaşma/hakediş devri](instructor-earnings-handover.md) yeni akışı ve sınırları tanımlar. Eğitmen ödeme komutları ve merkezler arası hesaplaşma runtime'ı bu teslim değildir. Önceki snapshot sayıları aşağıda tarihsel bağlamdır.
-
-# DS-2026-10-17 — güncel sözleşme ve CI devri
-
-## Starter yoklama/koruma teslimi — güncel kapsam
-
-[Starter devri](starter-attendance-protection-handover.md) zorunlu bağımlılıkları ve kalan tüketicileri tanımlar. 198 işlem / 89 canlı / 109 contract-only; 90 core tablo / 27 migration. Starter program → rezervasyon → etki/onay → korunan katılım → kapanış → gerekçeli düzeltme uygulanır. Ücretli finansal kapanış açıkça kapalı; başlangıç/belge ve diğer hak değişikliği tüketicileri pending. Son SHA’nın kanıtı PR’dedir; eski başarı taşınmaz.
-
-Doğrulanmış başlangıç: main `5265a70a0d29f91b9081a1ecbc2a8f0ff78668ee`; [aynı SHA CI](https://github.com/SXQHex/FtkSaaS/actions/runs/39030586306) başarılı: 322 test, 25 migration. Bu teslim yeni Starter runtime ve 26–27. migration’ı ekler; 198 sözleşmeli işlem, 89 canlı / 109 yalnız sözleşme. Başlangıcın başarısı yeni head’e taşınmaz; son CI/inceleme PR üzerinde aynı tam SHA’ya bağlıdır.
-
-[Karar sprinti devri](decision-sprint-handover.md), [kabul edilmiş kararlar](decisions/DS-2026-10-17.md), [F01–F33 haritası](feature-delivery.md), [main koruma denetimi](branch-protection-review.md). Yeni DS davranışları gerçek Auth → Edge → RPC kabulü bekler; sözleşme negatif testleri ve mevcut runtime regresyonu ayrı kanıttır. Son revizyon: docs/decisions/DS-2026-10-17-settlement-center-scope.md; kaynak/kanıt raporu: reports/settlement-center-scope-verification.json; son PR head inceleme ve tam temiz CI ayrıca doğrulanır.
-
-Mevcut runtime anlaşma/plan/koruma farkları açıkça delivery_gaps olarak kaydedildi. DS-OPEN-01 grantor konusu son revizyonla karar düzeyinde kapalıdır: Owner delege OM iznini yönetir; Owner veya delege OM merkez CM grantını yönetir. B onayı kayıt/bakiyeyi atomik kesinleştirir; ayrı OM kayıt adımı kaldırıldı. DS-OPEN-02 son merkez yetki düzeltmesiyle karar düzeyinde kapalıdır: aynı hesap gerekli A/B merkez yetkileriyle iki adımı yapabilir; A-only yetki B onayı sağlamaz. Audit her adımın merkez/rol/grant kapsamını kaydeder, fallback yoktur. Runtime pending. Klasik main koruması API 403 nedeniyle doğrulanamıyor; rulesets boş, yönetim yazması yapılmadı. PR #13 tarihsel merge yetkisi bu yeni PR’yi kapsamaz; repository yönetimi ayrı iştir; frontend, production ve Resend'e müdahale edilmez.
-
----
-
-Aşağıdaki önceki teslim kapsamları kendi kaynak snapshot’larıdır; güncel açık iş olarak yorumlanmaz.
-
-# Takvim/seans/rezervasyon okumaları — geliştirme uygulaması
-
-72 çağrılabilir / 112 yalnız sözleşme; 24 migration. `calendar_get_v1`, `session_get_v1`, `reservation_list_v1` kapsamı, canlı görünürlük, UTC aralık, cursor ve entegrasyon sınırları [okuma devrinde](schedule-read-handover.md). `products_list_v1` ürün kataloğudur; uygun satın alınmış paket seçimi için seans/kişi/sale bağlamı ayrıca aktarılmalıdır ve bu teslimin dışında kalır. Kaynak `9a5b2bd7ba71d25a259bf96851c2829bc4782c7c` üzerinde tam `npm run test:clean` geçti: 12 sözleşme + 27 DB + 182 Auth/API = 221 test, 24 migration, seed/health/advisors başarılı. [Kaynak raporu](../reports/schedule-read-verification.json). Son head temiz CI ayrıca doğrulanır. Aşağıdaki uygunluk/politika uygulama sayıları kendi kaynak snapshot'ıdır.
-
----
-
-## Uygunluk ve politikalar — geliştirme uygulaması
-
-Bu PR dört işlemi ekler: `availability_save_v1`, `availability_exception_save_v1`, `policies_get_v1`, `policy_publish_v1`. Toplam 184 işlemin 69'u geliştirme ortamında çağrılabilir, 115'i yalnız sözleşmedir; 23 append-only migration vardır. Kabul sonucu bu PR'nin son SHA'sının CI'ından ayrıca okunur. [Kaynak kapsam raporu](../reports/availability-policy-verification.json): a031f8142da4a2959232644c88fc911278ac5d06 üzerinde 12 sözleşme + 27 DB + 27 odaklı Auth/API testi, temiz 23 migration ve advisor kontrolü geçti; tam temiz PR/main CI ile aynı kanıt değildir.
-
-- Uygunluk kuralı oluşturma sürümsüz, güncelleme `rule_id + availability_rules.version` ister; kaynak türü/kimliği/merkezi değiştirilemez. Yerel saatler 00:00:00–23:59:59, başlangıç bitişten küçüktür; gece aralığı açıkça bölünür. Günler ISO 1–7; geçerlilik başlangıç dahil/bitiş hariçtir. UTC seans zamanları yerel uygunlukla karşılaştırılır; saat kaydırılmaz.
-- İstisna komutu mevcut istisnayı değiştirmez; yeni [starts_at,ends_at) engeli ekler. `expected_version`, seçili merkezin `centers_list.version` değeridir; merkez yapılandırma aggregate sürümü atomik artırılır. Mutation sürümü bu aggregate'in yeni sürümüdür, yeni istisna satırının sürümü değildir. İstisna mevcut seansı/rezervasyonu kendiliğinden iptal etmez.
-- Organizasyon politikası Owner/OM tarafından yayımlanır. Business merkez istisnası CM veya organizasyon okuyucusu tarafından yalnız mevcut tavsiye organizasyon politikası altında yayımlanabilir; merkez kendini zorunlu üst otorite yapamaz. Değerler açık typed input'tur; sayısal başlangıç uydurulmaz.
-- Politika sürümü org/merkez/key zincirinde append-only'dir. `expected_version` alanı bu istekte yoktur; organizasyon kilidi eşzamanlı yayınları sıralayıp `previous_id/version` zinciri üretir. Etkin zamanda her scope'un en yeni satırı alınır; zorunlu organizasyon sürümü, aksi hâlde merkez sürümü, ardından organizasyon sürümü uygulanır. Hâlen zorunlu organizasyon kuralı geçmiş effective_at ile de merkezden değiştirilemez. Gelecek yayın bugünkü sonucu değiştirmez; eski zorunlu sürüm daha yeni tavsiye sürümünü sonsuza kadar kilitlemez.
-- `policies_get_v1` etkin çözümlenmiş değerleri ve kaynak scope'u döndürür; `keys:[]` mevcut anahtarları listeler. Eksik politika listede yoktur; zorunlu tüketici eksik yapılandırmayı ayrıca reddeder. Owner/OM organizasyon okur, CM yalnız açıkça seçilmiş yetkili merkezi okur; öğrenci/personel için genel politika kataloğu erişimi verilmez.
-
-Mevcut tüketiciler:
-- `session_create_v1` kaynakları ve görevli kişileri uygunluk/istisna açısından denetler. Kaynak yapılandırılmamışsa `POLICY_NOT_CONFIGURED`, uygun değilse `RESOURCE_CONFLICT`; hiçbir kısmi seans/kaynak kaydı oluşmaz.
-- `reservation_create_v1` seansın etkin kaynak/görevlilerinin güncel uygunluğunu tekrar denetler. Esnek rezervasyonun açıkça yayımlanmış kayıt penceresi gerekir; pencere dışı `FORBIDDEN`. İstek ayrı yönetici istisnası/gerekçesi taşımadığı için `manager_exception:true` sessiz bypass açmaz.
-- Yeni rezervasyonun iptal politikası ortak zorunlu/miras çözümleyicisiyle seçilip ID ile sabitlenir. İptal eski snapshot'ı kullanır; typed `cancellation.terms` ve tarihsel düzleştirilmiş fixture biçimi desteklenir. Negatif kredi limitleri ve blocked etkinlik kredi politikası aynı hiyerarşiyi kullanır.
-
-Açık bağımlılıklar ve sınırlar:
-- Program önizleme/uygulama, seans değişiklik/atama ve talep/bekleme/yer teklifi API'leri hâlâ yalnız sözleşmedir; bu PR onları uygulamaz.
-- Yapılandırma değişikliği mevcut rezervasyonu iptal etmez, geçmiş hak/borç/hakediş hesaplamaz. Etkilenen mevcut kayıtları gösterip yetkili düzeltme uygulayan akış henüz yoktur.
-- Süre dışı gerekçeli yönetici rezervasyonu için mevcut istek yetersizdir; ayrı teknik aktarım gerekir. Genel `request_window`, borçlu rezervasyon/katılım, belgeler, bildirim/CRM, dondurma ve hassas işlem eşikleri için tüketici kabulü bu dört API'nin kaydedebilmesinden çıkarılamaz.
-- Yapılandırma okuması politika için mevcuttur; uygunluk listesi/istisna düzenleme API'si bu dört işlem arasında yoktur. Birden fazla kuralın birleştirilmesiyle gece/gün aşan seans uygunluğu bu uygulamada desteklenmez.
-- Hosted geliştirme backend'inin önceki 65 işlem smoke'u tarihsel kanıttır; bu PR'nin 69 işlemli temiz kabulüyle karıştırılmaz. Frontend gerçek entegrasyon ve yük/restore açık; dış e-posta ertelendi, Resend başlatılmadı; production dağıtımı yok.
-
----
-
-# FtkSaaS backend — tarihsel Claude devri
-
-## Önceki doğrulanmış başlangıç — PR #8
-
-Kaynak main `b9bd9c110f0cf4a121eac6ef0752945de99b10ac`; [PR #8](https://github.com/SXQHex/FtkSaaS/pull/8) birleşmiş; [aynı SHA’nın main CI’ı](https://github.com/SXQHex/FtkSaaS/actions/runs/38993548576) başarılı. 22 migration, 181 test (12 sözleşme + 27 DB + 142 Auth/API); 184 operasyonun 65’i çalışan geliştirme uygulaması, 119’u yalnız sözleşme. Bu kanıt belirtilen kaynak içindir; sonraki commit’in CI sonucu ayrıca doğrulanır.
-
-Uzak geliştirme/test Auth → Edge → RPC smoke [ayrı rapordadır](../reports/remote-backend-verification.json); 181 testin uzak projede tekrarı değildir. Geçici fixture temizlendi; ortak tenant/kullanıcı girişi sağlanmadı. Dış e-posta ertelendi; Resend entegrasyonu başlatılmayacak. Yük/restore ve frontend gerçek entegrasyon kabulü açık; production dağıtımı yok.
-
-184 sözleşmeden **65 çağrılabilir / 119 yalnız sözleşme**. `room_save_v1` atomik kapasite, sürüm, tekrar ve rollback; `roles_list_v1` canlı organizasyon/merkez yetkisi, plan erişimi, cursor kapsamı ve `as_of` snapshot sözleşmesiyle çalışır. Owner sanal rol satırı değildir. Mevcut seans/etkinlik kapasitesi yeniden yazılmaz. Önceki 18 migration korunur; 19–21 oda/rol uygulaması ve iki düzeltmedir. Kanıt: `reports/room-role-verification.json`.
-
-## Kullanıcının bildirdiği kalıcı backend hedefi
-
-Supabase `gwyprhenabtpkbojephw` (FtkSaaS, eu-central-1) kullanıcı tarafından geliştirme/test olarak doğrulandı. 21 uygulama migration’ı kuruldu; 22. migration hosted PostgREST’i yerel `api_v1` şema ayarıyla eşleştirir. `core/private` dışarı açılmaz; 65 wrapper yalnız service_role içindir. `backend-v1` Edge Function, doğrulanan main bundle’ından JWT kontrolü açık olarak kuruldu. 90 core tabloda RLS açık; anon/authenticated EXECUTE sıfır. Gerçek Auth → Edge → RPC smoke sonuçları `reports/remote-backend-verification.json` içindedir. Bu smoke 181 testlik yerel/CI kabulünün uzaktan tekrarı değildir; frontend, dış e-posta ve yük/restore kabulü açıktır. Production dağıtımı yasağı sürer. Ayrıntı: `docs/remote-backend-setup.md`.
-
-
-## Kurulum ve gerçek bağlantı
-
-Node 24.19.0 ve sabit lockfile kullanılır:
-
-```sh
-git clone --branch main https://github.com/SXQHex/FtkSaaS.git
-cd FtkSaaS
-npm ci
-npm run dev:start
-npm run dev:seed
-npm run dev:info
-npm test
+```json
+{
+  "client_api_version": 1,
+  "request_id": "<UUIDv7>",
+  "operation_key": "<işlem boyunca sabit UUIDv7>",
+  "expected_version": 1,
+  "display_name": "Yeni görünen ad"
+}
 ```
 
-`dev:info` her checkout için gerçek loopback API/functions adresi, publishable key ve Mailpit bağlantısını üretir. Süreli eski Box URL'leri veya sabit ortak staging varsayılmaz. Servis anahtarı/secrets frontend'e veya repository'ye konmaz. Geliştirme sentetik veri kullanır; dış e-posta teslimi tamamlanmış değildir. Yerel davet teslimi için `scripts/deliver-dev-invitations.mjs` ve Mailpit kullanılır.
+Bu yalnız şema örneğidir; expected_version=1 varsayılmaz, management okumasından gelir. Kullanıcı ad/soyad/iletişim yayılma hedefinin tamamını temsil etmez.
 
-`npm run test:clean` yalnız checkout'ın loopback DB'sini sıfırlar; 22 migration ve boş tenant/Auth/receipt durumu doğrulanır, ardından testler, sentetik seed, sağlık ve DB advisors çalışır. `npm run dev:stop` ortamı durdurur. Özel bağlantı ve reset logları paylaşılmaz.
+## Yetki zaman ve iş sonuçları
 
-## Tarihsel uygulama kanıtları ve kapsam
+Owner olmak CM operasyon yetkisi vermez. Merkez, disiplin, plan, canlı bağlantı/grant ve alan görünürlüğü her istek için backend'de doğrulanır. Rol/görünüm seçimi veya kayıtlı filtre yeni yetki üretmez. Aynı kişi A ve B merkezlerinde açık yetkiliyse hesaplaşmanın iki tarafını da yapabilir; A-only B onayı vermez.
 
-Yeni kişi/merkez/disiplin uygulaması [PR #6](https://github.com/SXQHex/FtkSaaS/pull/6) içindedir. İncelenen uygulama `e4252981871f3aa911257342cde6ebf5f79f82c1`: iki temiz CI çalışmasında 169/169 test (12 sözleşme + 27 DB + 130 gerçek Auth/API), 18 migration, seed/sağlık/advisors başarılı; son inceleme bulgusuz. Kanıt `reports/registry-verification.json` dosyasındadır. Her sonraki belge head’i ve main merge CI’ı ayrıca doğrulanır. Önceki fiilî başlangıç kabulü 148/148 testi kapsıyordu; yeni head için kanıt yerine kullanılamaz.
+UTC Instant, merkez iş saati ve kullanıcının görüntüleme saati ayrıdır. Kullanıcının tarih/saat biçimi veya timezone seçimi seansın gerçek zamanını, iptal parasal sınırını veya paket geçerliliğini değiştirmez. Erişim kaybolunca eski ekrandaki veri ve seçenekler kullanılmaz; başka tenantın varlığı hatadan açıklanmaz.
 
-Her yeni head ve merge için [Actions](https://github.com/SXQHex/FtkSaaS/actions) sonucu ayrıca denetlenir. `reports/actual-start-verification.json` güncel işin kanıt kapsamını, `reports/qe03-verification.json` Q-E03 kapsamını belirtir. Eski verification/resumed/Q-E01/Q-E02/RC3 dosyaları tarihsel snapshot'tır; yeni head kabulünü kanıtlamaz. Makine envanteri `docs/endpoint-inventory.json`, insan okunur API kataloğu `contracts/05-FtkSaaS-O4-API-katalogu.md` ve kapalı tipler `contracts/08-FtkSaaS-tip-ve-operasyon-sozlesmesi.json` esas alınır. Yalnız sözleşme işlemleri gateway'de `NOT_FOUND` döner.
+## Sağlayıcı ve yaşam döngüsü sınırları
 
-## Transport, Auth ve işlem tekrarı
+Dış e-posta/Resend, gerçek frontend entegrasyon kabulü ve yük/restore açık. Native Mailpit kabulü dış teslim kanıtı değildir. Public başvuruda JWT gateway credential, signed ingress, Turnstile hostname/action ve hız kapıları mevcut P04 sözleşmesine tabidir; iki web formu için telefon tabanlı genel CRM kabulü P08'dir. Güvenlik/bot kapıları kaldırılarak demo yapılmaz.
 
-`POST {API_URL}/functions/v1/backend-v1/{operation}`; doğrudan typed Request JSON gövdesi, `Authorization: Bearer <Supabase access_token>`, `apikey: <publishable key>`, `Content-Type: application/json`. Başarı `ok/data/trace_id`, hata `ok:false/error` zarfıdır. Frontend core/private tablolara veya service-only named RPC'lere doğrudan erişmez.
+`account_delete_*` ve `organization_*` lifecycle komutları mevcut; fiziksel imha kanıtı eksikse partial/pending ve completed_at=null korunur. Kullanıcının talebi iptal etme veya kişisel veri export akışının tamamı otomatik hazır sayılmaz. Beş Cron'un idle çalışması gerçek iş yükü veya fiziksel imha kanıtı değildir.
 
-Aktör, canlı Auth oturumu/hesap/organizasyon bağlantısı/rol ve merkez yetkisinden alınır. Request rol veya actor beyanı yetki vermez. Owner tek başına merkez operasyonu yapamaz; merkez yöneticiliği gerekir. Owner atama/devri platform işlemidir. Abonelik, plan ve tenant sınırları her komutta denetlenir.
+## Claude teslim kontrolü
 
-Frontend `request_id` ve mutasyon `operation_key` üretmek zorundaysa doğrulanmış UUIDv7 kullanır; domain kayıt ID'leri backend'den gelir. Auth sağlayıcı kimlikleri aynen korunur. Aynı kullanıcı işleminin tekrarında operation_key korunur; request_id yenilenebilir. Aynı anahtar/farklı business içerik `IDEMPOTENCY_PAYLOAD_MISMATCH` döner. Belirsiz transport sonucu yeni anahtar üretme nedeni değildir. Retryable geçici hatalarda en fazla üç otomatik retry; sürüm/izin/kontenjan/politika engellerinde kör retry yoktur.
+- Tasarımda kullanılan her kayıt yolu için gerçek operation + request/response alanı + permission + sürüm/preview kaynağı yazılır. API boşluğu mevcut iş kuyruğuna sözleşme önerisi olarak iletilir; backend source/migration Claude tarafından değiştirilmez.
+- Yalnız callable sözleşmeye uyan mock gerçek entegrasyonun yerine geçmez. Yeni kabul edilmiş ekran davranışı statik tasarımda gösterilebilir; buna hayali endpoint veya başarılı kaydetme yanıtı eklenmez. Üretimde mock fallback yoktur.
+- Gerçek testler sentetik kullanıcı/tenant ve yetkili ortamda yapılır; paylaşılan gerçek kurulum verisi resetlenmez. Başarı, ret, erişim geri alma, stale version, timeout/replay ve alan gizliliği kabulü ayrı kanıtlanır.
+- Ortak tipler elle kopyalanmaz. Güncel package yolu `packages/contracts` ve üretilmiş operations.ts'dir; kullanıcı tarafından kararlaştırılmış `packages/api-contracts` düzenleme hedefi mevcut dosya yolu gibi import edilmez. Solito kullanılmaz; monorepo reorganizasyonu backend davranışını değiştirmez.
+- Kendi frontend tasarımını/istemci kodunu kendi alanında sürdür. Bu backend belge teslimi frontend framework, ekran yerleşimi veya deployment değişikliği yapmaz. Main merge production izni değildir.
 
-`expected_version` güncel hedef sürümüdür. Stale preview yeniden alınır; başarılı sonuç aynı key ile replay edilir. Domain + audit + receipt + notification/outbox tek transaction'dır. Yeni preview tokenı değişen payload olduğu için yalnız rollback olmuş/receipt yazılmamış işlemde aynı anahtar kullanılabilir. Tüm istemciler ortak üretilmiş tipleri kullanır; mock gerçek entegrasyon değildir.
-
-## Çalışan işlem grupları
-
-Tam adlar ve sınırlar endpoint envanterindedir. Başlıca gruplar:
-- Hesap/organizasyon, platform owner devri.
-- Merkez, yönetici/rol/permission atama ve geri alma; öğrenci aktivasyonu ve hesap erişimi daveti.
-- Disiplin/merkez-disiplin, abonelik ödeme doğrulaması ve erişim kapıları.
-- Paket/satış, tahsilat, borç düzeltmesi, öğrenci alacağı iade/mahsup ve ortak hak bakiyesi.
-- Ders rezervasyonu ve ortak havuz/kapasite yarışına ilişkin yazma yolları.
-- Etkinlik kaydetme/yayınlama/okuma/listeleme, hazırlık/kayıt/iptal, yoklama/kapanış/düzeltme, gerçekleşme ve görev doğrulaması.
-- Fiilî başlangıç: `event_actual_start_record_v1`, `event_actual_start_correct_v1`.
-
-Organizasyon kilidi canlı yetki ve ortak havuz mutasyonlarını sıralar; yük testi yerine geçmez. Ortak haklar disiplin başına çoğaltılmaz. Q-D01: tek etikette uygun dar/geniş paket, sıfır/çok etikette yalnız uygun geniş paket; etkinlik negatif kredi yaratmaz. Paket tarihleri merkez saat dilimi snapshot'ında başlangıç dahil/bitiş hariçtir. Satış merkezinin para borcu ile hizmet merkezinin hak/earning aidiyeti ayrıdır.
+## Mevcut finans ve etkinlik entegrasyon ayrıntıları
 
 ## Q-E01 — ödeme hazırlığı ve kesin kayıt
 
@@ -195,26 +112,4 @@ Ayrıntılı request/response ve kurallar: `docs/actual-start-handover.md`. İki
 `event_get` current `actual_started_at` döndürür. Yönetici/organizasyon okuyucusu `actual_start_history` içindeki actor/time/reason/diff geçmişini de görür; diğer izinli okuyucular audit gerekçelerini görmez. İptal sonrasında geriye kayıt/düzeltme yapılabilir, state yeniden açılmaz. Published/occurred/cancelled korunur; draft ret. Sürüm artışı eski iptal önizlemesini stale yapar; yeni preview aynı Q-E02 hesabını uygular.
 
 Bu yalnız operasyonel kanıttır. Q-E03 katılımcı sınıflandırması, Q-E02 hesaplaşması, yoklama, haklar ve earning kendiliğinden değişmez. Kısmi gerçekleşmeden yeni parasal kural türetilmez.
-
-## Kaynak üretimi ve kalan işler
-
-`npm run generate` ortak tipleri, minimal Edge contract/validator/bundle ve katalog/endpoint envanterini üretir; `npm run verify` drift'i reddeder. Yeni değişiklik ayrı branch/PR ve append-only migration ile yapılır. Önceki 11 migration korunmuştur; 12–18. migration yeni registry işlemleri, kişi görünürlüğü ve okuma sürümlerini taşır. Eski wrapper kaynağı tarihsel migration ile sabittir; güncel üretilen wrapper `database/runtime-wrappers-current.sql` dosyasındadır. Yeni API'nin DB kurulumu yeni migration ile taşınır. Historical/transfer scriptleri güncel sözleşmeye körlemesine uygulanmaz.
-
-119 işlem yalnız sözleşme düzeyindedir; tam liste ve bağımlılık sırası `docs/remaining-work.md` içindedir. Kalıcı geliştirme/test backend kurulmuştur; ortak tenant/kullanıcı erişimi sağlanmadı. Dış e-posta ertelendi; Resend başlatılmayacak. Yük/restore ve frontend gerçek entegrasyon kabulü açıktır; production dağıtımı yapılmadı. Frontend kodu/tasarımı Claude'un alanıdır. `vercel.json` main otomatik dağıtımını kapalı tutar; merge production izni değildir.
-
-## Yeni kişi/merkez/disiplin entegrasyonu
-
-- `organization_update_v1`: org.manage; organizasyonun güncel `expected_version` değeri. `organization_get` ve `organizations_list` artık `version` döndürür.
-- `center_update_v1`: seçili merkez yöneticisi; güncel merkez sürümü, ad ve IANA saat dilimi. `centers_list` artık `version` döndürür. Değişiklik geçmiş seansların UTC zamanlarını veya satış saat dilimi snapshot’larını yeniden hesaplamaz.
-- `disciplines_list_v1`: owner/OM organizasyon kataloğu; CM yalnız erişilebilir atanmış merkezlerinde aktif olarak sunulan aktif disiplinlerin projeksiyonu; diğer roller reddedilir; `page` zorunlu; desteklenen sıralama `created_at_asc`. Yanıt `items/next_cursor`, `as_of` içermez.
-- `person_discipline_set_v1`: aynı organizasyon/merkez/disiplin; aktif ilişki için aynı merkezde eşleşen öğrenci/eğitmen ilişkisi gerekir. Öğrenci aktifleştirme veya login/rol grantı yerine geçmez. Güncelleme güncel ilişki sürümünü ister; `person_get.discipline_relationships[].version` ile okunur.
-- `student_deactivate_v1`: mevcut merkez öğrenci ilişkisini kapatır. Açık talep/alternatif, rezervasyon, bekleme/yer teklifi, etkinlik kaydı veya hazırlanmış ödeme engeldir. Süresi dolmuş aktif yer teklifi ve bağlı offered liste kaydı aynı kilit/transaction içinde kapanır; geciken worker tek başına pasifliği engellemez. Borç/hak ve hesap/rol bağları silinmez. Başka merkez öğrenci ilişkisi bu komutla kapatılmaz.
-- `person_get_v1` / `people_list_v1`: owner/OM organizasyon okumaları; merkez operasyon okuyucuları seçili merkezle ilişkili kişiler; öğrenci yalnız kendi kaydı; canlı görevlendirmesi olan I/A gerekli katılımcı alanları. I/A iletişim alanını alamaz. Merkez seçiliyse başka merkez ilişkileri yanıta konmaz. Mevcut kişilerde aktif merkez ilişkisi aranır. İlk ilişki kurulmadan önce yalnız teknik oluşturma kaydıyla aynı merkeze ait kişi açılır; kökeni bilinmeyen ilişkisiz kayıtlar kapalı kalır. Pasif ilişki operasyon okuma/yazma yetkisi vermez. Kişi listesi `created_at_asc`; cursor aynı filtre/kapsama bağlıdır.
-- `person_update_v1`: CM veya açık person.manage personel grantı; hedef kişinin aktif merkez ilişkisi (ilk ilişki öncesinde aynı oluşturma merkezi) ve güncel kişi sürümü gerekir. Contacts patch’i listeyi değiştirir; aynı kind/value kanıtı korunur, yeni adres doğrulanmış sayılmaz. Auth kimliği veya hesap bağlantısı değiştirilmez.
-
-İşlem adı ortak tiplerden seçilir. Yeni yazmalar da aynı receipt/audit/outbox transaction ve canlı yetki kontrolünden geçer. Görünürlükte rol/bağ geri alma bir sonraki istekte geçerlidir. Yeni bir ürün iptal, para veya hakediş kuralı eklenmedi.
-
-</details>
-
-P01 request_window istisna DTO'su create/offer_alternative/accept_alternative için optional window_exception ve reason içerir. True yalnız politika izinli canlı CM'nin açık, gerekçeli işlemidir; varsayılan false, eksik politika kapalı. Son kapsam ve yeni runtime kabulü docs/p01-handover.md içindedir.
 

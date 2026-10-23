@@ -1,4 +1,21 @@
-# FtkSaaS — güncel devir
+# FtkSaaS güncel devir
+
+## 23 Ekim 2026 güncel kaynak ve kabul
+
+- Belge tabanı main `bfb8ccb29a1e0ca9efde7813dc3af4bbbad8768d` (PR41); 200 yayımlanmış operasyon, 0 yalnız sözleşme, 59 migration, 90 core tablo. P08 veya yeni settings API’si yayımlanmadı.
+- P07 PR40 son head `5e5bec8beb9fa0d0990ff32f4bad7a9115124e28`, aynı incelenmiş/test edilmiş tree `49214064f8325dd8da121e24aa2d55004a3e1669`; [aday39863852941](https://github.com/SXQHex/FtkSaaS/actions/runs/39863852941) success sonrası normal merge `4cfc9a55ca8ff8ccf723d91d98abe33e47311d54`.
+- [Aynı runtime main39866466608](https://github.com/SXQHex/FtkSaaS/actions/runs/39866466608): gerçek core/API1–4/toplayıcı success. [CD39869023193](https://github.com/SXQHex/FtkSaaS/actions/runs/39869023193): 18 kontrol, 59 migration içerik eşleşmesi, Edge8 ACTIVE/JWT, 90 core tabloda eksik RLS0/uygulama RPC client EXECUTE0, gerçek Auth→Edge→RPC ve sentetik fixture temizliği. Receipt artifact12465975149 SHA256 `964841e1b0ccc0623c63f966b63976da745b95592ace300478ddeb93ecb3c106`. Receipt pending_migrations listesi dağıtım öncesi dört dosyadır; başarılı readback sonrasında kalan eksik migration anlamına gelmez.
+- PR41 [belge39872819806](https://github.com/SXQHex/FtkSaaS/actions/runs/39872819806), [main39873010292](https://github.com/SXQHex/FtkSaaS/actions/runs/39873010292) success: kaynak bağlı yalnız-belge kabulüdür; yeni runtime full clean değildir. [CD39873101014](https://github.com/SXQHex/FtkSaaS/actions/runs/39873101014) source success/deploy skipped; yeni dağıtım sayılmaz. Aynı head'deki targeted39877930243 cancelled; kabul kanıtı değildir.
+- 23 Ekim 05:04 Türkiye hosted salt-okuma kontrolü: p01/p05/p06/p07/p07_privacy beş Cron5sn/active; beşi enabled/idle, failed0/claimed0. p07 ticks1620, privacy ticks1620; p07 bir gerçek org scope, privacy aynı org + global null scope. Quote TTL3600sn/reauth900sn kullanıcı seçimiyle kuruldu. Yeni P07 hatlarında temel kurulum/heartbeat doğrulandı; gerçek iş yükü, yeni hosted kesinti/disable-restart ve fiziksel imha kanıtı bununla kapanmaz.
+
+## Frontend başlangıcı
+
+[Ayarlar sözleşmesi](02-FtkSaaS-teknik-sozlesme.md#ayarlar-sozlesmesi-ve-davranis-sprinti) S01–S10 ürün davranışlarını taşır. [Entegrasyon devri](../docs/claude-handover.md) callable alanları ve açık bağımlılıkları ayırır. Kullanıcı tüm ayar davranışları netleşmeden runtime geliştirmesini durdurdu; yalnız belgeler güncelleniyor. 208 API/60. migration içeren yerel ayar taslağı kaynak kabulü değildir ve yayımlanmamıştır.
+
+## Önceki devir snapshotları
+
+Aşağıdaki eski geliştirme/CI durumları kendi tarihlerine aittir; yukarıdaki kapanışı yeniden açmaz. Kabul edilmiş ürün hükümleri son kararlarla çelişmediği ölçüde geçerlidir.
+
 
 22 Ekim API-3 teşhisi: [aday39852699702](https://github.com/SXQHex/FtkSaaS/actions/runs/39852699702) kullanıcı tarafından iptal edildi; kabul değildir. Registry sonrasında açık kalan PostgreSQL bağlantısının nedeni P07 lifecycle fixture cleanup’ındaki `DROP OWNED` yetki hatasıdır. Dar düzeltme ve süre sınırlı tanılama yalnız ilgili suite üzerinde doğrulanır; [kanıt ve kapsam](../docs/p07-a-handover.md#api-3-registry-sonrası-kapanış-teşhisi). Profil/merge iki test beklentisi de ürün/SQL kodu değiştirilmeden düzeltildi; temiz59 migration ve gerçek Auth→Edge→RPC ile9/9 native test95.887s’de geçti, kalan PG bağlantısı0. Kullanıcı yeni aday full clean istedi; son kaynak incelemesi sonrası tek koşu başlatılır, merge/main clean/CD kabulü ayrıca bekler. Eski iptal edilmiş koşuyu rerun etmek yeni test kaynağını kullanmaz.
 
