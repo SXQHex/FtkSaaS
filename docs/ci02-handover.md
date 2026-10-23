@@ -10,7 +10,7 @@ Son actual main **0ade7877cc16fc121095decbc276f2fbc868607e**, basea0325d7cdace18
 
 [Performans](ci-performance.md) aynı kaynak seri/dört-shard ölçümünü ve yeni main sürelerini ayırır. Rutin geliştirmede hızlı/birikimli hedefli, son hazır runtime/CI adayı için açık full clean, merge sonrası aynı main full clean; güvenli yalnız-belge için ayrı source-bound belge kabulü aktiftir. Unknown/mixed/runtime girdisi, Draft/development ve eksik/skipped/başarısız zorunlu iş kapalıdır. Yeni trusted CI politika değişikliği otomatik kabul almaz; mevcut kaynak bazlı kurulum izinleri başka kaynağa taşınmaz.
 
-P01 ve CI-02 done; P02 henüz başlamadı. Hosted worker, frontend/production, Resend, yük/restore ve repository yönetim ayarları bu teslimin kabulü değildir. Sonraki kaynak kabulü ayrıca doğrulanır.
+Bu kapanış anında P01 ve CI-02 done, P02 henüz başlamamıştı. 23 Ekim güncel durumda P01–P07 kaynak kabulü kapalı, beş hosted worker temel kurulumu tamamdır. Frontend/production, Resend, yük/restore ve repository yönetim ayarları CI-02 kabulü değildir; güncel açıklar remaining-work.md içindedir.
 
 <details>
 <summary>Önceki dilimler ve hata teşhisleri — kaynaklarına ait tarihsel süreç</summary>

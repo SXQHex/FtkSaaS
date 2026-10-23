@@ -1,4 +1,4 @@
-> **Güncel kaynak sınırı:** Bu dosyanın eski teslim sayıları kendi kaynak snapshot’ıdır. Güncel main 7577b2f1873c6b1fcf83390bfa94a34374c44082, 199/118/81 ve 34 migration; kaynak/CI [tek devirde](../contracts/00-FtkSaaS-yeni-sohbet-devir.md), güncel açık işler [kalan işlerde](remaining-work.md) izlenir.
+> **23 Ekim kaynak sınırı:** Yayımlanmış toplam 200 API / 0 contract_only / 59 migration. Aşağıdaki eski sayılar ilgili modülün ilk teslim kaydıdır. Son kaynak ve kabul [güncel devirde](../contracts/00-FtkSaaS-yeni-sohbet-devir.md); gerçek açıklar [kalan işlerde](remaining-work.md) izlenir.
 
 > DS-2026-10-17 kabulü plan/anlaşma ve korunan rezervasyon hedefini değiştirir. Bu dosya önceki runtime kapsamını anlatır; yeni hedef ve açık farklar [sprint devrinde](decision-sprint-handover.md).
 
@@ -43,5 +43,5 @@ Cursor keyset'tir; aktör/işlem/tenant/merkez/filtre/sort bağını doğrular; 
 
 `tests/schedule-reads.test.mjs` gerçek Supabase Auth → Edge → service-only RPC zincirini kullanır; sentetik ilişki/seans/rezervasyon fixture'ları DB'de kurulur, ayrıca güncel seans yazma → okuma bağlantısı doğrulanır. DB/Auth yetki kaldırma fixture'ı kullanılması, henüz uygulanmayan hesap erişimi veya görev kaldırma komutunun kabul edildiği anlamına gelmez.
 
-Sözleşme/tip/envanter kontrolleri, temiz migration, tüm regresyon, seed/health/advisors ve son head CI ayrı kanıttır. Kaynak raporu: [schedule-read-verification](../reports/schedule-read-verification.json). Hosted geliştirme backend'ine bu 72 işlem kurulmuş sayılmaz. Program/seans, yoklama/hakediş ve P01 talep/bekleme/uygun hak seçimi sonraki teslimlerde uygulanmıştır. Public discovery, frontend gerçek entegrasyon ve yük/restore açık kalır; bu eski okuma raporu onların güncel kabulü değildir. Production dağıtımı yok; dış e-posta ertelendi.
+Sözleşme/tip/envanter kontrolleri, temiz migration, tüm regresyon, seed/health/advisors ve son head CI ayrı kanıttır. Kaynak raporu: [schedule-read-verification](../reports/schedule-read-verification.json). Bu ilk rapor hosted kabulü değildir; sonraki P07 CD kabulünde 200 runtime işlem/59 migration/Edge8 doğrulandı. Program/seans, yoklama/hakediş ve P01 talep/bekleme/uygun hak seçimi sonraki teslimlerde uygulanmıştır. Public discovery API'si P04 ile canlıdır; gerçek hostname/Turnstile/signed gateway ve deneme konfigürasyonu kabulü ayrıdır. Frontend gerçek entegrasyonu ve yük/restore açık kalır. Production dağıtımı yok; dış e-posta ertelendi.
 

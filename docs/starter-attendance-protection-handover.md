@@ -1,6 +1,6 @@
 # Starter yoklama ve kesin rezervasyon koruması devri
 
-Güncel durum ve kaynak/CI: [doğrulanmış devir](../contracts/00-FtkSaaS-yeni-sohbet-devir.md). Aşağıdaki 198/89/109 ve 27 migration sayıları PR #14 teslim snapshot’ıdır; güncel envanter P01 sonrasında 199/118/81 ve 34 migration’dır.
+Güncel durum ve kaynak/CI: [doğrulanmış devir](../contracts/00-FtkSaaS-yeni-sohbet-devir.md). Aşağıdaki 198/89/109 ve 27 migration sayıları PR #14 teslim snapshot’ıdır; 23 Ekim yayımlanmış envanter 200 API / 0 contract_only / 59 migration’dır. P02 hak değişikliği/koruma ve P05 belge tüketicileri sonradan kabul edildi; eski açık tüketici ifadeleri ilk PR kapsamını anlatır, güncel açık liste değildir.
 
 Başlangıç: main `5265a70a0d29f91b9081a1ecbc2a8f0ff78668ee`; aynı SHA’nın başarılı [CI çalışması](https://github.com/SXQHex/FtkSaaS/actions/runs/39030586306). Başlangıcın 322 testi yeni head’in kabulü değildir. Son PR head/inceleme/temiz CI kanıtı PR üzerinde aynı tam SHA’ya bağlanır.
 
@@ -22,14 +22,14 @@ Yetkili merkez yöneticisi Starter ders/programını anlaşmasız oluşturur; me
 
 Koruma yalnız değişikliğin neden olduğu olumsuz etkiye bağlıdır. Önceden bağımsız uygunsuz kayıt etkisiz politika yayımıyla muaf olmaz. Sabit yükümlülük/negatif toplam tavanı ve borç kimlikleri tutulur; sonraki bağımsız engel affedilmez. Yayınlanmış ama gelecekte etkinleşen politika altında arada yetkilendirilmiş kaydın gerçek booking kanıtı korunur. Kaynak/uygunluk engelleri kaldırılmaz; yeni kayıt güncel koşullara tabidir. Koruma iptal, borç silme veya yeni hak üretmez.
 
-## Açık tüketiciler ve sınırlar
+## İlk teslimden sonra tamamlanan tüketiciler ve kalan sınırlar
 
-- Politika/kişisel limit dışındaki `credit_adjust`, `sale_scope`, `entitlement_extend` impact türleri `POLICY_NOT_CONFIGURED`; altyapı kurulması uygulama değildir.
-- Kredi düzeltme, satışın kabul edilmiş kapsam değişikliği, geçerlilik uzatma, dondurma/erken bitirme, hak sonlandırma koruma tüketicileri pending. Satışla geçmiş açık kapama ve settled deficit’in sonradan yoklama düzeltmesi ayrı teslimdir; allocation kanıtı olmayan settled deficit correction başarı göstermez.
+- İlk PR’de politika/kişisel limit dışındaki impact türleri kapalıydı. `credit_adjust`, `sale_scope`, `entitlement_extend` P02 ile uygulanıp kabul edildi; güncel çağrılar yayımlanmış DTO ve etki onayına tabidir.
+- Kredi düzeltme, kapsam değişikliği, uzatma, dondurma/erken bitirme ve sonlandırma P02 ile kabul edildi. Satışla geçmiş açık kapama ve bağlı hesaplaşma sonraki tüketicilerde uygulanmıştır; allocation kanıtı olmayan settled deficit correction başarı göstermez.
 - Başlangıç anını otomatik gözlemleyen ders katılım tüketicisi henüz yok. Taslağın `evaluated_for` değeri gerçek değerlendirme zamanıdır; başlangıç snapshot’ı değildir. Geç kapanışta bugünkü bakiyeden geçmiş başlangıç türetilmez; kanıt eksik diye kabul edilmemiş toplu kapanış engeli konmaz. Başlangıç öncesi taslak ile başlangıç arasındaki bağımsız uygunluk değişiminin tam kabulü pending.
-- Pro/Business finansal kapanış/düzeltme, anlaşma zinciri ve hakediş PR #15 ile uygulanmıştır. Merkezler arası hesaplaşma uygulanmıştır; eğitmen ödeme komutları P03’te açıktır.
+- Pro/Business finansal kapanış/düzeltme, anlaşma zinciri ve hakediş PR #15 ile uygulanmıştır. Merkezler arası hesaplaşma uygulanmıştır; eğitmen ödeme komutları P03 ile uygulanıp kabul edilmiştir.
 - Eski satış/rezervasyona blocked-policy snapshot’ı geri doldurulmaz. Eksik tarihsel koşulda ilgili blocked sonucu POLICY_NOT_CONFIGURED; diğer katıldı/no_show yolu koşulları varsa çalışır.
-- P01 mevcut yayımlanmış rezervasyon belge gerekliliklerini dar olarak tüketir. Genel belge API’leri/yoklama tüketicileri ve geniş DS-PROT-03 kabulü açık kalır; P05 kapsamı P01 ile tamamlandı sayılmaz.
+- P01 dar rezervasyon belge kapısı, P05 genel belge API’leri/yoklama tüketicileri sonradan kabul edildi. P01 fixture’ı tek başına P05 kabulü değildir; güncel kaynak kanıtı tek devirde ayrılır.
 - Frontend, production, Resend ve main koruması değişmedi. Bu kapsam notu güncel merge yetkisi belirlemez; son açık kullanıcı talimatı esas alınır.
 
 ## Kanıt ayrımı

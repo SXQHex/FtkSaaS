@@ -1,3 +1,5 @@
+> 23 Ekim 2026 güncel durum: P01–P07 kod/main/geliştirme-test kabulü kapandı; yayımlanmış kapsam **200 API / 0 contract_only / 59 migration / 90 core tablo / Edge8**. P07 runtime kaynağı `4cfc9a55`; güncel belge tabanı `bfb8ccb2`. Beş Cron hattı aktif ve boş kuyrukta healthy/idle; fiziksel imha ve gerçek yük kabulü tamamlanmış değildir. Ayar davranış sprinti ve güncel entegrasyon sınırları [tek devir](../contracts/00-FtkSaaS-yeni-sohbet-devir.md) ve [ayarlar sözleşmesinde](../contracts/02-FtkSaaS-teknik-sozlesme.md#ayarlar-sozlesmesi-ve-davranis-sprinti). Eski tarih/CI/pending snapshotları yeni durum kanıtı değildir; ürün kuralları yalnız son açık kararla değişir.
+
 # Eğitmen anlaşması, ücretli yoklama kapanışı ve hakediş
 
 PR #15 main’e birleşmiştir. Güncel uygulama SHA’sı, bağımsız son-head incelemesi, head CI ve merge sonrası temiz CI kanıtları [doğrulanmış devirde](../contracts/00-FtkSaaS-yeni-sohbet-devir.md) birlikte bulunur. Başlangıç main ab3fca4af47b71b34a4a7b6d0df5211ad1e41141 önceki teslim referansıdır.
@@ -20,10 +22,10 @@ Gerekçeli correction preview, sabit orijinal koşullardan hak ve finans farkın
 
 ## Ayrı kalanlar ve üçüncü teslim bağlantısı
 
-- `instructor_payment_record_v1` / `instructor_payment_correct_v1` contract_only; okuma mevcut dağıtım verisini gösterebilir. Kabul fixture'ındaki geçmiş ödeme, bu iki API'nin uygulanmışlığı değildir.
+- `instructor_payment_record_v1` / `instructor_payment_correct_v1` P03 ile runtime ve kaynak kabulüne geçti. İlk PR'nin geçmiş ödeme fixture'ı bu sonraki kabulün kanıtı değildir. Tutarı karşılandıktan sonraki kullanılmayan earning_ids kapsam doğrulaması iyileştirmesi kalan işlerde açıktır.
 - A→B ledger ve Owner/delege OM/CM yetki, başvuru/onay, mahsup/bağlı düzeltme runtime’ı sonraki hesaplaşma tesliminde uygulanmıştır; [hesaplaşma devri](settlement-handover.md) güncel davranış ve kabul sınırıdır. Eğitmen hakedişi ve merkez payı ayrı kayıtlardır.
 - Üçüncü teslim satış net tutarı/product credits paydası, tüketim allocation/reservation/closure, hizmet merkezi, gerçekleşme beyanı ve settled deficit allocation kanıtını kullanır. Orijinal earning snapshot'ı sonradan satışla değiştirilmez.
-- management_state_get_v1 P01 talep/alternatif/bekleme/teklif sürüm okumalarını da destekler; diğer eşlenmemiş selector’lar uygulanmış sayılmaz. P01 dar rezervasyon belge kapısı mevcut; genel belge/yoklama tüketicileri, otomatik başlangıç gözlemi ve diğer hak değişikliği koruma tüketicileri açık kalır.
+- management_state_get_v1 hedefi ilgili operation_contract üzerinden seçilir; selector keyfi genel tablo sorgusu değildir. P02 hak değişikliği/koruma ve P05 belge/yoklama tüketicileri sonradan uygulandı. Otomatik başlangıç gözlemcisi bu kabulden türetilmez; açık Instant ile attendance_start akışı kullanılır.
 - Frontend, production, Resend ve repository yönetimi değişmez. Yük/restore ve frontend gerçek entegrasyon kanıtsız kapatılmaz.
 
 ## Kabul ayrımı

@@ -1,6 +1,8 @@
 # P01 — talep, rezervasyon ve bekleme devri
 
-## 20 Ekim 2026 — P01 birleşti; belge senkronizasyonu
+23 Ekim: P01 tamamlanmıştır. Toplam yayımlanmış kapsam 200 API/59 migration; P01 dedicated worker kurulumu ve gerçek organizasyona scope bağlama tamamlandı, boş kuyrukta idle heartbeat doğrulandı. Gerçek talep/teklif iş yükü ve ölçek kabulü bu kurulumdan çıkarılmaz. Kaynak kanıtı [güncel devirde](../contracts/00-FtkSaaS-yeni-sohbet-devir.md).
+
+## 20 Ekim 2026 — P01 kaynak kabul kaydı
 
 Uygulama kaynağı main `7577b2f1873c6b1fcf83390bfa94a34374c44082`, [PR #22](https://github.com/SXQHex/FtkSaaS/pull/22); aday head `97f0b46d2277791339398aa47a1882630787dba9`. Envanter **199 sözleşme / 118 çağrılabilir / 81 yalnız sözleşme; 34 migration**. Çağrılabilirlik bütün ürün/hosted/production kabulü değildir.
 

@@ -1,6 +1,6 @@
 # FtkSaaS — Q-E01 kabul kararı
 
-Tarih: 16 Ekim 2026. Durum: Kullanıcı tarafından kabul edildi; ana sözleşme ve teknik aktarım bekliyor.
+Tarih: 16 Ekim 2026. Durum: Kullanıcı tarafından kabul edildi; sonraki ana sözleşme/teknik aktarım ve kabul [Q-E01 teknik devrinde](Q-E01.md) kayıtlıdır. Aşağıdaki görevler ilk kararın kabul ölçütleridir, güncel açık iş listesi değildir. Merkez iptalinde sonraki Q-E02, katılımcı parasal sınırında Q-E03 önceliklidir.
 
 ## 1. Paketsiz, ücretli ve tam ödeme şartlı etkinlik
 

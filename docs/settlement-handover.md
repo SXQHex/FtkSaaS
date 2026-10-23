@@ -1,4 +1,4 @@
-> **Güncel kaynak sınırı:** Bu dosyanın eski teslim sayıları kendi kaynak snapshot’ıdır. Güncel main 7577b2f1873c6b1fcf83390bfa94a34374c44082, 199/118/81 ve 34 migration; kaynak/CI [tek devirde](../contracts/00-FtkSaaS-yeni-sohbet-devir.md), güncel açık işler [kalan işlerde](remaining-work.md) izlenir.
+> **23 Ekim kaynak sınırı:** Yayımlanmış toplam 200 API / 0 contract_only / 59 migration. Aşağıdaki eski sayılar ilgili modülün ilk teslim kaydıdır. Son kaynak ve kabul [güncel devirde](../contracts/00-FtkSaaS-yeni-sohbet-devir.md); gerçek açıklar [kalan işlerde](remaining-work.md) izlenir.
 
 # Merkezler arası hesaplaşma — üçüncü teslim
 
@@ -34,5 +34,5 @@ Owner/OM rolü veya idari grant yönetimi operasyon yetkisi yaratmaz. Organizasy
 
 `tests/cross-center-settlement.test.mjs` gerçek Auth → Edge → RPC testidir; büyük kapsam testindeki sentetik ledger fixture'ı tahakkuk üretim kanıtı değildir, onay kapasitesi testidir. Ayrı ders/satış testleri gerçek tahakkuk ve terslemeyi doğrular. Yapısal governance/AJV/enum kontrolleri davranış kabulü değildir. Nihai kaynak kabulü tam `npm run test:clean` ve son head bağımsız incelemesiyle bağlanır.
 
-Eğitmen ödeme API'leri, satış kapsam değişimi/backdate yönetim akışı, diğer hak koruma tüketicileri, frontend gerçek entegrasyonu ve yük/restore ayrı açık işlerdir. Hosted eski smoke ne bu teslimin 104 işlem snapshot’ının ne P01 sonrası 118 işlemin uzaktan kabulüdür. Dış e-posta ertelendi; Resend başlatılmaz. Production dağıtımı yapılmaz.
+Eğitmen ödeme API'leri P03, satış kapsamı/backdate ve hak koruma tüketicileri P02 ile sonradan kabul edildi. P03'te tutar karşılandıktan sonraki kullanılmayan earning_ids kapsam doğrulaması iyileştirmesi açık kalır; ödeme akışının bütünü eksik değildir. Frontend gerçek entegrasyonu ve yük/restore açıktır. Eski smoke bu ilk teslimin kabulü değildir; güncel 200 runtime/59 migration/Edge8 hosted kanıtı tek devirdeki P07 CD receipt'idir. Dış e-posta ertelendi; Resend başlatılmaz. Production dağıtımı yapılmaz.
 

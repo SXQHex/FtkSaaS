@@ -1,13 +1,12 @@
+> 23 Ekim 2026 güncel durum: P01–P07 kod/main/geliştirme-test kabulü kapandı; yayımlanmış kapsam **200 API / 0 contract_only / 59 migration / 90 core tablo / Edge8**. P07 runtime kaynağı `4cfc9a55`; güncel belge tabanı `bfb8ccb2`. Beş Cron hattı aktif ve boş kuyrukta healthy/idle; fiziksel imha ve gerçek yük kabulü tamamlanmış değildir. Ayar davranış sprinti ve güncel entegrasyon sınırları [tek devir](00-FtkSaaS-yeni-sohbet-devir.md) ve [ayarlar sözleşmesinde](02-FtkSaaS-teknik-sozlesme.md#ayarlar-sozlesmesi-ve-davranis-sprinti). Eski tarih/CI/pending snapshotları yeni durum kanıtı değildir; ürün kuralları yalnız son açık kararla değişir.
+
 # FtkSaaS — Kodlama sorumlulukları ve model yetki sınırları
 
-## 20 Ekim 2026 — yürürlükteki çalışma kararı
+## 23 Ekim 2026 yürürlükteki çalışma kararı
 
-[AGENTS.md](../AGENTS.md), [CI-2026-10-20](../docs/decisions/CI-2026-10-20.md) ve [üretim kuyruğu](../docs/production-queue.md) aşağıdaki eski kurulum/durum notlarının üstündedir. Güncel kaynak main 7577b2f1873c6b1fcf83390bfa94a34374c44082; P01 birleşti; aynı main clean 39401570751 completed/success doğrulandı, P01 done. CI-02 otomasyonu henüz uygulanmadı.
+[AGENTS](../AGENTS.md), [settings sözleşmesi](02-FtkSaaS-teknik-sozlesme.md#ayarlar-sozlesmesi-ve-davranis-sprinti) ve [Claude talimatı](../docs/claude-handover.md) geçerlidir. P01–P07 kabulü kapandı; şimdi frontend başlangıcı için belge eşitlemesi ve davranış karar sprinti yürür. Yeni settings runtime geliştirmesi kullanıcı tarafından durduruldu. Belge onayı, UI tasarım kararı ve çalışan API ayrı teslimdir.
 
-Bölüm boyunca tek Draft/development PR ve hedefli CI; bitince son-head incelemesi/açık aday full clean, merge sonrası main full clean esastır. Güvenli yalnız-belge farkları belge kabulüyle clean olmadan kapanacaktır; karma/runtime/CI farkı istisna değildir. Dört shard ayrı backend/DB ve eksiksiz sonuç doğrulaması kullanır. Her biten dilimde etkilenen belgeler aynı PR'de güncellenir; çalışan clean'in SHA'sı sırf durum için değiştirilmez.
-
-Bu sohbet karar/denetim ve açıkça istenen belge eşitlemesi içindir; uygulama ve CI değişiklikleri BackendCoder'dadır. Mevcut açık koşullu merge yetkisi kendi kapsamıyla geçerlidir; üretim kuyruğu tek başına yeni merge/production veya repository yönetim yetkisi vermez. Tarihsel raporlar yeniden yazılmaz.
-
+CI-02 otomasyonu kuruludur. Geliştirmede Draft/development ve birikimli hedefli doğrulama; runtime/CI son adayda kaynak bağlı full clean, merge sonrası aynı main full clean; incelenmiş güvenli yalnız-belge kaynağında ayrı belge kabulü. Mevcut kapı veya izin listesi bu görevle değiştirilmez. Önceden verilen somut yetki tekrar onaylatılmaz; genel üretim kuyruğu frontend/production/repository yönetim yetkisi vermez.
 
 > **Güncel öncelik: Q-E02 · 0.2.0-rc.3.** Kullanıcının 16 Ekim 2026 son iptal kabulü önceki çelişen merkez iptali hükümlerinin yerine geçer. Güncel davranış/kanıt: docs/decisions/Q-E02.md, docs/claude-handover.md ve reports/qe02-verification.json. Aşağıdaki eski durum/test sayıları tarihsel kayıttır; teknik aktarım bekleyen işler tamamlandı sayılmaz.
 
@@ -30,7 +29,7 @@ FtkSaaS bağımsız yeni projedir. Eski studioSaaS kodu/tablosu/kuralları incel
 | İş modeli, veri/API/yetki sözleşmesi | ChatGPT; ürün davranışını değiştiren kararları kullanıcı kabul eder. |
 | Supabase şema, migration, RPC, Edge Functions, backend testleri | ChatGPT |
 | Frontend tasarım, ekran, görsel dil, kullanıcı akışı, istemci kodu ve frontend testleri | Claude; ChatGPT bu tasarım/koda müdahale etmez. |
-| Ortak API tipleri | Backend sözleşmesinden üretilir; modeller ayrı elle tip kopyaları oluşturmaz. Araç/dil/paketleme teknik hazırlıkta seçilecek. |
+| Ortak API tipleri | Backend sözleşmesinden üretilir; modeller ayrı elle tip kopyaları oluşturmaz. Mevcut üretilmiş paket packages/contracts yolundadır; packages/api-contracts reorganizasyon hedefi uygulanmış dosya yolu gibi kullanılmaz. |
 | Uçtan uca kabul | Gerçek test backend’iyle ayrıca doğrulanır; yalnız alan testleri veya mock yeterli değildir. |
 
 Modeller birbirinin alanını doğrudan değiştirmez; eksik/değişiklik ihtiyacını sözleşme üzerinden bildirir. ChatGPT API/kabul senaryosu ve entegrasyon etkisini sağlar, Claude tanımlı API’yi kullanır ve eksiklik bildirir. Frontend kontrolü backend yetkisini veya bütünlük kuralını ikame etmez. Model adları sorumluluk etiketidir; kendiliğinden ortam/hafıza/erişim paylaşımı varsayılmaz.
@@ -97,7 +96,7 @@ Belge paketi revizyonu: 2.1. Bu bölüm önceki çelişen disiplin, paket kapsam
 
 **Teknik aktarım durumu:** D01–D09 kapsamı şema, API, izin ve ortak tiplerde mevcuttur; Q-D01 etkinlik kapsamı/negatif kredi ve ortak hak akışı uygulanmıştır. İlk aktarım tarihindeki açık listesi güncel iş listesi değildir; bugün kalanlar docs/remaining-work.md ve kaynak bağlı kabul kayıtlarında izlenir.
 
-Bu sohbet uygulama kararları içindir. Kurulum, tablo/API dönüşümü, migration ve test uygulaması ayrı teknik sohbette yürütülür. Claude frontend, ChatGPT backend sorumluluğu korunur.
+Güncel kullanıcı görevi ve AGENTS çalışma sınırı esastır. Bu belge teslimi runtime/migration/istemci değişikliği başlatmaz. Claude frontend, ChatGPT backend sorumluluğu korunur.
 
 ## 15 Ekim 2026 — U01–U08 UUIDv7 standardı (kabul edildi)
 

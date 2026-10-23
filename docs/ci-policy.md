@@ -78,4 +78,8 @@ Test-only PR33 headfab366c5 bağımsız review5598374267, hedefli39585487735 (ik
 
 [CD39590690817 attempt1](https://github.com/SXQHex/FtkSaaS/actions/runs/39590690817/attempts/1), variable değeri TRUE olduğu için yazma öncesi yapılandırma kontrolünde durdu. Kullanıcı değeri true düzeltti; yalnız başarısız CD işleri yeniden çalıştırıldı, main full CI tekrarlanmadı. [Attempt2](https://github.com/SXQHex/FtkSaaS/actions/runs/39590690817/attempts/2) source/deploy success;17 kontrol geçti,49 migration/Edge4 ve fixture temizliği doğrulandı. İlk canlı CD kabulü tamamlandı. Ayrıntı/işletim/token rotasyonu [uzak backend kurulumundadır](remote-backend-setup.md).
 
-CD aynı kaynak bağlı main kabulüne dayanır; belge kabulü full runtime kanıtı yerine geçmez. Kabul edilmiş runtime ile araya giren yalnız-belge main’in SHA’ları ayrı bağlanır; her yazma aşamasında run/attempt/işler ve güvenli belge eşdeğerliği yeniden doğrulanır. Gelecekteki trusted politika değişikliklerine bu PR’nin kurulum izni taşınmaz. P04 sıradadır; frontend, dış e-posta, worker işletimi ve yük/restore açık kalır.
+CD aynı kaynak bağlı main kabulüne dayanır; belge kabulü full runtime kanıtı yerine geçmez. Kabul edilmiş runtime ile araya giren yalnız-belge main’in SHA’ları ayrı bağlanır; her yazma aşamasında run/attempt/işler ve güvenli belge eşdeğerliği yeniden doğrulanır. Gelecekteki trusted politika değişikliklerine bu PR’nin kurulum izni taşınmaz. Bu 21 Ekim CD-01 kapanışında P04 sıradaydı. Sonradan P01–P07 kaynak ve beş worker temel kurulum kabulü tamamlandı; frontend, dış e-posta ve yük/restore açık kalır.
+
+## 23 Ekim dokümantasyon teslimi
+
+P01–P07 kaynak kabulü kapanmıştır. Frontend/settings belge eşitlemesi yalnız incelenmiş source-bound belge yolundan geçer; yeni runtime kabulü gibi raporlanmaz. PR41 main39873010292 belge kabulü/CD deploy skipped örneğidir. Bilinmeyen/mixed yol aynı kapı tarafından reddedilir; izin listesi/CI workflow bu belge göreviyle değiştirilmez.

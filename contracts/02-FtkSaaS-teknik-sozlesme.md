@@ -1,6 +1,4 @@
-> **20 Ekim güncel durum:** P01 PR #22 main `7577b2f1873c6b1fcf83390bfa94a34374c44082` ile birleşti; 199 sözleşme / 118 çağrılabilir / 81 yalnız sözleşme / 34 migration. Eski teslim sayıları ve pending notları kendi kapsamına aittir. [Tek güncel devir](../contracts/00-FtkSaaS-yeni-sohbet-devir.md) aynı SHA’nın gerçek başarılı main CI kanıtını gösterir; P01 done. [CI-2026-10-20](../docs/decisions/CI-2026-10-20.md) dört shard, Draft/development ve belge-only kararını içerir; otomasyon CI-02’de bekliyor. Bu karar ürün/izin/finans davranışını değiştirmez.
-
-> 22 Ekim güncel uygulama kabulü: P01–P06/PR38 kapalı; main006ad36,200 sözleşme/178 runtime/22 contract_only,54 migration/Edge7. Aday39779013518/main39782197422/CD39785146645 başarılı. OPS-W01 Supabase Cron kaynak adayı55 migration taşır; native hosted işletim kabulü beklenir. [Tek devir](00-FtkSaaS-yeni-sohbet-devir.md) güncel kanıttır; eski snapshotlar tarihsel bağlamdır.
+> 23 Ekim 2026 güncel durum: P01–P07 kod/main/geliştirme-test kabulü kapandı; yayımlanmış kapsam **200 API / 0 contract_only / 59 migration / 90 core tablo / Edge8**. P07 runtime kaynağı `4cfc9a55`; güncel belge tabanı `bfb8ccb2`. Beş Cron hattı aktif ve boş kuyrukta healthy/idle; fiziksel imha ve gerçek yük kabulü tamamlanmış değildir. Ayar davranış sprinti ve güncel entegrasyon sınırları [tek devir](00-FtkSaaS-yeni-sohbet-devir.md) ve [ayarlar sözleşmesinde](02-FtkSaaS-teknik-sozlesme.md#ayarlar-sozlesmesi-ve-davranis-sprinti). Eski tarih/CI/pending snapshotları yeni durum kanıtı değildir; ürün kuralları yalnız son açık kararla değişir.
 
 > Güncel öncelik: [DS-2026-10-17](../docs/decisions/DS-2026-10-17.md). Çelişen eski hükümler yalnız belirtilen kapsamda yürürlükten kalkmıştır. [Hedef sözleşme/runtime ayrımı](../docs/decision-sprint-handover.md).
 
@@ -719,3 +717,340 @@ opening_credit_value_minor özgün tam paket net değeridir; kalan kredi miktar�
 Rapor dosyası private DB byte nesnesidir (core.files + private.p06_export_files), Storage public linki değildir.7 gün sonra indirme kapanır; her authenticated Edge POST güncel özgün rapor/merkez/alan/plan yetkisini kontrol eder. Upload bucket'ı özel,2MiB teknik tavanlı CSV'dir; tenant limitleri private.p06_configuration'da açık kurulum değerleri ister.5000 satır/16MiB export teknik tavanları iş/ücret politikası değildir. Büyük sonuç kesilmez; belirlenmiş byte sınırını aşarsa iş açık hata verir.
 
 İşlem/önizleme kurtarma, bu migration'dan sonra yakalanan özgün yetki bağlamına dayanır. Eski kayıtta bağlam yoksa fail-closed NOT_FOUND; aynı hesapta olmak tek başına sonuç yetkisi değildir. Önizleme tokenı yalnız private,15 dakika süreli kurtarma bağlamında bulunur; audit diff kapalı güvenli alan listesidir. Worker dedicated LOGIN + org binding, claim/60sn lease, en çok3 art arda başarısız deneme ve25 satırlık batch kullanır. Hosted zamanlayıcı ve kesinti işletim kabulü OPS-W01 olarak ayrıca gereklidir.
+
+<a id="ayarlar-sozlesmesi-ve-davranis-sprinti"></a>
+
+## Ayarlar sözleşmesi ve davranış sprinti
+
+23 Ekim 2026 belge eşitlemesi. Bu bölüm dört kapsamın tek settings sözleşmesidir; Word v0.1 inceleme taslağı bundan sonra ayrı otorite değildir. Kaynak API: `bfb8ccb29a1e0ca9efde7813dc3af4bbbad8768d`; son runtime tam kabulü `4cfc9a55ca8ff8ccf723d91d98abe33e47311d54`. Davranış kararı, callable API, native sağlayıcı desteği ve işletim kabulü ayrı durumlardır. 200 mevcut endpoint'in tamamlanması yeni ayar alanlarının uygulanmış olduğu anlamına gelmez.
+
+### Durumların anlamı
+
+- **Kabul edildi:** Kullanıcının açık kararı; aşağıdaki S01–S10 gruplarının davranışı kesinleşti. API/DTO/istemci desteği ayrıca eşlenecek.
+- **Kabul edilmiş tasarım kuralı:** Sözleşme incelemesinde kabul edilen koruma/analiz gereksinimi; seçenek içeren ayrıntılar ayrıca kararlaştırılır.
+- **Aday:** U/C/O/P kataloğundaki henüz grup bazında onaylanmamış özellik ailesi. Özellik veya sağlayıcı geliştirme taahhüdü değildir.
+- **Açık:** Varsayılan, sağlayıcı, alan veya uygulama seçimi henüz sonuçlanmadı. Sayısal değer veya davranış uydurulmaz.
+- **Mevcut API:** Yalnız 08 makine sözleşmesi, implemented.json ve endpoint envanterinde yayımlanmış 200 operasyon. Ayrı yerel settings taslağındaki 208 operasyon/60. migration yayımlanmadı; kullanılmaz.
+
+### Kabul edilmiş kullanıcı davranışları
+
+| Grup | Durum | Bağlayıcı davranış |
+|---|---|---|
+| S01 Profil | Kabul edildi | Görünen ad hesap genelindedir; organizasyonun ad/soyad veya geçmiş belge alanı yerine geçmez. Tercih edilen hitap isteğe bağlı ve kaldırılabilir. Fotoğraf yüklenir/değiştirilir/kaldırılır; platform dosya sınırları korunur. Yükleme diğer katılımcılara görünürlük izni vermez. |
+| S02 Kimlik ve iletişim | Kabul edildi | Ad/soyad kaydetmeyle güncellenir. Yeni e-posta/telefon doğrulanana kadar eski doğrulanmış değer geçerlidir; bekleyen değer yayılmaz. Aynı alandaki yeni talep eski bekleyen talebi/kodu geçersizleştirir; e-posta ve telefon ayrı izlenir. Giriş/kurtarma sağlayan iletişim başka hesaba bağlıysa ret; otomatik hesap/CRM birleştirme yoktur. Aktif güvenli hesap–kişi bağı güncel ad/doğrulanmış iletişim kaynağıdır; org onayı aranmaz. Kopya zorunluysa sürümlü yayılma/tekrar denenir, eksik yayılma tamamlandı gösterilmez. Eski/yeni değer denetimi korunur. Tamamlanan iletişim değişikliği eski doğrulanmış kanala güvenlik bildirimi üretir; teslimat hatası değişikliği geri almaz. |
+| S03 Hesap–kişi bağlantısı | Kabul edildi | Hesapsız kişi güvenli davet/doğrulamayla mevcut kişi kaydına bağlanır; ikinci kişi yaratılmaz. Güncel hesap bilgisi esas alınır, önceki bilgiler geçmişte kalır. İç not/öğrenci durumu/borç/hak/görev org içinde kalır. Bağ kaldırılınca org erişimi ve gelecekteki otomatik yayılma durur; kişi/abone/iş geçmişi silinmez. Yeniden bağlanma yeni güvenli işlem ister; aynı kişi doğrulanırsa numara korunur, eski yetkiler canlanmaz. Birden fazla aday kayıt varsa yetkili inceleme/birleştirme gerekir. Bağ kaldırma, üyelik sonlandırma ve hesap silme ayrıdır. |
+| S04 Şifre ve kurtarma | Kabul edildi | Şifresiz giriş hesabı desteklenen güvenli yeniden doğrulama sonrası şifre ekleyebilir. Şifre değişiminde mevcut oturum korunur, diğerleri kapatılır. Kurtarma yalnız mevcut doğrulanmış kanala tek kullanımlık/süreli kanıtla gider; yanıt hesabın varlığını açıklamaz. Sıfırlama tamamlanınca kurtarma oturumu dahil tüm oturumlar kapanır, yeniden giriş gerekir. Süre/rate/deneme limitleri platforma aittir; değerleri henüz seçilmedi. Tamamlanan işlem pazarlamadan bağımsız güvenlik bildirimi üretir; dış teslimat ayrı kanıttır. |
+| S05 Giriş yöntemleri ve MFA | Kabul edildi, sağlayıcı seçimi açık | Eklemede mevcut hesap yeniden doğrulanır ve yeni sağlayıcı hesabı doğrulanır; aynı e-posta bağlama kanıtı değildir. Başka hesaba bağlı yöntem reddedilir. Son kullanılabilir giriş yöntemi kaldırılamaz. Desteklenirse passkey ekle/adlandır/kaldır; MFA kurulum kanıtıyla etkinleşir, değiştirme/kaldırma mevcut güvenlik doğrulamasını ister. Platform zorunluluğu aşılamaz; orgun rol şartı diğer orglara kendiliğinden taşınmaz. Desteklenirse kurtarma kodları tek kullanımlıktır; yenilemede eskiler geçersiz, sırlar log/audit dışıdır. Erişim kaybında ayrı kurtarma; org yöneticisi global güvenliği sıfırlayamaz. Google/Apple/passkey/MFA yöntem listesi henüz seçilmedi. |
+| S06 Cihaz ve oturum | Kabul edildi | Mevcut oturum, başlangıç/son etkinlik ve bilinen cihaz/tarayıcı gösterilir; tahmin kesinlik gibi sunulmaz. Etiket yetki/kanıt değildir. Seçili oturum ve yenilemesi iptal edilir, eski token sonraki korumalı istekte reddedilir. Diğer tüm oturumları kapatmada yeniden doğrulama gerekir, mevcut oturum korunur. Bu cihazdan çıkış sunucu oturumunu ve yerel hesap verisi/oturum push bağını temizler; diğer hesap/cihaz etkilenmez. Güvenilen cihaz kaldırma aktif oturum kapatmadan ayrıdır; birlikte seçilebilir. Kullanıcı yalnız kendisininkini yönetir; org yöneticisi yalnız kendi org erişimini kaldırır. Token/sır içermeyen denetim tutulur. |
+| S07 Dil bölge saat | Kabul edildi | Desteklenen dil veya cihaz dili seçilir; desteklenmeyende platform fallback dili kullanılır, somut dil listesi açık. Bölgesel tarih/sayı/12–24 saat/hafta başlangıcı desteklendiği ölçüde ayrı seçilir. Otomatik saat dilimi her cihazdan, manuel tercih hesaptan gelir. Merkez/kullanıcı saati farklıysa ikisi açık ayırt edilir; gün değişimi ve DST doğru gösterilir. Görünüm iş zamanını, iptal sınırını, paket/finans tarihini veya para birimi/tutarını değiştirmez. Manuel tercihler cihazlara yansır; otomatik tercihler cihazda çözülür. |
+| S08 Tema ve erişilebilirlik | Kabul edildi | Açık/koyu/sistem teması; cihaz yazı ölçeği ve uygulama ölçeği, büyütmede içerik/düğmelerin korunması; yüksek kontrast, renk dışı durum anlatımı ve azaltılmış hareket. Ses/titreşim cihaz bazında ve OS izinleri içindedir. Ekran okuyucu/klavye/odak/etiket temel davranıştır. Tema/kontrast/uygulama yazı ölçeği hesapta, sistemden alınan tercihler cihazdadır. Görünüm sıfırlaması bildirim/pazarlama/reklam/ölçüm seçimini değiştirmez. |
+| S09 Başlangıç ve bağlam | Kabul edildi | Son bağlam veya sabit başlangıç seçilir. Sabit org/merkez/disiplin ve yetkili başlangıç ekranı hesapta; son kullanılan bağlam cihazda tutulur. Üst seçim uyumsuz alt seçimi temizler. Görünüm/rol seçimi yetki vermez. Erişim kaybında veri açıklamayan yeniden seçim; yetkili deep link başlangıç tercihini değiştirmez. Çıkış cihaz son bağlamını temizler; grup sıfırlaması diğer tercihlere/yetkilere dokunmaz. |
+| S10 Liste ekran ve takvim | Kabul edildi | Desteklenen liste/kart/yoğunluk/sütun/sayfa boyutu ve ekran bazlı filtre/sıralama; takvim gün/hafta/ay/ajanda/hafta sonu/renk/görünür saat. Sayfalama teknik üst sınırı korunur. Filtreler gerektiğinde org bağlamına ayrılır; yetkisiz/eski alanlar çıkarılır. Görünüm dışında kalan kayıtlar silinmez/iptal olmaz, renk tek anlam taşıyıcısı değildir. Kayıtlı görünüm hesapta, anlık arama/açık kayıt/sayfa yereldir. Ekran sıfırlaması diğer tercih ve izinleri değiştirmez. API'de yetkisiz alanı döndürmek sütun gizleyerek meşrulaştırılmaz. |
+
+Toplam **10 kullanıcı grubu** açık kullanıcı onayıyla kabul edildi. Önceki sohbetteki sekiz grup sayımı eksikti; bu kayıt her onayı ayrı tutar. Bunlar ürün davranışlarıdır; istemci/API uygulama kabulü değildir.
+
+### İnceleme önerilerinden kabul edilen tasarım kuralları
+
+Kimlik değişiminde bekleyen/doğrulanmış değer, yarış ve çatışma açık durumlarla yönetilir. Bağlanma ve ayrılmada verinin kaynağı ve yayılma sınırı bellidir. Hesap/cihaz/işletim sistemi tercihi ayrı çözülür; çevrimdışı eski değer sunucudaki kapatmayı ezemez. Kullanıcının kapatması giriş, uygulama veya varsayılan güncellemesiyle geri açılmaz. Her bildirim olayı için kanal/zorunluluk/sessiz saat/özet/son kullanım matrisi hazırlanır; süresi dolmuş teklif sonradan gönderilmez. İleri tarihli ayar, iptal, plan düşüşü ve eski değere dönüş ayrı sürümlü davranış ister. Yüksek etkili banka/sağlayıcı/operatör/worker işlemlerinde ek güvenlik gereksinimi alan bazında belirlenir; ikinci onayın hangi işlemlerde zorunlu olduğu henüz seçilmedi. Kullanıcı güvenlik hareketlerini görme ve kapsamlı sıfırlama ailesi kataloğa dahildir; alan/durum ayrıntıları henüz açık.
+
+### Kalan davranış kararları
+
+| Kapsam | Henüz kesinleşmeyenler |
+|---|---|
+| Kullanıcı | Kişisel takvim bağlantısı; bildirim olay/kanalları; hatırlatma/sıklık/sessiz saat; pazarlama/ilgi/öneri; reklam/analitik uygulama ayrıntıları; görünürlük/iletişim paylaşımı/izin geçmişi; veri talepleri/hesap silme/sıfırlama ve güvenlik geçmişinin ayrıntıları. |
+| Merkez organizasyon platform | Aşağıdaki aday aileler, mevcut üst ürün kuralları korunarak grup grup netleştirilecek. Henüz otomatik geliştirme taahhüdü yok. |
+| İlk kurulum | Kullanıcının seçtiği teklif TTL 3600 saniye ve silme reauth penceresi 900 saniye hosted uygulanmıştır. Bunlar açık kurulum değeridir; bütün yeni kurulumların varsayılanı değildir. Kurtarma/rate değerleri bunlardan türetilmez. |
+| P08 | Sabit organizasyon abone numarası; ortak çok kaynaklı CRM başvurusu; cinsiyet kontenjanı; sınırsız kapasite/Business temsili; ders tüketmeyen pakete bağlı etkinlik uygunluğu. |
+
+### Frontend için geliştirme sınırı
+
+Mevcut callable DTO'lar `08` ve üretilmiş TypeScript üzerinden kullanılır. Kabul edilmiş fakat API eşlemesi tamamlanmamış ayarlar tasarımda taslak/bağımlı durum olarak gösterilir; bilinmeyen endpoint çağrılmaz, kayıt başarılı taklidi yapılmaz. İstemci tasarımı bu belgeyle değiştirilmez. Generic settings endpoint'i, yeni tablo/DTO veya yerel settings taslağı bu metinle yayımlanmış sayılmaz. Tasarımcı kapalı/yetersiz yetki/sağlayıcı yok/doğrulama bekliyor/sürüm çatışması ve kısmi yayılma durumlarını birbirinden ayırmalıdır.
+
+### Ayrıntılı dört kapsam kataloğu
+
+Aşağıdaki katalog Word v0.1 içeriğinin Markdown aktarımıdır. S01–S10 ve kabul edilmiş tasarım kurallarıyla çelişen aday/X notları yalnız ilgili davranış bakımından yukarıdaki kararlara tabidir. Henüz seçilmemiş alan/sağlayıcı/sayılar aday kalır.
+
+#### 4. Ortak kapsam ve yetki kuralları
+
+| Kapsam | Değerin sahibi / yazabilen | Sınır |
+| --- | --- | --- |
+| Kullanıcı | Hesap sahibi; teknik işlem hesabın kendisi olarak doğrulanır. | Kişisel görünüm ve tercih; başka hesabın veya organizasyonun kuralını değiştirmez. |
+| Hesap–org | İlgili bağlı kişi, izin verilen tercih alanlarında. | Org amaçlı bildirim/izinler organizasyonlar arasında taşınmaz. |
+| Cihaz | Kullanıcı ve cihaz/işletim sistemi. | Push izni, yerel görünüm veya cihaz oturumu; işletim sistemi reddi aşılamaz. |
+| Merkez | İlgili komutun canlı merkez yetkisine sahip aktör. | Org sınırı, zorunlu politika, plan ve disiplin kapsamı korunur. |
+| Organizasyon | Komuta göre Owner veya yetkili OM/diğer açık izin. | Owner unvanı CM operasyon yetkisi vermez. Her satırın kesin izni API analizinde atanır. |
+| Platform | İlgili platform operatör iznine sahip aktör. | Müşteri organizasyonu adına operasyon veya kullanıcı adına rıza verme yetkisi türemez. |
+
+##### 4.1 Miras ve öncelik
+
+K — İş politikalarında ilgili anahtarın mevcut resolver’ı esas alınır: kapsam/zaman için geçerli sürüm seçilir; zorunlu organizasyon politikası merkez ayarını sınırlar. Danışma niteliğindeki organizasyon ayarına yerel istisna yalnız sözleşme, plan ve izin açıkça destekliyorsa uygulanır. Bütün ayarlara tek bir platform → org → merkez → kullanıcı zinciri uygulanmaz.
+
+T — Her ayar tanımı, canlı miras mı yoksa oluşturma anında kopyalanan şablon mu olduğunu belirtir. Üst şablon değişimi geçmiş kayıtları sessizce güncellemez. Kişisel reklam/ölçüm tercihinde merkez veya org kullanıcı yerine “açık” kararı veremez.
+
+T — “Belirtilmedi/miras al”, false, sıfır, boş liste ve null ayrı anlamlardır. Varsayılana dön komutu yalnız izin verilen override’ı kaldırır. Varsayılanı bulunmayan zorunlu iş politikası, keyfi bir değerle işletilmez.
+
+##### 4.2 Değişiklik ve geçmiş
+
+K — Satış, anlaşma, politika, seans ve finans alanlarının mevcut immutable sürüm ve snapshot kuralları korunur. Politika/kişisel limit değişiminde etkilenen kesin rezervasyonlar için mevcut etki önizlemesi, açık yönetici onayı ve koruma yükümlülükleri uygulanır. Sessiz otomatik iptal yoktur; yeni işlemler güncel kurallardan geçer.
+
+T — Yazma sırasında canlı yetki, plan, kapsam ve bağımlılıklar yeniden doğrulanır. Geri alınmış yetki eski ekran veya tekrar isteğiyle canlanmaz. Gizli değerler, parolalar ve sağlayıcı anahtarları genel settings yanıtında veya audit diff’inde bulunmaz.
+
+#### 5. Kullanıcı ayar kataloğu — hesap ve deneyim
+
+S01–S10 ile kabul edilmiş alt alanlar K, diğer katalog seçenekleri A statüsündedir. Seçilmemiş varsayılanlar X kalır. Hesap güvenliği işlemleri kendi doğrulama akışında yürür.
+
+| ID | Ayar ailesi | Alanlar ve sözleşme sınırı |
+| --- | --- | --- |
+| U01 | Profil ve kimlik | Görünen ad, hitap, profil fotoğrafı/kaldırma; ad-soyad ve doğrulanmış iletişim ayrı alanlardır. Mevcut profil API’si yalnız display_name kapsamındadır. |
+| U02 | İletişim | E-posta/telefon değişimi, doğrulama ve birincil iletişim seçimi. Hesap kimliği e-posta değildir. Org kişi iletişimiyle senkronizasyonun teknik aktarımı ayrıca incelenir. |
+| U03 | Parola ve giriş | Parola oluşturma/değiştirme, kurtarma, bağlı giriş sağlayıcıları ve varsa passkey yönetimi. Hassas komutlar yeniden doğrulama ister; düz ayar yazımı değildir. |
+| U04 | İki aşamalı güvenlik | MFA yöntemleri, kurtarma kodları, güvenilen cihazlar; ekle/kaldır akışları ve zorunluluklar platform güvenlik politikasına tabidir. |
+| U05 | Oturumlar | Cihaz/oturum listesi, tek veya tüm oturumları kapatma, hatırlanan cihaz iznini kaldırma; hesap silmeyle karıştırılmaz. |
+| U06 | Dil ve bölge | Arayüz dili, tarih/saat ve sayı biçimi, 12/24 saat, hafta başlangıcı. Para veya ürünün ticari birimini kendiliğinden değiştirmez. |
+| U07 | Görüntüleme saati | Otomatik/manuel saat dilimi. Merkezin iş zamanı, satış tarih sınırı ve seans Instant değeri değişmez. |
+| U08 | Erişilebilirlik | Tema, metin büyüklüğü, kontrast, azaltılmış hareket, ses/titreşim; desteklenen istemci yetenekleriyle sınırlı. |
+| U09 | Başlangıç bağlamı | Varsayılan org/merkez/disiplin, son bağlam, rol bazlı açılış. Erişim yoksa güvenli yeniden seçim; gizli bağlam açıklanmaz. |
+| U10 | Liste ve takvim | Liste/kart, yoğunluk, sütun, filtre, sıralama; takvim gün/hafta/ay/ajanda, hafta sonu, renk ve görünür saat aralığı. |
+| U11 | Takvim paylaşımı | Kişisel takvim aboneliği oluşturma, kapsam daraltma, iptal/anahtar yenileme. Yetki geri alındığında yeni veri servis edilmez. |
+
+##### 5.1 Kimlik ve kişi kaydı
+
+K — Hesap organizasyonlar arasında ortak, kişi organizasyona aittir; hesabı olmayan kişi kaydı mümkündür. Profil adı değişikliği otomatik rol veya kişi birleştirme değildir. Geçmiş finansal/hukuki kayıtların kimlik snapshot’ları yeniden yazılmaz.
+
+K — Güncel ad ve doğrulanmış e-posta/telefon aktif güvenli hesap–kişi bağlantısından org onayı olmadan yansır; aynı alanın yeni talebi eski bekleyen doğrulamayı geçersizleştirir, başka hesaba bağlı giriş/kurtarma iletişimi reddedilir. Bağı kaldırılmış org gelecekteki değişiklikleri almaz; eski belge snapshotları değişmez. Teknik API/DTO ve veri aktarımı ayrı iştir. Org abone numarası P08 kapsamındadır; UUID ilişki kimliği kalır.
+
+#### 6. Kullanıcı ayar kataloğu — iletişim ve veri
+
+| ID | Ayar ailesi | Alanlar ve sözleşme sınırı |
+| --- | --- | --- |
+| U12 | Bildirim kanalları | Uygulama içi, push, e-posta ve olası SMS; güvenlik, işlem, hatırlatma ve pazarlama amaçları ayrı. Mevcut in_app transactional kapatma yasağı korunur. |
+| U13 | Operasyon bildirimleri | Rezervasyon/onay/iptal, saat/oda/eğitmen değişimi, merkez iptali, talep/alternatif/bekleme/yer teklifi ve teklif bitişi için olay tercihleri. |
+| U14 | Finans ve belgeler | Hak bitişi/düşük bakiye, borç/tahsilat/iade, belge bekleme/yayın, hesap bağlantısı ve yetki değişimi bildirimleri; zorunlu olaylar ayrıca sınıflanır. |
+| U15 | Hatırlatma düzeni | Ders/paket/ödeme hatırlatmaları, anlık/özet sıklığı, mükerrer kanal azaltma; sessiz saatler, günler ve kişisel saat dilimi. |
+| U16 | Cihaz bildirimleri | Push aboneliği, ses/titreşim, kilit ekranında içerik gizleme. Kritik istisnaların kapsamı ve kullanıcıya açıklanması X’tir. |
+| U17 | Pazarlama | Platform ve her org için ayrı amaç/kanal tercihleri; kampanya ve bültenler. Reklam/analitik tercihi pazarlama izni yerine geçmez. |
+| U18 | İlgi ve öneriler | Disiplin, merkez ve etkinlik ilgileri; öneri kişiselleştirmesi. Erişim veya otomatik kayıt yaratmaz. |
+| U19 | Reklam kişiselleştirme | K: Varsayılan açık, kapatılabilir. Önerilen teknik anahtar ad_personalization; nihai DTO anahtarı henüz kabul edilmiş değildir. |
+| U20 | Reklam amaçlı takip | K: Varsayılan açık, kapatılabilir. Önerilen teknik anahtar ad_tracking; kaynak/sağlayıcı ve amaç kapsamı ayrıca tanımlanır. |
+| U21 | İsteğe bağlı analitik | K: Varsayılan açık, kapatılabilir. Önerilen teknik anahtar optional_analytics; zorunlu güvenlik/işletim kayıtlarından ayrılır. |
+| U22 | Görünürlük ve izinler | Diğer kullanıcılara ad/fotoğraf/iletişim görünürlüğü yalnız ilgili özellik varsa; izin geçmişini görme ve geri çekme. |
+| U23 | Veri ve hesap yaşamı | Veri dışa aktarma/düzeltme talepleri, org bağlantısı talepleri, hesabı silme önizlemesi/başvurusu; yerel cihaz verisini temizleme ayrı. |
+| U24 | Role özgü tercihler | Öğrenci özetleri; eğitmen görev/yoklama/hakediş uyarıları; personel iş/CRM uyarıları; CM onayları; Owner abonelik özetleri. Tercih yeni yetki vermez. |
+
+##### 6.1 Tercih, onay ve fiilî işleme
+
+K/T — Saklanan tercih, hukuki izin/işleme dayanağı ve teknik etkinlik ayrı gösterilmelidir. “Açık tercih” tek başına veri toplamayı başlatmaz. Hukuki değerlendirme tamamlanıncaya kadar bu belgeye dayanarak rıza kaydı üretilemez veya geçerli dayanak gerektiren takip açılmaz. Dayanak alanlarının nihai şeması X’tir.
+
+T — Kullanıcının kapatması gelecekteki isteğe bağlı toplama/gönderime uygulanır; gönderim anında kuyruktaki işler tekrar kontrol edilir. Geçmiş kanıt ve hukuken tutulması gereken kayıtların silinmesi ayrı süreçtir. Kapatma temel SaaS erişimini veya zorunlu işlem kayıtlarını bozmaz.
+
+#### 7. Merkez ayar kataloğu — işletim
+
+A statüsü. Merkez komutları, ilgili merkez ve disiplinin canlı yetkisi ile çalışır. Organizasyon kataloğunun kullanıma açılması, organizasyon genelini değiştirme yetkisi vermez.
+
+| ID | Ayar ailesi | Alanlar ve sözleşme sınırı |
+| --- | --- | --- |
+| C01 | Kimlik ve ulaşım | Merkez adı/kodu, açıklama, logo, adres/harita, telefon/e-posta/web/sosyal bağlantılar; ticari ve kamusal gösterim ayrı. |
+| C02 | İş takvimi | Merkez saat dilimi, çalışma saatleri, tatil/istisna günleri, bakım ve geçici kapanış. Mevcut seansları taşıma/iptal ayrı etki komutu. |
+| C03 | Disiplinler | Org disiplinlerinden sunulanları etkinleştirme, görüntüleme sırası ve yerel açıklama; aynı org disiplin kimliği korunur. |
+| C04 | Oda ve kaynaklar | Mekân/oda/kaynak, disipline göre kapasite, kullanım saatleri ve bakım blokları. Kapasite düşüşünde mevcut kesin kayıtlar korunur. |
+| C05 | Eğitmen ve görev | Eğitmen/asistan uygunluğu, disiplin/merkez ilişkileri, müsaitlik ve izin takvimi. Görevlendirme ve login grant ayrı. |
+| C06 | Personel yetkileri | Merkez personeli kapsamı, açık delegasyonlar ve izin sınırları. Owner atama veya org yetkisi merkez ayarıyla yapılamaz. |
+| C07 | Program ve seans | Süre/saat adımı, varsayılan oda/görevli, nominal/maksimum kontenjan, kapalı sınıf ve dış görünürlük; program sürüm kuralları korunur. |
+| C08 | Talep ve rezervasyon | Talep/rezervasyon pencereleri, alternatif sunumu ve izin verilen yönetici istisnaları. Plan/kapasite/hak kapıları atlanamaz. |
+| C09 | Bekleme ve teklif | Bekleme kullanımı, yer teklifi süresi ve bildirimleri; yarışta tek kesin yer/hak, süre dolumu ve idempotency korunur. |
+| C10 | İptal ve yoklama | Özel/grup iptal politikası, gelmeme ve yoklama hatırlatmaları; Q-E02/E03 parasal sonuçları serbest ayar değildir. |
+| C11 | Borç ve kredi | Borçlu rezervasyon/katılım politikaları; kişi–merkez–disiplin negatif limit istisnası. Event negatif kredi yasağı değiştirilemez. |
+| C12 | Etkinlikler | Varsayılan mekân, kapasite, kayıt/hak/ücret koşulları ve görünürlük. P08 sınırsız kapasite ve ders tüketmeyen katılım tasarımları uygulanmış sayılmaz. |
+
+##### 7.1 Operasyonel durdurma
+
+T — Yeni rezervasyonu, satışı veya kamusal yayını durdurmak ayrı anahtar/komut olmalıdır. Merkezin pasifleşmesi, plandaki aktif merkez sayımı, mevcut seansların iptali ve organizasyon kapanışı aynı anahtara bağlanmamalıdır. Kesin mevcut API davranışı eşleme sırasında korunur.
+
+#### 8. Merkez ayar kataloğu — ticari ve iletişim
+
+| ID | Ayar ailesi | Alanlar ve sözleşme sınırı |
+| --- | --- | --- |
+| C13 | Ürün ve fiyat | Ürün sürümü, fiyat/para birimi, merkez/disiplin kullanım kapsamı, paket yaşam koşulları; geçmiş satış snapshot’ı korunur. |
+| C14 | Paket işlemleri | Dondurma/uzatma/değişim/yenileme/sonlandırma/iade koşulları; tekil satış işlemi ayrı komuttur, genel ayarla geçmiş değiştirilmez. |
+| C15 | İndirim ve kampanya | Yetki dahilinde fiyat/indirim sınırları, geçerlilik ve uygun kitle. Org/plan sınırını veya izin gereksinimini aşmaz. |
+| C16 | Ödeme ve banka | Desteklenen ödeme yöntemleri, vade/taksit seçeneği varsa koşulları, banka/hesap bilgileri ve makbuz gösterimi. Otomatik banka entegrasyonu varsayılmaz. |
+| C17 | Eğitmen anlaşmaları | Ücret modeli, genel/özel anlaşma sürümü ve varsa oda ücreti koşulu. Fiilî hakediş ve ödeme komutları ayrı; eski anlaşma yeniden yazılmaz. |
+| C18 | Hesaplaşma yetkisi | Merkez bazlı hesaplaşma yetkileri mevcut Owner/delege OM zinciriyle atanır. CM unvanı ve tercih ekranı tek başına grant değildir. |
+| C19 | Deneme | Org deneme uygunluğu ve tekrar politikası içindeki yerel uygulama; süre/sayı varsayılmaz, planın ilk ödeme kuralı aşılmaz. |
+| C20 | CRM | Kaynak, sorumlu atama, ilgi/seviye alanları, takip düzeni; org ortak kişi/form modelinden kopuk kopya kayıt kurulmaz. |
+| C21 | Kamusal yayın ve form | Kamusal takvim/alan görünürlüğü, form alanları, yerel zorunlu/isteğe bağlı ekler; ayrı form kaynakları ve onay kanıtları kaybolmaz. |
+| C22 | Belge ve bildirim | Org belge zorunlulukları altında yerel ekler; işlem/hatırlatma şablonları, izin verilen kanal ve gönderici gösterimi. Kullanıcı izinleri aşılamaz. |
+| C23 | Otomasyon | Plan destekliyorsa yerel otomasyon koşulları ve çalışma izni. Org tanımı ile merkezde çalıştırma yetkisi ayrı doğrulanır. |
+| C24 | Rapor ve aktarım | Varsayılan rapor filtreleri, yetkili alıcılar, import eşleştirme/şablonları, export kapsamı. Alan/tenant izni, dosya ve iş sınırları korunur. |
+
+##### 8.1 Sabit iş sonuçları
+
+K — Merkez iptalinde Q-E02’nin tam borç kaldırma, tekrar üretmeyen para/hak dönüşü ve ayrı nakit iade kuralları korunur. Katılımcı iptalinin parasal sınırı Q-E03’e göre planlanan başlangıçtır. Sonradan fiilî başlangıç düzeltmesi bu sınıflandırmayı veya geçmiş hakedişi yeniden hesaplamaz.
+
+K — Negatif kredi para borcu değildir. İlgili merkez–disiplin açıkları ayrılmış+tüketilmiş toplam üzerinden kontrol edilir; başka disiplindeki hak sınır dışı açığı kapatamaz. Sonradan ödeme geçmiş katılım/hakediş yaratmaz. Starter ve ücretli plan anlaşma/hakediş ayrımı bir tercih düğmesiyle değiştirilemez.
+
+#### 9. Organizasyon ayar kataloğu — yapı ve politika
+
+A statüsü. Her satır için komut bazında yazma izni kesinleştirilir; “Owner her işlemi yapar” şeklinde toplu izin verilmez.
+
+| ID | Ayar ailesi | Alanlar ve sözleşme sınırı |
+| --- | --- | --- |
+| O01 | Kurumsal kimlik | Org adı/markası, ticari unvan, vergi/fatura bilgileri, resmî/iletişim adresleri, destek kanalları ve logo. |
+| O02 | Merkez yönetimi | Merkez kurma, aktiflik, plan içi merkez seçimi ve yaşam döngüsü. Merkez kapatma geçmiş borç/hak kayıtlarını silmez. |
+| O03 | Disiplin ve sözlükler | Org disiplinleri, ortak kategori/seviye/kaynak sözlükleri, yerel merkezde kullanıma açılabilirlik. |
+| O04 | OM/CM ve personel | Mevcut atama/delegasyon akışları, merkez/işlem kapsamları; Owner atama/kaldırma yalnız platformda kalır. |
+| O05 | Hesap erişimi | Davet/bağlama tercihleri, izin verilen erişim kanalları, personel görev kaydı ile login grant ayrımı. İlk student-self sınırı korunur. |
+| O06 | Abone gösterimi | Org operasyonunda kullanıcıya gösterilecek abone numarası ve UUID ayrımı. K: Organizasyon içinde benzersiz, değişmez, tekrar kullanılmaz; UUID bağlantıları korunur. Format/tahsis/merge ayrıntıları X ve uygulama P08 kapsamındadır. |
+| O07 | Güvenlik gereksinimi | Plan/ürün destekliyorsa belirli rollerde MFA veya oturum gereksinimi. Kullanıcı kurtarma ve platform güvenlik kapıları aşılamaz. |
+| O08 | Politika yetkisi | Anahtar bazında zorunlu/danışma niteliği, izin verilen yerel istisna ve sayısal sınırlar; tüm politikalar otomatik override edilemez. |
+| O09 | Yeni merkez şablonu | İş takvimi, saat dilimi, varsayılan görünüm/iletişim ve yerel politika başlangıçları. Kopya/miras modeli açıkça belirtilir. |
+| O10 | Operasyon politikaları | Talep/rezervasyon/iptal/bekleme, borç/negatif kredi, katılım/yoklama ve hatırlatma politikalarının org sürümleri. |
+| O11 | Ürün ve satış | Ortak ürün katalogları, fiyat/indirim yetkileri, merkezler arası/disiplinler arası kullanım kapsamları; plan kapıları ve satış snapshot’ı korunur. |
+| O12 | Paket ve deneme | Dondurma/uzatma/yenileme/sonlandırma varsayılanları, deneme tekrar sınırı; bilinmeyen sayı/süre veya ücretsiz ilk ödeme grace’i icat edilmez. |
+
+##### 9.1 Veri sahipliği
+
+K — Org içindeki kişi aynı kişi kaydı olarak birden fazla merkez/disipline bağlanır. Ayrı organizasyonların kişi kayıtları ayrıdır. Hesap erişimi kaldırma, kişi birleştirme ve kişi iletişim düzeltme işlemleri birbirinin yerine geçmez. Başka orgdaki profil/tercih/kayıt bilgisi yanıt içinde açılmaz.
+
+#### 10. Organizasyon ayar kataloğu — finans ve yönetişim
+
+| ID | Ayar ailesi | Alanlar ve sözleşme sınırı |
+| --- | --- | --- |
+| O13 | Finans sözlükleri | Desteklenen ödeme yöntemleri, vade/taksit varsa koşulları, banka bilgileri, mali gösterim ve rapor birimleri. |
+| O14 | Anlaşma şablonları | Eğitmen anlaşma modelleri ve kullanılabilir sürümler; merkez anlaşması, satış ve gerçekleşmiş hakedişin yerine geçmez. |
+| O15 | Hesaplaşma delegasyonu | Owner/delege OM merkez bazlı grant zinciri, okuma ve geri alma. A/B onayında her tarafın canlı yetkisi ayrı aranır. |
+| O16 | CRM ve formlar | Ortak alanlar, seviye/ilgi/kaynak sözlükleri, segment ve takip kuralları; form özgü alanlar korunarak ortak başvuru modeline eşlenir. |
+| O17 | Kamusal görünürlük | Org/merkez rehberi, kamusal takvim, iletişim ve yayınlanabilir alanlar; kişi verisinin görünürlüğü ayrıca sınırlandırılır. |
+| O18 | Belge yönetişimi | Şablon/sürüm, hangi hedefte zorunlu olduğu, yayın/kanıt koşulları, yerel eklerin sınırları. Geçmiş kabul sürümü korunur. |
+| O19 | Bildirim düzeni | İşlem/hatırlatma şablonları, desteklenen kanallar, gönderici kimliği ve org sessiz saat önerileri. Zorunlu in_app kayıtları ve kişisel tercihler korunur. |
+| O20 | Pazarlama | İzinli amaç/kitle/kanal ve kampanya düzeni; org yöneticisi kişi yerine izin veremez. Platform pazarlama izniyle birleştirilmez. |
+| O21 | Business otomasyonu | Desteklenen otomasyon tanımları, tetikleyici/koşul/aksiyon ve etkinlik; merkezde çalışma ayrıca o merkezin operasyon iznine bağlı. |
+| O22 | Rapor ve veri aktarımı | Org raporları, erişimli alıcılar, export/import şablonları ve alan eşlemeleri; herkese açık dosya veya kapsam genişlemesi yaratılmaz. |
+| O23 | Saklama ve entegrasyon | İzin verilen saklama yapılandırması, entegrasyon/webhook anahtar referansları ve kapsamları. Hukuki saklama süreleri ve dış servisler ayrıca değerlendirilir. |
+| O24 | Abonelik ve kapanış | Plan/değişim/yenileme tercihleri; org kapatma/yeniden açma/kalıcı silme ayrı sürümlü komutlardır. Fiyat/dönem ve grace kuralları serbest ayar değildir. |
+
+##### 10.1 Abonelik ve kalıcı imha
+
+K — İlk ödeme, dönem başlangıcı, yenileme gecikmesi, düşürmede merkez seçimi ve gönüllü yenilememe mevcut abonelik sözleşmesine tabidir. Kullanıcının ayar değiştirmesi tek başına ödeme doğrulaması değildir. Plan veya fiyat sürümü geçmiş satın alımı sessizce değiştirmez.
+
+K — Hesap silme, org kapanışı, abonelik bitişi ve kalıcı imha ayrı durumlardır. Hukuki arşiv/borç/alacak kanıtı keyfi silinmez. Fiziksel imha kanıtı eksikse işlem tamamlanmış gösterilmez; backup restore imha listesini uygulamadan veriyi yeniden açamaz.
+
+#### 11. Platform ayar kataloğu — ürün ve güvenlik
+
+A statüsü. Platform ayarları yalnız yetkili operatör komutlarıyla değişir; müşteri kullanıcılarına genel config yazımı açılmaz.
+
+| ID | Ayar ailesi | Alanlar ve sözleşme sınırı |
+| --- | --- | --- |
+| P01 | Platform kimliği | Ürün markası, destek/iletişim, hukuki metin bağlantı ve sürümleri, bakım duyuruları. |
+| P02 | Operatör yönetimi | Platform rolleri, işlem kapsamları ve yetki geri alma; MFA/yeniden doğrulama gereksinimleri ve audit. |
+| P03 | Owner yönetimi | Org Owner atama/kaldırma yalnız mevcut platform akışıyla. Müşteri kendi Owner’ını devredemez. |
+| P04 | Kuruluş ve abone kimliği | Kuruluş/ilk ödeme akışı ve abone numarası üretim politikası; mevcut UUIDv7 standardı korunur, dış sağlayıcı kimlikleri dönüştürülmez. |
+| P05 | Plan kataloğu | Starter/Pro/Business özellikleri, fiyat/dönem/limit sürümleri. Kuruluma özgü değerler genelleştirilmez; unlimited temsili P08’de X. |
+| P06 | Abonelik işletimi | Ödeme doğrulama, plan değişimi, yenileme/grace ve istisna uzatma yetkileri; müşteri tercihinden ve tahsilat kanıtından ayrılır. |
+| P07 | SaaS ticari araçlar | Desteklenen ödeme/fiş/fatura akışları ve varsa platform kampanya/kuponları. Ticari değerler ve sağlayıcılar ayrıca kararlaştırılır. |
+| P08 | Özellik yayını | Özellik bayrağı, kademeli açılış ve acil yeni işlem durdurma; kazanılmış hak, snapshot, plan ve yetki kontrollerini aşamaz. |
+| P09 | Settings tanım kaydı | İzinli anahtarlar, tip, kapsam, varsayılanın kaynağı, miras/override, sürüm, plan/izin ve etki sınıfları. Keyfi anahtar kabul edilmez. |
+| P10 | Dil ve kimlik sağlayıcı | Desteklenen dil/bölge; Auth sağlayıcıları, iletişim doğrulama, hesap kurtarma ve oturum güvenliği. Gizli anahtar yerine güvenli referans tutulur. |
+| P11 | Erişim davetleri | Desteklenen kanallar ve açık config’li süre/rate sınırları. Bearer token UUID değildir; sırlar ayar okumasına dönmez. |
+| P12 | Gizlilik ve bildirim | Kullanıcı tercih/amaç/kanal kataloğu, izin kanıt şeması, sağlayıcı uygunluğu ve şablonları. Varsayılan açık değeri rıza kaydı üretmez. |
+
+##### 11.1 Değiştirilemeyen korumalar
+
+K/T — Tenant izolasyonu, RLS/EXECUTE sınırları, canlı aktör yetkisi, transaction/idempotency, worker lease/fencing ve kayıt geçmişini koruma ilkeleri müşteri ayarıyla kapatılamaz. Platformda da bu korumalar genel settings anahtarı olarak sunulmaz; kaynak/sözleşme değişimi ve uygun kabul gerektirir.
+
+#### 12. Platform ayar kataloğu — işletim ve veri
+
+| ID | Ayar ailesi | Alanlar ve sözleşme sınırı |
+| --- | --- | --- |
+| P13 | Kötüye kullanım | Bot/hız sınırı sağlayıcı ve kuralları, engelleme/inceleme akışları; desteklenmeyen hedef/süre veya ayrıcalık uydurulmaz. |
+| P14 | Dosya ve belgeler | Boyut/tür sınırları, imzalı erişim, tarama/karantina ve kanıt gereksinimleri; güvenlik ve belge kabulü atlanamaz. |
+| P15 | Import/export ve rapor | Satır/dosya/iş boyutu, eşzamanlılık ve erişim süresi; değerler ölçülüp kabul edilir. Kaynakta sabit güvenlik limitleri keyfi ayara çevrilmez. |
+| P16 | Worker işletimi | İzinli job türünde schedule/tick, batch, concurrency, retry ve çalışma config’i. Dedicated kimlik, tenant binding, lease ve atomiklik korunur. |
+| P17 | İş müdahalesi | Yetkili retry/cancel/başarısız iş incelemesi; neden, güncel sürüm/kapsam ve replay kapıları. Genel SQL çalıştırma ayarı değildir. |
+| P18 | Bakım ve kısıtlama | Bakım duyurusu, yeni işlem durdurma ve desteklenen org kısıtlama/geri açma; sebep ve audit. Mevcut mali sonuçları yeniden yazmaz. |
+| P19 | Gözlemlenebilirlik | Log seviyesi, maskeleme, metrik/uyarı eşikleri ve güvenlik alıcıları; parola/token/kişisel veri sızıntısı yaratılmaz. |
+| P20 | Audit ve saklama | Audit erişimi, saklama/imha kuralları ve hukuki bekletmeler; sayısal süreler ve dayanaklar ayrıca karara bağlanır. |
+| P21 | Yedek ve geri yükleme | Yedek/restore hedefleri, doğrulama ve imha listesi uygulaması. Ayar kaydı gerçek restore veya SLA kabulü değildir. |
+| P22 | Destek erişimi | Varsa süre/kapsam/gerekçeyle sınırlı destek yetkisi; gizli kullanıcı taklidi veya genel tenant erişimi oluşturulmaz. |
+| P23 | Entegrasyon ve API | Sağlayıcı kullanılabilirliği, secret referansları, webhook sınırları; API sürüm/istemci uyumu ve deprecation ilkeleri. |
+| P24 | Dağıtım ve mahremiyet | Kaynak/migration/Edge/worker durumu görüntüleme; hesap/org gizlilik işi ilerleme ve kanıtları. Deploy/reset/kalıcı imha ayrı yetkili işlemdir. |
+
+##### 12.1 Ortamlar ve CI/CD
+
+K — Kaynak main, geliştirme/test ortamı ve production birbirinden ayrıdır. Main merge production izni değildir. Frontend/Vercel uygulaması bu sözleşmenin değişiklik kapsamına girmez; dış e-posta ve gerçek yük/restore kabulü ayrı kalır.
+
+K — Geliştirme commitlerinde hızlı ve birikimli değişikliklere göre hedefli CI; son runtime/CI adayında açık full clean; merge sonrası aynı main SHA için full clean. Güvenli yalnız-belge değişikliği mevcut CI politikasının kaynak bağlı yolundan geçer. Bir dosyanın belge olması tek başına onu güvenli izin listesine eklemez; workflow/kapılar bu teslimle değiştirilmez.
+
+#### 13. Önerilen teknik sözleşme
+
+Bu bölüm T statüsündedir. Mevcut typed domain komutları korunur. Yeni ortak settings read/write endpoint’i kabul edilmiş değildir; API analizi sonunda ortak okuma modeli veya domain komutları arasında seçim yapılacaktır.
+
+| Alan grubu | Asgari tanım |
+| --- | --- |
+| Kimlik ve kapsam | Sabit setting_key; definition_version; scope_type; kapsam için gereken account/org/center/disiplin veya cihaz referansları. Key adları bu taslakta kavramsaldır. |
+| Değer ve tip | Kapalı şema, veri tipi, izinli enum/aralık, null/unset/false anlamları; hassas alan sınıfı. Bilinmeyen anahtar ve alan reddedilir. |
+| Varsayılan ve miras | default_value veya kararsız; default_source; canlı miras/kopya/yerel sabit modu; izinli override kapsamları ve anahtara özgü çözümleme. |
+| Etkin sonuç | Yetkili okuyucuya stored_value, effective_value, effective_source, inherited_from ve overridden/locked bilgisi; yazılamama nedeni gerektiği kadar açıklanır. |
+| Yetki ve özellik | read_permission, write_permission; gerekli plan/özellik, canlı tenant/merkez/disiplin ve hesap sahipliği kontrolleri. Rol adı yeterli değildir. |
+| Sürüm ve zaman | İlgili mevcut row version veya append-only zincir; effective_at, changed_at, changed_by ve gerekçe. Geçmişe uygulama yalnız mevcut açık komutla. |
+| Etki ve kanıt | Etki sınıfı, gerekli preview/onay, bağımlılık sürümleri, audit/receipt ve bildirim sonucu. Hukuki tercih ve onay kanıtı ayrı alan ailesi. |
+| Uygulama durumu | Sözleşme kabulü, API eşlemesi, runtime kapsamı, son doğrulanan kaynak ve kabul kanıtı ayrı sütunlar; görünüm özelliği runtime kabulü değildir. |
+
+##### 13.1 Okuma ve yazma davranışı
+
+T — Okuma yan etkisizdir; yalnız yetkili alanlar döner. Mevcut bir anahtarın etkili kaynağı ve kullanıcıya görünen değeri çelişmez. Secret değerler dönmez; yalnız maskeli durum/referans sunulur. Diğer tenant veya kullanıcının varlığı hata/yanıt üzerinden açılmaz.
+
+K/T — Güncelleme, mevcut komutun sürüm ve operation_key sözleşmesini izler. Row-version komutlarında eski sürüm kazanamaz; append-only policy_publish gibi komutlara gelişigüzel expected_version eklenmez. Aynı anahtar ve aynı iş yükü mükerrer yan etki üretmez; farklı yükle replay reddedilir. Bağlı iş etkisi, audit ve receipt gerektiği yerde aynı transaction içinde geri alınır.
+
+T — Çoklu ayar kaydetme özelliği sunulursa atomik mi alan bazlı mı olduğu açıkça tanımlanır; kısmi başarı tam başarı gösterilmez. Önizleme, tam değişiklik kümesine ve bağımlılıklarına bağlanır; yetki/plan/sürüm/zaman değiştiğinde yeniden doğrulanır. Sayısal config yoksa güvenli ve açıklanabilir hata verilir.
+
+#### 14. API uygunluğu ve açık iş analizi
+
+Aşağıdakiler mevcut kaynakta doğrulanan başlangıç eşlemeleridir; tüm katalog için API denetimi tamamlandı iddiası değildir. Eski decision_delivery notları tek başına güncel eksik ilan etmek için kullanılmamıştır.
+
+| Kapsam | Mevcut kaynak / eşleme | Sonuç veya analiz gereği |
+| --- | --- | --- |
+| U01 | account_get_v1; account_profile_update_v1; management_state_get_v1 | Display_name okuma/yazma ve sürüm yolu var. Fotoğraf, doğrulanmış iletişim ve orga yayılma aynı DTO’da yok; ayrı eşleme gerekir. |
+| U03 | account_password_change_v1; account_password_reset_request_v1 | Başlatıcı ve native Auth tamamlama akışları ayrıdır. Başlatma yanıtı, parola değişti veya dış e-posta ulaştı kanıtı değildir. |
+| U12–17 | notification_preferences_set_v1; management_state_get_v1; database/p05-notifications.sql | Amaçlar transactional/reminder/marketing. Şemada in_app/email olsa da mevcut geliştirme yolu in_app ile sınırlı; transactional=false reddedilir. |
+| U19–21 | Yeni tercih alanları için eşleme bekler | NotificationPurpose enum’una reklam/analitik amaçlarını kendiliğinden ekleme. Ayrı amaç/dayanak, provider ve kuyruk kapısı analizi gerekir. |
+| C08–11 / O08–10 | policies_get_v1; policy_publish_v1; negative_limits_get_v1; negative_limit_set_v1 | Mevcut anahtar/sürüm/koruma akışı kullanılmalı; bu belge alternatif politika motoru oluşturmaz. İlgili DTO ve tüketiciler alan bazında incelenecek. |
+| U23 / O24 | account_delete_preview/apply_v1; organization_close_preview/apply_v1; organization_reopen_v1; organization_delete_preview/apply_v1 | Ayrı lifecycle komutları korunur. Gerçek imha tamamlanması kanıt koşullarına tabidir. |
+| Diğer aileler | 08 makine sözleşmesi; endpoint-inventory; implemented.json | Her ailenin alanları mevcut komutlara tek tek eşlenecek. Genel ayarlar endpoint’i veya desteklenmeyen iş akışı var sayılmayacak. |
+
+##### 14.1 Her alan için doldurulacak analiz kaydı
+
+setting_id + field_key | karar durumu | kapsam | tip/varsayılan kaynağı | read operation + response alanı | write operation + request alanı | permission/feature | sürüm/etki/snapshot | mevcut runtime sınırı | doğrulama SHA/kanıt | gap türü | bağımlılık | iş sahibi/kabul ölçütü.
+
+Gap türleri T önerisidir: ürün kararı; sözleşme/DTO; runtime; yetki/plan; okuma projeksiyonu; veri aktarımı; istemci/cihaz; sağlayıcı; doğrulama/işletim. “Eşleme bekliyor” ile “eksik API doğrulandı” ayrı statülerdir.
+
+##### 14.2 İşe dönüşüm
+
+Önce K hükümleri mevcut sözleşme ve runtime ile karşılaştırılır; sonra A aileleri alanlara ayrılır. Yalnız doğrulanan fark için iş açılır. Yeni API gerekirse tip, izin, guard, hata, idempotency, sürüm/preview ve kabul senaryoları birlikte tanımlanır. Uygulama tesliminde etkilenmiş sözleşmeler, makine kontratı, envanter ve devir birlikte güncellenir.
+
+#### 15. Açık kararlar ve kabul ölçütleri
+
+| ID | Karar / takip | Kapanış ölçütü |
+| --- | --- | --- |
+| X01 | Katalog onayı | A ailelerinden hedef sürüme alınacak alanlar ve ertelenenler seçilir; hepsi otomatik taahhüt sayılmaz. |
+| X02 | Varsayılanlar ve sınırlar | Üç K tercih dışındaki değerler; sessiz saat/özet, kritik istisna, görünürlük, limit ve süreler kaynak kararıyla atanır. |
+| X03 | Hukuki aktarım | Amaç, dayanak, rıza gerekiyorsa kanıt/geri çekme, saklama ve sağlayıcı kapsamı ayrıca değerlendirilir; ürün varsayılanı onay sayılmaz. |
+| X04 | Kimlik ve abone | Ad ve doğrulanmış iletişimin onaysız yayılımı, bağlantı kaldırmada durması ve organizasyon içinde sabit tekil abone numarası K. Kalan API/veri aktarımı, alias/merge ve format/tahsis ayrıntıları açık olarak alan bazında aktarılır. |
+| X05 | P08 ve plan temsili | Sınırsız Business limiti, ayrı kontenjan/sınırsız etkinlik ve ders tüketmeyen paket katılımı mevcut P08 sırasında çözülür; settings ile geçici bypass kurulmaz. |
+| X06 | API ve istemci | Her alanın mevcut DTO/runtime eşlemesi; yeni ihtiyaç varsa sözleşmesi; cihazda yerel/senkron kapsamı ve gerçek entegrasyon kanıtı belirlenir. |
+
+##### 15.1 Asgari davranış kabulü
+
+- Yetkisiz kullanıcı başka hesap/org/merkez değerini okuyamaz veya yazamaz; Owner olup CM olmayan aktör merkez operasyonu yapamaz.
+- Zorunlu org politikası yerel ayarla aşılamaz; izinli istisna yalnız kendi anahtarı/kapsamında çalışır. Mirası sıfırlamak false yazmaktan farklıdır.
+- Eski sürüm/önizleme ve geri alınmış yetki reddedilir; aynı işlemin tekrarı tek sonuç üretir. Geç audit/outbox hatası bağlı yazımları geri alır.
+- Olumsuz politika/limit değişimi mevcut kesin rezervasyonu sessiz iptal etmez; önizleme/onay ve koruma kanıtı korunur. Geçmiş satış/anlaşma/finans snapshot’ı değişmez.
+- Üç reklam/ölçüm tercihi ilk varsayılanda açık, ayrı ayrı kapatılabilir ve yeniden girişte korunur. Org/platform kullanıcı yerine yeniden açamaz; açık tercih rıza kaydı oluşturmaz.
+- Kapatma sonrası isteğe bağlı kuyruk/SDK/veri toplama yolları etkin tercihi ve gerekli hukuki kapıyı yeniden kontrol eder; zorunlu işlem kayıtları ve diğer amaçlar yanlışlıkla kapanmaz.
+- Mevcut in_app transactional kapatma yasağı korunur. Ertelenmiş email veya henüz desteklenmeyen push/SMS başarılı teslim gibi gösterilmez.
+- Kullanıcı görüntüleme saat dilimi satış/seans iş zamanını değiştirmez. Profil/iletişim değişimi grant veya geçmiş hukuki belgeyi değiştirmez.
+- Hesap/org silme, yenilememe ve kapatma farklı komut/durumlar olarak kalır. Eksik fiziksel imha kanıtı partial/pending kalır; yeniden canlanma engellenir.
+
+### Ek kullanıcı aileleri
+
+U25 Güvenlik hareketleri: kullanıcıya kendi giriş, iletişim değişikliği ve kurtarma olaylarını sır/token göstermeden sunma; ayrıntılar açık. U26 Tercih sıfırlama: alan/grup/ekran/cihaz/hesap kapsamı; kabul edilmiş görünüm grubu sıfırlaması izin ve bildirimleri değiştirmez. Diğer kapsamların ayrıntıları açık.

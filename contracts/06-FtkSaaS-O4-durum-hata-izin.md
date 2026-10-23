@@ -1,4 +1,4 @@
-> **20 Ekim güncel durum:** P01 PR #22 main `7577b2f1873c6b1fcf83390bfa94a34374c44082` ile birleşti; 199 sözleşme / 118 çağrılabilir / 81 yalnız sözleşme / 34 migration. Eski teslim sayıları ve pending notları kendi kapsamına aittir. [Tek güncel devir](../contracts/00-FtkSaaS-yeni-sohbet-devir.md) aynı SHA’nın gerçek başarılı main CI kanıtını gösterir; P01 done. [CI-2026-10-20](../docs/decisions/CI-2026-10-20.md) dört shard, Draft/development ve belge-only kararını içerir; otomasyon CI-02’de bekliyor. Bu karar ürün/izin/finans davranışını değiştirmez.
+> 23 Ekim 2026 güncel durum: P01–P07 kod/main/geliştirme-test kabulü kapandı; yayımlanmış kapsam **200 API / 0 contract_only / 59 migration / 90 core tablo / Edge8**. P07 runtime kaynağı `4cfc9a55`; güncel belge tabanı `bfb8ccb2`. Beş Cron hattı aktif ve boş kuyrukta healthy/idle; fiziksel imha ve gerçek yük kabulü tamamlanmış değildir. Ayar davranış sprinti ve güncel entegrasyon sınırları [tek devir](00-FtkSaaS-yeni-sohbet-devir.md) ve [ayarlar sözleşmesinde](02-FtkSaaS-teknik-sozlesme.md#ayarlar-sozlesmesi-ve-davranis-sprinti). Eski tarih/CI/pending snapshotları yeni durum kanıtı değildir; ürün kuralları yalnız son açık kararla değişir.
 
 > Güncel öncelik: [DS-2026-10-17](../docs/decisions/DS-2026-10-17.md). Çelişen eski hükümler yalnız belirtilen kapsamda yürürlükten kalkmıştır. [Hedef sözleşme/runtime ayrımı](../docs/decision-sprint-handover.md).
 
@@ -315,4 +315,14 @@ settlement.delegation.manage Owner'a özgü; settlement.authority.manage Owner v
 [Starter devri](../docs/starter-attendance-protection-handover.md) kabul edilmiş kararları değiştirmeden dar runtime kapsamını belirtir. Starter F14 kapanışı ve bağlı düzeltme hak hareketi + audit/outbox/receipt ile atomiktir; hakediş üretmez. Ücretli finansal kapanış ve bağlı hakediş düzeltmesi PR #15 ile uygulanmıştır. Koruma yalnız yeni olumsuz etkiye bağlıdır; bağımsız engelleri veya yeni rezervasyon koşullarını kaldırmaz. Taslak başlangıç kanıtı değildir; başlangıç/belge ve diğer hak değişikliği tüketicileri pending. 198 işlem/89 canlı/109 contract-only bu Starter tesliminin tarihsel sayısıdır; güncel envanter 199/118/81 ve 34 migration’dır. İşlem sayısı özellik tamamlama oranı değildir.
 
 Anlaşma/hakediş teslimi: earnings.manage yalnız seçili CM; earnings.read org okuyucusu / seçili CM / kendi canlı merkez rolündeki eğitmen projeksiyonu. attendance_start_v1 attendance.close yetkisiyle explicit olgu kaydıdır; taslak/tüketim/kapanış değildir. management.inspect runtime yalnız negcredit_valuation_set_v1 selector'ını ve özgün CM/F15 kapısını uygular; genel tablo okuması sağlamaz. Ayrıntı: docs/instructor-earnings-handover.md.
+
+## 23 Ekim settings ve kullanıcı güvenliği aktarımı
+
+Ayarlar davranış sözleşmesi [02 içindedir](02-FtkSaaS-teknik-sozlesme.md#ayarlar-sozlesmesi-ve-davranis-sprinti). Ürün kararı yeni hata/enum/permission veya callable DTO eklemez; aşağıdakiler hedef semantik aktarımıdır.
+
+- Hesap sahibi kendi profil/tercih/oturumunu; merkez ve org yöneticileri yalnız mevcut canlı scoped izinlerini kullanır. Platform yetkisi kullanıcı adına rıza oluşturamaz. Org güvenlik şartı diğer orga kendiliğinden taşınmaz.
+- Doğrulama bekleyen iletişim, doğrulanmış güncel değer değildir. Yeni aynı-alan talebi eski bekleyeni geçersizleştirir. Başka hesaba bağlı giriş/kurtarma iletişimi otomatik birleştirme doğurmaz. Active güvenli bağlantı kaldırılınca gelecekteki yayılım durur; üyelik/hesap silme anlamına gelmez.
+- Şifre değişiminde mevcut oturum dışındakiler; sıfırlamada kurtarma oturumu dahil hepsi kapatılmalıdır. Bu hedefin mevcut native Auth/Edge uygulaması alan bazında ayrıca doğrulanacaktır. Mevcut live session kapısı korunur.
+- Ayarları kapalı/desteklenmiyor/yetkisiz/doğrulama bekliyor/sürüm çatışması/yayılma sürüyor durumları UI'da tek başarı durumuna indirgenmez. Mevcut error enum'u dışında yeni string uydurulmaz; gerekli yeni kod ayrı API sözleşmesidir.
+- S01–S10 görünüm tercihleri rol/merkez/plan/alan iznini değiştirmez. Erişimsiz kayıtlı bağlam güvenli yeniden seçime gider; API gizli alanları göndermemelidir.
 

@@ -1,6 +1,4 @@
-> **20 Ekim güncel durum:** P01 PR #22 main `7577b2f1873c6b1fcf83390bfa94a34374c44082` ile birleşti; 199 sözleşme / 118 çağrılabilir / 81 yalnız sözleşme / 34 migration. Eski teslim sayıları ve pending notları kendi kapsamına aittir. [Tek güncel devir](../contracts/00-FtkSaaS-yeni-sohbet-devir.md) aynı SHA’nın gerçek başarılı main CI kanıtını gösterir; P01 done. [CI-2026-10-20](../docs/decisions/CI-2026-10-20.md) dört shard, Draft/development ve belge-only kararını içerir; otomasyon CI-02’de bekliyor. Bu karar ürün/izin/finans davranışını değiştirmez.
-
-> 22 Ekim güncel uygulama kabulü: P01–P06/PR38 kapalı; main006ad36,200 sözleşme/178 runtime/22 contract_only,54 migration/Edge7. Aday39779013518/main39782197422/CD39785146645 başarılı. OPS-W01 Supabase Cron kaynak adayı55 migration taşır; native hosted işletim kabulü beklenir. [Tek devir](00-FtkSaaS-yeni-sohbet-devir.md) güncel kanıttır; eski snapshotlar tarihsel bağlamdır.
+> 23 Ekim 2026 güncel durum: P01–P07 kod/main/geliştirme-test kabulü kapandı; yayımlanmış kapsam **200 API / 0 contract_only / 59 migration / 90 core tablo / Edge8**. P07 runtime kaynağı `4cfc9a55`; güncel belge tabanı `bfb8ccb2`. Beş Cron hattı aktif ve boş kuyrukta healthy/idle; fiziksel imha ve gerçek yük kabulü tamamlanmış değildir. Ayar davranış sprinti ve güncel entegrasyon sınırları [tek devir](00-FtkSaaS-yeni-sohbet-devir.md) ve [ayarlar sözleşmesinde](02-FtkSaaS-teknik-sozlesme.md#ayarlar-sozlesmesi-ve-davranis-sprinti). Eski tarih/CI/pending snapshotları yeni durum kanıtı değildir; ürün kuralları yalnız son açık kararla değişir.
 
 > Güncel öncelik: [DS-2026-10-17](../docs/decisions/DS-2026-10-17.md). Çelişen eski hükümler yalnız belirtilen kapsamda yürürlükten kalkmıştır. [Hedef sözleşme/runtime ayrımı](../docs/decision-sprint-handover.md).
 
@@ -469,4 +467,12 @@ DS-OPEN-01 karar düzeyinde kapalıdır; hesaplaşma runtime aktarımı uygulanm
 ## Starter yoklama/koruma runtime aktarımı
 
 [Starter devri](../docs/starter-attendance-protection-handover.md) kabul edilmiş kararları değiştirmeden dar runtime kapsamını belirtir. Starter F14 kapanışı ve bağlı düzeltme hak hareketi + audit/outbox/receipt ile atomiktir; hakediş üretmez. Ücretli finansal kapanış ve bağlı hakediş düzeltmesi PR #15 ile uygulanmıştır. Koruma yalnız yeni olumsuz etkiye bağlıdır; bağımsız engelleri veya yeni rezervasyon koşullarını kaldırmaz. Taslak başlangıç kanıtı değildir; başlangıç ve belge tüketicileri P01–P05 ile uygulandı; diğer tüketici/kabul açıkları güncel kuyruktadır. 198 işlem/89 canlı/109 contract-only bu Starter tesliminin tarihsel sayısıdır; güncel envanter 199/118/81 ve 34 migration’dır. İşlem sayısı özellik tamamlama oranı değildir.
+
+## 23 Ekim ayarlar kapsamı ve frontend başlangıcı
+
+[Kabul edilmiş settings davranışları](02-FtkSaaS-teknik-sozlesme.md#ayarlar-sozlesmesi-ve-davranis-sprinti) dört yönetim kapsamını ayrı tutar. Kullanıcı S01–S10 onaylı; diğer U/C/O/P alt alanları aday/açık olarak işaretlidir. Görünen ad ile yasal ad ayrıdır. Ad ve doğrulanmış iletişim aktif güvenli hesap–kişi bağı üzerinden org onayı olmadan yansır; geçmiş belge snapshotları değiştirilmez. Org kişi geçmişi/borç/hak/görev diğer orga taşınmaz. Abone numarası UUID yerine insan tarafından kullanılan org içi sabit takip anahtarıdır; uygulaması P08'dir.
+
+Tema/dil/saat/başlangıç/liste/takvim tercihleri erişim veya iş kuralı üretmez. Bildirim/pazarlama/kişiselleştirme/ölçüm izinleri aynı ayar değildir. Üç reklam/analitik varsayılanı açık/kapatılabilir ürün kararı, işleme dayanağı veya rıza kanıtı değildir. Bu görev sağlayıcı/SDK entegrasyonu açmaz.
+
+Yeni settings alanları yayımlanmış API'lere sessizce eklenmez; callable kapsam200 ve machine DTO'lar sabittir. Frontend tasarımda kabul edilmiş hedefleri dikkate alır, uygulama eksiklerini [entegrasyon devrinden](../docs/claude-handover.md) izler.
 
