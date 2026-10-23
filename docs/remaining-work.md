@@ -8,6 +8,7 @@ Frontend başlangıcı için belgeler eşitleniyor; [Claude talimatları](claude
 
 | İş | Durum ve kapanış koşulu |
 |---|---|
+| Organizasyon renk/font paketleri | Kullanıcı hazır marka paketleri ve kişisel görünüm ayrımını kabul etti. [Frontend ihtiyaç notu](claude-handover.md) içindeki organizasyon renk ve font paketleri bölümüne göre mevcut alan/API, canlı org yetkisi, katalog/sürüm/fallback, logo hattı, ortak tip ve kabul senaryoları eşlenecek. Not callable/runtime değildir; settings geliştirmesini durdurma kararı korunur. |
 | Kabul edilmiş ayarların alan eşlemesi | Her alan için mevcut read/write/DTO, izin/plan, sürüm/preview, veri kaynağı, sağlayıcı, cihaz/senkron kapsamı ve kabul senaryosu çıkarılacak. Kabul edilmiş davranış otomatik runtime değil. |
 | Kalan settings kararları | Takvim aboneliği; bildirim olay/kanal/sıklık/sessiz saat; pazarlama/ilgi/reklam/analitik ayrıntıları; görünürlük/izin; veri talepleri/silme/sıfırlama. Ardından C/O/P grupları. |
 | P03 eğitmen ödeme doğrulaması | instructor_payment_record_v1 tutarı karşılandıktan sonra kullanılmayan trailing earning_ids için de kişi/merkez/para birimi doğrulaması ve karışık kapsam regresyonu. Review5594023911; başka tenant'a allocation/para sızıntısı tespit edilmedi, iyileştirme henüz uygulanmadı. |
