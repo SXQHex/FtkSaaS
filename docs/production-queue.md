@@ -162,6 +162,17 @@ Kabul: eski oturumun reddi; abonelik sınır anları; kapatma/izinli geri dönü
 
 ### P08 — Geliştirmeler
 
+#### Organizasyon bazında sabit abone numarası — 23 Ekim 2026
+
+- Kullanıcı kararı: organizasyonun insan tarafından kullanılan takip anahtarı abone numarasıdır; platformun UUID kimlikleri ve mevcut ilişki bağlantıları backend'de korunur. API'den UUID kaldırılması veya yetkilendirme anahtarının değiştirilmesi anlamına gelmez.
+- Abone numarası organizasyon içinde benzersiz, değişmez ve yeniden kullanılmaz. Aynı hesaba bağlı kişinin farklı organizasyonlarda farklı abone numarası olabilir; kapsam platform genelinde izleme numarasına dönüşmez.
+- İsim, doğrulanmış e-posta veya telefon değişikliği abone numarasını, kişi/hesap bağlantısını, üyeliği, hakları veya finansal bağlantıları değiştirmez. Hesaba güvenli bağlı kişi kayıtlarının güncel kimlik/iletişim bilgisi organizasyon onayı olmadan tutarlı yansıtılır; bağlantısız CRM kayıtları aynı iletişim bilgisi nedeniyle kendiliğinden birleştirilmez.
+- Organizasyon ekranları, yetkili arama ve raporlar abone numarası + güncel ad ile takip sağlar. Tarihsel belge içeriği ile güncel kişi bilgisi ayrımı korunur; abone numarası tarihsel izlemeyi destekler.
+- Numara tek başına erişim veya kimlik doğrulama sağlamaz; mevcut tenant/merkez/rol ve canlı yetki kapıları korunur. Numara üretim biçimi, başlangıç noktası, adaylara hangi aşamada verileceği ve mevcut kayıtlara geçiş yöntemi uygulamadan önce netleştirilir.
+- Kabul kapsamı: eşzamanlı tahsiste tekillik, tekrar gönderimde aynı numara, organizasyon izolasyonu, ad/iletişim değişiminde sabitlik, silme/ayrılma/yeniden katılım ve kişi birleştirmede eski numaraların yeniden kullanılmaması/izlenebilirliği. Birleştirmede geçerli numara ve eski numaraların yönlendirme davranışı ayrıca kararlaştırılır.
+- P08 plan kaydıdır; bu ekleme API, migration, canlı veri veya ayar taslaklarını uygulamaz.
+
+
 22 Ekim kullanıcı kararı: mevcut kurulum mevcut API’lerle ilerler; aşağıdaki genişletmeler P08 kapsamındadır, şimdi uygulanmaz ve P07’ye eklenmez. API sayısı/DTO/runtime/migration bu kayıtla değişmez.
 
 #### Çok kaynaklı ortak CRM başvuru toplama — 23 Ekim 2026 kullanıcı kararı
