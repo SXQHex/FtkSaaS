@@ -2,6 +2,8 @@
 
 24 Ekim 2026 inceleme tabanı main `702063807b0a0d09f559f070ffde1b1ae3e7563b`. Yayımlanmış kapsam **200 sözleşme / 200 runtime / 0 contract_only / 59 migration / 90 core tablo / Edge8**. P01–P07 kod/main/geliştirme-test kabulü kapandı. Ürün, işletim ve frontend kabulü API sayısından türetilmez.
 
+Öncelik artık beş ayar ekranı ve typed API teslimidir: kullanıcı/global hesap, üye/org person ve tercihi, merkez, org, platform. SQL/Cron/DB işletim ayarları ayrı backlog. [Somut ekran/alan/API matrisi](claude-handover.md) mevcut desteği ve açıkları gösterir.
+
 ## Başlangıç sırası
 
 1. [AGENTS](../AGENTS.md): alan sahipliği, kaynak kanıtı ve full clean sırasında kullanıcıya devir.

@@ -2,12 +2,14 @@
 
 24 Ekim 2026 belge tabanı main `702063807b0a0d09f559f070ffde1b1ae3e7563b`. P01–P07 kod/main/geliştirme-test kabulü tamamlandı; **200 API/0 contract_only/59 migration**. Eski178/22 ve PR40 pending listeleri güncel açık API listesi değildir. Kanıt [tek devirde](../contracts/00-FtkSaaS-yeni-sohbet-devir.md).
 
-## Aktif görev ve durdurulmuş geliştirme
+## Aktif görev — beş ayar ekranı ve API teslimi
 
-Frontend başlangıcı için belgeler eşitleniyor; [Claude talimatları](claude-handover.md) ve [settings davranışları](../contracts/02-FtkSaaS-teknik-sozlesme.md#ayarlar-sozlesmesi-ve-davranis-sprinti) güncel giriş noktalarıdır. 69 ana grup kabul edildi: 17 kullanıcı, 22 merkez, 21 organizasyon, 9 platform. Grup görüşmesi kapandı; sıradaki iş alan/değer/yetki/sağlayıcı/API matrisi. Bu kapanış yeni settings API/DTO/runtime geliştirmesi başlatmaz. Yerel feature/platform-settings taslağı208 endpoint/60. migration ile yayımlanmış kaynak değildir; bu belge PR'sine dahil edilmez ve frontend tarafından kullanılmaz.
+Frontend başlangıcı için belgeler eşitleniyor; [Claude talimatları](claude-handover.md) ve [settings davranışları](../contracts/02-FtkSaaS-teknik-sozlesme.md#ayarlar-sozlesmesi-ve-davranis-sprinti) güncel giriş noktalarıdır. 69 ana grup kabul edildi: 17 kullanıcı, 22 merkez, 21 organizasyon, 9 platform. Grup görüşmesi kapandı. Son talimat kullanıcı–üye–merkez–org–platform ekranları ve gerçek API teslimidir; [somut alan/API matrisi](claude-handover.md) hazır ve eksik yolları ayırır. SQL/Cron/DB/worker teknik yönetim ayarları ertelendi; uygulama verisi kalıcılığı ve kabul kontrolleri ertelenmedi. Yerel feature/platform-settings taslağı208 endpoint/60. migration ile yayımlanmış kaynak değildir; bu belge PR'sine dahil edilmez ve frontend tarafından kullanılmaz.
 
 | İş | Durum ve kapanış koşulu |
 |---|---|
+| Beş ekran/API kabulü | Kullanıcı global hesap, üye org person/relationship ve org tercihi; merkez/org/platform scope ayrı. Her ekran alan/tip/default, yetki/miras, gerçek read-write/sürüm, hata ve kabul senaryosuyla teslim edilir. Mevcut API ile eksik alanlar ayrıdır; genel settings/marka API boşluğu kapanmadan beş ekran çalışıyor denmez. |
+| Ertelenmiş altyapı ayarları | Worker/pg_cron/DB bağlantı-RLS-grant/search_path/network/SSL, migration/deploy/yedek-restore motoru ve teknik limit yönetimi ayrı iş. Eski sekiz endpointli 208/60 taslak bu hedefin yerine geçmez. |
 | Frontend PR43 renk/font ihtiyacı | [PR43](https://github.com/SXQHex/FtkSaaS/pull/43) okundu; hazır org marka paketi ve S08 kişisel görünüm ayrımı teknik sözleşmede O01/S08/P01/P04 alan eşlemesine bağlandı. Katalog, read/write/reset, logo, canlı yetki, sürüm/cache/fallback, ortak tip ve gerçek E2E açık; isimler öneri, API hazır değil. PR43 ayrı açık branch olarak korunur. |
 | Kabul edilmiş ayarların alan eşlemesi | Her alan için mevcut read/write/DTO, izin/plan, sürüm/preview, veri kaynağı, sağlayıcı, cihaz/senkron kapsamı ve kabul senaryosu çıkarılacak. Kabul edilmiş davranış otomatik runtime değil. |
 | Açık settings alanları | 69 grup tekrar onaylatılmayacak. Somut süre/limit/default, dil/sağlayıcı/kitle, miras/yerel/yayın/reset ve kesin permission/ek onay eşlemesi teknik sözleşmedeki tek matriste çözülecek. API uygunluğu ve runtime testi ayrı kanıtlanacak. |

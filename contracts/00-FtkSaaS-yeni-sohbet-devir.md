@@ -1,5 +1,9 @@
 # FtkSaaS güncel devir
 
+## Son öncelik — frontend beş ekran teslimi
+
+Kullanıcı–üye–merkez–org–platform ayar ekranlarının alanları, gerçek API ve ortak tipleri frontend’e teslim edilecek. Kullanıcı global hesap; üye org person/relationship ve org tercihi. [Alan/API matrisi](../docs/claude-handover.md) mevcut 200 işlemdeki gerçek desteği, eksik marka/tercih/katalog yollarını ve kabul şartını ayırır. SQL/Cron/DB/worker teknik işletim yönetimi ertelendi. Bu yeni öncelik önceki salt belge kapanışı sınırından sonra verilmiştir; belgede API adının yazılması uygulama kabulü değildir. PR43 veya PR44 henüz merge/deploy edildi sayılmaz.
+
 ## 24 Ekim 2026 — ayar davranış sprinti kapanışı
 
 69 ana grup kullanıcı tarafından kabul edildi: S01–S17 kullanıcı, M01–M22 merkez, O01–O21 organizasyon ve P01–P09 platform. [Tek settings sözleşmesi](02-FtkSaaS-teknik-sozlesme.md#ayarlar-sozlesmesi-ve-davranis-sprinti) grup bazlı kararı ve açık alan/değer/yetki/API matrisini taşır. Yeni ana grup eklenmez; henüz seçilmemiş default/limit/sağlayıcı veya permission uydurulmaz. Eski Word O/P aileleri ve üretim P01–P08 numaraları ayrı kapsamdır. Yerel 208/60 taslak kullanılmaz; kod/şema/API geliştirmesi bu kapanışla başlamaz.

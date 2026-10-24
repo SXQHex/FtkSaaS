@@ -753,6 +753,12 @@ Yukarıdaki ilk **10 kullanıcı grubu** 23 Ekim belge tabanında kayıtlıydı;
 
 Kimlik değişiminde bekleyen/doğrulanmış değer, yarış ve çatışma açık durumlarla yönetilir. Bağlanma ve ayrılmada verinin kaynağı ve yayılma sınırı bellidir. Hesap/cihaz/işletim sistemi tercihi ayrı çözülür; çevrimdışı eski değer sunucudaki kapatmayı ezemez. Kullanıcının kapatması giriş, uygulama veya varsayılan güncellemesiyle geri açılmaz. Her bildirim olayı için kanal/zorunluluk/sessiz saat/özet/son kullanım matrisi hazırlanır; süresi dolmuş teklif sonradan gönderilmez. İleri tarihli ayar, iptal, plan düşüşü ve eski değere dönüş ayrı sürümlü davranış ister. Yüksek etkili banka/sağlayıcı/operatör/worker işlemlerinde ek güvenlik gereksinimi alan bazında belirlenir; ikinci onayın hangi işlemlerde zorunlu olduğu henüz seçilmedi. Kullanıcı güvenlik hareketlerini görme ve kapsamlı sıfırlama ailesi kataloğa dahildir; alan/durum ayrıntıları henüz açık.
 
+### Son öncelik — beş kapsamda ekran ve API teslimi
+
+Kullanıcının son talimatıyla kullanıcı–üye–merkez–org–platform ayar değiştirme ekranlarının alanları ve gerçek API'leri frontend'e teslim edilecektir. Kullanıcı global hesap, üye org person/relationship kaydı ve org bazlı self tercihleridir; altıncı grup/yeni hesap türü eklenmez. Backend alan/Request-Response/permission/sürüm/kabul paketini sağlar, frontend tasarım ve istemci uygulamasını yürütür. [Beş ekran kapsamı ve mevcut API matrisi](../docs/claude-handover.md) bağlayıcı teslim listesidir.
+
+SQL/Cron/worker teknik işletimi, DB yönetimi, migration/deployment yönetim ekranları ve benzeri altyapı ayarları ayrı backlog'a ertelenir. Platform ekranında uygulama kimliği/dil/marka katalogları, plan-fiyat-limit seçenekleri, desteklenen alan default/mirasları, hazır kanal/şablon/entegrasyon ve yönetim tercihleri önceliklidir. Erteleme normal uygulama verisinin güvenli kalıcılığını veya CI kapılarını kaldırmaz. 69 grup yeniden onaylatılmaz; yalnız gerçek belirsiz alan kararı sorulur. Yeni genel endpoint veya alan uydurulup mevcut gibi gösterilmez.
+
 ### 24 Ekim 2026 — davranış sprintinin kapanışı
 
 Kullanıcı S11–S17, M01–M22, O01–O21 ve platform P01–P09 gruplarını tek tek onayladı; son P08/P09 birlikte onaylandı. **17 kullanıcı + 22 merkez + 21 organizasyon + 9 platform = 69 ana grup kabul edildi.** S01–S10 yukarıdaki hükümlerle korunur. Yeni ana grup açılmaz; sonraki çalışma açık alanları ve API karşılıklarını tek matriste netleştirmektir. Bu kapanış runtime geliştirmesini veya yayımlanmamış yerel taslağın kullanımını başlatmaz.

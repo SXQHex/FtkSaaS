@@ -1,5 +1,9 @@
 # Changes
 
+## 24 Ekim 2026 — beş ayar ekranı teslim önceliği
+
+Kullanıcı/üye/merkez/org/platform için ekran bölümleri ve doğrulanmış mevcut read-write/permission matrisi Claude devrine eklendi. Kullanıcı ve org üyeliği ayrıldı. SQL/Cron/DB/worker yönetim ayarları ertelendi; eski 208/60 taslağın UI ihtiyacını karşılamadığı kaydedildi. Eksik API ve sağlayıcı/ürün değerleri hazır gösterilmedi; runtime değişmedi.
+
 ## 24 Ekim 2026 — 69 ayar grubu davranış kapanışı
 
 S11–S17, M01–M22, organizasyon O01–O21 ve platform P01–P09 kabulleri tek teknik sözleşmede birleştirildi; ilk S01–S10 korunur. Toplam 69 grup kabul edildi, somut alt alanlar açık. Eski Word aile numaraları, davranış grupları ve üretim P01–P08 ayrıldı. Kaynak indeksi, Claude talimatı, devir, kalan işler ve kuyruk güncellendi. PR42 aynı kaynak belge kabulü ve CD deploy skipped kanıtı kaydedildi. Yeni ana grup veya varsayılan icat edilmedi; runtime, DTO, migration, CI ve üretilmiş dosyalar değişmedi.

@@ -1,6 +1,6 @@
 # FtkSaaS çalışma kuralları
 
-24 Ekim son kullanıcı kabulü: 17 kullanıcı/22 merkez/21 organizasyon/9 platform olmak üzere 69 ana ayar grubu tamamlandı. Önce kararları yaşayan belgelerde birleştir ve alan/değer/yetki/API matrisiyle açık ayrıntıları çöz; bu kapanış yeni settings runtime/DTO/API geliştirmesi başlatmaz. Mevcut yerel platform-settings taslağı yayımlanmış sayılmaz. Frontend tasarımına müdahale etme.
+24 Ekim son kullanıcı kabulü: 17 kullanıcı/22 merkez/21 organizasyon/9 platform olmak üzere 69 ana ayar grubu tamamlandı. Son öncelik kullanıcı–üye–merkez–org–platform ayar değiştirme ekranları ve gerçek API teslimidir. SQL/Cron/DB/worker teknik işletim ayarları ertelenir; frontend beş ekranının alan/typed API/kabul boşlukları tamamlanır. Bu belge değişikliği tek başına yeni endpoint uygulandığı anlamına gelmez. Mevcut yerel platform-settings taslağı yayımlanmış sayılmaz. Frontend tasarımına müdahale etme.
 
 P01–P07/PR40 kod/main/development kabulü kapandı; runtime main4cfc9a55, belge main7020638;200 API/0 contract_only/59 migration/90 core tablo/Edge8. Beş hosted worker temel kurulum ve idle heartbeat doğrulaması geçti. Fiziksel imha/yük/restore ve ek işletim kabulü açık; ayrıntılar [güncel devir](contracts/00-FtkSaaS-yeni-sohbet-devir.md). Eski GitHub ertelemesi ve PR40 pending notları tarihsel sınırdır; mevcut görev yalnız belge eşitlemesidir.
 
