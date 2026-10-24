@@ -1,10 +1,10 @@
 # FtkSaaS çalışma kuralları
 
-23 Ekim son kullanıcı talimatı: frontend tasarımı başlamadan ilgili yaşayan belgeleri güncelle; ayar davranış sprinti tamamlanmadan yeni settings runtime/DTO/API geliştirme. Mevcut yerel platform-settings taslağı yayımlanmış sayılmaz. Frontend tasarımına müdahale etme.
+24 Ekim son kullanıcı kabulü: 17 kullanıcı/22 merkez/21 organizasyon/9 platform olmak üzere 69 ana ayar grubu tamamlandı. Önce kararları yaşayan belgelerde birleştir ve alan/değer/yetki/API matrisiyle açık ayrıntıları çöz; bu kapanış yeni settings runtime/DTO/API geliştirmesi başlatmaz. Mevcut yerel platform-settings taslağı yayımlanmış sayılmaz. Frontend tasarımına müdahale etme.
 
-P01–P07/PR40 kod/main/development kabulü kapandı; runtime main4cfc9a55, belge mainbfb8ccb2;200 API/0 contract_only/59 migration/90 core tablo/Edge8. Beş hosted worker temel kurulum ve idle heartbeat doğrulaması geçti. Fiziksel imha/yük/restore ve ek işletim kabulü açık; ayrıntılar [güncel devir](contracts/00-FtkSaaS-yeni-sohbet-devir.md). Eski GitHub ertelemesi ve PR40 pending notları tarihsel sınırdır; mevcut görev yalnız belge eşitlemesidir.
+P01–P07/PR40 kod/main/development kabulü kapandı; runtime main4cfc9a55, belge main7020638;200 API/0 contract_only/59 migration/90 core tablo/Edge8. Beş hosted worker temel kurulum ve idle heartbeat doğrulaması geçti. Fiziksel imha/yük/restore ve ek işletim kabulü açık; ayrıntılar [güncel devir](contracts/00-FtkSaaS-yeni-sohbet-devir.md). Eski GitHub ertelemesi ve PR40 pending notları tarihsel sınırdır; mevcut görev yalnız belge eşitlemesidir.
 
-[Ayarlar sözleşmesi](contracts/02-FtkSaaS-teknik-sozlesme.md#ayarlar-sozlesmesi-ve-davranis-sprinti) kullanıcı S01–S10 kabulünü, aday C/O/P ailelerini ve kalan sprinti ayırır. Yeni davranış kararı otomatik runtime kabulü değildir. Word dosyası ayrı otorite değildir.
+[Ayarlar sözleşmesi](contracts/02-FtkSaaS-teknik-sozlesme.md#ayarlar-sozlesmesi-ve-davranis-sprinti) 69 S/M/O/P kabul grubunu ve açık alt alanları ayırır. Davranış grubu numaraları eski Word aileleri ve üretim P01–P08 kuyruğuyla karıştırılmaz. Yeni davranış kararı otomatik runtime kabulü değildir. Word dosyası ayrı otorite değildir.
 
 Vercel Sandbox yalnız yerelde çalıştırmanın mümkün olmadığı zorunlu dar doğrulamada kullanılabilir; kanıt alınınca durdurulur. Bu belge görevinde native test/Sandbox veya runtime full clean gerektiren kaynak değişikliği yapılmaz. Mevcut CI kapıları/izin listesi değiştirilmez; güvenli yalnız-belge yolu kaynak bağlı olarak doğrulanır.
 

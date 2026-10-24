@@ -1,15 +1,16 @@
 # Kalan backend ve entegrasyon işleri
 
-23 Ekim 2026 belge tabanı main `bfb8ccb29a1e0ca9efde7813dc3af4bbbad8768d`. P01–P07 kod/main/geliştirme-test kabulü tamamlandı; **200 API/0 contract_only/59 migration**. Eski178/22 ve PR40 pending listeleri güncel açık API listesi değildir. Kanıt [tek devirde](../contracts/00-FtkSaaS-yeni-sohbet-devir.md).
+24 Ekim 2026 belge tabanı main `702063807b0a0d09f559f070ffde1b1ae3e7563b`. P01–P07 kod/main/geliştirme-test kabulü tamamlandı; **200 API/0 contract_only/59 migration**. Eski178/22 ve PR40 pending listeleri güncel açık API listesi değildir. Kanıt [tek devirde](../contracts/00-FtkSaaS-yeni-sohbet-devir.md).
 
 ## Aktif görev ve durdurulmuş geliştirme
 
-Frontend başlangıcı için belgeler eşitleniyor; [Claude talimatları](claude-handover.md) ve [settings davranışları](../contracts/02-FtkSaaS-teknik-sozlesme.md#ayarlar-sozlesmesi-ve-davranis-sprinti) güncel giriş noktalarıdır. Kullanıcı S01–S10 grupları kabul edildi. Kalan kullanıcı/merkez/organizasyon/platform davranışları netleşmeden yeni settings API/DTO/runtime geliştirmesi durduruldu. Yerel feature/platform-settings taslağı208 endpoint/60. migration ile yayımlanmış kaynak değildir; bu belge PR'sine dahil edilmez ve frontend tarafından kullanılmaz.
+Frontend başlangıcı için belgeler eşitleniyor; [Claude talimatları](claude-handover.md) ve [settings davranışları](../contracts/02-FtkSaaS-teknik-sozlesme.md#ayarlar-sozlesmesi-ve-davranis-sprinti) güncel giriş noktalarıdır. 69 ana grup kabul edildi: 17 kullanıcı, 22 merkez, 21 organizasyon, 9 platform. Grup görüşmesi kapandı; sıradaki iş alan/değer/yetki/sağlayıcı/API matrisi. Bu kapanış yeni settings API/DTO/runtime geliştirmesi başlatmaz. Yerel feature/platform-settings taslağı208 endpoint/60. migration ile yayımlanmış kaynak değildir; bu belge PR'sine dahil edilmez ve frontend tarafından kullanılmaz.
 
 | İş | Durum ve kapanış koşulu |
 |---|---|
+| Frontend PR43 renk/font ihtiyacı | [PR43](https://github.com/SXQHex/FtkSaaS/pull/43) okundu; hazır org marka paketi ve S08 kişisel görünüm ayrımı teknik sözleşmede O01/S08/P01/P04 alan eşlemesine bağlandı. Katalog, read/write/reset, logo, canlı yetki, sürüm/cache/fallback, ortak tip ve gerçek E2E açık; isimler öneri, API hazır değil. PR43 ayrı açık branch olarak korunur. |
 | Kabul edilmiş ayarların alan eşlemesi | Her alan için mevcut read/write/DTO, izin/plan, sürüm/preview, veri kaynağı, sağlayıcı, cihaz/senkron kapsamı ve kabul senaryosu çıkarılacak. Kabul edilmiş davranış otomatik runtime değil. |
-| Kalan settings kararları | Takvim aboneliği; bildirim olay/kanal/sıklık/sessiz saat; pazarlama/ilgi/reklam/analitik ayrıntıları; görünürlük/izin; veri talepleri/silme/sıfırlama. Ardından C/O/P grupları. |
+| Açık settings alanları | 69 grup tekrar onaylatılmayacak. Somut süre/limit/default, dil/sağlayıcı/kitle, miras/yerel/yayın/reset ve kesin permission/ek onay eşlemesi teknik sözleşmedeki tek matriste çözülecek. API uygunluğu ve runtime testi ayrı kanıtlanacak. |
 | P03 eğitmen ödeme doğrulaması | instructor_payment_record_v1 tutarı karşılandıktan sonra kullanılmayan trailing earning_ids için de kişi/merkez/para birimi doğrulaması ve karışık kapsam regresyonu. Review5594023911; başka tenant'a allocation/para sızıntısı tespit edilmedi, iyileştirme henüz uygulanmadı. |
 | Güvenlik sertleştirmesi | private.ops_run connection/role search_path sabitlemesi ve public.rls_auto_enable gereksiz EXECUTE izinlerinin kaldırılması kaynak kabulüyle yapılacak. ops_run üzerine SET clause eklenmez: COMMIT bozulur. Event-trigger dönüş tipi doğrudan normal çağrıyı reddeder; uyarılar kanıtlanmış dış saldırı gibi sunulmaz. |
 | Parola koruması uyarısı | Kullanıcı Free plan kısıtı nedeniyle kapsam dışında bıraktı; çözülmüş sayılmaz, geliştirme engeli yapılmaz. |

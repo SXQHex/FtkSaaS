@@ -1,5 +1,13 @@
 # FtkSaaS güncel devir
 
+## 24 Ekim 2026 — ayar davranış sprinti kapanışı
+
+69 ana grup kullanıcı tarafından kabul edildi: S01–S17 kullanıcı, M01–M22 merkez, O01–O21 organizasyon ve P01–P09 platform. [Tek settings sözleşmesi](02-FtkSaaS-teknik-sozlesme.md#ayarlar-sozlesmesi-ve-davranis-sprinti) grup bazlı kararı ve açık alan/değer/yetki/API matrisini taşır. Yeni ana grup eklenmez; henüz seçilmemiş default/limit/sağlayıcı veya permission uydurulmaz. Eski Word O/P aileleri ve üretim P01–P08 numaraları ayrı kapsamdır. Yerel 208/60 taslak kullanılmaz; kod/şema/API geliştirmesi bu kapanışla başlamaz.
+
+Belge tabanı `702063807b0a0d09f559f070ffde1b1ae3e7563b` (PR42), tree `272a4d968a90d450d98078040025d48b6db6417d`. [Aday belge39889500257](https://github.com/SXQHex/FtkSaaS/actions/runs/39889500257), kaynak bağlı merge kapısı ve [aynı main39890889184](https://github.com/SXQHex/FtkSaaS/actions/runs/39890889184) success. Main documentation success, runtime clean skipped: bu yeni full clean değildir. [CD39890983257](https://github.com/SXQHex/FtkSaaS/actions/runs/39890983257) source success/deploy skipped. Runtime 200/59 ve aşağıdaki P07 kabulü değişmedi. Aynı main'in sonraki cancelled targeted koşusu bu kaynak bağlı belge kabulünü başarısız yapmaz ve ek kabul kanıtı sayılmaz.
+
+Açık PR43 `3eaa0cff6173a81db97d779c8f2ba679f124a869` organizasyon renk/font paketleri frontend ihtiyaç notu okundu; katalog/kalıcı seçim/logo/izin/sürüm-cache-fallback/ortak tip beklentileri teknik sözleşmede O01/S08/P01/P04 alan eşlemesine kaydedildi. PR43 merge edilmedi ve mevcut API kabulüne dahil sayılmaz; ayrı branch üzerine yazılmadı.
+
 ## 23 Ekim 2026 güncel kaynak ve kabul
 
 - Belge tabanı main `bfb8ccb29a1e0ca9efde7813dc3af4bbbad8768d` (PR41); 200 yayımlanmış operasyon, 0 yalnız sözleşme, 59 migration, 90 core tablo. P08 veya yeni settings API’si yayımlanmadı.
@@ -10,7 +18,7 @@
 
 ## Frontend başlangıcı
 
-[Ayarlar sözleşmesi](02-FtkSaaS-teknik-sozlesme.md#ayarlar-sozlesmesi-ve-davranis-sprinti) S01–S10 ürün davranışlarını taşır. [Entegrasyon devri](../docs/claude-handover.md) callable alanları ve açık bağımlılıkları ayırır. Kullanıcı tüm ayar davranışları netleşmeden runtime geliştirmesini durdurdu; yalnız belgeler güncelleniyor. 208 API/60. migration içeren yerel ayar taslağı kaynak kabulü değildir ve yayımlanmamıştır.
+[Ayarlar sözleşmesi](02-FtkSaaS-teknik-sozlesme.md#ayarlar-sozlesmesi-ve-davranis-sprinti) 69 ana ayar grubunun ürün davranışlarını taşır. [Entegrasyon devri](../docs/claude-handover.md) callable alanları ve açık bağımlılıkları ayırır. Ana gruplar kapandı; kullanıcı odağı ayarlar ve alan ayrıntılarıdır. Bu teslim yalnız belgeleri günceller; yeni runtime geliştirmesi başlamaz. 208 API/60. migration içeren yerel ayar taslağı kaynak kabulü değildir ve yayımlanmamıştır.
 
 ## Önceki devir snapshotları
 

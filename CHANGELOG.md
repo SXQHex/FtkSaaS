@@ -1,5 +1,9 @@
 # Changes
 
+## 24 Ekim 2026 — 69 ayar grubu davranış kapanışı
+
+S11–S17, M01–M22, organizasyon O01–O21 ve platform P01–P09 kabulleri tek teknik sözleşmede birleştirildi; ilk S01–S10 korunur. Toplam 69 grup kabul edildi, somut alt alanlar açık. Eski Word aile numaraları, davranış grupları ve üretim P01–P08 ayrıldı. Kaynak indeksi, Claude talimatı, devir, kalan işler ve kuyruk güncellendi. PR42 aynı kaynak belge kabulü ve CD deploy skipped kanıtı kaydedildi. Yeni ana grup veya varsayılan icat edilmedi; runtime, DTO, migration, CI ve üretilmiş dosyalar değişmedi.
+
 ## 23 Ekim 2026 frontend başlangıcı ve settings karar eşitlemesi
 
 P01–P07 kaynak/full-clean/main/development CD kapanışı güncel devir ve istemci talimatlarına aktarıldı:200 API/59 migration/Edge8. PR41 belge kabulü, gerçek runtime kabulü ve CD deploy skipped ayrıldı. Beş Cron temel kurulum/idle heartbeat ile3600sn quote/900sn reauth kullanıcı config'i kaydedildi; gerçek yük/fiziksel imha açık.

@@ -1,10 +1,12 @@
+> 24 Ekim ayar kapanışı: **69 ana grup kabul edildi** (17 kullanıcı/22 merkez/21 organizasyon/9 platform). Somut alan/değer/yetki/sağlayıcı ve API eşlemesi açıktır; runtime/enum/permission bu belgeyle değişmez. [Tek karar ve açık alan matrisi](02-FtkSaaS-teknik-sozlesme.md#ayarlar-sozlesmesi-ve-davranis-sprinti). Önceki S01–S10/kalan grup ifadeleri 23 Ekim aktarım sınırıdır.
+
 > 23 Ekim 2026 güncel durum: P01–P07 kod/main/geliştirme-test kabulü kapandı; yayımlanmış kapsam **200 API / 0 contract_only / 59 migration / 90 core tablo / Edge8**. P07 runtime kaynağı `4cfc9a55`; güncel belge tabanı `bfb8ccb2`. Beş Cron hattı aktif ve boş kuyrukta healthy/idle; fiziksel imha ve gerçek yük kabulü tamamlanmış değildir. Ayar davranış sprinti ve güncel entegrasyon sınırları [tek devir](00-FtkSaaS-yeni-sohbet-devir.md) ve [ayarlar sözleşmesinde](02-FtkSaaS-teknik-sozlesme.md#ayarlar-sozlesmesi-ve-davranis-sprinti). Eski tarih/CI/pending snapshotları yeni durum kanıtı değildir; ürün kuralları yalnız son açık kararla değişir.
 
 # FtkSaaS — Kodlama sorumlulukları ve model yetki sınırları
 
-## 23 Ekim 2026 yürürlükteki çalışma kararı
+## 24 Ekim 2026 yürürlükteki çalışma kararı
 
-[AGENTS](../AGENTS.md), [settings sözleşmesi](02-FtkSaaS-teknik-sozlesme.md#ayarlar-sozlesmesi-ve-davranis-sprinti) ve [Claude talimatı](../docs/claude-handover.md) geçerlidir. P01–P07 kabulü kapandı; şimdi frontend başlangıcı için belge eşitlemesi ve davranış karar sprinti yürür. Yeni settings runtime geliştirmesi kullanıcı tarafından durduruldu. Belge onayı, UI tasarım kararı ve çalışan API ayrı teslimdir.
+[AGENTS](../AGENTS.md), [settings sözleşmesi](02-FtkSaaS-teknik-sozlesme.md#ayarlar-sozlesmesi-ve-davranis-sprinti) ve [Claude talimatı](../docs/claude-handover.md) geçerlidir. P01–P07 kabulü kapandı; 69 ana ayar grubu kararı kapanmıştır; şimdi belge eşitlemesi ve açık alan/değer/yetki/API matrisi hazırlanır. Yeni settings runtime geliştirmesi kullanıcı tarafından durduruldu. Belge onayı, UI tasarım kararı ve çalışan API ayrı teslimdir.
 
 CI-02 otomasyonu kuruludur. Geliştirmede Draft/development ve birikimli hedefli doğrulama; runtime/CI son adayda kaynak bağlı full clean, merge sonrası aynı main full clean; incelenmiş güvenli yalnız-belge kaynağında ayrı belge kabulü. Mevcut kapı veya izin listesi bu görevle değiştirilmez. Önceden verilen somut yetki tekrar onaylatılmaz; genel üretim kuyruğu frontend/production/repository yönetim yetkisi vermez.
 

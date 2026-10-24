@@ -19,6 +19,8 @@ Paylaşılan **geliştirme/test** hedefi `https://gwyprhenabtpkbojephw.supabase.
 
 ## Tasarım kararı ile mevcut API ayrımı
 
+S11 kişisel takvim, S14 pazarlama/ilgi, S15 görünürlük/izin, S16 veri talebi/silme ve S17 güvenlik geçmişi/reset de kabul edilmiştir. Bu grupların gerçek read/write/DTO desteği aşağıdaki mevcut 200 işlemden tek tek eşlenecek; takvim bağlantısı, session listesi, export veya genel reset endpoint’i var sayılmaz. Desteklenmeyen seçenek yerel taslak olabilir, sahte kalıcı kayıt olamaz.
+
 | Ayar alanı | Kabul edilmiş hedef | Bugün kullanılabilen yol ve açık sınır |
 |---|---|---|
 | S01 Profil | Görünen ad, hitap, fotoğraf ve ayrı görünürlük | `account_get_v1` ve `account_profile_update_v1` yalnız display_name; yazma sürümü `management_state_get_v1` ile okunur. Hitap/fotoğraf/görünürlük alanları bu DTO'da yok. |
@@ -29,11 +31,11 @@ Paylaşılan **geliştirme/test** hedefi `https://gwyprhenabtpkbojephw.supabase.
 | S06 Oturumlar | Kendi oturumlarını gör/kapat; güven kaydını ayrı yönet | Mevcut canlı session kapıları oturum listeleme/etiketleme/tüm cihaz yönetimi API'si var anlamına gelmez. Yeni alanlar/sağlayıcı eşlemesi bekler. |
 | S07 Dil bölge saat | Hesap manuel/cihaz otomatik tercihleri; iş zamanı sabit | Genel tercih saklama DTO'su yok. İşlem saatleri mevcut Instant ve merkez saat dilimi kurallarıyla okunur; istemci görünüm tercihi iş zamanını değiştiremez. |
 | S08–S10 Görünüm ve bağlam | Erişilebilirlik, başlangıç, ekran/takvim tercihleri | Yerel görünüm tasarımı yapılabilir; hesapta kalıcı tercih senkronizasyonu mevcut200 API'de var sayılmaz. Yetki/alan filtreleri backend'den gelir. |
-| Bildirim tercihi | Ayrıntılı olay/kanal/sessiz saat grupları henüz açık | `notification_preferences_set_v1` ve yetkili management okuması mevcut. Amaçlar transactional/reminder/marketing; mevcut yol in_app, transactional=false ret. Enum'da email olması dış teslim kanıtı değildir; push/SMS yeni enum gibi eklenmez. |
+| Bildirim tercihi | S12–S13 davranışı kabul; kesin olay/kanal/istisna/zaman değerleri açık | `notification_preferences_set_v1` ve yetkili management okuması mevcut. Amaçlar transactional/reminder/marketing; mevcut yol in_app, transactional=false ret. Enum'da email olması dış teslim kanıtı değildir; push/SMS yeni enum gibi eklenmez. |
 | Reklam ölçüm ve analitik | Üç ayrı tercih varsayılan açık/kapatılabilir; ayrıntılar açık | Tercih değeri rıza/dayanak değildir. Yeni SDK/toplama entegrasyonu bu belgeyle etkinleştirilmez. İzin, teknik etkinlik ve sağlayıcı desteği ayrı. |
-| Merkez/org/platform | Katalog aileleri aday; mevcut ürün korumaları kesin | Mevcut `policies_get/policy_publish`, availability, registry, belge/otomasyon ve abonelik komutları kullanılır. Generic settings read/write endpoint'i yayımlanmadı. |
+| Merkez/org/platform | M01–M22, org O01–O21 ve platform P01–P09 kabul edildi; alt alan değerleri açık | Mevcut `policies_get/policy_publish`, availability, registry, belge/otomasyon ve abonelik komutları kullanılır. Generic settings read/write endpoint'i yayımlanmadı. |
 
-S01–S10 ürün davranışları kabul edilmiş olmakla birlikte tüm alanlar uygulanmış değildir. Kalan altı kullanıcı teması ve C/O/P grupları tamamlanmadan yeni API alanı, değer veya sağlayıcı davranışı uydurma. Aynı durumun tasarım prototipi ile gerçek API kaydetme başarısını ayır; desteklenmeyen alan için sahte başarılı kayıt üretme.
+24 Ekim: S01–S17/M01–M22/org O01–O21/platform P01–P09 olmak üzere 69 ana davranış grubu kabul edildi; tüm alanlar uygulanmış değildir. Ayrıntılar tek teknik sözleşmede; açık default/değer/permission/sağlayıcı ve mevcut API eşlemesi ayrı çözülür. Yeni API alanı, değer veya sağlayıcı davranışı uydurma. Eski Word aileleri ve üretim kuyruğu aynı numaralarla karıştırılmaz. Aynı durumun tasarım prototipi ile gerçek API kaydetme başarısını ayır; desteklenmeyen alan için sahte başarılı kayıt üretme.
 
 ## İstek yanıt ve sürüm kuralları
 
