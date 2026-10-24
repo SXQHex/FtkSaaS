@@ -1,6 +1,8 @@
 # FtkSaaS kaynak indeksi
 
-23 Ekim 2026 inceleme tabanı main `bfb8ccb29a1e0ca9efde7813dc3af4bbbad8768d`. Yayımlanmış kapsam **200 sözleşme / 200 runtime / 0 contract_only / 59 migration / 90 core tablo / Edge8**. P01–P07 kod/main/geliştirme-test kabulü kapandı. Ürün, işletim ve frontend kabulü API sayısından türetilmez.
+24 Ekim 2026 inceleme tabanı main `702063807b0a0d09f559f070ffde1b1ae3e7563b`. Yayımlanmış kapsam **200 sözleşme / 200 runtime / 0 contract_only / 59 migration / 90 core tablo / Edge8**. P01–P07 kod/main/geliştirme-test kabulü kapandı. Ürün, işletim ve frontend kabulü API sayısından türetilmez.
+
+Öncelik artık beş ayar ekranı ve typed API teslimidir: kullanıcı/global hesap, üye/org person ve tercihi, merkez, org, platform. SQL/Cron/DB işletim ayarları ayrı backlog. [Somut ekran/alan/API matrisi](claude-handover.md) mevcut desteği ve açıkları gösterir.
 
 ## Başlangıç sırası
 
@@ -8,7 +10,7 @@
 2. [00 güncel devir](../contracts/00-FtkSaaS-yeni-sohbet-devir.md): kaynak/run/tree/CD receipt ve hosted temel kurulum kanıtı.
 3. [Kalan işler](remaining-work.md) ve [üretim kuyruğu](production-queue.md): gerçek açıklar; P08 abone numarası ve ortak çok kaynaklı CRM.
 4. [Claude frontend talimatları](claude-handover.md): gerçek API/DTO, istek, sürüm, ortam, güvenlik ve tasarım sınırları. Kökte otomatik yüklenen CLAUDE.md bulunmadığından bu dosya açıkça okutulur.
-5. [02 ayarlar sözleşmesi](../contracts/02-FtkSaaS-teknik-sozlesme.md#ayarlar-sozlesmesi-ve-davranis-sprinti): S01–S10 kabul edilmiş davranış; kalan kullanıcı ve C/O/P aileleri açık/aday. Yeni ayar davranışlarının tümü mevcut API'de var değildir. Yerel 208 API/60. migration taslağı yayımlanmamıştır.
+5. [02 ayarlar sözleşmesi](../contracts/02-FtkSaaS-teknik-sozlesme.md#ayarlar-sozlesmesi-ve-davranis-sprinti): S01–S17, M01–M22, organizasyon O01–O21 ve platform P01–P09: 69 ana grup kabul edildi; somut değerler/yetkiler/sağlayıcılar alan bazında açık. Yeni ayar davranışlarının tümü mevcut API'de var değildir. Yerel 208 API/60. migration taslağı yayımlanmamıştır.
 6. Görevle ilgili ürün/teknik sözleşme, kabul edilmiş karar ve gerçek makine/TypeScript DTO'su.
 
 Son açık kullanıcı kararı üstündür; sonraki kabul yalnız çelişen hükümleri değiştirir. Kabul edilmiş ürün davranışı, teknik aktarım, callable uygulama ve doğrulanmış kabul ayrı tutulur. Eski bir rapor veya modül devrindeki pending notu güncel kaynak kanıtından üstün değildir.
@@ -19,7 +21,7 @@ Son açık kullanıcı kararı üstündür; sonraki kabul yalnız çelişen hük
 |---|---|
 | [00 devir](../contracts/00-FtkSaaS-yeni-sohbet-devir.md) | Güncel başlangıç. P07 aday/main/CD, PR41 belge kabulü ve beş Cron heartbeat kanıtı eklendi; önceki kaynaklar tarihsel bölümde. |
 | [01 ürün](../contracts/01-FtkSaaS-urun-kapsam-sozlesmesi.md) | Normatif ürün kapsamı. Ayar davranış kabulü/uygulama ayrımı, güncel kişi verisi ve P08 abone numarası sınırı eşitlendi. |
-| [02 teknik](../contracts/02-FtkSaaS-teknik-sozlesme.md) | Normatif teknik davranış. Word v0.1 settings kataloğu tek Markdown kaynağına aktarıldı; on kullanıcı kabulü, adaylar ve açıklar ayrı. |
+| [02 teknik](../contracts/02-FtkSaaS-teknik-sozlesme.md) | Normatif teknik davranış. Word v0.1 settings kataloğu tek Markdown kaynağına aktarıldı; 69 ana grubun kabulü, eski Word aileleri ve açık alt alanlar ayrı; numara kapsamları karıştırılmaz. |
 | [03 sorumluluklar](../contracts/03-FtkSaaS-kodlama-sorumluluklari.md) | ChatGPT backend / Claude frontend sınırı, ortak tiplerin gerçek yolu ve durdurulmuş settings geliştirmesi güncellendi. |
 | [04 şema](../contracts/04-FtkSaaS-O4-veri-semasi.md) | Üretilmiş katalog; 90 tablo/59 migration doğrulanır. Kesin DDL migrations içindedir. Yeni settings alanı elle eklenmedi. |
 | [05 API](../contracts/05-FtkSaaS-O4-API-katalogu.md) | Üretilmiş 200 callable operasyon kataloğu. DTO kaynağı 08; kapsam notu gerçek sağlayıcı kabulünün yerine geçmez. |

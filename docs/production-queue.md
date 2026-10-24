@@ -1,6 +1,6 @@
 # FtkSaaS sıralı üretim kuyruğu
 
-23 Ekim güncel durum: P01–P07 kod/main/geliştirme-test kabulü kapandı. Yayımlanmış200 API/59 migration; kaynak ve run kanıtı [tek devirdedir](../contracts/00-FtkSaaS-yeni-sohbet-devir.md). Beş hosted worker kurulu/idle/hata0; gerçek yük ve fiziksel imha ayrı açık. Yeni settings uygulaması kullanıcı kararıyla durduruldu; frontend için belgeler eşitleniyor. [Davranış sprinti](../contracts/02-FtkSaaS-teknik-sozlesme.md#ayarlar-sozlesmesi-ve-davranis-sprinti) S01–S10 kabulünü ve kalan grupları taşır.
+23 Ekim güncel durum: P01–P07 kod/main/geliştirme-test kabulü kapandı. Yayımlanmış200 API/59 migration; kaynak ve run kanıtı [tek devirdedir](../contracts/00-FtkSaaS-yeni-sohbet-devir.md). Beş hosted worker kurulu/idle/hata0; gerçek yük ve fiziksel imha ayrı açık. 69 ana settings grubu kabul edildi; açık alan/değer/yetki/API eşlemesi sıradadır, yeni runtime uygulaması bu belgeyle başlatılmaz. [Davranış sprinti](../contracts/02-FtkSaaS-teknik-sozlesme.md#ayarlar-sozlesmesi-ve-davranis-sprinti) 69 grup kabulünü ve kalan alt alanları taşır. Settings platform P01–P09, bu üretim tablosundaki P01–P08 teslimleri değildir.
 
 | Sıra | Teslim | İşlem | Durum | Kanıt / sonraki adım |
 |---|---|---:|---|---|
@@ -16,6 +16,10 @@
 | OPS-W01 | Hosted worker işletimi | — | done | d1830c8 main/CD kabulü; Cron2/3/4 healthy idle ve disable-restart geçti; tenant kapsamı3 bağlı |
 | P07 | Hesap, organizasyon ve abonelik yaşam döngüsü | 22 | done (kod/main/development) | PR40/main4cfc9a55; aday39863852941/main39866466608/CD39869023193 success; hosted temel kurulum ve idle heartbeat geçti; fiziksel imha/yük ayrı |
 | P08 | Geliştirmeler | — | queued | Ayrı kontenjanlar, sınırsız etkinlik ve paket ders/etkinlik kapsamları; mevcut kurulum20 kontenjan/100 tekrar; paket süresi+bakiye ile ücretsiz etkinlik uygunluğu; sabit abone no ve ortak çok kaynaklı CRM |
+
+## Aktif öncelik — beş ayar ekranının API teslimi
+
+Son kullanıcı talimatı: [kullanıcı–üye–merkez–org–platform alan/API matrisi](claude-handover.md) üzerinden mevcut yolları kullan, eksik typed ekran API ihtiyaçlarını tamamla. Yeni ana ayar gruplarıyla kapsamı uzatma. SQL/Cron/worker/DB işletim ayarları ayrı sonraki iş; eski 208/60 taslak otomatik taşınmaz. Frontend tasarım/istemci sahipliği Claude’da kalır.
 
 ## Ajanın kuyruk bakımı
 
@@ -141,4 +145,4 @@ Güncel operasyonel kurulum girdileri: Business aylık5000 TRY/yıllık50000 TRY
 Worker işletim kapanışı: son kullanıcı talimatıyla mevcut organizasyon p01/p05/p06 kapsamlarına yalnız kendi LOGIN karşılıklarıyla bağlandı (gerçek rol adları ftk_ops_p01/ftk_ops_p05/ftk_ops_p06). Üç Cron5sn/active, üç lane enabled/healthy ve last_org gerçek organizasyona bağlı; ticks1397/1397/1392 okumasında hata0. Kuyruk boş olduğundan idle/claim0; bu gerçek iş yükü veya henüz oluşturulmamış satış/seans/etkinlik kabulü değildir. Tenant worker kurulumu P07’yi bekletmez. P07-B/C kaynakları PR40 ile kabul edildi; ayrıntılı source/CI tek devirdedir. Fiziksel imha ve gerçek iş yükü kabulü ayrı kalır.
 
 
-P07'nin sonraki tamamlanmış kaynak ve hosted temel kurulum kanıtı yukarıdaki kapanış kaydındadır. Gizlilik partial/pending ve fiziksel imha kanıtı sınırı sürer. Kullanıcının yeni ayar API geliştirmesini durdurma kararı geçerlidir; önce settings davranışları netleştirilecektir.
+P07'nin sonraki tamamlanmış kaynak ve hosted temel kurulum kanıtı yukarıdaki kapanış kaydındadır. Gizlilik partial/pending ve fiziksel imha kanıtı sınırı sürer. 69 ana ayar davranışı tamamlandı. Sonraki adım tek alan/değer/yetki/API matrisi; yeni ayar API geliştirmesi bu kapanışla başlamaz.

@@ -1,6 +1,101 @@
 # Claude frontend entegrasyon talimatları
 
-23 Ekim 2026. Belge tabanı main `bfb8ccb29a1e0ca9efde7813dc3af4bbbad8768d`. Frontend tasarım/istemci kodu Claude'un alanıdır; backend bu teslimde tasarıma müdahale etmez. Bu dosya Claude'un açıkça okutulacak başlangıç talimatıdır; repository'de kök `CLAUDE.md` veya `.claude` yapılandırması bulunmuyor. Dosyanın Claude tarafından kendiliğinden yüklendiğini varsayma.
+24 Ekim 2026. Belge tabanı main `702063807b0a0d09f559f070ffde1b1ae3e7563b`. Frontend tasarım/istemci kodu Claude'un alanıdır; backend bu teslimde tasarıma müdahale etmez. Bu dosya Claude'un açıkça okutulacak başlangıç talimatıdır; repository'de kök `CLAUDE.md` veya `.claude` yapılandırması bulunmuyor. Dosyanın Claude tarafından kendiliğinden yüklendiğini varsayma.
+
+## Beş kapsamlı ayar ekranı teslimi — 24 Ekim önceliği
+
+Son kullanıcı talimatı: kullanıcı–üye–merkez–organizasyon–platform ayar değiştirme ekranları ve gerçek API karşılıkları frontend'e teslim edilecek. SQL/Cron/worker işletimi ve DB yönetim ayarları sonraya bırakılır. 69 ana grubu yeniden görüşmek yerine ekran alanları tamamlanır. Backend ekranların alan/veri/yetki/API sözleşmesini, frontend kendi tasarım ve istemci uygulamasını teslim eder. Bu belge ekranların veya eksik API'lerin çalıştığı iddiası değildir.
+
+### Beş kapsamın anlamı
+
+| Ekran | Değerin sahibi | Düzenleyen / ayrım |
+|---|---|---|
+| Kullanıcı | Global hesap; bazı tercihler cihaz | Hesap sahibi kendi bilgisi/güvenliği/tercihi. Org yöneticisi global hesabı düzenleyemez. |
+| Üye | Organizasyona ait kişi/ilişki ve o orgdaki kullanıcı tercihleri | Kendi org tercihini hesap sahibi; üye operasyon alanını ilgili mevcut person/merkez yetkilisi. Tek ekranda bu iki izin birbirinin yerine geçmez. |
+| Merkez | Açık org + merkez | Yetkili merkez yöneticisi ve yalnız açık devredilmiş alan yetkilisi. |
+| Organizasyon | Organizasyon | Alana göre Owner veya ilgili açık organizasyon yetkilisi. Owner otomatik merkez operasyon yetkisi değildir. |
+| Platform | SaaS'ın uygulama yapılandırması | Alana göre platform yapılandırma/güvenlik/plan/entegrasyon yetkilisi. İsimler henüz yeni permission enumu değildir. |
+
+Üye yeni global hesap veya yeni UUID türü değildir: mevcut org person/relationship kaydıdır. Bir kişi farklı orglarda bağımsız tercihlere sahiptir. Hesaba güvenli bağlanmış üyenin güncel ad/doğrulanmış iletişimi global kaynaktan gelir; admin ekranı sessiz yerel kimlik override'ı üretmez. Hesapsız kişi için mevcut person_update yetkisi ayrı korunur. Abone no üretim P08'dir, salt okunur hedef alan olarak ayrılır.
+
+### Ekran bölümleri ve kontrol türleri
+
+Bu tablo bileşen yerleşimi veya route/framework dayatmaz. Metin, seçim, çoklu seçim, aç/kapat ve özel doğrulama akışları backend alan türüne bağlanır. Aşağıdaki hedef alanların tamamı mevcut API'de var sayılmaz.
+
+| Ekran | Bölüm | Düzenlenebilir hedef alanlar / kontrol |
+|---|---|---|
+| Kullanıcı | Profil | Görünen ad (metin), isteğe bağlı hitap (metin), fotoğraf (yükle/değiştir/kaldır). |
+| Kullanıcı | Kimlik/iletişim | Ad/soyad; e-posta/telefon için yeni değer–doğrulama bekliyor–doğrulanmış akışı. Normal tercih PATCH'i değildir. |
+| Kullanıcı | Güvenlik | Parola ekle/değiştir/sıfırla, hazır login yöntemi/MFA, kendi session/cihaz işlemleri. Özel proof/reauth ve durum akışı. |
+| Kullanıcı | Dil/saat/görünüm | Desteklenen dil/format/hafta başlangıcı/timezone, açık-koyu-sistem tema, erişilebilirlik, desteklenen ses/titreşim; hesap/cihaz alanları ayrıdır. |
+| Kullanıcı | Başlangıç/ekran | Yetkili org/merkez/disiplin/başlangıç ekranı, son bağlam seçimi, desteklenen liste/takvim/görünüm ve filtreler. |
+| Kullanıcı | Genel tercihler | Sessiz saat/gün/timezone, platform pazarlama kanalları ve üç bağımsız reklam/ölçüm tercihi. Açık tercih hukuki izin/SDK aktivasyonu değildir. |
+| Kullanıcı | Geçmiş/veri | Güvenlik ve izin geçmişi salt okunur; veri talebi/silme/reset ayrı etki/reauth komutları. |
+| Üye | Organizasyon tercihleri | Org bazlı bildirim olay/kanal/hatırlatma/özet, pazarlama amaç/kanalı, ilgi/öneri tercihleri. |
+| Üye | Paylaşım | Org katılımcılarına ad/fotoğraf/telefon/e-posta gösterimi ayrı aç/kapat; default kapalı, kitle ayrıca seçilecek. |
+| Üye | Takvim/bağlantı | Org takvim bağlantısı tür seçimi/oluştur/yenile/kaldır; hesap–kişi bağını görme ve kendi kaldırma talebi/özel akış. |
+| Üye | Yetkili yönetim | Hesapsız kişi ad/contacts, merkez/disiplin ilişkileri ve ilgili kişisel negatif ders limiti yalnız mevcut yetkiyle. Borç, paket, hak, görev veya abonelik durumunu genel settings kaydıyla değiştirme yok. |
+| Üye | Bilgi | Üye/ilişki kimliği, varsa ileride abone no, bağ/ilişki durumu ve iş bakiyeleri salt okunur veya ilgili domain işlemine yönlenir. |
+| Merkez | Kimlik/konum | Ad, açıklama, işletme iletişimi, adres/harita/ulaşım ve dış alan görünürlüğü. |
+| Merkez | Takvim/kaynak | İş timezone/takvim, oda uygunluk/kapasite ve sunulan org disiplinleri; mevcut domain önizleme/yazma yolları korunur. |
+| Merkez | İş varsayılanları | Yeni program/paket/etkinlik/anlaşma hazırlığında desteklenen başlangıç seçenekleri. Mevcut kayıtları güncelleme işlemi değildir. |
+| Merkez | Katılım politikası | Mevcut izinli rezervasyon/talep/bekleme/borç/negatif hak politika alanları ve etki/onay. |
+| Merkez | İletişim/belge/CRM | Şablon/kanal/hatırlatma, belge/yeniden onay, form görünürlüğü/alanlar ve CRM ortak sözlük/atama seçenekleri. |
+| Merkez | Otomasyon/rapor | Hazır iş otomasyonu, yetkili alıcılar, ortak rapor/import şablonu; teknik worker ayarı yok. |
+| Merkez | Miras/yetki | Desteklenen orgdan al/yerel değer, kaynak/kilit nedeni, izinli grup reseti ve değişiklik geçmişi. |
+| Organizasyon | Kurumsal bilgiler | Ad, iletişim, fatura alanı, logo ve dış görünürlük; kişisel Owner bilgisi ayrı. |
+| Organizasyon | Marka | PR43'teki hazır renk/font paket kataloğu seçimi, bağımsız marka reseti. Özel font/CSS/serbest renk ilk kapsam değil. |
+| Organizasyon | Ortak katalog/şablon | Disiplinler ve desteklenen paket/program/etkinlik/anlaşma, takvim/dil/format başlangıçları. |
+| Organizasyon | Miras/politika | Merkezlere default/zorunlu/yerel sınır; desteklenen katılım/bildirim/belge/CRM ayarları. |
+| Organizasyon | Yetki/gizlilik | Kaynakta izinli delegasyon, org güvenlik şartı, izin metni/katılımcı paylaşım kapsamı ve veri talebi sorumluları. |
+| Organizasyon | Bağlantılar/işler | Hazır sağlayıcı bağlantısı ve kapsamı, iş otomasyonu, rapor/import şablonları. Provider sırları genel form yanıtında yok. |
+| Organizasyon | SaaS hesabı | Fatura iletişimi, yenileme tercihi ve desteklenen plan/dönem değişim komutları. Mevcut dönem/fiyat/limit serbest düzenleme alanı değildir. |
+| Platform | Uygulama kimliği | Ad/logo/destek/iletişim, hazır dil/format seçenekleri ve yeni hesap/org/merkez başlangıçları. |
+| Platform | Görünüm katalogları | Hazır renk/font/tema paketlerinin tanımlı kimlik/sürüm/aktiflik/varsayılan seçimi; rastgele font URL/CSS veya yeni veri tipi tanımı değil. |
+| Platform | Plan/fiyat/limit | Desteklenen plan katalog/özellik/fiyat dönemi ve kullanım limitleri; mevcut subscriber komutları plan katalog API'si sayılmaz. |
+| Platform | Alan politikaları | Kaynakta tanımlı kullanıcı/üye/merkez/org alanlarının default/seçenek/miras/yerel aralık/plan kullanılabilirliği. Serbest JSON/SQL düzenleyici yok. |
+| Platform | Güvenlik seçenekleri | Entegrasyonu hazır giriş/MFA yöntemi ve desteklenen uygulama güvenlik şartları. Backend DB/connection/JWT-secret ayarı bu ekrana girmez. |
+| Platform | Bildirim/belge katalogları | Hazır olay-kanal matrisi, şablon/dil/yerel düzenleme izni, izin metni sürümü ve yetkili sorumlular. Dış e-posta kurulum işi ertelenmiş kalır. |
+| Platform | İş yetenekleri | Desteklenen form/CRM/iş otomasyonu/rapor-import seçeneklerini plan ve kapsam içinde kullanıma açma. Teknik executor parametreleri değil. |
+| Platform | Hazır entegrasyonlar | Bağlantısı desteklenen sağlayıcı/amaç/organizasyon kullanım izni ve health; provider/bot kurulumu ayrıca açık. |
+| Platform | Yönetim | Tanımlı platform görev kapsamları, yetkili uyarı alıcıları, kullanıcıya gösterilecek bakım açıklaması, ayar yayın/geçmiş/reset. Migration/deployment kontrolü değil. |
+
+### Mevcut 200 API üzerinden doğrulanmış ilk eşleme
+
+Bu tabloda yalnız gerçek operasyonlar vardır. Yeni genel settings endpoint adları öneri olarak bile mevcut client'a eklenmez. Parametre/Response tam kaynağı 08 ve üretilmiş operations.ts'dir.
+
+| Ekran / alan | Mevcut okuma | Mevcut yazma / izin | Hazır sınır ve eksik |
+|---|---|---|---|
+| Kullanıcı görünen adı | account_get_v1; yazma sürümü management_state_get_v1 | account_profile_update_v1 / account.self | Yalnız display_name; hitap/fotoğraf/dil/tema bu DTO'da yok. |
+| Kullanıcı parola | Mevcut Auth/Edge challenge akışı | account_password_change_v1; account_password_reset_request_v1 | Başlatıcı ile native Auth completion ayrı; MFA/session listesi/kimlik doğrulama yayılımı genel prefs gibi gösterilmez. |
+| Üye kişi bilgisi | person_get_v1 | person_update_v1 / person.manage | PersonPatch yalnız display_name ve contacts. Kendi tercihini düzenlemek bu admin iznine dönüşmez; doğrulanmış global identity yayılımının tamamı hazır değildir. |
+| Üye org bildirim tercihi | management_state_get_v1, hedef notification_preferences_set_v1 | notification_preferences_set_v1 / notification.self | channel/purpose/enabled + hedef sürüm; enum in_app/email ve transactional/reminder/marketing. Canlı yol in_app, transactional=false ret; email enum'u teslim kanıtı değil. Sessiz saat/olay detayları yok. |
+| Üye merkez/disiplin ilişkisi | person_get_v1; ilgili management state | student_activate_v1, student_deactivate_v1 / person.activate; person_discipline_set_v1 / person.manage | Domain state/grant kapıları korunur. Üye kendisine admin ilişkisi veya sınırsız hak veremez. |
+| Üye kişisel negatif limit | negative_limits_get_v1 | negative_limit_set_v1 / entitlement.correct | Person + merkez + disiplin, gerekçe/etki/onay; üyenin kendi self tercih alanı değildir. |
+| Merkez adı/timezone | centers_list_v1; ilgili management_state_get_v1 | center_update_v1 / center.manage | Yalnız name/timezone; hedef merkez selector/versiyon sözleşmesi aynen korunur, keyfî center_get ucu uydurulmaz. İletişim/takvim şablonu aynı DTO'da yok. |
+| Merkez oda/uygunluk/disiplin | İlgili mevcut domain okuyucuları ve management state | room_save_v1, availability_save_v1, availability_exception_save_v1, center_discipline_set_v1 / center.manage | Kaynak/kapasite/etki şartları korunur; genel ayar yazmasıyla mevcut kayıtlar topluca değiştirilmez. |
+| Org/merkez politika alanları | policies_get_v1 | policy_publish_v1 / policy.manage | Mevcut kapalı policy_value_map anahtarları. Yeni key veya generic preferences değildir. effective_at/mandatory/etki-onay alanları aynen korunur. |
+| Organizasyon adı | organization_get_v1 | organization_update_v1 / org.manage | Yalnız name; marka/iletişim/fatura alanı yok. |
+| Organizasyon disiplini | disciplines_list_v1 | discipline_save_v1 / org.manage | Mevcut name/state; yeni simge/renk alanı var sayılmaz. |
+| Organizasyon aboneliği | subscription_get_v1 | subscription_renewal_set_v1, subscription_upgrade_quote_v1, subscription_downgrade_request_v1, subscription_change_cancel_v1 / subscription.owner | Alanlar domain komutlarıyla; fatura tercihleri/plan dönem seçiminin tümü ve auto ödeme hazır değil. |
+| Platform plan/marka/default katalogları | Uygun genel katalog/settings okuyucusu henüz yok | Mevcut 200 işlemde uygun typed genel katalog/settings yazarı yok | Yeni backend sözleşme ve uygulama gerekir. saas_payment_verify/grace_extend gibi operasyon komutları settings editörü yerine kullanılamaz. |
+| PR43 org marka + kişisel görünüm | Kalıcı paket/tercih okuyucusu yok | Kalıcı katalog/seçim/reset yazarı yok | Ayrı org/kullanıcı scope, yetki, sürüm, logo/cache/fallback ve ortak tip ihtiyacı açık. |
+
+### Ertelenen SQL ve altyapı ayarları
+
+Frontend ilk teslim ekranlarından çıkarılanlar: private.ops_* ve worker scope/LOGIN yönetimi, pg_cron takvimi, batch/concurrency/lease/retry/timeout teknik ayarı, DB search_path/RLS/grant/connection-pool/network/SSL, Auth/JWT signing secret, migration ve deployment, yedek/restore motoru, fiziksel imha yürütücüsü ve backend dosya/iş teknik tavanlarının yönetimi. Kararlar silinmez; ayrı altyapı backlog'unda kalır. Uygulama ekranındaki normal iş otomasyonu aç/kapat ve iş hatırlatma tercihleri bu ertelemeye dahil değildir.
+
+Yerel 208 API/60. migration taslağı incelendi: sekiz yeni işlem çoğunlukla quote/reauth teknik config, dosya/rapor tavanları, deneme config ve worker kontrolüdür; kullanıcı ve üye tercih ekranlarını veya PR43 markayı sağlamaz. Dolayısıyla bu taslak beş ekran teslimi olarak kullanılmayacak, otomatik taşınmayacaktır.
+
+### Her ekranın frontend kabul paketi
+
+1. Alan listesi + kontrol/veri tipi + seçilebilir değerler + default kaynağı; seçilmemiş bir ürün değeri uydurulmaz.
+2. Okuyabilen/değiştirebilen aktör, kapsam, miras/etkin değer/kilit nedeni ve alan bazlı destek durumu.
+3. Gerçek read/write Request/Response/Error, hedef sürüm okuması, idempotency/preview/reset davranışı ve üretilmiş ortak tip.
+4. Normal kaydetme, validation, yetki kaybı, stale sürüm, aynı işlem retry'si, tenant geçişi ve ilgili miras/bağımsız reset kabul senaryoları.
+5. Her alan için ayrı hazır/eksik/sağlayıcı bekliyor/cihazda durum kaydı. Çalışan API ve test kanıtı olmadan ekran bütünü teslim edildi sayılmaz.
+
+Öncelik UI alanlarının ve typed API boşluklarının tamamlanmasıdır. Kalıcılık için gereken uygulama migration'ı ile ertelenmiş DB işletim ayarları birbirinden ayrılır; ertelenen şey normal uygulama verisinin güvenli saklanması değildir. Mevcut backend güvenlik ve full/main clean kapıları korunur.
 
 ## Önce okunacak kaynaklar
 
@@ -19,6 +114,8 @@ Paylaşılan **geliştirme/test** hedefi `https://gwyprhenabtpkbojephw.supabase.
 
 ## Tasarım kararı ile mevcut API ayrımı
 
+S11 kişisel takvim, S14 pazarlama/ilgi, S15 görünürlük/izin, S16 veri talebi/silme ve S17 güvenlik geçmişi/reset de kabul edilmiştir. Bu grupların gerçek read/write/DTO desteği aşağıdaki mevcut 200 işlemden tek tek eşlenecek; takvim bağlantısı, session listesi, export veya genel reset endpoint’i var sayılmaz. Desteklenmeyen seçenek yerel taslak olabilir, sahte kalıcı kayıt olamaz.
+
 | Ayar alanı | Kabul edilmiş hedef | Bugün kullanılabilen yol ve açık sınır |
 |---|---|---|
 | S01 Profil | Görünen ad, hitap, fotoğraf ve ayrı görünürlük | `account_get_v1` ve `account_profile_update_v1` yalnız display_name; yazma sürümü `management_state_get_v1` ile okunur. Hitap/fotoğraf/görünürlük alanları bu DTO'da yok. |
@@ -29,11 +126,11 @@ Paylaşılan **geliştirme/test** hedefi `https://gwyprhenabtpkbojephw.supabase.
 | S06 Oturumlar | Kendi oturumlarını gör/kapat; güven kaydını ayrı yönet | Mevcut canlı session kapıları oturum listeleme/etiketleme/tüm cihaz yönetimi API'si var anlamına gelmez. Yeni alanlar/sağlayıcı eşlemesi bekler. |
 | S07 Dil bölge saat | Hesap manuel/cihaz otomatik tercihleri; iş zamanı sabit | Genel tercih saklama DTO'su yok. İşlem saatleri mevcut Instant ve merkez saat dilimi kurallarıyla okunur; istemci görünüm tercihi iş zamanını değiştiremez. |
 | S08–S10 Görünüm ve bağlam | Erişilebilirlik, başlangıç, ekran/takvim tercihleri | Yerel görünüm tasarımı yapılabilir; hesapta kalıcı tercih senkronizasyonu mevcut200 API'de var sayılmaz. Yetki/alan filtreleri backend'den gelir. |
-| Bildirim tercihi | Ayrıntılı olay/kanal/sessiz saat grupları henüz açık | `notification_preferences_set_v1` ve yetkili management okuması mevcut. Amaçlar transactional/reminder/marketing; mevcut yol in_app, transactional=false ret. Enum'da email olması dış teslim kanıtı değildir; push/SMS yeni enum gibi eklenmez. |
+| Bildirim tercihi | S12–S13 davranışı kabul; kesin olay/kanal/istisna/zaman değerleri açık | `notification_preferences_set_v1` ve yetkili management okuması mevcut. Amaçlar transactional/reminder/marketing; mevcut yol in_app, transactional=false ret. Enum'da email olması dış teslim kanıtı değildir; push/SMS yeni enum gibi eklenmez. |
 | Reklam ölçüm ve analitik | Üç ayrı tercih varsayılan açık/kapatılabilir; ayrıntılar açık | Tercih değeri rıza/dayanak değildir. Yeni SDK/toplama entegrasyonu bu belgeyle etkinleştirilmez. İzin, teknik etkinlik ve sağlayıcı desteği ayrı. |
-| Merkez/org/platform | Katalog aileleri aday; mevcut ürün korumaları kesin | Mevcut `policies_get/policy_publish`, availability, registry, belge/otomasyon ve abonelik komutları kullanılır. Generic settings read/write endpoint'i yayımlanmadı. |
+| Merkez/org/platform | M01–M22, org O01–O21 ve platform P01–P09 kabul edildi; alt alan değerleri açık | Mevcut `policies_get/policy_publish`, availability, registry, belge/otomasyon ve abonelik komutları kullanılır. Generic settings read/write endpoint'i yayımlanmadı. |
 
-S01–S10 ürün davranışları kabul edilmiş olmakla birlikte tüm alanlar uygulanmış değildir. Kalan altı kullanıcı teması ve C/O/P grupları tamamlanmadan yeni API alanı, değer veya sağlayıcı davranışı uydurma. Aynı durumun tasarım prototipi ile gerçek API kaydetme başarısını ayır; desteklenmeyen alan için sahte başarılı kayıt üretme.
+24 Ekim: S01–S17/M01–M22/org O01–O21/platform P01–P09 olmak üzere 69 ana davranış grubu kabul edildi; tüm alanlar uygulanmış değildir. Ayrıntılar tek teknik sözleşmede; açık default/değer/permission/sağlayıcı ve mevcut API eşlemesi ayrı çözülür. Yeni API alanı, değer veya sağlayıcı davranışı uydurma. Eski Word aileleri ve üretim kuyruğu aynı numaralarla karıştırılmaz. Aynı durumun tasarım prototipi ile gerçek API kaydetme başarısını ayır; desteklenmeyen alan için sahte başarılı kayıt üretme.
 
 ## İstek yanıt ve sürüm kuralları
 
