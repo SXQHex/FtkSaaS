@@ -866,6 +866,152 @@ Grup onayı alan değerlerinin seçildiği anlamına gelmez. Word kataloğundaki
 | Kaynak ve runtime | Mevcut 200 operation/59 migration kabulü yeni ayar alanı desteği değildir. Yerel 208/60 taslak kullanılmaz. Alan matrisi/DTO/izin/sağlayıcı boşluğu çözülmeden hayali kaydetme başarısı, yeni key veya toplu settings implementasyonu yoktur. |
 
 
+<a id="ayarlar-backend-frontend-siniflama"></a>
+
+### Kararların backend/frontend ayrımı ve beş frontend kapsamı
+
+Son kullanıcı sırası: önce şimdiye kadarki kararları backend ayarları ve frontend'ten değiştirilebilir ayarlar olarak ayır; frontend ayarlarını user/member/center/organization/platform olarak sınıfla; yalnız eksik frontend alan kararlarını paketler halinde tamamla. Bu sınıflama 69 grup kabulünü iptal etmez ve yeni ana grup eklemez. API uygulaması bu karar turunun önüne geçirilmez.
+
+**Sınıflama ölçütü:** Verinin DB'de saklanması onu backend ayarı yapmaz. Yetkili insan uygulama ekranından bir iş tercihini/değerini değiştirecekse frontend ayarıdır; platform yöneticisinin ekranı da frontend'dir. Altyapının nasıl çalışacağını belirleyen ve mevcut UI teslimine açılmayan teknik yapılandırma backend'dir. Grup karma olabilir; ayrım alan bazındadır.
+
+#### Backend ayarları — ayrı işe ertelendi
+
+| Küme | Backend'de kalan yapılandırma | Kaynak gruplar / frontend'de kalan bölüm |
+|---|---|---|
+| B01 DB ve erişim altyapısı | RLS/grant/fonksiyon sahibi/search_path, connection pool, ağ/SSL, teknik SQL güvenlik kapıları | Sabit güvenlik kuralları; ayar ekranı, rol veya paylaşım tercihiyle kapatılamaz. |
+| B02 Worker zamanlayıcı | pg_cron, teknik LOGIN/scope binding, tick sıklığı, batch/concurrency, lease/fencing, executor timeout/retry | Platform P05'in teknik kısmı. M17/O13'teki hazır iş otomasyonunun kapsamı/zamanı/aç-kapatı frontend'de kalır. |
+| B03 Auth motoru | Provider credentials, signing/JWT secrets, session token altyapısı, teknik rate/kanıt TTL tavanları | P02'nin altyapısı. Kullanıcının hazır giriş yöntemi seçimi/MFA yönetimi ve org rol güvenlik şartı frontend özel akışlarıdır. |
+| B04 Mesaj teslim motoru | SMTP/push servis kurulumu, provider sırları, transport retry/backoff, iş kuyruğu delivery TTL/hız tavanı | P06. Kullanıcı kanal/olay tercihleri, iş hatırlatma zamanı, şablon ve alıcı seçimi frontend'dir. |
+| B05 Dosya ve iş tavanları | Storage ingress/izin altyapısı, imzalı erişim motoru, teknik MIME/byte/satır/job limitleri | P07 ve eski 208/60 taslağı. Hazır dosya türlerinden iş belgesine uygun seçim ve aktarım şablonu frontend olabilir; teknik tavan artırılmaz. |
+| B06 Saklama imha ve restore | Onaylanmış saklama politikalarının teknik uygulanması, fiziksel imha/hold kanıtı, backup/restore motoru | P07. Kendi veri talebini başlatma/durum görme ve yetkili talep takip alıcısı frontend özel akışıdır. |
+| B07 Entegrasyon güvenliği | İmza/secret saklama, bot hostname/action doğrulama altyapısı, webhook retry/dedupe ve teknik abuse limitleri | P08. Hazır sağlayıcı bağlama/kapsam/alan eşleme ve yönlendirme frontend'de, sırlar genel read'de yok. |
+| B08 Dağıtım ve kabul | Migration, CI/full/main clean, deploy, ortam kimlik bilgileri ve teknik geri alma | P09. Kullanıcıya gösterilen bakım açıklaması/planı ve yetkili iş uyarısı alıcıları frontend olabilir; deploy düğmesi değildir. |
+| B09 Teknik gözlem | Backend log/metric retention, alarm motoru ve düşük seviye kaynak eşikleri | P05/P09. Yetkili uygulama takip sorumlusu seçimi ve kendi yetkili değişiklik geçmişini görme frontend'de kalır. |
+
+UUID standardı, tenant izolasyonu, kapasite/para/hak atomikliği, canlı yetki, idempotency, Q-E02/E03, Starter/ücretli plan ayrımı gibi **sabit ürün/güvenlik hükümleri ayar değildir**. Para tahsil et, yoklamayı kapat, hesaplaşmayı onayla gibi tekil domain komutları da genel tercih kaydetme işlemine çevrilmez. İlgili ekrandan ayrı eylem olarak açılabilirler.
+
+#### Frontend ayarları — user/member/center/organization/platform
+
+Aynı konunun üç düzeyde görünmesi aynı değerin üç kez tutulması değildir: platform izinli katalog/defaultu, organizasyon ortak politika/mirası, merkez izinli yerel değeri; user global tercihi, member ilgili org tercihini yönetir. Kullanıcı arayüzünde org bağlamı seçili olsa da global alan user olarak kalır.
+
+| Kapsam | Düzenleyen | Frontend'de değiştirilecek ayar aileleri | Salt okunur veya ayrı eylem |
+|---|---|---|---|
+| **user** | Kendi global hesabı | Görünen ad/hitap/fotoğraf; güncel kimlik ve doğrulanmış iletişim; dil/format/timezone/görünüm/erişilebilirlik; başlangıç/liste/takvim; hesap sessiz saatleri; platform pazarlama ve üç reklam/analitik tercihi | Login/MFA/session, kimlik doğrulama, veri talebi/silme/reset özel komut. İş geçmişi ve güvenlik geçmişi salt okunur; cihaz ses/push/cache alanı yerel. |
+| **member** | Kendi org tercihinde bağlı hesap sahibi; org kişi/operasyon alanında mevcut yetkili personel/CM | Org bildirim/hatırlatma/pazarlama; org ilgi/öneri; katılımcı profil/iletişim paylaşımı; org kişisel takvim türleri. Yetkili yönetimde hesapsız kişinin iletişimi/ilişkileri ve kişisel merkez–disiplin limit istisnası | Global doğrulanmış ad/iletişim yerel override edilmez. Abone no/kimlik/bakiye salt okunur; ilişki/rol/bağlantı/limit değişimi kendi domain yetki/onayına tabidir. |
+| **center** | İlgili merkez/alan yetkilisi | İşletme kimlik/iletişim/konum/görünürlük; iş takvimi/oda/disiplin; program/paket/etkinlik/anlaşma hazırlık defaultları; izinli rezervasyon/borç/hak politikası; görev/izin; bildirim/belge/form/CRM; iş otomasyonu; ortak rapor/import; yerel miras/reset | Mevcut satış/yoklama/finans/hakediş tekil işlemleri ayrı. Worker, DB ve teknik limit yönetimi yok. |
+| **organization** | İlgili org alan yetkilisi | Kurumsal/fatura bilgileri ve PR43 hazır marka; ortak dil/format/disiplin/katalog/şablon; merkez default/kilit/yerel sınır; rol/delegasyon ve org güvenlik gereksinimi; bildirim/belge/CRM/gizlilik; iş otomasyonu/rapor/import/bağlantı; SaaS yenileme ve desteklenen plan tercihi; yayın/geçmiş/reset | Owner atama platformda; mevcut abonelik dönemi/limit/ödeme durumu salt okunur. Geçmiş kayıtların yeniden yazılması ayar değildir. |
+| **platform** | İlgili uygulama/plan/güvenlik/entegrasyon yetkilisi | Uygulama kimlik/destek; hazır dil/format/tema/renk-font katalogları; yeni hesap/org/merkez defaultları; plan/fiyat/özellik/limit kataloğu; kaynakta tanımlı alanların izinli default/miras/aralıkları; hazır login/MFA kullanılabilirliği; olay/kanal/şablon katalogları; iş otomasyonu/form/CRM/rapor-import seçenekleri; hazır entegrasyon kullanılabilirliği; operatör görev kapsamı/uyarı alıcıları/bakım metni ve yayın/reset | Yeni key/tip/kod/permission yaratma, DB/worker/secret/migration/deploy yönetimi yok. Plan/fiyat API'si hazır değilse mevcut subscriber komutu yerine kullanılamaz. |
+
+#### 69 karar grubunun izlenebilir sınıflaması
+
+Aşağıdaki tablo kapsam eşlemesidir; o gruptaki her alt seçeneğin değeri veya API'si hazır demek değildir. Eski S/M/O/P kararları ilgili alt alanları ve korumalarıyla önceki tablolarda korunur.
+
+| Kabul grubu | Frontend kapsamı | Backend ayrımı / sınır |
+|---|---|---|
+| S01 Profil | user | İş ayarı frontend; sabit ürün/yetki/transaction kuralları ayar değildir. |
+| S02 Kimlik ve iletişim | user | İş ayarı frontend; sabit ürün/yetki/transaction kuralları ayar değildir. |
+| S03 Hesap–kişi bağlantısı | user, member | İş ayarı frontend; sabit ürün/yetki/transaction kuralları ayar değildir. |
+| S04 Şifre ve kurtarma | user | Backend: teknik kurtarma TTL/rate; frontend: parola işlemleri. |
+| S05 Giriş yöntemleri ve MFA | user | Backend: sağlayıcı sırları; frontend: destekli yöntem seçme/MFA. |
+| S06 Cihaz ve oturum | user | Backend: token/session motoru; frontend: kendi cihaz/oturum yönetimi. |
+| S07 Dil bölge saat | user | İş ayarı frontend; sabit ürün/yetki/transaction kuralları ayar değildir. |
+| S08 Tema ve erişilebilirlik | user | İş ayarı frontend; sabit ürün/yetki/transaction kuralları ayar değildir. |
+| S09 Başlangıç ve bağlam | user | İş ayarı frontend; sabit ürün/yetki/transaction kuralları ayar değildir. |
+| S10 Liste ekran ve takvim | user | İş ayarı frontend; sabit ürün/yetki/transaction kuralları ayar değildir. |
+| S11 Kişisel takvim bağlantısı | member | Backend: güvenli takvim beslemesi; frontend: bağlantı/filtre seçimi. |
+| S12 Bildirim kanalları ve olaylar | user, member | İş ayarı frontend; sabit ürün/yetki/transaction kuralları ayar değildir. |
+| S13 Hatırlatma sıklık ve sessiz saat | user, member | İş ayarı frontend; sabit ürün/yetki/transaction kuralları ayar değildir. |
+| S14 Pazarlama ilgi ve kişiselleştirme | user, member | İş ayarı frontend; sabit ürün/yetki/transaction kuralları ayar değildir. |
+| S15 Görünürlük paylaşım ve izin geçmişi | member | İş ayarı frontend; sabit ürün/yetki/transaction kuralları ayar değildir. |
+| S16 Veri talepleri ve hesap silme | user, member | Backend: saklama/imha motoru; frontend: talep ve durum akışı. |
+| S17 Güvenlik geçmişi ve sıfırlama | user | Backend: teknik log saklama; frontend: izinli geçmiş ve kapsamlı reset. |
+| M01 Kimlik iletişim konum | center | İş ayarı frontend; sabit ürün/yetki/transaction kuralları ayar değildir. |
+| M02 Saat dilimi ve iş takvimi | center | İş ayarı frontend; sabit ürün/yetki/transaction kuralları ayar değildir. |
+| M03 Oda kaynak kapasite | center | İş ayarı frontend; sabit ürün/yetki/transaction kuralları ayar değildir. |
+| M04 Sunulan disiplinler | center | İş ayarı frontend; sabit ürün/yetki/transaction kuralları ayar değildir. |
+| M05 Görevler ve izinler | center; member yönetim eylemleri | İş ayarı frontend; sabit ürün/yetki/transaction kuralları ayar değildir. |
+| M06 Program seans varsayılanları | center | İş ayarı frontend; sabit ürün/yetki/transaction kuralları ayar değildir. |
+| M07 Rezervasyon talep bekleme | center | İş ayarı frontend; sabit ürün/yetki/transaction kuralları ayar değildir. |
+| M08 Katılım borç negatif hak | center; member limit istisnası | İş ayarı frontend; sabit ürün/yetki/transaction kuralları ayar değildir. |
+| M09 Yoklama gerçekleşme | center | İş ayarı frontend; sabit ürün/yetki/transaction kuralları ayar değildir. |
+| M10 Paket fiyat satış | center | İş ayarı frontend; sabit ürün/yetki/transaction kuralları ayar değildir. |
+| M11 Tahsilat iade finans | center | İş ayarı frontend; sabit ürün/yetki/transaction kuralları ayar değildir. |
+| M12 Anlaşma koşulları | center | İş ayarı frontend; sabit ürün/yetki/transaction kuralları ayar değildir. |
+| M13 Etkinlik dış katılım | center | İş ayarı frontend; sabit ürün/yetki/transaction kuralları ayar değildir. |
+| M14 Bildirim hatırlatma | center | İş ayarı frontend; sabit ürün/yetki/transaction kuralları ayar değildir. |
+| M15 Belge onay | center | İş ayarı frontend; sabit ürün/yetki/transaction kuralları ayar değildir. |
+| M16 Dış görünürlük başvuru | center | İş ayarı frontend; sabit ürün/yetki/transaction kuralları ayar değildir. |
+| M17 Otomasyon | center | Teknik worker parametreleri B02; hazır iş otomasyonu frontend. |
+| M18 Rapor export | center | Teknik tavanlar B05; rapor/şablon seçenekleri frontend. |
+| M19 Import eşleme | center | Teknik tavanlar B05; import eşleme/paylaşım frontend. |
+| M20 Miras sıfırlama | center | İş ayarı frontend; sabit ürün/yetki/transaction kuralları ayar değildir. |
+| M21 CRM | center | İş ayarı frontend; sabit ürün/yetki/transaction kuralları ayar değildir. |
+| M22 Ayar yetkisi geçmiş | center | İş ayarı frontend; sabit ürün/yetki/transaction kuralları ayar değildir. |
+| O01 Kimlik iletişim | organization | İş ayarı frontend; sabit ürün/yetki/transaction kuralları ayar değildir. |
+| O02 Ortak merkez politikaları | organization | İş ayarı frontend; sabit ürün/yetki/transaction kuralları ayar değildir. |
+| O03 Roller yetki devri | organization | İş ayarı frontend; sabit ürün/yetki/transaction kuralları ayar değildir. |
+| O04 Güvenlik | organization | Auth motoru B03; organizasyon rol güvenlik şartları frontend. |
+| O05 Disiplin kataloğu | organization | İş ayarı frontend; sabit ürün/yetki/transaction kuralları ayar değildir. |
+| O06 Dil bölge gösterim | organization | İş ayarı frontend; sabit ürün/yetki/transaction kuralları ayar değildir. |
+| O07 Bildirim | organization | Teslim motoru B04; kanal/şablon/alıcı frontend. |
+| O08 Belge onay | organization | İş ayarı frontend; sabit ürün/yetki/transaction kuralları ayar değildir. |
+| O09 CRM başvuru | organization | İş ayarı frontend; sabit ürün/yetki/transaction kuralları ayar değildir. |
+| O10 Paket satış | organization | İş ayarı frontend; sabit ürün/yetki/transaction kuralları ayar değildir. |
+| O11 Katılım politikası | organization | İş ayarı frontend; sabit ürün/yetki/transaction kuralları ayar değildir. |
+| O12 Finans | organization | İş ayarı frontend; sabit ürün/yetki/transaction kuralları ayar değildir. |
+| O13 Otomasyon | organization | Worker B02; iş otomasyonu tanımı frontend. |
+| O14 Rapor aktarım | organization | Teknik tavan B05; rapor/import şablonu frontend. |
+| O15 Entegrasyon | organization | Bağlantı sırları/transport B07; hazır bağlantı ve kapsam frontend. |
+| O16 Gizlilik paylaşım | organization | Saklama/imha B06; paylaşım, metin ve talep alıcısı frontend. |
+| O17 SaaS aboneliği | organization | İş ayarı frontend; sabit ürün/yetki/transaction kuralları ayar değildir. |
+| O18 Program takvim defaultları | organization | İş ayarı frontend; sabit ürün/yetki/transaction kuralları ayar değildir. |
+| O19 Anlaşma şablonu | organization | İş ayarı frontend; sabit ürün/yetki/transaction kuralları ayar değildir. |
+| O20 Etkinlik defaultları | organization | İş ayarı frontend; sabit ürün/yetki/transaction kuralları ayar değildir. |
+| O21 Yayın geçmiş sıfırlama | organization | İş ayarı frontend; sabit ürün/yetki/transaction kuralları ayar değildir. |
+| P01 Kimlik dil başlangıç | platform | Hazır katalog/default seçimi frontend; katalog asset hazırlığı uygulama bağımlılığı. |
+| P02 Giriş hesap güvenliği | platform | Kullanılabilir login/MFA seçenekleri frontend; secrets/teknik TTL/rate B03. |
+| P03 SaaS plan fiyat limit | platform | Plan/fiyat/iş limiti frontend; sayım ve güvenlik motoru sabit uygulama. |
+| P04 Ayar tanım miras yayın | platform | Kaynakta tanımlı değer/miras frontend; yeni key/tip/schema kod geliştirmesi. |
+| P05 Worker zamanlayıcı | platform | Teknik worker/scheduler kısmı backend B02/B09; uygulama sorumlu seçimi platform frontend. |
+| P06 Bildirim sağlayıcı | platform | Hazır kanal/şablon/gönderici/alıcı frontend; transport/credentials B04. |
+| P07 Veri gizlilik dosya aktarım | platform | İzin metni/talep sorumlusu ve hazır iş seçenekleri frontend; file/job tavanı/saklama/restore B05/B06. |
+| P08 Entegrasyon API dış başvuru | platform | Hazır entegrasyon ve kaynak/alan seçimi frontend; imza/secret/bot/rate motoru B07. |
+| P09 İşletim operatör denetim | platform | Operatör uygulama kapsamı/uyarı/bakım metni/yayın frontend; altyapı bakım/CI/deploy B08/B09. |
+
+#### Yalnız eksik frontend kararları — karar paketleri
+
+Bu FD paketleri yeni ana ayar grubu değildir; mevcut kabullerin açık alanlarını kapatır. Onaylanmış davranış yeniden sorulmaz. Backend parametreleri bu tura alınmaz. Değer kararı, API eksikliği ve sağlayıcı kurulumu ayrı durumdur: ürün seçimi yapılmış bir alan sırf API yok diye yeniden tartışılmaz.
+
+| Paket | Kapsam | Gerçekten seçilmemiş frontend kararları |
+|---|---|---|
+| FD01 Dil bölge görünüm başlangıçları | user; platform katalog/default | İlk dil listesi ve fallback; ilk tarih/saat/sayı/hafta/timezone/tema/takvim görünümü değerleri ve ayrı override seçenekleri. S07–S10 davranışı korunur. |
+| FD02 Hazır marka paketleri | organization; platform katalog | İlk renk/font paketleri ve uyumlu kombinasyon, logo özellikleri; seçme yetkisi, girişsiz okuma, merkez override/plan kapsamı. Özel CSS/font ilk kapsam dışı kalır. |
+| FD03 Kimlik giriş ve hesap ekranı | user; organization/platform kullanılabilir yöntem | Desteklenecek ilk login/MFA yöntemleri, profil alan sınırları ve kullanıcıya gösterilecek güvenlik geçmişi ayrıntıları. Teknik Auth TTL/rate backend'e ertelidir. |
+| FD04 Bildirim ve pazarlama seçenekleri | user/member; center/organization/platform katalog/default | İlk kanal listesi, olay–kanal/zorunluluk matrisi, kullanıcıya sunulan hatırlatma seçenekleri, özet saati, kritik sessiz-saat istisnaları ve pazarlama kanal defaultları. Dış teslim kurulumu ayrı. |
+| FD05 Üye görünürlük ilgi ve takvim | member; organization izinli kitle | Aynı ders/etkinlik gibi görünürlük kitlesi, ilgi/öneri seçim katalogları ve takvime dahil kayıt türü seçenekleri. Görünürlük/telefon/e-posta default kapalı kararı korunur. |
+| FD06 İş takvimi ve rezervasyon defaultları | center/organization; platform seçenekler | Süre/saat adımı/sonlu tekrar başlangıçları; çalışma saati zorunluluk kapsamı; rezervasyon/talep/teklif seçenekleri; hangi alan merkezde değişebilir. 100/3600sn gibi kulüp değerleri genelleştirilmez. |
+| FD07 Paket katılım ve finans seçenekleri | center/organization; member yetkili istisna; platform katalog | Paket şablonlarının başlangıçları, izinli negatif/borç istisna aralıkları, indirim yetki sınırları, ödeme yöntemleri, referans zorunluluğu ve desteklenen iş bazlı ek onay alanları. Sabit parasal/hak kuralları açılmaz. |
+| FD08 Belge/onay ve dış görünürlük | center/organization; platform şablon | İlk şablonlar, zorunlu/düzenlenebilir alanlar, kapsam, tekrar onay ve yayın yetkileri. Yeni metin/örnek form kullanıcı izni yaratmaz. |
+| FD09 CRM ve başvuru seçenekleri | center/organization; platform katalog | Aşama/etiket/sonuç listesi, ortak ve forma özel alanlar, zorunluluk, merkez/sorumlu yönlendirme ve yerel ek sınırı. Üretim P08 entegrasyon işi ayrı kalır. |
+| FD10 İş otomasyonu rapor/import | center/organization; platform katalog | Hazır iş kuralı türleri/koşul/eylem/zaman seçenekleri; rapor ve dosya formatı, şablon paylaşma/oluşturma yetkileri, import eşleme biçimleri. Worker/teknik byte/satır ayarı bu pakete alınmaz. |
+| FD11 Yetki miras yayın ve reset | tüm kapsamlar, aktöre göre | Alan bazında kim okuyabilir/yazabilir/devredebilir; default/kopya/miras/yerel kilit; ileri yayın/ek onay ve reset kapsamı. Kullanıcı kapatmasını yeniden açma ve A/B yetki kuralını bozma yok. |
+| FD12 Hesap/org talepleri ve bağlantılar | user/member/organization/platform yetkili yönetim | Veri talebi tür/çıktı/status görünümü, silme iptal sınırının kullanıcıya sunumu; hazır sağlayıcı seçimi ve destek erişim kapsamı; abonelikte sunulacak plan/dönem seçenekleri. Saklama, imha, provider kurulum ve restore işletimi ayrı backlog. |
+
+Her FD paketinde yalnız somut öneriler ve onay bekleyen seçimler sunulur. Yeni frontend ayar fikri veya uygulama gerektiren aday, kabul edilmiş gibi eklenmez. Gruplar kapandıkça bu tabloda karar durumu ve ilgili alanlar güncellenir; sonrasında beş ekranın gerçek typed API teslimi yapılır.
+
+##### FD01 — ilk karar önerisi (henüz onaylanmadı)
+
+| Alan | Önerilen ilk değer / seçenek |
+|---|---|
+| İlk diller | Türkçe ve İngilizce; yeni hesap cihaz dili bu ikisinden biriyse onu kullanır, diğer durumda Türkçe. |
+| Bölgesel başlangıç | Yeni hesap tr-TR biçimleri; tarih 24.10.2026 gibi gün.ay.yıl, saat 24, sayılar 1.234,56, haftanın başlangıcı Pazartesi. Kullanıcı desteklenen biçimleri ayrı seçebilir. |
+| Görüntüleme timezone'u | Otomatik cihaz saat dilimi; kullanıcı isterse desteklenen IANA listesinden manuel seçer. Merkez iş timezone'u değişmez. |
+| Tema başlangıcı | Sistem temasını izle; kullanıcı açık veya koyu seçebilir. Org marka paketi ayrı kalır. |
+| Erişilebilirlik başlangıcı | Cihazın yazı ölçeği ve azaltılmış hareket tercihine uy; uygulama içi açık tercih mevcut S08 kapsamıyla ayrı tutulur. |
+| Takvim başlangıcı | Hafta görünümü, hafta sonu görünür; kullanıcı görünümü değiştirebilir. İş kayıtlarının kapsamını değiştirmez. |
+
+Bu değerler mevcut kullanıcı/cihaz tercihini ezmez ve yalnız onaydan sonra başlangıç kararı olur. Burada formüle edilen hiçbir default mevcut API/config'e uygulanmadı. FD01'de önerilmeyen profil, ödeme, bildirim, pazarlama veya paylaşım defaultları değiştirilmez.
+
 ### Frontend PR43 — organizasyon renk ve font paketleri
 
 [PR43](https://github.com/SXQHex/FtkSaaS/pull/43), `3eaa0cff6173a81db97d779c8f2ba679f124a869` kaynağında frontend oturumunda kabul edilmiş hazır marka paketi ihtiyacını iletiyor. Yeni bir 70. ana grup değildir; organizasyon O01 kimlik/marka, S08 kişisel görünüm ve platform P01/P04 katalog/default sınırlarıyla eşlenir. Bu not PR43'ün merge edildiği veya API'sinin hazır olduğu anlamına gelmez; başka branch'in değişikliği bu teslimde üzerine yazılmaz.

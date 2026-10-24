@@ -17,6 +17,10 @@
 | P07 | Hesap, organizasyon ve abonelik yaşam döngüsü | 22 | done (kod/main/development) | PR40/main4cfc9a55; aday39863852941/main39866466608/CD39869023193 success; hosted temel kurulum ve idle heartbeat geçti; fiziksel imha/yük ayrı |
 | P08 | Geliştirmeler | — | queued | Ayrı kontenjanlar, sınırsız etkinlik ve paket ders/etkinlik kapsamları; mevcut kurulum20 kontenjan/100 tekrar; paket süresi+bakiye ile ücretsiz etkinlik uygunluğu; sabit abone no ve ortak çok kaynaklı CRM |
 
+## Önce karar ayrımı ve eksik frontend seçimleri
+
+[Backend/frontend sınıflaması ve FD paketleri](../contracts/02-FtkSaaS-teknik-sozlesme.md#ayarlar-backend-frontend-siniflama) beş kapsamla kaydedildi. Sıra: sınıflama → yalnız eksik frontend alan kararları → alan/API/ekran teslimi. FD01 öneri/onay bekliyor; SQL/işletim parametreleri sonraki backlog. 69 ana grubu yeniden açma.
+
 ## Aktif öncelik — beş ayar ekranının API teslimi
 
 Son kullanıcı talimatı: [kullanıcı–üye–merkez–org–platform alan/API matrisi](claude-handover.md) üzerinden mevcut yolları kullan, eksik typed ekran API ihtiyaçlarını tamamla. Yeni ana ayar gruplarıyla kapsamı uzatma. SQL/Cron/worker/DB işletim ayarları ayrı sonraki iş; eski 208/60 taslak otomatik taşınmaz. Frontend tasarım/istemci sahipliği Claude’da kalır.

@@ -1,5 +1,9 @@
 # FtkSaaS güncel devir
 
+## Son çalışma sırası — karar sınıflaması
+
+Kullanıcının son talimatı önce backend/frontend ayrımı, frontend için user/member/center/organization/platform sınıflaması, ardından yalnız eksik frontend kararlarını grup grup bitirmektir. [69 kararın alan bazlı izi ve FD01–FD12](02-FtkSaaS-teknik-sozlesme.md#ayarlar-backend-frontend-siniflama) tek kaynaktır. FD01 başlangıç dil/bölge/görünüm değerleri henüz onaylanmamış öneri; hiçbir default veya API uygulanmadı. Önceki beş ekran hedefi korunur, yeni sıra API uygulamasının önüne eksik karar turunu koyar.
+
 ## Son öncelik — frontend beş ekran teslimi
 
 Kullanıcı–üye–merkez–org–platform ayar ekranlarının alanları, gerçek API ve ortak tipleri frontend’e teslim edilecek. Kullanıcı global hesap; üye org person/relationship ve org tercihi. [Alan/API matrisi](../docs/claude-handover.md) mevcut 200 işlemdeki gerçek desteği, eksik marka/tercih/katalog yollarını ve kabul şartını ayırır. SQL/Cron/DB/worker teknik işletim yönetimi ertelendi. Bu yeni öncelik önceki salt belge kapanışı sınırından sonra verilmiştir; belgede API adının yazılması uygulama kabulü değildir. PR43 veya PR44 henüz merge/deploy edildi sayılmaz.

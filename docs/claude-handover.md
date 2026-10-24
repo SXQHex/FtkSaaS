@@ -2,6 +2,12 @@
 
 24 Ekim 2026. Belge tabanı main `702063807b0a0d09f559f070ffde1b1ae3e7563b`. Frontend tasarım/istemci kodu Claude'un alanıdır; backend bu teslimde tasarıma müdahale etmez. Bu dosya Claude'un açıkça okutulacak başlangıç talimatıdır; repository'de kök `CLAUDE.md` veya `.claude` yapılandırması bulunmuyor. Dosyanın Claude tarafından kendiliğinden yüklendiğini varsayma.
 
+## Son sıra — kararların sınıflanması ve açık frontend seçimleri
+
+Önce [backend/frontend ve beş scope sınıflaması](../contracts/02-FtkSaaS-teknik-sozlesme.md#ayarlar-backend-frontend-siniflama) uygulanır: 69 kabul grubunun her biri alan bazında izlendi; SQL/işletim yapılandırması ayrı backlog. Frontend alanlarının scope'u user/member/center/organization/platform. Platform yöneticisinin uygulama ayarı da frontend ayarıdır; verinin DB'de tutulması sınıflamayı değiştirmez.
+
+Ana grup kabulleri korunur. Eksik seçimler FD01–FD12 karar paketlerinde tamamlanacak; bunlar yeni ana grup veya API değildir. FD01 dil/bölge/görünüm başlangıçları yalnız öneridir, onaylanmadı. UI alan/default tasarımında henüz kabul edilmemiş önerileri kesin değer gibi kullanma. Aşağıdaki mevcut API matrisi uygulama analizidir; karar turu bitmeden yeni teknik knob/endpoint eklenmez.
+
 ## Beş kapsamlı ayar ekranı teslimi — 24 Ekim önceliği
 
 Son kullanıcı talimatı: kullanıcı–üye–merkez–organizasyon–platform ayar değiştirme ekranları ve gerçek API karşılıkları frontend'e teslim edilecek. SQL/Cron/worker işletimi ve DB yönetim ayarları sonraya bırakılır. 69 ana grubu yeniden görüşmek yerine ekran alanları tamamlanır. Backend ekranların alan/veri/yetki/API sözleşmesini, frontend kendi tasarım ve istemci uygulamasını teslim eder. Bu belge ekranların veya eksik API'lerin çalıştığı iddiası değildir.

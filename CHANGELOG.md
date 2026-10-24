@@ -1,5 +1,9 @@
 # Changes
 
+## 24 Ekim 2026 — backend/frontend ayar ayrımı ve eksik karar sırası
+
+69 kabul grubunun alanları backend yapılandırması ile frontend ayarlarına ayrıldı; frontend için user/member/center/organization/platform kapsamları eşlendi. Sabit güvenlik/iş kuralları ve tekil domain komutları genel tercih ayarı sayılmadı. Eksik frontend seçimleri FD01–FD12 paketlerinde toplandı; FD01 değerleri onaylanmamış öneridir. Yeni sıra karar ayrımı/eksik seçimler tamamlandıktan sonra API/ekran teslimidir. Runtime veya default uygulanmadı.
+
 ## 24 Ekim 2026 — beş ayar ekranı teslim önceliği
 
 Kullanıcı/üye/merkez/org/platform için ekran bölümleri ve doğrulanmış mevcut read-write/permission matrisi Claude devrine eklendi. Kullanıcı ve org üyeliği ayrıldı. SQL/Cron/DB/worker yönetim ayarları ertelendi; eski 208/60 taslağın UI ihtiyacını karşılamadığı kaydedildi. Eksik API ve sağlayıcı/ürün değerleri hazır gösterilmedi; runtime değişmedi.
