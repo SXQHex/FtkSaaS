@@ -1,5 +1,10 @@
 # Changes
 
+## 26 Ekim 2026 — izole restore sahiplik/izin kanıtı
+
+PR48 aynı-main clean/CD kabulü kaydedildi. İki izole native Supabase stack’inde uygulama sahipliği/ACL/RLS,178 tablo/1.025 satır, aynı UUID/parola Auth→Edge, private Storage bayt aktarımı ve beş dedicated worker idle geri dönüşü doğrulandı. Hosted afet kurtarma/RPO/RTO açık; yeni runtime/API/migration veya rutin CI testi eklenmedi. Ayrı hosted dummy kurulum işi iptal edildi. Ayrıntı [geri dönüş kaydında](docs/remote-backend-setup.md#restore-20261026).
+
+
 ## 2026-10-25 — CLI2.122 ve ölçümlü shard dengesi adayı
 
 Supabase CLI tam2.122.0 package/lock pin; aynı başarılı main40226464989 ölçümleriyle15 suite ağırlığı güncellendi. Dört shard/iki process içinde alfabetik kuyruk modeline göre sınırlı deterministik dengeleme; kaynak/attempt bağlı manuel ölçüm yenileme ve ek negatif CI politika regresyonları. Full/main scope, assertionlar, migration/API ve gateway değişmedi. Yeni süreler aday/main ölçümünden önce modeldir.
