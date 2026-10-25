@@ -1,5 +1,14 @@
 # Claude frontend entegrasyon talimatları
 
+## 26 Ekim — PR50 hesap ve güvenlik teslim paketi
+
+PR50 yerel kapsamı **212 callable API / 64 migration**,46 ayar alanı/44 writable; başlangıç main `a7569bbb11353dc342804eb5050800d77a31a8e9`. İlk207/63 iki alan adayı aşağıda tarihsel snapshot’tır. Yeni beş işlem kendi oturumlarını listeleme/etiketleme/kapatma, güvenlik geçmişi ve güçlü doğrulanmış TOTP kaldırmayı kapsar. Native TOTP enrollment/challenge/verify sağlayıcıda kalır; verified factor varsa uygulama ve SQL hem doğrulanmış JWT aal2 hem canlı native session aal2 ister. Genel tercih patch’i güvenlik işlemlerini değiştirmez.
+
+Oturum/refresh iptali ve geç hata rollback’i dar native testte geçti. Native sağlayıcının eski aal1 token ile aynı-session factor kaldırmasını kabul ettiği görüldü; bu negatif assertion korunarak10 saniyelik, yalnız aynı faktöre ait güçlü yeniden doğrulanmış kaldırma niyeti ve transactional native DELETE koruması eklendi. Son koruma gerçek native Auth üzerinde4/4 geçti (23.229sn); resetin ilk üç özgün akışı4/4 (44.889sn), ayrılan başlangıç grubu2/2 (51.937sn) geçti. Bağımsız incelemede bloklayıcı bulgu kalmadı; son commit/tree bağı ve aday/main clean/CD bekler. Eski başarısız aday40237107409 bu genişleyen kaynağın kabulü değildir; yeni full clean başlatılmadı. Uygulanmış62 migration değişmez;63–64 henüz adaydır.
+
+Bu paket beş ekranın/69 grubun tümü değildir. Global ad/doğrulanmış iletişim yayılımı, avatar/logo, gerçek Google sağlayıcısı, takvim bağlantısı ve diğer özel consumer açıkları korunur. Hosted TOTP yapılandırması, yeni Auth trigger’larıyla hosted restore ve aynı-main CD kabulü kanıtsız kapatılmaz. Ayrı dummy organizasyon veya yeni CI altyapısı kurulmaz.
+
+
 ## 25 Ekim — aktif backend ve kalıcı pilot teslimi
 
 Main `d6b67139445f2b88298fc0ee6e1f5c476f3586b7`:207 API/61 migration; PR45 main clean40206350648 ve development CD40207909599 başarılı. Aşağıdaki eski PR45 pending notları önceki aday snapshotıdır. Son kullanıcı talimatı beş ayar kapsamının backend/API kabulü, pilot zinciri ve restore/operasyon güvenliği teslimidir. Frontend için yeni alt alan kullanılacak; önce backend hazır edilir. Sentetik pilot verileri ayrı organizasyonda geliştirme Supabase’inde kalıcı tutulabilir; her koşuda silinmez. Dağıtım öncesi sıfırlama ayrıca yapılır; mevcut gerçek kulüp verileri şimdi silinmez. [Teslim sırası, kapsam ve kanıt sınırı](pilot-readiness.md). Bu ilk aday207/62 olup bütün ayar/hosted pilot/restore kabulü değildir.
@@ -145,7 +154,7 @@ Paylaşılan **geliştirme/test** hedefi `https://gwyprhenabtpkbojephw.supabase.
 
 ## Tasarım kararı ile mevcut API ayrımı
 
-S11 kişisel takvim, S14 pazarlama/ilgi, S15 görünürlük/izin, S16 veri talebi/silme ve S17 güvenlik geçmişi/reset de kabul edilmiştir. Bu grupların gerçek read/write/DTO desteği aşağıdaki mevcut 200 işlemden tek tek eşlenecek; takvim bağlantısı, session listesi, export veya genel reset endpoint’i var sayılmaz. Desteklenmeyen seçenek yerel taslak olabilir, sahte kalıcı kayıt olamaz.
+S11 kişisel takvim, S14 pazarlama/ilgi, S15 görünürlük/izin, S16 veri talebi/silme ve S17 güvenlik geçmişi/reset de kabul edilmiştir. Bu grupların gerçek read/write/DTO desteği aşağıdaki mevcut 200 işlemden tek tek eşlenecek; takvim bağlantısı/export desteği ayrıca eşlenir; PR50 oturum/güvenlik ve mevcut settings reset desteği güncel API devrinde ayrıdır. Desteklenmeyen seçenek yerel taslak olabilir, sahte kalıcı kayıt olamaz.
 
 | Ayar alanı | Kabul edilmiş hedef | Bugün kullanılabilen yol ve açık sınır |
 |---|---|---|
@@ -154,7 +163,7 @@ S11 kişisel takvim, S14 pazarlama/ilgi, S15 görünürlük/izin, S16 veri taleb
 | S03 Bağlantılar | Güvenli mevcut kişiye bağlama, kaldırma ve yeni yetkiyle yeniden bağlama | `account_access_send/accept/revoke_v1`, `account_link_remove_v1`, `person_merge_*` mevcut komutlarıdır; her biri kendi yetkisine tabidir. Kullanıcının kendi bağlantısını kaldırma hedefi mevcut CM komutuna otomatik eşitlenmez. Abone numarası P08'dir. |
 | S04 Şifre | Ekle/değiştir/kurtarma ve kabul edilmiş oturum kapatma | `account_password_change_v1` challenge başlatır; tamamlama native Auth'tadır. `account_password_reset_request_v1` korumalı recover başlatıcısıdır. Kabul edilmiş tüm oturum temizliği ve dış teslim hazır varsayılmaz. |
 | S05 Sağlayıcı MFA | Güvenli ekleme/kaldırma, son giriş yöntemi koruması | Seçim kesin: e-posta/parola ve Google kayıt/giriş, doğrulayıcı uygulama MFA. Apple/Instagram login kapsam dışı, passkey erteli. Gerçek provider/hesap yaşam döngüsü ve kabul kanıtı ayrıca doğrulanacak; seçim desteğin çalıştığı kanıtı değildir. |
-| S06 Oturumlar | Kendi oturumlarını gör/kapat; güven kaydını ayrı yönet | Mevcut canlı session kapıları oturum listeleme/etiketleme/tüm cihaz yönetimi API'si var anlamına gelmez. Yeni alanlar/sağlayıcı eşlemesi bekler. |
+| S06 Oturumlar | Kendi oturumlarını gör/kapat; güven kaydını ayrı yönet | PR50 beş hesap güvenlik API’si ve native TOTP devri frontend-settings-handover belgesindedir; son native/CI/hosted kabulü bekler. Güvenilen cihaz ayrı ve açık kalır. |
 | S07 Dil bölge saat | Hesap manuel/cihaz otomatik tercihleri; iş zamanı sabit | Aday settings_get/update S07 görünüm alanlarını kapalı DTO ile saklar. İş zamanları Instant/merkez timezone kaynağında kalır; görüntüleme tercihi onları değiştirmez. |
 | S08–S10 Görünüm ve bağlam | Erişilebilirlik, başlangıç, ekran/takvim tercihleri | Aday settings API'leri sistem tema/kontrast/hareket, hatırlama ve takvim görünümünü saklar; desteklenmeyen ekran filtre/sütun ve varsayılan bağlam yolları ayrı açıktır. Yetki filtreleri tercihle aşılmaz. |
 | Bildirim tercihi | S12–S13 ve FD04 olay/kanal/istisna/zaman değerleri kesin; mevcut API kapsamı dar | `notification_preferences_set_v1` ve yetkili management okuması mevcut. Amaçlar transactional/reminder/marketing; mevcut yol in_app, transactional=false ret. Enum'da email olması dış teslim kanıtı değildir; push/SMS yeni enum gibi eklenmez. |

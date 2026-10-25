@@ -1486,3 +1486,12 @@ U25 Güvenlik hareketleri: kullanıcıya kendi giriş, iletişim değişikliği 
 ## Pilot operasyonel güvenlik aktarımı — 25 Ekim
 
 Yeni kullanıcı talimatı beş ayar API/alan kabulü ve gerçek pilot zinciri/restore hazırlığıdır. İlk207/62 adayı davranış kararı eklemez: worker connection/session search_path sabitlemesi ve platform event-trigger EXECUTE daraltması. COMMIT yapabilen ops_run üzerine SET clause eklenmez. [Yöntem ve açık kabul sınırı](../docs/pilot-readiness.md). Sentetik pilot verisinin geliştirme ortamında kalıcı tutulması kabul edildi; gerçek kayıtlar korunur, dağıtım öncesi reset şimdi yapılmaz.
+
+
+### 26 Ekim — S08/S09 uygulama alan eşlemesi
+
+Kullanıcı uygulama yazı ölçeği font_scale:number0.75–2|null; null OS/cihaz tercihini izler. Sabit başlangıç startup_context:null|{org_id,center_id,discipline_id}; alt iki ID nullable, disiplinde merkez gerekir. remember_context=true son bağlamı cihazda kullanır; false sabit bağlamı seçer. Üst seçimde uyumsuz alt seçimler istemcide temizlenir ve nesne atomik kaydedilir. Canlı link/kişi/org/merkez-plan/rol-ilişki ve merkez-disiplin denetimi yazma/tekrarda korunur; kayıp erişimde okuma null ile yeniden seçime döner. Geçersiz kayıt domain yetkisi yaratmaz. Bu teknik aralıklar ve wire eşlemesi yeni ana davranış grubu değildir; S08/S09’un ekran/rol ve gerçek frontend kabulü dahil tamamı kapanmış sayılmaz. [Güncel API aktarımı](../docs/frontend-settings-handover.md#kullanici-gorunum-baslangic-20261026).
+
+## PR50 S04–S06 güvenlik uygulama eşlemesi
+
+Kararlar yeniden açılmaz: ilk MFA doğrulayıcı uygulama TOTP, native kayıt/challenge/verify; verified factor sonrası uygulamada hem signed JWT aal2 hem exact live native session aal2 zorunlu. Current logout kullanılabilir. Hassas others logout ve TOTP kaldırma aynı mevcut taze native sign-in session proof’u gerektirir; eski refresh token yeni sign-in sayılmaz. account_totp_remove_v1 yalnız exact own factor için kısa10sn intent, transactional native DELETE/history ve tamamlanmış sonuç okuması sunar; verified factor doğrudan native kaldırma backend intent olmadan yasaktır. Bu intent authorization’dır, native isteğin JWT’sini SQL’de doğrulama değildir. Bir faktor olayı bütün MFA durumuyla eşitlenmez. Ayrıntılı alan ve consumer devri docs/frontend-settings-handover.md içindedir; bu kaynak adayının native/CI/hosted kabulü ayrı izlenir. Google/passkey/trusted-device/recovery ve rol zorunlu MFA politikası bu eşlemeyle uygulanmış sayılmaz.

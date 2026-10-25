@@ -1,5 +1,15 @@
 # Changes
 
+## 26 Ekim 2026 — hesap oturum ve TOTP güvenliği adayı
+
+Beş kendi-hesap API’siyle212/64 aday: canlı session listesi, sürümlü etiket, seçili/current/others iptali ve refresh sonlandırma, değişmez güvenlik geçmişi, taze güçlü proof’la TOTP kaldırma köprüsü. Native JWT/session çift aal2 kontrolü eski aal1 erişimini engeller. Sağlayıcıdaki zayıf doğrudan factor kaldırma davranışı exact-factor kısa intent ve transactional fence ile sınırlandı; dar native doğrulama ve bağımsız kod incelemesi geçti; son kaynak/aday/main/CD kabulü bekler. Full/main scope/assertion/süre sınırları korunur.
+
+
+## 26 Ekim 2026 — kullanıcı yazı ölçeği ve sabit bağlam
+
+Aynı altı settings API’sine nullable font_scale ve startup_context eklendi; katalog2,20 user/46 toplam alan,44 writable. Yeni63. migration; önceki62 değişmedi. Sabit bağlam yetki vermez; kayıp erişimde read null, retry canlı denetimlidir. UI/başlangıç ekran-rol/kayıtlı filtre ve diğer69 grup kabulü ayrı kalır.
+
+
 ## 26 Ekim 2026 — izole restore sahiplik/izin kanıtı
 
 PR48 aynı-main clean/CD kabulü kaydedildi. İki izole native Supabase stack’inde uygulama sahipliği/ACL/RLS,178 tablo/1.025 satır, aynı UUID/parola Auth→Edge, private Storage bayt aktarımı ve beş dedicated worker idle geri dönüşü doğrulandı. Hosted afet kurtarma/RPO/RTO açık; yeni runtime/API/migration veya rutin CI testi eklenmedi. Ayrı hosted dummy kurulum işi iptal edildi. Ayrıntı [geri dönüş kaydında](docs/remote-backend-setup.md#restore-20261026).

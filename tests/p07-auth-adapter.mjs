@@ -35,7 +35,10 @@ test('P07 deletion reauth trusts native verification, binds the same user/sessio
  const proof=token({sub:id,session_id:session});let calls=0;
  const provider=async(url,options)=>{calls++;assert.equal(url,'https://synthetic.supabase.co/auth/v1/user');assert.equal(options.headers.authorization,'Bearer '+proof);return Response.json({id});};
  const result=await lifecycleReauth('https://synthetic.supabase.co','synthetic',proof,id,provider);
- assert.deepEqual(result,{context:{reauth_verified:true,reauth_auth_id:id,reauth_session_id:session}});assert(!JSON.stringify(result).includes(proof));assert.equal(calls,1);
+ assert.deepEqual(result,{context:{reauth_verified:true,reauth_auth_id:id,reauth_session_id:session,reauth_aal:'aal1'}});assert(!JSON.stringify(result).includes(proof));assert.equal(calls,1);
+ const verified={id,factors:[{status:'verified',factor_type:'totp'}]};
+ assert.deepEqual(await lifecycleReauth('x','k',proof,id,async()=>Response.json(verified)),{error:'AUTH_REQUIRED'});
+ assert.deepEqual(await lifecycleReauth('x','k',token({sub:id,session_id:session,aal:'aal2'}),id,async()=>Response.json(verified)),{context:{reauth_verified:true,reauth_auth_id:id,reauth_session_id:session,reauth_aal:'aal2'}});
  assert.deepEqual(await lifecycleReauth('x','k',proof,id,async()=>Response.json({}, {status:401})),{error:'AUTH_REQUIRED'});
  assert.deepEqual(await lifecycleReauth('x','k',proof,id,async()=>Response.json({id:session})),{error:'AUTH_REQUIRED'});
  assert.deepEqual(await lifecycleReauth('x','k',token({sub:session,session_id:session}),id,async()=>Response.json({id})),{error:'AUTH_REQUIRED'});

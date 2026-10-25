@@ -5601,6 +5601,131 @@
       "limits": [
         "Single explicit booking; reason required; current center manager, granted staff, or assigned live instructor; no right/debt/time/document bypass; room ceiling always enforced."
       ]
+    },
+    {
+      "name": "account_sessions_list_v1",
+      "status": "operational_development_limited",
+      "external_path": "/functions/v1/backend-v1/account_sessions_list_v1",
+      "permission": "account.self",
+      "features": [
+        "F06"
+      ],
+      "required_features": [
+        "F06"
+      ],
+      "runtime_required_features": [],
+      "decision_delivery": {
+        "accepted_contract": "DS-2026-10-17",
+        "runtime_conformance": "implemented_pending_ci",
+        "open_dependencies": [],
+        "target_request": {
+          "$ref": "#/$defs/Request_account_sessions_list"
+        }
+      },
+      "billing_class": "exempt",
+      "limits": [
+        "Self-only native Auth sessions; no IP, location, token or refresh secret in output."
+      ]
+    },
+    {
+      "name": "account_session_label_v1",
+      "status": "operational_development_limited",
+      "external_path": "/functions/v1/backend-v1/account_session_label_v1",
+      "permission": "account.self",
+      "features": [
+        "F06"
+      ],
+      "required_features": [
+        "F06"
+      ],
+      "runtime_required_features": [],
+      "decision_delivery": {
+        "accepted_contract": "DS-2026-10-17",
+        "runtime_conformance": "implemented_pending_ci",
+        "open_dependencies": [],
+        "target_request": {
+          "$ref": "#/$defs/Request_account_session_label"
+        }
+      },
+      "billing_class": "exempt",
+      "limits": [
+        "Self-only native Auth sessions; no IP, location, token or refresh secret in output."
+      ]
+    },
+    {
+      "name": "account_sessions_revoke_v1",
+      "status": "operational_development_limited",
+      "external_path": "/functions/v1/backend-v1/account_sessions_revoke_v1",
+      "permission": "account.self",
+      "features": [
+        "F06"
+      ],
+      "required_features": [
+        "F06"
+      ],
+      "runtime_required_features": [],
+      "decision_delivery": {
+        "accepted_contract": "DS-2026-10-17",
+        "runtime_conformance": "implemented_pending_ci",
+        "open_dependencies": [],
+        "target_request": {
+          "$ref": "#/$defs/Request_account_sessions_revoke"
+        }
+      },
+      "billing_class": "exempt",
+      "limits": [
+        "Self-only native Auth sessions; no IP, location, token or refresh secret in output."
+      ]
+    },
+    {
+      "name": "account_security_history_get_v1",
+      "status": "operational_development_limited",
+      "external_path": "/functions/v1/backend-v1/account_security_history_get_v1",
+      "permission": "account.self",
+      "features": [
+        "F06"
+      ],
+      "required_features": [
+        "F06"
+      ],
+      "runtime_required_features": [],
+      "decision_delivery": {
+        "accepted_contract": "DS-2026-10-17",
+        "runtime_conformance": "implemented_pending_ci",
+        "open_dependencies": [],
+        "target_request": {
+          "$ref": "#/$defs/Request_account_security_history_get"
+        }
+      },
+      "billing_class": "exempt",
+      "limits": [
+        "Self-only native Auth sessions; no IP, location, token or refresh secret in output."
+      ]
+    },
+    {
+      "name": "account_totp_remove_v1",
+      "status": "operational_development_limited",
+      "external_path": "/functions/v1/backend-v1/account_totp_remove_v1",
+      "permission": "account.self",
+      "features": [
+        "F06"
+      ],
+      "required_features": [
+        "F06"
+      ],
+      "runtime_required_features": [],
+      "decision_delivery": {
+        "accepted_contract": "DS-2026-10-17",
+        "runtime_conformance": "implemented_pending_ci",
+        "open_dependencies": [],
+        "target_request": {
+          "$ref": "#/$defs/Request_account_totp_remove"
+        }
+      },
+      "billing_class": "exempt",
+      "limits": [
+        "Verified TOTP removal requires fresh strong current proof and one-time bounded exact-factor intent; native direct verified-factor deletion is fenced."
+      ]
     }
   ]
 }

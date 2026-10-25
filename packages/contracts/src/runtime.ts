@@ -206,6 +206,11 @@ export const runtimeOperationNames = [
   "settings_reset_preview_v1",
   "settings_reset_apply_v1",
   "settings_history_get_v1",
-  "reservation_capacity_override_v1"
+  "reservation_capacity_override_v1",
+  "account_sessions_list_v1",
+  "account_session_label_v1",
+  "account_sessions_revoke_v1",
+  "account_security_history_get_v1",
+  "account_totp_remove_v1"
 ] as const;
 export type RuntimeOperationName = typeof runtimeOperationNames[number];

@@ -1,5 +1,12 @@
 # Beş ayar kapsamı ve kalıcı geliştirme pilotu
 
+## 26 Ekim güncel ürün hedefi
+
+Backend frontendten bağımsız kullanıma hazırlanır; ekran/render kabulü bu işin kapanış şartı değildir. Ayrı kalıcı dummy/pilot kurulum görevi kullanıcı tarafından iptal edildi; var olan sentetik kayıtların silinmesi gerekmez. PR48 runtime34aac276 aynı-main clean/CD kabulü kapalıdır. PR49 izole managed-baseline restore sahiplik/ACL/RLS, Auth giriş, Storage bayt aktarımı ve beş worker idle dönüşünü doğruladı; [restore sınırı](remote-backend-setup.md#restore-20261026) hosted afet kurtarma/RPO/RTO’yu açık tutar. Aşağıdaki25 Ekim prototip başarısızlığı tarihsel denemedir.
+
+PR50 yerel aday212 API/64 migration;46 ayar alanı/44 writable ve beş kendi-hesap session/TOTP API’si içerir. Yeni native/bağımsız/full clean/main/CD kabulü ayrı tamamlanır. [Ayar ve güvenlik devri](frontend-settings-handover.md) güncel destek sınırıdır. Yeni Auth factor trigger’ları eski restore kanıtına dahil değildir.
+
+
 25 Ekim 2026 başlangıç kaynağı: `d6b67139445f2b88298fc0ee6e1f5c476f3586b7`,207 API/61 migration. Main clean40206350648 ve development CD40207909599 başarılı; PR45 kapasitesi açık iş değildir. Bu ilk pilot ön koşul adayı207 API/62 migration; aşağıdaki kalan kapsam tamamlanmadan pilotun bütünü kabul edilmez.
 
 ## Son kullanıcı hedefi ve veri kararı
@@ -13,8 +20,8 @@ Beş ayar ekranının backend alan/API kabulü tamamlanacak; öğrenci/eğitmen/
 | Hat | Kapanış koşulu | Mevcut durum |
 |---|---|---|
 | 1. Operasyon/pilot ön koşulları | Worker güvenli session lookup, minimum EXECUTE, gerçek native roller; aynı sentetik orgda uçtan uca zincir; izole dump/restore eşitliği ayrıca restore hattında | Bu adayda güvenlik/zincir kodu ve dar doğrulama; son inceleme/CI/main/CD gerekir. |
-| 2. Beş kapsam ayarları | Tüm kabul alanları gerçek read/write/DTO/yetki/sürüm/reset/consumer ve açık sağlayıcı durumuna eşlenir | Mevcut44 alan/42 writable; yalnız bu kapsamın native alan matrisi eklenir.69 grubun tamamı değildir. |
-| 3. Kalıcı hosted pilot | Native öğrenci/eğitmen/yönetici hesapları, ayrı sentetik org, seçili açık iş koşulları; normal API zinciri ve tutarlı rapor; tekrar çalıştırmada çift kayıt yok | Kullanıcı yetkisi var; henüz oluşturulmadı. İlk gerçek kulüp kurulumu bunun yerine kullanılmaz. |
+| 2. Beş kapsam ayarları | Tüm kabul alanları gerçek read/write/DTO/yetki/sürüm/reset/consumer ve açık sağlayıcı durumuna eşlenir | PR50 adayı46 alan/44 writable; yalnız bu kapsamın native alan matrisi eklenir.69 grubun tamamı değildir. |
+| 3. Kalıcı hosted pilot | Mevcut sentetik veri yeniden kullanılabilir | Ayrı dummy kurulum işi iptal edildi; yeni kurulum kabul kapısı değildir. |
 | 4. Frontend entegrasyonu | Yeni frontend SHA/önizleme + gerçek Auth→ekran→Edge→DB + öğrenci/eğitmen/yönetici yetki, stale/replay/hata testleri | Yeni dağıtım yok; kaynak/önizleme gelmeden kabul edilemez. Tasarım Claude alanıdır. |
 | 5. Restore/temel operasyon kapanışı | Veri+Auth çalışırlığı+Storage byte+gerekli secret/config ve worker geri dönüşü; izole hedefte tekrar doğrulama, RPO/RTO kanıtı | İzole PostgreSQL restore prototipi yönetilen extension ACL’lerinde başarısız; bu adaydan çıkarıldı. Hosted tam afet dönüşü/Storage/secrets açık. |
 
@@ -22,7 +29,7 @@ Beş ayar ekranının backend alan/API kabulü tamamlanacak; öğrenci/eğitmen/
 
 | Ekran | Mevcut genel ayar alanı | Ayrı kalan gerçek eksikler |
 |---|---:|---|
-| Kullanıcı |18 | Fotoğraf/ad-soyad ve doğrulanmış iletişim yayılımı; Google/MFA/cihaz/session yaşam döngüsü; ekran/bağlam kaydı; sessiz saatler. |
+| Kullanıcı |20 | Fotoğraf/ad-soyad ve doğrulanmış iletişim yayılımı; gerçek Google sağlayıcısı, hosted TOTP aktivasyonu ve güvenilen cihaz; ekran/bağlam kaydı; sessiz saatler. |
 | Üye |9 | Açılan profil/iletişimin FD05 kitlesine gerçek projeksiyonu; takvim aboneliği; olay/zaman/özet consumerları. |
 | Merkez |4 | Alan bazlı miras/şablonlar ve kabul edilmiş başlangıçların ilgili domain komutlarıyla eşlenmesi. |
 | Organizasyon |9, marka2 salt okunur | Hazır marka kataloğu/seçimi ve PNG/JPEG/WebP logo hattı; delegasyon, şablon/default yayını ve domain consumerlar. |

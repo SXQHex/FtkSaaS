@@ -1,5 +1,5 @@
 {
-  "version": 1,
+  "version": 2,
   "fields": [
     {
       "scope": "user",
@@ -558,6 +558,73 @@
       },
       "default": "",
       "group": "P01",
+      "consumer": "frontend"
+    },
+    {
+      "scope": "user",
+      "key": "font_scale",
+      "schema": {
+        "anyOf": [
+          {
+            "type": "number",
+            "minimum": 0.75,
+            "maximum": 2
+          },
+          {
+            "type": "null"
+          }
+        ]
+      },
+      "default": null,
+      "group": "S08",
+      "consumer": "frontend"
+    },
+    {
+      "scope": "user",
+      "key": "startup_context",
+      "schema": {
+        "anyOf": [
+          {
+            "type": "object",
+            "properties": {
+              "org_id": {
+                "$ref": "#/$defs/FtkUuid"
+              },
+              "center_id": {
+                "anyOf": [
+                  {
+                    "$ref": "#/$defs/FtkUuid"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "discipline_id": {
+                "anyOf": [
+                  {
+                    "$ref": "#/$defs/FtkUuid"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              }
+            },
+            "required": [
+              "org_id",
+              "center_id",
+              "discipline_id"
+            ],
+            "additionalProperties": false
+          },
+          {
+            "type": "null"
+          }
+        ]
+      },
+      "default": null,
+      "group": "S09",
       "consumer": "frontend"
     }
   ]

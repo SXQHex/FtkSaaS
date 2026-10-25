@@ -907,7 +907,12 @@
         "settings_reset_preview_v1",
         "settings_reset_apply_v1",
         "settings_history_get_v1",
-        "reservation_capacity_override_v1"
+        "reservation_capacity_override_v1",
+        "account_sessions_list_v1",
+        "account_session_label_v1",
+        "account_sessions_revoke_v1",
+        "account_security_history_get_v1",
+        "account_totp_remove_v1"
       ]
     },
     "EntityType": {
@@ -42434,6 +42439,59 @@
               "type": "null"
             }
           ]
+        },
+        "font_scale": {
+          "anyOf": [
+            {
+              "type": "number",
+              "minimum": 0.75,
+              "maximum": 2
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "startup_context": {
+          "anyOf": [
+            {
+              "type": "object",
+              "properties": {
+                "org_id": {
+                  "$ref": "#/$defs/FtkUuid"
+                },
+                "center_id": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/$defs/FtkUuid"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "discipline_id": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/$defs/FtkUuid"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                }
+              },
+              "required": [
+                "org_id",
+                "center_id",
+                "discipline_id"
+              ],
+              "additionalProperties": false
+            },
+            {
+              "type": "null"
+            }
+          ]
         }
       },
       "required": [],
@@ -42663,6 +42721,7 @@
               "description",
               "email_visible",
               "font_package_id",
+              "font_scale",
               "history_recommendations",
               "honorific",
               "in_app_marketing",
@@ -42680,6 +42739,7 @@
               "profile_visible",
               "remember_context",
               "show_weekends",
+              "startup_context",
               "support_email",
               "support_url",
               "theme",
@@ -42740,7 +42800,9 @@
                   "ad_personalization",
                   "ad_measurement",
                   "optional_analytics",
-                  "timezone_name"
+                  "timezone_name",
+                  "font_scale",
+                  "startup_context"
                 ]
               },
               "uniqueItems": true,
@@ -42944,6 +43006,7 @@
           "description",
           "email_visible",
           "font_package_id",
+          "font_scale",
           "history_recommendations",
           "honorific",
           "in_app_marketing",
@@ -42961,6 +43024,7 @@
           "profile_visible",
           "remember_context",
           "show_weekends",
+          "startup_context",
           "support_email",
           "support_url",
           "theme",
@@ -43167,6 +43231,7 @@
             "description",
             "email_visible",
             "font_package_id",
+            "font_scale",
             "history_recommendations",
             "honorific",
             "in_app_marketing",
@@ -43184,6 +43249,7 @@
             "profile_visible",
             "remember_context",
             "show_weekends",
+            "startup_context",
             "support_email",
             "support_url",
             "theme",
@@ -43224,7 +43290,7 @@
           "$ref": "#/$defs/SettingsScope"
         },
         "catalog_version": {
-          "const": 1
+          "const": 2
         },
         "fields": {
           "type": "array",
@@ -43283,7 +43349,7 @@
               "const": "user"
             },
             "catalog_version": {
-              "const": 1
+              "const": 2
             },
             "fields": {
               "type": "array",
@@ -43326,7 +43392,7 @@
               "const": "member"
             },
             "catalog_version": {
-              "const": 1
+              "const": 2
             },
             "fields": {
               "type": "array",
@@ -43369,7 +43435,7 @@
               "const": "center"
             },
             "catalog_version": {
-              "const": 1
+              "const": 2
             },
             "fields": {
               "type": "array",
@@ -43412,7 +43478,7 @@
               "const": "organization"
             },
             "catalog_version": {
-              "const": 1
+              "const": 2
             },
             "fields": {
               "type": "array",
@@ -43455,7 +43521,7 @@
               "const": "platform"
             },
             "catalog_version": {
-              "const": 1
+              "const": 2
             },
             "fields": {
               "type": "array",
@@ -44162,7 +44228,9 @@
                   "ad_personalization",
                   "ad_measurement",
                   "optional_analytics",
-                  "timezone_name"
+                  "timezone_name",
+                  "font_scale",
+                  "startup_context"
                 ]
               },
               "minItems": 1,
@@ -45166,6 +45234,564 @@
         "category_held",
         "category_remaining",
         "room_capacity"
+      ],
+      "additionalProperties": false
+    },
+    "AccountSessionView": {
+      "type": "object",
+      "properties": {
+        "session_id": {
+          "$ref": "#/$defs/ProviderUuid"
+        },
+        "current": {
+          "type": "boolean"
+        },
+        "created_at": {
+          "$ref": "#/$defs/Instant"
+        },
+        "last_refreshed_at": {
+          "$ref": "#/$defs/Instant"
+        },
+        "expires_at": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Instant"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "aal": {
+          "anyOf": [
+            {
+              "type": "string",
+              "enum": [
+                "aal1",
+                "aal2"
+              ]
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "user_agent": {
+          "anyOf": [
+            {
+              "type": "string",
+              "maxLength": 400
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "label": {
+          "anyOf": [
+            {
+              "type": "string",
+              "maxLength": 80
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "version": {
+          "$ref": "#/$defs/SettingsVersion"
+        }
+      },
+      "required": [
+        "session_id",
+        "current",
+        "created_at",
+        "last_refreshed_at",
+        "expires_at",
+        "aal",
+        "user_agent",
+        "label",
+        "version"
+      ],
+      "additionalProperties": false
+    },
+    "AccountSecurityEvent": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/FtkUuid"
+        },
+        "at": {
+          "$ref": "#/$defs/Instant"
+        },
+        "action": {
+          "type": "string",
+          "enum": [
+            "session_labelled",
+            "session_revoked",
+            "other_sessions_revoked",
+            "totp_enabled",
+            "totp_disabled"
+          ]
+        },
+        "session_id": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/ProviderUuid"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "affected_count": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        }
+      },
+      "required": [
+        "id",
+        "at",
+        "action",
+        "session_id",
+        "affected_count"
+      ],
+      "additionalProperties": false
+    },
+    "AccountSessionPage": {
+      "type": "object",
+      "properties": {
+        "items": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/AccountSessionView"
+          },
+          "maxItems": 50
+        },
+        "next_cursor": {
+          "anyOf": [
+            {
+              "type": "string",
+              "pattern": "^[a-f0-9]+$",
+              "maxLength": 2048
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "as_of": {
+          "$ref": "#/$defs/Instant"
+        }
+      },
+      "required": [
+        "items",
+        "next_cursor",
+        "as_of"
+      ],
+      "additionalProperties": false
+    },
+    "AccountSecurityHistory": {
+      "type": "object",
+      "properties": {
+        "items": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/AccountSecurityEvent"
+          },
+          "maxItems": 50
+        },
+        "next_cursor": {
+          "anyOf": [
+            {
+              "type": "string",
+              "pattern": "^[a-f0-9]+$",
+              "maxLength": 2048
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "as_of": {
+          "$ref": "#/$defs/Instant"
+        }
+      },
+      "required": [
+        "items",
+        "next_cursor",
+        "as_of"
+      ],
+      "additionalProperties": false
+    },
+    "AccountSessionRevocation": {
+      "type": "object",
+      "properties": {
+        "operation_id": {
+          "$ref": "#/$defs/FtkUuid"
+        },
+        "affected_count": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "current_revoked": {
+          "type": "boolean"
+        },
+        "replayed": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "operation_id",
+        "affected_count",
+        "current_revoked",
+        "replayed"
+      ],
+      "additionalProperties": false
+    },
+    "Request_account_sessions_list": {
+      "type": "object",
+      "properties": {
+        "client_api_version": {
+          "const": 1
+        },
+        "request_id": {
+          "$ref": "#/$defs/FtkUuid"
+        },
+        "cursor": {
+          "type": "string",
+          "pattern": "^[a-f0-9]+$",
+          "maxLength": 2048
+        }
+      },
+      "required": [
+        "client_api_version",
+        "request_id"
+      ],
+      "additionalProperties": false
+    },
+    "Success_account_sessions_list": {
+      "type": "object",
+      "properties": {
+        "ok": {
+          "const": true
+        },
+        "data": {
+          "$ref": "#/$defs/AccountSessionPage"
+        },
+        "trace_id": {
+          "$ref": "#/$defs/FtkUuid"
+        }
+      },
+      "required": [
+        "ok",
+        "data",
+        "trace_id"
+      ],
+      "additionalProperties": false
+    },
+    "Request_account_session_label": {
+      "type": "object",
+      "properties": {
+        "client_api_version": {
+          "const": 1
+        },
+        "request_id": {
+          "$ref": "#/$defs/FtkUuid"
+        },
+        "operation_key": {
+          "$ref": "#/$defs/FtkUuid"
+        },
+        "session_id": {
+          "$ref": "#/$defs/ProviderUuid"
+        },
+        "expected_version": {
+          "$ref": "#/$defs/SettingsVersion"
+        },
+        "label": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 80
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "client_api_version",
+        "request_id",
+        "operation_key",
+        "session_id",
+        "expected_version",
+        "label"
+      ],
+      "additionalProperties": false
+    },
+    "Success_account_session_label": {
+      "type": "object",
+      "properties": {
+        "ok": {
+          "const": true
+        },
+        "data": {
+          "$ref": "#/$defs/Mutation"
+        },
+        "trace_id": {
+          "$ref": "#/$defs/FtkUuid"
+        }
+      },
+      "required": [
+        "ok",
+        "data",
+        "trace_id"
+      ],
+      "additionalProperties": false
+    },
+    "Request_account_sessions_revoke": {
+      "type": "object",
+      "properties": {
+        "client_api_version": {
+          "const": 1
+        },
+        "request_id": {
+          "$ref": "#/$defs/FtkUuid"
+        },
+        "operation_key": {
+          "$ref": "#/$defs/FtkUuid"
+        },
+        "mode": {
+          "type": "string",
+          "enum": [
+            "selected",
+            "current",
+            "others"
+          ]
+        },
+        "session_id": {
+          "$ref": "#/$defs/ProviderUuid"
+        },
+        "reauth": {
+          "$ref": "#/$defs/ReauthProof"
+        }
+      },
+      "required": [
+        "client_api_version",
+        "request_id",
+        "operation_key",
+        "mode"
+      ],
+      "additionalProperties": false,
+      "oneOf": [
+        {
+          "type": "object",
+          "properties": {
+            "client_api_version": {
+              "const": 1
+            },
+            "request_id": {
+              "$ref": "#/$defs/FtkUuid"
+            },
+            "operation_key": {
+              "$ref": "#/$defs/FtkUuid"
+            },
+            "mode": {
+              "const": "selected"
+            },
+            "session_id": {
+              "$ref": "#/$defs/ProviderUuid"
+            }
+          },
+          "required": [
+            "client_api_version",
+            "request_id",
+            "operation_key",
+            "mode",
+            "session_id"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "client_api_version": {
+              "const": 1
+            },
+            "request_id": {
+              "$ref": "#/$defs/FtkUuid"
+            },
+            "operation_key": {
+              "$ref": "#/$defs/FtkUuid"
+            },
+            "mode": {
+              "const": "current"
+            }
+          },
+          "required": [
+            "client_api_version",
+            "request_id",
+            "operation_key",
+            "mode"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "client_api_version": {
+              "const": 1
+            },
+            "request_id": {
+              "$ref": "#/$defs/FtkUuid"
+            },
+            "operation_key": {
+              "$ref": "#/$defs/FtkUuid"
+            },
+            "mode": {
+              "const": "others"
+            },
+            "reauth": {
+              "$ref": "#/$defs/ReauthProof"
+            }
+          },
+          "required": [
+            "client_api_version",
+            "request_id",
+            "operation_key",
+            "mode",
+            "reauth"
+          ],
+          "additionalProperties": false
+        }
+      ]
+    },
+    "Success_account_sessions_revoke": {
+      "type": "object",
+      "properties": {
+        "ok": {
+          "const": true
+        },
+        "data": {
+          "$ref": "#/$defs/AccountSessionRevocation"
+        },
+        "trace_id": {
+          "$ref": "#/$defs/FtkUuid"
+        }
+      },
+      "required": [
+        "ok",
+        "data",
+        "trace_id"
+      ],
+      "additionalProperties": false
+    },
+    "Request_account_security_history_get": {
+      "type": "object",
+      "properties": {
+        "client_api_version": {
+          "const": 1
+        },
+        "request_id": {
+          "$ref": "#/$defs/FtkUuid"
+        },
+        "cursor": {
+          "type": "string",
+          "pattern": "^[a-f0-9]+$",
+          "maxLength": 2048
+        }
+      },
+      "required": [
+        "client_api_version",
+        "request_id"
+      ],
+      "additionalProperties": false
+    },
+    "Success_account_security_history_get": {
+      "type": "object",
+      "properties": {
+        "ok": {
+          "const": true
+        },
+        "data": {
+          "$ref": "#/$defs/AccountSecurityHistory"
+        },
+        "trace_id": {
+          "$ref": "#/$defs/FtkUuid"
+        }
+      },
+      "required": [
+        "ok",
+        "data",
+        "trace_id"
+      ],
+      "additionalProperties": false
+    },
+    "Request_account_totp_remove": {
+      "type": "object",
+      "properties": {
+        "client_api_version": {
+          "const": 1
+        },
+        "request_id": {
+          "$ref": "#/$defs/FtkUuid"
+        },
+        "factor_id": {
+          "$ref": "#/$defs/ProviderUuid"
+        },
+        "reauth": {
+          "$ref": "#/$defs/ReauthProof"
+        }
+      },
+      "required": [
+        "client_api_version",
+        "request_id",
+        "factor_id",
+        "reauth"
+      ],
+      "additionalProperties": false
+    },
+    "AccountTotpRemoval": {
+      "type": "object",
+      "properties": {
+        "factor_id": {
+          "$ref": "#/$defs/ProviderUuid"
+        },
+        "removed": {
+          "const": true
+        },
+        "provider": {
+          "const": "supabase_auth"
+        }
+      },
+      "required": [
+        "factor_id",
+        "removed",
+        "provider"
+      ],
+      "additionalProperties": false
+    },
+    "Success_account_totp_remove": {
+      "type": "object",
+      "properties": {
+        "ok": {
+          "const": true
+        },
+        "data": {
+          "$ref": "#/$defs/AccountTotpRemoval"
+        },
+        "trace_id": {
+          "$ref": "#/$defs/FtkUuid"
+        }
+      },
+      "required": [
+        "ok",
+        "data",
+        "trace_id"
       ],
       "additionalProperties": false
     }
@@ -71734,6 +72360,513 @@
             "$ref": "#/$defs/Request_reservation_create"
           }
         }
+      },
+      {
+        "name": "account_sessions_list_v1",
+        "module": "M02",
+        "features": [
+          "F06"
+        ],
+        "permission": "account.self",
+        "actor_source": "server_verified",
+        "transport": "R",
+        "billing_class": "exempt",
+        "request": {
+          "$ref": "#/$defs/Request_account_sessions_list"
+        },
+        "success": {
+          "$ref": "#/$defs/Success_account_sessions_list"
+        },
+        "errors": [
+          "AUTH_REQUIRED",
+          "BILLING_OPERATION_RESTRICTED",
+          "CLIENT_UPDATE_REQUIRED",
+          "FORBIDDEN",
+          "NOT_FOUND",
+          "PLAN_FEATURE_UNAVAILABLE",
+          "PLAN_LIMIT_REACHED",
+          "POLICY_NOT_CONFIGURED",
+          "SERVICE_UNAVAILABLE",
+          "SESSION_REVOKED",
+          "SUBSCRIPTION_NOT_STARTED",
+          "TEMPORARY_FAILURE",
+          "VALIDATION_FAILED",
+          "VERSION_CONFLICT",
+          "INVALID_STATE_TRANSITION",
+          "PREVIEW_STALE",
+          "CAPACITY_FULL",
+          "ENTITLEMENT_UNAVAILABLE",
+          "CLASS_ACCESS_DENIED",
+          "RESERVATION_EXISTS",
+          "ASSISTANT_PARTICIPANT_CONFLICT",
+          "ACCOUNT_ALREADY_LINKED",
+          "INVITATION_UNAVAILABLE",
+          "CREDIT_LIMIT_EXCEEDED"
+        ],
+        "transaction_class": "read",
+        "transaction_guarantee": "Self-only bounded session/security projection; no mutation.",
+        "transition": {
+          "effect": "account_sessions_list",
+          "from": [],
+          "to": [],
+          "invariant": "Verified own active account/session; others requires fresh current native proof."
+        },
+        "semantic_guards": [
+          "live_actor_and_scope",
+          "billing_gate_exempt"
+        ],
+        "audit": false,
+        "notification": "none",
+        "concurrency": "Live original permission/tenant/field scope on every request; current authorized projection; no business writes",
+        "expected_version_subject": "none",
+        "acceptance_scenario_ids": [
+          "A01",
+          "A02",
+          "A03",
+          "A23",
+          "A24",
+          "A25",
+          "A46",
+          "A47",
+          "A55"
+        ],
+        "configuration_policy": "numeric plan limits/prices and legal approval are deployment configuration, never arbitrary allow/deny",
+        "implementation_status": "operational_development_limited",
+        "runtime_path": "/functions/v1/backend-v1/account_sessions_list_v1",
+        "runtime_rpc": "api_v1.account_sessions_list_v1",
+        "runtime_transport": "authenticated Edge adapter -> service-only RPC; rules/transaction in PostgreSQL",
+        "runtime_external_path": "/functions/v1/backend-v1/account_sessions_list_v1",
+        "runtime_limits": [
+          "Self-only native Auth sessions; no IP, location, token or refresh secret in output."
+        ],
+        "required_features": [
+          "F06"
+        ],
+        "runtime_required_features": [],
+        "conditional_features": [],
+        "operation_contract": {
+          "kind": "read",
+          "target_entity": "accounts",
+          "version_mode": "none",
+          "version_field": null,
+          "read_operation": null,
+          "atomic_effects": [],
+          "business_commit": false,
+          "read_path_status": null,
+          "source_decision": "S06/FD03"
+        },
+        "decision_delivery": {
+          "accepted_contract": "DS-2026-10-17",
+          "runtime_conformance": "implemented_pending_ci",
+          "open_dependencies": [],
+          "target_request": {
+            "$ref": "#/$defs/Request_account_sessions_list"
+          }
+        }
+      },
+      {
+        "name": "account_session_label_v1",
+        "module": "M02",
+        "features": [
+          "F06"
+        ],
+        "permission": "account.self",
+        "actor_source": "server_verified",
+        "transport": "W",
+        "billing_class": "exempt",
+        "request": {
+          "$ref": "#/$defs/Request_account_session_label"
+        },
+        "success": {
+          "$ref": "#/$defs/Success_account_session_label"
+        },
+        "errors": [
+          "AUTH_REQUIRED",
+          "BILLING_OPERATION_RESTRICTED",
+          "CLIENT_UPDATE_REQUIRED",
+          "FORBIDDEN",
+          "IDEMPOTENCY_PAYLOAD_MISMATCH",
+          "INTEGRITY_VIOLATION",
+          "NOT_FOUND",
+          "OPERATION_IN_PROGRESS",
+          "OPERATION_RESULT_EXPIRED",
+          "PLAN_FEATURE_UNAVAILABLE",
+          "PLAN_LIMIT_REACHED",
+          "POLICY_NOT_CONFIGURED",
+          "SERVICE_UNAVAILABLE",
+          "SESSION_REVOKED",
+          "SUBSCRIPTION_NOT_STARTED",
+          "TEMPORARY_FAILURE",
+          "VALIDATION_FAILED",
+          "VERSION_CONFLICT"
+        ],
+        "transaction_class": "auth",
+        "transaction_guarantee": "Same PostgreSQL transaction: own session label/revocation, refresh-token cascade, global security history and receipt. No fabricated tenant.",
+        "transition": {
+          "effect": "account_session_label",
+          "from": [],
+          "to": [],
+          "invariant": "Verified own active account/session; others requires fresh current native proof."
+        },
+        "semantic_guards": [
+          "live_actor_and_scope",
+          "billing_gate_exempt",
+          "same_key_same_payload_replay",
+          "receipt_audit_outbox_atomic_domain_commit"
+        ],
+        "audit": true,
+        "notification": "global_account_security_history",
+        "concurrency": "Live original permission/tenant scope on every request; target/aggregate lock; row_version; idempotent receipt and all declared effects rollback together",
+        "expected_version_subject": "native session label version via account_sessions_list_v1",
+        "acceptance_scenario_ids": [
+          "A01",
+          "A02",
+          "A03",
+          "A23",
+          "A24",
+          "A25",
+          "A46",
+          "A47",
+          "A55"
+        ],
+        "configuration_policy": "numeric plan limits/prices and legal approval are deployment configuration, never arbitrary allow/deny",
+        "implementation_status": "operational_development_limited",
+        "required_features": [
+          "F06"
+        ],
+        "runtime_required_features": [],
+        "conditional_features": [],
+        "operation_contract": {
+          "kind": "auth",
+          "target_entity": "accounts",
+          "version_mode": "row_version",
+          "version_field": "session_id",
+          "read_operation": "account_sessions_list_v1",
+          "atomic_effects": [
+            "auth_session_metadata_or_revocation",
+            "account_security_event",
+            "receipt"
+          ],
+          "business_commit": true,
+          "read_path_status": "implemented",
+          "source_decision": "S06/FD03"
+        },
+        "decision_delivery": {
+          "accepted_contract": "DS-2026-10-17",
+          "runtime_conformance": "implemented_pending_ci",
+          "open_dependencies": [],
+          "target_request": {
+            "$ref": "#/$defs/Request_account_session_label"
+          }
+        },
+        "runtime_path": "/functions/v1/backend-v1/account_session_label_v1",
+        "runtime_rpc": "api_v1.account_session_label_v1",
+        "runtime_external_path": "/functions/v1/backend-v1/account_session_label_v1",
+        "runtime_limits": [
+          "Self-only native Auth sessions; no IP, location, token or refresh secret in output."
+        ]
+      },
+      {
+        "name": "account_sessions_revoke_v1",
+        "module": "M02",
+        "features": [
+          "F06"
+        ],
+        "permission": "account.self",
+        "actor_source": "server_verified",
+        "transport": "W",
+        "billing_class": "exempt",
+        "request": {
+          "$ref": "#/$defs/Request_account_sessions_revoke"
+        },
+        "success": {
+          "$ref": "#/$defs/Success_account_sessions_revoke"
+        },
+        "errors": [
+          "AUTH_REQUIRED",
+          "BILLING_OPERATION_RESTRICTED",
+          "CLIENT_UPDATE_REQUIRED",
+          "FORBIDDEN",
+          "IDEMPOTENCY_PAYLOAD_MISMATCH",
+          "INTEGRITY_VIOLATION",
+          "NOT_FOUND",
+          "OPERATION_IN_PROGRESS",
+          "OPERATION_RESULT_EXPIRED",
+          "PLAN_FEATURE_UNAVAILABLE",
+          "PLAN_LIMIT_REACHED",
+          "POLICY_NOT_CONFIGURED",
+          "SERVICE_UNAVAILABLE",
+          "SESSION_REVOKED",
+          "SUBSCRIPTION_NOT_STARTED",
+          "TEMPORARY_FAILURE",
+          "VALIDATION_FAILED",
+          "VERSION_CONFLICT"
+        ],
+        "transaction_class": "auth",
+        "transaction_guarantee": "Same PostgreSQL transaction: own session label/revocation, refresh-token cascade, global security history and receipt. No fabricated tenant.",
+        "transition": {
+          "effect": "account_sessions_revoke",
+          "from": [],
+          "to": [],
+          "invariant": "Verified own active account/session; others requires fresh current native proof."
+        },
+        "semantic_guards": [
+          "live_actor_and_scope",
+          "billing_gate_exempt",
+          "same_key_same_payload_replay",
+          "receipt_audit_outbox_atomic_domain_commit"
+        ],
+        "audit": true,
+        "notification": "global_account_security_history",
+        "concurrency": "Live original permission/tenant scope on every request; target/aggregate lock; row_version; idempotent receipt and all declared effects rollback together",
+        "expected_version_subject": "none",
+        "acceptance_scenario_ids": [
+          "A01",
+          "A02",
+          "A03",
+          "A23",
+          "A24",
+          "A25",
+          "A46",
+          "A47",
+          "A55"
+        ],
+        "configuration_policy": "numeric plan limits/prices and legal approval are deployment configuration, never arbitrary allow/deny",
+        "implementation_status": "operational_development_limited",
+        "required_features": [
+          "F06"
+        ],
+        "runtime_required_features": [],
+        "conditional_features": [],
+        "operation_contract": {
+          "kind": "auth",
+          "target_entity": "accounts",
+          "version_mode": "none",
+          "version_field": null,
+          "read_operation": "account_sessions_list_v1",
+          "atomic_effects": [
+            "auth_session_metadata_or_revocation",
+            "account_security_event",
+            "receipt"
+          ],
+          "business_commit": true,
+          "read_path_status": "implemented",
+          "source_decision": "S06/FD03"
+        },
+        "decision_delivery": {
+          "accepted_contract": "DS-2026-10-17",
+          "runtime_conformance": "implemented_pending_ci",
+          "open_dependencies": [],
+          "target_request": {
+            "$ref": "#/$defs/Request_account_sessions_revoke"
+          }
+        },
+        "runtime_path": "/functions/v1/backend-v1/account_sessions_revoke_v1",
+        "runtime_rpc": "api_v1.account_sessions_revoke_v1",
+        "runtime_external_path": "/functions/v1/backend-v1/account_sessions_revoke_v1",
+        "runtime_limits": [
+          "Self-only native Auth sessions; no IP, location, token or refresh secret in output."
+        ]
+      },
+      {
+        "name": "account_security_history_get_v1",
+        "module": "M02",
+        "features": [
+          "F06"
+        ],
+        "permission": "account.self",
+        "actor_source": "server_verified",
+        "transport": "R",
+        "billing_class": "exempt",
+        "request": {
+          "$ref": "#/$defs/Request_account_security_history_get"
+        },
+        "success": {
+          "$ref": "#/$defs/Success_account_security_history_get"
+        },
+        "errors": [
+          "AUTH_REQUIRED",
+          "BILLING_OPERATION_RESTRICTED",
+          "CLIENT_UPDATE_REQUIRED",
+          "FORBIDDEN",
+          "NOT_FOUND",
+          "PLAN_FEATURE_UNAVAILABLE",
+          "PLAN_LIMIT_REACHED",
+          "POLICY_NOT_CONFIGURED",
+          "SERVICE_UNAVAILABLE",
+          "SESSION_REVOKED",
+          "SUBSCRIPTION_NOT_STARTED",
+          "TEMPORARY_FAILURE",
+          "VALIDATION_FAILED",
+          "VERSION_CONFLICT",
+          "INVALID_STATE_TRANSITION",
+          "PREVIEW_STALE",
+          "CAPACITY_FULL",
+          "ENTITLEMENT_UNAVAILABLE",
+          "CLASS_ACCESS_DENIED",
+          "RESERVATION_EXISTS",
+          "ASSISTANT_PARTICIPANT_CONFLICT",
+          "ACCOUNT_ALREADY_LINKED",
+          "INVITATION_UNAVAILABLE",
+          "CREDIT_LIMIT_EXCEEDED"
+        ],
+        "transaction_class": "read",
+        "transaction_guarantee": "Self-only bounded session/security projection; no mutation.",
+        "transition": {
+          "effect": "account_security_history_get",
+          "from": [],
+          "to": [],
+          "invariant": "Verified own active account/session; others requires fresh current native proof."
+        },
+        "semantic_guards": [
+          "live_actor_and_scope",
+          "billing_gate_exempt"
+        ],
+        "audit": false,
+        "notification": "none",
+        "concurrency": "Live original permission/tenant/field scope on every request; current authorized projection; no business writes",
+        "expected_version_subject": "none",
+        "acceptance_scenario_ids": [
+          "A01",
+          "A02",
+          "A03",
+          "A23",
+          "A24",
+          "A25",
+          "A46",
+          "A47",
+          "A55"
+        ],
+        "configuration_policy": "numeric plan limits/prices and legal approval are deployment configuration, never arbitrary allow/deny",
+        "implementation_status": "operational_development_limited",
+        "runtime_path": "/functions/v1/backend-v1/account_security_history_get_v1",
+        "runtime_rpc": "api_v1.account_security_history_get_v1",
+        "runtime_transport": "authenticated Edge adapter -> service-only RPC; rules/transaction in PostgreSQL",
+        "runtime_external_path": "/functions/v1/backend-v1/account_security_history_get_v1",
+        "runtime_limits": [
+          "Self-only native Auth sessions; no IP, location, token or refresh secret in output."
+        ],
+        "required_features": [
+          "F06"
+        ],
+        "runtime_required_features": [],
+        "conditional_features": [],
+        "operation_contract": {
+          "kind": "read",
+          "target_entity": "accounts",
+          "version_mode": "none",
+          "version_field": null,
+          "read_operation": null,
+          "atomic_effects": [],
+          "business_commit": false,
+          "read_path_status": null,
+          "source_decision": "S06/FD03"
+        },
+        "decision_delivery": {
+          "accepted_contract": "DS-2026-10-17",
+          "runtime_conformance": "implemented_pending_ci",
+          "open_dependencies": [],
+          "target_request": {
+            "$ref": "#/$defs/Request_account_security_history_get"
+          }
+        }
+      },
+      {
+        "name": "account_totp_remove_v1",
+        "module": "M02",
+        "features": [
+          "F06"
+        ],
+        "permission": "account.self",
+        "actor_source": "server_verified",
+        "transport": "H",
+        "billing_class": "exempt",
+        "request": {
+          "$ref": "#/$defs/Request_account_totp_remove"
+        },
+        "success": {
+          "$ref": "#/$defs/Success_account_totp_remove"
+        },
+        "errors": [
+          "AUTH_REQUIRED",
+          "BILLING_OPERATION_RESTRICTED",
+          "CLIENT_UPDATE_REQUIRED",
+          "FORBIDDEN",
+          "NOT_FOUND",
+          "PLAN_FEATURE_UNAVAILABLE",
+          "PLAN_LIMIT_REACHED",
+          "POLICY_NOT_CONFIGURED",
+          "SERVICE_UNAVAILABLE",
+          "SESSION_REVOKED",
+          "SUBSCRIPTION_NOT_STARTED",
+          "TEMPORARY_FAILURE",
+          "VALIDATION_FAILED",
+          "VERSION_CONFLICT"
+        ],
+        "transaction_class": "auth",
+        "transaction_guarantee": "Prepare commits only expiring intent. Native factor deletion, intent completion and security history commit atomically. Timeout/retry reports removed only from committed completion.",
+        "transition": {
+          "effect": "native_verified_totp_remove",
+          "from": [
+            "verified"
+          ],
+          "to": [
+            "removed"
+          ],
+          "invariant": "Same account, exact factor, live approving AAL2 session; no raw proof retained."
+        },
+        "semantic_guards": [
+          "live_actor_and_scope",
+          "billing_gate_exempt",
+          "required_feature_gates_separate_from_references"
+        ],
+        "audit": true,
+        "notification": "global_account_security_history",
+        "concurrency": "Live original permission/tenant scope on every request; target/aggregate lock; none; idempotent receipt and all declared effects rollback together",
+        "expected_version_subject": "accounts: none; captured target/scope dependencies, no client row version",
+        "acceptance_scenario_ids": [
+          "A01",
+          "A02",
+          "A03",
+          "A23",
+          "A24",
+          "A25",
+          "A46",
+          "A47",
+          "A55"
+        ],
+        "configuration_policy": "numeric plan limits/prices and legal approval are deployment configuration, never arbitrary allow/deny",
+        "implementation_status": "operational_development_limited",
+        "required_features": [
+          "F06"
+        ],
+        "runtime_required_features": [],
+        "conditional_features": [],
+        "operation_contract": {
+          "kind": "auth",
+          "target_entity": "accounts",
+          "version_mode": "none",
+          "version_field": null,
+          "read_operation": null,
+          "atomic_effects": [],
+          "business_commit": false,
+          "read_path_status": "implemented",
+          "source_decision": "DS-2026-10-17"
+        },
+        "decision_delivery": {
+          "accepted_contract": "DS-2026-10-17",
+          "runtime_conformance": "implemented_pending_ci",
+          "open_dependencies": [],
+          "target_request": {
+            "$ref": "#/$defs/Request_account_totp_remove"
+          }
+        },
+        "runtime_path": "/functions/v1/backend-v1/account_totp_remove_v1",
+        "runtime_rpc": "api_v1.account_totp_remove_v1",
+        "runtime_external_path": "/functions/v1/backend-v1/account_totp_remove_v1",
+        "runtime_limits": [
+          "Verified TOTP removal requires fresh strong current proof and one-time bounded exact-factor intent; native direct verified-factor deletion is fenced."
+        ]
       }
     ],
     "policy_value_map": {
@@ -86365,6 +87498,186 @@
         "origin": "ftksaas",
         "acceptance": "generic_uuid",
         "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/UserSettingsValues/properties/startup_context/anyOf/0/properties/org_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/UserSettingsValues/properties/startup_context/anyOf/0/properties/center_id/anyOf/0",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/UserSettingsValues/properties/startup_context/anyOf/0/properties/discipline_id/anyOf/0",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/AccountSessionView/properties/session_id",
+        "origin": "provider",
+        "acceptance": "generic_uuid",
+        "generation": "preserve"
+      },
+      {
+        "path": "#/$defs/AccountSecurityEvent/properties/id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/AccountSecurityEvent/properties/session_id/anyOf/0",
+        "origin": "provider",
+        "acceptance": "generic_uuid",
+        "generation": "preserve"
+      },
+      {
+        "path": "#/$defs/AccountSessionRevocation/properties/operation_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Request_account_sessions_list/properties/request_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Success_account_sessions_list/properties/trace_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Request_account_session_label/properties/request_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Request_account_session_label/properties/operation_key",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Request_account_session_label/properties/session_id",
+        "origin": "provider",
+        "acceptance": "generic_uuid",
+        "generation": "preserve"
+      },
+      {
+        "path": "#/$defs/Success_account_session_label/properties/trace_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Request_account_sessions_revoke/properties/request_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Request_account_sessions_revoke/properties/operation_key",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Request_account_sessions_revoke/properties/session_id",
+        "origin": "provider",
+        "acceptance": "generic_uuid",
+        "generation": "preserve"
+      },
+      {
+        "path": "#/$defs/Request_account_sessions_revoke/oneOf/0/properties/request_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Request_account_sessions_revoke/oneOf/0/properties/operation_key",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Request_account_sessions_revoke/oneOf/0/properties/session_id",
+        "origin": "provider",
+        "acceptance": "generic_uuid",
+        "generation": "preserve"
+      },
+      {
+        "path": "#/$defs/Request_account_sessions_revoke/oneOf/1/properties/request_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Request_account_sessions_revoke/oneOf/1/properties/operation_key",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Request_account_sessions_revoke/oneOf/2/properties/request_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Request_account_sessions_revoke/oneOf/2/properties/operation_key",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Success_account_sessions_revoke/properties/trace_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Request_account_security_history_get/properties/request_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Success_account_security_history_get/properties/trace_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Request_account_totp_remove/properties/request_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Request_account_totp_remove/properties/factor_id",
+        "origin": "provider",
+        "acceptance": "generic_uuid",
+        "generation": "preserve"
+      },
+      {
+        "path": "#/$defs/AccountTotpRemoval/properties/factor_id",
+        "origin": "provider",
+        "acceptance": "generic_uuid",
+        "generation": "preserve"
+      },
+      {
+        "path": "#/$defs/Success_account_totp_remove/properties/trace_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
       }
     ],
     "open_product_decisions": [],
@@ -87390,7 +88703,12 @@
         "settings_reset_preview_v1",
         "settings_reset_apply_v1",
         "settings_history_get_v1",
-        "reservation_capacity_override_v1"
+        "reservation_capacity_override_v1",
+        "account_sessions_list_v1",
+        "account_session_label_v1",
+        "account_sessions_revoke_v1",
+        "account_security_history_get_v1",
+        "account_totp_remove_v1"
       ],
       "runtime_deliveries": {
         "starter_attendance_protection": {
@@ -87757,7 +89075,12 @@
           "report_get_v1",
           "report_export_start_v1",
           "report_file_get_v1",
-          "report_build_v1"
+          "report_build_v1",
+          "account_sessions_list_v1",
+          "account_session_label_v1",
+          "account_sessions_revoke_v1",
+          "account_security_history_get_v1",
+          "account_totp_remove_v1"
         ],
         "dependencies": [
           "plan_gate_alignment"
@@ -87776,7 +89099,12 @@
           "report_get_v1",
           "report_export_start_v1",
           "report_file_get_v1",
-          "report_build_v1"
+          "report_build_v1",
+          "account_sessions_list_v1",
+          "account_session_label_v1",
+          "account_sessions_revoke_v1",
+          "account_security_history_get_v1",
+          "account_totp_remove_v1"
         ],
         "contract_only_operations": [
           "account_profile_update_v1",
