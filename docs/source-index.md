@@ -4,7 +4,7 @@
 
 Öncelik artık beş ayar ekranı ve typed API teslimidir: kullanıcı/global hesap, üye/org person ve tercihi, merkez, org, platform. SQL/Cron/DB işletim ayarları ayrı backlog. [Somut ekran/alan/API matrisi](claude-handover.md) mevcut desteği ve açıkları gösterir.
 
-Önce [backend/frontend ayrımı, 69 kararın beş frontend scope eşlemesi ve FD açık kararları](../contracts/02-FtkSaaS-teknik-sozlesme.md#ayarlar-backend-frontend-siniflama) okunur. Yeni sıra sınıflama → eksik frontend kararları → gerçek typed API/ekran teslimidir.
+Önce [backend/frontend ayrımı, 69 kararın beş frontend scope eşlemesi ve FD01–FD12 kabulü](../contracts/02-FtkSaaS-teknik-sozlesme.md#ayarlar-backend-frontend-siniflama) okunur. Sınıflama ve FD01–FD12 karar turu tamamlandı. Sıradaki iş gerçek typed API/ekran teslimi ve uygulama açığıdır; backend işletim ayarları ayrı kalır.
 
 ## Başlangıç sırası
 

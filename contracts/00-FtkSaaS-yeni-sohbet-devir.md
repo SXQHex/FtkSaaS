@@ -1,8 +1,8 @@
 # FtkSaaS güncel devir
 
-## Son çalışma sırası — karar sınıflaması
+## 25 Ekim — frontend karar sprinti tamamlandı
 
-Kullanıcının son talimatı önce backend/frontend ayrımı, frontend için user/member/center/organization/platform sınıflaması, ardından yalnız eksik frontend kararlarını grup grup bitirmektir. [69 kararın alan bazlı izi ve FD01–FD12](02-FtkSaaS-teknik-sozlesme.md#ayarlar-backend-frontend-siniflama) tek kaynaktır. FD01 başlangıç dil/bölge/görünüm değerleri henüz onaylanmamış öneri; hiçbir default veya API uygulanmadı. Önceki beş ekran hedefi korunur, yeni sıra API uygulamasının önüne eksik karar turunu koyar.
+69 ana grubun backend/frontend alan ayrımı ve beş scope sınıflaması tamamlandı; **FD01–FD12 kullanıcı tarafından kabul edildi**. [Kesin alan/default/kapsam kararları](02-FtkSaaS-teknik-sozlesme.md#ayarlar-backend-frontend-siniflama) tek kaynaktır. Standart yeni org negatif kredi limiti 0; mevcut kulüp −2 ve diğer gerçek ayarlar korunur. Yeni ana/FD karar turu açılmaz. Sıradaki iş mevcut 200 işlemle alan/DTO/permission/sürüm/API açığını eşlemek, gerekli runtime ve kabulünü ayrı teslim etmektir. Bu belge kapanışında hiçbir default/API/sağlayıcı/canlı veri uygulanmadı; PR43/44 merge/deploy sayılmaz. Backend işletim ayarları ertelenmiş kalır.
 
 ## Son öncelik — frontend beş ekran teslimi
 

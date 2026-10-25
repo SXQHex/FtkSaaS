@@ -8,7 +8,7 @@ Frontend başlangıcı için belgeler eşitleniyor; [Claude talimatları](claude
 
 | İş | Durum ve kapanış koşulu |
 |---|---|
-| Açık frontend seçimleri | [Alan sınıflaması ve FD01–FD12](../contracts/02-FtkSaaS-teknik-sozlesme.md#ayarlar-backend-frontend-siniflama) üzerinden önce eksik ürün kararları kapanır. 69 ana grup yeniden sorulmaz; backend ayarları bu tura alınmaz. FD01 başlangıç değerleri öneri/onay bekliyor; uygulanmış default değildir. |
+| Frontend karar kapanışı | [FD01–FD12](../contracts/02-FtkSaaS-teknik-sozlesme.md#ayarlar-backend-frontend-siniflama) 25 Ekim kullanıcı kabulüyle kapandı. Yeni tur açılmaz; sıradaki iş gerçek alan/DTO/permission/API/sürüm ve kabul açığıdır. Standart negatif limit 0, mevcut kulüp −2. Karar uygulanmış config/API değildir. |
 | Beş ekran/API kabulü | Kullanıcı global hesap, üye org person/relationship ve org tercihi; merkez/org/platform scope ayrı. Her ekran alan/tip/default, yetki/miras, gerçek read-write/sürüm, hata ve kabul senaryosuyla teslim edilir. Mevcut API ile eksik alanlar ayrıdır; genel settings/marka API boşluğu kapanmadan beş ekran çalışıyor denmez. |
 | Ertelenmiş altyapı ayarları | Worker/pg_cron/DB bağlantı-RLS-grant/search_path/network/SSL, migration/deploy/yedek-restore motoru ve teknik limit yönetimi ayrı iş. Eski sekiz endpointli 208/60 taslak bu hedefin yerine geçmez. |
 | Frontend PR43 renk/font ihtiyacı | [PR43](https://github.com/SXQHex/FtkSaaS/pull/43) okundu; hazır org marka paketi ve S08 kişisel görünüm ayrımı teknik sözleşmede O01/S08/P01/P04 alan eşlemesine bağlandı. Katalog, read/write/reset, logo, canlı yetki, sürüm/cache/fallback, ortak tip ve gerçek E2E açık; isimler öneri, API hazır değil. PR43 ayrı açık branch olarak korunur. |

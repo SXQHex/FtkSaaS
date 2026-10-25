@@ -2,11 +2,23 @@
 
 24 Ekim 2026. Belge tabanı main `702063807b0a0d09f559f070ffde1b1ae3e7563b`. Frontend tasarım/istemci kodu Claude'un alanıdır; backend bu teslimde tasarıma müdahale etmez. Bu dosya Claude'un açıkça okutulacak başlangıç talimatıdır; repository'de kök `CLAUDE.md` veya `.claude` yapılandırması bulunmuyor. Dosyanın Claude tarafından kendiliğinden yüklendiğini varsayma.
 
-## Son sıra — kararların sınıflanması ve açık frontend seçimleri
+## 25 Ekim — frontend karar kapanışı ve uygulama sırası
 
 Önce [backend/frontend ve beş scope sınıflaması](../contracts/02-FtkSaaS-teknik-sozlesme.md#ayarlar-backend-frontend-siniflama) uygulanır: 69 kabul grubunun her biri alan bazında izlendi; SQL/işletim yapılandırması ayrı backlog. Frontend alanlarının scope'u user/member/center/organization/platform. Platform yöneticisinin uygulama ayarı da frontend ayarıdır; verinin DB'de tutulması sınıflamayı değiştirmez.
 
-Ana grup kabulleri korunur. Eksik seçimler FD01–FD12 karar paketlerinde tamamlanacak; bunlar yeni ana grup veya API değildir. FD01 dil/bölge/görünüm başlangıçları yalnız öneridir, onaylanmadı. UI alan/default tasarımında henüz kabul edilmemiş önerileri kesin değer gibi kullanma. Aşağıdaki mevcut API matrisi uygulama analizidir; karar turu bitmeden yeni teknik knob/endpoint eklenmez.
+69 ana grup korunur; **FD01–FD12 tamamen kabul edildi**. [Kesin frontend kararları](../contracts/02-FtkSaaS-teknik-sozlesme.md#ayarlar-backend-frontend-siniflama) tek kaynaktır. Bunlar yeni 12 ana grup veya çalışan API değildir. Yeni hesap/org defaultu mevcut tercihleri ezmez; standart negatif limit 0, mevcut kulüp −2 kalır. Backend teknik knobları ertelidir. Aşağıdaki API matrisi hâlen gerçek mevcut desteği gösterir; bu belge kapanışı yeni endpoint/enum/permission yayımlamaz.
+
+### İlk kapsam için kesinleşen alanlar
+
+| Kapsam | FD kapanışından önemli sonuç |
+|---|---|
+| user | Hazır Türkçe/İngilizce, cihaz dili/fallback Türkçe; tr-TR/24 saat/Pazartesi, cihaz timezone, sistem tema; foto PNG/JPEG/WebP. İlk login e-posta+şifre, ilk MFA doğrulayıcı kodu; sosyal login/passkey sonraya. |
+| member | Org bazlı bildirim/pazarlama, aynı gelecek/aktif kesin kayıt kitlesi, default kapalı profil/iletişim; boş ilgi, geçmiş öneri kapalı; takvim türleri kullanıcı seçimi. |
+| center | İş takvimi tanımsızsa kurulum; yeni merkez timezone önerisi İstanbul, yeni ders 60dk/saat seçici 15dk/tek seans; pencere/teklif orgdan, liste yeni sınıfta kapalı. Teknik worker alanı yok. |
+| organization | Hazır uyumlu marka, Owner/açık OM; merkez marka override yok. Yeni org negatif 0, kişisel istisna kapalı, borç engelleri ayrı açık; mevcut kurulum korunur. Belge/yayın default taslak/kapalı. |
+| platform | Hazır katalog/default/miras seçenekleri ve yetkili yönetim; DB/worker/secrets/CI/deploy alanı yok. Sadece gerçek katalog/sağlayıcı sunulur, serbest SQL/CSS/font yok. |
+
+FD04 kişisel hatırlatmaları başlangıçta açık, pazarlama kapalıdır. FD10'daki ek iş otomasyonları başlangıçta kapalıdır; bu iki alan birbirini değiştirmez. Yeni genel ikinci-onay akışı ilk kapsam dışı; mevcut özel onaylar korunur. CSV rapor/import ile JSON kişisel veri kopyası ayrı hedeflerdir. İmha kanıtsız completed veya provider hazır değilken doğrulama başarısı gösterilmez.
 
 ## Beş kapsamlı ayar ekranı teslimi — 24 Ekim önceliği
 

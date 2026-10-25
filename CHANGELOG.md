@@ -1,5 +1,9 @@
 # Changes
 
+## 25 Ekim 2026 — FD01–FD12 frontend kararları kabul edildi
+
+User/member/center/organization/platform frontend seçimlerinin tamamı kullanıcı onayıyla kesinleştirildi; 69 ana gruba yeni grup eklenmedi. Standart negatif kredi limiti 0 ayrıca teyit edildi, mevcut kulüp −2 ve eski ayarlar korunur. İlk kapsam/ertelemeler, marka-login-MFA, bildirim zamanları, görünürlük, program/finans/belge/CRM, CSV/JSON, miras/reset ve yetki sınırları teknik sözleşmeye işlendi. Claude/kuyruk/kalan işler/devir eşitlendi. Runtime, DTO, migration, CI ve canlı default uygulanmadı.
+
 ## 24 Ekim 2026 — backend/frontend ayar ayrımı ve eksik karar sırası
 
 69 kabul grubunun alanları backend yapılandırması ile frontend ayarlarına ayrıldı; frontend için user/member/center/organization/platform kapsamları eşlendi. Sabit güvenlik/iş kuralları ve tekil domain komutları genel tercih ayarı sayılmadı. Eksik frontend seçimleri FD01–FD12 paketlerinde toplandı; FD01 değerleri onaylanmamış öneridir. Yeni sıra karar ayrımı/eksik seçimler tamamlandıktan sonra API/ekran teslimidir. Runtime veya default uygulanmadı.
