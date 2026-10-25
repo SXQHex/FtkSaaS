@@ -83,3 +83,9 @@ CD aynı kaynak bağlı main kabulüne dayanır; belge kabulü full runtime kan�
 ## 23 Ekim dokümantasyon teslimi
 
 P01–P07 kaynak kabulü kapanmıştır. Frontend/settings belge eşitlemesi yalnız incelenmiş source-bound belge yolundan geçer; yeni runtime kabulü gibi raporlanmaz. PR41 main39873010292 belge kabulü/CD deploy skipped örneğidir. Bilinmeyen/mixed yol aynı kapı tarafından reddedilir; izin listesi/CI workflow bu belge göreviyle değiştirilmez.
+
+## 25 Ekim — ölçüm güncellemesi ve CLI bakımı
+
+Supabase CLI tam2.122.0 sürümüne package+lockfile ile sabitlenir; her koşuda otomatik en son sürüm çekilmez. Dört API shardı, concurrency2 ve bütün full/main clean yükümlülükleri korunur. Süre kaynağı ve sonraki kontrollü ölçüm güncellemesi [performans kaydındadır](ci-performance.md). Yeni suite için gerçek pozitif ölçüm/inventory şartı, kaynak/head/base/merge-tree kabulü ve bağımsız inceleme kaldırılmaz. Tahmini süre gerçek CI sonucu değildir.
+
+Bu bakım scripts/ci ve clean runner güven yüzeyini değiştirir. Mevcut trusted-base policyMatches denetimi aday full clean başarılı olsa bile otomatik merge-clean status’unu reddeder; bu beklenen kurulum sınırıdır. Bağımsız son kaynak incelemesi ve gerçek aday kabulü sonrası exact-source güvenilir politika kurulum yetkisi gerekir. Gate kodu, status, required check ve repository yönetim ayarları değiştirilmeyecek.

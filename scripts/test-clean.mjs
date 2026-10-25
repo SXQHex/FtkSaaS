@@ -1,7 +1,7 @@
 import fs from 'node:fs';
 import assert from 'node:assert/strict';
 import {performance} from 'node:perf_hooks';
-import {spawnSync} from 'node:child_process';
+import {spawnSync,execFileSync} from 'node:child_process';
 import {apiSuites} from './ci/select-tests.mjs';
 import {shardPlan,coverageHash} from './ci/shards.mjs';
 import {stackStatus,connect} from './db.mjs';
@@ -14,6 +14,7 @@ const args=process.argv.slice(2),role=args[0]??'serial';
 if(!['serial','core','api'].includes(role)||args.length>(role==='api'?2:1))throw Error('Unknown clean role/arguments');
 const shard=role==='api'?shardPlan().find(b=>String(b.shard)===args[1]):null;
 if(role==='api'&&!shard)throw Error('Unknown shard');
+console.log('Supabase CLI:',execFileSync('node_modules/.bin/supabase',['--version'],{encoding:'utf8'}).trim());
 console.log('Clean coverage:',coverageHash(),'role:',role,'shard:',shard?.shard??'none');
 const phaseStart=performance.now();
 run('npm',['run','dev:start']);

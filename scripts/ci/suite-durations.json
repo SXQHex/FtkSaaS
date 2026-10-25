@@ -1,22 +1,30 @@
 {
-  "source": "7577b2f1873c6b1fcf83390bfa94a34374c44082",
-  "run_id": 39401570751,
-  "kind": "measured suite process wall seconds; overlapping at concurrency=2, not additive wall time",
+  "source": "9fd084b9ddbbefc225c98adbf3f25ddee85a9b6e",
+  "run_id": 40226464989,
+  "run_attempt": 1,
+  "cli_version": "2.121.0",
+  "kind": "measured suite process wall seconds from successful main job summaries; overlapping at concurrency=2, not additive wall time",
+  "job_ids": [
+    121268815374,
+    121268815368,
+    121268815383,
+    121268815443
+  ],
   "seconds": {
-    "api-acceptance": 347.84,
-    "availability-policies": 144.62,
-    "cross-center-settlement": 735.77,
-    "event-cancellation": 958.13,
-    "event-payment": 340.65,
-    "instructor-earnings": 382.42,
-    "p01-catalog-entitlement-reads": 147.86,
-    "p01-lesson-requests": 115.86,
-    "p01-waitlist-workers": 105.37,
-    "person-registry": 115.88,
-    "program-session-lifecycle": 362.26,
-    "registry": 86.53,
-    "room-role-registry": 126.95,
-    "schedule-reads": 227.13,
-    "starter-attendance-protection": 214.39
+    "api-acceptance": 353.15,
+    "availability-policies": 157.42,
+    "cross-center-settlement": 646.05,
+    "event-cancellation": 801.18,
+    "event-payment": 663.4,
+    "instructor-earnings": 649.3,
+    "p01-catalog-entitlement-reads": 161.7,
+    "p01-lesson-requests": 169.06,
+    "p01-waitlist-workers": 141.83,
+    "person-registry": 310.53,
+    "program-session-lifecycle": 723.19,
+    "registry": 855.73,
+    "room-role-registry": 122.54,
+    "schedule-reads": 228.36,
+    "starter-attendance-protection": 433.87
   }
 }
