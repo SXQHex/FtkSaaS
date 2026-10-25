@@ -1,5 +1,7 @@
 # FtkSaaS güncel devir
 
+Kapasite dilimi kaynak kanıtı: [doğrulama raporu](../reports/session-capacity-validation.json). Runtime kaynak `b799a3a6fd8a16eb2f4b222094838ab7279acef8`, eşleşen tree `0c47eb285496d948717a4ed531da4d5f53528b39`; 103+43 yapısal test ve son kaynakta 7/7 gerçek Auth→Edge→RPC geçti. Ara uygunluk/P01 worker grupları geçti; beş gruplu uzun koşu tamamlanmadı, tam kabul sayılmaz. İzole ortam durduruldu. Bağımsız inceleme, GitHub hedefli/aday/main kabulü ve merge henüz yok; P08 done değildir.
+
 ## 25 Ekim kapasite branch'i — geliştirme, main kabulü bekliyor
 
 Kabul edilmiş [kapasite revizyonu](../docs/decisions/DS-2026-10-25-session-capacity.md) P08'in dar dilimi olarak uygulanıyor. Başlangıç main `702063807b0a0d09f559f070ffde1b1ae3e7563b`; kaynak/belge CI başarılı, clean skipped. 201 API/60 migration branch taslağıdır; 200/59 yayımlanmış main'den ayrı tutulur. Yerel yapısal kontroller ve izole runtime doğrulama kanıtları teslimde ayrı verilir; aday/main ve hosted kabul yapılmadı. Yeni settings geliştirme durdurması diğer alanlarda sürer.

@@ -1,5 +1,7 @@
 # FtkSaaS sıralı üretim kuyruğu
 
+Kapasite dilimi kaynak kanıtı: [doğrulama raporu](../reports/session-capacity-validation.json). Runtime kaynak `b799a3a6fd8a16eb2f4b222094838ab7279acef8`, eşleşen tree `0c47eb285496d948717a4ed531da4d5f53528b39`; 103+43 yapısal test ve son kaynakta 7/7 gerçek Auth→Edge→RPC geçti. Ara uygunluk/P01 worker grupları geçti; beş gruplu uzun koşu tamamlanmadı, tam kabul sayılmaz. İzole ortam durduruldu. Bağımsız inceleme, GitHub hedefli/aday/main kabulü ve merge henüz yok; P08 done değildir.
+
 ## 25 Ekim — P08 kapasite dilimi geliştirmesi
 
 Son kullanıcı talimatıyla [kapasite kararı](decisions/DS-2026-10-25-session-capacity.md) kabul edildi ve `feat/session-capacity-controls` branch'inde uygulanıyor. Bu, diğer settings runtime işlerini açmaz. Main tabanı `702063807b0a0d09f559f070ffde1b1ae3e7563b`; yayımlanmış ana kaynaktaki 200 API/59 migration değişmedi. Bu branch taslağı 201 operasyon/60 migration içerir; aday/main CI ve inceleme tamamlanmadan yayımlanmış veya done sayılmaz. P08'in CRM/abone no/sınırsız etkinlik/paket etkinlik uygunluğu işleri açık kalır. PR43/44 belge çalışmaları bu branch'e kopyalanmaz; birleşmede kararlar korunmalıdır.
