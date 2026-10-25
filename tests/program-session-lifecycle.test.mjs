@@ -410,12 +410,13 @@ test('Session capacity revision: total, categories, explicit override and physic
  const account=await must(owner,'account_get_v1');
  const org=(await must(platform,'organization_create_v1',{verified_account_id:account.id,name:'Capacity acceptance',initial_plan_id:plan},key())).primary_id;
  const db=await connect(),rows=async(q,a=[])=>(await db.query(q,a)).rows;
- const center=(await must(owner,'center_create_v1',{org_id:org,name:'Capacity center',timezone:'Europe/Istanbul'},key())).primary_id;
+ let center;
  const scope=b=>({org_id:org,center_id:center,...b}),mut=(op,b={},k=key(),u=owner)=>must(u,op,scope(b),k);
  const req=(op,b,u=owner,k=key())=>call(u,op,scope(b),k);
  const fail=async(op,b,code,u=owner,k=key())=>{const r=await req(op,b,u,k);assert.equal(r.result.ok,false,JSON.stringify(r.result));assert.equal(r.result.error.code,code,JSON.stringify(r.result));};
  let fault;
  try{
+ center=(await must(owner,'center_create_v1',{org_id:org,name:'Capacity center',timezone:'Europe/Istanbul'},key())).primary_id;
  const ownerPerson=(await rows('select owner_person_id from core.organizations where id=$1',[org]))[0].owner_person_id;
  await mut('center_manager_assign_v1',{person_id:ownerPerson});
  const payment=await mut('saas_payment_submit_v1',{amount_minor:'1000',currency:'TRY',reference:'synthetic capacity',occurred_at:new Date().toISOString()});await mut('saas_payment_verify_v1',{payment_id:payment.primary_id,accepted:true},key(),platform);

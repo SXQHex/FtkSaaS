@@ -1,5 +1,18 @@
 -- Accepted 25 October capacity revision. Previous migrations stay immutable.
 begin;
+-- Extend only the installed permission-column CHECK; retain every existing code.
+do $permission$
+declare c record;seen bool:=false;expression text;col smallint;
+begin
+ select attnum into col from pg_attribute where attrelid='core.permission_overrides'::regclass and attname='permission';
+ for c in select oid,conname from pg_constraint where conrelid='core.permission_overrides'::regclass and contype='c' and conkey=array[col] loop
+  expression:=pg_get_constraintdef(c.oid);expression:=substring(expression from 8 for length(expression)-8);
+  execute format('alter table core.permission_overrides drop constraint %I',c.conname);
+  execute format('alter table core.permission_overrides add constraint %I check (permission=%L or (%s))',c.conname,'reservation.capacity_override',expression);seen:=true;
+ end loop;
+ if not seen then raise exception 'Capacity permission CHECK anchor missing';end if;
+end$permission$;
+
 alter table core.rooms add column if not exists capacity bigint check(capacity>=0);
 -- Physical occupancy cannot be inferred from discipline-specific historical values.
 -- Existing rooms remain explicitly unconfigured until an authorized room_save.
