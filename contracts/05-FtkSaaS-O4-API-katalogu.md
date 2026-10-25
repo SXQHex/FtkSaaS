@@ -1,6 +1,6 @@
 # FtkSaaS — API kataloğu · 0.2.0-rc.3
 
-201 sözleşme; 201 geliştirme ortamında çağrılabilir endpoint, 0 yalnız sözleşme. Çağrılabilir olmak bütün ürün özelliklerinin veya üretim kabulünün tamamlandığı anlamına gelmez. Kapsam sınırları ve Q-E01 `docs/claude-handover.md` içindedir.
+207 sözleşme; 207 geliştirme ortamında çağrılabilir endpoint, 0 yalnız sözleşme. Çağrılabilir olmak bütün ürün özelliklerinin veya üretim kabulünün tamamlandığı anlamına gelmez. Kapsam sınırları ve Q-E01 `docs/claude-handover.md` içindedir.
 
 `POST {API_URL}/functions/v1/backend-v1/{operation}`; JSON gövde doğrudan typed Request nesnesidir. Header: `Authorization: Bearer <Supabase access_token>`, `apikey: <publishable key>`, `Content-Type: application/json`. Başarı: `ok/data/trace_id`; hata: `ok:false/error:SafeError`. Servis anahtarı frontend’e verilmez.
 
@@ -208,6 +208,12 @@ Named `/rest/v1/rpc/{operation}` yalnız backend içindir; imzası p_request + d
 | `negative_limits_get_v1` | çağrılabilir (kapsam notları geçerli) | `entitlement.correct` | R / read | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; center_id: FtkUuid; person_id: FtkUuid; discipline_id: FtkUuid | Success_negative_limits_get |
 | `attendance_start_v1` | çağrılabilir (kapsam notları geçerli) | `attendance.close` | W / maintenance | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; center_id?: FtkUuid ∣ null; operation_key: FtkUuid; expected_version: PositiveInt; session_id: FtkUuid; actual_started_at: Instant; reason: Text | Success_attendance_start |
 | `document_publication_preview_v1` | çağrılabilir (kapsam notları geçerli) | `document.manage` | R / config | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; center_id?: FtkUuid ∣ null; document_id?: FtkUuid ∣ null; file_id: FtkUuid; version_label: Text; requirements: DocumentRequirement[]; scope: ConfigurationScope | Success_document_publication_preview |
+| `settings_catalog_get_v1` | çağrılabilir (kapsam notları geçerli) | `settings.access` | R / read | client_api_version: 1; request_id: FtkUuid; scope: SettingsScope; org_id?: FtkUuid; center_id?: FtkUuid | Success_settings_catalog_get |
+| `settings_get_v1` | çağrılabilir (kapsam notları geçerli) | `settings.access` | R / read | client_api_version: 1; request_id: FtkUuid; scope: SettingsScope; org_id?: FtkUuid; center_id?: FtkUuid | Success_settings_get |
+| `settings_update_v1` | çağrılabilir (kapsam notları geçerli) | `settings.access` | W / maintenance | client_api_version: 1; request_id: FtkUuid; scope: SettingsScope; org_id?: FtkUuid; center_id?: FtkUuid; operation_key: FtkUuid; expected_version: SettingsVersion; reason?: string; patch: UserSettingsValues ∣ MemberSettingsValues ∣ CenterSettingsValues ∣ OrganizationSettingsValues ∣ PlatformSettingsValues | Success_settings_update |
+| `settings_reset_preview_v1` | çağrılabilir (kapsam notları geçerli) | `settings.access` | R / read | client_api_version: 1; request_id: FtkUuid; scope: SettingsScope; org_id?: FtkUuid; center_id?: FtkUuid; fields: SettingsFieldKeys | Success_settings_reset_preview |
+| `settings_reset_apply_v1` | çağrılabilir (kapsam notları geçerli) | `settings.access` | W / maintenance | client_api_version: 1; request_id: FtkUuid; scope: SettingsScope; org_id?: FtkUuid; center_id?: FtkUuid; operation_key: FtkUuid; expected_version: SettingsVersion; reason?: string; preview: PreviewToken | Success_settings_reset_apply |
+| `settings_history_get_v1` | çağrılabilir (kapsam notları geçerli) | `settings.access` | R / read | client_api_version: 1; request_id: FtkUuid; scope: SettingsScope; org_id?: FtkUuid; center_id?: FtkUuid; cursor?: string | Success_settings_history_get |
 | `reservation_capacity_override_v1` | çağrılabilir (kapsam notları geçerli) | `reservation.capacity_override` | W / reservation | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; center_id?: FtkUuid ∣ null; operation_key: FtkUuid; person_id: FtkUuid; session_id: FtkUuid; source_sale_id?: FtkUuid ∣ null; mode: BookingMode; booking_category?: BookingCategory; reason: Text | Success_reservation_capacity_override |
 
 ## İşlem bazında hedef sözleşme ve runtime ayrımı
@@ -416,6 +422,12 @@ features ürün referanslarıdır. required_features hedef plan kapısı; runtim
 | negative_limits_get_v1 | read | none / None |  | starter_runtime_limited_paid_path_pending |
 | attendance_start_v1 | command | row_version / attendance_get_v1 | sessions.actual_started_at, sessions.started_agreements | implemented_auth_edge_rpc_acceptance |
 | document_publication_preview_v1 | preview | preview_dependencies / document_publication_preview_v1 |  | implemented_pending_ci |
+| settings_catalog_get_v1 | read | none / None |  | implemented_pending_ci |
+| settings_get_v1 | read | none / None |  | implemented_pending_ci |
+| settings_update_v1 | command | row_version / settings_get_v1 | frontend_settings.versioned_change, frontend_settings.history | implemented_pending_ci |
+| settings_reset_preview_v1 | preview | none / settings_get_v1 |  | implemented_pending_ci |
+| settings_reset_apply_v1 | command | row_version / settings_get_v1 | frontend_settings.versioned_change, frontend_settings.history | implemented_pending_ci |
+| settings_history_get_v1 | read | none / None |  | implemented_pending_ci |
 | reservation_capacity_override_v1 | command | append_or_current_scope_lock / session_get_v1 | reservations.active, rights.reserve_or_deficit, capacity_override.audit | capacity_revision_acceptance_pending |
 
 Önizleme süre sınırı 15 dakika. Apply canlı aktör/yetki/abonelik ve ilgili satır sürümlerini yeniden denetler. İdempotency kapsamı org + hesap + operasyon; merkez payload içindedir. Aynı anahtar/aynı içerik sonucu tekrarlar, farklı içerik reddedilir. Doğrulanmamış transport sonucunda yeni anahtar üretilmez.

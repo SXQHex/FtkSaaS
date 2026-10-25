@@ -1,10 +1,42 @@
 > 23 Ekim 2026 güncel durum: P01–P07 kod/main/geliştirme-test kabulü kapandı; yayımlanmış kapsam **200 API / 0 contract_only / 59 migration / 90 core tablo / Edge8**. P07 runtime kaynağı `4cfc9a55`; güncel belge tabanı `bfb8ccb2`. Beş Cron hattı aktif ve boş kuyrukta healthy/idle; fiziksel imha ve gerçek yük kabulü tamamlanmış değildir. Ayar davranış sprinti ve güncel entegrasyon sınırları [tek devir](00-FtkSaaS-yeni-sohbet-devir.md) ve [ayarlar sözleşmesinde](02-FtkSaaS-teknik-sozlesme.md#ayarlar-sozlesmesi-ve-davranis-sprinti). Eski tarih/CI/pending snapshotları yeni durum kanıtı değildir; ürün kuralları yalnız son açık kararla değişir.
 
+## 25 Ekim — PR45 kapasite ve main ayarları uzlaştırması
+
+Başlangıç main `3456050a3061d7bf5dc2ce8898b82c5cfe84e773`: **206 callable API / 60 migration**; PR46 ayarları birleşti, aynı main clean [40200716603](https://github.com/SXQHex/FtkSaaS/actions/runs/40200716603) ve development CD [40202862244](https://github.com/SXQHex/FtkSaaS/actions/runs/40202862244) başarılı. Bu PR45 birleşim adayı kapasite işlemini ekler: **207 callable API / 61 migration**. Altı ayar işlemi ve kapasite davranışı birlikte korunur. Henüz uygulanmamış kapasite migration’ı main’deki ayar migration’ından sonra sıralandı; SQL içeriği ve mevcut 60 migration değişmedi. Önceki PR45 clean yalnız eski tabana aittir; bu birleşik kaynak için bağımsız inceleme ve yeni aday/main clean gerekir. Kapasite henüz main/hosted kabulü değildir.
+
+[Alanlar, API'ler ve kesin destek sınırı](../docs/frontend-settings-handover.md). Teknik SQL/worker yönetimi erteli; beş ekranın bütün 69 davranış grubu tamamlandı denmez. Hazır renk/font/logo, native provider/MFA/oturum ve diğer özel yaşam döngüsü açıkları bu genel tercihlere dönüştürülmez.
+
+
 > Güncel öncelik: [DS-2026-10-17](../docs/decisions/DS-2026-10-17.md). Çelişen eski hükümler yalnız belirtilen kapsamda yürürlükten kalkmıştır. [Hedef sözleşme/runtime ayrımı](../docs/decision-sprint-handover.md).
 
 > **Güncel ek: Q-E03.** Parasal iptal sınırı planlanan başlangıçtır (eşitlik dahil sonrası). Q-E02 merkez iptali korunur. Teknik durum: docs/decisions/Q-E03.md; test/CI kanıtı ayrıca doğrulanır.
 
 # FtkSaaS — Teknik sözleşme
+
+<a id="oda-seans-kapasite-karari"></a>
+
+## 25 Ekim — güncel oda/seans kapasitesi kararı ve kaynak sınırı
+
+Oda fiziksel kapasitesi ve seans kayıt kapasitesi ayrı girilir. Seanslarda nominal/maksimum ayrımı kaldırılmıştır. Tek toplam ve varsa erkek/kadın kategori kontenjanları normal kayıtta birlikte denetlenir; öncelikli/esnek kayıt farklı tavan veya aşım yetkisi vermez. Kesin kayıt + süresi dolmamış bekleme/deneme teklifleri ortak yer tutar. Seans toplamı fiziksel oda kapasitesini geçemez.
+
+Canlı yetkili görevli eğitmen, açık merkez izni olan personel veya canlı merkez yöneticisi yalnız ayrı ve gerekçeli tek kayıt işlemiyle toplam/kategori kontenjanını kontrollü aşabilir. Fiziksel oda sınırı, hak/borç/belge/zaman/plan/tenant/merkez ve tekrar kapıları aşılmaz. Aktör, gerekçe, aşılan sınır ve miktar audit'e yazılır. Tek kayıt aşımı kalıcı seans kapasitesini artırmaz; kalıcı değişiklik ayrı sürümlü komuttur. Kategori kişi profilinden tahmin edilmez, kayıt isteğinde açık seçilir.
+
+Kapasite küçültme mevcut kesin kayıtları sessiz iptal etmez. Oda küçültmesi açık seans veya fiilî yer tutmayı fiziksel sınırın dışına çıkaramaz. Eski odanın gerçek fiziksel kapasitesi disiplin değerlerinden tahmin edilmez; eksikse yeni oda bağlı işlemler için açık yapılandırma gerekir. Seans revizyonu etkinlik kapasite DTO'sunu veya sınırsız etkinlik geliştirmesini değiştirmez.
+
+| Katman | Doğrulanmış kaynak ve durum |
+|---|---|
+| Yayımlanmış main | `702063807b0a0d09f559f070ffde1b1ae3e7563b`:200 API/59 migration. [Main39890889184](https://github.com/SXQHex/FtkSaaS/actions/runs/39890889184) belge kabulü; yeni kapasite runtime kabulü değil. |
+| Kapasite adayı | [PR45](https://github.com/SXQHex/FtkSaaS/pull/45), head `149be4f4d925674c97f04d40bb0c9a8416f2c66c`:201 API/60 migration. [Bağımsız inceleme5641685684](https://github.com/SXQHex/FtkSaaS/pull/45#pullrequestreview-5641685684) ve [aday40164825351](https://github.com/SXQHex/FtkSaaS/actions/runs/40164825351) başarılı: core/API1–4/toplayıcı gerçek success. Merge, aynı main clean ve hosted CD bekliyor. |
+| Bu belge PR'si | PR44 karar/alan eşitlemesidir; PR45 runtime/DTO/migration dosyaları taşınmadı. Yeni kapasite API'si main'de var sayılmaz. |
+
+PR45 [ayrıntılı karar/API geçişi](https://github.com/SXQHex/FtkSaaS/blob/149be4f4d925674c97f04d40bb0c9a8416f2c66c/docs/decisions/DS-2026-10-25-session-capacity.md) kaynağına bağlıdır: room_save capacity, seans capacity.total/categories, booking_category ve ayrı reservation_capacity_override_v1 bu adayın sözleşmesidir. Main 08/04/05 ve ortak tipleri hâlen 200/59 kaynağını anlatır; PR45 kabul edilmeden iki kaynağın DTO'ları karıştırılmaz.
+
+## 25 Ekim — giriş yöntemlerinde son kullanıcı kararı
+
+FD03'teki Google'ı erteleme hükmü son karar sohbetiyle değişmiştir: **e-posta + parola ana kayıt/giriş; Google ek kayıt ve giriş yöntemidir. Apple kapsam dışıdır. Instagram ile kayıt/giriş, hesap bağlama ve bunlara yönelik Graph/Basic Display entegrasyonu kapsam dışıdır; önceki IG akışı iptal edilmiştir.** Passkey ertelidir. İlk MFA doğrulayıcı uygulama kodu olarak kalır. Provider seçimi gerçek entegrasyonun kurulduğu veya test edildiği anlamına gelmez.
+
+Bu son karar kişisel Instagram login bağlamındadır; reklam/lead/P08 iptali ayrıca söylenmemiştir. Bu nedenle önceki ortak CRM kaynak modelindeki Instagram reklam başvuruları sessizce silinmez; kaynak alımı ayrı P08 entegrasyon/kabul işidir. Reklam kaynağı bulunması Instagram hesabıyla oturum açma veya hesap bağlama yeteneği vermez.
+
 
 > **Güncel öncelik: Q-E02 · 0.2.0-rc.3.** Kullanıcının 16 Ekim 2026 son iptal kabulü önceki çelişen merkez iptali hükümlerinin yerine geçer. Güncel davranış/kanıt: docs/decisions/Q-E02.md, docs/claude-handover.md ve reports/qe02-verification.json. Aşağıdaki eski durum/test sayıları tarihsel kayıttır; teknik aktarım bekleyen işler tamamlandı sayılmaz.
 
@@ -96,7 +128,7 @@ Sınıfın dış katılıma açık/kapalı olması ile paketin öncelikli/esnek 
 | Açık yetkili tek kayıt aşımı | Gerekçeli ayrı komut; toplam/kategori aşılabilir, fiziksel oda sınırı aşılamaz |
 | Kalıcı kapasite/kategori değişimi | Ayrı yönetici komutu, sürüm ve gerekçe; fiziksel oda sınırı korunur |
 
-Kesin kayıtlar ve süresi dolmamış bekleme/deneme teklifleri ortak yer tutar. Kontrollü aşımın hesap/kişi, gerekçe, kontenjan ve aşım miktarı audit'e kaydedilir; hak, borç, belge, zaman, plan, tenant ve merkez kapıları korunur. Mevcut kesin kayıtlar kapasite düşüşünde otomatik iptal edilmez; odanın fiziksel sınırı altına düşüş mevcut açık seans/kayıtlar çözülmeden tamamlanmaz. [25 Ekim kapasite kararı](../docs/decisions/DS-2026-10-25-session-capacity.md) eski çelişen kapasite hükümlerinin yerini alır. Ürün kabulü, bu branch'in uygulaması ve aday/main kabulü ayrı durumlardır.
+Kesin kayıtlar ve süresi dolmamış bekleme/deneme teklifleri ortak yer tutar. Kontrollü aşımın hesap/kişi, gerekçe, kontenjan ve aşım miktarı audit'e kaydedilir; hak, borç, belge, zaman, plan, tenant ve merkez kapıları korunur. Mevcut kesin kayıtlar kapasite düşüşünde otomatik iptal edilmez; odanın fiziksel sınırı altına düşüş mevcut açık seans/kayıtlar çözülmeden tamamlanmaz. [25 Ekim kapasite kararı](#oda-seans-kapasite-karari) eski çelişen kapasite hükümlerinin yerini alır. Ürün kabulü, bu branch'in uygulaması ve aday/main kabulü ayrı durumlardır.
 
 ## 6. Kullanım hakları ve paket yaşam döngüsü
 
@@ -150,7 +182,7 @@ Yoklama kapanabilmesi için iptal edilmemiş bütün rezervasyonların sonucu gi
 
 ### Bekleme listesi
 
-Teklif yalnız toplam ve ilgili kategori kontenjanında boş yer varsa verilir; süre boyunca yeri tutar, hak tutmaz. Başlangıç sıra listeye giriş zamanı, eşitlikte kararlı sıra; teklif başlangıç süresi 30 dakika, kayıt kapanışı/ders başlangıcını aşamaz. Kabul, mevcut yer tutmayı rezervasyona dönüştürür; hak, erişim, belge ve koşullar tekrar kontrol edilir. Geçici hata süreyi bitirmez; kalan sürede yeniden denenebilir.
+Teklif yalnız toplam ve ilgili kategori kontenjanında boş yer varsa verilir; süre boyunca yeri tutar, hak tutmaz. Başlangıç sıra listeye giriş zamanı, eşitlikte kararlı sıra; teklif süresi FD06 gereği orgdan/izinli merkezden açıkça yapılandırılır; tanımsızsa yeni hedef akış teklif üretmez. Geçmiş 30 dakika fallback yeni ürün varsayılanı değildir; mevcut kulüp 3600 sn korunur. Etkin süre kayıt kapanışı/ders başlangıcını aşamaz. Kabul, mevcut yer tutmayı rezervasyona dönüştürür; hak, erişim, belge ve koşullar tekrar kontrol edilir. Geçici hata süreyi bitirmez; kalan sürede yeniden denenebilir.
 
 Ret/süre dolumunda yer serbest kalır, önceki kişinin liste kaydı kapanır, sıradaki uyguna geçilir. Yeniden katılım sıranın sonundandır. Otomatik kesin kayıt yoktur. Seans iptalinde teklifler geri çekilir ve liste kayıtları kapanır. Kabul ve süre dolumu yarışında tek sonuç geçerlidir.
 
@@ -689,7 +721,7 @@ Talep/alternatif niyettir; yer, kaynak veya hak ayırmaz. Alternatif seçimi mer
 
 ## P01-C teknik aktarımı — bekleme ve worker
 
-Bekleme niyeti yer/hak ayırmaz; uygun kategori içinde FIFO joined_at/id, toplam/kategori boşluğu ve aktif rezervasyon+geçerli teklif ortak kapasitesi korunur. Kabul held seat'i aynı transaction'da guarded rezervasyona dönüştürür; geç hata teklif süresini uzatmaz/bitirmez. Ret/expiry kapanmış entry sonrasında yeniden giriş yeni sıradır. İptal durumu teklifleri ve waiting-only entry'leri kapatır. Etkin waitlist_offer_minutes veya kabul edilmiş başlangıç 30 dakika, kayıt kapanışı/seans başlangıcı sınırına tabidir. Worker insan yetkisinden bağımsız DB rol+org bağında, değişmez iş/op/target, lease ve bounded retry ile yürür. Request expiry kayıtlı son tarih veya geçerli gelecek alternatifi kalmamış başlangıç üzerinden; keyfi TTL/otomatik katılım yoktur. Uygulama/runtime/production işletim sınırları docs/p01-handover.md içindedir.
+Bekleme niyeti yer/hak ayırmaz; uygun kategori içinde FIFO joined_at/id, toplam/kategori boşluğu ve aktif rezervasyon+geçerli teklif ortak kapasitesi korunur. Kabul held seat'i aynı transaction'da guarded rezervasyona dönüştürür; geç hata teklif süresini uzatmaz/bitirmez. Ret/expiry kapanmış entry sonrasında yeniden giriş yeni sıradır. İptal durumu teklifleri ve waiting-only entry'leri kapatır. Hedef waitlist_offer_minutes FD06 gereği açık yapılandırmadır; geçmiş runtime30dk fallback yeni organizasyon defaultu değildir. Mevcut kulüp 3600 sn korunur; süre kayıt kapanışı/seans başlangıcını aşmaz. Worker insan yetkisinden bağımsız DB rol+org bağında, değişmez iş/op/target, lease ve bounded retry ile yürür. Request expiry kayıtlı son tarih veya geçerli gelecek alternatifi kalmamış başlangıç üzerinden; keyfi TTL/otomatik katılım yoktur. Uygulama/runtime/production işletim sınırları docs/p01-handover.md içindedir.
 
 ## P01 son pencere/merkez teknik aktarımı
 
@@ -723,13 +755,13 @@ Rapor dosyası private DB byte nesnesidir (core.files + private.p06_export_files
 
 ## Ayarlar sözleşmesi ve davranış sprinti
 
-23 Ekim 2026 belge eşitlemesi. Bu bölüm dört kapsamın tek settings sözleşmesidir; Word v0.1 inceleme taslağı bundan sonra ayrı otorite değildir. Kaynak API: `bfb8ccb29a1e0ca9efde7813dc3af4bbbad8768d`; son runtime tam kabulü `4cfc9a55ca8ff8ccf723d91d98abe33e47311d54`. Davranış kararı, callable API, native sağlayıcı desteği ve işletim kabulü ayrı durumlardır. 200 mevcut endpoint'in tamamlanması yeni ayar alanlarının uygulanmış olduğu anlamına gelmez.
+24 Ekim 2026 davranış sprinti kapanışı. Bu bölüm dört kapsamın tek settings sözleşmesidir; Word v0.1 inceleme taslağı bundan sonra ayrı otorite değildir. Kaynak API/belge tabanı: `702063807b0a0d09f559f070ffde1b1ae3e7563b`; son runtime tam kabulü `4cfc9a55ca8ff8ccf723d91d98abe33e47311d54`. Davranış kararı, callable API, native sağlayıcı desteği ve işletim kabulü ayrı durumlardır. 200 mevcut endpoint'in tamamlanması yeni ayar alanlarının uygulanmış olduğu anlamına gelmez.
 
 ### Durumların anlamı
 
-- **Kabul edildi:** Kullanıcının açık kararı; aşağıdaki S01–S10 gruplarının davranışı kesinleşti. API/DTO/istemci desteği ayrıca eşlenecek.
+- **Kabul edildi:** Kullanıcının açık kararı; aşağıdaki 69 S/M/O/P grubunun davranışı kesinleşti; ilk frontend alt alanları FD01–FD12 ile seçildi; kapsam dışı seçenekler ve teknik backend alanları ayrıca ayrıdır. API/DTO/istemci desteği ayrıca eşlenecek.
 - **Kabul edilmiş tasarım kuralı:** Sözleşme incelemesinde kabul edilen koruma/analiz gereksinimi; seçenek içeren ayrıntılar ayrıca kararlaştırılır.
-- **Aday:** U/C/O/P kataloğundaki henüz grup bazında onaylanmamış özellik ailesi. Özellik veya sağlayıcı geliştirme taahhüdü değildir.
+- **Aday:** Word U/C/O/P kataloğunda yer alıp 69 kabul grubunda seçilmeyen alt seçenek veya alternatif. Özellik veya sağlayıcı geliştirme taahhüdü değildir.
 - **Açık:** Varsayılan, sağlayıcı, alan veya uygulama seçimi henüz sonuçlanmadı. Sayısal değer veya davranış uydurulmaz.
 - **Mevcut API:** Yalnız 08 makine sözleşmesi, implemented.json ve endpoint envanterinde yayımlanmış 200 operasyon. Ayrı yerel settings taslağındaki 208 operasyon/60. migration yayımlanmadı; kullanılmaz.
 
@@ -741,27 +773,422 @@ Rapor dosyası private DB byte nesnesidir (core.files + private.p06_export_files
 | S02 Kimlik ve iletişim | Kabul edildi | Ad/soyad kaydetmeyle güncellenir. Yeni e-posta/telefon doğrulanana kadar eski doğrulanmış değer geçerlidir; bekleyen değer yayılmaz. Aynı alandaki yeni talep eski bekleyen talebi/kodu geçersizleştirir; e-posta ve telefon ayrı izlenir. Giriş/kurtarma sağlayan iletişim başka hesaba bağlıysa ret; otomatik hesap/CRM birleştirme yoktur. Aktif güvenli hesap–kişi bağı güncel ad/doğrulanmış iletişim kaynağıdır; org onayı aranmaz. Kopya zorunluysa sürümlü yayılma/tekrar denenir, eksik yayılma tamamlandı gösterilmez. Eski/yeni değer denetimi korunur. Tamamlanan iletişim değişikliği eski doğrulanmış kanala güvenlik bildirimi üretir; teslimat hatası değişikliği geri almaz. |
 | S03 Hesap–kişi bağlantısı | Kabul edildi | Hesapsız kişi güvenli davet/doğrulamayla mevcut kişi kaydına bağlanır; ikinci kişi yaratılmaz. Güncel hesap bilgisi esas alınır, önceki bilgiler geçmişte kalır. İç not/öğrenci durumu/borç/hak/görev org içinde kalır. Bağ kaldırılınca org erişimi ve gelecekteki otomatik yayılma durur; kişi/abone/iş geçmişi silinmez. Yeniden bağlanma yeni güvenli işlem ister; aynı kişi doğrulanırsa numara korunur, eski yetkiler canlanmaz. Birden fazla aday kayıt varsa yetkili inceleme/birleştirme gerekir. Bağ kaldırma, üyelik sonlandırma ve hesap silme ayrıdır. |
 | S04 Şifre ve kurtarma | Kabul edildi | Şifresiz giriş hesabı desteklenen güvenli yeniden doğrulama sonrası şifre ekleyebilir. Şifre değişiminde mevcut oturum korunur, diğerleri kapatılır. Kurtarma yalnız mevcut doğrulanmış kanala tek kullanımlık/süreli kanıtla gider; yanıt hesabın varlığını açıklamaz. Sıfırlama tamamlanınca kurtarma oturumu dahil tüm oturumlar kapanır, yeniden giriş gerekir. Süre/rate/deneme limitleri platforma aittir; değerleri henüz seçilmedi. Tamamlanan işlem pazarlamadan bağımsız güvenlik bildirimi üretir; dış teslimat ayrı kanıttır. |
-| S05 Giriş yöntemleri ve MFA | Kabul edildi, sağlayıcı seçimi açık | Eklemede mevcut hesap yeniden doğrulanır ve yeni sağlayıcı hesabı doğrulanır; aynı e-posta bağlama kanıtı değildir. Başka hesaba bağlı yöntem reddedilir. Son kullanılabilir giriş yöntemi kaldırılamaz. Desteklenirse passkey ekle/adlandır/kaldır; MFA kurulum kanıtıyla etkinleşir, değiştirme/kaldırma mevcut güvenlik doğrulamasını ister. Platform zorunluluğu aşılamaz; orgun rol şartı diğer orglara kendiliğinden taşınmaz. Desteklenirse kurtarma kodları tek kullanımlıktır; yenilemede eskiler geçersiz, sırlar log/audit dışıdır. Erişim kaybında ayrı kurtarma; org yöneticisi global güvenliği sıfırlayamaz. Google/Apple/passkey/MFA yöntem listesi henüz seçilmedi. |
+| S05 Giriş yöntemleri ve MFA | Kabul edildi; son giriş seçimi aşağıda kesin | Eklemede mevcut hesap yeniden doğrulanır ve yeni sağlayıcı hesabı doğrulanır; aynı e-posta bağlama kanıtı değildir. Başka hesaba bağlı yöntem reddedilir. Son kullanılabilir giriş yöntemi kaldırılamaz. Desteklenirse passkey ekle/adlandır/kaldır; MFA kurulum kanıtıyla etkinleşir, değiştirme/kaldırma mevcut güvenlik doğrulamasını ister. Platform zorunluluğu aşılamaz; orgun rol şartı diğer orglara kendiliğinden taşınmaz. Desteklenirse kurtarma kodları tek kullanımlıktır; yenilemede eskiler geçersiz, sırlar log/audit dışıdır. Erişim kaybında ayrı kurtarma; org yöneticisi global güvenliği sıfırlayamaz. Son karar: e-posta/parola ve Google kayıt/giriş; Apple ve Instagram login/bağlama kapsam dışı, passkey erteli, ilk MFA doğrulayıcı kodu. Provider uygulama kabulü ayrı. |
 | S06 Cihaz ve oturum | Kabul edildi | Mevcut oturum, başlangıç/son etkinlik ve bilinen cihaz/tarayıcı gösterilir; tahmin kesinlik gibi sunulmaz. Etiket yetki/kanıt değildir. Seçili oturum ve yenilemesi iptal edilir, eski token sonraki korumalı istekte reddedilir. Diğer tüm oturumları kapatmada yeniden doğrulama gerekir, mevcut oturum korunur. Bu cihazdan çıkış sunucu oturumunu ve yerel hesap verisi/oturum push bağını temizler; diğer hesap/cihaz etkilenmez. Güvenilen cihaz kaldırma aktif oturum kapatmadan ayrıdır; birlikte seçilebilir. Kullanıcı yalnız kendisininkini yönetir; org yöneticisi yalnız kendi org erişimini kaldırır. Token/sır içermeyen denetim tutulur. |
 | S07 Dil bölge saat | Kabul edildi | Desteklenen dil veya cihaz dili seçilir; desteklenmeyende platform fallback dili kullanılır, somut dil listesi açık. Bölgesel tarih/sayı/12–24 saat/hafta başlangıcı desteklendiği ölçüde ayrı seçilir. Otomatik saat dilimi her cihazdan, manuel tercih hesaptan gelir. Merkez/kullanıcı saati farklıysa ikisi açık ayırt edilir; gün değişimi ve DST doğru gösterilir. Görünüm iş zamanını, iptal sınırını, paket/finans tarihini veya para birimi/tutarını değiştirmez. Manuel tercihler cihazlara yansır; otomatik tercihler cihazda çözülür. |
 | S08 Tema ve erişilebilirlik | Kabul edildi | Açık/koyu/sistem teması; cihaz yazı ölçeği ve uygulama ölçeği, büyütmede içerik/düğmelerin korunması; yüksek kontrast, renk dışı durum anlatımı ve azaltılmış hareket. Ses/titreşim cihaz bazında ve OS izinleri içindedir. Ekran okuyucu/klavye/odak/etiket temel davranıştır. Tema/kontrast/uygulama yazı ölçeği hesapta, sistemden alınan tercihler cihazdadır. Görünüm sıfırlaması bildirim/pazarlama/reklam/ölçüm seçimini değiştirmez. |
 | S09 Başlangıç ve bağlam | Kabul edildi | Son bağlam veya sabit başlangıç seçilir. Sabit org/merkez/disiplin ve yetkili başlangıç ekranı hesapta; son kullanılan bağlam cihazda tutulur. Üst seçim uyumsuz alt seçimi temizler. Görünüm/rol seçimi yetki vermez. Erişim kaybında veri açıklamayan yeniden seçim; yetkili deep link başlangıç tercihini değiştirmez. Çıkış cihaz son bağlamını temizler; grup sıfırlaması diğer tercihlere/yetkilere dokunmaz. |
 | S10 Liste ekran ve takvim | Kabul edildi | Desteklenen liste/kart/yoğunluk/sütun/sayfa boyutu ve ekran bazlı filtre/sıralama; takvim gün/hafta/ay/ajanda/hafta sonu/renk/görünür saat. Sayfalama teknik üst sınırı korunur. Filtreler gerektiğinde org bağlamına ayrılır; yetkisiz/eski alanlar çıkarılır. Görünüm dışında kalan kayıtlar silinmez/iptal olmaz, renk tek anlam taşıyıcısı değildir. Kayıtlı görünüm hesapta, anlık arama/açık kayıt/sayfa yereldir. Ekran sıfırlaması diğer tercih ve izinleri değiştirmez. API'de yetkisiz alanı döndürmek sütun gizleyerek meşrulaştırılmaz. |
 
-Toplam **10 kullanıcı grubu** açık kullanıcı onayıyla kabul edildi. Önceki sohbetteki sekiz grup sayımı eksikti; bu kayıt her onayı ayrı tutar. Bunlar ürün davranışlarıdır; istemci/API uygulama kabulü değildir.
+Yukarıdaki ilk **10 kullanıcı grubu** 23 Ekim belge tabanında kayıtlıydı; sekiz grup sayımı eksikti. Devamındaki S11–S17 ve diğer kapsamların kabulü aşağıdaki 24 Ekim kapanışında birleştirilmiştir. Ürün davranışı istemci/API uygulama kabulü değildir.
 
 ### İnceleme önerilerinden kabul edilen tasarım kuralları
 
-Kimlik değişiminde bekleyen/doğrulanmış değer, yarış ve çatışma açık durumlarla yönetilir. Bağlanma ve ayrılmada verinin kaynağı ve yayılma sınırı bellidir. Hesap/cihaz/işletim sistemi tercihi ayrı çözülür; çevrimdışı eski değer sunucudaki kapatmayı ezemez. Kullanıcının kapatması giriş, uygulama veya varsayılan güncellemesiyle geri açılmaz. Her bildirim olayı için kanal/zorunluluk/sessiz saat/özet/son kullanım matrisi hazırlanır; süresi dolmuş teklif sonradan gönderilmez. İleri tarihli ayar, iptal, plan düşüşü ve eski değere dönüş ayrı sürümlü davranış ister. Yüksek etkili banka/sağlayıcı/operatör/worker işlemlerinde ek güvenlik gereksinimi alan bazında belirlenir; ikinci onayın hangi işlemlerde zorunlu olduğu henüz seçilmedi. Kullanıcı güvenlik hareketlerini görme ve kapsamlı sıfırlama ailesi kataloğa dahildir; alan/durum ayrıntıları henüz açık.
+Kimlik değişiminde bekleyen/doğrulanmış değer, yarış ve çatışma açık durumlarla yönetilir. Bağlanma ve ayrılmada verinin kaynağı ve yayılma sınırı bellidir. Hesap/cihaz/işletim sistemi tercihi ayrı çözülür; çevrimdışı eski değer sunucudaki kapatmayı ezemez. Kullanıcının kapatması giriş, uygulama veya varsayılan güncellemesiyle geri açılmaz. Her bildirim olayı için kanal/zorunluluk/sessiz saat/özet/son kullanım matrisi hazırlanır; süresi dolmuş teklif sonradan gönderilmez. İleri tarihli ayar, iptal, plan düşüşü ve eski değere dönüş ayrı sürümlü davranış ister. Yüksek etkili banka/sağlayıcı/operatör/worker işlemlerinde ek güvenlik gereksinimi alan bazında belirlenir; FD11 ile ilk teslimde yeni genel ikinci-onay mekanizması eklenmemesi seçildi; mevcut özel onaylar korunur. Kullanıcı güvenlik geçmişi ve resetin ilk kapsamı FD03/FD11 ile seçildi; gerçek DTO ve uygulama eşlemesi ayrı.
 
-### Kalan davranış kararları
+### Son öncelik — beş kapsamda ekran ve API teslimi
 
-| Kapsam | Henüz kesinleşmeyenler |
+Kullanıcının son talimatıyla kullanıcı–üye–merkez–org–platform ayar değiştirme ekranlarının alanları ve gerçek API'leri frontend'e teslim edilecektir. Kullanıcı global hesap, üye org person/relationship kaydı ve org bazlı self tercihleridir; altıncı grup/yeni hesap türü eklenmez. Backend alan/Request-Response/permission/sürüm/kabul paketini sağlar, frontend tasarım ve istemci uygulamasını yürütür. [Beş ekran kapsamı ve mevcut API matrisi](../docs/claude-handover.md) bağlayıcı teslim listesidir.
+
+SQL/Cron/worker teknik işletimi, DB yönetimi, migration/deployment yönetim ekranları ve benzeri altyapı ayarları ayrı backlog'a ertelenir. Platform ekranında uygulama kimliği/dil/marka katalogları, plan-fiyat-limit seçenekleri, desteklenen alan default/mirasları, hazır kanal/şablon/entegrasyon ve yönetim tercihleri önceliklidir. Erteleme normal uygulama verisinin güvenli kalıcılığını veya CI kapılarını kaldırmaz. 69 grup yeniden onaylatılmaz; yalnız gerçek belirsiz alan kararı sorulur. Yeni genel endpoint veya alan uydurulup mevcut gibi gösterilmez.
+
+### 24 Ekim 2026 — davranış sprintinin kapanışı
+
+Kullanıcı S11–S17, M01–M22, O01–O21 ve platform P01–P09 gruplarını tek tek onayladı; son P08/P09 birlikte onaylandı. **17 kullanıcı + 22 merkez + 21 organizasyon + 9 platform = 69 ana grup kabul edildi.** S01–S10 yukarıdaki hükümlerle korunur. Yeni ana grup açılmaz; FD01–FD12 açık frontend seçimleri de 25 Ekim kabulüyle kapandı. Sonraki iş API karşılıkları ve uygulama boşluklarını tek matriste tamamlamaktır. Bu kapanış runtime geliştirmesini veya yayımlanmamış yerel taslağın kullanımını başlatmaz.
+
+**Kimlik alanları:** Buradaki S/M/O/P numaraları davranış sprintine aittir. Word kataloğundaki U/C/O/P aile numaralarıyla ve üretim kuyruğunun P01–P08 teslim numaralarıyla aynı kimlik değildir. Örneğin platform P08, reklam/CRM geliştirmelerinin tutulduğu üretim P08 değildir. Aşağıdaki tabloların kapsam başlığı numaranın namespace'idir.
+
+#### Kullanıcı S11–S17 — kabul edilmiş devam grupları
+
+| Grup | Kabul edilen seçenek ve davranış sınırı | Kapanış / kalan teknik iş |
+|---|---|---|
+| S11 Kişisel takvim bağlantısı | Kullanıcı/org özel salt okunur bağlantı; ders/etkinlik/görev türlerini seçme, kaldırma/yenileme. Yalnız yetkili kayıtlar, saat/yer/iptal değişiklikleri yansır; harici yenileme gecikebilir. Borç/ödeme/iç not/başka katılımcı iletişimi aktarılmaz. Yenileme eski bağlantıyı, org erişim kaybı ilgili bağlantıyı kapatır. Harici düzenleme rezervasyon/yoklama işlemi yapmaz. Önceden dışarı kopyalanmış veri silinmiş sayılamaz; harici hatırlatmalar bağımsız. | FD05/FD12 kapsamında frontend kararı kapalı; gerçek DTO/permission/runtime/kabul eşlemesi ve ayrı aday işler açık. |
+| S12 Bildirim kanalları ve olaylar | Platform ve her org ayrı; güvenlik/işlem/hatırlatma/pazarlama ayrılır. Rezervasyon/talep, iptal/değişiklik/teklif, paket/hak/finans/belge olayları seçilebilir. Zorunlu in_app işlem bildirimi kapanmaz; bütün dış kanallar topluca zorunlu yapılmaz. Kanal gerçek destek, doğrulanmış iletişim ve cihaz iznine bağlıdır. Yeni cihaz/kanal kapatılmış tercihi açmaz. Alternatif kanalda da amaç/kanal izni gerekir; tercih iş kaydını değiştirmez. | FD04 kapsamında frontend kararı kapalı; gerçek DTO/permission/runtime/kabul eşlemesi ve ayrı aday işler açık. |
+| S13 Hatırlatma sıklık ve sessiz saat | Ders/etkinlik/paket/ödeme hatırlatması org bazında ayrı. Desteklenen zamanlar, uygun olaylarda anlık/günlük/haftalık özet. Zaman duyarlı teklif/iptal/yakın değişiklik özete bırakılmaz. Sessiz saat hesap genelinde gün/aralık/timezone ve gece aşımı destekler; dış teslim ertelenir, in_app kayıt/okunmamış görünür. Güvenlik ve zaman duyarlı olay istisnaları açıklanır. Teslim öncesi güncellik denetimi; geçersiz/expired olay gönderilmez, tekrarlar birleştirilir. | FD04 kapsamında frontend kararı kapalı; gerçek DTO/permission/runtime/kabul eşlemesi ve ayrı aday işler açık. |
+| S14 Pazarlama ilgi ve kişiselleştirme | Platform/her org ve kanal ayrı; kampanya işlem bildirimi olamaz. İlgi alanı düzenlenir/silinir, kayıt/satış/izin oluşturmaz. Geçmişten öneri ayrı açılır/kapanır; kapalıysa davranışa göre sıralama yok, açık filtreyle genel öneri olabilir. Reklam kişiselleştirme/takip/isteğe bağlı analitik üç ayrı varsayılan açık-kapatılabilir tercih; hukuki izin/teknik toplama kanıtı değildir. Kapatma yeni işlemlere ve teslim öncesi kuyruğa uygulanır; giriş/default güncellemesi yeniden açmaz. Geçmiş iş kayıtları silinmez veya yeni amaç yetkisi doğmaz. | FD04/FD05 kapsamında frontend kararı kapalı; gerçek DTO/permission/runtime/kabul eşlemesi ve ayrı aday işler açık. |
+| S15 Görünürlük paylaşım ve izin geçmişi | Her org ayrı. Katılımcılara profil varsayılan kapalı; ad/fotoğraf ayrı seçim. Telefon/e-posta ayrı ve varsayılan kapalı. İlgili yetkili katılımcı kapsamı, herkese açık profil/arama motoru yayını değil. İş gereği yetkili personel erişimi ayrı; mesleki görev bilgisi kişisel iletişimi açmaz. İzin amaç/kapsam/kanal/tarih/metin sürümüyle görülür; geri çekme yeni değişmez kayıt. Amaçlar toplu onayda birleştirilmez. Kapatma sonraki erişimde uygulanır, uygulama eski görünür kopyaları temizler; dış kopyalar için silme garantisi yok. | FD05 kapsamında frontend kararı kapalı; gerçek DTO/permission/runtime/kabul eşlemesi ve ayrı aday işler açık. |
+| S16 Veri talepleri ve hesap silme | Platform hesabı/org kayıtları ayrı kapsamlı veri kopyası; başkası/iç gizli not otomatik eklenmez. Talep/indirme hassas doğrulama, özel süreli iptal edilebilir dosya. Alındı/işleniyor/ek bilgi/tamamlandı/gerekçeli karşılanamadı ve kısmi sonuç ayrımı. Güncel kimlik önceki kabulden, tarihsel belge hatası bağlı düzeltmeden giderilir. Silme preview bağlantı/sahiplik/işler/korunan kategorileri gösterir; org silme değildir. Owner engeli çözülmeden silme/otomatik devir yok. İmha doğrulanmadan completed yok; geri döndürülemez aşamaya kadar iptal. Borç/iş geçmişi kendiliğinden yok olmaz; durum bildirimi pazarlamadan ayrı. | FD12 kapsamında frontend kararı kapalı; gerçek DTO/permission/runtime/kabul eşlemesi ve ayrı aday işler açık. |
+| S17 Güvenlik geçmişi ve sıfırlama | Kendi giriş/oturum/iletişim/parola/yöntem/kurtarma hareketlerinde zaman/sonuç/bilinen cihaz; sırlar yok, geçmiş salt okunur. İlgili güvenlik akışına geçiş. Sıfırlama ekran/grup/cihaz/hesap kapsamı ve etki gösterimiyle; görünüm reset bildirim/pazarlama/reklam/izinleri değiştirmez. Genel reset kapatılmış izinleri açmaz. Cache temizliği sunucu verisini silmez; gönderilmemiş değişiklik kaybı açıklanır. Cihaz çıkışı yalnız ilgili hesap yerel veri/push bağını temizler. Rol/bağ/borç/hak/rezervasyon/güvenlik yöntemi resetlenmez. | FD03/FD11 kapsamında frontend kararı kapalı; gerçek DTO/permission/runtime/kabul eşlemesi ve ayrı aday işler açık. |
+
+#### Merkez M01–M22 — kabul edilmiş ayar grupları
+
+Merkez yetkisi yalnız kendi canlı kapsamıdır. Organizasyonun zorunlu değeri ve platform güvenlik/plan sınırı aşılamaz. İşlem komutları genel ayar anahtarlarıyla ikame edilmez.
+
+| Grup | Kabul edilen ayar alanları ve sınırlar | Kapanış / kalan teknik iş |
+|---|---|---|
+| M01 Kimlik iletişim konum | Ad/açıklama/işletme iletişimi/adres/harita/ulaşım ve alan bazında dış görünürlük. UUID/org bağı değişmez; kişisel hesap iletişimi ayrı. İletişim kaydı gönderim doğrulaması değildir. Adres değişimi mevcut seans konumunu veya geçmiş belgeyi sessiz değiştirmez; org zorunlu alanı kaldırılamaz. | FD08/FD11 kapsamında frontend kararı kapalı; gerçek DTO/permission/runtime/kabul eşlemesi ve ayrı aday işler açık. |
+| M02 Saat dilimi ve iş takvimi | Merkez iş timezone'u kullanıcı görüntüsünden ayrı; çok aralıklı haftalık ve gece aşan çalışma, açık tatil/kapanış/özel saat. Resmî tatil otomatik kapanış değil; kaynak uygunluğunun yerine geçmez. Daraltma/kapanış etkilenen seansları gösterir, aykırılığa açık çözüm olmadan tamamlanmaz. İstisna varsa ayrı yetki/gerekçe; diğer kapıları aşmaz. Timezone değişiminde mevcut UTC/satış snapshotları korunur; gelecek tekrar düzenlemesi ayrı preview/onay. DST sessiz kaydırılmaz, geçmiş ücret/yoklama değişmez. | FD06 kapsamında frontend kararı kapalı; gerçek DTO/permission/runtime/kabul eşlemesi ve ayrı aday işler açık. |
+| M03 Oda kaynak kapasite | Oda kimlik/açıklama/konum/aktiflik, tek fiziksel oda kapasitesi ve seansın ayrı toplam/kategori kapasitesi, uygunluk ve istisna. Aynı fiziksel oda disiplin için çoğaltılmaz. Seans kontenjanı ayrıca ve oda maksimumu içinde. Oda değişimi seansları otomatik değiştirmez; maksimum düşüşünde çelişen gelecek seanslara açık çözüm gerekir. Pasifleştirmede taşıma/açık iptal, geçmiş korunur. Kaynak çakışması disiplin/sınıfla aşılamaz; oda değişimi rezervasyonu sessiz düşürmez. Dış etkinlik için sahte oda gerekmez. | 25 Ekim kapasite kararı/PR45 kapsamında frontend kararı kapalı; gerçek DTO/permission/runtime/kabul eşlemesi ve ayrı aday işler açık. |
+| M04 Sunulan disiplinler | Org disiplini etkinleştirme, yerel açıklama/görünürlük; org kimliği/adı değişmez ve ikinci disiplin yok. Etkinlik otomatik program/paket/görev/kayıt üretmez. Dış görünürlük ve sunum aktifliği ayrı. Pasifleştirmede seans/rezervasyon/talep/liste/paket etkisi açık çözülür, hak silinmez. Yeniden açma eski işleri/grantları canlandırmaz. | FD11 kapsamında frontend kararı kapalı; gerçek DTO/permission/runtime/kabul eşlemesi ve ayrı aday işler açık. |
+| M05 Görevler ve izinler | Mevcut org kişisinden merkez/disiplin görev ve izin seçimi. Eğitmen/personel/login/operasyon ayrı; varsayılan sınıf görevi ile seans override ayrı. Starter anlaşmasız/hakedişsiz, ücretli Pro/Business anlaşmalı. Görev kaldırmada gelecek işler gösterilir; güvenlik erişimi hemen kesilebilir. Canlı geri alma, başka merkez/global hesap/geçmiş ücret silinmez. Hesaplaşma özel zincirden. | FD11 kapsamında frontend kararı kapalı; gerçek DTO/permission/runtime/kabul eşlemesi ve ayrı aday işler açık. |
+| M06 Program seans varsayılanları | Disiplin/biçime göre süre/saat adımı/oda/kontenjan/görevli. Varsayılan zorunlu kural veya otomatik program değil; kaydetmeden gösterilir. Kapalı sınıf/dış katılım/rezervasyon ayrı. Başlangıç/tekrar/son sınır açık; mevcut 100 tekrar, süresiz geliştirme yok. Default değişimi mevcut programı değiştirmez; gelecek değişimi preview/onay, seans override korunur. Program gerçekleşme/hakediş/yoklama üretmez; iptal/yerine seans katılımcıyı otomatik taşımaz. | FD06 kapsamında frontend kararı kapalı; gerçek DTO/permission/runtime/kabul eşlemesi ve ayrı aday işler açık. |
+| M07 Rezervasyon talep bekleme | Açılış/kapanış ve izinli yönetici zaman istisnası, ayrı doğrudan/talep/kapalı sınıf akışı. Talep/alternatif yer tutmaz; kesin onayda canlı kapılar. Liste açık seçilir, mevcut kararlı sıra; keyfî/ücretli öne alma yok. Teklif süreli kapasite tutar, kabulde yeniden uygunluk; dolumda sıradaki uygun kişi. Liste kapamada mevcut liste/teklif sonucu seçilir, kesin rezervasyon korunur. Olumsuz politika etki/onay ve mevcut koruma; paket iptal/no-show snapshotı ezilmez. | FD06 kapsamında frontend kararı kapalı; gerçek DTO/permission/runtime/kabul eşlemesi ve ayrı aday işler açık. |
+| M08 Katılım borç negatif hak | Üst politika içinde borç engeli/kapsamı, ayrı merkez–disiplin negatif ders hakkı ve kişisel limit. Ayrılmış+tüketilmiş tek sayılır; event negatif yasak. Kesin rezervasyon koruma/onayı; yeni işlem güncel politika. Başlangıç uygunluğu sonradan ödeme ile yeniden yazılmaz. Tahsilat kredi üretmez; uygun yeni paket tüketilmiş sonra ayrılmış açığı kapatır. | FD07 kapsamında frontend kararı kapalı; gerçek DTO/permission/runtime/kabul eşlemesi ve ayrı aday işler açık. |
+| M09 Yoklama gerçekleşme | Başlat/işaretle/kapat/düzelt yetkileri görev kapsamıyla. Saat geçişi auto gerçekleşme/no-show değil; açık fiilî başlangıç, gerekçeli geçmiş ve gelecek zaman ret. Taslak tüketmez; kapanış atomik hak/rezervasyon/ücret. Sonuçlar ayrı, tüketim frozen satıştan; engelli katılım ücretli katılım sayılmaz. Starter/ücretli ayrımı, closure silinmez, bağlı düzeltme. | FD10 kapsamında frontend kararı kapalı; gerçek DTO/permission/runtime/kabul eşlemesi ve ayrı aday işler açık. |
+| M10 Paket fiyat satış | Paket kataloğu, hak/geçerlilik/kapsam, sürümlü koşullar; iptal/no-show/dondurma/uzatma/iade açık. Varsayılan belirsiz tarih yok. İndirim yetkili, liste/gerçek fiyat ayrı. Sipariş hak değildir; mevcut açık borçlu satış ayrı. Backdate gerekçeli/geçmiş tüketim üretmez. Yenileme linked bağımsız, değişim preview/onay; para/hak/rezervasyon komutları ayrı. | FD07 kapsamında frontend kararı kapalı; gerçek DTO/permission/runtime/kabul eşlemesi ve ayrı aday işler açık. |
+| M11 Tahsilat iade finans | Tahsilat/read/düzeltme/iade/mahsup ayrı yetkiler ve kişi/merkez/currency. Desteklenen ödeme yöntemleri; seçim banka entegrasyonu değil. Gerçek tutar/zaman/referans ve açık borç dağılımı. Fazla ödeme alacak, otomatik iade yok; bağlı düzeltme ve tekrar koruması. Eğitmen ödemesi ayrı, otomatik transfer/döviz dönüşümü yok. | FD07/FD11 kapsamında frontend kararı kapalı; gerçek DTO/permission/runtime/kabul eşlemesi ve ayrı aday işler açık. |
+| M12 Anlaşma koşulları | Merkez/disiplin/biçim, açık sabit/kişi/yüzde/karma bileşen, paket özel/genel yerine geçme, tek seans sabiti ve tek salon kesintisi. Süreli/sınırsız temel öneri sabit; diğerleri açık seçim. Immutable sürüm/yürürlük, başlamış/kapanmış ücret korunur; açık gerçekleşme, bağlı fark düzeltmesi. A→B payı ayrı, Starter anlaşmasız. | FD07/FD11 kapsamında frontend kararı kapalı; gerçek DTO/permission/runtime/kabul eşlemesi ve ayrı aday işler açık. |
+| M13 Etkinlik dış katılım | Event dersten ayrı; 0/1/çok disiplin ilişki hakkı tek başına vermez. Yer/saat/kayıt/kapasite/görünürlük, paket/ücretsiz/ücretli yol ayrı. Tam ödeme hazırlığı yer tutmaz; yoklama ders kredisi/ücret talimatı değil. Q-E03 planlanan parasal sınır, Q-E02 her aşama tam dönüş, event negatif yasak. Koşul değişimi mevcut kayıtları yeniden fiyatlandırmaz. | FD06/FD08 kapsamında frontend kararı kapalı; gerçek DTO/permission/runtime/kabul eşlemesi ve ayrı aday işler açık. |
+| M14 Bildirim hatırlatma | Tür, desteklenen zaman/kanal, izinli gönderici/yanıt adresi, şablon alanı, personel uyarı alıcısı, yönetim özeti ve hata sorumlusu. Kullanıcı amaç/kanal/sessiz saat aşılmaz, zorunlu olay kapanmaz. | FD04 kapsamında frontend kararı kapalı; gerçek DTO/permission/runtime/kabul eşlemesi ve ayrı aday işler açık. |
+| M15 Belge onay | İzinli şablon/yerel ek/kapsam/zorunluluk, yürürlük, yeniden onay, takip ve hatırlatma. Org zorunlu belge kapanmaz; yayımlanmış metin/geçmiş onay değişmez. Yeni gerekliliğin etkisi gösterilir, geçmiş onay üretilmez. | FD08 kapsamında frontend kararı kapalı; gerçek DTO/permission/runtime/kabul eşlemesi ve ayrı aday işler açık. |
+| M16 Dış görünürlük başvuru | Merkez yayını/tanıtım/görseller/bağlantı, alan görünürlüğü, başvuruya açık seçenekler, başvuru aç/kapat/metin, form alanı/zorunluluk, sorumlu ve kaynak. Görünürlük otomatik rezervasyon/deneme değil; güvenlik/izin alanı kaldırılamaz, pazarlama başvuru şartına birleştirilemez. | FD08/FD09 kapsamında frontend kararı kapalı; gerçek DTO/permission/runtime/kabul eşlemesi ve ayrı aday işler açık. |
+| M17 Otomasyon | Hazır otomasyon aç/kapat, kapsam, desteklenen zaman/koşul/eylem, sorumlu, duraklatma ve etki preview. Serbest SQL/kod/teknik worker ayarı yok. Durdurma yeni isteğe bağlı işleri engeller, çalışan iş ayrı gösterilir; yeniden açma geriye kör çalıştırmaz. Zorunlu sistem temizliği kapatılamaz. | FD10 kapsamında frontend kararı kapalı; gerçek DTO/permission/runtime/kabul eşlemesi ve ayrı aday işler açık. |
+| M18 Rapor export | Ortak şablon, yetkili filtre/sütun/gruplama/sıralama, paylaşım ve desteklenen format. Kişisel görünüm ayrı; paylaşım erişim vermez, çalıştır/indir canlı yetki. Teknik limit büyütülemez; otomatik zamanlama/dış gönderim açılmadı. | FD10 kapsamında frontend kararı kapalı; gerçek DTO/permission/runtime/kabul eşlemesi ve ayrı aday işler açık. |
+| M19 Import eşleme | Desteklenen tür için sütun şablonu, dosya/tarih/sayı biçimi, hedef merkez/disiplin, kaynak/tekilleştirme anahtarı, yetkili paylaşım ve sonuç sorumlusu. Her dosya preview/açık apply; boş alana borç/hak/ödeme/izin defaultu yok. İsim/telefon/e-posta benzerliği otomatik merge değil. | FD10 kapsamında frontend kararı kapalı; gerçek DTO/permission/runtime/kabul eşlemesi ve ayrı aday işler açık. |
+| M20 Miras sıfırlama | Desteklenen alanda orgdan al/yerel değer, etkin kaynak/kilit nedeni, mirasa dön ve grup reset/etki preview. Org değişimi mirası izler, izinli yerel değer korunur. Olumsuz etkiye koruma/onay; geçmiş/izinler resetlenmez. Eskiye dönüş yeni sürüm; plan geri dönüşü riskli özelliği sessiz açmaz. | FD11 kapsamında frontend kararı kapalı; gerçek DTO/permission/runtime/kabul eşlemesi ve ayrı aday işler açık. |
+| M21 CRM | Yetkili sorumlu/atama kuralı, org izinli aşamalar/sıra, etiket, takip hatırlatması, kapanış nedeni, ortak görünüm. Aşama/etiket satış/öğrenci/izin oluşturmaz; atama erişim genişletmez. Kaldırmada açık yeniden eşleme, geçmiş korunur; ortak başvuru deposu bölünmez. | FD09 kapsamında frontend kararı kapalı; gerçek DTO/permission/runtime/kabul eşlemesi ve ayrı aday işler açık. |
+| M22 Ayar yetkisi geçmiş | Grup bazlı gör/değiştir ve yalnız devredilebilir izinler, değişiklik alıcıları, yetkili geçmiş ve eski değere yeni sürümle dönüş. Yönetmek devretmek değildir, üst scope verilemez. Hassas reauth/ek onay kapatılamaz; sırlar gizli, rollback canlı kapılardan geçer. | FD11 kapsamında frontend kararı kapalı; gerçek DTO/permission/runtime/kabul eşlemesi ve ayrı aday işler açık. |
+
+#### Organizasyon O01–O21 — kabul edilmiş ayar grupları
+
+Her alan ilgili organizasyon yetkisiyle yönetilir. Owner unvanı toplu merkez operasyon yetkisi değildir; kesin permission adları alan eşlemesinde belirlenir.
+
+| Grup | Kabul edilen ayar alanları ve sınırlar | Kapanış / kalan teknik iş |
+|---|---|---|
+| O01 Kimlik iletişim | Görünen ad/logo/açıklama/marka, tanımlı hukuki-fatura alanları, kurumsal iletişim/web/destek ve dış görünürlük, merkez başlangıç değerleri. UUID/sahiplik değişmez; kişisel hesap ayrı; gönderim doğrulaması ayrı; yerel açık değer ve geçmiş belge ezilmez. | FD02/FD08 kapsamında frontend kararı kapalı; gerçek DTO/permission/runtime/kabul eşlemesi ve ayrı aday işler açık. |
+| O02 Ortak merkez politikaları | Desteklenen ortak default/zorunlu değer, yerel değişiklik izni, sayısal aralık, merkez şablonu/hedef merkez/etki preview. Kopyalama canlı mirastan ayrı; şablon güncellemesi eski merkezi değiştirmez. Yereli zorunluya çevirme etki/onay; geçmiş satış/anlaşma ve kesin rezervasyon korunur. | FD11 kapsamında frontend kararı kapalı; gerçek DTO/permission/runtime/kabul eşlemesi ve ayrı aday işler açık. |
+| O03 Roller yetki devri | Devredilebilir izin şablonları, yeni görevde önerilen izinler, açık merkez kapsamı, davet/erişim ve ayar yönetimi, uyarı alıcıları. Şablon yeni rol/sınırsız yetki değil, güncellemesi mevcut izinleri sessiz değiştirmez; toplu apply etki/onay. Kendi yetkisini genişletme yok; platform/Owner ve hesaplaşma özel zinciri ayrı. | FD11 kapsamında frontend kararı kapalı; gerçek DTO/permission/runtime/kabul eşlemesi ve ayrı aday işler açık. |
+| O04 Güvenlik | Desteklenen rol MFA şartı, daha sık hassas reauth, desteklenen işlem ek onayı, yetkili uyarı ve yürürlük/etki. Platform asgarisi gevşetilmez, org şartı başka orga taşınmaz; global parola/MFA/kod org yöneticisinde değil. A/B aynı hesap ayrı yetki kabulü genel ikinci onayla bozulmaz; güvenlik geçmişi topluca orga açılmaz. | FD03/FD11 kapsamında frontend kararı kapalı; gerçek DTO/permission/runtime/kabul eşlemesi ve ayrı aday işler açık. |
+| O05 Disiplin kataloğu | Ad/açıklama/simge/renk/aktiflik, sunabilecek merkezler, dış görünürlük/sıra, yerel alan izni. Kimlik aynı, renk tek anlam değil; pasifleştirme hak/geçmiş silmez ve etkisi gösterilir. | FD11 kapsamında frontend kararı kapalı; gerçek DTO/permission/runtime/kabul eşlemesi ve ayrı aday işler açık. |
+| O06 Dil bölge gösterim | Desteklenen varsayılan uygulama/dış sayfa/belge-bildirim dili ve fallback, ortak çıktı tarih/saat/sayı/hafta başlangıcı, yeni merkez için önerilen timezone. Kişisel ekran tercihi korunur; para/iş zamanı/mevcut merkez timezone/geçmiş belge değişmez. | FD01 kapsamında frontend kararı kapalı; gerçek DTO/permission/runtime/kabul eşlemesi ve ayrı aday işler açık. |
+| O07 Bildirim | Kurulu kanalların merkezlere açılması, doğrulanmış gönderici/yanıt, ortak metin/logo/destek, yerel şablon alanı, hatırlatma defaultu, yönetim alıcısı/özet/teslimat sorumlusu. Kullanıcı tercihleri aşılmaz, olay sınıfı platformdan; dış e-posta ertelendi. | FD04 kapsamında frontend kararı kapalı; gerçek DTO/permission/runtime/kabul eşlemesi ve ayrı aday işler açık. |
+| O08 Belge onay | Ortak şablon/kurumsal alan/dil, desteklenen işlem-kitle kapsamı/zorunluluk, merkez ek/düzenleme kilidi, yayın-yürürlük/hedef, yeniden onay/takip. Geçmiş onay immutable, etkiler gösterilir; pazarlama hizmet belgesine tek zorunlu onay olarak birleştirilmez. | FD08 kapsamında frontend kararı kapalı; gerçek DTO/permission/runtime/kabul eşlemesi ve ayrı aday işler açık. |
+| O09 CRM başvuru | Ortak aşama/sıra/yerel düzenleme, alan/zorunluluk, etiket/sonuç, kaynak/kampanya, merkeze yönlendirme/atama/takip ve ekip görünürlüğü. Kaynak geçmişi korunur; eşleşmeyen başvuru rastgele değil yetkili incelemeye gider. Öğrenci/satış/izin otomatik oluşmaz. | FD09 kapsamında frontend kararı kapalı; gerçek DTO/permission/runtime/kabul eşlemesi ve ayrı aday işler açık. |
+| O10 Paket satış | Ortak yeni ürün şablonu, desteklenen hak/süre/kapsam/iptal/no-show/dondurma/uzatma/iade seçenekleri, indirim sınırı/ek onay ve yerel kilit. Yeni hazırlıkta koşul gösterilir, şablon yayın değil; mevcut satış/sürüm değişmez ve kullanım yetkisi doğmaz. | FD07 kapsamında frontend kararı kapalı; gerçek DTO/permission/runtime/kabul eşlemesi ve ayrı aday işler açık. |
+| O11 Katılım politikası | Borç engeli/kapsamı, negatif ders default/üst sınır, kişisel limit izni, rezervasyon/talep penceresi ve zaman istisnası, bekleme/teklif süre sınırları ve yerel izin. Merkez–disiplin/event yasağı ve kesin rezervasyon koruma etkisi korunur. | FD06/FD07 kapsamında frontend kararı kapalı; gerçek DTO/permission/runtime/kabul eşlemesi ve ayrı aday işler açık. |
+| O12 Finans | Desteklenen ödeme yöntemi, kullanılabiliyorsa ortak banka/yerel bilgi izni, referans/açıklama zorunluluğu, indirim yetkisi, desteklenen tutar ek onayı, finans alıcısı/özet/yerel alan. Banka kaydı otomatik transfer değil; hassas değişim reauth/audit, döviz dönüşümü yok, özel hesaplaşma yetkisi aşılmaz. | FD07/FD11 kapsamında frontend kararı kapalı; gerçek DTO/permission/runtime/kabul eşlemesi ve ayrı aday işler açık. |
+| O13 Otomasyon | Plan destekli hazır liste, ortak koşul/eylem/zaman şablonu, merkez kapsamı/yerel alan, sonuç alıcısı, isteğe bağlı işleri toplu duraklatma, yetkili geçmiş. Şablon etkinleştirme değil; worker teknik sınırı platformda, zorunlu temizleme kapanmaz ve kör catch-up yok. | FD10 kapsamında frontend kararı kapalı; gerçek DTO/permission/runtime/kabul eşlemesi ve ayrı aday işler açık. |
+| O14 Rapor aktarım | Ortak rapor filtre/sütun/grup/sıra, merkez/karşılaştırma kapsamı, kullanım-düzenleme paylaşımı, desteklenen export/import eşleme/biçim/kaynak ve yerel kopya izni. Paylaşım yetki değil; canlı çalıştır/indir, import onayı ve teknik tavan korunur. | FD10 kapsamında frontend kararı kapalı; gerçek DTO/permission/runtime/kabul eşlemesi ve ayrı aday işler açık. |
+| O15 Entegrasyon | Hazır sağlayıcı bağla/kaldır/yenile, amaç/merkez/kullanım ve veri eşleme, isteğe bağlı aktarımı duraklat, sağlık/son başarı/yetki süresi, sorumlu ve merkez kullanım izni. Sırlar normal read'de yok; hassas bağlantı yetkisi, kaldırma dış veriyi silmez, yeniden bağlama otomatik backfill değil. | FD12 kapsamında frontend kararı kapalı; gerçek DTO/permission/runtime/kabul eşlemesi ve ayrı aday işler açık. |
+| O16 Gizlilik paylaşım | Desteklenen katılımcı profil/iletişim paylaşım kapsamı, merkez daraltma izni, pazarlama amaç/kanal, sürümlü açıklama-izin metni, veri talebi sorumlusu ve uyarı. Org paylaşımı mümkün kılar, kullanıcı yerine açmaz. Orglar arası paylaşım otomatik değil; saklama serbest merkez ayarı değil. | FD05/FD08/FD12 kapsamında frontend kararı kapalı; gerçek DTO/permission/runtime/kabul eşlemesi ve ayrı aday işler açık. |
+| O17 SaaS aboneliği | Tanımlı fatura alanı, doğrulanmış fatura adresi/yetkili ek alıcı, dönem sonu yenileme tercihi, desteklenen gelecek dönem aylık/yıllık-plan seçimi/etki. Mevcut kullanım/limit/plan/dönem/ödeme bilgi alanı, serbest yazılamaz. Yenilememe hemen org kapatmaz; sağlayıcı yoksa auto ödeme sunulmaz; geçmiş fatura/dönem korunur. | FD12 kapsamında frontend kararı kapalı; gerçek DTO/permission/runtime/kabul eşlemesi ve ayrı aday işler açık. |
+| O18 Program takvim defaultları | Disiplin/biçim süreleri, saat adımı, sonlu tekrar, yeni merkez çalışma/özel gün kopya şablonu, ortak takvim görünüm/renk ve yerel aralıklar. Mevcut program değişmez, özel gün auto iptal değil; kişisel görünüm korunur. | FD06 kapsamında frontend kararı kapalı; gerçek DTO/permission/runtime/kabul eşlemesi ve ayrı aday işler açık. |
+| O19 Anlaşma şablonu | Ortak şablon, desteklenen ücret modelleri/bileşen defaultu, paket özel koşul izni, salon kesintisi, yerel sınır ve şablon yetkileri. Şablon anlaşma yayınlamaz veya eski ücreti değiştirmez; süreli/sınırsız temel öneri sabit, diğerleri açık seçim. | FD07/FD11 kapsamında frontend kararı kapalı; gerçek DTO/permission/runtime/kabul eşlemesi ve ayrı aday işler açık. |
+| O20 Etkinlik defaultları | Ortak şablon, desteklenen ücretsiz/ücretli/paket kayıt, pencere/yerel sınır, dış katılım izni, konum alanları, görünürlük/yoklama ve zorunlu alanlar. Eski event/ücret/koşul değişmez; yoklama ders kredisi açmaz. | FD06/FD08 kapsamında frontend kararı kapalı; gerçek DTO/permission/runtime/kabul eşlemesi ve ayrı aday işler açık. |
+| O21 Yayın geçmiş sıfırlama | İlgili yetkilerle desteklenen taslak, hemen/ileri yürürlük, değişiklik alıcısı, yetkili gizli-sırsız geçmiş, önceki değere yeni sürümle dönüş ve seçili grubun platform defaultuna etki gösterimli reseti. Taslak auto yayınlanmaz; başka grup/kişisel izin değişmez, default olmayan zorunlu alan boşaltılmaz. | FD11 kapsamında frontend kararı kapalı; gerçek DTO/permission/runtime/kabul eşlemesi ve ayrı aday işler açık. |
+
+#### Platform P01–P09 — dokuz kabul grubu
+
+Platform ayarı yalnız ilgili yapılandırma/güvenlik/işletim/plan/entegrasyon/veri yetkilisince, kaynakta hazırlanmış alan ve doğrulanmış sınırlar içinde yönetilir. Hiçbir grup keyfî kod/anahtar/permission veya kabul kapısı istisnası vermez.
+
+| Grup | Kabul edilen ayar alanları ve sınırlar | Kapanış / kalan teknik iş |
+|---|---|---|
+| P01 Kimlik dil başlangıç | Platform ad/logo/destek, hazır diller/fallback, yeni hesap bölgesel görünüm/tema, yeni org/merkez şablonu ve desteklenen liste yoğunluk/sayfa seçenekleri. Mevcut kişisel tercihler/iş zamanları ezilmez; erişilebilirlik/teknik tavan korunur, kapatılmış izin açılmaz. | FD01/FD02 kapsamında frontend kararı kapalı; gerçek DTO/permission/runtime/kabul eşlemesi ve ayrı aday işler açık. |
+| P02 Giriş hesap güvenliği | Hazır login sağlayıcıları, desteklenen parola kontrolü/MFA-rol şartı, amaç bazlı davet/doğrulama/kurtarma süreleri, giriş/rate/yeniden gönderim sınırları, gerçek sağlayıcı destekli session süresi/hareketsizlik, işlem bazlı reauth, güvenlik olay-kanal/alıcı. Son giriş yöntemi kaldırılamaz, asgari güvenlik ve etki preview; hassas değişim reauth, ek onay alanları ayrı. | FD03/FD11 ve son giriş kararı kapsamında frontend kararı kapalı; gerçek DTO/permission/runtime/kabul eşlemesi ve ayrı aday işler açık. |
+| P03 SaaS plan fiyat limit | Plan katalog/yeni satış aktifliği, desteklenen feature, sayım yöntemi sabit limitler, model destekli sınırsızlık, dönem/currency fiyat sürümleri, satış dönemleri, yenileme ve desteklenen plan değişim yolları. Geçmiş abonelik/fiyat sessiz değişmez, limit/veri etkisi preview; ticari başlangıç/gecikme serbest düğme değil. | FD07/FD12 kapsamında frontend kararı kapalı; gerçek DTO/permission/runtime/kabul eşlemesi ve ayrı aday işler açık. |
+| P04 Ayar tanım miras yayın | Kaynakta tanımlı scope, default, güvenli seçenek/aralık, miras/yerel izin, kaynak plan-yetki eşlemesi, hemen/ileri yayın, rollback/reset ve alıcı. Tip/teknik tavan/yeni key eklenmez, kullanıcı kapatması/üst zorunlu aşılmaz; geçmiş korunur, sır loglanmaz. | FD11 kapsamında frontend kararı kapalı; gerçek DTO/permission/runtime/kabul eşlemesi ve ayrı aday işler açık. |
+| P05 Worker zamanlayıcı | Desteklenen isteğe bağlı hatları duraklat/aç, doğrulanmış zamanlama/batch/concurrency/timeout/retry, açık tenant binding, heartbeat/hata/gecikme eşikleri ve alıcı, etkisi gösterilen yetkili bakım stop/start. Zorunlu işler ayrı; lease/fencing/idempotency/yetki kapatılamaz, sır normal alan olmaz; kör catch-up yok. | Backend B02/B09 erteli kapsamında frontend kararı kapalı; gerçek DTO/permission/runtime/kabul eşlemesi ve ayrı aday işler açık. |
+| P06 Bildirim sağlayıcı | Hazır kanal/sağlayıcı, doğrulanmış gönderici-org izni, kaynak olay-kanal zorunluluk, şablon/dil/güvenli değişken, hız/retry/TTL, izinli fallback, hata alıcıları. Kullanıcı amaç/kanal/sessiz saat korunur, kampanya zorunlu olamaz; expired yeniden canlanmaz, sır normal read'de yok. | FD04; provider kurulumu ayrı kapsamında frontend kararı kapalı; gerçek DTO/permission/runtime/kabul eşlemesi ve ayrı aday işler açık. |
+| P07 Veri gizlilik dosya aktarım | Doğrulanmış veri kategori/amaç saklama sürümü, talep yönlendirme/durum/takip, izin metni/dil/yürürlük, dosya tür/boyut/imzalı erişim, import/export tür/format/satır/byte/indirme süresi, desteklenen yedek/restore politikası ve işletim alıcıları. Özel dosya public olmaz, canlı erişim/preview/apply korunur; ayar auto toplu silme veya restore kanıtı değil, imha kanıtsız completed yok. | FD08/FD10/FD12; backend B05/B06 erteli kapsamında frontend kararı kapalı; gerçek DTO/permission/runtime/kabul eşlemesi ve ayrı aday işler açık. |
+| P08 Entegrasyon API dış başvuru | Hazır sağlayıcı katalog/plan-org kullanımı, desteklenen veri yönü/izin, doğrulanmış site-form-kaynak, bot hostname/action eşlemesi, güvenli rate, desteklenen webhook olay/doğrulanmış hedef ve sorumlular. İmza/tekrar/tenant kapıları korunur; eksik config güvenlik bypass değil, sır gizli. | FD09/FD12; backend B07 erteli kapsamında frontend kararı kapalı; gerçek DTO/permission/runtime/kabul eşlemesi ve ayrı aday işler açık. |
+| P09 İşletim operatör denetim | Kaynaktaki operatör görev/kapsamları, desteklenen süreli gerekçeli support erişimi, hata/gecikme/alıcılar, bakım metni-hedef-zaman, kontrollü servis/isteğe bağlı iş pause, kaynakta hazır feature kullanılabilirliği, desteklenen yüksek etkili ek onay, denetim/eskiye dönüş. Kendi yetkisini artırma/kullanıcıya bürünme/sınırsız veri erişimi yok. Bakım bildirimi auto stop değil; feature flag plan/yetki/kabul bypass değil. | FD11/FD12; backend B08/B09 erteli kapsamında frontend kararı kapalı; gerçek DTO/permission/runtime/kabul eşlemesi ve ayrı aday işler açık. |
+
+
+### Karar kapanışı sonrası API aktarım matrisi
+
+69 ana grup ve aşağıdaki FD01–FD12 frontend seçimleri kabul edilmiştir. Önceki grup tablolarındaki açık alan sütunları 24 Ekim ilk aktarımının eksik seçimlerini gösterir; 25 Ekim FD kabulü çelişen frontend değerleri bakımından üstündür. Seçilmemiş Word örnekleri, katalog assetleri ve backend teknik parametreleri topluca onaylanmaz. Alan matrisi yeni seçim icat etmeden doldurulur:
+
+`davranış grubu + FD + alan | kabul/aday/erteli | yazabilen aktör ve gerçek permission | user/member/center/organization/platform scope | tip/seçenek | kabul edilen default ve uygulanma durumu | miras/kopya/override/kilit | gerçek read/write DTO alanı | sürüm/preview/idempotency | provider/cihaz desteği | runtime kanıt SHA | gap | kabul ölçütü`.
+
+| Küme | Karar / kalan uygulama işi |
 |---|---|
-| Kullanıcı | Kişisel takvim bağlantısı; bildirim olay/kanalları; hatırlatma/sıklık/sessiz saat; pazarlama/ilgi/öneri; reklam/analitik uygulama ayrıntıları; görünürlük/iletişim paylaşımı/izin geçmişi; veri talepleri/hesap silme/sıfırlama ve güvenlik geçmişinin ayrıntıları. |
-| Merkez organizasyon platform | Aşağıdaki aday aileler, mevcut üst ürün kuralları korunarak grup grup netleştirilecek. Henüz otomatik geliştirme taahhüdü yok. |
-| İlk kurulum | Kullanıcının seçtiği teklif TTL 3600 saniye ve silme reauth penceresi 900 saniye hosted uygulanmıştır. Bunlar açık kurulum değeridir; bütün yeni kurulumların varsayılanı değildir. Kurtarma/rate değerleri bunlardan türetilmez. |
-| P08 | Sabit organizasyon abone numarası; ortak çok kaynaklı CRM başvurusu; cinsiyet kontenjanı; sınırsız kapasite/Business temsili; ders tüketmeyen pakete bağlı etkinlik uygunluğu. |
+| Frontend değerleri | Dil/bölge/tema, bildirim zamanları ve istisnaları, member kitlesi, CRM, ilk dosya/ödeme yöntemleri ve standart negatif limit 0 FD01–FD12'de kesinleşti; tekrar onay istenmez. Mevcut ayarlar ezilmez. |
+| Yetki/miras/reset | FD11 aktör ve ilk kapsamı belirler; kesin permission/selector ve alan bazlı güvenli uygulama analizi yapılır. Yeni genel ikinci onay ilk teslimde yok. A/B aynı hesap ayrı canlı merkez yetkisi korunur. |
+| Teknik alanlar | Auth/rate/worker/file tavanı/saklama/restore ve DB işletimi backend B01–B09 backlog'unda; bu tur değer atanmadı. 100 tekrar/20 kontenjan/−2/3600sn/900sn/5sn/Business1000-50-5 mevcut kurulum kayıtlarıdır. |
+| Provider ve asset | Hazır çeviri, somut renk-font paketleri, katalog sürüm/compatibility, logo hattı ve entegrasyon desteği uygulama bağımlılığıdır; desteklenmeyen seçenek hazır gösterilmez. |
+| Ayrı işler | Üretim P08 abone/alias, ortak form CRM, kategori kontenjanı/sınırsız model/paket etkinlik uygunluğu, dış e-posta, frontend E2E, load/restore ve fiziksel imha kendi kaynak kabulüne tabidir. |
+| Mevcut kaynak | 200 operasyon/59 migration kabulü yeni settings alanlarının desteği değildir. Yerel 208/60 taslak otomatik taşınmaz. Sıradaki iş beş scope için gerçek DTO/permission/read-write/sürüm/kabul eşlemesidir. |
+
+<a id="ayarlar-backend-frontend-siniflama"></a>
+
+### Kararların backend/frontend ayrımı ve beş frontend kapsamı
+
+Son kullanıcı sırası uygulandı: backend/frontend alan ayrımı ve user/member/center/organization/platform sınıflaması yapıldı; FD01–FD12 açık frontend seçimleri kullanıcı tarafından tamamıyla kabul edildi. Bu sınıflama 69 grup kabulünü iptal etmez ve yeni ana grup eklemez. API uygulaması bu karar turunun önüne geçirilmez.
+
+**Sınıflama ölçütü:** Verinin DB'de saklanması onu backend ayarı yapmaz. Yetkili insan uygulama ekranından bir iş tercihini/değerini değiştirecekse frontend ayarıdır; platform yöneticisinin ekranı da frontend'dir. Altyapının nasıl çalışacağını belirleyen ve mevcut UI teslimine açılmayan teknik yapılandırma backend'dir. Grup karma olabilir; ayrım alan bazındadır.
+
+#### Backend ayarları — ayrı işe ertelendi
+
+| Küme | Backend'de kalan yapılandırma | Kaynak gruplar / frontend'de kalan bölüm |
+|---|---|---|
+| B01 DB ve erişim altyapısı | RLS/grant/fonksiyon sahibi/search_path, connection pool, ağ/SSL, teknik SQL güvenlik kapıları | Sabit güvenlik kuralları; ayar ekranı, rol veya paylaşım tercihiyle kapatılamaz. |
+| B02 Worker zamanlayıcı | pg_cron, teknik LOGIN/scope binding, tick sıklığı, batch/concurrency, lease/fencing, executor timeout/retry | Platform P05'in teknik kısmı. M17/O13'teki hazır iş otomasyonunun kapsamı/zamanı/aç-kapatı frontend'de kalır. |
+| B03 Auth motoru | Provider credentials, signing/JWT secrets, session token altyapısı, teknik rate/kanıt TTL tavanları | P02'nin altyapısı. Kullanıcının hazır giriş yöntemi seçimi/MFA yönetimi ve org rol güvenlik şartı frontend özel akışlarıdır. |
+| B04 Mesaj teslim motoru | SMTP/push servis kurulumu, provider sırları, transport retry/backoff, iş kuyruğu delivery TTL/hız tavanı | P06. Kullanıcı kanal/olay tercihleri, iş hatırlatma zamanı, şablon ve alıcı seçimi frontend'dir. |
+| B05 Dosya ve iş tavanları | Storage ingress/izin altyapısı, imzalı erişim motoru, teknik MIME/byte/satır/job limitleri | P07 ve eski 208/60 taslağı. Hazır dosya türlerinden iş belgesine uygun seçim ve aktarım şablonu frontend olabilir; teknik tavan artırılmaz. |
+| B06 Saklama imha ve restore | Onaylanmış saklama politikalarının teknik uygulanması, fiziksel imha/hold kanıtı, backup/restore motoru | P07. Kendi veri talebini başlatma/durum görme ve yetkili talep takip alıcısı frontend özel akışıdır. |
+| B07 Entegrasyon güvenliği | İmza/secret saklama, bot hostname/action doğrulama altyapısı, webhook retry/dedupe ve teknik abuse limitleri | P08. Hazır sağlayıcı bağlama/kapsam/alan eşleme ve yönlendirme frontend'de, sırlar genel read'de yok. |
+| B08 Dağıtım ve kabul | Migration, CI/full/main clean, deploy, ortam kimlik bilgileri ve teknik geri alma | P09. Kullanıcıya gösterilen bakım açıklaması/planı ve yetkili iş uyarısı alıcıları frontend olabilir; deploy düğmesi değildir. |
+| B09 Teknik gözlem | Backend log/metric retention, alarm motoru ve düşük seviye kaynak eşikleri | P05/P09. Yetkili uygulama takip sorumlusu seçimi ve kendi yetkili değişiklik geçmişini görme frontend'de kalır. |
+
+UUID standardı, tenant izolasyonu, kapasite/para/hak atomikliği, canlı yetki, idempotency, Q-E02/E03, Starter/ücretli plan ayrımı gibi **sabit ürün/güvenlik hükümleri ayar değildir**. Para tahsil et, yoklamayı kapat, hesaplaşmayı onayla gibi tekil domain komutları da genel tercih kaydetme işlemine çevrilmez. İlgili ekrandan ayrı eylem olarak açılabilirler.
+
+#### Frontend ayarları — user/member/center/organization/platform
+
+Aynı konunun üç düzeyde görünmesi aynı değerin üç kez tutulması değildir: platform izinli katalog/defaultu, organizasyon ortak politika/mirası, merkez izinli yerel değeri; user global tercihi, member ilgili org tercihini yönetir. Kullanıcı arayüzünde org bağlamı seçili olsa da global alan user olarak kalır.
+
+| Kapsam | Düzenleyen | Frontend'de değiştirilecek ayar aileleri | Salt okunur veya ayrı eylem |
+|---|---|---|---|
+| **user** | Kendi global hesabı | Görünen ad/hitap/fotoğraf; güncel kimlik ve doğrulanmış iletişim; dil/format/timezone/görünüm/erişilebilirlik; başlangıç/liste/takvim; hesap sessiz saatleri; platform pazarlama ve üç reklam/analitik tercihi | Login/MFA/session, kimlik doğrulama, veri talebi/silme/reset özel komut. İş geçmişi ve güvenlik geçmişi salt okunur; cihaz ses/push/cache alanı yerel. |
+| **member** | Kendi org tercihinde bağlı hesap sahibi; org kişi/operasyon alanında mevcut yetkili personel/CM | Org bildirim/hatırlatma/pazarlama; org ilgi/öneri; katılımcı profil/iletişim paylaşımı; org kişisel takvim türleri. Yetkili yönetimde hesapsız kişinin iletişimi/ilişkileri ve kişisel merkez–disiplin limit istisnası | Global doğrulanmış ad/iletişim yerel override edilmez. Abone no/kimlik/bakiye salt okunur; ilişki/rol/bağlantı/limit değişimi kendi domain yetki/onayına tabidir. |
+| **center** | İlgili merkez/alan yetkilisi | İşletme kimlik/iletişim/konum/görünürlük; iş takvimi/oda/disiplin; program/paket/etkinlik/anlaşma hazırlık defaultları; izinli rezervasyon/borç/hak politikası; görev/izin; bildirim/belge/form/CRM; iş otomasyonu; ortak rapor/import; yerel miras/reset | Mevcut satış/yoklama/finans/hakediş tekil işlemleri ayrı. Worker, DB ve teknik limit yönetimi yok. |
+| **organization** | İlgili org alan yetkilisi | Kurumsal/fatura bilgileri ve PR43 hazır marka; ortak dil/format/disiplin/katalog/şablon; merkez default/kilit/yerel sınır; rol/delegasyon ve org güvenlik gereksinimi; bildirim/belge/CRM/gizlilik; iş otomasyonu/rapor/import/bağlantı; SaaS yenileme ve desteklenen plan tercihi; yayın/geçmiş/reset | Owner atama platformda; mevcut abonelik dönemi/limit/ödeme durumu salt okunur. Geçmiş kayıtların yeniden yazılması ayar değildir. |
+| **platform** | İlgili uygulama/plan/güvenlik/entegrasyon yetkilisi | Uygulama kimlik/destek; hazır dil/format/tema/renk-font katalogları; yeni hesap/org/merkez defaultları; plan/fiyat/özellik/limit kataloğu; kaynakta tanımlı alanların izinli default/miras/aralıkları; hazır login/MFA kullanılabilirliği; olay/kanal/şablon katalogları; iş otomasyonu/form/CRM/rapor-import seçenekleri; hazır entegrasyon kullanılabilirliği; operatör görev kapsamı/uyarı alıcıları/bakım metni ve yayın/reset | Yeni key/tip/kod/permission yaratma, DB/worker/secret/migration/deploy yönetimi yok. Plan/fiyat API'si hazır değilse mevcut subscriber komutu yerine kullanılamaz. |
+
+#### 69 karar grubunun izlenebilir sınıflaması
+
+Aşağıdaki tablo kapsam eşlemesidir; o gruptaki her alt seçeneğin değeri veya API'si hazır demek değildir. Eski S/M/O/P kararları ilgili alt alanları ve korumalarıyla önceki tablolarda korunur.
+
+| Kabul grubu | Frontend kapsamı | Backend ayrımı / sınır |
+|---|---|---|
+| S01 Profil | user | İş ayarı frontend; sabit ürün/yetki/transaction kuralları ayar değildir. |
+| S02 Kimlik ve iletişim | user | İş ayarı frontend; sabit ürün/yetki/transaction kuralları ayar değildir. |
+| S03 Hesap–kişi bağlantısı | user, member | İş ayarı frontend; sabit ürün/yetki/transaction kuralları ayar değildir. |
+| S04 Şifre ve kurtarma | user | Backend: teknik kurtarma TTL/rate; frontend: parola işlemleri. |
+| S05 Giriş yöntemleri ve MFA | user | Backend: sağlayıcı sırları; frontend: destekli yöntem seçme/MFA. |
+| S06 Cihaz ve oturum | user | Backend: token/session motoru; frontend: kendi cihaz/oturum yönetimi. |
+| S07 Dil bölge saat | user | İş ayarı frontend; sabit ürün/yetki/transaction kuralları ayar değildir. |
+| S08 Tema ve erişilebilirlik | user | İş ayarı frontend; sabit ürün/yetki/transaction kuralları ayar değildir. |
+| S09 Başlangıç ve bağlam | user | İş ayarı frontend; sabit ürün/yetki/transaction kuralları ayar değildir. |
+| S10 Liste ekran ve takvim | user | İş ayarı frontend; sabit ürün/yetki/transaction kuralları ayar değildir. |
+| S11 Kişisel takvim bağlantısı | member | Backend: güvenli takvim beslemesi; frontend: bağlantı/filtre seçimi. |
+| S12 Bildirim kanalları ve olaylar | user, member | İş ayarı frontend; sabit ürün/yetki/transaction kuralları ayar değildir. |
+| S13 Hatırlatma sıklık ve sessiz saat | user, member | İş ayarı frontend; sabit ürün/yetki/transaction kuralları ayar değildir. |
+| S14 Pazarlama ilgi ve kişiselleştirme | user, member | İş ayarı frontend; sabit ürün/yetki/transaction kuralları ayar değildir. |
+| S15 Görünürlük paylaşım ve izin geçmişi | member | İş ayarı frontend; sabit ürün/yetki/transaction kuralları ayar değildir. |
+| S16 Veri talepleri ve hesap silme | user, member | Backend: saklama/imha motoru; frontend: talep ve durum akışı. |
+| S17 Güvenlik geçmişi ve sıfırlama | user | Backend: teknik log saklama; frontend: izinli geçmiş ve kapsamlı reset. |
+| M01 Kimlik iletişim konum | center | İş ayarı frontend; sabit ürün/yetki/transaction kuralları ayar değildir. |
+| M02 Saat dilimi ve iş takvimi | center | İş ayarı frontend; sabit ürün/yetki/transaction kuralları ayar değildir. |
+| M03 Oda kaynak kapasite | center | İş ayarı frontend; sabit ürün/yetki/transaction kuralları ayar değildir. |
+| M04 Sunulan disiplinler | center | İş ayarı frontend; sabit ürün/yetki/transaction kuralları ayar değildir. |
+| M05 Görevler ve izinler | center; member yönetim eylemleri | İş ayarı frontend; sabit ürün/yetki/transaction kuralları ayar değildir. |
+| M06 Program seans varsayılanları | center | İş ayarı frontend; sabit ürün/yetki/transaction kuralları ayar değildir. |
+| M07 Rezervasyon talep bekleme | center | İş ayarı frontend; sabit ürün/yetki/transaction kuralları ayar değildir. |
+| M08 Katılım borç negatif hak | center; member limit istisnası | İş ayarı frontend; sabit ürün/yetki/transaction kuralları ayar değildir. |
+| M09 Yoklama gerçekleşme | center | İş ayarı frontend; sabit ürün/yetki/transaction kuralları ayar değildir. |
+| M10 Paket fiyat satış | center | İş ayarı frontend; sabit ürün/yetki/transaction kuralları ayar değildir. |
+| M11 Tahsilat iade finans | center | İş ayarı frontend; sabit ürün/yetki/transaction kuralları ayar değildir. |
+| M12 Anlaşma koşulları | center | İş ayarı frontend; sabit ürün/yetki/transaction kuralları ayar değildir. |
+| M13 Etkinlik dış katılım | center | İş ayarı frontend; sabit ürün/yetki/transaction kuralları ayar değildir. |
+| M14 Bildirim hatırlatma | center | İş ayarı frontend; sabit ürün/yetki/transaction kuralları ayar değildir. |
+| M15 Belge onay | center | İş ayarı frontend; sabit ürün/yetki/transaction kuralları ayar değildir. |
+| M16 Dış görünürlük başvuru | center | İş ayarı frontend; sabit ürün/yetki/transaction kuralları ayar değildir. |
+| M17 Otomasyon | center | Teknik worker parametreleri B02; hazır iş otomasyonu frontend. |
+| M18 Rapor export | center | Teknik tavanlar B05; rapor/şablon seçenekleri frontend. |
+| M19 Import eşleme | center | Teknik tavanlar B05; import eşleme/paylaşım frontend. |
+| M20 Miras sıfırlama | center | İş ayarı frontend; sabit ürün/yetki/transaction kuralları ayar değildir. |
+| M21 CRM | center | İş ayarı frontend; sabit ürün/yetki/transaction kuralları ayar değildir. |
+| M22 Ayar yetkisi geçmiş | center | İş ayarı frontend; sabit ürün/yetki/transaction kuralları ayar değildir. |
+| O01 Kimlik iletişim | organization | İş ayarı frontend; sabit ürün/yetki/transaction kuralları ayar değildir. |
+| O02 Ortak merkez politikaları | organization | İş ayarı frontend; sabit ürün/yetki/transaction kuralları ayar değildir. |
+| O03 Roller yetki devri | organization | İş ayarı frontend; sabit ürün/yetki/transaction kuralları ayar değildir. |
+| O04 Güvenlik | organization | Auth motoru B03; organizasyon rol güvenlik şartları frontend. |
+| O05 Disiplin kataloğu | organization | İş ayarı frontend; sabit ürün/yetki/transaction kuralları ayar değildir. |
+| O06 Dil bölge gösterim | organization | İş ayarı frontend; sabit ürün/yetki/transaction kuralları ayar değildir. |
+| O07 Bildirim | organization | Teslim motoru B04; kanal/şablon/alıcı frontend. |
+| O08 Belge onay | organization | İş ayarı frontend; sabit ürün/yetki/transaction kuralları ayar değildir. |
+| O09 CRM başvuru | organization | İş ayarı frontend; sabit ürün/yetki/transaction kuralları ayar değildir. |
+| O10 Paket satış | organization | İş ayarı frontend; sabit ürün/yetki/transaction kuralları ayar değildir. |
+| O11 Katılım politikası | organization | İş ayarı frontend; sabit ürün/yetki/transaction kuralları ayar değildir. |
+| O12 Finans | organization | İş ayarı frontend; sabit ürün/yetki/transaction kuralları ayar değildir. |
+| O13 Otomasyon | organization | Worker B02; iş otomasyonu tanımı frontend. |
+| O14 Rapor aktarım | organization | Teknik tavan B05; rapor/import şablonu frontend. |
+| O15 Entegrasyon | organization | Bağlantı sırları/transport B07; hazır bağlantı ve kapsam frontend. |
+| O16 Gizlilik paylaşım | organization | Saklama/imha B06; paylaşım, metin ve talep alıcısı frontend. |
+| O17 SaaS aboneliği | organization | İş ayarı frontend; sabit ürün/yetki/transaction kuralları ayar değildir. |
+| O18 Program takvim defaultları | organization | İş ayarı frontend; sabit ürün/yetki/transaction kuralları ayar değildir. |
+| O19 Anlaşma şablonu | organization | İş ayarı frontend; sabit ürün/yetki/transaction kuralları ayar değildir. |
+| O20 Etkinlik defaultları | organization | İş ayarı frontend; sabit ürün/yetki/transaction kuralları ayar değildir. |
+| O21 Yayın geçmiş sıfırlama | organization | İş ayarı frontend; sabit ürün/yetki/transaction kuralları ayar değildir. |
+| P01 Kimlik dil başlangıç | platform | Hazır katalog/default seçimi frontend; katalog asset hazırlığı uygulama bağımlılığı. |
+| P02 Giriş hesap güvenliği | platform | Kullanılabilir login/MFA seçenekleri frontend; secrets/teknik TTL/rate B03. |
+| P03 SaaS plan fiyat limit | platform | Plan/fiyat/iş limiti frontend; sayım ve güvenlik motoru sabit uygulama. |
+| P04 Ayar tanım miras yayın | platform | Kaynakta tanımlı değer/miras frontend; yeni key/tip/schema kod geliştirmesi. |
+| P05 Worker zamanlayıcı | platform | Teknik worker/scheduler kısmı backend B02/B09; uygulama sorumlu seçimi platform frontend. |
+| P06 Bildirim sağlayıcı | platform | Hazır kanal/şablon/gönderici/alıcı frontend; transport/credentials B04. |
+| P07 Veri gizlilik dosya aktarım | platform | İzin metni/talep sorumlusu ve hazır iş seçenekleri frontend; file/job tavanı/saklama/restore B05/B06. |
+| P08 Entegrasyon API dış başvuru | platform | Hazır entegrasyon ve kaynak/alan seçimi frontend; imza/secret/bot/rate motoru B07. |
+| P09 İşletim operatör denetim | platform | Operatör uygulama kapsamı/uyarı/bakım metni/yayın frontend; altyapı bakım/CI/deploy B08/B09. |
+
+#### FD01–FD12 — frontend alan kararları tamamlandı
+
+25 Ekim 2026: kullanıcı FD01–FD12 paketlerinin tamamını onayladı. FD07 için standart başlangıç negatif kredi limiti **0** ayrıca teyit edildi; diğer FD07 maddeleri de kabul edildi. Bu paketler 69 ana grubun açık frontend seçimlerini kapatır, yeni 12 ana grup değildir. Backend/altyapı ayarları ertelenmiş kalır. Aşağıdaki kabuller ürün/ekran sözleşmesidir; API, sağlayıcı veya migration uygulanmış sayılmaz.
+
+| Paket | Frontend kapsamı | Durum / kesinleşen alan |
+|---|---|---|
+| FD01 | user; platform default/katalog | Kabul edildi — dil/bölge/görünüm başlangıçları. |
+| FD02 | organization; platform marka kataloğu | Kabul edildi — hazır renk/font/logo, yetki ve bağımsız reset. |
+| FD03 | user; org/platform yöntem kullanılabilirliği | Kabul edildi — profil alanları, ilk login/MFA ve güvenlik görünümü. |
+| FD04 | user/member; center/org/platform kanal-şablon | Kabul edildi — bildirim matrisi, hatırlatma seçenekleri, özet/sessiz saat ve pazarlama defaultları. |
+| FD05 | member; organization izinli kitle | Kabul edildi — katılımcı görünürlüğü, ilgi/öneri ve takvim türleri. |
+| FD06 | center/organization; platform seçenekler | Kabul edildi — iş takvimi/program ve rezervasyon başlangıçları. |
+| FD07 | center/organization; member yetkili istisna; platform katalog | Kabul edildi — paket/finans seçenekleri, standart negatif limit 0. |
+| FD08 | center/organization; platform şablon | Kabul edildi — belge, yeniden onay ve dış görünürlük. |
+| FD09 | center/organization; platform CRM kataloğu | Kabul edildi — CRM aşama/form/kaynak/yönlendirme başlangıçları. |
+| FD10 | center/organization; platform hazır iş seçenekleri | Kabul edildi — iş otomasyonu, rapor/CSV ve import eşleme. |
+| FD11 | user/member/center/organization/platform, aktöre göre | Kabul edildi — yetki, canlı miras/kopya, yayın ve reset. |
+| FD12 | user/member/organization/platform, yetkili eylemler | Kabul edildi — veri talebi, bağlantı ve abonelik ekranı. |
+
+##### FD01 — dil bölge ve görünüm (kabul edildi)
+
+| Alan | Kabul edilen ilk seçenek/default |
+|---|---|
+| İlk dil hedefi | Türkçe/İngilizce; yalnız hazır çeviri açılır. Cihaz dili destekleniyorsa onu kullan, değilse Türkçe. |
+| Bölgesel başlangıç | tr-TR; kullanıcı desteklenen biçimleri ayrı değiştirebilir. Tarih gün.ay.yıl (24.10.2026), 24 saat, sayı 1.234,56, hafta başlangıcı Pazartesi. |
+| Görüntüleme timezone'u | Otomatik cihaz; desteklenen IANA listesinden manuel seçim mümkün. Merkez iş timezone'u etkilenmez. |
+| Tema | Sistem temasını izle; açık/koyu seçilebilir, org markası ayrı. |
+| Erişilebilirlik | Cihaz yazı ölçeği/azaltılmış hareketi izle; açık uygulama tercihi S08 hesabı/cihaz ayrımıyla. |
+| Takvim başlangıcı | Hafta görünümü, hafta sonu görünür; kullanıcı değiştirebilir. |
+
+##### FD02 — hazır marka (kabul edildi)
+
+| Alan | Kabul edilen seçenek/default |
+|---|---|
+| Seçim | Renk paketi ve başlık/gövde font paketi ayrı; yalnız platformun uyumlu sunduğu birleşimler. Başlangıç sistem varsayılanı. |
+| İlk özelleştirme | Hazır paket; serbest renk/CSS/özel font yükleme yok. Somut renk/font/adları frontend hazırlar, erişilebilirlik/dil kontrolü sonrası platform kataloğuna alınır; Akış/Sahne/Atölye kesinleşmedi. |
+| Yazma yetkisi | Owner ve açık yetkilendirilmiş OM. İlk teslimde ayrı merkez markası yok; merkez org markasını kullanır. |
+| Kullanıcı tercihi | Açık/koyu/sistem, ölçek ve erişilebilirlik markadan bağımsız. |
+| Logo | PNG/JPEG/WebP yükle-değiştir-kaldır; ilk kapsamda SVG/animasyon yok. Kaldırınca org adı ve sistem yedek simgesi. Teknik boyut limitleri backend'de. |
+| Reset ve katalog ömrü | Renk/font ayrı ayrı sistem defaultuna döner; logo ayrı kaldırılır. Katalogdan kaldırma yeni seçimleri kapatır; mevcut kullanım destek/fallback durumu açık yönetilir. |
+| Public okuma | Yalnız yayımlanmış org bağlamında marka/logo; iç ayar bilgileri açılmaz. |
+
+##### FD03 — profil giriş ve güvenlik (kabul edildi)
+
+| Alan | Kabul edilen seçenek/default |
+|---|---|
+| Profil | Görünen ad, ad, soyad, isteğe bağlı kısa serbest hitap ve fotoğraf ayrı; zorunlu unvan listesi yok. Fotoğraf PNG/JPEG/WebP, kaldırılınca baş harfler. |
+| İlk login | E-posta + şifre ana; 25 Ekim son kararıyla Google ek kayıt/giriş. Apple ve Instagram login/bağlama kapsam dışı, passkey sonraya. Bu revizyon FD03 ilk Google ertelemesini değiştirir. |
+| İlk MFA | Doğrulayıcı uygulama kodu; SMS MFA ilk kapsamda yok. Kullanıcıya isteğe bağlı, org belirli rollere şart koyabilir. |
+| İletişim | E-posta/telefon ayrı pending/confirm akışı; doğrulanmadan güncel değer olmaz. Provider hazır değilse ilgili seçenek kapalı/nedeni görünür. |
+| Session görünümü | Bu oturum, başlangıç/son etkinlik ve bilinen cihaz/tarayıcı; tek oturum veya diğerlerini kapatma. |
+| Güvenlik geçmişi | İşlem türü/zaman/sonuç/bilinen cihaz. İlk ekranda IP/konum yok; parola/kod/sırlar profil alanı değildir. |
+
+Teknik süre/rate backend işidir. Dış e-posta teslimi ertelenmiş kalır; ürün kabulü native Auth/dış teslim desteği kanıtı değildir.
+
+##### FD04 — bildirim hatırlatma ve pazarlama (kabul edildi)
+
+| Alan | Kabul edilen seçenek/default |
+|---|---|
+| İlk çalışan kanal | in_app. E-posta/push entegrasyon hazır olduğunda seçilir; enum veya ürün onayı dış teslim kanıtı değil. |
+| Zorunlu olaylar | Güvenlik; rezervasyon/talep sonucu; iptal/değişiklik; yer teklifi; tahsilat/iade; erişim değişikliği in_app zorunlu. Diğer olayların zorunluluğu bu listeye sessiz eklenmez. |
+| Hatırlatma | Organizasyon bazında ayrı, başlangıç açık. Ders/etkinlik: 1/3/24 saat, default 24 saat. Paket bitişi: 3/7/14 gün, default 7 gün. Ödeme vadesi: 1/3/7 gün, default 3 gün. |
+| Pazarlama | Platform ve her org ayrı, default kapalı; kanal bazında açılır. Üç reklam/analitik açık-kapatılabilir tercihi ayrı korunur. |
+| Bilgilendirme sıklığı | Uygun olaylarda anlık/günlük/haftalık; default anlık. Günlük 18.00, haftalık pazar 18.00; seçili kullanıcı timezone'unda. |
+| Sessiz saat | Default kapalı; kullanıcı gün/aralık seçer. Güvenlik, merkez iptali, sonraki 24 saatteki ders/event değişimi ve süreli yer teklifi istisna. İstisna kapatılmış dış kanalı açmaz; in_app görünür. |
+| Tekrar/özet | in_app kaydı korunur; hazır dış kanallar ayrı seçilir. Zaman duyarlı olay özete bırakılmaz; geçersiz hatırlatma gönderilmez. |
+
+##### FD05 — member görünürlük ilgi ve takvim (kabul edildi)
+
+| Alan | Kabul edilen seçenek/default |
+|---|---|
+| Görünürlük kitlesi | Yalnız aynı gelecek/devam eden ders/event'te kesin kayıtlı kişiler; başvuru/bekleme hariç. Bitişte katılımcılar arası görünürlük biter; personelin yetkili erişimi ayrı. |
+| Görünen içerik | Açılmışsa display_name ve fotoğraf; hukuki ad/soyad ayrıca açılmaz. Telefon/e-posta ayrı açılmışsa aynı kitleye, bütün org üyelerine değil. Profil/fotoğraf/telefon/e-posta default kapalı. |
+| İlgi | Org disiplin/merkez/event türlerinden çoklu seçim, default boş. Açık ilgi filtresi geçmiş kişiselleştirmesinden bağımsız. |
+| Geçmişten öneri | Org bazında default kapalı; kullanıcı açabilir. |
+| Kişisel takvim | Kesin ders, kesin event ve yetkili eğitmen/personel görevleri ayrı seçilir. Bağlantı kendiliğinden oluşturulmaz; oluştururken tür seçilir. İçerik başlık/tarih-saat/yer/uygulama bağlantısı; başkaları/borç/ödeme yok. |
+
+##### FD06 — iş takvimi program rezervasyon (kabul edildi)
+
+| Alan | Kabul edilen seçenek/default |
+|---|---|
+| Yeni merkez timezone'u | Europe/Istanbul önerisi; oluştururken açık onay/değişiklik. User görüntüleme timezone'u ayrı. |
+| Çalışma saatleri | Default tanımsız; org şablonundan al veya merkez belirle. Yeni seans ve saat/oda/eğitmen değişiminde kontrol; görüntüleme/iptal/yoklama düzeltmesini engellemez. |
+| Zaman istisnası | Default kapalı; org izin verirse yetkili yönetici gerekçeyle kullanır. Diğer kapılar aşılmaz. |
+| Yeni program | Ders süresi önerisi 60 dakika, değiştirilebilir. Saat seçici adımı 15 dakika; elle geçerli saat desteklenir. Default tek seans; tekrar açılırsa bitiş tarihi veya sayı açık. |
+| Rezervasyon/talep | Açılış/kapanış ayrı, orgdan miras; tanımsızsa yetkili yapılandırma gerekir. Otomatik pencere değeri uydurulmaz. |
+| Bekleme/teklif | Yeni sınıfta liste default kapalı. Teklif süresi orgdan miras; değer yoksa teklif üretimi başlamaz. |
+| Yerel değişiklik | Org zorunlu alan kilitli, serbest alan yerel değiştirilebilir. Mevcut 100 tekrar/3600sn kulüp seçimi korunur, yeni orglara yayılmaz. |
+
+##### FD07 — paket katılım finans (kabul edildi, standart negatif limit 0)
+
+| Alan | Kabul edilen seçenek/default |
+|---|---|
+| Yeni paket | Org şablonu; yoksa hak miktarı/geçerlilik/fiyat açık girilir. İptal/no-show/dondurma ayrı; şablonda yoksa yayın öncesi seçilir. İade yöntemi açık seçim, eksiklik none sayılmaz. |
+| Para birimi | Yeni taslakta TRY önerisi; desteklenen başka currency seçilebilir. Mevcut satış/fiyat değiştirilmez. |
+| Standart negatif limit | Yeni org için **0**. Kullanıcı ayrıca teyit etti. Mevcut kulüp −2 ve diğer politikalar aynen korunur; mevcut org ayarları defaultla ezilmez. |
+| Kişisel istisna | Default kapalı; org açarsa yetkili merkez aktörü org sınırı içinde düzenler. Event negatif yasağı korunur. |
+| Borç engeli | Yeni orgda rezervasyon ve katılım ayrı, başlangıçta açık; mevcut borç denetimi kapsamı korunur. |
+| İndirim | Ayrı yetkisi olmayana kapalı; yetkiliye org sınırı. Yeni sayısal indirim sınırı bu kararda atanmadı. |
+| İlk ödeme yöntemi listesi | Manuel nakit, banka transferi, kart/POS kaydı. Auto tahsilat/ödeme entegrasyonu değildir. Banka/kart referansı zorunlu; nakit isteğe bağlı. |
+| Ek onay eşiği | Ayrı alan olarak modellenebilir ama tutar defaultu yok; desteklenmeyen mekanizma etkinleştirilemez. FD11 ilk teslimde yeni genel ikinci-onay mekanizması eklemez. |
+
+##### FD08 — belge onay dış görünürlük (kabul edildi)
+
+| Alan | Kabul edilen seçenek/default |
+|---|---|
+| İlk belge | Yayımlanmış/zorunlu hazır belge atanmaz; org kendi şablonunu hazırlar/seçer. Başlık/dil/sürüm/içerik-dosya/kapsam/zorunluluk açık. Default taslak, açık yayın olmadan kullanıcıya gösterilmez. |
+| Zorunluluk/yerel alan | Org belirler, merkez kapatamaz. İlk yerel düzenleme merkez adı/adres/iletişim gibi tanımlı alan ve ayrı ek; ortak metin doğrudan değiştirilmez. |
+| Yeni sürüm | Yayında yeniden onay gerekliliği açık seçilir, mevcut kayda etki gösterilir; geriye onay üretilmez. Pazarlama ayrı. |
+| Yeni org/merkez | Dış yayın default kapalı. Ad/açıklama/logo/adres/iletişim/çalışma saatleri ayrı seçilir. |
+| Kamusal takvim | Merkez görünürlüğünden ayrı açılır; açık yayımlanmış ders/event. Üye/yoklama/borç/kişisel iletişim listesi yok. Mevcut yayınlar değişmez. |
+
+##### FD09 — CRM başvuru (kabul edildi)
+
+| Alan | Kabul edilen seçenek/default |
+|---|---|
+| İlk aşamalar | Yeni → İletişime geçildi → Görüşme/deneme planlandı → Değerlendiriyor → Kazanıldı/Kaybedildi. Org ad/sıra/ara aşama düzenler; merkez ortak listeyi kullanır. |
+| Ortak alanlar | Ad, telefon, e-posta, ilgili disiplin/merkez, seviye, açıklama. Ad + en az bir iletişim zorunlu; form bazında telefon veya e-posta şartı seçilir. Mevcut telefon formlarına e-posta zorunluluğu eklenmez. |
+| Forma özel | İzinli ek alanlar; partnerli katılım/partner adı gibi değerler kaybolmaz. |
+| Kaynak | Form/sağlayıcı/kampanya/varsa UTM otomatik korunur, normal form düzenlemesinden değiştirilmez. |
+| Atama | İlk kapsam belirli kişi/ekip veya merkez kuralı; eşleşmeyen yetkili inceleme kuyruğunda. |
+| Takip | Hatırlatma default kapalı; açılırsa 1/3/7 gün seçilir. |
+| Kapanış/etiket | Kaybedildi için neden zorunlu: ulaşılamadı, zaman uygun değil, fiyat, başka tercih, diğer. Ortak etiket orgdan; yerel ek ancak izinli. Kazanıldı öğrenci/satış/ödeme yaratmaz. |
+
+Web/reklam ortak CRM entegrasyonu üretim P08'dir; yukarıdaki kabul mevcut public_application_submit DTO'sunun telefonla çalıştığı anlamına gelmez.
+
+##### FD10 — iş otomasyonu rapor import (kabul edildi)
+
+| Alan | Kabul edilen seçenek/default |
+|---|---|
+| İlk hazır işler | Bekleyen talep, kapanmamış yoklama ve CRM takip uyarısı; yalnız gerçek destekli kural. Bu ek otomasyonlar default kapalı, yetkili kapsam/sorumlu seçerek açar. FD04 kişisel hatırlatması değişmez. |
+| Zaman/eylem | Desteklenen olay sonrası süre veya günlük saat; serbest cron/kod yok. İlk eylem in_app uyarı; auto satış/tahsilat/yoklama/hak değişimi yok. |
+| Rapor | Gerçek destekli rapor filtre/sütun/sıra/gruplama şablona kaydedilir. İlk export CSV; PDF/XLSX zorunlu ilk kapsam değil. Zamanlı dış gönderim ilk kapsamda yok. |
+| Şablon | Default yalnız oluşturan; yetkili merkez/org kapsamında paylaşır. Ortak şablonu merkezde yetkili CM, orgda ilgili yönetici düzenler; diğer kullanıcı yetkili verilerle kendi kopyasını oluşturabilir. |
+| Import | UTF-8 CSV, virgül/noktalı virgül seçimi/örnek satır preview. Otomatik sütun önerisi kullanıcı onayından geçer. Eksik zorunlu alan satır hatası, otomatik borç/hak/izin defaultu yok. Kaynak sistem/kayıt anahtarı; benzer isim/telefon auto merge değil. |
+
+##### FD11 — yetki miras yayın reset (kabul edildi)
+
+| Alan | Kabul edilen seçenek/default |
+|---|---|
+| user/member | Kendi global tercihleri user; kendi org tercihleri member. Yönetim alanı mevcut person/center yetkisinden; org yöneticisi global hesaba yazamaz. |
+| center/organization/platform | CM kendi izinli merkez alanı, açık devredilebilir alan personel/eğitmen; Owner ve açık ilgili yetkili OM org alanı; ilgili platform görev yetkilisi platform alanı. Bu unvanlar yeni permission enumu veya otomatik merkez finans yetkisi değildir. |
+| Canlı miras | İzinli ortak görünüm, şablon ve politika değeri orgdan izlenebilir. Yeni merkez çalışma takvimi/program-paket hazırlık/timezone başlangıçları şablondan kopya; şablon değişimi eski merkezi taşımaz. Merkez ad/adres yerel kimlik alanıdır, canlı miras değildir. |
+| Yazma semantiği | Alanı göndermemek dokunma; yerel değer kaldırma açık organizasyondan al eylemi. null/reset/inherit wire karşılığı ayrıca typed sözleşmede belirlenecek. |
+| Yayın | Genel tercih kayıt anında uygulanır. Belge/politika ileri yürürlüğü mevcut destekli domain akışında kalır. |
+| Reset | Alan/grup seçimi ve somut sonuç preview; ilk teslimde bütün scope'ları tek düğmeyle reset yok. Eskiye dönüş yeni sürüm; kapatılmış izin açılmaz. |
+| Geçmiş/ek onay | Yetkiliye eski-yeni/aktör/zaman/gerekçe; sırlar gizli. İlk teslimde yeni genel ikinci-onay mekanizması yok; mevcut özel onaylar ve A/B aynı hesap ayrı yetki kararı korunur, desteklenmeyen finans eşiği açılamaz. |
+
+##### FD12 — talep bağlantı abonelik ekranı (kabul edildi)
+
+| Alan | Kabul edilen seçenek/default |
+|---|---|
+| Talep türleri/kapsam | Veri kopyası, kayıt düzeltme talebi, hesap silme ayrı. Platform hesabı/org kayıtları ayrı gösterilir, kullanıcı kapsamı görerek başlatır. |
+| Veri kopyası | İlk çıktı JSON; tablo raporu CSV FD10. Kullanıcıya özel dosya, hazır bildirimi ve erişim bitişi gösterilir. Teknik süre backend'de. |
+| Talep takibi | Alındı, işleniyor, ek bilgi bekleniyor, kısmen tamamlandı, tamamlandı, gerekçeli karşılanamadı ürün durumları. Bunlar yeni API enumu olarak sessiz eklenmez; typed eşleme gerekir. |
+| Hesap silme | Preview/reauth, sahiplik/korunacak kayıt/sonuç açıklaması. İptal yalnız sistemin geri döndürülebilir bildirdiği aşamada; sonrasında seçenek kapalı. İmha kanıtsız completed yok. |
+| Bağlantılar | Org bağlantı kaldırma, üyelik sonlandırma ve hesap silme ayrı eylem. Hazır entegrasyonlar seçilebilir; hazır olmayan hizmet etkinleştirilemez. |
+| Destek erişimi | İlk teslimde org adına oturum açma/kimliğe bürünme yok; mevcut açık yetkiler korunur. Önceki aday destek erişimi bu kapsama göre daraltılmıştır. |
+| Abonelik | Fatura iletişimi/yenileme tercihi; plan/dönem yalnız destekli teklif akışıyla. Mevcut plan/fiyat/dönem/kullanım/limit salt okunur, ücret/yürürlük etki onaydan önce gösterilir; yeni fiyatlama kuralı yok. |
+
+#### Karar kapanışı ile uygulama açığının ayrımı
+
+**Frontend karar turu kapandı.** Açık kalanlar yeniden ana grup onayı değil; kesin DTO/permission/selector/version/reset/proof eşlemesi, hazır katalog asset ve çevirileri, provider/cihaz desteği, runtime/migration, kabul testleri ve frontend E2E'dir. API/sağlayıcı hazır değilse alan destek durumunu doğru gösterir; sahte kayıt/doğrulama başarısı yoktur.
+
+Henüz seçilmemiş somut marka paket adları/font/renk assetleri frontend hazırlığıdır; serbest renk veya keyfî font/CSS yetkisi değildir. Onaylanmış yeni hesap/org defaultları mevcut kişilerin/kurumların açık değerlerini ezmez. Backend B01–B09 ertelemesi ve üretim P08 işleri korunur. Bu belge güncellemesinde **hiçbir runtime, default veya canlı veri değişmedi**.
+
+
+### Frontend PR43 — organizasyon renk ve font paketleri
+
+[PR43](https://github.com/SXQHex/FtkSaaS/pull/43), `3eaa0cff6173a81db97d779c8f2ba679f124a869` kaynağında frontend oturumunda kabul edilmiş hazır marka paketi ihtiyacını iletiyor. Yeni bir 70. ana grup değildir; organizasyon O01 kimlik/marka, S08 kişisel görünüm ve platform P01/P04 katalog/default sınırlarıyla eşlenir. Bu not PR43'ün merge edildiği veya API'sinin hazır olduğu anlamına gelmez; başka branch'in değişikliği bu teslimde üzerine yazılmaz.
+
+- Organizasyon hazır renk paleti ve başlık/gövde font paketini seçer; ilk kapsam serbest renk, özel font yükleme veya rastgele CSS/HTML değildir.
+- Marka ile kullanıcının açık/koyu/sistem ve erişilebilirlik tercihleri ayrıdır. Semantik hata/uyarı/başarı/odak ve renk dışı anlatım sistem denetiminde kalır; kontrast/dil glifleri/Türkçe/LTR-RTL kontrolü gerekir.
+- Frontend paket token/font eşlemesi ve render'ı; backend izinli katalog/kalıcı seçim/canlı org yetkisi/sürüm/denetim sözleşmesini sağlar. Mevcut organization_update yalnız name alanını yazar; hazır theme/font read-write veya logo desteği buradan türetilemez.
+- Alan matrisi; kararlı paket kimlik/sürüm/seçilebilirlik/default, org seçimi okuma-yazma-reset, logo sahipliği/tür/boyut/kaldırma, stale/idempotency ve ortak Request/Response/Error/permission eşlemesini içermelidir. theme_package_id/font_package_id öneri adlarıdır; gerçek DTO değildir.
+- Org değiştirme/yenileme/girişte doğru marka, tenant'a bağlı cache temizliği, eski istemci veya tanınmayan paket için güvenli fallback doğrulanır. WebSocket/anlık yayılım SLA'sı kabul edilmedi. Org reseti kişisel tercihi, kişisel reset org markasını değiştirmez.
+- FD02 ile Owner/açık yetkili OM yazması, yalnız yayımlanmış org bağlamında public marka okuması, ilk kapsamda merkez override olmaması ve hazır uyumlu kombinasyon seçimi kesinleşti. Somut paket/font/renk assetleri, lisans/dil kontrolleri, kesin permission eşlemesi ve ilk kapsam dışı plan kilidi/platformun org adına değişikliği ayrıca uygulanacak veya açık aday olarak kalır. Akış/Sahne/Atölye adları yalnız frontend tasarım önerisidir.
+- Uygulama kabulü yetkili/yetkisiz/geri alınmış erişim, A/B org geçişi, sürüm yarışı/retry, fallback/erişilebilirlik, bağımsız reset/logo kaldırma ve desteklenmeyen kayıtta sahte başarı üretmemeyi kapsar. Backend API ve gerçek frontend E2E ayrı kanıtlanır.
 
 ### Frontend için geliştirme sınırı
 
@@ -769,7 +1196,7 @@ Mevcut callable DTO'lar `08` ve üretilmiş TypeScript üzerinden kullanılır. 
 
 ### Ayrıntılı dört kapsam kataloğu
 
-Aşağıdaki katalog Word v0.1 içeriğinin Markdown aktarımıdır. S01–S10 ve kabul edilmiş tasarım kurallarıyla çelişen aday/X notları yalnız ilgili davranış bakımından yukarıdaki kararlara tabidir. Henüz seçilmemiş alan/sağlayıcı/sayılar aday kalır.
+Aşağıdaki katalog Word v0.1 içeriğinin Markdown aktarımıdır. 69 kabul grubu ve kabul edilmiş tasarım kurallarıyla çelişen aday/X notları yalnız ilgili davranış bakımından yukarıdaki kararlara tabidir. Henüz seçilmemiş alan/sağlayıcı/sayılar aday kalır.
 
 #### 4. Ortak kapsam ve yetki kuralları
 
@@ -798,7 +1225,7 @@ T — Yazma sırasında canlı yetki, plan, kapsam ve bağımlılıklar yeniden 
 
 #### 5. Kullanıcı ayar kataloğu — hesap ve deneyim
 
-S01–S10 ile kabul edilmiş alt alanlar K, diğer katalog seçenekleri A statüsündedir. Seçilmemiş varsayılanlar X kalır. Hesap güvenliği işlemleri kendi doğrulama akışında yürür.
+69 grupta açıkça kabul edilmiş alt alanlar K, seçilmemiş diğer Word katalog seçenekleri A statüsündedir. Word aile numaraları davranış sprinti numaraları değildir. Seçilmemiş varsayılanlar X kalır. Hesap güvenliği işlemleri kendi doğrulama akışında yürür.
 
 | ID | Ayar ailesi | Alanlar ve sözleşme sınırı |
 | --- | --- | --- |
@@ -846,7 +1273,7 @@ T — Kullanıcının kapatması gelecekteki isteğe bağlı toplama/gönderime 
 
 #### 7. Merkez ayar kataloğu — işletim
 
-A statüsü. Merkez komutları, ilgili merkez ve disiplinin canlı yetkisi ile çalışır. Organizasyon kataloğunun kullanıma açılması, organizasyon genelini değiştirme yetkisi vermez.
+Word kataloğunun ilk A statüsü tarihsel sınıflamadır; güncel kabul M01–M22 ve açık alan matrisiyle belirlenir. Merkez komutları, ilgili merkez ve disiplinin canlı yetkisi ile çalışır. Organizasyon kataloğunun kullanıma açılması, organizasyon genelini değiştirme yetkisi vermez.
 
 | ID | Ayar ailesi | Alanlar ve sözleşme sınırı |
 | --- | --- | --- |
@@ -892,7 +1319,7 @@ K — Negatif kredi para borcu değildir. İlgili merkez–disiplin açıkları 
 
 #### 9. Organizasyon ayar kataloğu — yapı ve politika
 
-A statüsü. Her satır için komut bazında yazma izni kesinleştirilir; “Owner her işlemi yapar” şeklinde toplu izin verilmez.
+Word kataloğunun ilk A statüsü tarihsel sınıflamadır; güncel kabul organizasyon O01–O21 ve açık alan matrisiyle belirlenir. Her satır için komut bazında yazma izni kesinleştirilir; “Owner her işlemi yapar” şeklinde toplu izin verilmez.
 
 | ID | Ayar ailesi | Alanlar ve sözleşme sınırı |
 | --- | --- | --- |

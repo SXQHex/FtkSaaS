@@ -31,7 +31,7 @@ Yetki: merkez yöneticisinin canlı merkez yetkisi; personelin aynı merkezde a�
 
 ## Veri geçişi ve sınırlar
 
-Uygulanmış 59 migration değiştirilmez. Yeni append-only migration oda fiziksel kapasitesini ve kategori snapshot alanlarını ekler. Eski `sessions.nominal` tek toplamın uyumluluk depolamasıdır; `maximum` eski şema/etkinlik bağımlılıklarını bozmamak için korunur, yeni yazımlarda toplamla eşitlenir ve kayıt kapısında farklı tavan olarak kullanılmaz. Bu adlar seans API'sinden kaldırılır. Tarihsel defter, fiyat, ödeme, hakediş ve önceki audit değiştirilmez.
+Main’deki uygulanmış 60 migration değiştirilmez. Kapasite SQL’i değişmeden, Supabase CLI ile üretilen `20261025143856_session_capacity.sql` adıyla 61. sıraya alınır; eski taslak `20261025030000_session_capacity.sql` uygulanmadığı için kaldırılmıştır. Yeni append-only migration oda fiziksel kapasitesini ve kategori snapshot alanlarını ekler. Eski `sessions.nominal` tek toplamın uyumluluk depolamasıdır; `maximum` eski şema/etkinlik bağımlılıklarını bozmamak için korunur, yeni yazımlarda toplamla eşitlenir ve kayıt kapısında farklı tavan olarak kullanılmaz. Bu adlar seans API'sinden kaldırılır. Tarihsel defter, fiyat, ödeme, hakediş ve önceki audit değiştirilmez.
 
 Eski disiplin bazlı oda değerleri fiziksel kapasite kanıtı değildir. Eski odalarda yeni alan `null` kalır; yetkili kişi gerçek kapasiteyi girene kadar odayı kullanan yeni seans/rezervasyon işlemi `POLICY_NOT_CONFIGURED` verir. Migration mevcut rezervasyonları silmez. Oda küçültme, açık seansların tanımlı kapasitesi veya mevcut kayıt/teklif doluluğu yeni fiziksel sınırı aşacaksa reddedilir; açık kayıtların sessiz iptali yoktur.
 

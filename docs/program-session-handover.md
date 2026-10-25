@@ -1,6 +1,6 @@
 > **23 Ekim kaynak sınırı:** Yayımlanmış toplam 200 API / 0 contract_only / 59 migration. Aşağıdaki eski sayılar ilgili modülün ilk teslim kaydıdır. Son kaynak ve kabul [güncel devirde](../contracts/00-FtkSaaS-yeni-sohbet-devir.md); gerçek açıklar [kalan işlerde](remaining-work.md) izlenir.
 
-25 Ekim kapasite revizyonu: [kabul edilmiş karar](decisions/DS-2026-10-25-session-capacity.md). Bu branch'te tek seans toplamı, kategori snapshotları, ayrı kontrollü aşım ve fiziksel oda tavanı uygulanır; aday/main kabulü bekler. Aşağıdaki ilk teslim kanıtları kendi kaynaklarına aittir; eski nominal/maksimum kapasite davranışı yeni kararın yerine geçmez.
+25 Ekim kapasite revizyonu: [kabul edilmiş karar](../contracts/02-FtkSaaS-teknik-sozlesme.md#oda-seans-kapasite-karari). PR45 adayında tek seans toplamı, kategori snapshotları, ayrı kontrollü aşım ve fiziksel oda tavanı uygulanır. Head149be4f4 bağımsız inceleme ve aday40164825351 geçti; merge/main/CD bekler. Bu PR44 belge kaynağı runtime içermez. Aşağıdaki ilk teslim kanıtları kendi kaynaklarına aittir; eski nominal/maksimum kapasite davranışı yeni kararın yerine geçmez.
 
 > Sonraki Starter uyarlaması: [Starter devri](starter-attendance-protection-handover.md). Aşağıdaki 79/105 ve tüm-plan anlaşma sınırı kendi önceki kaynak snapshot’ıdır.
 
@@ -55,4 +55,4 @@ Odaklı geliştirme testleri `tests/program-session-lifecycle.test.mjs` ve etkil
 İlk program PR’sinin dışında kalan ders yoklaması/anlaşma yayını ve P01 bekleme/teklif/uygun hak seçimi sonraki teslimlerde uygulanmıştır. Seans iptali ve yerine seans komutları P02 ile uygulanıp kabul edildi; ilk program PR’sinin kapsamına geriye dönük eklenmez. Yeni program planlanan seans yaratır; gerçekleşme/hakediş yaratmaz. Birden fazla uygunluk kuralını birleştirerek gece/gün aşan uygunluk hâlen ayrı sınırdır. Sonraki P07 CD/hosted kabulü güncel devirde kapandı; bu ilk PR raporu onun kanıtı değildir. Frontend gerçek entegrasyonu ve yük/restore açık kalır. Frontend, production ve Resend değişikliği yoktur.
 
 
-Kapasite-only `session_change_preview_v1`/apply patch de `_capacity_touch` ile fiziksel oda/kategori geçiş doğrulamasına girer; `_touch` değiştirilmediğinden kaynak/görevleri yeniden yazmaz. İlk kaynak P1 bulgusu ve regresyon kanıtı [inceleme raporundadır](../reports/session-capacity-independent-review.md).
+Kapasite-only `session_change_preview_v1`/apply patch de `_capacity_touch` ile fiziksel oda/kategori geçiş doğrulamasına girer; `_touch` değiştirilmediğinden kaynak/görevleri yeniden yazmaz. İlk kaynak P1 bulgusu ve regresyon kanıtı [inceleme raporundadır](https://github.com/SXQHex/FtkSaaS/blob/149be4f4d925674c97f04d40bb0c9a8416f2c66c/reports/session-capacity-independent-review.md).

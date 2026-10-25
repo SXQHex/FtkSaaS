@@ -1,10 +1,38 @@
 # FtkSaaS güncel devir
 
-Kapasite dilimi: ilk dar doğrulama [tarihsel raporda](../reports/session-capacity-validation.json). PR45 ilk head `7e04b46617c4732932823d69d2d6bf302f2da3ba` için [40159833415](https://github.com/SXQHex/FtkSaaS/actions/runs/40159833415) full clean başarılıydı; bağımsız incelemeden önce başlatıldı ve kabul sırasına uymadı. Sonraki bağımsız inceleme iki bloklayıcı kusur buldu: kapasite-only seans patch doğrulaması ve worker yeniden keşfi. Düzeltme/yeniden inceleme/dar test kanıtı [bağımsız inceleme raporunda](../reports/session-capacity-independent-review.md). İlk başarı yeni kaynağa taşınmaz; son kaynak aday/main CI, merge ve hosted kabulü bekler. P08 done değildir.
+## 25 Ekim — PR45 kapasite ve main ayarları uzlaştırması
 
-## 25 Ekim kapasite branch'i — geliştirme, main kabulü bekliyor
+Başlangıç main `3456050a3061d7bf5dc2ce8898b82c5cfe84e773`: **206 callable API / 60 migration**; PR46 ayarları birleşti, aynı main clean [40200716603](https://github.com/SXQHex/FtkSaaS/actions/runs/40200716603) ve development CD [40202862244](https://github.com/SXQHex/FtkSaaS/actions/runs/40202862244) başarılı. Bu PR45 birleşim adayı kapasite işlemini ekler: **207 callable API / 61 migration**. Altı ayar işlemi ve kapasite davranışı birlikte korunur. Henüz uygulanmamış kapasite migration’ı main’deki ayar migration’ından sonra sıralandı; SQL içeriği ve mevcut 60 migration değişmedi. Önceki PR45 clean yalnız eski tabana aittir; bu birleşik kaynak için bağımsız inceleme ve yeni aday/main clean gerekir. Kapasite henüz main/hosted kabulü değildir.
 
-Kabul edilmiş [kapasite revizyonu](../docs/decisions/DS-2026-10-25-session-capacity.md) P08'in dar dilimi olarak uygulanıyor. Başlangıç main `702063807b0a0d09f559f070ffde1b1ae3e7563b`; kaynak/belge CI başarılı, clean skipped. 201 API/60 migration branch taslağıdır; 200/59 yayımlanmış main'den ayrı tutulur. Yerel yapısal kontroller ve izole runtime doğrulama kanıtları teslimde ayrı verilir; aday/main ve hosted kabul yapılmadı. Yeni settings geliştirme durdurması diğer alanlarda sürer.
+[Alanlar, API'ler ve kesin destek sınırı](../docs/frontend-settings-handover.md). Teknik SQL/worker yönetimi erteli; beş ekranın bütün 69 davranış grubu tamamlandı denmez. Hazır renk/font/logo, native provider/MFA/oturum ve diğer özel yaşam döngüsü açıkları bu genel tercihlere dönüştürülmez.
+
+
+## 25 Ekim kaynaklar arası uzlaştırma
+
+| Kaynak | Durum |
+|---|---|
+| Main `3456050a3061d7bf5dc2ce8898b82c5cfe84e773` |206 callable API/60 migration/90 core tablo. PR46 aday40183389440 ve main40200716603 clean success; development CD40202862244 success. |
+| PR44 |69 ana grup +12 FD belge kaynağı PR46 içinde main’e taşındı; ayrı runtime teslimi değildir. |
+| PR43 |Hazır org renk/font ihtiyacı; FD02 ile seçilen yetki/public okuma/merkez override sınırları günceldir. Eski açık seçenek notları yeni kararları geri açmaz; branch merge edilmedi. |
+| PR45 |Main3456050a ile uzlaştırılan207 API/61 migration kapasite adayı; yeni son kaynak inceleme/aday/main clean bekler. Eski head149be4f4 review5641685684/full clean40164825351 yalnız eski tabana ait kanıttır. |
+
+Güncel kararlar: FD01–FD12 kapalı; standart negatif limit 0/mevcut kulüp −2. E-posta+parola ve Google kayıt/giriş kabul; Apple/Instagram login/bağlama kapsam dışı, passkey erteli. Instagram reklam lead alımı ayrı üretim P08 işi olarak kalır. Seans tek toplam/kategori ve oda fiziksel sınırı; kontrollü tek kayıt aşımı ayrı. [Tek karar](02-FtkSaaS-teknik-sozlesme.md#oda-seans-kapasite-karari), [frontend devri](../docs/claude-handover.md). Ürün kararı, mevcut main API ve başarılı PR adayı aynı teslim durumu değildir.
+
+## 25 Ekim — frontend karar sprinti tamamlandı
+
+69 ana grubun backend/frontend alan ayrımı ve beş scope sınıflaması tamamlandı; **FD01–FD12 kullanıcı tarafından kabul edildi**. [Kesin alan/default/kapsam kararları](02-FtkSaaS-teknik-sozlesme.md#ayarlar-backend-frontend-siniflama) tek kaynaktır. Standart yeni org negatif kredi limiti 0; mevcut kulüp −2 ve diğer gerçek ayarlar korunur. Yeni ana/FD karar turu açılmaz. Sıradaki iş mevcut 200 işlemle alan/DTO/permission/sürüm/API açığını eşlemek, gerekli runtime ve kabulünü ayrı teslim etmektir. Bu belge kapanışında hiçbir default/API/sağlayıcı/canlı veri uygulanmadı; PR43/44 merge/deploy sayılmaz. Backend işletim ayarları ertelenmiş kalır.
+
+## Son öncelik — frontend beş ekran teslimi
+
+Kullanıcı–üye–merkez–org–platform ayar ekranlarının alanları, gerçek API ve ortak tipleri frontend’e teslim edilecek. Kullanıcı global hesap; üye org person/relationship ve org tercihi. [Alan/API matrisi](../docs/claude-handover.md) mevcut 200 işlemdeki gerçek desteği, eksik marka/tercih/katalog yollarını ve kabul şartını ayırır. SQL/Cron/DB/worker teknik işletim yönetimi ertelendi. Bu yeni öncelik önceki salt belge kapanışı sınırından sonra verilmiştir; belgede API adının yazılması uygulama kabulü değildir. PR43 veya PR44 henüz merge/deploy edildi sayılmaz.
+
+## 24 Ekim 2026 — ayar davranış sprinti kapanışı
+
+69 ana grup kullanıcı tarafından kabul edildi: S01–S17 kullanıcı, M01–M22 merkez, O01–O21 organizasyon ve P01–P09 platform. [Tek settings sözleşmesi](02-FtkSaaS-teknik-sozlesme.md#ayarlar-sozlesmesi-ve-davranis-sprinti) grup bazlı kararı ve açık alan/değer/yetki/API matrisini taşır. Yeni ana grup eklenmez; henüz seçilmemiş default/limit/sağlayıcı veya permission uydurulmaz. Eski Word O/P aileleri ve üretim P01–P08 numaraları ayrı kapsamdır. Yerel 208/60 taslak kullanılmaz; kod/şema/API geliştirmesi bu kapanışla başlamaz.
+
+Belge tabanı `702063807b0a0d09f559f070ffde1b1ae3e7563b` (PR42), tree `272a4d968a90d450d98078040025d48b6db6417d`. [Aday belge39889500257](https://github.com/SXQHex/FtkSaaS/actions/runs/39889500257), kaynak bağlı merge kapısı ve [aynı main39890889184](https://github.com/SXQHex/FtkSaaS/actions/runs/39890889184) success. Main documentation success, runtime clean skipped: bu yeni full clean değildir. [CD39890983257](https://github.com/SXQHex/FtkSaaS/actions/runs/39890983257) source success/deploy skipped. Runtime 200/59 ve aşağıdaki P07 kabulü değişmedi. Aynı main'in sonraki cancelled targeted koşusu bu kaynak bağlı belge kabulünü başarısız yapmaz ve ek kabul kanıtı sayılmaz.
+
+Açık PR43 `3eaa0cff6173a81db97d779c8f2ba679f124a869` organizasyon renk/font paketleri frontend ihtiyaç notu okundu; katalog/kalıcı seçim/logo/izin/sürüm-cache-fallback/ortak tip beklentileri teknik sözleşmede O01/S08/P01/P04 alan eşlemesine kaydedildi. PR43 merge edilmedi ve mevcut API kabulüne dahil sayılmaz; ayrı branch üzerine yazılmadı.
 
 ## 23 Ekim 2026 güncel kaynak ve kabul
 
@@ -16,7 +44,7 @@ Kabul edilmiş [kapasite revizyonu](../docs/decisions/DS-2026-10-25-session-capa
 
 ## Frontend başlangıcı
 
-[Ayarlar sözleşmesi](02-FtkSaaS-teknik-sozlesme.md#ayarlar-sozlesmesi-ve-davranis-sprinti) S01–S10 ürün davranışlarını taşır. [Entegrasyon devri](../docs/claude-handover.md) callable alanları ve açık bağımlılıkları ayırır. Kullanıcı tüm ayar davranışları netleşmeden runtime geliştirmesini durdurdu; yalnız belgeler güncelleniyor. 208 API/60. migration içeren yerel ayar taslağı kaynak kabulü değildir ve yayımlanmamıştır.
+[Ayarlar sözleşmesi](02-FtkSaaS-teknik-sozlesme.md#ayarlar-sozlesmesi-ve-davranis-sprinti) 69 ana ayar grubunun ürün davranışlarını taşır. [Entegrasyon devri](../docs/claude-handover.md) callable alanları ve açık bağımlılıkları ayırır. Ana gruplar kapandı; kullanıcı odağı ayarlar ve alan ayrıntılarıdır. Bu teslim yalnız belgeleri günceller; yeni runtime geliştirmesi başlamaz. 208 API/60. migration içeren yerel ayar taslağı kaynak kabulü değildir ve yayımlanmamıştır.
 
 ## Önceki devir snapshotları
 
@@ -208,7 +236,7 @@ Frontend ekran/görsel/kullanıcı akışı/kod Claude; ChatGPT frontend’e mü
 - Hesap orglar arası ortak, kişi orga ait; e-posta identity değildir. Hesapsız kişi/görev/öğrenci kaydı işletilir. Mevcut kişiye hesap erişimi gönderilir, yeni org daveti ayrı özellik diye icat edilmez. İlk bağ student-self; privileged login grant ancak sonra. Offline görev otomatik login grant olmaz.
 - Owner yalnız FtkSaaS atar/kaldırır. Owner CM değilse invite/tahsilat/rezervasyon yapamaz; merkez kurar/self-CM atar, sonra operasyon. Diğer CM atayıp öz CM rolünü owner yetkisiyle kaldırır. Müşteri owner devredemez. Org-manager eski self-center atama hakkı ve owner’ın org-manager yönetimi korunur.
 - İlk ödeme doğrulaması dönem+operasyon başı; ödeme öncesi kuruluş/ödeme/center+self-CM, trial/ilk-payment grace yok. Yenileme gecikmesi ilk7gün matris, sonra bütün hizmet kapalı/owner subscription. Downgrade dönem sonu/veri korunur; Business merkez seçimi zorunlu.
-- Reservation atomik yer+hak. Nominal esnek/offer, maksimum priority; ortak toplam. Allocation consume değil; taslak attendance consume etmez; close atomik hak+earning+outbox. Assistant-participant iki yönlü conflict.
+- Bu tarihsel kaynakta reservation atomik yer+hak ve nominal esnek/offer–maximum priority idi. 25 Ekim kabulü bu farklı tavanı kaldırır; güncel ürün tek toplam/kategori ve fiziksel oda sınırıdır, PR45 uygulama adayı ayrıdır. Allocation consume değil; taslak attendance consume etmez; close atomik hak+earning+outbox. Assistant-participant iki yönlü conflict.
 - Negative izinli limit reserved+consumed ortak, kişisel override default yerine/mandatory upper. Başlangıç limit aşımı blocked, bu katılımdan yüzde/kişi earning yok; geç ödeme geçmişi değiştirmez. Gerçekleşen seans sabiti korunur; gerçekleşmeyen özel seans0. Kaynak satışsız izinli negative için merkez değeri reservation snapshot; yeni sale eski earning’i değiştirmez veya ek nakit borcu doğurmaz.
 - Satış start/end tarihleri açık girilir, center00:00 snapshot→UTC, start dahil/end hariç. End son kullanım günü değildir; takvim aylık ürün/satış bitişi otomatik ay kaydırma yok. Quota week/month başlangıç çıpalı, son kısa dönem tam, carryyok.
 - Business ortak hakta satış/para satış merkezinde, hizmet/earning hizmet merkezinde; rapor transfer/merkezler arası borç yaratmaz. Fiilî instructor ve açık agreement, timed için otomatik person-fee yok. Trial bedelsiz kişi/yüzdeye girmez. Event aktif öğrenci/limit istisnası değil, harici venue olabilir.

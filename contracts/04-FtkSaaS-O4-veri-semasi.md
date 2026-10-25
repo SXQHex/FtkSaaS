@@ -1,6 +1,6 @@
 # FtkSaaS — fiziksel şema · 0.2.0-rc.3
 
-90 domain tablosu; 60 sıralı migration. Güncel kaynak/kabul ve kapsam: `contracts/00-FtkSaaS-yeni-sohbet-devir.md`, `docs/claude-handover.md`. `reports/qe02-verification.json` yalnız tarihsel Q-E02 snapshot’ının kanıtıdır. Aşağıdaki alan listesi makine sözleşmesi 08’den üretilir. Kesin PostgreSQL DDL kaynağı `supabase/migrations`; uygulanan migration değiştirilmez.
+90 domain tablosu; 61 sıralı migration. Güncel kaynak/kabul ve kapsam: `contracts/00-FtkSaaS-yeni-sohbet-devir.md`, `docs/claude-handover.md`. `reports/qe02-verification.json` yalnız tarihsel Q-E02 snapshot’ının kanıtıdır. Aşağıdaki alan listesi makine sözleşmesi 08’den üretilir. Kesin PostgreSQL DDL kaynağı `supabase/migrations`; uygulanan migration değiştirilmez.
 
 UUID/FK alanları `uuid`, parasal stringler DB’de `bigint`, Instant `timestamptz`, tarih `date`, kapalı nesneler `jsonb`. Yeni domain kimlikleri Edge içinde doğrulanmış `uuid@14.0.3` v7 üreticisinden gelir. PostgreSQL 17 DB default üreticisi zorunlu değildir; üretici bulunmadığında default kapalıdır ve v4 fallback yoktur. Auth sağlayıcı UUID’leri korunur.
 
@@ -101,7 +101,7 @@ UUID/FK alanları `uuid`, parasal stringler DB’de `bigint`, Instant `timestamp
 
 ## DS-2026-10-17 hedef depolama bağımlılıkları
 
-Hesaplaşma tesliminin tarihsel snapshot’ı 90 core tablo/29 migration’dır; güncel migration sayısı bu belgenin başında kaynak dosyalarından hesaplanır. Starter teslimi iki private teknik tablo ve snapshot alanları ekler. Immutable agreement predecessor, açık fiilî başlangıç/anlaşma snapshot’ı ve ürün kimliği override; Starter causal obligations/approval ve satış blocked snapshot’ları uygulanmıştır; diğer hak değişikliği tüketicileri açıktır. settlement accrual/reversal, immutable request versions/lines, B-confirmed payment/offset/correction records and selected allocations; organization authority aggregate, scoped grants ve sabit kredi dilimleri 29. migration ile private şemada uygulanmıştır. DTO varlığı tek başına kabul kanıtı değildir. Ayrıntı: docs/decision-sprint-handover.md.
+Bu bölüm ilk DS aktarımının hedef/kanıt ayrımını kaydeder; 90 core tablo/29 migration o hesaplaşma tesliminin tarihsel snapshotıdır. Güncel migration sayısı belge başında kaynak dosyalarından hesaplanır. Açık fiili başlangıç, immutable anlaşma/hakediş, Starter koruma ve hesaplaşma defteri uygulanmıştır; sonraki P02 hak değişikliği ve P05 belge tüketicileri de tamamlanmıştır. İlk metadata notları güncel açık iş listesi değildir. Kesin DDL supabase/migrations, callable durum docs/endpoint-inventory.json; son kaynak/CI ve ayrı PR adayları contracts/00-FtkSaaS-yeni-sohbet-devir.md içindedir. Kabul edilmiş yeni kapasite ve ayar kararları güncel teknik sözleşmededir; bu mevcut-main şema kataloğu henüz merge edilmemiş PR DTOlarını uygulanmış saymaz.
 
 Teknik private tablolar: `platform_operators`, `preview_payloads`, `invitation_deliveries`, `runtime_operations`, `person_origins`, `reservation_protections`, `lesson_deficit_movements`. Bunlar müşteriye yeni ürün varlığı veya rol vermez.
 
