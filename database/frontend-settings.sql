@@ -44,8 +44,21 @@ create trigger frontend_settings_notification_version after insert or update or 
 create function private.frontend_settings_key(r jsonb,account uuid,person uuid) returns text language sql immutable security invoker set search_path='' as $$
  select case r->>'scope' when 'user' then 'user:'||account when 'member' then 'member:'||(r->>'org_id')||':'||account when 'center' then 'center:'||(r->>'org_id')||':'||(r->>'center_id') when 'organization' then 'organization:'||(r->>'org_id') when 'platform' then 'platform' end
 $$;
+-- Field authority is live even when the command result is replayed.
+create function private.frontend_settings_field_access(scope text,keys jsonb,org uuid,person uuid) returns void language plpgsql security invoker set search_path='' as $$
+declare key text;field jsonb;
+begin
+ for key in select jsonb_array_elements_text(keys) loop
+  select f into field from jsonb_array_elements(private.frontend_settings_fields()) f where f->>'scope'=$1 and f->>'key'=key;
+  if not found then perform private.fail('VALIDATION_FAILED');end if;
+  if scope='organization' and key like 'billing_%' and not exists(select 1 from core.organizations where id=org and owner_person_id=person) then perform private.fail('FORBIDDEN');end if;
+  if field#>>'{schema,type}'='null' then perform private.fail('SERVICE_UNAVAILABLE');end if;
+ end loop;
+end$$;
+revoke all on function private.frontend_settings_field_access(text,jsonb,uuid,uuid) from public,anon,authenticated;
+grant execute on function private.frontend_settings_field_access(text,jsonb,uuid,uuid) to service_role;
 create function private.frontend_settings_access(r jsonb,account uuid,person uuid,platform boolean) returns void language plpgsql security invoker set search_path='' as $$
-declare scope text:=r->>'scope';org uuid:=(r->>'org_id')::uuid;center uuid:=(r->>'center_id')::uuid;
+declare scope text:=r->>'scope';org uuid:=(r->>'org_id')::uuid;center uuid:=(r->>'center_id')::uuid;keys jsonb;
 begin
  if scope not in ('user','member','center','organization','platform') or scope is null then perform private.fail('VALIDATION_FAILED');end if;
  if scope in ('user','platform') then
@@ -59,6 +72,15 @@ begin
  end if;
  -- Same lock serializes absent-row creation, writes, reset preview and receipt replay.
  perform pg_advisory_xact_lock(hashtextextended('frontend.settings.'||private.frontend_settings_key(r,account,person),0));
+ if r?'patch' then select coalesce(jsonb_agg(k),'[]') into keys from jsonb_object_keys(r->'patch') k;
+ elsif r?'fields' then keys:=r->'fields';
+ elsif r?'preview' then
+  -- Applied/expired previews are deliberately still usable for receipt replay.
+  -- Validate only actor/scope/token binding and current field authority here.
+  select p.fields into keys from private.frontend_settings_previews p where p.id=(r#>>'{preview,id}')::uuid and p.actor_account_id=account and p.scope_key=private.frontend_settings_key(r,account,person) and p.token_hash=encode(extensions.digest(r#>>'{preview,token}','sha256'),'hex');
+  if not found then perform private.fail('PREVIEW_STALE');end if;
+ end if;
+ if keys is not null then perform private.frontend_settings_field_access(scope,keys,org,person);end if;
 end$$;
 create function private.frontend_settings_defaults(scope text) returns jsonb language sql immutable security invoker set search_path='' as $$
  select coalesce(jsonb_object_agg(f->>'key',f->'default'),'{}') from jsonb_array_elements(private.frontend_settings_fields()) f where f->>'scope'=$1
@@ -105,11 +127,10 @@ create function private.frontend_settings_patch(r jsonb,patch jsonb,person uuid)
 declare item record;field jsonb;scope text:=r->>'scope';org uuid:=(r->>'org_id')::uuid;selected_id text;
 begin
  if jsonb_typeof(patch)<>'object' or patch='{}' then perform private.fail('VALIDATION_FAILED');end if;
+ perform private.frontend_settings_field_access(scope,(select jsonb_agg(k) from jsonb_object_keys(patch) k),org,person);
  for item in select * from jsonb_each(patch) loop
   select f into field from jsonb_array_elements(private.frontend_settings_fields()) f where f->>'scope'=scope and f->>'key'=item.key;
   if not found or not private.frontend_setting_valid(item.value,field->'schema') then perform private.fail('VALIDATION_FAILED');end if;
-  if field#>>'{schema,type}'='null' then perform private.fail('SERVICE_UNAVAILABLE');end if;
-  if scope='organization' and item.key like 'billing_%' and not exists(select 1 from core.organizations where id=org and owner_person_id=person) then perform private.fail('FORBIDDEN');end if;
   if scope='user' and item.key='timezone_name' and item.value<>'null' and not exists(select 1 from pg_timezone_names where name=item.value#>>'{}') then perform private.fail('VALIDATION_FAILED');end if;
   if scope='member' and item.key in ('interest_center_ids','interest_discipline_ids') then
    for selected_id in select jsonb_array_elements_text(item.value) loop

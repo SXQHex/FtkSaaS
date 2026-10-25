@@ -54,6 +54,26 @@ test('Frontend settings scoped persistence, live authority, reset and delivery p
   await must(owner,'center_manager_assign_v1',{org_id:org,center_id:center,person_id:person},key());
   const payment=(await must(owner,'saas_payment_submit_v1',{org_id:org,center_id:center,amount_minor:'1000',currency:'TRY',reference:'synthetic',occurred_at:new Date().toISOString()},key())).primary_id;
   await must(platform,'saas_payment_verify_v1',{org_id:org,center_id:center,payment_id:payment,accepted:true},key());
+  await t.test('Owner-only field authority is rechecked before update and reset receipt replay',async()=>{
+   const successor=await authUser('settings-successor'),successorAccount=await must(successor,'account_get_v1');
+   await must(owner,'org_manager_assign_v1',{org_id:org,person_id:person},key());
+   const q={scope:'organization',org_id:org},v=await read(owner,q),updateKey=key();
+   const updateBody={...q,expected_version:v.version,patch:{billing_name:'Original billing'}};
+   await must(owner,'settings_update_v1',updateBody,updateKey);
+   const p=await must(owner,'settings_reset_preview_v1',{...q,fields:['billing_name']}),resetKey=key();
+   const resetBody={...q,expected_version:p.version,preview:{id:p.id,token:p.token}};
+   await must(owner,'settings_reset_apply_v1',resetBody,resetKey);
+   // A legitimate reset retry still works after preview expiry/application.
+   await db.query("update private.frontend_settings_previews set expires_at=now()-interval '1 minute' where id=$1",[p.id]);
+   assert.equal((await must(owner,'settings_reset_apply_v1',resetBody,resetKey)).replayed,true);
+   await must(platform,'platform_owner_set_v1',{org_id:org,verified_account_id:successorAccount.id,reason:'Synthetic ownership transfer'},key());
+   try{
+    await fail('FORBIDDEN',owner,'settings_update_v1',updateBody,updateKey);
+    await fail('FORBIDDEN',owner,'settings_reset_apply_v1',resetBody,resetKey);
+    await fail('FORBIDDEN',owner,'settings_reset_preview_v1',{...q,fields:['billing_name']});
+    const current=await read(owner,q);await write(owner,q,{description:'Still an organization manager'},current.version);
+   }finally{await must(platform,'platform_owner_set_v1',{org_id:org,verified_account_id:account.id,reason:'Restore synthetic owner'},key());}
+  });
   await t.test('member, center, organization and platform scopes are separate; role revocation also denies replay',async()=>{
    for(const [scope,patch] of [['member',{profile_visible:true}],['organization',{description:'Organization description'}],['center',{description:'Center description'}]]){
     const q={scope,org_id:org,...scope==='center'?{center_id:center}:{}};const v=await read(owner,q);if(scope==='member')assert.equal(v.values.in_app_reminders,true);await write(owner,q,patch,v.version);assert.equal((await read(owner,q)).values[Object.keys(patch)[0]],Object.values(patch)[0]);
