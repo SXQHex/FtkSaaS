@@ -54,3 +54,5 @@ Odaklı geliştirme testleri `tests/program-session-lifecycle.test.mjs` ve etkil
 
 İlk program PR’sinin dışında kalan ders yoklaması/anlaşma yayını ve P01 bekleme/teklif/uygun hak seçimi sonraki teslimlerde uygulanmıştır. Seans iptali ve yerine seans komutları P02 ile uygulanıp kabul edildi; ilk program PR’sinin kapsamına geriye dönük eklenmez. Yeni program planlanan seans yaratır; gerçekleşme/hakediş yaratmaz. Birden fazla uygunluk kuralını birleştirerek gece/gün aşan uygunluk hâlen ayrı sınırdır. Sonraki P07 CD/hosted kabulü güncel devirde kapandı; bu ilk PR raporu onun kanıtı değildir. Frontend gerçek entegrasyonu ve yük/restore açık kalır. Frontend, production ve Resend değişikliği yoktur.
 
+
+Kapasite-only `session_change_preview_v1`/apply patch de `_capacity_touch` ile fiziksel oda/kategori geçiş doğrulamasına girer; `_touch` değiştirilmediğinden kaynak/görevleri yeniden yazmaz. İlk kaynak P1 bulgusu ve regresyon kanıtı [inceleme raporundadır](../reports/session-capacity-independent-review.md).

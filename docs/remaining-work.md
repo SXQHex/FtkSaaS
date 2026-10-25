@@ -1,6 +1,6 @@
 # Kalan backend ve entegrasyon işleri
 
-Kapasite dilimi kaynak kanıtı: [doğrulama raporu](../reports/session-capacity-validation.json). Runtime kaynak `b799a3a6fd8a16eb2f4b222094838ab7279acef8`, eşleşen tree `0c47eb285496d948717a4ed531da4d5f53528b39`; 103+43 yapısal test ve son kaynakta 7/7 gerçek Auth→Edge→RPC geçti. Ara uygunluk/P01 worker grupları geçti; beş gruplu uzun koşu tamamlanmadı, tam kabul sayılmaz. İzole ortam durduruldu. Bağımsız inceleme, GitHub hedefli/aday/main kabulü ve merge henüz yok; P08 done değildir.
+Kapasite dilimi: ilk dar doğrulama [tarihsel raporda](../reports/session-capacity-validation.json). PR45 ilk head `7e04b46617c4732932823d69d2d6bf302f2da3ba` için [40159833415](https://github.com/SXQHex/FtkSaaS/actions/runs/40159833415) full clean başarılıydı; bağımsız incelemeden önce başlatıldı ve kabul sırasına uymadı. Sonraki bağımsız inceleme iki bloklayıcı kusur buldu: kapasite-only seans patch doğrulaması ve worker yeniden keşfi. Düzeltme/yeniden inceleme/dar test kanıtı [bağımsız inceleme raporunda](../reports/session-capacity-independent-review.md). İlk başarı yeni kaynağa taşınmaz; son kaynak aday/main CI, merge ve hosted kabulü bekler. P08 done değildir.
 
 ## 25 Ekim — P08 kapasite dilimi geliştirmesi
 

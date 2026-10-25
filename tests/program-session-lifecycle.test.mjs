@@ -448,6 +448,20 @@ test('Session capacity revision: total, categories, explicit override and physic
   await fail('session_capacity_set_v1',{session_id:sid,expected_version:1,capacity:{total:2,categories:{male:-1,female:1}},reason:'Invalid category'},'VALIDATION_FAILED');
   await fail('session_create_v1',{...input,capacity:{nominal:2,maximum:3}},'VALIDATION_FAILED');
  });
+ await t.test('capacity-only preview/apply checks physical limits and category activation without rewriting resources',async()=>{
+  const start=new Date(+at+86400000),plain=(await mut('session_create_v1',{...input,interval:{starts_at:start.toISOString(),ends_at:new Date(+start+3600000).toISOString()},capacity:{total:2}})).primary_id;
+  const preview=capacity=>must(owner,'session_change_preview_v1',scope({session_id:plain,scope:'single',patch:{capacity},reason:'Capacity-only review regression'}));
+  const apply=p=>mut('session_change_apply_v1',{preview:{id:p.id,token:p.token}});
+  const before=await rows('select id,version,state from core.resource_bookings where session_id=$1 order by id',[plain]);
+  const excessive=await preview({total:4});assert.equal(excessive.blockers[0].code,'CAPACITY_FULL');
+  await fail('session_change_apply_v1',{preview:{id:excessive.id,token:excessive.token}},'CAPACITY_FULL');
+  await mut('reservation_create_v1',{session_id:plain,person_id:people[0].p,mode:'flexible'});
+  const segmented=await preview({total:2,categories:{male:1,female:1}});assert.equal(segmented.blockers[0].code,'VALIDATION_FAILED');
+  await fail('session_change_apply_v1',{preview:{id:segmented.id,token:segmented.token}},'VALIDATION_FAILED');
+  const valid=await preview({total:3});assert.deepEqual(valid.blockers,[]);await apply(valid);
+  assert.equal((await must(owner,'session_get_v1',scope({session_id:plain}))).capacity.total,3);
+  assert.deepEqual(await rows('select id,version,state from core.resource_bookings where session_id=$1 order by id',[plain]),before);
+ });
  await t.test('category limit blocks normal booking; override is explicit and audited once',async()=>{
   await mut('reservation_create_v1',body(0),key(),people[0].u);
   await fail('reservation_create_v1',body(1),'CAPACITY_FULL');

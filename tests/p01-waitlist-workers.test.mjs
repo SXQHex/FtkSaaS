@@ -145,6 +145,27 @@ test('P01-C waitlist -> scoped worker -> held offer -> guarded reservation and c
    assert(offered,'Loop must discover work added after it started');assert.equal(await holds(b),1);
   }finally{child.kill('SIGTERM');await done;}
  });
+ await t.test('room configuration wakes a completed no-offer discovery without changing session or queue',async()=>{
+  const sid=await session(),room=key();
+  await db.query("insert into core.rooms(id,org_id,center_id,name,state) values($1,$2,$3,'Legacy room','active')",[room,org,center]);
+  await db.query("insert into core.resource_bookings(id,org_id,center_id,session_id,resource_kind,resource_id,starts_at,ends_at,state) select $1,org_id,center_id,id,'room',$2,starts_at,ends_at,'active' from core.sessions where id=$3",[key(),room,sid]);
+  await join(sid);await drain();assert.equal(await holds(sid),0);assert.equal((await view(sid))[0].state,'waiting');
+  assert.equal((await rows("select count(*)::int n from private.p01_jobs p join core.outbox_jobs j on j.id=p.job_id where p.target_id=$1 and p.operation='seat_offer_issue_v1' and j.state='succeeded'",[sid]))[0].n,1);
+  const version=(await rows('select version from core.sessions where id=$1',[sid]))[0].version;
+  await mut('room_save_v1',{room_id:room,expected_version:1,name:'Legacy room configured',capacity:1});
+  assert.equal((await rows('select version from core.sessions where id=$1',[sid]))[0].version,version);
+  await drain();assert.equal(await holds(sid),1);assert.equal((await view(sid))[0].state,'offered');
+ });
+ await t.test('category vacancy wakes discovery when total reservation occupancy is unchanged',async()=>{
+  const sid=await session({full:true});await db.query("update core.sessions set nominal=3,maximum=3,category_capacities=$2 where id=$1",[sid,{male:1,female:2}]);
+  const reservation=(await rows("update core.reservations set booking_category='male' where session_id=$1 returning id,version",[sid]))[0];
+  await mut('waitlist_join_v1',{session_id:sid,person_id:second.p,booking_category:'male'},second.u);
+  await drain();assert.equal(await holds(sid),0);assert.equal((await view(sid,second))[0].state,'waiting');
+  await mut('reservation_cancel_v1',{reservation_id:reservation.id,expected_version:Number(reservation.version),reason:'Category vacancy regression'});
+  await mut('reservation_create_v1',{session_id:sid,person_id:first.p,mode:'flexible',booking_category:'female'});
+  assert.equal((await rows("select count(*)::int n from core.reservations where session_id=$1 and state='active'",[sid]))[0].n,1);
+  await drain();assert.equal(await holds(sid),1);assert.equal((await view(sid,second))[0].offers[0].booking_category,'male');
+ });
  await t.test('category FIFO holds separate limits and offer acceptance preserves its category',async()=>{
   const sid=await session();await db.query("update core.sessions set nominal=2,maximum=2,category_capacities=$2 where id=$1",[sid,{male:1,female:1}]);
   await mut('waitlist_join_v1',{session_id:sid,person_id:first.p,booking_category:'male'},first.u);

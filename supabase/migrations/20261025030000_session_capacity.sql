@@ -202,7 +202,7 @@ select private.capacity_patch('private.schedule_snapshot(uuid,uuid)',$old$'maxim
 
 select private.capacity_patch('private.schedule_build_program(uuid,uuid,jsonb,uuid[])',$old$'maximum',spec#>'{capacity,maximum}',$old$,$new$'maximum',spec#>'{capacity,maximum}','category_capacities',spec#>'{capacity,categories}',$new$);
 
-select private.capacity_patch('private.schedule_build_change(uuid,uuid,jsonb)',$old$'maximum',p#>'{capacity,maximum}');$old$,$new$'maximum',p#>'{capacity,maximum}','category_capacities',p#>'{capacity,categories}');$new$);
+select private.capacity_patch('private.schedule_build_change(uuid,uuid,jsonb)',$old$'maximum',p#>'{capacity,maximum}');$old$,$new$'maximum',p#>'{capacity,maximum}','category_capacities',p#>'{capacity,categories}','_capacity_touch',true);$new$);
 
 select private.capacity_patch('private.schedule_validate(uuid,uuid,jsonb)',$old$  if not exists(select 1 from core.center_disciplines$old$,$new$  if coalesce((d->>'_touch')::bool,true) or coalesce((d->>'_capacity_touch')::bool,false) then
    if d->'category_capacities' is not null and d->'category_capacities'<>'null'::jsonb then
@@ -247,6 +247,16 @@ select private.capacity_patch('private.p01_worker_execute(text,jsonb,uuid[])',$o
 
 select private.capacity_patch('private.p01_worker_execute(text,jsonb,uuid[])',$old$w.person_id,close_at,'active');$old$,$new$w.person_id,close_at,'active');
     update core.seat_offers set booking_category=w.booking_category where org_id=org and id=entity_id;$new$);
+
+-- A completed no-offer job must be rediscovered when room configuration or
+-- category occupancy changes, even if the total number of held places is equal.
+create function private.capacity_discovery_key(org uuid,sid uuid) returns text language sql stable set search_path='' as $$
+ select md5(jsonb_build_object('rooms',coalesce((select jsonb_agg(jsonb_build_array(z.id,z.capacity) order by z.id)
+  from core.resource_bookings b join core.rooms z on z.org_id=b.org_id and z.center_id=b.center_id and z.id=b.resource_id
+  where b.org_id=org and b.session_id=sid and b.resource_kind='room' and b.state='active'),'[]'::jsonb),
+  'male',private.capacity_holds(org,sid,'male'),'female',private.capacity_holds(org,sid,'female'))::text)
+$$;
+select private.capacity_patch('private.p01_jobs_claim(uuid,uuid[],integer)',$old$||':'||private.p04_trial_places(p_org,s.id)::text$old$,$new$||':'||private.p04_trial_places(p_org,s.id)::text||':'||private.capacity_discovery_key(p_org,s.id)$new$);
 
 select private.capacity_patch('private.p04_command(text,jsonb,uuid,uuid,uuid,uuid,uuid,uuid[])',$old$  if sid is not null then perform private.p04_trial_session(org,center,l.person_id,pv.id,sid);end if;$old$,$new$  if sid is not null then perform private.p04_trial_session(org,center,l.person_id,pv.id,sid);perform private.capacity_check(org,sid,r->>'booking_category',false);end if;$new$);
 

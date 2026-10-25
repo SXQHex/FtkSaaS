@@ -118,3 +118,5 @@ Kök neden genel Date.now/slot fixture'ının 14 ve 15'inci slotlarının Europe
 
 
 </details>
+
+Kapasite incelemesi: worker no-offer işinin ardından oda fiziksel kapasitesinin yapılandırılması veya toplamı değiştirmeyen kategori doluluğu değişimi yeni keşif anahtarı üretir. İlk kaynak P2 bulgusu ve düzeltme testi [inceleme raporundadır](../reports/session-capacity-independent-review.md); önceki clean sonucu yeni kaynağa taşınmaz.
