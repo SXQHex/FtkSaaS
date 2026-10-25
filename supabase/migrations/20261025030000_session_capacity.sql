@@ -67,7 +67,7 @@ create function private.capacity_authorize(org uuid,actor uuid,center uuid,sid u
 begin
  if length(btrim(coalesce(reason,'')))=0 then perform private.fail('VALIDATION_FAILED');end if;
  if not exists(select 1 from core.sessions s where s.org_id=org and s.center_id=center and s.id=sid) then perform private.fail('NOT_FOUND');end if;
- if private.is_manager(org,actor,center) or private.staff_grant(org,actor,center,'reservation.capacity_override') or (private.has_role(org,actor,'instructor',center) and private.session_assignee(org,actor,sid)) then return;end if;
+ if private.is_manager(org,actor,center) or private.staff_grant(org,actor,center,'reservation.capacity_override') or (private.has_role(org,actor,'instructor',center) and private.lesson_duty(org,actor,sid,true)) then return;end if;
  perform private.fail('FORBIDDEN');
 end$$;
 create function private.capacity_view(org uuid,sid uuid) returns jsonb language sql stable set search_path='' as $$
@@ -253,6 +253,9 @@ select private.capacity_patch('private.p01_request_command(text,jsonb,uuid,uuid,
 select private.capacity_patch('private.execute_operation(text,jsonb,uuid,uuid,uuid[],jsonb)',$old$'person.manage','person.activate','invite.student','reservation.write','attendance.draft','sale.write','finance.collect'$old$,$new$'person.manage','person.activate','invite.student','reservation.write','attendance.draft','sale.write','finance.collect','reservation.capacity_override'$new$);
 
 select private.capacity_patch('private.schedule_page(text,jsonb,uuid,uuid,uuid)',$old$'state',v.state,'mode',v.mode,'version',v.version,$old$,$new$'state',v.state,'mode',v.mode,'version',v.version,'booking_category',v.booking_category,$new$);
+
+select private.capacity_patch('private.execute_operation(text,jsonb,uuid,uuid,uuid[],jsonb)',$old$  if r->>'permission' not in ($old$,$new$  if r->>'permission'='reservation.capacity_override' and not private.has_role(org,target,'staff',center) then perform private.fail('FORBIDDEN');end if;
+  if r->>'permission' not in ($new$);
 
 insert into private.runtime_operations(name,permission,billing_class,features) values('reservation_capacity_override_v1','reservation.capacity_override','reservation',array['F15']::text[]);
 create function api_v1.reservation_capacity_override_v1(p_request jsonb,p_actor_auth_id uuid,p_session_id uuid,p_ids uuid[],p_aux jsonb default null) returns jsonb language sql security invoker set search_path='' as $$select private.execute_operation('reservation_capacity_override_v1',p_request,p_actor_auth_id,p_session_id,p_ids,p_aux)$$;

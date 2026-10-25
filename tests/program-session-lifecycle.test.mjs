@@ -487,6 +487,10 @@ test('Session capacity revision: total, categories, explicit override and physic
   const version=(await must(owner,'session_get_v1',scope({session_id:sid}))).version;
   await mut('session_assignment_set_v1',{session_id:sid,expected_version:version,person_id:teacher.p,duty:'instructor',agreement_id:agreement});
   await mut('reservation_capacity_override_v1',over(5),k,teacher.u);
+  const assignedVersion=(await must(owner,'session_get_v1',scope({session_id:sid}))).version;
+  await mut('session_assignment_set_v1',{session_id:sid,expected_version:assignedVersion,person_id:teacher.p,duty:'instructor',state:'inactive'});
+  await fail('reservation_capacity_override_v1',over(5),'FORBIDDEN',teacher.u,k);
+  await mut('session_assignment_set_v1',{session_id:sid,expected_version:assignedVersion+1,person_id:teacher.p,duty:'instructor',agreement_id:agreement});
   await mut('role_revoke_v1',{assignment_id:role,expected_version:1,reason:'Live teacher authority revoked'});
   await fail('reservation_capacity_override_v1',over(5),'FORBIDDEN',teacher.u,k);
   const staff=people[6];await mut('role_assign_v1',{person_id:staff.p,role:'staff',scope:{center_id:center}});
