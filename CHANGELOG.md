@@ -1,5 +1,32 @@
 # Changes
 
+## 2026-10-25 — beş kapsamlı kapalı ayar API adayı
+
+- Altı typed ayar işlemi; user/member/center/organization/platform kalıcılık, sürüm/receipt, reset preview/apply, kendi kapsam geçmişi ve alan destek kataloğu.
+- Member tercihi org+hesap kimliğiyle sabit; eski notification API değişikliği aynı ayar sürümünü ilerletir. Yeni üye hatırlatma defaultu açık; mevcut bağlı üyelerin eski kapalı defaultu korunur. Pazarlama kapalı; consent ayrı.
+- 60. yeni migration, private/RLS/service-only kapılar; domain/finans/politika/worker ayarlarına genel yazma yok. Henüz inceleme/gerçek Auth/aday/main/CD kabulü yok; main200/59 ve ayrı PR45 korunur.
+
+
+## 25 Ekim 2026 — sözleşmeler arası karar/kaynak uzlaştırması
+
+Son Google kayıt/giriş kabulü, Apple/Instagram login dışlaması ve reklam CRM kaynağı ayrımı işlendi. Aktif ürün metinlerinden nominal/maksimum farkı ve yeni default gibi duran30dk teklif fallback kaldırıldı; FD06 açık yapılandırma, standart negatif0 ve kulüp−2 korundu. PR45 son inceleme/aday başarı kanıtı mevcut main200/59 ve belge PR44'ten ayrıldı. Tarihsel raporlar/uygulanmış migration'lar değiştirilmedi; canlı default veya runtime yayımlanmadı.
+
+## 25 Ekim 2026 — FD01–FD12 frontend kararları kabul edildi
+
+User/member/center/organization/platform frontend seçimlerinin tamamı kullanıcı onayıyla kesinleştirildi; 69 ana gruba yeni grup eklenmedi. Standart negatif kredi limiti 0 ayrıca teyit edildi, mevcut kulüp −2 ve eski ayarlar korunur. İlk kapsam/ertelemeler, marka-login-MFA, bildirim zamanları, görünürlük, program/finans/belge/CRM, CSV/JSON, miras/reset ve yetki sınırları teknik sözleşmeye işlendi. Claude/kuyruk/kalan işler/devir eşitlendi. Runtime, DTO, migration, CI ve canlı default uygulanmadı.
+
+## 24 Ekim 2026 — backend/frontend ayar ayrımı ve eksik karar sırası
+
+69 kabul grubunun alanları backend yapılandırması ile frontend ayarlarına ayrıldı; frontend için user/member/center/organization/platform kapsamları eşlendi. Sabit güvenlik/iş kuralları ve tekil domain komutları genel tercih ayarı sayılmadı. Eksik frontend seçimleri FD01–FD12 paketlerinde toplandı; FD01 değerleri onaylanmamış öneridir. Yeni sıra karar ayrımı/eksik seçimler tamamlandıktan sonra API/ekran teslimidir. Runtime veya default uygulanmadı.
+
+## 24 Ekim 2026 — beş ayar ekranı teslim önceliği
+
+Kullanıcı/üye/merkez/org/platform için ekran bölümleri ve doğrulanmış mevcut read-write/permission matrisi Claude devrine eklendi. Kullanıcı ve org üyeliği ayrıldı. SQL/Cron/DB/worker yönetim ayarları ertelendi; eski 208/60 taslağın UI ihtiyacını karşılamadığı kaydedildi. Eksik API ve sağlayıcı/ürün değerleri hazır gösterilmedi; runtime değişmedi.
+
+## 24 Ekim 2026 — 69 ayar grubu davranış kapanışı
+
+S11–S17, M01–M22, organizasyon O01–O21 ve platform P01–P09 kabulleri tek teknik sözleşmede birleştirildi; ilk S01–S10 korunur. Toplam 69 grup kabul edildi, somut alt alanlar açık. Eski Word aile numaraları, davranış grupları ve üretim P01–P08 ayrıldı. Kaynak indeksi, Claude talimatı, devir, kalan işler ve kuyruk güncellendi. PR42 aynı kaynak belge kabulü ve CD deploy skipped kanıtı kaydedildi. Yeni ana grup veya varsayılan icat edilmedi; runtime, DTO, migration, CI ve üretilmiş dosyalar değişmedi.
+
 ## 23 Ekim 2026 frontend başlangıcı ve settings karar eşitlemesi
 
 P01–P07 kaynak/full-clean/main/development CD kapanışı güncel devir ve istemci talimatlarına aktarıldı:200 API/59 migration/Edge8. PR41 belge kabulü, gerçek runtime kabulü ve CD deploy skipped ayrıldı. Beş Cron temel kurulum/idle heartbeat ile3600sn quote/900sn reauth kullanıcı config'i kaydedildi; gerçek yük/fiziksel imha açık.

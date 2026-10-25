@@ -1,6 +1,6 @@
 # F01–F33 karar, teknik bağımlılık, runtime ve kabul haritası
 
-Bu harita 08 makine sözleşmesinden üretilir. İşlem sayısı ürün tamamlanma yüzdesi değildir. Çağrılabilir işlem sayısı DS davranışlarının tamamlandığını göstermez. Yeni ürün kararlarının gerçek Auth → Edge → RPC kabulü aşağıdaki açık teslim bağımlılıklarında bekler.
+Bu harita 08 içindeki DS/feature_delivery aktarım metadatasından üretilir. Satırlardaki eski mevcut-runtime/yalnız-sözleşme sayımları ve pending_runtime bağımlılıkları ait oldukları ilk DS aktarımının snapshotıdır; güncel callable envanter veya yeniden açılacak iş listesi değildir. Gerçek işlem desteği docs/endpoint-inventory.json ve implemented.json, kabul kanıtı contracts/00-FtkSaaS-yeni-sohbet-devir.md, güncel açıklar docs/remaining-work.md üzerinden okunur. FD01–FD12 ürün kararının kapanışı runtime/sağlayıcı/E2E kabulünden ayrıdır.
 
 | Özellik / ürün kararı | Plan erişimi | Teknik karşılık | Açık bağımlılıklar | Uygulama | Kabul |
 |---|---|---|---|---|---|

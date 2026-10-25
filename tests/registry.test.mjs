@@ -1,3 +1,4 @@
+import './frontend-settings-acceptance.mjs';
 import test from 'node:test';
 import './p05-acceptance.mjs';
 import './p06-acceptance.mjs';
