@@ -1482,3 +1482,7 @@ Gap türleri T önerisidir: ürün kararı; sözleşme/DTO; runtime; yetki/plan;
 ### Ek kullanıcı aileleri
 
 U25 Güvenlik hareketleri: kullanıcıya kendi giriş, iletişim değişikliği ve kurtarma olaylarını sır/token göstermeden sunma; ayrıntılar açık. U26 Tercih sıfırlama: alan/grup/ekran/cihaz/hesap kapsamı; kabul edilmiş görünüm grubu sıfırlaması izin ve bildirimleri değiştirmez. Diğer kapsamların ayrıntıları açık.
+
+## Pilot operasyonel güvenlik aktarımı — 25 Ekim
+
+Yeni kullanıcı talimatı beş ayar API/alan kabulü ve gerçek pilot zinciri/restore hazırlığıdır. İlk207/62 adayı davranış kararı eklemez: worker connection/session search_path sabitlemesi ve platform event-trigger EXECUTE daraltması. COMMIT yapabilen ops_run üzerine SET clause eklenmez. [Yöntem ve açık kabul sınırı](../docs/pilot-readiness.md). Sentetik pilot verisinin geliştirme ortamında kalıcı tutulması kabul edildi; gerçek kayıtlar korunur, dağıtım öncesi reset şimdi yapılmaz.

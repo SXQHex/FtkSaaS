@@ -1,5 +1,9 @@
 # Changes
 
+## 2026-10-25 — pilot operasyon ön koşulları adayı
+
+62. migration worker role/session lookup ve rls_auto_enable EXECUTE sertleştirmesi. Mevcut beş scope44 alanın native read/write/replay matrisi; aynı orgda öğrenci satın alma→rezervasyon→eğitmen yoklama→hakediş→yönetici rapor regresyonu. İzole restore deneyi managed ACL nedeniyle başarısız; prototip bu teslimden çıkarıldı, restore kabulü açık. Bu kısmi aday tüm ayar alanları, kalıcı hosted pilot veya tam hosted restore kabulü değildir.
+
 ## 2026-10-25 — beş kapsamlı kapalı ayar API adayı
 
 - Altı typed ayar işlemi; user/member/center/organization/platform kalıcılık, sürüm/receipt, reset preview/apply, kendi kapsam geçmişi ve alan destek kataloğu.

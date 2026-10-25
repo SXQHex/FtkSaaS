@@ -44,6 +44,14 @@ test('real PostgreSQL physical baseline and D/U integrity',async t=>{
   const grants=(await db.query("select table_name from information_schema.role_table_grants where table_schema='core' and grantee in ('anon','authenticated','PUBLIC')")).rows;assert.equal(grants.length,0);
   for(const role of ['anon','authenticated']){await db.query('begin');await db.query('set local role '+role);await assert.rejects(db.query('select * from core.people'),e=>e.code==='42501');await db.query('rollback');}
  });
+ await t.test('pilot worker session pin preserves transaction CALL and platform event trigger is not client executable',async()=>{
+  const procedure=(await db.query("select prosecdef,proconfig,prosrc from pg_proc where oid='private.ops_run(text)'::regprocedure")).rows[0];
+  assert.equal(procedure.prosecdef,false);assert.equal(procedure.proconfig,null);assert(procedure.prosrc.includes("pg_catalog.set_config('search_path','pg_catalog',false)"));
+  const roles=(await db.query("select rolname,rolsuper,rolbypassrls,rolconfig from pg_roles where rolname in ('ftk_ops_p01','ftk_ops_p05','ftk_ops_p06','ftk_ops_p07','ftk_ops_p07_privacy')")).rows;
+  assert.equal(roles.length,5);for(const r of roles){assert.equal(r.rolsuper,false);assert.equal(r.rolbypassrls,false);assert(r.rolconfig.includes('search_path=pg_catalog'));}
+  const trigger=(await db.query("select oid from pg_proc where oid=to_regprocedure('public.rls_auto_enable()')")).rows[0];
+  if(trigger)for(const role of ['anon','authenticated'])assert.equal((await db.query("select has_function_privilege($1,$2::oid,'EXECUTE') allowed",[role,trigger.oid])).rows[0].allowed,false);
+ });
  await db.query('begin');
  for(const org of ['A','B']){
   await row('organizations',{id:id(org),org_id:id(org),name:org,owner_person_id:id(org+'owner'),state:'active'});

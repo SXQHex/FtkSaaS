@@ -1,5 +1,6 @@
 import test,{resources} from './p07-diagnostics.mjs';
 import assert from 'node:assert/strict';
+import fs from 'node:fs';
 import {authUser,fixturePlatform,must,call,context} from './api-client.mjs';
 import {newUuidV7 as key} from '../scripts/uuid.mjs';
 
@@ -113,6 +114,26 @@ test('Frontend settings scoped persistence, live authority, reset and delivery p
    await write(owner,q,{in_app_reminders:false},current.version);assert.equal((await db.query("select private.p05_optional_allowed($1,$2,'reminder') a",[org,person])).rows[0].a,false);
    await fail('VALIDATION_FAILED',owner,'settings_update_v1',{...q,patch:{transactional:false},expected_version:(await read(owner,q)).version},key());
    await fail('NOT_FOUND',owner,'settings_update_v1',{...q,patch:{interest_center_ids:[key()]},expected_version:(await read(owner,q)).version},key());
+  });
+  await t.test('all declared fields in five scopes round-trip through real typed APIs; unsupported branding cannot fake success',async()=>{
+   const fields=JSON.parse(fs.readFileSync('config/frontend-settings.json','utf8')).fields;
+   const operator=await authUser('settings-field-operator');await must(operator,'account_get_v1');
+   await db.query('insert into private.platform_operators(auth_user_id) values($1)',[operator.id]);
+   try{
+    for(const scope of ['user','member','center','organization','platform']){
+     const actor=scope==='platform'?operator:owner,q={scope,...['member','center','organization'].includes(scope)?{org_id:org}:{},...scope==='center'?{center_id:center}:{}};
+     const catalog=await must(actor,'settings_catalog_get_v1',q),expected=fields.filter(f=>f.scope===scope);
+     assert.deepEqual(catalog.fields.map(f=>f.key).sort(),expected.map(f=>f.key).sort());
+     const patch=Object.fromEntries(expected.filter(f=>f.schema.type!=='null').map(f=>[f.key,f.default]));
+     if(scope==='user'){patch.theme='dark';patch.language='en';patch.timezone_mode='manual';patch.timezone_name='Europe/Istanbul';}
+     if(scope==='member'){patch.profile_visible=true;patch.interest_center_ids=[center];}
+     if(scope==='center'||scope==='organization')patch.description='Synthetic field acceptance';
+     let before=await read(actor,q);const operationKey=key();await write(actor,q,patch,before.version,operationKey);
+     assert((await write(actor,q,patch,before.version,operationKey)).replayed);
+     const after=await read(actor,q);for(const [name,value] of Object.entries(patch))assert.deepEqual(after.values[name],value,scope+'.'+name);
+     for(const field of expected.filter(f=>f.schema.type==='null'))await fail('SERVICE_UNAVAILABLE',actor,'settings_update_v1',{...q,expected_version:after.version,patch:{[field.key]:null}},key());
+    }
+   }finally{await db.query('delete from private.platform_operators where auth_user_id=$1',[operator.id]);}
   });
  }finally{if(trigger){await db.query(`drop trigger if exists ${trigger} on private.frontend_settings_history`);await db.query(`drop function if exists private.${trigger}()`);}await db.end();}
 });
