@@ -3,8 +3,8 @@
   "tables": 90,
   "operations": 207,
   "definitions": 1154,
-  "uuid_paths": 2397,
-  "references": 5616,
+  "uuid_paths": 2400,
+  "references": 5619,
   "checks": [
     {
       "name": "JSON Schema 2020-12 meta-schema",

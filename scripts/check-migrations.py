@@ -129,10 +129,20 @@ assert next(Path('supabase/migrations').glob('*_session_capacity.sql')).read_tex
 assert next(Path('supabase/migrations').glob('*_frontend_settings.sql')).read_text()==Path('database/frontend-settings-catalog.sql').read_text()+Path('database/frontend-settings.sql').read_text().replace('commit;\n','',1)+Path('database/frontend-settings-wrappers.sql').read_text().replace('begin;\n','',1),'Frontend settings source drift'
 
 settings_fields=json.loads(Path('config/frontend-settings.json').read_text())['fields']
-settings_catalog="begin;\ncreate function private.frontend_settings_fields() returns jsonb language sql immutable security invoker set search_path='' as $fields$select '"+json.dumps(settings_fields,ensure_ascii=False,separators=(',',':')).replace("'","''")+"'::jsonb$fields$;\n"
-assert Path('database/frontend-settings-catalog.sql').read_text()==settings_catalog,'Frontend field catalog SQL drift'
+settings_catalog="begin;\ncreate or replace function private.frontend_settings_fields() returns jsonb language sql immutable security invoker set search_path='' as $fields$select '"+json.dumps(settings_fields,ensure_ascii=False,separators=(',',':')).replace("'","''")+"'::jsonb$fields$;\n"
+assert Path('database/user-settings-catalog.sql').read_text()==settings_catalog,'Frontend field catalog SQL drift'
 settings_contract=json.loads(Path('contracts/08-FtkSaaS-tip-ve-operasyon-sozlesmesi.json').read_text())
 for scope in ['user','member','center','organization','platform']:
  assert settings_contract['$defs'][scope.title()+'SettingsValues']['properties']=={f['key']:f['schema'] for f in settings_fields if f['scope']==scope},'Frontend field DTO drift: '+scope
 
 assert next(Path('supabase/migrations').glob('*_pilot_operational_security.sql')).read_text()==Path('database/pilot-operational-security.sql').read_text(),'Pilot operational security source drift'
+
+assert next(Path('supabase/migrations').glob('*_user_settings_context.sql')).read_text()==Path('database/user-settings-catalog.sql').read_text()+Path('database/user-settings-context.sql').read_text(),'User settings extension source drift'
+
+# Scoped response variants keep the same closed field set/catalog version as the base definitions.
+settings_defs=settings_contract['$defs']
+for variant in settings_defs['SettingsView']['oneOf']:
+ scope=variant['properties']['scope']['const']
+ assert set(variant['properties']['overridden_fields']['items']['enum'])=={f['key'] for f in settings_fields if f['scope']==scope},'Scoped settings field drift: '+scope
+for variant in settings_defs['SettingsCatalog']['oneOf']:
+ assert variant['properties']['catalog_version']=={'const':json.loads(Path('config/frontend-settings.json').read_text())['version']},'Scoped settings catalog version drift'

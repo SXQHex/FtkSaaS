@@ -1,5 +1,11 @@
 # Frontend ayar API uygulama devri
 
+## 26 Ekim — kullanıcı görünüm ve başlangıç ayarı adayı
+
+Başlangıç main `a7569bbb11353dc342804eb5050800d77a31a8e9`: PR49 belge kabulü40235383940 ve development CD40235449919 başarılı; runtime kaynağı PR48/34aac276 için full clean40232332540 ve CD40234018404 kabulü korunur. Bu uygulama adayı **207 API/63 migration**,46 genel ayar alanı/44 writable içerir; kullanıcı alanı18’den20’ye çıkar. Aynı altı settings API’sine font_scale ve startup_context eklenir, katalog sürümü2’dir. Eski62 migration değiştirilmez; yeni migration20261025213014.
+
+Yazı ölçeği ve sabit org/merkez/disiplin seçimi kullanıcı hesabına aittir; yetki/plan veya merkez iş timezone’u değişmez. Canlı erişim kaybında başlangıç bağlamı null döner, aynı yazma receipt’i yetki denetimini atlayamaz. UI tasarımı değiştirilmedi; ekran/rol başlangıcı, kayıtlı filtreler ve kalan69 grup bu iki alanla tamamlanmış sayılmaz. [Alanlar ve tüketici sınırı](frontend-settings-handover.md#kullanici-gorunum-baslangic-20261026). Son aday inceleme/full clean/main/CD kabulü henüz bekler.
+
 25 Ekim 2026 uygulama adayı; main7020638 / 200 API /59 migration üstüne 6 işlem ve yeni 20261025091433 migration. Kaynak aday206/60; bu sayı ayrı PR45 kapasite adayı201/60 ile birleştirilmez. Frontend tasarım/istemci Claude alanıdır. Gerçek Auth→Edge→RPC ve bağımsız CI kabulü bekler.
 
 ## İşlemler
@@ -48,3 +54,24 @@ PR46 head e98946adcbafb57d55e209f2284d1326d4488fb3 bağımsız inceleme ve aday4
 Yerel izole PGlite üzerinde bütün migration zinciri ve yeni SQL davranışları kontrol edildi; sentetik Auth tablo fixture'ları native Auth değildir, E2E kabulü sayılmaz. Native Auth→Edge→RPC suite tests/frontend-settings-acceptance.mjs mevcut registry shardına eklidir; full/main clean kapsamı azaltılmadı. Eski P05 negatif teslim fixture'ı yeni FD04 açık defaultu nedeniyle açıkça opt-out yapar; sıfır teslim assertionı aynen korunur. Gerçek CI sonuçları kaynak head'ine bağlı doğrulanacaktır.
 
 Bağımsız ilk inceleme, Owner→OM geçişinde billing_* eski update/reset receipt replay yolundaki alan yetkisi açığını buldu. Alan yetkisi artık receipt okumasından önce denetlenir; geçerli rol korunurken uygulanmış/süresi dolmuş resetin başarılı retry sonucu korunur. Native regresyon bu iki tarafı da kapsar; düzeltilmiş PR46 kaynağı bağımsız inceleme ve aday/main CI’dan geçti. Birleşik PR45 kaynağı ayrı kabul bekler.
+
+
+## Kullanici gorunum baslangic 20261026
+
+| Alan | Wire/default | Frontend tüketimi ve sınır |
+|---|---|---|
+| font_scale | number0.75–2 veya null; default null | null cihaz/OS ölçeğini izler; açık değer uygulama yazı ölçeği tercihidir. S08 kapsamında hesaplar/cihazlar arası okunur; OS ses/titreşim izni veya marka font kataloğu değildir. Büyütmede düğme/içerik korunması frontend kabulünde ayrıca doğrulanır. |
+| startup_context | null veya kapalı {org_id:FtkUuid,center_id:FtkUuid\|null,discipline_id:FtkUuid\|null}; default null | remember_context=true: son bağlam cihazdadır; sabit tercih açılış yönlendirmesini değiştirmez. false: geçerli sabit bağlam kullanılır; null ise erişim açıklamayan seçim ekranı. Deep link bu tercihi yazmaz. |
+
+Üst seçim değişirken istemci uyumsuz alt seçimleri null göndermelidir; üç alan tek atomik nesnedir, yarım merkez/disiplin seçimi saklanmaz. org_id zorunlu; disiplinde merkez zorunlu. Ek actor/account/role/route/alan kabul edilmez. Geçersiz biçim VALIDATION_FAILED; bilinmeyen, başka tenant, aktif/doğrulanmış linki olmayan, kapalı org, erişimsiz merkez veya merkezde etkin olmayan disiplin NOT_FOUND verir. Bu kod varlık keşfi için ayırt edilmez. Başlangıç merkezinde mevcut centers_list yetki kitlesi ve plan erişimi korunur.
+
+settings_get_v1 her okumada bağlamı canlı denetler; kayıp erişimde startup_context:null döndürür. Saklanan tercihi silmez veya version artırmaz; erişim yeniden gelirse tercih tekrar okunabilir. overridden_fields seçimin yerel saklandığını gösterebilir; org/merkez/disiplin adları bu API’den dönmez. Gerçek sayfa/veri/komut her zaman kendi güncel yetkisini kontrol eder. Tercih rol veya rezervasyon yetkisi vermez. Diğer user alanları (örneğin görünüm/pazarlama geri alma) bu geçersiz bağlam nedeniyle engellenmez.
+
+Aynı operation_key+payload için startup_context yazma retry’si de güncel kapsamı yeniden denetler; erişim kaybında eski başarı tekrar verilmez. font_scale ve startup_context ayrı ayrı reset edilir; diğer ayarlar ve privacy seçimleri korunur. Reset preview15 dakika, expected_version ve aynı kullanıcı/scope/token davranışı değişmedi. Katalog sürümü2 ve üretilmiş UserSettingsValues/SettingsFieldKeys/descriptor tipleri iki alanı taşır. Yeni endpoint, genel JSON/serbest CSS/route veya rol seçici eklenmedi. Başlangıç ekranı/rolü ve S10 kayıtlı filtreler sonraki typed teslimdir.
+
+
+### Bu adayın dar doğrulaması
+
+Aynı63-migration kaynağı Vercel’in tek izole native Supabase ortamında yalnız tests/frontend-settings-acceptance.mjs ile sınandı:11/11pass,0fail/skip/cancel,159134.234555ms, normal tamamlanma. Yeni iki alan/closed nested shape/font range; canlı üyelik, org kapanması ve replay engeli; resetin privacy ve diğer alanı koruması mevcut yarış/rollback/yetki/sayfalama/beş-scope testleriyle birlikte geçti. İlk denemede SettingsView kapsamlı overridden_fields ve SettingsCatalog kapsamlı version listeleri eski kaldığından Edge INTEGRITY_VIOLATION üretti; kapalı listeler ve tüm katalog varyantları eşitlendi, assertion gevşetilmedi. SQL/migration bu düzeltmede değişmedi.
+
+Yerelde149 yapısal test,63 migration derlemesi ve sentetik SQL davranışı geçti; native doğrulama bunun yerine sayılmaz. Migration/DTO checker artık kapsamlı cevap field/version listelerini de eşitliyor. İşlem207, yeni suite/shard yok; mevcut registry suite’inin alt testleri genişledi. Full/main clean kapsamı ve assertionlar değişmedi. Makine sözleşmesi, validator, Edge bundle, yeni migration ve ilgili testin yerel ve native SHA256’ları eşleşti. Native ortam durduruldu; hosted veri değişmedi. Son bağımsız kaynak incelemesi ve aday/main clean/CD kabulü ayrıca gerekir.

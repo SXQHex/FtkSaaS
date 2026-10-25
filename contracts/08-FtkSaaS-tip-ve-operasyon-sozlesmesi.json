@@ -42434,6 +42434,59 @@
               "type": "null"
             }
           ]
+        },
+        "font_scale": {
+          "anyOf": [
+            {
+              "type": "number",
+              "minimum": 0.75,
+              "maximum": 2
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "startup_context": {
+          "anyOf": [
+            {
+              "type": "object",
+              "properties": {
+                "org_id": {
+                  "$ref": "#/$defs/FtkUuid"
+                },
+                "center_id": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/$defs/FtkUuid"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "discipline_id": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/$defs/FtkUuid"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                }
+              },
+              "required": [
+                "org_id",
+                "center_id",
+                "discipline_id"
+              ],
+              "additionalProperties": false
+            },
+            {
+              "type": "null"
+            }
+          ]
         }
       },
       "required": [],
@@ -42663,6 +42716,7 @@
               "description",
               "email_visible",
               "font_package_id",
+              "font_scale",
               "history_recommendations",
               "honorific",
               "in_app_marketing",
@@ -42680,6 +42734,7 @@
               "profile_visible",
               "remember_context",
               "show_weekends",
+              "startup_context",
               "support_email",
               "support_url",
               "theme",
@@ -42740,7 +42795,9 @@
                   "ad_personalization",
                   "ad_measurement",
                   "optional_analytics",
-                  "timezone_name"
+                  "timezone_name",
+                  "font_scale",
+                  "startup_context"
                 ]
               },
               "uniqueItems": true,
@@ -42944,6 +43001,7 @@
           "description",
           "email_visible",
           "font_package_id",
+          "font_scale",
           "history_recommendations",
           "honorific",
           "in_app_marketing",
@@ -42961,6 +43019,7 @@
           "profile_visible",
           "remember_context",
           "show_weekends",
+          "startup_context",
           "support_email",
           "support_url",
           "theme",
@@ -43167,6 +43226,7 @@
             "description",
             "email_visible",
             "font_package_id",
+            "font_scale",
             "history_recommendations",
             "honorific",
             "in_app_marketing",
@@ -43184,6 +43244,7 @@
             "profile_visible",
             "remember_context",
             "show_weekends",
+            "startup_context",
             "support_email",
             "support_url",
             "theme",
@@ -43224,7 +43285,7 @@
           "$ref": "#/$defs/SettingsScope"
         },
         "catalog_version": {
-          "const": 1
+          "const": 2
         },
         "fields": {
           "type": "array",
@@ -43283,7 +43344,7 @@
               "const": "user"
             },
             "catalog_version": {
-              "const": 1
+              "const": 2
             },
             "fields": {
               "type": "array",
@@ -43326,7 +43387,7 @@
               "const": "member"
             },
             "catalog_version": {
-              "const": 1
+              "const": 2
             },
             "fields": {
               "type": "array",
@@ -43369,7 +43430,7 @@
               "const": "center"
             },
             "catalog_version": {
-              "const": 1
+              "const": 2
             },
             "fields": {
               "type": "array",
@@ -43412,7 +43473,7 @@
               "const": "organization"
             },
             "catalog_version": {
-              "const": 1
+              "const": 2
             },
             "fields": {
               "type": "array",
@@ -43455,7 +43516,7 @@
               "const": "platform"
             },
             "catalog_version": {
-              "const": 1
+              "const": 2
             },
             "fields": {
               "type": "array",
@@ -44162,7 +44223,9 @@
                   "ad_personalization",
                   "ad_measurement",
                   "optional_analytics",
-                  "timezone_name"
+                  "timezone_name",
+                  "font_scale",
+                  "startup_context"
                 ]
               },
               "minItems": 1,
@@ -86362,6 +86425,24 @@
       },
       {
         "path": "#/$defs/ManagementSelector_reservation_capacity_override_v1/properties/key/properties/source_sale_id/anyOf/0",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/UserSettingsValues/properties/startup_context/anyOf/0/properties/org_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/UserSettingsValues/properties/startup_context/anyOf/0/properties/center_id/anyOf/0",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/UserSettingsValues/properties/startup_context/anyOf/0/properties/discipline_id/anyOf/0",
         "origin": "ftksaas",
         "acceptance": "generic_uuid",
         "generation": "uuidv7"

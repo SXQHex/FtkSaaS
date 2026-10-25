@@ -1486,3 +1486,8 @@ U25 Güvenlik hareketleri: kullanıcıya kendi giriş, iletişim değişikliği 
 ## Pilot operasyonel güvenlik aktarımı — 25 Ekim
 
 Yeni kullanıcı talimatı beş ayar API/alan kabulü ve gerçek pilot zinciri/restore hazırlığıdır. İlk207/62 adayı davranış kararı eklemez: worker connection/session search_path sabitlemesi ve platform event-trigger EXECUTE daraltması. COMMIT yapabilen ops_run üzerine SET clause eklenmez. [Yöntem ve açık kabul sınırı](../docs/pilot-readiness.md). Sentetik pilot verisinin geliştirme ortamında kalıcı tutulması kabul edildi; gerçek kayıtlar korunur, dağıtım öncesi reset şimdi yapılmaz.
+
+
+### 26 Ekim — S08/S09 uygulama alan eşlemesi
+
+Kullanıcı uygulama yazı ölçeği font_scale:number0.75–2|null; null OS/cihaz tercihini izler. Sabit başlangıç startup_context:null|{org_id,center_id,discipline_id}; alt iki ID nullable, disiplinde merkez gerekir. remember_context=true son bağlamı cihazda kullanır; false sabit bağlamı seçer. Üst seçimde uyumsuz alt seçimler istemcide temizlenir ve nesne atomik kaydedilir. Canlı link/kişi/org/merkez-plan/rol-ilişki ve merkez-disiplin denetimi yazma/tekrarda korunur; kayıp erişimde okuma null ile yeniden seçime döner. Geçersiz kayıt domain yetkisi yaratmaz. Bu teknik aralıklar ve wire eşlemesi yeni ana davranış grubu değildir; S08/S09’un ekran/rol ve gerçek frontend kabulü dahil tamamı kapanmış sayılmaz. [Güncel API aktarımı](../docs/frontend-settings-handover.md#kullanici-gorunum-baslangic-20261026).
