@@ -1,6 +1,6 @@
 # Claude frontend entegrasyon talimatları
 
-24 Ekim 2026. Belge tabanı main `702063807b0a0d09f559f070ffde1b1ae3e7563b`. Frontend tasarım/istemci kodu Claude'un alanıdır; backend bu teslimde tasarıma müdahale etmez. Bu dosya Claude'un açıkça okutulacak başlangıç talimatıdır; repository'de kök `CLAUDE.md` veya `.claude` yapılandırması bulunmuyor. Dosyanın Claude tarafından kendiliğinden yüklendiğini varsayma.
+25 Ekim 2026. Belge tabanı main `702063807b0a0d09f559f070ffde1b1ae3e7563b`. Frontend tasarım/istemci kodu Claude'un alanıdır; backend bu teslimde tasarıma müdahale etmez. Bu dosya Claude'un açıkça okutulacak başlangıç talimatıdır; repository'de kök `CLAUDE.md` veya `.claude` yapılandırması bulunmuyor. Dosyanın Claude tarafından kendiliğinden yüklendiğini varsayma.
 
 ## 25 Ekim — frontend karar kapanışı ve uygulama sırası
 
@@ -12,13 +12,15 @@
 
 | Kapsam | FD kapanışından önemli sonuç |
 |---|---|
-| user | Hazır Türkçe/İngilizce, cihaz dili/fallback Türkçe; tr-TR/24 saat/Pazartesi, cihaz timezone, sistem tema; foto PNG/JPEG/WebP. İlk login e-posta+şifre, ilk MFA doğrulayıcı kodu; sosyal login/passkey sonraya. |
+| user | Hazır Türkçe/İngilizce, cihaz dili/fallback Türkçe; tr-TR/24 saat/Pazartesi, cihaz timezone, sistem tema; foto PNG/JPEG/WebP. E-posta+şifre ana, son kararla Google ek kayıt/giriş; Apple/Instagram login yok, passkey erteli, ilk MFA doğrulayıcı kodu. |
 | member | Org bazlı bildirim/pazarlama, aynı gelecek/aktif kesin kayıt kitlesi, default kapalı profil/iletişim; boş ilgi, geçmiş öneri kapalı; takvim türleri kullanıcı seçimi. |
 | center | İş takvimi tanımsızsa kurulum; yeni merkez timezone önerisi İstanbul, yeni ders 60dk/saat seçici 15dk/tek seans; pencere/teklif orgdan, liste yeni sınıfta kapalı. Teknik worker alanı yok. |
 | organization | Hazır uyumlu marka, Owner/açık OM; merkez marka override yok. Yeni org negatif 0, kişisel istisna kapalı, borç engelleri ayrı açık; mevcut kurulum korunur. Belge/yayın default taslak/kapalı. |
 | platform | Hazır katalog/default/miras seçenekleri ve yetkili yönetim; DB/worker/secrets/CI/deploy alanı yok. Sadece gerçek katalog/sağlayıcı sunulur, serbest SQL/CSS/font yok. |
 
 FD04 kişisel hatırlatmaları başlangıçta açık, pazarlama kapalıdır. FD10'daki ek iş otomasyonları başlangıçta kapalıdır; bu iki alan birbirini değiştirmez. Yeni genel ikinci-onay akışı ilk kapsam dışı; mevcut özel onaylar korunur. CSV rapor/import ile JSON kişisel veri kopyası ayrı hedeflerdir. İmha kanıtsız completed veya provider hazır değilken doğrulama başarısı gösterilmez.
+
+Kapasite için [güncel teknik karar](../contracts/02-FtkSaaS-teknik-sozlesme.md#oda-seans-kapasite-karari) esas alınır: tek fiziksel oda kapasitesi, ayrı seans toplamı ve isteğe bağlı kategori limitleri; seanslarda nominal/maksimum ayrımı yoktur. PR45 adayı `149be4f4` bu modeli uygular ve aday full clean başarılıdır; henüz merge/main/CD kabulü yoktur. Aşağıdaki mevcut-main API matrisi 200 operasyon/59 migration kaynağındadır; adayın yeni DTO'larını yayımlanmış sayma. Tek kayıt için gerekçeli kapasite istisnası fiziksel oda tavanını veya diğer katılım engellerini aşamaz.
 
 ## Beş kapsamlı ayar ekranı teslimi — 24 Ekim önceliği
 
@@ -50,7 +52,7 @@ Bu tablo bileşen yerleşimi veya route/framework dayatmaz. Metin, seçim, çokl
 | Kullanıcı | Genel tercihler | Sessiz saat/gün/timezone, platform pazarlama kanalları ve üç bağımsız reklam/ölçüm tercihi. Açık tercih hukuki izin/SDK aktivasyonu değildir. |
 | Kullanıcı | Geçmiş/veri | Güvenlik ve izin geçmişi salt okunur; veri talebi/silme/reset ayrı etki/reauth komutları. |
 | Üye | Organizasyon tercihleri | Org bazlı bildirim olay/kanal/hatırlatma/özet, pazarlama amaç/kanalı, ilgi/öneri tercihleri. |
-| Üye | Paylaşım | Org katılımcılarına ad/fotoğraf/telefon/e-posta gösterimi ayrı aç/kapat; default kapalı, kitle ayrıca seçilecek. |
+| Üye | Paylaşım | Org katılımcılarına ad/fotoğraf/telefon/e-posta gösterimi ayrı aç/kapat; default kapalı; kitle FD05 gereği aynı gelecek/aktif kesin kayıt katılımcılarıdır. |
 | Üye | Takvim/bağlantı | Org takvim bağlantısı tür seçimi/oluştur/yenile/kaldır; hesap–kişi bağını görme ve kendi kaldırma talebi/özel akış. |
 | Üye | Yetkili yönetim | Hesapsız kişi ad/contacts, merkez/disiplin ilişkileri ve ilgili kişisel negatif ders limiti yalnız mevcut yetkiyle. Borç, paket, hak, görev veya abonelik durumunu genel settings kaydıyla değiştirme yok. |
 | Üye | Bilgi | Üye/ilişki kimliği, varsa ileride abone no, bağ/ilişki durumu ve iş bakiyeleri salt okunur veya ilgili domain işlemine yönlenir. |
@@ -140,12 +142,12 @@ S11 kişisel takvim, S14 pazarlama/ilgi, S15 görünürlük/izin, S16 veri taleb
 | S02 Kimlik iletişim | Ad ve doğrulanmış iletişimin aktif bağlı orglara onaysız yansıması | Mevcut display_name komutu bu akışın bütünü değildir. Global yasal ad, e-posta/telefon doğrulama ve yayılma için alan bazlı API/sağlayıcı analizi bekler. |
 | S03 Bağlantılar | Güvenli mevcut kişiye bağlama, kaldırma ve yeni yetkiyle yeniden bağlama | `account_access_send/accept/revoke_v1`, `account_link_remove_v1`, `person_merge_*` mevcut komutlarıdır; her biri kendi yetkisine tabidir. Kullanıcının kendi bağlantısını kaldırma hedefi mevcut CM komutuna otomatik eşitlenmez. Abone numarası P08'dir. |
 | S04 Şifre | Ekle/değiştir/kurtarma ve kabul edilmiş oturum kapatma | `account_password_change_v1` challenge başlatır; tamamlama native Auth'tadır. `account_password_reset_request_v1` korumalı recover başlatıcısıdır. Kabul edilmiş tüm oturum temizliği ve dış teslim hazır varsayılmaz. |
-| S05 Sağlayıcı MFA | Güvenli ekleme/kaldırma, son giriş yöntemi koruması | Google/Apple/passkey/MFA yöntem seçimi ve gerçek sağlayıcı entegrasyonu açık; katalogdaki varlık destek kanıtı değil. |
+| S05 Sağlayıcı MFA | Güvenli ekleme/kaldırma, son giriş yöntemi koruması | Seçim kesin: e-posta/parola ve Google kayıt/giriş, doğrulayıcı uygulama MFA. Apple/Instagram login kapsam dışı, passkey erteli. Gerçek provider/hesap yaşam döngüsü ve kabul kanıtı ayrıca doğrulanacak; seçim desteğin çalıştığı kanıtı değildir. |
 | S06 Oturumlar | Kendi oturumlarını gör/kapat; güven kaydını ayrı yönet | Mevcut canlı session kapıları oturum listeleme/etiketleme/tüm cihaz yönetimi API'si var anlamına gelmez. Yeni alanlar/sağlayıcı eşlemesi bekler. |
 | S07 Dil bölge saat | Hesap manuel/cihaz otomatik tercihleri; iş zamanı sabit | Genel tercih saklama DTO'su yok. İşlem saatleri mevcut Instant ve merkez saat dilimi kurallarıyla okunur; istemci görünüm tercihi iş zamanını değiştiremez. |
 | S08–S10 Görünüm ve bağlam | Erişilebilirlik, başlangıç, ekran/takvim tercihleri | Yerel görünüm tasarımı yapılabilir; hesapta kalıcı tercih senkronizasyonu mevcut200 API'de var sayılmaz. Yetki/alan filtreleri backend'den gelir. |
-| Bildirim tercihi | S12–S13 davranışı kabul; kesin olay/kanal/istisna/zaman değerleri açık | `notification_preferences_set_v1` ve yetkili management okuması mevcut. Amaçlar transactional/reminder/marketing; mevcut yol in_app, transactional=false ret. Enum'da email olması dış teslim kanıtı değildir; push/SMS yeni enum gibi eklenmez. |
-| Reklam ölçüm ve analitik | Üç ayrı tercih varsayılan açık/kapatılabilir; ayrıntılar açık | Tercih değeri rıza/dayanak değildir. Yeni SDK/toplama entegrasyonu bu belgeyle etkinleştirilmez. İzin, teknik etkinlik ve sağlayıcı desteği ayrı. |
+| Bildirim tercihi | S12–S13 ve FD04 olay/kanal/istisna/zaman değerleri kesin; mevcut API kapsamı dar | `notification_preferences_set_v1` ve yetkili management okuması mevcut. Amaçlar transactional/reminder/marketing; mevcut yol in_app, transactional=false ret. Enum'da email olması dış teslim kanıtı değildir; push/SMS yeni enum gibi eklenmez. |
+| Reklam ölçüm ve analitik | Üç ayrı tercih açık/kapatılabilir; FD04 pazarlama ve FD05 geçmiş öneri defaultları ayrı kapalı | Tercih değeri rıza/dayanak değildir. Yeni SDK/toplama entegrasyonu bu belgeyle etkinleştirilmez. İzin, teknik etkinlik ve sağlayıcı desteği ayrı. |
 | Merkez/org/platform | M01–M22, org O01–O21 ve platform P01–P09 kabul edildi; alt alan değerleri açık | Mevcut `policies_get/policy_publish`, availability, registry, belge/otomasyon ve abonelik komutları kullanılır. Generic settings read/write endpoint'i yayımlanmadı. |
 
 24 Ekim: S01–S17/M01–M22/org O01–O21/platform P01–P09 olmak üzere 69 ana davranış grubu kabul edildi; tüm alanlar uygulanmış değildir. Ayrıntılar tek teknik sözleşmede; açık default/değer/permission/sağlayıcı ve mevcut API eşlemesi ayrı çözülür. Yeni API alanı, değer veya sağlayıcı davranışı uydurma. Eski Word aileleri ve üretim kuyruğu aynı numaralarla karıştırılmaz. Aynı durumun tasarım prototipi ile gerçek API kaydetme başarısını ayır; desteklenmeyen alan için sahte başarılı kayıt üretme.

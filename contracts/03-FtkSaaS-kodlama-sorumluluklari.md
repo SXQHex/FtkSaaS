@@ -1,18 +1,14 @@
-> 25 Ekim: **FD01–FD12 frontend alan kararları tamamen kabul edildi.** [Kesin seçimler ve beş scope](02-FtkSaaS-teknik-sozlesme.md#ayarlar-backend-frontend-siniflama) önceki açık frontend değerleri bakımından üstündür. Standart negatif başlangıç 0; mevcut kulüp −2 korunur. Yeni API/enum/default uygulaması bu belgeyle yapılmadı.
-
-> 24 Ekim ayar kapanışı: **69 ana grup kabul edildi** (17 kullanıcı/22 merkez/21 organizasyon/9 platform). Somut alan/değer/yetki/sağlayıcı ve API eşlemesi açıktır; runtime/enum/permission bu belgeyle değişmez. [Tek karar ve açık alan matrisi](02-FtkSaaS-teknik-sozlesme.md#ayarlar-sozlesmesi-ve-davranis-sprinti). Önceki S01–S10/kalan grup ifadeleri 23 Ekim aktarım sınırıdır.
-
-> 23 Ekim 2026 güncel durum: P01–P07 kod/main/geliştirme-test kabulü kapandı; yayımlanmış kapsam **200 API / 0 contract_only / 59 migration / 90 core tablo / Edge8**. P07 runtime kaynağı `4cfc9a55`; güncel belge tabanı `bfb8ccb2`. Beş Cron hattı aktif ve boş kuyrukta healthy/idle; fiziksel imha ve gerçek yük kabulü tamamlanmış değildir. Ayar davranış sprinti ve güncel entegrasyon sınırları [tek devir](00-FtkSaaS-yeni-sohbet-devir.md) ve [ayarlar sözleşmesinde](02-FtkSaaS-teknik-sozlesme.md#ayarlar-sozlesmesi-ve-davranis-sprinti). Eski tarih/CI/pending snapshotları yeni durum kanıtı değildir; ürün kuralları yalnız son açık kararla değişir.
-
 # FtkSaaS — Kodlama sorumlulukları ve model yetki sınırları
+
+> 25 Ekim güncel karar: 69 ana grup ve FD01–FD12 kabul edildi; backend işletim ayarları erteli, frontend scope user/member/center/organization/platform. Standart yeni org negatif limit 0, mevcut kulüp −2 korunur. Giriş: e-posta/parola + Google; Apple/Instagram login kapsam dışı, passkey erteli. Oda/seans kapasite kararı ile mevcut yayımlanmış API farklı kaynak aşamalarıdır. [Tek teknik karar ve kaynak durumu](02-FtkSaaS-teknik-sozlesme.md#oda-seans-kapasite-karari), [beş ekran devri](../docs/claude-handover.md). Bu belge yeni runtime teslimi değildir.
 
 ## 24 Ekim 2026 yürürlükteki çalışma kararı
 
-[AGENTS](../AGENTS.md), [settings sözleşmesi](02-FtkSaaS-teknik-sozlesme.md#ayarlar-sozlesmesi-ve-davranis-sprinti) ve [Claude talimatı](../docs/claude-handover.md) geçerlidir. P01–P07 kabulü kapandı; 69 ana ayar grubu kararı kapanmıştır; şimdi belge eşitlemesi ve açık alan/değer/yetki/API matrisi hazırlanır. Yeni settings runtime geliştirmesi kullanıcı tarafından durduruldu. Belge onayı, UI tasarım kararı ve çalışan API ayrı teslimdir.
+[AGENTS](../AGENTS.md), [settings sözleşmesi](02-FtkSaaS-teknik-sozlesme.md#ayarlar-sozlesmesi-ve-davranis-sprinti) ve [Claude talimatı](../docs/claude-handover.md) geçerlidir. P01–P07 kabulü kapandı; 69 ana ayar grubu kararı kapanmıştır; FD01–FD12 frontend seçimleri de kapandı; şimdi kalan DTO/permission/API/uygulama kanıtı eşlenir. Yeni settings runtime geliştirmesi kullanıcı tarafından durduruldu. Belge onayı, UI tasarım kararı ve çalışan API ayrı teslimdir.
 
 CI-02 otomasyonu kuruludur. Geliştirmede Draft/development ve birikimli hedefli doğrulama; runtime/CI son adayda kaynak bağlı full clean, merge sonrası aynı main full clean; incelenmiş güvenli yalnız-belge kaynağında ayrı belge kabulü. Mevcut kapı veya izin listesi bu görevle değiştirilmez. Önceden verilen somut yetki tekrar onaylatılmaz; genel üretim kuyruğu frontend/production/repository yönetim yetkisi vermez.
 
-> **Güncel öncelik: Q-E02 · 0.2.0-rc.3.** Kullanıcının 16 Ekim 2026 son iptal kabulü önceki çelişen merkez iptali hükümlerinin yerine geçer. Güncel davranış/kanıt: docs/decisions/Q-E02.md, docs/claude-handover.md ve reports/qe02-verification.json. Aşağıdaki eski durum/test sayıları tarihsel kayıttır; teknik aktarım bekleyen işler tamamlandı sayılmaz.
+> **16 Ekim Q-E02 alan kabulü · 0.2.0-rc.3.** Kullanıcının 16 Ekim 2026 son iptal kabulü önceki çelişen merkez iptali hükümlerinin yerine geçer. Güncel davranış/kanıt: docs/decisions/Q-E02.md, docs/claude-handover.md ve reports/qe02-verification.json. Aşağıdaki eski durum/test sayıları tarihsel kayıttır; teknik aktarım bekleyen işler tamamlandı sayılmaz.
 
 > **Q-D01 durumu:** Etkinlik disiplin/kapsam matrisi ve negatif kredi yasağı kabul edilmiş ve runtime’a aktarılmıştır. İlk teknik aktarım raporları tarihsel kanıttır; güncel kaynak/kabul [tek devirde](00-FtkSaaS-yeni-sohbet-devir.md) ve işlem envanterindedir.
 

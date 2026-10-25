@@ -1,5 +1,7 @@
 # Starter yoklama ve kesin rezervasyon koruması devri
 
+25 Ekim güncel ürün hedefi: [tek oda/seans/kategori kapasitesi ve ayrı kontrollü aşım](../contracts/02-FtkSaaS-teknik-sozlesme.md#oda-seans-kapasite-karari). Yayımlanmış main200/59 DTO'ları ile PR45 adayı201/60 ayrıdır. PR45 bağımsız inceleme ve aday40164825351 başarılı; merge/main/CD bekler. Bu modülün eski test/alan adları kendi tarihsel runtime kaydını anlatır, yeni ürün kuralı değildir.
+
 Güncel durum ve kaynak/CI: [doğrulanmış devir](../contracts/00-FtkSaaS-yeni-sohbet-devir.md). Aşağıdaki 198/89/109 ve 27 migration sayıları PR #14 teslim snapshot’ıdır; 23 Ekim yayımlanmış envanter 200 API / 0 contract_only / 59 migration’dır. P02 hak değişikliği/koruma ve P05 belge tüketicileri sonradan kabul edildi; eski açık tüketici ifadeleri ilk PR kapsamını anlatır, güncel açık liste değildir.
 
 Başlangıç: main `5265a70a0d29f91b9081a1ecbc2a8f0ff78668ee`; aynı SHA’nın başarılı [CI çalışması](https://github.com/SXQHex/FtkSaaS/actions/runs/39030586306). Başlangıcın 322 testi yeni head’in kabulü değildir. Son PR head/inceleme/temiz CI kanıtı PR üzerinde aynı tam SHA’ya bağlanır.

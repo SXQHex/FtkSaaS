@@ -1,5 +1,16 @@
 # FtkSaaS güncel devir
 
+## 25 Ekim kaynaklar arası uzlaştırma
+
+| Kaynak | Durum |
+|---|---|
+| Main `702063807b0a0d09f559f070ffde1b1ae3e7563b` |200 callable API/59 migration/90 core tablo. PR42 main39890889184 belge kabulü success; CD39890983257 source success/deploy skipped. |
+| PR44 |69 ana grup +12 FD kabulü ve bu belge eşitlemesi; runtime/DTO/migration yok. Önceki headcbbf8386 belge40151955154 success, güncellenen head için yeni belge kanıtı gerekir. |
+| PR43 |Hazır org renk/font ihtiyacı; FD02 ile seçilen yetki/public okuma/merkez override sınırları günceldir. Eski açık seçenek notları yeni kararları geri açmaz; branch merge edilmedi. |
+| PR45 `149be4f4d925674c97f04d40bb0c9a8416f2c66c` |201 API/60 migration kapasite adayı. Bağımsız review5641685684 ve full clean40164825351 core/API1–4/toplayıcı success; merge/main/CD bekliyor. Eski ilk aday40159833415 bu son kaynak için kullanılmaz. |
+
+Güncel kararlar: FD01–FD12 kapalı; standart negatif limit 0/mevcut kulüp −2. E-posta+parola ve Google kayıt/giriş kabul; Apple/Instagram login/bağlama kapsam dışı, passkey erteli. Instagram reklam lead alımı ayrı üretim P08 işi olarak kalır. Seans tek toplam/kategori ve oda fiziksel sınırı; kontrollü tek kayıt aşımı ayrı. [Tek karar](02-FtkSaaS-teknik-sozlesme.md#oda-seans-kapasite-karari), [frontend devri](../docs/claude-handover.md). Ürün kararı, mevcut main API ve başarılı PR adayı aynı teslim durumu değildir.
+
 ## 25 Ekim — frontend karar sprinti tamamlandı
 
 69 ana grubun backend/frontend alan ayrımı ve beş scope sınıflaması tamamlandı; **FD01–FD12 kullanıcı tarafından kabul edildi**. [Kesin alan/default/kapsam kararları](02-FtkSaaS-teknik-sozlesme.md#ayarlar-backend-frontend-siniflama) tek kaynaktır. Standart yeni org negatif kredi limiti 0; mevcut kulüp −2 ve diğer gerçek ayarlar korunur. Yeni ana/FD karar turu açılmaz. Sıradaki iş mevcut 200 işlemle alan/DTO/permission/sürüm/API açığını eşlemek, gerekli runtime ve kabulünü ayrı teslim etmektir. Bu belge kapanışında hiçbir default/API/sağlayıcı/canlı veri uygulanmadı; PR43/44 merge/deploy sayılmaz. Backend işletim ayarları ertelenmiş kalır.
@@ -218,7 +229,7 @@ Frontend ekran/görsel/kullanıcı akışı/kod Claude; ChatGPT frontend’e mü
 - Hesap orglar arası ortak, kişi orga ait; e-posta identity değildir. Hesapsız kişi/görev/öğrenci kaydı işletilir. Mevcut kişiye hesap erişimi gönderilir, yeni org daveti ayrı özellik diye icat edilmez. İlk bağ student-self; privileged login grant ancak sonra. Offline görev otomatik login grant olmaz.
 - Owner yalnız FtkSaaS atar/kaldırır. Owner CM değilse invite/tahsilat/rezervasyon yapamaz; merkez kurar/self-CM atar, sonra operasyon. Diğer CM atayıp öz CM rolünü owner yetkisiyle kaldırır. Müşteri owner devredemez. Org-manager eski self-center atama hakkı ve owner’ın org-manager yönetimi korunur.
 - İlk ödeme doğrulaması dönem+operasyon başı; ödeme öncesi kuruluş/ödeme/center+self-CM, trial/ilk-payment grace yok. Yenileme gecikmesi ilk7gün matris, sonra bütün hizmet kapalı/owner subscription. Downgrade dönem sonu/veri korunur; Business merkez seçimi zorunlu.
-- Reservation atomik yer+hak. Nominal esnek/offer, maksimum priority; ortak toplam. Allocation consume değil; taslak attendance consume etmez; close atomik hak+earning+outbox. Assistant-participant iki yönlü conflict.
+- Bu tarihsel kaynakta reservation atomik yer+hak ve nominal esnek/offer–maximum priority idi. 25 Ekim kabulü bu farklı tavanı kaldırır; güncel ürün tek toplam/kategori ve fiziksel oda sınırıdır, PR45 uygulama adayı ayrıdır. Allocation consume değil; taslak attendance consume etmez; close atomik hak+earning+outbox. Assistant-participant iki yönlü conflict.
 - Negative izinli limit reserved+consumed ortak, kişisel override default yerine/mandatory upper. Başlangıç limit aşımı blocked, bu katılımdan yüzde/kişi earning yok; geç ödeme geçmişi değiştirmez. Gerçekleşen seans sabiti korunur; gerçekleşmeyen özel seans0. Kaynak satışsız izinli negative için merkez değeri reservation snapshot; yeni sale eski earning’i değiştirmez veya ek nakit borcu doğurmaz.
 - Satış start/end tarihleri açık girilir, center00:00 snapshot→UTC, start dahil/end hariç. End son kullanım günü değildir; takvim aylık ürün/satış bitişi otomatik ay kaydırma yok. Quota week/month başlangıç çıpalı, son kısa dönem tam, carryyok.
 - Business ortak hakta satış/para satış merkezinde, hizmet/earning hizmet merkezinde; rapor transfer/merkezler arası borç yaratmaz. Fiilî instructor ve açık agreement, timed için otomatik person-fee yok. Trial bedelsiz kişi/yüzdeye girmez. Event aktif öğrenci/limit istisnası değil, harici venue olabilir.

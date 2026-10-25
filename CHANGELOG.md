@@ -1,5 +1,9 @@
 # Changes
 
+## 25 Ekim 2026 — sözleşmeler arası karar/kaynak uzlaştırması
+
+Son Google kayıt/giriş kabulü, Apple/Instagram login dışlaması ve reklam CRM kaynağı ayrımı işlendi. Aktif ürün metinlerinden nominal/maksimum farkı ve yeni default gibi duran30dk teklif fallback kaldırıldı; FD06 açık yapılandırma, standart negatif0 ve kulüp−2 korundu. PR45 son inceleme/aday başarı kanıtı mevcut main200/59 ve belge PR44'ten ayrıldı. Tarihsel raporlar/uygulanmış migration'lar değiştirilmedi; canlı default veya runtime yayımlanmadı.
+
 ## 25 Ekim 2026 — FD01–FD12 frontend kararları kabul edildi
 
 User/member/center/organization/platform frontend seçimlerinin tamamı kullanıcı onayıyla kesinleştirildi; 69 ana gruba yeni grup eklenmedi. Standart negatif kredi limiti 0 ayrıca teyit edildi, mevcut kulüp −2 ve eski ayarlar korunur. İlk kapsam/ertelemeler, marka-login-MFA, bildirim zamanları, görünürlük, program/finans/belge/CRM, CSV/JSON, miras/reset ve yetki sınırları teknik sözleşmeye işlendi. Claude/kuyruk/kalan işler/devir eşitlendi. Runtime, DTO, migration, CI ve canlı default uygulanmadı.

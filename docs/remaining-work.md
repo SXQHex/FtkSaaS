@@ -1,5 +1,7 @@
 # Kalan backend ve entegrasyon işleri
 
+25 Ekim uzlaştırması: FD01–FD12 kararları kapalı; [kaynak/main/PR43–45 kabul tablosu](../contracts/00-FtkSaaS-yeni-sohbet-devir.md) ve [tek kapasite/giriş kararı](../contracts/02-FtkSaaS-teknik-sozlesme.md#oda-seans-kapasite-karari) geçerlidir. Main200/59; PR45 adayı201/60 bağımsız inceleme/aday clean başarılı, merge/main/CD bekliyor. Settings belge çalışması runtime teslimi değildir.
+
 24 Ekim 2026 belge tabanı main `702063807b0a0d09f559f070ffde1b1ae3e7563b`. P01–P07 kod/main/geliştirme-test kabulü tamamlandı; **200 API/0 contract_only/59 migration**. Eski178/22 ve PR40 pending listeleri güncel açık API listesi değildir. Kanıt [tek devirde](../contracts/00-FtkSaaS-yeni-sohbet-devir.md).
 
 ## Aktif görev — beş ayar ekranı ve API teslimi
@@ -29,6 +31,8 @@ Frontend başlangıcı için belgeler eşitleniyor; [Claude talimatları](claude
 
 ## P08 geliştirmeler
 
-[Üretim kuyruğu](production-queue.md#p08--geliştirmeler) tam kapsamdır: organizasyon bazlı sabit abone numarası; web/Instagram/Facebook/Google formları için kaynak izlenen ortak CRM başvurusu; kadın/erkek kontenjanı; sınırsız etkinlik kapasitesi ve Business limit temsili; ders kredisi tüketmeyen pakete bağlı Pratik uygunluğu. Yeni ayar endpoint'iyle bu farklara bypass kurulmaz.
+[Üretim kuyruğu](production-queue.md#p08--geliştirmeler) tam kapsamdır: organizasyon bazlı sabit abone numarası; web/Instagram/Facebook/Google formları için kaynak izlenen ortak CRM başvurusu; PR45 adayında tamamlanan fakat main/CD bekleyen kategori kapasitesi; ayrı sınırsız etkinlik kapasitesi ve Business limit temsili; ders kredisi tüketmeyen pakete bağlı Pratik uygunluğu. Yeni ayar endpoint'iyle bu farklara bypass kurulmaz.
 
 Mevcut kurulum20 kontenjan/100 tekrar/4 ders/2 ay; geçerli ve kullanılabilir ders hakkı birlikte sürerken ücretsiz Pratik hedefi P08'dir. Ayrı4 etkinlik sayacı, sonraki hafta uzatması veya ayrıca süresiz program işi açılmaz. Ayrıntılı gerçek kurulum verileri kuyrukta tarihli aktarım kaydıdır; gerçekleşmiş seans/satış/yoklama kanıtı değildir.
+
+Instagram ile giriş/kayıt/hesap bağlama kapsam dışıdır. Buradaki Instagram/Facebook/Google reklam başvuru kaynakları ayrı ortak CRM/P08 veri alımıdır; sosyal login yöntemi veya kurulmuş entegrasyon değildir.

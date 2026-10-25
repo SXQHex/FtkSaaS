@@ -1,5 +1,7 @@
 # FtkSaaS sıralı üretim kuyruğu
 
+25 Ekim uzlaştırması: FD01–FD12 kararları kapalı; [kaynak/main/PR43–45 kabul tablosu](../contracts/00-FtkSaaS-yeni-sohbet-devir.md) ve [tek kapasite/giriş kararı](../contracts/02-FtkSaaS-teknik-sozlesme.md#oda-seans-kapasite-karari) geçerlidir. Main200/59; PR45 adayı201/60 bağımsız inceleme/aday clean başarılı, merge/main/CD bekliyor. Settings belge çalışması runtime teslimi değildir.
+
 23 Ekim güncel durum: P01–P07 kod/main/geliştirme-test kabulü kapandı. Yayımlanmış200 API/59 migration; kaynak ve run kanıtı [tek devirdedir](../contracts/00-FtkSaaS-yeni-sohbet-devir.md). Beş hosted worker kurulu/idle/hata0; gerçek yük ve fiziksel imha ayrı açık. 69 ana settings grubu kabul edildi; açık alan/değer/yetki/API eşlemesi sıradadır, yeni runtime uygulaması bu belgeyle başlatılmaz. [Davranış sprinti](../contracts/02-FtkSaaS-teknik-sozlesme.md#ayarlar-sozlesmesi-ve-davranis-sprinti) 69 grup kabulünü ve kalan alt alanları taşır. Settings platform P01–P09, bu üretim tablosundaki P01–P08 teslimleri değildir.
 
 | Sıra | Teslim | İşlem | Durum | Kanıt / sonraki adım |
@@ -133,7 +135,7 @@ Format, başlangıç, adaya hangi aşamada tahsis, mevcut kayıt aktarımı ve k
 
 
 
-- Cinsiyete göre ayrı ders kontenjanı: istenen10 erkek+10 kadın sınırları, toplam/oda kapasitesiyle birlikte yetkili rezervasyon ve yarış kapılarında uygulanmalı. Mevcut kurulumda kategori ayrımı yok, toplam kontenjan20.
+- Ders kategori kontenjanı PR45 adayıdır: tek toplam/erkek-kadın ve fiziksel oda sınırı, ayrı kontrollü kayıt aşımı. Son head149be4f4 inceleme/full clean geçti; merge/main/CD bekler. Mevcut kurulum toplam20 ve önceki veri değişmedi; bu aday tamamlanmadan yeni DTO çalışıyor sayılmaz.
 - Sınırsız etkinlik kapasitesinin açık temsili: sihirli büyük sayı veya0 ile taklit edilmemeli. Mevcut kurulumda etkinlik dahil sonlu kontenjan20 kullanılır.
 - Pakete bağlı, ders kredisi tüketmeyen etkinlik katılımı: bu paket4 ders sağlar; etkinlik için ayrıca4 hak veya sayaç yoktur. İzin verilen “Pratik” etkinliğine ücretsiz katılım, etkinlik tarihinde paketin iki aylık geçerliliği VE kullanılabilir ders hakkı sürerken mümkündür; süre veya ders hakkı hangisi önce biterse uygunluk kapanır. Etkinlik kaydı yalnız etkinliğin kontenjanından yer ayırır; ders kredisini reserve/consume etmez. Etkinlik yoklaması alınabilir ve ders bakiyesini değiştirmez. Diğer paketler için ayrı etkinlik hak sayacı seçeneği ayrıca tartışılabilir; bu pakete zorunlu değildir. Mevcut event_register/reserve_right ortak havuzdan1 kredi ayırdığından bu davranış uygulanmış değildir. “Pratik” etkinliğin adıdır; mevcut core.events modeli kullanılır, yeni pratik modülü açılmaz.
 - Uygunluk ve paket hareketleri: her harekette bütün etkinlik kayıtlarına durum kopyalamak yerine güncel paket/kapsam/bakiye/geçerlilikten uygunluk hesaplanmalı; kayıt ve katılım kapılarında atomik tekrar kontrolü/yarışlar doğrulanmalı. Hak tüketimi/iadesi, süre uzatma/kısaltma, dondurma/sonlandırma gibi değişiklikler hesabı etkiler. Geçmiş yoklama ve kesin kayıtlar sessizce silinmez/iptal edilmez; mevcut kesin rezervasyon koruması ve açık yönetici çözümü korunur. İlk kayıt, katılım anı ve önceden kesinleşmiş kayıtların korunması birlikte kabul senaryolarına bağlanmalı.
@@ -150,3 +152,5 @@ Worker işletim kapanışı: son kullanıcı talimatıyla mevcut organizasyon p0
 
 
 P07'nin sonraki tamamlanmış kaynak ve hosted temel kurulum kanıtı yukarıdaki kapanış kaydındadır. Gizlilik partial/pending ve fiziksel imha kanıtı sınırı sürer. 69 ana ayar davranışı tamamlandı. Sonraki adım tek alan/değer/yetki/API matrisi; yeni ayar API geliştirmesi bu kapanışla başlamaz.
+
+Instagram ile giriş/kayıt/hesap bağlama kapsam dışıdır. Buradaki Instagram/Facebook/Google reklam başvuru kaynakları ayrı ortak CRM/P08 veri alımıdır; sosyal login yöntemi veya kurulmuş entegrasyon değildir.

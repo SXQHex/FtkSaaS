@@ -1,5 +1,7 @@
 # FtkSaaS backend
 
+25 Ekim: FD kararları tamamlandı; giriş e-posta/parola + Google (uygulama/provider kabulü ayrı), Apple/Instagram login kapsam dışı. [Güncel karar/kaynak tablosu](contracts/00-FtkSaaS-yeni-sohbet-devir.md) yayımlanmış main200/59 ile henüz merge edilmemiş PR45 kapasite adayını201/60 ayırır. Nominal/maksimum ürün modeli kaldırıldı; mevcut main DTO'ları PR45 merge edilmeden değiştirilmiş sayılmaz.
+
 Güncel kaynak merkezi [SXQHex/FtkSaaS main](https://github.com/SXQHex/FtkSaaS). Önce [AGENTS](AGENTS.md), [kaynak indeksi](docs/source-index.md) ve [güncel devir](contracts/00-FtkSaaS-yeni-sohbet-devir.md) okunur.
 
 ## Frontend için başlangıç

@@ -1,16 +1,8 @@
-> 25 Ekim: **FD01–FD12 frontend alan kararları tamamen kabul edildi.** [Kesin seçimler ve beş scope](02-FtkSaaS-teknik-sozlesme.md#ayarlar-backend-frontend-siniflama) önceki açık frontend değerleri bakımından üstündür. Standart negatif başlangıç 0; mevcut kulüp −2 korunur. Yeni API/enum/default uygulaması bu belgeyle yapılmadı.
-
-> 24 Ekim ayar kapanışı: **69 ana grup kabul edildi** (17 kullanıcı/22 merkez/21 organizasyon/9 platform). Somut alan/değer/yetki/sağlayıcı ve API eşlemesi açıktır; runtime/enum/permission bu belgeyle değişmez. [Tek karar ve açık alan matrisi](02-FtkSaaS-teknik-sozlesme.md#ayarlar-sozlesmesi-ve-davranis-sprinti). Önceki S01–S10/kalan grup ifadeleri 23 Ekim aktarım sınırıdır.
-
-> 23 Ekim 2026 güncel durum: P01–P07 kod/main/geliştirme-test kabulü kapandı; yayımlanmış kapsam **200 API / 0 contract_only / 59 migration / 90 core tablo / Edge8**. P07 runtime kaynağı `4cfc9a55`; güncel belge tabanı `bfb8ccb2`. Beş Cron hattı aktif ve boş kuyrukta healthy/idle; fiziksel imha ve gerçek yük kabulü tamamlanmış değildir. Ayar davranış sprinti ve güncel entegrasyon sınırları [tek devir](00-FtkSaaS-yeni-sohbet-devir.md) ve [ayarlar sözleşmesinde](02-FtkSaaS-teknik-sozlesme.md#ayarlar-sozlesmesi-ve-davranis-sprinti). Eski tarih/CI/pending snapshotları yeni durum kanıtı değildir; ürün kuralları yalnız son açık kararla değişir.
-
-> Güncel öncelik: [DS-2026-10-17](../docs/decisions/DS-2026-10-17.md). Çelişen eski hükümler yalnız belirtilen kapsamda yürürlükten kalkmıştır. [Hedef sözleşme/runtime ayrımı](../docs/decision-sprint-handover.md).
-
-> **Güncel ek: Q-E03.** Parasal iptal sınırı planlanan başlangıçtır (eşitlik dahil sonrası). Q-E02 merkez iptali korunur. Teknik durum: docs/decisions/Q-E03.md; test/CI kanıtı ayrıca doğrulanır.
-
 # FtkSaaS — Ürün kapsam sözleşmesi
 
-> **Güncel öncelik: Q-E02 · 0.2.0-rc.3.** Kullanıcının 16 Ekim 2026 son iptal kabulü önceki çelişen merkez iptali hükümlerinin yerine geçer. Güncel davranış/kanıt: docs/decisions/Q-E02.md, docs/claude-handover.md ve reports/qe02-verification.json. Aşağıdaki eski durum/test sayıları tarihsel kayıttır; teknik aktarım bekleyen işler tamamlandı sayılmaz.
+> 25 Ekim güncel karar: 69 ana grup ve FD01–FD12 kabul edildi; backend işletim ayarları erteli, frontend scope user/member/center/organization/platform. Standart yeni org negatif limit 0, mevcut kulüp −2 korunur. Giriş: e-posta/parola + Google; Apple/Instagram login kapsam dışı, passkey erteli. Oda/seans kapasite kararı ile mevcut yayımlanmış API farklı kaynak aşamalarıdır. [Tek teknik karar ve kaynak durumu](02-FtkSaaS-teknik-sozlesme.md#oda-seans-kapasite-karari), [beş ekran devri](../docs/claude-handover.md). Bu belge yeni runtime teslimi değildir.
+
+> **16 Ekim Q-E02 alan kabulü · 0.2.0-rc.3.** Kullanıcının 16 Ekim 2026 son iptal kabulü önceki çelişen merkez iptali hükümlerinin yerine geçer. Güncel davranış/kanıt: docs/decisions/Q-E02.md, docs/claude-handover.md ve reports/qe02-verification.json. Aşağıdaki eski durum/test sayıları tarihsel kayıttır; teknik aktarım bekleyen işler tamamlandı sayılmaz.
 
 > **Q-D01 durumu:** Etkinlik disiplin/kapsam matrisi ve negatif kredi yasağı kabul edilmiş ve runtime’a aktarılmıştır. İlk teknik aktarım raporları tarihsel kanıttır; güncel kaynak/kabul [tek devirde](00-FtkSaaS-yeni-sohbet-devir.md) ve işlem envanterindedir.
 
@@ -111,10 +103,10 @@ Bu modüller ayrı servis veya ayrı uygulama zorunluluğu değildir. Yeni backe
 ### Planlama, bekleme listesi ve ders gerçekleşmesi
 
 - Bekleyen özel ders talebi odayı bloke etmez. Onay anında oda/eğitmen çakışması yeniden kontrol edilir; planlanan grup kullanımı görünür. Öğrenci bekleyen talebi geri çekebilir; yönetici gerekçeli reddedebilir veya alternatif saat sunabilir.
-- Sınıfın dış katılıma açıklığı ile paketin öncelikli/esnek rezervasyon biçimi ayrı boyutlardır. Öncelikli paket ilgili seansları topluca, esnek paket kalan nominal kontenjanı tek tek kullanır; aynı sınıfta iki biçim birlikte bulunabilir. Öğrencinin açık grup dersine kaydolması, özel dersin otomatik onaylanacağı anlamına gelmez.
+- Sınıfın dış katılıma açıklığı ile paketin öncelikli/esnek rezervasyon biçimi ayrı boyutlardır. Öncelikli paket ilgili seansları topluca, esnek paket kalan seans/kategori kontenjanını tek tek kullanır; aynı sınıfta iki biçim birlikte bulunabilir. Öğrencinin açık grup dersine kaydolması, özel dersin otomatik onaylanacağı anlamına gelmez.
 - Bekleme listesine katılmak kesin rezervasyon oluşturmaz ve kredi tüketmez. Yer açıldığında sıradaki uygun kişiye süreli teklif verilir; kabul edilmezse sıradakine geçilir.
 - Teklif edilen yer, teklif süresince başkasına satılmayacak şekilde geçici ayrılır. Bu, bekleyen özel ders talebinin oda bloke etmesinden ayrı bir işlemdir.
-- Kabul anında kontenjan, kullanım hakkı, belge ve katılım koşulları kontrol edilir; eşzamanlı işlemler ilgili nominal/maksimum sınırı aşamaz. Öncelikli kayıt maksimum, esnek kayıt/yer teklifi nominal sınıra tabidir; toplam yer tutma ortaktır. Mevcut rezervasyonlar kapasite değişikliğinde otomatik iptal edilmez. Başlangıçta listeye giriş zamanı sırası ve 30 dakika teklif süresi kullanılır; süre dersin başlangıcını veya kayıt kapanışını geçemez.
+- Kabul anında kontenjan, kullanım hakkı, belge ve katılım koşulları kontrol edilir; normal eşzamanlı işlemler tek seans toplamını ve ilgili kategori sınırını aşamaz. Öncelikli/esnek kayıt aynı sınıra tabidir. Yetkili, gerekçeli tek kayıt aşımı ayrı komuttur; fiziksel oda sınırı aşılamaz. Toplam yer tutma ortaktır. Mevcut rezervasyonlar kapasite değişikliğinde otomatik iptal edilmez. Listeye giriş zamanı sırası korunur. FD06 gereği teklif süresi açık org/izinli merkez yapılandırmasından gelir; süre ders başlangıcı/kayıt kapanışını aşamaz. Eski30dk yeni default değil, mevcut kulüp 3600 sn ayrı kurulumdur.
 - Bekleme listesinden otomatik kesin kayıt ilk kabul edilen kapsamda değildir; süreli kabul akışı yeterlidir.
 - Öğrenci iptali, eğitmen iptali ve gelmeme ayrı değerlendirilir. Varsayılan 12 saat iptal/kredi sınırı yalnızca özel ders içindir; grup ve etkinliğe kendiliğinden uygulanmaz. Organizasyon/merkez ayarlarıyla yönetilir.
 - Ders iptali, yerine seans düzenleme, kredi ve bildirim akışı koordine edilir; aynı işlem tekrarlandığında ikinci kredi hareketi oluşmaz.
@@ -199,7 +191,7 @@ Aşağıdaki değerler yeni yapılandırmalar için bu sürümün değiştirileb
 | Ayar | Başlangıç değeri | Kapsam/sınır |
 |---|---|---|
 | Bekleme sırası | Listeye giriş zamanı | İlk kapsamda öncelikli/VIP sıra yoktur. Eşit zamanlarda kararlı sıra korunur. |
-| Bekleme teklifi kabul süresi | 30 dakika | Organizasyon/izin verilen merkez ayarı; etkin süre kayıt kapanışı veya ders başlangıcıyla sınırlanır. |
+| Bekleme teklifi kabul süresi | Açık org/izinli merkez yapılandırması | FD06: tanımsızsa hedef akış teklif üretmez. Mevcut kulüp 3600 sn korunur; tarihsel30dk fallback yeni ürün defaultu değildir. |
 | Teklifin reddedilmesi veya süresinin dolması | Sıradaki uygun kişiye geçiş | M04'ün sabit akış davranışıdır; teklif geçmişi korunur. |
 | Bekleme listesinden otomatik kesin kayıt | Kapalı | İlk kapsamda otomatik kayıt özelliği yoktur; ayarı açarak kapsam genişletilemez. |
 | Özel ders iptal/kredi sınırı | Dersten 12 saat önce | Yeni kapsam sözleşmesi v1.1 içinde açıkça yer alan başlangıç değeri olarak korunur; eski uygulama garantisi değildir. Grup ve etkinliğe uygulanmaz. |
@@ -246,7 +238,7 @@ Bu bölüm önceki sürümdeki çelişen hükümlerin yerini alır. Uygulama ayr
 
 ### Hak, rezervasyon ve finans
 
-- Oda kapasitesi varsayılan sağlar; yönetici seansa nominal/maksimum kontenjan belirler. Esnek kayıt nominale, öncelikli kayıt maksimuma kadar alınır. Kesin rezervasyon ve aktif teklifler ortak yer tutar. Mevcut kayıt kapasite değişikliğiyle otomatik iptal edilmez.
+- Oda fiziksel kapasitesi ve seans kayıt kapasitesi ayrı girilir; seans toplamı oda kapasitesini geçemez. Seans toplam/kategori sınırları normal kayıtların tamamına uygulanır. Yetkili eğitmen/personel/yönetici seans bazında gerekçeli ve denetimli tek kayıt aşımı yapabilir; fiziksel oda sınırı korunur. Kalıcı kapasite artırımı ayrı işlemdir. Kesin kayıt, bekleme ve deneme teklifleri ortak yer tutar; kapasite indirimi mevcut kayıtları otomatik iptal etmez. Ayrıntı: [25 Ekim kapasite kararı](02-FtkSaaS-teknik-sozlesme.md#oda-seans-kapasite-karari).
 - Kredili/süreli hak, öncelikli/esnek rezervasyon ve taahhüt/iade koşulu bağımsızdır. İadeli/iadesiz ve gerekiyorsa hesap yöntemi üründe tanımlanır, satış koşulu korunur. Kullanılmamış hak otomatik para iadesi veya borç silme hakkı değildir.
 - Kesin rezervasyonda hak ayrılır. Taslak yoklama tüketmez; kapanışta sonuç/politika uygulanır. Eksik yoklama kendiliğinden noShow olmaz. Talep/rezervasyon/seans/yoklama/teklif durumları teknik sözleşmede ayrıdır.
 - İşletme iptalinde ayrılmış kredi serbest kalır; otomatik seans arama/öteleme veya ayrı telafi kredisi yoktur. Yönetici planlamayı yapar. Geçerlilik sorunu gösterilir, yönetici uzatabilir; süreli üyelik otomatik uzamaz.

@@ -1,10 +1,12 @@
 # FtkSaaS çalışma kuralları
 
+25 Ekim uzlaştırması: son kararlar Google ek kayıt/girişini kabul eder; Apple/Instagram login/bağlama kapsam dışı, passkey erteli. Kapasite hedefi nominal/maksimum değil tek seans toplam/kategori ve fiziksel oda tavanıdır. PR45 adayı `149be4f4` inceleme/full clean başarılı fakat henüz main/CD değildir; bu belge branch'i 200/59 runtime'ı değiştirmez. FD01–FD12 tekrar onaylatılmaz. PR43/44/45 kaynakları birleşirken son karar ve kaynak ayrımı korunur.
+
 25 Ekim son kullanıcı kabulü: 17 kullanıcı/22 merkez/21 organizasyon/9 platform olmak üzere 69 ana ayar grubu tamamlandı. Backend/frontend ayrımı ve user/member/center/organization/platform scope sınıflaması yapıldı; FD01–FD12 frontend kararlarının tamamı kabul edildi. Standart başlangıç negatif limit 0, mevcut kulüp −2 korunur. Sonraki iş gerçek alan/DTO/permission/sürüm/API/kabul eşlemesi ve beş ekran teslimidir; kararları tekrar onaylatma, desteklenmeyen alanı hazır gösterme. SQL/Cron/DB/worker teknik işletim ayarları ertelenir; frontend beş ekranının alan/typed API/kabul boşlukları tamamlanır. Bu belge değişikliği tek başına yeni endpoint uygulandığı anlamına gelmez. Mevcut yerel platform-settings taslağı yayımlanmış sayılmaz. Frontend tasarımına müdahale etme.
 
 P01–P07/PR40 kod/main/development kabulü kapandı; runtime main4cfc9a55, belge main7020638;200 API/0 contract_only/59 migration/90 core tablo/Edge8. Beş hosted worker temel kurulum ve idle heartbeat doğrulaması geçti. Fiziksel imha/yük/restore ve ek işletim kabulü açık; ayrıntılar [güncel devir](contracts/00-FtkSaaS-yeni-sohbet-devir.md). Eski GitHub ertelemesi ve PR40 pending notları tarihsel sınırdır; mevcut görev yalnız belge eşitlemesidir.
 
-[Ayarlar sözleşmesi](contracts/02-FtkSaaS-teknik-sozlesme.md#ayarlar-sozlesmesi-ve-davranis-sprinti) 69 S/M/O/P kabul grubunu ve açık alt alanları ayırır. Davranış grubu numaraları eski Word aileleri ve üretim P01–P08 kuyruğuyla karıştırılmaz. Yeni davranış kararı otomatik runtime kabulü değildir. Word dosyası ayrı otorite değildir.
+[Ayarlar sözleşmesi](contracts/02-FtkSaaS-teknik-sozlesme.md#ayarlar-sozlesmesi-ve-davranis-sprinti) 69 S/M/O/P kabul grubunu, kapanmış FD alan kararlarını ve kalan teknik eşlemeyi ayırır. Davranış grubu numaraları eski Word aileleri ve üretim P01–P08 kuyruğuyla karıştırılmaz. Yeni davranış kararı otomatik runtime kabulü değildir. Word dosyası ayrı otorite değildir.
 
 Vercel Sandbox yalnız yerelde çalıştırmanın mümkün olmadığı zorunlu dar doğrulamada kullanılabilir; kanıt alınınca durdurulur. Bu belge görevinde native test/Sandbox veya runtime full clean gerektiren kaynak değişikliği yapılmaz. Mevcut CI kapıları/izin listesi değiştirilmez; güvenli yalnız-belge yolu kaynak bağlı olarak doğrulanır.
 
