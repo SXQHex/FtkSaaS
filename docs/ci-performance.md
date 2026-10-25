@@ -93,3 +93,26 @@ Aynı tree'nin boş commit head 09c9cc321204ca6a1bd3a93866d97d0ed819036e / run 3
 ## 23 Ekim P07 ve belge kabulü ayrımı
 
 P07 aday39863852941 yaklaşık18dk59sn workflow wall ile başarılıdır (22 Ekim22:17:30–22:36:29 UTC); bu tüm job CPU/runner dakikalarının toplamı değildir. PR41 belge39872819806/main39873010292 ayrı hafif belge kabulüdür, runtime hızlandırma kıyası değildir. Eski Registry sonrası asıl açık bağlantı P07 lifecycle cleanup DROP OWNED yetki hatasıydı; dar test düzeltmesi ve son gerçek full/main kabulüyle kapandı. P02 dar seçici bakım işi açık; kapsam azaltarak süre kazanılmaz.
+
+## 25 Ekim — CLI2.122 ve güncel ölçümle dört shard dengesi adayı
+
+Kaynak main `9fd084b9ddbbefc225c98adbf3f25ddee85a9b6e`, aynı main clean [40226464989](https://github.com/SXQHex/FtkSaaS/actions/runs/40226464989) attempt1 ve development CD40228555171 success. Bu bakım adayı CLI’ı package.json+lockfile içinde **2.122.0** sürümüne sabitler; otomatik sürüm aralığı/güncelleme PR’ı eklemez. Önceki ağırlık kaynağı P01 main7577b2f/39401570751 idi; sonraki P03–P07 ve settings modülleri aynı test processlerine eklenmişti.
+
+| Shard | Ölçülen job süresi (checkout/npm/backend dahil) | Ölçülen test process duvarı | Yeni plan test modeli |
+|---|---:|---:|---:|
+| API1 |860 sn |801.29 sn |855.73 sn |
+| API2 |699 sn |646.14 sn |831.29 sn |
+| API3 |1577 sn |1519.53 sn |820.82 sn |
+| API4 |777 sn |723.28 sn |825.38 sn |
+
+Yeni değerler **tahmindir**, yeni CLI ile ölçülmüş başarı değildir. Test kuyruğunda en uzun process registry855.73sn; bu dosyanın içinde P05/P06/P07/ayar kabul modülleri de vardır. Yalnız dosya sayısını veya eski ağırlığı eşitlemek yanlıştı. Mevcut15 API processinin yeni wall ölçümleri başarılı kaynak/attempt/job loglarından çıkarıldı. [Ölçümler ve yeni plan](../reports/ci-balance-20261025.json).
+
+Dağıtım önce mevcut LPT toplam-ağırlık planını güvenli başlangıç kabul eder; aynı dört shard ve concurrency2 içinde Node’un alfabetik dosya kuyruğunu modelleyen deterministik sınırlı aramayla iyileştirir. Arama250000 düğümle sınırlıdır, duvar saati veya rastgeleliğe bağlı değildir; sonuç cache’ten kopyalanır. Mevcut toplam-ağırlık1.08 denge sınırı ve bütün suite envanter kontrolü korunur; mevcut veriyle tahmini shard duvarları arasındaki fark yaklaşık35sn’dir. Daha hızlı gerçek sonuç ancak yeni aday/main koşularından sonra kabul edilir.
+
+Hiçbir test dosyası/alt testi taşınmadı, kaldırılmadı veya bölünmedi. Assertion ve kapsam azaltılmadı. Core verify/test:db/seed/health/advisors, temiz62 migration ve boş Auth/tenant/receipt şartı, dört zorunlu API shardı, fail-fast=false, aynı run/attempt/head toplayıcı ve merge kapısı korunur. CLI sürümü clean loguna ayrıca yazılır. CLI2.122 binary kurulumu ve kullanılan start/reset/status/stop/advisors CLI yüzeyleri yerelde doğrulandı; gerçek native stack ve tüm regresyon uyumluluğu aday/main clean’de doğrulanacak.
+
+### Sonraki testler ve ölçüm güncellemesi
+
+Yeni API suite’i envanterde ve pozitif ölçüm tablosunda yoksa dağıtım reddedilir; sıfır/negatif/NaN/Infinity süreye veya varsayılan uydurma ağırlığa geçiş yoktur. Yeni `.test.mjs` dosyasının clean envanterinde yer alması CI politikasıyla da zorunludur. Mevcut process içine eklenen alt testin ağırlığı process ölçümüne dahildir; süre büyümesi sonraki başarılı clean’den tekrar ölçülür. Bu bakım her yeni assertion’ın ağırlığını statik olarak ölçtüğünü iddia etmez.
+
+`node scripts/ci/refresh-suite-durations.mjs bundle.json --write` bilinçli bakım komutudur; otomatik workflow/PR/CI tetiklemez. Bundle başarılı exact-source main push run metadata’sı, aynı attempt’in bütün job/step sonuçları ve API1–4’ün decoded loglarıdır (`run`, `jobs`, ID ile eşlenmiş `logs`). Komut önce core/API1–4/full-clean gerçek başarılı adımlarını doğrular; yanlış SHA/attempt, skipped/cancelled/failed job, eksik veya mükerrer timer, karışık CLI, yanlış shard, eksik/fazla suite verisini reddeder. `--write` yoksa yalnız sonucu gösterir. Güncelleme sonrası mevcut yapısal denge/kapsam kontrolleri ve son kaynak inceleme/aday/main kabulü gerekir. Bu araç log verisini tek başına GitHub kabulü yerine geçirmez.

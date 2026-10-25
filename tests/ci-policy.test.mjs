@@ -352,3 +352,54 @@ test('routine main collector measures five executed roles and excludes skipped o
   assert.throws(()=>validateJobs(broken,v.run,{benchmark:false}),/api-1/);
  }
 });
+
+import {durationSnapshot} from '../scripts/ci/refresh-suite-durations.mjs';
+import {durations,predictedWall} from '../scripts/ci/shards.mjs';
+function measuredMainBundle(){
+ const run={id:99,run_attempt:2,head_sha:'a'.repeat(40),head_branch:'main',event:'push',name:'Main clean acceptance',status:'completed',conclusion:'success'};
+ const jobs=['core','api-1','api-2','api-3','api-4','full-clean'].map((role,i)=>({id:i+10,name:'clean / '+role,run_id:run.id,run_attempt:run.run_attempt,head_sha:run.head_sha,status:'completed',conclusion:'success',steps:[{name:role==='full-clean'?'Verify all required jobs':'Clean acceptance',conclusion:'success'}]}));
+ const logs={};for(let i=0;i<4;i++){
+  const samples=apiSuites.filter((_,j)=>j%4===i).map(p=>'### '+p.slice(6)+'\n\nProcess wall: 10.00 s (includes setup/waits);').join('\n');
+  logs[jobs[i+1].id]='Supabase CLI: 2.122.0\nClean phase timings: '+JSON.stringify({role:'api',shard:i+1,tests_s:100})+'\n'+samples+'\n';
+ }
+ return {run,jobs,logs};
+}
+test('duration refresh requires successful same-source same-attempt executed jobs and one complete measured inventory',()=>{
+ const source=measuredMainBundle(),snapshot=durationSnapshot(source);
+ assert.equal(snapshot.source,source.run.head_sha);assert.equal(snapshot.run_attempt,2);assert.equal(snapshot.cli_version,'2.122.0');assert.equal(Object.keys(snapshot.seconds).length,apiSuites.length);
+ for(const mutate of [
+  x=>x.run.conclusion='failure',x=>x.run.event='pull_request',x=>x.run.head_branch='other',x=>x.run.head_sha='invalid',
+  x=>x.jobs[2].run_attempt=1,x=>x.jobs[2].head_sha='b'.repeat(40),x=>x.jobs[5].conclusion='failure',x=>x.jobs[1].steps[0].conclusion='skipped',
+  x=>delete x.logs[11],x=>x.logs[11]=x.logs[11].replace('Process wall: 10.00','Process wall: 0.00'),
+  x=>x.logs[11]+='### unknown.test.mjs\n\nProcess wall: 1.00 s\n',
+  x=>x.logs[11]+=x.logs[12].split('Clean phase timings:')[0]+'### '+apiSuites[0].slice(6)+'\n\nProcess wall: 10.00 s\n',
+  x=>x.logs[11]=x.logs[11].replace('2.122.0','2.121.0'),x=>x.logs[11]+='Supabase CLI: 2.121.0\n',x=>x.logs[11]+='currently installed v2.121.0)\n',x=>x.logs[11]=x.logs[11].replace('"shard":1','"shard":2'),
+  x=>x.logs[11]=x.logs[11].replace('### '+apiSuites[0].slice(6),'### missing')
+ ]){const input=measuredMainBundle();mutate(input);assert.throws(()=>durationSnapshot(input));}
+});
+test('current two-slot balance avoids the late long-suite queue and retains the measured weight bound',()=>{
+ assert.equal(predictedWall(['tests/c.test.mjs','tests/b.test.mjs','tests/a.test.mjs'],{a:1,b:1,c:100}),101);
+ const bins=shardPlan(),walls=bins.map(b=>predictedWall(b.suites));
+ assert(Math.max(...walls)/Math.min(...walls)<1.08);
+ const lowerBound=Math.max(...Object.values(durations.seconds),Object.values(durations.seconds).reduce((a,b)=>a+b,0)/8);
+ assert(Math.max(...walls)<=lowerBound*1.08);
+ // A caller cannot alter a later runner's cached coverage/scheduling decision.
+ const copy=shardPlan();copy[0].suites.pop();assert.deepEqual(shardPlan([...apiSuites].reverse()),bins);
+ for(const bad of [0,-1,NaN,Infinity])assert.throws(()=>shardPlan(apiSuites,{...durations.seconds,[Object.keys(durations.seconds)[0]]:bad}));
+});
+
+test('installed Node runner really queues explicit files lexically in the two process slots modeled by the planner',()=>{
+ const dir=mkdtempSync(join(tmpdir(),'ftk-queue-model-')),trace=join(dir,'starts.jsonl');
+ try{
+  for(const name of ['a','b','c']){
+   const script=["import fs from 'node:fs';import test from 'node:test';",`test('${name}',async()=>{`,
+    ` const trace=${JSON.stringify(trace)};fs.appendFileSync(trace,JSON.stringify('${name}')+'\\n');`,
+    ` if('${name}'!=='c'){const deadline=Date.now()+4000;while(!['a','b'].every(n=>fs.readFileSync(trace,'utf8').trim().split('\\n').map(JSON.parse).includes(n))){if(Date.now()>deadline)throw Error('First two runner slots did not start');await new Promise(r=>setTimeout(r,5));}}`,
+    '});'].join('\n');
+   writeFileSync(join(dir,name+'.test.mjs'),script);
+  }
+  execFileSync(process.execPath,['--test','--test-concurrency=2',...['c','b','a'].map(n=>join(dir,n+'.test.mjs'))],{stdio:'pipe',timeout:10000,env:Object.fromEntries(Object.entries(process.env).filter(([name])=>!name.startsWith('NODE_TEST_')))});
+  const starts=fs.readFileSync(trace,'utf8').trim().split('\n').map(JSON.parse);
+  assert.deepEqual(starts.slice(0,2).sort(),['a','b']);assert.equal(starts[2],'c');
+ }finally{rmSync(dir,{recursive:true,force:true});}
+});

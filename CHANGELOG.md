@@ -1,5 +1,9 @@
 # Changes
 
+## 2026-10-25 — CLI2.122 ve ölçümlü shard dengesi adayı
+
+Supabase CLI tam2.122.0 package/lock pin; aynı başarılı main40226464989 ölçümleriyle15 suite ağırlığı güncellendi. Dört shard/iki process içinde alfabetik kuyruk modeline göre sınırlı deterministik dengeleme; kaynak/attempt bağlı manuel ölçüm yenileme ve ek negatif CI politika regresyonları. Full/main scope, assertionlar, migration/API ve gateway değişmedi. Yeni süreler aday/main ölçümünden önce modeldir.
+
 ## 2026-10-25 — pilot operasyon ön koşulları adayı
 
 62. migration worker role/session lookup ve rls_auto_enable EXECUTE sertleştirmesi. Mevcut beş scope44 alanın native read/write/replay matrisi; aynı orgda öğrenci satın alma→rezervasyon→eğitmen yoklama→hakediş→yönetici rapor regresyonu. İzole restore deneyi managed ACL nedeniyle başarısız; prototip bu teslimden çıkarıldı, restore kabulü açık. Bu kısmi aday tüm ayar alanları, kalıcı hosted pilot veya tam hosted restore kabulü değildir.
