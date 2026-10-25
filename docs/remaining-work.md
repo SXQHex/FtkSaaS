@@ -1,5 +1,12 @@
 # Kalan backend ve entegrasyon işleri
 
+## 25 Ekim — beş kapsam için uygulama adayı
+
+`feature/frontend-settings-delivery` bu belge kararlarını uygulamaya geçiren ilk teslimdir: **206 callable API / 60 migration**. Altı yeni işlem katalog, okuma, sürümlü kısmi yazma, reset önizleme/uygulama ve geçmiş sağlar. Bu bir kaynak/yerel doğrulama durumudur; bağımsız inceleme, gerçek Auth/Edge/RPC, aday/main clean ve CD henüz kabul edilmiş değildir. Main `7020638` hâlâ 200/59'dur. Ayrı PR45 kapasite kaynağı bu branch'e alınmadı; onun 60. migration sayısı bu teslimin migration'ıyla aynı dosya değildir.
+
+[Alanlar, API'ler ve kesin destek sınırı](frontend-settings-handover.md). Teknik SQL/worker yönetimi erteli; beş ekranın bütün 69 davranış grubu tamamlandı denmez. Hazır renk/font/logo, native provider/MFA/oturum ve diğer özel yaşam döngüsü açıkları bu genel tercihlere dönüştürülmez.
+
+
 25 Ekim uzlaştırması: FD01–FD12 kararları kapalı; [kaynak/main/PR43–45 kabul tablosu](../contracts/00-FtkSaaS-yeni-sohbet-devir.md) ve [tek kapasite/giriş kararı](../contracts/02-FtkSaaS-teknik-sozlesme.md#oda-seans-kapasite-karari) geçerlidir. Main200/59; PR45 adayı201/60 bağımsız inceleme/aday clean başarılı, merge/main/CD bekliyor. Settings belge çalışması runtime teslimi değildir.
 
 24 Ekim 2026 belge tabanı main `702063807b0a0d09f559f070ffde1b1ae3e7563b`. P01–P07 kod/main/geliştirme-test kabulü tamamlandı; **200 API/0 contract_only/59 migration**. Eski178/22 ve PR40 pending listeleri güncel açık API listesi değildir. Kanıt [tek devirde](../contracts/00-FtkSaaS-yeni-sohbet-devir.md).
@@ -11,11 +18,11 @@ Frontend başlangıcı için belgeler eşitleniyor; [Claude talimatları](claude
 | İş | Durum ve kapanış koşulu |
 |---|---|
 | Frontend karar kapanışı | [FD01–FD12](../contracts/02-FtkSaaS-teknik-sozlesme.md#ayarlar-backend-frontend-siniflama) 25 Ekim kullanıcı kabulüyle kapandı. Yeni tur açılmaz; sıradaki iş gerçek alan/DTO/permission/API/sürüm ve kabul açığıdır. Standart negatif limit 0, mevcut kulüp −2. Karar uygulanmış config/API değildir. |
-| Beş ekran/API kabulü | Kullanıcı global hesap, üye org person/relationship ve org tercihi; merkez/org/platform scope ayrı. Her ekran alan/tip/default, yetki/miras, gerçek read-write/sürüm, hata ve kabul senaryosuyla teslim edilir. Mevcut API ile eksik alanlar ayrıdır; genel settings/marka API boşluğu kapanmadan beş ekran çalışıyor denmez. |
+| Beş ekran/API kabulü | Kullanıcı global hesap, üye org person/relationship ve org tercihi; merkez/org/platform scope ayrı. Her ekran alan/tip/default, yetki/miras, gerçek read-write/sürüm, hata ve kabul senaryosuyla teslim edilir. Mevcut API ile eksik alanlar ayrıdır; altı kapalı settings işlemi ilk adayda; diğer özel API/marka/provider/alan boşlukları kapanmadan beş ekranin tamamı çalışıyor denmez. |
 | Ertelenmiş altyapı ayarları | Worker/pg_cron/DB bağlantı-RLS-grant/search_path/network/SSL, migration/deploy/yedek-restore motoru ve teknik limit yönetimi ayrı iş. Eski sekiz endpointli 208/60 taslak bu hedefin yerine geçmez. |
 | Frontend PR43 renk/font ihtiyacı | [PR43](https://github.com/SXQHex/FtkSaaS/pull/43) okundu; hazır org marka paketi ve S08 kişisel görünüm ayrımı teknik sözleşmede O01/S08/P01/P04 alan eşlemesine bağlandı. Katalog, read/write/reset, logo, canlı yetki, sürüm/cache/fallback, ortak tip ve gerçek E2E açık; isimler öneri, API hazır değil. PR43 ayrı açık branch olarak korunur. |
 | Kabul edilmiş ayarların alan eşlemesi | Her alan için mevcut read/write/DTO, izin/plan, sürüm/preview, veri kaynağı, sağlayıcı, cihaz/senkron kapsamı ve kabul senaryosu çıkarılacak. Kabul edilmiş davranış otomatik runtime değil. |
-| Açık settings alanları | 69 grup tekrar onaylatılmayacak. Somut süre/limit/default, dil/sağlayıcı/kitle, miras/yerel/yayın/reset ve kesin permission/ek onay eşlemesi teknik sözleşmedeki tek matriste çözülecek. API uygunluğu ve runtime testi ayrı kanıtlanacak. |
+| Açık settings alanları | 69 grup tekrar onaylatılmayacak. Kabul edilmiş süre/default/dil/kitle kararları yeniden açılmaz; kalan kesin wire/provider/domain consumer/miras/yayın/izin eşlemesi tamamlanacak. İlk reset/yerel/default alanları yeni aday devrinde tanımlıdır. API uygunluğu ve runtime testi ayrı kanıtlanacak. |
 | P03 eğitmen ödeme doğrulaması | instructor_payment_record_v1 tutarı karşılandıktan sonra kullanılmayan trailing earning_ids için de kişi/merkez/para birimi doğrulaması ve karışık kapsam regresyonu. Review5594023911; başka tenant'a allocation/para sızıntısı tespit edilmedi, iyileştirme henüz uygulanmadı. |
 | Güvenlik sertleştirmesi | private.ops_run connection/role search_path sabitlemesi ve public.rls_auto_enable gereksiz EXECUTE izinlerinin kaldırılması kaynak kabulüyle yapılacak. ops_run üzerine SET clause eklenmez: COMMIT bozulur. Event-trigger dönüş tipi doğrudan normal çağrıyı reddeder; uyarılar kanıtlanmış dış saldırı gibi sunulmaz. |
 | Parola koruması uyarısı | Kullanıcı Free plan kısıtı nedeniyle kapsam dışında bıraktı; çözülmüş sayılmaz, geliştirme engeli yapılmaz. |

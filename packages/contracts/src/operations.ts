@@ -201,4 +201,10 @@ export interface Operations {
   negative_limits_get_v1: {request: T.RequestNegativeLimitsGet; response: T.SuccessNegativeLimitsGet};
   attendance_start_v1: {request: T.RequestAttendanceStart; response: T.SuccessAttendanceStart};
   document_publication_preview_v1: {request: T.RequestDocumentPublicationPreview; response: T.SuccessDocumentPublicationPreview};
+  settings_catalog_get_v1: {request: T.RequestSettingsCatalogGet; response: T.SuccessSettingsCatalogGet};
+  settings_get_v1: {request: T.RequestSettingsGet; response: T.SuccessSettingsGet};
+  settings_update_v1: {request: T.RequestSettingsUpdate; response: T.SuccessSettingsUpdate};
+  settings_reset_preview_v1: {request: T.RequestSettingsResetPreview; response: T.SuccessSettingsResetPreview};
+  settings_reset_apply_v1: {request: T.RequestSettingsResetApply; response: T.SuccessSettingsResetApply};
+  settings_history_get_v1: {request: T.RequestSettingsHistoryGet; response: T.SuccessSettingsHistoryGet};
 }

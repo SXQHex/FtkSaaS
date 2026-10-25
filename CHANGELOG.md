@@ -1,5 +1,12 @@
 # Changes
 
+## 2026-10-25 — beş kapsamlı kapalı ayar API adayı
+
+- Altı typed ayar işlemi; user/member/center/organization/platform kalıcılık, sürüm/receipt, reset preview/apply, kendi kapsam geçmişi ve alan destek kataloğu.
+- Member tercihi org+hesap kimliğiyle sabit; eski notification API değişikliği aynı ayar sürümünü ilerletir. Yeni üye hatırlatma defaultu açık; mevcut bağlı üyelerin eski kapalı defaultu korunur. Pazarlama kapalı; consent ayrı.
+- 60. yeni migration, private/RLS/service-only kapılar; domain/finans/politika/worker ayarlarına genel yazma yok. Henüz inceleme/gerçek Auth/aday/main/CD kabulü yok; main200/59 ve ayrı PR45 korunur.
+
+
 ## 25 Ekim 2026 — sözleşmeler arası karar/kaynak uzlaştırması
 
 Son Google kayıt/giriş kabulü, Apple/Instagram login dışlaması ve reklam CRM kaynağı ayrımı işlendi. Aktif ürün metinlerinden nominal/maksimum farkı ve yeni default gibi duran30dk teklif fallback kaldırıldı; FD06 açık yapılandırma, standart negatif0 ve kulüp−2 korundu. PR45 son inceleme/aday başarı kanıtı mevcut main200/59 ve belge PR44'ten ayrıldı. Tarihsel raporlar/uygulanmış migration'lar değiştirilmedi; canlı default veya runtime yayımlanmadı.

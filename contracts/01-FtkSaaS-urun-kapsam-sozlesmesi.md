@@ -1,5 +1,12 @@
 # FtkSaaS — Ürün kapsam sözleşmesi
 
+## 25 Ekim — beş kapsam için uygulama adayı
+
+`feature/frontend-settings-delivery` bu belge kararlarını uygulamaya geçiren ilk teslimdir: **206 callable API / 60 migration**. Altı yeni işlem katalog, okuma, sürümlü kısmi yazma, reset önizleme/uygulama ve geçmiş sağlar. Bu bir kaynak/yerel doğrulama durumudur; bağımsız inceleme, gerçek Auth/Edge/RPC, aday/main clean ve CD henüz kabul edilmiş değildir. Main `7020638` hâlâ 200/59'dur. Ayrı PR45 kapasite kaynağı bu branch'e alınmadı; onun 60. migration sayısı bu teslimin migration'ıyla aynı dosya değildir.
+
+[Alanlar, API'ler ve kesin destek sınırı](../docs/frontend-settings-handover.md). Teknik SQL/worker yönetimi erteli; beş ekranın bütün 69 davranış grubu tamamlandı denmez. Hazır renk/font/logo, native provider/MFA/oturum ve diğer özel yaşam döngüsü açıkları bu genel tercihlere dönüştürülmez.
+
+
 > 25 Ekim güncel karar: 69 ana grup ve FD01–FD12 kabul edildi; backend işletim ayarları erteli, frontend scope user/member/center/organization/platform. Standart yeni org negatif limit 0, mevcut kulüp −2 korunur. Giriş: e-posta/parola + Google; Apple/Instagram login kapsam dışı, passkey erteli. Oda/seans kapasite kararı ile mevcut yayımlanmış API farklı kaynak aşamalarıdır. [Tek teknik karar ve kaynak durumu](02-FtkSaaS-teknik-sozlesme.md#oda-seans-kapasite-karari), [beş ekran devri](../docs/claude-handover.md). Bu belge yeni runtime teslimi değildir.
 
 > **16 Ekim Q-E02 alan kabulü · 0.2.0-rc.3.** Kullanıcının 16 Ekim 2026 son iptal kabulü önceki çelişen merkez iptali hükümlerinin yerine geçer. Güncel davranış/kanıt: docs/decisions/Q-E02.md, docs/claude-handover.md ve reports/qe02-verification.json. Aşağıdaki eski durum/test sayıları tarihsel kayıttır; teknik aktarım bekleyen işler tamamlandı sayılmaz.

@@ -18,6 +18,8 @@ test('P05 actual Auth/Storage/documents/inbox/scoped worker acceptance',async t=
  const discipline=(await must(owner,'discipline_save_v1',{org_id:org,name:'P05',state:'active'},key())).primary_id;await mut('center_discipline_set_v1',{discipline_id:discipline,state:'active'});
  const person=(await mut('person_create_v1',{display_name:'P05 learner',contacts:[]})).primary_id;await mut('student_activate_v1',{person_id:person});
  await db.query("insert into core.account_links(id,org_id,account_id,person_id,state,verified_at) values($1,$2,$3,$4,'active',now())",[key(),org,sa.id,person]);
+ // FD04 new-member reminders default on. This negative-delivery fixture explicitly opts out.
+ await must(student,'settings_update_v1',{scope:'member',org_id:org,expected_version:0,patch:{in_app_reminders:false}},key());
  const pub=(policy,value)=>mut('policy_publish_v1',{center_id:null,key:policy,value,effective_at:new Date(Date.now()-1000).toISOString(),mandatory:false});
  const policy=(await pub('student_cancel_group',{kind:'cancellation',terms:{cutoff_minutes:0,before_cutoff:'release',after_cutoff:'release',no_show:'consume'}})).primary_id;
  await pub('reservation_window',{kind:'window',opens_minutes_before:4320,closes_minutes_before:0,manager_exception:false});await pub('negative_default',{kind:'integer',value:0});await pub('negative_upper',{kind:'integer',value:0});await pub('inactive_student_days',{kind:'integer',value:0});await pub('entitlement_reminder_days',{kind:'integer',value:7});

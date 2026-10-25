@@ -1,5 +1,12 @@
 # FtkSaaS backend
 
+## 25 Ekim — beş kapsam için uygulama adayı
+
+`feature/frontend-settings-delivery` bu belge kararlarını uygulamaya geçiren ilk teslimdir: **206 callable API / 60 migration**. Altı yeni işlem katalog, okuma, sürümlü kısmi yazma, reset önizleme/uygulama ve geçmiş sağlar. Bu bir kaynak/yerel doğrulama durumudur; bağımsız inceleme, gerçek Auth/Edge/RPC, aday/main clean ve CD henüz kabul edilmiş değildir. Main `7020638` hâlâ 200/59'dur. Ayrı PR45 kapasite kaynağı bu branch'e alınmadı; onun 60. migration sayısı bu teslimin migration'ıyla aynı dosya değildir.
+
+[Alanlar, API'ler ve kesin destek sınırı](docs/frontend-settings-handover.md). Teknik SQL/worker yönetimi erteli; beş ekranın bütün 69 davranış grubu tamamlandı denmez. Hazır renk/font/logo, native provider/MFA/oturum ve diğer özel yaşam döngüsü açıkları bu genel tercihlere dönüştürülmez.
+
+
 25 Ekim: FD kararları tamamlandı; giriş e-posta/parola + Google (uygulama/provider kabulü ayrı), Apple/Instagram login kapsam dışı. [Güncel karar/kaynak tablosu](contracts/00-FtkSaaS-yeni-sohbet-devir.md) yayımlanmış main200/59 ile henüz merge edilmemiş PR45 kapasite adayını201/60 ayırır. Nominal/maksimum ürün modeli kaldırıldı; mevcut main DTO'ları PR45 merge edilmeden değiştirilmiş sayılmaz.
 
 Güncel kaynak merkezi [SXQHex/FtkSaaS main](https://github.com/SXQHex/FtkSaaS). Önce [AGENTS](AGENTS.md), [kaynak indeksi](docs/source-index.md) ve [güncel devir](contracts/00-FtkSaaS-yeni-sohbet-devir.md) okunur.

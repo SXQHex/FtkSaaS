@@ -124,3 +124,12 @@ assert next(Path('supabase/migrations').glob('*_p07_account_profile_auth_merge.s
 assert next(Path('supabase/migrations').glob('*_p07_subscription_lifecycle.sql')).read_text()==''.join(Path('database',n).read_text() for n in ['p07-subscriptions.sql', 'p07-subscription-payments.sql', 'p07-subscription-workers.sql', 'p07-subscription-bind.sql', 'p07-lifecycle.sql', 'p07-privacy-workers.sql', 'p07-lifecycle-bind.sql', 'p07-reopen-workers.sql', 'p07-hosted-workers.sql', 'p07-subscription-lifecycle-wrappers.sql']),'P07 subscription/lifecycle source drift'
 
 assert next(Path('supabase/migrations').glob('*_p07_payment_response_contract.sql')).read_text()==Path('database/p07-payment-response.sql').read_text(),'P07 payment response source drift'
+
+assert next(Path('supabase/migrations').glob('*_frontend_settings.sql')).read_text()==Path('database/frontend-settings-catalog.sql').read_text()+Path('database/frontend-settings.sql').read_text().replace('commit;\n','',1)+Path('database/frontend-settings-wrappers.sql').read_text().replace('begin;\n','',1),'Frontend settings source drift'
+
+settings_fields=json.loads(Path('config/frontend-settings.json').read_text())['fields']
+settings_catalog="begin;\ncreate function private.frontend_settings_fields() returns jsonb language sql immutable security invoker set search_path='' as $fields$select '"+json.dumps(settings_fields,ensure_ascii=False,separators=(',',':')).replace("'","''")+"'::jsonb$fields$;\n"
+assert Path('database/frontend-settings-catalog.sql').read_text()==settings_catalog,'Frontend field catalog SQL drift'
+settings_contract=json.loads(Path('contracts/08-FtkSaaS-tip-ve-operasyon-sozlesmesi.json').read_text())
+for scope in ['user','member','center','organization','platform']:
+ assert settings_contract['$defs'][scope.title()+'SettingsValues']['properties']=={f['key']:f['schema'] for f in settings_fields if f['scope']==scope},'Frontend field DTO drift: '+scope

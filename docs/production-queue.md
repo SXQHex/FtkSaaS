@@ -1,5 +1,12 @@
 # FtkSaaS sıralı üretim kuyruğu
 
+## 25 Ekim — beş kapsam için uygulama adayı
+
+`feature/frontend-settings-delivery` bu belge kararlarını uygulamaya geçiren ilk teslimdir: **206 callable API / 60 migration**. Altı yeni işlem katalog, okuma, sürümlü kısmi yazma, reset önizleme/uygulama ve geçmiş sağlar. Bu bir kaynak/yerel doğrulama durumudur; bağımsız inceleme, gerçek Auth/Edge/RPC, aday/main clean ve CD henüz kabul edilmiş değildir. Main `7020638` hâlâ 200/59'dur. Ayrı PR45 kapasite kaynağı bu branch'e alınmadı; onun 60. migration sayısı bu teslimin migration'ıyla aynı dosya değildir.
+
+[Alanlar, API'ler ve kesin destek sınırı](frontend-settings-handover.md). Teknik SQL/worker yönetimi erteli; beş ekranın bütün 69 davranış grubu tamamlandı denmez. Hazır renk/font/logo, native provider/MFA/oturum ve diğer özel yaşam döngüsü açıkları bu genel tercihlere dönüştürülmez.
+
+
 25 Ekim uzlaştırması: FD01–FD12 kararları kapalı; [kaynak/main/PR43–45 kabul tablosu](../contracts/00-FtkSaaS-yeni-sohbet-devir.md) ve [tek kapasite/giriş kararı](../contracts/02-FtkSaaS-teknik-sozlesme.md#oda-seans-kapasite-karari) geçerlidir. Main200/59; PR45 adayı201/60 bağımsız inceleme/aday clean başarılı, merge/main/CD bekliyor. Settings belge çalışması runtime teslimi değildir.
 
 23 Ekim güncel durum: P01–P07 kod/main/geliştirme-test kabulü kapandı. Yayımlanmış200 API/59 migration; kaynak ve run kanıtı [tek devirdedir](../contracts/00-FtkSaaS-yeni-sohbet-devir.md). Beş hosted worker kurulu/idle/hata0; gerçek yük ve fiziksel imha ayrı açık. 69 ana settings grubu kabul edildi; açık alan/değer/yetki/API eşlemesi sıradadır, yeni runtime uygulaması bu belgeyle başlatılmaz. [Davranış sprinti](../contracts/02-FtkSaaS-teknik-sozlesme.md#ayarlar-sozlesmesi-ve-davranis-sprinti) 69 grup kabulünü ve kalan alt alanları taşır. Settings platform P01–P09, bu üretim tablosundaki P01–P08 teslimleri değildir.

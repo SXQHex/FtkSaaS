@@ -1,5 +1,12 @@
 # Claude frontend entegrasyon talimatları
 
+## 25 Ekim — beş kapsam için uygulama adayı
+
+`feature/frontend-settings-delivery` bu belge kararlarını uygulamaya geçiren ilk teslimdir: **206 callable API / 60 migration**. Altı yeni işlem katalog, okuma, sürümlü kısmi yazma, reset önizleme/uygulama ve geçmiş sağlar. Bu bir kaynak/yerel doğrulama durumudur; bağımsız inceleme, gerçek Auth/Edge/RPC, aday/main clean ve CD henüz kabul edilmiş değildir. Main `7020638` hâlâ 200/59'dur. Ayrı PR45 kapasite kaynağı bu branch'e alınmadı; onun 60. migration sayısı bu teslimin migration'ıyla aynı dosya değildir.
+
+[Alanlar, API'ler ve kesin destek sınırı](frontend-settings-handover.md). Teknik SQL/worker yönetimi erteli; beş ekranın bütün 69 davranış grubu tamamlandı denmez. Hazır renk/font/logo, native provider/MFA/oturum ve diğer özel yaşam döngüsü açıkları bu genel tercihlere dönüştürülmez.
+
+
 25 Ekim 2026. Belge tabanı main `702063807b0a0d09f559f070ffde1b1ae3e7563b`. Frontend tasarım/istemci kodu Claude'un alanıdır; backend bu teslimde tasarıma müdahale etmez. Bu dosya Claude'un açıkça okutulacak başlangıç talimatıdır; repository'de kök `CLAUDE.md` veya `.claude` yapılandırması bulunmuyor. Dosyanın Claude tarafından kendiliğinden yüklendiğini varsayma.
 
 ## 25 Ekim — frontend karar kapanışı ve uygulama sırası
@@ -82,7 +89,7 @@ Bu tablo bileşen yerleşimi veya route/framework dayatmaz. Metin, seçim, çokl
 
 ### Mevcut 200 API üzerinden doğrulanmış ilk eşleme
 
-Bu tabloda yalnız gerçek operasyonlar vardır. Yeni genel settings endpoint adları öneri olarak bile mevcut client'a eklenmez. Parametre/Response tam kaynağı 08 ve üretilmiş operations.ts'dir.
+Bu tablo main200 baseline işlemlerini gösterir. Yeni altı settings işleminin aday kaynak/alan matrisi yukarıdaki uygulama devrindedir; main/deploy tamamlanmadan mevcut canlı ortamda var sayılmaz. Parametre/Response tam kaynağı 08 ve üretilmiş operations.ts'dir.
 
 | Ekran / alan | Mevcut okuma | Mevcut yazma / izin | Hazır sınır ve eksik |
 |---|---|---|---|
@@ -144,11 +151,11 @@ S11 kişisel takvim, S14 pazarlama/ilgi, S15 görünürlük/izin, S16 veri taleb
 | S04 Şifre | Ekle/değiştir/kurtarma ve kabul edilmiş oturum kapatma | `account_password_change_v1` challenge başlatır; tamamlama native Auth'tadır. `account_password_reset_request_v1` korumalı recover başlatıcısıdır. Kabul edilmiş tüm oturum temizliği ve dış teslim hazır varsayılmaz. |
 | S05 Sağlayıcı MFA | Güvenli ekleme/kaldırma, son giriş yöntemi koruması | Seçim kesin: e-posta/parola ve Google kayıt/giriş, doğrulayıcı uygulama MFA. Apple/Instagram login kapsam dışı, passkey erteli. Gerçek provider/hesap yaşam döngüsü ve kabul kanıtı ayrıca doğrulanacak; seçim desteğin çalıştığı kanıtı değildir. |
 | S06 Oturumlar | Kendi oturumlarını gör/kapat; güven kaydını ayrı yönet | Mevcut canlı session kapıları oturum listeleme/etiketleme/tüm cihaz yönetimi API'si var anlamına gelmez. Yeni alanlar/sağlayıcı eşlemesi bekler. |
-| S07 Dil bölge saat | Hesap manuel/cihaz otomatik tercihleri; iş zamanı sabit | Genel tercih saklama DTO'su yok. İşlem saatleri mevcut Instant ve merkez saat dilimi kurallarıyla okunur; istemci görünüm tercihi iş zamanını değiştiremez. |
-| S08–S10 Görünüm ve bağlam | Erişilebilirlik, başlangıç, ekran/takvim tercihleri | Yerel görünüm tasarımı yapılabilir; hesapta kalıcı tercih senkronizasyonu mevcut200 API'de var sayılmaz. Yetki/alan filtreleri backend'den gelir. |
+| S07 Dil bölge saat | Hesap manuel/cihaz otomatik tercihleri; iş zamanı sabit | Aday settings_get/update S07 görünüm alanlarını kapalı DTO ile saklar. İş zamanları Instant/merkez timezone kaynağında kalır; görüntüleme tercihi onları değiştirmez. |
+| S08–S10 Görünüm ve bağlam | Erişilebilirlik, başlangıç, ekran/takvim tercihleri | Aday settings API'leri sistem tema/kontrast/hareket, hatırlama ve takvim görünümünü saklar; desteklenmeyen ekran filtre/sütun ve varsayılan bağlam yolları ayrı açıktır. Yetki filtreleri tercihle aşılmaz. |
 | Bildirim tercihi | S12–S13 ve FD04 olay/kanal/istisna/zaman değerleri kesin; mevcut API kapsamı dar | `notification_preferences_set_v1` ve yetkili management okuması mevcut. Amaçlar transactional/reminder/marketing; mevcut yol in_app, transactional=false ret. Enum'da email olması dış teslim kanıtı değildir; push/SMS yeni enum gibi eklenmez. |
 | Reklam ölçüm ve analitik | Üç ayrı tercih açık/kapatılabilir; FD04 pazarlama ve FD05 geçmiş öneri defaultları ayrı kapalı | Tercih değeri rıza/dayanak değildir. Yeni SDK/toplama entegrasyonu bu belgeyle etkinleştirilmez. İzin, teknik etkinlik ve sağlayıcı desteği ayrı. |
-| Merkez/org/platform | M01–M22, org O01–O21 ve platform P01–P09 kabul edildi; alt alan değerleri açık | Mevcut `policies_get/policy_publish`, availability, registry, belge/otomasyon ve abonelik komutları kullanılır. Generic settings read/write endpoint'i yayımlanmadı. |
+| Merkez/org/platform | M01–M22, org O01–O21 ve platform P01–P09 / FD alan kararları kapalı; uygulama kapsamı alan bazında | Mevcut `policies_get/policy_publish`, availability, registry, belge/otomasyon ve abonelik komutları kullanılır. Altı generic tercih işlemi uygulama adayında; yalnız kapalı alan listesi, main/CD henüz yok. |
 
 24 Ekim: S01–S17/M01–M22/org O01–O21/platform P01–P09 olmak üzere 69 ana davranış grubu kabul edildi; tüm alanlar uygulanmış değildir. Ayrıntılar tek teknik sözleşmede; açık default/değer/permission/sağlayıcı ve mevcut API eşlemesi ayrı çözülür. Yeni API alanı, değer veya sağlayıcı davranışı uydurma. Eski Word aileleri ve üretim kuyruğu aynı numaralarla karıştırılmaz. Aynı durumun tasarım prototipi ile gerçek API kaydetme başarısını ayır; desteklenmeyen alan için sahte başarılı kayıt üretme.
 

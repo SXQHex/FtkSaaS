@@ -5413,6 +5413,138 @@
         "Development/test only; final source candidate/main clean required.",
         "No external email; dedicated scoped DB worker; hosted scheduling remains separate."
       ]
+    },
+    {
+      "name": "settings_catalog_get_v1",
+      "status": "operational_development_limited",
+      "external_path": "/functions/v1/backend-v1/settings_catalog_get_v1",
+      "permission": "settings.access",
+      "features": [],
+      "required_features": [],
+      "runtime_required_features": [],
+      "decision_delivery": {
+        "accepted_contract": "DS-2026-10-17",
+        "runtime_conformance": "implemented_pending_ci",
+        "open_dependencies": [],
+        "target_request": {
+          "$ref": "#/$defs/Request_settings_catalog_get"
+        }
+      },
+      "billing_class": "read",
+      "limits": [
+        "First closed preference fields only; no generic domain policy, arbitrary key, provider or technical SQL/worker controls.",
+        "Only system brand assets; reviewed color/font/logo delivery remains separate."
+      ]
+    },
+    {
+      "name": "settings_get_v1",
+      "status": "operational_development_limited",
+      "external_path": "/functions/v1/backend-v1/settings_get_v1",
+      "permission": "settings.access",
+      "features": [],
+      "required_features": [],
+      "runtime_required_features": [],
+      "decision_delivery": {
+        "accepted_contract": "DS-2026-10-17",
+        "runtime_conformance": "implemented_pending_ci",
+        "open_dependencies": [],
+        "target_request": {
+          "$ref": "#/$defs/Request_settings_get"
+        }
+      },
+      "billing_class": "read",
+      "limits": [
+        "First closed preference fields only; no generic domain policy, arbitrary key, provider or technical SQL/worker controls.",
+        "Only system brand assets; reviewed color/font/logo delivery remains separate."
+      ]
+    },
+    {
+      "name": "settings_update_v1",
+      "status": "operational_development_limited",
+      "external_path": "/functions/v1/backend-v1/settings_update_v1",
+      "permission": "settings.access",
+      "features": [],
+      "required_features": [],
+      "runtime_required_features": [],
+      "decision_delivery": {
+        "accepted_contract": "DS-2026-10-17",
+        "runtime_conformance": "implemented_pending_ci",
+        "open_dependencies": [],
+        "target_request": {
+          "$ref": "#/$defs/Request_settings_update"
+        }
+      },
+      "billing_class": "maintenance",
+      "limits": [
+        "First closed preference fields only; no generic domain policy, arbitrary key, provider or technical SQL/worker controls.",
+        "Only system brand assets; reviewed color/font/logo delivery remains separate."
+      ]
+    },
+    {
+      "name": "settings_reset_preview_v1",
+      "status": "operational_development_limited",
+      "external_path": "/functions/v1/backend-v1/settings_reset_preview_v1",
+      "permission": "settings.access",
+      "features": [],
+      "required_features": [],
+      "runtime_required_features": [],
+      "decision_delivery": {
+        "accepted_contract": "DS-2026-10-17",
+        "runtime_conformance": "implemented_pending_ci",
+        "open_dependencies": [],
+        "target_request": {
+          "$ref": "#/$defs/Request_settings_reset_preview"
+        }
+      },
+      "billing_class": "read",
+      "limits": [
+        "First closed preference fields only; no generic domain policy, arbitrary key, provider or technical SQL/worker controls.",
+        "Only system brand assets; reviewed color/font/logo delivery remains separate."
+      ]
+    },
+    {
+      "name": "settings_reset_apply_v1",
+      "status": "operational_development_limited",
+      "external_path": "/functions/v1/backend-v1/settings_reset_apply_v1",
+      "permission": "settings.access",
+      "features": [],
+      "required_features": [],
+      "runtime_required_features": [],
+      "decision_delivery": {
+        "accepted_contract": "DS-2026-10-17",
+        "runtime_conformance": "implemented_pending_ci",
+        "open_dependencies": [],
+        "target_request": {
+          "$ref": "#/$defs/Request_settings_reset_apply"
+        }
+      },
+      "billing_class": "maintenance",
+      "limits": [
+        "First closed preference fields only; no generic domain policy, arbitrary key, provider or technical SQL/worker controls.",
+        "Only system brand assets; reviewed color/font/logo delivery remains separate."
+      ]
+    },
+    {
+      "name": "settings_history_get_v1",
+      "status": "operational_development_limited",
+      "external_path": "/functions/v1/backend-v1/settings_history_get_v1",
+      "permission": "settings.access",
+      "features": [],
+      "required_features": [],
+      "runtime_required_features": [],
+      "decision_delivery": {
+        "accepted_contract": "DS-2026-10-17",
+        "runtime_conformance": "implemented_pending_ci",
+        "open_dependencies": [],
+        "target_request": {
+          "$ref": "#/$defs/Request_settings_history_get"
+        }
+      },
+      "billing_class": "read",
+      "limits": [
+        "First closed preference fields only; no generic domain policy, arbitrary key, provider or technical SQL/worker controls.",
+        "Only system brand assets; reviewed color/font/logo delivery remains separate."
+      ]
     }
   ]
 }
