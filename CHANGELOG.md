@@ -1,5 +1,9 @@
 # Changes
 
+## 25 Ekim 2026 — seans kapasitesi revizyonu (kabul bekleyen branch)
+
+Oda fiziksel kapasitesi seans toplam/kategori kontenjanından ayrıldı. Öncelikli/esnek kayıtların nominal/maksimum kapasite farkı kaldırıldı. Gerekçe ve audit içeren ayrı tek rezervasyon aşımı komutu oda üst sınırını ve diğer iş kurallarını korur. Program/seans/yerine seans/özel ders, bekleme/deneme teklifleri ve okuma DTO'ları birlikte güncellendi. Append-only migration, ortak tip/validator/katalog/envanter ve ilgili yaşayan sözleşmeler eşitlendi; aday/main/runtime kabul kanıtı ayrıca bekler.
+
 ## 23 Ekim 2026 frontend başlangıcı ve settings karar eşitlemesi
 
 P01–P07 kaynak/full-clean/main/development CD kapanışı güncel devir ve istemci talimatlarına aktarıldı:200 API/59 migration/Edge8. PR41 belge kabulü, gerçek runtime kabulü ve CD deploy skipped ayrıldı. Beş Cron temel kurulum/idle heartbeat ile3600sn quote/900sn reauth kullanıcı config'i kaydedildi; gerçek yük/fiziksel imha açık.

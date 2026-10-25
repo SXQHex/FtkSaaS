@@ -1,5 +1,7 @@
 > 23 Ekim 2026 güncel durum: P01–P07 kod/main/geliştirme-test kabulü kapandı; yayımlanmış kapsam **200 API / 0 contract_only / 59 migration / 90 core tablo / Edge8**. P07 runtime kaynağı `4cfc9a55`; güncel belge tabanı `bfb8ccb2`. Beş Cron hattı aktif ve boş kuyrukta healthy/idle; fiziksel imha ve gerçek yük kabulü tamamlanmış değildir. Ayar davranış sprinti ve güncel entegrasyon sınırları [tek devir](00-FtkSaaS-yeni-sohbet-devir.md) ve [ayarlar sözleşmesinde](02-FtkSaaS-teknik-sozlesme.md#ayarlar-sozlesmesi-ve-davranis-sprinti). Eski tarih/CI/pending snapshotları yeni durum kanıtı değildir; ürün kuralları yalnız son açık kararla değişir.
 
+25 Ekim kapasite revizyonu: yeni `reservation.capacity_override` izni yalnız merkez kapsamında açık personel grant'ı için atanabilir; canlı CM veya ilgili seansa atanmış aktif eğitmen doğrudan kendi kapsamıyla ayrı `reservation_capacity_override_v1` komutunu kullanır. Öğrenci, owner/OM veya atanmadığı seanstaki eğitmen bu yetkiyi kendiliğinden edinmez. Boş gerekçe `VALIDATION_FAILED`, kontenjan/oda tavanı `CAPACITY_FULL`, eksik fiziksel oda yapılandırması `POLICY_NOT_CONFIGURED`; diğer mevcut domain hataları korunur. [Karar ve geçiş](../docs/decisions/DS-2026-10-25-session-capacity.md). Bu branch'in aday/main kabulü bekler.
+
 > Güncel öncelik: [DS-2026-10-17](../docs/decisions/DS-2026-10-17.md). Çelişen eski hükümler yalnız belirtilen kapsamda yürürlükten kalkmıştır. [Hedef sözleşme/runtime ayrımı](../docs/decision-sprint-handover.md).
 
 # FtkSaaS — O4 durum, hata ve izin sözleşmesi

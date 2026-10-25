@@ -1,5 +1,7 @@
 # FtkSaaS backend
 
+Kapasite revizyonu bu branch'te geliştirmededir: [ürün/API geçişi](docs/decisions/DS-2026-10-25-session-capacity.md). 201 operasyon/60 migration taslağı yayımlanmış main kabulü değildir.
+
 Güncel kaynak merkezi [SXQHex/FtkSaaS main](https://github.com/SXQHex/FtkSaaS). Önce [AGENTS](AGENTS.md), [kaynak indeksi](docs/source-index.md) ve [güncel devir](contracts/00-FtkSaaS-yeni-sohbet-devir.md) okunur.
 
 ## Frontend için başlangıç

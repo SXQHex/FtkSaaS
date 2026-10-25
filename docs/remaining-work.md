@@ -1,5 +1,11 @@
 # Kalan backend ve entegrasyon işleri
 
+## 25 Ekim — P08 kapasite dilimi geliştirmesi
+
+Son kullanıcı talimatıyla [kapasite kararı](decisions/DS-2026-10-25-session-capacity.md) kabul edildi ve `feat/session-capacity-controls` branch'inde uygulanıyor. Bu, diğer settings runtime işlerini açmaz. Main tabanı `702063807b0a0d09f559f070ffde1b1ae3e7563b`; yayımlanmış ana kaynaktaki 200 API/59 migration değişmedi. Bu branch taslağı 201 operasyon/60 migration içerir; aday/main CI ve inceleme tamamlanmadan yayımlanmış veya done sayılmaz. P08'in CRM/abone no/sınırsız etkinlik/paket etkinlik uygunluğu işleri açık kalır. PR43/44 belge çalışmaları bu branch'e kopyalanmaz; birleşmede kararlar korunmalıdır.
+
+Tek seans toplamı ve kategori limitleri, oda fiziksel kapasitesi, ayrı `reservation_capacity_override_v1`, tekliflerin ortak yer tutması ve room/seans okuma geçişleri aynı dilimdir. Eski `nominal/maximum` seans DTO'ları yeni istemci sözleşmesinde kullanılmaz. Şema/tip/validator/envanter üretimi ve ilgili belgeler bu branch içinde eşitlenir.
+
 23 Ekim 2026 belge tabanı main `bfb8ccb29a1e0ca9efde7813dc3af4bbbad8768d`. P01–P07 kod/main/geliştirme-test kabulü tamamlandı; **200 API/0 contract_only/59 migration**. Eski178/22 ve PR40 pending listeleri güncel açık API listesi değildir. Kanıt [tek devirde](../contracts/00-FtkSaaS-yeni-sohbet-devir.md).
 
 ## Aktif görev ve durdurulmuş geliştirme

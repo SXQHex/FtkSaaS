@@ -1,5 +1,9 @@
 # FtkSaaS güncel devir
 
+## 25 Ekim kapasite branch'i — geliştirme, main kabulü bekliyor
+
+Kabul edilmiş [kapasite revizyonu](../docs/decisions/DS-2026-10-25-session-capacity.md) P08'in dar dilimi olarak uygulanıyor. Başlangıç main `702063807b0a0d09f559f070ffde1b1ae3e7563b`; kaynak/belge CI başarılı, clean skipped. 201 API/60 migration branch taslağıdır; 200/59 yayımlanmış main'den ayrı tutulur. Yerel yapısal kontroller ve izole runtime doğrulama kanıtları teslimde ayrı verilir; aday/main ve hosted kabul yapılmadı. Yeni settings geliştirme durdurması diğer alanlarda sürer.
+
 ## 23 Ekim 2026 güncel kaynak ve kabul
 
 - Belge tabanı main `bfb8ccb29a1e0ca9efde7813dc3af4bbbad8768d` (PR41); 200 yayımlanmış operasyon, 0 yalnız sözleşme, 59 migration, 90 core tablo. P08 veya yeni settings API’si yayımlanmadı.

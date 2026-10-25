@@ -1,5 +1,11 @@
 # FtkSaaS sıralı üretim kuyruğu
 
+## 25 Ekim — P08 kapasite dilimi geliştirmesi
+
+Son kullanıcı talimatıyla [kapasite kararı](decisions/DS-2026-10-25-session-capacity.md) kabul edildi ve `feat/session-capacity-controls` branch'inde uygulanıyor. Bu, diğer settings runtime işlerini açmaz. Main tabanı `702063807b0a0d09f559f070ffde1b1ae3e7563b`; yayımlanmış ana kaynaktaki 200 API/59 migration değişmedi. Bu branch taslağı 201 operasyon/60 migration içerir; aday/main CI ve inceleme tamamlanmadan yayımlanmış veya done sayılmaz. P08'in CRM/abone no/sınırsız etkinlik/paket etkinlik uygunluğu işleri açık kalır. PR43/44 belge çalışmaları bu branch'e kopyalanmaz; birleşmede kararlar korunmalıdır.
+
+Tek seans toplamı ve kategori limitleri, oda fiziksel kapasitesi, ayrı `reservation_capacity_override_v1`, tekliflerin ortak yer tutması ve room/seans okuma geçişleri aynı dilimdir. Eski `nominal/maximum` seans DTO'ları yeni istemci sözleşmesinde kullanılmaz. Şema/tip/validator/envanter üretimi ve ilgili belgeler bu branch içinde eşitlenir.
+
 23 Ekim güncel durum: P01–P07 kod/main/geliştirme-test kabulü kapandı. Yayımlanmış200 API/59 migration; kaynak ve run kanıtı [tek devirdedir](../contracts/00-FtkSaaS-yeni-sohbet-devir.md). Beş hosted worker kurulu/idle/hata0; gerçek yük ve fiziksel imha ayrı açık. Yeni settings uygulaması kullanıcı kararıyla durduruldu; frontend için belgeler eşitleniyor. [Davranış sprinti](../contracts/02-FtkSaaS-teknik-sozlesme.md#ayarlar-sozlesmesi-ve-davranis-sprinti) S01–S10 kabulünü ve kalan grupları taşır.
 
 | Sıra | Teslim | İşlem | Durum | Kanıt / sonraki adım |
@@ -15,7 +21,7 @@
 | P06 | Rapor, import ve işlem izleme | 13 | done | PR38/main006ad36; aday39779013518/main39782197422/CD39785146645 success;54 migration/Edge7 |
 | OPS-W01 | Hosted worker işletimi | — | done | d1830c8 main/CD kabulü; Cron2/3/4 healthy idle ve disable-restart geçti; tenant kapsamı3 bağlı |
 | P07 | Hesap, organizasyon ve abonelik yaşam döngüsü | 22 | done (kod/main/development) | PR40/main4cfc9a55; aday39863852941/main39866466608/CD39869023193 success; hosted temel kurulum ve idle heartbeat geçti; fiziksel imha/yük ayrı |
-| P08 | Geliştirmeler | — | queued | Ayrı kontenjanlar, sınırsız etkinlik ve paket ders/etkinlik kapsamları; mevcut kurulum20 kontenjan/100 tekrar; paket süresi+bakiye ile ücretsiz etkinlik uygunluğu; sabit abone no ve ortak çok kaynaklı CRM |
+| P08 | Geliştirmeler | — | in_progress (kapasite dilimi) | Ayrı kontenjanlar, sınırsız etkinlik ve paket ders/etkinlik kapsamları; mevcut kurulum20 kontenjan/100 tekrar; paket süresi+bakiye ile ücretsiz etkinlik uygunluğu; sabit abone no ve ortak çok kaynaklı CRM |
 
 ## Ajanın kuyruk bakımı
 

@@ -95,7 +95,7 @@ test('Real Auth → Edge UUID producer → named RPC → PostgreSQL acceptance',
   assert.equal((await db.query("select count(*)::int n from core.entitlement_movements where org_id=$1 and kind='reverse' and previous_id is not null",[org])).rows[0].n,1);
  });
  const classId=(await mutate(owner,'class_save_v1',{name:'Class',discipline_id:discipline,external_open:true})).primary_id;
- const session=(await mutate(owner,'session_create_v1',{class_id:classId,discipline_id:discipline,format:'group',interval:lessonInterval(),resources:[],assignments:[],capacity:{nominal:10,maximum:10}})).primary_id;
+ const session=(await mutate(owner,'session_create_v1',{class_id:classId,discipline_id:discipline,format:'group',interval:lessonInterval(),resources:[],assignments:[],capacity:{total:10}})).primary_id;
  const ev=await newEvent();
  await t.test('last shared right: event vs lesson named RPC race cannot double spend',async()=>{
   const results=await Promise.all([call(owner,'event_register_v1',scoped({event_id:ev.id,person_id:studentPerson,sale_id:sale}),key()),call(owner,'reservation_create_v1',scoped({session_id:session,person_id:studentPerson,mode:'flexible',source_sale_id:sale}),key())]);
@@ -281,7 +281,7 @@ test('Real Auth → Edge UUID producer → named RPC → PostgreSQL acceptance',
   await db.query("insert into core.policy_versions(id,org_id,key,effective_at,mandatory,value) values($1,$2,'negative_upper',now(),true,$3)",[key(),org,{kind:'integer',value:1}]);
   const p=(await mutate(owner,'person_create_v1',{display_name:'Scoped deficit student',contacts:[]})).primary_id;await mutate(owner,'student_activate_v1',{person_id:p});
   const second=(await must(owner,'discipline_save_v1',{org_id:org,name:'Deficit other discipline',state:'active'},key())).primary_id;await mutate(owner,'center_discipline_set_v1',{discipline_id:second,state:'active'});
-  async function sessionFor(d){const c=(await mutate(owner,'class_save_v1',{name:'Deficit class',discipline_id:d,external_open:true})).primary_id;return(await mutate(owner,'session_create_v1',{class_id:c,discipline_id:d,format:'group',interval:lessonInterval(),resources:[],assignments:[],capacity:{nominal:10,maximum:10}})).primary_id;}
+  async function sessionFor(d){const c=(await mutate(owner,'class_save_v1',{name:'Deficit class',discipline_id:d,external_open:true})).primary_id;return(await mutate(owner,'session_create_v1',{class_id:c,discipline_id:d,format:'group',interval:lessonInterval(),resources:[],assignments:[],capacity:{total:10}})).primary_id;}
   const sessions=[await sessionFor(discipline),await sessionFor(discipline),await sessionFor(second)];
   const first=await mutate(owner,'reservation_create_v1',{session_id:sessions[0],person_id:p,mode:'flexible'});await error(owner,'reservation_create_v1',scoped({session_id:sessions[1],person_id:p,mode:'flexible'}),'CREDIT_LIMIT_EXCEEDED');await mutate(owner,'reservation_create_v1',{session_id:sessions[2],person_id:p,mode:'flexible'});
   await mutate(owner,'reservation_cancel_v1',{reservation_id:first.primary_id,expected_version:1,reason:'synthetic'});await mutate(owner,'reservation_create_v1',{session_id:sessions[1],person_id:p,mode:'flexible'});

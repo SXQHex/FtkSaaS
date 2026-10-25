@@ -199,6 +199,7 @@ export const runtimeOperationNames = [
   "subscription_renewal_set_v1",
   "saas_grace_extend_v1",
   "privacy_execute_v1",
-  "subscription_boundary_apply_v1"
+  "subscription_boundary_apply_v1",
+  "reservation_capacity_override_v1"
 ] as const;
 export type RuntimeOperationName = typeof runtimeOperationNames[number];

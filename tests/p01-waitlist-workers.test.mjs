@@ -145,5 +145,17 @@ test('P01-C waitlist -> scoped worker -> held offer -> guarded reservation and c
    assert(offered,'Loop must discover work added after it started');assert.equal(await holds(b),1);
   }finally{child.kill('SIGTERM');await done;}
  });
+ await t.test('category FIFO holds separate limits and offer acceptance preserves its category',async()=>{
+  const sid=await session();await db.query("update core.sessions set nominal=2,maximum=2,category_capacities=$2 where id=$1",[sid,{male:1,female:1}]);
+  await mut('waitlist_join_v1',{session_id:sid,person_id:first.p,booking_category:'male'},first.u);
+  await mut('waitlist_join_v1',{session_id:sid,person_id:second.p,booking_category:'male'},second.u);
+  await mut('waitlist_join_v1',{session_id:sid,person_id:third.p,booking_category:'female'},third.u);
+  await drain();assert.equal(await holds(sid),2);
+  assert.equal((await view(sid,second))[0].state,'waiting');
+  const offer=(await view(sid,first))[0].offers[0];assert.equal(offer.booking_category,'male');
+  await mut('seat_offer_accept_v1',{offer_id:offer.id,expected_version:offer.version},first.u);
+  assert.equal((await rows("select booking_category from core.reservations where session_id=$1 and person_id=$2 and state='active'",[sid,first.p]))[0].booking_category,'male');
+  const result=await call(owner,'reservation_create_v1',scope({session_id:sid,person_id:second.p,mode:'flexible',booking_category:'male'}),key());assert.equal(result.result.error.code,'CAPACITY_FULL');
+ });
  }finally{if(worker)await worker.end();await db.query('delete from private.p01_worker_scopes where db_role=$1',[role]);await db.query(`drop role if exists "${role}"`);await db.end();}
 });

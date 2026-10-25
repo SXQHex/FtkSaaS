@@ -1,5 +1,11 @@
 # Claude frontend entegrasyon talimatları
 
+## 25 Ekim — P08 kapasite dilimi geliştirmesi
+
+Son kullanıcı talimatıyla [kapasite kararı](decisions/DS-2026-10-25-session-capacity.md) kabul edildi ve `feat/session-capacity-controls` branch'inde uygulanıyor. Bu, diğer settings runtime işlerini açmaz. Main tabanı `702063807b0a0d09f559f070ffde1b1ae3e7563b`; yayımlanmış ana kaynaktaki 200 API/59 migration değişmedi. Bu branch taslağı 201 operasyon/60 migration içerir; aday/main CI ve inceleme tamamlanmadan yayımlanmış veya done sayılmaz. P08'in CRM/abone no/sınırsız etkinlik/paket etkinlik uygunluğu işleri açık kalır. PR43/44 belge çalışmaları bu branch'e kopyalanmaz; birleşmede kararlar korunmalıdır.
+
+Tek seans toplamı ve kategori limitleri, oda fiziksel kapasitesi, ayrı `reservation_capacity_override_v1`, tekliflerin ortak yer tutması ve room/seans okuma geçişleri aynı dilimdir. Eski `nominal/maximum` seans DTO'ları yeni istemci sözleşmesinde kullanılmaz. Şema/tip/validator/envanter üretimi ve ilgili belgeler bu branch içinde eşitlenir.
+
 23 Ekim 2026. Belge tabanı main `bfb8ccb29a1e0ca9efde7813dc3af4bbbad8768d`. Frontend tasarım/istemci kodu Claude'un alanıdır; backend bu teslimde tasarıma müdahale etmez. Bu dosya Claude'un açıkça okutulacak başlangıç talimatıdır; repository'de kök `CLAUDE.md` veya `.claude` yapılandırması bulunmuyor. Dosyanın Claude tarafından kendiliğinden yüklendiğini varsayma.
 
 ## Önce okunacak kaynaklar
@@ -113,3 +119,11 @@ Ayrıntılı request/response ve kurallar: `docs/actual-start-handover.md`. İki
 
 Bu yalnız operasyonel kanıttır. Q-E03 katılımcı sınıflandırması, Q-E02 hesaplaşması, yoklama, haklar ve earning kendiliğinden değişmez. Kısmi gerçekleşmeden yeni parasal kural türetilmez.
 
+
+## Kapasite istemci geçişi — henüz main teslimi değil
+
+`room_save_v1.capacity` tek fiziksel sayı; `management_state_get_v1` room_save_v1 seçicisi aynı merkezde oda değerini/sürümünü okur. Eski fiziksel kapasitesi yapılandırılmamış oda `null` gösterilir; doldurulmadan yeni oda bağlı kayıt tamamlanmaz. `session_get_v1`, takvim seansları ve önizlemelerde `capacity.total`/`capacity.categories` kullanılır. Etkinlik DTO'su bu ders kapsamı dışında korunur. Program, tek seans, yerine seans, özel ders oluşturma ve kapasite güncellemesi aynı yeni `SessionCapacity` tipini kullanır.
+
+`booking_category` kategorili seansa kayıt, bekleme ve deneme teklifi girişinde açık seçilir; profil cinsiyetinden tahmin yapılmaz. Normal kayıt dolduğunda açık kontrollü aşım eylemi ayrı komutu ve zorunlu gerekçeyi gönderir. Başarı tanımlı seans kapasitesini değiştirmez. Aktif teklifler dahil doluluk ve oda tavanı backend tarafından yeniden kontrol edilir. Yetki UI görünürlüğünden türetilmez; `FORBIDDEN`, `CAPACITY_FULL`, `POLICY_NOT_CONFIGURED`, `VERSION_CONFLICT` ve tekrar gönderim sonuçları gerçek sözleşme üzerinden ele alınır. Backend/API kabulü tamamlanmadan ekranların bu yeni biçimi çalışıyor sayılmaz; frontend tasarımı değiştirilmedi.
+
+Seans/takvim okuması ayrıca toplam `held`/`remaining`, `category_held`/`category_remaining` ve `room_capacity` verir. Bunlar kesin kayıt + süresi dolmamış bekleme/deneme tekliflerinin sunucu hesabıdır. Kontrollü aşımda kalan yer sıfırın altına düşmez; tanımlı limit ayrı kalır. Rezervasyon listesi `booking_category` snapshot'ını gösterir. Bu özetler yeni kayıt yetkisi veya boş yer garantisi değildir; komut yeniden denetler.

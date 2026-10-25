@@ -1,5 +1,7 @@
 # FtkSaaS çalışma kuralları
 
+25 Ekim açık kullanıcı talimatı: kabul edilmiş oda/seans/kategori kapasitesi kararlarını backend'de uygula ve ilgili yaşayan belgeleri aynı branch'te güncelle. Nominal/maksimum kaldırılır; fiziksel oda sınırı, tek toplam/kategori limiti ve ayrı gerekçeli tek kayıt aşımı korunur. Bu dar P08 kapasite dilimi diğer settings geliştirme durdurmasını kaldırmaz. [Karar](docs/decisions/DS-2026-10-25-session-capacity.md); aday/main kabulü henüz yapılmadı.
+
 23 Ekim son kullanıcı talimatı: frontend tasarımı başlamadan ilgili yaşayan belgeleri güncelle; ayar davranış sprinti tamamlanmadan yeni settings runtime/DTO/API geliştirme. Mevcut yerel platform-settings taslağı yayımlanmış sayılmaz. Frontend tasarımına müdahale etme.
 
 P01–P07/PR40 kod/main/development kabulü kapandı; runtime main4cfc9a55, belge mainbfb8ccb2;200 API/0 contract_only/59 migration/90 core tablo/Edge8. Beş hosted worker temel kurulum ve idle heartbeat doğrulaması geçti. Fiziksel imha/yük/restore ve ek işletim kabulü açık; ayrıntılar [güncel devir](contracts/00-FtkSaaS-yeni-sohbet-devir.md). Eski GitHub ertelemesi ve PR40 pending notları tarihsel sınırdır; mevcut görev yalnız belge eşitlemesidir.

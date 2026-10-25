@@ -1,5 +1,7 @@
 > **23 Ekim kaynak sınırı:** Yayımlanmış toplam 200 API / 0 contract_only / 59 migration. Aşağıdaki eski sayılar ilgili modülün ilk teslim kaydıdır. Son kaynak ve kabul [güncel devirde](../contracts/00-FtkSaaS-yeni-sohbet-devir.md); gerçek açıklar [kalan işlerde](remaining-work.md) izlenir.
 
+25 Ekim kapasite revizyonu: [kabul edilmiş karar](decisions/DS-2026-10-25-session-capacity.md). Bu branch'te tek seans toplamı, kategori snapshotları, ayrı kontrollü aşım ve fiziksel oda tavanı uygulanır; aday/main kabulü bekler. Aşağıdaki ilk teslim kanıtları kendi kaynaklarına aittir; eski nominal/maksimum kapasite davranışı yeni kararın yerine geçmez.
+
 > Sonraki Starter uyarlaması: [Starter devri](starter-attendance-protection-handover.md). Aşağıdaki 79/105 ve tüm-plan anlaşma sınırı kendi önceki kaynak snapshot’ıdır.
 
 > DS-2026-10-17 kabulü plan/anlaşma ve korunan rezervasyon hedefini değiştirir. Bu dosya önceki runtime kapsamını anlatır; yeni hedef ve açık farklar [sprint devrinde](decision-sprint-handover.md).

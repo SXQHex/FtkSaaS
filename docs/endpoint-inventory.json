@@ -472,7 +472,8 @@
       },
       "billing_class": "config",
       "limits": [
-        "Clean Auth/API acceptance evidence is tracked in reports/room-role-verification.json; production acceptance remains open."
+        "Clean Auth/API acceptance evidence is tracked in reports/room-role-verification.json; production acceptance remains open.",
+        "25 October session capacity revision: single total/category limits and physical room ceiling; acceptance pending."
       ]
     },
     {
@@ -1128,7 +1129,9 @@
         }
       },
       "billing_class": "read",
-      "limits": []
+      "limits": [
+        "25 October session capacity revision: single total/category limits and physical room ceiling; acceptance pending."
+      ]
     },
     {
       "name": "class_save_v1",
@@ -1185,7 +1188,9 @@
         ]
       },
       "billing_class": "new",
-      "limits": []
+      "limits": [
+        "25 October session capacity revision: single total/category limits and physical room ceiling; acceptance pending."
+      ]
     },
     {
       "name": "program_apply_v1",
@@ -1216,7 +1221,9 @@
         ]
       },
       "billing_class": "new",
-      "limits": []
+      "limits": [
+        "25 October session capacity revision: single total/category limits and physical room ceiling; acceptance pending."
+      ]
     },
     {
       "name": "session_create_v1",
@@ -1245,7 +1252,9 @@
         ]
       },
       "billing_class": "new",
-      "limits": []
+      "limits": [
+        "25 October session capacity revision: single total/category limits and physical room ceiling; acceptance pending."
+      ]
     },
     {
       "name": "session_get_v1",
@@ -1270,7 +1279,9 @@
         }
       },
       "billing_class": "read",
-      "limits": []
+      "limits": [
+        "25 October session capacity revision: single total/category limits and physical room ceiling; acceptance pending."
+      ]
     },
     {
       "name": "session_change_preview_v1",
@@ -1299,7 +1310,9 @@
         }
       },
       "billing_class": "maintenance",
-      "limits": []
+      "limits": [
+        "25 October session capacity revision: single total/category limits and physical room ceiling; acceptance pending."
+      ]
     },
     {
       "name": "session_change_apply_v1",
@@ -1331,7 +1344,9 @@
         ]
       },
       "billing_class": "maintenance",
-      "limits": []
+      "limits": [
+        "25 October session capacity revision: single total/category limits and physical room ceiling; acceptance pending."
+      ]
     },
     {
       "name": "session_capacity_set_v1",
@@ -1356,7 +1371,9 @@
         }
       },
       "billing_class": "maintenance",
-      "limits": []
+      "limits": [
+        "25 October session capacity revision: single total/category limits and physical room ceiling; acceptance pending."
+      ]
     },
     {
       "name": "session_cancel_preview_v1",
@@ -1425,7 +1442,9 @@
         }
       },
       "billing_class": "new",
-      "limits": []
+      "limits": [
+        "25 October session capacity revision: single total/category limits and physical room ceiling; acceptance pending."
+      ]
     },
     {
       "name": "session_assignment_set_v1",
@@ -1645,7 +1664,8 @@
       "billing_class": "reservation",
       "limits": [
         "Starter lesson attendance supported; paid financial closure and waitlist remain pending",
-        "Automatic actual-start participation observation and mandatory-document lesson consumer remain pending"
+        "Automatic actual-start participation observation and mandatory-document lesson consumer remain pending",
+        "25 October session capacity revision: single total/category limits and physical room ceiling; acceptance pending."
       ]
     },
     {
@@ -1725,7 +1745,8 @@
       },
       "billing_class": "reservation",
       "limits": [
-        "P01-C implementation; runtime acceptance pending. Dedicated DB worker LOGIN/org binding and runner required; no production installation performed."
+        "P01-C implementation; runtime acceptance pending. Dedicated DB worker LOGIN/org binding and runner required; no production installation performed.",
+        "25 October session capacity revision: single total/category limits and physical room ceiling; acceptance pending."
       ]
     },
     {
@@ -1779,7 +1800,8 @@
       },
       "billing_class": "reservation",
       "limits": [
-        "P01-C implementation; runtime acceptance pending. Dedicated DB worker LOGIN/org binding and runner required; no production installation performed."
+        "P01-C implementation; runtime acceptance pending. Dedicated DB worker LOGIN/org binding and runner required; no production installation performed.",
+        "25 October session capacity revision: single total/category limits and physical room ceiling; acceptance pending."
       ]
     },
     {
@@ -2890,7 +2912,9 @@
         }
       },
       "billing_class": "new",
-      "limits": []
+      "limits": [
+        "25 October session capacity revision: single total/category limits and physical room ceiling; acceptance pending."
+      ]
     },
     {
       "name": "trial_registration_confirm_v1",
@@ -2917,7 +2941,9 @@
         }
       },
       "billing_class": "request",
-      "limits": []
+      "limits": [
+        "25 October session capacity revision: single total/category limits and physical room ceiling; acceptance pending."
+      ]
     },
     {
       "name": "lead_convert_v1",
@@ -4107,7 +4133,8 @@
       },
       "billing_class": "worker",
       "limits": [
-        "P01-C worker transport corrected; new runtime acceptance pending. Dedicated DB LOGIN/org binding and runner required; no production installation. API/Edge worker routes do not grant worker authority."
+        "P01-C worker transport corrected; new runtime acceptance pending. Dedicated DB LOGIN/org binding and runner required; no production installation. API/Edge worker routes do not grant worker authority.",
+        "25 October session capacity revision: single total/category limits and physical room ceiling; acceptance pending."
       ]
     },
     {
@@ -5412,6 +5439,35 @@
       "limits": [
         "Development/test only; final source candidate/main clean required.",
         "No external email; dedicated scoped DB worker; hosted scheduling remains separate."
+      ]
+    },
+    {
+      "name": "reservation_capacity_override_v1",
+      "status": "operational_development_limited",
+      "external_path": "/functions/v1/backend-v1/reservation_capacity_override_v1",
+      "permission": "reservation.capacity_override",
+      "features": [
+        "F10",
+        "F11",
+        "F15"
+      ],
+      "required_features": [
+        "F15"
+      ],
+      "runtime_required_features": [
+        "F15"
+      ],
+      "decision_delivery": {
+        "accepted_contract": "DS-2026-10-17",
+        "runtime_conformance": "capacity_revision_acceptance_pending",
+        "open_dependencies": [],
+        "target_request": {
+          "$ref": "#/$defs/Request_reservation_create"
+        }
+      },
+      "billing_class": "reservation",
+      "limits": [
+        "Single explicit booking; reason required; current center manager, granted staff, or assigned live instructor; no right/debt/time/document bypass; room ceiling always enforced."
       ]
     }
   ]

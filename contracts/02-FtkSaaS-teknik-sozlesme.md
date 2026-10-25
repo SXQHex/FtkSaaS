@@ -36,7 +36,7 @@ FtkSaaS bağımsız yeni projedir. Eski studioSaaS kodu, tabloları, frontendler
 | T04 | İş verisi yazmaları adlandırılmış ortak backend operasyonlarından, ağırlıkla PostgreSQL RPC üzerinden geçer. Edge Functions dış servis, gizli anahtar ve gerekli sunucu işleri içindir; her RPC önüne zorunlu Edge Function konulmaz. Auth ve dosya yükleme kendi güvenli API'lerini kullanır. Kurallar frontend veya web sunucusuna bağlanmaz; SQL ve Edge içinde aynı iş kuralı çoğaltılmaz. |
 | T05 | Organizasyona ait kişi kaydı ile organizasyonlar arasında kullanılabilen ortak oturum hesabı ayrıdır. Aynı kişi farklı organizasyonlarda farklı kişi ID'leri alır. Aynı organizasyonda aday/öğrenci/eğitmen/personel ilişkileri için kişi çoğaltılmaz. |
 | T06 | Kesin rezervasyonda hak ayrılır; tüketim değildir. Katılımın taslak yoklaması hakkı ayrılmış tutar. Yoklama kapatıldığında katıldı/noShow ve geçerli politikaya göre tüketim veya serbest bırakma kesinleşir. Rezervasyon iptalinde kendi politikası uygulanır. |
-| T07 | Rezervasyon, gerekli kontenjan/kaynak kontrolü ve hak ayırma tek atomik işlemde tamamlanır. Eşzamanlı istekler geçerli nominal/maksimum kontenjan veya kredi açığı sınırını aşamaz. Yöneticinin birden fazla operasyon adımından oluşan bütün iş akışı tek işlem olmak zorunda değildir. |
+| T07 | Rezervasyon, gerekli kontenjan/kaynak kontrolü ve hak ayırma tek atomik işlemde tamamlanır. Eşzamanlı istekler normal toplam/kategori kontenjanını, fiziksel oda kapasitesini veya kredi açığı sınırını aşamaz. Yöneticinin birden fazla operasyon adımından oluşan bütün iş akışı tek işlem olmak zorunda değildir. |
 | T08 | Kritik işlemlerde aynı işlem anahtarı + aynı içerik aynı sonucu döndürür; aynı anahtar + farklı içerik reddedilir. Farklı anahtarlarla yinelenen aynı rezervasyon da iş kurallarıyla engellenir. Anahtar kapsamı ve saklama davranışı bölüm 21’de kabul edilmiştir. |
 | T09 | Kesinleşmiş para/kredi ve bunlara bağlı hakediş düzeltmeleri önceki kayda bağlantılı hareketlerle yapılır; geçmiş silinmez. Basit profil alanı değişikliği için gereksiz hareket sistemi kurulmaz. |
 | T10 | Gerekli bildirim işi iş işlemiyle birlikte kalıcı kaydedilir; gönderim ayrı yürür. Teslimat hatası başarılı işi geri almaz, yeniden deneme izlenir. |
@@ -87,15 +87,16 @@ Sınıfın dış katılıma açık/kapalı olması ile paketin öncelikli/esnek 
 
 - Öncelikli paket başlangıcından itibaren tanımlı kredileri ilgili seanslara topluca ayırır. Kalan kredi başka programa serbest kredi varsayılmaz; ayrılmış ve kullanılabilir ayrıdır.
 - Esnek paket, uygun seansa tek tek kesin kayıtla hak ayırır.
-- Satış/kesin kayıtta kapsanan seanslardan biri maksimum doluysa engel yöneticiye gösterilir; eksik rezervasyonla sessizce kesinleşmez, yönetici çözer.
-- Oda teknik kapasitesi varsayılan sağlar. Yönetici oda–seans atamasında seans biçimine uygun nominal ve maksimum kontenjan belirler. Rezervasyon oda tablosunun değil seans kontenjanının hesabını kullanır. Nominal maksimumdan büyük olamaz; kişi birimi esas alınır, çift dengesi ayrı karardır.
+- Satış/kesin kayıtta kapsanan seans doluysa işlem sessizce eksik rezervasyonla tamamlanmaz. Öncelikli biçim kapasite aşımı sağlamaz.
+- Oda fiziksel kapasitesi ile tek seans toplamı ayrı girilir. İsteğe bağlı erkek/kadın limitleri bağımsız kayıt sınırlarıdır; toplam sınır da birlikte uygulanır. Nominal/maksimum ayrımı kaldırılmıştır.
 
 | İşlem | Kabul sınırı |
 |---|---|
-| Esnek/tekli kayıt veya yeni yer teklifi | Toplam yer ayırma nominalin altındaysa |
-| Öncelikli kayıt | Toplam yer ayırma maksimumun altındaysa |
+| Normal esnek/öncelikli kayıt, bekleme/deneme teklifi | Toplam ve ilgili kategori kontenjanında boşluk ve fiziksel odada yer |
+| Açık yetkili tek kayıt aşımı | Gerekçeli ayrı komut; toplam/kategori aşılabilir, fiziksel oda sınırı aşılamaz |
+| Kalıcı kapasite/kategori değişimi | Ayrı yönetici komutu, sürüm ve gerekçe; fiziksel oda sınırı korunur |
 
-Bunlar ayrı havuz değildir. Kesin rezervasyonlar ve süresi dolmamış teklifler toplam yer tutar. Nominal 10/maksimum 12 için toplam 11 iken yeni esnek kayıt alınmaz, öncelikli kayıt alınabilir. Bir iptalle toplam 10'a inerse esnek yer hâlâ sıfırdır. Yönetici kontenjanı düşürdüğünde mevcut rezervasyonlar otomatik iptal edilmez; yeni işlemler güncel sınırlara göre kontrol edilir. Bilinçli yönetici kapasite değişikliği ile yetkisiz eşzamanlı kontenjan aşımı farklıdır.
+Kesin kayıtlar ve süresi dolmamış bekleme/deneme teklifleri ortak yer tutar. Kontrollü aşımın hesap/kişi, gerekçe, kontenjan ve aşım miktarı audit'e kaydedilir; hak, borç, belge, zaman, plan, tenant ve merkez kapıları korunur. Mevcut kesin kayıtlar kapasite düşüşünde otomatik iptal edilmez; odanın fiziksel sınırı altına düşüş mevcut açık seans/kayıtlar çözülmeden tamamlanmaz. [25 Ekim kapasite kararı](../docs/decisions/DS-2026-10-25-session-capacity.md) eski çelişen kapasite hükümlerinin yerini alır. Ürün kabulü, bu branch'in uygulaması ve aday/main kabulü ayrı durumlardır.
 
 ## 6. Kullanım hakları ve paket yaşam döngüsü
 
@@ -149,7 +150,7 @@ Yoklama kapanabilmesi için iptal edilmemiş bütün rezervasyonların sonucu gi
 
 ### Bekleme listesi
 
-Teklif yalnız nominalde boş yer varsa verilir; süre boyunca yeri tutar, hak tutmaz. Başlangıç sıra listeye giriş zamanı, eşitlikte kararlı sıra; teklif başlangıç süresi 30 dakika, kayıt kapanışı/ders başlangıcını aşamaz. Kabul, mevcut yer tutmayı rezervasyona dönüştürür; hak, erişim, belge ve koşullar tekrar kontrol edilir. Geçici hata süreyi bitirmez; kalan sürede yeniden denenebilir.
+Teklif yalnız toplam ve ilgili kategori kontenjanında boş yer varsa verilir; süre boyunca yeri tutar, hak tutmaz. Başlangıç sıra listeye giriş zamanı, eşitlikte kararlı sıra; teklif başlangıç süresi 30 dakika, kayıt kapanışı/ders başlangıcını aşamaz. Kabul, mevcut yer tutmayı rezervasyona dönüştürür; hak, erişim, belge ve koşullar tekrar kontrol edilir. Geçici hata süreyi bitirmez; kalan sürede yeniden denenebilir.
 
 Ret/süre dolumunda yer serbest kalır, önceki kişinin liste kaydı kapanır, sıradaki uyguna geçilir. Yeniden katılım sıranın sonundandır. Otomatik kesin kayıt yoktur. Seans iptalinde teklifler geri çekilir ve liste kayıtları kapanır. Kabul ve süre dolumu yarışında tek sonuç geçerlidir.
 
@@ -269,7 +270,7 @@ Asgari doğrulama konuları:
 
 - Tenant/merkez izolasyonu; owner/organizasyon yöneticisi merkez ataması olmadan operasyon yapamaz.
 - Kaldırılmış rol/bağlantı açık oturumla çalışmaz; asistan–katılımcı çakışması iki yönde engellenir.
-- Son nominal/maksimum yer ve son hak/açık limiti yarışlarında fazla ayırma oluşmaz.
+- Son toplam/kategori/fiziksel oda yeri ve son hak/açık limiti yarışlarında fazla ayırma oluşmaz.
 - Teklif kabul/süre dolumu tek sonuç verir; teklif yeri ikinci kez sayılmaz.
 - İşlem tekrarı çift tahsilat/iptal/kredi/hakediş üretmez; taslak yoklama tüketmez.
 - Öğrenci alacağı iade/mahsup yarışında bakiye aşılamaz, mahsup nakit sayılmaz.
@@ -688,7 +689,7 @@ Talep/alternatif niyettir; yer, kaynak veya hak ayırmaz. Alternatif seçimi mer
 
 ## P01-C teknik aktarımı — bekleme ve worker
 
-Bekleme niyeti yer/hak ayırmaz; FIFO joined_at/id, nominal boşluk ve aktif rezervasyon+geçerli teklif ortak kapasitesi korunur. Kabul held seat'i aynı transaction'da guarded rezervasyona dönüştürür; geç hata teklif süresini uzatmaz/bitirmez. Ret/expiry kapanmış entry sonrasında yeniden giriş yeni sıradır. İptal durumu teklifleri ve waiting-only entry'leri kapatır. Etkin waitlist_offer_minutes veya kabul edilmiş başlangıç 30 dakika, kayıt kapanışı/seans başlangıcı sınırına tabidir. Worker insan yetkisinden bağımsız DB rol+org bağında, değişmez iş/op/target, lease ve bounded retry ile yürür. Request expiry kayıtlı son tarih veya geçerli gelecek alternatifi kalmamış başlangıç üzerinden; keyfi TTL/otomatik katılım yoktur. Uygulama/runtime/production işletim sınırları docs/p01-handover.md içindedir.
+Bekleme niyeti yer/hak ayırmaz; uygun kategori içinde FIFO joined_at/id, toplam/kategori boşluğu ve aktif rezervasyon+geçerli teklif ortak kapasitesi korunur. Kabul held seat'i aynı transaction'da guarded rezervasyona dönüştürür; geç hata teklif süresini uzatmaz/bitirmez. Ret/expiry kapanmış entry sonrasında yeniden giriş yeni sıradır. İptal durumu teklifleri ve waiting-only entry'leri kapatır. Etkin waitlist_offer_minutes veya kabul edilmiş başlangıç 30 dakika, kayıt kapanışı/seans başlangıcı sınırına tabidir. Worker insan yetkisinden bağımsız DB rol+org bağında, değişmez iş/op/target, lease ve bounded retry ile yürür. Request expiry kayıtlı son tarih veya geçerli gelecek alternatifi kalmamış başlangıç üzerinden; keyfi TTL/otomatik katılım yoktur. Uygulama/runtime/production işletim sınırları docs/p01-handover.md içindedir.
 
 ## P01 son pencere/merkez teknik aktarımı
 
@@ -852,10 +853,10 @@ A statüsü. Merkez komutları, ilgili merkez ve disiplinin canlı yetkisi ile �
 | C01 | Kimlik ve ulaşım | Merkez adı/kodu, açıklama, logo, adres/harita, telefon/e-posta/web/sosyal bağlantılar; ticari ve kamusal gösterim ayrı. |
 | C02 | İş takvimi | Merkez saat dilimi, çalışma saatleri, tatil/istisna günleri, bakım ve geçici kapanış. Mevcut seansları taşıma/iptal ayrı etki komutu. |
 | C03 | Disiplinler | Org disiplinlerinden sunulanları etkinleştirme, görüntüleme sırası ve yerel açıklama; aynı org disiplin kimliği korunur. |
-| C04 | Oda ve kaynaklar | Mekân/oda/kaynak, disipline göre kapasite, kullanım saatleri ve bakım blokları. Kapasite düşüşünde mevcut kesin kayıtlar korunur. |
+| C04 | Oda ve kaynaklar | Mekân/oda/kaynak, ayrı fiziksel oda kapasitesi, kullanım saatleri ve bakım blokları. Kapasite düşüşünde mevcut kesin kayıtlar korunur. |
 | C05 | Eğitmen ve görev | Eğitmen/asistan uygunluğu, disiplin/merkez ilişkileri, müsaitlik ve izin takvimi. Görevlendirme ve login grant ayrı. |
 | C06 | Personel yetkileri | Merkez personeli kapsamı, açık delegasyonlar ve izin sınırları. Owner atama veya org yetkisi merkez ayarıyla yapılamaz. |
-| C07 | Program ve seans | Süre/saat adımı, varsayılan oda/görevli, nominal/maksimum kontenjan, kapalı sınıf ve dış görünürlük; program sürüm kuralları korunur. |
+| C07 | Program ve seans | Süre/saat adımı, varsayılan oda/görevli, tek toplam ve isteğe bağlı kategori kontenjanları, kapalı sınıf ve dış görünürlük; program sürüm kuralları korunur. |
 | C08 | Talep ve rezervasyon | Talep/rezervasyon pencereleri, alternatif sunumu ve izin verilen yönetici istisnaları. Plan/kapasite/hak kapıları atlanamaz. |
 | C09 | Bekleme ve teklif | Bekleme kullanımı, yer teklifi süresi ve bildirimleri; yarışta tek kesin yer/hak, süre dolumu ve idempotency korunur. |
 | C10 | İptal ve yoklama | Özel/grup iptal politikası, gelmeme ve yoklama hatırlatmaları; Q-E02/E03 parasal sonuçları serbest ayar değildir. |

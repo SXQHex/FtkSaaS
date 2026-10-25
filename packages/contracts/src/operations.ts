@@ -201,4 +201,5 @@ export interface Operations {
   negative_limits_get_v1: {request: T.RequestNegativeLimitsGet; response: T.SuccessNegativeLimitsGet};
   attendance_start_v1: {request: T.RequestAttendanceStart; response: T.SuccessAttendanceStart};
   document_publication_preview_v1: {request: T.RequestDocumentPublicationPreview; response: T.SuccessDocumentPublicationPreview};
+  reservation_capacity_override_v1: {request: T.RequestReservationCapacityOverride; response: T.SuccessReservationCapacityOverride};
 }
