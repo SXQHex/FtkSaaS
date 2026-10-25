@@ -205,6 +205,7 @@ export const runtimeOperationNames = [
   "settings_update_v1",
   "settings_reset_preview_v1",
   "settings_reset_apply_v1",
-  "settings_history_get_v1"
+  "settings_history_get_v1",
+  "reservation_capacity_override_v1"
 ] as const;
 export type RuntimeOperationName = typeof runtimeOperationNames[number];

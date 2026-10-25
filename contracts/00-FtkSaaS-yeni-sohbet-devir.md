@@ -1,8 +1,8 @@
 # FtkSaaS güncel devir
 
-## 25 Ekim — beş kapsam için uygulama adayı
+## 25 Ekim — PR45 kapasite ve main ayarları uzlaştırması
 
-`feature/frontend-settings-delivery` bu belge kararlarını uygulamaya geçiren ilk teslimdir: **206 callable API / 60 migration**. Altı yeni işlem katalog, okuma, sürümlü kısmi yazma, reset önizleme/uygulama ve geçmiş sağlar. Bu bir kaynak/yerel doğrulama durumudur; bağımsız inceleme, gerçek Auth/Edge/RPC, aday/main clean ve CD henüz kabul edilmiş değildir. Main `7020638` hâlâ 200/59'dur. Ayrı PR45 kapasite kaynağı bu branch'e alınmadı; onun 60. migration sayısı bu teslimin migration'ıyla aynı dosya değildir.
+Başlangıç main `3456050a3061d7bf5dc2ce8898b82c5cfe84e773`: **206 callable API / 60 migration**; PR46 ayarları birleşti, aynı main clean [40200716603](https://github.com/SXQHex/FtkSaaS/actions/runs/40200716603) ve development CD [40202862244](https://github.com/SXQHex/FtkSaaS/actions/runs/40202862244) başarılı. Bu PR45 birleşim adayı kapasite işlemini ekler: **207 callable API / 61 migration**. Altı ayar işlemi ve kapasite davranışı birlikte korunur. Henüz uygulanmamış kapasite migration’ı main’deki ayar migration’ından sonra sıralandı; SQL içeriği ve mevcut 60 migration değişmedi. Önceki PR45 clean yalnız eski tabana aittir; bu birleşik kaynak için bağımsız inceleme ve yeni aday/main clean gerekir. Kapasite henüz main/hosted kabulü değildir.
 
 [Alanlar, API'ler ve kesin destek sınırı](../docs/frontend-settings-handover.md). Teknik SQL/worker yönetimi erteli; beş ekranın bütün 69 davranış grubu tamamlandı denmez. Hazır renk/font/logo, native provider/MFA/oturum ve diğer özel yaşam döngüsü açıkları bu genel tercihlere dönüştürülmez.
 
@@ -11,10 +11,10 @@
 
 | Kaynak | Durum |
 |---|---|
-| Main `702063807b0a0d09f559f070ffde1b1ae3e7563b` |200 callable API/59 migration/90 core tablo. PR42 main39890889184 belge kabulü success; CD39890983257 source success/deploy skipped. |
-| PR44 |69 ana grup +12 FD kabulü ve bu belge eşitlemesi; runtime/DTO/migration yok. Önceki headcbbf8386 belge40151955154 success, güncellenen head için yeni belge kanıtı gerekir. |
+| Main `3456050a3061d7bf5dc2ce8898b82c5cfe84e773` |206 callable API/60 migration/90 core tablo. PR46 aday40183389440 ve main40200716603 clean success; development CD40202862244 success. |
+| PR44 |69 ana grup +12 FD belge kaynağı PR46 içinde main’e taşındı; ayrı runtime teslimi değildir. |
 | PR43 |Hazır org renk/font ihtiyacı; FD02 ile seçilen yetki/public okuma/merkez override sınırları günceldir. Eski açık seçenek notları yeni kararları geri açmaz; branch merge edilmedi. |
-| PR45 `149be4f4d925674c97f04d40bb0c9a8416f2c66c` |201 API/60 migration kapasite adayı. Bağımsız review5641685684 ve full clean40164825351 core/API1–4/toplayıcı success; merge/main/CD bekliyor. Eski ilk aday40159833415 bu son kaynak için kullanılmaz. |
+| PR45 |Main3456050a ile uzlaştırılan207 API/61 migration kapasite adayı; yeni son kaynak inceleme/aday/main clean bekler. Eski head149be4f4 review5641685684/full clean40164825351 yalnız eski tabana ait kanıttır. |
 
 Güncel kararlar: FD01–FD12 kapalı; standart negatif limit 0/mevcut kulüp −2. E-posta+parola ve Google kayıt/giriş kabul; Apple/Instagram login/bağlama kapsam dışı, passkey erteli. Instagram reklam lead alımı ayrı üretim P08 işi olarak kalır. Seans tek toplam/kategori ve oda fiziksel sınırı; kontrollü tek kayıt aşımı ayrı. [Tek karar](02-FtkSaaS-teknik-sozlesme.md#oda-seans-kapasite-karari), [frontend devri](../docs/claude-handover.md). Ürün kararı, mevcut main API ve başarılı PR adayı aynı teslim durumu değildir.
 

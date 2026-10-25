@@ -1,8 +1,8 @@
 # Claude frontend entegrasyon talimatları
 
-## 25 Ekim — beş kapsam için uygulama adayı
+## 25 Ekim — PR45 kapasite ve main ayarları uzlaştırması
 
-`feature/frontend-settings-delivery` bu belge kararlarını uygulamaya geçiren ilk teslimdir: **206 callable API / 60 migration**. Altı yeni işlem katalog, okuma, sürümlü kısmi yazma, reset önizleme/uygulama ve geçmiş sağlar. Bu bir kaynak/yerel doğrulama durumudur; bağımsız inceleme, gerçek Auth/Edge/RPC, aday/main clean ve CD henüz kabul edilmiş değildir. Main `7020638` hâlâ 200/59'dur. Ayrı PR45 kapasite kaynağı bu branch'e alınmadı; onun 60. migration sayısı bu teslimin migration'ıyla aynı dosya değildir.
+Başlangıç main `3456050a3061d7bf5dc2ce8898b82c5cfe84e773`: **206 callable API / 60 migration**; PR46 ayarları birleşti, aynı main clean [40200716603](https://github.com/SXQHex/FtkSaaS/actions/runs/40200716603) ve development CD [40202862244](https://github.com/SXQHex/FtkSaaS/actions/runs/40202862244) başarılı. Bu PR45 birleşim adayı kapasite işlemini ekler: **207 callable API / 61 migration**. Altı ayar işlemi ve kapasite davranışı birlikte korunur. Henüz uygulanmamış kapasite migration’ı main’deki ayar migration’ından sonra sıralandı; SQL içeriği ve mevcut 60 migration değişmedi. Önceki PR45 clean yalnız eski tabana aittir; bu birleşik kaynak için bağımsız inceleme ve yeni aday/main clean gerekir. Kapasite henüz main/hosted kabulü değildir.
 
 [Alanlar, API'ler ve kesin destek sınırı](frontend-settings-handover.md). Teknik SQL/worker yönetimi erteli; beş ekranın bütün 69 davranış grubu tamamlandı denmez. Hazır renk/font/logo, native provider/MFA/oturum ve diğer özel yaşam döngüsü açıkları bu genel tercihlere dönüştürülmez.
 
@@ -27,7 +27,7 @@
 
 FD04 kişisel hatırlatmaları başlangıçta açık, pazarlama kapalıdır. FD10'daki ek iş otomasyonları başlangıçta kapalıdır; bu iki alan birbirini değiştirmez. Yeni genel ikinci-onay akışı ilk kapsam dışı; mevcut özel onaylar korunur. CSV rapor/import ile JSON kişisel veri kopyası ayrı hedeflerdir. İmha kanıtsız completed veya provider hazır değilken doğrulama başarısı gösterilmez.
 
-Kapasite için [güncel teknik karar](../contracts/02-FtkSaaS-teknik-sozlesme.md#oda-seans-kapasite-karari) esas alınır: tek fiziksel oda kapasitesi, ayrı seans toplamı ve isteğe bağlı kategori limitleri; seanslarda nominal/maksimum ayrımı yoktur. PR45 adayı `149be4f4` bu modeli uygular ve aday full clean başarılıdır; henüz merge/main/CD kabulü yoktur. Aşağıdaki mevcut-main API matrisi 200 operasyon/59 migration kaynağındadır; adayın yeni DTO'larını yayımlanmış sayma. Tek kayıt için gerekçeli kapasite istisnası fiziksel oda tavanını veya diğer katılım engellerini aşamaz.
+Kapasite için [güncel teknik karar](../contracts/02-FtkSaaS-teknik-sozlesme.md#oda-seans-kapasite-karari) esas alınır: tek fiziksel oda kapasitesi, ayrı seans toplamı ve isteğe bağlı kategori limitleri; seanslarda nominal/maksimum ayrımı yoktur. PR45’in önceki aday clean’i eski tabana aittir. Yeni birleşik aday207/61, mevcut main206/60’tır; kapasite DTO’su henüz main/hosted kabulü değildir. Ayar API’leri PR46 ile main’de mevcuttur. Tek kayıt için gerekçeli kapasite istisnası fiziksel oda tavanını veya diğer katılım engellerini aşamaz.
 
 ## Beş kapsamlı ayar ekranı teslimi — 24 Ekim önceliği
 
@@ -237,3 +237,11 @@ Ayrıntılı request/response ve kurallar: `docs/actual-start-handover.md`. İki
 
 Bu yalnız operasyonel kanıttır. Q-E03 katılımcı sınıflandırması, Q-E02 hesaplaşması, yoklama, haklar ve earning kendiliğinden değişmez. Kısmi gerçekleşmeden yeni parasal kural türetilmez.
 
+
+## Kapasite istemci geçişi — henüz main teslimi değil
+
+`room_save_v1.capacity` tek fiziksel sayı; `management_state_get_v1` room_save_v1 seçicisi aynı merkezde oda değerini/sürümünü okur. Eski fiziksel kapasitesi yapılandırılmamış oda `null` gösterilir; doldurulmadan yeni oda bağlı kayıt tamamlanmaz. `session_get_v1`, takvim seansları ve önizlemelerde `capacity.total`/`capacity.categories` kullanılır. Etkinlik DTO'su bu ders kapsamı dışında korunur. Program, tek seans, yerine seans, özel ders oluşturma ve kapasite güncellemesi aynı yeni `SessionCapacity` tipini kullanır.
+
+`booking_category` kategorili seansa kayıt, bekleme ve deneme teklifi girişinde açık seçilir; profil cinsiyetinden tahmin yapılmaz. Normal kayıt dolduğunda açık kontrollü aşım eylemi ayrı komutu ve zorunlu gerekçeyi gönderir. Başarı tanımlı seans kapasitesini değiştirmez. Aktif teklifler dahil doluluk ve oda tavanı backend tarafından yeniden kontrol edilir. Yetki UI görünürlüğünden türetilmez; `FORBIDDEN`, `CAPACITY_FULL`, `POLICY_NOT_CONFIGURED`, `VERSION_CONFLICT` ve tekrar gönderim sonuçları gerçek sözleşme üzerinden ele alınır. Backend/API kabulü tamamlanmadan ekranların bu yeni biçimi çalışıyor sayılmaz; frontend tasarımı değiştirilmedi.
+
+Seans/takvim okuması ayrıca toplam `held`/`remaining`, `category_held`/`category_remaining` ve `room_capacity` verir. Bunlar kesin kayıt + süresi dolmamış bekleme/deneme tekliflerinin sunucu hesabıdır. Kontrollü aşımda kalan yer sıfırın altına düşmez; tanımlı limit ayrı kalır. Rezervasyon listesi `booking_category` snapshot'ını gösterir. Bu özetler yeni kayıt yetkisi veya boş yer garantisi değildir; komut yeniden denetler.

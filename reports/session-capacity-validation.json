@@ -1,0 +1,74 @@
+{
+  "decision": "docs/decisions/DS-2026-10-25-session-capacity.md",
+  "base_main_sha": "702063807b0a0d09f559f070ffde1b1ae3e7563b",
+  "tested_source_sha": "b799a3a6fd8a16eb2f4b222094838ab7279acef8",
+  "tested_source_tree": "0c47eb285496d948717a4ed531da4d5f53528b39",
+  "source_sha256": {
+    "database/session-capacity.sql": "200ac601702557dc53a05b0ef797b001cd7a10ad24a0ae48d1edd37d21b0dc96",
+    "supabase/migrations/20261025030000_session_capacity.sql": "200ac601702557dc53a05b0ef797b001cd7a10ad24a0ae48d1edd37d21b0dc96",
+    "contracts/08-FtkSaaS-tip-ve-operasyon-sozlesmesi.json": "aa44e6fc8632fddc0431b70109e0959b50cf1aba1d3379c63b642abdeb92702f",
+    "tests/program-session-lifecycle.test.mjs": "10bde3f76f57e2947294f35b990a739bf193901d38bc10d878d321d2bd2f08d1"
+  },
+  "structural": {
+    "command": "npm run verify",
+    "contract_governance_tests": 103,
+    "ci_policy_tests": 43,
+    "failures": 0,
+    "migration_count": 60,
+    "operation_count": 201,
+    "core_table_count": 90,
+    "kind": "local_structural_not_runtime_acceptance"
+  },
+  "runtime": {
+    "environment": "isolated Vercel Sandbox; native Supabase Auth -> Edge -> RPC; synthetic fixtures only",
+    "command": "node --test --test-name-pattern='Session capacity revision' tests/program-session-lifecycle.test.mjs",
+    "normal_process_exit": 0,
+    "tests": 7,
+    "passed": 7,
+    "failed": 0,
+    "cancelled": 0,
+    "skipped": 0,
+    "duration_ms": 91696.465125,
+    "cases": [
+      "single total/category DTO and physical room validation",
+      "category limit blocks normal booking; explicit override audit and idempotency",
+      "concurrent last physical place; total and physical ceiling",
+      "permanent configuration separate; rights failure and late audit rollback",
+      "assigned instructor, explicitly granted staff, live role/duty/grant revocation before receipt replay",
+      "scoped room capacity/version read"
+    ],
+    "release_full_clean": false
+  },
+  "intermediate_regressions": {
+    "completed_groups": [
+      "Availability and policies through real Auth -> Edge -> RPC",
+      "P01-C waitlist -> scoped worker -> held offer -> guarded reservation and cleanup"
+    ],
+    "includes": "category FIFO and category-preserving held-offer acceptance",
+    "source": "intermediate source before final duty, permission-check and read-summary changes",
+    "program_group": "partial; no observed assertion failure before bounded run termination",
+    "whole_five_group_run": "not completed; not passed acceptance; stopped at the bounded runtime budget",
+    "acceptance_transferred_to_final_head": false
+  },
+  "review_fixes": [
+    "capacity-only updates explicitly validate physical room and category limits without rewriting duties/resources",
+    "current instructor duty uses legacy-aware lesson_duty instead of broader read visibility",
+    "new staff permission extends installed permission CHECK without deleting prior allowed codes",
+    "fixture DB cleanup covers bootstrap failure; wait-local readiness runs after native DB reset"
+  ],
+  "documentation": {
+    "local_markdown_files_checked": 52,
+    "local_links_checked": 288,
+    "diff_check": "passed",
+    "historical_reports_rewritten": false
+  },
+  "remaining_acceptance": {
+    "independent_final_source_review": "pending",
+    "github_targeted_head_ci": "pending publication",
+    "candidate_full_clean": "not started",
+    "main_clean": "not started",
+    "merge": "not performed",
+    "hosted_deployment": "not performed"
+  },
+  "sandbox": "stopped after collecting final proof"
+}

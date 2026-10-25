@@ -19,11 +19,11 @@ test('Availability and policies through real Auth -> Edge -> RPC',async t=>{
  await must(platform,'saas_payment_verify_v1',scope({payment_id:pay.primary_id,accepted:true}),key());
  const discipline=(await must(owner,'discipline_save_v1',{org_id:org,name:'Salsa',state:'active'},key())).primary_id;
  await mut('center_discipline_set_v1',{discipline_id:discipline,state:'active'});
- const room=(await mut('room_save_v1',{name:'Room',capacities:[{discipline_id:discipline,nominal:4,maximum:4}]})).primary_id;
+ const room=(await mut('room_save_v1',{name:'Room',capacity:4})).primary_id;
  const resource={kind:'room',id:room},rule={weekdays:[1,2,3,4,5,6,7],local_start:'08:00:00',local_end:'22:00:00',valid_from:'2020-01-01'};
  const at=new Date();at.setUTCDate(at.getUTCDate()+2);at.setUTCHours(9,0,0,0);
  const interval={starts_at:at.toISOString(),ends_at:new Date(+at+3600000).toISOString()};
- const sessionBody={discipline_id:discipline,format:'group',interval,resources:[resource],assignments:[],capacity:{nominal:4,maximum:4}};
+ const sessionBody={discipline_id:discipline,format:'group',interval,resources:[resource],assignments:[],capacity:{total:4}};
  let saved,session,trigger;
  const effective_at=new Date(Date.now()-5000).toISOString();
  const publish=(k,value,mandatory=false,b={},u=owner,opkey=key())=>mut('policy_publish_v1',{center_id:null,key:k,value,effective_at,mandatory,...b},opkey,u);

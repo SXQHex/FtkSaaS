@@ -125,6 +125,7 @@ assert next(Path('supabase/migrations').glob('*_p07_subscription_lifecycle.sql')
 
 assert next(Path('supabase/migrations').glob('*_p07_payment_response_contract.sql')).read_text()==Path('database/p07-payment-response.sql').read_text(),'P07 payment response source drift'
 
+assert next(Path('supabase/migrations').glob('*_session_capacity.sql')).read_text()==Path('database/session-capacity.sql').read_text(),'Session capacity source drift'
 assert next(Path('supabase/migrations').glob('*_frontend_settings.sql')).read_text()==Path('database/frontend-settings-catalog.sql').read_text()+Path('database/frontend-settings.sql').read_text().replace('commit;\n','',1)+Path('database/frontend-settings-wrappers.sql').read_text().replace('begin;\n','',1),'Frontend settings source drift'
 
 settings_fields=json.loads(Path('config/frontend-settings.json').read_text())['fields']

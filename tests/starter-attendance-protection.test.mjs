@@ -38,7 +38,7 @@ test('Starter attendance and protected reservation through Auth -> Edge -> RPC',
  await publish('student_cancel_group',{kind:'cancellation',terms:{cutoff_minutes:0,before_cutoff:'release',after_cutoff:'release',no_show:'release'}});
  await publish('reservation_window',{kind:'window',opens_minutes_before:10080,closes_minutes_before:0,manager_exception:false});
  await publish('negative_valuation',{kind:'valuation',discipline_id:discipline,format:'group',amount_minor:'100',currency:'TRY'});
- const makeSession=async(extra={})=>{const start=new Date(Date.now()+86400000);start.setUTCHours(9,0,0,0);return mut('session_create_v1',{discipline_id:discipline,format:'group',interval:{starts_at:start.toISOString(),ends_at:new Date(+start+3600000).toISOString()},resources:[],assignments:[],capacity:{nominal:8,maximum:10},...extra});};
+ const makeSession=async(extra={})=>{const start=new Date(Date.now()+86400000);start.setUTCHours(9,0,0,0);return mut('session_create_v1',{discipline_id:discipline,format:'group',interval:{starts_at:start.toISOString(),ends_at:new Date(+start+3600000).toISOString()},resources:[],assignments:[],capacity:{total:8},...extra});};
  const book=(sid,p=student.p,k=key())=>mut('reservation_create_v1',{session_id:sid,person_id:p,mode:'flexible'},k);
  const get=sid=>must(owner,'attendance_get_v1',scope({session_id:sid}));
  const token=p=>({id:p.id,token:p.token});
@@ -46,7 +46,7 @@ test('Starter attendance and protected reservation through Auth -> Edge -> RPC',
  let sid,rid,impact;
  await t.test('Starter creates class/program with instructor and no pay agreement',async()=>{
   const cls=(await mut('class_save_v1',{name:'Starter class',discipline_id:discipline,external_open:false})).primary_id;
-  const p=await must(owner,'program_preview_v1',scope({class_id:cls,schedule:{weekdays:[1],local_start:'12:00:00',duration_minutes:60,starts_on:'2027-01-04',ends_on:'2027-01-12',assignments:[{person_id:instructor.p,duty:'instructor'}],capacity:{nominal:8,maximum:10}}}));
+  const p=await must(owner,'program_preview_v1',scope({class_id:cls,schedule:{weekdays:[1],local_start:'12:00:00',duration_minutes:60,starts_on:'2027-01-04',ends_on:'2027-01-12',assignments:[{person_id:instructor.p,duty:'instructor'}],capacity:{total:8}}}));
   assert.deepEqual(p.blockers,[]);assert(!p.sessions[0].assignments[0].agreement_id);
   await mut('program_apply_v1',{preview:token(p)});
   sid=(await makeSession()).primary_id;rid=(await book(sid)).primary_id;
@@ -56,7 +56,7 @@ test('Starter attendance and protected reservation through Auth -> Edge -> RPC',
   await fail('class_save_v1',{name:'Not open',discipline_id:discipline,external_open:true},'PLAN_FEATURE_UNAVAILABLE');
   await fail('role_assign_v1',{person_id:instructor.p,role:'staff',scope:{center_id:center}},'PLAN_FEATURE_UNAVAILABLE');
   await fail('reservation_create_v1',{session_id:(await makeSession()).primary_id,person_id:student.p,mode:'flexible'},'PLAN_FEATURE_UNAVAILABLE',student.u);
-  await fail('session_create_v1',{discipline_id:discipline,format:'group',interval:{starts_at:new Date(Date.now()+60000).toISOString(),ends_at:new Date(Date.now()+3660000).toISOString()},resources:[],assignments:[{person_id:instructor.p,duty:'instructor',agreement_id:key()}],capacity:{nominal:8,maximum:10}},'PLAN_FEATURE_UNAVAILABLE');
+  await fail('session_create_v1',{discipline_id:discipline,format:'group',interval:{starts_at:new Date(Date.now()+60000).toISOString(),ends_at:new Date(Date.now()+3660000).toISOString()},resources:[],assignments:[{person_id:instructor.p,duty:'instructor',agreement_id:key()}],capacity:{total:8}},'PLAN_FEATURE_UNAVAILABLE');
   const terms={name:'Plan boundary',kind:'credits',booking_mode:'flexible',credits:2,price_minor:'1000',currency:'TRY',freeze:{enabled:false,extends_validity:false},refund:{method:'none'},scopes:[{scope_kind:'organization_all',center_id:null,discipline_id:null,usage_targets:['lesson']}]};
   await fail('product_publish_v1',{terms:{...terms,freeze:{enabled:true,extends_validity:false}}},'PLAN_FEATURE_UNAVAILABLE');
   const {credits,...timed}=terms;await fail('product_publish_v1',{terms:{...timed,kind:'timed'}},'PLAN_FEATURE_UNAVAILABLE');

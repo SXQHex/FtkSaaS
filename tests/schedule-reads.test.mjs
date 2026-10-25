@@ -34,7 +34,7 @@ test('Schedule reads through real Auth -> Edge -> RPC',async t=>{
  const instructor=await linked('schedule-instructor','instructor'),assistant=await linked('schedule-assistant','assistant');
  const cm=await linked('schedule-cm','center_manager'),staff=await linked('schedule-staff','staff');
  const cls=(await mut('class_save_v1',{center_id:c1,name:'Class one',discipline_id:discipline,external_open:false})).primary_id;
- const room=(await mut('room_save_v1',{center_id:c1,name:'Read room',capacities:[{discipline_id:discipline,nominal:10,maximum:10}]})).primary_id;
+ const room=(await mut('room_save_v1',{center_id:c1,name:'Read room',capacity:10})).primary_id;
  async function session(c,starts,ends,cl=null,assigned=[]){
   const id=key();await db.query("insert into core.sessions(id,org_id,center_id,class_id,discipline_id,format,starts_at,ends_at,nominal,maximum,state,attendance_state) values($1,$2,$3,$4,$5,'group',$6,$7,10,10,'planned','open')",[id,org,c,cl,discipline,starts,ends]);
   for(const a of assigned)await db.query("insert into core.session_assignments(id,org_id,center_id,session_id,person_id,duty,state) values($1,$2,$3,$4,$5,$6,'active')",[key(),org,c,id,a.p,a===assistant?'assistant':'instructor']);
@@ -117,7 +117,7 @@ test('Schedule reads through real Auth -> Edge -> RPC',async t=>{
  });
  await t.test('a session written through the current command is read with the same version and UTC times',async()=>{
   const it={starts_at:'2027-01-10T12:00:00+03:00',ends_at:'2027-01-10T13:00:00+03:00'};
-  const made=await mut('session_create_v1',{center_id:c1,discipline_id:discipline,format:'group',interval:it,resources:[],assignments:[],capacity:{nominal:4,maximum:5}});
+  const made=await mut('session_create_v1',{center_id:c1,discipline_id:discipline,format:'group',interval:it,resources:[],assignments:[],capacity:{total:4}});
   const view=await get(owner,made.primary_id);assert.equal(view.version,made.version);assert.equal(Date.parse(view.starts_at),Date.parse(it.starts_at));
   assert.deepEqual(ids(await cal(owner,{interval:it})),[made.primary_id]);
  });

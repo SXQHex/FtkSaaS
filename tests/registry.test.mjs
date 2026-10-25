@@ -67,7 +67,7 @@ test('Registry real Auth/API scope, lifecycle and atomicity',async t=>{
  });
  const cls=(await mutate('class_save_v1',{name:'Registry class',discipline_id:discipline,external_open:true})).primary_id;
  const at=Date.now()+86400000;
- const session=(await mutate('session_create_v1',{class_id:cls,discipline_id:discipline,format:'group',interval:{starts_at:new Date(at).toISOString(),ends_at:new Date(at+3600000).toISOString()},resources:[],assignments:[],capacity:{nominal:10,maximum:10}})).primary_id;
+ const session=(await mutate('session_create_v1',{class_id:cls,discipline_id:discipline,format:'group',interval:{starts_at:new Date(at).toISOString(),ends_at:new Date(at+3600000).toISOString()},resources:[],assignments:[],capacity:{total:10}})).primary_id;
  for(const state of ['pending','alternative_offered'])await t.test('open lesson request '+state+' blocks deactivation atomically',async()=>{
   const id=key(),k=key();await db.query('insert into core.lesson_requests(id,org_id,center_id,person_id,format,requested_start,duration_minutes,state,discipline_id) values($1,$2,$3,$4,\'group\',now(),60,$5,$6)',[id,org,center,p,state,discipline]);
   await fail('student_deactivate_v1',{person_id:p,reason:'blocked'},'OPEN_OPERATIONS_EXIST',k);assert.equal(await receipt(k),0);

@@ -207,4 +207,5 @@ export interface Operations {
   settings_reset_preview_v1: {request: T.RequestSettingsResetPreview; response: T.SuccessSettingsResetPreview};
   settings_reset_apply_v1: {request: T.RequestSettingsResetApply; response: T.SuccessSettingsResetApply};
   settings_history_get_v1: {request: T.RequestSettingsHistoryGet; response: T.SuccessSettingsHistoryGet};
+  reservation_capacity_override_v1: {request: T.RequestReservationCapacityOverride; response: T.SuccessReservationCapacityOverride};
 }

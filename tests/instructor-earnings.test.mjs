@@ -35,7 +35,7 @@ test('Instructor agreement and earnings through Auth -> Edge -> RPC',async t=>{
  await publish('student_cancel_group',{kind:'cancellation',terms:{cutoff_minutes:0,before_cutoff:'release',after_cutoff:'release',no_show:'release'}});
  await publish('reservation_window',{kind:'window',opens_minutes_before:60000,closes_minutes_before:0,manager_exception:false});
  await publish('negative_valuation',{kind:'valuation',discipline_id:discipline,format:'group',amount_minor:'100',currency:'TRY'});
- let sequence=0;const makeSession=async(extra={})=>{sequence++;return mut('session_create_v1',{discipline_id:discipline,format:'group',interval:{starts_at:new Date(new Date().setUTCHours(10,0,0,0)+sequence*86400000).toISOString(),ends_at:new Date(new Date().setUTCHours(11,0,0,0)+sequence*86400000).toISOString()},resources:[],assignments:[],capacity:{nominal:8,maximum:10},assignments:[{person_id:instructor.p,duty:'instructor'}],...extra});};
+ let sequence=0;const makeSession=async(extra={})=>{sequence++;return mut('session_create_v1',{discipline_id:discipline,format:'group',interval:{starts_at:new Date(new Date().setUTCHours(10,0,0,0)+sequence*86400000).toISOString(),ends_at:new Date(new Date().setUTCHours(11,0,0,0)+sequence*86400000).toISOString()},resources:[],assignments:[],capacity:{total:8},assignments:[{person_id:instructor.p,duty:'instructor'}],...extra});};
  const book=(sid,p=student.p,k=key())=>mut('reservation_create_v1',{session_id:sid,person_id:p,mode:'flexible'},k);
  const get=sid=>must(owner,'attendance_get_v1',scope({session_id:sid}));
  const token=p=>({id:p.id,token:p.token});
@@ -220,7 +220,7 @@ test('Instructor agreement and earnings through Auth -> Edge -> RPC',async t=>{
   await fail('attendance_start_v1',{...payload,expected_version:v.session_version},'INVALID_STATE_TRANSITION');
   agreement=await agree(terms([fixed(333)]),{supersedes_id:old.primary_id,expected_version:old.version,valid:{starts_at:new Date().toISOString(),ends_at:'2030-01-01T00:00:00Z'}});
   assert.equal((await rows('select agreement_id from core.session_assignments where session_id=$1',[ses]))[0].agreement_id,old.primary_id);
-  const preview=await must(owner,'session_change_preview_v1',scope({session_id:ses,scope:'single',patch:{capacity:{nominal:9,maximum:10}},reason:'Cannot edit a started session'}));assert.equal(preview.blockers[0].code,'INVALID_STATE_TRANSITION');
+  const preview=await must(owner,'session_change_preview_v1',scope({session_id:ses,scope:'single',patch:{capacity:{total:9}},reason:'Cannot edit a started session'}));assert.equal(preview.blockers[0].code,'INVALID_STATE_TRANSITION');
   v=await get(ses);await mut('attendance_mark_v1',{reservation_id:rv,expected_version:v.entries[0].version,result:'attended'});await close(ses);assert.equal((await earningRows(ses))[0].amount_minor,'450');
  });
 

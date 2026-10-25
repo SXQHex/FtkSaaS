@@ -25,40 +25,35 @@ test('Room configuration and scoped role reads through real Auth/API',async t=>{
  const second=(await must(owner,'discipline_save_v1',{org_id:org,name:'Tango',state:'active'},key())).primary_id;
  await mutate('center_discipline_set_v1',{discipline_id:discipline,state:'active'});
  await mutate('center_discipline_set_v1',{discipline_id:second,state:'active'});
- const capacities=[{discipline_id:discipline,nominal:8,maximum:10},{discipline_id:second,nominal:4,maximum:6}];
+ const capacity=10;
  await t.test('create and exact replay produce one room, audit and outbox',async()=>{
-  const k=key(),body={name:'Studio A',capacities};const a=await mutate('room_save_v1',body,k);room=a.primary_id;
+  const k=key(),body={name:'Studio A',capacity};const a=await mutate('room_save_v1',body,k);room=a.primary_id;
   assert.equal(a.version,1);assert.equal((await mutate('room_save_v1',body,k)).primary_id,room);assert.equal((await mutate('room_save_v1',body,k)).replayed,true);
-  assert.equal((await rows('select count(*)::int n from core.room_capacities where room_id=$1',[room]))[0].n,2);
+  assert.equal((await rows('select capacity from core.rooms where id=$1',[room]))[0].capacity,'10');
   assert.equal((await rows('select count(*)::int n from core.audit_events where operation_id=$1',[a.operation_id]))[0].n,1);
   assert.equal((await rows('select count(*)::int n from core.outbox_jobs where dedupe_key=$1',[a.operation_id]))[0].n,1);
   await fail('room_save_v1',{...body,name:'changed'},'IDEMPOTENCY_PAYLOAD_MISMATCH',owner,k);
  });
  await t.test('create/update distinction, semantic validation and discipline scope',async()=>{
-  await fail('room_save_v1',{name:'bad',capacities,expected_version:1},'VERSION_CONFLICT');
-  await fail('room_save_v1',{room_id:room,name:'bad',capacities},'VERSION_CONFLICT');
-  await fail('room_save_v1',{name:'bad',capacities:[capacities[0],capacities[0]]},'VALIDATION_FAILED');
-  await fail('room_save_v1',{name:'bad',capacities:[{...capacities[0],nominal:11}]},'VALIDATION_FAILED');
-  await fail('room_save_v1',{name:'bad',capacities:[{...capacities[0],discipline_id:key()}]},'NOT_FOUND');
-  await mutate('center_discipline_set_v1',{discipline_id:second,state:'inactive',expected_version:1});
-  await fail('room_save_v1',{name:'bad',capacities:[capacities[1]]},'NOT_FOUND');
-  await mutate('center_discipline_set_v1',{discipline_id:second,state:'active',expected_version:2});
+  await fail('room_save_v1',{name:'bad',capacity,expected_version:1},'VERSION_CONFLICT');
+  await fail('room_save_v1',{room_id:room,name:'bad',capacity},'VERSION_CONFLICT');
+  await fail('room_save_v1',{name:'bad',capacity:-1},'VALIDATION_FAILED');
+  await fail('room_save_v1',{name:'bad',capacity:null},'VALIDATION_FAILED');
  });
- await t.test('update preserves retained capacity identity, removes omitted definitions and versions once',async()=>{
-  const old=(await rows('select id from core.room_capacities where room_id=$1 and discipline_id=$2',[room,discipline]))[0].id;
-  const b={room_id:room,expected_version:1,name:'Studio renamed',capacities:[{...capacities[0],nominal:7}]},k=key();
+ await t.test('physical capacity update versions once without discipline capacity mutation',async()=>{
+  const b={room_id:room,expected_version:1,name:'Studio renamed',capacity:7},k=key();
   assert.equal((await mutate('room_save_v1',b,k)).version,2);assert.equal((await mutate('room_save_v1',b,k)).replayed,true);
-  const c=await rows('select id,version,nominal from core.room_capacities where room_id=$1',[room]);assert.equal(c.length,1);assert.equal(c[0].id,old);assert.equal(c[0].nominal,'7');assert.equal(c[0].version,'2');
+  assert.equal((await rows('select capacity from core.rooms where id=$1',[room]))[0].capacity,'7');
   await fail('room_save_v1',b,'VERSION_CONFLICT');
  });
  await t.test('concurrent updates share the room version and only one succeeds',async()=>{
-  const rs=await Promise.all(['one','two'].map(name=>call(owner,'room_save_v1',scope({room_id:room,expected_version:2,name,capacities}),key())));
+  const rs=await Promise.all(['one','two'].map(name=>call(owner,'room_save_v1',scope({room_id:room,expected_version:2,name,capacity}),key())));
   assert.equal(rs.filter(x=>x.result.ok).length,1);assert.equal(rs.find(x=>!x.result.ok).result.error.code,'VERSION_CONFLICT');
   assert.equal((await rows('select version from core.rooms where id=$1',[room]))[0].version,'3');
  });
  await t.test('late audit failure rolls back room, capacities, receipt and notifications; retry succeeds',async()=>{
   const snapshot=async()=>JSON.stringify({room:await rows('select * from core.rooms where id=$1',[room]),caps:await rows('select * from core.room_capacities where room_id=$1 order by id',[room]),audit:await rows('select id from core.audit_events where org_id=$1 order by id',[org]),outbox:await rows('select id from core.outbox_jobs where org_id=$1 order by id',[org])});
-  const before=await snapshot(),k=key(),b={room_id:room,expected_version:3,name:'Rollback',capacities:[]};
+  const before=await snapshot(),k=key(),b={room_id:room,expected_version:3,name:'Rollback',capacity:10};
   trigger='rooms_'+key().replaceAll('-','');
   await db.query('create function private.'+trigger+"() returns trigger language plpgsql set search_path='' as $$begin raise exception using errcode='P0001',message='INTEGRITY_VIOLATION';end$$");
   await db.query('create trigger '+trigger+" before insert on core.audit_events for each row when (new.org_id='"+org+"'::uuid and new.action='room_save_v1') execute function private."+trigger+'()');
@@ -68,10 +63,10 @@ test('Room configuration and scoped role reads through real Auth/API',async t=>{
   assert.equal((await mutate('room_save_v1',b,k)).version,4);assert.equal((await mutate('room_save_v1',b,k)).replayed,true);
  });
  await t.test('room writes require assigned center and conceal foreign tenant',async()=>{
-  await fail('room_save_v1',{center_id:other,name:'denied',capacities:[]},'FORBIDDEN');
-  await fail('room_save_v1',{name:'denied',capacities:[]},'NOT_FOUND',stranger);
-  await fail('room_save_v1',{center_id:null,name:'denied',capacities:[]},'FORBIDDEN');
-  await fail('room_save_v1',{room_id:key(),expected_version:1,name:'missing',capacities:[]},'NOT_FOUND');
+  await fail('room_save_v1',{center_id:other,name:'denied',capacity:10},'FORBIDDEN');
+  await fail('room_save_v1',{name:'denied',capacity:10},'NOT_FOUND',stranger);
+  await fail('room_save_v1',{center_id:null,name:'denied',capacity:10},'FORBIDDEN');
+  await fail('room_save_v1',{room_id:key(),expected_version:1,name:'missing',capacity:10},'NOT_FOUND');
  });
  await mutate('center_manager_assign_v1',{center_id:other,person_id:ownerPerson});
  async function linked(label,role,c=center){
@@ -94,7 +89,7 @@ test('Room configuration and scoped role reads through real Auth/API',async t=>{
  await t.test('student, instructor and foreign tenant cannot list roles or configure rooms',async()=>{
   for(const u of [student.u,instructor.u]){
    await fail('roles_list_v1',{center_id:null,page:{}},'FORBIDDEN',u);
-   await fail('room_save_v1',{name:'denied',capacities:[]},'FORBIDDEN',u);
+   await fail('room_save_v1',{name:'denied',capacity:10},'FORBIDDEN',u);
   }
   await fail('roles_list_v1',{center_id:null,page:{}},'NOT_FOUND',stranger);
  });
@@ -128,7 +123,7 @@ test('Room configuration and scoped role reads through real Auth/API',async t=>{
   const before=await count();const first=await list(manager.u,{page:{limit:1}});assert(first.next_cursor);assert.equal(await count(),before);
   await mutate('center_manager_revoke_v1',{person_id:manager.p,expected_version:1,reason:'synthetic revoke'});
   await fail('roles_list_v1',{center_id:null,page:{cursor:first.next_cursor}},'FORBIDDEN',manager.u);
-  await fail('room_save_v1',{room_id:room,expected_version:4,name:'denied',capacities:[]},'FORBIDDEN',manager.u);
+  await fail('room_save_v1',{room_id:room,expected_version:4,name:'denied',capacity:10},'FORBIDDEN',manager.u);
   assert.equal((await list(owner,{person_id:manager.p})).items[0].state,'inactive');
  });
  }finally{

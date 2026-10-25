@@ -39,8 +39,12 @@ Member anahtarı org+hesaptır; UUID kişisi alias/merge sonrası ayrı kullanı
 
 Bu paket 69 grubun tamamı değildir. Hazır renk/font paket yönetimi ve public marka okuması; PNG/JPEG/WebP avatar/logo Storage hattı; global ad/doğrulanmış e-posta/telefon yayılımı; Google/native MFA/session cihaz akışları; takvim aboneliği; sessiz saat/olay bazlı reminder zamanları ve özet consumerları; kayıtlı ekran filtreleri/bağlam; yetkili görünürlük kitle projeksiyonu; alan bazlı canlı miras/şablon ve platform default yayınlama; mevcut özel program/paket/belge/CRM/rapor/import/abonelik alanlarının eksik DTO/consumer eşlemesi ayrı açık kalır. Provider/secrets veya ertelenmiş SQL/Cron yönetimi genel preference patch'iyle etkinleştirilmez.
 
+## PR46 kabulü ve birleşim sınırı
+
+PR46 head e98946adcbafb57d55e209f2284d1326d4488fb3 bağımsız inceleme ve aday40183389440 başarılıdır. Main3456050a3061d7bf5dc2ce8898b82c5cfe84e773 için main40200716603 ve development CD40202862244 başarılıdır. Bu PR45 birleşim adayı aynı altı API’yi korur; yeni birleşik kaynağa eski test kabulü taşınmaz.
+
 ## Doğrulama sınırı
 
 Yerel izole PGlite üzerinde bütün migration zinciri ve yeni SQL davranışları kontrol edildi; sentetik Auth tablo fixture'ları native Auth değildir, E2E kabulü sayılmaz. Native Auth→Edge→RPC suite tests/frontend-settings-acceptance.mjs mevcut registry shardına eklidir; full/main clean kapsamı azaltılmadı. Eski P05 negatif teslim fixture'ı yeni FD04 açık defaultu nedeniyle açıkça opt-out yapar; sıfır teslim assertionı aynen korunur. Gerçek CI sonuçları kaynak head'ine bağlı doğrulanacaktır.
 
-Bağımsız ilk inceleme, Owner→OM geçişinde billing_* eski update/reset receipt replay yolundaki alan yetkisi açığını buldu. Alan yetkisi artık receipt okumasından önce denetlenir; geçerli rol korunurken uygulanmış/süresi dolmuş resetin başarılı retry sonucu korunur. Native regresyon bu iki tarafı da kapsar; düzeltilmiş kaynak yeniden bağımsız inceleme ve CI bekler.
+Bağımsız ilk inceleme, Owner→OM geçişinde billing_* eski update/reset receipt replay yolundaki alan yetkisi açığını buldu. Alan yetkisi artık receipt okumasından önce denetlenir; geçerli rol korunurken uygulanmış/süresi dolmuş resetin başarılı retry sonucu korunur. Native regresyon bu iki tarafı da kapsar; düzeltilmiş PR46 kaynağı bağımsız inceleme ve aday/main CI’dan geçti. Birleşik PR45 kaynağı ayrı kabul bekler.
