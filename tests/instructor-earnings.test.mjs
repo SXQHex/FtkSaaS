@@ -296,6 +296,37 @@ test('Instructor agreement and earnings through Auth -> Edge -> RPC',async t=>{
   await fail('earnings_list_v1',{center_id:c2,person_id:instructor.p,interval:{starts_at:'2020-01-01T00:00:00Z',ends_at:'2030-01-01T00:00:00Z'},page:{}},'FORBIDDEN',manager.u);
   await fail('instructor_agreement_publish_v1',{center_id:c2,...agreementRequest(terms([fixed(1)]))},'FORBIDDEN',manager.u);
  });
+ await t.test('pilot chain: linked student purchase, self reservation, instructor attendance, rights and manager report reconcile',async()=>{
+  const learner=await linked('pilot-learner'),teacher=await linked('pilot-teacher','instructor');
+  await mut('availability_save_v1',{resource:{kind:'person',id:teacher.p},rule:{weekdays:[1,2,3,4,5,6,7],local_start:'00:00:00',local_end:'23:59:59',valid_from:'2020-01-01'}});
+  await agree(terms([fixed(321)]),{person_id:teacher.p});
+  const packageVersion=(await product('credits',{credits:4,price_minor:'260000'})).primary_id;
+  const sale=await sell(learner.p,packageVersion,'260000');
+  const debt=(await rows('select id from core.debts where org_id=$1 and sale_id=$2',[org,sale]))[0].id;
+  const collectionKey=key(),collectionBody={person_id:learner.p,debt_ids:[debt],amount_minor:'260000',currency:'TRY',occurred_at:new Date().toISOString()};
+  await mut('collection_record_v1',collectionBody,collectionKey);assert((await mut('collection_record_v1',collectionBody,collectionKey)).replayed);
+  const session=(await makeSession({assignments:[{person_id:teacher.p,duty:'instructor'}]})).primary_id;
+  const reservationKey=key(),reservationBody={session_id:session,person_id:learner.p,source_sale_id:sale,mode:'flexible'};
+  const reservation=(await mut('reservation_create_v1',reservationBody,reservationKey,learner.u)).primary_id;
+  assert((await mut('reservation_create_v1',reservationBody,reservationKey,learner.u)).replayed);
+  const rights=await must(learner.u,'entitlements_get_v1',scope({person_id:learner.p,session_id:session}));assert(rights.some(x=>x.sale_id===sale));
+  let attendance=await must(teacher.u,'attendance_get_v1',scope({session_id:session}));
+  await mut('attendance_start_v1',{session_id:session,expected_version:attendance.session_version,actual_started_at:new Date().toISOString(),reason:'Explicit synthetic pilot start'},key(),teacher.u);
+  attendance=await must(teacher.u,'attendance_get_v1',scope({session_id:session}));const entry=attendance.entries.find(x=>x.reservation_id===reservation);assert(entry);
+  await mut('attendance_mark_v1',{reservation_id:reservation,expected_version:entry.version,result:'attended'},key(),teacher.u);
+  attendance=await must(teacher.u,'attendance_get_v1',scope({session_id:session}));
+  const closeKey=key(),closeBody={session_id:session,expected_version:attendance.session_version,performed:true,performed_instructor_ids:[teacher.p]};
+  await mut('attendance_close_v1',closeBody,closeKey,teacher.u);assert((await mut('attendance_close_v1',closeBody,closeKey,teacher.u)).replayed);
+  const earning=(await must(teacher.u,'earnings_list_v1',scope({person_id:teacher.p,interval:{starts_at:'2020-01-01T00:00:00Z',ends_at:'2030-01-01T00:00:00Z'},page:{}}))).items.find(x=>x.session_id===session);
+  assert.equal(earning.amount_minor,'321');
+  assert.equal((await rows("select count(*)::int n from core.entitlement_allocations where org_id=$1 and reservation_id=$2 and state='consumed'",[org,reservation]))[0].n,1);
+  assert.equal((await rows('select private.debt_remaining($1,$2)::text n',[org,debt]))[0].n,'0');
+  const filters={center_ids:[center],person_ids:[teacher.p],interval:{starts_at:new Date(Date.now()-3600000).toISOString(),ends_at:new Date(Date.now()+3600000).toISOString()}};
+  const report=await must(owner,'report_get_v1',scope({report:'earnings',filters,page:{}}));
+  assert.equal(report.totals.find(x=>x.group_key==='earning_accrual'&&x.currency==='TRY').amount_minor,earning.amount_minor);
+  await fail('report_get_v1',{report:'earnings',filters,page:{}},'FORBIDDEN',learner.u);
+ });
+
  await t.test('live role revocation blocks instructor read and manager receipt replay',async()=>{
   await mut('role_revoke_v1',{assignment_id:instructor.grant.primary_id,expected_version:instructor.grant.version,reason:'Revoke instructor access'});
   await fail('attendance_start_v1',startReceipt.payload,'FORBIDDEN',instructor.u,startReceipt.k);

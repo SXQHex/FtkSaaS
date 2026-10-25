@@ -134,3 +134,5 @@ assert Path('database/frontend-settings-catalog.sql').read_text()==settings_cata
 settings_contract=json.loads(Path('contracts/08-FtkSaaS-tip-ve-operasyon-sozlesmesi.json').read_text())
 for scope in ['user','member','center','organization','platform']:
  assert settings_contract['$defs'][scope.title()+'SettingsValues']['properties']=={f['key']:f['schema'] for f in settings_fields if f['scope']==scope},'Frontend field DTO drift: '+scope
+
+assert next(Path('supabase/migrations').glob('*_pilot_operational_security.sql')).read_text()==Path('database/pilot-operational-security.sql').read_text(),'Pilot operational security source drift'
