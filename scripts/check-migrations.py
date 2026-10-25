@@ -146,3 +146,10 @@ for variant in settings_defs['SettingsView']['oneOf']:
  assert set(variant['properties']['overridden_fields']['items']['enum'])=={f['key'] for f in settings_fields if f['scope']==scope},'Scoped settings field drift: '+scope
 for variant in settings_defs['SettingsCatalog']['oneOf']:
  assert variant['properties']['catalog_version']=={'const':json.loads(Path('config/frontend-settings.json').read_text())['version']},'Scoped settings catalog version drift'
+
+assert next(Path('supabase/migrations').glob('*_account_session_management.sql')).read_text()==Path('database/account-session-management.sql').read_text()+Path('database/account-session-management-wrappers.sql').read_text(),'Account sessions source drift'
+
+account_session_names=['account_sessions_list_v1','account_session_label_v1','account_sessions_revoke_v1','account_security_history_get_v1','account_totp_remove_v1']
+account_session_entries=[line for line in Path('database/runtime-wrappers-current.sql').read_text().splitlines() if any("'"+name+"'" in line or 'api_v1.'+name+'(' in line for name in account_session_names)]
+assert len(account_session_entries)==4*len(account_session_names),'Account session wrapper inventory'
+assert Path('database/account-session-management-wrappers.sql').read_text()=="begin;\n"+'\n'.join(account_session_entries)+"\nnotify pgrst,'reload schema';\ncommit;\n",'Account sessions wrapper drift or privilege expansion'

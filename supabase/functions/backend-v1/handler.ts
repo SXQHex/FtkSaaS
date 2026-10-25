@@ -55,6 +55,9 @@ Deno.serve(async req=>{
   const user=await userResponse.json();
   const part=authorization.slice(7).split(".")[1].replaceAll("-","+").replaceAll("_","/");
   const claims=JSON.parse(atob(part));if(claims.sub!==user.id||!claims.session_id)return failure("SESSION_REVOKED",401);
+  // Native Auth owns factor state. Never read user_metadata for assurance.
+  if(user.factors?.some((f:any)=>f.status==='verified')&&claims.aal!=='aal2'&&!(operation==='account_sessions_revoke_v1'&&request.mode==='current'))return failure('AUTH_REQUIRED',401);
+  const authAux={verified_aal:claims.aal==='aal2'?'aal2':'aal1'};
   // Authenticated input never controls internal IDs or actor context.
   const readOnly=operation.endsWith("_get_v1")||operation.endsWith("_list_v1")||operation.endsWith("_preview_v1");
   const bulk=["event_attendance_close_v1","event_cancel_apply_v1","sale_apply_v1","program_preview_v1","program_apply_v1","session_change_preview_v1","session_change_apply_v1","class_assignment_set_v1","attendance_close_v1","attendance_correct_apply_v1","reservation_impact_apply_v1","negative_limit_set_v1","policy_publish_v1"].includes(operation);
@@ -73,13 +76,13 @@ Deno.serve(async req=>{
     invite={token_hash,sealed_token:JSON.stringify({iv:b64(iv),cipher:b64(new Uint8Array(cipher))})};
    }
   }
-  if(operation==='account_delete_apply_v1'||operation==='organization_delete_apply_v1'||(operation==='job_status_get_v1'&&request.org_id===null)){
+  if(operation==='account_delete_apply_v1'||operation==='organization_delete_apply_v1'||operation==='account_totp_remove_v1'||(operation==='account_sessions_revoke_v1'&&request.mode==='others')||(operation==='job_status_get_v1'&&request.org_id===null)){
    const proof=await lifecycleReauth(base,key,(operation==='job_status_get_v1'?authorization.slice(7):request.reauth),user.id);if(proof.error)return failure(proof.error,proof.error==='AUTH_REQUIRED'?401:503);invite=proof.context!;
   }
   const storage=documentStorage(base,key);
   const imports=importStorage(base,key);
   if(operation==='file_upload_complete_v1'){
-   const contextResponse=await fetch(base+'/rest/v1/rpc/'+operation,{method:'POST',headers:{authorization:'Bearer '+key,apikey:key,'content-type':'application/json','Content-Profile':'api_v1'},body:JSON.stringify({p_request:request,p_actor_auth_id:user.id,p_session_id:claims.session_id,p_ids:Array.from({length:count},()=>v7()),p_aux:{phase:'storage_context'}})});
+   const contextResponse=await fetch(base+'/rest/v1/rpc/'+operation,{method:'POST',headers:{authorization:'Bearer '+key,apikey:key,'content-type':'application/json','Content-Profile':'api_v1'},body:JSON.stringify({p_request:request,p_actor_auth_id:user.id,p_session_id:claims.session_id,p_ids:Array.from({length:count},()=>v7()),p_aux:{...authAux,phase:'storage_context'}})});
    if(!contextResponse.ok)return failure('TEMPORARY_FAILURE',503);const context=await contextResponse.json();
    if(!context._internal_storage)return json(context);
    const meta=context._internal_storage;
@@ -93,9 +96,20 @@ Deno.serve(async req=>{
    }
   }
   const rpcContext=async(aux:unknown)=>{
-   const r=await fetch(base+'/rest/v1/rpc/'+operation,{method:'POST',headers:{authorization:'Bearer '+key,apikey:key,'content-type':'application/json','Content-Profile':'api_v1'},body:JSON.stringify({p_request:request,p_actor_auth_id:user.id,p_session_id:claims.session_id,p_ids:Array.from({length:count},()=>v7()),p_aux:aux})});
+   const r=await fetch(base+'/rest/v1/rpc/'+operation,{method:'POST',headers:{authorization:'Bearer '+key,apikey:key,'content-type':'application/json','Content-Profile':'api_v1'},body:JSON.stringify({p_request:request,p_actor_auth_id:user.id,p_session_id:claims.session_id,p_ids:Array.from({length:count},()=>v7()),p_aux:{...(aux as object??{}),...authAux}})});
    if(!r.ok)throw Error('RPC_UNAVAILABLE');return r.json();
   };
+  if(operation==='account_totp_remove_v1'){
+   const prepared=await rpcContext({...invite,phase:'totp_prepare'});
+   if(prepared._internal_totp_remove){
+    if(prepared._internal_totp_remove.factor_id!==request.factor_id)return failure('INTEGRITY_VIOLATION',500);
+    // Even a network timeout may follow a committed native deletion. Confirm its DB intent.
+    try{const response=await fetch(base+'/auth/v1/factors/'+encodeURIComponent(request.factor_id),{method:'DELETE',headers:{authorization,apikey:key},signal:AbortSignal.timeout(10000)});await response.body?.cancel();}catch{}
+    const completed=await rpcContext({...invite,phase:'totp_complete'});
+    if(completed.ok&&!(validators as any)['success_'+operation](completed))return failure('INTEGRITY_VIOLATION',500);return json(completed);
+   }
+   if(prepared.ok&&!(validators as any)['success_'+operation](prepared))return failure('INTEGRITY_VIOLATION',500);return json(prepared);
+  }
   if(operation==='account_password_change_v1'){
    const result=await passwordChallenge(base,key,authorization,n=>Deno.env.get(n),rpcContext);
    if(result.error)return failure(result.error);if(result.ok===false)return json(result);
@@ -118,7 +132,7 @@ Deno.serve(async req=>{
   for(let attempt=0;attempt<4;attempt++){
   const ids=Array.from({length:Math.max(count*2**attempt,requiredCount)},()=>v7());
   const rpc=await fetch(base+"/rest/v1/rpc/"+operation,{method:"POST",headers:{authorization:"Bearer "+key,apikey:key,"content-type":"application/json","Content-Profile":"api_v1"},
-   body:JSON.stringify({p_request:request,p_actor_auth_id:user.id,p_session_id:claims.session_id,p_ids:ids,p_aux:invite})});
+   body:JSON.stringify({p_request:request,p_actor_auth_id:user.id,p_session_id:claims.session_id,p_ids:ids,p_aux:{...(invite??{}),...authAux}})});
   if(!rpc.ok)return failure("TEMPORARY_FAILURE",503);
   const result=await rpc.json();if(result._internal_retry==="uuid_bank_exhausted"){
    // Trusted RPC preflight derives size from the stored immutable selection.

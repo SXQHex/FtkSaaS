@@ -9,6 +9,7 @@ export async function lifecycleReauth(base:string,key:string,proof:string,actorI
   const payload=proof.split('.')[1];if(!payload)return {error:'AUTH_REQUIRED'};
   const claims=JSON.parse(atob(payload.replaceAll('-','+').replaceAll('_','/')));
   if(user.id!==actorId||claims.sub!==actorId||typeof claims.session_id!=='string'||!/^[a-f0-9-]{36}$/i.test(claims.session_id))return {error:'AUTH_REQUIRED'};
-  return {context:{reauth_verified:true,reauth_auth_id:actorId,reauth_session_id:claims.session_id}};
+  if(user.factors?.some((f:any)=>f.status==='verified')&&claims.aal!=='aal2')return {error:'AUTH_REQUIRED'};
+  return {context:{reauth_verified:true,reauth_auth_id:actorId,reauth_session_id:claims.session_id,reauth_aal:claims.aal==='aal2'?'aal2':'aal1'}};
  }catch{return {error:'TEMPORARY_FAILURE'};}
 }

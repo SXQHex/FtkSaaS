@@ -1,6 +1,6 @@
 # FtkSaaS — API kataloğu · 0.2.0-rc.3
 
-207 sözleşme; 207 geliştirme ortamında çağrılabilir endpoint, 0 yalnız sözleşme. Çağrılabilir olmak bütün ürün özelliklerinin veya üretim kabulünün tamamlandığı anlamına gelmez. Kapsam sınırları ve Q-E01 `docs/claude-handover.md` içindedir.
+212 sözleşme; 212 geliştirme ortamında çağrılabilir endpoint, 0 yalnız sözleşme. Çağrılabilir olmak bütün ürün özelliklerinin veya üretim kabulünün tamamlandığı anlamına gelmez. Kapsam sınırları ve Q-E01 `docs/claude-handover.md` içindedir.
 
 `POST {API_URL}/functions/v1/backend-v1/{operation}`; JSON gövde doğrudan typed Request nesnesidir. Header: `Authorization: Bearer <Supabase access_token>`, `apikey: <publishable key>`, `Content-Type: application/json`. Başarı: `ok/data/trace_id`; hata: `ok:false/error:SafeError`. Servis anahtarı frontend’e verilmez.
 
@@ -215,6 +215,11 @@ Named `/rest/v1/rpc/{operation}` yalnız backend içindir; imzası p_request + d
 | `settings_reset_apply_v1` | çağrılabilir (kapsam notları geçerli) | `settings.access` | W / maintenance | client_api_version: 1; request_id: FtkUuid; scope: SettingsScope; org_id?: FtkUuid; center_id?: FtkUuid; operation_key: FtkUuid; expected_version: SettingsVersion; reason?: string; preview: PreviewToken | Success_settings_reset_apply |
 | `settings_history_get_v1` | çağrılabilir (kapsam notları geçerli) | `settings.access` | R / read | client_api_version: 1; request_id: FtkUuid; scope: SettingsScope; org_id?: FtkUuid; center_id?: FtkUuid; cursor?: string | Success_settings_history_get |
 | `reservation_capacity_override_v1` | çağrılabilir (kapsam notları geçerli) | `reservation.capacity_override` | W / reservation | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; center_id?: FtkUuid ∣ null; operation_key: FtkUuid; person_id: FtkUuid; session_id: FtkUuid; source_sale_id?: FtkUuid ∣ null; mode: BookingMode; booking_category?: BookingCategory; reason: Text | Success_reservation_capacity_override |
+| `account_sessions_list_v1` | çağrılabilir (kapsam notları geçerli) | `account.self` | R / exempt | client_api_version: 1; request_id: FtkUuid; cursor?: string | Success_account_sessions_list |
+| `account_session_label_v1` | çağrılabilir (kapsam notları geçerli) | `account.self` | W / exempt | client_api_version: 1; request_id: FtkUuid; operation_key: FtkUuid; session_id: ProviderUuid; expected_version: SettingsVersion; label: string ∣ null | Success_account_session_label |
+| `account_sessions_revoke_v1` | çağrılabilir (kapsam notları geçerli) | `account.self` | W / exempt | client_api_version: 1; request_id: FtkUuid; operation_key: FtkUuid; mode: selected / current / others; session_id?: ProviderUuid; reauth?: ReauthProof | Success_account_sessions_revoke |
+| `account_security_history_get_v1` | çağrılabilir (kapsam notları geçerli) | `account.self` | R / exempt | client_api_version: 1; request_id: FtkUuid; cursor?: string | Success_account_security_history_get |
+| `account_totp_remove_v1` | çağrılabilir (kapsam notları geçerli) | `account.self` | H / exempt | client_api_version: 1; request_id: FtkUuid; factor_id: ProviderUuid; reauth: ReauthProof | Success_account_totp_remove |
 
 ## İşlem bazında hedef sözleşme ve runtime ayrımı
 
@@ -429,6 +434,11 @@ features ürün referanslarıdır. required_features hedef plan kapısı; runtim
 | settings_reset_apply_v1 | command | row_version / settings_get_v1 | frontend_settings.versioned_change, frontend_settings.history | implemented_pending_ci |
 | settings_history_get_v1 | read | none / None |  | implemented_pending_ci |
 | reservation_capacity_override_v1 | command | append_or_current_scope_lock / session_get_v1 | reservations.active, rights.reserve_or_deficit, capacity_override.audit | capacity_revision_acceptance_pending |
+| account_sessions_list_v1 | read | none / None |  | implemented_pending_ci |
+| account_session_label_v1 | auth | row_version / account_sessions_list_v1 | auth_session_metadata_or_revocation, account_security_event, receipt | implemented_pending_ci |
+| account_sessions_revoke_v1 | auth | none / account_sessions_list_v1 | auth_session_metadata_or_revocation, account_security_event, receipt | implemented_pending_ci |
+| account_security_history_get_v1 | read | none / None |  | implemented_pending_ci |
+| account_totp_remove_v1 | auth | none / None |  | implemented_pending_ci |
 
 Önizleme süre sınırı 15 dakika. Apply canlı aktör/yetki/abonelik ve ilgili satır sürümlerini yeniden denetler. İdempotency kapsamı org + hesap + operasyon; merkez payload içindedir. Aynı anahtar/aynı içerik sonucu tekrarlar, farklı içerik reddedilir. Doğrulanmamış transport sonucunda yeni anahtar üretilmez.
 

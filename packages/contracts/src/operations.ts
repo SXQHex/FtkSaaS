@@ -208,4 +208,9 @@ export interface Operations {
   settings_reset_apply_v1: {request: T.RequestSettingsResetApply; response: T.SuccessSettingsResetApply};
   settings_history_get_v1: {request: T.RequestSettingsHistoryGet; response: T.SuccessSettingsHistoryGet};
   reservation_capacity_override_v1: {request: T.RequestReservationCapacityOverride; response: T.SuccessReservationCapacityOverride};
+  account_sessions_list_v1: {request: T.RequestAccountSessionsList; response: T.SuccessAccountSessionsList};
+  account_session_label_v1: {request: T.RequestAccountSessionLabel; response: T.SuccessAccountSessionLabel};
+  account_sessions_revoke_v1: {request: T.RequestAccountSessionsRevoke; response: T.SuccessAccountSessionsRevoke};
+  account_security_history_get_v1: {request: T.RequestAccountSecurityHistoryGet; response: T.SuccessAccountSecurityHistoryGet};
+  account_totp_remove_v1: {request: T.RequestAccountTotpRemove; response: T.SuccessAccountTotpRemove};
 }

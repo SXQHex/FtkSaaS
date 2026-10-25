@@ -158,3 +158,7 @@ Hosted ayrı hedefte gerçek proje ayarları, secret/key rotasyonu, sağlayıcı
 
 
 Deneme fixture hazırlığında Node name-pattern üst testi eşlediği için planlanandan geniş eğitmen suite’i başlamıştı; successor sınır vakası bir kez failed gösterdi ve geniş koşu durduruldu. Bu koşu başarılı suite diye raporlanmaz. Kaynak assertionlarına dokunmadan yalnız ilk iki mevcut testin setup+bloklarıyla yapılan dar tanı3/3pass,0fail,56.455ms ile normal tamamlandı. İlk tekil başarısızlığın nedeni kanıtlanmadı; yeni runtime kusuru veya çözülmüş bir flaky sorun iddiası yoktur. Restore veri kabulü bu kesilmiş suite’in sonucundan türetilmedi; satış/hakediş varlığı ve snapshot içerik/güvenlik eşitliği ayrı assertionlarla denetlendi. Aday/main tam clean kanıtları yukarıdaki gerçek GitHub koşularıdır.
+
+## PR50 Auth trigger restore bağımlılığı
+
+64. aday migration auth.mfa_factors üzerinde verified TOTP history ve removal fence trigger’ları ekler. Restore’da uygulama tablolarıyla birlikte bu tanımlar/owner/ACL ve intent-event bağı korunmalıdır; Auth faktör secret’ları loga veya uygulama geçmişine taşınmaz. Önceki34aac276 restore kanıtı bu yeni kaynağı kapsamaz. Hosted TOTP enable/config/secrets ve bu yeni kaynakla managed restore kabulü ayrıca doğrulanır; local supabase/config.toml hosted aktivasyon kanıtı değildir.
