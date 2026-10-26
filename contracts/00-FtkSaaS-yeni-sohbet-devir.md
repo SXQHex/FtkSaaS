@@ -1,5 +1,10 @@
 # FtkSaaS güncel devir
 
+## 26 Ekim — Starter / Pro / Business ürün kararı (belge devri)
+
+[Son ürün kararı](../docs/decisions/PLANS-2026-10-26.md): Starter **1 merkez/1 aktif oda/1 disiplin/1 eğitmen/100 aktif öğrenci**, tek mantıksal odada düzenli programlar, zorunlu disiplin paket adı, F11 öğrenci self-servisi, F25 temel takvim/başvuru ve tek disiplinli F16; CRM/etkinlik/hakediş yok. Pro bir merkezde tüm program/CRM/etkinlik/otomasyon/eğitmen yönetimi; Business en fazla 5 merkez. 5 üstü özel teklif ayrı sınır/sözleşme. Ana ürün ve teknik sözleşmelerde normatif aktarım; runtime, plan kataloğu, tip, envanter, deploy ve yeni CI testleri **henüz uygulanmadı**. Bu belge güncellemesi 26e7091cd73482a623839266324b049d617fe9c2 temiz CI'ını yeni koda taşımaz; [üretim kuyruğunda](../docs/production-queue.md) ayrı backend uygulama/kabul işi açıldı. Mevcut bekleme/restore ve P08 üretim çalışmaları önceliği değiştirilmedi.
+
+
 ## 26 Ekim — PR50 hesap ve güvenlik teslim paketi
 
 PR50 yerel kapsamı **212 callable API / 64 migration**,46 ayar alanı/44 writable; başlangıç main `a7569bbb11353dc342804eb5050800d77a31a8e9`. İlk207/63 iki alan adayı aşağıda tarihsel snapshot’tır. Yeni beş işlem kendi oturumlarını listeleme/etiketleme/kapatma, güvenlik geçmişi ve güçlü doğrulanmış TOTP kaldırmayı kapsar. Native TOTP enrollment/challenge/verify sağlayıcıda kalır; verified factor varsa uygulama ve SQL hem doğrulanmış JWT aal2 hem canlı native session aal2 ister. Genel tercih patch’i güvenlik işlemlerini değiştirmez.

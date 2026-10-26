@@ -1,5 +1,10 @@
 # Kalan backend ve entegrasyon işleri
 
+## 26 Ekim — planların ticari sınır kararı: teknik aktarım açık
+
+[Karar](decisions/PLANS-2026-10-26.md) kullanıcı tarafından kabul edildi; yazılımda uygulanmış/hosted/CI kabulü değildir. **Kapanış şartları:** (1) plan kataloğunda Starter 1 merkez/oda/disiplin/eğitmen/100 aktif öğrenci, Pro 1 merkez/tam özellik, Business 5 merkez; 5 üzeri sözleşmeli sürümlü istisna; (2) tüm create/activate/assign/program/product/sale/reservation/public/event/CRM/automation/earning ve downgrade yollarında merkezi plan kapıları; (3) tek mantıksal oda çakışması ve 40/5 gibi seans limitleri; (4) disiplin adının zorunlu paket ön eki ve gerçek `discipline_id` guardı; (5) F11/F16/F25 dar Starter ve F24 Pro erişimi, F14 anlaşmasız/hakedişsiz; (6) aktif öğrenci 100 sınırında atomik race/retry/rollback; (7) 5 merkez/6. ret ve özel teklif sınırları; (8) eski aktif kayıt, kesin rezervasyon ve para/hak geçmişini koruyan düşürme; (9) plan sözleşmesi/08 makine/tip/catalog/validator/endpoint/F01–F33/üretim kuyruğu/CI ve gerekli native Auth→Edge→RPC kabulü aynı uygulama PR'sinde. Henüz kesin olmayan Pro/Business diğer sayısal limitleri, özel teklif pricing ve downgrade aktif kapsam çözümünü uydurma. Mevcut P08/PR ve hesap-ayar işi tekrar açılmaz; backend coder uygun sıra/bağımlılıkla uygular. Bu belge PR'si **kod, migration, CI, generated inventory değiştirmez**.
+
+
 ## 26 Ekim — PR50 hesap ve güvenlik teslim paketi
 
 PR50 yerel kapsamı **212 callable API / 64 migration**,46 ayar alanı/44 writable; başlangıç main `a7569bbb11353dc342804eb5050800d77a31a8e9`. İlk207/63 iki alan adayı aşağıda tarihsel snapshot’tır. Yeni beş işlem kendi oturumlarını listeleme/etiketleme/kapatma, güvenlik geçmişi ve güçlü doğrulanmış TOTP kaldırmayı kapsar. Native TOTP enrollment/challenge/verify sağlayıcıda kalır; verified factor varsa uygulama ve SQL hem doğrulanmış JWT aal2 hem canlı native session aal2 ister. Genel tercih patch’i güvenlik işlemlerini değiştirmez.

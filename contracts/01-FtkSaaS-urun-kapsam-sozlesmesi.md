@@ -1,5 +1,10 @@
 # FtkSaaS — Ürün kapsam sözleşmesi
 
+## 26 Ekim 2026 — kabul edilmiş SaaS plan sınırları (yalnız ürün kararı)
+
+[Starter / Pro / Business bağlayıcı karar kaydı](../docs/decisions/PLANS-2026-10-26.md) kabul edildi: **Starter = 1 merkez, 1 aktif mantıksal ders odası, 1 disiplin, 1 aktif eğitmen, 100 aktif öğrenci**; tek oda kimliğiyle tüm seanslar, disiplin kimliğinden zorunlu paket adı başlangıcı, temel self-servis/public takvim ve başvuru, sabit program/paket/yoklama/finans; genel CRM ve bağımsız etkinlik yok. **Pro = tüm tek merkezli fonksiyonlar**, çok oda/eğitmen/disiplin ve gelişmiş CRM/otomasyon; **Business = en fazla 5 merkez**, merkezler izolasyonlu ve bağlı. 5 merkez üstü sürümlü özel teklif gerektirir; güvenlik kuralı bypass değildir. Ürün kararı **uygulanmış plan gate/DTO, katalog, frontend, hosted veya yeni CI kabulü değildir**. Uygulama ihtiyacı [kalan işler](../docs/remaining-work.md) ve [kuyruk](../docs/production-queue.md) içindedir. Eski plan matrisi veya üretilmiş izlerdeki çelişen etiketler aktarılıncaya dek tarihsel runtime snapshotıdır.
+
+
 ## 25 Ekim — PR45 kapasite ve main ayarları uzlaştırması
 
 Başlangıç main `3456050a3061d7bf5dc2ce8898b82c5cfe84e773`: **206 callable API / 60 migration**; PR46 ayarları birleşti, aynı main clean [40200716603](https://github.com/SXQHex/FtkSaaS/actions/runs/40200716603) ve development CD [40202862244](https://github.com/SXQHex/FtkSaaS/actions/runs/40202862244) başarılı. Bu PR45 birleşim adayı kapasite işlemini ekler: **207 callable API / 61 migration**. Altı ayar işlemi ve kapasite davranışı birlikte korunur. Henüz uygulanmamış kapasite migration’ı main’deki ayar migration’ından sonra sıralandı; SQL içeriği ve mevcut 60 migration değişmedi. Önceki PR45 clean yalnız eski tabana aittir; bu birleşik kaynak için bağımsız inceleme ve yeni aday/main clean gerekir. Kapasite henüz main/hosted kabulü değildir.
@@ -32,7 +37,7 @@ Bu belge, geliştirme için yazılı kapsam sözleşmesi ve esas başvuru kayna�
 - Kapsam durumu: Kabul edildi / Sonraki aşama / Kapsam dışı.
 - Uygulama/kabul durumu özellik bazında docs/feature-delivery.md ve makine feature_delivery eşlemesindedir; işlem sayısı ürün tamamlanma oranı değildir.
 - Planlar: Starter, Pro ve Business aynı backend iş modelini kullanır; plan farkı erişim ve kullanım limitidir.
-- Bu belge fiyat, kesin eğitmen/öğrenci limitleri veya sınırsız kullanım taahhüdü belirlemez. İlk paket şablonundaki sayılar tavsiye olarak kalır.
+- **26 Ekim plan kararı:** Starter 1 merkez/1 aktif oda/1 disiplin/1 eğitmen/100 aktif öğrencidir; Pro 1 merkez, Business en fazla 5 merkezdir. Pro/Business diğer öğrenci/eğitmen/oda sayısal sınırları ve fiyatlar kesinleşmedi; ilk paket şablonundaki tarihsel sayılar evrensel limit değildir.
 - Pro özellikleri Business'a da dahildir. Temel güvenlik, veri bütünlüğü ve kayıt geçmişi bütün planlarda geçerlidir.
 - Starter'ın ortak temel özellikleri Pro ve Business'a da dahildir. Bir modülün ayarını etkinleştirmek, abonelik planında bulunmayan özelliğe erişim sağlamaz.
 - Ayarlanabilir sayısal değerlerin kesinleşmemiş olması ortak altyapı geliştirmesini engellemez. Başlangıç değerleri ve ayrıca karar gerektiren davranışlar aşağıda ayrılmıştır.
@@ -64,7 +69,7 @@ Bu modüller ayrı servis veya ayrı uygulama zorunluluğu değildir. Yeni backe
 
 | ID | Özellik | Sahip | Starter | Pro | Business | Kapsam durumu |
 |---|---|---|---|---|---|---|
-| F01 | İşletme, merkez, oda ve kaynak tanımı | M01 | Tek merkez | Tek merkez | Çoklu merkez | Kabul edildi |
+| F01 | İşletme, merkez, oda ve kaynak tanımı | M01 | 1 merkez / 1 aktif ders odası / 1 disiplin | 1 merkez; çok oda/disiplin | En fazla 5 merkez; çok oda/disiplin | Kabul edildi; 26 Ekim plan revizyonu |
 | F02 | Çalışma saatleri, izin ve uygunluk | M01/M04 | Temel | Tam | Tam | Kabul edildi |
 | F03 | İşletme kuralları ve merkez istisnaları | M01 | İşletme ayarları | İşletme ayarları | Zorunlu/tavsiye merkez hiyerarşisi | Kabul edildi |
 | F04 | Hesap eşleştirme, çoklu rol, kapsamlı yetkilendirme | M02/M03 | Var | Var | Merkez kapsamlarıyla | Kabul edildi |
@@ -74,21 +79,21 @@ Bu modüller ayrı servis veya ayrı uygulama zorunluluğu değildir. Yeni backe
 | F08 | Birleşik takvim ve kaynak çakışma kontrolü | M04 | Temel | Tam | Merkez bazlı | Kabul edildi |
 | F09 | Özel ders talep, onay, ret ve alternatif saat | M04 | Var | Var | Var | Kabul edildi |
 | F10 | Tekrarlayan grup programı ve sabit gruba kayıt | M04 | Var | Var | Var | Kabul edildi |
-| F11 | Kontenjanlı açık grup dersine öğrencinin kaydolması | M04 | — | Var | Var | Kabul edildi |
+| F11 | Kontenjanlı açık grup dersine öğrencinin kaydolması | M04 | Var; tek disiplinli düzenli programa self-servis | Var | Var | Kabul edildi; Starter erişimi yeni plan kararı |
 | F12 | Bekleme listesi ve süreli yer teklifi | M04 | — | Var | Var | Kabul edildi |
 | F13 | Eğitmen değişikliği | M04/M08 | — | Var | Var | Kabul edildi |
 | F14 | Yoklama, gelmeme, iptal, erteleme ve yerine seans düzenleme | M05 | Var | Var | Var | Kabul edildi |
 | F15 | Ders sayılı paket, geçerlilik ve kredi hareketleri | M06 | Temel | Tam | Tam | Kabul edildi |
-| F16 | Süreli/sınırsız üyelik, dönemsel kullanım sınırı | M06 | — | Var | Var | Kabul edildi |
+| F16 | Süreli/sınırsız üyelik, dönemsel kullanım sınırı | M06 | Tek disiplin/sabit programa bağlı | Var | Var | Kabul edildi; Starter erişimi yeni plan kararı |
 | F17 | Üyelik/paket dondurma ve plan değişimi | M06 | — | Var | Var | Kabul edildi |
 | F18 | Merkezler arasında kullanım hakkı ve onaylı hesaplaşma | M06/M07 | — | — | Var | Kabul edildi |
 | F19 | Manuel tahsilat, kısmi ödeme, iade/düzeltme ve alacak | M07 | Var | Var | Var | Kabul edildi |
 | F20 | Eğitmen hakedişi ve ödeme takibi | M08 | — | Var | Var | Kabul edildi |
-| F21 | Aday, kaynak, ilgi, takip ve dönüşüm | M09 | — | Temel | Gelişmiş | Kabul edildi |
+| F21 | Aday, kaynak, ilgi, takip ve dönüşüm | M09 | —; yalnız F25 temel ders başvurusu | Tam, tek merkez | Tam, merkez bazlı ve birleşik | Kabul edildi; 26 Ekim plan revizyonu |
 | F22 | Deneme teklifi ve kontrollü indirim | M09/M06/M07 | — | Var | Var | Kabul edildi |
 | F23 | Yenileme ve hareketsiz öğrenci takip listeleri | M09 | — | Var | Var | Kabul edildi |
-| F24 | Davranışa dayalı segmentler ve takip otomasyonu | M09/M10 | — | — | Var | Kabul edildi |
-| F25 | Paylaşılabilir işletme takvimi ve başvuru/kayıt sayfası | M04/M09/M13 | — | Var | Var | Kabul edildi |
+| F24 | Davranışa dayalı segmentler ve takip otomasyonu | M09/M10 | — | Var | Var, merkez bazlı/birleşik | Kabul edildi; Pro'ya açılacak |
+| F25 | Paylaşılabilir işletme takvimi ve başvuru/kayıt sayfası | M04/M09/M13 | Temel ders takvimi ve başvuru; CRM/etkinlik yok | Tam, CRM/etkinlik bağlantılı | Tam, merkez kapsamlı | Kabul edildi; Starter temel erişimi yeni plan kararı |
 | F26 | Talep sonucu, ders değişikliği ve benzeri işlemsel bildirimler | M10 | Uygulama içi | Var | Var | Kabul edildi |
 | F27 | Otomatik yaklaşan ders/paket bitiş hatırlatmaları | M10 | — | Var | Var | Kabul edildi |
 | F28 | Operasyon ve finans raporları, tarih filtresi, dışa aktarım | M11 | Temel | Tam | Birleşik ve merkez bazlı | Kabul edildi |
@@ -143,7 +148,7 @@ Bu modüller ayrı servis veya ayrı uygulama zorunluluğu değildir. Yeni backe
 - İçe aktarmada alan eşleştirme, önizleme, doğrulama ve hatalı satır raporu bulunur. Açılış kredi/borçları ilgili modüllerde izlenebilir kayıt olarak oluşturulur; yeniden yükleme mükerrer kayıt üretmez.
 - Starter raporları temel tahsilat/borç ve ders/katılım özetlerini; Pro paket yenileme, doluluk, kaynak kullanımı, hakediş ve CRM dönüşümlerini; Business merkez bazlı ve birleşik karşılaştırmaları kapsar.
 - Kullanım oranında çalışma saatleri ve izinler hesaba katılır. Dışa aktarım yalnızca ekranda görünen sayfayı değil, yetkili ve filtrelenmiş bütün sonucu kapsar.
-- Plan erişimi yalnızca menü gizleyerek uygulanmaz; backend doğrular. Plan düşürmede mevcut veriler silinmez. Aktif öğrenci sayımı ve plan geçiş davranışları aşağıdaki kabul edilmiş revizyonlarla belirlenmiştir; kesin sayısal limitler ticari kullanıma açılmadan belirlenir.
+- Plan erişimi yalnızca menü gizleyerek uygulanmaz; backend doğrular. Plan düşürmede mevcut veriler silinmez. Aktif öğrenci sayımı ve plan geçiş davranışları aşağıdaki kabul edilmiş revizyonlarla belirlenmiştir; Starter 100 aktif öğrenci limiti kabul edilmiştir; diğer açık sayısal limitler ticari kullanıma açılmadan belirlenir.
 - Kritik iş kuralları frontend'e bağlı değildir; web, Android, iOS, macOS ve Windows aynı operasyonları ve yetki kontrollerini kullanır.
 
 ## Öncelik sırası
@@ -157,7 +162,7 @@ Bu sıralama yapılacak işlerin bağımlılık sırasıdır; mevcut uygulamada 
 | 3 — Hak ve para | Paket/süreli üyelik, dondurma, kredi, tahsilat/iade/alacak ve hakediş |
 | 4 — Pro operasyon kapsamı | Etkinlik, belge/form, paylaşılabilir kayıt sayfası, veri aktarımı, bildirim/hatırlatma ve operasyon raporları |
 | 5 — CRM | Aday ve deneme süreci, kontrollü indirim, dönüşüm, yenileme/geri kazanma takibi |
-| 6 — Business kapsamı | Çoklu merkez, ortak kullanım hakları, merkez kuralları, birleşik raporlar ve CRM otomasyonları |
+| 6 — Business kapsamı | Çoklu merkez, ortak kullanım hakları, merkez kuralları, birleşik raporlar ve merkezler arası CRM |
 
 SaaS erişim altyapısı ortak temelle tasarlanır; ticari planların etkinleştirilmesi kapsam ve limit kararlarından sonra yapılır. Her aşamanın tamamlanması yalnızca yeni FtkSaaS üzerinde kabul ölçütleriyle doğrulanır. Eski kod envanteri çıkarılmaz. Bu sıralama ürün önceliğidir; teknik bağımlılık sırası teknik sözleşmede ayrıca netleşecektir.
 

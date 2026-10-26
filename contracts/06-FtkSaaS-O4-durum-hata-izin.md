@@ -1,5 +1,10 @@
 # FtkSaaS — O4 durum, hata ve izin sözleşmesi
 
+## 26 Ekim — Starter/Pro/Business plan erişim hedefi
+
+[Ürün kararı](../docs/decisions/PLANS-2026-10-26.md): Starter 1 merkez/1 aktif oda/1 disiplin/1 aktif eğitmen/100 aktif öğrenci; self-servis ve temel ders public başvurusu açık; bağımsız etkinlik, genel CRM/otomasyon ve hakediş kapalı. Pro bütün tek merkezli fonksiyonları, Business en fazla 5 merkezi kapsar. Operasyon rolü, owner/grant veya doğrudan RPC çağrısı plan kapısını aşmaz. Mevcut öğrenci limitinde `RelationshipState=active` ve canlı yetki esas alınır; eski kayıtlar/rezervasyonlar plan düşüşüyle silinmez. Hangi isteğin hangi plan/iş kuralı hatasını döndüreceği mevcut `08` makine sözleşmesi ve gerçek API ayrıntıları incelenerek ayrıca eşitlenmeli; **yeni hata kodu veya izin enum'u bugün uydurulmaz**. Bu normatif ürün hedefidir, mevcut callable enforcement veya CI kabulü değildir.
+
+
 ## 25 Ekim — PR45 kapasite ve main ayarları uzlaştırması
 
 Başlangıç main `3456050a3061d7bf5dc2ce8898b82c5cfe84e773`: **206 callable API / 60 migration**; PR46 ayarları birleşti, aynı main clean [40200716603](https://github.com/SXQHex/FtkSaaS/actions/runs/40200716603) ve development CD [40202862244](https://github.com/SXQHex/FtkSaaS/actions/runs/40202862244) başarılı. Bu PR45 birleşim adayı kapasite işlemini ekler: **207 callable API / 61 migration**. Altı ayar işlemi ve kapasite davranışı birlikte korunur. Henüz uygulanmamış kapasite migration’ı main’deki ayar migration’ından sonra sıralandı; SQL içeriği ve mevcut 60 migration değişmedi. Önceki PR45 clean yalnız eski tabana aittir; bu birleşik kaynak için bağımsız inceleme ve yeni aday/main clean gerekir. Kapasite henüz main/hosted kabulü değildir.

@@ -13,6 +13,17 @@ Başlangıç main `3456050a3061d7bf5dc2ce8898b82c5cfe84e773`: **206 callable API
 
 # FtkSaaS — Teknik sözleşme
 
+## 26 Ekim 2026 — SaaS plan güvenlik ve kullanım sınırı (normatif hedef)
+
+[Plan kapsamı kabul kararı](../docs/decisions/PLANS-2026-10-26.md) eski F01/F11/F16/F21–F25 plan dağılımındaki çelişen hükümleri değiştirir; mevcut runtime/API uyarlaması henüz kabul edilmiş değildir. **Starter**: tek merkez, tek aktif oda kaynağı, tek disiplin, tek aktif eğitmen ve en fazla 100 aktif öğrenci. Bütün ders/seans/kayıtlar aynı `room_id` ve `discipline_id` ile sınırlandırılır; ikinci oda veya disiplin oluşturma/aktifleştirme; ikinci aktif eğitmen görevlendirme; 101. öğrenci aktifleştirme atomik plan kapısından reddedilir. Öğrenci aktifliğinin mevcut organizasyon tekil sayımı korunur.
+
+Oda fiziksel kapasitesi (örn. 50) seans toplam/kategori kapasitesinden (örn. aynı mantıksal odada ayrı saatlerde 40 ve 5) ayrıdır. Tek odada eşzamanlı iki seans, gerçek işletmede farklı fiziksel mekânlar olsa bile çakışır; gerçek fiziksel salon kapasitesini işletme doğru seans limitiyle beyan eder, sistem tek başına bilemez. Mevcut fiziksel oda tavanı ve kontrollü aşım korumaları korunur.
+
+Starter ürün/paket isminin **kayıtlı disiplin adıyla başlayan** gösterimi/saklama doğrulaması ve gerçek disiplin kimliği bağlaması zorunludur; isim tek başına disiplin yetkisi oluşturmaz. Düzenli grup programı, sınırlı özel ders, tek disiplinli kredili/süreli/sınırsız hak, F11 self rezervasyon, F25 temel public ders takvimi/başvurusu ve F14 kapanış korunur. Starter'da ikinci aktif eğitmen, ayrı etkinlik (F29), CRM/lead/otomasyon (F21–F24) ve hakediş (F20) kapalıdır. Starter'ın temel başvuru değerlendirmesi CRM veya kesin yer/satış yaratmaz. F12/F17/F22 ve gelişmiş plan işlevleri önceki izin sınırlarını korur. Pro bütün tek merkezli program/etkinlik/CRM/otomasyon/hakediş işlevlerini açar. Business beş merkez ve A→B hesaplaşmayı açar; 5 üstü ayrı sözleşmeli özel limit, genel bypass değildir.
+
+Önceki **plan düşürmede veri korunur** hükmü geçerlidir; mevcut rezervasyon/hak/satış geçmişi otomatik silinmez. Üst plan kayıtlarının tek merkez/oda/disiplin/eğitmen/üye sınırlarına dönmesi için seçilecek aktif kapsam ve etki/önizleme davranışı uygulama kabulünde kesinleştirilmelidir. Ürün kararının makine sözleşmesi, `PlanLimit`, DTO/validator, Edge/RPC, katalog, ürün sürümü, üretilmiş F01–F33 izi ve gerçek test eşlemesi ayrı teslimdir. Yeni enum/limit anahtarı veya izin adı bu belgeyle icat edilmez.
+
+
 <a id="oda-seans-kapasite-karari"></a>
 
 ## 25 Ekim — güncel oda/seans kapasitesi kararı ve kaynak sınırı
