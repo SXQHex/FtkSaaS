@@ -1,5 +1,10 @@
 # FtkSaaS sıralı üretim kuyruğu
 
+## 26 Ekim — kabul edilmiş Starter/Pro/Business plan revizyonu (uygulama kuyruğu)
+
+[Plan ürün kararı](../contracts/01-FtkSaaS-urun-kapsam-sozlesmesi.md) 01/02/06 sözleşmelerine aktarıldı: Starter 1 merkez/oda/disiplin/eğitmen/100 aktif öğrenci, tek odalı sabit program, temel self/public, CRM+etkinliksiz; Pro 1 merkez/tüm işlevler; Business 5 merkez, 5 üstü sürümlü özel teklif. **İş durumu: queued — yalnız ürün kararı ve doküman**, runtime kabulü değil. Mevcut ilk açık backend ürün işi ve P08'e göre zorunlu bağımlılıkları saptamadan yeni paralel uygulama PR'si açma. Bir sonraki doğal backend uygulama diliminde [kalan işlerin kontrol listesi](remaining-work.md) gereği plan katalog/limit, plan gate, yeni Starter F11/F16/F25 ve Pro F24, event/CRM retleri, oda/disiplin/eğitmen atomik sınırları, downgrade/özel teklif, DTO, F01–F33, CI/hosted kanıtları aynı teslimde veya kaynak bağı açık kademeli teslimlerde kapatılacak. Bu docs-only PR'si `feature_delivery` üretecini veya çalışma kaynaklarını elle değiştirmez; tam clean tetiklemez. Önceki P08 durum satırları tarihsel/bekleyen işler olarak korunur.
+
+
 ## 26 Ekim — PR50 hesap ve güvenlik teslim paketi
 
 PR50 yerel kapsamı **212 callable API / 64 migration**,46 ayar alanı/44 writable; başlangıç main `a7569bbb11353dc342804eb5050800d77a31a8e9`. İlk207/63 iki alan adayı aşağıda tarihsel snapshot’tır. Yeni beş işlem kendi oturumlarını listeleme/etiketleme/kapatma, güvenlik geçmişi ve güçlü doğrulanmış TOTP kaldırmayı kapsar. Native TOTP enrollment/challenge/verify sağlayıcıda kalır; verified factor varsa uygulama ve SQL hem doğrulanmış JWT aal2 hem canlı native session aal2 ister. Genel tercih patch’i güvenlik işlemlerini değiştirmez.

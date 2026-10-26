@@ -1,5 +1,70 @@
 # FtkSaaS — Ürün kapsam sözleşmesi
 
+## 26 Ekim 2026 — kabul edilmiş SaaS plan sınırları (yalnız ürün kararı)
+
+**Starter / Pro / Business bağlayıcı kararı** kabul edildi: **Starter = 1 merkez, 1 aktif mantıksal ders odası, 1 disiplin, 1 aktif eğitmen, 100 aktif öğrenci**; tek oda kimliğiyle tüm seanslar, disiplin kimliğinden zorunlu paket adı başlangıcı, temel self-servis/public takvim ve başvuru, sabit program/paket/yoklama/finans; genel CRM ve bağımsız etkinlik yok. **Pro = tüm tek merkezli fonksiyonlar**, çok oda/eğitmen/disiplin ve gelişmiş CRM/otomasyon; **Business = en fazla 5 merkez**, merkezler izolasyonlu ve bağlı. 5 merkez üstü sürümlü özel teklif gerektirir; güvenlik kuralı bypass değildir. Ürün kararı **uygulanmış plan gate/DTO, katalog, frontend, hosted veya yeni CI kabulü değildir**. Uygulama ihtiyacı [kalan işler](../docs/remaining-work.md) ve [kuyruk](../docs/production-queue.md) içindedir. Eski plan matrisi veya üretilmiş izlerdeki çelişen etiketler aktarılıncaya dek tarihsel runtime snapshotıdır.
+
+
+### Ayrıntılı normatif plan kabulü
+
+**Durum:** Kullanıcı tarafından ürün davranışı ve ticari plan sınırları kabul edildi; teknik uygulama, makine sözleşmesi, yayımlanmış plan kataloğu, typed API, gerçek ortam ve CI kabulü **ayrı ve açık**. Başlangıç kaynağı: `main` `26e7091cd73482a623839266324b049d617fe9c2`; o SHA'nın [main clean](https://github.com/SXQHex/FtkSaaS/actions/runs/40246191868) ve [development CD](https://github.com/SXQHex/FtkSaaS/actions/runs/40247685028) başarılıdır. Bu kanıt yeni plan kurallarının uygulanmış olduğunu kanıtlamaz.
+
+#### Ürün konumlandırması
+
+- **Starter:** Sabit yürüyen tek disiplinli ders programını, öğrencilerini, sınıf/seans rezervasyonlarını, paketlerini, yoklama ve temel finansını yöneten bağımsız eğitmen/küçük stüdyo.
+- **Pro:** **Bir merkez** içinde çok oda, çok disiplin ve/veya çok eğitmen, tüm ders/program/etkinlik/CRM/iş otomasyonu/eğitmen hakedişi fonksiyonları olan hareket/eğitim merkezi.
+- **Business:** Pro kapsamı + **en fazla beş merkez**; merkezler kendi erişim, operasyon ve finans yetkilerinde izole, organizasyon altında bağlı; mevcut koşullarla merkezler arası kullanım ve onaylı hesaplaşma.
+- **Beş merkez üzeri:** Otomatik sınırsızlık veya genel bypass değil, teklif/özel sözleşme kapsamında müşteri başına sürümlü, açıkça kabul edilmiş merkez limitinin ve gerekiyorsa alan davranışlarının ayrı tanımlanması. Tenant izolasyonu, mali bütünlük, gizlilik, kimlik, audit ve güvenlik kapıları özel teklifle devre dışı bırakılamaz. Standart yeni bir dördüncü plan veya fiyat bu kararla oluşturulmadı.
+
+#### Bağlayıcı kapsam
+
+| Kural | Starter | Pro | Business |
+|---|---|---|---|
+| Aktif merkez | 1 | 1 | 5'e kadar |
+| Sisteme tanımlanabilen **aktif ders/aktivite odası** | 1 | Birden fazla; ticari sayı henüz seçilmedi | Merkezlere göre birden fazla; ticari sayı henüz seçilmedi |
+| Aktif disiplin | 1 | Birden fazla | Birden fazla |
+| Aktif eğitmen | 1 | Birden fazla | Birden fazla |
+| Aktif öğrenci/üye | **100** | Henüz kesin sayısal limit seçilmedi | Henüz kesin sayısal limit seçilmedi |
+| Düzenli sınıf/program, temel özel ders talebi, öğrenci self rezervasyonu, temel public ders takvimi ve başvuru | Var, aynı tek kaynak/disiplinle | Var | Var |
+| Tek disiplinli kredili, süreli/sınırsız paket; uygun rezervasyon, yoklama, borç/tahsilat | Var | Var | Var |
+| Bağımsız workshop/parti/atölye/etkinlik yaşam döngüsü (F29) | **Yok** | Var | Var |
+| Gelişmiş CRM, reklam/lead kaynakları, kampanya, segment, otomasyon (F21–F24) | **Yok**; yalnız gelen temel ders başvurusunun incelenmesi | Var | Var; merkez bazlı/organizasyon birleşik |
+| Bağımsız operasyon personeli yönetimi ve eğitmen anlaşma/hakedişi | Yok | Var | Var |
+| Merkezler arası paket kullanımı ve A→B hesaplaşma | Yok | Yok | Var |
+
+**Starter tek oda davranışı:** Yazılım bir aktif mantıksal ders odası tutar; işletmenin gerçek mekânda birden fazla salonu olsa bile bütün sınıf/seans/özel ders rezervasyonları aynı `room_id` üzerinde yürür. Oda eşzamanlı iki seansa atanamaz; ikinci fiziksel alanın varlığı paralel program kapısını açmaz. Odanın tanımlı kapasitesi bir üst sınırdır; her seansın toplam/kategori limiti bunun altında ayrıca belirlenir. Örneğin mantıksal oda kapasitesi 50; büyük fiziksel alandaki seans limiti 40, küçük alandaki özel ders limiti 5 olabilir. Yazılım fiilî salonun fiziksel kapasitesini ayrıca gözlemlemez; doğru seans limiti işletmenin sorumluluğundadır. Var olan oda fiziksel tavanı, toplam/kategori kontenjanı, gerekçeli kontrollü aşım, rezervasyon ve yarış kontrolleri gevşetilmez.
+
+**Starter tek disiplin:** Organizatör/merkezden programa, sınıfa, seansa, pakete ve kesin katılıma dek gerçek disiplin kimliği aynı tek aktif disipline bağlıdır. Starter paketinin kullanıcıya gösterilen ismi **disiplin adıyla başlar** (ör. `Yoga · 8 Ders`); bu ön ek kayıtlı `discipline_id` üzerinden üretilir/doğrulanır, serbest isim hilesi ile ikinci disiplin açılamaz. Kaynağın teknik kimliği ve immutable satış/sürüm geçmişi salt isim değişikliğiyle değiştirilmez. Pro/Business isim politikası bu kararla değiştirilmez.
+
+**Starter tek eğitmen:** Bir etkin öğretmen/görevli eğitim ilişkisi; dersler bu eğitmenle yürür. İkinci aktif eğitmen, paralel eğitmen programı, bağımsız personel yetkisi Pro gerektirir. Önceden önerilen dört yedek seans/30 gün ve ikinci geçici eğitmen istisnası **kabul edilmiş bir kural değildir**. Starter F14 yoklama/hak tüketimi ücret anlaşması olmadan kapanır, F20 hakediş/ücretli görevlendirme üretmez. Pro/Business ücretli görevlendirme ve hakediş için mevcut geçerli anlaşma şartları aynen korunur.
+
+**Starter tek disiplinli sabit program:** Düzenli tekrarlayan grup sınıfları, temel bireysel ders talebi ve bunların değişiklik/iptal/telafi yaşam döngüsü; öncelikli veya esnek hakları, ders sayılı ve süreli/sınırsız paketleri, standart öğrenci self rezervasyonu, yoklama, borç ve manuel tahsilat korunur. Mevcut dersin meşru gerekçeli telafisi ayrı workshop/etkinlik hakkı vermez. Etkinlik/parti/workshop bileti ve `event_*` yaşam döngüsü, CRM satış/deneme/kampanya akışları Starter planında kapalıdır. Tekrarlanan sınıf adını “Workshop” yazmak tek başına kesin teknik sınıflandırma değildir; gerçek işlem türü, kaynak/plan kapısı ve kötüye kullanım politikası birlikte uygulanmalıdır.
+
+**Starter public/self:** Temel halka açık ders takvimi ve yalnız programa ilişkin başvuru; doğrulanmış öğrencinin geçerli hak/katılım koşullarıyla kendi rezervasyon/iptal işlemi. Hesapsız başvuru **kesin rezervasyon, satış, kredi, aktif hesap veya pazarlama rızası yaratmaz**; bot/rate/tenant/yetki doğrulaması korunur. Başvuruyu görme ve gerektiğinde öğrenci ilişkisine bağlama için dar operasyonel değerlendirme sunulur; genel CRM `lead_*`, reklam entegrasyonu, kampanya, segment, otomasyon yetkileri Starter'a bu yüzden açılmaz. Gerçek public hostname, Turnstile/gateway ve ortam kabulü ayrıca açıktır; dış e-posta/Resend ertelenmiştir. Online ödeme/gateway bu plan kararıyla otomatik açılmaz.
+
+**Aktif öğrenci sınırı:** Önceden kabul edilmiş `RelationshipState=active` öğrenci sayımı esas alınır; hesapsız öğrenciler dahildir, aynı organizasyon kişisi bir kez sayılır, yalnız aday/eğitmen/personel olanlar sayılmaz. En çok 100; yeni aktive/yeniden aktive ve ilgili kesinleştirmede eşzamanlı atomik kontrol yapılır. Limit aşıldığında mevcut hak, borç, yoklama ve kesin rezervasyonlar silinmez veya otomatik iptal edilmez. Açık işlemi olan öğrenci kotayı boşaltmak için keyfî pasifleştirilemez. Pro/Business sayısal üye/eğitmen/oda sınırları veya ücretleri burada uydurulmaz.
+
+#### Plan geçişleri ve kaynak bütünlüğü
+
+Plan düşürme mevcut veriyi, katalog/satış snapshotını, kredi/para/denetim geçmişini veya kesin rezervasyonları silmez. Çok merkezi Business'tan tek merkez planına geçişte zaten kabul edilen korunacak merkez seçimi geçerlidir. Oda/disiplin/eğitmen/aktif öğrenci fazlalığının yeni plan yürürlüğüne etkisi, hangi aktif kapsamın sürdürüleceği, mevcut kayıtların salt okuma/işletim tamamlaması ve yeni yazmaların nasıl engelleneceği açık preview + geçiş kabulünde netleştirilmelidir; mevcut kesin rezervasyon sessizce silinmez. Plan erişiminde yalnız UI/menü saklama yetmez; Auth→Edge→RPC/RLS/plan-katalogu ve her mutasyon üzerinden merkezi kapı gerekir. Var olan D01–D09 ve Q-E02/E03/DS korumaları üst ürün kurallarıdır.
+
+#### F01–F33 değişim izi
+
+- **F01/F04/F08/F10/F32:** Starter tek merkez/oda/disiplin/eğitmen + 100 aktif öğrenci; Pro tek merkez ve tam faaliyet yapısı; Business beş merkez. Mevcut altyapı rol/scope modeli korunur.
+- **F11:** Starter dahil; tek disiplin sabit programla yetkili öğrenci self rezervasyonu. **F12** bekleme/yer teklifi Pro/Business'ta kalır.
+- **F13/F20:** İkinci aktif eğitmen/ücretli görevlendirme Starter'da kapalı; Starter F14 anlaşmasız ve hakedişsiz kapanır.
+- **F15/F16:** Starter tek disiplinli kredili ve süreli/sınırsız ürün kapsamı; gelişmiş dondurma/plan değişimi F17 Pro'da.
+- **F21–F24:** Genel CRM, yenileme/kampanya, davranış segmenti ve takip otomasyonu Pro+Business; Business'a özgü olan merkezler arası birleşik görünüm/merkez kapsamı, tek merkezde gelişmiş CRM değildir.
+- **F25:** Starter temel ders takvimi ve ders başvurusu, Pro/Business geniş kayıt/kampanya/etkinlik.
+- **F29:** Bağımsız etkinlikler Pro+Business; Starter'daki sabit dersin mevcut iptal/telafi yolu F14'tür.
+- **F26/F27/F28/F30/F31/F33:** Temel işlemsel bildirim, rapor, belge, import, izlenebilirlik korunur. Önce önerilen Starter otomatik paket/ders hatırlatma F27 genişlemesi veya ticari yeni sayısal limit **bu kararla kabul edilmiş sayılmaz**.
+
+#### Açık teknik kabul ve kesinleştirilmemiş değerler
+
+Bu karar mevcut `contracts/08-*`, generated `docs/feature-delivery.md`, `docs/endpoint-inventory.json`, mevcut `packages/contracts`, plan kataloğu, SQL/RPC, UI veya F01–F33 runtime kabulünü **değiştirmez**. Uygulama paketinde aynı branch/PR'de kural-kapı/DTO/validator/versiyon/migration/üretim/katalog/envanter/CI ve devir eşitlenmeli. Mevcut generated feature-delivery'deki eski plan etiketleri bu normatif karardan daha düşük önceliklidir, elle yamalanmaz.
+
+Kritik testler: Starter ikinci oda/disiplin/eğitmen/101. öğrenci reddi; plan erişiminin direct Edge/RPC, staff grant ve paket adı spoof üzerinden aşılmaması; tek mantıksal odada çakışan iki seansın reddi; fiziksel oda tavanına tabi 40/5 seans kapasitesi; ödeme/hak yarışları; public başvurunun yalnız talep olması; CRM/event/automation kapıları; Pro tam tek merkez kapsamı; Business 5 merkez ve 6. merkezin standart katalogda reddi; merkezler arası gizlilik; downgrade geçmiş/rezervasyon koruması. Sınırsızlık/özel teklif limitinin wire temsili ve Pro/Business diğer sayısal limitleri ayrıca düzenlenecek. Henüz yeni test geçti veya CI tetiklendi denmez.
+
 ## 25 Ekim — PR45 kapasite ve main ayarları uzlaştırması
 
 Başlangıç main `3456050a3061d7bf5dc2ce8898b82c5cfe84e773`: **206 callable API / 60 migration**; PR46 ayarları birleşti, aynı main clean [40200716603](https://github.com/SXQHex/FtkSaaS/actions/runs/40200716603) ve development CD [40202862244](https://github.com/SXQHex/FtkSaaS/actions/runs/40202862244) başarılı. Bu PR45 birleşim adayı kapasite işlemini ekler: **207 callable API / 61 migration**. Altı ayar işlemi ve kapasite davranışı birlikte korunur. Henüz uygulanmamış kapasite migration’ı main’deki ayar migration’ından sonra sıralandı; SQL içeriği ve mevcut 60 migration değişmedi. Önceki PR45 clean yalnız eski tabana aittir; bu birleşik kaynak için bağımsız inceleme ve yeni aday/main clean gerekir. Kapasite henüz main/hosted kabulü değildir.
@@ -32,7 +97,7 @@ Bu belge, geliştirme için yazılı kapsam sözleşmesi ve esas başvuru kayna�
 - Kapsam durumu: Kabul edildi / Sonraki aşama / Kapsam dışı.
 - Uygulama/kabul durumu özellik bazında docs/feature-delivery.md ve makine feature_delivery eşlemesindedir; işlem sayısı ürün tamamlanma oranı değildir.
 - Planlar: Starter, Pro ve Business aynı backend iş modelini kullanır; plan farkı erişim ve kullanım limitidir.
-- Bu belge fiyat, kesin eğitmen/öğrenci limitleri veya sınırsız kullanım taahhüdü belirlemez. İlk paket şablonundaki sayılar tavsiye olarak kalır.
+- **26 Ekim plan kararı:** Starter 1 merkez/1 aktif oda/1 disiplin/1 eğitmen/100 aktif öğrencidir; Pro 1 merkez, Business en fazla 5 merkezdir. Pro/Business diğer öğrenci/eğitmen/oda sayısal sınırları ve fiyatlar kesinleşmedi; ilk paket şablonundaki tarihsel sayılar evrensel limit değildir.
 - Pro özellikleri Business'a da dahildir. Temel güvenlik, veri bütünlüğü ve kayıt geçmişi bütün planlarda geçerlidir.
 - Starter'ın ortak temel özellikleri Pro ve Business'a da dahildir. Bir modülün ayarını etkinleştirmek, abonelik planında bulunmayan özelliğe erişim sağlamaz.
 - Ayarlanabilir sayısal değerlerin kesinleşmemiş olması ortak altyapı geliştirmesini engellemez. Başlangıç değerleri ve ayrıca karar gerektiren davranışlar aşağıda ayrılmıştır.
@@ -59,6 +124,8 @@ Bu belge, geliştirme için yazılı kapsam sözleşmesi ve esas başvuru kayna�
 Bu modüller ayrı servis veya ayrı uygulama zorunluluğu değildir. Yeni backend için sorumluluk alanlarıdır. Supabase üzerinde tek modüler backend ve multi-frontend sözleşmesi kabul edilmiştir; ayrıntıları teknik sözleşmededir. “Üyelik ilişkisi” kişinin işletmeyle ilişkisini; “süreli üyelik” satın alınan kullanım hakkını; “SaaS aboneliği” işletmenin yazılım planını ifade eder.
 
 ## Özellik ve plan matrisi
+
+**Teknik aktarım uyarısı (26 Ekim):** Aşağıdaki F01–F33 tablo satırları `contracts/08` makine sözleşmesiyle kaynak tutarlılığı ve mevcut governance denetimi için **önceki uygulanmış plan-matrisi snapshotı** olarak korunur. **Yeni normatif ürün erişimi** yukarıdaki 26 Ekim bölümünde ve yukarıdaki ayrıntılı plan kabulünde tanımlıdır; tablo çeliştiğinde yeni karar üstündür. Backend coder yeni plan gate/DTO/plan katalogu ile birlikte bu tabloyu ve üretilmiş F01–F33 izini **aynı uygulama PR'sinde** eşitleyecek. Bu salt belge teslimi tabloyu runtime güncelmiş gibi göstermez.
 
 “Temel” ve “gelişmiş” ifadelerinin sınırları aşağıdaki tamamlanma ölçütleriyle belirlenir. Çizgi o planda kapsam dışında demektir. Her satırın uygulama/kabul sınırı feature_delivery haritasında ayrıca izlenir.
 
@@ -143,7 +210,7 @@ Bu modüller ayrı servis veya ayrı uygulama zorunluluğu değildir. Yeni backe
 - İçe aktarmada alan eşleştirme, önizleme, doğrulama ve hatalı satır raporu bulunur. Açılış kredi/borçları ilgili modüllerde izlenebilir kayıt olarak oluşturulur; yeniden yükleme mükerrer kayıt üretmez.
 - Starter raporları temel tahsilat/borç ve ders/katılım özetlerini; Pro paket yenileme, doluluk, kaynak kullanımı, hakediş ve CRM dönüşümlerini; Business merkez bazlı ve birleşik karşılaştırmaları kapsar.
 - Kullanım oranında çalışma saatleri ve izinler hesaba katılır. Dışa aktarım yalnızca ekranda görünen sayfayı değil, yetkili ve filtrelenmiş bütün sonucu kapsar.
-- Plan erişimi yalnızca menü gizleyerek uygulanmaz; backend doğrular. Plan düşürmede mevcut veriler silinmez. Aktif öğrenci sayımı ve plan geçiş davranışları aşağıdaki kabul edilmiş revizyonlarla belirlenmiştir; kesin sayısal limitler ticari kullanıma açılmadan belirlenir.
+- Plan erişimi yalnızca menü gizleyerek uygulanmaz; backend doğrular. Plan düşürmede mevcut veriler silinmez. Aktif öğrenci sayımı ve plan geçiş davranışları aşağıdaki kabul edilmiş revizyonlarla belirlenmiştir; Starter 100 aktif öğrenci limiti kabul edilmiştir; diğer açık sayısal limitler ticari kullanıma açılmadan belirlenir.
 - Kritik iş kuralları frontend'e bağlı değildir; web, Android, iOS, macOS ve Windows aynı operasyonları ve yetki kontrollerini kullanır.
 
 ## Öncelik sırası
@@ -157,7 +224,7 @@ Bu sıralama yapılacak işlerin bağımlılık sırasıdır; mevcut uygulamada 
 | 3 — Hak ve para | Paket/süreli üyelik, dondurma, kredi, tahsilat/iade/alacak ve hakediş |
 | 4 — Pro operasyon kapsamı | Etkinlik, belge/form, paylaşılabilir kayıt sayfası, veri aktarımı, bildirim/hatırlatma ve operasyon raporları |
 | 5 — CRM | Aday ve deneme süreci, kontrollü indirim, dönüşüm, yenileme/geri kazanma takibi |
-| 6 — Business kapsamı | Çoklu merkez, ortak kullanım hakları, merkez kuralları, birleşik raporlar ve CRM otomasyonları |
+| 6 — Business kapsamı | Çoklu merkez, ortak kullanım hakları, merkez kuralları, birleşik raporlar ve merkezler arası CRM |
 
 SaaS erişim altyapısı ortak temelle tasarlanır; ticari planların etkinleştirilmesi kapsam ve limit kararlarından sonra yapılır. Her aşamanın tamamlanması yalnızca yeni FtkSaaS üzerinde kabul ölçütleriyle doğrulanır. Eski kod envanteri çıkarılmaz. Bu sıralama ürün önceliğidir; teknik bağımlılık sırası teknik sözleşmede ayrıca netleşecektir.
 

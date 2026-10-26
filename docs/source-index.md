@@ -1,5 +1,10 @@
 # FtkSaaS kaynak indeksi
 
+## 26 Ekim — normatif plan paketi kararı / kaynak önceliği
+
+[Ürün planı kabulü](../contracts/01-FtkSaaS-urun-kapsam-sozlesmesi.md), [01 ürün](../contracts/01-FtkSaaS-urun-kapsam-sozlesmesi.md), [02 teknik](../contracts/02-FtkSaaS-teknik-sozlesme.md) ve [06 plan erişim notu](../contracts/06-FtkSaaS-O4-durum-hata-izin.md) birlikte okunur. Starter 1 merkez/1 aktif oda/1 disiplin/1 eğitmen/100 aktif öğrenci; Pro tüm tek merkezli fonksiyonlar; Business 5 merkez; 5 üzeri sözleşmeli özel teklif. Önceki F01–F33 üretim haritası/08 makine plan etiketleri, `docs/endpoint-inventory.json`, paket tipleri ve runtime **henüz bu kabul kararına eşitlenmedi**; eski etiketleri yeni çalışır plan desteği sanma. Önce [kalan işler](remaining-work.md), [kuyruk](production-queue.md) ve [frontend devri](claude-handover.md) içindeki açık kabul ayrımına bak. Ana başlangıç kaynak SHA `26e7091cd73482a623839266324b049d617fe9c2`, [aynı SHA main clean](https://github.com/SXQHex/FtkSaaS/actions/runs/40246191868)/[CD](https://github.com/SXQHex/FtkSaaS/actions/runs/40247685028) başarılı; bu yeni belge kararının veya yeni plan gate'in CI kanıtı değildir.
+
+
 ## 26 Ekim — PR50 hesap ve güvenlik teslim paketi
 
 PR50 yerel kapsamı **212 callable API / 64 migration**,46 ayar alanı/44 writable; başlangıç main `a7569bbb11353dc342804eb5050800d77a31a8e9`. İlk207/63 iki alan adayı aşağıda tarihsel snapshot’tır. Yeni beş işlem kendi oturumlarını listeleme/etiketleme/kapatma, güvenlik geçmişi ve güçlü doğrulanmış TOTP kaldırmayı kapsar. Native TOTP enrollment/challenge/verify sağlayıcıda kalır; verified factor varsa uygulama ve SQL hem doğrulanmış JWT aal2 hem canlı native session aal2 ister. Genel tercih patch’i güvenlik işlemlerini değiştirmez.

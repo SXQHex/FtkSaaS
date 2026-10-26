@@ -1,5 +1,10 @@
 # Claude frontend entegrasyon talimatları
 
+## 26 Ekim — Starter/Pro/Business kararının frontend teslim sınırı
+
+[Normatif ürün kararı](../contracts/01-FtkSaaS-urun-kapsam-sozlesmesi.md): Starter 1 merkez/1 aktif ders odası/1 disiplin/1 aktif eğitmen/100 aktif öğrenci; tek room_id üzerinde ayrı seans limitleri, zorunlu disiplin paket adı, temel self-servis ve public ders takvimi/başvuru. Starter genel CRM, etkinlik, otomasyon, eğitmen hakedişi yönetimi açmaz. Pro bir merkezde tam program ve CRM/etkinlik/otomasyon; Business en çok 5 merkez ve merkezler arası kapsam. 5 üzeri ayrı özel teklif. **Bu kararın typed DTO/plan gate/public provider/real frontend E2E kabulü yoktur; mevcut UI veya endpoint bu yeni kapsamı destekliyor gösterilemez.** Frontend müşteri görünümünde limit, kota dolu, plan upgrade ve kayıt güvenlik sonuçlarını ancak backend sözleşme eşitlenince kullanır; müşteri tarafında role/menu kontrolü backend plan enforcement yerine geçmez. Kaynağın eski plan API değerlerini aktif karar diye uygulama. Frontend tasarımı veya istemci kodu bu belge tesliminde değiştirilmez.
+
+
 ## 26 Ekim — PR50 hesap ve güvenlik teslim paketi
 
 PR50 yerel kapsamı **212 callable API / 64 migration**,46 ayar alanı/44 writable; başlangıç main `a7569bbb11353dc342804eb5050800d77a31a8e9`. İlk207/63 iki alan adayı aşağıda tarihsel snapshot’tır. Yeni beş işlem kendi oturumlarını listeleme/etiketleme/kapatma, güvenlik geçmişi ve güçlü doğrulanmış TOTP kaldırmayı kapsar. Native TOTP enrollment/challenge/verify sağlayıcıda kalır; verified factor varsa uygulama ve SQL hem doğrulanmış JWT aal2 hem canlı native session aal2 ister. Genel tercih patch’i güvenlik işlemlerini değiştirmez.
