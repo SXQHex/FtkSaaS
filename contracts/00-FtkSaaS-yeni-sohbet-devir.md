@@ -1,5 +1,20 @@
 # FtkSaaS güncel devir
 
+## 26 Ekim — main uzlaştırması ve sağlayıcı kabul sırası
+
+Güncel remote main18a151adf3f1519395dc1c539beacd6bf003ada3: PR51 yalnız plan karar belgelerini birleştirdi; Main clean40254883988 ve CD40254953023 success. Bu belge-only kabul yeni kimlik kaynağının runtime kabulü değildir; backend hâlâ212 API/64 migration. Yerel teslim1 adayı213/65 yeni main plan kararlarını koruyarak uzlaştırıldı. Kullanıcı gerçek bağlama kabulü için kullanılmamış bir Google hesabı sağladı; önce yeni API/fence için inceleme/aday/main/development kabulü gerekir, ardından kullanıcı gerçek Google kimliğini test hesabına bağlar. Bu amaçla bağımsız Google signup yapılıp kimlik tüketilmez. SMS dış entegrasyondur ve backend kapısı değildir.
+
+## 26 Ekim — SMS dış entegrasyon kararı (son kullanıcı kabulü)
+
+Telefon numarası kaydedilebilir; gerçek SMS proof tamamlanmadıkça doğrulanmamış kalır. Numaranın kaydedilmesi, doğrulanmış iletişim yayılımı, hesap sahipliği kanıtı veya telefonla giriş yetkisi değildir. Ücretsiz geliştirme testlerinde yalnız izole yerel test OTP kodları kullanılabilir; bunlar gerçek SMS gönderimi/teslimi veya hosted provider kabulü sayılmaz. Sabit test kodları hosted ortama uygulanmaz.
+
+E-posta/parola, gerçek Google giriş/bağlama ve doğrulayıcı uygulama TOTP ile ilerlenir. Gerçek SMS sağlayıcısı kurulumu ayrı dış entegrasyon statüsündedir; birinci satırın diğer backend işlerini ve backend kapanışını engellemez. SMS'in gerçek sağlayıcı kabulü tamamlandı işaretlenmez. Doğrulanmamış telefon kaydetme/okuma yolu ile yerel proof/test-code davranışının uygulama kabulü backend kapsamındadır; bu karar tek başına yeni alan/API'nin uygulanmış olduğu kanıtı değildir.
+
+
+## 26 Ekim güncel kabul ve aktif teslim
+
+PR50 main `26e7091cd73482a623839266324b049d617fe9c2`:212 API/64 migration; main40246191868 ve gerçek Supabase CD40247685028 başarılı. Aşağıdaki önceki aday/pending kayıtları tarihsel kapsamdır. Kullanıcı sıralı kapanış istiyor: yalnız kimlik/doğrulanmış iletişim/hesap güvenliği satırı aktif, bitmeden sonraki satıra geçilmez. Platform e-postaları için Resend ertelemesi kaldırıldı. [Tek aktif sıra ve kalan sağlayıcı kabulü](../docs/production-queue.md#teslim1-kimlik-iletisim).
+
 ## 26 Ekim — Starter / Pro / Business ürün kararı (belge devri)
 
 [Son ürün kararı](01-FtkSaaS-urun-kapsam-sozlesmesi.md): Starter **1 merkez/1 aktif oda/1 disiplin/1 eğitmen/100 aktif öğrenci**, tek mantıksal odada düzenli programlar, zorunlu disiplin paket adı, F11 öğrenci self-servisi, F25 temel takvim/başvuru ve tek disiplinli F16; CRM/etkinlik/hakediş yok. Pro bir merkezde tüm program/CRM/etkinlik/otomasyon/eğitmen yönetimi; Business en fazla 5 merkez. 5 üstü özel teklif ayrı sınır/sözleşme. Ana ürün ve teknik sözleşmelerde normatif aktarım; runtime, plan kataloğu, tip, envanter, deploy ve yeni CI testleri **henüz uygulanmadı**. Bu belge güncellemesi 26e7091cd73482a623839266324b049d617fe9c2 temiz CI'ını yeni koda taşımaz; [üretim kuyruğunda](../docs/production-queue.md) ayrı backend uygulama/kabul işi açıldı. Mevcut bekleme/restore ve P08 üretim çalışmaları önceliği değiştirilmedi.

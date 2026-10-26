@@ -153,3 +153,5 @@ account_session_names=['account_sessions_list_v1','account_session_label_v1','ac
 account_session_entries=[line for line in Path('database/runtime-wrappers-current.sql').read_text().splitlines() if any("'"+name+"'" in line or 'api_v1.'+name+'(' in line for name in account_session_names)]
 assert len(account_session_entries)==4*len(account_session_names),'Account session wrapper inventory'
 assert Path('database/account-session-management-wrappers.sql').read_text()=="begin;\n"+'\n'.join(account_session_entries)+"\nnotify pgrst,'reload schema';\ncommit;\n",'Account sessions wrapper drift or privilege expansion'
+
+assert next(Path('supabase/migrations').glob('*_account_identity_projection.sql')).read_text()==Path('database/account-identity-projection.sql').read_text(),'Account identity source drift'

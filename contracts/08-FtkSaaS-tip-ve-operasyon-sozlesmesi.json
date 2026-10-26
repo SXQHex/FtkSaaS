@@ -912,7 +912,8 @@
         "account_session_label_v1",
         "account_sessions_revoke_v1",
         "account_security_history_get_v1",
-        "account_totp_remove_v1"
+        "account_totp_remove_v1",
+        "account_google_link_prepare_v1"
       ]
     },
     "EntityType": {
@@ -3220,6 +3221,9 @@
             ],
             "additionalProperties": false
           }
+        },
+        "identity": {
+          "$ref": "#/$defs/AccountIdentityView"
         }
       },
       "required": [
@@ -3411,6 +3415,24 @@
           "items": {
             "$ref": "#/$defs/FtkUuid"
           }
+        },
+        "given_name": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "minLength": 1,
+          "maxLength": 100,
+          "pattern": "^(?=.*\\S)[^\\u0000-\\u001f\\u007f]*$"
+        },
+        "family_name": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "minLength": 1,
+          "maxLength": 100,
+          "pattern": "^(?=.*\\S)[^\\u0000-\\u001f\\u007f]*$"
         }
       },
       "required": [
@@ -3455,6 +3477,24 @@
           "items": {
             "$ref": "#/$defs/FtkUuid"
           }
+        },
+        "given_name": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "minLength": 1,
+          "maxLength": 100,
+          "pattern": "^(?=.*\\S)[^\\u0000-\\u001f\\u007f]*$"
+        },
+        "family_name": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "minLength": 1,
+          "maxLength": 100,
+          "pattern": "^(?=.*\\S)[^\\u0000-\\u001f\\u007f]*$"
         }
       },
       "required": [
@@ -6110,6 +6150,32 @@
         },
         "display_name": {
           "$ref": "#/$defs/Text"
+        },
+        "given_name": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "minLength": 1,
+          "maxLength": 100,
+          "pattern": "^(?=.*\\S)[^\\u0000-\\u001f\\u007f]*$"
+        },
+        "family_name": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "minLength": 1,
+          "maxLength": 100,
+          "pattern": "^(?=.*\\S)[^\\u0000-\\u001f\\u007f]*$"
+        },
+        "unverified_phone": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "pattern": "^\\+[1-9][0-9]{7,14}$",
+          "maxLength": 16
         }
       },
       "required": [
@@ -30801,6 +30867,32 @@
           "properties": {
             "display_name": {
               "$ref": "#/$defs/Text"
+            },
+            "given_name": {
+              "type": [
+                "string",
+                "null"
+              ],
+              "minLength": 1,
+              "maxLength": 100,
+              "pattern": "^(?=.*\\S)[^\\u0000-\\u001f\\u007f]*$"
+            },
+            "family_name": {
+              "type": [
+                "string",
+                "null"
+              ],
+              "minLength": 1,
+              "maxLength": 100,
+              "pattern": "^(?=.*\\S)[^\\u0000-\\u001f\\u007f]*$"
+            },
+            "unverified_phone": {
+              "type": [
+                "string",
+                "null"
+              ],
+              "pattern": "^\\+[1-9][0-9]{7,14}$",
+              "maxLength": 16
             }
           },
           "required": [],
@@ -45331,7 +45423,11 @@
             "session_revoked",
             "other_sessions_revoked",
             "totp_enabled",
-            "totp_disabled"
+            "totp_disabled",
+            "email_changed",
+            "phone_changed",
+            "identity_linked",
+            "identity_unlinked"
           ]
         },
         "session_id": {
@@ -45783,6 +45879,163 @@
         },
         "data": {
           "$ref": "#/$defs/AccountTotpRemoval"
+        },
+        "trace_id": {
+          "$ref": "#/$defs/FtkUuid"
+        }
+      },
+      "required": [
+        "ok",
+        "data",
+        "trace_id"
+      ],
+      "additionalProperties": false
+    },
+    "AccountIdentityView": {
+      "type": "object",
+      "properties": {
+        "given_name": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "minLength": 1,
+          "maxLength": 100,
+          "pattern": "^(?=.*\\S)[^\\u0000-\\u001f\\u007f]*$"
+        },
+        "family_name": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "minLength": 1,
+          "maxLength": 100,
+          "pattern": "^(?=.*\\S)[^\\u0000-\\u001f\\u007f]*$"
+        },
+        "email": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "maxLength": 320
+        },
+        "phone": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "maxLength": 320
+        },
+        "pending_email": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "maxLength": 320
+        },
+        "pending_phone": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "maxLength": 320
+        },
+        "email_verified_at": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Instant"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "phone_verified_at": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Instant"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "unverified_phone": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "pattern": "^\\+[1-9][0-9]{7,14}$",
+          "maxLength": 16
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "given_name",
+        "family_name",
+        "email",
+        "phone",
+        "pending_email",
+        "pending_phone",
+        "email_verified_at",
+        "phone_verified_at",
+        "unverified_phone"
+      ]
+    },
+    "Request_account_google_link_prepare": {
+      "type": "object",
+      "properties": {
+        "client_api_version": {
+          "const": 1
+        },
+        "request_id": {
+          "$ref": "#/$defs/FtkUuid"
+        },
+        "reauth": {
+          "$ref": "#/$defs/ReauthProof"
+        },
+        "google_id_token": {
+          "type": "string",
+          "minLength": 32,
+          "maxLength": 16384
+        }
+      },
+      "required": [
+        "client_api_version",
+        "request_id",
+        "reauth",
+        "google_id_token"
+      ],
+      "additionalProperties": false
+    },
+    "GoogleLinkAuthorization": {
+      "type": "object",
+      "properties": {
+        "provider": {
+          "const": "google"
+        },
+        "status": {
+          "const": "ready"
+        },
+        "expires_in": {
+          "const": 10
+        }
+      },
+      "required": [
+        "provider",
+        "status",
+        "expires_in"
+      ],
+      "additionalProperties": false
+    },
+    "Success_account_google_link_prepare": {
+      "type": "object",
+      "properties": {
+        "ok": {
+          "const": true
+        },
+        "data": {
+          "$ref": "#/$defs/GoogleLinkAuthorization"
         },
         "trace_id": {
           "$ref": "#/$defs/FtkUuid"
@@ -72867,6 +73120,101 @@
         "runtime_limits": [
           "Verified TOTP removal requires fresh strong current proof and one-time bounded exact-factor intent; native direct verified-factor deletion is fenced."
         ]
+      },
+      {
+        "name": "account_google_link_prepare_v1",
+        "module": "M02",
+        "features": [
+          "F06"
+        ],
+        "permission": "account.self",
+        "actor_source": "server_verified",
+        "transport": "H",
+        "billing_class": "exempt",
+        "request": {
+          "$ref": "#/$defs/Request_account_google_link_prepare"
+        },
+        "success": {
+          "$ref": "#/$defs/Success_account_google_link_prepare"
+        },
+        "errors": [
+          "AUTH_REQUIRED",
+          "BILLING_OPERATION_RESTRICTED",
+          "CLIENT_UPDATE_REQUIRED",
+          "FORBIDDEN",
+          "NOT_FOUND",
+          "PLAN_FEATURE_UNAVAILABLE",
+          "PLAN_LIMIT_REACHED",
+          "POLICY_NOT_CONFIGURED",
+          "SERVICE_UNAVAILABLE",
+          "SESSION_REVOKED",
+          "SUBSCRIPTION_NOT_STARTED",
+          "TEMPORARY_FAILURE",
+          "VALIDATION_FAILED",
+          "VERSION_CONFLICT"
+        ],
+        "transaction_class": "auth",
+        "transaction_guarantee": "Fresh own native proof authorizes a bounded Google linking intent; actual provider identity insert and immutable security history commit atomically.",
+        "transition": {
+          "effect": "prepare_google_identity_link",
+          "from": [],
+          "to": [],
+          "invariant": "Existing account fresh reauth and new Google proof are both required."
+        },
+        "semantic_guards": [
+          "live_actor_and_scope",
+          "billing_gate_exempt",
+          "required_feature_gates_separate_from_references"
+        ],
+        "audit": true,
+        "notification": "native_identity_linked_security_notification",
+        "concurrency": "Exact Google subject and fresh own session; 10-second account mutex-protected intent. Actual native identity insertion and security event commit together; no business receipt or OAuth redirect intent.",
+        "expected_version_subject": "none",
+        "acceptance_scenario_ids": [
+          "A01",
+          "A02",
+          "A03",
+          "A23",
+          "A24",
+          "A25",
+          "A46",
+          "A47",
+          "A55"
+        ],
+        "configuration_policy": "numeric plan limits/prices and legal approval are deployment configuration, never arbitrary allow/deny",
+        "implementation_status": "operational_development_limited",
+        "required_features": [
+          "F06"
+        ],
+        "runtime_required_features": [],
+        "conditional_features": [],
+        "operation_contract": {
+          "kind": "auth",
+          "target_entity": "accounts",
+          "version_mode": "none",
+          "version_field": null,
+          "read_operation": "account_get_v1",
+          "atomic_effects": [
+            "bounded_google_link_intent"
+          ],
+          "business_commit": false,
+          "read_path_status": "implemented",
+          "source_decision": "S05"
+        },
+        "decision_delivery": {
+          "accepted_contract": "DS-2026-10-17",
+          "runtime_conformance": "implemented_pending_ci",
+          "open_dependencies": [],
+          "target_request": {
+            "$ref": "#/$defs/Request_account_google_link_prepare"
+          }
+        },
+        "runtime_path": "/functions/v1/backend-v1/account_google_link_prepare_v1",
+        "runtime_rpc": "api_v1.account_google_link_prepare_v1",
+        "runtime_external_path": "/functions/v1/backend-v1/account_google_link_prepare_v1",
+        "runtime_limits": [
+          "Obtain Google ID token first. Prepare with fresh current native reauth; within 10 seconds call native id_token grant with link_identity=true and matching Google token/nonce. Native signature, issuer, audience and nonce checks are mandatory."
+        ]
       }
     ],
     "policy_value_map": {
@@ -87678,6 +88026,18 @@
         "origin": "ftksaas",
         "acceptance": "generic_uuid",
         "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Request_account_google_link_prepare/properties/request_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Success_account_google_link_prepare/properties/trace_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
       }
     ],
     "open_product_decisions": [],
@@ -88708,7 +89068,8 @@
         "account_session_label_v1",
         "account_sessions_revoke_v1",
         "account_security_history_get_v1",
-        "account_totp_remove_v1"
+        "account_totp_remove_v1",
+        "account_google_link_prepare_v1"
       ],
       "runtime_deliveries": {
         "starter_attendance_protection": {
@@ -89080,7 +89441,8 @@
           "account_session_label_v1",
           "account_sessions_revoke_v1",
           "account_security_history_get_v1",
-          "account_totp_remove_v1"
+          "account_totp_remove_v1",
+          "account_google_link_prepare_v1"
         ],
         "dependencies": [
           "plan_gate_alignment"
@@ -89104,7 +89466,8 @@
           "account_session_label_v1",
           "account_sessions_revoke_v1",
           "account_security_history_get_v1",
-          "account_totp_remove_v1"
+          "account_totp_remove_v1",
+          "account_google_link_prepare_v1"
         ],
         "contract_only_operations": [
           "account_profile_update_v1",

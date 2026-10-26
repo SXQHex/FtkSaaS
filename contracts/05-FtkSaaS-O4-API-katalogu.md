@@ -1,6 +1,6 @@
 # FtkSaaS — API kataloğu · 0.2.0-rc.3
 
-212 sözleşme; 212 geliştirme ortamında çağrılabilir endpoint, 0 yalnız sözleşme. Çağrılabilir olmak bütün ürün özelliklerinin veya üretim kabulünün tamamlandığı anlamına gelmez. Kapsam sınırları ve Q-E01 `docs/claude-handover.md` içindedir.
+213 sözleşme; 213 geliştirme ortamında çağrılabilir endpoint, 0 yalnız sözleşme. Çağrılabilir olmak bütün ürün özelliklerinin veya üretim kabulünün tamamlandığı anlamına gelmez. Kapsam sınırları ve Q-E01 `docs/claude-handover.md` içindedir.
 
 `POST {API_URL}/functions/v1/backend-v1/{operation}`; JSON gövde doğrudan typed Request nesnesidir. Header: `Authorization: Bearer <Supabase access_token>`, `apikey: <publishable key>`, `Content-Type: application/json`. Başarı: `ok/data/trace_id`; hata: `ok:false/error:SafeError`. Servis anahtarı frontend’e verilmez.
 
@@ -9,7 +9,7 @@ Named `/rest/v1/rpc/{operation}` yalnız backend içindir; imzası p_request + d
 | İşlem | Durum | İzin | Tür / abonelik | İstek | Yanıt |
 |---|---|---|---|---|---|
 | `account_get_v1` | çağrılabilir (kapsam notları geçerli) | `account.self` | R / exempt | client_api_version: 1; request_id: FtkUuid | Success_account_get |
-| `account_profile_update_v1` | çağrılabilir (kapsam notları geçerli) | `account.self` | W / exempt | client_api_version: 1; request_id: FtkUuid; operation_key: FtkUuid; expected_version: PositiveInt; display_name: Text | Success_account_profile_update |
+| `account_profile_update_v1` | çağrılabilir (kapsam notları geçerli) | `account.self` | W / exempt | client_api_version: 1; request_id: FtkUuid; operation_key: FtkUuid; expected_version: PositiveInt; display_name: Text; given_name?: string ∣ null; family_name?: string ∣ null; unverified_phone?: string ∣ null | Success_account_profile_update |
 | `account_password_change_v1` | çağrılabilir (kapsam notları geçerli) | `account.self` | H / exempt | client_api_version: 1; request_id: FtkUuid | Success_account_password_change |
 | `account_password_reset_request_v1` | çağrılabilir (kapsam notları geçerli) | `auth.recover` | H / exempt | client_api_version: 1; request_id: FtkUuid; email: Text | Success_account_password_reset_request |
 | `account_delete_preview_v1` | çağrılabilir (kapsam notları geçerli) | `account.self` | P / exempt | client_api_version: 1; request_id: FtkUuid | Success_account_delete_preview |
@@ -220,6 +220,7 @@ Named `/rest/v1/rpc/{operation}` yalnız backend içindir; imzası p_request + d
 | `account_sessions_revoke_v1` | çağrılabilir (kapsam notları geçerli) | `account.self` | W / exempt | client_api_version: 1; request_id: FtkUuid; operation_key: FtkUuid; mode: selected / current / others; session_id?: ProviderUuid; reauth?: ReauthProof | Success_account_sessions_revoke |
 | `account_security_history_get_v1` | çağrılabilir (kapsam notları geçerli) | `account.self` | R / exempt | client_api_version: 1; request_id: FtkUuid; cursor?: string | Success_account_security_history_get |
 | `account_totp_remove_v1` | çağrılabilir (kapsam notları geçerli) | `account.self` | H / exempt | client_api_version: 1; request_id: FtkUuid; factor_id: ProviderUuid; reauth: ReauthProof | Success_account_totp_remove |
+| `account_google_link_prepare_v1` | çağrılabilir (kapsam notları geçerli) | `account.self` | H / exempt | client_api_version: 1; request_id: FtkUuid; reauth: ReauthProof; google_id_token: string | Success_account_google_link_prepare |
 
 ## İşlem bazında hedef sözleşme ve runtime ayrımı
 
@@ -439,6 +440,7 @@ features ürün referanslarıdır. required_features hedef plan kapısı; runtim
 | account_sessions_revoke_v1 | auth | none / account_sessions_list_v1 | auth_session_metadata_or_revocation, account_security_event, receipt | implemented_pending_ci |
 | account_security_history_get_v1 | read | none / None |  | implemented_pending_ci |
 | account_totp_remove_v1 | auth | none / None |  | implemented_pending_ci |
+| account_google_link_prepare_v1 | auth | none / account_get_v1 | bounded_google_link_intent | implemented_pending_ci |
 
 Önizleme süre sınırı 15 dakika. Apply canlı aktör/yetki/abonelik ve ilgili satır sürümlerini yeniden denetler. İdempotency kapsamı org + hesap + operasyon; merkez payload içindedir. Aynı anahtar/aynı içerik sonucu tekrarlar, farklı içerik reddedilir. Doğrulanmamış transport sonucunda yeni anahtar üretilmez.
 

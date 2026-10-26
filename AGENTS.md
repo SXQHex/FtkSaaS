@@ -1,4 +1,22 @@
+26 Ekim son kabul:213/65 adayı için dar kimlik+profil/merge native22/22,0fail/skip/cancel (132.473sn) geçti; yerel SMS proof ve retired alias yeniden ekleme dahil. Gerçek SMS dış entegrasyon, Google gerçek bağlama/final kaynak incelemesi/aday/main clean/CD açık. Önceki503 bu koşuda tekrarlanmadı, kök neden iddiası yok. Kanıt ve kaynak hashleri account-identity-progress-20261026 raporundadır. Sandbox kanıt alınınca durduruldu.
+
+26 Ekim devam checkpoint: yerel teslim1 adayı213 API/65 migration. Native kimlik/iletişim suite10/10 geçti; mevcut profil/merge tekrarında boş503 nedeniyle9node7pass2fail, temiz kabul yok. Google fresh reauth exact-subject/10sn hazırlık API’si ve native INSERT fence eklendi; gerçek provider binding, eski-kanal güvenlik teslimi/SMS ve son kaynak/CI açık. Hosted7 security mail bildirim ayarı açıldı. Main hâlâ212/64, uygulama taslağı push/PR/merge edilmedi. Ayrıntı production-queue ve ara rapordadır.
+
+## 26 Ekim — SMS dış entegrasyon kararı (son kullanıcı kabulü)
+
+Telefon numarası kaydedilebilir; gerçek SMS proof tamamlanmadıkça doğrulanmamış kalır. Numaranın kaydedilmesi, doğrulanmış iletişim yayılımı, hesap sahipliği kanıtı veya telefonla giriş yetkisi değildir. Ücretsiz geliştirme testlerinde yalnız izole yerel test OTP kodları kullanılabilir; bunlar gerçek SMS gönderimi/teslimi veya hosted provider kabulü sayılmaz. Sabit test kodları hosted ortama uygulanmaz.
+
+E-posta/parola, gerçek Google giriş/bağlama ve doğrulayıcı uygulama TOTP ile ilerlenir. Gerçek SMS sağlayıcısı kurulumu ayrı dış entegrasyon statüsündedir; birinci satırın diğer backend işlerini ve backend kapanışını engellemez. SMS'in gerçek sağlayıcı kabulü tamamlandı işaretlenmez. Doğrulanmamış telefon kaydetme/okuma yolu ile yerel proof/test-code davranışının uygulama kabulü backend kapsamındadır; bu karar tek başına yeni alan/API'nin uygulanmış olduğu kanıtı değildir.
+
+
 # FtkSaaS çalışma kuralları
+
+## 26 Ekim — sıralı backend kapanışı: yalnız teslim1 aktif
+
+Kullanıcı her satır eksiksiz tamamlanınca yalnız sonraki işin satırının gösterilmesini istedi. Aktif teslim kimlik, doğrulanmış iletişim ve hesap güvenliğidir; ikinci pakete geçilmez. **Platform e-postaları için Resend kullanımına açık yetki verildi.** Önceki dış e-posta/Resend ertelemesi bu teslim bakımından kaldırıldı; marketing veya diğer organizasyonlara rastgele gönderim yetkisi değildir. Google ve telefon sağlayıcısı hosted public Auth ayarlarında kapalıdır; eksik gerçek sağlayıcı kabulü kod/fixture başarısıyla kapatılmaz.
+
+Başlangıç main26e7091cd73482a623839266324b049d617fe9c2: PR50 main clean40246191868 ve development CD40247685028 başarılı, gerçek deploy/hosted kontrol yapıldı;212 API/64 migration. Önceki PR50 aday/bekliyor kayıtları tarihsel snapshot’tır. Aktif65. migration henüz yerel taslak; source review/native/aday/main/CD kabulü yoktur. [Aktif teslim ve kanıtlar](docs/production-queue.md#teslim1-kimlik-iletisim).
+
 
 ## 26 Ekim — PR50 hesap ve güvenlik teslim paketi
 

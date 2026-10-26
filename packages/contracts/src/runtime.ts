@@ -211,6 +211,7 @@ export const runtimeOperationNames = [
   "account_session_label_v1",
   "account_sessions_revoke_v1",
   "account_security_history_get_v1",
-  "account_totp_remove_v1"
+  "account_totp_remove_v1",
+  "account_google_link_prepare_v1"
 ] as const;
 export type RuntimeOperationName = typeof runtimeOperationNames[number];

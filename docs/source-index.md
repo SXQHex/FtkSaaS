@@ -1,5 +1,13 @@
 # FtkSaaS kaynak indeksi
 
+## 26 Ekim — main uzlaştırması ve sağlayıcı kabul sırası
+
+Güncel remote main18a151adf3f1519395dc1c539beacd6bf003ada3: PR51 yalnız plan karar belgelerini birleştirdi; Main clean40254883988 ve CD40254953023 success. Bu belge-only kabul yeni kimlik kaynağının runtime kabulü değildir; backend hâlâ212 API/64 migration. Yerel teslim1 adayı213/65 yeni main plan kararlarını koruyarak uzlaştırıldı. Kullanıcı gerçek bağlama kabulü için kullanılmamış bir Google hesabı sağladı; önce yeni API/fence için inceleme/aday/main/development kabulü gerekir, ardından kullanıcı gerçek Google kimliğini test hesabına bağlar. Bu amaçla bağımsız Google signup yapılıp kimlik tüketilmez. SMS dış entegrasyondur ve backend kapısı değildir.
+
+## 26 Ekim güncel kabul ve aktif teslim
+
+PR50 main `26e7091cd73482a623839266324b049d617fe9c2`:212 API/64 migration; main40246191868 ve gerçek Supabase CD40247685028 başarılı. Aşağıdaki önceki aday/pending kayıtları tarihsel kapsamdır. Kullanıcı sıralı kapanış istiyor: yalnız kimlik/doğrulanmış iletişim/hesap güvenliği satırı aktif, bitmeden sonraki satıra geçilmez. Platform e-postaları için Resend ertelemesi kaldırıldı. [Tek aktif sıra ve kalan sağlayıcı kabulü](production-queue.md#teslim1-kimlik-iletisim).
+
 ## 26 Ekim — normatif plan paketi kararı / kaynak önceliği
 
 [Ürün planı kabulü](../contracts/01-FtkSaaS-urun-kapsam-sozlesmesi.md), [01 ürün](../contracts/01-FtkSaaS-urun-kapsam-sozlesmesi.md), [02 teknik](../contracts/02-FtkSaaS-teknik-sozlesme.md) ve [06 plan erişim notu](../contracts/06-FtkSaaS-O4-durum-hata-izin.md) birlikte okunur. Starter 1 merkez/1 aktif oda/1 disiplin/1 eğitmen/100 aktif öğrenci; Pro tüm tek merkezli fonksiyonlar; Business 5 merkez; 5 üzeri sözleşmeli özel teklif. Önceki F01–F33 üretim haritası/08 makine plan etiketleri, `docs/endpoint-inventory.json`, paket tipleri ve runtime **henüz bu kabul kararına eşitlenmedi**; eski etiketleri yeni çalışır plan desteği sanma. Önce [kalan işler](remaining-work.md), [kuyruk](production-queue.md) ve [frontend devri](claude-handover.md) içindeki açık kabul ayrımına bak. Ana başlangıç kaynak SHA `26e7091cd73482a623839266324b049d617fe9c2`, [aynı SHA main clean](https://github.com/SXQHex/FtkSaaS/actions/runs/40246191868)/[CD](https://github.com/SXQHex/FtkSaaS/actions/runs/40247685028) başarılı; bu yeni belge kararının veya yeni plan gate'in CI kanıtı değildir.

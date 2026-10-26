@@ -213,4 +213,5 @@ export interface Operations {
   account_sessions_revoke_v1: {request: T.RequestAccountSessionsRevoke; response: T.SuccessAccountSessionsRevoke};
   account_security_history_get_v1: {request: T.RequestAccountSecurityHistoryGet; response: T.SuccessAccountSecurityHistoryGet};
   account_totp_remove_v1: {request: T.RequestAccountTotpRemove; response: T.SuccessAccountTotpRemove};
+  account_google_link_prepare_v1: {request: T.RequestAccountGoogleLinkPrepare; response: T.SuccessAccountGoogleLinkPrepare};
 }

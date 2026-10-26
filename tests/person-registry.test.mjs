@@ -1,3 +1,4 @@
+import './account-identity-acceptance.mjs';
 import './account-mfa-acceptance.mjs';
 import './account-session-management-acceptance.mjs';
 import test from 'node:test';
@@ -24,7 +25,7 @@ test('Person registry real Auth/API authorization and contact privacy',async t=>
  const payment=await mutate('saas_payment_submit_v1',{amount_minor:'1000',currency:'TRY',reference:'synthetic people',occurred_at:new Date().toISOString()});await must(platform,'saas_payment_verify_v1',scope({payment_id:payment.primary_id,accepted:true}),key());
  const create=async(name,c=center)=>{const id=(await mutate('person_create_v1',{display_name:name,contacts:[{kind:'email',value:name+'@ftksaas.invalid'}]})).primary_id;await mutate('student_activate_v1',{center_id:c,person_id:id});return id;};
  const p=await create('Student one'),p2=await create('Student two',other);
- async function loginPerson(label,pid,role){const user=await authUser(label),a=await must(user,'account_get_v1');await db.query("insert into core.account_links(id,org_id,account_id,person_id,state,verified_at) values($1,$2,$3,$4,'active',now())",[key(),org,a.id,pid]);let grant;if(role)grant=await mutate(role==='center_manager'?'center_manager_assign_v1':'role_assign_v1',{person_id:pid,...(role==='center_manager'?{}:{role,scope:{center_id:center}})});return {user,grant};}
+ async function loginPerson(label,pid,role){const user=await authUser(label),a=await must(user,'account_get_v1');await must(user,'account_profile_update_v1',{display_name:(await rows('select display_name from core.people where org_id=$1 and id=$2',[org,pid]))[0].display_name,expected_version:Number((await rows('select version from core.accounts where id=$1',[a.id]))[0].version)},key());await db.query("insert into core.account_links(id,org_id,account_id,person_id,state,verified_at) values($1,$2,$3,$4,'active',now())",[key(),org,a.id,pid]);let grant;if(role)grant=await mutate(role==='center_manager'?'center_manager_assign_v1':'role_assign_v1',{person_id:pid,...(role==='center_manager'?{}:{role,scope:{center_id:center}})});return {user,grant};}
  const student=(await loginPerson('self',p)).user;
  const cmPerson=await create('Scoped manager'),{user:cm}=await loginPerson('cm',cmPerson,'center_manager');
  const instructorPerson=await create('Instructor'),{user:instructor,grant:instructorGrant}=await loginPerson('instructor',instructorPerson,'instructor');
@@ -77,28 +78,34 @@ test('Person registry real Auth/API authorization and contact privacy',async t=>
   const list=await must(instructor,'people_list_v1',scope({page:{},query:'Student'}));assert.deepEqual(list.items.map(x=>x.id),[p]);assert(!('contacts' in list.items[0]));
   await mutate('role_revoke_v1',{assignment_id:instructorGrant.primary_id,expected_version:1,reason:'synthetic revoke'});await fail('person_get_v1',{person_id:p},'NOT_FOUND',instructor);
  });
+ // Organization-owned contacts remain editable; linked current identity is tested separately.
+ const editable=await create('Editable org person');
+ const canonicalBefore=await get(student,p);
+ await fail('person_update_v1',{person_id:p,expected_version:canonicalBefore.version,patch:{display_name:'Organization cannot rename linked account'}},'FORBIDDEN');
  await t.test('contact replacement preserves existing verification, clears new evidence and never changes Auth identity',async()=>{
-  await db.query('update core.person_contacts set verified_at=$1 where org_id=$2 and person_id=$3',['2026-01-01T00:00:00Z',org,p]);
+  await db.query('update core.person_contacts set verified_at=$1 where org_id=$2 and person_id=$3',['2026-01-01T00:00:00Z',org,editable]);
   const beforeIdentity=await rows('select auth_user_id from core.accounts where id=$1',[(await must(student,'account_get_v1')).id]);
-  const k=key(),b={person_id:p,expected_version:1,patch:{display_name:'Updated student',contacts:[{kind:'email',value:'Student one@ftksaas.invalid'},{kind:'phone',value:'+905551234567'}]}};
+  const k=key(),b={person_id:editable,expected_version:1,patch:{display_name:'Updated student',contacts:[{kind:'email',value:'Editable org person@ftksaas.invalid'},{kind:'phone',value:'+905551234567'}]}};
   const a=await mutate('person_update_v1',b,k);assert.equal(a.version,2);assert.equal((await mutate('person_update_v1',b,k)).replayed,true);
   await fail('person_update_v1',b,'VERSION_CONFLICT');await fail('person_update_v1',{...b,patch:{display_name:'changed'}},'IDEMPOTENCY_PAYLOAD_MISMATCH',owner,k);
-  const v=await get(student,p);assert.equal(v.display_name,'Updated student');assert(v.contacts.find(x=>x.kind==='email').verified_at);assert.equal(v.contacts.find(x=>x.kind==='phone').verified_at,null);
+  const v=await get(owner,editable);assert.equal(v.display_name,'Updated student');assert(v.contacts.find(x=>x.kind==='email').verified_at);assert.equal(v.contacts.find(x=>x.kind==='phone').verified_at,null);
   assert.deepEqual(await rows('select auth_user_id from core.accounts where id=$1',[(await must(student,'account_get_v1')).id]),beforeIdentity);
  });
  await t.test('same expected person version admits one concurrent update',async()=>{
-  const results=await Promise.all(['one','two'].map(display_name=>call(owner,'person_update_v1',scope({person_id:p,expected_version:2,patch:{display_name}}),key())));
-  assert.equal(results.filter(x=>x.result.ok).length,1,JSON.stringify(results));assert.equal(results.find(x=>!x.result.ok).result.error.code,'VERSION_CONFLICT');assert.equal((await get(owner,p)).version,3);
+  const results=await Promise.all(['one','two'].map(display_name=>call(owner,'person_update_v1',scope({person_id:editable,expected_version:2,patch:{display_name}}),key())));
+  assert.equal(results.filter(x=>x.result.ok).length,1,JSON.stringify(results));assert.equal(results.find(x=>!x.result.ok).result.error.code,'VERSION_CONFLICT');assert.equal((await get(owner,editable)).version,3);
  });
  await t.test('late audit failure restores removed contacts and version; exact key can retry',async()=>{
-  const before=await get(owner,p),k=key(),b={person_id:p,expected_version:3,patch:{display_name:'Final',contacts:[]}};
+  const before=await get(owner,editable),k=key(),b={person_id:editable,expected_version:3,patch:{display_name:'Final',contacts:[]}};
   trigger='people_'+key().replaceAll('-','');await db.query('create function private.'+trigger+"() returns trigger language plpgsql set search_path='' as $$begin raise exception using errcode='P0001',message='INTEGRITY_VIOLATION';end$$");
   await db.query('create trigger '+trigger+" before insert on core.audit_events for each row when (new.org_id='"+org+"'::uuid and new.action='person_update_v1') execute function private."+trigger+'()');
-  await fail('person_update_v1',b,'INTEGRITY_VIOLATION',owner,k);assert.deepEqual(await get(owner,p),before);
+  await fail('person_update_v1',b,'INTEGRITY_VIOLATION',owner,k);assert.deepEqual(await get(owner,editable),before);
   assert.equal((await rows('select count(*)::int n from core.operation_receipts where org_id=$1 and key_hash=$2',[org,createHash('sha256').update(k).digest('hex')]))[0].n,0);
   await db.query('drop trigger '+trigger+' on core.audit_events');await db.query('drop function private.'+trigger+'()');trigger=null;
-  assert.equal((await mutate('person_update_v1',b,k)).version,4);assert.deepEqual((await get(owner,p)).contacts,[]);
+  assert.equal((await mutate('person_update_v1',b,k)).version,4);assert.deepEqual((await get(owner,editable)).contacts,[]);
  });
+ assert.deepEqual(await get(student,p),canonicalBefore);
+
  }finally{if(trigger){await db.query('drop trigger if exists '+trigger+' on core.audit_events');await db.query('drop function if exists private.'+trigger+'()');}await db.end();}
 });
 
