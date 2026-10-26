@@ -1,12 +1,41 @@
-## 26 Ekim son karar — native Auth davranışı ve bakım sınırı
+## 26 Ekim — satır 1 runtime ve hosted kabulü tamamlandı
 
-Supabase Auth + yerleşik Turnstile ana yoldur. Parola sıfırlanınca mevcut kurtarma oturumu kalır, diğer native oturumlar kapanır; sırf yeniden giriş istemek için sağlayıcının iç SQL/sorgu sırasına bağlı bakım alınmaz. Belirgin güvenlik riski veya bağlayıcı ürün gereksinimi olmayan durumlarda aynı işi tekrar eden auth function/gateway eklenmez. Canlı oturum, MFA, tenant/rol/yetki denetimleri ve mevcut full/main clean kapsamı korunur.
+Kimlik, doğrulanmış iletişim ve hesap güvenliği tesliminin backend/hosted kabulü tamamlandı. Runtime kaynak main `7464383802deb8322e14a5ebec7d5e2ef650e436`: bağımsız review5656369798, PR54 aday [40370157098](https://github.com/SXQHex/FtkSaaS/actions/runs/40370157098), aynı main [40374760224](https://github.com/SXQHex/FtkSaaS/actions/runs/40374760224) ve gerçek development CD [40378100016](https://github.com/SXQHex/FtkSaaS/actions/runs/40378100016) başarılı. CD receipt20/20; canlı213 API/65 migration/Edge20 ACTIVE/verify_jwt=true. İlgili14 SQL fonksiyon gövdesi kaynakla aynı; aktif ad/iletişim projeksiyon farkı0. [Native kurtarma, sağlayıcı ve temizlik kanıtı](remote-backend-setup.md#teslim1-native-kurtarma-kabul-20261026). Bu kapanış belgesinin kendi kaynak bağlı belge CI/merge kabulü runtime kabulünden ayrıdır; belge değişikliği yeni full-clean veya deploy icrası sayılmaz.
 
-Yayımlanmamış özel all-session-reset66 migration/trigger/marker ve yalnız bu davranışa ait yeni test/enum taslağı iptal edildi. Hosted migration66/table bulunmadığı SQL ile doğrulandı; yayımlanmış65 migration ve mevcut native test assertionları değiştirilmedi. Önceki8/8 native kanıt bu iptal edilmiş taslağın tarihsel kanıtıdır; yeni ürün davranışının kabulü değildir. Runtime213 API/65 migration'dır. Yayınlanmış API'ler bu kararla sessizce silinmez; mevcut istemciler için compatibility korunur, yeni Auth tüketicisi native SDK/endpoint kullanır.
+Son kullanıcı kapsamı: native Supabase Auth ana yoldur; Turnstile yalnız hesapsız public başvuru/giriş yollarındadır. Native Auth CAPTCHA etkinleştirmesi ve geçici özel kurtarma gateway testi satır1 kapanış şartı değildir. Canlı Auth CAPTCHA kapalı; Email/Google/manual linking/confirmed email/TOTP açık, phone login kapalı. Son kararla özel66 reset SQL/marker/trigger iptal edildi; kurtarma oturumu korunur, diğer native oturumlar kapanır. Yeni Auth tüketicisi native SDK/endpoint kullanır; yayınlanmış eski API uyumluluğu korunur. Belirgin güvenlik veya fonksiyon zafiyeti yoksa sağlayıcı davranışını tekrar eden bakım katmanı eklenmez.
 
-Birinci satır açık kalır: native CAPTCHA/gerçek kurtarma sağlayıcı kabulü ve son kaynak/adayı/main/CD kanıtı tamamlanacaktır. Geçici özel kurtarma gateway'inin başarılı kabulü artık kapanış şartı değildir; bu yol için kullanıcıdan yeniden test istenmez. Önceki10/3 özel sayaçların native karşılığı uygulanmış sayılmaz; native rate-limit envanteriyle açık eşleme yapılır ve yalnız sayısal benzerlik için ek gateway kurulmaz. Aynı oturum URL'sinin gateway'de değişmesinden doğan mevcut public-ingress imza hatası ayrı bir uyumluluk düzeltmesidir; HMAC/route/bot/rate korumaları gevşetilmez.
+Gerçek sentetik hosted kabul18/18 geçti: native signup ve e-posta proof/replay, iki kullanıcı oturumu ile Auth→Edge→RPC, native recover ve gerçek recovery proof/replay, yeni parola, kurtarma oturumunun korunması, iki eski oturumun Edge+refresh reddi, eski parolanın reddi, yeni parolayla Auth→Edge→RPC. testin exact-ID hesabı/profili/native oturumları temizlendi ve yokluk geri okuması yapıldı. Gerçek kullanıcı parolası veya kurum verisi değiştirilmedi. Parola/token/proof/kişisel adresler kaynaklara kaydedilmez.
 
-Aşağıdaki66/özel gateway kabul notları önceki checkpointlerdir; bu son karar çelişen hükümlerinin yerine geçer.
+Native hız limitleri sağlayıcı ayarlarıdır; IP başına giriş/kayıt30/5dk, token doğrulama30/5dk, refresh150/5dk, aynı kullanıcıya SMTP e-postası minimum60sn. Eski900sn/IP10/adres3 sayacı yalnız uyumluluk kurtarma endpoint'ine aittir; native Auth'a uygulanmış sayılmaz. Secure email change açık; native secure password change ve current-password zorunluluğu kapalıdır. Özel account_password_change_v1 challenge'ı native endpoint için zorunlu ön kapı değildir. Bu mevcut sağlayıcı davranışı ek function ile değiştirilmiyor.
+
+Gerçek SMS sağlayıcısı, public başvuru alanının Turnstile/siteverify kabulü, frontend ekranları ve genel production/yük/afet dönüşü ayrı kapsamdır; tamamlandı gösterilmez. Önceki13 Google/hosted TOTP/iletişim/native yarış-rollback kabulü kaynak/main kanıtlarıyla korunur. Aşağıdaki eski taslak, bekliyor ve CAPTCHA-kurtarma şartları tarihsel checkpointlerdir; satır1'i yeniden açmaz. Tarihsel reports dosyaları değiştirilmez.
+
+
+## Teslim1 native kurtarma kabul 20261026
+
+26 Ekim2026 yaklaşık22:02–22:06 Europe/Istanbul; hedef geliştirme/test proje gwyprhenabtpkbojephw, runtime source7464383802deb8322e14a5ebec7d5e2ef650e436. Gerçek kişinin hesabı/parolası kullanılmadı; ayrı sentetik native signup ve mevcut kontrollü kabul posta kutusu kullanıldı. Provider proof SQL'den üretilmedi/confirmed flag/hash/session yazılmadı; native signup→SMTP→verify→password grant→recover→SMTP→verify→PUT user akışı kullanıldı. Test parolaları/token/proof/adresler yalnız geçici yerel test durumundaydı ve yayımlanmadı.
+
+| Kontrol | Sonuç |
+|---|---|
+| Native signup onay öncesi oturum vermemesi, gerçek signup verify ve proof replay reddi | Geçti |
+| İki ayrı native parola oturumuyla Auth→Edge→RPC account_get | Geçti |
+| Doğrudan native recover; custom gateway/Turnstile olmadan gerçek mail proof ve replay reddi | Geçti |
+| Native yeni parola kaydı ve current recovery session ile Edge erişimi | Geçti |
+| Önceki iki oturumun hem Edge hem refresh reddi | Geçti |
+| Eski parolanın reddi; yeni parolayla aynı kullanıcıda native giriş ve Edge erişimi | Geçti |
+| Toplam native assertion |18/18 başarılı |
+| E-posta kanıtı | Signup ve recovery proof native verify tarafından kabul edildi; bu kapanış kontrolünde ayrıca Resend delivered sorgusu yapılmadı |
+| Exact fixture cleanup | core account/profile ve native user/session/refresh yokluğu geri okundu |
+
+
+CD40378100016 receipt:20/20 kontrol başarılı;65 migration contents match/pending0,90core/missingRLS0/clientRPC0. edge_version20, edge_bundle_sha256 ded819b514620a44710002eb35ab9d490f0d34ab0d58aebe69fbcf37c335fdb4; canlı listeyle aynı. Canlı14 kimlik/session/MFA/recovery fonksiyon gövdesi main ile birebir; aktif ad/projeksiyon iletişim drift0. Uygulanmamış66 reset marker/fonksiyon yok. Bu salt-okuma kaynak denetimi runtime testi yerine sunulmaz; native hosted18/18 ayrıca yukarıdadır.
+
+Dashboard readback: Auth CAPTCHA disabled; Email/Google/manual linking/Confirm email/TOTP enabled; phone login disabled; secure email change enabled; secure password change/current-password requirement disabled; SMTP enabled/smtp.resend.com465; yedi security notification enabled; AAL1 MFA oturum sınırı enabled. Native limit readback giriş/kayıt30/5dk,verification30/5dk,refresh150/5dk/IP; kullanıcı e-posta aralığı60sn. Projeye ait saatlik e-posta limiti bu kayıtta okunmuş gibi ilan edilmez. Native Auth CAPTCHA'sı açılmadı; kullanıcıya ek özel gateway/Turnstile denemesi yaptırılmadı.
+
+Cloudflare readback: bir managed widget, yalnız geçici kabul hostu+localhost+127.0.0.1, no_clearance. Bu kayıt gerçek public başvuru hostname/ürün/siteverify kabulü değildir; P04/public kapsamına aittir. Eski900sn/IP10/adres3 private recovery config mevcut, rate row0; native Auth limitleriyle karıştırılmaz. Eski custom API korunur; bu kapanış onun hosted başarısı iddiası değildir.
+
+Önceki gerçek Google bağlama13 kontrol ve Resend identity-linked; hosted TOTP enroll/wrong-code/verify/AAL1-red/strong-remove/retry ve secret'siz history kanıtları reports/account-identity-progress-20261026.md içinde kaynaklıdır. Native email expired/replaced/resend/double-confirm/collision, unlink/last-usable-login, unverified-phone ve projection/race/rollback testleri değişmeyen runtime main full clean kapsamındadır. Tarihsel raporlar yeniden yazılmaz.
+
 
 ## 26 Ekim — PR52 main kabulü ve CD cleanup düzeltmesi
 
