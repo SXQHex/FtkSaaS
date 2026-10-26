@@ -1,3 +1,7 @@
+## 27 Ekim — PR56 aday kabul düzeltmesi
+
+İlk full clean40415840619 API4'te tek rol okuma senaryosu ve parent nedeniyle başarısız; core/API1/API2/API3 başarılı. Genel rol listesinin Starter F05 kapısı korunarak eski scope fixture'ı Pro'ya taşındı ve owner/CM Starter retleri eklendi. Runtime/66 migration değişmedi. Son oda/rol native12/12,149 yapısal kontrol ve bağımsız inceleme geçti; yeni aday/main/CD kabulü tamamlanmadan Starter teslimi kapanmaz. [Kaynak ve kabul](../reports/starter-plan-gates-role-read-ci-fix-20261027.md).
+
 ## 26 Ekim — aktif Starter plan kapıları teslimi
 
 Birinci satır PR55/main3fa72e7 belge kabulüyle kapandı. Aktif iş Starter limit/özellik kapıları ve sürümlü plan düşürme kapsamıdır. Başlangıç main `3fa72e7b805b2bbfb8895f3d90813eaa3cb416aa`; yeni kaynak213 API/66 migration adayıdır. Seçilmeyen kaynakların operasyonu kapanır, geçmiş/rezervasyon/para-hak verisi korunur. [Kaynak, DTO ve kabul sınırı](starter-plan-gates-handover.md). Yeni kaynak final native/bağımsız inceleme/aday/main/CD kabulü henüz tamamlanmadı; production dağıtımı yok. Pro/Business ayrı sayısal limit ve özel teklif işleri bu dar teslimle kapatılmaz. Aşağıdaki eski bekleme/yerel kayıtlar kendi kaynaklarının checkpointleridir.

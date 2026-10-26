@@ -111,11 +111,16 @@ test('Room configuration and scoped role reads through real Auth/API',async t=>{
   finally {await db.query("update core.centers set state='active' where id=$1",[center]);}
   assert((await list(manager.u)).items.every(x=>x.scope_center_id===center));
   const otherManager=await linked('rooms-other-manager','center_manager',other);
-  await db.query("update core.saas_plan_versions set name='starter' where id=$1",[plan]);
+  // Pro retains F05 but is single-center: test scope isolation independently of the feature gate.
+  await db.query("update core.saas_plan_versions set name='pro' where id=$1",[plan]);
   try {
    await fail('roles_list_v1',{center_id:null,page:{}},'FORBIDDEN',otherManager.u);
    assert((await list(owner)).items.some(x=>x.id===otherManager.grant.primary_id));
    assert((await list(manager.u)).items.every(x=>x.scope_center_id===center));
+   // Starter closes the general F05 role list even for an otherwise authorized owner/manager.
+   await db.query("update core.saas_plan_versions set name='starter' where id=$1",[plan]);
+   for(const actor of [owner,manager.u,otherManager.u])
+    await fail('roles_list_v1',{center_id:null,page:{}},'PLAN_FEATURE_UNAVAILABLE',actor);
   }finally {await db.query("update core.saas_plan_versions set name='business' where id=$1",[plan]);}
  });
  await t.test('reads create no domain mutations and revoked manager cannot reuse cursor',async()=>{
