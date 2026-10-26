@@ -234,7 +234,7 @@ export async function hostedSmoke(api,sql,record){
    // Attempt both cleanup operations even if one fails. Never delete by domain.
    const results=[];
    for(const cleanup of [
-    ()=>sql('delete from core.accounts where auth_user_id='+literal(authId)),
+    ()=>sql('do $ftk_smoke_cleanup$ begin delete from private.p07_profiles where account_id in (select id from core.accounts where auth_user_id='+literal(authId)+'); delete from core.accounts where auth_user_id='+literal(authId)+'; end $ftk_smoke_cleanup$;'),
     ()=>http('/auth/v1/admin/users/'+authId,{admin:true,method:'DELETE'})
    ]){try{results.push({status:'fulfilled',value:await cleanup()});}catch{results.push({status:'rejected'});}}
    const [left]=await sql('select (select count(*)::int from core.accounts where auth_user_id='+literal(authId)+') as accounts, (select count(*)::int from auth.users where id='+literal(authId)+') as users');
