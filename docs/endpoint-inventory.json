@@ -1457,9 +1457,7 @@
       "required_features": [
         "F13"
       ],
-      "runtime_required_features": [
-        "F13"
-      ],
+      "runtime_required_features": [],
       "decision_delivery": {
         "accepted_contract": "DS-2026-10-17",
         "runtime_conformance": "pending",
@@ -3986,7 +3984,6 @@
         "F25"
       ],
       "runtime_required_features": [
-        "F21",
         "F25"
       ],
       "decision_delivery": {

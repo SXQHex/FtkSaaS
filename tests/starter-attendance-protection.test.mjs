@@ -31,6 +31,14 @@ test('Starter attendance and protected reservation through Auth -> Edge -> RPC',
  }
  const student=await linked('starter-student'),instructor=await linked('starter-instructor','instructor');
  await mut('availability_save_v1',{resource:{kind:'person',id:instructor.p},rule:{weekdays:[1,2,3,4,5,6,7],local_start:'00:00:00',local_end:'23:59:59',valid_from:'2020-01-01'}});
+ const room=(await mut('room_save_v1',{name:'Starter single room',capacity:50})).primary_id;
+ await mut('availability_save_v1',{resource:{kind:'room',id:room},rule:{weekdays:[1,2,3,4,5,6,7],local_start:'00:00:00',local_end:'23:59:59',valid_from:'2020-01-01'}});
+ let sessionIndex=0,pastSessionIndex=0;
+ const syncFixtureBookings=async sid=>{
+  // Keep every open reservation's resource evidence intact; each elapsed fixture gets its own day.
+  await db.query("update core.resource_bookings b set starts_at=s.starts_at,ends_at=s.ends_at from core.sessions s where b.org_id=$1 and s.org_id=b.org_id and s.id=b.session_id and s.id=$2 and b.state='active'",[org,sid]);
+ };
+ const fixturePastSession=async sid=>{const start=new Date();start.setUTCHours(9,0,0,0);if(+start>=Date.now())start.setUTCDate(start.getUTCDate()-1);start.setUTCDate(start.getUTCDate()-pastSessionIndex++);await db.query('update core.sessions set starts_at=$1,ends_at=$2 where id=$3',[start,new Date(+start+3600000),sid]);await syncFixtureBookings(sid);};
  const effective_at=new Date(Date.now()-10000).toISOString();
  const publish=(k,value)=>mut('policy_publish_v1',{center_id:null,key:k,value,effective_at:new Date().toISOString(),mandatory:false});
  await publish('participation_block_credit',{kind:'blocked_credit',effect:'release'});
@@ -38,7 +46,7 @@ test('Starter attendance and protected reservation through Auth -> Edge -> RPC',
  await publish('student_cancel_group',{kind:'cancellation',terms:{cutoff_minutes:0,before_cutoff:'release',after_cutoff:'release',no_show:'release'}});
  await publish('reservation_window',{kind:'window',opens_minutes_before:10080,closes_minutes_before:0,manager_exception:false});
  await publish('negative_valuation',{kind:'valuation',discipline_id:discipline,format:'group',amount_minor:'100',currency:'TRY'});
- const makeSession=async(extra={})=>{const start=new Date(Date.now()+86400000);start.setUTCHours(9,0,0,0);return mut('session_create_v1',{discipline_id:discipline,format:'group',interval:{starts_at:start.toISOString(),ends_at:new Date(+start+3600000).toISOString()},resources:[],assignments:[],capacity:{total:8},...extra});};
+ const makeSession=async(extra={})=>{const start=new Date(Date.now()+86400000);const n=sessionIndex++;start.setUTCDate(start.getUTCDate()+Math.floor(n/6));start.setUTCHours(6+(n%6)*2,0,0,0);return mut('session_create_v1',{discipline_id:discipline,format:'group',interval:{starts_at:start.toISOString(),ends_at:new Date(+start+3600000).toISOString()},resources:[{kind:'room',id:room}],assignments:[{person_id:instructor.p,duty:'instructor'}],capacity:{total:8},...extra});};
  const book=(sid,p=student.p,k=key())=>mut('reservation_create_v1',{session_id:sid,person_id:p,mode:'flexible'},k);
  const get=sid=>must(owner,'attendance_get_v1',scope({session_id:sid}));
  const token=p=>({id:p.id,token:p.token});
@@ -46,16 +54,17 @@ test('Starter attendance and protected reservation through Auth -> Edge -> RPC',
  let sid,rid,impact;
  await t.test('Starter creates class/program with instructor and no pay agreement',async()=>{
   const cls=(await mut('class_save_v1',{name:'Starter class',discipline_id:discipline,external_open:false})).primary_id;
-  const p=await must(owner,'program_preview_v1',scope({class_id:cls,schedule:{weekdays:[1],local_start:'12:00:00',duration_minutes:60,starts_on:'2027-01-04',ends_on:'2027-01-12',assignments:[{person_id:instructor.p,duty:'instructor'}],capacity:{total:8}}}));
+  const p=await must(owner,'program_preview_v1',scope({class_id:cls,schedule:{room_id:room,weekdays:[1],local_start:'12:00:00',duration_minutes:60,starts_on:'2027-01-04',ends_on:'2027-01-12',assignments:[{person_id:instructor.p,duty:'instructor'}],capacity:{total:8}}}));
   assert.deepEqual(p.blockers,[]);assert(!p.sessions[0].assignments[0].agreement_id);
   await mut('program_apply_v1',{preview:token(p)});
   sid=(await makeSession()).primary_id;rid=(await book(sid)).primary_id;
   assert.equal((await rows('select count(*)::int n from core.instructor_agreements where org_id=$1',[org]))[0].n,0);
  });
  await t.test('Starter keeps paid and self-service plan boundaries conditional',async()=>{
-  await fail('class_save_v1',{name:'Not open',discipline_id:discipline,external_open:true},'PLAN_FEATURE_UNAVAILABLE');
+  await mut('class_save_v1',{name:'Starter self-service class',discipline_id:discipline,external_open:true});
   await fail('role_assign_v1',{person_id:instructor.p,role:'staff',scope:{center_id:center}},'PLAN_FEATURE_UNAVAILABLE');
-  await fail('reservation_create_v1',{session_id:(await makeSession()).primary_id,person_id:student.p,mode:'flexible'},'PLAN_FEATURE_UNAVAILABLE',student.u);
+  const self=await mut('reservation_create_v1',{session_id:(await makeSession()).primary_id,person_id:student.p,mode:'flexible'},key(),student.u);
+  await mut('reservation_cancel_v1',{reservation_id:self.primary_id,expected_version:self.version,reason:'End self-service acceptance fixture'},key(),student.u);
   await fail('session_create_v1',{discipline_id:discipline,format:'group',interval:{starts_at:new Date(Date.now()+60000).toISOString(),ends_at:new Date(Date.now()+3660000).toISOString()},resources:[],assignments:[{person_id:instructor.p,duty:'instructor',agreement_id:key()}],capacity:{total:8}},'PLAN_FEATURE_UNAVAILABLE');
   const terms={name:'Plan boundary',kind:'credits',booking_mode:'flexible',credits:2,price_minor:'1000',currency:'TRY',freeze:{enabled:false,extends_validity:false},refund:{method:'none'},scopes:[{scope_kind:'organization_all',center_id:null,discipline_id:null,usage_targets:['lesson']}]};
   await fail('product_publish_v1',{terms:{...terms,freeze:{enabled:true,extends_validity:false}}},'PLAN_FEATURE_UNAVAILABLE');
@@ -86,7 +95,7 @@ test('Starter attendance and protected reservation through Auth -> Edge -> RPC',
  });
  await t.test('draft does not consume; closure and reasoned correction consume/release atomically',async()=>{
   // Fixture supplies a planned lesson whose actual start has passed. No historical balance is synthesized.
-  await db.query("update core.sessions set starts_at=now()-interval '1 minute',ends_at=now()+interval '59 minutes' where id=$1",[sid]);
+  await fixturePastSession(sid);
   let v=await get(sid);
   await mut('attendance_mark_v1',{reservation_id:rid,expected_version:v.entries[0].version,result:'attended'});
   assert.equal((await rows('select state from core.credit_deficits where reservation_id=$1',[rid]))[0].state,'reserved');
@@ -122,8 +131,7 @@ test('Starter attendance and protected reservation through Auth -> Edge -> RPC',
   const assigned=(await makeSession({assignments:[{person_id:instructor.p,duty:'instructor'}]})).primary_id;
   const own=(await book(assigned,(await linked('assigned-student')).p)).primary_id;
   // Keep the full elapsed lesson inside configured Istanbul availability at any runner time.
-  const elapsed=new Date();elapsed.setUTCHours(9,0,0,0);if(+elapsed>=Date.now())elapsed.setUTCDate(elapsed.getUTCDate()-1);
-  await db.query('update core.sessions set starts_at=$1,ends_at=$2 where id=$3',[elapsed,new Date(+elapsed+3600000),assigned]);
+  await fixturePastSession(assigned);
   let v=await get(assigned);await mut('attendance_mark_v1',{reservation_id:own,expected_version:v.entries[0].version,result:'attended'},key(),instructor.u);
   v=await must(instructor.u,'attendance_get_v1',scope({session_id:assigned}));assert.equal(v.entries[0].eligibility_snapshot,null);
   await publish('debt_participation',{kind:'boolean',value:true});
@@ -147,6 +155,7 @@ test('Starter attendance and protected reservation through Auth -> Edge -> RPC',
   await mut('role_revoke_v1',{assignment_id:instructor.grant.primary_id,expected_version:instructor.grant.version,reason:'Live role revoke'});
   await fail('attendance_get_v1',{session_id:assigned},'FORBIDDEN',instructor.u);
   await fail('attendance_close_v1',{session_id:assigned,expected_version:v.session_version},'FORBIDDEN',instructor.u);
+  instructor.grant=await mut('role_assign_v1',{person_id:instructor.p,role:'instructor',scope:{center_id:center}});
  });
  await t.test('live center authority revocation rejects an old-session receipt replay',async()=>{
   const p=await preview({kind:'negative_limit',person_id:student.p,discipline_id:discipline,allowed_negative_credits:3}),k=key();
@@ -157,11 +166,11 @@ test('Starter attendance and protected reservation through Auth -> Edge -> RPC',
  });
  await t.test('package-backed closure and correction use the same entitlement ledger',async()=>{
   const p=await linked('package-student');
-  const product=(await mut('product_publish_v1',{terms:{name:'Starter rights',kind:'credits',booking_mode:'flexible',credits:2,price_minor:'1000',currency:'TRY',freeze:{enabled:false,extends_validity:false},refund:{method:'none'},scopes:[{scope_kind:'organization_all',center_id:null,discipline_id:null,usage_targets:['lesson']}]}})).primary_id;
+  const product=(await mut('product_publish_v1',{terms:{name:'Starter lesson · rights',kind:'credits',booking_mode:'flexible',credits:2,price_minor:'1000',currency:'TRY',freeze:{enabled:false,extends_validity:false},refund:{method:'none'},scopes:[{scope_kind:'center_discipline',center_id:center,discipline_id:discipline,usage_targets:['lesson']}]}})).primary_id;
   const pv=await must(owner,'sale_preview_v1',scope({person_id:p.p,product_version_id:product,start_date:'2026-01-01',end_date:'2027-01-01'}));
   const sale=(await mut('sale_apply_v1',{preview:token(pv)})).primary_id;
   const ses=(await makeSession()).primary_id,rv=(await mut('reservation_create_v1',{session_id:ses,person_id:p.p,source_sale_id:sale,mode:'flexible'})).primary_id;
-  await db.query("update core.sessions set starts_at=now()-interval '1 minute',ends_at=now()+interval '59 minutes' where id=$1",[ses]);
+  await fixturePastSession(ses);
   let v=await get(ses);await mut('attendance_mark_v1',{reservation_id:rv,expected_version:v.entries[0].version,result:'attended'});
   assert.equal((await rows('select state from core.entitlement_allocations where reservation_id=$1',[rv]))[0].state,'reserved');
   v=await get(ses);await mut('attendance_close_v1',{session_id:ses,expected_version:v.session_version});
@@ -172,7 +181,7 @@ test('Starter attendance and protected reservation through Auth -> Edge -> RPC',
  });
  await t.test('late closure failure rolls back rights, reservation, session, history and receipt',async()=>{
   const p=await linked('rollback-student'),p2=await linked('rollback-student-two'),ses=(await makeSession()).primary_id,rv=(await book(ses,p.p)).primary_id;await book(ses,p2.p);
-  await db.query("update core.sessions set starts_at=now()-interval '1 minute',ends_at=now()+interval '59 minutes' where id=$1",[ses]);
+  await fixturePastSession(ses);
   let v=await get(ses);for(const entry of v.entries)await mut('attendance_mark_v1',{reservation_id:entry.reservation_id,expected_version:entry.version,result:'attended'});v=await get(ses);
   await db.query('update core.attendance_entries set consumes_on_close=null,policy_snapshot=null where reservation_id=$1',[rv]);
   const snapshot=async()=>{const out={};for(const table of ['reservations','sessions','credit_deficits','attendance_entries','attendance_closures','operation_receipts','audit_events','outbox_jobs'])out[table]=await rows('select to_jsonb(q) v from core.'+table+' q where org_id=$1 order by id',[org]);out.history=await rows('select to_jsonb(q) v from private.lesson_deficit_movements q where org_id=$1 order by id',[org]);return out;};
@@ -186,7 +195,7 @@ test('Starter attendance and protected reservation through Auth -> Edge -> RPC',
  });
  await t.test('Pro/Business closure requires explicit occurrence before any rights or financial write',async()=>{
   const p=await linked('paid-boundary-student'),ses=(await makeSession()).primary_id,rv=(await book(ses,p.p)).primary_id;
-  await db.query("update core.sessions set starts_at=now()-interval '1 minute',ends_at=now()+interval '59 minutes' where id=$1",[ses]);
+  await fixturePastSession(ses);
   let v=await get(ses);await mut('attendance_mark_v1',{reservation_id:rv,expected_version:v.entries[0].version,result:'attended'});v=await get(ses);
   const sub=(await rows('select id from core.saas_subscriptions where org_id=$1',[org]))[0].id,paid=key();
   await db.query("insert into core.saas_plan_versions(id,name,effective_at,price_minor,currency,period,limits,features) select $1,'pro',now(),price_minor,currency,period,limits,features||array['F20'] from core.saas_plan_versions where id=$2",[paid,plan]);
@@ -203,7 +212,7 @@ test('Starter attendance and protected reservation through Auth -> Edge -> RPC',
   assert(pv.affected.some(x=>x.reservation_id===rv));
   const b={center_id:null,key:change.key,value:change.value,effective_at:change.effective_at,mandatory:false,impact_approval:token(pv.preview),accepted_reservation_ids:pv.affected.map(x=>x.reservation_id)};
   await mut('policy_publish_v1',b);
-  await db.query("update core.sessions set starts_at=now()-interval '1 minute',ends_at=now()+interval '59 minutes' where id=$1",[ses]);
+  await fixturePastSession(ses);
   const v=await get(ses);assert(v.entries[0].protected);await mut('attendance_mark_v1',{reservation_id:rv,expected_version:v.entries[0].version,result:'attended'});
   // No-op publication cannot create a new exemption for an independently blocked reservation.
   const noop=await must(owner,'reservation_impact_preview_v1',scope({center_id:null,change:{...change,effective_at:new Date().toISOString()},reason:'No change'}));
@@ -224,7 +233,7 @@ test('Starter attendance and protected reservation through Auth -> Edge -> RPC',
   let v=await get(ses);await fail('attendance_mark_v1',{reservation_id:rv,expected_version:v.entries[0].version,result:'attended'},'FORBIDDEN');
   await mut('attendance_block_v1',{reservation_id:rv,expected_version:v.entries[0].version,reason:'debt_policy'});
   assert.equal((await rows('select state from core.credit_deficits where reservation_id=$1',[rv]))[0].state,'reserved');
-  await db.query("update core.sessions set starts_at=now()-interval '1 minute',ends_at=now()+interval '59 minutes' where id=$1",[ses]);
+  await fixturePastSession(ses);
   v=await get(ses);await mut('attendance_close_v1',{session_id:ses,expected_version:v.session_version});
   assert.equal((await rows('select state from core.credit_deficits where reservation_id=$1',[rv]))[0].state,'released');
  });
@@ -284,14 +293,14 @@ test('Starter attendance and protected reservation through Auth -> Edge -> RPC',
   await publish('negative_upper',{kind:'integer',value:10});
   await publish('participation_block_credit',{kind:'blocked_credit',effect:'release'});
   const p=await linked('sale-blocked-policy');
-  const product=(await mut('product_publish_v1',{terms:{name:'Blocked snapshot credits',kind:'credits',booking_mode:'flexible',credits:2,price_minor:'1000',currency:'TRY',freeze:{enabled:false,extends_validity:false},refund:{method:'none'},scopes:[{scope_kind:'organization_all',center_id:null,discipline_id:null,usage_targets:['lesson']}]}})).primary_id;
+  const product=(await mut('product_publish_v1',{terms:{name:'Starter lesson · blocked credits',kind:'credits',booking_mode:'flexible',credits:2,price_minor:'1000',currency:'TRY',freeze:{enabled:false,extends_validity:false},refund:{method:'none'},scopes:[{scope_kind:'center_discipline',center_id:center,discipline_id:discipline,usage_targets:['lesson']}]}})).primary_id;
   const pv=await must(owner,'sale_preview_v1',scope({person_id:p.p,product_version_id:product,start_date:'2026-01-01',end_date:'2027-01-01'}));
   const sale=(await mut('sale_apply_v1',{preview:token(pv)})).primary_id;
   assert.deepEqual((await rows('select participation_block_policy_snapshot v from core.sales where id=$1',[sale]))[0].v,{kind:'blocked_credit',effect:'release'});
   const ses=(await makeSession()).primary_id,rv=(await mut('reservation_create_v1',{session_id:ses,person_id:p.p,source_sale_id:sale,mode:'flexible'})).primary_id;
   await publish('participation_block_credit',{kind:'blocked_credit',effect:'consume'});
   let v=await get(ses);await mut('attendance_block_v1',{reservation_id:rv,expected_version:v.entries[0].version,reason:'debt_policy'});
-  await db.query("update core.sessions set starts_at=now()-interval '1 minute',ends_at=now()+interval '59 minutes' where id=$1",[ses]);
+  await fixturePastSession(ses);
   v=await get(ses);await mut('attendance_close_v1',{session_id:ses,expected_version:v.session_version});
   assert.equal((await rows('select state from core.entitlement_allocations where reservation_id=$1',[rv]))[0].state,'released');
  });

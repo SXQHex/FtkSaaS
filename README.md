@@ -1,3 +1,5 @@
+> Aktif backend adayı: [Starter plan kapıları ve sürümlü kapsam seçimi](docs/starter-plan-gates-handover.md).213 API/66 migration; main/hosted kabulü henüz tamamlanmadı.
+
 # FtkSaaS backend
 
 ## 25 Ekim — PR45 kapasite ve main ayarları uzlaştırması

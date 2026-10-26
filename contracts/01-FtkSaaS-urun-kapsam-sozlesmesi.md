@@ -1,3 +1,7 @@
+## 26 Ekim — Starter operasyon kapsamı son kararı
+
+Plan düşürmede owner devam edecek merkez/oda/disiplin/eğitmen ve öğrenci kapsamını açıkça seçer. Seçilmeyen kaynaklar operasyon bakımından kapanır; geçmiş/rezervasyon/hak/finans kayıtları korunur ve üst plana dönüşte erişilir. Yeni kayıtla birlikte eski kesin rezervasyonun yoklama/hak tüketimi de bu kapalı kapsamda yürütülmez. Kapsam seçimi sürümlüdür; yeni plan dönem sonunda uygulanır. Geçişte eski satır state’leri tarihsel olarak korunur; operasyonel aktif sayım aktif ilişkiyle yürürlükteki seçilmiş kapsamın kesişimidir. [Uygulama ve kabul sınırı](../docs/starter-plan-gates-handover.md).
+
 # FtkSaaS — Ürün kapsam sözleşmesi
 
 ## 26 Ekim 2026 — kabul edilmiş SaaS plan sınırları (yalnız ürün kararı)
@@ -131,7 +135,7 @@ Bu modüller ayrı servis veya ayrı uygulama zorunluluğu değildir. Yeni backe
 
 | ID | Özellik | Sahip | Starter | Pro | Business | Kapsam durumu |
 |---|---|---|---|---|---|---|
-| F01 | İşletme, merkez, oda ve kaynak tanımı | M01 | Tek merkez | Tek merkez | Çoklu merkez | Kabul edildi |
+| F01 | İşletme, merkez, oda ve kaynak tanımı | M01 | 1 aktif merkez/oda/disiplin/eğitmen; 100 aktif öğrenci | Tek merkez | Çoklu merkez | Kabul edildi |
 | F02 | Çalışma saatleri, izin ve uygunluk | M01/M04 | Temel | Tam | Tam | Kabul edildi |
 | F03 | İşletme kuralları ve merkez istisnaları | M01 | İşletme ayarları | İşletme ayarları | Zorunlu/tavsiye merkez hiyerarşisi | Kabul edildi |
 | F04 | Hesap eşleştirme, çoklu rol, kapsamlı yetkilendirme | M02/M03 | Var | Var | Merkez kapsamlarıyla | Kabul edildi |
@@ -141,12 +145,12 @@ Bu modüller ayrı servis veya ayrı uygulama zorunluluğu değildir. Yeni backe
 | F08 | Birleşik takvim ve kaynak çakışma kontrolü | M04 | Temel | Tam | Merkez bazlı | Kabul edildi |
 | F09 | Özel ders talep, onay, ret ve alternatif saat | M04 | Var | Var | Var | Kabul edildi |
 | F10 | Tekrarlayan grup programı ve sabit gruba kayıt | M04 | Var | Var | Var | Kabul edildi |
-| F11 | Kontenjanlı açık grup dersine öğrencinin kaydolması | M04 | — | Var | Var | Kabul edildi |
+| F11 | Kontenjanlı açık grup dersine öğrencinin kaydolması | M04 | Tek disiplinli sabit programın öğrenci self rezervasyonu | Var | Var | Kabul edildi |
 | F12 | Bekleme listesi ve süreli yer teklifi | M04 | — | Var | Var | Kabul edildi |
-| F13 | Eğitmen değişikliği | M04/M08 | — | Var | Var | Kabul edildi |
+| F13 | Eğitmen değişikliği | M04/M08 | Tek aktif eğitmenin temel görevlendirmesi; ücretli/çoklu görevlendirme kapalı | Var | Var | Kabul edildi |
 | F14 | Yoklama, gelmeme, iptal, erteleme ve yerine seans düzenleme | M05 | Var | Var | Var | Kabul edildi |
 | F15 | Ders sayılı paket, geçerlilik ve kredi hareketleri | M06 | Temel | Tam | Tam | Kabul edildi |
-| F16 | Süreli/sınırsız üyelik, dönemsel kullanım sınırı | M06 | — | Var | Var | Kabul edildi |
+| F16 | Süreli/sınırsız üyelik, dönemsel kullanım sınırı | M06 | Tek merkez/disiplin süreli veya sınırsız paket | Var | Var | Kabul edildi |
 | F17 | Üyelik/paket dondurma ve plan değişimi | M06 | — | Var | Var | Kabul edildi |
 | F18 | Merkezler arasında kullanım hakkı ve onaylı hesaplaşma | M06/M07 | — | — | Var | Kabul edildi |
 | F19 | Manuel tahsilat, kısmi ödeme, iade/düzeltme ve alacak | M07 | Var | Var | Var | Kabul edildi |
@@ -154,8 +158,8 @@ Bu modüller ayrı servis veya ayrı uygulama zorunluluğu değildir. Yeni backe
 | F21 | Aday, kaynak, ilgi, takip ve dönüşüm | M09 | — | Temel | Gelişmiş | Kabul edildi |
 | F22 | Deneme teklifi ve kontrollü indirim | M09/M06/M07 | — | Var | Var | Kabul edildi |
 | F23 | Yenileme ve hareketsiz öğrenci takip listeleri | M09 | — | Var | Var | Kabul edildi |
-| F24 | Davranışa dayalı segmentler ve takip otomasyonu | M09/M10 | — | — | Var | Kabul edildi |
-| F25 | Paylaşılabilir işletme takvimi ve başvuru/kayıt sayfası | M04/M09/M13 | — | Var | Var | Kabul edildi |
+| F24 | Davranışa dayalı segmentler ve takip otomasyonu | M09/M10 | — | Var | Var | Kabul edildi |
+| F25 | Paylaşılabilir işletme takvimi ve başvuru/kayıt sayfası | M04/M09/M13 | Yalnız ders takvimi/başvurusu; genel CRM veya etkinlik değil | Var | Var | Kabul edildi |
 | F26 | Talep sonucu, ders değişikliği ve benzeri işlemsel bildirimler | M10 | Uygulama içi | Var | Var | Kabul edildi |
 | F27 | Otomatik yaklaşan ders/paket bitiş hatırlatmaları | M10 | — | Var | Var | Kabul edildi |
 | F28 | Operasyon ve finans raporları, tarih filtresi, dışa aktarım | M11 | Temel | Tam | Birleşik ve merkez bazlı | Kabul edildi |
