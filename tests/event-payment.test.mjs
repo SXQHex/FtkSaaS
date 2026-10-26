@@ -244,7 +244,10 @@ test('P03 linked finance corrections, frozen refunds and instructor payments',as
   const staffPerson=(await m('person_create_v1',{display_name:'P03 collection staff',contacts:[]})).primary_id;
   await db.query("insert into core.account_links(id,org_id,account_id,person_id,state,verified_at) values($1,$2,$3,$4,'active',now())",[key(),org,staffAccount.id,staffPerson]);
   await m('role_assign_v1',{person_id:staffPerson,role:'staff',scope:{center_id:center}});
-  await m('permission_set_v1',{person_id:staffPerson,permission:'finance.collect',expected_version:1,enabled:true});
+  const staffVersion=(await must(owner,'person_get_v1',scope({person_id:staffPerson}))).version;
+  assert.equal(staffVersion,2); // Verified link projected the account name over the organization-only name.
+  await bad('permission_set_v1',{person_id:staffPerson,permission:'finance.collect',expected_version:1,enabled:true},'VERSION_CONFLICT');
+  await m('permission_set_v1',{person_id:staffPerson,permission:'finance.collect',expected_version:staffVersion,enabled:true});
   await bad('finance_get_v1',{person_id:person,currency:'TRY',page:{}},'FORBIDDEN',staff);
 
   const q={cash_movement_id:cash,correction:{amount_minor:'100',currency:'TRY',occurred_at:now(),direction:'decrease'},reason:'P03 amount correction'};

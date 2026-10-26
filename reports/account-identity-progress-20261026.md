@@ -94,3 +94,21 @@ Telefon için local SMS confirmations=true ve yalnız ayrılmış sentetik numar
 - tests/account-identity-acceptance.mjs: `997442224f0d525eeb627c83670251a1e48ab7c628db7d407954c454e5a0e584`
 - tests/p07-account-profile-merge-acceptance.mjs: `e97690938b3e4f8ecaf9eac705d75853e9997c9b2ab3f9dc2dd315fbea05318f`
 - supabase/config.toml: `1fe4208ab8de92846fc7d9ce1505067b87d3c69dc23a9929bcfeb6cbed9c995f`
+
+## PR52 ilk aday clean — fixture uyumsuzluğu teşhisi
+
+Aday40298563663, head df091c72d25cfd703c5c586515e420f5d372ed2b/base18a151adf3f1519395dc1c539beacd6bf003ada3/mergea0890a0ba0568735b01163e22bbfd7e95e0cfc11 başarısız. Core/API1/API2 geçti. API3 ilk hata permission_set_v1 VERSION_CONFLICT: verified account link global ad yayılımıyla kişi sürümünü2 yaparken eski P03 fixture1 gönderiyordu. Child erken kesildiği için correction çalışmadı ve sonraki credit arithmetic negatif testi farklı başlangıç bakiyesiyle başarısız oldu. API4 eski yerel adla arama ve canonical native verified_at doğrudan yazımı beklentileri yeni global-current-name/contact guard ile çelişiyordu. Tam iki job logu scratch ortamında korundu; başarısız kabul merge edilmedi.
+
+Test-only düzeltme: P03 kişi okumasından gerçek2 assert edilir, stale1 VERSION_CONFLICT negatif kontrolü eklenir ve canlı sürüm kullanılır. Person fixture kullanıcı kendi profil adını linkten önce açıkça belirler; arama/pagination/privacy assertionları korunur. Organizasyon-owned bağımsız kişi üzerinde contact verification-preservation, new evidence clearing, idempotency, concurrency ve geç audit rollback aynı assertionlarla sürer. Linked canonical rename FORBIDDEN ve kendi tam profilinin değişmemesi kontrolleri eklenir. Runtime/migration/timeout/CI kapsamı değiştirilmez. Bağımsız dar diff incelemesinde bloklayıcı veya assertion gevşetmesi bulunmadı; final kaynak bağı ayrıca bekler.
+
+Dar native ilk tekrar: P03 linked finance7/7,109246.893ms geçti. Person setup account_get DTO’sunda olmayan version alanını okuduğu için VALIDATION_FAILED oldu; bu test hazırlık hatası mevcut fixture SQL okuma yoluyla core.accounts.version alınarak düzeltildi. Yalnız person parent aynı sandbox’ta yeniden koşuluyor; henüz temiz person kabulü iddiası yok. npm verify149/149 ve55file/369link belge kontrolü geçti.
+
+- İlk job121490590013 log SHA256: `26417d7e529c6f9aeef5292a114628a3e67f1f96a368b45f205e08108cddc140`.
+
+- İlk job121490590038 log SHA256: `13d618c888c8668f567bc7d5972a6ec658418638ea8b20ffe48439b75540b0d3`.
+
+Son dar person tekrarı: ilk4 child (scope/self, search/cursor, discipline scope ve instructor privacy/revocation) geçti; canonicalBefore okumasında empty HTTP503 nedeniyle parent başarısız,5node4pass1fail/93.240sn. Son üç org-local mutation child bu tekrarda çalışmadı; temiz native person kabulü yoktur. Native functions log connection aborted kaydını aynı503 zamanında gösterdi; cgroup OOM/kill0. Kesin altyapı kök nedeni veya ürün başarısı iddia edilmez. Retry/assertion/timeout eklenmedi. Native test+functions+gateway logları pr52-native-fix-evidence.json olarak korundu, Sandbox401744ms sonunda durduruldu. P03 tam7/7 kabulü ayrı geçerlidir. Kaynaklı ilk fixture hataları teşhis edildi/düzeltildi; bu kaynak için tam aday CI yeni kabul olacaktır, eski başarısız clean devralınmaz.
+
+- Dar native evidence SHA256: `4b5d1bbf74639128cf9ba8ea7385b8f827b4978f9522415217970f7bc4dec44d`.
+- tests/person-registry.test.mjs: `8cf345171a565ea44b84a0e28458a39435ab251979cf867e30fdf147e2b0a429`.
+- tests/event-payment.test.mjs: `b2969e4ec6cbb8e7b2963f16fc6bac139de7548f7eda351a5466be91f407a942`.
