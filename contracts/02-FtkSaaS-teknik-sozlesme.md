@@ -15,7 +15,7 @@ Başlangıç main `3456050a3061d7bf5dc2ce8898b82c5cfe84e773`: **206 callable API
 
 ## 26 Ekim 2026 — SaaS plan güvenlik ve kullanım sınırı (normatif hedef)
 
-[Plan kapsamı kabul kararı](../docs/decisions/PLANS-2026-10-26.md) eski F01/F11/F16/F21–F25 plan dağılımındaki çelişen hükümleri değiştirir; mevcut runtime/API uyarlaması henüz kabul edilmiş değildir. **Starter**: tek merkez, tek aktif oda kaynağı, tek disiplin, tek aktif eğitmen ve en fazla 100 aktif öğrenci. Bütün ders/seans/kayıtlar aynı `room_id` ve `discipline_id` ile sınırlandırılır; ikinci oda veya disiplin oluşturma/aktifleştirme; ikinci aktif eğitmen görevlendirme; 101. öğrenci aktifleştirme atomik plan kapısından reddedilir. Öğrenci aktifliğinin mevcut organizasyon tekil sayımı korunur.
+[Plan kapsamı kabul kararı](01-FtkSaaS-urun-kapsam-sozlesmesi.md) eski F01/F11/F16/F21–F25 plan dağılımındaki çelişen hükümleri değiştirir; mevcut runtime/API uyarlaması henüz kabul edilmiş değildir. **Starter**: tek merkez, tek aktif oda kaynağı, tek disiplin, tek aktif eğitmen ve en fazla 100 aktif öğrenci. Bütün ders/seans/kayıtlar aynı `room_id` ve `discipline_id` ile sınırlandırılır; ikinci oda veya disiplin oluşturma/aktifleştirme; ikinci aktif eğitmen görevlendirme; 101. öğrenci aktifleştirme atomik plan kapısından reddedilir. Öğrenci aktifliğinin mevcut organizasyon tekil sayımı korunur.
 
 Oda fiziksel kapasitesi (örn. 50) seans toplam/kategori kapasitesinden (örn. aynı mantıksal odada ayrı saatlerde 40 ve 5) ayrıdır. Tek odada eşzamanlı iki seans, gerçek işletmede farklı fiziksel mekânlar olsa bile çakışır; gerçek fiziksel salon kapasitesini işletme doğru seans limitiyle beyan eder, sistem tek başına bilemez. Mevcut fiziksel oda tavanı ve kontrollü aşım korumaları korunur.
 

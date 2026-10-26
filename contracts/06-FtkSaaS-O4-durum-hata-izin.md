@@ -2,7 +2,7 @@
 
 ## 26 Ekim — Starter/Pro/Business plan erişim hedefi
 
-[Ürün kararı](../docs/decisions/PLANS-2026-10-26.md): Starter 1 merkez/1 aktif oda/1 disiplin/1 aktif eğitmen/100 aktif öğrenci; self-servis ve temel ders public başvurusu açık; bağımsız etkinlik, genel CRM/otomasyon ve hakediş kapalı. Pro bütün tek merkezli fonksiyonları, Business en fazla 5 merkezi kapsar. Operasyon rolü, owner/grant veya doğrudan RPC çağrısı plan kapısını aşmaz. Mevcut öğrenci limitinde `RelationshipState=active` ve canlı yetki esas alınır; eski kayıtlar/rezervasyonlar plan düşüşüyle silinmez. Hangi isteğin hangi plan/iş kuralı hatasını döndüreceği mevcut `08` makine sözleşmesi ve gerçek API ayrıntıları incelenerek ayrıca eşitlenmeli; **yeni hata kodu veya izin enum'u bugün uydurulmaz**. Bu normatif ürün hedefidir, mevcut callable enforcement veya CI kabulü değildir.
+[Ürün kararı](01-FtkSaaS-urun-kapsam-sozlesmesi.md): Starter 1 merkez/1 aktif oda/1 disiplin/1 aktif eğitmen/100 aktif öğrenci; self-servis ve temel ders public başvurusu açık; bağımsız etkinlik, genel CRM/otomasyon ve hakediş kapalı. Pro bütün tek merkezli fonksiyonları, Business en fazla 5 merkezi kapsar. Operasyon rolü, owner/grant veya doğrudan RPC çağrısı plan kapısını aşmaz. Mevcut öğrenci limitinde `RelationshipState=active` ve canlı yetki esas alınır; eski kayıtlar/rezervasyonlar plan düşüşüyle silinmez. Hangi isteğin hangi plan/iş kuralı hatasını döndüreceği mevcut `08` makine sözleşmesi ve gerçek API ayrıntıları incelenerek ayrıca eşitlenmeli; **yeni hata kodu veya izin enum'u bugün uydurulmaz**. Bu normatif ürün hedefidir, mevcut callable enforcement veya CI kabulü değildir.
 
 
 ## 25 Ekim — PR45 kapasite ve main ayarları uzlaştırması
