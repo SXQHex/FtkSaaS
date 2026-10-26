@@ -1,3 +1,13 @@
+## 26 Ekim son karar — native Auth davranışı ve bakım sınırı
+
+Supabase Auth + yerleşik Turnstile ana yoldur. Parola sıfırlanınca mevcut kurtarma oturumu kalır, diğer native oturumlar kapanır; sırf yeniden giriş istemek için sağlayıcının iç SQL/sorgu sırasına bağlı bakım alınmaz. Belirgin güvenlik riski veya bağlayıcı ürün gereksinimi olmayan durumlarda aynı işi tekrar eden auth function/gateway eklenmez. Canlı oturum, MFA, tenant/rol/yetki denetimleri ve mevcut full/main clean kapsamı korunur.
+
+Yayımlanmamış özel all-session-reset66 migration/trigger/marker ve yalnız bu davranışa ait yeni test/enum taslağı iptal edildi. Hosted migration66/table bulunmadığı SQL ile doğrulandı; yayımlanmış65 migration ve mevcut native test assertionları değiştirilmedi. Önceki8/8 native kanıt bu iptal edilmiş taslağın tarihsel kanıtıdır; yeni ürün davranışının kabulü değildir. Runtime213 API/65 migration'dır. Yayınlanmış API'ler bu kararla sessizce silinmez; mevcut istemciler için compatibility korunur, yeni Auth tüketicisi native SDK/endpoint kullanır.
+
+Birinci satır açık kalır: native CAPTCHA/gerçek kurtarma sağlayıcı kabulü ve son kaynak/adayı/main/CD kanıtı tamamlanacaktır. Geçici özel kurtarma gateway'inin başarılı kabulü artık kapanış şartı değildir; bu yol için kullanıcıdan yeniden test istenmez. Önceki10/3 özel sayaçların native karşılığı uygulanmış sayılmaz; native rate-limit envanteriyle açık eşleme yapılır ve yalnız sayısal benzerlik için ek gateway kurulmaz. Aynı oturum URL'sinin gateway'de değişmesinden doğan mevcut public-ingress imza hatası ayrı bir uyumluluk düzeltmesidir; HMAC/route/bot/rate korumaları gevşetilmez.
+
+Aşağıdaki66/özel gateway kabul notları önceki checkpointlerdir; bu son karar çelişen hükümlerinin yerine geçer.
+
 # Claude frontend entegrasyon talimatları
 
 ## 26 Ekim — Starter/Pro/Business kararının frontend teslim sınırı

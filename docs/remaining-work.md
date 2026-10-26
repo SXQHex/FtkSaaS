@@ -1,3 +1,23 @@
+## 26 Ekim son karar — native Auth davranışı ve bakım sınırı
+
+Supabase Auth + yerleşik Turnstile ana yoldur. Parola sıfırlanınca mevcut kurtarma oturumu kalır, diğer native oturumlar kapanır; sırf yeniden giriş istemek için sağlayıcının iç SQL/sorgu sırasına bağlı bakım alınmaz. Belirgin güvenlik riski veya bağlayıcı ürün gereksinimi olmayan durumlarda aynı işi tekrar eden auth function/gateway eklenmez. Canlı oturum, MFA, tenant/rol/yetki denetimleri ve mevcut full/main clean kapsamı korunur.
+
+Yayımlanmamış özel all-session-reset66 migration/trigger/marker ve yalnız bu davranışa ait yeni test/enum taslağı iptal edildi. Hosted migration66/table bulunmadığı SQL ile doğrulandı; yayımlanmış65 migration ve mevcut native test assertionları değiştirilmedi. Önceki8/8 native kanıt bu iptal edilmiş taslağın tarihsel kanıtıdır; yeni ürün davranışının kabulü değildir. Runtime213 API/65 migration'dır. Yayınlanmış API'ler bu kararla sessizce silinmez; mevcut istemciler için compatibility korunur, yeni Auth tüketicisi native SDK/endpoint kullanır.
+
+Birinci satır açık kalır: native CAPTCHA/gerçek kurtarma sağlayıcı kabulü ve son kaynak/adayı/main/CD kanıtı tamamlanacaktır. Geçici özel kurtarma gateway'inin başarılı kabulü artık kapanış şartı değildir; bu yol için kullanıcıdan yeniden test istenmez. Önceki10/3 özel sayaçların native karşılığı uygulanmış sayılmaz; native rate-limit envanteriyle açık eşleme yapılır ve yalnız sayısal benzerlik için ek gateway kurulmaz. Aynı oturum URL'sinin gateway'de değişmesinden doğan mevcut public-ingress imza hatası ayrı bir uyumluluk düzeltmesidir; HMAC/route/bot/rate korumaları gevşetilmez.
+
+Aşağıdaki66/özel gateway kabul notları önceki checkpointlerdir; bu son karar çelişen hükümlerinin yerine geçer.
+
+## 26 Ekim — PR53 ve gerçek Google kabulü; S04 kapanış adayı
+
+Güncel main `7086d7e00c142b9049e3d76cb8ac2f587fdaa5b6`: PR53 aday full clean40314333376, aynı main clean40318033261 ve gerçek development CD40320789568 başarılı. Yayımlanmış kapsam213 API/65 migration/Edge12. Önceki PR52 CD cleanup hatası dar fixture düzeltmesiyle kapandı; aşağıdaki eski pending/draft kayıtları kaynaklarına ait tarihsel checkpointlerdir.
+
+Gerçek Google kimliği mevcut hesaba native ID-token yoluyla bağlandı: hazırlıksız bağlama ve yanlış nonce reddi dahil13 kontrol geçti; native kullanıcı/core UUID ve birincil doğrulanmış e-posta değişmedi, ikinci hesap yaratılmadı. Manual linking açık ve yeniden yüklemeyle doğrulandı. Bağlama güvenlik e-postası Resend'de delivered; yalnız kabul testinde oluşan native oturumlar ve refresh kayıtları kapatıldı. Sağlayıcı tokenı, parola ve kişisel iletişim bilgileri bu kayda alınmadı.
+
+**Birinci satır hâlâ aktiftir.** Kalanlar: native Auth/Turnstile gerçek sağlayıcı kabulü ve son kaynak/adayı/main/CD. Özel66 taslağı son kararla iptal edilmiştir; mevcut65 migration değiştirilmez. Yeni full clean henüz başlatılmadı. Gerçek SMS dış entegrasyondur ve backend kapanış kapısı değildir.
+
+Kullanıcının seçtiği kurtarma istek limiti:15 dakika içinde IP başına10 ve normalize e-posta başına3; adres yerine anahtarlı hash saklanır. Hosted kurulum ve gerçek kapı kabulü bu kararın kaydedilmesiyle tamamlanmış sayılmaz. Kanıt ayrıntısı [kimlik ilerleme raporundadır](../reports/account-identity-progress-20261026.md).
+
 # Kalan backend ve entegrasyon işleri
 
 ## 26 Ekim — SMS dış entegrasyon kararı (son kullanıcı kabulü)

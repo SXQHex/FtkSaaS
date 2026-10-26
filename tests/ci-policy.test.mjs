@@ -9,18 +9,26 @@ test('unchanged Edge requires both trusted source receipt and live version/JWT m
 });
 test('hosted smoke checks real request sequence and cleans its exact UUID even on a failed assertion',async()=>{
  const original=globalThis.fetch;
- try{for(const failure of [false,true]){
-  let id,deleted=false,loggedOut=false,accountRemoved=false;const checks=[];
+ try{for(const captchaEnabled of [false,true])for(const failure of [false,true]){
+  let id,password,deleted=false,loggedOut=false,accountRemoved=false;const checks=[];
   globalThis.fetch=async(url,options)=>{
    const body=options.body?JSON.parse(options.body):null;
    const response=(status,data)=>({status,text:async()=>status===204?'':JSON.stringify(data)});
-   if(url.endsWith('/auth/v1/admin/users')){id=body.id;assert.equal(body.email_confirm,true);return response(200,{id});}
+   if(url.endsWith('/auth/v1/admin/users')){id=body.id;password=body.password;assert.equal(body.email_confirm,true);return response(200,{id});}
    if(url.includes('/auth/v1/admin/users/')){assert(url.endsWith(id));assert(accountRemoved);deleted=true;return response(200,{});}
-   if(url.includes('/auth/v1/token?'))return response(200,{access_token:'synthetic-jwt'});
+   if(url.includes('/auth/v1/token?')){
+    assert.equal(body.email,'cd-'+id+'@example.invalid');
+    if(options.headers.apikey==='synthetic-public'){
+     assert.equal(options.headers.Authorization,undefined);assert(body.password!==password);
+     return response(400,{error_code:captchaEnabled?'captcha_failed':'invalid_credentials'});
+    }
+    assert.equal(options.headers.apikey,'synthetic-admin');assert.equal(options.headers.Authorization,'Bearer synthetic-admin');
+    return body.password===password?response(200,{access_token:'synthetic-jwt',user:{id}}):response(400,{error_code:'invalid_credentials'});
+   }
    if(url.endsWith('/auth/v1/logout')){loggedOut=true;return response(204,{});}
    if(url.includes('/rest/v1/rpc/'))return response(403,{code:'42501'});
    if(options.headers.Authorization==='Bearer invalid-jwt')return response(401,{});
-   if(url.endsWith('/account_get_v1'))return failure?response(500,{}):loggedOut?response(401,{ok:false,error:{code:'AUTH_REQUIRED'}}):response(200,{ok:true,data:{id:'synthetic-account'}});
+   if(url.endsWith('/account_get_v1')){assert.equal(options.headers.Authorization,'Bearer synthetic-jwt');assert.equal(options.headers.apikey,'synthetic-public');return failure?response(500,{}):loggedOut?response(401,{ok:false,error:{code:'AUTH_REQUIRED'}}):response(200,{ok:true,data:{id:'synthetic-account'}});}
    if(url.endsWith('/organizations_list_v1'))return response(200,{ok:true});
    if(url.endsWith('/finance_get_v1'))return response(200,{ok:false,error:{code:'NOT_FOUND'}});
    throw Error('Unexpected hosted request');
@@ -30,6 +38,7 @@ test('hosted smoke checks real request sequence and cleans its exact UUID even o
   const record=(name,passed)=>{checks.push({name,passed});assert(passed,name);};
   if(failure)await assert.rejects(hostedSmoke(api,sql,record),/auth_edge_rpc_account/);else await hostedSmoke(api,sql,record);
   assert(accountRemoved&&deleted);assert(checks.some(c=>c.name==='synthetic_fixture_removed'&&c.passed));
+  for(const name of ['public_invalid_login_rejected','trusted_invalid_password_rejected','real_auth_login'])assert(checks.some(c=>c.name===name&&c.passed));
   if(!failure)assert(checks.some(c=>c.name==='revoked_session_rejected'&&c.passed));
  }}finally{globalThis.fetch=original;}
 });

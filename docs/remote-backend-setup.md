@@ -1,3 +1,13 @@
+## 26 Ekim son karar — native Auth davranışı ve bakım sınırı
+
+Supabase Auth + yerleşik Turnstile ana yoldur. Parola sıfırlanınca mevcut kurtarma oturumu kalır, diğer native oturumlar kapanır; sırf yeniden giriş istemek için sağlayıcının iç SQL/sorgu sırasına bağlı bakım alınmaz. Belirgin güvenlik riski veya bağlayıcı ürün gereksinimi olmayan durumlarda aynı işi tekrar eden auth function/gateway eklenmez. Canlı oturum, MFA, tenant/rol/yetki denetimleri ve mevcut full/main clean kapsamı korunur.
+
+Yayımlanmamış özel all-session-reset66 migration/trigger/marker ve yalnız bu davranışa ait yeni test/enum taslağı iptal edildi. Hosted migration66/table bulunmadığı SQL ile doğrulandı; yayımlanmış65 migration ve mevcut native test assertionları değiştirilmedi. Önceki8/8 native kanıt bu iptal edilmiş taslağın tarihsel kanıtıdır; yeni ürün davranışının kabulü değildir. Runtime213 API/65 migration'dır. Yayınlanmış API'ler bu kararla sessizce silinmez; mevcut istemciler için compatibility korunur, yeni Auth tüketicisi native SDK/endpoint kullanır.
+
+Birinci satır açık kalır: native CAPTCHA/gerçek kurtarma sağlayıcı kabulü ve son kaynak/adayı/main/CD kanıtı tamamlanacaktır. Geçici özel kurtarma gateway'inin başarılı kabulü artık kapanış şartı değildir; bu yol için kullanıcıdan yeniden test istenmez. Önceki10/3 özel sayaçların native karşılığı uygulanmış sayılmaz; native rate-limit envanteriyle açık eşleme yapılır ve yalnız sayısal benzerlik için ek gateway kurulmaz. Aynı oturum URL'sinin gateway'de değişmesinden doğan mevcut public-ingress imza hatası ayrı bir uyumluluk düzeltmesidir; HMAC/route/bot/rate korumaları gevşetilmez.
+
+Aşağıdaki66/özel gateway kabul notları önceki checkpointlerdir; bu son karar çelişen hükümlerinin yerine geçer.
+
 ## 26 Ekim — PR52 main kabulü ve CD cleanup düzeltmesi
 
 PR52 main043347e8e23e671059285f5f20d86f1c0fafe9ad: aday40302913868 ve aynı main40309879942 full clean başarılı;213 API/65 migration. CD40312648189 migration65 ve Edgev12’yi uyguladı; Auth→Edge→RPC, tenant/direct-RPC/JWT/session kontrolleri geçti fakat synthetic_fixture_removed başarısız. Yeni otomatik p07_profiles FK’si CD’nin eski hesap temizliğini engelledi; CD başarılı sayılmaz. Yalnız CD fixture UUID’sine bağlı profil+hesap temizliğini atomik yapan dar script/test düzeltmesi hazırlanıyor; kalıcı FK/retention/ürün API davranışı değiştirilmez. Gerçek Google bağlama ve başarılı CD kabulü hâlâ açık; birinci satır kapanmadı. Ayrıntı account-identity-progress-20261026 raporundadır.
@@ -179,3 +189,49 @@ Deneme fixture hazırlığında Node name-pattern üst testi eşlediği için pl
 Yerel65 taslağındaki private.account_identity_names ve private.account_contact_projections current kimlik/authority verisidir; restore RLS/owner/ACL ve trigger envanterine, fiziksel privacy/purge envanterine dahil edilmelidir. Mapping geçmiş snapshot değildir: link target değişince eski authority satırı kaldırılır, mevcut physical contact geçmişi otomatik silinmez. Önceki restore ve PR50 native kabulü yeni65 kaynağı kapsamaz. Google/SMS/SMTP secret ve provider config geri dönüşü ayrıca kanıtlanır; Resend key veya kullanıcı OTP’si rapora yazılmaz.
 
 26 Ekim hosted Auth güvenlik kabulü: yayımlanmış26e7091/64 üzerinde gerçek Resend signup-mail doğrulaması, tek kullanımlık proof reddi, native TOTP enroll/challenge/verify, eski aal1 Edge reddi, güçlü erişim, native direct removal fence, güçlü backend removal+repeat ve tek enable/disable history geçti. Ayrıntılar [aktif rapordadır](../reports/account-identity-progress-20261026.md). Yeni65 yerel kimlik trigger’ları bu hosted denemede yoktur; yeni kaynak/restore kabulü açık kalır.
+
+## Teslim1 hosted parola kurtarma kapısı — kurulum manifesti
+
+PR53 main7086d7e0 development CD başarılı,213/65/Edge12. Yeni S04 atomik reset66migration yerel adaydır; native8/8 geçti, hosted66/aday/main/CD kabulü yoktur. E-posta SMTP Resend hazır ve Google bağlama güvenlik e-postası delivered. Dashboard Edge Custom secrets envanteri26Ekim kontrolünde boş: yalnız sağlayıcının varsayılan secret adları görünür; değerleri açılmadı. Bu yüzden uygulamanın recovery kapısı henüz açılmış sayılmaz.
+
+| Hedef | Kurulum değeri/kuralı | Durum |
+|---|---|---|
+| private.p07_recovery_config | window_seconds900,max_ip10,max_target3 | Kullanıcı seçimi; hosted upsert+readback doğrulandı. |
+| FTK_P07_AUTH_DELIVERY_ENABLED | true | Kaydedildi; SHA256 readback doğrulandı. Mevcut HMAC+bot/rate kapıları korunur. |
+| FTK_PUBLIC_INGRESS_SECRET | En az256bit rastgele, yalnız güvenilen server imzacısında ve Supabase Edge secret store'da | Kaydedildi; SHA256 readback doğrulandı. Browser bundle/repoya konmadı. |
+| FTK_PUBLIC_HASH_SECRET | Ayrı en az256bit rastgele anahtar, yalnız Edge secret store | Kaydedildi; SHA256 readback doğrulandı; adres/IP için keyed hash. |
+| FTK_TURNSTILE_SECRET | Hesabın gerçek managed widget secret'ı | Widget/domain ve secret SHA256 readback doğrulandı; gerçek siteverify/mail kabulü bekler. |
+| FTK_TURNSTILE_HOSTNAME | ftk-auth-acceptance-erkinkunbuk-4818.vercel.app | Aynı izole kabul projesinin sabit preview alias'ı; kaydedildi, SHA256 readback eşleşti. |
+| Turnstile action | password_recovery | Native siteverify success+exactaction+exacthostname gerekir. |
+
+26 Ekim kullanıcı onayıyla managed widget `0x4AAAAAAFm2HIz08p6Kjde1` oluşturuldu; localhost,127.0.0.1 ve yukarıdaki geçici kabul hostname'i readback ile doğrulandı. Clearance no_clearance; secret değeri sohbete/repo/loga çıkarılmadı. Hosted expected hostname'e local adresler eklenmez. Ürün frontend'i değiştirilmez; yeni Worker/proxy/sidecar kurulmaz. Kabul sayfasında gerçek bot-proof→güvenilen server imzası→mevcut Edge recovery→native Auth→Resend teslimi ve proof replay reddi kanıtlanır. Mevcut gateway HMAC header'ları body/path/IP/time'a bağlıdır; sahte forwarded header veya browser'da signer secret kabul edilmez. Gerçek kanıt çıkmadan feature enabled/delivered yazılmaz. Geçici widget/origin/test asset temizliği ayrıca yapılır.
+
+private.account_password_transactions kalıcı ürün verisi değildir: native transaction bitmeden tüketilir/temizlenir; RLS ve client/service ACL kapalıdır. Yeni66 restore/owner/ACL/trigger envanterine dahildir; eski65 restore kabulü buna taşınmaz. Recovery-capable native AMR otp/magiclink/recovery olarak eşlenir. Ordinary parola ekleme/değiştirme için fresh password/Google session kullanılır; recovery-capable session ile parola set etmek tüm oturumların kapanmasını gerektirir. Native sağlayıcı yükseltmesinde bu SQL sırası ve gerçek native regresyon tekrar doğrulanır.
+
+Server-only imzalama adaptörü `scripts/p04-public-ingress.mjs` içindeki signPasswordRecovery/body,clientIp,secret,now fonksiyonudur. publicSubmitPath korunur; recovery için kapalı passwordRecoveryPath imzalanır. IP yalnız güvenilen bağlantı metadata'sından gelir; browser body/header'dan alınmaz. Ortak imza diğer endpoint'e taşınamaz; IPv4/IPv6 ve çapraz-path negatifleri19/19 dar contract testinde geçti. Bu server adaptörü gerçek gateway kurulumu veya mail teslimi kanıtı değildir.
+
+Dashboard beş alan adı ve iki public config değeriyle taslak hazırlandı; üç secret boş, Bulk save çalıştırılmadı. Browser güvenlik kuralı yeni kimlik bilgilerinin giriş/onay/submission adımlarını kullanıcıya devretmeyi gerektirir. FTK_TURNSTILE_SECRET gerçek widget'tan; ingress/hash birbirinden bağımsız en az256bit rastgele değerler olmalıdır. Secret değeri sohbete istenmez ve secret-bearing form DOM'u sonradan okunmaz; kayıt sonrası yalnız adlar/digest/başarı durumu kontrol edilir.
+
+### 26 Ekim — mobil hosted kabul hazırlığı
+
+Kullanıcı beş Edge değerini kendi cihazından kaydetti; secret değerleri açılmadan SHA256 digestleri verilen geliştirme değerleriyle eşleşti. Kullanıcı anahtarların bu sohbet üzerinden verilmesini açıkça istedi; bu geliştirme değerlerinin production öncesi yenilenmesi gereği korunur. Repository'ye değerler yazılmaz.
+
+Eski immutable deployment hostname'i yerine aynı geçici projenin zaten mevcut sabit preview alias'ı ftk-auth-acceptance-erkinkunbuk-4818.vercel.app kullanılır. Turnstile exact domain ve Edge exact expected hostname eşitlendi; local adresler hosted expected hostname'e eklenmedi, wildcard yok. Native Google kabulünün eski immutable URL'si bu hostname geçişinden ayrı tarihsel kanıttır.
+
+Mevcut izole ftk-auth-acceptance projesinde staging deployment dpl_BBsyDkw5QMumw7w3rxV1JD5Ya9mW READY. Ürün studiosaas/ürün frontend'i ve production deployment değiştirilmedi. Mevcut backend'in server-only HMAC adaptörünü kullanan dar kabul handler'ı yalnız serverENV'deki kontrollü recipient'e veya yeniunknowninvalid adrese imzalar. Arbitraryemail/URL/IP girdisi yok. Aynı gerçek Turnstile proof'u ikinci imzalı istekte VALIDATION_FAILED ile reddedilmezse kabul200 olmaz. ExactOrigin/Host ve Vercel'in overwrite ettiği verified x-forwarded-for kullanılır; externaltrustedproxy modu kullanılmaz. Secret'lar yalnız bu geçici projenin Preview secret store'undadır; client bundle'da veya raporda bulunmaz.
+
+Intermediary source bağımsız güvenlik incelemesinden geçti; dört meaningful handler testi4/4, mevcut signer contract19/19. GET/api/recover200 ready=true, backend referansı5aece22; gerçek sayfa ve managed insan doğrulama kutusu görünür. Bu GET ve kaynak testi gerçek siteverify/mail/replay kabulü değildir. Kullanıcının mobil sayfada known ve unknown akışlarını tamamlaması beklenir; ardından Edge log/Resend teslimi doğrulanır. Korunan Vercel erişimi kaldırılmadı; geçici scoped share link kullanılır, link tokenı rapora yazılmaz.
+
+### İptal edilmiş özel kurtarma kabulü ve yeni native hazırlık
+
+Önceki managed widget/customEdge-secret/harness kurulum kayıtları tarihsel kanıttır. Son kullanıcı kararıyla özel Vercel kurtarma testinin tamamlanması beklenmez; bu yolun başarısız olması native Auth/Turnstile'ın başarısız olduğu anlamına gelmez. Native CAPTCHA Auth ayarında etkinleştirilmiş sayılmaz. Etkinleştirmeden önce hosted CD'nin native anonim parola girişine ve istemcilere etkisi incelenir; yalnız Edge env kaydı yerleşik Auth CAPTCHA'yı açmaz. Nativeintegration güvenlik ayarını uygulama ve gerçek mail/proof kabulü ayrı kapıdır. Secretlar production öncesi yenilenir.
+
+Kaldırılan66 migration hiç uygulanmamıştır; private.account_password_transactions ve özel native-password trigger'ları hosted'da yoktur. Mevcut65history korunur. Native kullanımla ilişkisiz HMACpublicCRM hata düzeltmesi ayrı kalır: hostedgateway dış `/functions/v1` prefixini kaldırır; verifier yalnız iki bilinen internalroute'u canonicalexternalpath'e eşler; timestamp/body/IP/operation kontrolü korunur.
+
+### Native CAPTCHA ile trusted CD parola kabulü
+
+Supabase Authv2.197 verifyCaptcha middleware, yalnız geçerli admin Authorization taşıyan trusted server isteğini CAPTCHA'dan muaf tutar; password grant kullanıcı parolasını doğrulamaya devam eder. Bu sağlayıcının kendi desteklediği yoldur, testtokenı/fakeCAPTCHA veya publicclient bypass değildir. Kaynak: https://github.com/supabase/auth/blob/v2.197.0/internal/api/middleware.go . CD adayında mevcutserver-onlyadmin anahtarı yalnız native grant isteğinde kullanılır; Edge/RPC istekleri elde edilen gerçek fixture userJWT + publicapikey ile devam eder. Wrongpasswordpublicrequest (CAPTCHA açıkken captcha_failed, kapalıyken invalid_credentials), trustedwrongpasswordinvalid_credentials ve successfuluser.id=fixtureID ayrı zorunlu assertionlardır; eski tenant/directRPC/invalidJWT/logout/cleanup kontrolleri korunur.
+
+Mock CD source tests46/46 native CAPTCHA on/off ve erkenfailurecleanup durumlarında geçti. Bu yeniCDkaynağı henüz main/hosted gerçek kabulü değildir; exactsourcebağımsızinceleme+adayclean+kurulumonayı+mainclean/CD gerekir. NativeCAPTCHA globalayarını buCDsource main'e geçmeden etkinleştirmek eskihostedsmoke'ı bozar; aktivasyon şimdilik bekler. NativeAuth+gerçekTurnstile publickullanıcı kabulü trustedCDsmoke'ından ayrı doğrulanır.
+
+Özel gateway sabitpreviewalias'ı dpl_AJdPYBzAvvv748mzFyCjmnYkAmmC stagingstatic retirement sayfasına çevrildi: root200 retired=true, /api/recover?probe=path404 doğrulandı. Eskiimmutabledeploymentlar ve Previewsecret kayıtları sağlayıcıda henüz silinmedi; bunların tümünün kaldırıldığı iddia edilmez. Nativegeçiş tamamlanınca eskiözeltestasset/secret/sharelink temizliği ayrıca kapatılır; kullanıcıdan retiredözelakıştesti istenmez.
