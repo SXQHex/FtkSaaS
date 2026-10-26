@@ -112,3 +112,13 @@ Son dar person tekrarı: ilk4 child (scope/self, search/cursor, discipline scope
 - Dar native evidence SHA256: `4b5d1bbf74639128cf9ba8ea7385b8f827b4978f9522415217970f7bc4dec44d`.
 - tests/person-registry.test.mjs: `8cf345171a565ea44b84a0e28458a39435ab251979cf867e30fdf147e2b0a429`.
 - tests/event-payment.test.mjs: `b2969e4ec6cbb8e7b2963f16fc6bac139de7548f7eda351a5466be91f407a942`.
+
+## 26 Ekim — PR52 main kabulü ve CD cleanup düzeltmesi
+
+PR52 main043347e8e23e671059285f5f20d86f1c0fafe9ad: aday40302913868 ve aynı main40309879942 full clean başarılı;213 API/65 migration. CD40312648189 migration65 ve Edgev12’yi uyguladı; Auth→Edge→RPC, tenant/direct-RPC/JWT/session kontrolleri geçti fakat synthetic_fixture_removed başarısız. Yeni otomatik p07_profiles FK’si CD’nin eski hesap temizliğini engelledi; CD başarılı sayılmaz. Yalnız CD fixture UUID’sine bağlı profil+hesap temizliğini atomik yapan dar script/test düzeltmesi hazırlanıyor; kalıcı FK/retention/ürün API davranışı değiştirilmez. Gerçek Google bağlama ve başarılı CD kabulü hâlâ açık; birinci satır kapanmadı. Ayrıntı account-identity-progress-20261026 raporundadır.
+
+CD receipt65 migration/all contents match, Edgeactive verify_jwt=true/version12, core90/missingRLS0/exposedRPC0; son tek başarısız kontrol fixture temizliğidir. Advisors aşamasına ulaşılmadı. Doğrudan okunan hosted65/Edge12 durumu receipt ile eşleşir; ayrı advisor okumaları hata incelemesi içindir ve CD başarısı yerine geçmez.
+
+Düzeltme yalnız hostedSmoke finally SQL temizliğidir: aynı authId ile private.p07_profiles → core.accounts anonim transaction bloğu; native Auth DELETE girişimi ve fixture yokluk doğrulaması korunur. Domain/desen bazında veri silme yok. Node hostedSmoke regression hem başarılı akışta hem erken assertion hatasında exact-ID ve temizleme sırası denetler. Scratch PGlite actual hostedSmoke-generated SQL ile unrelated profil korunması, exact fixture temizliği ve parent FK engelinde profil temizliğinin rollback’i geçti. npm verify149/149 geçti. Ürün runtime/migration değişmedi; yeni CI altyapısı kurulmadı, cleanup kabulü veya assertionları kaldırılmadı.
+
+Başarısız40312648189 koşusunun tek sentetik fixture’ı exact UUID+beklenen sentetik email+organizasyon link yokluğu doğrulandıktan sonra tek transaction’da profile/account/Auth sırasıyla temizlendi. Readback accounts0/users0. Diğer veriler silinmedi; bu tek seferlik temizlik başarılı yeni CD koşusu yerine sayılmaz. Kaynak incelemesi, yeni aday/main clean ve CD kabulü açık.

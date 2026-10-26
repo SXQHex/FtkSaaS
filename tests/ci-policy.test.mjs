@@ -26,7 +26,7 @@ test('hosted smoke checks real request sequence and cleans its exact UUID even o
    throw Error('Unexpected hosted request');
   };
   const api=async()=>[{type:'publishable',api_key:'synthetic-public'},{name:'service_role',api_key:'synthetic-admin'}];
-  const sql=async(query)=>{assert(query.includes(id));if(query.startsWith('delete')){accountRemoved=true;return [];}assert(deleted);return [{accounts:0,users:0}];};
+  const sql=async(query)=>{assert(query.includes(id));if(query.startsWith('do $ftk_smoke_cleanup$')){assert(query.includes('delete from private.p07_profiles where account_id in (select id from core.accounts where auth_user_id='));assert(query.indexOf('delete from private.p07_profiles')<query.indexOf('delete from core.accounts'));assert.equal(query.split(id).length-1,2);accountRemoved=true;return [];}assert(deleted);return [{accounts:0,users:0}];};
   const record=(name,passed)=>{checks.push({name,passed});assert(passed,name);};
   if(failure)await assert.rejects(hostedSmoke(api,sql,record),/auth_edge_rpc_account/);else await hostedSmoke(api,sql,record);
   assert(accountRemoved&&deleted);assert(checks.some(c=>c.name==='synthetic_fixture_removed'&&c.passed));

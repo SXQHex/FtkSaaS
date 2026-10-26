@@ -1,3 +1,7 @@
+## 26 Ekim — PR52 main kabulü ve CD cleanup düzeltmesi
+
+PR52 main043347e8e23e671059285f5f20d86f1c0fafe9ad: aday40302913868 ve aynı main40309879942 full clean başarılı;213 API/65 migration. CD40312648189 migration65 ve Edgev12’yi uyguladı; Auth→Edge→RPC, tenant/direct-RPC/JWT/session kontrolleri geçti fakat synthetic_fixture_removed başarısız. Yeni otomatik p07_profiles FK’si CD’nin eski hesap temizliğini engelledi; CD başarılı sayılmaz. Yalnız CD fixture UUID’sine bağlı profil+hesap temizliğini atomik yapan dar script/test düzeltmesi hazırlanıyor; kalıcı FK/retention/ürün API davranışı değiştirilmez. Gerçek Google bağlama ve başarılı CD kabulü hâlâ açık; birinci satır kapanmadı. Ayrıntı account-identity-progress-20261026 raporundadır.
+
 # FtkSaaS güncel devir
 
 ## 26 Ekim — main uzlaştırması ve sağlayıcı kabul sırası
