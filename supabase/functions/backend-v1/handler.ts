@@ -76,7 +76,7 @@ Deno.serve(async req=>{
     invite={token_hash,sealed_token:JSON.stringify({iv:b64(iv),cipher:b64(new Uint8Array(cipher))})};
    }
   }
-  if(operation==='account_delete_apply_v1'||operation==='organization_delete_apply_v1'||operation==='account_totp_remove_v1'||(operation==='account_sessions_revoke_v1'&&request.mode==='others')||(operation==='job_status_get_v1'&&request.org_id===null)){
+  if(operation==='account_delete_apply_v1'||operation==='organization_delete_apply_v1'||operation==='account_totp_remove_v1'||operation==='account_google_link_prepare_v1'||(operation==='account_sessions_revoke_v1'&&request.mode==='others')||(operation==='job_status_get_v1'&&request.org_id===null)){
    const proof=await lifecycleReauth(base,key,(operation==='job_status_get_v1'?authorization.slice(7):request.reauth),user.id);if(proof.error)return failure(proof.error,proof.error==='AUTH_REQUIRED'?401:503);invite=proof.context!;
   }
   const storage=documentStorage(base,key);
@@ -99,6 +99,13 @@ Deno.serve(async req=>{
    const r=await fetch(base+'/rest/v1/rpc/'+operation,{method:'POST',headers:{authorization:'Bearer '+key,apikey:key,'content-type':'application/json','Content-Profile':'api_v1'},body:JSON.stringify({p_request:request,p_actor_auth_id:user.id,p_session_id:claims.session_id,p_ids:Array.from({length:count},()=>v7()),p_aux:{...(aux as object??{}),...authAux}})});
    if(!r.ok)throw Error('RPC_UNAVAILABLE');return r.json();
   };
+  if(operation==='account_google_link_prepare_v1'){
+   // This parses only a restrictive target. Native Auth must still verify the
+   // token's signature, issuer, audience and nonce in the subsequent link call.
+   let subject:string;try{const part=request.google_id_token.split('.')[1];subject=JSON.parse(atob(part.replaceAll('-','+').replaceAll('_','/'))).sub;if(typeof subject!=='string'||subject.length<1||subject.length>255)throw Error();}catch{return failure('VALIDATION_FAILED');}
+   const prepared=await rpcContext({...invite,google_subject:subject});if(!prepared._internal_google_link)return json(prepared);
+   const out={ok:true,data:{provider:'google',status:'ready',expires_in:10},trace_id:v7()};if(!(validators as any)['success_'+operation](out))return failure('INTEGRITY_VIOLATION',500);return json(out);
+  }
   if(operation==='account_totp_remove_v1'){
    const prepared=await rpcContext({...invite,phase:'totp_prepare'});
    if(prepared._internal_totp_remove){

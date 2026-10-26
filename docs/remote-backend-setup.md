@@ -1,5 +1,12 @@
 # Kalıcı geliştirme/test backend’i
 
+## 26 Ekim — SMS dış entegrasyon kararı (son kullanıcı kabulü)
+
+Telefon numarası kaydedilebilir; gerçek SMS proof tamamlanmadıkça doğrulanmamış kalır. Numaranın kaydedilmesi, doğrulanmış iletişim yayılımı, hesap sahipliği kanıtı veya telefonla giriş yetkisi değildir. Ücretsiz geliştirme testlerinde yalnız izole yerel test OTP kodları kullanılabilir; bunlar gerçek SMS gönderimi/teslimi veya hosted provider kabulü sayılmaz. Sabit test kodları hosted ortama uygulanmaz.
+
+E-posta/parola, gerçek Google giriş/bağlama ve doğrulayıcı uygulama TOTP ile ilerlenir. Gerçek SMS sağlayıcısı kurulumu ayrı dış entegrasyon statüsündedir; birinci satırın diğer backend işlerini ve backend kapanışını engellemez. SMS'in gerçek sağlayıcı kabulü tamamlandı işaretlenmez. Doğrulanmamış telefon kaydetme/okuma yolu ile yerel proof/test-code davranışının uygulama kabulü backend kapsamındadır; bu karar tek başına yeni alan/API'nin uygulanmış olduğu kanıtı değildir.
+
+
 ## 23 Ekim güncel geliştirme kaynağı ve hosted kontrol
 
 Geliştirme/test proje `gwyprhenabtpkbojephw`; gerçek ilk kurulum verisi içerir. Reset/clean/seed yalnız izole loopback ortamında yapılır. Son runtime kabulü main4cfc9a55/PR40:59 migration içeriği eşleşti,200 runtime,90 core tablo,Edge backend-v1 v8 ACTIVE/verify_jwt=true. [CD39869023193](https://github.com/SXQHex/FtkSaaS/actions/runs/39869023193) 18 kontrol ve fixture temizliği geçti; receipt/source bağları [tek devirdedir](../contracts/00-FtkSaaS-yeni-sohbet-devir.md).
@@ -10,7 +17,7 @@ Son belge mainbfb8ccb2/PR41 source-bound belge kabulünden geçti; CD39873101014
 
 Son advisor incelemesindeki ops_run search_path ve rls_auto_enable EXECUTE sertleştirmeleri henüz yayımlanmadı. Parola koruması uyarısı Free plan nedeniyle kullanıcı tarafından kapsam dışında bırakıldı. Uygulama RPC EXECUTE0 ölçümü, public yardımcı event-trigger fonksiyonu uyarısını kapsıyor gibi sunulmaz.
 
-İstemci bağlantı ve sınırları [Claude talimatındadır](claude-handover.md). Secret değerler bu belgeye yazılmaz. PAT30-gün rotasyonu ayrı işletim sorumluluğudur; otomatik yenileme varsayılmaz. Production, dış e-posta/Resend, frontend E2E, yük/restore ve fiziksel erasure tamamlanmış değildir.
+İstemci bağlantı ve sınırları [Claude talimatındadır](claude-handover.md). Secret değerler bu belgeye yazılmaz. PAT30-gün rotasyonu ayrı işletim sorumluluğudur; otomatik yenileme varsayılmaz. Production, frontend E2E, yük/restore ve fiziksel erasure tamamlanmış değildir. 26 Ekim platform Auth SMTP kurulumu ve Resend delivered kanıtı [aktif teslimde](production-queue.md#teslim1-kimlik-iletisim) kayıtlıdır; tüm dış e-posta yaşam döngüsü kabulü değildir.
 
 ## Önceki dağıtım kaynaklarının tarihsel kayıtları
 
@@ -162,3 +169,9 @@ Deneme fixture hazırlığında Node name-pattern üst testi eşlediği için pl
 ## PR50 Auth trigger restore bağımlılığı
 
 64. aday migration auth.mfa_factors üzerinde verified TOTP history ve removal fence trigger’ları ekler. Restore’da uygulama tablolarıyla birlikte bu tanımlar/owner/ACL ve intent-event bağı korunmalıdır; Auth faktör secret’ları loga veya uygulama geçmişine taşınmaz. Önceki34aac276 restore kanıtı bu yeni kaynağı kapsamaz. Hosted TOTP enable/config/secrets ve bu yeni kaynakla managed restore kabulü ayrıca doğrulanır; local supabase/config.toml hosted aktivasyon kanıtı değildir.
+
+## Teslim1 kimlik tabloları ve sağlayıcı envanteri
+
+Yerel65 taslağındaki private.account_identity_names ve private.account_contact_projections current kimlik/authority verisidir; restore RLS/owner/ACL ve trigger envanterine, fiziksel privacy/purge envanterine dahil edilmelidir. Mapping geçmiş snapshot değildir: link target değişince eski authority satırı kaldırılır, mevcut physical contact geçmişi otomatik silinmez. Önceki restore ve PR50 native kabulü yeni65 kaynağı kapsamaz. Google/SMS/SMTP secret ve provider config geri dönüşü ayrıca kanıtlanır; Resend key veya kullanıcı OTP’si rapora yazılmaz.
+
+26 Ekim hosted Auth güvenlik kabulü: yayımlanmış26e7091/64 üzerinde gerçek Resend signup-mail doğrulaması, tek kullanımlık proof reddi, native TOTP enroll/challenge/verify, eski aal1 Edge reddi, güçlü erişim, native direct removal fence, güçlü backend removal+repeat ve tek enable/disable history geçti. Ayrıntılar [aktif rapordadır](../reports/account-identity-progress-20261026.md). Yeni65 yerel kimlik trigger’ları bu hosted denemede yoktur; yeni kaynak/restore kabulü açık kalır.

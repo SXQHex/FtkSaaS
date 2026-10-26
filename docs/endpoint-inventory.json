@@ -5726,6 +5726,31 @@
       "limits": [
         "Verified TOTP removal requires fresh strong current proof and one-time bounded exact-factor intent; native direct verified-factor deletion is fenced."
       ]
+    },
+    {
+      "name": "account_google_link_prepare_v1",
+      "status": "operational_development_limited",
+      "external_path": "/functions/v1/backend-v1/account_google_link_prepare_v1",
+      "permission": "account.self",
+      "features": [
+        "F06"
+      ],
+      "required_features": [
+        "F06"
+      ],
+      "runtime_required_features": [],
+      "decision_delivery": {
+        "accepted_contract": "DS-2026-10-17",
+        "runtime_conformance": "implemented_pending_ci",
+        "open_dependencies": [],
+        "target_request": {
+          "$ref": "#/$defs/Request_account_google_link_prepare"
+        }
+      },
+      "billing_class": "exempt",
+      "limits": [
+        "Obtain Google ID token first. Prepare with fresh current native reauth; within 10 seconds call native id_token grant with link_identity=true and matching Google token/nonce. Native signature, issuer, audience and nonce checks are mandatory."
+      ]
     }
   ]
 }

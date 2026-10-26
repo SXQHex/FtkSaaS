@@ -1,3 +1,4 @@
+import './account-identity-acceptance.mjs';
 import './account-mfa-acceptance.mjs';
 import './account-session-management-acceptance.mjs';
 import test from 'node:test';

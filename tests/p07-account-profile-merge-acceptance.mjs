@@ -96,13 +96,27 @@ test('P07 account profile and manual cross-center alias merge',async t=>{
    assert.equal((await rows('select limit_count from core.negative_limit_overrides where org_id=$1 and center_id=$2 and person_id=$3 and discipline_id=$4',[org,c1,target,discipline]))[0].limit_count,'0');
    const eligibility=(await rows('select private.lesson_eligibility($1,$2) code',[org,existingReservation]))[0].code;assert.equal(eligibility.eligible,false);assert.equal(eligibility.reason,'debt_policy');
    const personBefore=await must(owner,'person_get_v1',scope({person_id:target}));assert(personBefore.contacts.some(x=>x.value==='p07-old@ftksaas.invalid'));
-   await mut('person_update_v1',{person_id:target,expected_version:personBefore.version,patch:{contacts:[]}});
-   assert.deepEqual((await must(owner,'person_get_v1',scope({person_id:target}))).contacts,[]);
+   await fail('person_update_v1',{person_id:target,expected_version:personBefore.version,patch:{contacts:[]}},'FORBIDDEN');
+   const canonical=personBefore.contacts.filter(c=>c.value===member.email&&c.verified_at).map(({kind,value})=>({kind,value}));assert.equal(canonical.length,1);
+   await mut('person_update_v1',{person_id:target,expected_version:personBefore.version,patch:{contacts:canonical}});
+   const afterContacts=(await must(owner,'person_get_v1',scope({person_id:target}))).contacts;assert.equal(afterContacts.length,1);assert.equal(afterContacts[0].value,member.email);assert(afterContacts[0].verified_at);
    const rights=await must(member,'entitlements_get_v1',scope({person_id:target,session_id:futureSession}));assert(rights.some(x=>x.sale_id===sold));
    const booked=await mut('reservation_create_v1',{person_id:target,session_id:futureSession,source_sale_id:sold,mode:'flexible'});assert.equal((await rows('select sale_id from core.entitlement_allocations where org_id=$1 and reservation_id=$2',[org,booked.primary_id]))[0].sale_id,sold);
    const offset=await mut('student_credit_offset_v1',{person_id:target,debt_id:debt,expected_version:1,amount_minor:'500',currency:'TRY'});assert(offset.primary_id);
    const finance=await must(member,'finance_get_v1',scope({person_id:target,currency:'TRY',page:{}}));assert.equal(finance.debts.find(x=>x.id===debt).remaining_minor,'1200');assert.equal(finance.credit_available_minor,'0');
    await publish('debt_booking',{kind:'boolean',value:true});await fail('reservation_create_v1',{person_id:target,session_id:blockedSession,source_sale_id:sold,mode:'flexible'},'FORBIDDEN');
+  });
+  await t.test('retired account contact stays historical after merge; explicit re-add is unverified',async()=>{
+   const oldEmail=member.email,newEmail='merged-current-'+key()+'@ftksaas.invalid';
+   // Isolate an already-confirmed native value change; real email proofs are
+   // covered by the identity suite, not simulated by this history fixture.
+   await db.query('update auth.users set email=$2 where id=$1',[member.id,newEmail]);member.email=newEmail;
+   const before=await must(owner,'person_get_v1',scope({person_id:target}));assert(before.contacts.some(c=>c.value===newEmail&&c.verified_at));assert(before.contacts.every(c=>c.value!==oldEmail));
+   assert((await rows('select * from core.person_contacts where org_id=$1 and person_id=$2 and value=$3 and account_projection_retired',[org,source,oldEmail])).length>0);
+   const contacts=before.contacts.map(({kind,value})=>({kind,value}));contacts.push({kind:'email',value:oldEmail});
+   await mut('person_update_v1',{person_id:target,expected_version:before.version,patch:{contacts}});
+   const after=await must(owner,'person_get_v1',scope({person_id:target}));const restored=after.contacts.find(c=>c.value===oldEmail);assert(restored);assert.equal(restored.verified_at,null);assert(after.contacts.some(c=>c.value===newEmail&&c.verified_at));
+   assert((await rows('select * from core.person_contacts where org_id=$1 and person_id=$2 and value=$3 and account_projection_retired',[org,source,oldEmail])).length>0);
   });
   await t.test('recovery rate gates are atomic under concurrent callers and do not store addresses',async()=>{
    await db.query('insert into private.p07_recovery_config values(true,86400,1,1)');
