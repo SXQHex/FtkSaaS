@@ -127,3 +127,5 @@ import './p07-account-revocation-acceptance.mjs';
 import './p07-account-profile-merge-acceptance.mjs';
 import './p07-subscription-lifecycle-acceptance.mjs';
 import './p07-lifecycle-acceptance.mjs';
+
+import './starter-plan-gates-acceptance.mjs';

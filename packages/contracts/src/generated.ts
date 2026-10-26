@@ -3047,6 +3047,8 @@ AccountIdentityView?: AccountIdentityView
 Request_account_google_link_prepare?: RequestAccountGoogleLinkPrepare
 GoogleLinkAuthorization?: GoogleLinkAuthorization
 Success_account_google_link_prepare?: SuccessAccountGoogleLinkPrepare
+StarterRetainedScope?: StarterRetainedScope
+StarterScopeSelection?: StarterScopeSelection
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -6100,7 +6102,7 @@ expires_at: Instant
  * via the `definition` "PlanLimit".
  */
 export interface PlanLimit {
-key: ("active_students" | "instructors" | "centers")
+key: ("active_students" | "instructors" | "centers" | "rooms" | "disciplines")
 value: Count
 }
 /**
@@ -6124,6 +6126,36 @@ cancel_at_period_end: Bool
 pending_change: (EntityRef | null)
 limits: PlanLimits
 usage: PlanLimits
+subscription_version?: PositiveInt
+starter_scope?: (StarterScopeSelection | null)
+pending_starter_scope?: (StarterScopeSelection | null)
+starter_scope_required?: boolean
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "StarterScopeSelection".
+ */
+export interface StarterScopeSelection {
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+center_id: string
+scope: StarterRetainedScope
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "StarterRetainedScope".
+ */
+export interface StarterRetainedScope {
+room_id: (string | null)
+discipline_id: (string | null)
+instructor_id: (string | null)
+/**
+ * @maxItems 100
+ *
+ * Items: Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+student_person_ids: string[]
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -10953,6 +10985,8 @@ operation_key: string
  */
 target_plan_id: string
 kept_center_id?: (string | null)
+kept_scope?: StarterRetainedScope
+expected_version?: PositiveInt
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -17218,6 +17252,8 @@ values: {
  */
 target_plan_id?: string
 kept_center_id?: (string | null)
+kept_scope?: StarterRetainedScope
+expected_version?: PositiveInt
 }
 }
 /**
@@ -19716,6 +19752,8 @@ key: {
  */
 target_plan_id: string
 kept_center_id?: (string | null)
+kept_scope?: StarterRetainedScope
+expected_version?: PositiveInt
 }
 }
 /**

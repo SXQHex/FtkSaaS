@@ -1,3 +1,7 @@
+## 26 Ekim — Starter kapsam seçimi ve kapı uygulaması
+
+Son kullanıcı kararı: Starter’a geçişte seçilmeyen oda/disiplin/eğitmen ve öğrenci kapsamının operasyon erişimi kapanır. Geçmiş seans, kesin rezervasyon, hak/para ve denetim kaydı silinmez; üst plana dönüşte erişim açılır. Seçim ödenmiş dönem sonunda uygulanır, yürürlükten önce sürümlü istekle değiştirilebilir. Başlamış/eski rezervasyonları tamamlama istisnası verilmez. Bu revizyon önceki açık seçim/operasyon sorusunun çelişen kısmının yerine geçer. [Typed alanlar, kaynak ve doğrulama sınırı](../docs/starter-plan-gates-handover.md). Bu kaynak henüz adaydır; eski CI sonucu yeni66 migration kabulü değildir.
+
 ## 26 Ekim — satır1 kapanışı ve Turnstile kapsam düzeltmesi
 
 Kimlik/doğrulanmış iletişim/hesap güvenliği backend teslimi main7464383802deb8322e14a5ebec7d5e2ef650e436 üzerinde aday/main/CD ve gerçek native kurtarma kabulünü tamamladı; [kapsam ve kanıt](../docs/remote-backend-setup.md#teslim1-native-kurtarma-kabul-20261026). Önceki aday/yerel65/pending ifadeleri kaynağının tarihsel durumudur. Bu belge değişikliği runtime, migration, makine sözleşmesi veya endpoint envanteri değiştirmez.

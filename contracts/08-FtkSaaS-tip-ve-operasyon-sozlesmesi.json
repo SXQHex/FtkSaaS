@@ -4593,7 +4593,9 @@
           "enum": [
             "active_students",
             "instructors",
-            "centers"
+            "centers",
+            "rooms",
+            "disciplines"
           ]
         },
         "value": {
@@ -4678,6 +4680,32 @@
         },
         "usage": {
           "$ref": "#/$defs/PlanLimits"
+        },
+        "subscription_version": {
+          "$ref": "#/$defs/PositiveInt"
+        },
+        "starter_scope": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/StarterScopeSelection"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "pending_starter_scope": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/StarterScopeSelection"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "starter_scope_required": {
+          "type": "boolean"
         }
       },
       "required": [
@@ -14457,6 +14485,12 @@
               "type": "null"
             }
           ]
+        },
+        "kept_scope": {
+          "$ref": "#/$defs/StarterRetainedScope"
+        },
+        "expected_version": {
+          "$ref": "#/$defs/PositiveInt"
         }
       },
       "required": [
@@ -33719,6 +33753,12 @@
                   "type": "null"
                 }
               ]
+            },
+            "kept_scope": {
+              "$ref": "#/$defs/StarterRetainedScope"
+            },
+            "expected_version": {
+              "$ref": "#/$defs/PositiveInt"
             }
           },
           "required": [],
@@ -38333,6 +38373,12 @@
                   "type": "null"
                 }
               ]
+            },
+            "kept_scope": {
+              "$ref": "#/$defs/StarterRetainedScope"
+            },
+            "expected_version": {
+              "$ref": "#/$defs/PositiveInt"
             }
           },
           "required": [
@@ -46045,6 +46091,72 @@
         "ok",
         "data",
         "trace_id"
+      ],
+      "additionalProperties": false
+    },
+    "StarterRetainedScope": {
+      "type": "object",
+      "properties": {
+        "room_id": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/FtkUuid"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "discipline_id": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/FtkUuid"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "instructor_id": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/FtkUuid"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "student_person_ids": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/FtkUuid"
+          },
+          "uniqueItems": true,
+          "maxItems": 100
+        }
+      },
+      "required": [
+        "room_id",
+        "discipline_id",
+        "instructor_id",
+        "student_person_ids"
+      ],
+      "additionalProperties": false
+    },
+    "StarterScopeSelection": {
+      "type": "object",
+      "properties": {
+        "center_id": {
+          "$ref": "#/$defs/FtkUuid"
+        },
+        "scope": {
+          "$ref": "#/$defs/StarterRetainedScope"
+        }
+      },
+      "required": [
+        "center_id",
+        "scope"
       ],
       "additionalProperties": false
     }
@@ -54238,9 +54350,7 @@
         "required_features": [
           "F13"
         ],
-        "runtime_required_features": [
-          "F13"
-        ],
+        "runtime_required_features": [],
         "conditional_features": [],
         "operation_contract": {
           "kind": "command",
@@ -62935,7 +63045,7 @@
         "audit": true,
         "notification": "outbox_if_user_visible_business_result",
         "concurrency": "Live original permission/tenant scope on every request; target/aggregate lock; append_or_current_scope_lock; idempotent receipt and all declared effects rollback together",
-        "expected_version_subject": "saas_subscriptions: append_or_current_scope_lock; captured target/scope dependencies, no client row version",
+        "expected_version_subject": "saas_subscriptions: target Starter requires expected_version and explicit retained scope; other target plans retain append/current-scope-lock behavior",
         "acceptance_scenario_ids": [
           "A01",
           "A02",
@@ -65612,7 +65722,6 @@
           "F25"
         ],
         "runtime_required_features": [
-          "F21",
           "F25"
         ],
         "conditional_features": [],
@@ -87194,6 +87303,24 @@
         "generation": "uuidv7"
       },
       {
+        "path": "#/$defs/UserSettingsValues/properties/startup_context/anyOf/0/properties/org_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/UserSettingsValues/properties/startup_context/anyOf/0/properties/center_id/anyOf/0",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/UserSettingsValues/properties/startup_context/anyOf/0/properties/discipline_id/anyOf/0",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
         "path": "#/$defs/MemberSettingsValues/properties/interest_center_ids/items",
         "origin": "ftksaas",
         "acceptance": "generic_uuid",
@@ -87848,24 +87975,6 @@
         "generation": "uuidv7"
       },
       {
-        "path": "#/$defs/UserSettingsValues/properties/startup_context/anyOf/0/properties/org_id",
-        "origin": "ftksaas",
-        "acceptance": "generic_uuid",
-        "generation": "uuidv7"
-      },
-      {
-        "path": "#/$defs/UserSettingsValues/properties/startup_context/anyOf/0/properties/center_id/anyOf/0",
-        "origin": "ftksaas",
-        "acceptance": "generic_uuid",
-        "generation": "uuidv7"
-      },
-      {
-        "path": "#/$defs/UserSettingsValues/properties/startup_context/anyOf/0/properties/discipline_id/anyOf/0",
-        "origin": "ftksaas",
-        "acceptance": "generic_uuid",
-        "generation": "uuidv7"
-      },
-      {
         "path": "#/$defs/AccountSessionView/properties/session_id",
         "origin": "provider",
         "acceptance": "generic_uuid",
@@ -88035,6 +88144,36 @@
       },
       {
         "path": "#/$defs/Success_account_google_link_prepare/properties/trace_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/StarterRetainedScope/properties/room_id/anyOf/0",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/StarterRetainedScope/properties/discipline_id/anyOf/0",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/StarterRetainedScope/properties/instructor_id/anyOf/0",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/StarterRetainedScope/properties/student_person_ids/items",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/StarterScopeSelection/properties/center_id",
         "origin": "ftksaas",
         "acceptance": "generic_uuid",
         "generation": "uuidv7"
@@ -89204,7 +89343,7 @@
         "acceptance_case_ids": [],
         "baseline_regression": "global baseline 241-test main CI; not per-feature DS acceptance",
         "plan_scope": {
-          "starter": "Tek merkez",
+          "starter": "1 aktif merkez/oda/disiplin/eğitmen; 100 aktif öğrenci",
           "pro": "Tek merkez",
           "business": "Çoklu merkez"
         },
@@ -89729,7 +89868,7 @@
         "name": "Kontenjanlı açık grup dersine öğrencinin kaydolması",
         "owner": "M04",
         "plans": {
-          "starter": false,
+          "starter": true,
           "pro": true,
           "business": true
         },
@@ -89752,7 +89891,7 @@
         "acceptance_case_ids": [],
         "baseline_regression": "global baseline 241-test main CI; not per-feature DS acceptance",
         "plan_scope": {
-          "starter": "—",
+          "starter": "Tek disiplinli sabit programın öğrenci self rezervasyonu",
           "pro": "Var",
           "business": "Var"
         },
@@ -89803,7 +89942,7 @@
         "name": "Eğitmen değişikliği",
         "owner": "M04/M08",
         "plans": {
-          "starter": false,
+          "starter": true,
           "pro": true,
           "business": true
         },
@@ -89834,7 +89973,7 @@
         ],
         "baseline_regression": "global baseline 241-test main CI; not per-feature DS acceptance",
         "plan_scope": {
-          "starter": "—",
+          "starter": "Tek aktif eğitmenin temel görevlendirmesi; ücretli/çoklu görevlendirme kapalı",
           "pro": "Var",
           "business": "Var"
         },
@@ -90026,7 +90165,7 @@
         "name": "Süreli/sınırsız üyelik, dönemsel kullanım sınırı",
         "owner": "M06",
         "plans": {
-          "starter": false,
+          "starter": true,
           "pro": true,
           "business": true
         },
@@ -90088,7 +90227,7 @@
         ],
         "baseline_regression": "global baseline 241-test main CI; not per-feature DS acceptance",
         "plan_scope": {
-          "starter": "—",
+          "starter": "Tek merkez/disiplin süreli veya sınırsız paket",
           "pro": "Var",
           "business": "Var"
         },
@@ -90537,7 +90676,7 @@
         "owner": "M09/M10",
         "plans": {
           "starter": false,
-          "pro": false,
+          "pro": true,
           "business": true
         },
         "decision": "contracts/01-FtkSaaS-urun-kapsam-sozlesmesi.md",
@@ -90560,7 +90699,7 @@
         "baseline_regression": "P05 source implemented; real Auth/Storage/worker acceptance pending CI",
         "plan_scope": {
           "starter": "—",
-          "pro": "—",
+          "pro": "Var",
           "business": "Var"
         },
         "completed_dependencies": []
@@ -90569,7 +90708,7 @@
         "name": "Paylaşılabilir işletme takvimi ve başvuru/kayıt sayfası",
         "owner": "M04/M09/M13",
         "plans": {
-          "starter": false,
+          "starter": true,
           "pro": true,
           "business": true
         },
@@ -90601,7 +90740,7 @@
         ],
         "baseline_regression": "global baseline 241-test main CI; not per-feature DS acceptance",
         "plan_scope": {
-          "starter": "—",
+          "starter": "Yalnız ders takvimi/başvurusu; genel CRM veya etkinlik değil",
           "pro": "Var",
           "business": "Var"
         },
@@ -91090,6 +91229,18 @@
       "audit_actor_reason_limits_excess": true,
       "existing_reservations_preserved": true,
       "event_capacity_unchanged": true
+    },
+    "starter_plan_policy": {
+      "revision": "20261026",
+      "limits": {
+        "centers": 1,
+        "rooms": 1,
+        "disciplines": 1,
+        "instructors": 1,
+        "active_students": 100
+      },
+      "retained_scope": "StarterRetainedScope",
+      "downgrade": "explicit versioned selection; excluded resources operationally closed; history unchanged"
     }
   }
 }

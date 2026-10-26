@@ -155,3 +155,5 @@ assert len(account_session_entries)==4*len(account_session_names),'Account sessi
 assert Path('database/account-session-management-wrappers.sql').read_text()=="begin;\n"+'\n'.join(account_session_entries)+"\nnotify pgrst,'reload schema';\ncommit;\n",'Account sessions wrapper drift or privilege expansion'
 
 assert next(Path('supabase/migrations').glob('*_account_identity_projection.sql')).read_text()==Path('database/account-identity-projection.sql').read_text(),'Account identity source drift'
+
+assert next(Path('supabase/migrations').glob('*_starter_plan_gates.sql')).read_text()==Path('database/starter-plan-gates.sql').read_text(),'Starter gates source drift'

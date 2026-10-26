@@ -1,3 +1,11 @@
+## 27 Ekim — PR56 aday kabul düzeltmesi
+
+İlk full clean40415840619 API4'te tek rol okuma senaryosu ve parent nedeniyle başarısız; core/API1/API2/API3 başarılı. Genel rol listesinin Starter F05 kapısı korunarak eski scope fixture'ı Pro'ya taşındı ve owner/CM Starter retleri eklendi. Runtime/66 migration değişmedi. Son oda/rol native12/12,149 yapısal kontrol ve bağımsız inceleme geçti; yeni aday/main/CD kabulü tamamlanmadan Starter teslimi kapanmaz. [Kaynak ve kabul](../reports/starter-plan-gates-role-read-ci-fix-20261027.md).
+
+## 26 Ekim — aktif Starter plan kapıları teslimi
+
+Birinci satır PR55/main3fa72e7 belge kabulüyle kapandı. Aktif iş Starter limit/özellik kapıları ve sürümlü plan düşürme kapsamıdır. Başlangıç main `3fa72e7b805b2bbfb8895f3d90813eaa3cb416aa`; yeni kaynak213 API/66 migration adayıdır. Seçilmeyen kaynakların operasyonu kapanır, geçmiş/rezervasyon/para-hak verisi korunur. [Kaynak, DTO ve kabul sınırı](starter-plan-gates-handover.md). Yeni kaynak final native/bağımsız inceleme/aday/main/CD kabulü henüz tamamlanmadı; production dağıtımı yok. Pro/Business ayrı sayısal limit ve özel teklif işleri bu dar teslimle kapatılmaz. Aşağıdaki eski bekleme/yerel kayıtlar kendi kaynaklarının checkpointleridir.
+
 ## 26 Ekim — satır 1 runtime ve hosted kabulü tamamlandı
 
 Kimlik, doğrulanmış iletişim ve hesap güvenliği tesliminin backend/hosted kabulü tamamlandı. Runtime kaynak main `7464383802deb8322e14a5ebec7d5e2ef650e436`: bağımsız review5656369798, PR54 aday [40370157098](https://github.com/SXQHex/FtkSaaS/actions/runs/40370157098), aynı main [40374760224](https://github.com/SXQHex/FtkSaaS/actions/runs/40374760224) ve gerçek development CD [40378100016](https://github.com/SXQHex/FtkSaaS/actions/runs/40378100016) başarılı. CD receipt20/20; canlı213 API/65 migration/Edge20 ACTIVE/verify_jwt=true. İlgili14 SQL fonksiyon gövdesi kaynakla aynı; aktif ad/iletişim projeksiyon farkı0. [Native kurtarma, sağlayıcı ve temizlik kanıtı](remote-backend-setup.md#teslim1-native-kurtarma-kabul-20261026). Bu kapanış belgesinin kendi kaynak bağlı belge CI/merge kabulü runtime kabulünden ayrıdır; belge değişikliği yeni full-clean veya deploy icrası sayılmaz.

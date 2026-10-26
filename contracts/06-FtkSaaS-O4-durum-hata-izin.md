@@ -1,3 +1,7 @@
+## 26 Ekim — Starter kapıları uygulama adayı
+
+Yeni66 migration adayı Starter canlı limit/özellik/kapsam ve receipt tekrar denetimini uygular; [hata, DTO ve kabul sınırı](../docs/starter-plan-gates-handover.md). Yeni hata/izin enum’u eklenmez: kaynak/öğrenci kota aşımı `PLAN_LIMIT_REACHED`; plan dışı özellik veya seçilmemiş kaynak `PLAN_FEATURE_UNAVAILABLE`; güncel yetki yokluğu `FORBIDDEN`; yabancı/olmayan kimlik `NOT_FOUND`; stale abonelik sürümü `VERSION_CONFLICT`; yanlış ad/çapraz seçim `VALIDATION_FAILED`. Şema kapısı geçerli istekten önce çalışır; malformed istek plan kabul testi değildir. Eski yüksek katalog veya personel grant’i kapıyı açmaz; personel yetkisiyle operasyon Pro/Business lisansına tabidir, öğrencinin kendi ve atanmış eğitmenin bağımsız yetkisi korunur. Bu aday henüz main/hosted kabulü değildir.
+
 # FtkSaaS — O4 durum, hata ve izin sözleşmesi
 
 ## 26 Ekim — Starter/Pro/Business plan erişim hedefi

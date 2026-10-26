@@ -85,12 +85,12 @@ begin
  -- Surviving normal-payment responses must reach the Node Edge validators as well.
  answer:=pg_temp.invoke('saas_payment_submit_v1',jsonb_build_object('org_id',u[5],'amount_minor','10','currency','TRY','reference','normal response sample','occurred_at',clock_timestamp()),u[1],w[1]);payment_id:=(answer->>'primary_id')::uuid;
  perform pg_temp.invoke('saas_payment_verify_v1',jsonb_build_object('org_id',u[5],'payment_id',payment_id,'accepted',false),u[1],w[1]);
- answer:=pg_temp.invoke('subscription_downgrade_request_v1',jsonb_build_object('org_id',u[5],'target_plan_id',w[30],'kept_center_id',u[29]),u[1],w[1]);change_id:=(answer->>'primary_id')::uuid;
+ answer:=pg_temp.invoke('subscription_downgrade_request_v1',jsonb_build_object('org_id',u[5],'target_plan_id',w[30],'kept_center_id',u[29],'expected_version',(select version from core.saas_subscriptions where id=sub_id),'kept_scope',jsonb_build_object('room_id',null,'discipline_id',null,'instructor_id',null,'student_person_ids',jsonb_build_array(u[28]))),u[1],w[1]);change_id:=(answer->>'primary_id')::uuid;
  if not exists(select 1 from core.saas_change_requests where id=change_id and effective_at=original_end and state='scheduled') then raise exception 'DOWNGRADE_NOT_PERIOD_BOUND';end if;
  answer:=pg_temp.invoke('management_state_get_v1',jsonb_build_object('org_id',u[5],'operation','subscription_change_cancel_v1','selector',jsonb_build_object('operation','subscription_change_cancel_v1','key',jsonb_build_object('change_id',change_id))),u[1],w[1]);
  if answer#>>'{items,0,entity,id}' is distinct from change_id::text then raise exception 'CHANGE_SELECTOR_KEY_NOT_RESOLVED %',answer;end if;
  perform pg_temp.invoke('subscription_change_cancel_v1',jsonb_build_object('org_id',u[5],'change_id',change_id,'expected_version',1),u[1],w[1]);
- answer:=pg_temp.invoke('subscription_downgrade_request_v1',jsonb_build_object('org_id',u[5],'target_plan_id',w[30],'kept_center_id',u[29]),u[1],w[1]);change_id:=(answer->>'primary_id')::uuid;
+ answer:=pg_temp.invoke('subscription_downgrade_request_v1',jsonb_build_object('org_id',u[5],'target_plan_id',w[30],'kept_center_id',u[29],'expected_version',(select version from core.saas_subscriptions where id=sub_id),'kept_scope',jsonb_build_object('room_id',null,'discipline_id',null,'instructor_id',null,'student_person_ids',jsonb_build_array(u[28]))),u[1],w[1]);change_id:=(answer->>'primary_id')::uuid;
  update core.saas_change_requests set effective_at=clock_timestamp()-interval '1 second' where id=change_id;
  insert into core.operation_receipts(id,org_id,actor_fingerprint,operation,key_hash,payload_hash,state,result_expires_at) values(w[42],u[5],'probe','subscription_boundary_apply_v1','probe-42','probe','in_progress',now()+interval '1 day');
  perform private.p07_boundary(u[5],sub_id,w[42],pg_temp.bank(512));
@@ -139,6 +139,8 @@ begin
  if private.access_mode(u[5])<>'normal' then raise exception 'PAID_REOPEN_FAILED';end if;
  if private.p07_due_allowed(u[5],(select closed_at from private.p07_closure_epochs where org_id=u[5])) or not private.p07_due_allowed(u[5],clock_timestamp()+interval '1 day') then raise exception 'REOPEN_DUE_BOUNDARY_WRONG';end if;
 
+ -- Automation clocks are tested under a licensed multi-center plan; Starter's excluded center remains closed above.
+ update core.saas_subscriptions set plan_version_id=u[21],version=version+1 where id=sub_id;
  -- Reopened organizations suppress missed work while keeping every future trigger live.
  update private.p07_closure_epochs set closed_at=clock_timestamp()-interval '2 days',reopened_at=clock_timestamp()-interval '1 hour' where org_id=u[5];
  update core.center_relationships set started_at=clock_timestamp()-interval '5 days' where id=u[34];
