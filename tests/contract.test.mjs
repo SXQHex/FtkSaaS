@@ -52,6 +52,8 @@ test('P04 public ingress binds exact body/path/IP and provider hostname/action; 
  for(const clientIp of [ip,'2001:0DB8:0000:0000:0000:0000:0000:0001']){
   const signed=signPublicApplication(body,clientIp,cfg.FTK_PUBLIC_INGRESS_SECRET,now);
   assert(await publicIngress(new Request(req.url,{method:'POST',headers:signed}),body,env,now));
+  assert(await publicIngress(new Request(req.url.replace('/functions/v1',''),{method:'POST',headers:signed}),body,env,now),'Hosted gateway removes the external functions prefix');
+  for(const changed of ['/backend-v1/account_get_v1','/other/public_application_submit_v1','/backend-v1/public_application_submit_v1/','/functions/v1/backend-v1/account_get_v1'])assert.equal(await publicIngress(new Request('https://example.invalid'+changed,{method:'POST',headers:signed}),body,env,now),null,'Only exact known gateway route equivalents may share a signature');
  }
  for(const invalid of ['192.0.2.15, 192.0.2.16','not-an-ip','192.0.2.999','[2001:db8::1]'])assert.throws(()=>signPublicApplication(body,invalid,cfg.FTK_PUBLIC_INGRESS_SECRET,now),/IP/);
  assert.throws(()=>signPublicApplication(body,ip,'short',now),/32 bytes/);

@@ -1,3 +1,17 @@
+## 26 Ekim son karar — native Auth davranışı ve bakım sınırı
+
+Supabase Auth + yerleşik Turnstile ana yoldur. Parola sıfırlanınca mevcut kurtarma oturumu kalır, diğer native oturumlar kapanır; sırf yeniden giriş istemek için sağlayıcının iç SQL/sorgu sırasına bağlı bakım alınmaz. Belirgin güvenlik riski veya bağlayıcı ürün gereksinimi olmayan durumlarda aynı işi tekrar eden auth function/gateway eklenmez. Canlı oturum, MFA, tenant/rol/yetki denetimleri ve mevcut full/main clean kapsamı korunur.
+
+Yayımlanmamış özel all-session-reset66 migration/trigger/marker ve yalnız bu davranışa ait yeni test/enum taslağı iptal edildi. Hosted migration66/table bulunmadığı SQL ile doğrulandı; yayımlanmış65 migration ve mevcut native test assertionları değiştirilmedi. Önceki8/8 native kanıt bu iptal edilmiş taslağın tarihsel kanıtıdır; yeni ürün davranışının kabulü değildir. Runtime213 API/65 migration'dır. Yayınlanmış API'ler bu kararla sessizce silinmez; mevcut istemciler için compatibility korunur, yeni Auth tüketicisi native SDK/endpoint kullanır.
+
+Birinci satır açık kalır: native CAPTCHA/gerçek kurtarma sağlayıcı kabulü ve son kaynak/adayı/main/CD kanıtı tamamlanacaktır. Geçici özel kurtarma gateway'inin başarılı kabulü artık kapanış şartı değildir; bu yol için kullanıcıdan yeniden test istenmez. Önceki10/3 özel sayaçların native karşılığı uygulanmış sayılmaz; native rate-limit envanteriyle açık eşleme yapılır ve yalnız sayısal benzerlik için ek gateway kurulmaz. Aynı oturum URL'sinin gateway'de değişmesinden doğan mevcut public-ingress imza hatası ayrı bir uyumluluk düzeltmesidir; HMAC/route/bot/rate korumaları gevşetilmez.
+
+Aşağıdaki66/özel gateway kabul notları önceki checkpointlerdir; bu son karar çelişen hükümlerinin yerine geçer.
+
+## 26 Ekim — hesap güvenliği kabul sınırı
+
+PR53 main7086d7e0 main clean/CD başarılı;213 API/65 migration yayımlandı. Gerçek Google bağlama13 kontrol ve güvenlik e-postası teslimiyle doğrulandı. Önceki manual-linking kapalı/pending kayıtları tarihsel checkpointtir. S04 son kararı native kurtarma oturumunu korur; özel66 taslağı iptal edilmiştir. Parola native Auth'a gönderilir; business API'ye veya tercih patch'ine eklenmez. Kurtarma tamamlanınca native mevcut oturum korunur; yeniden giriş zorunlu değildir. Normal parola değişimi current session'ı korur. Hosted uygulama kurtarma kapısı/real bot-proof kabulü henüz açıktır.
+
 # Frontend ayar API uygulama devri
 
 ## 26 Ekim — SMS dış entegrasyon kararı (son kullanıcı kabulü)
@@ -127,3 +141,5 @@ E-posta/telefon request/resend/verify native Auth SDK’sındadır. account_get_
 Doğrulanmamış telefon yerel65 adayında account_profile_update_v1.unverified_phone ile E.164 biçiminde kaydedilir; null yalnız bu doğrulanmamış kaydı temizler, alanın gönderilmemesi mevcut değeri korur. account_get_v1.identity.unverified_phone ayrı döner; identity.phone/phone_verified_at yalnız native doğrulama kaynağındandır. Aynı numaranın doğrulanmış native değer olması halinde doğrulanmamış kopya gösterilmez. Org canonical iletişimlerine otomatik yayılmaz, giriş/sahiplik kanıtı değildir. Native SMS pending_phone ile aynı alan değildir. Sürüm/receipt/profile audit mevcut yol üzerinden korunur. Yerel149 yapısal kontrol geçti; eklenen native regression henüz koşulmadı, önceki10/10 sonucu bu yeni alana taşınmaz.
 
 Son telefon düzeltmesi: strict ManagementProjection_account_profile_update_v1.values DTO’suna unverified_phone eklendi; management_state_get üzerinden alanın gerçek dönüşü native regression’a dahil edildi. Nullable yeni alan bile eski strict DTO’da başarısız olduğundan bu kaynak boşluğu kapatıldı.65 migration compile ve SQL profil-yazma/okuma doğrulanmamış kalma, native digits/+ eşdeğer numaranın doğrulanınca draft kopyasının gizlenmesi kontrolleri geçti.149 yapısal kontrol geçti.
+
+Native Auth entegrasyonu: Supabase JS `auth.resetPasswordForEmail(email,{captchaToken,redirectTo})`, `auth.signInWithPassword({email,password,options:{captchaToken}})` ve e-posta kayıt akışındaki `options.captchaToken` kullanılır. Kanıt widget'tan o işlem için alınır; aynı tokenın tekrar kullanımı kabul edilmez. Native CAPTCHA açılması yalnız customEdgeenv kaydı değildir, Auth/provider ayarıdır. Varsayılan native reset tamamlanınca mevcut Auth session korunur; UI zorunlu global signOut/ikinci completionRPC çağırmaz. Korumalı ürün API'leri canlı session/MFA ve tenant/role denetimini sürdürür. Published legacyaccount_passwordreset/change endpointleri bu teslimde silinmez; yeni Authclient native yola geçer ve özel Vercel test URL'si kullanılmaz.

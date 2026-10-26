@@ -2,6 +2,9 @@
 // The gateway signs the exact body/path/IP; CAPTCHA tokens remain provider-verified.
 export type PublicEnv=(key:string)=>string|undefined;
 const enc=new TextEncoder();
+// Supabase's hosted gateway removes /functions/v1 before dispatch. Keep the
+// public signing protocol unchanged and canonicalize only these exact routes.
+const forwardedPublicPaths=new Set(['/backend-v1/public_application_submit_v1','/backend-v1/account_password_reset_request_v1']);
 const hex=(x:ArrayBuffer)=>Array.from(new Uint8Array(x),b=>b.toString(16).padStart(2,'0')).join('');
 export async function keyedHash(secret:string,value:string):Promise<string>{
  const key=await crypto.subtle.importKey('raw',enc.encode(secret),{name:'HMAC',hash:'SHA-256'},false,['sign']);
@@ -13,7 +16,9 @@ export async function publicIngress(req:Request,body:string,env:PublicEnv,now=Da
  if(!secret||!salt)return null;
  if(!ip||!time||!signature||!/^\d{10}$/.test(time)||Math.abs(now/1000-Number(time))>60||ip.length>64||!/^([0-9a-fA-F:.]+)$/.test(ip))return null;
  const digest=hex(await crypto.subtle.digest('SHA-256',enc.encode(body)));
- const expected=await keyedHash(secret,[req.method,new URL(req.url).pathname,time,ip,digest].join('\n'));
+ const receivedPath=new URL(req.url).pathname;
+ const signingPath=forwardedPublicPaths.has(receivedPath)?'/functions/v1'+receivedPath:receivedPath;
+ const expected=await keyedHash(secret,[req.method,signingPath,time,ip,digest].join('\n'));
  if(signature.length!==expected.length)return null;
  let diff=0;for(let i=0;i<expected.length;i++)diff|=signature.charCodeAt(i)^expected.charCodeAt(i);
  if(diff)return null;

@@ -220,8 +220,16 @@ export async function hostedSmoke(api,sql,record){
   created=true;
   const user=await http('/auth/v1/admin/users',{admin:true,body:{id:authId,email,password,email_confirm:true}});
   record('synthetic_user_created',user.status===200&&user.data.id===authId);
-  const session=await http('/auth/v1/token?grant_type=password',{body:{email,password}});token=session.data.access_token;
-  record('real_auth_login',session.status===200&&!!token);
+  // Native Auth supports a trusted-admin CAPTCHA exemption. Keep credentials
+  // server-side; this is a real password grant, never an admin bearer used as
+  // the fixture session or a fabricated CAPTCHA token. Public CAPTCHA acceptance
+  // is a separate hosted provider check, not claimed by this trusted smoke.
+  const publicBad=await http('/auth/v1/token?grant_type=password',{body:{email,password:password+'-wrong'}});
+  record('public_invalid_login_rejected',publicBad.status===400&&['invalid_credentials','captcha_failed'].includes(publicBad.data.error_code));
+  const trustedBad=await http('/auth/v1/token?grant_type=password',{admin:true,body:{email,password:password+'-wrong'}});
+  record('trusted_invalid_password_rejected',trustedBad.status===400&&trustedBad.data.error_code==='invalid_credentials');
+  const session=await http('/auth/v1/token?grant_type=password',{admin:true,body:{email,password}});token=session.data.access_token;
+  record('real_auth_login',session.status===200&&!!token&&session.data.user?.id===authId);
   const account=await edge('account_get_v1');record('auth_edge_rpc_account',account.status===200&&account.data.ok===true);
   const orgs=await edge('organizations_list_v1',{page:{}});record('organizations_read',orgs.status===200&&orgs.data.ok===true);
   const finance=await edge('finance_get_v1',{org_id:uuid(),center_id:uuid(),person_id:uuid(),currency:'TRY',page:{}});record('finance_tenant_boundary',finance.status===200&&finance.data.ok===false&&finance.data.error?.code==='NOT_FOUND');
