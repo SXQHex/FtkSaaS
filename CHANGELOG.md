@@ -1,8 +1,8 @@
 # Changes
 
-## 27 Ekim — tek stüdyo kurulum ve sürümlü ürün adı adayı
+## 27 Ekim — tek stüdyo kurulum ve sürümlü ürün adı kabulü
 
-Mevcut domain komutlarında tek oda40/5 kapasite, süreli/sınırsız satış→rezervasyon→hakedişsiz kapanış için bütünleşik native kabul eklendi.67 migration `product_versions.published_name` snapshotı ve mevcut ProductTerms.name okumasını sürüme bağlar; doğru disiplin ön ekiyle aynı ürüne yeni yayın yapılabilir, eski satış/sürüm/hak değişmez.213 API/90 core tablo korunur; aday/main/CD kabulü bekler.
+Mevcut domain komutlarında tek oda40/5 kapasite, süreli/sınırsız satış→rezervasyon→hakedişsiz kapanış için bütünleşik native kabul eklendi.67 migration `product_versions.published_name` snapshotı ve mevcut ProductTerms.name okumasını sürüme bağlar; doğru disiplin ön ekiyle aynı ürüne yeni yayın yapılabilir, eski satış/sürüm/hak değişmez.213 API/90 core tablo korunur; PR58/main5639783b5dcd963d84bb76ec7bdf75d65a75ced5; bağımsız inceleme5662350042, aday40452100471/main40476673333/CD40479412819 başarılı.67 uygulandı; mevcut Edge21/JWT açık korundu.
 
 ## 27 Ekim 2026 — Starter plan kapıları kabulü ve belge kapanışı
 
