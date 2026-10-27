@@ -1,6 +1,6 @@
 # FtkSaaS
 
-Supabase backend ve ortak API sözleşmelerini içeren pnpm/Turborepo monoreposu. Backend apps/backend, ortak paketler packages, belgeler docs altındadır. Next.js frontend göçü sonraki adımdır.
+Supabase backend ve ortak API sözleşmelerini içeren pnpm/Turborepo monoreposu. Backend apps/backend, ortak paketler packages, belgeler docs altındadır. Next.js frontend apps/web, ortak shadcn/ui bileşenleri packages/ui altındadır; [frontend geliştirme ve test komutları](docs/frontend-development.md).
 
 - [Kaynak indeksi](docs/source-index.md): hangi sorunun hangi dosyada cevaplandığı.
 - [Güncel kabul](docs/contracts/00-FtkSaaS-yeni-sohbet-devir.md): doğrulanmış backend kaynağı ve hosted sürümü.
