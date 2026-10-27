@@ -2,8 +2,8 @@ import {isDeepStrictEqual as same} from 'node:util';
 
 const contractPath='contracts/08-FtkSaaS-tip-ve-operasyon-sozlesmesi.json';
 const generatedPaths=new Set([
- 'packages/contracts/src/generated.ts','packages/contracts/src/operations.ts',
- 'packages/contracts/src/index.ts','packages/contracts/src/runtime.ts',
+ 'packages/api-contracts/src/generated.ts','packages/api-contracts/src/operations.ts',
+ 'packages/api-contracts/src/index.ts','packages/api-contracts/src/runtime.ts',
  'supabase/functions/backend-v1/contract.json','supabase/functions/backend-v1/index.ts',
  'supabase/functions/backend-v1/validators.js','database/runtime-wrappers-current.sql'
 ]);

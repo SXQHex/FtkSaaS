@@ -1,3 +1,5 @@
+> Alan devri: teknik tüketim ve kaynağına bağlı eski kabul kayıtları. Güncel kaynak/CI/hosted durum [00 devirde](../contracts/00-FtkSaaS-yeni-sohbet-devir.md), açık iş [tek backlog’da](remaining-work.md) tutulur. Eski aday/pending ifadeleri yeni görev veya güncel durum değildir.
+
 # P01 — talep, rezervasyon ve bekleme devri
 
 25 Ekim güncel ürün hedefi: [tek oda/seans/kategori kapasitesi ve ayrı kontrollü aşım](../contracts/02-FtkSaaS-teknik-sozlesme.md#oda-seans-kapasite-karari). Yayımlanmış main200/59 DTO'ları ile PR45 adayı201/60 ayrıdır. PR45 bağımsız inceleme ve aday40164825351 başarılı; merge/main/CD bekler. Bu modülün eski test/alan adları kendi tarihsel runtime kaydını anlatır, yeni ürün kuralı değildir.

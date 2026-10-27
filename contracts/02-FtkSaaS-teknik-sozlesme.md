@@ -1,6 +1,10 @@
-## Starter başlangıç ayarları ve self/public — backend adayı
+# FtkSaaS — Teknik sözleşme
 
-Son kabul edilmiş taban PR60/main `6c7587b63681cc9f89d14483eaca71e520a074af` (213 API/67 migration); bu uygulama Draft PR61’de213 API/68 migration’dır. Önceki67 migration değişmez. Son aday/main/CD kabulü tamamlanmadan yeni kaynak yayımlanmış sayılmaz.
+Normatif davranış ve teknik aktarımın sahibidir. Güncel kaynak/envanter/CI/CD [00 devirde](00-FtkSaaS-yeni-sohbet-devir.md); alan bazlı gerçek istemci tüketimi [API devrinde](../docs/claude-handover.md) tutulur. Tarihli aktarım bölümleri kendi kaynağına aittir, güncel kabul veya iş listesi değildir.
+
+## Starter başlangıç ayarları ve self/public
+
+Güncel kaynak/CI/hosted kabulü [00 devirde](00-FtkSaaS-yeni-sohbet-devir.md) tutulur.
 
 | Alan | API ve gerçek tüketici |
 |---|---|
@@ -16,41 +20,17 @@ Public server adapter api/public-application.js, scripts/public-application-gate
 
 Sunucu config’i: FTK_PUBLIC_APPLICATION_HOSTNAME, FTK_PUBLIC_INGRESS_SECRET (en az32bayt), FTK_PUBLIC_ANON_KEY (legacy anon JWT); isteğe bağlı FTK_PUBLIC_BACKEND_ORIGIN yalnız sunucuda HTTPS origin’dir, default mevcut geliştirme Supabase’idir. Edge’de FTK_PUBLIC_INGRESS_SECRET/FTK_PUBLIC_HASH_SECRET/FTK_TURNSTILE_SECRET gerekir. Public hostname FTK_PUBLIC_APPLICATION_HOSTNAME, yoksa legacy FTK_TURNSTILE_HOSTNAME olur. Handler erken kapısı ve siteverify aynı resolver’ı kullanır; recovery action legacy hostname’inde kalır. Sırlar istemciye/kaynağa/rapora yazılmaz.
 
-Kabul kapsamı: native Auth→Edge→RPC yönetim/davet/self rezervasyon; public submit’in DB aşamasında yalnız yerel testte Edge-owned doğrulanmış bağlam emülasyonu; ayrıca tam handler signed ingress→preflight→mock siteverify→submit ve gateway adversarial sözleşme testleri. Bunlar gerçek Turnstile tokenı, dış SMTP veya frontend E2E kabulü değildir. Son kaynak/sonuçlar [PR61 backend raporundadır](../reports/starter-onboarding-20261027.md):151 yerel doğrulama, temiz native9+19=28/28 ve advisors exit0 geçti. Son aday/main/CD kabulü ayrıca bekler.
-
-## 27 Ekim — tek stüdyo kurulum ve ürün adı sürümü kabul edildi
-
-Dar native tek-stüdyo7/7 ve seri Starter kapı9/9 geçti; kaynak hashleri ve başarısız ilk koşular [kabul kaydındadır](../reports/starter-studio-20261027.md). [PR #58](https://github.com/SXQHex/FtkSaaS/pull/58) main `5639783b5dcd963d84bb76ec7bdf75d65a75ced5` üzerinde kabul edildi: **213 API / 67 migration / 90 core tablo**. Son head `a9a09c8685d706d6f9abab842aeb10c7c90b565d` bağımsız incelemesi5662350042, [aday full clean40452100471](https://github.com/SXQHex/FtkSaaS/actions/runs/40452100471), [aynı main full clean40476673333](https://github.com/SXQHex/FtkSaaS/actions/runs/40476673333) ve [development CD40479412819](https://github.com/SXQHex/FtkSaaS/actions/runs/40479412819) başarılı. Aday ve main tree `3d1fc9d98c6eea8864c7bb99e9d7515200a86a74` aynıdır. CD67 migration içerik eşliğini ve20/20 kontrolü doğruladı;67 gerçekten uygulandı. Edge kaynağı değişmediği için yeniden deploy edilmedi; mevcut backend-v1 Edge21 ACTIVE ve `verify_jwt=true` korundu.
-
-Başlangıç main `5892b3cb729d62a045358ffdc588a66361331537`; aynı kaynak main clean40430528120 ve development CD40432912898 başarılı. Kabul edilen kapsam **213 API / 67 migration / 90 core tablo**; önceki66 migration değişmez. Güncel F16 plan izi zaten Starter/Pro/Business’tır; eski Pro/Business-only etiketleri yeniden uygulanmaz. Başlangıç kaynağının kabulü ile yukarıdaki67 migration kabulü ayrı kaynaklara aittir.
-
-Mevcut merkez/oda/disiplin/eğitmen/uygunluk/politika/program/paket/satış/rezervasyon/yoklama komutları kullanılır; yeni kurulum modülü veya endpoint yoktur. `core.product_versions.published_name` sürüme bağlı ad snapshot’ıdır. Eski sürümler yalnız migration öncesinde gerçekten saklanan ürün adıyla doldurulur; bilinmeyen eski adlar uydurulmaz. Starter yayını `terms.name` değerini kendi sürümüne kaydeder; güncel katalog etiketi de güncellenir. Diğer planlarda mevcut ürün kimliği adı davranışı korunur. Eski satışın product_version_id/tarih/bedel/kapsam/hakları yeniden yazılmaz.
-
-Yeni yayın güncel disiplin adı ön ekini ister. Disiplin adı değiştikten sonra eski ön ekli sürümle yeni satış yapılmaz; aynı ürün kimliğinde doğru yeni adla yeni sürüm yayımlanabilir. Eski satışın uygun seçili kapsamındaki rezervasyon ve hak tüketimi devam eder. Canlı plan/yetki, scope, kapasite, borç, belge, kota ve receipt denetimleri korunur; genel JSON settings bu domain komutlarının yerine geçmez.
-
-Kabul kaynağı `tests/starter-studio-acceptance.mjs` mevcut registry shard’ına bağlıdır: gerçek Starter kuruluşu; tek odada40 kişilik tekrarlı program ve ayrı saatte5 kişilik özel seans; eşzamanlı oda reddi ve fiziksel50 tavanı; kredili/kotalı süreli/sınırsız ürün satış-tahsilat-self rezervasyon-kapanış; ad/disciplin değişimi, immutable eski satış/sürüm ve sıfır hakediş. Test config/fiyatları yalnız sentetik kabul verisidir; yeni ticari/politika defaultu değildir. Bu alt teslim native kabul, bağımsız inceleme, aday/main full clean ve development CD ile kapandı. Bütün Starter dağıtım yol haritası veya production hazırlığı tamamlandı sayılmaz. Hedefli40436211363 öncelikli94 testi geçti, sonraki geniş regresyonda45 dakika sınırında iptal edildi; başarılı kabul sayılmadı. Son aday/main tam kapsamı ayrıca başarıyla geçti. Bu belge eşitlemesi yeni runtime test/deploy icrası değildir; tarihsel raporlar korunur.
-
-## 27 Ekim — Starter plan kapıları teslimi kapandı
-
-[PR #56](https://github.com/SXQHex/FtkSaaS/pull/56) main `ed747324f7d008b24103d4fd2eba503791c70a93` üzerinde kabul edildi: **213 callable API / 0 contract_only / 66 migration / 90 core tablo**. [Aday full clean40419827224](https://github.com/SXQHex/FtkSaaS/actions/runs/40419827224), [aynı main full clean40422823564](https://github.com/SXQHex/FtkSaaS/actions/runs/40422823564) ve [development CD40425584520](https://github.com/SXQHex/FtkSaaS/actions/runs/40425584520) başarılı. CD gerçek deploy ve20/20 hosted kontrol içerir; backend-v1 Edge21 ACTIVE, `verify_jwt=true`. JWT doğrulaması son kullanıcı kararıyla açık kalır.
-
-Starter limitleri **1 merkez / 1 aktif oda / 1 disiplin / 1 aktif eğitmen / 100 aktif öğrenci**; tek mantıksal oda, seçili merkez-disiplin paketi ve disiplin adı ön eki uygulanır. Genel CRM/etkinlik/personel/hakediş kapalı; yoklama anlaşmasız ve hakedişsiz çalışır. Canlı plan/kapsam kapıları eski receipt/preview/grant ve doğrudan RPC ile aşılamaz. Pro→Starter kapsam seçimi sürümlüdür; seçilmeyen operasyon kapanır, geçmiş seans/kesin rezervasyon/hak/finans kayıtları korunur. [DTO, kapsam ve kabul kanıtları](../docs/starter-plan-gates-handover.md).
-
-Bu kapanış yalnız plan kapıları ve sürümlü kapsam düşürme teslimidir; bütün Starter dağıtım yol haritası, gerçek public hostname/Turnstile, Pro/Business ayrı limit/özel teklif veya production hazırlığı tamamlandı sayılmaz. Aşağıdaki önceki kaynaklara ait tarihli aday/bekleme/envanter notları tarihsel checkpointlerdir; güncel kabul veya açık iş olarak kullanılmaz. Tarihsel `reports/` dosyaları ve eski kaynak snapshotları korunur. Bu belge eşitlemesi yeni runtime testi veya deploy değildir.
+Kabul kanıtı ve sağlayıcı sınırı yalnız [00 devirde](00-FtkSaaS-yeni-sohbet-devir.md) tutulur.
 
 ## 26 Ekim — Starter kapsam seçimi ve kapı uygulaması
 
-Son kullanıcı kararı: Starter’a geçişte seçilmeyen oda/disiplin/eğitmen ve öğrenci kapsamının operasyon erişimi kapanır. Geçmiş seans, kesin rezervasyon, hak/para ve denetim kaydı silinmez; üst plana dönüşte erişim açılır. Seçim ödenmiş dönem sonunda uygulanır, yürürlükten önce sürümlü istekle değiştirilebilir. Başlamış/eski rezervasyonları tamamlama istisnası verilmez. Bu revizyon önceki açık seçim/operasyon sorusunun çelişen kısmının yerine geçer. [Typed alanlar, kaynak ve doğrulama sınırı](../docs/starter-plan-gates-handover.md). Bu kaynak PR56 ile aday/main/CD kabulünü tamamladı;66. migration uygulandı.
+Son kullanıcı kararı: Starter’a geçişte seçilmeyen oda/disiplin/eğitmen ve öğrenci kapsamının operasyon erişimi kapanır. Geçmiş seans, kesin rezervasyon, hak/para ve denetim kaydı silinmez; üst plana dönüşte erişim açılır. Seçim ödenmiş dönem sonunda uygulanır, yürürlükten önce sürümlü istekle değiştirilebilir. Başlamış/eski rezervasyonları tamamlama istisnası verilmez. Bu revizyon önceki açık seçim/operasyon sorusunun çelişen kısmının yerine geçer. [Typed alanlar, kaynak ve doğrulama sınırı](../docs/starter-plan-gates-handover.md). Uygulama/dağıtım kabulü00 devirde izlenir.
 
 ## 26 Ekim — satır1 kapanışı ve Turnstile kapsam düzeltmesi
-
-Kimlik/doğrulanmış iletişim/hesap güvenliği backend teslimi main7464383802deb8322e14a5ebec7d5e2ef650e436 üzerinde aday/main/CD ve gerçek native kurtarma kabulünü tamamladı; [kapsam ve kanıt](../docs/remote-backend-setup.md#teslim1-native-kurtarma-kabul-20261026). Önceki aday/yerel65/pending ifadeleri kaynağının tarihsel durumudur. Bu belge değişikliği runtime, migration, makine sözleşmesi veya endpoint envanteri değiştirmez.
 
 Son kullanıcı kararı: Turnstile yalnız hesapsız public başvuru/giriş yollarında uygulanır; native Supabase Auth CAPTCHA etkinleştirmesi satır1 şartı değildir. Native Auth mevcut sağlayıcı davranışıyla çalışır. Kurtarma sonrası current session korunur, diğer oturumlar kapanır; ek all-session reset trigger'ı/marker/tamamlama API'si kurulmaz. Secure email change iki adres doğrulamasını ister. Hosted native secure password change/current-password zorunluluğu kapalıdır; eski uygulama challenge komutu doğrudan native endpoint'e zorunluluk getirmez. Canlı session/MFA ve tenant/rol kontrolleri backend'de sürer.
 
 Native limitler: giriş/kayıt30/5dk/IP, token verification30/5dk/IP, refresh150/5dk/IP ve kullanıcı başına SMTP minimum60sn;900sn/IP10/adres3 eski custom recovery sayacıdır ve native garanti değildir. Yalnız sayısal eşitlik için gateway eklenmez. Gerçek SMS dış entegrasyon, public başvuru sağlayıcı/hostname kabulü ve frontend/production ayrı kalır.
-
-> 23 Ekim 2026 güncel durum: P01–P07 kod/main/geliştirme-test kabulü kapandı; yayımlanmış kapsam **200 API / 0 contract_only / 59 migration / 90 core tablo / Edge8**. P07 runtime kaynağı `4cfc9a55`; güncel belge tabanı `bfb8ccb2`. Beş Cron hattı aktif ve boş kuyrukta healthy/idle; fiziksel imha ve gerçek yük kabulü tamamlanmış değildir. Ayar davranış sprinti ve güncel entegrasyon sınırları [tek devir](00-FtkSaaS-yeni-sohbet-devir.md) ve [ayarlar sözleşmesinde](02-FtkSaaS-teknik-sozlesme.md#ayarlar-sozlesmesi-ve-davranis-sprinti). Eski tarih/CI/pending snapshotları yeni durum kanıtı değildir; ürün kuralları yalnız son açık kararla değişir.
 
 ## 26 Ekim — SMS dış entegrasyon kararı (son kullanıcı kabulü)
 
@@ -58,19 +38,6 @@ Telefon numarası kaydedilebilir; gerçek SMS proof tamamlanmadıkça doğrulanm
 
 E-posta/parola, gerçek Google giriş/bağlama ve doğrulayıcı uygulama TOTP ile ilerlenir. Gerçek SMS sağlayıcısı kurulumu ayrı dış entegrasyon statüsündedir; birinci satırın diğer backend işlerini ve backend kapanışını engellemez. SMS'in gerçek sağlayıcı kabulü tamamlandı işaretlenmez. Doğrulanmamış telefon kaydetme/okuma yolu ile yerel proof/test-code davranışının uygulama kabulü backend kapsamındadır; bu karar tek başına yeni alan/API'nin uygulanmış olduğu kanıtı değildir.
 
-
-## 25 Ekim — PR45 kapasite ve main ayarları uzlaştırması
-
-Başlangıç main `3456050a3061d7bf5dc2ce8898b82c5cfe84e773`: **206 callable API / 60 migration**; PR46 ayarları birleşti, aynı main clean [40200716603](https://github.com/SXQHex/FtkSaaS/actions/runs/40200716603) ve development CD [40202862244](https://github.com/SXQHex/FtkSaaS/actions/runs/40202862244) başarılı. Bu PR45 birleşim adayı kapasite işlemini ekler: **207 callable API / 61 migration**. Altı ayar işlemi ve kapasite davranışı birlikte korunur. Henüz uygulanmamış kapasite migration’ı main’deki ayar migration’ından sonra sıralandı; SQL içeriği ve mevcut 60 migration değişmedi. Önceki PR45 clean yalnız eski tabana aittir; bu birleşik kaynak için bağımsız inceleme ve yeni aday/main clean gerekir. Kapasite henüz main/hosted kabulü değildir.
-
-[Alanlar, API'ler ve kesin destek sınırı](../docs/frontend-settings-handover.md). Teknik SQL/worker yönetimi erteli; beş ekranın bütün 69 davranış grubu tamamlandı denmez. Hazır renk/font/logo, native provider/MFA/oturum ve diğer özel yaşam döngüsü açıkları bu genel tercihlere dönüştürülmez.
-
-
-> Güncel öncelik: [DS-2026-10-17](../docs/decisions/DS-2026-10-17.md). Çelişen eski hükümler yalnız belirtilen kapsamda yürürlükten kalkmıştır. [Hedef sözleşme/runtime ayrımı](../docs/decision-sprint-handover.md).
-
-> **Güncel ek: Q-E03.** Parasal iptal sınırı planlanan başlangıçtır (eşitlik dahil sonrası). Q-E02 merkez iptali korunur. Teknik durum: docs/decisions/Q-E03.md; test/CI kanıtı ayrıca doğrulanır.
-
-# FtkSaaS — Teknik sözleşme
 
 ## 26 Ekim 2026 — SaaS plan güvenlik ve kullanım sınırı (normatif hedef)
 
@@ -93,13 +60,7 @@ Canlı yetkili görevli eğitmen, açık merkez izni olan personel veya canlı m
 
 Kapasite küçültme mevcut kesin kayıtları sessiz iptal etmez. Oda küçültmesi açık seans veya fiilî yer tutmayı fiziksel sınırın dışına çıkaramaz. Eski odanın gerçek fiziksel kapasitesi disiplin değerlerinden tahmin edilmez; eksikse yeni oda bağlı işlemler için açık yapılandırma gerekir. Seans revizyonu etkinlik kapasite DTO'sunu veya sınırsız etkinlik geliştirmesini değiştirmez.
 
-| Katman | Doğrulanmış kaynak ve durum |
-|---|---|
-| Yayımlanmış main | `702063807b0a0d09f559f070ffde1b1ae3e7563b`:200 API/59 migration. [Main39890889184](https://github.com/SXQHex/FtkSaaS/actions/runs/39890889184) belge kabulü; yeni kapasite runtime kabulü değil. |
-| Kapasite adayı | [PR45](https://github.com/SXQHex/FtkSaaS/pull/45), head `149be4f4d925674c97f04d40bb0c9a8416f2c66c`:201 API/60 migration. [Bağımsız inceleme5641685684](https://github.com/SXQHex/FtkSaaS/pull/45#pullrequestreview-5641685684) ve [aday40164825351](https://github.com/SXQHex/FtkSaaS/actions/runs/40164825351) başarılı: core/API1–4/toplayıcı gerçek success. Merge, aynı main clean ve hosted CD bekliyor. |
-| Bu belge PR'si | PR44 karar/alan eşitlemesidir; PR45 runtime/DTO/migration dosyaları taşınmadı. Yeni kapasite API'si main'de var sayılmaz. |
-
-PR45 [ayrıntılı karar/API geçişi](https://github.com/SXQHex/FtkSaaS/blob/149be4f4d925674c97f04d40bb0c9a8416f2c66c/docs/decisions/DS-2026-10-25-session-capacity.md) kaynağına bağlıdır: room_save capacity, seans capacity.total/categories, booking_category ve ayrı reservation_capacity_override_v1 bu adayın sözleşmesidir. Main 08/04/05 ve ortak tipleri hâlen 200/59 kaynağını anlatır; PR45 kabul edilmeden iki kaynağın DTO'ları karıştırılmaz.
+[Kapasite kararı ve istemci DTO geçişi](../docs/decisions/DS-2026-10-25-session-capacity.md) normatif kaynaktır; uygulama/CI/hosted kabulü 00 devirden okunur.
 
 ## 25 Ekim — giriş yöntemlerinde son kullanıcı kararı
 
@@ -805,7 +766,7 @@ P02 PR #28 main cc4878d kaynağında15 API ve aynı main39461804543 kabulüyle t
 
 ## P03 uygulama aktarımı — geliştirme kabulü doğrulandı
 
-P03 **done**: [PR #30](https://github.com/SXQHex/FtkSaaS/pull/30), kabul edilmiş main `10710ffa90747a7e35c452c4c07ba59522f50ce3`. Son head2526347 / basece95a9d / tested merge1768fc2 / tree9ac328b aynı kaynak zinciridir. Bağımsız kaynak incelemesi PR review5594023911 içinde kayıtlı; [aday39527260056](https://github.com/SXQHex/FtkSaaS/actions/runs/39527260056) ve [aynı main39529992556](https://github.com/SXQHex/FtkSaaS/actions/runs/39529992556) completed/success.96 yapı +37 CI politika +27 DB +316 API =476 test düğümü; fail/skipped0,49 migration. Main13:18; aday13:34. Envanter199 sözleşme/140 runtime/59 contract_only,90 core tablo. Geliştirme/test Supabase aynı49 migration/Edge3 kaynağına eşitlendi; ayrı dokuz kontrollü Auth→Edge→RPC smoke ve fixture temizliği başarılı. P04 queued, başlamadı.
+P03 kaynak kabulü [00 devirde](00-FtkSaaS-yeni-sohbet-devir.md); işlem tüketimi [P03 devrindedir](../docs/p03-handover.md).
 
 CashCorrection.amount_minor yeni toplam değil, direction yönünde açık farktır. Artış özgün tahsilat borç kapsamını korur; azalış kaynak alacağı/dağıtımlarını bağlı hareketle geri alır. Harcanmış alacak silinemez. Kalan borç=max(0,net−gross_paid+claimed); alacağa taşınmış ödeme ikinci kez borç ödeme sayılmaz. Alacak geri alımı ilgili allocation azalışını aşamaz. Ters tahsisler her pozitif kaynak satırının açık kalanına kadar deterministic bölünür; previous_id tam o kaynağı gösterir. Ters debt/earning allocation SignedMoney, API bakiye toplamları nonnegative Money kalır. Tam finans geçmişi orgreader/CM/self kapsamındadır; finance.collect personel grantı tam geçmiş vermez. Paket iadesi nakit/hak/rezervasyon işlemi değildir; önizlemede borç ve öğrenci alacağı ayrı gösterilir. Eğitmen correction sonucu kök payment ID ve aggregate version döndürür; yeni fact related içindedir. Önceki fact kayıtları immutable kalır.
 
@@ -1559,7 +1520,7 @@ U25 Güvenlik hareketleri: kullanıcıya kendi giriş, iletişim değişikliği 
 
 ## Pilot operasyonel güvenlik aktarımı — 25 Ekim
 
-Yeni kullanıcı talimatı beş ayar API/alan kabulü ve gerçek pilot zinciri/restore hazırlığıdır. İlk207/62 adayı davranış kararı eklemez: worker connection/session search_path sabitlemesi ve platform event-trigger EXECUTE daraltması. COMMIT yapabilen ops_run üzerine SET clause eklenmez. [Yöntem ve açık kabul sınırı](../docs/pilot-readiness.md). Sentetik pilot verisinin geliştirme ortamında kalıcı tutulması kabul edildi; gerçek kayıtlar korunur, dağıtım öncesi reset şimdi yapılmaz.
+Yeni kullanıcı talimatı beş ayar API/alan kabulü ve gerçek pilot zinciri/restore hazırlığıdır. İlk207/62 adayı davranış kararı eklemez: worker connection/session search_path sabitlemesi ve platform event-trigger EXECUTE daraltması. COMMIT yapabilen ops_run üzerine SET clause eklenmez. [Yöntem ve açık kabul sınırı](../docs/remaining-work.md). Sentetik pilot verisinin geliştirme ortamında kalıcı tutulması kabul edildi; gerçek kayıtlar korunur, dağıtım öncesi reset şimdi yapılmaz.
 
 
 ### 26 Ekim — S08/S09 uygulama alan eşlemesi

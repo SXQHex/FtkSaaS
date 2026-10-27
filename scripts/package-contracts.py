@@ -10,7 +10,7 @@ def read(p):return git('show',sha+':'+p)
 files=git('ls-tree','-r','--name-only',sha).decode().splitlines()
 selected=[p for p in files if (
  (p.startswith('contracts/') and '/source-v2.2/' not in p)
- or p.startswith('packages/contracts/')
+ or p.startswith('packages/api-contracts/')
  or p.startswith('docs/decisions/')
  or p in ['docs/claude-handover.md','docs/endpoint-inventory.json','docs/development-connection.json',
  'vercel.json','reports/qe02-verification.json','reports/qe02-acceptance.log','reports/qe02-review.md','examples/event-cancellation-semantics.json']

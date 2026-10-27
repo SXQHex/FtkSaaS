@@ -1,6 +1,12 @@
-## 27 Ekim — Starter başlangıç ve public backend adayı
+> Tarihsel değişiklik kaydıdır; güncel kabul [00 devirde](contracts/00-FtkSaaS-yeni-sohbet-devir.md), açık iş [tek backlog’da](docs/remaining-work.md).
 
-Yeni Starter org için atomik FD07 negative_default0 ve borçlu rezervasyon/katılım=true başlangıcı; mevcut politikalara backfill yok. Signed public server adapter, ayrı public hostname resolver’ı ve kapalı upstream envelope; native public intent→review→davet/hesap bağı→satış/tahsilat→self rezervasyon kabulü.213 API/68 migration. Draft PR61; son kaynak kabulü bekler. Frontend/site/DNS değişmez.
+## 27 Ekim — frontend göç hazırlığı ve SSoT
+
+pnpm tek lockfile/Turbo workspace, packages/api-contracts yolu ve CI komutları hazırlanır. saaspt kaynak incelemesi tamam; frontend aktarımı ayrı sonraki adımdır. Durum metni kopyaları kaldırılır; eşsiz karar/işletim kayıtları kendi sahibine taşınır. Bu aday eski backend clean/CD kabulüyle yayımlanmış sayılmaz.
+
+## 27 Ekim — Starter başlangıç ve public backend
+
+PR61 yeni Starter FD07 politikaları, public/self backend tüketicileri ve hostname/gateway kurallarını ekledi. Kabul/CI/CD sonuçları [00 devirde](contracts/00-FtkSaaS-yeni-sohbet-devir.md), kaynak/native kanıt [tarihsel raporda](reports/starter-onboarding-20261027.md).
 
 # Changes
 

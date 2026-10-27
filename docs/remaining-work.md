@@ -1,44 +1,25 @@
-# Starter backend — güncel kalan işler
+# Açık işler — tek backlog
 
-Kabul edilmiş main `fc96dc15f336abed20cd0a6c73d84a5b0e3b08b0`:213 API/67 migration/90 core tablo/Edge21 ACTIVE/JWT açık. [PR58](https://github.com/SXQHex/FtkSaaS/pull/58) tek-stüdyo runtime kabulünü, [PR59](https://github.com/SXQHex/FtkSaaS/pull/59) belge kapanışını taşır. [Main40483793353](https://github.com/SXQHex/FtkSaaS/actions/runs/40483793353) ve [development CD40487227365](https://github.com/SXQHex/FtkSaaS/actions/runs/40487227365) başarılıdır.
+Kabul edilmiş kaynak ve kapanmış teslimler [00 devirde](../contracts/00-FtkSaaS-yeni-sohbet-devir.md), aktif sıra [üretim kuyruğunda](production-queue.md). Bu dosya başka belgedeki eski pending listesinden otomatik görev üretmez.
 
-## Kapanmış teslimler
+| Kimlik | Alan | Açık iş ve kapanış ölçütü |
+|---|---|---|
+| REPO-01 | Monorepo/SSoT | Frontend göç planı ve saaspt kaynak incelemesi, tek pnpm lock/Turbo görevleri, ortak API paketi, belge sahipliği ve CI bütünlüğü; odaklı test, son bağımsız inceleme, kaynak bağlı aday/main kabulü. Production/site/DNS taşıması dahil değildir. |
+| WEB-01 | Gerçek istemci entegrasyonu | saaspt kaynaklarını hash/SHA iziyle apps/web ve packages/ui içine aktar; sentetik görünümü native Auth + typed Edge API ile mevcut geliştirme Supabase’ine bağla. Rol/plan/tenant, expected_version, preview, replay/bilinmeyen sonuç ve veri görünürlüğü ekran→API→DB ile doğrulanır. Tasarım kaynağını taşımak bu kabul değildir. |
+| PUBLIC-01 | Public sağlayıcı/istemci devri | uye.fethiyetango.com üzerinde gerçek widget tokenı/action/hostname/replay ve gateway yapılandırmasıyla başvuru kabulü. Backend intent/review/self zinciri kapalıdır; gerçek provider/browser kanıtı mock ile kapanmaz. |
+| ST-02 | Rapor/import/bildirim | P05/P06 motorlarını Starter plan/rol/kapsam ve gerçek consumer akışlarıyla bütünleşik doğrula. Native Auth e-postası kabulü org marketing/reminder teslimi değildir. |
+| ST-03 | Kalan ayar consumerları |69 kabul grubunda eksik alan/DTO/miras/default/şablon/yayın/sağlayıcı eşlemesini [alan devri](frontend-settings-handover.md) üzerinden tamamla. Marka kataloğu/logo/medya, takvim, sessiz saat/özet/olay consumerları ve özel domain yolları generic JSON saklamayla kapanmaz. Yeni Starter FD07 başlangıcı yeniden açılmaz. |
+| OPS-01 | Worker/retention | Beş worker’ın temel kurulum/idle kabulü var; gerçek yük, kesinti/disable-restart ve fiziksel imha kabulünü izole ve kaynak bağlı kanıtla tamamla. |
+| REL-01 | Yayın/geri dönüş | Hosted tam restore, Auth/Storage baytları/secret/config envanteri, RPO/RTO ve yük kabulü. İzole restore sahiplik denemesi ve development CD production kabulü değildir. |
+| CI-ADMIN | Repo koruması | Yönetici required-check/strict-base/bypass ayarlarını ayrı doğrula; kaynak CI kapısı bu ayarların kurulu olduğuna kanıt değildir. |
+| FIN-01 | Eğitmen ödeme okuması | trailing earning_ids doğrulaması ayrı iyileştirmedir; mevcut kabul edilmiş finans/tenant zinciri yeniden açık sayılmaz. |
 
-| Alan | Kabul |
-|---|---|
-| Kimlik/iletişim/oturum | PR54; native Auth, Google bağlama, doğrulanmış e-posta, kurtarma ve canlı oturum iptali. Gerçek SMS ayrı dış entegrasyondur. |
-| Starter plan kapıları | PR56;1 merkez/oda/disiplin/eğitmen/100 aktif öğrenci, API/RPC/replay sınırları ve geçmişi koruyan sürümlü downgrade. |
-| Tek stüdyo ve ürün/hak zinciri | PR58;50 oda tavanında40/5 seans, çakışma reddi, kredili/kotalı süreli/sınırsız satış/tahsilat/self rezervasyon/yoklama/hak tüketimi; sıfır hakediş. |
-| Ürün adı/sürüm | PR58; zorunlu disiplin ön eki, aynı kimlikte yeni yayın, disiplin/ad değişiminde eski satış/bedel/kapsam/hak bütünlüğü. |
-| Temel motorlar | P01–P07 API uygulama kabulü mevcut. Tekrar geliştirilmez; aşağıdaki Starter tüketici ve işletim kabulü ayrı doğrulanır. |
+## Ayrı ürün kapsamı: P08
 
-## Aktif teslim — başlangıç ayarları ve self/public
+[P08 karar kaydı](decisions/P08-accepted-scope.md) Business kurulumunda abone numarası yaşam döngüsü; telefon tabanlı çok kaynaklı ortak CRM/web/reklam başvuru alımı; sınırsız etkinlik kapasitesi; pakete bağlı ders kredisi tüketmeyen Pratik katılımı; Pro/Business diğer limit/özel teklif temsili değerlendirilir. Ortak başvuru için ikinci paralel tablo kurulmaz; kaynak/form/kampanya ve ayrı onay kanıtları korunur. Mevcut public submit’in e-posta/publication DTO’su telefon tabanlı genel CRM ihtiyacını karşılamaz. Uygulama öncesi eşsiz numara/alias/merge ve paketin geçerlilik+bakiye ilişkisi netleştirilir; ürün kararı uydurulmaz.
 
-İki alan Draft PR61 içinde backend kapsamında geliştirilir. Yeni68 migration yalnız yeni Starter org için FD07 üç başlangıç politikasını oluşturur; mevcut ayarlar değişmez. Native davet/hesap bağı→satış/tahsilat→self rezervasyon ve public backend koşulları kabul edilir; gerçek frontend/widget tokenı ve mevcut site dağıtımı son kullanıcı talimatıyla entegrasyon devridir. Son adayda bağımsız inceleme ve tek full clean alınır; aynı main/CD kabulü korunur.
+P08 mevcut Fethiye Tango kurulum değerleri ve önceki izinli tekil yönetici aktarımı [hosted runbook’un kaynak kaydındadır](remote-backend-setup.md). Sipariş/ödenmiş satış/tahsilat/yoklama birbirine çevrilmez.100 tekrar,20 kontenjan,4 ders/2ay ve Pratik adı genel ürün defaultu değildir. İkinci paket kendiliğinden satış değildir; gerçek kulüp verisi silinmez.
 
-| Alan | Kalan iş / kapanış kanıtı |
-|---|---|
-| Yeni işletme başlangıç ayarları | Gerekli alanların mevcut API/DTO/default/miras/yetki/sürüm/reset ve gerçek program/paket/rezervasyon/yoklama tüketici eşlemesi; org zorunlu politika/merkez istisnası; eksik config’in kapalı kalması. Sözleşmede olmayan ticari/politika değeri yaratılmaz. |
-| Öğrenci self/public başlangıcı | Self rezervasyon kabulü korunur; gerçek public hostname, Turnstile action/hostname/replay, signed ingress ve yetkili yapılandırmayla anonim başvuru→yetkili inceleme→öğrenci başlangıcı. Starter genel CRM/etkinlik/deneme Pro kapıları aşılmaz. Gerçek sağlayıcı kanıtı mock ile kapanmaz. |
+## Ertelenmiş ve kapsam dışı
 
-## Sonraki Starter işleri
-
-| Alan | Durum |
-|---|---|
-| Temel rapor/import/bildirim | Mevcut P05/P06 motorları var; Starter plan/rol/kapsam ve gerçek tüketici akışlarının bütünleşik kabulü tamamlanacak. |
-| Gerekli diğer ayar consumerları |69 davranış grubu yeniden onaylatılmaz. Alan bazlı kalan wire/provider/domain/miras/şablon/yayın boşlukları gerçek kaynakla ayrılır; genel JSON saklama yeterli değildir. Marka/medya/takvim gibi özel yaşam döngüleri mevcut destek sınırına göre ele alınır. |
-| Worker işletimi | Beş worker’ın kurulum/idle heartbeat kabulü mevcut; gerçek yük, kesinti/disable-restart ve fiziksel imha kabulü açık. |
-| Geri dönüş/yayın hazırlığı | İzole restore sahiplik kanıtı mevcut; hosted tam geri dönüş, secret/config/Storage envanteri ve RPO/RTO/yük kabulü açık. Development CD production yetkisi değildir. |
-| CI belge istisnası | Yeni devir dosyalarının incelenmiş izin listesine eklenmesi ayrı CI bakımıdır. Bu belge eşitlemesinde politika/kapı değiştirilmez. |
-
-## Ayrı kapsam ve korunacak sınırlar
-
-Pro/Business diğer sayısal limit/özel teklif işleri Starter kapanışını genişletmez. Genel CRM/etkinlikler, Business P08 gerçek kulüp geçmişi ve ders kredisi tüketmeyen Pratik, frontend tasarımı/ekranları ayrı kapsamdır. İnstructor ödeme trailing earning_ids iyileştirmesi ayrı takip notudur; para/tenant sızıntısı bulgusu olarak sunulmaz.
-
-Native Auth güvenlik e-postaları/Resend kurulumu ve gerçek kimlik kabulü tamamlandığından eski “dış e-posta hiç kurulmadı / Google kapalı / kurtarma gateway’i zorunlu” notları güncel açık iş değildir. Organizasyon pazarlama/diğer dış e-posta consumerları ayrıca değerlendirilir. Gerçek SMS erteli; sabit yerel OTP hosted kabul değildir. Ücretsiz plan parola koruması uyarısı kullanıcı kararıyla kapsam dışıdır. ops_run/search_path ve rls_auto_enable önceki düzeltmeleri yeniden açık ilan edilmez; belgeli ops_run linter istisnası korunur.
-
-Repository required-check/strict-base/bypass yönetim ayarlarının doğrulanması ayrı yönetici işidir; source-bound CI kabulü yönetim ayarı kanıtı değildir.
-
-## Kaynaklar
-
-[Güncel devir](../contracts/00-FtkSaaS-yeni-sohbet-devir.md), [kaynak önceliği](source-index.md), [üretim kuyruğu](production-queue.md), [Starter devri](starter-plan-gates-handover.md), [ayar alan/consumer sınırları](frontend-settings-handover.md), [public transport kurulumu](p04-handover.md), [uzak backend kabulü](remote-backend-setup.md). Tarihsel reports/ ve source-v2.2 değiştirilmez; eski aday sayıları yeni kaynağa taşınmaz.
+Gerçek SMS sağlayıcısı ayrı dış entegrasyondur; sabit yerel OTP hosted kanıtı değildir. Apple/Instagram login kapsam dışı, passkey erteli; reklam formu alımı sosyal login değildir. Ayrı kalıcı dummy/pilot kurulum görevi iptaldir; mevcut sentetik veri tekrar kullanılabilir. SQL/Cron/DB teknik yönetim ekranı ertelidir. Free-plan parola koruması uyarısı ve belgeli ops_run search_path linter istisnası yeniden açık ilan edilmez. Frontend gerçek ortamda kullanıma açılmadan production verisi/dağıtımı ayrı kabul edilir.

@@ -1,15 +1,45 @@
-import fs from 'node:fs';import path from 'node:path';import {execFileSync} from 'node:child_process';
-const args=process.argv.slice(2);const changed=args.length?args:JSON.parse(fs.readFileSync('.ci/selection.json')).docs;
-// Inbound links must also be checked after a target is deleted or renamed. Historical reports are immutable snapshots.
-const living=execFileSync('git',['ls-files','-z'],{encoding:'utf8'}).split('\0').filter(p=>p.endsWith('.md')&&!p.startsWith('reports/')&&!p.startsWith('contracts/source-v2.2/'));
-const files=[...new Set([...changed,...living])];
-let count=0;
-for(const f of files){if(!fs.existsSync(f))continue; // Deleted documents have no outgoing links.
- const text=fs.readFileSync(f,'utf8');if(/^(<<<<<<<|=======|>>>>>>>) /m.test(text))throw Error('MERGE_MARKER '+f);
- if(!f.endsWith('.md'))continue;
- for(const m of text.matchAll(/\[[^\]]*\]\(([^)\s]+)(?:\s+"[^"]*")?\)/g)){
-  const link=m[1];if(/^(?:[a-z][a-z0-9+.-]*:|#|\/)/i.test(link))continue;
-  const target=decodeURIComponent(link.split('#')[0].split('?')[0]);if(!target)continue;
-  if(!fs.existsSync(path.resolve(path.dirname(f),target)))throw Error('BROKEN_LOCAL_LINK '+f+' -> '+target);count++;
+import fs from 'node:fs';
+import path from 'node:path';
+import {execFileSync} from 'node:child_process';
+import {pathToFileURL} from 'node:url';
+
+export function markdownAnchors(text){
+ const anchors=new Set(),counts=new Map();let fence=null;
+ for(const line of text.split('\n')){
+  const marker=/^\s{0,3}(`{3,}|~{3,})/.exec(line)?.[1];
+  if(marker){if(!fence)fence=marker;else if(marker[0]===fence[0]&&marker.length>=fence.length)fence=null;continue;}
+  if(fence)continue;
+  for(const m of line.matchAll(/\b(?:id|name)=["']([^"']+)["']/g))anchors.add(m[1]);
+  const heading=/^\s{0,3}#{1,6}\s+(.+?)\s*#*\s*$/.exec(line)?.[1];if(!heading)continue;
+  const slug=heading.replace(/<[^>]*>/g,'').replace(/!?\[([^\]]+)\]\([^)]*\)/g,'$1').toLowerCase().replace(/[^\p{L}\p{M}\p{N}_\-\s]/gu,'').replace(/\s/g,'-');
+  let unique=slug,n=counts.get(slug)??0;while(anchors.has(unique))unique=slug+'-'+(++n);counts.set(slug,n);anchors.add(unique);
  }
-}console.log('Documentation checks:',files.length,'files;',count,'local links');
+ return anchors;
+}
+export function checkDocuments(files){
+ let count=0;const targets=new Map();
+ for(const f of [...new Set(files)]){
+  if(!fs.existsSync(f))continue;
+  const text=fs.readFileSync(f,'utf8');if(/^(<<<<<<<|=======|>>>>>>>) /m.test(text))throw Error('MERGE_MARKER '+f);
+  if(!f.endsWith('.md'))continue;
+  for(const m of text.matchAll(/\[[^\]]*\]\(([^)\s]+)(?:\s+"[^"]*")?\)/g)){
+   const link=m[1];if(/^(?:[a-z][a-z0-9+.-]*:|\/)/i.test(link))continue;
+   const [location,fragment]=link.split('#');const target=decodeURIComponent(location.split('?')[0]);
+   const absolute=path.resolve(path.dirname(f),target||path.basename(f));
+   if(!fs.existsSync(absolute))throw Error('BROKEN_LOCAL_LINK '+f+' -> '+target);
+   if(fragment&&absolute.endsWith('.md')){
+    if(!targets.has(absolute))targets.set(absolute,markdownAnchors(fs.readFileSync(absolute,'utf8')));
+    if(!targets.get(absolute).has(decodeURIComponent(fragment)))throw Error('BROKEN_LOCAL_ANCHOR '+f+' -> '+link);
+   }
+   count++;
+  }
+ }
+ return count;
+}
+if(import.meta.url===pathToFileURL(process.argv[1]??'').href){
+ const args=process.argv.slice(2),changed=args.length?args:JSON.parse(fs.readFileSync('.ci/selection.json')).docs;
+ // Inbound links, including fragments, survive deletion/move checks. Reports are source snapshots.
+ const living=execFileSync('git',['ls-files','-z'],{encoding:'utf8'}).split('\0').filter(p=>p.endsWith('.md')&&!p.startsWith('reports/')&&!p.startsWith('contracts/source-v2.2/'));
+ const files=[...new Set([...changed,...living])];
+ console.log('Documentation checks:',files.length,'files;',checkDocuments(files),'local links');
+}

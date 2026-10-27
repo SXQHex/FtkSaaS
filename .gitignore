@@ -14,3 +14,10 @@ reports/*.log
 
 !reports/qe02-acceptance.log
 .DS_Store
+.next/
+.turbo/
+dist/
+coverage/
+playwright-report/
+test-results/
+*.tsbuildinfo

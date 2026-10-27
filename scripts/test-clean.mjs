@@ -17,7 +17,7 @@ if(role==='api'&&!shard)throw Error('Unknown shard');
 console.log('Supabase CLI:',execFileSync('node_modules/.bin/supabase',['--version'],{encoding:'utf8'}).trim());
 console.log('Clean coverage:',coverageHash(),'role:',role,'shard:',shard?.shard??'none');
 const phaseStart=performance.now();
-run('npm',['run','dev:start']);
+run('pnpm',['run','dev:start']);
 const url=stackStatus().env?.DB_URL;
 if(!url||!['127.0.0.1','localhost'].includes(new URL(url).hostname))throw new Error('LOCAL_DB_REQUIRED');
 fs.mkdirSync('.dev',{recursive:true,mode:0o700});
@@ -36,15 +36,15 @@ try {
 const preparedAt=performance.now();
 if(role!=='api'){
  run('node',['scripts/ci/docs-check.mjs','README.md']);
- run('npm',['run','verify']);
- run('npm',['run','test:db']);
+ run('pnpm',['run','verify']);
+ run('pnpm',['run','test:db']);
 }
 if(role!=='core')run('node',['--test','--test-concurrency=2',...(shard?.suites??apiSuites)]);
 const testsAt=performance.now();
 if(role!=='api'){
-run('npm',['run','dev:seed']);
-run('npm',['run','dev:health']);
-run('npm',['run','db:advisors']);
+run('pnpm',['run','dev:seed']);
+run('pnpm',['run','dev:health']);
+run('pnpm',['run','db:advisors']);
 // Parsing the written report also catches invalid JSON serialization.
 const report=JSON.parse(fs.readFileSync('reports/environment.json','utf8'));
 assert(report.checks.every(x=>x.passed));

@@ -5,12 +5,13 @@
   "environment": "per-checkout isolated native Supabase plus shared development/test project",
   "shared_staging_url": "https://gwyprhenabtpkbojephw.supabase.co",
   "setup_commands": [
-    "npm ci",
-    "npm run dev:start",
-    "npm run dev:seed",
-    "npm run dev:info"
+    "corepack enable",
+    "pnpm install --frozen-lockfile",
+    "pnpm run dev:start",
+    "pnpm run dev:seed",
+    "pnpm run dev:info"
   ],
-  "public_connection_source": "npm run dev:info; API/gateway/Studio/Mailpit ports are generated per checkout",
+  "public_connection_source": "pnpm run dev:info; API/gateway/Studio/Mailpit ports are generated per checkout",
   "public_frontend_env": ".dev/frontend.env",
   "private_synthetic_logins": ".dev/development-users.json",
   "gateway_path": "/functions/v1/backend-v1/{operation}",
@@ -23,13 +24,9 @@
   "requested_remote_target": {
     "project_ref": "gwyprhenabtpkbojephw",
     "project_url": "https://supabase.com/project/gwyprhenabtpkbojephw",
-    "status": "installed_remote_auth_edge_rpc_smoke_passed",
     "environment_role": "development_test_confirmed_by_user",
-    "migration_count_observed": 0,
-    "edge_function_count_observed": 0,
-    "migration_count": 22,
-    "edge_function_count": 1,
     "edge_function": "backend-v1"
   },
-  "remote_verification_report": "reports/remote-backend-verification.json"
+  "current_acceptance_source": "contracts/00-FtkSaaS-yeni-sohbet-devir.md",
+  "historical_verification_report": "reports/remote-backend-verification.json"
 }

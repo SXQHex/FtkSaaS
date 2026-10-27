@@ -1,5 +1,5 @@
 {
-  "name": "@ftksaas/contracts",
+  "name": "@ftksaas/api-contracts",
   "version": "0.2.0-rc.2",
   "private": true,
   "type": "module",
@@ -12,5 +12,8 @@
       "import": "./src/client.ts"
     }
   },
-  "description": "Generated shared backend contract types; runtime validation uses authoritative 08 JSON"
+  "description": "Generated shared backend contract types; runtime validation uses authoritative 08 JSON",
+  "scripts": {
+    "typecheck": "tsc --noEmit -p tsconfig.json"
+  }
 }

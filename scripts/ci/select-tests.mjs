@@ -59,7 +59,7 @@ export function select(changes,{diffAvailable=true,headMatches=true,evidence,ciO
    structural=true;reasons.push(p+': selector/runner or documentation renderer checks; no product runtime source');continue;
   }
   if(p==='reports/p01-a-targeted-diagnosis.json'){structural=true;reasons.push(p+': diagnostic evidence; structural checks, no runtime input');continue;}
-  if(p.startsWith('contracts/')||p.startsWith('packages/')||p.startsWith('supabase/')||p.startsWith('.github/')||['package.json','package-lock.json','tsconfig.json'].includes(p)){
+  if(p.startsWith('contracts/')||p.startsWith('packages/')||p.startsWith('supabase/')||p.startsWith('.github/')||['package.json','pnpm-lock.yaml','pnpm-workspace.yaml','turbo.json','tsconfig.json'].includes(p)){
    all(p+': shared schema/gateway/migration/build or CI dependency');continue;
   }
   if(/^tests\/(contract|governance|ci-policy)\.test\.mjs$/.test(p)||p==='tests/types.test.ts'){structural=true;reasons.push(p+': structural checks');continue;}

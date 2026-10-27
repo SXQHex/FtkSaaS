@@ -1,3 +1,5 @@
+> Alan devri: teknik tüketim ve kaynağına bağlı eski kabul kayıtları. Güncel kaynak/CI/hosted durum [00 devirde](../contracts/00-FtkSaaS-yeni-sohbet-devir.md), açık iş [tek backlog’da](remaining-work.md) tutulur. Eski aday/pending ifadeleri yeni görev veya güncel durum değildir.
+
 # CI-02 — kaynak bağlı belge kabulü ve dört bağımsız shard
 
 ## Kapanış — 20 Ekim 2026

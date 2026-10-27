@@ -1,3 +1,5 @@
+> Alan devri: teknik tüketim ve kaynağına bağlı eski kabul kayıtları. Güncel kaynak/CI/hosted durum [00 devirde](../contracts/00-FtkSaaS-yeni-sohbet-devir.md), açık iş [tek backlog’da](remaining-work.md) tutulur. Eski aday/pending ifadeleri yeni görev veya güncel durum değildir.
+
 # P03 finans ve eğitmen ödemeleri devri
 
 Tarihsel geliştirme notudur. P03 PR30/main10710ffa90747a7e35c452c4c07ba59522f50ce3 ve aday39527260056/main39529992556 başarılarıyla kapandı; güncel P04 ve CD durumu source-index.md ile p04-handover.md içindedir. Aşağıdaki Draft/pending ifadeleri o geliştirme snapshot’ını anlatır.
@@ -25,7 +27,7 @@ Geliştirme kabul kaynağı `d3d5ae65d4ed226573cfb7e163cf2be8e0500c5a`; base `ce
 
 Başlangıç kaydı olmadan ücretli kapanış, cross-center-settlement suite’inin DS-SET gerçek tüketim testlerinde ayrıca korunur:75 eğitmen hakedişi,250 A→B payı, hak tüketimi ve receipt tekrarında mükerrerlik olmaması son hedefli koşuda geçti. Son aday hazırlığında bu helper’a başlangıç alanının null kaldığı, ilk ücretli kapanıştan sonra da kaydın null olduğu assertion’ları eklendi; bu yeni assertion’ların CI kabulü bekliyor. Yeni test atlanmadı, beklenen tutarlar değiştirilmedi.
 
-Geçici `.github/p03-bootstrap.py` ve `.github/workflows/p03-workbench.yml` kaldırıldı; `.github/p03-diagnose.mjs` zaten kaynakta yoktur. Generation standart npm run generate yoluyla sürer. Trusted workflow/scripts/ci/clean-start blob ve mode kümesi main ile eşit olmalıdır; herhangi bir CI politika kurulumu veya kapı istisnası istenmez. Yerel yapısal kontrol ve son kaynak hedefli kabulü bu temizlik farkına ayrıca uygulanır. Yeni aday/main clean ve hosted eşitlemesi henüz yapılmadı.
+Geçici `.github/p03-bootstrap.py` ve `.github/workflows/p03-workbench.yml` kaldırıldı; `.github/p03-diagnose.mjs` zaten kaynakta yoktur. Generation standart pnpm run generate yoluyla sürer. Trusted workflow/scripts/ci/clean-start blob ve mode kümesi main ile eşit olmalıdır; herhangi bir CI politika kurulumu veya kapı istisnası istenmez. Yerel yapısal kontrol ve son kaynak hedefli kabulü bu temizlik farkına ayrıca uygulanır. Yeni aday/main clean ve hosted eşitlemesi henüz yapılmadı.
 
 ## Açık kabul sırası
 

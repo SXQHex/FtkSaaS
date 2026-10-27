@@ -2,14 +2,6 @@
 
 Yayında güncel disiplin ön eki yoksa `VALIDATION_FAILED`; güncel ön eki taşımayan eski sürümle yeni satış `PLAN_FEATURE_UNAVAILABLE`; sürümün `published_name` alanını sonradan değiştirme `INVALID_STATE_TRANSITION` ile reddedilir. Yeni ürün adı yalnız yeni yayın sürümündedir. DTO’ya yeni hata/izin veya yeni endpoint eklenmez; mevcut `ProductTerms.name` seçilen sürümden okunur.67 kabulü PR58/main5639783b5dcd963d84bb76ec7bdf75d65a75ced5, aday40452100471/main40476673333/CD40479412819 ile doğrulandı.
 
-## 27 Ekim — Starter plan kapıları teslimi kapandı
-
-[PR #56](https://github.com/SXQHex/FtkSaaS/pull/56) main `ed747324f7d008b24103d4fd2eba503791c70a93` üzerinde kabul edildi: **213 callable API / 0 contract_only / 66 migration / 90 core tablo**. [Aday full clean40419827224](https://github.com/SXQHex/FtkSaaS/actions/runs/40419827224), [aynı main full clean40422823564](https://github.com/SXQHex/FtkSaaS/actions/runs/40422823564) ve [development CD40425584520](https://github.com/SXQHex/FtkSaaS/actions/runs/40425584520) başarılı. CD gerçek deploy ve20/20 hosted kontrol içerir; backend-v1 Edge21 ACTIVE, `verify_jwt=true`. JWT doğrulaması son kullanıcı kararıyla açık kalır.
-
-Starter limitleri **1 merkez / 1 aktif oda / 1 disiplin / 1 aktif eğitmen / 100 aktif öğrenci**; tek mantıksal oda, seçili merkez-disiplin paketi ve disiplin adı ön eki uygulanır. Genel CRM/etkinlik/personel/hakediş kapalı; yoklama anlaşmasız ve hakedişsiz çalışır. Canlı plan/kapsam kapıları eski receipt/preview/grant ve doğrudan RPC ile aşılamaz. Pro→Starter kapsam seçimi sürümlüdür; seçilmeyen operasyon kapanır, geçmiş seans/kesin rezervasyon/hak/finans kayıtları korunur. [DTO, kapsam ve kabul kanıtları](../docs/starter-plan-gates-handover.md).
-
-Bu kapanış yalnız plan kapıları ve sürümlü kapsam düşürme teslimidir; bütün Starter dağıtım yol haritası, gerçek public hostname/Turnstile, Pro/Business ayrı limit/özel teklif veya production hazırlığı tamamlandı sayılmaz. Aşağıdaki önceki kaynaklara ait tarihli aday/bekleme/envanter notları tarihsel checkpointlerdir; güncel kabul veya açık iş olarak kullanılmaz. Tarihsel `reports/` dosyaları ve eski kaynak snapshotları korunur. Bu belge eşitlemesi yeni runtime testi veya deploy değildir.
-
 ## Starter kapıları — kabul edilmiş hata ve yetki davranışı
 
 PR56 ile kabul edilmiş66. migration Starter canlı limit/özellik/kapsam ve receipt tekrar denetimini uygular; [hata, DTO ve kabul sınırı](../docs/starter-plan-gates-handover.md). Yeni hata/izin enum’u eklenmez: kaynak/öğrenci kota aşımı `PLAN_LIMIT_REACHED`; plan dışı özellik veya seçilmemiş kaynak `PLAN_FEATURE_UNAVAILABLE`; güncel yetki yokluğu `FORBIDDEN`; yabancı/olmayan kimlik `NOT_FOUND`; stale abonelik sürümü `VERSION_CONFLICT`; yanlış ad/çapraz seçim `VALIDATION_FAILED`. Şema kapısı geçerli istekten önce çalışır; malformed istek plan kabul testi değildir. Eski yüksek katalog veya personel grant’i kapıyı açmaz; personel yetkisiyle operasyon Pro/Business lisansına tabidir, öğrencinin kendi ve atanmış eğitmenin bağımsız yetkisi korunur. Bu davranış PR56 aynı-main clean ve development CD kabulüyle doğrulanmıştır.
@@ -20,27 +12,6 @@ PR56 ile kabul edilmiş66. migration Starter canlı limit/özellik/kapsam ve rec
 
 [Ürün kararı](01-FtkSaaS-urun-kapsam-sozlesmesi.md): Starter 1 merkez/1 aktif oda/1 disiplin/1 aktif eğitmen/100 aktif öğrenci; self-servis ve temel ders public başvurusu açık; bağımsız etkinlik, genel CRM/otomasyon ve hakediş kapalı. Pro bütün tek merkezli fonksiyonları, Business en fazla 5 merkezi kapsar. Operasyon rolü, owner/grant veya doğrudan RPC çağrısı plan kapısını aşmaz. Mevcut öğrenci limitinde `RelationshipState=active` ve canlı yetki esas alınır; eski kayıtlar/rezervasyonlar plan düşüşüyle silinmez. Starter isteklerinin hata/izin eşlemesi mevcut `08`, gerçek API ve PR56 kabulüne bağlıdır; yeni hata kodu veya izin enum’u eklenmemiştir. Pro/Business ayrı limit/özel teklif hedefinin tamamı bu dar kabulden türetilmez.
 
-
-## 25 Ekim — PR45 kapasite ve main ayarları uzlaştırması
-
-Başlangıç main `3456050a3061d7bf5dc2ce8898b82c5cfe84e773`: **206 callable API / 60 migration**; PR46 ayarları birleşti, aynı main clean [40200716603](https://github.com/SXQHex/FtkSaaS/actions/runs/40200716603) ve development CD [40202862244](https://github.com/SXQHex/FtkSaaS/actions/runs/40202862244) başarılı. Bu PR45 birleşim adayı kapasite işlemini ekler: **207 callable API / 61 migration**. Altı ayar işlemi ve kapasite davranışı birlikte korunur. Henüz uygulanmamış kapasite migration’ı main’deki ayar migration’ından sonra sıralandı; SQL içeriği ve mevcut 60 migration değişmedi. Önceki PR45 clean yalnız eski tabana aittir; bu birleşik kaynak için bağımsız inceleme ve yeni aday/main clean gerekir. Kapasite henüz main/hosted kabulü değildir.
-
-[Alanlar, API'ler ve kesin destek sınırı](../docs/frontend-settings-handover.md). Teknik SQL/worker yönetimi erteli; beş ekranın bütün 69 davranış grubu tamamlandı denmez. Hazır renk/font/logo, native provider/MFA/oturum ve diğer özel yaşam döngüsü açıkları bu genel tercihlere dönüştürülmez.
-
-
-> 25 Ekim güncel karar: 69 ana grup ve FD01–FD12 kabul edildi; backend işletim ayarları erteli, frontend scope user/member/center/organization/platform. Standart yeni org negatif limit 0, mevcut kulüp −2 korunur. Giriş: e-posta/parola + Google; Apple/Instagram login kapsam dışı, passkey erteli. Oda/seans kapasite kararı ile mevcut yayımlanmış API farklı kaynak aşamalarıdır. [Tek teknik karar ve kaynak durumu](02-FtkSaaS-teknik-sozlesme.md#oda-seans-kapasite-karari), [beş ekran devri](../docs/claude-handover.md). Bu belge yeni runtime teslimi değildir.
-
-> **16 Ekim Q-E02 alan kabulü · 0.2.0-rc.3.** Kullanıcının 16 Ekim 2026 son iptal kabulü önceki çelişen merkez iptali hükümlerinin yerine geçer. Güncel davranış/kanıt: docs/decisions/Q-E02.md, docs/claude-handover.md ve reports/qe02-verification.json. Aşağıdaki eski durum/test sayıları tarihsel kayıttır; teknik aktarım bekleyen işler tamamlandı sayılmaz.
-
-> **Q-D01 durumu:** Etkinlik disiplin/kapsam matrisi ve negatif kredi yasağı kabul edilmiş ve runtime’a aktarılmıştır. İlk teknik aktarım raporları tarihsel kanıttır; güncel kaynak/kabul [tek devirde](00-FtkSaaS-yeni-sohbet-devir.md) ve işlem envanterindedir.
-
-> **İlk aktarımın tarihsel sınırı:** 2.2-tech.1 döneminin iki migration ve kurulum bekleme notları bugünkü uygulama açığı değildir. D01–D09/U01–U08 aktarımı mevcuttur; bütün ürünün kabulü, hosted ve production durumu bundan çıkarılmaz.
-
-> Güncel UUID üretim standardı: U01–U08, UUIDv7. Sağlayıcı kimlikleri korunur.
-
-> Güncel ek: D01–D09 disiplin revizyonu kabul edilmiştir; aşağıdaki tarihsel teknik tamamlanma ifadeleri yeni kapsamı içermez. Kabul hükümleri belgenin sonundadır; güncel kalan uygulama listesi docs/remaining-work.md üzerinden okunur.
-
-17 Ekim 2026 · DS-2026-10-17 aktarımı · Yazılı hedef sözlük. Uygulanmış RLS/endpoint değildir.08 JSON enum ve request/response yapıları makine kaynağı; aşağıdaki rol ve durum anlamları kabul edilmiş02 hükümlerini uygular.
 
 ## Durum aileleri
 

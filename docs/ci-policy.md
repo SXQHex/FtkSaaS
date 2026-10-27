@@ -1,6 +1,10 @@
-# CI çalışma politikası — 20 Ekim 2026
+# CI çalışma politikası
 
 CI-02 PR25/26 ile main’e kuruldu; tam kabul kaynağı0ade7877cc16fc121095decbc276f2fbc868607e / [39425915555](https://github.com/SXQHex/FtkSaaS/actions/runs/39425915555) completed/success. [Teknik devir](ci02-handover.md) kaynak/review/kurulum zincirini, [karar](decisions/CI-2026-10-20.md) bağlayıcı davranışı ve [ölçüm](ci-performance.md) gerçek süreleri taşır. Yeni SHA eski kabulü devralmaz.
+
+## Paket yöneticisi
+
+Kurulum package.json’da sabit pnpm sürümüyle `corepack enable` ve `pnpm install --frozen-lockfile` kullanır. Tek lockfile pnpm-lock.yaml; ortak tipler packages/api-contracts. Paket/workspace/lock değişimi runtime/shared girdi olarak geniş regresyona gider. Bu politika adayı trusted-base kurulum sınırına tabidir; [göç kapsamı](monorepo.md#ci-geçiş-sınırı).
 
 ## Geliştirme ve açık kabul
 

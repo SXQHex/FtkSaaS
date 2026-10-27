@@ -1,19 +1,3 @@
-## 27 Ekim — Starter plan kapıları teslimi kapandı
-
-[PR #56](https://github.com/SXQHex/FtkSaaS/pull/56) main `ed747324f7d008b24103d4fd2eba503791c70a93` üzerinde kabul edildi: **213 callable API / 0 contract_only / 66 migration / 90 core tablo**. [Aday full clean40419827224](https://github.com/SXQHex/FtkSaaS/actions/runs/40419827224), [aynı main full clean40422823564](https://github.com/SXQHex/FtkSaaS/actions/runs/40422823564) ve [development CD40425584520](https://github.com/SXQHex/FtkSaaS/actions/runs/40425584520) başarılı. CD gerçek deploy ve20/20 hosted kontrol içerir; backend-v1 Edge21 ACTIVE, `verify_jwt=true`. JWT doğrulaması son kullanıcı kararıyla açık kalır.
-
-Starter limitleri **1 merkez / 1 aktif oda / 1 disiplin / 1 aktif eğitmen / 100 aktif öğrenci**; tek mantıksal oda, seçili merkez-disiplin paketi ve disiplin adı ön eki uygulanır. Genel CRM/etkinlik/personel/hakediş kapalı; yoklama anlaşmasız ve hakedişsiz çalışır. Canlı plan/kapsam kapıları eski receipt/preview/grant ve doğrudan RPC ile aşılamaz. Pro→Starter kapsam seçimi sürümlüdür; seçilmeyen operasyon kapanır, geçmiş seans/kesin rezervasyon/hak/finans kayıtları korunur. [DTO, kapsam ve kabul kanıtları](starter-plan-gates-handover.md).
-
-Bu kapanış yalnız plan kapıları ve sürümlü kapsam düşürme teslimidir; bütün Starter dağıtım yol haritası, gerçek public hostname/Turnstile, Pro/Business ayrı limit/özel teklif veya production hazırlığı tamamlandı sayılmaz. Aşağıdaki önceki kaynaklara ait tarihli aday/bekleme/envanter notları tarihsel checkpointlerdir; güncel kabul veya açık iş olarak kullanılmaz. Tarihsel `reports/` dosyaları ve eski kaynak snapshotları korunur. Bu belge eşitlemesi yeni runtime testi veya deploy değildir.
-
-## Starter plan revizyonu 20261026
-
-[Starter kapsamı ve wire DTO](starter-plan-gates-handover.md) canlı actor/tenant/yetki kontrollerine ek kapıdır. Seçim dışı kaynak veya yasak özellik eski receipt/preview/rol grant’iyle işletilemez. Starter hedefli düşürmede abonelik `expected_version`, seçilmiş merkez ve `kept_scope` zorunludur; diğer planların önceki wire istekleri korunur. Plan erişimi yokluğu, kişisel Student/Instructor yetkisini personel lisansına dönüştürmez.
-
-> 23 Ekim 2026 güncel durum: P01–P07 kod/main/geliştirme-test kabulü kapandı; yayımlanmış kapsam **200 API / 0 contract_only / 59 migration / 90 core tablo / Edge8**. P07 runtime kaynağı `4cfc9a55`; güncel belge tabanı `bfb8ccb2`. Beş Cron hattı aktif ve boş kuyrukta healthy/idle; fiziksel imha ve gerçek yük kabulü tamamlanmış değildir. Ayar davranış sprinti ve güncel entegrasyon sınırları [tek devir](../contracts/00-FtkSaaS-yeni-sohbet-devir.md) ve [ayarlar sözleşmesinde](../contracts/02-FtkSaaS-teknik-sozlesme.md#ayarlar-sozlesmesi-ve-davranis-sprinti). Eski tarih/CI/pending snapshotları yeni durum kanıtı değildir; ürün kuralları yalnız son açık kararla değişir.
-
-25 Ekim güncel ürün hedefi: [tek oda/seans/kategori kapasitesi ve ayrı kontrollü aşım](../contracts/02-FtkSaaS-teknik-sozlesme.md#oda-seans-kapasite-karari). Yayımlanmış main200/59 DTO'ları ile PR45 adayı201/60 ayrıdır. PR45 bağımsız inceleme ve aday40164825351 başarılı; merge/main/CD bekler. Bu modülün eski test/alan adları kendi tarihsel runtime kaydını anlatır, yeni ürün kuralı değildir.
-
 # API değişmezleri ve uygulama sınırı
 
 Güncel çağrılabilir kullanıcı API transport'u `POST /functions/v1/backend-v1/{operation}` → service-only named RPC'dir; frontend doğrudan core/private veya service-only Data API RPC'sine çağrı yapmaz. P01 sistem worker'ı ayrı dar DB kimliğiyle private worker girişini kullanır; insan Auth dispatcher'ı değildir. Aşağıdaki W/R/P/A/E/B/H ayrımı sözleşmenin işlem türü/hedef taşıma sınıflandırmasıdır; her soyut sınıfın ayrı public URL ile uygulanmış olduğu anlamına gelmez. Kesin çağrılabilir yol ve izinler [endpoint envanterinde](endpoint-inventory.json), kaynak/CI ve açık kapsam [tek devirde](../contracts/00-FtkSaaS-yeni-sohbet-devir.md) izlenir.
@@ -39,7 +23,7 @@ Q-E03: `event_registration_cancel_v1` zamanını backend belirler; planlanan ba�
 
 ## Settings ve frontend sınırları 23 Ekim
 
-[Normatif settings davranışları](../contracts/02-FtkSaaS-teknik-sozlesme.md#ayarlar-sozlesmesi-ve-davranis-sprinti) kabul edilmiş hedef ile callable DTO'yu ayırır. Mevcut200 operasyon yerinde kalır. Profil write-version account_get'den tahmin edilmez; management okumasından alınır. Native parola challenge yanıtı parola tamamlandı/diğer oturumlar kapandı/dış e-posta ulaştı kanıtı değildir.
+[Normatif settings davranışları](../contracts/02-FtkSaaS-teknik-sozlesme.md#ayarlar-sozlesmesi-ve-davranis-sprinti) kabul edilmiş hedef ile callable DTO'yu ayırır. Profil write-version account_get'den tahmin edilmez; management okumasından alınır. Native parola challenge yanıtı parola tamamlandı/diğer oturumlar kapandı/dış e-posta ulaştı kanıtı değildir.
 
 Güncel kişisel bilgi yalnız aktif güvenli hesap bağına yansır; rol veya kişi birleştirmesi üretmez. Geçmiş belge snapshotları ayrı kalır. Tercih sıfırlama izin verme değildir. Görünüm/rol/filtre seçimi erişimi genişletemez; cihaz timezone'u iş Instant'ını değiştiremez. API olmadığı yerde sahte kaydetme başarısı üretilemez.
 

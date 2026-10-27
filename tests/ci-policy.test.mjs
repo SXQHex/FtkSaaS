@@ -216,7 +216,7 @@ test('standalone generated edit, unmapped registration or shared kernel edit can
   x=>x.head['scripts/generate-validators.mjs']='shared generator',
   x=>x.head['supabase/functions/backend-v1/implemented.json']=JSON.stringify({operations:['entitlements_get_v1','unknown_v1']}),
   x=>x.head['supabase/functions/backend-v1/implemented.json']=JSON.stringify({operations:[]}),
-  x=>x.head['packages/contracts/src/unknown.ts']='unknown shared type',
+  x=>x.head['packages/api-contracts/src/unknown.ts']='unknown shared type',
   x=>x.head['scripts/ci/unknown-runner.mjs']='unknown infrastructure'
  ]){const x=deltaFixture();mutate(x);assert.deepEqual(x.run().api,apiSuites);}
 });
@@ -234,8 +234,8 @@ test('actual P01-A branch delta selects two suites even with accumulated generat
  // This regression fixture is optional in shallow external test checkouts;
  // normal workflow uses full git history and the pure snapshot cases above always run.
  try{execFileSync('git',['cat-file','-e',head+'^{commit}'],{stdio:'pipe'});}catch{t.skip('Historical snapshot unavailable in shallow checkout; pure snapshot cases still run');return;}
- const changes=parseChanges(execFileSync('git',['diff','--name-status','-z',base,head],{encoding:'utf8'}));
- const cache=new Map(),read=(side,path)=>{const k=side+':'+path;if(!cache.has(k)){try{cache.set(k,execFileSync('git',['show',(side==='base'?base:head)+':'+path],{encoding:'utf8',maxBuffer:20*1024*1024,stdio:'pipe'}));}catch{cache.set(k,null);}}return cache.get(k);};
+ const changes=parseChanges(execFileSync('git',['diff','--name-status','-z',base,head],{encoding:'utf8'})).map(c=>({...c,path:c.path.replace('packages/contracts/','packages/api-contracts/')}));
+ const cache=new Map(),read=(side,path)=>{const k=side+':'+path;if(!cache.has(k)){try{cache.set(k,execFileSync('git',['show',(side==='base'?base:head)+':'+path.replace('packages/api-contracts/','packages/contracts/')],{encoding:'utf8',maxBuffer:20*1024*1024,stdio:'pipe'}));}catch{cache.set(k,null);}}return cache.get(k);};
  const p=select(changes,{evidence:analyzeDelta(changes,read,[profile])});
  assert.equal(p.broad,false);assert.deepEqual(p.api,['tests/api-acceptance.test.mjs',p01Suite]);assert.deepEqual(p.priority,[p01Suite]);
 });
@@ -411,4 +411,23 @@ test('installed Node runner really queues explicit files lexically in the two pr
   const starts=fs.readFileSync(trace,'utf8').trim().split('\n').map(JSON.parse);
   assert.deepEqual(starts.slice(0,2).sort(),['a','b']);assert.equal(starts[2],'c');
  }finally{rmSync(dir,{recursive:true,force:true});}
+});
+
+import {markdownAnchors,checkDocuments} from '../scripts/ci/docs-check.mjs';
+test('document links reject missing fragments and ignore fenced example headings',()=>fixture((dir)=>{
+ const target=join(dir,'target.md'),source=join(dir,'source.md');
+ writeFileSync(target,'# Güncel kabul\n\n# Güncel kabul\n\n```md\n# Örnek\n```\n<a id="stable-wire"></a>\n');
+ const anchors=markdownAnchors(fs.readFileSync(target,'utf8'));
+ assert(anchors.has('güncel-kabul'));assert(anchors.has('güncel-kabul-1'));assert(anchors.has('stable-wire'));assert(!anchors.has('örnek'));
+ writeFileSync(source,'[Kabul](target.md#güncel-kabul-1) [Wire](target.md#stable-wire)');assert.equal(checkDocuments([source]),2);
+ writeFileSync(source,'[Yanlış](target.md#örnek)');assert.throws(()=>checkDocuments([source]),/BROKEN_LOCAL_ANCHOR/);
+ writeFileSync(source,'[Silindi](deleted.md)');assert.throws(()=>checkDocuments([source]),/BROKEN_LOCAL_LINK/);
+}));
+test('workspace and lock changes retain broad backend coverage and pinned frozen installs',()=>{
+ for(const p of ['pnpm-lock.yaml','pnpm-workspace.yaml','turbo.json','packages/api-contracts/package.json'])assert.deepEqual(plan(p).api,apiSuites,p);
+ for(const f of ['backend','ci-docs','ci-fast','clean-suite','cd-development']){
+  const s=fs.readFileSync('.github/workflows/'+f+'.yml','utf8');assert(s.includes('corepack enable'));assert(s.includes('pnpm install --frozen-lockfile'));assert(!s.includes('npm ci'));
+ }
+ const p=JSON.parse(fs.readFileSync('package.json'));assert.equal(p.packageManager,'pnpm@12.15.0');assert(!fs.existsSync('package-lock.json'));
+ const turbo=JSON.parse(fs.readFileSync('turbo.json'));assert.equal(turbo.tasks['//#test:clean'].cache,false);assert.equal(turbo.tasks['//#verify'].cache,false);
 });
