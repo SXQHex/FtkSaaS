@@ -1,4 +1,5 @@
 import './p06-parser.mjs';
+import './settings-media-unit.mjs';
 import test from 'node:test';import assert from 'node:assert/strict';import fs from 'node:fs';import Ajv from 'ajv/dist/2020.js';import addFormats from 'ajv-formats';import {validate,version} from 'uuid';import {newUuidV7,newOperation} from '../scripts/uuid.mjs';
 test('P05 Storage adapter checks actual bytes/hash/mime/size and returns no internal origin',async()=>{
  const {build}=await import('esbuild');const built=await build({entryPoints:['supabase/functions/backend-v1/document-storage.ts'],bundle:true,platform:'browser',format:'esm',write:false});

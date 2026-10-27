@@ -69,5 +69,6 @@
   "20261027103358_starter_onboarding_defaults.sql": "9c5f3b1e09029ba88ca5b99c4532c74408b4fdff4d1b00ee5211e6c9237fbfe9",
   "20261027212401_starter_preparation_settings.sql": "23c96715b03702431e22d12d9aa0846b649161fa8ae74f0a8feffba9b87d1fd8",
   "20261027213629_starter_peer_sharing.sql": "cb8aa9ab50ec5ca748aa5c2a7466052052ca9671e7726dd78702104ab4f3cd90",
-  "20261027214545_canonical_settings_scope.sql": "b61f1241d9c5fad01c7d0884137f905cba9f74e9fd2b05a7af6ace80426a405e"
+  "20261027214545_canonical_settings_scope.sql": "b61f1241d9c5fad01c7d0884137f905cba9f74e9fd2b05a7af6ace80426a405e",
+  "20261027220147_starter_settings_media.sql": "e63553c4914bce0c050ebe03d66364ac377bb4fa8c7e993e2707c4a7c7689f05"
 }

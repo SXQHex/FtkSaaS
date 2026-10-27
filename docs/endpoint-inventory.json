@@ -5748,6 +5748,28 @@
       "limits": [
         "Obtain Google ID token first. Prepare with fresh current native reauth; within 10 seconds call native id_token grant with link_identity=true and matching Google token/nonce. Native signature, issuer, audience and nonce checks are mandatory."
       ]
+    },
+    {
+      "name": "media_get_v1",
+      "status": "operational_development_limited",
+      "external_path": "/functions/v1/backend-v1/media_get_v1",
+      "permission": "media.read",
+      "features": [],
+      "required_features": [],
+      "runtime_required_features": [],
+      "decision_delivery": {
+        "accepted_contract": "DS-2026-10-17",
+        "runtime_conformance": "implemented_pending_ci",
+        "open_dependencies": [],
+        "target_request": {
+          "$ref": "#/$defs/Request_media_get"
+        }
+      },
+      "billing_class": "read",
+      "limits": [
+        "Authenticated POST only. 1 MiB private PNG/JPEG/WebP binary envelope; no SVG/HTML/remote URL. Current pointer and live scope/privacy are rechecked on every read.",
+        "External/public logo exposure is separately gated by published organization context and selected public fields."
+      ]
     }
   ]
 }

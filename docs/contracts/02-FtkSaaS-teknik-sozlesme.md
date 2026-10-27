@@ -1090,6 +1090,8 @@ Aşağıdaki tablo kapsam eşlemesidir; o gruptaki her alt seçeneğin değeri v
 
 ##### FD03 — profil giriş ve güvenlik (kabul edildi)
 
+ST-03 medya eşlemesi: profil komutunun opsiyonel photo alanı ve org settings komutunun organization-only logo_image alanı kapalı PNG/JPEG/WebP byte nesnesi veya açık null kabul eder; gönderilmeyen değer korunur. Güncel metadata/null ayrı read projeksiyonudur. Typed `media_get_v1` own/organization/lesson_participant bağlamlarında güncel pointer'ı ve canlı yetkiyi yeniden denetler; peer fotoğrafı FD05 photo_visible ve kesin ortak katılımına tabidir. Ham byte özel kayıttadır, audit/receipt/context'e taşınmaz. Boyut/format teknik sınırı, reset/kaldırma, fallback ve public sınırı [ayar devrinde](../frontend-settings-handover.md#özel-fotoğraf-ve-logo-tüketicisi--aday) eşlenir; native kaynak kabulü ayrı kalır.
+
 | Alan | Kabul edilen seçenek/default |
 |---|---|
 | Profil | Görünen ad, ad, soyad, isteğe bağlı kısa serbest hitap ve fotoğraf ayrı; zorunlu unvan listesi yok. Fotoğraf PNG/JPEG/WebP, kaldırılınca baş harfler. |

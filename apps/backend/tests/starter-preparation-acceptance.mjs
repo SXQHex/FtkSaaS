@@ -1,7 +1,8 @@
 import test from 'node:test';import assert from 'node:assert/strict';
 import {authUser,fixturePlatform,must,call,context} from './api-client.mjs';
 import {connect} from '../scripts/db.mjs';import {newUuidV7 as key} from '../scripts/uuid.mjs';
-test('ST-03 Starter preparation defaults copy, authority, reset and program consumer',{timeout:240000},async t=>{
+import fs from 'node:fs';import {createHash} from 'node:crypto';
+test('ST-03 Starter preparation defaults copy, authority, reset and program consumer',{timeout:360000},async t=>{
  const {platform,plan}=await fixturePlatform(),owner=await authUser('st03-preparation-owner'),student=await authUser('st03-preparation-student');
  const db=await connect(),rows=async(sql,args=[])=>(await db.query(sql,args)).rows;let org,center,room,discipline,person,studentPerson;
  const scoped=b=>({org_id:org,center_id:center,...b}),api=(op,b={},u=owner,k=key())=>must(u,op,scoped(b),k);
@@ -79,6 +80,30 @@ test('ST-03 Starter preparation defaults copy, authority, reset and program cons
    await db.query("update core.reservations set state='active' where id=$1",[reservations[1]]);
    await db.query("update core.account_links set state='revoked' where id=$1",[link]);await denied(student,'session_get_v1',scoped({session_id:session}),'NOT_FOUND');
    await db.query("update core.account_links set state='active' where id=$1",[link]);
+  });
+  await t.test('private photo/logo bytes, removal, replay, history and live photo sharing use real consumers',async()=>{
+   const data=JSON.parse(fs.readFileSync('tests/fixtures/settings-images.json')).png,checksum=createHash('sha256').update(Buffer.from(data,'base64')).digest('hex'),image={mime:'image/png',data_base64:data,checksum};
+   const profileBody=async photo=>{const managed=await must(owner,'management_state_get_v1',{operation:'account_profile_update_v1',selector:{operation:'account_profile_update_v1',key:{}}});return {expected_version:managed.items[0].versions[0].version,display_name:managed.items[0].current.values.display_name,photo};};
+   const b=await profileBody(image),k=key();await must(owner,'account_profile_update_v1',b,k);assert.equal((await must(owner,'account_profile_update_v1',b,k)).replayed,true);
+   const photo=(await must(owner,'account_get_v1')).photo;assert.equal(photo.checksum,checksum);assert.equal(photo.bytes,Buffer.from(data,'base64').length);
+   assert.equal(Number((await rows('select count(*) n from private.settings_media_assets where scope_key=$1',['user:'+account.id]))[0].n),1);
+   const own=await must(owner,'media_get_v1',{scope:'user',asset_id:photo.id});assert.equal(own.data_base64,data);assert.deepEqual(own.asset,photo);
+   await denied(student,'media_get_v1',{scope:'user',asset_id:photo.id},'NOT_FOUND');
+   const session=(await rows('select id from core.sessions where org_id=$1',[org]))[0].id,peer={scope:'lesson_participant',org_id:org,session_id:session,person_id:person,asset_id:photo.id};
+   await change('member',{profile_visible:false,photo_visible:false});await denied(student,'media_get_v1',peer,'NOT_FOUND');
+   await change('member',{photo_visible:true});const shared=(await api('session_get_v1',{session_id:session},student)).shared_participants;assert.deepEqual(shared,[{person_id:person,photo}]);assert.equal((await must(student,'media_get_v1',peer)).data_base64,data);
+   const response=await fetch(context().env.API_URL+'/functions/v1/backend-v1/media_get_v1',{method:'POST',headers:{apikey:context().env.ANON_KEY,authorization:'Bearer '+student.jwt,'content-type':'application/json'},body:JSON.stringify({client_api_version:1,request_id:key(),...peer})});assert(response.ok);assert.match(response.headers.get('cache-control'),/no-store/);await response.arrayBuffer();
+   await change('member',{photo_visible:false});await denied(student,'media_get_v1',peer,'NOT_FOUND');
+   await must(owner,'account_profile_update_v1',await profileBody(null),key());assert.equal((await must(owner,'account_get_v1')).photo,null);await denied(owner,'media_get_v1',{scope:'user',asset_id:photo.id},'NOT_FOUND');
+   const orgView=await read('organization'),logoKey=key(),logoBody={...q('organization'),expected_version:orgView.version,patch:{},logo_image:image};
+   await must(owner,'settings_update_v1',logoBody,logoKey);assert.equal((await must(owner,'settings_update_v1',logoBody,logoKey)).replayed,true);
+   const logo=(await read('organization')).logo;assert.equal(logo.checksum,checksum);assert.equal((await must(student,'media_get_v1',{scope:'organization',org_id:org,asset_id:logo.id})).data_base64,data);
+   assert.equal((await must(owner,'centers_list_v1',{org_id:org,page:{}})).items[0].organization_logo.id,logo.id);
+   const history=await must(owner,'settings_history_get_v1',q('organization'));assert.equal(history.items[0].media_change.after_asset_id,logo.id);
+   const saved=(await rows("select c.request from private.p06_contexts c join core.operation_receipts o on o.id=c.receipt_id where o.org_id=$1 and o.key_hash=encode(extensions.digest($2,'sha256'),'hex')",[org,logoKey]))[0];assert(saved);assert(!JSON.stringify(saved.request).includes(data));
+   await denied(student,'settings_update_v1',{...q('organization'),expected_version:(await read('organization')).version,patch:{},logo_image:image},'FORBIDDEN');
+   await denied(owner,'settings_update_v1',{...q('center'),expected_version:(await read('center')).version,patch:{},logo_image:image},'VALIDATION_FAILED');
+   await must(owner,'settings_update_v1',{...q('organization'),expected_version:(await read('organization')).version,patch:{},logo_image:null},key());assert.equal((await read('organization')).logo,null);await denied(student,'media_get_v1',{scope:'organization',org_id:org,asset_id:logo.id},'NOT_FOUND');
   });
   await t.test('typed limits and live CM ownership prevent arbitrary setting writes and replay after revocation',async()=>{
    await denied(student,'settings_get_v1',q('center'),'FORBIDDEN');

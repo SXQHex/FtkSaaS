@@ -167,3 +167,5 @@ assert next(Path('supabase/migrations').glob('*_starter_preparation_settings.sql
 assert next(Path('supabase/migrations').glob('*_starter_peer_sharing.sql')).read_text()==Path('database/starter-peer-sharing.sql').read_text(),'Starter peer sharing source drift'
 
 assert next(Path('supabase/migrations').glob('*_canonical_settings_scope.sql')).read_text()==Path('database/canonical-settings-scope.sql').read_text(),'Canonical settings scope source drift'
+
+assert next(Path('supabase/migrations').glob('*_starter_settings_media.sql')).read_text()==Path('database/starter-settings-media.sql').read_text().replace('commit;\n','',1)+Path('database/starter-settings-media-wrappers.sql').read_text().replace('begin;\n','',1),'Starter media source drift'

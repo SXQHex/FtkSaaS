@@ -3,11 +3,12 @@ import {passwordChallenge,passwordRecovery} from './account-auth.ts';
 import {publicIngress,verifyPublicBot,publicBotHostname} from "./public-ingress.ts";
 import {importStorage,parseImportCsv} from "./import-file.ts";
 import {documentStorage} from "./document-storage.ts";
+import {verifySettingsImage} from './settings-image.ts';
 import implementation from "./implemented.json" with {type:"json"};
 import { v7 } from "uuid";
 import * as validators from "./validators.js";
 const implemented=new Set(implementation.operations);
-const json=(x:unknown,status=200)=>new Response(JSON.stringify(x),{status,headers:{"content-type":"application/json","access-control-allow-origin":"*"}});
+const json=(x:unknown,status=200,noStore=false)=>new Response(JSON.stringify(x),{status,headers:{"content-type":"application/json","access-control-allow-origin":"*",...(noStore?{'cache-control':'private, no-store'}:{})}});
 const failure=(code:string,status=400)=>json({ok:false,error:{code,retryable:code==="TEMPORARY_FAILURE"||code==="OPERATION_IN_PROGRESS",trace_id:v7()}},status);
 Deno.serve(async req=>{
  if(req.method==="OPTIONS")return new Response("",{headers:{"access-control-allow-origin":"*","access-control-allow-headers":"authorization,apikey,content-type,x-ftk-client-ip,x-ftk-ingress-time,x-ftk-ingress-signature,x-ftk-bot-proof","access-control-allow-methods":"POST,OPTIONS"}});
@@ -58,6 +59,9 @@ Deno.serve(async req=>{
   // Native Auth owns factor state. Never read user_metadata for assurance.
   if(user.factors?.some((f:any)=>f.status==='verified')&&claims.aal!=='aal2'&&!(operation==='account_sessions_revoke_v1'&&request.mode==='current'))return failure('AUTH_REQUIRED',401);
   const authAux={verified_aal:claims.aal==='aal2'?'aal2':'aal1'};
+  let imageAux:Record<string,unknown>={};
+  const image=operation==='account_profile_update_v1'?request.photo:operation==='settings_update_v1'?request.logo_image:undefined;
+  if(image!==undefined&&image!==null){try{imageAux=await verifySettingsImage(image);}catch{return failure('VALIDATION_FAILED');}}
   // Authenticated input never controls internal IDs or actor context.
   const readOnly=operation.endsWith("_get_v1")||operation.endsWith("_list_v1")||operation.endsWith("_preview_v1");
   const bulk=["event_attendance_close_v1","event_cancel_apply_v1","sale_apply_v1","program_preview_v1","program_apply_v1","session_change_preview_v1","session_change_apply_v1","class_assignment_set_v1","attendance_close_v1","attendance_correct_apply_v1","reservation_impact_apply_v1","negative_limit_set_v1","policy_publish_v1"].includes(operation);
@@ -139,7 +143,7 @@ Deno.serve(async req=>{
   for(let attempt=0;attempt<4;attempt++){
   const ids=Array.from({length:Math.max(count*2**attempt,requiredCount)},()=>v7());
   const rpc=await fetch(base+"/rest/v1/rpc/"+operation,{method:"POST",headers:{authorization:"Bearer "+key,apikey:key,"content-type":"application/json","Content-Profile":"api_v1"},
-   body:JSON.stringify({p_request:request,p_actor_auth_id:user.id,p_session_id:claims.session_id,p_ids:ids,p_aux:{...(invite??{}),...authAux}})});
+   body:JSON.stringify({p_request:request,p_actor_auth_id:user.id,p_session_id:claims.session_id,p_ids:ids,p_aux:{...(invite??{}),...authAux,...imageAux}})});
   if(!rpc.ok)return failure("TEMPORARY_FAILURE",503);
   const result=await rpc.json();if(result._internal_retry==="uuid_bank_exhausted"){
    // Trusted RPC preflight derives size from the stored immutable selection.
@@ -162,7 +166,7 @@ Deno.serve(async req=>{
     item.content={mime:file.mime,encoding:'base64',data:btoa(raw)};
    }
    const success=(validators as any)["success_"+operation];if(!success?.(result))return failure("INTEGRITY_VIOLATION",500);}
-  return json(result);
+  return json(result,200,operation==='media_get_v1');
   }
   return failure("TEMPORARY_FAILURE",503);
  }catch{return failure("TEMPORARY_FAILURE",503);}

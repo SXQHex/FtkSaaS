@@ -13,8 +13,8 @@ Kullanıcı Starter'da izinli FD01–FD12 alanlarının tamamını seçti; marka
 | FD | Starter tüketicisi ve mevcut sınır |
 |---|---|
 | FD01 | Dil/format/timezone/tema/ölçek alanları typed; gerçek görüntüleme ve cihaz çözümü istemci kabulüdür, iş timezone'u değişmez. |
-| FD02 | Sistem marka fallback'i mevcut; somut renk/font kataloğu, logo yükleme/okuma/kaldırma ve public projeksiyon tamamlanmalı. Frontend'in hazırlamadığı marka assetleri uydurulmaz. |
-| FD03 | Native Auth, Google/TOTP/session/kimlik zinciri kabul edildi; fotoğraf/medya tüketicisi ve izinli profil paylaşımı ayrı doğrulanmalı. |
+| FD02 | Sistem renk/font fallback'i mevcut; aşağıdaki logo hattı aday. Somut renk/font asset kataloğu ve public projeksiyon ayrıca tamamlanmalı; hazır asset uydurulmaz. |
+| FD03 | Native Auth, Google/TOTP/session/kimlik zinciri kabul edildi; aşağıdaki fotoğraf/medya tüketicisi ve izinli paylaşımı adaydır. |
 | FD04 | in_app amaç tercihleri ve zorunlu teslim mevcut; typed olay/zaman/sessiz saat/özet eşlemesi tamamlanmalı. Starter'a F27 hatırlatma veya dış kanal açılmaz. |
 | FD05 | Görünürlük/iletişim/ilgi tercihleri saklanıyor; kesin gelecek/devam eden ortak ders kitlesinde gerçek read tüketicisi ve kişisel takvim bağlantısı tamamlanmalı. |
 | FD06 | İş timezone/availability/pencereler mevcut domain API'lerinde. Program süresi için aşağıdaki kopya/önizleme tüketicisi adaydır; saat adımı ve liste/görünüm cihaz/istemci tarafında tüketilir. |
@@ -42,7 +42,7 @@ Yeni program preview isteğinde duration_minutes gönderilmişse açık değer �
 
 ### Katılımcı paylaşım tüketicisi — aday
 
-`session_get_v1` sonucundaki `shared_participants`, salt okunur `SharedLessonParticipant[]` alanıdır. Varsayılan boş; iki tarafın da aynı planned ve bitmemiş derste active kesin rezervasyonu, hedefin aktif kişi/hesap ve doğrulanmış canlı org bağlantısı gerekir. Başvuru/bekleme kaydı yetmez. `profile_visible` yalnız display_name, `email_visible`/`phone_visible` yalnız native doğrulanmış güncel iletişim alanını ayrı açar. Kapalı alan hiç dönmez; pending veya doğrulanmamış iletişim, hukuki ad/soyad ve finans taşınmaz. Açık ve mevcut hiçbir alanı olmayan kişi listede de görünmez. Fotoğraf henüz bu projeksiyonda yoktur; hazır medya tüketicisiyle ayrıca bağlanmalıdır.
+`session_get_v1` sonucundaki `shared_participants`, salt okunur `SharedLessonParticipant[]` alanıdır. Varsayılan boş; iki tarafın da aynı planned ve bitmemiş derste active kesin rezervasyonu, hedefin aktif kişi/hesap ve doğrulanmış canlı org bağlantısı gerekir. Başvuru/bekleme kaydı yetmez. `profile_visible` yalnız display_name, `email_visible`/`phone_visible` yalnız native doğrulanmış güncel iletişim alanını ayrı açar. `photo_visible` yalnız mevcut fotoğrafın MediaAsset metadata'sını açar; byte okuması da aynı kitle/tercih denetimini tekrar yapar. Kapalı alan hiç dönmez; pending veya doğrulanmamış iletişim, hukuki ad/soyad ve finans taşınmaz. Açık ve mevcut hiçbir alanı olmayan kişi listede de görünmez.
 
 Her okuma canlı tercihi/kayıtları tekrar değerlendirir; kapatma, iptal, bitiş veya unlink sonraki okumada görünürlüğü kaldırır. Katılımcı olmayan CM/personelin aynı session'ı okuyabilmesi bu alandan paylaşım yetkisi üretmez; personelin mevcut operasyonel kişi okuması ayrı kalır. İstemci önceki görünür kopyasını yenilenen sonuçla temizler; dış kopyaların silindiği iddia edilmez. Bu alan org üye dizini veya public profil değildir.
 
@@ -60,7 +60,17 @@ Scope user/platform organizasyonsuz; member/organization için org_id; center i�
 | organization (10) | Canlı Owner/OM; billing_* yalnız Owner | `description`, `address`, `contact_phone`, `contact_email`, `theme_package_id`, `font_package_id`, `billing_name`, `billing_address`, `billing_email`, `program_duration_minutes` |
 | platform (4) | Canlı private.platform_operators kaydı | `application_name`, `support_email`, `support_url`, `maintenance_message` |
 
-theme_package_id/font_package_id şu anda salt okunur sistem fallback null değeridir; katalogda hazır paket yoktur. Seçilmiş/erişilebilirlik-dil/lisans kontrolü yapılmış assetler olmadan keyfi renk/font kabul edilmez. Logo hattı bu teslimde yoktur. Center marka override yoktur.
+theme_package_id/font_package_id şu anda salt okunur sistem fallback null değeridir; katalogda hazır paket yoktur. Seçilmiş/erişilebilirlik-dil/lisans kontrolü yapılmış assetler olmadan keyfi renk/font kabul edilmez. Center marka override yoktur.
+
+## Özel fotoğraf ve logo tüketicisi — aday
+
+Profilde `account_profile_update_v1.photo`, organizasyonda `settings_update_v1.logo_image` opsiyonel `SettingsImageUpload|null` alanıdır. Göndermemek korur, null açık kaldırmadır. İlk resim yoktur; kaldırmada organizasyon adı/sistem simgesi veya kişisel sistem görseli fallback'i kullanılır. Fotoğrafta mevcut profil sürümü `management_state_get_v1` ile okunur; account_get sonucu profil write sürümü yerine kullanılmaz. Logoda mevcut organization settings version gerekir. Yalnız logo değişirken patch:{} geçerlidir; başka scope/boş komutta bu istisna yoktur. Owner/OM org yazma kapısı, self profil kapısı ve canlı replay denetimleri korunur.
+
+Yükleme kapalı `{mime,data_base64,checksum}` nesnesidir: PNG/JPEG/WebP, en fazla1MiB; checksum küçük harf SHA256. Bu sınır mevcut2MiB JSON ingress içinde base64 taşımak için teknik byte tavanıdır, ticari plan limiti değildir. Edge gerçek byte MIME zarfını/hash/boyutu denetler; raster codec veya transcoder iddiası yoktur. SVG/HTML, serbest URL/path, keyfi MIME ve public bucket yoktur. Küçük byte kayıtları private DB'de, metadata/güncel pointer/immutable değişim geçmişiyle atomiktir. Ham resim receipt/audit/tracking context'e kopyalanmaz.
+
+Okuma `media_get_v1` ile authenticated POST'tur; cache-control private,no-store. `scope:user` yalnız kendi güncel photo asset_id'sini; `scope:organization` ilgili canlı üyenin güncel org logosunu; `scope:lesson_participant` org_id/session_id/person_id ile o an açık photo_visible ve kesin ortak katılımı denetler. Sonuç `{asset:SettingsMediaAsset,data_base64}`; istemci Blob üretir. Resim bytes'ı genel account/settings/session listesine eklenmez. AccountView.photo, SettingsView.logo, OrganizationView.logo ve CenterView.organization_logo yalnız metadata/null taşır. Merkez logosu override edilmez; org logosunu canlı okur.
+
+Eski asset ID, kaldırılmış/değişmiş pointer veya kapanmış izin NOT_FOUND verir; imzalı eski URL ile kapıyı aşma yolu yoktur. Kaldırma yeni okumayı keser; fiziksel imha ve dış kopyanın silinmesi sayılmaz. settings_history'de media_change önceki/yeni asset ID'sini gösterir; byte/sır taşımaz. Logo/fotoğraf genel tercih resetine gizlice eklenmez, açık null komutuyla kaldırılır. Public logo gösterimi ayrıca yayımlanmış org bağlamı ve seçili public alan tüketicisine bağlıdır; authenticated logo okuması tek başına public kabulü değildir.
 
 ## Sürüm, reset ve bildirim uyumu
 

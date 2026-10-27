@@ -913,7 +913,8 @@
         "account_sessions_revoke_v1",
         "account_security_history_get_v1",
         "account_totp_remove_v1",
-        "account_google_link_prepare_v1"
+        "account_google_link_prepare_v1",
+        "media_get_v1"
       ]
     },
     "EntityType": {
@@ -3230,6 +3231,16 @@
         },
         "identity": {
           "$ref": "#/$defs/AccountIdentityView"
+        },
+        "photo": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/SettingsMediaAsset"
+            },
+            {
+              "type": "null"
+            }
+          ]
         }
       },
       "required": [
@@ -3261,6 +3272,16 @@
         },
         "version": {
           "$ref": "#/$defs/PositiveInt"
+        },
+        "logo": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/SettingsMediaAsset"
+            },
+            {
+              "type": "null"
+            }
+          ]
         }
       },
       "required": [
@@ -3292,6 +3313,16 @@
         },
         "version": {
           "$ref": "#/$defs/PositiveInt"
+        },
+        "organization_logo": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/SettingsMediaAsset"
+            },
+            {
+              "type": "null"
+            }
+          ]
         }
       },
       "required": [
@@ -6216,6 +6247,16 @@
           ],
           "pattern": "^\\+[1-9][0-9]{7,14}$",
           "maxLength": 16
+        },
+        "photo": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/SettingsImageUpload"
+            },
+            {
+              "type": "null"
+            }
+          ]
         }
       },
       "required": [
@@ -30943,6 +30984,16 @@
               ],
               "pattern": "^\\+[1-9][0-9]{7,14}$",
               "maxLength": 16
+            },
+            "photo": {
+              "anyOf": [
+                {
+                  "$ref": "#/$defs/SettingsMediaAsset"
+                },
+                {
+                  "type": "null"
+                }
+              ]
             }
           },
           "required": [],
@@ -42937,6 +42988,16 @@
             "kind"
           ],
           "additionalProperties": false
+        },
+        "logo": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/SettingsMediaAsset"
+            },
+            {
+              "type": "null"
+            }
+          ]
         }
       },
       "required": [
@@ -43141,6 +43202,16 @@
               },
               "uniqueItems": true,
               "maxItems": 50
+            },
+            "logo": {
+              "anyOf": [
+                {
+                  "$ref": "#/$defs/SettingsMediaAsset"
+                },
+                {
+                  "type": "null"
+                }
+              ]
             }
           },
           "required": [
@@ -43373,6 +43444,16 @@
         "reason": {
           "type": "string",
           "maxLength": 1000
+        },
+        "media_change": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/SettingsMediaChange"
+            },
+            {
+              "type": "null"
+            }
+          ]
         }
       },
       "required": [
@@ -44143,8 +44224,17 @@
             {
               "$ref": "#/$defs/PlatformSettingsValues"
             }
-          ],
-          "minProperties": 1
+          ]
+        },
+        "logo_image": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/SettingsImageUpload"
+            },
+            {
+              "type": "null"
+            }
+          ]
         }
       },
       "required": [
@@ -44304,6 +44394,16 @@
             },
             "patch": {
               "$ref": "#/$defs/OrganizationSettingsValues"
+            },
+            "logo_image": {
+              "anyOf": [
+                {
+                  "$ref": "#/$defs/SettingsImageUpload"
+                },
+                {
+                  "type": "null"
+                }
+              ]
             }
           },
           "required": [
@@ -44352,6 +44452,20 @@
             "patch"
           ],
           "additionalProperties": false
+        }
+      ],
+      "anyOf": [
+        {
+          "properties": {
+            "patch": {
+              "minProperties": 1
+            }
+          }
+        },
+        {
+          "required": [
+            "logo_image"
+          ]
         }
       ]
     },
@@ -46250,6 +46364,9 @@
         },
         "phone": {
           "type": "string"
+        },
+        "photo": {
+          "$ref": "#/$defs/SettingsMediaAsset"
         }
       },
       "required": [
@@ -46257,6 +46374,262 @@
       ],
       "additionalProperties": false,
       "x-invariant": "Live FD05 opt-in; same active reservation in future/ongoing lesson only. No legal names, pending contacts, other members or financial fields."
+    },
+    "SettingsImageUpload": {
+      "type": "object",
+      "properties": {
+        "mime": {
+          "type": "string",
+          "enum": [
+            "image/png",
+            "image/jpeg",
+            "image/webp"
+          ]
+        },
+        "data_base64": {
+          "type": "string",
+          "minLength": 4,
+          "maxLength": 1398104
+        },
+        "checksum": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        }
+      },
+      "required": [
+        "mime",
+        "data_base64",
+        "checksum"
+      ],
+      "additionalProperties": false
+    },
+    "SettingsMediaAsset": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/FtkUuid"
+        },
+        "mime": {
+          "type": "string",
+          "enum": [
+            "image/png",
+            "image/jpeg",
+            "image/webp"
+          ]
+        },
+        "bytes": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 1048576
+        },
+        "checksum": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        }
+      },
+      "required": [
+        "id",
+        "mime",
+        "bytes",
+        "checksum"
+      ],
+      "additionalProperties": false
+    },
+    "SettingsMediaChange": {
+      "type": "object",
+      "properties": {
+        "before_asset_id": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/FtkUuid"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "after_asset_id": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/FtkUuid"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "before_asset_id",
+        "after_asset_id"
+      ],
+      "additionalProperties": false
+    },
+    "Request_media_get": {
+      "type": "object",
+      "properties": {
+        "client_api_version": {
+          "const": 1
+        },
+        "request_id": {
+          "$ref": "#/$defs/FtkUuid"
+        },
+        "scope": {
+          "type": "string",
+          "enum": [
+            "user",
+            "organization",
+            "lesson_participant"
+          ]
+        },
+        "asset_id": {
+          "$ref": "#/$defs/FtkUuid"
+        },
+        "org_id": {
+          "$ref": "#/$defs/FtkUuid"
+        },
+        "session_id": {
+          "$ref": "#/$defs/FtkUuid"
+        },
+        "person_id": {
+          "$ref": "#/$defs/FtkUuid"
+        }
+      },
+      "required": [
+        "client_api_version",
+        "request_id",
+        "scope",
+        "asset_id"
+      ],
+      "additionalProperties": false,
+      "oneOf": [
+        {
+          "type": "object",
+          "properties": {
+            "client_api_version": {
+              "const": 1
+            },
+            "request_id": {
+              "$ref": "#/$defs/FtkUuid"
+            },
+            "scope": {
+              "const": "user"
+            },
+            "asset_id": {
+              "$ref": "#/$defs/FtkUuid"
+            }
+          },
+          "required": [
+            "client_api_version",
+            "request_id",
+            "scope",
+            "asset_id"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "client_api_version": {
+              "const": 1
+            },
+            "request_id": {
+              "$ref": "#/$defs/FtkUuid"
+            },
+            "scope": {
+              "const": "organization"
+            },
+            "asset_id": {
+              "$ref": "#/$defs/FtkUuid"
+            },
+            "org_id": {
+              "$ref": "#/$defs/FtkUuid"
+            }
+          },
+          "required": [
+            "client_api_version",
+            "request_id",
+            "scope",
+            "asset_id",
+            "org_id"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "client_api_version": {
+              "const": 1
+            },
+            "request_id": {
+              "$ref": "#/$defs/FtkUuid"
+            },
+            "scope": {
+              "const": "lesson_participant"
+            },
+            "asset_id": {
+              "$ref": "#/$defs/FtkUuid"
+            },
+            "org_id": {
+              "$ref": "#/$defs/FtkUuid"
+            },
+            "session_id": {
+              "$ref": "#/$defs/FtkUuid"
+            },
+            "person_id": {
+              "$ref": "#/$defs/FtkUuid"
+            }
+          },
+          "required": [
+            "client_api_version",
+            "request_id",
+            "scope",
+            "asset_id",
+            "org_id",
+            "session_id",
+            "person_id"
+          ],
+          "additionalProperties": false
+        }
+      ]
+    },
+    "SettingsMediaContent": {
+      "type": "object",
+      "properties": {
+        "asset": {
+          "$ref": "#/$defs/SettingsMediaAsset"
+        },
+        "data_base64": {
+          "type": "string",
+          "minLength": 4,
+          "maxLength": 1398104
+        }
+      },
+      "required": [
+        "asset",
+        "data_base64"
+      ],
+      "additionalProperties": false
+    },
+    "Success_media_get": {
+      "type": "object",
+      "properties": {
+        "ok": {
+          "const": true
+        },
+        "data": {
+          "$ref": "#/$defs/SettingsMediaContent"
+        },
+        "trace_id": {
+          "$ref": "#/$defs/FtkUuid"
+        }
+      },
+      "required": [
+        "ok",
+        "data",
+        "trace_id"
+      ],
+      "additionalProperties": false
     }
   },
   "x-contract": {
@@ -46331,7 +46704,8 @@
       "settlement.authority.manage": "Organization Owner directly OR active org_manager with explicit live delegation permission grants/revokes settlement authority to an active center_manager in that exact center. Center_manager cannot delegate.",
       "settlement.authority.inspect": "Owner may inspect delegation/grant administration; org_manager with live delegation permission may inspect manageable CM targets; CM may inspect own grant state. Financial records are excluded.",
       "settings.access": "Global user/platform without tenant; own linked member; center live CM; org live Owner/OM. Per-scope closed fields only.",
-      "reservation.capacity_override": "Canlı merkez yöneticisi; merkez kapsamında açık reservation.capacity_override yetkili personel; ilgili seansa atanmış aktif eğitmen. Owner/OM olmak merkez yetkisi sağlamaz."
+      "reservation.capacity_override": "Canlı merkez yöneticisi; merkez kapsamında açık reservation.capacity_override yetkili personel; ilgili seansa atanmış aktif eğitmen. Owner/OM olmak merkez yetkisi sağlamaz.",
+      "media.read": "Own current photo, live org member logo, or current confirmed same-lesson photo opt-in; no arbitrary asset ownership or public read."
     },
     "tables": [
       {
@@ -72132,10 +72506,10 @@
         ],
         "configuration_policy": "numeric plan limits/prices and legal approval are deployment configuration, never arbitrary allow/deny",
         "implementation_status": "operational_development_limited",
-        "runtime_path": "/functions/v1/backend-v1/account_get_v1",
-        "runtime_rpc": "api_v1.account_get_v1",
+        "runtime_path": "/functions/v1/backend-v1/settings_catalog_get_v1",
+        "runtime_rpc": "api_v1.settings_catalog_get_v1",
         "runtime_transport": "authenticated Edge adapter -> service-only RPC; rules/transaction in PostgreSQL",
-        "runtime_external_path": "/functions/v1/backend-v1/account_get_v1",
+        "runtime_external_path": "/functions/v1/backend-v1/settings_catalog_get_v1",
         "runtime_limits": [
           "First closed preference fields only; no generic domain policy, arbitrary key, provider or technical SQL/worker controls.",
           "Only system brand assets; reviewed color/font/logo delivery remains separate."
@@ -72233,10 +72607,10 @@
         ],
         "configuration_policy": "numeric plan limits/prices and legal approval are deployment configuration, never arbitrary allow/deny",
         "implementation_status": "operational_development_limited",
-        "runtime_path": "/functions/v1/backend-v1/account_get_v1",
-        "runtime_rpc": "api_v1.account_get_v1",
+        "runtime_path": "/functions/v1/backend-v1/settings_get_v1",
+        "runtime_rpc": "api_v1.settings_get_v1",
         "runtime_transport": "authenticated Edge adapter -> service-only RPC; rules/transaction in PostgreSQL",
-        "runtime_external_path": "/functions/v1/backend-v1/account_get_v1",
+        "runtime_external_path": "/functions/v1/backend-v1/settings_get_v1",
         "runtime_limits": [
           "First closed preference fields only; no generic domain policy, arbitrary key, provider or technical SQL/worker controls.",
           "Only system brand assets; reviewed color/font/logo delivery remains separate."
@@ -72358,7 +72732,10 @@
         "runtime_limits": [
           "First closed preference fields only; no generic domain policy, arbitrary key, provider or technical SQL/worker controls.",
           "Only system brand assets; reviewed color/font/logo delivery remains separate."
-        ]
+        ],
+        "runtime_path": "/functions/v1/backend-v1/settings_update_v1",
+        "runtime_external_path": "/functions/v1/backend-v1/settings_update_v1",
+        "runtime_rpc": "api_v1.settings_update_v1"
       },
       {
         "name": "settings_reset_preview_v1",
@@ -72430,10 +72807,10 @@
         ],
         "configuration_policy": "numeric plan limits/prices and legal approval are deployment configuration, never arbitrary allow/deny",
         "implementation_status": "operational_development_limited",
-        "runtime_path": "/functions/v1/backend-v1/account_get_v1",
-        "runtime_rpc": "api_v1.account_get_v1",
+        "runtime_path": "/functions/v1/backend-v1/settings_reset_preview_v1",
+        "runtime_rpc": "api_v1.settings_reset_preview_v1",
         "runtime_transport": "authenticated Edge adapter -> service-only RPC; rules/transaction in PostgreSQL",
-        "runtime_external_path": "/functions/v1/backend-v1/account_get_v1",
+        "runtime_external_path": "/functions/v1/backend-v1/settings_reset_preview_v1",
         "runtime_limits": [
           "First closed preference fields only; no generic domain policy, arbitrary key, provider or technical SQL/worker controls.",
           "Only system brand assets; reviewed color/font/logo delivery remains separate."
@@ -72556,7 +72933,10 @@
         "runtime_limits": [
           "First closed preference fields only; no generic domain policy, arbitrary key, provider or technical SQL/worker controls.",
           "Only system brand assets; reviewed color/font/logo delivery remains separate."
-        ]
+        ],
+        "runtime_path": "/functions/v1/backend-v1/settings_reset_apply_v1",
+        "runtime_external_path": "/functions/v1/backend-v1/settings_reset_apply_v1",
+        "runtime_rpc": "api_v1.settings_reset_apply_v1"
       },
       {
         "name": "settings_history_get_v1",
@@ -72628,10 +73008,10 @@
         ],
         "configuration_policy": "numeric plan limits/prices and legal approval are deployment configuration, never arbitrary allow/deny",
         "implementation_status": "operational_development_limited",
-        "runtime_path": "/functions/v1/backend-v1/account_get_v1",
-        "runtime_rpc": "api_v1.account_get_v1",
+        "runtime_path": "/functions/v1/backend-v1/settings_history_get_v1",
+        "runtime_rpc": "api_v1.settings_history_get_v1",
         "runtime_transport": "authenticated Edge adapter -> service-only RPC; rules/transaction in PostgreSQL",
-        "runtime_external_path": "/functions/v1/backend-v1/account_get_v1",
+        "runtime_external_path": "/functions/v1/backend-v1/settings_history_get_v1",
         "runtime_limits": [
           "First closed preference fields only; no generic domain policy, arbitrary key, provider or technical SQL/worker controls.",
           "Only system brand assets; reviewed color/font/logo delivery remains separate."
@@ -73422,6 +73802,108 @@
         "runtime_limits": [
           "Obtain Google ID token first. Prepare with fresh current native reauth; within 10 seconds call native id_token grant with link_identity=true and matching Google token/nonce. Native signature, issuer, audience and nonce checks are mandatory."
         ]
+      },
+      {
+        "name": "media_get_v1",
+        "module": "M02",
+        "features": [],
+        "permission": "media.read",
+        "actor_source": "server_verified",
+        "transport": "R",
+        "billing_class": "read",
+        "request": {
+          "$ref": "#/$defs/Request_media_get"
+        },
+        "success": {
+          "$ref": "#/$defs/Success_media_get"
+        },
+        "errors": [
+          "AUTH_REQUIRED",
+          "BILLING_OPERATION_RESTRICTED",
+          "CLIENT_UPDATE_REQUIRED",
+          "FORBIDDEN",
+          "NOT_FOUND",
+          "PLAN_FEATURE_UNAVAILABLE",
+          "PLAN_LIMIT_REACHED",
+          "POLICY_NOT_CONFIGURED",
+          "SERVICE_UNAVAILABLE",
+          "SESSION_REVOKED",
+          "SUBSCRIPTION_NOT_STARTED",
+          "TEMPORARY_FAILURE",
+          "VALIDATION_FAILED",
+          "VERSION_CONFLICT",
+          "INVALID_STATE_TRANSITION",
+          "PREVIEW_STALE",
+          "CAPACITY_FULL",
+          "ENTITLEMENT_UNAVAILABLE",
+          "CLASS_ACCESS_DENIED",
+          "RESERVATION_EXISTS",
+          "ASSISTANT_PARTICIPANT_CONFLICT",
+          "ACCOUNT_ALREADY_LINKED",
+          "INVITATION_UNAVAILABLE",
+          "CREDIT_LIMIT_EXCEEDED"
+        ],
+        "transaction_class": "read",
+        "transaction_guarantee": "Read only the current private image for self, live member organization branding or explicitly shared confirmed co-attendee. No signed URL or historical asset read.",
+        "transition": {
+          "effect": "read_or_preview_only",
+          "from": [],
+          "to": [],
+          "invariant": "Scope/key authorization is checked live before every receipt replay."
+        },
+        "semantic_guards": [
+          "live_actor_and_scope",
+          "current_image_pointer",
+          "confirmed_coattendance_and_photo_opt_in",
+          "no_business_mutation"
+        ],
+        "audit": false,
+        "notification": "none",
+        "concurrency": "Live original permission/tenant/field scope on every request; current authorized projection; no business writes",
+        "expected_version_subject": "none",
+        "acceptance_scenario_ids": [
+          "A01",
+          "A02",
+          "A03",
+          "A23",
+          "A24",
+          "A25",
+          "A46",
+          "A47",
+          "A55"
+        ],
+        "configuration_policy": "numeric plan limits/prices and legal approval are deployment configuration, never arbitrary allow/deny",
+        "implementation_status": "operational_development_limited",
+        "runtime_path": "/functions/v1/backend-v1/media_get_v1",
+        "runtime_rpc": "api_v1.media_get_v1",
+        "runtime_transport": "authenticated Edge adapter -> service-only RPC; rules/transaction in PostgreSQL",
+        "runtime_external_path": "/functions/v1/backend-v1/media_get_v1",
+        "runtime_limits": [
+          "Authenticated POST only. 1 MiB private PNG/JPEG/WebP binary envelope; no SVG/HTML/remote URL. Current pointer and live scope/privacy are rechecked on every read.",
+          "External/public logo exposure is separately gated by published organization context and selected public fields."
+        ],
+        "required_features": [],
+        "runtime_required_features": [],
+        "conditional_features": [],
+        "operation_contract": {
+          "kind": "read",
+          "target_entity": "settings_media_assets",
+          "version_mode": "none",
+          "version_field": null,
+          "read_operation": null,
+          "atomic_effects": [],
+          "business_commit": false,
+          "read_path_status": "not_required",
+          "source_decision": "FD02/FD03/FD05"
+        },
+        "decision_delivery": {
+          "accepted_contract": "DS-2026-10-17",
+          "runtime_conformance": "implemented_pending_ci",
+          "open_dependencies": [],
+          "target_request": {
+            "$ref": "#/$defs/Request_media_get"
+          }
+        }
       }
     ],
     "policy_value_map": {
@@ -88281,6 +88763,120 @@
         "origin": "ftksaas",
         "acceptance": "generic_uuid",
         "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/SettingsMediaAsset/properties/id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/SettingsMediaChange/properties/before_asset_id/anyOf/0",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/SettingsMediaChange/properties/after_asset_id/anyOf/0",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Request_media_get/properties/request_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Request_media_get/properties/asset_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Request_media_get/properties/org_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Request_media_get/properties/session_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Request_media_get/properties/person_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Request_media_get/oneOf/0/properties/request_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Request_media_get/oneOf/0/properties/asset_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Request_media_get/oneOf/1/properties/request_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Request_media_get/oneOf/1/properties/asset_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Request_media_get/oneOf/1/properties/org_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Request_media_get/oneOf/2/properties/request_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Request_media_get/oneOf/2/properties/asset_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Request_media_get/oneOf/2/properties/org_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Request_media_get/oneOf/2/properties/session_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Request_media_get/oneOf/2/properties/person_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Success_media_get/properties/trace_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
       }
     ],
     "open_product_decisions": [],
@@ -88432,6 +89028,18 @@
       {
         "function": "private.p02_dependencies",
         "kind": "source_sale_finance_rights_actor_plan_reservation_dependency_binding"
+      },
+      {
+        "function": "private.settings_media_get",
+        "kind": "private_current_image_scope_and_live_photo_sharing"
+      },
+      {
+        "function": "private.settings_media_set",
+        "kind": "atomic_private_binary_pointer_and_metadata_history"
+      },
+      {
+        "function": "private.session_shared_participants",
+        "kind": "live_confirmed_future_or_ongoing_opt_in_projection"
       }
     ],
     "runtime": {
@@ -88616,13 +89224,14 @@
         "operation_status_get_v1",
         "preview_get_v1",
         "job_status_get_v1",
-        "audit_list_v1"
+        "audit_list_v1",
+        "media_get_v1"
       ],
       "auth": "Supabase getUser + live auth.sessions + current account/link/role; no request actor claims",
       "uuid": "backend uuid@14.0.3 v7 for all inserted IDs; DB defaults not required",
       "external_transport": "POST /functions/v1/backend-v1/{operation}; direct typed request body",
       "internal_rpc": "service-only api_v1 named functions; actor/session/UUID bank supplied by verified gateway",
-      "migration_count": 54,
+      "migration_count": 72,
       "test_evidence": "P06 acceptance is registered through registry.test.mjs; candidate/main full clean evidence is pending",
       "frontend_unchanged": true
     },
@@ -89312,7 +89921,8 @@
         "account_sessions_revoke_v1",
         "account_security_history_get_v1",
         "account_totp_remove_v1",
-        "account_google_link_prepare_v1"
+        "account_google_link_prepare_v1",
+        "media_get_v1"
       ],
       "runtime_deliveries": {
         "starter_attendance_protection": {

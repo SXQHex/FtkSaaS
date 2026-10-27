@@ -20,6 +20,10 @@ Aktif adayın ilk tüketicileri program süresinin orgdan yeni merkeze bir kez k
 
 İlk ara adayın Vercel izole native testinde hazırlık/provenance/preview/reset/katılımcı/replay7/7 geçti. Birleşik test21/28 kaldı: ST-02 zincirinin ilk hatası job_status_get boş HTTP503; ona bağımlı fixture assertionları da başarısız oldu, bu koşu başarı sayılmaz. Aynı sırada runtime üretimi yapıldığı için sabit kaynakta regresyon yeniden koşmalıdır. VM13dk timeout sonunda kapandı. Bağımsız incelemenin yakaladığı UUID harf büyüklüğü P1'i için yeni kanonik scope göçü ve mixed-case testleri; telefon consumer'ı için native sentetik doğrulanmış telefon assertionları eklendi. Bunlar7/7 kaynağından sonradır; yeni native/CI kanıtı bekler. Uygulanmış69/70 migration değiştirilmedi, düzeltme71'e eklendi.
 
+[Draft PR65](https://github.com/SXQHex/FtkSaaS/pull/65) çalışma dalıdır. Medya öncesi head `bc419f3225609b6372617d6b554bbcdfc0113b76`, tree `b4d9833578e272084b28cfa36071c6f054dbeef6`; [hedefli40591949965](https://github.com/SXQHex/FtkSaaS/actions/runs/40591949965) son sorguda in_progress'ti. Full clean tetiklenmedi. Legacy UUID göçünün exact SQL'ini ayrı loopback veritabanında çalıştıran kabul testi eklenmiştir; minimal history dispatcher fixture'ı gerçek Auth kabulü yerine sayılmaz.
+
+Sonraki yerel medya adayı profil photo/org logo_image komut alanlarını, private güncel asset okumasını ve photo_visible consumer'ını ekler; aday envanter214 callable/0 contract_only/72 migration/90 core tablodur. Yapısal157/157 ve görsel envelope unit1/1 geçti; son medya/legacy/telefon kaynağı native kabul bekler. Bağımsız kaynak incelemesi ek somut bulgu bildirmedi; CI/main/hosted kabulü bundan türetilmez.
+
 ## Önceki domain/hosted tabanı — PR61
 
 | Alan | Doğrulanmış kaynak |
