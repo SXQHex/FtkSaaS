@@ -65,5 +65,6 @@
   "20261025222434_account_session_management.sql": "c74b2127cb79a054b3f3222d2c93a0ccc652e3646de276e7a71f48bac9aef367",
   "20261026003615_account_identity_projection.sql": "a04d73dca3c04b224c287447fd1f6639604a5a4c9caa76571b7348f271c9fe21",
   "20261026195138_starter_plan_gates.sql": "da64572fe7650184694399f383eb454dd0b0bf1d5e481fc8d731c2ded62b4d85",
-  "20261027013809_starter_studio_product_names.sql": "8692bf7f654faf9574f695af4ffe5c1384e48c29a538d2deaddaeca98528bc2d"
+  "20261027013809_starter_studio_product_names.sql": "8692bf7f654faf9574f695af4ffe5c1384e48c29a538d2deaddaeca98528bc2d",
+  "20261027103358_starter_onboarding_defaults.sql": "6657d858a87a70bd7c108f1f13d395d2c4f1b1a36b86f5e2766b3b085f1ec5df"
 }

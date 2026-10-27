@@ -159,3 +159,5 @@ assert next(Path('supabase/migrations').glob('*_account_identity_projection.sql'
 assert next(Path('supabase/migrations').glob('*_starter_plan_gates.sql')).read_text()==Path('database/starter-plan-gates.sql').read_text(),'Starter gates source drift'
 
 assert next(Path('supabase/migrations').glob('*_starter_studio_product_names.sql')).read_text()==Path('database/starter-studio-product-names.sql').read_text(),'Starter studio name snapshot source drift'
+
+assert next(Path("supabase/migrations").glob("*_starter_onboarding_defaults.sql")).read_text()==Path("database/starter-onboarding-defaults.sql").read_text(),"Starter onboarding source drift"

@@ -1,3 +1,11 @@
+## Aktif Draft — Starter başlangıç ayarları ve public başvuru
+
+Belge eşitlemesi PR60/main6c7587b63681cc9f89d14483eaca71e520a074af üzerinde yalnız-belge kabul40489030502/main40489319042/CD40489417743 ile tamamlandı; full clean çalıştırılmadı. Yeni uygulama adayı213 API/68 migration içerir: yalnız yeni Starter kuruluşunda FD07 negatif varsayılan0 politika sürümü atomik oluşturulur; mevcut işletme/politikalar backfill edilmez. Program/paket/borç/iptal/çalışma saati gibi seçilmemiş değerler üretilmez. Org politikası gerçek mevcut resolver ile merkezden okunur; Starter merkez override kapısı korunur.
+
+Kullanıcı public hedefi uye.fethiyetango.com seçti ve eski studioSaaS uygulamasının bu hosttan değiştirilmesini açıkça istedi. DNS/Vercel projesi okundu; henüz gateway dağıtımı veya gerçek Turnstile kabulü yapılmış sayılmaz. Gateway yalnız sabit submit route’una, Vercel’in doğrulanmış IP başlığıyla imza atar; caller x-ftk/cookie/authorization başlıklarını taşımaz. Public action hostname’i FTK_PUBLIC_APPLICATION_HOSTNAME ile ayrı yapılandırılır; mevcut recovery hostname fallback’i korunur.
+
+Durum: geliştirme; yerel verify150/150 geçti, native/domain ve gerçek sağlayıcı kabulü henüz bekler. Son kaynak bağımsız incelemesi sonrası tek aday full clean; aynı main/CD kabulü korunur.
+
 ## 27 Ekim — güncel Starter kapanışı ve sıradaki teslim
 
 Kabul edilmiş main `fc96dc15f336abed20cd0a6c73d84a5b0e3b08b0`:213 API/67 migration/90 core tablo/Edge21 ACTIVE/JWT açık. [PR58](https://github.com/SXQHex/FtkSaaS/pull/58) tek-stüdyo runtime kabulünü, [PR59](https://github.com/SXQHex/FtkSaaS/pull/59) belge kapanışını taşır. [Main40483793353](https://github.com/SXQHex/FtkSaaS/actions/runs/40483793353) ve [development CD40487227365](https://github.com/SXQHex/FtkSaaS/actions/runs/40487227365) başarılıdır.

@@ -35,7 +35,14 @@ test('Starter studio setup: one room, timed sales and immutable published names'
   room=(await mut('room_save_v1',{name:'Only logical room',capacity:50})).primary_id;
   for(const resource of [{kind:'room',id:room},{kind:'person',id:person}])await mut('availability_save_v1',{resource,rule:{weekdays:[1,2,3,4,5,6,7],local_start:'00:00:00',local_end:'23:59:59',valid_from:'2020-01-01'}});
   const policy=(key,value)=>mut('policy_publish_v1',{center_id:null,key,value,effective_at:new Date().toISOString(),mandatory:false});
-  await policy('negative_default',{kind:'integer',value:0});await policy('negative_upper',{kind:'integer',value:0});
+  await t.test('new Starter inherits the approved zero credit default; unconfigured policies and center overrides stay closed',async()=>{
+   const read=await mut('policies_get_v1',{keys:['negative_default','reservation_window']});
+   assert.equal(read.length,1);assert.equal(read[0].key,'negative_default');assert.deepEqual(read[0].value,{kind:'integer',value:0});assert.equal(read[0].scope.kind,'organization');
+   const denied=await call(owner,'policy_publish_v1',scope({key:'negative_default',value:{kind:'integer',value:3},effective_at:new Date().toISOString(),mandatory:false}),key());
+   assert.equal(denied.result.ok,false);assert.equal(denied.result.error.code,'PLAN_FEATURE_UNAVAILABLE');
+   const again=await mut('policies_get_v1',{keys:['negative_default']});assert.deepEqual(again,read);
+  });
+  await policy('negative_upper',{kind:'integer',value:0});
   await policy('participation_block_credit',{kind:'blocked_credit',effect:'release'});
   await policy('reservation_window',{kind:'window',opens_minutes_before:10080,closes_minutes_before:0,manager_exception:false});
   await policy('student_cancel_group',{kind:'cancellation',terms:{cutoff_minutes:0,before_cutoff:'release',after_cutoff:'release',no_show:'release'}});
