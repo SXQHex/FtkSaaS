@@ -77,11 +77,37 @@ test('public gateway uses only trusted Vercel IP, exact origin and fixed Edge ro
  const env={FTK_PUBLIC_APPLICATION_HOSTNAME:'uye.fethiyetango.com',FTK_PUBLIC_INGRESS_SECRET:'synthetic-32-byte-gateway-ingress-secret',FTK_PUBLIC_ANON_KEY:'synthetic-anon-jwt'};
  const body=JSON.stringify({client_api_version:1,contact:'synthetic@ftksaas.invalid'});
  const headers={origin:'https://uye.fethiyetango.com','content-type':'application/json','x-vercel-forwarded-for':'192.0.2.30','x-ftk-client-ip':'203.0.113.99','x-ftk-ingress-signature':'attacker',cookie:'secret-cookie',authorization:'Bearer caller-secret'};
- let calls=0;const provider=async(url,options)=>{calls++;assert.equal(url,'https://gwyprhenabtpkbojephw.supabase.co/functions/v1/backend-v1/public_application_submit_v1');assert.equal(options.body,body);assert.equal(options.headers['x-ftk-client-ip'],'192.0.2.30');assert.notEqual(options.headers['x-ftk-ingress-signature'],'attacker');assert.equal(options.headers.authorization,'Bearer synthetic-anon-jwt');assert.equal(options.headers.cookie,undefined);return Response.json({ok:true,data:{accepted:true}},{headers:{'set-cookie':'secret'}});};
+ let calls=0;const provider=async(url,options)=>{calls++;assert.equal(url,'https://gwyprhenabtpkbojephw.supabase.co/functions/v1/backend-v1/public_application_submit_v1');assert.equal(options.body,body);assert.equal(options.headers['x-ftk-client-ip'],'192.0.2.30');assert.notEqual(options.headers['x-ftk-ingress-signature'],'attacker');assert.equal(options.headers.authorization,'Bearer synthetic-anon-jwt');assert.equal(options.headers.cookie,undefined);return Response.json({ok:true,data:{accepted:true},trace_id:id},{headers:{'set-cookie':'secret'}});};
  const make=(h={},data=body)=>new Request('https://uye.fethiyetango.com/api/public-application',{method:'POST',headers:{...headers,...h},body:data});
  const ok=await handlePublicApplication(make(),env,provider);assert.equal(ok.status,200);assert.equal(ok.headers.get('set-cookie'),null);
  for(const h of [{origin:'https://foreign.invalid'},{'x-vercel-forwarded-for':''},{'x-vercel-forwarded-for':'192.0.2.30, 192.0.2.31'},{'content-type':'text/plain'}])assert.notEqual((await handlePublicApplication(make(h),env,provider)).status,200);
  assert.equal((await handlePublicApplication(make(),{},provider)).status,503);
  assert.equal((await handlePublicApplication(make({},'x'.repeat(65537)),env,provider)).status,413);
  assert.equal(calls,1);
+ assert.equal((await handlePublicApplication(make({},'{'),env,provider)).status,400);
+ for(const response of [new Response('<html>bad</html>'),Response.json({diagnostic:'private'}),new Response('x'.repeat(65537)),Response.json({ok:true,data:{accepted:true},trace_id:id,secret:'private'})]){
+  const failed=await handlePublicApplication(make(),env,async()=>response);assert.equal(failed.status,503);const failure=await failed.json();assert.equal(failure.error.code,'TEMPORARY_FAILURE');assert(valid('FailureEnvelope',failure));
+ }
+ const denied=await handlePublicApplication(make(),env,async()=>Response.json({ok:false,error:{code:'RATE_LIMITED',retryable:false,trace_id:id,retry_after_ms:1000}}));assert.equal(denied.status,200);assert.equal((await denied.json()).error.code,'RATE_LIMITED');
+
+});
+
+test('public-only hostname configuration reaches handler preflight, siteverify and submit without legacy recovery hostname',async()=>{
+ const {build}=await import('esbuild');
+ const built=await build({entryPoints:['supabase/functions/backend-v1/handler.ts'],bundle:true,platform:'browser',format:'esm',write:false});
+ const {signPublicApplication}=await import('../scripts/p04-public-ingress.mjs');
+ const env={SUPABASE_URL:'https://supabase.invalid',SUPABASE_SERVICE_ROLE_KEY:'synthetic-service',FTK_PUBLIC_INGRESS_SECRET:'synthetic-32-byte-ingress-handler-secret',FTK_PUBLIC_HASH_SECRET:'synthetic-hash',FTK_TURNSTILE_SECRET:'synthetic-provider',FTK_PUBLIC_APPLICATION_HOSTNAME:'uye.fethiyetango.com'};
+ const body=JSON.stringify({client_api_version:1,request_id:id,publication_id:id,contact:'synthetic@ftksaas.invalid',bot_proof:'synthetic-provider-proof',client_request_key:id});
+ const originalDeno=globalThis.Deno,originalFetch=globalThis.fetch;let handler;const phases=[];
+ try{
+  globalThis.Deno={serve:f=>{handler=f;},env:{get:k=>env[k]}};
+  globalThis.fetch=async(url,options)=>{
+   if(url==='https://challenges.cloudflare.com/turnstile/v0/siteverify')return Response.json({success:true,hostname:env.FTK_PUBLIC_APPLICATION_HOSTNAME,action:'public_application'});
+   assert.equal(url,'https://supabase.invalid/rest/v1/rpc/public_application_submit_v1');const phase=JSON.parse(options.body).p_aux.phase;phases.push(phase);
+   return Response.json({ok:true,data:phase==='preflight'?{bot_required:true}:{accepted:true},trace_id:id});
+  };
+  await import('data:text/javascript;base64,'+Buffer.from(built.outputFiles[0].text).toString('base64'));
+  const response=await handler(new Request('https://edge.invalid/functions/v1/backend-v1/public_application_submit_v1',{method:'POST',headers:signPublicApplication(body,'192.0.2.30',env.FTK_PUBLIC_INGRESS_SECRET),body}));
+  assert.equal(response.status,200);assert.equal((await response.json()).data.accepted,true);assert.deepEqual(phases,['preflight','submit']);
+ }finally{globalThis.fetch=originalFetch;if(originalDeno===undefined)delete globalThis.Deno;else globalThis.Deno=originalDeno;}
 });

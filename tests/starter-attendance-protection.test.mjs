@@ -41,6 +41,11 @@ test('Starter attendance and protected reservation through Auth -> Edge -> RPC',
  const fixturePastSession=async sid=>{const start=new Date();start.setUTCHours(9,0,0,0);if(+start>=Date.now())start.setUTCDate(start.getUTCDate()-1);start.setUTCDate(start.getUTCDate()-pastSessionIndex++);await db.query('update core.sessions set starts_at=$1,ends_at=$2 where id=$3',[start,new Date(+start+3600000),sid]);await syncFixtureBookings(sid);};
  const effective_at=new Date(Date.now()-10000).toISOString();
  const publish=(k,value)=>mut('policy_publish_v1',{center_id:null,key:k,value,effective_at:new Date().toISOString(),mandatory:false});
+ // This suite exercises explicit unpaid/negative-credit policy choices. Verify
+ // the new-org defaults first, then configure this fixture through the real API.
+ const defaults=await mut('policies_get_v1',{keys:['debt_booking','debt_participation']});assert.equal(defaults.length,2);assert(defaults.every(p=>p.value.value===true));
+ await publish('debt_booking',{kind:'boolean',value:false});
+ await publish('debt_participation',{kind:'boolean',value:false});
  await publish('participation_block_credit',{kind:'blocked_credit',effect:'release'});
  await publish('negative_default',{kind:'integer',value:2});await publish('negative_upper',{kind:'integer',value:2});
  await publish('student_cancel_group',{kind:'cancellation',terms:{cutoff_minutes:0,before_cutoff:'release',after_cutoff:'release',no_show:'release'}});

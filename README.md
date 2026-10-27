@@ -1,3 +1,5 @@
+> Aktif backend adayı: Draft PR61,213 API/68 migration; Starter başlangıç politikaları ve self/public backend zinciri. Son kabul edilmiş main `6c7587b` (213 API/67 migration); yeni adayın son inceleme/CI/main/CD kabulü ayrı bekler. Frontend/site/DNS değiştirilmez.
+
 > Tek stüdyo backend kabulü tamamlandı: PR58/main5639783b5dcd963d84bb76ec7bdf75d65a75ced5;213 API/67 migration. Aday40452100471, main40476673333 ve development CD40479412819 başarılı; Edge21/JWT açık. Kapsam ve kalan yol haritası güncel devir belgelerindedir.
 
 # FtkSaaS backend

@@ -9,8 +9,10 @@ begin
  execute replace(b,a,a||$a$
   if exists(select 1 from core.saas_plan_versions where id=(r->>'initial_plan_id')::uuid and name='starter') then
    insert into core.policy_versions(id,org_id,scope_center_id,key,effective_at,mandatory,value,previous_id,version)
-    values(private.new_id(p_ids,31),org,null,'negative_default',transaction_timestamp(),false,'{"kind":"integer","value":0}'::jsonb,null,1);
-   audit_delta:=jsonb_build_object('initial_policy',jsonb_build_object('key','negative_default','value',0,'source','FD07','policy_version_id',private.new_id(p_ids,31)));
+    values(private.new_id(p_ids,31),org,null,'negative_default',transaction_timestamp(),false,'{"kind":"integer","value":0}'::jsonb,null,1),
+          (private.new_id(p_ids,32),org,null,'debt_booking',transaction_timestamp(),false,'{"kind":"boolean","value":true}'::jsonb,null,1),
+          (private.new_id(p_ids,33),org,null,'debt_participation',transaction_timestamp(),false,'{"kind":"boolean","value":true}'::jsonb,null,1);
+   audit_delta:=jsonb_build_object('initial_policy',jsonb_build_object('key','negative_default','value',0,'source','FD07','policy_version_id',private.new_id(p_ids,31),'debt_booking_policy_id',private.new_id(p_ids,32),'debt_participation_policy_id',private.new_id(p_ids,33)));
   end if;$a$);
 end$patch$;
 notify pgrst,'reload schema';

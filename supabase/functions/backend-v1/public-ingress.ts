@@ -24,8 +24,9 @@ export async function publicIngress(req:Request,body:string,env:PublicEnv,now=Da
  if(diff)return null;
  return {ip,ip_hash:await keyedHash(salt,'ip:'+ip),targetHash:(contact:string)=>keyedHash(salt,'target:'+contact.trim().toLowerCase())};
 }
+export function publicBotHostname(env:PublicEnv,action:string='public_application'){return (action==='public_application'?env('FTK_PUBLIC_APPLICATION_HOSTNAME'):undefined)??env('FTK_TURNSTILE_HOSTNAME');}
 export async function verifyPublicBot(token:string,ip:string,env:PublicEnv,fetcher:typeof fetch=fetch,action:string='public_application'):Promise<boolean>{
- const secret=env('FTK_TURNSTILE_SECRET'),hostname=(action==='public_application'?env('FTK_PUBLIC_APPLICATION_HOSTNAME'):undefined)??env('FTK_TURNSTILE_HOSTNAME');
+ const secret=env('FTK_TURNSTILE_SECRET'),hostname=publicBotHostname(env,action);
  if(!secret||!hostname)return false;
  try{
   const res=await fetcher('https://challenges.cloudflare.com/turnstile/v0/siteverify',{method:'POST',body:new URLSearchParams({secret,response:token,remoteip:ip}),signal:AbortSignal.timeout(10000)});

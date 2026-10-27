@@ -91246,7 +91246,28 @@
         "active_students": 100
       },
       "retained_scope": "StarterRetainedScope",
-      "downgrade": "explicit versioned selection; excluded resources operationally closed; history unchanged"
+      "downgrade": "explicit versioned selection; excluded resources operationally closed; history unchanged",
+      "onboarding": {
+        "source": "FD07",
+        "new_organizations_only": true,
+        "organization_policy_defaults": {
+          "negative_default": {
+            "kind": "integer",
+            "value": 0
+          },
+          "debt_booking": {
+            "kind": "boolean",
+            "value": true
+          },
+          "debt_participation": {
+            "kind": "boolean",
+            "value": true
+          }
+        },
+        "existing_policies": "unchanged; no backfill",
+        "consumer_read": "policies_get_v1 and existing policy_at/lesson/reservation consumers",
+        "unconfigured_business_values": "explicit setup required; no invented windows, hours, terms or pricing"
+      }
     }
   }
 }

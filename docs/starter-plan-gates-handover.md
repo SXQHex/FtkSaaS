@@ -1,3 +1,23 @@
+## Starter başlangıç ayarları ve self/public — backend adayı
+
+Son kabul edilmiş taban PR60/main `6c7587b63681cc9f89d14483eaca71e520a074af` (213 API/67 migration); bu uygulama Draft PR61’de213 API/68 migration’dır. Önceki67 migration değişmez. Son aday/main/CD kabulü tamamlanmadan yeni kaynak yayımlanmış sayılmaz.
+
+| Alan | API ve gerçek tüketici |
+|---|---|
+| FD07 başlangıcı | Yeni Starter organization_create_v1 aynı transaction’da org scope’lu sürüm1 negative_default=0, debt_booking=true, debt_participation=true üretir. Oluşum audit’i politika kimliklerini taşır; receipt replay yeni sürüm üretmez. Mevcut org/merkez/kişi/politika kayıtlarına backfill yok. |
+| Miras ve yetki | policies_get_v1 ile merkezden org politikası okunur; policy_at/lesson_limits/rezervasyon/yoklama tüketir. Starter merkez override’ı açılmaz; org yöneticisinin mevcut policy_publish/impact yolları kullanılır. Genel settings patch’i bu iş politikalarının yerine geçmez. |
+| Eksik yapılandırma | Merkez timezone’u açık seçilir. Oda/eğitmen uygunluğu, pencere, iptal/no-show, ürün hak/fiyat/süre/iade şartları açık domain komutlarıyla kurulur. Tanımsız değer, sahte çalışma saati veya ücretsiz hak üretilmez. Otomatik public yayın yok; publication_set_v1 açık hedef ve public_details ister. |
+| Public başlangıç | Public takvim yalnız yayın allowlist’ini verir. Geçerli hizmet+imza+bot bağlamında submit yalnız intent üretir. CM review ile kişi/aday oluşturur/eşler; Starter genel CRM lead’i, satış, rezervasyon veya yönetim rolü oluşturmaz. |
+| Öğrenciye geçiş | student_activate_v1, account_access_send_v1/accept_v1 ve doğrulanmış native hesap bağı; sonra ayrı sale/collection ve kendi reservation_create_v1. Yanlış hesap daveti alamaz; borç engeli yeni rezervasyonda gerçekten uygulanır. |
+
+Frontend tasarımı/işleyişi, studiosaas dağıtımı ve DNS değişmedi. Hedef uye.fethiyetango.com; mevcut managed widget’a yalnız bu alan eklendi, eski alanlar/mode korundu. Gerçek istemcinin widget tokenı/siteverify kabulü bu backend/native bağlam testiyle kapanmış sayılmaz.
+
+Public server adapter api/public-application.js, scripts/public-application-gateway.mjs ve mevcut signer’ı kullanır. Web Request/Response POST; exact HTTPS host/origin; Vercel’in overwrite ettiği tek x-vercel-forwarded-for IP’si; sabit Edge submit path;64KiB istek/yanıt; caller imza/auth/cookie’leri taşınmaz. Upstream yalnız kapalı accepted veya SafeError allowlist envelope’uyla döner; bozuk/taşan yanıt503, bozuk istemci JSON/UTF8 girdisi400’dür. Kodlar kanonik08 sözleşmesinden okunur; server dağıtımı bu sözleşme dosyasını da içermelidir. Bu adapter mevcut frontend’e dağıtılmadı.
+
+Sunucu config’i: FTK_PUBLIC_APPLICATION_HOSTNAME, FTK_PUBLIC_INGRESS_SECRET (en az32bayt), FTK_PUBLIC_ANON_KEY (legacy anon JWT); isteğe bağlı FTK_PUBLIC_BACKEND_ORIGIN yalnız sunucuda HTTPS origin’dir, default mevcut geliştirme Supabase’idir. Edge’de FTK_PUBLIC_INGRESS_SECRET/FTK_PUBLIC_HASH_SECRET/FTK_TURNSTILE_SECRET gerekir. Public hostname FTK_PUBLIC_APPLICATION_HOSTNAME, yoksa legacy FTK_TURNSTILE_HOSTNAME olur. Handler erken kapısı ve siteverify aynı resolver’ı kullanır; recovery action legacy hostname’inde kalır. Sırlar istemciye/kaynağa/rapora yazılmaz.
+
+Kabul kapsamı: native Auth→Edge→RPC yönetim/davet/self rezervasyon; public submit’in DB aşamasında yalnız yerel testte Edge-owned doğrulanmış bağlam emülasyonu; ayrıca tam handler signed ingress→preflight→mock siteverify→submit ve gateway adversarial sözleşme testleri. Bunlar gerçek Turnstile tokenı, dış SMTP veya frontend E2E kabulü değildir. Son kaynak/sonuçlar [PR61 backend raporundadır](../reports/starter-onboarding-20261027.md):151 yerel doğrulama, temiz native9+19=28/28 ve advisors exit0 geçti. Son aday/main/CD kabulü ayrıca bekler.
+
 # Starter plan kapıları — uygulama ve kabul devri
 
 Başlangıç: `3fa72e7b805b2bbfb8895f3d90813eaa3cb416aa`. Bu SHA'nın belge kabulü40386335578 ve CD kaynak kontrolü40386480669 başarılı; runtime kabul kaynağı7464383802deb8322e14a5ebec7d5e2ef650e436'dır. Yeni kaynak bu önceki CI başarısıyla kabul edilmiş sayılmaz. Güncel kabul main `ed747324f7d008b24103d4fd2eba503791c70a93` üzerindedir; aşağıdaki başlangıç SHA’sı önceki kaynak referansıdır. Bu teslim **Starter kapılarıdır**; Pro/Business diğer sayısal limitleri, fiyatlar ve özel teklif uygulaması ayrı iş olarak kalır.
