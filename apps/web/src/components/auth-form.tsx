@@ -133,14 +133,14 @@ export function AuthForm({
     }
   }
   return (
-    <Card className="w-full shadow-none">
-      <CardHeader className="space-y-2">
+    <Card className="w-full min-w-0 wrap-anywhere shadow-none">
+      <CardHeader className="min-w-0 space-y-2 px-4 sm:px-6">
         <CardTitle className="text-2xl leading-tight">
           <h2>{text.title}</h2>
         </CardTitle>
         <CardDescription>{text.description}</CardDescription>
       </CardHeader>
-      <CardContent className="space-y-6">
+      <CardContent className="min-w-0 space-y-6 px-4 sm:px-6">
         {!configured ? (
           <Alert>
             <AlertDescription>
@@ -227,7 +227,11 @@ export function AuthForm({
               Parolamı unuttum
             </Link>
           ) : null}
-          <Button type="submit" className="min-h-11 w-full" disabled={busy || !configured}>
+          <Button
+            type="submit"
+            className="h-auto min-h-11 w-full whitespace-normal py-3"
+            disabled={busy || !configured}
+          >
             {busy ? "İşlem sürüyor…" : text.submit}
           </Button>
         </form>
@@ -236,7 +240,7 @@ export function AuthForm({
             onClick={google}
             type="button"
             variant="outline"
-            className="min-h-11 w-full"
+            className="h-auto min-h-11 w-full whitespace-normal py-3"
             disabled={busy || !configured}
           >
             Google ile devam et

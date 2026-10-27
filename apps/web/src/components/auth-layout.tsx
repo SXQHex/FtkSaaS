@@ -1,8 +1,12 @@
 import Link from "next/link";
 export function AuthLayout({ children }: { children: React.ReactNode }) {
   return (
-    <main id="main-content" tabIndex={-1} className="grid min-h-svh lg:grid-cols-[1fr_1.1fr]">
-      <section className="flex flex-col justify-between bg-primary p-6 text-primary-foreground lg:p-14">
+    <main
+      id="main-content"
+      tabIndex={-1}
+      className="grid min-h-svh grid-cols-1 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.1fr)]"
+    >
+      <section className="flex min-w-0 flex-col justify-between bg-primary p-4 text-primary-foreground sm:p-6 lg:p-14">
         <Link href="/giris" className="w-fit text-xl font-extrabold tracking-tight">
           FtkSaaS
         </Link>
@@ -20,9 +24,9 @@ export function AuthLayout({ children }: { children: React.ReactNode }) {
       </section>
       <section
         aria-label="Hesap erişimi"
-        className="flex items-center justify-center px-6 py-12 lg:p-16"
+        className="flex min-w-0 items-center justify-center px-4 py-12 sm:px-6 lg:p-16"
       >
-        <div className="w-full max-w-md">{children}</div>
+        <div className="w-full min-w-0 max-w-md">{children}</div>
       </section>
     </main>
   );
