@@ -20,6 +20,12 @@ Kurulum package.json’da sabit pnpm sürümüyle `corepack enable` ve `pnpm ins
 
 Aynı branch'in eski hızlı işi iptal edilir; farklı PR ve her main SHA birbirini kesmez. Matrix fail-fast:false ile bir shard hatası diğerlerini iptal etmez. Toplayıcı tüm zorunlu işlerin bitmesini bekler; tam hata ayrıntıları ayrı job loglarındadır, tekleştirilmiş bütün hata listesi henüz yoktur. Zorunlu skipped/cancelled/failure kabulü kapatır. Optional serial-reference yalnız açık ci:measure-serial isteğinde zorunludur; istenmediğinde atlanır ve ölçülmez. Bu isteğin sonradan eklenmesi onu çalıştırmamış eski kabulü geçersiz kılar.
 
+## Manuel main full clean
+
+Kullanıcının 28 Ekim izniyle [Manual full clean](../.github/workflows/manual-full-clean.yml) yalnız main dalında `workflow_dispatch` ile çalışır. `tested_sha` alanına main geçmişindeki tam40 karakter SHA verilir; atalık, checkout SHA ve tree doğrulanır. Mevcut clean-suite core+dört API shard+toplayıcıyı aynı izole runner düzeninde çalıştırır; etiket gerekmez. Test kaynağı, workflow kaynağı, coverage hash ve run/attempt receipt'e bağlanır.
+
+Bu manuel testin kabul türü `manual-full`dür. Aday PR kanıtı yerine geçmez, önceki başarısız main koşusunu değiştirmez ve development CD başlatmaz. Mevcut aday/main güven kapıları ile otomatik tetikleme politikası bu eklemeyle değişmez.
+
 ## Birikimli hedefli seçim
 
 [Seçici](../apps/backend/scripts/ci/select-tests.mjs) dosya adı benzerliğinden ziyade açık kaynak–tüketici haritası ve [delta kanıtı](../apps/backend/scripts/ci/delta-analysis.mjs) kullanır. Diff origin/main ile head'in merge-base'inden tüm branch değişiklikleridir; son belge commit'i önceki runtime değişimini gizleyemez. Rename eski/yeni uç, silme ve açıklanamayan fark kapsama dahildir. Eksik geçmiş/head uyumsuzluğu/bilinmeyen paylaşılan kaynak bütün DB/API regresyonuna düşer.
