@@ -1,3 +1,11 @@
+## Aktif Draft — Starter başlangıç ayarları ve public başvuru
+
+Belge eşitlemesi PR60/main6c7587b63681cc9f89d14483eaca71e520a074af üzerinde yalnız-belge kabul40489030502/main40489319042/CD40489417743 ile tamamlandı; full clean çalıştırılmadı. Yeni uygulama adayı213 API/68 migration içerir: yalnız yeni Starter kuruluşunda FD07 negatif varsayılan0 ve borçlu rezervasyon/katılım engelleri açık olacak şekilde üç politika sürümü atomik oluşturulur; mevcut işletme/politikalar backfill edilmez. Program/paket/borç/iptal/çalışma saati gibi seçilmemiş değerler üretilmez. Org politikası gerçek mevcut resolver ile merkezden okunur; Starter merkez override kapısı korunur.
+
+Kullanıcı public hedefi uye.fethiyetango.com seçti; sonraki açık talimat yalnız backend kapsamıdır. Mevcut frontend tasarımı/işleyişi/dağıtımı ve DNS değiştirilmez. DNS/Vercel projesi yalnız okundu. Mevcut managed Turnstile widget’ının alanlarına bu hostname eklendi; widget’ın önceki alanları/mode’u korundu. Bu kayıt gerçek widget tokenı/siteverify veya frontend kabulü değildir. Gateway dağıtımı ve gerçek istemci/provider kabulü entegrasyon devridir. Gateway yalnız sabit submit route’una, Vercel’in doğrulanmış IP başlığıyla imza atar; caller x-ftk/cookie/authorization başlıklarını taşımaz. Public action hostname’i FTK_PUBLIC_APPLICATION_HOSTNAME ile ayrı yapılandırılır; mevcut recovery hostname fallback’i korunur.
+
+Durum: son backend adayı; yerel verify151/151 geçti. Son3-policy temiz native/reset kabulü9+19=28/28 ve advisors exit0 geçti; bağımsız incelemedeki bulgular kapandı. Kanıtlar [raporda](../reports/starter-onboarding-20261027.md) izlenir. Gerçek istemci/widget sağlayıcı kabulü frontend entegrasyon devridir; bu backend testiyle tamamlandı gösterilmez. Son kaynak bağımsız incelemesi sonrası tek aday full clean; aynı main/CD kabulü korunur.
+
 ## 27 Ekim — güncel Starter kapanışı ve sıradaki teslim
 
 Kabul edilmiş main `fc96dc15f336abed20cd0a6c73d84a5b0e3b08b0`:213 API/67 migration/90 core tablo/Edge21 ACTIVE/JWT açık. [PR58](https://github.com/SXQHex/FtkSaaS/pull/58) tek-stüdyo runtime kabulünü, [PR59](https://github.com/SXQHex/FtkSaaS/pull/59) belge kapanışını taşır. [Main40483793353](https://github.com/SXQHex/FtkSaaS/actions/runs/40483793353) ve [development CD40487227365](https://github.com/SXQHex/FtkSaaS/actions/runs/40487227365) başarılıdır.

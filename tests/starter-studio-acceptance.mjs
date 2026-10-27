@@ -1,6 +1,8 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {authUser,fixturePlatform,must,call} from './api-client.mjs';
+import {authUser,fixturePlatform,must,call,context} from './api-client.mjs';
+import {createHash} from 'node:crypto';
+import {deliverDevInvitation} from '../scripts/deliver-dev-invitations.mjs';
 import {connect} from '../scripts/db.mjs';
 import {newUuidV7 as key} from '../scripts/uuid.mjs';
 
@@ -23,7 +25,8 @@ test('Starter studio setup: one room, timed sales and immutable published names'
  try{
   await db.query("update core.saas_plan_versions set name='starter' where id=$1",[plan]);
   const account=await must(owner,'account_get_v1');
-  org=(await must(platform,'organization_create_v1',{verified_account_id:account.id,name:'Synthetic Starter studio',initial_plan_id:plan},key())).primary_id;
+  const creationKey=key(),creationBody={verified_account_id:account.id,name:'Synthetic Starter studio',initial_plan_id:plan};
+  org=(await must(platform,'organization_create_v1',creationBody,creationKey)).primary_id;
   center=(await mut('center_create_v1',{name:'Only center',timezone:'UTC'})).primary_id;
   person=(await rows('select owner_person_id from core.organizations where id=$1',[org]))[0].owner_person_id;
   await mut('center_manager_assign_v1',{person_id:person});
@@ -35,7 +38,17 @@ test('Starter studio setup: one room, timed sales and immutable published names'
   room=(await mut('room_save_v1',{name:'Only logical room',capacity:50})).primary_id;
   for(const resource of [{kind:'room',id:room},{kind:'person',id:person}])await mut('availability_save_v1',{resource,rule:{weekdays:[1,2,3,4,5,6,7],local_start:'00:00:00',local_end:'23:59:59',valid_from:'2020-01-01'}});
   const policy=(key,value)=>mut('policy_publish_v1',{center_id:null,key,value,effective_at:new Date().toISOString(),mandatory:false});
-  await policy('negative_default',{kind:'integer',value:0});await policy('negative_upper',{kind:'integer',value:0});
+  await t.test('new Starter inherits the approved zero credit default; unconfigured policies and center overrides stay closed',async()=>{
+   assert.equal((await must(platform,'organization_create_v1',creationBody,creationKey)).primary_id,org);
+   assert.equal((await rows('select count(*)::int n from core.policy_versions where org_id=$1',[org]))[0].n,3);
+   const read=await mut('policies_get_v1',{keys:['negative_default','reservation_window']});
+   assert.equal(read.length,1);assert.equal(read[0].key,'negative_default');assert.deepEqual(read[0].value,{kind:'integer',value:0});assert.equal(read[0].scope.kind,'organization');
+   const debt=await mut('policies_get_v1',{keys:['debt_booking','debt_participation']});assert.equal(debt.length,2);assert(debt.every(p=>p.value.kind==='boolean'&&p.value.value===true&&p.scope.kind==='organization'));
+   const denied=await call(owner,'policy_publish_v1',scope({key:'negative_default',value:{kind:'integer',value:3},effective_at:new Date().toISOString(),mandatory:false}),key());
+   assert.equal(denied.result.ok,false);assert.equal(denied.result.error.code,'PLAN_FEATURE_UNAVAILABLE');
+   const again=await mut('policies_get_v1',{keys:['negative_default']});assert.deepEqual(again,read);
+  });
+  await policy('negative_upper',{kind:'integer',value:0});
   await policy('participation_block_credit',{kind:'blocked_credit',effect:'release'});
   await policy('reservation_window',{kind:'window',opens_minutes_before:10080,closes_minutes_before:0,manager_exception:false});
   await policy('student_cancel_group',{kind:'cancellation',terms:{cutoff_minutes:0,before_cutoff:'release',after_cutoff:'release',no_show:'release'}});
@@ -54,13 +67,49 @@ test('Starter studio setup: one room, timed sales and immutable published names'
    assert.equal(Number((await rows('select capacity from core.rooms where id=$1',[room]))[0].capacity),50);
    await reject('session_create_v1',{discipline_id:discipline,format:'group',interval:{starts_at:at(19),ends_at:at(20)},resources:[{kind:'room',id:room}],assignments:[{person_id:person,duty:'instructor'}],capacity:{total:51}},'CAPACITY_FULL');
   });
+  await t.test('Starter public intent becomes an invited self-booking student without CRM, management role or automatic sale',async()=>{
+   const publicSession=(await session(20)).primary_id;
+   const newcomer=await authUser('studio-public-student'),pub=(await mut('publication_set_v1',{session_id:publicSession,published:true,public_details:{title:'Synthetic Yoga',venue_public_label:'Synthetic public venue',fee_minor:'1000',currency:'TRY',public_conditions:'Application only; no seat reserved'}})).primary_id;
+   const {env}=context(),anon={jwt:env.ANON_KEY};
+   const calendar=await must(anon,'public_calendar_get_v1',{slug:org,interval:{starts_at:at(19),ends_at:at(22)},page:{}});
+   assert.equal(calendar.items.length,1);assert.equal(calendar.items[0].publication_id,pub);
+   assert(!JSON.stringify(calendar).includes(newcomer.email));
+   const request={client_api_version:1,request_id:key(),publication_id:pub,contact:newcomer.email,bot_proof:'synthetic-provider-proof',client_request_key:key()};
+   const missing=await call(anon,'public_application_submit_v1',request);assert.equal(missing.result.ok,false);assert.equal(missing.result.error.code,'SERVICE_UNAVAILABLE');
+   // Native local DB only: emulate the Edge-owned verified context. This is not
+   // a real widget/siteverify acceptance; ingress/provider contracts are separate tests.
+   const rpc=async(aux={})=>{await db.query("select set_config('request.jwt.claim.role','service_role',false)");return (await rows('select api_v1.public_application_submit_v1($1,null,null,$2,$3) result',[request,Array.from({length:64},key),{ip_hash:createHash('sha256').update('synthetic-public-ip').digest('hex'),target_hash:createHash('sha256').update(newcomer.email).digest('hex'),phase:'submit',bot_verified:true,...aux}]))[0].result;};
+   assert.equal((await rpc({bot_verified:false})).error.code,'BOT_VERIFICATION_FAILED');
+   assert.equal((await rpc()).ok,true);assert.deepEqual((await rpc()).data,{accepted:true});
+   assert.equal((await rows('select count(*)::int n from core.public_applications where org_id=$1',[org]))[0].n,1);
+   assert.equal((await rows('select count(*)::int n from core.people where org_id=$1 and display_name=$2',[org,newcomer.email]))[0].n,0);
+   const application=(await rows('select id from core.public_applications where org_id=$1',[org]))[0].id;
+   await mut('public_application_review_v1',{application_id:application,action:'create_candidate'});
+   const target=(await rows('select person_id from core.public_applications where id=$1',[application]))[0].person_id;
+   for(const table of ['leads','sales','reservations'])assert.equal((await rows('select count(*)::int n from core.'+table+' where org_id=$1 and person_id=$2',[org,target]))[0].n,0);
+   await mut('student_activate_v1',{person_id:target});
+   await must(newcomer,'account_get_v1');const invite=await mut('account_access_send_v1',{person_id:target});await deliverDevInvitation(invite.job_id);
+   const messages=await(await fetch(env.MAILPIT_URL+'/api/v1/messages')).json(),message=messages.messages.find(m=>m.To.some(a=>a.Address===newcomer.email));assert(message);
+   const detail=await(await fetch(env.MAILPIT_URL+'/api/v1/message/'+message.ID)).json(),token=detail.Text.match(/Token: ([a-f0-9]{64})/)[1];
+   const wrong=await call(student,'account_access_accept_v1',{token},key());assert.equal(wrong.result.ok,false);assert.equal(wrong.result.error.code,'INVITATION_UNAVAILABLE');
+   await must(newcomer,'account_access_accept_v1',{token},key());
+   assert.equal((await rows('select count(*)::int n from core.role_assignments where org_id=$1 and person_id=$2',[org,target]))[0].n,0);
+   const v=(await publish('Yoga · public onboarding',{kind:'credits',credits:1})).primary_id;
+   const preview=await mut('sale_preview_v1',{person_id:target,product_version_id:v,start_date:day(-1),end_date:day(30)}),sale=(await mut('sale_apply_v1',{preview:{id:preview.id,token:preview.token}})).primary_id;
+   const blocked=await call(newcomer,'reservation_create_v1',scope({session_id:publicSession,person_id:target,mode:'flexible',source_sale_id:sale}),key());assert.equal(blocked.result.ok,false);assert.equal(blocked.result.error.code,'FORBIDDEN');
+   const debts=await rows('select id from core.debts where org_id=$1 and sale_id=$2',[org,sale]);await mut('collection_record_v1',{person_id:target,debt_ids:debts.map(x=>x.id),amount_minor:'1000',currency:'TRY',occurred_at:new Date().toISOString()});
+   const booking=await mut('reservation_create_v1',{session_id:publicSession,person_id:target,mode:'flexible',source_sale_id:sale},key(),newcomer);assert(booking.primary_id);
+   const forbidden=await call(newcomer,'policies_get_v1',scope({keys:[]}));assert.equal(forbidden.result.ok,false);assert.equal(forbidden.result.error.code,'FORBIDDEN');
+   await reject('lead_save_v1',{person_id:target,source:'public_application',interest:'Synthetic'},'PLAN_FEATURE_UNAVAILABLE');
+   await mut('publication_set_v1',{session_id:publicSession,published:false,expected_version:1});assert.equal((await rpc()).error.code,'SERVICE_UNAVAILABLE');
+  });
   await t.test('credits, quota timed and unlimited timed products all sell in a real Starter subscription',async()=>{
    creditVersion=(await publish('Yoga · 4 lessons',{kind:'credits',credits:4})).primary_id;
    creditProduct=(await rows('select product_id from core.product_versions where id=$1',[creditVersion]))[0].product_id;
    creditSale=await sell(creditVersion);const limited=(await publish('Yoga · 2 per week',{quota:{period:'week',limit:2}})).primary_id;timedSale=await sell(limited);
    const unlimited=(await publish('Yoga · unlimited')).primary_id;unlimitedSale=await sell(unlimited);
-   const catalog=await mut('products_list_v1',{include_timed_products:true,page:{limit:20}});assert.equal(catalog.items.length,3);assert.equal(catalog.items.filter(x=>x.terms.kind==='timed').length,2);
-   assert.equal((await rows('select count(*)::int n from core.sales where org_id=$1',[org]))[0].n,3);
+   const catalog=await mut('products_list_v1',{include_timed_products:true,page:{limit:20}});assert.equal(catalog.items.length,4);assert.equal(catalog.items.filter(x=>x.terms.kind==='timed').length,2);
+   assert.equal((await rows('select count(*)::int n from core.sales where org_id=$1',[org]))[0].n,4);
   });
   let oldCreditReservation;
   await t.test('self reservation uses paid credit and timed quota; unlimited membership is not a one-credit package',async()=>{

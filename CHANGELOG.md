@@ -1,3 +1,7 @@
+## 27 Ekim — Starter başlangıç ve public backend adayı
+
+Yeni Starter org için atomik FD07 negative_default0 ve borçlu rezervasyon/katılım=true başlangıcı; mevcut politikalara backfill yok. Signed public server adapter, ayrı public hostname resolver’ı ve kapalı upstream envelope; native public intent→review→davet/hesap bağı→satış/tahsilat→self rezervasyon kabulü.213 API/68 migration. Draft PR61; son kaynak kabulü bekler. Frontend/site/DNS değişmez.
+
 # Changes
 
 ## 27 Ekim — tek stüdyo kurulum ve sürümlü ürün adı kabulü

@@ -14,7 +14,7 @@ Kabul edilmiş main `fc96dc15f336abed20cd0a6c73d84a5b0e3b08b0`:213 API/67 migrat
 
 ## Aktif teslim — başlangıç ayarları ve self/public
 
-İki alan tek Draft PR içinde geliştirilir. Son adayda bağımsız inceleme ve tek full clean alınır; aynı main/CD kabulü korunur.
+İki alan Draft PR61 içinde backend kapsamında geliştirilir. Yeni68 migration yalnız yeni Starter org için FD07 üç başlangıç politikasını oluşturur; mevcut ayarlar değişmez. Native davet/hesap bağı→satış/tahsilat→self rezervasyon ve public backend koşulları kabul edilir; gerçek frontend/widget tokenı ve mevcut site dağıtımı son kullanıcı talimatıyla entegrasyon devridir. Son adayda bağımsız inceleme ve tek full clean alınır; aynı main/CD kabulü korunur.
 
 | Alan | Kalan iş / kapanış kanıtı |
 |---|---|

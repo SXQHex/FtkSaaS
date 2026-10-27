@@ -1,6 +1,6 @@
 import {lifecycleReauth} from './lifecycle-auth.ts';
 import {passwordChallenge,passwordRecovery} from './account-auth.ts';
-import {publicIngress,verifyPublicBot} from "./public-ingress.ts";
+import {publicIngress,verifyPublicBot,publicBotHostname} from "./public-ingress.ts";
 import {importStorage,parseImportCsv} from "./import-file.ts";
 import {documentStorage} from "./document-storage.ts";
 import implementation from "./implemented.json" with {type:"json"};
@@ -36,7 +36,7 @@ Deno.serve(async req=>{
    };
    let aux:Record<string,unknown>|null=null;
    if(operation==='public_application_submit_v1'){
-    if(!env('FTK_TURNSTILE_SECRET')||!env('FTK_TURNSTILE_HOSTNAME'))return failure('SERVICE_UNAVAILABLE',503);
+    if(!env('FTK_TURNSTILE_SECRET')||!publicBotHostname(env))return failure('SERVICE_UNAVAILABLE',503);
     const ingress=await publicIngress(req,body,env);if(!ingress)return failure('SERVICE_UNAVAILABLE',503);
     aux={phase:'preflight',ip_hash:ingress.ip_hash,target_hash:await ingress.targetHash(request.contact)};
     const preflight=await rpcPublic(aux);
