@@ -30,7 +30,7 @@ test('ST-03 Starter preparation defaults copy, authority, reset and program cons
   await t.test('new center copies approved org proposal; subsequent template edits do not move it',async()=>{
    const v=await read('center');assert.equal(v.values.program_duration_minutes,45);assert.equal(v.program_duration_source.kind,'organization_copy');assert.equal(v.program_duration_source.organization_version,(await read('organization')).version);
    await change('organization',{program_duration_minutes:90});assert.equal((await read('center')).values.program_duration_minutes,45);
-   const catalog=await must(owner,'settings_catalog_get_v1',q('center'));assert.equal(catalog.catalog_version,3);assert.equal(catalog.defaults.program_duration_minutes,60);assert.equal(catalog.fields.find(x=>x.key==='program_duration_minutes').consumer,'schedule_build_program');
+   const catalog=await must(owner,'settings_catalog_get_v1',q('center'));assert.equal(catalog.catalog_version,4);assert.equal(catalog.defaults.program_duration_minutes,60);assert.equal(catalog.fields.find(x=>x.key==='program_duration_minutes').consumer,'schedule_build_program');
   });
   await t.test('an explicit local selection equal to the copy records local provenance',async()=>{
    await change('center',{program_duration_minutes:45});assert.equal((await read('center')).program_duration_source.kind,'center_local');
@@ -62,12 +62,13 @@ test('ST-03 Starter preparation defaults copy, authority, reset and program cons
    let peers=await shared();assert.equal(peers.length,1);assert.equal(peers[0].person_id,person);assert.equal(peers[0].display_name,(await must(owner,'account_get_v1')).display_name);assert.equal(peers[0].email,owner.email);assert(!('phone' in peers[0]));assert(!('given_name' in peers[0]));assert(!('family_name' in peers[0]));
    const profile=await must(owner,'account_get_v1'),managed=await must(owner,'management_state_get_v1',{operation:'account_profile_update_v1',selector:{operation:'account_profile_update_v1',key:{}}});
    await must(owner,'account_profile_update_v1',{expected_version:managed.items[0].versions[0].version,display_name:profile.display_name,unverified_phone:'+15550001234',given_name:'Synthetic private legal',family_name:'Private legal family'},key());
-   assert(!('phone' in (await shared())[0]));assert(!('given_name' in (await shared())[0]));
+   const pendingProfile=(await shared())[0];assert(!('phone' in pendingProfile));assert(!('given_name' in pendingProfile));assert(!('family_name' in pendingProfile));
    const phone='+1555'+String(Date.now()).slice(-7),{env}=context();
    const proof=await fetch(env.API_URL+'/auth/v1/admin/users/'+owner.id,{method:'PUT',headers:{apikey:env.SERVICE_ROLE_KEY,authorization:'Bearer '+env.SERVICE_ROLE_KEY,'content-type':'application/json'},body:JSON.stringify({phone,phone_confirm:true})});assert(proof.ok,'Synthetic native verified phone fixture: '+proof.status);
-   assert.equal((await shared())[0].phone,phone);
+   const verified=(await proof.json()).phone;assert.equal(verified,phone.slice(1));const canonical=(await must(owner,'account_get_v1')).identity;assert.equal(canonical.phone,verified);assert(canonical.phone_verified_at);
+   assert.equal((await shared())[0].phone,verified);
    await change('member',{phone_visible:false});assert(!('phone' in (await shared())[0]));
-   await change('member',{phone_visible:true});assert.equal((await shared())[0].phone,phone);
+   await change('member',{phone_visible:true});assert.equal((await shared())[0].phone,verified);
    await change('member',{profile_visible:false});peers=await shared();assert(!('display_name' in peers[0]));assert.equal(peers[0].email,owner.email);
    await must(owner,'settings_update_v1',{scope:'member',org_id:org.toUpperCase(),expected_version:(await read('member')).version,patch:{email_visible:false,phone_visible:false}},key());
    assert.equal((await read('member')).values.email_visible,false);assert.deepEqual(await shared(),[]);
@@ -90,7 +91,7 @@ test('ST-03 Starter preparation defaults copy, authority, reset and program cons
    const own=await must(owner,'media_get_v1',{scope:'user',asset_id:photo.id});assert.equal(own.data_base64,data);assert.deepEqual(own.asset,photo);
    await denied(student,'media_get_v1',{scope:'user',asset_id:photo.id},'NOT_FOUND');
    const session=(await rows('select id from core.sessions where org_id=$1',[org]))[0].id,peer={scope:'lesson_participant',org_id:org,session_id:session,person_id:person,asset_id:photo.id};
-   await change('member',{profile_visible:false,photo_visible:false});await denied(student,'media_get_v1',peer,'NOT_FOUND');
+   await change('member',{profile_visible:false,photo_visible:false,email_visible:false,phone_visible:false});await denied(student,'media_get_v1',peer,'NOT_FOUND');
    await change('member',{photo_visible:true});const shared=(await api('session_get_v1',{session_id:session},student)).shared_participants;assert.deepEqual(shared,[{person_id:person,photo}]);assert.equal((await must(student,'media_get_v1',peer)).data_base64,data);
    const response=await fetch(context().env.API_URL+'/functions/v1/backend-v1/media_get_v1',{method:'POST',headers:{apikey:context().env.ANON_KEY,authorization:'Bearer '+student.jwt,'content-type':'application/json'},body:JSON.stringify({client_api_version:1,request_id:key(),...peer})});assert(response.ok);assert.match(response.headers.get('cache-control'),/no-store/);await response.arrayBuffer();
    await change('member',{photo_visible:false});await denied(student,'media_get_v1',peer,'NOT_FOUND');

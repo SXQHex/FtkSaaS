@@ -5770,6 +5770,31 @@
         "Authenticated POST only. 1 MiB private PNG/JPEG/WebP binary envelope; no SVG/HTML/remote URL. Current pointer and live scope/privacy are rechecked on every read.",
         "External/public logo exposure is separately gated by published organization context and selected public fields."
       ]
+    },
+    {
+      "name": "settings_template_resolve_v1",
+      "status": "operational_development_limited",
+      "external_path": "/functions/v1/backend-v1/settings_template_resolve_v1",
+      "permission": "templates.resolve",
+      "features": [
+        "F28",
+        "F31"
+      ],
+      "required_features": [],
+      "runtime_required_features": [],
+      "decision_delivery": {
+        "accepted_contract": "DS-2026-10-17",
+        "runtime_conformance": "implemented_pending_ci",
+        "open_dependencies": [],
+        "target_request": {
+          "$ref": "#/$defs/Request_settings_template_resolve"
+        }
+      },
+      "billing_class": "read",
+      "limits": [
+        "Private member templates by default; explicit scoped center/org templates confer no data or execution permission.",
+        "Prepared values are an explicit request snapshot. No automatic job/apply, financial defaults, merge, automation or external send."
+      ]
     }
   ]
 }

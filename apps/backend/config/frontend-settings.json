@@ -1,5 +1,5 @@
 {
-  "version": 3,
+  "version": 4,
   "fields": [
     {
       "scope": "user",
@@ -650,6 +650,696 @@
       "default": 60,
       "group": "M06",
       "consumer": "schedule_build_program"
+    },
+    {
+      "scope": "member",
+      "key": "report_templates",
+      "schema": {
+        "type": "array",
+        "maxItems": 100,
+        "items": {
+          "type": "object",
+          "properties": {
+            "key": {
+              "type": "string",
+              "pattern": "^[A-Za-z0-9_-]{1,64}$"
+            },
+            "name": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 100
+            },
+            "report": {
+              "type": "string",
+              "enum": [
+                "collections_debts",
+                "lesson_attendance"
+              ]
+            },
+            "filters": {
+              "type": "object",
+              "properties": {
+                "interval": {
+                  "type": "object",
+                  "properties": {
+                    "starts_at": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "ends_at": {
+                      "type": "string",
+                      "format": "date-time"
+                    }
+                  },
+                  "required": [
+                    "starts_at",
+                    "ends_at"
+                  ],
+                  "additionalProperties": false,
+                  "x-invariant": "starts_at < ends_at; [start,end)"
+                },
+                "center_ids": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/$defs/FtkUuid"
+                  }
+                },
+                "person_ids": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/$defs/FtkUuid"
+                  }
+                },
+                "currency": {
+                  "anyOf": [
+                    {
+                      "type": "string",
+                      "pattern": "^[A-Z]{3}$",
+                      "x-validation": "currency exponent from versioned server allowlist; unsupported rejected"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "state": {
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                }
+              },
+              "required": [
+                "interval",
+                "center_ids"
+              ],
+              "additionalProperties": false
+            },
+            "columns": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "enum": [
+                  "group_key",
+                  "center_id",
+                  "person_id",
+                  "currency",
+                  "count",
+                  "amount_minor",
+                  "credits",
+                  "ratio_bps",
+                  "basis_count"
+                ]
+              },
+              "minItems": 1,
+              "maxItems": 9,
+              "uniqueItems": true
+            },
+            "report_order": {
+              "type": "string",
+              "enum": [
+                "group_key_asc",
+                "group_key_desc"
+              ]
+            },
+            "group_by": {
+              "type": "string",
+              "enum": [
+                "person",
+                "center",
+                "total"
+              ]
+            }
+          },
+          "required": [
+            "key",
+            "name",
+            "report",
+            "filters",
+            "columns",
+            "report_order",
+            "group_by"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "default": [],
+      "group": "S10",
+      "consumer": "p06_report_prepare"
+    },
+    {
+      "scope": "member",
+      "key": "import_templates",
+      "schema": {
+        "type": "array",
+        "maxItems": 100,
+        "items": {
+          "type": "object",
+          "properties": {
+            "key": {
+              "type": "string",
+              "pattern": "^[A-Za-z0-9_-]{1,64}$"
+            },
+            "name": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 100
+            },
+            "center_id": {
+              "$ref": "#/$defs/FtkUuid"
+            },
+            "mapping": {
+              "type": "object",
+              "properties": {
+                "columns": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "source_column": {
+                        "type": "string"
+                      },
+                      "target": {
+                        "type": "string",
+                        "enum": [
+                          "display_name",
+                          "email",
+                          "phone",
+                          "source_key",
+                          "person_ref",
+                          "opening_credits",
+                          "opening_debt_minor",
+                          "currency",
+                          "product_version_ref",
+                          "start_date",
+                          "end_date",
+                          "opening_credit_value_minor"
+                        ]
+                      }
+                    },
+                    "required": [
+                      "source_column",
+                      "target"
+                    ],
+                    "additionalProperties": false
+                  }
+                },
+                "delimiter": {
+                  "type": "string",
+                  "enum": [
+                    ",",
+                    ";"
+                  ]
+                }
+              },
+              "required": [
+                "columns",
+                "delimiter"
+              ],
+              "additionalProperties": false,
+              "x-invariant": "unique targets except contacts, permanent source_key required; existing person only explicit person_ref, never email auto merge"
+            },
+            "source_namespace": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "key",
+            "name",
+            "center_id",
+            "mapping",
+            "source_namespace"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "default": [],
+      "group": "S10",
+      "consumer": "p06_import_prepare"
+    },
+    {
+      "scope": "center",
+      "key": "report_templates",
+      "schema": {
+        "type": "array",
+        "maxItems": 100,
+        "items": {
+          "type": "object",
+          "properties": {
+            "key": {
+              "type": "string",
+              "pattern": "^[A-Za-z0-9_-]{1,64}$"
+            },
+            "name": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 100
+            },
+            "report": {
+              "type": "string",
+              "enum": [
+                "collections_debts",
+                "lesson_attendance"
+              ]
+            },
+            "filters": {
+              "type": "object",
+              "properties": {
+                "interval": {
+                  "type": "object",
+                  "properties": {
+                    "starts_at": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "ends_at": {
+                      "type": "string",
+                      "format": "date-time"
+                    }
+                  },
+                  "required": [
+                    "starts_at",
+                    "ends_at"
+                  ],
+                  "additionalProperties": false,
+                  "x-invariant": "starts_at < ends_at; [start,end)"
+                },
+                "center_ids": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/$defs/FtkUuid"
+                  }
+                },
+                "person_ids": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/$defs/FtkUuid"
+                  }
+                },
+                "currency": {
+                  "anyOf": [
+                    {
+                      "type": "string",
+                      "pattern": "^[A-Z]{3}$",
+                      "x-validation": "currency exponent from versioned server allowlist; unsupported rejected"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "state": {
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                }
+              },
+              "required": [
+                "interval",
+                "center_ids"
+              ],
+              "additionalProperties": false
+            },
+            "columns": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "enum": [
+                  "group_key",
+                  "center_id",
+                  "person_id",
+                  "currency",
+                  "count",
+                  "amount_minor",
+                  "credits",
+                  "ratio_bps",
+                  "basis_count"
+                ]
+              },
+              "minItems": 1,
+              "maxItems": 9,
+              "uniqueItems": true
+            },
+            "report_order": {
+              "type": "string",
+              "enum": [
+                "group_key_asc",
+                "group_key_desc"
+              ]
+            },
+            "group_by": {
+              "type": "string",
+              "enum": [
+                "person",
+                "center",
+                "total"
+              ]
+            }
+          },
+          "required": [
+            "key",
+            "name",
+            "report",
+            "filters",
+            "columns",
+            "report_order",
+            "group_by"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "default": [],
+      "group": "M18",
+      "consumer": "p06_report_prepare"
+    },
+    {
+      "scope": "center",
+      "key": "import_templates",
+      "schema": {
+        "type": "array",
+        "maxItems": 100,
+        "items": {
+          "type": "object",
+          "properties": {
+            "key": {
+              "type": "string",
+              "pattern": "^[A-Za-z0-9_-]{1,64}$"
+            },
+            "name": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 100
+            },
+            "center_id": {
+              "$ref": "#/$defs/FtkUuid"
+            },
+            "mapping": {
+              "type": "object",
+              "properties": {
+                "columns": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "source_column": {
+                        "type": "string"
+                      },
+                      "target": {
+                        "type": "string",
+                        "enum": [
+                          "display_name",
+                          "email",
+                          "phone",
+                          "source_key",
+                          "person_ref",
+                          "opening_credits",
+                          "opening_debt_minor",
+                          "currency",
+                          "product_version_ref",
+                          "start_date",
+                          "end_date",
+                          "opening_credit_value_minor"
+                        ]
+                      }
+                    },
+                    "required": [
+                      "source_column",
+                      "target"
+                    ],
+                    "additionalProperties": false
+                  }
+                },
+                "delimiter": {
+                  "type": "string",
+                  "enum": [
+                    ",",
+                    ";"
+                  ]
+                }
+              },
+              "required": [
+                "columns",
+                "delimiter"
+              ],
+              "additionalProperties": false,
+              "x-invariant": "unique targets except contacts, permanent source_key required; existing person only explicit person_ref, never email auto merge"
+            },
+            "source_namespace": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "key",
+            "name",
+            "center_id",
+            "mapping",
+            "source_namespace"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "default": [],
+      "group": "M19",
+      "consumer": "p06_import_prepare"
+    },
+    {
+      "scope": "organization",
+      "key": "report_templates",
+      "schema": {
+        "type": "array",
+        "maxItems": 100,
+        "items": {
+          "type": "object",
+          "properties": {
+            "key": {
+              "type": "string",
+              "pattern": "^[A-Za-z0-9_-]{1,64}$"
+            },
+            "name": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 100
+            },
+            "report": {
+              "type": "string",
+              "enum": [
+                "collections_debts",
+                "lesson_attendance"
+              ]
+            },
+            "filters": {
+              "type": "object",
+              "properties": {
+                "interval": {
+                  "type": "object",
+                  "properties": {
+                    "starts_at": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "ends_at": {
+                      "type": "string",
+                      "format": "date-time"
+                    }
+                  },
+                  "required": [
+                    "starts_at",
+                    "ends_at"
+                  ],
+                  "additionalProperties": false,
+                  "x-invariant": "starts_at < ends_at; [start,end)"
+                },
+                "center_ids": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/$defs/FtkUuid"
+                  }
+                },
+                "person_ids": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/$defs/FtkUuid"
+                  }
+                },
+                "currency": {
+                  "anyOf": [
+                    {
+                      "type": "string",
+                      "pattern": "^[A-Z]{3}$",
+                      "x-validation": "currency exponent from versioned server allowlist; unsupported rejected"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "state": {
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                }
+              },
+              "required": [
+                "interval",
+                "center_ids"
+              ],
+              "additionalProperties": false
+            },
+            "columns": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "enum": [
+                  "group_key",
+                  "center_id",
+                  "person_id",
+                  "currency",
+                  "count",
+                  "amount_minor",
+                  "credits",
+                  "ratio_bps",
+                  "basis_count"
+                ]
+              },
+              "minItems": 1,
+              "maxItems": 9,
+              "uniqueItems": true
+            },
+            "report_order": {
+              "type": "string",
+              "enum": [
+                "group_key_asc",
+                "group_key_desc"
+              ]
+            },
+            "group_by": {
+              "type": "string",
+              "enum": [
+                "person",
+                "center",
+                "total"
+              ]
+            }
+          },
+          "required": [
+            "key",
+            "name",
+            "report",
+            "filters",
+            "columns",
+            "report_order",
+            "group_by"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "default": [],
+      "group": "O14",
+      "consumer": "p06_report_prepare"
+    },
+    {
+      "scope": "organization",
+      "key": "import_templates",
+      "schema": {
+        "type": "array",
+        "maxItems": 100,
+        "items": {
+          "type": "object",
+          "properties": {
+            "key": {
+              "type": "string",
+              "pattern": "^[A-Za-z0-9_-]{1,64}$"
+            },
+            "name": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 100
+            },
+            "center_id": {
+              "$ref": "#/$defs/FtkUuid"
+            },
+            "mapping": {
+              "type": "object",
+              "properties": {
+                "columns": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "source_column": {
+                        "type": "string"
+                      },
+                      "target": {
+                        "type": "string",
+                        "enum": [
+                          "display_name",
+                          "email",
+                          "phone",
+                          "source_key",
+                          "person_ref",
+                          "opening_credits",
+                          "opening_debt_minor",
+                          "currency",
+                          "product_version_ref",
+                          "start_date",
+                          "end_date",
+                          "opening_credit_value_minor"
+                        ]
+                      }
+                    },
+                    "required": [
+                      "source_column",
+                      "target"
+                    ],
+                    "additionalProperties": false
+                  }
+                },
+                "delimiter": {
+                  "type": "string",
+                  "enum": [
+                    ",",
+                    ";"
+                  ]
+                }
+              },
+              "required": [
+                "columns",
+                "delimiter"
+              ],
+              "additionalProperties": false,
+              "x-invariant": "unique targets except contacts, permanent source_key required; existing person only explicit person_ref, never email auto merge"
+            },
+            "source_namespace": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "key",
+            "name",
+            "center_id",
+            "mapping",
+            "source_namespace"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "default": [],
+      "group": "O14",
+      "consumer": "p06_import_prepare"
     }
   ]
 }

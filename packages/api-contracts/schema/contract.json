@@ -914,7 +914,8 @@
         "account_security_history_get_v1",
         "account_totp_remove_v1",
         "account_google_link_prepare_v1",
-        "media_get_v1"
+        "media_get_v1",
+        "settings_template_resolve_v1"
       ]
     },
     "EntityType": {
@@ -4544,6 +4545,9 @@
           "items": {
             "$ref": "#/$defs/ReportTotal"
           }
+        },
+        "columns": {
+          "$ref": "#/$defs/ReportColumns"
         }
       },
       "required": [
@@ -13985,6 +13989,15 @@
         },
         "page": {
           "$ref": "#/$defs/Page"
+        },
+        "columns": {
+          "$ref": "#/$defs/ReportColumns"
+        },
+        "report_order": {
+          "$ref": "#/$defs/ReportPreparationOrder"
+        },
+        "group_by": {
+          "$ref": "#/$defs/ReportPreparationGrouping"
         }
       },
       "required": [
@@ -13995,7 +14008,33 @@
         "filters",
         "page"
       ],
-      "additionalProperties": false
+      "additionalProperties": false,
+      "allOf": [
+        {
+          "if": {
+            "required": [
+              "report"
+            ],
+            "properties": {
+              "report": {
+                "not": {
+                  "enum": [
+                    "collections_debts",
+                    "lesson_attendance"
+                  ]
+                }
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "group_by": {
+                "const": "person"
+              }
+            }
+          }
+        }
+      ]
     },
     "Success_report_get": {
       "type": "object",
@@ -14050,6 +14089,15 @@
         },
         "format": {
           "$ref": "#/$defs/ExportFormat"
+        },
+        "columns": {
+          "$ref": "#/$defs/ReportColumns"
+        },
+        "report_order": {
+          "$ref": "#/$defs/ReportPreparationOrder"
+        },
+        "group_by": {
+          "$ref": "#/$defs/ReportPreparationGrouping"
         }
       },
       "required": [
@@ -14061,7 +14109,33 @@
         "filters",
         "format"
       ],
-      "additionalProperties": false
+      "additionalProperties": false,
+      "allOf": [
+        {
+          "if": {
+            "required": [
+              "report"
+            ],
+            "properties": {
+              "report": {
+                "not": {
+                  "enum": [
+                    "collections_debts",
+                    "lesson_attendance"
+                  ]
+                }
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "group_by": {
+                "const": "person"
+              }
+            }
+          }
+        }
+      ]
     },
     "Success_report_export_start": {
       "type": "object",
@@ -42741,6 +42815,222 @@
         },
         "in_app_marketing": {
           "type": "boolean"
+        },
+        "report_templates": {
+          "type": "array",
+          "maxItems": 100,
+          "items": {
+            "type": "object",
+            "properties": {
+              "key": {
+                "type": "string",
+                "pattern": "^[A-Za-z0-9_-]{1,64}$"
+              },
+              "name": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 100
+              },
+              "report": {
+                "type": "string",
+                "enum": [
+                  "collections_debts",
+                  "lesson_attendance"
+                ]
+              },
+              "filters": {
+                "type": "object",
+                "properties": {
+                  "interval": {
+                    "type": "object",
+                    "properties": {
+                      "starts_at": {
+                        "type": "string",
+                        "format": "date-time"
+                      },
+                      "ends_at": {
+                        "type": "string",
+                        "format": "date-time"
+                      }
+                    },
+                    "required": [
+                      "starts_at",
+                      "ends_at"
+                    ],
+                    "additionalProperties": false,
+                    "x-invariant": "starts_at < ends_at; [start,end)"
+                  },
+                  "center_ids": {
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/$defs/FtkUuid"
+                    }
+                  },
+                  "person_ids": {
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/$defs/FtkUuid"
+                    }
+                  },
+                  "currency": {
+                    "anyOf": [
+                      {
+                        "type": "string",
+                        "pattern": "^[A-Z]{3}$",
+                        "x-validation": "currency exponent from versioned server allowlist; unsupported rejected"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  },
+                  "state": {
+                    "anyOf": [
+                      {
+                        "type": "string"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  }
+                },
+                "required": [
+                  "interval",
+                  "center_ids"
+                ],
+                "additionalProperties": false
+              },
+              "columns": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "enum": [
+                    "group_key",
+                    "center_id",
+                    "person_id",
+                    "currency",
+                    "count",
+                    "amount_minor",
+                    "credits",
+                    "ratio_bps",
+                    "basis_count"
+                  ]
+                },
+                "minItems": 1,
+                "maxItems": 9,
+                "uniqueItems": true
+              },
+              "report_order": {
+                "type": "string",
+                "enum": [
+                  "group_key_asc",
+                  "group_key_desc"
+                ]
+              },
+              "group_by": {
+                "type": "string",
+                "enum": [
+                  "person",
+                  "center",
+                  "total"
+                ]
+              }
+            },
+            "required": [
+              "key",
+              "name",
+              "report",
+              "filters",
+              "columns",
+              "report_order",
+              "group_by"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "import_templates": {
+          "type": "array",
+          "maxItems": 100,
+          "items": {
+            "type": "object",
+            "properties": {
+              "key": {
+                "type": "string",
+                "pattern": "^[A-Za-z0-9_-]{1,64}$"
+              },
+              "name": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 100
+              },
+              "center_id": {
+                "$ref": "#/$defs/FtkUuid"
+              },
+              "mapping": {
+                "type": "object",
+                "properties": {
+                  "columns": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "source_column": {
+                          "type": "string"
+                        },
+                        "target": {
+                          "type": "string",
+                          "enum": [
+                            "display_name",
+                            "email",
+                            "phone",
+                            "source_key",
+                            "person_ref",
+                            "opening_credits",
+                            "opening_debt_minor",
+                            "currency",
+                            "product_version_ref",
+                            "start_date",
+                            "end_date",
+                            "opening_credit_value_minor"
+                          ]
+                        }
+                      },
+                      "required": [
+                        "source_column",
+                        "target"
+                      ],
+                      "additionalProperties": false
+                    }
+                  },
+                  "delimiter": {
+                    "type": "string",
+                    "enum": [
+                      ",",
+                      ";"
+                    ]
+                  }
+                },
+                "required": [
+                  "columns",
+                  "delimiter"
+                ],
+                "additionalProperties": false,
+                "x-invariant": "unique targets except contacts, permanent source_key required; existing person only explicit person_ref, never email auto merge"
+              },
+              "source_namespace": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "key",
+              "name",
+              "center_id",
+              "mapping",
+              "source_namespace"
+            ],
+            "additionalProperties": false
+          }
         }
       },
       "required": [],
@@ -42777,6 +43067,222 @@
           "type": "integer",
           "minimum": 1,
           "maximum": 2147483647
+        },
+        "report_templates": {
+          "type": "array",
+          "maxItems": 100,
+          "items": {
+            "type": "object",
+            "properties": {
+              "key": {
+                "type": "string",
+                "pattern": "^[A-Za-z0-9_-]{1,64}$"
+              },
+              "name": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 100
+              },
+              "report": {
+                "type": "string",
+                "enum": [
+                  "collections_debts",
+                  "lesson_attendance"
+                ]
+              },
+              "filters": {
+                "type": "object",
+                "properties": {
+                  "interval": {
+                    "type": "object",
+                    "properties": {
+                      "starts_at": {
+                        "type": "string",
+                        "format": "date-time"
+                      },
+                      "ends_at": {
+                        "type": "string",
+                        "format": "date-time"
+                      }
+                    },
+                    "required": [
+                      "starts_at",
+                      "ends_at"
+                    ],
+                    "additionalProperties": false,
+                    "x-invariant": "starts_at < ends_at; [start,end)"
+                  },
+                  "center_ids": {
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/$defs/FtkUuid"
+                    }
+                  },
+                  "person_ids": {
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/$defs/FtkUuid"
+                    }
+                  },
+                  "currency": {
+                    "anyOf": [
+                      {
+                        "type": "string",
+                        "pattern": "^[A-Z]{3}$",
+                        "x-validation": "currency exponent from versioned server allowlist; unsupported rejected"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  },
+                  "state": {
+                    "anyOf": [
+                      {
+                        "type": "string"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  }
+                },
+                "required": [
+                  "interval",
+                  "center_ids"
+                ],
+                "additionalProperties": false
+              },
+              "columns": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "enum": [
+                    "group_key",
+                    "center_id",
+                    "person_id",
+                    "currency",
+                    "count",
+                    "amount_minor",
+                    "credits",
+                    "ratio_bps",
+                    "basis_count"
+                  ]
+                },
+                "minItems": 1,
+                "maxItems": 9,
+                "uniqueItems": true
+              },
+              "report_order": {
+                "type": "string",
+                "enum": [
+                  "group_key_asc",
+                  "group_key_desc"
+                ]
+              },
+              "group_by": {
+                "type": "string",
+                "enum": [
+                  "person",
+                  "center",
+                  "total"
+                ]
+              }
+            },
+            "required": [
+              "key",
+              "name",
+              "report",
+              "filters",
+              "columns",
+              "report_order",
+              "group_by"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "import_templates": {
+          "type": "array",
+          "maxItems": 100,
+          "items": {
+            "type": "object",
+            "properties": {
+              "key": {
+                "type": "string",
+                "pattern": "^[A-Za-z0-9_-]{1,64}$"
+              },
+              "name": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 100
+              },
+              "center_id": {
+                "$ref": "#/$defs/FtkUuid"
+              },
+              "mapping": {
+                "type": "object",
+                "properties": {
+                  "columns": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "source_column": {
+                          "type": "string"
+                        },
+                        "target": {
+                          "type": "string",
+                          "enum": [
+                            "display_name",
+                            "email",
+                            "phone",
+                            "source_key",
+                            "person_ref",
+                            "opening_credits",
+                            "opening_debt_minor",
+                            "currency",
+                            "product_version_ref",
+                            "start_date",
+                            "end_date",
+                            "opening_credit_value_minor"
+                          ]
+                        }
+                      },
+                      "required": [
+                        "source_column",
+                        "target"
+                      ],
+                      "additionalProperties": false
+                    }
+                  },
+                  "delimiter": {
+                    "type": "string",
+                    "enum": [
+                      ",",
+                      ";"
+                    ]
+                  }
+                },
+                "required": [
+                  "columns",
+                  "delimiter"
+                ],
+                "additionalProperties": false,
+                "x-invariant": "unique targets except contacts, permanent source_key required; existing person only explicit person_ref, never email auto merge"
+              },
+              "source_namespace": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "key",
+              "name",
+              "center_id",
+              "mapping",
+              "source_namespace"
+            ],
+            "additionalProperties": false
+          }
         }
       },
       "required": [],
@@ -42839,6 +43345,222 @@
           "type": "integer",
           "minimum": 1,
           "maximum": 2147483647
+        },
+        "report_templates": {
+          "type": "array",
+          "maxItems": 100,
+          "items": {
+            "type": "object",
+            "properties": {
+              "key": {
+                "type": "string",
+                "pattern": "^[A-Za-z0-9_-]{1,64}$"
+              },
+              "name": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 100
+              },
+              "report": {
+                "type": "string",
+                "enum": [
+                  "collections_debts",
+                  "lesson_attendance"
+                ]
+              },
+              "filters": {
+                "type": "object",
+                "properties": {
+                  "interval": {
+                    "type": "object",
+                    "properties": {
+                      "starts_at": {
+                        "type": "string",
+                        "format": "date-time"
+                      },
+                      "ends_at": {
+                        "type": "string",
+                        "format": "date-time"
+                      }
+                    },
+                    "required": [
+                      "starts_at",
+                      "ends_at"
+                    ],
+                    "additionalProperties": false,
+                    "x-invariant": "starts_at < ends_at; [start,end)"
+                  },
+                  "center_ids": {
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/$defs/FtkUuid"
+                    }
+                  },
+                  "person_ids": {
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/$defs/FtkUuid"
+                    }
+                  },
+                  "currency": {
+                    "anyOf": [
+                      {
+                        "type": "string",
+                        "pattern": "^[A-Z]{3}$",
+                        "x-validation": "currency exponent from versioned server allowlist; unsupported rejected"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  },
+                  "state": {
+                    "anyOf": [
+                      {
+                        "type": "string"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  }
+                },
+                "required": [
+                  "interval",
+                  "center_ids"
+                ],
+                "additionalProperties": false
+              },
+              "columns": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "enum": [
+                    "group_key",
+                    "center_id",
+                    "person_id",
+                    "currency",
+                    "count",
+                    "amount_minor",
+                    "credits",
+                    "ratio_bps",
+                    "basis_count"
+                  ]
+                },
+                "minItems": 1,
+                "maxItems": 9,
+                "uniqueItems": true
+              },
+              "report_order": {
+                "type": "string",
+                "enum": [
+                  "group_key_asc",
+                  "group_key_desc"
+                ]
+              },
+              "group_by": {
+                "type": "string",
+                "enum": [
+                  "person",
+                  "center",
+                  "total"
+                ]
+              }
+            },
+            "required": [
+              "key",
+              "name",
+              "report",
+              "filters",
+              "columns",
+              "report_order",
+              "group_by"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "import_templates": {
+          "type": "array",
+          "maxItems": 100,
+          "items": {
+            "type": "object",
+            "properties": {
+              "key": {
+                "type": "string",
+                "pattern": "^[A-Za-z0-9_-]{1,64}$"
+              },
+              "name": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 100
+              },
+              "center_id": {
+                "$ref": "#/$defs/FtkUuid"
+              },
+              "mapping": {
+                "type": "object",
+                "properties": {
+                  "columns": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "source_column": {
+                          "type": "string"
+                        },
+                        "target": {
+                          "type": "string",
+                          "enum": [
+                            "display_name",
+                            "email",
+                            "phone",
+                            "source_key",
+                            "person_ref",
+                            "opening_credits",
+                            "opening_debt_minor",
+                            "currency",
+                            "product_version_ref",
+                            "start_date",
+                            "end_date",
+                            "opening_credit_value_minor"
+                          ]
+                        }
+                      },
+                      "required": [
+                        "source_column",
+                        "target"
+                      ],
+                      "additionalProperties": false
+                    }
+                  },
+                  "delimiter": {
+                    "type": "string",
+                    "enum": [
+                      ",",
+                      ";"
+                    ]
+                  }
+                },
+                "required": [
+                  "columns",
+                  "delimiter"
+                ],
+                "additionalProperties": false,
+                "x-invariant": "unique targets except contacts, permanent source_key required; existing person only explicit person_ref, never email auto merge"
+              },
+              "source_namespace": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "key",
+              "name",
+              "center_id",
+              "mapping",
+              "source_namespace"
+            ],
+            "additionalProperties": false
+          }
         }
       },
       "required": [],
@@ -42963,7 +43685,9 @@
               "time_format",
               "timezone_mode",
               "timezone_name",
-              "week_start"
+              "week_start",
+              "report_templates",
+              "import_templates"
             ]
           },
           "uniqueItems": true,
@@ -43092,7 +43816,9 @@
                   "interest_center_ids",
                   "interest_discipline_ids",
                   "in_app_reminders",
-                  "in_app_marketing"
+                  "in_app_marketing",
+                  "report_templates",
+                  "import_templates"
                 ]
               },
               "uniqueItems": true,
@@ -43132,7 +43858,9 @@
                   "address",
                   "contact_phone",
                   "contact_email",
-                  "program_duration_minutes"
+                  "program_duration_minutes",
+                  "report_templates",
+                  "import_templates"
                 ]
               },
               "uniqueItems": true,
@@ -43197,7 +43925,9 @@
                   "billing_name",
                   "billing_address",
                   "billing_email",
-                  "program_duration_minutes"
+                  "program_duration_minutes",
+                  "report_templates",
+                  "import_templates"
                 ]
               },
               "uniqueItems": true,
@@ -43311,7 +44041,9 @@
           "time_format",
           "timezone_mode",
           "timezone_name",
-          "week_start"
+          "week_start",
+          "report_templates",
+          "import_templates"
         ]
       },
       "minItems": 1,
@@ -43547,7 +44279,9 @@
             "time_format",
             "timezone_mode",
             "timezone_name",
-            "week_start"
+            "week_start",
+            "report_templates",
+            "import_templates"
           ]
         },
         "group": {
@@ -43560,7 +44294,9 @@
             "frontend",
             "p05_optional_allowed",
             "new_center_copy",
-            "schedule_build_program"
+            "schedule_build_program",
+            "p06_report_prepare",
+            "p06_import_prepare"
           ]
         },
         "writable": {
@@ -43582,7 +44318,7 @@
           "$ref": "#/$defs/SettingsScope"
         },
         "catalog_version": {
-          "const": 3
+          "const": 4
         },
         "fields": {
           "type": "array",
@@ -43622,6 +44358,9 @@
             "type": "string",
             "maxLength": 400
           }
+        },
+        "work_templates": {
+          "$ref": "#/$defs/WorkTemplates"
         }
       },
       "required": [
@@ -43641,7 +44380,7 @@
               "const": "user"
             },
             "catalog_version": {
-              "const": 3
+              "const": 4
             },
             "fields": {
               "type": "array",
@@ -43665,6 +44404,9 @@
                 "type": "string",
                 "maxLength": 400
               }
+            },
+            "work_templates": {
+              "$ref": "#/$defs/WorkTemplates"
             }
           },
           "required": [
@@ -43684,7 +44426,7 @@
               "const": "member"
             },
             "catalog_version": {
-              "const": 3
+              "const": 4
             },
             "fields": {
               "type": "array",
@@ -43708,6 +44450,9 @@
                 "type": "string",
                 "maxLength": 400
               }
+            },
+            "work_templates": {
+              "$ref": "#/$defs/WorkTemplates"
             }
           },
           "required": [
@@ -43727,7 +44472,7 @@
               "const": "center"
             },
             "catalog_version": {
-              "const": 3
+              "const": 4
             },
             "fields": {
               "type": "array",
@@ -43751,6 +44496,9 @@
                 "type": "string",
                 "maxLength": 400
               }
+            },
+            "work_templates": {
+              "$ref": "#/$defs/WorkTemplates"
             }
           },
           "required": [
@@ -43770,7 +44518,7 @@
               "const": "organization"
             },
             "catalog_version": {
-              "const": 3
+              "const": 4
             },
             "fields": {
               "type": "array",
@@ -43794,6 +44542,9 @@
                 "type": "string",
                 "maxLength": 400
               }
+            },
+            "work_templates": {
+              "$ref": "#/$defs/WorkTemplates"
             }
           },
           "required": [
@@ -43813,7 +44564,7 @@
               "const": "platform"
             },
             "catalog_version": {
-              "const": 3
+              "const": 4
             },
             "fields": {
               "type": "array",
@@ -43837,6 +44588,9 @@
                 "type": "string",
                 "maxLength": 400
               }
+            },
+            "work_templates": {
+              "$ref": "#/$defs/WorkTemplates"
             }
           },
           "required": [
@@ -43867,6 +44621,9 @@
           "$ref": "#/$defs/FtkUuid"
         },
         "center_id": {
+          "$ref": "#/$defs/FtkUuid"
+        },
+        "template_center_id": {
           "$ref": "#/$defs/FtkUuid"
         }
       },
@@ -43910,6 +44667,9 @@
               "const": "member"
             },
             "org_id": {
+              "$ref": "#/$defs/FtkUuid"
+            },
+            "template_center_id": {
               "$ref": "#/$defs/FtkUuid"
             }
           },
@@ -44599,7 +45359,9 @@
                   "interest_center_ids",
                   "interest_discipline_ids",
                   "in_app_reminders",
-                  "in_app_marketing"
+                  "in_app_marketing",
+                  "report_templates",
+                  "import_templates"
                 ]
               },
               "minItems": 1,
@@ -44643,7 +45405,9 @@
                   "address",
                   "contact_phone",
                   "contact_email",
-                  "program_duration_minutes"
+                  "program_duration_minutes",
+                  "report_templates",
+                  "import_templates"
                 ]
               },
               "minItems": 1,
@@ -44690,7 +45454,9 @@
                   "billing_name",
                   "billing_address",
                   "billing_email",
-                  "program_duration_minutes"
+                  "program_duration_minutes",
+                  "report_templates",
+                  "import_templates"
                 ]
               },
               "minItems": 1,
@@ -46630,6 +47396,620 @@
         "trace_id"
       ],
       "additionalProperties": false
+    },
+    "ReportColumns": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "enum": [
+          "group_key",
+          "center_id",
+          "person_id",
+          "currency",
+          "count",
+          "amount_minor",
+          "credits",
+          "ratio_bps",
+          "basis_count"
+        ]
+      },
+      "minItems": 1,
+      "maxItems": 9,
+      "uniqueItems": true
+    },
+    "ReportPreparationOrder": {
+      "type": "string",
+      "enum": [
+        "group_key_asc",
+        "group_key_desc"
+      ]
+    },
+    "ReportPreparationGrouping": {
+      "type": "string",
+      "enum": [
+        "person",
+        "center",
+        "total"
+      ]
+    },
+    "WorkTemplateReference": {
+      "type": "object",
+      "properties": {
+        "scope": {
+          "type": "string",
+          "enum": [
+            "member",
+            "center",
+            "organization"
+          ]
+        },
+        "key": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9_-]{1,64}$"
+        },
+        "version": {
+          "$ref": "#/$defs/SettingsVersion"
+        },
+        "center_id": {
+          "$ref": "#/$defs/FtkUuid"
+        }
+      },
+      "required": [
+        "scope",
+        "key",
+        "version"
+      ],
+      "additionalProperties": false,
+      "oneOf": [
+        {
+          "type": "object",
+          "properties": {
+            "scope": {
+              "const": "member"
+            },
+            "key": {
+              "type": "string",
+              "pattern": "^[A-Za-z0-9_-]{1,64}$"
+            },
+            "version": {
+              "$ref": "#/$defs/SettingsVersion"
+            }
+          },
+          "required": [
+            "scope",
+            "key",
+            "version"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "scope": {
+              "const": "center"
+            },
+            "key": {
+              "type": "string",
+              "pattern": "^[A-Za-z0-9_-]{1,64}$"
+            },
+            "version": {
+              "$ref": "#/$defs/SettingsVersion"
+            },
+            "center_id": {
+              "$ref": "#/$defs/FtkUuid"
+            }
+          },
+          "required": [
+            "scope",
+            "key",
+            "version",
+            "center_id"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "scope": {
+              "const": "organization"
+            },
+            "key": {
+              "type": "string",
+              "pattern": "^[A-Za-z0-9_-]{1,64}$"
+            },
+            "version": {
+              "$ref": "#/$defs/SettingsVersion"
+            }
+          },
+          "required": [
+            "scope",
+            "key",
+            "version"
+          ],
+          "additionalProperties": false
+        }
+      ]
+    },
+    "StarterReportTemplate": {
+      "type": "object",
+      "properties": {
+        "key": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9_-]{1,64}$"
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 100
+        },
+        "report": {
+          "type": "string",
+          "enum": [
+            "collections_debts",
+            "lesson_attendance"
+          ]
+        },
+        "filters": {
+          "$ref": "#/$defs/ReportFilters"
+        },
+        "columns": {
+          "$ref": "#/$defs/ReportColumns"
+        },
+        "report_order": {
+          "$ref": "#/$defs/ReportPreparationOrder"
+        },
+        "group_by": {
+          "$ref": "#/$defs/ReportPreparationGrouping"
+        }
+      },
+      "required": [
+        "key",
+        "name",
+        "report",
+        "filters",
+        "columns",
+        "report_order",
+        "group_by"
+      ],
+      "additionalProperties": false
+    },
+    "StarterImportTemplate": {
+      "type": "object",
+      "properties": {
+        "key": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9_-]{1,64}$"
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 100
+        },
+        "center_id": {
+          "$ref": "#/$defs/FtkUuid"
+        },
+        "mapping": {
+          "type": "object",
+          "properties": {
+            "columns": {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/ImportColumn"
+              }
+            },
+            "delimiter": {
+              "type": "string",
+              "enum": [
+                ",",
+                ";"
+              ]
+            }
+          },
+          "required": [
+            "columns",
+            "delimiter"
+          ],
+          "additionalProperties": false,
+          "x-invariant": "unique targets except contacts, permanent source_key required; existing person only explicit person_ref, never email auto merge"
+        },
+        "source_namespace": {
+          "$ref": "#/$defs/Text"
+        }
+      },
+      "required": [
+        "key",
+        "name",
+        "center_id",
+        "mapping",
+        "source_namespace"
+      ],
+      "additionalProperties": false
+    },
+    "WorkTemplates": {
+      "type": "object",
+      "properties": {
+        "reports": {
+          "type": "array",
+          "maxItems": 300,
+          "items": {
+            "type": "object",
+            "properties": {
+              "source": {
+                "$ref": "#/$defs/WorkTemplateReference"
+              },
+              "template": {
+                "$ref": "#/$defs/StarterReportTemplate"
+              }
+            },
+            "required": [
+              "source",
+              "template"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "imports": {
+          "type": "array",
+          "maxItems": 300,
+          "items": {
+            "type": "object",
+            "properties": {
+              "source": {
+                "$ref": "#/$defs/WorkTemplateReference"
+              },
+              "template": {
+                "$ref": "#/$defs/StarterImportTemplate"
+              }
+            },
+            "required": [
+              "source",
+              "template"
+            ],
+            "additionalProperties": false
+          }
+        }
+      },
+      "required": [
+        "reports",
+        "imports"
+      ],
+      "additionalProperties": false
+    },
+    "ReportFilterOverrides": {
+      "type": "object",
+      "properties": {
+        "interval": {
+          "$ref": "#/$defs/Interval"
+        },
+        "center_ids": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/FtkUuid"
+          }
+        },
+        "person_ids": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/FtkUuid"
+          }
+        },
+        "currency": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Currency"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "state": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Text"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [],
+      "additionalProperties": false
+    },
+    "ReportTemplateOverrides": {
+      "type": "object",
+      "properties": {
+        "filters": {
+          "$ref": "#/$defs/ReportFilterOverrides"
+        },
+        "columns": {
+          "$ref": "#/$defs/ReportColumns"
+        },
+        "report_order": {
+          "$ref": "#/$defs/ReportPreparationOrder"
+        },
+        "group_by": {
+          "$ref": "#/$defs/ReportPreparationGrouping"
+        }
+      },
+      "required": [],
+      "additionalProperties": false
+    },
+    "ImportTemplateOverrides": {
+      "type": "object",
+      "properties": {
+        "mapping": {
+          "$ref": "#/$defs/ImportMapping"
+        },
+        "source_namespace": {
+          "$ref": "#/$defs/Text"
+        }
+      },
+      "required": [],
+      "additionalProperties": false
+    },
+    "Request_settings_template_resolve": {
+      "type": "object",
+      "properties": {
+        "client_api_version": {
+          "const": 1
+        },
+        "request_id": {
+          "$ref": "#/$defs/FtkUuid"
+        },
+        "org_id": {
+          "$ref": "#/$defs/FtkUuid"
+        },
+        "center_id": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/FtkUuid"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "kind": {
+          "type": "string",
+          "enum": [
+            "report",
+            "import"
+          ]
+        },
+        "template": {
+          "$ref": "#/$defs/WorkTemplateReference"
+        },
+        "overrides": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/ReportTemplateOverrides"
+            },
+            {
+              "$ref": "#/$defs/ImportTemplateOverrides"
+            }
+          ]
+        }
+      },
+      "required": [
+        "client_api_version",
+        "request_id",
+        "org_id",
+        "kind",
+        "template"
+      ],
+      "additionalProperties": false,
+      "oneOf": [
+        {
+          "type": "object",
+          "properties": {
+            "client_api_version": {
+              "const": 1
+            },
+            "request_id": {
+              "$ref": "#/$defs/FtkUuid"
+            },
+            "org_id": {
+              "$ref": "#/$defs/FtkUuid"
+            },
+            "center_id": {
+              "anyOf": [
+                {
+                  "$ref": "#/$defs/FtkUuid"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "kind": {
+              "const": "report"
+            },
+            "template": {
+              "$ref": "#/$defs/WorkTemplateReference"
+            },
+            "overrides": {
+              "$ref": "#/$defs/ReportTemplateOverrides"
+            }
+          },
+          "required": [
+            "client_api_version",
+            "request_id",
+            "org_id",
+            "kind",
+            "template"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "client_api_version": {
+              "const": 1
+            },
+            "request_id": {
+              "$ref": "#/$defs/FtkUuid"
+            },
+            "org_id": {
+              "$ref": "#/$defs/FtkUuid"
+            },
+            "center_id": {
+              "anyOf": [
+                {
+                  "$ref": "#/$defs/FtkUuid"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "kind": {
+              "const": "import"
+            },
+            "template": {
+              "$ref": "#/$defs/WorkTemplateReference"
+            },
+            "overrides": {
+              "$ref": "#/$defs/ImportTemplateOverrides"
+            }
+          },
+          "required": [
+            "client_api_version",
+            "request_id",
+            "org_id",
+            "kind",
+            "template"
+          ],
+          "additionalProperties": false
+        }
+      ]
+    },
+    "PreparedReportRequest": {
+      "type": "object",
+      "properties": {
+        "center_id": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/FtkUuid"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "report": {
+          "type": "string",
+          "enum": [
+            "collections_debts",
+            "lesson_attendance"
+          ]
+        },
+        "filters": {
+          "$ref": "#/$defs/ReportFilters"
+        },
+        "columns": {
+          "$ref": "#/$defs/ReportColumns"
+        },
+        "report_order": {
+          "$ref": "#/$defs/ReportPreparationOrder"
+        },
+        "group_by": {
+          "$ref": "#/$defs/ReportPreparationGrouping"
+        }
+      },
+      "required": [
+        "report",
+        "filters",
+        "columns",
+        "report_order",
+        "group_by"
+      ],
+      "additionalProperties": false
+    },
+    "PreparedImportRequest": {
+      "type": "object",
+      "properties": {
+        "center_id": {
+          "$ref": "#/$defs/FtkUuid"
+        },
+        "mapping": {
+          "$ref": "#/$defs/ImportMapping"
+        },
+        "source_namespace": {
+          "$ref": "#/$defs/Text"
+        }
+      },
+      "required": [
+        "center_id",
+        "mapping",
+        "source_namespace"
+      ],
+      "additionalProperties": false
+    },
+    "ResolvedWorkTemplate": {
+      "oneOf": [
+        {
+          "type": "object",
+          "properties": {
+            "kind": {
+              "const": "report"
+            },
+            "source": {
+              "$ref": "#/$defs/WorkTemplateReference"
+            },
+            "request": {
+              "$ref": "#/$defs/PreparedReportRequest"
+            }
+          },
+          "required": [
+            "kind",
+            "source",
+            "request"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "kind": {
+              "const": "import"
+            },
+            "source": {
+              "$ref": "#/$defs/WorkTemplateReference"
+            },
+            "request": {
+              "$ref": "#/$defs/PreparedImportRequest"
+            }
+          },
+          "required": [
+            "kind",
+            "source",
+            "request"
+          ],
+          "additionalProperties": false
+        }
+      ]
+    },
+    "Success_settings_template_resolve": {
+      "type": "object",
+      "properties": {
+        "ok": {
+          "const": true
+        },
+        "data": {
+          "$ref": "#/$defs/ResolvedWorkTemplate"
+        },
+        "trace_id": {
+          "$ref": "#/$defs/FtkUuid"
+        }
+      },
+      "required": [
+        "ok",
+        "data",
+        "trace_id"
+      ],
+      "additionalProperties": false
     }
   },
   "x-contract": {
@@ -46705,7 +48085,8 @@
       "settlement.authority.inspect": "Owner may inspect delegation/grant administration; org_manager with live delegation permission may inspect manageable CM targets; CM may inspect own grant state. Financial records are excluded.",
       "settings.access": "Global user/platform without tenant; own linked member; center live CM; org live Owner/OM. Per-scope closed fields only.",
       "reservation.capacity_override": "Canlı merkez yöneticisi; merkez kapsamında açık reservation.capacity_override yetkili personel; ilgili seansa atanmış aktif eğitmen. Owner/OM olmak merkez yetkisi sağlamaz.",
-      "media.read": "Own current photo, live org member logo, or current confirmed same-lesson photo opt-in; no arbitrary asset ownership or public read."
+      "media.read": "Own current photo, live org member logo, or current confirmed same-lesson photo opt-in; no arbitrary asset ownership or public read.",
+      "templates.resolve": "Own member or explicitly scoped shared template; live report/import domain access required. Configuration sharing never grants execution access."
     },
     "tables": [
       {
@@ -73904,6 +75285,120 @@
             "$ref": "#/$defs/Request_media_get"
           }
         }
+      },
+      {
+        "name": "settings_template_resolve_v1",
+        "module": "M02",
+        "features": [
+          "F28",
+          "F31"
+        ],
+        "permission": "templates.resolve",
+        "actor_source": "server_verified",
+        "transport": "R",
+        "billing_class": "read",
+        "request": {
+          "$ref": "#/$defs/Request_settings_template_resolve"
+        },
+        "success": {
+          "$ref": "#/$defs/Success_settings_template_resolve"
+        },
+        "errors": [
+          "AUTH_REQUIRED",
+          "BILLING_OPERATION_RESTRICTED",
+          "CLIENT_UPDATE_REQUIRED",
+          "FORBIDDEN",
+          "NOT_FOUND",
+          "PLAN_FEATURE_UNAVAILABLE",
+          "PLAN_LIMIT_REACHED",
+          "POLICY_NOT_CONFIGURED",
+          "SERVICE_UNAVAILABLE",
+          "SESSION_REVOKED",
+          "SUBSCRIPTION_NOT_STARTED",
+          "TEMPORARY_FAILURE",
+          "VALIDATION_FAILED",
+          "VERSION_CONFLICT",
+          "INVALID_STATE_TRANSITION",
+          "PREVIEW_STALE",
+          "CAPACITY_FULL",
+          "ENTITLEMENT_UNAVAILABLE",
+          "CLASS_ACCESS_DENIED",
+          "RESERVATION_EXISTS",
+          "ASSISTANT_PARTICIPANT_CONFLICT",
+          "ACCOUNT_ALREADY_LINKED",
+          "INVITATION_UNAVAILABLE",
+          "CREDIT_LIMIT_EXCEEDED"
+        ],
+        "transaction_class": "read",
+        "transaction_guarantee": "Resolve one versioned private/shared preparation into an authorized typed report/import request. No job, business write or receipt; execution rechecks current domain authority.",
+        "transition": {
+          "effect": "read_or_preview_only",
+          "from": [],
+          "to": [],
+          "invariant": "Scope/key authorization is checked live before every receipt replay."
+        },
+        "semantic_guards": [
+          "live_actor_and_scope",
+          "template_version",
+          "closed_template_fields",
+          "domain_authority_on_resolve_and_execute"
+        ],
+        "audit": false,
+        "notification": "none",
+        "concurrency": "Live original permission/tenant/field scope on every request; current authorized projection; no business writes",
+        "expected_version_subject": "none",
+        "acceptance_scenario_ids": [
+          "A01",
+          "A02",
+          "A03",
+          "A23",
+          "A24",
+          "A25",
+          "A46",
+          "A47",
+          "A55"
+        ],
+        "configuration_policy": "numeric plan limits/prices and legal approval are deployment configuration, never arbitrary allow/deny",
+        "implementation_status": "operational_development_limited",
+        "runtime_path": "/functions/v1/backend-v1/settings_template_resolve_v1",
+        "runtime_rpc": "api_v1.settings_template_resolve_v1",
+        "runtime_transport": "authenticated Edge adapter -> service-only RPC; rules/transaction in PostgreSQL",
+        "runtime_external_path": "/functions/v1/backend-v1/settings_template_resolve_v1",
+        "runtime_limits": [
+          "Private member templates by default; explicit scoped center/org templates confer no data or execution permission.",
+          "Prepared values are an explicit request snapshot. No automatic job/apply, financial defaults, merge, automation or external send."
+        ],
+        "required_features": [],
+        "runtime_required_features": [],
+        "conditional_features": [
+          {
+            "when": "kind=report",
+            "feature": "F28"
+          },
+          {
+            "when": "kind=import",
+            "feature": "F31"
+          }
+        ],
+        "operation_contract": {
+          "kind": "read",
+          "target_entity": "frontend_settings",
+          "version_mode": "none",
+          "version_field": null,
+          "read_operation": null,
+          "atomic_effects": [],
+          "business_commit": false,
+          "read_path_status": "not_required",
+          "source_decision": "FD10/FD11"
+        },
+        "decision_delivery": {
+          "accepted_contract": "DS-2026-10-17",
+          "runtime_conformance": "implemented_pending_ci",
+          "open_dependencies": [],
+          "target_request": {
+            "$ref": "#/$defs/Request_settings_template_resolve"
+          }
+        }
       }
     ],
     "policy_value_map": {
@@ -88877,6 +90372,174 @@
         "origin": "ftksaas",
         "acceptance": "generic_uuid",
         "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/MemberSettingsValues/properties/report_templates/items/properties/filters/properties/center_ids/items",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/MemberSettingsValues/properties/report_templates/items/properties/filters/properties/person_ids/items",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/MemberSettingsValues/properties/import_templates/items/properties/center_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/CenterSettingsValues/properties/report_templates/items/properties/filters/properties/center_ids/items",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/CenterSettingsValues/properties/report_templates/items/properties/filters/properties/person_ids/items",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/CenterSettingsValues/properties/import_templates/items/properties/center_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/OrganizationSettingsValues/properties/report_templates/items/properties/filters/properties/center_ids/items",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/OrganizationSettingsValues/properties/report_templates/items/properties/filters/properties/person_ids/items",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/OrganizationSettingsValues/properties/import_templates/items/properties/center_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Request_settings_catalog_get/properties/template_center_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Request_settings_catalog_get/oneOf/1/properties/template_center_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/WorkTemplateReference/properties/center_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/WorkTemplateReference/oneOf/1/properties/center_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/StarterImportTemplate/properties/center_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/ReportFilterOverrides/properties/center_ids/items",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/ReportFilterOverrides/properties/person_ids/items",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Request_settings_template_resolve/properties/request_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Request_settings_template_resolve/properties/org_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Request_settings_template_resolve/properties/center_id/anyOf/0",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Request_settings_template_resolve/oneOf/0/properties/request_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Request_settings_template_resolve/oneOf/0/properties/org_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Request_settings_template_resolve/oneOf/0/properties/center_id/anyOf/0",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Request_settings_template_resolve/oneOf/1/properties/request_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Request_settings_template_resolve/oneOf/1/properties/org_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Request_settings_template_resolve/oneOf/1/properties/center_id/anyOf/0",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/PreparedReportRequest/properties/center_id/anyOf/0",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/PreparedImportRequest/properties/center_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Success_settings_template_resolve/properties/trace_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
       }
     ],
     "open_product_decisions": [],
@@ -89225,13 +90888,14 @@
         "preview_get_v1",
         "job_status_get_v1",
         "audit_list_v1",
-        "media_get_v1"
+        "media_get_v1",
+        "settings_template_resolve_v1"
       ],
       "auth": "Supabase getUser + live auth.sessions + current account/link/role; no request actor claims",
       "uuid": "backend uuid@14.0.3 v7 for all inserted IDs; DB defaults not required",
       "external_transport": "POST /functions/v1/backend-v1/{operation}; direct typed request body",
       "internal_rpc": "service-only api_v1 named functions; actor/session/UUID bank supplied by verified gateway",
-      "migration_count": 72,
+      "migration_count": 73,
       "test_evidence": "P06 acceptance is registered through registry.test.mjs; candidate/main full clean evidence is pending",
       "frontend_unchanged": true
     },
@@ -89922,7 +91586,8 @@
         "account_security_history_get_v1",
         "account_totp_remove_v1",
         "account_google_link_prepare_v1",
-        "media_get_v1"
+        "media_get_v1",
+        "settings_template_resolve_v1"
       ],
       "runtime_deliveries": {
         "starter_attendance_protection": {
@@ -91544,7 +93209,8 @@
           "report_export_start_v1",
           "report_file_get_v1",
           "job_status_get_v1",
-          "report_build_v1"
+          "report_build_v1",
+          "settings_template_resolve_v1"
         ],
         "dependencies": [],
         "implementation": "partial",
@@ -91689,7 +93355,8 @@
           "import_rows_list_v1",
           "job_status_get_v1",
           "import_rows_process_v1",
-          "file_upload_complete_v1"
+          "file_upload_complete_v1",
+          "settings_template_resolve_v1"
         ],
         "dependencies": [],
         "implementation": "partial",

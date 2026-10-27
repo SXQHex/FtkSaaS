@@ -1180,6 +1180,8 @@ Web/reklam ortak CRM entegrasyonu üretim P08'dir; yukarıdaki kabul mevcut publ
 
 ST-03 teknik eşleme adayı: `ImportMapping.delimiter` opsiyonel kapalı virgül/noktalı virgül seçimidir; yokluğu eski virgül davranışını korur. Seçim tahmin edilmez, eşlemenin parçası olarak preview/bağımlılık/receipt istek hash'ine girer. Quoted separator, escaped quote, CRLF ve quoted newline aynı parser kurallarını kullanır; hatalı yapı/eşleme reddedilir. Hak/borç veya kişi birleştirme defaultu üretmez. Kaynak/native kabulü [alan devrinden](../frontend-settings-handover.md#st-03--starter-tüketici-kapsamı) izlenir.
 
+Şablon tüketicisi adayı: member/center/organization report_templates/import_templates default[]; private başlangıç ve açık scoped paylaşım. `settings_template_resolve_v1` canlı source/version ve domain yetkisinden typed hazır request üretir, iş veya preview yaratmaz. Asıl query/export/import yine kendi canlı yetki ve açık preview/apply kapısını kullanır; tam request snapshot'ı sonraki şablon değişiminden/resetinden değer almaz. İlk iki Starter raporunda kapalı sütun seçimi, group_key sırası ve person/center/total gruplama gerçek satır/CSV sonucuna gider; currency'ler birleşmez. Eşleme yalnız source/column/delimiter hazırlığıdır; otomatik finans veya kişi birleştirme yoktur. [Wire, yetki ve kaynak devri](../frontend-settings-handover.md#rapor-ve-import-şablon-tüketicisi--aday).
+
 | Alan | Kabul edilen seçenek/default |
 |---|---|
 | İlk hazır işler | Bekleyen talep, kapanmamış yoklama ve CRM takip uyarısı; yalnız gerçek destekli kural. Bu ek otomasyonlar default kapalı, yetkili kapsam/sorumlu seçerek açar. FD04 kişisel hatırlatması değişmez. |

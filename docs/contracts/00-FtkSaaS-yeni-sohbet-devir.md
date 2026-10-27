@@ -24,6 +24,10 @@ Aktif adayın ilk tüketicileri program süresinin orgdan yeni merkeze bir kez k
 
 Sonraki yerel medya adayı profil photo/org logo_image komut alanlarını, private güncel asset okumasını ve photo_visible consumer'ını ekler; aday envanter214 callable/0 contract_only/72 migration/90 core tablodur. Yapısal157/157 ve görsel envelope unit1/1 geçti; son medya/legacy/telefon kaynağı native kabul bekler. Bağımsız kaynak incelemesi ek somut bulgu bildirmedi; CI/main/hosted kabulü bundan türetilmez.
 
+Medya head `38e304b0f3da446fbf7d0c39c0ffec5e1fb2e566`, tree `b55748096203d72aa3f87c73840bb81290d9d1e6` için [hedefli40593393943](https://github.com/SXQHex/FtkSaaS/actions/runs/40593393943) failure: yapısal157/157, DB29/29, öncelikli API114/117. Canonical legacy göçü3/3 ve ST-02 zinciri geçti. Telefon testinin native Admin API kanonik değerindeki baştaki+ dönüşümü beklentisi hatalıydı; peer testi durunca fotoğraf alt testi önceki açık email/phone tercihlerinden etkilendi. Fixture kanonik doğrulanmış kaynakla eşitliği ayrıca denetleyecek ve photo-only başlangıcını bağımsız kuracak biçimde düzeltildi. Henüz yeni native başarı yoktur; kalan API regresyonları bu priority failure ardından çalışmadı.69–72 uygulanmış göçleri değiştirilmedi.
+
+Yerel sonraki şablon adayı katalogv4, scoped özel/ortak rapor-import hazırlığı ve canlı resolve→mevcut engine tüketimini ekler; aday envanter215 callable/0 contract_only/73 migration/90 core tablo. Kaynak/native ayrımı korunur; şablon yetki veya otomatik iş değildir. Son kaynak ve kapsam [ayar devrinden](../frontend-settings-handover.md#rapor-ve-import-şablon-tüketicisi--aday) okunur; ST-03 ve main/development teslimi açık kalır.
+
 ## Önceki domain/hosted tabanı — PR61
 
 | Alan | Doğrulanmış kaynak |

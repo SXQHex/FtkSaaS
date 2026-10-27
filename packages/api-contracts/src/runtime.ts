@@ -213,6 +213,7 @@ export const runtimeOperationNames = [
   "account_security_history_get_v1",
   "account_totp_remove_v1",
   "account_google_link_prepare_v1",
-  "media_get_v1"
+  "media_get_v1",
+  "settings_template_resolve_v1"
 ] as const;
 export type RuntimeOperationName = typeof runtimeOperationNames[number];

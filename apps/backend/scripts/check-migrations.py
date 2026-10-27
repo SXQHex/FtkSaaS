@@ -130,7 +130,10 @@ assert next(Path('supabase/migrations').glob('*_frontend_settings.sql')).read_te
 
 settings_fields=json.loads(Path('config/frontend-settings.json').read_text())['fields']
 settings_catalog="begin;\ncreate or replace function private.frontend_settings_fields() returns jsonb language sql immutable security invoker set search_path='' as $fields$select '"+json.dumps(settings_fields,ensure_ascii=False,separators=(',',':')).replace("'","''")+"'::jsonb$fields$;\n"
-assert Path('database/starter-settings-catalog.sql').read_text()==settings_catalog+'commit;\n','Frontend field catalog SQL drift'
+settings_version=json.loads(Path('config/frontend-settings.json').read_text())['version']
+assert Path(f'database/settings-catalog-v{settings_version}.sql').read_text()==settings_catalog+'commit;\n','Frontend field catalog SQL drift'
+installed_catalogs=[line for p in sorted(Path('supabase/migrations').glob('*.sql')) for line in p.read_text().splitlines() if line.startswith('create or replace function private.frontend_settings_fields()')]
+assert installed_catalogs[-1]==settings_catalog.splitlines()[1],'Latest applied catalog must match the current typed field source'
 settings_contract=json.loads(Path('../../packages/api-contracts/schema/contract.json').read_text())
 for scope in ['user','member','center','organization','platform']:
  assert settings_contract['$defs'][scope.title()+'SettingsValues']['properties']=={f['key']:f['schema'] for f in settings_fields if f['scope']==scope},'Frontend field DTO drift: '+scope
@@ -169,3 +172,5 @@ assert next(Path('supabase/migrations').glob('*_starter_peer_sharing.sql')).read
 assert next(Path('supabase/migrations').glob('*_canonical_settings_scope.sql')).read_text()==Path('database/canonical-settings-scope.sql').read_text(),'Canonical settings scope source drift'
 
 assert next(Path('supabase/migrations').glob('*_starter_settings_media.sql')).read_text()==Path('database/starter-settings-media.sql').read_text().replace('commit;\n','',1)+Path('database/starter-settings-media-wrappers.sql').read_text().replace('begin;\n','',1),'Starter media source drift'
+
+assert next(Path('supabase/migrations').glob('*_starter_work_templates.sql')).read_text()==Path('database/settings-catalog-v4.sql').read_text().replace('commit;\n','',1)+Path('database/starter-work-templates.sql').read_text().replace('begin;\n','',1).replace('commit;\n','',1)+Path('database/starter-work-templates-wrappers.sql').read_text().replace('begin;\n','',1),'Work templates source drift'
