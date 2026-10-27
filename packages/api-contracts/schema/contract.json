@@ -4068,6 +4068,16 @@
               "type": "null"
             }
           ]
+        },
+        "payment": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/ManualCollectionPayment"
+            },
+            {
+              "type": "null"
+            }
+          ]
         }
       },
       "required": [
@@ -12362,6 +12372,9 @@
               "type": "null"
             }
           ]
+        },
+        "payment": {
+          "$ref": "#/$defs/ManualCollectionPayment"
         }
       },
       "required": [
@@ -48263,6 +48276,64 @@
       },
       "required": [],
       "additionalProperties": false
+    },
+    "ManualCollectionPayment": {
+      "type": "object",
+      "properties": {
+        "method": {
+          "type": "string",
+          "enum": [
+            "cash",
+            "bank_transfer",
+            "card_pos"
+          ]
+        },
+        "reference": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1,
+              "pattern": "\\S"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "method"
+      ],
+      "additionalProperties": false,
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "method": {
+                "enum": [
+                  "bank_transfer",
+                  "card_pos"
+                ]
+              }
+            },
+            "required": [
+              "method"
+            ]
+          },
+          "then": {
+            "properties": {
+              "reference": {
+                "type": "string",
+                "minLength": 1,
+                "pattern": "\\S"
+              }
+            },
+            "required": [
+              "reference"
+            ]
+          }
+        }
+      ]
     }
   },
   "x-contract": {

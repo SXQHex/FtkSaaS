@@ -1154,6 +1154,8 @@ ST-03 teknik eşleme adayı: organization/center `program_duration_minutes` kapa
 
 ST-03 public eşleme adayı organization/center kapalı yayın/alan seçimini ve açık timezone'lu tanıtım saatlerini typed settings üzerinden gerçek public calendar read projection'ına bağlar. Org yayın üst kapısı ve ayrı center opt-in, güncel logo ve işletme iletişimi beyaz listesi uygulanır; takvim publication kararı ayrıdır. Default/reset/yetki/kopya sınırı [ayar devrindedir](../frontend-settings-handover.md#public-işletme-alanları-tüketicisi--aday). Native ve hosted kabulü ayrı kalır.
 
+ST-03 manuel tahsilat adayı cash/bank_transfer/card_pos yöntemini ve banka/kart için zorunlu referansı gerçek tahsilat INSERT'i/finans okumasına bağlar. Eski belirtilmemiş yöntem null kalır; otomatik tahsilat açılmaz. [Alan devri](../frontend-settings-handover.md#manuel-tahsilat-yöntemi--aday).
+
 ##### FD08 — belge onay dış görünürlük (kabul edildi)
 
 | Alan | Kabul edilen seçenek/default |

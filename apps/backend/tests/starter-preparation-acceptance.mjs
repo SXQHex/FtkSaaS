@@ -128,6 +128,23 @@ test('ST-03 Starter preparation defaults copy, authority, reset and program cons
    await change('organization',{public_profile_enabled:true});v=await publicRead();assert.deepEqual(v.center_profile,{});
    await change('organization',{public_profile_enabled:false});
   });
+  await t.test('manual collection methods persist real references without inventing a legacy payment method',async()=>{
+   const body={person_id:person,amount_minor:'1',currency:'TRY',occurred_at:new Date().toISOString()},ids=[];
+   for(const payment of [{method:'cash'},{method:'bank_transfer',reference:'SYNTHETIC BANK'},{method:'card_pos',reference:'SYNTHETIC POS'}]){
+    const k=key(),b={...body,payment},result=await api('collection_record_v1',b,owner,k);ids.push(result.primary_id);assert.equal((await api('collection_record_v1',b,owner,k)).replayed,true);
+    assert.deepEqual((await rows('select payment from core.cash_movements where id=$1',[result.primary_id]))[0].payment,payment);
+   }
+   const legacy=await api('collection_record_v1',body);assert.equal((await rows('select payment from core.cash_movements where id=$1',[legacy.primary_id]))[0].payment,null);
+   const count=Number((await rows("select count(*) n from core.cash_movements where org_id=$1",[org]))[0].n);
+   for(const payment of [{method:'bank_transfer'},{method:'card_pos',reference:' '},{method:'automatic_debit'},{method:'cash',reference:''}])await denied(owner,'collection_record_v1',scoped({...body,payment}),'VALIDATION_FAILED');
+   assert.equal(Number((await rows('select count(*) n from core.cash_movements where org_id=$1',[org]))[0].n),count);
+   for(const reference of ['\t','\n','\u00a0','\ufeff']){
+    const payment=JSON.stringify({method:'bank_transfer',reference});assert.equal((await rows('select private.collection_payment_valid($1::jsonb) valid',[payment]))[0].valid,false);
+    await assert.rejects(rows(`insert into core.cash_movements select (jsonb_populate_record(null::core.cash_movements,to_jsonb(c)||jsonb_build_object('id',$1::uuid,'payment',$2::jsonb))).* from core.cash_movements c where c.id=$3`,[key(),payment,ids[0]]),e=>e.code==='23514'&&e.constraint==='cash_collection_payment');
+   }
+   const finance=await api('finance_get_v1',{person_id:person,currency:'TRY',page:{limit:200}});for(const id of ids)assert.deepEqual(finance.movements.items.find(x=>x.id===id).payment,(await rows('select payment from core.cash_movements where id=$1',[id]))[0].payment);assert.equal(finance.movements.items.find(x=>x.id===legacy.primary_id).payment,null);
+   await denied(student,'finance_get_v1',scoped({person_id:person,currency:'TRY',page:{}}),'FORBIDDEN');
+  });
   await t.test('typed limits and live CM ownership prevent arbitrary setting writes and replay after revocation',async()=>{
    await denied(student,'settings_get_v1',q('center'),'FORBIDDEN');
    for(const value of [0,1.5,2147483648,'60',null])await denied(owner,'settings_update_v1',{...q('center'),expected_version:(await read('center')).version,patch:{program_duration_minutes:value}},'VALIDATION_FAILED');

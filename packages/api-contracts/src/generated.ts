@@ -579,6 +579,14 @@ export type EventDisciplineIds = string[]
 export type BookingCategory = ("male" | "female")
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "ManualCollectionPayment".
+ */
+export type ManualCollectionPayment = {
+method: ("cash" | "bank_transfer" | "card_pos")
+reference?: (string | null)
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
  * via the `definition` "EarningDirection".
  */
 export type EarningDirection = ("add" | "subtract")
@@ -3340,6 +3348,7 @@ PreparedImportRequest?: PreparedImportRequest
 ResolvedWorkTemplate?: ResolvedWorkTemplate
 Success_settings_template_resolve?: SuccessSettingsTemplateResolve
 PublicBusinessProfile?: PublicBusinessProfile
+ManualCollectionPayment?: ManualCollectionPayment
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -6200,6 +6209,7 @@ occurred_at: Instant
 center_id?: string
 version?: PositiveInt
 previous_id?: (string | null)
+payment?: (ManualCollectionPayment | null)
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -10262,6 +10272,7 @@ currency: Currency
 occurred_at: Instant
 debt_ids?: (string[] | null)
 note?: (Text | null)
+payment?: ManualCollectionPayment
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
