@@ -1,16 +1,10 @@
-## 27 Ekim — Starter plan kapıları teslimi kapandı
-
-[PR #56](https://github.com/SXQHex/FtkSaaS/pull/56) main `ed747324f7d008b24103d4fd2eba503791c70a93` üzerinde kabul edildi: **213 callable API / 0 contract_only / 66 migration / 90 core tablo**. [Aday full clean40419827224](https://github.com/SXQHex/FtkSaaS/actions/runs/40419827224), [aynı main full clean40422823564](https://github.com/SXQHex/FtkSaaS/actions/runs/40422823564) ve [development CD40425584520](https://github.com/SXQHex/FtkSaaS/actions/runs/40425584520) başarılı. CD gerçek deploy ve20/20 hosted kontrol içerir; backend-v1 Edge21 ACTIVE, `verify_jwt=true`. JWT doğrulaması son kullanıcı kararıyla açık kalır.
-
-Starter limitleri **1 merkez / 1 aktif oda / 1 disiplin / 1 aktif eğitmen / 100 aktif öğrenci**; tek mantıksal oda, seçili merkez-disiplin paketi ve disiplin adı ön eki uygulanır. Genel CRM/etkinlik/personel/hakediş kapalı; yoklama anlaşmasız ve hakedişsiz çalışır. Canlı plan/kapsam kapıları eski receipt/preview/grant ve doğrudan RPC ile aşılamaz. Pro→Starter kapsam seçimi sürümlüdür; seçilmeyen operasyon kapanır, geçmiş seans/kesin rezervasyon/hak/finans kayıtları korunur. [DTO, kapsam ve kabul kanıtları](starter-plan-gates-handover.md).
-
-Bu kapanış yalnız plan kapıları ve sürümlü kapsam düşürme teslimidir; bütün Starter dağıtım yol haritası, gerçek public hostname/Turnstile, Pro/Business ayrı limit/özel teklif veya production hazırlığı tamamlandı sayılmaz. Aşağıdaki önceki kaynaklara ait tarihli aday/bekleme/envanter notları tarihsel checkpointlerdir; güncel kabul veya açık iş olarak kullanılmaz. Tarihsel `reports/` dosyaları ve eski kaynak snapshotları korunur. Bu belge eşitlemesi yeni runtime testi veya deploy değildir.
+> Alan devri: teknik tüketim ve kaynağına bağlı eski kabul kayıtları. Güncel kaynak/CI/hosted durum [00 devirde](contracts/00-FtkSaaS-yeni-sohbet-devir.md), açık iş [tek backlog’da](remaining-work.md) tutulur. Eski aday/pending ifadeleri yeni görev veya güncel durum değildir.
 
 # Starter yoklama ve kesin rezervasyon koruması devri
 
-25 Ekim güncel ürün hedefi: [tek oda/seans/kategori kapasitesi ve ayrı kontrollü aşım](../contracts/02-FtkSaaS-teknik-sozlesme.md#oda-seans-kapasite-karari). Yayımlanmış main200/59 DTO'ları ile PR45 adayı201/60 ayrıdır. PR45 bağımsız inceleme ve aday40164825351 başarılı; merge/main/CD bekler. Bu modülün eski test/alan adları kendi tarihsel runtime kaydını anlatır, yeni ürün kuralı değildir.
+25 Ekim güncel ürün hedefi: [tek oda/seans/kategori kapasitesi ve ayrı kontrollü aşım](contracts/02-FtkSaaS-teknik-sozlesme.md#oda-seans-kapasite-karari). Yayımlanmış main200/59 DTO'ları ile PR45 adayı201/60 ayrıdır. PR45 bağımsız inceleme ve aday40164825351 başarılı; merge/main/CD bekler. Bu modülün eski test/alan adları kendi tarihsel runtime kaydını anlatır, yeni ürün kuralı değildir.
 
-Güncel durum ve kaynak/CI: [doğrulanmış devir](../contracts/00-FtkSaaS-yeni-sohbet-devir.md). Aşağıdaki 198/89/109 ve 27 migration sayıları PR #14 teslim snapshot’ıdır; 23 Ekim yayımlanmış envanter 200 API / 0 contract_only / 59 migration’dır. P02 hak değişikliği/koruma ve P05 belge tüketicileri sonradan kabul edildi; eski açık tüketici ifadeleri ilk PR kapsamını anlatır, güncel açık liste değildir.
+Güncel durum ve kaynak/CI: [doğrulanmış devir](contracts/00-FtkSaaS-yeni-sohbet-devir.md). Aşağıdaki 198/89/109 ve 27 migration sayıları PR #14 teslim snapshot’ıdır; 23 Ekim yayımlanmış envanter 200 API / 0 contract_only / 59 migration’dır. P02 hak değişikliği/koruma ve P05 belge tüketicileri sonradan kabul edildi; eski açık tüketici ifadeleri ilk PR kapsamını anlatır, güncel açık liste değildir.
 
 Başlangıç: main `5265a70a0d29f91b9081a1ecbc2a8f0ff78668ee`; aynı SHA’nın başarılı [CI çalışması](https://github.com/SXQHex/FtkSaaS/actions/runs/39030586306). Başlangıcın 322 testi yeni head’in kabulü değildir. Son PR head/inceleme/temiz CI kanıtı PR üzerinde aynı tam SHA’ya bağlanır.
 
@@ -44,15 +38,15 @@ Koruma yalnız değişikliğin neden olduğu olumsuz etkiye bağlıdır. Öncede
 
 ## Kanıt ayrımı
 
-Yapısal kontroller davranış kabulü değildir. Mevcut 202 API/27 DB regresyonu ayrı tutulur. Yeni gerçek Auth → Edge → RPC testleri `tests/starter-attendance-protection.test.mjs`: anlaşmasız Starter program, plan sınırları, limit/politika etki/onayı, eski korunan/yeni reddedilen kayıt, taslak/kapanış/düzeltme, paket/negatif ledger, tekrar/yarış, canlı rol/merkez geri alma, finans redaksiyonu, stale onay, UTC etkinleşme, geç audit/outbox rollback.
+Yapısal kontroller davranış kabulü değildir. Mevcut 202 API/27 DB regresyonu ayrı tutulur. Yeni gerçek Auth → Edge → RPC testleri `apps/backend/tests/starter-attendance-protection.test.mjs`: anlaşmasız Starter program, plan sınırları, limit/politika etki/onayı, eski korunan/yeni reddedilen kayıt, taslak/kapanış/düzeltme, paket/negatif ledger, tekrar/yarış, canlı rol/merkez geri alma, finans redaksiyonu, stale onay, UTC etkinleşme, geç audit/outbox rollback.
 
-Mevcut DST/fold/gap testi `tests/program-session-lifecycle.test.mjs` regresyonudur; yeni başlangıç anı kabulü değildir. DS-PLAN-01’in gerçek Starter kabulü bu dosyaya bağlıdır; F14/F15/F03 veya geniş DS-PROT/DS-ACCESS vakaları topluca kapatılmaz. Son SHA’nın CI/inceleme bağlantıları PR üzerindedir.
+Mevcut DST/fold/gap testi `apps/backend/tests/program-session-lifecycle.test.mjs` regresyonudur; yeni başlangıç anı kabulü değildir. DS-PLAN-01’in gerçek Starter kabulü bu dosyaya bağlıdır; F14/F15/F03 veya geniş DS-PROT/DS-ACCESS vakaları topluca kapatılmaz. Son SHA’nın CI/inceleme bağlantıları PR üzerindedir.
 
 198 sözleşmeli işlem, 89 çağrılabilir, 109 contract-only; 90 core domain tablosu, 27 migration, iki yeni private teknik tablo. F01–F33 özellikleri partial/pending kalır.
 
-[Önceki geliştirme kaynak raporu](../reports/starter-attendance-protection-verification.json): 93 yapısal test ve 60 gerçek API testi (41 mevcut regresyon + 19 yeni kabul). Bu rapor önceki kaynak snapshot’ıdır; yeni head’e taşınmaz. Tam temiz final CI ayrı kanıttır.
+[Önceki geliştirme kaynak raporu](history/reports/starter-attendance-protection-verification.json): 93 yapısal test ve 60 gerçek API testi (41 mevcut regresyon + 19 yeni kabul). Bu rapor önceki kaynak snapshot’ıdır; yeni head’e taşınmaz. Tam temiz final CI ayrı kanıttır.
 
 PR #14 tesliminin tarihsel CI’ı iki işte head SHA’sını checkout ederdi. Güncel hedefli/açık aday/main ayrımı ve CI-02 uygulama farkı [CI politikasında](ci-policy.md) izlenir. I/A yanıtında blocked sonucu kalır, finans gerekçesi açılmaz. Eski taslağın teknik tüketim alanı boşsa sabit rezervasyon koşulundan belirlenir; genel kapanış engeli eklenmez. Eski blocked koşulu yoksa yalnız o etki açık yapılandırma hatasıdır.
 
-[Son odaklı kaynak raporu](../reports/starter-attendance-protection-final-verification.json): redaksiyon/legacy düzeltmesiyle 19 gerçek API kabulü; 26+27 ile yeniden kurulan fonksiyonlar test edilen tanımlarla byte-identical. 26 değiştirilmedi; 27 append-only düzeltmedir. Yeni son head’in CI/inceleme kanıtı PR’de ayrıca bağlanır.
+[Son odaklı kaynak raporu](history/reports/starter-attendance-protection-final-verification.json): redaksiyon/legacy düzeltmesiyle 19 gerçek API kabulü; 26+27 ile yeniden kurulan fonksiyonlar test edilen tanımlarla byte-identical. 26 değiştirilmedi; 27 append-only düzeltmedir. Yeni son head’in CI/inceleme kanıtı PR’de ayrıca bağlanır.
 

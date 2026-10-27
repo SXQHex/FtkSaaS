@@ -1,8 +1,10 @@
+> Alan devri: teknik tüketim ve kaynağına bağlı eski kabul kayıtları. Güncel kaynak/CI/hosted durum [00 devirde](contracts/00-FtkSaaS-yeni-sohbet-devir.md), açık iş [tek backlog’da](remaining-work.md) tutulur. Eski aday/pending ifadeleri yeni görev veya güncel durum değildir.
+
 # P01 — talep, rezervasyon ve bekleme devri
 
-25 Ekim güncel ürün hedefi: [tek oda/seans/kategori kapasitesi ve ayrı kontrollü aşım](../contracts/02-FtkSaaS-teknik-sozlesme.md#oda-seans-kapasite-karari). Yayımlanmış main200/59 DTO'ları ile PR45 adayı201/60 ayrıdır. PR45 bağımsız inceleme ve aday40164825351 başarılı; merge/main/CD bekler. Bu modülün eski test/alan adları kendi tarihsel runtime kaydını anlatır, yeni ürün kuralı değildir.
+25 Ekim güncel ürün hedefi: [tek oda/seans/kategori kapasitesi ve ayrı kontrollü aşım](contracts/02-FtkSaaS-teknik-sozlesme.md#oda-seans-kapasite-karari). Yayımlanmış main200/59 DTO'ları ile PR45 adayı201/60 ayrıdır. PR45 bağımsız inceleme ve aday40164825351 başarılı; merge/main/CD bekler. Bu modülün eski test/alan adları kendi tarihsel runtime kaydını anlatır, yeni ürün kuralı değildir.
 
-23 Ekim: P01 tamamlanmıştır. Toplam yayımlanmış kapsam 200 API/59 migration; P01 dedicated worker kurulumu ve gerçek organizasyona scope bağlama tamamlandı, boş kuyrukta idle heartbeat doğrulandı. Gerçek talep/teklif iş yükü ve ölçek kabulü bu kurulumdan çıkarılmaz. Kaynak kanıtı [güncel devirde](../contracts/00-FtkSaaS-yeni-sohbet-devir.md).
+23 Ekim: P01 tamamlanmıştır. Toplam yayımlanmış kapsam 200 API/59 migration; P01 dedicated worker kurulumu ve gerçek organizasyona scope bağlama tamamlandı, boş kuyrukta idle heartbeat doğrulandı. Gerçek talep/teklif iş yükü ve ölçek kabulü bu kurulumdan çıkarılmaz. Kaynak kanıtı [güncel devirde](contracts/00-FtkSaaS-yeni-sohbet-devir.md).
 
 ## 20 Ekim 2026 — P01 kaynak kabul kaydı
 
@@ -50,10 +52,10 @@ P01-B kaynak `78d68653e903d9764264f1fe8d73dfb9d9de7f49` için [hedefli CI 393191
 - P01 ilk runtime'ında teklif süresi etkin waitlist_offer_minutes, yoksa eski30dk fallback'inden geliyordu. FD06 güncel ürün hedefinde açık kurulum zorunludur; bu belge/code baseline değişimi o hedefi uygulanmış yapmaz. Mevcut kulüp3600sn ayrı kurulumdur. Kayıt kapanışını ve seans başlangıcını aşmaz. Ret/expiry eski entry'yi kapatır; yeniden giriş yeni FIFO sonundadır. Seans iptali aktif teklifleri geri çeker ve yalnız bekleyen kayıtları da kapatır. Yeni seans iptal API'si P02'de kalır; temizlik mevcut cancelled durumunu tüketir.
 - Request expiry yalnız kayıtlı expires_at veya talebin artık gerçekleştirilemeyecek istenen başlangıcı üzerinden çalışır; geçerli gelecek alternatif varken özgün saatin geçmiş olması tek başına kapatmaz. Yeni sayısal talep TTL'i türetilmedi; elapsed time yoklama/hak tüketimi değildir.
 - Worker insan Auth/CM grantından türemez. `ftk_p01_worker` NOLOGIN rolü yalnız sınırlı RPC/private girişlerini çalıştırır; core/private tablo DML yetkisi yoktur. Ayrı LOGIN ve `private.p01_worker_scopes(db_role,org_id)` bağı yalnız güvenilir DB işletimiyle sağlanır. SECURITY DEFINER yalnız private, sabit search_path'li ve session_user + rol üyeliği + canlı org kaydı doğrulayan bounded iş kodundadır. API claim wrapper invoker'dır. İnsan Edge/service_role aktörü worker yetkisi kazanmaz.
-- `scripts/p01-worker.mjs`: P01_WORKER_DATABASE_URL, P01_WORKER_ORG_ID ile çalışır; yönetici/service_role hesabını reddeder. `--loop` planlı tarama yapar; tek sefer yolu yalnız tanı/testtir. Varsayılan 5 saniye teknik tick, 60 saniye lease, her seferde tek claim, en fazla üç deneme; sonrasında failed. P01_WORKER_INTERVAL_MS test/işletim sıklığıdır, ürün süresi değildir. Sonradan gelen iş ve kontrollü duruş gerçek süreç testiyle hedeflenir; production kurulumu yapılmadı.
+- `apps/backend/scripts/p01-worker.mjs`: P01_WORKER_DATABASE_URL, P01_WORKER_ORG_ID ile çalışır; yönetici/service_role hesabını reddeder. `--loop` planlı tarama yapar; tek sefer yolu yalnız tanı/testtir. Varsayılan 5 saniye teknik tick, 60 saniye lease, her seferde tek claim, en fazla üç deneme; sonrasında failed. P01_WORKER_INTERVAL_MS test/işletim sıklığıdır, ürün süresi değildir. Sonradan gelen iş ve kontrollü duruş gerçek süreç testiyle hedeflenir; production kurulumu yapılmadı.
 - Claim discovery bounded'dır, dedupe elemesi limitten önce yapılır. Açık kayıt penceresi ve toplam/kategori boşluğu aranır; mevcut politika fingerprint'e dahildir. İşin op/target'ı değişmez; lease hash ve işlem anahtarı bağlanır, eski token fencing uygulanır. Domain/worker receipt/audit/inbox/job sonucu atomiktir; hata domain'i geri alıp retry_wait/failed iş durumunu ayrı kaydeder. Scope iptali replay'de de geçerlidir. Failed işler kendiliğinden sonsuz yeniden üretilmez; kök neden düzeldikten sonra yetkili DB işletim incelemesi gerekir.
 
-Yeni davranış kaynağı `tests/p01-waitlist-workers.test.mjs`: gerçek Auth→Edge→RPC ve ayrı DB worker kimliği, CLI/loop, FIFO, hak reddi rollback, reject/expiry/rejoin, scope/lease/replay, üç denemelik geç hata, iptal temizliği, 51 dolu ön ek ve pencere açılışı. Yapısal başarı runtime kabulü değildir. C hedefli test geçmeden P01 uygulama kabulü tamamlanmış sayılmaz; ardından son-head incelemesi/full clean/main kabulü gerekir. F01–F33 generated haritası özellik kabulünü pending tutar.
+Yeni davranış kaynağı `apps/backend/tests/p01-waitlist-workers.test.mjs`: gerçek Auth→Edge→RPC ve ayrı DB worker kimliği, CLI/loop, FIFO, hak reddi rollback, reject/expiry/rejoin, scope/lease/replay, üç denemelik geç hata, iptal temizliği, 51 dolu ön ek ve pencere açılışı. Yapısal başarı runtime kabulü değildir. C hedefli test geçmeden P01 uygulama kabulü tamamlanmış sayılmaz; ardından son-head incelemesi/full clean/main kabulü gerekir. F01–F33 generated haritası özellik kabulünü pending tutar.
 
 ## Önceki dilim ve teşhis kayıtları
 
@@ -106,7 +108,7 @@ Altyapı sınırı: Upstash Box aylık compute kotası doldu (5 CPU-saat); check
 
 PR #22 head 635e148651b2a85b18f5d40fe1fdea938ea94bf2 için run 39270054878 başarısızdır. 30 migration, yapı/DB ve diğer runtime vakaları geçti; P01-A'nın sekiz alt vakası geçti, son Auth oturum geri alma vakası mevcut Edge AUTH_REQUIRED döndürürken SESSION_REVOKED bekledi. Bu sonuç P01-A'nın tüm kabulü değildir.
 
-Test iki reddi ayırır: aktif Auth altında uygulama hesabı deletion_pending olduğunda RPC SESSION_REVOKED verir; Auth oturumu silindiğinde provider'ın erken AUTH_REQUIRED reddi veya RPC'nin SESSION_REVOKED reddi kabul edilir, başarı asla kabul edilmez. Uygulama davranışı değiştirilmedi. [Teşhis](../reports/p01-a-targeted-diagnosis.json).
+Test iki reddi ayırır: aktif Auth altında uygulama hesabı deletion_pending olduğunda RPC SESSION_REVOKED verir; Auth oturumu silindiğinde provider'ın erken AUTH_REQUIRED reddi veya RPC'nin SESSION_REVOKED reddi kabul edilir, başarı asla kabul edilmez. Uygulama davranışı değiştirilmedi. [Teşhis](history/reports/p01-a-targeted-diagnosis.json).
 
 Aynı doğal düzeltme diliminde seçici kaynak farkı kanıtıyla bu modülü ve ortak regresyonu seçer (13 dosya yerine 2); yeni modül önce çalışır. Bilinmeyen/paylaşılan değişiklikler ve aday/main full clean korunur. Yeni head'in runtime sonucu bekleniyor; gerçek hızlanma henüz ölçülmedi. P01'in diğer 13 API'si açık kalır.
 
@@ -119,4 +121,4 @@ Kök neden genel Date.now/slot fixture'ının 14 ve 15'inci slotlarının Europe
 
 </details>
 
-Kapasite incelemesi: worker no-offer işinin ardından oda fiziksel kapasitesinin yapılandırılması veya toplamı değiştirmeyen kategori doluluğu değişimi yeni keşif anahtarı üretir. İlk kaynak P2 bulgusu ve düzeltme testi [inceleme raporundadır](../reports/session-capacity-independent-review.md); önceki clean sonucu yeni kaynağa taşınmaz.
+Kapasite incelemesi: worker no-offer işinin ardından oda fiziksel kapasitesinin yapılandırılması veya toplamı değiştirmeyen kategori doluluğu değişimi yeni keşif anahtarı üretir. İlk kaynak P2 bulgusu ve düzeltme testi [inceleme raporundadır](history/reports/session-capacity-independent-review.md); önceki clean sonucu yeni kaynağa taşınmaz.

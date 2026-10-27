@@ -1,6 +1,10 @@
-# CI çalışma politikası — 20 Ekim 2026
+# CI çalışma politikası
 
 CI-02 PR25/26 ile main’e kuruldu; tam kabul kaynağı0ade7877cc16fc121095decbc276f2fbc868607e / [39425915555](https://github.com/SXQHex/FtkSaaS/actions/runs/39425915555) completed/success. [Teknik devir](ci02-handover.md) kaynak/review/kurulum zincirini, [karar](decisions/CI-2026-10-20.md) bağlayıcı davranışı ve [ölçüm](ci-performance.md) gerçek süreleri taşır. Yeni SHA eski kabulü devralmaz.
+
+## Paket yöneticisi
+
+Kurulum package.json’da sabit pnpm sürümüyle `corepack enable` ve `pnpm install --frozen-lockfile` kullanır. Tek lockfile pnpm-lock.yaml; ortak tipler packages/api-contracts. Paket/workspace/lock değişimi runtime/shared girdi olarak geniş regresyona gider. Bu politika adayı trusted-base kurulum sınırına tabidir; [göç kapsamı](monorepo.md#ci-geçiş-sınırı).
 
 ## Geliştirme ve açık kabul
 
@@ -18,7 +22,7 @@ Aynı branch'in eski hızlı işi iptal edilir; farklı PR ve her main SHA birbi
 
 ## Birikimli hedefli seçim
 
-[Seçici](../scripts/ci/select-tests.mjs) dosya adı benzerliğinden ziyade açık kaynak–tüketici haritası ve [delta kanıtı](../scripts/ci/delta-analysis.mjs) kullanır. Diff origin/main ile head'in merge-base'inden tüm branch değişiklikleridir; son belge commit'i önceki runtime değişimini gizleyemez. Rename eski/yeni uç, silme ve açıklanamayan fark kapsama dahildir. Eksik geçmiş/head uyumsuzluğu/bilinmeyen paylaşılan kaynak bütün DB/API regresyonuna düşer.
+[Seçici](../apps/backend/scripts/ci/select-tests.mjs) dosya adı benzerliğinden ziyade açık kaynak–tüketici haritası ve [delta kanıtı](../apps/backend/scripts/ci/delta-analysis.mjs) kullanır. Diff origin/main ile head'in merge-base'inden tüm branch değişiklikleridir; son belge commit'i önceki runtime değişimini gizleyemez. Rename eski/yeni uç, silme ve açıklanamayan fark kapsama dahildir. Eksik geçmiş/head uyumsuzluğu/bilinmeyen paylaşılan kaynak bütün DB/API regresyonuna düşer.
 
 Bilinen modül sözleşme/tip/bundle/envanter farkı ancak operasyon/definition tüketicileri ve birebir source+wrapper append-only migration kanıtıyla daralır; generation/schema/TypeScript kontrolü korunur. Paylaşılan management_state_get modüle bütünüyle sahiplenilmez; yalnız izinli projection/selector ekleri açıklanabilir. Auth/tenant/kernel/finans/hak/gateway ve açıklanamayan migration/üretim kaynağı geniştir.
 
@@ -34,7 +38,7 @@ PR base–head ağaç farkı, gerçek merge parent/tree ve yaşayan inbound/outg
 
 Aday/main aynı [reusable workflow](../.github/workflows/clean-suite.yml) kullanır. Core ve dört API işi ayrı runner/backend/DB, temiz migration manifesti ve boş Auth/tenant/receipt ile başlar. Core verify/DB/seed/health/advisors'ı; dört shard 15 API suite'ini eksiksiz/tekrarsız taşır. Suite içi bağlı yarışlar bölünmez; mevcut process concurrency=2 korunur. Ölçümlü deterministik dağılım envanteri kapalıdır; bilinmeyen/yeni/missing/duplicate suite kabul edilmez.
 
-[Toplayıcı](../scripts/ci/collect.mjs) önce tüm zorunlu job/step'lerin aynı run/attempt/head ve gerçek başarısını doğrular, sonra başarılı icra rollerini ölçer. Artifact tek başına kabul değildir. Rerun-failed ile başka attempt başarıları birleştirilmez. PR/head/base/tested merge/tree/coverage/run/attempt bağlanır; actual main aynı iki parent ve tested tree ile normal merge olmalıdır. Squash/rebase'e kanıt sessiz taşınmaz. Source değişirse yeni kabul gerekir.
+[Toplayıcı](../apps/backend/scripts/ci/collect.mjs) önce tüm zorunlu job/step'lerin aynı run/attempt/head ve gerçek başarısını doğrular, sonra başarılı icra rollerini ölçer. Artifact tek başına kabul değildir. Rerun-failed ile başka attempt başarıları birleştirilmez. PR/head/base/tested merge/tree/coverage/run/attempt bağlanır; actual main aynı iki parent ve tested tree ile normal merge olmalıdır. Squash/rebase'e kanıt sessiz taşınmaz. Source değişirse yeni kabul gerekir.
 
 `ftksaas/merge-clean` status'unu yalnız trusted main kodu, salt-okuma aday işlerinin gerçek kanıtıyla yazar. Aday script/archive executable'ı privileged verifier'da çalışmaz. Trust yüzeyi tüm workflow'lar, scripts/ci ve clean/start runner blob/mode kümesidir. Bu yüzeyi değiştiren PR normal otomatik kapıyı açamaz; bağımsız son-head incelemesi + gerçek aday kabulü + açık kaynak bazlı güvenilir politika kurulum yetkisi gerekir. PR23,25,26 kurulum izinleri gelecekteki kaynağa otomatik taşınmaz. Sahte status, required-check bypass, direct push veya yönetim ayarı değişikliği kullanılmaz.
 

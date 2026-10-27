@@ -2,6 +2,9 @@ name: Candidate full clean
 on:
   pull_request:
     types: [labeled]
+defaults:
+  run:
+    working-directory: apps/backend
 permissions:
   contents: read
   actions: read
@@ -26,7 +29,7 @@ jobs:
         uses: actions/github-script@ed597411d8f924073f98dfc5c65a23a2325f34cd
         with:
           script: |
-            const source=await import(`${process.env.GITHUB_WORKSPACE}/scripts/ci/source.mjs`);
+            const source=await import(`${process.env.GITHUB_WORKSPACE}/apps/backend/scripts/ci/source.mjs`);
             await source.resolveCandidate(github,context,core,'full');
   clean:
     needs: candidate

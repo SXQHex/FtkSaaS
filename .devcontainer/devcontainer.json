@@ -1,10 +1,10 @@
 {
-  "name": "FtkSaaS isolated backend",
+  "name": "FtkSaaS monorepo",
   "build": {
     "dockerfile": "Dockerfile"
   },
   "remoteUser": "node",
-  "postCreateCommand": "npm ci",
+  "postCreateCommand": "corepack pnpm install --frozen-lockfile",
   "forwardPorts": [],
   "customizations": {
     "vscode": {

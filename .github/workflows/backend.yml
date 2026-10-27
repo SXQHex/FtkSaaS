@@ -8,6 +8,9 @@ on:
         description: Exact documentation merge to audit (not a full clean)
         required: true
         type: string
+defaults:
+  run:
+    working-directory: apps/backend
 permissions:
   contents: read
   actions: read
@@ -31,7 +34,7 @@ jobs:
         uses: actions/github-script@ed597411d8f924073f98dfc5c65a23a2325f34cd
         with:
           script: |
-            const gate=await import(`${process.env.GITHUB_WORKSPACE}/scripts/ci/gate.mjs`);
+            const gate=await import(`${process.env.GITHUB_WORKSPACE}/apps/backend/scripts/ci/gate.mjs`);
             await gate.verifyMerged(github,context,core);
   clean:
     needs: source
@@ -51,24 +54,25 @@ jobs:
           persist-credentials: false
       - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1
         with:
-          node-version: '24.19.0'
-          cache: npm
-      - run: npm ci
+          node-version-file: '.nvmrc'
+      - run: corepack enable
+      - run: pnpm install --frozen-lockfile
+        working-directory: .
       - name: Documentation main acceptance (no full clean)
         run: |
           node scripts/ci/docs-check.mjs README.md
-          npm run verify
+          pnpm --dir ../.. run verify
       - env:
           BINDING: ${{ needs.source.outputs.binding }}
         run: |
-          mkdir -p .ci
-          node -e "require('fs').writeFileSync('.ci/binding.json',process.env.BINDING)"
+          mkdir -p ../../.artifacts/ci
+          node -e "require('fs').writeFileSync('../../.artifacts/ci/binding.json',process.env.BINDING)"
           echo 'Documentation main acceptance; full clean was not run.' >> "$GITHUB_STEP_SUMMARY"
-          cat .ci/binding.json >> "$GITHUB_STEP_SUMMARY"
+          cat ../../.artifacts/ci/binding.json >> "$GITHUB_STEP_SUMMARY"
       - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9
         with:
           name: main-documentation-${{ github.run_attempt }}
-          path: .ci/binding.json
+          path: .artifacts/ci/binding.json
           if-no-files-found: error
           include-hidden-files: true
           archive: true
@@ -83,7 +87,7 @@ jobs:
         uses: actions/github-script@ed597411d8f924073f98dfc5c65a23a2325f34cd
         with:
           script: |
-            const audit=await import(`${process.env.GITHUB_WORKSPACE}/scripts/ci/recovery.mjs`);
+            const audit=await import(`${process.env.GITHUB_WORKSPACE}/apps/backend/scripts/ci/recovery.mjs`);
             await audit.resolveRecovery(github,context,core);
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
         with:
@@ -95,24 +99,25 @@ jobs:
         run: test "$(git rev-parse HEAD)" = "$EXPECTED"
       - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1
         with:
-          node-version: '24.19.0'
-          cache: npm
-      - run: npm ci
+          node-version-file: '.nvmrc'
+      - run: corepack enable
+      - run: pnpm install --frozen-lockfile
+        working-directory: .
       - name: Documentation recovery acceptance
         run: |
           node scripts/ci/docs-check.mjs README.md
-          npm run verify
+          pnpm --dir ../.. run verify
       - env:
           BINDING: ${{ steps.recovery.outputs.binding }}
         run: |
-          mkdir -p .ci
-          node -e "require('fs').writeFileSync('.ci/binding.json',process.env.BINDING)"
+          mkdir -p ../../.artifacts/ci
+          node -e "require('fs').writeFileSync('../../.artifacts/ci/binding.json',process.env.BINDING)"
           echo 'Source-bound documentation recovery; no full clean; original failed run unchanged.' >> "$GITHUB_STEP_SUMMARY"
-          cat .ci/binding.json >> "$GITHUB_STEP_SUMMARY"
+          cat ../../.artifacts/ci/binding.json >> "$GITHUB_STEP_SUMMARY"
       - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9
         with:
           name: documentation-recovery-${{ github.run_attempt }}
-          path: .ci/binding.json
+          path: .artifacts/ci/binding.json
           if-no-files-found: error
           include-hidden-files: true
           archive: true

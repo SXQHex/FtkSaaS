@@ -1,0 +1,41 @@
+{
+  "name": "@ftksaas/backend",
+  "version": "0.2.0-rc.3",
+  "description": "Supabase backend, domain SQL, Edge functions and isolated acceptance",
+  "scripts": {
+    "generate": "python3 scripts/generate-runtime.py && node scripts/generate-validators.mjs && node scripts/build-edge.mjs && node scripts/generate.mjs && python3 scripts/render_catalogs.py",
+    "verify": "python3 scripts/check-migrations.py && python3 scripts/generate-runtime.py --check && node scripts/generate-validators.mjs --check && node scripts/build-edge.mjs --check && node scripts/generate.mjs --check && python3 scripts/render_catalogs.py --check && node scripts/audit.mjs && node scripts/governance.mjs && tsc --noEmit && node --test tests/contract.test.mjs tests/governance.test.mjs && node --test tests/ci-policy.test.mjs",
+    "test:db": "node --test tests/database.test.mjs tests/event-scope.test.mjs",
+    "test": "pnpm run verify && pnpm run test:db && pnpm run test:api",
+    "dev:start": "node scripts/start-dev.mjs",
+    "dev:stop": "supabase stop",
+    "dev:health": "node scripts/health.mjs",
+    "db:advisors": "supabase db advisors --local --type all --level warn --fail-on error",
+    "dev:info": "node scripts/dev-info.mjs",
+    "test:api": "node --test --test-concurrency=2 tests/cross-center-settlement.test.mjs tests/api-acceptance.test.mjs tests/event-payment.test.mjs tests/event-cancellation.test.mjs tests/registry.test.mjs tests/person-registry.test.mjs tests/room-role-registry.test.mjs tests/availability-policies.test.mjs tests/schedule-reads.test.mjs tests/program-session-lifecycle.test.mjs tests/starter-attendance-protection.test.mjs tests/instructor-earnings.test.mjs tests/p01-catalog-entitlement-reads.test.mjs tests/p01-lesson-requests.test.mjs tests/p01-waitlist-workers.test.mjs",
+    "dev:seed": "node scripts/dev-seed.mjs",
+    "test:clean": "node scripts/test-clean.mjs",
+    "test:governance": "node scripts/governance.mjs && node --test tests/governance.test.mjs",
+    "typecheck": "tsc --noEmit"
+  },
+  "type": "module",
+  "devDependencies": {
+    "ajv": "8.20.0",
+    "ajv-formats": "3.0.1",
+    "esbuild": "0.28.2",
+    "json-schema-to-typescript": "16.0.0",
+    "nodemailer": "10.1.1",
+    "supabase": "2.122.0",
+    "typescript": "catalog:",
+    "@ftksaas/api-contracts": "workspace:*",
+    "@ftksaas/typescript-config": "workspace:*"
+  },
+  "dependencies": {
+    "pg": "8.23.1",
+    "uuid": "14.0.3"
+  },
+  "private": true,
+  "engines": {
+    "node": ">=24.22.1 <25"
+  }
+}

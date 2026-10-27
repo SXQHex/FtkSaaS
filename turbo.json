@@ -1,0 +1,35 @@
+{
+  "$schema": "https://turbo.build/schema.json",
+  "tasks": {
+    "verify": {
+      "dependsOn": [
+        "^typecheck"
+      ],
+      "cache": false,
+      "env": [
+        "FTK_TEST_TIMINGS"
+      ]
+    },
+    "typecheck": {
+      "dependsOn": [
+        "^typecheck"
+      ],
+      "cache": false
+    },
+    "test": {
+      "dependsOn": [
+        "^typecheck"
+      ],
+      "cache": false,
+      "env": [
+        "FTK_TEST_TIMINGS"
+      ]
+    },
+    "test:clean": {
+      "cache": false,
+      "env": [
+        "FTK_TEST_TIMINGS"
+      ]
+    }
+  }
+}

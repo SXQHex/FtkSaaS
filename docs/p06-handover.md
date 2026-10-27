@@ -1,3 +1,5 @@
+> Alan devri: teknik tüketim ve kaynağına bağlı eski kabul kayıtları. Güncel kaynak/CI/hosted durum [00 devirde](contracts/00-FtkSaaS-yeni-sohbet-devir.md), açık iş [tek backlog’da](remaining-work.md) tutulur. Eski aday/pending ifadeleri yeni görev veya güncel durum değildir.
+
 # P06 — rapor, CSV import ve sonuç kurtarma
 
 P06 **done (kod, main ve geliştirme/test kabulü)**: [PR38](https://github.com/SXQHex/FtkSaaS/pull/38), main `006ad36918ae823bc10fbdefa2d48901e193121c`;200 sözleşme/178 runtime/22 contract_only,54 migration/90 core tablo. Son headf2f9d6c/base8364144/tested merge1901fc6/treeb486ffe; bağımsız review5614150102, [aday39779013518](https://github.com/SXQHex/FtkSaaS/actions/runs/39779013518), [aynı main39782197422](https://github.com/SXQHex/FtkSaaS/actions/runs/39782197422) ve [CD39785146645 attempt1](https://github.com/SXQHex/FtkSaaS/actions/runs/39785146645) success. CD18 kontrol/54 içerik eşleşmesi/Edge7 ACTIVE/verify_jwt=true/RLS kapalı0/client RPC EXECUTE0 ve fixture temizliği geçti; receipt12428881259 SHA256 `bcd1ab3255c1808982de76c3d09d47d5eaa95c5fb2e8f9f870d3fedc9ce93b65`. Önceki aday hataları tarihsel kanıttır. Aktif OPS-W01 adayı Supabase Cron içindir;55 migration/aynı178 runtime, kaynak ve hosted işletim kabulü beklenir. Tenant config/binding uydurulmaz; P07 queued kalır.
@@ -57,7 +59,7 @@ Yerel `npm run verify`:100 yapı/sözleşme +43 CI politikası geçti; frozen mi
 
 Geliştirme sırasında alınmış kaynak snapshotlarında hosted DB'de yalnız BEGIN/ROLLBACK ile P06 kaynağı kurulup gerçek dispatcher/worker çalıştırıldı:28 satır,2 preview/apply batch, replay tekilliği, kişi/borç önizlemede oluşmaması, config-stale apply reddi, açılış3 kredi +200 borç/nakit0, geç audit hatasında bütün açılış batch rollback ve yeniden claim, sayfadan bağımsız tam CSV, audit/management ve link geri alma reddi.20 gerçek yanıt projeksiyonu ve WorkerResult üretilmiş Edge success validator'larından geçti. Bu sentetik SQL denemeleri son SHA kabulü değildir; gerçek Auth/Storage/Edge clean testinin yerine geçmez. Uzak53 migration/Edge6 korunmuştur; P06 kalıcı yayımlanmadı.
 
-Gerçek Auth/özel Storage/Edge/dedicated DB LOGIN kabulü `tests/p06-acceptance.mjs` içinde mevcut registry shard'ına bağlıdır; ayrı15. suite veya yeni shard yoktur. Final bağımsız inceleme, açık aday full clean, aynı merge/main clean ve development CD henüz beklenir. Bu kanıtlar tamamlanmadan P06 done değildir. Clean başlayınca izleme durur, kullanıcıya kaynak/run ile devir yapılır.
+Gerçek Auth/özel Storage/Edge/dedicated DB LOGIN kabulü `apps/backend/tests/p06-acceptance.mjs` içinde mevcut registry shard'ına bağlıdır; ayrı15. suite veya yeni shard yoktur. Final bağımsız inceleme, açık aday full clean, aynı merge/main clean ve development CD henüz beklenir. Bu kanıtlar tamamlanmadan P06 done değildir. Clean başlayınca izleme durur, kullanıcıya kaynak/run ile devir yapılır.
 
 ### İlk aday clean ve fixture düzeltmesi
 

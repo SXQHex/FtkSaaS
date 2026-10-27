@@ -1,0 +1,11 @@
+# PR62 — tarihsel belge taşımasının CI bağlamı
+
+İlk head d2f9cb1c69248d471f93aaff9cca8e1f1f79ffb8 için [hedefli40519890563](https://github.com/SXQHex/FtkSaaS/actions/runs/40519890563) başarısızdır. Node24.22.1/Corepack/frozen pnpm kurulumu, bağımlılık seçimi ve49’uncu test eklenmeden önceki48 CI politika testi geçti. Sonrasında BROKEN_LOCAL_LINK reports/pilot-readiness.md→starter-plan-gates-handover.md hatası oluştu; DB/API başlamadı. Bu koşu kabul değildir; full clean henüz tetiklenmedi.
+
+Yerel ilk kontrol README+yaşayan dosyaları sınamıştı; hedefli CI ise birikimli değişen Markdown listesine iki yeni tarihsel arşivi de ekledi. Arşivin göreli bağlantıları özgün docs/ konumuna aitken yeni reports/ konumundan yorumlandı. Belge taşımasının bu kontrol farkı ilk yerel doğrulamada kapsanmamıştı.
+
+Düzeltme genel reports/ istisnası getirmez. Yalnız byte eş taşınan iki açık yol, ilk kabul edilmiş af06a64 kaynağından hesaplanan SHA256 ile tanımlıdır. Tam eşleşen kaynak snapshotı tarihsel bağlamında kalır; herhangi bir byte değişikliği HISTORICAL_SNAPSHOT_DRIFT verir. Bilinmeyen rapor yolu bu istisnayı alamaz. Yaşayan inbound/outgoing dosya ve başlık kontrolleri, silinen hedef/yanlış fragment negatifleri korunur. Arşiv içerikleri veya mevcut raporlar değiştirilmedi.
+
+Yeni regresyon iki kaynak snapshotının kabulünü, değiştirilmiş içeriğin reddini ve bilinmeyen raporun istisna alamamasını doğrular. Corepack pnpm12.15.0/Node24.22.1 üzerinde verify105+49=154/154 ve workspace typecheck geçti; iki arşivi değişen listeye açıkça ekleyen belge kontrolü de geçti. Son exact-tree incelemesi, gerçek aday/main CI ve politika kurulum yetkisi ayrıca gereklidir. Önceki hazırlık raporu kendi153-test kaynağına ait olarak korunur.
+
+Son kullanıcı CI/CD sınırı: GitHub Actions backend geliştirme kabulü ve Supabase dağıtımının sahibi kalır. Turbo görev bağımlılığı/build/typecheck/test yürütücüsüdür; çalışan frontend ile backend arasındaki API uyumluluk katmanı değildir. Hedef göç akışında PR kabulü→aynı main backend CD→gerçek frontend/Auth/API entegrasyon kabulü→frontend yayını yine Actions/dağıtım platformunca yönetilir. Bu hedef frontend işi bu düzeltmede kurulmadı; yalnız repo hazırlığı sürer.

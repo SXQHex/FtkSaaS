@@ -1,16 +1,4 @@
-## 27 Ekim — Starter plan kapıları teslimi kapandı
-
-[PR #56](https://github.com/SXQHex/FtkSaaS/pull/56) main `ed747324f7d008b24103d4fd2eba503791c70a93` üzerinde kabul edildi: **213 callable API / 0 contract_only / 66 migration / 90 core tablo**. [Aday full clean40419827224](https://github.com/SXQHex/FtkSaaS/actions/runs/40419827224), [aynı main full clean40422823564](https://github.com/SXQHex/FtkSaaS/actions/runs/40422823564) ve [development CD40425584520](https://github.com/SXQHex/FtkSaaS/actions/runs/40425584520) başarılı. CD gerçek deploy ve20/20 hosted kontrol içerir; backend-v1 Edge21 ACTIVE, `verify_jwt=true`. JWT doğrulaması son kullanıcı kararıyla açık kalır.
-
-Starter limitleri **1 merkez / 1 aktif oda / 1 disiplin / 1 aktif eğitmen / 100 aktif öğrenci**; tek mantıksal oda, seçili merkez-disiplin paketi ve disiplin adı ön eki uygulanır. Genel CRM/etkinlik/personel/hakediş kapalı; yoklama anlaşmasız ve hakedişsiz çalışır. Canlı plan/kapsam kapıları eski receipt/preview/grant ve doğrudan RPC ile aşılamaz. Pro→Starter kapsam seçimi sürümlüdür; seçilmeyen operasyon kapanır, geçmiş seans/kesin rezervasyon/hak/finans kayıtları korunur. [DTO, kapsam ve kabul kanıtları](starter-plan-gates-handover.md).
-
-Bu kapanış yalnız plan kapıları ve sürümlü kapsam düşürme teslimidir; bütün Starter dağıtım yol haritası, gerçek public hostname/Turnstile, Pro/Business ayrı limit/özel teklif veya production hazırlığı tamamlandı sayılmaz. Aşağıdaki önceki kaynaklara ait tarihli aday/bekleme/envanter notları tarihsel checkpointlerdir; güncel kabul veya açık iş olarak kullanılmaz. Tarihsel `reports/` dosyaları ve eski kaynak snapshotları korunur. Bu belge eşitlemesi yeni runtime testi veya deploy değildir.
-
-> **23 Ekim kaynak sınırı:** Yayımlanmış toplam 200 API / 0 contract_only / 59 migration. Aşağıdaki eski sayılar ilgili modülün ilk teslim kaydıdır. Son kaynak ve kabul [güncel devirde](../contracts/00-FtkSaaS-yeni-sohbet-devir.md); gerçek açıklar [kalan işlerde](remaining-work.md) izlenir.
-
-25 Ekim güncel ürün hedefi: [tek oda/seans/kategori kapasitesi ve ayrı kontrollü aşım](../contracts/02-FtkSaaS-teknik-sozlesme.md#oda-seans-kapasite-karari). Yayımlanmış main200/59 DTO'ları ile PR45 adayı201/60 ayrıdır. PR45 bağımsız inceleme ve aday40164825351 başarılı; merge/main/CD bekler. Bu modülün eski test/alan adları kendi tarihsel runtime kaydını anlatır, yeni ürün kuralı değildir.
-
-> DS-2026-10-17 kabulü plan/anlaşma ve korunan rezervasyon hedefini değiştirir. Bu dosya önceki runtime kapsamını anlatır; yeni hedef ve açık farklar [sprint devrinde](decision-sprint-handover.md).
+> Alan devri: teknik tüketim ve kaynağına bağlı eski kabul kayıtları. Güncel kaynak/CI/hosted durum [00 devirde](contracts/00-FtkSaaS-yeni-sohbet-devir.md), açık iş [tek backlog’da](remaining-work.md) tutulur. Eski aday/pending ifadeleri yeni görev veya güncel durum değildir.
 
 # Takvim, seans ve rezervasyon okumaları
 
@@ -51,7 +39,7 @@ Cursor keyset'tir; aktör/işlem/tenant/merkez/filtre/sort bağını doğrular; 
 
 ## Kabul kanıtı ve açık işler
 
-`tests/schedule-reads.test.mjs` gerçek Supabase Auth → Edge → service-only RPC zincirini kullanır; sentetik ilişki/seans/rezervasyon fixture'ları DB'de kurulur, ayrıca güncel seans yazma → okuma bağlantısı doğrulanır. DB/Auth yetki kaldırma fixture'ı kullanılması, henüz uygulanmayan hesap erişimi veya görev kaldırma komutunun kabul edildiği anlamına gelmez.
+`apps/backend/tests/schedule-reads.test.mjs` gerçek Supabase Auth → Edge → service-only RPC zincirini kullanır; sentetik ilişki/seans/rezervasyon fixture'ları DB'de kurulur, ayrıca güncel seans yazma → okuma bağlantısı doğrulanır. DB/Auth yetki kaldırma fixture'ı kullanılması, henüz uygulanmayan hesap erişimi veya görev kaldırma komutunun kabul edildiği anlamına gelmez.
 
-Sözleşme/tip/envanter kontrolleri, temiz migration, tüm regresyon, seed/health/advisors ve son head CI ayrı kanıttır. Kaynak raporu: [schedule-read-verification](../reports/schedule-read-verification.json). Bu ilk rapor hosted kabulü değildir; sonraki P07 CD kabulünde 200 runtime işlem/59 migration/Edge8 doğrulandı. Program/seans, yoklama/hakediş ve P01 talep/bekleme/uygun hak seçimi sonraki teslimlerde uygulanmıştır. Public discovery API'si P04 ile canlıdır; gerçek hostname/Turnstile/signed gateway ve deneme konfigürasyonu kabulü ayrıdır. Frontend gerçek entegrasyonu ve yük/restore açık kalır. Production dağıtımı yok; dış e-posta ertelendi.
+Sözleşme/tip/envanter kontrolleri, temiz migration, tüm regresyon, seed/health/advisors ve son head CI ayrı kanıttır. Kaynak raporu: [schedule-read-verification](history/reports/schedule-read-verification.json). Bu ilk rapor hosted kabulü değildir; sonraki P07 CD kabulünde 200 runtime işlem/59 migration/Edge8 doğrulandı. Program/seans, yoklama/hakediş ve P01 talep/bekleme/uygun hak seçimi sonraki teslimlerde uygulanmıştır. Public discovery API'si P04 ile canlıdır; gerçek hostname/Turnstile/signed gateway ve deneme konfigürasyonu kabulü ayrıdır. Frontend gerçek entegrasyonu ve yük/restore açık kalır. Production dağıtımı yok; dış e-posta ertelendi.
 
