@@ -162,9 +162,21 @@ settings:
   autoInstallPeers: true
   excludeLinksFromLockfile: false
 
+catalogs:
+  default:
+    typescript:
+      specifier: 7.0.2
+      version: 7.0.2
+
 importers:
 
   .:
+    devDependencies:
+      turbo:
+        specifier: 2.11.10
+        version: 2.11.10
+
+  apps/backend:
     dependencies:
       pg:
         specifier: 8.23.1
@@ -175,7 +187,10 @@ importers:
     devDependencies:
       '@ftksaas/api-contracts':
         specifier: workspace:*
-        version: link:packages/api-contracts
+        version: link:../../packages/api-contracts
+      '@ftksaas/typescript-config':
+        specifier: workspace:*
+        version: link:../../packages/typescript-config
       ajv:
         specifier: 8.20.0
         version: 8.20.0
@@ -194,14 +209,20 @@ importers:
       supabase:
         specifier: 2.122.0
         version: 2.122.0
-      turbo:
-        specifier: 2.11.10
-        version: 2.11.10
       typescript:
-        specifier: 7.0.2
+        specifier: 'catalog:'
         version: 7.0.2
 
-  packages/api-contracts: {}
+  packages/api-contracts:
+    devDependencies:
+      '@ftksaas/typescript-config':
+        specifier: workspace:*
+        version: link:../typescript-config
+      typescript:
+        specifier: 'catalog:'
+        version: 7.0.2
+
+  packages/typescript-config: {}
 
 packages:
 

@@ -1,0 +1,6 @@
+{
+  "extends": "@ftksaas/typescript-config/base.json",
+  "include": [
+    "tests/types.test.ts"
+  ]
+}

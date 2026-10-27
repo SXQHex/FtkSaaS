@@ -1,10 +1,10 @@
 # İstemci entegrasyon devri
 
-Güncel kaynak/hosted kabulü [00 devirde](../contracts/00-FtkSaaS-yeni-sohbet-devir.md); repo ve ortam düzeni [monorepo devrinde](monorepo.md). Bu belge yalnız istemci tüketim kurallarını taşır. UI hedefi apps/web, ortak bileşen hedefi packages/ui; aktarım henüz yapılmamıştır. Eski model adları rol etiketidir.
+Güncel kaynak/hosted kabulü [00 devirde](contracts/00-FtkSaaS-yeni-sohbet-devir.md); repo ve ortam düzeni [monorepo devrinde](monorepo.md). Bu belge yalnız istemci tüketim kurallarını taşır. UI hedefi apps/web, ortak bileşen hedefi packages/ui; aktarım henüz yapılmamıştır. Eski model adları rol etiketidir.
 
 ## Gerçek sözleşme
 
-[08 makine sözleşmesi](../contracts/08-FtkSaaS-tip-ve-operasyon-sozlesmesi.json) tek DTO/hata/izin kaynağıdır. [packages/api-contracts](../packages/api-contracts/package.json) bundan üretilir; uygulama `@ftksaas/api-contracts` ve `@ftksaas/api-contracts/client` kullanır. Elle paralel API tipi veya sahte endpoint yoktur. Yalnız yayımlanmış callable operasyonlar kullanılır; kesin alan/sürüm/selector için operations.ts ve08 okunur.
+[08 makine sözleşmesi](../packages/api-contracts/schema/contract.json) tek DTO/hata/izin kaynağıdır. [packages/api-contracts](../packages/api-contracts/package.json) bundan üretilir; uygulama `@ftksaas/api-contracts` ve `@ftksaas/api-contracts/client` kullanır. Elle paralel API tipi veya sahte endpoint yoktur. Yalnız yayımlanmış callable operasyonlar kullanılır; kesin alan/sürüm/selector için operations.ts ve08 okunur.
 
 İnsan işlemleri `POST {API_URL}/functions/v1/backend-v1/{operation}` üzerinden typed Request JSON ile yapılır. Başlıklar `Authorization: Bearer <native Supabase access_token>`, `apikey: <publishable key>`, `Content-Type: application/json`. core/private tablo ve service-only RPC istemci yolu değildir. JWT doğrulaması açık kalır; native Auth ana yoldur.
 

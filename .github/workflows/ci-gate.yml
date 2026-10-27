@@ -7,6 +7,9 @@ on:
     types: [completed]
   push:
     branches: [main]
+defaults:
+  run:
+    working-directory: apps/backend
 permissions:
   contents: read
   actions: read
@@ -27,5 +30,5 @@ jobs:
       - uses: actions/github-script@ed597411d8f924073f98dfc5c65a23a2325f34cd
         with:
           script: |
-            const gate=await import(`${process.env.GITHUB_WORKSPACE}/scripts/ci/gate.mjs`);
+            const gate=await import(`${process.env.GITHUB_WORKSPACE}/apps/backend/scripts/ci/gate.mjs`);
             await gate.main(github,context,core);

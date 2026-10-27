@@ -1,8 +1,8 @@
-> Alan devri: teknik tüketim ve kaynağına bağlı eski kabul kayıtları. Güncel kaynak/CI/hosted durum [00 devirde](../contracts/00-FtkSaaS-yeni-sohbet-devir.md), açık iş [tek backlog’da](remaining-work.md) tutulur. Eski aday/pending ifadeleri yeni görev veya güncel durum değildir.
+> Alan devri: teknik tüketim ve kaynağına bağlı eski kabul kayıtları. Güncel kaynak/CI/hosted durum [00 devirde](contracts/00-FtkSaaS-yeni-sohbet-devir.md), açık iş [tek backlog’da](remaining-work.md) tutulur. Eski aday/pending ifadeleri yeni görev veya güncel durum değildir.
 
 # Eğitmen anlaşması, ücretli yoklama kapanışı ve hakediş
 
-PR #15 main’e birleşmiştir. Güncel uygulama SHA’sı, bağımsız son-head incelemesi, head CI ve merge sonrası temiz CI kanıtları [doğrulanmış devirde](../contracts/00-FtkSaaS-yeni-sohbet-devir.md) birlikte bulunur. Başlangıç main ab3fca4af47b71b34a4a7b6d0df5211ad1e41141 önceki teslim referansıdır.
+PR #15 main’e birleşmiştir. Güncel uygulama SHA’sı, bağımsız son-head incelemesi, head CI ve merge sonrası temiz CI kanıtları [doğrulanmış devirde](contracts/00-FtkSaaS-yeni-sohbet-devir.md) birlikte bulunur. Başlangıç main ab3fca4af47b71b34a4a7b6d0df5211ad1e41141 önceki teslim referansıdır.
 
 ## Uçtan uca akış
 
@@ -30,5 +30,5 @@ Gerekçeli correction preview, sabit orijinal koşullardan hak ve finans farkın
 
 ## Kabul ayrımı
 
-`tests/instructor-earnings.test.mjs` gerçek Auth → Edge → RPC testidir. Yapısal governance/AJV/enum/üretilmiş envanter kontrolleri davranış kabulü değildir. Önceki raporlar tarihsel kalır. Son kaynak odaklı sonuç, tam temiz CI ve bağımsız inceleme ayrı raporlanır.
+`apps/backend/tests/instructor-earnings.test.mjs` gerçek Auth → Edge → RPC testidir. Yapısal governance/AJV/enum/üretilmiş envanter kontrolleri davranış kabulü değildir. Önceki raporlar tarihsel kalır. Son kaynak odaklı sonuç, tam temiz CI ve bağımsız inceleme ayrı raporlanır.
 

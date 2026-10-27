@@ -1,4 +1,4 @@
-> Alan devri: teknik tüketim ve kaynağına bağlı eski kabul kayıtları. Güncel kaynak/CI/hosted durum [00 devirde](../contracts/00-FtkSaaS-yeni-sohbet-devir.md), açık iş [tek backlog’da](remaining-work.md) tutulur. Eski aday/pending ifadeleri yeni görev veya güncel durum değildir.
+> Alan devri: teknik tüketim ve kaynağına bağlı eski kabul kayıtları. Güncel kaynak/CI/hosted durum [00 devirde](contracts/00-FtkSaaS-yeni-sohbet-devir.md), açık iş [tek backlog’da](remaining-work.md) tutulur. Eski aday/pending ifadeleri yeni görev veya güncel durum değildir.
 
 # CI-02 — kaynak bağlı belge kabulü ve dört bağımsız shard
 
@@ -35,7 +35,7 @@ P01 PR22 / `7577b2f1873c6b1fcf83390bfa94a34374c44082` / [39401570751](https://gi
 
 ## PR24 için somut belge kanıtı
 
-Birikimli fark `7577b2f… → 4e80716fdd6f12c3972635903c9435f253b34905`, actual merge `d544efe…`, gerçek iki parent ve tree ile değerlendirilir. 33 yaşayan Markdown ve `scripts/render_catalogs.py` değişmiştir; dependency/lockfile, migration, workflow, makine sözleşmesi, runtime tip/bundle ve endpoint JSON değişmemiştir.
+Birikimli fark `7577b2f… → 4e80716fdd6f12c3972635903c9435f253b34905`, actual merge `d544efe…`, gerçek iki parent ve tree ile değerlendirilir. 33 yaşayan Markdown ve `apps/backend/scripts/render_catalogs.py` değişmiştir; dependency/lockfile, migration, workflow, makine sözleşmesi, runtime tip/bundle ve endpoint JSON değişmemiştir.
 
 Renderer değişikliği yalnız `schema[2]` giriş paragrafı, `schema +=` DS bağımlılık açıklaması (başlıkla sabitlenen dördüncü öğe) ve `feature_doc[2]` açıklamasıdır; ayrıca etkisiz son boş satır vardır. Trusted Python AST karşılaştırması yalnız bu konumlardaki metin sabitlerini normalleştirir. f-string ifadeleri, importlar, bütün diğer AST, emit hedefleri, envanter/iteration mantığı aynı kalmalıdır. JSON envanter üretimi içeren dosyanın tamamına istisna verilmez. Metin dışı veya bilinmeyen değişiklik reddedilir.
 
@@ -54,7 +54,7 @@ Aday ve main aynı `clean-suite.yml` reusable workflow ve aynı test-clean rol r
 | full-clean | GitHub Jobs API üzerinden bütün zorunlu iş/step'lerin aynı run, attempt, head ve gerçek success durumunu denetler; source/coverage binding artifact ve ölçüm üretir |
 | serial-reference | Yalnız açık `ci:measure-serial` etiketiyle aynı kaynakta ek karşılaştırma; eski seri kapsamın tamamı, aynı reset/verify/DB/API/seed/health/advisors. İstenmişse başarısı zorunludur |
 
-Shard dağılımı [suite-durations.json](../scripts/ci/suite-durations.json) ölçümüne dayanır: süre azalan, eşitlikte dosya adı ve shard numarasıyla LPT. Test envanteri package test:api ve seçiciyle eşleşir; yeni/missing/duplicate suite kapalıdır. Ağırlıkların toplamı tahmini wall değildir; süreçler concurrency=2 altında örtüşür. Gerçek yeni sonuçlar [performans belgesinde](ci-performance.md) ayrıca yazılacak.
+Shard dağılımı [suite-durations.json](../apps/backend/scripts/ci/suite-durations.json) ölçümüne dayanır: süre azalan, eşitlikte dosya adı ve shard numarasıyla LPT. Test envanteri package test:api ve seçiciyle eşleşir; yeni/missing/duplicate suite kapalıdır. Ağırlıkların toplamı tahmini wall değildir; süreçler concurrency=2 altında örtüşür. Gerçek yeni sonuçlar [performans belgesinde](ci-performance.md) ayrıca yazılacak.
 
 Eksik, skipped, cancelled, failure, farklı run/attempt/head, eksik Clean acceptance step'i, bozuk coverage veya gerektiğinde eksik seri benchmark kabulü kapatır. Rerun-failed ile eski attempt'ten başarı birleştirilmez; yeni attempt tüm zorunlu işleri kapsamalıdır. Artifact tek başına kabul değildir. Privileged status yalnız main'deki trusted verifier tarafından, salt-okuma aday işlerinin gerçek kaynak/step kanıtıyla yazılır.
 

@@ -1,4 +1,4 @@
-/* Generated from contracts/08. Do not edit. */
+/* Generated from ../../docs/contracts/08. Do not edit. */
 
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema

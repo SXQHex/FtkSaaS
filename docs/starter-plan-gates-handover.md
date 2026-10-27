@@ -1,4 +1,4 @@
-> Alan devri: teknik tüketim ve kaynağına bağlı eski kabul kayıtları. Güncel kaynak/CI/hosted durum [00 devirde](../contracts/00-FtkSaaS-yeni-sohbet-devir.md), açık iş [tek backlog’da](remaining-work.md) tutulur. Eski aday/pending ifadeleri yeni görev veya güncel durum değildir.
+> Alan devri: teknik tüketim ve kaynağına bağlı eski kabul kayıtları. Güncel kaynak/CI/hosted durum [00 devirde](contracts/00-FtkSaaS-yeni-sohbet-devir.md), açık iş [tek backlog’da](remaining-work.md) tutulur. Eski aday/pending ifadeleri yeni görev veya güncel durum değildir.
 
 # Starter plan kapıları — uygulama ve kabul devri
 
@@ -6,7 +6,7 @@ Başlangıç: `3fa72e7b805b2bbfb8895f3d90813eaa3cb416aa`. Bu SHA'nın belge kabu
 
 ## Çalışan kaynak değişikliği
 
-`database/starter-plan-gates.sql` / uygulanmış66. migration;213 API,90 core tablo. Eski65 migration ve satış/plan sürümleri değiştirilmez. Eğitmen hesabı normal `role_assign_v1` ile veya mevcut aktif eğitmen ilişkisiyle tanınır; program için ikinci bir SQL ilişki kaydı gerekmez. Yeni özel `starter_change_scopes` tablosu, geçişin seçilmiş kapsamını ve kaynak abonelik sürümünü tutar; RLS açık, anon/authenticated erişimi kapalıdır. `starter_scope_required=true`, eski permissive Starter verisi kapsam seçimi olmadan sınır üstündeyse operasyonların kapalı olduğunu gösterir. Sessiz ilk kaynak seçilmez; owner mevcut güvenli pasifleştirme yollarıyla kapsamı daraltabilir veya üst plana dönüp dönem sonu için açık Starter seçimi yapabilir. Yeni alanlar dump/restore ve ilerideki fiziksel imha envanterine dahildir. Bu teslim fiziksel imha kabulü değildir.
+`apps/backend/database/starter-plan-gates.sql` / uygulanmış66. migration;213 API,90 core tablo. Eski65 migration ve satış/plan sürümleri değiştirilmez. Eğitmen hesabı normal `role_assign_v1` ile veya mevcut aktif eğitmen ilişkisiyle tanınır; program için ikinci bir SQL ilişki kaydı gerekmez. Yeni özel `starter_change_scopes` tablosu, geçişin seçilmiş kapsamını ve kaynak abonelik sürümünü tutar; RLS açık, anon/authenticated erişimi kapalıdır. `starter_scope_required=true`, eski permissive Starter verisi kapsam seçimi olmadan sınır üstündeyse operasyonların kapalı olduğunu gösterir. Sessiz ilk kaynak seçilmez; owner mevcut güvenli pasifleştirme yollarıyla kapsamı daraltabilir veya üst plana dönüp dönem sonu için açık Starter seçimi yapabilir. Yeni alanlar dump/restore ve ilerideki fiziksel imha envanterine dahildir. Bu teslim fiziksel imha kabulü değildir.
 
 Starter'ın canlı limit kataloğu beş kalemdir: merkez1, oda1, disiplin1, eğitmen1, aktif öğrenci100. `plan_limit`, `require_feature`, `lesson_plan` ve abonelik okuması aynı revizyona bağlıdır. Tarihsel bir plan sürümünün yüksek kotası veya fazladan feature bitleri Starter sınırını genişletemez. Mevcut Pro/Business katalog değerleri bu teslimle uydurulmaz.
 
@@ -57,7 +57,7 @@ Geçişte seçilmeyen eski aktif satırların tarihsel state'i değiştirilmez; 
 | Hosted envanter |66 migration içeriği eşleşti; backend-v1 Edge21 ACTIVE, `verify_jwt=true`;90 core tabloda RLS eksik0, istemci RPC EXECUTE0; advisors ERROR yok |
 | CD artifact |12698584169; ZIP SHA256 `4add712822474c84707f3db469da4100b5a99cf8399ac4526d43b931eda5b919` |
 
-İlk başarısız aday40415840619 ve önceki bekleme ifadeleri kendi kaynaklarının tarihsel kanıtıdır. F05 genel rol listesinin eski Starter beklentisi düzeltildi; Pro merkez izolasyonu assertion’ları korundu, owner/CM Starter retleri ayrıca doğrulandı. Runtime kapısı gevşetilmedi. [İlk kaynak raporu](../reports/starter-plan-gates-20261026.md), [devralma ve native kabul](../reports/starter-plan-gates-takeover-20261027.md), [rol testi düzeltmesi](../reports/starter-plan-gates-role-read-ci-fix-20261027.md) yeniden yazılmadı.
+İlk başarısız aday40415840619 ve önceki bekleme ifadeleri kendi kaynaklarının tarihsel kanıtıdır. F05 genel rol listesinin eski Starter beklentisi düzeltildi; Pro merkez izolasyonu assertion’ları korundu, owner/CM Starter retleri ayrıca doğrulandı. Runtime kapısı gevşetilmedi. [İlk kaynak raporu](history/reports/starter-plan-gates-20261026.md), [devralma ve native kabul](history/reports/starter-plan-gates-takeover-20261027.md), [rol testi düzeltmesi](history/reports/starter-plan-gates-role-read-ci-fix-20261027.md) yeniden yazılmadı.
 
 Testlerde yalnız sentetik izole aktörler/veriler kullanıldı. Açık rezervasyonların booking kanıtı korundu; testin fiilî zaman kaydırmasında session ve resource booking saatleri birlikte tutuldu. Assertion veya ürün kuralı gevşetilmedi. Gerçek ortam verisi ve sırlar bu belge işinde değiştirilmez.
 

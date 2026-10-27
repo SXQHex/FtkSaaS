@@ -1,6 +1,6 @@
-> Alan devri: teknik tüketim ve kaynağına bağlı eski kabul kayıtları. Güncel kaynak/CI/hosted durum [00 devirde](../contracts/00-FtkSaaS-yeni-sohbet-devir.md), açık iş [tek backlog’da](remaining-work.md) tutulur. Eski aday/pending ifadeleri yeni görev veya güncel durum değildir.
+> Alan devri: teknik tüketim ve kaynağına bağlı eski kabul kayıtları. Güncel kaynak/CI/hosted durum [00 devirde](contracts/00-FtkSaaS-yeni-sohbet-devir.md), açık iş [tek backlog’da](remaining-work.md) tutulur. Eski aday/pending ifadeleri yeni görev veya güncel durum değildir.
 
-> **23 Ekim kaynak sınırı:** Yayımlanmış toplam 200 API / 0 contract_only / 59 migration. Aşağıdaki eski sayılar ilgili modülün ilk teslim kaydıdır. Son kaynak ve kabul [güncel devirde](../contracts/00-FtkSaaS-yeni-sohbet-devir.md); gerçek açıklar [kalan işlerde](remaining-work.md) izlenir.
+> **23 Ekim kaynak sınırı:** Yayımlanmış toplam 200 API / 0 contract_only / 59 migration. Aşağıdaki eski sayılar ilgili modülün ilk teslim kaydıdır. Son kaynak ve kabul [güncel devirde](contracts/00-FtkSaaS-yeni-sohbet-devir.md); gerçek açıklar [kalan işlerde](remaining-work.md) izlenir.
 
 # Merkezler arası hesaplaşma — üçüncü teslim
 
@@ -34,7 +34,7 @@ Owner/OM rolü veya idari grant yönetimi operasyon yetkisi yaratmaz. Organizasy
 
 ## Kabul ve sınırlar
 
-`tests/cross-center-settlement.test.mjs` gerçek Auth → Edge → RPC testidir; büyük kapsam testindeki sentetik ledger fixture'ı tahakkuk üretim kanıtı değildir, onay kapasitesi testidir. Ayrı ders/satış testleri gerçek tahakkuk ve terslemeyi doğrular. Yapısal governance/AJV/enum kontrolleri davranış kabulü değildir. Nihai kaynak kabulü tam `pnpm run test:clean` ve son head bağımsız incelemesiyle bağlanır.
+`apps/backend/tests/cross-center-settlement.test.mjs` gerçek Auth → Edge → RPC testidir; büyük kapsam testindeki sentetik ledger fixture'ı tahakkuk üretim kanıtı değildir, onay kapasitesi testidir. Ayrı ders/satış testleri gerçek tahakkuk ve terslemeyi doğrular. Yapısal governance/AJV/enum kontrolleri davranış kabulü değildir. Nihai kaynak kabulü tam `pnpm run test:clean` ve son head bağımsız incelemesiyle bağlanır.
 
 Eğitmen ödeme API'leri P03, satış kapsamı/backdate ve hak koruma tüketicileri P02 ile sonradan kabul edildi. P03'te tutar karşılandıktan sonraki kullanılmayan earning_ids kapsam doğrulaması iyileştirmesi açık kalır; ödeme akışının bütünü eksik değildir. Frontend gerçek entegrasyonu ve yük/restore açıktır. Eski smoke bu ilk teslimin kabulü değildir; güncel 200 runtime/59 migration/Edge8 hosted kanıtı tek devirdeki P07 CD receipt'idir. Dış e-posta ertelendi; Resend başlatılmaz. Production dağıtımı yapılmaz.
 

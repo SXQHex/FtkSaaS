@@ -1,4 +1,4 @@
-> Alan devri: teknik tüketim ve kaynağına bağlı eski kabul kayıtları. Güncel kaynak/CI/hosted durum [00 devirde](../contracts/00-FtkSaaS-yeni-sohbet-devir.md), açık iş [tek backlog’da](remaining-work.md) tutulur. Eski aday/pending ifadeleri yeni görev veya güncel durum değildir.
+> Alan devri: teknik tüketim ve kaynağına bağlı eski kabul kayıtları. Güncel kaynak/CI/hosted durum [00 devirde](contracts/00-FtkSaaS-yeni-sohbet-devir.md), açık iş [tek backlog’da](remaining-work.md) tutulur. Eski aday/pending ifadeleri yeni görev veya güncel durum değildir.
 
 # Takvim, seans ve rezervasyon okumaları
 
@@ -39,7 +39,7 @@ Cursor keyset'tir; aktör/işlem/tenant/merkez/filtre/sort bağını doğrular; 
 
 ## Kabul kanıtı ve açık işler
 
-`tests/schedule-reads.test.mjs` gerçek Supabase Auth → Edge → service-only RPC zincirini kullanır; sentetik ilişki/seans/rezervasyon fixture'ları DB'de kurulur, ayrıca güncel seans yazma → okuma bağlantısı doğrulanır. DB/Auth yetki kaldırma fixture'ı kullanılması, henüz uygulanmayan hesap erişimi veya görev kaldırma komutunun kabul edildiği anlamına gelmez.
+`apps/backend/tests/schedule-reads.test.mjs` gerçek Supabase Auth → Edge → service-only RPC zincirini kullanır; sentetik ilişki/seans/rezervasyon fixture'ları DB'de kurulur, ayrıca güncel seans yazma → okuma bağlantısı doğrulanır. DB/Auth yetki kaldırma fixture'ı kullanılması, henüz uygulanmayan hesap erişimi veya görev kaldırma komutunun kabul edildiği anlamına gelmez.
 
-Sözleşme/tip/envanter kontrolleri, temiz migration, tüm regresyon, seed/health/advisors ve son head CI ayrı kanıttır. Kaynak raporu: [schedule-read-verification](../reports/schedule-read-verification.json). Bu ilk rapor hosted kabulü değildir; sonraki P07 CD kabulünde 200 runtime işlem/59 migration/Edge8 doğrulandı. Program/seans, yoklama/hakediş ve P01 talep/bekleme/uygun hak seçimi sonraki teslimlerde uygulanmıştır. Public discovery API'si P04 ile canlıdır; gerçek hostname/Turnstile/signed gateway ve deneme konfigürasyonu kabulü ayrıdır. Frontend gerçek entegrasyonu ve yük/restore açık kalır. Production dağıtımı yok; dış e-posta ertelendi.
+Sözleşme/tip/envanter kontrolleri, temiz migration, tüm regresyon, seed/health/advisors ve son head CI ayrı kanıttır. Kaynak raporu: [schedule-read-verification](history/reports/schedule-read-verification.json). Bu ilk rapor hosted kabulü değildir; sonraki P07 CD kabulünde 200 runtime işlem/59 migration/Edge8 doğrulandı. Program/seans, yoklama/hakediş ve P01 talep/bekleme/uygun hak seçimi sonraki teslimlerde uygulanmıştır. Public discovery API'si P04 ile canlıdır; gerçek hostname/Turnstile/signed gateway ve deneme konfigürasyonu kabulü ayrıdır. Frontend gerçek entegrasyonu ve yük/restore açık kalır. Production dağıtımı yok; dış e-posta ertelendi.
 

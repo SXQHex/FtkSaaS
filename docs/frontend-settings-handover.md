@@ -1,8 +1,8 @@
-> Alan devri: teknik tüketim ve kaynağına bağlı eski kabul kayıtları. Güncel kaynak/CI/hosted durum [00 devirde](../contracts/00-FtkSaaS-yeni-sohbet-devir.md), açık iş [tek backlog’da](remaining-work.md) tutulur. Eski aday/pending ifadeleri yeni görev veya güncel durum değildir.
+> Alan devri: teknik tüketim ve kaynağına bağlı eski kabul kayıtları. Güncel kaynak/CI/hosted durum [00 devirde](contracts/00-FtkSaaS-yeni-sohbet-devir.md), açık iş [tek backlog’da](remaining-work.md) tutulur. Eski aday/pending ifadeleri yeni görev veya güncel durum değildir.
 
 # Ayar ve hesap API tüketicileri
 
-Güncel kabul/hosted durum [00 devirde](../contracts/00-FtkSaaS-yeni-sohbet-devir.md), açık alanlar [tek backlog’da](remaining-work.md#ertelenmiş-ve-kapsam-dışı) tutulur.69 davranış grubunun normatif sahibi [02 sözleşmedir](../contracts/02-FtkSaaS-teknik-sozlesme.md#ayarlar-sozlesmesi-ve-davranis-sprinti); bu belge gerçek typed alan ve tüketici eşlemesidir. Starter FD07 başlangıcı [teknik sözleşmeden](../contracts/02-FtkSaaS-teknik-sozlesme.md#starter-başlangıç-ayarları-ve-selfpublic) okunur.
+Güncel kabul/hosted durum [00 devirde](contracts/00-FtkSaaS-yeni-sohbet-devir.md), açık alanlar [tek backlog’da](remaining-work.md#ertelenmiş-ve-kapsam-dışı) tutulur.69 davranış grubunun normatif sahibi [02 sözleşmedir](contracts/02-FtkSaaS-teknik-sozlesme.md#ayarlar-sozlesmesi-ve-davranis-sprinti); bu belge gerçek typed alan ve tüketici eşlemesidir. Starter FD07 başlangıcı [teknik sözleşmeden](contracts/02-FtkSaaS-teknik-sozlesme.md#starter-başlangıç-ayarları-ve-selfpublic) okunur.
 
 ## İşlemler
 

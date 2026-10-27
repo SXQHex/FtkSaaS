@@ -1,18 +1,14 @@
 {
   "$schema": "https://turbo.build/schema.json",
   "tasks": {
-    "build": {
+    "verify": {
       "dependsOn": [
-        "^build"
+        "^typecheck"
       ],
-      "outputs": [
-        ".next/**",
-        "!.next/cache/**"
-      ]
-    },
-    "dev": {
       "cache": false,
-      "persistent": true
+      "env": [
+        "FTK_TEST_TIMINGS"
+      ]
     },
     "typecheck": {
       "dependsOn": [
@@ -21,18 +17,18 @@
       "cache": false
     },
     "test": {
-      "cache": false
-    },
-    "//#verify": {
+      "dependsOn": [
+        "^typecheck"
+      ],
       "cache": false,
-      "passThroughEnv": [
-        "*"
+      "env": [
+        "FTK_TEST_TIMINGS"
       ]
     },
-    "//#test:clean": {
+    "test:clean": {
       "cache": false,
-      "passThroughEnv": [
-        "*"
+      "env": [
+        "FTK_TEST_TIMINGS"
       ]
     }
   }

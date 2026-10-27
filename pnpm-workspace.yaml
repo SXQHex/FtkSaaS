@@ -2,7 +2,9 @@ packages:
   - apps/*
   - packages/*
 
+catalog:
+  typescript: 7.0.2
+
 allowBuilds:
   esbuild: true
-  sharp: true
   supabase: true

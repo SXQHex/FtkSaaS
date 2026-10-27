@@ -10,6 +10,9 @@ on:
         description: Successful full main acceptance run for current main (never a PR run)
         required: true
         type: string
+defaults:
+  run:
+    working-directory: apps/backend
 permissions:
   contents: read
   actions: read
@@ -35,7 +38,7 @@ jobs:
         uses: actions/github-script@ed597411d8f924073f98dfc5c65a23a2325f34cd
         with:
           script: |
-            const cd=await import(`${process.env.GITHUB_WORKSPACE}/scripts/ci/deployment-source.mjs`);
+            const cd=await import(`${process.env.GITHUB_WORKSPACE}/apps/backend/scripts/ci/deployment-source.mjs`);
             await cd.resolveDeployment(github,context,core);
   deploy:
     needs: source
@@ -53,11 +56,12 @@ jobs:
           node-version-file: '.nvmrc'
       - run: corepack enable
       - run: pnpm install --frozen-lockfile
+        working-directory: .
       - name: Read previous successful delivery receipt
         uses: actions/github-script@ed597411d8f924073f98dfc5c65a23a2325f34cd
         with:
           script: |
-            const cd=await import(`${process.env.GITHUB_WORKSPACE}/scripts/ci/deployment-source.mjs`);
+            const cd=await import(`${process.env.GITHUB_WORKSPACE}/apps/backend/scripts/ci/deployment-source.mjs`);
             await cd.previousReceipt(github,context);
       - name: Deliver accepted source and verify hosted backend
         env:
@@ -73,7 +77,7 @@ jobs:
         uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9
         with:
           name: development-delivery-${{ github.run_id }}-${{ github.run_attempt }}
-          path: .ci/development-delivery.json
+          path: .artifacts/ci/development-delivery.json
           if-no-files-found: warn
           include-hidden-files: true
           retention-days: 14

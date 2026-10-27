@@ -7,13 +7,13 @@
   "setup_commands": [
     "corepack enable",
     "pnpm install --frozen-lockfile",
-    "pnpm run dev:start",
-    "pnpm run dev:seed",
-    "pnpm run dev:info"
+    "pnpm --filter @ftksaas/backend dev:start",
+    "pnpm --filter @ftksaas/backend dev:seed",
+    "pnpm --filter @ftksaas/backend dev:info"
   ],
-  "public_connection_source": "pnpm run dev:info; API/gateway/Studio/Mailpit ports are generated per checkout",
-  "public_frontend_env": ".dev/frontend.env",
-  "private_synthetic_logins": ".dev/development-users.json",
+  "public_connection_source": "pnpm --filter @ftksaas/backend dev:info",
+  "public_frontend_env": "apps/backend/.dev/frontend.env",
+  "private_synthetic_logins": "apps/backend/.dev/development-users.json",
   "gateway_path": "/functions/v1/backend-v1/{operation}",
   "headers": [
     "Authorization: Bearer <Supabase access token>",
@@ -27,6 +27,6 @@
     "environment_role": "development_test_confirmed_by_user",
     "edge_function": "backend-v1"
   },
-  "current_acceptance_source": "contracts/00-FtkSaaS-yeni-sohbet-devir.md",
-  "historical_verification_report": "reports/remote-backend-verification.json"
+  "current_acceptance_source": "docs/contracts/00-FtkSaaS-yeni-sohbet-devir.md",
+  "historical_verification_report": "docs/history/reports/remote-backend-verification.json"
 }

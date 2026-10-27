@@ -1,19 +1,10 @@
 node_modules/
+.artifacts/
+.ci/
+.dev/
 .env*
 !.env.example
 supabase/.temp/
-.dev/
-reports/native-start.log
-reports/*raw*
-reports/git-whitespace.log
-
-reports/*.log
-!reports/acceptance-verified.log
-!reports/resumed-acceptance.log
-!reports/qe01-acceptance.log
-
-!reports/qe02-acceptance.log
-.DS_Store
 .next/
 .turbo/
 dist/
@@ -21,3 +12,4 @@ coverage/
 playwright-report/
 test-results/
 *.tsbuildinfo
+.DS_Store

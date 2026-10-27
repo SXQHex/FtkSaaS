@@ -1,0 +1,390 @@
+{
+  "format": 1,
+  "notice": "Immutable source snapshots relocated without byte changes; outgoing links belong to the source commit. New reports are not implicitly exempt.",
+  "files": [
+    {
+      "path": "docs/history/contracts/07-FtkSaaS-O4-denetim-ve-aciklar.md",
+      "source_path": "contracts/07-FtkSaaS-O4-denetim-ve-aciklar.md",
+      "source_commit": "94831a10e9f888e7c9e3e7ebf4137bc1e8082f56",
+      "sha256": "eb9841ff3f8188debb7471f404ef6be0757a27dc68fb058c9ca532804d7b3eed"
+    },
+    {
+      "path": "docs/history/contracts/09-FtkSaaS-teknik-aktarim-raporu.md",
+      "source_path": "contracts/09-FtkSaaS-teknik-aktarim-raporu.md",
+      "source_commit": "94831a10e9f888e7c9e3e7ebf4137bc1e8082f56",
+      "sha256": "e5144b3e844641efe403560a98e8fa623372e5533c2ff58996ef4d3e091f7729"
+    },
+    {
+      "path": "docs/history/contracts/11-FtkSaaS-Q-D01-teknik-aktarim-raporu.md",
+      "source_path": "contracts/11-FtkSaaS-Q-D01-teknik-aktarim-raporu.md",
+      "source_commit": "94831a10e9f888e7c9e3e7ebf4137bc1e8082f56",
+      "sha256": "1fe0e9822ec021f5b34ab3bc11a90e8ba0d6359557e3a6f180ae2d33a57af12d"
+    },
+    {
+      "path": "docs/history/source-v2.2/08-FtkSaaS-tip-ve-operasyon-sozlesmesi.json",
+      "source_path": "contracts/source-v2.2/08-FtkSaaS-tip-ve-operasyon-sozlesmesi.json",
+      "source_commit": "94831a10e9f888e7c9e3e7ebf4137bc1e8082f56",
+      "sha256": "7573f68dee529d56ecf29b92aaa7b17573b43df06770d2e5587ad3d0eb1b26db"
+    },
+    {
+      "path": "docs/history/reports/acceptance-verified.log",
+      "source_path": "reports/acceptance-verified.log",
+      "source_commit": "94831a10e9f888e7c9e3e7ebf4137bc1e8082f56",
+      "sha256": "8b430cfccbe5dc3a89d11bad5f385fcb4434c4ac4c164092afa90d0bd8fff93a"
+    },
+    {
+      "path": "docs/history/reports/account-identity-progress-20261026.md",
+      "source_path": "reports/account-identity-progress-20261026.md",
+      "source_commit": "94831a10e9f888e7c9e3e7ebf4137bc1e8082f56",
+      "sha256": "05f6ba0761390424cd00fb388358543c9e0aee44502585083fc53a9e4430bba6"
+    },
+    {
+      "path": "docs/history/reports/account-security-native-20261026.md",
+      "source_path": "reports/account-security-native-20261026.md",
+      "source_commit": "94831a10e9f888e7c9e3e7ebf4137bc1e8082f56",
+      "sha256": "222a8550023fb00525c66051b150abf273352fadc76a22a25a9cb4e5dcbe0d18"
+    },
+    {
+      "path": "docs/history/reports/actual-start-verification.json",
+      "source_path": "reports/actual-start-verification.json",
+      "source_commit": "94831a10e9f888e7c9e3e7ebf4137bc1e8082f56",
+      "sha256": "b791988034ce53f310538e42222ff228005680f67386a2d204344208ea751fbd"
+    },
+    {
+      "path": "docs/history/reports/advisors.json",
+      "source_path": "reports/advisors.json",
+      "source_commit": "94831a10e9f888e7c9e3e7ebf4137bc1e8082f56",
+      "sha256": "ac16630c7479d9c630e53f68e0e441b520f6ffb5d8f400434dc2ec5bbeecaa1c"
+    },
+    {
+      "path": "docs/history/reports/all-tests.tap",
+      "source_path": "reports/all-tests.tap",
+      "source_commit": "94831a10e9f888e7c9e3e7ebf4137bc1e8082f56",
+      "sha256": "650492a207af51e27f90c6514b96d8624db4e611064eeb3abceb577face70eac"
+    },
+    {
+      "path": "docs/history/reports/availability-policy-verification.json",
+      "source_path": "reports/availability-policy-verification.json",
+      "source_commit": "94831a10e9f888e7c9e3e7ebf4137bc1e8082f56",
+      "sha256": "5bd083d03175e1c0ed7168648e1144d4733184e191e6055e6423ec5250b5711e"
+    },
+    {
+      "path": "docs/history/reports/cancellation-race-review.md",
+      "source_path": "reports/cancellation-race-review.md",
+      "source_commit": "94831a10e9f888e7c9e3e7ebf4137bc1e8082f56",
+      "sha256": "8c28985de480cfdf474bf75be50dfa6bbe5218e6c97de03b088c8aac992b6525"
+    },
+    {
+      "path": "docs/history/reports/ci-balance-20261025.json",
+      "source_path": "reports/ci-balance-20261025.json",
+      "source_commit": "94831a10e9f888e7c9e3e7ebf4137bc1e8082f56",
+      "sha256": "beba7cfcb928286c0d925cd854371d1afd46b614416bfefc7f80a26f10fcccf7"
+    },
+    {
+      "path": "docs/history/reports/consistency.json",
+      "source_path": "reports/consistency.json",
+      "source_commit": "94831a10e9f888e7c9e3e7ebf4137bc1e8082f56",
+      "sha256": "07235a25c55098e7d1f6884e2bef92374578752a74dacfc079a6e24f7a980fb8"
+    },
+    {
+      "path": "docs/history/reports/contract-tests.tap",
+      "source_path": "reports/contract-tests.tap",
+      "source_commit": "94831a10e9f888e7c9e3e7ebf4137bc1e8082f56",
+      "sha256": "e2753933a9cec332d710d747577202f36075d50294b36925120280efbeef9927"
+    },
+    {
+      "path": "docs/history/reports/database-tests.tap",
+      "source_path": "reports/database-tests.tap",
+      "source_commit": "94831a10e9f888e7c9e3e7ebf4137bc1e8082f56",
+      "sha256": "60e59050433b712c758383d21fff527ffd7a047fc1913bca952906bc17e39a6b"
+    },
+    {
+      "path": "docs/history/reports/db-probe.json",
+      "source_path": "reports/db-probe.json",
+      "source_commit": "94831a10e9f888e7c9e3e7ebf4137bc1e8082f56",
+      "sha256": "5e8b3b6641849c2bab38bf5719aff9999debd517261e21939277640268cc2d04"
+    },
+    {
+      "path": "docs/history/reports/decision-sprint-review.md",
+      "source_path": "reports/decision-sprint-review.md",
+      "source_commit": "94831a10e9f888e7c9e3e7ebf4137bc1e8082f56",
+      "sha256": "71ca98030012a7a26c94745bdf15113111d1b749f82bcccaf01edee88b3c87b9"
+    },
+    {
+      "path": "docs/history/reports/decision-sprint-verification.json",
+      "source_path": "reports/decision-sprint-verification.json",
+      "source_commit": "94831a10e9f888e7c9e3e7ebf4137bc1e8082f56",
+      "sha256": "5172a32fc879fa49f806f3a5c53e5ccd03b388fca92a527c8b8507345cc367d4"
+    },
+    {
+      "path": "docs/history/reports/environment.json",
+      "source_path": "reports/environment.json",
+      "source_commit": "94831a10e9f888e7c9e3e7ebf4137bc1e8082f56",
+      "sha256": "e7c515bfc70d3882778baf2b24868d0b4ae0460a74bb2827cdf40a3d948053d7"
+    },
+    {
+      "path": "docs/history/reports/final-checks.log",
+      "source_path": "reports/final-checks.log",
+      "source_commit": "94831a10e9f888e7c9e3e7ebf4137bc1e8082f56",
+      "sha256": "caa74c9fc55e76ac4b1cf76f565a078d8c5875357e260988afc24d18f79d8d43"
+    },
+    {
+      "path": "docs/history/reports/generate.log",
+      "source_path": "reports/generate.log",
+      "source_commit": "94831a10e9f888e7c9e3e7ebf4137bc1e8082f56",
+      "sha256": "6f8c3e98fdeda9e7197a5d5a56737864d7a83d98243b44adeb4574f466f70622"
+    },
+    {
+      "path": "docs/history/reports/health.log",
+      "source_path": "reports/health.log",
+      "source_commit": "94831a10e9f888e7c9e3e7ebf4137bc1e8082f56",
+      "sha256": "7dc41c31b25259a539b44548a294ac37da65e452a9fd5154317874d700ffa183"
+    },
+    {
+      "path": "docs/history/reports/install.log",
+      "source_path": "reports/install.log",
+      "source_commit": "94831a10e9f888e7c9e3e7ebf4137bc1e8082f56",
+      "sha256": "b6ec338952ebad68012bcfdd2b85f3aabe5cac269cb350c9a79dc93d8b52c370"
+    },
+    {
+      "path": "docs/history/reports/instructor-earnings-verification.json",
+      "source_path": "reports/instructor-earnings-verification.json",
+      "source_commit": "94831a10e9f888e7c9e3e7ebf4137bc1e8082f56",
+      "sha256": "3483733968b7ea319a73ea05ed95c049b5bb961c01bd0e855136d76dcdec3aed"
+    },
+    {
+      "path": "docs/history/reports/lock-update.log",
+      "source_path": "reports/lock-update.log",
+      "source_commit": "94831a10e9f888e7c9e3e7ebf4137bc1e8082f56",
+      "sha256": "0e1d4a20bceb5f9dcc3ae3c9d438f1c0b1eacfaa1c4499f44aec0f5cc2efedc3"
+    },
+    {
+      "path": "docs/history/reports/migration-up.log",
+      "source_path": "reports/migration-up.log",
+      "source_commit": "94831a10e9f888e7c9e3e7ebf4137bc1e8082f56",
+      "sha256": "f4d62ba09aa314c3f3691f15161eaddff34f2330942ab47028e40126cfbaa90b"
+    },
+    {
+      "path": "docs/history/reports/migrations-before.json",
+      "source_path": "reports/migrations-before.json",
+      "source_commit": "94831a10e9f888e7c9e3e7ebf4137bc1e8082f56",
+      "sha256": "65c12fe8dd83865fb71e21f0539d9f80493cf50612f764dd8e32c97caed403e0"
+    },
+    {
+      "path": "docs/history/reports/migrations.json",
+      "source_path": "reports/migrations.json",
+      "source_commit": "94831a10e9f888e7c9e3e7ebf4137bc1e8082f56",
+      "sha256": "371793971b1f1576d642d5fd2431118d33eb01e1668a1cfcf01b1b8e5b286d21"
+    },
+    {
+      "path": "docs/history/reports/monorepo-preparation-20261027.md",
+      "source_path": "reports/monorepo-preparation-20261027.md",
+      "source_commit": "94831a10e9f888e7c9e3e7ebf4137bc1e8082f56",
+      "sha256": "23f3f4bb747c3280bd0a67e6793f2d4c1ee4e950389440b1b9be7fab3c3d848b"
+    },
+    {
+      "path": "docs/history/reports/monorepo-preparation-ci-fix-20261027.md",
+      "source_path": "reports/monorepo-preparation-ci-fix-20261027.md",
+      "source_commit": "94831a10e9f888e7c9e3e7ebf4137bc1e8082f56",
+      "sha256": "3494e6524125a6dcf25176abe3efb8daf624012934f52abc239ce4308d5d0bc2"
+    },
+    {
+      "path": "docs/history/reports/p01-a-targeted-diagnosis.json",
+      "source_path": "reports/p01-a-targeted-diagnosis.json",
+      "source_commit": "94831a10e9f888e7c9e3e7ebf4137bc1e8082f56",
+      "sha256": "9a667f7d407a1b6b71bd544212e25ba8cac992c8e9d9b88363bf335b6b827811"
+    },
+    {
+      "path": "docs/history/reports/pilot-readiness.md",
+      "source_path": "reports/pilot-readiness.md",
+      "source_commit": "94831a10e9f888e7c9e3e7ebf4137bc1e8082f56",
+      "sha256": "f9ff18998bc066d0dcc6e61ff5d674cf85319a9c7c354639d7841a0da2391006"
+    },
+    {
+      "path": "docs/history/reports/pr45-main-integration.md",
+      "source_path": "reports/pr45-main-integration.md",
+      "source_commit": "94831a10e9f888e7c9e3e7ebf4137bc1e8082f56",
+      "sha256": "3f9a5d9389a02ee41b6f28eab63557bfd322f4aba57828bf7f98eb77f935376a"
+    },
+    {
+      "path": "docs/history/reports/previous-stack-stop.log",
+      "source_path": "reports/previous-stack-stop.log",
+      "source_commit": "94831a10e9f888e7c9e3e7ebf4137bc1e8082f56",
+      "sha256": "01f17db171c6bca83a0e3190beb30e54c529b7812005572044afdd490d36791c"
+    },
+    {
+      "path": "docs/history/reports/program-session-verification.json",
+      "source_path": "reports/program-session-verification.json",
+      "source_commit": "94831a10e9f888e7c9e3e7ebf4137bc1e8082f56",
+      "sha256": "a05fa5d324c4d9f359a6e3368eec1e564bc54bc49cea9ec3b0bfa5858c6b421f"
+    },
+    {
+      "path": "docs/history/reports/q-d01-advisors.log",
+      "source_path": "reports/q-d01-advisors.log",
+      "source_commit": "94831a10e9f888e7c9e3e7ebf4137bc1e8082f56",
+      "sha256": "3fcefdf79d43fa8d6b8701bcb741868548cc9784c0b9d811cf019c4f0f6b8365"
+    },
+    {
+      "path": "docs/history/reports/q-d01-checks.log",
+      "source_path": "reports/q-d01-checks.log",
+      "source_commit": "94831a10e9f888e7c9e3e7ebf4137bc1e8082f56",
+      "sha256": "d70d3de9e343215cc2b6d4982da41ac4112d69ab7d396041ccbb8e5c42edc077"
+    },
+    {
+      "path": "docs/history/reports/qe01-acceptance.log",
+      "source_path": "reports/qe01-acceptance.log",
+      "source_commit": "94831a10e9f888e7c9e3e7ebf4137bc1e8082f56",
+      "sha256": "eea07f839fdb3e2562c52cfad4d11261c003e5b051467606aa8e06ca60d8548b"
+    },
+    {
+      "path": "docs/history/reports/qe01-verification.json",
+      "source_path": "reports/qe01-verification.json",
+      "source_commit": "94831a10e9f888e7c9e3e7ebf4137bc1e8082f56",
+      "sha256": "d8dc49b88bd4eb8a8783f38c6a7e8988da671ea3be6c0b74d645bdde75e4b2ac"
+    },
+    {
+      "path": "docs/history/reports/qe02-acceptance.log",
+      "source_path": "reports/qe02-acceptance.log",
+      "source_commit": "94831a10e9f888e7c9e3e7ebf4137bc1e8082f56",
+      "sha256": "bf22d4793c382d8b57d780ddf5562f8861b13b399ebb7ce4cf84979af2096775"
+    },
+    {
+      "path": "docs/history/reports/qe02-review.md",
+      "source_path": "reports/qe02-review.md",
+      "source_commit": "94831a10e9f888e7c9e3e7ebf4137bc1e8082f56",
+      "sha256": "ad4c621113c550551d1d754147793a441f9c6ca2d6c26c4a5363db5cf09086e8"
+    },
+    {
+      "path": "docs/history/reports/qe02-verification.json",
+      "source_path": "reports/qe02-verification.json",
+      "source_commit": "94831a10e9f888e7c9e3e7ebf4137bc1e8082f56",
+      "sha256": "a874ab00480b0c8f7449b68fd0d37b46ecdcfeac6782e8402b042f136b31e3d0"
+    },
+    {
+      "path": "docs/history/reports/qe03-verification.json",
+      "source_path": "reports/qe03-verification.json",
+      "source_commit": "94831a10e9f888e7c9e3e7ebf4137bc1e8082f56",
+      "sha256": "c2de26e2f48c5c2805f1ed2b36ff27ecbbf07de375bc6385bfb86a2e0cd68333"
+    },
+    {
+      "path": "docs/history/reports/registry-verification.json",
+      "source_path": "reports/registry-verification.json",
+      "source_commit": "94831a10e9f888e7c9e3e7ebf4137bc1e8082f56",
+      "sha256": "2ed22db2da5e08ff6e1763d7a3f8d60248a64a4c2a792c30ac7f89857490482d"
+    },
+    {
+      "path": "docs/history/reports/remote-backend-verification.json",
+      "source_path": "reports/remote-backend-verification.json",
+      "source_commit": "94831a10e9f888e7c9e3e7ebf4137bc1e8082f56",
+      "sha256": "fd9e42a9a558eeb8d9d3bd0f6a1bda9db49c60b96ae74c6e7415cb432b72cc37"
+    },
+    {
+      "path": "docs/history/reports/resumed-acceptance.log",
+      "source_path": "reports/resumed-acceptance.log",
+      "source_commit": "94831a10e9f888e7c9e3e7ebf4137bc1e8082f56",
+      "sha256": "1e228ae25eea4974e7dc678d778f3a313c21489a72eff444ead09b2e6a36df1a"
+    },
+    {
+      "path": "docs/history/reports/resumed-verification.json",
+      "source_path": "reports/resumed-verification.json",
+      "source_commit": "94831a10e9f888e7c9e3e7ebf4137bc1e8082f56",
+      "sha256": "275663765573c159f27d460e4e66e18f5dd38eba33bb8b4a78483c9279c225a1"
+    },
+    {
+      "path": "docs/history/reports/room-role-verification.json",
+      "source_path": "reports/room-role-verification.json",
+      "source_commit": "94831a10e9f888e7c9e3e7ebf4137bc1e8082f56",
+      "sha256": "22e4719cd3c4954ce01db266589f161db61ab034a0c7451d8b7f78553ab34f63"
+    },
+    {
+      "path": "docs/history/reports/schedule-read-verification.json",
+      "source_path": "reports/schedule-read-verification.json",
+      "source_commit": "94831a10e9f888e7c9e3e7ebf4137bc1e8082f56",
+      "sha256": "fe6a60cd011a7412649c323bb775ca90e65bd15200b2fcb7e95af98dde792c2b"
+    },
+    {
+      "path": "docs/history/reports/session-capacity-independent-review.md",
+      "source_path": "reports/session-capacity-independent-review.md",
+      "source_commit": "94831a10e9f888e7c9e3e7ebf4137bc1e8082f56",
+      "sha256": "870b302b61209ff50cbe9c0294862f21facc950c8c91042ff25cda81d08b0ebe"
+    },
+    {
+      "path": "docs/history/reports/session-capacity-validation.json",
+      "source_path": "reports/session-capacity-validation.json",
+      "source_commit": "94831a10e9f888e7c9e3e7ebf4137bc1e8082f56",
+      "sha256": "720eb698b0d3905f5478551994c7f21414d3705d30b1911d92046135c1b85c7e"
+    },
+    {
+      "path": "docs/history/reports/settlement-center-scope-review.md",
+      "source_path": "reports/settlement-center-scope-review.md",
+      "source_commit": "94831a10e9f888e7c9e3e7ebf4137bc1e8082f56",
+      "sha256": "6628f7131e74b29eba188a50a9436babb55126c03b574bc4547ac4e45f61df76"
+    },
+    {
+      "path": "docs/history/reports/settlement-center-scope-verification.json",
+      "source_path": "reports/settlement-center-scope-verification.json",
+      "source_commit": "94831a10e9f888e7c9e3e7ebf4137bc1e8082f56",
+      "sha256": "1511252749139b79f6c2dfa21a0bf1f832d45273af1594c90e531515cdc12976"
+    },
+    {
+      "path": "docs/history/reports/settlement-revision-review.md",
+      "source_path": "reports/settlement-revision-review.md",
+      "source_commit": "94831a10e9f888e7c9e3e7ebf4137bc1e8082f56",
+      "sha256": "f14f606a1b759e050e8d96fc1bb3d3c63985c576b9eae7b91459a89efa4f8b0b"
+    },
+    {
+      "path": "docs/history/reports/settlement-revision-verification.json",
+      "source_path": "reports/settlement-revision-verification.json",
+      "source_commit": "94831a10e9f888e7c9e3e7ebf4137bc1e8082f56",
+      "sha256": "2d8a3bb027067c127f35598b84b326af0dce9ad59ffa652eaae4fbec68413e61"
+    },
+    {
+      "path": "docs/history/reports/starter-attendance-protection-final-verification.json",
+      "source_path": "reports/starter-attendance-protection-final-verification.json",
+      "source_commit": "94831a10e9f888e7c9e3e7ebf4137bc1e8082f56",
+      "sha256": "9abe0dd2f7eb85ad6a237602c8333db2bc19e9698f898f523e2ca90df31d4c59"
+    },
+    {
+      "path": "docs/history/reports/starter-attendance-protection-verification.json",
+      "source_path": "reports/starter-attendance-protection-verification.json",
+      "source_commit": "94831a10e9f888e7c9e3e7ebf4137bc1e8082f56",
+      "sha256": "9f57a36b825896e8b6f83c454e92462694a8cbc96eded5cd1feb9ac9b2e8874d"
+    },
+    {
+      "path": "docs/history/reports/starter-onboarding-20261027.md",
+      "source_path": "reports/starter-onboarding-20261027.md",
+      "source_commit": "94831a10e9f888e7c9e3e7ebf4137bc1e8082f56",
+      "sha256": "10c36a973cd28b52de667061fe7c15c769e02df546f690e58348d39f1c8531ef"
+    },
+    {
+      "path": "docs/history/reports/starter-plan-gates-20261026.md",
+      "source_path": "reports/starter-plan-gates-20261026.md",
+      "source_commit": "94831a10e9f888e7c9e3e7ebf4137bc1e8082f56",
+      "sha256": "f7292491e06bdc7bca9275d8108a8b6dac6fb61427a28c554ea4d9b6b75cb962"
+    },
+    {
+      "path": "docs/history/reports/starter-plan-gates-role-read-ci-fix-20261027.md",
+      "source_path": "reports/starter-plan-gates-role-read-ci-fix-20261027.md",
+      "source_commit": "94831a10e9f888e7c9e3e7ebf4137bc1e8082f56",
+      "sha256": "8317a67bba72fa6ee5812cc7f8544b50c34ca48d2e6e469b4551118f617fb0fb"
+    },
+    {
+      "path": "docs/history/reports/starter-plan-gates-takeover-20261027.md",
+      "source_path": "reports/starter-plan-gates-takeover-20261027.md",
+      "source_commit": "94831a10e9f888e7c9e3e7ebf4137bc1e8082f56",
+      "sha256": "7db4b5545291d786e933a29f8499584d875951e40ae0db12471117fdec0f395f"
+    },
+    {
+      "path": "docs/history/reports/starter-studio-20261027.md",
+      "source_path": "reports/starter-studio-20261027.md",
+      "source_commit": "94831a10e9f888e7c9e3e7ebf4137bc1e8082f56",
+      "sha256": "d0ef21b3edae9880a3bfacda93bfc63a4a6abf778b212c273b9b0567b9ee03ea"
+    },
+    {
+      "path": "docs/history/reports/verification.json",
+      "source_path": "reports/verification.json",
+      "source_commit": "94831a10e9f888e7c9e3e7ebf4137bc1e8082f56",
+      "sha256": "4b1a4b8e63184f6f59b3fbbe6dced54f3bd9d32627ca84474eb43e8ef2218ab9"
+    }
+  ]
+}

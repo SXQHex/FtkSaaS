@@ -79,7 +79,7 @@ Kaynak 635e148651b2a85b18f5d40fe1fdea938ea94bf2; [run 39270054878](https://githu
 
 P01-A suite'i 2:25.181; ortak api-acceptance 5:31.146 idi. Bu süreler önceki iki paralel süreçteki gözlemdir; yeni sıralı fazların süresi veya kazancı diye toplanmaz. Yeni kaynak seçimi P01-A + api-acceptance olarak iki suite'e iner; yeni modül öncelikli çalışır ve hata olursa sonraki regresyon başlamaz. Sağlıklı yeni koşunun süresi ölçülmeden dakika kazancı iddia edilmez. Bilinmeyen/paylaşılan kaynak geniş geri dönüşü, tam aday/main clean, izolasyon ve paralellik=2 korunur.
 
-[Teşhis kaydı](../reports/p01-a-targeted-diagnosis.json) eski başarısız SHA'yı ve henüz bekleyen yeni runtime kabulünü ayırır.
+[Teşhis kaydı](history/reports/p01-a-targeted-diagnosis.json) eski başarısız SHA'yı ve henüz bekleyen yeni runtime kabulünü ayırır.
 
 ## İki suite koşusunun gerçek log süresi
 
@@ -103,7 +103,7 @@ Kaynak main `9fd084b9ddbbefc225c98adbf3f25ddee85a9b6e`, aynı main clean [402264
 | API3 |1577 sn |1519.53 sn |820.82 sn |
 | API4 |777 sn |723.28 sn |825.38 sn |
 
-Yeni değerler **tahmindir**, yeni CLI ile ölçülmüş başarı değildir. Test kuyruğunda en uzun process registry855.73sn; bu dosyanın içinde P05/P06/P07/ayar kabul modülleri de vardır. Yalnız dosya sayısını veya eski ağırlığı eşitlemek yanlıştı. Mevcut15 API processinin yeni wall ölçümleri başarılı kaynak/attempt/job loglarından çıkarıldı. [Ölçümler ve yeni plan](../reports/ci-balance-20261025.json).
+Yeni değerler **tahmindir**, yeni CLI ile ölçülmüş başarı değildir. Test kuyruğunda en uzun process registry855.73sn; bu dosyanın içinde P05/P06/P07/ayar kabul modülleri de vardır. Yalnız dosya sayısını veya eski ağırlığı eşitlemek yanlıştı. Mevcut15 API processinin yeni wall ölçümleri başarılı kaynak/attempt/job loglarından çıkarıldı. [Ölçümler ve yeni plan](history/reports/ci-balance-20261025.json).
 
 Dağıtım önce mevcut LPT toplam-ağırlık planını güvenli başlangıç kabul eder; aynı dört shard ve concurrency2 içinde Node’un alfabetik dosya kuyruğunu modelleyen deterministik sınırlı aramayla iyileştirir. Arama250000 düğümle sınırlıdır, duvar saati veya rastgeleliğe bağlı değildir; sonuç cache’ten kopyalanır. Mevcut toplam-ağırlık1.08 denge sınırı ve bütün suite envanter kontrolü korunur; mevcut veriyle tahmini shard duvarları arasındaki fark yaklaşık35sn’dir. Daha hızlı gerçek sonuç ancak yeni aday/main koşularından sonra kabul edilir.
 

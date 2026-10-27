@@ -2,15 +2,15 @@
 
 ## Başlangıç ve kaynak önceliği
 
-Önce bu belgeyi, [kaynak indeksini](docs/source-index.md), [güncel kabulü](contracts/00-FtkSaaS-yeni-sohbet-devir.md), [açık işleri](docs/remaining-work.md) ve [aktif sırayı](docs/production-queue.md) oku. Ardından yalnız görevle ilgili normatif sözleşme/karar ve entegrasyon belgesini oku. Tam başlangıç SHA’sını ve aynı SHA’nın gerçek CI sonucunu doğrula. Eski başarı yeni kaynağa taşınmaz.
+Önce bu belgeyi, [kaynak indeksini](docs/source-index.md), [güncel kabulü](docs/contracts/00-FtkSaaS-yeni-sohbet-devir.md), [açık işleri](docs/remaining-work.md) ve [aktif sırayı](docs/production-queue.md) oku. Ardından yalnız görevle ilgili normatif sözleşme/karar ve entegrasyon belgesini oku. Tam başlangıç SHA’sını ve aynı SHA’nın gerçek CI sonucunu doğrula. Eski başarı yeni kaynağa taşınmaz.
 
 Son açık kullanıcı kararı üstündür; kabul edilmiş D01–D09/U01–U08/Q-D01/Q-E02/Q-E03 ve FD01–FD12 hükümleri korunur. Bilinmeyen ürün, fiyat, politika veya config değeri uydurulmaz. Karar, uygulama, test, merge ve hosted kabulü ayrı durumlardır.
 
 ## Tek kaynak ve dosya sahipliği
 
-[Belge haritası](docs/documentation-map.md) her yaşayan Markdown dosyasının sahibini/rolünü gösterir. Güncel SHA/envanter/CI/CD yalnız 00 devirde; açık iş yalnız remaining-work’te; sıra yalnız production-queue’da tutulur. Diğer belgeler bu kaynaklara bağlanır, durum metnini kopyalamaz. Tarihsel reports/ ve contracts/source-v2.2/ yeniden yazılmaz. Üretilmiş katalog/tipler üreticiden güncellenir; ikinci sözleşme ağacı kurulmaz.
+[Belge haritası](docs/documentation-map.md) her yaşayan Markdown dosyasının sahibini/rolünü gösterir. Güncel SHA/envanter/CI/CD yalnız 00 devirde; açık iş yalnız remaining-work’te; sıra yalnız production-queue’da tutulur. Diğer belgeler bu kaynaklara bağlanır, durum metnini kopyalamaz. Tarihsel docs/history/ içeriği yeniden yazılmaz; taşınmış kaynakların commit/yol/hash izi docs/history/manifest.json içinde tutulur. Üretilmiş katalog/tipler üreticiden güncellenir; ikinci sözleşme ağacı kurulmaz.
 
-SXQHex/FtkSaaS tek geliştirme reposudur. saaspt göçü sonraki adımdır; hedef apps/web ve packages/ui olarak hazırlanır; frontend tasarımı/etkileşimleri bu taşıma kapsamında değiştirilmez. Uygulama kapsamları ve pnpm/Turbo komutları [monorepo devrindedir](docs/monorepo.md). packages/api-contracts ortak üretilmiş API tiplerinin tek paketidir. Frontend göçünde saaspt’nin ilgili ajan/tasarım kuralları ayrıca incelenir.
+SXQHex/FtkSaaS tek geliştirme reposudur. saaspt göçü sonraki adımdır; hedef apps/web ve packages/ui olarak hazırlanır; frontend tasarımı/etkileşimleri bu taşıma kapsamında değiştirilmez. Uygulama kapsamları ve pnpm/Turbo komutları [monorepo devrindedir](docs/monorepo.md). apps/backend backend kod/test/CI araçlarının tek sahibidir. Root package.json yalnız workspace yönetir. packages/api-contracts/schema/contract.json tek makine kaynağı, aynı paketin src/ dizini üretilmiş tip sahibidir. Ortak TS ayarı packages/typescript-config içindedir; yeni runtime çıktısı .artifacts altında, private yerel durum apps/backend/.dev altında kalır. Frontend göçünde saaspt’nin ilgili ajan/tasarım kuralları ayrıca incelenir.
 
 ## Güvenlik ve ortamlar
 

@@ -1,4 +1,4 @@
-> Alan devri: teknik tüketim ve kaynağına bağlı eski kabul kayıtları. Güncel kaynak/CI/hosted durum [00 devirde](../contracts/00-FtkSaaS-yeni-sohbet-devir.md), açık iş [tek backlog’da](remaining-work.md) tutulur. Eski aday/pending ifadeleri yeni görev veya güncel durum değildir.
+> Alan devri: teknik tüketim ve kaynağına bağlı eski kabul kayıtları. Güncel kaynak/CI/hosted durum [00 devirde](contracts/00-FtkSaaS-yeni-sohbet-devir.md), açık iş [tek backlog’da](remaining-work.md) tutulur. Eski aday/pending ifadeleri yeni görev veya güncel durum değildir.
 
 # P06 — rapor, CSV import ve sonuç kurtarma
 
@@ -59,7 +59,7 @@ Yerel `npm run verify`:100 yapı/sözleşme +43 CI politikası geçti; frozen mi
 
 Geliştirme sırasında alınmış kaynak snapshotlarında hosted DB'de yalnız BEGIN/ROLLBACK ile P06 kaynağı kurulup gerçek dispatcher/worker çalıştırıldı:28 satır,2 preview/apply batch, replay tekilliği, kişi/borç önizlemede oluşmaması, config-stale apply reddi, açılış3 kredi +200 borç/nakit0, geç audit hatasında bütün açılış batch rollback ve yeniden claim, sayfadan bağımsız tam CSV, audit/management ve link geri alma reddi.20 gerçek yanıt projeksiyonu ve WorkerResult üretilmiş Edge success validator'larından geçti. Bu sentetik SQL denemeleri son SHA kabulü değildir; gerçek Auth/Storage/Edge clean testinin yerine geçmez. Uzak53 migration/Edge6 korunmuştur; P06 kalıcı yayımlanmadı.
 
-Gerçek Auth/özel Storage/Edge/dedicated DB LOGIN kabulü `tests/p06-acceptance.mjs` içinde mevcut registry shard'ına bağlıdır; ayrı15. suite veya yeni shard yoktur. Final bağımsız inceleme, açık aday full clean, aynı merge/main clean ve development CD henüz beklenir. Bu kanıtlar tamamlanmadan P06 done değildir. Clean başlayınca izleme durur, kullanıcıya kaynak/run ile devir yapılır.
+Gerçek Auth/özel Storage/Edge/dedicated DB LOGIN kabulü `apps/backend/tests/p06-acceptance.mjs` içinde mevcut registry shard'ına bağlıdır; ayrı15. suite veya yeni shard yoktur. Final bağımsız inceleme, açık aday full clean, aynı merge/main clean ve development CD henüz beklenir. Bu kanıtlar tamamlanmadan P06 done değildir. Clean başlayınca izleme durur, kullanıcıya kaynak/run ile devir yapılır.
 
 ### İlk aday clean ve fixture düzeltmesi
 

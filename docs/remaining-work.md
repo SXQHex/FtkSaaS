@@ -1,10 +1,10 @@
 # Açık işler — tek backlog
 
-Kabul edilmiş kaynak ve kapanmış teslimler [00 devirde](../contracts/00-FtkSaaS-yeni-sohbet-devir.md), aktif sıra [üretim kuyruğunda](production-queue.md). Bu dosya başka belgedeki eski pending listesinden otomatik görev üretmez.
+Kabul edilmiş kaynak ve kapanmış teslimler [00 devirde](contracts/00-FtkSaaS-yeni-sohbet-devir.md), aktif sıra [üretim kuyruğunda](production-queue.md). Bu dosya başka belgedeki eski pending listesinden otomatik görev üretmez.
 
 | Kimlik | Alan | Açık iş ve kapanış ölçütü |
 |---|---|---|
-| REPO-01 | Monorepo/SSoT | Frontend göç planı ve saaspt kaynak incelemesi, tek pnpm lock/Turbo görevleri, ortak API paketi, belge sahipliği ve CI bütünlüğü; odaklı test, son bağımsız inceleme, kaynak bağlı aday/main kabulü. Production/site/DNS taşıması dahil değildir. |
+| REPO-01 | Monorepo/SSoT | Backend package/CWD/CI taşınması, root sadeleştirme, Node/devcontainer eşliği, tarihsel arşiv ve ephemeral artifact ayrımı; frontend göç planı ve saaspt kaynak incelemesi, tek pnpm lock/Turbo görevleri, ortak API paketi, belge sahipliği ve CI bütünlüğü; odaklı test, son bağımsız inceleme, kaynak bağlı aday/main kabulü. Production/site/DNS taşıması dahil değildir. |
 | WEB-01 | Gerçek istemci entegrasyonu | saaspt kaynaklarını hash/SHA iziyle apps/web ve packages/ui içine aktar; sentetik görünümü native Auth + typed Edge API ile mevcut geliştirme Supabase’ine bağla. Rol/plan/tenant, expected_version, preview, replay/bilinmeyen sonuç ve veri görünürlüğü ekran→API→DB ile doğrulanır. Tasarım kaynağını taşımak bu kabul değildir. |
 | PUBLIC-01 | Public sağlayıcı/istemci devri | uye.fethiyetango.com üzerinde gerçek widget tokenı/action/hostname/replay ve gateway yapılandırmasıyla başvuru kabulü. Backend intent/review/self zinciri kapalıdır; gerçek provider/browser kanıtı mock ile kapanmaz. |
 | ST-02 | Rapor/import/bildirim | P05/P06 motorlarını Starter plan/rol/kapsam ve gerçek consumer akışlarıyla bütünleşik doğrula. Native Auth e-postası kabulü org marketing/reminder teslimi değildir. |
