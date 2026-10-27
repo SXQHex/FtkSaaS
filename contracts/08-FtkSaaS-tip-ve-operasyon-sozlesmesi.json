@@ -19501,6 +19501,9 @@
         },
         "refund_terms": {
           "$ref": "#/$defs/RefundTerms"
+        },
+        "published_name": {
+          "$ref": "#/$defs/Text"
         }
       },
       "required": [
@@ -19515,7 +19518,8 @@
         "currency",
         "refund_method",
         "freeze_terms",
-        "effective_at"
+        "effective_at",
+        "published_name"
       ],
       "additionalProperties": false
     },
@@ -90186,7 +90190,9 @@
         ],
         "implementation": "partial",
         "acceptance": "pending_feature_acceptance",
-        "acceptance_evidence": [],
+        "acceptance_evidence": [
+          "Starter studio subset: tests/starter-studio-acceptance.mjs, credit/timed quota/unlimited sale-collection-self reservation-attendance and immutable name; native7/7. Full feature acceptance remains separately pending."
+        ],
         "implemented_operations": [
           "products_list_v1",
           "product_publish_v1",

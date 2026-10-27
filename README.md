@@ -1,3 +1,5 @@
+> Aktif aday: tek stüdyo kurulum kabulü ve sürümlü ürün adı;213 API/67 migration. Son kabul edilmiş main5892b3c hâlâ213/66’dır; yeni adayın kabulü ayrı bekler.
+
 # FtkSaaS backend
 
 ## Doğrulanmış güncel kaynak
