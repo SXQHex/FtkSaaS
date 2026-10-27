@@ -4,6 +4,7 @@ import './p05-acceptance.mjs';
 import './p06-acceptance.mjs';
 import './starter-operations-acceptance.mjs';
 import './starter-preparation-acceptance.mjs';
+import './canonical-settings-migration-acceptance.mjs';
 import assert from 'node:assert/strict';
 import {createHash} from 'node:crypto';
 import {authUser,fixturePlatform,must,call} from './api-client.mjs';
