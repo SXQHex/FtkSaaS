@@ -1,3 +1,13 @@
+## 27 Ekim — güncel Starter kapanışı ve sıradaki teslim
+
+Kabul edilmiş main `fc96dc15f336abed20cd0a6c73d84a5b0e3b08b0`:213 API/67 migration/90 core tablo/Edge21 ACTIVE/JWT açık. [PR58](https://github.com/SXQHex/FtkSaaS/pull/58) tek-stüdyo runtime kabulünü, [PR59](https://github.com/SXQHex/FtkSaaS/pull/59) belge kapanışını taşır. [Main40483793353](https://github.com/SXQHex/FtkSaaS/actions/runs/40483793353) ve [development CD40487227365](https://github.com/SXQHex/FtkSaaS/actions/runs/40487227365) başarılıdır.
+
+Kimlik/iletişim/oturum güvenliği, Starter plan kapıları ve sürümlü downgrade, tek-stüdyo40/5 kapasite ve50 fiziksel tavan, kredili/kotalı süreli/sınırsız satış→tahsilat→self rezervasyon→yoklama/hak tüketimi kapalı teslimlerdir. Disiplin ön eki/ad değişikliği ve eski satış sürüm bütünlüğü kabul edilmiştir. Bu alanlar eski aday notları yüzünden yeniden açılmaz.
+
+Aktif kullanıcı talimatı: önce mevcut belge kabul yolunda güncel durum eşitlenir; sonra yeni işletmenin başlangıç ayarları (default/miras/yetki/domain tüketicileri) ve öğrenci self/public başlangıç akışı tek Draft PR içinde tamamlanır. Geliştirme sırasında odaklı testler; son kaynak bağımsız incelemesi sonrası tek aday full clean. Main kabulü ve development CD korunur. Genel ayar JSON’u, mock Turnstile veya kod varlığı gerçek domain/sağlayıcı kabulü değildir. Gerçek hostname/widget/gateway/tenant/config önkoşulları mevcut bağlı kaynaklardan incelenir; eksik ticari değer veya sağlayıcı kanıtı uydurulmaz.
+
+Bu belge eşitlemesi runtime/migration/CI/izin listesi değiştirmez ve full-clean label’ı istemez. Tarihsel raporlar korunur. Aşağıdaki önceki tarihli kayıtlar kendi kaynaklarının geçmişidir; güncel açık iş için remaining-work.md esas alınır.
+
 ## 27 Ekim — tek stüdyo kurulum ve ürün adı sürümü kabul edildi
 
 Dar native tek-stüdyo7/7 ve seri Starter kapı9/9 geçti; kaynak hashleri ve başarısız ilk koşular [kabul kaydındadır](reports/starter-studio-20261027.md). [PR #58](https://github.com/SXQHex/FtkSaaS/pull/58) main `5639783b5dcd963d84bb76ec7bdf75d65a75ced5` üzerinde kabul edildi: **213 API / 67 migration / 90 core tablo**. Son head `a9a09c8685d706d6f9abab842aeb10c7c90b565d` bağımsız incelemesi5662350042, [aday full clean40452100471](https://github.com/SXQHex/FtkSaaS/actions/runs/40452100471), [aynı main full clean40476673333](https://github.com/SXQHex/FtkSaaS/actions/runs/40476673333) ve [development CD40479412819](https://github.com/SXQHex/FtkSaaS/actions/runs/40479412819) başarılı. Aday ve main tree `3d1fc9d98c6eea8864c7bb99e9d7515200a86a74` aynıdır. CD67 migration içerik eşliğini ve20/20 kontrolü doğruladı;67 gerçekten uygulandı. Edge kaynağı değişmediği için yeniden deploy edilmedi; mevcut backend-v1 Edge21 ACTIVE ve `verify_jwt=true` korundu.
