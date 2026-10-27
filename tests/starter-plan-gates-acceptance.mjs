@@ -73,9 +73,10 @@ test('Starter real Auth/API resource limits, downgrade scope and receipt gates',
    const legacyVersion=(await invoke('product_publish_v1',{terms:{...terms,name:'Legacy incompatible name'}})).primary_id;
    const legacyProduct=(await db.query('select product_id from core.product_versions where id=$1',[legacyVersion])).rows[0].product_id;
    await db.query("update core.saas_plan_versions set name='starter' where id=$1",[plan]);
-   await reject('product_publish_v1',{product_id:legacyProduct,terms},'PLAN_FEATURE_UNAVAILABLE');
+   const repaired=(await invoke('product_publish_v1',{product_id:legacyProduct,terms})).primary_id;assert.notEqual(repaired,legacyVersion);
    await reject('sale_preview_v1',{person_id:students[0],product_version_id:legacyVersion,start_date:'2026-01-01',end_date:'2027-01-01'},'PLAN_FEATURE_UNAVAILABLE');
-   assert.equal((await db.query('select name from core.products where id=$1',[legacyProduct])).rows[0].name,'Legacy incompatible name');
+   assert.equal((await db.query('select published_name from core.product_versions where id=$1',[legacyVersion])).rows[0].published_name,'Legacy incompatible name');
+   assert.equal((await db.query('select name from core.products where id=$1',[legacyProduct])).rows[0].name,terms.name);
 
   });
   await t.test('versioned downgrade keeps explicit resources and closes excluded ones without deleting history',async()=>{

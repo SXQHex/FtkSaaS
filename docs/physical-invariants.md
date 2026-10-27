@@ -1,3 +1,7 @@
+## Ürün adı snapshot’ı — 67 adayı
+
+`product_versions.published_name` yeni sürümde sabittir; kataloğun `ProductTerms.name` alanı seçilen sürümün adıdır. UPDATE trigger’ı ad değişimini reddeder. Backfill yalnız gerçekten kayıtlı ürün adını kullanır; eski satış/finans/scope/hak defterleri değiştirilmez. Aynı ürün kimliğinde yeni yayın yeni snapshot yaratır. Restore/export core satırının yeni alanını taşır; ayrı private veri deposu veya imha consumer’ı eklenmez. Önceki migrationlar değiştirilmez. Yeni adayın native ve CI kanıtları tek stüdyo devrindedir.
+
 ## Eşzamanlılık ve indeks planı
 
 25 Ekim güncel ürün hedefi: [tek oda/seans/kategori kapasitesi ve ayrı kontrollü aşım](../contracts/02-FtkSaaS-teknik-sozlesme.md#oda-seans-kapasite-karari). Yayımlanmış main200/59 DTO'ları ile PR45 adayı201/60 ayrıdır. PR45 bağımsız inceleme ve aday40164825351 başarılı; merge/main/CD bekler. Bu modülün eski test/alan adları kendi tarihsel runtime kaydını anlatır, yeni ürün kuralı değildir.

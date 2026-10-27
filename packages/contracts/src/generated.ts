@@ -13845,6 +13845,7 @@ freeze_terms: FreezeTerms
 quota?: (QuotaSpec | null)
 effective_at: Instant
 refund_terms?: RefundTerms
+published_name: Text
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema

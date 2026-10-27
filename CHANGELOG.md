@@ -1,5 +1,9 @@
 # Changes
 
+## 27 Ekim — tek stüdyo kurulum ve sürümlü ürün adı adayı
+
+Mevcut domain komutlarında tek oda40/5 kapasite, süreli/sınırsız satış→rezervasyon→hakedişsiz kapanış için bütünleşik native kabul eklendi.67 migration `product_versions.published_name` snapshotı ve mevcut ProductTerms.name okumasını sürüme bağlar; doğru disiplin ön ekiyle aynı ürüne yeni yayın yapılabilir, eski satış/sürüm/hak değişmez.213 API/90 core tablo korunur; aday/main/CD kabulü bekler.
+
 ## 27 Ekim 2026 — Starter plan kapıları kabulü ve belge kapanışı
 
 PR56 normal merge main `ed747324f7d008b24103d4fd2eba503791c70a93`:213 callable API/0 contract_only/66 migration/90 core tablo. Starter kaynak ve100 öğrenci sınırları, tek oda, disiplin paket kapsamı/adı, CRM/etkinlik/personel/hakediş retleri ve eski receipt/preview denetimi kabul edildi. Pro→Starter açık sürümlü kaynak seçimiyle geçmiş/kesin rezervasyon/hak/finans korunur. Aday40419827224, aynı main40422823564 ve gerçek development CD40425584520 başarılı; hosted20/20, Edge21 ACTIVE/verify_jwt=true. [Kapanış kanıtları](docs/starter-plan-gates-handover.md). Güncel devir/kuyruk/durum belgeleri eşitlendi; tarihsel raporlar ve aşağıdaki eski sürüm kayıtları korunur. Bu kapanış bütün Starter yol haritası veya production kabulü değildir.

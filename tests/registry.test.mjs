@@ -129,3 +129,5 @@ import './p07-subscription-lifecycle-acceptance.mjs';
 import './p07-lifecycle-acceptance.mjs';
 
 import './starter-plan-gates-acceptance.mjs';
+
+import './starter-studio-acceptance.mjs';

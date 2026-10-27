@@ -1,3 +1,15 @@
+## 27 Ekim — tek stüdyo kurulum ve ürün adı sürümü adayı
+
+Dar native tek-stüdyo7/7 ve seri Starter kapı9/9 geçti; kaynak hashleri ve başarısız ilk koşular [kabul kaydındadır](reports/starter-studio-20261027.md). Son kaynak bağımsız incelemesi ve aday/main/CD kabulü henüz yoktur.
+
+Başlangıç main `5892b3cb729d62a045358ffdc588a66361331537`; aynı kaynak main clean40430528120 ve development CD40432912898 başarılı. Yeni aday **213 API / 67 migration / 90 core tablo**; önceki66 migration değişmez. Güncel F16 plan izi zaten Starter/Pro/Business’tır; eski Pro/Business-only etiketleri yeniden uygulanmaz. Yeni kaynak henüz aday/main/CD kabulü değildir.
+
+Mevcut merkez/oda/disiplin/eğitmen/uygunluk/politika/program/paket/satış/rezervasyon/yoklama komutları kullanılır; yeni kurulum modülü veya endpoint yoktur. `core.product_versions.published_name` sürüme bağlı ad snapshot’ıdır. Eski sürümler yalnız migration öncesinde gerçekten saklanan ürün adıyla doldurulur; bilinmeyen eski adlar uydurulmaz. Starter yayını `terms.name` değerini kendi sürümüne kaydeder; güncel katalog etiketi de güncellenir. Diğer planlarda mevcut ürün kimliği adı davranışı korunur. Eski satışın product_version_id/tarih/bedel/kapsam/hakları yeniden yazılmaz.
+
+Yeni yayın güncel disiplin adı ön ekini ister. Disiplin adı değiştikten sonra eski ön ekli sürümle yeni satış yapılmaz; aynı ürün kimliğinde doğru yeni adla yeni sürüm yayımlanabilir. Eski satışın uygun seçili kapsamındaki rezervasyon ve hak tüketimi devam eder. Canlı plan/yetki, scope, kapasite, borç, belge, kota ve receipt denetimleri korunur; genel JSON settings bu domain komutlarının yerine geçmez.
+
+Kabul kaynağı `tests/starter-studio-acceptance.mjs` mevcut registry shard’ına bağlıdır: gerçek Starter kuruluşu; tek odada40 kişilik tekrarlı program ve ayrı saatte5 kişilik özel seans; eşzamanlı oda reddi ve fiziksel50 tavanı; kredili/kotalı süreli/sınırsız ürün satış-tahsilat-self rezervasyon-kapanış; ad/disciplin değişimi, immutable eski satış/sürüm ve sıfır hakediş. Test config/fiyatları yalnız sentetik kabul verisidir; yeni ticari/politika defaultu değildir. Native/inceleme ve son aday/main/CD kanıtları tamamlanmadan bu alt teslim kapanmış sayılmaz.
+
 ## 27 Ekim — Starter plan kapıları teslimi kapandı
 
 [PR #56](https://github.com/SXQHex/FtkSaaS/pull/56) main `ed747324f7d008b24103d4fd2eba503791c70a93` üzerinde kabul edildi: **213 callable API / 0 contract_only / 66 migration / 90 core tablo**. [Aday full clean40419827224](https://github.com/SXQHex/FtkSaaS/actions/runs/40419827224), [aynı main full clean40422823564](https://github.com/SXQHex/FtkSaaS/actions/runs/40422823564) ve [development CD40425584520](https://github.com/SXQHex/FtkSaaS/actions/runs/40425584520) başarılı. CD gerçek deploy ve20/20 hosted kontrol içerir; backend-v1 Edge21 ACTIVE, `verify_jwt=true`. JWT doğrulaması son kullanıcı kararıyla açık kalır.

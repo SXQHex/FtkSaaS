@@ -1,3 +1,7 @@
+## Tek stüdyo ürün adı hata eşlemesi — 67 adayı
+
+Yayında güncel disiplin ön eki yoksa `VALIDATION_FAILED`; güncel ön eki taşımayan eski sürümle yeni satış `PLAN_FEATURE_UNAVAILABLE`; sürümün `published_name` alanını sonradan değiştirme `INVALID_STATE_TRANSITION` ile reddedilir. Yeni ürün adı yalnız yeni yayın sürümündedir. DTO’ya yeni hata/izin veya yeni endpoint eklenmez; mevcut `ProductTerms.name` seçilen sürümden okunur.67 adayının native/CI kabulü ayrı doğrulanır.
+
 ## 27 Ekim — Starter plan kapıları teslimi kapandı
 
 [PR #56](https://github.com/SXQHex/FtkSaaS/pull/56) main `ed747324f7d008b24103d4fd2eba503791c70a93` üzerinde kabul edildi: **213 callable API / 0 contract_only / 66 migration / 90 core tablo**. [Aday full clean40419827224](https://github.com/SXQHex/FtkSaaS/actions/runs/40419827224), [aynı main full clean40422823564](https://github.com/SXQHex/FtkSaaS/actions/runs/40422823564) ve [development CD40425584520](https://github.com/SXQHex/FtkSaaS/actions/runs/40425584520) başarılı. CD gerçek deploy ve20/20 hosted kontrol içerir; backend-v1 Edge21 ACTIVE, `verify_jwt=true`. JWT doğrulaması son kullanıcı kararıyla açık kalır.
