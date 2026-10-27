@@ -1,0 +1,50 @@
+name: Manual full clean
+run-name: Full clean · ${{ inputs.tested_sha }}
+on:
+  workflow_dispatch:
+    inputs:
+      tested_sha:
+        description: Exact main commit to test (40-character SHA)
+        required: true
+        type: string
+permissions:
+  contents: read
+  actions: read
+concurrency:
+  group: manual-full-clean-${{ inputs.tested_sha }}
+  cancel-in-progress: false
+jobs:
+  source:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-24.04
+    outputs:
+      tested_sha: ${{ steps.source.outputs.tested_sha }}
+      binding: ${{ steps.source.outputs.binding }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Bind exact main source
+        id: source
+        uses: actions/github-script@ed597411d8f924073f98dfc5c65a23a2325f34cd
+        with:
+          script: |
+            const {execFileSync}=await import('node:child_process');
+            const sha=context.payload.inputs.tested_sha;
+            if(!/^[0-9a-f]{40}$/.test(sha))throw Error('Exact SHA required');
+            const git=(...args)=>execFileSync('git',args,{encoding:'utf8'}).trim();
+            git('merge-base','--is-ancestor',sha,'origin/main');
+            git('checkout','--detach',sha);
+            if(git('rev-parse','HEAD')!==sha)throw Error('Source mismatch');
+            const {coverageHash}=await import(`${process.env.GITHUB_WORKSPACE}/apps/backend/scripts/ci/shards.mjs`);
+            const binding={kind:'manual-full',actual:sha,tree:git('rev-parse','HEAD^{tree}'),workflow_sha:context.sha,coverage:coverageHash(),run_id:context.runId,attempt:Number(process.env.GITHUB_RUN_ATTEMPT),benchmark:false};
+            core.setOutput('tested_sha',sha);
+            core.setOutput('binding',JSON.stringify(binding));
+            await core.summary.addRaw('Manual exact-source test only; no candidate proof or deployment authorization.\n'+JSON.stringify(binding)).write();
+  clean:
+    needs: source
+    uses: ./.github/workflows/clean-suite.yml
+    with:
+      tested_sha: ${{ needs.source.outputs.tested_sha }}
+      binding: ${{ needs.source.outputs.binding }}
