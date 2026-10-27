@@ -53,6 +53,12 @@ Kaynak [SXQHex/saaspt](https://github.com/SXQHex/saaspt/tree/bec7e204e06a813e490
 
 Göçte kaynak TSX/CSS/route/etkileşimleri korunur; frontend testleri uygulama kapsamına alınır. saaspt root README/AGENTS/devir/lockfile’ı kökteki yetkili dosyaların üstüne yazılmaz. Tasarım yönergeleri frontend alanına kapsamlanır; normatif backend belgeleri kopyalanmaz. Kaynak repo/SHA/dosya hash’leriyle import izi tutulur; eski repo silinmez/archived yapılmaz. packages/ui ve uygulama gerçek workspace manifestleriyle eklenir; ortak API paketi workspace bağımlılığı olur. Kök typecheck/frontend build/test ve gerçek API entegrasyon kabulü sonraki kaynakta alınır.
 
+## GitHub Actions ve Turbo görev sınırı
+
+GitHub Actions kabul/dağıtım zincirinin sahibi kalır. Turbo workflow içinde paket görevlerini sıralar; CD sonrasında çalışan backend ile frontend’i kendiliğinden bağlamaz. API uyumluluğu sözleşme/sürüm ve gerçek entegrasyon testleriyle doğrulanır.
+
+Hedef frontend göç zinciri: PR’da mevcut backend kabulü + Turbo ortak tip/frontend typecheck/test/build; aynı-main kabulü sonrası mevcut Supabase CD; yayımlanan backend kaynağına karşı gerçek frontend/Auth/API entegrasyon kabulü; ardından yetkili frontend yayını. Production/DNS işlemleri bu hazırlıkla yetkilendirilmez. Bu frontend job’ları uygulama göçünden önce kurulmuş veya çalışmış sayılmaz. Turbo backend shard/CD zincirini yeniden yazma gerekçesi değildir.
+
 ## CI geçiş sınırı
 
 Dört API shard, source/head/base/merge-tree kontrolleri, toplayıcı, bağımsız inceleme ve aynı-main kabulü korunur. Lock/workspace/Turbo/shared tip değişimi dar belge işi değildir; hedefli seçici bu değişiklikleri geniş regresyona gönderir. Güvenli yalnız-belge istisnası tam incelenmiş yol listesiyle devam eder. Yeni belge dosyalarının bu listesi path bazında incelenir; uzantıya genel istisna eklenmez.

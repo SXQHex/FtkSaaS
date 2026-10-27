@@ -2,6 +2,20 @@ import fs from 'node:fs';
 import path from 'node:path';
 import {execFileSync} from 'node:child_process';
 import {pathToFileURL} from 'node:url';
+import {createHash} from 'node:crypto';
+
+// These exact source snapshots moved out of docs/. Their relative links refer
+// to the original commit, not the current reports/ directory. No other report
+// gains an exception, and any byte edit invalidates the snapshot identity.
+const historicalDigests = new Map(Object.entries({
+  "reports/pilot-readiness.md": "f9ff18998bc066d0dcc6e61ff5d674cf85319a9c7c354639d7841a0da2391006",
+  "reports/pr45-main-integration.md": "3f9a5d9389a02ee41b6f28eab63557bfd322f4aba57828bf7f98eb77f935376a"
+}));
+export function historicalSnapshot(file,text){
+ const expected=historicalDigests.get(file);if(!expected)return false;
+ if(createHash('sha256').update(text).digest('hex')!==expected)throw Error('HISTORICAL_SNAPSHOT_DRIFT '+file);
+ return true;
+}
 
 export function markdownAnchors(text){
  const anchors=new Set(),counts=new Map();let fence=null;
@@ -21,7 +35,7 @@ export function checkDocuments(files){
  for(const f of [...new Set(files)]){
   if(!fs.existsSync(f))continue;
   const text=fs.readFileSync(f,'utf8');if(/^(<<<<<<<|=======|>>>>>>>) /m.test(text))throw Error('MERGE_MARKER '+f);
-  if(!f.endsWith('.md'))continue;
+  if(!f.endsWith('.md')||historicalSnapshot(f,text))continue;
   for(const m of text.matchAll(/\[[^\]]*\]\(([^)\s]+)(?:\s+"[^"]*")?\)/g)){
    const link=m[1];if(/^(?:[a-z][a-z0-9+.-]*:|\/)/i.test(link))continue;
    const [location,fragment]=link.split('#');const target=decodeURIComponent(location.split('?')[0]);

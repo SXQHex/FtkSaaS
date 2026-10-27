@@ -413,7 +413,7 @@ test('installed Node runner really queues explicit files lexically in the two pr
  }finally{rmSync(dir,{recursive:true,force:true});}
 });
 
-import {markdownAnchors,checkDocuments} from '../scripts/ci/docs-check.mjs';
+import {markdownAnchors,checkDocuments,historicalSnapshot} from '../scripts/ci/docs-check.mjs';
 test('document links reject missing fragments and ignore fenced example headings',()=>fixture((dir)=>{
  const target=join(dir,'target.md'),source=join(dir,'source.md');
  writeFileSync(target,'# Güncel kabul\n\n# Güncel kabul\n\n```md\n# Örnek\n```\n<a id="stable-wire"></a>\n');
@@ -430,4 +430,12 @@ test('workspace and lock changes retain broad backend coverage and pinned frozen
  }
  const p=JSON.parse(fs.readFileSync('package.json'));assert.equal(p.packageManager,'pnpm@12.15.0');assert(!fs.existsSync('package-lock.json'));
  const turbo=JSON.parse(fs.readFileSync('turbo.json'));assert.equal(turbo.tasks['//#test:clean'].cache,false);assert.equal(turbo.tasks['//#verify'].cache,false);
+});
+
+test('only exact immutable moved snapshots retain their historical link context',()=>{
+ for(const file of ['reports/pilot-readiness.md','reports/pr45-main-integration.md']){
+  const text=fs.readFileSync(file,'utf8');assert(historicalSnapshot(file,text));assert.throws(()=>historicalSnapshot(file,text+'tampered'),/HISTORICAL_SNAPSHOT_DRIFT/);
+ }
+ assert.equal(historicalSnapshot('reports/unreviewed.md','[bad](missing.md)'),false);
+ assert.equal(checkDocuments(['reports/pilot-readiness.md','reports/pr45-main-integration.md']),0);
 });

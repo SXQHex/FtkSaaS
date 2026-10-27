@@ -89,6 +89,8 @@ SSoT her bilgiyi tek sahibinde tutmaktır; bütün bilgiyi tek dev dosyada topla
 
 | [reports/monorepo-preparation-20261027.md](../reports/monorepo-preparation-20261027.md) | Değiştirilmeyen tarihsel hazırlık/yerel doğrulama kanıtı; güncel statü değil |
 
+| [reports/monorepo-preparation-ci-fix-20261027.md](../reports/monorepo-preparation-ci-fix-20261027.md) | İlk hedefli CI hatası ve tarihsel snapshot bağlam düzeltmesi |
+
 ## Bakım
 
 Yeni yaşayan belge eklerken önce mevcut sahibinde bir bölümün yeterli olup olmadığını değerlendir. Dosya ekleme/silme/birleştirmede bu envanteri, kaynak indeksini ve inbound/outgoing anchor bağlantılarını aynı PR’da güncelle. Belge kontrolü silinen hedef ve bulunmayan başlıkları reddeder. Tarihsel rapor içeriklerine güncel statü ekleme; eski modül pending notları görev üretmez. Yalnız-belge CI istisnası bu haritadan otomatik türetilmez; ayrı incelenmiş tam yol listesine bağlıdır.
