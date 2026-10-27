@@ -53,15 +53,8 @@ ST-02 teslimi yukarıdaki aynı kaynak main/development zinciriyle kapandı. Son
 Backend `apps/backend`, normatif JSON `packages/api-contracts/schema`, yaşayan sözleşmeler `docs/contracts`, tarihsel snapshotlar `docs/history` altındadır. saaspt main `bec7e204e06a813e4907ff012d4bcea783472a15` kaynak incelemesi önceki teslimdedir; frontend aktarımı ve ekran/API kabulü frontend ekibinin ayrı WEB-01 işidir.
 
 [Kaynak indeksi](../source-index.md), [tek backlog](../remaining-work.md), [aktif sıra](../production-queue.md), [ortam devri](../monorepo.md).
-
-## Manuel tam test izni — 28 Ekim 2026
-
-Frontend PR66 normal merge ile main `321bf5b4f959291f1a2dc435518a343251bedf17` kaynağına alındı. Aynı SHA'nın [frontend checks40602061747](https://github.com/SXQHex/FtkSaaS/actions/runs/40602061747) koşusunda lint/typecheck/test/build ve dört tarayıcı başarılıdır. [Main clean40602061758](https://github.com/SXQHex/FtkSaaS/actions/runs/40602061758) `No source-bound full clean evidence for merged tree` hatasıyla kaynak aşamasında durdu; core/API testleri çalışmadı.
-
-Kullanıcı şimdilik full clean başlatılmasını ve yalnız bunun için hazırlanan manuel tetikleyicinin eklenmesini açıkça onayladı. Etiket yasağı korunur. Bu dar izin manuel workflow'un normal PR ile kurulmasını ve main SHA'sının mevcut izole core+dört API shard paketinde test edilmesini kapsar; backend runtime, aday/main kapıları veya CD değiştirilmez. [Manuel çalıştırma kuralı](../ci-policy.md#manuel-main-full-clean). Koşu tamamlanmadan yeni tam kabul ilan edilmez.
-
 ## Frontend geri alma adayı — 28 Ekim 2026
 
-Kullanıcı etiket yasağını kaldırdı ve PR66 frontend merge'inin geri alınmasına başlanmasını istedi. Hazırlık main `7334d24c9f1f5a54686125b890ce90c321b896e6` üzerinde ayrı geri alma dalındadır. PR66'nın ilk parent'ına göre ters yaması uygulanır; PR67 manuel test workflow'u korunur. Backend uygulama kaynağı PR66 öncesi `f52fdaf7b6d1ecec56a8cb75ffaf7272f45770cf` ile aynıdır; yalnız PR66 ile eklenmiş governance test uyarlaması geri alınır. Yeni full clean ve merge henüz kabul edilmedi.
+Kullanıcı etiket yasağını kaldırdı ve PR66 frontend merge'inin geri alınmasına başlanmasını istedi. Ardından manuel tetikleyicinin de gereksiz olduğunu belirtti; PR67'nin manuel workflow'u ve ona ait politika bölümü aynı adayda kaldırılır. Hazırlık main `7334d24c9f1f5a54686125b890ce90c321b896e6` üzerinde ayrı geri alma dalındadır. PR66'nın ilk parent'ına göre ters yaması uygulanır. Backend uygulama kaynağı PR66 öncesi `f52fdaf7b6d1ecec56a8cb75ffaf7272f45770cf` ile aynıdır; yalnız PR66 ile eklenmiş governance test uyarlaması geri alınır. Yeni full clean ve merge henüz kabul edilmedi.
 
 Geri alma sonrasında frontend aynı repo içinde ayrı PR ile yeniden uygulanır. Her adayda son head/base/tested merge üzerinde full clean başarıyla bitmeden merge yapılmaz; merge sonrası aynı main kabulü ayrıca doğrulanır. Eski başarısız koşular yeniden adlandırılmaz veya başarıya çevrilmez. Diğer repolar bağlam dışıdır; eski göç notları bu kararı değiştirmez.
