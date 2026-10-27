@@ -62,9 +62,3 @@ Frontend değişiklikleri feat/frontend-foundation aday dalındadır; yeni kayna
 Güncel main ile frontend dalının belge çakışmaları birleştirildi; ST-02 ve REPO-01 kapanışları korunur. Kullanıcı yalnız workspace kök sahiplik testinin skill dokümanlarını tanıması için dar izin verdi; bu değişiklik ve kalan CI ayrımı [backend CI devrinde](../frontend-backend-ci-handover.md) açıklanır. PR66 için kullanıcının son talimatı full clean veya başka etiket eklemeden yerel frontend testlerini çalıştırıp normal merge yapmaktır. Bu talimat backend CI/gate kaynağını değiştirme veya yeni hosted kabulü ilan etme yetkisi değildir.
 
 [Kaynak indeksi](../source-index.md), [tek backlog](../remaining-work.md), [aktif sıra](../production-queue.md), [ortam devri](../monorepo.md).
-
-## Manuel tam test izni — 28 Ekim 2026
-
-Frontend PR66 normal merge ile main `321bf5b4f959291f1a2dc435518a343251bedf17` kaynağına alındı. Aynı SHA'nın [frontend checks40602061747](https://github.com/SXQHex/FtkSaaS/actions/runs/40602061747) koşusunda lint/typecheck/test/build ve dört tarayıcı başarılıdır. [Main clean40602061758](https://github.com/SXQHex/FtkSaaS/actions/runs/40602061758) `No source-bound full clean evidence for merged tree` hatasıyla kaynak aşamasında durdu; core/API testleri çalışmadı.
-
-Kullanıcı şimdilik full clean başlatılmasını ve yalnız bunun için hazırlanan manuel tetikleyicinin eklenmesini açıkça onayladı. Etiket yasağı korunur. Bu dar izin manuel workflow'un normal PR ile kurulmasını ve main SHA'sının mevcut izole core+dört API shard paketinde test edilmesini kapsar; backend runtime, aday/main kapıları veya CD değiştirilmez. [Manuel çalıştırma kuralı](../ci-policy.md#manuel-main-full-clean). Koşu tamamlanmadan yeni tam kabul ilan edilmez.
