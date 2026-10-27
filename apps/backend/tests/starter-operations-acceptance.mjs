@@ -101,7 +101,12 @@ test('ST-02 Starter import, reports and transactional inbox',{timeout:300000},as
   });
   await t.test('transactional completion reaches only requester inbox; preferences, read versions and replay never create loops',async()=>{
    await must(owner,'settings_update_v1',{scope:'member',org_id:org,expected_version:0,patch:{in_app_reminders:false,in_app_marketing:false}},key());
+   const delivery=await rows("select j.id,j.notification_id,j.state,n.kind from core.outbox_jobs j join core.notifications n on n.org_id=j.org_id and n.id=j.notification_id where j.org_id=$1 and j.kind='in_app' and n.recipient_person_id=$2 and ((n.kind='report_build_v1' and n.subject_id=$3) or (n.kind='import_rows_process_v1' and n.subject_id=$4)) order by j.id",[org,ownerPerson,exportJob,importJob]);
+   assert(delivery.some(x=>x.kind==='report_build_v1'));assert(delivery.some(x=>x.kind==='import_rows_process_v1'));assert(delivery.every(x=>x.state==='pending'));
    await drain(p05,notificationsTick);
+   const delivered=await rows("select j.id,j.notification_id,j.state,p.operation,p.result,(select count(*)::int from core.operation_receipts r where r.org_id=j.org_id and r.operation='outbox_deliver_v1' and r.actor_fingerprint=$3 and r.key_hash=encode(extensions.digest(p.operation_key::text,'sha256'),'hex') and r.state='succeeded' and r.business_reference=j.notification_id and r.result=p.result) receipts from core.outbox_jobs j left join private.p05_jobs p on p.org_id=j.org_id and p.job_id=j.id where j.org_id=$1 and j.id=any($2::uuid[]) order by j.id",[org,delivery.map(x=>x.id),'worker:p05:'+roles[0]]);
+   assert.equal(delivered.length,delivery.length);
+   for(const job of delivered){assert.equal(job.state,'succeeded');assert.equal(job.operation,'outbox_deliver_v1');assert.equal(job.result?.ok,true);assert.equal(job.result.data.job_id,job.id);assert.deepEqual(job.result.data.result_reference,{type:'notifications',id:job.notification_id});assert.equal(job.receipts,1);}
    const list=()=>api('notifications_list_v1',{page:{limit:200},unread_only:false});
    const inbox=await list(),completion=inbox.items.find(x=>x.kind==='report_build_v1'&&x.payload.subject.id===exportJob);assert(completion);assert(inbox.items.some(x=>x.kind==='import_rows_process_v1'&&x.payload.subject.id===importJob));
    const other=await api('notifications_list_v1',{page:{limit:200},unread_only:false},student);assert(!other.items.some(x=>x.payload.subject.id===exportJob||x.payload.subject.id===importJob));

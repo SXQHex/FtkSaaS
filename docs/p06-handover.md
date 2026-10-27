@@ -16,6 +16,8 @@ Import açık teknik tenant konfigürasyonu ister; bu teslim default limit icat 
 
 İşin tamamlanma bildirimi yalnız isteği açan kişinin uygulama içi inbox’ına gider. Reminder/marketing tercihinin kapalı olması işlemsel bildirimi durdurmaz. Okundu ve tercih yazma yeni bildirim üretmez. Dedicated P05 worker bu işleri Starter'da teslim eder; F27 reminder ve F24 otomasyon açılmaz. Dış e-posta/SMS/provider veya frontend ekran kabulü bu teslim değildir.
 
+Inbox satırı tek başına worker teslim kanıtı değildir: Starter kabulü ilgili import/rapor tamamlanma outbox işinin pending→succeeded geçişini, aynı işin P05 sonucunu ve dedicated role/operation key/bildirim/result ile bağlı tek başarılı worker receipt'ini de denetler.
+
 Kaynak bağlı regresyon: `apps/backend/tests/starter-operations-acceptance.mjs`, mevcut registry suite üzerinden gerçek Auth→Storage→Edge→RPC ve dedicated P05/P06 LOGIN çalıştırır. Yeni suite/shard veya full clean kapsam değişikliği yoktur. Bu yeni tüketici kabulünün çalışma durumu [tek backlog](remaining-work.md), CI/main/development kabulü [00 devir](contracts/00-FtkSaaS-yeni-sohbet-devir.md) sahibindedir; kaynakta test bulunması testin geçtiği anlamına gelmez.
 
 ### ST-02 özellik izi
