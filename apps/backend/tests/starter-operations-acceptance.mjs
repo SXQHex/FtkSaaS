@@ -38,8 +38,8 @@ test('ST-02 Starter import, reports and transactional inbox',{timeout:300000},as
   const response=await fetch(new URL(f.upload_url,context().env.API_URL),{method:'PUT',headers:{apikey:context().env.ANON_KEY,'content-type':'text/csv'},body:csv});assert(response.ok,'Upload HTTP '+response.status);
   await api('file_upload_complete_v1',{file_id:f.file_id,checksum});return f;
  }
- async function previewFile(f,namespace,k=key()){
-  const b={file_id:f.file_id,mapping,source_namespace:namespace};const j=await api('import_preview_v1',b,owner,k);
+ async function previewFile(f,namespace,k=key(),selectedMapping=mapping){
+  const b={file_id:f.file_id,mapping:selectedMapping,source_namespace:namespace};const j=await api('import_preview_v1',b,owner,k);
   assert.equal((await api('import_preview_v1',b,owner,k)).job_id,j.job_id);
   await drain(p06,importTick);const status=await api('job_status_get_v1',{job_id:j.job_id});assert.equal(status.state,'succeeded');
   return {job:j.job_id,preview:await api('preview_get_v1',{preview_id:status.result_reference.id})};
@@ -87,6 +87,18 @@ test('ST-02 Starter import, reports and transactional inbox',{timeout:300000},as
    const repeat=await previewFile(uploaded,'st02-opening');assert.equal(repeat.preview.import_summary.replayed_rows,2);await api('import_apply_v1',{preview:token(repeat.preview)});await drain(p06,importTick);
    assert.equal((await rows('select count(*)::int n from core.sales where org_id=$1',[org]))[0].n,1);
    assert.equal((await rows('select sum(amount_minor)::text n from core.debts where org_id=$1',[org]))[0].n,'300');
+  });
+  await t.test('Starter CSV delimiter selection is explicit, typed and consumed before preview/apply',async()=>{
+   const f=await upload('id;name;ref\r\nsemicolon;"Synthetic; comma, member";'+studentPerson+'\r\n');
+   const selected={delimiter:';',columns:[{source_column:'id',target:'source_key'},{source_column:'name',target:'display_name'},{source_column:'ref',target:'person_ref'}]};
+   const {delimiter,...withoutSelection}=selected;
+   await denied('import_preview_v1',{file_id:f.file_id,mapping:withoutSelection,source_namespace:'st03-delimiter'},'VALIDATION_FAILED');
+   const before=await rows('select (select count(*) from core.people where org_id=$1)::int people,(select count(*) from core.sales where org_id=$1)::int sales,(select count(*) from core.debts where org_id=$1)::int debts',[org]);
+   const next=await previewFile(f,'st03-delimiter',key(),selected);assert.equal(next.preview.import_summary.valid_rows,1);assert.equal(next.preview.import_summary.new_people,0);
+   assert.equal((await rows('select mapping from core.import_jobs where id=$1',[next.job]))[0].mapping.delimiter,';');
+   await api('import_apply_v1',{preview:token(next.preview)});await drain(p06,importTick);
+   const result=await api('import_rows_list_v1',{job_id:next.job,page:{}});assert.equal(result.items[0].state,'applied');assert.deepEqual(result.items[0].created_references,[{type:'people',id:studentPerson}]);
+   assert.deepEqual(await rows('select (select count(*) from core.people where org_id=$1)::int people,(select count(*) from core.sales where org_id=$1)::int sales,(select count(*) from core.debts where org_id=$1)::int debts',[org]),before);
   });
   await t.test('Starter report totals survive pagination and authenticated export; files cannot cross account or expiry',async()=>{
    const b={report:'collections_debts',filters:filters(),page:{limit:1}};const report=await api('report_get_v1',b);assert.equal(report.rows.items.length,1);assert(report.rows.next_cursor);assert.equal(report.totals.find(x=>x.group_key==='outstanding_debt').amount_minor,'300');

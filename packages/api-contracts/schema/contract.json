@@ -1308,7 +1308,6 @@
       "required": [
         "weekdays",
         "local_start",
-        "duration_minutes",
         "starts_on",
         "ends_on",
         "assignments",
@@ -2297,6 +2296,13 @@
           "items": {
             "$ref": "#/$defs/ImportColumn"
           }
+        },
+        "delimiter": {
+          "type": "string",
+          "enum": [
+            ",",
+            ";"
+          ]
         }
       },
       "required": [
@@ -3673,6 +3679,12 @@
         },
         "capacity": {
           "$ref": "#/$defs/SessionCapacityView"
+        },
+        "shared_participants": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/SharedLessonParticipant"
+          }
         }
       },
       "required": [
@@ -42709,6 +42721,11 @@
               "type": "null"
             }
           ]
+        },
+        "program_duration_minutes": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 2147483647
         }
       },
       "required": [],
@@ -42766,6 +42783,11 @@
               "type": "null"
             }
           ]
+        },
+        "program_duration_minutes": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 2147483647
         }
       },
       "required": [],
@@ -42879,6 +42901,7 @@
               "phone_visible",
               "photo_visible",
               "profile_visible",
+              "program_duration_minutes",
               "remember_context",
               "show_weekends",
               "startup_context",
@@ -42894,6 +42917,26 @@
           },
           "uniqueItems": true,
           "maxItems": 50
+        },
+        "program_duration_source": {
+          "type": "object",
+          "properties": {
+            "kind": {
+              "type": "string",
+              "enum": [
+                "system_default",
+                "organization_copy",
+                "center_local"
+              ]
+            },
+            "organization_version": {
+              "$ref": "#/$defs/SettingsVersion"
+            }
+          },
+          "required": [
+            "kind"
+          ],
+          "additionalProperties": false
         }
       },
       "required": [
@@ -43027,11 +43070,32 @@
                   "description",
                   "address",
                   "contact_phone",
-                  "contact_email"
+                  "contact_email",
+                  "program_duration_minutes"
                 ]
               },
               "uniqueItems": true,
               "maxItems": 50
+            },
+            "program_duration_source": {
+              "type": "object",
+              "properties": {
+                "kind": {
+                  "type": "string",
+                  "enum": [
+                    "system_default",
+                    "organization_copy",
+                    "center_local"
+                  ]
+                },
+                "organization_version": {
+                  "$ref": "#/$defs/SettingsVersion"
+                }
+              },
+              "required": [
+                "kind"
+              ],
+              "additionalProperties": false
             }
           },
           "required": [
@@ -43071,7 +43135,8 @@
                   "font_package_id",
                   "billing_name",
                   "billing_address",
-                  "billing_email"
+                  "billing_email",
+                  "program_duration_minutes"
                 ]
               },
               "uniqueItems": true,
@@ -43164,6 +43229,7 @@
           "phone_visible",
           "photo_visible",
           "profile_visible",
+          "program_duration_minutes",
           "remember_context",
           "show_weekends",
           "startup_context",
@@ -43389,6 +43455,7 @@
             "phone_visible",
             "photo_visible",
             "profile_visible",
+            "program_duration_minutes",
             "remember_context",
             "show_weekends",
             "startup_context",
@@ -43410,7 +43477,9 @@
           "type": "string",
           "enum": [
             "frontend",
-            "p05_optional_allowed"
+            "p05_optional_allowed",
+            "new_center_copy",
+            "schedule_build_program"
           ]
         },
         "writable": {
@@ -43432,7 +43501,7 @@
           "$ref": "#/$defs/SettingsScope"
         },
         "catalog_version": {
-          "const": 2
+          "const": 3
         },
         "fields": {
           "type": "array",
@@ -43491,7 +43560,7 @@
               "const": "user"
             },
             "catalog_version": {
-              "const": 2
+              "const": 3
             },
             "fields": {
               "type": "array",
@@ -43534,7 +43603,7 @@
               "const": "member"
             },
             "catalog_version": {
-              "const": 2
+              "const": 3
             },
             "fields": {
               "type": "array",
@@ -43577,7 +43646,7 @@
               "const": "center"
             },
             "catalog_version": {
-              "const": 2
+              "const": 3
             },
             "fields": {
               "type": "array",
@@ -43620,7 +43689,7 @@
               "const": "organization"
             },
             "catalog_version": {
-              "const": 2
+              "const": 3
             },
             "fields": {
               "type": "array",
@@ -43663,7 +43732,7 @@
               "const": "platform"
             },
             "catalog_version": {
-              "const": 2
+              "const": 3
             },
             "fields": {
               "type": "array",
@@ -44459,7 +44528,8 @@
                   "description",
                   "address",
                   "contact_phone",
-                  "contact_email"
+                  "contact_email",
+                  "program_duration_minutes"
                 ]
               },
               "minItems": 1,
@@ -44505,7 +44575,8 @@
                   "font_package_id",
                   "billing_name",
                   "billing_address",
-                  "billing_email"
+                  "billing_email",
+                  "program_duration_minutes"
                 ]
               },
               "minItems": 1,
@@ -46163,6 +46234,29 @@
         "scope"
       ],
       "additionalProperties": false
+    },
+    "SharedLessonParticipant": {
+      "type": "object",
+      "properties": {
+        "person_id": {
+          "$ref": "#/$defs/FtkUuid"
+        },
+        "display_name": {
+          "type": "string"
+        },
+        "email": {
+          "type": "string",
+          "format": "email"
+        },
+        "phone": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "person_id"
+      ],
+      "additionalProperties": false,
+      "x-invariant": "Live FD05 opt-in; same active reservation in future/ongoing lesson only. No legal names, pending contacts, other members or financial fields."
     }
   },
   "x-contract": {
@@ -88178,6 +88272,12 @@
       },
       {
         "path": "#/$defs/StarterScopeSelection/properties/center_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/SharedLessonParticipant/properties/person_id",
         "origin": "ftksaas",
         "acceptance": "generic_uuid",
         "generation": "uuidv7"

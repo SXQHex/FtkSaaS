@@ -130,7 +130,7 @@ assert next(Path('supabase/migrations').glob('*_frontend_settings.sql')).read_te
 
 settings_fields=json.loads(Path('config/frontend-settings.json').read_text())['fields']
 settings_catalog="begin;\ncreate or replace function private.frontend_settings_fields() returns jsonb language sql immutable security invoker set search_path='' as $fields$select '"+json.dumps(settings_fields,ensure_ascii=False,separators=(',',':')).replace("'","''")+"'::jsonb$fields$;\n"
-assert Path('database/user-settings-catalog.sql').read_text()==settings_catalog,'Frontend field catalog SQL drift'
+assert Path('database/starter-settings-catalog.sql').read_text()==settings_catalog+'commit;\n','Frontend field catalog SQL drift'
 settings_contract=json.loads(Path('../../packages/api-contracts/schema/contract.json').read_text())
 for scope in ['user','member','center','organization','platform']:
  assert settings_contract['$defs'][scope.title()+'SettingsValues']['properties']=={f['key']:f['schema'] for f in settings_fields if f['scope']==scope},'Frontend field DTO drift: '+scope
@@ -161,3 +161,9 @@ assert next(Path('supabase/migrations').glob('*_starter_plan_gates.sql')).read_t
 assert next(Path('supabase/migrations').glob('*_starter_studio_product_names.sql')).read_text()==Path('database/starter-studio-product-names.sql').read_text(),'Starter studio name snapshot source drift'
 
 assert next(Path("supabase/migrations").glob("*_starter_onboarding_defaults.sql")).read_text()==Path("database/starter-onboarding-defaults.sql").read_text(),"Starter onboarding source drift"
+
+assert next(Path('supabase/migrations').glob('*_starter_preparation_settings.sql')).read_text()==Path('database/starter-settings-catalog.sql').read_text()+Path('database/starter-preparation-settings.sql').read_text(),'Starter preparation source drift'
+
+assert next(Path('supabase/migrations').glob('*_starter_peer_sharing.sql')).read_text()==Path('database/starter-peer-sharing.sql').read_text(),'Starter peer sharing source drift'
+
+assert next(Path('supabase/migrations').glob('*_canonical_settings_scope.sql')).read_text()==Path('database/canonical-settings-scope.sql').read_text(),'Canonical settings scope source drift'

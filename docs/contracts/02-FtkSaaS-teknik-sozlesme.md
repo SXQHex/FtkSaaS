@@ -1125,6 +1125,8 @@ Teknik süre/rate backend işidir. Dış e-posta teslimi ertelenmiş kalır; ür
 
 ##### FD06 — iş takvimi program rezervasyon (kabul edildi)
 
+ST-03 teknik eşleme adayı: organization/center `program_duration_minutes` kapalı integer önerisi sistem60'tır. Yeni merkez o anki org önerisini ve sürümünü kopyalar; mevcut merkez/programlar taşınmaz. Açık yerel seçim eşit değerde de yereldir. `SettingsView.program_duration_source` kaynak bilgisidir, yazılamaz. `ProgramSpec.duration_minutes` gönderilmezse merkezin hazırlık değeri preview spec'ine açık olarak alınır; gönderilirse açık değer üstündür. Sonraki ayar değişimi preview/program snapshot'ını değiştirmez. Seçili reset org şablonuna değil sistem60'a döner. Yetki/sürüm/replay mevcut settings ve program komutlarında korunur.
+
 | Alan | Kabul edilen seçenek/default |
 |---|---|
 | Yeni merkez timezone'u | Europe/Istanbul önerisi; oluştururken açık onay/değişiklik. User görüntüleme timezone'u ayrı. |
@@ -1173,6 +1175,8 @@ Teknik süre/rate backend işidir. Dış e-posta teslimi ertelenmiş kalır; ür
 Web/reklam ortak CRM entegrasyonu üretim P08'dir; yukarıdaki kabul mevcut public_application_submit DTO'sunun telefonla çalıştığı anlamına gelmez.
 
 ##### FD10 — iş otomasyonu rapor import (kabul edildi)
+
+ST-03 teknik eşleme adayı: `ImportMapping.delimiter` opsiyonel kapalı virgül/noktalı virgül seçimidir; yokluğu eski virgül davranışını korur. Seçim tahmin edilmez, eşlemenin parçası olarak preview/bağımlılık/receipt istek hash'ine girer. Quoted separator, escaped quote, CRLF ve quoted newline aynı parser kurallarını kullanır; hatalı yapı/eşleme reddedilir. Hak/borç veya kişi birleştirme defaultu üretmez. Kaynak/native kabulü [alan devrinden](../frontend-settings-handover.md#st-03--starter-tüketici-kapsamı) izlenir.
 
 | Alan | Kabul edilen seçenek/default |
 |---|---|

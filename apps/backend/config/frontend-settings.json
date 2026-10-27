@@ -1,5 +1,5 @@
 {
-  "version": 2,
+  "version": 3,
   "fields": [
     {
       "scope": "user",
@@ -626,6 +626,30 @@
       "default": null,
       "group": "S09",
       "consumer": "frontend"
+    },
+    {
+      "scope": "organization",
+      "key": "program_duration_minutes",
+      "schema": {
+        "type": "integer",
+        "minimum": 1,
+        "maximum": 2147483647
+      },
+      "default": 60,
+      "group": "O18",
+      "consumer": "new_center_copy"
+    },
+    {
+      "scope": "center",
+      "key": "program_duration_minutes",
+      "schema": {
+        "type": "integer",
+        "minimum": 1,
+        "maximum": 2147483647
+      },
+      "default": 60,
+      "group": "M06",
+      "consumer": "schedule_build_program"
     }
   ]
 }

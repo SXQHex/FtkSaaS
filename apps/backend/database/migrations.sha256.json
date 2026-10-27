@@ -66,5 +66,8 @@
   "20261026003615_account_identity_projection.sql": "a04d73dca3c04b224c287447fd1f6639604a5a4c9caa76571b7348f271c9fe21",
   "20261026195138_starter_plan_gates.sql": "da64572fe7650184694399f383eb454dd0b0bf1d5e481fc8d731c2ded62b4d85",
   "20261027013809_starter_studio_product_names.sql": "8692bf7f654faf9574f695af4ffe5c1384e48c29a538d2deaddaeca98528bc2d",
-  "20261027103358_starter_onboarding_defaults.sql": "9c5f3b1e09029ba88ca5b99c4532c74408b4fdff4d1b00ee5211e6c9237fbfe9"
+  "20261027103358_starter_onboarding_defaults.sql": "9c5f3b1e09029ba88ca5b99c4532c74408b4fdff4d1b00ee5211e6c9237fbfe9",
+  "20261027212401_starter_preparation_settings.sql": "23c96715b03702431e22d12d9aa0846b649161fa8ae74f0a8feffba9b87d1fd8",
+  "20261027213629_starter_peer_sharing.sql": "cb8aa9ab50ec5ca748aa5c2a7466052052ca9671e7726dd78702104ab4f3cd90",
+  "20261027214545_canonical_settings_scope.sql": "b61f1241d9c5fad01c7d0884137f905cba9f74e9fd2b05a7af6ace80426a405e"
 }

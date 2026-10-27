@@ -3,7 +3,9 @@ type Column={source_column:string;target:string};
 const targets=new Set(['display_name','email','phone','source_key','person_ref','opening_credits','opening_debt_minor','opening_credit_value_minor','currency','product_version_ref','start_date','end_date']);
 // Strict RFC4180, including escaped quotes and quoted line breaks. Headers are
 // exact, unique names; malformed structure fails the file, typed values fail a row.
-export function parseImportCsv(text:string,mapping:{columns:Column[]},maxRows:number){
+export function parseImportCsv(text:string,mapping:{columns:Column[];delimiter?:','|';'},maxRows:number){
+ const delimiter=mapping.delimiter===undefined?',':mapping.delimiter;
+ if(delimiter!==','&&delimiter!==';')throw Error('VALIDATION_FAILED');
  if(!Number.isSafeInteger(maxRows)||maxRows<1||maxRows>5000||text.includes('\0'))throw Error('VALIDATION_FAILED');
  text=text.replace(/^\uFEFF/,'');let cell='',line:string[]=[],lines:string[][]=[],quoted=false,closed=false;
  const field=()=>{line.push(cell);cell='';closed=false;if(line.length>100)throw Error('VALIDATION_FAILED');};
@@ -11,7 +13,7 @@ export function parseImportCsv(text:string,mapping:{columns:Column[]},maxRows:nu
  for(let i=0;i<text.length;i++){
   const ch=text[i];
   if(quoted){if(ch==='"'){if(text[i+1]==='"'){cell+='"';i++;}else{quoted=false;closed=true;}}else cell+=ch;continue;}
-  if(ch===','){field();continue;}
+  if(ch===delimiter){field();continue;}
   if(ch==='\r'||ch==='\n'){if(ch==='\r'&&text[i+1]==='\n')i++;row();continue;}
   if(ch==='"'&&!cell&&!closed){quoted=true;continue;}
   if(ch==='"'||closed)throw Error('VALIDATION_FAILED');cell+=ch;

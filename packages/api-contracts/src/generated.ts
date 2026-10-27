@@ -1121,7 +1121,11 @@ as_of: Instant
 /**
  * @maxItems 50
  */
-overridden_fields: ("ad_measurement" | "ad_personalization" | "address" | "application_name" | "billing_address" | "billing_email" | "billing_name" | "calendar_view" | "contact_email" | "contact_phone" | "contrast" | "date_format" | "description" | "email_visible" | "font_package_id" | "font_scale" | "history_recommendations" | "honorific" | "in_app_marketing" | "in_app_reminders" | "interest_center_ids" | "interest_discipline_ids" | "language" | "maintenance_message" | "marketing_in_app" | "motion" | "number_format" | "optional_analytics" | "phone_visible" | "photo_visible" | "profile_visible" | "remember_context" | "show_weekends" | "startup_context" | "support_email" | "support_url" | "theme" | "theme_package_id" | "time_format" | "timezone_mode" | "timezone_name" | "week_start")[]
+overridden_fields: ("ad_measurement" | "ad_personalization" | "address" | "application_name" | "billing_address" | "billing_email" | "billing_name" | "calendar_view" | "contact_email" | "contact_phone" | "contrast" | "date_format" | "description" | "email_visible" | "font_package_id" | "font_scale" | "history_recommendations" | "honorific" | "in_app_marketing" | "in_app_reminders" | "interest_center_ids" | "interest_discipline_ids" | "language" | "maintenance_message" | "marketing_in_app" | "motion" | "number_format" | "optional_analytics" | "phone_visible" | "photo_visible" | "profile_visible" | "program_duration_minutes" | "remember_context" | "show_weekends" | "startup_context" | "support_email" | "support_url" | "theme" | "theme_package_id" | "time_format" | "timezone_mode" | "timezone_name" | "week_start")[]
+program_duration_source?: {
+kind: ("system_default" | "organization_copy" | "center_local")
+organization_version?: SettingsVersion
+}
 } & SettingsView1)
 export type SettingsView1 = ({
 scope: "user"
@@ -1149,7 +1153,11 @@ as_of: Instant
 /**
  * @maxItems 50
  */
-overridden_fields: ("description" | "address" | "contact_phone" | "contact_email")[]
+overridden_fields: ("description" | "address" | "contact_phone" | "contact_email" | "program_duration_minutes")[]
+program_duration_source?: {
+kind: ("system_default" | "organization_copy" | "center_local")
+organization_version?: SettingsVersion
+}
 } | {
 scope: "organization"
 version: SettingsVersion
@@ -1158,7 +1166,7 @@ as_of: Instant
 /**
  * @maxItems 50
  */
-overridden_fields: ("description" | "address" | "contact_phone" | "contact_email" | "theme_package_id" | "font_package_id" | "billing_name" | "billing_address" | "billing_email")[]
+overridden_fields: ("description" | "address" | "contact_phone" | "contact_email" | "theme_package_id" | "font_package_id" | "billing_name" | "billing_address" | "billing_email" | "program_duration_minutes")[]
 } | {
 scope: "platform"
 version: SettingsVersion
@@ -1176,14 +1184,14 @@ overridden_fields: ("application_name" | "support_email" | "support_url" | "main
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
  * via the `definition` "SettingsFieldKeys".
  */
-export type SettingsFieldKeys = [("ad_measurement" | "ad_personalization" | "address" | "application_name" | "billing_address" | "billing_email" | "billing_name" | "calendar_view" | "contact_email" | "contact_phone" | "contrast" | "date_format" | "description" | "email_visible" | "font_package_id" | "font_scale" | "history_recommendations" | "honorific" | "in_app_marketing" | "in_app_reminders" | "interest_center_ids" | "interest_discipline_ids" | "language" | "maintenance_message" | "marketing_in_app" | "motion" | "number_format" | "optional_analytics" | "phone_visible" | "photo_visible" | "profile_visible" | "remember_context" | "show_weekends" | "startup_context" | "support_email" | "support_url" | "theme" | "theme_package_id" | "time_format" | "timezone_mode" | "timezone_name" | "week_start"), ...(("ad_measurement" | "ad_personalization" | "address" | "application_name" | "billing_address" | "billing_email" | "billing_name" | "calendar_view" | "contact_email" | "contact_phone" | "contrast" | "date_format" | "description" | "email_visible" | "font_package_id" | "font_scale" | "history_recommendations" | "honorific" | "in_app_marketing" | "in_app_reminders" | "interest_center_ids" | "interest_discipline_ids" | "language" | "maintenance_message" | "marketing_in_app" | "motion" | "number_format" | "optional_analytics" | "phone_visible" | "photo_visible" | "profile_visible" | "remember_context" | "show_weekends" | "startup_context" | "support_email" | "support_url" | "theme" | "theme_package_id" | "time_format" | "timezone_mode" | "timezone_name" | "week_start"))[]]
+export type SettingsFieldKeys = [("ad_measurement" | "ad_personalization" | "address" | "application_name" | "billing_address" | "billing_email" | "billing_name" | "calendar_view" | "contact_email" | "contact_phone" | "contrast" | "date_format" | "description" | "email_visible" | "font_package_id" | "font_scale" | "history_recommendations" | "honorific" | "in_app_marketing" | "in_app_reminders" | "interest_center_ids" | "interest_discipline_ids" | "language" | "maintenance_message" | "marketing_in_app" | "motion" | "number_format" | "optional_analytics" | "phone_visible" | "photo_visible" | "profile_visible" | "program_duration_minutes" | "remember_context" | "show_weekends" | "startup_context" | "support_email" | "support_url" | "theme" | "theme_package_id" | "time_format" | "timezone_mode" | "timezone_name" | "week_start"), ...(("ad_measurement" | "ad_personalization" | "address" | "application_name" | "billing_address" | "billing_email" | "billing_name" | "calendar_view" | "contact_email" | "contact_phone" | "contrast" | "date_format" | "description" | "email_visible" | "font_package_id" | "font_scale" | "history_recommendations" | "honorific" | "in_app_marketing" | "in_app_reminders" | "interest_center_ids" | "interest_discipline_ids" | "language" | "maintenance_message" | "marketing_in_app" | "motion" | "number_format" | "optional_analytics" | "phone_visible" | "photo_visible" | "profile_visible" | "program_duration_minutes" | "remember_context" | "show_weekends" | "startup_context" | "support_email" | "support_url" | "theme" | "theme_package_id" | "time_format" | "timezone_mode" | "timezone_name" | "week_start"))[]]
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
  * via the `definition` "SettingsCatalog".
  */
 export type SettingsCatalog = ({
 scope: SettingsScope
-catalog_version: 2
+catalog_version: 3
 fields: SettingsFieldDescriptor[]
 defaults: (UserSettingsValues | MemberSettingsValues | CenterSettingsValues | OrganizationSettingsValues | PlatformSettingsValues)
 /**
@@ -1194,7 +1202,7 @@ limitations: string[]
 } & SettingsCatalog1)
 export type SettingsCatalog1 = ({
 scope: "user"
-catalog_version: 2
+catalog_version: 3
 fields: SettingsFieldDescriptor[]
 defaults: UserSettingsValues
 /**
@@ -1204,7 +1212,7 @@ brand_packages: []
 limitations: string[]
 } | {
 scope: "member"
-catalog_version: 2
+catalog_version: 3
 fields: SettingsFieldDescriptor[]
 defaults: MemberSettingsValues
 /**
@@ -1214,7 +1222,7 @@ brand_packages: []
 limitations: string[]
 } | {
 scope: "center"
-catalog_version: 2
+catalog_version: 3
 fields: SettingsFieldDescriptor[]
 defaults: CenterSettingsValues
 /**
@@ -1224,7 +1232,7 @@ brand_packages: []
 limitations: string[]
 } | {
 scope: "organization"
-catalog_version: 2
+catalog_version: 3
 fields: SettingsFieldDescriptor[]
 defaults: OrganizationSettingsValues
 /**
@@ -1234,7 +1242,7 @@ brand_packages: []
 limitations: string[]
 } | {
 scope: "platform"
-catalog_version: 2
+catalog_version: 3
 fields: SettingsFieldDescriptor[]
 defaults: PlatformSettingsValues
 /**
@@ -1569,7 +1577,7 @@ center_id: string
  * @minItems 1
  * @maxItems 50
  */
-fields: [("description" | "address" | "contact_phone" | "contact_email"), ...(("description" | "address" | "contact_phone" | "contact_email"))[]]
+fields: [("description" | "address" | "contact_phone" | "contact_email" | "program_duration_minutes"), ...(("description" | "address" | "contact_phone" | "contact_email" | "program_duration_minutes"))[]]
 } | {
 client_api_version: 1
 /**
@@ -1585,7 +1593,7 @@ org_id: string
  * @minItems 1
  * @maxItems 50
  */
-fields: [("description" | "address" | "contact_phone" | "contact_email" | "theme_package_id" | "font_package_id" | "billing_name" | "billing_address" | "billing_email"), ...(("description" | "address" | "contact_phone" | "contact_email" | "theme_package_id" | "font_package_id" | "billing_name" | "billing_address" | "billing_email"))[]]
+fields: [("description" | "address" | "contact_phone" | "contact_email" | "theme_package_id" | "font_package_id" | "billing_name" | "billing_address" | "billing_email" | "program_duration_minutes"), ...(("description" | "address" | "contact_phone" | "contact_email" | "theme_package_id" | "font_package_id" | "billing_name" | "billing_address" | "billing_email" | "program_duration_minutes"))[]]
 } | {
 client_api_version: 1
 /**
@@ -3049,6 +3057,7 @@ GoogleLinkAuthorization?: GoogleLinkAuthorization
 Success_account_google_link_prepare?: SuccessAccountGoogleLinkPrepare
 StarterRetainedScope?: StarterRetainedScope
 StarterScopeSelection?: StarterScopeSelection
+SharedLessonParticipant?: SharedLessonParticipant
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -3175,7 +3184,7 @@ export interface ProgramSpec {
  */
 weekdays: [number, ...(number)[]]
 local_start: LocalTime
-duration_minutes: PositiveInt
+duration_minutes?: PositiveInt
 starts_on: Date
 ends_on: Date
 room_id?: (string | null)
@@ -3568,6 +3577,7 @@ target: ImportTarget
  */
 export interface ImportMapping {
 columns: ImportColumn[]
+delimiter?: ("," | ";")
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -5645,6 +5655,20 @@ discipline_id: string
 class_assignments?: ClassAssignmentView[]
 class_version?: PositiveInt
 capacity: SessionCapacityView
+shared_participants?: SharedLessonParticipant[]
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "SharedLessonParticipant".
+ */
+export interface SharedLessonParticipant {
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+person_id: string
+display_name?: string
+email?: string
+phone?: string
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -21127,6 +21151,7 @@ description?: string
 address?: string
 contact_phone?: string
 contact_email?: (string | null)
+program_duration_minutes?: number
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -21142,6 +21167,7 @@ font_package_id?: null
 billing_name?: string
 billing_address?: string
 billing_email?: (string | null)
+program_duration_minutes?: number
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -21205,9 +21231,9 @@ as_of: Instant
  * via the `definition` "SettingsFieldDescriptor".
  */
 export interface SettingsFieldDescriptor {
-key: ("ad_measurement" | "ad_personalization" | "address" | "application_name" | "billing_address" | "billing_email" | "billing_name" | "calendar_view" | "contact_email" | "contact_phone" | "contrast" | "date_format" | "description" | "email_visible" | "font_package_id" | "font_scale" | "history_recommendations" | "honorific" | "in_app_marketing" | "in_app_reminders" | "interest_center_ids" | "interest_discipline_ids" | "language" | "maintenance_message" | "marketing_in_app" | "motion" | "number_format" | "optional_analytics" | "phone_visible" | "photo_visible" | "profile_visible" | "remember_context" | "show_weekends" | "startup_context" | "support_email" | "support_url" | "theme" | "theme_package_id" | "time_format" | "timezone_mode" | "timezone_name" | "week_start")
+key: ("ad_measurement" | "ad_personalization" | "address" | "application_name" | "billing_address" | "billing_email" | "billing_name" | "calendar_view" | "contact_email" | "contact_phone" | "contrast" | "date_format" | "description" | "email_visible" | "font_package_id" | "font_scale" | "history_recommendations" | "honorific" | "in_app_marketing" | "in_app_reminders" | "interest_center_ids" | "interest_discipline_ids" | "language" | "maintenance_message" | "marketing_in_app" | "motion" | "number_format" | "optional_analytics" | "phone_visible" | "photo_visible" | "profile_visible" | "program_duration_minutes" | "remember_context" | "show_weekends" | "startup_context" | "support_email" | "support_url" | "theme" | "theme_package_id" | "time_format" | "timezone_mode" | "timezone_name" | "week_start")
 group: string
-consumer: ("frontend" | "p05_optional_allowed")
+consumer: ("frontend" | "p05_optional_allowed" | "new_center_copy" | "schedule_build_program")
 writable: boolean
 }
 /**

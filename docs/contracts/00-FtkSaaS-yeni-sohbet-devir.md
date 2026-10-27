@@ -12,6 +12,14 @@ ST-02 kapandı: Starter gerçek CSV→preview→apply→hak/borç→tahsilat→s
 
 Development kabulü production kabulü değildir. Frontend/public sağlayıcı, ST-03/OPS-01/REL-01 bu kapanıştan türetilmez. Sonraki sıra başlatılmadı. İptal edilmiş hedefli koşular başarı sayılmaz; son kaynak bağlı aday/main full clean esas alınır.
 
+## ST-03 çalışma başlangıcı
+
+Kullanıcının CI sonrası yeni işi Starter'da izinli bütün FD01–FD12 ayar tüketicileridir; marka/medya, kişisel takvim ve paylaşım kapsam dışına çıkarılmaz. Başlangıç main `f52fdaf7b6d1ecec56a8cb75ffaf7272f45770cf`, tree `ca0c4ca8e34ba5d489c47ddcf5792ef1bd62e203`. Aynı SHA'nın [belge CI40584796701](https://github.com/SXQHex/FtkSaaS/actions/runs/40584796701) ve [CD40584930534](https://github.com/SXQHex/FtkSaaS/actions/runs/40584930534) completed/success olduğu doğrulandı; belge yolunda full clean çalışmadı. Runtime kabulü yukarıdaki ST-02 kaynağına aittir.
+
+Aktif adayın ilk tüketicileri program süresinin orgdan yeni merkeze bir kez kopyalanması, preview snapshot'ında kullanılması, CSV ayırıcı seçimi ve katılımcı görünürlüğünün gerçek session okumasıdır. Kaynak/yerel/native test, PR/bağımsız inceleme/CI ve main/development kabulü ayrı ilerler. ST-03 tamamlandı veya dağıtıldı sayılmaz. Kapsam ve kalan davranışlar [ayar devrinde](../frontend-settings-handover.md#st-03--starter-tüketici-kapsamı), açık iş ve sıra kendi tek kaynaklarındadır.
+
+İlk ara adayın Vercel izole native testinde hazırlık/provenance/preview/reset/katılımcı/replay7/7 geçti. Birleşik test21/28 kaldı: ST-02 zincirinin ilk hatası job_status_get boş HTTP503; ona bağımlı fixture assertionları da başarısız oldu, bu koşu başarı sayılmaz. Aynı sırada runtime üretimi yapıldığı için sabit kaynakta regresyon yeniden koşmalıdır. VM13dk timeout sonunda kapandı. Bağımsız incelemenin yakaladığı UUID harf büyüklüğü P1'i için yeni kanonik scope göçü ve mixed-case testleri; telefon consumer'ı için native sentetik doğrulanmış telefon assertionları eklendi. Bunlar7/7 kaynağından sonradır; yeni native/CI kanıtı bekler. Uygulanmış69/70 migration değiştirilmedi, düzeltme71'e eklendi.
+
 ## Önceki domain/hosted tabanı — PR61
 
 | Alan | Doğrulanmış kaynak |

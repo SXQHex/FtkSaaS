@@ -6,6 +6,31 @@ Güncel kabul/hosted durum [00 devirde](contracts/00-FtkSaaS-yeni-sohbet-devir.m
 
 ## İşlemler
 
+### ST-03 — Starter tüketici kapsamı
+
+Kullanıcı Starter'da izinli FD01–FD12 alanlarının tamamını seçti; marka/medya, kişisel takvim ve paylaşım bu kapsamdan çıkarılmaz. Pro/Business'a kapalı F12/F17/F20–F24/F27/F29 yolları bu teslimle açılmaz. Backend davranışı, hazır istemci tüketimi ve gerçek sağlayıcı/ekran kabulü ayrı kanıtlardır. Aşağıdaki eşleme desteklenmeyen alanları kaydedilmiş gibi göstermez; açık kabulün sahibi [tek backlog](remaining-work.md) ve [00 devir](contracts/00-FtkSaaS-yeni-sohbet-devir.md) olarak kalır.
+
+| FD | Starter tüketicisi ve mevcut sınır |
+|---|---|
+| FD01 | Dil/format/timezone/tema/ölçek alanları typed; gerçek görüntüleme ve cihaz çözümü istemci kabulüdür, iş timezone'u değişmez. |
+| FD02 | Sistem marka fallback'i mevcut; somut renk/font kataloğu, logo yükleme/okuma/kaldırma ve public projeksiyon tamamlanmalı. Frontend'in hazırlamadığı marka assetleri uydurulmaz. |
+| FD03 | Native Auth, Google/TOTP/session/kimlik zinciri kabul edildi; fotoğraf/medya tüketicisi ve izinli profil paylaşımı ayrı doğrulanmalı. |
+| FD04 | in_app amaç tercihleri ve zorunlu teslim mevcut; typed olay/zaman/sessiz saat/özet eşlemesi tamamlanmalı. Starter'a F27 hatırlatma veya dış kanal açılmaz. |
+| FD05 | Görünürlük/iletişim/ilgi tercihleri saklanıyor; kesin gelecek/devam eden ortak ders kitlesinde gerçek read tüketicisi ve kişisel takvim bağlantısı tamamlanmalı. |
+| FD06 | İş timezone/availability/pencereler mevcut domain API'lerinde. Program süresi için aşağıdaki kopya/önizleme tüketicisi adaydır; saat adımı ve liste/görünüm cihaz/istemci tarafında tüketilir. |
+| FD07 | Yeni Starter'ın üç politikası ve plan kapıları kabul edildi; paket/tahsilat hazırlık şablonu, ödeme yöntemi/reference ve ayar tüketicisi eşlemesi tamamlanmalı. |
+| FD08 | Belge/yayın/etki/onay mevcut domain zincirinde; medya ve açık public alan seçimi ayrıca tamamlanmalı. |
+| FD09 | Genel CRM Starter'a kapalı; dar ders başvurusu korunur. P08 telefon/ortak form kapsamı buraya taşınmaz. |
+| FD10 | Rapor/import motoru ST-02 ile kabul edildi. Bu adayda ImportMapping.delimiter virgül/noktalı virgül seçimini gerçek parser'a bağlar; şablon saklama/paylaşma ayrıca tamamlanmalı. Otomasyon Starter'a açılmaz. |
+| FD11 | Scope/sürüm/replay/reset/history mevcut. Yeni alanlarda kaynak/miras ve gerçek tüketici ayrı test edilir; genel yeni ikinci onay yoktur. |
+| FD12 | Mevcut hesap/org lifecycle ve abonelik komutları korunur; desteklenmeyen sağlayıcı/gerçek imha tamamlandı gösterilmez. |
+
+### Program süresi hazırlık tüketicisi — aday
+
+`program_duration_minutes` organization/center kapalı integer alanıdır; minimum1, üst sınır mevcut Postgres integer temsilidir (2147483647), sistem önerisi FD06 gereği60. Org Owner/OM kapsamı ve merkezde canlı CM şartı mevcut settings kapılarından gelir. Yeni merkez, orgun o anki değeri ve sürümünü bir kez kopyalar; mevcut merkez ve programlar backfill edilmez. Sonraki org değişimi eski merkeze canlı miras değildir. Merkez `SettingsView.program_duration_source` system_default/organization_copy/center_local bilgisini, kopyada organization_version değerini döndürür. Kaynak bilgisi yazılabilir ayar değildir.
+
+Yeni program preview isteğinde duration_minutes gönderilmişse açık değer üstündür; gönderilmemişse o merkezin hazırlık değeri kullanılır ve açık preview/program spec snapshot'ına alınır. Ayarı değiştirmek mevcut programı veya onay bekleyen preview'nun yakaladığı süreyi değiştirmez. Seçili reset sistem60'a döner; güncel org şablonuna dönme olarak sunulmaz. Diğer değerler, kişisel izinler ve geçmiş snapshot'lar korunur. Katalog sürümü3'tür. Yeni endpoint veya ikinci politika motoru yoktur; kaynak/native/CI kabulü tamamlanmadan bu aday kapanmış değildir.
+
 | İşlem | İstek/sonuç |
 |---|---|
 | settings_catalog_get_v1 | scope; izinli alan/group/consumer/writable, kaynak defaultları, açık destek sınırı. |
@@ -15,6 +40,14 @@ Güncel kabul/hosted durum [00 devirde](contracts/00-FtkSaaS-yeni-sohbet-devir.m
 | settings_reset_apply_v1 | scope, expected_version, operation_key, preview{id,token}; güncel yetki tekrar kontrolü. |
 | settings_history_get_v1 | scope + isteğe bağlı cursor; 50'lik kararlı sayfalarla settings komutlarının önce/sonra/aktör/zaman/gerekçesi. Legacy bildirim komutlarının kendi audit yolu korunur. Cursor scope ve ilk as_of sınırına bağlıdır; user/member scope anahtarı ayrıca hesabı içerir. Her sayfada güncel okuma yetkisi tekrar denetlenir. |
 
+### Katılımcı paylaşım tüketicisi — aday
+
+`session_get_v1` sonucundaki `shared_participants`, salt okunur `SharedLessonParticipant[]` alanıdır. Varsayılan boş; iki tarafın da aynı planned ve bitmemiş derste active kesin rezervasyonu, hedefin aktif kişi/hesap ve doğrulanmış canlı org bağlantısı gerekir. Başvuru/bekleme kaydı yetmez. `profile_visible` yalnız display_name, `email_visible`/`phone_visible` yalnız native doğrulanmış güncel iletişim alanını ayrı açar. Kapalı alan hiç dönmez; pending veya doğrulanmamış iletişim, hukuki ad/soyad ve finans taşınmaz. Açık ve mevcut hiçbir alanı olmayan kişi listede de görünmez. Fotoğraf henüz bu projeksiyonda yoktur; hazır medya tüketicisiyle ayrıca bağlanmalıdır.
+
+Her okuma canlı tercihi/kayıtları tekrar değerlendirir; kapatma, iptal, bitiş veya unlink sonraki okumada görünürlüğü kaldırır. Katılımcı olmayan CM/personelin aynı session'ı okuyabilmesi bu alandan paylaşım yetkisi üretmez; personelin mevcut operasyonel kişi okuması ayrı kalır. İstemci önceki görünür kopyasını yenilenen sonuçla temizler; dış kopyaların silindiği iddia edilmez. Bu alan org üye dizini veya public profil değildir.
+
+Scope anahtarı UUID'nin harf büyüklüğünden bağımsızdır; lock, belge, reset, history ve consumer aynı kanonik UUID'ye bağlanır. Eski farklı yazım belgeleri göçte değişmez private snapshot'ta korunur. Privacy çatışmasında eski görünümlerden herhangi birinde kapalı olan seçim kapalı kalır; farklı non-privacy değerler sessizce seçilmez, göç `AMBIGUOUS_LEGACY_SETTINGS_SCOPE` ile atomik durur ve açık kapsam çözümü gerekir. Birleşen belgenin sürümü ilerler, eski reset preview'su kapanır; tarihsel ayar kayıtları değiştirilmeden kanonik scope altında okunur.
+
 Scope user/platform organizasyonsuz; member/organization için org_id; center için org_id+center_id. account_id/person_id/actor/rol seçicisi kabul edilmez. Tüm istemci alanları ek alanlara kapalı typed Request/Response ile üretilir. Giriş POST backend-v1; named RPC service-only, canlı session/account/link/yetki her retry öncesi tekrar kontrol edilir.
 
 ## Yetki ve ilk alanlar
@@ -23,8 +56,8 @@ Scope user/platform organizasyonsuz; member/organization için org_id; center i�
 |---|---|---|
 | user (20) | Kendi aktif global hesabı | `honorific`, `language`, `date_format`, `time_format`, `number_format`, `week_start`, `timezone_mode`, `theme`, `contrast`, `motion`, `remember_context`, `calendar_view`, `show_weekends`, `marketing_in_app`, `ad_personalization`, `ad_measurement`, `optional_analytics`, `timezone_name`, `font_scale`, `startup_context` |
 | member (9) | O orgdaki kendi aktif doğrulanmış hesap bağlantısı; admin başkasının tercihini yazamaz | `profile_visible`, `photo_visible`, `email_visible`, `phone_visible`, `history_recommendations`, `interest_center_ids`, `interest_discipline_ids`, `in_app_reminders`, `in_app_marketing` |
-| center (4) | Tam merkezde canlı CM; Owner/OM tek başına merkez işletim yetkisi vermez | `description`, `address`, `contact_phone`, `contact_email` |
-| organization (9) | Canlı Owner/OM; billing_* yalnız Owner | `description`, `address`, `contact_phone`, `contact_email`, `theme_package_id`, `font_package_id`, `billing_name`, `billing_address`, `billing_email` |
+| center (5) | Tam merkezde canlı CM; Owner/OM tek başına merkez işletim yetkisi vermez | `description`, `address`, `contact_phone`, `contact_email`, `program_duration_minutes` |
+| organization (10) | Canlı Owner/OM; billing_* yalnız Owner | `description`, `address`, `contact_phone`, `contact_email`, `theme_package_id`, `font_package_id`, `billing_name`, `billing_address`, `billing_email`, `program_duration_minutes` |
 | platform (4) | Canlı private.platform_operators kaydı | `application_name`, `support_email`, `support_url`, `maintenance_message` |
 
 theme_package_id/font_package_id şu anda salt okunur sistem fallback null değeridir; katalogda hazır paket yoktur. Seçilmiş/erişilebilirlik-dil/lisans kontrolü yapılmış assetler olmadan keyfi renk/font kabul edilmez. Logo hattı bu teslimde yoktur. Center marka override yoktur.
