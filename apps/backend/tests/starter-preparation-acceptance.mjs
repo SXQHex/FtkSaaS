@@ -59,7 +59,8 @@ test('ST-03 Starter preparation defaults copy, authority, reset and program cons
    assert.deepEqual(await shared(),[]);
    await change('member',{profile_visible:true,email_visible:true,phone_visible:true});
    let peers=await shared();assert.equal(peers.length,1);assert.equal(peers[0].person_id,person);assert.equal(peers[0].display_name,(await must(owner,'account_get_v1')).display_name);assert.equal(peers[0].email,owner.email);assert(!('phone' in peers[0]));assert(!('given_name' in peers[0]));assert(!('family_name' in peers[0]));
-   const profile=await must(owner,'account_get_v1');await must(owner,'account_profile_update_v1',{expected_version:profile.version,display_name:profile.display_name,unverified_phone:'+15550001234',given_name:'Synthetic private legal',family_name:'Private legal family'},key());
+   const profile=await must(owner,'account_get_v1'),managed=await must(owner,'management_state_get_v1',{operation:'account_profile_update_v1',selector:{operation:'account_profile_update_v1',key:{}}});
+   await must(owner,'account_profile_update_v1',{expected_version:managed.items[0].versions[0].version,display_name:profile.display_name,unverified_phone:'+15550001234',given_name:'Synthetic private legal',family_name:'Private legal family'},key());
    assert(!('phone' in (await shared())[0]));assert(!('given_name' in (await shared())[0]));
    const phone='+1555'+String(Date.now()).slice(-7),{env}=context();
    const proof=await fetch(env.API_URL+'/auth/v1/admin/users/'+owner.id,{method:'PUT',headers:{apikey:env.SERVICE_ROLE_KEY,authorization:'Bearer '+env.SERVICE_ROLE_KEY,'content-type':'application/json'},body:JSON.stringify({phone,phone_confirm:true})});assert(proof.ok,'Synthetic native verified phone fixture: '+proof.status);
