@@ -57,8 +57,8 @@ Scope user/platform organizasyonsuz; member/organization için org_id; center i�
 |---|---|---|
 | user (20) | Kendi aktif global hesabı | `honorific`, `language`, `date_format`, `time_format`, `number_format`, `week_start`, `timezone_mode`, `theme`, `contrast`, `motion`, `remember_context`, `calendar_view`, `show_weekends`, `marketing_in_app`, `ad_personalization`, `ad_measurement`, `optional_analytics`, `timezone_name`, `font_scale`, `startup_context` |
 | member (11) | O orgdaki kendi aktif doğrulanmış hesap bağlantısı; admin başkasının tercihini yazamaz | `profile_visible`, `photo_visible`, `email_visible`, `phone_visible`, `history_recommendations`, `interest_center_ids`, `interest_discipline_ids`, `in_app_reminders`, `in_app_marketing`, `report_templates`, `import_templates` |
-| center (7) | Tam merkezde canlı CM; Owner/OM tek başına merkez işletim yetkisi vermez | `description`, `address`, `contact_phone`, `contact_email`, `program_duration_minutes`, `report_templates`, `import_templates` |
-| organization (12) | Canlı Owner/OM; billing_* yalnız Owner | `description`, `address`, `contact_phone`, `contact_email`, `theme_package_id`, `font_package_id`, `billing_name`, `billing_address`, `billing_email`, `program_duration_minutes`, `report_templates`, `import_templates` |
+| center (10) | Tam merkezde canlı CM; Owner/OM tek başına merkez işletim yetkisi vermez | `description`, `address`, `contact_phone`, `contact_email`, `program_duration_minutes`, `report_templates`, `import_templates`, `public_profile_enabled`, `public_fields`, `public_hours` |
+| organization (15) | Canlı Owner/OM; billing_* yalnız Owner | `description`, `address`, `contact_phone`, `contact_email`, `theme_package_id`, `font_package_id`, `billing_name`, `billing_address`, `billing_email`, `program_duration_minutes`, `report_templates`, `import_templates`, `public_profile_enabled`, `public_fields`, `public_hours` |
 | platform (4) | Canlı private.platform_operators kaydı | `application_name`, `support_email`, `support_url`, `maintenance_message` |
 
 theme_package_id/font_package_id şu anda salt okunur sistem fallback null değeridir; katalogda hazır paket yoktur. Seçilmiş/erişilebilirlik-dil/lisans kontrolü yapılmış assetler olmadan keyfi renk/font kabul edilmez. Center marka override yoktur.
@@ -141,3 +141,13 @@ Doğrulanmamış telefon account_profile_update_v1.unverified_phone ile E.164 bi
 
 
 Native Auth CAPTCHA/token seçenekleri sağlayıcı yapılandırmasına göre kullanılır; public Turnstile ile karıştırılmaz. Kurtarmada mevcut native oturum korunur, istemci zorunlu global signOut/ikinci completion RPC çağırmaz. Gerçek SMS kapalı/erteli olduğunda numara kaydı doğrulama başarısı olarak gösterilmez.
+
+## Public işletme alanları tüketicisi — aday
+
+Katalogv5 organization/center `public_profile_enabled:false`, `public_fields:[]`, `public_hours:[]` ekler. Org Owner/OM ve merkezde canlı CM mevcut yazma/sürüm/replay/history kapısını kullanır. Başka scope veya serbest alan yazılamaz. Her scope seçimi yereldir, otomatik miras/kopya yoktur; seçili reset yalnız o alanı sistem defaultuna döndürür. Org public_profile_enabled yayın üst kapısıdır; center ayrıca kendi açık yayınını ve alanlarını ister. Varsayılanlar isim dahil tanıtımı açmaz.
+
+`public_calendar_get_v1` aynı takvim items/pagination yanına nullable `organization_profile` ve `center_profile` ekler. Org UUID slug veya mevcut yayımlanmış slug bağlamında yalnız canlı F25 ve normal/grace erişimde tanıtım döner. center_profile yalnız istekte açık center_id ve aynı orgda erişilebilir merkez içindir. Bilinmeyen/yayımlanmamış bağlam null verir. Takvim publications kendi açık published kararını kullanır; tanıtımı kapatmak mevcut seans yayınına müdahale etmez. Public HTTP yanıtı no-store'dur; istemci kapanan alanları sonraki okumada temizler, dış kopyanın silindiği iddia edilmez.
+
+Alan beyaz listesi name/description/logo/address/contact/hours'tur. Billing, kişisel hesap iletişimi, roller, kaynak uygunluğu ve iç ayar belgesi açılmaz. contact yalnız işletmenin açık contact_phone/contact_email alanıdır. Logo güncel private org pointer'ından `{asset,data_base64}` döner; kaldırma/değişim bir sonraki okumaya yansır, asset ID ile tarihsel public okuma yoktur. Center aynı org logosunu ancak org public_fields.logo da açıkken kullanabilir; merkez marka override yoktur.
+
+public_hours açık tanıtım saatleri dizisidir; her satır ISO1–7 weekdays, HH:mm:ss local_start/local_end ve geçerli IANA timezone ister. Gece aşımı desteklenir; eşit başlangıç/bitiş reddedilir. Default[] saat ilan etmez.100 satır mevcut yapılandırılmış JSON dizi tavanıdır, plan kotası değildir. Bu bilgi oda/eğitmen availability veya rezervasyon kapısı yerine geçmez; iş takvimi değişikliği kendi domain komutudur. UTC seanslar, mevcut program ve ücret snapshotları değiştirilmez.

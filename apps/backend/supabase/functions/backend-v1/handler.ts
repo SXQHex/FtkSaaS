@@ -48,7 +48,7 @@ Deno.serve(async req=>{
    }
    const result=await rpcPublic(aux);
    if(result.ok&&!(validators as any)['success_'+operation]?.(result))return failure('INTEGRITY_VIOLATION',500);
-   return json(result);
+   return json(result,200,true);
   }
   const authorization=req.headers.get("authorization");if(!authorization?.startsWith("Bearer "))return failure("AUTH_REQUIRED",401);
   const userResponse=await fetch(base+"/auth/v1/user",{headers:{authorization,apikey:key}});

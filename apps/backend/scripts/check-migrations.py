@@ -174,3 +174,5 @@ assert next(Path('supabase/migrations').glob('*_canonical_settings_scope.sql')).
 assert next(Path('supabase/migrations').glob('*_starter_settings_media.sql')).read_text()==Path('database/starter-settings-media.sql').read_text().replace('commit;\n','',1)+Path('database/starter-settings-media-wrappers.sql').read_text().replace('begin;\n','',1),'Starter media source drift'
 
 assert next(Path('supabase/migrations').glob('*_starter_work_templates.sql')).read_text()==Path('database/settings-catalog-v4.sql').read_text().replace('commit;\n','',1)+Path('database/starter-work-templates.sql').read_text().replace('begin;\n','',1).replace('commit;\n','',1)+Path('database/starter-work-templates-wrappers.sql').read_text().replace('begin;\n','',1),'Work templates source drift'
+
+assert next(Path("supabase/migrations").glob("*_starter_public_settings.sql")).read_text()==Path("database/settings-catalog-v5.sql").read_text().replace("commit;\n","",1)+Path("database/starter-public-settings.sql").read_text().replace("begin;\n","",1),"Public settings source drift"

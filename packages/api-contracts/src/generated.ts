@@ -1187,7 +1187,7 @@ as_of: Instant
 /**
  * @maxItems 50
  */
-overridden_fields: ("ad_measurement" | "ad_personalization" | "address" | "application_name" | "billing_address" | "billing_email" | "billing_name" | "calendar_view" | "contact_email" | "contact_phone" | "contrast" | "date_format" | "description" | "email_visible" | "font_package_id" | "font_scale" | "history_recommendations" | "honorific" | "in_app_marketing" | "in_app_reminders" | "interest_center_ids" | "interest_discipline_ids" | "language" | "maintenance_message" | "marketing_in_app" | "motion" | "number_format" | "optional_analytics" | "phone_visible" | "photo_visible" | "profile_visible" | "program_duration_minutes" | "remember_context" | "show_weekends" | "startup_context" | "support_email" | "support_url" | "theme" | "theme_package_id" | "time_format" | "timezone_mode" | "timezone_name" | "week_start" | "report_templates" | "import_templates")[]
+overridden_fields: ("ad_measurement" | "ad_personalization" | "address" | "application_name" | "billing_address" | "billing_email" | "billing_name" | "calendar_view" | "contact_email" | "contact_phone" | "contrast" | "date_format" | "description" | "email_visible" | "font_package_id" | "font_scale" | "history_recommendations" | "honorific" | "in_app_marketing" | "in_app_reminders" | "interest_center_ids" | "interest_discipline_ids" | "language" | "maintenance_message" | "marketing_in_app" | "motion" | "number_format" | "optional_analytics" | "phone_visible" | "photo_visible" | "profile_visible" | "program_duration_minutes" | "remember_context" | "show_weekends" | "startup_context" | "support_email" | "support_url" | "theme" | "theme_package_id" | "time_format" | "timezone_mode" | "timezone_name" | "week_start" | "report_templates" | "import_templates" | "public_profile_enabled" | "public_fields" | "public_hours")[]
 program_duration_source?: {
 kind: ("system_default" | "organization_copy" | "center_local")
 organization_version?: SettingsVersion
@@ -1220,7 +1220,7 @@ as_of: Instant
 /**
  * @maxItems 50
  */
-overridden_fields: ("description" | "address" | "contact_phone" | "contact_email" | "program_duration_minutes" | "report_templates" | "import_templates")[]
+overridden_fields: ("description" | "address" | "contact_phone" | "contact_email" | "program_duration_minutes" | "report_templates" | "import_templates" | "public_profile_enabled" | "public_fields" | "public_hours")[]
 program_duration_source?: {
 kind: ("system_default" | "organization_copy" | "center_local")
 organization_version?: SettingsVersion
@@ -1233,7 +1233,7 @@ as_of: Instant
 /**
  * @maxItems 50
  */
-overridden_fields: ("description" | "address" | "contact_phone" | "contact_email" | "theme_package_id" | "font_package_id" | "billing_name" | "billing_address" | "billing_email" | "program_duration_minutes" | "report_templates" | "import_templates")[]
+overridden_fields: ("description" | "address" | "contact_phone" | "contact_email" | "theme_package_id" | "font_package_id" | "billing_name" | "billing_address" | "billing_email" | "program_duration_minutes" | "report_templates" | "import_templates" | "public_profile_enabled" | "public_fields" | "public_hours")[]
 logo?: (SettingsMediaAsset | null)
 } | {
 scope: "platform"
@@ -1252,14 +1252,14 @@ overridden_fields: ("application_name" | "support_email" | "support_url" | "main
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
  * via the `definition` "SettingsFieldKeys".
  */
-export type SettingsFieldKeys = [("ad_measurement" | "ad_personalization" | "address" | "application_name" | "billing_address" | "billing_email" | "billing_name" | "calendar_view" | "contact_email" | "contact_phone" | "contrast" | "date_format" | "description" | "email_visible" | "font_package_id" | "font_scale" | "history_recommendations" | "honorific" | "in_app_marketing" | "in_app_reminders" | "interest_center_ids" | "interest_discipline_ids" | "language" | "maintenance_message" | "marketing_in_app" | "motion" | "number_format" | "optional_analytics" | "phone_visible" | "photo_visible" | "profile_visible" | "program_duration_minutes" | "remember_context" | "show_weekends" | "startup_context" | "support_email" | "support_url" | "theme" | "theme_package_id" | "time_format" | "timezone_mode" | "timezone_name" | "week_start" | "report_templates" | "import_templates"), ...(("ad_measurement" | "ad_personalization" | "address" | "application_name" | "billing_address" | "billing_email" | "billing_name" | "calendar_view" | "contact_email" | "contact_phone" | "contrast" | "date_format" | "description" | "email_visible" | "font_package_id" | "font_scale" | "history_recommendations" | "honorific" | "in_app_marketing" | "in_app_reminders" | "interest_center_ids" | "interest_discipline_ids" | "language" | "maintenance_message" | "marketing_in_app" | "motion" | "number_format" | "optional_analytics" | "phone_visible" | "photo_visible" | "profile_visible" | "program_duration_minutes" | "remember_context" | "show_weekends" | "startup_context" | "support_email" | "support_url" | "theme" | "theme_package_id" | "time_format" | "timezone_mode" | "timezone_name" | "week_start" | "report_templates" | "import_templates"))[]]
+export type SettingsFieldKeys = [("ad_measurement" | "ad_personalization" | "address" | "application_name" | "billing_address" | "billing_email" | "billing_name" | "calendar_view" | "contact_email" | "contact_phone" | "contrast" | "date_format" | "description" | "email_visible" | "font_package_id" | "font_scale" | "history_recommendations" | "honorific" | "in_app_marketing" | "in_app_reminders" | "interest_center_ids" | "interest_discipline_ids" | "language" | "maintenance_message" | "marketing_in_app" | "motion" | "number_format" | "optional_analytics" | "phone_visible" | "photo_visible" | "profile_visible" | "program_duration_minutes" | "remember_context" | "show_weekends" | "startup_context" | "support_email" | "support_url" | "theme" | "theme_package_id" | "time_format" | "timezone_mode" | "timezone_name" | "week_start" | "report_templates" | "import_templates" | "public_profile_enabled" | "public_fields" | "public_hours"), ...(("ad_measurement" | "ad_personalization" | "address" | "application_name" | "billing_address" | "billing_email" | "billing_name" | "calendar_view" | "contact_email" | "contact_phone" | "contrast" | "date_format" | "description" | "email_visible" | "font_package_id" | "font_scale" | "history_recommendations" | "honorific" | "in_app_marketing" | "in_app_reminders" | "interest_center_ids" | "interest_discipline_ids" | "language" | "maintenance_message" | "marketing_in_app" | "motion" | "number_format" | "optional_analytics" | "phone_visible" | "photo_visible" | "profile_visible" | "program_duration_minutes" | "remember_context" | "show_weekends" | "startup_context" | "support_email" | "support_url" | "theme" | "theme_package_id" | "time_format" | "timezone_mode" | "timezone_name" | "week_start" | "report_templates" | "import_templates" | "public_profile_enabled" | "public_fields" | "public_hours"))[]]
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
  * via the `definition` "SettingsCatalog".
  */
 export type SettingsCatalog = ({
 scope: SettingsScope
-catalog_version: 4
+catalog_version: 5
 fields: SettingsFieldDescriptor[]
 defaults: (UserSettingsValues | MemberSettingsValues | CenterSettingsValues | OrganizationSettingsValues | PlatformSettingsValues)
 /**
@@ -1301,7 +1301,7 @@ version: SettingsVersion
 })
 export type SettingsCatalog1 = ({
 scope: "user"
-catalog_version: 4
+catalog_version: 5
 fields: SettingsFieldDescriptor[]
 defaults: UserSettingsValues
 /**
@@ -1312,7 +1312,7 @@ limitations: string[]
 work_templates?: WorkTemplates
 } | {
 scope: "member"
-catalog_version: 4
+catalog_version: 5
 fields: SettingsFieldDescriptor[]
 defaults: MemberSettingsValues
 /**
@@ -1323,7 +1323,7 @@ limitations: string[]
 work_templates?: WorkTemplates
 } | {
 scope: "center"
-catalog_version: 4
+catalog_version: 5
 fields: SettingsFieldDescriptor[]
 defaults: CenterSettingsValues
 /**
@@ -1334,7 +1334,7 @@ limitations: string[]
 work_templates?: WorkTemplates
 } | {
 scope: "organization"
-catalog_version: 4
+catalog_version: 5
 fields: SettingsFieldDescriptor[]
 defaults: OrganizationSettingsValues
 /**
@@ -1345,7 +1345,7 @@ limitations: string[]
 work_templates?: WorkTemplates
 } | {
 scope: "platform"
-catalog_version: 4
+catalog_version: 5
 fields: SettingsFieldDescriptor[]
 defaults: PlatformSettingsValues
 /**
@@ -1698,7 +1698,7 @@ center_id: string
  * @minItems 1
  * @maxItems 50
  */
-fields: [("description" | "address" | "contact_phone" | "contact_email" | "program_duration_minutes" | "report_templates" | "import_templates"), ...(("description" | "address" | "contact_phone" | "contact_email" | "program_duration_minutes" | "report_templates" | "import_templates"))[]]
+fields: [("description" | "address" | "contact_phone" | "contact_email" | "program_duration_minutes" | "report_templates" | "import_templates" | "public_profile_enabled" | "public_fields" | "public_hours"), ...(("description" | "address" | "contact_phone" | "contact_email" | "program_duration_minutes" | "report_templates" | "import_templates" | "public_profile_enabled" | "public_fields" | "public_hours"))[]]
 } | {
 client_api_version: 1
 /**
@@ -1714,7 +1714,7 @@ org_id: string
  * @minItems 1
  * @maxItems 50
  */
-fields: [("description" | "address" | "contact_phone" | "contact_email" | "theme_package_id" | "font_package_id" | "billing_name" | "billing_address" | "billing_email" | "program_duration_minutes" | "report_templates" | "import_templates"), ...(("description" | "address" | "contact_phone" | "contact_email" | "theme_package_id" | "font_package_id" | "billing_name" | "billing_address" | "billing_email" | "program_duration_minutes" | "report_templates" | "import_templates"))[]]
+fields: [("description" | "address" | "contact_phone" | "contact_email" | "theme_package_id" | "font_package_id" | "billing_name" | "billing_address" | "billing_email" | "program_duration_minutes" | "report_templates" | "import_templates" | "public_profile_enabled" | "public_fields" | "public_hours"), ...(("description" | "address" | "contact_phone" | "contact_email" | "theme_package_id" | "font_package_id" | "billing_name" | "billing_address" | "billing_email" | "program_duration_minutes" | "report_templates" | "import_templates" | "public_profile_enabled" | "public_fields" | "public_hours"))[]]
 } | {
 client_api_version: 1
 /**
@@ -3339,6 +3339,7 @@ PreparedReportRequest?: PreparedReportRequest
 PreparedImportRequest?: PreparedImportRequest
 ResolvedWorkTemplate?: ResolvedWorkTemplate
 Success_settings_template_resolve?: SuccessSettingsTemplateResolve
+PublicBusinessProfile?: PublicBusinessProfile
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -6934,6 +6935,44 @@ export interface Page_PublicCalendarItem {
 items: PublicCalendarItem[]
 next_cursor?: (OpaqueToken | null)
 as_of: Instant
+organization_profile?: (PublicBusinessProfile | null)
+center_profile?: (PublicBusinessProfile | null)
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "PublicBusinessProfile".
+ */
+export interface PublicBusinessProfile {
+name?: string
+description?: string
+address?: string
+contact?: {
+phone: string
+email: (string | null)
+}
+/**
+ * @maxItems 100
+ */
+hours?: {
+/**
+ * @minItems 1
+ * @maxItems 7
+ */
+weekdays: [number]|[number, number]|[number, number, number]|[number, number, number, number]|[number, number, number, number, number]|[number, number, number, number, number, number]|[number, number, number, number, number, number, number]
+local_start: string
+local_end: string
+timezone: string
+}[]
+timezone?: string
+logo?: (SettingsMediaContent | null)
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "SettingsMediaContent".
+ */
+export interface SettingsMediaContent {
+asset: SettingsMediaAsset
+data_base64: string
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -21520,6 +21559,24 @@ delimiter: ("," | ";")
 }
 source_namespace: string
 }[]
+public_profile_enabled?: boolean
+/**
+ * @maxItems 6
+ */
+public_fields?: []|[("name" | "description" | "logo" | "address" | "contact" | "hours")]|[("name" | "description" | "logo" | "address" | "contact" | "hours"), ("name" | "description" | "logo" | "address" | "contact" | "hours")]|[("name" | "description" | "logo" | "address" | "contact" | "hours"), ("name" | "description" | "logo" | "address" | "contact" | "hours"), ("name" | "description" | "logo" | "address" | "contact" | "hours")]|[("name" | "description" | "logo" | "address" | "contact" | "hours"), ("name" | "description" | "logo" | "address" | "contact" | "hours"), ("name" | "description" | "logo" | "address" | "contact" | "hours"), ("name" | "description" | "logo" | "address" | "contact" | "hours")]|[("name" | "description" | "logo" | "address" | "contact" | "hours"), ("name" | "description" | "logo" | "address" | "contact" | "hours"), ("name" | "description" | "logo" | "address" | "contact" | "hours"), ("name" | "description" | "logo" | "address" | "contact" | "hours"), ("name" | "description" | "logo" | "address" | "contact" | "hours")]|[("name" | "description" | "logo" | "address" | "contact" | "hours"), ("name" | "description" | "logo" | "address" | "contact" | "hours"), ("name" | "description" | "logo" | "address" | "contact" | "hours"), ("name" | "description" | "logo" | "address" | "contact" | "hours"), ("name" | "description" | "logo" | "address" | "contact" | "hours"), ("name" | "description" | "logo" | "address" | "contact" | "hours")]
+/**
+ * @maxItems 100
+ */
+public_hours?: {
+/**
+ * @minItems 1
+ * @maxItems 7
+ */
+weekdays: [number]|[number, number]|[number, number, number]|[number, number, number, number]|[number, number, number, number, number]|[number, number, number, number, number, number]|[number, number, number, number, number, number, number]
+local_start: string
+local_end: string
+timezone: string
+}[]
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -21585,6 +21642,24 @@ target: ("display_name" | "email" | "phone" | "source_key" | "person_ref" | "ope
 delimiter: ("," | ";")
 }
 source_namespace: string
+}[]
+public_profile_enabled?: boolean
+/**
+ * @maxItems 6
+ */
+public_fields?: []|[("name" | "description" | "logo" | "address" | "contact" | "hours")]|[("name" | "description" | "logo" | "address" | "contact" | "hours"), ("name" | "description" | "logo" | "address" | "contact" | "hours")]|[("name" | "description" | "logo" | "address" | "contact" | "hours"), ("name" | "description" | "logo" | "address" | "contact" | "hours"), ("name" | "description" | "logo" | "address" | "contact" | "hours")]|[("name" | "description" | "logo" | "address" | "contact" | "hours"), ("name" | "description" | "logo" | "address" | "contact" | "hours"), ("name" | "description" | "logo" | "address" | "contact" | "hours"), ("name" | "description" | "logo" | "address" | "contact" | "hours")]|[("name" | "description" | "logo" | "address" | "contact" | "hours"), ("name" | "description" | "logo" | "address" | "contact" | "hours"), ("name" | "description" | "logo" | "address" | "contact" | "hours"), ("name" | "description" | "logo" | "address" | "contact" | "hours"), ("name" | "description" | "logo" | "address" | "contact" | "hours")]|[("name" | "description" | "logo" | "address" | "contact" | "hours"), ("name" | "description" | "logo" | "address" | "contact" | "hours"), ("name" | "description" | "logo" | "address" | "contact" | "hours"), ("name" | "description" | "logo" | "address" | "contact" | "hours"), ("name" | "description" | "logo" | "address" | "contact" | "hours"), ("name" | "description" | "logo" | "address" | "contact" | "hours")]
+/**
+ * @maxItems 100
+ */
+public_hours?: {
+/**
+ * @minItems 1
+ * @maxItems 7
+ */
+weekdays: [number]|[number, number]|[number, number, number]|[number, number, number, number]|[number, number, number, number, number]|[number, number, number, number, number, number]|[number, number, number, number, number, number, number]
+local_start: string
+local_end: string
+timezone: string
 }[]
 }
 /**
@@ -21658,9 +21733,9 @@ as_of: Instant
  * via the `definition` "SettingsFieldDescriptor".
  */
 export interface SettingsFieldDescriptor {
-key: ("ad_measurement" | "ad_personalization" | "address" | "application_name" | "billing_address" | "billing_email" | "billing_name" | "calendar_view" | "contact_email" | "contact_phone" | "contrast" | "date_format" | "description" | "email_visible" | "font_package_id" | "font_scale" | "history_recommendations" | "honorific" | "in_app_marketing" | "in_app_reminders" | "interest_center_ids" | "interest_discipline_ids" | "language" | "maintenance_message" | "marketing_in_app" | "motion" | "number_format" | "optional_analytics" | "phone_visible" | "photo_visible" | "profile_visible" | "program_duration_minutes" | "remember_context" | "show_weekends" | "startup_context" | "support_email" | "support_url" | "theme" | "theme_package_id" | "time_format" | "timezone_mode" | "timezone_name" | "week_start" | "report_templates" | "import_templates")
+key: ("ad_measurement" | "ad_personalization" | "address" | "application_name" | "billing_address" | "billing_email" | "billing_name" | "calendar_view" | "contact_email" | "contact_phone" | "contrast" | "date_format" | "description" | "email_visible" | "font_package_id" | "font_scale" | "history_recommendations" | "honorific" | "in_app_marketing" | "in_app_reminders" | "interest_center_ids" | "interest_discipline_ids" | "language" | "maintenance_message" | "marketing_in_app" | "motion" | "number_format" | "optional_analytics" | "phone_visible" | "photo_visible" | "profile_visible" | "program_duration_minutes" | "remember_context" | "show_weekends" | "startup_context" | "support_email" | "support_url" | "theme" | "theme_package_id" | "time_format" | "timezone_mode" | "timezone_name" | "week_start" | "report_templates" | "import_templates" | "public_profile_enabled" | "public_fields" | "public_hours")
 group: string
-consumer: ("frontend" | "p05_optional_allowed" | "new_center_copy" | "schedule_build_program" | "p06_report_prepare" | "p06_import_prepare")
+consumer: ("frontend" | "p05_optional_allowed" | "new_center_copy" | "schedule_build_program" | "p06_report_prepare" | "p06_import_prepare" | "public_profile")
 writable: boolean
 }
 /**
@@ -22064,14 +22139,6 @@ data: GoogleLinkAuthorization
  * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
  */
 trace_id: string
-}
-/**
- * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
- * via the `definition` "SettingsMediaContent".
- */
-export interface SettingsMediaContent {
-asset: SettingsMediaAsset
-data_base64: string
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema

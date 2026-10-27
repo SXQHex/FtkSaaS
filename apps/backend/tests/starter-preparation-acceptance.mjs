@@ -30,7 +30,7 @@ test('ST-03 Starter preparation defaults copy, authority, reset and program cons
   await t.test('new center copies approved org proposal; subsequent template edits do not move it',async()=>{
    const v=await read('center');assert.equal(v.values.program_duration_minutes,45);assert.equal(v.program_duration_source.kind,'organization_copy');assert.equal(v.program_duration_source.organization_version,(await read('organization')).version);
    await change('organization',{program_duration_minutes:90});assert.equal((await read('center')).values.program_duration_minutes,45);
-   const catalog=await must(owner,'settings_catalog_get_v1',q('center'));assert.equal(catalog.catalog_version,4);assert.equal(catalog.defaults.program_duration_minutes,60);assert.equal(catalog.fields.find(x=>x.key==='program_duration_minutes').consumer,'schedule_build_program');
+   const catalog=await must(owner,'settings_catalog_get_v1',q('center'));assert.equal(catalog.catalog_version,5);assert.equal(catalog.defaults.program_duration_minutes,60);assert.equal(catalog.fields.find(x=>x.key==='program_duration_minutes').consumer,'schedule_build_program');
   });
   await t.test('an explicit local selection equal to the copy records local provenance',async()=>{
    await change('center',{program_duration_minutes:45});assert.equal((await read('center')).program_duration_source.kind,'center_local');
@@ -105,6 +105,28 @@ test('ST-03 Starter preparation defaults copy, authority, reset and program cons
    await denied(student,'settings_update_v1',{...q('organization'),expected_version:(await read('organization')).version,patch:{},logo_image:image},'FORBIDDEN');
    await denied(owner,'settings_update_v1',{...q('center'),expected_version:(await read('center')).version,patch:{},logo_image:image},'VALIDATION_FAILED');
    await must(owner,'settings_update_v1',{...q('organization'),expected_version:(await read('organization')).version,patch:{},logo_image:null},key());assert.equal((await read('organization')).logo,null);await denied(student,'media_get_v1',{scope:'organization',org_id:org,asset_id:logo.id},'NOT_FOUND');
+  });
+  await t.test('public field selection is default closed, live, scoped and independent of calendar publication',async()=>{
+   const anon={jwt:context().env.ANON_KEY},request={slug:org,center_id:center,interval:{starts_at:new Date().toISOString(),ends_at:new Date(Date.now()+7*86400000).toISOString()},page:{}};
+   const session=(await rows(`select id from core.sessions where org_id=$1 and starts_at>now() and state='planned' order by starts_at limit 1`,[org]))[0].id;
+   const publication=(await api('publication_set_v1',{session_id:session,published:true,public_details:{title:'Synthetic public lesson',venue_public_label:'Synthetic venue',fee_minor:'0',currency:'TRY',public_conditions:'Application only'}})).primary_id;
+   await db.query("update core.saas_plan_versions set features=array_remove(features,'F25') where id=$1",[plan]);
+   const publicRead=()=>must(anon,'public_calendar_get_v1',request);
+   let v=await publicRead();assert.equal(v.organization_profile,null);assert.equal(v.center_profile,null);const originalItems=v.items;assert(originalItems.some(x=>x.publication_id===publication));
+   const data=JSON.parse(fs.readFileSync('tests/fixtures/settings-images.json')).png,image={mime:'image/png',data_base64:data,checksum:createHash('sha256').update(Buffer.from(data,'base64')).digest('hex')};
+   await must(owner,'settings_update_v1',{...q('organization'),expected_version:(await read('organization')).version,patch:{public_profile_enabled:true,public_fields:['name','logo'],description:'Unselected private description',billing_name:'Never public'},logo_image:image},key());
+   v=await publicRead();assert.deepEqual(Object.keys(v.organization_profile).sort(),['logo','name']);assert.equal(v.organization_profile.logo.data_base64,data);assert.equal(v.center_profile,null);assert.deepEqual(v.items,originalItems);
+   const hours=[{weekdays:[1,2],local_start:'22:00:00',local_end:'02:00:00',timezone:'Europe/Istanbul'}];
+   await change('center',{public_profile_enabled:true,public_fields:['description','contact','hours','logo'],description:'Published center',contact_email:'business@ftksaas.invalid',public_hours:hours});
+   v=await publicRead();assert.equal(v.center_profile.description,'Published center');assert.equal(v.center_profile.contact.email,'business@ftksaas.invalid');assert.deepEqual(v.center_profile.hours,hours);assert.equal(v.center_profile.logo.data_base64,data);assert(!JSON.stringify(v).includes('Never public'));
+   await change('organization',{public_fields:['name']});v=await publicRead();assert(!('logo' in v.organization_profile));assert(!('logo' in v.center_profile));
+   const foreign=await must(anon,'public_calendar_get_v1',{...request,center_id:key()});assert.equal(foreign.center_profile,null);
+   await denied(student,'settings_update_v1',{...q('center'),expected_version:(await read('center')).version,patch:{public_profile_enabled:false}},'FORBIDDEN');
+   await denied(owner,'settings_update_v1',{...q('center'),expected_version:(await read('center')).version,patch:{public_hours:[{...hours[0],timezone:'Unknown/Zone'}]}},'VALIDATION_FAILED');
+   await change('organization',{public_profile_enabled:false});v=await publicRead();assert.equal(v.organization_profile,null);assert.equal(v.center_profile,null);assert.deepEqual(v.items,originalItems);
+   const reset=await must(owner,'settings_reset_preview_v1',{...q('center'),fields:['public_fields']});await must(owner,'settings_reset_apply_v1',{...q('center'),expected_version:reset.version,preview:{id:reset.id,token:reset.token}},key());assert.deepEqual((await read('center')).values.public_fields,[]);
+   await change('organization',{public_profile_enabled:true});v=await publicRead();assert.deepEqual(v.center_profile,{});
+   await change('organization',{public_profile_enabled:false});
   });
   await t.test('typed limits and live CM ownership prevent arbitrary setting writes and replay after revocation',async()=>{
    await denied(student,'settings_get_v1',q('center'),'FORBIDDEN');

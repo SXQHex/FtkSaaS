@@ -1152,6 +1152,8 @@ ST-03 teknik eşleme adayı: organization/center `program_duration_minutes` kapa
 | İlk ödeme yöntemi listesi | Manuel nakit, banka transferi, kart/POS kaydı. Auto tahsilat/ödeme entegrasyonu değildir. Banka/kart referansı zorunlu; nakit isteğe bağlı. |
 | Ek onay eşiği | Ayrı alan olarak modellenebilir ama tutar defaultu yok; desteklenmeyen mekanizma etkinleştirilemez. FD11 ilk teslimde yeni genel ikinci-onay mekanizması eklemez. |
 
+ST-03 public eşleme adayı organization/center kapalı yayın/alan seçimini ve açık timezone'lu tanıtım saatlerini typed settings üzerinden gerçek public calendar read projection'ına bağlar. Org yayın üst kapısı ve ayrı center opt-in, güncel logo ve işletme iletişimi beyaz listesi uygulanır; takvim publication kararı ayrıdır. Default/reset/yetki/kopya sınırı [ayar devrindedir](../frontend-settings-handover.md#public-işletme-alanları-tüketicisi--aday). Native ve hosted kabulü ayrı kalır.
+
 ##### FD08 — belge onay dış görünürlük (kabul edildi)
 
 | Alan | Kabul edilen seçenek/default |
