@@ -1,6 +1,6 @@
-## Tek stüdyo ürün adı hata eşlemesi — 67 adayı
+## Tek stüdyo ürün adı hata eşlemesi — 67 kabulü
 
-Yayında güncel disiplin ön eki yoksa `VALIDATION_FAILED`; güncel ön eki taşımayan eski sürümle yeni satış `PLAN_FEATURE_UNAVAILABLE`; sürümün `published_name` alanını sonradan değiştirme `INVALID_STATE_TRANSITION` ile reddedilir. Yeni ürün adı yalnız yeni yayın sürümündedir. DTO’ya yeni hata/izin veya yeni endpoint eklenmez; mevcut `ProductTerms.name` seçilen sürümden okunur.67 adayının native/CI kabulü ayrı doğrulanır.
+Yayında güncel disiplin ön eki yoksa `VALIDATION_FAILED`; güncel ön eki taşımayan eski sürümle yeni satış `PLAN_FEATURE_UNAVAILABLE`; sürümün `published_name` alanını sonradan değiştirme `INVALID_STATE_TRANSITION` ile reddedilir. Yeni ürün adı yalnız yeni yayın sürümündedir. DTO’ya yeni hata/izin veya yeni endpoint eklenmez; mevcut `ProductTerms.name` seçilen sürümden okunur.67 kabulü PR58/main5639783b5dcd963d84bb76ec7bdf75d65a75ced5, aday40452100471/main40476673333/CD40479412819 ile doğrulandı.
 
 ## 27 Ekim — Starter plan kapıları teslimi kapandı
 

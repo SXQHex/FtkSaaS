@@ -1,6 +1,6 @@
-## Ürün adı snapshot’ı — 67 adayı
+## Ürün adı snapshot’ı — 67 kabulü
 
-`product_versions.published_name` yeni sürümde sabittir; kataloğun `ProductTerms.name` alanı seçilen sürümün adıdır. UPDATE trigger’ı ad değişimini reddeder. Backfill yalnız gerçekten kayıtlı ürün adını kullanır; eski satış/finans/scope/hak defterleri değiştirilmez. Aynı ürün kimliğinde yeni yayın yeni snapshot yaratır. Restore/export core satırının yeni alanını taşır; ayrı private veri deposu veya imha consumer’ı eklenmez. Önceki migrationlar değiştirilmez. Yeni adayın native ve CI kanıtları tek stüdyo devrindedir.
+`product_versions.published_name` yeni sürümde sabittir; kataloğun `ProductTerms.name` alanı seçilen sürümün adıdır. UPDATE trigger’ı ad değişimini reddeder. Backfill yalnız gerçekten kayıtlı ürün adını kullanır; eski satış/finans/scope/hak defterleri değiştirilmez. Aynı ürün kimliğinde yeni yayın yeni snapshot yaratır. Restore/export core satırının yeni alanını taşır; ayrı private veri deposu veya imha consumer’ı eklenmez. Önceki migrationlar değiştirilmez. PR58/main5639783b5dcd963d84bb76ec7bdf75d65a75ced5 için aday40452100471/main40476673333/CD40479412819 başarılı;67 uygulandı. Native ve kaynak kanıtları tek stüdyo devrindedir.
 
 ## Eşzamanlılık ve indeks planı
 
