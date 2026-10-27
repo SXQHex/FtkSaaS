@@ -8,6 +8,16 @@ Aşağıdaki geliştirme/aday-pending ve hata kayıtları tarihsel kaynak snapsh
 
 Kaynak: `feature/p06-reports-imports`, taban kabul edilmiş main `83641447b29e459236aea1a9a4379b5d19825af6`. Durum **kod adayı; aynı kaynak aday/main clean ve development CD kabulü bekleniyor**.200 sözleşme/178 runtime/22 contract_only,54 migration/90 core tablo. P07'nin22 API'si yalnız sözleşmedir. P05/PR37'nin kabul ve CD receipt'i güncel devirde kapatıldı; bu eski başarı yeni P06 kaynağının kabulü değildir.
 
+## Starter tüketici kabulü — ST-02
+
+Starter backend teslimi mevcut P05/P06 işlemlerini kullanır; yeni endpoint veya genel CRM/reminder yetkisi açmaz. `collections_debts` ve `lesson_attendance` aynı filtre/para birimi/sayfa/tam toplam kurallarıyla okunur. Export yalnız isteği açan hesabın güncel rapor/merkez/finans/export yetkisinde indirilir. Öğrenci kendi inbox’ını okuyabilir; bu hak yönetim raporu veya import yetkisi değildir. Owner'ın org okuması tek başına import için CM yetkisi sağlamaz.
+
+Import açık teknik tenant konfigürasyonu ister; bu teslim default limit icat etmez. Özel CSV yüklemesi ve checksum doğrulaması sonrası teknik preview hiçbir kişi/hak/borç üretmez. Açık apply ve dedicated worker, başarılı kaynak anahtarını kalıcı tekilleştirir. Mevcut kişiyi `person_ref` seçer; yeni kişinin hesabı/daveti otomatik oluşmaz. Açılış hakkı, açık borç ve tahsilat ayrı kayıtlardır; import nakit yaratmaz. Starter 100 aktif öğrenci sınırı preview ve her apply satırında tekrar denetlenir; son kontenjan dolarsa başarısız satır kişi/borç/hak bırakmaz. Açılış kredi gerçek self rezervasyon ve anlaşmasız/hakedişsiz yoklama akışınca tüketilir.
+
+İşin tamamlanma bildirimi yalnız isteği açan kişinin uygulama içi inbox’ına gider. Reminder/marketing tercihinin kapalı olması işlemsel bildirimi durdurmaz. Okundu ve tercih yazma yeni bildirim üretmez. Dedicated P05 worker bu işleri Starter'da teslim eder; F27 reminder ve F24 otomasyon açılmaz. Dış e-posta/SMS/provider veya frontend ekran kabulü bu teslim değildir.
+
+Kaynak bağlı regresyon: `apps/backend/tests/starter-operations-acceptance.mjs`, mevcut registry suite üzerinden gerçek Auth→Storage→Edge→RPC ve dedicated P05/P06 LOGIN çalıştırır. Yeni suite/shard veya full clean kapsam değişikliği yoktur. Bu yeni tüketici kabulünün çalışma durumu [tek backlog](remaining-work.md), CI/main/development kabulü [00 devir](contracts/00-FtkSaaS-yeni-sohbet-devir.md) sahibindedir; kaynakta test bulunması testin geçtiği anlamına gelmez.
+
 ## Teslim edilen akış
 
 - Rapor: `report_get_v1` → `report_export_start_v1` → dedicated `report_build_v1` → `report_file_get_v1` tanımı ve aynı authenticated POST ile CSV byte indirme. Sayfa limiti toplamı/exportu kesmez. Aynı key/payload aynı işi döndürür.

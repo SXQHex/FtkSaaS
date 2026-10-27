@@ -34,8 +34,12 @@ Actual main’in iki parent’ı yukarıdaki base/head’dir ve test edilen tree
 
 PR61 native28/28 ve yerel151/151 kanıtları kaynak raporundadır. Gerçek Turnstile tokenı ve frontend E2E bu kanıtlarla kapatılmaz. uye.fethiyetango.com yalnız mevcut widget’ın izinli alanına eklendi; eski frontend/site/DNS değiştirilmedi, public adapter dağıtılmadı.
 
-## Aktif çalışma ve frontend kaynağı
+## Monorepo kabulü ve aktif çalışma
 
-Monorepo/SSoT taşıması PR62 içinde bu kabul edilmiş main’den ayrı bir adaydır; yukarıdaki CI/hosted başarısı taşıma kaynağına otomatik geçmez. Eski94831a adayı için full clean40521129985 kullanıcı tarafından iptal edildi; kabul değildir. Son talimat kök dizini temiz monorepo biçimine almak ve önce PR testlerini çalıştırmaktır. Backend apps/backend, normatif JSON packages/api-contracts/schema, yaşayan sözleşmeler docs/contracts, tarihsel snapshotlar docs/history altına taşınır; içerik ve domain davranışı korunur. saaspt main `bec7e204e06a813e4907ff012d4bcea783472a15` kaynağı incelendi; apps/web ve packages/ui aktarımı sonraki adımdır. Tasarım sentetiktir; Auth/API ekranları henüz bağlı değildir. Kullanıcının gerçek API entegrasyon hedefi mevcut geliştirme Supabase’idir.
+PR62 normal merge ile main `1c15ac8c43b4acc07e129b970e49801ebaf16d10` kaynağına alındı (parent’lar `af06a64ba2e02823f60e74dcf637cc4dee0bd485` ve `e5dfcfd18e91c21a77e9773d33e5b58e6a4ec18a`; tree `9684db7655e25cd631d30cfc804d2d649f90e524`). Aynı SHA'nın [main clean40542200511](https://github.com/SXQHex/FtkSaaS/actions/runs/40542200511) ve [development CD40546616984](https://github.com/SXQHex/FtkSaaS/actions/runs/40546616984) completed/success olduğu GitHub'dan doğrulandı. CD artifact12752229300. REPO-01 kapandı; önceki PR61 domain/hosted ayrıntıları yukarıda kendi kaynağında korunur.
 
-[Kaynak indeksi](../source-index.md), [tek backlog](../remaining-work.md), [aktif sıra](../production-queue.md), [taşıma/ortam devri](../monorepo.md). Önceki uzun devir checkpointleri Git geçmişinde `af06a64` sürümünde korunur; tarihsel reports/ dosyaları değişmez.
+Kullanıcının son talimatı yalnız ST-02 rapor/import/işlemsel bildirim teslimidir. Branch `feat/starter-reports-import-notifications`, başlangıç yukarıdaki kabul edilmiş main. Yeni Starter tüketici testleri mevcut registry suite'e eklenir; aday/main/development kabulü henüz yoktur. Yerel verify156/156 geçti; native stack PostgreSQL artifact indirmesi bu host’un ağında DNS timeout verdi, gerçek API testleri henüz geçmedi. Bu sınır hosted veride test/reset yaparak aşılmaz.
+
+Backend `apps/backend`, normatif JSON `packages/api-contracts/schema`, yaşayan sözleşmeler `docs/contracts`, tarihsel snapshotlar `docs/history` altındadır. saaspt main `bec7e204e06a813e4907ff012d4bcea783472a15` kaynak incelemesi önceki teslimdedir; frontend aktarımı ve ekran/API kabulü frontend ekibinin ayrı WEB-01 işidir.
+
+[Kaynak indeksi](../source-index.md), [tek backlog](../remaining-work.md), [aktif sıra](../production-queue.md), [ortam devri](../monorepo.md).
