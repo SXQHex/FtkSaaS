@@ -2,7 +2,17 @@
 
 Bu dosya güncel backend kabulünün tek kaynağıdır. Ürün davranışı 01/02 ve kabul kararlarında; açık iş docs/remaining-work.md içindedir. Tarihsel aday notları güncel statü olarak taşınmaz.
 
-## Son kabul edilmiş backend
+## ST-02 kapanışı — 28 Ekim 2026
+
+Son kabul edilmiş backend main: `19189d74e7feb1f03cfbd4e05b9132b2c71e4926`, [PR63](https://github.com/SXQHex/FtkSaaS/pull/63). Head `398c34dccb140b2763ba4907d642b05a41fbe4ab`, base `1c15ac8c43b4acc07e129b970e49801ebaf16d10`, tested merge `529bf58a86986ac8a883106a919520bbb658808b`, tree `97ea9416a20c041cdb16498e1960f8d14fb8426d`. Actual main aynı iki parent ve tree ile doğrulandı. Son tree bağımsız incelemesinde açık bulgu yok; ilk P2 outbox teslim kanıtı düzeltildi. İnceleme kaydı PR63 açıklamasındadır.
+
+[Aday40574962716](https://github.com/SXQHex/FtkSaaS/actions/runs/40574962716), [aynı main40580037633](https://github.com/SXQHex/FtkSaaS/actions/runs/40580037633) ve [development CD40583510430](https://github.com/SXQHex/FtkSaaS/actions/runs/40583510430) attempt1 completed/success. Main source/core/API1–4/toplayıcı ve CD source/deploy/hosted doğrulama adımları geçti. CD receipt artifact12771360001, SHA256 `216a2d150fd0c2ec26b274117deec4ea995a02231e12274dd4f1fba73d0c717d`.
+
+ST-02 kapandı: Starter gerçek CSV→preview→apply→hak/borç→tahsilat→self rezervasyon/yoklama→temel rapor/CSV ve işlemsel inbox zinciri kabul edildi. P05 pending→succeeded, worker sonucu ve tam bir bağlı receipt ayrıca denetlenir. Canlı yetki kaybı, current/consumed preview, satır rollback/kota ve replay korundu. Runtime API/migration/plan/CI politikası değişmedi; envanter213 callable/0 contract_only/68 migration/90 core tablo kaldı. [Alan devri](../p06-handover.md#starter-tüketici-kabulü--st-02).
+
+Development kabulü production kabulü değildir. Frontend/public sağlayıcı, ST-03/OPS-01/REL-01 bu kapanıştan türetilmez. Sonraki sıra başlatılmadı. İptal edilmiş hedefli koşular başarı sayılmaz; son kaynak bağlı aday/main full clean esas alınır.
+
+## Önceki domain/hosted tabanı — PR61
 
 | Alan | Doğrulanmış kaynak |
 |---|---|
@@ -34,6 +44,10 @@ Actual main’in iki parent’ı yukarıdaki base/head’dir ve test edilen tree
 
 PR61 native28/28 ve yerel151/151 kanıtları kaynak raporundadır. Gerçek Turnstile tokenı ve frontend E2E bu kanıtlarla kapatılmaz. uye.fethiyetango.com yalnız mevcut widget’ın izinli alanına eklendi; eski frontend/site/DNS değiştirilmedi, public adapter dağıtılmadı.
 
+## Monorepo kabulü ve aktif çalışma
+
+PR62 normal merge ile main `1c15ac8c43b4acc07e129b970e49801ebaf16d10` kaynağına alındı (parent’lar `af06a64ba2e02823f60e74dcf637cc4dee0bd485` ve `e5dfcfd18e91c21a77e9773d33e5b58e6a4ec18a`; tree `9684db7655e25cd631d30cfc804d2d649f90e524`). Aynı SHA'nın [main clean40542200511](https://github.com/SXQHex/FtkSaaS/actions/runs/40542200511) ve [development CD40546616984](https://github.com/SXQHex/FtkSaaS/actions/runs/40546616984) completed/success olduğu GitHub'dan doğrulandı. CD artifact12752229300. REPO-01 kapandı; önceki PR61 domain/hosted ayrıntıları yukarıda kendi kaynağında korunur.
+
 ## Aktif frontend çalışması
 
 Yerel başlangıç kaynağı main `1c15ac8c43b4acc07e129b970e49801ebaf16d10` (PR62 monorepo). Aynı kaynağın [main kabulü40542200511](https://github.com/SXQHex/FtkSaaS/actions/runs/40542200511) ve [development CD40546616984](https://github.com/SXQHex/FtkSaaS/actions/runs/40546616984) başarılı olarak canlı doğrulandı; bu kanıt yerel frontend değişikliklerine taşınmaz.
@@ -44,4 +58,7 @@ Yerel pnpm check:frontend lint + TypeScript7.0.2 typecheck +11 web/1 UI testi +N
 
 Frontend değişiklikleri feat/frontend-foundation aday dalındadır; yeni kaynak için uzak CI/merge kabulü henüz yoktur. Kullanıcı 28 Ekim’de bu dalın push edilmesini istedi. Mevcut backend tetikleyicileri frontend push/merge’lerinde de çalışabilir; bu push talimatı backend kodunu veya kabul politikasını değiştirme yetkisi vermez. Backend sahibinin [CI kapsam/kabul devrini](../frontend-backend-ci-handover.md) tamamlaması gerekir. Güncel frontend araç/komut kuralları [frontend devrindedir](../frontend-development.md).
 
-[Kaynak indeksi](../source-index.md), [tek backlog](../remaining-work.md), [aktif sıra](../production-queue.md), [taşıma/ortam devri](../monorepo.md). Önceki uzun devir checkpointleri Git geçmişinde `af06a64` sürümünde korunur; tarihsel reports/ dosyaları değişmez.
+
+Güncel main ile frontend dalının belge çakışmaları birleştirildi; ST-02 ve REPO-01 kapanışları korunur. Kullanıcı yalnız workspace kök sahiplik testinin skill dokümanlarını tanıması için dar izin verdi; bu değişiklik ve kalan CI ayrımı [backend CI devrinde](../frontend-backend-ci-handover.md) açıklanır. PR66 aktif adaydır; yeni kaynağın full clean kabulü ayrıca gereklidir.
+
+[Kaynak indeksi](../source-index.md), [tek backlog](../remaining-work.md), [aktif sıra](../production-queue.md), [ortam devri](../monorepo.md).
