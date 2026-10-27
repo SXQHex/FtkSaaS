@@ -10,7 +10,11 @@ Son açık kullanıcı kararı üstündür; kabul edilmiş D01–D09/U01–U08/Q
 
 [Belge haritası](docs/documentation-map.md) her yaşayan Markdown dosyasının sahibini/rolünü gösterir. Güncel SHA/envanter/CI/CD yalnız 00 devirde; açık iş yalnız remaining-work’te; sıra yalnız production-queue’da tutulur. Diğer belgeler bu kaynaklara bağlanır, durum metnini kopyalamaz. Tarihsel docs/history/ içeriği yeniden yazılmaz; taşınmış kaynakların commit/yol/hash izi docs/history/manifest.json içinde tutulur. Üretilmiş katalog/tipler üreticiden güncellenir; ikinci sözleşme ağacı kurulmaz.
 
-SXQHex/FtkSaaS tek geliştirme reposudur. saaspt göçü sonraki adımdır; hedef apps/web ve packages/ui olarak hazırlanır; frontend tasarımı/etkileşimleri bu taşıma kapsamında değiştirilmez. Uygulama kapsamları ve pnpm/Turbo komutları [monorepo devrindedir](docs/monorepo.md). apps/backend backend kod/test/CI araçlarının tek sahibidir. Root package.json yalnız workspace yönetir. packages/api-contracts/schema/contract.json tek makine kaynağı, aynı paketin src/ dizini üretilmiş tip sahibidir. Ortak TS ayarı packages/typescript-config içindedir; yeni runtime çıktısı .artifacts altında, private yerel durum apps/backend/.dev altında kalır. Frontend göçünde saaspt’nin ilgili ajan/tasarım kuralları ayrıca incelenir.
+SXQHex/FtkSaaS tek geliştirme reposudur. Kullanıcının 28 Ekim kararıyla diğer repolar bağlam dışıdır; frontend apps/web ve packages/ui içinde yeni geliştirilir. Önce shadcn/ui ve ondan türetilen hazır bloklar kullanılır; kaynak/lisans izi korunur. Vitest/Testing Library/MSW ve Playwright/axe altyapısı başlangıçtan itibaren hazır tutulur. [Frontend geliştirme devri](docs/frontend-development.md) ve paket kapsamındaki AGENTS ayrıca okunur.
+
+Frontend görevi apps/backend ve mevcut backend CI/kabul kaynaklarını değiştirme yetkisi vermez. Frontend/backend test komutları ve tetiklemeleri ayrıdır. Backend sahibinin yapması gereken karşılıklı tetikleme/kabul değişiklikleri [CI devrinde](docs/frontend-backend-ci-handover.md) tutulur; uygulanmamış devir tamamlandı sayılmaz.
+
+Backend kod/test/CI araçlarının tek sahibi apps/backend'dir. Root package.json yalnız workspace yönetir. packages/api-contracts/schema/contract.json tek makine kaynağı, aynı paketin src/ dizini üretilmiş tip sahibidir. Ortak TS sürümü katalogdan kullanılır; backend araçları frontend uyumluluğu için değiştirilmez. Yeni runtime çıktısı .artifacts altında, private backend yerel durumu apps/backend/.dev altında kalır.
 
 ## Güvenlik ve ortamlar
 

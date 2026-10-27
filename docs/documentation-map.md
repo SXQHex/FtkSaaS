@@ -24,6 +24,8 @@ Kuyruktaki eşsiz P08 kararları [P08 kararının](decisions/P08-accepted-scope.
 | [docs/ci-performance.md](ci-performance.md) | Kaynağa bağlı performans ölçümleri |
 | [docs/ci-policy.md](ci-policy.md) | CI/kabul ve test süreci |
 | [docs/ci02-handover.md](ci02-handover.md) | Alan tüketim devri ve kaynağına bağlı eski kabul; güncel durum sahibi00 |
+| [docs/frontend-development.md](frontend-development.md) | Frontend bileşen/araç/çalıştırma ve test kuralları |
+| [docs/frontend-backend-ci-handover.md](frontend-backend-ci-handover.md) | Backend sahibine CI kapsam ve kabul arayüzü |
 | [docs/claude-handover.md](claude-handover.md) | İstemci protokolü ve gerçek tüketim devri |
 | [docs/contracts/00-FtkSaaS-yeni-sohbet-devir.md](contracts/00-FtkSaaS-yeni-sohbet-devir.md) | Güncel kabul/SHA/CI/CD/hosted durumun tek sahibi |
 | [docs/contracts/01-FtkSaaS-urun-kapsam-sozlesmesi.md](contracts/01-FtkSaaS-urun-kapsam-sozlesmesi.md) | Normatif ürün/plan kapsamı |

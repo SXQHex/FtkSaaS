@@ -1,6 +1,41 @@
 {
   "$schema": "https://turbo.build/schema.json",
   "tasks": {
+    "dev": {
+      "cache": false,
+      "persistent": true
+    },
+    "lint": {
+      "outputs": []
+    },
+    "build": {
+      "dependsOn": [
+        "^typecheck"
+      ],
+      "outputs": []
+    },
+    "test:e2e": {
+      "cache": false,
+      "dependsOn": [
+        "build"
+      ],
+      "env": [
+        "NEXT_PUBLIC_SUPABASE_URL",
+        "NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY",
+        "NEXT_PUBLIC_APP_ORIGIN",
+        "CI",
+        "PLAYWRIGHT_BASE_URL"
+      ]
+    },
+    "test:coverage": {
+      "cache": false,
+      "dependsOn": [
+        "^typecheck"
+      ],
+      "outputs": [
+        "coverage/**"
+      ]
+    },
     "verify": {
       "dependsOn": [
         "^typecheck"

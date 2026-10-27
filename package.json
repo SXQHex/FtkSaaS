@@ -11,6 +11,13 @@
     "typecheck": "turbo run typecheck",
     "generate": "pnpm --filter @ftksaas/backend generate",
     "test": "turbo run test",
+    "test:frontend": "turbo run test --filter=@ftksaas/web --filter=@ftksaas/ui",
+    "test:frontend:e2e": "turbo run test:e2e --filter=@ftksaas/web",
+    "test:frontend:coverage": "turbo run test:coverage --filter=@ftksaas/web --filter=@ftksaas/ui",
+    "test:backend": "turbo run test --filter=@ftksaas/backend",
+    "check:frontend": "turbo run lint typecheck test build --filter=@ftksaas/web --filter=@ftksaas/ui",
+    "dev:web": "turbo run dev --filter=@ftksaas/web",
+    "build:web": "turbo run build --filter=@ftksaas/web",
     "test:clean": "pnpm --filter @ftksaas/backend test:clean",
     "dev:backend": "pnpm --filter @ftksaas/backend dev:start",
     "stop:backend": "pnpm --filter @ftksaas/backend dev:stop"

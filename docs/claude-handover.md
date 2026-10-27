@@ -1,6 +1,6 @@
 # İstemci entegrasyon devri
 
-Güncel kaynak/hosted kabulü [00 devirde](contracts/00-FtkSaaS-yeni-sohbet-devir.md); repo ve ortam düzeni [monorepo devrinde](monorepo.md). Bu belge yalnız istemci tüketim kurallarını taşır. UI hedefi apps/web, ortak bileşen hedefi packages/ui; aktarım henüz yapılmamıştır. Eski model adları rol etiketidir.
+Güncel kaynak/hosted kabulü [00 devirde](contracts/00-FtkSaaS-yeni-sohbet-devir.md); repo ve ortam düzeni [monorepo devrinde](monorepo.md). Bu belge yalnız istemci tüketim kurallarını taşır. Frontend apps/web, ortak shadcn/ui bileşenleri packages/ui sahibindedir; [geliştirme kuralları](frontend-development.md) uygulanır. Eski model adları rol etiketidir.
 
 ## Gerçek sözleşme
 
@@ -35,4 +35,4 @@ Para borcu, öğrenci alacağı, kullanılabilir/ayrılmış hak ayrı gösteril
 
 ## Entegrasyon kabulü
 
-saaspt’deki görünüm ve test verisi sentetiktir. Gerçek native giriş/oturum, rol-plan görünürlüğü, DTO/sürüm/preview/replay ve hata senaryoları ekran→Edge→DB ile doğrulanmadan canlı bağlı denmez. Gerçek API hatasında sessiz demo/sahte başarı fallback’i yoktur. Secrets/admin anahtarı public değişkene veya istemci bundle’ına girmez. Native Auth provider kabulü, public Turnstile ve org dış bildirimleri farklıdır. Açık iş bu dosyada çoğaltılmaz; [tek backlog](remaining-work.md) kullanılır.
+Vitest/MSW sunum fixture’ları sentetiktir. Gerçek native giriş/oturum, rol-plan görünürlüğü, DTO/sürüm/preview/replay ve hata senaryoları ekran→Edge→DB ile doğrulanmadan canlı bağlı denmez. Gerçek API hatasında sessiz demo/sahte başarı fallback’i yoktur. Secrets/admin anahtarı public değişkene veya istemci bundle’ına girmez. Native Auth provider kabulü, public Turnstile ve org dış bildirimleri farklıdır. Açık iş bu dosyada çoğaltılmaz; [tek backlog](remaining-work.md) kullanılır.
