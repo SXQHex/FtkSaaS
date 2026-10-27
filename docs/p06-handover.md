@@ -18,6 +18,16 @@ Import açık teknik tenant konfigürasyonu ister; bu teslim default limit icat 
 
 Kaynak bağlı regresyon: `apps/backend/tests/starter-operations-acceptance.mjs`, mevcut registry suite üzerinden gerçek Auth→Storage→Edge→RPC ve dedicated P05/P06 LOGIN çalıştırır. Yeni suite/shard veya full clean kapsam değişikliği yoktur. Bu yeni tüketici kabulünün çalışma durumu [tek backlog](remaining-work.md), CI/main/development kabulü [00 devir](contracts/00-FtkSaaS-yeni-sohbet-devir.md) sahibindedir; kaynakta test bulunması testin geçtiği anlamına gelmez.
 
+### ST-02 özellik izi
+
+| Özellik | Bu teslimde doğrulanan tüketici |
+|---|---|
+| F01/F04/F07 | Canlı hesap/tenant/merkez/yönetici ve 100 aktif öğrenci sınırı |
+| F11/F14/F15/F19 | İçe aktarılan hak, ayrı borç/tahsilat, self rezervasyon ve Starter yoklama; hakediş yok |
+| F26 | İşi açanın in_app tamamlanma bildirimi, kendi inbox’ı, sürümlü okundu ve tekrar koruması |
+| F28/F31/F33 | Temel rapor/tam CSV, private upload, preview/apply, kaynak tekilliği ve canlı sonuç kurtarma |
+| Diğer F01–F33 | Yeni davranış veya plan genişlemesi yok; mevcut kabul korunur |
+
 ## Teslim edilen akış
 
 - Rapor: `report_get_v1` → `report_export_start_v1` → dedicated `report_build_v1` → `report_file_get_v1` tanımı ve aynı authenticated POST ile CSV byte indirme. Sayfa limiti toplamı/exportu kesmez. Aynı key/payload aynı işi döndürür.
