@@ -1,10 +1,10 @@
-## 27 Ekim — PR56 aday kabul düzeltmesi
+## 27 Ekim — Starter plan kapıları teslimi kapandı
 
-İlk full clean40415840619 API4'te tek rol okuma senaryosu ve parent nedeniyle başarısız; core/API1/API2/API3 başarılı. Genel rol listesinin Starter F05 kapısı korunarak eski scope fixture'ı Pro'ya taşındı ve owner/CM Starter retleri eklendi. Runtime/66 migration değişmedi. Son oda/rol native12/12,149 yapısal kontrol ve bağımsız inceleme geçti; yeni aday/main/CD kabulü tamamlanmadan Starter teslimi kapanmaz. [Kaynak ve kabul](../reports/starter-plan-gates-role-read-ci-fix-20261027.md).
+[PR #56](https://github.com/SXQHex/FtkSaaS/pull/56) main `ed747324f7d008b24103d4fd2eba503791c70a93` üzerinde kabul edildi: **213 callable API / 0 contract_only / 66 migration / 90 core tablo**. [Aday full clean40419827224](https://github.com/SXQHex/FtkSaaS/actions/runs/40419827224), [aynı main full clean40422823564](https://github.com/SXQHex/FtkSaaS/actions/runs/40422823564) ve [development CD40425584520](https://github.com/SXQHex/FtkSaaS/actions/runs/40425584520) başarılı. CD gerçek deploy ve20/20 hosted kontrol içerir; backend-v1 Edge21 ACTIVE, `verify_jwt=true`. JWT doğrulaması son kullanıcı kararıyla açık kalır.
 
-## 26 Ekim — aktif Starter plan kapıları teslimi
+Starter limitleri **1 merkez / 1 aktif oda / 1 disiplin / 1 aktif eğitmen / 100 aktif öğrenci**; tek mantıksal oda, seçili merkez-disiplin paketi ve disiplin adı ön eki uygulanır. Genel CRM/etkinlik/personel/hakediş kapalı; yoklama anlaşmasız ve hakedişsiz çalışır. Canlı plan/kapsam kapıları eski receipt/preview/grant ve doğrudan RPC ile aşılamaz. Pro→Starter kapsam seçimi sürümlüdür; seçilmeyen operasyon kapanır, geçmiş seans/kesin rezervasyon/hak/finans kayıtları korunur. [DTO, kapsam ve kabul kanıtları](starter-plan-gates-handover.md).
 
-Birinci satır PR55/main3fa72e7 belge kabulüyle kapandı. Aktif iş Starter limit/özellik kapıları ve sürümlü plan düşürme kapsamıdır. Başlangıç main `3fa72e7b805b2bbfb8895f3d90813eaa3cb416aa`; yeni kaynak213 API/66 migration adayıdır. Seçilmeyen kaynakların operasyonu kapanır, geçmiş/rezervasyon/para-hak verisi korunur. [Kaynak, DTO ve kabul sınırı](starter-plan-gates-handover.md). Yeni kaynak final native/bağımsız inceleme/aday/main/CD kabulü henüz tamamlanmadı; production dağıtımı yok. Pro/Business ayrı sayısal limit ve özel teklif işleri bu dar teslimle kapatılmaz. Aşağıdaki eski bekleme/yerel kayıtlar kendi kaynaklarının checkpointleridir.
+Bu kapanış yalnız plan kapıları ve sürümlü kapsam düşürme teslimidir; bütün Starter dağıtım yol haritası, gerçek public hostname/Turnstile, Pro/Business ayrı limit/özel teklif veya production hazırlığı tamamlandı sayılmaz. Aşağıdaki önceki kaynaklara ait tarihli aday/bekleme/envanter notları tarihsel checkpointlerdir; güncel kabul veya açık iş olarak kullanılmaz. Tarihsel `reports/` dosyaları ve eski kaynak snapshotları korunur. Bu belge eşitlemesi yeni runtime testi veya deploy değildir.
 
 ## 26 Ekim — satır 1 runtime ve hosted kabulü tamamlandı
 
@@ -36,6 +36,17 @@ PR52 main043347e8e23e671059285f5f20d86f1c0fafe9ad: aday40302913868 ve aynı main
 
 # FtkSaaS sıralı üretim kuyruğu
 
+## Güncel teslim ve kalan sıra — 27 Ekim
+
+| Teslim | Durum | Sonraki sınır |
+|---|---|---|
+| Kimlik/doğrulanmış iletişim/hesap güvenliği | PR54/55 backend ve hosted kabulü kapalı | SMS gerçek sağlayıcısı ayrı dış entegrasyon |
+| Starter plan kapıları ve sürümlü kapsam düşürme | PR56 backend/main/CD kabulü kapalı; tamamlanan uygulama promptu kaldırıldı | Bu belge eşitlemesinin kendi kaynak/merge kabulü ayrıca doğrulanır |
+| Starter dağıtım yol haritasının kalan backend işleri | Açık | Yeni Starter kuruluş/defaultları ve tek stüdyo paket-program zincirinin gap/kabul eşlemesi; self/public gerçek hostname/Turnstile; satış→tahsilat→rezervasyon→yoklama→hak ve temel rapor/import/bildirim/işletim kabulü |
+| Production yayını ve frontend | Bu teslimin dışında | Ayrı somut hedef/kaynak yetkisi ve kabul |
+
+Son kullanıcı hedefi bütün Starter backend yol haritasıdır. Önceden kapanmış motorlar yeniden yazılmaz; Pro/Business genişletmeleri öne alınmaz. Yol haritasındaki eski çok-disiplin/F11/F16 ret varsayımları son1 disiplin/F11 self/F16 süreli-sınırsız/F25 dar public kararını değiştirmez. Sıradaki uygulama mevcut kaynak ve gerçek boşlukla belirlenir; bu belge kapanışı yeni ürün davranışı veya production yetkisi değildir.
+
 ## 26 Ekim — main uzlaştırması ve sağlayıcı kabul sırası
 
 Güncel remote main18a151adf3f1519395dc1c539beacd6bf003ada3: PR51 yalnız plan karar belgelerini birleştirdi; Main clean40254883988 ve CD40254953023 success. Bu belge-only kabul yeni kimlik kaynağının runtime kabulü değildir; backend hâlâ212 API/64 migration. Yerel teslim1 adayı213/65 yeni main plan kararlarını koruyarak uzlaştırıldı. Kullanıcı gerçek bağlama kabulü için kullanılmamış bir Google hesabı sağladı; önce yeni API/fence için inceleme/aday/main/development kabulü gerekir, ardından kullanıcı gerçek Google kimliğini test hesabına bağlar. Bu amaçla bağımsız Google signup yapılıp kimlik tüketilmez. SMS dış entegrasyondur ve backend kapısı değildir.
@@ -59,7 +70,7 @@ Bu kapanış ikinci teslim için otomatik geliştirme/merge/yayın yetkisi deği
 
 ## 26 Ekim — kabul edilmiş Starter/Pro/Business plan revizyonu (uygulama kuyruğu)
 
-[Plan ürün kararı](../contracts/01-FtkSaaS-urun-kapsam-sozlesmesi.md) 01/02/06 sözleşmelerine aktarıldı: Starter 1 merkez/oda/disiplin/eğitmen/100 aktif öğrenci, tek odalı sabit program, temel self/public, CRM+etkinliksiz; Pro 1 merkez/tüm işlevler; Business 5 merkez, 5 üstü sürümlü özel teklif. **İş durumu: queued — yalnız ürün kararı ve doküman**, runtime kabulü değil. Mevcut ilk açık backend ürün işi ve P08'e göre zorunlu bağımlılıkları saptamadan yeni paralel uygulama PR'si açma. Bir sonraki doğal backend uygulama diliminde [kalan işlerin kontrol listesi](remaining-work.md) gereği plan katalog/limit, plan gate, yeni Starter F11/F16/F25 ve Pro F24, event/CRM retleri, oda/disiplin/eğitmen atomik sınırları, downgrade/özel teklif, DTO, F01–F33, CI/hosted kanıtları aynı teslimde veya kaynak bağı açık kademeli teslimlerde kapatılacak. Bu docs-only PR'si `feature_delivery` üretecini veya çalışma kaynaklarını elle değiştirmez; tam clean tetiklemez. Önceki P08 durum satırları tarihsel/bekleyen işler olarak korunur.
+[Plan ürün kararı](../contracts/01-FtkSaaS-urun-kapsam-sozlesmesi.md) 01/02/06 sözleşmelerine aktarıldı: Starter 1 merkez/oda/disiplin/eğitmen/100 aktif öğrenci, tek odalı sabit program, temel self/public, CRM+etkinliksiz; Pro 1 merkez/tüm işlevler; Business 5 merkez, 5 üstü sürümlü özel teklif. **Starter alt teslimi tamamlandı:** PR56/main ed747324 üzerinde runtime, aday/main clean ve development CD kabulü var. Pro/Business diğer sayısal limit/özel teklif alt işleri ayrı açıktır. Mevcut ilk açık backend ürün işi ve P08'e göre zorunlu bağımlılıkları saptamadan yeni paralel uygulama PR'si açma. Bir sonraki doğal backend uygulama diliminde [kalan işlerin kontrol listesi](remaining-work.md) gereği plan katalog/limit, plan gate, yeni Starter F11/F16/F25 ve Pro F24, event/CRM retleri, oda/disiplin/eğitmen atomik sınırları, downgrade/özel teklif, DTO, F01–F33, CI/hosted kanıtları aynı teslimde veya kaynak bağı açık kademeli teslimlerde kapatılacak. Bu docs-only PR'si `feature_delivery` üretecini veya çalışma kaynaklarını elle değiştirmez; tam clean tetiklemez. Önceki P08 durum satırları tarihsel/bekleyen işler olarak korunur.
 
 
 ## 26 Ekim — PR50 hesap ve güvenlik teslim paketi

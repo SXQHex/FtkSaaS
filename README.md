@@ -1,30 +1,25 @@
-> Aktif backend adayı: [Starter plan kapıları ve sürümlü kapsam seçimi](docs/starter-plan-gates-handover.md).213 API/66 migration; main/hosted kabulü henüz tamamlanmadı.
-
 # FtkSaaS backend
 
-## 25 Ekim — PR45 kapasite ve main ayarları uzlaştırması
+## Doğrulanmış güncel kaynak
 
-Başlangıç main `3456050a3061d7bf5dc2ce8898b82c5cfe84e773`: **206 callable API / 60 migration**; PR46 ayarları birleşti, aynı main clean [40200716603](https://github.com/SXQHex/FtkSaaS/actions/runs/40200716603) ve development CD [40202862244](https://github.com/SXQHex/FtkSaaS/actions/runs/40202862244) başarılı. Bu PR45 birleşim adayı kapasite işlemini ekler: **207 callable API / 61 migration**. Altı ayar işlemi ve kapasite davranışı birlikte korunur. Henüz uygulanmamış kapasite migration’ı main’deki ayar migration’ından sonra sıralandı; SQL içeriği ve mevcut 60 migration değişmedi. Önceki PR45 clean yalnız eski tabana aittir; bu birleşik kaynak için bağımsız inceleme ve yeni aday/main clean gerekir. Kapasite henüz main/hosted kabulü değildir.
+## 27 Ekim — Starter plan kapıları teslimi kapandı
 
-[Alanlar, API'ler ve kesin destek sınırı](docs/frontend-settings-handover.md). Teknik SQL/worker yönetimi erteli; beş ekranın bütün 69 davranış grubu tamamlandı denmez. Hazır renk/font/logo, native provider/MFA/oturum ve diğer özel yaşam döngüsü açıkları bu genel tercihlere dönüştürülmez.
+[PR #56](https://github.com/SXQHex/FtkSaaS/pull/56) main `ed747324f7d008b24103d4fd2eba503791c70a93` üzerinde kabul edildi: **213 callable API / 0 contract_only / 66 migration / 90 core tablo**. [Aday full clean40419827224](https://github.com/SXQHex/FtkSaaS/actions/runs/40419827224), [aynı main full clean40422823564](https://github.com/SXQHex/FtkSaaS/actions/runs/40422823564) ve [development CD40425584520](https://github.com/SXQHex/FtkSaaS/actions/runs/40425584520) başarılı. CD gerçek deploy ve20/20 hosted kontrol içerir; backend-v1 Edge21 ACTIVE, `verify_jwt=true`. JWT doğrulaması son kullanıcı kararıyla açık kalır.
 
+Starter limitleri **1 merkez / 1 aktif oda / 1 disiplin / 1 aktif eğitmen / 100 aktif öğrenci**; tek mantıksal oda, seçili merkez-disiplin paketi ve disiplin adı ön eki uygulanır. Genel CRM/etkinlik/personel/hakediş kapalı; yoklama anlaşmasız ve hakedişsiz çalışır. Canlı plan/kapsam kapıları eski receipt/preview/grant ve doğrudan RPC ile aşılamaz. Pro→Starter kapsam seçimi sürümlüdür; seçilmeyen operasyon kapanır, geçmiş seans/kesin rezervasyon/hak/finans kayıtları korunur. [DTO, kapsam ve kabul kanıtları](docs/starter-plan-gates-handover.md).
 
-25 Ekim: FD kararları tamamlandı; giriş e-posta/parola + Google (uygulama/provider kabulü ayrı), Apple/Instagram login kapsam dışı. [Güncel karar/kaynak tablosu](contracts/00-FtkSaaS-yeni-sohbet-devir.md) yayımlanmış main200/59 ile henüz merge edilmemiş PR45 kapasite adayını201/60 ayırır. Nominal/maksimum ürün modeli kaldırıldı; mevcut main DTO'ları PR45 merge edilmeden değiştirilmiş sayılmaz.
+Bu kapanış yalnız plan kapıları ve sürümlü kapsam düşürme teslimidir; bütün Starter dağıtım yol haritası, gerçek public hostname/Turnstile, Pro/Business ayrı limit/özel teklif veya production hazırlığı tamamlandı sayılmaz. Aşağıdaki önceki kaynaklara ait tarihli aday/bekleme/envanter notları tarihsel checkpointlerdir; güncel kabul veya açık iş olarak kullanılmaz. Tarihsel `reports/` dosyaları ve eski kaynak snapshotları korunur. Bu belge eşitlemesi yeni runtime testi veya deploy değildir.
 
-Güncel kaynak merkezi [SXQHex/FtkSaaS main](https://github.com/SXQHex/FtkSaaS). Önce [AGENTS](AGENTS.md), [kaynak indeksi](docs/source-index.md) ve [güncel devir](contracts/00-FtkSaaS-yeni-sohbet-devir.md) okunur.
+Güncel kaynak merkezi [SXQHex/FtkSaaS main](https://github.com/SXQHex/FtkSaaS). İşe [AGENTS](AGENTS.md), [kaynak indeksi](docs/source-index.md) ve [güncel devir](contracts/00-FtkSaaS-yeni-sohbet-devir.md) ile başlanır.
 
-## Frontend için başlangıç
+## API ve entegrasyon
 
-- [Settings sözleşmesi ve davranış sprinti](contracts/02-FtkSaaS-teknik-sozlesme.md#ayarlar-sozlesmesi-ve-davranis-sprinti): kabul edilmiş 69 ana grup, tamamlanan FD01–FD12 frontend seçimleri ve backend/frontend ayrımı.
-- [İstemci entegrasyon devri](docs/claude-handover.md): hangi alan/API mevcut, hangi davranış henüz uygulama gerektiriyor; Auth, hata, erişim ve sağlayıcı sınırları.
-- [Makine sözleşmesi](contracts/08-FtkSaaS-tip-ve-operasyon-sozlesmesi.json), [TypeScript API](packages/contracts/src/operations.ts), [endpoint envanteri](docs/endpoint-inventory.json): yalnız yayımlanmış200 operasyonun çağrı sözleşmesi.
-- [Kalan işler](docs/remaining-work.md) ve [üretim kuyruğu](docs/production-queue.md): P08 abone numarası/ortak CRM ve diğer bağımlılıklar.
+- [Makine sözleşmesi](contracts/08-FtkSaaS-tip-ve-operasyon-sozlesmesi.json), [TypeScript API](packages/contracts/src/operations.ts) ve [endpoint envanteri](docs/endpoint-inventory.json):213 yayımlanmış callable operasyon;0 contract_only.
+- [İstemci devri](docs/claude-handover.md): gerçek DTO/yetki/sürüm/sağlayıcı ve kalan consumer sınırları.
+- [Ayar API devri](docs/frontend-settings-handover.md):46 alan/44 writable, altı settings işlemi;69 davranış grubunun tümü uygulanmış değildir.
+- [Kalan işler](docs/remaining-work.md) ve [üretim kuyruğu](docs/production-queue.md): tüm Starter backend yol haritasının kalanları ve ayrı P08 işleri.
 
-## Doğrulanmış durum
-
-P01–P07/PR40 kod/main/geliştirme-test kabulü kapalı:200 sözleşme/200 runtime/0 contract_only,59 migration,90 core tablo/Edge8. Runtime main `4cfc9a55`; son belge tabanı `7020638` (PR42). PR41 yalnız belge kabulüdür; yeni runtime tam test veya deploy değildir. Tam run/source zinciri güncel devirdedir.
-
-Beş hosted Cron aktif; temel heartbeat/idle kontrolü geçti. Fiziksel imha, gerçek yük/restore, dış e-posta ve frontend uçtan uca kabulü ayrıdır. Yeni settings API taslağı yayımlanmadı; 69 ana grup ve FD01–FD12 alan kararları kabul edildi; gerçek DTO/yetki/API matrisi ve uygulama kabulü ayrı. Standart yeni org negatif limiti 0; mevcut kulüp −2 korunur. Bu belge kapanışı yeni kod geliştirmesi başlatmaz. Arayüz tasarımı bu belge tesliminin dışında kalır.
+Kapasite, settings ve kimlik kaynakları PR56 tabanında birleşmiştir. P01–P07 önceki motorları yeniden yazılmaz. Standart yeni org negatif limit kararı0, mevcut kulüp−2’dir; politika yapılandırması ve gerçek consumer kabulü ayrı doğrulanır. Beş hosted worker’ın temel kurulum/idle kanıtı, gerçek iş yükü veya afet kurtarma kabulü değildir.
 
 ## Geliştirme ve CI
 
@@ -39,6 +34,6 @@ npm run test:clean
 npm run dev:stop
 ```
 
-`test:clean` yalnız izole loopback DB'sini sıfırlar; hosted gerçek veriyi reset etme. Geliştirmede birikimli hedefli, runtime/CI son aday ve aynı main'de full clean; incelenmiş güvenli yalnız-belge farkında ayrı kaynak bağlı belge kabulü. [CI politikası](docs/ci-policy.md) ve full-clean kullanıcıya devir kuralı geçerlidir.
+`test:clean` yalnız izole loopback DB’sini sıfırlar; hosted gerçek veriye reset/clean/seed uygulanmaz. Geliştirmede birikimli hedefli doğrulama, runtime/CI son aday ve aynı main’de full clean; incelenmiş güvenli belge yollarında kaynak bağlı belge kabulü uygulanır. [CI politikası](docs/ci-policy.md) ve clean başladığında kullanıcıya devir kuralı korunur. Sadece Markdown uzantısı belge istisnası sağlamaz.
 
-[Hosted kurulum](docs/remote-backend-setup.md) geliştirme/test içindir. Production dağıtımı, frontend tasarımı veya dış e-posta/Resend kurulumu bu görevle yetkilendirilmez. Eski raporlar tarihsel kaynak snapshotlarıdır.
+[Hosted kurulum](docs/remote-backend-setup.md) geliştirme/test içindir. Frontend tasarımı ve production dağıtımı bu kapanışta yapılmaz. Native Auth e-postası/Google/TOTP kabulü önceki kimlik teslimine aittir; pazarlama veya yeni dış gönderim başlatılmaz. Tarihsel raporlar korunur.

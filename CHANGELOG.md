@@ -1,5 +1,9 @@
 # Changes
 
+## 27 Ekim 2026 — Starter plan kapıları kabulü ve belge kapanışı
+
+PR56 normal merge main `ed747324f7d008b24103d4fd2eba503791c70a93`:213 callable API/0 contract_only/66 migration/90 core tablo. Starter kaynak ve100 öğrenci sınırları, tek oda, disiplin paket kapsamı/adı, CRM/etkinlik/personel/hakediş retleri ve eski receipt/preview denetimi kabul edildi. Pro→Starter açık sürümlü kaynak seçimiyle geçmiş/kesin rezervasyon/hak/finans korunur. Aday40419827224, aynı main40422823564 ve gerçek development CD40425584520 başarılı; hosted20/20, Edge21 ACTIVE/verify_jwt=true. [Kapanış kanıtları](docs/starter-plan-gates-handover.md). Güncel devir/kuyruk/durum belgeleri eşitlendi; tarihsel raporlar ve aşağıdaki eski sürüm kayıtları korunur. Bu kapanış bütün Starter yol haritası veya production kabulü değildir.
+
 ## 26 Ekim 2026 — hesap oturum ve TOTP güvenliği adayı
 
 Beş kendi-hesap API’siyle212/64 aday: canlı session listesi, sürümlü etiket, seçili/current/others iptali ve refresh sonlandırma, değişmez güvenlik geçmişi, taze güçlü proof’la TOTP kaldırma köprüsü. Native JWT/session çift aal2 kontrolü eski aal1 erişimini engeller. Sağlayıcıdaki zayıf doğrudan factor kaldırma davranışı exact-factor kısa intent ve transactional fence ile sınırlandı; dar native doğrulama ve bağımsız kod incelemesi geçti; son kaynak/aday/main/CD kabulü bekler. Full/main scope/assertion/süre sınırları korunur.
