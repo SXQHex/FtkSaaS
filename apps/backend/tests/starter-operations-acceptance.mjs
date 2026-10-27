@@ -145,11 +145,13 @@ test('ST-02 Starter import, reports and transactional inbox',{timeout:300000},as
    assert.equal((await rows('select private.starter_student_count($1) n',[org]))[0].n,'100');assert.equal((await rows("select count(*)::int n from core.people where org_id=$1 and display_name='Synthetic overflow'",[org]))[0].n,0);assert.equal((await rows('select sum(amount_minor)::text n from core.debts where org_id=$1',[org]))[0].n,'310');
   });
   await t.test('live manager revocation fences queued import and old result recovery',async()=>{
+   const current=await previewFile(uploaded,'st02-opening');
    const next=await previewFile(uploaded,'st02-opening');await api('import_apply_v1',{preview:token(next.preview)});
    const manager=(await rows("select version from core.role_assignments where org_id=$1 and person_id=$2 and role='center_manager' and state='active'",[org,ownerPerson]))[0];
    await api('center_manager_revoke_v1',{person_id:ownerPerson,expected_version:Number(manager.version),reason:'Synthetic live import authority revocation'});
    const result=await importTick(p06,org);assert.equal(result.length,1);assert.equal(result[0].ok,false);assert.equal(result[0].error.code,'FORBIDDEN');
-   await denied('job_status_get_v1',{job_id:next.job},'FORBIDDEN');await denied('import_rows_list_v1',{job_id:importJob,page:{}},'FORBIDDEN');await denied('preview_get_v1',{preview_id:next.preview.id},'FORBIDDEN');
+   await denied('job_status_get_v1',{job_id:next.job},'FORBIDDEN');await denied('import_rows_list_v1',{job_id:importJob,page:{}},'FORBIDDEN');
+   await denied('preview_get_v1',{preview_id:current.preview.id},'FORBIDDEN');await denied('preview_get_v1',{preview_id:next.preview.id},'NOT_FOUND');
    assert.equal((await rows('select count(*)::int n from core.sales where org_id=$1',[org]))[0].n,1);
   });
  }finally{
