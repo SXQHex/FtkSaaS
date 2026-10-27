@@ -1,10 +1,10 @@
 # Starter plan kapıları — uygulama ve kabul devri
 
-Başlangıç: `3fa72e7b805b2bbfb8895f3d90813eaa3cb416aa`. Bu SHA'nın belge kabulü40386335578 ve CD kaynak kontrolü40386480669 başarılı; runtime kabul kaynağı7464383802deb8322e14a5ebec7d5e2ef650e436'dır. Yeni kaynak bu önceki CI başarısıyla kabul edilmiş sayılmaz. Bu teslim **Starter kapılarıdır**; Pro/Business diğer sayısal limitleri, fiyatlar ve özel teklif uygulaması ayrı iş olarak kalır.
+Başlangıç: `3fa72e7b805b2bbfb8895f3d90813eaa3cb416aa`. Bu SHA'nın belge kabulü40386335578 ve CD kaynak kontrolü40386480669 başarılı; runtime kabul kaynağı7464383802deb8322e14a5ebec7d5e2ef650e436'dır. Yeni kaynak bu önceki CI başarısıyla kabul edilmiş sayılmaz. Güncel kabul main `ed747324f7d008b24103d4fd2eba503791c70a93` üzerindedir; aşağıdaki başlangıç SHA’sı önceki kaynak referansıdır. Bu teslim **Starter kapılarıdır**; Pro/Business diğer sayısal limitleri, fiyatlar ve özel teklif uygulaması ayrı iş olarak kalır.
 
 ## Çalışan kaynak değişikliği
 
-`database/starter-plan-gates.sql` / yeni66. migration;213 API,90 core tablo. Eski65 migration ve satış/plan sürümleri değiştirilmez. Eğitmen hesabı normal `role_assign_v1` ile veya mevcut aktif eğitmen ilişkisiyle tanınır; program için ikinci bir SQL ilişki kaydı gerekmez. Yeni özel `starter_change_scopes` tablosu, geçişin seçilmiş kapsamını ve kaynak abonelik sürümünü tutar; RLS açık, anon/authenticated erişimi kapalıdır. `starter_scope_required=true`, eski permissive Starter verisi kapsam seçimi olmadan sınır üstündeyse operasyonların kapalı olduğunu gösterir. Sessiz ilk kaynak seçilmez; owner mevcut güvenli pasifleştirme yollarıyla kapsamı daraltabilir veya üst plana dönüp dönem sonu için açık Starter seçimi yapabilir. Yeni alanlar dump/restore ve ilerideki fiziksel imha envanterine dahildir. Bu teslim fiziksel imha kabulü değildir.
+`database/starter-plan-gates.sql` / uygulanmış66. migration;213 API,90 core tablo. Eski65 migration ve satış/plan sürümleri değiştirilmez. Eğitmen hesabı normal `role_assign_v1` ile veya mevcut aktif eğitmen ilişkisiyle tanınır; program için ikinci bir SQL ilişki kaydı gerekmez. Yeni özel `starter_change_scopes` tablosu, geçişin seçilmiş kapsamını ve kaynak abonelik sürümünü tutar; RLS açık, anon/authenticated erişimi kapalıdır. `starter_scope_required=true`, eski permissive Starter verisi kapsam seçimi olmadan sınır üstündeyse operasyonların kapalı olduğunu gösterir. Sessiz ilk kaynak seçilmez; owner mevcut güvenli pasifleştirme yollarıyla kapsamı daraltabilir veya üst plana dönüp dönem sonu için açık Starter seçimi yapabilir. Yeni alanlar dump/restore ve ilerideki fiziksel imha envanterine dahildir. Bu teslim fiziksel imha kabulü değildir.
 
 Starter'ın canlı limit kataloğu beş kalemdir: merkez1, oda1, disiplin1, eğitmen1, aktif öğrenci100. `plan_limit`, `require_feature`, `lesson_plan` ve abonelik okuması aynı revizyona bağlıdır. Tarihsel bir plan sürümünün yüksek kotası veya fazladan feature bitleri Starter sınırını genişletemez. Mevcut Pro/Business katalog değerleri bu teslimle uydurulmaz.
 
@@ -35,8 +35,30 @@ Bütün UUID'ler aynı organizasyona, oda/disiplin/eğitmen ve öğrenciler seç
 
 Geçişte seçilmeyen eski aktif satırların tarihsel state'i değiştirilmez; **operasyonel aktif kullanım**, aktif ilişki ve yürürlükteki seçilmiş kapsamın kesişimidir. Kota okumaları bu kapsamı sayar. Seçilmiş bir kaynak/ilişki meşru olarak pasife alınırsa mevcut domain kuralları korunur; boşalan slotta yeni kaynak oluşturmak/ilişkiyi açıkça aktive etmek receipt/audit'li komuttur. Öğrencinin açık işlem varken pasifleştirilmesi gibi mevcut korumalar kaldırılmaz.
 
-## Doğrulama durumu
+## Doğrulama ve kapanış durumu
 
-Ayrıntılı kaynak hashleri ve koşu sınırları [kabul raporundadır](../reports/starter-plan-gates-20261026.md). Yapısal `npm run verify` geçti. Yeni66 migration izole native Supabase'e temiz resetle uygulanmıştır. 27 Ekim devralmasında son kaynak Starter native9/9 ve149 yapısal kontrol geçti; bağımsız kaynak incelemesinde bloklayıcı bulgu yok. Aynı SQL ve son fixture ile mevcut yoklama/koruma ve abonelik regresyonu20/20 geçti; açık rezervasyonların booking kanıtını koruyan son test fixture incelemesinde bloklayıcı bulgu yok; [devralma kabul kaydı](../reports/starter-plan-gates-takeover-20261027.md). İlk aday full clean40415840619 API4 rol okuma testinin eski Starter beklentisi nedeniyle başarısız oldu; core/API1/API2/API3 geçti. Dar test düzeltmesi ve yeni kaynak kabulü [CI düzeltme kaydındadır](../reports/starter-plan-gates-role-read-ci-fix-20261027.md). Dar düzeltmede oda/rol native12/12 ve149 yapısal kontrol geçti; bağımsız incelemede bloklayıcı yok. Yeni aday kabulü henüz yoktur. Main/hosted uygulaması yapılmadı; bu taslak tamamlandı sayılmaz.
+**Tamamlandı: kod, bağımsız inceleme, aday/main kabulü ve geliştirme/test dağıtımı.** Bu belge eşitlemesinin kendi kaynak kabulü runtime kabulünden ayrıdır.
 
-Testlerde yalnız sentetik izole aktörler/veriler kullanılır. Yeni saatli tek oda/eğitmen modelinde eski eşzamanlı, kaynaksız test seansları ayrı saatlere taşınır. Testin fiilî zaman kaydırmasında session ve resource booking saatleri birlikte tutulur; kural/assertion gevşetilmez. Gerçek ortam verisi, secret veya provider ayarı değiştirilmez.
+| Kanıt | Doğrulanmış sonuç |
+|---|---|
+| Uygulama PR’si | [PR #56](https://github.com/SXQHex/FtkSaaS/pull/56), normal merge ile kapandı |
+| Son uygulama head | `8cd720a7e5879ae30b90123100b8ddba7c4a3200` |
+| Base | `3fa72e7b805b2bbfb8895f3d90813eaa3cb416aa` |
+| Test edilen merge | `3e758583fbbfae08d1211dab07a579757d4d8439` |
+| Kabul edilen main | `ed747324f7d008b24103d4fd2eba503791c70a93` |
+| Test edilen ve main kaynak ağacı | `e67e059d3968d46bcbd7f9cacc95e75683c96111`; parentlar base + son head |
+| Dar native kabul | Starter9/9; yoklama/abonelik20/20; oda/rol12/12. Bunlar ayrı koşulardır;149 yapısal kontrol geçti |
+| Bağımsız inceleme | Son uygulama ve test fixture incelemelerinde bloklayıcı bulgu yok; PR56 kaynak kayıtları ve aşağıdaki raporlar |
+| Aday full clean | [40419827224](https://github.com/SXQHex/FtkSaaS/actions/runs/40419827224): core, dört API shard ve toplayıcı başarılı; kaynak bağlı merge-clean doğrulandı |
+| Aynı main full clean | [40422823564](https://github.com/SXQHex/FtkSaaS/actions/runs/40422823564): source/core/dört API shard/toplayıcı başarılı; istenmeyen optional serial-reference atlandı |
+| Development CD | [40425584520](https://github.com/SXQHex/FtkSaaS/actions/runs/40425584520): aynı main kaynağında gerçek deploy,20/20 hosted kontrol ve sentetik fixture temizliği başarılı |
+| Hosted envanter |66 migration içeriği eşleşti; backend-v1 Edge21 ACTIVE, `verify_jwt=true`;90 core tabloda RLS eksik0, istemci RPC EXECUTE0; advisors ERROR yok |
+| CD artifact |12698584169; ZIP SHA256 `4add712822474c84707f3db469da4100b5a99cf8399ac4526d43b931eda5b919` |
+
+İlk başarısız aday40415840619 ve önceki bekleme ifadeleri kendi kaynaklarının tarihsel kanıtıdır. F05 genel rol listesinin eski Starter beklentisi düzeltildi; Pro merkez izolasyonu assertion’ları korundu, owner/CM Starter retleri ayrıca doğrulandı. Runtime kapısı gevşetilmedi. [İlk kaynak raporu](../reports/starter-plan-gates-20261026.md), [devralma ve native kabul](../reports/starter-plan-gates-takeover-20261027.md), [rol testi düzeltmesi](../reports/starter-plan-gates-role-read-ci-fix-20261027.md) yeniden yazılmadı.
+
+Testlerde yalnız sentetik izole aktörler/veriler kullanıldı. Açık rezervasyonların booking kanıtı korundu; testin fiilî zaman kaydırmasında session ve resource booking saatleri birlikte tutuldu. Assertion veya ürün kuralı gevşetilmedi. Gerçek ortam verisi ve sırlar bu belge işinde değiştirilmez.
+
+## Kapsam dışında kalanlar
+
+Bu teslim Starter dağıtım yol haritasının bütünü değildir. Gerçek public hostname/Turnstile/siteverify ve istemci entegrasyonu, Pro/Business ayrı sayısal limit/özel teklif, kalan backend ürün akışları, fiziksel imha, gerçek worker yükü, yük/backup-restore ve production kabulü [kalan işler](remaining-work.md) ve [üretim kuyruğunda](production-queue.md) ayrı kalır. Önceden kabul edilmiş motorlar yeniden geliştirme işi değildir. Son kullanıcı kararıyla JWT doğrulaması açık kalır.

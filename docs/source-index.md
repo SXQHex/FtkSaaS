@@ -1,6 +1,10 @@
-## 26 Ekim — aktif Starter plan kapıları teslimi
+## 27 Ekim — Starter plan kapıları teslimi kapandı
 
-Birinci satır PR55/main3fa72e7 belge kabulüyle kapandı. Aktif iş Starter limit/özellik kapıları ve sürümlü plan düşürme kapsamıdır. Başlangıç main `3fa72e7b805b2bbfb8895f3d90813eaa3cb416aa`; yeni kaynak213 API/66 migration adayıdır. Seçilmeyen kaynakların operasyonu kapanır, geçmiş/rezervasyon/para-hak verisi korunur. [Kaynak, DTO ve kabul sınırı](starter-plan-gates-handover.md). Yeni kaynak final native/bağımsız inceleme/aday/main/CD kabulü henüz tamamlanmadı; production dağıtımı yok. Pro/Business ayrı sayısal limit ve özel teklif işleri bu dar teslimle kapatılmaz. Aşağıdaki eski bekleme/yerel kayıtlar kendi kaynaklarının checkpointleridir.
+[PR #56](https://github.com/SXQHex/FtkSaaS/pull/56) main `ed747324f7d008b24103d4fd2eba503791c70a93` üzerinde kabul edildi: **213 callable API / 0 contract_only / 66 migration / 90 core tablo**. [Aday full clean40419827224](https://github.com/SXQHex/FtkSaaS/actions/runs/40419827224), [aynı main full clean40422823564](https://github.com/SXQHex/FtkSaaS/actions/runs/40422823564) ve [development CD40425584520](https://github.com/SXQHex/FtkSaaS/actions/runs/40425584520) başarılı. CD gerçek deploy ve20/20 hosted kontrol içerir; backend-v1 Edge21 ACTIVE, `verify_jwt=true`. JWT doğrulaması son kullanıcı kararıyla açık kalır.
+
+Starter limitleri **1 merkez / 1 aktif oda / 1 disiplin / 1 aktif eğitmen / 100 aktif öğrenci**; tek mantıksal oda, seçili merkez-disiplin paketi ve disiplin adı ön eki uygulanır. Genel CRM/etkinlik/personel/hakediş kapalı; yoklama anlaşmasız ve hakedişsiz çalışır. Canlı plan/kapsam kapıları eski receipt/preview/grant ve doğrudan RPC ile aşılamaz. Pro→Starter kapsam seçimi sürümlüdür; seçilmeyen operasyon kapanır, geçmiş seans/kesin rezervasyon/hak/finans kayıtları korunur. [DTO, kapsam ve kabul kanıtları](starter-plan-gates-handover.md).
+
+Bu kapanış yalnız plan kapıları ve sürümlü kapsam düşürme teslimidir; bütün Starter dağıtım yol haritası, gerçek public hostname/Turnstile, Pro/Business ayrı limit/özel teklif veya production hazırlığı tamamlandı sayılmaz. Aşağıdaki önceki kaynaklara ait tarihli aday/bekleme/envanter notları tarihsel checkpointlerdir; güncel kabul veya açık iş olarak kullanılmaz. Tarihsel `reports/` dosyaları ve eski kaynak snapshotları korunur. Bu belge eşitlemesi yeni runtime testi veya deploy değildir.
 
 ## 26 Ekim — satır 1 runtime ve hosted kabulü tamamlandı
 
@@ -36,7 +40,7 @@ PR50 main `26e7091cd73482a623839266324b049d617fe9c2`:212 API/64 migration; main4
 
 ## 26 Ekim — normatif plan paketi kararı / kaynak önceliği
 
-[Ürün planı kabulü](../contracts/01-FtkSaaS-urun-kapsam-sozlesmesi.md), [01 ürün](../contracts/01-FtkSaaS-urun-kapsam-sozlesmesi.md), [02 teknik](../contracts/02-FtkSaaS-teknik-sozlesme.md) ve [06 plan erişim notu](../contracts/06-FtkSaaS-O4-durum-hata-izin.md) birlikte okunur. Starter 1 merkez/1 aktif oda/1 disiplin/1 eğitmen/100 aktif öğrenci; Pro tüm tek merkezli fonksiyonlar; Business 5 merkez; 5 üzeri sözleşmeli özel teklif. Önceki F01–F33 üretim haritası/08 makine plan etiketleri, `docs/endpoint-inventory.json`, paket tipleri ve runtime **henüz bu kabul kararına eşitlenmedi**; eski etiketleri yeni çalışır plan desteği sanma. Önce [kalan işler](remaining-work.md), [kuyruk](production-queue.md) ve [frontend devri](claude-handover.md) içindeki açık kabul ayrımına bak. Ana başlangıç kaynak SHA `26e7091cd73482a623839266324b049d617fe9c2`, [aynı SHA main clean](https://github.com/SXQHex/FtkSaaS/actions/runs/40246191868)/[CD](https://github.com/SXQHex/FtkSaaS/actions/runs/40247685028) başarılı; bu yeni belge kararının veya yeni plan gate'in CI kanıtı değildir.
+[Ürün planı kabulü](../contracts/01-FtkSaaS-urun-kapsam-sozlesmesi.md), [01 ürün](../contracts/01-FtkSaaS-urun-kapsam-sozlesmesi.md), [02 teknik](../contracts/02-FtkSaaS-teknik-sozlesme.md) ve [06 plan erişim notu](../contracts/06-FtkSaaS-O4-durum-hata-izin.md) birlikte okunur. Starter 1 merkez/1 aktif oda/1 disiplin/1 eğitmen/100 aktif öğrenci; Pro tüm tek merkezli fonksiyonlar; Business 5 merkez; 5 üzeri sözleşmeli özel teklif. Starter F01–F33 plan izi,08 makine/DTO, endpoint envanteri, tipler ve runtime PR56 ile eşitlendi. Pro/Business kalan limit/özel teklif kabulü Starter kapanışından türetilmez. Önce [kalan işler](remaining-work.md), [kuyruk](production-queue.md) ve [frontend devri](claude-handover.md) içindeki açık kabul ayrımına bak. Ana başlangıç kaynak SHA `26e7091cd73482a623839266324b049d617fe9c2`, [aynı SHA main clean](https://github.com/SXQHex/FtkSaaS/actions/runs/40246191868)/[CD](https://github.com/SXQHex/FtkSaaS/actions/runs/40247685028) başarılı; bu yeni belge kararının veya yeni plan gate'in CI kanıtı değildir.
 
 
 ## 26 Ekim — PR50 hesap ve güvenlik teslim paketi
@@ -103,6 +107,10 @@ Başlangıç main `3456050a3061d7bf5dc2ce8898b82c5cfe84e773`: **206 callable API
 
 Son açık kullanıcı kararı üstündür; sonraki kabul yalnız çelişen hükümleri değiştirir. Kabul edilmiş ürün davranışı, teknik aktarım, callable uygulama ve doğrulanmış kabul ayrı tutulur. Eski bir rapor veya modül devrindeki pending notu güncel kaynak kanıtından üstün değildir.
 
+## Starter kapanış belge kapsamı — 27 Ekim
+
+Starter tesliminin tek ayrıntılı kabul kaydı [plan kapıları devridir](starter-plan-gates-handover.md). README/AGENTS,00/01/02/06 sözleşmeleri, bu indeks, kalan işler/kuyruk/Claude devri, hosted kurulum ve ilgili settings/pilot/program/takvim/yoklama/API consumer devirleri aynı kapanışa eşitlendi.213 makine operasyonu/213 runtime,66 migration ve üretilmiş tip/katalog/envanter kaynakları değişmeden kontrol edilir. F01–F33 haritasındaki ilk DS metadata sayıları tarihsel açıklamasını korur; yeni test başarısı veya bütün özellik kabulü gibi yeniden yazılmaz. `reports/`, eski teknik aktarım raporları ve `contracts/source-v2.2/` korunur.
+
 ## Sözleşmelerin ayrı inceleme kaydı
 
 | Belge | Rol ve inceleme sonucu |
@@ -111,11 +119,11 @@ Son açık kullanıcı kararı üstündür; sonraki kabul yalnız çelişen hük
 | [01 ürün](../contracts/01-FtkSaaS-urun-kapsam-sozlesmesi.md) | Normatif ürün kapsamı. Ayar davranış kabulü/uygulama ayrımı, güncel kişi verisi ve P08 abone numarası sınırı eşitlendi. |
 | [02 teknik](../contracts/02-FtkSaaS-teknik-sozlesme.md) | Normatif teknik davranış. Word v0.1 settings kataloğu tek Markdown kaynağına aktarıldı; 69 ana grup ve FD01–FD12 kapanışı, eski Word aileleri ve kalan teknik eşleme ayrı; numara kapsamları karıştırılmaz. |
 | [03 sorumluluklar](../contracts/03-FtkSaaS-kodlama-sorumluluklari.md) | ChatGPT backend / Claude frontend sınırı, ortak tiplerin gerçek yolu ve durdurulmuş settings geliştirmesi güncellendi. |
-| [04 şema](../contracts/04-FtkSaaS-O4-veri-semasi.md) | Üretilmiş katalog; 90 core tablo; bu aday61 migration/main60 doğrulanır. Kesin DDL migrations içindedir. Yeni settings alanı elle eklenmedi. |
-| [05 API](../contracts/05-FtkSaaS-O4-API-katalogu.md) | Üretilmiş207 callable operasyon aday kataloğu; main206. DTO kaynağı 08; kapsam notu gerçek sağlayıcı kabulünün yerine geçmez. |
+| [04 şema](../contracts/04-FtkSaaS-O4-veri-semasi.md) | Üretilmiş katalog; 90 core tablo; PR56 kabul kaynağında66 migration doğrulanmıştır. Kesin DDL migrations içindedir. Yeni settings alanı elle eklenmedi. |
+| [05 API](../contracts/05-FtkSaaS-O4-API-katalogu.md) | Üretilmiş213 callable operasyon kataloğu; main/runtime213. DTO kaynağı 08; kapsam notu gerçek sağlayıcı kabulünün yerine geçmez. |
 | [06 durum/hata/izin](../contracts/06-FtkSaaS-O4-durum-hata-izin.md) | Yeni ayarlar için uydurma enum/izin eklenmedi. Global kimlik, oturum ve görünüm yetki sınırları eşitlendi. |
 | [07 denetim](../contracts/07-FtkSaaS-O4-denetim-ve-aciklar.md) | İlk tasarım denetimi; tarihsel açık listesi güncel teslim listesi olarak kullanılmaz. Değiştirilmedi. |
-| [08 makine sözleşmesi](../contracts/08-FtkSaaS-tip-ve-operasyon-sozlesmesi.json) | Callable DTO/izin/guard/faz/sürüm kaynağı. Bu aday207/207/0, main206/206/0. Eski decision_delivery/feature_delivery notları ürünün tüm kabulü değildir; değişiklik yapılmadı. |
+| [08 makine sözleşmesi](../contracts/08-FtkSaaS-tip-ve-operasyon-sozlesmesi.json) | Callable DTO/izin/guard/faz/sürüm kaynağı. PR56 kabul kaynağı213 sözleşme/213 runtime/0 contract_only. Eski decision_delivery/feature_delivery notları ürünün tüm kabulü değildir; değişiklik yapılmadı. |
 | [09 aktarım](../contracts/09-FtkSaaS-teknik-aktarim-raporu.md) | İlk aktarımın kaynak raporu; bugünün CI/hosted kabulü yerine kullanılmaz. Değiştirilmedi. |
 | [10 Q-D01](../contracts/10-FtkSaaS-Q-D01-kabul-karari.md) | Etkinlik disiplin/kapsam ve negatif kredi yasağı kabulü; ürün hükmü korundu. |
 | [11 Q-D01 aktarım](../contracts/11-FtkSaaS-Q-D01-teknik-aktarim-raporu.md) | Kaynağına ait tarihsel aktarım raporu; yeniden yazılmadı. |
@@ -129,9 +137,9 @@ Son açık kullanıcı kararı üstündür; sonraki kabul yalnız çelişen hük
 | [Claude devri](claude-handover.md) | Baştan güncellendi. Eski 119 işlem/eksik backend yönlendirmesi kaldırıldı; mevcut API ile kabul edilmiş gelecek ayarlar ayrıldı. |
 | [API invariants](api-invariants.md) | Canlı yetki, idempotency, sürüm/preview ve gizli alan sınırları korundu; profil sürüm okuması ve Auth tamamlama ayrımı eklendi. |
 | [Fiziksel invariants](physical-invariants.md) | Kilit/indeks, hak/zaman ve migration kabul ilkeleri incelendi; SQL uygulama kanıtı olmadığı açıklaması korunur; eski kapasite alanlarının tarihsel sınırı güncel karar bağlantısıyla açıklandı. |
-| [Hosted kurulum](remote-backend-setup.md) | 59 migration/Edge8, beş dedicated LOGIN Cron ve 23 Ekim health kaydı. 3600sn quote/900sn reauth kullanıcı seçimi; evrensel varsayılan değil. |
+| [Hosted kurulum](remote-backend-setup.md) | PR56 CD kabulü66 migration/Edge21/JWT açık; beş dedicated LOGIN Cron için eski idle/workload sınırı korunur. 3600sn quote/900sn reauth kullanıcı seçimi; evrensel varsayılan değil. |
 | [Bağlantı JSON'u](development-connection.json) | URL/yerel hazırlık yönergesi kullanılabilir; 0 observed/22 migration ve ilk rapor alanları tarihsel kurulum snapshotıdır. Güncel hosted envanter olarak kullanılmaz. Runtime/CI girdisi olabileceği için bu prose tesliminde değiştirilmedi. |
-| [Endpoint envanteri](endpoint-inventory.json) | Üretilmiş aday207/207/0 callable envanteri; generate --check ile eşleşmesi doğrulanır, elle değiştirilmedi. |
+| [Endpoint envanteri](endpoint-inventory.json) | Üretilmiş213/213/0 callable envanteri; generate --check ile eşleşmesi doğrulanır, elle değiştirilmedi. |
 | [Özellik haritası](feature-delivery.md) | Üretilmiş F01–F33 eşlemesi. İşlem varlığı gerçek sağlayıcı/operasyonel/üretim kabulü değildir; ilk DS metadata partial/pending satırlarının tarihsel snapshot olduğu üretici prose içinde açıklandı; güncel runtime/açık iş kaynağına yönlendirildi. |
 | [Kalan işler](remaining-work.md) | Baştan güncellendi; kapanan API'ler açık listeden çıkarıldı, settings/P08/sağlayıcı/güvenlik/işletim açıkları ayrıldı. |
 | [Üretim kuyruğu](production-queue.md) | P01–P07 ve OPS kaynak kapanışı; P08 ortak CRM/abone no/etkinlik hakkı. Eski Draft/CI bekletme aktif talimat olmaktan çıkarıldı. |
