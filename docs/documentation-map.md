@@ -69,6 +69,8 @@ Kuyruktaki eşsiz P08 kararları [P08 kararının](decisions/P08-accepted-scope.
 | [docs/starter-attendance-protection-handover.md](starter-attendance-protection-handover.md) | Alan tüketim devri ve kaynağına bağlı eski kabul; güncel durum sahibi00 |
 | [docs/starter-plan-gates-handover.md](starter-plan-gates-handover.md) | Alan tüketim devri ve kaynağına bağlı eski kabul; güncel durum sahibi00 |
 | [packages/api-contracts/README.md](../packages/api-contracts/README.md) | Ortak şema/üreteç/typed tüketim arayüzü |
+| [docs/frontend-development.md](frontend-development.md) | Frontend araçları, hazır blok seçimi, iki dil ve doğrulama komutları |
+| [apps/web/AGENTS.md](../apps/web/AGENTS.md) | Frontend dosya sahipliği ve hazır bileşen kuralları |
 
 ## Tarihsel dosyalar
 
