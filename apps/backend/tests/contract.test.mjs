@@ -1,4 +1,6 @@
+import './calendar-feed-unit.mjs';
 import './p06-parser.mjs';
+import './settings-media-unit.mjs';
 import test from 'node:test';import assert from 'node:assert/strict';import fs from 'node:fs';import Ajv from 'ajv/dist/2020.js';import addFormats from 'ajv-formats';import {validate,version} from 'uuid';import {newUuidV7,newOperation} from '../scripts/uuid.mjs';
 test('P05 Storage adapter checks actual bytes/hash/mime/size and returns no internal origin',async()=>{
  const {build}=await import('esbuild');const built=await build({entryPoints:['supabase/functions/backend-v1/document-storage.ts'],bundle:true,platform:'browser',format:'esm',write:false});
@@ -110,4 +112,24 @@ test('public-only hostname configuration reaches handler preflight, siteverify a
   const response=await handler(new Request('https://edge.invalid/functions/v1/backend-v1/public_application_submit_v1',{method:'POST',headers:signPublicApplication(body,'192.0.2.30',env.FTK_PUBLIC_INGRESS_SECRET),body}));
   assert.equal(response.status,200);assert.equal((await response.json()).data.accepted,true);assert.deepEqual(phases,['preflight','submit']);
  }finally{globalThis.fetch=originalFetch;if(originalDeno===undefined)delete globalThis.Deno;else globalThis.Deno=originalDeno;}
+});
+
+
+test('center preparation provenance accepts source objects and rejects template arrays',()=>{
+ const scope={availability_templates:{kind:'organization_copy',organization_version:3},package_templates:{kind:'system_default'}};
+ assert(valid('PreparationSources',scope));
+ assert(valid('PreparationSources',{availability_templates:{kind:'center_local'},package_templates:{kind:'organization_copy',organization_version:0}}));
+ for(const field of ['availability_templates','package_templates']){
+  assert(!valid('PreparationSources',{...scope,[field]:[]}));
+  assert(!valid('PreparationSources',{...scope,[field]:{kind:'unrecognized'}}));
+  assert(!valid('PreparationSources',{...scope,[field]:{kind:'center_local',account_id:id}}));
+ }
+ const values=Object.fromEntries(JSON.parse(fs.readFileSync('config/frontend-settings.json')).fields.filter(f=>f.scope==='center').map(f=>[f.key,f.default]));
+ assert(valid('SettingsView',{scope:'center',version:0,values,as_of:new Date().toISOString(),overridden_fields:[],program_duration_source:{kind:'system_default'},preparation_sources:scope}));
+});
+
+
+test("every settings catalog consumer has a closed descriptor in the response contract",()=>{
+ const fields=JSON.parse(fs.readFileSync("config/frontend-settings.json")).fields;
+ for(const field of fields)assert(valid("SettingsFieldDescriptor",{key:field.key,group:field.group,consumer:field.consumer,writable:true}),field.scope+":"+field.key);
 });

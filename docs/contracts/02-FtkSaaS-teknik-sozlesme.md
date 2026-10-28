@@ -1090,6 +1090,8 @@ Aşağıdaki tablo kapsam eşlemesidir; o gruptaki her alt seçeneğin değeri v
 
 ##### FD03 — profil giriş ve güvenlik (kabul edildi)
 
+ST-03 medya eşlemesi: profil komutunun opsiyonel photo alanı ve org settings komutunun organization-only logo_image alanı kapalı PNG/JPEG/WebP byte nesnesi veya açık null kabul eder; gönderilmeyen değer korunur. Güncel metadata/null ayrı read projeksiyonudur. Typed `media_get_v1` own/organization/lesson_participant bağlamlarında güncel pointer'ı ve canlı yetkiyi yeniden denetler; peer fotoğrafı FD05 photo_visible ve kesin ortak katılımına tabidir. Ham byte özel kayıttadır, audit/receipt/context'e taşınmaz. Boyut/format teknik sınırı, reset/kaldırma, fallback ve public sınırı [ayar devrinde](../frontend-settings-handover.md#özel-fotoğraf-ve-logo-tüketicisi--aday) eşlenir; native kaynak kabulü ayrı kalır.
+
 | Alan | Kabul edilen seçenek/default |
 |---|---|
 | Profil | Görünen ad, ad, soyad, isteğe bağlı kısa serbest hitap ve fotoğraf ayrı; zorunlu unvan listesi yok. Fotoğraf PNG/JPEG/WebP, kaldırılınca baş harfler. |
@@ -1113,6 +1115,8 @@ Teknik süre/rate backend işidir. Dış e-posta teslimi ertelenmiş kalır; ür
 | Sessiz saat | Default kapalı; kullanıcı gün/aralık seçer. Güvenlik, merkez iptali, sonraki 24 saatteki ders/event değişimi ve süreli yer teklifi istisna. İstisna kapatılmış dış kanalı açmaz; in_app görünür. |
 | Tekrar/özet | in_app kaydı korunur; hazır dış kanallar ayrı seçilir. Zaman duyarlı olay özete bırakılmaz; geçersiz hatırlatma gönderilmez. |
 
+ST-03 bildirim kullanılabilirliği `SettingsCatalog.notification_delivery` ile typed okunur. Hazır olmayan email/push uygulama kanalı preference komutunda replay öncesi SERVICE_UNAVAILABLE verir; in_app tercihini değiştirmez. Starter F27 kapalı, zamanlama/sessiz saat/özet kontrolleri unavailable; ilk zorunlu in_app teslim ertelenmez. [Tüketici sınırı](../frontend-settings-handover.md#bildirim-kullanılabilirliği--aday).
+
 ##### FD05 — member görünürlük ilgi ve takvim (kabul edildi)
 
 | Alan | Kabul edilen seçenek/default |
@@ -1123,7 +1127,13 @@ Teknik süre/rate backend işidir. Dış e-posta teslimi ertelenmiş kalır; ür
 | Geçmişten öneri | Org bazında default kapalı; kullanıcı açabilir. |
 | Kişisel takvim | Kesin ders, kesin event ve yetkili eğitmen/personel görevleri ayrı seçilir. Bağlantı kendiliğinden oluşturulmaz; oluştururken tür seçilir. İçerik başlık/tarih-saat/yer/uygulama bağlantısı; başkaları/borç/ödeme yok. |
 
+ST-03 ilgi filtresi kendi merkez/disiplin seçimlerini yalnız açık calendar_get isteğinde mevcut yetkili kayıtlarla kesiştirir. Geçmiş sırası yalnız ayrı opt-in ve recommendation_desc isteğiyle kendi kapanmış attended ders sayımını kullanır; kapalıyken kronoloji korunur, yeni erişim veya pazarlama izni doğmaz. [Cursor/reset/alias ve consumer eşlemesi](../frontend-settings-handover.md#üye-ilgi-filtresi-ve-geçmiş-takvim-sırası--aday).
+
+ST-03 kişisel takvim adayı, global own-account credential lifecycle komutları ve explicit org/kinds ile oluşturulur. Starter'da lessons/duties; event kapalıdır. Salt okunur token feed'i canlı account/org/link/plan/selected-session ve kesin kendi katılım/görevini denetler; başlık/UTC zaman/yer/uygulama linki dışına veri aktarmaz. Tek seans UID'si, rotate/revoke ve metadata-only receipt korunur. [API, teknik hazır olma, HTTP adapter ve kabul sınırı](../frontend-settings-handover.md#kişisel-takvim-bağlantısı--aday).
+
 ##### FD06 — iş takvimi program rezervasyon (kabul edildi)
+
+ST-03 teknik eşleme adayı: organization/center `program_duration_minutes` kapalı integer önerisi sistem60'tır. Yeni merkez o anki org önerisini ve sürümünü kopyalar; mevcut merkez/programlar taşınmaz. Açık yerel seçim eşit değerde de yereldir. `SettingsView.program_duration_source` kaynak bilgisidir, yazılamaz. `ProgramSpec.duration_minutes` gönderilmezse merkezin hazırlık değeri preview spec'ine açık olarak alınır; gönderilirse açık değer üstündür. Sonraki ayar değişimi preview/program snapshot'ını değiştirmez. Seçili reset org şablonuna değil sistem60'a döner. Yetki/sürüm/replay mevcut settings ve program komutlarında korunur.
 
 | Alan | Kabul edilen seçenek/default |
 |---|---|
@@ -1134,6 +1144,8 @@ Teknik süre/rate backend işidir. Dış e-posta teslimi ertelenmiş kalır; ür
 | Rezervasyon/talep | Açılış/kapanış ayrı, orgdan miras; tanımsızsa yetkili yapılandırma gerekir. Otomatik pencere değeri uydurulmaz. |
 | Bekleme/teklif | Yeni sınıfta liste default kapalı. Teklif süresi orgdan miras; değer yoksa teklif üretimi başlamaz. |
 | Yerel değişiklik | Org zorunlu alan kilitli, serbest alan yerel değiştirilebilir. Mevcut 100 tekrar/3600sn kulüp seçimi korunur, yeni orglara yayılmaz. |
+
+ST-03 availability/package hazırlıkları orgdan yeni merkeze bir kez kopyalanır; kaynak bilgisi typed okunur, reset boş sistem dizisine döner. Salt okunur resolver güncel CM ve kaynak sürümüyle mevcut availability/product/sale isteklerini hazırlar; şablon değişimi uygulanmış domain kayıtlarını değiştirmez. Gece aşımı günlük24:00/ertesi gün00:00 parçalarıyla açık bölünür; gerçek UTC aralığı bitişik günlük availability birleşimince tamamen kapsanır, belirsiz/olmayan haftalık sınır sessiz kaydırılmaz. [Kopya, alan ve gerçek domain tüketicileri](../frontend-settings-handover.md#availability-ve-paket-hazırlıkları--aday).
 
 ##### FD07 — paket katılım finans (kabul edildi, standart negatif limit 0)
 
@@ -1147,6 +1159,10 @@ Teknik süre/rate backend işidir. Dış e-posta teslimi ertelenmiş kalır; ür
 | İndirim | Ayrı yetkisi olmayana kapalı; yetkiliye org sınırı. Yeni sayısal indirim sınırı bu kararda atanmadı. |
 | İlk ödeme yöntemi listesi | Manuel nakit, banka transferi, kart/POS kaydı. Auto tahsilat/ödeme entegrasyonu değildir. Banka/kart referansı zorunlu; nakit isteğe bağlı. |
 | Ek onay eşiği | Ayrı alan olarak modellenebilir ama tutar defaultu yok; desteklenmeyen mekanizma etkinleştirilemez. FD11 ilk teslimde yeni genel ikinci-onay mekanizması eklemez. |
+
+ST-03 public eşleme adayı organization/center kapalı yayın/alan seçimini ve açık timezone'lu tanıtım saatlerini typed settings üzerinden gerçek public calendar read projection'ına bağlar. Org yayın üst kapısı ve ayrı center opt-in, güncel logo ve işletme iletişimi beyaz listesi uygulanır; takvim publication kararı ayrıdır. Default/reset/yetki/kopya sınırı [ayar devrindedir](../frontend-settings-handover.md#public-işletme-alanları-tüketicisi--aday). Native ve hosted kabulü ayrı kalır.
+
+ST-03 manuel tahsilat adayı cash/bank_transfer/card_pos yöntemini ve banka/kart için zorunlu referansı gerçek tahsilat INSERT'i/finans okumasına bağlar. Eski belirtilmemiş yöntem null kalır; otomatik tahsilat açılmaz. [Alan devri](../frontend-settings-handover.md#manuel-tahsilat-yöntemi--aday).
 
 ##### FD08 — belge onay dış görünürlük (kabul edildi)
 
@@ -1173,6 +1189,10 @@ Teknik süre/rate backend işidir. Dış e-posta teslimi ertelenmiş kalır; ür
 Web/reklam ortak CRM entegrasyonu üretim P08'dir; yukarıdaki kabul mevcut public_application_submit DTO'sunun telefonla çalıştığı anlamına gelmez.
 
 ##### FD10 — iş otomasyonu rapor import (kabul edildi)
+
+ST-03 teknik eşleme adayı: `ImportMapping.delimiter` opsiyonel kapalı virgül/noktalı virgül seçimidir; yokluğu eski virgül davranışını korur. Seçim tahmin edilmez, eşlemenin parçası olarak preview/bağımlılık/receipt istek hash'ine girer. Quoted separator, escaped quote, CRLF ve quoted newline aynı parser kurallarını kullanır; hatalı yapı/eşleme reddedilir. Hak/borç veya kişi birleştirme defaultu üretmez. Kaynak/native kabulü [alan devrinden](../frontend-settings-handover.md#st-03--starter-tüketici-kapsamı) izlenir.
+
+Şablon tüketicisi adayı: member/center/organization report_templates/import_templates default[]; private başlangıç ve açık scoped paylaşım. `settings_template_resolve_v1` canlı source/version ve domain yetkisinden typed hazır request üretir, iş veya preview yaratmaz. Asıl query/export/import yine kendi canlı yetki ve açık preview/apply kapısını kullanır; tam request snapshot'ı sonraki şablon değişiminden/resetinden değer almaz. İlk iki Starter raporunda kapalı sütun seçimi, group_key sırası ve person/center/total gruplama gerçek satır/CSV sonucuna gider; currency'ler birleşmez. Eşleme yalnız source/column/delimiter hazırlığıdır; otomatik finans veya kişi birleştirme yoktur. [Wire, yetki ve kaynak devri](../frontend-settings-handover.md#rapor-ve-import-şablon-tüketicisi--aday).
 
 | Alan | Kabul edilen seçenek/default |
 |---|---|

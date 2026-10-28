@@ -21,6 +21,7 @@ for o in ops:
  def literal(s):return "'"+s.replace("'","''")+"'"
  sql.append("insert into private.runtime_operations(name,permission,billing_class,features) values("+','.join([literal(o['name']),literal(o['permission']),literal(o['billing_class']),"array["+','.join(map(literal,o['runtime_required_features']))+"]::text[]"])+") on conflict(name) do update set permission=excluded.permission,billing_class=excluded.billing_class,features=excluded.features;")
  entry=f"private.p04_public('{o['name']}',p_request,p_ids,p_aux)" if o['name'] in ('public_calendar_get_v1','public_application_submit_v1') else f"private.execute_operation('{o['name']}',p_request,p_actor_auth_id,p_session_id,p_ids,p_aux)"
+ if o['name']=='calendar_feed_get_v1':entry='private.personal_calendar_feed(p_request,p_ids,p_aux)'
  if o['name']=='account_google_link_prepare_v1':entry='private.account_google_link_prepare(p_request,p_actor_auth_id,p_session_id,p_ids,p_aux)'
  if o['name']=='account_totp_remove_v1':entry='private.account_totp_remove(p_request,p_actor_auth_id,p_session_id,p_ids,p_aux)'
  if o['name']=='account_password_change_v1':entry='private.p07_password_preflight(p_request,p_actor_auth_id,p_session_id,p_ids,p_aux)'

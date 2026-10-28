@@ -1,3 +1,4 @@
+import './availability-day-boundaries-acceptance.mjs';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {createHash} from 'node:crypto';

@@ -431,12 +431,22 @@ export type Permission = ("account.self" | "org.read" | "org.manage" | "org.owne
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
  * via the `definition` "OperationName".
  */
-export type OperationName = ("account_get_v1" | "account_profile_update_v1" | "account_password_change_v1" | "account_password_reset_request_v1" | "account_delete_preview_v1" | "account_delete_apply_v1" | "organizations_list_v1" | "organization_create_v1" | "organization_get_v1" | "organization_update_v1" | "organization_close_preview_v1" | "organization_close_apply_v1" | "organization_reopen_v1" | "organization_delete_preview_v1" | "organization_delete_apply_v1" | "centers_list_v1" | "center_create_v1" | "center_update_v1" | "room_save_v1" | "availability_save_v1" | "availability_exception_save_v1" | "policies_get_v1" | "policy_publish_v1" | "roles_list_v1" | "role_assign_v1" | "role_revoke_v1" | "permission_set_v1" | "org_manager_assign_v1" | "org_manager_revoke_v1" | "manager_self_assign_center_v1" | "account_access_send_v1" | "account_access_revoke_v1" | "account_access_accept_v1" | "account_link_remove_v1" | "people_list_v1" | "person_get_v1" | "person_create_v1" | "person_update_v1" | "student_activate_v1" | "student_deactivate_v1" | "person_merge_preview_v1" | "person_merge_approve_v1" | "person_merge_apply_v1" | "calendar_get_v1" | "class_save_v1" | "program_preview_v1" | "program_apply_v1" | "session_create_v1" | "session_get_v1" | "session_change_preview_v1" | "session_change_apply_v1" | "session_capacity_set_v1" | "session_cancel_preview_v1" | "session_cancel_apply_v1" | "replacement_session_create_v1" | "session_assignment_set_v1" | "lesson_request_create_v1" | "lesson_request_withdraw_v1" | "lesson_request_reject_v1" | "lesson_request_offer_alternative_v1" | "lesson_request_accept_alternative_v1" | "lesson_request_approve_v1" | "reservation_create_v1" | "reservation_cancel_v1" | "reservation_list_v1" | "waitlist_join_v1" | "waitlist_leave_v1" | "seat_offer_accept_v1" | "seat_offer_reject_v1" | "attendance_get_v1" | "attendance_mark_v1" | "attendance_close_v1" | "attendance_correct_preview_v1" | "attendance_correct_apply_v1" | "products_list_v1" | "product_publish_v1" | "sale_preview_v1" | "sale_apply_v1" | "entitlements_get_v1" | "entitlement_extend_v1" | "credit_adjust_v1" | "negative_limit_set_v1" | "freeze_preview_v1" | "freeze_apply_v1" | "freeze_end_preview_v1" | "freeze_end_apply_v1" | "sale_terminate_preview_v1" | "sale_terminate_apply_v1" | "sale_refund_preview_v1" | "sale_refund_apply_v1" | "sale_change_preview_v1" | "sale_change_apply_v1" | "sale_renew_preview_v1" | "sale_renew_apply_v1" | "finance_get_v1" | "collection_record_v1" | "collection_correct_preview_v1" | "collection_correct_apply_v1" | "student_credit_refund_v1" | "student_credit_offset_v1" | "debt_adjust_v1" | "instructor_agreement_publish_v1" | "earnings_list_v1" | "instructor_payment_record_v1" | "instructor_payment_correct_v1" | "leads_list_v1" | "lead_save_v1" | "crm_activity_save_v1" | "trial_offer_create_v1" | "trial_registration_confirm_v1" | "lead_convert_v1" | "crm_followup_list_v1" | "segment_save_v1" | "automation_save_v1" | "notifications_list_v1" | "notification_mark_read_v1" | "notification_preferences_set_v1" | "report_get_v1" | "report_export_start_v1" | "report_file_get_v1" | "import_upload_prepare_v1" | "import_preview_v1" | "import_apply_v1" | "import_rows_list_v1" | "subscription_get_v1" | "subscription_upgrade_quote_v1" | "subscription_downgrade_request_v1" | "subscription_change_cancel_v1" | "subscription_renewal_set_v1" | "saas_payment_submit_v1" | "saas_payment_verify_v1" | "saas_grace_extend_v1" | "event_save_v1" | "event_publish_v1" | "event_register_v1" | "event_registration_cancel_v1" | "event_complete_v1" | "event_duty_verify_v1" | "event_cancel_preview_v1" | "event_cancel_apply_v1" | "event_list_v1" | "document_upload_prepare_v1" | "document_version_publish_v1" | "document_requirements_get_v1" | "document_accept_v1" | "publication_set_v1" | "public_calendar_get_v1" | "public_application_submit_v1" | "public_application_review_v1" | "operation_status_get_v1" | "preview_get_v1" | "job_status_get_v1" | "audit_list_v1" | "seat_offer_issue_v1" | "seat_offer_expire_v1" | "request_expire_v1" | "outbox_deliver_v1" | "reminder_schedule_v1" | "automation_run_v1" | "import_rows_process_v1" | "report_build_v1" | "privacy_execute_v1" | "subscription_boundary_apply_v1" | "class_assignment_set_v1" | "event_attendance_mark_v1" | "platform_owner_set_v1" | "platform_owner_remove_v1" | "center_manager_assign_v1" | "center_manager_revoke_v1" | "attendance_block_v1" | "event_attendance_close_v1" | "event_attendance_correct_v1" | "file_upload_complete_v1" | "negcredit_valuation_set_v1" | "disciplines_list_v1" | "discipline_save_v1" | "center_discipline_set_v1" | "person_discipline_set_v1" | "event_get_v1" | "event_registration_preview_v1" | "event_payment_prepare_v1" | "event_payment_get_v1" | "event_actual_start_record_v1" | "event_actual_start_correct_v1" | "management_state_get_v1" | "instructor_agreements_list_v1" | "reservation_impact_preview_v1" | "reservation_impact_apply_v1" | "settlement_movements_list_v1" | "settlement_requests_list_v1" | "settlement_request_get_v1" | "settlement_request_submit_v1" | "settlement_request_withdraw_v1" | "settlement_request_decide_v1" | "settlement_authority_get_v1" | "settlement_delegation_set_v1" | "settlement_authority_set_v1" | "negative_limits_get_v1" | "attendance_start_v1" | "document_publication_preview_v1" | "settings_catalog_get_v1" | "settings_get_v1" | "settings_update_v1" | "settings_reset_preview_v1" | "settings_reset_apply_v1" | "settings_history_get_v1" | "reservation_capacity_override_v1" | "account_sessions_list_v1" | "account_session_label_v1" | "account_sessions_revoke_v1" | "account_security_history_get_v1" | "account_totp_remove_v1" | "account_google_link_prepare_v1")
+export type OperationName = ("account_get_v1" | "account_profile_update_v1" | "account_password_change_v1" | "account_password_reset_request_v1" | "account_delete_preview_v1" | "account_delete_apply_v1" | "organizations_list_v1" | "organization_create_v1" | "organization_get_v1" | "organization_update_v1" | "organization_close_preview_v1" | "organization_close_apply_v1" | "organization_reopen_v1" | "organization_delete_preview_v1" | "organization_delete_apply_v1" | "centers_list_v1" | "center_create_v1" | "center_update_v1" | "room_save_v1" | "availability_save_v1" | "availability_exception_save_v1" | "policies_get_v1" | "policy_publish_v1" | "roles_list_v1" | "role_assign_v1" | "role_revoke_v1" | "permission_set_v1" | "org_manager_assign_v1" | "org_manager_revoke_v1" | "manager_self_assign_center_v1" | "account_access_send_v1" | "account_access_revoke_v1" | "account_access_accept_v1" | "account_link_remove_v1" | "people_list_v1" | "person_get_v1" | "person_create_v1" | "person_update_v1" | "student_activate_v1" | "student_deactivate_v1" | "person_merge_preview_v1" | "person_merge_approve_v1" | "person_merge_apply_v1" | "calendar_get_v1" | "class_save_v1" | "program_preview_v1" | "program_apply_v1" | "session_create_v1" | "session_get_v1" | "session_change_preview_v1" | "session_change_apply_v1" | "session_capacity_set_v1" | "session_cancel_preview_v1" | "session_cancel_apply_v1" | "replacement_session_create_v1" | "session_assignment_set_v1" | "lesson_request_create_v1" | "lesson_request_withdraw_v1" | "lesson_request_reject_v1" | "lesson_request_offer_alternative_v1" | "lesson_request_accept_alternative_v1" | "lesson_request_approve_v1" | "reservation_create_v1" | "reservation_cancel_v1" | "reservation_list_v1" | "waitlist_join_v1" | "waitlist_leave_v1" | "seat_offer_accept_v1" | "seat_offer_reject_v1" | "attendance_get_v1" | "attendance_mark_v1" | "attendance_close_v1" | "attendance_correct_preview_v1" | "attendance_correct_apply_v1" | "products_list_v1" | "product_publish_v1" | "sale_preview_v1" | "sale_apply_v1" | "entitlements_get_v1" | "entitlement_extend_v1" | "credit_adjust_v1" | "negative_limit_set_v1" | "freeze_preview_v1" | "freeze_apply_v1" | "freeze_end_preview_v1" | "freeze_end_apply_v1" | "sale_terminate_preview_v1" | "sale_terminate_apply_v1" | "sale_refund_preview_v1" | "sale_refund_apply_v1" | "sale_change_preview_v1" | "sale_change_apply_v1" | "sale_renew_preview_v1" | "sale_renew_apply_v1" | "finance_get_v1" | "collection_record_v1" | "collection_correct_preview_v1" | "collection_correct_apply_v1" | "student_credit_refund_v1" | "student_credit_offset_v1" | "debt_adjust_v1" | "instructor_agreement_publish_v1" | "earnings_list_v1" | "instructor_payment_record_v1" | "instructor_payment_correct_v1" | "leads_list_v1" | "lead_save_v1" | "crm_activity_save_v1" | "trial_offer_create_v1" | "trial_registration_confirm_v1" | "lead_convert_v1" | "crm_followup_list_v1" | "segment_save_v1" | "automation_save_v1" | "notifications_list_v1" | "notification_mark_read_v1" | "notification_preferences_set_v1" | "report_get_v1" | "report_export_start_v1" | "report_file_get_v1" | "import_upload_prepare_v1" | "import_preview_v1" | "import_apply_v1" | "import_rows_list_v1" | "subscription_get_v1" | "subscription_upgrade_quote_v1" | "subscription_downgrade_request_v1" | "subscription_change_cancel_v1" | "subscription_renewal_set_v1" | "saas_payment_submit_v1" | "saas_payment_verify_v1" | "saas_grace_extend_v1" | "event_save_v1" | "event_publish_v1" | "event_register_v1" | "event_registration_cancel_v1" | "event_complete_v1" | "event_duty_verify_v1" | "event_cancel_preview_v1" | "event_cancel_apply_v1" | "event_list_v1" | "document_upload_prepare_v1" | "document_version_publish_v1" | "document_requirements_get_v1" | "document_accept_v1" | "publication_set_v1" | "public_calendar_get_v1" | "public_application_submit_v1" | "public_application_review_v1" | "operation_status_get_v1" | "preview_get_v1" | "job_status_get_v1" | "audit_list_v1" | "seat_offer_issue_v1" | "seat_offer_expire_v1" | "request_expire_v1" | "outbox_deliver_v1" | "reminder_schedule_v1" | "automation_run_v1" | "import_rows_process_v1" | "report_build_v1" | "privacy_execute_v1" | "subscription_boundary_apply_v1" | "class_assignment_set_v1" | "event_attendance_mark_v1" | "platform_owner_set_v1" | "platform_owner_remove_v1" | "center_manager_assign_v1" | "center_manager_revoke_v1" | "attendance_block_v1" | "event_attendance_close_v1" | "event_attendance_correct_v1" | "file_upload_complete_v1" | "negcredit_valuation_set_v1" | "disciplines_list_v1" | "discipline_save_v1" | "center_discipline_set_v1" | "person_discipline_set_v1" | "event_get_v1" | "event_registration_preview_v1" | "event_payment_prepare_v1" | "event_payment_get_v1" | "event_actual_start_record_v1" | "event_actual_start_correct_v1" | "management_state_get_v1" | "instructor_agreements_list_v1" | "reservation_impact_preview_v1" | "reservation_impact_apply_v1" | "settlement_movements_list_v1" | "settlement_requests_list_v1" | "settlement_request_get_v1" | "settlement_request_submit_v1" | "settlement_request_withdraw_v1" | "settlement_request_decide_v1" | "settlement_authority_get_v1" | "settlement_delegation_set_v1" | "settlement_authority_set_v1" | "negative_limits_get_v1" | "attendance_start_v1" | "document_publication_preview_v1" | "settings_catalog_get_v1" | "settings_get_v1" | "settings_update_v1" | "settings_reset_preview_v1" | "settings_reset_apply_v1" | "settings_history_get_v1" | "reservation_capacity_override_v1" | "account_sessions_list_v1" | "account_session_label_v1" | "account_sessions_revoke_v1" | "account_security_history_get_v1" | "account_totp_remove_v1" | "account_google_link_prepare_v1" | "media_get_v1" | "settings_template_resolve_v1" | "calendar_links_get_v1" | "calendar_link_create_v1" | "calendar_link_rotate_v1" | "calendar_link_revoke_v1" | "calendar_feed_get_v1" | "settings_preparation_resolve_v1")
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
  * via the `definition` "EntityType".
  */
 export type EntityType = ("organizations" | "centers" | "rooms" | "room_capacities" | "availability_rules" | "availability_exceptions" | "policy_versions" | "accounts" | "account_links" | "role_assignments" | "permission_overrides" | "invitations" | "people" | "person_contacts" | "center_relationships" | "merge_requests" | "merge_approvals" | "classes" | "program_versions" | "sessions" | "session_assignments" | "resource_bookings" | "lesson_requests" | "request_alternatives" | "reservations" | "waitlist_entries" | "seat_offers" | "attendance_entries" | "attendance_closures" | "products" | "product_versions" | "product_scopes" | "sales" | "entitlement_accounts" | "entitlement_movements" | "entitlement_allocations" | "credit_deficits" | "quota_buckets" | "freezes" | "negative_limit_overrides" | "debts" | "cash_movements" | "debt_allocations" | "student_credit_movements" | "debt_adjustments" | "instructor_agreements" | "earnings" | "instructor_payments" | "earning_allocations" | "leads" | "crm_activities" | "trial_offers" | "trial_usages" | "segments" | "automations" | "automation_runs" | "notification_preferences" | "notifications" | "outbox_jobs" | "report_jobs" | "saas_plan_versions" | "saas_subscriptions" | "saas_change_requests" | "saas_quotes" | "saas_payment_verifications" | "events" | "event_assignments" | "event_registrations" | "documents" | "document_versions" | "document_requirements" | "document_acceptances" | "files" | "previews" | "operation_receipts" | "audit_events" | "import_jobs" | "import_rows" | "publications" | "public_applications" | "privacy_requests" | "retention_holds" | "deletion_receipts" | "class_assignments" | "rate_limit_windows" | "disciplines" | "center_disciplines" | "person_disciplines" | "event_disciplines" | "event_payment_preparations")
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "AvailabilityStartTime".
+ */
+export type AvailabilityStartTime = string
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "AvailabilityEndTime".
+ */
+export type AvailabilityEndTime = string
 /**
  * Rows OR; dimensions AND. Same organization; plan/current center access and class/date/capacity gates remain mandatory. No pool per scope. Q-D01: narrow event scope requires exactly one matching label and explicit event eligibility; no event negative credit.
  *
@@ -579,6 +589,14 @@ export type EventDisciplineIds = string[]
 export type BookingCategory = ("male" | "female")
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "ManualCollectionPayment".
+ */
+export type ManualCollectionPayment = {
+method: ("cash" | "bank_transfer" | "card_pos")
+reference?: (string | null)
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
  * via the `definition` "EarningDirection".
  */
 export type EarningDirection = ("add" | "subtract")
@@ -589,6 +607,14 @@ export type EarningDirection = ("add" | "subtract")
  * via the `definition` "ReportRatioBps".
  */
 export type ReportRatioBps = number
+/**
+ * @minItems 1
+ * @maxItems 9
+ *
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "ReportColumns".
+ */
+export type ReportColumns = [("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count")]|[("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count"), ("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count")]|[("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count"), ("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count"), ("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count")]|[("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count"), ("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count"), ("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count"), ("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count")]|[("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count"), ("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count"), ("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count"), ("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count"), ("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count")]|[("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count"), ("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count"), ("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count"), ("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count"), ("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count"), ("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count")]|[("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count"), ("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count"), ("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count"), ("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count"), ("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count"), ("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count"), ("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count")]|[("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count"), ("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count"), ("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count"), ("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count"), ("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count"), ("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count"), ("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count"), ("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count")]|[("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count"), ("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count"), ("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count"), ("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count"), ("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count"), ("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count"), ("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count"), ("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count"), ("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count")]
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
  * via the `definition` "Request_policy_publish".
@@ -825,6 +851,64 @@ lead_id?: null
  */
 person_id: string
 })
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "Request_report_get".
+ */
+export type RequestReportGet = {
+client_api_version: 1
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+request_id: string
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+org_id: string
+center_id?: (string | null)
+report: ReportKind
+filters: ReportFilters
+page: Page
+columns?: ReportColumns
+report_order?: ReportPreparationOrder
+group_by?: ReportPreparationGrouping
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "ReportPreparationOrder".
+ */
+export type ReportPreparationOrder = ("group_key_asc" | "group_key_desc")
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "ReportPreparationGrouping".
+ */
+export type ReportPreparationGrouping = ("person" | "center" | "total")
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "Request_report_export_start".
+ */
+export type RequestReportExportStart = {
+client_api_version: 1
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+request_id: string
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+org_id: string
+center_id?: (string | null)
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+operation_key: string
+report: ReportKind
+filters: ReportFilters
+format: ExportFormat
+columns?: ReportColumns
+report_order?: ReportPreparationOrder
+group_by?: ReportPreparationGrouping
+}
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
  * via the `definition` "Request_event_register".
@@ -1121,7 +1205,13 @@ as_of: Instant
 /**
  * @maxItems 50
  */
-overridden_fields: ("ad_measurement" | "ad_personalization" | "address" | "application_name" | "billing_address" | "billing_email" | "billing_name" | "calendar_view" | "contact_email" | "contact_phone" | "contrast" | "date_format" | "description" | "email_visible" | "font_package_id" | "font_scale" | "history_recommendations" | "honorific" | "in_app_marketing" | "in_app_reminders" | "interest_center_ids" | "interest_discipline_ids" | "language" | "maintenance_message" | "marketing_in_app" | "motion" | "number_format" | "optional_analytics" | "phone_visible" | "photo_visible" | "profile_visible" | "remember_context" | "show_weekends" | "startup_context" | "support_email" | "support_url" | "theme" | "theme_package_id" | "time_format" | "timezone_mode" | "timezone_name" | "week_start")[]
+overridden_fields: ("ad_measurement" | "ad_personalization" | "address" | "application_name" | "billing_address" | "billing_email" | "billing_name" | "calendar_view" | "contact_email" | "contact_phone" | "contrast" | "date_format" | "description" | "email_visible" | "font_package_id" | "font_scale" | "history_recommendations" | "honorific" | "in_app_marketing" | "in_app_reminders" | "interest_center_ids" | "interest_discipline_ids" | "language" | "maintenance_message" | "marketing_in_app" | "motion" | "number_format" | "optional_analytics" | "phone_visible" | "photo_visible" | "profile_visible" | "program_duration_minutes" | "remember_context" | "show_weekends" | "startup_context" | "support_email" | "support_url" | "theme" | "theme_package_id" | "time_format" | "timezone_mode" | "timezone_name" | "week_start" | "report_templates" | "import_templates" | "public_profile_enabled" | "public_fields" | "public_hours" | "availability_templates" | "package_templates")[]
+program_duration_source?: {
+kind: ("system_default" | "organization_copy" | "center_local")
+organization_version?: SettingsVersion
+}
+logo?: (SettingsMediaAsset | null)
+preparation_sources?: PreparationSources
 } & SettingsView1)
 export type SettingsView1 = ({
 scope: "user"
@@ -1140,7 +1230,7 @@ as_of: Instant
 /**
  * @maxItems 50
  */
-overridden_fields: ("profile_visible" | "photo_visible" | "email_visible" | "phone_visible" | "history_recommendations" | "interest_center_ids" | "interest_discipline_ids" | "in_app_reminders" | "in_app_marketing")[]
+overridden_fields: ("profile_visible" | "photo_visible" | "email_visible" | "phone_visible" | "history_recommendations" | "interest_center_ids" | "interest_discipline_ids" | "in_app_reminders" | "in_app_marketing" | "report_templates" | "import_templates")[]
 } | {
 scope: "center"
 version: SettingsVersion
@@ -1149,7 +1239,12 @@ as_of: Instant
 /**
  * @maxItems 50
  */
-overridden_fields: ("description" | "address" | "contact_phone" | "contact_email")[]
+overridden_fields: ("description" | "address" | "contact_phone" | "contact_email" | "program_duration_minutes" | "report_templates" | "import_templates" | "public_profile_enabled" | "public_fields" | "public_hours" | "availability_templates" | "package_templates")[]
+program_duration_source?: {
+kind: ("system_default" | "organization_copy" | "center_local")
+organization_version?: SettingsVersion
+}
+preparation_sources?: PreparationSources
 } | {
 scope: "organization"
 version: SettingsVersion
@@ -1158,7 +1253,8 @@ as_of: Instant
 /**
  * @maxItems 50
  */
-overridden_fields: ("description" | "address" | "contact_phone" | "contact_email" | "theme_package_id" | "font_package_id" | "billing_name" | "billing_address" | "billing_email")[]
+overridden_fields: ("description" | "address" | "contact_phone" | "contact_email" | "theme_package_id" | "font_package_id" | "billing_name" | "billing_address" | "billing_email" | "program_duration_minutes" | "report_templates" | "import_templates" | "public_profile_enabled" | "public_fields" | "public_hours" | "availability_templates" | "package_templates")[]
+logo?: (SettingsMediaAsset | null)
 } | {
 scope: "platform"
 version: SettingsVersion
@@ -1176,14 +1272,14 @@ overridden_fields: ("application_name" | "support_email" | "support_url" | "main
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
  * via the `definition` "SettingsFieldKeys".
  */
-export type SettingsFieldKeys = [("ad_measurement" | "ad_personalization" | "address" | "application_name" | "billing_address" | "billing_email" | "billing_name" | "calendar_view" | "contact_email" | "contact_phone" | "contrast" | "date_format" | "description" | "email_visible" | "font_package_id" | "font_scale" | "history_recommendations" | "honorific" | "in_app_marketing" | "in_app_reminders" | "interest_center_ids" | "interest_discipline_ids" | "language" | "maintenance_message" | "marketing_in_app" | "motion" | "number_format" | "optional_analytics" | "phone_visible" | "photo_visible" | "profile_visible" | "remember_context" | "show_weekends" | "startup_context" | "support_email" | "support_url" | "theme" | "theme_package_id" | "time_format" | "timezone_mode" | "timezone_name" | "week_start"), ...(("ad_measurement" | "ad_personalization" | "address" | "application_name" | "billing_address" | "billing_email" | "billing_name" | "calendar_view" | "contact_email" | "contact_phone" | "contrast" | "date_format" | "description" | "email_visible" | "font_package_id" | "font_scale" | "history_recommendations" | "honorific" | "in_app_marketing" | "in_app_reminders" | "interest_center_ids" | "interest_discipline_ids" | "language" | "maintenance_message" | "marketing_in_app" | "motion" | "number_format" | "optional_analytics" | "phone_visible" | "photo_visible" | "profile_visible" | "remember_context" | "show_weekends" | "startup_context" | "support_email" | "support_url" | "theme" | "theme_package_id" | "time_format" | "timezone_mode" | "timezone_name" | "week_start"))[]]
+export type SettingsFieldKeys = [("ad_measurement" | "ad_personalization" | "address" | "application_name" | "billing_address" | "billing_email" | "billing_name" | "calendar_view" | "contact_email" | "contact_phone" | "contrast" | "date_format" | "description" | "email_visible" | "font_package_id" | "font_scale" | "history_recommendations" | "honorific" | "in_app_marketing" | "in_app_reminders" | "interest_center_ids" | "interest_discipline_ids" | "language" | "maintenance_message" | "marketing_in_app" | "motion" | "number_format" | "optional_analytics" | "phone_visible" | "photo_visible" | "profile_visible" | "program_duration_minutes" | "remember_context" | "show_weekends" | "startup_context" | "support_email" | "support_url" | "theme" | "theme_package_id" | "time_format" | "timezone_mode" | "timezone_name" | "week_start" | "report_templates" | "import_templates" | "public_profile_enabled" | "public_fields" | "public_hours" | "availability_templates" | "package_templates"), ...(("ad_measurement" | "ad_personalization" | "address" | "application_name" | "billing_address" | "billing_email" | "billing_name" | "calendar_view" | "contact_email" | "contact_phone" | "contrast" | "date_format" | "description" | "email_visible" | "font_package_id" | "font_scale" | "history_recommendations" | "honorific" | "in_app_marketing" | "in_app_reminders" | "interest_center_ids" | "interest_discipline_ids" | "language" | "maintenance_message" | "marketing_in_app" | "motion" | "number_format" | "optional_analytics" | "phone_visible" | "photo_visible" | "profile_visible" | "program_duration_minutes" | "remember_context" | "show_weekends" | "startup_context" | "support_email" | "support_url" | "theme" | "theme_package_id" | "time_format" | "timezone_mode" | "timezone_name" | "week_start" | "report_templates" | "import_templates" | "public_profile_enabled" | "public_fields" | "public_hours" | "availability_templates" | "package_templates"))[]]
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
  * via the `definition` "SettingsCatalog".
  */
 export type SettingsCatalog = ({
 scope: SettingsScope
-catalog_version: 2
+catalog_version: 8
 fields: SettingsFieldDescriptor[]
 defaults: (UserSettingsValues | MemberSettingsValues | CenterSettingsValues | OrganizationSettingsValues | PlatformSettingsValues)
 /**
@@ -1191,10 +1287,69 @@ defaults: (UserSettingsValues | MemberSettingsValues | CenterSettingsValues | Or
  */
 brand_packages: []
 limitations: string[]
+work_templates?: WorkTemplates
+preparation_templates?: PreparationTemplates
+notification_delivery?: NotificationDeliverySupport
 } & SettingsCatalog1)
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "WorkTemplateReference".
+ */
+export type WorkTemplateReference = ({
+scope: ("member" | "center" | "organization")
+key: string
+version: SettingsVersion
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+center_id?: string
+} & WorkTemplateReference1)
+export type WorkTemplateReference1 = ({
+scope: "member"
+key: string
+version: SettingsVersion
+} | {
+scope: "center"
+key: string
+version: SettingsVersion
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+center_id: string
+} | {
+scope: "organization"
+key: string
+version: SettingsVersion
+})
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "PreparationSourceReference".
+ */
+export type PreparationSourceReference = ({
+scope: ("organization" | "center")
+key: string
+version: SettingsVersion
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+center_id?: string
+} & PreparationSourceReference1)
+export type PreparationSourceReference1 = ({
+scope: "organization"
+key: string
+version: SettingsVersion
+} | {
+scope: "center"
+key: string
+version: SettingsVersion
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+center_id: string
+})
 export type SettingsCatalog1 = ({
 scope: "user"
-catalog_version: 2
+catalog_version: 8
 fields: SettingsFieldDescriptor[]
 defaults: UserSettingsValues
 /**
@@ -1202,9 +1357,12 @@ defaults: UserSettingsValues
  */
 brand_packages: []
 limitations: string[]
+work_templates?: WorkTemplates
+preparation_templates?: PreparationTemplates
+notification_delivery?: NotificationDeliverySupport
 } | {
 scope: "member"
-catalog_version: 2
+catalog_version: 8
 fields: SettingsFieldDescriptor[]
 defaults: MemberSettingsValues
 /**
@@ -1212,9 +1370,12 @@ defaults: MemberSettingsValues
  */
 brand_packages: []
 limitations: string[]
+work_templates?: WorkTemplates
+preparation_templates?: PreparationTemplates
+notification_delivery?: NotificationDeliverySupport
 } | {
 scope: "center"
-catalog_version: 2
+catalog_version: 8
 fields: SettingsFieldDescriptor[]
 defaults: CenterSettingsValues
 /**
@@ -1222,9 +1383,12 @@ defaults: CenterSettingsValues
  */
 brand_packages: []
 limitations: string[]
+work_templates?: WorkTemplates
+preparation_templates?: PreparationTemplates
+notification_delivery?: NotificationDeliverySupport
 } | {
 scope: "organization"
-catalog_version: 2
+catalog_version: 8
 fields: SettingsFieldDescriptor[]
 defaults: OrganizationSettingsValues
 /**
@@ -1232,9 +1396,12 @@ defaults: OrganizationSettingsValues
  */
 brand_packages: []
 limitations: string[]
+work_templates?: WorkTemplates
+preparation_templates?: PreparationTemplates
+notification_delivery?: NotificationDeliverySupport
 } | {
 scope: "platform"
-catalog_version: 2
+catalog_version: 8
 fields: SettingsFieldDescriptor[]
 defaults: PlatformSettingsValues
 /**
@@ -1242,6 +1409,9 @@ defaults: PlatformSettingsValues
  */
 brand_packages: []
 limitations: string[]
+work_templates?: WorkTemplates
+preparation_templates?: PreparationTemplates
+notification_delivery?: NotificationDeliverySupport
 })
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -1262,6 +1432,10 @@ org_id?: string
  * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
  */
 center_id?: string
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+template_center_id?: string
 } & RequestSettingsCatalogGet1)
 export type RequestSettingsCatalogGet1 = ({
 client_api_version: 1
@@ -1281,6 +1455,10 @@ scope: "member"
  * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
  */
 org_id: string
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+template_center_id?: string
 } | {
 client_api_version: 1
 /**
@@ -1391,7 +1569,7 @@ scope: "platform"
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
  * via the `definition` "Request_settings_update".
  */
-export type RequestSettingsUpdate = ({
+export type RequestSettingsUpdate = (RequestSettingsUpdate1 & {
 client_api_version: 1
 /**
  * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
@@ -1413,8 +1591,16 @@ operation_key: string
 expected_version: SettingsVersion
 reason?: string
 patch: (UserSettingsValues | MemberSettingsValues | CenterSettingsValues | OrganizationSettingsValues | PlatformSettingsValues)
-} & RequestSettingsUpdate1)
+logo_image?: (SettingsImageUpload | null)
+} & RequestSettingsUpdate2)
 export type RequestSettingsUpdate1 = ({
+patch?: {
+[k: string]: unknown
+}
+} | {
+[k: string]: unknown
+})
+export type RequestSettingsUpdate2 = ({
 client_api_version: 1
 /**
  * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
@@ -1486,6 +1672,7 @@ operation_key: string
 expected_version: SettingsVersion
 reason?: string
 patch: OrganizationSettingsValues
+logo_image?: (SettingsImageUpload | null)
 } | {
 client_api_version: 1
 /**
@@ -1549,7 +1736,7 @@ org_id: string
  * @minItems 1
  * @maxItems 50
  */
-fields: [("profile_visible" | "photo_visible" | "email_visible" | "phone_visible" | "history_recommendations" | "interest_center_ids" | "interest_discipline_ids" | "in_app_reminders" | "in_app_marketing"), ...(("profile_visible" | "photo_visible" | "email_visible" | "phone_visible" | "history_recommendations" | "interest_center_ids" | "interest_discipline_ids" | "in_app_reminders" | "in_app_marketing"))[]]
+fields: [("profile_visible" | "photo_visible" | "email_visible" | "phone_visible" | "history_recommendations" | "interest_center_ids" | "interest_discipline_ids" | "in_app_reminders" | "in_app_marketing" | "report_templates" | "import_templates"), ...(("profile_visible" | "photo_visible" | "email_visible" | "phone_visible" | "history_recommendations" | "interest_center_ids" | "interest_discipline_ids" | "in_app_reminders" | "in_app_marketing" | "report_templates" | "import_templates"))[]]
 } | {
 client_api_version: 1
 /**
@@ -1569,7 +1756,7 @@ center_id: string
  * @minItems 1
  * @maxItems 50
  */
-fields: [("description" | "address" | "contact_phone" | "contact_email"), ...(("description" | "address" | "contact_phone" | "contact_email"))[]]
+fields: [("description" | "address" | "contact_phone" | "contact_email" | "program_duration_minutes" | "report_templates" | "import_templates" | "public_profile_enabled" | "public_fields" | "public_hours" | "availability_templates" | "package_templates"), ...(("description" | "address" | "contact_phone" | "contact_email" | "program_duration_minutes" | "report_templates" | "import_templates" | "public_profile_enabled" | "public_fields" | "public_hours" | "availability_templates" | "package_templates"))[]]
 } | {
 client_api_version: 1
 /**
@@ -1585,7 +1772,7 @@ org_id: string
  * @minItems 1
  * @maxItems 50
  */
-fields: [("description" | "address" | "contact_phone" | "contact_email" | "theme_package_id" | "font_package_id" | "billing_name" | "billing_address" | "billing_email"), ...(("description" | "address" | "contact_phone" | "contact_email" | "theme_package_id" | "font_package_id" | "billing_name" | "billing_address" | "billing_email"))[]]
+fields: [("description" | "address" | "contact_phone" | "contact_email" | "theme_package_id" | "font_package_id" | "billing_name" | "billing_address" | "billing_email" | "program_duration_minutes" | "report_templates" | "import_templates" | "public_profile_enabled" | "public_fields" | "public_hours" | "availability_templates" | "package_templates"), ...(("description" | "address" | "contact_phone" | "contact_email" | "theme_package_id" | "font_package_id" | "billing_name" | "billing_address" | "billing_email" | "program_duration_minutes" | "report_templates" | "import_templates" | "public_profile_enabled" | "public_fields" | "public_hours" | "availability_templates" | "package_templates"))[]]
 } | {
 client_api_version: 1
 /**
@@ -1850,6 +2037,225 @@ request_id: string
 operation_key: string
 mode: "others"
 reauth: ReauthProof
+})
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "Request_media_get".
+ */
+export type RequestMediaGet = ({
+client_api_version: 1
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+request_id: string
+scope: ("user" | "organization" | "lesson_participant")
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+asset_id: string
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+org_id?: string
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+session_id?: string
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+person_id?: string
+} & RequestMediaGet1)
+export type RequestMediaGet1 = ({
+client_api_version: 1
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+request_id: string
+scope: "user"
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+asset_id: string
+} | {
+client_api_version: 1
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+request_id: string
+scope: "organization"
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+asset_id: string
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+org_id: string
+} | {
+client_api_version: 1
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+request_id: string
+scope: "lesson_participant"
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+asset_id: string
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+org_id: string
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+session_id: string
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+person_id: string
+})
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "Request_settings_template_resolve".
+ */
+export type RequestSettingsTemplateResolve = ({
+client_api_version: 1
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+request_id: string
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+org_id: string
+center_id?: (string | null)
+kind: ("report" | "import")
+template: WorkTemplateReference
+overrides?: (ReportTemplateOverrides | ImportTemplateOverrides)
+} & RequestSettingsTemplateResolve1)
+export type RequestSettingsTemplateResolve1 = ({
+client_api_version: 1
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+request_id: string
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+org_id: string
+center_id?: (string | null)
+kind: "report"
+template: WorkTemplateReference
+overrides?: ReportTemplateOverrides
+} | {
+client_api_version: 1
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+request_id: string
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+org_id: string
+center_id?: (string | null)
+kind: "import"
+template: WorkTemplateReference
+overrides?: ImportTemplateOverrides
+})
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "ResolvedWorkTemplate".
+ */
+export type ResolvedWorkTemplate = ({
+kind: "report"
+source: WorkTemplateReference
+request: PreparedReportRequest
+} | {
+kind: "import"
+source: WorkTemplateReference
+request: PreparedImportRequest
+})
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "Request_settings_preparation_resolve".
+ */
+export type RequestSettingsPreparationResolve = ({
+client_api_version: 1
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+request_id: string
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+org_id: string
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+center_id: string
+kind: ("availability" | "package")
+source: PreparationSourceReference
+resource?: ResourceRef
+rule_index?: number
+} & RequestSettingsPreparationResolve1)
+export type RequestSettingsPreparationResolve1 = ({
+client_api_version: 1
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+request_id: string
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+org_id: string
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+center_id: string
+kind: "availability"
+source: PreparationSourceReference
+resource: ResourceRef
+rule_index: number
+} | {
+client_api_version: 1
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+request_id: string
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+org_id: string
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+center_id: string
+kind: "package"
+source: PreparationSourceReference
+})
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "ResolvedDomainPreparation".
+ */
+export type ResolvedDomainPreparation = ({
+kind: "availability"
+source: PreparationSourceReference
+request: {
+resource: ResourceRef
+rule: AvailabilityRule
+}
+} | {
+kind: "package"
+source: PreparationSourceReference
+product_request: {
+terms: ProductTerms
+}
+sale_dates: {
+start_date: Date
+end_date: Date
+}
 })
 /**
  * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
@@ -3049,6 +3455,59 @@ GoogleLinkAuthorization?: GoogleLinkAuthorization
 Success_account_google_link_prepare?: SuccessAccountGoogleLinkPrepare
 StarterRetainedScope?: StarterRetainedScope
 StarterScopeSelection?: StarterScopeSelection
+SharedLessonParticipant?: SharedLessonParticipant
+SettingsImageUpload?: SettingsImageUpload
+SettingsMediaAsset?: SettingsMediaAsset
+SettingsMediaChange?: SettingsMediaChange
+Request_media_get?: RequestMediaGet
+SettingsMediaContent?: SettingsMediaContent
+Success_media_get?: SuccessMediaGet
+ReportColumns?: ReportColumns
+ReportPreparationOrder?: ReportPreparationOrder
+ReportPreparationGrouping?: ReportPreparationGrouping
+WorkTemplateReference?: WorkTemplateReference
+StarterReportTemplate?: StarterReportTemplate
+StarterImportTemplate?: StarterImportTemplate
+WorkTemplates?: WorkTemplates
+ReportFilterOverrides?: ReportFilterOverrides
+ReportTemplateOverrides?: ReportTemplateOverrides
+ImportTemplateOverrides?: ImportTemplateOverrides
+Request_settings_template_resolve?: RequestSettingsTemplateResolve
+PreparedReportRequest?: PreparedReportRequest
+PreparedImportRequest?: PreparedImportRequest
+ResolvedWorkTemplate?: ResolvedWorkTemplate
+Success_settings_template_resolve?: SuccessSettingsTemplateResolve
+PublicBusinessProfile?: PublicBusinessProfile
+ManualCollectionPayment?: ManualCollectionPayment
+PersonalCalendarLink?: PersonalCalendarLink
+PersonalCalendarMutation?: PersonalCalendarMutation
+PersonalCalendarCredentialMutation?: PersonalCalendarCredentialMutation
+Page_PersonalCalendarLink?: Page_PersonalCalendarLink
+Request_calendar_links_get?: RequestCalendarLinksGet
+Request_calendar_link_create?: RequestCalendarLinkCreate
+Request_calendar_link_rotate?: RequestCalendarLinkRotate
+Request_calendar_link_revoke?: RequestCalendarLinkRevoke
+Request_calendar_feed_get?: RequestCalendarFeedGet
+PersonalCalendarFeed?: PersonalCalendarFeed
+Success_calendar_links_get?: SuccessCalendarLinksGet
+Success_calendar_link_create?: SuccessCalendarLinkCreate
+Success_calendar_link_rotate?: SuccessCalendarLinkRotate
+Success_calendar_link_revoke?: SuccessCalendarLinkRevoke
+Success_calendar_feed_get?: SuccessCalendarFeedGet
+StarterAvailabilityTemplate?: StarterAvailabilityTemplate
+StarterPackageTerms?: StarterPackageTerms
+StarterPackageTemplate?: StarterPackageTemplate
+PreparationSourceReference?: PreparationSourceReference
+PreparationSources?: PreparationSources
+PreparationTemplates?: PreparationTemplates
+Request_settings_preparation_resolve?: RequestSettingsPreparationResolve
+ResolvedDomainPreparation?: ResolvedDomainPreparation
+Success_settings_preparation_resolve?: SuccessSettingsPreparationResolve
+PreparationAvailabilityRule?: PreparationAvailabilityRule
+NotificationDeliverySupport?: NotificationDeliverySupport
+CalendarPage?: CalendarPage
+AvailabilityStartTime?: AvailabilityStartTime
+AvailabilityEndTime?: AvailabilityEndTime
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -3148,8 +3607,8 @@ export interface AvailabilityRule {
  * @minItems 1
  */
 weekdays: [number, ...(number)[]]
-local_start: LocalTime
-local_end: LocalTime
+local_start: AvailabilityStartTime
+local_end: AvailabilityEndTime
 valid_from: Date
 valid_until?: (Date | null)
 }
@@ -3175,7 +3634,7 @@ export interface ProgramSpec {
  */
 weekdays: [number, ...(number)[]]
 local_start: LocalTime
-duration_minutes: PositiveInt
+duration_minutes?: PositiveInt
 starts_on: Date
 ends_on: Date
 room_id?: (string | null)
@@ -3568,6 +4027,7 @@ target: ImportTarget
  */
 export interface ImportMapping {
 columns: ImportColumn[]
+delimiter?: ("," | ";")
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -5464,6 +5924,7 @@ kind: "account_profile_updated"
 created_at: Instant
 }]
 identity?: AccountIdentityView
+photo?: (SettingsMediaAsset | null)
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -5482,6 +5943,19 @@ unverified_phone: (string | null)
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "SettingsMediaAsset".
+ */
+export interface SettingsMediaAsset {
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+id: string
+mime: ("image/png" | "image/jpeg" | "image/webp")
+bytes: number
+checksum: string
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
  * via the `definition` "OrganizationView".
  */
 export interface OrganizationView {
@@ -5493,6 +5967,7 @@ name: Text
 state: OrganizationState
 access_mode: ("bootstrap" | "normal" | "grace" | "closed")
 version: PositiveInt
+logo?: (SettingsMediaAsset | null)
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -5508,6 +5983,7 @@ timezone: IanaZone
 state: RecordState
 accessible: Bool
 version: PositiveInt
+organization_logo?: (SettingsMediaAsset | null)
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -5645,6 +6121,21 @@ discipline_id: string
 class_assignments?: ClassAssignmentView[]
 class_version?: PositiveInt
 capacity: SessionCapacityView
+shared_participants?: SharedLessonParticipant[]
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "SharedLessonParticipant".
+ */
+export interface SharedLessonParticipant {
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+person_id: string
+display_name?: string
+email?: string
+phone?: string
+photo?: SettingsMediaAsset
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -5877,6 +6368,7 @@ occurred_at: Instant
 center_id?: string
 version?: PositiveInt
 previous_id?: (string | null)
+payment?: (ManualCollectionPayment | null)
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -6060,6 +6552,7 @@ as_of: Instant
 filters: ReportFilters
 rows: Page_ReportRow
 totals: ReportTotal[]
+columns?: ReportColumns
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -6611,6 +7104,44 @@ export interface Page_PublicCalendarItem {
 items: PublicCalendarItem[]
 next_cursor?: (OpaqueToken | null)
 as_of: Instant
+organization_profile?: (PublicBusinessProfile | null)
+center_profile?: (PublicBusinessProfile | null)
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "PublicBusinessProfile".
+ */
+export interface PublicBusinessProfile {
+name?: string
+description?: string
+address?: string
+contact?: {
+phone: string
+email: (string | null)
+}
+/**
+ * @maxItems 100
+ */
+hours?: {
+/**
+ * @minItems 1
+ * @maxItems 7
+ */
+weekdays: [number]|[number, number]|[number, number, number]|[number, number, number, number]|[number, number, number, number, number]|[number, number, number, number, number, number]|[number, number, number, number, number, number, number]
+local_start: string
+local_end: string
+timezone: string
+}[]
+timezone?: string
+logo?: (SettingsMediaContent | null)
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "SettingsMediaContent".
+ */
+export interface SettingsMediaContent {
+asset: SettingsMediaAsset
+data_base64: string
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -6681,6 +7212,16 @@ display_name: Text
 given_name?: (string | null)
 family_name?: (string | null)
 unverified_phone?: (string | null)
+photo?: (SettingsImageUpload | null)
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "SettingsImageUpload".
+ */
+export interface SettingsImageUpload {
+mime: ("image/png" | "image/jpeg" | "image/webp")
+data_base64: string
+checksum: string
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -8047,7 +8588,17 @@ org_id: string
 center_id?: (string | null)
 interval: Interval
 resource?: (ResourceRef | null)
-page: Page
+page: CalendarPage
+interest_filter?: boolean
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "CalendarPage".
+ */
+export interface CalendarPage {
+limit?: number
+cursor?: (OpaqueToken | null)
+sort?: ("starts_at_asc" | "recommendation_desc")
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -9890,6 +10441,7 @@ currency: Currency
 occurred_at: Instant
 debt_ids?: (string[] | null)
 note?: (Text | null)
+payment?: ManualCollectionPayment
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -10657,25 +11209,6 @@ trace_id: string
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
- * via the `definition` "Request_report_get".
- */
-export interface RequestReportGet {
-client_api_version: 1
-/**
- * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
- */
-request_id: string
-/**
- * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
- */
-org_id: string
-center_id?: (string | null)
-report: ReportKind
-filters: ReportFilters
-page: Page
-}
-/**
- * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
  * via the `definition` "Success_report_get".
  */
 export interface SuccessReportGet {
@@ -10685,29 +11218,6 @@ data: ReportView
  * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
  */
 trace_id: string
-}
-/**
- * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
- * via the `definition` "Request_report_export_start".
- */
-export interface RequestReportExportStart {
-client_api_version: 1
-/**
- * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
- */
-request_id: string
-/**
- * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
- */
-org_id: string
-center_id?: (string | null)
-/**
- * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
- */
-operation_key: string
-report: ReportKind
-filters: ReportFilters
-format: ExportFormat
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -15871,6 +16381,7 @@ display_name?: Text
 given_name?: (string | null)
 family_name?: (string | null)
 unverified_phone?: (string | null)
+photo?: (SettingsMediaAsset | null)
 }
 }
 /**
@@ -21117,6 +21628,56 @@ interest_center_ids?: string[]
 interest_discipline_ids?: string[]
 in_app_reminders?: boolean
 in_app_marketing?: boolean
+/**
+ * @maxItems 100
+ */
+report_templates?: {
+key: string
+name: string
+report: ("collections_debts" | "lesson_attendance")
+filters: {
+interval: {
+starts_at: string
+ends_at: string
+}
+/**
+ * Items: Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+center_ids: string[]
+/**
+ * Items: Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+person_ids?: string[]
+currency?: (string | null)
+state?: (string | null)
+}
+/**
+ * @minItems 1
+ * @maxItems 9
+ */
+columns: [("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count")]|[("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count"), ("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count")]|[("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count"), ("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count"), ("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count")]|[("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count"), ("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count"), ("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count"), ("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count")]|[("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count"), ("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count"), ("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count"), ("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count"), ("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count")]|[("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count"), ("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count"), ("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count"), ("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count"), ("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count"), ("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count")]|[("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count"), ("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count"), ("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count"), ("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count"), ("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count"), ("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count"), ("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count")]|[("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count"), ("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count"), ("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count"), ("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count"), ("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count"), ("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count"), ("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count"), ("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count")]|[("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count"), ("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count"), ("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count"), ("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count"), ("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count"), ("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count"), ("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count"), ("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count"), ("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count")]
+report_order: ("group_key_asc" | "group_key_desc")
+group_by: ("person" | "center" | "total")
+}[]
+/**
+ * @maxItems 100
+ */
+import_templates?: {
+key: string
+name: string
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+center_id: string
+mapping: {
+columns: {
+source_column: string
+target: ("display_name" | "email" | "phone" | "source_key" | "person_ref" | "opening_credits" | "opening_debt_minor" | "currency" | "product_version_ref" | "start_date" | "end_date" | "opening_credit_value_minor")
+}[]
+delimiter: ("," | ";")
+}
+source_namespace: string
+}[]
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -21127,6 +21688,139 @@ description?: string
 address?: string
 contact_phone?: string
 contact_email?: (string | null)
+program_duration_minutes?: number
+/**
+ * @maxItems 100
+ */
+report_templates?: {
+key: string
+name: string
+report: ("collections_debts" | "lesson_attendance")
+filters: {
+interval: {
+starts_at: string
+ends_at: string
+}
+/**
+ * Items: Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+center_ids: string[]
+/**
+ * Items: Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+person_ids?: string[]
+currency?: (string | null)
+state?: (string | null)
+}
+/**
+ * @minItems 1
+ * @maxItems 9
+ */
+columns: [("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count")]|[("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count"), ("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count")]|[("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count"), ("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count"), ("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count")]|[("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count"), ("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count"), ("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count"), ("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count")]|[("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count"), ("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count"), ("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count"), ("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count"), ("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count")]|[("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count"), ("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count"), ("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count"), ("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count"), ("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count"), ("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count")]|[("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count"), ("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count"), ("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count"), ("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count"), ("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count"), ("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count"), ("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count")]|[("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count"), ("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count"), ("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count"), ("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count"), ("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count"), ("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count"), ("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count"), ("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count")]|[("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count"), ("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count"), ("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count"), ("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count"), ("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count"), ("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count"), ("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count"), ("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count"), ("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count")]
+report_order: ("group_key_asc" | "group_key_desc")
+group_by: ("person" | "center" | "total")
+}[]
+/**
+ * @maxItems 100
+ */
+import_templates?: {
+key: string
+name: string
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+center_id: string
+mapping: {
+columns: {
+source_column: string
+target: ("display_name" | "email" | "phone" | "source_key" | "person_ref" | "opening_credits" | "opening_debt_minor" | "currency" | "product_version_ref" | "start_date" | "end_date" | "opening_credit_value_minor")
+}[]
+delimiter: ("," | ";")
+}
+source_namespace: string
+}[]
+public_profile_enabled?: boolean
+/**
+ * @maxItems 6
+ */
+public_fields?: []|[("name" | "description" | "logo" | "address" | "contact" | "hours")]|[("name" | "description" | "logo" | "address" | "contact" | "hours"), ("name" | "description" | "logo" | "address" | "contact" | "hours")]|[("name" | "description" | "logo" | "address" | "contact" | "hours"), ("name" | "description" | "logo" | "address" | "contact" | "hours"), ("name" | "description" | "logo" | "address" | "contact" | "hours")]|[("name" | "description" | "logo" | "address" | "contact" | "hours"), ("name" | "description" | "logo" | "address" | "contact" | "hours"), ("name" | "description" | "logo" | "address" | "contact" | "hours"), ("name" | "description" | "logo" | "address" | "contact" | "hours")]|[("name" | "description" | "logo" | "address" | "contact" | "hours"), ("name" | "description" | "logo" | "address" | "contact" | "hours"), ("name" | "description" | "logo" | "address" | "contact" | "hours"), ("name" | "description" | "logo" | "address" | "contact" | "hours"), ("name" | "description" | "logo" | "address" | "contact" | "hours")]|[("name" | "description" | "logo" | "address" | "contact" | "hours"), ("name" | "description" | "logo" | "address" | "contact" | "hours"), ("name" | "description" | "logo" | "address" | "contact" | "hours"), ("name" | "description" | "logo" | "address" | "contact" | "hours"), ("name" | "description" | "logo" | "address" | "contact" | "hours"), ("name" | "description" | "logo" | "address" | "contact" | "hours")]
+/**
+ * @maxItems 100
+ */
+public_hours?: {
+/**
+ * @minItems 1
+ * @maxItems 7
+ */
+weekdays: [number]|[number, number]|[number, number, number]|[number, number, number, number]|[number, number, number, number, number]|[number, number, number, number, number, number]|[number, number, number, number, number, number, number]
+local_start: string
+local_end: string
+timezone: string
+}[]
+/**
+ * @maxItems 100
+ */
+availability_templates?: {
+key: string
+name: string
+/**
+ * @minItems 1
+ * @maxItems 100
+ */
+rules: [{
+/**
+ * @minItems 1
+ */
+weekdays: [number, ...(number)[]]
+local_start: string
+local_end: string
+valid_from: string
+valid_until?: (string | null)
+}, ...({
+/**
+ * @minItems 1
+ */
+weekdays: [number, ...(number)[]]
+local_start: string
+local_end: string
+valid_from: string
+valid_until?: (string | null)
+})[]]
+}[]
+/**
+ * @maxItems 100
+ */
+package_templates?: {
+key: string
+name: string
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+discipline_id: string
+terms: {
+name: string
+kind: ("credits" | "timed")
+booking_mode: ("priority" | "flexible")
+credits: (number | null)
+price_minor: string
+currency: string
+freeze: {
+enabled: false
+extends_validity: boolean
+max_days?: (number | null)
+}
+refund: {
+method: ("none" | "credit_ratio" | "used_at_unit_price" | "time_ratio")
+used_unit_minor?: (string | null)
+}
+quota: ({
+period: ("week" | "month")
+limit: number
+} | null)
+}
+start_date: string
+end_date: string
+}[]
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -21142,6 +21836,139 @@ font_package_id?: null
 billing_name?: string
 billing_address?: string
 billing_email?: (string | null)
+program_duration_minutes?: number
+/**
+ * @maxItems 100
+ */
+report_templates?: {
+key: string
+name: string
+report: ("collections_debts" | "lesson_attendance")
+filters: {
+interval: {
+starts_at: string
+ends_at: string
+}
+/**
+ * Items: Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+center_ids: string[]
+/**
+ * Items: Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+person_ids?: string[]
+currency?: (string | null)
+state?: (string | null)
+}
+/**
+ * @minItems 1
+ * @maxItems 9
+ */
+columns: [("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count")]|[("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count"), ("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count")]|[("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count"), ("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count"), ("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count")]|[("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count"), ("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count"), ("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count"), ("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count")]|[("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count"), ("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count"), ("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count"), ("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count"), ("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count")]|[("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count"), ("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count"), ("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count"), ("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count"), ("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count"), ("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count")]|[("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count"), ("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count"), ("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count"), ("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count"), ("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count"), ("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count"), ("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count")]|[("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count"), ("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count"), ("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count"), ("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count"), ("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count"), ("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count"), ("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count"), ("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count")]|[("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count"), ("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count"), ("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count"), ("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count"), ("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count"), ("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count"), ("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count"), ("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count"), ("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count")]
+report_order: ("group_key_asc" | "group_key_desc")
+group_by: ("person" | "center" | "total")
+}[]
+/**
+ * @maxItems 100
+ */
+import_templates?: {
+key: string
+name: string
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+center_id: string
+mapping: {
+columns: {
+source_column: string
+target: ("display_name" | "email" | "phone" | "source_key" | "person_ref" | "opening_credits" | "opening_debt_minor" | "currency" | "product_version_ref" | "start_date" | "end_date" | "opening_credit_value_minor")
+}[]
+delimiter: ("," | ";")
+}
+source_namespace: string
+}[]
+public_profile_enabled?: boolean
+/**
+ * @maxItems 6
+ */
+public_fields?: []|[("name" | "description" | "logo" | "address" | "contact" | "hours")]|[("name" | "description" | "logo" | "address" | "contact" | "hours"), ("name" | "description" | "logo" | "address" | "contact" | "hours")]|[("name" | "description" | "logo" | "address" | "contact" | "hours"), ("name" | "description" | "logo" | "address" | "contact" | "hours"), ("name" | "description" | "logo" | "address" | "contact" | "hours")]|[("name" | "description" | "logo" | "address" | "contact" | "hours"), ("name" | "description" | "logo" | "address" | "contact" | "hours"), ("name" | "description" | "logo" | "address" | "contact" | "hours"), ("name" | "description" | "logo" | "address" | "contact" | "hours")]|[("name" | "description" | "logo" | "address" | "contact" | "hours"), ("name" | "description" | "logo" | "address" | "contact" | "hours"), ("name" | "description" | "logo" | "address" | "contact" | "hours"), ("name" | "description" | "logo" | "address" | "contact" | "hours"), ("name" | "description" | "logo" | "address" | "contact" | "hours")]|[("name" | "description" | "logo" | "address" | "contact" | "hours"), ("name" | "description" | "logo" | "address" | "contact" | "hours"), ("name" | "description" | "logo" | "address" | "contact" | "hours"), ("name" | "description" | "logo" | "address" | "contact" | "hours"), ("name" | "description" | "logo" | "address" | "contact" | "hours"), ("name" | "description" | "logo" | "address" | "contact" | "hours")]
+/**
+ * @maxItems 100
+ */
+public_hours?: {
+/**
+ * @minItems 1
+ * @maxItems 7
+ */
+weekdays: [number]|[number, number]|[number, number, number]|[number, number, number, number]|[number, number, number, number, number]|[number, number, number, number, number, number]|[number, number, number, number, number, number, number]
+local_start: string
+local_end: string
+timezone: string
+}[]
+/**
+ * @maxItems 100
+ */
+availability_templates?: {
+key: string
+name: string
+/**
+ * @minItems 1
+ * @maxItems 100
+ */
+rules: [{
+/**
+ * @minItems 1
+ */
+weekdays: [number, ...(number)[]]
+local_start: string
+local_end: string
+valid_from: string
+valid_until?: (string | null)
+}, ...({
+/**
+ * @minItems 1
+ */
+weekdays: [number, ...(number)[]]
+local_start: string
+local_end: string
+valid_from: string
+valid_until?: (string | null)
+})[]]
+}[]
+/**
+ * @maxItems 100
+ */
+package_templates?: {
+key: string
+name: string
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+discipline_id: string
+terms: {
+name: string
+kind: ("credits" | "timed")
+booking_mode: ("priority" | "flexible")
+credits: (number | null)
+price_minor: string
+currency: string
+freeze: {
+enabled: false
+extends_validity: boolean
+max_days?: (number | null)
+}
+refund: {
+method: ("none" | "credit_ratio" | "used_at_unit_price" | "time_ratio")
+used_unit_minor?: (string | null)
+}
+quota: ({
+period: ("week" | "month")
+limit: number
+} | null)
+}
+start_date: string
+end_date: string
+}[]
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -21152,6 +21979,20 @@ application_name?: string
 support_email?: (string | null)
 support_url?: (string | null)
 maintenance_message?: string
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "PreparationSources".
+ */
+export interface PreparationSources {
+availability_templates: {
+kind: ("system_default" | "organization_copy" | "center_local")
+organization_version?: SettingsVersion
+}
+package_templates: {
+kind: ("system_default" | "organization_copy" | "center_local")
+organization_version?: SettingsVersion
+}
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -21187,6 +22028,15 @@ at: Instant
 before: (UserSettingsValues | MemberSettingsValues | CenterSettingsValues | OrganizationSettingsValues | PlatformSettingsValues)
 after: (UserSettingsValues | MemberSettingsValues | CenterSettingsValues | OrganizationSettingsValues | PlatformSettingsValues)
 reason: string
+media_change?: (SettingsMediaChange | null)
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "SettingsMediaChange".
+ */
+export interface SettingsMediaChange {
+before_asset_id: (string | null)
+after_asset_id: (string | null)
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -21205,10 +22055,211 @@ as_of: Instant
  * via the `definition` "SettingsFieldDescriptor".
  */
 export interface SettingsFieldDescriptor {
-key: ("ad_measurement" | "ad_personalization" | "address" | "application_name" | "billing_address" | "billing_email" | "billing_name" | "calendar_view" | "contact_email" | "contact_phone" | "contrast" | "date_format" | "description" | "email_visible" | "font_package_id" | "font_scale" | "history_recommendations" | "honorific" | "in_app_marketing" | "in_app_reminders" | "interest_center_ids" | "interest_discipline_ids" | "language" | "maintenance_message" | "marketing_in_app" | "motion" | "number_format" | "optional_analytics" | "phone_visible" | "photo_visible" | "profile_visible" | "remember_context" | "show_weekends" | "startup_context" | "support_email" | "support_url" | "theme" | "theme_package_id" | "time_format" | "timezone_mode" | "timezone_name" | "week_start")
+key: ("ad_measurement" | "ad_personalization" | "address" | "application_name" | "billing_address" | "billing_email" | "billing_name" | "calendar_view" | "contact_email" | "contact_phone" | "contrast" | "date_format" | "description" | "email_visible" | "font_package_id" | "font_scale" | "history_recommendations" | "honorific" | "in_app_marketing" | "in_app_reminders" | "interest_center_ids" | "interest_discipline_ids" | "language" | "maintenance_message" | "marketing_in_app" | "motion" | "number_format" | "optional_analytics" | "phone_visible" | "photo_visible" | "profile_visible" | "program_duration_minutes" | "remember_context" | "show_weekends" | "startup_context" | "support_email" | "support_url" | "theme" | "theme_package_id" | "time_format" | "timezone_mode" | "timezone_name" | "week_start" | "report_templates" | "import_templates" | "public_profile_enabled" | "public_fields" | "public_hours" | "availability_templates" | "package_templates")
 group: string
-consumer: ("frontend" | "p05_optional_allowed")
+consumer: ("frontend" | "p05_optional_allowed" | "new_center_copy" | "schedule_build_program" | "p06_report_prepare" | "p06_import_prepare" | "public_profile" | "domain_preparation_resolve" | "schedule_calendar_preferences")
 writable: boolean
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "WorkTemplates".
+ */
+export interface WorkTemplates {
+/**
+ * @maxItems 300
+ */
+reports: {
+source: WorkTemplateReference
+template: StarterReportTemplate
+}[]
+/**
+ * @maxItems 300
+ */
+imports: {
+source: WorkTemplateReference
+template: StarterImportTemplate
+}[]
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "StarterReportTemplate".
+ */
+export interface StarterReportTemplate {
+key: string
+name: string
+report: ("collections_debts" | "lesson_attendance")
+filters: ReportFilters
+columns: ReportColumns
+report_order: ReportPreparationOrder
+group_by: ReportPreparationGrouping
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "StarterImportTemplate".
+ */
+export interface StarterImportTemplate {
+key: string
+name: string
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+center_id: string
+mapping: {
+columns: ImportColumn[]
+delimiter: ("," | ";")
+}
+source_namespace: Text
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "PreparationTemplates".
+ */
+export interface PreparationTemplates {
+/**
+ * @maxItems 200
+ */
+availability: {
+source: PreparationSourceReference
+template: StarterAvailabilityTemplate
+}[]
+/**
+ * @maxItems 200
+ */
+packages: {
+source: PreparationSourceReference
+template: StarterPackageTemplate
+}[]
+package_currency_suggestion: "TRY"
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "StarterAvailabilityTemplate".
+ */
+export interface StarterAvailabilityTemplate {
+key: string
+name: string
+/**
+ * @minItems 1
+ * @maxItems 100
+ */
+rules: [PreparationAvailabilityRule, ...(PreparationAvailabilityRule)[]]
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "PreparationAvailabilityRule".
+ */
+export interface PreparationAvailabilityRule {
+/**
+ * @minItems 1
+ */
+weekdays: [number, ...(number)[]]
+local_start: AvailabilityStartTime
+local_end: AvailabilityEndTime
+valid_from: Date
+valid_until?: (Date | null)
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "StarterPackageTemplate".
+ */
+export interface StarterPackageTemplate {
+key: string
+name: string
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+discipline_id: string
+terms: StarterPackageTerms
+start_date: Date
+end_date: Date
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "StarterPackageTerms".
+ */
+export interface StarterPackageTerms {
+name: Text
+kind: EntitlementKind
+booking_mode: BookingMode
+credits: (number | null)
+price_minor: Money
+currency: Currency
+freeze: {
+enabled: false
+extends_validity: Bool
+max_days?: (PositiveInt | null)
+}
+refund: RefundTerms
+quota: ({
+period: ("week" | "month")
+limit: number
+} | null)
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "NotificationDeliverySupport".
+ */
+export interface NotificationDeliverySupport {
+channels: {
+in_app: boolean
+email: boolean
+push: boolean
+}
+/**
+ * @minItems 9
+ * @maxItems 9
+ */
+mandatory_when_available: [("security" | "reservation_result" | "request_result" | "cancellation" | "change" | "seat_offer" | "collection" | "refund" | "access_change"), ("security" | "reservation_result" | "request_result" | "cancellation" | "change" | "seat_offer" | "collection" | "refund" | "access_change"), ("security" | "reservation_result" | "request_result" | "cancellation" | "change" | "seat_offer" | "collection" | "refund" | "access_change"), ("security" | "reservation_result" | "request_result" | "cancellation" | "change" | "seat_offer" | "collection" | "refund" | "access_change"), ("security" | "reservation_result" | "request_result" | "cancellation" | "change" | "seat_offer" | "collection" | "refund" | "access_change"), ("security" | "reservation_result" | "request_result" | "cancellation" | "change" | "seat_offer" | "collection" | "refund" | "access_change"), ("security" | "reservation_result" | "request_result" | "cancellation" | "change" | "seat_offer" | "collection" | "refund" | "access_change"), ("security" | "reservation_result" | "request_result" | "cancellation" | "change" | "seat_offer" | "collection" | "refund" | "access_change"), ("security" | "reservation_result" | "request_result" | "cancellation" | "change" | "seat_offer" | "collection" | "refund" | "access_change")]
+transactional_in_app_required: true
+in_app_delayed_by_quiet_hours: false
+in_app_in_digest: false
+new_member_marketing_default_enabled: false
+platform_marketing_default_enabled: false
+reminders: {
+timing_controls_available: boolean
+new_member_default_enabled: true
+/**
+ * @minItems 3
+ * @maxItems 3
+ */
+lesson_hours: [(1 | 3 | 24), (1 | 3 | 24), (1 | 3 | 24)]
+default_lesson_hours: 24
+/**
+ * @minItems 3
+ * @maxItems 3
+ */
+package_expiry_days: [(3 | 7 | 14), (3 | 7 | 14), (3 | 7 | 14)]
+default_package_expiry_days: 7
+/**
+ * @minItems 3
+ * @maxItems 3
+ */
+payment_due_days: [(1 | 3 | 7), (1 | 3 | 7), (1 | 3 | 7)]
+default_payment_due_days: 3
+feature_licensed: boolean
+}
+digest: {
+controls_available: boolean
+/**
+ * @minItems 3
+ * @maxItems 3
+ */
+choices: [("instant" | "daily" | "weekly"), ("instant" | "daily" | "weekly"), ("instant" | "daily" | "weekly")]
+default_frequency: "instant"
+daily_local_time: "18:00:00"
+weekly_weekday: 7
+weekly_local_time: "18:00:00"
+timezone_source: "user_display_timezone"
+}
+quiet_hours: {
+controls_available: boolean
+new_user_default_enabled: false
+/**
+ * @minItems 4
+ * @maxItems 4
+ */
+exceptions: [("security" | "center_cancellation" | "near_24h_change" | "expiring_seat_offer"), ("security" | "center_cancellation" | "near_24h_change" | "expiring_seat_offer"), ("security" | "center_cancellation" | "near_24h_change" | "expiring_seat_offer"), ("security" | "center_cancellation" | "near_24h_change" | "expiring_seat_offer")]
+}
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -21557,6 +22608,337 @@ expires_in: 10
 export interface SuccessAccountGoogleLinkPrepare {
 ok: true
 data: GoogleLinkAuthorization
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+trace_id: string
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "Success_media_get".
+ */
+export interface SuccessMediaGet {
+ok: true
+data: SettingsMediaContent
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+trace_id: string
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "ReportFilterOverrides".
+ */
+export interface ReportFilterOverrides {
+interval?: Interval
+/**
+ * Items: Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+center_ids?: string[]
+/**
+ * Items: Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+person_ids?: string[]
+currency?: (Currency | null)
+state?: (Text | null)
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "ReportTemplateOverrides".
+ */
+export interface ReportTemplateOverrides {
+filters?: ReportFilterOverrides
+columns?: ReportColumns
+report_order?: ReportPreparationOrder
+group_by?: ReportPreparationGrouping
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "ImportTemplateOverrides".
+ */
+export interface ImportTemplateOverrides {
+mapping?: ImportMapping
+source_namespace?: Text
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "PreparedReportRequest".
+ */
+export interface PreparedReportRequest {
+center_id?: (string | null)
+report: ("collections_debts" | "lesson_attendance")
+filters: ReportFilters
+columns: ReportColumns
+report_order: ReportPreparationOrder
+group_by: ReportPreparationGrouping
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "PreparedImportRequest".
+ */
+export interface PreparedImportRequest {
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+center_id: string
+mapping: ImportMapping
+source_namespace: Text
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "Success_settings_template_resolve".
+ */
+export interface SuccessSettingsTemplateResolve {
+ok: true
+data: ResolvedWorkTemplate
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+trace_id: string
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "PersonalCalendarLink".
+ */
+export interface PersonalCalendarLink {
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+id: string
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+org_id: string
+/**
+ * @minItems 1
+ * @maxItems 2
+ */
+kinds: [("lessons" | "duties")]|[("lessons" | "duties"), ("lessons" | "duties")]
+state: ("active" | "revoked")
+version: PositiveInt
+created_at: Instant
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "PersonalCalendarMutation".
+ */
+export interface PersonalCalendarMutation {
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+operation_id: string
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+primary_id: string
+version?: PositiveInt
+replayed: Bool
+related: EntityRef[]
+link: PersonalCalendarLink
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "PersonalCalendarCredentialMutation".
+ */
+export interface PersonalCalendarCredentialMutation {
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+operation_id: string
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+primary_id: string
+version?: PositiveInt
+replayed: Bool
+related: EntityRef[]
+link: PersonalCalendarLink
+subscription_url: string
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "Page_PersonalCalendarLink".
+ */
+export interface Page_PersonalCalendarLink {
+items: PersonalCalendarLink[]
+next_cursor?: (OpaqueToken | null)
+as_of: Instant
+service_ready: boolean
+/**
+ * @maxItems 2
+ */
+supported_kinds: []|[("lessons" | "duties")]|[("lessons" | "duties"), ("lessons" | "duties")]
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "Request_calendar_links_get".
+ */
+export interface RequestCalendarLinksGet {
+client_api_version: 1
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+request_id: string
+page: Page
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "Request_calendar_link_create".
+ */
+export interface RequestCalendarLinkCreate {
+client_api_version: 1
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+request_id: string
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+operation_key: string
+organization_scope: {
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+org_id: string
+}
+/**
+ * @minItems 1
+ * @maxItems 2
+ */
+kinds: [("lessons" | "duties")]|[("lessons" | "duties"), ("lessons" | "duties")]
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "Request_calendar_link_rotate".
+ */
+export interface RequestCalendarLinkRotate {
+client_api_version: 1
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+request_id: string
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+operation_key: string
+organization_scope: {
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+org_id: string
+}
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+link_id: string
+expected_version: PositiveInt
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "Request_calendar_link_revoke".
+ */
+export interface RequestCalendarLinkRevoke {
+client_api_version: 1
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+request_id: string
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+operation_key: string
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+link_id: string
+expected_version: PositiveInt
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "Request_calendar_feed_get".
+ */
+export interface RequestCalendarFeedGet {
+client_api_version: 1
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+request_id: string
+token: string
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "PersonalCalendarFeed".
+ */
+export interface PersonalCalendarFeed {
+ics_base64: string
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "Success_calendar_links_get".
+ */
+export interface SuccessCalendarLinksGet {
+ok: true
+data: Page_PersonalCalendarLink
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+trace_id: string
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "Success_calendar_link_create".
+ */
+export interface SuccessCalendarLinkCreate {
+ok: true
+data: PersonalCalendarCredentialMutation
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+trace_id: string
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "Success_calendar_link_rotate".
+ */
+export interface SuccessCalendarLinkRotate {
+ok: true
+data: PersonalCalendarCredentialMutation
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+trace_id: string
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "Success_calendar_link_revoke".
+ */
+export interface SuccessCalendarLinkRevoke {
+ok: true
+data: PersonalCalendarMutation
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+trace_id: string
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "Success_calendar_feed_get".
+ */
+export interface SuccessCalendarFeedGet {
+ok: true
+data: PersonalCalendarFeed
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+trace_id: string
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "Success_settings_preparation_resolve".
+ */
+export interface SuccessSettingsPreparationResolve {
+ok: true
+data: ResolvedDomainPreparation
 /**
  * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
  */

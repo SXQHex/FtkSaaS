@@ -3,6 +3,7 @@ import hashlib,json
 expected=json.loads(Path('database/migrations.sha256.json').read_text())
 actual={p.name:hashlib.sha256(p.read_bytes()).hexdigest() for p in sorted(Path('supabase/migrations').glob('*.sql'))}
 assert actual==expected,'Migration history changed: append a new migration and explicitly update the review manifest.'
+assert json.loads(Path("../../packages/api-contracts/schema/contract.json").read_text())["x-contract"]["runtime"]["migration_count"]==len(actual),"Contract migration inventory drift"
 parts=[]
 for name in ['runtime.sql','kernel.sql','dispatch.sql','wrappers.sql']:
  s=Path('database',name).read_text();parts.append('\n'.join(l for l in s.splitlines() if l.strip() not in ['begin;','commit;']))
@@ -130,7 +131,10 @@ assert next(Path('supabase/migrations').glob('*_frontend_settings.sql')).read_te
 
 settings_fields=json.loads(Path('config/frontend-settings.json').read_text())['fields']
 settings_catalog="begin;\ncreate or replace function private.frontend_settings_fields() returns jsonb language sql immutable security invoker set search_path='' as $fields$select '"+json.dumps(settings_fields,ensure_ascii=False,separators=(',',':')).replace("'","''")+"'::jsonb$fields$;\n"
-assert Path('database/user-settings-catalog.sql').read_text()==settings_catalog,'Frontend field catalog SQL drift'
+settings_version=json.loads(Path('config/frontend-settings.json').read_text())['version']
+assert Path(f'database/settings-catalog-v{settings_version}.sql').read_text()==settings_catalog+'commit;\n','Frontend field catalog SQL drift'
+installed_catalogs=[line for p in sorted(Path('supabase/migrations').glob('*.sql')) for line in p.read_text().splitlines() if line.startswith('create or replace function private.frontend_settings_fields()')]
+assert installed_catalogs[-1]==settings_catalog.splitlines()[1],'Latest applied catalog must match the current typed field source'
 settings_contract=json.loads(Path('../../packages/api-contracts/schema/contract.json').read_text())
 for scope in ['user','member','center','organization','platform']:
  assert settings_contract['$defs'][scope.title()+'SettingsValues']['properties']=={f['key']:f['schema'] for f in settings_fields if f['scope']==scope},'Frontend field DTO drift: '+scope
@@ -161,3 +165,31 @@ assert next(Path('supabase/migrations').glob('*_starter_plan_gates.sql')).read_t
 assert next(Path('supabase/migrations').glob('*_starter_studio_product_names.sql')).read_text()==Path('database/starter-studio-product-names.sql').read_text(),'Starter studio name snapshot source drift'
 
 assert next(Path("supabase/migrations").glob("*_starter_onboarding_defaults.sql")).read_text()==Path("database/starter-onboarding-defaults.sql").read_text(),"Starter onboarding source drift"
+
+assert next(Path('supabase/migrations').glob('*_starter_preparation_settings.sql')).read_text()==Path('database/starter-settings-catalog.sql').read_text()+Path('database/starter-preparation-settings.sql').read_text(),'Starter preparation source drift'
+
+assert next(Path('supabase/migrations').glob('*_starter_peer_sharing.sql')).read_text()==Path('database/starter-peer-sharing.sql').read_text(),'Starter peer sharing source drift'
+
+assert next(Path('supabase/migrations').glob('*_canonical_settings_scope.sql')).read_text()==Path('database/canonical-settings-scope.sql').read_text(),'Canonical settings scope source drift'
+
+assert next(Path('supabase/migrations').glob('*_starter_settings_media.sql')).read_text()==Path('database/starter-settings-media.sql').read_text().replace('commit;\n','',1)+Path('database/starter-settings-media-wrappers.sql').read_text().replace('begin;\n','',1),'Starter media source drift'
+
+assert next(Path('supabase/migrations').glob('*_starter_work_templates.sql')).read_text()==Path('database/settings-catalog-v4.sql').read_text().replace('commit;\n','',1)+Path('database/starter-work-templates.sql').read_text().replace('begin;\n','',1).replace('commit;\n','',1)+Path('database/starter-work-templates-wrappers.sql').read_text().replace('begin;\n','',1),'Work templates source drift'
+
+assert next(Path("supabase/migrations").glob("*_starter_public_settings.sql")).read_text()==Path("database/settings-catalog-v5.sql").read_text().replace("commit;\n","",1)+Path("database/starter-public-settings.sql").read_text().replace("begin;\n","",1),"Public settings source drift"
+
+assert next(Path("supabase/migrations").glob("*_starter_collection_methods.sql")).read_text()==Path("database/starter-collection-methods.sql").read_text(),"Collection methods source drift"
+
+assert next(Path("supabase/migrations").glob("*_personal_calendar_links.sql")).read_text()==Path("database/personal-calendar-links.sql").read_text().replace("commit;\n","",1)+Path("database/personal-calendar-links-wrappers.sql").read_text().replace("begin;\n","",1),"Personal calendar source drift"
+
+assert next(Path("supabase/migrations").glob("*_starter_domain_preparations.sql")).read_text()==Path("database/settings-catalog-v6.sql").read_text().replace("commit;\n","",1)+Path("database/starter-domain-preparations.sql").read_text().replace("begin;\n","",1).replace("commit;\n","",1)+Path("database/starter-domain-preparations-wrappers.sql").read_text().replace("begin;\n","",1),"Domain preparations source drift"
+
+assert next(Path("supabase/migrations").glob("*_starter_notification_support.sql")).read_text()==Path("database/starter-notification-support.sql").read_text(),"Notification support source drift"
+
+assert next(Path("supabase/migrations").glob("*_starter_calendar_preferences.sql")).read_text()==Path("database/settings-catalog-v7.sql").read_text().replace("commit;\n","",1)+Path("database/starter-calendar-preferences.sql").read_text().replace("begin;\n","",1),"Calendar preferences source drift"
+
+assert next(Path("supabase/migrations").glob("*_starter_availability_day_boundaries.sql")).read_text()==Path("database/settings-catalog-v8.sql").read_text().replace("commit;\n","",1)+Path("database/starter-availability-day-boundaries.sql").read_text().replace("begin;\n","",1),"Availability day boundaries source drift"
+
+assert next(Path("supabase/migrations").glob("*_starter_availability_management.sql")).read_text()==Path("database/starter-availability-management.sql").read_text(),"Availability management source drift"
+
+assert next(Path("supabase/migrations").glob("*_starter_availability_management_asof.sql")).read_text()==Path("database/starter-availability-management-asof.sql").read_text(),"Availability management snapshot source drift"
