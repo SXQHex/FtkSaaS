@@ -75,8 +75,10 @@ export function Workspace() {
       .then(([account, organizations, settings]) => {
         if (!active) return;
         let remembered = null;
+        let deviceTheme: string | null = null;
         try {
           remembered = readRememberedContext(localStorage.getItem(contextStorageKey(account.id)));
+          deviceTheme = localStorage.getItem("theme");
         } catch {
           /* Device storage may be unavailable. */
         }
@@ -85,7 +87,9 @@ export function Workspace() {
         setOrganizationId(preferred?.org_id ?? "");
         setCenterId(preferred?.center_id ?? "");
         setError("");
-        setTheme(settings.theme ?? "system");
+        if (!["light", "dark", "system"].includes(deviceTheme ?? "")) {
+          setTheme(settings.theme ?? "system");
+        }
         document.documentElement.style.fontSize = settings.font_scale
           ? `${settings.font_scale * 100}%`
           : "";

@@ -38,3 +38,17 @@ test("a late response from the previous organization cannot populate the next or
   expect(screen.getByRole("option", { name: "B Merkezi" })).toBeVisible();
   expect(screen.queryByRole("option", { name: "A Merkezi" })).not.toBeInTheDocument();
 });
+
+test("account theme initializes an unset device but never overwrites a saved device choice on remount", async () => {
+  mocks.settings.mockResolvedValue({ remember_context: false, theme: "light" });
+  const first = render(<Workspace />);
+  await screen.findByRole("heading", { name: "Merhaba, Test Yöneticisi" });
+  expect(mocks.setTheme).toHaveBeenCalledWith("light");
+  first.unmount();
+  mocks.setTheme.mockClear();
+  // next-themes persists a user's selection under its standard storage key.
+  localStorage.setItem("theme", "dark");
+  render(<Workspace />);
+  await screen.findByRole("heading", { name: "Merhaba, Test Yöneticisi" });
+  expect(mocks.setTheme).not.toHaveBeenCalled();
+});

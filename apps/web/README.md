@@ -65,7 +65,7 @@ Ters yöndeki tetikleme ve merge kabulü mevcut [CI politikası](../../docs/ci-p
 
 ## Dil, tema ve Expo sınırı
 
-next-intl, locale routing eklemeden tr/en sözlüklerini sunucu ve istemciye taşır. Mevcut Auth/callback URL’leri korunur. Varsayılan Türkçe, dil seçimi doğrulanmış `ftksaas_locale` HttpOnly cookie’sinde bir yıl tutulur (Secure yalnız HTTP loopback adreslerinde kapalıdır); backend ayarı yazılmaz. Sayfa başlıkları, document lang, Auth/API hata metinleri ve bağlantı kontrolü iki dildedir. Tema next-themes ile sistem/açık/koyu seçeneklerini kullanır. Hesap ayarlarının tema/font ölçeği/kontrast/hareket tüketimi korunur. Nötr CSS tokenları ve sistem fontu ürünün nihai marka tasarımı değildir.
+next-intl, locale routing eklemeden tr/en sözlüklerini sunucu ve istemciye taşır. Mevcut Auth/callback URL’leri korunur. Varsayılan Türkçe, dil seçimi doğrulanmış `ftksaas_locale` HttpOnly cookie’sinde bir yıl tutulur (Secure yalnız HTTP loopback adreslerinde kapalıdır); backend ayarı yazılmaz. Sayfa başlıkları, document lang, Auth/API hata metinleri ve bağlantı kontrolü iki dildedir. Tema next-themes ile sistem/açık/koyu seçeneklerini kullanır. Cihazda geçerli next-themes tercihi varsa hesap ayarı bunu ezmez; cihaz tercihi yoksa hesabın tema ayarı başlangıcı belirler. Font ölçeği/kontrast/hareket tüketimi korunur. Nötr CSS tokenları ve sistem fontu ürünün nihai marka tasarımı değildir.
 
 Çeviri runtime’ı opsiyonel SWC/Parcel extraction araçlarının lifecycle scriptlerini gerektirmez; workspace allowBuilds bunları açıkça kapatır. Yeni form/state/tablo/chart kütüphanesi kurulmaz.
 
