@@ -37,7 +37,7 @@ try {
 const preparedAt=performance.now();
 if(role!=='api'){
  run('node',['scripts/ci/docs-check.mjs',repoFile('README.md')]);
- run('pnpm',['--dir',repoFile(),'run','verify']);
+ run('pnpm',['--dir',repoFile(),'exec','turbo','run','verify','--filter=@ftksaas/backend...']);
  run('pnpm',['run','test:db']);
 }
 if(role!=='core')run('node',['--test','--test-concurrency=2',...(shard?.suites??apiSuites).map(p=>repoFile(p))]);

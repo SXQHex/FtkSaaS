@@ -2,6 +2,20 @@
 
 CI-02 PR25/26 ile main’e kuruldu; tam kabul kaynağı0ade7877cc16fc121095decbc276f2fbc868607e / [39425915555](https://github.com/SXQHex/FtkSaaS/actions/runs/39425915555) completed/success. [Teknik devir](ci02-handover.md) kaynak/review/kurulum zincirini, [karar](decisions/CI-2026-10-20.md) bağlayıcı davranışı ve [ölçüm](ci-performance.md) gerçek süreleri taşır. Yeni SHA eski kabulü devralmaz.
 
+## CI-SPLIT — frontend/backend kaynak sınırı
+
+Backend push girişleri [pozitif sahiplik kaydındaki](../apps/backend/scripts/ci/scope.json) backend/shared yolları ve incelenmiş belge yollarını izler. `.github/workflows/ci-fast.yml` ve `backend.yml` listeleri bu kayıtla test edilir; `apps/**`, `packages/**` veya her kaynağı kabul eden genel filtre yoktur. Yeni backend girdisi eklenirse kayıt, workflow listeleri ve negatif testler birlikte güncellenir. Her PR'yi gören hafif trusted merge kapısı bilinmeyen yolu başarılı istisna saymaz; eksik/truncated ağaç reddedilir.
+
+Development girişinde kurulumdan önce merge-base→head birikimli kapsam çözülür. Yalnız frontend değişikliğinde backend DB/API işi başlamaz. İncelenmiş saf belge değişikliğinde yalnız bağlantı/anchor/belge kontrolü çalışır; dependency kurulumu, backend verify, DB/API ve full clean yoktur. Backend+frontend/belge karmasında backend kapsamı korunur; son belge commit'i önceki runtime değişikliğini silemez. Rename/silmenin iki ucu ve dosya mode'u değerlendirilir.
+
+Frontend sahipliği `apps/web/**`, `packages/ui/**`, iki adlandırılmış frontend workflow'u ve `vercel.json`dur. Frontend kendi test araçlarını, komutlarını ve workflow'larını kurar; bu dilim bunları oluşturmaz. Backend'in Turbo verify çağrıları `--filter=@ftksaas/backend...` ile yalnız backend ve bağımlılıklarını yürütür. Backend-only değişiklik için frontend görevi çağrılmaz. Ortak API/TypeScript paketi, root manifest, pnpm lock/workspace, Turbo ve Node girdileri ortak kapsamdır; bu dilim lockfile'ın yalnız frontend importer farkı için daraltılmış kanıt üretmez. Ortak girdileri frontend tarafında da izlemek frontend sahibinin yükümlülüğüdür.
+
+Frontend-only PR'de mevcut backend status'u yalnız backend kapsamının değişmediğini bildirir; frontend testi veya backend full clean başarılıymış gibi göstermez. Hazır olma, güncel head/base ve merge parent kontrolü korunur. Frontend+belge değişikliğinde ayrıca gerçek kaynak bağlı belge kabulü gerekir. Backend aday/main tam kapsamı, dört shard, trusted politika sınırı ve run/attempt kontrolleri bu ayrımla kaldırılmaz. Aday/main tekrarının kaldırılması ve merge gate workflow'unun birleştirilmesi ayrı sonraki değişikliktir.
+
+Frontend-only main push backend kabul workflow'unu başlatmaz, dolayısıyla o push Supabase CD tetiklemez. Bekleyen gerçek backend kabulü sırasında frontend main'i ilerletirse yalnız tam ağaç farkıyla backend girdilerinin değişmediği kanıtlanarak eski kabul edilmiş backend kaynağı dağıtılabilir. Bu frontend deploy'u değildir; kabul run/attempt'i ve güncel main her yazma öncesinde tekrar doğrulanır. Bilinmeyen/shared/backend farkı bu eşdeğerliği reddeder. `ci-fast.yml` içindeki eski branch/sabit-SHA belge recovery işi kaldırılmıştır; mevcut main manuel belge tanısı ayrı kalır.
+
+Kaynak uygulaması, yerel negatif test, uzak CI, bağımsız inceleme, kurulum/merge ve main kabulü ayrı durumlardır. Gerçek frontend yeniden uygulama örneklerinde karşı zincirin başlamadığı doğrulanmadan CI-SPLIT kapatılmaz. Required-check/strict-base/bypass yönetim doğrulaması CI-ADMIN'dir; frontend kabulü kendi required check'leriyle ayrıca korunmalıdır.
+
 ## Paket yöneticisi
 
 Kurulum package.json’da sabit pnpm sürümüyle `corepack enable` ve `pnpm install --frozen-lockfile` kullanır. Tek lockfile pnpm-lock.yaml; ortak tipler packages/api-contracts. Paket/workspace/lock değişimi runtime/shared girdi olarak geniş regresyona gider. Bu politika adayı trusted-base kurulum sınırına tabidir; [göç kapsamı](monorepo.md#ci-geçiş-sınırı).

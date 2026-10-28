@@ -58,3 +58,21 @@ Backend `apps/backend`, normatif JSON `packages/api-contracts/schema`, yaşayan 
 Kullanıcı etiket yasağını kaldırdı ve PR66 frontend merge'inin geri alınmasına başlanmasını istedi. Ardından manuel tetikleyicinin de gereksiz olduğunu belirtti; PR67'nin manuel workflow'u ve ona ait politika bölümü aynı adayda kaldırılır. Hazırlık main `7334d24c9f1f5a54686125b890ce90c321b896e6` üzerinde ayrı geri alma dalındadır. PR66'nın ilk parent'ına göre ters yaması uygulanır. Backend uygulama kaynağı PR66 öncesi `f52fdaf7b6d1ecec56a8cb75ffaf7272f45770cf` ile aynıdır; yalnız PR66 ile eklenmiş governance test uyarlaması geri alınır. Yeni full clean ve merge henüz kabul edilmedi.
 
 Geri alma sonrasında frontend aynı repo içinde ayrı PR ile yeniden uygulanır. Her adayda son head/base/tested merge üzerinde full clean başarıyla bitmeden merge yapılmaz; merge sonrası aynı main kabulü ayrıca doğrulanır. Eski başarısız koşular yeniden adlandırılmaz veya başarıya çevrilmez. Diğer repolar bağlam dışıdır; eski göç notları bu kararı değiştirmez.
+
+## CI-SPLIT uygulama adayı — 28 Ekim 2026
+
+Başlangıç main `1f7f4a394c6ef8c50af0b292e23f457882370f77`; aynı SHA'nın [main kabulü40610094049](https://github.com/SXQHex/FtkSaaS/actions/runs/40610094049) ve [development CD40613023027](https://github.com/SXQHex/FtkSaaS/actions/runs/40613023027) GitHub'dan completed/success doğrulandı. Açık PR65 ST-03 kapsamındadır; bu işe mükerrer değildir. CI-SPLIT `ci/split-backend-frontend` dalında ayrı uygulama adayıdır.
+
+Backend/shared pozitif kaynak kaydı, development ön sınıflandırması, saf belge hafif kabulü, backend Turbo grafiği ve frontend ilerlemesinde kaynak bağlı CD eşdeğerliği eklendi. Frontend uygulama/test/workflow yapısı kurulmadı; sahibi frontend ekibidir. Runtime API/migration/plan davranışı ve F01–F33 uygulama izi değişmedi; tip/katalog/envanter üretimi değişmedi. Aday/main full clean tekrarı ve ayrı merge gate bu dilimde korunur. CI-ADMIN ayarları değiştirilmedi.
+
+Yerel `pnpm exec turbo run verify --filter=@ftksaas/backend...` geçti:106 contract/governance ve60 CI politika testi; tip/generator/migration manifest/audit kontrolleri de geçti. Gerçek Turbo sentetik workspace grafiğinde backend/frontend ayrımı ve ortak paket tüketimi doğrulandı. Belge kontrolünde55 dosya/335 bağlantı geçti; workflow YAML parse ve diff whitespace kontrolü de geçti. Kaynak/taşıma/silme/bilinmeyen kapsam/eksik ağaç/run-attempt/CD negatifleri bu yerel kapsamdadır. Bu kaydın yeni aday için uzak CI, bağımsız inceleme, trusted politika kurulumu, merge veya hosted kabul iddiası yoktur. CI-SPLIT gerçek karşılıklı tetikleme örnekleriyle doğrulanana kadar açık kalır. Kapsamın tek tarifi [CI politikasındadır](../ci-policy.md#ci-split--frontendbackend-kaynak-sınırı).
+
+### İlk uzak hedefli koşu ve cwd düzeltmesi
+
+Head `5409d466ea4b71041deb0ea381ff7ad1ce49ec75` için [Development targeted40614523847](https://github.com/SXQHex/FtkSaaS/actions/runs/40614523847) attempt1 başarısızdır; scope işi backend cwd'den belge mode'unu çözerken `UNSAFE_DOCUMENT_SCOPE` verdi. DB/API ve targeted işi başlamadı. Gate workflow'unun yeşil bitmesi Draft PR'nin merge kabulü değildir; belge işi Draft nedeniyle skipped'dır. Bu başarısız sonuç korunur.
+
+`localScope` git işlemleri öncesinde repo kökünü çözecek şekilde düzeltildi. Kök ve backend cwd'de belge-only/karma kapsam, kurulum öncesi CLI çıktısı ve symlink reddi aynı regresyon testinde doğrulandı. Yerel backend verify106 contract/governance +61 CI politika testiyle geçti. Yeni kaynak için uzak CI henüz ayrı doğrulanmalıdır; eski SHA'nın sonucu yeni kaynağa taşınmaz.
+
+### Bağımsız inceleme ve aday hazırlığı
+
+Kullanıcının ayrı inceleme ajanı yetkisiyle CI-SPLIT bağımsız incelendi. İlk kaynak hedefli CI40654290663 completed/success; scope, documentation ve targeted işleri geçti. İncelemede P2: checkout yapılmayan frontend-only main marker işinin backend çalışma dizinini miras alması bulundu. Step çalışma dizini repo çalışma alanı köküne sabitlendi ve regresyon testi eklendi. Son yerel backend verify106 contract/governance +62 CI politika testiyle geçti. Son ağaç inceleme kaydı PR69 açıklamasına bağlanır; bağımsız inceleme CI veya kurulum/merge/main kabulü yerine geçmez. Bu workflow politika değişimi normal trusted-base kapısını otomatik açmaz; kaynak bazlı kurulum sınırı korunur.

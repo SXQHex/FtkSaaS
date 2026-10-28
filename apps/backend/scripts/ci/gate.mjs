@@ -1,5 +1,5 @@
 import {validateJobs,coverageHash,roleName} from './shards.mjs';
-import {assertReady,assertParents,remoteDocumentScope,policyMatches,resolveMerged} from './source.mjs';
+import {assertReady,assertParents,policyMatches,resolveMerged,remoteSourceScope} from './source.mjs';
 import {mkdtempSync,writeFileSync,rmSync} from 'node:fs';import {tmpdir} from 'node:os';import {join} from 'node:path';import {execFileSync} from 'node:child_process';
 export const gateContext='ftksaas/merge-clean';
 export function validateBinding({binding,pr,run,jobs,tested,currentTree,workflowMatches}) {
@@ -26,8 +26,14 @@ export async function checkPr(github,context,number){
   const current=(await github.rest.git.getRef({...repo,ref:'pull/'+number+'/merge'})).data.object.sha;
   const currentCommit=(await github.rest.git.getCommit({...repo,commit_sha:current})).data;
   assertReady(pr);
-  const docs=await remoteDocumentScope(github,repo,pr.base.sha,pr.head.sha);
-  const kind=docs.safe?'documentation':'full';
+  assertParents(currentCommit,pr.base.sha,pr.head.sha);
+  const scope=await remoteSourceScope(github,repo,pr.base.sha,pr.head.sha);
+  const kind=scope.kind;
+  if(kind==='frontend'){
+   const live=(await github.rest.pulls.get({...repo,pull_number:number})).data;assertReady(live);
+   if(live.head.sha!==pr.head.sha||live.base.sha!==pr.base.sha)throw Error('Head/base moved during verification');
+   state='success';description='Backend scope unchanged; no backend tests accepted; frontend checks are independent';
+  }else{
   const runs=await github.paginate(github.rest.actions.listWorkflowRuns,{...repo,workflow_id:kind==='documentation'?'ci-docs.yml':'ci-full.yml',head_sha:pr.head.sha,event:'pull_request',per_page:100});
   for(const run of runs){
    const jobs=await github.paginate(github.rest.actions.listJobsForWorkflowRun,{...repo,run_id:run.id,filter:'latest',per_page:100});
@@ -42,6 +48,7 @@ export async function checkPr(github,context,number){
    if(live.labels?.some(l=>l.name==='ci:measure-serial')&&!binding.benchmark&&kind==='full')throw Error('Serial comparison requested during verification');
    if(live.head.sha!==pr.head.sha||live.base.sha!==pr.base.sha)throw Error('Head/base moved during verification');
    state='success';description=kind==='documentation'?'Verified source-bound documentation acceptance (no full clean)':'Verified head/base/merge tree and executed full clean';target_url=run.html_url;break;
+  }
   }
  }catch(e){description=String(e.message).slice(0,140);}
  await github.rest.repos.createCommitStatus({...repo,sha:pr.head.sha,state,context:gateContext,description,...(target_url?{target_url}:{})});
@@ -71,8 +78,13 @@ export function validateDocumentBinding(v){
 export async function verifyMerged(github,context,core){
  const repo=context.repo,sha=context.sha;
  const {pr,merged}=await resolveMerged(github,context);
- const docs=await remoteDocumentScope(github,repo,pr.base.sha,pr.head.sha);
- const kind=docs.safe?'documentation':'full';
+ const scope=await remoteSourceScope(github,repo,pr.base.sha,pr.head.sha);
+ const kind=scope.kind;
+ if(kind==='frontend'){
+  core.setOutput('kind','frontend');
+  await core.summary.addRaw('Actual merge parents verified; backend scope unchanged. No backend test or frontend acceptance claimed.\n').write();
+  return {kind:'frontend',actual:sha};
+ }
  const runs=await github.paginate(github.rest.actions.listWorkflowRuns,{...repo,workflow_id:kind==='documentation'?'ci-docs.yml':'ci-full.yml',head_sha:pr.head.sha,event:'pull_request',per_page:100});
  let accepted;
  for(const run of runs){

@@ -1,6 +1,6 @@
 import {ciFile} from '../paths.mjs';
 import {validateJobs} from './shards.mjs';
-import {remoteDocumentScope} from './source.mjs';
+import {backendUnchanged} from './source.mjs';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
@@ -13,6 +13,8 @@ export function deploymentSource({run,jobs,currentMain,repository,attempt}) {
  if(run.head_sha!==currentMain)return {deploy:false,reason:'Superseded main source'};
  const source=jobs.filter(j=>j.name==='source');
  if(source.length!==1||source[0].status!=='completed'||source[0].conclusion!=='success'||source[0].run_id!==run.id||source[0].run_attempt!==run.run_attempt||source[0].head_sha!==run.head_sha)throw Error('Missing main source verification');
+ const frontend=jobs.filter(j=>j.name==='frontend'&&j.conclusion==='success'&&j.status==='completed'&&j.run_id===run.id&&j.run_attempt===run.run_attempt&&j.head_sha===run.head_sha&&j.steps?.some(s=>s.name==='Backend unchanged (no backend acceptance)'&&s.conclusion==='success'));
+ if(frontend.length===1)return {deploy:false,reason:'Frontend-only scope; no backend acceptance',frontend:true};
  const docs=jobs.filter(j=>j.name==='documentation'&&j.conclusion==='success'&&j.status==='completed'&&j.run_id===run.id&&j.run_attempt===run.run_attempt&&j.head_sha===run.head_sha&&j.steps?.some(s=>s.name==='Documentation main acceptance (no full clean)'&&s.conclusion==='success'));
  if(docs.length===1)return {deploy:false,reason:'Documentation acceptance; backend unchanged'};
  validateJobs(jobs,run,{collector:true});
@@ -24,12 +26,13 @@ async function fullProof(github,repo,run,jobs,currentMain,attempt){
  if(!proof.deploy)return null;
  if(run.head_sha!==currentMain){
   const comparison=(await github.rest.repos.compareCommitsWithBasehead({...repo,basehead:run.head_sha+'...'+currentMain})).data;
-  if(comparison.status!=='ahead'||!(await remoteDocumentScope(github,repo,run.head_sha,currentMain)).safe)return null;
+  if(comparison.status!=='ahead'||!(await backendUnchanged(github,repo,run.head_sha,currentMain)))return null;
  }
  return {...proof,expected_main:currentMain};
 }
 export async function resolveAcceptedSource(github,repo,run,jobs,currentMain,attempt){
  const initial=deploymentSource({run,jobs,currentMain:run.head_sha,repository:repo.owner+'/'+repo.repo,attempt});
+ if(initial.frontend)return initial;
  if(initial.deploy)return await fullProof(github,repo,run,jobs,currentMain,attempt)??{deploy:false,reason:'Superseded runtime source'};
  if(run.head_sha!==currentMain)return {deploy:false,reason:'Superseded documentation source'};
  // A docs-only main may have overtaken an accepted runtime before CD ran.
