@@ -41,3 +41,14 @@ Ruleset kurulurken main8d5d3025f1be5d3318e042bfb9167b4bfdca859c değişmedi. Kay
 ### Tek yetkili çalışma düzeni düzeltmesi
 
 Kullanıcının açık onayıyla required_approving_review_count0 olarak kaydedildi. İlk kurulumdaki1 onay zorunluluğu tek yetkili repoda gereksiz merge kilidi oluşturduğu için geri alındı. Bu son karar, bu dosyadaki önceki zorunlu GitHub review önerisini değiştirir. Bağımsız ajan incelemesi korunur; ayrı GitHub reviewer hesabı gerekmez. API readback approvals0; diğer rule parametreleri önce/sonra birebir aynı, enforcement active ve bypass_actors[] kaldı. PR/CI/strict-base, conversation resolution, normal merge, force-push ve silme korumaları korunur. Güncel ayar canlıdır; belge PR70 henüz main'e alınmadı.
+
+## CI-ADMIN izole negatif kabulü — 28 Ekim 2026
+
+Main63f2471d0b57e45edd5ac6c4422bfa141b63dfe2 üzerinde yalnız disposable README değişiklikleriyle iki gerçek non-Draft test PR'si oluşturuldu. Sahte status yazılmadı, ruleset değiştirilmedi, hiçbir test PR'si merge edilmedi.
+
+| Senaryo | Gerçek kanıt | GitHub merge değerlendirmesi |
+|---|---|---|
+| Başarısız gerekli kontrol | [PR71](https://github.com/SXQHex/FtkSaaS/pull/71), head2db6b5119cda8ca55fec25b6e613bc545fabf8c8; [belge koşusu40693345160](https://github.com/SXQHex/FtkSaaS/actions/runs/40693345160) gerçek BROKEN_LOCAL_LINK README.md→ci-admin-probe-missing.md ile failure; ftksaas/merge-clean failure | draft=false, mergeable=true (çakışmasız), mergeable_state=blocked |
+| Başarılı kontrol + eski branch | [PR72](https://github.com/SXQHex/FtkSaaS/pull/72), head6111842df30353a8a46f8872961155c3ba9057f7; [belge40693353896](https://github.com/SXQHex/FtkSaaS/actions/runs/40693353896) ve targeted40693347701 success; ftksaas/merge-clean success, source-bound documentation acceptance | draft=false, mergeable=true, mergeable_state=behind; compare main...head ahead1/behind3. Başarısız kontrol değil strict-base engeli |
+
+Ruleset aktif, required review0 ve bypass boşken gözlemlendi. GitHub sunucusunun hesapladığı PR/merge durumu salt okunarak doğrulandı; reddedileceği varsayılan bir merge/push/delete yazması gönderilmedi. Bu kabul o tehlikeli yazmaların denenmiş olduğu iddiası değildir. Her iki PR closed/merged=false olarak temizlendi; main önce/sonra63f2471d0b57e45edd5ac6c4422bfa141b63dfe2 kaldı. CI-ADMIN yönetim kurulumu ve bu iki kabul ölçütü tamamlandı; frontend karşılıklı tetikleme kabulü CI-SPLIT kapsamında ayrı açık kalır.
