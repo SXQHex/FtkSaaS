@@ -13,8 +13,12 @@ export default async function RootLayout({ children }: { children: React.ReactNo
   return (
     <html lang={locale} suppressHydrationWarning>
       <body>
-        <a className="skip-link" href="#main-content">{t("skip")}</a>
-        <NextIntlClientProvider><Providers>{children}</Providers></NextIntlClientProvider>
+        <a className="skip-link" href="#main-content">
+          {t("skip")}
+        </a>
+        <NextIntlClientProvider>
+          <Providers>{children}</Providers>
+        </NextIntlClientProvider>
       </body>
     </html>
   );

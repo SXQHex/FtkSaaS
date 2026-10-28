@@ -12,7 +12,7 @@ Bu teslim teknik altyapıdır; mevcut taslak tasarım kabul edilmemiştir. Ürü
 
 Build önbelleği apps/web/turbo.json içinde .next çıktıları, açık NEXT_PUBLIC_* girdileri ve .env* dosya hash’leriyle tanımlıdır; yerel bağlantı değişince önceki build cache’i kullanılmaz.
 
-TypeScript sürümü kök pnpm-workspace.yaml katalogundaki 7.0.2'dir. Next.js 16.4.3 varsayılan proje-yerel tsc CLI yoluyla build sırasında tip kontrolü yapar; ignoreBuildErrors veya TypeScript 6 fallback'i yoktur. JavaScript compiler API'si isteyen typescript-eslint yerine Biome lint kullanılır. Vitest/MSW ve Playwright sürümleri manifestlerde tam sabittir. Node .nvmrc, pnpm kök packageManager kaynağından seçilir.
+TypeScript sürümü kök pnpm-workspace.yaml katalogundaki 7.0.2'dir. Next.js 16.4.3 varsayılan proje-yerel tsc CLI yoluyla build sırasında tip kontrolü yapar; ignoreBuildErrors veya TypeScript 6 fallback'i yoktur. Frontend lint için Oxlint, format için Oxfmt kullanılır; bağımsız tsc typecheck korunur. Oxlint React/Hooks, Next.js, JSX erişilebilirlik ve Vitest yerleşik kural gruplarını açar. `lint`, uyarıları hata sayar ve ardından Oxfmt check çalıştırır; bu nedenle mevcut `check:frontend` ve frontend CI format denetimini de içerir. Type-aware lint için ek tsgolint bu geçişe eklenmez. Vitest/MSW ve Playwright sürümleri manifestlerde tam sabittir. Node .nvmrc, pnpm kök packageManager kaynağından seçilir.
 
 ## Çalıştırma
 
@@ -70,3 +70,11 @@ next-intl, locale routing eklemeden tr/en sözlüklerini sunucu ve istemciye ta�
 Çeviri runtime’ı opsiyonel SWC/Parcel extraction araçlarının lifecycle scriptlerini gerektirmez; workspace allowBuilds bunları açıkça kapatır. Yeni form/state/tablo/chart kütüphanesi kurulmaz.
 
 packages/ui web/DOM bileşenleridir; Expo’da doğrudan kullanılabilir kabul edilmez. Expo kurulumu sonraki iştir. API tipleri ortak pakette kalır; renk/boşluk değerleri platformdan bağımsız kavramlarla ifade edilir.
+
+## Lint ve format
+
+`pnpm --filter @ftksaas/web format` ve `pnpm --filter @ftksaas/ui format` yalnız ilgili paketi Oxfmt ile düzenler. `format:check` dosya yazmadan kontrol eder; `lint` hem Oxlint hem format kontrolünü çalıştırır. Araç sürümleri her iki frontend manifestinde tam sabittir; kökte ikinci lint/format config’i yoktur.
+
+Oxfmt100 sütun/2 boşluk kullanır; import, package anahtarı ve Tailwind sınıfı sıralaması kapalıdır. Geçişte TSX/CSS farkları yalnız biçimdir; markup, CSS değerleri, sınıf sırası ve etkileşimler korunur. Üretilmiş next-env, .next/coverage, yerel env ve Markdown dosyaları format kapsamı dışındadır.
+
+Oxlint’te `vitest/valid-expect.maxArgs=2`, Vitest’in desteklediği tanılama mesajı argümanını korur. İki yerel istisna açıkça sınırlandırılmıştır: Preferences/Workspace için React Compiler `set-state-in-effect` kuralı, next-themes SSR mount ve asenkron bağlam yükleme davranışını bu araç geçişinde yeniden yazmamak için kapalıdır. AuthForm/Workspace için `jsx-a11y/prefer-tag-over-role`, geçerli ARIA status bölgelerini form sonucuna özgü output etiketine dönüştürmemek için kapalıdır. Diğer erişilebilirlik/React kuralları ve Playwright/axe kabulü korunur; test assertion’ları değiştirilmez.

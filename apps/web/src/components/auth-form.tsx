@@ -24,8 +24,7 @@ function authMessage(error: unknown) {
   if (code === "email_not_confirmed") return "emailUnconfirmed";
   if (code === "over_request_rate_limit" || code === "over_email_send_rate_limit")
     return "rateLimit";
-  if (code === "mfa_verification_failed")
-    return "invalidCode";
+  if (code === "mfa_verification_failed") return "invalidCode";
   return "failed";
 }
 // Layout adapted from shadcn/ui login-01; source recorded in packages/ui/registry-sources.json.
@@ -44,7 +43,11 @@ export function AuthForm({
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState(initialError ? "callbackError" : "");
   const [notice, setNotice] = useState("");
-  const text = { title: t(`${mode}Title`), description: t(`${mode}Description`), submit: t(`${mode}Submit`) };
+  const text = {
+    title: t(`${mode}Title`),
+    description: t(`${mode}Description`),
+    submit: t(`${mode}Submit`),
+  };
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setError("");
@@ -66,9 +69,7 @@ export function AuthForm({
           redirectTo: `${appOrigin()}/auth/callback?next=/parola-yenile`,
         });
         if (result.error) throw result.error;
-        setNotice(
-          "recoveryNotice",
-        );
+        setNotice("recoveryNotice");
       } else if (mode === "update") {
         if (form.get("password") !== form.get("confirm")) {
           setError("passwordMismatch");
@@ -124,9 +125,7 @@ export function AuthForm({
       <CardContent className="min-w-0 space-y-6 px-4 sm:px-6">
         {!configured ? (
           <Alert>
-            <AlertDescription>
-              {t("notConfigured")}
-            </AlertDescription>
+            <AlertDescription>{t("notConfigured")}</AlertDescription>
           </Alert>
         ) : null}
         {error ? (
@@ -157,7 +156,9 @@ export function AuthForm({
           ) : null}
           {mode === "login" || mode === "update" ? (
             <div className="space-y-2">
-              <Label htmlFor="password">{mode === "update" ? t("newPassword") : t("password")}</Label>
+              <Label htmlFor="password">
+                {mode === "update" ? t("newPassword") : t("password")}
+              </Label>
               <Input
                 id="password"
                 name="password"

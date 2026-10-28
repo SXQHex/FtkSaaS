@@ -194,46 +194,98 @@ export function Workspace() {
     }
   }
   return (
-    <main id="main-content" tabIndex={-1} className="mx-auto flex min-h-svh max-w-xl flex-col gap-6 p-6 md:p-10">
+    <main
+      id="main-content"
+      tabIndex={-1}
+      className="mx-auto flex min-h-svh max-w-xl flex-col gap-6 p-6 md:p-10"
+    >
       <Preferences />
       <Card>
         <CardHeader>
-          <CardTitle><h1>{t("title")}</h1></CardTitle>
+          <CardTitle>
+            <h1>{t("title")}</h1>
+          </CardTitle>
           <CardDescription>{t("description")}</CardDescription>
         </CardHeader>
         <CardContent className="space-y-5">
-          <h2 className="text-lg font-medium">{snapshot ? t("greeting", { name: snapshot.account.display_name }) : t("welcome")}</h2>
+          <h2 className="text-lg font-medium">
+            {snapshot ? t("greeting", { name: snapshot.account.display_name }) : t("welcome")}
+          </h2>
           {error ? (
             <Alert variant="destructive" role="alert">
               <AlertDescription>
                 <p>{error === "signOutFailed" ? t("signOutFailed") : api(error)}</p>
-                <Button variant="outline" className="mt-3 min-h-11" onClick={() => {
-                  setSnapshot(null); setOrganizationId(""); setCenterId("");
-                  setCenters([]); setError(""); setRetry((value) => value + 1);
-                }}>{common("retry")}</Button>
+                <Button
+                  variant="outline"
+                  className="mt-3 min-h-11"
+                  onClick={() => {
+                    setSnapshot(null);
+                    setOrganizationId("");
+                    setCenterId("");
+                    setCenters([]);
+                    setError("");
+                    setRetry((value) => value + 1);
+                  }}
+                >
+                  {common("retry")}
+                </Button>
               </AlertDescription>
             </Alert>
           ) : null}
           {!snapshot && !error ? <p role="status">{t("loading")}</p> : null}
           {snapshot && !snapshot.organizations.length ? (
-            <div><h3>{t("noOrg")}</h3><p>{t("noOrgHelp")}</p></div>
+            <div>
+              <h3>{t("noOrg")}</h3>
+              <p>{t("noOrgHelp")}</p>
+            </div>
           ) : null}
           {snapshot?.organizations.length ? (
             <>
               <Select value={organizationId} onValueChange={chooseOrganization}>
-                <SelectTrigger className="w-full min-h-11" aria-label={t("org")}><SelectValue placeholder={t("org")} /></SelectTrigger>
-                <SelectContent>{snapshot.organizations.map((item) => <SelectItem key={item.id} value={item.id}>{item.name}</SelectItem>)}</SelectContent>
+                <SelectTrigger className="w-full min-h-11" aria-label={t("org")}>
+                  <SelectValue placeholder={t("org")} />
+                </SelectTrigger>
+                <SelectContent>
+                  {snapshot.organizations.map((item) => (
+                    <SelectItem key={item.id} value={item.id}>
+                      {item.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
               </Select>
-              <Select value={centerId} onValueChange={setCenterId} disabled={!centers.length || centersLoading}>
-                <SelectTrigger className="w-full min-h-11" aria-label={t("center")}><SelectValue placeholder={t(centersLoading ? "centersLoading" : "center")} /></SelectTrigger>
-                <SelectContent>{centers.map((item) => <SelectItem key={item.id} value={item.id}>{item.name}</SelectItem>)}</SelectContent>
+              <Select
+                value={centerId}
+                onValueChange={setCenterId}
+                disabled={!centers.length || centersLoading}
+              >
+                <SelectTrigger className="w-full min-h-11" aria-label={t("center")}>
+                  <SelectValue placeholder={t(centersLoading ? "centersLoading" : "center")} />
+                </SelectTrigger>
+                <SelectContent>
+                  {centers.map((item) => (
+                    <SelectItem key={item.id} value={item.id}>
+                      {item.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
               </Select>
               <div role="status" className="space-y-2 text-sm">
                 <p>{organization ? t(organization.access_mode) : t("chooseHelp")}</p>
-                {organization ? <p>{organization.access_mode === "closed" ? t("closedHelp")
-                  : organization.access_mode === "bootstrap" ? t("bootstrapHelp")
-                  : centersLoading ? t("centersHelp") : !centers.length ? t("noCenter")
-                  : center ? t("selected", { name: center.name, timezone: center.timezone }) : t("selectCenter")}</p> : null}
+                {organization ? (
+                  <p>
+                    {organization.access_mode === "closed"
+                      ? t("closedHelp")
+                      : organization.access_mode === "bootstrap"
+                        ? t("bootstrapHelp")
+                        : centersLoading
+                          ? t("centersHelp")
+                          : !centers.length
+                            ? t("noCenter")
+                            : center
+                              ? t("selected", { name: center.name, timezone: center.timezone })
+                              : t("selectCenter")}
+                  </p>
+                ) : null}
               </div>
             </>
           ) : null}

@@ -7,7 +7,7 @@
       "commit": "e3705510d4ef6a6357195925aa4ae13d516dcee0",
       "license": "MIT",
       "mode": "reference-only; no source files copied",
-      "selected": "Retain existing Vitest/Playwright and theme infrastructure; do not add duplicate tooling or Better Auth."
+      "selected": "Retain Vitest/Playwright and theme infrastructure; adopt the Oxlint/Oxfmt tool pair using pinned package dependencies and local frontend configs. No starter source files or Better Auth imported."
     },
     {
       "repository": "https://github.com/Kiranism/next-shadcn-dashboard-starter",

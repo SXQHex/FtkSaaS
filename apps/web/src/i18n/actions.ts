@@ -8,7 +8,10 @@ export async function setLocale(value: string) {
   const origin = (await headers()).get("origin");
   const localHttp = origin !== null && /^http:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/.test(origin);
   (await cookies()).set(localeCookie, value, {
-    path: "/", sameSite: "lax", httpOnly: true,
-    secure: !localHttp, maxAge: 60 * 60 * 24 * 365,
+    path: "/",
+    sameSite: "lax",
+    httpOnly: true,
+    secure: !localHttp,
+    maxAge: 60 * 60 * 24 * 365,
   });
 }
