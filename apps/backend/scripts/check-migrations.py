@@ -3,6 +3,7 @@ import hashlib,json
 expected=json.loads(Path('database/migrations.sha256.json').read_text())
 actual={p.name:hashlib.sha256(p.read_bytes()).hexdigest() for p in sorted(Path('supabase/migrations').glob('*.sql'))}
 assert actual==expected,'Migration history changed: append a new migration and explicitly update the review manifest.'
+assert json.loads(Path("../../packages/api-contracts/schema/contract.json").read_text())["x-contract"]["runtime"]["migration_count"]==len(actual),"Contract migration inventory drift"
 parts=[]
 for name in ['runtime.sql','kernel.sql','dispatch.sql','wrappers.sql']:
  s=Path('database',name).read_text();parts.append('\n'.join(l for l in s.splitlines() if l.strip() not in ['begin;','commit;']))
@@ -178,3 +179,5 @@ assert next(Path('supabase/migrations').glob('*_starter_work_templates.sql')).re
 assert next(Path("supabase/migrations").glob("*_starter_public_settings.sql")).read_text()==Path("database/settings-catalog-v5.sql").read_text().replace("commit;\n","",1)+Path("database/starter-public-settings.sql").read_text().replace("begin;\n","",1),"Public settings source drift"
 
 assert next(Path("supabase/migrations").glob("*_starter_collection_methods.sql")).read_text()==Path("database/starter-collection-methods.sql").read_text(),"Collection methods source drift"
+
+assert next(Path("supabase/migrations").glob("*_personal_calendar_links.sql")).read_text()==Path("database/personal-calendar-links.sql").read_text().replace("commit;\n","",1)+Path("database/personal-calendar-links-wrappers.sql").read_text().replace("begin;\n","",1),"Personal calendar source drift"

@@ -915,7 +915,12 @@
         "account_totp_remove_v1",
         "account_google_link_prepare_v1",
         "media_get_v1",
-        "settings_template_resolve_v1"
+        "settings_template_resolve_v1",
+        "calendar_links_get_v1",
+        "calendar_link_create_v1",
+        "calendar_link_rotate_v1",
+        "calendar_link_revoke_v1",
+        "calendar_feed_get_v1"
       ]
     },
     "EntityType": {
@@ -48334,6 +48339,443 @@
           }
         }
       ]
+    },
+    "PersonalCalendarLink": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/FtkUuid"
+        },
+        "org_id": {
+          "$ref": "#/$defs/FtkUuid"
+        },
+        "kinds": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "lessons",
+              "duties"
+            ]
+          },
+          "minItems": 1,
+          "maxItems": 2,
+          "uniqueItems": true
+        },
+        "state": {
+          "type": "string",
+          "enum": [
+            "active",
+            "revoked"
+          ]
+        },
+        "version": {
+          "$ref": "#/$defs/PositiveInt"
+        },
+        "created_at": {
+          "$ref": "#/$defs/Instant"
+        }
+      },
+      "required": [
+        "id",
+        "org_id",
+        "kinds",
+        "state",
+        "version",
+        "created_at"
+      ],
+      "additionalProperties": false
+    },
+    "PersonalCalendarMutation": {
+      "type": "object",
+      "properties": {
+        "operation_id": {
+          "$ref": "#/$defs/FtkUuid"
+        },
+        "primary_id": {
+          "$ref": "#/$defs/FtkUuid"
+        },
+        "version": {
+          "$ref": "#/$defs/PositiveInt"
+        },
+        "replayed": {
+          "$ref": "#/$defs/Bool"
+        },
+        "related": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/EntityRef"
+          }
+        },
+        "link": {
+          "$ref": "#/$defs/PersonalCalendarLink"
+        }
+      },
+      "required": [
+        "operation_id",
+        "primary_id",
+        "replayed",
+        "related",
+        "link"
+      ],
+      "additionalProperties": false
+    },
+    "PersonalCalendarCredentialMutation": {
+      "type": "object",
+      "properties": {
+        "operation_id": {
+          "$ref": "#/$defs/FtkUuid"
+        },
+        "primary_id": {
+          "$ref": "#/$defs/FtkUuid"
+        },
+        "version": {
+          "$ref": "#/$defs/PositiveInt"
+        },
+        "replayed": {
+          "$ref": "#/$defs/Bool"
+        },
+        "related": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/EntityRef"
+          }
+        },
+        "link": {
+          "$ref": "#/$defs/PersonalCalendarLink"
+        },
+        "subscription_url": {
+          "type": "string",
+          "format": "uri",
+          "maxLength": 2048
+        }
+      },
+      "required": [
+        "operation_id",
+        "primary_id",
+        "replayed",
+        "related",
+        "link",
+        "subscription_url"
+      ],
+      "additionalProperties": false
+    },
+    "Page_PersonalCalendarLink": {
+      "type": "object",
+      "properties": {
+        "items": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/PersonalCalendarLink"
+          }
+        },
+        "next_cursor": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/OpaqueToken"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "as_of": {
+          "$ref": "#/$defs/Instant"
+        },
+        "service_ready": {
+          "type": "boolean"
+        },
+        "supported_kinds": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "lessons",
+              "duties"
+            ]
+          },
+          "uniqueItems": true,
+          "maxItems": 2
+        }
+      },
+      "required": [
+        "items",
+        "as_of",
+        "service_ready",
+        "supported_kinds"
+      ],
+      "additionalProperties": false
+    },
+    "Request_calendar_links_get": {
+      "type": "object",
+      "properties": {
+        "client_api_version": {
+          "const": 1
+        },
+        "request_id": {
+          "$ref": "#/$defs/FtkUuid"
+        },
+        "page": {
+          "$ref": "#/$defs/Page"
+        }
+      },
+      "required": [
+        "client_api_version",
+        "request_id",
+        "page"
+      ],
+      "additionalProperties": false
+    },
+    "Request_calendar_link_create": {
+      "type": "object",
+      "properties": {
+        "client_api_version": {
+          "const": 1
+        },
+        "request_id": {
+          "$ref": "#/$defs/FtkUuid"
+        },
+        "operation_key": {
+          "$ref": "#/$defs/FtkUuid"
+        },
+        "organization_scope": {
+          "type": "object",
+          "properties": {
+            "org_id": {
+              "$ref": "#/$defs/FtkUuid"
+            }
+          },
+          "required": [
+            "org_id"
+          ],
+          "additionalProperties": false
+        },
+        "kinds": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "lessons",
+              "duties"
+            ]
+          },
+          "minItems": 1,
+          "maxItems": 2,
+          "uniqueItems": true
+        }
+      },
+      "required": [
+        "client_api_version",
+        "request_id",
+        "operation_key",
+        "organization_scope",
+        "kinds"
+      ],
+      "additionalProperties": false
+    },
+    "Request_calendar_link_rotate": {
+      "type": "object",
+      "properties": {
+        "client_api_version": {
+          "const": 1
+        },
+        "request_id": {
+          "$ref": "#/$defs/FtkUuid"
+        },
+        "operation_key": {
+          "$ref": "#/$defs/FtkUuid"
+        },
+        "organization_scope": {
+          "type": "object",
+          "properties": {
+            "org_id": {
+              "$ref": "#/$defs/FtkUuid"
+            }
+          },
+          "required": [
+            "org_id"
+          ],
+          "additionalProperties": false
+        },
+        "link_id": {
+          "$ref": "#/$defs/FtkUuid"
+        },
+        "expected_version": {
+          "$ref": "#/$defs/PositiveInt"
+        }
+      },
+      "required": [
+        "client_api_version",
+        "request_id",
+        "operation_key",
+        "organization_scope",
+        "link_id",
+        "expected_version"
+      ],
+      "additionalProperties": false
+    },
+    "Request_calendar_link_revoke": {
+      "type": "object",
+      "properties": {
+        "client_api_version": {
+          "const": 1
+        },
+        "request_id": {
+          "$ref": "#/$defs/FtkUuid"
+        },
+        "operation_key": {
+          "$ref": "#/$defs/FtkUuid"
+        },
+        "link_id": {
+          "$ref": "#/$defs/FtkUuid"
+        },
+        "expected_version": {
+          "$ref": "#/$defs/PositiveInt"
+        }
+      },
+      "required": [
+        "client_api_version",
+        "request_id",
+        "operation_key",
+        "link_id",
+        "expected_version"
+      ],
+      "additionalProperties": false
+    },
+    "Request_calendar_feed_get": {
+      "type": "object",
+      "properties": {
+        "client_api_version": {
+          "const": 1
+        },
+        "request_id": {
+          "$ref": "#/$defs/FtkUuid"
+        },
+        "token": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        }
+      },
+      "required": [
+        "client_api_version",
+        "request_id",
+        "token"
+      ],
+      "additionalProperties": false
+    },
+    "PersonalCalendarFeed": {
+      "type": "object",
+      "properties": {
+        "ics_base64": {
+          "type": "string",
+          "minLength": 4,
+          "maxLength": 2796204
+        }
+      },
+      "required": [
+        "ics_base64"
+      ],
+      "additionalProperties": false
+    },
+    "Success_calendar_links_get": {
+      "type": "object",
+      "properties": {
+        "ok": {
+          "const": true
+        },
+        "data": {
+          "$ref": "#/$defs/Page_PersonalCalendarLink"
+        },
+        "trace_id": {
+          "$ref": "#/$defs/FtkUuid"
+        }
+      },
+      "required": [
+        "ok",
+        "data",
+        "trace_id"
+      ],
+      "additionalProperties": false
+    },
+    "Success_calendar_link_create": {
+      "type": "object",
+      "properties": {
+        "ok": {
+          "const": true
+        },
+        "data": {
+          "$ref": "#/$defs/PersonalCalendarCredentialMutation"
+        },
+        "trace_id": {
+          "$ref": "#/$defs/FtkUuid"
+        }
+      },
+      "required": [
+        "ok",
+        "data",
+        "trace_id"
+      ],
+      "additionalProperties": false
+    },
+    "Success_calendar_link_rotate": {
+      "type": "object",
+      "properties": {
+        "ok": {
+          "const": true
+        },
+        "data": {
+          "$ref": "#/$defs/PersonalCalendarCredentialMutation"
+        },
+        "trace_id": {
+          "$ref": "#/$defs/FtkUuid"
+        }
+      },
+      "required": [
+        "ok",
+        "data",
+        "trace_id"
+      ],
+      "additionalProperties": false
+    },
+    "Success_calendar_link_revoke": {
+      "type": "object",
+      "properties": {
+        "ok": {
+          "const": true
+        },
+        "data": {
+          "$ref": "#/$defs/PersonalCalendarMutation"
+        },
+        "trace_id": {
+          "$ref": "#/$defs/FtkUuid"
+        }
+      },
+      "required": [
+        "ok",
+        "data",
+        "trace_id"
+      ],
+      "additionalProperties": false
+    },
+    "Success_calendar_feed_get": {
+      "type": "object",
+      "properties": {
+        "ok": {
+          "const": true
+        },
+        "data": {
+          "$ref": "#/$defs/PersonalCalendarFeed"
+        },
+        "trace_id": {
+          "$ref": "#/$defs/FtkUuid"
+        }
+      },
+      "required": [
+        "ok",
+        "data",
+        "trace_id"
+      ],
+      "additionalProperties": false
     }
   },
   "x-contract": {
@@ -48410,7 +48852,9 @@
       "settings.access": "Global user/platform without tenant; own linked member; center live CM; org live Owner/OM. Per-scope closed fields only.",
       "reservation.capacity_override": "Canlı merkez yöneticisi; merkez kapsamında açık reservation.capacity_override yetkili personel; ilgili seansa atanmış aktif eğitmen. Owner/OM olmak merkez yetkisi sağlamaz.",
       "media.read": "Own current photo, live org member logo, or current confirmed same-lesson photo opt-in; no arbitrary asset ownership or public read.",
-      "templates.resolve": "Own member or explicitly scoped shared template; live report/import domain access required. Configuration sharing never grants execution access."
+      "templates.resolve": "Own member or explicitly scoped shared template; live report/import domain access required. Configuration sharing never grants execution access.",
+      "calendar.self": "Own global account calendar link metadata and lifecycle; explicit nested org is checked live, never an actor selector.",
+      "calendar.feed": "Public opaque personal calendar bearer link, current hash and live account/org/link/own booking or duty; service-only transport."
     },
     "tables": [
       {
@@ -54968,7 +55412,8 @@
           "no_agreement_details_for_non_management_readers",
           "required_feature_gates_separate_from_references",
           "no_business_commit",
-          "scope_filter_before_pagination"
+          "scope_filter_before_pagination",
+          "live_actor_and_scope"
         ],
         "audit": false,
         "notification": "none",
@@ -75723,6 +76168,527 @@
             "$ref": "#/$defs/Request_settings_template_resolve"
           }
         }
+      },
+      {
+        "name": "calendar_links_get_v1",
+        "module": "M02",
+        "features": [
+          "F08"
+        ],
+        "permission": "calendar.self",
+        "actor_source": "server_verified",
+        "transport": "R",
+        "billing_class": "read",
+        "request": {
+          "$ref": "#/$defs/Request_calendar_links_get"
+        },
+        "success": {
+          "$ref": "#/$defs/Success_calendar_links_get"
+        },
+        "errors": [
+          "AUTH_REQUIRED",
+          "BILLING_OPERATION_RESTRICTED",
+          "CLIENT_UPDATE_REQUIRED",
+          "FORBIDDEN",
+          "NOT_FOUND",
+          "PLAN_FEATURE_UNAVAILABLE",
+          "PLAN_LIMIT_REACHED",
+          "POLICY_NOT_CONFIGURED",
+          "SERVICE_UNAVAILABLE",
+          "SESSION_REVOKED",
+          "SUBSCRIPTION_NOT_STARTED",
+          "TEMPORARY_FAILURE",
+          "VALIDATION_FAILED",
+          "VERSION_CONFLICT",
+          "INVALID_STATE_TRANSITION",
+          "PREVIEW_STALE",
+          "CAPACITY_FULL",
+          "ENTITLEMENT_UNAVAILABLE",
+          "CLASS_ACCESS_DENIED",
+          "RESERVATION_EXISTS",
+          "ASSISTANT_PARTICIPANT_CONFLICT",
+          "ACCOUNT_ALREADY_LINKED",
+          "INVITATION_UNAVAILABLE",
+          "CREDIT_LIMIT_EXCEEDED"
+        ],
+        "transaction_class": "read",
+        "transaction_guarantee": "Own account calendar credential; live org/link/role/plan checks, immutable metadata and receipt; URL never stored in receipt.",
+        "transition": {
+          "effect": "own_calendar_calendar_links_get",
+          "from": [],
+          "to": [],
+          "invariant": "Own active account, explicit organization and kinds; current credential and live business authority, no external edit operation."
+        },
+        "semantic_guards": [
+          "live_account_and_org_link",
+          "own_calendar_link",
+          "current_secret_hash",
+          "no_other_participants_or_finance",
+          "live_actor_and_scope"
+        ],
+        "audit": false,
+        "notification": "none",
+        "concurrency": "Live original permission/tenant/field scope on every request; current authorized projection; no business writes",
+        "expected_version_subject": "none",
+        "acceptance_scenario_ids": [
+          "A01",
+          "A02",
+          "A03",
+          "A23",
+          "A24",
+          "A25",
+          "A46",
+          "A47",
+          "A55"
+        ],
+        "configuration_policy": "numeric plan limits/prices and legal approval are deployment configuration, never arbitrary allow/deny",
+        "implementation_status": "operational_development_limited",
+        "runtime_path": "/functions/v1/backend-v1/calendar_links_get_v1",
+        "runtime_rpc": "api_v1.calendar_links_get_v1",
+        "runtime_transport": "authenticated Edge adapter -> service-only RPC; rules/transaction in PostgreSQL",
+        "runtime_external_path": "/functions/v1/backend-v1/calendar_links_get_v1",
+        "runtime_limits": [
+          "Starter kinds are lessons/duties; event calendars remain unavailable. Explicit selection; no automatic link.",
+          "Public ICS adapter and application origins plus signing key must be configured; no implicit URL.",
+          "Create/rotate URLs are added only by Edge after receipt handling; only token hashes are stored. Current live pointer and scope are rechecked before replay and each feed fetch."
+        ],
+        "required_features": [],
+        "runtime_required_features": [],
+        "conditional_features": [],
+        "operation_contract": {
+          "kind": "read",
+          "target_entity": "accounts",
+          "version_mode": "none",
+          "version_field": null,
+          "read_operation": null,
+          "atomic_effects": [],
+          "business_commit": false,
+          "read_path_status": "not_required",
+          "source_decision": "FD05/FD12"
+        },
+        "decision_delivery": {
+          "accepted_contract": "DS-2026-10-17",
+          "runtime_conformance": "implemented_pending_ci",
+          "open_dependencies": [],
+          "target_request": {
+            "$ref": "#/$defs/Request_calendar_links_get"
+          }
+        }
+      },
+      {
+        "name": "calendar_link_create_v1",
+        "module": "M02",
+        "features": [
+          "F08"
+        ],
+        "permission": "calendar.self",
+        "actor_source": "server_verified",
+        "transport": "W",
+        "billing_class": "config",
+        "request": {
+          "$ref": "#/$defs/Request_calendar_link_create"
+        },
+        "success": {
+          "$ref": "#/$defs/Success_calendar_link_create"
+        },
+        "errors": [
+          "AUTH_REQUIRED",
+          "BILLING_OPERATION_RESTRICTED",
+          "CLIENT_UPDATE_REQUIRED",
+          "FORBIDDEN",
+          "IDEMPOTENCY_PAYLOAD_MISMATCH",
+          "INTEGRITY_VIOLATION",
+          "NOT_FOUND",
+          "OPERATION_IN_PROGRESS",
+          "OPERATION_RESULT_EXPIRED",
+          "PLAN_FEATURE_UNAVAILABLE",
+          "PLAN_LIMIT_REACHED",
+          "POLICY_NOT_CONFIGURED",
+          "SERVICE_UNAVAILABLE",
+          "SESSION_REVOKED",
+          "SUBSCRIPTION_NOT_STARTED",
+          "TEMPORARY_FAILURE",
+          "VALIDATION_FAILED",
+          "VERSION_CONFLICT"
+        ],
+        "transaction_class": "auth",
+        "transaction_guarantee": "Own account calendar credential; live org/link/role/plan checks, immutable metadata and receipt; URL never stored in receipt.",
+        "transition": {
+          "effect": "own_calendar_calendar_link_create",
+          "from": [],
+          "to": [],
+          "invariant": "Own active account, explicit organization and kinds; current credential and live business authority, no external edit operation."
+        },
+        "semantic_guards": [
+          "live_account_and_org_link",
+          "own_calendar_link",
+          "current_secret_hash",
+          "no_other_participants_or_finance",
+          "live_actor_and_scope"
+        ],
+        "audit": true,
+        "notification": "none",
+        "concurrency": "Live original permission/tenant scope on every request; target/aggregate lock; row_version; idempotent receipt and all declared effects rollback together",
+        "expected_version_subject": "none",
+        "acceptance_scenario_ids": [
+          "A01",
+          "A02",
+          "A03",
+          "A23",
+          "A24",
+          "A25",
+          "A46",
+          "A47",
+          "A55"
+        ],
+        "configuration_policy": "numeric plan limits/prices and legal approval are deployment configuration, never arbitrary allow/deny",
+        "implementation_status": "operational_development_limited",
+        "required_features": [],
+        "runtime_required_features": [],
+        "conditional_features": [
+          {
+            "feature": "F08",
+            "when": "calendar_link_create_rotate_or_feed",
+            "mode": "required_if_selected"
+          }
+        ],
+        "operation_contract": {
+          "kind": "auth",
+          "target_entity": "accounts",
+          "version_mode": "none",
+          "version_field": null,
+          "read_operation": "calendar_links_get_v1",
+          "atomic_effects": [
+            "personal_calendar_credential_change",
+            "personal_calendar_metadata_history",
+            "receipt"
+          ],
+          "business_commit": true,
+          "read_path_status": "implemented",
+          "source_decision": "FD05/FD12"
+        },
+        "decision_delivery": {
+          "accepted_contract": "DS-2026-10-17",
+          "runtime_conformance": "implemented_pending_ci",
+          "open_dependencies": [],
+          "target_request": {
+            "$ref": "#/$defs/Request_calendar_link_create"
+          }
+        },
+        "runtime_path": "/functions/v1/backend-v1/calendar_link_create_v1",
+        "runtime_rpc": "api_v1.calendar_link_create_v1",
+        "runtime_external_path": "/functions/v1/backend-v1/calendar_link_create_v1",
+        "runtime_limits": [
+          "Starter kinds are lessons/duties; event calendars remain unavailable. Explicit selection; no automatic link.",
+          "Public ICS adapter and application origins plus signing key must be configured; no implicit URL.",
+          "Create/rotate URLs are added only by Edge after receipt handling; only token hashes are stored. Current live pointer and scope are rechecked before replay and each feed fetch."
+        ]
+      },
+      {
+        "name": "calendar_link_rotate_v1",
+        "module": "M02",
+        "features": [
+          "F08"
+        ],
+        "permission": "calendar.self",
+        "actor_source": "server_verified",
+        "transport": "W",
+        "billing_class": "config",
+        "request": {
+          "$ref": "#/$defs/Request_calendar_link_rotate"
+        },
+        "success": {
+          "$ref": "#/$defs/Success_calendar_link_rotate"
+        },
+        "errors": [
+          "AUTH_REQUIRED",
+          "BILLING_OPERATION_RESTRICTED",
+          "CLIENT_UPDATE_REQUIRED",
+          "FORBIDDEN",
+          "IDEMPOTENCY_PAYLOAD_MISMATCH",
+          "INTEGRITY_VIOLATION",
+          "NOT_FOUND",
+          "OPERATION_IN_PROGRESS",
+          "OPERATION_RESULT_EXPIRED",
+          "PLAN_FEATURE_UNAVAILABLE",
+          "PLAN_LIMIT_REACHED",
+          "POLICY_NOT_CONFIGURED",
+          "SERVICE_UNAVAILABLE",
+          "SESSION_REVOKED",
+          "SUBSCRIPTION_NOT_STARTED",
+          "TEMPORARY_FAILURE",
+          "VALIDATION_FAILED",
+          "VERSION_CONFLICT"
+        ],
+        "transaction_class": "auth",
+        "transaction_guarantee": "Own account calendar credential; live org/link/role/plan checks, immutable metadata and receipt; URL never stored in receipt.",
+        "transition": {
+          "effect": "own_calendar_calendar_link_rotate",
+          "from": [],
+          "to": [],
+          "invariant": "Own active account, explicit organization and kinds; current credential and live business authority, no external edit operation."
+        },
+        "semantic_guards": [
+          "live_account_and_org_link",
+          "own_calendar_link",
+          "current_secret_hash",
+          "no_other_participants_or_finance",
+          "live_actor_and_scope"
+        ],
+        "audit": true,
+        "notification": "none",
+        "concurrency": "Live original permission/tenant scope on every request; target/aggregate lock; row_version; idempotent receipt and all declared effects rollback together",
+        "expected_version_subject": "personal calendar link via calendar_links_get_v1",
+        "acceptance_scenario_ids": [
+          "A01",
+          "A02",
+          "A03",
+          "A23",
+          "A24",
+          "A25",
+          "A46",
+          "A47",
+          "A55"
+        ],
+        "configuration_policy": "numeric plan limits/prices and legal approval are deployment configuration, never arbitrary allow/deny",
+        "implementation_status": "operational_development_limited",
+        "required_features": [],
+        "runtime_required_features": [],
+        "conditional_features": [
+          {
+            "feature": "F08",
+            "when": "calendar_link_create_rotate_or_feed",
+            "mode": "required_if_selected"
+          }
+        ],
+        "operation_contract": {
+          "kind": "auth",
+          "target_entity": "accounts",
+          "version_mode": "row_version",
+          "version_field": "expected_version",
+          "read_operation": "calendar_links_get_v1",
+          "atomic_effects": [
+            "personal_calendar_credential_change",
+            "personal_calendar_metadata_history",
+            "receipt"
+          ],
+          "business_commit": true,
+          "read_path_status": "implemented",
+          "source_decision": "FD05/FD12"
+        },
+        "decision_delivery": {
+          "accepted_contract": "DS-2026-10-17",
+          "runtime_conformance": "implemented_pending_ci",
+          "open_dependencies": [],
+          "target_request": {
+            "$ref": "#/$defs/Request_calendar_link_rotate"
+          }
+        },
+        "runtime_path": "/functions/v1/backend-v1/calendar_link_rotate_v1",
+        "runtime_rpc": "api_v1.calendar_link_rotate_v1",
+        "runtime_external_path": "/functions/v1/backend-v1/calendar_link_rotate_v1",
+        "runtime_limits": [
+          "Starter kinds are lessons/duties; event calendars remain unavailable. Explicit selection; no automatic link.",
+          "Public ICS adapter and application origins plus signing key must be configured; no implicit URL.",
+          "Create/rotate URLs are added only by Edge after receipt handling; only token hashes are stored. Current live pointer and scope are rechecked before replay and each feed fetch."
+        ]
+      },
+      {
+        "name": "calendar_link_revoke_v1",
+        "module": "M02",
+        "features": [
+          "F08"
+        ],
+        "permission": "calendar.self",
+        "actor_source": "server_verified",
+        "transport": "W",
+        "billing_class": "config",
+        "request": {
+          "$ref": "#/$defs/Request_calendar_link_revoke"
+        },
+        "success": {
+          "$ref": "#/$defs/Success_calendar_link_revoke"
+        },
+        "errors": [
+          "AUTH_REQUIRED",
+          "BILLING_OPERATION_RESTRICTED",
+          "CLIENT_UPDATE_REQUIRED",
+          "FORBIDDEN",
+          "IDEMPOTENCY_PAYLOAD_MISMATCH",
+          "INTEGRITY_VIOLATION",
+          "NOT_FOUND",
+          "OPERATION_IN_PROGRESS",
+          "OPERATION_RESULT_EXPIRED",
+          "PLAN_FEATURE_UNAVAILABLE",
+          "PLAN_LIMIT_REACHED",
+          "POLICY_NOT_CONFIGURED",
+          "SERVICE_UNAVAILABLE",
+          "SESSION_REVOKED",
+          "SUBSCRIPTION_NOT_STARTED",
+          "TEMPORARY_FAILURE",
+          "VALIDATION_FAILED",
+          "VERSION_CONFLICT"
+        ],
+        "transaction_class": "auth",
+        "transaction_guarantee": "Own account calendar credential; live org/link/role/plan checks, immutable metadata and receipt; URL never stored in receipt.",
+        "transition": {
+          "effect": "own_calendar_calendar_link_revoke",
+          "from": [],
+          "to": [],
+          "invariant": "Own active account, explicit organization and kinds; current credential and live business authority, no external edit operation."
+        },
+        "semantic_guards": [
+          "live_account_and_org_link",
+          "own_calendar_link",
+          "current_secret_hash",
+          "no_other_participants_or_finance",
+          "live_actor_and_scope"
+        ],
+        "audit": true,
+        "notification": "none",
+        "concurrency": "Live original permission/tenant scope on every request; target/aggregate lock; row_version; idempotent receipt and all declared effects rollback together",
+        "expected_version_subject": "personal calendar link via calendar_links_get_v1",
+        "acceptance_scenario_ids": [
+          "A01",
+          "A02",
+          "A03",
+          "A23",
+          "A24",
+          "A25",
+          "A46",
+          "A47",
+          "A55"
+        ],
+        "configuration_policy": "numeric plan limits/prices and legal approval are deployment configuration, never arbitrary allow/deny",
+        "implementation_status": "operational_development_limited",
+        "required_features": [],
+        "runtime_required_features": [],
+        "conditional_features": [],
+        "operation_contract": {
+          "kind": "auth",
+          "target_entity": "accounts",
+          "version_mode": "row_version",
+          "version_field": "expected_version",
+          "read_operation": "calendar_links_get_v1",
+          "atomic_effects": [
+            "personal_calendar_credential_change",
+            "personal_calendar_metadata_history",
+            "receipt"
+          ],
+          "business_commit": true,
+          "read_path_status": "implemented",
+          "source_decision": "FD05/FD12"
+        },
+        "decision_delivery": {
+          "accepted_contract": "DS-2026-10-17",
+          "runtime_conformance": "implemented_pending_ci",
+          "open_dependencies": [],
+          "target_request": {
+            "$ref": "#/$defs/Request_calendar_link_revoke"
+          }
+        },
+        "runtime_path": "/functions/v1/backend-v1/calendar_link_revoke_v1",
+        "runtime_rpc": "api_v1.calendar_link_revoke_v1",
+        "runtime_external_path": "/functions/v1/backend-v1/calendar_link_revoke_v1",
+        "runtime_limits": [
+          "Starter kinds are lessons/duties; event calendars remain unavailable. Explicit selection; no automatic link.",
+          "Public ICS adapter and application origins plus signing key must be configured; no implicit URL.",
+          "Create/rotate URLs are added only by Edge after receipt handling; only token hashes are stored. Current live pointer and scope are rechecked before replay and each feed fetch."
+        ]
+      },
+      {
+        "name": "calendar_feed_get_v1",
+        "module": "M02",
+        "features": [
+          "F08"
+        ],
+        "permission": "calendar.feed",
+        "actor_source": "public_request_context",
+        "transport": "R",
+        "billing_class": "read",
+        "request": {
+          "$ref": "#/$defs/Request_calendar_feed_get"
+        },
+        "success": {
+          "$ref": "#/$defs/Success_calendar_feed_get"
+        },
+        "errors": [
+          "BOT_VERIFICATION_FAILED",
+          "RATE_LIMITED",
+          "SERVICE_UNAVAILABLE",
+          "TEMPORARY_FAILURE",
+          "VALIDATION_FAILED",
+          "CLIENT_UPDATE_REQUIRED",
+          "INTEGRITY_VIOLATION"
+        ],
+        "transaction_class": "read",
+        "transaction_guarantee": "Own account calendar credential; live org/link/role/plan checks, immutable metadata and receipt; URL never stored in receipt.",
+        "transition": {
+          "effect": "own_calendar_calendar_feed_get",
+          "from": [],
+          "to": [],
+          "invariant": "Own active account, explicit organization and kinds; current credential and live business authority, no external edit operation."
+        },
+        "semantic_guards": [
+          "live_account_and_org_link",
+          "own_calendar_link",
+          "current_secret_hash",
+          "no_other_participants_or_finance",
+          "live_actor_and_scope"
+        ],
+        "audit": false,
+        "notification": "none",
+        "concurrency": "Live original permission/tenant/field scope on every request; filter/sort/cursor-bound projection; no business writes",
+        "expected_version_subject": "none",
+        "acceptance_scenario_ids": [
+          "A01",
+          "A02",
+          "A03",
+          "A23",
+          "A24",
+          "A25",
+          "A46",
+          "A47",
+          "A55"
+        ],
+        "configuration_policy": "numeric plan limits/prices and legal approval are deployment configuration, never arbitrary allow/deny",
+        "implementation_status": "operational_development_limited",
+        "required_features": [],
+        "runtime_required_features": [],
+        "conditional_features": [
+          {
+            "feature": "F08",
+            "when": "calendar_link_create_rotate_or_feed",
+            "mode": "required_if_selected"
+          }
+        ],
+        "operation_contract": {
+          "kind": "read",
+          "target_entity": "accounts",
+          "version_mode": "none",
+          "version_field": null,
+          "read_operation": null,
+          "atomic_effects": [],
+          "business_commit": false,
+          "read_path_status": "not_required",
+          "source_decision": "FD05/FD12"
+        },
+        "decision_delivery": {
+          "accepted_contract": "DS-2026-10-17",
+          "runtime_conformance": "implemented_pending_ci",
+          "open_dependencies": [],
+          "target_request": {
+            "$ref": "#/$defs/Request_calendar_feed_get"
+          }
+        },
+        "runtime_path": "/functions/v1/backend-v1/calendar_feed_get_v1",
+        "runtime_external_path": "/functions/v1/backend-v1/calendar_feed_get_v1",
+        "runtime_rpc": "api_v1.calendar_feed_get_v1",
+        "runtime_limits": [
+          "Starter kinds are lessons/duties; event calendars remain unavailable. Explicit selection; no automatic link.",
+          "Public ICS adapter and application origins plus signing key must be configured; no implicit URL.",
+          "Create/rotate URLs are added only by Edge after receipt handling; only token hashes are stored. Current live pointer and scope are rechecked before replay and each feed fetch."
+        ]
       }
     ],
     "policy_value_map": {
@@ -90864,6 +91830,144 @@
         "origin": "ftksaas",
         "acceptance": "generic_uuid",
         "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/PersonalCalendarLink/properties/id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/PersonalCalendarLink/properties/org_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/PersonalCalendarMutation/properties/operation_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/PersonalCalendarMutation/properties/primary_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/PersonalCalendarCredentialMutation/properties/operation_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/PersonalCalendarCredentialMutation/properties/primary_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Request_calendar_links_get/properties/request_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Request_calendar_link_create/properties/request_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Request_calendar_link_create/properties/operation_key",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Request_calendar_link_create/properties/organization_scope/properties/org_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Request_calendar_link_rotate/properties/request_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Request_calendar_link_rotate/properties/operation_key",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Request_calendar_link_rotate/properties/organization_scope/properties/org_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Request_calendar_link_rotate/properties/link_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Request_calendar_link_revoke/properties/request_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Request_calendar_link_revoke/properties/operation_key",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Request_calendar_link_revoke/properties/link_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Request_calendar_feed_get/properties/request_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Success_calendar_links_get/properties/trace_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Success_calendar_link_create/properties/trace_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Success_calendar_link_rotate/properties/trace_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Success_calendar_link_revoke/properties/trace_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Success_calendar_feed_get/properties/trace_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
       }
     ],
     "open_product_decisions": [],
@@ -91213,13 +92317,18 @@
         "job_status_get_v1",
         "audit_list_v1",
         "media_get_v1",
-        "settings_template_resolve_v1"
+        "settings_template_resolve_v1",
+        "calendar_links_get_v1",
+        "calendar_link_create_v1",
+        "calendar_link_rotate_v1",
+        "calendar_link_revoke_v1",
+        "calendar_feed_get_v1"
       ],
       "auth": "Supabase getUser + live auth.sessions + current account/link/role; no request actor claims",
       "uuid": "backend uuid@14.0.3 v7 for all inserted IDs; DB defaults not required",
       "external_transport": "POST /functions/v1/backend-v1/{operation}; direct typed request body",
       "internal_rpc": "service-only api_v1 named functions; actor/session/UUID bank supplied by verified gateway",
-      "migration_count": 73,
+      "migration_count": 76,
       "test_evidence": "P06 acceptance is registered through registry.test.mjs; candidate/main full clean evidence is pending",
       "frontend_unchanged": true
     },
@@ -91911,7 +93020,12 @@
         "account_totp_remove_v1",
         "account_google_link_prepare_v1",
         "media_get_v1",
-        "settings_template_resolve_v1"
+        "settings_template_resolve_v1",
+        "calendar_links_get_v1",
+        "calendar_link_create_v1",
+        "calendar_link_rotate_v1",
+        "calendar_link_revoke_v1",
+        "calendar_feed_get_v1"
       ],
       "runtime_deliveries": {
         "starter_attendance_protection": {
@@ -92402,7 +93516,13 @@
           "session_get_v1",
           "session_change_preview_v1",
           "session_change_apply_v1",
-          "session_capacity_set_v1"
+          "session_capacity_set_v1",
+          "calendar_get_v1",
+          "calendar_links_get_v1",
+          "calendar_link_create_v1",
+          "calendar_link_rotate_v1",
+          "calendar_link_revoke_v1",
+          "calendar_feed_get_v1"
         ],
         "dependencies": [],
         "implementation": "implemented_acceptance_pending",
@@ -92416,7 +93536,13 @@
           "session_get_v1",
           "session_change_preview_v1",
           "session_change_apply_v1",
-          "session_capacity_set_v1"
+          "session_capacity_set_v1",
+          "calendar_get_v1",
+          "calendar_links_get_v1",
+          "calendar_link_create_v1",
+          "calendar_link_rotate_v1",
+          "calendar_link_revoke_v1",
+          "calendar_feed_get_v1"
         ],
         "contract_only_operations": [],
         "acceptance_case_ids": [

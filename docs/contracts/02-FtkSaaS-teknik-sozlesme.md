@@ -1125,6 +1125,8 @@ Teknik süre/rate backend işidir. Dış e-posta teslimi ertelenmiş kalır; ür
 | Geçmişten öneri | Org bazında default kapalı; kullanıcı açabilir. |
 | Kişisel takvim | Kesin ders, kesin event ve yetkili eğitmen/personel görevleri ayrı seçilir. Bağlantı kendiliğinden oluşturulmaz; oluştururken tür seçilir. İçerik başlık/tarih-saat/yer/uygulama bağlantısı; başkaları/borç/ödeme yok. |
 
+ST-03 kişisel takvim adayı, global own-account credential lifecycle komutları ve explicit org/kinds ile oluşturulur. Starter'da lessons/duties; event kapalıdır. Salt okunur token feed'i canlı account/org/link/plan/selected-session ve kesin kendi katılım/görevini denetler; başlık/UTC zaman/yer/uygulama linki dışına veri aktarmaz. Tek seans UID'si, rotate/revoke ve metadata-only receipt korunur. [API, teknik hazır olma, HTTP adapter ve kabul sınırı](../frontend-settings-handover.md#kişisel-takvim-bağlantısı--aday).
+
 ##### FD06 — iş takvimi program rezervasyon (kabul edildi)
 
 ST-03 teknik eşleme adayı: organization/center `program_duration_minutes` kapalı integer önerisi sistem60'tır. Yeni merkez o anki org önerisini ve sürümünü kopyalar; mevcut merkez/programlar taşınmaz. Açık yerel seçim eşit değerde de yereldir. `SettingsView.program_duration_source` kaynak bilgisidir, yazılamaz. `ProgramSpec.duration_minutes` gönderilmezse merkezin hazırlık değeri preview spec'ine açık olarak alınır; gönderilirse açık değer üstündür. Sonraki ayar değişimi preview/program snapshot'ını değiştirmez. Seçili reset org şablonuna değil sistem60'a döner. Yetki/sürüm/replay mevcut settings ve program komutlarında korunur.

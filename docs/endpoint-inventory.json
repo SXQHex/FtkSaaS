@@ -5795,6 +5795,131 @@
         "Private member templates by default; explicit scoped center/org templates confer no data or execution permission.",
         "Prepared values are an explicit request snapshot. No automatic job/apply, financial defaults, merge, automation or external send."
       ]
+    },
+    {
+      "name": "calendar_links_get_v1",
+      "status": "operational_development_limited",
+      "external_path": "/functions/v1/backend-v1/calendar_links_get_v1",
+      "permission": "calendar.self",
+      "features": [
+        "F08"
+      ],
+      "required_features": [],
+      "runtime_required_features": [],
+      "decision_delivery": {
+        "accepted_contract": "DS-2026-10-17",
+        "runtime_conformance": "implemented_pending_ci",
+        "open_dependencies": [],
+        "target_request": {
+          "$ref": "#/$defs/Request_calendar_links_get"
+        }
+      },
+      "billing_class": "read",
+      "limits": [
+        "Starter kinds are lessons/duties; event calendars remain unavailable. Explicit selection; no automatic link.",
+        "Public ICS adapter and application origins plus signing key must be configured; no implicit URL.",
+        "Create/rotate URLs are added only by Edge after receipt handling; only token hashes are stored. Current live pointer and scope are rechecked before replay and each feed fetch."
+      ]
+    },
+    {
+      "name": "calendar_link_create_v1",
+      "status": "operational_development_limited",
+      "external_path": "/functions/v1/backend-v1/calendar_link_create_v1",
+      "permission": "calendar.self",
+      "features": [
+        "F08"
+      ],
+      "required_features": [],
+      "runtime_required_features": [],
+      "decision_delivery": {
+        "accepted_contract": "DS-2026-10-17",
+        "runtime_conformance": "implemented_pending_ci",
+        "open_dependencies": [],
+        "target_request": {
+          "$ref": "#/$defs/Request_calendar_link_create"
+        }
+      },
+      "billing_class": "config",
+      "limits": [
+        "Starter kinds are lessons/duties; event calendars remain unavailable. Explicit selection; no automatic link.",
+        "Public ICS adapter and application origins plus signing key must be configured; no implicit URL.",
+        "Create/rotate URLs are added only by Edge after receipt handling; only token hashes are stored. Current live pointer and scope are rechecked before replay and each feed fetch."
+      ]
+    },
+    {
+      "name": "calendar_link_rotate_v1",
+      "status": "operational_development_limited",
+      "external_path": "/functions/v1/backend-v1/calendar_link_rotate_v1",
+      "permission": "calendar.self",
+      "features": [
+        "F08"
+      ],
+      "required_features": [],
+      "runtime_required_features": [],
+      "decision_delivery": {
+        "accepted_contract": "DS-2026-10-17",
+        "runtime_conformance": "implemented_pending_ci",
+        "open_dependencies": [],
+        "target_request": {
+          "$ref": "#/$defs/Request_calendar_link_rotate"
+        }
+      },
+      "billing_class": "config",
+      "limits": [
+        "Starter kinds are lessons/duties; event calendars remain unavailable. Explicit selection; no automatic link.",
+        "Public ICS adapter and application origins plus signing key must be configured; no implicit URL.",
+        "Create/rotate URLs are added only by Edge after receipt handling; only token hashes are stored. Current live pointer and scope are rechecked before replay and each feed fetch."
+      ]
+    },
+    {
+      "name": "calendar_link_revoke_v1",
+      "status": "operational_development_limited",
+      "external_path": "/functions/v1/backend-v1/calendar_link_revoke_v1",
+      "permission": "calendar.self",
+      "features": [
+        "F08"
+      ],
+      "required_features": [],
+      "runtime_required_features": [],
+      "decision_delivery": {
+        "accepted_contract": "DS-2026-10-17",
+        "runtime_conformance": "implemented_pending_ci",
+        "open_dependencies": [],
+        "target_request": {
+          "$ref": "#/$defs/Request_calendar_link_revoke"
+        }
+      },
+      "billing_class": "config",
+      "limits": [
+        "Starter kinds are lessons/duties; event calendars remain unavailable. Explicit selection; no automatic link.",
+        "Public ICS adapter and application origins plus signing key must be configured; no implicit URL.",
+        "Create/rotate URLs are added only by Edge after receipt handling; only token hashes are stored. Current live pointer and scope are rechecked before replay and each feed fetch."
+      ]
+    },
+    {
+      "name": "calendar_feed_get_v1",
+      "status": "operational_development_limited",
+      "external_path": "/functions/v1/backend-v1/calendar_feed_get_v1",
+      "permission": "calendar.feed",
+      "features": [
+        "F08"
+      ],
+      "required_features": [],
+      "runtime_required_features": [],
+      "decision_delivery": {
+        "accepted_contract": "DS-2026-10-17",
+        "runtime_conformance": "implemented_pending_ci",
+        "open_dependencies": [],
+        "target_request": {
+          "$ref": "#/$defs/Request_calendar_feed_get"
+        }
+      },
+      "billing_class": "read",
+      "limits": [
+        "Starter kinds are lessons/duties; event calendars remain unavailable. Explicit selection; no automatic link.",
+        "Public ICS adapter and application origins plus signing key must be configured; no implicit URL.",
+        "Create/rotate URLs are added only by Edge after receipt handling; only token hashes are stored. Current live pointer and scope are rechecked before replay and each feed fetch."
+      ]
     }
   ]
 }

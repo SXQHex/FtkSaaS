@@ -1,6 +1,6 @@
 # FtkSaaS — API kataloğu · 0.2.0-rc.3
 
-215 sözleşme; 215 geliştirme ortamında çağrılabilir endpoint, 0 yalnız sözleşme. Çağrılabilir olmak bütün ürün özelliklerinin veya üretim kabulünün tamamlandığı anlamına gelmez. Kapsam sınırları ve Q-E01 `docs/claude-handover.md` içindedir.
+220 sözleşme; 220 geliştirme ortamında çağrılabilir endpoint, 0 yalnız sözleşme. Çağrılabilir olmak bütün ürün özelliklerinin veya üretim kabulünün tamamlandığı anlamına gelmez. Kapsam sınırları ve Q-E01 `docs/claude-handover.md` içindedir.
 
 `POST {API_URL}/functions/v1/backend-v1/{operation}`; JSON gövde doğrudan typed Request nesnesidir. Header: `Authorization: Bearer <Supabase access_token>`, `apikey: <publishable key>`, `Content-Type: application/json`. Başarı: `ok/data/trace_id`; hata: `ok:false/error:SafeError`. Servis anahtarı frontend’e verilmez.
 
@@ -223,6 +223,11 @@ Named `/rest/v1/rpc/{operation}` yalnız backend içindir; imzası p_request + d
 | `account_google_link_prepare_v1` | çağrılabilir (kapsam notları geçerli) | `account.self` | H / exempt | client_api_version: 1; request_id: FtkUuid; reauth: ReauthProof; google_id_token: string | Success_account_google_link_prepare |
 | `media_get_v1` | çağrılabilir (kapsam notları geçerli) | `media.read` | R / read | client_api_version: 1; request_id: FtkUuid; scope: user / organization / lesson_participant; asset_id: FtkUuid; org_id?: FtkUuid; session_id?: FtkUuid; person_id?: FtkUuid | Success_media_get |
 | `settings_template_resolve_v1` | çağrılabilir (kapsam notları geçerli) | `templates.resolve` | R / read | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; center_id?: FtkUuid ∣ null; kind: report / import; template: WorkTemplateReference; overrides?: ReportTemplateOverrides ∣ ImportTemplateOverrides | Success_settings_template_resolve |
+| `calendar_links_get_v1` | çağrılabilir (kapsam notları geçerli) | `calendar.self` | R / read | client_api_version: 1; request_id: FtkUuid; page: Page | Success_calendar_links_get |
+| `calendar_link_create_v1` | çağrılabilir (kapsam notları geçerli) | `calendar.self` | W / config | client_api_version: 1; request_id: FtkUuid; operation_key: FtkUuid; organization_scope: object; kinds: lessons / duties[] | Success_calendar_link_create |
+| `calendar_link_rotate_v1` | çağrılabilir (kapsam notları geçerli) | `calendar.self` | W / config | client_api_version: 1; request_id: FtkUuid; operation_key: FtkUuid; organization_scope: object; link_id: FtkUuid; expected_version: PositiveInt | Success_calendar_link_rotate |
+| `calendar_link_revoke_v1` | çağrılabilir (kapsam notları geçerli) | `calendar.self` | W / config | client_api_version: 1; request_id: FtkUuid; operation_key: FtkUuid; link_id: FtkUuid; expected_version: PositiveInt | Success_calendar_link_revoke |
+| `calendar_feed_get_v1` | çağrılabilir (kapsam notları geçerli) | `calendar.feed` | R / read | client_api_version: 1; request_id: FtkUuid; token: string | Success_calendar_feed_get |
 
 ## İşlem bazında hedef sözleşme ve runtime ayrımı
 
@@ -445,6 +450,11 @@ features ürün referanslarıdır. required_features hedef plan kapısı; runtim
 | account_google_link_prepare_v1 | auth | none / account_get_v1 | bounded_google_link_intent | implemented_pending_ci |
 | media_get_v1 | read | none / None |  | implemented_pending_ci |
 | settings_template_resolve_v1 | read | none / None |  | implemented_pending_ci |
+| calendar_links_get_v1 | read | none / None |  | implemented_pending_ci |
+| calendar_link_create_v1 | auth | none / calendar_links_get_v1 | personal_calendar_credential_change, personal_calendar_metadata_history, receipt | implemented_pending_ci |
+| calendar_link_rotate_v1 | auth | row_version / calendar_links_get_v1 | personal_calendar_credential_change, personal_calendar_metadata_history, receipt | implemented_pending_ci |
+| calendar_link_revoke_v1 | auth | row_version / calendar_links_get_v1 | personal_calendar_credential_change, personal_calendar_metadata_history, receipt | implemented_pending_ci |
+| calendar_feed_get_v1 | read | none / None |  | implemented_pending_ci |
 
 Önizleme süre sınırı 15 dakika. Apply canlı aktör/yetki/abonelik ve ilgili satır sürümlerini yeniden denetler. İdempotency kapsamı org + hesap + operasyon; merkez payload içindedir. Aynı anahtar/aynı içerik sonucu tekrarlar, farklı içerik reddedilir. Doğrulanmamış transport sonucunda yeni anahtar üretilmez.
 

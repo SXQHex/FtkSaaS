@@ -1,3 +1,4 @@
+import './personal-calendar-acceptance.mjs';
 import './frontend-settings-acceptance.mjs';
 import test from 'node:test';
 import './p05-acceptance.mjs';

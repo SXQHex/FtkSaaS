@@ -16,7 +16,8 @@
     "dev:seed": "node scripts/dev-seed.mjs",
     "test:clean": "node scripts/test-clean.mjs",
     "test:governance": "node scripts/governance.mjs && node --test tests/governance.test.mjs",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "calendar:proxy": "node transports/calendar-proxy.mjs"
   },
   "type": "module",
   "devDependencies": {

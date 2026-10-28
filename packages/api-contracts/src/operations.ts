@@ -216,4 +216,9 @@ export interface Operations {
   account_google_link_prepare_v1: {request: T.RequestAccountGoogleLinkPrepare; response: T.SuccessAccountGoogleLinkPrepare};
   media_get_v1: {request: T.RequestMediaGet; response: T.SuccessMediaGet};
   settings_template_resolve_v1: {request: T.RequestSettingsTemplateResolve; response: T.SuccessSettingsTemplateResolve};
+  calendar_links_get_v1: {request: T.RequestCalendarLinksGet; response: T.SuccessCalendarLinksGet};
+  calendar_link_create_v1: {request: T.RequestCalendarLinkCreate; response: T.SuccessCalendarLinkCreate};
+  calendar_link_rotate_v1: {request: T.RequestCalendarLinkRotate; response: T.SuccessCalendarLinkRotate};
+  calendar_link_revoke_v1: {request: T.RequestCalendarLinkRevoke; response: T.SuccessCalendarLinkRevoke};
+  calendar_feed_get_v1: {request: T.RequestCalendarFeedGet; response: T.SuccessCalendarFeedGet};
 }
