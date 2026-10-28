@@ -13,7 +13,7 @@ Kullanıcı Starter'da izinli FD01–FD12 alanlarının tamamını seçti; marka
 | FD | Starter tüketicisi ve mevcut sınır |
 |---|---|
 | FD01 | Dil/format/timezone/tema/ölçek alanları typed; gerçek görüntüleme ve cihaz çözümü istemci kabulüdür, iş timezone'u değişmez. |
-| FD02 | Sistem renk/font fallback'i mevcut; aşağıdaki logo hattı aday. Public alan/logo projection aşağıda eşlenir; somut renk/font asset kataloğu için hazır asset uydurulmaz. |
+| FD02 | Organizasyon üç isteğe bağlı #RRGGBB rengi kullanır; null sistem defaultudur. Hazır renk/font kataloğu gereksinimi kaldırıldı; aşağıdaki logo hattı korunur. |
 | FD03 | Native Auth, Google/TOTP/session/kimlik zinciri kabul edildi; aşağıdaki fotoğraf/medya tüketicisi ve izinli paylaşımı adaydır. |
 | FD04 | in_app amaç tercihleri ve zorunlu teslim mevcut; aşağıdaki typed kullanılabilirlik kataloğu ve desteklenmeyen kanal koruması uygulanır. Starter'a F27 hatırlatma veya dış kanal açılmaz. |
 | FD05 | Kesin gelecek/devam eden ortak ders kitlesinde canlı profil/iletişim/fotoğraf ve kişisel takvim aşağıda eşlenir. İlgi filtresi ve opt-in geçmiş sırası mevcut yetkili takvim okumasında aşağıda eşlenir. |
@@ -58,10 +58,10 @@ Scope user/platform organizasyonsuz; member/organization için org_id; center i�
 | user (20) | Kendi aktif global hesabı | `honorific`, `language`, `date_format`, `time_format`, `number_format`, `week_start`, `timezone_mode`, `theme`, `contrast`, `motion`, `remember_context`, `calendar_view`, `show_weekends`, `marketing_in_app`, `ad_personalization`, `ad_measurement`, `optional_analytics`, `timezone_name`, `font_scale`, `startup_context` |
 | member (11) | O orgdaki kendi aktif doğrulanmış hesap bağlantısı; admin başkasının tercihini yazamaz | `profile_visible`, `photo_visible`, `email_visible`, `phone_visible`, `history_recommendations`, `interest_center_ids`, `interest_discipline_ids`, `in_app_reminders`, `in_app_marketing`, `report_templates`, `import_templates` |
 | center (12) | Tam merkezde canlı CM; Owner/OM tek başına merkez işletim yetkisi vermez | `description`, `address`, `contact_phone`, `contact_email`, `program_duration_minutes`, `report_templates`, `import_templates`, `public_profile_enabled`, `public_fields`, `public_hours`, `availability_templates`, `package_templates` |
-| organization (17) | Canlı Owner/OM; billing_* yalnız Owner | `description`, `address`, `contact_phone`, `contact_email`, `theme_package_id`, `font_package_id`, `billing_name`, `billing_address`, `billing_email`, `program_duration_minutes`, `report_templates`, `import_templates`, `public_profile_enabled`, `public_fields`, `public_hours`, `availability_templates`, `package_templates` |
+| organization (20) | Canlı Owner/OM; billing_* yalnız Owner | `description`, `address`, `contact_phone`, `contact_email`, `theme_package_id`, `font_package_id`, `primary_color`, `secondary_color`, `accent_color`, `billing_name`, `billing_address`, `billing_email`, `program_duration_minutes`, `report_templates`, `import_templates`, `public_profile_enabled`, `public_fields`, `public_hours`, `availability_templates`, `package_templates` |
 | platform (4) | Canlı private.platform_operators kaydı | `application_name`, `support_email`, `support_url`, `maintenance_message` |
 
-theme_package_id/font_package_id şu anda salt okunur sistem fallback null değeridir; katalogda hazır paket yoktur. Seçilmiş/erişilebilirlik-dil/lisans kontrolü yapılmış assetler olmadan keyfi renk/font kabul edilmez. Center marka override yoktur.
+`theme_package_id`/`font_package_id` yalnız null kabul eden salt okunur yer tutucular olarak korunur. Organizasyonun `primary_color`, `secondary_color`, `accent_color` alanları null veya tam #RRGGBB (altı hex hane, büyük/küçük harf) kabul eder; boş tercih null gönderilir ve sistem varsayılanını kullanır. Boş metin/geçersiz biçim reddedilir. Canlı Owner/OM, expected_version, idempotency, bağımsız reset ve immutable değişiklik geçmişi mevcut settings API zincirinde korunur. Center override yoktur. Açık/koyu tema, kontrast, işlevsel durum renkleri ve fontlar sistem tarafından yönetilir; kişisel erişilebilirlik tercihleri korunur. Bu karar önceki hazır renk/font kataloğu gereksiniminin yerini alır.
 
 ## Özel fotoğraf ve logo tüketicisi — aday
 

@@ -1053,7 +1053,7 @@ Aşağıdaki tablo kapsam eşlemesidir; o gruptaki her alt seçeneğin değeri v
 | Paket | Frontend kapsamı | Durum / kesinleşen alan |
 |---|---|---|
 | FD01 | user; platform default/katalog | Kabul edildi — dil/bölge/görünüm başlangıçları. |
-| FD02 | organization; platform marka kataloğu | Kabul edildi — hazır renk/font/logo, yetki ve bağımsız reset. |
+| FD02 | organization; sistem görünümü | Kabul edildi — üç isteğe bağlı renk, logo, yetki ve bağımsız reset; hazır renk/font kataloğu yok. |
 | FD03 | user; org/platform yöntem kullanılabilirliği | Kabul edildi — profil alanları, ilk login/MFA ve güvenlik görünümü. |
 | FD04 | user/member; center/org/platform kanal-şablon | Kabul edildi — bildirim matrisi, hatırlatma seçenekleri, özet/sessiz saat ve pazarlama defaultları. |
 | FD05 | member; organization izinli kitle | Kabul edildi — katılımcı görünürlüğü, ilgi/öneri ve takvim türleri. |
@@ -1076,17 +1076,16 @@ Aşağıdaki tablo kapsam eşlemesidir; o gruptaki her alt seçeneğin değeri v
 | Erişilebilirlik | Cihaz yazı ölçeği/azaltılmış hareketi izle; açık uygulama tercihi S08 hesabı/cihaz ayrımıyla. |
 | Takvim başlangıcı | Hafta görünümü, hafta sonu görünür; kullanıcı değiştirebilir. |
 
-##### FD02 — hazır marka (kabul edildi)
+##### FD02 — organizasyon marka renkleri (28 Ekim güncel karar)
 
 | Alan | Kabul edilen seçenek/default |
 |---|---|
-| Seçim | Renk paketi ve başlık/gövde font paketi ayrı; yalnız platformun uyumlu sunduğu birleşimler. Başlangıç sistem varsayılanı. |
-| İlk özelleştirme | Hazır paket; serbest renk/CSS/özel font yükleme yok. Somut renk/font/adları frontend hazırlar, erişilebilirlik/dil kontrolü sonrası platform kataloğuna alınır; Akış/Sahne/Atölye kesinleşmedi. |
-| Yazma yetkisi | Owner ve açık yetkilendirilmiş OM. İlk teslimde ayrı merkez markası yok; merkez org markasını kullanır. |
-| Kullanıcı tercihi | Açık/koyu/sistem, ölçek ve erişilebilirlik markadan bağımsız. |
-| Logo | PNG/JPEG/WebP yükle-değiştir-kaldır; ilk kapsamda SVG/animasyon yok. Kaldırınca org adı ve sistem yedek simgesi. Teknik boyut limitleri backend'de. |
-| Reset ve katalog ömrü | Renk/font ayrı ayrı sistem defaultuna döner; logo ayrı kaldırılır. Katalogdan kaldırma yeni seçimleri kapatır; mevcut kullanım destek/fallback durumu açık yönetilir. |
-| Public okuma | Yalnız yayımlanmış org bağlamında marka/logo; iç ayar bilgileri açılmaz. |
+| Organizasyon renkleri | `primary_color`, `secondary_color`, `accent_color`: isteğe bağlı tam `#RRGGBB` veya null; null sistem varsayılanıdır. Boş metin geçersizdir; boş tercih null gönderilir. |
+| Paket yer tutucuları | `theme_package_id` ve `font_package_id` aynen kalır: yalnız null, seçilemez. Hazır renk/font kataloğu gereksinimi kaldırılmıştır. |
+| Yazma yetkisi | Canlı Owner/OM; existing expected_version/idempotency ve değişiklik geçmişi korunur. Merkez renk override yoktur. |
+| Sistem görünümü | Açık/koyu tema, kontrast ve işlevsel durum renkleri sistem denetimindedir; marka bunları değiştirmez. Kişisel erişilebilirlik tercihleri korunur. |
+| Reset | Üç renk ayrı veya birlikte null/system defaultuna döner; logo ayrı kaldırılır. |
+| Logo/public | Mevcut PNG/JPEG/WebP ve yayımlanmış alan sınırı korunur; bu karar yeni public veri yayını açmaz. |
 
 ##### FD03 — profil giriş ve güvenlik (kabul edildi)
 
@@ -1233,17 +1232,9 @@ ST-03 teknik eşleme adayı: `ImportMapping.delimiter` opsiyonel kapalı virgül
 Henüz seçilmemiş somut marka paket adları/font/renk assetleri frontend hazırlığıdır; serbest renk veya keyfî font/CSS yetkisi değildir. Onaylanmış yeni hesap/org defaultları mevcut kişilerin/kurumların açık değerlerini ezmez. Backend B01–B09 ertelemesi ve üretim P08 işleri korunur. Bu belge güncellemesinde **hiçbir runtime, default veya canlı veri değişmedi**.
 
 
-### Frontend PR43 — organizasyon renk ve font paketleri
+### Frontend PR43 — önceki marka paketi talebinin güncel karşılığı
 
-[PR43](https://github.com/SXQHex/FtkSaaS/pull/43), `3eaa0cff6173a81db97d779c8f2ba679f124a869` kaynağında frontend oturumunda kabul edilmiş hazır marka paketi ihtiyacını iletiyor. Yeni bir 70. ana grup değildir; organizasyon O01 kimlik/marka, S08 kişisel görünüm ve platform P01/P04 katalog/default sınırlarıyla eşlenir. Bu not PR43'ün merge edildiği veya API'sinin hazır olduğu anlamına gelmez; başka branch'in değişikliği bu teslimde üzerine yazılmaz.
-
-- Organizasyon hazır renk paleti ve başlık/gövde font paketini seçer; ilk kapsam serbest renk, özel font yükleme veya rastgele CSS/HTML değildir.
-- Marka ile kullanıcının açık/koyu/sistem ve erişilebilirlik tercihleri ayrıdır. Semantik hata/uyarı/başarı/odak ve renk dışı anlatım sistem denetiminde kalır; kontrast/dil glifleri/Türkçe/LTR-RTL kontrolü gerekir.
-- Frontend paket token/font eşlemesi ve render'ı; backend izinli katalog/kalıcı seçim/canlı org yetkisi/sürüm/denetim sözleşmesini sağlar. Mevcut organization_update yalnız name alanını yazar; hazır theme/font read-write veya logo desteği buradan türetilemez.
-- Alan matrisi; kararlı paket kimlik/sürüm/seçilebilirlik/default, org seçimi okuma-yazma-reset, logo sahipliği/tür/boyut/kaldırma, stale/idempotency ve ortak Request/Response/Error/permission eşlemesini içermelidir. theme_package_id/font_package_id öneri adlarıdır; gerçek DTO değildir.
-- Org değiştirme/yenileme/girişte doğru marka, tenant'a bağlı cache temizliği, eski istemci veya tanınmayan paket için güvenli fallback doğrulanır. WebSocket/anlık yayılım SLA'sı kabul edilmedi. Org reseti kişisel tercihi, kişisel reset org markasını değiştirmez.
-- FD02 ile Owner/açık yetkili OM yazması, yalnız yayımlanmış org bağlamında public marka okuması, ilk kapsamda merkez override olmaması ve hazır uyumlu kombinasyon seçimi kesinleşti. Somut paket/font/renk assetleri, lisans/dil kontrolleri, kesin permission eşlemesi ve ilk kapsam dışı plan kilidi/platformun org adına değişikliği ayrıca uygulanacak veya açık aday olarak kalır. Akış/Sahne/Atölye adları yalnız frontend tasarım önerisidir.
-- Uygulama kabulü yetkili/yetkisiz/geri alınmış erişim, A/B org geçişi, sürüm yarışı/retry, fallback/erişilebilirlik, bağımsız reset/logo kaldırma ve desteklenmeyen kayıtta sahte başarı üretmemeyi kapsar. Backend API ve gerçek frontend E2E ayrı kanıtlanır.
+[PR43](https://github.com/SXQHex/FtkSaaS/pull/43) hazır marka talebi, 28 Ekim kullanıcının FD02 kararıyla değiştirilmiştir: paket seçimi yerine organizasyonda üç isteğe bağlı renk; mevcut null-only paket alanları korunur. Sözleşme ve tüketim yukarıdaki FD02 ve [alan devri](../frontend-settings-handover.md) üzerinden yürür. Frontend dosyası veya tasarımı bu backend değişikliğiyle değiştirilmez. Eski hazır asset/lisans/katalog işi kapanış koşulu değildir.
 
 ### Frontend için geliştirme sınırı
 

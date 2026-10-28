@@ -193,3 +193,5 @@ assert next(Path("supabase/migrations").glob("*_starter_availability_day_boundar
 assert next(Path("supabase/migrations").glob("*_starter_availability_management.sql")).read_text()==Path("database/starter-availability-management.sql").read_text(),"Availability management source drift"
 
 assert next(Path("supabase/migrations").glob("*_starter_availability_management_asof.sql")).read_text()==Path("database/starter-availability-management-asof.sql").read_text(),"Availability management snapshot source drift"
+
+assert next(Path('supabase/migrations').glob('*_organization_brand_colors.sql')).read_text()==Path('database/organization-brand-colors.sql').read_text(),'Organization brand colors migration source drift'

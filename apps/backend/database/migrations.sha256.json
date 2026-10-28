@@ -80,5 +80,6 @@
   "20261028012813_starter_calendar_preferences.sql": "2be88b4438f1a2124de112e672cf1473baf2e5c57af5e9c8ea37f8d0763cfbca",
   "20261028013253_starter_availability_day_boundaries.sql": "6c427947e31a7171fe63e84964524e1a0645bb76d9288534c9cfe0081b85be76",
   "20261028175405_starter_availability_management.sql": "55c5f4129982e88f7dcf49173fb7d8f97af48bd57de54d9b20a42ce2e3a93d4d",
-  "20261028180210_starter_availability_management_asof.sql": "94faca5fcb311f1cf2c910cc3a0eab20ba827dafeeffa6d5d6080aade0f0950d"
+  "20261028180210_starter_availability_management_asof.sql": "94faca5fcb311f1cf2c910cc3a0eab20ba827dafeeffa6d5d6080aade0f0950d",
+  "20261028203952_organization_brand_colors.sql": "b0631f4fe4abd1144fcfc742284f153d74cf47a923c9a92928e3a2894a670b64"
 }

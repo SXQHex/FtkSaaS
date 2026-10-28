@@ -1,5 +1,5 @@
 {
-  "version": 8,
+  "version": 9,
   "fields": [
     {
       "scope": "user",
@@ -2046,6 +2046,66 @@
       "default": [],
       "group": "M07",
       "consumer": "domain_preparation_resolve"
+    },
+    {
+      "scope": "organization",
+      "key": "primary_color",
+      "schema": {
+        "anyOf": [
+          {
+            "type": "string",
+            "pattern": "^#[0-9A-Fa-f]{6}$",
+            "minLength": 7,
+            "maxLength": 7
+          },
+          {
+            "type": "null"
+          }
+        ]
+      },
+      "default": null,
+      "group": "O01",
+      "consumer": "frontend"
+    },
+    {
+      "scope": "organization",
+      "key": "secondary_color",
+      "schema": {
+        "anyOf": [
+          {
+            "type": "string",
+            "pattern": "^#[0-9A-Fa-f]{6}$",
+            "minLength": 7,
+            "maxLength": 7
+          },
+          {
+            "type": "null"
+          }
+        ]
+      },
+      "default": null,
+      "group": "O01",
+      "consumer": "frontend"
+    },
+    {
+      "scope": "organization",
+      "key": "accent_color",
+      "schema": {
+        "anyOf": [
+          {
+            "type": "string",
+            "pattern": "^#[0-9A-Fa-f]{6}$",
+            "minLength": 7,
+            "maxLength": 7
+          },
+          {
+            "type": "null"
+          }
+        ]
+      },
+      "default": null,
+      "group": "O01",
+      "consumer": "frontend"
     }
   ]
 }

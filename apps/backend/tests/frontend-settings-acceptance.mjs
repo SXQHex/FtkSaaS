@@ -72,8 +72,26 @@ test('Frontend settings scoped persistence, live authority, reset and delivery p
     await fail('FORBIDDEN',owner,'settings_update_v1',updateBody,updateKey);
     await fail('FORBIDDEN',owner,'settings_reset_apply_v1',resetBody,resetKey);
     await fail('FORBIDDEN',owner,'settings_reset_preview_v1',{...q,fields:['billing_name']});
-    const current=await read(owner,q);await write(owner,q,{description:'Still an organization manager'},current.version);
+    const current=await read(owner,q);await write(owner,q,{description:'Still an organization manager',primary_color:'#102030'},current.version);
    }finally{await must(platform,'platform_owner_set_v1',{org_id:org,verified_account_id:account.id,reason:'Restore synthetic owner'},key());}
+  });
+  await t.test('organization brand colors are closed, versioned, audited and resettable without center overrides',async()=>{
+   const q={scope:'organization',org_id:org},fields=['primary_color','secondary_color','accent_color'];
+   const initial=await read(owner,q);assert.equal(initial.values.primary_color,'#102030');for(const f of ['secondary_color','accent_color'])assert.equal(initial.values[f],null);
+   assert.equal(initial.values.theme_package_id,null);assert.equal(initial.values.font_package_id,null);
+   const patch={primary_color:'#12aBcF',secondary_color:'#000000',accent_color:'#FFFFFF'};
+   const saved=await write(owner,q,patch,initial.version);assert.equal(saved.version,initial.version+1);
+   const current=await read(owner,q);for(const f of fields)assert.equal(current.values[f],patch[f]);
+   await fail('VERSION_CONFLICT',owner,'settings_update_v1',{...q,patch:{primary_color:null},expected_version:initial.version},key());
+   for(const value of ['red','#fff','#12345678',' #123456','#12345G','',123])await fail('VALIDATION_FAILED',owner,'settings_update_v1',{...q,patch:{primary_color:value},expected_version:current.version},key());
+   await fail('VALIDATION_FAILED',owner,'settings_update_v1',{scope:'center',org_id:org,center_id:center,patch:{primary_color:'#123456'},expected_version:0},key());
+   const history=await must(owner,'settings_history_get_v1',q);assert(history.items.some(h=>h.after.primary_color==='#12aBcF'));
+   const cleared=await write(owner,q,{primary_color:null},current.version);assert.equal((await read(owner,q)).values.primary_color,null);
+   const preview=await must(owner,'settings_reset_preview_v1',{...q,fields:['secondary_color','accent_color']});
+   await must(owner,'settings_reset_apply_v1',{...q,expected_version:preview.version,preview:{id:preview.id,token:preview.token}},key());
+   const reset=await read(owner,q);for(const f of fields)assert.equal(reset.values[f],null);
+   const catalog=await must(owner,'settings_catalog_get_v1',q);assert.equal(catalog.catalog_version,9);for(const f of fields)assert(catalog.fields.some(x=>x.key===f&&x.writable));
+   assert(catalog.fields.some(x=>x.key==='font_package_id'&&!x.writable));assert(catalog.fields.some(x=>x.key==='theme_package_id'&&!x.writable));
   });
   await t.test('member, center, organization and platform scopes are separate; role revocation also denies replay',async()=>{
    for(const [scope,patch] of [['member',{profile_visible:true}],['organization',{description:'Organization description'}],['center',{description:'Center description'}]]){
