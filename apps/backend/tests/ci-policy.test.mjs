@@ -300,7 +300,7 @@ test('documentation proof is separate, source bound and rejects stale/missing/sk
  for(const mutate of [x=>x.binding.kind='full',x=>x.run.path='.github/workflows/ci-docs.yml',x=>x.pr.base.sha='new',x=>x.binding.attempt=2,x=>x.currentTree='new',x=>x.workflowMatches=false,x=>x.jobs=[],x=>x.jobs[0].steps[0].conclusion='skipped']){const x=structuredClone(v);mutate(x);assert.throws(()=>validateDocumentBinding(x));}
 });
 
-import {shardPlan,coverageHash,validateJobs,apiBalancePolicy,apiTimeBalance,assertApiTimeBalance} from '../scripts/ci/shards.mjs';
+import {shardPlan,coverageHash,validateJobs,apiBalancePolicy,apiTimeBalance} from '../scripts/ci/shards.mjs';
 import {measurements} from '../scripts/ci/collect.mjs';
 test('four deterministic measured shards partition every suite exactly once with bounded weight imbalance',()=>{
  const bins=shardPlan();assert.equal(bins.length,4);
@@ -699,17 +699,40 @@ test('historical suite measurement still retains its original eight-percent pred
 function jobsWithApiSeconds(values){
  const v=valid();for(let i=0;i<4;i++){const job=v.jobs.find(j=>j.name==='api-'+(i+1));job.steps[0].completed_at=new Date(Date.parse(job.steps[0].started_at)+values[i]*1000).toISOString();}return v;
 }
-test('real PR77 imbalance is rejected even when every test and collector is successful',()=>{
+test('real PR77 imbalance is visible without blocking successful functional and source acceptance',()=>{
  const v=jobsWithApiSeconds([1651,1102,793,1167]),report=apiTimeBalance(v.jobs,v.run);
- assert.equal(report.gap_s,858);assert(report.ratio>2);assert.equal(report.balanced,false);assert.throws(()=>assertApiTimeBalance(report),/API_TIME_IMBALANCE/);
- assert.throws(()=>validateBinding(v),/API_TIME_IMBALANCE/);
+ assert.equal(report.gap_s,858);assert(report.ratio>2);assert.equal(report.balanced,false);assert.equal(report.balanced,false);
+ assert(validateBinding(v));
  const balanced=jobsWithApiSeconds([1600,1450,1490,1400]);assert(validateBinding(balanced));
  // New assertions inside an existing file require no inventory delta to be caught.
- balanced.jobs.find(j=>j.name==='api-3').steps[0].completed_at='2026-01-01T00:40:00Z';assert.throws(()=>validateBinding(balanced),/API_TIME_IMBALANCE/);
+ balanced.jobs.find(j=>j.name==='api-3').steps[0].completed_at='2026-01-01T00:40:00Z';assert(validateBinding(balanced));assert.equal(apiTimeBalance(balanced.jobs,balanced.run).balanced,false);
 });
 test('actual balance uses explicit jitter bounds and rejects missing mixed or duplicate timing evidence',()=>{
- for(const values of [[600,600,600,750],[60,60,60,180]]){const v=jobsWithApiSeconds(values);assertApiTimeBalance(apiTimeBalance(v.jobs,v.run));}
- const tooSlow=jobsWithApiSeconds([600,600,600,751]);assert.throws(()=>assertApiTimeBalance(apiTimeBalance(tooSlow.jobs,tooSlow.run)),/API_TIME_IMBALANCE/);
+ for(const values of [[600,600,600,750],[60,60,60,180]]){const v=jobsWithApiSeconds(values);assert.equal(apiTimeBalance(v.jobs,v.run).balanced,true);}
+ const tooSlow=jobsWithApiSeconds([600,600,600,751]);assert.equal(apiTimeBalance(tooSlow.jobs,tooSlow.run).balanced,false);
  for(const mutate of [v=>v.jobs.splice(1,1),v=>v.jobs.push(structuredClone(v.jobs[1])),v=>v.jobs[1].run_attempt=2,v=>v.jobs[1].head_sha='other',v=>v.jobs[1].conclusion='skipped',v=>delete v.jobs[1].steps[0].started_at,v=>v.jobs[1].steps[0].completed_at='invalid',v=>v.jobs[1].steps[0].completed_at=v.jobs[1].steps[0].started_at,v=>v.jobs[1].steps.push(structuredClone(v.jobs[1].steps[0]))]){const v=valid();mutate(v);assert.throws(()=>apiTimeBalance(v.jobs,v.run));}
- const old=valid();delete old.binding.balance_policy;assert.throws(()=>validateBinding(old),/coverage/);
+ const old=valid();delete old.binding.balance_policy;assert(validateBinding(old));
+});
+
+test('collector publishes functional proof despite imbalance or unavailable timing but rejects failed or mixed source jobs',async()=>{
+ const {collect}=await import('../scripts/ci/collect.mjs'),file=repoFile('.artifacts/ci/binding.json'),reportFile=repoFile('.artifacts/ci/measurements.json');
+ const previous=process.env.GITHUB_RUN_ATTEMPT;process.env.GITHUB_RUN_ATTEMPT='1';
+ const preserved=new Map([file,reportFile].map(p=>[p,fs.existsSync(p)?fs.readFileSync(p):null]));
+ try{
+  for(const unavailable of [false,true]){
+   const v=jobsWithApiSeconds([1154,1239,1488,1629]),warnings=[];
+   if(unavailable)delete v.jobs[1].steps[0].started_at;
+   const github={rest:{actions:{getWorkflowRun:async()=>({data:{...v.run,created_at:'2026-01-01T00:00:00Z'}}),listJobsForWorkflowRunAttempt:'jobs'}},paginate:async()=>v.jobs};
+   const core={warning:s=>warnings.push(s),summary:{addRaw(){return this;},async write(){}}};
+   await collect(github,{repo:{},runId:5},core,v.binding);
+   assert.equal(JSON.parse(fs.readFileSync(file)).head,'H');assert.equal(warnings.length,1);
+   const report=JSON.parse(fs.readFileSync(reportFile));assert.equal(report.balance.balanced,unavailable?null:false);
+   if(unavailable)assert.equal(report.balance.status,'unavailable');
+   v.jobs[1].conclusion='failure';await assert.rejects(collect(github,{repo:{},runId:5},core,v.binding),/Failed/);assert(!fs.existsSync(file));
+   v.jobs[1].conclusion='success';v.binding.attempt=2;await assert.rejects(collect(github,{repo:{},runId:5},core,v.binding),/mismatch/);assert(!fs.existsSync(file));
+  }
+ }finally{
+  if(previous===undefined)delete process.env.GITHUB_RUN_ATTEMPT;else process.env.GITHUB_RUN_ATTEMPT=previous;
+  for(const [p,bytes] of preserved){if(bytes===null)fs.rmSync(p,{force:true});else fs.writeFileSync(p,bytes);}
+ }
 });

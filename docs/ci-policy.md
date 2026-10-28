@@ -46,15 +46,14 @@ PR’nin gerçek merge ağacında [belge kontrolü](../apps/backend/scripts/ci/d
 
 Merge normal iki parent’lı merge olmalıdır; squash/rebase’e kanıt taşınmaz. Head/base/tree değişirse yeni kabul gerekir. Main yeniden test yerine gerçek parent/tree’nin test edilen adayla aynılığını ve başarılı adayın güncel attempt/job sonuçlarını doğrular. Böylece test maliyeti tekrarlanmaz; kaynak güveni kaldırılmaz.
 
-## API süre dengesi — zorunlu kabul
+<a id="api-süre-dengesi--zorunlu-kabul"></a>
+## API süre dengesi — uyarı ve ölçüm
 
-`api-wall-v1` her full clean’de dört API işinin gerçek `Clean acceptance` başlangıç/bitişlerini aynı run/attempt/head üzerinde doğrular. Bu süre izole backend başlatma/reset ve API testlerini kapsar; paket kurulumu ve runner kuyruğu hariçtir. En uzun/en kısa oranı **1.25’i** ve mutlak fark **120 saniyeyi** birlikte aşarsa kabul başarısızdır. Bu iki eşik küçük sabit kurulum/runner sapmasına toleranstır; eski tahmini ağırlıkların dengeli olması gerçek zaman kapısını atlatmaz. Her koşu açık PASS/FAIL, oran, fark ve dört süreyi raporlar.
+28 Ekim üretim önceliği kararı önceki zorunlu süre kapısını kaldırır. Süre dengesi fonksiyon doğruluğu veya güvenlik kabulü değildir. Dört API gerçek `Clean acceptance` süreleri her koşuda raporlanır; oran1.25 ve fark120sn birlikte aşılırsa GitHub uyarısı oluşur. Eksik/geçersiz ölçüm de görünür uyarıdır. Bu durumlar kendi başlarına full clean, merge veya development CD’yi engellemez; eşikler artırılarak yeşil sonuç üretilmez, optimizasyon üretim dışında değerlendirilir.
 
-Toplayıcı dengesizlikte `measurements.json` ve özeti korur, kabul binding’i üretmez; artifact yüklemesi hata halinde de çalışır. Trusted merge/main/CD doğrulayıcısı gerçek API step zamanlarını bağımsız yeniden hesaplar ve binding’in denge politika sürümünü ister. Bütün fonksiyon testlerinin yeşil olması performans kabulü yerine geçmez. Eksik/geçersiz/sıfır/mükerrer zaman veya farklı kaynak/attempt hata verir; başarı uydurulmaz.
+Toplayıcı önce kaynak/run/attempt/coverage ve bütün zorunlu core/dört API gerçek test başarılarını doğrular. Bunlardan biri eksik/skipped/cancelled/failed veya başka run/attempt/head’e aitse binding üretilmez. Bu güvenlik sınırı değişmez. Sonra süre ölçümü ayrı try/catch içinde değerlendirilir; rapor ve varsa uyarı yazılır, fonksiyon/kaynak kabulü başarılıysa binding üretilir. Binding `balance_mode:advisory` taşır; süre politika sürümü veya denge sonucu trusted merge/main/CD kapısının kabul şartı değildir.
 
-Yeni suite ölçümlü envantere eklenmeden shard planı oluşturulamaz. Mevcut suite içine eklenen assertion’lar envanter değişmese de her koşudaki gerçek süre/fark kontrolüne tabidir; bozulma tolerans içinde birikebilir, sınırı aşınca merge engellenir. CI süre tablosunu otomatik commit etmez, kaynak kabulü sırasında kendisine yeni baseline oluşturmaz. Başarılı kaynak bağlı ölçümden incelenmiş ağırlık güncellemesi veya baskın suite’in güvenli bölünmesi gerekir. Test azaltmak, atlamak, sleep eklemek veya sırf yeşil sonuç için eşikleri büyütmek çözüm değildir.
-
-Statik toplam-ağırlık oranı1.08, bütün suite’lerin bir kez çalışması, concurrency2 ve süre alt sınırına göre en uzun tahmin kontrolü korunur. Eski snapshot’ın tahmini duvar8% regresyonu kendi ölçümüyle korunur; yeni snapshot ayrı değerlendirilir. Büyük tek suite, en iyi dağıtımda da alt sınırdır; yalnız yeniden dağıtım daha kısa toplam bekleme garantisi değildir. Güvenli fixture/grup ayrımı ve yeni gerçek kabul olmadan suite bölünmüş veya hızlanmış sayılmaz.
+Yeni testler eksiksiz suite/shard envanterinde bulunur, dört bağımsız runner ve concurrency2 korunur. Kullanıcının talimatıyla suite bölme, tekrar denetimi ve fixture optimizasyonu ertelenmiştir; üretim kuyruğunu bloke etmez. İşlevsel kapsam, test assertion’ları ve kaynak güvenliği gevşetilmez. Aynı run’ın failed-job rerun’ında başka attempt’lerin başarılı testleri birleştirilemez; toplayıcı-only rerun eski binding attempt’ini başarılıya çeviremez. İncelemede açıkça istenen attempt API’si kullanılır; latest-job verisi attempt1 kanıtı diye sunulmaz.
 
 ## Güvenilir politika ve dağıtım
 
