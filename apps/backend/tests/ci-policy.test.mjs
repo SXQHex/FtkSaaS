@@ -130,7 +130,7 @@ test('cumulative selector retains canceled API commit coverage when next commit 
 test('deleting or renaming referenced documentation is detected through unchanged inbound links',()=>fixture((dir,git)=>{writeFileSync(join(dir,'README.md'),'[Target](target.md)\n');writeFileSync(join(dir,'target.md'),'Target\n');git('add','.');git('commit','-m','links');fs.renameSync(join(dir,'target.md'),join(dir,'renamed.md'));assert.throws(()=>execFileSync(process.execPath,[resolve('apps/backend/scripts/ci/docs-check.mjs'),'target.md'],{cwd:dir,stdio:'pipe'}),/Command failed/);}));
 
 import {verifyMerged} from '../scripts/ci/gate.mjs';
-test('main verification rejects missing proof before running expensive acceptance',async()=>{const g={rest:{repos:{listPullRequestsAssociatedWithCommit:'prs'},actions:{listWorkflowRuns:'runs'}},paginate:async method=>method==='prs'?[{number:1,merged_at:'now',merge_commit_sha:'M',head:{sha:'H'},base:{sha:'B'}}]:[]};g.rest.git={getTree:async()=>({data:{tree:[],truncated:false}}),getCommit:async()=>({data:{sha:'M',tree:{sha:'T'},parents:[{sha:'B'},{sha:'H'}]}})};await assert.rejects(()=>verifyMerged(g,{repo:{owner:'synthetic',repo:'test'},sha:'M'},{summary:{}}),/No source-bound full clean evidence/);});
+test('main verification rejects missing proof before running expensive acceptance',async()=>{const g={rest:{repos:{listPullRequestsAssociatedWithCommit:'prs'},actions:{listWorkflowRuns:'runs'}},paginate:async method=>method==='prs'?[{number:1,merged_at:'now',merge_commit_sha:'M',head:{sha:'H'},base:{sha:'B'}}]:[]};g.rest.git={getTree:async({tree_sha})=>({data:{tree:[{path:'apps/backend/database/kernel.sql',type:'blob',mode:'100644',sha:tree_sha+'kernel'}],truncated:false}}),getCommit:async()=>({data:{sha:'M',tree:{sha:'T'},parents:[{sha:'B'},{sha:'H'}]}})};await assert.rejects(()=>verifyMerged(g,{repo:{owner:'synthetic',repo:'test'},sha:'M'},{summary:{}}),/No source-bound full clean evidence/);});
 test('main verification rejects direct push without a merged PR proof',async()=>{const g={rest:{repos:{listPullRequestsAssociatedWithCommit:'prs'}},paginate:async()=>[]};await assert.rejects(()=>verifyMerged(g,{repo:{},sha:'direct'},{}),/PR merge/);});
 const p01Suite='apps/backend/tests/p01-catalog-entitlement-reads.test.mjs';
 const profile={id:'p01-reads',sources:['p01-catalog-entitlement-reads'],operations:['products_list_v1','entitlements_get_v1'],migrationCheckLabel:'P01 reads source drift',suites:[p01Suite]};
@@ -316,7 +316,7 @@ test('reusable full clean retains all obligations and isolated setup; final trig
  assert(clean.includes('shard: [1, 2, 3, 4]'));assert(clean.includes('fail-fast: false'));assert(!clean.includes('max-parallel: 1'));
  assert(clean.includes('needs: [core, api, serial-reference]'));assert(clean.includes('if: always()'));assert(clean.includes('Verify all required jobs'));
  for(const op of ['test:db','dev:seed','dev:health','db:advisors'])assert(runner.includes("['run','"+op+"']"));
- assert(runner.includes("['--dir',repoFile(),'run','verify']"));
+ assert(runner.includes("['--dir',repoFile(),'exec','turbo','run','verify','--filter=@ftksaas/backend...']"));
  assert(runner.includes("['db','reset','--local','--no-seed','--yes']"));assert(runner.includes("'auth.users'"));
  const full=fs.readFileSync('.github/workflows/ci-full.yml','utf8'),docs=fs.readFileSync('.github/workflows/ci-docs.yml','utf8'),gate=fs.readFileSync('.github/workflows/ci-gate.yml','utf8');
  assert(full.includes("github.event.pull_request.draft == false"));assert(full.includes("'development'"));assert(!full.includes('ready_for_review'));assert(!full.includes('synchronize'));
@@ -433,7 +433,7 @@ test('document links reject missing fragments and ignore fenced example headings
 }));
 test('workspace and lock changes retain broad backend coverage and pinned frozen installs',()=>{
  for(const p of ['pnpm-lock.yaml','pnpm-workspace.yaml','turbo.json','packages/api-contracts/package.json'])assert.deepEqual(plan(p).api,apiSuites,p);
- for(const f of ['backend','ci-docs','ci-fast','clean-suite','cd-development']){
+ for(const f of ['ci-fast','clean-suite','cd-development']){
   const s=fs.readFileSync('.github/workflows/'+f+'.yml','utf8');assert(s.includes('corepack enable'));assert(s.includes('pnpm install --frozen-lockfile'));assert(!s.includes('npm ci'));
  }
  const p=JSON.parse(fs.readFileSync('package.json'));assert.equal(p.packageManager,'pnpm@12.15.0');assert(!fs.existsSync('package-lock.json'));
@@ -455,4 +455,137 @@ test('repository graph and documentation scope are identical from backend and ro
  assert.deepEqual(plans[0],plans[1]);assert.equal(plans[1].db,false);assert(plans[1].structural);
  writeFileSync(join(dir,'README.md'),'Only docs now');git('add','README.md');git('commit','-m','docs only');const docs=git('rev-parse','HEAD');
  assert(gitDocumentScope(head,docs,dir).safe);assert(gitDocumentScope(head,docs,backend).safe);
+}));
+
+import {classifyChanges,ownerOf,localScope,ownership} from '../scripts/ci/scope.mjs';
+import {remoteSourceScope,backendUnchanged,resolveCandidate} from '../scripts/ci/source.mjs';
+import {checkPr} from '../scripts/ci/gate.mjs';
+const change=path=>({path,status:'M'});
+test('positive ownership separates backend frontend prose and shared inputs, rejecting unknown scope',()=>{
+ for(const path of ['apps/web/src/app/page.tsx','packages/ui/src/button.tsx','.github/workflows/frontend.yml','vercel.json']){
+  const scope=classifyChanges([change(path)]);assert.equal(scope.backend,false);assert.equal(scope.kind,'frontend');assert.equal(select([change(path)]).db,false);
+ }
+ for(const path of ['apps/backend/database/kernel.sql','packages/api-contracts/schema/contract.json','packages/typescript-config/base.json','pnpm-lock.yaml','package.json','pnpm-workspace.yaml','turbo.json','.nvmrc','.github/workflows/ci-fast.yml'])assert.equal(classifyChanges([change(path)]).backend,true,path);
+ assert.equal(classifyChanges([change('README.md')]).kind,'documentation');
+ assert.equal(classifyChanges([change('apps/web/page.tsx'),change('apps/backend/database/kernel.sql')]).kind,'full');
+ assert.equal(classifyChanges([change('apps/web/page.tsx'),change('README.md')]).kind,'documentation');
+ for(const path of ['apps/unknown/file.ts','packages/unknown/index.ts','.github/workflows/unknown.yml','docs/unreviewed.md','../apps/web/file.ts','apps/web/../../backend/file.ts','apps/web//file.ts','apps\\web\\file.ts'])assert.throws(()=>ownerOf(path));
+ assert.throws(()=>classifyChanges([]));assert.throws(()=>classifyChanges([{path:'apps/web/a.ts',status:'U'}]));
+ assert.equal(policyPath('.github/workflows/frontend.yml'),false);assert.equal(policyPath('.github/workflows/ci-full.yml'),true);
+});
+test('positive backend push paths match the reviewed ownership registry and do not admit frontend paths',()=>{
+ const patterns=[...ownership.backendPrefixes.map(p=>p+'**'),...ownership.backendFiles,'docs/*.json',...JSON.parse(fs.readFileSync('apps/backend/scripts/ci/document-paths.json'))];
+ for(const name of ['ci-fast','backend']){
+  const workflow=fs.readFileSync('.github/workflows/'+name+'.yml','utf8');
+  const configured=[...workflow.matchAll(/^      - '([^']+)'$/gm)].map(m=>m[1]);
+  assert.deepEqual(configured,[...new Set(patterns)]);
+  assert(!configured.some(p=>p==='apps/**'||p==='packages/**'||p==='**'||p.includes('apps/web')||p.includes('packages/ui')));
+ }
+ const fast=fs.readFileSync('.github/workflows/ci-fast.yml','utf8');assert(fast.includes("if: needs.scope.outputs.backend == 'true'"));
+ const docs=fast.slice(fast.indexOf('\n  documentation:'));
+ assert(docs.includes('docs-check.mjs'));assert(!docs.includes('pnpm'));assert(!docs.includes('test:db'));
+ assert(!fast.includes('documentation-recovery:'));
+ for(const name of ['backend','ci-docs']){
+  const workflow=fs.readFileSync('.github/workflows/'+name+'.yml','utf8');assert(!workflow.includes('run verify'));assert(!workflow.includes('pnpm install'));
+ }
+});
+test('cumulative scope covers rename old endpoints and retains runtime after a later frontend or prose commit',()=>fixture((dir,git)=>{
+ const base=git('rev-parse','HEAD');mkdirSync(join(dir,'apps/web'),{recursive:true});writeFileSync(join(dir,'apps/web/page.tsx'),'frontend');git('add','.');git('commit','-m','frontend');
+ assert.equal(localScope(base,git('rev-parse','HEAD'),dir).backend,false);
+ mkdirSync(join(dir,'apps/backend/database'),{recursive:true});writeFileSync(join(dir,'apps/backend/database/kernel.sql'),'runtime');git('add','.');git('commit','-m','backend');
+ const beforeRename=git('rev-parse','HEAD');git('mv','apps/backend/database/kernel.sql','apps/web/moved.sql');git('commit','-m','rename');
+ assert.equal(localScope(beforeRename,git('rev-parse','HEAD'),dir).backend,true);
+ writeFileSync(join(dir,'README.md'),'later docs');git('add','.');git('commit','-m','docs');
+ // The removed backend source endpoint stays in the cumulative diff.
+ assert.equal(localScope(beforeRename,git('rev-parse','HEAD'),dir).backend,true);
+ const beforeLink=git('rev-parse','HEAD');fs.unlinkSync(join(dir,'README.md'));fs.symlinkSync('apps/web/page.tsx',join(dir,'README.md'));git('add','.');git('commit','-m','unsafe prose');
+ assert.throws(()=>localScope(beforeLink,git('rev-parse','HEAD'),dir),/UNSAFE_DOCUMENT/);
+}));
+function scopedGithub(paths,{truncated=false,moved=false}={}){
+ const pr={number:9,state:'open',draft:false,labels:[],base:{sha:'B'},head:{sha:'H'},merged_at:'now',merge_commit_sha:'M'};
+ const statuses=[];
+ const github={rest:{
+  pulls:{get:async()=>({data:moved?{...pr,head:{sha:'changed'}}:pr})},
+  git:{getRef:async()=>({data:{object:{sha:'M'}}}),getCommit:async()=>({data:{sha:'M',tree:{sha:'T'},parents:[{sha:'B'},{sha:'H'}]}}),
+   getTree:async({tree_sha})=>({data:{truncated,tree:paths.map(path=>({path,type:'blob',mode:'100644',sha:tree_sha+path}))}}),
+   getBlob:async()=>({data:{encoding:'base64',content:Buffer.from('prose').toString('base64')}})},
+  repos:{listPullRequestsAssociatedWithCommit:'prs',createCommitStatus:async s=>{statuses.push(s);}},
+  actions:{listWorkflowRuns:'runs'}
+ },paginate:async method=>method==='prs'?[pr]:[]};
+ return {github,pr,statuses};
+}
+test('frontend-only PR passes backend scope without inventing a full-test receipt; mixed and unknown scope cannot skip',async()=>{
+ for(const paths of [['apps/web/page.tsx'],['apps/web/page.tsx','apps/backend/database/kernel.sql'],['packages/unknown/a.ts']]){
+  const {github,statuses}=scopedGithub(paths);const result=await checkPr(github,{repo:{}},9);
+  assert.equal(result.state,paths.length===1&&paths[0].startsWith('apps/web/')?'success':'failure');
+  if(result.state==='success')assert(statuses[0].description.includes('no backend tests accepted'));
+ }
+ const {github}=scopedGithub(['apps/web/a.ts'],{truncated:true});assert.equal((await checkPr(github,{repo:{}},9)).state,'failure');
+});
+test('frontend candidate never starts backend clean, while actual merge verifies parents before non-backend classification',async()=>{
+ const {github,pr}=scopedGithub(['apps/web/page.tsx']);const outputs={},core={setOutput:(k,v)=>outputs[k]=v,summary:{addRaw(){return this;},async write(){}}};
+ await resolveCandidate(github,{repo:{},issue:{number:9},payload:{pull_request:pr},runId:1},core,'full');assert.equal(outputs.eligible,'false');assert.equal(outputs.merge,undefined);
+ assert.equal((await verifyMerged(github,{repo:{},sha:'M'},core)).kind,'frontend');assert.equal(outputs.kind,'frontend');
+ github.rest.git.getCommit=async()=>({data:{sha:'M',tree:{sha:'T'},parents:[{sha:'X'},{sha:'H'}]}});
+ await assert.rejects(verifyMerged(github,{repo:{},sha:'M'},core),/parents/);
+});
+test('CD source equivalence accepts frontend progress only with unchanged backend and complete trees',async()=>{
+ for(const [paths,options,expected] of [
+  [['apps/web/page.tsx'],{},true],
+  [['apps/web/page.tsx','README.md'],{},true],
+  [['apps/web/page.tsx','apps/backend/database/kernel.sql'],{},false],
+  [['pnpm-lock.yaml'],{},false],
+  [['apps/web/page.tsx'],{truncated:true},false],
+  [['packages/unknown/a.ts'],{},false]
+ ]){const {github}=scopedGithub(paths,options);assert.equal(await backendUnchanged(github,{},'B','H'),expected);}
+});
+test('frontend scope marker cannot authorize CD or substitute for missing executed full jobs',()=>{
+ const v=valid(),sha='a'.repeat(40),run={...v.run,path:'.github/workflows/backend.yml',event:'push',head_branch:'main',head_sha:sha,repository:{full_name:'SXQHex/FtkSaaS'},head_repository:{full_name:'SXQHex/FtkSaaS'}};
+ const source={name:'source',status:'completed',conclusion:'success',run_id:run.id,run_attempt:run.run_attempt,head_sha:sha};
+ const marker={...source,name:'frontend',steps:[{name:'Backend unchanged (no backend acceptance)',conclusion:'success'}]};
+ const input={run,jobs:[source,marker],currentMain:sha,repository:'SXQHex/FtkSaaS'};
+ assert.equal(deploymentSource(input).deploy,false);
+ for(const mutate of [x=>x.jobs[1].conclusion='skipped',x=>x.jobs[1].run_attempt=9,x=>x.jobs[1].head_sha='other',x=>x.jobs[1].steps[0].conclusion='skipped']){
+  const x=structuredClone(input);mutate(x);assert.throws(()=>deploymentSource(x));
+ }
+});
+test('scope CLI runs before dependency installation and emits only the cumulative backend requirement',()=>fixture((dir,git)=>{
+ mkdirSync(join(dir,'apps/web'),{recursive:true});writeFileSync(join(dir,'apps/web/page.tsx'),'frontend');git('add','.');git('commit','-m','frontend');
+ const output=join(dir,'outputs');
+ const run=()=>{
+  writeFileSync(output,'');execFileSync(process.execPath,[resolve('apps/backend/scripts/ci/scope.mjs')],{cwd:dir,env:{...process.env,HEAD:git('rev-parse','HEAD'),GITHUB_OUTPUT:output},stdio:'pipe'});
+  return fs.readFileSync(output,'utf8');
+ };
+ assert(run().includes('backend=false'));assert(run().includes('kind=frontend'));
+ mkdirSync(join(dir,'apps/backend/database'),{recursive:true});writeFileSync(join(dir,'apps/backend/database/kernel.sql'),'runtime');git('add','apps/backend');git('commit','-m','backend');
+ writeFileSync(join(dir,'README.md'),'later docs');git('add','README.md');git('commit','-m','prose');
+ assert(run().includes('backend=true'));assert(run().includes('documentation=true'));
+}));
+test('an accepted backend finishing after a frontend-only merge keeps its full proof and revalidates before CD writes',async()=>{
+ const repo={owner:'SXQHex',repo:'FtkSaaS'},a='a'.repeat(40),b='b'.repeat(40),v=valid();
+ const run={...v.run,path:'.github/workflows/backend.yml',event:'push',head_branch:'main',head_sha:a,repository:{full_name:'SXQHex/FtkSaaS'},head_repository:{full_name:'SXQHex/FtkSaaS'}};
+ const jobs=[...v.jobs.map(j=>({...j,head_sha:a})),{name:'source',status:'completed',conclusion:'success',run_id:run.id,run_attempt:run.run_attempt,head_sha:a}];
+ let backendChanged=false;
+ const {github}=scopedGithub(['apps/web/page.tsx']);
+ github.rest.git.getRef=async()=>({data:{object:{sha:b}}});
+ github.rest.git.getTree=async({tree_sha})=>({data:{tree:[{path:'apps/web/page.tsx',type:'blob',mode:'100644',sha:tree_sha+'web'},{path:'apps/backend/database/kernel.sql',type:'blob',mode:'100644',sha:backendChanged&&tree_sha===b?'changed':'same'}]}});
+ github.rest.repos.compareCommitsWithBasehead=async()=>({data:{status:'ahead'}});
+ github.rest.actions.getWorkflowRun=async()=>({data:run});github.rest.actions.listJobsForWorkflowRun='jobs';github.paginate=async()=>jobs;
+ const proof=await resolveAcceptedSource(github,repo,run,jobs,b,1);assert.equal(proof.deploy,true);assert.equal(proof.sha,a);assert.equal(proof.expected_main,b);
+ assert.equal((await revalidateDeployment(github,repo,proof)).sha,a);
+ backendChanged=true;await assert.rejects(revalidateDeployment(github,repo,proof),/equivalence/);
+});
+test('real Turbo dependency filters run backend and frontend independently and include shared consumers',()=>fixture((dir)=>{
+ writeFileSync(join(dir,'package.json'),JSON.stringify({name:'scope-probe',private:true,packageManager:'pnpm@12.15.0'}));
+ writeFileSync(join(dir,'pnpm-workspace.yaml'),'packages:\n  - apps/*\n  - packages/*\n');
+ writeFileSync(join(dir,'turbo.json'),JSON.stringify({tasks:{verify:{dependsOn:['^typecheck'],cache:false},typecheck:{cache:false}}}));
+ for(const [folder,name,deps] of [['apps/backend','@ftksaas/backend',{'@ftksaas/api-contracts':'workspace:*'}],['apps/web','@ftksaas/web',{'@ftksaas/api-contracts':'workspace:*','@ftksaas/ui':'workspace:*'}],['packages/ui','@ftksaas/ui',{}],['packages/api-contracts','@ftksaas/api-contracts',{}]]){
+  mkdirSync(join(dir,folder),{recursive:true});writeFileSync(join(dir,folder,'package.json'),JSON.stringify({name,private:true,dependencies:deps,scripts:{verify:'exit 1',typecheck:'exit 1'}}));
+ }
+ const graph=filter=>JSON.parse(execFileSync(resolve('node_modules/.bin/turbo'),['run','verify','--filter='+filter,'--dry=json'],{cwd:dir,encoding:'utf8',stdio:['ignore','pipe','pipe']}));
+ const installed=JSON.parse(execFileSync(resolve('node_modules/.bin/turbo'),['run','verify','--filter=@ftksaas/backend...','--dry=json'],{encoding:'utf8',stdio:['ignore','pipe','pipe']}));
+ for(const task of installed.tasks)assert(!['@ftksaas/web','@ftksaas/ui'].includes(task.package),'Backend must not depend on frontend packages');
+ const backend=graph('@ftksaas/backend...').tasks.map(t=>t.package),frontend=graph('@ftksaas/web...').tasks.map(t=>t.package);
+ assert(backend.includes('@ftksaas/backend'));assert(backend.includes('@ftksaas/api-contracts'));assert(!backend.includes('@ftksaas/web'));assert(!backend.includes('@ftksaas/ui'));
+ assert(frontend.includes('@ftksaas/web'));assert(frontend.includes('@ftksaas/api-contracts'));assert(frontend.includes('@ftksaas/ui'));assert(!frontend.includes('@ftksaas/backend'));
 }));

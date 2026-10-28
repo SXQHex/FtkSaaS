@@ -1,0 +1,6 @@
+{
+  "backendPrefixes": ["apps/backend/", "packages/api-contracts/", "packages/typescript-config/", ".devcontainer/"],
+  "backendFiles": ["package.json", "pnpm-lock.yaml", "pnpm-workspace.yaml", "turbo.json", ".nvmrc", ".gitignore", "docs/history/manifest.json", "docs/endpoint-inventory.json", "docs/feature-delivery.json", ".github/workflows/backend.yml", ".github/workflows/cd-development.yml", ".github/workflows/ci-docs.yml", ".github/workflows/ci-fast.yml", ".github/workflows/ci-full.yml", ".github/workflows/ci-gate.yml", ".github/workflows/clean-suite.yml"],
+  "frontendPrefixes": ["apps/web/", "packages/ui/"],
+  "frontendFiles": ["vercel.json", ".github/workflows/frontend.yml", ".github/workflows/frontend-compatibility.yml"]
+}

@@ -17,6 +17,7 @@ jobs:
     if: github.event.label.name == 'ci:full-clean' && github.event.pull_request.draft == false && !contains(github.event.pull_request.labels.*.name, 'development')
     runs-on: ubuntu-24.04
     outputs:
+      eligible: ${{ steps.candidate.outputs.eligible }}
       merge: ${{ steps.candidate.outputs.merge }}
       binding: ${{ steps.candidate.outputs.binding }}
     steps:
@@ -33,6 +34,7 @@ jobs:
             await source.resolveCandidate(github,context,core,'full');
   clean:
     needs: candidate
+    if: needs.candidate.outputs.eligible == 'true'
     uses: ./.github/workflows/clean-suite.yml
     with:
       tested_sha: ${{ needs.candidate.outputs.merge }}

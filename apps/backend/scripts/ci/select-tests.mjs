@@ -1,3 +1,4 @@
+import {ownerOf} from './scope.mjs';
 import {ciFile} from '../paths.mjs';
 import fs from 'node:fs';
 import {execFileSync} from 'node:child_process';
@@ -34,7 +35,7 @@ export function parseChanges(z) {
 // Finite reviewed CI harness surface. A mixed runtime delta still takes the
 // normal dependency graph; an unknown CI-looking path still expands safely.
 export const ciSources=new Set([
- 'docs/history/manifest.json',
+ 'docs/history/manifest.json','apps/backend/scripts/ci/scope.mjs','apps/backend/scripts/ci/scope.json',
  '.github/workflows/cd-development.yml','apps/backend/scripts/ci/deployment-source.mjs','apps/backend/scripts/ci/deploy-development.mjs',
  '.github/workflows/backend.yml','.github/workflows/ci-fast.yml','.github/workflows/ci-full.yml','.github/workflows/ci-gate.yml','.github/workflows/ci-docs.yml','.github/workflows/clean-suite.yml',
  'apps/backend/scripts/ci/select-tests.mjs','apps/backend/scripts/ci/delta-analysis.mjs','apps/backend/scripts/ci/run-targeted.mjs','apps/backend/scripts/ci/gate.mjs','apps/backend/scripts/ci/source.mjs','apps/backend/scripts/ci/document-scope.mjs','apps/backend/scripts/ci/document-paths.json','apps/backend/scripts/ci/renderer-proof.py','apps/backend/scripts/ci/recovery.mjs','apps/backend/scripts/ci/cleanup.mjs','apps/backend/scripts/ci/shards.mjs','apps/backend/scripts/ci/suite-durations.json','apps/backend/scripts/ci/collect.mjs','apps/backend/scripts/ci/timings.mjs','apps/backend/scripts/ci/summarize-timings.mjs','apps/backend/scripts/ci/reset-local.mjs','apps/backend/scripts/ci/docs-check.mjs',
@@ -48,6 +49,7 @@ export function select(changes,{diffAvailable=true,headMatches=true,evidence,ciO
  if(!Array.isArray(changes)||!changes.length)all('Empty/unknown change set: all DB/API regressions');
  for(const {path:p,status} of changes??[]){
   if(typeof p!=='string'||!p||p.startsWith('/')||p.split('/').includes('..')){all('Invalid/missing path');continue;}
+  if(diffAvailable&&headMatches){try{if(ownerOf(p)==='frontend'){reasons.push(p+': frontend-owned; no backend tests');continue;}}catch{/* Existing conservative selector handles unknown backend inputs. */}}
   if(p.endsWith('.md')||p.endsWith('.txt')){docs.push(p);if(p.startsWith('docs/contracts/')||p.startsWith('docs/decisions/')||p==='docs/feature-delivery.md')structural=true;reasons.push(p+': documentation/link checks'+(structural?' and contract consistency when applicable':''));continue;}
   if(p==='AGENTS.md')continue;
   const proof=diffAvailable&&headMatches&&evidence?.explained[p];
@@ -89,7 +91,7 @@ if(import.meta.url===pathToFileURL(process.argv[1]??'').href){
  if(available&&matches){
   const cache=new Map();
   const read=(side,path)=>{const key=side+':'+path;if(!cache.has(key)){try{cache.set(key,execFileSync('git',['show',(side==='base'?from:head)+':'+path],{encoding:'utf8',maxBuffer:20*1024*1024,stdio:['ignore','pipe','pipe']}));}catch{cache.set(key,null);}}return cache.get(key);};
-  const remainder=changes.filter(c=>!ciSources.has(c.path));
+  const remainder=changes.filter(c=>{try{if(ownerOf(c.path)==='frontend')return false;}catch{}return !ciSources.has(c.path);});
   const mode=(side,path)=>{try{return execFileSync('git',['ls-tree',side==='base'?from:head,'--',path],{encoding:'utf8'}).split(' ')[0];}catch{return null;}};
   ciOnly=changes.some(c=>ciSources.has(c.path))&&(!remainder.length||documentScope(remainder,read,mode).safe);
   evidence=analyzeDelta(changes,read,modules.map(p=>({...p,suites:p.suites.map(n=>'apps/backend/tests/'+n+'.test.mjs')})));

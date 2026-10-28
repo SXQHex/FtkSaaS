@@ -11,7 +11,7 @@ if(import.meta.url===pathToFileURL(process.argv[1]??'').href){
  const plan=JSON.parse(fs.readFileSync(ciFile('selection.json')));
  const run=(cmd,args)=>{const r=spawnSync(cmd,args,{stdio:'inherit',env:{...process.env,FTK_TEST_TIMINGS:'1'}});if(r.error||r.status!==0)throw Error('TARGETED_FAILED '+cmd);};
  run('node',['--test','tests/ci-policy.test.mjs']);run('node',['scripts/ci/docs-check.mjs']);
- if(plan.structural)run('pnpm',['--dir',repoFile(),'run','verify']);
+ if(plan.structural)run('pnpm',['--dir',repoFile(),'exec','turbo','run','verify','--filter=@ftksaas/backend...']);
  if(plan.db){run('pnpm',['run','dev:start']);try{
   run('node',['scripts/ci/reset-local.mjs']);run('pnpm',['run','test:db']);runApiPhases(plan,run);
  }finally{run('node',['scripts/ci/cleanup.mjs']);}}
