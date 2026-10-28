@@ -589,3 +589,20 @@ test('real Turbo dependency filters run backend and frontend independently and i
  assert(backend.includes('@ftksaas/backend'));assert(backend.includes('@ftksaas/api-contracts'));assert(!backend.includes('@ftksaas/web'));assert(!backend.includes('@ftksaas/ui'));
  assert(frontend.includes('@ftksaas/web'));assert(frontend.includes('@ftksaas/api-contracts'));assert(frontend.includes('@ftksaas/ui'));assert(!frontend.includes('@ftksaas/backend'));
 }));
+test('scope and its pre-install CLI give identical full-tree decisions from repository root and backend cwd',()=>fixture((dir,git)=>{
+ const backend=join(dir,'apps/backend');mkdirSync(backend,{recursive:true});
+ const base=git('rev-parse','HEAD');
+ writeFileSync(join(dir,'README.md'),'Changed prose');git('add','.');git('commit','-m','docs');
+ let head=git('rev-parse','HEAD');
+ assert.deepEqual(localScope(base,head,backend),localScope(base,head,dir));
+ assert.equal(localScope(base,head,backend).kind,'documentation');
+ mkdirSync(join(backend,'database'),{recursive:true});writeFileSync(join(backend,'database/kernel.sql'),'runtime');git('add','.');git('commit','-m','backend');head=git('rev-parse','HEAD');
+ assert.deepEqual(localScope(base,head,backend),localScope(base,head,dir));assert.equal(localScope(base,head,backend).backend,true);
+ for(const cwd of [dir,backend]){
+  const output=join(dir,'scope-output');writeFileSync(output,'');
+  execFileSync(process.execPath,[resolve('apps/backend/scripts/ci/scope.mjs')],{cwd,env:{...process.env,HEAD:head,GITHUB_OUTPUT:output},stdio:'pipe'});
+  assert(fs.readFileSync(output,'utf8').includes('backend=true'));
+ }
+ const beforeLink=head;fs.unlinkSync(join(dir,'README.md'));fs.symlinkSync('apps/backend/database/kernel.sql',join(dir,'README.md'));git('add','README.md');git('commit','-m','symlink');head=git('rev-parse','HEAD');
+ for(const cwd of [dir,backend])assert.throws(()=>localScope(beforeLink,head,cwd),/UNSAFE_DOCUMENT/);
+}));

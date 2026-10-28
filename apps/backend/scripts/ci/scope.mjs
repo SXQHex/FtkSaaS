@@ -25,6 +25,7 @@ export function classifyChanges(changes){
  return scope;
 }
 export function localScope(base,head,cwd=process.cwd()){
+ cwd=execFileSync('git',['rev-parse','--show-toplevel'],{cwd,encoding:'utf8',stdio:['ignore','pipe','pipe']}).trim();
  const git=(...a)=>execFileSync('git',a,{cwd,encoding:'utf8',maxBuffer:24*1024*1024,stdio:['ignore','pipe','pipe']});
  const changes=parseChanges(git('diff','--name-status','-z','--find-renames',base,head)),scope=classifyChanges(changes);
  const docs=changes.filter(c=>ownerOf(c.path)==='documentation');
