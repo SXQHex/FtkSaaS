@@ -72,5 +72,13 @@ export async function getCenters(orgId: string) {
 export function errorMessageKey(error: unknown) {
   if (!(error instanceof ApiFailure)) return "network";
   const code = error.failure.error.code;
-  return ["AUTH_REQUIRED", "SESSION_REVOKED", "NOT_FOUND", "FORBIDDEN", "SERVICE_UNAVAILABLE"].includes(code) ? code : "unknown";
+  return [
+    "AUTH_REQUIRED",
+    "SESSION_REVOKED",
+    "NOT_FOUND",
+    "FORBIDDEN",
+    "SERVICE_UNAVAILABLE",
+  ].includes(code)
+    ? code
+    : "unknown";
 }
