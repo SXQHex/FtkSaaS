@@ -119,6 +119,7 @@ jobs:
     runs-on: ubuntu-24.04
     steps:
       - name: Backend unchanged (no backend acceptance)
+        working-directory: .
         run: echo 'Frontend-only merge; backend tests and delivery are not required.'
   clean:
     needs: source

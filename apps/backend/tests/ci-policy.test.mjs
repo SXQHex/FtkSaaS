@@ -606,3 +606,10 @@ test('scope and its pre-install CLI give identical full-tree decisions from repo
  const beforeLink=head;fs.unlinkSync(join(dir,'README.md'));fs.symlinkSync('apps/backend/database/kernel.sql',join(dir,'README.md'));git('add','README.md');git('commit','-m','symlink');head=git('rev-parse','HEAD');
  for(const cwd of [dir,backend])assert.throws(()=>localScope(beforeLink,head,cwd),/UNSAFE_DOCUMENT/);
 }));
+
+test('frontend-only main marker runs without checkout from runner workspace root',()=>{
+ const source=fs.readFileSync('.github/workflows/backend.yml','utf8');
+ const marker=source.slice(source.indexOf('  frontend:\n'),source.indexOf('  clean:\n'));
+ assert(marker.includes('working-directory: .'));
+ assert(marker.includes('Backend unchanged (no backend acceptance)'));
+});
