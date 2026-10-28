@@ -1,14 +1,14 @@
 # Kaynak indeksi
 
-Tek repo SXQHex/FtkSaaS; main güncel kaynak dalıdır. Önce [AGENTS](../AGENTS.md), sonra [güncel kabul](contracts/00-FtkSaaS-yeni-sohbet-devir.md), [açık işler](remaining-work.md), [aktif sıra](production-queue.md) okunur. Görevle ilgili alan belgesi bunun ardından seçilir.
+Tek repo SXQHex/FtkSaaS; main güncel kaynak dalıdır. Başlangıç yönlendirmesi [AGENTS](../AGENTS.md) sahibindedir. Frontend UI/UX işi [uygulama planı](../apps/web/PLAN.md), kuralları ve README’siyle başlar; frontend günlük işleri genel görev listelerine kopyalanmaz. Backend/ortak entegrasyon işi [backend kabulü](contracts/00-FtkSaaS-yeni-sohbet-devir.md), [açık işler](remaining-work.md), [sıra](production-queue.md) ve ilgili alan belgesiyle ilerler.
 
 ## Tek kaynak tablosu
 
 | Soru | Yetkili kaynak |
 |---|---|
-| Ne kabul edildi, hangi SHA/CI/CD/hosted sürümü? | [00 güncel kabul](contracts/00-FtkSaaS-yeni-sohbet-devir.md) |
-| Hangi iş açık? | [remaining-work](remaining-work.md) |
-| Şimdi hangi sırada çalışıyoruz? | [production-queue](production-queue.md) — backlog’u kopyalamaz |
+| Backend/ortak entegrasyonda hangi kaynak ve kabul geçerli? | [00 güncel kabul](contracts/00-FtkSaaS-yeni-sohbet-devir.md) |
+| Backend/ortak entegrasyonda hangi iş açık? | [remaining-work](remaining-work.md) |
+| Backend/ortak entegrasyon sırası ne? | [production-queue](production-queue.md) — backlog’u kopyalamaz |
 | Ürün davranışı ne? | [01 ürün](contracts/01-FtkSaaS-urun-kapsam-sozlesmesi.md), kabul edilmiş decisions/ |
 | Teknik kurallar ve69 ayar grubu? | [02 teknik](contracts/02-FtkSaaS-teknik-sozlesme.md) |
 | Aktör/dosya/değişiklik yetkisi? | [AGENTS](../AGENTS.md), [03 sorumluluk](contracts/03-FtkSaaS-kodlama-sorumluluklari.md) |
@@ -16,7 +16,8 @@ Tek repo SXQHex/FtkSaaS; main güncel kaynak dalıdır. Önce [AGENTS](../AGENTS
 | Uygulanan API ve fiziksel şema? | [Endpoint envanteri](endpoint-inventory.json), apps/backend/supabase/migrations/, apps/backend/database/;04/05 ve [özellik haritası](feature-delivery.md) üretilmiş görünümler |
 | İstemci nasıl bağlanır? | [Entegrasyon devri](claude-handover.md), [ayar tüketicileri](frontend-settings-handover.md), [API değişmezleri](api-invariants.md) |
 | Repo/ortam/dağıtım düzeni? | [Monorepo](monorepo.md), [hosted runbook](remote-backend-setup.md), [CI politikası](ci-policy.md) |
-| Frontend ne durumda? | [Frontend geliştirme](../apps/web/README.md), [göç/ortam sınırları](monorepo.md) |
+| Frontend planı, açık işleri, sırası ve kabulü ne? | [apps/web/PLAN.md](../apps/web/PLAN.md) |
+| Frontend nasıl çalıştırılır ve doğrulanır? | [apps/web/README.md](../apps/web/README.md) |
 | Hangi belge neden var? | [Belge haritası ve saklama kuralı](documentation-map.md) |
 
 ## Öncelik ve kanıt

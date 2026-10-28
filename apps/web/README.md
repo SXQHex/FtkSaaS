@@ -1,14 +1,14 @@
 # Frontend geliştirme
 
-Kapsam yalnız FtkSaaS'tır. Web uygulaması apps/web, ortak arayüz packages/ui sahibindedir. Kök [AGENTS](../../AGENTS.md), [istemci protokolü](../../docs/claude-handover.md) ve [API sözleşme paketi](../../packages/api-contracts/README.md) önceliklidir. Güncel kabul [00 devirde](../../docs/contracts/00-FtkSaaS-yeni-sohbet-devir.md), açık iş [tek backlog'dadır](../../docs/remaining-work.md).
+Kapsam yalnız FtkSaaS'tır. Web uygulaması apps/web, ortak arayüz packages/ui sahibindedir. Kök [AGENTS](../../AGENTS.md), [istemci protokolü](../../docs/claude-handover.md) ve [API sözleşme paketi](../../packages/api-contracts/README.md) önceliklidir. Frontend planı, ilerleme, açık kararlar ve kabul durumu [PLAN.md](PLAN.md) sahibindedir. Bu README yalnız teknik kullanım ve araçları anlatır; [AGENTS](AGENTS.md) çalışma kurallarını taşır.
 
 ## Bileşen ve araç kuralları
 
 Önce shadcn/ui ve ondan türetilmiş hazır bloklar değerlendirilir. Özel bileşen yalnız hazır seçenek ihtiyacı karşılamadığında yazılır. packages/ui/registry-sources.json resmî registry adreslerini, alınan kaynakların SHA256 değerlerini ve login-01 uyarlamasını kaydeder; aynı paketin LICENSE dosyası MIT bildirimini korur. Kullanılan bileşenler React 19 ve Tailwind 4 ile çalışır.
 
-Bu teslim teknik altyapıdır; mevcut taslak tasarım kabul edilmemiştir. Ürün CRM olarak ele alınmaz. Resmî login-01 bloğunun merkezlenmiş yerleşimi yalnız Auth bağlantısını doğrulamak için kullanılır; dashboard, ürün menüsü ve iş ekranları ayrı tasarım çalışmasına bırakılır. Genel tablo/form framework’ü veya hazır bileşenleri yeniden saran bir katman kurulmaz.
+Auth bağlantı kontrolü resmî login-01 bloğunun merkezlenmiş yerleşimini kullanır. Ekran tasarımı kapsamı ve açık kararlar [planda](PLAN.md) tutulur; genel tablo/form framework’ü veya hazır bileşenleri yeniden saran bir katman kurulmaz.
 
-Üç starter için değerlendirme ve tam kaynak commit’leri [starter kaynak kaydındadır](starter-sources.json). Bu aşamada starter dosyası kopyalanmadı: mevcut araçlar korunur, Clerk/Better Auth/veritabanı ve Base UI katmanları taşınmaz. shadcn uyarlamasının dosya/commit/hash izi registry kaydında, MIT bildirimi packages/ui/LICENSE içindedir.
+Üç starter için değerlendirme ve tam kaynak commit’leri [starter kaynak kaydındadır](starter-sources.json). Starter dosyası kopyalanmamıştır; Clerk/Better Auth/veritabanı ve Base UI katmanları taşınmaz. shadcn uyarlamasının dosya/commit/hash izi registry kaydında, MIT bildirimi packages/ui/LICENSE içindedir.
 
 Build önbelleği apps/web/turbo.json içinde .next çıktıları, açık NEXT_PUBLIC_* girdileri ve .env* dosya hash’leriyle tanımlıdır; yerel bağlantı değişince önceki build cache’i kullanılmaz.
 
@@ -69,7 +69,7 @@ next-intl, locale routing eklemeden tr/en sözlüklerini sunucu ve istemciye ta�
 
 Çeviri runtime’ı opsiyonel SWC/Parcel extraction araçlarının lifecycle scriptlerini gerektirmez; workspace allowBuilds bunları açıkça kapatır. Yeni form/state/tablo/chart kütüphanesi kurulmaz.
 
-packages/ui web/DOM bileşenleridir; Expo’da doğrudan kullanılabilir kabul edilmez. Expo kurulumu sonraki iştir. API tipleri ortak pakette kalır; renk/boşluk değerleri platformdan bağımsız kavramlarla ifade edilir.
+packages/ui web/DOM bileşenleridir; Expo’da doğrudan kullanılabilir kabul edilmez. Expo işinin sırası [planda](PLAN.md) tutulur. API tipleri ortak pakette kalır; renk/boşluk değerleri platformdan bağımsız kavramlarla ifade edilir.
 
 ## Lint ve format
 

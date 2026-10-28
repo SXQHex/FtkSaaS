@@ -50,15 +50,9 @@ PR62 normal merge ile main `1c15ac8c43b4acc07e129b970e49801ebaf16d10` kaynağın
 
 ST-02 teslimi yukarıdaki aynı kaynak main/development zinciriyle kapandı. Sonraki sıra için yeni uygulama başlatılmadı.
 
-Backend `apps/backend`, normatif JSON `packages/api-contracts/schema`, yaşayan sözleşmeler `docs/contracts`, tarihsel snapshotlar `docs/history` altındadır. saaspt main `bec7e204e06a813e4907ff012d4bcea783472a15` kaynak incelemesi önceki teslimdedir; frontend aktarımı ve ekran/API kabulü frontend ekibinin ayrı WEB-01 işidir.
+Backend `apps/backend`, normatif JSON `packages/api-contracts/schema`, yaşayan sözleşmeler `docs/contracts`, tarihsel snapshotlar `docs/history` altındadır. saaspt main `bec7e204e06a813e4907ff012d4bcea783472a15` kaynak incelemesi önceki teslimdedir; frontend planı ve ekran/API kabulü [uygulama planının](../../apps/web/PLAN.md) sahibindedir.
 
 [Kaynak indeksi](../source-index.md), [tek backlog](../remaining-work.md), [aktif sıra](../production-queue.md), [ortam devri](../monorepo.md).
-## Frontend geri alma adayı — 28 Ekim 2026
-
-Kullanıcı etiket yasağını kaldırdı ve PR66 frontend merge'inin geri alınmasına başlanmasını istedi. Ardından manuel tetikleyicinin de gereksiz olduğunu belirtti; PR67'nin manuel workflow'u ve ona ait politika bölümü aynı adayda kaldırılır. Hazırlık main `7334d24c9f1f5a54686125b890ce90c321b896e6` üzerinde ayrı geri alma dalındadır. PR66'nın ilk parent'ına göre ters yaması uygulanır. Backend uygulama kaynağı PR66 öncesi `f52fdaf7b6d1ecec56a8cb75ffaf7272f45770cf` ile aynıdır; yalnız PR66 ile eklenmiş governance test uyarlaması geri alınır. Yeni full clean ve merge henüz kabul edilmedi.
-
-Geri alma sonrasında frontend aynı repo içinde ayrı PR ile yeniden uygulanır. Her adayda son head/base/tested merge üzerinde full clean başarıyla bitmeden merge yapılmaz; merge sonrası aynı main kabulü ayrıca doğrulanır. Eski başarısız koşular yeniden adlandırılmaz veya başarıya çevrilmez. Diğer repolar bağlam dışıdır; eski göç notları bu kararı değiştirmez.
-
 ## CI-SPLIT uygulama adayı — 28 Ekim 2026
 
 Başlangıç main `1f7f4a394c6ef8c50af0b292e23f457882370f77`; aynı SHA'nın [main kabulü40610094049](https://github.com/SXQHex/FtkSaaS/actions/runs/40610094049) ve [development CD40613023027](https://github.com/SXQHex/FtkSaaS/actions/runs/40613023027) GitHub'dan completed/success doğrulandı. Açık PR65 ST-03 kapsamındadır; bu işe mükerrer değildir. CI-SPLIT `ci/split-backend-frontend` dalında ayrı uygulama adayıdır.
@@ -87,24 +81,6 @@ CI-ADMIN talimatıyla main-acceptance ruleset26040398 uygulandı, active/strict-
 
 CI-ADMIN required-check/strict-base/bypass kurulumunun eksik iki negatif kabulü gerçek test PR71 ve72 ile doğrulandı. Çakışmasız/non-Draft başarısız kanıt blocked; source-bound başarılı kanıt taşıyan eski branch behind kaldı. Test PR'leri merge edilmeden kapatıldı ve main değişmedi. [İzole kanıtlar](../branch-protection-review.md#ci-admin-izole-negatif-kabulü--28-ekim-2026). Bu kapanış yalnız yönetim ve negatif kabul içindir; CI-SPLIT frontend örneklerini veya yeni runtime/production kabulünü kapatmaz. Kapanış belge adayının kendi kaynak bağlı belge/main kabulü ayrıca izlenir.
 
-## WEB-01 frontend altyapısı adayı — 28 Ekim 2026
+## Frontend kaynak yönlendirmesi
 
-[PR76](https://github.com/SXQHex/FtkSaaS/pull/76) ayrı frontend adayıdır. Başlangıç kaynak `8d5d3025f1be5d3318e042bfb9167b4bfdca859c`; aynı SHA'nın [main clean40682715287](https://github.com/SXQHex/FtkSaaS/actions/runs/40682715287) source/core/API1–4/full-clean işleri ve [development CD40686483288](https://github.com/SXQHex/FtkSaaS/actions/runs/40686483288) completed/success doğrulandı. PR açılırken güncel base `7bf9b3a15843d13c7f31ad4ecd0f8f78c8812d88` üzerindeki yalnız CI-ADMIN belge değişiklikleri korundu; bu base'in [main40694002736](https://github.com/SXQHex/FtkSaaS/actions/runs/40694002736) ve [CD40694110185](https://github.com/SXQHex/FtkSaaS/actions/runs/40694110185) completed/success sonucu ayrıca okundu. Belge-only kabulü yeni frontend runtime kabulü değildir.
-
-Son kullanıcı kararıyla mevcut taslak tasarım reddedildi; ürün CRM olarak ele alınmaz. Bu aday yalnız resmî shadcn/ui login-01 tabanlı Auth/bağlantı doğrulaması, tr/en, tema, typed Edge tüketimi ve frontend araç/test/CI altyapısıdır. Ekran tasarımı ve Expo kurulumu ayrı aşamadır. Backend kaynakları, API sözleşmesi ve backend workflow/gate dosyalarında değişiklik yoktur. Teknik tüketim ve hazır blok kuralları [frontend rehberindedir](../../apps/web/README.md).
-
-Node24.22.1 ile frontend lint/typecheck/build,12 web +1 UI birim testi, coverage ve gerçek Turbo dry-run ayrımı geçti. Chromium/WebKit/mobil public kabul18/18 geçti; dil kalıcılığı, metadata/lang, tema, klavye,320px/yüzde200 metin ve axe dahildir. Yerel Firefox1555, test sayfasını açmadan `Could not find profile folder` ile başlatılamadı; CI Firefox projesi korunur, kabul edilmiş sayılmaz. Mevcut yetkili development hesabıyla live-chromium native giriş→gerçek kuruluş/merkez seçimi→çıkış→korumalı alana erişimin kapanması1/1 geçti. Canlı koşuda trace/video/screenshot kapalıdır; hesap/parola kaydı yoktur. Google/TOTP sağlayıcı dönüşü bu parola giriş kabulünden türetilmez.
-
-PR Draft durumundadır. Son kaynak bağımsız incelemesi, uzak frontend/ortak kapsam kabulü, aday full clean, normal merge ve aynı main kabulü bu yerel sonuçlarla kapanmaz; güncel run/head ilişkisi PR üzerinden doğrulanmalıdır.
-
-İlk kaynak head `e9c6ba5b9d9a613f483f203a1a0ba1bd63b99d20` için [targeted40694656538](https://github.com/SXQHex/FtkSaaS/actions/runs/40694656538), scope aşamasında `UNCLASSIFIED_SOURCE docs/frontend-development.md` ile durdu; backend testleri başlamadı. Yeni frontend rehberi uygulama sahibinin apps/web/README.md yoluna alındı ve bağlantıları düzeltildi. Backend scope kaydı veya güvenlik kapıları değiştirilmedi; önceki başarısız koşu korunur. Yeni kaynak uzak kabulü ayrıca doğrulanacaktır.
-
-Head `1518149b0e957c322bbd792b218ba5dffdeec92d` için [frontend40695015077](https://github.com/SXQHex/FtkSaaS/actions/runs/40695015077) koşusunda Chromium ve Firefox geçti; WebKit/mobil dil seçimi HTTP loopback üzerinde Secure cookie reddi nedeniyle başarısız oldu. Yalnız locale cookie için HTTP localhost/127.0.0.1 istisnası eklendi; hosted originlerde Secure korunur. Assertion veya güvenlik kapısı gevşetilmedi. Bu sınır için3 regresyon testi eklendi;15 web +1 UI birim testi ve yerel WebKit/mobil dil-tema4/4 doğrulandı. Eski başarısız koşular yeni kaynağa başarı olarak taşınmaz.
-
-Kullanıcının ayrı ajan yetkisiyle head `b5b0aa42ed84e789151f2366c209dae86b57d875`, tree `888eef4ccc2f1a17be1d4718f4d9b436a3ea2828` bağımsız incelendi. P2: girişli settings yüklemesi cihazın next-themes tercihini eziyordu. Geçerli cihaz seçimi korunacak, yalnız seçim yokken hesap teması başlangıç olacak şekilde dar düzeltme ve remount regresyonu eklendi. Son yerel frontend lint/typecheck/build ve16 web +1 UI testi geçti. Son kaynak yeniden incelemesi PR76 açıklamasında kaydedilir; önceki inceleme yeni kaynağın kabulü yerine geçmez. Backend/sözleşme/backend CI kaynağı değişmedi.
-
-## WEB-01 Oxlint/Oxfmt araç adayı — 28 Ekim 2026
-
-Son kullanıcı talimatıyla araç geçişi `chore/frontend-oxlint-oxfmt` dalında, PR76 head `9673f87aea7dcafe784f87e9c5a99272c0c84f41` üstünde ayrı adaydır. PR76 kaynağına push veya yeni full-clean tetiklemesi yapılmadı. apps/web ve packages/ui Biome bağımlılık/config’leri kaldırıldı; Oxlint1.90.0 ve Oxfmt0.75.0 tam sürümle eklendi. Lint önce Oxlint uyarılarını hata sayar, ardından Oxfmt check yapar; mevcut frontend CI komutları bu iki kontrolü de tüketir. Bağımsız tsc typecheck korundu. Yerel kural kapsamı ve gerekçeli iki bileşen istisnası [frontend rehberindedir](../../apps/web/README.md#lint-ve-format).
-
-Node24.22.1 `check:frontend` lint/format/typecheck/build ve16 web +1 UI testiyle geçti; gerçek Turbo görev ayrımı backend görevi seçmedi. Formatlanan11 runtime kaynağının normalize derleme çıktısı başlangıçla aynı; test assertion’ları değişmedi, mock tipleri açıklaştırıldı. pnpm çok belgeli lockfile karşılaştırmasında backend importer’ı ve geçişli100 snapshot/resolution kaydı birebir aynı. Backend/API sözleşmesi/backend CI/CD kaynak farkı yoktur. Ortak lockfile hâlâ mevcut CI politikasının ortak kapsamındadır; bu kontrol scope istisnası oluşturmaz. Yeni araç adayının uzak CI/bağımsız inceleme/full clean/merge/main kabulü henüz bu yerel sonuçlarla kapanmaz.
+Frontend planı, açık işleri, sırası ve kabul kanıtları [apps/web/PLAN.md](../../apps/web/PLAN.md) sahibindedir. Bu backend/ortak entegrasyon devrinde frontend aday kronolojisi tutulmaz. Önceki frontend kayıtlarının değişmez kaynak bağlantısı uygulama planında korunur.

@@ -1,6 +1,6 @@
 # Markdown sahipliği ve saklama haritası
 
-SSoT her bilgiyi tek sahibinde tutmaktır. [Kaynak indeksi](source-index.md) önceliği belirler. Güncel kaynak/CI/CD yalnız00 devirde, açık iş remaining-work’te, aktif sıra production-queue’da tutulur. Alan devirleri bu sahipleri referans verir; kopya durum kronolojisi eklenmez.
+SSoT her bilgiyi tek sahibinde tutmaktır. [Kaynak indeksi](source-index.md) önceliği belirler. Backend/ortak entegrasyon kaynak kabulü00 devirde, açık işleri remaining-work’te ve sırası production-queue’da tutulur. Frontend planı, açık işleri, sırası ve kabul durumu apps/web/PLAN.md sahibindedir; frontend günlük görevleri genel docs içinde çoğaltılmaz. Alan devirleri bu sahipleri referans verir; kopya durum kronolojisi eklenmez.
 
 ## Saklama ve konsolidasyon
 
@@ -59,9 +59,9 @@ Kuyruktaki eşsiz P08 kararları [P08 kararının](decisions/P08-accepted-scope.
 | [docs/p06-handover.md](p06-handover.md) | Alan tüketim devri ve kaynağına bağlı eski kabul; güncel durum sahibi00 |
 | [docs/p07-a-handover.md](p07-a-handover.md) | Alan tüketim devri ve kaynağına bağlı eski kabul; güncel durum sahibi00 |
 | [docs/physical-invariants.md](physical-invariants.md) | Fiziksel bütünlük ve kilit/indeks devri |
-| [docs/production-queue.md](production-queue.md) | Yalnız aktif iş sırası |
+| [docs/production-queue.md](production-queue.md) | Backend/ortak entegrasyon iş sırası |
 | [docs/program-session-handover.md](program-session-handover.md) | Alan tüketim devri ve kaynağına bağlı eski kabul; güncel durum sahibi00 |
-| [docs/remaining-work.md](remaining-work.md) | Açık iş ve kapanış ölçütlerinin tek sahibi |
+| [docs/remaining-work.md](remaining-work.md) | Backend/ortak entegrasyon açık işleri ve kapanış ölçütleri |
 | [docs/remote-backend-setup.md](remote-backend-setup.md) | Hosted/restore runbook ve tarihli işletim kanıtları |
 | [docs/schedule-read-handover.md](schedule-read-handover.md) | Alan tüketim devri ve kaynağına bağlı eski kabul; güncel durum sahibi00 |
 | [docs/settlement-handover.md](settlement-handover.md) | Alan tüketim devri ve kaynağına bağlı eski kabul; güncel durum sahibi00 |
@@ -69,7 +69,8 @@ Kuyruktaki eşsiz P08 kararları [P08 kararının](decisions/P08-accepted-scope.
 | [docs/starter-attendance-protection-handover.md](starter-attendance-protection-handover.md) | Alan tüketim devri ve kaynağına bağlı eski kabul; güncel durum sahibi00 |
 | [docs/starter-plan-gates-handover.md](starter-plan-gates-handover.md) | Alan tüketim devri ve kaynağına bağlı eski kabul; güncel durum sahibi00 |
 | [packages/api-contracts/README.md](../packages/api-contracts/README.md) | Ortak şema/üreteç/typed tüketim arayüzü |
-| [apps/web/README.md](../apps/web/README.md) | Frontend araçları, hazır blok seçimi, iki dil ve doğrulama komutları |
+| [apps/web/README.md](../apps/web/README.md) | Frontend teknik kullanım, araçlar ve doğrulama komutları |
+| [apps/web/PLAN.md](../apps/web/PLAN.md) | Kabul edilmiş frontend planı, ilerleme, açık işler, sıra ve kabul kanıtlarının tek sahibi |
 | [apps/web/AGENTS.md](../apps/web/AGENTS.md) | Frontend dosya sahipliği ve hazır bileşen kuralları |
 
 ## Tarihsel dosyalar

@@ -1,9 +1,10 @@
 # Frontend kuralları
 
-Kapsam yalnız FtkSaaS'tır. Önce kök AGENTS ve docs/claude-handover.md okunur.
+Kapsam yalnız FtkSaaS'tır. Önce [kök kuralları](../../AGENTS.md), [plan ve ilerlemeyi](PLAN.md), [teknik kullanımı](README.md) oku; API tüketimi gerektiğinde [istemci protokolünü](../../docs/claude-handover.md) kullan.
+Frontend planı, açık işleri, sırası ve kabul durumu yalnız PLAN.md içinde tutulur. README kurulum/komutlar, AGENTS çalışma kuralları içindir; buralara ikinci görev listesi yazılmaz. Genel docs listeleri frontend günlük işlerini taşımaz; ortak belgelerde yalnız iki tarafı etkileyen sözleşme/entegrasyon bilgisi bulunur.
 Ekran tasarımı ayrı çalışmadır; mevcut taslak kabul edilmez, CRM menüsü veya dashboard varsayılmaz.
 Önce shadcn/ui ve ondan türetilmiş hazır bloklar kullanılır; özel bileşen ancak mevcut seçenekler yetmediğinde yazılır. Kaynak ve lisans izi korunur.
-Frontend/test değişiklikleri apps/backend veya mevcut backend CI/kabul kaynaklarını değiştirme yetkisi vermez. Bu sınırdaki ihtiyaç docs/remaining-work.md içinde bildirilir.
+Frontend/test değişiklikleri apps/backend veya mevcut backend CI/kabul kaynaklarını değiştirme yetkisi vermez. Frontend’e ait ihtiyaç PLAN.md içinde tutulur; backend değişikliği gerektiren gerçek ortak entegrasyon ihtiyacı ilgili alan belgesine bağlanır.
 Vitest/Testing Library/MSW bileşen testleri ve Playwright/axe tarayıcı testleri ilk günden tutulur. Mock kabulü gerçek Auth/Edge/DB kabulü değildir. Teste özel Auth bypass'ı uygulamaya eklenmez.
 API tipleri @ftksaas/api-contracts, transport aynı paketin /client export'undan gelir. Ayrıcalıklı anahtar, token veya gerçek veri fixture/log'a yazılmaz. Hiçbir hata sahte başarıya dönüşmez.
 pnpm check:frontend ve pnpm test:frontend:e2e frontend doğrulamasıdır. Backend komutları burada otomatik çağrılmaz.
