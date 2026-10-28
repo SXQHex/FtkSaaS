@@ -1,6 +1,6 @@
 # FtkSaaS — API kataloğu · 0.2.0-rc.3
 
-220 sözleşme; 220 geliştirme ortamında çağrılabilir endpoint, 0 yalnız sözleşme. Çağrılabilir olmak bütün ürün özelliklerinin veya üretim kabulünün tamamlandığı anlamına gelmez. Kapsam sınırları ve Q-E01 `docs/claude-handover.md` içindedir.
+221 sözleşme; 221 geliştirme ortamında çağrılabilir endpoint, 0 yalnız sözleşme. Çağrılabilir olmak bütün ürün özelliklerinin veya üretim kabulünün tamamlandığı anlamına gelmez. Kapsam sınırları ve Q-E01 `docs/claude-handover.md` içindedir.
 
 `POST {API_URL}/functions/v1/backend-v1/{operation}`; JSON gövde doğrudan typed Request nesnesidir. Header: `Authorization: Bearer <Supabase access_token>`, `apikey: <publishable key>`, `Content-Type: application/json`. Başarı: `ok/data/trace_id`; hata: `ok:false/error:SafeError`. Servis anahtarı frontend’e verilmez.
 
@@ -228,6 +228,7 @@ Named `/rest/v1/rpc/{operation}` yalnız backend içindir; imzası p_request + d
 | `calendar_link_rotate_v1` | çağrılabilir (kapsam notları geçerli) | `calendar.self` | W / config | client_api_version: 1; request_id: FtkUuid; operation_key: FtkUuid; organization_scope: object; link_id: FtkUuid; expected_version: PositiveInt | Success_calendar_link_rotate |
 | `calendar_link_revoke_v1` | çağrılabilir (kapsam notları geçerli) | `calendar.self` | W / config | client_api_version: 1; request_id: FtkUuid; operation_key: FtkUuid; link_id: FtkUuid; expected_version: PositiveInt | Success_calendar_link_revoke |
 | `calendar_feed_get_v1` | çağrılabilir (kapsam notları geçerli) | `calendar.feed` | R / read | client_api_version: 1; request_id: FtkUuid; token: string | Success_calendar_feed_get |
+| `settings_preparation_resolve_v1` | çağrılabilir (kapsam notları geçerli) | `preparation.resolve` | R / read | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; center_id: FtkUuid; kind: availability / package; source: PreparationSourceReference; resource?: ResourceRef; rule_index?: integer | Success_settings_preparation_resolve |
 
 ## İşlem bazında hedef sözleşme ve runtime ayrımı
 
@@ -455,6 +456,7 @@ features ürün referanslarıdır. required_features hedef plan kapısı; runtim
 | calendar_link_rotate_v1 | auth | row_version / calendar_links_get_v1 | personal_calendar_credential_change, personal_calendar_metadata_history, receipt | implemented_pending_ci |
 | calendar_link_revoke_v1 | auth | row_version / calendar_links_get_v1 | personal_calendar_credential_change, personal_calendar_metadata_history, receipt | implemented_pending_ci |
 | calendar_feed_get_v1 | read | none / None |  | implemented_pending_ci |
+| settings_preparation_resolve_v1 | read | none / None |  | implemented_pending_ci |
 
 Önizleme süre sınırı 15 dakika. Apply canlı aktör/yetki/abonelik ve ilgili satır sürümlerini yeniden denetler. İdempotency kapsamı org + hesap + operasyon; merkez payload içindedir. Aynı anahtar/aynı içerik sonucu tekrarlar, farklı içerik reddedilir. Doğrulanmamış transport sonucunda yeni anahtar üretilmez.
 

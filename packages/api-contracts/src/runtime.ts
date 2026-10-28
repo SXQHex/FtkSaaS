@@ -219,6 +219,7 @@ export const runtimeOperationNames = [
   "calendar_link_create_v1",
   "calendar_link_rotate_v1",
   "calendar_link_revoke_v1",
-  "calendar_feed_get_v1"
+  "calendar_feed_get_v1",
+  "settings_preparation_resolve_v1"
 ] as const;
 export type RuntimeOperationName = typeof runtimeOperationNames[number];

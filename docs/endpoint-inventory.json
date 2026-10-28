@@ -5920,6 +5920,33 @@
         "Public ICS adapter and application origins plus signing key must be configured; no implicit URL.",
         "Create/rotate URLs are added only by Edge after receipt handling; only token hashes are stored. Current live pointer and scope are rechecked before replay and each feed fetch."
       ]
+    },
+    {
+      "name": "settings_preparation_resolve_v1",
+      "status": "operational_development_limited",
+      "external_path": "/functions/v1/backend-v1/settings_preparation_resolve_v1",
+      "permission": "preparation.resolve",
+      "features": [
+        "F02",
+        "F15",
+        "F16"
+      ],
+      "required_features": [],
+      "runtime_required_features": [],
+      "decision_delivery": {
+        "accepted_contract": "DS-2026-10-17",
+        "runtime_conformance": "implemented_pending_ci",
+        "open_dependencies": [],
+        "target_request": {
+          "$ref": "#/$defs/Request_settings_preparation_resolve"
+        }
+      },
+      "billing_class": "read",
+      "limits": [
+        "Read-only explicit template/source/version selection. Resolve grants no execution permission and creates no rule, product, sale or job.",
+        "New centers copy org preparation arrays once; existing centers and business snapshots do not live-inherit.",
+        "Package dates and refund method are explicit; no automatic rolling validity or implicit none."
+      ]
     }
   ]
 }

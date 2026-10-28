@@ -920,7 +920,8 @@
         "calendar_link_create_v1",
         "calendar_link_rotate_v1",
         "calendar_link_revoke_v1",
-        "calendar_feed_get_v1"
+        "calendar_feed_get_v1",
+        "settings_preparation_resolve_v1"
       ]
     },
     "EntityType": {
@@ -43380,6 +43381,265 @@
             ],
             "additionalProperties": false
           }
+        },
+        "availability_templates": {
+          "type": "array",
+          "maxItems": 100,
+          "items": {
+            "type": "object",
+            "properties": {
+              "key": {
+                "type": "string",
+                "pattern": "^[A-Za-z0-9_-]{1,64}$"
+              },
+              "name": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 100
+              },
+              "rules": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "weekdays": {
+                      "type": "array",
+                      "items": {
+                        "type": "integer",
+                        "minimum": 1,
+                        "maximum": 7
+                      },
+                      "uniqueItems": true,
+                      "minItems": 1
+                    },
+                    "local_start": {
+                      "type": "string",
+                      "pattern": "^([01][0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9]$"
+                    },
+                    "local_end": {
+                      "type": "string",
+                      "pattern": "^([01][0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9]$"
+                    },
+                    "valid_from": {
+                      "type": "string",
+                      "format": "date"
+                    },
+                    "valid_until": {
+                      "anyOf": [
+                        {
+                          "type": "string",
+                          "format": "date"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    }
+                  },
+                  "required": [
+                    "weekdays",
+                    "local_start",
+                    "local_end",
+                    "valid_from"
+                  ],
+                  "additionalProperties": false,
+                  "x-invariant": "local_start<local_end; overnight split explicitly, no silent DST shift"
+                },
+                "minItems": 1,
+                "maxItems": 100
+              }
+            },
+            "required": [
+              "key",
+              "name",
+              "rules"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "package_templates": {
+          "type": "array",
+          "maxItems": 100,
+          "items": {
+            "type": "object",
+            "properties": {
+              "key": {
+                "type": "string",
+                "pattern": "^[A-Za-z0-9_-]{1,64}$"
+              },
+              "name": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 100
+              },
+              "discipline_id": {
+                "$ref": "#/$defs/FtkUuid"
+              },
+              "terms": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string"
+                  },
+                  "kind": {
+                    "type": "string",
+                    "enum": [
+                      "credits",
+                      "timed"
+                    ]
+                  },
+                  "booking_mode": {
+                    "type": "string",
+                    "enum": [
+                      "priority",
+                      "flexible"
+                    ]
+                  },
+                  "credits": {
+                    "anyOf": [
+                      {
+                        "type": "integer",
+                        "minimum": 1,
+                        "maximum": 2147483647
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  },
+                  "price_minor": {
+                    "type": "string",
+                    "pattern": "^(0|[1-9][0-9]{0,18})$",
+                    "x-validation": "int(value)<=9223372036854775807"
+                  },
+                  "currency": {
+                    "type": "string",
+                    "pattern": "^[A-Z]{3}$",
+                    "x-validation": "currency exponent from versioned server allowlist; unsupported rejected"
+                  },
+                  "freeze": {
+                    "type": "object",
+                    "properties": {
+                      "enabled": {
+                        "type": "boolean",
+                        "enum": [
+                          false
+                        ]
+                      },
+                      "extends_validity": {
+                        "type": "boolean"
+                      },
+                      "max_days": {
+                        "anyOf": [
+                          {
+                            "type": "integer",
+                            "minimum": 1
+                          },
+                          {
+                            "type": "null"
+                          }
+                        ]
+                      }
+                    },
+                    "required": [
+                      "enabled",
+                      "extends_validity"
+                    ],
+                    "additionalProperties": false
+                  },
+                  "refund": {
+                    "type": "object",
+                    "properties": {
+                      "method": {
+                        "type": "string",
+                        "enum": [
+                          "none",
+                          "credit_ratio",
+                          "used_at_unit_price",
+                          "time_ratio"
+                        ]
+                      },
+                      "used_unit_minor": {
+                        "anyOf": [
+                          {
+                            "type": "string",
+                            "pattern": "^(0|[1-9][0-9]{0,18})$",
+                            "x-validation": "int(value)<=9223372036854775807"
+                          },
+                          {
+                            "type": "null"
+                          }
+                        ]
+                      }
+                    },
+                    "required": [
+                      "method"
+                    ],
+                    "additionalProperties": false,
+                    "x-invariant": "used_at_unit_price needs used_unit_minor; net actual sale basis; time_ratio uses paid local days"
+                  },
+                  "quota": {
+                    "anyOf": [
+                      {
+                        "type": "object",
+                        "properties": {
+                          "period": {
+                            "enum": [
+                              "week",
+                              "month"
+                            ],
+                            "type": "string"
+                          },
+                          "limit": {
+                            "type": "integer",
+                            "minimum": 1,
+                            "maximum": 9007199254740991
+                          }
+                        },
+                        "required": [
+                          "period",
+                          "limit"
+                        ],
+                        "additionalProperties": false
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  }
+                },
+                "required": [
+                  "booking_mode",
+                  "credits",
+                  "currency",
+                  "freeze",
+                  "kind",
+                  "name",
+                  "price_minor",
+                  "quota",
+                  "refund"
+                ],
+                "additionalProperties": false
+              },
+              "start_date": {
+                "type": "string",
+                "format": "date"
+              },
+              "end_date": {
+                "type": "string",
+                "format": "date"
+              }
+            },
+            "required": [
+              "key",
+              "name",
+              "discipline_id",
+              "terms",
+              "start_date",
+              "end_date"
+            ],
+            "additionalProperties": false
+          }
         }
       },
       "required": [],
@@ -43717,6 +43977,265 @@
             ],
             "additionalProperties": false
           }
+        },
+        "availability_templates": {
+          "type": "array",
+          "maxItems": 100,
+          "items": {
+            "type": "object",
+            "properties": {
+              "key": {
+                "type": "string",
+                "pattern": "^[A-Za-z0-9_-]{1,64}$"
+              },
+              "name": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 100
+              },
+              "rules": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "weekdays": {
+                      "type": "array",
+                      "items": {
+                        "type": "integer",
+                        "minimum": 1,
+                        "maximum": 7
+                      },
+                      "uniqueItems": true,
+                      "minItems": 1
+                    },
+                    "local_start": {
+                      "type": "string",
+                      "pattern": "^([01][0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9]$"
+                    },
+                    "local_end": {
+                      "type": "string",
+                      "pattern": "^([01][0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9]$"
+                    },
+                    "valid_from": {
+                      "type": "string",
+                      "format": "date"
+                    },
+                    "valid_until": {
+                      "anyOf": [
+                        {
+                          "type": "string",
+                          "format": "date"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    }
+                  },
+                  "required": [
+                    "weekdays",
+                    "local_start",
+                    "local_end",
+                    "valid_from"
+                  ],
+                  "additionalProperties": false,
+                  "x-invariant": "local_start<local_end; overnight split explicitly, no silent DST shift"
+                },
+                "minItems": 1,
+                "maxItems": 100
+              }
+            },
+            "required": [
+              "key",
+              "name",
+              "rules"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "package_templates": {
+          "type": "array",
+          "maxItems": 100,
+          "items": {
+            "type": "object",
+            "properties": {
+              "key": {
+                "type": "string",
+                "pattern": "^[A-Za-z0-9_-]{1,64}$"
+              },
+              "name": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 100
+              },
+              "discipline_id": {
+                "$ref": "#/$defs/FtkUuid"
+              },
+              "terms": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string"
+                  },
+                  "kind": {
+                    "type": "string",
+                    "enum": [
+                      "credits",
+                      "timed"
+                    ]
+                  },
+                  "booking_mode": {
+                    "type": "string",
+                    "enum": [
+                      "priority",
+                      "flexible"
+                    ]
+                  },
+                  "credits": {
+                    "anyOf": [
+                      {
+                        "type": "integer",
+                        "minimum": 1,
+                        "maximum": 2147483647
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  },
+                  "price_minor": {
+                    "type": "string",
+                    "pattern": "^(0|[1-9][0-9]{0,18})$",
+                    "x-validation": "int(value)<=9223372036854775807"
+                  },
+                  "currency": {
+                    "type": "string",
+                    "pattern": "^[A-Z]{3}$",
+                    "x-validation": "currency exponent from versioned server allowlist; unsupported rejected"
+                  },
+                  "freeze": {
+                    "type": "object",
+                    "properties": {
+                      "enabled": {
+                        "type": "boolean",
+                        "enum": [
+                          false
+                        ]
+                      },
+                      "extends_validity": {
+                        "type": "boolean"
+                      },
+                      "max_days": {
+                        "anyOf": [
+                          {
+                            "type": "integer",
+                            "minimum": 1
+                          },
+                          {
+                            "type": "null"
+                          }
+                        ]
+                      }
+                    },
+                    "required": [
+                      "enabled",
+                      "extends_validity"
+                    ],
+                    "additionalProperties": false
+                  },
+                  "refund": {
+                    "type": "object",
+                    "properties": {
+                      "method": {
+                        "type": "string",
+                        "enum": [
+                          "none",
+                          "credit_ratio",
+                          "used_at_unit_price",
+                          "time_ratio"
+                        ]
+                      },
+                      "used_unit_minor": {
+                        "anyOf": [
+                          {
+                            "type": "string",
+                            "pattern": "^(0|[1-9][0-9]{0,18})$",
+                            "x-validation": "int(value)<=9223372036854775807"
+                          },
+                          {
+                            "type": "null"
+                          }
+                        ]
+                      }
+                    },
+                    "required": [
+                      "method"
+                    ],
+                    "additionalProperties": false,
+                    "x-invariant": "used_at_unit_price needs used_unit_minor; net actual sale basis; time_ratio uses paid local days"
+                  },
+                  "quota": {
+                    "anyOf": [
+                      {
+                        "type": "object",
+                        "properties": {
+                          "period": {
+                            "enum": [
+                              "week",
+                              "month"
+                            ],
+                            "type": "string"
+                          },
+                          "limit": {
+                            "type": "integer",
+                            "minimum": 1,
+                            "maximum": 9007199254740991
+                          }
+                        },
+                        "required": [
+                          "period",
+                          "limit"
+                        ],
+                        "additionalProperties": false
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  }
+                },
+                "required": [
+                  "booking_mode",
+                  "credits",
+                  "currency",
+                  "freeze",
+                  "kind",
+                  "name",
+                  "price_minor",
+                  "quota",
+                  "refund"
+                ],
+                "additionalProperties": false
+              },
+              "start_date": {
+                "type": "string",
+                "format": "date"
+              },
+              "end_date": {
+                "type": "string",
+                "format": "date"
+              }
+            },
+            "required": [
+              "key",
+              "name",
+              "discipline_id",
+              "terms",
+              "start_date",
+              "end_date"
+            ],
+            "additionalProperties": false
+          }
         }
       },
       "required": [],
@@ -43846,7 +44365,9 @@
               "import_templates",
               "public_profile_enabled",
               "public_fields",
-              "public_hours"
+              "public_hours",
+              "availability_templates",
+              "package_templates"
             ]
           },
           "uniqueItems": true,
@@ -43881,6 +44402,9 @@
               "type": "null"
             }
           ]
+        },
+        "preparation_sources": {
+          "$ref": "#/$defs/PreparationSources"
         }
       },
       "required": [
@@ -44022,7 +44546,9 @@
                   "import_templates",
                   "public_profile_enabled",
                   "public_fields",
-                  "public_hours"
+                  "public_hours",
+                  "availability_templates",
+                  "package_templates"
                 ]
               },
               "uniqueItems": true,
@@ -44047,6 +44573,9 @@
                 "kind"
               ],
               "additionalProperties": false
+            },
+            "preparation_sources": {
+              "$ref": "#/$defs/PreparationSources"
             }
           },
           "required": [
@@ -44092,7 +44621,9 @@
                   "import_templates",
                   "public_profile_enabled",
                   "public_fields",
-                  "public_hours"
+                  "public_hours",
+                  "availability_templates",
+                  "package_templates"
                 ]
               },
               "uniqueItems": true,
@@ -44211,7 +44742,9 @@
           "import_templates",
           "public_profile_enabled",
           "public_fields",
-          "public_hours"
+          "public_hours",
+          "availability_templates",
+          "package_templates"
         ]
       },
       "minItems": 1,
@@ -44452,7 +44985,9 @@
             "import_templates",
             "public_profile_enabled",
             "public_fields",
-            "public_hours"
+            "public_hours",
+            "availability_templates",
+            "package_templates"
           ]
         },
         "group": {
@@ -44468,7 +45003,8 @@
             "schedule_build_program",
             "p06_report_prepare",
             "p06_import_prepare",
-            "public_profile"
+            "public_profile",
+            "domain_preparation_resolve"
           ]
         },
         "writable": {
@@ -44490,7 +45026,7 @@
           "$ref": "#/$defs/SettingsScope"
         },
         "catalog_version": {
-          "const": 5
+          "const": 6
         },
         "fields": {
           "type": "array",
@@ -44533,6 +45069,12 @@
         },
         "work_templates": {
           "$ref": "#/$defs/WorkTemplates"
+        },
+        "preparation_templates": {
+          "$ref": "#/$defs/PreparationTemplates"
+        },
+        "notification_delivery": {
+          "$ref": "#/$defs/NotificationDeliverySupport"
         }
       },
       "required": [
@@ -44552,7 +45094,7 @@
               "const": "user"
             },
             "catalog_version": {
-              "const": 5
+              "const": 6
             },
             "fields": {
               "type": "array",
@@ -44579,6 +45121,12 @@
             },
             "work_templates": {
               "$ref": "#/$defs/WorkTemplates"
+            },
+            "preparation_templates": {
+              "$ref": "#/$defs/PreparationTemplates"
+            },
+            "notification_delivery": {
+              "$ref": "#/$defs/NotificationDeliverySupport"
             }
           },
           "required": [
@@ -44598,7 +45146,7 @@
               "const": "member"
             },
             "catalog_version": {
-              "const": 5
+              "const": 6
             },
             "fields": {
               "type": "array",
@@ -44625,6 +45173,12 @@
             },
             "work_templates": {
               "$ref": "#/$defs/WorkTemplates"
+            },
+            "preparation_templates": {
+              "$ref": "#/$defs/PreparationTemplates"
+            },
+            "notification_delivery": {
+              "$ref": "#/$defs/NotificationDeliverySupport"
             }
           },
           "required": [
@@ -44644,7 +45198,7 @@
               "const": "center"
             },
             "catalog_version": {
-              "const": 5
+              "const": 6
             },
             "fields": {
               "type": "array",
@@ -44671,6 +45225,12 @@
             },
             "work_templates": {
               "$ref": "#/$defs/WorkTemplates"
+            },
+            "preparation_templates": {
+              "$ref": "#/$defs/PreparationTemplates"
+            },
+            "notification_delivery": {
+              "$ref": "#/$defs/NotificationDeliverySupport"
             }
           },
           "required": [
@@ -44690,7 +45250,7 @@
               "const": "organization"
             },
             "catalog_version": {
-              "const": 5
+              "const": 6
             },
             "fields": {
               "type": "array",
@@ -44717,6 +45277,12 @@
             },
             "work_templates": {
               "$ref": "#/$defs/WorkTemplates"
+            },
+            "preparation_templates": {
+              "$ref": "#/$defs/PreparationTemplates"
+            },
+            "notification_delivery": {
+              "$ref": "#/$defs/NotificationDeliverySupport"
             }
           },
           "required": [
@@ -44736,7 +45302,7 @@
               "const": "platform"
             },
             "catalog_version": {
-              "const": 5
+              "const": 6
             },
             "fields": {
               "type": "array",
@@ -44763,6 +45329,12 @@
             },
             "work_templates": {
               "$ref": "#/$defs/WorkTemplates"
+            },
+            "preparation_templates": {
+              "$ref": "#/$defs/PreparationTemplates"
+            },
+            "notification_delivery": {
+              "$ref": "#/$defs/NotificationDeliverySupport"
             }
           },
           "required": [
@@ -45582,7 +46154,9 @@
                   "import_templates",
                   "public_profile_enabled",
                   "public_fields",
-                  "public_hours"
+                  "public_hours",
+                  "availability_templates",
+                  "package_templates"
                 ]
               },
               "minItems": 1,
@@ -45634,7 +46208,9 @@
                   "import_templates",
                   "public_profile_enabled",
                   "public_fields",
-                  "public_hours"
+                  "public_hours",
+                  "availability_templates",
+                  "package_templates"
                 ]
               },
               "minItems": 1,
@@ -48776,6 +49352,849 @@
         "trace_id"
       ],
       "additionalProperties": false
+    },
+    "StarterAvailabilityTemplate": {
+      "type": "object",
+      "properties": {
+        "key": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9_-]{1,64}$"
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 100
+        },
+        "rules": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/PreparationAvailabilityRule"
+          },
+          "minItems": 1,
+          "maxItems": 100
+        }
+      },
+      "required": [
+        "key",
+        "name",
+        "rules"
+      ],
+      "additionalProperties": false
+    },
+    "StarterPackageTerms": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "$ref": "#/$defs/Text"
+        },
+        "kind": {
+          "$ref": "#/$defs/EntitlementKind"
+        },
+        "booking_mode": {
+          "$ref": "#/$defs/BookingMode"
+        },
+        "credits": {
+          "anyOf": [
+            {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 2147483647
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "price_minor": {
+          "$ref": "#/$defs/Money"
+        },
+        "currency": {
+          "$ref": "#/$defs/Currency"
+        },
+        "freeze": {
+          "type": "object",
+          "properties": {
+            "enabled": {
+              "type": "boolean",
+              "enum": [
+                false
+              ]
+            },
+            "extends_validity": {
+              "$ref": "#/$defs/Bool"
+            },
+            "max_days": {
+              "anyOf": [
+                {
+                  "$ref": "#/$defs/PositiveInt"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            }
+          },
+          "required": [
+            "enabled",
+            "extends_validity"
+          ],
+          "additionalProperties": false
+        },
+        "refund": {
+          "$ref": "#/$defs/RefundTerms"
+        },
+        "quota": {
+          "anyOf": [
+            {
+              "type": "object",
+              "properties": {
+                "period": {
+                  "enum": [
+                    "week",
+                    "month"
+                  ]
+                },
+                "limit": {
+                  "type": "integer",
+                  "minimum": 1,
+                  "maximum": 9007199254740991
+                }
+              },
+              "required": [
+                "period",
+                "limit"
+              ],
+              "additionalProperties": false
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "booking_mode",
+        "credits",
+        "currency",
+        "freeze",
+        "kind",
+        "name",
+        "price_minor",
+        "quota",
+        "refund"
+      ],
+      "additionalProperties": false
+    },
+    "StarterPackageTemplate": {
+      "type": "object",
+      "properties": {
+        "key": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9_-]{1,64}$"
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 100
+        },
+        "discipline_id": {
+          "$ref": "#/$defs/FtkUuid"
+        },
+        "terms": {
+          "$ref": "#/$defs/StarterPackageTerms"
+        },
+        "start_date": {
+          "$ref": "#/$defs/Date"
+        },
+        "end_date": {
+          "$ref": "#/$defs/Date"
+        }
+      },
+      "required": [
+        "key",
+        "name",
+        "discipline_id",
+        "terms",
+        "start_date",
+        "end_date"
+      ],
+      "additionalProperties": false
+    },
+    "PreparationSourceReference": {
+      "type": "object",
+      "properties": {
+        "scope": {
+          "type": "string",
+          "enum": [
+            "organization",
+            "center"
+          ]
+        },
+        "key": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9_-]{1,64}$"
+        },
+        "version": {
+          "$ref": "#/$defs/SettingsVersion"
+        },
+        "center_id": {
+          "$ref": "#/$defs/FtkUuid"
+        }
+      },
+      "required": [
+        "scope",
+        "key",
+        "version"
+      ],
+      "additionalProperties": false,
+      "oneOf": [
+        {
+          "type": "object",
+          "properties": {
+            "scope": {
+              "const": "organization"
+            },
+            "key": {
+              "type": "string",
+              "pattern": "^[A-Za-z0-9_-]{1,64}$"
+            },
+            "version": {
+              "$ref": "#/$defs/SettingsVersion"
+            }
+          },
+          "required": [
+            "scope",
+            "key",
+            "version"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "scope": {
+              "const": "center"
+            },
+            "key": {
+              "type": "string",
+              "pattern": "^[A-Za-z0-9_-]{1,64}$"
+            },
+            "version": {
+              "$ref": "#/$defs/SettingsVersion"
+            },
+            "center_id": {
+              "$ref": "#/$defs/FtkUuid"
+            }
+          },
+          "required": [
+            "scope",
+            "key",
+            "version",
+            "center_id"
+          ],
+          "additionalProperties": false
+        }
+      ]
+    },
+    "PreparationSources": {
+      "type": "object",
+      "properties": {
+        "availability_templates": {
+          "type": "object",
+          "properties": {
+            "kind": {
+              "type": "string",
+              "enum": [
+                "system_default",
+                "organization_copy",
+                "center_local"
+              ]
+            },
+            "organization_version": {
+              "$ref": "#/$defs/SettingsVersion"
+            }
+          },
+          "required": [
+            "kind"
+          ],
+          "additionalProperties": false
+        },
+        "package_templates": {
+          "type": "object",
+          "properties": {
+            "kind": {
+              "type": "string",
+              "enum": [
+                "system_default",
+                "organization_copy",
+                "center_local"
+              ]
+            },
+            "organization_version": {
+              "$ref": "#/$defs/SettingsVersion"
+            }
+          },
+          "required": [
+            "kind"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "required": [
+        "availability_templates",
+        "package_templates"
+      ],
+      "additionalProperties": false
+    },
+    "PreparationTemplates": {
+      "type": "object",
+      "properties": {
+        "availability": {
+          "type": "array",
+          "maxItems": 200,
+          "items": {
+            "type": "object",
+            "properties": {
+              "source": {
+                "$ref": "#/$defs/PreparationSourceReference"
+              },
+              "template": {
+                "$ref": "#/$defs/StarterAvailabilityTemplate"
+              }
+            },
+            "required": [
+              "source",
+              "template"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "packages": {
+          "type": "array",
+          "maxItems": 200,
+          "items": {
+            "type": "object",
+            "properties": {
+              "source": {
+                "$ref": "#/$defs/PreparationSourceReference"
+              },
+              "template": {
+                "$ref": "#/$defs/StarterPackageTemplate"
+              }
+            },
+            "required": [
+              "source",
+              "template"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "package_currency_suggestion": {
+          "const": "TRY"
+        }
+      },
+      "required": [
+        "availability",
+        "packages",
+        "package_currency_suggestion"
+      ],
+      "additionalProperties": false
+    },
+    "Request_settings_preparation_resolve": {
+      "type": "object",
+      "properties": {
+        "client_api_version": {
+          "const": 1
+        },
+        "request_id": {
+          "$ref": "#/$defs/FtkUuid"
+        },
+        "org_id": {
+          "$ref": "#/$defs/FtkUuid"
+        },
+        "center_id": {
+          "$ref": "#/$defs/FtkUuid"
+        },
+        "kind": {
+          "type": "string",
+          "enum": [
+            "availability",
+            "package"
+          ]
+        },
+        "source": {
+          "$ref": "#/$defs/PreparationSourceReference"
+        },
+        "resource": {
+          "$ref": "#/$defs/ResourceRef"
+        },
+        "rule_index": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 99
+        }
+      },
+      "required": [
+        "client_api_version",
+        "request_id",
+        "org_id",
+        "center_id",
+        "kind",
+        "source"
+      ],
+      "additionalProperties": false,
+      "oneOf": [
+        {
+          "type": "object",
+          "properties": {
+            "client_api_version": {
+              "const": 1
+            },
+            "request_id": {
+              "$ref": "#/$defs/FtkUuid"
+            },
+            "org_id": {
+              "$ref": "#/$defs/FtkUuid"
+            },
+            "center_id": {
+              "$ref": "#/$defs/FtkUuid"
+            },
+            "kind": {
+              "const": "availability"
+            },
+            "source": {
+              "$ref": "#/$defs/PreparationSourceReference"
+            },
+            "resource": {
+              "$ref": "#/$defs/ResourceRef"
+            },
+            "rule_index": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 99
+            }
+          },
+          "required": [
+            "client_api_version",
+            "request_id",
+            "org_id",
+            "center_id",
+            "kind",
+            "source",
+            "resource",
+            "rule_index"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "client_api_version": {
+              "const": 1
+            },
+            "request_id": {
+              "$ref": "#/$defs/FtkUuid"
+            },
+            "org_id": {
+              "$ref": "#/$defs/FtkUuid"
+            },
+            "center_id": {
+              "$ref": "#/$defs/FtkUuid"
+            },
+            "kind": {
+              "const": "package"
+            },
+            "source": {
+              "$ref": "#/$defs/PreparationSourceReference"
+            }
+          },
+          "required": [
+            "client_api_version",
+            "request_id",
+            "org_id",
+            "center_id",
+            "kind",
+            "source"
+          ],
+          "additionalProperties": false
+        }
+      ]
+    },
+    "ResolvedDomainPreparation": {
+      "oneOf": [
+        {
+          "type": "object",
+          "properties": {
+            "kind": {
+              "const": "availability"
+            },
+            "source": {
+              "$ref": "#/$defs/PreparationSourceReference"
+            },
+            "request": {
+              "type": "object",
+              "properties": {
+                "resource": {
+                  "$ref": "#/$defs/ResourceRef"
+                },
+                "rule": {
+                  "$ref": "#/$defs/AvailabilityRule"
+                }
+              },
+              "required": [
+                "resource",
+                "rule"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "required": [
+            "kind",
+            "source",
+            "request"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "kind": {
+              "const": "package"
+            },
+            "source": {
+              "$ref": "#/$defs/PreparationSourceReference"
+            },
+            "product_request": {
+              "type": "object",
+              "properties": {
+                "terms": {
+                  "$ref": "#/$defs/ProductTerms"
+                }
+              },
+              "required": [
+                "terms"
+              ],
+              "additionalProperties": false
+            },
+            "sale_dates": {
+              "type": "object",
+              "properties": {
+                "start_date": {
+                  "$ref": "#/$defs/Date"
+                },
+                "end_date": {
+                  "$ref": "#/$defs/Date"
+                }
+              },
+              "required": [
+                "start_date",
+                "end_date"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "required": [
+            "kind",
+            "source",
+            "product_request",
+            "sale_dates"
+          ],
+          "additionalProperties": false
+        }
+      ]
+    },
+    "Success_settings_preparation_resolve": {
+      "type": "object",
+      "properties": {
+        "ok": {
+          "const": true
+        },
+        "data": {
+          "$ref": "#/$defs/ResolvedDomainPreparation"
+        },
+        "trace_id": {
+          "$ref": "#/$defs/FtkUuid"
+        }
+      },
+      "required": [
+        "ok",
+        "data",
+        "trace_id"
+      ],
+      "additionalProperties": false
+    },
+    "PreparationAvailabilityRule": {
+      "type": "object",
+      "properties": {
+        "weekdays": {
+          "type": "array",
+          "items": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 7
+          },
+          "uniqueItems": true,
+          "minItems": 1
+        },
+        "local_start": {
+          "type": "string",
+          "pattern": "^([01][0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9]$"
+        },
+        "local_end": {
+          "type": "string",
+          "pattern": "^([01][0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9]$"
+        },
+        "valid_from": {
+          "$ref": "#/$defs/Date"
+        },
+        "valid_until": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Date"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "weekdays",
+        "local_start",
+        "local_end",
+        "valid_from"
+      ],
+      "additionalProperties": false,
+      "x-invariant": "local_start<local_end; overnight split explicitly, no silent DST shift"
+    },
+    "NotificationDeliverySupport": {
+      "type": "object",
+      "properties": {
+        "channels": {
+          "type": "object",
+          "properties": {
+            "in_app": {
+              "type": "boolean"
+            },
+            "email": {
+              "type": "boolean"
+            },
+            "push": {
+              "type": "boolean"
+            }
+          },
+          "required": [
+            "in_app",
+            "email",
+            "push"
+          ],
+          "additionalProperties": false
+        },
+        "mandatory_when_available": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "security",
+              "reservation_result",
+              "request_result",
+              "cancellation",
+              "change",
+              "seat_offer",
+              "collection",
+              "refund",
+              "access_change"
+            ]
+          },
+          "minItems": 9,
+          "maxItems": 9,
+          "uniqueItems": true
+        },
+        "transactional_in_app_required": {
+          "const": true
+        },
+        "in_app_delayed_by_quiet_hours": {
+          "const": false
+        },
+        "in_app_in_digest": {
+          "const": false
+        },
+        "new_member_marketing_default_enabled": {
+          "const": false
+        },
+        "platform_marketing_default_enabled": {
+          "const": false
+        },
+        "reminders": {
+          "type": "object",
+          "properties": {
+            "timing_controls_available": {
+              "type": "boolean"
+            },
+            "new_member_default_enabled": {
+              "const": true
+            },
+            "lesson_hours": {
+              "type": "array",
+              "items": {
+                "type": "integer",
+                "enum": [
+                  1,
+                  3,
+                  24
+                ]
+              },
+              "minItems": 3,
+              "maxItems": 3,
+              "uniqueItems": true
+            },
+            "default_lesson_hours": {
+              "const": 24
+            },
+            "package_expiry_days": {
+              "type": "array",
+              "items": {
+                "type": "integer",
+                "enum": [
+                  3,
+                  7,
+                  14
+                ]
+              },
+              "minItems": 3,
+              "maxItems": 3,
+              "uniqueItems": true
+            },
+            "default_package_expiry_days": {
+              "const": 7
+            },
+            "payment_due_days": {
+              "type": "array",
+              "items": {
+                "type": "integer",
+                "enum": [
+                  1,
+                  3,
+                  7
+                ]
+              },
+              "minItems": 3,
+              "maxItems": 3,
+              "uniqueItems": true
+            },
+            "default_payment_due_days": {
+              "const": 3
+            },
+            "feature_licensed": {
+              "type": "boolean"
+            }
+          },
+          "required": [
+            "feature_licensed",
+            "timing_controls_available",
+            "new_member_default_enabled",
+            "lesson_hours",
+            "default_lesson_hours",
+            "package_expiry_days",
+            "default_package_expiry_days",
+            "payment_due_days",
+            "default_payment_due_days"
+          ],
+          "additionalProperties": false
+        },
+        "digest": {
+          "type": "object",
+          "properties": {
+            "controls_available": {
+              "type": "boolean"
+            },
+            "choices": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "enum": [
+                  "instant",
+                  "daily",
+                  "weekly"
+                ]
+              },
+              "minItems": 3,
+              "maxItems": 3,
+              "uniqueItems": true
+            },
+            "default_frequency": {
+              "const": "instant"
+            },
+            "daily_local_time": {
+              "const": "18:00:00"
+            },
+            "weekly_weekday": {
+              "const": 7
+            },
+            "weekly_local_time": {
+              "const": "18:00:00"
+            },
+            "timezone_source": {
+              "const": "user_display_timezone"
+            }
+          },
+          "required": [
+            "controls_available",
+            "choices",
+            "default_frequency",
+            "daily_local_time",
+            "weekly_weekday",
+            "weekly_local_time",
+            "timezone_source"
+          ],
+          "additionalProperties": false
+        },
+        "quiet_hours": {
+          "type": "object",
+          "properties": {
+            "controls_available": {
+              "type": "boolean"
+            },
+            "new_user_default_enabled": {
+              "const": false
+            },
+            "exceptions": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "enum": [
+                  "security",
+                  "center_cancellation",
+                  "near_24h_change",
+                  "expiring_seat_offer"
+                ]
+              },
+              "minItems": 4,
+              "maxItems": 4,
+              "uniqueItems": true
+            }
+          },
+          "required": [
+            "controls_available",
+            "new_user_default_enabled",
+            "exceptions"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "required": [
+        "channels",
+        "mandatory_when_available",
+        "transactional_in_app_required",
+        "in_app_delayed_by_quiet_hours",
+        "in_app_in_digest",
+        "new_member_marketing_default_enabled",
+        "platform_marketing_default_enabled",
+        "reminders",
+        "digest",
+        "quiet_hours"
+      ],
+      "additionalProperties": false
     }
   },
   "x-contract": {
@@ -48854,7 +50273,8 @@
       "media.read": "Own current photo, live org member logo, or current confirmed same-lesson photo opt-in; no arbitrary asset ownership or public read.",
       "templates.resolve": "Own member or explicitly scoped shared template; live report/import domain access required. Configuration sharing never grants execution access.",
       "calendar.self": "Own global account calendar link metadata and lifecycle; explicit nested org is checked live, never an actor selector.",
-      "calendar.feed": "Public opaque personal calendar bearer link, current hash and live account/org/link/own booking or duty; service-only transport."
+      "calendar.feed": "Public opaque personal calendar bearer link, current hash and live account/org/link/own booking or duty; service-only transport.",
+      "preparation.resolve": "Live CM on the explicit destination, source scope/version and real resource/plan guards; no actor choice."
     },
     "tables": [
       {
@@ -76689,6 +78109,129 @@
           "Public ICS adapter and application origins plus signing key must be configured; no implicit URL.",
           "Create/rotate URLs are added only by Edge after receipt handling; only token hashes are stored. Current live pointer and scope are rechecked before replay and each feed fetch."
         ]
+      },
+      {
+        "name": "settings_preparation_resolve_v1",
+        "module": "M02",
+        "features": [
+          "F02",
+          "F15",
+          "F16"
+        ],
+        "permission": "preparation.resolve",
+        "actor_source": "server_verified",
+        "transport": "R",
+        "billing_class": "read",
+        "request": {
+          "$ref": "#/$defs/Request_settings_preparation_resolve"
+        },
+        "success": {
+          "$ref": "#/$defs/Success_settings_preparation_resolve"
+        },
+        "errors": [
+          "AUTH_REQUIRED",
+          "BILLING_OPERATION_RESTRICTED",
+          "CLIENT_UPDATE_REQUIRED",
+          "FORBIDDEN",
+          "NOT_FOUND",
+          "PLAN_FEATURE_UNAVAILABLE",
+          "PLAN_LIMIT_REACHED",
+          "POLICY_NOT_CONFIGURED",
+          "SERVICE_UNAVAILABLE",
+          "SESSION_REVOKED",
+          "SUBSCRIPTION_NOT_STARTED",
+          "TEMPORARY_FAILURE",
+          "VALIDATION_FAILED",
+          "VERSION_CONFLICT",
+          "INVALID_STATE_TRANSITION",
+          "PREVIEW_STALE",
+          "CAPACITY_FULL",
+          "ENTITLEMENT_UNAVAILABLE",
+          "CLASS_ACCESS_DENIED",
+          "RESERVATION_EXISTS",
+          "ASSISTANT_PARTICIPANT_CONFLICT",
+          "ACCOUNT_ALREADY_LINKED",
+          "INVITATION_UNAVAILABLE",
+          "CREDIT_LIMIT_EXCEEDED"
+        ],
+        "transaction_class": "read",
+        "transaction_guarantee": "Resolve one versioned private/shared preparation into an authorized typed report/import request. No job, business write or receipt; execution rechecks current domain authority.",
+        "transition": {
+          "effect": "read_or_preview_only",
+          "from": [],
+          "to": [],
+          "invariant": "Scope/key authorization is checked live before every receipt replay."
+        },
+        "semantic_guards": [
+          "live_actor_and_scope",
+          "template_version",
+          "closed_template_fields",
+          "domain_authority_on_resolve_and_execute"
+        ],
+        "audit": false,
+        "notification": "none",
+        "concurrency": "Live original permission/tenant/field scope on every request; current authorized projection; no business writes",
+        "expected_version_subject": "none",
+        "acceptance_scenario_ids": [
+          "A01",
+          "A02",
+          "A03",
+          "A23",
+          "A24",
+          "A25",
+          "A46",
+          "A47",
+          "A55"
+        ],
+        "configuration_policy": "numeric plan limits/prices and legal approval are deployment configuration, never arbitrary allow/deny",
+        "implementation_status": "operational_development_limited",
+        "runtime_path": "/functions/v1/backend-v1/settings_preparation_resolve_v1",
+        "runtime_rpc": "api_v1.settings_preparation_resolve_v1",
+        "runtime_transport": "authenticated Edge adapter -> service-only RPC; rules/transaction in PostgreSQL",
+        "runtime_external_path": "/functions/v1/backend-v1/settings_preparation_resolve_v1",
+        "runtime_limits": [
+          "Read-only explicit template/source/version selection. Resolve grants no execution permission and creates no rule, product, sale or job.",
+          "New centers copy org preparation arrays once; existing centers and business snapshots do not live-inherit.",
+          "Package dates and refund method are explicit; no automatic rolling validity or implicit none."
+        ],
+        "required_features": [],
+        "runtime_required_features": [],
+        "conditional_features": [
+          {
+            "feature": "F02",
+            "when": "availability_preparation",
+            "mode": "required_if_selected"
+          },
+          {
+            "feature": "F15",
+            "when": "credits_package_preparation",
+            "mode": "required_if_selected"
+          },
+          {
+            "feature": "F16",
+            "when": "timed_package_preparation",
+            "mode": "required_if_selected"
+          }
+        ],
+        "operation_contract": {
+          "kind": "read",
+          "target_entity": "frontend_settings",
+          "version_mode": "none",
+          "version_field": null,
+          "read_operation": null,
+          "atomic_effects": [],
+          "business_commit": false,
+          "read_path_status": "not_required",
+          "source_decision": "FD06/FD07/FD11"
+        },
+        "decision_delivery": {
+          "accepted_contract": "DS-2026-10-17",
+          "runtime_conformance": "implemented_pending_ci",
+          "open_dependencies": [],
+          "target_request": {
+            "$ref": "#/$defs/Request_settings_preparation_resolve"
+          }
+        }
       }
     ],
     "policy_value_map": {
@@ -91968,6 +93511,96 @@
         "origin": "ftksaas",
         "acceptance": "generic_uuid",
         "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/CenterSettingsValues/properties/package_templates/items/properties/discipline_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/OrganizationSettingsValues/properties/package_templates/items/properties/discipline_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/StarterPackageTemplate/properties/discipline_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/PreparationSourceReference/properties/center_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/PreparationSourceReference/oneOf/1/properties/center_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Request_settings_preparation_resolve/properties/request_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Request_settings_preparation_resolve/properties/org_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Request_settings_preparation_resolve/properties/center_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Request_settings_preparation_resolve/oneOf/0/properties/request_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Request_settings_preparation_resolve/oneOf/0/properties/org_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Request_settings_preparation_resolve/oneOf/0/properties/center_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Request_settings_preparation_resolve/oneOf/1/properties/request_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Request_settings_preparation_resolve/oneOf/1/properties/org_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Request_settings_preparation_resolve/oneOf/1/properties/center_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Success_settings_preparation_resolve/properties/trace_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
       }
     ],
     "open_product_decisions": [],
@@ -92322,13 +93955,14 @@
         "calendar_link_create_v1",
         "calendar_link_rotate_v1",
         "calendar_link_revoke_v1",
-        "calendar_feed_get_v1"
+        "calendar_feed_get_v1",
+        "settings_preparation_resolve_v1"
       ],
       "auth": "Supabase getUser + live auth.sessions + current account/link/role; no request actor claims",
       "uuid": "backend uuid@14.0.3 v7 for all inserted IDs; DB defaults not required",
       "external_transport": "POST /functions/v1/backend-v1/{operation}; direct typed request body",
       "internal_rpc": "service-only api_v1 named functions; actor/session/UUID bank supplied by verified gateway",
-      "migration_count": 76,
+      "migration_count": 78,
       "test_evidence": "P06 acceptance is registered through registry.test.mjs; candidate/main full clean evidence is pending",
       "frontend_unchanged": true
     },
@@ -93025,7 +94659,8 @@
         "calendar_link_create_v1",
         "calendar_link_rotate_v1",
         "calendar_link_revoke_v1",
-        "calendar_feed_get_v1"
+        "calendar_feed_get_v1",
+        "settings_preparation_resolve_v1"
       ],
       "runtime_deliveries": {
         "starter_attendance_protection": {
@@ -93177,7 +94812,8 @@
         "decision": "contracts/01-FtkSaaS-urun-kapsam-sozlesmesi.md",
         "technical_operations": [
           "availability_save_v1",
-          "availability_exception_save_v1"
+          "availability_exception_save_v1",
+          "settings_preparation_resolve_v1"
         ],
         "dependencies": [],
         "implementation": "implemented_acceptance_pending",
@@ -93185,7 +94821,8 @@
         "acceptance_evidence": [],
         "implemented_operations": [
           "availability_save_v1",
-          "availability_exception_save_v1"
+          "availability_exception_save_v1",
+          "settings_preparation_resolve_v1"
         ],
         "contract_only_operations": [],
         "acceptance_case_ids": [],
@@ -93914,7 +95551,8 @@
           "reservation_impact_preview_v1",
           "reservation_impact_apply_v1",
           "negative_limits_get_v1",
-          "reservation_capacity_override_v1"
+          "reservation_capacity_override_v1",
+          "settings_preparation_resolve_v1"
         ],
         "dependencies": [
           "sale_scope_and_backdating",
@@ -93946,7 +95584,8 @@
           "reservation_impact_preview_v1",
           "reservation_impact_apply_v1",
           "negative_limits_get_v1",
-          "reservation_capacity_override_v1"
+          "reservation_capacity_override_v1",
+          "settings_preparation_resolve_v1"
         ],
         "contract_only_operations": [],
         "acceptance_case_ids": [
@@ -94006,7 +95645,8 @@
           "sale_apply_v1",
           "entitlements_get_v1",
           "sale_renew_preview_v1",
-          "sale_renew_apply_v1"
+          "sale_renew_apply_v1",
+          "settings_preparation_resolve_v1"
         ],
         "dependencies": [
           "sale_scope_and_backdating",
@@ -94025,7 +95665,8 @@
           "sale_apply_v1",
           "entitlements_get_v1",
           "sale_renew_preview_v1",
-          "sale_renew_apply_v1"
+          "sale_renew_apply_v1",
+          "settings_preparation_resolve_v1"
         ],
         "contract_only_operations": [],
         "acceptance_case_ids": [

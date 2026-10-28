@@ -1115,6 +1115,8 @@ Teknik süre/rate backend işidir. Dış e-posta teslimi ertelenmiş kalır; ür
 | Sessiz saat | Default kapalı; kullanıcı gün/aralık seçer. Güvenlik, merkez iptali, sonraki 24 saatteki ders/event değişimi ve süreli yer teklifi istisna. İstisna kapatılmış dış kanalı açmaz; in_app görünür. |
 | Tekrar/özet | in_app kaydı korunur; hazır dış kanallar ayrı seçilir. Zaman duyarlı olay özete bırakılmaz; geçersiz hatırlatma gönderilmez. |
 
+ST-03 bildirim kullanılabilirliği `SettingsCatalog.notification_delivery` ile typed okunur. Hazır olmayan email/push uygulama kanalı preference komutunda replay öncesi SERVICE_UNAVAILABLE verir; in_app tercihini değiştirmez. Starter F27 kapalı, zamanlama/sessiz saat/özet kontrolleri unavailable; ilk zorunlu in_app teslim ertelenmez. [Tüketici sınırı](../frontend-settings-handover.md#bildirim-kullanılabilirliği--aday).
+
 ##### FD05 — member görünürlük ilgi ve takvim (kabul edildi)
 
 | Alan | Kabul edilen seçenek/default |
@@ -1140,6 +1142,8 @@ ST-03 teknik eşleme adayı: organization/center `program_duration_minutes` kapa
 | Rezervasyon/talep | Açılış/kapanış ayrı, orgdan miras; tanımsızsa yetkili yapılandırma gerekir. Otomatik pencere değeri uydurulmaz. |
 | Bekleme/teklif | Yeni sınıfta liste default kapalı. Teklif süresi orgdan miras; değer yoksa teklif üretimi başlamaz. |
 | Yerel değişiklik | Org zorunlu alan kilitli, serbest alan yerel değiştirilebilir. Mevcut 100 tekrar/3600sn kulüp seçimi korunur, yeni orglara yayılmaz. |
+
+ST-03 availability/package hazırlıkları orgdan yeni merkeze bir kez kopyalanır; kaynak bilgisi typed okunur, reset boş sistem dizisine döner. Salt okunur resolver güncel CM ve kaynak sürümüyle mevcut availability/product/sale isteklerini hazırlar; şablon değişimi uygulanmış domain kayıtlarını değiştirmez. Gece aşan availability ayrı açık kabul olarak kalır. [Kopya, alan ve gerçek domain tüketicileri](../frontend-settings-handover.md#availability-ve-paket-hazırlıkları--aday).
 
 ##### FD07 — paket katılım finans (kabul edildi, standart negatif limit 0)
 

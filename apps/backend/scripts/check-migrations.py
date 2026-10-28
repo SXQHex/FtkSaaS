@@ -181,3 +181,7 @@ assert next(Path("supabase/migrations").glob("*_starter_public_settings.sql")).r
 assert next(Path("supabase/migrations").glob("*_starter_collection_methods.sql")).read_text()==Path("database/starter-collection-methods.sql").read_text(),"Collection methods source drift"
 
 assert next(Path("supabase/migrations").glob("*_personal_calendar_links.sql")).read_text()==Path("database/personal-calendar-links.sql").read_text().replace("commit;\n","",1)+Path("database/personal-calendar-links-wrappers.sql").read_text().replace("begin;\n","",1),"Personal calendar source drift"
+
+assert next(Path("supabase/migrations").glob("*_starter_domain_preparations.sql")).read_text()==Path("database/settings-catalog-v6.sql").read_text().replace("commit;\n","",1)+Path("database/starter-domain-preparations.sql").read_text().replace("begin;\n","",1).replace("commit;\n","",1)+Path("database/starter-domain-preparations-wrappers.sql").read_text().replace("begin;\n","",1),"Domain preparations source drift"
+
+assert next(Path("supabase/migrations").glob("*_starter_notification_support.sql")).read_text()==Path("database/starter-notification-support.sql").read_text(),"Notification support source drift"
