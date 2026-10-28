@@ -21,3 +21,6 @@ pnpm typecheck
 Backend: `pnpm dev:backend`, `pnpm --filter @ftksaas/backend dev:info`, `pnpm stop:backend`. Tam izole kabul `pnpm test:clean`; yalnız loopback veritabanını sıfırlar. Geliştirmede rutin full clean çalıştırılmaz; [CI politikası](docs/ci-policy.md) geçerlidir.
 
 saaspt görünümü sentetik tasarımdır ve bu hazırlıkta henüz taşınmaz. Repo düzeni Auth/API ekran entegrasyonunu tamamlamaz. Gerçek API hedefi kullanıcı seçimiyle mevcut geliştirme Supabase’idir. Production kurulumu ve eski studiosaas/DNS değişikliği yapılmaz.
+
+
+CI-ADMIN disposable failure probe: [missing target](ci-admin-probe-missing.md).
