@@ -1,3 +1,5 @@
+import './availability-day-boundaries-acceptance.mjs';
+import './calendar-preferences-acceptance.mjs';
 import './personal-calendar-acceptance.mjs';
 import './frontend-settings-acceptance.mjs';
 import test from 'node:test';

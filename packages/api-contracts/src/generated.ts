@@ -438,6 +438,16 @@ export type OperationName = ("account_get_v1" | "account_profile_update_v1" | "a
  */
 export type EntityType = ("organizations" | "centers" | "rooms" | "room_capacities" | "availability_rules" | "availability_exceptions" | "policy_versions" | "accounts" | "account_links" | "role_assignments" | "permission_overrides" | "invitations" | "people" | "person_contacts" | "center_relationships" | "merge_requests" | "merge_approvals" | "classes" | "program_versions" | "sessions" | "session_assignments" | "resource_bookings" | "lesson_requests" | "request_alternatives" | "reservations" | "waitlist_entries" | "seat_offers" | "attendance_entries" | "attendance_closures" | "products" | "product_versions" | "product_scopes" | "sales" | "entitlement_accounts" | "entitlement_movements" | "entitlement_allocations" | "credit_deficits" | "quota_buckets" | "freezes" | "negative_limit_overrides" | "debts" | "cash_movements" | "debt_allocations" | "student_credit_movements" | "debt_adjustments" | "instructor_agreements" | "earnings" | "instructor_payments" | "earning_allocations" | "leads" | "crm_activities" | "trial_offers" | "trial_usages" | "segments" | "automations" | "automation_runs" | "notification_preferences" | "notifications" | "outbox_jobs" | "report_jobs" | "saas_plan_versions" | "saas_subscriptions" | "saas_change_requests" | "saas_quotes" | "saas_payment_verifications" | "events" | "event_assignments" | "event_registrations" | "documents" | "document_versions" | "document_requirements" | "document_acceptances" | "files" | "previews" | "operation_receipts" | "audit_events" | "import_jobs" | "import_rows" | "publications" | "public_applications" | "privacy_requests" | "retention_holds" | "deletion_receipts" | "class_assignments" | "rate_limit_windows" | "disciplines" | "center_disciplines" | "person_disciplines" | "event_disciplines" | "event_payment_preparations")
 /**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "AvailabilityStartTime".
+ */
+export type AvailabilityStartTime = string
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "AvailabilityEndTime".
+ */
+export type AvailabilityEndTime = string
+/**
  * Rows OR; dimensions AND. Same organization; plan/current center access and class/date/capacity gates remain mandatory. No pool per scope. Q-D01: narrow event scope requires exactly one matching label and explicit event eligibility; no event negative credit.
  *
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -1269,7 +1279,7 @@ export type SettingsFieldKeys = [("ad_measurement" | "ad_personalization" | "add
  */
 export type SettingsCatalog = ({
 scope: SettingsScope
-catalog_version: 6
+catalog_version: 8
 fields: SettingsFieldDescriptor[]
 defaults: (UserSettingsValues | MemberSettingsValues | CenterSettingsValues | OrganizationSettingsValues | PlatformSettingsValues)
 /**
@@ -1339,7 +1349,7 @@ center_id: string
 })
 export type SettingsCatalog1 = ({
 scope: "user"
-catalog_version: 6
+catalog_version: 8
 fields: SettingsFieldDescriptor[]
 defaults: UserSettingsValues
 /**
@@ -1352,7 +1362,7 @@ preparation_templates?: PreparationTemplates
 notification_delivery?: NotificationDeliverySupport
 } | {
 scope: "member"
-catalog_version: 6
+catalog_version: 8
 fields: SettingsFieldDescriptor[]
 defaults: MemberSettingsValues
 /**
@@ -1365,7 +1375,7 @@ preparation_templates?: PreparationTemplates
 notification_delivery?: NotificationDeliverySupport
 } | {
 scope: "center"
-catalog_version: 6
+catalog_version: 8
 fields: SettingsFieldDescriptor[]
 defaults: CenterSettingsValues
 /**
@@ -1378,7 +1388,7 @@ preparation_templates?: PreparationTemplates
 notification_delivery?: NotificationDeliverySupport
 } | {
 scope: "organization"
-catalog_version: 6
+catalog_version: 8
 fields: SettingsFieldDescriptor[]
 defaults: OrganizationSettingsValues
 /**
@@ -1391,7 +1401,7 @@ preparation_templates?: PreparationTemplates
 notification_delivery?: NotificationDeliverySupport
 } | {
 scope: "platform"
-catalog_version: 6
+catalog_version: 8
 fields: SettingsFieldDescriptor[]
 defaults: PlatformSettingsValues
 /**
@@ -3495,6 +3505,9 @@ ResolvedDomainPreparation?: ResolvedDomainPreparation
 Success_settings_preparation_resolve?: SuccessSettingsPreparationResolve
 PreparationAvailabilityRule?: PreparationAvailabilityRule
 NotificationDeliverySupport?: NotificationDeliverySupport
+CalendarPage?: CalendarPage
+AvailabilityStartTime?: AvailabilityStartTime
+AvailabilityEndTime?: AvailabilityEndTime
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -3594,8 +3607,8 @@ export interface AvailabilityRule {
  * @minItems 1
  */
 weekdays: [number, ...(number)[]]
-local_start: LocalTime
-local_end: LocalTime
+local_start: AvailabilityStartTime
+local_end: AvailabilityEndTime
 valid_from: Date
 valid_until?: (Date | null)
 }
@@ -8575,7 +8588,17 @@ org_id: string
 center_id?: (string | null)
 interval: Interval
 resource?: (ResourceRef | null)
-page: Page
+page: CalendarPage
+interest_filter?: boolean
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "CalendarPage".
+ */
+export interface CalendarPage {
+limit?: number
+cursor?: (OpaqueToken | null)
+sort?: ("starts_at_asc" | "recommendation_desc")
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -21962,10 +21985,36 @@ maintenance_message?: string
  * via the `definition` "PreparationSources".
  */
 export interface PreparationSources {
+/**
+ * @maxItems 100
+ */
 availability_templates: {
-kind: ("system_default" | "organization_copy" | "center_local")
-organization_version?: SettingsVersion
-}
+key: string
+name: string
+/**
+ * @minItems 1
+ * @maxItems 100
+ */
+rules: [{
+/**
+ * @minItems 1
+ */
+weekdays: [number, ...(number)[]]
+local_start: string
+local_end: string
+valid_from: string
+valid_until?: (string | null)
+}, ...({
+/**
+ * @minItems 1
+ */
+weekdays: [number, ...(number)[]]
+local_start: string
+local_end: string
+valid_from: string
+valid_until?: (string | null)
+})[]]
+}[]
 package_templates: {
 kind: ("system_default" | "organization_copy" | "center_local")
 organization_version?: SettingsVersion
@@ -22130,8 +22179,8 @@ export interface PreparationAvailabilityRule {
  * @minItems 1
  */
 weekdays: [number, ...(number)[]]
-local_start: string
-local_end: string
+local_start: AvailabilityStartTime
+local_end: AvailabilityEndTime
 valid_from: Date
 valid_until?: (Date | null)
 }

@@ -1127,6 +1127,8 @@ ST-03 bildirim kullanılabilirliği `SettingsCatalog.notification_delivery` ile 
 | Geçmişten öneri | Org bazında default kapalı; kullanıcı açabilir. |
 | Kişisel takvim | Kesin ders, kesin event ve yetkili eğitmen/personel görevleri ayrı seçilir. Bağlantı kendiliğinden oluşturulmaz; oluştururken tür seçilir. İçerik başlık/tarih-saat/yer/uygulama bağlantısı; başkaları/borç/ödeme yok. |
 
+ST-03 ilgi filtresi kendi merkez/disiplin seçimlerini yalnız açık calendar_get isteğinde mevcut yetkili kayıtlarla kesiştirir. Geçmiş sırası yalnız ayrı opt-in ve recommendation_desc isteğiyle kendi kapanmış attended ders sayımını kullanır; kapalıyken kronoloji korunur, yeni erişim veya pazarlama izni doğmaz. [Cursor/reset/alias ve consumer eşlemesi](../frontend-settings-handover.md#üye-ilgi-filtresi-ve-geçmiş-takvim-sırası--aday).
+
 ST-03 kişisel takvim adayı, global own-account credential lifecycle komutları ve explicit org/kinds ile oluşturulur. Starter'da lessons/duties; event kapalıdır. Salt okunur token feed'i canlı account/org/link/plan/selected-session ve kesin kendi katılım/görevini denetler; başlık/UTC zaman/yer/uygulama linki dışına veri aktarmaz. Tek seans UID'si, rotate/revoke ve metadata-only receipt korunur. [API, teknik hazır olma, HTTP adapter ve kabul sınırı](../frontend-settings-handover.md#kişisel-takvim-bağlantısı--aday).
 
 ##### FD06 — iş takvimi program rezervasyon (kabul edildi)
@@ -1143,7 +1145,7 @@ ST-03 teknik eşleme adayı: organization/center `program_duration_minutes` kapa
 | Bekleme/teklif | Yeni sınıfta liste default kapalı. Teklif süresi orgdan miras; değer yoksa teklif üretimi başlamaz. |
 | Yerel değişiklik | Org zorunlu alan kilitli, serbest alan yerel değiştirilebilir. Mevcut 100 tekrar/3600sn kulüp seçimi korunur, yeni orglara yayılmaz. |
 
-ST-03 availability/package hazırlıkları orgdan yeni merkeze bir kez kopyalanır; kaynak bilgisi typed okunur, reset boş sistem dizisine döner. Salt okunur resolver güncel CM ve kaynak sürümüyle mevcut availability/product/sale isteklerini hazırlar; şablon değişimi uygulanmış domain kayıtlarını değiştirmez. Gece aşan availability ayrı açık kabul olarak kalır. [Kopya, alan ve gerçek domain tüketicileri](../frontend-settings-handover.md#availability-ve-paket-hazırlıkları--aday).
+ST-03 availability/package hazırlıkları orgdan yeni merkeze bir kez kopyalanır; kaynak bilgisi typed okunur, reset boş sistem dizisine döner. Salt okunur resolver güncel CM ve kaynak sürümüyle mevcut availability/product/sale isteklerini hazırlar; şablon değişimi uygulanmış domain kayıtlarını değiştirmez. Gece aşımı günlük24:00/ertesi gün00:00 parçalarıyla açık bölünür; gerçek UTC aralığı bitişik günlük availability birleşimince tamamen kapsanır, belirsiz/olmayan haftalık sınır sessiz kaydırılmaz. [Kopya, alan ve gerçek domain tüketicileri](../frontend-settings-handover.md#availability-ve-paket-hazırlıkları--aday).
 
 ##### FD07 — paket katılım finans (kabul edildi, standart negatif limit 0)
 

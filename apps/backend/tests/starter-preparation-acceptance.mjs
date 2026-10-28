@@ -33,7 +33,7 @@ test('ST-03 Starter preparation defaults copy, authority, reset and program cons
   await t.test('new center copies approved org proposal; subsequent template edits do not move it',async()=>{
    const v=await read('center');assert.equal(v.values.program_duration_minutes,45);assert.equal(v.program_duration_source.kind,'organization_copy');assert.equal(v.program_duration_source.organization_version,(await read('organization')).version);
    await change('organization',{program_duration_minutes:90});assert.equal((await read('center')).values.program_duration_minutes,45);
-   const catalog=await must(owner,'settings_catalog_get_v1',q('center'));assert.equal(catalog.catalog_version,6);assert.equal(catalog.defaults.program_duration_minutes,60);assert.equal(catalog.fields.find(x=>x.key==='program_duration_minutes').consumer,'schedule_build_program');
+   const catalog=await must(owner,'settings_catalog_get_v1',q('center'));assert.equal(catalog.catalog_version,8);assert.equal(catalog.defaults.program_duration_minutes,60);assert.equal(catalog.fields.find(x=>x.key==='program_duration_minutes').consumer,'schedule_build_program');
   });
   await t.test('an explicit local selection equal to the copy records local provenance',async()=>{
    await change('center',{program_duration_minutes:45});assert.equal((await read('center')).program_duration_source.kind,'center_local');
@@ -84,6 +84,12 @@ test('ST-03 Starter preparation defaults copy, authority, reset and program cons
    await db.query("update core.reservations set state='active' where id=$1",[reservations[1]]);
    await db.query("update core.account_links set state='revoked' where id=$1",[link]);await denied(student,'session_get_v1',scoped({session_id:session}),'NOT_FOUND');
    await db.query("update core.account_links set state='active' where id=$1",[link]);
+  });
+  await t.test('Starter calendar interests consume own member preferences without opening history or wider access',async()=>{
+   const request={org_id:org,center_id:center,interval:{starts_at:day(0)+'T00:00:00Z',ends_at:day(5)+'T00:00:00Z'},page:{limit:200}};
+   const initial=await must(owner,'calendar_get_v1',request);assert(initial.items.length>0);
+   await change('member',{interest_center_ids:[center.toUpperCase()],interest_discipline_ids:[discipline.toUpperCase()],history_recommendations:false});
+   const filtered=await must(owner,'calendar_get_v1',{...request,interest_filter:true,page:{limit:200,sort:'recommendation_desc'}});assert.deepEqual(filtered.items.map(x=>x.id),initial.items.map(x=>x.id));assert(filtered.items.every(x=>x.center_id===center&&x.discipline_id===discipline));
   });
   await t.test('private photo/logo bytes, removal, replay, history and live photo sharing use real consumers',async()=>{
    const data=JSON.parse(fs.readFileSync('tests/fixtures/settings-images.json')).png,checksum=createHash('sha256').update(Buffer.from(data,'base64')).digest('hex'),image={mime:'image/png',data_base64:data,checksum};

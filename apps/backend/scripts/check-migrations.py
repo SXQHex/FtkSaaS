@@ -185,3 +185,7 @@ assert next(Path("supabase/migrations").glob("*_personal_calendar_links.sql")).r
 assert next(Path("supabase/migrations").glob("*_starter_domain_preparations.sql")).read_text()==Path("database/settings-catalog-v6.sql").read_text().replace("commit;\n","",1)+Path("database/starter-domain-preparations.sql").read_text().replace("begin;\n","",1).replace("commit;\n","",1)+Path("database/starter-domain-preparations-wrappers.sql").read_text().replace("begin;\n","",1),"Domain preparations source drift"
 
 assert next(Path("supabase/migrations").glob("*_starter_notification_support.sql")).read_text()==Path("database/starter-notification-support.sql").read_text(),"Notification support source drift"
+
+assert next(Path("supabase/migrations").glob("*_starter_calendar_preferences.sql")).read_text()==Path("database/settings-catalog-v7.sql").read_text().replace("commit;\n","",1)+Path("database/starter-calendar-preferences.sql").read_text().replace("begin;\n","",1),"Calendar preferences source drift"
+
+assert next(Path("supabase/migrations").glob("*_starter_availability_day_boundaries.sql")).read_text()==Path("database/settings-catalog-v8.sql").read_text().replace("commit;\n","",1)+Path("database/starter-availability-day-boundaries.sql").read_text().replace("begin;\n","",1),"Availability day boundaries source drift"
