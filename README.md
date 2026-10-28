@@ -7,7 +7,7 @@ Supabase backend ve ortak API sözleşmelerini içeren pnpm/Turborepo monoreposu
 - [Monorepo ve ortamlar](docs/monorepo.md): geliştirme, gerçek API bağlantısı ve dağıtım sınırları.
 - [Açık işler](docs/remaining-work.md), [aktif sıra](docs/production-queue.md), [ajan kuralları](AGENTS.md).
 
-Web geliştirme ve yalnız frontend doğrulama komutları için [frontend rehberine](docs/frontend-development.md) bak. Hızlı başlangıç: `pnpm dev:web`; kontrol: `pnpm check:frontend`.
+Web geliştirme ve yalnız frontend doğrulama komutları için [frontend rehberine](apps/web/README.md) bak. Hızlı başlangıç: `pnpm dev:web`; kontrol: `pnpm check:frontend`.
 
 ## Çalıştırma
 

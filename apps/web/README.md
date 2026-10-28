@@ -1,6 +1,6 @@
 # Frontend geliştirme
 
-Kapsam yalnız FtkSaaS'tır. Web uygulaması apps/web, ortak arayüz packages/ui sahibindedir. Kök [AGENTS](../AGENTS.md), [istemci protokolü](claude-handover.md) ve [API sözleşme paketi](../packages/api-contracts/README.md) önceliklidir. Güncel kabul [00 devirde](contracts/00-FtkSaaS-yeni-sohbet-devir.md), açık iş [tek backlog'dadır](remaining-work.md).
+Kapsam yalnız FtkSaaS'tır. Web uygulaması apps/web, ortak arayüz packages/ui sahibindedir. Kök [AGENTS](../../AGENTS.md), [istemci protokolü](../../docs/claude-handover.md) ve [API sözleşme paketi](../../packages/api-contracts/README.md) önceliklidir. Güncel kabul [00 devirde](../../docs/contracts/00-FtkSaaS-yeni-sohbet-devir.md), açık iş [tek backlog'dadır](../../docs/remaining-work.md).
 
 ## Bileşen ve araç kuralları
 
@@ -8,7 +8,7 @@ Kapsam yalnız FtkSaaS'tır. Web uygulaması apps/web, ortak arayüz packages/ui
 
 Bu teslim teknik altyapıdır; mevcut taslak tasarım kabul edilmemiştir. Ürün CRM olarak ele alınmaz. Resmî login-01 bloğunun merkezlenmiş yerleşimi yalnız Auth bağlantısını doğrulamak için kullanılır; dashboard, ürün menüsü ve iş ekranları ayrı tasarım çalışmasına bırakılır. Genel tablo/form framework’ü veya hazır bileşenleri yeniden saran bir katman kurulmaz.
 
-Üç starter için değerlendirme ve tam kaynak commit’leri [starter kaynak kaydındadır](../apps/web/starter-sources.json). Bu aşamada starter dosyası kopyalanmadı: mevcut araçlar korunur, Clerk/Better Auth/veritabanı ve Base UI katmanları taşınmaz. shadcn uyarlamasının dosya/commit/hash izi registry kaydında, MIT bildirimi packages/ui/LICENSE içindedir.
+Üç starter için değerlendirme ve tam kaynak commit’leri [starter kaynak kaydındadır](starter-sources.json). Bu aşamada starter dosyası kopyalanmadı: mevcut araçlar korunur, Clerk/Better Auth/veritabanı ve Base UI katmanları taşınmaz. shadcn uyarlamasının dosya/commit/hash izi registry kaydında, MIT bildirimi packages/ui/LICENSE içindedir.
 
 Build önbelleği apps/web/turbo.json içinde .next çıktıları, açık NEXT_PUBLIC_* girdileri ve .env* dosya hash’leriyle tanımlıdır; yerel bağlantı değişince önceki build cache’i kullanılmaz.
 
@@ -61,7 +61,7 @@ Frontend komutları yalnız @ftksaas/web, @ftksaas/ui ve gerekli ortak tip kontr
 
 Frontend checks workflow'u yalnız apps/web, packages/ui ve kendi workflow değişiklikleriyle PR/main'de veya manuel başlar. Backend-only değişiklik frontend testlerini başlatmaz. Ortak sözleşme/TypeScript ayarı/kök manifest/lockfile/Turbo değişiklikleri ayrı Frontend contract compatibility workflow'unda kurulum, frontend typecheck ve görev grafiği denetimi çalıştırır; tam frontend/backend test zinciri başlatmaz. Workflow'ların concurrency grupları ve artifact adları backend'den ayrıdır.
 
-Ters yöndeki tetikleme ve merge kabulü mevcut [CI politikası](ci-policy.md#ci-split--frontendbackend-kaynak-sınırı) kapsamındadır; frontend çalışması backend workflow/gate kaynaklarını değiştirmez. Yerel görev ayrımı uzak CI kabulünün yerine geçmez.
+Ters yöndeki tetikleme ve merge kabulü mevcut [CI politikası](../../docs/ci-policy.md#ci-split--frontendbackend-kaynak-sınırı) kapsamındadır; frontend çalışması backend workflow/gate kaynaklarını değiştirmez. Yerel görev ayrımı uzak CI kabulünün yerine geçmez.
 
 ## Dil, tema ve Expo sınırı
 
