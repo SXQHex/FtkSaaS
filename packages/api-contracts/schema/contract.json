@@ -44241,6 +44241,45 @@
             ],
             "additionalProperties": false
           }
+        },
+        "primary_color": {
+          "anyOf": [
+            {
+              "type": "string",
+              "pattern": "^#[0-9A-Fa-f]{6}$",
+              "minLength": 7,
+              "maxLength": 7
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "secondary_color": {
+          "anyOf": [
+            {
+              "type": "string",
+              "pattern": "^#[0-9A-Fa-f]{6}$",
+              "minLength": 7,
+              "maxLength": 7
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "accent_color": {
+          "anyOf": [
+            {
+              "type": "string",
+              "pattern": "^#[0-9A-Fa-f]{6}$",
+              "minLength": 7,
+              "maxLength": 7
+            },
+            {
+              "type": "null"
+            }
+          ]
         }
       },
       "required": [],
@@ -44323,10 +44362,12 @@
           "items": {
             "type": "string",
             "enum": [
+              "accent_color",
               "ad_measurement",
               "ad_personalization",
               "address",
               "application_name",
+              "availability_templates",
               "billing_address",
               "billing_email",
               "billing_name",
@@ -44341,6 +44382,7 @@
               "font_scale",
               "history_recommendations",
               "honorific",
+              "import_templates",
               "in_app_marketing",
               "in_app_reminders",
               "interest_center_ids",
@@ -44351,11 +44393,18 @@
               "motion",
               "number_format",
               "optional_analytics",
+              "package_templates",
               "phone_visible",
               "photo_visible",
+              "primary_color",
               "profile_visible",
               "program_duration_minutes",
+              "public_fields",
+              "public_hours",
+              "public_profile_enabled",
               "remember_context",
+              "report_templates",
+              "secondary_color",
               "show_weekends",
               "startup_context",
               "support_email",
@@ -44365,14 +44414,7 @@
               "time_format",
               "timezone_mode",
               "timezone_name",
-              "week_start",
-              "report_templates",
-              "import_templates",
-              "public_profile_enabled",
-              "public_fields",
-              "public_hours",
-              "availability_templates",
-              "package_templates"
+              "week_start"
             ]
           },
           "uniqueItems": true,
@@ -44612,23 +44654,26 @@
               "items": {
                 "type": "string",
                 "enum": [
-                  "description",
+                  "accent_color",
                   "address",
-                  "contact_phone",
-                  "contact_email",
-                  "theme_package_id",
-                  "font_package_id",
-                  "billing_name",
+                  "availability_templates",
                   "billing_address",
                   "billing_email",
-                  "program_duration_minutes",
-                  "report_templates",
+                  "billing_name",
+                  "contact_email",
+                  "contact_phone",
+                  "description",
+                  "font_package_id",
                   "import_templates",
-                  "public_profile_enabled",
+                  "package_templates",
+                  "primary_color",
+                  "program_duration_minutes",
                   "public_fields",
                   "public_hours",
-                  "availability_templates",
-                  "package_templates"
+                  "public_profile_enabled",
+                  "report_templates",
+                  "secondary_color",
+                  "theme_package_id"
                 ]
               },
               "uniqueItems": true,
@@ -44700,10 +44745,12 @@
       "items": {
         "type": "string",
         "enum": [
+          "accent_color",
           "ad_measurement",
           "ad_personalization",
           "address",
           "application_name",
+          "availability_templates",
           "billing_address",
           "billing_email",
           "billing_name",
@@ -44718,6 +44765,7 @@
           "font_scale",
           "history_recommendations",
           "honorific",
+          "import_templates",
           "in_app_marketing",
           "in_app_reminders",
           "interest_center_ids",
@@ -44728,11 +44776,18 @@
           "motion",
           "number_format",
           "optional_analytics",
+          "package_templates",
           "phone_visible",
           "photo_visible",
+          "primary_color",
           "profile_visible",
           "program_duration_minutes",
+          "public_fields",
+          "public_hours",
+          "public_profile_enabled",
           "remember_context",
+          "report_templates",
+          "secondary_color",
           "show_weekends",
           "startup_context",
           "support_email",
@@ -44742,14 +44797,7 @@
           "time_format",
           "timezone_mode",
           "timezone_name",
-          "week_start",
-          "report_templates",
-          "import_templates",
-          "public_profile_enabled",
-          "public_fields",
-          "public_hours",
-          "availability_templates",
-          "package_templates"
+          "week_start"
         ]
       },
       "minItems": 1,
@@ -44943,10 +44991,12 @@
         "key": {
           "type": "string",
           "enum": [
+            "accent_color",
             "ad_measurement",
             "ad_personalization",
             "address",
             "application_name",
+            "availability_templates",
             "billing_address",
             "billing_email",
             "billing_name",
@@ -44961,6 +45011,7 @@
             "font_scale",
             "history_recommendations",
             "honorific",
+            "import_templates",
             "in_app_marketing",
             "in_app_reminders",
             "interest_center_ids",
@@ -44971,11 +45022,18 @@
             "motion",
             "number_format",
             "optional_analytics",
+            "package_templates",
             "phone_visible",
             "photo_visible",
+            "primary_color",
             "profile_visible",
             "program_duration_minutes",
+            "public_fields",
+            "public_hours",
+            "public_profile_enabled",
             "remember_context",
+            "report_templates",
+            "secondary_color",
             "show_weekends",
             "startup_context",
             "support_email",
@@ -44985,14 +45043,7 @@
             "time_format",
             "timezone_mode",
             "timezone_name",
-            "week_start",
-            "report_templates",
-            "import_templates",
-            "public_profile_enabled",
-            "public_fields",
-            "public_hours",
-            "availability_templates",
-            "package_templates"
+            "week_start"
           ]
         },
         "group": {
@@ -45032,7 +45083,7 @@
           "$ref": "#/$defs/SettingsScope"
         },
         "catalog_version": {
-          "const": 8
+          "const": 9
         },
         "fields": {
           "type": "array",
@@ -45100,7 +45151,7 @@
               "const": "user"
             },
             "catalog_version": {
-              "const": 8
+              "const": 9
             },
             "fields": {
               "type": "array",
@@ -45152,7 +45203,7 @@
               "const": "member"
             },
             "catalog_version": {
-              "const": 8
+              "const": 9
             },
             "fields": {
               "type": "array",
@@ -45204,7 +45255,7 @@
               "const": "center"
             },
             "catalog_version": {
-              "const": 8
+              "const": 9
             },
             "fields": {
               "type": "array",
@@ -45256,7 +45307,7 @@
               "const": "organization"
             },
             "catalog_version": {
-              "const": 8
+              "const": 9
             },
             "fields": {
               "type": "array",
@@ -45308,7 +45359,7 @@
               "const": "platform"
             },
             "catalog_version": {
-              "const": 8
+              "const": 9
             },
             "fields": {
               "type": "array",
@@ -46200,23 +46251,26 @@
               "items": {
                 "type": "string",
                 "enum": [
-                  "description",
+                  "accent_color",
                   "address",
-                  "contact_phone",
-                  "contact_email",
-                  "theme_package_id",
-                  "font_package_id",
-                  "billing_name",
+                  "availability_templates",
                   "billing_address",
                   "billing_email",
-                  "program_duration_minutes",
-                  "report_templates",
+                  "billing_name",
+                  "contact_email",
+                  "contact_phone",
+                  "description",
+                  "font_package_id",
                   "import_templates",
-                  "public_profile_enabled",
+                  "package_templates",
+                  "primary_color",
+                  "program_duration_minutes",
                   "public_fields",
                   "public_hours",
-                  "availability_templates",
-                  "package_templates"
+                  "public_profile_enabled",
+                  "report_templates",
+                  "secondary_color",
+                  "theme_package_id"
                 ]
               },
               "minItems": 1,
@@ -94003,7 +94057,7 @@
       "uuid": "backend uuid@14.0.3 v7 for all inserted IDs; DB defaults not required",
       "external_transport": "POST /functions/v1/backend-v1/{operation}; direct typed request body",
       "internal_rpc": "service-only api_v1 named functions; actor/session/UUID bank supplied by verified gateway",
-      "migration_count": 82,
+      "migration_count": 83,
       "test_evidence": "P06 acceptance is registered through registry.test.mjs; candidate/main full clean evidence is pending",
       "frontend_unchanged": true
     },

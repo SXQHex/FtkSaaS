@@ -33,7 +33,7 @@ test('ST-03 Starter preparation defaults copy, authority, reset and program cons
   await t.test('new center copies approved org proposal; subsequent template edits do not move it',async()=>{
    const v=await read('center');assert.equal(v.values.program_duration_minutes,45);assert.equal(v.program_duration_source.kind,'organization_copy');assert.equal(v.program_duration_source.organization_version,(await read('organization')).version);
    await change('organization',{program_duration_minutes:90});assert.equal((await read('center')).values.program_duration_minutes,45);
-   const catalog=await must(owner,'settings_catalog_get_v1',q('center'));assert.equal(catalog.catalog_version,8);assert.equal(catalog.defaults.program_duration_minutes,60);assert.equal(catalog.fields.find(x=>x.key==='program_duration_minutes').consumer,'schedule_build_program');
+   const catalog=await must(owner,'settings_catalog_get_v1',q('center'));assert.equal(catalog.catalog_version,9);assert.equal(catalog.defaults.program_duration_minutes,60);assert.equal(catalog.fields.find(x=>x.key==='program_duration_minutes').consumer,'schedule_build_program');
   });
   await t.test('an explicit local selection equal to the copy records local provenance',async()=>{
    await change('center',{program_duration_minutes:45});assert.equal((await read('center')).program_duration_source.kind,'center_local');

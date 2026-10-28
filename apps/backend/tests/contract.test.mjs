@@ -133,3 +133,14 @@ test("every settings catalog consumer has a closed descriptor in the response co
  const fields=JSON.parse(fs.readFileSync("config/frontend-settings.json")).fields;
  for(const field of fields)assert(valid("SettingsFieldDescriptor",{key:field.key,group:field.group,consumer:field.consumer,writable:true}),field.scope+":"+field.key);
 });
+
+test('organization brand colors validate exact hex or null and cannot appear in center settings',()=>{
+ const props=p.$defs.OrganizationSettingsValues.properties;
+ assert(valid('OrganizationSettingsValues',{description:'Legacy history'}));assert(valid('OrganizationSettingsValues',{primary_color:null}));
+ for(const key of ['primary_color','secondary_color','accent_color']){
+  const check=a.compile(props[key]);for(const value of [null,'#123456','#aBcDeF','#000000'])assert(check(value));
+  for(const value of ['', '#fff','#12345678',' #123456','#12345G',12])assert.equal(check(value),false);
+  assert.equal(p.$defs.CenterSettingsValues.properties[key],undefined);
+ }
+ assert.deepEqual(props.theme_package_id,{type:'null'});assert.deepEqual(props.font_package_id,{type:'null'});
+});
