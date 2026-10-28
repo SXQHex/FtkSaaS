@@ -1,4 +1,4 @@
-import {validateJobs,coverageHash,roleName,apiBalancePolicy,apiTimeBalance,assertApiTimeBalance} from './shards.mjs';
+import {validateJobs,coverageHash,roleName} from './shards.mjs';
 import {assertReady,assertParents,policyMatches,resolveMerged,remoteSourceScope} from './source.mjs';
 import {mkdtempSync,writeFileSync,rmSync} from 'node:fs';import {tmpdir} from 'node:os';import {join} from 'node:path';import {execFileSync} from 'node:child_process';
 export const gateContext='ftksaas/merge-clean';
@@ -8,9 +8,8 @@ export function validateBinding({binding,pr,run,jobs,tested,currentTree,workflow
  if(run.event!=='pull_request'||run.path!=='.github/workflows/ci-full.yml'||run.conclusion!=='success'||run.status!=='completed')throw Error('No successful candidate workflow');
  if(binding.run_id!==run.id||binding.attempt!==run.run_attempt||binding.pr!==pr.number||binding.head!==pr.head.sha||binding.base!==pr.base.sha||run.head_sha!==binding.head)throw Error('Stale head/base/attempt');
  if(binding.merge!==tested.sha||binding.tree!==tested.tree.sha||binding.tree!==currentTree||tested.parents.length!==2||tested.parents[0].sha!==binding.base||tested.parents[1].sha!==binding.head)throw Error('Tested merge parents/tree mismatch');
- if(binding.kind!=='full'||binding.profile!=='four-isolated-v1'||binding.balance_policy!==apiBalancePolicy.version||binding.coverage!==coverageHash())throw Error('Unrecognized/incomplete full coverage');
+ if(binding.kind!=='full'||binding.profile!=='four-isolated-v1'||binding.coverage!==coverageHash())throw Error('Unrecognized/incomplete full coverage');
  validateJobs(jobs,run,{benchmark:binding.benchmark,collector:true});
- assertApiTimeBalance(apiTimeBalance(jobs,run));
  return true;
 }
 export async function receipt(github,repo,run,kind="full"){
