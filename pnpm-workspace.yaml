@@ -6,5 +6,8 @@ catalog:
   typescript: 7.0.2
 
 allowBuilds:
+  # Optional next-intl extraction tools; not used by runtime translations.
+  "@parcel/watcher": false
+  "@swc/core": false
   esbuild: true
   supabase: true

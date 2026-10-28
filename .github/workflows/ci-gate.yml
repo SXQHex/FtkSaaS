@@ -1,9 +1,11 @@
-name: Candidate merge gate
+name: Backend merge verification
+run-name: 'Merge proof · ${{ github.event.pull_request.number || github.event.workflow_run.head_branch || github.sha }}'
 on:
   pull_request_target:
-    types: [opened, synchronize, reopened, edited, labeled, unlabeled, ready_for_review, converted_to_draft]
+    branches: [main]
+    types: [ready_for_review, converted_to_draft, edited]
   workflow_run:
-    workflows: ['Candidate full clean', 'Documentation acceptance']
+    workflows: ['Backend CI']
     types: [completed]
   push:
     branches: [main]
@@ -16,10 +18,11 @@ permissions:
   pull-requests: read
   statuses: write
 concurrency:
-  group: merge-gate-${{ github.event.pull_request.number || github.event.workflow_run.id || github.sha }}
+  group: merge-gate-${{ github.event.pull_request.number || github.event.workflow_run.id || github.sha }}-${{ github.event.action == 'edited' && github.event.changes.base == null && 'metadata' || 'source' }}
   cancel-in-progress: false
 jobs:
   verify:
+    if: github.event_name != 'pull_request_target' || github.event.action != 'edited' || github.event.changes.base != null
     runs-on: ubuntu-24.04
     steps:
       # Privileged verifier executes default-branch code only, never candidate code.

@@ -1,13 +1,81 @@
-name: Main clean acceptance
+name: Main acceptance
+run-name: 'Main proof · ${{ github.sha }}'
 on:
   push:
     branches: [main]
-  workflow_dispatch:
-    inputs:
-      merge_sha:
-        description: Exact documentation merge to audit (not a full clean)
-        required: true
-        type: string
+    paths:
+      - 'apps/backend/**'
+      - 'packages/api-contracts/**'
+      - 'packages/typescript-config/**'
+      - '.devcontainer/**'
+      - '.github/workflows/**'
+      - 'package.json'
+      - 'pnpm-lock.yaml'
+      - 'pnpm-workspace.yaml'
+      - 'turbo.json'
+      - '.nvmrc'
+      - '.gitignore'
+      - 'docs/history/manifest.json'
+      - 'docs/endpoint-inventory.json'
+      - 'docs/feature-delivery.json'
+      - '!.github/workflows/frontend.yml'
+      - '!.github/workflows/frontend-compatibility.yml'
+      - 'docs/*.json'
+      - 'AGENTS.md'
+      - 'CHANGELOG.md'
+      - 'README.md'
+      - 'apps/backend/README.md'
+      - 'docs/actual-start-handover.md'
+      - 'docs/api-invariants.md'
+      - 'docs/branch-protection-review.md'
+      - 'docs/ci-performance.md'
+      - 'docs/ci-policy.md'
+      - 'docs/ci02-handover.md'
+      - 'docs/claude-handover.md'
+      - 'docs/contracts/00-FtkSaaS-yeni-sohbet-devir.md'
+      - 'docs/contracts/01-FtkSaaS-urun-kapsam-sozlesmesi.md'
+      - 'docs/contracts/02-FtkSaaS-teknik-sozlesme.md'
+      - 'docs/contracts/03-FtkSaaS-kodlama-sorumluluklari.md'
+      - 'docs/contracts/04-FtkSaaS-O4-veri-semasi.md'
+      - 'docs/contracts/05-FtkSaaS-O4-API-katalogu.md'
+      - 'docs/contracts/06-FtkSaaS-O4-durum-hata-izin.md'
+      - 'docs/contracts/10-FtkSaaS-Q-D01-kabul-karari.md'
+      - 'docs/contracts/12-FtkSaaS-Q-E02-kabul-karari.md'
+      - 'docs/decision-sprint-handover.md'
+      - 'docs/decisions/CI-2026-10-20.md'
+      - 'docs/decisions/DS-2026-10-17-settlement-center-scope.md'
+      - 'docs/decisions/DS-2026-10-17-settlement-revision.md'
+      - 'docs/decisions/DS-2026-10-17.md'
+      - 'docs/decisions/P08-accepted-scope.md'
+      - 'docs/decisions/Q-E01-accepted.md'
+      - 'docs/decisions/Q-E01.md'
+      - 'docs/decisions/Q-E02.md'
+      - 'docs/decisions/Q-E03.md'
+      - 'docs/documentation-map.md'
+      - 'docs/feature-delivery.md'
+      - 'docs/frontend-settings-handover.md'
+      - 'docs/instructor-earnings-handover.md'
+      - 'docs/karar-sohbetine-Q-D01.md'
+      - 'docs/monorepo.md'
+      - 'docs/ops-w01-handover.md'
+      - 'docs/p01-handover.md'
+      - 'docs/p02-handover.md'
+      - 'docs/p03-handover.md'
+      - 'docs/p04-handover.md'
+      - 'docs/p05-handover.md'
+      - 'docs/p06-handover.md'
+      - 'docs/p07-a-handover.md'
+      - 'docs/physical-invariants.md'
+      - 'docs/production-queue.md'
+      - 'docs/program-session-handover.md'
+      - 'docs/remaining-work.md'
+      - 'docs/remote-backend-setup.md'
+      - 'docs/schedule-read-handover.md'
+      - 'docs/settlement-handover.md'
+      - 'docs/source-index.md'
+      - 'docs/starter-attendance-protection-handover.md'
+      - 'docs/starter-plan-gates-handover.md'
+      - 'packages/api-contracts/README.md'
 defaults:
   run:
     working-directory: apps/backend
@@ -36,88 +104,52 @@ jobs:
           script: |
             const gate=await import(`${process.env.GITHUB_WORKSPACE}/apps/backend/scripts/ci/gate.mjs`);
             await gate.verifyMerged(github,context,core);
-  clean:
+  frontend:
+    needs: source
+    if: needs.source.outputs.kind == 'frontend'
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Backend unchanged (no backend acceptance)
+        working-directory: .
+        run: echo 'Frontend-only merge; backend tests and delivery are not required.'
+  acceptance:
     needs: source
     if: needs.source.outputs.kind == 'full'
-    uses: ./.github/workflows/clean-suite.yml
-    with:
-      tested_sha: ${{ github.sha }}
-      binding: ${{ needs.source.outputs.binding }}
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Main acceptance proof
+        working-directory: .
+        run: echo 'Candidate full clean verified against actual main; no tests repeated.'
+      - env:
+          BINDING: ${{ needs.source.outputs.binding }}
+        run: |
+          mkdir -p "$RUNNER_TEMP/main-proof"
+          printf '%s' "$BINDING" > "$RUNNER_TEMP/main-proof/binding.json"
+        working-directory: .
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9
+        with:
+          name: main-binding-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/main-proof/binding.json
+          if-no-files-found: error
+          archive: true
   documentation:
     needs: source
     if: needs.source.outputs.kind == 'documentation'
     runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
-        with:
-          fetch-depth: 0
-          persist-credentials: false
-      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1
-        with:
-          node-version-file: '.nvmrc'
-      - run: corepack enable
-      - run: pnpm install --frozen-lockfile
-        working-directory: .
       - name: Documentation main acceptance (no full clean)
-        run: |
-          node scripts/ci/docs-check.mjs README.md
-          pnpm --dir ../.. run verify
+        working-directory: .
+        run: echo 'Verified source-bound documentation receipt; tests not repeated.'
       - env:
           BINDING: ${{ needs.source.outputs.binding }}
+        working-directory: .
         run: |
-          mkdir -p ../../.artifacts/ci
-          node -e "require('fs').writeFileSync('../../.artifacts/ci/binding.json',process.env.BINDING)"
-          echo 'Documentation main acceptance; full clean was not run.' >> "$GITHUB_STEP_SUMMARY"
-          cat ../../.artifacts/ci/binding.json >> "$GITHUB_STEP_SUMMARY"
+          mkdir -p "$RUNNER_TEMP/main-proof"
+          printf '%s' "$BINDING" > "$RUNNER_TEMP/main-proof/binding.json"
+          echo 'Documentation acceptance only; no backend full clean or deploy.' >> "$GITHUB_STEP_SUMMARY"
       - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9
         with:
           name: main-documentation-${{ github.run_attempt }}
-          path: .artifacts/ci/binding.json
+          path: ${{ runner.temp }}/main-proof/binding.json
           if-no-files-found: error
-          include-hidden-files: true
-          archive: true
-  documentation-recovery:
-    if: github.event_name == 'workflow_dispatch'
-    runs-on: ubuntu-24.04
-    steps:
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
-        with:
-          persist-credentials: false
-      - id: recovery
-        uses: actions/github-script@ed597411d8f924073f98dfc5c65a23a2325f34cd
-        with:
-          script: |
-            const audit=await import(`${process.env.GITHUB_WORKSPACE}/apps/backend/scripts/ci/recovery.mjs`);
-            await audit.resolveRecovery(github,context,core);
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
-        with:
-          ref: ${{ steps.recovery.outputs.merge }}
-          persist-credentials: false
-      - name: Verify tested merge
-        env:
-          EXPECTED: ${{ steps.recovery.outputs.merge }}
-        run: test "$(git rev-parse HEAD)" = "$EXPECTED"
-      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1
-        with:
-          node-version-file: '.nvmrc'
-      - run: corepack enable
-      - run: pnpm install --frozen-lockfile
-        working-directory: .
-      - name: Documentation recovery acceptance
-        run: |
-          node scripts/ci/docs-check.mjs README.md
-          pnpm --dir ../.. run verify
-      - env:
-          BINDING: ${{ steps.recovery.outputs.binding }}
-        run: |
-          mkdir -p ../../.artifacts/ci
-          node -e "require('fs').writeFileSync('../../.artifacts/ci/binding.json',process.env.BINDING)"
-          echo 'Source-bound documentation recovery; no full clean; original failed run unchanged.' >> "$GITHUB_STEP_SUMMARY"
-          cat ../../.artifacts/ci/binding.json >> "$GITHUB_STEP_SUMMARY"
-      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9
-        with:
-          name: documentation-recovery-${{ github.run_attempt }}
-          path: .artifacts/ci/binding.json
-          if-no-files-found: error
-          include-hidden-files: true
           archive: true

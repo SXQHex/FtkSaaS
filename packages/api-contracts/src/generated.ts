@@ -21985,36 +21985,10 @@ maintenance_message?: string
  * via the `definition` "PreparationSources".
  */
 export interface PreparationSources {
-/**
- * @maxItems 100
- */
 availability_templates: {
-key: string
-name: string
-/**
- * @minItems 1
- * @maxItems 100
- */
-rules: [{
-/**
- * @minItems 1
- */
-weekdays: [number, ...(number)[]]
-local_start: string
-local_end: string
-valid_from: string
-valid_until?: (string | null)
-}, ...({
-/**
- * @minItems 1
- */
-weekdays: [number, ...(number)[]]
-local_start: string
-local_end: string
-valid_from: string
-valid_until?: (string | null)
-})[]]
-}[]
+kind: ("system_default" | "organization_copy" | "center_local")
+organization_version?: SettingsVersion
+}
 package_templates: {
 kind: ("system_default" | "organization_copy" | "center_local")
 organization_version?: SettingsVersion
@@ -22083,7 +22057,7 @@ as_of: Instant
 export interface SettingsFieldDescriptor {
 key: ("ad_measurement" | "ad_personalization" | "address" | "application_name" | "billing_address" | "billing_email" | "billing_name" | "calendar_view" | "contact_email" | "contact_phone" | "contrast" | "date_format" | "description" | "email_visible" | "font_package_id" | "font_scale" | "history_recommendations" | "honorific" | "in_app_marketing" | "in_app_reminders" | "interest_center_ids" | "interest_discipline_ids" | "language" | "maintenance_message" | "marketing_in_app" | "motion" | "number_format" | "optional_analytics" | "phone_visible" | "photo_visible" | "profile_visible" | "program_duration_minutes" | "remember_context" | "show_weekends" | "startup_context" | "support_email" | "support_url" | "theme" | "theme_package_id" | "time_format" | "timezone_mode" | "timezone_name" | "week_start" | "report_templates" | "import_templates" | "public_profile_enabled" | "public_fields" | "public_hours" | "availability_templates" | "package_templates")
 group: string
-consumer: ("frontend" | "p05_optional_allowed" | "new_center_copy" | "schedule_build_program" | "p06_report_prepare" | "p06_import_prepare" | "public_profile" | "domain_preparation_resolve")
+consumer: ("frontend" | "p05_optional_allowed" | "new_center_copy" | "schedule_build_program" | "p06_report_prepare" | "p06_import_prepare" | "public_profile" | "domain_preparation_resolve" | "schedule_calendar_preferences")
 writable: boolean
 }
 /**

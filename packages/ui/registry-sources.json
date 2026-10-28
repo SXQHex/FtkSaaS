@@ -1,0 +1,72 @@
+{
+  "registry": "shadcn/ui",
+  "license": "MIT",
+  "retrieved": "2026-10-28",
+  "components": [
+    {
+      "name": "button",
+      "url": "https://ui.shadcn.com/r/styles/new-york-v4/button.json",
+      "sha256": "4b8d7d848742727973c1b088af8d15f0b628272a1316f2d2fa344e73ddff9e9c"
+    },
+    {
+      "name": "input",
+      "url": "https://ui.shadcn.com/r/styles/new-york-v4/input.json",
+      "sha256": "b1fffa12ba72ce30a291749012b47235eda110648b8106725ced22b5b31c8f1b"
+    },
+    {
+      "name": "label",
+      "url": "https://ui.shadcn.com/r/styles/new-york-v4/label.json",
+      "sha256": "b03d6bc91da205758df87c5403d74bae4d742f1f4ac5ae0b94ad7a29ab6350ea"
+    },
+    {
+      "name": "card",
+      "url": "https://ui.shadcn.com/r/styles/new-york-v4/card.json",
+      "sha256": "c7ebaa49ba2a0613838558f3892c5007523c2dc26d6b36a244145d454a796106"
+    },
+    {
+      "name": "separator",
+      "url": "https://ui.shadcn.com/r/styles/new-york-v4/separator.json",
+      "sha256": "4242a9fe839cae9083acff1280b7cccfda10e97bbc83283aed12d2d12bebdc6a"
+    },
+    {
+      "name": "sheet",
+      "url": "https://ui.shadcn.com/r/styles/new-york-v4/sheet.json",
+      "sha256": "bdf118300491675f05a9181af491217ba690929338aefd108437c2b07d25432f"
+    },
+    {
+      "name": "select",
+      "url": "https://ui.shadcn.com/r/styles/new-york-v4/select.json",
+      "sha256": "ca3189ea8101a04f144b6d0f0e7330841639bfa5f4d57e7cca0894d39b30817b"
+    },
+    {
+      "name": "badge",
+      "url": "https://ui.shadcn.com/r/styles/new-york-v4/badge.json",
+      "sha256": "0f988b37cf1c56e7ecc83b1dcf24c9af4e73ce4341da5caf2c9d9b07a551319b"
+    },
+    {
+      "name": "alert",
+      "url": "https://ui.shadcn.com/r/styles/new-york-v4/alert.json",
+      "sha256": "413c97869ec0e53efa4a37f590833bcf4a7a57255f5a2e909c6bb5bac7b4570d"
+    }
+  ],
+  "blocks": [
+    {
+      "name": "login-01",
+      "url": "https://ui.shadcn.com/r/styles/new-york-v4/login-01.json",
+      "adaptation": "Official centered login-01 layout and Card/Input/Label/Button composition; native Supabase integration, tr/en labels, recovery and TOTP variants; no marketing panel.",
+      "commit": "96da9cc7f1aa10580a3741664e2a77c721206c00",
+      "files": [
+        {
+          "path": "apps/v4/registry/new-york-v4/blocks/login-01/page.tsx",
+          "url": "https://github.com/shadcn-ui/ui/blob/96da9cc7f1aa10580a3741664e2a77c721206c00/apps/v4/registry/new-york-v4/blocks/login-01/page.tsx",
+          "sha256": "9abc004ff5446fc599b684eff842a6c8eb13d65030779d90162567f6903e3c6e"
+        },
+        {
+          "path": "apps/v4/registry/new-york-v4/blocks/login-01/components/login-form.tsx",
+          "url": "https://github.com/shadcn-ui/ui/blob/96da9cc7f1aa10580a3741664e2a77c721206c00/apps/v4/registry/new-york-v4/blocks/login-01/components/login-form.tsx",
+          "sha256": "a62a24aef1e3be9cb204c7b3bd563cc2f8cdd5d7c4ff07693af2128a4773a91a"
+        }
+      ]
+    }
+  ]
+}

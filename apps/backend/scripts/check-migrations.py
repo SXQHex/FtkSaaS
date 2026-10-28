@@ -189,3 +189,7 @@ assert next(Path("supabase/migrations").glob("*_starter_notification_support.sql
 assert next(Path("supabase/migrations").glob("*_starter_calendar_preferences.sql")).read_text()==Path("database/settings-catalog-v7.sql").read_text().replace("commit;\n","",1)+Path("database/starter-calendar-preferences.sql").read_text().replace("begin;\n","",1),"Calendar preferences source drift"
 
 assert next(Path("supabase/migrations").glob("*_starter_availability_day_boundaries.sql")).read_text()==Path("database/settings-catalog-v8.sql").read_text().replace("commit;\n","",1)+Path("database/starter-availability-day-boundaries.sql").read_text().replace("begin;\n","",1),"Availability day boundaries source drift"
+
+assert next(Path("supabase/migrations").glob("*_starter_availability_management.sql")).read_text()==Path("database/starter-availability-management.sql").read_text(),"Availability management source drift"
+
+assert next(Path("supabase/migrations").glob("*_starter_availability_management_asof.sql")).read_text()==Path("database/starter-availability-management-asof.sql").read_text(),"Availability management snapshot source drift"

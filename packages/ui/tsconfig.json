@@ -1,0 +1,5 @@
+{
+  "extends": "@ftksaas/typescript-config/base.json",
+  "compilerOptions": { "module": "ESNext", "moduleResolution": "bundler" },
+  "include": ["src", "tests", "vitest.config.ts"]
+}

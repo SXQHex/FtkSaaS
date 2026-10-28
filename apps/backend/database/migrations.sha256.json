@@ -78,5 +78,7 @@
   "20261028004254_starter_domain_preparations.sql": "fa54056d2959dcc0a2bb09d478072990307e76c1c8c7e7af1a9c670145a522da",
   "20261028010736_starter_notification_support.sql": "a66eef347d4ac8f0a887253ed2436dccf1f569430084f25b900053bed9de1b8e",
   "20261028012813_starter_calendar_preferences.sql": "2be88b4438f1a2124de112e672cf1473baf2e5c57af5e9c8ea37f8d0763cfbca",
-  "20261028013253_starter_availability_day_boundaries.sql": "6c427947e31a7171fe63e84964524e1a0645bb76d9288534c9cfe0081b85be76"
+  "20261028013253_starter_availability_day_boundaries.sql": "6c427947e31a7171fe63e84964524e1a0645bb76d9288534c9cfe0081b85be76",
+  "20261028175405_starter_availability_management.sql": "55c5f4129982e88f7dcf49173fb7d8f97af48bd57de54d9b20a42ce2e3a93d4d",
+  "20261028180210_starter_availability_management_asof.sql": "94faca5fcb311f1cf2c910cc3a0eab20ba827dafeeffa6d5d6080aade0f0950d"
 }

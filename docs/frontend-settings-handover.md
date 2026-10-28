@@ -85,6 +85,12 @@ Katalogv4 member/center/organization kapsamlarında kapalı `report_templates` v
 
 Import şablonu yalnız explicit center_id/source_namespace ve sütun eşlemesidir; delimiter virgül/noktalı virgül seçimi şablonda zorunludur. Eski templatesiz virgül davranışı korunur. Şablon source_key/display_name hedefini ve tekil kaynak sütunlarını ister; email/phone dışında tekrarlanan hedef reddedilir. Borç/hak/para/izin değeri, kişi birleştirme veya auto apply defaultu yoktur. Org yönetimi ortak mapping hazırlayabilir; resolve/preview/apply için ayrıca canlı import yetkisi gerekir. Başka kullanıcı yetkili ortak projection'ı kendi member dizisine farklı key ile kopyalayabilir; paylaşılmış kaynağı değiştirmiş sayılmaz.100 şablon/dizi teknik JSON hazırlık tavanıdır, Starter ticari kotası değildir.
 
+## Availability hazırlığı ve canlı sürüm okuması
+
+`management_state_get_v1` içinde `operation:availability_save_v1` ve aynı işlemli `selector` gerçek kaynağın kapalı `resource` ve opsiyonel `rule_id` seçimini okur. Yalnız o an ilgili merkezde canlı CM ve F02 yetkisiyle; organization/center/resource sınırı asıl availability komutuyla aynıdır. Sonuç güncel typed kural, ilgili availability_rules sürümü ve mevcut created_at_asc/cursor sayfalamasıdır. Yabancı kaynak NOT_FOUND; kayıp CM FORBIDDEN; farklı actor/selector kapsamındaki cursor VALIDATION_FAILED olur. Okuma receipt/audit veya availability kaydı oluşturmaz.
+
+Şablon resolve sonucu kendi başına güncelleme sürümü değildir. İstemci bu okumadan aldığı expected_version ile mevcut availability_save_v1 komutunu çalıştırır; arada değişiklik varsa sürüm çatışması korunur. Sadece generic settings JSON saklama veya merkez sürümünü kural sürümü yerine kullanma kabul değildir. Bu okuma yeni bir endpoint veya yazma yetkisi açmaz; mevcut typed yönetim seçicisini tamamlar.
+
 ## Sürüm, reset ve bildirim uyumu
 
 İlk saklanmamış belge version0; yazma bu değeri açık ister. Sürüm opaktır, istemci +1 hesaplamaz. Eski notification_preferences_set insert/update/delete tetikleyicisi member ayar sürümünü de ilerletir; genel yazma birden çok alt değişiklik nedeniyle birden fazla artırabilir. Katalogdaki scope alanları dışına veya özel finans/politika/yetki alanlarına yazma VALIDATION_FAILED olur. Sahiplik alanları aynı kalır.

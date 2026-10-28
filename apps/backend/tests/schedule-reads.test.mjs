@@ -1,3 +1,5 @@
+import './calendar-preferences-acceptance.mjs';
+import './personal-calendar-acceptance.mjs';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {authUser,fixturePlatform,must,call,context} from './api-client.mjs';

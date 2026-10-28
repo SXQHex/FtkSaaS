@@ -1,0 +1,29 @@
+{
+  "backendPrefixes": [
+    "apps/backend/",
+    "packages/api-contracts/",
+    "packages/typescript-config/",
+    ".devcontainer/",
+    ".github/workflows/"
+  ],
+  "backendFiles": [
+    "package.json",
+    "pnpm-lock.yaml",
+    "pnpm-workspace.yaml",
+    "turbo.json",
+    ".nvmrc",
+    ".gitignore",
+    "docs/history/manifest.json",
+    "docs/endpoint-inventory.json",
+    "docs/feature-delivery.json"
+  ],
+  "frontendPrefixes": [
+    "apps/web/",
+    "packages/ui/"
+  ],
+  "frontendFiles": [
+    "vercel.json",
+    ".github/workflows/frontend.yml",
+    ".github/workflows/frontend-compatibility.yml"
+  ]
+}

@@ -1,3 +1,4 @@
+import './starter-preparation-acceptance.mjs';
 import {deliverDevInvitation} from '../scripts/deliver-dev-invitations.mjs';import test from 'node:test';import assert from 'node:assert/strict';import fs from 'node:fs';import {createHash} from 'node:crypto';
 import {authUser,fixturePlatform,must,call,context} from './api-client.mjs';import {connect} from '../scripts/db.mjs';import {newUuidV7} from '../scripts/uuid.mjs';import {version} from 'uuid';
 const key=()=>newUuidV7();

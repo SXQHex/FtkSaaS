@@ -1,7 +1,9 @@
-name: Candidate full clean
+name: Backend CI
+run-name: 'PR #${{ github.event.pull_request.number }} · ${{ github.event.pull_request.head.sha }}'
 on:
   pull_request:
-    types: [labeled]
+    branches: [main]
+    types: [opened, synchronize, reopened, edited]
 defaults:
   run:
     working-directory: apps/backend
@@ -10,14 +12,16 @@ permissions:
   actions: read
   pull-requests: read
 concurrency:
-  group: candidate-full-${{ github.event.pull_request.number }}-${{ github.event.pull_request.head.sha }}
-  cancel-in-progress: false
+  group: backend-pr-${{ github.event.pull_request.number }}-${{ github.event.action == 'edited' && github.event.changes.base == null && 'metadata' || 'source' }}
+  cancel-in-progress: true
 jobs:
   candidate:
-    if: github.event.label.name == 'ci:full-clean' && github.event.pull_request.draft == false && !contains(github.event.pull_request.labels.*.name, 'development')
+    # GitHub exposes retargeting as edited; title/body edits start no jobs.
+    if: github.event.action != 'edited' || github.event.changes.base != null
     runs-on: ubuntu-24.04
     outputs:
       merge: ${{ steps.candidate.outputs.merge }}
+      kind: ${{ steps.candidate.outputs.kind }}
       binding: ${{ steps.candidate.outputs.binding }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
@@ -30,10 +34,43 @@ jobs:
         with:
           script: |
             const source=await import(`${process.env.GITHUB_WORKSPACE}/apps/backend/scripts/ci/source.mjs`);
-            await source.resolveCandidate(github,context,core,'full');
+            await source.resolveCandidate(github,context,core,'auto');
   clean:
     needs: candidate
+    if: needs.candidate.outputs.kind == 'full'
     uses: ./.github/workflows/clean-suite.yml
     with:
       tested_sha: ${{ needs.candidate.outputs.merge }}
       binding: ${{ needs.candidate.outputs.binding }}
+  documentation:
+    needs: candidate
+    if: needs.candidate.outputs.kind == 'documentation'
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          ref: ${{ needs.candidate.outputs.merge }}
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Verify tested merge
+        env:
+          EXPECTED: ${{ needs.candidate.outputs.merge }}
+        run: test "$(git rev-parse HEAD)" = "$EXPECTED"
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1
+        with:
+          node-version-file: '.nvmrc'
+      - name: Documentation acceptance
+        run: node scripts/ci/docs-check.mjs README.md
+      - name: Record documentation binding
+        env:
+          BINDING: ${{ needs.candidate.outputs.binding }}
+        run: |
+          mkdir -p ../../.artifacts/ci
+          node -e "require('fs').writeFileSync('../../.artifacts/ci/binding.json',process.env.BINDING)"
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9
+        with:
+          name: document-binding-${{ github.run_attempt }}
+          path: .artifacts/ci/binding.json
+          include-hidden-files: true
+          if-no-files-found: error
+          archive: true

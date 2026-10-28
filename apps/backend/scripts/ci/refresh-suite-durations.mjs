@@ -1,12 +1,14 @@
 // Explicit maintenance utility: input is a preserved, source-bound successful
-// main run + its attempt-specific jobs + decoded API job logs. No auto updates.
+// full clean run + its attempt-specific jobs + decoded API job logs. No auto updates.
 import fs from 'node:fs';
 import path from 'node:path';
 import {fileURLToPath} from 'node:url';
 import {apiSuites} from './select-tests.mjs';
 import {validateJobs,roleName} from './shards.mjs';
 export function durationSnapshot({run,jobs,logs}){
- if(run?.status!=='completed'||run.conclusion!=='success'||run.name!=='Main clean acceptance'||run.event!=='push'||run.head_branch!=='main'||!/^[a-f0-9]{40}$/.test(run.head_sha)||!Number.isSafeInteger(run.id)||!Number.isSafeInteger(run.run_attempt)||run.run_attempt<1)throw Error('Successful exact-source main run required');
+ const candidate=run?.path==='.github/workflows/ci-full.yml'&&run.event==='pull_request';
+ const historical=run?.name==='Main clean acceptance'&&run.event==='push'&&run.head_branch==='main';
+ if(run?.status!=='completed'||run.conclusion!=='success'||(!candidate&&!historical)||!/^[a-f0-9]{40}$/.test(run.head_sha)||!Number.isSafeInteger(run.id)||!Number.isSafeInteger(run.run_attempt)||run.run_attempt<1)throw Error('Successful exact-source full clean run required');
  validateJobs(jobs,run,{collector:true});
  const seconds={},jobIds=[],versions=new Set();
  for(const job of jobs.filter(j=>/^api-[1-4]$/.test(roleName(j))).sort((a,b)=>roleName(a).localeCompare(roleName(b)))){
@@ -26,7 +28,7 @@ export function durationSnapshot({run,jobs,logs}){
  }
  if(versions.size!==1)throw Error('Mixed measured CLI versions');
  if(JSON.stringify(Object.keys(seconds).map(n=>'apps/backend/tests/'+n+'.test.mjs').sort())!==JSON.stringify([...apiSuites].sort()))throw Error('Missing/unknown measured suite; every API suite must be measured');
- return {source:run.head_sha,run_id:run.id,run_attempt:run.run_attempt,cli_version:[...versions][0],kind:'measured suite process wall seconds from successful main job summaries; overlapping at concurrency=2, not additive wall time',job_ids:jobIds,seconds:Object.fromEntries(Object.entries(seconds).sort())};
+ return {source:run.head_sha,run_id:run.id,run_attempt:run.run_attempt,cli_version:[...versions][0],kind:'measured suite process wall seconds from successful full clean job summaries; overlapping at concurrency=2, not additive wall time',job_ids:jobIds,seconds:Object.fromEntries(Object.entries(seconds).sort())};
 }
 if(process.argv[1]&&path.resolve(process.argv[1])===fileURLToPath(import.meta.url)){
  const [bundle,mode]=process.argv.slice(2);if(!bundle||!['--write',undefined].includes(mode)||process.argv.length>4)throw Error('Usage: node scripts/ci/refresh-suite-durations.mjs bundle.json [--write]');

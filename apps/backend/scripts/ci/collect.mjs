@@ -1,6 +1,6 @@
 import {ciFile} from '../paths.mjs';
 import fs from 'node:fs';
-import {validateJobs,coverageHash,roleName,shardPlan} from './shards.mjs';
+import {validateJobs,coverageHash,roleName,shardPlan,apiTimeBalance,assertApiTimeBalance} from './shards.mjs';
 
 export function measurements(jobs,created){
  const seconds=(a,b)=>(Date.parse(b)-Date.parse(a))/1000;
@@ -13,14 +13,18 @@ export function measurements(jobs,created){
  });
 }
 export async function collect(github,context,core,binding){
+ fs.rmSync(ciFile('binding.json'),{force:true});
  if(binding.run_id!==context.runId||binding.attempt!==Number(process.env.GITHUB_RUN_ATTEMPT)||binding.coverage!==coverageHash())throw Error('Collector source/run/attempt/coverage mismatch');
  const run=(await github.rest.actions.getWorkflowRun({...context.repo,run_id:context.runId})).data;
  const jobs=await github.paginate(github.rest.actions.listJobsForWorkflowRunAttempt,{...context.repo,run_id:context.runId,attempt_number:binding.attempt,per_page:100});
  validateJobs(jobs,run,{benchmark:binding.benchmark});
+ const balance=apiTimeBalance(jobs,run);
  const rows=measurements(jobs,run.created_at),sharded=rows.filter(r=>r.role!=='serial-reference');
  const total=rs=>rs.reduce((n,r)=>n+r.runner_s,0)/60;
  const end=Math.max(...sharded.map(r=>Date.parse(r.finished)));
- const report={test_step_includes_backend_setup:true,backend_phase_details:'Each required job summary and timings artifact separately measures backend setup/tests/seed-health-advisors; queue/setup below refers to GitHub job and checkout/package installation.',source:binding,distribution:shardPlan(),jobs:rows,sharded_wait_s:(end-Date.parse(run.created_at))/1000,longest_api_s:Math.max(...rows.filter(r=>r.role.startsWith('api-')).map(r=>r.test_s)),sharded_runner_minutes:total(sharded),serial_runner_minutes:total(rows.filter(r=>r.role==='serial-reference')),acceptance_roles_runner_minutes:total(rows),completed_workflow_runner_minutes:jobs.filter(j=>j.status==='completed'&&j.started_at&&j.completed_at).reduce((s,j)=>s+(Date.parse(j.completed_at)-Date.parse(j.started_at))/60000,0),workflow_total_note:'Collector is still running; final total workflow runner minutes must be measured after completion'};
- fs.mkdirSync(ciFile(),{recursive:true});fs.writeFileSync(ciFile('binding.json'),JSON.stringify({...binding,profile:'four-isolated-v1'}));fs.writeFileSync(ciFile('measurements.json'),JSON.stringify(report,null,2));
- await core.summary.addRaw('## Source-bound full clean\n\nAll required jobs executed successfully in this run/attempt.\n\n```json\n'+JSON.stringify(report,null,2)+'\n```\n').write();
+ const report={balance,test_step_includes_backend_setup:true,backend_phase_details:'Each required job summary and timings artifact separately measures backend setup/tests/seed-health-advisors; queue/setup below refers to GitHub job and checkout/package installation.',source:binding,distribution:shardPlan(),jobs:rows,sharded_wait_s:(end-Date.parse(run.created_at))/1000,longest_api_s:Math.max(...rows.filter(r=>r.role.startsWith('api-')).map(r=>r.test_s)),sharded_runner_minutes:total(sharded),serial_runner_minutes:total(rows.filter(r=>r.role==='serial-reference')),acceptance_roles_runner_minutes:total(rows),completed_workflow_runner_minutes:jobs.filter(j=>j.status==='completed'&&j.started_at&&j.completed_at).reduce((s,j)=>s+(Date.parse(j.completed_at)-Date.parse(j.started_at))/60000,0),workflow_total_note:'Collector is still running; final total workflow runner minutes must be measured after completion'};
+ fs.mkdirSync(ciFile(),{recursive:true});fs.writeFileSync(ciFile('measurements.json'),JSON.stringify(report,null,2));
+ await core.summary.addRaw('## API time balance: '+(balance.balanced?'PASS':'FAIL')+'\n\nSlowest/fastest: '+balance.ratio.toFixed(3)+'; gap: '+balance.gap_s+'s. Limit: ratio '+balance.max_ratio+' with '+balance.min_gap_s+'s absolute tolerance.\n\n## Source-bound full clean\n\nAll required tests executed successfully in this run/attempt. API wall-time balance is a separate mandatory acceptance condition.\n\n```json\n'+JSON.stringify(report,null,2)+'\n```\n').write();
+ assertApiTimeBalance(balance);
+ fs.writeFileSync(ciFile('binding.json'),JSON.stringify({...binding,profile:'four-isolated-v1',balance_policy:balance.version}));
 }

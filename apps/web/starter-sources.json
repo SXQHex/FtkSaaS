@@ -1,0 +1,27 @@
+{
+  "reviewed": "2026-10-28",
+  "policy": "Official shadcn/ui blocks first; no starter backend, auth provider, Base UI primitives or demo features imported.",
+  "references": [
+    {
+      "repository": "https://github.com/salmanshahriar/Next-Elite",
+      "commit": "e3705510d4ef6a6357195925aa4ae13d516dcee0",
+      "license": "MIT",
+      "mode": "reference-only; no source files copied",
+      "selected": "Retain Vitest/Playwright and theme infrastructure; adopt the Oxlint/Oxfmt tool pair using pinned package dependencies and local frontend configs. No starter source files or Better Auth imported."
+    },
+    {
+      "repository": "https://github.com/Kiranism/next-shadcn-dashboard-starter",
+      "commit": "9084ffd954d24591d9b1d279c4b18e119b02b34e",
+      "license": "MIT",
+      "mode": "reference-only; no source files copied",
+      "selected": "Feature-boundary reference; dashboard, tables and Clerk deferred because no screen requirements are accepted."
+    },
+    {
+      "repository": "https://github.com/makerkit/nextjs-saas-starter-kit-lite",
+      "commit": "9ff430df9c58516add0136bd01ed800ce551675e",
+      "license": "MIT",
+      "mode": "reference-only; no source files copied",
+      "selected": "Separate native Auth integration from UI primitives; retain current Supabase adapter without database scaffolding."
+    }
+  ]
+}
