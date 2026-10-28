@@ -613,3 +613,5 @@ test('frontend-only main marker runs without checkout from runner workspace root
  assert(marker.includes('working-directory: .'));
  assert(marker.includes('Backend unchanged (no backend acceptance)'));
 });
+
+// Disposable CI-SPLIT backend-only trigger probe; never merge.
