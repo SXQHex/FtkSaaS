@@ -143,10 +143,10 @@ export async function deliver(){
   if(!r.ok)throw Error('Cannot revalidate GitHub acceptance: HTTP '+r.status);return r.json();
  };
  const github={rest:{
-  git:{getRef:async()=>({data:await gh('git/ref/heads/main')}),getTree:async a=>({data:await gh('git/trees/'+a.tree_sha+'?recursive=1')}),getBlob:async a=>({data:await gh('git/blobs/'+a.file_sha)})},
-  repos:{compareCommitsWithBasehead:async a=>({data:await gh('compare/'+a.basehead)})},
-  actions:{getWorkflowRun:async a=>({data:await gh('actions/runs/'+a.run_id)}),listJobsForWorkflowRun:async a=>({data:await gh('actions/runs/'+a.run_id+'/jobs?filter=latest&per_page=100&page='+a.page)})}
- },paginate:async(method,args)=>{const all=[];for(let page=1;;page++){const rows=(await method({...args,page})).data.jobs;all.push(...rows);if(rows.length<100)return all;}}};
+  git:{getRef:async a=>({data:await gh('git/ref/'+(a.ref??'heads/main'))}),getCommit:async a=>({data:await gh('git/commits/'+a.commit_sha)}),getTree:async a=>({data:await gh('git/trees/'+a.tree_sha+'?recursive=1')}),getBlob:async a=>({data:await gh('git/blobs/'+a.file_sha)})},
+  repos:{listPullRequestsAssociatedWithCommit:async a=>({data:await gh('commits/'+a.commit_sha+'/pulls?per_page=100&page='+a.page)}),compareCommitsWithBasehead:async a=>({data:await gh('compare/'+a.basehead)})},
+  actions:{listWorkflowRuns:async a=>({data:await gh('actions/workflows/'+a.workflow_id+'/runs?head_sha='+a.head_sha+'&event=pull_request&per_page=100&page='+a.page)}),listWorkflowRunArtifacts:async a=>({data:await gh('actions/runs/'+a.run_id+'/artifacts?per_page=100&page='+a.page)}),downloadArtifact:async a=>{const r=await fetch('https://api.github.com/repos/SXQHex/FtkSaaS/actions/artifacts/'+a.artifact_id+'/zip',{headers:{Authorization:'Bearer '+process.env.GH_TOKEN},signal:AbortSignal.timeout(30000)});if(!r.ok)throw Error('Cannot read candidate receipt');return {data:await r.arrayBuffer()};},getWorkflowRun:async a=>({data:await gh('actions/runs/'+a.run_id)}),listJobsForWorkflowRun:async a=>({data:await gh('actions/runs/'+a.run_id+'/jobs?filter=latest&per_page=100&page='+a.page)})}
+ },paginate:async(method,args)=>{const all=[];for(let page=1;;page++){const data=(await method({...args,page})).data;const rows=Array.isArray(data)?data:(data.jobs??data.artifacts??data.workflow_runs);if(!Array.isArray(rows))throw Error('Invalid GitHub proof page');all.push(...rows);if(rows.length<100)return all;}}};
  const current=()=>revalidateDeployment(github,{owner:'SXQHex',repo:'FtkSaaS'},{sha:receipt.source,expected_main:receipt.expected_main,run_id:Number(receipt.acceptance_run_id),attempt:receipt.acceptance_attempt});
  const cli=(args)=>{const r=spawnSync(path.resolve('node_modules/.bin/supabase'),args,{encoding:'utf8',timeout:600000,maxBuffer:20*1024*1024,env:process.env});if(r.error||r.status!==0)throw Error('Supabase CLI failed in '+stage+'; output withheld to protect credentials/SQL');};
  try{

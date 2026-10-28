@@ -1,6 +1,7 @@
 import {ciFile} from '../paths.mjs';
 import {validateJobs} from './shards.mjs';
 import {backendUnchanged} from './source.mjs';
+import {verifyMerged} from './gate.mjs';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
@@ -17,6 +18,13 @@ export function deploymentSource({run,jobs,currentMain,repository,attempt}) {
  if(frontend.length===1)return {deploy:false,reason:'Frontend-only scope; no backend acceptance',frontend:true};
  const docs=jobs.filter(j=>j.name==='documentation'&&j.conclusion==='success'&&j.status==='completed'&&j.run_id===run.id&&j.run_attempt===run.run_attempt&&j.head_sha===run.head_sha&&j.steps?.some(s=>s.name==='Documentation main acceptance (no full clean)'&&s.conclusion==='success'));
  if(docs.length===1)return {deploy:false,reason:'Documentation acceptance; backend unchanged'};
+ const proof=jobs.filter(j=>j.name==='acceptance');
+ if(proof.length){
+  const j=proof[0];
+  if(proof.length!==1||j.status!=='completed'||j.conclusion!=='success'||j.run_id!==run.id||j.run_attempt!==run.run_attempt||j.head_sha!==run.head_sha||!j.steps?.some(s=>s.name==='Main acceptance proof'&&s.conclusion==='success'))throw Error('Invalid main proof job');
+  return {deploy:true,sha:run.head_sha,run_id:run.id,attempt:run.run_attempt,proofRequired:true};
+ }
+ // Historical accepted full-main runs retain their original obligations.
  validateJobs(jobs,run,{collector:true});
  return {deploy:true,sha:run.head_sha,run_id:run.id,attempt:run.run_attempt};
 }
@@ -24,6 +32,11 @@ export function deploymentSource({run,jobs,currentMain,repository,attempt}) {
 async function fullProof(github,repo,run,jobs,currentMain,attempt){
  const proof=deploymentSource({run,jobs,currentMain:run.head_sha,repository:repo.owner+'/'+repo.repo,attempt});
  if(!proof.deploy)return null;
+ if(proof.proofRequired){
+  const core={setOutput(){},summary:{addRaw(){return this;},async write(){}}};
+  const binding=await verifyMerged(github,{repo,sha:run.head_sha,runId:run.id},core);
+  if(binding.kind!=='full')throw Error('Main proof is not full candidate acceptance');
+ }
  if(run.head_sha!==currentMain){
   const comparison=(await github.rest.repos.compareCommitsWithBasehead({...repo,basehead:run.head_sha+'...'+currentMain})).data;
   if(comparison.status!=='ahead'||!(await backendUnchanged(github,repo,run.head_sha,currentMain)))return null;
@@ -74,10 +87,18 @@ export async function resolveDeployment(github,context,core) {
  await core.summary.addRaw(JSON.stringify(proof)+'\n').write();
 }
 
+export function trustedDeliveryRun(run,jobs,repository){
+ if(run.path!=='.github/workflows/cd-development.yml'||!['workflow_run','workflow_dispatch'].includes(run.event)||run.head_branch!=='main'||run.repository?.full_name!==repository||run.head_repository?.full_name!==repository||run.status!=='completed'||run.conclusion!=='success')return false;
+ const deploy=jobs.filter(j=>j.name==='deploy');
+ return deploy.length===1&&deploy[0].status==='completed'&&deploy[0].conclusion==='success'&&deploy[0].run_id===run.id&&deploy[0].run_attempt===run.run_attempt&&deploy[0].head_sha===run.head_sha&&deploy[0].steps?.some(s=>s.name==='Deliver accepted source and verify hosted backend'&&s.conclusion==='success');
+}
 export async function previousReceipt(github,context){
  const runs=(await github.rest.actions.listWorkflowRuns({...context.repo,workflow_id:'cd-development.yml',status:'success',branch:'main',per_page:20})).data.workflow_runs;
  for(const run of runs){
   if(run.id===context.runId||run.path!=='.github/workflows/cd-development.yml')continue;
+  const current=(await github.rest.actions.getWorkflowRun({...context.repo,run_id:run.id})).data;
+  const jobs=await github.paginate(github.rest.actions.listJobsForWorkflowRun,{...context.repo,run_id:run.id,filter:'latest',per_page:100});
+  if(current.run_attempt!==run.run_attempt||!trustedDeliveryRun(current,jobs,context.repo.owner+'/'+context.repo.repo))continue;
   const artifacts=await github.paginate(github.rest.actions.listWorkflowRunArtifacts,{...context.repo,run_id:run.id,per_page:100});
   const a=artifacts.find(a=>!a.expired&&a.name===`development-delivery-${run.id}-${run.run_attempt}`);if(!a)continue;
   const zip=await github.rest.actions.downloadArtifact({...context.repo,artifact_id:a.id,archive_format:'zip'});
@@ -85,7 +106,7 @@ export async function previousReceipt(github,context){
   try{
    const file=path.join(dir,'receipt.zip');fs.writeFileSync(file,Buffer.from(zip.data));
    const receipt=JSON.parse(execFileSync('unzip',['-p',file,'development-delivery.json'],{encoding:'utf8',maxBuffer:100000}));
-   if(receipt.success===true&&receipt.project==='gwyprhenabtpkbojephw'){
+   if(receipt.success===true&&receipt.project==='gwyprhenabtpkbojephw'&&/^[a-f0-9]{40}$/.test(receipt.source??'')){
     fs.mkdirSync(ciFile(),{recursive:true});fs.writeFileSync(ciFile('previous-development-delivery.json'),JSON.stringify(receipt));return receipt;
    }
   }finally{fs.rmSync(dir,{recursive:true,force:true});}

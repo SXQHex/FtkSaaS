@@ -1,5 +1,16 @@
 # CI ölçüm temeli ve sonraki performans işi
 
+## 28 Ekim — gerçek API süre farkı ve zorunlu kapı adayı
+
+Başarılı main [40709789814](https://github.com/SXQHex/FtkSaaS/actions/runs/40709789814), kaynak `5bebc8f0fb6c89e1d67648fb06a2db729a4f489b`, attempt1: API1–4 clean adımları sırasıyla1651/1102/793/1167sn; en uzun/en kısa2.082, fark858sn. Backend hazırlığı yaklaşık38–43sn; test süreçleri API1’de1607.94, API2’de1057.91, API3’te754.63, API4’te1122.66sn. API1’de registry1607.58 ve event-cancellation1443.88sn aynı iki slotta koştu. Eski855.73/801.18sn ağırlıkları bu yükü temsil etmiyordu. Bu kaynakta artışın yeni assertion, fixture veya runner çekişmesinden gelen payı ayrıca ölçülmeden tek nedene bağlanmaz.
+
+15 suite’in gerçek process wall ölçümleri ve CLI2.122.0 kaynak/run/attempt/job kimlikleriyle [süre tablosuna](../apps/backend/scripts/ci/suite-durations.json) alındı. Yeni planın model duvarları API1–4 için1607.58/1443.88/1476.08/1375.06sn; oran1.169. Bunlar **tahmindir**; en uzun suite’in26dk48sn alt sınırı yalnız dağılımla kaldırılmaz. Toplam-ağırlık1.08 sınırı ve iki process slotu korunur. Gerçek yeni süre ve runner maliyeti henüz kabul edilmedi.
+
+Yeni [denge politikası](ci-policy.md#api-süre-dengesi--zorunlu-kabul) her full clean’de gerçek dört API clean zamanı için oran>1.25 ve fark>120sn birlikteliğini reddeder. Fonksiyon testleri başarılı olsa da binding yoktur ve merge kapısı kapalıdır. İki eşik küçük ortam sapmasını tolere eder; her koşuda görünür rapor vardır, mevcut suite’e assertion eklemek bu kontrolü atlamaz. Yeni suite ölçümsüz envantere alınamaz. Baseline veya eşik kendiliğinden güncellenmez. Bu kapı ve yeni dağılımın gerçek aday kabulü tamamlanmadan süre dengesi kapanmış sayılmaz.
+
+
+28 Ekim sadeleştirme kararı: rutin otomatik PR kabulü bir full clean çalıştırır; main aynı testleri tekrarlamadan aday kanıtını doğrular. Manuel targeted yalnız seçilen SHA aralığı için isteğe bağlıdır. Saf belge dependency/DB/API başlatmaz. Yeni akışın gerçek wall/runner kazancı henüz ölçülmedi; aşağıdaki eski kaynak ölçümleri yeni sonuç gibi kullanılmaz. Süre güncellemesi artık gerçek başarılı aday full clean’i de kabul eder; proof-only main’den test süresi türetilmez. Güncel davranış [CI politikasındadır](ci-policy.md).
+
 ## P03 geliştirme ölçümü — 21 Ekim 2026
 
 Kaynak `d3d5ae65d4ed226573cfb7e163cf2be8e0500c5a`, [39522543011](https://github.com/SXQHex/FtkSaaS/actions/runs/39522543011) completed/success. Run00:38:33–01:11:14 UTC=32:41; öncelikli2 API suite’i6:13.468, kalan13 suite25:17.243. Seçici P03 SQL, ortak borç hesabı, migration/manifest ve üretilmiş gateway girdilerinde fail-closed geniş geri dönüş kullandı;15 API suite’i seçildi. P03 için yalnız dosya adı eşlemek, paylaşılan finans tüketicilerinin kapsandığını tek başına kanıtlamaz. Hedefli süreç tek backend/DB’de concurrency2 kullanır; aday/main dört izole DB shard’ı ile aynı çalışma profili değildir.
