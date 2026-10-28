@@ -46,6 +46,16 @@ PR’nin gerçek merge ağacında [belge kontrolü](../apps/backend/scripts/ci/d
 
 Merge normal iki parent’lı merge olmalıdır; squash/rebase’e kanıt taşınmaz. Head/base/tree değişirse yeni kabul gerekir. Main yeniden test yerine gerçek parent/tree’nin test edilen adayla aynılığını ve başarılı adayın güncel attempt/job sonuçlarını doğrular. Böylece test maliyeti tekrarlanmaz; kaynak güveni kaldırılmaz.
 
+## API süre dengesi — zorunlu kabul
+
+`api-wall-v1` her full clean’de dört API işinin gerçek `Clean acceptance` başlangıç/bitişlerini aynı run/attempt/head üzerinde doğrular. Bu süre izole backend başlatma/reset ve API testlerini kapsar; paket kurulumu ve runner kuyruğu hariçtir. En uzun/en kısa oranı **1.25’i** ve mutlak fark **120 saniyeyi** birlikte aşarsa kabul başarısızdır. Bu iki eşik küçük sabit kurulum/runner sapmasına toleranstır; eski tahmini ağırlıkların dengeli olması gerçek zaman kapısını atlatmaz. Her koşu açık PASS/FAIL, oran, fark ve dört süreyi raporlar.
+
+Toplayıcı dengesizlikte `measurements.json` ve özeti korur, kabul binding’i üretmez; artifact yüklemesi hata halinde de çalışır. Trusted merge/main/CD doğrulayıcısı gerçek API step zamanlarını bağımsız yeniden hesaplar ve binding’in denge politika sürümünü ister. Bütün fonksiyon testlerinin yeşil olması performans kabulü yerine geçmez. Eksik/geçersiz/sıfır/mükerrer zaman veya farklı kaynak/attempt hata verir; başarı uydurulmaz.
+
+Yeni suite ölçümlü envantere eklenmeden shard planı oluşturulamaz. Mevcut suite içine eklenen assertion’lar envanter değişmese de her koşudaki gerçek süre/fark kontrolüne tabidir; bozulma tolerans içinde birikebilir, sınırı aşınca merge engellenir. CI süre tablosunu otomatik commit etmez, kaynak kabulü sırasında kendisine yeni baseline oluşturmaz. Başarılı kaynak bağlı ölçümden incelenmiş ağırlık güncellemesi veya baskın suite’in güvenli bölünmesi gerekir. Test azaltmak, atlamak, sleep eklemek veya sırf yeşil sonuç için eşikleri büyütmek çözüm değildir.
+
+Statik toplam-ağırlık oranı1.08, bütün suite’lerin bir kez çalışması, concurrency2 ve süre alt sınırına göre en uzun tahmin kontrolü korunur. Eski snapshot’ın tahmini duvar8% regresyonu kendi ölçümüyle korunur; yeni snapshot ayrı değerlendirilir. Büyük tek suite, en iyi dağıtımda da alt sınırdır; yalnız yeniden dağıtım daha kısa toplam bekleme garantisi değildir. Güvenli fixture/grup ayrımı ve yeni gerçek kabul olmadan suite bölünmüş veya hızlanmış sayılmaz.
+
 ## Güvenilir politika ve dağıtım
 
 `ftksaas/merge-clean` status’unu yalnız main’den çalışan doğrulayıcı üretir. Aday testleri salt-okuma token kullanır, secrets/status-write yetkisi almaz. Yetkili doğrulayıcı aday kodu veya artifact executable’ı çalıştırmaz. Bütün `.github/workflows/*`, `scripts/ci` ve clean/start/path runner blob/mode kümesi trusted yüzeydir. Frontend-only sınıflandırma dahi workflow politika değişikliğine otomatik izin vermez.

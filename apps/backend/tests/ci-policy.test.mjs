@@ -119,7 +119,7 @@ test('contract generator/shared types cannot silently omit structural coverage',
 test('rename and deletion cover both source and destination; malformed diffs reject',()=>{const c=parseChanges('R100\0database/instructor-earnings.sql\0docs/moved.md\0D\0tests/api-client.mjs\0');assert.equal(c.length,3);assert.deepEqual(select(c).api,apiSuites);assert.throws(()=>parseChanges('R100\0one\0'));});
 test('missing diff, empty set, missing path and moved checkout expand to all suites',()=>{for(const p of [select([]),select([{status:'M'}]),select([{path:'docs/a.md'}],{diffAvailable:false}),select([{path:'docs/a.md'}],{headMatches:false})])assert.deepEqual(p.api,apiSuites);});
 test('API suite inventory exactly matches package test command; no shard loses tests',()=>{const command=JSON.parse(fs.readFileSync('apps/backend/package.json')).scripts['test:api'];assert.deepEqual([...command.matchAll(/tests\/[\w-]+\.test\.mjs/g)].map(m=>'apps/backend/'+m[0]).sort(),[...apiSuites].sort());});
-const valid=()=>({binding:{kind:'full',profile:'four-isolated-v1',coverage:coverageHash(),pr:1,head:'H',base:'B',merge:'M',tree:'T',run_id:5,attempt:1},pr:{number:1,head:{sha:'H'},base:{sha:'B'}},run:{id:5,run_attempt:1,head_sha:'H',event:'pull_request',path:'.github/workflows/ci-full.yml',status:'completed',conclusion:'success'},tested:{sha:'M',tree:{sha:'T'},parents:[{sha:'B'},{sha:'H'}]},currentTree:'T',workflowMatches:true,jobs:['core','api-1','api-2','api-3','api-4','full-clean'].map(name=>({name,status:'completed',conclusion:'success',run_id:5,run_attempt:1,head_sha:'H',steps:[{name:name==='full-clean'?'Verify all required jobs':'Clean acceptance',conclusion:'success'},{name:'Verify tested merge',conclusion:'success'}]}))});
+const valid=()=>({binding:{kind:'full',profile:'four-isolated-v1',balance_policy:'api-wall-v1',coverage:coverageHash(),pr:1,head:'H',base:'B',merge:'M',tree:'T',run_id:5,attempt:1},pr:{number:1,head:{sha:'H'},base:{sha:'B'}},run:{id:5,run_attempt:1,head_sha:'H',event:'pull_request',path:'.github/workflows/ci-full.yml',status:'completed',conclusion:'success'},tested:{sha:'M',tree:{sha:'T'},parents:[{sha:'B'},{sha:'H'}]},currentTree:'T',workflowMatches:true,jobs:['core','api-1','api-2','api-3','api-4','full-clean'].map(name=>({name,status:'completed',conclusion:'success',run_id:5,run_attempt:1,head_sha:'H',steps:[{name:name==='full-clean'?'Verify all required jobs':'Clean acceptance',conclusion:'success',started_at:'2026-01-01T00:00:00Z',completed_at:'2026-01-01T00:01:00Z'},{name:'Verify tested merge',conclusion:'success'}]}))});
 test('merge acceptance binds live head base merge tree workflow and attempt',()=>{assert(validateBinding(valid()));for(const mutate of [v=>v.pr.head.sha='new',v=>v.pr.base.sha='new',v=>v.currentTree='new',v=>v.binding.attempt=2,v=>v.run.event='push',v=>v.workflowMatches=false,v=>v.tested.parents[1].sha='other']){const v=valid();mutate(v);assert.throws(()=>validateBinding(v));}});
 test('label, skipped job or skipped clean step never constitutes acceptance',()=>{for(const mutate of [v=>v.jobs=[],v=>v.jobs[0].conclusion='skipped',v=>v.jobs[0].steps[0].conclusion='skipped',v=>v.run.conclusion='cancelled']){const v=valid();mutate(v);assert.throws(()=>validateBinding(v));}});
 test('automatic PR acceptance and manual diagnostics have disjoint event and cancellation boundaries',()=>{
@@ -300,7 +300,7 @@ test('documentation proof is separate, source bound and rejects stale/missing/sk
  for(const mutate of [x=>x.binding.kind='full',x=>x.run.path='.github/workflows/ci-docs.yml',x=>x.pr.base.sha='new',x=>x.binding.attempt=2,x=>x.currentTree='new',x=>x.workflowMatches=false,x=>x.jobs=[],x=>x.jobs[0].steps[0].conclusion='skipped']){const x=structuredClone(v);mutate(x);assert.throws(()=>validateDocumentBinding(x));}
 });
 
-import {shardPlan,coverageHash,validateJobs} from '../scripts/ci/shards.mjs';
+import {shardPlan,coverageHash,validateJobs,apiBalancePolicy,apiTimeBalance,assertApiTimeBalance} from '../scripts/ci/shards.mjs';
 import {measurements} from '../scripts/ci/collect.mjs';
 test('four deterministic measured shards partition every suite exactly once with bounded weight imbalance',()=>{
  const bins=shardPlan();assert.equal(bins.length,4);
@@ -392,7 +392,7 @@ test('duration refresh requires successful same-source same-attempt executed job
 test('current two-slot balance avoids the late long-suite queue and retains the measured weight bound',()=>{
  assert.equal(predictedWall(['apps/backend/tests/c.test.mjs','apps/backend/tests/b.test.mjs','apps/backend/tests/a.test.mjs'],{a:1,b:1,c:100}),101);
  const bins=shardPlan(),walls=bins.map(b=>predictedWall(b.suites));
- assert(Math.max(...walls)/Math.min(...walls)<1.08);
+ assert(Math.max(...walls)/Math.min(...walls)<=apiBalancePolicy.max_ratio);
  const lowerBound=Math.max(...Object.values(durations.seconds),Object.values(durations.seconds).reduce((a,b)=>a+b,0)/8);
  assert(Math.max(...walls)<=lowerBound*1.08);
  // A caller cannot alter a later runner's cached coverage/scheduling decision.
@@ -678,7 +678,7 @@ test('proof-only main authorizes CD only after candidate jobs are independently 
  }finally{rmSync(dir,{recursive:true,force:true});}
 });
 test('measurement maintenance accepts actual PR clean logs but rejects proof-only main as test evidence',()=>{
- const input=measuredMainBundle();input.run={...input.run,name:'Backend CI',path:'.github/workflows/ci-full.yml',event:'pull_request',head_branch:'candidate'};
+ const input=measuredMainBundle();input.run={...input.run,name:'PR #78 · exact-head',path:'.github/workflows/ci-full.yml',event:'pull_request',head_branch:'candidate'};
  assert.equal(Object.keys(durationSnapshot(input).seconds).length,apiSuites.length);
  input.run={...input.run,name:'Main acceptance',path:'.github/workflows/backend.yml',event:'push',head_branch:'main'};assert.throws(()=>durationSnapshot(input),/full clean run/);
 });
@@ -690,4 +690,26 @@ test('automatic candidate tests Draft source, binds the live main base and rejec
   pr.base.ref='main';pr.head.sha='moved';await assert.rejects(resolveCandidate(github,context,{setOutput(){}},'auto'),/Candidate changed/);
  }
  const gate=fs.readFileSync('.github/workflows/ci-gate.yml','utf8');assert(gate.includes("github.event.action != 'edited' || github.event.changes.base != null"));
+});
+
+test('historical suite measurement still retains its original eight-percent predicted-wall regression',()=>{
+ const seconds={'api-acceptance':353.15,'availability-policies':157.42,'cross-center-settlement':646.05,'event-cancellation':801.18,'event-payment':663.4,'instructor-earnings':649.3,'p01-catalog-entitlement-reads':161.7,'p01-lesson-requests':169.06,'p01-waitlist-workers':141.83,'person-registry':310.53,'program-session-lifecycle':723.19,registry:855.73,'room-role-registry':122.54,'schedule-reads':228.36,'starter-attendance-protection':433.87};
+ const walls=shardPlan(apiSuites,seconds).map(b=>predictedWall(b.suites,seconds));assert(Math.max(...walls)/Math.min(...walls)<1.08);
+});
+function jobsWithApiSeconds(values){
+ const v=valid();for(let i=0;i<4;i++){const job=v.jobs.find(j=>j.name==='api-'+(i+1));job.steps[0].completed_at=new Date(Date.parse(job.steps[0].started_at)+values[i]*1000).toISOString();}return v;
+}
+test('real PR77 imbalance is rejected even when every test and collector is successful',()=>{
+ const v=jobsWithApiSeconds([1651,1102,793,1167]),report=apiTimeBalance(v.jobs,v.run);
+ assert.equal(report.gap_s,858);assert(report.ratio>2);assert.equal(report.balanced,false);assert.throws(()=>assertApiTimeBalance(report),/API_TIME_IMBALANCE/);
+ assert.throws(()=>validateBinding(v),/API_TIME_IMBALANCE/);
+ const balanced=jobsWithApiSeconds([1600,1450,1490,1400]);assert(validateBinding(balanced));
+ // New assertions inside an existing file require no inventory delta to be caught.
+ balanced.jobs.find(j=>j.name==='api-3').steps[0].completed_at='2026-01-01T00:40:00Z';assert.throws(()=>validateBinding(balanced),/API_TIME_IMBALANCE/);
+});
+test('actual balance uses explicit jitter bounds and rejects missing mixed or duplicate timing evidence',()=>{
+ for(const values of [[600,600,600,750],[60,60,60,180]]){const v=jobsWithApiSeconds(values);assertApiTimeBalance(apiTimeBalance(v.jobs,v.run));}
+ const tooSlow=jobsWithApiSeconds([600,600,600,751]);assert.throws(()=>assertApiTimeBalance(apiTimeBalance(tooSlow.jobs,tooSlow.run)),/API_TIME_IMBALANCE/);
+ for(const mutate of [v=>v.jobs.splice(1,1),v=>v.jobs.push(structuredClone(v.jobs[1])),v=>v.jobs[1].run_attempt=2,v=>v.jobs[1].head_sha='other',v=>v.jobs[1].conclusion='skipped',v=>delete v.jobs[1].steps[0].started_at,v=>v.jobs[1].steps[0].completed_at='invalid',v=>v.jobs[1].steps[0].completed_at=v.jobs[1].steps[0].started_at,v=>v.jobs[1].steps.push(structuredClone(v.jobs[1].steps[0]))]){const v=valid();mutate(v);assert.throws(()=>apiTimeBalance(v.jobs,v.run));}
+ const old=valid();delete old.binding.balance_policy;assert.throws(()=>validateBinding(old),/coverage/);
 });

@@ -6,7 +6,7 @@ import {fileURLToPath} from 'node:url';
 import {apiSuites} from './select-tests.mjs';
 import {validateJobs,roleName} from './shards.mjs';
 export function durationSnapshot({run,jobs,logs}){
- const candidate=run?.name==='Backend CI'&&run.path==='.github/workflows/ci-full.yml'&&run.event==='pull_request';
+ const candidate=run?.path==='.github/workflows/ci-full.yml'&&run.event==='pull_request';
  const historical=run?.name==='Main clean acceptance'&&run.event==='push'&&run.head_branch==='main';
  if(run?.status!=='completed'||run.conclusion!=='success'||(!candidate&&!historical)||!/^[a-f0-9]{40}$/.test(run.head_sha)||!Number.isSafeInteger(run.id)||!Number.isSafeInteger(run.run_attempt)||run.run_attempt<1)throw Error('Successful exact-source full clean run required');
  validateJobs(jobs,run,{collector:true});

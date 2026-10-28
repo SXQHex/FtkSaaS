@@ -60,7 +60,8 @@ export function shardPlan(suites=apiSuites,seconds=durations.seconds){
  if(flattened.length!==suites.length||new Set(flattened).size!==suites.length||best.some(b=>!b.suites.length))throw Error('Incomplete shard inventory');
  cache.set(key,best);return structuredClone(best);
 }
-export function coverageHash(){return createHash('sha256').update(JSON.stringify({api:[...apiSuites].sort(),plan:shardPlan(),core:['verify','test:db','dev:seed','dev:health','db:advisors'],reset:'34-or-current-manifest; empty auth/tenant/receipts per runner',concurrency:2})).digest('hex');}
+export const apiBalancePolicy=Object.freeze({version:'api-wall-v1',max_ratio:1.25,min_gap_s:120});
+export function coverageHash(){return createHash('sha256').update(JSON.stringify({balance:apiBalancePolicy,api:[...apiSuites].sort(),plan:shardPlan(),core:['verify','test:db','dev:seed','dev:health','db:advisors'],reset:'34-or-current-manifest; empty auth/tenant/receipts per runner',concurrency:2})).digest('hex');}
 export const roleName=j=>j.name.split(' / ').at(-1);
 export function validateJobs(jobs,run,{benchmark=false,collector=false}={}){
  const names=['core','api-1','api-2','api-3','api-4',...(benchmark?['serial-reference']:[]),...(collector?['full-clean']:[])];
@@ -73,4 +74,28 @@ export function validateJobs(jobs,run,{benchmark=false,collector=false}={}){
   if(!j.steps?.some(s=>s.name===step&&s.conclusion==='success'))throw Error('Unexecuted acceptance step: '+name);
  }
  return true;
+}
+
+// Real executed Clean acceptance wall time includes isolated backend setup/reset,
+// but excludes package installation and queue time. No historical estimate can
+// substitute for these current run/attempt API timestamps.
+export function apiTimeBalance(jobs,run){
+ const rows=[];
+ for(let shard=1;shard<=4;shard++){
+  const role='api-'+shard,matches=jobs.filter(j=>roleName(j)===role);
+  if(matches.length!==1)throw Error('Missing/duplicate timed API job: '+role);
+  const j=matches[0];
+  if(j.status!=='completed'||j.conclusion!=='success'||j.run_id!==run.id||j.run_attempt!==run.run_attempt||j.head_sha!==run.head_sha)throw Error('Invalid timed API source: '+role);
+  const steps=(j.steps??[]).filter(s=>s.name==='Clean acceptance');
+  if(steps.length!==1||steps[0].conclusion!=='success')throw Error('Missing/duplicate timed API step: '+role);
+  const start=Date.parse(steps[0].started_at),end=Date.parse(steps[0].completed_at),seconds=(end-start)/1000;
+  if(!Number.isFinite(start)||!Number.isFinite(end)||seconds<=0)throw Error('Missing/invalid API duration: '+role);
+  rows.push({role,clean_s:seconds});
+ }
+ const times=rows.map(r=>r.clean_s),fastest=Math.min(...times),slowest=Math.max(...times),gap=slowest-fastest,ratio=slowest/fastest;
+ return {...apiBalancePolicy,api:rows,fastest_s:fastest,slowest_s:slowest,gap_s:gap,ratio,balanced:ratio<=apiBalancePolicy.max_ratio||gap<=apiBalancePolicy.min_gap_s};
+}
+export function assertApiTimeBalance(report){
+ if(!report.balanced)throw Error('API_TIME_IMBALANCE: ratio '+report.ratio.toFixed(3)+' > '+apiBalancePolicy.max_ratio+' and gap '+report.gap_s+'s > '+apiBalancePolicy.min_gap_s+'s; remeasure/rebalance or split dominant suite, never skip tests');
+ return report;
 }
