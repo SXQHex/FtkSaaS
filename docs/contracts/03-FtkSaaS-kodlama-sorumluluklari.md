@@ -4,7 +4,7 @@
 
 ## 1. Sorumluluk ve dosya sahipliği
 
-Tek kaynak SXQHex/FtkSaaS main’dir. Kullanıcının 28 Ekim kararıyla frontend yalnız bu monorepoda yeni geliştirilir; diğer repolar bağlam dışıdır. Hazır shadcn/ui bileşenleri/blokları ve başlangıçtan itibaren frontend test altyapısı önceliklidir. Frontend görevi backend kodu ve mevcut backend CI/kabul kaynaklarını değiştirme yetkisi vermez.
+Tek kaynak SXQHex/FtkSaaS main’dir. Kullanıcının son görevi repo hazırlığı ve sonrasında saaspt frontend göçüdür; eski studioSaaS uygulaması bu göçün kaynağı değildir. Frontend tasarımı/etkileşimleri korunur; repo/araç/ortak tip taşıması yetkili görevdir.
 
 | Alan | Sorumlu |
 |---|---|
