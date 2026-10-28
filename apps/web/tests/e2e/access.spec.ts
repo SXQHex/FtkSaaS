@@ -58,7 +58,9 @@ test("expired callback returns a usable error and password update requires a ses
   await expect(page).toHaveURL(/\/giris\?error=session$/);
 });
 
-test("language switching persists across reload and recovery without changing routes", async ({ page }) => {
+test("language switching persists across reload and recovery without changing routes", async ({
+  page,
+}) => {
   await page.goto("/giris");
   await page.getByRole("combobox", { name: "Dil / Language" }).click();
   await page.getByRole("option", { name: "English", exact: true }).click();
@@ -86,10 +88,19 @@ test("theme persists and both languages reflow with accessible controls", async 
   for (const language of ["Türkçe", "English"]) {
     await page.getByRole("combobox", { name: "Dil / Language" }).click();
     await page.getByRole("option", { name: language, exact: true }).click();
-    await expect(page.locator("html")).toHaveAttribute("lang", language === "English" ? "en" : "tr");
-    await expect(page).toHaveTitle(language === "English" ? "Sign in to your account · FtkSaaS" : "Hesabına giriş yap · FtkSaaS");
-    await page.evaluate(() => { document.documentElement.style.fontSize = "200%"; });
-    expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+    await expect(page.locator("html")).toHaveAttribute(
+      "lang",
+      language === "English" ? "en" : "tr",
+    );
+    await expect(page).toHaveTitle(
+      language === "English" ? "Sign in to your account · FtkSaaS" : "Hesabına giriş yap · FtkSaaS",
+    );
+    await page.evaluate(() => {
+      document.documentElement.style.fontSize = "200%";
+    });
+    expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(
+      true,
+    );
     expect((await new AxeBuilder({ page }).analyze()).violations).toEqual([]);
   }
 });

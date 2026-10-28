@@ -1,0 +1,18 @@
+{
+  "$schema": "./node_modules/oxfmt/configuration_schema.json",
+  "printWidth": 100,
+  "tabWidth": 2,
+  "useTabs": false,
+  "sortImports": false,
+  "sortPackageJson": false,
+  "sortTailwindcss": false,
+  "ignorePatterns": [
+    "node_modules/**",
+    ".next/**",
+    "coverage/**",
+    "next-env.d.ts",
+    "*.tsbuildinfo",
+    ".env*",
+    "**/*.md"
+  ]
+}

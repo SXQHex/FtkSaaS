@@ -3,11 +3,12 @@ import { expect, test, vi, beforeEach } from "vitest";
 import { screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { AuthForm } from "../src/components/auth-form";
+type AuthResult = Promise<{ error: { code: string } | null }>;
 const mocks = vi.hoisted(() => ({
-  signIn: vi.fn(),
-  recover: vi.fn(),
-  replace: vi.fn(),
-  refresh: vi.fn(),
+  signIn: vi.fn<(credentials: { email: string; password: string }) => AuthResult>(),
+  recover: vi.fn<(email: string, options: { redirectTo: string }) => AuthResult>(),
+  replace: vi.fn<(href: string) => void>(),
+  refresh: vi.fn<() => void>(),
 }));
 vi.mock("next/navigation", () => ({
   useRouter: () => ({ replace: mocks.replace, refresh: mocks.refresh }),
