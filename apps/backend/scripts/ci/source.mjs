@@ -1,8 +1,8 @@
-import {classifyChanges,ownerOf,ownership} from './scope.mjs';
+import {classifyChanges,ownerOf} from './scope.mjs';
 import {coverageHash} from './shards.mjs';
 import {documentScope} from './document-scope.mjs';
 export function assertReady(pr){
- if(pr.state!=='open'||pr.draft||pr.labels?.some(l=>l.name==='development'))throw Error('Draft/development candidate cannot run or merge');
+ if(pr.state!=='open'||pr.draft)throw Error('Draft or closed candidate cannot merge');
 }
 export function assertParents(commit,base,head){
  if(commit.parents.length!==2||commit.parents[0].sha!==base||commit.parents[1].sha!==head)throw Error('Merge parents mismatch');
@@ -53,7 +53,7 @@ export async function backendUnchanged(github,repo,base,head){
  if(base===head)return true;
  try{return !(await remoteSourceScope(github,repo,base,head)).backend;}catch{return false;}
 }
-export const policyPath=p=>p==='docs/history/manifest.json'||(p.startsWith('.github/workflows/')&&!ownership.frontendFiles.includes(p))||p.startsWith('apps/backend/scripts/ci/')||['apps/backend/scripts/test-clean.mjs','apps/backend/scripts/start-dev.mjs','apps/backend/scripts/paths.mjs'].includes(p);
+export const policyPath=p=>p==='docs/history/manifest.json'||p.startsWith('.github/workflows/')||p.startsWith('apps/backend/scripts/ci/')||['apps/backend/scripts/test-clean.mjs','apps/backend/scripts/start-dev.mjs','apps/backend/scripts/paths.mjs'].includes(p);
 export async function policyMatches(github,repo,base,head){
  const values=await Promise.all([base,head].map(async tree_sha=>{
   const t=(await github.rest.git.getTree({...repo,tree_sha,recursive:'1'})).data;
@@ -64,17 +64,20 @@ export async function policyMatches(github,repo,base,head){
 }
 export async function resolveCandidate(github,context,core,kind){
  const p=(await github.rest.pulls.get({...context.repo,pull_number:context.issue.number})).data;
- assertReady(p);
+ if(kind==='auto'){if(p.state!=='open')throw Error('Closed PR cannot be tested');}else assertReady(p);
+ if(p.base.ref!=='main')throw Error('Candidate must target main');
  if(p.head.sha!==context.payload.pull_request.head.sha)throw Error('Candidate changed');
  const merge=(await github.rest.git.getRef({...context.repo,ref:`pull/${p.number}/merge`})).data.object.sha;
  const commit=(await github.rest.git.getCommit({...context.repo,commit_sha:merge})).data;
  assertParents(commit,p.base.sha,p.head.sha);
  const sourceScope=await remoteSourceScope(github,context.repo,p.base.sha,p.head.sha);
+ core.setOutput('kind',sourceScope.kind);
  if(sourceScope.kind==='frontend'){core.setOutput('eligible','false');return;}
+ if(kind==='auto')kind=sourceScope.kind;
  const scope={safe:sourceScope.kind==='documentation'};
  if(kind==='full'&&scope.safe)throw Error('Documentation-only source uses documentation acceptance, not full clean');
  if(kind==='documentation'&&!scope.safe){core.setOutput('eligible','false');return;}
- const binding={kind,coverage:kind==='full'?coverageHash():undefined,pr:p.number,head:p.head.sha,base:p.base.sha,merge,tree:commit.tree.sha,run_id:context.runId,attempt:Number(process.env.GITHUB_RUN_ATTEMPT),benchmark:kind==='full'&&p.labels.some(l=>l.name==='ci:measure-serial')};
+ const binding={kind,coverage:kind==='full'?coverageHash():undefined,pr:p.number,head:p.head.sha,base:p.base.sha,merge,tree:commit.tree.sha,run_id:context.runId,attempt:Number(process.env.GITHUB_RUN_ATTEMPT),benchmark:false};
  core.setOutput('eligible','true');core.setOutput('merge',merge);core.setOutput('binding',JSON.stringify(binding));
 }
 export async function resolveMerged(github,context){

@@ -1,7 +1,8 @@
-name: Development Supabase delivery
+name: Development delivery
+run-name: 'Development delivery · ${{ github.event.workflow_run.head_sha || inputs.acceptance_run_id }}'
 on:
   workflow_run:
-    workflows: [Main clean acceptance]
+    workflows: [Main acceptance]
     types: [completed]
     branches: [main]
   workflow_dispatch:
@@ -16,6 +17,7 @@ defaults:
 permissions:
   contents: read
   actions: read
+  pull-requests: read
 concurrency:
   group: supabase-development-gwyprhenabtpkbojephw
   cancel-in-progress: false

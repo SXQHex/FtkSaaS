@@ -1,5 +1,7 @@
 # CI ölçüm temeli ve sonraki performans işi
 
+28 Ekim sadeleştirme kararı: rutin otomatik PR kabulü bir full clean çalıştırır; main aynı testleri tekrarlamadan aday kanıtını doğrular. Manuel targeted yalnız seçilen SHA aralığı için isteğe bağlıdır. Saf belge dependency/DB/API başlatmaz. Yeni akışın gerçek wall/runner kazancı henüz ölçülmedi; aşağıdaki eski kaynak ölçümleri yeni sonuç gibi kullanılmaz. Süre güncellemesi artık gerçek başarılı aday full clean’i de kabul eder; proof-only main’den test süresi türetilmez. Güncel davranış [CI politikasındadır](ci-policy.md).
+
 ## P03 geliştirme ölçümü — 21 Ekim 2026
 
 Kaynak `d3d5ae65d4ed226573cfb7e163cf2be8e0500c5a`, [39522543011](https://github.com/SXQHex/FtkSaaS/actions/runs/39522543011) completed/success. Run00:38:33–01:11:14 UTC=32:41; öncelikli2 API suite’i6:13.468, kalan13 suite25:17.243. Seçici P03 SQL, ortak borç hesabı, migration/manifest ve üretilmiş gateway girdilerinde fail-closed geniş geri dönüş kullandı;15 API suite’i seçildi. P03 için yalnız dosya adı eşlemek, paylaşılan finans tüketicilerinin kapsandığını tek başına kanıtlamaz. Hedefli süreç tek backend/DB’de concurrency2 kullanır; aday/main dört izole DB shard’ı ile aynı çalışma profili değildir.

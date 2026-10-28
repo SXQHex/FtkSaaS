@@ -9,7 +9,7 @@ export function ownerOf(p){
  if(typeof p!=='string'||!p||p.includes('\\')||p.startsWith('/')||p.split('/').some(s=>!s||s==='.'||s==='..'))throw Error('INVALID_SOURCE_PATH '+p);
  // Reviewed prose wins over its containing application directory.
  if(documents.has(p))return 'documentation';
- for(const owner of ['backend','frontend'])if(ownership[owner+'Files'].includes(p)||ownership[owner+'Prefixes'].some(prefix=>p.startsWith(prefix)))return owner;
+ for(const owner of ['frontend','backend'])if(ownership[owner+'Files'].includes(p)||ownership[owner+'Prefixes'].some(prefix=>p.startsWith(prefix)))return owner;
  // Generated JSON inventories remain backend inputs, never documentation.
  if(/^docs\/[a-z0-9-]+\.json$/.test(p))return 'backend';
  throw Error('UNCLASSIFIED_SOURCE '+p);

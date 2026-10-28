@@ -1,68 +1,64 @@
 # CI çalışma politikası
 
-CI-02 PR25/26 ile main’e kuruldu; tam kabul kaynağı0ade7877cc16fc121095decbc276f2fbc868607e / [39425915555](https://github.com/SXQHex/FtkSaaS/actions/runs/39425915555) completed/success. [Teknik devir](ci02-handover.md) kaynak/review/kurulum zincirini, [karar](decisions/CI-2026-10-20.md) bağlayıcı davranışı ve [ölçüm](ci-performance.md) gerçek süreleri taşır. Yeni SHA eski kabulü devralmaz.
+Bu bölüm kullanıcının 28 Ekim 2026 sadeleştirme kararını tarif eder; önceki otomatik targeted, etiketle aday clean ve merge sonrası test tekrarı hükümlerinin yerini alır. Kurulum/kabul durumu yalnız [00 devirde](contracts/00-FtkSaaS-yeni-sohbet-devir.md), açık iş [backlog’da](remaining-work.md) tutulur. Geçmiş koşular yeni kaynak için kanıt değildir.
+
+## Olaylar ve kabul
+
+| Olay | Gerekli işlem |
+|---|---|
+| Main tabanlı PR açma, kaynak güncelleme, yeniden açma veya main’e retarget | `Backend CI` önce base→head tam ağaç farkını sınıflandırır. Backend/shared kapsamda gerçek güncel merge ağacında core + dört API shard + toplayıcı; saf belgede yalnız belge kontrolü; frontend-only kapsamda backend testi yok. |
+| Draft PR | Aynı otomatik test kapsamı çalışabilir; merge kapısı kapalıdır. Hazır duruma geçiş testleri tekrar başlatmaz, mevcut kaynak kanıtını değerlendirir. `development` etiketi artık test/merge kontrolü değildir. |
+| PR başlığı/açıklaması/etiketi | Test tetiklemez; GitHub `edited` olayını retarget ile ortak ilettiği için başlık/açıklama olayının workflow zarfı görünebilir, bütün işler atlanır. Eski `ci:full-clean` ve `ci:measure-serial` etiketlerinin kabul yetkisi yoktur. |
+| PR dışındaki branch push | Otomatik backend testi yok. |
+| Main merge | `Main acceptance` gerçek merge parent/tree ve adayın başarılı run/attempt/job kanıtını doğrular. Aynı full clean veya belge testini tekrarlamaz. |
+| Main kabulü tamamlandı | `Development delivery` yalnız doğrulanmış backend kabulünü development ortamına taşır ve hosted kontrolleri çalıştırır. Production yetkisi yoktur. |
+| Manuel tanı | `Manual targeted`, yalnız main’den seçilen tam `base_sha`→`tested_sha` aralığını test eder; merge/full/main kabulü veya status üretmez. |
+
+Metadata olayları ayrı concurrency grubundadır; çalışan veya bekleyen kaynak full clean’ini iptal edemez. Aynı PR’nin eski kaynak koşusu iptal edilir; farklı PR ve main kabulü birbirini kesmez. Otomatik PR testinden önce ayrıca targeted koşulmaz. Base retarget gerçek yeni kabul gerektirir; başlık/açıklama/etiket olayları full clean yaratmaz. Yetkili merge doğrulayıcısı kaynak sonucu tamamlandığında ve Draft/hazır durum değişiminde çalışır; PR açılışı/synchronize için ayrıca aynı doğrulamayı başlatmaz. Main değişimi açık PR’lerin kanıtını yeniden değerlendirir. Workflow’nun yeşil olması tek başına required status’un başarılı olduğunu göstermez.
 
 ## CI-SPLIT — frontend/backend kaynak sınırı
 
-Backend push girişleri [pozitif sahiplik kaydındaki](../apps/backend/scripts/ci/scope.json) backend/shared yolları ve incelenmiş belge yollarını izler. `.github/workflows/ci-fast.yml` ve `backend.yml` listeleri bu kayıtla test edilir; `apps/**`, `packages/**` veya her kaynağı kabul eden genel filtre yoktur. Yeni backend girdisi eklenirse kayıt, workflow listeleri ve negatif testler birlikte güncellenir. Her PR'yi gören hafif trusted merge kapısı bilinmeyen yolu başarılı istisna saymaz; eksik/truncated ağaç reddedilir.
+[Pozitif kaynak kaydı](../apps/backend/scripts/ci/scope.json) backend/shared girdileri, incelenmiş belge listesini ve frontend sahipliğini ayırır. Main tetikleme yolları bu kayıtla test edilir; frontend workflow’ları iki açık negatif yolla dışlanır. Bütün workflow dosyaları backend politika güven yüzeyidir; yeni/silinen workflow belgesel istisna sayılmaz. Frontend workflow’ları frontend test kapsamındadır ama politika kurulum kontrolünden muaf değildir. Bilinmeyen diğer yol, eksik/truncated ağaç veya boş fark başarılı atlama değildir.
 
-Development girişinde kurulumdan önce merge-base→head birikimli kapsam çözülür. Yalnız frontend değişikliğinde backend DB/API işi başlamaz. İncelenmiş saf belge değişikliğinde yalnız bağlantı/anchor/belge kontrolü çalışır; dependency kurulumu, backend verify, DB/API ve full clean yoktur. Backend+frontend/belge karmasında backend kapsamı korunur; son belge commit'i önceki runtime değişikliğini silemez. Rename/silmenin iki ucu ve dosya mode'u değerlendirilir.
+Frontend sahipliği `apps/web/**`, `packages/ui/**`, `vercel.json` ve kayıtlı iki frontend workflow’udur. Frontend-only main değişikliği backend test/CD tetiklemez. Frontend+belge değişikliği gerçek belge kabulü ister. Backend+frontend/belge karmasında backend’in bütün kapsamı korunur. Rename/silmenin iki ucu ve mode değişimi değerlendirilir. Ortak API/TypeScript paketi, root manifest/lock/workspace, Turbo ve Node girdileri shared kapsamdır; frontend lock importer’ı için örtük istisna yoktur.
 
-Frontend sahipliği `apps/web/**`, `packages/ui/**`, iki adlandırılmış frontend workflow'u ve `vercel.json`dur. Frontend kendi test araçlarını, komutlarını ve workflow'larını kurar; bu dilim bunları oluşturmaz. Backend'in Turbo verify çağrıları `--filter=@ftksaas/backend...` ile yalnız backend ve bağımlılıklarını yürütür. Backend-only değişiklik için frontend görevi çağrılmaz. Ortak API/TypeScript paketi, root manifest, pnpm lock/workspace, Turbo ve Node girdileri ortak kapsamdır; bu dilim lockfile'ın yalnız frontend importer farkı için daraltılmış kanıt üretmez. Ortak girdileri frontend tarafında da izlemek frontend sahibinin yükümlülüğüdür.
+Backend verify yalnız `--filter=@ftksaas/backend...` Turbo grafiğini yürütür. Frontend status’u frontend testlerinin yerine geçmez; frontend kendi gerçek test/workflow kabulünün sahibidir. İki zincirin gerçek tek-taraflı ve ortak kaynak örnekleriyle kabulü ayrıca kanıtlanır; yerel sentetik grafik testi uzak kabul sayılmaz.
 
-Frontend-only PR'de mevcut backend status'u yalnız backend kapsamının değişmediğini bildirir; frontend testi veya backend full clean başarılıymış gibi göstermez. Hazır olma, güncel head/base ve merge parent kontrolü korunur. Frontend+belge değişikliğinde ayrıca gerçek kaynak bağlı belge kabulü gerekir. Backend aday/main tam kapsamı, dört shard, trusted politika sınırı ve run/attempt kontrolleri bu ayrımla kaldırılmaz. Aday/main tekrarının kaldırılması ve merge gate workflow'unun birleştirilmesi ayrı sonraki değişikliktir.
+## Manuel targeted
 
-Frontend-only main push backend kabul workflow'unu başlatmaz, dolayısıyla o push Supabase CD tetiklemez. Bekleyen gerçek backend kabulü sırasında frontend main'i ilerletirse yalnız tam ağaç farkıyla backend girdilerinin değişmediği kanıtlanarak eski kabul edilmiş backend kaynağı dağıtılabilir. Bu frontend deploy'u değildir; kabul run/attempt'i ve güncel main her yazma öncesinde tekrar doğrulanır. Bilinmeyen/shared/backend farkı bu eşdeğerliği reddeder. `ci-fast.yml` içindeki eski branch/sabit-SHA belge recovery işi kaldırılmıştır; mevcut main manuel belge tanısı ayrı kalır.
+Girdiler tam 40 karakter SHA’dır; base test edilen head’in atası ve checkout birebir head olmalıdır. Son commit için parent→commit, birikimli değişiklik için seçilen ancestor→head kullanılır; origin/main merge-base’i açık aralığın yerine geçmez. Plan ve shard çıktıları kaynak aralığını gösterir; bu tanı mevcut main ile birleşim uygunluğunu kanıtlamaz.
 
-Kaynak uygulaması, yerel negatif test, uzak CI, bağımsız inceleme, kurulum/merge ve main kabulü ayrı durumlardır. Gerçek frontend yeniden uygulama örneklerinde karşı zincirin başlamadığı doğrulanmadan CI-SPLIT kapatılmaz. Required-check/strict-base/bypass yönetim doğrulaması CI-ADMIN'dir; frontend kabulü kendi required check'leriyle ayrıca korunmalıdır.
+Seçici güvenilir main kodundan çalışır. Kaynak–tüketici ve append-only migration kanıtıyla ilgili API suite’lerini seçer; eksik/açıklanamayan runtime farkı geniş regresyona gider. [Delta analizi](../apps/backend/scripts/ci/delta-analysis.mjs) ortak Auth/tenant/finans/hak/gateway değişikliğini dar modüle sahiplenmez. Kaynağın API envanteri trusted envanterden farklıysa yeni/silinmiş test sessizce atlanmaz; tanı açık hata verir, önce incelenmiş envanter kurulmalıdır.
 
-## Paket yöneticisi
-
-Kurulum package.json’da sabit pnpm sürümüyle `corepack enable` ve `pnpm install --frozen-lockfile` kullanır. Tek lockfile pnpm-lock.yaml; ortak tipler packages/api-contracts. Paket/workspace/lock değişimi runtime/shared girdi olarak geniş regresyona gider. Bu politika adayı trusted-base kurulum sınırına tabidir; [göç kapsamı](monorepo.md#ci-geçiş-sınırı).
-
-## Geliştirme ve açık kabul
-
-| Olay/durum | Uygulanan davranış |
-|---|---|
-| Bölüm geliştirmesi | Tek Draft + development PR; push ile hızlı ve merge-base'ten birikimli hedefli CI |
-| Push/PR güncellemesi, Draft/development temizliği | Kendiliğinden full clean yok |
-| Draft veya development | Aday clean resolver'ı ve merge kabulü kapalı |
-| Hazır runtime/CI son adayı | Açık ci:full-clean eklenmesiyle core + dört bağımsız API shard; kaynak bağlı toplayıcı |
-| Runtime/CI merge'i | Actual merge ilişkisi doğrulanır, aynı main SHA'sında aynı tam kapsam çalışır |
-| Güvenli yalnız-belge PR/main | Ayrı source-bound belge kabulü; full clean çalışmaz ve çalışmış gösterilmez |
-| Karma, bilinmeyen veya runtime girdisi | Belge istisnası verilmez; birikimli runtime kapsamı korunur |
-
-Aynı branch'in eski hızlı işi iptal edilir; farklı PR ve her main SHA birbirini kesmez. Matrix fail-fast:false ile bir shard hatası diğerlerini iptal etmez. Toplayıcı tüm zorunlu işlerin bitmesini bekler; tam hata ayrıntıları ayrı job loglarındadır, tekleştirilmiş bütün hata listesi henüz yoktur. Zorunlu skipped/cancelled/failure kabulü kapatır. Optional serial-reference yalnız açık ci:measure-serial isteğinde zorunludur; istenmediğinde atlanır ve ölçülmez. Bu isteğin sonradan eklenmesi onu çalıştırmamış eski kabulü geçersiz kılar.
-
-## Birikimli hedefli seçim
-
-[Seçici](../apps/backend/scripts/ci/select-tests.mjs) dosya adı benzerliğinden ziyade açık kaynak–tüketici haritası ve [delta kanıtı](../apps/backend/scripts/ci/delta-analysis.mjs) kullanır. Diff origin/main ile head'in merge-base'inden tüm branch değişiklikleridir; son belge commit'i önceki runtime değişimini gizleyemez. Rename eski/yeni uç, silme ve açıklanamayan fark kapsama dahildir. Eksik geçmiş/head uyumsuzluğu/bilinmeyen paylaşılan kaynak bütün DB/API regresyonuna düşer.
-
-Bilinen modül sözleşme/tip/bundle/envanter farkı ancak operasyon/definition tüketicileri ve birebir source+wrapper append-only migration kanıtıyla daralır; generation/schema/TypeScript kontrolü korunur. Paylaşılan management_state_get modüle bütünüyle sahiplenilmez; yalnız izinli projection/selector ekleri açıklanabilir. Auth/tenant/kernel/finans/hak/gateway ve açıklanamayan migration/üretim kaynağı geniştir.
-
-CI-only geliştirme daralması yalnız sonlu incelenmiş harness listesi + kaynak bağlı güvenli belge farkını kapsar. Unknown CI-looking/doc yolu veya karma runtime farkı daraltılmaz. Yeni test dosyası envanterden kaybolamaz; package test:api, seçici ve shard planı birebir denetlenir. Seçilen modül öncelikli koşar; hata halinde ertelenmiş hedefli regresyon başlamaz. Son aday/main her durumda tam kapsamı kullanır.
+Seçilen API suite’leri mevcut ölçümlü dört shard planının kesişimine dağıtılır; boş shard açılmaz. Her API shard ayrı runner/backend/DB kullanır; concurrency=2 korunur. İlgili öncelikli test hata verirse aynı shard’daki ertelenmiş regresyon başlamaz. Core/DB ve API işleri ayrı runner kullanır. Belge/frontend-only tanı dependency kurulumu veya DB/API başlatmaz. Plan/timings artifact’leri tanıdır; source-bound kabul makbuzu değildir.
 
 ## Güvenli belge kabulü
 
-Tam incelenmiş belge yolu, regular100644 dosya ve UTF8/NUL kontrolü gerekir; uzantı/docs öneki/etiket yeterli değildir. Workflow, CI kapı/seçici, dependency/lockfile, migration, makine sözleşmesi ve runtime tüketimli tip/üretilmiş dosya istisna değildir. Renderer'ın yalnız üç açıklama slotu AST ile kanıtlanabilir; f-string ifadeleri, inventory/emit/diğer mantık değişikliği tam yola gider. [PR24 kanıtı](ci02-handover.md) dosyanın tamamına izin vermez.
+İncelenmiş tam yol, regular100644 dosya ve UTF8/NUL kontrolü gerekir; `.md`, `docs/` veya etiket yeterli değildir. Workflow, seçici/kapı, dependency/lockfile, migration, makine sözleşmesi ve runtime tipleri istisna değildir. Renderer’ın yalnız üç açıklama slotu AST ile kanıtlanabilir; executable/f-string/emit değişimi tam kapsama gider. [Eski renderer kanıtı](ci02-handover.md) dosyanın tamamına izin vermez.
 
-PR base–head ağaç farkı, gerçek merge parent/tree ve yaşayan inbound/outgoing bağlantılar denetlenir. docs-check + verify başarılı job/step receipt'i ayrı belge kabulüdür; DB/API/full clean sayılmaz. Main doc merge'inde actual tree/parents aynı receipt'e bağlanır ve belge kontrolleri tekrar çalışır. Her main push bütün açık PR'lerin base kabulünü yeniden değerlendirir. Tarihsel belge recovery, exact source/policy SHA/run/attempt ile salt-okuma tanıdır; genel proof fallback'i veya eski başarısız status'u değiştirme yolu değildir.
+PR’nin gerçek merge ağacında [belge kontrolü](../apps/backend/scripts/ci/docs-check.mjs) yaşayan inbound/outgoing bağlantıları ve anchor’ları denetler. Belge-only iş dependency/backend kurulumu yapmaz; DB/API/full clean gibi raporlanmaz. Main aynı parent/tree ve receipt’i doğrular; kontrol tekrarı yoktur. Ayrı eski belge workflow’u ve recovery girişi kaldırılmıştır. Eski başarısız run değiştirilmez; sorun düzeltildiyse yeni gerçek kaynak kanıtı gerekir.
 
-## Tam clean, toplayıcı ve güvenilir kurulum
+## Tam clean ve kanıt doğrulama
 
-Aday/main aynı [reusable workflow](../.github/workflows/clean-suite.yml) kullanır. Core ve dört API işi ayrı runner/backend/DB, temiz migration manifesti ve boş Auth/tenant/receipt ile başlar. Core verify/DB/seed/health/advisors'ı; dört shard 15 API suite'ini eksiksiz/tekrarsız taşır. Suite içi bağlı yarışlar bölünmez; mevcut process concurrency=2 korunur. Ölçümlü deterministik dağılım envanteri kapalıdır; bilinmeyen/yeni/missing/duplicate suite kabul edilmez.
+[Ortak clean suite](../.github/workflows/clean-suite.yml) yalnız adayda çalışır. Core ve dört API işi ayrı runner/backend/DB’de temiz migration manifesti ve boş Auth/tenant/receipt ile başlar. Core verify/DB/seed/health/advisors’ı, dört shard bütün API suite’lerini eksiksiz ve tekrarsız taşır. Suite içi yarışlar bölünmez; fail-fast:false ve concurrency=2 korunur. Paketler sabit pnpm ile `corepack enable` ve `pnpm install --frozen-lockfile` kullanır.
 
-[Toplayıcı](../apps/backend/scripts/ci/collect.mjs) önce tüm zorunlu job/step'lerin aynı run/attempt/head ve gerçek başarısını doğrular, sonra başarılı icra rollerini ölçer. Artifact tek başına kabul değildir. Rerun-failed ile başka attempt başarıları birleştirilmez. PR/head/base/tested merge/tree/coverage/run/attempt bağlanır; actual main aynı iki parent ve tested tree ile normal merge olmalıdır. Squash/rebase'e kanıt sessiz taşınmaz. Source değişirse yeni kabul gerekir.
+[Toplayıcı](../apps/backend/scripts/ci/collect.mjs) gerçek job/step başarısını aynı run/attempt/head içinde doğrular. Coverage/profile, PR/head/base/merge/tree/run/attempt birlikte bağlanır. Skipped/cancelled/failure/eksik/mükerrer iş kabulü kapatır; artifact tek başına başarı değildir. Rerun-failed farklı attempt başarılarını birleştiremez. Kanıt seçimi her başarılı koşuyu bağımsız doğrular; iptal edilmiş, eski veya makbuzu eksik başka koşu geçerli kanıtı gölgelemez. Kaynak uyumsuzluğu yine kabul edilmez.
 
-`ftksaas/merge-clean` status'unu yalnız trusted main kodu, salt-okuma aday işlerinin gerçek kanıtıyla yazar. Aday script/archive executable'ı privileged verifier'da çalışmaz. Trust yüzeyi tüm workflow'lar, scripts/ci ve clean/start runner blob/mode kümesidir. Bu yüzeyi değiştiren PR normal otomatik kapıyı açamaz; bağımsız son-head incelemesi + gerçek aday kabulü + açık kaynak bazlı güvenilir politika kurulum yetkisi gerekir. PR23,25,26 kurulum izinleri gelecekteki kaynağa otomatik taşınmaz. Sahte status, required-check bypass, direct push veya yönetim ayarı değişikliği kullanılmaz.
+Merge normal iki parent’lı merge olmalıdır; squash/rebase’e kanıt taşınmaz. Head/base/tree değişirse yeni kabul gerekir. Main yeniden test yerine gerçek parent/tree’nin test edilen adayla aynılığını ve başarılı adayın güncel attempt/job sonuçlarını doğrular. Böylece test maliyeti tekrarlanmaz; kaynak güveni kaldırılmaz.
 
-Required-check/strict-base/bypass yönetim ayarları API erişim sınırı nedeniyle uygulanmış/doğrulanmış sayılmaz; [koruma durumu](branch-protection-review.md) ayrı yönetici işidir. CI status invalidasyonu tek başına sunucu tarafı strict merge yarış korumasının yerine sunulmaz.
+## Güvenilir politika ve dağıtım
+
+`ftksaas/merge-clean` status’unu yalnız main’den çalışan doğrulayıcı üretir. Aday testleri salt-okuma token kullanır, secrets/status-write yetkisi almaz. Yetkili doğrulayıcı aday kodu veya artifact executable’ı çalıştırmaz. Bütün `.github/workflows/*`, `scripts/ci` ve clean/start/path runner blob/mode kümesi trusted yüzeydir. Frontend-only sınıflandırma dahi workflow politika değişikliğine otomatik izin vermez.
+
+Trusted yüzey değişen PR’de bağımsız son kaynak incelemesi, gerçek aday başarısı ve tam kaynağa özel açık kurulum yetkisi gerekir. Önceki PR izinleri taşınmaz. Sahte status, bypass, direct push veya koruma gevşetme yoktur. Aktif required-check/strict-base/bypass ve tek-yetkili review0 düzeni [yönetim kaydında](branch-protection-review.md) doğrulanmıştır; bağımsız ajan incelemesi korunur.
+
+CD, başarılı main source/proof job’larını ve dayandığı adayın kanıtını yeniden doğrular. Her yazma öncesi current main/run/attempt ve kaynak eşdeğerliği kontrol edilir. Araya giren yalnız belge/frontend değişimi backend girdilerini değiştirmediyse kabul edilmiş backend dağıtılabilir; shared/backend/bilinmeyen fark bunu reddeder. Belge kanıtı runtime kabulü yerine geçmez. Önceki dağıtım receipt’i yalnız aynı repo güvenilir main CD koşusunun gerçek başarılı aynı-attempt deploy işinden okunur; PR/fork/atlanan deploy makbuzu optimizasyon yetkisi vermez. Hosted Edge kaynak/version/JWT eşleşmesi ayrıca gerekir.
 
 ## Ölçüm ve ajan devri
 
-Suite ağırlıkları önceki process wall ölçümünden gelir; örtüşen sürelerin toplamı wall diye sunulmaz. Kuyruk, checkout/npm, backend/reset, test, seed-health-advisors ve runner maliyeti ayrı raporlanır. Aynı kaynak seri/shard kıyası istenirse ek seri iş zorunludur; rutin main'de yoktur. Collector henüz çalışırken ölçülen toplam nihai workflow runner dakikası diye sunulmaz. Sonuç tamamlanınca tüm Jobs API zamanlarıyla final toplam alınır; ölçülmemiş tasarruf vaat edilmez.
+Ölçümlü deterministik shard planı eksik/yeni/mükerrer suite veya geçersiz süreyi reddeder. `refresh-suite-durations.mjs` başarılı aday full-clean (ve tarihsel full-main) job loglarından bilinçli bakım yapar; proof-only main koşusu test ölçümü sayılmaz. Örtüşen process süreleri wall diye toplanmaz; ölçülmemiş hız/maliyet kazancı iddia edilmez. Eski seri reference ölçümleri tarihsel kalır; metadata etiketi yeni otomatik benchmark başlatmaz.
 
-Aday veya main full clean tetiklenince run/PR/head/base/tested merge/kuyruk/sonraki adımı bildirip turu bitir. Yanıtta run URL yoksa workflow ve tetikleme zamanını kaydet; run aramak için bekleme. Kullanıcı dönene kadar polling/log takibi/sleep döngüsü/arka plan watcher/otomasyon yoktur. Kullanıcı döndüğünde gerçek sonuç ve güncel kaynak bir kez doğrulanır; hâlâ çalışıyorsa yeniden durulur. Başarı ve mevcut yetki varsa merge; main full clean başlayınca tekrar devir. Sırf durum için frozen clean SHA'sını değiştirme; sonraki doğal belge commit'inde eşitle. Güvenli yalnız-belge kontrolleri full clean olarak raporlanmaz.
+Aday full clean başlayınca run/PR/head/base/tested merge/kuyruk/sonraki adımı bildirip turu bitir. Run henüz listelenmiyorsa workflow ve tetikleme zamanını kaydet; bekleme/polling/log takibi/watch/arka plan otomasyonu yoktur. Kullanıcı dönünce gerçek sonuç ve güncel kaynak bir kez doğrulanır. Sırf durum için çalışan kaynağı değiştirme; kanıt sonraki doğal belge değişikliğinde eşitlenir. Main kanıt kabulü ve gerekli development CD doğrulanmadan teslim kapanmaz.
 
 ## Tarihsel Action runtime bakım kaydı — 19 Ekim 2026
 

@@ -13,7 +13,7 @@ Koruma uygulanmış veya mevcut koruma yeterli diye raporlanamaz. Yetkili reposi
 
 1. Require pull request before merging; doğrudan push, force push ve deletion kapalı.
 2. Son değişikliği kapsayan onaylı inceleme zorunlu; eski onayları dismiss et, unresolved conversation varken merge engelle. Bağımsız ajan inceleme kanıtı ile GitHub review onayı ayrı türlerdir.
-3. Required status checks: `ftksaas/merge-clean` (beklenen kaynak GitHub Actions); Development targeted/targeted hızlı sonucu da zorunlu tutulabilir. Güncel base ile merge/sıkı güncellik kontrolü açık. Bu PR'nin check isimleri ilk CI sonrasında Actions'tan doğrulanır.
+3. Required status checks: `ftksaas/merge-clean` (beklenen kaynak GitHub Actions); Manuel targeted tanısı required check değildir. Güncel base ile merge/sıkı güncellik kontrolü açık. Bu PR'nin check isimleri ilk CI sonrasında Actions'tan doğrulanır.
 4. Yetkisiz bypass yok; admin/bypass politikası yetkili yönetici tarafından açıkça belirlenip belgelenmeli.
 5. Runtime/CI merge’lerinde aynı yeni main SHA’sının full clean’i başarılı olmadan kabul kapanmaz. Güvenli yalnız-belge kabulü CI-02’de ayrı uygulanacak; mevcut kapının bunu desteklediği varsayılmaz.
 6. Production dağıtım yetkisi merge'den türemez. Mevcut vercel.json main otomatik deployment kapısını false tutar.
