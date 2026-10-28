@@ -16,7 +16,7 @@ Tek repo SXQHex/FtkSaaS; main güncel kaynak dalıdır. Önce [AGENTS](../AGENTS
 | Uygulanan API ve fiziksel şema? | [Endpoint envanteri](endpoint-inventory.json), apps/backend/supabase/migrations/, apps/backend/database/;04/05 ve [özellik haritası](feature-delivery.md) üretilmiş görünümler |
 | İstemci nasıl bağlanır? | [Entegrasyon devri](claude-handover.md), [ayar tüketicileri](frontend-settings-handover.md), [API değişmezleri](api-invariants.md) |
 | Repo/ortam/dağıtım düzeni? | [Monorepo](monorepo.md), [hosted runbook](remote-backend-setup.md), [CI politikası](ci-policy.md) |
-| Frontend ne durumda? | [Göç planı](monorepo.md), saaspt kaynak ajan kuralları |
+| Frontend ne durumda? | [Frontend geliştirme](../apps/web/README.md), [göç/ortam sınırları](monorepo.md) |
 | Hangi belge neden var? | [Belge haritası ve saklama kuralı](documentation-map.md) |
 
 ## Öncelik ve kanıt
