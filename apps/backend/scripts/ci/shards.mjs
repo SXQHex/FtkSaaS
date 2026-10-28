@@ -95,7 +95,3 @@ export function apiTimeBalance(jobs,run){
  const times=rows.map(r=>r.clean_s),fastest=Math.min(...times),slowest=Math.max(...times),gap=slowest-fastest,ratio=slowest/fastest;
  return {...apiBalancePolicy,api:rows,fastest_s:fastest,slowest_s:slowest,gap_s:gap,ratio,balanced:ratio<=apiBalancePolicy.max_ratio||gap<=apiBalancePolicy.min_gap_s};
 }
-export function assertApiTimeBalance(report){
- if(!report.balanced)throw Error('API_TIME_IMBALANCE: ratio '+report.ratio.toFixed(3)+' > '+apiBalancePolicy.max_ratio+' and gap '+report.gap_s+'s > '+apiBalancePolicy.min_gap_s+'s; remeasure/rebalance or split dominant suite, never skip tests');
- return report;
-}

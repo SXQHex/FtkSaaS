@@ -1,5 +1,12 @@
 # CI ölçüm temeli ve sonraki performans işi
 
+## 28 Ekim — üretim blokajı düzeltmesi
+
+Son kullanıcı kararı: süre optimizasyonu üretimi engelleyemez; suite’lere dokunulmaz. [PR65 koşusu40743048028 attempt1](https://github.com/SXQHex/FtkSaaS/actions/runs/40743048028/attempts/1) core ve dört API testlerini başarıyla tamamladı; toplayıcı yalnız `API_TIME_IMBALANCE`, oran1.412/fark475sn nedeniyle başarısız oldu. Sonraki failed-job denemelerinde eski attempt1 binding’i ile yeni attempt’in eşleşmemesi ayrıca güvenli biçimde reddedildi; bu ikinci hata ilk attempt’in nedeni değildir.
+
+Süre değerlendirmesi uyarıya alınır; dengesizlik veya eksik ölçüm kaynak/fonksiyon kabulünü durdurmaz. Gerçek test/core/shard ve head/base/tree/run/attempt kontrolleri zorunlu kalır. Güncel davranış [CI politikasında](ci-policy.md#api-süre-dengesi--uyarı-ve-ölçüm). Aşağıdaki eski zorunlu süre kapısı kayıtları PR78’in tarihsel kararına aittir; yeni üretim talimatı olarak uygulanmaz. Yeni optimizasyon/suite işi başlatılmaz.
+
+
 ## 28 Ekim — gerçek API süre farkı ve zorunlu kapı adayı
 
 Başarılı main [40709789814](https://github.com/SXQHex/FtkSaaS/actions/runs/40709789814), kaynak `5bebc8f0fb6c89e1d67648fb06a2db729a4f489b`, attempt1: API1–4 clean adımları sırasıyla1651/1102/793/1167sn; en uzun/en kısa2.082, fark858sn. Backend hazırlığı yaklaşık38–43sn; test süreçleri API1’de1607.94, API2’de1057.91, API3’te754.63, API4’te1122.66sn. API1’de registry1607.58 ve event-cancellation1443.88sn aynı iki slotta koştu. Eski855.73/801.18sn ağırlıkları bu yükü temsil etmiyordu. Bu kaynakta artışın yeni assertion, fixture veya runner çekişmesinden gelen payı ayrıca ölçülmeden tek nedene bağlanmaz.
