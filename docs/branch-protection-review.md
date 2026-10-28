@@ -24,3 +24,20 @@ Bu dosya ayarların uygulanmış olduğuna dair kanıt değildir. Yönetici ayar
 
 Protection okuması yeniden 403; rulesets boş. Yeni status ve strict-base ayarları bu bağlantıyla kurulmadı/doğrulanmadı. [CI politikası](ci-policy.md) ilk workflow kurulumu, güvenilir verifier ve merge-tree ilişkisinin sınırlarını açıklar. Eski otomatik her PR full-clean talimatı son kullanıcı politikasıyla değişmiştir. Sıradan geliştirmede skip-ci merge kapısı değildir; runtime/CI için gerçek kaynak bağlı aday clean gerekir. [20 Ekim kararı](decisions/CI-2026-10-20.md) güvenli belge-only kabulünü ayrıca tanımlar; CI-02 kaynak bağlı belge otomasyonu PR25/26 ile sonradan kurulmuştur; yönetici branch-protection ayarı bu kanıt değildir.
 
+
+## 28 Ekim 2026 — CI-ADMIN uygulaması
+
+Kullanıcının CI-ADMIN uygulama talimatıyla [main-acceptance ruleset26040398](https://github.com/SXQHex/FtkSaaS/rules/26040398) tarayıcı yönetim oturumunda oluşturuldu. API readback: active; hedef ~DEFAULT_BRANCH (main); bypass_actors=[] ve current_user_can_bypass=never. Klasik protection API403 sınırı sürer; ruleset GET başarılıdır.
+
+- PR zorunlu; required_approving_review_count=0, stale approvals dismiss=true ve conversation resolution=true. Tek yetkili çalışma düzeninde başka GitHub hesabından onay zorunlu değildir; bağımsız ajan incelemesi teslim sürecinde korunur.
+- Yalnız normal merge; squash/rebase kapalı. Main silme ve force push engelli.
+- Required status ftksaas/merge-clean; kaynak GitHub Actions integration_id15368. strict_required_status_checks_policy=true; creation istisnası kapalı.
+- Koşullu frontend/backend job adları ayrıca required yapılmadı. Frontend kabulü frontend sahibinin sonraki PR'sinde kendi kontrolleriyle tamamlanmalıdır; backend scope istisnası frontend test kabulü değildir.
+
+PR65 ekranında ftksaas/merge-clean Required ve merge düğmesi disabled; ilk kurulumda1 approving review zorunluluğu görüldü; kullanıcı düzeltmesiyle bu zorunluluk kaldırıldı. PR65'te ayrıca kaynak çakışması vardır; bu gözlem, başarısız/stale kanıt engelinin diğer engellerden izole edilmiş uçtan uca denemesi olarak sunulmaz. Main'e doğrudan/force push, dal silme veya geçersiz PR merge yazması denenmedi. Ayarların uygulanması ve readback doğrulandı; izole negatif kabul örnekleri ayrıca açıktır.
+
+Ruleset kurulurken main8d5d3025f1be5d3318e042bfb9167b4bfdca859c değişmedi. Kaynak workflow'ları, testler, kişilerin/app'lerin erişimi, secret ve production dağıtımı değiştirilmedi. Bypass aktörü eklenmedi. Gelecekte trusted CI politika kurulumlarının da bu zorunlu gate altında kontrollü bir kurulum yolu gerektireceği unutulmamalıdır; sohbet onayı tek başına sunucu korumasını aşmaz.
+
+### Tek yetkili çalışma düzeni düzeltmesi
+
+Kullanıcının açık onayıyla required_approving_review_count0 olarak kaydedildi. İlk kurulumdaki1 onay zorunluluğu tek yetkili repoda gereksiz merge kilidi oluşturduğu için geri alındı. Bu son karar, bu dosyadaki önceki zorunlu GitHub review önerisini değiştirir. Bağımsız ajan incelemesi korunur; ayrı GitHub reviewer hesabı gerekmez. API readback approvals0; diğer rule parametreleri önce/sonra birebir aynı, enforcement active ve bypass_actors[] kaldı. PR/CI/strict-base, conversation resolution, normal merge, force-push ve silme korumaları korunur. Güncel ayar canlıdır; belge PR70 henüz main'e alınmadı.

@@ -10,7 +10,7 @@ Kabul edilmiş kaynak ve kapanmış teslimler [00 devirde](contracts/00-FtkSaaS-
 | ST-03 | Kalan ayar consumerları |69 kabul grubunda eksik alan/DTO/miras/default/şablon/yayın/sağlayıcı eşlemesini [alan devri](frontend-settings-handover.md) üzerinden tamamla. Marka kataloğu/logo/medya, takvim, sessiz saat/özet/olay consumerları ve özel domain yolları generic JSON saklamayla kapanmaz. Yeni Starter FD07 başlangıcı yeniden açılmaz. |
 | OPS-01 | Worker/retention | Beş worker’ın temel kurulum/idle kabulü var; gerçek yük, kesinti/disable-restart ve fiziksel imha kabulünü izole ve kaynak bağlı kanıtla tamamla. |
 | REL-01 | Yayın/geri dönüş | Hosted tam restore, Auth/Storage baytları/secret/config envanteri, RPO/RTO ve yük kabulü. İzole restore sahiplik denemesi ve development CD production kabulü değildir. |
-| CI-ADMIN | Repo koruması | Yönetici required-check/strict-base/bypass ayarlarını ayrı doğrula; kaynak CI kapısı bu ayarların kurulu olduğuna kanıt değildir. |
+| CI-ADMIN | Repo koruması kabulü | main-acceptance ruleset26040398 uygulandı; required-check/strict-base/bypass readback doğrulandı. [Denetim kaydı](branch-protection-review.md#28-ekim-2026--ci-admin-uygulaması). Belge PR'si kabulü ve diğer engellerden izole başarısız/stale PR negatif örnekleri açık; ayar kurulumu uçtan uca test yerine geçmez. |
 | FIN-01 | Eğitmen ödeme okuması | trailing earning_ids doğrulaması ayrı iyileştirmedir; mevcut kabul edilmiş finans/tenant zinciri yeniden açık sayılmaz. |
 
 ## Ayrı ürün kapsamı: P08

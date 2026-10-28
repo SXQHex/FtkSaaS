@@ -76,3 +76,9 @@ Head `5409d466ea4b71041deb0ea381ff7ad1ce49ec75` için [Development targeted40614
 ### Bağımsız inceleme ve aday hazırlığı
 
 Kullanıcının ayrı inceleme ajanı yetkisiyle CI-SPLIT bağımsız incelendi. İlk kaynak hedefli CI40654290663 completed/success; scope, documentation ve targeted işleri geçti. İncelemede P2: checkout yapılmayan frontend-only main marker işinin backend çalışma dizinini miras alması bulundu. Step çalışma dizini repo çalışma alanı köküne sabitlendi ve regresyon testi eklendi. Son yerel backend verify106 contract/governance +62 CI politika testiyle geçti. Son ağaç inceleme kaydı PR69 açıklamasına bağlanır; bağımsız inceleme CI veya kurulum/merge/main kabulü yerine geçmez. Bu workflow politika değişimi normal trusted-base kapısını otomatik açmaz; kaynak bazlı kurulum sınırı korunur.
+
+## CI-SPLIT main ve CI-ADMIN yönetim kaydı
+
+PR69 normal merge main `8d5d3025f1be5d3318e042bfb9167b4bfdca859c`; parent'lar1f7f4a394c6ef8c50af0b292e23f457882370f77 ve3f2ce6b796db54ac1190aae411b62d00ae550f4d; tree df6a10f52557dd8637451749e42c220f1b5613de. Aynı main [40682715287](https://github.com/SXQHex/FtkSaaS/actions/runs/40682715287) ve development CD[40686483288](https://github.com/SXQHex/FtkSaaS/actions/runs/40686483288) attempt1 completed/success; source/core/API1–4/toplayıcı ve deploy/hosted adımları GitHub'dan doğrulandı. Delivery receipt artifact12815591017. Frontend karşılıklı tetikleme kabulü açık kalır.
+
+CI-ADMIN talimatıyla main-acceptance ruleset26040398 uygulandı, active/strict-status/GitHub Actions/bypass boş readback doğrulandı. [Denetim kaydı](../branch-protection-review.md#28-ekim-2026--ci-admin-uygulaması). Bu belge adayı henüz main kabulü değildir; kaynak kod veya production dağıtımı değişmez.
