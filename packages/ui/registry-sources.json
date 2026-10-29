@@ -51,28 +51,24 @@
   ],
   "blocks": [
     {
-      "name": "login-01",
-      "url": "https://ui.shadcn.com/r/styles/new-york-v4/login-01.json",
-      "adaptation": "Official centered login-01 layout and Card/Input/Label/Button composition; native Supabase integration, tr/en labels, recovery and TOTP variants; no marketing panel.",
-      "commit": "96da9cc7f1aa10580a3741664e2a77c721206c00",
-      "files": [
-        {
-          "path": "apps/v4/registry/new-york-v4/blocks/login-01/page.tsx",
-          "url": "https://github.com/shadcn-ui/ui/blob/96da9cc7f1aa10580a3741664e2a77c721206c00/apps/v4/registry/new-york-v4/blocks/login-01/page.tsx",
-          "sha256": "9abc004ff5446fc599b684eff842a6c8eb13d65030779d90162567f6903e3c6e"
-        },
-        {
-          "path": "apps/v4/registry/new-york-v4/blocks/login-01/components/login-form.tsx",
-          "url": "https://github.com/shadcn-ui/ui/blob/96da9cc7f1aa10580a3741664e2a77c721206c00/apps/v4/registry/new-york-v4/blocks/login-01/components/login-form.tsx",
-          "sha256": "a62a24aef1e3be9cb204c7b3bd563cc2f8cdd5d7c4ff07693af2128a4773a91a"
-        }
-      ]
-    },
-    {
       "name": "sidebar-07",
       "url": "https://ui.shadcn.com/r/styles/new-york-v4/sidebar-07.json",
       "sha256": "54789cc67edf51a0da25a80c4d68910373edb4354142fdc6dcb2c059aed5f11c",
       "adaptation": "Grouped collapsible navigation and mobile Sheet composition in apps/web/src/components/admin/admin-shell.tsx. Uses existing shadcn Button/Input/Sheet/Card primitives. Team switcher omitted by user request; no organization selector or domain access rules in the shell."
+    },
+    {
+      "name": "login-02",
+      "url": "https://ui.shadcn.com/r/styles/new-york-v4/login-02.json",
+      "sha256": "a3448a5bf2398316428befc01c4aee03cacaf5e221ac3acf8c3e792a6d5e7402",
+      "retrieved": "2026-10-29",
+      "adaptation": "Two-column AuthScreen and AuthFields composition using existing shadcn primitives; neutral studio panel, native Supabase email/password and Google, TR/EN, password recovery and TOTP. No placeholder image or additional provider."
+    },
+    {
+      "name": "signup-02",
+      "url": "https://ui.shadcn.com/r/styles/new-york-v4/signup-02.json",
+      "sha256": "597aa32a743d49385c36f50315648da7a02bcca52f46f0f2bf8a7f81975691bc",
+      "retrieved": "2026-10-29",
+      "adaptation": "Two-column AuthScreen and AuthFields composition using existing shadcn primitives; neutral studio panel, native Supabase email/password and Google, TR/EN, password recovery and TOTP. No placeholder image or additional provider."
     }
   ]
 }

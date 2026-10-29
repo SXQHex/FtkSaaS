@@ -1,6 +1,6 @@
 import { redirect } from "next/navigation";
 import { serverClient } from "../lib/supabase/server";
-import { Workspace } from "../components/workspace";
+import { StudioWorkspace } from "../components/admin/studio-workspace";
 export const dynamic = "force-dynamic";
 export default async function HomePage() {
   const client = await serverClient();
@@ -11,5 +11,5 @@ export default async function HomePage() {
   if (assurance.error) throw assurance.error;
   if (assurance.data.nextLevel === "aal2" && assurance.data.currentLevel !== "aal2")
     redirect("/dogrulama");
-  return <Workspace />;
+  return <StudioWorkspace />;
 }

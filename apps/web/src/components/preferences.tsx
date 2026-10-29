@@ -23,7 +23,7 @@ export function Preferences() {
   const [failed, setFailed] = useState(false);
   useEffect(() => setMounted(true), []);
   return (
-    <div className="flex flex-wrap gap-3">
+    <div className="flex min-w-0 max-w-full flex-wrap gap-3">
       <Select
         value={locale}
         disabled={pending}
@@ -39,7 +39,10 @@ export function Preferences() {
           });
         }}
       >
-        <SelectTrigger className="min-h-11 w-40" aria-label={t("language")}>
+        <SelectTrigger
+          className="h-auto min-h-11 w-40 max-w-full whitespace-normal py-2"
+          aria-label={t("language")}
+        >
           <SelectValue />
         </SelectTrigger>
         <SelectContent>
@@ -52,7 +55,10 @@ export function Preferences() {
         disabled={!mounted}
         onValueChange={setTheme}
       >
-        <SelectTrigger className="min-h-11 w-32" aria-label={t("theme")}>
+        <SelectTrigger
+          className="h-auto min-h-11 w-32 max-w-full whitespace-normal py-2"
+          aria-label={t("theme")}
+        >
           <SelectValue />
         </SelectTrigger>
         <SelectContent>
