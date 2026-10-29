@@ -264,3 +264,10 @@ Aday40859842984 attempt1 head a8bc4d228aaa87f4289935946b99c00d3e22e94f için cor
 ### PR83 export fixture sözleşme düzeltmesi — 29 Ekim 2026
 
 Aday40867303163 attempt1 head323dbb57e4cb7a7f3903e09e66b77622fd405307 için core/API2/API3/API4 geçti; API1 yalnız yeni export expiry testinde report_file_get_v1 VALIDATION_FAILED ile kaldı. Retry sayısı ve fault-cleanup düzeltmeleri bu koşuda geçti. Yeni testin metadata, HTTP CSV ve expired-result çağrıları sözleşmedeki required operation_key alanını atlamıştı; üç çağrı da ayrı gerçek UUIDv7 operation_key ile düzeltildi. Byte equality, expired-result reddi ve payload yokluğu assertionları korunur; runtime/API sözleşmesi/migration/CI/timeout değiştirilmedi. Eski başarısız koşular başarı sayılmaz; yeni kaynak kabulü ve genel privacy/REL işleri açık kalır.
+
+
+## PR83 main/development kabulü ve kalan kapsamın ayrılması — 29 Ekim 2026
+
+Son kullanıcı kararı PR83'ü kabul edilmiş worker/export dilimiyle birleştirip genel privacy purge, backup non-resurrection ve tam REL-01'i sonraki ayrı adayda tamamlamaktır. PR83 normal merge main `0ef87670f3fb830e9ac39cbc2dcc7e56b04bb4d3`; parents4cb29f7601413656e808c2f9b3b95502a6bc9f5b/de345f0d95c79fbad2aafa1a05803416e290fa2e, tree e128714b1707468c11e50c3f1d6c37950c30ee89. Aday [40872824440](https://github.com/SXQHex/FtkSaaS/actions/runs/40872824440) core/dört API/toplayıcı başarılı. Aynı main [proof40878002265](https://github.com/SXQHex/FtkSaaS/actions/runs/40878002265), [merge proof40878002468](https://github.com/SXQHex/FtkSaaS/actions/runs/40878002468) ve [development delivery40878067010](https://github.com/SXQHex/FtkSaaS/actions/runs/40878067010) completed/success doğrulandı.
+
+Bu kabul bounded report backlog/retry/kesinti/disable/rebind/restart ve aktif export payload expiry dilimine aittir. Genel fiziksel imha, beş lane bütün iş yükleri, backup/WAL/cache expiry/non-resurrection, provider secret/config, tam RPO/RTO/yük kabulü kapanmadı. Yeni feat/privacy-rel01 adayı aynı main'den başlar; yalnız ilk kapsam/devir düzenlemesi uygulama veya hosted kapanış kanıtı değildir. Kaynak projenin korunması ve yıkıcı testlerin izole hedefte yapılması sınırı devam eder.
