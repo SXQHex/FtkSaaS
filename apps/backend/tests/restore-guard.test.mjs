@@ -1,0 +1,24 @@
+import test from 'node:test';import assert from 'node:assert/strict';import {generateKeyPairSync,sign} from 'node:crypto';
+import {inspectRestore,canonical,sha256} from '../scripts/restore-guard.mjs';
+const erased='01900000-0000-7000-8000-000000000001',request='01900000-0000-7000-8000-000000000002',other='01900000-0000-7000-8000-000000000003';
+const {privateKey,publicKey}=generateKeyPairSync('ed25519');const pem=publicKey.export({type:'spki',format:'pem'});const now=Date.parse('2026-10-29T12:00:00.000Z');
+function fixture(row={id:other}){
+ const payload={format:1,source_project_ref:'abcdefghijklmnopqrst',sequence:2,issued_at:'2026-10-29T11:00:00.000Z',erasures:[{request_id:request,kind:'account',subject_ids:[erased],completed_at:'2026-10-29T10:00:00.000Z'}]};
+ const ledger={...payload,signature:sign(null,Buffer.from(canonical(payload)),privateKey).toString('base64')};
+ const snapshot={project_ref:payload.source_project_ref,tables:[{schema:'auth',table:'users',rows:[row]}]};const snapshotBytes=Buffer.from(JSON.stringify(snapshot)),ledgerBytes=Buffer.from(JSON.stringify(ledger));
+ return {snapshotBytes,ledgerBytes,trust:{format:1,source_project_ref:payload.source_project_ref,snapshot_sha256:sha256(snapshotBytes),ledger_sha256:sha256(ledgerBytes),ledger_sequence:2,ledger_public_key_pem:pem},now};
+}
+test('restore guard accepts authenticated clean snapshot references without exposing rows',()=>{const x=inspectRestore(fixture());assert.equal(x.rows,1);assert.equal(x.erased_subjects,1);assert.equal(x.result,'no_erased_subject_reference');assert(!JSON.stringify(x).includes(other));});
+for(const [name,row]of [['root',{id:erased}],['foreign key',{actor_account_id:erased}],['nested payload',{detail:{owner:erased}}],['embedded uppercase',{detail:'reference '+erased.toUpperCase()}],['JSON key',{[erased]:'value'}]])test('restore guard blocks erased subject in '+name,()=>assert.throws(()=>inspectRestore(fixture(row)),/ERASED_SUBJECT_PRESENT/));
+test('modified snapshot cannot use the original trusted digest',()=>{const x=fixture();x.snapshotBytes=Buffer.from('{}');assert.throws(()=>inspectRestore(x),/SNAPSHOT_DIGEST_MISMATCH/);});
+test('modified ledger cannot use the original trusted digest',()=>{const x=fixture();x.ledgerBytes=Buffer.from('{}');assert.throws(()=>inspectRestore(x),/LEDGER_DIGEST_MISMATCH/);});
+test('old signed ledger cannot match a newer independent checkpoint',()=>{const x=fixture();x.trust.ledger_sequence=3;assert.throws(()=>inspectRestore(x),/LEDGER_CHECKPOINT_MISMATCH/);});
+test('rehashed forged ledger still fails signature verification',()=>{const x=fixture();const l=JSON.parse(x.ledgerBytes);l.erasures=[];x.ledgerBytes=Buffer.from(JSON.stringify(l));x.trust.ledger_sha256=sha256(x.ledgerBytes);assert.throws(()=>inspectRestore(x),/INVALID_LEDGER_SIGNATURE/);});
+test('key substitution cannot verify signed erasure register',()=>{const x=fixture();x.trust.ledger_public_key_pem=generateKeyPairSync('ed25519').publicKey.export({type:'spki',format:'pem'});assert.throws(()=>inspectRestore(x),/INVALID_LEDGER_SIGNATURE/);});
+test('future ledger and missing trust fail closed',()=>{assert.throws(()=>inspectRestore({...fixture(),now:0}),/FUTURE_LEDGER/);assert.throws(()=>inspectRestore({...fixture(),trust:{}}),/INVALID_RESTORE_EVIDENCE/);});
+
+test('unknown top-level snapshot payload fails closed',()=>{const x=fixture();const data=JSON.parse(x.snapshotBytes);data.hidden_rows=[{id:erased}];x.snapshotBytes=Buffer.from(JSON.stringify(data));x.trust.snapshot_sha256=sha256(x.snapshotBytes);assert.throws(()=>inspectRestore(x),/INVALID_SNAPSHOT/);});
+test('invalid UTF8 evidence is not silently replaced',()=>{const x=fixture();x.snapshotBytes=Buffer.concat([Buffer.from('{"invalid":"'),Buffer.from([0xff]),Buffer.from('"}')]);x.trust.snapshot_sha256=sha256(x.snapshotBytes);assert.throws(()=>inspectRestore(x),/INVALID_RESTORE_EVIDENCE/);});
+test('signed malformed request ID array is rejected',()=>{const x=fixture();const l=JSON.parse(x.ledgerBytes);l.erasures[0].request_id=[request];const {signature,...payload}=l;l.signature=sign(null,Buffer.from(canonical(payload)),privateKey).toString('base64');x.ledgerBytes=Buffer.from(JSON.stringify(l));x.trust.ledger_sha256=sha256(x.ledgerBytes);assert.throws(()=>inspectRestore(x),/INVALID_ERASURE_ENTRY/);});
+
+for(const name of ['snapshot','captured_at'])test('snapshot metadata cannot hide structured payload in '+name,()=>{const x=fixture();const data=JSON.parse(x.snapshotBytes);data[name]={hidden_rows:[{id:erased}]};x.snapshotBytes=Buffer.from(JSON.stringify(data));x.trust.snapshot_sha256=sha256(x.snapshotBytes);assert.throws(()=>inspectRestore(x),/INVALID_SNAPSHOT/);});
