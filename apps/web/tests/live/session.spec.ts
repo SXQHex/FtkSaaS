@@ -9,18 +9,14 @@ test("native development login reads the real workspace and signs out", async ({
     phase = "authenticated route";
     await expect(page).toHaveURL(/\/$/);
     await expect(page.getByRole("heading", { name: /^Merhaba,/ })).toBeVisible();
-    await expect(page.getByRole("combobox", { name: "Kuruluş seç" })).toBeVisible();
-    phase = "organization selection";
-    await page.getByRole("combobox", { name: "Kuruluş seç" }).click();
-    await expect(page.getByRole("option").first()).toBeVisible();
-    await page.getByRole("option").first().click();
-    phase = "center selection";
-    const center = page.getByRole("combobox", { name: "Merkez seç" });
-    await expect(center).toBeEnabled();
-    await center.click();
-    await expect(page.getByRole("option").first()).toBeVisible();
-    await page.getByRole("option").first().click();
-    await expect(page.getByRole("status")).toContainText("İş zamanı:");
+    phase = "studio cards";
+    await page
+      .getByRole("navigation", { name: "Ana menü" })
+      .getByRole("button", { name: "Stüdyo", exact: true })
+      .click();
+    await expect(page.getByText(/^İş zamanı:/).first()).toBeVisible();
+    await expect(page.getByRole("combobox", { name: "Kuruluş seç" })).toHaveCount(0);
+    await page.getByRole("button", { name: /Hesap ve görünüm/ }).click();
     phase = "sign-out";
     await page.getByRole("button", { name: "Çıkış yap" }).click();
     await expect(page).toHaveURL(/\/giris$/);

@@ -4,7 +4,7 @@ Kabul edilmiş kaynak ve kapanmış teslimler [00 devirde](contracts/00-FtkSaaS-
 
 | Kimlik | Alan | Açık iş ve kapanış ölçütü |
 |---|---|---|
-| WEB-01 | Gerçek istemci entegrasyonu | PR68 ile geri alınan frontend temelini ayrı adayda yeniden uygula; altyapı ve ekran tasarımı ayrı teslimlerdir. Mevcut taslak kabul edilmez, CRM/dashboard varsayılmaz. Önce hazır bloklarla tr/en, tema, native Auth/kuruluş/merkez ve frontend test altyapısını; ayrıca ayrı adayda Oxlint/Oxfmt araç geçişini kaynak bağlı full clean, normal merge ve aynı main kabulüyle tamamla. Yalnız FtkSaaS içinde apps/web ve packages/ui, öncelikle shadcn/ui/hazır bloklar ve Vitest/Playwright/MSW/axe altyapısıyla native Auth + typed Edge API'yi mevcut geliştirme Supabase’ine bağla. Rol/plan/tenant, expected_version, preview, replay/bilinmeyen sonuç ve veri görünürlüğü ekran→API→DB ile doğrulanır. |
+| WEB-01 | Starter frontend uçtan uca | 29 Ekim son kullanıcı hedefi: `frontend-design` ile Starter planını frontend’de eksiksiz tamamla. Auth/kabuk yayın kabulü00 devirdedir; açık iş aşağıdaki Starter ekran/akış matrisidir. Syncfusion React Scheduler seçildi. Gerçek API, rol/plan/tenant, preview/version/replay ve hosted tarayıcı kabulü tamamlanmadan WEB-01 kapanmaz. |
 | CI-SPLIT | Bağımsız CI | Backend/shared pozitif kapsam, frontend-only atlama ve gerçek karşılıklı tek-taraflı/ortak değişiklik kabulü [CI politikasına](ci-policy.md#ci-split--frontendbackend-kaynak-sınırı) göre doğrulanır. Önceki backend gerçek PR74/75 denemeleri frontend zinciri kabulü değildir; PR76 ile gelen frontend workflow’larının güncel main kabulü ve kaynak bağlı karşılıklı uzak kanıt tamamlanır. |
 | CI-SIMPLIFY | Üretim blokajı düzeltmesi | PR78 ana kurulum/main/CD kabulü tamamlandı; kanıt00 devirdedir. PR65 attempt1’in yalnız süre nedeniyle engellenmesini kaldır: süreyi advisory yap; gerçek test ve kaynak/run/attempt güvenliğini koru. Suite bölme/tekrar/fixture optimizasyonları erteli; üretim kapanış koşulu değildir. Dar düzeltmenin kaynak bağlı kabulü beklenir. |
 | PUBLIC-01 | Public sağlayıcı/istemci devri | uye.fethiyetango.com üzerinde gerçek widget tokenı/action/hostname/replay ve gateway yapılandırmasıyla başvuru kabulü. Backend intent/review/self zinciri kapalıdır; gerçek provider/browser kanıtı mock ile kapanmaz. |
@@ -12,6 +12,28 @@ Kabul edilmiş kaynak ve kapanmış teslimler [00 devirde](contracts/00-FtkSaaS-
 | OPS-01 | Worker/retention | PR83 bounded report backlog/retry/kesinti/disable/rebind/restart ve aktif export payload expiry dilimi main/development kabulüyle kapandı; kaynak00 devirdedir. Genel privacy purge/retention/legal hold, database/Auth/Storage/export/geçici kopyalar ve backup non-resurrection ile beş lane kalan gerçek iş yükleri ayrı feat/privacy-rel01 adayında devam eder. Privacy worker partial/retry_wait manifesti genel imha değildir; yeni uygulamanın kaynak bağlı CI/hosted kabulü gerekir. |
 | REL-01 | Yayın/geri dönüş | PR83 sonrası ayrı feat/privacy-rel01 adayı kapsamında genel purge ile birlikte kapatılacak. Backup non-resurrection, hosted tam restore, Auth/Storage baytları/secret/config envanteri, RPO/RTO ve yük kabulü. İzole restore sahiplik denemesi ve development CD production kabulü değildir. |
 | FIN-01 | Eğitmen ödeme okuması | trailing earning_ids doğrulaması ayrı iyileştirmedir; mevcut kabul edilmiş finans/tenant zinciri yeniden açık sayılmaz. |
+
+## WEB-01 — Starter frontend tamamlama matrisi
+
+Son kullanıcı hedefinin tek kapsam listesi. Tasarım, API bağlantısı, yazma akışı ve gerçek ortam kabulü birbirinden ayrı değerlendirilir. Takvim okuma ve korumalı seans detayından sonraki uygulama dilimi seans değişikliği preview/apply akışıdır; aşağıdaki bütün satırlar kapanışa kadar açıktır. Ekranlar `apps/web`, ortak UI `packages/ui` içinde; backend ürün kuralları mevcut sözleşmeden tüketilir.
+
+| Dilim | Ekran ve tamamlanacak iş akışı |
+|---|---|
+| WEB-S01 Kimlik | Giriş/kayıt/kurtarma/Google/TOTP için gerçek sağlayıcı kabulü; profil, doğrulanmış iletişim, hesap oturumları ve güvenlik işlemleri. |
+| WEB-S02 Stüdyo kurulumu | Organizasyon/merkez/oda/disiplin/tek eğitmen tanımı; çalışma saatleri ve uygunluk; owner ile merkez işlem yetkisinin ayrılması; Starter bootstrap ve limit reddi. |
+| WEB-S03 Program | Syncfusion `SessionCalendar`, gün/hafta ve mobil liste, saat dilimi, gerçek seans route’u; sınıf ve tekrarlayan program preview/apply; seans oluşturma/değişiklik/iptal/telafi, kontenjan ve oda/eğitmen çakışması. Korumalı seans route’u/giriş dönüşünün ardından saat ve toplam/kategori kontenjanının tek seans veya bu ve sonraki seanslar kapsamında backend preview/apply adayı eklendi; engel, süre aşımı ve aynı anahtarla belirsiz sonuç takibi içerir. Program oluşturma, oda/eğitmen seçimi, iptal/telafi, seri içindeki sonraki DST tekrar saatleri için offset_choices ve gerçek yetkiye göre eylem görünürlüğü tamamlanır; management_state_get_v1 okuması contract_only sınırındadır. Gerçek hesap/erişim kaybı ve hosted yazma kabulü, lisans anahtarı ve gerçek Scheduler tarayıcı kabulü açıktır. |
+| WEB-S04 Öğrenciler | Arama/sayfalama, kişi profili, ilişki etkinleştirme/pasifleştirme, hesap daveti/bağı, öğrenci detayı ve gerekli belge durumu. Hesapsız kişi ile doğrulanmış kullanıcı ayrılır. |
+| WEB-S05 Paket ve satış | Tek disiplinli kredili, kotalı süreli ve sınırsız ürünler; ürün sürümü; satış önizlemesi/onayı, kullanılabilir/ayrılmış hak ve satış geçmişi; Starter’da izinli satış yaşam döngüsü. Ürün ile satın alınmış hak eşitlenmez. |
+| WEB-S06 Rezervasyon ve talep | Yetkili yönetici/öğrenci self rezervasyonu/iptal; uygun satış-hak seçimi, kapasite/borç/belge reddi; özel ders talebi, geri çekme, ret ve alternatif saat/onay. |
+| WEB-S07 Yoklama | Fiilî başlangıç, taslak, kapatma ve gerekçeli düzeltme; hak tüketimi ve mevcut rezervasyon koruması; Starter’da ücret anlaşması/hakediş üretilmez. |
+| WEB-S08 Finans | Borç/tahsilat/öğrenci alacağı ayrı gösterilir; manuel tahsilat, izinli düzeltme/iade/mahsup ve geçmiş; gerçek preview/version/operation key/sonucu bilinmeyen işlem davranışı. |
+| WEB-S09 Public ve kişisel takvim | Ders yayını/başvuru/değerlendirme; gerçek public hostname/widget/gateway kabulü; öğrenci paneli; abonelik URL’si→ICS→yetkili seans route’u, rotate/revoke ve erişim kaybı. ST-03/PUBLIC-01 bağımlılıkları korunur. |
+| WEB-S10 Rapor ve import | Temel tahsilat/borç/katılım raporu, filtre ve CSV; dosya→preview→satır hataları→apply→job durumu ile öğrenci/kredi/borç import’u. |
+| WEB-S11 Belge ve bildirim | Sürümlü belge yayını/okuma/kabul; işlemsel inbox/okundu; yetkili işlem/audit geçmişi. Dış kanal veya otomasyon Starter’a eklenmez. |
+| WEB-S12 Ayarlar | Starter’da izinli FD01–FD12 tüketicileri: kullanıcı/stüdyo/merkez ayarları, marka/medya, görünürlük, katılım/iptal/rezervasyon politikaları, şablonlar ve reset önizleme/onayı. Ayrıntı frontend-settings-handover kaynağındadır. |
+| WEB-S13 Abonelik ve kabul | Starter plan/erişim/kota ve limit mesajları; öğrenci/eğitmen/yönetici yetki ayrımı; TR/EN, açık/koyu, mobil/klavye/axe, yükleniyor/boş/hata/yeniden deneme, stale version ve replay; gerçek uçtan uca Starter kabul zinciri. |
+
+Starter dışındaki genel CRM/kampanya, bağımsız etkinlik, bekleme listesi/yer teklifi, ikinci eğitmen/personel ve hakediş kullanıcı akışlarına eklenmez. Ortak bir ekranda üst plan verisi desteklenmesi Starter özelliği sayılmaz. Tamamlama yüzdesi endpoint sayısından veya çizilmiş ekran sayısından türetilmez.
 
 ## Ayrı ürün kapsamı: P08
 

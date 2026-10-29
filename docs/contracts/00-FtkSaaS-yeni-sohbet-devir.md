@@ -289,3 +289,80 @@ Yerel17 test kök/foreign-key/nested/metin/JSON-key eşleşmesini, snapshot/ledg
 Son bağımsız inceleme mutable caller-trust sonrası head karşılaştırması ve crashte lock dizin kaydı sürekliliği bulgularını yakaladı. Karşılaştırma await öncesi doğrulanmış immutable hash üzerinden yapılır; lock acquire/release dizin fsync sınırları eklendi. Yeni mutation regresyonu dahil27 test geçti; önceki kaynak verify139+74 başarılıydı. Bu yeni kaynak ayrıca uzak kabul gerektirir.
 
 Belirsiz .pending durumu identical replay ve restore girişinde de REGISTER_RECOVERY_REQUIRED ile bloke edilir; iki ek regresyon bunu doğrular.
+## WEB-01 tasarımın ana uygulamaya taşınması — 29 Ekim 2026
+
+PR85 tasarım kaynağı normal merge ile main `522df4777c29c8d2128b4434fbd69cfdc25f4453` oldu. Aynı kaynakta [frontend40889593015](https://github.com/SXQHex/FtkSaaS/actions/runs/40889593015), [main proof40889593534](https://github.com/SXQHex/FtkSaaS/actions/runs/40889593534), [merge proof40889593155](https://github.com/SXQHex/FtkSaaS/actions/runs/40889593155) ve [development delivery40889670656](https://github.com/SXQHex/FtkSaaS/actions/runs/40889670656) success doğrulandı. Vercel `ftksaas-web` ilk yayını bu kaynaktan READY; bu durum yeni Auth adayı veya gerçek hesap akışı kabulü değildir.
+
+Kullanıcı yerleşimi başlangıç için onayladı, eski tasarım/Auth sayfalarının kaldırılmasını ve atıl üye alan adının kullanılmasını istedi. Ayrı `feat/live-admin-auth` adayı ortak login-02/signup-02 düzenini, yeni kayıt ekranını ve korumalı yönetici kabuğunu içerir. Eski seçicili bağlantı ekranı kaldırıldı; gerçek hesap/stüdyo okumaları kullanılır. Henüz bağlı olmayan iş modülleri sentetik kayıt yerine hazırlık durumu gösterir. Backend/API/CI-politika kaynakları değişmez.
+
+Yerel `pnpm check:frontend` başarılı: 24 web ve1 UI testi, lint/format/typecheck/build. `pnpm test:frontend:e2e` çağrıldı fakat48 senaryo tarayıcı executable dosyaları bulunmadığından başlatılamadı; bu koşu başarı değildir. Uzak frontend tarayıcı ve kaynak bağlı aday/main kabulü beklenir.
+
+`uye.fethiyetango.com` Vercel’de `ftksaas-web` projesine bağlı ve verified=true; mevcut Cloudflare CNAME doğru Vercel hedefine yönelir. Production environment, mevcut geliştirme Supabase URL/publishable key ve bu origin için hazırlandı. Supabase Dashboard readback iki kesin callback kaydını doğruladı: `/auth/callback` ve `/auth/callback?next=/parola-yenile`. Site URL hâlâ `https://ftksaas.vercel.app/`; kullanıcı kalan Supabase işlerini devraldı ve yeni Site URL olarak `https://uye.fethiyetango.com` kaydetmesi tarif edildi. Yeni kaynak dağıtılmadı. Gerçek giriş/kayıt/e-posta/Google/TOTP kabulü ve tüm WEB-01 bu hazırlıkla kapanmaz.
+
+
+### PR86 Safari tema geçişi düzeltmesi — 29 Ekim 2026
+
+Head `65c815d5ee318729562aa43ecb267488a55f8222`, base `522df4777c29c8d2128b4434fbd69cfdc25f4453`, tested merge `3f8881be6632063042c027133f939a044866ccd9` için [aday40900062281](https://github.com/SXQHex/FtkSaaS/actions/runs/40900062281) success; [frontend40900062447](https://github.com/SXQHex/FtkSaaS/actions/runs/40900062447) failure. Checks ve Chromium/Firefox12/12 geçti; WebKit/mobil11/12 ile aynı yeni kayıt/kurtarma axe testi başarısız oldu. Test, provider durumunu atlayarak dark sınıfını doğrudan değiştiriyordu; Select metni geçişte koyu arka plan üzerinde eski koyu rengini taşıdı.
+
+Dar düzeltme next-themes’in yerleşik `disableTransitionOnChange` seçeneğini açar; test görünüm seçicisinden açık/koyu tema seçer ve hem sınıfı hem color-scheme değerini doğruladıktan sonra mevcut eksiksiz axe kontrolünü çalıştırır. Kontrast eşiği/kural kapsamı, retry/timeout veya CI değiştirilmez. Yeni kaynak uzak kabulü beklenir; merge/yayın yapılmadı. Kullanıcı kalan Supabase hazırlığını tamamladığını bildirdi; ek platform değişikliği yapılmadı.
+
+
+## PR86 main/yayın kabulü ve Starter frontend başlangıcı — 29 Ekim 2026
+
+Önceki PR86 aday/yayın-bekliyor notlarının sonraki durumu: PR86 normal merge ile main `68e5696edc21a0a1ea613e17e90747bb8607b6b0` kaynağına alındı. Aynı SHA’nın [frontend40930658787](https://github.com/SXQHex/FtkSaaS/actions/runs/40930658787), [main proof40930658768](https://github.com/SXQHex/FtkSaaS/actions/runs/40930658768), [merge proof40930658772](https://github.com/SXQHex/FtkSaaS/actions/runs/40930658772) ve [development delivery40930729324](https://github.com/SXQHex/FtkSaaS/actions/runs/40930729324) completed/success olduğu yeni iş başlangıcında tekrar doğrulandı. Dört Playwright tarayıcı matrisi geçti.
+
+Önceki yayın kontrolünde Vercel production `dpl_8vWHYQuuKEekT6fw2Z7VjmbLBGDK` aynı main kaynağında READY; `uye.fethiyetango.com` alias’ı bağlıdır. Giriş/kayıt/kurtarma sayfaları HTTP200 verdi. Kullanıcı kalan Supabase hazırlığını tamamladığını bildirdi. Gerçek hesapla kayıt/e-posta/Google/TOTP uçtan uca kabulü bu HTTP kontrollerinden türetilmez. Bu yeni frontend çalışmasında provider/DNS değiştirilmedi.
+
+Kullanıcı Syncfusion React Scheduler’ı seçti ve `frontend-design` ile Starter planının frontend’de eksiksiz tamamlanmasını ilk hedef yaptı. Yeni `feat/session-calendar-ux` dalı yukarıdaki başarılı main’den açıldı. İlk kaynak adayı ortak `SessionCalendar`, gerçek sayfalı calendar/session okumaları, merkez saat dilimi, arama/gün/hafta/liste ve güncel detay panelidir. Sentetik `/tasarim` aynı sunum bileşenini kullanır; gerçek API hatası örnek veriye dönüşmez. Syncfusion tipleri adaptör içinde, yazma ve iş kuralları backend’dedir; bu aday program/rezervasyon/yoklama yazması yapmaz.
+
+Bu bölüm yeni adayın CI/main/hosted kabulünü veya bütün Starter’ın tamamlandığını iddia etmez. Eksik lisans anahtarında takvim listesi çalışır; Scheduler çizelgesi için sürüme uygun Community License anahtarı ve gerçek tarayıcı kabulü ayrıca gerekir. Kalan işler ve sıra kendi tek kaynaklarında tutulur.
+
+
+Yerel ilk kaynak doğrulaması: `env -u NODE_USE_ENV_PROXY pnpm check:frontend` lint/format/typecheck/build,31 web ve1 UI testiyle geçti; `test:isolation` backend testi çalıştırmadan görev ayrımını doğruladı. Ortamın Node ağ proxy’si MSW testlerini ilk denemede timeout’a uğrattı; aynı testler yalnız test sürecinde proxy devre dışıyken geçti. Eski yerel Next build önbelleği temizlendikten sonra production build geçti. Test eşikleri/timeout/CI değiştirilmedi.
+
+`67e378822107b744f52a1c499821f8c6dfbfb1ad` kaynaklı Vercel preview `dpl_Ama4w5EiaTKPj6wk99dCsADwank5` READY. Sentetik `/tasarim` üzerinde gerçek Chrome ile hafta araması18→6 kayıt, seans Sheet/kontenjan ve390px koyu/320px açık görünümde yatay taşma olmaması doğrulandı. Browser tercihi/viewport test sonunda eski haline getirildi. Bu gerçek API hesabı veya lisanslı Scheduler kabulü değildir. Sonraki fark yalnız E2E testinin “Bugün” seçicisini takvim bölgesine daraltır; uygulama kaynağı değişmez. Dört tarayıcı matrisi ve yeni aday/main kabulü CI’da ayrıca beklenir.
+
+
+### PR87 ilk frontend CI hatası ve dar düzeltme — 29 Ekim 2026
+
+Head `f88ce29d60ac2e173307dec26c047264f1c651aa`, base `68e5696edc21a0a1ea613e17e90747bb8607b6b0`, tested merge `736d15b291d1529a48f5a12dd32c38318c80eb4c` için [aday40938068645](https://github.com/SXQHex/FtkSaaS/actions/runs/40938068645) ve [frontend uyumluluk40938068701](https://github.com/SXQHex/FtkSaaS/actions/runs/40938068701) success; [frontend40938068643](https://github.com/SXQHex/FtkSaaS/actions/runs/40938068643) failure. Checks geçti; dört tarayıcıda11/13 geçti. İki ortak hata: takvim günü düğmesinin gizli tam tarih metni accessible name ile uyuşmadığı için axe label-content-name-mismatch;320px İngilizce %200 metinde yatay taşma.
+
+Dar düzeltme gün adını görünen iki span üzerinden aria-labelledby ile kurar; tam tarih açıklaması düğme dışında benzersiz useId kimliğiyle tutulur. Kontenjan rozeti ve ok dar alanda satır atlayabilir; font küçültülmez ve taşma saklanmaz. İki dilde gerçek takvim bileşeninin ad/açıklama ayrımı regresyonu eklendi. Aynı sayfa genişliği assertion'ı ve bütün axe kuralları korunur; genişlik hatasına yalnız route/taşan öğe tanısı eklendi.
+
+İlk düzeltme kaynağı yerel frontend lint/format/typecheck/build,33 web ve1 UI testiyle geçti. Yerel Playwright tarayıcısı indirilerek iki başarısız senaryo denenmek istendi; container socket izni Chromium'u sayfa açılmadan durdurdu. Bu yerel E2E başarı değildir; sandbox/CI politikası değiştirilmedi. Yeni kaynak aynı uzak dört tarayıcı kabulü bekler; PR87 Draft ve merge edilmemiştir.
+
+
+### PR87 kalan dar ekran taşması — 29 Ekim 2026
+
+Head `062235afdea3b3a5a62cb2dbf8964f624f61d9ea`, tested merge `f9672aeeba3f005d89355cc10f0e597d9b6ef660` için [frontend40944393504](https://github.com/SXQHex/FtkSaaS/actions/runs/40944393504) failure; checks ve [frontend uyumluluk40944393439](https://github.com/SXQHex/FtkSaaS/actions/runs/40944393439) success. Dört tarayıcı12/13: erişilebilir gün adları ve mobil axe geçti; kalan tek ortak hata320px/%200 İngilizce takvimde scrollWidth396. Önceki kontenjan satırı düzeltmesi bu taşmayı çözmemişti.
+
+Kalan neden arama kapsayıcısının flex-1 ile aşırı daralırken input iç boşluğunun geniş kalmasıdır. Mobilde kapsayıcı w-full ile ayrı satır alır; sm ve üstünde önceki esnek yerleşim korunur. Genişlik assertion'ı/axe kuralları/font ölçeği veya CI değiştirilmedi. Son kaynak yerel lint/format/typecheck/production build,33 web+1 UI testini geçti. Standart Chromium container socket sınırında açılmadı; aynı yetkilerle resmi Chromium Headless Shell141 kullanılarak mevcut başarısız iki Playwright senaryosu2/2 geçti (mobil axe/taşma ve320px/%200 İngilizce). Bu geçici yerel executable seçimi .artifacts içindedir; repo/CI tarayıcı sürümü değişmez. Yeni dört tarayıcı CI kabulü ayrıca gerekir.
+
+Kullanıcı mevcut backend CI'ını iptal edeceğini bildirdi. İptal başarı kabulü sayılmaz; backend workflow/merge politikası değiştirilmedi ve manuel backend koşusu başlatılmadı. PR87 henüz merge edilmedi.
+
+
+### PR87 frontend kabulü ve bağımlı seans route dilimi — 29 Ekim 2026
+
+Kullanıcı frontend CI'ın geçtiğini, backend CI'ın sürdüğünü bildirdi ve yeni Draft PR'de geliştirmeye devam edilmesini istedi. Başlangıçta GitHub'dan bir kez doğrulandı: PR87 head `e57c7f3b50267273707644fec2258ed62ca7d465`, base `68e5696edc21a0a1ea613e17e90747bb8607b6b0`, tested merge `bca5b7b2c57a46376d12d3837310bfaf3cd504f8`. [Frontend40945424611](https://github.com/SXQHex/FtkSaaS/actions/runs/40945424611) ve [uyumluluk40945424266](https://github.com/SXQHex/FtkSaaS/actions/runs/40945424266) completed/success; [aday40945424676](https://github.com/SXQHex/FtkSaaS/actions/runs/40945424676) in_progress. Bu kaynak için backend başarı veya iptal sonucu varsayılmadı.
+
+Son kullanıcı talimatıyla mevcut PR87 kaynağı sabit bırakılarak `feat/session-detail-route` dalı bu head'den açıldı. Yeni Draft'ın tabanı `feat/session-calendar-ux`; PR87 kabulü/normal merge sonrasında main'e yeniden hedeflenir ve yeni gerçek base/head/merge ağacı kabulü gerekir. Önceki PR'nin başarısı yeni kaynağın CI sonucu yerine geçmez; backend/CI kapıları değiştirilmedi ve manuel backend koşusu başlatılmadı.
+
+Yeni frontend dilimi `/organizasyon/[orgId]/seans/[sessionId]` korumalı seans sayfası ve canlı detay panelinden bağlantıdır. Sunucuda native kullanıcı/MFA, istemcide gerçek session_get_v1 denetlenir. Merkez ID'si uydurulmaz; seans merkezi/yetkisi backend'de çözülür. Sayfa cihaz saat dilimini açıkça gösterir; mevcut takvim paneli merkez saat diliminde kalır. Oturum kapanması/geç yanıt, hata/yenileme/yeniden deneme ve mevcut kapasite/yoklama ayrımı korunur. Giriş/MFA güvenli yerel hedefe döner; Google/kayıt dönüş hedefi on dakikalık HttpOnly callback-scope çerezinde tutulur ve callback'te silinir. Mevcut kesin provider callback URL'si/izin listesi değiştirilmez. Başka cihazdaki veya süresi dolmuş e-posta dönüşünde kayıtlı hedef yoksa normal ana sayfa açılır; parola kurtarma hedefi önceliklidir.
+
+Yerel `env -u NODE_USE_ENV_PROXY pnpm check:frontend` lint/format/typecheck/production build ve49 web+1 UI testiyle başarılı. Mevcut dört tarayıcılı CI tanımına yeni anonim seans bağlantısı→giriş→kayıt gezinmesi ve geçersiz ID senaryosu eklendi. Önceki ortam için kurulmuş resmi Chromium Headless Shell141 ile geçici, Git dışı config üzerinden14/14 Playwright senaryosu geçti; CI tarayıcı sürümleri/axe/assertion/timeout/retry değiştirilmedi. Gerçek hesapla hosted seans erişimi/erişim kaybı, Google/MFA sağlayıcı dönüşü ve ICS host/config kabulü bu mock/public testlerden türetilmez. Yeni route kaynak adayıdır; merge/yayın yapılmadı.
+
+
+### PR88 frontend kabulü ve seans değişikliği dilimi — 29 Ekim 2026
+
+Kullanıcı [frontend40948045879](https://github.com/SXQHex/FtkSaaS/actions/runs/40948045879) başarısını bildirip aynı dalda geliştirmeye devam edilmesini istedi. GitHub doğrulaması: PR88 head `2ea57e088eb80f799f2abef765577d359b368fa5`, base `e57c7f3b50267273707644fec2258ed62ca7d465`, tested merge `ffcf4b53bab8cfbee8720c671964a1c50e70caef`; ilgili frontend run completed/success. PR88 açık Draft ve tabanı `feat/session-calendar-ux` olarak korundu; yeni PR açılmadı. Bu başarı aşağıdaki yeni kaynak değişikliğinin CI kabulü sayılmaz.
+
+Yeni dilim korumalı seans sayfasında saat ve toplam/kategori kontenjanı düzenlemesidir. Tek seans veya bu ve sonraki seanslar kapsamı mevcut backend preview/apply çağrılarını kullanır; onayda gerçek etkilenen seanslar, saatleri ve kontenjanları gösterilir. Engeller/süresi dolan önizleme uygulanmaz. Değişmeyen alanlar patch'e eklenmez; cihaz saat dilimi etiketlenir, var olmayan yerel saatler reddedilir ve çift saatte açık UTC farkı seçilir. Sürüm, merkez yetkisi, kaynak çakışması, rezervasyon/hak ve seri kuralları backend'de kalır.
+
+İşlem gönderilmeden önce aynı sekmede doğrulanmış kullanıcı/organizasyon/seans kapsamlı teknik takip kaydı saklanır. Kaybolan yanıt yenileme sonrası aynı operation_key ve preview ile sürdürülür; kullanıcı sonuç kontrolünü veya aynı isteğin tekrarını başlatır. Belirsiz sonuçta yeni anahtar/otomatik retry/polling yoktur; erişim kaybı önceki işlem başarısızlığı sayılmaz. `/tasarim/seans` açıkça sentetik, gerçek backend'e istek göndermeyen form/onay örneğidir. Gerçek eylemler sabit live adapter kullanır; API hatası örneğe dönüştürülmez. Backend runtime/sözleşme/migration/lockfile/CI veya platform ayarı değişmedi.
+
+Son yerel kaynak `env -u NODE_USE_ENV_PROXY pnpm check:frontend` lint/format/typecheck/production build ve62 web+1 UI testiyle geçti. Testler çift tıklama, preview engeli/süresi, kayıp yanıt/yenileme/aynı istek, erişim kaybı, hesap izolasyonu, depolama reddi, DST boşluk/tekrar ve değişmeyen saatin kesirli saniyelerini kapsar. Yerel Chromium Headless Shell141 ile ilk Playwright koşusunda mevcut14 senaryo geçti; iki yeni senaryodaki test alert seçicisi ve320px/%200 onay düğmesi taşması düzeltildi. Son yeni iki senaryo2/2 geçti: örnek yazma izolasyonu ile TR/açık ve EN/koyu form+onay genişlik/axe kontrolleri. Taşma gizlenmedi, font/viewport küçültülmedi; assertion/axe/timeout/retry/CI gevşetilmedi. Yeni kaynak dört tarayıcılı uzak kabulü bekler; gerçek hesapla hosted yazma/erişim ve Starter bütünlüğü kabulü yapılmadı. Merge veya production dağıtımı yapılmadı.
+
+
+### PR84 güncel main eşitlemesi — 30 Ekim 2026
+
+Main cd73ff7abe84d11de052eb0193b20f7d3b41ad92 normal merge ile PR84 kaynağına alındı. Çakışan devir kayıtları iki teslimin geçmişi korunarak birleştirildi; sıra belgesinde güncel Starter frontend hedefi ve ayrı backend privacy/REL işi birlikte korundu. Main frontend/CI kaynakları değiştirilmedi; privacy runtime/modül/test içeriği bu eşitlemede değiştirilmedi. Önceki kaynak başarısı yeni birleşik kaynak kabulü değildir; yeni kaynak doğrulanmalıdır.

@@ -1,5 +1,20 @@
 import { test, expect } from "@playwright/test";
 import AxeBuilder from "@axe-core/playwright";
+test("session deep link requires login and preserves its destination through signup navigation", async ({
+  page,
+}) => {
+  const path =
+    "/organizasyon/019a2b3c-4d5e-7000-8000-000000000001/seans/019a2b3c-4d5e-7000-8000-000000000002";
+  await page.goto(path);
+  await expect(page.getByRole("heading", { name: "Hesabına giriş yap" })).toBeVisible();
+  expect(new URL(page.url()).pathname).toBe("/giris");
+  expect(new URL(page.url()).searchParams.get("next")).toBe(path);
+  await page.getByRole("link", { name: "Hesap oluştur", exact: true }).click();
+  await expect(page.getByLabel("Ad soyad")).toBeVisible();
+  expect(new URL(page.url()).searchParams.get("next")).toBe(path);
+  await page.goto("/organizasyon/invalid/seans/invalid");
+  await expect(page.getByRole("heading", { name: "Sayfa bulunamadı" })).toBeVisible();
+});
 test("protected workspace redirects to login and recovery remains reachable", async ({ page }) => {
   await page.goto("/");
   await expect(page).toHaveURL(/\/giris$/);
@@ -27,7 +42,7 @@ test("auth pages reflow at 320px with 200 percent text without clipping controls
   page,
 }) => {
   await page.setViewportSize({ width: 320, height: 900 });
-  for (const route of ["/giris", "/parolami-unuttum"]) {
+  for (const route of ["/giris", "/kayit", "/parolami-unuttum"]) {
     await page.goto(route);
     await page.evaluate(async () => {
       document.documentElement.style.fontSize = "200%";
@@ -102,5 +117,26 @@ test("theme persists and both languages reflow with accessible controls", async 
       true,
     );
     expect((await new AxeBuilder({ page }).analyze()).violations).toEqual([]);
+  }
+});
+
+test("new signup and recovery share the auth layout and pass accessibility checks", async ({
+  page,
+}) => {
+  await page.goto("/giris");
+  await page.getByRole("link", { name: "Hesap oluştur", exact: true }).click();
+  await expect(page).toHaveURL(/\/kayit$/);
+  await expect(page.getByLabel("Ad soyad")).toBeVisible();
+  for (const route of ["/kayit", "/parolami-unuttum"]) {
+    await page.goto(route);
+    for (const theme of ["light", "dark"]) {
+      await page.getByRole("combobox", { name: "Görünüm", exact: true }).click();
+      await page
+        .getByRole("option", { name: theme === "dark" ? "Koyu" : "Açık", exact: true })
+        .click();
+      await expect(page.locator("html")).toHaveClass(new RegExp(`\\b${theme}\\b`));
+      await expect(page.locator("html")).toHaveCSS("color-scheme", theme);
+      expect((await new AxeBuilder({ page }).analyze()).violations).toEqual([]);
+    }
   }
 });

@@ -1,34 +1,41 @@
 import { render } from "./render";
-import { act, screen, waitFor } from "@testing-library/react";
+import { act, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { beforeEach, expect, test, vi } from "vitest";
-import type { AccountView, CenterView, OrganizationView } from "@ftksaas/api-contracts";
-import { Workspace } from "../src/components/workspace";
+import type { AccountView, OrganizationView } from "@ftksaas/api-contracts";
+import { StudioWorkspace } from "../src/components/admin/studio-workspace";
 const mocks = vi.hoisted(() => ({
   account: vi.fn<typeof import("../src/lib/api").getAccount>(),
   organizations: vi.fn<typeof import("../src/lib/api").getOrganizations>(),
   settings: vi.fn<typeof import("../src/lib/api").getUserSettings>(),
+  calendar: vi.fn<typeof import("../src/lib/api").getCalendar>(),
   centers: vi.fn<typeof import("../src/lib/api").getCenters>(),
   replace: vi.fn<(href: string) => void>(),
   refresh: vi.fn<() => void>(),
   setTheme: vi.fn<(theme: string) => void>(),
   unsubscribe: vi.fn<() => void>(),
+  signOut: vi.fn<() => Promise<{ error: Error | null }>>(),
+  listener: null as null | ((event: string) => void),
 }));
 const router = { replace: mocks.replace, refresh: mocks.refresh };
 vi.mock("next/navigation", () => ({ useRouter: () => router }));
 vi.mock("next-themes", () => ({ useTheme: () => ({ theme: "system", setTheme: mocks.setTheme }) }));
-vi.mock("../src/lib/api", () => ({
+vi.mock("../src/lib/api", async (original) => ({
+  ...(await original<typeof import("../src/lib/api")>()),
   getAccount: mocks.account,
   getOrganizations: mocks.organizations,
   getUserSettings: mocks.settings,
   getCenters: mocks.centers,
-  ApiFailure: class extends Error {},
-  errorMessageKey: () => "network",
+  getCalendar: mocks.calendar,
 }));
 vi.mock("../src/lib/supabase/client", () => ({
   browserClient: () => ({
     auth: {
-      onAuthStateChange: () => ({ data: { subscription: { unsubscribe: mocks.unsubscribe } } }),
+      signOut: mocks.signOut,
+      onAuthStateChange: (listener: (event: string) => void) => {
+        mocks.listener = listener;
+        return { data: { subscription: { unsubscribe: mocks.unsubscribe } } };
+      },
     },
   }),
 }));
@@ -49,78 +56,84 @@ const organizations: OrganizationView[] = [
     id: "019a2b3c-4d5e-7000-8000-000000000003",
     name: "Kuruluş B",
     state: "active",
-    access_mode: "normal",
+    access_mode: "closed",
     version: 1,
   },
 ];
 beforeEach(() => {
   vi.clearAllMocks();
   localStorage.clear();
+  window.location.hash = "";
+  mocks.calendar.mockResolvedValue([]);
   mocks.account.mockResolvedValue(account);
   mocks.organizations.mockResolvedValue(organizations);
   mocks.settings.mockResolvedValue({ remember_context: false });
+  mocks.centers.mockResolvedValue([
+    {
+      id: "center-a",
+      name: "A Merkezi",
+      timezone: "Europe/Istanbul",
+      state: "active",
+      accessible: true,
+      version: 1,
+    },
+    {
+      id: "hidden",
+      name: "Gizli Merkez",
+      timezone: "Europe/Istanbul",
+      state: "active",
+      accessible: false,
+      version: 1,
+    },
+  ]);
+  mocks.signOut.mockResolvedValue({ error: null });
   HTMLElement.prototype.scrollIntoView = vi.fn<HTMLElement["scrollIntoView"]>();
   HTMLElement.prototype.hasPointerCapture = () => false;
   HTMLElement.prototype.setPointerCapture = vi.fn<HTMLElement["setPointerCapture"]>();
   HTMLElement.prototype.releasePointerCapture = vi.fn<HTMLElement["releasePointerCapture"]>();
 });
-test("a late response from the previous organization cannot populate the next organization's center selector", async () => {
-  let resolveA!: (items: CenterView[]) => void;
-  let resolveB!: (items: CenterView[]) => void;
-  mocks.centers.mockImplementation(
-    (id: string) =>
-      new Promise<CenterView[]>((resolve) => {
-        if (id === organizations[0].id) resolveA = resolve;
-        else resolveB = resolve;
+test("live shell reads accessible studios without selectors, sample records or closed-organization reads", async () => {
+  const user = userEvent.setup();
+  render(<StudioWorkspace />);
+  await screen.findByRole("heading", { name: "Merhaba, Test Yöneticisi" });
+  await user.click(screen.getAllByRole("button", { name: "Stüdyo" })[0]);
+  expect(await screen.findByRole("heading", { name: "A Merkezi" })).toBeVisible();
+  expect(screen.queryByText("Gizli Merkez")).not.toBeInTheDocument();
+  expect(mocks.centers).toHaveBeenCalledExactlyOnceWith(organizations[0].id);
+  expect(screen.queryByRole("combobox", { name: "Kuruluş seç" })).not.toBeInTheDocument();
+  expect(screen.queryByText("Örnek Yönetici")).not.toBeInTheDocument();
+  expect(screen.queryByText("Ece Demir")).not.toBeInTheDocument();
+});
+test("late account response after sign-out cannot repopulate the shell", async () => {
+  let resolve!: (value: AccountView) => void;
+  mocks.account.mockImplementation(
+    () =>
+      new Promise((done) => {
+        resolve = done;
       }),
   );
-  const user = userEvent.setup();
-  render(<Workspace />);
-  await screen.findByRole("heading", { name: "Merhaba, Test Yöneticisi" });
-  await user.click(screen.getByRole("combobox", { name: "Kuruluş seç" }));
-  await user.click(screen.getByRole("option", { name: "Kuruluş A" }));
-  await waitFor(() => expect(mocks.centers).toHaveBeenCalledWith(organizations[0].id));
-  await user.click(screen.getByRole("combobox", { name: "Kuruluş seç" }));
-  await user.click(screen.getByRole("option", { name: "Kuruluş B" }));
-  await act(async () =>
-    resolveB([
-      {
-        id: "center-b",
-        name: "B Merkezi",
-        timezone: "Europe/Istanbul",
-        state: "active",
-        accessible: true,
-        version: 1,
-      },
-    ]),
-  );
-  await act(async () =>
-    resolveA([
-      {
-        id: "center-a",
-        name: "A Merkezi",
-        timezone: "Europe/Istanbul",
-        state: "active",
-        accessible: true,
-        version: 1,
-      },
-    ]),
-  );
-  await user.click(screen.getByRole("combobox", { name: "Merkez seç" }));
-  expect(screen.getByRole("option", { name: "B Merkezi" })).toBeVisible();
-  expect(screen.queryByRole("option", { name: "A Merkezi" })).not.toBeInTheDocument();
+  render(<StudioWorkspace />);
+  act(() => mocks.listener?.("SIGNED_OUT"));
+  await act(async () => resolve(account));
+  expect(mocks.replace).toHaveBeenCalledWith("/giris");
+  expect(screen.queryByText("Test Yöneticisi")).not.toBeInTheDocument();
+  expect(mocks.centers).not.toHaveBeenCalled();
 });
-
-test("account theme initializes an unset device but never overwrites a saved device choice on remount", async () => {
+test("API failure renders a retryable error without demo fallback", async () => {
+  mocks.account.mockRejectedValue(new Error("offline"));
+  render(<StudioWorkspace />);
+  expect(await screen.findByRole("alert")).toHaveTextContent("Bağlantı kurulamadı");
+  expect(screen.queryByText("Ece Demir")).not.toBeInTheDocument();
+});
+test("account theme initializes an unset device but never overwrites a saved device choice", async () => {
   mocks.settings.mockResolvedValue({ remember_context: false, theme: "light" });
-  const first = render(<Workspace />);
+  const first = render(<StudioWorkspace />);
   await screen.findByRole("heading", { name: "Merhaba, Test Yöneticisi" });
   expect(mocks.setTheme).toHaveBeenCalledWith("light");
   first.unmount();
   mocks.setTheme.mockClear();
-  // next-themes persists a user's selection under its standard storage key.
   localStorage.setItem("theme", "dark");
-  render(<Workspace />);
+  render(<StudioWorkspace />);
   await screen.findByRole("heading", { name: "Merhaba, Test Yöneticisi" });
   expect(mocks.setTheme).not.toHaveBeenCalled();
 });

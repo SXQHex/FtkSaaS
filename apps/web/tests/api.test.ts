@@ -1,7 +1,13 @@
 import { expect, test, vi, beforeEach } from "vitest";
 import { http, HttpResponse } from "msw";
 import { server } from "./mocks/server";
-import { ApiFailure, getOrganizations } from "../src/lib/api";
+import {
+  ApiFailure,
+  getCalendar,
+  getOrganizations,
+  getSession,
+  applySessionChange,
+} from "../src/lib/api";
 import type { FailureEnvelope, Operations } from "@ftksaas/api-contracts";
 vi.mock("../src/lib/supabase/client", () => ({
   browserClient: () => ({
@@ -16,6 +22,28 @@ vi.mock("../src/lib/supabase/client", () => ({
 beforeEach(() => {
   vi.stubEnv("NEXT_PUBLIC_SUPABASE_URL", "https://project.example.invalid");
   vi.stubEnv("NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY", "synthetic-publishable");
+});
+
+test("direct session lookup preserves org and session and lets the backend resolve center scope", async () => {
+  server.use(
+    http.post(
+      "https://project.example.invalid/functions/v1/backend-v1/session_get_v1",
+      async ({ request }) => {
+        const body = (await request.json()) as Operations["session_get_v1"]["request"];
+        expect(body.org_id).toBe("org-a");
+        expect(body.session_id).toBe("session-a");
+        expect(body).not.toHaveProperty("center_id");
+        return HttpResponse.json(
+          {
+            ok: false,
+            error: { code: "FORBIDDEN", retryable: false, trace_id: body.request_id },
+          } satisfies FailureEnvelope,
+          { status: 403 },
+        );
+      },
+    ),
+  );
+  await expect(getSession("org-a", undefined, "session-a")).rejects.toBeInstanceOf(ApiFailure);
 });
 test("shared transport follows typed cursor pages with native authorization and UUIDv7 request IDs", async () => {
   let calls = 0;
@@ -71,4 +99,88 @@ test("API failure and invalid transport never become successful empty data", asy
     ),
   );
   await expect(getOrganizations()).rejects.toThrow("valid API envelope");
+});
+
+test("calendar pagination preserves tenant, center and interval and discards partial data on failure", async () => {
+  const interval = { starts_at: "2026-10-28T21:00:00Z", ends_at: "2026-10-29T21:00:00Z" };
+  let calls = 0;
+  server.use(
+    http.post(
+      "https://project.example.invalid/functions/v1/backend-v1/calendar_get_v1",
+      async ({ request }) => {
+        const body = (await request.json()) as Operations["calendar_get_v1"]["request"];
+        expect(body.org_id).toBe("org-a");
+        expect(body.center_id).toBe("center-a");
+        expect(body.interval).toEqual(interval);
+        expect(body.page.sort).toBe("starts_at_asc");
+        expect(body.page.cursor).toBe(calls === 0 ? undefined : "page-2");
+        calls++;
+        if (calls === 2)
+          return HttpResponse.json(
+            {
+              ok: false,
+              error: { code: "FORBIDDEN", retryable: false, trace_id: body.request_id },
+            } satisfies FailureEnvelope,
+            { status: 403 },
+          );
+        return HttpResponse.json({
+          ok: true,
+          data: {
+            items: [
+              {
+                id: "session-a",
+                type: "session",
+                center_id: "center-a",
+                title: "First page",
+                ...interval,
+              },
+            ],
+            next_cursor: "page-2",
+            as_of: interval.starts_at,
+          },
+          trace_id: body.request_id,
+        } satisfies Operations["calendar_get_v1"]["response"]);
+      },
+    ),
+  );
+  await expect(
+    getCalendar({ org_id: "org-a", center_id: "center-a", interval }),
+  ).rejects.toBeInstanceOf(ApiFailure);
+  expect(calls).toBe(2);
+});
+
+test("session apply replay keeps its operation key and token while each transport request gets a new ID", async () => {
+  const calls: Operations["session_change_apply_v1"]["request"][] = [];
+  server.use(
+    http.post(
+      "https://project.example.invalid/functions/v1/backend-v1/session_change_apply_v1",
+      async ({ request }) => {
+        const body = (await request.json()) as Operations["session_change_apply_v1"]["request"];
+        calls.push(body);
+        expect(request.headers.get("authorization")).toBe("Bearer synthetic-session");
+        return HttpResponse.json({
+          ok: true,
+          data: {
+            operation_id: "operation",
+            primary_id: "session-a",
+            related: [],
+            replayed: calls.length > 1,
+          },
+          trace_id: body.request_id,
+        } satisfies Operations["session_change_apply_v1"]["response"]);
+      },
+    ),
+  );
+  const command = {
+    org_id: "org-a",
+    operation_key: "019a2b3c-4d5e-7000-8000-000000000016",
+    preview: { id: "019a2b3c-4d5e-7000-8000-000000000013", token: "synthetic-preview-token" },
+  };
+  await applySessionChange(command);
+  expect((await applySessionChange(command)).replayed).toBe(true);
+  expect(calls.map(({ request_id: _request, ...body }) => body)).toEqual([
+    { client_api_version: 1, ...command },
+    { client_api_version: 1, ...command },
+  ]);
+  expect(calls[0].request_id).not.toBe(calls[1].request_id);
 });
