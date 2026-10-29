@@ -69,6 +69,34 @@ export async function getCenters(orgId: string) {
   } while (cursor);
   return items;
 }
+export async function getCalendar(
+  query: Pick<Operations["calendar_get_v1"]["request"], "org_id" | "center_id" | "interval">,
+) {
+  const items: Operations["calendar_get_v1"]["response"]["data"]["items"] = [];
+  let cursor: string | null | undefined;
+  do {
+    const data = unwrap<Operations["calendar_get_v1"]["response"]>(
+      await apiClient().call("calendar_get_v1", {
+        ...request(),
+        ...query,
+        page: { limit: 200, sort: "starts_at_asc", ...(cursor ? { cursor } : {}) },
+      }),
+    );
+    items.push(...data.items);
+    cursor = data.next_cursor;
+  } while (cursor);
+  return [...new Map(items.map((item) => [`${item.type}:${item.id}`, item])).values()];
+}
+export async function getSession(orgId: string, centerId: string, sessionId: string) {
+  return unwrap<Operations["session_get_v1"]["response"]>(
+    await apiClient().call("session_get_v1", {
+      ...request(),
+      org_id: orgId,
+      center_id: centerId,
+      session_id: sessionId,
+    }),
+  );
+}
 export function errorMessageKey(error: unknown) {
   if (!(error instanceof ApiFailure)) return "network";
   const code = error.failure.error.code;

@@ -7,7 +7,6 @@ import {
   ArrowUpRight,
   CalendarDays,
   Check,
-  ChevronLeft,
   ChevronRight,
   Clock3,
   DoorOpen,
@@ -32,6 +31,7 @@ import {
   SheetTitle,
 } from "@ftksaas/ui/components/sheet";
 import { cn } from "@ftksaas/ui/lib/utils";
+import { CalendarPreview } from "./calendar-preview";
 import { Preferences } from "../preferences";
 import { AdminShell, sections, type AdminSection } from "./admin-shell";
 import {
@@ -323,65 +323,7 @@ export function AdminPreview() {
       {section === "schedule" && (
         <>
           {heading(t("nav.schedule"), t("scheduleSubtitle"))}
-          <div className="grid items-start gap-7 xl:grid-cols-[minmax(0,1fr)_300px]">
-            <section>
-              <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
-                <h2 className="text-lg font-semibold">
-                  {date(day, { month: "long", year: "numeric" })}
-                </h2>
-                <div className="flex items-center gap-1">
-                  <Button
-                    variant="outline"
-                    size="icon"
-                    disabled={day === 0}
-                    aria-label={t("previousDay")}
-                    onClick={() => setDay(day - 1)}
-                  >
-                    <ChevronLeft />
-                  </Button>
-                  <Button variant="outline" onClick={() => setDay(3)}>
-                    {t("today")}
-                  </Button>
-                  <Button
-                    variant="outline"
-                    size="icon"
-                    disabled={day === 6}
-                    aria-label={t("nextDay")}
-                    onClick={() => setDay(day + 1)}
-                  >
-                    <ChevronRight />
-                  </Button>
-                </div>
-              </div>
-              {dayPicker}
-              <h3 className="my-5 text-sm font-medium">
-                {date(day, { weekday: "long", day: "numeric", month: "long" })}
-              </h3>
-              {sessionCards}
-            </section>
-            <Card className="shadow-none">
-              <CardHeader>
-                <h2 className="font-semibold">{t("weekSummary")}</h2>
-              </CardHeader>
-              <CardContent className="space-y-5">
-                <div className="flex justify-between text-sm">
-                  <span className="text-muted-foreground">{t("sessionLabel")}</span>
-                  <span className="font-medium">18</span>
-                </div>
-                <div className="flex justify-between text-sm">
-                  <span className="text-muted-foreground">{t("discipline")}</span>
-                  <span className="font-medium">Tango</span>
-                </div>
-                <div className="flex justify-between text-sm">
-                  <span className="text-muted-foreground">{t("room")}</span>
-                  <span className="font-medium">{t("roomName")}</span>
-                </div>
-                <p className="border-t pt-4 text-xs leading-5 text-muted-foreground">
-                  {t("scheduleNote")}
-                </p>
-              </CardContent>
-            </Card>
-          </div>
+          <CalendarPreview />
         </>
       )}
       {section === "students" && (

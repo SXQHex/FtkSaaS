@@ -282,5 +282,62 @@
       "settings": "Dil, görünüm ve hesap tercihlerin.",
       "inbox": "Hesabına gelen güncellemeler."
     }
+  },
+  "calendar": {
+    "label": "Ders programı",
+    "loading": "Ders programı yükleniyor…",
+    "previous": "Önceki dönem",
+    "next": "Sonraki dönem",
+    "today": "Bugün",
+    "refresh": "Programı yenile",
+    "chooseDay": "Gün seç",
+    "range": "Tarih aralığı",
+    "day": "Gün",
+    "week": "Hafta",
+    "search": "Programda ara…",
+    "layout": "Takvim görünümü",
+    "list": "Liste görünümü",
+    "grid": "Zaman çizelgesi",
+    "filter": "Kayıt türü",
+    "all": "Tümü",
+    "session": "Ders",
+    "event": "Etkinlik",
+    "count": "{count} kayıt gösteriliyor",
+    "loadFailed": "Ders programı yüklenemedi",
+    "retry": "Yeniden dene",
+    "noResults": "Aramana uygun ders bulunamadı",
+    "noResultsHint": "Başka bir ad ara veya filtreleri temizle.",
+    "empty": "Bu aralıkta ders yok",
+    "emptyHint": "Diğer günleri görmek için tarihi değiştirebilirsin.",
+    "clearFilters": "Filtreleri temizle",
+    "remaining": "{count} boş yer",
+    "ends": "Bitiş: {date}",
+    "close": "Kapat",
+    "detailLoading": "Güncel seans bilgileri yükleniyor…",
+    "date": "Tarih",
+    "time": "Saat",
+    "capacity": "Kontenjan",
+    "capacityLabels": {
+      "total": "Toplam",
+      "held": "Ayrılan",
+      "remaining": "Kalan"
+    },
+    "capacityHint": "Yer sayısı son okuma anına aittir. Kesin uygunluk rezervasyon sırasında kontrol edilir.",
+    "state": {
+      "planned": "Planlandı",
+      "occurred": "Gerçekleşti",
+      "cancelled": "İptal edildi"
+    },
+    "format": {
+      "group": "Grup dersi",
+      "private": "Özel ders"
+    },
+    "attendance": "Yoklama",
+    "attendanceState": {
+      "open": "Açık",
+      "closed": "Kapatıldı"
+    },
+    "noCenter": "Ders programı için erişilebilir merkez yok",
+    "noCenterHint": "Stüdyo bilgilerini ve merkez erişimini kontrol et. Erişebildiğin bir merkez olduğunda program burada görünecek."
   }
 }

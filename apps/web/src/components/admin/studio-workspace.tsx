@@ -10,6 +10,7 @@ import { Button } from "@ftksaas/ui/components/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@ftksaas/ui/components/card";
 import { Badge } from "@ftksaas/ui/components/badge";
 import { Alert, AlertDescription } from "@ftksaas/ui/components/alert";
+import { ScheduleWorkspace } from "../calendar/schedule-workspace";
 import { Preferences } from "../preferences";
 import { AdminShell, sections, type AdminSection } from "./admin-shell";
 import {
@@ -239,19 +240,15 @@ export function StudioWorkspace() {
               </button>
             ))}
           </div>
-          <div className="grid gap-6 xl:grid-cols-[1.4fr_1fr]">
+          <div className="grid gap-6 2xl:grid-cols-[minmax(0,1fr)_300px]">
             <Card className="shadow-none">
               <CardHeader>
                 <CardTitle>
                   <h2 className="text-base">{t("dailyFlow")}</h2>
                 </CardTitle>
               </CardHeader>
-              <CardContent className="flex min-h-52 flex-col items-start justify-center">
-                <CalendarDays aria-hidden="true" className="mb-4 size-7 text-muted-foreground" />
-                <h3 className="font-medium">{t("comingTitle")}</h3>
-                <p className="mt-2 max-w-lg text-sm leading-6 text-muted-foreground">
-                  {t("comingDescription")}
-                </p>
+              <CardContent>
+                <ScheduleWorkspace studios={snapshot.studios} />
               </CardContent>
             </Card>
             <Card className="shadow-none">
@@ -314,7 +311,8 @@ export function StudioWorkspace() {
           </Card>
         </div>
       )}
-      {snapshot && !["overview", "studio", "settings"].includes(section) && (
+      {snapshot && section === "schedule" && <ScheduleWorkspace studios={snapshot.studios} />}
+      {snapshot && !["overview", "studio", "settings", "schedule"].includes(section) && (
         <Card className="shadow-none">
           <CardContent className="flex min-h-72 flex-col items-center justify-center px-5 py-12 text-center">
             <Layers3 aria-hidden="true" className="mb-5 size-8 text-muted-foreground" />
