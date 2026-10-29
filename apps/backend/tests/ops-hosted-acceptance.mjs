@@ -1,6 +1,6 @@
 // Existing registry shard: real LOGIN roles, native CALL and durable recovery.
 import test from 'node:test';import assert from 'node:assert/strict';import pg from 'pg';import {randomBytes} from 'node:crypto';
-import {connect} from '../scripts/db.mjs';import {newUuidV7 as key} from '../scripts/uuid.mjs';import {authUser,fixturePlatform,must,context} from './api-client.mjs';
+import {connect} from '../scripts/db.mjs';import {newUuidV7 as key} from '../scripts/uuid.mjs';import {authUser,fixturePlatform,must,call,context} from './api-client.mjs';
 test('OPS-W01 native scheduler identity, bounded heartbeat and committed lease recovery',async t=>{
  const db=await connect(),password=randomBytes(24).toString('hex');let worker,trigger;const clients=[];
  const login=async lane=>{const u=new URL(context().env.DB_URL);u.username='ftk_ops_'+lane;u.password=password;const c=new pg.Client({connectionString:u.href});await c.connect();clients.push(c);return c;};
@@ -59,6 +59,25 @@ test('OPS-W01 native scheduler identity, bounded heartbeat and committed lease r
    assert.deepEqual((await q('select state,attempts from core.outbox_jobs where id=$1',[id]))[0],{state:'succeeded',attempts:2});
    assert.equal((await q('select count(*)::int n from private.p06_export_files where job_id=$1',[id]))[0].n,1);
    await worker.query("call private.ops_run('p06')");assert.equal((await q('select count(*)::int n from private.p06_export_files where job_id=$1',[id]))[0].n,1);
+  });
+  await t.test('expired export payloads leave active storage while a live CSV remains byte-identical',async()=>{
+   const expired=await startReport(),live=await startReport();
+   await worker.query("call private.ops_run('p06')");await worker.query("call private.ops_run('p06')");
+   const files=await q('select job_id,octet_length(body)::int bytes from private.p06_export_files where job_id=any($1::uuid[])',[[expired,live]]);
+   assert.equal(files.length,2);for(const file of files)assert(file.bytes>0);
+   await db.query("update core.files set expires_at=clock_timestamp()-interval '1 second' where id=(select file_id from core.report_jobs where id=$1)",[expired]);
+   await worker.query("call private.ops_run('p06')");
+   assert.equal((await q('select count(*)::int n from private.p06_export_files where job_id=$1',[expired]))[0].n,0);
+   assert.equal((await q('select count(*)::int n from private.p06_export_files where job_id=$1',[live]))[0].n,1);
+   await must(owner,'report_file_get_v1',{org_id:org,center_id:center,job_id:live});
+   const {env}=context();const response=await fetch(env.API_URL+'/functions/v1/backend-v1/report_file_get_v1?download=csv',{method:'POST',headers:{apikey:env.ANON_KEY,authorization:'Bearer '+owner.jwt,'content-type':'application/json'},body:JSON.stringify({client_api_version:1,request_id:key(),org_id:org,center_id:center,job_id:live}),signal:AbortSignal.timeout(60000)});
+   assert.equal(response.status,200);assert.match(response.headers.get('content-type'),/^text\/csv/);
+   const downloaded=Buffer.from(await response.arrayBuffer()),stored=(await q('select body from private.p06_export_files where job_id=$1',[live]))[0].body;
+   assert(downloaded.length>0);assert(downloaded.equals(stored));
+   const {result}=await call(owner,'report_file_get_v1',{org_id:org,center_id:center,job_id:expired});
+   assert.equal(result.ok,false);assert.equal(result.error.code,'OPERATION_RESULT_EXPIRED');
+   await worker.query("call private.ops_run('p06')");
+   assert.equal((await q('select count(*)::int n from private.p06_export_files where job_id=$1',[expired]))[0].n,0);
   });
   await t.test('disable and tenant revocation stop new work without invented bindings',async()=>{
    const waiting=await startReport();
