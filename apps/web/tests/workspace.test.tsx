@@ -8,6 +8,7 @@ const mocks = vi.hoisted(() => ({
   account: vi.fn<typeof import("../src/lib/api").getAccount>(),
   organizations: vi.fn<typeof import("../src/lib/api").getOrganizations>(),
   settings: vi.fn<typeof import("../src/lib/api").getUserSettings>(),
+  calendar: vi.fn<typeof import("../src/lib/api").getCalendar>(),
   centers: vi.fn<typeof import("../src/lib/api").getCenters>(),
   replace: vi.fn<(href: string) => void>(),
   refresh: vi.fn<() => void>(),
@@ -25,6 +26,7 @@ vi.mock("../src/lib/api", async (original) => ({
   getOrganizations: mocks.organizations,
   getUserSettings: mocks.settings,
   getCenters: mocks.centers,
+  getCalendar: mocks.calendar,
 }));
 vi.mock("../src/lib/supabase/client", () => ({
   browserClient: () => ({
@@ -62,6 +64,7 @@ beforeEach(() => {
   vi.clearAllMocks();
   localStorage.clear();
   window.location.hash = "";
+  mocks.calendar.mockResolvedValue([]);
   mocks.account.mockResolvedValue(account);
   mocks.organizations.mockResolvedValue(organizations);
   mocks.settings.mockResolvedValue({ remember_context: false });

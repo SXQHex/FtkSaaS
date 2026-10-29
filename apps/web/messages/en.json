@@ -282,5 +282,62 @@
       "settings": "Your language, appearance and account preferences.",
       "inbox": "Updates for your account."
     }
+  },
+  "calendar": {
+    "label": "Class schedule",
+    "loading": "Loading the schedule…",
+    "previous": "Previous period",
+    "next": "Next period",
+    "today": "Today",
+    "refresh": "Refresh schedule",
+    "chooseDay": "Choose a day",
+    "range": "Date range",
+    "day": "Day",
+    "week": "Week",
+    "search": "Search the schedule…",
+    "layout": "Calendar layout",
+    "list": "List view",
+    "grid": "Time grid",
+    "filter": "Entry type",
+    "all": "All",
+    "session": "Class",
+    "event": "Event",
+    "count": "Showing {count} entries",
+    "loadFailed": "The schedule could not be loaded",
+    "retry": "Try again",
+    "noResults": "No matching classes",
+    "noResultsHint": "Search for another name or clear the filters.",
+    "empty": "No classes in this period",
+    "emptyHint": "Choose another date to see the rest of your schedule.",
+    "clearFilters": "Clear filters",
+    "remaining": "{count} places left",
+    "ends": "Ends: {date}",
+    "close": "Close",
+    "detailLoading": "Loading current session details…",
+    "date": "Date",
+    "time": "Time",
+    "capacity": "Capacity",
+    "capacityLabels": {
+      "total": "Total",
+      "held": "Held",
+      "remaining": "Remaining"
+    },
+    "capacityHint": "Availability reflects the last refresh. Eligibility is checked when a reservation is made.",
+    "state": {
+      "planned": "Planned",
+      "occurred": "Occurred",
+      "cancelled": "Cancelled"
+    },
+    "format": {
+      "group": "Group class",
+      "private": "Private class"
+    },
+    "attendance": "Attendance",
+    "attendanceState": {
+      "open": "Open",
+      "closed": "Closed"
+    },
+    "noCenter": "No accessible center for the schedule",
+    "noCenterHint": "Check your studio details and center access. The schedule will appear here when a center is available."
   }
 }

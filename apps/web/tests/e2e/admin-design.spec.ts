@@ -25,7 +25,7 @@ test("design preview supports navigation, browser history and class details with
   const sunday = page.getByRole("button", { name: "Paz 1", exact: true });
   await expect(sunday).toHaveAccessibleDescription("1 Kasım Pazar");
   await sunday.click();
-  await expect(page.getByRole("heading", { name: "Bugün ders yok" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Bu aralıkta ders yok" })).toBeVisible();
   await page.goBack();
   await expect(page.getByRole("heading", { name: "Stüdyoda bugün" })).toBeVisible();
   expect(writes).toEqual([]);
@@ -51,6 +51,32 @@ test("student cards filter, open and add only an in-memory sample", async ({ pag
   await expect(page.getByRole("heading", { name: "Öğrenci bulunamadı" })).toBeVisible();
   await page.getByRole("button", { name: "Filtreleri temizle" }).click();
   await expect(page.getByText("6 örnek öğrenci gösteriliyor")).toBeVisible();
+});
+
+test("schedule supports week search, empty filters and accessible session capacity", async ({
+  page,
+}) => {
+  await page.goto("/tasarim#schedule");
+  await page.getByRole("button", { name: "Hafta", exact: true }).click();
+  await expect(page.getByText("18 kayıt gösteriliyor", { exact: true })).toBeVisible();
+  await page.getByRole("textbox", { name: "Programda ara…" }).fill("başlangıç");
+  await expect(page.getByText("6 kayıt gösteriliyor", { exact: true })).toBeVisible();
+  await page
+    .getByRole("button", { name: /Tango başlangıç/ })
+    .first()
+    .click();
+  await expect(page.getByRole("dialog")).toContainText("Kontenjan");
+  await expect(page.getByRole("dialog")).toContainText("Kalan");
+  expect((await new AxeBuilder({ page }).analyze()).violations).toEqual([]);
+  await page.getByRole("dialog").getByRole("button", { name: "Kapat", exact: true }).click();
+  await page.getByRole("textbox", { name: "Programda ara…" }).fill("xxxxx");
+  await expect(page.getByRole("heading", { name: "Aramana uygun ders bulunamadı" })).toBeVisible();
+  await page.getByRole("button", { name: "Filtreleri temizle" }).click();
+  await expect(page.getByText("18 kayıt gösteriliyor", { exact: true })).toBeVisible();
+  await page.getByRole("button", { name: "Sonraki dönem" }).click();
+  await expect(page.getByRole("heading", { name: "Bu aralıkta ders yok" })).toBeVisible();
+  await page.getByRole("button", { name: "Bugün", exact: true }).click();
+  await expect(page.getByText("18 kayıt gösteriliyor", { exact: true })).toBeVisible();
 });
 
 test("page search works by keyboard and the selected page survives a reload", async ({ page }) => {
@@ -84,6 +110,7 @@ test("mobile menu, light and dark views are accessible and do not overflow", asy
   await expect(page.locator("html")).toHaveClass(/dark/);
   for (const route of [
     "overview",
+    "schedule",
     "students",
     "packages",
     "finance",
@@ -122,7 +149,7 @@ test("desktop shell collapses and English pages support enlarged text", async ({
   await page.getByRole("option", { name: "English", exact: true }).click();
   await expect(page.getByRole("heading", { name: "Settings", exact: true })).toBeVisible();
   await page.setViewportSize({ width: 320, height: 900 });
-  for (const route of ["overview", "students", "packages", "settings"]) {
+  for (const route of ["overview", "schedule", "students", "packages", "settings"]) {
     await page.goto(`/tasarim#${route}`);
     await page.evaluate(() => {
       document.documentElement.style.fontSize = "200%";

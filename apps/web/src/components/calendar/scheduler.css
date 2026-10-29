@@ -1,0 +1,33 @@
+@import "@syncfusion/ej2-tailwind3-theme/styles/schedule/index.css";
+
+.session-scheduler .e-schedule,
+.session-scheduler .e-schedule .e-date-header-wrap,
+.session-scheduler .e-schedule .e-time-cells-wrap table td,
+.session-scheduler .e-schedule .e-header-cells,
+.session-scheduler .e-schedule .e-work-cells,
+.session-scheduler .e-schedule .e-all-day-cells,
+.session-scheduler .e-schedule .e-resource-cells,
+.session-scheduler .e-schedule .e-content-wrap {
+  background: var(--card);
+  color: var(--foreground);
+  border-color: var(--border);
+  font-family: inherit;
+}
+.session-scheduler .e-schedule .e-work-hours {
+  background: var(--muted);
+}
+.session-scheduler .e-schedule .e-appointment {
+  background: var(--primary);
+  color: var(--primary-foreground);
+  border-radius: var(--radius);
+}
+.session-scheduler .e-schedule .e-appointment .e-subject {
+  color: inherit;
+}
+.session-scheduler .e-schedule .e-current-day {
+  color: var(--foreground);
+  font-weight: 700;
+}
+.session-scheduler .e-schedule .e-date-header-wrap table td {
+  border-color: var(--border);
+}
