@@ -6,7 +6,7 @@ Kapsam yalnız FtkSaaS'tır. Web uygulaması apps/web, ortak arayüz packages/ui
 
 Önce shadcn/ui ve ondan türetilmiş hazır bloklar değerlendirilir. Özel bileşen yalnız hazır seçenek ihtiyacı karşılamadığında yazılır. packages/ui/registry-sources.json resmî registry adreslerini, alınan kaynakların SHA256 değerlerini ve login-01 uyarlamasını kaydeder; aynı paketin LICENSE dosyası MIT bildirimini korur. Kullanılan bileşenler React 19 ve Tailwind 4 ile çalışır.
 
-Bu teslim teknik altyapıdır; mevcut taslak tasarım kabul edilmemiştir. Ürün CRM olarak ele alınmaz. Resmî login-01 bloğunun merkezlenmiş yerleşimi yalnız Auth bağlantısını doğrulamak için kullanılır; dashboard, ürün menüsü ve iş ekranları ayrı tasarım çalışmasına bırakılır. Genel tablo/form framework’ü veya hazır bileşenleri yeniden saran bir katman kurulmaz.
+Auth altyapısı ile yönetici kabuğu tasarımı ayrı teslimlerdir. Resmî login-01 bloğu Auth bağlantısında kullanılır. Kullanıcının 29 Ekim talimatıyla yeni yönetici kabuğu `/tasarim` altında değerlendirilir; aşağıdaki önizleme sınırları geçerlidir. Genel tablo/form framework’ü kurulmaz.
 
 Üç starter için değerlendirme ve tam kaynak commit’leri [starter kaynak kaydındadır](starter-sources.json). Bu aşamada starter dosyası kopyalanmadı: mevcut araçlar korunur, Clerk/Better Auth/veritabanı ve Base UI katmanları taşınmaz. shadcn uyarlamasının dosya/commit/hash izi registry kaydında, MIT bildirimi packages/ui/LICENSE içindedir.
 
@@ -78,3 +78,15 @@ packages/ui web/DOM bileşenleridir; Expo’da doğrudan kullanılabilir kabul e
 Oxfmt100 sütun/2 boşluk kullanır; import, package anahtarı ve Tailwind sınıfı sıralaması kapalıdır. Geçişte TSX/CSS farkları yalnız biçimdir; markup, CSS değerleri, sınıf sırası ve etkileşimler korunur. Üretilmiş next-env, .next/coverage, yerel env ve Markdown dosyaları format kapsamı dışındadır.
 
 Oxlint’te `vitest/valid-expect.maxArgs=2`, Vitest’in desteklediği tanılama mesajı argümanını korur. İki yerel istisna açıkça sınırlandırılmıştır: Preferences/Workspace için React Compiler `set-state-in-effect` kuralı, next-themes SSR mount ve asenkron bağlam yükleme davranışını bu araç geçişinde yeniden yazmamak için kapalıdır. AuthForm/Workspace için `jsx-a11y/prefer-tag-over-role`, geçerli ARIA status bölgelerini form sonucuna özgü output etiketine dönüştürmemek için kapalıdır. Diğer erişilebilirlik/React kuralları ve Playwright/axe kabulü korunur; test assertion’ları değiştirilmez.
+
+## Yönetici kabuğu tasarımı
+
+`pnpm dev:web` sonrasında `/tasarim` adresini aç. Giriş gerektirmeyen bu route yalnız sentetik tasarım verisi içerir; mevcut korumalı `/` route'u ve native Auth akışı ayrı kalır. Önizleme, Auth bypass veya gerçek API hata fallback'i değildir. Üretim kullanıcı/veri/tenant erişimi vermez; arama motoru indekslemesi kapalıdır.
+
+Tasarım yönü: kullanıcının verdiği nötr shadcn OKLCH tokenları, 0.625rem radius, sistem fontu; marka çalışması yapılmadı. Sidebar-07 yerleşimi mevcut shadcn bileşenleriyle uyarlandı. Kuruluş/merkez seçici kullanılmaz. Günün dersleri ve sıradaki ders ana odağı oluşturur; öğrenci/paket/ödeme görünümleri kart, detaylar Sheet kullanır. Kaynak ve MIT izi packages/ui/registry-sources.json ile LICENSE içindedir.
+
+- `AdminShell`: kontrollü bölüm seçimi, daraltılabilir masaüstü menüsü, mobil Sheet, sayfa araması (Ctrl/⌘+K), hesap/görünüm ve yardım panelleri. Auth, plan veya domain yetkisi uygulamaz.
+- `AdminPreview`: URL hash ve geri/ileri gezinme; ders günü seçimi, öğrenci arama/filtre, detay panelleri ve örnek kart ekleme. Geçici eklenen kartlar yenilemede sıfırlanır. Bildirim okundu durumu yalnız önizleme belleğindedir; CSV açıkça örnek olarak indirilir.
+- `preview-data`: yalnız `/tasarim` tarafından kullanılan kurgusal kişiler, dersler ve paketler. Fiyatlar/öğrenci sayıları ürün kararı veya canlı veri değildir.
+
+TR/EN ve açık/koyu/sistem teması mevcut tercih altyapısını kullanır. Ürün ayarları/backend bağlantısı veya Syncfusion takvim entegrasyonu bu tasarım tesliminden türetilmez. `admin-design.spec.ts` gezinme/detay, örnek kayıt izolasyonu, klavye araması, mobil menü, axe, TR/EN ve büyütülmüş metin akışlarını gerçek tarayıcıda doğrular. Testlerin yazılmış olması çalışıp geçtiği anlamına gelmez; gerçek CI sonucu ayrıca değerlendirilir.

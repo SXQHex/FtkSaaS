@@ -67,6 +67,12 @@
           "sha256": "a62a24aef1e3be9cb204c7b3bd563cc2f8cdd5d7c4ff07693af2128a4773a91a"
         }
       ]
+    },
+    {
+      "name": "sidebar-07",
+      "url": "https://ui.shadcn.com/r/styles/new-york-v4/sidebar-07.json",
+      "sha256": "54789cc67edf51a0da25a80c4d68910373edb4354142fdc6dcb2c059aed5f11c",
+      "adaptation": "Grouped collapsible navigation and mobile Sheet composition in apps/web/src/components/admin/admin-shell.tsx. Uses existing shadcn Button/Input/Sheet/Card primitives. Team switcher omitted by user request; no organization selector or domain access rules in the shell."
     }
   ]
 }
