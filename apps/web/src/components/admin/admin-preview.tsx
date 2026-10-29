@@ -717,8 +717,9 @@ export function AdminPreview() {
                       "mt-2 size-2 shrink-0 rounded-full",
                       read ? "bg-border" : "bg-foreground",
                     )}
-                    aria-label={t(read ? "read" : "unread")}
+                    aria-hidden="true"
                   />
+                  <span className="sr-only">{t(read ? "read" : "unread")}</span>
                   <div className="flex-1">
                     <h2 className="text-sm font-medium">{t(key)}</h2>
                     <p className="mt-2 text-sm leading-6 text-muted-foreground">
