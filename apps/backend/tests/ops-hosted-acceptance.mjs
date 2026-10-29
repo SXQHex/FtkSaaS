@@ -49,14 +49,17 @@ test('OPS-W01 native scheduler identity, bounded heartbeat and committed lease r
    const id=await startReport();trigger='ops_retry_'+key().replaceAll('-','');
    await db.query(`create function private.${trigger}() returns trigger language plpgsql as $$begin if new.org_id='${org}'::uuid and new.action='report_build_v1' then raise exception using errcode='23514',message='synthetic retry fault';end if;return new;end$$`);
    await db.query(`create trigger ${trigger} before insert on core.audit_events for each row execute function private.${trigger}()`);
-   await worker.query("call private.ops_run('p06')");
-   assert.deepEqual((await q('select state,attempts from core.outbox_jobs where id=$1',[id]))[0],{state:'retry_wait',attempts:1});
-   assert.equal((await q('select count(*)::int n from private.p06_export_files where job_id=$1',[id]))[0].n,0);
-   const health=(await q("select last_status,last_error_code from private.ops_worker_health where lane='p06'"))[0];assert.equal(health.last_status,'job_error');assert.equal(health.last_error_code,'INTEGRITY_VIOLATION');
-   await db.query(`drop trigger ${trigger} on core.audit_events`);await db.query(`drop function private.${trigger}()`);trigger=null;
+   try{
+    await worker.query("call private.ops_run('p06')");
+    assert.deepEqual((await q('select state,attempts::int as attempts from core.outbox_jobs where id=$1',[id]))[0],{state:'retry_wait',attempts:1});
+    assert.equal((await q('select count(*)::int n from private.p06_export_files where job_id=$1',[id]))[0].n,0);
+    const health=(await q("select last_status,last_error_code from private.ops_worker_health where lane='p06'"))[0];assert.equal(health.last_status,'job_error');assert.equal(health.last_error_code,'INTEGRITY_VIOLATION');
+   }finally{
+    await db.query(`drop trigger if exists ${trigger} on core.audit_events`);await db.query(`drop function if exists private.${trigger}()`);trigger=null;
+   }
    await worker.end();worker=null;await db.query("update core.outbox_jobs set next_attempt_at=clock_timestamp()-interval '1 second' where id=$1",[id]);worker=await login('p06');
    await worker.query("call private.ops_run('p06')");
-   assert.deepEqual((await q('select state,attempts from core.outbox_jobs where id=$1',[id]))[0],{state:'succeeded',attempts:2});
+   assert.deepEqual((await q('select state,attempts::int as attempts from core.outbox_jobs where id=$1',[id]))[0],{state:'succeeded',attempts:2});
    assert.equal((await q('select count(*)::int n from private.p06_export_files where job_id=$1',[id]))[0].n,1);
    await worker.query("call private.ops_run('p06')");assert.equal((await q('select count(*)::int n from private.p06_export_files where job_id=$1',[id]))[0].n,1);
   });
