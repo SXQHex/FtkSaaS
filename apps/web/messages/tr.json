@@ -338,6 +338,11 @@
       "closed": "Kapatıldı"
     },
     "noCenter": "Ders programı için erişilebilir merkez yok",
-    "noCenterHint": "Stüdyo bilgilerini ve merkez erişimini kontrol et. Erişebildiğin bir merkez olduğunda program burada görünecek."
+    "noCenterHint": "Stüdyo bilgilerini ve merkez erişimini kontrol et. Erişebildiğin bir merkez olduğunda program burada görünecek.",
+    "detailTitle": "Seans detayı",
+    "openPage": "Seans sayfasını aç",
+    "backToSchedule": "Programa dön",
+    "refreshDetail": "Bilgileri yenile",
+    "deviceTimezone": "Saatler cihazının saat diliminde gösteriliyor: {timezone}"
   }
 }

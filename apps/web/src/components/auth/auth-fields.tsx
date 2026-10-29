@@ -10,7 +10,8 @@ import { Input } from "@ftksaas/ui/components/input";
 import { Label } from "@ftksaas/ui/components/label";
 import { Alert, AlertDescription } from "@ftksaas/ui/components/alert";
 import { browserClient } from "../../lib/supabase/client";
-import { appOrigin } from "../../lib/config";
+import { appOrigin, safeReturnPath } from "../../lib/config";
+import { rememberAuthReturn } from "../../lib/auth-return";
 
 type Mode = "login" | "signup" | "recovery" | "update" | "mfa";
 function authMessage(error: unknown) {
@@ -30,10 +31,12 @@ export function AuthFields({
   mode = "login",
   configured = true,
   initialError,
+  returnTo = "/",
 }: {
   mode?: Mode;
   configured?: boolean;
   initialError?: boolean;
+  returnTo?: string;
 }) {
   const router = useRouter();
   const t = useTranslations("auth");
@@ -46,8 +49,10 @@ export function AuthFields({
   const social = mode === "login" || mode === "signup";
   const newPassword = mode === "signup" || mode === "update";
   const confirmed = mode === "signup" && notice === "signupNotice";
+  const destination = safeReturnPath(returnTo);
+  const returnQuery = destination === "/" ? "" : `?next=${encodeURIComponent(destination)}`;
   function enter() {
-    router.replace("/");
+    router.replace(destination);
     router.refresh();
   }
   async function submit(event: FormEvent<HTMLFormElement>) {
@@ -75,6 +80,7 @@ export function AuthFields({
           setError("nameRequired");
           return;
         }
+        await rememberAuthReturn(destination);
         const result = await client.auth.signUp({
           email,
           password,
@@ -124,6 +130,7 @@ export function AuthFields({
     setBusy(true);
     setError("");
     try {
+      await rememberAuthReturn(destination);
       const result = await browserClient().auth.signInWithOAuth({
         provider: "google",
         options: { redirectTo: `${appOrigin()}/auth/callback` },
@@ -310,7 +317,7 @@ export function AuthFields({
         <p className="text-center text-sm leading-6 text-muted-foreground">
           {t(mode === "login" ? "noAccount" : "haveAccount")}{" "}
           <Link
-            href={mode === "login" ? "/kayit" : "/giris"}
+            href={`${mode === "login" ? "/kayit" : "/giris"}${returnQuery}`}
             className="font-medium text-foreground underline underline-offset-4"
           >
             {t(mode === "login" ? "signupLink" : "loginSubmit")}

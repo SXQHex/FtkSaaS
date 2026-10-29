@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Link from "next/link";
 import { useLocale, useTranslations } from "next-intl";
 import type { SessionView } from "@ftksaas/api-contracts";
 import { CalendarDays, Clock3, Users, X } from "lucide-react";
@@ -16,6 +17,7 @@ import {
 } from "@ftksaas/ui/components/sheet";
 import { errorMessageKey, getSession } from "../../lib/api";
 import type { CalendarEntry } from "../../lib/schedule";
+import { sessionPath } from "../../lib/session-route";
 
 export function SessionDetail({
   entry,
@@ -115,7 +117,18 @@ function LiveSessionDetail({
         </Button>
       </div>
     );
-  const session = result.session;
+  return (
+    <>
+      <SessionSummary session={result.session} timeZone={timeZone} />
+      <Button asChild variant="outline" className="h-auto min-h-11 whitespace-normal">
+        <Link href={sessionPath(scope.orgId, entry.id)}>{t("openPage")}</Link>
+      </Button>
+    </>
+  );
+}
+
+export function SessionSummary({ session, timeZone }: { session: SessionView; timeZone: string }) {
+  const t = useTranslations("calendar");
   return (
     <>
       <div className="flex flex-wrap gap-2">
@@ -124,7 +137,9 @@ function LiveSessionDetail({
       </div>
       <SessionFacts
         entry={{
-          ...entry,
+          id: session.id,
+          kind: "session",
+          title: t("detailTitle"),
           startsAt: session.starts_at,
           endsAt: session.ends_at,
           capacity: session.capacity,
@@ -182,7 +197,7 @@ function SessionFacts({ entry, timeZone }: { entry: CalendarEntry; timeZone: str
             <Users className="size-4" aria-hidden="true" />
             {t("capacity")}
           </h3>
-          <dl className="grid grid-cols-3 gap-2 rounded-xl border p-4">
+          <dl className="grid grid-cols-1 gap-4 rounded-xl border p-4 min-[400px]:grid-cols-3">
             {(["total", "held", "remaining"] as const).map((key) => (
               <div key={key}>
                 <dt className="text-xs text-muted-foreground">{t(`capacityLabels.${key}`)}</dt>

@@ -87,12 +87,12 @@ export async function getCalendar(
   } while (cursor);
   return [...new Map(items.map((item) => [`${item.type}:${item.id}`, item])).values()];
 }
-export async function getSession(orgId: string, centerId: string, sessionId: string) {
+export async function getSession(orgId: string, centerId: string | undefined, sessionId: string) {
   return unwrap<Operations["session_get_v1"]["response"]>(
     await apiClient().call("session_get_v1", {
       ...request(),
       org_id: orgId,
-      center_id: centerId,
+      ...(centerId ? { center_id: centerId } : {}),
       session_id: sessionId,
     }),
   );

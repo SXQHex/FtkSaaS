@@ -338,6 +338,11 @@
       "closed": "Closed"
     },
     "noCenter": "No accessible center for the schedule",
-    "noCenterHint": "Check your studio details and center access. The schedule will appear here when a center is available."
+    "noCenterHint": "Check your studio details and center access. The schedule will appear here when a center is available.",
+    "detailTitle": "Session details",
+    "openPage": "Open session page",
+    "backToSchedule": "Back to schedule",
+    "refreshDetail": "Refresh details",
+    "deviceTimezone": "Times are shown in your device time zone: {timezone}"
   }
 }

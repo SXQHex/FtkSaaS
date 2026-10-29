@@ -17,7 +17,9 @@ export function appOrigin() {
 }
 export function safeReturnPath(value: string | null | undefined) {
   if (
-    !value?.startsWith("/") ||
+    typeof value !== "string" ||
+    value.length > 2048 ||
+    !value.startsWith("/") ||
     value.startsWith("//") ||
     Array.from(value).some((char) => char === "\\" || char.charCodeAt(0) <= 32)
   )

@@ -1,7 +1,7 @@
 import { expect, test, vi, beforeEach } from "vitest";
 import { http, HttpResponse } from "msw";
 import { server } from "./mocks/server";
-import { ApiFailure, getCalendar, getOrganizations } from "../src/lib/api";
+import { ApiFailure, getCalendar, getOrganizations, getSession } from "../src/lib/api";
 import type { FailureEnvelope, Operations } from "@ftksaas/api-contracts";
 vi.mock("../src/lib/supabase/client", () => ({
   browserClient: () => ({
@@ -16,6 +16,28 @@ vi.mock("../src/lib/supabase/client", () => ({
 beforeEach(() => {
   vi.stubEnv("NEXT_PUBLIC_SUPABASE_URL", "https://project.example.invalid");
   vi.stubEnv("NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY", "synthetic-publishable");
+});
+
+test("direct session lookup preserves org and session and lets the backend resolve center scope", async () => {
+  server.use(
+    http.post(
+      "https://project.example.invalid/functions/v1/backend-v1/session_get_v1",
+      async ({ request }) => {
+        const body = (await request.json()) as Operations["session_get_v1"]["request"];
+        expect(body.org_id).toBe("org-a");
+        expect(body.session_id).toBe("session-a");
+        expect(body).not.toHaveProperty("center_id");
+        return HttpResponse.json(
+          {
+            ok: false,
+            error: { code: "FORBIDDEN", retryable: false, trace_id: body.request_id },
+          } satisfies FailureEnvelope,
+          { status: 403 },
+        );
+      },
+    ),
+  );
+  await expect(getSession("org-a", undefined, "session-a")).rejects.toBeInstanceOf(ApiFailure);
 });
 test("shared transport follows typed cursor pages with native authorization and UUIDv7 request IDs", async () => {
   let calls = 0;
