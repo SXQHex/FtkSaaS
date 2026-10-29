@@ -307,3 +307,12 @@ Head `f88ce29d60ac2e173307dec26c047264f1c651aa`, base `68e5696edc21a0a1ea613e17e
 Dar düzeltme gün adını görünen iki span üzerinden aria-labelledby ile kurar; tam tarih açıklaması düğme dışında benzersiz useId kimliğiyle tutulur. Kontenjan rozeti ve ok dar alanda satır atlayabilir; font küçültülmez ve taşma saklanmaz. İki dilde gerçek takvim bileşeninin ad/açıklama ayrımı regresyonu eklendi. Aynı sayfa genişliği assertion'ı ve bütün axe kuralları korunur; genişlik hatasına yalnız route/taşan öğe tanısı eklendi.
 
 İlk düzeltme kaynağı yerel frontend lint/format/typecheck/build,33 web ve1 UI testiyle geçti. Yerel Playwright tarayıcısı indirilerek iki başarısız senaryo denenmek istendi; container socket izni Chromium'u sayfa açılmadan durdurdu. Bu yerel E2E başarı değildir; sandbox/CI politikası değiştirilmedi. Yeni kaynak aynı uzak dört tarayıcı kabulü bekler; PR87 Draft ve merge edilmemiştir.
+
+
+### PR87 kalan dar ekran taşması — 29 Ekim 2026
+
+Head `062235afdea3b3a5a62cb2dbf8964f624f61d9ea`, tested merge `f9672aeeba3f005d89355cc10f0e597d9b6ef660` için [frontend40944393504](https://github.com/SXQHex/FtkSaaS/actions/runs/40944393504) failure; checks ve [frontend uyumluluk40944393439](https://github.com/SXQHex/FtkSaaS/actions/runs/40944393439) success. Dört tarayıcı12/13: erişilebilir gün adları ve mobil axe geçti; kalan tek ortak hata320px/%200 İngilizce takvimde scrollWidth396. Önceki kontenjan satırı düzeltmesi bu taşmayı çözmemişti.
+
+Kalan neden arama kapsayıcısının flex-1 ile aşırı daralırken input iç boşluğunun geniş kalmasıdır. Mobilde kapsayıcı w-full ile ayrı satır alır; sm ve üstünde önceki esnek yerleşim korunur. Genişlik assertion'ı/axe kuralları/font ölçeği veya CI değiştirilmedi. Son kaynak yerel lint/format/typecheck/production build,33 web+1 UI testini geçti. Standart Chromium container socket sınırında açılmadı; aynı yetkilerle resmi Chromium Headless Shell141 kullanılarak mevcut başarısız iki Playwright senaryosu2/2 geçti (mobil axe/taşma ve320px/%200 İngilizce). Bu geçici yerel executable seçimi .artifacts içindedir; repo/CI tarayıcı sürümü değişmez. Yeni dört tarayıcı CI kabulü ayrıca gerekir.
+
+Kullanıcı mevcut backend CI'ını iptal edeceğini bildirdi. İptal başarı kabulü sayılmaz; backend workflow/merge politikası değiştirilmedi ve manuel backend koşusu başlatılmadı. PR87 henüz merge edilmedi.

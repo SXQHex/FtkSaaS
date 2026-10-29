@@ -194,7 +194,7 @@ export function SessionCalendar({
             </Button>
           ))}
         </fieldset>
-        <div className="relative min-w-0 flex-1 sm:max-w-72">
+        <div className="relative w-full min-w-0 sm:w-auto sm:flex-1 sm:max-w-72">
           <Search
             className="pointer-events-none absolute left-3 top-3 size-4 text-muted-foreground"
             aria-hidden="true"
