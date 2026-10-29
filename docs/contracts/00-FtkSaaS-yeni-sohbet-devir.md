@@ -259,3 +259,8 @@ PR83 test kaynağı dar aktif export payload cleanup, canlı CSV'nin HTTP üzeri
 ### PR83 ilk yeni kaynak CI hatası ve dar düzeltme — 29 Ekim 2026
 
 Aday40859842984 attempt1 head a8bc4d228aaa87f4289935946b99c00d3e22e94f için core/API2/API3/API4 başarılı, API1 başarısız. Retry testinde bigint attempts sürücüden string döndüğü için numeric deepEqual yanıldı; assertion öncesi kurulu fault trigger kaldırılmadan alt test sonlandı ve sonraki expiry/restart testlerini de bozdu. İki sorguda yalnız test projection'ı attempts::int olarak düzeltildi; fault trigger temizliği alt test try/finally sınırına alındı. Beklenen retry_wait/attempt1, zero file, health error ve retry sonrası succeeded/attempt2/tek dosya assertionları korunur. Runtime/migration/API/CI/shard/timeout değişmez. İlk başarısız koşu başarı sayılmaz; yeni kaynak bağımsız inceleme ve full clean bekler. Genel privacy/retention/backup non-resurrection ve REL-01 açık işleri bu dar düzeltmeyle kapanmaz.
+
+
+### PR83 export fixture sözleşme düzeltmesi — 29 Ekim 2026
+
+Aday40867303163 attempt1 head323dbb57e4cb7a7f3903e09e66b77622fd405307 için core/API2/API3/API4 geçti; API1 yalnız yeni export expiry testinde report_file_get_v1 VALIDATION_FAILED ile kaldı. Retry sayısı ve fault-cleanup düzeltmeleri bu koşuda geçti. Yeni testin metadata, HTTP CSV ve expired-result çağrıları sözleşmedeki required operation_key alanını atlamıştı; üç çağrı da ayrı gerçek UUIDv7 operation_key ile düzeltildi. Byte equality, expired-result reddi ve payload yokluğu assertionları korunur; runtime/API sözleşmesi/migration/CI/timeout değiştirilmedi. Eski başarısız koşular başarı sayılmaz; yeni kaynak kabulü ve genel privacy/REL işleri açık kalır.

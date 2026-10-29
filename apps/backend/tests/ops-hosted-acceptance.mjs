@@ -72,12 +72,12 @@ test('OPS-W01 native scheduler identity, bounded heartbeat and committed lease r
    await worker.query("call private.ops_run('p06')");
    assert.equal((await q('select count(*)::int n from private.p06_export_files where job_id=$1',[expired]))[0].n,0);
    assert.equal((await q('select count(*)::int n from private.p06_export_files where job_id=$1',[live]))[0].n,1);
-   await must(owner,'report_file_get_v1',{org_id:org,center_id:center,job_id:live});
-   const {env}=context();const response=await fetch(env.API_URL+'/functions/v1/backend-v1/report_file_get_v1?download=csv',{method:'POST',headers:{apikey:env.ANON_KEY,authorization:'Bearer '+owner.jwt,'content-type':'application/json'},body:JSON.stringify({client_api_version:1,request_id:key(),org_id:org,center_id:center,job_id:live}),signal:AbortSignal.timeout(60000)});
+   await must(owner,'report_file_get_v1',{org_id:org,center_id:center,job_id:live},key());
+   const {env}=context();const response=await fetch(env.API_URL+'/functions/v1/backend-v1/report_file_get_v1?download=csv',{method:'POST',headers:{apikey:env.ANON_KEY,authorization:'Bearer '+owner.jwt,'content-type':'application/json'},body:JSON.stringify({client_api_version:1,request_id:key(),operation_key:key(),org_id:org,center_id:center,job_id:live}),signal:AbortSignal.timeout(60000)});
    assert.equal(response.status,200);assert.match(response.headers.get('content-type'),/^text\/csv/);
    const downloaded=Buffer.from(await response.arrayBuffer()),stored=(await q('select body from private.p06_export_files where job_id=$1',[live]))[0].body;
    assert(downloaded.length>0);assert(downloaded.equals(stored));
-   const {result}=await call(owner,'report_file_get_v1',{org_id:org,center_id:center,job_id:expired});
+   const {result}=await call(owner,'report_file_get_v1',{org_id:org,center_id:center,job_id:expired},key());
    assert.equal(result.ok,false);assert.equal(result.error.code,'OPERATION_RESULT_EXPIRED');
    await worker.query("call private.ops_run('p06')");
    assert.equal((await q('select count(*)::int n from private.p06_export_files where job_id=$1',[expired]))[0].n,0);
