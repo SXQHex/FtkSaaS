@@ -87,13 +87,43 @@ export async function getCalendar(
   } while (cursor);
   return [...new Map(items.map((item) => [`${item.type}:${item.id}`, item])).values()];
 }
-export async function getSession(orgId: string, centerId: string, sessionId: string) {
+export async function getSession(orgId: string, centerId: string | undefined, sessionId: string) {
   return unwrap<Operations["session_get_v1"]["response"]>(
     await apiClient().call("session_get_v1", {
       ...request(),
       org_id: orgId,
-      center_id: centerId,
+      ...(centerId ? { center_id: centerId } : {}),
       session_id: sessionId,
+    }),
+  );
+}
+export async function previewSessionChange(
+  input: Omit<
+    Operations["session_change_preview_v1"]["request"],
+    "client_api_version" | "request_id"
+  >,
+) {
+  return unwrap<Operations["session_change_preview_v1"]["response"]>(
+    await apiClient().call("session_change_preview_v1", { ...request(), ...input }),
+  );
+}
+export async function applySessionChange(
+  input: Omit<
+    Operations["session_change_apply_v1"]["request"],
+    "client_api_version" | "request_id"
+  >,
+) {
+  return unwrap<Operations["session_change_apply_v1"]["response"]>(
+    await apiClient().call("session_change_apply_v1", { ...request(), ...input }),
+  );
+}
+export async function getSessionChangeStatus(orgId: string, key: string) {
+  return unwrap<Operations["operation_status_get_v1"]["response"]>(
+    await apiClient().call("operation_status_get_v1", {
+      ...request(),
+      org_id: orgId,
+      operation: "session_change_apply_v1",
+      key,
     }),
   );
 }

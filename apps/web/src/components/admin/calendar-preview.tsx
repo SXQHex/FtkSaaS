@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useTranslations } from "next-intl";
+import Link from "next/link";
 import { SessionCalendar } from "../calendar/session-calendar";
 import { SessionDetail } from "../calendar/session-detail";
 import { previewSessions } from "./preview-data";
@@ -16,6 +17,7 @@ import {
 // The public design route shares presentation only. No Auth/API fallback lives here.
 export function CalendarPreview() {
   const t = useTranslations("admin");
+  const change = useTranslations("sessionChange");
   const [date, setDate] = useState("2026-10-29");
   const [range, setRange] = useState<CalendarRange>("day");
   const [selected, setSelected] = useState<CalendarEntry | null>(null);
@@ -40,6 +42,12 @@ export function CalendarPreview() {
   );
   return (
     <>
+      <Link
+        href="/tasarim/seans"
+        className="mb-4 inline-block text-sm underline underline-offset-4"
+      >
+        {change("demoTitle")}
+      </Link>
       <SessionCalendar
         date={date}
         range={range}

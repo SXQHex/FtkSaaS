@@ -15,7 +15,10 @@ const mocks = vi.hoisted(() => ({
   verify: vi.fn<(values: { factorId: string; code: string }) => AuthResult>(),
   replace: vi.fn<(href: string) => void>(),
   refresh: vi.fn<() => void>(),
+  remember: vi.fn<() => Promise<void>>(),
+  oauth: vi.fn<() => AuthResult>(),
 }));
+vi.mock("../src/lib/auth-return", () => ({ rememberAuthReturn: mocks.remember }));
 vi.mock("next/navigation", () => ({
   useRouter: () => ({ replace: mocks.replace, refresh: mocks.refresh }),
 }));
@@ -26,6 +29,7 @@ vi.mock("../src/lib/supabase/client", () => ({
       resetPasswordForEmail: mocks.recover,
       signUp: mocks.signup,
       updateUser: mocks.update,
+      signInWithOAuth: mocks.oauth,
       mfa: { listFactors: mocks.factors, challengeAndVerify: mocks.verify },
     },
   }),
@@ -109,6 +113,43 @@ test("successful native login refreshes server-rendered session", async () => {
   await user.click(screen.getByRole("button", { name: "Giriş yap" }));
   expect(mocks.replace).toHaveBeenCalledWith("/");
   expect(mocks.refresh).toHaveBeenCalled();
+});
+test("login returns to a safe session link and rejects external destinations", async () => {
+  mocks.signIn.mockResolvedValue({ error: null });
+  const user = userEvent.setup();
+  for (const destination of ["/organizasyon/org/seans/session", "//attacker.invalid"]) {
+    const view = render(<AuthFields returnTo={destination} />);
+    await user.type(screen.getByLabelText("E-posta adresi"), "test@example.invalid");
+    await user.type(screen.getByLabelText("Parola"), "synthetic-password");
+    await user.click(screen.getByRole("button", { name: "Giriş yap" }));
+    expect(mocks.replace).toHaveBeenLastCalledWith(
+      destination.startsWith("//") ? "/" : destination,
+    );
+    view.unmount();
+  }
+});
+test("Google preserves the local destination without changing the provider callback URL", async () => {
+  mocks.oauth.mockResolvedValue({ error: null });
+  const user = userEvent.setup();
+  render(<AuthFields returnTo="/organizasyon/org/seans/session" />);
+  await user.click(screen.getByRole("button", { name: "Google ile devam et" }));
+  expect(mocks.remember).toHaveBeenCalledWith("/organizasyon/org/seans/session");
+  expect(mocks.oauth).toHaveBeenCalledWith({
+    provider: "google",
+    options: { redirectTo: "http://127.0.0.1:3000/auth/callback" },
+  });
+});
+test("successful TOTP verification keeps the session destination", async () => {
+  mocks.factors.mockResolvedValue({
+    error: null,
+    data: { totp: [{ id: "factor", status: "verified" }] },
+  });
+  mocks.verify.mockResolvedValue({ error: null });
+  const user = userEvent.setup();
+  render(<AuthFields mode="mfa" returnTo="/organizasyon/org/seans/session" />);
+  await user.type(screen.getByLabelText("Doğrulama kodu"), "123456");
+  await user.click(screen.getByRole("button", { name: "Doğrula" }));
+  expect(mocks.replace).toHaveBeenCalledWith("/organizasyon/org/seans/session");
 });
 test("recovery request uses native callback and an enumeration-safe response", async () => {
   mocks.recover.mockResolvedValue({ error: null });
