@@ -280,3 +280,12 @@ Yeni restore-guard aracı bağımsız current trust snapshot/ledger hash ve sequ
 Yerel17 test kök/foreign-key/nested/metin/JSON-key eşleşmesini, snapshot/ledger değişimini, eski sequence'i, imza/anahtar ikamesini ve eksik/gelecek trust reddini doğruladı. Bağımsız incelemenin format bulguları üzerine signed request_id array, hatalı UTF8 ve bilinmeyen snapshot üst alanları/metadata payload için de fail-closed kontrolleri/testleri eklendi. Test verify'nin mevcut yapısal grubuna eklendi; CI test dosya envanterine açık kayıt eklendi. DB/API suite/shard, yetki/CI kabul kapısı veya süre sınırı değiştirilmedi.
 
 İzole gctmlkohhbwpimgxubzj hedefinde yeni sentetik Auth hesabına gerçek parola girişi ve pre-delete JSON snapshot alındı. Global logout ve native hard-delete sonrası auth.users/identities/sessions/refresh_tokens sayıları0; eski JWT Edge401, eski parola400. Test için ayrı Ed25519 anahtarla imzalanan silme kaydı ve bağımsız test trust'ı altında pre-delete snapshot ERASED_SUBJECT_PRESENT ile reddedildi; satırı içermeyen kontrol kabul edildi. Anahtar/snapshot/kimlikler repoya yazılmadı; kaynak geliştirme verisi değişmedi. Bu fixture gerçek Auth ve gerçek guard kodunu kullanır; production silme sicili, uygulama privacy orkestrasyonu, tam DB restore veya genel fiziksel imha kabulü değildir.
+
+
+### PR84 sicil/restore adaptörü hazırlığı
+
+İlk guard kaynağı0f51c0b için aday40882472008 core/dört API/toplayıcı başarılıdır; genel privacy/REL-01 kapanışı değildir. Sonraki kaynak signed erasure-register dosya adaptörüne CAS/sequence/idempotency, exclusive lock/pending, fsync/rename ekler. Guarded restore çağrısı exact/frozen snapshot'ı aynı sicil kilidi altında adaptöre verir; ret durumunda apply çağrılmaz. Yerel27 test bu dar kod ve gerçek dosya/kriptografi davranışını doğrular. Yeni production sicil altyapısı, tenant purge, hosted SQL restore entegrasyonu ve hizmet erişim kapısı kurulmadı; bu kaynak tam hosted restore/backup imhası olarak sunulmaz.
+
+Son bağımsız inceleme mutable caller-trust sonrası head karşılaştırması ve crashte lock dizin kaydı sürekliliği bulgularını yakaladı. Karşılaştırma await öncesi doğrulanmış immutable hash üzerinden yapılır; lock acquire/release dizin fsync sınırları eklendi. Yeni mutation regresyonu dahil27 test geçti; önceki kaynak verify139+74 başarılıydı. Bu yeni kaynak ayrıca uzak kabul gerektirir.
+
+Belirsiz .pending durumu identical replay ve restore girişinde de REGISTER_RECOVERY_REQUIRED ile bloke edilir; iki ek regresyon bunu doğrular.
