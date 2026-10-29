@@ -115,10 +115,12 @@ test("new signup and recovery share the auth layout and pass accessibility check
   for (const route of ["/kayit", "/parolami-unuttum"]) {
     await page.goto(route);
     for (const theme of ["light", "dark"]) {
-      await page.evaluate(
-        (value) => document.documentElement.classList.toggle("dark", value === "dark"),
-        theme,
-      );
+      await page.getByRole("combobox", { name: "Görünüm", exact: true }).click();
+      await page
+        .getByRole("option", { name: theme === "dark" ? "Koyu" : "Açık", exact: true })
+        .click();
+      await expect(page.locator("html")).toHaveClass(new RegExp(`\\b${theme}\\b`));
+      await expect(page.locator("html")).toHaveCSS("color-scheme", theme);
       expect((await new AxeBuilder({ page }).analyze()).violations).toEqual([]);
     }
   }

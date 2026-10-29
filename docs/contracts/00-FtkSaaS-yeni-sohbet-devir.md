@@ -275,3 +275,10 @@ Kullanıcı yerleşimi başlangıç için onayladı, eski tasarım/Auth sayfalar
 Yerel `pnpm check:frontend` başarılı: 24 web ve1 UI testi, lint/format/typecheck/build. `pnpm test:frontend:e2e` çağrıldı fakat48 senaryo tarayıcı executable dosyaları bulunmadığından başlatılamadı; bu koşu başarı değildir. Uzak frontend tarayıcı ve kaynak bağlı aday/main kabulü beklenir.
 
 `uye.fethiyetango.com` Vercel’de `ftksaas-web` projesine bağlı ve verified=true; mevcut Cloudflare CNAME doğru Vercel hedefine yönelir. Production environment, mevcut geliştirme Supabase URL/publishable key ve bu origin için hazırlandı. Supabase Dashboard readback iki kesin callback kaydını doğruladı: `/auth/callback` ve `/auth/callback?next=/parola-yenile`. Site URL hâlâ `https://ftksaas.vercel.app/`; kullanıcı kalan Supabase işlerini devraldı ve yeni Site URL olarak `https://uye.fethiyetango.com` kaydetmesi tarif edildi. Yeni kaynak dağıtılmadı. Gerçek giriş/kayıt/e-posta/Google/TOTP kabulü ve tüm WEB-01 bu hazırlıkla kapanmaz.
+
+
+### PR86 Safari tema geçişi düzeltmesi — 29 Ekim 2026
+
+Head `65c815d5ee318729562aa43ecb267488a55f8222`, base `522df4777c29c8d2128b4434fbd69cfdc25f4453`, tested merge `3f8881be6632063042c027133f939a044866ccd9` için [aday40900062281](https://github.com/SXQHex/FtkSaaS/actions/runs/40900062281) success; [frontend40900062447](https://github.com/SXQHex/FtkSaaS/actions/runs/40900062447) failure. Checks ve Chromium/Firefox12/12 geçti; WebKit/mobil11/12 ile aynı yeni kayıt/kurtarma axe testi başarısız oldu. Test, provider durumunu atlayarak dark sınıfını doğrudan değiştiriyordu; Select metni geçişte koyu arka plan üzerinde eski koyu rengini taşıdı.
+
+Dar düzeltme next-themes’in yerleşik `disableTransitionOnChange` seçeneğini açar; test görünüm seçicisinden açık/koyu tema seçer ve hem sınıfı hem color-scheme değerini doğruladıktan sonra mevcut eksiksiz axe kontrolünü çalıştırır. Kontrast eşiği/kural kapsamı, retry/timeout veya CI değiştirilmez. Yeni kaynak uzak kabulü beklenir; merge/yayın yapılmadı. Kullanıcı kalan Supabase hazırlığını tamamladığını bildirdi; ek platform değişikliği yapılmadı.
