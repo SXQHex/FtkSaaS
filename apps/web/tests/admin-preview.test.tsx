@@ -24,6 +24,7 @@ test.each([
     render(<AdminPreview />, locale);
     const sunday = screen.getByRole("button", { name: dayName });
     expect(sunday).toHaveAccessibleDescription(fullDate);
+    expect(sunday.textContent?.replace(/\s+/g, " ").trim()).toBe(dayName);
     expect(sunday).toHaveAttribute("aria-pressed", "false");
     const previewRegion = screen.getByRole("region", { name: preview });
     expect(within(previewRegion).getByText(note)).toBeVisible();

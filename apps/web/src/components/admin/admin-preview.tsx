@@ -151,14 +151,16 @@ export function AdminPreview() {
         >
           <span id={`preview-weekday-${index}`} className="text-[11px] sm:text-xs">
             {date(index, { weekday: "short" })}
-          </span>
+          </span>{" "}
           <span id={`preview-day-${index}`} className="text-base font-semibold tabular-nums">
             {date(index, { day: "numeric" })}
           </span>
-          <span id={`preview-full-date-${index}`} className="sr-only">
-            {date(index, { weekday: "long", day: "numeric", month: "long" })}
-          </span>
         </button>
+      ))}
+      {Array.from({ length: 7 }, (_, index) => (
+        <span key={index} id={`preview-full-date-${index}`} className="sr-only">
+          {date(index, { weekday: "long", day: "numeric", month: "long" })}
+        </span>
       ))}
     </div>
   );
