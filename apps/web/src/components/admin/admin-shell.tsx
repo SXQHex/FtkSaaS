@@ -272,12 +272,6 @@ export function AdminShell({
             >
               <Search className="size-4" />
               <span className="hidden text-xs sm:inline">{t("searchPages")}</span>
-              <kbd
-                aria-hidden="true"
-                className="ml-auto hidden rounded border px-1 text-[10px] sm:inline"
-              >
-                ⌘ K
-              </kbd>
             </Button>
             <Button
               variant="ghost"
