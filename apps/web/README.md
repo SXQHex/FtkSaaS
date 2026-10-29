@@ -4,9 +4,9 @@ Kapsam yalnız FtkSaaS'tır. Web uygulaması apps/web, ortak arayüz packages/ui
 
 ## Bileşen ve araç kuralları
 
-Önce shadcn/ui ve ondan türetilmiş hazır bloklar değerlendirilir. Özel bileşen yalnız hazır seçenek ihtiyacı karşılamadığında yazılır. packages/ui/registry-sources.json resmî registry adreslerini, alınan kaynakların SHA256 değerlerini ve login-01 uyarlamasını kaydeder; aynı paketin LICENSE dosyası MIT bildirimini korur. Kullanılan bileşenler React 19 ve Tailwind 4 ile çalışır.
+Önce shadcn/ui ve ondan türetilmiş hazır bloklar değerlendirilir. Özel bileşen yalnız hazır seçenek ihtiyacı karşılamadığında yazılır. packages/ui/registry-sources.json resmî registry adreslerini, alınan kaynakların SHA256 değerlerini ve sidebar-07/login-02/signup-02 uyarlamalarını kaydeder; aynı paketin LICENSE dosyası MIT bildirimini korur. Kullanılan bileşenler React 19 ve Tailwind 4 ile çalışır.
 
-Auth altyapısı ile yönetici kabuğu tasarımı ayrı teslimlerdir. Resmî login-01 bloğu Auth bağlantısında kullanılır. Kullanıcının 29 Ekim talimatıyla yeni yönetici kabuğu `/tasarim` altında değerlendirilir; aşağıdaki önizleme sınırları geçerlidir. Genel tablo/form framework’ü kurulmaz.
+Kullanıcının 29 Ekim onayıyla yönetici kabuğu korumalı `/` route’una taşınır; eski bağlantı doğrulama ekranı ve login-01 Auth bileşenleri kaldırılır. Yeni Auth ekranları login-02/signup-02 tabanında ortak iki sütunlu düzeni kullanır; mobilde yalnız form bölümü gösterilir. `/tasarim` ayrı sentetik referans olarak kalır. Genel tablo/form framework’ü kurulmaz.
 
 Üç starter için değerlendirme ve tam kaynak commit’leri [starter kaynak kaydındadır](starter-sources.json). Bu aşamada starter dosyası kopyalanmadı: mevcut araçlar korunur, Clerk/Better Auth/veritabanı ve Base UI katmanları taşınmaz. shadcn uyarlamasının dosya/commit/hash izi registry kaydında, MIT bildirimi packages/ui/LICENSE içindedir.
 
@@ -26,7 +26,9 @@ cp apps/web/.env.example apps/web/.env.local
 pnpm dev:web
 ```
 
-Uygulama adresi http://127.0.0.1:3000. NEXT_PUBLIC_APP_ORIGIN OAuth ve kurtarma callback'inin güvenilen origin'idir. Development Supabase projesi docs/development-connection.json ile tanımlıdır; yalnız URL ve publishable key istemciye gider. .env.local Git dışında kalır. Auth/Google izinli callback adreslerinin backend/platform sahibi tarafından doğrulanması gerekir; frontend görevi hosted Auth config değiştirme yetkisi vermez.
+Uygulama adresi http://127.0.0.1:3000. NEXT_PUBLIC_APP_ORIGIN OAuth, kayıt ve kurtarma callback'inin güvenilen origin'idir. Development Supabase projesi docs/development-connection.json ile tanımlıdır; yalnız URL ve publishable key istemciye gider. .env.local Git dışında kalır. Yayın sırasında kesin origin ile `/auth/callback` ve `/auth/callback?next=/parola-yenile` adreslerinin Supabase izin listesi ve sağlayıcı dönüşü doğrulanır; environment yazılması tek başına hosted Auth kabulü değildir.
+
+`(auth)` route grubu mevcut `/giris`, `/parolami-unuttum`, `/parola-yenile`, `/dogrulama` yollarını korur ve `/kayit` ekler. Native Supabase SDK parola, Google, e-posta doğrulamalı kayıt, kurtarma ve TOTP işlemlerinin sahibidir. Kayıt yalnız `display_name` metadata’sı taşır; rol/organizasyon üretmez. Doğrulama bekleyen kayıt oturum açmış sayılmaz. Callback PKCE exchange ve güvenli dönüş yolu denetimini korur; korumalı ana sayfa sunucuda kullanıcı ve MFA seviyesini doğrular.
 
 ## Test komutları
 
@@ -39,7 +41,7 @@ pnpm --filter @ftksaas/web test:e2e:install
 pnpm test:frontend:e2e
 ```
 
-Vitest/Testing Library etkileşimleri, MSW gerçek shared transport'un DTO/hata/sayfalama tüketimini doğrular. Playwright varsayılan olarak public giriş/kurtarma, korumalı yönlendirme, klavye erişimi, yüzde 200 metin ve axe kontrollerini Chromium/Firefox/WebKit/mobil projelerinde çalıştırır. Otomatik testte production uygulamasına Auth bypass veya demo fallback eklenmez. Coverage raporu ilgili paketin coverage dizininde; Playwright HTML/trace/başarısızlık ekran görüntüsü .artifacts/frontend altında tutulur. Gerçek API/E2E kabulü Turbo cache'inden gelmez.
+Vitest/Testing Library etkileşimleri, MSW gerçek shared transport'un DTO/hata/sayfalama tüketimini doğrular. Playwright varsayılan olarak public giriş/kayıt/kurtarma, korumalı yönlendirme, klavye erişimi, yüzde 200 metin ve axe kontrollerini Chromium/Firefox/WebKit/mobil projelerinde çalıştırır. Otomatik testte production uygulamasına Auth bypass veya demo fallback eklenmez. Coverage raporu ilgili paketin coverage dizininde; Playwright HTML/trace/başarısızlık ekran görüntüsü .artifacts/frontend altında tutulur. Gerçek API/E2E kabulü Turbo cache'inden gelmez.
 
 Canlı development giriş testi ayrı ve açıktır. Mevcut yetkili hesabı Git dışındaki `apps/web/.env.e2e.local` dosyasında tanımla; parola veya gerçek hesap bilgisini belgeye/sohbete yazma. Dosya canlı test config’i tarafından Node native env loader ile okunur; process ortamı önceliklidir:
 
@@ -65,7 +67,7 @@ Ters yöndeki tetikleme ve merge kabulü mevcut [CI politikası](../../docs/ci-p
 
 ## Dil, tema ve Expo sınırı
 
-next-intl, locale routing eklemeden tr/en sözlüklerini sunucu ve istemciye taşır. Mevcut Auth/callback URL’leri korunur. Varsayılan Türkçe, dil seçimi doğrulanmış `ftksaas_locale` HttpOnly cookie’sinde bir yıl tutulur (Secure yalnız HTTP loopback adreslerinde kapalıdır); backend ayarı yazılmaz. Sayfa başlıkları, document lang, Auth/API hata metinleri ve bağlantı kontrolü iki dildedir. Tema next-themes ile sistem/açık/koyu seçeneklerini kullanır. Cihazda geçerli next-themes tercihi varsa hesap ayarı bunu ezmez; cihaz tercihi yoksa hesabın tema ayarı başlangıcı belirler. Font ölçeği/kontrast/hareket tüketimi korunur. Nötr CSS tokenları ve sistem fontu ürünün nihai marka tasarımı değildir.
+next-intl, locale routing eklemeden tr/en sözlüklerini sunucu ve istemciye taşır. Mevcut Auth/callback URL’leri korunur. Varsayılan Türkçe, dil seçimi doğrulanmış `ftksaas_locale` HttpOnly cookie’sinde bir yıl tutulur (Secure yalnız HTTP loopback adreslerinde kapalıdır); backend ayarı yazılmaz. Sayfa başlıkları, document lang, Auth/API hata metinleri ve yönetici kabuğu iki dildedir. Tema next-themes ile sistem/açık/koyu seçeneklerini kullanır. Cihazda geçerli next-themes tercihi varsa hesap ayarı bunu ezmez; cihaz tercihi yoksa hesabın tema ayarı başlangıcı belirler. Font ölçeği/kontrast/hareket tüketimi korunur. Nötr CSS tokenları ve sistem fontu ürünün nihai marka tasarımı değildir.
 
 Çeviri runtime’ı opsiyonel SWC/Parcel extraction araçlarının lifecycle scriptlerini gerektirmez; workspace allowBuilds bunları açıkça kapatır. Yeni form/state/tablo/chart kütüphanesi kurulmaz.
 
@@ -77,15 +79,16 @@ packages/ui web/DOM bileşenleridir; Expo’da doğrudan kullanılabilir kabul e
 
 Oxfmt100 sütun/2 boşluk kullanır; import, package anahtarı ve Tailwind sınıfı sıralaması kapalıdır. Geçişte TSX/CSS farkları yalnız biçimdir; markup, CSS değerleri, sınıf sırası ve etkileşimler korunur. Üretilmiş next-env, .next/coverage, yerel env ve Markdown dosyaları format kapsamı dışındadır.
 
-Oxlint’te `vitest/valid-expect.maxArgs=2`, Vitest’in desteklediği tanılama mesajı argümanını korur. İki yerel istisna açıkça sınırlandırılmıştır: Preferences/Workspace için React Compiler `set-state-in-effect` kuralı, next-themes SSR mount ve asenkron bağlam yükleme davranışını bu araç geçişinde yeniden yazmamak için kapalıdır. AuthForm/Workspace için `jsx-a11y/prefer-tag-over-role`, geçerli ARIA status bölgelerini form sonucuna özgü output etiketine dönüştürmemek için kapalıdır. Diğer erişilebilirlik/React kuralları ve Playwright/axe kabulü korunur; test assertion’ları değiştirilmez.
+Oxlint’te `vitest/valid-expect.maxArgs=2`, Vitest’in desteklediği tanılama mesajı argümanını korur. Yalnız Preferences için React Compiler `set-state-in-effect` istisnası next-themes SSR mount davranışını kapsar. Eski AuthForm/Workspace istisnaları kaldırılır; yeni bileşenler standart kurallardan geçer. Diğer erişilebilirlik/React kuralları ve Playwright/axe kabulü korunur.
 
 ## Yönetici kabuğu tasarımı
 
-`pnpm dev:web` sonrasında `/tasarim` adresini aç. Giriş gerektirmeyen bu route yalnız sentetik tasarım verisi içerir; mevcut korumalı `/` route'u ve native Auth akışı ayrı kalır. Önizleme, Auth bypass veya gerçek API hata fallback'i değildir. Üretim kullanıcı/veri/tenant erişimi vermez; arama motoru indekslemesi kapalıdır.
+`pnpm dev:web` sonrasında `/tasarim` adresini aç. Giriş gerektirmeyen bu route yalnız sentetik tasarım verisi içerir; korumalı `/` route’u aynı kabuğu gerçek hesap ve stüdyo okumalarıyla kullanır. Önizleme, Auth bypass veya gerçek API hata fallback'i değildir. Üretim kullanıcı/veri/tenant erişimi vermez; arama motoru indekslemesi kapalıdır.
 
 Tasarım yönü: kullanıcının verdiği nötr shadcn OKLCH tokenları, 0.625rem radius, sistem fontu; marka çalışması yapılmadı. Sidebar-07 yerleşimi mevcut shadcn bileşenleriyle uyarlandı. Kuruluş/merkez seçici kullanılmaz. Günün dersleri ve sıradaki ders ana odağı oluşturur; öğrenci/paket/ödeme görünümleri kart, detaylar Sheet kullanır. Kaynak ve MIT izi packages/ui/registry-sources.json ile LICENSE içindedir.
 
 - `AdminShell`: kontrollü bölüm seçimi, daraltılabilir masaüstü menüsü, mobil Sheet, sayfa araması (Ctrl/⌘+K), hesap/görünüm ve yardım panelleri. Auth, plan veya domain yetkisi uygulamaz.
+- `StudioWorkspace`: native oturum altında gerçek account/organization/center ve kullanıcı ayarı okumaları. Kuruluş/merkez seçici yoktur; izinli merkezler kartlarla gösterilir. Closed/bootstrap kuruluşlar için merkez okuması yapılmaz. Oturum kapandıktan sonra geç gelen yanıt ekrana taşınmaz; API hatası sentetik veriye dönüştürülmez. Ders/öğrenci/paket/finans/rapor/inbox alanları canlı consumer’ları bağlanana kadar açık bir hazırlık durumu gösterir.
 - `AdminPreview`: URL hash ve geri/ileri gezinme; ders günü seçimi, öğrenci arama/filtre, detay panelleri ve örnek kart ekleme. Geçici eklenen kartlar yenilemede sıfırlanır. Bildirim okundu durumu yalnız önizleme belleğindedir; CSV açıkça örnek olarak indirilir.
 - `preview-data`: yalnız `/tasarim` tarafından kullanılan kurgusal kişiler, dersler ve paketler. Fiyatlar/öğrenci sayıları ürün kararı veya canlı veri değildir.
 

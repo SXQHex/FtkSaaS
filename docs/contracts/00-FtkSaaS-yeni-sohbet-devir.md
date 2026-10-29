@@ -264,3 +264,14 @@ Aday40859842984 attempt1 head a8bc4d228aaa87f4289935946b99c00d3e22e94f için cor
 ### PR83 export fixture sözleşme düzeltmesi — 29 Ekim 2026
 
 Aday40867303163 attempt1 head323dbb57e4cb7a7f3903e09e66b77622fd405307 için core/API2/API3/API4 geçti; API1 yalnız yeni export expiry testinde report_file_get_v1 VALIDATION_FAILED ile kaldı. Retry sayısı ve fault-cleanup düzeltmeleri bu koşuda geçti. Yeni testin metadata, HTTP CSV ve expired-result çağrıları sözleşmedeki required operation_key alanını atlamıştı; üç çağrı da ayrı gerçek UUIDv7 operation_key ile düzeltildi. Byte equality, expired-result reddi ve payload yokluğu assertionları korunur; runtime/API sözleşmesi/migration/CI/timeout değiştirilmedi. Eski başarısız koşular başarı sayılmaz; yeni kaynak kabulü ve genel privacy/REL işleri açık kalır.
+
+
+## WEB-01 tasarımın ana uygulamaya taşınması — 29 Ekim 2026
+
+PR85 tasarım kaynağı normal merge ile main `522df4777c29c8d2128b4434fbd69cfdc25f4453` oldu. Aynı kaynakta [frontend40889593015](https://github.com/SXQHex/FtkSaaS/actions/runs/40889593015), [main proof40889593534](https://github.com/SXQHex/FtkSaaS/actions/runs/40889593534), [merge proof40889593155](https://github.com/SXQHex/FtkSaaS/actions/runs/40889593155) ve [development delivery40889670656](https://github.com/SXQHex/FtkSaaS/actions/runs/40889670656) success doğrulandı. Vercel `ftksaas-web` ilk yayını bu kaynaktan READY; bu durum yeni Auth adayı veya gerçek hesap akışı kabulü değildir.
+
+Kullanıcı yerleşimi başlangıç için onayladı, eski tasarım/Auth sayfalarının kaldırılmasını ve atıl üye alan adının kullanılmasını istedi. Ayrı `feat/live-admin-auth` adayı ortak login-02/signup-02 düzenini, yeni kayıt ekranını ve korumalı yönetici kabuğunu içerir. Eski seçicili bağlantı ekranı kaldırıldı; gerçek hesap/stüdyo okumaları kullanılır. Henüz bağlı olmayan iş modülleri sentetik kayıt yerine hazırlık durumu gösterir. Backend/API/CI-politika kaynakları değişmez.
+
+Yerel `pnpm check:frontend` başarılı: 24 web ve1 UI testi, lint/format/typecheck/build. `pnpm test:frontend:e2e` çağrıldı fakat48 senaryo tarayıcı executable dosyaları bulunmadığından başlatılamadı; bu koşu başarı değildir. Uzak frontend tarayıcı ve kaynak bağlı aday/main kabulü beklenir.
+
+`uye.fethiyetango.com` Vercel’de `ftksaas-web` projesine bağlı ve verified=true; mevcut Cloudflare CNAME doğru Vercel hedefine yönelir. Production environment, mevcut geliştirme Supabase URL/publishable key ve bu origin için hazırlandı. Supabase Dashboard readback iki kesin callback kaydını doğruladı: `/auth/callback` ve `/auth/callback?next=/parola-yenile`. Site URL hâlâ `https://ftksaas.vercel.app/`; kullanıcı kalan Supabase işlerini devraldı ve yeni Site URL olarak `https://uye.fethiyetango.com` kaydetmesi tarif edildi. Yeni kaynak dağıtılmadı. Gerçek giriş/kayıt/e-posta/Google/TOTP kabulü ve tüm WEB-01 bu hazırlıkla kapanmaz.

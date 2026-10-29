@@ -19,15 +19,9 @@
   },
   "overrides": [
     {
-      "files": ["src/components/preferences.tsx", "src/components/workspace.tsx"],
+      "files": ["src/components/preferences.tsx"],
       "rules": {
         "react/set-state-in-effect": "off"
-      }
-    },
-    {
-      "files": ["src/components/auth-form.tsx", "src/components/workspace.tsx"],
-      "rules": {
-        "jsx-a11y/prefer-tag-over-role": "off"
       }
     }
   ]
