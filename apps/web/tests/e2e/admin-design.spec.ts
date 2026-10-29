@@ -75,7 +75,10 @@ test("schedule supports week search, empty filters and accessible session capaci
   await expect(page.getByText("18 kayıt gösteriliyor", { exact: true })).toBeVisible();
   await page.getByRole("button", { name: "Sonraki dönem" }).click();
   await expect(page.getByRole("heading", { name: "Bu aralıkta ders yok" })).toBeVisible();
-  await page.getByRole("button", { name: "Bugün", exact: true }).click();
+  await page
+    .getByRole("region", { name: "Ders programı", exact: true })
+    .getByRole("button", { name: "Bugün", exact: true })
+    .click();
   await expect(page.getByText("18 kayıt gösteriliyor", { exact: true })).toBeVisible();
 });
 
