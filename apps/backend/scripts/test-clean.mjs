@@ -35,6 +35,8 @@ try {
  console.log('Clean database confirmed: '+actual.length+' ordered migrations; no organizations, receipts or Auth users');
 } finally { await db.end(); }
 const preparedAt=performance.now();
+// Capture pristine migration metadata before tests/fixtures can create objects.
+if(role==='core')run('node',['scripts/capture-docs.mjs','--local']);
 if(role!=='api'){
  run('node',['scripts/ci/docs-check.mjs',repoFile('README.md')]);
  run('pnpm',['--dir',repoFile(),'exec','turbo','run','verify','--filter=@ftksaas/backend...']);

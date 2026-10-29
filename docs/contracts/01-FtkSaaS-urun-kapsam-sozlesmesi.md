@@ -1,6 +1,6 @@
 ## 26 Ekim — Starter operasyon kapsamı son kararı
 
-Plan düşürmede owner devam edecek merkez/oda/disiplin/eğitmen ve öğrenci kapsamını açıkça seçer. Seçilmeyen kaynaklar operasyon bakımından kapanır; geçmiş/rezervasyon/hak/finans kayıtları korunur ve üst plana dönüşte erişilir. Yeni kayıtla birlikte eski kesin rezervasyonun yoklama/hak tüketimi de bu kapalı kapsamda yürütülmez. Kapsam seçimi sürümlüdür; yeni plan dönem sonunda uygulanır. Geçişte eski satır state’leri tarihsel olarak korunur; operasyonel aktif sayım aktif ilişkiyle yürürlükteki seçilmiş kapsamın kesişimidir. [Uygulama ve kabul sınırı](../starter-plan-gates-handover.md).
+Plan düşürmede owner devam edecek merkez/oda/disiplin/eğitmen ve öğrenci kapsamını açıkça seçer. Seçilmeyen kaynaklar operasyon bakımından kapanır; geçmiş/rezervasyon/hak/finans kayıtları korunur ve üst plana dönüşte erişilir. Yeni kayıtla birlikte eski kesin rezervasyonun yoklama/hak tüketimi de bu kapalı kapsamda yürütülmez. Kapsam seçimi sürümlüdür; yeni plan dönem sonunda uygulanır. Geçişte eski satır state’leri tarihsel olarak korunur; operasyonel aktif sayım aktif ilişkiyle yürürlükteki seçilmiş kapsamın kesişimidir. [Uygulama ve kabul sınırı](../../apps/backend/docs/starter-plan-gates-handover.md).
 
 # FtkSaaS — Ürün kapsam sözleşmesi
 
@@ -505,7 +505,7 @@ Teknik aktarım ve test durumu: docs/decisions/Q-E02.md ve reports/qe02-verifica
 
 **AS-03.** İptalden sonra geriye dönük kayıt/düzeltme mümkündür; iptal yeniden açılmaz. Etkinlik sürümü artar; eski önizleme geçersizleşir. event_get mevcut actual_started_at değerini; yönetici/organizasyon okuyucusuna append-only actual_start_history geçmişini döndürür.
 
-Teknik kanıt: docs/actual-start-handover.md, PR son commit CI. Bu aktarım kısmi gerçekleşmeye bağlı yeni parasal veya hak kuralı üretmez.
+Teknik kanıt: apps/backend/docs/actual-start-handover.md, PR son commit CI. Bu aktarım kısmi gerçekleşmeye bağlı yeni parasal veya hak kuralı üretmez.
 
 ## Son hesaplaşma revizyonu — DS-2026-10-17
 
@@ -513,11 +513,11 @@ Teknik kanıt: docs/actual-start-handover.md, PR son commit CI. Bu aktarım kıs
 
 A'nın açık yetkili CM'si gerçekleşen ödeme veya önerilen mahsup başvurusu açar; bakiye değişmez. B merkezinde ayrı doğrulanmış güncel CM rolü ve açık hesaplaşma yetkisi olan kişi (başlatanla aynı hesap olabilir) onayı kayıt, seçili bakiye, request, audit/outbox/receipt'i atomik kesinleştirir. Gerekçeli ret bakiye değiştirmez, A'ya uygulama içi gider. Ayrı OM ödeme/mahsup kayıt aşaması yoktur; onay banka transferi değildir. Kısmi, aynı para birimli karşılıklı mahsup ve geçmişi koruyan bağlı düzeltme aynı başvuru/onay zincirindedir. İlgili sürüm değişimi yeni onay ister, alakasız dersler stale yapmaz. Farklı kişi/hesap veya kendi başvurusunu onaylama yasağı yoktur. A’da başvuru ve dondurulmuş B merkezinde onay yetkisi ayrı aranır; istemci center seçimi yetki değildir. Audit her adımın hesap/merkez/CM rol/grant kapsamını kaydeder. Aynı hesap kullanımı çift kapama/sürüm/yarış korumasını aşmaz; receipt replay ve commit dahil canlı yetki aranır.
 
-DS-OPEN-01 karar düzeyinde kapalıdır; hesaplaşma runtime aktarımı uygulanmıştır. [Son merkez yetki düzeltmesi](../decisions/DS-2026-10-17-settlement-center-scope.md) farklı hesap şartını kaldırır; DS-OPEN-02 karar düzeyinde kapalıdır, ayrı istisna/fallback yolu yoktur. Yeni idari grant/read/version/audit scope DTO’ları ve 38 gerçek kabul senaryosu 08’de izlenir: vaka bazlı kanıt durumu makine sözleşmesindedir; [hesaplaşma devri](../settlement-handover.md) ve son head temiz CI gerçek kabulü ayrıca belirler. Main koruması ayrı yönetici işidir. Merge için son açık kullanıcı yetkisi geçerlidir; production dağıtım yetkisi yoktur.
+DS-OPEN-01 karar düzeyinde kapalıdır; hesaplaşma runtime aktarımı uygulanmıştır. [Son merkez yetki düzeltmesi](../decisions/DS-2026-10-17-settlement-center-scope.md) farklı hesap şartını kaldırır; DS-OPEN-02 karar düzeyinde kapalıdır, ayrı istisna/fallback yolu yoktur. Yeni idari grant/read/version/audit scope DTO’ları ve 38 gerçek kabul senaryosu 08’de izlenir: vaka bazlı kanıt durumu makine sözleşmesindedir; [hesaplaşma devri](../../apps/backend/docs/settlement-handover.md) ve son head temiz CI gerçek kabulü ayrıca belirler. Main koruması ayrı yönetici işidir. Merge için son açık kullanıcı yetkisi geçerlidir; production dağıtım yetkisi yoktur.
 
 ## Starter yoklama/koruma runtime aktarımı
 
-[Starter devri](../starter-attendance-protection-handover.md) kabul edilmiş kararları değiştirmeden dar runtime kapsamını belirtir. Starter F14 kapanışı ve bağlı düzeltme hak hareketi + audit/outbox/receipt ile atomiktir; hakediş üretmez. Ücretli finansal kapanış ve bağlı hakediş düzeltmesi PR #15 ile uygulanmıştır. Koruma yalnız yeni olumsuz etkiye bağlıdır; bağımsız engelleri veya yeni rezervasyon koşullarını kaldırmaz. Taslak başlangıç kanıtı değildir; başlangıç ve belge tüketicileri P01–P05 ile uygulandı; diğer tüketici/kabul açıkları güncel kuyruktadır. 198 işlem/89 canlı/109 contract-only bu Starter tesliminin tarihsel sayısıdır; bu metnin önceki güncel envanteri 199/118/81 ve 34 migration idi; 24 Ekim tabanı 200/200/0 ve 59 migration’dır. İşlem sayısı özellik tamamlama oranı değildir.
+[Starter devri](../../apps/backend/docs/starter-attendance-protection-handover.md) kabul edilmiş kararları değiştirmeden dar runtime kapsamını belirtir. Starter F14 kapanışı ve bağlı düzeltme hak hareketi + audit/outbox/receipt ile atomiktir; hakediş üretmez. Ücretli finansal kapanış ve bağlı hakediş düzeltmesi PR #15 ile uygulanmıştır. Koruma yalnız yeni olumsuz etkiye bağlıdır; bağımsız engelleri veya yeni rezervasyon koşullarını kaldırmaz. Taslak başlangıç kanıtı değildir; başlangıç ve belge tüketicileri P01–P05 ile uygulandı; diğer tüketici/kabul açıkları güncel kuyruktadır. 198 işlem/89 canlı/109 contract-only bu Starter tesliminin tarihsel sayısıdır; bu metnin önceki güncel envanteri 199/118/81 ve 34 migration idi; 24 Ekim tabanı 200/200/0 ve 59 migration’dır. İşlem sayısı özellik tamamlama oranı değildir.
 
 ## 23 Ekim ayarlar kapsamı ve frontend başlangıcı
 
@@ -525,5 +525,5 @@ DS-OPEN-01 karar düzeyinde kapalıdır; hesaplaşma runtime aktarımı uygulanm
 
 Tema/dil/saat/başlangıç/liste/takvim tercihleri erişim veya iş kuralı üretmez. Bildirim/pazarlama/kişiselleştirme/ölçüm izinleri aynı ayar değildir. Üç reklam/analitik varsayılanı açık/kapatılabilir ürün kararı, işleme dayanağı veya rıza kanıtı değildir. Bu görev sağlayıcı/SDK entegrasyonu açmaz.
 
-Yeni settings alanları yayımlanmış API'lere sessizce eklenmez; callable kapsam200 ve machine DTO'lar sabittir. Frontend tasarımda kabul edilmiş hedefleri dikkate alır, uygulama eksiklerini [entegrasyon devrinden](../claude-handover.md) izler.
+Yeni settings alanları yayımlanmış API'lere sessizce eklenmez; callable kapsam200 ve machine DTO'lar sabittir. Frontend tasarımda kabul edilmiş hedefleri dikkate alır, uygulama eksiklerini [entegrasyon devrinden](../client-integration.md) izler.
 

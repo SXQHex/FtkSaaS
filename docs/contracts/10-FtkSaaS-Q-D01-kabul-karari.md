@@ -1,6 +1,6 @@
 # FtkSaaS — Q-D01 kabul kararı
 
-Tarih: 15 Ekim 2026 kabulü. Güncel durum: karar ve teknik/runtime aktarımı mevcut; ilk “teknik aktarım bekliyor” notu tarihsel aşamadır. [Tek güncel devir](00-FtkSaaS-yeni-sohbet-devir.md) kaynak/CI’ı, [kalan işler](../remaining-work.md) gerçek açıkları belirtir.
+Tarih: 15 Ekim 2026 kabulü. Güncel durum: karar ve teknik/runtime aktarımı mevcut; ilk “teknik aktarım bekliyor” notu tarihsel aşamadır. [Tek güncel devir](../../apps/backend/docs/00-FtkSaaS-yeni-sohbet-devir.md) kaynak/CI’ı, [kalan işler](../remaining-work.md) gerçek açıkları belirtir.
 Dayanak: v2.2 D01–D09 ve U01–U08; 2.2-tech.1 paketindeki Q-D01 açığı.
 
 ## Kabul edilen davranış

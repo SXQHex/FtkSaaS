@@ -4,19 +4,19 @@
 
 Son kullanıcı kararı: süre optimizasyonu üretimi engelleyemez; suite’lere dokunulmaz. [PR65 koşusu40743048028 attempt1](https://github.com/SXQHex/FtkSaaS/actions/runs/40743048028/attempts/1) core ve dört API testlerini başarıyla tamamladı; toplayıcı yalnız `API_TIME_IMBALANCE`, oran1.412/fark475sn nedeniyle başarısız oldu. Sonraki failed-job denemelerinde eski attempt1 binding’i ile yeni attempt’in eşleşmemesi ayrıca güvenli biçimde reddedildi; bu ikinci hata ilk attempt’in nedeni değildir.
 
-Süre değerlendirmesi uyarıya alınır; dengesizlik veya eksik ölçüm kaynak/fonksiyon kabulünü durdurmaz. Gerçek test/core/shard ve head/base/tree/run/attempt kontrolleri zorunlu kalır. Güncel davranış [CI politikasında](ci-policy.md#api-süre-dengesi--uyarı-ve-ölçüm). Aşağıdaki eski zorunlu süre kapısı kayıtları PR78’in tarihsel kararına aittir; yeni üretim talimatı olarak uygulanmaz. Yeni optimizasyon/suite işi başlatılmaz.
+Süre değerlendirmesi uyarıya alınır; dengesizlik veya eksik ölçüm kaynak/fonksiyon kabulünü durdurmaz. Gerçek test/core/shard ve head/base/tree/run/attempt kontrolleri zorunlu kalır. Güncel davranış [CI politikasında](../../../docs/ci-policy.md#api-süre-dengesi--uyarı-ve-ölçüm). Aşağıdaki eski zorunlu süre kapısı kayıtları PR78’in tarihsel kararına aittir; yeni üretim talimatı olarak uygulanmaz. Yeni optimizasyon/suite işi başlatılmaz.
 
 
 ## 28 Ekim — gerçek API süre farkı ve zorunlu kapı adayı
 
 Başarılı main [40709789814](https://github.com/SXQHex/FtkSaaS/actions/runs/40709789814), kaynak `5bebc8f0fb6c89e1d67648fb06a2db729a4f489b`, attempt1: API1–4 clean adımları sırasıyla1651/1102/793/1167sn; en uzun/en kısa2.082, fark858sn. Backend hazırlığı yaklaşık38–43sn; test süreçleri API1’de1607.94, API2’de1057.91, API3’te754.63, API4’te1122.66sn. API1’de registry1607.58 ve event-cancellation1443.88sn aynı iki slotta koştu. Eski855.73/801.18sn ağırlıkları bu yükü temsil etmiyordu. Bu kaynakta artışın yeni assertion, fixture veya runner çekişmesinden gelen payı ayrıca ölçülmeden tek nedene bağlanmaz.
 
-15 suite’in gerçek process wall ölçümleri ve CLI2.122.0 kaynak/run/attempt/job kimlikleriyle [süre tablosuna](../apps/backend/scripts/ci/suite-durations.json) alındı. Yeni planın model duvarları API1–4 için1607.58/1443.88/1476.08/1375.06sn; oran1.169. Bunlar **tahmindir**; en uzun suite’in26dk48sn alt sınırı yalnız dağılımla kaldırılmaz. Toplam-ağırlık1.08 sınırı ve iki process slotu korunur. Gerçek yeni süre ve runner maliyeti henüz kabul edilmedi.
+15 suite’in gerçek process wall ölçümleri ve CLI2.122.0 kaynak/run/attempt/job kimlikleriyle [süre tablosuna](../scripts/ci/suite-durations.json) alındı. Yeni planın model duvarları API1–4 için1607.58/1443.88/1476.08/1375.06sn; oran1.169. Bunlar **tahmindir**; en uzun suite’in26dk48sn alt sınırı yalnız dağılımla kaldırılmaz. Toplam-ağırlık1.08 sınırı ve iki process slotu korunur. Gerçek yeni süre ve runner maliyeti henüz kabul edilmedi.
 
-Yeni [denge politikası](ci-policy.md#api-süre-dengesi--zorunlu-kabul) her full clean’de gerçek dört API clean zamanı için oran>1.25 ve fark>120sn birlikteliğini reddeder. Fonksiyon testleri başarılı olsa da binding yoktur ve merge kapısı kapalıdır. İki eşik küçük ortam sapmasını tolere eder; her koşuda görünür rapor vardır, mevcut suite’e assertion eklemek bu kontrolü atlamaz. Yeni suite ölçümsüz envantere alınamaz. Baseline veya eşik kendiliğinden güncellenmez. Bu kapı ve yeni dağılımın gerçek aday kabulü tamamlanmadan süre dengesi kapanmış sayılmaz.
+Yeni [denge politikası](../../../docs/ci-policy.md#api-süre-dengesi--zorunlu-kabul) her full clean’de gerçek dört API clean zamanı için oran>1.25 ve fark>120sn birlikteliğini reddeder. Fonksiyon testleri başarılı olsa da binding yoktur ve merge kapısı kapalıdır. İki eşik küçük ortam sapmasını tolere eder; her koşuda görünür rapor vardır, mevcut suite’e assertion eklemek bu kontrolü atlamaz. Yeni suite ölçümsüz envantere alınamaz. Baseline veya eşik kendiliğinden güncellenmez. Bu kapı ve yeni dağılımın gerçek aday kabulü tamamlanmadan süre dengesi kapanmış sayılmaz.
 
 
-28 Ekim sadeleştirme kararı: rutin otomatik PR kabulü bir full clean çalıştırır; main aynı testleri tekrarlamadan aday kanıtını doğrular. Manuel targeted yalnız seçilen SHA aralığı için isteğe bağlıdır. Saf belge dependency/DB/API başlatmaz. Yeni akışın gerçek wall/runner kazancı henüz ölçülmedi; aşağıdaki eski kaynak ölçümleri yeni sonuç gibi kullanılmaz. Süre güncellemesi artık gerçek başarılı aday full clean’i de kabul eder; proof-only main’den test süresi türetilmez. Güncel davranış [CI politikasındadır](ci-policy.md).
+28 Ekim sadeleştirme kararı: rutin otomatik PR kabulü bir full clean çalıştırır; main aynı testleri tekrarlamadan aday kanıtını doğrular. Manuel targeted yalnız seçilen SHA aralığı için isteğe bağlıdır. Saf belge dependency/DB/API başlatmaz. Yeni akışın gerçek wall/runner kazancı henüz ölçülmedi; aşağıdaki eski kaynak ölçümleri yeni sonuç gibi kullanılmaz. Süre güncellemesi artık gerçek başarılı aday full clean’i de kabul eder; proof-only main’den test süresi türetilmez. Güncel davranış [CI politikasındadır](../../../docs/ci-policy.md).
 
 ## P03 geliştirme ölçümü — 21 Ekim 2026
 
@@ -69,7 +69,7 @@ Yeni kaynakta seri/parçalı gerçek koşu henüz yok; kuyruk, kurulum, en uzun 
 
 ## 20 Ekim 2026 — yeni performans kararı
 
-P01 main [39401570751](https://github.com/SXQHex/FtkSaaS/actions/runs/39401570751), kaynak `7577b2f1873c6b1fcf83390bfa94a34374c44082`, completed/success doğrulandı. GitHub job/step zamanları: main-clean 09:33:46–10:12:46 UTC = **39:00**; test:clean 09:34:04–10:12:41 = **38:37**; run oluşturma–son güncelleme aralığı **39:04**. Kullanıcının yaklaşık 40 dakika bildirimiyle uyumludur. Önceki 30'ar dakika öngörüsü main için bu gerçek ölçümle değiştirildi; aday süre burada yeniden ölçülmedi. [CI-2026-10-20](decisions/CI-2026-10-20.md) ile dört ayrı runner/backend/DB shard'ı kabul edildi; uygulama/ölçüm CI-02'de bekliyor. Bu seri koşu süresi shard hız kazancı değildir. Aynı kaynak ve kapsamda seri/parçalı wall süre, shard dağılımı, kurulum/kuyruk ve toplam runner dakikası ölçülmeden 4 kat hızlanma vaat edilmez.
+P01 main [39401570751](https://github.com/SXQHex/FtkSaaS/actions/runs/39401570751), kaynak `7577b2f1873c6b1fcf83390bfa94a34374c44082`, completed/success doğrulandı. GitHub job/step zamanları: main-clean 09:33:46–10:12:46 UTC = **39:00**; test:clean 09:34:04–10:12:41 = **38:37**; run oluşturma–son güncelleme aralığı **39:04**. Kullanıcının yaklaşık 40 dakika bildirimiyle uyumludur. Önceki 30'ar dakika öngörüsü main için bu gerçek ölçümle değiştirildi; aday süre burada yeniden ölçülmedi. [CI-2026-10-20](../../../docs/decisions/CI-2026-10-20.md) ile dört ayrı runner/backend/DB shard'ı kabul edildi; uygulama/ölçüm CI-02'de bekliyor. Bu seri koşu süresi shard hız kazancı değildir. Aynı kaynak ve kapsamda seri/parçalı wall süre, shard dağılımı, kurulum/kuyruk ve toplam runner dakikası ölçülmeden 4 kat hızlanma vaat edilmez.
 
 
 Kaynak: main d4eff4f00d897364d5f46ee637533deae9adbc29, [39225823561](https://github.com/SXQHex/FtkSaaS/actions/runs/39225823561). Bu eski çalışmanın loglarından ölçülenler; yeni workflow süreleri değildir.
@@ -97,7 +97,7 @@ Kaynak 635e148651b2a85b18f5d40fe1fdea938ea94bf2; [run 39270054878](https://githu
 
 P01-A suite'i 2:25.181; ortak api-acceptance 5:31.146 idi. Bu süreler önceki iki paralel süreçteki gözlemdir; yeni sıralı fazların süresi veya kazancı diye toplanmaz. Yeni kaynak seçimi P01-A + api-acceptance olarak iki suite'e iner; yeni modül öncelikli çalışır ve hata olursa sonraki regresyon başlamaz. Sağlıklı yeni koşunun süresi ölçülmeden dakika kazancı iddia edilmez. Bilinmeyen/paylaşılan kaynak geniş geri dönüşü, tam aday/main clean, izolasyon ve paralellik=2 korunur.
 
-[Teşhis kaydı](history/reports/p01-a-targeted-diagnosis.json) eski başarısız SHA'yı ve henüz bekleyen yeni runtime kabulünü ayırır.
+[Teşhis kaydı](../../../docs/history/reports/p01-a-targeted-diagnosis.json) eski başarısız SHA'yı ve henüz bekleyen yeni runtime kabulünü ayırır.
 
 ## İki suite koşusunun gerçek log süresi
 
@@ -121,7 +121,7 @@ Kaynak main `9fd084b9ddbbefc225c98adbf3f25ddee85a9b6e`, aynı main clean [402264
 | API3 |1577 sn |1519.53 sn |820.82 sn |
 | API4 |777 sn |723.28 sn |825.38 sn |
 
-Yeni değerler **tahmindir**, yeni CLI ile ölçülmüş başarı değildir. Test kuyruğunda en uzun process registry855.73sn; bu dosyanın içinde P05/P06/P07/ayar kabul modülleri de vardır. Yalnız dosya sayısını veya eski ağırlığı eşitlemek yanlıştı. Mevcut15 API processinin yeni wall ölçümleri başarılı kaynak/attempt/job loglarından çıkarıldı. [Ölçümler ve yeni plan](history/reports/ci-balance-20261025.json).
+Yeni değerler **tahmindir**, yeni CLI ile ölçülmüş başarı değildir. Test kuyruğunda en uzun process registry855.73sn; bu dosyanın içinde P05/P06/P07/ayar kabul modülleri de vardır. Yalnız dosya sayısını veya eski ağırlığı eşitlemek yanlıştı. Mevcut15 API processinin yeni wall ölçümleri başarılı kaynak/attempt/job loglarından çıkarıldı. [Ölçümler ve yeni plan](../../../docs/history/reports/ci-balance-20261025.json).
 
 Dağıtım önce mevcut LPT toplam-ağırlık planını güvenli başlangıç kabul eder; aynı dört shard ve concurrency2 içinde Node’un alfabetik dosya kuyruğunu modelleyen deterministik sınırlı aramayla iyileştirir. Arama250000 düğümle sınırlıdır, duvar saati veya rastgeleliğe bağlı değildir; sonuç cache’ten kopyalanır. Mevcut toplam-ağırlık1.08 denge sınırı ve bütün suite envanter kontrolü korunur; mevcut veriyle tahmini shard duvarları arasındaki fark yaklaşık35sn’dir. Daha hızlı gerçek sonuç ancak yeni aday/main koşularından sonra kabul edilir.
 

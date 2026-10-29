@@ -472,7 +472,10 @@ test('main positive paths match ownership and manual targeted cannot auto-run or
  const patterns=[...ownership.backendPrefixes.map(p=>p+'**'),...ownership.backendFiles,...ownership.frontendFiles.filter(p=>p.startsWith('.github/workflows/')).map(p=>'!'+p),'docs/*.json',...JSON.parse(fs.readFileSync('apps/backend/scripts/ci/document-paths.json'))];
  const main=fs.readFileSync('.github/workflows/backend.yml','utf8');
  const configured=[...main.matchAll(/^      - '([^']+)'$/gm)].map(m=>m[1]);assert.deepEqual(configured,[...new Set(patterns)]);
- assert(!configured.some(p=>p==='apps/**'||p==='packages/**'||p==='**'||p.includes('apps/web')||p.includes('packages/ui')));
+ const reviewedProse=new Set(JSON.parse(fs.readFileSync('apps/backend/scripts/ci/document-paths.json')));
+ assert(!configured.some(p=>p==='apps/**'||p==='packages/**'||p==='**'||(p.includes('apps/web')&&!reviewedProse.has(p))||p.includes('packages/ui')));
+ for(const path of ['docs/workflows.md','apps/backend/docs/documentation-development.md','apps/web/docs/development.md'])assert.equal(classifyChanges([change(path)]).kind,'documentation');
+ for(const path of ['docs/workflows.json','apps/backend/scripts/update-docs.mjs','apps/backend/scripts/capture-docs.mjs'])assert.equal(classifyChanges([change(path)]).kind,'full');
  assert(!main.includes('pnpm install'));assert(!main.includes('test:clean'));assert(!main.includes('recovery'));
  const fast=fs.readFileSync('.github/workflows/ci-fast.yml','utf8');assert(fast.includes("if: needs.selection.outputs.setup == 'true'"));assert(fast.includes("if: github.ref == 'refs/heads/main'"));assert(!fast.includes('statuses: write'));assert(!fast.includes('pull_request:'));assert(!fast.includes('push:'));
  const full=fs.readFileSync('.github/workflows/ci-full.yml','utf8');const docs=full.slice(full.indexOf('  documentation:'));assert(!docs.includes('pnpm'));assert(!docs.includes('test:db'));assert(docs.includes('docs-check.mjs'));
@@ -735,4 +738,55 @@ test('collector publishes functional proof despite imbalance or unavailable timi
   if(previous===undefined)delete process.env.GITHUB_RUN_ATTEMPT;else process.env.GITHUB_RUN_ATTEMPT=previous;
   for(const [p,bytes] of preserved){if(bytes===null)fs.rmSync(p,{force:true});else fs.writeFileSync(p,bytes);}
  }
+});
+
+// Documentation is an integration contract, not merely a list of Markdown links.
+import {validateWorkflows,renderReferences,workflowPath} from '../scripts/update-docs.mjs';
+import {structure,validateCapture} from '../scripts/capture-docs.mjs';
+test('workflow map rejects missing duplicate unknown APIs and worker promotion to UI',()=>{
+ const root=resolve('.'),manifest=JSON.parse(fs.readFileSync(workflowPath)),contract=JSON.parse(fs.readFileSync('packages/api-contracts/schema/contract.json'));
+ assert.equal(validateWorkflows(manifest,contract,root).size,contract['x-contract'].operations.length);
+ for(const mutate of [
+  m=>m.flows[0].operations.pop(),
+  m=>m.flows[0].operations.push(m.flows[1].operations[0]),
+  m=>m.flows[0].operations.push('invented_operation_v1'),
+  m=>m.flows.find(f=>f.audience==='backend-only').audience='starter',
+  m=>m.flows[0].guide='docs/workflows.md#missing',
+  m=>m.flows[0].tests=['apps/backend/tests/missing.mjs'],
+  m=>m.flows[0].sources=['../.env'],
+  m=>m.flows[0].review.fingerprint='0'.repeat(64)
+ ]){const m=structuredClone(manifest);mutate(m);assert.throws(()=>validateWorkflows(m,contract,root));}
+ const changed=structuredClone(contract);changed['x-contract'].operations[0].permission='different';
+ assert.throws(()=>validateWorkflows(manifest,changed,root),/WORKFLOW_REVIEW_REQUIRED/);
+ const outputs=renderReferences(root,manifest,contract).outputs;
+ for(const [p,content] of Object.entries(outputs))assert.equal(fs.readFileSync(p,'utf8'),content,p);
+});
+test('documentation metadata comparison distinguishes schema drift from environment ACL and requires exact successful CD',()=>{
+ const catalog={format:1,relations:[{name:'example',rls:true,columns:[{name:'id',type:'uuid'}]}],functions:[],policies:[],grants:{relations:[]}};
+ const reordered={grants:{relations:['different worker role']},policies:[],functions:[],relations:catalog.relations,format:1};
+ assert.equal(structure(catalog),structure(reordered));
+ const drift=structuredClone(catalog);drift.relations[0].rls=false;assert.notEqual(structure(catalog),structure(drift));
+ const source='a'.repeat(40),receipt={success:true,project:'gwyprhenabtpkbojephw',source};validateCapture(receipt,source);
+ for(const invalid of [{...receipt,success:false},{...receipt,project:'other'},{...receipt,source:'b'.repeat(40)}])assert.throws(()=>validateCapture(invalid,source));
+});
+test('every staged document move is classifiable at both ends and retired paths cannot silently return',()=>{
+ const moves=JSON.parse(fs.readFileSync('apps/backend/scripts/ci/document-moves.json'));
+ for(const [oldPath,newPath] of Object.entries(moves)){
+  assert.equal(classifyChanges([change(oldPath)]).kind,'documentation',oldPath);
+  assert.equal(classifyChanges([change(newPath)]).kind,'documentation',newPath);
+  assert(!fs.existsSync(oldPath),oldPath);assert(fs.existsSync(newPath),newPath);
+ }
+ // Inspect the actual complete branch delta, including deleted rename sources.
+ const changes=parseChanges(execFileSync('git',['diff','--name-status','-z','--no-renames','HEAD'],{encoding:'utf8'}));
+ for(const item of changes)assert.doesNotThrow(()=>ownerOf(item.path),item.path);
+});
+test('unassigned integration runtime sources and transport dependency drift require review',()=>{
+ const root=resolve('.'),p='apps/backend/transports/unassigned-documentation-fixture.mjs';
+ const manifest=JSON.parse(fs.readFileSync(workflowPath)),contract=JSON.parse(fs.readFileSync('packages/api-contracts/schema/contract.json'));
+ assert(manifest.flows.find(f=>f.id==='WF09').sources.includes('apps/backend/transports/calendar-proxy.mjs'));
+ for(const name of ['p01-worker.mjs','p05-worker.mjs','p06-worker.mjs'])assert(manifest.flows.find(f=>f.id==='WF20').sources.includes('apps/backend/scripts/'+name));
+ fs.writeFileSync(p,'// test fixture; no execution\n');
+ try{assert.throws(()=>validateWorkflows(manifest,contract,root),/UNASSIGNED_WORKFLOW_SOURCE/);}finally{fs.rmSync(p);}
+ const altered=structuredClone(manifest),flow=altered.flows.find(f=>f.id==='WF09');flow.sources=flow.sources.filter(p=>!p.includes('calendar-proxy'));
+ assert.throws(()=>validateWorkflows(altered,contract,root),/WORKFLOW_REVIEW_REQUIRED|UNASSIGNED_WORKFLOW_SOURCE/);
 });

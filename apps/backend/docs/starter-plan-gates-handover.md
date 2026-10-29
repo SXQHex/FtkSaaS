@@ -1,4 +1,4 @@
-> Alan devri: teknik tüketim ve kaynağına bağlı eski kabul kayıtları. Güncel kaynak/CI/hosted durum [00 devirde](contracts/00-FtkSaaS-yeni-sohbet-devir.md), açık iş [tek backlog’da](remaining-work.md) tutulur. Eski aday/pending ifadeleri yeni görev veya güncel durum değildir.
+> Alan devri: teknik tüketim ve kaynağına bağlı eski kabul kayıtları. Güncel kaynak/CI/hosted durum [00 devirde](00-FtkSaaS-yeni-sohbet-devir.md), açık iş [tek backlog’da](../../../docs/remaining-work.md) tutulur. Eski aday/pending ifadeleri yeni görev veya güncel durum değildir.
 
 # Starter plan kapıları — uygulama ve kabul devri
 
@@ -57,10 +57,10 @@ Geçişte seçilmeyen eski aktif satırların tarihsel state'i değiştirilmez; 
 | Hosted envanter |66 migration içeriği eşleşti; backend-v1 Edge21 ACTIVE, `verify_jwt=true`;90 core tabloda RLS eksik0, istemci RPC EXECUTE0; advisors ERROR yok |
 | CD artifact |12698584169; ZIP SHA256 `4add712822474c84707f3db469da4100b5a99cf8399ac4526d43b931eda5b919` |
 
-İlk başarısız aday40415840619 ve önceki bekleme ifadeleri kendi kaynaklarının tarihsel kanıtıdır. F05 genel rol listesinin eski Starter beklentisi düzeltildi; Pro merkez izolasyonu assertion’ları korundu, owner/CM Starter retleri ayrıca doğrulandı. Runtime kapısı gevşetilmedi. [İlk kaynak raporu](history/reports/starter-plan-gates-20261026.md), [devralma ve native kabul](history/reports/starter-plan-gates-takeover-20261027.md), [rol testi düzeltmesi](history/reports/starter-plan-gates-role-read-ci-fix-20261027.md) yeniden yazılmadı.
+İlk başarısız aday40415840619 ve önceki bekleme ifadeleri kendi kaynaklarının tarihsel kanıtıdır. F05 genel rol listesinin eski Starter beklentisi düzeltildi; Pro merkez izolasyonu assertion’ları korundu, owner/CM Starter retleri ayrıca doğrulandı. Runtime kapısı gevşetilmedi. [İlk kaynak raporu](../../../docs/history/reports/starter-plan-gates-20261026.md), [devralma ve native kabul](../../../docs/history/reports/starter-plan-gates-takeover-20261027.md), [rol testi düzeltmesi](../../../docs/history/reports/starter-plan-gates-role-read-ci-fix-20261027.md) yeniden yazılmadı.
 
 Testlerde yalnız sentetik izole aktörler/veriler kullanıldı. Açık rezervasyonların booking kanıtı korundu; testin fiilî zaman kaydırmasında session ve resource booking saatleri birlikte tutuldu. Assertion veya ürün kuralı gevşetilmedi. Gerçek ortam verisi ve sırlar bu belge işinde değiştirilmez.
 
 ## Kapsam dışında kalanlar
 
-Bu teslim Starter dağıtım yol haritasının bütünü değildir. Gerçek public hostname/Turnstile/siteverify ve istemci entegrasyonu, Pro/Business ayrı sayısal limit/özel teklif, kalan backend ürün akışları, fiziksel imha, gerçek worker yükü, yük/backup-restore ve production kabulü [kalan işler](remaining-work.md) ve [üretim kuyruğunda](production-queue.md) ayrı kalır. Önceden kabul edilmiş motorlar yeniden geliştirme işi değildir. Son kullanıcı kararıyla JWT doğrulaması açık kalır.
+Bu teslim Starter dağıtım yol haritasının bütünü değildir. Gerçek public hostname/Turnstile/siteverify ve istemci entegrasyonu, Pro/Business ayrı sayısal limit/özel teklif, kalan backend ürün akışları, fiziksel imha, gerçek worker yükü, yük/backup-restore ve production kabulü [kalan işler](../../../docs/remaining-work.md) ve [üretim kuyruğunda](../../../docs/production-queue.md) ayrı kalır. Önceden kabul edilmiş motorlar yeniden geliştirme işi değildir. Son kullanıcı kararıyla JWT doğrulaması açık kalır.

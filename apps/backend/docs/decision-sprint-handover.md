@@ -1,10 +1,10 @@
-> Alan devri: teknik tüketim ve kaynağına bağlı eski kabul kayıtları. Güncel kaynak/CI/hosted durum [00 devirde](contracts/00-FtkSaaS-yeni-sohbet-devir.md), açık iş [tek backlog’da](remaining-work.md) tutulur. Eski aday/pending ifadeleri yeni görev veya güncel durum değildir.
+> Alan devri: teknik tüketim ve kaynağına bağlı eski kabul kayıtları. Güncel kaynak/CI/hosted durum [00 devirde](00-FtkSaaS-yeni-sohbet-devir.md), açık iş [tek backlog’da](../../../docs/remaining-work.md) tutulur. Eski aday/pending ifadeleri yeni görev veya güncel durum değildir.
 
-25 Ekim güncel ürün hedefi: [tek oda/seans/kategori kapasitesi ve ayrı kontrollü aşım](contracts/02-FtkSaaS-teknik-sozlesme.md#oda-seans-kapasite-karari). Yayımlanmış main200/59 DTO'ları ile PR45 adayı201/60 ayrıdır. PR45 bağımsız inceleme ve aday40164825351 başarılı; merge/main/CD bekler. Bu modülün eski test/alan adları kendi tarihsel runtime kaydını anlatır, yeni ürün kuralı değildir.
+25 Ekim güncel ürün hedefi: [tek oda/seans/kategori kapasitesi ve ayrı kontrollü aşım](../../../docs/contracts/02-FtkSaaS-teknik-sozlesme.md#oda-seans-kapasite-karari). Yayımlanmış main200/59 DTO'ları ile PR45 adayı201/60 ayrıdır. PR45 bağımsız inceleme ve aday40164825351 başarılı; merge/main/CD bekler. Bu modülün eski test/alan adları kendi tarihsel runtime kaydını anlatır, yeni ürün kuralı değildir.
 
 # DS-2026-10-17 sözleşme ve CI devri
 
-Güncel uygulama SHA/CI ve teslim kanıtı: [doğrulanmış devir](contracts/00-FtkSaaS-yeni-sohbet-devir.md). Aşağıdaki başlangıç SHA’sı tarihsel referanstır; güncel kabul yerine geçmez.
+Güncel uygulama SHA/CI ve teslim kanıtı: [doğrulanmış devir](00-FtkSaaS-yeni-sohbet-devir.md). Aşağıdaki başlangıç SHA’sı tarihsel referanstır; güncel kabul yerine geçmez.
 
 Başlangıç main: c231ab5526854ed62445613467649e1b0bf960bb; [aynı SHA CI](https://github.com/SXQHex/FtkSaaS/actions/runs/39010419849) başarılı: 25 migration, 241 test (12 sözleşme + 27 DB + 202 Auth/API). Bu geçmiş kanıt yeni PR'nin kabulü değildir.
 
@@ -14,7 +14,7 @@ Kabul edilmiş karar/DTO/izin/guard aktarımı korunur. Starter ve anlaşma/hake
 
 | Katman | Durum |
 |---|---|
-| Ürün kararı | [DS-2026-10-17 açık kullanıcı kararları](decisions/DS-2026-10-17.md) kabul edilmiş ve önceki çelişen hükümleri değiştirir |
+| Ürün kararı | [DS-2026-10-17 açık kullanıcı kararları](../../../docs/decisions/DS-2026-10-17.md) kabul edilmiş ve önceki çelişen hükümleri değiştirir |
 | Teknik aktarım | 01/02/06 yaşayan hükümler, 08 DTO/izin/guard/faz/sürüm/etki metaverisi, üretilmiş 04/05/envanter/ortak tipler |
 | Runtime | P07 sonrası 200 çağrılabilir işlem/90 core tablo/59 migration. P02 hak koruma ve P05 belge tüketicileri dahil uygulanmıştır; ürün/işletim kabul açıkları kalan işlerde ayrılır |
 | Sözleşme/CI denetimi | Pozitif şema/tutarlılık ve kasıtlı bozmada gerçekten başarısız olan negatif governance testleri |
@@ -53,7 +53,7 @@ B'nin fiilî eğitmeni B anlaşmasıyla hesaplanır: ilgili ürün kimliğine ö
 
 İade/düzeltme önceki kaydın tutarını bağlı ters hareketle geri alır. Ödenmiş tutar silinmez; fazla ödeme B'nin A'ya iade/mahsup bakiyesidir. Mevcut para hassasiyet kuralı (yarım sıfırdan uzağa, en büyük küsurat/kararlı eşitlik; ters kayıtta orijinal tutar) kullanılır. Otomatik para transferi, otomatik netleştirme veya kur dönüşümü yoktur. Kullanım izni her zaman paket kapsamı, Business, merkez erişimi, disiplin ve diğer kapılardan gelir; hesaplaşma yeni kullanım yetkisi vermez.
 
-[Son merkez bazlı yetki düzeltmesi](decisions/DS-2026-10-17-settlement-center-scope.md) önceki üç aşamayı kaldırır. Owner, OM'ye CM hesaplaşma grantını yönetme izni verir/kaldırır. Owner doğrudan veya canlı delege OM, belirli merkezde aktif CM'ye açık grant verir/kaldırır. CM devredemez. Rol veya idari grant yönetimi finansal operasyon hakkı doğurmaz.
+[Son merkez bazlı yetki düzeltmesi](../../../docs/decisions/DS-2026-10-17-settlement-center-scope.md) önceki üç aşamayı kaldırır. Owner, OM'ye CM hesaplaşma grantını yönetme izni verir/kaldırır. Owner doğrudan veya canlı delege OM, belirli merkezde aktif CM'ye açık grant verir/kaldırır. CM devredemez. Rol veya idari grant yönetimi finansal operasyon hakkı doğurmaz.
 
 A'nın açık yetkili CM'si gerçekleşen ödeme / önerilen açık aynı para birimli mahsup / bağlı düzeltme başvurusu açar; bakiye değişmez. B merkezinde bağımsız doğrulanmış aktif CM rolü ve açık grantı olan kişi (aynı hesap olabilir) onayında başvuru + ödeme/mahsup/bağlı düzeltme kaydı + seçili bakiye etkileri + audit/outbox/receipt tek transaction içinde kesinleşir. Gerekçeli rette bakiye/kayıt değişmez, gerekçe A'ya uygulama içi gider. Ayrı OM kayıt aşaması ve banka transferi yoktur.
 
@@ -77,15 +77,15 @@ Bileşik kimlikler (class/person/duty, person/discipline, resource/rule gibi) ka
 
 ## Açık ürün/teslim sınırı
 
-DS-OPEN-01 grantor konusu [son karar](decisions/DS-2026-10-17-settlement-revision.md) ile karar düzeyinde kapalıdır; grant yönetimi ve finansal adım yetkisi üçüncü teslimde uygulanmıştır. DS-OPEN-02 [son merkez yetki kararı](decisions/DS-2026-10-17-settlement-center-scope.md) ile karar düzeyinde kapalıdır: aynı hesap iki merkezde de açık canlı yetkiliyse iki adımı yapabilir; ayrı istisna/fallback yoktur.
+DS-OPEN-01 grantor konusu [son karar](../../../docs/decisions/DS-2026-10-17-settlement-revision.md) ile karar düzeyinde kapalıdır; grant yönetimi ve finansal adım yetkisi üçüncü teslimde uygulanmıştır. DS-OPEN-02 [son merkez yetki kararı](../../../docs/decisions/DS-2026-10-17-settlement-center-scope.md) ile karar düzeyinde kapalıdır: aynı hesap iki merkezde de açık canlı yetkiliyse iki adımı yapabilir; ayrı istisna/fallback yoktur.
 
-Otomatik başlangıç gözlemi ürün davranışı uydurularak kapatılmaz; mevcut açık attendance_start kaydı korunur. Diğer hak değişikliği koruma tüketicileri P02 ile tamamlanmıştır. Hesaplaşma ledger’ı ve ilgili okuma/izolasyon/yarış/rollback kapsamı üçüncü teslimdedir; kabul kanıtı güncel hesaplaşma devrinden okunur. Açık başlangıç kaydı, anlaşma seçicisi ve ücretli kapanış PR #15 ile uygulanmıştır. [F01–F33 haritası](feature-delivery.md) ve 08 içindeki 38 DS kabul senaryosu bu ayrımı taşır.
+Otomatik başlangıç gözlemi ürün davranışı uydurularak kapatılmaz; mevcut açık attendance_start kaydı korunur. Diğer hak değişikliği koruma tüketicileri P02 ile tamamlanmıştır. Hesaplaşma ledger’ı ve ilgili okuma/izolasyon/yarış/rollback kapsamı üçüncü teslimdedir; kabul kanıtı güncel hesaplaşma devrinden okunur. Açık başlangıç kaydı, anlaşma seçicisi ve ücretli kapanış PR #15 ile uygulanmıştır. [F01–F33 haritası](../../../docs/feature-delivery.md) ve 08 içindeki 38 DS kabul senaryosu bu ayrımı taşır.
 
 ## CI ve kanıt
 
 pnpm run verify üretilmiş 04/05/envanter drift'ini, işlem enum/status/audit/izin referanslarını, plan hedefini, faz/sürüm/okuma/atomik etki tutarlılığını ve gerçek migration runtime kapılarını denetler. tests/governance.test.mjs kasıtlı bozmaları doğrulayıcının reddettiğini kanıtlar. Bu testler sözleşme bozulmasını saptar; yeni runtime iş davranışını çalıştırmaz.
 
-[Yeni CI politikası](ci-policy.md) otomatik push/PR mükerrer clean yerine hedefli geliştirme ve açık son aday full clean kullanır. Merge kapısı head/base/tested merge ağacını doğrular; runtime/CI merge’lerinde main full clean korunur. Yeni yalnız-belge kabulü ve dört shard/Draft-development geçişi [CI-2026-10-20](decisions/CI-2026-10-20.md) kararında kabul edilmiş, uygulaması CI-02 PR25/26 ile kurulmuş ve kabul edilmiştir. [Main koruması denetimi](branch-protection-review.md) gerçek erişim sınırını kaydeder.
+[Yeni CI politikası](../../../docs/ci-policy.md) otomatik push/PR mükerrer clean yerine hedefli geliştirme ve açık son aday full clean kullanır. Merge kapısı head/base/tested merge ağacını doğrular; runtime/CI merge’lerinde main full clean korunur. Yeni yalnız-belge kabulü ve dört shard/Draft-development geçişi [CI-2026-10-20](../../../docs/decisions/CI-2026-10-20.md) kararında kabul edilmiş, uygulaması CI-02 PR25/26 ile kurulmuş ve kabul edilmiştir. [Main koruması denetimi](branch-protection-review.md) gerçek erişim sınırını kaydeder.
 
 Kaynak raporu reports/decision-sprint-verification.json, geliştirici sözleşme kontrolleri ile son head CI ve yeni davranış kabulünü ayrı belirtir. Tarihsel raporlar yeniden yazılmaz. Frontend/production/Resend değişikliği yoktur; repository yönetim yetkisi varsayılmaz.
 

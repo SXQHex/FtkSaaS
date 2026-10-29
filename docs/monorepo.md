@@ -64,7 +64,7 @@ Hedef frontend göç akışı: PR’da backend kabulü + ortak tip/frontend type
 
 ## CI geçiş sınırı
 
-Bu taşıma CI politika yollarını değiştirdiği için trusted-base kurulum sınırına tabidir. Gate gevşetilmez; sahte status/bypass veya repository yönetim ayarı değişikliği yoktur. Güncel kaynak/CI/hosted kabulü [00 devirde](contracts/00-FtkSaaS-yeni-sohbet-devir.md), açık iş [tek backlog’da](remaining-work.md) tutulur. İptal edilen eski full clean yeni kaynağın kabulü değildir; önce son kaynak incelemesi ve otomatik PR kapsam kabulü alınır; main aday kanıtını test tekrarı olmadan doğrular.
+Bu taşıma CI politika yollarını değiştirdiği için trusted-base kurulum sınırına tabidir. Gate gevşetilmez; sahte status/bypass veya repository yönetim ayarı değişikliği yoktur. Güncel kaynak/CI/hosted kabulü [00 devirde](../apps/backend/docs/00-FtkSaaS-yeni-sohbet-devir.md), açık iş [tek backlog’da](remaining-work.md) tutulur. İptal edilen eski full clean yeni kaynağın kabulü değildir; önce son kaynak incelemesi ve otomatik PR kapsam kabulü alınır; main aday kanıtını test tekrarı olmadan doğrular.
 
 ## Frontend göç kaynağı
 

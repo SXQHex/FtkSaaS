@@ -1,6 +1,6 @@
 # CI çalışma politikası
 
-Bu bölüm kullanıcının 28 Ekim 2026 sadeleştirme kararını tarif eder; önceki otomatik targeted, etiketle aday clean ve merge sonrası test tekrarı hükümlerinin yerini alır. Kurulum/kabul durumu yalnız [00 devirde](contracts/00-FtkSaaS-yeni-sohbet-devir.md), açık iş [backlog’da](remaining-work.md) tutulur. Geçmiş koşular yeni kaynak için kanıt değildir.
+Bu bölüm kullanıcının 28 Ekim 2026 sadeleştirme kararını tarif eder; önceki otomatik targeted, etiketle aday clean ve merge sonrası test tekrarı hükümlerinin yerini alır. Kurulum/kabul durumu yalnız [00 devirde](../apps/backend/docs/00-FtkSaaS-yeni-sohbet-devir.md), açık iş [backlog’da](remaining-work.md) tutulur. Geçmiş koşular yeni kaynak için kanıt değildir.
 
 ## Olaylar ve kabul
 
@@ -34,7 +34,7 @@ Seçilen API suite’leri mevcut ölçümlü dört shard planının kesişimine 
 
 ## Güvenli belge kabulü
 
-İncelenmiş tam yol, regular100644 dosya ve UTF8/NUL kontrolü gerekir; `.md`, `docs/` veya etiket yeterli değildir. Workflow, seçici/kapı, dependency/lockfile, migration, makine sözleşmesi ve runtime tipleri istisna değildir. Renderer’ın yalnız üç açıklama slotu AST ile kanıtlanabilir; executable/f-string/emit değişimi tam kapsama gider. [Eski renderer kanıtı](ci02-handover.md) dosyanın tamamına izin vermez.
+İncelenmiş tam yol, regular100644 dosya ve UTF8/NUL kontrolü gerekir; `.md`, `docs/` veya etiket yeterli değildir. Workflow, seçici/kapı, dependency/lockfile, migration, makine sözleşmesi ve runtime tipleri istisna değildir. Renderer’ın yalnız üç açıklama slotu AST ile kanıtlanabilir; executable/f-string/emit değişimi tam kapsama gider. [Eski renderer kanıtı](../apps/backend/docs/ci02-handover.md) dosyanın tamamına izin vermez.
 
 PR’nin gerçek merge ağacında [belge kontrolü](../apps/backend/scripts/ci/docs-check.mjs) yaşayan inbound/outgoing bağlantıları ve anchor’ları denetler. Belge-only iş dependency/backend kurulumu yapmaz; DB/API/full clean gibi raporlanmaz. Main aynı parent/tree ve receipt’i doğrular; kontrol tekrarı yoktur. Ayrı eski belge workflow’u ve recovery girişi kaldırılmıştır. Eski başarısız run değiştirilmez; sorun düzeltildiyse yeni gerçek kaynak kanıtı gerekir.
 
@@ -59,7 +59,7 @@ Yeni testler eksiksiz suite/shard envanterinde bulunur, dört bağımsız runner
 
 `ftksaas/merge-clean` status’unu yalnız main’den çalışan doğrulayıcı üretir. Aday testleri salt-okuma token kullanır, secrets/status-write yetkisi almaz. Yetkili doğrulayıcı aday kodu veya artifact executable’ı çalıştırmaz. Bütün `.github/workflows/*`, `scripts/ci` ve clean/start/path runner blob/mode kümesi trusted yüzeydir. Frontend-only sınıflandırma dahi workflow politika değişikliğine otomatik izin vermez.
 
-Trusted yüzey değişen PR’de bağımsız son kaynak incelemesi, gerçek aday başarısı ve tam kaynağa özel açık kurulum yetkisi gerekir. Önceki PR izinleri taşınmaz. Sahte status, bypass, direct push veya koruma gevşetme yoktur. Aktif required-check/strict-base/bypass ve tek-yetkili review0 düzeni [yönetim kaydında](branch-protection-review.md) doğrulanmıştır; bağımsız ajan incelemesi korunur.
+Trusted yüzey değişen PR’de bağımsız son kaynak incelemesi, gerçek aday başarısı ve tam kaynağa özel açık kurulum yetkisi gerekir. Önceki PR izinleri taşınmaz. Sahte status, bypass, direct push veya koruma gevşetme yoktur. Aktif required-check/strict-base/bypass ve tek-yetkili review0 düzeni [yönetim kaydında](../apps/backend/docs/branch-protection-review.md) doğrulanmıştır; bağımsız ajan incelemesi korunur.
 
 CD, başarılı main source/proof job’larını ve dayandığı adayın kanıtını yeniden doğrular. Her yazma öncesi current main/run/attempt ve kaynak eşdeğerliği kontrol edilir. Araya giren yalnız belge/frontend değişimi backend girdilerini değiştirmediyse kabul edilmiş backend dağıtılabilir; shared/backend/bilinmeyen fark bunu reddeder. Belge kanıtı runtime kabulü yerine geçmez. Önceki dağıtım receipt’i yalnız aynı repo güvenilir main CD koşusunun gerçek başarılı aynı-attempt deploy işinden okunur; PR/fork/atlanan deploy makbuzu optimizasyon yetkisi vermez. Hosted Edge kaynak/version/JWT eşleşmesi ayrıca gerekir.
 
@@ -99,7 +99,7 @@ PR32 head4e1e25c5 için bağımsız review5597902305 + aday39580259901 + açık 
 
 Test-only PR33 headfab366c5 bağımsız review5598374267, hedefli39585487735 (iki düzelen vaka dahil60 API+27 DB), aday39587119715 sonrasında normal merge ile `0fabf3a4a605dd6be5a1d358c660021f59406e20` main kaynağına alındı. [Aynı main39588975421](https://github.com/SXQHex/FtkSaaS/actions/runs/39588975421) core/dört API shard/toplayıcı completed/success. Runtime, migration ve CI kapıları test düzeltmesiyle değişmedi.
 
-[CD39590690817 attempt1](https://github.com/SXQHex/FtkSaaS/actions/runs/39590690817/attempts/1), variable değeri TRUE olduğu için yazma öncesi yapılandırma kontrolünde durdu. Kullanıcı değeri true düzeltti; yalnız başarısız CD işleri yeniden çalıştırıldı, main full CI tekrarlanmadı. [Attempt2](https://github.com/SXQHex/FtkSaaS/actions/runs/39590690817/attempts/2) source/deploy success;17 kontrol geçti,49 migration/Edge4 ve fixture temizliği doğrulandı. İlk canlı CD kabulü tamamlandı. Ayrıntı/işletim/token rotasyonu [uzak backend kurulumundadır](remote-backend-setup.md).
+[CD39590690817 attempt1](https://github.com/SXQHex/FtkSaaS/actions/runs/39590690817/attempts/1), variable değeri TRUE olduğu için yazma öncesi yapılandırma kontrolünde durdu. Kullanıcı değeri true düzeltti; yalnız başarısız CD işleri yeniden çalıştırıldı, main full CI tekrarlanmadı. [Attempt2](https://github.com/SXQHex/FtkSaaS/actions/runs/39590690817/attempts/2) source/deploy success;17 kontrol geçti,49 migration/Edge4 ve fixture temizliği doğrulandı. İlk canlı CD kabulü tamamlandı. Ayrıntı/işletim/token rotasyonu [uzak backend kurulumundadır](../apps/backend/docs/remote-backend-setup.md).
 
 CD aynı kaynak bağlı main kabulüne dayanır; belge kabulü full runtime kanıtı yerine geçmez. Kabul edilmiş runtime ile araya giren yalnız-belge main’in SHA’ları ayrı bağlanır; her yazma aşamasında run/attempt/işler ve güvenli belge eşdeğerliği yeniden doğrulanır. Gelecekteki trusted politika değişikliklerine bu PR’nin kurulum izni taşınmaz. Bu 21 Ekim CD-01 kapanışında P04 sıradaydı. Sonradan P01–P07 kaynak ve beş worker temel kurulum kabulü tamamlandı; frontend, dış e-posta ve yük/restore açık kalır.
 
@@ -109,6 +109,6 @@ P01–P07 kaynak kabulü kapanmıştır. Frontend/settings belge eşitlemesi yal
 
 ## 25 Ekim — ölçüm güncellemesi ve CLI bakımı
 
-Supabase CLI tam2.122.0 sürümüne package+lockfile ile sabitlenir; her koşuda otomatik en son sürüm çekilmez. Dört API shardı, concurrency2 ve bütün full/main clean yükümlülükleri korunur. Süre kaynağı ve sonraki kontrollü ölçüm güncellemesi [performans kaydındadır](ci-performance.md). Yeni suite için gerçek pozitif ölçüm/inventory şartı, kaynak/head/base/merge-tree kabulü ve bağımsız inceleme kaldırılmaz. Tahmini süre gerçek CI sonucu değildir.
+Supabase CLI tam2.122.0 sürümüne package+lockfile ile sabitlenir; her koşuda otomatik en son sürüm çekilmez. Dört API shardı, concurrency2 ve bütün full/main clean yükümlülükleri korunur. Süre kaynağı ve sonraki kontrollü ölçüm güncellemesi [performans kaydındadır](../apps/backend/docs/ci-performance.md). Yeni suite için gerçek pozitif ölçüm/inventory şartı, kaynak/head/base/merge-tree kabulü ve bağımsız inceleme kaldırılmaz. Tahmini süre gerçek CI sonucu değildir.
 
 Bu bakım scripts/ci ve clean runner güven yüzeyini değiştirir. Mevcut trusted-base policyMatches denetimi aday full clean başarılı olsa bile otomatik merge-clean status’unu reddeder; bu beklenen kurulum sınırıdır. Bağımsız son kaynak incelemesi ve gerçek aday kabulü sonrası exact-source güvenilir politika kurulum yetkisi gerekir. Gate kodu, status, required check ve repository yönetim ayarları değiştirilmeyecek.

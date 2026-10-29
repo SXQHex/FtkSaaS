@@ -1,10 +1,10 @@
-> Alan devri: teknik tüketim ve kaynağına bağlı eski kabul kayıtları. Güncel kaynak/CI/hosted durum [00 devirde](contracts/00-FtkSaaS-yeni-sohbet-devir.md), açık iş [tek backlog’da](remaining-work.md) tutulur. Eski aday/pending ifadeleri yeni görev veya güncel durum değildir.
+> Alan devri: teknik tüketim ve kaynağına bağlı eski kabul kayıtları. Güncel kaynak/CI/hosted durum [00 devirde](00-FtkSaaS-yeni-sohbet-devir.md), açık iş [tek backlog’da](../../../docs/remaining-work.md) tutulur. Eski aday/pending ifadeleri yeni görev veya güncel durum değildir.
 
 # P01 — talep, rezervasyon ve bekleme devri
 
-25 Ekim güncel ürün hedefi: [tek oda/seans/kategori kapasitesi ve ayrı kontrollü aşım](contracts/02-FtkSaaS-teknik-sozlesme.md#oda-seans-kapasite-karari). Yayımlanmış main200/59 DTO'ları ile PR45 adayı201/60 ayrıdır. PR45 bağımsız inceleme ve aday40164825351 başarılı; merge/main/CD bekler. Bu modülün eski test/alan adları kendi tarihsel runtime kaydını anlatır, yeni ürün kuralı değildir.
+25 Ekim güncel ürün hedefi: [tek oda/seans/kategori kapasitesi ve ayrı kontrollü aşım](../../../docs/contracts/02-FtkSaaS-teknik-sozlesme.md#oda-seans-kapasite-karari). Yayımlanmış main200/59 DTO'ları ile PR45 adayı201/60 ayrıdır. PR45 bağımsız inceleme ve aday40164825351 başarılı; merge/main/CD bekler. Bu modülün eski test/alan adları kendi tarihsel runtime kaydını anlatır, yeni ürün kuralı değildir.
 
-23 Ekim: P01 tamamlanmıştır. Toplam yayımlanmış kapsam 200 API/59 migration; P01 dedicated worker kurulumu ve gerçek organizasyona scope bağlama tamamlandı, boş kuyrukta idle heartbeat doğrulandı. Gerçek talep/teklif iş yükü ve ölçek kabulü bu kurulumdan çıkarılmaz. Kaynak kanıtı [güncel devirde](contracts/00-FtkSaaS-yeni-sohbet-devir.md).
+23 Ekim: P01 tamamlanmıştır. Toplam yayımlanmış kapsam 200 API/59 migration; P01 dedicated worker kurulumu ve gerçek organizasyona scope bağlama tamamlandı, boş kuyrukta idle heartbeat doğrulandı. Gerçek talep/teklif iş yükü ve ölçek kabulü bu kurulumdan çıkarılmaz. Kaynak kanıtı [güncel devirde](00-FtkSaaS-yeni-sohbet-devir.md).
 
 ## 20 Ekim 2026 — P01 kaynak kabul kaydı
 
@@ -18,7 +18,7 @@ P01'in talep→alternatif→merkez onayı→rezervasyon ve bekleme→FIFO yer te
 
 Sıradaki iş **CI-02: dört bağımsız shard + Draft/development + yalnız-belge kabulü**, ardından P02. Yeni politika karar düzeyinde kabul edildi, workflow/merge kapısı uygulaması bekliyor. P01 için hosted worker kurulumu, frontend gerçek entegrasyonu, dış e-posta, yük/restore ve production kapsamı tamamlanmış sayılmaz.
 
-[CI-02 kararı](decisions/CI-2026-10-20.md). Aşağıdaki kayıtlar kaynak tarihine göre okunur; son hedefli/aday kabulü geçmiş pending notlarını kapatmıştır.
+[CI-02 kararı](../../../docs/decisions/CI-2026-10-20.md). Aşağıdaki kayıtlar kaynak tarihine göre okunur; son hedefli/aday kabulü geçmiş pending notlarını kapatmıştır.
 
 <details>
 <summary>P01 teknik uygulama ayrıntıları ve önceki teşhisler — tarihsel kaynak sırası</summary>
@@ -108,7 +108,7 @@ Altyapı sınırı: Upstash Box aylık compute kotası doldu (5 CPU-saat); check
 
 PR #22 head 635e148651b2a85b18f5d40fe1fdea938ea94bf2 için run 39270054878 başarısızdır. 30 migration, yapı/DB ve diğer runtime vakaları geçti; P01-A'nın sekiz alt vakası geçti, son Auth oturum geri alma vakası mevcut Edge AUTH_REQUIRED döndürürken SESSION_REVOKED bekledi. Bu sonuç P01-A'nın tüm kabulü değildir.
 
-Test iki reddi ayırır: aktif Auth altında uygulama hesabı deletion_pending olduğunda RPC SESSION_REVOKED verir; Auth oturumu silindiğinde provider'ın erken AUTH_REQUIRED reddi veya RPC'nin SESSION_REVOKED reddi kabul edilir, başarı asla kabul edilmez. Uygulama davranışı değiştirilmedi. [Teşhis](history/reports/p01-a-targeted-diagnosis.json).
+Test iki reddi ayırır: aktif Auth altında uygulama hesabı deletion_pending olduğunda RPC SESSION_REVOKED verir; Auth oturumu silindiğinde provider'ın erken AUTH_REQUIRED reddi veya RPC'nin SESSION_REVOKED reddi kabul edilir, başarı asla kabul edilmez. Uygulama davranışı değiştirilmedi. [Teşhis](../../../docs/history/reports/p01-a-targeted-diagnosis.json).
 
 Aynı doğal düzeltme diliminde seçici kaynak farkı kanıtıyla bu modülü ve ortak regresyonu seçer (13 dosya yerine 2); yeni modül önce çalışır. Bilinmeyen/paylaşılan değişiklikler ve aday/main full clean korunur. Yeni head'in runtime sonucu bekleniyor; gerçek hızlanma henüz ölçülmedi. P01'in diğer 13 API'si açık kalır.
 
@@ -121,4 +121,4 @@ Kök neden genel Date.now/slot fixture'ının 14 ve 15'inci slotlarının Europe
 
 </details>
 
-Kapasite incelemesi: worker no-offer işinin ardından oda fiziksel kapasitesinin yapılandırılması veya toplamı değiştirmeyen kategori doluluğu değişimi yeni keşif anahtarı üretir. İlk kaynak P2 bulgusu ve düzeltme testi [inceleme raporundadır](history/reports/session-capacity-independent-review.md); önceki clean sonucu yeni kaynağa taşınmaz.
+Kapasite incelemesi: worker no-offer işinin ardından oda fiziksel kapasitesinin yapılandırılması veya toplamı değiştirmeyen kategori doluluğu değişimi yeni keşif anahtarı üretir. İlk kaynak P2 bulgusu ve düzeltme testi [inceleme raporundadır](../../../docs/history/reports/session-capacity-independent-review.md); önceki clean sonucu yeni kaynağa taşınmaz.

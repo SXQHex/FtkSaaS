@@ -1,6 +1,6 @@
 # F01–F33 karar, teknik bağımlılık, runtime ve kabul haritası
 
-Bu harita 08 içindeki DS/feature_delivery aktarım metadatasından üretilir. Satırlardaki eski mevcut-runtime/yalnız-sözleşme sayımları ve pending_runtime bağımlılıkları ait oldukları ilk DS aktarımının snapshotıdır; güncel callable envanter veya yeniden açılacak iş listesi değildir. Gerçek işlem desteği docs/endpoint-inventory.json ve implemented.json, kabul kanıtı ../../docs/contracts/00-FtkSaaS-yeni-sohbet-devir.md, güncel açıklar docs/remaining-work.md üzerinden okunur. FD01–FD12 ürün kararının kapanışı runtime/sağlayıcı/E2E kabulünden ayrıdır.
+Bu harita 08 içindeki DS/feature_delivery aktarım metadatasından üretilir. Satırlardaki eski mevcut-runtime/yalnız-sözleşme sayımları ve pending_runtime bağımlılıkları ait oldukları ilk DS aktarımının snapshotıdır; güncel callable envanter veya yeniden açılacak iş listesi değildir. Gerçek işlem desteği docs/endpoint-inventory.json ve implemented.json, kabul kanıtı ../../apps/backend/docs/00-FtkSaaS-yeni-sohbet-devir.md, güncel açıklar docs/remaining-work.md üzerinden okunur. FD01–FD12 ürün kararının kapanışı runtime/sağlayıcı/E2E kabulünden ayrıdır.
 
 | Özellik / ürün kararı | Plan erişimi | Teknik karşılık | Açık bağımlılıklar | Uygulama | Kabul |
 |---|---|---|---|---|---|
@@ -38,7 +38,7 @@ Bu harita 08 içindeki DS/feature_delivery aktarım metadatasından üretilir. S
 | F32 İşletme aboneliği, erişim ve kullanım limitleri — contracts/01-FtkSaaS-urun-kapsam-sozlesmesi.md | starter, pro, business | organization_create_v1, organization_close_preview_v1, organization_close_apply_v1, organization_reopen_v1, student_activate_v1, student_deactivate_v1, subscription_get_v1, subscription_upgrade_quote_v1, subscription_downgrade_request_v1, subscription_change_cancel_v1, subscription_renewal_set_v1, saas_payment_submit_v1, saas_payment_verify_v1, saas_grace_extend_v1, subscription_boundary_apply_v1 |  | partial (6 mevcut runtime / 9 yalnız sözleşme) | pending_feature_acceptance |
 | F33 Denetlenebilir geçmiş ve yinelenen işlem koruması — contracts/01-FtkSaaS-urun-kapsam-sozlesmesi.md | starter, pro, business | organization_delete_preview_v1, organization_delete_apply_v1, credit_adjust_v1, collection_correct_preview_v1, collection_correct_apply_v1, instructor_payment_correct_v1, operation_status_get_v1, preview_get_v1, audit_list_v1, privacy_execute_v1 | confirmed_reservation_protection | partial (7 mevcut runtime / 3 yalnız sözleşme) | pending_feature_acceptance |
 
-Kabul edilmiş DS kuralları ve uçtan uca teslim sınırları: docs/decision-sprint-handover.md. Ücret/finans/koruma/hesaplaşma kabulü yapısal sözleşme testlerinden çıkarılamaz. Frontend, production, dış e-posta ve yük/restore bu haritada tamamlandı sayılmaz.
+Kabul edilmiş DS kuralları ve uçtan uca teslim sınırları: apps/backend/docs/decision-sprint-handover.md. Ücret/finans/koruma/hesaplaşma kabulü yapısal sözleşme testlerinden çıkarılamaz. Frontend, production, dış e-posta ve yük/restore bu haritada tamamlandı sayılmaz.
 
 ## DS davranış kabul kataloğu — yalnız gerçek davranışla kanıtlanan vakalar kapalı
 

@@ -1,6 +1,6 @@
 # Kodlama ve değişiklik sorumlulukları
 
-Çalışma/CI/ortam kurallarının sahibi [AGENTS](../../AGENTS.md); güncel kabulün sahibi [00 devir](00-FtkSaaS-yeni-sohbet-devir.md). D01–D09/U01–U08 normatif hükümleri [01 ürün](01-FtkSaaS-urun-kapsam-sozlesmesi.md) ve [02 teknik](02-FtkSaaS-teknik-sozlesme.md) içindedir; burada yeniden kopyalanmaz.
+Çalışma/CI/ortam kurallarının sahibi [AGENTS](../../AGENTS.md); güncel kabulün sahibi [00 devir](../../apps/backend/docs/00-FtkSaaS-yeni-sohbet-devir.md). D01–D09/U01–U08 normatif hükümleri [01 ürün](01-FtkSaaS-urun-kapsam-sozlesmesi.md) ve [02 teknik](02-FtkSaaS-teknik-sozlesme.md) içindedir; burada yeniden kopyalanmaz.
 
 ## 1. Sorumluluk ve dosya sahipliği
 

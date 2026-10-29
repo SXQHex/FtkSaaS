@@ -1,6 +1,6 @@
-# İstemci entegrasyon devri
+# İstemci entegrasyon protokolü
 
-Güncel kaynak/hosted kabulü [00 devirde](contracts/00-FtkSaaS-yeni-sohbet-devir.md); repo ve ortam düzeni [monorepo devrinde](monorepo.md). Bu belge yalnız istemci tüketim kurallarını taşır. UI hedefi apps/web, ortak bileşen hedefi packages/ui; aktarım henüz yapılmamıştır. Eski model adları rol etiketidir.
+Güncel kaynak/hosted kabulü [00 devirde](../apps/backend/docs/00-FtkSaaS-yeni-sohbet-devir.md); repo ve ortam düzeni [monorepo devrinde](monorepo.md). Bu belge projenin ortak istemci tüketim kurallarını taşır. Web istemcisi apps/web, ortak bileşenler packages/ui içindedir. Çalışma durumu ve sohbet devri uygulamanın geliştirme belgelerindedir.
 
 ## Gerçek sözleşme
 
@@ -26,12 +26,12 @@ Para borcu, öğrenci alacağı, kullanılabilir/ayrılmış hak ayrı gösteril
 
 | Alan | Tüketim kaynağı |
 |---|---|
-| Ayarlar/hesap/kimlik | [Ayar alanları ve gerçek destek](frontend-settings-handover.md);69 kabul grubunun tamamı uygulanmış değildir |
-| Program/takvim | [Program](program-session-handover.md), [okumalar](schedule-read-handover.md), [kapasite kararı](decisions/DS-2026-10-25-session-capacity.md) |
-| Starter/public | [Starter](starter-plan-gates-handover.md), [public transport](p04-handover.md) |
-| Finans/etkinlik | [P03](p03-handover.md), [Q-E01](decisions/Q-E01-accepted.md), [Q-E02](decisions/Q-E02.md), [Q-E03](decisions/Q-E03.md), [fiilî başlangıç](actual-start-handover.md), [hesaplaşma](settlement-handover.md) |
-| Hakediş | [Anlaşma ve hakediş](instructor-earnings-handover.md), [Starter koruma](starter-attendance-protection-handover.md) |
-| Belge/bildirim/rapor/import | [P05](p05-handover.md), [P06](p06-handover.md) |
+| Ayarlar/hesap/kimlik | [Ayar alanları ve gerçek destek](../apps/backend/docs/frontend-settings-handover.md);69 kabul grubunun tamamı uygulanmış değildir |
+| Program/takvim | [Program](../apps/backend/docs/program-session-handover.md), [okumalar](../apps/backend/docs/schedule-read-handover.md), [kapasite kararı](decisions/DS-2026-10-25-session-capacity.md) |
+| Starter/public | [Starter](../apps/backend/docs/starter-plan-gates-handover.md), [public transport](../apps/backend/docs/p04-handover.md) |
+| Finans/etkinlik | [P03](../apps/backend/docs/p03-handover.md), [Q-E01](decisions/Q-E01-accepted.md), [Q-E02](decisions/Q-E02.md), [Q-E03](decisions/Q-E03.md), [fiilî başlangıç](../apps/backend/docs/actual-start-handover.md), [hesaplaşma](../apps/backend/docs/settlement-handover.md) |
+| Hakediş | [Anlaşma ve hakediş](../apps/backend/docs/instructor-earnings-handover.md), [Starter koruma](../apps/backend/docs/starter-attendance-protection-handover.md) |
+| Belge/bildirim/rapor/import | [P05](../apps/backend/docs/p05-handover.md), [P06](../apps/backend/docs/p06-handover.md) |
 
 ## Entegrasyon kabulü
 

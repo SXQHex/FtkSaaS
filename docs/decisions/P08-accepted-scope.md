@@ -41,4 +41,4 @@ Instagram ile giriş/kayıt/hesap bağlama kapsam dışıdır. Buradaki Instagra
 
 
 
-Güncel uygulama durumu ve açık işler [tek backlog’dan](../remaining-work.md), geçmiş izinli operasyonel aktarım [hosted kaydından](../remote-backend-setup.md#p08-kurulum-kaydı) okunur. Bu karar kaydı veri aktarımı çalıştırma yetkisi değildir.
+Güncel uygulama durumu ve açık işler [tek backlog’dan](../remaining-work.md), geçmiş izinli operasyonel aktarım [hosted kaydından](../../apps/backend/docs/remote-backend-setup.md#p08-kurulum-kaydı) okunur. Bu karar kaydı veri aktarımı çalıştırma yetkisi değildir.

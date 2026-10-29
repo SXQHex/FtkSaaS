@@ -1,4 +1,4 @@
-> Alan devri: teknik tüketim ve kaynağına bağlı eski kabul kayıtları. Güncel kaynak/CI/hosted durum [00 devirde](contracts/00-FtkSaaS-yeni-sohbet-devir.md), açık iş [tek backlog’da](remaining-work.md) tutulur. Eski aday/pending ifadeleri yeni görev veya güncel durum değildir.
+> Alan devri: teknik tüketim ve kaynağına bağlı eski kabul kayıtları. Güncel kaynak/CI/hosted durum [00 devirde](00-FtkSaaS-yeni-sohbet-devir.md), açık iş [tek backlog’da](../../../docs/remaining-work.md) tutulur. Eski aday/pending ifadeleri yeni görev veya güncel durum değildir.
 
 # Program ve gelecek seans değişiklikleri
 
@@ -44,7 +44,7 @@ Kapasite indirimi mevcut rezervasyonları veya süresi dolmamış yer teklifleri
 
 ## Kabul ve açık sınırlar
 
-Odaklı geliştirme testleri `apps/backend/tests/program-session-lifecycle.test.mjs` ve etkilenen eski tüketici testleridir; gerçek Supabase Auth → Edge → service-only RPC yolunu kullanır. Son kapsam tam temiz CI'ında sözleşme, DB, tüm API testleri, 25 migration reset, seed, health ve advisors birlikte çalışır. Son geliştirici kaynak ağacında 12 sözleşme ve 20 program Auth/API testi geçti; önceki kaynakta 68 etkilenen API testi geçti. Bağımsız statik incelemede bulunan legacy sınıf-only görev kaldırma P2'si düzeltildi ve yeniden inceleme bulgusuz tamamlandı. Kaynak ve kanıt ayrımı [raporda](history/reports/program-session-verification.json) belirtilir. Başarısızlık veya kaynak değişikliği dışında aynı kabul geliştirici tarafından gereksiz tekrarlanmaz.
+Odaklı geliştirme testleri `apps/backend/tests/program-session-lifecycle.test.mjs` ve etkilenen eski tüketici testleridir; gerçek Supabase Auth → Edge → service-only RPC yolunu kullanır. Son kapsam tam temiz CI'ında sözleşme, DB, tüm API testleri, 25 migration reset, seed, health ve advisors birlikte çalışır. Son geliştirici kaynak ağacında 12 sözleşme ve 20 program Auth/API testi geçti; önceki kaynakta 68 etkilenen API testi geçti. Bağımsız statik incelemede bulunan legacy sınıf-only görev kaldırma P2'si düzeltildi ve yeniden inceleme bulgusuz tamamlandı. Kaynak ve kanıt ayrımı [raporda](../../../docs/history/reports/program-session-verification.json) belirtilir. Başarısızlık veya kaynak değişikliği dışında aynı kabul geliştirici tarafından gereksiz tekrarlanmaz.
 
 İlk program PR’sinin dışında kalan ders yoklaması/anlaşma yayını ve P01 bekleme/teklif/uygun hak seçimi sonraki teslimlerde uygulanmıştır. Seans iptali ve yerine seans komutları P02 ile uygulanıp kabul edildi; ilk program PR’sinin kapsamına geriye dönük eklenmez. Yeni program planlanan seans yaratır; gerçekleşme/hakediş yaratmaz. Birden fazla uygunluk kuralını birleştirerek gece/gün aşan uygunluk hâlen ayrı sınırdır. Sonraki P07 CD/hosted kabulü güncel devirde kapandı; bu ilk PR raporu onun kanıtı değildir. Frontend gerçek entegrasyonu ve yük/restore açık kalır. Frontend, production ve Resend değişikliği yoktur.
 

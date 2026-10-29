@@ -2,7 +2,7 @@
 
 Backend kendi apps/backend paketi ve çalışma dizinine, ortak şema/config kendi packages sahiplerine; sözleşme ve tarihsel raporlar docs altına taşınır. Root yalnız workspace yönetir. GitHub Actions kabul/CD sahibi kalır; dört shard ve kaynak bağı korunur. Yeni koşu çıktıları tarihsel raporları ezmez. Eski94831a aday clean’i kullanıcı tarafından iptal edildi; kaynak kabulü değildir. Frontend göçü henüz yapılmadı.
 
-> Tarihsel değişiklik kaydıdır; güncel kabul [00 devirde](docs/contracts/00-FtkSaaS-yeni-sohbet-devir.md), açık iş [tek backlog’da](docs/remaining-work.md).
+> Tarihsel değişiklik kaydıdır; güncel kabul [00 devirde](apps/backend/docs/00-FtkSaaS-yeni-sohbet-devir.md), açık iş [tek backlog’da](docs/remaining-work.md).
 
 ## 27 Ekim — frontend göç hazırlığı ve SSoT
 
@@ -10,7 +10,7 @@ pnpm tek lockfile/Turbo workspace, packages/api-contracts yolu ve CI komutları 
 
 ## 27 Ekim — Starter başlangıç ve public backend
 
-PR61 yeni Starter FD07 politikaları, public/self backend tüketicileri ve hostname/gateway kurallarını ekledi. Kabul/CI/CD sonuçları [00 devirde](docs/contracts/00-FtkSaaS-yeni-sohbet-devir.md), kaynak/native kanıt [tarihsel raporda](docs/history/reports/starter-onboarding-20261027.md).
+PR61 yeni Starter FD07 politikaları, public/self backend tüketicileri ve hostname/gateway kurallarını ekledi. Kabul/CI/CD sonuçları [00 devirde](apps/backend/docs/00-FtkSaaS-yeni-sohbet-devir.md), kaynak/native kanıt [tarihsel raporda](docs/history/reports/starter-onboarding-20261027.md).
 
 # Changes
 
@@ -20,7 +20,7 @@ Mevcut domain komutlarında tek oda40/5 kapasite, süreli/sınırsız satış→
 
 ## 27 Ekim 2026 — Starter plan kapıları kabulü ve belge kapanışı
 
-PR56 normal merge main `ed747324f7d008b24103d4fd2eba503791c70a93`:213 callable API/0 contract_only/66 migration/90 core tablo. Starter kaynak ve100 öğrenci sınırları, tek oda, disiplin paket kapsamı/adı, CRM/etkinlik/personel/hakediş retleri ve eski receipt/preview denetimi kabul edildi. Pro→Starter açık sürümlü kaynak seçimiyle geçmiş/kesin rezervasyon/hak/finans korunur. Aday40419827224, aynı main40422823564 ve gerçek development CD40425584520 başarılı; hosted20/20, Edge21 ACTIVE/verify_jwt=true. [Kapanış kanıtları](docs/starter-plan-gates-handover.md). Güncel devir/kuyruk/durum belgeleri eşitlendi; tarihsel raporlar ve aşağıdaki eski sürüm kayıtları korunur. Bu kapanış bütün Starter yol haritası veya production kabulü değildir.
+PR56 normal merge main `ed747324f7d008b24103d4fd2eba503791c70a93`:213 callable API/0 contract_only/66 migration/90 core tablo. Starter kaynak ve100 öğrenci sınırları, tek oda, disiplin paket kapsamı/adı, CRM/etkinlik/personel/hakediş retleri ve eski receipt/preview denetimi kabul edildi. Pro→Starter açık sürümlü kaynak seçimiyle geçmiş/kesin rezervasyon/hak/finans korunur. Aday40419827224, aynı main40422823564 ve gerçek development CD40425584520 başarılı; hosted20/20, Edge21 ACTIVE/verify_jwt=true. [Kapanış kanıtları](apps/backend/docs/starter-plan-gates-handover.md). Güncel devir/kuyruk/durum belgeleri eşitlendi; tarihsel raporlar ve aşağıdaki eski sürüm kayıtları korunur. Bu kapanış bütün Starter yol haritası veya production kabulü değildir.
 
 ## 26 Ekim 2026 — hesap oturum ve TOTP güvenliği adayı
 
@@ -34,7 +34,7 @@ Aynı altı settings API’sine nullable font_scale ve startup_context eklendi; 
 
 ## 26 Ekim 2026 — izole restore sahiplik/izin kanıtı
 
-PR48 aynı-main clean/CD kabulü kaydedildi. İki izole native Supabase stack’inde uygulama sahipliği/ACL/RLS,178 tablo/1.025 satır, aynı UUID/parola Auth→Edge, private Storage bayt aktarımı ve beş dedicated worker idle geri dönüşü doğrulandı. Hosted afet kurtarma/RPO/RTO açık; yeni runtime/API/migration veya rutin CI testi eklenmedi. Ayrı hosted dummy kurulum işi iptal edildi. Ayrıntı [geri dönüş kaydında](docs/remote-backend-setup.md#restore-20261026).
+PR48 aynı-main clean/CD kabulü kaydedildi. İki izole native Supabase stack’inde uygulama sahipliği/ACL/RLS,178 tablo/1.025 satır, aynı UUID/parola Auth→Edge, private Storage bayt aktarımı ve beş dedicated worker idle geri dönüşü doğrulandı. Hosted afet kurtarma/RPO/RTO açık; yeni runtime/API/migration veya rutin CI testi eklenmedi. Ayrı hosted dummy kurulum işi iptal edildi. Ayrıntı [geri dönüş kaydında](apps/backend/docs/remote-backend-setup.md#restore-20261026).
 
 
 ## 2026-10-25 — CLI2.122 ve ölçümlü shard dengesi adayı
@@ -101,7 +101,7 @@ Clean acceptance is now one CI command with explicit local migration replay and 
 
 ## 0.2.0-rc.1 — 2026-10-15
 
-Persistent GitHub development branch, pinned CI/devcontainer and reproducible local Supabase stack. Verified Auth gateway creates domain UUIDv7 IDs and calls service-only named transaction RPCs. Identity, billing gates, shared entitlement pool, event save/read/preview/register/cancel/attendance/corrections and duty verification implemented for the explicitly listed runtime capabilities. Runtime schema validators are generated before execution. See docs/claude-handover.md for supported paths, acceptance evidence and unresolved product decisions.
+Persistent GitHub development branch, pinned CI/devcontainer and reproducible local Supabase stack. Verified Auth gateway creates domain UUIDv7 IDs and calls service-only named transaction RPCs. Identity, billing gates, shared entitlement pool, event save/read/preview/register/cancel/attendance/corrections and duty verification implemented for the explicitly listed runtime capabilities. Runtime schema validators are generated before execution. See docs/client-integration.md for supported paths, acceptance evidence and unresolved product decisions.
 
 ## 0.1.0 / 2.2-tech.2
 

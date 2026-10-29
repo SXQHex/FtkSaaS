@@ -1,14 +1,14 @@
-> Alan devri: teknik tüketim ve kaynağına bağlı eski kabul kayıtları. Güncel kaynak/CI/hosted durum [00 devirde](contracts/00-FtkSaaS-yeni-sohbet-devir.md), açık iş [tek backlog’da](remaining-work.md) tutulur. Eski aday/pending ifadeleri yeni görev veya güncel durum değildir.
+> Alan devri: teknik tüketim ve kaynağına bağlı eski kabul kayıtları. Güncel kaynak/CI/hosted durum [00 devirde](00-FtkSaaS-yeni-sohbet-devir.md), açık iş [tek backlog’da](../../../docs/remaining-work.md) tutulur. Eski aday/pending ifadeleri yeni görev veya güncel durum değildir.
 
 # Ayar ve hesap API tüketicileri
 
-Güncel kabul/hosted durum [00 devirde](contracts/00-FtkSaaS-yeni-sohbet-devir.md), açık alanlar [tek backlog’da](remaining-work.md#ertelenmiş-ve-kapsam-dışı) tutulur.69 davranış grubunun normatif sahibi [02 sözleşmedir](contracts/02-FtkSaaS-teknik-sozlesme.md#ayarlar-sozlesmesi-ve-davranis-sprinti); bu belge gerçek typed alan ve tüketici eşlemesidir. Starter FD07 başlangıcı [teknik sözleşmeden](contracts/02-FtkSaaS-teknik-sozlesme.md#starter-başlangıç-ayarları-ve-selfpublic) okunur.
+Güncel kabul/hosted durum [00 devirde](00-FtkSaaS-yeni-sohbet-devir.md), açık alanlar [tek backlog’da](../../../docs/remaining-work.md#ertelenmiş-ve-kapsam-dışı) tutulur.69 davranış grubunun normatif sahibi [02 sözleşmedir](../../../docs/contracts/02-FtkSaaS-teknik-sozlesme.md#ayarlar-sozlesmesi-ve-davranis-sprinti); bu belge gerçek typed alan ve tüketici eşlemesidir. Starter FD07 başlangıcı [teknik sözleşmeden](../../../docs/contracts/02-FtkSaaS-teknik-sozlesme.md#starter-başlangıç-ayarları-ve-selfpublic) okunur.
 
 ## İşlemler
 
 ### ST-03 — Starter tüketici kapsamı
 
-Kullanıcı Starter'da izinli FD01–FD12 alanlarının tamamını seçti; marka/medya, kişisel takvim ve paylaşım bu kapsamdan çıkarılmaz. Pro/Business'a kapalı F12/F17/F20–F24/F27/F29 yolları bu teslimle açılmaz. Backend davranışı, hazır istemci tüketimi ve gerçek sağlayıcı/ekran kabulü ayrı kanıtlardır. Aşağıdaki eşleme desteklenmeyen alanları kaydedilmiş gibi göstermez; açık kabulün sahibi [tek backlog](remaining-work.md) ve [00 devir](contracts/00-FtkSaaS-yeni-sohbet-devir.md) olarak kalır.
+Kullanıcı Starter'da izinli FD01–FD12 alanlarının tamamını seçti; marka/medya, kişisel takvim ve paylaşım bu kapsamdan çıkarılmaz. Pro/Business'a kapalı F12/F17/F20–F24/F27/F29 yolları bu teslimle açılmaz. Backend davranışı, hazır istemci tüketimi ve gerçek sağlayıcı/ekran kabulü ayrı kanıtlardır. Aşağıdaki eşleme desteklenmeyen alanları kaydedilmiş gibi göstermez; açık kabulün sahibi [tek backlog](../../../docs/remaining-work.md) ve [00 devir](00-FtkSaaS-yeni-sohbet-devir.md) olarak kalır.
 
 | FD | Starter tüketicisi ve mevcut sınır |
 |---|---|
@@ -166,7 +166,7 @@ Snapshot gerçek cash_movements INSERT'i ile mevcut borç dağıtımı/öğrenci
 
 ## Kişisel takvim bağlantısı — aday
 
-29 Ekim kullanıcı doğrulaması: gerçek seans ekranı henüz yoktur. Bu nedenle FTK_CALENDAR_SESSION_URL_TEMPLATE için onaylı gerçek route mevcut değildir; sentetik route veya login yönlendirmesi hosted kabul yerine geçmez. Gerçek ekran/route sonrası development host/config, GET/HEAD→Edge→SQL→ICS→yetkili seans ekranı ve rotate/revoke/erişim kaybı tek kabul PR'sinde tamamlanır. Bu frontend tasarımı/ekranı burada uygulanmaz; WEB-01 bağımlılığı [backlog'dadır](remaining-work.md).
+29 Ekim kullanıcı doğrulaması: gerçek seans ekranı henüz yoktur. Bu nedenle FTK_CALENDAR_SESSION_URL_TEMPLATE için onaylı gerçek route mevcut değildir; sentetik route veya login yönlendirmesi hosted kabul yerine geçmez. Gerçek ekran/route sonrası development host/config, GET/HEAD→Edge→SQL→ICS→yetkili seans ekranı ve rotate/revoke/erişim kaybı tek kabul PR'sinde tamamlanır. Bu frontend tasarımı/ekranı burada uygulanmaz; WEB-01 bağımlılığı [backlog'dadır](../../../docs/remaining-work.md).
 
 Yeni own-account API'leri calendar_links_get_v1, calendar_link_create_v1, calendar_link_rotate_v1 ve calendar_link_revoke_v1'dir. Otomatik bağlantı yoktur. Oluşturma explicit organization_scope:{org_id} ve boş olmayan unique kinds:[lessons,duties] seçimi ister; bu global hesap kaynağına başka actor/account/person seçicisi eklenmez. Starter event/F29 açılmaz. Ders kesin active kendi reservation, görev active kendi instructor/assistant ataması ve canlı rol ile gelir; aynı seans iki yoldan uygunsa tek item'dır. Merkez, Starter scope_required ve selected session read guard'ları korunur. Gelecek/devam eden planned seanslar okunur; intent/waitlist/başka katılımcı veya finans kaydı yoktur.
 

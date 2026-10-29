@@ -1,4 +1,4 @@
-> Alan devri: teknik tüketim ve kaynağına bağlı eski kabul kayıtları. Güncel kaynak/CI/hosted durum [00 devirde](contracts/00-FtkSaaS-yeni-sohbet-devir.md), açık iş [tek backlog’da](remaining-work.md) tutulur. Eski aday/pending ifadeleri yeni görev veya güncel durum değildir.
+> Alan devri: teknik tüketim ve kaynağına bağlı eski kabul kayıtları. Güncel kaynak/CI/hosted durum [00 devirde](00-FtkSaaS-yeni-sohbet-devir.md), açık iş [tek backlog’da](../../../docs/remaining-work.md) tutulur. Eski aday/pending ifadeleri yeni görev veya güncel durum değildir.
 
 # P06 — rapor, CSV import ve sonuç kurtarma
 
@@ -18,7 +18,7 @@ Import açık teknik tenant konfigürasyonu ister; bu teslim default limit icat 
 
 Inbox satırı tek başına worker teslim kanıtı değildir: Starter kabulü ilgili import/rapor tamamlanma outbox işinin pending→succeeded geçişini, aynı işin P05 sonucunu ve dedicated role/operation key/bildirim/result ile bağlı tek başarılı worker receipt'ini de denetler.
 
-Kaynak bağlı regresyon: `apps/backend/tests/starter-operations-acceptance.mjs`, mevcut registry suite üzerinden gerçek Auth→Storage→Edge→RPC ve dedicated P05/P06 LOGIN çalıştırır. Yeni suite/shard veya full clean kapsam değişikliği yoktur. Bu yeni tüketici kabulünün çalışma durumu [tek backlog](remaining-work.md), CI/main/development kabulü [00 devir](contracts/00-FtkSaaS-yeni-sohbet-devir.md) sahibindedir; kaynakta test bulunması testin geçtiği anlamına gelmez.
+Kaynak bağlı regresyon: `apps/backend/tests/starter-operations-acceptance.mjs`, mevcut registry suite üzerinden gerçek Auth→Storage→Edge→RPC ve dedicated P05/P06 LOGIN çalıştırır. Yeni suite/shard veya full clean kapsam değişikliği yoktur. Bu yeni tüketici kabulünün çalışma durumu [tek backlog](../../../docs/remaining-work.md), CI/main/development kabulü [00 devir](00-FtkSaaS-yeni-sohbet-devir.md) sahibindedir; kaynakta test bulunması testin geçtiği anlamına gelmez.
 
 ### ST-02 özellik izi
 

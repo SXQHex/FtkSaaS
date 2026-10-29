@@ -1,6 +1,7 @@
 import {repositoryRoot,repoFile} from '../paths.mjs';
 import {ciFile} from '../paths.mjs';
 import fs from 'node:fs';
+import {updateDocs} from '../update-docs.mjs';
 import path from 'node:path';
 import {execFileSync} from 'node:child_process';
 import {pathToFileURL} from 'node:url';
@@ -58,5 +59,7 @@ if(import.meta.url===pathToFileURL(process.argv[1]??'').href){
  // Inbound links, including fragments, survive deletion/move checks. Reports are source snapshots.
  const living=execFileSync('git',['ls-files','-z'],{encoding:'utf8'}).split('\0').filter(p=>p.endsWith('.md')&&!p.startsWith('docs/history/'));
  const files=[...new Set([...changed,...living])];
+ for(const retired of Object.keys(JSON.parse(fs.readFileSync(new URL('./document-moves.json',import.meta.url)))))if(fs.existsSync(repoFile(retired)))throw Error('RETIRED_DOCUMENT_PATH '+retired);
+ updateDocs({check:true});
  console.log('Documentation checks:',files.length,'files;',checkDocuments(files),'local links');
 }
