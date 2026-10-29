@@ -12,12 +12,22 @@ import { browserClient } from "../../lib/supabase/client";
 import { sessionPath } from "../../lib/session-route";
 import { Preferences } from "../preferences";
 import { SessionSummary } from "./session-detail";
+import { SessionChange } from "./session-change";
 
-export function SessionPage({ orgId, sessionId }: { orgId: string; sessionId: string }) {
+export function SessionPage({
+  orgId,
+  sessionId,
+  actorId,
+}: {
+  orgId: string;
+  sessionId: string;
+  actorId: string;
+}) {
   const router = useRouter();
   const t = useTranslations("calendar");
   const api = useTranslations("api");
   const [attempt, setAttempt] = useState(0);
+  const [editing, setEditing] = useState(false);
   const [result, setResult] = useState<{
     key: string;
     session?: SessionView;
@@ -84,7 +94,7 @@ export function SessionPage({ orgId, sessionId }: { orgId: string; sessionId: st
         </div>
         <Button
           variant="outline"
-          disabled={!current}
+          disabled={!current || editing}
           className="h-auto min-h-11 whitespace-normal"
           onClick={() => setAttempt((value) => value + 1)}
         >
@@ -103,9 +113,32 @@ export function SessionPage({ orgId, sessionId }: { orgId: string; sessionId: st
             {t("retry")}
           </Button>
         </div>
+      ) : current.session && editing ? (
+        <SessionChange
+          key={`${key}:${actorId}`}
+          session={current.session}
+          orgId={orgId}
+          actorId={actorId}
+          timeZone={current.timeZone ?? "UTC"}
+          onClose={() => {
+            setEditing(false);
+            setAttempt((value) => value + 1);
+          }}
+          onSaved={() => {
+            setEditing(false);
+            setAttempt((value) => value + 1);
+          }}
+        />
       ) : current.session ? (
         <div className="space-y-6">
           <SessionSummary session={current.session} timeZone={current.timeZone ?? "UTC"} />
+          <Button
+            variant="outline"
+            className="h-auto min-h-11 whitespace-normal"
+            onClick={() => setEditing(true)}
+          >
+            {t("changeSession")}
+          </Button>
         </div>
       ) : null}
     </main>

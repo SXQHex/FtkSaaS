@@ -53,7 +53,7 @@ beforeEach(() => {
   mocks.session.mockResolvedValue(session);
 });
 test("direct links use the backend session scope without requiring an administrative center list", async () => {
-  render(<SessionPage orgId="org" sessionId="session" />);
+  render(<SessionPage actorId="actor" orgId="org" sessionId="session" />);
   expect(await screen.findByText("İptal edildi")).toBeVisible();
   expect(screen.getByText("Açık", { exact: true })).toBeVisible();
   expect(screen.getByText(/Saatler cihazının saat diliminde/)).toBeVisible();
@@ -65,7 +65,7 @@ test("failed refresh hides the old session and retry loads fresh state", async (
     .mockResolvedValueOnce(session)
     .mockRejectedValueOnce(new Error("offline"))
     .mockResolvedValueOnce({ ...session, state: "planned" });
-  render(<SessionPage orgId="org" sessionId="session" />);
+  render(<SessionPage actorId="actor" orgId="org" sessionId="session" />);
   await screen.findByText("İptal edildi");
   await user.click(screen.getByRole("button", { name: "Bilgileri yenile" }));
   expect(await screen.findByRole("alert")).toHaveTextContent("Bağlantı kurulamadı");
@@ -81,7 +81,7 @@ test("sign-out clears the detail and a late response cannot restore it", async (
         finish = resolve;
       }),
   );
-  render(<SessionPage orgId="org" sessionId="session" />);
+  render(<SessionPage actorId="actor" orgId="org" sessionId="session" />);
   act(() => mocks.listener?.("SIGNED_OUT"));
   await act(async () => finish(session));
   expect(screen.queryByText("İptal edildi")).not.toBeInTheDocument();
@@ -95,7 +95,7 @@ test("access denial remains an error without session facts or a demo fallback", 
       error: { code: "FORBIDDEN", retryable: false, trace_id: "synthetic" },
     }),
   );
-  render(<SessionPage orgId="other-org" sessionId="session" />);
+  render(<SessionPage actorId="actor" orgId="other-org" sessionId="session" />);
   expect(await screen.findByRole("alert")).toHaveTextContent("yetkin");
   expect(screen.queryByText("Kontenjan")).not.toBeInTheDocument();
 });

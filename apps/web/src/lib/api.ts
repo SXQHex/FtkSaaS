@@ -97,6 +97,36 @@ export async function getSession(orgId: string, centerId: string | undefined, se
     }),
   );
 }
+export async function previewSessionChange(
+  input: Omit<
+    Operations["session_change_preview_v1"]["request"],
+    "client_api_version" | "request_id"
+  >,
+) {
+  return unwrap<Operations["session_change_preview_v1"]["response"]>(
+    await apiClient().call("session_change_preview_v1", { ...request(), ...input }),
+  );
+}
+export async function applySessionChange(
+  input: Omit<
+    Operations["session_change_apply_v1"]["request"],
+    "client_api_version" | "request_id"
+  >,
+) {
+  return unwrap<Operations["session_change_apply_v1"]["response"]>(
+    await apiClient().call("session_change_apply_v1", { ...request(), ...input }),
+  );
+}
+export async function getSessionChangeStatus(orgId: string, key: string) {
+  return unwrap<Operations["operation_status_get_v1"]["response"]>(
+    await apiClient().call("operation_status_get_v1", {
+      ...request(),
+      org_id: orgId,
+      operation: "session_change_apply_v1",
+      key,
+    }),
+  );
+}
 export function errorMessageKey(error: unknown) {
   if (!(error instanceof ApiFailure)) return "network";
   const code = error.failure.error.code;

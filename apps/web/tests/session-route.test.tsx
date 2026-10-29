@@ -64,5 +64,5 @@ test("required MFA cannot be bypassed by a deep link and preserves the destinati
 });
 test("verified native session renders only the requested tenant and session IDs", async () => {
   const page = await SessionRoute({ params: Promise.resolve(ids) });
-  expect(page.props).toEqual(ids);
+  expect(page.props).toEqual({ ...ids, actorId: "user" });
 });

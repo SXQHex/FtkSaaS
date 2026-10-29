@@ -28,5 +28,12 @@ export default async function SessionRoute({
   if (assurance.error) throw assurance.error;
   if (assurance.data.nextLevel === "aal2" && assurance.data.currentLevel !== "aal2")
     redirect(`/dogrulama?next=${next}`);
-  return <SessionPage key={`${orgId}:${sessionId}`} orgId={orgId} sessionId={sessionId} />;
+  return (
+    <SessionPage
+      key={`${orgId}:${sessionId}:${result.data.user.id}`}
+      orgId={orgId}
+      sessionId={sessionId}
+      actorId={result.data.user.id}
+    />
+  );
 }
