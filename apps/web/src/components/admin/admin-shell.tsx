@@ -268,10 +268,16 @@ export function AdminShell({
               className="h-9 gap-2 px-2.5 text-muted-foreground sm:w-44 sm:justify-start"
               onClick={() => setSearchOpen(true)}
               aria-label={t("searchPages")}
+              aria-keyshortcuts="Control+K Meta+K"
             >
               <Search className="size-4" />
-              <span className="hidden text-xs sm:inline">{t("search")}</span>
-              <kbd className="ml-auto hidden rounded border px-1 text-[10px] sm:inline">⌘ K</kbd>
+              <span className="hidden text-xs sm:inline">{t("searchPages")}</span>
+              <kbd
+                aria-hidden="true"
+                className="ml-auto hidden rounded border px-1 text-[10px] sm:inline"
+              >
+                ⌘ K
+              </kbd>
             </Button>
             <Button
               variant="ghost"
@@ -284,13 +290,16 @@ export function AdminShell({
           </div>
         </header>
         {preview && (
-          <div className="flex flex-wrap items-center justify-between gap-1 border-b bg-background px-5 py-2 text-xs text-muted-foreground sm:px-8">
+          <section
+            aria-label={t("preview")}
+            className="flex flex-wrap items-center justify-between gap-1 border-b bg-background px-5 py-2 text-xs text-muted-foreground sm:px-8"
+          >
             <span className="flex items-center gap-2">
               <span className="size-1.5 rounded-full bg-muted-foreground" aria-hidden="true" />
               {t("preview")}
             </span>
             <span>{t("previewNote")}</span>
-          </div>
+          </section>
         )}
         <main
           ref={contentRef}

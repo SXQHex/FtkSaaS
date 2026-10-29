@@ -141,16 +141,22 @@ export function AdminPreview() {
           key={index}
           type="button"
           aria-pressed={day === index}
-          aria-label={date(index, { weekday: "long", day: "numeric", month: "long" })}
+          aria-labelledby={`preview-weekday-${index} preview-day-${index}`}
+          aria-describedby={`preview-full-date-${index}`}
           onClick={() => setDay(index)}
           className={cn(
             "flex min-h-17 min-w-0 flex-col items-center justify-center gap-1 rounded-lg px-0.5 transition-colors hover:bg-muted",
             day === index && "bg-primary text-primary-foreground hover:bg-primary",
           )}
         >
-          <span className="text-[11px] sm:text-xs">{date(index, { weekday: "short" })}</span>
-          <span className="text-base font-semibold tabular-nums">
+          <span id={`preview-weekday-${index}`} className="text-[11px] sm:text-xs">
+            {date(index, { weekday: "short" })}
+          </span>
+          <span id={`preview-day-${index}`} className="text-base font-semibold tabular-nums">
             {date(index, { day: "numeric" })}
+          </span>
+          <span id={`preview-full-date-${index}`} className="sr-only">
+            {date(index, { weekday: "long", day: "numeric", month: "long" })}
           </span>
         </button>
       ))}

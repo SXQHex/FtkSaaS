@@ -22,7 +22,9 @@ test("design preview supports navigation, browser history and class details with
   await page.getByRole("button", { name: "Takvime git" }).click();
   await expect(page).toHaveURL(/#schedule$/);
   await expect(page.getByRole("heading", { name: "Takvim", exact: true })).toBeVisible();
-  await page.getByRole("button", { name: "1 Kasım Pazar" }).click();
+  const sunday = page.getByRole("button", { name: "Paz 1", exact: true });
+  await expect(sunday).toHaveAccessibleDescription("1 Kasım Pazar");
+  await sunday.click();
   await expect(page.getByRole("heading", { name: "Bugün ders yok" })).toBeVisible();
   await page.goBack();
   await expect(page.getByRole("heading", { name: "Stüdyoda bugün" })).toBeVisible();
@@ -111,6 +113,7 @@ test("desktop shell collapses and English pages support enlarged text", async ({
 }, testInfo) => {
   await page.setViewportSize({ width: 1440, height: 1080 });
   await page.goto("/tasarim");
+  expect((await new AxeBuilder({ page }).analyze()).violations).toEqual([]);
   await page.screenshot({ path: testInfo.outputPath("admin-desktop.png"), fullPage: true });
   await page.getByRole("button", { name: "Menüyü daralt" }).click();
   await expect(page.getByRole("button", { name: "Menüyü genişlet" })).toBeVisible();
