@@ -158,7 +158,50 @@ export async function getPerson(orgId: string, centerId: string, personId: strin
     }),
   );
 }
-export type StudentOperation = "student_activate_v1" | "student_deactivate_v1";
+export async function updatePerson(
+  input: Omit<Operations["person_update_v1"]["request"], "client_api_version" | "request_id">,
+) {
+  return unwrap<Operations["person_update_v1"]["response"]>(
+    await apiClient().call("person_update_v1", { ...request(), ...input }),
+  );
+}
+export async function createPerson(
+  input: Omit<Operations["person_create_v1"]["request"], "client_api_version" | "request_id">,
+) {
+  return unwrap<Operations["person_create_v1"]["response"]>(
+    await apiClient().call("person_create_v1", { ...request(), ...input }),
+  );
+}
+export type PersonCreateCommand = {
+  operation: "person_create_v1";
+  input: Omit<Operations["person_create_v1"]["request"], "client_api_version" | "request_id">;
+};
+export async function sendAccountInvitation(
+  input: Omit<Operations["account_access_send_v1"]["request"], "client_api_version" | "request_id">,
+) {
+  return unwrap<Operations["account_access_send_v1"]["response"]>(
+    await apiClient().call("account_access_send_v1", { ...request(), ...input }),
+  );
+}
+export type AccountInvitationCommand = {
+  operation: "account_access_send_v1";
+  input: Omit<Operations["account_access_send_v1"]["request"], "client_api_version" | "request_id">;
+};
+export async function getJobStatus(orgId: string, centerId: string, jobId: string) {
+  return unwrap<Operations["job_status_get_v1"]["response"]>(
+    await apiClient().call("job_status_get_v1", {
+      ...request(),
+      org_id: orgId,
+      center_id: centerId,
+      job_id: jobId,
+    }),
+  );
+}
+export type PersonUpdateCommand = {
+  operation: "person_update_v1";
+  input: Omit<Operations["person_update_v1"]["request"], "client_api_version" | "request_id">;
+};
+export type StudentOperation = "student_activate_v1" | "student_deactivate_v1" | "person_update_v1";
 export type StudentCommand =
   | {
       operation: "student_activate_v1";
@@ -184,6 +227,20 @@ export async function changeStudent(command: StudentCommand) {
 export async function getStudentChangeStatus(
   orgId: string,
   operation: StudentOperation,
+  key: string,
+) {
+  return unwrap<Operations["operation_status_get_v1"]["response"]>(
+    await apiClient().call("operation_status_get_v1", {
+      ...request(),
+      org_id: orgId,
+      operation,
+      key,
+    }),
+  );
+}
+export async function getOperationStatus(
+  orgId: string,
+  operation: Operations["operation_status_get_v1"]["request"]["operation"],
   key: string,
 ) {
   return unwrap<Operations["operation_status_get_v1"]["response"]>(

@@ -18,12 +18,17 @@ import {
 } from "@ftksaas/ui/components/sheet";
 import { errorMessageKey } from "../../lib/api";
 import {
+  readCreatedPeople,
+  saveCreatedPeople,
   studentActions,
   studentState,
   type StudentActions,
   type StudentScope,
 } from "../../lib/students";
 import { StudentChange } from "./student-change";
+import { PersonEdit } from "./person-edit";
+import { PersonCreate } from "./person-create";
+import { PersonInvitation } from "./person-invitation";
 
 const buttonClass = "h-auto min-h-11 max-w-full whitespace-normal";
 export function StudentsWorkspace({
@@ -82,6 +87,65 @@ export function StudentsWorkspace({
   );
 }
 
+function CreatedStudentRows({
+  ids,
+  scope,
+  actions,
+  onOpen,
+}: {
+  ids: string[];
+  scope: StudentScope;
+  actions: StudentActions;
+  onOpen: (id: string) => void;
+}) {
+  const t = useTranslations("students");
+  const [people, setPeople] = useState<{ id: string; name?: string; error?: string }[]>(
+    ids.map((id) => ({ id })),
+  );
+  useEffect(() => {
+    let active = true;
+    Promise.all(
+      ids.map(async (id) => {
+        try {
+          const person = await actions.person(scope.orgId, scope.centerId, id);
+          return { id, name: person.display_name };
+        } catch (error) {
+          return { id, error: errorMessageKey(error) };
+        }
+      }),
+    ).then((result) => {
+      if (active) setPeople(result);
+    });
+    return () => {
+      active = false;
+    };
+  }, [actions, ids, scope.orgId, scope.centerId]);
+  return (
+    <section className="space-y-3 rounded-xl border p-5" aria-labelledby="created-students-title">
+      <h2 id="created-students-title" className="font-semibold">
+        {t("awaitingActivation")}
+      </h2>
+      <p className="text-sm leading-6 text-muted-foreground">{t("awaitingActivationHint")}</p>
+      <ul className="divide-y rounded-lg border">
+        {people.map((person) => (
+          <li key={person.id}>
+            <button
+              type="button"
+              className="flex min-h-14 w-full flex-wrap items-center justify-between gap-2 px-4 py-3 text-left focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
+              onClick={() => onOpen(person.id)}
+            >
+              <span className="font-medium">
+                {person.name ?? (person.error ? t("createdPersonUnavailable") : t("loadingDetail"))}
+              </span>
+              <Badge variant="outline">{t("states.none")}</Badge>
+            </button>
+          </li>
+        ))}
+      </ul>
+    </section>
+  );
+}
+
 // The public design route injects fictional actions; the live wrapper always uses the backend.
 export function StudentDirectory({
   scope,
@@ -99,6 +163,7 @@ export function StudentDirectory({
   const [cursors, setCursors] = useState<(string | undefined)[]>([undefined]);
   const [attempt, setAttempt] = useState(0);
   const [selected, setSelected] = useState<{ id: string } | null>(null);
+  const [createdIds, setCreatedIds] = useState(() => readCreatedPeople(scope));
   const opener = useRef<HTMLButtonElement | null>(null);
   const searchInput = useRef<HTMLInputElement | null>(null);
   const [result, setResult] = useState<{
@@ -126,6 +191,27 @@ export function StudentDirectory({
   function refresh() {
     setCursors([undefined]);
     setAttempt((value) => value + 1);
+  }
+  function onCreated(personId: string) {
+    try {
+      const next = [...new Set([...createdIds, personId])];
+      saveCreatedPeople(scope, next);
+      setCreatedIds(next);
+      setSelected({ id: personId });
+      return true;
+    } catch {
+      return false;
+    }
+  }
+  function onActivated(personId: string) {
+    if (!createdIds.includes(personId)) return;
+    const next = createdIds.filter((id) => id !== personId);
+    try {
+      saveCreatedPeople(scope, next);
+    } catch {
+      /* The profile can still be refreshed from the backend next time. */
+    }
+    setCreatedIds(next);
   }
   function submit(event: FormEvent) {
     event.preventDefault();
@@ -160,7 +246,18 @@ export function StudentDirectory({
           {t("refresh")}
         </Button>
       </form>
-      <p className="max-w-2xl text-sm leading-6 text-muted-foreground">{t("listHint")}</p>
+      <div className="flex flex-wrap items-start justify-between gap-4">
+        <p className="max-w-2xl text-sm leading-6 text-muted-foreground">{t("listHint")}</p>
+        <PersonCreate scope={scope} actions={actions} onCreated={onCreated} />
+      </div>
+      {createdIds.length > 0 && (
+        <CreatedStudentRows
+          ids={createdIds}
+          scope={scope}
+          actions={actions}
+          onOpen={(id) => setSelected({ id })}
+        />
+      )}
       {query && (
         <div className="flex flex-wrap items-center gap-3 text-sm">
           <p>{t("searching", { query })}</p>
@@ -304,6 +401,7 @@ export function StudentDirectory({
               centerName={centerName}
               actions={actions}
               onSaved={refresh}
+              onActivated={onActivated}
             />
           </SheetContent>
         </Sheet>
@@ -318,12 +416,14 @@ function StudentDetail({
   centerName,
   actions,
   onSaved,
+  onActivated,
 }: {
   scope: StudentScope;
   personId: string;
   centerName: string;
   actions: StudentActions;
   onSaved: () => void;
+  onActivated: (personId: string) => void;
 }) {
   const t = useTranslations("students");
   const api = useTranslations("api");
@@ -422,8 +522,21 @@ function StudentDetail({
               <p className="text-sm text-muted-foreground">{t("noRelationships")}</p>
             )}
           </section>
+          <section className="space-y-3 border-t pt-6" aria-label={t("documents")}>
+            <h3 className="font-semibold">{t("documents")}</h3>
+            <p className="text-sm leading-6 text-muted-foreground">{t("documentStatusHint")}</p>
+          </section>
         </>
       )}
+      <PersonEdit
+        key={`${personId}:${person?.version ?? "loading"}`}
+        scope={scope}
+        personId={personId}
+        person={person}
+        actions={actions}
+        onSaved={() => setAttempt((value) => value + 1)}
+      />
+      {person && <PersonInvitation scope={scope} person={person} actions={actions} />}
       <StudentChange
         key={changeRevision}
         scope={scope}
@@ -435,6 +548,7 @@ function StudentDetail({
           setAttempt((value) => value + 1);
           setChangeRevision((value) => value + 1);
           onSaved();
+          onActivated(personId);
         }}
       />
     </div>

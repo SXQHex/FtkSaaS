@@ -31,6 +31,12 @@ function actions() {
       replayed: false,
     }),
     status: vi.fn<StudentActions["status"]>(),
+    update: vi.fn<StudentActions["update"]>(),
+    operationStatus: vi.fn<StudentActions["operationStatus"]>(),
+    create: vi.fn<StudentActions["create"]>(),
+    invite: vi.fn<StudentActions["invite"]>(),
+    jobStatus: vi.fn<StudentActions["jobStatus"]>(),
+    operationResult: vi.fn<StudentActions["operationResult"]>(),
   };
 }
 function directory(api: StudentActions) {
