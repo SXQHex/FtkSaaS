@@ -1,5 +1,21 @@
-import { test, expect } from "@playwright/test";
+import { test, expect, type Page } from "@playwright/test";
 import AxeBuilder from "@axe-core/playwright";
+
+async function expectNoHorizontalOverflow(page: Page, route: string) {
+  const layout = await page.evaluate(() => ({
+    width: innerWidth,
+    scrollWidth: document.documentElement.scrollWidth,
+    overflowing: Array.from(document.querySelectorAll("main *"))
+      .filter((element) => element.getBoundingClientRect().right > innerWidth)
+      .slice(0, 10)
+      .map((element) => ({
+        tag: element.tagName,
+        classes: element.className,
+        text: element.textContent?.slice(0, 100),
+      })),
+  }));
+  expect(layout.scrollWidth <= layout.width, JSON.stringify({ route, ...layout })).toBe(true);
+}
 
 test("design preview supports navigation, browser history and class details without a session", async ({
   page,
@@ -123,9 +139,7 @@ test("mobile menu, light and dark views are accessible and do not overflow", asy
   ]) {
     await page.goto(`/tasarim#${route}`);
     await expect(page.getByRole("main").getByRole("heading", { level: 1 })).toBeVisible();
-    expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(
-      true,
-    );
+    await expectNoHorizontalOverflow(page, route);
     expect((await new AxeBuilder({ page }).analyze()).violations).toEqual([]);
   }
   await page.goto("/tasarim");
@@ -158,8 +172,6 @@ test("desktop shell collapses and English pages support enlarged text", async ({
       document.documentElement.style.fontSize = "200%";
     });
     await expect(page.getByRole("main").getByRole("heading", { level: 1 })).toBeVisible();
-    expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(
-      true,
-    );
+    await expectNoHorizontalOverflow(page, route);
   }
 });

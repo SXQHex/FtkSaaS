@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useId, useState } from "react";
 import dynamic from "next/dynamic";
 import { useLocale, useTranslations } from "next-intl";
 import {
@@ -67,6 +67,7 @@ export function SessionCalendar({
 }: SessionCalendarProps) {
   const t = useTranslations("calendar");
   const locale = useLocale();
+  const id = useId();
   const [query, setQuery] = useState("");
   const [kind, setKind] = useState("all");
   const [layout, setLayout] = useState<"list" | "grid">("list");
@@ -148,20 +149,31 @@ export function SessionCalendar({
               key={day}
               type="button"
               aria-pressed={day === date}
-              aria-label={`${weekday} ${number}`}
-              aria-describedby={`calendar-date-${day}`}
+              aria-labelledby={`${id}-weekday-${day} ${id}-day-${day}`}
+              aria-describedby={`${id}-date-${day}`}
               onClick={() => onDateChange(day)}
               className={cn(
                 "flex min-h-17 min-w-0 flex-col items-center justify-center gap-1 rounded-lg px-0.5 hover:bg-muted",
                 day === date && "bg-primary text-primary-foreground hover:bg-primary",
               )}
             >
-              <span className="text-[11px] sm:text-xs">{weekday}</span>
-              <span className="text-base font-semibold tabular-nums">{number}</span>
-              <span id={`calendar-date-${day}`} className="sr-only">
-                {formatDay(day, { weekday: "long", day: "numeric", month: "long" })}
+              <span id={`${id}-weekday-${day}`} className="text-[11px] sm:text-xs">
+                {weekday}
+              </span>{" "}
+              <span id={`${id}-day-${day}`} className="text-base font-semibold tabular-nums">
+                {number}
               </span>
             </button>
+          );
+        })}
+      </div>
+      <div className="sr-only">
+        {Array.from({ length: 7 }, (_, index) => {
+          const day = addDays(start, index);
+          return (
+            <span key={day} id={`${id}-date-${day}`}>
+              {formatDay(day, { weekday: "long", day: "numeric", month: "long" })}
+            </span>
           );
         })}
       </div>
@@ -334,7 +346,7 @@ export function SessionCalendar({
                           </p>
                         )}
                       </div>
-                      <div className="flex max-w-full items-center gap-3">
+                      <div className="flex max-w-full flex-wrap items-center gap-3">
                         {entry.capacity && (
                           <Badge variant="outline" className="gap-1.5">
                             <Users className="size-3" aria-hidden="true" />

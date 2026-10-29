@@ -2,6 +2,7 @@ import { expect, test } from "vitest";
 import { screen, within } from "@testing-library/react";
 import { render } from "./render";
 import { AdminPreview } from "../src/components/admin/admin-preview";
+import { CalendarPreview } from "../src/components/admin/calendar-preview";
 
 test.each([
   {
@@ -28,5 +29,19 @@ test.each([
     expect(sunday).toHaveAttribute("aria-pressed", "false");
     const previewRegion = screen.getByRole("region", { name: preview });
     expect(within(previewRegion).getByText(note)).toBeVisible();
+  },
+);
+
+test.each([
+  { locale: "tr" as const, dayName: "Paz 1", fullDate: "1 Kasım Pazar" },
+  { locale: "en" as const, dayName: "Sun 1", fullDate: "Sunday, November 1" },
+])(
+  "$locale calendar names match visible day text and keep the full date separate",
+  ({ locale, dayName, fullDate }) => {
+    render(<CalendarPreview />, locale);
+    const sunday = screen.getByRole("button", { name: dayName });
+    expect(sunday).toHaveAccessibleDescription(fullDate);
+    expect(sunday.textContent?.replace(/\s+/g, " ").trim()).toBe(dayName);
+    expect(sunday).not.toHaveAttribute("aria-label");
   },
 );
