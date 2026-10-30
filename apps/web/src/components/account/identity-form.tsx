@@ -4,6 +4,7 @@ import { useTranslations } from "next-intl";
 import type { AccountView } from "@ftksaas/api-contracts";
 import { Button } from "@ftksaas/ui/components/button";
 import { AccountField } from "./account-field";
+import { normalizePhone } from "../../lib/phone";
 import { browserClient } from "../../lib/supabase/client";
 import { appOrigin } from "../../lib/config";
 import { rememberAuthReturn } from "../../lib/auth-return";
@@ -14,6 +15,7 @@ export function IdentityForm({ account, onSaved }: { account: AccountView; onSav
   const [notice, setNotice] = useState("");
   const [error, setError] = useState("");
   const [passwordError, setPasswordError] = useState("");
+  const [phoneError, setPhoneError] = useState("");
   const lock = useRef(false);
   async function run(task: () => Promise<unknown>, message: string) {
     if (lock.current) return;
@@ -34,7 +36,17 @@ export function IdentityForm({ account, onSaved }: { account: AccountView; onSav
   }
   function update(event: FormEvent<HTMLFormElement>, kind: "email" | "phone") {
     event.preventDefault();
-    const value = String(new FormData(event.currentTarget).get(kind)).trim();
+    const form = event.currentTarget;
+    const input = String(new FormData(form).get(kind)).trim();
+    const value = kind === "phone" ? normalizePhone(input) : input;
+    if (value === undefined) {
+      setNotice("");
+      setError("");
+      setPhoneError(t("fieldPhone"));
+      form.querySelector<HTMLInputElement>('[name="phone"]')?.focus();
+      return;
+    }
+    setPhoneError("");
     void run(async () => {
       if (kind === "email") await rememberAuthReturn("/account");
       const result = await browserClient().auth.updateUser(
@@ -70,11 +82,12 @@ export function IdentityForm({ account, onSaved }: { account: AccountView; onSav
         <form key={kind} onSubmit={(event) => update(event, kind)} className="space-y-3">
           <AccountField
             label={t(`new_${kind}`)}
-            placeholder={kind === "email" ? "name@example.com" : "+905xxxxxxxxx"}
+            placeholder={kind === "email" ? "name@example.com" : "05xx xxx xx xx"}
+            error={kind === "phone" ? phoneError : undefined}
+            onChange={kind === "phone" ? () => setPhoneError("") : undefined}
             id={`new-${kind}`}
             name={kind}
             type={kind === "email" ? "email" : "tel"}
-            pattern={kind === "phone" ? "\\+[1-9][0-9]{7,14}" : undefined}
             required
             disabled={busy}
             autoComplete={kind}

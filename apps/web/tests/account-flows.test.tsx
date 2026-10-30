@@ -19,13 +19,17 @@ vi.mock("next-themes", () => ({
 const mocks = vi.hoisted(() => ({
   call: vi.fn<(operation: string, input: Record<string, unknown>) => Promise<unknown>>(),
   proof: vi.fn<() => Promise<string>>(),
-  update:
-    vi.fn<
-      (
-        attributes: { password?: string; current_password?: string; email?: string },
-        options?: unknown,
-      ) => Promise<{ error: Error | null }>
-    >(),
+  update: vi.fn<
+    (
+      attributes: {
+        password?: string;
+        current_password?: string;
+        email?: string;
+        phone?: string;
+      },
+      options?: unknown,
+    ) => Promise<{ error: Error | null }>
+  >(),
   factors:
     vi.fn<() => Promise<{ error: null; data: { totp: { id: string; status: string }[] } }>>(),
   unenroll: vi.fn<() => Promise<{ error: null }>>(),
@@ -366,8 +370,7 @@ test("password mismatch belongs to the confirmation field", async () => {
   expect(screen.getByRole("alert")).toHaveClass("text-destructive");
 });
 
-test("profile phone accepts an international number and keeps it optional", async () => {
-  const user = userEvent.setup();
+function renderProfilePhone() {
   render(
     <ProfileForm
       account={{
@@ -390,9 +393,70 @@ test("profile phone accepts an international number and keeps it optional", asyn
       onSaved={mocks.saved}
     />,
   );
-  const phone = screen.getByLabelText("Doğrulanmamış telefon") as HTMLInputElement;
-  expect(phone).not.toBeRequired();
-  expect(phone.checkValidity()).toBe(true);
-  await user.type(phone, "+905551234567");
-  expect(phone.checkValidity()).toBe(true);
+}
+
+test.each([
+  ["0555 123 45 67", "+905551234567"],
+  ["+44 20 7946 0018", "+442079460018"],
+  ["", null],
+] as const)(
+  "profile phone %s saves only library E.164 or an explicit empty value",
+  async (input, expected) => {
+    mocks.call.mockResolvedValue({});
+    const user = userEvent.setup();
+    renderProfilePhone();
+    const phone = screen.getByLabelText("Doğrulanmamış telefon") as HTMLInputElement;
+    expect(phone).not.toBeRequired();
+    expect(phone.checkValidity()).toBe(true);
+    if (input) await user.type(phone, input);
+    await user.click(screen.getByRole("button", { name: "Profili kaydet" }));
+    await waitFor(() =>
+      expect(mocks.call).toHaveBeenCalledWith(
+        "account_profile_update_v1",
+        expect.objectContaining({ unverified_phone: expected, expected_version: 1 }),
+      ),
+    );
+  },
+);
+
+test("identity phone change normalizes a local Turkey number before native verification", async () => {
+  mocks.update.mockResolvedValue({ error: null });
+  const user = userEvent.setup();
+  render(
+    <IdentityForm
+      account={{ id: actor, state: "active", display_name: "Synthetic" }}
+      onSaved={mocks.saved}
+    />,
+  );
+  await user.type(screen.getByLabelText("Yeni telefon"), "0555 123 45 67");
+  await user.click(
+    within(screen.getByLabelText("Yeni telefon").closest("form")!).getByRole("button"),
+  );
+  expect(mocks.update).toHaveBeenCalledWith({ phone: "+905551234567" }, undefined);
+});
+test("invalid phone stays inline and never starts native verification", async () => {
+  const user = userEvent.setup();
+  render(
+    <IdentityForm
+      account={{ id: actor, state: "active", display_name: "Synthetic" }}
+      onSaved={mocks.saved}
+    />,
+  );
+  const field = screen.getByLabelText("Yeni telefon");
+  await user.type(field, "+901111111111");
+  await user.click(within(field.closest("form")!).getByRole("button"));
+  expect(field).toHaveAccessibleDescription("Geçerli bir telefon numarası gir.");
+  expect(field).toHaveFocus();
+  expect(mocks.update).not.toHaveBeenCalled();
+});
+
+test("invalid profile phone blocks saving and shows its own inline error", async () => {
+  const user = userEvent.setup();
+  renderProfilePhone();
+  const phone = screen.getByLabelText("Doğrulanmamış telefon");
+  await user.type(phone, "+901111111111");
+  await user.click(screen.getByRole("button", { name: "Profili kaydet" }));
+  expect(mocks.call).not.toHaveBeenCalled();
+  expect(phone).toHaveAccessibleDescription("Geçerli bir telefon numarası gir.");
+  expect(phone).toHaveFocus();
 });
