@@ -4,8 +4,7 @@ import { useFormatter, useTranslations } from "next-intl";
 import { v7 } from "uuid";
 import type { AccountSecurityHistory, AccountSessionView } from "@ftksaas/api-contracts";
 import { Button } from "@ftksaas/ui/components/button";
-import { Input } from "@ftksaas/ui/components/input";
-import { Label } from "@ftksaas/ui/components/label";
+import { AccountField } from "./account-field";
 import { accountCall, freshAccountProof } from "../../lib/account";
 import { CommandFeedback, useAccountCommand, type SessionPage } from "./account-command";
 
@@ -61,8 +60,8 @@ function SessionRow({
         }}
       >
         <div className="min-w-0 flex-1 space-y-2">
-          <Label htmlFor={`label-${item.session_id}`}>{t("sessionLabel")}</Label>
-          <Input
+          <AccountField
+            label={t("sessionLabel")}
             id={`label-${item.session_id}`}
             name="label"
             defaultValue={item.label ?? ""}
@@ -111,16 +110,15 @@ export function ReauthFields({ disabled = false }: { disabled?: boolean }) {
   const id = useId();
   return (
     <fieldset disabled={disabled} className="space-y-3">
-      <p className="text-sm text-muted-foreground">{t("reauthHint")}</p>
-      <Label htmlFor={`${id}-password`}>{t("currentPassword")}</Label>
-      <Input
+      <AccountField
+        label={t("currentPassword")}
         id={`${id}-password`}
         name="password"
         type="password"
         autoComplete="current-password"
       />
-      <Label htmlFor={`${id}-code`}>{t("totpCode")}</Label>
-      <Input
+      <AccountField
+        label={t("totpCode")}
         id={`${id}-code`}
         name="code"
         autoComplete="one-time-code"
@@ -215,7 +213,6 @@ export function SessionManager({ actorId }: { actorId: string }) {
       <h2 id="sessions-heading" className="text-xl font-semibold">
         {t("sessions")}
       </h2>
-      <p className="text-sm text-muted-foreground">{t("sessionHint")}</p>
       {error && <p role="alert">{t("failed")}</p>}
       <Button variant="outline" type="button" onClick={() => setRetry((n) => n + 1)}>
         {t("refresh")}
