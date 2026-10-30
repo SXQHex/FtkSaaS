@@ -57,10 +57,13 @@ export function PersonEdit({
   const message = (code: string) =>
     t(t.has(`errors.${code}`) ? `errors.${code}` : "errors.unknown");
   function persist(command: PendingPersonUpdate["command"], blocked?: boolean) {
+    const keepBlocked =
+      blocked ||
+      (pending?.command.input.operation_key === command.input.operation_key && pending.blocked);
     try {
       sessionStorage.setItem(
         storageKey,
-        JSON.stringify({ command, ...(blocked ? { blocked: true } : {}) }),
+        JSON.stringify({ command, ...(keepBlocked ? { blocked: true } : {}) }),
       );
       return true;
     } catch {
@@ -77,8 +80,10 @@ export function PersonEdit({
   function clear() {
     try {
       sessionStorage.removeItem(storageKey);
+      return true;
     } catch {
-      /* A retained receipt remains safe to check. */
+      setStage("storageInvalid");
+      return false;
     }
   }
   async function send(
@@ -86,14 +91,14 @@ export function PersonEdit({
     recovering = false,
     blocked?: boolean,
   ) {
-    if (locked.current || blocked || !persist(command)) return;
+    if (locked.current || blocked || pending?.blocked || !persist(command)) return;
     locked.current = true;
     setError("");
     setStage("saving");
     try {
       await actions.update(command.input);
       if (!mounted.current) return;
-      clear();
+      if (!clear()) return;
       setStage("success");
       onSaved();
     } catch (cause) {
@@ -106,7 +111,7 @@ export function PersonEdit({
           ["OPERATION_RESULT_EXPIRED", "IDEMPOTENCY_PAYLOAD_MISMATCH"].includes(code),
         );
       else {
-        clear();
+        if (!clear()) return;
         setError(code);
         setStage("edit");
       }
@@ -133,11 +138,11 @@ export function PersonEdit({
         result.result_reference?.type === "people" &&
         result.result_reference.id === command.input.person_id
       ) {
-        clear();
+        if (!clear()) return;
         setStage("success");
         onSaved();
       } else if (result.status === "failed_final") {
-        clear();
+        if (!clear()) return;
         setError("failedFinal");
         setStage("edit");
       } else unresolved(command, result.status, result.status === "result_expired");

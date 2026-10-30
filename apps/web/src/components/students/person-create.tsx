@@ -35,7 +35,7 @@ export function PersonCreate({
   onCreated: (personId: string) => boolean;
 }) {
   const t = useTranslations("students");
-  const [pending] = useState(() => recoverPersonCreate(scope));
+  const [pending, setPending] = useState(() => recoverPersonCreate(scope));
   const [open, setOpen] = useState(pending !== null);
   const [phase, setPhase] = useState<
     "edit" | "saving" | "checking" | "uncertain" | "storageInvalid"
@@ -57,11 +57,23 @@ export function PersonCreate({
   const message = (code: string) =>
     t(t.has(`errors.${code}`) ? `errors.${code}` : "errors.unknown");
   function persist(value: PendingPersonCreate["command"], expired = false) {
+    const next: PendingPersonCreate = {
+      command: value,
+      blocked: expired || !!(command?.input.operation_key === value.input.operation_key && blocked),
+    };
     try {
-      sessionStorage.setItem(
-        storageKey,
-        JSON.stringify({ command: value, ...(expired ? { blocked: true } : {}) }),
-      );
+      sessionStorage.setItem(storageKey, JSON.stringify(next));
+      setPending(next);
+      return true;
+    } catch {
+      setPhase("storageInvalid");
+      return false;
+    }
+  }
+  function clear() {
+    try {
+      sessionStorage.removeItem(storageKey);
+      setPending(null);
       return true;
     } catch {
       setPhase("storageInvalid");
@@ -74,16 +86,16 @@ export function PersonCreate({
       setError("storageInvalid");
       return false;
     }
-    try {
-      sessionStorage.removeItem(storageKey);
-    } catch {
-      /* A retained command is safe to resolve by its original key. */
-    }
+    if (!clear()) return false;
+    setName("");
+    setContacts([]);
+    setError("");
+    setPhase("edit");
     setOpen(false);
     return true;
   }
-  async function send(value: PendingPersonCreate["command"], recovering = false, expired = false) {
-    if (locked.current || expired || !persist(value, expired)) return;
+  async function send(value: PendingPersonCreate["command"], recovering = false) {
+    if (locked.current || blocked || !persist(value)) return;
     locked.current = true;
     setError("");
     setPhase("saving");
@@ -95,15 +107,17 @@ export function PersonCreate({
       if (!mounted.current) return;
       const code = studentError(cause);
       if (recovering || uncertainStudentChange(cause)) {
-        persist(value, ["OPERATION_RESULT_EXPIRED", "IDEMPOTENCY_PAYLOAD_MISMATCH"].includes(code));
+        if (
+          !persist(
+            value,
+            ["OPERATION_RESULT_EXPIRED", "IDEMPOTENCY_PAYLOAD_MISMATCH"].includes(code),
+          )
+        )
+          return;
         setError(code);
         setPhase("uncertain");
       } else {
-        try {
-          sessionStorage.removeItem(storageKey);
-        } catch {
-          /* Retaining a resolved command is safe. */
-        }
+        if (!clear()) return;
         setError(code);
         setPhase("edit");
       }
@@ -128,22 +142,18 @@ export function PersonCreate({
       if (result.status === "succeeded" && result.result_reference?.type === "people")
         complete(result.result_reference.id);
       else if (result.status === "failed_final") {
-        try {
-          sessionStorage.removeItem(storageKey);
-        } catch {
-          /* safe to retain */
-        }
+        if (!clear()) return;
         setPhase("edit");
         setError("failedFinal");
       } else {
         const expired = result.status === "result_expired";
-        persist(value, expired);
+        if (!persist(value, expired)) return;
         setError(result.status);
         setPhase("uncertain");
       }
     } catch (cause) {
       if (mounted.current) {
-        persist(value);
+        if (!persist(value)) return;
         setError(studentError(cause));
         setPhase("uncertain");
       }

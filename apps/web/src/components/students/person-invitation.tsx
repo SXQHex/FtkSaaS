@@ -85,6 +85,19 @@ export function PersonInvitation({
   const email = person.contacts?.find((contact) => contact.kind === "email")?.value;
   const key = invitationKey(scope, person.id);
   const write = (value: Exclude<StoredInvitation, "invalid" | null>) => {
+    if (
+      "command" in value &&
+      record &&
+      record !== "invalid" &&
+      "command" in record &&
+      record.command.input.operation_key === value.command.input.operation_key
+    ) {
+      value = {
+        ...value,
+        blocked: record.blocked || value.blocked,
+        resolved: record.resolved || value.resolved,
+      };
+    }
     try {
       sessionStorage.setItem(key, JSON.stringify(value));
       setRecord(value);
@@ -99,12 +112,15 @@ export function PersonInvitation({
     try {
       sessionStorage.removeItem(key);
     } catch {
-      /* A retained operation key remains safe to check. */
+      setRecord("invalid");
+      setError("storageInvalid");
+      return false;
     }
     setRecord(null);
+    return true;
   }
   async function send(command?: InvitationCommand, replay = false) {
-    if (locked.current) return;
+    if (locked.current || expired) return;
     if (record && !replay && (!job || !terminal)) return;
     const value = command ?? {
       operation: "account_access_send_v1" as const,
@@ -126,11 +142,14 @@ export function PersonInvitation({
     } catch (cause) {
       const code = studentError(cause);
       if (replay || uncertainStudentChange(cause)) {
-        write({
-          command: value,
-          blocked: ["OPERATION_RESULT_EXPIRED", "IDEMPOTENCY_PAYLOAD_MISMATCH"].includes(code),
-        });
-      } else clear();
+        if (
+          !write({
+            command: value,
+            blocked: ["OPERATION_RESULT_EXPIRED", "IDEMPOTENCY_PAYLOAD_MISMATCH"].includes(code),
+          })
+        )
+          return;
+      } else if (!clear()) return;
       setError(code);
     } finally {
       locked.current = false;
@@ -142,6 +161,7 @@ export function PersonInvitation({
     locked.current = true;
     setLoading(true);
     setError("");
+    setOperationState("");
     try {
       const status = await actions.operationResult(
         scope.orgId,
@@ -151,16 +171,16 @@ export function PersonInvitation({
       if (status.operation !== command.operation || status.key !== command.input.operation_key)
         throw new Error("Unexpected invitation status");
       if (status.status === "failed_final") {
-        clear();
+        if (!clear()) return;
         setError("failedFinal");
       } else if (status.status === "result_expired") {
-        write({ command, blocked: true });
+        if (!write({ command, blocked: true })) return;
         setError("result_expired");
       } else if (status.status === "succeeded") {
-        write({ command, resolved: true });
+        if (!write({ command, resolved: true })) return;
         setError("");
       } else {
-        write({ command });
+        if (!write({ command })) return;
         setError("");
         setOperationState(status.status);
       }

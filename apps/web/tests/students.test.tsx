@@ -206,7 +206,11 @@ test("detail reads current contacts and current center relationships; save refre
   });
   await user.click(screen.getByRole("button", { name: "Güncel öğrenci bilgilerini göster" }));
   expect(await screen.findByRole("button", { name: "Öğrenciliği etkinleştir" })).toBeVisible();
-  expect(screen.getByText("Bu görünümde iletişim bilgisi paylaşılmıyor.")).toBeVisible();
+  expect(
+    within(screen.getByRole("region", { name: "İletişim" })).getByText(
+      "Bu görünümde iletişim bilgisi paylaşılmıyor.",
+    ),
+  ).toBeVisible();
   expect(api.list).toHaveBeenCalledTimes(2);
   await user.keyboard("{Escape}");
   expect(screen.getByRole("button", { name: /Deniz Örnek/ })).toHaveFocus();

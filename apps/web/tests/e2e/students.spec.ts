@@ -59,6 +59,11 @@ test("student list and confirmation reflow at 320px and 200% text with full axe 
       await page.getByRole("option", { name: "English", exact: true }).click();
       await expect(page.locator("html")).toHaveAttribute("lang", "en");
     }
+    // Metadata streams separately from the localized page content.
+    await expect(page.getByRole("combobox", { name: "Dil / Language" })).toBeEnabled();
+    await expect(page).toHaveTitle(
+      lang === "tr" ? "Öğrenci yönetimi tasarımı · FtkSaaS" : "Student management design · FtkSaaS",
+    );
     await page
       .getByRole("combobox", { name: lang === "tr" ? "Görünüm" : "Appearance", exact: true })
       .click();
