@@ -389,33 +389,31 @@ Kapsam dışı feature'ların tam listesi bölüm 2'dedir. Yeni karar veya backe
 
 ## 11. WEB-S01 güncel kabul durumu
 
-Aktif iş, kullanıcının son kararıyla [PR92](https://github.com/SXQHex/FtkSaaS/pull/92) kabulüdür. S02 ayrı [Draft PR93](https://github.com/SXQHex/FtkSaaS/pull/93) içinde korunur; bu kabul dalına alınmadı. Başka bölümün kodu veya backend/ortam kabulü bu çalışmaya eklenmez.
+[PR92](https://github.com/SXQHex/FtkSaaS/pull/92) kullanıcının açık isteğiyle main'e birleşti: `7e15a8de12c63f943b30a035248b74392ff39261`. Merge, S01'in bütün gerçek kabulünü kapatmaz. S02 ayrı [Draft PR93](https://github.com/SXQHex/FtkSaaS/pull/93) içinde korunur. Aktif iş S01 kayıt/e-posta geri bildirimi düzeltmesi ve kalan canlı kabuldür.
 
-### Kaynak ve kanıt
+### Kaynak ve doğrulama
 
-PR92'nin önceki head'i `925ed06426cb51393ef506c09204720c2e568172` için [frontend40989289804](https://github.com/SXQHex/FtkSaaS/actions/runs/40989289804) ve [kapsam40989289810](https://github.com/SXQHex/FtkSaaS/actions/runs/40989289810) completed/success doğrulandı. Bu sonuç yeni birleşik kaynak için başarı sayılmaz.
+PR92 head `e92f4efbb57fb6b64c8c3adef8d8d6a23cedf3d1` için [frontend40998175873](https://github.com/SXQHex/FtkSaaS/actions/runs/40998175873), [aday40998176020](https://github.com/SXQHex/FtkSaaS/actions/runs/40998176020) ve [merge proof41001509799](https://github.com/SXQHex/FtkSaaS/actions/runs/41001509799) başarılıdır. Main için [frontend41001553604](https://github.com/SXQHex/FtkSaaS/actions/runs/41001553604), [main proof41001553407](https://github.com/SXQHex/FtkSaaS/actions/runs/41001553407), [uyumluluk41001553522](https://github.com/SXQHex/FtkSaaS/actions/runs/41001553522) ve [development delivery41001592777](https://github.com/SXQHex/FtkSaaS/actions/runs/41001592777) completed/success doğrulandı. Bunlar sonraki düzeltme kaynağının kabulü değildir.
 
-Güncel main `86b9b890d987518f3afe2d18ccef960a43cd244d`, PR90 belge sahipliği ve koşullu CI düzenini içerir. Aynı main'in [frontend40995363897](https://github.com/SXQHex/FtkSaaS/actions/runs/40995363897), [acceptance40995363932](https://github.com/SXQHex/FtkSaaS/actions/runs/40995363932) ve [development CD40995403589](https://github.com/SXQHex/FtkSaaS/actions/runs/40995403589) sonucu başarılı olarak doğrulandı. Bu kanıt main kaynağına aittir; S01'in sağlayıcı/ekran kabulünü kapatmaz.
+Önceki yerel doğrulama: 141 web + 1 UI testi, lint/format/typecheck/build, coverage/isolation; aynı build'de 20/20 Chromium Playwright, axe/TR/EN/320px/%200 ve Türkçe yolların yönlendirmesiz 404 kontrolü. WF00/WF01/WF04/WF12/WF17/WF20 sınırları korunur.
 
-Main aynı S01 dalına normal birleştirmeyle alındı. Frontend planı artık bu dosyadadır; kısa README ve AGENTS main'deki yapıyı korur. S01 tüketim notları `development.md`, sohbet bağlamı `handover.md` sahibine taşındı; kaldırılmış `apps/web/todo.md` veya eski ortak alan devirleri geri oluşturulmaz. Ortak/backend/CI dosyaları main ile aynı kalır.
+### Canlı kabul ve e-posta teşhisi
 
-### Kabul incelemesindeki düzeltmeler
+Kullanıcı onayıyla S01 `uye.fethiyetango.com` üzerinde production'a dağıtıldı: `dpl_HdnrUKvaEGLvuzRdAZZcCbEPb54h`. Dağıtılan PR head ile merge main'in ağacı aynı: `e20b93390744e367d535f370e5d8b1d7a46907ae`. Main SHA'sına ait ayrıca otomatik Vercel dağıtımı görülemedi; eski SHA yeni commit'te çalışmış gibi gösterilmez.
 
-- Yanıtı kaybolan hesap silme işleminde normal account projection kapanmış olsa da `/account/deletion` kendi native kullanıcısına ait bekleyen özgün komutu bulabilir. Kullanıcı tekrar açık onay ve taze native proof verir; preview/key değiştirilmez. Recovery, aktif account_get sonucuna bağımlı değildir. Sunucunun doğruladığı native kullanıcı kimliği hem giriş öncesi hem dönen oturumda karşılaştırılır; backend actor/state/reauth koşulları aynen uygulanır. Takip kaydına parola/proof girmez.
-- Mevcut oturumun iptali yalnız operation status sorgusuyla kesinleştiğinde de yerel native oturum temizlenir; yeni revoke komutu üretilmez.
-- Oturum/geçmiş tarihleri, ekrandaki cihaz saat dilimi açıklamasına uygun açık timeZone ile biçimlenir; next-intl'ın UTC defaultu cihaz saati gibi sunulmaz.
+- Yetkili admin hesabında native çıkış/yeniden giriş ve hesap/profil/kimlik/oturum/geçmiş okumaları çalıştı. Oturum adı komutu ve taze yeniden okuma doğrulandı; deneme etiketi eski boş değerine geri alındı. Silme preview'si sahiplik devri engelini gösterdi; apply yapılmadı. İncelenen hesap sayfasında console error/warn yoktu.
+- Kayıt ekranı e-posta gönderilmiş izlenimi verdiği halde Auth loglarında mevcut doğrulanmış hesabın `user_repeated_signup` olayları var. İstenen test adresi için kullanıcı oluşmadı. Form, submit anındaki FormData.email değerini native signUp'a geçirir; kodda admin adresine çevirme yok. Otomatik doldurma olasıdır, kanıtlanmış kök neden diye kaydedilmez.
+- SMTP açık, host `smtp.resend.com`, port 465; signup ve Confirm email açık. Resend gönderici alanı verified/sending enabled; test alıcısında suppression kaydı yok. İncelenen zaman aralığında Resend'e yeni POST /emails ulaşmadı; son SMTP gönderimleri 26 Ekim'de başarılıydı. SMTP ayarları değiştirilmedi. Bu okuma güncel uçtan uca SMTP teslim kabulü değildir.
+- Açık test posta kutusunda in:anywhere ile gelen kutusu/spam/çöp dahil ilgili son gün e-postası aranıp sonuç bulunamadı. Kayıt isteğinin genel 200 yanıtı, hesap oluşumu veya dış teslim kanıtı sayılmaz.
 
-WF kapsamı: ortak protokol WF00; native kimlik/profil/güvenlik WF01; davet kabulü WF04; private medya WF12; hesap silme WF17; yalnız izinli job/privacy sonucu okuma WF20. İşlem sırası ve DTO/rol/plan sınırının sahibi ortak WF/settings/makine sözleşmesidir.
+### Kayıt geri bildirimi düzeltmesi
 
-### Kabul kapıları
+`fix/web-signup-feedback` dalı yalnız frontend'dedir. Sonuç ekranı native sağlayıcıya gerçekten iletilen adresi gösterir; adres düzeltme formuna ad/e-posta ile dönülür, parola tutulmaz ve tekrar girilir. Yeni/var olan hesap ayrımı ifşa edilmez; genel mesaj yalnız doğrulama gerekiyorsa e-posta gönderileceğini söyler. Resend isteğinin alındığı ayrı canlı durumla duyurulur; sağlayıcı hatasında başarı duyurusu kalmaz. Gerçek kullanıcı bilgileri test fixture/log/koda yazılmaz. Regresyonlar yanlış adresi düzeltme, submit anındaki son adres, yeniden gönderme/sağlayıcı hatası ve TR/EN davranışını kapsar. Düzeltme için pnpm check:frontend (144 web + 1 UI testi, lint/format/typecheck/build), coverage ve frontend isolation başarılıdır. İki regresyon önce eski kaynakta başarısız olup düzeltmeyle geçti. Uzak CI ve yeni kaynak üzerinde hosted kayıt/teslim kabulü ayrıca gerekir.
 
-| Kapı | Durum |
-|---|---|
-| Yerel kaynak | Lint/format/typecheck/build, 141 web + 1 UI testi başarılı. Kurtarma, yanlış native kullanıcı, taze proof, status ile oturum iptali ve cihaz saat dilimi regresyonları dahil. |
-| Yerel tarayıcı/coverage | Aynı uygulama build'iyle resmi Chromium Headless Shell141, Git dışı executable seçimi: 20/20 Playwright, tam axe/TR/EN/320px/%200 ve eski Türkçe yolların yönlendirmesiz 404 kontrolü başarılı. Coverage ve isolation başarılı. Bu, korumalı S01 formlarının gerçek hesap kabulü değildir. |
-| Uzak kaynak kabulü | Yeni head/base/tested merge için CI gerekir; eski PR head veya yalnız main başarısı taşınmaz. |
-| Gerçek hesap/sağlayıcı | Açık. Bu çalışma ortamında FTK_E2E_EMAIL/PASSWORD veya Git dışı canlı kabul dosyası yoktur. Native hesap, profil/fotoğraf, iki oturum ve iptal sonrası erişim, TOTP, doğru/yanlış/süresi dolan davet, gerçek callback ve e-posta/Google teslimi yetkili hesapla doğrulanmalıdır. |
-| Hesap silme/iş takibi | Açık. Yalnız bu iş için yetkilendirilmiş ayrı kabul hesabında güçlü yeniden doğrulama, ownership engeli, kayıp yanıt/replay ve own/foreign global job doğrulanır. Gerçek kullanıcı hesabı silinmedi. Job başarı veya partial/retry_wait fiziksel imha kabulü değildir. |
-| SMS | Gerçek SMS sağlayıcısı ayrı dış entegrasyondur; geçmiş native Auth/SMTP/Google kabulü gerçek SMS teslimi sayılmaz. Mevcut destek doğrulanmadan teslim vaat edilmez. |
+### Açık kapılar
 
-S01 tamamlanmadı ve merge'e hazır sayılmıyor. Yeni kaynak CI'si ve gerçek ortam kapıları kapanmadan bölüm kapanmaz. Frontend kabulü için backend belgeleri veya ortak sözleşmeler güncellenmez; ihtiyaç varsa yalnız kendi talep alanı üzerinden koordinasyon yapılır.
+- Gerçek yeni test hesabı kaydı → dış e-posta teslimi → callback → giriş ve tekrar/kullanılmış bağlantı kabulü açık. Kullanıcı yeni parolayı kendisi girip gönderir; doğrulama bypass'ı veya SQL ile kullanıcı yaratma yapılmaz.
+- Profil/fotoğraf yazma, iki oturum ve revoke sonrası Edge erişimi, TOTP, Google giriş/bağlama, doğru/yanlış/expired davet ve yetkili ayrı hesapta silme/replay/own-foreign job açık. Google bağlama web client ID eksik. SMS ayrı sağlayıcı entegrasyonudur.
+- Oturum açılışı, güvenlik geçmişi ve silme preview süreleri hâlâ UTC biçimleniyor; cihaz saati açıklamasıyla tutarsızlık takip düzeltmesidir. Oturum yenilenme saati cihaz timezone'unu kullanır.
+
+S01 kapanmadı. Gerçek kullanıcı hesabı silinmedi; job başarısı fiziksel imha kabulü sayılmaz. Kendi alanı dışındaki backend/ortak/CI belgeleri değiştirilmez.

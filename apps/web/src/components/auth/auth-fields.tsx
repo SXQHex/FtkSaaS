@@ -45,7 +45,8 @@ export function AuthFields({
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState(initialError ? "callbackError" : "");
   const [notice, setNotice] = useState("");
-  const [pendingEmail, setPendingEmail] = useState("");
+  const [signupIdentity, setSignupIdentity] = useState({ email: "", name: "" });
+  const [resendRequested, setResendRequested] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const social = mode === "login" || mode === "signup";
   const newPassword = mode === "signup" || mode === "update";
@@ -93,7 +94,8 @@ export function AuthFields({
         if (result.error) throw result.error;
         if (result.data.session) enter();
         else {
-          setPendingEmail(email);
+          setSignupIdentity({ email, name: String(form.get("name")).trim() });
+          setResendRequested(false);
           setNotice("signupNotice");
         }
       } else if (mode === "recovery") {
@@ -129,18 +131,20 @@ export function AuthFields({
     }
   }
   async function resendSignup() {
-    if (pending.current || !pendingEmail) return;
+    if (pending.current || !signupIdentity.email) return;
     pending.current = true;
     setBusy(true);
     setError("");
+    setResendRequested(false);
     try {
       await rememberAuthReturn(destination);
       const result = await browserClient().auth.resend({
         type: "signup",
-        email: pendingEmail,
+        email: signupIdentity.email,
         options: { emailRedirectTo: `${appOrigin()}/auth/callback` },
       });
       if (result.error) throw result.error;
+      setResendRequested(true);
     } catch (cause) {
       setError(authMessage(cause));
     } finally {
@@ -195,6 +199,14 @@ export function AuthFields({
           {t(notice)}
         </output>
       )}
+      {confirmed && (
+        <p className="text-sm leading-6">{t("signupAddress", { email: signupIdentity.email })}</p>
+      )}
+      {confirmed && resendRequested && (
+        <output className="block text-sm leading-6" aria-live="polite">
+          {t("resendRequested")}
+        </output>
+      )}
       {!confirmed && !(mode === "update" && notice) && (
         <form
           onSubmit={submit}
@@ -208,6 +220,7 @@ export function AuthFields({
               <Input
                 id="name"
                 name="name"
+                defaultValue={signupIdentity.name}
                 autoComplete="name"
                 required
                 maxLength={120}
@@ -222,6 +235,7 @@ export function AuthFields({
               <Input
                 id="email"
                 name="email"
+                defaultValue={mode === "signup" ? signupIdentity.email : undefined}
                 type="email"
                 autoComplete="email"
                 placeholder="name@example.com"
@@ -320,9 +334,28 @@ export function AuthFields({
         </form>
       )}
       {confirmed && (
-        <Button type="button" variant="outline" disabled={busy} onClick={() => void resendSignup()}>
-          {t("resendSignup")}
-        </Button>
+        <div className="flex flex-wrap gap-3">
+          <Button
+            type="button"
+            variant="outline"
+            disabled={busy}
+            onClick={() => void resendSignup()}
+          >
+            {t("resendSignup")}
+          </Button>
+          <Button
+            type="button"
+            variant="outline"
+            disabled={busy}
+            onClick={() => {
+              setNotice("");
+              setError("");
+              setResendRequested(false);
+            }}
+          >
+            {t("changeSignupEmail")}
+          </Button>
+        </div>
       )}
       {social && !confirmed && (
         <div className="space-y-5">
