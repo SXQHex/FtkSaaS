@@ -50295,7 +50295,7 @@
   "x-contract": {
     "version": "2.2-tech.4-decision-sprint",
     "status": "development_runtime_with_declared_limits",
-    "source": "02 v2.0, final15October2026 user decisions",
+    "source": "docs/contracts/02-FtkSaaS-teknik-sozlesme.md; current accepted decisions; release evidence owned by apps/backend/docs/00-FtkSaaS-yeni-sohbet-devir.md",
     "transport_codes": {
       "R": "read RPC or approved projection",
       "W": "write RPC",
@@ -62895,8 +62895,7 @@
           "target_request": {
             "$ref": "#/$defs/Request_sale_refund_preview"
           }
-        },
-        "runtime_notes": "P03 source implementation; runtime acceptance, candidate and main are tracked separately in docs/production-queue.md."
+        }
       },
       {
         "name": "sale_refund_apply_v1",
@@ -63016,8 +63015,7 @@
           "target_request": {
             "$ref": "#/$defs/Request_sale_refund_apply"
           }
-        },
-        "runtime_notes": "P03 source implementation; runtime acceptance, candidate and main are tracked separately in docs/production-queue.md."
+        }
       },
       {
         "name": "sale_change_preview_v1",
@@ -63644,8 +63642,7 @@
           "target_request": {
             "$ref": "#/$defs/Request_finance_get"
           }
-        },
-        "runtime_notes": "P03 source implementation; runtime acceptance, candidate and main are tracked separately in docs/production-queue.md."
+        }
       },
       {
         "name": "collection_record_v1",
@@ -63873,8 +63870,7 @@
           "target_request": {
             "$ref": "#/$defs/Request_collection_correct_preview"
           }
-        },
-        "runtime_notes": "P03 source implementation; runtime acceptance, candidate and main are tracked separately in docs/production-queue.md."
+        }
       },
       {
         "name": "collection_correct_apply_v1",
@@ -63992,8 +63988,7 @@
           "target_request": {
             "$ref": "#/$defs/Request_collection_correct_apply"
           }
-        },
-        "runtime_notes": "P03 source implementation; runtime acceptance, candidate and main are tracked separately in docs/production-queue.md."
+        }
       },
       {
         "name": "student_credit_refund_v1",
@@ -64675,8 +64670,7 @@
           "target_request": {
             "$ref": "#/$defs/Request_instructor_payment_record"
           }
-        },
-        "runtime_notes": "P03 source implementation; runtime acceptance, candidate and main are tracked separately in docs/production-queue.md."
+        }
       },
       {
         "name": "instructor_payment_correct_v1",
@@ -64792,8 +64786,7 @@
           "target_request": {
             "$ref": "#/$defs/Request_instructor_payment_correct"
           }
-        },
-        "runtime_notes": "P03 source implementation; runtime acceptance, candidate and main are tracked separately in docs/production-queue.md."
+        }
       },
       {
         "name": "leads_list_v1",
@@ -93713,14 +93706,14 @@
       },
       {
         "id": "Q-E01",
-        "source": "docs/decisions/Q-E01-accepted.md",
+        "source": "docs/contracts/02-FtkSaaS-teknik-sozlesme.md",
         "product_status": "accepted_closed",
         "technical_status": "implemented_real_api_acceptance",
         "required_followup": []
       },
       {
         "id": "Q-E03",
-        "source": "docs/decisions/Q-E03.md",
+        "source": "docs/contracts/02-FtkSaaS-teknik-sozlesme.md",
         "product_status": "accepted_closed",
         "technical_status": "implemented_exact_head_ci_required",
         "required_followup": [
@@ -93867,143 +93860,108 @@
       "branch": "main",
       "implemented_operations": [
         "account_get_v1",
+        "account_profile_update_v1",
+        "account_password_change_v1",
+        "account_password_reset_request_v1",
+        "account_delete_preview_v1",
+        "account_delete_apply_v1",
         "organizations_list_v1",
         "organization_create_v1",
         "organization_get_v1",
-        "platform_owner_set_v1",
-        "platform_owner_remove_v1",
-        "center_create_v1",
-        "centers_list_v1",
-        "center_manager_assign_v1",
-        "manager_self_assign_center_v1",
-        "org_manager_assign_v1",
-        "role_assign_v1",
-        "center_manager_revoke_v1",
-        "org_manager_revoke_v1",
-        "role_revoke_v1",
-        "discipline_save_v1",
-        "center_discipline_set_v1",
-        "person_create_v1",
-        "student_activate_v1",
-        "account_access_send_v1",
-        "account_access_accept_v1",
-        "saas_payment_submit_v1",
-        "saas_payment_verify_v1",
-        "subscription_get_v1",
-        "product_publish_v1",
-        "sale_preview_v1",
-        "sale_apply_v1",
-        "collection_record_v1",
-        "entitlements_get_v1",
-        "class_save_v1",
-        "session_create_v1",
-        "reservation_create_v1",
-        "reservation_cancel_v1",
-        "event_save_v1",
-        "event_publish_v1",
-        "event_get_v1",
-        "event_list_v1",
-        "event_registration_preview_v1",
-        "event_register_v1",
-        "event_registration_cancel_v1",
-        "event_attendance_mark_v1",
-        "event_attendance_close_v1",
-        "event_attendance_correct_v1",
-        "event_complete_v1",
-        "permission_set_v1",
-        "event_duty_verify_v1",
-        "event_cancel_preview_v1",
-        "event_cancel_apply_v1",
-        "event_payment_prepare_v1",
-        "event_payment_get_v1",
-        "student_credit_refund_v1",
-        "student_credit_offset_v1",
-        "debt_adjust_v1",
-        "event_actual_start_record_v1",
-        "event_actual_start_correct_v1",
         "organization_update_v1",
+        "organization_close_preview_v1",
+        "organization_close_apply_v1",
+        "organization_reopen_v1",
+        "organization_delete_preview_v1",
+        "organization_delete_apply_v1",
+        "centers_list_v1",
+        "center_create_v1",
         "center_update_v1",
-        "disciplines_list_v1",
-        "person_discipline_set_v1",
-        "student_deactivate_v1",
-        "person_get_v1",
-        "person_update_v1",
-        "people_list_v1",
         "room_save_v1",
-        "roles_list_v1",
         "availability_save_v1",
         "availability_exception_save_v1",
         "policies_get_v1",
         "policy_publish_v1",
+        "roles_list_v1",
+        "role_assign_v1",
+        "role_revoke_v1",
+        "permission_set_v1",
+        "org_manager_assign_v1",
+        "org_manager_revoke_v1",
+        "manager_self_assign_center_v1",
+        "account_access_send_v1",
+        "account_access_revoke_v1",
+        "account_access_accept_v1",
+        "account_link_remove_v1",
+        "people_list_v1",
+        "person_get_v1",
+        "person_create_v1",
+        "person_update_v1",
+        "student_activate_v1",
+        "student_deactivate_v1",
+        "person_merge_preview_v1",
+        "person_merge_approve_v1",
+        "person_merge_apply_v1",
         "calendar_get_v1",
-        "session_get_v1",
-        "reservation_list_v1",
+        "class_save_v1",
         "program_preview_v1",
         "program_apply_v1",
+        "session_create_v1",
+        "session_get_v1",
         "session_change_preview_v1",
         "session_change_apply_v1",
         "session_capacity_set_v1",
+        "session_cancel_preview_v1",
+        "session_cancel_apply_v1",
+        "replacement_session_create_v1",
         "session_assignment_set_v1",
-        "class_assignment_set_v1",
-        "reservation_impact_preview_v1",
-        "reservation_impact_apply_v1",
-        "negative_limit_set_v1",
-        "negative_limits_get_v1",
-        "attendance_get_v1",
-        "attendance_mark_v1",
-        "attendance_block_v1",
-        "attendance_close_v1",
-        "attendance_correct_preview_v1",
-        "attendance_correct_apply_v1",
-        "instructor_agreement_publish_v1",
-        "instructor_agreements_list_v1",
-        "earnings_list_v1",
-        "negcredit_valuation_set_v1",
-        "management_state_get_v1",
-        "attendance_start_v1",
-        "settlement_movements_list_v1",
-        "settlement_requests_list_v1",
-        "settlement_request_get_v1",
-        "settlement_request_submit_v1",
-        "settlement_request_withdraw_v1",
-        "settlement_request_decide_v1",
-        "settlement_authority_get_v1",
-        "settlement_delegation_set_v1",
-        "settlement_authority_set_v1",
-        "products_list_v1",
         "lesson_request_create_v1",
         "lesson_request_withdraw_v1",
         "lesson_request_reject_v1",
         "lesson_request_offer_alternative_v1",
         "lesson_request_accept_alternative_v1",
         "lesson_request_approve_v1",
+        "reservation_create_v1",
+        "reservation_cancel_v1",
+        "reservation_list_v1",
         "waitlist_join_v1",
         "waitlist_leave_v1",
         "seat_offer_accept_v1",
         "seat_offer_reject_v1",
-        "seat_offer_issue_v1",
-        "seat_offer_expire_v1",
-        "request_expire_v1",
-        "session_cancel_preview_v1",
-        "session_cancel_apply_v1",
-        "replacement_session_create_v1",
-        "credit_adjust_v1",
+        "attendance_get_v1",
+        "attendance_mark_v1",
+        "attendance_close_v1",
+        "attendance_correct_preview_v1",
+        "attendance_correct_apply_v1",
+        "products_list_v1",
+        "product_publish_v1",
+        "sale_preview_v1",
+        "sale_apply_v1",
+        "entitlements_get_v1",
         "entitlement_extend_v1",
+        "credit_adjust_v1",
+        "negative_limit_set_v1",
         "freeze_preview_v1",
         "freeze_apply_v1",
         "freeze_end_preview_v1",
         "freeze_end_apply_v1",
         "sale_terminate_preview_v1",
         "sale_terminate_apply_v1",
+        "sale_refund_preview_v1",
+        "sale_refund_apply_v1",
         "sale_change_preview_v1",
         "sale_change_apply_v1",
         "sale_renew_preview_v1",
         "sale_renew_apply_v1",
         "finance_get_v1",
+        "collection_record_v1",
         "collection_correct_preview_v1",
         "collection_correct_apply_v1",
-        "sale_refund_preview_v1",
-        "sale_refund_apply_v1",
+        "student_credit_refund_v1",
+        "student_credit_offset_v1",
+        "debt_adjust_v1",
+        "instructor_agreement_publish_v1",
+        "earnings_list_v1",
         "instructor_payment_record_v1",
         "instructor_payment_correct_v1",
         "leads_list_v1",
@@ -94013,24 +93971,11 @@
         "trial_registration_confirm_v1",
         "lead_convert_v1",
         "crm_followup_list_v1",
-        "publication_set_v1",
-        "public_calendar_get_v1",
-        "public_application_submit_v1",
-        "public_application_review_v1",
-        "document_upload_prepare_v1",
-        "document_version_publish_v1",
-        "document_requirements_get_v1",
-        "document_accept_v1",
-        "file_upload_complete_v1",
+        "segment_save_v1",
+        "automation_save_v1",
         "notifications_list_v1",
         "notification_mark_read_v1",
         "notification_preferences_set_v1",
-        "segment_save_v1",
-        "automation_save_v1",
-        "outbox_deliver_v1",
-        "reminder_schedule_v1",
-        "automation_run_v1",
-        "document_publication_preview_v1",
         "report_get_v1",
         "report_export_start_v1",
         "report_file_get_v1",
@@ -94038,12 +93983,95 @@
         "import_preview_v1",
         "import_apply_v1",
         "import_rows_list_v1",
-        "import_rows_process_v1",
-        "report_build_v1",
+        "subscription_get_v1",
+        "subscription_upgrade_quote_v1",
+        "subscription_downgrade_request_v1",
+        "subscription_change_cancel_v1",
+        "subscription_renewal_set_v1",
+        "saas_payment_submit_v1",
+        "saas_payment_verify_v1",
+        "saas_grace_extend_v1",
+        "event_save_v1",
+        "event_publish_v1",
+        "event_register_v1",
+        "event_registration_cancel_v1",
+        "event_complete_v1",
+        "event_duty_verify_v1",
+        "event_cancel_preview_v1",
+        "event_cancel_apply_v1",
+        "event_list_v1",
+        "document_upload_prepare_v1",
+        "document_version_publish_v1",
+        "document_requirements_get_v1",
+        "document_accept_v1",
+        "publication_set_v1",
+        "public_calendar_get_v1",
+        "public_application_submit_v1",
+        "public_application_review_v1",
         "operation_status_get_v1",
         "preview_get_v1",
         "job_status_get_v1",
         "audit_list_v1",
+        "seat_offer_issue_v1",
+        "seat_offer_expire_v1",
+        "request_expire_v1",
+        "outbox_deliver_v1",
+        "reminder_schedule_v1",
+        "automation_run_v1",
+        "import_rows_process_v1",
+        "report_build_v1",
+        "privacy_execute_v1",
+        "subscription_boundary_apply_v1",
+        "class_assignment_set_v1",
+        "event_attendance_mark_v1",
+        "platform_owner_set_v1",
+        "platform_owner_remove_v1",
+        "center_manager_assign_v1",
+        "center_manager_revoke_v1",
+        "attendance_block_v1",
+        "event_attendance_close_v1",
+        "event_attendance_correct_v1",
+        "file_upload_complete_v1",
+        "negcredit_valuation_set_v1",
+        "disciplines_list_v1",
+        "discipline_save_v1",
+        "center_discipline_set_v1",
+        "person_discipline_set_v1",
+        "event_get_v1",
+        "event_registration_preview_v1",
+        "event_payment_prepare_v1",
+        "event_payment_get_v1",
+        "event_actual_start_record_v1",
+        "event_actual_start_correct_v1",
+        "management_state_get_v1",
+        "instructor_agreements_list_v1",
+        "reservation_impact_preview_v1",
+        "reservation_impact_apply_v1",
+        "settlement_movements_list_v1",
+        "settlement_requests_list_v1",
+        "settlement_request_get_v1",
+        "settlement_request_submit_v1",
+        "settlement_request_withdraw_v1",
+        "settlement_request_decide_v1",
+        "settlement_authority_get_v1",
+        "settlement_delegation_set_v1",
+        "settlement_authority_set_v1",
+        "negative_limits_get_v1",
+        "attendance_start_v1",
+        "document_publication_preview_v1",
+        "settings_catalog_get_v1",
+        "settings_get_v1",
+        "settings_update_v1",
+        "settings_reset_preview_v1",
+        "settings_reset_apply_v1",
+        "settings_history_get_v1",
+        "reservation_capacity_override_v1",
+        "account_sessions_list_v1",
+        "account_session_label_v1",
+        "account_sessions_revoke_v1",
+        "account_security_history_get_v1",
+        "account_totp_remove_v1",
+        "account_google_link_prepare_v1",
         "media_get_v1",
         "settings_template_resolve_v1",
         "calendar_links_get_v1",
@@ -94058,12 +94086,11 @@
       "external_transport": "POST /functions/v1/backend-v1/{operation}; direct typed request body",
       "internal_rpc": "service-only api_v1 named functions; actor/session/UUID bank supplied by verified gateway",
       "migration_count": 83,
-      "test_evidence": "P06 acceptance is registered through registry.test.mjs; candidate/main full clean evidence is pending",
-      "frontend_unchanged": true
+      "acceptance_source": "apps/backend/docs/00-FtkSaaS-yeni-sohbet-devir.md"
     },
     "decision_sprint": {
       "id": "DS-2026-10-17",
-      "source": "docs/decisions/DS-2026-10-17.md",
+      "source": "docs/contracts/02-FtkSaaS-teknik-sozlesme.md",
       "baseline_operation_count": 184,
       "new_contract_only_operations": [],
       "starter_closure": {
@@ -94708,16 +94735,16 @@
           "id": "DS-OPEN-01",
           "status": "accepted_runtime_verified",
           "resolution": "Owner grants/revokes OM delegation permission; Owner directly or live delegated OM grants/revokes exact-center CM settlement authority. Roles and authority administration imply no financial operations.",
-          "source": "docs/decisions/DS-2026-10-17-settlement-revision.md"
+          "source": "docs/contracts/02-FtkSaaS-teknik-sozlesme.md"
         },
         {
           "id": "DS-OPEN-02",
           "status": "accepted_runtime_verified",
           "resolution": "No different-account/person condition. Same account may initiate under live A CM+grant and approve under independently verified live B CM+grant. No separate exception/fallback. Prior self-approval prohibition superseded by latest explicit user decision.",
-          "source": "docs/decisions/DS-2026-10-17-settlement-center-scope.md"
+          "source": "docs/contracts/02-FtkSaaS-teknik-sozlesme.md"
         }
       ],
-      "latest_settlement_decision": "docs/decisions/DS-2026-10-17-settlement-center-scope.md",
+      "latest_settlement_decision": "docs/contracts/02-FtkSaaS-teknik-sozlesme.md#hesaplasma",
       "introduced_operations": [
         "management_state_get_v1",
         "instructor_agreements_list_v1",
@@ -94865,13 +94892,18 @@
           "center_discipline_set_v1"
         ],
         "dependencies": [],
-        "implementation": "partial",
+        "implementation": "source_operations_present",
         "acceptance": "pending_feature_acceptance",
         "acceptance_evidence": [],
         "implemented_operations": [
           "organization_create_v1",
           "organization_get_v1",
           "organization_update_v1",
+          "organization_close_preview_v1",
+          "organization_close_apply_v1",
+          "organization_reopen_v1",
+          "organization_delete_preview_v1",
+          "organization_delete_apply_v1",
           "centers_list_v1",
           "center_create_v1",
           "center_update_v1",
@@ -94880,21 +94912,15 @@
           "discipline_save_v1",
           "center_discipline_set_v1"
         ],
-        "contract_only_operations": [
-          "organization_close_preview_v1",
-          "organization_close_apply_v1",
-          "organization_reopen_v1",
-          "organization_delete_preview_v1",
-          "organization_delete_apply_v1"
-        ],
+        "contract_only_operations": [],
         "acceptance_case_ids": [],
-        "baseline_regression": "global baseline 241-test main CI; not per-feature DS acceptance",
         "plan_scope": {
           "starter": "1 aktif merkez/oda/disiplin/eğitmen; 100 aktif öğrenci",
           "pro": "Tek merkez",
           "business": "Çoklu merkez"
         },
-        "completed_dependencies": []
+        "completed_dependencies": [],
+        "acceptance_source": "apps/backend/docs/00-FtkSaaS-yeni-sohbet-devir.md"
       },
       "F02": {
         "name": "Çalışma saatleri, izin ve uygunluk",
@@ -94911,7 +94937,7 @@
           "settings_preparation_resolve_v1"
         ],
         "dependencies": [],
-        "implementation": "implemented_acceptance_pending",
+        "implementation": "source_operations_present",
         "acceptance": "pending_feature_acceptance",
         "acceptance_evidence": [],
         "implemented_operations": [
@@ -94921,13 +94947,13 @@
         ],
         "contract_only_operations": [],
         "acceptance_case_ids": [],
-        "baseline_regression": "global baseline 241-test main CI; not per-feature DS acceptance",
         "plan_scope": {
           "starter": "Temel",
           "pro": "Tam",
           "business": "Tam"
         },
-        "completed_dependencies": []
+        "completed_dependencies": [],
+        "acceptance_source": "apps/backend/docs/00-FtkSaaS-yeni-sohbet-devir.md"
       },
       "F03": {
         "name": "İşletme kuralları ve merkez istisnaları",
@@ -94945,7 +94971,7 @@
         "dependencies": [
           "confirmed_reservation_protection"
         ],
-        "implementation": "implemented_acceptance_pending",
+        "implementation": "source_operations_present",
         "acceptance": "pending_feature_acceptance",
         "acceptance_evidence": [],
         "implemented_operations": [
@@ -94960,13 +94986,13 @@
           "DS-PROT-04",
           "DS-PROT-05"
         ],
-        "baseline_regression": "global baseline 241-test main CI; not per-feature DS acceptance",
         "plan_scope": {
           "starter": "İşletme ayarları",
           "pro": "İşletme ayarları",
           "business": "Zorunlu/tavsiye merkez hiyerarşisi"
         },
-        "completed_dependencies": []
+        "completed_dependencies": [],
+        "acceptance_source": "apps/backend/docs/00-FtkSaaS-yeni-sohbet-devir.md"
       },
       "F04": {
         "name": "Hesap eşleştirme, çoklu rol, kapsamlı yetkilendirme",
@@ -95000,7 +95026,7 @@
         "dependencies": [
           "plan_gate_alignment"
         ],
-        "implementation": "partial",
+        "implementation": "source_operations_present",
         "acceptance": "pending_feature_acceptance",
         "acceptance_evidence": [],
         "implemented_operations": [
@@ -95012,7 +95038,9 @@
           "org_manager_revoke_v1",
           "manager_self_assign_center_v1",
           "account_access_send_v1",
+          "account_access_revoke_v1",
           "account_access_accept_v1",
+          "account_link_remove_v1",
           "platform_owner_set_v1",
           "platform_owner_remove_v1",
           "center_manager_assign_v1",
@@ -95021,10 +95049,7 @@
           "settlement_delegation_set_v1",
           "settlement_authority_set_v1"
         ],
-        "contract_only_operations": [
-          "account_access_revoke_v1",
-          "account_link_remove_v1"
-        ],
+        "contract_only_operations": [],
         "acceptance_case_ids": [
           "DS-SET-01",
           "DS-SET-02",
@@ -95050,7 +95075,6 @@
           "DS-SCOPE-03",
           "DS-SCOPE-04"
         ],
-        "baseline_regression": "global baseline 241-test main CI; not per-feature DS acceptance",
         "plan_scope": {
           "starter": "Var",
           "pro": "Var",
@@ -95058,7 +95082,8 @@
         },
         "completed_dependencies": [
           "cross_center_settlement"
-        ]
+        ],
+        "acceptance_source": "apps/backend/docs/00-FtkSaaS-yeni-sohbet-devir.md"
       },
       "F05": {
         "name": "Resepsiyon/operasyon personeli izinleri",
@@ -95078,7 +95103,7 @@
         "dependencies": [
           "plan_gate_alignment"
         ],
-        "implementation": "implemented_acceptance_pending",
+        "implementation": "source_operations_present",
         "acceptance": "pending_feature_acceptance",
         "acceptance_evidence": [],
         "implemented_operations": [
@@ -95091,13 +95116,13 @@
         "acceptance_case_ids": [
           "DS-ACCESS-01"
         ],
-        "baseline_regression": "global baseline 241-test main CI; not per-feature DS acceptance",
         "plan_scope": {
           "starter": "—",
           "pro": "Var",
           "business": "Var"
         },
-        "completed_dependencies": []
+        "completed_dependencies": [],
+        "acceptance_source": "apps/backend/docs/00-FtkSaaS-yeni-sohbet-devir.md"
       },
       "F06": {
         "name": "Öğrenci/eğitmen panelleri, profil ve şifre işlemleri",
@@ -95135,11 +95160,16 @@
         "dependencies": [
           "plan_gate_alignment"
         ],
-        "implementation": "partial",
+        "implementation": "source_operations_present",
         "acceptance": "pending_feature_acceptance",
         "acceptance_evidence": [],
         "implemented_operations": [
           "account_get_v1",
+          "account_profile_update_v1",
+          "account_password_change_v1",
+          "account_password_reset_request_v1",
+          "account_delete_preview_v1",
+          "account_delete_apply_v1",
           "account_access_send_v1",
           "account_access_accept_v1",
           "person_get_v1",
@@ -95157,23 +95187,17 @@
           "account_totp_remove_v1",
           "account_google_link_prepare_v1"
         ],
-        "contract_only_operations": [
-          "account_profile_update_v1",
-          "account_password_change_v1",
-          "account_password_reset_request_v1",
-          "account_delete_preview_v1",
-          "account_delete_apply_v1"
-        ],
+        "contract_only_operations": [],
         "acceptance_case_ids": [
           "DS-ACCESS-01"
         ],
-        "baseline_regression": "global baseline 241-test main CI; not per-feature DS acceptance",
         "plan_scope": {
           "starter": "Var",
           "pro": "Var",
           "business": "Var"
         },
-        "completed_dependencies": []
+        "completed_dependencies": [],
+        "acceptance_source": "apps/backend/docs/00-FtkSaaS-yeni-sohbet-devir.md"
       },
       "F07": {
         "name": "Tek kişi kaydı, adaydan öğrenciye dönüşüm",
@@ -95201,7 +95225,7 @@
           "person_discipline_set_v1"
         ],
         "dependencies": [],
-        "implementation": "partial",
+        "implementation": "source_operations_present",
         "acceptance": "pending_feature_acceptance",
         "acceptance_evidence": [],
         "implemented_operations": [
@@ -95211,25 +95235,24 @@
           "person_update_v1",
           "student_activate_v1",
           "student_deactivate_v1",
+          "person_merge_preview_v1",
+          "person_merge_approve_v1",
+          "person_merge_apply_v1",
           "lead_convert_v1",
           "import_preview_v1",
           "import_apply_v1",
           "import_rows_process_v1",
           "person_discipline_set_v1"
         ],
-        "contract_only_operations": [
-          "person_merge_preview_v1",
-          "person_merge_approve_v1",
-          "person_merge_apply_v1"
-        ],
+        "contract_only_operations": [],
         "acceptance_case_ids": [],
-        "baseline_regression": "global baseline 241-test main CI; not per-feature DS acceptance",
         "plan_scope": {
           "starter": "Tek kişi altyapısı",
           "pro": "CRM dönüşümü",
           "business": "CRM dönüşümü"
         },
-        "completed_dependencies": []
+        "completed_dependencies": [],
+        "acceptance_source": "apps/backend/docs/00-FtkSaaS-yeni-sohbet-devir.md"
       },
       "F08": {
         "name": "Birleşik takvim ve kaynak çakışma kontrolü",
@@ -95257,7 +95280,7 @@
           "calendar_feed_get_v1"
         ],
         "dependencies": [],
-        "implementation": "implemented_acceptance_pending",
+        "implementation": "source_operations_present",
         "acceptance": "pending_feature_acceptance",
         "acceptance_evidence": [],
         "implemented_operations": [
@@ -95286,7 +95309,6 @@
           "DS-AGR-04",
           "DS-AGR-05"
         ],
-        "baseline_regression": "global baseline 241-test main CI; not per-feature DS acceptance",
         "plan_scope": {
           "starter": "Temel",
           "pro": "Tam",
@@ -95295,7 +95317,8 @@
         "completed_dependencies": [
           "starter_plan_and_earning_split",
           "agreement_versions_and_selection"
-        ]
+        ],
+        "acceptance_source": "apps/backend/docs/00-FtkSaaS-yeni-sohbet-devir.md"
       },
       "F09": {
         "name": "Özel ders talep, onay, ret ve alternatif saat",
@@ -95318,7 +95341,7 @@
           "management_state_get_v1"
         ],
         "dependencies": [],
-        "implementation": "implemented_acceptance_pending",
+        "implementation": "source_operations_present",
         "acceptance": "pending_feature_acceptance",
         "acceptance_evidence": [],
         "implemented_operations": [
@@ -95337,7 +95360,6 @@
           "DS-PLAN-01",
           "DS-PLAN-02"
         ],
-        "baseline_regression": "global baseline 241-test main CI; not per-feature DS acceptance",
         "plan_scope": {
           "starter": "Var",
           "pro": "Var",
@@ -95345,7 +95367,8 @@
         },
         "completed_dependencies": [
           "starter_plan_and_earning_split"
-        ]
+        ],
+        "acceptance_source": "apps/backend/docs/00-FtkSaaS-yeni-sohbet-devir.md"
       },
       "F10": {
         "name": "Tekrarlayan grup programı ve sabit gruba kayıt",
@@ -95371,7 +95394,7 @@
           "sale_scope_and_backdating",
           "cross_center_settlement"
         ],
-        "implementation": "implemented_acceptance_pending",
+        "implementation": "source_operations_present",
         "acceptance": "pending_feature_acceptance",
         "acceptance_evidence": [],
         "implemented_operations": [
@@ -95415,7 +95438,6 @@
           "DS-SCOPE-03",
           "DS-SCOPE-04"
         ],
-        "baseline_regression": "global baseline 241-test main CI; not per-feature DS acceptance",
         "plan_scope": {
           "starter": "Var",
           "pro": "Var",
@@ -95423,7 +95445,8 @@
         },
         "completed_dependencies": [
           "starter_plan_and_earning_split"
-        ]
+        ],
+        "acceptance_source": "apps/backend/docs/00-FtkSaaS-yeni-sohbet-devir.md"
       },
       "F11": {
         "name": "Kontenjanlı açık grup dersine öğrencinin kaydolması",
@@ -95440,7 +95463,7 @@
           "reservation_capacity_override_v1"
         ],
         "dependencies": [],
-        "implementation": "implemented_acceptance_pending",
+        "implementation": "source_operations_present",
         "acceptance": "pending_feature_acceptance",
         "acceptance_evidence": [],
         "implemented_operations": [
@@ -95450,13 +95473,13 @@
         ],
         "contract_only_operations": [],
         "acceptance_case_ids": [],
-        "baseline_regression": "global baseline 241-test main CI; not per-feature DS acceptance",
         "plan_scope": {
           "starter": "Tek disiplinli sabit programın öğrenci self rezervasyonu",
           "pro": "Var",
           "business": "Var"
         },
-        "completed_dependencies": []
+        "completed_dependencies": [],
+        "acceptance_source": "apps/backend/docs/00-FtkSaaS-yeni-sohbet-devir.md"
       },
       "F12": {
         "name": "Bekleme listesi ve süreli yer teklifi",
@@ -95477,7 +95500,7 @@
           "management_state_get_v1"
         ],
         "dependencies": [],
-        "implementation": "implemented_acceptance_pending",
+        "implementation": "source_operations_present",
         "acceptance": "pending_feature_acceptance",
         "acceptance_evidence": [],
         "implemented_operations": [
@@ -95491,13 +95514,13 @@
         ],
         "contract_only_operations": [],
         "acceptance_case_ids": [],
-        "baseline_regression": "no callable operation; no behavior acceptance claimed",
         "plan_scope": {
           "starter": "—",
           "pro": "Var",
           "business": "Var"
         },
-        "completed_dependencies": []
+        "completed_dependencies": [],
+        "acceptance_source": "apps/backend/docs/00-FtkSaaS-yeni-sohbet-devir.md"
       },
       "F13": {
         "name": "Eğitmen değişikliği",
@@ -95514,7 +95537,7 @@
           "session_assignment_set_v1"
         ],
         "dependencies": [],
-        "implementation": "implemented_acceptance_pending",
+        "implementation": "source_operations_present",
         "acceptance": "pending_feature_acceptance",
         "acceptance_evidence": [],
         "implemented_operations": [
@@ -95532,7 +95555,6 @@
           "DS-AGR-04",
           "DS-AGR-05"
         ],
-        "baseline_regression": "global baseline 241-test main CI; not per-feature DS acceptance",
         "plan_scope": {
           "starter": "Tek aktif eğitmenin temel görevlendirmesi; ücretli/çoklu görevlendirme kapalı",
           "pro": "Var",
@@ -95541,7 +95563,8 @@
         "completed_dependencies": [
           "agreement_versions_and_selection",
           "starter_plan_and_earning_split"
-        ]
+        ],
+        "acceptance_source": "apps/backend/docs/00-FtkSaaS-yeni-sohbet-devir.md"
       },
       "F14": {
         "name": "Yoklama, gelmeme, iptal, erteleme ve yerine seans düzenleme",
@@ -95571,7 +95594,7 @@
         "dependencies": [
           "confirmed_reservation_protection"
         ],
-        "implementation": "partial",
+        "implementation": "source_operations_present",
         "acceptance": "pending_feature_acceptance",
         "acceptance_evidence": [],
         "implemented_operations": [
@@ -95605,7 +95628,6 @@
           "DS-AGR-04",
           "DS-AGR-05"
         ],
-        "baseline_regression": "global baseline 241-test main CI; not per-feature DS acceptance",
         "plan_scope": {
           "starter": "Var",
           "pro": "Var",
@@ -95614,7 +95636,8 @@
         "completed_dependencies": [
           "agreement_versions_and_selection",
           "starter_plan_and_earning_split"
-        ]
+        ],
+        "acceptance_source": "apps/backend/docs/00-FtkSaaS-yeni-sohbet-devir.md"
       },
       "F15": {
         "name": "Ders sayılı paket, geçerlilik ve kredi hareketleri",
@@ -95655,7 +95678,7 @@
           "plan_gate_alignment",
           "confirmed_reservation_protection"
         ],
-        "implementation": "partial",
+        "implementation": "source_operations_present",
         "acceptance": "pending_feature_acceptance",
         "acceptance_evidence": [],
         "implemented_operations": [
@@ -95716,13 +95739,13 @@
           "DS-SCOPE-03",
           "DS-SCOPE-04"
         ],
-        "baseline_regression": "global baseline 241-test main CI; not per-feature DS acceptance",
         "plan_scope": {
           "starter": "Temel",
           "pro": "Tam",
           "business": "Tam"
         },
-        "completed_dependencies": []
+        "completed_dependencies": [],
+        "acceptance_source": "apps/backend/docs/00-FtkSaaS-yeni-sohbet-devir.md"
       },
       "F16": {
         "name": "Süreli/sınırsız üyelik, dönemsel kullanım sınırı",
@@ -95748,7 +95771,7 @@
           "cross_center_settlement",
           "plan_gate_alignment"
         ],
-        "implementation": "partial",
+        "implementation": "source_operations_present",
         "acceptance": "pending_feature_acceptance",
         "acceptance_evidence": [
           "Starter studio subset: tests/starter-studio-acceptance.mjs, credit/timed quota/unlimited sale-collection-self reservation-attendance and immutable name; native7/7. Full feature acceptance remains separately pending."
@@ -95792,13 +95815,13 @@
           "DS-SCOPE-03",
           "DS-SCOPE-04"
         ],
-        "baseline_regression": "global baseline 241-test main CI; not per-feature DS acceptance",
         "plan_scope": {
           "starter": "Tek merkez/disiplin süreli veya sınırsız paket",
           "pro": "Var",
           "business": "Var"
         },
-        "completed_dependencies": []
+        "completed_dependencies": [],
+        "acceptance_source": "apps/backend/docs/00-FtkSaaS-yeni-sohbet-devir.md"
       },
       "F17": {
         "name": "Üyelik/paket dondurma ve plan değişimi",
@@ -95824,7 +95847,7 @@
           "sale_scope_and_backdating",
           "confirmed_reservation_protection"
         ],
-        "implementation": "partial",
+        "implementation": "source_operations_present",
         "acceptance": "pending_feature_acceptance",
         "acceptance_evidence": [],
         "implemented_operations": [
@@ -95849,13 +95872,13 @@
           "DS-SALE-02",
           "DS-SALE-03"
         ],
-        "baseline_regression": "global baseline 241-test main CI; not per-feature DS acceptance",
         "plan_scope": {
           "starter": "—",
           "pro": "Var",
           "business": "Var"
         },
-        "completed_dependencies": []
+        "completed_dependencies": [],
+        "acceptance_source": "apps/backend/docs/00-FtkSaaS-yeni-sohbet-devir.md"
       },
       "F18": {
         "name": "Merkezler arasında kullanım hakkı ve onaylı hesaplaşma",
@@ -95888,7 +95911,7 @@
         "dependencies": [
           "sale_scope_and_backdating"
         ],
-        "implementation": "implemented_acceptance_pending",
+        "implementation": "source_operations_present",
         "acceptance": "pending_feature_acceptance",
         "acceptance_evidence": [],
         "implemented_operations": [
@@ -95938,7 +95961,6 @@
           "DS-SCOPE-03",
           "DS-SCOPE-04"
         ],
-        "baseline_regression": "global baseline 241-test main CI; not per-feature DS acceptance",
         "plan_scope": {
           "starter": "—",
           "pro": "—",
@@ -95946,7 +95968,8 @@
         },
         "completed_dependencies": [
           "cross_center_settlement"
-        ]
+        ],
+        "acceptance_source": "apps/backend/docs/00-FtkSaaS-yeni-sohbet-devir.md"
       },
       "F19": {
         "name": "Manuel tahsilat, kısmi ödeme, iade/düzeltme ve alacak",
@@ -95984,7 +96007,7 @@
           "cross_center_settlement",
           "confirmed_reservation_protection"
         ],
-        "implementation": "implemented_acceptance_pending",
+        "implementation": "source_operations_present",
         "acceptance": "pending_feature_acceptance",
         "acceptance_evidence": [],
         "implemented_operations": [
@@ -96042,13 +96065,13 @@
           "DS-SCOPE-03",
           "DS-SCOPE-04"
         ],
-        "baseline_regression": "global baseline 241-test main CI; not per-feature DS acceptance",
         "plan_scope": {
           "starter": "Var",
           "pro": "Var",
           "business": "Var"
         },
-        "completed_dependencies": []
+        "completed_dependencies": [],
+        "acceptance_source": "apps/backend/docs/00-FtkSaaS-yeni-sohbet-devir.md"
       },
       "F20": {
         "name": "Eğitmen hakedişi ve ödeme takibi",
@@ -96081,7 +96104,7 @@
           "plan_gate_alignment",
           "confirmed_reservation_protection"
         ],
-        "implementation": "implemented_acceptance_pending",
+        "implementation": "source_operations_present",
         "acceptance": "pending_feature_acceptance",
         "acceptance_evidence": [],
         "implemented_operations": [
@@ -96118,7 +96141,6 @@
           "DS-AGR-05",
           "DS-ACCESS-01"
         ],
-        "baseline_regression": "global baseline 241-test main CI; not per-feature DS acceptance",
         "plan_scope": {
           "starter": "—",
           "pro": "Var",
@@ -96127,7 +96149,8 @@
         "completed_dependencies": [
           "agreement_versions_and_selection",
           "starter_plan_and_earning_split"
-        ]
+        ],
+        "acceptance_source": "apps/backend/docs/00-FtkSaaS-yeni-sohbet-devir.md"
       },
       "F21": {
         "name": "Aday, kaynak, ilgi, takip ve dönüşüm",
@@ -96150,7 +96173,7 @@
           "report_build_v1"
         ],
         "dependencies": [],
-        "implementation": "partial",
+        "implementation": "source_operations_present",
         "acceptance": "pending_feature_acceptance",
         "acceptance_evidence": [],
         "implemented_operations": [
@@ -96166,13 +96189,13 @@
         ],
         "contract_only_operations": [],
         "acceptance_case_ids": [],
-        "baseline_regression": "no callable operation; no behavior acceptance claimed",
         "plan_scope": {
           "starter": "—",
-          "pro": "Temel",
-          "business": "Gelişmiş"
+          "pro": "Tam",
+          "business": "Tam; merkez/organizasyon kapsamıyla"
         },
-        "completed_dependencies": []
+        "completed_dependencies": [],
+        "acceptance_source": "apps/backend/docs/00-FtkSaaS-yeni-sohbet-devir.md"
       },
       "F22": {
         "name": "Deneme teklifi ve kontrollü indirim",
@@ -96190,7 +96213,7 @@
         "dependencies": [
           "Explicit trial product/offer duration and trial_repeat_limit deployment configuration."
         ],
-        "implementation": "partial",
+        "implementation": "source_operations_present",
         "acceptance": "pending_feature_acceptance",
         "acceptance_evidence": [],
         "implemented_operations": [
@@ -96199,13 +96222,13 @@
         ],
         "contract_only_operations": [],
         "acceptance_case_ids": [],
-        "baseline_regression": "no callable operation; no behavior acceptance claimed",
         "plan_scope": {
           "starter": "—",
           "pro": "Var",
           "business": "Var"
         },
-        "completed_dependencies": []
+        "completed_dependencies": [],
+        "acceptance_source": "apps/backend/docs/00-FtkSaaS-yeni-sohbet-devir.md"
       },
       "F23": {
         "name": "Yenileme ve hareketsiz öğrenci takip listeleri",
@@ -96221,7 +96244,7 @@
           "crm_followup_list_v1"
         ],
         "dependencies": [],
-        "implementation": "partial",
+        "implementation": "source_operations_present",
         "acceptance": "pending_feature_acceptance",
         "acceptance_evidence": [],
         "implemented_operations": [
@@ -96230,13 +96253,13 @@
         ],
         "contract_only_operations": [],
         "acceptance_case_ids": [],
-        "baseline_regression": "no callable operation; no behavior acceptance claimed",
         "plan_scope": {
           "starter": "—",
           "pro": "Var",
           "business": "Var"
         },
-        "completed_dependencies": []
+        "completed_dependencies": [],
+        "acceptance_source": "apps/backend/docs/00-FtkSaaS-yeni-sohbet-devir.md"
       },
       "F24": {
         "name": "Davranışa dayalı segmentler ve takip otomasyonu",
@@ -96253,7 +96276,7 @@
           "automation_run_v1"
         ],
         "dependencies": [],
-        "implementation": "partial",
+        "implementation": "source_operations_present",
         "acceptance": "pending_feature_acceptance",
         "acceptance_evidence": [],
         "implemented_operations": [
@@ -96263,13 +96286,13 @@
         ],
         "contract_only_operations": [],
         "acceptance_case_ids": [],
-        "baseline_regression": "P05 source implemented; real Auth/Storage/worker acceptance pending CI",
         "plan_scope": {
           "starter": "—",
           "pro": "Var",
           "business": "Var"
         },
-        "completed_dependencies": []
+        "completed_dependencies": [],
+        "acceptance_source": "apps/backend/docs/00-FtkSaaS-yeni-sohbet-devir.md"
       },
       "F25": {
         "name": "Paylaşılabilir işletme takvimi ve başvuru/kayıt sayfası",
@@ -96291,7 +96314,7 @@
           "plan_gate_alignment",
           "Configured signed ingress, Turnstile secret/hostname and real provider acceptance; no bypass."
         ],
-        "implementation": "partial",
+        "implementation": "source_operations_present",
         "acceptance": "pending_feature_acceptance",
         "acceptance_evidence": [],
         "implemented_operations": [
@@ -96305,13 +96328,13 @@
         "acceptance_case_ids": [
           "DS-ACCESS-01"
         ],
-        "baseline_regression": "global baseline 241-test main CI; not per-feature DS acceptance",
         "plan_scope": {
           "starter": "Yalnız ders takvimi/başvurusu; genel CRM veya etkinlik değil",
           "pro": "Var",
           "business": "Var"
         },
-        "completed_dependencies": []
+        "completed_dependencies": [],
+        "acceptance_source": "apps/backend/docs/00-FtkSaaS-yeni-sohbet-devir.md"
       },
       "F26": {
         "name": "Talep sonucu, ders değişikliği ve benzeri işlemsel bildirimler",
@@ -96329,7 +96352,7 @@
           "outbox_deliver_v1"
         ],
         "dependencies": [],
-        "implementation": "partial",
+        "implementation": "source_operations_present",
         "acceptance": "pending_feature_acceptance",
         "acceptance_evidence": [],
         "implemented_operations": [
@@ -96340,13 +96363,13 @@
         ],
         "contract_only_operations": [],
         "acceptance_case_ids": [],
-        "baseline_regression": "P05 source implemented; real Auth/Storage/worker acceptance pending CI",
         "plan_scope": {
           "starter": "Uygulama içi",
           "pro": "Var",
           "business": "Var"
         },
-        "completed_dependencies": []
+        "completed_dependencies": [],
+        "acceptance_source": "apps/backend/docs/00-FtkSaaS-yeni-sohbet-devir.md"
       },
       "F27": {
         "name": "Otomatik yaklaşan ders/paket bitiş hatırlatmaları",
@@ -96363,7 +96386,7 @@
           "reminder_schedule_v1"
         ],
         "dependencies": [],
-        "implementation": "partial",
+        "implementation": "source_operations_present",
         "acceptance": "pending_feature_acceptance",
         "acceptance_evidence": [],
         "implemented_operations": [
@@ -96373,13 +96396,13 @@
         ],
         "contract_only_operations": [],
         "acceptance_case_ids": [],
-        "baseline_regression": "P05 source implemented; real Auth/Storage/worker acceptance pending CI",
         "plan_scope": {
           "starter": "—",
           "pro": "Var",
           "business": "Var"
         },
-        "completed_dependencies": []
+        "completed_dependencies": [],
+        "acceptance_source": "apps/backend/docs/00-FtkSaaS-yeni-sohbet-devir.md"
       },
       "F28": {
         "name": "Operasyon ve finans raporları, tarih filtresi, dışa aktarım",
@@ -96399,7 +96422,7 @@
           "settings_template_resolve_v1"
         ],
         "dependencies": [],
-        "implementation": "partial",
+        "implementation": "source_operations_present",
         "acceptance": "pending_feature_acceptance",
         "acceptance_evidence": [],
         "implemented_operations": [
@@ -96407,17 +96430,18 @@
           "report_export_start_v1",
           "report_file_get_v1",
           "job_status_get_v1",
-          "report_build_v1"
+          "report_build_v1",
+          "settings_template_resolve_v1"
         ],
         "contract_only_operations": [],
         "acceptance_case_ids": [],
-        "baseline_regression": "P06 source implementation; 20 real PostgreSQL projections + worker validated in rollback; final real Auth/Storage/Edge candidate/main clean remains required",
         "plan_scope": {
           "starter": "Temel",
           "pro": "Tam",
           "business": "Birleşik ve merkez bazlı"
         },
-        "completed_dependencies": []
+        "completed_dependencies": [],
+        "acceptance_source": "apps/backend/docs/00-FtkSaaS-yeni-sohbet-devir.md"
       },
       "F29": {
         "name": "Atölye/etkinlik, kontenjan, kayıt ve katılım",
@@ -96451,7 +96475,7 @@
         "dependencies": [
           "plan_gate_alignment"
         ],
-        "implementation": "implemented_acceptance_pending",
+        "implementation": "source_operations_present",
         "acceptance": "pending_feature_acceptance",
         "acceptance_evidence": [],
         "implemented_operations": [
@@ -96478,13 +96502,13 @@
         "acceptance_case_ids": [
           "DS-ACCESS-01"
         ],
-        "baseline_regression": "global baseline 241-test main CI; not per-feature DS acceptance",
         "plan_scope": {
           "starter": "—",
           "pro": "Var",
           "business": "Var"
         },
-        "completed_dependencies": []
+        "completed_dependencies": [],
+        "acceptance_source": "apps/backend/docs/00-FtkSaaS-yeni-sohbet-devir.md"
       },
       "F30": {
         "name": "Temel form ve sürümlü belge onayı",
@@ -96504,7 +96528,7 @@
           "document_publication_preview_v1"
         ],
         "dependencies": [],
-        "implementation": "partial",
+        "implementation": "source_operations_present",
         "acceptance": "pending_feature_acceptance",
         "acceptance_evidence": [],
         "implemented_operations": [
@@ -96517,13 +96541,13 @@
         ],
         "contract_only_operations": [],
         "acceptance_case_ids": [],
-        "baseline_regression": "P05 source implemented; real Auth/Storage/worker acceptance pending CI",
         "plan_scope": {
           "starter": "Var",
           "pro": "Var",
           "business": "Var"
         },
-        "completed_dependencies": []
+        "completed_dependencies": [],
+        "acceptance_source": "apps/backend/docs/00-FtkSaaS-yeni-sohbet-devir.md"
       },
       "F31": {
         "name": "Öğrenci, kalan kredi ve borç için veri içe aktarma",
@@ -96545,7 +96569,7 @@
           "settings_template_resolve_v1"
         ],
         "dependencies": [],
-        "implementation": "partial",
+        "implementation": "source_operations_present",
         "acceptance": "pending_feature_acceptance",
         "acceptance_evidence": [],
         "implemented_operations": [
@@ -96555,17 +96579,18 @@
           "import_rows_list_v1",
           "job_status_get_v1",
           "import_rows_process_v1",
-          "file_upload_complete_v1"
+          "file_upload_complete_v1",
+          "settings_template_resolve_v1"
         ],
         "contract_only_operations": [],
         "acceptance_case_ids": [],
-        "baseline_regression": "P06 source implementation; 20 real PostgreSQL projections + worker validated in rollback; final real Auth/Storage/Edge candidate/main clean remains required",
         "plan_scope": {
           "starter": "Var",
           "pro": "Var",
           "business": "Var"
         },
-        "completed_dependencies": []
+        "completed_dependencies": [],
+        "acceptance_source": "apps/backend/docs/00-FtkSaaS-yeni-sohbet-devir.md"
       },
       "F32": {
         "name": "İşletme aboneliği, erişim ve kullanım limitleri",
@@ -96594,36 +96619,35 @@
           "subscription_boundary_apply_v1"
         ],
         "dependencies": [],
-        "implementation": "partial",
+        "implementation": "source_operations_present",
         "acceptance": "pending_feature_acceptance",
         "acceptance_evidence": [],
         "implemented_operations": [
           "organization_create_v1",
-          "student_activate_v1",
-          "student_deactivate_v1",
-          "subscription_get_v1",
-          "saas_payment_submit_v1",
-          "saas_payment_verify_v1"
-        ],
-        "contract_only_operations": [
           "organization_close_preview_v1",
           "organization_close_apply_v1",
           "organization_reopen_v1",
+          "student_activate_v1",
+          "student_deactivate_v1",
+          "subscription_get_v1",
           "subscription_upgrade_quote_v1",
           "subscription_downgrade_request_v1",
           "subscription_change_cancel_v1",
           "subscription_renewal_set_v1",
+          "saas_payment_submit_v1",
+          "saas_payment_verify_v1",
           "saas_grace_extend_v1",
           "subscription_boundary_apply_v1"
         ],
+        "contract_only_operations": [],
         "acceptance_case_ids": [],
-        "baseline_regression": "global baseline 241-test main CI; not per-feature DS acceptance",
         "plan_scope": {
           "starter": "Var",
           "pro": "Var",
           "business": "Var"
         },
-        "completed_dependencies": []
+        "completed_dependencies": [],
+        "acceptance_source": "apps/backend/docs/00-FtkSaaS-yeni-sohbet-devir.md"
       },
       "F33": {
         "name": "Denetlenebilir geçmiş ve yinelenen işlem koruması",
@@ -96649,23 +96673,22 @@
         "dependencies": [
           "confirmed_reservation_protection"
         ],
-        "implementation": "partial",
+        "implementation": "source_operations_present",
         "acceptance": "pending_feature_acceptance",
         "acceptance_evidence": [],
         "implemented_operations": [
+          "organization_delete_preview_v1",
+          "organization_delete_apply_v1",
           "credit_adjust_v1",
           "collection_correct_preview_v1",
           "collection_correct_apply_v1",
           "instructor_payment_correct_v1",
           "operation_status_get_v1",
           "preview_get_v1",
-          "audit_list_v1"
-        ],
-        "contract_only_operations": [
-          "organization_delete_preview_v1",
-          "organization_delete_apply_v1",
+          "audit_list_v1",
           "privacy_execute_v1"
         ],
+        "contract_only_operations": [],
         "acceptance_case_ids": [
           "DS-PROT-01",
           "DS-PROT-02",
@@ -96673,17 +96696,17 @@
           "DS-PROT-04",
           "DS-PROT-05"
         ],
-        "baseline_regression": "P06 source implementation; 20 real PostgreSQL projections + worker validated in rollback; final real Auth/Storage/Edge candidate/main clean remains required",
         "plan_scope": {
           "starter": "Var",
           "pro": "Var",
           "business": "Var"
         },
-        "completed_dependencies": []
+        "completed_dependencies": [],
+        "acceptance_source": "apps/backend/docs/00-FtkSaaS-yeni-sohbet-devir.md"
       }
     },
     "p04_delivery": {
-      "status": "implemented_pending_ci",
+      "status": "implemented_source",
       "scope": [
         "leads_list_v1",
         "lead_save_v1",
@@ -96702,10 +96725,10 @@
       "public_contact": "normalized email; unverified until separate account linking",
       "trial_config": "private.p04_trial_configuration plus existing trial_repeat_limit policy; no default trial duration/cap",
       "followup_config": "existing entitlement_reminder_days and inactive_student_days; no automatic segmentation or messaging",
-      "acceptance": "local verification and independent review pending; candidate/main clean unchanged"
+      "acceptance_source": "apps/backend/docs/00-FtkSaaS-yeni-sohbet-devir.md"
     },
     "p05_delivery": {
-      "status": "accepted_main_and_development",
+      "status": "implemented_source",
       "scope": [
         "document_upload_prepare_v1",
         "document_version_publish_v1",
@@ -96726,19 +96749,10 @@
       "worker": "private.p05_worker_execute + p05_jobs_claim; dedicated LOGIN granted ftk_p05_worker with explicit org binding; human Auth cannot execute jobs",
       "gates": "reservation/sale/event registration deferred insert checks; attended transition check; append-only version/acceptance evidence; no automatic existing booking cancellation",
       "external_email": "deferred; no provider integration",
-      "acceptance": {
-        "main": "83641447b29e459236aea1a9a4379b5d19825af6",
-        "candidate_run": 39745672815,
-        "main_run": 39748053581,
-        "development_run": 39750264949,
-        "artifact": 12412499512,
-        "tree": "736a75bb7a7b429ac8506f2676c8d2601ec48f54",
-        "hosted_worker": "separate OPS-W01 after P06 before P07"
-      }
+      "acceptance_source": "apps/backend/docs/00-FtkSaaS-yeni-sohbet-devir.md"
     },
     "p06_delivery": {
-      "status": "done_code_main_development_acceptance",
-      "base_main": "83641447b29e459236aea1a9a4379b5d19825af6",
+      "status": "implemented_source",
       "operations": [
         "report_get_v1",
         "report_export_start_v1",
@@ -96754,42 +96768,23 @@
         "job_status_get_v1",
         "audit_list_v1"
       ],
-      "hosted_workers": "OPS-W01 Supabase Cron selected; native adapter source/operational acceptance pending; explicit tenant bindings/config remain required",
+      "hosted_workers": "five dedicated Supabase Cron lanes; explicit bindings/config; workload/purge/restore limits owned by current acceptance and backlog",
       "report_files": "private database byte objects, authenticated Edge POST on every download; seven-day expiry, no signed read URL",
       "import_file": "private Storage CSV; explicit tenant byte/row limits, 2MiB/5000 technical ceilings",
       "import_credit_basis": "explicit full original package value, remaining quantity <= product original credits; no cash movement or implicit debt",
       "historical_tracking": "P06 captures accepted business request contexts and short-lived preview responses from this migration onward; absent legacy authorization context fails closed",
       "opening_history_limits": "No historical use or cent-slot reconstruction. Only none/credit_ratio refunds; partial opening value must divide exactly by original package quantity, otherwise POLICY_NOT_CONFIGURED.",
-      "source_verification": {
-        "kind": "local structural + hosted rollback SQL, not clean acceptance",
-        "projection_schemas": 20,
-        "worker_schema": true,
-        "business_flow": "28-row preview/apply, original job replay, opening credit/debt without cash, config-stale apply denial, late audit full-batch rollback, full export, revoked linkage denial",
-        "accepted_main_still": "83641447b29e459236aea1a9a4379b5d19825af6"
-      },
-      "accepted_main": "006ad36918ae823bc10fbdefa2d48901e193121c",
-      "candidate_run": 39779013518,
-      "main_run": 39782197422,
-      "development_cd_run": 39785146645,
-      "acceptance_receipt": {
-        "artifact": 12428881259,
-        "sha256": "bcd1ab3255c1808982de76c3d09d47d5eaa95c5fb2e8f9f870d3fedc9ce93b65",
-        "checks": 18,
-        "migrations": 54,
-        "edge_version": 7
-      }
+      "acceptance_source": "apps/backend/docs/00-FtkSaaS-yeni-sohbet-devir.md"
     },
     "ops_w01_delivery": {
-      "status": "implemented_pending_source_and_hosted_acceptance",
-      "base_main": "006ad36918ae823bc10fbdefa2d48901e193121c",
+      "status": "implemented_source",
       "hosting": "Supabase Cron; real dedicated DB session per worker lane",
       "tenant_policy": "explicit existing org binding/config only; empty scope heartbeats idle",
-      "source_acceptance": "candidate/main full clean and development CD pending",
-      "operational_acceptance": "accepted-source install, heartbeat/disable/restart and lease recovery pending"
+      "acceptance_source": "apps/backend/docs/00-FtkSaaS-yeni-sohbet-devir.md"
     },
     "session_capacity_revision": {
-      "decision": "docs/decisions/DS-2026-10-25-session-capacity.md",
-      "status": "implemented_source_acceptance_pending",
+      "decision": "docs/contracts/02-FtkSaaS-teknik-sozlesme.md#oda-seans-kapasite-karari",
+      "status": "implemented_source",
       "physical_room_ceiling": true,
       "single_session_total": true,
       "category_limits": true,
@@ -96797,7 +96792,8 @@
       "no_implicit_priority_override": true,
       "audit_actor_reason_limits_excess": true,
       "existing_reservations_preserved": true,
-      "event_capacity_unchanged": true
+      "event_capacity_unchanged": true,
+      "acceptance_source": "apps/backend/docs/00-FtkSaaS-yeni-sohbet-devir.md"
     },
     "starter_plan_policy": {
       "revision": "20261026",

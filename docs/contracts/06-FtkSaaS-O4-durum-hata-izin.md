@@ -4,7 +4,7 @@ Yayında güncel disiplin ön eki yoksa `VALIDATION_FAILED`; güncel ön eki ta�
 
 ## Starter kapıları — kabul edilmiş hata ve yetki davranışı
 
-PR56 ile kabul edilmiş66. migration Starter canlı limit/özellik/kapsam ve receipt tekrar denetimini uygular; [hata, DTO ve kabul sınırı](../starter-plan-gates-handover.md). Yeni hata/izin enum’u eklenmez: kaynak/öğrenci kota aşımı `PLAN_LIMIT_REACHED`; plan dışı özellik veya seçilmemiş kaynak `PLAN_FEATURE_UNAVAILABLE`; güncel yetki yokluğu `FORBIDDEN`; yabancı/olmayan kimlik `NOT_FOUND`; stale abonelik sürümü `VERSION_CONFLICT`; yanlış ad/çapraz seçim `VALIDATION_FAILED`. Şema kapısı geçerli istekten önce çalışır; malformed istek plan kabul testi değildir. Eski yüksek katalog veya personel grant’i kapıyı açmaz; personel yetkisiyle operasyon Pro/Business lisansına tabidir, öğrencinin kendi ve atanmış eğitmenin bağımsız yetkisi korunur. Bu davranış PR56 aynı-main clean ve development CD kabulüyle doğrulanmıştır.
+PR56 ile kabul edilmiş66. migration Starter canlı limit/özellik/kapsam ve receipt tekrar denetimini uygular; [hata, DTO ve kabul sınırı](../workflows.md). Yeni hata/izin enum’u eklenmez: kaynak/öğrenci kota aşımı `PLAN_LIMIT_REACHED`; plan dışı özellik veya seçilmemiş kaynak `PLAN_FEATURE_UNAVAILABLE`; güncel yetki yokluğu `FORBIDDEN`; yabancı/olmayan kimlik `NOT_FOUND`; stale abonelik sürümü `VERSION_CONFLICT`; yanlış ad/çapraz seçim `VALIDATION_FAILED`. Şema kapısı geçerli istekten önce çalışır; malformed istek plan kabul testi değildir. Eski yüksek katalog veya personel grant’i kapıyı açmaz; personel yetkisiyle operasyon Pro/Business lisansına tabidir, öğrencinin kendi ve atanmış eğitmenin bağımsız yetkisi korunur. Bu davranış PR56 aynı-main clean ve development CD kabulüyle doğrulanmıştır.
 
 # FtkSaaS — O4 durum, hata ve izin sözleşmesi
 
@@ -124,55 +124,55 @@ Self hesap erişimi aktif öğrenci ilişkisinin veya ticari kota istisnasının
 
 ## Hata kodları
 
-RPC domain error ve transport ayrı normalize edilir; düz metin ayrıştırılmaz. HTTP sütunu adapter eşlemesidir. retry=true aynı operation_key gerektirir; otomatik deneme en fazla3, rate-limit Retry-After beklenir. RESULT_NOT_CONFIRMED istemci durumu, DB başarısızlık hükmü değildir.
+RPC domain error ve transport ayrı normalize edilir; düz metin ayrıştırılmaz. SQL domain sonuçları HTTP 200 içinde ok:false/SafeError dönebilir. Gateway/Auth/transport hatalarının HTTP status’u ayrıca vardır; iş başarısı yalnız HTTP kodundan çıkarılmaz. Aşağıdaki kodlar domain anlamını taşır, sabit HTTP eşlemesi değildir. retry=true aynı operation_key gerektirir; otomatik deneme en fazla3, rate-limit Retry-After beklenir. RESULT_NOT_CONFIRMED istemci durumu, DB başarısızlık hükmü değildir.
 
-| Kod | HTTP | Retry | Anlam |
-|---|---|---|---|
-| `AUTH_REQUIRED` | 401 | hayır | Geçerli hesap/oturum yok; public kapsam ayrı. |
-| `SESSION_REVOKED` | 401 | hayır | Eski JWT tek başına canlı erişim sağlamaz. |
-| `FORBIDDEN` | 403 | hayır | Güncel işlem/scope/alan yetkisi yok. |
-| `NOT_FOUND` | 404 | hayır | Yok veya aktörün göremediği kayıt; tenant varlığı açıklanmaz. |
-| `VALIDATION_FAILED` | 400 | hayır | Tip/aralık/bilinmeyen alan/geçersiz currency; alan yolları güvenli. |
-| `CLIENT_UPDATE_REQUIRED` | 426 | hayır | Desteklenmeyen sözleşme sürümü, iş yaratılmadı. |
-| `PLAN_FEATURE_UNAVAILABLE` | 403 | hayır | Özellik plan dışında; veri silinmez, kullanım açılmaz. |
-| `PLAN_LIMIT_REACHED` | 409 | hayır | Yeni aktif öğrenci/merkez vb plan limitinde. |
-| `SERVICE_UNAVAILABLE` | 503 | hayır | Organizasyon hizmeti kapalı; öğrenciye SaaS borcu açıklanmaz. |
-| `BILLING_OPERATION_RESTRICTED` | 403 | hayır | İlk 7 gün kapalı işlem grubu. |
-| `POLICY_NOT_CONFIGURED` | 409 | hayır | Zorunlu politika veya anlaşma eksik; otomatik izin/ret varsayımı yok. |
-| `CAPACITY_FULL` | 409 | hayır | Güncel hedefte seans toplam/kategori veya fiziksel oda sınırı; ayrı kontrollü aşım fiziksel oda sınırını kaldıramaz. Main eski DTO ve PR45 geçişi kaynak durumuyla ayrılır. |
-| `RESOURCE_CONFLICT` | 409 | hayır | Oda/görevli çakışması. |
-| `RESERVATION_EXISTS` | 409 | hayır | Farklı key ile aynı aktif rezervasyon; izinli current ref varsa döner. |
-| `ENTITLEMENT_UNAVAILABLE` | 409 | hayır | Ders tarihinde uygun kullanılabilir hak yok. |
-| `CREDIT_LIMIT_EXCEEDED` | 409 | hayır | Ayrılmış+tüketilmiş açık limiti aşar. |
-| `QUOTA_EXCEEDED` | 409 | hayır | Süreli ürün dönem kullanım sınırı dolu. |
-| `CLASS_ACCESS_DENIED` | 403 | hayır | Paket sınıf/merkez kapsamı uygun değil. |
-| `DOCUMENT_REQUIRED` | 409 | hayır | İşlem noktasında gerekli sürüm onayı eksik. |
-| `ATTENDANCE_INCOMPLETE` | 409 | hayır | Sonucu girilmemiş iptal edilmemiş rezervasyon var. |
-| `ATTENDANCE_CLOSED` | 409 | hayır | Açık yoklama komutu kapalıya uygulanamaz. |
-| `ASSISTANT_PARTICIPANT_CONFLICT` | 409 | hayır | Asistan/katılımcı iki yönlü çakışma. |
-| `OPEN_OPERATIONS_EXIST` | 409 | hayır | Öğrenci pasifleştirmesi açık işlem varken yasak. |
-| `VERSION_CONFLICT` | 409 | hayır | Güncel veri yeniden alınmalı; eski değişiklik otomatik uygulanmaz. |
-| `PREVIEW_STALE` | 409 | hayır | İlgili scope/sürüm/onay değişmiş, yeniden önizleme. |
-| `APPROVAL_REQUIRED` | 409 | hayır | Eksik etkilenen merkez onayları. |
-| `ACCOUNT_LINK_CONFLICT` | 409 | hayır | Hesap bağlantısı veya çok rollü davet; otomatik merge yok. |
-| `OWNER_TRANSFER_REQUIRED` | 409 | hayır | Aktif owner hesabı silinmeden devir/kapama gerekir. |
-| `INVALID_STATE_TRANSITION` | 409 | hayır | Terminal kayıt yeniden açılamaz/uygunsuz komut. |
-| `INVITATION_UNAVAILABLE` | 409 | hayır | Kullanılmış/süresi dolmuş/iptal/uygunsuz davet; hesap varlığı açılmaz. |
-| `OFFER_UNAVAILABLE` | 409 | hayır | Yer teklifi terminal veya expiry; kabul tekrar yeri arttırmaz. |
-| `INSUFFICIENT_STUDENT_CREDIT` | 409 | hayır | Alacak iade/mahsup yarışı kalan bakiyeyi aştı. |
-| `CURRENCY_MISMATCH` | 409 | hayır | Merkez/currency eşleşmez; kur dönüşümü yok. |
-| `IDEMPOTENCY_PAYLOAD_MISMATCH` | 409 | hayır | Aynı key farklı kanonik içerik. |
-| `OPERATION_IN_PROGRESS` | 409 | aynı key | Aynı key işlem durumu sorgulanır; yeni iş açılmaz. |
-| `OPERATION_RESULT_EXPIRED` | 409 | hayır | Tam sonuç 30 gün sonra yok; aynı key yeni iş başlatmaz, yetkili business ref sorgulanır. |
-| `RATE_LIMITED` | 429 | aynı key | retry_after_ms dolmadan deneme yok; public yanıt hesabı sızdırmaz. |
-| `BOT_VERIFICATION_FAILED` | 400 | hayır | Kabulden önce doğrulama gerekli; kişisel veri sisteme yazılmadı. |
-| `TEMPORARY_FAILURE` | 503 | aynı key | Geçici DB/altyapı; en fazla 3 otomatik retry aynı key. |
-| `INTEGRITY_VIOLATION` | 500 | hayır | İlgili transaction rollback, kritik alarm; hassas DB hata metni açıklanmaz. |
-| `RESULT_NOT_CONFIRMED` | istemci | hayır | İstemcinin bağlantı sonucu belirsiz sunum durumu; DB başarısızlık kodu değildir. |
-| `ACCOUNT_ALREADY_LINKED` | 409 | hayır | Mevcut bağlı hesaba tekrar erişim daveti gönderilmez. |
-| `ACCOUNT_LINK_REQUIRED` | 409 | hayır | Öğrenci dışı role grant öncesi hesap bağı zorunlu. |
-| `SUBSCRIPTION_NOT_STARTED` | 403 | hayır | İlk ödeme doğrulanmadı; yalnız kuruluş/ödeme kapısı açık. |
-| `PARTICIPATION_BLOCKED` | 409 | hayır | Seans başlangıcındaki kredi limit aşımı; geriye ödeme sonucu değiştirmez. |
+| Kod | Retry | Anlam |
+|---|---|---|
+| `AUTH_REQUIRED` | hayır | Geçerli hesap/oturum yok; public kapsam ayrı. |
+| `SESSION_REVOKED` | hayır | Eski JWT tek başına canlı erişim sağlamaz. |
+| `FORBIDDEN` | hayır | Güncel işlem/scope/alan yetkisi yok. |
+| `NOT_FOUND` | hayır | Yok veya aktörün göremediği kayıt; tenant varlığı açıklanmaz. |
+| `VALIDATION_FAILED` | hayır | Tip/aralık/bilinmeyen alan/geçersiz currency; alan yolları güvenli. |
+| `CLIENT_UPDATE_REQUIRED` | hayır | Desteklenmeyen sözleşme sürümü, iş yaratılmadı. |
+| `PLAN_FEATURE_UNAVAILABLE` | hayır | Özellik plan dışında; veri silinmez, kullanım açılmaz. |
+| `PLAN_LIMIT_REACHED` | hayır | Yeni aktif öğrenci/merkez vb plan limitinde. |
+| `SERVICE_UNAVAILABLE` | hayır | Organizasyon hizmeti kapalı; öğrenciye SaaS borcu açıklanmaz. |
+| `BILLING_OPERATION_RESTRICTED` | hayır | İlk 7 gün kapalı işlem grubu. |
+| `POLICY_NOT_CONFIGURED` | hayır | Zorunlu politika veya anlaşma eksik; otomatik izin/ret varsayımı yok. |
+| `CAPACITY_FULL` | hayır | Güncel hedefte seans toplam/kategori veya fiziksel oda sınırı; ayrı kontrollü aşım fiziksel oda sınırını kaldıramaz. |
+| `RESOURCE_CONFLICT` | hayır | Oda/görevli çakışması. |
+| `RESERVATION_EXISTS` | hayır | Farklı key ile aynı aktif rezervasyon; izinli current ref varsa döner. |
+| `ENTITLEMENT_UNAVAILABLE` | hayır | Ders tarihinde uygun kullanılabilir hak yok. |
+| `CREDIT_LIMIT_EXCEEDED` | hayır | Ayrılmış+tüketilmiş açık limiti aşar. |
+| `QUOTA_EXCEEDED` | hayır | Süreli ürün dönem kullanım sınırı dolu. |
+| `CLASS_ACCESS_DENIED` | hayır | Paket sınıf/merkez kapsamı uygun değil. |
+| `DOCUMENT_REQUIRED` | hayır | İşlem noktasında gerekli sürüm onayı eksik. |
+| `ATTENDANCE_INCOMPLETE` | hayır | Sonucu girilmemiş iptal edilmemiş rezervasyon var. |
+| `ATTENDANCE_CLOSED` | hayır | Açık yoklama komutu kapalıya uygulanamaz. |
+| `ASSISTANT_PARTICIPANT_CONFLICT` | hayır | Asistan/katılımcı iki yönlü çakışma. |
+| `OPEN_OPERATIONS_EXIST` | hayır | Öğrenci pasifleştirmesi açık işlem varken yasak. |
+| `VERSION_CONFLICT` | hayır | Güncel veri yeniden alınmalı; eski değişiklik otomatik uygulanmaz. |
+| `PREVIEW_STALE` | hayır | İlgili scope/sürüm/onay değişmiş, yeniden önizleme. |
+| `APPROVAL_REQUIRED` | hayır | Eksik etkilenen merkez onayları. |
+| `ACCOUNT_LINK_CONFLICT` | hayır | Hesap bağlantısı veya çok rollü davet; otomatik merge yok. |
+| `OWNER_TRANSFER_REQUIRED` | hayır | Aktif owner hesabı silinmeden devir/kapama gerekir. |
+| `INVALID_STATE_TRANSITION` | hayır | Terminal kayıt yeniden açılamaz/uygunsuz komut. |
+| `INVITATION_UNAVAILABLE` | hayır | Kullanılmış/süresi dolmuş/iptal/uygunsuz davet; hesap varlığı açılmaz. |
+| `OFFER_UNAVAILABLE` | hayır | Yer teklifi terminal veya expiry; kabul tekrar yeri arttırmaz. |
+| `INSUFFICIENT_STUDENT_CREDIT` | hayır | Alacak iade/mahsup yarışı kalan bakiyeyi aştı. |
+| `CURRENCY_MISMATCH` | hayır | Merkez/currency eşleşmez; kur dönüşümü yok. |
+| `IDEMPOTENCY_PAYLOAD_MISMATCH` | hayır | Aynı key farklı kanonik içerik. |
+| `OPERATION_IN_PROGRESS` | aynı key | Aynı key işlem durumu sorgulanır; yeni iş açılmaz. |
+| `OPERATION_RESULT_EXPIRED` | hayır | Tam sonuç 30 gün sonra yok; aynı key yeni iş başlatmaz, yetkili business ref sorgulanır. |
+| `RATE_LIMITED` | aynı key | retry_after_ms dolmadan deneme yok; public yanıt hesabı sızdırmaz. |
+| `BOT_VERIFICATION_FAILED` | hayır | Kabulden önce doğrulama gerekli; kişisel veri sisteme yazılmadı. |
+| `TEMPORARY_FAILURE` | aynı key | Geçici DB/altyapı; en fazla 3 otomatik retry aynı key. |
+| `INTEGRITY_VIOLATION` | hayır | İlgili transaction rollback, kritik alarm; hassas DB hata metni açıklanmaz. |
+| `RESULT_NOT_CONFIRMED` | hayır | İstemcinin bağlantı sonucu belirsiz sunum durumu; DB başarısızlık kodu değildir. |
+| `ACCOUNT_ALREADY_LINKED` | hayır | Mevcut bağlı hesaba tekrar erişim daveti gönderilmez. |
+| `ACCOUNT_LINK_REQUIRED` | hayır | Öğrenci dışı role grant öncesi hesap bağı zorunlu. |
+| `SUBSCRIPTION_NOT_STARTED` | hayır | İlk ödeme doğrulanmadı; yalnız kuruluş/ödeme kapısı açık. |
+| `PARTICIPATION_BLOCKED` | hayır | Seans başlangıcındaki kredi limit aşımı; geriye ödeme sonucu değiştirmez. |
 
 08 operations.errors her işlem için izinli kod kümesini içerir; permission/transition/semantic_guards ve transaction sınıfıyla birlikte değerlendirilir. Örn. role owner beyanı doğrulama/forbidden, source-less negative basis eksikliği POLICY_NOT_CONFIGURED, başlangıç limit aşımı PARTICIPATION_BLOCKED, closed correction yetkisi yoksa FORBIDDEN. İş sonucunu sızdırabilecek NOT_FOUND/FORBIDDEN ayrımı tenant varlığı açıklamayacak şekilde maskelenir. Public/hesap kurtarma yanıtı hesap varlığını açıklamaz.
 
@@ -180,56 +180,11 @@ RPC domain error ve transport ayrı normalize edilir; düz metin ayrıştırılm
 
 OrdinaryAttendanceResult attended/no_show; blocked ayrı CM işlemidir. AttendanceResult unmarked/attended/no_show/blocked. Seans saatinin geçmesi hiçbiri için otomatik yoklama üretmez. blocked sonucu işaretli kabul edildiği için CM/I ders kapanışı tüm sonuçlar tamken yapılabilir; katılım engeli kararını verme yetkisi instructor’a geçmez. Event closure yalnız CM’dir, instructor/asst sadece mark.
 
-Kesin para/kredi/hakediş düzeltilirken eski hareket silinmez. Slot/hak/limit/permission yarışı transaction içinde yeniden denetlenir; notification hatası domain commit’i geri almaz. Terminal iptal ve tamamlanmış katılım yeniden etkinleşmez; izinli düzeltme bağlı yeni revision/hareketle. Ayrı platform silme/kanuni imha yükümlülüğü append-only geçmiş için de geçerlidir.
+Kesin para/kredi/hakediş düzeltilirken eski hareket silinmez. Slot/hak/limit/permission yarışı transaction içinde yeniden denetlenir; dış bildirim teslimat hatası domain commit’i geri almaz. Terminal iptal ve tamamlanmış katılım yeniden etkinleşmez; izinli düzeltme bağlı yeni revision/hareketle. Ayrı platform silme/kanuni imha yükümlülüğü append-only geçmiş için de geçerlidir.
 
-## 15 Ekim 2026 — D01–D09 disiplin revizyonu (kabul edildi)
+## Normatif davranış kaynağı
 
-Belge paketi revizyonu: 2.1. Bu bölüm önceki çelişen disiplin, paket kapsamı ve negatif kredi hükümlerinin yerini alır. Önceki sürüm numaraları ve denetim sayıları tarihsel tabanı gösterir.
-
-**D01.** Disiplin organizasyon düzeyinde tanımlanır; merkezler sundukları disiplinleri kullanıma açar. Aynı organizasyonun merkezleri aynı disiplin kimliğini kullanır.
-
-**D02.** Eğitmen birden fazla merkez/disiplinde görev alabilir. Öğrenci birden fazla merkez/disipline kayıt olabilir; organizasyon kişi kaydı çoğaltılmaz. Öğrenci eğitmenin alt kaydı değildir; eğitmen değişimi öğrencinin kimliğini veya haklarını değiştirmez.
-
-**D03.** Normal ders/seansın merkezi ve disiplini belirgindir. Merkezlerin program, fiyat ve eğitmen anlaşmaları ayrı kalır. Disiplin ilişkisi yeni uygulama rolü veya operasyon yetkisi vermez.
-
-**D04.** Paket kullanım kapsamları: merkez+disiplin; merkezin bütün disiplinleri; organizasyonun bütün merkezlerinde belirli disiplin; organizasyonun bütün merkez ve disiplinleri. Organizasyon sınırı aşılamaz; mevcut SaaS plan/merkez erişim sınırları korunur.
-
-**D05.** Ders/etkinlik uygunluğu kullanım kapsamından ayrı belirtilir. Organizasyon genelinde etkinlik paketi bütün normal derslerde kendiliğinden geçmez. Geniş kapsam kapalı sınıf, kapasite, tarih ve diğer uygunluk kurallarını aşmaz.
-
-**D06.** Dar kapsamlı disiplin hakları başka disiplinde kullanılamaz; başka disipline ait paket, kapsam dışındaki kredi açığını kapatamaz. Birden fazla disiplinde geçerli 10 kredilik paket toplam 10 kredi sağlar; disiplin başına ayrı 10 kredi oluşmaz.
-
-**D07.** Negatif kredi sınırı öğrenci için merkez–disiplin bazında uygulanır. Aynı kapsamdaki ayrılmış ve tüketilmiş açık birlikte sayılır; mevcut rezervasyon iki kez sayılmaz. Bir disiplindeki kredi açığı diğer disiplinin katılımını engellemez. Organizasyon geneli kişi açığı üzerinden tek katılım sınırı uygulayan eski hükümler bu kararla değiştirilmiştir.
-
-**D08.** Geniş kapsamlı paket, uygun olduğu merkez/disiplinlerdeki açıkları mevcut kapatma sırasıyla karşılayabilir: önce geçmiş tüketilmiş açık, sonra gelecek rezervasyon açığı. Uygun hak seçiminde en erken bitiş, eşitlikte önce satın alma ve mevcut kararlı eşitlik çözümü korunur. Paket kapsamı uygunluk filtresidir.
-
-**D09.** Seans başlangıcındaki limit kontrolü ve sonradan ödemenin geçmiş katılım/hakedişi değiştirmemesi korunur; kontrol artık ilgili merkez–disiplin kapsamındadır. Para borcu ile kredi açığı ayrı kavramlardır.
-
-**Teknik aktarım durumu:** D01–D09 kapsamı şema, API, izin ve ortak tiplerde mevcuttur; Q-D01 etkinlik kapsamı/negatif kredi ve ortak hak akışı uygulanmıştır. İlk aktarım tarihindeki açık listesi güncel iş listesi değildir; bugün kalanlar docs/remaining-work.md ve kaynak bağlı kabul kayıtlarında izlenir.
-
-Teknik aktarım listesi: disiplin ilişki durumları ve yaşam döngüsü, işlem bazlı yetki/hata eşleşmeleri ve merkez–disiplin kapsam kontrolleri mevcut yetki modeline göre hazırlanır. Disiplin katmanı yeni yönetici rolü oluşturmaz.
-
-## 15 Ekim 2026 — U01–U08 UUIDv7 standardı (kabul edildi)
-
-Paket revizyonu: 2.2. D01–D09 disiplin kararları korunur. Bu bölüm önceki çelişen UUID üretim önerilerinin yerini alır.
-
-**U01.** FtkSaaS tarafından üretilen bütün UUID değerleri için UUIDv7 zorunlu standarttır. Domain kayıtları, işlem/idempotency anahtarları, request/trace kimlikleri ve geçici teknik UUID değerleri bu kapsamdadır. UUIDv1/v4/v5 üretimi için önceki öneriler yürürlükte değildir; istisna yeni açık karar gerektirir.
-
-**U02.** Domain kayıt kimlikleri varsayılan olarak backend tarafından üretilir. UUID üretmesi gereken istemci, test verisi, seed, worker, Edge veya diğer FtkSaaS bileşeni de UUIDv7 kullanır. Bu karar istemciye yeni kayıt oluşturma veya operasyon yetkisi vermez.
-
-**U03.** Supabase Auth ve diğer dış sağlayıcıların ürettiği kimlikler aynen korunur; yeniden UUIDv7 yapılmaz. Üretim standardı ile dış kimlik kabulü ayrıdır. Mevcut UUID değerleri sırf sürümü farklı diye yeniden yazılmaz; FK ve dış referanslar bozulmaz.
-
-**U04.** Aynı kişinin farklı organizasyonlardaki kişi kayıtları bağımsız UUIDv7 alır. E-posta/telefon/isimden deterministik kimlik türetilmez; disiplin kayıtları için de aynı üretim standardı geçerlidir.
-
-**U05.** UUIDv7 RFC 9562 uyumlu, güvenli rastgelelik kullanan doğrulanmış üreticiyle üretilir; timestamp eklenmiş özel UUID algoritması yazılmaz. Seçilen Supabase/PostgreSQL ortamındaki yerleşik üretim desteği teknik kurulumda doğrulanır; yoksa denetlenmiş uyumlu üretici seçilir, v4 fallback yapılmaz. Üretici yoksa ilgili üretim açılmaz.
-
-**U06.** UUIDv7 yaklaşık üretim zamanını açığa çıkarabilir. created_at, seans zamanı ve audit zamanı ayrı alanlardır; UUID kesin küresel işlem sırası, iş tarihi veya yetki kanıtı sayılmaz. Sıralama ve eşzamanlılık kuralları açık iş alanlarına dayanır.
-
-**U07.** Davet, hesap erişimi ve benzeri bearer token değerleri UUID kimliği değildir; güvenli rastgele token standardı korunur. Tokenlar UUIDv7 ile değiştirilmez. operation_key UUIDv7 olsa da retry aynı anahtarı yeniden kullanır; her denemede yeni UUID üretmek idempotency kuralını bozar.
-
-**U08.** PostgreSQL alan tipi uuid olarak kalır. UUIDv7 üretim standardı bütün dış UUID girişlerini v7 diye reddetmek anlamına gelmez. FtkSaaS üretimi olan alanlarla sağlayıcı kimliği alanlarının şema/DTO eşlemesi teknik sohbette tamamlanır; yetki ve tenant kontrolü UUID sürümünden bağımsız uygulanır.
-
-**Güncel teknik durum:** UUIDv7 üretim politikası ortak tip, backend üreticisi ve migration/çalışma zamanı yollarına aktarılmıştır. PostgreSQL default üreticisinin kapalı olması doğrulanmış backend UUIDv7 üretimini yok saydırmaz; v4 fallback yoktur. İlk aktarım tarihinin kurulum bekleme notları tarihsel kayıttır. Güncel CI/hosted/production kabulü tek devirde ayrı izlenir.
-
+D01–D09, U01–U08 ve etkinlik kararları [teknik sözleşmede](02-FtkSaaS-teknik-sozlesme.md) tutulur. Bu belge bu kararların hata/izin/durum projeksiyonudur; ayrı karar kopyası değildir.
 
 ## 2.2-tech.1 — alan/izin aktarımı
 
@@ -263,55 +218,33 @@ event_register başarı verisi outcome üzerinden ayrılır: registered kesin ka
 
 İptal önizlemesi kalan borç kaldırma, yeni öğrenci alacağı, hak serbest bırakma ve hazırlık kapatma etkilerini verir. Tahsilat/indirim/alacak veya hazırlık değiştiyse yeniden önizleme gerekir. Q-E02 merkez iptalinde aşamadan bağımsız tam hak/para sonucu; Q-E03 katılımcı iptalinde planlanan başlangıç sınırı uygulanır. Oransal yeni iade kuralı türetilmez.
 
-## Q-E02 — 16 Ekim 2026 son kabul (önceki çelişen hükümlerin yerine)
+## Etkinlik iptalinin durum etkisi
 
-**E02-01.** Katılımcının başlama sonrası kendi kaydını iptali/ayrılması parasal iade, borç indirimi veya öğrenci alacağı üretmez. Mevcut paket iptal koşulları aynen korunur.
-
-**E02-02.** Merkez iptali her aşamada etkinliğe bağlı ücret yükümlülüğünü tamamen kaldırır; kalan borç sıfır, tahsilatın daha önce alacaklaştırılmamış tamamı öğrenci alacağıdır. Nakit iade/mahsup ayrı açık yetkili işlem; otomatik nakit çıkışı yok.
-
-**E02-03.** Merkez iptali tüm ayrılmış hakları serbest bırakır, tüketilmiş hakları previous_id bağlı ters hareketle tamamen geri verir; kısmi tüketim ve paket hakkı için parasal alacak yok.
-
-**E02-04.** Önceki alacak/iade/mahsup/hak dönüşü tekrar üretilmez. Yalnız iptal edilen etkinliğe bağlı kayıtlar; başka borç/geçmiş değişmez. Önizleme+apply sürüm/finans bağımlılıkları, canlı yetki ve tek transaction audit/outbox/receipt ile korunur.
-
-**E02-05.** Etkinlik fiilî başlangıç kaydı/düzeltmesi güncel runtime’da vardır; saat geçmesi tek başına gerçekleşme değildir. Ders anlaşmasının başlangıçta sabitlenmesi DS teknik teslimidir. Merkez iptalinin aşamadan bağımsız sonucu bu tanıma ihtiyaç duymaz; mevcut occurred/attendance evidence korunur.
-
-Teknik aktarım ve test durumu: docs/decisions/Q-E02.md ve reports/qe02-verification.json. Tarihsel test sayıları bu değişikliğin kanıtı değildir.
+Q-E02/Q-E03’ün tek normatif sahibi [etkinlik kararıdır](02-FtkSaaS-teknik-sozlesme.md#etkinlik-kararlari). Merkezce iptal edilmiş etkinlikte sonraki yoklama komutları hakkı yeniden tüketemez.
 
 ## Takvim/seans/rezervasyon okuma aktarımı
 
-`schedule.read` satırı yeni genel merkez yetkisi değildir. Üç okuma için öğrenci self kayıtları, canlı seans/sınıf görevi + I/A login rolü, CM veya açık reservation.write/attendance.draft personel grantı ve organizasyon okuyucusu kapsamı satır bazında uygulanır. Aktif hesap bağı, plan/merkez/abonelik ve Auth oturumu her sayfada denetlenir. Yönetim dışındaki seans görevlerinde agreement_id gösterilmez. Zaman/cursor/alan ayrıntıları: [okuma devri](../schedule-read-handover.md). Ürün/uygun satış seçimi bu aktarımda kapatılmadı.
+`schedule.read` satırı yeni genel merkez yetkisi değildir. Üç okuma için öğrenci self kayıtları, canlı seans/sınıf görevi + I/A login rolü, CM veya açık reservation.write/attendance.draft personel grantı ve organizasyon okuyucusu kapsamı satır bazında uygulanır. Aktif hesap bağı, plan/merkez/abonelik ve Auth oturumu her sayfada denetlenir. Yönetim dışındaki seans görevlerinde agreement_id gösterilmez. Zaman/cursor/alan ayrıntıları: [okuma devri](../workflows.md). Ürün/uygun satış seçimi bu aktarımda kapatılmadı.
 
 
 ## Program/seans teknik aktarımı — 17 Ekim 2026
 
-Yeni ürün kuralı eklemeden mevcut program/saat/kaynak/kapasite/görev kuralları sonlu materialize edilmiş oluşumlara aktarılır. Ayrıntılı DTO, bağımlılık, miras/override ve hata davranışı [program/seans devrindedir](../program-session-handover.md). Yerel tarihler [başlangıç,bitiş), DST çift saatinde açık date/offset_minutes; gap reddi. this_and_future aynı programın gelecekteki planned/open oluşumlarını kapsar; geçmiş/sonuçlanmış korunur. Mevcut rezervasyon/hak kimliği kapasite indirimiyle iptal edilmez; saat değişikliği mevcut sabit hakkı geçersiz kılıyorsa transaction reddedilir. DS hedefinde Starter kapanışı F20/anlaşma istemez ve hakediş üretmez; Pro/Business ücretli görev için açık anlaşma gerekir. Runtime uyarlaması ayrı teslimdir.
+Yeni ürün kuralı eklemeden mevcut program/saat/kaynak/kapasite/görev kuralları sonlu materialize edilmiş oluşumlara aktarılır. Ayrıntılı DTO, bağımlılık, miras/override ve hata davranışı [program/seans devrindedir](../workflows.md). Yerel tarihler [başlangıç,bitiş), DST çift saatinde açık date/offset_minutes; gap reddi. this_and_future aynı programın gelecekteki planned/open oluşumlarını kapsar; geçmiş/sonuçlanmış korunur. Mevcut rezervasyon/hak kimliği kapasite indirimiyle iptal edilmez; saat değişikliği mevcut sabit hakkı geçersiz kılıyorsa transaction reddedilir. Kabul edilmiş DS kuralında Starter kapanışı F20/anlaşma istemez ve hakediş üretmez; Pro/Business ücretli görev için açık anlaşma gerekir. API tüketimi WF03/WF07, kaynak kabulü güncel kabul kaydında izlenir.
 
-Sınıf atama güncellemesi hedef atama satır sürümünü, seans kapasite/görev güncellemesi seans sürümünü ister. Inactive açık görev kaldırmasıdır; sınıf varsayılanı açık oluşum override'ını geri getirmez. Önizleme dependency değişimi PREVIEW_STALE, komut sürüm yarışı VERSION_CONFLICT, kaynak/uygunluk çakışması RESOURCE_CONFLICT, eksik yapılandırma POLICY_NOT_CONFIGURED üretir. Yetki geri alınması receipt replay öncesinde denetlenir. İptal/yerine seans/bekleme/yoklama/paket seçimi bu aktarımın kapsamı değildir.
-
-
-## DS-2026-10-17 durum ve izin aktarımı
-
-Starter F14 kapanış ve hak tüketimi anlaşma gerektirmez, hakediş üretmez. F20 yalnız Pro/Business ücretli hakediş yoludur. Kesin rezervasyon koruması açık etki onayı ve mevcut yükümlülükle sürer; sonraki politika/limit/hak değişimi tek başına blocked/iptal üretmez, bağımsız engelleri kaldırmaz.
+Sınıf atama güncellemesi hedef atama satır sürümünü, seans kapasite/görev güncellemesi seans sürümünü ister. Inactive açık görev kaldırmasıdır; sınıf varsayılanı açık oluşum override'ını geri getirmez. Önizleme dependency değişimi PREVIEW_STALE, komut sürüm yarışı VERSION_CONFLICT, kaynak/uygunluk çakışması RESOURCE_CONFLICT, eksik yapılandırma POLICY_NOT_CONFIGURED üretir. Yetki geri alınması receipt replay öncesinde denetlenir. İlgili komutların çağrı sırası ortak iş akışları rehberindedir.
 
 
+## Hesaplaşma durum ve izin projeksiyonu
 
-## Son hesaplaşma revizyonu — DS-2026-10-17
-
-[Yetki ve iki taraflı kesinleştirme kararı](../decisions/DS-2026-10-17-settlement-revision.md) geçerlidir. Owner → OM devretme izni → belirli merkez CM hesaplaşma grantı zinciri uygulanmıştır; Owner CM'ye doğrudan da grant verebilir. OM/CM rolü ve Owner'ın grant yönetimi tek başına merkez finansal operasyon yetkisi değildir. CM yetki devredemez.
-
-A'nın açık yetkili CM'si gerçekleşen ödeme veya önerilen mahsup başvurusu açar; bakiye değişmez. B merkezinde ayrı doğrulanmış güncel CM rolü ve açık hesaplaşma yetkisi olan kişi (başlatanla aynı hesap olabilir) onayı kayıt, seçili bakiye, request, audit/outbox/receipt'i atomik kesinleştirir. Gerekçeli ret bakiye değiştirmez, A'ya uygulama içi gider. Ayrı OM ödeme/mahsup kayıt aşaması yoktur; onay banka transferi değildir. Kısmi, aynı para birimli karşılıklı mahsup ve geçmişi koruyan bağlı düzeltme aynı başvuru/onay zincirindedir. İlgili sürüm değişimi yeni onay ister, alakasız dersler stale yapmaz. Farklı kişi/hesap veya kendi başvurusunu onaylama yasağı yoktur. A’da başvuru ve dondurulmuş B merkezinde onay yetkisi ayrı aranır; istemci center seçimi yetki değildir. Audit her adımın hesap/merkez/CM rol/grant kapsamını kaydeder. Aynı hesap kullanımı çift kapama/sürüm/yarış korumasını aşmaz; receipt replay ve commit dahil canlı yetki aranır.
-
-DS-OPEN-01 karar düzeyinde kapalıdır; hesaplaşma runtime aktarımı uygulanmıştır. [Son merkez yetki düzeltmesi](../decisions/DS-2026-10-17-settlement-center-scope.md) farklı hesap şartını kaldırır; DS-OPEN-02 karar düzeyinde kapalıdır, ayrı istisna/fallback yolu yoktur. Yeni idari grant/read/version/audit scope DTO’ları ve 38 gerçek kabul senaryosu 08’de izlenir: vaka bazlı kanıt durumu makine sözleşmesindedir; [hesaplaşma devri](../settlement-handover.md) ve son head temiz CI gerçek kabulü ayrıca belirler. Main koruması ayrı yönetici işidir. Merge için son açık kullanıcı yetkisi geçerlidir; production dağıtım yetkisi yoktur.
+Tek normatif [hesaplaşma kararı](02-FtkSaaS-teknik-sozlesme.md#hesaplasma) esas alınır.
 
 SettlementRequestState: pending → approved/rejected/withdrawn. approved = B tarafından record + seçili bakiye etkileri aynı transaction içinde kesinleşmiş; ayrı kayıt bekleyen approved aşaması yok. Onaylı kaydın revizyonu yeni bağlı pending başvuru ve yeniden onaydır; eski kayıt silinmez. Gerekçeli ret bakiye/kayıt üretmez. payment/offset/correction kapalı DTO birleşimidir. OM fallback alanı ve settlement.record izni kaldırıldı.
 
 settlement.delegation.manage Owner'a özgü; settlement.authority.manage Owner veya canlı delege OM'ye özgüdür. settlement.authority.inspect yalnız dar idari grant projeksiyonudur. settlement.read/request/decide aktif CM + açık canlı merkez grantı ister. Yetki setleri org settlement-authority aggregate sürümünü kullanır. B onayında record/balance/request/audit/outbox/receipt ve yetki setinde grant/version/audit/outbox/receipt atomiktir. DTO/guard varlığı çalışan uygulama kanıtı değildir.
 
-## Starter yoklama/koruma runtime aktarımı
+## Yoklama ve hakediş yetkileri
 
-[Starter devri](../starter-attendance-protection-handover.md) kabul edilmiş kararları değiştirmeden dar runtime kapsamını belirtir. Starter F14 kapanışı ve bağlı düzeltme hak hareketi + audit/outbox/receipt ile atomiktir; hakediş üretmez. Ücretli finansal kapanış ve bağlı hakediş düzeltmesi PR #15 ile uygulanmıştır. Koruma yalnız yeni olumsuz etkiye bağlıdır; bağımsız engelleri veya yeni rezervasyon koşullarını kaldırmaz. Taslak başlangıç kanıtı değildir; açık başlangıç, P02 hak değişikliği ve P05 belge tüketicileri sonradan uygulanmıştır; güncel operasyonel/sağlayıcı açıklar remaining-work.md içindedir. 198 işlem/89 canlı/109 contract-only bu Starter tesliminin tarihsel sayısıdır; bu ilk aktarımın sonraki snapshotı199/118/81/34 idi; yayımlanmış main200/200/0/59, PR45 adayı 201/60 ayrıdır. İşlem sayısı özellik tamamlama oranı değildir.
-
-Anlaşma/hakediş teslimi: earnings.manage yalnız seçili CM; earnings.read org okuyucusu / seçili CM / kendi canlı merkez rolündeki eğitmen projeksiyonu. attendance_start_v1 attendance.close yetkisiyle explicit olgu kaydıdır; taslak/tüketim/kapanış değildir. management.inspect runtime yalnız negcredit_valuation_set_v1 selector'ını ve özgün CM/F15 kapısını uygular; genel tablo okuması sağlamaz. Ayrıntı: docs/instructor-earnings-handover.md.
+earnings.manage seçili CM; earnings.read org okuyucusu/seçili CM/kendi canlı merkez rolündeki eğitmen projeksiyonudur. attendance_start_v1, attendance.close yetkisiyle açık olgu kaydıdır; taslak/tüketim/kapanış değildir. Management okuması yalnız makine sözleşmesindeki desteklenen selector ve domain yetki kapısıyla çalışır; genel tablo erişimi sağlamaz.
 
 ## 23 Ekim settings ve kullanıcı güvenliği aktarımı
 
@@ -319,7 +252,6 @@ Ayarlar davranış sözleşmesi [02 içindedir](02-FtkSaaS-teknik-sozlesme.md#ay
 
 - Hesap sahibi kendi profil/tercih/oturumunu; merkez ve org yöneticileri yalnız mevcut canlı scoped izinlerini kullanır. Platform yetkisi kullanıcı adına rıza oluşturamaz. Org güvenlik şartı diğer orga kendiliğinden taşınmaz.
 - Doğrulama bekleyen iletişim, doğrulanmış güncel değer değildir. Yeni aynı-alan talebi eski bekleyeni geçersizleştirir. Başka hesaba bağlı giriş/kurtarma iletişimi otomatik birleştirme doğurmaz. Active güvenli bağlantı kaldırılınca gelecekteki yayılım durur; üyelik/hesap silme anlamına gelmez.
-- Şifre değişiminde mevcut oturum dışındakiler; sıfırlamada kurtarma oturumu dahil hepsi kapatılmalıdır. Bu hedefin mevcut native Auth/Edge uygulaması alan bazında ayrıca doğrulanacaktır. Mevcut live session kapısı korunur.
+- Parola değişimi/kurtarmanın tek kuralı teknik sözleşmenin S04 grubudur: mevcut native oturum korunur, diğerleri kapatılır; ikinci completion/all-session trigger eklenmez. Canlı session kapısı korunur.
 - Ayarları kapalı/desteklenmiyor/yetkisiz/doğrulama bekliyor/sürüm çatışması/yayılma sürüyor durumları UI'da tek başarı durumuna indirgenmez. Mevcut error enum'u dışında yeni string uydurulmaz; gerekli yeni kod ayrı API sözleşmesidir.
 - S01–S10 görünüm tercihleri rol/merkez/plan/alan iznini değiştirmez. Erişimsiz kayıtlı bağlam güvenli yeniden seçime gider; API gizli alanları göndermemelidir.
-

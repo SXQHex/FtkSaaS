@@ -1,0 +1,93 @@
+# Veritabanı kaynak referansı
+
+Üretilmiştir: `node apps/backend/scripts/update-docs.mjs --write`. Elle düzenleme. Kaynak içerik özeti: `f7a84deef6c684c77823812bd630ffdd85d219766834febb79083b44dc15f311`. Bu özet CI/hosted kabulü değildir; dağıtılan SHA ve ortam CD artifact'ında bulunur.
+
+Alan/scope/değişmez görünümü [fiziksel şema kataloğundadır](contracts/04-FtkSaaS-O4-veri-semasi.md). Bu dosya ikinci DDL sözleşmesi değildir. Etkin PostgreSQL şeması migration zincirinin uygulanmasıyla oluşur; dosyaları regex ile birleştirmek nihai şema çıkarımı sayılmaz.
+
+Sıralı migration: 83. Uygulanmış içerik manifesti: [migrations.sha256.json](../apps/backend/database/migrations.sha256.json). CD, migration içeriklerini canlı geçmişle doğrular; dokümantasyon capture adımı ayrıca read-only pg_catalog snapshot ve Supabase CLI DB tiplerini alır. İş verisi/Auth satırı/secret toplanmaz.
+
+| Migration | SHA256 |
+|---|---|
+| [20261015152146_discipline_uuidv7_baseline.sql](../apps/backend/supabase/migrations/20261015152146_discipline_uuidv7_baseline.sql) | `4b6353fa9c5052f8fe597edce6f0b81ff2d8320c60822dae24e2044241504874` |
+| [20261015153414_discipline_reference_integrity.sql](../apps/backend/supabase/migrations/20261015153414_discipline_reference_integrity.sql) | `d5d08b67b29c07838941d5abd88fd7567aaf5ec204b7ac73688eae61a42e9da5` |
+| [20261015160836_event_discipline_scope.sql](../apps/backend/supabase/migrations/20261015160836_event_discipline_scope.sql) | `ab684d302c508eba33ec665bf2c3e91bf7034073b2b21884add7412f3de4794c` |
+| [20261015172815_runtime_foundation.sql](../apps/backend/supabase/migrations/20261015172815_runtime_foundation.sql) | `215115eb7e66f8ea23cfd33dffd15b0155f4511dd3fea62107000fbf201fec06` |
+| [20261015174211_runtime_read_projection.sql](../apps/backend/supabase/migrations/20261015174211_runtime_read_projection.sql) | `3e2f98633b4f9e879ccee43df2fb622a028e8fa0827ba0a60a34fe20939c1357` |
+| [20261015175240_runtime_index_cleanup.sql](../apps/backend/supabase/migrations/20261015175240_runtime_index_cleanup.sql) | `283617daf0158bb4bac3f8edccac2a258a4c8091508863717820ea96c2d2890c` |
+| [20261015214422_event_payment_finance.sql](../apps/backend/supabase/migrations/20261015214422_event_payment_finance.sql) | `10fde0c66abf726ce3cde077b320af42f07097855662730530f6bbe084ac560e` |
+| [20261015223614_event_operator_cancellation.sql](../apps/backend/supabase/migrations/20261015223614_event_operator_cancellation.sql) | `47c22931eecaa4480a1be90f0b8db7069da5e87e821446cb8b009badb91dd8ca` |
+| [20261016122700_planned_start_cancellation.sql](../apps/backend/supabase/migrations/20261016122700_planned_start_cancellation.sql) | `25065e2714247553d72b8396b0ab99bd078c3e15380262e2283d1ea327e86460` |
+| [20261016123651_planned_start_decision_clock.sql](../apps/backend/supabase/migrations/20261016123651_planned_start_decision_clock.sql) | `79a88d9324f14d5ed8949be693d332d33a6add45743f2207221cdb2ec285918c` |
+| [20261016130301_event_actual_start.sql](../apps/backend/supabase/migrations/20261016130301_event_actual_start.sql) | `568f4ab764c76a5e229343ca4e8e23773b903c5d8f283b5e6096f77eebb60258` |
+| [20261016174036_registry_operations.sql](../apps/backend/supabase/migrations/20261016174036_registry_operations.sql) | `90ae67c9c5cffe0cad0bba1624de06f171188eefc83d7aad4e0ca561064d8de0` |
+| [20261016174535_person_registry.sql](../apps/backend/supabase/migrations/20261016174535_person_registry.sql) | `4233a94bf0a60dcb54d19f6a10be31312a356a9a8801174c6ba97fe59288e301` |
+| [20261016175034_person_scope_guard.sql](../apps/backend/supabase/migrations/20261016175034_person_scope_guard.sql) | `5753f3e4445583771d01fa357ad7ffc12a20bef7c2e451bf9d3de3cc0c930cfe` |
+| [20261016175157_registry_read_versions.sql](../apps/backend/supabase/migrations/20261016175157_registry_read_versions.sql) | `4bd3fceb203338e36aa3bb1bebd7128c4e8f4035f56421e13e68d3aa5e2302d0` |
+| [20261016180037_discipline_read_scope.sql](../apps/backend/supabase/migrations/20261016180037_discipline_read_scope.sql) | `c870fbd905434f3671011592d3edb54b1a6881a583cacbf56ef125ed5f255a19` |
+| [20261016180602_active_discipline_projection.sql](../apps/backend/supabase/migrations/20261016180602_active_discipline_projection.sql) | `44a6c55fd5a1989ef11abb668777de356ed47d09f54286a972c8488fcfc7db06` |
+| [20261016180857_deactivate_expired_offers.sql](../apps/backend/supabase/migrations/20261016180857_deactivate_expired_offers.sql) | `84e258cee5ff9b8684e93682aeb42b52d00686d76f2dd236e3f61169433b458a` |
+| [20261017010246_room_and_role_registry.sql](../apps/backend/supabase/migrations/20261017010246_room_and_role_registry.sql) | `e05f0fda1c155cbfe6ea703584216749e82ed18ef1a791437d5f8c28fca92632` |
+| [20261017012144_role_list_snapshot.sql](../apps/backend/supabase/migrations/20261017012144_role_list_snapshot.sql) | `dd949199739028a1f2c5118008618b9bb8296b166cbacc64c6d5f37610879773` |
+| [20261017012316_role_read_center_access.sql](../apps/backend/supabase/migrations/20261017012316_role_read_center_access.sql) | `eeb3820792c3594150bdb03205017e94d5762d452cbf7da09554dba3d87abab7` |
+| [20261017015505_api_schema_exposure.sql](../apps/backend/supabase/migrations/20261017015505_api_schema_exposure.sql) | `a49fab81e910ac56c8c0140fe50f9bd8a7026831754c82be4358d066257af6ad` |
+| [20261017034207_availability_policies.sql](../apps/backend/supabase/migrations/20261017034207_availability_policies.sql) | `e1d0c1101b28fedac03ae644547d4ad2ca505f4b1bc649357604adc51f5dc9fa` |
+| [20261017043309_schedule_reads.sql](../apps/backend/supabase/migrations/20261017043309_schedule_reads.sql) | `4c52918de8d3078ed41d477001f5ed36bce0a7c1297fca355f989e73ccae50b4` |
+| [20261017051726_program_session_lifecycle.sql](../apps/backend/supabase/migrations/20261017051726_program_session_lifecycle.sql) | `b4afab9fb48d390dbdb49f8df22ddd7e209d646ac6562e2a0cb356736a708d59` |
+| [20261017122121_starter_attendance_protection.sql](../apps/backend/supabase/migrations/20261017122121_starter_attendance_protection.sql) | `a632266fdc5897fe9a1e247a7be6af38d9192a07214bfd9d4dac9679fd014365` |
+| [20261017131221_starter_attendance_privacy_legacy.sql](../apps/backend/supabase/migrations/20261017131221_starter_attendance_privacy_legacy.sql) | `406eb2ece9665e1a9e1212c6c2b5a21ae95f7359f21024059fcd7dcbf2ed3728` |
+| [20261017150034_instructor_earnings_workflow.sql](../apps/backend/supabase/migrations/20261017150034_instructor_earnings_workflow.sql) | `f7efe3cc9830170f81849fe6ad40b0079942bf4476ab61609704e2ee4f54eacc` |
+| [20261018231129_cross_center_settlement.sql](../apps/backend/supabase/migrations/20261018231129_cross_center_settlement.sql) | `7f5d990e00946a8ecab59dcb9b4c75fc260a5801df537634fd8dd6974a062500` |
+| [20261019131628_p01_catalog_entitlement_reads.sql](../apps/backend/supabase/migrations/20261019131628_p01_catalog_entitlement_reads.sql) | `d91d15dc7c2becd92316da8ee335b63f836f799edeaabed780b31fa86d39b832` |
+| [20261019195340_p01_lesson_requests.sql](../apps/backend/supabase/migrations/20261019195340_p01_lesson_requests.sql) | `f61d7c9b651526bdecb7da9bfde5c479968fe360e8c05c3946a634b1f760fc9c` |
+| [20261019203806_p01_waitlist_workers.sql](../apps/backend/supabase/migrations/20261019203806_p01_waitlist_workers.sql) | `d8c991b475f096b6972473f99765294991b97fd02f84bf114fd798fe22ee1241` |
+| [20261019205628_p01_worker_transport.sql](../apps/backend/supabase/migrations/20261019205628_p01_worker_transport.sql) | `d2fc11ad909e0bb6239e99008484892bdbcf98de212de7144e4d9947b4e3e79c` |
+| [20261019210808_p01_final_scope_guards.sql](../apps/backend/supabase/migrations/20261019210808_p01_final_scope_guards.sql) | `b3ec8649582483794654362dd08379a07e4482ab7eb0da956a521bc49be55d84` |
+| [20261020144629_p02_sessions.sql](../apps/backend/supabase/migrations/20261020144629_p02_sessions.sql) | `d5cf3484561a31be8cda7b2522c6c74dc28ee839e231fa5e0a3e927d433be3e8` |
+| [20261020145546_p02_entitlement_corrections.sql](../apps/backend/supabase/migrations/20261020145546_p02_entitlement_corrections.sql) | `e3e1af7caf8587912b06ef91e2ae758b75daabe8f8ab3edf661fd6bbf723d60d` |
+| [20261020145857_p02_freeze_lifecycle.sql](../apps/backend/supabase/migrations/20261020145857_p02_freeze_lifecycle.sql) | `19429993c11b73526a1b9ab2f19c9902e3edbbf0f0c91ea45a752cdefa231516` |
+| [20261020150309_p02_sale_lifecycle.sql](../apps/backend/supabase/migrations/20261020150309_p02_sale_lifecycle.sql) | `d14f3192beb2d8c4ec5277b204b34c30e5b250620665973cd40081ecfbbc412c` |
+| [20261020150858_p02_runtime_guards.sql](../apps/backend/supabase/migrations/20261020150858_p02_runtime_guards.sql) | `fdf9a34dc42ff8fca676c8e6a99284792f06acbb8d8b7beb9c2250edc6209b03` |
+| [20261020151631_p02_renewal_currency.sql](../apps/backend/supabase/migrations/20261020151631_p02_renewal_currency.sql) | `ca3661dacfc4884bbeb51ef186ce11af6ae693d4f1d807a9c61e6f6611b6f3cb` |
+| [20261020200347_p03_finance_payments.sql](../apps/backend/supabase/migrations/20261020200347_p03_finance_payments.sql) | `12b611d5094131309683a7e034970fa8fb9d769c50a7729233b2cb58f7cb11b9` |
+| [20261020201542_p03_finance_guardrails.sql](../apps/backend/supabase/migrations/20261020201542_p03_finance_guardrails.sql) | `0c0e742522dbf301cc7851cde4e4e120dce2d113125eb82106b02e4dbd616f12` |
+| [20261020201906_p03_finance_acceptance.sql](../apps/backend/supabase/migrations/20261020201906_p03_finance_acceptance.sql) | `5f55540731aa5400a50eb920b26e45f10e8852cd4b514e0368461b29e23001f5` |
+| [20261020201907_p03_finance_scope.sql](../apps/backend/supabase/migrations/20261020201907_p03_finance_scope.sql) | `bd732f3896f380f38d2d5fabfdfbc4f15042e06b3e6a5827cb16cf8421bfec1e` |
+| [20261020202740_p03_finance_balances.sql](../apps/backend/supabase/migrations/20261020202740_p03_finance_balances.sql) | `cf451bbedd3cedf86d52820b5a92f7650bc22173047c275461042b6f799e843a` |
+| [20261020202742_p03_finance_results.sql](../apps/backend/supabase/migrations/20261020202742_p03_finance_results.sql) | `1fc7c81fb401bb917ee7c0519816191ff2b1aee92a1fec52a4a29bbdb5b670a8` |
+| [20261020203453_p03_finance_integrity.sql](../apps/backend/supabase/migrations/20261020203453_p03_finance_integrity.sql) | `d061274ced5c42700f8bebdafbb2984a04861f881eb20a92d7e33a746daf4486` |
+| [20261020203823_p03_finance_provenance.sql](../apps/backend/supabase/migrations/20261020203823_p03_finance_provenance.sql) | `b29ed3654e68430ae086543bf2ecb83e207f6b168da17a97e2e518a9bcf9ecb9` |
+| [20261020204523_p03_refund_identity.sql](../apps/backend/supabase/migrations/20261020204523_p03_refund_identity.sql) | `aafb50f2c6ccac0f428984486f79ff5caf253b1c16b0a5c34b6b47bdf6691999` |
+| [20261021114726_p04_crm_public.sql](../apps/backend/supabase/migrations/20261021114726_p04_crm_public.sql) | `700f133b3076e014683d091aeed9999fb162d0d7cea7ab8332b6623a6191c7a9` |
+| [20261021123204_p04_free_trial_attendance.sql](../apps/backend/supabase/migrations/20261021123204_p04_free_trial_attendance.sql) | `5cb3af13c366d51d2b1277d41d1a1d8885732f6d55aa76cd48d5241af7cd70a1` |
+| [20261021150454_p04_followup_policy_guard.sql](../apps/backend/supabase/migrations/20261021150454_p04_followup_policy_guard.sql) | `160add7ca3e812b6d6ba8be384b758c2da445b55a5930c6f298c65301c8bef12` |
+| [20261021181208_p05_documents_notifications.sql](../apps/backend/supabase/migrations/20261021181208_p05_documents_notifications.sql) | `0d5eac0873a80f720d60c7cb31816f5c29c5f66aec9318ee7c50ef5208eaf27f` |
+| [20261022090305_p06_reports_imports_tracking.sql](../apps/backend/supabase/migrations/20261022090305_p06_reports_imports_tracking.sql) | `82721dfc8182be15c7ffc81f3a77f8ec3bdadb54da4c05d17478a90211153aed` |
+| [20261022134154_ops_w01_hosted_scheduler.sql](../apps/backend/supabase/migrations/20261022134154_ops_w01_hosted_scheduler.sql) | `f43952f01f12589a38e10527859227c0c340f5455bcbcbcc9237063115fd635c` |
+| [20261022151954_p07_account_revocation.sql](../apps/backend/supabase/migrations/20261022151954_p07_account_revocation.sql) | `12425479ed76ddf40079ea993120d53993e415455f75974a705d40659b2138f6` |
+| [20261022153421_p07_account_profile_auth_merge.sql](../apps/backend/supabase/migrations/20261022153421_p07_account_profile_auth_merge.sql) | `451922d8a0879f49875ea058588867579d7d721745b78480e77feee257efb958` |
+| [20261022201639_p07_subscription_lifecycle.sql](../apps/backend/supabase/migrations/20261022201639_p07_subscription_lifecycle.sql) | `fb9be9da0a52fa98a0cf0d917400066e9ad41d6ed958f78c9aeb87db7bff6987` |
+| [20261022204718_p07_payment_response_contract.sql](../apps/backend/supabase/migrations/20261022204718_p07_payment_response_contract.sql) | `8157a6f4f290283c2ee3b7f5d1fdccefcc3608916d937e78ad58b4d82c03d20e` |
+| [20261025091433_frontend_settings.sql](../apps/backend/supabase/migrations/20261025091433_frontend_settings.sql) | `f2798d12a5c14ddfc1930b311ff6e695ab44fef1bc1d1bd530dd4b8f51d75be8` |
+| [20261025143856_session_capacity.sql](../apps/backend/supabase/migrations/20261025143856_session_capacity.sql) | `11554b9292cb11e96322ed9f4d5eb66a06a41820d65a3e0187eb10175b835bc6` |
+| [20261025173350_pilot_operational_security.sql](../apps/backend/supabase/migrations/20261025173350_pilot_operational_security.sql) | `38120b53cd3c130c0bdf025466863341520b6feb9fa1355814aa9d933c3cdeb5` |
+| [20261025213014_user_settings_context.sql](../apps/backend/supabase/migrations/20261025213014_user_settings_context.sql) | `bfacaaadcc0c3395d3b256d4dbd905755ccf22a4200bce779d43705e3c11e341` |
+| [20261025222434_account_session_management.sql](../apps/backend/supabase/migrations/20261025222434_account_session_management.sql) | `c74b2127cb79a054b3f3222d2c93a0ccc652e3646de276e7a71f48bac9aef367` |
+| [20261026003615_account_identity_projection.sql](../apps/backend/supabase/migrations/20261026003615_account_identity_projection.sql) | `a04d73dca3c04b224c287447fd1f6639604a5a4c9caa76571b7348f271c9fe21` |
+| [20261026195138_starter_plan_gates.sql](../apps/backend/supabase/migrations/20261026195138_starter_plan_gates.sql) | `da64572fe7650184694399f383eb454dd0b0bf1d5e481fc8d731c2ded62b4d85` |
+| [20261027013809_starter_studio_product_names.sql](../apps/backend/supabase/migrations/20261027013809_starter_studio_product_names.sql) | `8692bf7f654faf9574f695af4ffe5c1384e48c29a538d2deaddaeca98528bc2d` |
+| [20261027103358_starter_onboarding_defaults.sql](../apps/backend/supabase/migrations/20261027103358_starter_onboarding_defaults.sql) | `9c5f3b1e09029ba88ca5b99c4532c74408b4fdff4d1b00ee5211e6c9237fbfe9` |
+| [20261027212401_starter_preparation_settings.sql](../apps/backend/supabase/migrations/20261027212401_starter_preparation_settings.sql) | `23c96715b03702431e22d12d9aa0846b649161fa8ae74f0a8feffba9b87d1fd8` |
+| [20261027213629_starter_peer_sharing.sql](../apps/backend/supabase/migrations/20261027213629_starter_peer_sharing.sql) | `cb8aa9ab50ec5ca748aa5c2a7466052052ca9671e7726dd78702104ab4f3cd90` |
+| [20261027214545_canonical_settings_scope.sql](../apps/backend/supabase/migrations/20261027214545_canonical_settings_scope.sql) | `b61f1241d9c5fad01c7d0884137f905cba9f74e9fd2b05a7af6ace80426a405e` |
+| [20261027220147_starter_settings_media.sql](../apps/backend/supabase/migrations/20261027220147_starter_settings_media.sql) | `e63553c4914bce0c050ebe03d66364ac377bb4fa8c7e993e2707c4a7c7689f05` |
+| [20261027222428_starter_work_templates.sql](../apps/backend/supabase/migrations/20261027222428_starter_work_templates.sql) | `5d7a0c1f39046cef218fe00ffd4ea7175939cd1c5a39fc5853c8b2b3f826ed05` |
+| [20261027234514_starter_public_settings.sql](../apps/backend/supabase/migrations/20261027234514_starter_public_settings.sql) | `0e622f2afa67cfadef9fd921c1770053d724695769e07555b1dfe31eb8f269ac` |
+| [20261027235043_starter_collection_methods.sql](../apps/backend/supabase/migrations/20261027235043_starter_collection_methods.sql) | `885509449945adb772066b3cb94bbc364a8955b716f04d7cbab5b0b6c429725f` |
+| [20261028000013_personal_calendar_links.sql](../apps/backend/supabase/migrations/20261028000013_personal_calendar_links.sql) | `b205507b375e898a315d678a950233da42a43648010e6b1b31f6cf1b7d27b118` |
+| [20261028004254_starter_domain_preparations.sql](../apps/backend/supabase/migrations/20261028004254_starter_domain_preparations.sql) | `fa54056d2959dcc0a2bb09d478072990307e76c1c8c7e7af1a9c670145a522da` |
+| [20261028010736_starter_notification_support.sql](../apps/backend/supabase/migrations/20261028010736_starter_notification_support.sql) | `a66eef347d4ac8f0a887253ed2436dccf1f569430084f25b900053bed9de1b8e` |
+| [20261028012813_starter_calendar_preferences.sql](../apps/backend/supabase/migrations/20261028012813_starter_calendar_preferences.sql) | `2be88b4438f1a2124de112e672cf1473baf2e5c57af5e9c8ea37f8d0763cfbca` |
+| [20261028013253_starter_availability_day_boundaries.sql](../apps/backend/supabase/migrations/20261028013253_starter_availability_day_boundaries.sql) | `6c427947e31a7171fe63e84964524e1a0645bb76d9288534c9cfe0081b85be76` |
+| [20261028175405_starter_availability_management.sql](../apps/backend/supabase/migrations/20261028175405_starter_availability_management.sql) | `55c5f4129982e88f7dcf49173fb7d8f97af48bd57de54d9b20a42ce2e3a93d4d` |
+| [20261028180210_starter_availability_management_asof.sql](../apps/backend/supabase/migrations/20261028180210_starter_availability_management_asof.sql) | `94faca5fcb311f1cf2c910cc3a0eab20ba827dafeeffa6d5d6080aade0f0950d` |
+| [20261028203952_organization_brand_colors.sql](../apps/backend/supabase/migrations/20261028203952_organization_brand_colors.sql) | `b0631f4fe4abd1144fcfc742284f153d74cf47a923c9a92928e3a2894a670b64` |

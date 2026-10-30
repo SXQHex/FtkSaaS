@@ -4109,7 +4109,7 @@
     {
       "name": "seat_offer_issue_v1",
       "status": "operational_development_limited",
-      "external_path": "/functions/v1/backend-v1/seat_offer_issue_v1",
+      "external_path": null,
       "permission": "system.worker",
       "features": [
         "F12"
@@ -4137,7 +4137,7 @@
     {
       "name": "seat_offer_expire_v1",
       "status": "operational_development_limited",
-      "external_path": "/functions/v1/backend-v1/seat_offer_expire_v1",
+      "external_path": null,
       "permission": "system.worker",
       "features": [
         "F12"
@@ -4164,7 +4164,7 @@
     {
       "name": "request_expire_v1",
       "status": "operational_development_limited",
-      "external_path": "/functions/v1/backend-v1/request_expire_v1",
+      "external_path": null,
       "permission": "system.worker",
       "features": [
         "F09"
@@ -4191,7 +4191,7 @@
     {
       "name": "outbox_deliver_v1",
       "status": "operational_development_limited",
-      "external_path": "/functions/v1/backend-v1/outbox_deliver_v1",
+      "external_path": null,
       "permission": "system.worker",
       "features": [
         "F26",
@@ -4220,7 +4220,7 @@
     {
       "name": "reminder_schedule_v1",
       "status": "operational_development_limited",
-      "external_path": "/functions/v1/backend-v1/reminder_schedule_v1",
+      "external_path": null,
       "permission": "system.worker",
       "features": [
         "F27"
@@ -4248,7 +4248,7 @@
     {
       "name": "automation_run_v1",
       "status": "operational_development_limited",
-      "external_path": "/functions/v1/backend-v1/automation_run_v1",
+      "external_path": null,
       "permission": "system.worker",
       "features": [
         "F24"
@@ -4276,7 +4276,7 @@
     {
       "name": "import_rows_process_v1",
       "status": "operational_development_limited",
-      "external_path": "/functions/v1/backend-v1/import_rows_process_v1",
+      "external_path": null,
       "permission": "system.worker",
       "features": [
         "F31",
@@ -4308,7 +4308,7 @@
     {
       "name": "report_build_v1",
       "status": "operational_development_limited",
-      "external_path": "/functions/v1/backend-v1/report_build_v1",
+      "external_path": null,
       "permission": "system.worker",
       "features": [
         "F28",
@@ -4341,7 +4341,7 @@
     {
       "name": "privacy_execute_v1",
       "status": "operational_development_limited",
-      "external_path": "/functions/v1/backend-v1/privacy_execute_v1",
+      "external_path": null,
       "permission": "system.worker",
       "features": [
         "F33"
@@ -4364,7 +4364,7 @@
     {
       "name": "subscription_boundary_apply_v1",
       "status": "operational_development_limited",
-      "external_path": "/functions/v1/backend-v1/subscription_boundary_apply_v1",
+      "external_path": null,
       "permission": "system.worker",
       "features": [
         "F32"

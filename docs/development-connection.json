@@ -27,6 +27,6 @@
     "environment_role": "development_test_confirmed_by_user",
     "edge_function": "backend-v1"
   },
-  "current_acceptance_source": "docs/contracts/00-FtkSaaS-yeni-sohbet-devir.md",
+  "current_acceptance_source": "apps/backend/docs/00-FtkSaaS-yeni-sohbet-devir.md",
   "historical_verification_report": "docs/history/reports/remote-backend-verification.json"
 }

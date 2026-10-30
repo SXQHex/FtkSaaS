@@ -234,15 +234,26 @@ test('typed settlement projection permits equal accounts with separate server-de
  assert(!valid('Request_settlement_request_decide',{...q,decision_authority:r.decision_authority}));
 });
 
-test('living settlement product/technical/permission clauses cannot reopen the closed decision or retain a stale case count',()=>{
- const paths=['../../docs/contracts/01-FtkSaaS-urun-kapsam-sozlesmesi.md','../../docs/contracts/02-FtkSaaS-teknik-sozlesme.md','../../docs/contracts/06-FtkSaaS-O4-durum-hata-izin.md'];
+test('authoritative settlement clause cannot reopen the closed decision or retain a stale case count',()=>{
+ const paths=['../../docs/contracts/02-FtkSaaS-teknik-sozlesme.md'];
  const sources=Object.fromEntries(paths.map(path=>[path,fs.readFileSync(path,'utf8')]));
- assert.equal(validateSettlementLivingDocs(original,sources),3);
+ assert.equal(validateSettlementLivingDocs(original,sources),1);
  for(const path of paths){
   const changed={...sources,[path]:sources[path].replace('DS-OPEN-02 karar düzeyinde kapalıdır','DS-OPEN-02 istisna çelişkisi açık')};
   assert.throws(()=>validateSettlementLivingDocs(original,changed),/LIVING_CENTER_SCOPE_CLOSURE/);
   const stale={...sources,[path]:sources[path].replace('38 gerçek kabul senaryosu','34 gerçek kabul senaryosu')};
   assert.throws(()=>validateSettlementLivingDocs(original,stale),/LIVING_ACCEPTANCE_COUNT/);
+ }
+});
+
+test('runtime and feature summaries cannot retain superseded contract-only inventories',()=>{
+ for(const mutate of [
+  p=>p['x-contract'].runtime.implemented_operations.pop(),
+  p=>p['x-contract'].feature_delivery.F32.implemented_operations.pop(),
+  p=>p['x-contract'].feature_delivery.F32.contract_only_operations.push('organization_close_apply_v1')
+ ]){
+  const p=structuredClone(original);mutate(p);
+  assert.throws(()=>validateGovernance(p,live),/SUMMARY_DRIFT/);
  }
 });
 

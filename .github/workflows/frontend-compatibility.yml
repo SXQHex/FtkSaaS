@@ -1,34 +1,38 @@
 name: Frontend contract compatibility
 on:
   pull_request:
-    paths:
-      - 'packages/api-contracts/**'
-      - 'packages/typescript-config/**'
-      - 'package.json'
-      - 'pnpm-lock.yaml'
-      - 'pnpm-workspace.yaml'
-      - 'turbo.json'
-      - '.nvmrc'
-      - '.github/workflows/frontend-compatibility.yml'
+    branches: [main]
+    types: [opened, synchronize, reopened, edited]
   push:
     branches: [main]
-    paths:
-      - 'packages/api-contracts/**'
-      - 'packages/typescript-config/**'
-      - 'package.json'
-      - 'pnpm-lock.yaml'
-      - 'pnpm-workspace.yaml'
-      - 'turbo.json'
-      - '.nvmrc'
-      - '.github/workflows/frontend-compatibility.yml'
   workflow_dispatch:
 permissions:
   contents: read
 concurrency:
-  group: frontend-compatibility-${{ github.event.pull_request.number || github.ref }}
+  group: frontend-compatibility-${{ github.event.pull_request.number || github.ref }}-${{ github.event.action == 'edited' && github.event.changes.base == null && 'metadata' || 'source' }}
   cancel-in-progress: true
 jobs:
+  scope:
+    if: github.event.action != 'edited' || github.event.changes.base != null
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    outputs:
+      compatibility: ${{ steps.scope.outputs.compatibility }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1
+        with:
+          node-version-file: '.nvmrc'
+      - name: Select frontend scope
+        id: scope
+        run: node apps/web/scripts/ci-scope.mjs
   compatibility:
+    needs: scope
+    if: needs.scope.outputs.compatibility == 'true'
     runs-on: ubuntu-24.04
     timeout-minutes: 10
     steps:
