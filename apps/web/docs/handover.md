@@ -4,10 +4,8 @@ Aktif bölüm, kapsam ve kabulün tek sahibi [todo.md](todo.md) dosyasıdır. Bu
 
 ## Çalışma bağlamı
 
-Dal `feat/web-s01-account-security`, [PR92](https://github.com/SXQHex/FtkSaaS/pull/92). Kullanıcının son kararı S01 kabulüne dönmektir; S02 ayrı Draft PR93'te korunur ve bu dala taşınmaz. Önce kök/yerel AGENTS, [geliştirme rehberi](development.md), [todo](todo.md), ardından WF00/WF01/WF04/WF12/WF17/WF20 ve settings alanları okunur.
+PR92 main'e birleşti. Devam dalı `fix/web-signup-feedback`, tabanı main `7e15a8de12c63f943b30a035248b74392ff39261`; S02 ayrı Draft PR93'te korunur. Önce kök/yerel AGENTS, [geliştirme rehberi](development.md), [todo](todo.md) ve ilgili WF01/native Auth sözleşmesi okunur.
 
-Main `86b9b890d987518f3afe2d18ccef960a43cd244d` bu S01 dalına normal merge ile alındı. README/todo çakışmaları yeni belge sahipliğine göre çözüldü: kısa README korunur; frontend notları bu dizinde kalır. Backend/ortak/CI kaynakları main ile aynı olmalıdır. Eski 925ed064 head'in başarısı yeni birleşik kaynağa taşınmaz.
+Kullanıcı Chrome eklentisiyle `uye.fethiyetango.com` üzerinde gerçek kabul istedi. Bu adres için dağıtım ve PR92 merge yetkisi verdi. Normal dağıtım yolu main merge sonrası Vercel'dir; tekrar doğrudan dağıtım gereksinimi varsayılmaz. Mevcut test kutusu kullanıcının Chrome'unda açıktır; bağlı Gmail connector hesabı farklıdır. E-posta için yalnız ilgili test mesajları aranır. Sağlayıcı araçları ayar/log incelemesi için tercih edilir.
 
-Kabul incelemesindeki runtime düzeltmeleri aynı dalda tutulur: aktif hesap projeksiyonu kapanmışken silme replay'inin native kullanıcı bağında kurtarılması; status ile kesinleşen mevcut oturum iptalinde native çıkış; cihaz saat diliminin açık formatlanması. Test ve kabul sonuçları yalnız todo sahibinde güncellenir.
-
-Bu çalışma ortamında canlı kabul hesabı/config dosyası yoktur. Token/parola sohbete veya kaynaklara yazılmaz; gerçek sağlayıcı/hesap kabulü mock ile kapatılmaz. Gerçek hesap silme veya production değişikliği yapılmadı. Yeni CI başlayınca run/head/base bilgisini kullanıcıya bırak; AGENTS bekleme kuralı uygulanır.
+Devam konusu kayıt sonrası yanlış e-posta izlenimi ve adres düzeltme: UI gönderilen adresi gösterir, yeni/var olan hesabı ifşa etmez, kesin teslim iddiası yapmaz; yeni parola saklanmaz. Detaylı teşhis/kanıt ve açık kabul yalnız todo sahibindedir. Parola/token/gerçek kullanıcı bilgileri kaynak, fixture veya rapora eklenmez. Yeni parola girme ve gönderme kullanıcı adımıdır. Yeni CI başlayınca run/head/base bilgisi kullanıcıya bırakılır; AGENTS bekleme kuralı uygulanır.
