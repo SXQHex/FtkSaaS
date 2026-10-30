@@ -25,5 +25,5 @@ test('password security applies only owned keys and independently reads back con
 test('security notice is informational with one trusted token-free recovery entry',()=>{
  assert.deepEqual([...passwordNotification.matchAll(/href="([^"]+)"/g)].map(x=>x[1]),['{{ .SiteURL }}/forgot-password']);
  assert.deepEqual([...passwordNotification.matchAll(/{{\s*([^}]+?)\s*}}/g)].map(x=>x[1].trim()),['.SiteURL']);
- assert.equal(policy.security_update_password_require_current_password,true);assert.equal(policy.security_update_password_require_reauthentication,false);assert.equal(policy.mailer_otp_exp,3600);
+ assert.equal(policy.security_update_password_require_current_password,true);assert.equal(policy.security_update_password_require_reauthentication,true);assert.equal(policy.mailer_otp_exp,3600);
 });

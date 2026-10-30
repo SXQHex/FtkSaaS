@@ -254,8 +254,8 @@
         "management_state_get_v1"
       ],
       "review": {
-        "fingerprint": "23b1c13791187cdb11d1d752f609ee62dfc40f26e21f55bfa34df562d56d0eff",
-        "reason": "Native startup regression reproduced with CLI 2.122: removed unsupported notification content_path; shared protocol and other native settings unchanged."
+        "fingerprint": "3774124baf6e6fd3695e6ca73338a0fcd3ccee1d8fa3b80374c30d6471d6d658",
+        "reason": "Native parola config aracı ve assertion gözden geçirildi; reauthentication mevcut parola kontrolüyle birlikte açık tutulur."
       }
     },
     {
@@ -335,8 +335,8 @@
         "account_signup_request_v1"
       ],
       "review": {
-        "fingerprint": "ffb23ee7d24228356c3aa5208c864d79ecfbbc8068e3a3f539617c6e6d4529fb",
-        "reason": "Approved delayed recovery request semantics; native template remains in hosted config and isolated Auth fixture after unsupported TOML key removal."
+        "fingerprint": "fc0a4987eba6e6564e550cc9b6a3a62460d8f32dcaf997d9b7e80b0bdf894221",
+        "reason": "İki native parola kontrolü birlikte açık: mevcut oturum yaşı, nonce gönderimi/doğrulaması, native hata kodları, recovery ve ilk parola sınırları; gerçek SMTP kabul kaynağı gözden geçirildi."
       }
     },
     {

@@ -7,7 +7,7 @@ import {newUuidV7 as id} from '../scripts/uuid.mjs';
 import {startPasswordAuth} from './native-password-auth.mjs';
 import {passwordSecurityConfig as policy} from '../scripts/auth-password-security.mjs';
 
-test('XREQ-002: native current password, security mail and recovery proofs',async t=>{
+test('XREQ-002: native current password, reauthentication, security mail and recovery proofs',async t=>{
  const guard=resources(t),{s,env}=context(),db=await guard.connect(env.DB_URL);
  const {origin,siteURL}=await startPasswordAuth(t,s);
  const password=()=>randomBytes(30).toString('base64url');
@@ -31,7 +31,12 @@ test('XREQ-002: native current password, security mail and recovery proofs',asyn
   }assert.fail('Expected native SMTP message was not delivered to the sink');
  };
  const messageIds=async address=>new Set((await messages(address)).map(m=>m.ID));
- const change=(user,next,old)=>native('/user','PUT',{password:next,...(old===undefined?{}:{current_password:old})},user.jwt);
+ const change=(user,next,old,nonce)=>native('/user','PUT',{password:next,...(old===undefined?{}:{current_password:old}),...(nonce===undefined?{}:{nonce})},user.jwt);
+ const reauthenticate=async user=>{
+  const before=await messageIds(user.email);assert.equal((await native('/reauthenticate','GET',undefined,user.jwt)).status,200);
+  const message=await mail(user.email,before);assert.deepEqual(message.To.map(x=>x.Address),[user.email]);
+  const codes=[...message.Text.matchAll(/\b\d{6}\b/g)].map(x=>x[0]);assert.equal(codes.length,1,'Native reauthentication email must contain one six-digit nonce');return codes[0];
+ };
  const verify=token=>native('/verify','POST',{type:'recovery',token_hash:token});
  const recover=async user=>{
   const before=await messageIds(user.email);assert.equal((await native('/recover','POST',{email:user.email})).status,200);
@@ -45,12 +50,13 @@ test('XREQ-002: native current password, security mail and recovery proofs',asyn
  };
  await t.test('missing and wrong current passwords fail even in a fresh session without changing credentials or sending mail',async()=>{
   const user=await authUser('password-rejected'),before=await messageIds(user.email),next=password();
-  for(const current of [undefined,'',password()]){const rejected=await change(user,next,current);assert([400,422].includes(rejected.status));}
+  for(const current of [undefined,'',password()]){const rejected=await change(user,next,current);assert.equal(rejected.status,400);assert.equal(rejected.data.error_code,current?'current_password_mismatch':'current_password_required');}
   assert.deepEqual(await messageIds(user.email),before);await login(user);
   assert.equal((await native('/token?grant_type=password','POST',{email:user.email,password:next})).status,400);
  });
- await t.test('success sends only to the registered address, uses a token-free trusted link and revokes other sessions',async()=>{
+ await t.test('a session younger than 24 hours changes without nonce, notifies only the registered address and revokes other sessions',async()=>{
   const user=await authUser('password-success'),secondary=await login(user),next=password(),spoof='spoof-'+id()+'@ftksaas.invalid';
+  await db.query("update auth.sessions set created_at=now()-interval '23 hours' where id=$1",[user.session_id]);
   await must(user,'account_get_v1');
   assert.equal((await native('/user','PUT',{data:{email:spoof,redirect_to:'https://untrusted.invalid'}},user.jwt)).status,200);
   const before=await messageIds(user.email);assert.equal((await change(user,next,user.password)).status,200);
@@ -62,6 +68,36 @@ test('XREQ-002: native current password, security mail and recovery proofs',asyn
   assert.equal(new URL(links[0]).search,'');assert.equal(new URL(links[0]).hash,'');
   assert.equal((await native('/token?grant_type=password','POST',{email:user.email,password:user.password})).status,400);
   await login(user,next);await denied(secondary);await must(user,'account_get_v1');
+ });
+ await t.test('an older session needs a native nonce even after token refresh; invalid, expired and replayed nonces fail',async()=>{
+  const user=await authUser('password-reauth'),session=await login(user),secondary=await login(user),next=password();
+  Object.assign(user,session);await must(user,'account_get_v1');
+  await db.query("update auth.sessions set created_at=now()-interval '25 hours' where id=$1",[user.session_id]);
+  const before=await messageIds(user.email),missing=await change(user,next,user.password);
+  assert.equal(missing.status,400);assert.equal(missing.data.error_code,'reauthentication_needed');assert.deepEqual(await messageIds(user.email),before);
+  const refreshed=await native('/token?grant_type=refresh_token','POST',{refresh_token:session.refresh});assert.equal(refreshed.status,200);user.jwt=refreshed.data.access_token;
+  assert.equal(JSON.parse(Buffer.from(user.jwt.split('.')[1],'base64url')).session_id,session.session_id);
+  assert.equal((await change(user,next,user.password)).data.error_code,'reauthentication_needed');
+  const nonce=await reauthenticate(user),wrong=String((Number(nonce[0])+1)%10)+nonce.slice(1);
+  const invalid=await change(user,next,user.password,wrong);assert.equal(invalid.status,422);assert.equal(invalid.data.error_code,'reauthentication_not_valid');
+  await db.query("update auth.users set reauthentication_sent_at=now()-interval '2 hours' where id=$1",[user.id]);
+  const expired=await change(user,next,user.password,nonce);assert.equal(expired.status,422);assert.equal(expired.data.error_code,'reauthentication_not_valid');
+  await login(user);assert.equal((await native('/token?grant_type=password','POST',{email:user.email,password:next})).status,400);
+  assert.equal((await messages(user.email)).filter(m=>m.Subject===policy.mailer_subjects_password_changed_notification).length,0);
+  const freshNonce=await reauthenticate(user),beforeChange=await messageIds(user.email);
+  assert.equal((await change(user,next,user.password,freshNonce)).status,200);await mail(user.email,beforeChange,policy.mailer_subjects_password_changed_notification);
+  const replay=await change(user,password(),next,freshNonce);assert.equal(replay.status,422);assert.equal(replay.data.error_code,'reauthentication_not_valid');
+  await denied(secondary);await must(user,'account_get_v1');await login(user,next);
+ });
+ await t.test('a valid nonce does not replace the current password in an older session',async()=>{
+  for(const current of [undefined,password()]){
+   const user=await authUser('password-reauth-current'),next=password();
+   await db.query("update auth.sessions set created_at=now()-interval '25 hours' where id=$1",[user.session_id]);
+   const nonce=await reauthenticate(user),rejected=await change(user,next,current,nonce);
+   assert.equal(rejected.status,400);assert.equal(rejected.data.error_code,current?'current_password_mismatch':'current_password_required');
+   assert.equal((await messages(user.email)).filter(m=>m.Subject===policy.mailer_subjects_password_changed_notification).length,0);
+   await login(user);assert.equal((await native('/token?grant_type=password','POST',{email:user.email,password:next})).status,400);
+  }
  });
  await t.test('recovery proof is single-use; verified recovery changes password without the forgotten password and revokes prior sessions',async()=>{
   const user=await authUser('password-recovery'),oldSession=await login(user),next=password();await must(user,'account_get_v1');

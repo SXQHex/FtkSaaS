@@ -60,7 +60,7 @@ export async function startPasswordAuth(t,status){
  };
  const version=spawnSync(original.executable,['version'],{env,encoding:'utf8'});
  if(version.status!==0)throw Error('NATIVE_AUTH_VERSION_FAILED');
- t.diagnostic('Native Auth '+version.stdout.trim()+'; sha256='+createHash('sha256').update(fs.readFileSync(original.executable)).digest('hex')+'; current_password=true; recovery_ttl='+policy.mailer_otp_exp);
+ t.diagnostic('Native Auth '+version.stdout.trim()+'; sha256='+createHash('sha256').update(fs.readFileSync(original.executable)).digest('hex')+'; current_password=true; reauthentication=true; recovery_ttl='+policy.mailer_otp_exp);
  child=spawn(original.executable,['serve'],{cwd:directory,env,stdio:['ignore',log,log]});
  let spawnError;child.once('error',error=>{spawnError=error;});
  for(let attempt=0;attempt<100;attempt++){

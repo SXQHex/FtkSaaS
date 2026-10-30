@@ -7,7 +7,7 @@ export const developmentProject='gwyprhenabtpkbojephw';
 export const passwordNotification=fs.readFileSync(new URL('../supabase/templates/password_changed_notification.html',import.meta.url),'utf8');
 export const passwordSecurityConfig=Object.freeze({
  security_update_password_require_current_password:true,
- security_update_password_require_reauthentication:false,
+ security_update_password_require_reauthentication:true,
  mailer_notifications_password_changed_enabled:true,
  mailer_subjects_password_changed_notification:'Parolanız değiştirildi',
  mailer_templates_password_changed_notification_content:passwordNotification,
