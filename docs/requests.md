@@ -7,6 +7,7 @@ Bu dosya alanlar arası talep ve teslim kabulünün tek kaydıdır. Sohbet devri
 | Kimlik | Talep eden | Karşılayan | Talep ve sözleşme/WF/API kaynağı | Kabul ölçütü | Talep durumu | Onay ve teslim kanıtı |
 |---|---|---|---|---|---|---|
 | XREQ-001 | Kullanıcı; frontend kayıt akışı ihtiyacı | Backend | [WF01 native kayıt](workflows.md#wf01) için ana hesap e-postası veya bağlı Google kimliği e-postası zaten mevcutsa frontend'in ayırt edebileceği açık bir “hesap mevcut” sonucu. [Talep ayrıntısı ve dört kabul senaryosu](#xreq-001-kayıtta-mevcut-hesap-bildirimi). | Mevcut ana adres, farklı adresli bağlı Google kimliği, doğrulanmamış kayıt ve tamamen yeni adres gerçek Auth akışında doğrulanır; mevcut kayıtta yeni hesap ve doğrulama e-postası oluşmaz. | Değerlendirmede | Kullanıcının 30 Ekim 2026 ürün kararı: adresin kayıtlı olduğunu açıklamak bilinçli tercihtir; ilişkili hesap/ana e-posta/rol açıklanmaz. Backend teknik değerlendirmesi, uygulama, kaynak/test kanıtı ve frontend teslim kabulü bekliyor. |
+| XREQ-002 | Kullanıcı; frontend hesap güvenliği ihtiyacı | Backend | [WF01 native Auth](workflows.md#wf01): hesap içi mevcut + yeni + tekrar parola değişiminden sonra kayıtlı e-postaya otomatik güvenlik bildirimi ve “Bu işlemi ben yapmadım” kurtarma yolu. | Geçerli mevcut parola olmadan değişim olmaz; bildirim yalnız kayıtlı adrese gider; e-postadaki eylem ve süresi/geçersiz/tekrar kullanım davranışı tanımlanıp gerçek Auth/posta ile denenir. | Değerlendirmede | Kullanıcının 30 Ekim 2026 isteği. Frontend native current_password formunu uygular; backend güvenli kurtarma/oturum iptali ve bildirim şablonu değerlendirmesi bekliyor. Karşılayan adına teknik onay verilmedi. |
 
 Alanların kendi planlarındaki bağımlılık gözlemleri otomatik olarak talep, onay veya işe başlama yetkisi sayılmaz; somut talep bu tabloya kaydedildiğinde `XREQ-001` biçiminde sabit bir kimlik alır.
 
@@ -28,6 +29,12 @@ Frontend'in göstereceği mesaj:
 | Tamamen yeni adresle kayıt | Mevcut native kayıt ve e-posta doğrulama akışı çalışır; yanlış “hesap mevcut” sonucu üretilmez. |
 
 **Teslim kabulü:** Dört senaryoda yanıt, Auth hesap/kimlik durumu ve e-posta gönderim etkisi birlikte doğrulanır; yalnız HTTP 200, UI metni veya mock testi yeterli değildir. Uygulama tesliminde backend ilgili ortak sözleşmeyi ve kendi iş/devrini; frontend kendi tüketicisini ve kabulünü yetkili kapsamlarında günceller. Bu kayıt teknik kabul veya tamamlanmış uygulama kanıtı değildir.
+
+## XREQ-002 parola değişimi güvenlik e-postası
+
+**İstenen davranış:** Hesap içindeki form mevcut parola, yeni parola ve yeni parola tekrarından oluşur. Native Auth mevcut parolayı doğrulayıp değişimi yapar; kullanıcıdan ayrıca e-posta adresi veya e-posta kodu istenmez. Kayıtlı adrese otomatik güvenlik bildirimi gelir. Kullanıcının istediği confirm/undo için backend değişim sonrası bilgilendirme/onay ile “Bu işlemi ben yapmadım” kurtarma eyleminin kesin davranışını ve güvenlik sınırını değerlendirir. Bu talep eski parolanın saklanmasını veya geri yüklenmesini tarif etmez.
+
+**Teslim kabulü:** Yanlış mevcut parola, eşleşmeyen yeni parolalar, başarılı değişim ve kayıtlı adrese dış teslim; ardından e-postadaki kurtarma eylemi, süresi dolmuş/tekrar kullanılmış bağlantı ve gerekli oturum iptali gerçek sağlayıcıda doğrulanır. Frontend form testi veya native bildirim ayarının açık olması bu e-posta eyleminin kabulünü kapatmaz. Yeni endpoint, token veya hata kodu frontend tarafından icat edilmez.
 
 ## Alan sahipliği ve onay
 

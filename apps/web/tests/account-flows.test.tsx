@@ -8,12 +8,23 @@ import { IdentityForm } from "../src/components/account/identity-form";
 import { InvitationAccept } from "../src/components/account/invitation-accept";
 import { SessionManager } from "../src/components/account/session-manager";
 import { DeletionProgress } from "../src/components/account/deletion-progress";
+import { Providers } from "../src/components/providers";
 import { ApiFailure } from "../src/lib/api";
 import type { Preview } from "@ftksaas/api-contracts";
+import type { ReactNode } from "react";
+vi.mock("next-themes", () => ({
+  ThemeProvider: ({ children }: { children: ReactNode }) => children,
+}));
 const mocks = vi.hoisted(() => ({
   call: vi.fn<(operation: string, input: Record<string, unknown>) => Promise<unknown>>(),
   proof: vi.fn<() => Promise<string>>(),
-  update: vi.fn<() => Promise<{ error: Error | null }>>(),
+  update:
+    vi.fn<
+      (
+        attributes: { password?: string; current_password?: string; email?: string },
+        options?: unknown,
+      ) => Promise<{ error: Error | null }>
+    >(),
   factors:
     vi.fn<() => Promise<{ error: null; data: { totp: { id: string; status: string }[] } }>>(),
   unenroll: vi.fn<() => Promise<{ error: null }>>(),
@@ -263,9 +274,56 @@ test("session dates use the stated device timezone instead of the provider's UTC
       : { items: [], next_cursor: null, as_of: "2030-01-01T00:00:00Z" },
   );
   try {
-    render(<SessionManager actorId={actor} />);
-    expect((await screen.findAllByText(/03:00/)).length).toBeGreaterThan(0);
+    render(
+      <Providers>
+        <SessionManager actorId={actor} />
+      </Providers>,
+    );
+    await waitFor(() => expect(screen.getAllByText(/03:00/)).toHaveLength(2));
   } finally {
     timezone.mockRestore();
   }
+});
+
+async function fillPasswordForm(confirm = "Synthetic-new-42") {
+  const user = userEvent.setup();
+  render(
+    <IdentityForm
+      account={{ id: actor, state: "active", display_name: "Synthetic" }}
+      onSaved={mocks.saved}
+    />,
+  );
+  await user.click(screen.getByText("Parolayı değiştir", { selector: "summary" }));
+  await user.type(screen.getByLabelText("Mevcut parola"), "Synthetic-old-42");
+  await user.type(screen.getByLabelText("Yeni parola"), "Synthetic-new-42");
+  await user.type(screen.getByLabelText("Yeni parolayı tekrar yaz"), confirm);
+  await user.click(screen.getByRole("button", { name: "Parolayı kaydet" }));
+}
+test("password change verifies current password natively without a nonce challenge", async () => {
+  mocks.update.mockResolvedValue({ error: null });
+  await fillPasswordForm();
+  expect(await screen.findByRole("status")).toHaveTextContent("Parolan değiştirildi");
+  expect(mocks.update).toHaveBeenCalledExactlyOnceWith({
+    current_password: "Synthetic-old-42",
+    password: "Synthetic-new-42",
+  });
+  expect(mocks.call).not.toHaveBeenCalled();
+  expect(mocks.saved).toHaveBeenCalledOnce();
+  expect(screen.getByLabelText("Mevcut parola")).toHaveValue("");
+  expect(screen.getByLabelText("Yeni parola")).toHaveValue("");
+  expect(screen.getByLabelText("Yeni parolayı tekrar yaz")).toHaveValue("");
+  expect(screen.queryByText("Parola doğrulama kodu gönder")).not.toBeInTheDocument();
+});
+test("mismatching new passwords never update the account", async () => {
+  await fillPasswordForm("Synthetic-other-42");
+  expect(await screen.findByRole("alert")).toHaveTextContent("Parolalar eşleşmiyor");
+  expect(mocks.update).not.toHaveBeenCalled();
+  expect(mocks.saved).not.toHaveBeenCalled();
+});
+test("rejected current password never announces a successful change", async () => {
+  mocks.update.mockResolvedValue({ error: new Error("current password rejected") });
+  await fillPasswordForm();
+  expect(await screen.findByRole("alert")).toHaveTextContent("Kimlik sağlayıcısı");
+  expect(screen.queryByRole("status")).not.toBeInTheDocument();
+  expect(mocks.saved).not.toHaveBeenCalled();
 });
