@@ -11,6 +11,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@ftksaas/ui/components
 import { Badge } from "@ftksaas/ui/components/badge";
 import { Alert, AlertDescription } from "@ftksaas/ui/components/alert";
 import { ScheduleWorkspace } from "../calendar/schedule-workspace";
+import { StudentsWorkspace } from "../students/students-workspace";
 import { Preferences } from "../preferences";
 import { AdminShell, sections, type AdminSection } from "./admin-shell";
 import {
@@ -312,24 +313,28 @@ export function StudioWorkspace() {
         </div>
       )}
       {snapshot && section === "schedule" && <ScheduleWorkspace studios={snapshot.studios} />}
-      {snapshot && !["overview", "studio", "settings", "schedule"].includes(section) && (
-        <Card className="shadow-none">
-          <CardContent className="flex min-h-72 flex-col items-center justify-center px-5 py-12 text-center">
-            <Layers3 aria-hidden="true" className="mb-5 size-8 text-muted-foreground" />
-            <h2 className="text-lg font-medium">{t("comingTitle")}</h2>
-            <p className="mt-3 max-w-md text-sm leading-6 text-muted-foreground">
-              {t("comingDescription")}
-            </p>
-            <Button
-              className="mt-6 h-auto min-h-11 whitespace-normal"
-              variant="outline"
-              onClick={() => navigate("overview")}
-            >
-              {t("backToToday")}
-            </Button>
-          </CardContent>
-        </Card>
+      {snapshot && section === "students" && (
+        <StudentsWorkspace studios={snapshot.studios} actorId={snapshot.account.id} />
       )}
+      {snapshot &&
+        !["overview", "studio", "settings", "schedule", "students"].includes(section) && (
+          <Card className="shadow-none">
+            <CardContent className="flex min-h-72 flex-col items-center justify-center px-5 py-12 text-center">
+              <Layers3 aria-hidden="true" className="mb-5 size-8 text-muted-foreground" />
+              <h2 className="text-lg font-medium">{t("comingTitle")}</h2>
+              <p className="mt-3 max-w-md text-sm leading-6 text-muted-foreground">
+                {t("comingDescription")}
+              </p>
+              <Button
+                className="mt-6 h-auto min-h-11 whitespace-normal"
+                variant="outline"
+                onClick={() => navigate("overview")}
+              >
+                {t("backToToday")}
+              </Button>
+            </CardContent>
+          </Card>
+        )}
     </AdminShell>
   );
 }

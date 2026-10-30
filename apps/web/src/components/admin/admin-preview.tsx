@@ -2,6 +2,7 @@
 
 import { useState, useSyncExternalStore, type ReactNode } from "react";
 import { useLocale, useTranslations } from "next-intl";
+import Link from "next/link";
 import {
   ArrowDownLeft,
   ArrowUpRight,
@@ -63,6 +64,7 @@ type Detail =
 
 // An isolated, in-memory prototype. AdminShell can later receive real authorized content.
 export function AdminPreview() {
+  const studentCopy = useTranslations("students");
   const t = useTranslations("admin");
   const locale = useLocale();
   const section = useSyncExternalStore(subscribeNavigation, currentSection, initialSection);
@@ -328,6 +330,12 @@ export function AdminPreview() {
       )}
       {section === "students" && (
         <>
+          <Link
+            href="/tasarim/ogrenciler"
+            className="mb-5 inline-block text-sm underline underline-offset-4"
+          >
+            {studentCopy("demoLink")}
+          </Link>
           {heading(
             t("nav.students"),
             t("studentsSubtitle"),

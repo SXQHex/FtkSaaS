@@ -7,6 +7,10 @@ import {
   getOrganizations,
   getSession,
   applySessionChange,
+  getStudents,
+  getPerson,
+  changeStudent,
+  getStudentChangeStatus,
 } from "../src/lib/api";
 import type { FailureEnvelope, Operations } from "@ftksaas/api-contracts";
 vi.mock("../src/lib/supabase/client", () => ({
@@ -22,6 +26,118 @@ vi.mock("../src/lib/supabase/client", () => ({
 beforeEach(() => {
   vi.stubEnv("NEXT_PUBLIC_SUPABASE_URL", "https://project.example.invalid");
   vi.stubEnv("NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY", "synthetic-publishable");
+});
+
+test("student reads preserve center scope, supported sort and cursor; detail is a separate request", async () => {
+  const calls: Operations["people_list_v1"]["request"][] = [];
+  server.use(
+    http.post(
+      "https://project.example.invalid/functions/v1/backend-v1/people_list_v1",
+      async ({ request }) => {
+        const body = (await request.json()) as Operations["people_list_v1"]["request"];
+        calls.push(body);
+        expect(request.headers.get("authorization")).toBe("Bearer synthetic-session");
+        return HttpResponse.json({
+          ok: true,
+          data: { items: [], next_cursor: "scoped-cursor", as_of: "2030-10-29T00:00:00Z" },
+          trace_id: body.request_id,
+        } satisfies Operations["people_list_v1"]["response"]);
+      },
+    ),
+    http.post(
+      "https://project.example.invalid/functions/v1/backend-v1/person_get_v1",
+      async ({ request }) => {
+        const body = (await request.json()) as Operations["person_get_v1"]["request"];
+        expect(body).toMatchObject({ org_id: "org", center_id: "center", person_id: "person" });
+        return HttpResponse.json(
+          {
+            ok: false,
+            error: { code: "FORBIDDEN", retryable: false, trace_id: body.request_id },
+          } satisfies FailureEnvelope,
+          { status: 403 },
+        );
+      },
+    ),
+  );
+  const query = { orgId: "org", centerId: "center", query: "Deniz" };
+  const first = await getStudents(query);
+  await getStudents({ ...query, cursor: first.next_cursor! });
+  expect(calls.map(({ request_id: _id, ...rest }) => rest)).toEqual(
+    [undefined, "scoped-cursor"].map((cursor) => ({
+      client_api_version: 1,
+      org_id: "org",
+      center_id: "center",
+      relationship: "student",
+      query: "Deniz",
+      page: { limit: 25, sort: "created_at_asc", ...(cursor ? { cursor } : {}) },
+    })),
+  );
+  expect(calls[0].request_id).not.toBe(calls[1].request_id);
+  await expect(getPerson("org", "center", "person")).rejects.toBeInstanceOf(ApiFailure);
+});
+
+test("student mutation replay keeps the entire command, renews request IDs and checks the exact operation", async () => {
+  const calls: Operations["student_deactivate_v1"]["request"][] = [];
+  const command = {
+    operation: "student_deactivate_v1" as const,
+    input: {
+      org_id: "org",
+      center_id: "center",
+      person_id: "person",
+      operation_key: "019a2b3c-4d5e-7000-8000-000000000021",
+      reason: "Ara verdi",
+    },
+  };
+  server.use(
+    http.post(
+      "https://project.example.invalid/functions/v1/backend-v1/student_deactivate_v1",
+      async ({ request }) => {
+        const body = (await request.json()) as Operations["student_deactivate_v1"]["request"];
+        calls.push(body);
+        return HttpResponse.json({
+          ok: true,
+          data: {
+            operation_id: "operation",
+            primary_id: "relationship",
+            related: [],
+            replayed: calls.length > 1,
+          },
+          trace_id: body.request_id,
+        } satisfies Operations["student_deactivate_v1"]["response"]);
+      },
+    ),
+    http.post(
+      "https://project.example.invalid/functions/v1/backend-v1/operation_status_get_v1",
+      async ({ request }) => {
+        const body = (await request.json()) as Operations["operation_status_get_v1"]["request"];
+        expect(body).toMatchObject({
+          org_id: "org",
+          operation: command.operation,
+          key: command.input.operation_key,
+        });
+        return HttpResponse.json({
+          ok: true,
+          data: {
+            operation: command.operation,
+            key: command.input.operation_key,
+            status: "succeeded",
+            result_available: true,
+            result_reference: { type: "center_relationships", id: "relationship" },
+          },
+          trace_id: body.request_id,
+        } satisfies Operations["operation_status_get_v1"]["response"]);
+      },
+    ),
+  );
+  await changeStudent(command);
+  expect((await changeStudent(command)).replayed).toBe(true);
+  expect(calls.map(({ request_id: _id, ...rest }) => rest)).toEqual(
+    [1, 2].map(() => ({ client_api_version: 1, ...command.input })),
+  );
+  expect(calls[0].request_id).not.toBe(calls[1].request_id);
+  expect(
+    (await getStudentChangeStatus("org", command.operation, command.input.operation_key)).status,
+  ).toBe("succeeded");
 });
 
 test("direct session lookup preserves org and session and lets the backend resolve center scope", async () => {
