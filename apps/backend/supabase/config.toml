@@ -247,8 +247,8 @@ otp_expiry = 3600
 [auth.email.notification.password_changed]
 enabled = true
 subject = "Parolanız değiştirildi"
-content_path = "./supabase/templates/password_changed_notification.html"
-# CLI 2.122 native mode omits content_path and the current-password setting.
+# CLI 2.122 native mode rejects content_path and omits the current-password setting.
+# Keep the custom template in the hosted config tool and isolated Auth fixture.
 # Hosted settings: scripts/auth-password-security.mjs; real native acceptance:
 # tests/account-password-security-acceptance.mjs (isolated CLI-owned binary).
 

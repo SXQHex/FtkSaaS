@@ -254,8 +254,8 @@
         "management_state_get_v1"
       ],
       "review": {
-        "fingerprint": "986a609eecd20458c7fcddcb0091bc71277d8e574330c3a32c28292bb07d2648",
-        "reason": "Native notification config and added unit import reviewed; shared request/response protocol remains unchanged."
+        "fingerprint": "23b1c13791187cdb11d1d752f609ee62dfc40f26e21f55bfa34df562d56d0eff",
+        "reason": "Native startup regression reproduced with CLI 2.122: removed unsupported notification content_path; shared protocol and other native settings unchanged."
       }
     },
     {
@@ -335,8 +335,8 @@
         "account_signup_request_v1"
       ],
       "review": {
-        "fingerprint": "9ec20934fd13e36a4e6c07bf7f634b0334285623a0688046d21afe9186a8ddb2",
-        "reason": "Reviewed native password config, notice and real Auth acceptance including independent expiry, valid-proof supersession, replay and session revocation."
+        "fingerprint": "ffb23ee7d24228356c3aa5208c864d79ecfbbc8068e3a3f539617c6e6d4529fb",
+        "reason": "Approved delayed recovery request semantics; native template remains in hosted config and isolated Auth fixture after unsupported TOML key removal."
       }
     },
     {

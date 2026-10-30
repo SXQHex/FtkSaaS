@@ -1,4 +1,4 @@
-// CLI 2.122 native mode omits current-password enforcement and template content.
+// CLI 2.122 native mode omits current-password enforcement and rejects content_path.
 // Run its exact Auth binary with supported native settings; never patch or restart
 // a CLI-owned process. Only the local acceptance suite imports this helper.
 import fs from 'node:fs';
