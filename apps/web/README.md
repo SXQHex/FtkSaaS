@@ -1,6 +1,6 @@
 # Frontend geliştirme
 
-Kapsam yalnız FtkSaaS'tır. Web uygulaması apps/web, ortak arayüz packages/ui sahibindedir. Kök [AGENTS](../../AGENTS.md), [istemci protokolü](../../docs/claude-handover.md) ve [API sözleşme paketi](../../packages/api-contracts/README.md) önceliklidir. Güncel kabul [00 devirde](../../docs/contracts/00-FtkSaaS-yeni-sohbet-devir.md), açık iş [tek backlog'dadır](../../docs/remaining-work.md).
+Kapsam yalnız FtkSaaS'tır. Web uygulaması apps/web, ortak arayüz packages/ui sahibindedir. Kök [AGENTS](../../AGENTS.md), [istemci protokolü](../../docs/claude-handover.md) ve [API sözleşme paketi](../../packages/api-contracts/README.md) önceliklidir. Starter frontend'in bölüm planı, aktif işi, bağımlılıkları ve kabul takibi [todo.md](todo.md) içindedir. Bu frontend planlama çalışmasının belge kapsamı yalnız `apps/web`'dir.
 
 ## Bileşen ve araç kuralları
 
@@ -103,7 +103,7 @@ Kullanıcının yüklediği `frontend-design` becerisi bu dilimde uygulanır. Ka
 
 Syncfusion yalnız çizelge seçildiğinde dinamik yüklenir. `NEXT_PUBLIC_SYNCFUSION_LICENSE_KEY`, kurulu35.x sürümüne uygun onaylı Community License anahtarıyla build ortamında tanımlanır; Turbo build girdisidir. Anahtar yokken lisanssız Scheduler başlatılmaz, aynı gerçek verinin liste görünümü kullanılır. Liste/gün/hafta işlevi lisans anahtarı gerektirmez. Anahtar değerini kaynak/PR/log’a yazma. İlk adaptör salt okunurdur; sürükle-bırak, resize ve dahili editör kapalıdır. Seans seçimi bizim detay panelimize gider. Lisans kaydı: [Community License](https://www.syncfusion.com/products/communitylicense); uygulama kaynakları [Scheduler](https://ej2.syncfusion.com/react/documentation/schedule/getting-started), [yerelleştirme](https://ej2.syncfusion.com/react/documentation/schedule/localization) ve [saat dilimi](https://ej2.syncfusion.com/react/documentation/schedule/timezone). Üçüncü taraf paketler kendi lisans bildirimlerini korur.
 
-Starter’ın tam ekran/işlem kapsamı ve açık kabul koşulları [tek backlog’daki matriste](../../docs/remaining-work.md#web-01--starter-frontend-tamamlama-matrisi) tutulur. Bu dosyada ikinci bir tamamlanma listesi üretilmez.
+Starter’ın ekran/işlem ayrıntıları ve bölüm kabul ölçütleri [frontend yol haritasında](todo.md) tutulur. Bir bölüm bitmeden sonraki bölüme geçilmez; bu README ikinci bir görev listesi içermez.
 
 
 ## Doğrudan seans bağlantısı
@@ -122,7 +122,7 @@ Doğrudan seans sayfasındaki düzenleme eylemi `SessionChange` formunu açar. S
 
 Göndermeden önce operation_key ve önizleme id/token'ı bu sekmenin sessionStorage alanında doğrulanmış kullanıcı/organizasyon/seans anahtarıyla tutulur; Auth tokenı saklanmaz. Yazılamayan veya bozuk takip kaydında yeni değişiklik gönderilmez. Kaybolan yanıtta aynı kayıt sayfa yenilemesinden sonra geri alınır; kullanıcı `operation_status_get_v1` ile sonucu kontrol edebilir veya birebir aynı işlemi yeniden gönderebilir. Her transport denemesinde yeni request_id, aynı işlemi sürdürürken aynı operation_key kullanılır. NOT_FOUND veya erişim kaybı önceki işlemin başarısızlığı sayılmaz; belirsiz işlem için yeni anahtar üretilmez. Otomatik retry/polling yoktur. Kesin sonuç sonrasında güncel seans yeniden okunur.
 
-`/tasarim/seans` aynı form ve onay görünümünü açıkça kurgusal, canlı backend'e erişmeyen bağımsız eylemlerle gösterir. Nötr tek sütunlu düzen, dar ekranda satıra bölünen eylemler, TR/EN ve açık/koyu tercihler kullanılır. Önizleme örneği veya mock testleri gerçek hosted yazma kabulü değildir; bu dilimin kalan kapsamı [WEB-S03](../../docs/remaining-work.md#web-01--starter-frontend-tamamlama-matrisi) kaynağındadır.
+`/tasarim/seans` aynı form ve onay görünümünü açıkça kurgusal, canlı backend'e erişmeyen bağımsız eylemlerle gösterir. Nötr tek sütunlu düzen, dar ekranda satıra bölünen eylemler, TR/EN ve açık/koyu tercihler kullanılır. Önizleme örneği veya mock testleri gerçek hosted yazma kabulü değildir; bu dilimin kalan kapsamı [WEB-S03](todo.md#web-s03) kaynağındadır.
 
 
 ## Öğrenci listesi ve merkezde öğrencilik
@@ -139,4 +139,4 @@ Profilde belge durumu uydurulmaz. `document_requirements_get_v1` gerçek rezerva
 
 Öğrencilik değişikliği isteği (pasifleştirme gerekçesi dahil), kişi oluşturma/düzenleme komutu veya davet anahtarı bu sekmenin kullanıcı/organizasyon/merkez/kişi kapsamlı sessionStorage kaydına yazılır; kimlik doğrulama tokenı hiçbir zaman saklanmaz. Kişi oluşturma/düzenlemenin bekleyen tam komutu iletişim alanlarını içerir ve kesin sonuçta silinir. Belirsiz sonuçta yeni anahtar üretilmez; manuel sonuç kontrolü veya aynı payload/operation_key ile tekrar gönderim yapılır, transport request_id yenilenir. NOT_FOUND veya sonraki yetki kaybı önceki işlemin başarısızlığı sayılmaz. Sonuç süresi dolarsa replay engeli yenileme sonrasında da korunur. Makbuzun center_relationships referansı kişi ID’siyle karşılaştırılmaz. Detay okuması reddedilse bile mevcut bekleyen işlemin sonuç kontrolü erişilebilir kalır; kontrol/yazma yetkisini backend yeniden denetler. Kapanan panelin geç yanıtı takip kaydını değiştiremez.
 
-`/tasarim/ogrenciler`, aynı liste/panel/onay bileşenlerini yalnız sentetik ve bellekteki eylemlerle gösterir. Tasarım, mevcut nötr palet ve sistem fontuyla ad/öğrencilik durumunu öne çıkaran sol hizalı satırlar ve sağ detay panelidir; dar ekranda panel tam genişlik kullanır. TR/EN, tema, arama/boş durum, sayfalama, açık işlem reddi ve etkinleştirme/pasifleştirme örnekleri gerçek hosted kabulü değildir. Açık kapsam yalnız [WEB-S04](../../docs/remaining-work.md#web-01--starter-frontend-tamamlama-matrisi) içindedir.
+`/tasarim/ogrenciler`, aynı liste/panel/onay bileşenlerini yalnız sentetik ve bellekteki eylemlerle gösterir. Tasarım, mevcut nötr palet ve sistem fontuyla ad/öğrencilik durumunu öne çıkaran sol hizalı satırlar ve sağ detay panelidir; dar ekranda panel tam genişlik kullanır. TR/EN, tema, arama/boş durum, sayfalama, açık işlem reddi ve etkinleştirme/pasifleştirme örnekleri gerçek hosted kabulü değildir. Açık kapsam yalnız [WEB-S04](todo.md#web-s04) içindedir.
