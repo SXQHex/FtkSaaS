@@ -7,7 +7,7 @@ Tek repo SXQHex/FtkSaaS; main güncel kaynak dalıdır. Önce [AGENTS](../AGENTS
 | Soru | Yetkili kaynak |
 |---|---|
 | Ne kabul edildi, hangi SHA/CI/CD/hosted sürümü? | [00 güncel kabul](contracts/00-FtkSaaS-yeni-sohbet-devir.md) |
-| Hangi iş açık? | [remaining-work](remaining-work.md); WEB-01 uygulama ayrıntıları [frontend todo](../apps/web/todo.md) |
+| Hangi iş açık? | [remaining-work](remaining-work.md) |
 | Şimdi hangi sırada çalışıyoruz? | [production-queue](production-queue.md) — backlog’u kopyalamaz |
 | Ürün davranışı ne? | [01 ürün](contracts/01-FtkSaaS-urun-kapsam-sozlesmesi.md), kabul edilmiş decisions/ |
 | Teknik kurallar ve69 ayar grubu? | [02 teknik](contracts/02-FtkSaaS-teknik-sozlesme.md) |

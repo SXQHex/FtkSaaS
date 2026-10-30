@@ -2,11 +2,11 @@
 
 Amaç: Bir Starter stüdyosunun kuruluşundan günlük ders, öğrenci, satış, rezervasyon, yoklama ve tahsilat yönetimine; öğrencinin kendi hesabından işlem yapmasına kadar bütün izinli akışları web arayüzünde tamamlamak.
 
-Bu belge WEB-01'in uygulama planıdır. Modül ayrıntıları burada, projenin açık iş/kapanış kaydı [remaining-work](../../docs/remaining-work.md), aktif iş sırası [production-queue](../../docs/production-queue.md), güncel kaynak/CI/dağıtım/hosted kanıtı [00 devir](../../docs/contracts/00-FtkSaaS-yeni-sohbet-devir.md) içindedir. İşaretli bir ekran veya başarılı mock testi, modülün canlı kabulü değildir. Aşağıdaki yapılacaklar uygulama sırasında kendi modülünde güncellenir; başka belgede ikinci ayrıntılı liste tutulmaz.
+Bu belge Starter frontend'in uygulama ve takip planıdır. Modül adımları, aktif bölüm, sıra, bağımlılıklar ve frontend kabul kanıtları burada tutulur. Kullanıcının kapsam kararı gereği bu çalışma yalnız `apps/web` belgelerini günceller; `/docs` belgeleri ürün ve API referansı olarak okunur. Gözlenen backend ihtiyaçları bu dosyada bağımlılık notu olarak tutulur; mevcut aşamada backend işi veya belge güncellemesi başlatılmaz. İşaretli bir ekran veya başarılı mock testi, modülün canlı kabulü değildir.
 
 ## 1. Kaynak ve değerlendirme yöntemi
 
-Plan, mevcut `src/app`, `src/components`, `src/lib/api.ts` ile aşağıdaki ürün ve backend kaynakları birlikte incelenerek hazırlanmıştır. Başlangıç kaynak ve kabul kaydı 00 devirdeki “Starter frontend yol haritası başlangıcı” bölümündedir. Backend değiştiğinde geliştirmeye başlamadan ilgili DTO, selector ve yetki tekrar okunur.
+Plan, mevcut `src/app`, `src/components`, `src/lib/api.ts` ile aşağıdaki ürün ve backend kaynakları birlikte incelenerek hazırlanmıştır. İncelenen başlangıç main kaynağı `fe650618503be24eb117297dc412c4ae6fd8018c`'dir; bu kaynak envanteri tek başına canlı kabul kanıtı değildir. Backend değiştiğinde geliştirmeye başlamadan ilgili DTO, selector ve yetki tekrar okunur.
 
 | Konu | Yetkili kaynak |
 |---|---|
@@ -86,7 +86,7 @@ Her modül aşağıdaki koşullarla tasarlanır; bunlar en sonda eklenecek ayrı
 | B03 | Davet/kayıt/kurtarma için dış e-posta ve Google/TOTP sağlayıcı kabulü | Ortam sahibi + frontend: mevcut yapılandırma yeniden doğrulanır, gerçek teslim/dönüş denenir. Önceki sentetik SMTP veya job success dış teslim kanıtı değildir. | S01, S04 |
 | B04 | Public signed ingress, gerçek hostname/action/Turnstile; ICS origin/host/template/signing hazırlığı | Backend/ortam sahibi sağlar; frontend gerçek sağlayıcı ve yetkili seans hedefiyle kabul eder. `service_ready` tek başına kullanıcı yetkisi veya servis kabulü değildir. | S09 |
 | B05 | Rapor/import/belge için tenant teknik limit/config ve çalışan iş hatları | Backend/ortam sahibi: private yükleme, checksum, worker ve indirme yetkisi kanıtı. Eksik config güvenli kurulum mesajı olur. | S10, S11 |
-| B06 | Eylem izinleri ve bazı yönetim/detail selector'ları işlem bazında doğrulanmalı | Her modülün ilk işi gerçek okuma→sürüm→komut matrisi. Eksik projection backend'e somut istek olarak aktarılır; “endpoint var” kabulü yetmez. | Tüm modüller |
+| B06 | Eylem izinleri ve bazı yönetim/detail selector'ları işlem bazında doğrulanmalı | Her modülün ilk işi gerçek okuma→sürüm→komut matrisi. Eksik projection bu dosyada somut bağımlılık olarak kaydedilir; “endpoint var” kabulü yetmez. | Tüm modüller |
 | B07 | Kurulu sürüme uygun Syncfusion anahtarı ve gerçek Scheduler tarayıcı kabulü | Ortam sahibi + frontend: anahtarın build'de kullanımı, TR/EN/timezone/mobil kabulü. Liste fallback'i çalışmaya devam eder. | S03 |
 
 Availability için `management_state_get_v1(operation: availability_save_v1)` okuması vardır; B01 bütün yönetim okumalarının eksik olduğu anlamına gelmez. Şablon resolve sonucu güncelleme sürümü yerine geçmez. Platform yetkili organizasyon yaratma ve SaaS ödeme doğrulama işleri sıradan kullanıcı self-service ekranı olarak varsayılmaz.
@@ -300,7 +300,7 @@ Her modülün “bitti” ölçütü kendi aşağıdaki kabul senaryosu **ve** b
 
 ## 7. Bölüm bölüm teslim: tek aktif bölüm
 
-Kullanıcının son kararı: **Bir bölüm bitmeden sonraki bölümün uygulamasına geçilmez.** Aktif sıranın tek kaydı production-queue'dur; aşağıdaki liste önerilen bağımlılık sırasıdır. Aynı anda birden çok yarım bölüm veya yeni modül dalı açılmaz.
+Kullanıcının son kararı: **Bir bölüm bitmeden sonraki bölümün uygulamasına geçilmez.** Frontend'in aktif bölümü ve sırası bu bölümde tutulur. **Aktif bölüm: öğrenci yönetimini tamamlama ve gerçek kabul.** Aşağıdaki liste bağımlılık sırasını gösterir. Aynı anda birden çok yarım bölüm veya yeni modül dalı açılmaz.
 
 S01–S13 işlev kapsamını izler. Teslim bölümleri ise kullanıcının baştan sona kullanabildiği akışlardır: örneğin davet kabulü öğrenci bölümünde, satışın zorunlu belge adımı satış bölümünde çalışır. Ortak bir bağımlılık önce kullanılacağı bölümün içinde tamamlanır ve daha sonra yeniden yazılmaz. Bölümün kabulü ileride yazılacak bir ekrana bağlanmaz: gerektiğinde yetkilendirilmiş mevcut kayıt kullanılır; yeni ekranlar arasındaki uçtan uca bağlantı, bağlantıyı kullanan sonraki bölümün açık kabul maddesidir. Gerekli gerçek kayıt/okuma yoksa bölüm engelli kalır, mock ile kapanmaz. Başka bir bölüme ait henüz yapılmamış işlem, mevcut bölümde çalışıyormuş gibi düğme/özet olarak sunulmaz.
 
@@ -335,8 +335,8 @@ Aynı bölümdeki küçük düzeltmeler aynı dal/PR'de sürer. Önceki bölüm 
 4. **Anlamlı frontend testleri:** UI davranışı ve hata/yarış koşulları Vitest/Testing Library/MSW ile; modülün kritik kullanıcı yolculuğu ve erişilebilirliği Playwright/axe ile. Backend ürün kurallarını istemcide tekrar uygulayan test katmanı kurulmaz.
 5. **Kontroller:** `pnpm check:frontend`, frontend isolation ve gerekli coverage; değişen akışın tarayıcı kabulü. Mevcut CI dört tarayıcı matrisini korur. Kural/timeout/retry gevşetme başarı yöntemi değildir.
 6. **Gerçek ortam:** Yetkili yönetici/eğitmen/öğrenci hesabıyla izinli okuma/yazma; yanlış rol, org/merkez, plan ve erişim kaybı. Gerçek veri üzerinde reset/seed yoktur; yalnız yetkilendirilmiş kabul kayıtlarıyla çalışılır.
-7. **Kaynak ve yayın:** Son kaynak incelemesi, aynı head/base/merge için CI; merge sonrası main kanıtı ve ilgili dağıtım. İşin kanıtı 00 devirde tutulur; eski head'in başarısı yeni head'e taşınmaz.
-8. **Doküman:** Bu dosyada modül adımları güncellenir; kalan bağımlılık/açık kabul root backlog'a, sıradaki iş production-queue'ya işlenir. Ürün/DTO değişikliği gerekiyorsa önce kendi yetkili kaynağı güncellenir.
+7. **Kaynak ve yayın:** Son kaynak incelemesi, aynı head/base/merge için CI; merge sonrası main kanıtı ve ilgili dağıtım. Frontend kanıtı bu dosyada ilgili bölümün kapanış kaydında tutulur; eski head'in başarısı yeni head'e taşınmaz.
+8. **Doküman:** Modül adımları, kalan bağımlılıklar, açık kabul ve sıradaki frontend işi bu dosyada güncellenir. Kapanış kaydı kaynak SHA'sını, ilgili CI/dağıtım bağlantılarını ve gerçek ortam kabul sonucunu içerir. Ürün/DTO değişikliği ihtiyacı bağımlılık olarak kaydedilir ve ayrı kapsamda ele alınır; bu iş için `/docs` güncellenmez.
 
 ## 9. Starter'ın bütününe ait son kabul zinciri
 
