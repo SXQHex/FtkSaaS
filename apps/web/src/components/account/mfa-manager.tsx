@@ -2,8 +2,7 @@
 import { useEffect, useRef, useState, type FormEvent } from "react";
 import { useTranslations } from "next-intl";
 import { Button } from "@ftksaas/ui/components/button";
-import { Input } from "@ftksaas/ui/components/input";
-import { Label } from "@ftksaas/ui/components/label";
+import { AccountField } from "./account-field";
 import { browserClient } from "../../lib/supabase/client";
 import { accountCall, freshAccountProof } from "../../lib/account";
 import { ReauthFields } from "./session-manager";
@@ -81,7 +80,6 @@ export function MfaManager({ actorId }: { actorId: string }) {
       <h2 id="mfa-heading" className="text-xl font-semibold">
         {t("mfa")}
       </h2>
-      <p className="text-sm text-muted-foreground">{t("mfaHint")}</p>
       {error && <p role="alert">{t("providerFailed")}</p>}
       {notice && (
         <output className="block" aria-live="polite">
@@ -166,9 +164,10 @@ export function MfaManager({ actorId }: { actorId: string }) {
               });
             }}
           >
-            <Label htmlFor="enrollment-code">{t("totpCode")}</Label>
-            <Input
+            <AccountField
+              label={t("totpCode")}
               id="enrollment-code"
+              placeholder="123456"
               name="code"
               inputMode="numeric"
               autoComplete="one-time-code"

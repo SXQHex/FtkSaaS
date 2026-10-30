@@ -134,7 +134,6 @@ export function GoogleLink({ actorId }: { actorId: string }) {
       <h2 id="google-heading" className="text-xl font-semibold">
         {t("googleLink")}
       </h2>
-      <p className="text-sm text-muted-foreground">{t("googleHint")}</p>
       {!clientId ? (
         <p>{t("googleNotConfigured")}</p>
       ) : (

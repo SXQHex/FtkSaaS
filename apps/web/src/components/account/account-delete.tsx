@@ -5,8 +5,7 @@ import { useFormatter, useTranslations } from "next-intl";
 import { v7 } from "uuid";
 import type { Preview } from "@ftksaas/api-contracts";
 import { Button } from "@ftksaas/ui/components/button";
-import { Input } from "@ftksaas/ui/components/input";
-import { Label } from "@ftksaas/ui/components/label";
+import { AccountField } from "./account-field";
 import { accountCall, accountError, freshAccountProof } from "../../lib/account";
 import { CommandFeedback, useAccountCommand } from "./account-command";
 import { ReauthFields } from "./session-manager";
@@ -156,19 +155,15 @@ export function AccountDelete({
           {(command.pending || (preview && !preview.blockers.length)) && (
             <form className="space-y-4" onSubmit={submit}>
               <ReauthFields disabled={busy || command.busy} />
-              <div className="flex items-start gap-3">
-                <Input
-                  id="delete-confirm"
-                  name="confirm"
-                  type="checkbox"
-                  required
-                  className="mt-1 size-4 shrink-0"
-                  disabled={busy || command.busy}
-                />
-                <Label htmlFor="delete-confirm" className="text-sm leading-6">
-                  {t("deleteConfirmation")}
-                </Label>
-              </div>
+              <AccountField
+                id="delete-confirm"
+                label={t("deleteConfirmation")}
+                name="confirm"
+                type="checkbox"
+                required
+                className="mt-1 size-4 shrink-0"
+                disabled={busy || command.busy}
+              />
               <Button
                 variant="destructive"
                 disabled={

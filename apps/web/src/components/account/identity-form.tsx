@@ -3,8 +3,8 @@ import { useRef, useState, type FormEvent } from "react";
 import { useTranslations } from "next-intl";
 import type { AccountView } from "@ftksaas/api-contracts";
 import { Button } from "@ftksaas/ui/components/button";
-import { Input } from "@ftksaas/ui/components/input";
-import { Label } from "@ftksaas/ui/components/label";
+import { AccountField } from "./account-field";
+import { normalizePhone } from "../../lib/phone";
 import { browserClient } from "../../lib/supabase/client";
 import { appOrigin } from "../../lib/config";
 import { rememberAuthReturn } from "../../lib/auth-return";
@@ -14,6 +14,8 @@ export function IdentityForm({ account, onSaved }: { account: AccountView; onSav
   const [busy, setBusy] = useState(false);
   const [notice, setNotice] = useState("");
   const [error, setError] = useState("");
+  const [passwordError, setPasswordError] = useState("");
+  const [phoneError, setPhoneError] = useState("");
   const lock = useRef(false);
   async function run(task: () => Promise<unknown>, message: string) {
     if (lock.current) return;
@@ -34,7 +36,17 @@ export function IdentityForm({ account, onSaved }: { account: AccountView; onSav
   }
   function update(event: FormEvent<HTMLFormElement>, kind: "email" | "phone") {
     event.preventDefault();
-    const value = String(new FormData(event.currentTarget).get(kind)).trim();
+    const form = event.currentTarget;
+    const input = String(new FormData(form).get(kind)).trim();
+    const value = kind === "phone" ? normalizePhone(input) : input;
+    if (value === undefined) {
+      setNotice("");
+      setError("");
+      setPhoneError(t("fieldPhone"));
+      form.querySelector<HTMLInputElement>('[name="phone"]')?.focus();
+      return;
+    }
+    setPhoneError("");
     void run(async () => {
       if (kind === "email") await rememberAuthReturn("/account");
       const result = await browserClient().auth.updateUser(
@@ -50,16 +62,15 @@ export function IdentityForm({ account, onSaved }: { account: AccountView; onSav
       <h2 id="identity-heading" className="text-xl font-semibold">
         {t("identity")}
       </h2>
-      <p className="text-sm text-muted-foreground">{t("identityHint")}</p>
       <dl className="space-y-3 text-sm wrap-anywhere">
-        {(["email", "phone", "pending_email", "pending_phone", "unverified_phone"] as const).map(
-          (kind) => (
+        {(["email", "phone", "pending_email", "pending_phone"] as const)
+          .filter((kind) => !!identity?.[kind])
+          .map((kind) => (
             <div key={kind}>
               <dt className="text-muted-foreground">{t(kind)}</dt>
-              <dd>{identity?.[kind] ?? t("none")}</dd>
+              <dd>{identity?.[kind]}</dd>
             </div>
-          ),
-        )}
+          ))}
       </dl>
       {error && <p role="alert">{t(error)}</p>}
       {notice && (
@@ -69,12 +80,14 @@ export function IdentityForm({ account, onSaved }: { account: AccountView; onSav
       )}
       {(["email", "phone"] as const).map((kind) => (
         <form key={kind} onSubmit={(event) => update(event, kind)} className="space-y-3">
-          <Label htmlFor={`new-${kind}`}>{t(`new_${kind}`)}</Label>
-          <Input
+          <AccountField
+            label={t(`new_${kind}`)}
+            placeholder={kind === "email" ? "name@example.com" : "05xx xxx xx xx"}
+            error={kind === "phone" ? phoneError : undefined}
+            onChange={kind === "phone" ? () => setPhoneError("") : undefined}
             id={`new-${kind}`}
             name={kind}
             type={kind === "email" ? "email" : "tel"}
-            pattern={kind === "phone" ? "\\+[1-9][0-9]{7,14}" : undefined}
             required
             disabled={busy}
             autoComplete={kind}
@@ -124,8 +137,9 @@ export function IdentityForm({ account, onSaved }: { account: AccountView; onSav
             }, "saved");
           }}
         >
-          <Label htmlFor="phone-code">{t("phoneCode")}</Label>
-          <Input
+          <AccountField
+            label={t("phoneCode")}
+            placeholder="123456"
             id="phone-code"
             name="code"
             autoComplete="one-time-code"
@@ -138,7 +152,6 @@ export function IdentityForm({ account, onSaved }: { account: AccountView; onSav
       )}
       <details className="space-y-4 border-t pt-5">
         <summary className="cursor-pointer font-medium">{t("password")}</summary>
-        <p className="text-sm text-muted-foreground">{t("passwordHint")}</p>
         <form
           className="space-y-3"
           onSubmit={(event) => {
@@ -147,9 +160,12 @@ export function IdentityForm({ account, onSaved }: { account: AccountView; onSav
             const data = new FormData(form);
             if (data.get("password") !== data.get("confirm")) {
               setNotice("");
-              setError("passwordMismatch");
+              setError("");
+              setPasswordError(t("passwordMismatch"));
+              form.querySelector<HTMLInputElement>('[name="confirm"]')?.focus();
               return;
             }
+            setPasswordError("");
             void run(async () => {
               const result = await browserClient().auth.updateUser({
                 password: String(data.get("password")),
@@ -160,8 +176,8 @@ export function IdentityForm({ account, onSaved }: { account: AccountView; onSav
             }, "passwordChanged");
           }}
         >
-          <Label htmlFor="current-password">{t("currentPassword")}</Label>
-          <Input
+          <AccountField
+            label={t("currentPassword")}
             id="current-password"
             name="current_password"
             type="password"
@@ -169,18 +185,22 @@ export function IdentityForm({ account, onSaved }: { account: AccountView; onSav
             required
             disabled={busy}
           />
-          <Label htmlFor="new-password">{t("newPassword")}</Label>
-          <Input
+          <AccountField
+            label={t("newPassword")}
+            placeholder={t("passwordPlaceholder")}
             id="new-password"
             name="password"
+            onChange={() => setPasswordError("")}
             type="password"
             autoComplete="new-password"
             minLength={8}
             required
             disabled={busy}
           />
-          <Label htmlFor="confirm-password">{t("confirmPassword")}</Label>
-          <Input
+          <AccountField
+            label={t("confirmPassword")}
+            error={passwordError}
+            onChange={() => setPasswordError("")}
             id="confirm-password"
             name="confirm"
             type="password"

@@ -254,8 +254,8 @@
         "management_state_get_v1"
       ],
       "review": {
-        "fingerprint": "3774124baf6e6fd3695e6ca73338a0fcd3ccee1d8fa3b80374c30d6471d6d658",
-        "reason": "Native parola config aracı ve assertion gözden geçirildi; reauthentication mevcut parola kontrolüyle birlikte açık tutulur."
+        "fingerprint": "8c43aa0f9b469570009c64f527ebb2e799857360ba870ecad4e41c2a89a789ef",
+        "reason": "PR94 per_worker politikası ve PR99 native Auth ayarları birlikte incelendi; istek başına kimlik ve oturum kontrolleri korunur."
       }
     },
     {
@@ -335,8 +335,8 @@
         "account_signup_request_v1"
       ],
       "review": {
-        "fingerprint": "fc0a4987eba6e6564e550cc9b6a3a62460d8f32dcaf997d9b7e80b0bdf894221",
-        "reason": "İki native parola kontrolü birlikte açık: mevcut oturum yaşı, nonce gönderimi/doğrulaması, native hata kodları, recovery ve ilk parola sınırları; gerçek SMTP kabul kaynağı gözden geçirildi."
+        "fingerprint": "5ff4704ad34464bfd0f10b42c79640d49799f59aff216bc877c2eb2ab8f5b748",
+        "reason": "Birleşik config incelendi: per_worker kullanımı current_password, 24 saat/nonce, bildirim ve recovery sözleşmesini değiştirmez."
       }
     },
     {

@@ -6,6 +6,8 @@ import { v7 } from "uuid";
 import type { AccountView, SettingsImageUpload } from "@ftksaas/api-contracts";
 import { Button } from "@ftksaas/ui/components/button";
 import { Input } from "@ftksaas/ui/components/input";
+import { AccountField } from "./account-field";
+import { normalizePhone } from "../../lib/phone";
 import { Label } from "@ftksaas/ui/components/label";
 import { accountCall, imageUpload } from "../../lib/account";
 import { CommandFeedback, useAccountCommand } from "./account-command";
@@ -25,6 +27,7 @@ export function ProfileForm({
   const [image, setImage] = useState("");
   const [imageError, setImageError] = useState(false);
   const [reading, setReading] = useState(false);
+  const [phoneError, setPhoneError] = useState("");
   useEffect(() => {
     let active = true;
     if (account.photo)
@@ -41,7 +44,16 @@ export function ProfileForm({
   }, [account.photo]);
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    const data = new FormData(event.currentTarget);
+    const form = event.currentTarget;
+    const data = new FormData(form);
+    const input = String(data.get("unverified_phone") ?? "").trim();
+    const phone = input ? normalizePhone(input) : null;
+    if (account.identity && phone === undefined) {
+      setPhoneError(t("fieldPhone"));
+      form.querySelector<HTMLInputElement>('[name="unverified_phone"]')?.focus();
+      return;
+    }
+    setPhoneError("");
     await command.run({
       operation: "account_profile_update_v1",
       input: {
@@ -52,7 +64,7 @@ export function ProfileForm({
           ? {
               given_name: String(data.get("given_name")).trim() || null,
               family_name: String(data.get("family_name")).trim() || null,
-              unverified_phone: String(data.get("unverified_phone")).trim() || null,
+              unverified_phone: phone,
             }
           : {}),
         ...(photo !== undefined ? { photo } : {}),
@@ -64,7 +76,6 @@ export function ProfileForm({
       <h2 id="profile-heading" className="text-xl font-semibold">
         {t("profile")}
       </h2>
-      <p className="text-sm text-muted-foreground">{t("profileHint")}</p>
       {image && (
         <Image
           unoptimized
@@ -75,15 +86,14 @@ export function ProfileForm({
           className="size-20 rounded-full object-cover"
         />
       )}
-      {imageError && <p role="alert">{t("imageInvalid")}</p>}
       <form onSubmit={submit} className="space-y-5">
         <fieldset disabled={command.busy || !!command.pending || reading} className="space-y-5">
           {(["display_name", "given_name", "family_name", "unverified_phone"] as const)
             .filter((name) => name === "display_name" || !!account.identity)
             .map((name) => (
               <div key={name} className="space-y-2">
-                <Label htmlFor={name}>{t(name)}</Label>
-                <Input
+                <AccountField
+                  label={t(name)}
                   id={name}
                   name={name}
                   defaultValue={
@@ -91,9 +101,12 @@ export function ProfileForm({
                       ? account.display_name
                       : (account.identity?.[name] ?? "")
                   }
+                  placeholder={name === "unverified_phone" ? "05xx xxx xx xx" : t(name)}
+                  type={name === "unverified_phone" ? "tel" : "text"}
+                  error={name === "unverified_phone" ? phoneError : undefined}
+                  onChange={name === "unverified_phone" ? () => setPhoneError("") : undefined}
                   required={name === "display_name"}
-                  maxLength={name === "unverified_phone" ? 16 : 100}
-                  pattern={name === "unverified_phone" ? "\\+[1-9][0-9]{7,14}" : undefined}
+                  maxLength={name === "unverified_phone" ? undefined : 100}
                   autoComplete={
                     name === "given_name"
                       ? "given-name"
@@ -111,6 +124,8 @@ export function ProfileForm({
             <Input
               id="photo"
               type="file"
+              aria-invalid={imageError}
+              aria-describedby={imageError ? "photo-error" : undefined}
               accept="image/png,image/jpeg,image/webp"
               onChange={async (event) => {
                 const file = event.target.files?.[0];
@@ -127,7 +142,11 @@ export function ProfileForm({
                 }
               }}
             />
-            <p className="text-xs text-muted-foreground">{t("photoHint")}</p>
+            {imageError && (
+              <p id="photo-error" role="alert" className="text-xs text-destructive">
+                {t("imageInvalid")}
+              </p>
+            )}
             {photo !== undefined && (
               <output className="block" aria-live="polite">
                 {t(photo === null ? "photoRemoval" : "photoSelected")}

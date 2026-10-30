@@ -16,6 +16,7 @@ import { AccountDelete } from "./account-delete";
 
 export function AccountWorkspace({ authUserId }: { authUserId: string }) {
   const t = useTranslations("account");
+  const common = useTranslations("common");
   const router = useRouter();
   const [profile, setProfile] = useState<Awaited<ReturnType<typeof accountProfile>> | null>(null);
   const [error, setError] = useState("");
@@ -63,15 +64,15 @@ export function AccountWorkspace({ authUserId }: { authUserId: string }) {
       </header>
       <div className="space-y-3">
         <h1 className="text-3xl font-semibold tracking-tight">{t("title")}</h1>
-        <p className="text-muted-foreground">{t("description")}</p>
       </div>
-      <Link href="/account/deletion" className="inline-block text-sm underline">
-        {t("deletionProgress")}
-      </Link>
-      <Button type="button" variant="outline" onClick={saved}>
-        {t("refresh")}
-      </Button>
-      {error && <p role="alert">{t(error)}</p>}
+      {error && (
+        <div className="space-y-3">
+          <p role="alert">{t(error)}</p>
+          <Button type="button" variant="outline" onClick={saved}>
+            {common("retry")}
+          </Button>
+        </div>
+      )}
       {!profile && !error && (
         <output className="block" aria-live="polite">
           {t("loading")}
