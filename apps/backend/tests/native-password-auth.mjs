@@ -15,27 +15,42 @@ export function findNativeAuth(status){
  if(process.platform!=='linux')throw Error('LINUX_NATIVE_AUTH_ACCEPTANCE_REQUIRED');
  const target=dbAddress(status.env.DB_URL),smtp=status.endpoints?.['mail.smtp'];
  if(!smtp||!loopback(smtp.address))throw Error('LOCAL_SMTP_REQUIRED');
- const matches=[];
+ const matches=[],rejected={executable_unreadable:0,auth_executables:0,environment_unreadable:0,invalid_db:0,database_mismatch:0,api_host:0,smtp_host:0,smtp_port:0,api_port:0};
  for(const entry of fs.readdirSync('/proc')){
   if(!/^\d+$/.test(entry))continue;
+  let executable;
+  try{executable=fs.readlinkSync('/proc/'+entry+'/exe');}catch{rejected.executable_unreadable++;continue;}
   try{
-   const executable=fs.readlinkSync('/proc/'+entry+'/exe');
    if(!['auth','gotrue'].includes(path.basename(executable)))continue;
+   rejected.auth_executables++;
    const env=Object.fromEntries(fs.readFileSync('/proc/'+entry+'/environ','utf8').split('\0').filter(Boolean).map(line=>{const i=line.indexOf('=');return [line.slice(0,i),line.slice(i+1)];}));
-   if(dbAddress(env.GOTRUE_DB_DATABASE_URL)!==target||!loopback(env.GOTRUE_API_HOST)||!loopback(env.GOTRUE_SMTP_HOST)||Number(env.GOTRUE_SMTP_PORT)!==smtp.port)continue;
+   let address;try{address=dbAddress(env.GOTRUE_DB_DATABASE_URL);}catch{rejected.invalid_db++;continue;}
+   if(address!==target){rejected.database_mismatch++;continue;}
+   if(!loopback(env.GOTRUE_API_HOST)){rejected.api_host++;continue;}
+   if(!loopback(env.GOTRUE_SMTP_HOST)){rejected.smtp_host++;continue;}
+   if(Number(env.GOTRUE_SMTP_PORT)!==smtp.port){rejected.smtp_port++;continue;}
    // status auth.http is the shared API proxy; native Auth binds a separately
    // reserved private port (CLI ProcessRecipe.reserveEndpoints). DB + SMTP
    // still identify this exact local stack; never match the public API port.
    const port=Number(env.GOTRUE_API_PORT);
-   if(!Number.isInteger(port)||port<1||port>65535)continue;
+   if(!Number.isInteger(port)||port<1||port>65535){rejected.api_port++;continue;}
    matches.push({executable,env});
-  }catch{/* Unrelated, inaccessible or already exited processes are not candidates. */}
+  }catch{rejected.environment_unreadable++;}
  }
- if(matches.length!==1)throw Error('EXACT_LOCAL_NATIVE_AUTH_PROCESS_REQUIRED');
+ if(matches.length!==1)throw Error('EXACT_LOCAL_NATIVE_AUTH_PROCESS_REQUIRED '+JSON.stringify({...rejected,matches:matches.length}));
  return matches[0];
 }
+export async function readyNativeAuth(status,fetcher=fetch){
+ const url=new URL(status.env.API_URL);
+ if(url.protocol!=='http:'||!loopback(url.hostname)||url.username||url.password||url.pathname!=='/'||url.search||url.hash)throw Error('LOCAL_AUTH_API_REQUIRED');
+ // A status read does not wake a lazy CLI service. Establish this fixture's
+ // own readiness before inspecting /proc; no password or email is involved.
+ const response=await fetcher(url.origin+'/auth/v1/health',{headers:{apikey:status.env.ANON_KEY},redirect:'error',signal:AbortSignal.timeout(15000)});
+ if(!response.ok){await response.body?.cancel();throw Error('NATIVE_AUTH_HEALTH_HTTP_'+response.status);}
+ await response.arrayBuffer();return findNativeAuth(status);
+}
 export async function startPasswordAuth(t,status){
- const original=findNativeAuth(status);
+ const original=await readyNativeAuth(status);
  const directory=fs.mkdtempSync(path.resolve('.dev/password-auth-'));fs.chmodSync(directory,0o700);
  const log=fs.openSync(path.join(directory,'auth.log'),'w',0o600);
  const template=createServer((req,res)=>{if(req.url!=='/password-notification'){res.writeHead(404);res.end();return;}res.writeHead(200,{'content-type':'text/html; charset=utf-8'});res.end(passwordNotification);});

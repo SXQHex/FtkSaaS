@@ -255,7 +255,7 @@
       ],
       "review": {
         "fingerprint": "8c43aa0f9b469570009c64f527ebb2e799857360ba870ecad4e41c2a89a789ef",
-        "reason": "Native Auth discovery regresyon testi incelendi; public proxy/iç port farkı düzeltmesi, exact DB/SMTP ve tek süreç reddi korunur."
+        "reason": "Auth fixture readiness ve yalnız sayısal süreç eleme tanısı incelendi; exact DB/SMTP ve tek aday koşulları korunur, gerçek CI kök nedeni açık kalır."
       }
     },
     {
@@ -335,8 +335,8 @@
         "account_signup_request_v1"
       ],
       "review": {
-        "fingerprint": "79b5f3261efa175a8b944fb50583cc99c991b9ac16684d69d14840c3eea501c9",
-        "reason": "CLI 2.122 ProcessRecipe/Auth kaynakları ve gerçek proc fixture incelendi; auth.http public proxy portudur, native Auth iç portu ayrı ayrılır."
+        "fingerprint": "56466278ea03bb532460f632c3c907c919ccfbb94576730ec6e9ccb12b5d8d92",
+        "reason": "Pinned CLI lazy Auth yaşam döngüsü, loopback health hazırlığı ve HTTP/proc regresyonu incelendi; native parola assertionları korunur, hata sayaçları secret içermez."
       }
     },
     {
