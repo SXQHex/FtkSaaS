@@ -1,6 +1,6 @@
 # Frontend geliştirme
 
-Kapsam yalnız FtkSaaS'tır. Web uygulaması apps/web, ortak arayüz packages/ui sahibindedir. Kök [AGENTS](../../AGENTS.md), [istemci protokolü](../../docs/claude-handover.md) ve [API sözleşme paketi](../../packages/api-contracts/README.md) önceliklidir. Güncel kabul [00 devirde](../../docs/contracts/00-FtkSaaS-yeni-sohbet-devir.md), açık iş [tek backlog'dadır](../../docs/remaining-work.md).
+Kapsam yalnız FtkSaaS'tır. Web uygulaması apps/web, ortak arayüz packages/ui sahibindedir. Kök [AGENTS](../../AGENTS.md), [istemci protokolü](../../docs/claude-handover.md) ve [API sözleşme paketi](../../packages/api-contracts/README.md) önceliklidir. Güncel kabul [00 devirde](../../docs/contracts/00-FtkSaaS-yeni-sohbet-devir.md), proje açık işi [tek backlog'da](../../docs/remaining-work.md), bölüm bölüm frontend uygulama planı [todo.md](todo.md) içindedir.
 
 ## Bileşen ve araç kuralları
 
@@ -103,7 +103,7 @@ Kullanıcının yüklediği `frontend-design` becerisi bu dilimde uygulanır. Ka
 
 Syncfusion yalnız çizelge seçildiğinde dinamik yüklenir. `NEXT_PUBLIC_SYNCFUSION_LICENSE_KEY`, kurulu35.x sürümüne uygun onaylı Community License anahtarıyla build ortamında tanımlanır; Turbo build girdisidir. Anahtar yokken lisanssız Scheduler başlatılmaz, aynı gerçek verinin liste görünümü kullanılır. Liste/gün/hafta işlevi lisans anahtarı gerektirmez. Anahtar değerini kaynak/PR/log’a yazma. İlk adaptör salt okunurdur; sürükle-bırak, resize ve dahili editör kapalıdır. Seans seçimi bizim detay panelimize gider. Lisans kaydı: [Community License](https://www.syncfusion.com/products/communitylicense); uygulama kaynakları [Scheduler](https://ej2.syncfusion.com/react/documentation/schedule/getting-started), [yerelleştirme](https://ej2.syncfusion.com/react/documentation/schedule/localization) ve [saat dilimi](https://ej2.syncfusion.com/react/documentation/schedule/timezone). Üçüncü taraf paketler kendi lisans bildirimlerini korur.
 
-Starter’ın tam ekran/işlem kapsamı ve açık kabul koşulları [tek backlog’daki matriste](../../docs/remaining-work.md#web-01--starter-frontend-tamamlama-matrisi) tutulur. Bu dosyada ikinci bir tamamlanma listesi üretilmez.
+Starter’ın ekran/işlem ayrıntıları ve bölüm kabul ölçütleri [frontend yol haritasında](todo.md) tutulur. Bir bölüm bitmeden sonraki bölüme geçilmez; bu README ikinci bir görev listesi içermez.
 
 
 ## Doğrudan seans bağlantısı
