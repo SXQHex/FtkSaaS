@@ -6,8 +6,28 @@ Bu dosya alanlar arası talep ve teslim kabulünün tek kaydıdır. Sohbet devri
 
 | Kimlik | Talep eden | Karşılayan | Talep ve sözleşme/WF/API kaynağı | Kabul ölçütü | Talep durumu | Onay ve teslim kanıtı |
 |---|---|---|---|---|---|---|
+| XREQ-001 | Kullanıcı; frontend kayıt akışı ihtiyacı | Backend | [WF01 native kayıt](workflows.md#wf01) için ana hesap e-postası veya bağlı Google kimliği e-postası zaten mevcutsa frontend'in ayırt edebileceği açık bir “hesap mevcut” sonucu. [Talep ayrıntısı ve dört kabul senaryosu](#xreq-001-kayıtta-mevcut-hesap-bildirimi). | Mevcut ana adres, farklı adresli bağlı Google kimliği, doğrulanmamış kayıt ve tamamen yeni adres gerçek Auth akışında doğrulanır; mevcut kayıtta yeni hesap ve doğrulama e-postası oluşmaz. | Değerlendirmede | Kullanıcının 30 Ekim 2026 ürün kararı: adresin kayıtlı olduğunu açıklamak bilinçli tercihtir; ilişkili hesap/ana e-posta/rol açıklanmaz. Backend teknik değerlendirmesi, uygulama, kaynak/test kanıtı ve frontend teslim kabulü bekliyor. |
 
-Başlangıçta kayıt yoktur. Alanların kendi planlarındaki bağımlılık gözlemleri otomatik olarak talep, onay veya işe başlama yetkisi sayılmaz; somut talep bu tabloya kaydedildiğinde `XREQ-001` biçiminde sabit bir kimlik alır.
+Alanların kendi planlarındaki bağımlılık gözlemleri otomatik olarak talep, onay veya işe başlama yetkisi sayılmaz; somut talep bu tabloya kaydedildiğinde `XREQ-001` biçiminde sabit bir kimlik alır.
+
+## XREQ-001 kayıtta mevcut hesap bildirimi
+
+**İstenen davranış:** Kayıtta kullanılan e-posta, ana hesap e-postası veya bağlı Google kimliği üzerinden zaten mevcutsa frontend'e açık, makinece ayırt edilebilir bir “hesap mevcut” sonucu dönülsün. Yeni hesap oluşturulmasın, doğrulama e-postası gönderilmesin. Backend teknik değerlendirmesi sonuç/hata sözleşmesini ve native Auth ile uygulanacak yolu belirler; bu talep yeni bir endpoint veya hata kodu tanımlamaz.
+
+Frontend'in göstereceği mesaj:
+
+> Bu e-posta adresiyle ilişkili bir hesap zaten var. Giriş yapın, Google ile devam edin veya parolanızı yenileyin.
+
+**Kullanıcının açık ürün kararı:** Adresin kayıtlı olduğunu açıklamak bilinçli tercihtir. Hangi hesaba bağlı olduğu, ana e-posta ve rol bilgileri anonim kullanıcıya açıklanmaz. Genel yönlendirme metni o hesabın hangi giriş yöntemini kullandığını ifşa etmez. Mevcut hesabın varlığı, oturum veya e-posta sahipliği doğrulaması sayılmaz.
+
+| Kabul senaryosu | Beklenen sonuç |
+|---|---|
+| Mevcut ana hesap e-postasıyla kayıt | “Hesap mevcut” sonucu; yeni hesap ve doğrulama e-postası yok. |
+| Ana e-postadan farklı adres taşıyan bağlı Google kimliğiyle kayıt | Google kimliğinin e-postası da mevcut kabul edilir; aynı genel sonuç döner. Ana hesap adresi, hesap bağlantısı ve rol bilgileri açıklanmaz; yeni hesap ve doğrulama e-postası yok. |
+| Daha önce oluşturulmuş, doğrulanmamış kayıtla tekrar kayıt | “Hesap mevcut” sonucu; ikinci hesap veya kayıt denemesi nedeniyle yeni doğrulama e-postası yok. Bu talep ayrı doğrulama yeniden gönderme akışını değiştirmez. |
+| Tamamen yeni adresle kayıt | Mevcut native kayıt ve e-posta doğrulama akışı çalışır; yanlış “hesap mevcut” sonucu üretilmez. |
+
+**Teslim kabulü:** Dört senaryoda yanıt, Auth hesap/kimlik durumu ve e-posta gönderim etkisi birlikte doğrulanır; yalnız HTTP 200, UI metni veya mock testi yeterli değildir. Uygulama tesliminde backend ilgili ortak sözleşmeyi ve kendi iş/devrini; frontend kendi tüketicisini ve kabulünü yetkili kapsamlarında günceller. Bu kayıt teknik kabul veya tamamlanmış uygulama kanıtı değildir.
 
 ## Alan sahipliği ve onay
 
