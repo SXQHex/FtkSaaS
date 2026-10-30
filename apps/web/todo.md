@@ -300,7 +300,7 @@ Her modülün “bitti” ölçütü kendi aşağıdaki kabul senaryosu **ve** b
 
 ## 7. Bölüm bölüm teslim: tek aktif bölüm
 
-Kullanıcının son kararı: **Bir bölüm bitmeden sonraki bölümün uygulamasına geçilmez.** Frontend'in aktif bölümü ve sırası bu bölümde tutulur. **Aktif bölüm: öğrenci yönetimini tamamlama ve gerçek kabul.** Aşağıdaki liste bağımlılık sırasını gösterir. Aynı anda birden çok yarım bölüm veya yeni modül dalı açılmaz.
+Kullanıcının son kararı: **Bir bölüm bitmeden sonraki bölümün uygulamasına geçilmez.** Frontend'in aktif bölümü ve sırası bu bölümde tutulur. **Aktif bölüm: WEB-S02 — stüdyo kurulumu ve işletme erişimi.** Kullanıcının 30 Ekim açık istisna kararıyla S01, backend PR kabulü sürerken [Draft PR #92](https://github.com/SXQHex/FtkSaaS/pull/92) içinde geçici olarak bekletilir; tamamlanmış sayılmaz. S02 güncel main tabanlı ayrı Draft PR/dalda ilerler ve S01 kodunu içermez. Aşağıdaki liste bağımlılık sırasını gösterir. Bu açık istisna dışında aynı anda birden çok bölüm uygulanmaz; S01 dalında bu sırada çalışma yapılmaz.
 
 S01–S13 işlev kapsamını izler. Teslim bölümleri ise kullanıcının baştan sona kullanabildiği akışlardır: örneğin davet kabulü öğrenci bölümünde, satışın zorunlu belge adımı satış bölümünde çalışır. Ortak bir bağımlılık önce kullanılacağı bölümün içinde tamamlanır ve daha sonra yeniden yazılmaz. Bölümün kabulü ileride yazılacak bir ekrana bağlanmaz: gerektiğinde yetkilendirilmiş mevcut kayıt kullanılır; yeni ekranlar arasındaki uçtan uca bağlantı, bağlantıyı kullanan sonraki bölümün açık kabul maddesidir. Gerekli gerçek kayıt/okuma yoksa bölüm engelli kalır, mock ile kapanmaz. Başka bir bölüme ait henüz yapılmamış işlem, mevcut bölümde çalışıyormuş gibi düğme/özet olarak sunulmaz.
 
@@ -384,3 +384,33 @@ Bu eşleme bütün Starter özelliklerinin bir teslim sahibine sahip olmasını 
 | FD01–FD12 Starter tüketicileri | S12 ve ilgili iş modülleri |
 
 Kapsam dışı feature'ların tam listesi bölüm 2'dedir. Yeni karar veya backend yetkisi bu eşlemeyi değiştirirse ilgili modül planı aynı değişiklikte güncellenir.
+
+
+## 11. WEB-S02 çalışma kaydı — 30 Ekim 2026
+
+Kullanıcı, backend PR kabulü devam ettiği için S01'i geçici olarak bekletip S02'nin ayrı bir Draft PR'de ilerlemesini istedi. S01 kaynağı `925ed06426cb51393ef506c09204720c2e568172` / [PR92](https://github.com/SXQHex/FtkSaaS/pull/92) korunur; bu dal değiştirilmedi, birleştirilmedi veya S02'ye taşınmadı. S02 dalı `feat/web-s02-studio-setup`, başlangıç main `5455ba824868e30adac131993608e81477a3b461`'dir. Backend kabul koşuları ve ortamına müdahale edilmedi. Bu istisna S01/S04 veya S02 kabulünü kapatmaz.
+
+### Uygulanan ilk S02 dilimi
+
+- Canlı Stüdyo bölümü organizasyonu gerçek kaynaktan yeniden okur; merkezleri, organizasyon sürümünü ve erişim modunu ayrı bağlamda yönetir. Organizasyonu olmayan hesap için platform açılışı gerekliliği gösterilir; otomatik organizasyon/owner oluşturulmaz.
+- Normal erişimde organizasyon adı; bootstrap/normal erişimde merkez oluşturma ve seçili merkezin adı/saat dilimi gerçek DTO ile bağlanır. Güncel organizasyon/merkez sürümü kendi okumasından gelir; oluşturma isteğine sürüm uydurulmaz. Grace/closed durumda yapılandırma formları açılmaz.
+- Plan/limit/kullanım `subscription_get_v1` üzerinden, liste satırı veya sabit sayaçtan hesaplanmadan gösterilir. Plan okuma hatası diğer izinli okumaları sahte boş veriye dönüştürmez. Oda kullanımının gerçekten sıfır olduğu okunursa erişilebilir merkezde ilk oda fiziksel kapasiteyle oluşturulabilir. Mevcut odayı adı/ID'si uydurularak düzenleme yoktur.
+- Disiplin kataloğu tüm cursor sayfalarıyla okunur; yeni disiplin ve mevcut disiplinin adı/aktifliği gerçek sürümle yönetilir. Merkez–disiplin bağlantısının durumu bilinmiyorken bağlandı veya hazır sayılmaz.
+- Kendi merkez yöneticiliğini üstlenme ayrı kullanıcı eylemidir. Organizasyon sahipliğinden CM yetkisi türetilmez. Eğitmen/CM atamaları gerçek scope/sürümle listelenir; kişi adları ayrı yetkili okumadan alınır, kişi seçimi gerçek ad araması/cursor sayfasından yapılır. Eğitmen atama ve gerekçeli kaldırma; CM için ayrı atama/kaldırma komutları kullanılır. Personel izin matrisi açılmaz; Starter kotasını backend denetler.
+- Aktif eğitmenin haftalık uygunluğu yalnız çalışan `management_state_get_v1(operation:availability_save_v1)` selector'ıyla kaynak/cursor/sürüm bağında okunur. Oluşturma veya mevcut rule/entity sürümüyle düzenleme bağlanır. Gece aşımı otomatik kaydırılmaz; 24:00 ve sonraki gün 00:00 sınırında ayrı kurallar gerekir. DST/gerçek UTC aralığı program önizlemesinin yetkisinde kalır.
+- Bütün yazmalar hesap/organizasyon/merkez/işlem alanında aynı payload/key ile izlenir. Storage başarısızken yeni komut gönderilmez; kayıp yanıt, NOT_FOUND ve sonraki yetki kaybı belirsizliği temizlemez. Result expiry veya payload mismatch replay'i bloke eder. Organizasyon değişiminde eski isteğin geç yanıtı atılır.
+
+### Açık bağımlılıklar ve S02'nin kalan işi
+
+| Konu | Somut sınır | Kapanış kanıtı |
+|---|---|---|
+| B01 oda kataloğu | Güncel main'de desteklenen oda liste/detay/sürüm okuması yoktur. room_save komutu bir katalog okuması değildir. | Gerçek tenant/merkez/yetki ve sürüm içeren okuma; mevcut odayı yeniden açma/düzenleme, oda uygunluğu ve kurulum doğrulaması. |
+| Merkez–disiplin bağlantısı | disciplines_list yalnız disiplin varlığı/version döndürür; merkezin bağlantı durumu ve ilişki sürümü değildir. | Desteklenen ilişki okuması → gerçek center_discipline_set komutu → yeniden okuma. Eksik sürümle mevcut ilişki yazılmaz. |
+| Uygunluk istisnaları | Haftalık rule okuması gerçek; availability_exception_save için gerekli mevcut exception/resource sürümü okuması doğrulanmış değildir. | Kendi desteklenen okuması ve gerçek version semantiği → istisna komutu → güncel sonuç. |
+| Gereken S12 ayar/politika tüketimi | Bu dilim politika yayını veya işletim defaultlarının tamamını tüketmez. Kayıtlı haftalık uygunluk veya merkez saat dilimi tüm politikalar hazır demek değildir. | Gerekli typed ayar, default/miras ve gerçek davranış etkisi; rezervasyon varsa gereken impact/ack zinciri. |
+| B06 yetki/kapanış | UI'nın bir kaydı okuyabilmesi bütün yazma yetkilerini kanıtlamaz. Backend her çağrıda rol/planı tekrar değerlendirir; eksik capability projeksiyonu tahmin edilmez. | Gerçek owner/CM/eğitmen/öğrenci, yanlış org/merkez, ikinci aktif kaynak ve stale version kabulü. |
+| Hosted/tarayıcı kabulü | Bu oturumda güvenli ortamdan gerçek kabul hesabı sağlanmadı; gerçek backend verisine yazılmadı. | Gerçek kullanıcıyla kurulum yolculuğu ve S02 form erişilebilirliği; aynı aday CI ve ilgili development sonucu. |
+
+Yerel `pnpm check:frontend` lint/format/typecheck/build, 95 web + 1 UI testini geçti. Yeni S02 testleri sürüm/kayıp yanıt/remount, açık timezone seçimi, storage blokajı, bootstrap sınırı, okunamayan kota, eski organizasyon yanıtı, kural/rol entity sürümü ve desteklenen availability selector/cursor'ını kapsar. Coverage komutu ve Turbo task isolation başarılı; backend testi çalıştırılmadı. Ayrı S02 kaynak/portunda resmi Chromium Headless Shell141 ve Git dışı executable seçimiyle mevcut 18/18 Playwright/axe/TR/EN/320px/%200 regresyonu geçti. Bu koşu yeni korumalı S02 formlarının gerçek hesap kabulü değildir; dört tarayıcılı uzak CI ayrıca gerekir.
+
+S02 **tamamlandı veya stüdyo program oluşturmaya hazır** sayılmaz. Kalan işler aynı Draft PR'de ilerler. Başka bölüm başlatılmadı; S01 beklemededir. Bu çalışma yalnız apps/web dosyalarını değiştirir; backend, ortak sözleşme, migration, CI, /docs ve S01 Auth dosyalarına dokunmaz.

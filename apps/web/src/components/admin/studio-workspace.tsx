@@ -4,13 +4,13 @@ import { useEffect, useState, useSyncExternalStore } from "react";
 import { useRouter } from "next/navigation";
 import { useTheme } from "next-themes";
 import { useTranslations } from "next-intl";
-import { ArrowUpRight, Building2, CalendarDays, CreditCard, Layers3, Users } from "lucide-react";
+import { ArrowUpRight, CalendarDays, CreditCard, Layers3, Users } from "lucide-react";
 import type { AccountView, CenterView, OrganizationView } from "@ftksaas/api-contracts";
 import { Button } from "@ftksaas/ui/components/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@ftksaas/ui/components/card";
-import { Badge } from "@ftksaas/ui/components/badge";
 import { Alert, AlertDescription } from "@ftksaas/ui/components/alert";
 import { ScheduleWorkspace } from "../calendar/schedule-workspace";
+import { StudioSetup } from "../setup/studio-setup";
 import { StudentsWorkspace } from "../students/students-workspace";
 import { Preferences } from "../preferences";
 import { AdminShell, sections, type AdminSection } from "./admin-shell";
@@ -136,45 +136,6 @@ export function StudioWorkspace() {
   function navigate(next: AdminSection) {
     window.location.assign(`#${next}`);
   }
-  const studioCards = snapshot && (
-    <div className="grid gap-4 md:grid-cols-2">
-      {snapshot.studios.map(({ organization, centers }) => (
-        <Card key={organization.id} className="shadow-none">
-          <CardHeader className="flex flex-wrap items-start justify-between gap-4">
-            <div className="flex items-center gap-3">
-              <Building2 className="size-5 text-muted-foreground" aria-hidden="true" />
-              <CardTitle className="text-base">
-                <h2>{organization.name}</h2>
-              </CardTitle>
-            </div>
-            <Badge variant="outline">{t(`access.${organization.access_mode}`)}</Badge>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            {centers.length ? (
-              centers.map((center) => (
-                <div key={center.id} className="rounded-xl border bg-muted/30 p-4">
-                  <h3 className="text-sm font-medium">{center.name}</h3>
-                  <p className="mt-1 text-xs text-muted-foreground">
-                    {t("timezone", { timezone: center.timezone })}
-                  </p>
-                </div>
-              ))
-            ) : (
-              <p className="text-sm leading-6 text-muted-foreground">
-                {t(
-                  organization.access_mode === "closed"
-                    ? "closedHelp"
-                    : organization.access_mode === "bootstrap"
-                      ? "bootstrapHelp"
-                      : "noCenters",
-                )}
-              </p>
-            )}
-          </CardContent>
-        </Card>
-      ))}
-    </div>
-  );
   return (
     <AdminShell
       section={section}
@@ -275,16 +236,13 @@ export function StudioWorkspace() {
           </div>
         </div>
       )}
-      {snapshot &&
-        section === "studio" &&
-        (snapshot.studios.length ? (
-          studioCards
-        ) : (
-          <Card className="p-6 shadow-none">
-            <h2 className="font-medium">{t("noStudio")}</h2>
-            <p className="mt-2 text-sm leading-6 text-muted-foreground">{t("noStudioHelp")}</p>
-          </Card>
-        ))}
+      {snapshot && section === "studio" && (
+        <StudioSetup
+          actorId={snapshot.account.id}
+          organizations={snapshot.studios.map(({ organization }) => organization)}
+          onChanged={() => setRetry((n) => n + 1)}
+        />
+      )}
       {snapshot && section === "settings" && (
         <div className="grid gap-6 lg:grid-cols-2">
           <Card className="shadow-none">
