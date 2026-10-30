@@ -3,15 +3,21 @@ import { http, HttpResponse } from "msw";
 import { server } from "./mocks/server";
 import { accountCall, accountProfile, freshAccountProof, imageUpload } from "../src/lib/account";
 const mocks = vi.hoisted(() => ({
-  user: vi.fn<() => Promise<{ error: Error | null; data: { user: { email: string } } }>>(),
+  user: vi.fn<
+    () => Promise<{ error: Error | null; data: { user: { email: string; id?: string } } }>
+  >(),
   signIn: vi.fn<(input: { email: string; password: string }) => Promise<{ error: Error | null }>>(),
   factors:
     vi.fn<
       () => Promise<{ error: Error | null; data: { totp: { id: string; status: string }[] } }>
     >(),
   verify: vi.fn<(input: { factorId: string; code: string }) => Promise<{ error: Error | null }>>(),
-  session:
-    vi.fn<() => Promise<{ error: Error | null; data: { session: { access_token: string } } }>>(),
+  session: vi.fn<
+    () => Promise<{
+      error: Error | null;
+      data: { session: { access_token: string; user?: { id: string } } };
+    }>
+  >(),
 }));
 vi.mock("../src/lib/supabase/client", () => ({
   browserClient: () => ({
@@ -146,4 +152,42 @@ test("photo validation rejects oversized or unsupported files before processing"
   await expect(
     imageUpload(new File([new Uint8Array(1048577)], "large.png", { type: "image/png" })),
   ).rejects.toThrow("imageInvalid");
+});
+
+test("deletion recovery verifies the server-selected native identity without requiring an active account projection", async () => {
+  let accountReads = 0;
+  mocks.user.mockResolvedValue({
+    error: null,
+    data: { user: { id: "native-user", email: "synthetic@example.invalid" } },
+  });
+  mocks.signIn.mockResolvedValue({ error: null });
+  mocks.factors.mockResolvedValue({ error: null, data: { totp: [] } });
+  mocks.session.mockResolvedValue({
+    error: null,
+    data: { session: { access_token: "fresh-native-proof", user: { id: "native-user" } } },
+  });
+  server.use(
+    http.post(`${base}/account_get_v1`, () => {
+      accountReads++;
+      return HttpResponse.json({
+        ok: false,
+        error: { code: "SESSION_REVOKED", retryable: false, trace_id: actor },
+      });
+    }),
+  );
+  expect(await freshAccountProof(actor, "synthetic-password", "", "native-user")).toBe(
+    "fresh-native-proof",
+  );
+  expect(accountReads).toBe(0);
+});
+
+test("deletion recovery refuses a different native user before attempting reauthentication", async () => {
+  mocks.user.mockResolvedValue({
+    error: null,
+    data: { user: { id: "other-native-user", email: "synthetic@example.invalid" } },
+  });
+  await expect(
+    freshAccountProof(actor, "synthetic-password", "", "expected-native-user"),
+  ).rejects.toThrow("AUTH_REQUIRED");
+  expect(mocks.signIn).not.toHaveBeenCalled();
 });

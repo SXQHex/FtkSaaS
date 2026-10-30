@@ -1,0 +1,277 @@
+{
+  "format": 1,
+  "documents": [
+    {
+      "path": "AGENTS.md",
+      "role": "authority",
+      "topics": [
+        "agent-policy"
+      ],
+      "purpose": "Alan, karar, kaynak seçimi ve işlem yetkisi"
+    },
+    {
+      "path": "README.md",
+      "role": "entry",
+      "topics": [
+        "project-entry"
+      ],
+      "purpose": "Proje başlangıcı"
+    },
+    {
+      "path": "apps/backend/AGENTS.md",
+      "role": "authority",
+      "topics": [
+        "backend-agent"
+      ],
+      "purpose": "Backend ajan çalışma yükümlülükleri"
+    },
+    {
+      "path": "apps/backend/README.md",
+      "role": "entry",
+      "topics": [
+        "backend-entry"
+      ],
+      "purpose": "Backend komut girişleri"
+    },
+    {
+      "path": "apps/backend/docs/00-FtkSaaS-yeni-sohbet-devir.md",
+      "role": "status",
+      "topics": [
+        "current-acceptance"
+      ],
+      "purpose": "Repo/backend kaynak, CI ve ortam kabul snapshot’ı"
+    },
+    {
+      "path": "apps/backend/docs/documentation-development.md",
+      "role": "guide",
+      "topics": [
+        "documentation-tooling"
+      ],
+      "purpose": "Belge üretim ve kaynak inceleme prosedürü"
+    },
+    {
+      "path": "apps/backend/docs/production-queue.md",
+      "role": "queue",
+      "topics": [
+        "active-order"
+      ],
+      "purpose": "Backend geliştirme sırası ve koordinasyon"
+    },
+    {
+      "path": "apps/backend/docs/remaining-work.md",
+      "role": "backlog",
+      "topics": [
+        "open-work"
+      ],
+      "purpose": "Backend açık işleri ve alanlar arası bağımlılıkları"
+    },
+    {
+      "path": "apps/backend/docs/remote-backend-setup.md",
+      "role": "guide",
+      "topics": [
+        "backend-operations"
+      ],
+      "purpose": "Dağıtım, worker ve restore işletimi"
+    },
+    {
+      "path": "apps/web/AGENTS.md",
+      "role": "authority",
+      "topics": [
+        "frontend-agent"
+      ],
+      "purpose": "Frontend ajan çalışma yükümlülükleri"
+    },
+    {
+      "path": "apps/web/README.md",
+      "role": "entry",
+      "topics": [
+        "frontend-entry"
+      ],
+      "purpose": "Frontend başlangıcı"
+    },
+    {
+      "path": "apps/web/docs/development.md",
+      "role": "guide",
+      "topics": [
+        "frontend-development"
+      ],
+      "purpose": "Web geliştirme ve mevcut ekran davranışları"
+    },
+    {
+      "path": "apps/web/docs/handover.md",
+      "role": "status",
+      "purpose": "Frontend sohbet devri ve çalışma bağlamı",
+      "topics": [
+        "frontend-handover"
+      ]
+    },
+    {
+      "path": "apps/web/docs/todo.md",
+      "role": "backlog",
+      "purpose": "Frontend bölüm adımları, aktif bölüm, bağımlılık ve kabul",
+      "topics": [
+        "frontend-delivery-plan"
+      ]
+    },
+    {
+      "path": "docs/ci-policy.md",
+      "role": "authority",
+      "topics": [
+        "ci-acceptance-policy"
+      ],
+      "purpose": "Kaynak bağlı CI ve teslim kapıları"
+    },
+    {
+      "path": "docs/client-integration.md",
+      "role": "guide",
+      "topics": [
+        "client-protocol"
+      ],
+      "purpose": "Ortak istemci transport ve wire tüketimi"
+    },
+    {
+      "path": "docs/contracts/01-FtkSaaS-urun-kapsam-sozlesmesi.md",
+      "role": "authority",
+      "topics": [
+        "product-scope"
+      ],
+      "purpose": "Modül ve plan erişimi"
+    },
+    {
+      "path": "docs/contracts/02-FtkSaaS-teknik-sozlesme.md",
+      "role": "authority",
+      "topics": [
+        "domain-decisions"
+      ],
+      "purpose": "Yürürlükteki domain ve ayar kararları"
+    },
+    {
+      "path": "docs/contracts/04-FtkSaaS-O4-veri-semasi.md",
+      "role": "generated",
+      "topics": [
+        "domain-schema-view"
+      ],
+      "purpose": "Makine sözleşmesinden domain tablo görünümü"
+    },
+    {
+      "path": "docs/contracts/05-FtkSaaS-O4-API-katalogu.md",
+      "role": "generated",
+      "topics": [
+        "api-contract-view"
+      ],
+      "purpose": "Makine sözleşmesinden DTO ve operasyon görünümü"
+    },
+    {
+      "path": "docs/contracts/06-FtkSaaS-O4-durum-hata-izin.md",
+      "role": "guide",
+      "topics": [
+        "state-error-permission"
+      ],
+      "purpose": "Wire durum, hata ve izin açıklamaları"
+    },
+    {
+      "path": "docs/database.md",
+      "role": "generated",
+      "topics": [
+        "migration-inventory"
+      ],
+      "purpose": "Migration kaynağı ve içerik hash’leri"
+    },
+    {
+      "path": "docs/decisions/P08-accepted-scope.md",
+      "role": "authority",
+      "topics": [
+        "p08-product-scope"
+      ],
+      "purpose": "P08 kabulü ve açık ürün tercihleri"
+    },
+    {
+      "path": "docs/documentation-map.md",
+      "role": "generated",
+      "topics": [
+        "documentation-map"
+      ],
+      "purpose": "Makine sahiplik envanterinin görünümü"
+    },
+    {
+      "path": "docs/feature-delivery.md",
+      "role": "generated",
+      "topics": [
+        "feature-api-coverage"
+      ],
+      "purpose": "F01–F33 kaynak/API ve gerçek test referansları"
+    },
+    {
+      "path": "docs/functions.md",
+      "role": "generated",
+      "topics": [
+        "api-workflow-map"
+      ],
+      "purpose": "Her API’nin birincil WF sahibi"
+    },
+    {
+      "path": "docs/monorepo.md",
+      "role": "guide",
+      "topics": [
+        "workspace-architecture"
+      ],
+      "purpose": "Repo, paket ve ortam yerleşimi"
+    },
+    {
+      "path": "docs/physical-invariants.md",
+      "role": "guide",
+      "topics": [
+        "physical-integrity-design"
+      ],
+      "purpose": "Transaction, kilit ve veri bütünlüğü tasarımı"
+    },
+    {
+      "path": "docs/requests.md",
+      "role": "coordination",
+      "purpose": "Backend/frontend alanlar arası talep, onay ve teslim kabulü",
+      "topics": [
+        "cross-area-requests"
+      ]
+    },
+    {
+      "path": "docs/security.md",
+      "role": "generated",
+      "topics": [
+        "security-source-inventory"
+      ],
+      "purpose": "Güvenlik DDL kaynak envanteri"
+    },
+    {
+      "path": "docs/settings.md",
+      "role": "guide",
+      "topics": [
+        "settings-consumers"
+      ],
+      "purpose": "Typed ayar ve native hesap tüketimi"
+    },
+    {
+      "path": "docs/source-index.md",
+      "role": "entry",
+      "topics": [
+        "source-routing"
+      ],
+      "purpose": "Başlangıç, konu seçimi ve arşiv sınırı"
+    },
+    {
+      "path": "docs/workflows.md",
+      "role": "guide",
+      "topics": [
+        "project-workflows"
+      ],
+      "purpose": "Kullanıcı amacından API sırasına ortak akışlar"
+    },
+    {
+      "path": "packages/api-contracts/README.md",
+      "role": "entry",
+      "topics": [
+        "contract-package-entry"
+      ],
+      "purpose": "Ortak sözleşme paketi kullanımı"
+    }
+  ]
+}

@@ -7,6 +7,8 @@ import { Button } from "@ftksaas/ui/components/button";
 import { Input } from "@ftksaas/ui/components/input";
 import { Label } from "@ftksaas/ui/components/label";
 import { browserClient } from "../../lib/supabase/client";
+import { AccountDelete } from "./account-delete";
+import { recoverAccountCommand } from "./account-command";
 import { accountCall, accountError } from "../../lib/account";
 
 export function DeletionProgress({ nativeUserId }: { nativeUserId: string }) {
@@ -14,6 +16,7 @@ export function DeletionProgress({ nativeUserId }: { nativeUserId: string }) {
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState("");
   const [job, setJob] = useState<JobStatusView | null>(null);
+  const [recoveryActor, setRecoveryActor] = useState<string | null>(null);
   const [accessible, setAccessible] = useState(true);
   const alive = useRef(true);
   useEffect(() => {
@@ -23,6 +26,7 @@ export function DeletionProgress({ nativeUserId }: { nativeUserId: string }) {
         alive.current = false;
         setAccessible(false);
         setJob(null);
+        setRecoveryActor(null);
         setMessage("AUTH_REQUIRED");
       }
     });
@@ -74,6 +78,57 @@ export function DeletionProgress({ nativeUserId }: { nativeUserId: string }) {
         <Input id="deletion-job" name="job" disabled={busy || !accessible} />
         <Button disabled={busy || !accessible}>{t("checkResult")}</Button>
       </form>
+      {accessible && (
+        <div className="space-y-4">
+          <Button
+            type="button"
+            variant="outline"
+            disabled={busy}
+            onClick={() => {
+              try {
+                const actor = sessionStorage.getItem(
+                  `ftksaas:account-deletion-recovery:${nativeUserId}`,
+                );
+                if (!actor) {
+                  setMessage("noPendingDeletion");
+                  return;
+                }
+                if (
+                  !/^[a-f0-9]{8}-[a-f0-9]{4}-7[a-f0-9]{3}-[89ab][a-f0-9]{3}-[a-f0-9]{12}$/i.test(
+                    actor,
+                  )
+                ) {
+                  setMessage("storageFailed");
+                  return;
+                }
+                const pending = recoverAccountCommand(actor, "delete");
+                if (pending === "invalid") {
+                  setMessage("storageFailed");
+                  return;
+                }
+                if (!pending || pending.command.operation !== "account_delete_apply_v1") {
+                  setMessage("noPendingDeletion");
+                  return;
+                }
+                setRecoveryActor(actor);
+                setMessage("");
+              } catch {
+                setMessage("storageFailed");
+              }
+            }}
+          >
+            {t("findPendingDeletion")}
+          </Button>
+          {recoveryActor && (
+            <AccountDelete
+              key={recoveryActor}
+              actorId={recoveryActor}
+              nativeUserId={nativeUserId}
+              recoveryOnly
+            />
+          )}
+        </div>
+      )}
       {job && (
         <section aria-label={t("deletionProgress")} className="space-y-3 border-t pt-5">
           <p>

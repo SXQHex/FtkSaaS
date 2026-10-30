@@ -749,6 +749,8 @@
       "storage": "Özel dosyalar",
       "exports": "Dışa aktarılan dosyalar",
       "backups": "Yedekler"
-    }
+    },
+    "findPendingDeletion": "Yanıtı kaybolan silme işlemini bul",
+    "noPendingDeletion": "Bu hesap için bu sekmede bekleyen silme işlemi yok."
   }
 }

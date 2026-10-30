@@ -137,6 +137,10 @@ export function useAccountCommand(
     let currentRevoked = false;
     try {
       // Save before sending. Proofs/passwords never enter the recovery record.
+      if (saved.command.operation === "account_delete_apply_v1") {
+        if (!nativeUserId) throw new Error("missingNativeIdentity");
+        sessionStorage.setItem(`ftksaas:account-deletion-recovery:${nativeUserId}`, actor);
+      }
       sessionStorage.setItem(key, JSON.stringify(saved));
       setPending(saved);
       const cmd = saved.command;
@@ -245,6 +249,17 @@ export function useAccountCommand(
         clear();
         setMessage("saved");
         onCommitted();
+        if (
+          pending.command.operation === "account_sessions_revoke_v1" &&
+          pending.command.input.mode === "current"
+        ) {
+          try {
+            const signedOut = await browserClient().auth.signOut({ scope: "local" });
+            if (signedOut.error) setMessage("SESSION_REVOKED");
+          } catch {
+            setMessage("SESSION_REVOKED");
+          }
+        }
       } else if (result.status === "failed_final") {
         clear();
         setMessage("failed");

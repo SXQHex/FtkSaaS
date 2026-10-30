@@ -6,6 +6,7 @@ import { AccountDelete } from "../src/components/account/account-delete";
 import { MfaManager } from "../src/components/account/mfa-manager";
 import { IdentityForm } from "../src/components/account/identity-form";
 import { InvitationAccept } from "../src/components/account/invitation-accept";
+import { SessionManager } from "../src/components/account/session-manager";
 import { DeletionProgress } from "../src/components/account/deletion-progress";
 import { ApiFailure } from "../src/lib/api";
 import type { Preview } from "@ftksaas/api-contracts";
@@ -199,4 +200,72 @@ test("a completed job with partial privacy work shows remaining backup scope wit
   );
   expect(screen.getByText("İmha talebinin durumu: Kısmen tamamlandı")).toBeVisible();
   expect(screen.getByText("Yedekler")).toBeVisible();
+});
+
+test("a lost deletion response can be resumed from tracking without opening a new preview or active profile", async () => {
+  sessionStorage.setItem("ftksaas:account-deletion-recovery:native-owner", actor);
+  const original = {
+    operation: "account_delete_apply_v1",
+    input: { operation_key: actor, preview: { id: actor, token: "synthetic-preview" } },
+  };
+  sessionStorage.setItem(`ftksaas:account:${actor}:delete`, JSON.stringify({ command: original }));
+  mocks.call.mockResolvedValue({ job_id: actor, state: "pending" });
+  const user = userEvent.setup();
+  render(<DeletionProgress nativeUserId="native-owner" />);
+  await user.click(screen.getByRole("button", { name: "Yanıtı kaybolan silme işlemini bul" }));
+  expect(screen.queryByRole("button", { name: "Silme etkilerini incele" })).not.toBeInTheDocument();
+  await user.click(screen.getByRole("checkbox"));
+  await user.click(screen.getByRole("button", { name: "Hesabı silme talebini onayla" }));
+  expect(await screen.findByText(/Silme talebi kabul edildi/)).toBeVisible();
+  expect(mocks.call).toHaveBeenCalledExactlyOnceWith(original.operation, {
+    ...original.input,
+    reauth: "synthetic-proof",
+  });
+  expect(sessionStorage.getItem("ftksaas:account-deletion-job:native-owner")).toBe(actor);
+});
+
+test("another native user's pending deletion is not offered as a recovery action", async () => {
+  sessionStorage.setItem("ftksaas:account-deletion-recovery:another-user", actor);
+  const user = userEvent.setup();
+  render(<DeletionProgress nativeUserId="native-owner" />);
+  await user.click(screen.getByRole("button", { name: "Yanıtı kaybolan silme işlemini bul" }));
+  expect(await screen.findByRole("status")).toHaveTextContent("bekleyen silme işlemi yok");
+  expect(screen.queryByRole("checkbox")).not.toBeInTheDocument();
+  expect(mocks.call).not.toHaveBeenCalled();
+});
+
+test("session dates use the stated device timezone instead of the provider's UTC default", async () => {
+  const original = Intl.DateTimeFormat.prototype.resolvedOptions;
+  const timezone = vi
+    .spyOn(Intl.DateTimeFormat.prototype, "resolvedOptions")
+    .mockImplementation(function (this: Intl.DateTimeFormat) {
+      return { ...original.call(this), timeZone: "Europe/Istanbul" };
+    });
+  mocks.call.mockImplementation(async (operation) =>
+    operation === "account_sessions_list_v1"
+      ? {
+          items: [
+            {
+              session_id: "native-session",
+              current: true,
+              created_at: "2030-01-01T00:00:00Z",
+              last_refreshed_at: "2030-01-01T00:00:00Z",
+              expires_at: null,
+              aal: "aal1",
+              user_agent: null,
+              label: null,
+              version: 0,
+            },
+          ],
+          next_cursor: null,
+          as_of: "2030-01-01T00:00:00Z",
+        }
+      : { items: [], next_cursor: null, as_of: "2030-01-01T00:00:00Z" },
+  );
+  try {
+    render(<SessionManager actorId={actor} />);
+    expect((await screen.findAllByText(/03:00/)).length).toBeGreaterThan(0);
+  } finally {
+    timezone.mockRestore();
+  }
 });

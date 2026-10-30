@@ -14,9 +14,11 @@ import { ReauthFields } from "./session-manager";
 export function AccountDelete({
   actorId,
   nativeUserId,
+  recoveryOnly = false,
 }: {
   actorId: string;
   nativeUserId: string;
+  recoveryOnly?: boolean;
 }) {
   const t = useTranslations("account");
   const format = useFormatter();
@@ -57,6 +59,7 @@ export function AccountDelete({
         actorId,
         String(data.get("password")),
         String(data.get("code")),
+        nativeUserId,
       );
       form.reset();
       await command.run(
@@ -87,14 +90,16 @@ export function AccountDelete({
         </output>
       ) : (
         <>
-          <Button
-            type="button"
-            variant="outline"
-            disabled={busy || command.busy || !!command.pending}
-            onClick={() => void load()}
-          >
-            {t("previewDeletion")}
-          </Button>
+          {!recoveryOnly && (
+            <Button
+              type="button"
+              variant="outline"
+              disabled={busy || command.busy || !!command.pending}
+              onClick={() => void load()}
+            >
+              {t("previewDeletion")}
+            </Button>
+          )}
           {preview && (
             <div className="space-y-4 rounded-lg border p-4">
               <p>

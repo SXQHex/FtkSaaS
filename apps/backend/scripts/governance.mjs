@@ -10,6 +10,7 @@ export function validateGovernance(p,implemented){
  for(const [n,k] of [['AuditView','action'],['OperationStatusView','operation'],['Request_operation_status_get','operation'],['Table_audit_events','action'],['Table_operation_receipts','operation']])
   assert.equal(d[n].properties[k].$ref,'#/$defs/OperationName','OP_NAME_TYPED '+n);
  const features=x.feature_delivery;equalSet(Object.keys(features),Array.from({length:33},(_,i)=>'F'+String(i+1).padStart(2,'0')),'FEATURE_COVERAGE');
+ equalSet(x.runtime.implemented_operations,[...live],'RUNTIME_SUMMARY_DRIFT');
  const allowedKinds=['read','preview','draft','closure','correction','apply','auth','worker','command'];
  for(const o of ops){
   const q=d[o.request.$ref.split('/').at(-1)],k=o.operation_contract;
@@ -50,6 +51,8 @@ export function validateGovernance(p,implemented){
  }
  for(const f of Object.keys(features)){
   const row=features[f];equalSet(row.technical_operations,ops.filter(o=>o.features.includes(f)).map(o=>o.name),'FEATURE_OPERATION_LINK '+f);
+  equalSet(row.implemented_operations,row.technical_operations.filter(n=>live.has(n)),'FEATURE_RUNTIME_SUMMARY_DRIFT '+f);
+  equalSet(row.contract_only_operations,row.technical_operations.filter(n=>!live.has(n)),'FEATURE_CONTRACT_ONLY_SUMMARY_DRIFT '+f);
   equalSet(row.dependencies,ops.filter(o=>o.features.includes(f)).flatMap(o=>o.decision_delivery.open_dependencies),'FEATURE_DEPENDENCY_LINK '+f);
   equalSet(row.completed_dependencies??[],ops.filter(o=>o.features.includes(f)).flatMap(o=>o.decision_delivery.completed_dependencies??[]),'FEATURE_COMPLETED_DEPENDENCY_LINK '+f);
   assert(row.decision&&row.owner,'FEATURE_TRACE '+f);
@@ -170,7 +173,7 @@ export function validateGovernance(p,implemented){
  assert(!x.permissions['settlement.record'],'REMOVED_RECORDER_PERMISSION');
  assert.equal(d.Request_permission_set.properties.permission.$ref,'#/$defs/Permission','GENERIC_GRANT_ROUTE');
  assert(!d.Permission.enum.some(v=>v.startsWith('settlement.')),'GENERIC_PERMISSION_ESCALATION');
- assert.equal(ds.latest_settlement_decision,'docs/decisions/DS-2026-10-17-settlement-center-scope.md','LATEST_SETTLEMENT_DECISION');
+ assert.equal(ds.latest_settlement_decision,'docs/contracts/02-FtkSaaS-teknik-sozlesme.md#hesaplasma','LATEST_SETTLEMENT_DECISION');
 
  assert.equal(map.get('settlement_delegation_set_v1').permission,'settlement.delegation.manage','OWNER_DELEGATION_PERMISSION');
  assert.equal(map.get('settlement_authority_set_v1').permission,'settlement.authority.manage','CENTER_GRANT_PERMISSION');
@@ -240,7 +243,7 @@ export function validateProductMatrix(p,source=fs.readFileSync('../../docs/contr
  return rows.length;
 }
 export function validateSettlementLivingDocs(p,sources){
- const paths=['../../docs/contracts/01-FtkSaaS-urun-kapsam-sozlesmesi.md','../../docs/contracts/02-FtkSaaS-teknik-sozlesme.md','../../docs/contracts/06-FtkSaaS-O4-durum-hata-izin.md'];
+ const paths=['../../docs/contracts/02-FtkSaaS-teknik-sozlesme.md'];
  for(const path of paths){
   const source=sources?.[path]??fs.readFileSync(path,'utf8');
   const start=source.lastIndexOf('## Son hesaplaşma revizyonu');

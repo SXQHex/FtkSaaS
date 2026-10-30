@@ -1,24 +1,38 @@
 name: Frontend checks
 on:
   pull_request:
-    paths:
-      - 'apps/web/**'
-      - 'packages/ui/**'
-      - '.github/workflows/frontend.yml'
+    branches: [main]
+    types: [opened, synchronize, reopened, edited]
   push:
     branches: [main]
-    paths:
-      - 'apps/web/**'
-      - 'packages/ui/**'
-      - '.github/workflows/frontend.yml'
   workflow_dispatch:
 permissions:
   contents: read
 concurrency:
-  group: frontend-${{ github.event.pull_request.number || github.ref }}
+  group: frontend-${{ github.event.pull_request.number || github.ref }}-${{ github.event.action == 'edited' && github.event.changes.base == null && 'metadata' || 'source' }}
   cancel-in-progress: true
 jobs:
+  scope:
+    if: github.event.action != 'edited' || github.event.changes.base != null
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    outputs:
+      frontend: ${{ steps.scope.outputs.frontend }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1
+        with:
+          node-version-file: '.nvmrc'
+      - name: Select frontend scope
+        id: scope
+        run: node apps/web/scripts/ci-scope.mjs
   checks:
+    needs: scope
+    if: needs.scope.outputs.frontend == 'true'
     runs-on: ubuntu-24.04
     timeout-minutes: 20
     steps:
@@ -42,6 +56,8 @@ jobs:
             packages/ui/coverage
           if-no-files-found: ignore
   browsers:
+    needs: scope
+    if: needs.scope.outputs.frontend == 'true'
     runs-on: ubuntu-24.04
     timeout-minutes: 20
     strategy:

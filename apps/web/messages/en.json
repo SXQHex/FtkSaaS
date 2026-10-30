@@ -749,6 +749,8 @@
       "storage": "Private files",
       "exports": "Exported files",
       "backups": "Backups"
-    }
+    },
+    "findPendingDeletion": "Find a deletion with a lost response",
+    "noPendingDeletion": "No pending deletion is saved for this account in this tab."
   }
 }

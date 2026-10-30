@@ -77,11 +77,19 @@ export function accountError(error: unknown) {
   }
   return "failed";
 }
-export async function freshAccountProof(accountId: string, password: string, code: string) {
+export async function freshAccountProof(
+  accountId: string,
+  password: string,
+  code: string,
+  expectedNativeUserId?: string,
+) {
   const auth = browserClient().auth;
   const user = await auth.getUser();
   if (user.error || !user.data.user?.email) throw user.error ?? new Error("AUTH_REQUIRED");
-  // Native identity is provider-owned; verify the Ftk account independently after signing in.
+  if (expectedNativeUserId && user.data.user.id !== expectedNativeUserId)
+    throw new Error("AUTH_REQUIRED");
+  // During deletion recovery the normal account projection may already be unavailable.
+  // Bind the proof to the server-verified native user; the API still checks its own actor/state.
   if (password) {
     const signed = await auth.signInWithPassword({ email: user.data.user.email, password });
     if (signed.error) throw signed.error;
@@ -93,10 +101,14 @@ export async function freshAccountProof(accountId: string, password: string, cod
     const verified = await auth.mfa.challengeAndVerify({ factorId: factor.id, code });
     if (verified.error) throw verified.error;
   }
-  const current = await accountCall("account_get_v1", {});
-  if (current.id !== accountId) throw new Error("AUTH_REQUIRED");
+  if (!expectedNativeUserId) {
+    const current = await accountCall("account_get_v1", {});
+    if (current.id !== accountId) throw new Error("AUTH_REQUIRED");
+  }
   const session = await auth.getSession();
   if (session.error || !session.data.session) throw session.error ?? new Error("AUTH_REQUIRED");
+  if (expectedNativeUserId && session.data.session.user.id !== expectedNativeUserId)
+    throw new Error("AUTH_REQUIRED");
   return session.data.session.access_token;
 }
 export async function imageUpload(file: File): Promise<SettingsImageUpload> {

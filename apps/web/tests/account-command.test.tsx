@@ -6,15 +6,21 @@ import { ProfileForm } from "../src/components/account/profile-form";
 import {
   recoverAccountCommand,
   accountStorageKey,
+  useAccountCommand,
+  CommandFeedback,
 } from "../src/components/account/account-command";
 import { ApiFailure } from "../src/lib/api";
 const mocks = vi.hoisted(() => ({
   call: vi.fn<(operation: string, input: Record<string, unknown>) => Promise<unknown>>(),
   saved: vi.fn<() => void>(),
+  signOut: vi.fn<() => Promise<{ error: null }>>(),
 }));
 vi.mock("../src/lib/account", async (load) => ({
   ...(await load<typeof import("../src/lib/account")>()),
   accountCall: mocks.call,
+}));
+vi.mock("../src/lib/supabase/client", () => ({
+  browserClient: () => ({ auth: { signOut: mocks.signOut } }),
 }));
 const actor = "019a2b3c-4d5e-7000-8000-000000000001";
 const profile = { id: actor, state: "active" as const, display_name: "Synthetic Person" };
@@ -113,4 +119,30 @@ test("recovery rejects proof fields, other operations, malformed records and sep
   expect(recoverAccountCommand("different-account", "profile")).toBeNull();
   sessionStorage.setItem(key, "not-json");
   expect(recoverAccountCommand(actor, "profile")).toBe("invalid");
+});
+
+function CurrentSessionRecovery() {
+  const command = useAccountCommand(actor, "current-session", mocks.saved);
+  return <CommandFeedback command={command} />;
+}
+test("status-confirmed current-session revocation also clears the native local session", async () => {
+  sessionStorage.setItem(
+    accountStorageKey(actor, "current-session"),
+    JSON.stringify({
+      command: {
+        operation: "account_sessions_revoke_v1",
+        input: { operation_key: actor, mode: "current" },
+      },
+    }),
+  );
+  mocks.call.mockResolvedValue({ status: "succeeded", result_reference: null });
+  mocks.signOut.mockResolvedValue({ error: null });
+  const user = userEvent.setup();
+  render(<CurrentSessionRecovery />);
+  await user.click(screen.getByRole("button", { name: "İşlem sonucunu kontrol et" }));
+  await waitFor(() => expect(mocks.signOut).toHaveBeenCalledWith({ scope: "local" }));
+  expect(mocks.call).toHaveBeenCalledExactlyOnceWith("operation_status_get_v1", {
+    operation: "account_sessions_revoke_v1",
+    key: actor,
+  });
 });
