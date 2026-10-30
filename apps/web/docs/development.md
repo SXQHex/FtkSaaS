@@ -28,6 +28,8 @@ pnpm dev:web
 
 Uygulama adresi http://127.0.0.1:3000. NEXT_PUBLIC_APP_ORIGIN OAuth, kayıt ve kurtarma callback'inin güvenilen origin'idir. Development Supabase projesi docs/development-connection.json ile tanımlıdır; yalnız URL ve publishable key istemciye gider. .env.local Git dışında kalır. Yayın sırasında kesin origin ile `/auth/callback` ve `/auth/callback?next=/reset-password` adreslerinin Supabase izin listesi ve sağlayıcı dönüşü doğrulanır; environment yazılması tek başına hosted Auth kabulü değildir.
 
+Web dağıtımı Vercel'in bağlı Git deposundan yürür. Production branch `main`, production adresi `https://uye.fethiyetango.com`'dur. Kullanıcının onayladığı düzen main merge sonrası otomatik production dağıtımıdır; repo ayarıyla `git.deploymentEnabled.main = false` uygulanmaz. CI başarısı deployment başarısı sayılmaz: alan adının gerçekten yayınladığı deployment kaynağı ayrıca doğrulanır.
+
 `(auth)` route grubu `/login`, `/signup`, `/forgot-password`, `/reset-password`, `/mfa` yollarını kullanır; eski Türkçe yollar ve yönlendirmeleri yoktur. Native Supabase SDK parola, Google, e-posta doğrulamalı kayıt, kurtarma ve TOTP işlemlerinin sahibidir. Kayıt yalnız `display_name` metadata’sı taşır; rol/organizasyon üretmez. Doğrulama bekleyen kayıt oturum açmış sayılmaz. Callback PKCE exchange ve güvenli dönüş yolu denetimini korur; korumalı ana sayfa sunucuda kullanıcı ve MFA seviyesini doğrular.
 
 ## Test komutları
