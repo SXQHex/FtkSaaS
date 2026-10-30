@@ -62,7 +62,7 @@ export function StudioWorkspace() {
       if (event === "SIGNED_OUT") {
         active = false;
         setSnapshot(null);
-        router.replace("/giris");
+        router.replace("/login");
         router.refresh();
       }
     });
@@ -106,7 +106,7 @@ export function StudioWorkspace() {
           ["AUTH_REQUIRED", "SESSION_REVOKED"].includes(cause.failure.error.code)
         ) {
           setSnapshot(null);
-          router.replace("/giris?error=session");
+          router.replace("/login?error=session");
           router.refresh();
         }
       }
@@ -126,7 +126,7 @@ export function StudioWorkspace() {
       const result = await browserClient().auth.signOut({ scope: "local" });
       if (result.error) throw result.error;
       setSnapshot(null);
-      router.replace("/giris");
+      router.replace("/login");
       router.refresh();
     } catch {
       setSigningOut(false);

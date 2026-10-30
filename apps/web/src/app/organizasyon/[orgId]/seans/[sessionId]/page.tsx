@@ -21,13 +21,13 @@ export default async function SessionRoute({
   if (!isUuid(orgId) || !isUuid(sessionId)) notFound();
   const next = encodeURIComponent(sessionPath(orgId, sessionId));
   const client = await serverClient();
-  if (!client) redirect(`/giris?next=${next}`);
+  if (!client) redirect(`/login?next=${next}`);
   const result = await client.auth.getUser();
-  if (!result.data.user || result.error) redirect(`/giris?next=${next}`);
+  if (!result.data.user || result.error) redirect(`/login?next=${next}`);
   const assurance = await client.auth.mfa.getAuthenticatorAssuranceLevel();
   if (assurance.error) throw assurance.error;
   if (assurance.data.nextLevel === "aal2" && assurance.data.currentLevel !== "aal2")
-    redirect(`/dogrulama?next=${next}`);
+    redirect(`/mfa?next=${next}`);
   return (
     <SessionPage
       key={`${orgId}:${sessionId}:${result.data.user.id}`}

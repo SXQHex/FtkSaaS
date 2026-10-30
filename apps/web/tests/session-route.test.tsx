@@ -45,7 +45,7 @@ test("invalid IDs fail before any provider or domain read", async () => {
 test("anonymous session link preserves its destination through login", async () => {
   mocks.user.mockResolvedValue({ data: { user: null }, error: null });
   await expect(SessionRoute({ params: Promise.resolve(ids) })).rejects.toThrow(
-    `redirect:/giris?next=${encodeURIComponent(destination)}`,
+    `redirect:/login?next=${encodeURIComponent(destination)}`,
   );
   expect(mocks.assurance).not.toHaveBeenCalled();
 });
@@ -55,7 +55,7 @@ test("required MFA cannot be bypassed by a deep link and preserves the destinati
     error: null,
   });
   await expect(SessionRoute({ params: Promise.resolve(ids) })).rejects.toThrow(
-    `redirect:/dogrulama?next=${encodeURIComponent(destination)}`,
+    `redirect:/mfa?next=${encodeURIComponent(destination)}`,
   );
   mocks.assurance.mockResolvedValue({ data: null, error: new Error("provider unavailable") });
   await expect(SessionRoute({ params: Promise.resolve(ids) })).rejects.toThrow(

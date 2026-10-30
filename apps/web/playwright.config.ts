@@ -25,7 +25,7 @@ export default defineConfig({
     ? undefined
     : {
         command: "pnpm start",
-        url: "http://127.0.0.1:3000/giris",
+        url: "http://127.0.0.1:3000/login",
         reuseExistingServer: !process.env.CI,
         timeout: 120000,
       },

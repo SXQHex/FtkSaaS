@@ -300,14 +300,14 @@ Her modülün “bitti” ölçütü kendi aşağıdaki kabul senaryosu **ve** b
 
 ## 7. Bölüm bölüm teslim: tek aktif bölüm
 
-Kullanıcının son kararı: **Bir bölüm bitmeden sonraki bölümün uygulamasına geçilmez.** Frontend'in aktif bölümü ve sırası bu bölümde tutulur. **Aktif bölüm: öğrenci yönetimini tamamlama ve gerçek kabul.** Aşağıdaki liste bağımlılık sırasını gösterir. Aynı anda birden çok yarım bölüm veya yeni modül dalı açılmaz.
+Kullanıcının son kararı: **Bir bölüm bitmeden sonraki bölümün uygulamasına geçilmez.** Frontend'in aktif bölümü ve sırası bu bölümde tutulur. **Aktif bölüm: WEB-S01 — kimlik, hesap ve güvenlik.** Kullanıcının 30 Ekim kararıyla bu bölüm öne alınmıştır; öğrenci yönetiminin kalan kabulü açık kalır. Aşağıdaki liste bağımlılık sırasını gösterir. Aynı anda birden çok yarım bölüm veya yeni modül dalı açılmaz.
 
 S01–S13 işlev kapsamını izler. Teslim bölümleri ise kullanıcının baştan sona kullanabildiği akışlardır: örneğin davet kabulü öğrenci bölümünde, satışın zorunlu belge adımı satış bölümünde çalışır. Ortak bir bağımlılık önce kullanılacağı bölümün içinde tamamlanır ve daha sonra yeniden yazılmaz. Bölümün kabulü ileride yazılacak bir ekrana bağlanmaz: gerektiğinde yetkilendirilmiş mevcut kayıt kullanılır; yeni ekranlar arasındaki uçtan uca bağlantı, bağlantıyı kullanan sonraki bölümün açık kabul maddesidir. Gerekli gerçek kayıt/okuma yoksa bölüm engelli kalır, mock ile kapanmaz. Başka bir bölüme ait henüz yapılmamış işlem, mevcut bölümde çalışıyormuş gibi düğme/özet olarak sunulmaz.
 
 | Sıra | Tamamlanacak bölüm | Bölüm kapanışının somut sonucu |
 |---|---|---|
-| 1 | **Öğrenci yönetimi** — S04 çekirdeği ve gereken S01 davet kabulü | Mevcut liste/profil/oluşturma/düzenleme/öğrencilik akışları; disiplin, birleştirme ve hesap erişimi dahil gerçek kabul. Paket/finans alt görünümü kendi sonraki bölümünün sorumluluğudur; bu aşamada sahte özet eklenmez. |
-| 2 | **Hesap ve güvenlik** — S01, kendi tercihleri için S12 | Giriş/kayıt/kurtarma/Google/TOTP, profil, oturumlar, güvenlik ve hesap lifecycle akışları tamam. |
+| 1 | **Hesap ve güvenlik** — S01, kendi tercihleri için S12 | Giriş/kayıt/kurtarma/Google/TOTP, profil, oturumlar, güvenlik ve hesap lifecycle akışları tamam. |
+| 2 | **Öğrenci yönetimi** — S04 çekirdeği ve gereken S01 davet kabulü | Mevcut liste/profil/oluşturma/düzenleme/öğrencilik akışları; disiplin, birleştirme ve hesap erişimi dahil gerçek kabul. Paket/finans alt görünümü kendi sonraki bölümünün sorumluluğudur; bu aşamada sahte özet eklenmez. |
 | 3 | **Stüdyo kurulumu ve işletme erişimi** — S02, gereken S12 politikaları ve S13 temel plan görünümü | Gerçek kaynak katalogları, merkez/oda/disiplin/eğitmen/uygunluk ve plan sınırlarıyla stüdyo program oluşturmaya hazır. B01 burada çözülür. |
 | 4 | **Belgeler ve işlemsel bildirimler** — S11 | Özel yükleme/yayın, bağlamsal okuma/onay, inbox ve izinli geçmiş tamam; sonraki iş formlarına bağlanacak çalışan bileşenler hazır. |
 | 5 | **Program ve seanslar** — S03 | Sınıf/program/tek seans oluşturma; kaynak ataması, değişiklik, iptal/telafi, Scheduler ve gerçek çakışma kabulü tamam. |
@@ -384,3 +384,26 @@ Bu eşleme bütün Starter özelliklerinin bir teslim sahibine sahip olmasını 
 | FD01–FD12 Starter tüketicileri | S12 ve ilgili iş modülleri |
 
 Kapsam dışı feature'ların tam listesi bölüm 2'dedir. Yeni karar veya backend yetkisi bu eşlemeyi değiştirirse ilgili modül planı aynı değişiklikte güncellenir.
+
+## 11. WEB-S01 çalışma kaydı — 30 Ekim 2026
+
+Kullanıcının açık kararıyla aktif bölüm S01'dir; S04'ün kalan kabulü kapatılmadı. Çalışma dalı `feat/web-s01-account-security`; başlangıç main `5455ba824868e30adac131993608e81477a3b461`. Aynı main'in [frontend CI](https://github.com/SXQHex/FtkSaaS/actions/runs/40984554770) checks ve dört tarayıcısı ile [main acceptance](https://github.com/SXQHex/FtkSaaS/actions/runs/40984554734) başarılı olarak doğrulandı. Bu başlangıç kanıtı yeni adayın kabulü değildir.
+
+| Akış | Uygulanan kaynak | Kalan kabul |
+|---|---|---|
+| Auth yolları | Dosyalar login/signup/forgot-password/reset-password/mfa olarak taşındı; tüm istemci/test referansları güncellendi. Kullanıcının “Simple is best” kararıyla eski Türkçe yollar ve yönlendirmeleri yoktur. Callback adı auth/callback kalır. | Aynı adayın uzak dört tarayıcı CI'si; gerçek origin/provider dönüşü. |
+| Kayıt/giriş/kurtarma | Mevcut native akış korundu; doğrulama bekleyen kaydın e-postasını native resend ile yeniden isteme eklendi. Güvenli next ve PKCE dönüşü yeni route adlarını kullanır. | Gerçek e-posta teslimi, süresi dolan/kullanılan link ve native Google dönüşü. |
+| Profil ve fotoğraf | Korumalı account sayfası; kendi management entity/version okuması, sürümlü profil, ad/soyad/doğrulanmamış telefon, private fotoğraf okuma/yükleme/kaldırma. Eksik identity projeksiyonu null ile ezilmez. | Gerçek hesapla kaynak sürümü, fotoğraf bytes ve yetki/hesap geçişi. |
+| Native iletişim/parola | Doğrulanmış/pending iletişim ayrı; native değişim/resend/phone OTP. Backend parola challenge ve native nonce/update. | E-posta çift doğrulama, gerçek SMS sağlayıcısı ve nonce teslimi. Kapalı sağlayıcı UI başarısı değildir. |
+| Oturumlar/geçmiş | Cursor liste/geçmiş; gerçek label version; selected/current/others iptali, taze kendi native proof'u ve mevcut TOTP doğrulaması. | Gerçek iki oturum ve iptal sonrası Edge erişim kaybı. |
+| TOTP | Native enrollment/challenge/verify ve doğrulanmamış kurulumu iptal; doğrulanmış faktör için yalnız backend kaldırma onayı. | Gerçek uygulama ile kurulum, yanlış kod, yeniden giriş ve kaldırma. |
+| Google hesap bağlama | GIS istemci config'i, nonce bağlı ID token; taze proof → backend prepare → native linkIdentity. Hazır config yoksa çalışmayan eylem açılmaz. | Web client ID/origin, gerçek Google hesabı ve native subject/nonce/expiry kabulü. Native Google login bu bağlama işleminden ayrıdır. |
+| Davet kabulü | Korumalı invite; doğru hesap gösterimi, açık kabul, token fingerprint + aynı key ile retry; ham token kalıcı kayda girmez. | Gerçek davet teslimi ve doğru/yanlış hesap, expiry/revoke/link çakışması. |
+| Hesap silme/takip | Gerçek preview/blocker/expiry, açık onay ve taze proof; global kendi job takibi, privacy durumu ve bekleyen kapsamlar. İş sonucu fiziksel imha sayılmaz. | Yetkilendirilmiş ayrı kabul hesabıyla ownership engeli, kayıp yanıt, oturum iptali, global own/foreign job ve gerçek privacy sonucu. Gerçek kullanıcı hesabı silinmedi. |
+| Kurtarma ve hesap izolasyonu | Sekme/hesap kapsamlı komut; proof'suz takip kaydı, aynı payload/key; expiry/payload mismatch replay engeli; NOT_FOUND/yetki kaybında belirsizliği koruma; geç hesap yanıtını atma. | Aynı adayın CI'si ve gerçek yetki/oturum değişimi. |
+
+Yerel doğrulama: `env -u NODE_USE_ENV_PROXY pnpm check:frontend` lint/format/typecheck/build ve 108 web + 1 UI testini geçti. Yerel environment proxy'si açık ilk denemede MSW istekleri zaman aşımına uğradı; proxy çıkarılarak normal test süreleriyle doğrulandı, assertion/timeout/retry gevşetilmedi. Coverage komutu ayrıca çalıştırıldı; Turbo task isolation backend testlerini çağırmadan geçti. Resmi Chromium Headless Shell 141 ve Git dışındaki executable seçimiyle 20/20 Playwright testi, mevcut tam axe/TR/EN/320px/%200 kontrolleri ve eski Türkçe yolların yönlendirmesiz 404 kontrolü geçti. Uzak dört tarayıcı kabulü bu yerel koşudan türetilmez.
+
+**Açık ortam bağımlılıkları:** B03 sürer. Gerçek uygulama origin'i ve yeni reset-password callback'inin Supabase izin listesiyle kabulü; Google bağlama için web client ID/GIS origin ve native Auth manual-linking ayarı; kullanılabilir e-posta/SMS teslimi; güvenli ortamdan yetkilendirilmiş kabul hesapları gerekir. Bu oturumda gerçek hesap parolası veya test hesabı sağlanmadığı için hosted kimlik/yazma/silme kabulü yapılmadı. Ortam/sağlayıcı ayarı uydurulmadı; backend, ortak sözleşme, migration, CI ve `/docs` değiştirilmedi.
+
+S01 ve bütün Starter kabulü açık kalır. Aday Draft PR'de ilerler; gerçek ortam kabulü ve aynı kaynak CI/main sonucu olmadan bölüm tamamlandı veya merge'e hazır sayılmaz. Başka modül başlatılmadı.

@@ -44,9 +44,9 @@ test("successful callback consumes the local destination and clears the correctl
 });
 test("password recovery overrides a saved destination, and untrusted redirects are rejected", async () => {
   const recovery = await GET(
-    new Request("https://app.example.invalid/auth/callback?code=synthetic&next=/parola-yenile"),
+    new Request("https://app.example.invalid/auth/callback?code=synthetic&next=/reset-password"),
   );
-  expect(recovery.headers.get("location")).toBe("https://app.example.invalid/parola-yenile");
+  expect(recovery.headers.get("location")).toBe("https://app.example.invalid/reset-password");
   mocks.saved = "//attacker.invalid";
   const result = await GET(new Request("https://app.example.invalid/auth/callback?code=synthetic"));
   expect(result.headers.get("location")).toBe("https://app.example.invalid/");
@@ -55,7 +55,7 @@ test("failed exchange keeps the destination on the login error without reporting
   mocks.exchange.mockResolvedValue({ error: new Error("expired") });
   const result = await GET(new Request("https://app.example.invalid/auth/callback?code=synthetic"));
   const url = new URL(result.headers.get("location")!);
-  expect(url.pathname).toBe("/giris");
+  expect(url.pathname).toBe("/login");
   expect(url.searchParams.get("error")).toBe("callback");
   expect(url.searchParams.get("next")).toBe(mocks.saved);
 });
