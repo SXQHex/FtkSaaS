@@ -344,7 +344,7 @@ test('measurement distinguishes queue setup test wall and runner time',()=>{
  assert.equal(rows[0].queue_s,10);assert.equal(rows[0].setup_s,20);assert.equal(rows[0].test_s,80);assert.equal(rows[0].runner_s,110);
 });
 
-test('every test file is accounted for in structural DB or API clean obligations',()=>{const actual=fs.readdirSync('apps/backend/tests').filter(p=>p.endsWith('.test.mjs')).map(p=>'apps/backend/tests/'+p).sort();assert.deepEqual(actual,[...apiSuites,...['contract','governance','ci-policy','database','event-scope'].map(n=>'apps/backend/tests/'+n+'.test.mjs')].sort());});
+test('every test file is accounted for in structural DB or API clean obligations',()=>{const actual=fs.readdirSync('apps/backend/tests').filter(p=>p.endsWith('.test.mjs')).map(p=>'apps/backend/tests/'+p).sort();assert.deepEqual(actual,[...apiSuites,...['contract','governance','ci-policy','database','event-scope','restore-guard'].map(n=>'apps/backend/tests/'+n+'.test.mjs')].sort());});
 test('metadata-only serial labels do not invalidate automatic acceptance or create extra tests',()=>{
  const v=valid();v.pr.labels=[{name:'ci:measure-serial'}];assert(validateBinding(v));
  v.binding.benchmark=true;assert.throws(()=>validateBinding(v));
