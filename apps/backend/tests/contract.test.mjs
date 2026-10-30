@@ -1,3 +1,4 @@
+import './auth-password-security-unit.mjs';
 import './account-signup-adapter.mjs';
 import './calendar-feed-unit.mjs';
 import './p06-parser.mjs';

@@ -254,8 +254,8 @@
         "management_state_get_v1"
       ],
       "review": {
-        "fingerprint": "3fa802e0f1b6cad8047db025d13e2b696b8572929c7feb6a622e3e2db65464ff",
-        "reason": "Reviewed signup-only handler dispatch, safe RPC DTO, closed schema, generated inventory and migration guard; shared authenticated transport is unchanged."
+        "fingerprint": "986a609eecd20458c7fcddcb0091bc71277d8e574330c3a32c28292bb07d2648",
+        "reason": "Native notification config and added unit import reviewed; shared request/response protocol remains unchanged."
       }
     },
     {
@@ -269,7 +269,10 @@
         "apps/backend/tests/account-session-management-acceptance.mjs",
         "apps/backend/tests/account-mfa-acceptance.mjs",
         "apps/backend/tests/account-signup-adapter.mjs",
-        "apps/backend/tests/account-signup-acceptance.mjs"
+        "apps/backend/tests/account-signup-acceptance.mjs",
+        "apps/backend/tests/auth-password-security-unit.mjs",
+        "apps/backend/tests/account-password-security-acceptance.mjs",
+        "apps/backend/tests/native-password-auth.mjs"
       ],
       "sources": [
         "apps/backend/database/account-identity-projection.sql",
@@ -313,7 +316,10 @@
         "apps/backend/database/account-signup-wrappers.sql",
         "apps/backend/supabase/functions/backend-v1/account-signup.ts",
         "apps/backend/supabase/migrations/20261030083856_account_signup_guard.sql",
-        "apps/backend/transports/account-signup-gateway.mjs"
+        "apps/backend/transports/account-signup-gateway.mjs",
+        "apps/backend/scripts/auth-password-security.mjs",
+        "apps/backend/supabase/templates/password_changed_notification.html",
+        "apps/backend/supabase/config.toml"
       ],
       "operations": [
         "account_get_v1",
@@ -329,8 +335,8 @@
         "account_signup_request_v1"
       ],
       "review": {
-        "fingerprint": "d8ecf37774e0929433e56e3fc295ab0450415c46be74432e1672be8575f9f2a6",
-        "reason": "XREQ-001 signup flow, safe result, durable dispatch, native provider limits and acceptance sources reviewed."
+        "fingerprint": "9ec20934fd13e36a4e6c07bf7f634b0334285623a0688046d21afe9186a8ddb2",
+        "reason": "Reviewed native password config, notice and real Auth acceptance including independent expiry, valid-proof supersession, replay and session revocation."
       }
     },
     {
@@ -563,8 +569,8 @@
         "person_discipline_set_v1"
       ],
       "review": {
-        "fingerprint": "a406b17b8c2ac0b88dac3d8d309eef662ef12ec2ddc3f592b679fbf3ef1cd053",
-        "reason": "Reviewed existing person registry suite plus signup acceptance import; person/role/merge behavior and wrappers are unchanged."
+        "fingerprint": "58202e3e41bac92afbaf52848663c9ca56a6790b32196ae823a4aa5177bc1603",
+        "reason": "Only password-security suite import added to person-registry entrypoint; person/CRM implementations and assertions unchanged; WF04 guide remains accurate."
       }
     },
     {

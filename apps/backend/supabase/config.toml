@@ -244,10 +244,13 @@ otp_expiry = 3600
 # content_path = "./supabase/templates/invite.html"
 
 # Uncomment to customize notification email template
-# [auth.email.notification.password_changed]
-# enabled = true
-# subject = "Your password has been changed"
-# content_path = "./supabase/templates/password_changed_notification.html"
+[auth.email.notification.password_changed]
+enabled = true
+subject = "Parolanız değiştirildi"
+content_path = "./supabase/templates/password_changed_notification.html"
+# CLI 2.122 native mode omits content_path and the current-password setting.
+# Hosted settings: scripts/auth-password-security.mjs; real native acceptance:
+# tests/account-password-security-acceptance.mjs (isolated CLI-owned binary).
 
 [auth.sms]
 # Allow/disallow new user signups via SMS to your project.

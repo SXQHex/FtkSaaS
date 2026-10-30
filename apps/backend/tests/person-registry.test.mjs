@@ -1,3 +1,4 @@
+import './account-password-security-acceptance.mjs';
 import './account-signup-acceptance.mjs';
 import './account-identity-acceptance.mjs';
 import './account-mfa-acceptance.mjs';

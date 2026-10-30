@@ -2,6 +2,22 @@
 
 Bu belge kurulum, dağıtım, worker ve restore prosedürünün sahibidir. Kaynak/ortam kabulü [güncel kabul kaydında](00-FtkSaaS-yeni-sohbet-devir.md), açık işler [backlog’da](remaining-work.md), ürün davranışı [ortak iş akışlarında](../../../docs/workflows.md) tutulur. Geçmiş denemeler canlı talimat olarak burada yinelenmez.
 
+## Native parola güvenliği (XREQ-002)
+
+Native Auth'ın mevcut parola kontrolü ve güvenlik e-postası [tek tüketici sözleşmesine](../../../docs/settings.md#parola-değişimi-ve-güvenlik-bildirimi) göre yapılandırılır. Kaynak [auth-password-security.mjs](../scripts/auth-password-security.mjs), ileti [native şablondur](../supabase/templates/password_changed_notification.html). Yalnız mevcut development projesi desteklenir. Kabul edilmiş kaynakta, backend dizininden:
+
+```sh
+node scripts/auth-password-security.mjs --plan
+node scripts/auth-password-security.mjs --check gwyprhenabtpkbojephw
+node scripts/auth-password-security.mjs --apply gwyprhenabtpkbojephw
+```
+
+Check/apply `SUPABASE_ACCESS_TOKEN` ortam değişkenini kullanır; secret komut satırına/yazıya konmaz. Plan ağ çağrısı yapmaz, check yalnız okur. Apply yalnız mevcut-parola/nonce, password_changed etkinlik/konu/şablon ve native e-posta OTP süresi alanlarını Management API ile yazar; sonra bağımsız GET ile birebir doğrular. SMTP/anahtar/Google/JWT/redirect izin listesi değiştirilmez; tam config veya credential çıktı verilmez. Auth SiteURL HTTPS kök origin olmalıdır; gerçek `/forgot-password` ve mevcut `/auth/callback?next=/reset-password` redirect izinleri önceden doğrulanır. Bu ayrı işletim adımıdır; SQL/Edge CD veya config.toml hosted ayarları otomatik uygulamaz.
+
+CLI 2.122.0 native runtime `security_update_password_require_current_password` ayarını sunmaz ve `content_path` içeriğini Auth'a taşımaz. `secure_password_change` yalnız nonce reauthentication'dır; onun açılması çözüm sayılmaz. Gerçek kabul testi CLI'nin çalışan Auth binary'sini exact loopback DB/SMTP üzerinden bulur; aynı binary'yi ayrı geçici loopback portta, desteklenen native ayarlarla ve yalnız testin HTML endpoint'iyle başlatır. Binary sürümü/hash'i güvenli test tanısında kaydedilir. CLI süreçlerine, bağımlılıklara veya ortak stack ayarına müdahale etmez. Linux `/proc` gereklidir; destek yoksa test atlanmaz, başarısız olur. Süreç ve geçici özel dosyalar test sonunda temizlenir. Bu gerçek Auth/SMTP sink testidir; hosted config, dış posta veya tarayıcı/PKCE kabulünün yerine geçmez.
+
+Hosted kabul: eksik/yanlış mevcut parola reddi; doğru değişim; yalnız kayıtlı ana adrese bildirim; gerçek bağlantıdan recovery/PKCE ve yeni parola; eski/yanlış/süresi dolmuş/tekrarlanmış proof reddi; diğer session refresh ve Edge erişiminin reddi, current recovery session'ın korunması. Parola tekrar eşleşmesi frontend kabulündedir. Native bildirim gönderimi best effort'tür: SMTP başarısızlığı parolayı geri almaz; Auth/provider logları kişisel veri/sırlar dışarı çıkarılmadan kontrol edilir. Production dağıtımı bu komutun kapsamı değildir.
+
 ## Ortam ve dağıtım
 
 Geliştirme hedefi `gwyprhenabtpkbojephw` FtkSaaS Supabase projesinin production adlı branch’idir; bu ad müşteri production kabulü değildir. Gerçek kurulum verisi vardır. Reset/clean/seed yalnız izole loopback ortamında çalışır. Git SQL/Edge kaynağını taşır; çalışma verisini, sağlayıcı ayarını, secret’ı veya Storage baytlarını geri getirmez.

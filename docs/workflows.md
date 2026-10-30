@@ -30,7 +30,7 @@ request_id transport denemesine, operation_key tek iş niyetine aittir. Preview 
 
 **Hata/kurtarma:** Doğrulama bekleyen e-posta giriş yapılmış sayılmaz; provider callback/reauth/MFA başarısızsa özel sahte completion yoktur. Oturum iptali sonrası eski tokenla başarı varsayılmaz. Şifre/reauth kanıtı loglanmaz. **Sonuç/yenileme:** Hesap, güvenlik geçmişi ve etkilenen oturum listesi yenilenir; hesap işlemi kendiliğinden organizasyon, kişi, rol veya satış üretmez.
 
-Hesap kimliği, native provider ve oturum komutlarının alan/sürüm ayrıntıları [ayar ve hesap tüketicilerinde](settings.md#hesap-oturum-ve-totp-api-devri) tek yerde tutulur. Kişi iletişimi doğrulanmış olsa da hesap bağlantısı ayrıca gerekir. Native `others` revoke tekrarında sonradan açılmış oturumlar kapatılmaz.
+Hesap kimliği, native provider ve oturum komutlarının alan/sürüm ayrıntıları [ayar ve hesap tüketicilerinde](settings.md#hesap-oturum-ve-totp-api-devri) tek yerde tutulur. Hesap içi parola değişiminde native mevcut parola kontrolü, kayıtlı adrese güvenlik bildirimi ve “Bu işlemi ben yapmadım” bağlantısından süreli/tek kullanımlık native kurtarma sırası [parola tüketicisindedir](settings.md#parola-değişimi-ve-güvenlik-bildirimi). Kişi iletişimi doğrulanmış olsa da hesap bağlantısı ayrıca gerekir. Native `others` revoke tekrarında sonradan açılmış oturumlar kapatılmaz.
 
 ## WF02
 
