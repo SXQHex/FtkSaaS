@@ -4,14 +4,15 @@
 
 ## Kaynak tabanı
 
-Repo SXQHex/FtkSaaS; main `5455ba824868e30adac131993608e81477a3b461`, tree `efa209fa71f627690e7e107c46f852a7b2e4a77d`. PR89 öğrenci modülü, PR84 restore-guard araçları ve PR91 frontend bölüm planı main’dedir. PR91 yalnız web belgelerini değiştirdi; frontend bölüm/aktif iş/kabul sahibinin [web yol haritası](../../web/docs/todo.md) olması korunur. Kaynak envanteri: 221 implemented operasyon, 83 migration. Operasyon varlığı bütün selector/provider/ekran kabulü değildir; detay envanterler üreticiden gelir.
+Repo SXQHex/FtkSaaS; çalışma tabanı main `faca3dc2420e8928531a8ce93ad5300be2003da4`, tree `a895004a1509d2fbc25460f03a42f61f815293d6`. PR100 frontend hesap formu/telefon değişiklikleri dahil güncel main, PR94 dalına taşındı; frontend kaynakları aynen korunur. PR90 belge merkeziyetçiliği, PR89 öğrenci modülü, PR84 restore-guard araçları ve PR91 frontend bölüm planı da main’dedir. Frontend bölüm/aktif iş/kabul sahibinin [web yol haritası](../../web/docs/todo.md) olması korunur. Kaynak envanteri: 221 implemented operasyon, 83 migration. Operasyon varlığı bütün selector/provider/ekran kabulü değildir; detay envanterler üreticiden gelir.
 
 | Aynı main SHA’sının koşusu | Bu kontrolde görülen sonuç |
 |---|---|
-| [Merge kanıtı 40984554734](https://github.com/SXQHex/FtkSaaS/actions/runs/40984554734) | completed/success |
-| [Frontend 40984554770](https://github.com/SXQHex/FtkSaaS/actions/runs/40984554770) | completed/success |
+| [Merge kanıtı 41037452649](https://github.com/SXQHex/FtkSaaS/actions/runs/41037452649) | completed/success |
+| [Backend main kanıtı 41037452785](https://github.com/SXQHex/FtkSaaS/actions/runs/41037452785) | completed/success |
+| [Development CD 41037500364](https://github.com/SXQHex/FtkSaaS/actions/runs/41037500364) | completed/success |
 
-Bu okumada yalnız run özetleri doğrulandı; job/receipt içeriği ve canlı Edge/DB metadata’sı yeniden okunmadı. Son okunmuş backend main/CD başarısı önceki `fe650618503be24eb117297dc412c4ae6fd8018c` kaynağına aittir ([main](https://github.com/SXQHex/FtkSaaS/actions/runs/40980147546), [development CD](https://github.com/SXQHex/FtkSaaS/actions/runs/40980186925)); PR91 bu runtime’ı değiştirmez fakat eski koşu yeni SHA’da çalışmış gibi gösterilmez. Bu kayıt hosted sürüm/envanter veya bütün akışların tarayıcı kabulü iddiası değildir.
+Bu taban kontrolünde yalnız run özetleri doğrulandı; job/receipt içeriği ve canlı Edge/DB metadata’sı yeniden okunmadı. Bu kayıt hosted sürüm/envanter veya bütün akışların tarayıcı kabulü iddiası değildir. Tabanın başarılı sonucu aşağıdaki worker politikası değişikliğinin kabulü yerine geçmez.
 
 ## Kabul edilmiş kapsamın sınırı
 
@@ -21,9 +22,13 @@ Bu okumada yalnız run özetleri doğrulandı; job/receipt içeriği ve canlı E
 - PR84 JSON restore guard, imzalı sicil ve guarded callback araçlarını ekler. Hosted SQL yükleyiciye entegrasyon veya tamamlanmış DB/Auth/Storage purge sağlamaz.
 - PR89 öğrenci arama/detay/kişi yazma/öğrencilik/davet işi takibini içerir. Frontend CI sonucu gerçek yetkili hesapla hosted bütün ekran/yazma/teslim kabulünün yerine geçmez. Ekran davranışının sahibi [web geliştirme rehberi](../../web/docs/development.md).
 
-## PR90
+## Backend full clean süre çalışması
 
-Draft [PR90](https://github.com/SXQHex/FtkSaaS/pull/90), belge merkeziyetçiliği ve kaynak bağlı dokümantasyon altyapısıdır. Bu yerel revizyonda PR91 dahil main tabanı güncellendi; eski alan devirleri birleştirildi, tek karar sahipleri tanımlandı. Son kullanıcı PR90’ın main ile birleştirilmesini istedi; önceki push/aday CI bekletme kararı bu teslim için kaldırıldı. Yerel revizyon yayımlanıp aynı head/base/merge kaynağının gerekli aday CI’si doğrulanır; başarı olmadan merge yapılmaz. Önceki PR90 head/test başarısı bu revizyonun kabulü değildir. Son kaynak bağımsız incelemesi tamamlandı; uzaktaki yeni kaynak kabulü ve ardından main/development doğrulaması ayrıca gerekir. Hosted metadata/DB tipi artifact kabulü DOCS-01 kapsamında ayrıca açık kalır.
+Kullanıcının yeni önceliği backend full clean süresidir. Son üç başarılı aday [40990953637](https://github.com/SXQHex/FtkSaaS/actions/runs/40990953637), [40975050984](https://github.com/SXQHex/FtkSaaS/actions/runs/40975050984) ve [40974542624](https://github.com/SXQHex/FtkSaaS/actions/runs/40974542624) toplam 29:19, 32:58 ve 33:36 sürmüştür. Son koşuda API job'larının backend hazırlığı 43–48 saniye, testleri 1183–1596 saniyedir; baskın maliyet API çağrılarıdır. On beş API giriş dosyasının import ağında 34 gerçek test dosyası bulunur; shard'lar arasında aynı test dosyası yeniden çalıştırılmaz. Ortak fixture/operasyon tekrarları ayrı test amaçları taşıyabilir ve bu değişiklikte kaldırılmaz.
+
+Dar düzeltme yerel/CI Edge worker politikasını `oneshot` yerine `per_worker` yapar. Gerçek Auth→Edge→RPC yolu, assertion'lar, core+dört izole shard, concurrency=2 ve kaynak/run/attempt kanıtı korunur. Yeni tam kabul ve süre kazancı henüz doğrulanmış değildir. Yerel native paket indirmesi ağ sınırına takıldı; geçici uzak ortamda servisler açıldı fakat ölçüm işlem kotası nedeniyle tamamlanamadı ve ortam silindi. Son adayın bütün testleri ve gerçek job/phase süreleri aynı GitHub runner sınıfındaki yukarıdaki tabanla karşılaştırılmadan optimizasyon kapanmış sayılmaz. Ana kabul ölçütü kapsam korunarak daha kısa full clean'dir; ölçülmemiş hızlanma yüzdesi kullanılmaz.
+
+PR94 eski head `efe50efbe4fd562b5d705e20d10f2719b2a87e17` için [41001187314](https://github.com/SXQHex/FtkSaaS/actions/runs/41001187314) core ve üç API shard'ında başarılıydı; API-4 testler sürerken kesildi. Kesilmeden önce başarısız assertion görülmedi; kesinti sonrası süreç hataları tam kabul değildir. Güncel main ile birleştirilmiş yeni kaynak için bütün core/dört API kabulü yeniden gereklidir. Kullanıcı PR94 ve PR99 için merge yetkisi verdi. Sıra: PR94 aday kabulü → merge/main/development kanıtı → PR99'u yeni main ile eşitleme ve aday kabulü → merge. PR99'un son kaynak koşusu `Merge parents mismatch` nedeniyle testlere başlamadan durdu; eski base ile rerun yapılmaz. CI ve kaynak güvenliği kapıları gevşetilmez.
 
 ## Alanlar arası koordinasyon
 

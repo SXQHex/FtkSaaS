@@ -254,8 +254,8 @@
         "management_state_get_v1"
       ],
       "review": {
-        "fingerprint": "c57b3f1effba7cd5e72c068585fcdbbef1f1baf1627fcaf7464fc2f7800d7048",
-        "reason": "Reviewed role-scoped documentation writes, app-owned handovers and backlogs, sole shared request register, exact path checks and removal of non-contract status notes. No business or transport behavior changed."
+        "fingerprint": "470ed682b6aefeb9b20fc29ba700513d668138208022afa5463747e958ef6c96",
+        "reason": "Reviewed config-only per_worker reuse against WF00, client protocol, request-local handler Auth/session context and existing tenant/race acceptance. API, JWT, RPC and business semantics remain unchanged; native candidate acceptance and timing comparison are still required."
       }
     },
     {
