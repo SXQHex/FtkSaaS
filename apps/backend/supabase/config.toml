@@ -370,10 +370,9 @@ allow_dynamic_registration = false
 
 [edge_runtime]
 enabled = true
-# Supported request policies: `oneshot`, `per_worker`.
-# `per_worker` (default) — enables hot reload during local development.
-# `oneshot` — fallback mode if hot reload causes issues (e.g. in large repos or with symlinks).
-policy = "oneshot"
+# Reuse the bundled gateway across requests; oneshot reloads it for every API call.
+# Each clean job still starts with its own isolated runtime and freshly reset DB.
+policy = "per_worker"
 # Port to attach the Chrome inspector for debugging edge functions.
 # The Deno major version to use.
 deno_version = 2
