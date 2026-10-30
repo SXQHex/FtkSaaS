@@ -222,4 +222,5 @@ export interface Operations {
   calendar_link_revoke_v1: {request: T.RequestCalendarLinkRevoke; response: T.SuccessCalendarLinkRevoke};
   calendar_feed_get_v1: {request: T.RequestCalendarFeedGet; response: T.SuccessCalendarFeedGet};
   settings_preparation_resolve_v1: {request: T.RequestSettingsPreparationResolve; response: T.SuccessSettingsPreparationResolve};
+  account_signup_request_v1: {request: T.RequestAccountSignupRequest; response: T.SuccessAccountSignupRequest};
 }

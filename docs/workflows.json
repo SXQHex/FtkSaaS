@@ -254,8 +254,8 @@
         "management_state_get_v1"
       ],
       "review": {
-        "fingerprint": "c57b3f1effba7cd5e72c068585fcdbbef1f1baf1627fcaf7464fc2f7800d7048",
-        "reason": "Reviewed role-scoped documentation writes, app-owned handovers and backlogs, sole shared request register, exact path checks and removal of non-contract status notes. No business or transport behavior changed."
+        "fingerprint": "3fa802e0f1b6cad8047db025d13e2b696b8572929c7feb6a622e3e2db65464ff",
+        "reason": "Reviewed signup-only handler dispatch, safe RPC DTO, closed schema, generated inventory and migration guard; shared authenticated transport is unchanged."
       }
     },
     {
@@ -267,7 +267,9 @@
       "tests": [
         "apps/backend/tests/account-identity-acceptance.mjs",
         "apps/backend/tests/account-session-management-acceptance.mjs",
-        "apps/backend/tests/account-mfa-acceptance.mjs"
+        "apps/backend/tests/account-mfa-acceptance.mjs",
+        "apps/backend/tests/account-signup-adapter.mjs",
+        "apps/backend/tests/account-signup-acceptance.mjs"
       ],
       "sources": [
         "apps/backend/database/account-identity-projection.sql",
@@ -306,7 +308,12 @@
         "apps/backend/database/starter-attendance-protection-wrappers.sql",
         "apps/backend/database/starter-settings-media.sql",
         "apps/backend/database/wrappers.sql",
-        "docs/settings.md"
+        "docs/settings.md",
+        "apps/backend/database/account-signup.sql",
+        "apps/backend/database/account-signup-wrappers.sql",
+        "apps/backend/supabase/functions/backend-v1/account-signup.ts",
+        "apps/backend/supabase/migrations/20261030083856_account_signup_guard.sql",
+        "apps/backend/transports/account-signup-gateway.mjs"
       ],
       "operations": [
         "account_get_v1",
@@ -318,11 +325,12 @@
         "account_sessions_revoke_v1",
         "account_security_history_get_v1",
         "account_totp_remove_v1",
-        "account_google_link_prepare_v1"
+        "account_google_link_prepare_v1",
+        "account_signup_request_v1"
       ],
       "review": {
-        "fingerprint": "ff63ce47ce278dd272b32a47f26d8e41ae9d028a1625c87d67ac27e4eaef0ba9",
-        "reason": "Settings consumer guidance now routes frontend acceptance to the PR91 web plan; typed settings behavior and API contract remain unchanged."
+        "fingerprint": "d8ecf37774e0929433e56e3fc295ab0450415c46be74432e1672be8575f9f2a6",
+        "reason": "XREQ-001 signup flow, safe result, durable dispatch, native provider limits and acceptance sources reviewed."
       }
     },
     {
@@ -402,8 +410,8 @@
         "center_discipline_set_v1"
       ],
       "review": {
-        "fingerprint": "ec4db659d1f98c536d13288a727fc0732a121373a85a8d1281f0d4e22a48e7fa",
-        "reason": "İlk ortak rehber güncel sözleşme ve alan kaynaklarıyla eşlendi; ortak kaynaklar WF00, public/ICS WF09, worker WF20 açık bağımlılığıdır. Test dosyası hosted kabul kanıtı değildir."
+        "fingerprint": "8f44129de14838877e873784f8ee680331bade4936f5c957fa86499faea3bbaf",
+        "reason": "XREQ-001 only appends a service-only signup wrapper; existing operation wrappers and this workflow behavior remain unchanged after source and guide review."
       }
     },
     {
@@ -486,8 +494,8 @@
         "class_assignment_set_v1"
       ],
       "review": {
-        "fingerprint": "a5e0155ed3ffa7560a0cccd0d84e34fcbc47c5836c7f5f4d78ff8bb2dccd4ca2",
-        "reason": "İlk ortak rehber güncel sözleşme ve alan kaynaklarıyla eşlendi; ortak kaynaklar WF00, public/ICS WF09, worker WF20 açık bağımlılığıdır. Test dosyası hosted kabul kanıtı değildir."
+        "fingerprint": "a6995d4c548b1e521a3a0c8e23b0c46bc7bba18da15c924455f7f34970f8523b",
+        "reason": "XREQ-001 only appends a service-only signup wrapper; existing operation wrappers and this workflow behavior remain unchanged after source and guide review."
       }
     },
     {
@@ -555,8 +563,8 @@
         "person_discipline_set_v1"
       ],
       "review": {
-        "fingerprint": "ef5d985452b8447f2a25ed5a48c7dde085c776adfb6efd0122bf0b1883d16e8d",
-        "reason": "İlk ortak rehber güncel sözleşme ve alan kaynaklarıyla eşlendi; ortak kaynaklar WF00, public/ICS WF09, worker WF20 açık bağımlılığıdır. Test dosyası hosted kabul kanıtı değildir."
+        "fingerprint": "a406b17b8c2ac0b88dac3d8d309eef662ef12ec2ddc3f592b679fbf3ef1cd053",
+        "reason": "Reviewed existing person registry suite plus signup acceptance import; person/role/merge behavior and wrappers are unchanged."
       }
     },
     {
@@ -640,8 +648,8 @@
         "negative_limits_get_v1"
       ],
       "review": {
-        "fingerprint": "b93c2d45b4ad52c2e70fab2bf646439d58008160d7b6164189e7cbb080b61564",
-        "reason": "Removed historical acceptance-tracking runtime_notes from sale refund contracts; request, response, permission, guards and sale workflow behavior are unchanged."
+        "fingerprint": "7a70ebd9efcbc11464293bde9af8b629fdd3c59048fa267beb07890dce358253",
+        "reason": "XREQ-001 only appends a service-only signup wrapper; existing operation wrappers and this workflow behavior remain unchanged after source and guide review."
       }
     },
     {
@@ -708,8 +716,8 @@
         "reservation_capacity_override_v1"
       ],
       "review": {
-        "fingerprint": "f8c197220266633f51985755671991396af28671ea880053acba58ba15ade37f",
-        "reason": "İlk ortak rehber güncel sözleşme ve alan kaynaklarıyla eşlendi; ortak kaynaklar WF00, public/ICS WF09, worker WF20 açık bağımlılığıdır. Test dosyası hosted kabul kanıtı değildir."
+        "fingerprint": "14a08ef54f4229293e9c701759d19ff315d756fac4c13d230a2953b7fcdbafc2",
+        "reason": "XREQ-001 only appends a service-only signup wrapper; existing operation wrappers and this workflow behavior remain unchanged after source and guide review."
       }
     },
     {
@@ -766,8 +774,8 @@
         "attendance_start_v1"
       ],
       "review": {
-        "fingerprint": "a18e8e9d496b5965e5df550822af27b1516e0a957c9cfaabb6e51d29297b4b35",
-        "reason": "İlk ortak rehber güncel sözleşme ve alan kaynaklarıyla eşlendi; ortak kaynaklar WF00, public/ICS WF09, worker WF20 açık bağımlılığıdır. Test dosyası hosted kabul kanıtı değildir."
+        "fingerprint": "7aee57a530b598ed296f9da21796ddd822c30f0f0d8592f586c250cfc4a61a76",
+        "reason": "XREQ-001 only appends a service-only signup wrapper; existing operation wrappers and this workflow behavior remain unchanged after source and guide review."
       }
     },
     {
@@ -823,8 +831,8 @@
         "debt_adjust_v1"
       ],
       "review": {
-        "fingerprint": "d7dda63a8f22d0b59f579ff14fdfaec6b1b7baf198b1095c62b1576e4a5fe0fb",
-        "reason": "Removed development-status pointers from finance and collection correction metadata; actual finance transaction contracts and workflow behavior are unchanged."
+        "fingerprint": "ab5b16cf9ff35d71f9d65dfb80b42b69174b4a30dd041a5b07e477602f0a1a16",
+        "reason": "XREQ-001 only appends a service-only signup wrapper; existing operation wrappers and this workflow behavior remain unchanged after source and guide review."
       }
     },
     {
@@ -864,8 +872,8 @@
         "calendar_feed_get_v1"
       ],
       "review": {
-        "fingerprint": "4b162255127fb99e991ffe7313a77ad7ee3deba3e06140186f718c5cc8cb0b55",
-        "reason": "İlk ortak rehber güncel sözleşme ve alan kaynaklarıyla eşlendi; ortak kaynaklar WF00, public/ICS WF09, worker WF20 açık bağımlılığıdır. Test dosyası hosted kabul kanıtı değildir."
+        "fingerprint": "d90474415f9a278e13053a21caa1e9c7096b322a80345778afb8bba67aa22406",
+        "reason": "Reviewed shared ingress signer: existing public-application path and signature are byte-equivalent; only the signup path was added."
       }
     },
     {
@@ -905,8 +913,8 @@
         "file_upload_complete_v1"
       ],
       "review": {
-        "fingerprint": "251f6f91bcee256ea248ee0a289edeed410b6a2aa4a603cfa449356e55408892",
-        "reason": "İlk ortak rehber güncel sözleşme ve alan kaynaklarıyla eşlendi; ortak kaynaklar WF00, public/ICS WF09, worker WF20 açık bağımlılığıdır. Test dosyası hosted kabul kanıtı değildir."
+        "fingerprint": "b7d84c4dc80f8e013a82ae71bc311243142060e4964dfb251186538e3c1aae73",
+        "reason": "XREQ-001 only appends a service-only signup wrapper; existing operation wrappers and this workflow behavior remain unchanged after source and guide review."
       }
     },
     {
@@ -939,8 +947,8 @@
         "document_publication_preview_v1"
       ],
       "review": {
-        "fingerprint": "aeb9e209926ac8d5f44dc45a72e9b2bbe3c2c8e176629315083590cad10c1b64",
-        "reason": "İlk ortak rehber güncel sözleşme ve alan kaynaklarıyla eşlendi; ortak kaynaklar WF00, public/ICS WF09, worker WF20 açık bağımlılığıdır. Test dosyası hosted kabul kanıtı değildir."
+        "fingerprint": "f460c205aa5d477160a7824d32b73cd71d47f9c21df7bc74c8c8ff6546269b69",
+        "reason": "XREQ-001 only appends a service-only signup wrapper; existing operation wrappers and this workflow behavior remain unchanged after source and guide review."
       }
     },
     {
@@ -986,8 +994,8 @@
         "settings_preparation_resolve_v1"
       ],
       "review": {
-        "fingerprint": "7aaf29d5afab8ccd944f775642270c3d81f9aa799c5f4a923edb4c0cb8158bd5",
-        "reason": "İlk ortak rehber güncel sözleşme ve alan kaynaklarıyla eşlendi; ortak kaynaklar WF00, public/ICS WF09, worker WF20 açık bağımlılığıdır. Test dosyası hosted kabul kanıtı değildir."
+        "fingerprint": "1cb0c8ef9daccc1666b3b158356dce49dd2c13e9e6052d18fb5ce94ce13950bd",
+        "reason": "XREQ-001 only appends a service-only signup wrapper; existing operation wrappers and this workflow behavior remain unchanged after source and guide review."
       }
     },
     {
@@ -1046,8 +1054,8 @@
         "saas_payment_submit_v1"
       ],
       "review": {
-        "fingerprint": "003cfedd3c095c436d9a1524bb22237b6e527eb70a00ee6a4afddaf8d72a8ac3",
-        "reason": "İlk ortak rehber güncel sözleşme ve alan kaynaklarıyla eşlendi; ortak kaynaklar WF00, public/ICS WF09, worker WF20 açık bağımlılığıdır. Test dosyası hosted kabul kanıtı değildir."
+        "fingerprint": "802bba9dba69a1e1f64e3688e7ce187f06394f1046a553510bc1f318dbccd1f2",
+        "reason": "XREQ-001 only appends a service-only signup wrapper; existing operation wrappers and this workflow behavior remain unchanged after source and guide review."
       }
     },
     {
@@ -1080,8 +1088,8 @@
         "instructor_agreements_list_v1"
       ],
       "review": {
-        "fingerprint": "18949f7366503bd826eafaed84b10b9ac6cabdbf75c9ba59e1376f34f4d3e88e",
-        "reason": "Removed development-status pointers from instructor payment metadata; earning/payment rules, permissions and acceptance obligations are unchanged."
+        "fingerprint": "00b632240455cf831f58dfcdc79920e151186c5ea17d855026a738b507f5a550",
+        "reason": "XREQ-001 only appends a service-only signup wrapper; existing operation wrappers and this workflow behavior remain unchanged after source and guide review."
       }
     },
     {
@@ -1146,8 +1154,8 @@
         "event_actual_start_correct_v1"
       ],
       "review": {
-        "fingerprint": "43fc903096d3b0203e403e9ddf2b5cae1bc45260aa3f2d982b603b4060374004",
-        "reason": "İlk ortak rehber güncel sözleşme ve alan kaynaklarıyla eşlendi; ortak kaynaklar WF00, public/ICS WF09, worker WF20 açık bağımlılığıdır. Test dosyası hosted kabul kanıtı değildir."
+        "fingerprint": "910cdb126d08b981c4d2442215b2eda2af464445aadeea0d5530cb0ea1696586",
+        "reason": "XREQ-001 only appends a service-only signup wrapper; existing operation wrappers and this workflow behavior remain unchanged after source and guide review."
       }
     },
     {
@@ -1183,8 +1191,8 @@
         "automation_save_v1"
       ],
       "review": {
-        "fingerprint": "aac859e4b242a0157c6172ccaa91e882b3681e56681aaf3f78ce6edeb46e3716",
-        "reason": "İlk ortak rehber güncel sözleşme ve alan kaynaklarıyla eşlendi; ortak kaynaklar WF00, public/ICS WF09, worker WF20 açık bağımlılığıdır. Test dosyası hosted kabul kanıtı değildir."
+        "fingerprint": "2ae1a178bdade029d98257d2283f20466ddf89d8f5b3751823fc9873b49009e9",
+        "reason": "XREQ-001 only appends a service-only signup wrapper; existing operation wrappers and this workflow behavior remain unchanged after source and guide review."
       }
     },
     {
@@ -1253,8 +1261,8 @@
         "platform_owner_remove_v1"
       ],
       "review": {
-        "fingerprint": "198bc26b8c3e02513831b75993af0cef7225abd8522d257b03f932473c973fc7",
-        "reason": "PR91 document ownership only: account and settings behavior unchanged; frontend acceptance pointers updated without changing runtime or restore guards."
+        "fingerprint": "26c0b3db564ca337801c8459d68b60a8303c608bfd84f532fc2eada96049f7da",
+        "reason": "XREQ-001 only appends a service-only signup wrapper; existing operation wrappers and this workflow behavior remain unchanged after source and guide review."
       }
     },
     {
@@ -1284,8 +1292,8 @@
         "settlement_authority_set_v1"
       ],
       "review": {
-        "fingerprint": "f8a03179c08a76ffbf5553f35221488c23bd92ef5f71cbb243b4ae5a91a3e763",
-        "reason": "İlk ortak rehber güncel sözleşme ve alan kaynaklarıyla eşlendi; ortak kaynaklar WF00, public/ICS WF09, worker WF20 açık bağımlılığıdır. Test dosyası hosted kabul kanıtı değildir."
+        "fingerprint": "6d5540bde93f800b0c7c6f9c82e6208d1e3e182fbe3723ae2e66c8cb46858ad2",
+        "reason": "XREQ-001 only appends a service-only signup wrapper; existing operation wrappers and this workflow behavior remain unchanged after source and guide review."
       }
     },
     {
@@ -1310,8 +1318,8 @@
         "seat_offer_reject_v1"
       ],
       "review": {
-        "fingerprint": "ba0ba0736c682b29a012d9f6eda7fd99b2e98e1f2e0455f8ba44f84143a3f2b4",
-        "reason": "İlk ortak rehber güncel sözleşme ve alan kaynaklarıyla eşlendi; ortak kaynaklar WF00, public/ICS WF09, worker WF20 açık bağımlılığıdır. Test dosyası hosted kabul kanıtı değildir."
+        "fingerprint": "77600742202c80f98ad4dcfc48e4e83656c93f680e55f462dc5efa0276121f63",
+        "reason": "XREQ-001 only appends a service-only signup wrapper; existing operation wrappers and this workflow behavior remain unchanged after source and guide review."
       }
     },
     {
@@ -1365,8 +1373,8 @@
         "subscription_boundary_apply_v1"
       ],
       "review": {
-        "fingerprint": "888ccd8ef2662f15123fdcb6dc6e373c05cd129f06e03dc75e9c25b06ce20caf",
-        "reason": "İlk ortak rehber güncel sözleşme ve alan kaynaklarıyla eşlendi; ortak kaynaklar WF00, public/ICS WF09, worker WF20 açık bağımlılığıdır. Test dosyası hosted kabul kanıtı değildir."
+        "fingerprint": "056861e3472f918bf2417af29fcc85277ef7881b36039421058f8bc71f2332f6",
+        "reason": "XREQ-001 only appends a service-only signup wrapper; existing operation wrappers and this workflow behavior remain unchanged after source and guide review."
       }
     }
   ]

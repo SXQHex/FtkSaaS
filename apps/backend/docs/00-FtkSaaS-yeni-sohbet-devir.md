@@ -4,14 +4,9 @@
 
 ## Kaynak tabanı
 
-Repo SXQHex/FtkSaaS; main `5455ba824868e30adac131993608e81477a3b461`, tree `efa209fa71f627690e7e107c46f852a7b2e4a77d`. PR89 öğrenci modülü, PR84 restore-guard araçları ve PR91 frontend bölüm planı main’dedir. PR91 yalnız web belgelerini değiştirdi; frontend bölüm/aktif iş/kabul sahibinin [web yol haritası](../../web/docs/todo.md) olması korunur. Kaynak envanteri: 221 implemented operasyon, 83 migration. Operasyon varlığı bütün selector/provider/ekran kabulü değildir; detay envanterler üreticiden gelir.
+Repo SXQHex/FtkSaaS; uygulama tabanı main `17ee1ebcf7b900b8e420d44903b589a9ebd22830`, tree `96440bc185aacd4370ae47e58c7853d7bb09081a`. PR97 XREQ-001 talebini kaydetti; sonraki PR98 frontend parola/saat dilimi değişikliğini ve XREQ-002 talebini ekledi. Backend runtime değişmedi. Bu main’in [kaynak kanıtı](https://github.com/SXQHex/FtkSaaS/actions/runs/41029219526), [merge kanıtı](https://github.com/SXQHex/FtkSaaS/actions/runs/41029219505) ve [development teslimi](https://github.com/SXQHex/FtkSaaS/actions/runs/41029271073) başarılı; backend kaynak değişmediği için development deploy atlandı. Önceki başarı yeni uygulama head’inin kabulü değildir.
 
-| Aynı main SHA’sının koşusu | Bu kontrolde görülen sonuç |
-|---|---|
-| [Merge kanıtı 40984554734](https://github.com/SXQHex/FtkSaaS/actions/runs/40984554734) | completed/success |
-| [Frontend 40984554770](https://github.com/SXQHex/FtkSaaS/actions/runs/40984554770) | completed/success |
-
-Bu okumada yalnız run özetleri doğrulandı; job/receipt içeriği ve canlı Edge/DB metadata’sı yeniden okunmadı. Son okunmuş backend main/CD başarısı önceki `fe650618503be24eb117297dc412c4ae6fd8018c` kaynağına aittir ([main](https://github.com/SXQHex/FtkSaaS/actions/runs/40980147546), [development CD](https://github.com/SXQHex/FtkSaaS/actions/runs/40980186925)); PR91 bu runtime’ı değiştirmez fakat eski koşu yeni SHA’da çalışmış gibi gösterilmez. Bu kayıt hosted sürüm/envanter veya bütün akışların tarayıcı kabulü iddiası değildir.
+Mevcut XREQ-001 revizyonu 222 implemented operasyon ve 84 migration içerir. Yeni kayıt adapter/gateway sözleşmesi ve dört ürün senaryosu için gerçek Auth/SMTP kabul kaynağı eklenmiştir. Yerel backend verify başarılı: 148 sözleşme/güvenlik/restore ve 81 CI politika testi (toplam 229); mevcut hesap kontrolünü bozan mutation testi başarısız oldu ve kaynak geri yüklendi. yerel native stack PostgreSQL paketini ağ kısıtı nedeniyle indiremedi. Gerçek DB/Auth/SMTP test sonucu aday CI’da doğrulanacak; yazılmış test geçilmiş test sayılmaz. Bu kayıt hosted sürüm veya frontend ekran kabulü iddiası değildir.
 
 ## Kabul edilmiş kapsamın sınırı
 
@@ -21,9 +16,11 @@ Bu okumada yalnız run özetleri doğrulandı; job/receipt içeriği ve canlı E
 - PR84 JSON restore guard, imzalı sicil ve guarded callback araçlarını ekler. Hosted SQL yükleyiciye entegrasyon veya tamamlanmış DB/Auth/Storage purge sağlamaz.
 - PR89 öğrenci arama/detay/kişi yazma/öğrencilik/davet işi takibini içerir. Frontend CI sonucu gerçek yetkili hesapla hosted bütün ekran/yazma/teslim kabulünün yerine geçmez. Ekran davranışının sahibi [web geliştirme rehberi](../../web/docs/development.md).
 
-## PR90
+## XREQ-001 teslim sınırı
 
-Draft [PR90](https://github.com/SXQHex/FtkSaaS/pull/90), belge merkeziyetçiliği ve kaynak bağlı dokümantasyon altyapısıdır. Bu yerel revizyonda PR91 dahil main tabanı güncellendi; eski alan devirleri birleştirildi, tek karar sahipleri tanımlandı. Son kullanıcı PR90’ın main ile birleştirilmesini istedi; önceki push/aday CI bekletme kararı bu teslim için kaldırıldı. Yerel revizyon yayımlanıp aynı head/base/merge kaynağının gerekli aday CI’si doğrulanır; başarı olmadan merge yapılmaz. Önceki PR90 head/test başarısı bu revizyonun kabulü değildir. Son kaynak bağımsız incelemesi tamamlandı; uzaktaki yeni kaynak kabulü ve ardından main/development doğrulaması ayrıca gerekir. Hosted metadata/DB tipi artifact kabulü DOCS-01 kapsamında ayrıca açık kalır.
+Kullanıcı “tamamla” ile backend uygulamasını istedi. `account_signup_request_v1`, ana/Google e-postası için yalnız varlık sonucunu verir; mevcut adreste native signup çağrılmaz. Yeni adreste native Auth parola/PKCE/doğrulama korunur; belirsiz dispatch otomatik yinelenmez. Ortak WF/typed tüketici ve backend işletim kurtarması aynı revizyondadır. Frontend kodu değiştirilmedi; route/consumer ve gerçek hosted kabul ayrı bağımlılıktır.
+
+Ayrı branch `fix/backend-existing-signup-account`; son kaynak bağımsız incelemesinde kalan zorunlu bulgu yok; exact-source aday full clean gerekir. Bu revizyon henüz merge/development kabulü değildir. Önceki PR97 merge yetkisi bu uygulamanın merge onayı olarak kullanılmaz. Full clean başlayınca kök AGENTS devir kuralına göre kullanıcıya run/head/base/tested merge bilgisi verilir ve kullanıcı dönene kadar takip yapılmaz.
 
 ## Alanlar arası koordinasyon
 

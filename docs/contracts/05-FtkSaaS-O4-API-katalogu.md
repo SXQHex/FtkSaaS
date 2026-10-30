@@ -2,7 +2,7 @@
 
 Üretilmiştir: `packages/api-contracts/schema/contract.json` ve `implemented.json` → `render_catalogs.py`. Elle düzenleme. DTO/enum/izin için makine sözleşmesi tek kaynaktır; çağrı sırası [WF rehberi](../workflows.md), transport [istemci protokolü](../client-integration.md) sahibindedir.
 
-221 sözleşme operasyonu; 221 kaynak envanterinde, 0 contract-only. Kaynakta bulunmak tüm selector/provider/özellik veya hosted kabulünün tamamlandığını göstermez. Backend-only worker işlemleri tarayıcı çağrısı değildir.
+222 sözleşme operasyonu; 222 kaynak envanterinde, 0 contract-only. Kaynakta bulunmak tüm selector/provider/özellik veya hosted kabulünün tamamlandığını göstermez. Backend-only worker işlemleri tarayıcı çağrısı değildir.
 
 | İşlem | Kaynak durumu / tüketici | İzin | Tür / abonelik | İstek | Yanıt |
 |---|---|---|---|---|---|
@@ -227,6 +227,7 @@
 | `calendar_link_revoke_v1` | runtime / ilgili WF’yi oku | `calendar.self` | W / config | client_api_version: 1; request_id: FtkUuid; operation_key: FtkUuid; link_id: FtkUuid; expected_version: PositiveInt | Success_calendar_link_revoke |
 | `calendar_feed_get_v1` | runtime / ilgili WF’yi oku | `calendar.feed` | R / read | client_api_version: 1; request_id: FtkUuid; token: string | Success_calendar_feed_get |
 | `settings_preparation_resolve_v1` | runtime / ilgili WF’yi oku | `preparation.resolve` | R / read | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; center_id: FtkUuid; kind: availability / package; source: PreparationSourceReference; resource?: ResourceRef; rule_index?: integer | Success_settings_preparation_resolve |
+| `account_signup_request_v1` | runtime / ilgili WF’yi oku | `auth.signup` | H / exempt | client_api_version: 1; request_id: FtkUuid; email: string; password: string; code_challenge?: string; code_challenge_method?: s256; email_redirect_to?: string; captcha_token?: string | Success_account_signup_request |
 
 ## Sürüm ve okuma desteği
 
@@ -455,6 +456,7 @@
 | calendar_link_revoke_v1 | auth | row_version | calendar_links_get_v1 | implemented | personal_calendar_credential_change, personal_calendar_metadata_history, receipt |
 | calendar_feed_get_v1 | read | none | None | not_required |  |
 | settings_preparation_resolve_v1 | read | none | None | not_required |  |
+| account_signup_request_v1 | auth | none | None | implemented |  |
 
 ## Sunucunun hesaplaşma yetki bağlamı
 

@@ -1,10 +1,10 @@
 # Veritabanı kaynak referansı
 
-Üretilmiştir: `node apps/backend/scripts/update-docs.mjs --write`. Elle düzenleme. Kaynak içerik özeti: `f7a84deef6c684c77823812bd630ffdd85d219766834febb79083b44dc15f311`. Bu özet CI/hosted kabulü değildir; dağıtılan SHA ve ortam CD artifact'ında bulunur.
+Üretilmiştir: `node apps/backend/scripts/update-docs.mjs --write`. Elle düzenleme. Kaynak içerik özeti: `ca8f20261ef528294476b46606ac9842169287a24e54762f4c967f39e623c9fb`. Bu özet CI/hosted kabulü değildir; dağıtılan SHA ve ortam CD artifact'ında bulunur.
 
 Alan/scope/değişmez görünümü [fiziksel şema kataloğundadır](contracts/04-FtkSaaS-O4-veri-semasi.md). Bu dosya ikinci DDL sözleşmesi değildir. Etkin PostgreSQL şeması migration zincirinin uygulanmasıyla oluşur; dosyaları regex ile birleştirmek nihai şema çıkarımı sayılmaz.
 
-Sıralı migration: 83. Uygulanmış içerik manifesti: [migrations.sha256.json](../apps/backend/database/migrations.sha256.json). CD, migration içeriklerini canlı geçmişle doğrular; dokümantasyon capture adımı ayrıca read-only pg_catalog snapshot ve Supabase CLI DB tiplerini alır. İş verisi/Auth satırı/secret toplanmaz.
+Sıralı migration: 84. Uygulanmış içerik manifesti: [migrations.sha256.json](../apps/backend/database/migrations.sha256.json). CD, migration içeriklerini canlı geçmişle doğrular; dokümantasyon capture adımı ayrıca read-only pg_catalog snapshot ve Supabase CLI DB tiplerini alır. İş verisi/Auth satırı/secret toplanmaz.
 
 | Migration | SHA256 |
 |---|---|
@@ -91,3 +91,4 @@ Sıralı migration: 83. Uygulanmış içerik manifesti: [migrations.sha256.json]
 | [20261028175405_starter_availability_management.sql](../apps/backend/supabase/migrations/20261028175405_starter_availability_management.sql) | `55c5f4129982e88f7dcf49173fb7d8f97af48bd57de54d9b20a42ce2e3a93d4d` |
 | [20261028180210_starter_availability_management_asof.sql](../apps/backend/supabase/migrations/20261028180210_starter_availability_management_asof.sql) | `94faca5fcb311f1cf2c910cc3a0eab20ba827dafeeffa6d5d6080aade0f0950d` |
 | [20261028203952_organization_brand_colors.sql](../apps/backend/supabase/migrations/20261028203952_organization_brand_colors.sql) | `b0631f4fe4abd1144fcfc742284f153d74cf47a923c9a92928e3a2894a670b64` |
+| [20261030083856_account_signup_guard.sql](../apps/backend/supabase/migrations/20261030083856_account_signup_guard.sql) | `77d60f6021952100ccb7907513f2f49866726d08dcd600da50f521569e7b588d` |

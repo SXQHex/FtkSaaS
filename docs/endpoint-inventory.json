@@ -5947,6 +5947,32 @@
         "New centers copy org preparation arrays once; existing centers and business snapshots do not live-inherit.",
         "Package dates and refund method are explicit; no automatic rolling validity or implicit none."
       ]
+    },
+    {
+      "name": "account_signup_request_v1",
+      "status": "operational_development_limited",
+      "external_path": "/functions/v1/backend-v1/account_signup_request_v1",
+      "permission": "auth.signup",
+      "features": [
+        "F06"
+      ],
+      "required_features": [
+        "F06"
+      ],
+      "runtime_required_features": [],
+      "decision_delivery": {
+        "accepted_contract": "DS-2026-10-17",
+        "runtime_conformance": "implemented_pending_ci",
+        "open_dependencies": [
+          "frontend_signup_proxy_integration",
+          "hosted_signup_acceptance"
+        ],
+        "target_request": {
+          "$ref": "#/$defs/Request_account_signup_request"
+        }
+      },
+      "billing_class": "exempt",
+      "limits": []
     }
   ]
 }

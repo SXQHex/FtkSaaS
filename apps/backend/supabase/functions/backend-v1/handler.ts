@@ -1,6 +1,7 @@
 import {calendarFeed} from './calendar-feed.ts';
 import {calendarToken,calendarTokenHash,calendarOrigin,calendarSubscriptionUrl,calendarAppUrl} from './calendar-token.ts';
 import {lifecycleReauth} from './lifecycle-auth.ts';
+import {accountSignup} from './account-signup.ts';
 import {passwordChallenge,passwordRecovery} from './account-auth.ts';
 import {publicIngress,verifyPublicBot,publicBotHostname} from "./public-ingress.ts";
 import {importStorage,parseImportCsv} from "./import-file.ts";
@@ -23,6 +24,15 @@ Deno.serve(async req=>{
   const request=JSON.parse(body);if(request.client_api_version!==1)return operation==='account_password_reset_request_v1'?failure("VALIDATION_FAILED"):failure("CLIENT_UPDATE_REQUIRED",426);const validate=(validators as any)["request_"+operation];
   if(!validate?.(request))return failure("VALIDATION_FAILED");
   const base=Deno.env.get("SUPABASE_URL")!,key=Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
+  if(operation==='account_signup_request_v1'){
+   const result=await accountSignup(req,body,request,base,Deno.env.get('SUPABASE_ANON_KEY'),n=>Deno.env.get(n),async(safeRequest,aux)=>{
+    const rpc=await fetch(base+'/rest/v1/rpc/'+operation,{method:'POST',headers:{authorization:'Bearer '+key,apikey:key,'content-type':'application/json','Content-Profile':'api_v1'},body:JSON.stringify({p_request:safeRequest,p_actor_auth_id:null,p_session_id:null,p_ids:[v7(),v7()],p_aux:aux}),signal:AbortSignal.timeout(10000)});
+    if(!rpc.ok)throw Error('SIGNUP_RPC_UNAVAILABLE');return rpc.json();
+   });
+   const out=result.error?{ok:false,error:{code:result.error,retryable:result.error==='TEMPORARY_FAILURE',trace_id:v7()}}:{ok:true,data:result.data,trace_id:v7()};
+   if(out.ok&&!(validators as any)['success_'+operation](out))return failure('INTEGRITY_VIOLATION',500);
+   return json(out,200,true);
+  }
   if(operation==='account_password_reset_request_v1'){
    const result=await passwordRecovery(req,body,request,base,key,n=>Deno.env.get(n),async aux=>{
     const rpc=await fetch(base+'/rest/v1/rpc/'+operation,{method:'POST',headers:{authorization:'Bearer '+key,apikey:key,'content-type':'application/json','Content-Profile':'api_v1'},body:JSON.stringify({p_request:request,p_actor_auth_id:null,p_session_id:null,p_ids:Array.from({length:32},()=>v7()),p_aux:aux})});

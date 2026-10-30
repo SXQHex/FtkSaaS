@@ -195,3 +195,5 @@ assert next(Path("supabase/migrations").glob("*_starter_availability_management.
 assert next(Path("supabase/migrations").glob("*_starter_availability_management_asof.sql")).read_text()==Path("database/starter-availability-management-asof.sql").read_text(),"Availability management snapshot source drift"
 
 assert next(Path('supabase/migrations').glob('*_organization_brand_colors.sql')).read_text()==Path('database/organization-brand-colors.sql').read_text(),'Organization brand colors migration source drift'
+
+assert next(Path('supabase/migrations').glob('*_account_signup_guard.sql')).read_text()==Path('database/account-signup.sql').read_text()+Path('database/account-signup-wrappers.sql').read_text(),'Signup guard source drift'

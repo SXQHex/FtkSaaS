@@ -775,7 +775,17 @@ Program/seans, rezervasyon/koruma, hakediş, P01–P07 okuma/yazma, rapor/import
 
 ### Native sağlayıcı önceliği — 26 Ekim son karar
 
-Supabase native Auth kayıt/giriş/kurtarma ve güvenlik yaşam döngüsünün ana yoludur. Turnstile hesapsız public başvuru korumasıdır; native Auth CAPTCHA zorunluluğu yoktur. Native davranış belirgin bir güvenlik açığı veya bağlayıcı ürün gereksinimini karşılamama durumu oluşturmuyorsa aynı işi tekrar eden function/gateway veya sağlayıcı iç şemasına/sorgu sırasına bağlı özel bakım alınmaz. İstisna somut risk ve dar zorunlu gereksinimle açıklanır; sırf daha katı göründüğü için ek katman eklenmez. Bu tercih canlı oturum doğrulamasını, zorunlu MFA'yı, tenant/rol/yetki izolasyonunu veya mevcut full/main clean assertionlarını kaldırmaz. Pazarlama izni ile güvenlik iletişimi ayrımı korunur.
+Supabase native Auth kayıt/giriş/kurtarma ve güvenlik yaşam döngüsünün ana yoludur. Turnstile hesapsız public başvuru korumasıdır; native Auth CAPTCHA zorunluluğu yoktur. Native davranış belirgin bir güvenlik açığı veya bağlayıcı ürün gereksinimini karşılamama durumu oluşturmuyorsa aynı işi tekrar eden function/gateway veya sağlayıcı iç şemasına/sorgu sırasına bağlı özel bakım alınmaz. Dar kayıt istisnası aşağıdaki XREQ-001’dir: native tekrar-kayıt yanıtı istenen açık varlık sonucunu ve doğrulanmamış hesapta posta göndermeme şartını sağlamaz. Bu tercih canlı oturum doğrulamasını, zorunlu MFA'yı, tenant/rol/yetki izolasyonunu veya mevcut full/main clean assertionlarını kaldırmaz. Pazarlama izni ile güvenlik iletişimi ayrımı korunur.
+
+### Kayıtta mevcut adres (XREQ-001)
+
+E-posta/parola kaydında normalize edilmiş adres `auth.users.email` veya bağlı Google kimliğinin `auth.identities.identity_data.email` alanında mevcutsa, doğrulanmamış hesap dahil, yalnız `account_exists` sonucu döner. Yeni hesap oluşturulmaz ve kayıt nedeniyle doğrulama e-postası gönderilmez. Hangi hesaba bağlı olduğu, ana e-posta, giriş yöntemi veya rol anonim kullanıcıya açıklanmaz. Adres varlığının açıklanması kullanıcının 30 Ekim 2026 bilinçli ürün kararıdır; sahiplik veya oturum kanıtı değildir. İstemci mesajı:
+
+> Bu e-posta adresiyle ilişkili bir hesap zaten var. Giriş yapın, Google ile devam edin veya parolanızı yenileyin.
+
+Yeni adreste native Auth parola, isteğe bağlı CAPTCHA, PKCE, redirect ve e-posta doğrulaması korunur. Ayrı doğrulama yeniden gönderme ve varlığı gizleyen parola kurtarma akışları değişmez. [WF01](../workflows.md#wf01) kayıt isteği güvenilir sunucu transport’undan geçer; native `/signup` sonucunun tek başına HTTP 200 olması yeni hesap kanıtı değildir. [Native signup kaynağı](https://github.com/supabase/auth/blob/master/internal/api/signup.go) doğrulanmış mevcut hesapta gizlenmiş yanıt, doğrulanmamış mevcut hesapta yeniden doğrulama gönderimi davranışını içerir; `before-user-created` kancası yalnız yeni hesapta çalıştığından tek başına çözüm değildir.
+
+Proxy çağrıları aynı adres için kalıcı dispatch kaydıyla seri hale gelir; kayıt yalnız HMAC adres parmak izi, sunucu deneme kimliği ve zamanı tutar. Belirsiz sağlayıcı sonucu/timeout/çökme sonrasında süre dolumuyla otomatik yeniden gönderim yoktur. Bu koruma aynı proxy’yi kullanan kayıtlar içindir; doğrudan native kayıt, OAuth oluşturma/bağlama veya e-posta değişiminin eşzamanlı işlemlerini kilitlemez. Global Auth benzersizliği veya bütün native yolların posta göndermeme garantisi olarak sunulmaz. İşletim kurtarması backend runbook’undadır.
 
 ### Kabul edilmiş kullanıcı davranışları
 

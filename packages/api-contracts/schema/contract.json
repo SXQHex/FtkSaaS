@@ -921,7 +921,8 @@
         "calendar_link_rotate_v1",
         "calendar_link_revoke_v1",
         "calendar_feed_get_v1",
-        "settings_preparation_resolve_v1"
+        "settings_preparation_resolve_v1",
+        "account_signup_request_v1"
       ]
     },
     "EntityType": {
@@ -2800,7 +2801,8 @@
             "ACCOUNT_ALREADY_LINKED",
             "ACCOUNT_LINK_REQUIRED",
             "SUBSCRIPTION_NOT_STARTED",
-            "PARTICIPATION_BLOCKED"
+            "PARTICIPATION_BLOCKED",
+            "WEAK_PASSWORD"
           ]
         },
         "retryable": {
@@ -50290,6 +50292,94 @@
     "AvailabilityEndTime": {
       "type": "string",
       "pattern": "^(([01][0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9]|24:00:00)$"
+    },
+    "Request_account_signup_request": {
+      "type": "object",
+      "properties": {
+        "client_api_version": {
+          "const": 1
+        },
+        "request_id": {
+          "$ref": "#/$defs/FtkUuid"
+        },
+        "email": {
+          "type": "string",
+          "minLength": 3,
+          "maxLength": 254
+        },
+        "password": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 4096
+        },
+        "code_challenge": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9_-]{43}$"
+        },
+        "code_challenge_method": {
+          "const": "s256"
+        },
+        "email_redirect_to": {
+          "type": "string",
+          "format": "uri",
+          "maxLength": 2048
+        },
+        "captcha_token": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 4096
+        }
+      },
+      "required": [
+        "client_api_version",
+        "request_id",
+        "email",
+        "password"
+      ],
+      "additionalProperties": false,
+      "dependentRequired": {
+        "code_challenge": [
+          "code_challenge_method"
+        ],
+        "code_challenge_method": [
+          "code_challenge"
+        ]
+      }
+    },
+    "AccountSignupResult": {
+      "type": "object",
+      "properties": {
+        "status": {
+          "enum": [
+            "account_exists",
+            "confirmation_required"
+          ]
+        }
+      },
+      "required": [
+        "status"
+      ],
+      "additionalProperties": false
+    },
+    "Success_account_signup_request": {
+      "type": "object",
+      "properties": {
+        "ok": {
+          "const": true
+        },
+        "data": {
+          "$ref": "#/$defs/AccountSignupResult"
+        },
+        "trace_id": {
+          "$ref": "#/$defs/FtkUuid"
+        }
+      },
+      "required": [
+        "ok",
+        "data",
+        "trace_id"
+      ],
+      "additionalProperties": false
     }
   },
   "x-contract": {
@@ -50369,7 +50459,8 @@
       "templates.resolve": "Own member or explicitly scoped shared template; live report/import domain access required. Configuration sharing never grants execution access.",
       "calendar.self": "Own global account calendar link metadata and lifecycle; explicit nested org is checked live, never an actor selector.",
       "calendar.feed": "Public opaque personal calendar bearer link, current hash and live account/org/link/own booking or duty; service-only transport.",
-      "preparation.resolve": "Live CM on the explicit destination, source scope/version and real resource/plan guards; no actor choice."
+      "preparation.resolve": "Live CM on the explicit destination, source scope/version and real resource/plan guards; no actor choice.",
+      "auth.signup": "Hesapsız kayıt: yalnız adres varlığı sonucu; bağlı hesap, ana adres, rol veya oturum açıklanmaz."
     },
     "tables": [
       {
@@ -78320,6 +78411,92 @@
             "$ref": "#/$defs/Request_settings_preparation_resolve"
           }
         }
+      },
+      {
+        "name": "account_signup_request_v1",
+        "module": "M02",
+        "features": [
+          "F06"
+        ],
+        "permission": "auth.signup",
+        "actor_source": "public_request_context",
+        "transport": "H",
+        "billing_class": "exempt",
+        "request": {
+          "$ref": "#/$defs/Request_account_signup_request"
+        },
+        "success": {
+          "$ref": "#/$defs/Success_account_signup_request"
+        },
+        "errors": [
+          "RATE_LIMITED",
+          "TEMPORARY_FAILURE",
+          "SERVICE_UNAVAILABLE",
+          "VALIDATION_FAILED",
+          "WEAK_PASSWORD",
+          "BOT_VERIFICATION_FAILED",
+          "RESULT_NOT_CONFIRMED"
+        ],
+        "transaction_class": "auth",
+        "transaction_guarantee": "Durable per-address dispatch claim before native signup. Existing primary/Google identity email returns account_exists without provider signup or email. Native Auth owns account creation and verification.",
+        "transition": {
+          "effect": "native_signup_or_account_exists",
+          "from": [],
+          "to": [],
+          "invariant": "No new signup call for an existing address or unresolved dispatch."
+        },
+        "semantic_guards": [
+          "billing_gate_exempt",
+          "required_feature_gates_separate_from_references",
+          "signed_public_ingress_and_ip_rate",
+          "native_signup_password_captcha_pkce",
+          "explicit_signup_existence_without_identity_or_tenant_disclosure",
+          "durable_dispatch_no_unknown_outcome_retry"
+        ],
+        "audit": false,
+        "notification": "none",
+        "concurrency": "Per-address proxy dispatch claim; unknown outcomes never expire or automatically retry. Native signup/OAuth/link/email changes are outside this fence.",
+        "expected_version_subject": "none",
+        "acceptance_scenario_ids": [
+          "A01",
+          "A02",
+          "A03",
+          "A23",
+          "A24",
+          "A25",
+          "A46",
+          "A47",
+          "A55"
+        ],
+        "configuration_policy": "numeric plan limits/prices and legal approval are deployment configuration, never arbitrary allow/deny",
+        "implementation_status": "operational_development_limited",
+        "required_features": [
+          "F06"
+        ],
+        "runtime_required_features": [],
+        "conditional_features": [],
+        "operation_contract": {
+          "kind": "auth",
+          "target_entity": "accounts",
+          "version_mode": "none",
+          "version_field": null,
+          "read_operation": null,
+          "atomic_effects": [],
+          "business_commit": false,
+          "read_path_status": "implemented",
+          "source_decision": "XREQ-001"
+        },
+        "decision_delivery": {
+          "accepted_contract": "DS-2026-10-17",
+          "runtime_conformance": "implemented_pending_ci",
+          "open_dependencies": [
+            "frontend_signup_proxy_integration",
+            "hosted_signup_acceptance"
+          ],
+          "target_request": {
+            "$ref": "#/$defs/Request_account_signup_request"
+          }
+        }
       }
     ],
     "policy_value_map": {
@@ -93689,6 +93866,18 @@
         "origin": "ftksaas",
         "acceptance": "generic_uuid",
         "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Request_account_signup_request/properties/request_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Success_account_signup_request/properties/trace_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
       }
     ],
     "open_product_decisions": [],
@@ -93852,6 +94041,10 @@
       {
         "function": "private.session_shared_participants",
         "kind": "live_confirmed_future_or_ongoing_opt_in_projection"
+      },
+      {
+        "function": "private.account_signup_gate",
+        "kind": "service_only_signup_existence_and_durable_dispatch"
       }
     ],
     "runtime": {
@@ -94079,13 +94272,14 @@
         "calendar_link_rotate_v1",
         "calendar_link_revoke_v1",
         "calendar_feed_get_v1",
-        "settings_preparation_resolve_v1"
+        "settings_preparation_resolve_v1",
+        "account_signup_request_v1"
       ],
       "auth": "Supabase getUser + live auth.sessions + current account/link/role; no request actor claims",
       "uuid": "backend uuid@14.0.3 v7 for all inserted IDs; DB defaults not required",
       "external_transport": "POST /functions/v1/backend-v1/{operation}; direct typed request body",
       "internal_rpc": "service-only api_v1 named functions; actor/session/UUID bank supplied by verified gateway",
-      "migration_count": 83,
+      "migration_count": 84,
       "acceptance_source": "apps/backend/docs/00-FtkSaaS-yeni-sohbet-devir.md"
     },
     "decision_sprint": {
@@ -94782,7 +94976,8 @@
         "calendar_link_rotate_v1",
         "calendar_link_revoke_v1",
         "calendar_feed_get_v1",
-        "settings_preparation_resolve_v1"
+        "settings_preparation_resolve_v1",
+        "account_signup_request_v1"
       ],
       "runtime_deliveries": {
         "starter_attendance_protection": {
@@ -95155,10 +95350,13 @@
           "account_sessions_revoke_v1",
           "account_security_history_get_v1",
           "account_totp_remove_v1",
-          "account_google_link_prepare_v1"
+          "account_google_link_prepare_v1",
+          "account_signup_request_v1"
         ],
         "dependencies": [
-          "plan_gate_alignment"
+          "plan_gate_alignment",
+          "frontend_signup_proxy_integration",
+          "hosted_signup_acceptance"
         ],
         "implementation": "source_operations_present",
         "acceptance": "pending_feature_acceptance",
@@ -95185,7 +95383,8 @@
           "account_sessions_revoke_v1",
           "account_security_history_get_v1",
           "account_totp_remove_v1",
-          "account_google_link_prepare_v1"
+          "account_google_link_prepare_v1",
+          "account_signup_request_v1"
         ],
         "contract_only_operations": [],
         "acceptance_case_ids": [

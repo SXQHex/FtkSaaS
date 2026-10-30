@@ -17,7 +17,7 @@ export function validateGovernance(p,implemented){
   assert(x.permissions[o.permission],'UNKNOWN_PERMISSION '+o.name);
   assert(d[o.success.$ref.split('/').at(-1)],'UNKNOWN_SUCCESS '+o.name);
   assert(k&&allowedKinds.includes(k.kind),'OP_PHASE '+o.name);
-  if(!['public_calendar_get_v1','public_application_submit_v1','account_password_reset_request_v1'].includes(o.name))assert(o.semantic_guards.includes('live_actor_and_scope'),'MISSING_LIVE_SCOPE '+o.name);
+  if(!['public_calendar_get_v1','public_application_submit_v1','account_password_reset_request_v1','account_signup_request_v1'].includes(o.name))assert(o.semantic_guards.includes('live_actor_and_scope'),'MISSING_LIVE_SCOPE '+o.name);
   for(const f of [...o.features,...o.required_features,...o.runtime_required_features,...o.conditional_features.map(v=>v.feature)])assert(features[f],'UNKNOWN_FEATURE '+o.name);
   for(const f of o.required_features)assert(o.features.includes(f),'REQUIRE_UNREFERENCED_FEATURE '+o.name);
   assert.equal(live.has(o.name),o.implementation_status==='operational_development_limited','RUNTIME_INVENTORY '+o.name);
