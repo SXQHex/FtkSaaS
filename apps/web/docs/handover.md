@@ -1,13 +1,9 @@
 # Frontend sohbet devri
 
-Bu dosya frontend'in sonraki sohbete taşıdığı çalışma bağlamının sahibidir. Aktif bölüm, görev listesi ve modül kabulü [todo.md](todo.md) içinde tutulur; burada kopyalanmaz. Backend devri ve ortak `/docs` frontend sohbetini devretmek için güncellenmez.
+Aktif bölüm, kapsam ve kabulün tek sahibi [todo.md](todo.md) dosyasıdır. Bu dosya yalnız devam için gerekli çalışma bağlamını taşır.
 
-## Sonraki çalışmanın başlangıcı
+## Çalışma bağlamı
 
-Önce [frontend ajan kuralları](../AGENTS.md), [geliştirme rehberi](development.md) ve [tek frontend planı](todo.md) okunur. İncelenen PR91 main kaynağı `5455ba824868e30adac131993608e81477a3b461` idi; yeni çalışmada canlı main/head ve aynı kaynağın kanıtı yeniden doğrulanır. Bu not yeni bir test, hosted kabul veya bölüm kapanışı iddiası değildir.
+Aktif dal `fix/web-account-form-feedback`, main tabanı `17ee1ebcf7b900b8e420d44903b589a9ebd22830`. S02 ayrı Draft PR93'te korunur. PR98 saat dilimi/parola formu main’e birleşti; CI/CD ve otomatik Vercel dağıtımı doğrulandı. Kullanıcı şimdi hesap ekranında boş kimlik satırları, genel bölüm açıklamaları ve üst tekrar kontrollerinin kaldırılmasını; zorunlu alanlarda yıldız/placeholder ve gönderimde alan altı hata görünümünü istedi. PR100 aynı dalda sürer; telefon doğrulama/dönüşümü `libphonenumber-js` ve varsayılan TR ile eklenir. Kütüphanenin E.164 çıktısı kaydedilir; elle telefon dönüştürme yapılmaz. Gerçek kabul ve açık kapılar yalnız [todo](todo.md) sahibindedir; e-postadaki kurtarma isteği XREQ-002'de, mevcut hesap bildirimi XREQ-001'dedir.
 
-PR90'ın yerel belge düzeninde frontend planı `apps/web/todo.md` yolundan `apps/web/docs/todo.md` yoluna taşındı. Bu çalışma frontend uygulamasını değiştirmedi. PR90’ın yayın/merge durumu [kaynak kabul kaydından](../../backend/docs/00-FtkSaaS-yeni-sohbet-devir.md) okunur; yerel hazırlık yayımlanmış kaynak sayılmaz.
-
-## Devir güncelleme kuralı
-
-Frontend ajanı devir sırasında yalnız mevcut branch/tam kaynak, korunacak yerel çalışma, devam için gerekli bağlam ve doğrulanmış kanıta bağlantı yazar. Eski snapshot yerine yenisi geçirilir; sohbet kronolojisi veya ikinci todo oluşturulmaz. Karşı alanın somut talebi ve onayı [ortak talep kaydında](../../../docs/requests.md) tutulur; bu dosya yalnız ilgili talep kimliğine bağlanır.
+Kullanıcı Chrome eklentisiyle `uye.fethiyetango.com` üzerinde gerçek kabul istedi. Main merge sonrası Vercel otomatik Git dağıtımı doğrulandı. Test posta kutusu Chrome'da açık, bağlı Gmail connector hesabı farklıdır. Sağlayıcı araçları ayar/log incelemesinde tercih edilir. Yeni parola girişi/gönderimi kullanıcı adımıdır; parola/token/gerçek adres kaynak veya rapora yazılmaz. Yeni CI başlayınca run/head/base bilgisi kullanıcıya bırakılır; AGENTS bekleme kuralı uygulanır.

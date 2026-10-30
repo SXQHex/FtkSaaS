@@ -45,6 +45,8 @@ export function AuthFields({
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState(initialError ? "callbackError" : "");
   const [notice, setNotice] = useState("");
+  const [signupIdentity, setSignupIdentity] = useState({ email: "", name: "" });
+  const [resendRequested, setResendRequested] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const social = mode === "login" || mode === "signup";
   const newPassword = mode === "signup" || mode === "update";
@@ -91,10 +93,14 @@ export function AuthFields({
         });
         if (result.error) throw result.error;
         if (result.data.session) enter();
-        else setNotice("signupNotice");
+        else {
+          setSignupIdentity({ email, name: String(form.get("name")).trim() });
+          setResendRequested(false);
+          setNotice("signupNotice");
+        }
       } else if (mode === "recovery") {
         const result = await client.auth.resetPasswordForEmail(email, {
-          redirectTo: `${appOrigin()}/auth/callback?next=/parola-yenile`,
+          redirectTo: `${appOrigin()}/auth/callback?next=/reset-password`,
         });
         if (result.error) throw result.error;
         setNotice("recoveryNotice");
@@ -117,6 +123,28 @@ export function AuthFields({
         if (result.error) throw result.error;
         enter();
       }
+    } catch (cause) {
+      setError(authMessage(cause));
+    } finally {
+      pending.current = false;
+      setBusy(false);
+    }
+  }
+  async function resendSignup() {
+    if (pending.current || !signupIdentity.email) return;
+    pending.current = true;
+    setBusy(true);
+    setError("");
+    setResendRequested(false);
+    try {
+      await rememberAuthReturn(destination);
+      const result = await browserClient().auth.resend({
+        type: "signup",
+        email: signupIdentity.email,
+        options: { emailRedirectTo: `${appOrigin()}/auth/callback` },
+      });
+      if (result.error) throw result.error;
+      setResendRequested(true);
     } catch (cause) {
       setError(authMessage(cause));
     } finally {
@@ -171,6 +199,14 @@ export function AuthFields({
           {t(notice)}
         </output>
       )}
+      {confirmed && (
+        <p className="text-sm leading-6">{t("signupAddress", { email: signupIdentity.email })}</p>
+      )}
+      {confirmed && resendRequested && (
+        <output className="block text-sm leading-6" aria-live="polite">
+          {t("resendRequested")}
+        </output>
+      )}
       {!confirmed && !(mode === "update" && notice) && (
         <form
           onSubmit={submit}
@@ -184,6 +220,7 @@ export function AuthFields({
               <Input
                 id="name"
                 name="name"
+                defaultValue={signupIdentity.name}
                 autoComplete="name"
                 required
                 maxLength={120}
@@ -198,6 +235,7 @@ export function AuthFields({
               <Input
                 id="email"
                 name="email"
+                defaultValue={mode === "signup" ? signupIdentity.email : undefined}
                 type="email"
                 autoComplete="email"
                 placeholder="name@example.com"
@@ -216,7 +254,7 @@ export function AuthFields({
                 {mode === "login" && (
                   <Link
                     className="text-xs underline-offset-4 hover:underline"
-                    href="/parolami-unuttum"
+                    href="/forgot-password"
                   >
                     {t("forgot")}
                   </Link>
@@ -295,6 +333,30 @@ export function AuthFields({
           </Button>
         </form>
       )}
+      {confirmed && (
+        <div className="flex flex-wrap gap-3">
+          <Button
+            type="button"
+            variant="outline"
+            disabled={busy}
+            onClick={() => void resendSignup()}
+          >
+            {t("resendSignup")}
+          </Button>
+          <Button
+            type="button"
+            variant="outline"
+            disabled={busy}
+            onClick={() => {
+              setNotice("");
+              setError("");
+              setResendRequested(false);
+            }}
+          >
+            {t("changeSignupEmail")}
+          </Button>
+        </div>
+      )}
       {social && !confirmed && (
         <div className="space-y-5">
           <div className="flex items-center gap-4 text-xs text-muted-foreground">
@@ -317,7 +379,7 @@ export function AuthFields({
         <p className="text-center text-sm leading-6 text-muted-foreground">
           {t(mode === "login" ? "noAccount" : "haveAccount")}{" "}
           <Link
-            href={`${mode === "login" ? "/kayit" : "/giris"}${returnQuery}`}
+            href={`${mode === "login" ? "/signup" : "/login"}${returnQuery}`}
             className="font-medium text-foreground underline underline-offset-4"
           >
             {t(mode === "login" ? "signupLink" : "loginSubmit")}
@@ -325,7 +387,7 @@ export function AuthFields({
         </p>
       ) : (
         <Link
-          href={mode === "update" && notice ? "/" : "/giris"}
+          href={mode === "update" && notice ? "/" : "/login"}
           className="inline-flex items-center gap-2 text-sm underline-offset-4 hover:underline"
         >
           <ArrowLeft className="size-4 shrink-0" aria-hidden="true" />

@@ -115,7 +115,7 @@ test("late account response after sign-out cannot repopulate the shell", async (
   render(<StudioWorkspace />);
   act(() => mocks.listener?.("SIGNED_OUT"));
   await act(async () => resolve(account));
-  expect(mocks.replace).toHaveBeenCalledWith("/giris");
+  expect(mocks.replace).toHaveBeenCalledWith("/login");
   expect(screen.queryByText("Test Yöneticisi")).not.toBeInTheDocument();
   expect(mocks.centers).not.toHaveBeenCalled();
 });

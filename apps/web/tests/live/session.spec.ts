@@ -2,7 +2,7 @@ import { test, expect } from "@playwright/test";
 test("native development login reads the real workspace and signs out", async ({ page }) => {
   let phase = "sign-in";
   try {
-    await page.goto("/giris");
+    await page.goto("/login");
     await page.getByLabel("E-posta adresi").fill(process.env.FTK_E2E_EMAIL ?? "");
     await page.getByLabel("Parola", { exact: true }).fill(process.env.FTK_E2E_PASSWORD ?? "");
     await page.getByRole("button", { name: "Giriş yap", exact: true }).click();
@@ -19,9 +19,9 @@ test("native development login reads the real workspace and signs out", async ({
     await page.getByRole("button", { name: /Hesap ve görünüm/ }).click();
     phase = "sign-out";
     await page.getByRole("button", { name: "Çıkış yap" }).click();
-    await expect(page).toHaveURL(/\/giris$/);
+    await expect(page).toHaveURL(/\/login$/);
     await page.goto("/");
-    await expect(page).toHaveURL(/\/giris$/);
+    await expect(page).toHaveURL(/\/login$/);
   } catch {
     // Provider/locator failures can contain credentials or account data.
     // Close the live page before Playwright creates its automatic error context.

@@ -9,5 +9,5 @@ test("auth return path rejects external, protocol-relative, and backslash redire
     "/\n/attacker.invalid",
   ])
     expect(safeReturnPath(path)).toBe("/");
-  expect(safeReturnPath("/parola-yenile")).toBe("/parola-yenile");
+  expect(safeReturnPath("/reset-password")).toBe("/reset-password");
 });

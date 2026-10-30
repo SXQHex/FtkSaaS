@@ -16,7 +16,7 @@ export async function AuthScreen({ children }: { children: ReactNode }) {
       <div className="flex min-w-0 flex-col px-5 py-6 sm:px-10 lg:px-14">
         <header className="flex flex-wrap items-center justify-between gap-5">
           <Link
-            href="/giris"
+            href="/login"
             className="inline-flex items-center gap-3 font-semibold tracking-tight"
           >
             <span className="flex size-9 items-center justify-center rounded-xl bg-primary text-sm text-primary-foreground">

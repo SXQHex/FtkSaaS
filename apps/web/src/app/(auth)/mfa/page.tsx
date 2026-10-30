@@ -15,7 +15,7 @@ export default async function MfaPage({
   const client = await serverClient();
   const result = client ? await client.auth.getUser() : null;
   if (!result?.data.user || result.error)
-    redirect(`/giris?error=session&next=${encodeURIComponent(returnTo)}`);
+    redirect(`/login?error=session&next=${encodeURIComponent(returnTo)}`);
   return (
     <>
       <AuthFields mode="mfa" returnTo={returnTo} />

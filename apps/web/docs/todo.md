@@ -302,14 +302,14 @@ Her modülün “bitti” ölçütü kendi aşağıdaki kabul senaryosu **ve** b
 
 ## 7. Bölüm bölüm teslim: tek aktif bölüm
 
-Kullanıcının son kararı: **Bir bölüm bitmeden sonraki bölümün uygulamasına geçilmez.** Frontend'in aktif bölümü ve sırası bu bölümde tutulur. **Aktif bölüm: öğrenci yönetimini tamamlama ve gerçek kabul.** Aşağıdaki liste bağımlılık sırasını gösterir. Aynı anda birden çok yarım bölüm veya yeni modül dalı açılmaz.
+Kullanıcının son kararı: **Bir bölüm bitmeden sonraki bölümün uygulamasına geçilmez.** Frontend'in aktif bölümü ve sırası bu bölümde tutulur. **Aktif bölüm: WEB-S01 — kimlik, hesap ve güvenlik.** Kullanıcının 30 Ekim kararıyla bu bölüm öne alınmıştır; öğrenci yönetiminin kalan kabulü açık kalır. Aşağıdaki liste bağımlılık sırasını gösterir. Aynı anda birden çok yarım bölüm veya yeni modül dalı açılmaz.
 
 S01–S13 işlev kapsamını izler. Teslim bölümleri ise kullanıcının baştan sona kullanabildiği akışlardır: örneğin davet kabulü öğrenci bölümünde, satışın zorunlu belge adımı satış bölümünde çalışır. Ortak bir bağımlılık önce kullanılacağı bölümün içinde tamamlanır ve daha sonra yeniden yazılmaz. Bölümün kabulü ileride yazılacak bir ekrana bağlanmaz: gerektiğinde yetkilendirilmiş mevcut kayıt kullanılır; yeni ekranlar arasındaki uçtan uca bağlantı, bağlantıyı kullanan sonraki bölümün açık kabul maddesidir. Gerekli gerçek kayıt/okuma yoksa bölüm engelli kalır, mock ile kapanmaz. Başka bir bölüme ait henüz yapılmamış işlem, mevcut bölümde çalışıyormuş gibi düğme/özet olarak sunulmaz.
 
 | Sıra | Tamamlanacak bölüm | Bölüm kapanışının somut sonucu |
 |---|---|---|
-| 1 | **Öğrenci yönetimi** — S04 çekirdeği ve gereken S01 davet kabulü | Mevcut liste/profil/oluşturma/düzenleme/öğrencilik akışları; disiplin, birleştirme ve hesap erişimi dahil gerçek kabul. Paket/finans alt görünümü kendi sonraki bölümünün sorumluluğudur; bu aşamada sahte özet eklenmez. |
-| 2 | **Hesap ve güvenlik** — S01, kendi tercihleri için S12 | Giriş/kayıt/kurtarma/Google/TOTP, profil, oturumlar, güvenlik ve hesap lifecycle akışları tamam. |
+| 1 | **Hesap ve güvenlik** — S01, kendi tercihleri için S12 | Giriş/kayıt/kurtarma/Google/TOTP, profil, oturumlar, güvenlik ve hesap lifecycle akışları tamam. |
+| 2 | **Öğrenci yönetimi** — S04 çekirdeği ve gereken S01 davet kabulü | Mevcut liste/profil/oluşturma/düzenleme/öğrencilik akışları; disiplin, birleştirme ve hesap erişimi dahil gerçek kabul. Paket/finans alt görünümü kendi sonraki bölümünün sorumluluğudur; bu aşamada sahte özet eklenmez. |
 | 3 | **Stüdyo kurulumu ve işletme erişimi** — S02, gereken S12 politikaları ve S13 temel plan görünümü | Gerçek kaynak katalogları, merkez/oda/disiplin/eğitmen/uygunluk ve plan sınırlarıyla stüdyo program oluşturmaya hazır. B01 burada çözülür. |
 | 4 | **Belgeler ve işlemsel bildirimler** — S11 | Özel yükleme/yayın, bağlamsal okuma/onay, inbox ve izinli geçmiş tamam; sonraki iş formlarına bağlanacak çalışan bileşenler hazır. |
 | 5 | **Program ve seanslar** — S03 | Sınıf/program/tek seans oluşturma; kaynak ataması, değişiklik, iptal/telafi, Scheduler ve gerçek çakışma kabulü tamam. |
@@ -385,4 +385,39 @@ Bu eşleme bütün Starter özelliklerinin bir teslim sahibine sahip olmasını 
 | F33 geçmiş/idempotency | Ortak yazma koşulları, S11/S13 |
 | FD01–FD12 Starter tüketicileri | S12 ve ilgili iş modülleri |
 
-Kapsam dışı feature'ların tam listesi bölüm 2'dedir. Yeni karar veya backend yetkisi bu eşlemeyi etkilerse frontend sahibi kendi yetkili görevinde planı günceller. Backend somut tüketim ihtiyacını ortak talep kaydında bildirir; frontend planını kendisi değiştirmez.
+Kapsam dışı feature'ların tam listesi bölüm 2'dedir. Yeni karar veya backend yetkisi bu eşlemeyi değiştirirse ilgili modül planı aynı değişiklikte güncellenir.
+
+## 11. WEB-S01 güncel kabul durumu
+
+[PR92](https://github.com/SXQHex/FtkSaaS/pull/92) kullanıcının açık isteğiyle main'e birleşti: `7e15a8de12c63f943b30a035248b74392ff39261`. Merge, S01'in bütün gerçek kabulünü kapatmaz. S02 ayrı [Draft PR93](https://github.com/SXQHex/FtkSaaS/pull/93) içinde korunur. Aktif iş S01 kayıt/e-posta geri bildirimi düzeltmesi ve kalan canlı kabuldür.
+
+### Kaynak ve doğrulama
+
+PR92 head `e92f4efbb57fb6b64c8c3adef8d8d6a23cedf3d1` için [frontend40998175873](https://github.com/SXQHex/FtkSaaS/actions/runs/40998175873), [aday40998176020](https://github.com/SXQHex/FtkSaaS/actions/runs/40998176020) ve [merge proof41001509799](https://github.com/SXQHex/FtkSaaS/actions/runs/41001509799) başarılıdır. Main için [frontend41001553604](https://github.com/SXQHex/FtkSaaS/actions/runs/41001553604), [main proof41001553407](https://github.com/SXQHex/FtkSaaS/actions/runs/41001553407), [uyumluluk41001553522](https://github.com/SXQHex/FtkSaaS/actions/runs/41001553522) ve [development delivery41001592777](https://github.com/SXQHex/FtkSaaS/actions/runs/41001592777) completed/success doğrulandı. Bunlar sonraki düzeltme kaynağının kabulü değildir.
+
+Önceki yerel doğrulama: 141 web + 1 UI testi, lint/format/typecheck/build, coverage/isolation; aynı build'de 20/20 Chromium Playwright, axe/TR/EN/320px/%200 ve Türkçe yolların yönlendirmesiz 404 kontrolü. WF00/WF01/WF04/WF12/WF17/WF20 sınırları korunur.
+
+### Canlı kabul ve e-posta teşhisi
+
+PR92/95/96/98 main'e birleşti. Main `17ee1ebcf7b900b8e420d44903b589a9ebd22830` için frontend41029219573, merge proof41029219505, main proof41029219526 ve development delivery41029271073 completed/success doğrulandı; compatibility scope başarılı, test job'u skipped. Vercel production `dpl_HeWvnkhJRxdXEEh6E8Vvh8iz8KmK` aynı SHA'dan Git kaynağıyla READY ve `uye.fethiyetango.com` alias'ını taşıyor. PR98 CI'da Chromium/Firefox/WebKit/mobil E2E, coverage ve frontend kontrolleri geçti.
+
+
+- Admin native çıkış/yeniden giriş, hesap okumaları ve oturum etiketi yazma/taze okuma kabul edildi; etiket eski değerine döndürüldü. Silme preview sahiplik devri engelini gösterdi, apply yapılmadı. Console error/warn yoktu.
+- E-posta gelmemesinin nedeni mevcut admin hesabına farklı adresli Google kimliğinin bağlı olmasıydı. Auth kimlik/hesap eşlemesiyle doğrulandı; otomatik doldurma kök neden değildi. Mevcut kimlikle tekrar kayıt yeni hesap/e-posta üretmedi. Açık “hesap mevcut” bildirimi [XREQ-001](../../../docs/requests.md#xreq-001-kayıtta-mevcut-hesap-bildirimi) kapsamında backend değerlendirmesindedir.
+- Ayrı yeni test hesabı native signup ile oluştu; 30 Ekim 2026 08:19:46Z doğrulama e-postası Resend'de delivered, açık posta kutusunda görüldü. Kullanıcı bağlantıyı onayladı; Auth email_confirmed_at ve giriş doğrulandı. Yeni hesaba otomatik merkez/rol atanmadı. Gerçek adres, parola veya token fixture/log/koda kaydedilmedi.
+- Test hesabı profil adı yazıldı ve yeniden okumayla doğrulandı; eski değerine döndürüldü. Fotoğraf kabulü ayrı açık. SMTP ayarı değiştirilmedi.
+
+### S01 hesap düzeltmeleri
+
+Ortak `next-intl` sağlayıcısı tarayıcı saat dilimini hydration sonrasında uygular; hesap tarihleri ortak varsayılanı kullanır, açık merkez takvimi saat dilimi korunur. Parola formu mevcut + yeni + tekrar alanlarına indirildi; native `current_password` doğrulaması kullanılır, challenge/nonce girişi kaldırıldı. Güvenlik e-postasındaki kurtarma davranışı [XREQ-002](../../../docs/requests.md#xreq-002-parola-değişimi-güvenlik-e-postası) değerlendirmesinde; uygulanmış “geri al” gibi gösterilmez. Chrome'da yeni üç alanlı parola formu ve oturum açılış/yenilenme saatlerinin cihaz diliminde tutarlılığı görüldü; parola değişimi ve dış bildirim teslimi henüz denenmedi.
+
+Kullanıcının hesap ekranı sadeleştirmesi: boş kimlik satırları/doğrulanmamış telefon özeti, genel bölüm açıklamaları ve sayfa başındaki silme takibi/genel güncelle kaldırıldı. Telefon biçimi/ülke doğrulaması ve E.164 dönüşümü `libphonenumber-js/max` ile, varsayılan `TR` olarak yapılır; yerel ve uluslararası numaralar kütüphanenin çıktısıyla native Auth/profil komutuna gider. Zorunlu form alanlarında kırmızı yıldız ve placeholder; native doğrulama ve parola tekrar hatasında kırmızı çerçeve/hover/focus ile alan altı kısa hata metni var. Kritik silme etkisi/onay uyarıları ve başarısız okuma yeniden denemesi korunur. Yerel `pnpm check:frontend` (172 web + 1 UI testi, lint/format/typecheck/build), coverage ve frontend isolation başarılı. Varsayılan ülkeyi TR yerine US yapan mutation testi başarısız oldu; kaynak geri yüklendi. Telefon incelemesinde engel bulunmadı. Boş kimlik satırı filtresi ters çevrilince regresyon testi başarısız oldu; kaynak geri yüklendi. Bağımsız incelemede engel bulunmadı. Yeni kaynak için CI ve dağıtım sonrası görsel/klavye/mobil kabulü açık.
+
+
+### Açık kapılar
+
+- Parola değiştirme/kurtarma, kullanılmış/süresi dolmuş bağlantı ve doğrulama yeniden gönderme; yeni parola girişi ve gönderimi kullanıcı adımıdır.
+- Fotoğraf, iki oturum ve revoke sonrası Edge erişimi, TOTP, Google giriş/bağlama, doğru/yanlış/expired davet ve ayrı hesapta silme/replay/own-foreign job açık. Google bağlama web client ID eksik. SMS ayrı sağlayıcı entegrasyonudur.
+- Yeni hesap sadeleştirmesi ve parola değişiminin uçtan uca tarayıcı kabulü açık. Native password-changed bildirimi açıktır; yeni değişiklikten doğan gerçek teslim ayrıca doğrulanır.
+
+S01 kapanmadı. Gerçek kullanıcı hesabı silinmedi; job başarısı fiziksel imha kabulü sayılmaz.

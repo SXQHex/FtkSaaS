@@ -85,7 +85,7 @@ test("sign-out clears the detail and a late response cannot restore it", async (
   act(() => mocks.listener?.("SIGNED_OUT"));
   await act(async () => finish(session));
   expect(screen.queryByText("İptal edildi")).not.toBeInTheDocument();
-  expect(mocks.replace).toHaveBeenCalledWith("/giris?next=%2Forganizasyon%2Forg%2Fseans%2Fsession");
+  expect(mocks.replace).toHaveBeenCalledWith("/login?next=%2Forganizasyon%2Forg%2Fseans%2Fsession");
 });
 test("access denial remains an error without session facts or a demo fallback", async () => {
   const { ApiFailure } = await import("../src/lib/api");
