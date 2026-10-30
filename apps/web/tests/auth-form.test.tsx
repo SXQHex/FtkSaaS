@@ -17,6 +17,7 @@ const mocks = vi.hoisted(() => ({
   refresh: vi.fn<() => void>(),
   remember: vi.fn<() => Promise<void>>(),
   oauth: vi.fn<() => AuthResult>(),
+  resend: vi.fn<() => AuthResult>(),
 }));
 vi.mock("../src/lib/auth-return", () => ({ rememberAuthReturn: mocks.remember }));
 vi.mock("next/navigation", () => ({
@@ -30,6 +31,7 @@ vi.mock("../src/lib/supabase/client", () => ({
       signUp: mocks.signup,
       updateUser: mocks.update,
       signInWithOAuth: mocks.oauth,
+      resend: mocks.resend,
       mfa: { listFactors: mocks.factors, challengeAndVerify: mocks.verify },
     },
   }),
@@ -159,7 +161,7 @@ test("recovery request uses native callback and an enumeration-safe response", a
   await user.click(screen.getByRole("button", { name: "Yenileme bağlantısı gönder" }));
   expect(await screen.findByRole("status")).toHaveTextContent("eşleşen bir hesap varsa");
   expect(mocks.recover).toHaveBeenCalledWith("test@example.invalid", {
-    redirectTo: "http://127.0.0.1:3000/auth/callback?next=/parola-yenile",
+    redirectTo: "http://127.0.0.1:3000/auth/callback?next=/reset-password",
   });
 });
 
@@ -172,4 +174,26 @@ test("English login translates provider errors without reporting success", async
   await user.click(screen.getByRole("button", { name: /^Sign in$/ }));
   expect(await screen.findByRole("alert")).toHaveTextContent("Incorrect email or password");
   expect(mocks.replace).not.toHaveBeenCalled();
+});
+
+test("signup confirmation can be resent through the native provider without creating an account again", async () => {
+  mocks.signup.mockResolvedValue({ error: null, data: { session: null } });
+  mocks.resend.mockResolvedValue({ error: null });
+  const user = userEvent.setup();
+  render(<AuthFields mode="signup" returnTo="/invite" />);
+  await user.type(screen.getByLabelText("Ad soyad"), "Test Person");
+  await user.type(screen.getByLabelText("E-posta adresi"), "test@example.invalid");
+  await user.type(screen.getByLabelText("Parola", { exact: true }), "synthetic-password");
+  await user.type(screen.getByLabelText("Yeni parolayı tekrar yaz"), "synthetic-password");
+  await user.click(screen.getByRole("button", { name: "Hesap oluştur" }));
+  await user.click(
+    await screen.findByRole("button", { name: "Doğrulama e-postasını tekrar gönder" }),
+  );
+  expect(mocks.signup).toHaveBeenCalledOnce();
+  expect(mocks.resend).toHaveBeenCalledWith({
+    type: "signup",
+    email: "test@example.invalid",
+    options: { emailRedirectTo: "http://127.0.0.1:3000/auth/callback" },
+  });
+  expect(mocks.remember).toHaveBeenLastCalledWith("/invite");
 });

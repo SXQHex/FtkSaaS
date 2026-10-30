@@ -45,6 +45,7 @@ export function AuthFields({
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState(initialError ? "callbackError" : "");
   const [notice, setNotice] = useState("");
+  const [pendingEmail, setPendingEmail] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const social = mode === "login" || mode === "signup";
   const newPassword = mode === "signup" || mode === "update";
@@ -91,10 +92,13 @@ export function AuthFields({
         });
         if (result.error) throw result.error;
         if (result.data.session) enter();
-        else setNotice("signupNotice");
+        else {
+          setPendingEmail(email);
+          setNotice("signupNotice");
+        }
       } else if (mode === "recovery") {
         const result = await client.auth.resetPasswordForEmail(email, {
-          redirectTo: `${appOrigin()}/auth/callback?next=/parola-yenile`,
+          redirectTo: `${appOrigin()}/auth/callback?next=/reset-password`,
         });
         if (result.error) throw result.error;
         setNotice("recoveryNotice");
@@ -117,6 +121,26 @@ export function AuthFields({
         if (result.error) throw result.error;
         enter();
       }
+    } catch (cause) {
+      setError(authMessage(cause));
+    } finally {
+      pending.current = false;
+      setBusy(false);
+    }
+  }
+  async function resendSignup() {
+    if (pending.current || !pendingEmail) return;
+    pending.current = true;
+    setBusy(true);
+    setError("");
+    try {
+      await rememberAuthReturn(destination);
+      const result = await browserClient().auth.resend({
+        type: "signup",
+        email: pendingEmail,
+        options: { emailRedirectTo: `${appOrigin()}/auth/callback` },
+      });
+      if (result.error) throw result.error;
     } catch (cause) {
       setError(authMessage(cause));
     } finally {
@@ -216,7 +240,7 @@ export function AuthFields({
                 {mode === "login" && (
                   <Link
                     className="text-xs underline-offset-4 hover:underline"
-                    href="/parolami-unuttum"
+                    href="/forgot-password"
                   >
                     {t("forgot")}
                   </Link>
@@ -295,6 +319,11 @@ export function AuthFields({
           </Button>
         </form>
       )}
+      {confirmed && (
+        <Button type="button" variant="outline" disabled={busy} onClick={() => void resendSignup()}>
+          {t("resendSignup")}
+        </Button>
+      )}
       {social && !confirmed && (
         <div className="space-y-5">
           <div className="flex items-center gap-4 text-xs text-muted-foreground">
@@ -317,7 +346,7 @@ export function AuthFields({
         <p className="text-center text-sm leading-6 text-muted-foreground">
           {t(mode === "login" ? "noAccount" : "haveAccount")}{" "}
           <Link
-            href={`${mode === "login" ? "/kayit" : "/giris"}${returnQuery}`}
+            href={`${mode === "login" ? "/signup" : "/login"}${returnQuery}`}
             className="font-medium text-foreground underline underline-offset-4"
           >
             {t(mode === "login" ? "signupLink" : "loginSubmit")}
@@ -325,7 +354,7 @@ export function AuthFields({
         </p>
       ) : (
         <Link
-          href={mode === "update" && notice ? "/" : "/giris"}
+          href={mode === "update" && notice ? "/" : "/login"}
           className="inline-flex items-center gap-2 text-sm underline-offset-4 hover:underline"
         >
           <ArrowLeft className="size-4 shrink-0" aria-hidden="true" />

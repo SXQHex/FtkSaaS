@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState, type ReactNode } from "react";
+import Link from "next/link";
 import { useTranslations } from "next-intl";
 import {
   Bell,
@@ -400,6 +401,11 @@ export function AdminShell({
           </SheetClose>
           <div className="space-y-8 px-4">
             <Preferences />
+            {!preview && (
+              <Button asChild variant="outline">
+                <Link href="/account">{common("accountSecurity")}</Link>
+              </Button>
+            )}
             {onSignOut && (
               <Button variant="outline" disabled={signingOut} onClick={onSignOut}>
                 <LogOut className="size-4" />

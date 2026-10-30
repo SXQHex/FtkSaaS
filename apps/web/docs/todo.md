@@ -302,14 +302,14 @@ Her modülün “bitti” ölçütü kendi aşağıdaki kabul senaryosu **ve** b
 
 ## 7. Bölüm bölüm teslim: tek aktif bölüm
 
-Kullanıcının son kararı: **Bir bölüm bitmeden sonraki bölümün uygulamasına geçilmez.** Frontend'in aktif bölümü ve sırası bu bölümde tutulur. **Aktif bölüm: öğrenci yönetimini tamamlama ve gerçek kabul.** Aşağıdaki liste bağımlılık sırasını gösterir. Aynı anda birden çok yarım bölüm veya yeni modül dalı açılmaz.
+Kullanıcının son kararı: **Bir bölüm bitmeden sonraki bölümün uygulamasına geçilmez.** Frontend'in aktif bölümü ve sırası bu bölümde tutulur. **Aktif bölüm: WEB-S01 — kimlik, hesap ve güvenlik.** Kullanıcının 30 Ekim kararıyla bu bölüm öne alınmıştır; öğrenci yönetiminin kalan kabulü açık kalır. Aşağıdaki liste bağımlılık sırasını gösterir. Aynı anda birden çok yarım bölüm veya yeni modül dalı açılmaz.
 
 S01–S13 işlev kapsamını izler. Teslim bölümleri ise kullanıcının baştan sona kullanabildiği akışlardır: örneğin davet kabulü öğrenci bölümünde, satışın zorunlu belge adımı satış bölümünde çalışır. Ortak bir bağımlılık önce kullanılacağı bölümün içinde tamamlanır ve daha sonra yeniden yazılmaz. Bölümün kabulü ileride yazılacak bir ekrana bağlanmaz: gerektiğinde yetkilendirilmiş mevcut kayıt kullanılır; yeni ekranlar arasındaki uçtan uca bağlantı, bağlantıyı kullanan sonraki bölümün açık kabul maddesidir. Gerekli gerçek kayıt/okuma yoksa bölüm engelli kalır, mock ile kapanmaz. Başka bir bölüme ait henüz yapılmamış işlem, mevcut bölümde çalışıyormuş gibi düğme/özet olarak sunulmaz.
 
 | Sıra | Tamamlanacak bölüm | Bölüm kapanışının somut sonucu |
 |---|---|---|
-| 1 | **Öğrenci yönetimi** — S04 çekirdeği ve gereken S01 davet kabulü | Mevcut liste/profil/oluşturma/düzenleme/öğrencilik akışları; disiplin, birleştirme ve hesap erişimi dahil gerçek kabul. Paket/finans alt görünümü kendi sonraki bölümünün sorumluluğudur; bu aşamada sahte özet eklenmez. |
-| 2 | **Hesap ve güvenlik** — S01, kendi tercihleri için S12 | Giriş/kayıt/kurtarma/Google/TOTP, profil, oturumlar, güvenlik ve hesap lifecycle akışları tamam. |
+| 1 | **Hesap ve güvenlik** — S01, kendi tercihleri için S12 | Giriş/kayıt/kurtarma/Google/TOTP, profil, oturumlar, güvenlik ve hesap lifecycle akışları tamam. |
+| 2 | **Öğrenci yönetimi** — S04 çekirdeği ve gereken S01 davet kabulü | Mevcut liste/profil/oluşturma/düzenleme/öğrencilik akışları; disiplin, birleştirme ve hesap erişimi dahil gerçek kabul. Paket/finans alt görünümü kendi sonraki bölümünün sorumluluğudur; bu aşamada sahte özet eklenmez. |
 | 3 | **Stüdyo kurulumu ve işletme erişimi** — S02, gereken S12 politikaları ve S13 temel plan görünümü | Gerçek kaynak katalogları, merkez/oda/disiplin/eğitmen/uygunluk ve plan sınırlarıyla stüdyo program oluşturmaya hazır. B01 burada çözülür. |
 | 4 | **Belgeler ve işlemsel bildirimler** — S11 | Özel yükleme/yayın, bağlamsal okuma/onay, inbox ve izinli geçmiş tamam; sonraki iş formlarına bağlanacak çalışan bileşenler hazır. |
 | 5 | **Program ve seanslar** — S03 | Sınıf/program/tek seans oluşturma; kaynak ataması, değişiklik, iptal/telafi, Scheduler ve gerçek çakışma kabulü tamam. |
@@ -385,4 +385,37 @@ Bu eşleme bütün Starter özelliklerinin bir teslim sahibine sahip olmasını 
 | F33 geçmiş/idempotency | Ortak yazma koşulları, S11/S13 |
 | FD01–FD12 Starter tüketicileri | S12 ve ilgili iş modülleri |
 
-Kapsam dışı feature'ların tam listesi bölüm 2'dedir. Yeni karar veya backend yetkisi bu eşlemeyi etkilerse frontend sahibi kendi yetkili görevinde planı günceller. Backend somut tüketim ihtiyacını ortak talep kaydında bildirir; frontend planını kendisi değiştirmez.
+Kapsam dışı feature'ların tam listesi bölüm 2'dedir. Yeni karar veya backend yetkisi bu eşlemeyi değiştirirse ilgili modül planı aynı değişiklikte güncellenir.
+
+## 11. WEB-S01 güncel kabul durumu
+
+Aktif iş, kullanıcının son kararıyla [PR92](https://github.com/SXQHex/FtkSaaS/pull/92) kabulüdür. S02 ayrı [Draft PR93](https://github.com/SXQHex/FtkSaaS/pull/93) içinde korunur; bu kabul dalına alınmadı. Başka bölümün kodu veya backend/ortam kabulü bu çalışmaya eklenmez.
+
+### Kaynak ve kanıt
+
+PR92'nin önceki head'i `925ed06426cb51393ef506c09204720c2e568172` için [frontend40989289804](https://github.com/SXQHex/FtkSaaS/actions/runs/40989289804) ve [kapsam40989289810](https://github.com/SXQHex/FtkSaaS/actions/runs/40989289810) completed/success doğrulandı. Bu sonuç yeni birleşik kaynak için başarı sayılmaz.
+
+Güncel main `86b9b890d987518f3afe2d18ccef960a43cd244d`, PR90 belge sahipliği ve koşullu CI düzenini içerir. Aynı main'in [frontend40995363897](https://github.com/SXQHex/FtkSaaS/actions/runs/40995363897), [acceptance40995363932](https://github.com/SXQHex/FtkSaaS/actions/runs/40995363932) ve [development CD40995403589](https://github.com/SXQHex/FtkSaaS/actions/runs/40995403589) sonucu başarılı olarak doğrulandı. Bu kanıt main kaynağına aittir; S01'in sağlayıcı/ekran kabulünü kapatmaz.
+
+Main aynı S01 dalına normal birleştirmeyle alındı. Frontend planı artık bu dosyadadır; kısa README ve AGENTS main'deki yapıyı korur. S01 tüketim notları `development.md`, sohbet bağlamı `handover.md` sahibine taşındı; kaldırılmış `apps/web/todo.md` veya eski ortak alan devirleri geri oluşturulmaz. Ortak/backend/CI dosyaları main ile aynı kalır.
+
+### Kabul incelemesindeki düzeltmeler
+
+- Yanıtı kaybolan hesap silme işleminde normal account projection kapanmış olsa da `/account/deletion` kendi native kullanıcısına ait bekleyen özgün komutu bulabilir. Kullanıcı tekrar açık onay ve taze native proof verir; preview/key değiştirilmez. Recovery, aktif account_get sonucuna bağımlı değildir. Sunucunun doğruladığı native kullanıcı kimliği hem giriş öncesi hem dönen oturumda karşılaştırılır; backend actor/state/reauth koşulları aynen uygulanır. Takip kaydına parola/proof girmez.
+- Mevcut oturumun iptali yalnız operation status sorgusuyla kesinleştiğinde de yerel native oturum temizlenir; yeni revoke komutu üretilmez.
+- Oturum/geçmiş tarihleri, ekrandaki cihaz saat dilimi açıklamasına uygun açık timeZone ile biçimlenir; next-intl'ın UTC defaultu cihaz saati gibi sunulmaz.
+
+WF kapsamı: ortak protokol WF00; native kimlik/profil/güvenlik WF01; davet kabulü WF04; private medya WF12; hesap silme WF17; yalnız izinli job/privacy sonucu okuma WF20. İşlem sırası ve DTO/rol/plan sınırının sahibi ortak WF/settings/makine sözleşmesidir.
+
+### Kabul kapıları
+
+| Kapı | Durum |
+|---|---|
+| Yerel kaynak | Lint/format/typecheck/build, 141 web + 1 UI testi başarılı. Kurtarma, yanlış native kullanıcı, taze proof, status ile oturum iptali ve cihaz saat dilimi regresyonları dahil. |
+| Yerel tarayıcı/coverage | Aynı uygulama build'iyle resmi Chromium Headless Shell141, Git dışı executable seçimi: 20/20 Playwright, tam axe/TR/EN/320px/%200 ve eski Türkçe yolların yönlendirmesiz 404 kontrolü başarılı. Coverage ve isolation başarılı. Bu, korumalı S01 formlarının gerçek hesap kabulü değildir. |
+| Uzak kaynak kabulü | Yeni head/base/tested merge için CI gerekir; eski PR head veya yalnız main başarısı taşınmaz. |
+| Gerçek hesap/sağlayıcı | Açık. Bu çalışma ortamında FTK_E2E_EMAIL/PASSWORD veya Git dışı canlı kabul dosyası yoktur. Native hesap, profil/fotoğraf, iki oturum ve iptal sonrası erişim, TOTP, doğru/yanlış/süresi dolan davet, gerçek callback ve e-posta/Google teslimi yetkili hesapla doğrulanmalıdır. |
+| Hesap silme/iş takibi | Açık. Yalnız bu iş için yetkilendirilmiş ayrı kabul hesabında güçlü yeniden doğrulama, ownership engeli, kayıp yanıt/replay ve own/foreign global job doğrulanır. Gerçek kullanıcı hesabı silinmedi. Job başarı veya partial/retry_wait fiziksel imha kabulü değildir. |
+| SMS | Gerçek SMS sağlayıcısı ayrı dış entegrasyondur; geçmiş native Auth/SMTP/Google kabulü gerçek SMS teslimi sayılmaz. Mevcut destek doğrulanmadan teslim vaat edilmez. |
+
+S01 tamamlanmadı ve merge'e hazır sayılmıyor. Yeni kaynak CI'si ve gerçek ortam kapıları kapanmadan bölüm kapanmaz. Frontend kabulü için backend belgeleri veya ortak sözleşmeler güncellenmez; ihtiyaç varsa yalnız kendi talep alanı üzerinden koordinasyon yapılır.

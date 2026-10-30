@@ -40,7 +40,7 @@ export function SessionPage({
     function leave() {
       active = false;
       setResult(null);
-      router.replace(`/giris?next=${encodeURIComponent(sessionPath(orgId, sessionId))}`);
+      router.replace(`/login?next=${encodeURIComponent(sessionPath(orgId, sessionId))}`);
       router.refresh();
     }
     const { data } = browserClient().auth.onAuthStateChange((event) => {
