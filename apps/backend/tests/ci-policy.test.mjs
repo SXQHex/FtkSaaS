@@ -2,6 +2,7 @@ import {repositoryRoot,repoFile} from '../scripts/paths.mjs';
 process.chdir(repositoryRoot);
 import test from 'node:test';import assert from 'node:assert/strict';import fs from 'node:fs';
 import {deploymentSource,resolveAcceptedSource,revalidateDeployment} from '../scripts/ci/deployment-source.mjs';
+import {registryPath,livingMarkdown,validateDocumentRegistry,renderDocumentMap} from '../scripts/document-registry.mjs';
 import {sameMigration,migrationPlan,migrationBody,migrationBatch,hostedSmoke,unchangedEdge,project} from '../scripts/ci/deploy-development.mjs';
 
 test('unchanged Edge requires both trusted source receipt and live version/JWT match',()=>{
@@ -112,7 +113,7 @@ import {validateBinding} from '../scripts/ci/gate.mjs';
 import {analyzeDelta} from '../scripts/ci/delta-analysis.mjs';
 import {runApiPhases} from '../scripts/ci/run-targeted.mjs';
 const plan=p=>select([{path:p,status:'M'}]);
-test('documentation only has no backend setup and retains link checks',()=>{const p=plan('docs/remaining-work.md');assert.equal(p.db,false);assert.equal(p.structural,false);assert.equal(p.docs.length,1);});
+test('documentation only has no backend setup and retains link checks',()=>{const p=plan('apps/backend/docs/remaining-work.md');assert.equal(p.db,false);assert.equal(p.structural,false);assert.equal(p.docs.length,1);});
 test('module changes include explicitly declared shared economic consumers',()=>{const p=plan('apps/backend/database/instructor-earnings.sql');for(const n of ['instructor-earnings','cross-center-settlement','starter-attendance-protection','program-session-lifecycle','api-acceptance'])assert(p.api.includes('apps/backend/tests/'+n+'.test.mjs'));assert(!p.api.includes('apps/backend/tests/person-registry.test.mjs'));});
 test('shared auth tenant finance gateway migrations infrastructure and unknown files expand safely',()=>{for(const p of ['apps/backend/database/kernel.sql','apps/backend/database/dispatch.sql','apps/backend/supabase/migrations/next.sql','apps/backend/tests/api-client.mjs','apps/backend/scripts/new-unknown.mjs','docs/contracts/example.json','.github/workflows/ci-fast.yml'])assert.deepEqual(plan(p).api,apiSuites,p);});
 test('contract generator/shared types cannot silently omit structural coverage',()=>{for(const p of ['docs/contracts/08.json','docs/contracts/01-product.md','docs/decisions/example.md','apps/backend/scripts/generate.mjs','packages/api-contracts/index.ts'])assert(plan(p).structural);});
@@ -283,7 +284,7 @@ test('renderer prose proof retains historical evidence and rejects current execu
  const old=execFileSync('git',['show',base+':scripts/render_catalogs.py'],{encoding:'utf8'}),historical=execFileSync('git',['show',head+':scripts/render_catalogs.py'],{encoding:'utf8'}),now=fs.readFileSync('apps/backend/scripts/render_catalogs.py','utf8');
  assert(rendererOnlyProse(old,historical));
  assert(!rendererOnlyProse(old,now)); // Moving executable input/output paths requires full acceptance.
- assert(rendererOnlyProse(now,now.replace('domain tablosu','domain tablo sayısı')));
+ assert(!rendererOnlyProse(now,now.replace('domain tablo tanımı','domain tablo listesi'))); // New renderer has no inherited prose-only exception.
  for(const source of [now.replace("inventory={'runtime_version'","inventory={'injected':True,'runtime_version'"),now.replace("emit('../../docs/endpoint-inventory.json'","emit('docs/runtime.json'"),now+"\nimport os\nos.system('false')\n",now.replace("len(c['tables'])","len(c['operations'])")])assert(!rendererOnlyProse(now,source));
 });
 
@@ -344,7 +345,7 @@ test('measurement distinguishes queue setup test wall and runner time',()=>{
  assert.equal(rows[0].queue_s,10);assert.equal(rows[0].setup_s,20);assert.equal(rows[0].test_s,80);assert.equal(rows[0].runner_s,110);
 });
 
-test('every test file is accounted for in structural DB or API clean obligations',()=>{const actual=fs.readdirSync('apps/backend/tests').filter(p=>p.endsWith('.test.mjs')).map(p=>'apps/backend/tests/'+p).sort();assert.deepEqual(actual,[...apiSuites,...['contract','governance','ci-policy','database','event-scope'].map(n=>'apps/backend/tests/'+n+'.test.mjs')].sort());});
+test('every test file is accounted for in structural DB or API clean obligations',()=>{const actual=fs.readdirSync('apps/backend/tests').filter(p=>p.endsWith('.test.mjs')).map(p=>'apps/backend/tests/'+p).sort();assert.deepEqual(actual,[...apiSuites,...['contract','governance','ci-policy','database','event-scope','restore-guard'].map(n=>'apps/backend/tests/'+n+'.test.mjs')].sort());});
 test('metadata-only serial labels do not invalidate automatic acceptance or create extra tests',()=>{
  const v=valid();v.pr.labels=[{name:'ci:measure-serial'}];assert(validateBinding(v));
  v.binding.benchmark=true;assert.throws(()=>validateBinding(v));
@@ -789,4 +790,39 @@ test('unassigned integration runtime sources and transport dependency drift requ
  try{assert.throws(()=>validateWorkflows(manifest,contract,root),/UNASSIGNED_WORKFLOW_SOURCE/);}finally{fs.rmSync(p);}
  const altered=structuredClone(manifest),flow=altered.flows.find(f=>f.id==='WF09');flow.sources=flow.sources.filter(p=>!p.includes('calendar-proxy'));
  assert.throws(()=>validateWorkflows(altered,contract,root),/WORKFLOW_REVIEW_REQUIRED|UNASSIGNED_WORKFLOW_SOURCE/);
+});
+
+test('document ownership rejects unregistered prose, duplicate topic authorities and stale records',()=>{
+ const root=resolve('.'),registry=JSON.parse(fs.readFileSync(registryPath)),files=livingMarkdown(root);
+ assert.equal(validateDocumentRegistry(registry,files,root),files.length);
+ const duplicate=structuredClone(registry);duplicate.documents[1].topics=[registry.documents[0].topics[0]];
+ assert.throws(()=>validateDocumentRegistry(duplicate,files,root),/DUPLICATE_TOPIC_OWNER/);
+ assert.throws(()=>validateDocumentRegistry(registry,[...files,'docs/unreviewed-topic.md'],root),/UNREGISTERED_DOCUMENT/);
+ assert.throws(()=>validateDocumentRegistry(registry,files.slice(1),root),/STALE_DOCUMENT_REGISTRY/);
+ const archived=structuredClone(registry);archived.documents[0].path='docs/history/reports/decision-sprint-review.md';
+ assert.throws(()=>validateDocumentRegistry(archived,files,root),/INVALID_LIVING_DOCUMENT/);
+ const traversal=structuredClone(registry);traversal.documents[0].path='../outside.md';
+ assert.throws(()=>validateDocumentRegistry(traversal,files,root),/INVALID_LIVING_DOCUMENT/);
+ for(const role of ['status','backlog','queue']){
+  const misplaced=structuredClone(registry);misplaced.documents.find(d=>d.path==='docs/workflows.md').role=role;
+  assert.throws(()=>validateDocumentRegistry(misplaced,files,root),/DEVELOPMENT_STATE_OUTSIDE_APP_DOCS/);
+ }
+ const secondRequests=structuredClone(registry);secondRequests.documents.find(d=>d.path==='docs/workflows.md').role='coordination';
+ assert.throws(()=>validateDocumentRegistry(secondRequests,files,root),/INVALID_COORDINATION_DOCUMENT/);
+ const lostRequestsOwner=structuredClone(registry);lostRequestsOwner.documents.find(d=>d.path==='docs/requests.md').role='guide';
+ assert.throws(()=>validateDocumentRegistry(lostRequestsOwner,files,root),/INVALID_COORDINATION_DOCUMENT/);
+ assert.equal(fs.readFileSync('docs/documentation-map.md','utf8'),renderDocumentMap(registry));
+});
+
+test('active documentation cannot use historical snapshots as current instructions',()=>{
+ const p='.artifacts/docs-current-history-negative.md';fs.mkdirSync('.artifacts',{recursive:true});
+ fs.writeFileSync(p,'[old decision](../docs/history/reports/decision-sprint-review.md)\n');
+ try{assert.throws(()=>checkDocuments([p]),/HISTORICAL_DOCUMENT_AS_CURRENT/);}finally{fs.rmSync(p);}
+});
+
+test('workflow prose cannot recommend an operation absent from the machine contract',()=>{
+ const root=resolve('.'),manifest=JSON.parse(fs.readFileSync(workflowPath)),contract=JSON.parse(fs.readFileSync('packages/api-contracts/schema/contract.json'));
+ // A removed operation is still cited by the guide: prose validation must reject it before mapping/coverage.
+ contract['x-contract'].operations=contract['x-contract'].operations.filter(o=>o.name!=='preview_get_v1');
+ assert.throws(()=>validateWorkflows(manifest,contract,root),/UNKNOWN_WORKFLOW_API preview_get_v1/);
 });

@@ -1,9 +1,16 @@
 # Backend ajanı
 
-Önce kök [AGENTS](../../AGENTS.md), [kaynak indeksi](../../docs/source-index.md), [güncel devir](docs/00-FtkSaaS-yeni-sohbet-devir.md), ortak backlog/kuyruk ve ilgili normatif sözleşme okunur. İş akışı projenin iş akışıdır: `/docs/workflows.md` ve `/docs/workflows.json` backend'in sürdürdüğü ortak entegrasyon yüzeyidir.
+Önce kök [AGENTS](../../AGENTS.md), [kaynak indeksi](../../docs/source-index.md), kendi [devrin](docs/00-FtkSaaS-yeni-sohbet-devir.md), [backlog](docs/remaining-work.md) ve [sıran](docs/production-queue.md), ardından ilgili sözleşme/WF okunur.
 
-Her davranış diliminde etkilenen WF rehberi, açık API eşlemesi, test/uygulama kaynakları, makine sözleşmesi/tipler, API/envanter ve alan devri aynı PR'de güncellenir. Yeni API eşlemesiz bırakılamaz. RLS/Edge tek başına iş akışını açıklamaz; SQL domain işlemleri ve gerçek kabul testleri de okunur. Sürüm, selector ve plan desteği eksikse bunu frontend'e açık bağımlılık olarak bildir; yalnız contract'ta var diye uygulanmış gösterme.
+## Yetki ve sınır
 
-`docs:review` bir kaynak inceleme kaydıdır. Scriptin istemesi nedeniyle okumadan onaylama veya sırf hash yenileyerek davranış anlatımını atlama. İlgili rehber zaten doğruysa gerekçeyi kaydet; değişmişse rehberi düzelt. Üretilmiş Markdown/tipleri elle düzeltme. CI metnin anlamını doğrulamaz; son kaynak incelemesi gerekir.
+- Kod/test/işletim sahibi `apps/backend`dir. İlerleme, test/kabul, sıra ve sohbet devri yalnız `apps/backend/docs` içine yazılır.
+- Kök `/docs` yalnız görevde değişen ortak ürün/API/iş akışı sözleşmesi ve gerekli teknik referans için güncellenir; iş kapanışı veya test sonucu için güncellenmez.
+- Frontend kodu, todo, kabul ve sohbet devri salt okunur. Karşı alana talep/onay [ortak kayıtta](../../docs/requests.md) yalnız kendi alanına yazılır; kendi planın talep kimliğine bağlanır.
+- Kapsam dışı veya belirsiz yetkide, dosya/bölüm ve gerekçeyi açıklayıp kullanıcı onayı iste; onaydan önce değiştirme. Aynı görev için verilmiş açık yetkiyi tekrar sorma. Ayrıntının sahibi kök [yazma sınırıdır](../../AGENTS.md#belge-yazma-sınırı).
 
-Sohbet devri, tanı, çalışma notları ve teknik işletim talimatları `apps/backend/docs` altında tutulur. Ürün kararı ve istemcinin ihtiyaç duyduğu iş akışı ortak `/docs` sahibindedir. [Dokümantasyon komutları](docs/documentation-development.md). Frontend tasarımı/istemci kodu ve production dağıtımı bu görevin kapsamı değildir.
+## Davranış ve doğrulama
+
+Backend’in sunduğu iş akışı projenin iş akışıdır. Değişen davranışın yetkili WF/sözleşme bölümü, gereken API ve kaynak/test eşlemesi, üretilmiş tip/envanter aynı PR’da güncellenir; yeni API eşlemesiz bırakılamaz. SQL domain işlemleri ve gerçek kabul testleri de okunur; RLS/Edge tek başına iş akışını açıklamaz. Selector/sürüm/plan sınırı açık yazılır; contract varlığı uygulanmış kabulü değildir.
+
+`docs:review` gerçek kaynak incelemesidir; okumadan hash yenileme. Rehber doğru kaldıysa gerekçeyi kaydet, değiştiyse düzelt. Üretilmiş Markdown/tipleri elle değiştirme. CI metnin anlamını kanıtlamaz; bağımsız son kaynak incelemesi gerekir. [Dokümantasyon komutları](docs/documentation-development.md). Production dağıtımı bu görevin yetkisi değildir.

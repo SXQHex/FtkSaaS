@@ -4,9 +4,10 @@ import {createHash} from 'node:crypto';
 import {execFileSync} from 'node:child_process';
 import {pathToFileURL} from 'node:url';
 import {repositoryRoot,repoFile} from './paths.mjs';
+import {registryPath,livingMarkdown,validateDocumentRegistry,renderDocumentMap} from './document-registry.mjs';
 
 export const workflowPath='docs/workflows.json';
-export const generatedPaths=['docs/database.md','docs/security.md','docs/functions.md'];
+export const generatedPaths=['docs/database.md','docs/security.md','docs/functions.md','docs/documentation-map.md'];
 const sha=value=>createHash('sha256').update(value).digest('hex');
 const json=p=>JSON.parse(fs.readFileSync(p,'utf8'));
 const cell=s=>String(s??'—').replaceAll('|','∣').replaceAll('\n',' ');
@@ -30,6 +31,7 @@ export function validateWorkflows(manifest,contract,root,{allowStale=false}={}){
   if(flow.guide!==`docs/workflows.md#${flow.id.toLowerCase()}`)throw Error('INVALID_WORKFLOW_GUIDE');
   const content=regular(root,flow.guide.split('#')[0]);
   if(!content.split('\n').includes('## '+flow.id))throw Error('MISSING_WORKFLOW_SECTION '+flow.id);
+  for(const name of content.match(/\b[a-z][a-z0-9_]*_v1\b/g)??[])if(!operations.has(name))throw Error('UNKNOWN_WORKFLOW_API '+name);
   if(!Array.isArray(flow.tests)||!flow.tests.length||!Array.isArray(flow.sources)||!flow.sources.length||!Array.isArray(flow.operations))throw Error('MISSING_WORKFLOW_EVIDENCE '+flow.id);
   for(const p of flow.tests){if(!/^apps\/backend\/tests\/.+\.(?:mjs|sql)$/.test(p))throw Error('INVALID_WORKFLOW_TEST');regular(root,p);}
   for(const p of flow.sources){if(!/^(apps\/backend\/(database|supabase|scripts|docs|api|transports|config|tests)\/|docs\/|packages\/api-contracts\/)/.test(p)||/\.env|\.dev\//.test(p))throw Error('UNSAFE_WORKFLOW_SOURCE '+p);regular(root,p);}
@@ -55,6 +57,9 @@ export function contextFiles(root){
 }
 export function renderReferences(root,manifest,contract){
  const ops=validateWorkflows(manifest,contract,root),out={};
+ const registry=json(path.join(root,registryPath));
+ validateDocumentRegistry(registry,livingMarkdown(root),root);
+ out['docs/documentation-map.md']=renderDocumentMap(registry);
  const base='docs/',migrationDir=path.join(root,'apps/backend/supabase/migrations');
  const migrations=fs.readdirSync(migrationDir).filter(n=>n.endsWith('.sql')).sort();
  const files=contextFiles(root),digest=sha(JSON.stringify(files));
@@ -65,7 +70,7 @@ export function renderReferences(root,manifest,contract){
   '| Migration | SHA256 |\n|---|---|\n'+migrations.map(n=>`| [${n}](../apps/backend/supabase/migrations/${n}) | \`${sha(fs.readFileSync(path.join(migrationDir,n)))}\` |`).join('\n')+'\n';
  const security=files.filter(f=>f.path.endsWith('.sql')&&/\b(?:policy|row level security|grant|revoke|security definer)\b/i.test(regular(root,f.path)));
  out[base+'security.md']=intro('Güvenlik kaynak referansı')+
-  'İnsan istemci native Auth → JWT doğrulanan Edge → service-only RPC yolunu kullanır. Canlı oturum/MFA/tenant/rol/plan kontrolü tekrar denetlenir; core/private erişimi istemciye açılmaz. Worker ve public credential transport ayrı yetki yollarıdır. RLS tek başına Edge iş yetkisi değildir. [İstemci değişmezleri](api-invariants.md), [teknik sözleşme](contracts/02-FtkSaaS-teknik-sozlesme.md) ve [iş akışları](workflows.md#wf00) normatif ayrıntıyı taşır.\n\n'+
+  'İnsan istemci native Auth → JWT doğrulanan Edge → service-only RPC yolunu kullanır. Canlı oturum/MFA/tenant/rol/plan kontrolü tekrar denetlenir; core/private erişimi istemciye açılmaz. Worker ve public credential transport ayrı yetki yollarıdır. RLS tek başına Edge iş yetkisi değildir. [İstemci değişmezleri](client-integration.md), [teknik sözleşme](contracts/02-FtkSaaS-teknik-sozlesme.md) ve [iş akışları](workflows.md#wf00) normatif ayrıntıyı taşır.\n\n'+
   'Aşağıdaki liste güvenlik DDL içeren kaynak dosyalarıdır; son policy/grant kümesi veya başarılı güvenlik denetimi olduğu iddia edilmez. Etkin RLS/ACL/fonksiyon security flag/policy ifadeleri CD pg_catalog artifact\'ından okunur. Auth/public/storage şemaları bu uygulama katalog snapshot\'ına dahil değildir; sağlayıcı ayarları ayrıca kabul edilir.\n\n'+
   '| Güvenlik kaynağı | SHA256 |\n|---|---|\n'+security.map(f=>`| [${path.basename(f.path)}](${link(base+'security.md',f.path)}) | \`${f.sha256}\` |`).join('\n')+'\n';
  const owners=new Map(manifest.flows.flatMap(f=>f.operations.map(n=>[n,f])));
@@ -74,7 +79,7 @@ export function renderReferences(root,manifest,contract){
   'DTO/izin/hata/yan etkiler [üretilmiş API kataloğu](contracts/05-FtkSaaS-O4-API-katalogu.md) ve [makine sözleşmesinden](../packages/api-contracts/schema/contract.json) gelir. Edge kodu [backend-v1](../apps/backend/supabase/functions/backend-v1/index.ts) altındadır; SQL domain davranışını Edge dosyasından tek başına çıkarma. `implemented.json` içindeki varlık tüm selector/provider/ürün kabulünün tamamlandığı anlamına gelmez. Backend-only satırları tarayıcı endpoint önerisi değildir.\n\n'+
   '| API | Çağrılabilir envanter | Faz | İzin | Akış / kapsam |\n|---|---|---|---|---|\n'+[...ops.values()].map(o=>{const f=owners.get(o.name);return `| \`${o.name}\` | ${implemented.has(o.name)?'runtime (sınırları oku)':'contract_only'} | ${cell(o.operation_contract.kind)} | ${cell(o.permission)} | [${f.id}](${link(base+'functions.md',f.guide)}) / ${f.audience} |`;}).join('\n')+
   '\n\n## Akış kanıt kaynakları\n\nTest dosyası bağlantısı çalıştırılmış test başarısı değildir. Kaynak bağlı CI/hosted sonuçları güncel kabul belgesinin sahibidir.\n\n'+manifest.flows.map(f=>`- [${f.id} — ${f.title}](${link(base+'functions.md',f.guide)}): [alan devri](${link(base+'functions.md',f.detail)}); ${f.tests.map(t=>`[${path.basename(t)}](${link(base+'functions.md',t)})`).join(', ')}`).join('\n')+'\n';
- return {outputs:out,context:{format:1,source_files:files,source_sha256:digest,flows:manifest.flows.map(f=>({id:f.id,guide:f.guide,sources:f.sources,tests:f.tests,operations:f.operations}))}};
+ return {outputs:out,context:{format:1,documents:registry.documents,excluded_documents:['docs/history/**'],source_files:files,source_sha256:digest,flows:manifest.flows.map(f=>({id:f.id,guide:f.guide,sources:f.sources,tests:f.tests,operations:f.operations}))}};
 }
 export function updateDocs({root=repositoryRoot,check=false}={}){
  const manifest=json(path.join(root,workflowPath)),contract=json(path.join(root,'packages/api-contracts/schema/contract.json'));

@@ -1,35 +1,34 @@
 # Kaynak indeksi
 
-Tek repo SXQHex/FtkSaaS; main güncel kaynak dalıdır. Önce [AGENTS](../AGENTS.md), sonra [güncel kabul](../apps/backend/docs/00-FtkSaaS-yeni-sohbet-devir.md), [açık işler](remaining-work.md), [aktif sıra](production-queue.md) okunur. Görevle ilgili alan belgesi bunun ardından seçilir.
+Başlangıç: [AGENTS](../AGENTS.md) → [güncel kaynak/kabul](../apps/backend/docs/00-FtkSaaS-yeni-sohbet-devir.md) → [backlog](../apps/backend/docs/remaining-work.md) → [sıra](../apps/backend/docs/production-queue.md). Ardından görevle ilgili tek konu sahibi seçilir. Main’in tam SHA’sı ve aynı kaynağın kanıtı doğrulanır.
 
-## Tek kaynak tablosu
+## Tek konu sahibi
 
-| Soru | Yetkili kaynak |
+| Konu | Yetkili kaynak |
 |---|---|
-| Ne kabul edildi, hangi SHA/CI/CD/hosted sürümü? | [00 güncel kabul](../apps/backend/docs/00-FtkSaaS-yeni-sohbet-devir.md) |
-| Hangi iş açık? | [remaining-work](remaining-work.md) |
-| Şimdi hangi sırada çalışıyoruz? | [production-queue](production-queue.md) — backlog’u kopyalamaz |
-| Ürün davranışı ne? | [01 ürün](contracts/01-FtkSaaS-urun-kapsam-sozlesmesi.md), kabul edilmiş decisions/ |
-| Teknik kurallar ve69 ayar grubu? | [02 teknik](contracts/02-FtkSaaS-teknik-sozlesme.md) |
-| Aktör/dosya/değişiklik yetkisi? | [AGENTS](../AGENTS.md), [03 sorumluluk](contracts/03-FtkSaaS-kodlama-sorumluluklari.md) |
-| Tam DTO/hata/izin/sürüm? | [08 makine sözleşmesi](../packages/api-contracts/schema/contract.json); bundan üretilen packages/api-contracts |
-| Uygulanan API ve fiziksel şema? | [Endpoint envanteri](endpoint-inventory.json), apps/backend/supabase/migrations/, apps/backend/database/;04/05 ve [özellik haritası](feature-delivery.md) üretilmiş görünümler |
-| Kullanıcı amacı hangi API sırasına dönüşür? | [Proje iş akışları](workflows.md), [API–akış haritası](functions.md), [açık WF/test eşlemesi](workflows.json) |
-| İstemci nasıl bağlanır? | [Entegrasyon devri](client-integration.md), [ayar tüketicileri](../apps/backend/docs/frontend-settings-handover.md), [API değişmezleri](api-invariants.md) |
-| Repo/ortam/dağıtım düzeni? | [Monorepo](monorepo.md), [hosted runbook](../apps/backend/docs/remote-backend-setup.md), [CI politikası](ci-policy.md) |
-| Frontend ne durumda? | [Frontend geliştirme](../apps/web/docs/development.md), [göç/ortam sınırları](monorepo.md) |
-| Hangi belge neden var? | [Belge haritası ve saklama kuralı](documentation-map.md) |
+| Ürün modülleri ve plan erişimi | [01 ürün kapsamı](contracts/01-FtkSaaS-urun-kapsam-sozlesmesi.md) |
+| Yürürlükteki domain/ayar davranışı; D/U/Q/DS/FD kararları | [02 teknik sözleşme](contracts/02-FtkSaaS-teknik-sozlesme.md) |
+| Henüz uygulamaya ayrılmamış P08 kabulü ve açık ürün tercihleri | [P08](decisions/P08-accepted-scope.md) |
+| DTO, enum, operasyon, izin ve sürüm alanları | [Makine sözleşmesi](../packages/api-contracts/schema/contract.json); [üretilmiş API](contracts/05-FtkSaaS-O4-API-katalogu.md) |
+| Durum/hata/izin açıklaması | [06 referansı](contracts/06-FtkSaaS-O4-durum-hata-izin.md) |
+| API sırası, rol/plan, yan etki ve kurtarma | [WF00–WF20](workflows.md); [API eşlemesi](functions.md) |
+| Ortak istemci transport’u | [Entegrasyon protokolü](client-integration.md) |
+| Typed ayar ve native hesap tüketicileri | [Ayar rehberi](settings.md) |
+| Fiziksel şema/güvenlik kaynakları | [Migration referansı](database.md), [güvenlik referansı](security.md); kesin DDL migration zinciri |
+| Repo düzeni ve CI kabul kuralları | [Monorepo](monorepo.md), [CI politikası](ci-policy.md) |
+| Backend dokümantasyon üretimi ve işletimi | [Dokümantasyon](../apps/backend/docs/documentation-development.md), [işletim](../apps/backend/docs/remote-backend-setup.md) |
+| Frontend geliştirme/ekran uygulaması | [Web rehberi](../apps/web/docs/development.md) |
+| Frontend modül planı, aktif bölüm, bağımlılık ve kabul | [Tek frontend yol haritası](../apps/web/docs/todo.md) |
+| Backend/frontend talep, karşı alanın onayı ve teslim kabulü | [Tek talep kaydı](requests.md) |
+| Frontend sohbet devri | [Frontend devir kaydı](../apps/web/docs/handover.md) |
+| Bütün yaşayan belgelerin rolü ve konu sahipliği | [Üretilmiş belge haritası](documentation-map.md) |
 
-## Öncelik ve kanıt
+Bir karar yalnız sahibinde güncellenir; eski hükmü bırakıp yeni tarihli zıt ek yazılmaz. WF uygulama sırasını, generated katalog makine sözleşmesini, durum kaydı kaynak/ortam kanıtını gösterir; bu roller yeni ürün kararı oluşturamaz. API sayısı, dosya bağlantısı veya mock başarı tam özellik kabulü değildir.
 
-Son açık kullanıcı kararı önceki çelişen hükmü değiştirir; alt katalog veya eski rapor üst kararı değiştirmez. Karar, teknik aktarım, runtime ve doğrulanmış kabul farklıdır. D01–D09/U01–U08/Q-D01/Q-E02/Q-E03 ve FD01–FD12 korunur. Kabul edilmiş69 davranış grubu bütün alanların uygulanmış olduğu anlamına gelmez.
+## Arşiv sınırı
 
-Tarihsel docs/history/ ve ilk07/09/11 raporları kaynağına aittir. Eski pending notundan yeni görev veya yeni kabul türetilmez. Yerel test, bağımsız inceleme, CI ve hosted/provider kabulü birbirinin yerine geçmez. development-connection.json bağlantı/yerel kurulum tarifidir; güncel hosted kabulü veya secret kaynağı değildir.
+`docs/history/` yalnız immutable tarihsel kanıt deposudur; güncel ajan başlangıç/arama/context listesine alınmaz. Yalnız açık tarihsel incelemede [kaynak/hash manifesti](history/manifest.json) üzerinden, belgeyi kaynak SHA’sıyla birlikte oku. Eski pending/başarı/izin bugünün durumuna taşınmaz. Yeni emekli belgeler için ikinci arşiv kopyası yaratılmaz; Git geçmişi korunur. Yaşayan belgeler tarihsel Markdown’a karar veya çalışma talimatı olarak bağlanamaz.
 
-## Güncelleme kuralı
+## Konum
 
-Her bilgi yalnız tablodaki sahibinde güncellenir. Devir/run/envanter paragrafını diğer belgelere yapıştırma. Davranış/API değişince normatif kaynak + üretici + ilgili consumer devri + tek backlog/kabul kaydı birlikte güncellenir. Tarihsel rapora sonradan CI-ID eklenmez. Belge silme/birleştirmede yaşayan inbound/outgoing bağlantılar ve başlık anchor’ları kontrol edilir; eşsiz karar/kanıt kaybedilmez.
-
-## Belge konumu
-
-Proje iş akışı backend liderliğinde ortak `/docs` sahibindedir. Normatif sözleşme/kararlar ve API/şema/güvenlik referansı burada kalır. Sohbet devri/geliştirme/işletim notları `apps/backend/docs`, frontend geliştirme/tasarım notları `apps/web/docs` altında tutulur. Backend ve frontend README/AGENTS girişleri bu kaynaklara yönlendirir; aynı içerik kopyalanmaz.
+Kök `/docs` ürün/API/iş akışı sözleşmeleri ve ortak kuralları tutar; uygulama geliştirme ilerlemesi, test günlüğü, aktif görev ve sohbet devri burada tutulmaz. Tek koordinasyon istisnası requests.md içindeki alanlar arası talep/onay kaydıdır; diğer dosyalar ortak ürün/iş/makine kuralları ve teknik sözleşmelerdir. Backend liderliğinde tanımlanan proje iş akışı ve SSoT kök `/docs`; backend sohbet/geliştirme/işletim `apps/backend/docs`; frontend geliştirme `apps/web/docs` sahibindedir. README ve AGENTS giriş/kural taşır, alan belgelerini kopyalamaz. Sahiplik envanteri `documentation.json`, akış/test/API eşlemesi `workflows.json` tek makine girdileridir; CI’da çalıştırılabilir politika girdisi olarak değerlendirilirler.

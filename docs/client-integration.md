@@ -22,17 +22,19 @@ Owner olmak CM operasyon yetkisi vermez. Canlı native session/MFA, hesap/kişi 
 
 Para borcu, öğrenci alacağı, kullanılabilir/ayrılmış hak ayrı gösterilir. Program zamanı gerçekleşme/yoklama kapanışı değildir. Kesin rezervasyon koruması yeni yetki/kapasite bypass’ı değildir. Finans iptal/ödeme/mahsup etkisi istemcide hesaplanmaz; preview/apply/status ve gerçek sürüm kullanılır.
 
-## Alan devirleri
+## Akış seçimi
 
-| Alan | Tüketim kaynağı |
-|---|---|
-| Ayarlar/hesap/kimlik | [Ayar alanları ve gerçek destek](../apps/backend/docs/frontend-settings-handover.md);69 kabul grubunun tamamı uygulanmış değildir |
-| Program/takvim | [Program](../apps/backend/docs/program-session-handover.md), [okumalar](../apps/backend/docs/schedule-read-handover.md), [kapasite kararı](decisions/DS-2026-10-25-session-capacity.md) |
-| Starter/public | [Starter](../apps/backend/docs/starter-plan-gates-handover.md), [public transport](../apps/backend/docs/p04-handover.md) |
-| Finans/etkinlik | [P03](../apps/backend/docs/p03-handover.md), [Q-E01](decisions/Q-E01-accepted.md), [Q-E02](decisions/Q-E02.md), [Q-E03](decisions/Q-E03.md), [fiilî başlangıç](../apps/backend/docs/actual-start-handover.md), [hesaplaşma](../apps/backend/docs/settlement-handover.md) |
-| Hakediş | [Anlaşma ve hakediş](../apps/backend/docs/instructor-earnings-handover.md), [Starter koruma](../apps/backend/docs/starter-attendance-protection-handover.md) |
-| Belge/bildirim/rapor/import | [P05](../apps/backend/docs/p05-handover.md), [P06](../apps/backend/docs/p06-handover.md) |
+İşlem sırası için [WF00–WF20](workflows.md), gerçek typed ayar/native hesap alanları için [ayar rehberi](settings.md), durum/hata açıklamaları için [06](contracts/06-FtkSaaS-O4-durum-hata-izin.md) okunur. Ürün davranışı teknik sözleşme, plan kapsamı ürün sözleşmesi sahibindedir.
+
+## Wire ve okuma sınırları
+
+- Ortak request başlığı: client_api_version=1, request_id UUID; domain işleminde org_id ve gerekiyorsa center_id. G hesap işleminde org zorunlu değildir; account_access_send org işlemi, access_accept hedef token/verified hesapla çözülür. Aktör hiçbir request rol/account beyanından alınmaz.
+- W/A/E/B mutasyonda operation_key; existing mutable record’da expected_version; create/update birleşik çağrıda existing target için version şart, create’de yok. A request preview token+dependencies içerir, TTL15dk teknik config; değişmiş ilgili kayıt/onay veya expired preview ret. Key içeriği: operation_key/request_id harici business içerik (expected_version dahil) canonical hash; retry payload semantiği korunur, version değiştirerek aynı key farklı iş yapılamaz.
+- API money bigint string, ara hesap decimal; yarım sıfırdan uzağa, dağıtım en büyük küsurat/kararlıID, kayıtlı tutar tersine çevirilir. Bilinmeyen alanlar ret. JSON nullable ile optional ayrıdır; key yoksa patch korur, izinli null temizler. Secret/password/token/signed URL loglanmaz.
+- Page default50/max200, sorguya özgü sort allowlist + UUID tiebreak; cursor org/actor-scope/filtre/sort bağlı. Tüm filterli export tüm sayfaları kapsar. Canlı keyset liste snapshot garantisi değildir; rapor as_of zamanı bellidir.
+- RPC domain yanıtı `{ok,data,trace_id}` veya `{ok:false,error}`. SQL domain hatası HTTP200 içinde ok:false olabilir; transport/Auth HTTP hataları ayrıdır, istemci hata metni parse etmez. Connection timeout iş başarısızlığı kanıtı değildir; aynı key ile status/retry.
+- Okuma DTO’su08’de alan bazında tanımlıdır; role mask’te izin verilmeyen optional alan üretilmez. Required output alanına yetki yoksa ilgili DTO/query yetkisi verilmez. JSON type doğrulama, semantic guard/tenant/RLS kontrolünün yerine geçmez.
 
 ## Entegrasyon kabulü
 
-saaspt’deki görünüm ve test verisi sentetiktir. Gerçek native giriş/oturum, rol-plan görünürlüğü, DTO/sürüm/preview/replay ve hata senaryoları ekran→Edge→DB ile doğrulanmadan canlı bağlı denmez. Gerçek API hatasında sessiz demo/sahte başarı fallback’i yoktur. Secrets/admin anahtarı public değişkene veya istemci bundle’ına girmez. Native Auth provider kabulü, public Turnstile ve org dış bildirimleri farklıdır. Açık iş bu dosyada çoğaltılmaz; [tek backlog](remaining-work.md) kullanılır.
+Gerçek native giriş/oturum, rol/plan görünürlüğü, DTO/sürüm/preview/replay ve hata senaryoları ekran→Edge→DB ile doğrulanır. Tasarım fixture’ı veya MSW kabulü hosted kanıt değildir. Gerçek API hatasında sessiz demo/sahte başarı fallback’i yoktur. Secrets/admin anahtarı public değişkene veya istemci bundle’ına girmez. Native Auth, public Turnstile ve uygulama dış bildirimleri ayrı kabul edilir. Ortak/backend açık iş [proje backlog’unda](../apps/backend/docs/remaining-work.md), frontend bölüm ve kabul işi [web planında](../apps/web/docs/todo.md) tutulur.

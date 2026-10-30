@@ -236,14 +236,15 @@
         "apps/backend/tests/p07-diagnostics.mjs",
         "apps/backend/tests/request-diagnostics.mjs",
         "apps/backend/tests/settings-media-unit.mjs",
-        "docs/api-invariants.md",
         "docs/client-integration.md",
         "packages/api-contracts/schema/contract.json",
         "packages/api-contracts/src/client.ts",
         "packages/api-contracts/src/generated.ts",
         "packages/api-contracts/src/index.ts",
         "packages/api-contracts/src/operations.ts",
-        "packages/api-contracts/src/runtime.ts"
+        "packages/api-contracts/src/runtime.ts",
+        "docs/documentation.json",
+        "apps/backend/scripts/document-registry.mjs"
       ],
       "operations": [
         "operation_status_get_v1",
@@ -253,8 +254,8 @@
         "management_state_get_v1"
       ],
       "review": {
-        "fingerprint": "530ab339264b92db740064d40d431ed213f6d2fbde4da1d76521db3f5430094b",
-        "reason": "İlk ortak rehber güncel sözleşme ve alan kaynaklarıyla eşlendi; ortak kaynaklar WF00, public/ICS WF09, worker WF20 açık bağımlılığıdır. Test dosyası hosted kabul kanıtı değildir."
+        "fingerprint": "c57b3f1effba7cd5e72c068585fcdbbef1f1baf1627fcaf7464fc2f7800d7048",
+        "reason": "Reviewed role-scoped documentation writes, app-owned handovers and backlogs, sole shared request register, exact path checks and removal of non-contract status notes. No business or transport behavior changed."
       }
     },
     {
@@ -262,7 +263,7 @@
       "title": "Kimlik ve hesap güvenliği",
       "audience": "starter",
       "guide": "docs/workflows.md#wf01",
-      "detail": "apps/backend/docs/frontend-settings-handover.md",
+      "detail": "docs/settings.md",
       "tests": [
         "apps/backend/tests/account-identity-acceptance.mjs",
         "apps/backend/tests/account-session-management-acceptance.mjs",
@@ -305,7 +306,7 @@
         "apps/backend/database/starter-attendance-protection-wrappers.sql",
         "apps/backend/database/starter-settings-media.sql",
         "apps/backend/database/wrappers.sql",
-        "apps/backend/docs/frontend-settings-handover.md"
+        "docs/settings.md"
       ],
       "operations": [
         "account_get_v1",
@@ -321,7 +322,7 @@
       ],
       "review": {
         "fingerprint": "ff63ce47ce278dd272b32a47f26d8e41ae9d028a1625c87d67ac27e4eaef0ba9",
-        "reason": "İlk ortak rehber güncel sözleşme ve alan kaynaklarıyla eşlendi; ortak kaynaklar WF00, public/ICS WF09, worker WF20 açık bağımlılığıdır. Test dosyası hosted kabul kanıtı değildir."
+        "reason": "Settings consumer guidance now routes frontend acceptance to the PR91 web plan; typed settings behavior and API contract remain unchanged."
       }
     },
     {
@@ -329,7 +330,7 @@
       "title": "Stüdyo kurulumu ve yetki",
       "audience": "starter",
       "guide": "docs/workflows.md#wf02",
-      "detail": "apps/backend/docs/starter-plan-gates-handover.md",
+      "detail": "docs/workflows.md",
       "tests": [
         "apps/backend/tests/registry.test.mjs",
         "apps/backend/tests/room-role-registry.test.mjs",
@@ -376,7 +377,7 @@
         "apps/backend/database/starter-plan-gates.sql",
         "apps/backend/database/starter-settings-media.sql",
         "apps/backend/database/wrappers.sql",
-        "apps/backend/docs/starter-plan-gates-handover.md"
+        "docs/workflows.md"
       ],
       "operations": [
         "organizations_list_v1",
@@ -410,7 +411,7 @@
       "title": "Program ve seans yaşam döngüsü",
       "audience": "starter",
       "guide": "docs/workflows.md#wf03",
-      "detail": "apps/backend/docs/program-session-handover.md",
+      "detail": "docs/workflows.md",
       "tests": [
         "apps/backend/tests/program-session-lifecycle.test.mjs",
         "apps/backend/tests/schedule-reads.test.mjs",
@@ -462,7 +463,7 @@
         "apps/backend/database/starter-calendar-preferences.sql",
         "apps/backend/database/starter-plan-gates.sql",
         "apps/backend/database/wrappers.sql",
-        "apps/backend/docs/program-session-handover.md"
+        "docs/workflows.md"
       ],
       "operations": [
         "availability_save_v1",
@@ -563,7 +564,7 @@
       "title": "Ürün, satış ve hak",
       "audience": "starter",
       "guide": "docs/workflows.md#wf05",
-      "detail": "apps/backend/docs/p02-handover.md",
+      "detail": "docs/workflows.md",
       "tests": [
         "apps/backend/tests/p01-catalog-entitlement-reads.test.mjs",
         "apps/backend/tests/starter-studio-acceptance.mjs"
@@ -611,7 +612,7 @@
         "apps/backend/database/starter-domain-preparations.sql",
         "apps/backend/database/starter-plan-gates.sql",
         "apps/backend/database/wrappers.sql",
-        "apps/backend/docs/p02-handover.md"
+        "docs/workflows.md"
       ],
       "operations": [
         "products_list_v1",
@@ -639,8 +640,8 @@
         "negative_limits_get_v1"
       ],
       "review": {
-        "fingerprint": "cd40b566ffa78bcbfc43a70fc8e7039f76e3d0ada67657aca7f054add8bd8c10",
-        "reason": "İlk ortak rehber güncel sözleşme ve alan kaynaklarıyla eşlendi; ortak kaynaklar WF00, public/ICS WF09, worker WF20 açık bağımlılığıdır. Test dosyası hosted kabul kanıtı değildir."
+        "fingerprint": "b93c2d45b4ad52c2e70fab2bf646439d58008160d7b6164189e7cbb080b61564",
+        "reason": "Removed historical acceptance-tracking runtime_notes from sale refund contracts; request, response, permission, guards and sale workflow behavior are unchanged."
       }
     },
     {
@@ -648,7 +649,7 @@
       "title": "Rezervasyon ve özel ders talebi",
       "audience": "starter",
       "guide": "docs/workflows.md#wf06",
-      "detail": "apps/backend/docs/p01-handover.md",
+      "detail": "docs/workflows.md",
       "tests": [
         "apps/backend/tests/p01-lesson-requests.test.mjs",
         "apps/backend/tests/p01-catalog-entitlement-reads.test.mjs"
@@ -692,7 +693,7 @@
         "apps/backend/database/starter-attendance-protection.sql",
         "apps/backend/database/starter-plan-gates.sql",
         "apps/backend/database/wrappers.sql",
-        "apps/backend/docs/p01-handover.md"
+        "docs/workflows.md"
       ],
       "operations": [
         "lesson_request_create_v1",
@@ -716,7 +717,7 @@
       "title": "Yoklama ve hak tüketimi",
       "audience": "starter",
       "guide": "docs/workflows.md#wf07",
-      "detail": "apps/backend/docs/starter-attendance-protection-handover.md",
+      "detail": "docs/workflows.md",
       "tests": [
         "apps/backend/tests/starter-attendance-protection.test.mjs"
       ],
@@ -753,7 +754,7 @@
         "apps/backend/database/starter-attendance-protection.sql",
         "apps/backend/database/starter-plan-gates.sql",
         "apps/backend/database/wrappers.sql",
-        "apps/backend/docs/starter-attendance-protection-handover.md"
+        "docs/workflows.md"
       ],
       "operations": [
         "attendance_get_v1",
@@ -774,7 +775,7 @@
       "title": "Borç, tahsilat ve öğrenci alacağı",
       "audience": "starter",
       "guide": "docs/workflows.md#wf08",
-      "detail": "apps/backend/docs/p03-handover.md",
+      "detail": "docs/workflows.md",
       "tests": [
         "apps/backend/tests/api-acceptance.test.mjs",
         "apps/backend/tests/starter-operations-acceptance.mjs"
@@ -810,7 +811,7 @@
         "apps/backend/database/runtime-wrappers.sql",
         "apps/backend/database/starter-attendance-protection-wrappers.sql",
         "apps/backend/database/wrappers.sql",
-        "apps/backend/docs/p03-handover.md"
+        "docs/workflows.md"
       ],
       "operations": [
         "finance_get_v1",
@@ -822,8 +823,8 @@
         "debt_adjust_v1"
       ],
       "review": {
-        "fingerprint": "411520d4cd38e683fee480a894df8189f09e779156c68b620211a14dd0663f7d",
-        "reason": "İlk ortak rehber güncel sözleşme ve alan kaynaklarıyla eşlendi; ortak kaynaklar WF00, public/ICS WF09, worker WF20 açık bağımlılığıdır. Test dosyası hosted kabul kanıtı değildir."
+        "fingerprint": "d7dda63a8f22d0b59f579ff14fdfaec6b1b7baf198b1095c62b1576e4a5fe0fb",
+        "reason": "Removed development-status pointers from finance and collection correction metadata; actual finance transaction contracts and workflow behavior are unchanged."
       }
     },
     {
@@ -831,7 +832,7 @@
       "title": "Public başvuru ve kişisel takvim",
       "audience": "starter",
       "guide": "docs/workflows.md#wf09",
-      "detail": "apps/backend/docs/p04-handover.md",
+      "detail": "docs/workflows.md",
       "tests": [
         "apps/backend/tests/personal-calendar-acceptance.mjs",
         "apps/backend/tests/calendar-feed-unit.mjs"
@@ -845,7 +846,7 @@
         "apps/backend/database/personal-calendar-links.sql",
         "apps/backend/database/runtime-wrappers-current.sql",
         "apps/backend/database/starter-plan-gates.sql",
-        "apps/backend/docs/p04-handover.md",
+        "docs/workflows.md",
         "apps/backend/scripts/p04-public-ingress.mjs",
         "apps/backend/scripts/p04-trial-config.mjs",
         "apps/backend/scripts/public-application-gateway.mjs",
@@ -872,7 +873,7 @@
       "title": "Rapor ve import",
       "audience": "starter",
       "guide": "docs/workflows.md#wf10",
-      "detail": "apps/backend/docs/p06-handover.md",
+      "detail": "docs/workflows.md",
       "tests": [
         "apps/backend/tests/p06-acceptance.mjs",
         "apps/backend/tests/p06-parser.mjs",
@@ -891,7 +892,7 @@
         "apps/backend/database/p06-wrappers.sql",
         "apps/backend/database/p07-lifecycle.sql",
         "apps/backend/database/runtime-wrappers-current.sql",
-        "apps/backend/docs/p06-handover.md"
+        "docs/workflows.md"
       ],
       "operations": [
         "report_get_v1",
@@ -913,7 +914,7 @@
       "title": "Belgeler ve işlemsel inbox",
       "audience": "starter",
       "guide": "docs/workflows.md#wf11",
-      "detail": "apps/backend/docs/p05-handover.md",
+      "detail": "docs/workflows.md",
       "tests": [
         "apps/backend/tests/p05-acceptance.mjs",
         "apps/backend/tests/starter-operations-acceptance.mjs"
@@ -926,7 +927,7 @@
         "apps/backend/database/p05-wrappers.sql",
         "apps/backend/database/p06-bind.sql",
         "apps/backend/database/runtime-wrappers-current.sql",
-        "apps/backend/docs/p05-handover.md"
+        "docs/workflows.md"
       ],
       "operations": [
         "notifications_list_v1",
@@ -947,7 +948,7 @@
       "title": "Ayarlar ve medya",
       "audience": "starter",
       "guide": "docs/workflows.md#wf12",
-      "detail": "apps/backend/docs/frontend-settings-handover.md",
+      "detail": "docs/settings.md",
       "tests": [
         "apps/backend/tests/frontend-settings-acceptance.mjs",
         "apps/backend/tests/starter-preparation-acceptance.mjs"
@@ -970,7 +971,7 @@
         "apps/backend/database/starter-settings-media.sql",
         "apps/backend/database/starter-work-templates-wrappers.sql",
         "apps/backend/database/starter-work-templates.sql",
-        "apps/backend/docs/frontend-settings-handover.md"
+        "docs/settings.md"
       ],
       "operations": [
         "notification_preferences_set_v1",
@@ -994,7 +995,7 @@
       "title": "Abonelik ve plan erişimi",
       "audience": "starter",
       "guide": "docs/workflows.md#wf13",
-      "detail": "apps/backend/docs/p07-a-handover.md",
+      "detail": "docs/workflows.md",
       "tests": [
         "apps/backend/tests/p07-subscription-lifecycle-acceptance.mjs",
         "apps/backend/tests/starter-plan-gates-acceptance.mjs"
@@ -1034,7 +1035,7 @@
         "apps/backend/database/starter-attendance-protection-wrappers.sql",
         "apps/backend/database/starter-plan-gates.sql",
         "apps/backend/database/wrappers.sql",
-        "apps/backend/docs/p07-a-handover.md"
+        "docs/workflows.md"
       ],
       "operations": [
         "subscription_get_v1",
@@ -1054,7 +1055,7 @@
       "title": "Anlaşma, hakediş ve eğitmen ödemesi",
       "audience": "upper-plan",
       "guide": "docs/workflows.md#wf14",
-      "detail": "apps/backend/docs/instructor-earnings-handover.md",
+      "detail": "docs/workflows.md",
       "tests": [
         "apps/backend/tests/instructor-earnings.test.mjs"
       ],
@@ -1068,7 +1069,7 @@
         "apps/backend/database/p03-refund-identity.sql",
         "apps/backend/database/runtime-wrappers-current.sql",
         "apps/backend/database/starter-availability-management.sql",
-        "apps/backend/docs/instructor-earnings-handover.md"
+        "docs/workflows.md"
       ],
       "operations": [
         "instructor_agreement_publish_v1",
@@ -1079,8 +1080,8 @@
         "instructor_agreements_list_v1"
       ],
       "review": {
-        "fingerprint": "ac8b9ca473cfa350c209a32384365479b6ce75fc1249170d6192bf11da637ef2",
-        "reason": "İlk ortak rehber güncel sözleşme ve alan kaynaklarıyla eşlendi; ortak kaynaklar WF00, public/ICS WF09, worker WF20 açık bağımlılığıdır. Test dosyası hosted kabul kanıtı değildir."
+        "fingerprint": "18949f7366503bd826eafaed84b10b9ac6cabdbf75c9ba59e1376f34f4d3e88e",
+        "reason": "Removed development-status pointers from instructor payment metadata; earning/payment rules, permissions and acceptance obligations are unchanged."
       }
     },
     {
@@ -1088,7 +1089,7 @@
       "title": "Etkinlik kayıt, ödeme ve iptal",
       "audience": "upper-plan",
       "guide": "docs/workflows.md#wf15",
-      "detail": "apps/backend/docs/actual-start-handover.md",
+      "detail": "docs/workflows.md",
       "tests": [
         "apps/backend/tests/event-payment.test.mjs",
         "apps/backend/tests/event-cancellation.test.mjs"
@@ -1122,7 +1123,7 @@
         "apps/backend/database/runtime-wrappers.sql",
         "apps/backend/database/starter-attendance-protection-wrappers.sql",
         "apps/backend/database/wrappers.sql",
-        "apps/backend/docs/actual-start-handover.md"
+        "docs/workflows.md"
       ],
       "operations": [
         "event_save_v1",
@@ -1154,7 +1155,7 @@
       "title": "Genel CRM ve otomasyon",
       "audience": "upper-plan",
       "guide": "docs/workflows.md#wf16",
-      "detail": "apps/backend/docs/p04-handover.md",
+      "detail": "docs/workflows.md",
       "tests": [
         "apps/backend/tests/p05-acceptance.mjs"
       ],
@@ -1168,7 +1169,7 @@
         "apps/backend/database/p05-wrappers.sql",
         "apps/backend/database/runtime-wrappers-current.sql",
         "apps/backend/database/session-capacity.sql",
-        "apps/backend/docs/p04-handover.md"
+        "docs/workflows.md"
       ],
       "operations": [
         "leads_list_v1",
@@ -1191,10 +1192,11 @@
       "title": "Kapatma, silme ve platform yönetimi",
       "audience": "restricted",
       "guide": "docs/workflows.md#wf17",
-      "detail": "apps/backend/docs/p07-a-handover.md",
+      "detail": "docs/workflows.md",
       "tests": [
         "apps/backend/tests/p07-lifecycle-acceptance.mjs",
-        "apps/backend/tests/p07-account-revocation-acceptance.mjs"
+        "apps/backend/tests/p07-account-revocation-acceptance.mjs",
+        "apps/backend/tests/restore-guard.test.mjs"
       ],
       "sources": [
         "apps/backend/database/account-session-management.sql",
@@ -1232,7 +1234,10 @@
         "apps/backend/database/starter-attendance-protection-wrappers.sql",
         "apps/backend/database/starter-plan-gates.sql",
         "apps/backend/database/wrappers.sql",
-        "apps/backend/docs/p07-a-handover.md"
+        "docs/workflows.md",
+        "apps/backend/scripts/restore-guard.mjs",
+        "apps/backend/scripts/erasure-register.mjs",
+        "apps/backend/scripts/guarded-restore.mjs"
       ],
       "operations": [
         "account_delete_preview_v1",
@@ -1248,8 +1253,8 @@
         "platform_owner_remove_v1"
       ],
       "review": {
-        "fingerprint": "7eb180bae3ebaa215dc755de56d563ba506705e7c582110070d702900c40e7eb",
-        "reason": "İlk ortak rehber güncel sözleşme ve alan kaynaklarıyla eşlendi; ortak kaynaklar WF00, public/ICS WF09, worker WF20 açık bağımlılığıdır. Test dosyası hosted kabul kanıtı değildir."
+        "fingerprint": "198bc26b8c3e02513831b75993af0cef7225abd8522d257b03f932473c973fc7",
+        "reason": "PR91 document ownership only: account and settings behavior unchanged; frontend acceptance pointers updated without changing runtime or restore guards."
       }
     },
     {
@@ -1257,7 +1262,7 @@
       "title": "Merkezler arası hesaplaşma",
       "audience": "upper-plan",
       "guide": "docs/workflows.md#wf18",
-      "detail": "apps/backend/docs/settlement-handover.md",
+      "detail": "docs/workflows.md",
       "tests": [
         "apps/backend/tests/cross-center-settlement.test.mjs"
       ],
@@ -1265,7 +1270,7 @@
         "apps/backend/database/cross-center-settlement-wrappers.sql",
         "apps/backend/database/cross-center-settlement.sql",
         "apps/backend/database/runtime-wrappers-current.sql",
-        "apps/backend/docs/settlement-handover.md"
+        "docs/workflows.md"
       ],
       "operations": [
         "settlement_movements_list_v1",
@@ -1288,7 +1293,7 @@
       "title": "Bekleme listesi ve yer teklifi",
       "audience": "upper-plan",
       "guide": "docs/workflows.md#wf19",
-      "detail": "apps/backend/docs/p01-handover.md",
+      "detail": "docs/workflows.md",
       "tests": [
         "apps/backend/tests/p01-waitlist-workers.test.mjs"
       ],
@@ -1296,7 +1301,7 @@
         "apps/backend/database/p01-waitlist-workers-wrappers.sql",
         "apps/backend/database/p01-waitlist-workers.sql",
         "apps/backend/database/runtime-wrappers-current.sql",
-        "apps/backend/docs/p01-handover.md"
+        "docs/workflows.md"
       ],
       "operations": [
         "waitlist_join_v1",
@@ -1314,7 +1319,7 @@
       "title": "Worker ve işletim",
       "audience": "backend-only",
       "guide": "docs/workflows.md#wf20",
-      "detail": "apps/backend/docs/ops-w01-handover.md",
+      "detail": "docs/workflows.md",
       "tests": [
         "apps/backend/tests/ops-hosted-acceptance.mjs",
         "apps/backend/tests/p01-waitlist-workers.test.mjs"
@@ -1340,7 +1345,7 @@
         "apps/backend/database/p07-subscription-lifecycle-wrappers.sql",
         "apps/backend/database/p07-subscription-workers.sql",
         "apps/backend/database/runtime-wrappers-current.sql",
-        "apps/backend/docs/ops-w01-handover.md",
+        "docs/workflows.md",
         "apps/backend/scripts/ops-cron-health.sql",
         "apps/backend/scripts/ops-cron-install.sql",
         "apps/backend/scripts/p01-worker.mjs",

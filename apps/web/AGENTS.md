@@ -1,12 +1,21 @@
-# Frontend kuralları
+# Frontend ajanı
 
-Kapsam yalnız FtkSaaS'tır. Önce kök AGENTS ve docs/client-integration.md okunur.
-Ekran tasarımı ayrı çalışmadır; mevcut taslak kabul edilmez, CRM menüsü veya dashboard varsayılmaz.
-Önce shadcn/ui ve ondan türetilmiş hazır bloklar kullanılır; özel bileşen ancak mevcut seçenekler yetmediğinde yazılır. Kaynak ve lisans izi korunur.
-Frontend/test değişiklikleri apps/backend veya mevcut backend CI/kabul kaynaklarını değiştirme yetkisi vermez. Bu sınırdaki ihtiyaç docs/remaining-work.md içinde bildirilir.
-Vitest/Testing Library/MSW bileşen testleri ve Playwright/axe tarayıcı testleri ilk günden tutulur. Mock kabulü gerçek Auth/Edge/DB kabulü değildir. Teste özel Auth bypass'ı uygulamaya eklenmez.
-API tipleri @ftksaas/api-contracts, transport aynı paketin /client export'undan gelir. Ayrıcalıklı anahtar, token veya gerçek veri fixture/log'a yazılmaz. Hiçbir hata sahte başarıya dönüşmez.
-pnpm check:frontend ve pnpm test:frontend:e2e frontend doğrulamasıdır. Backend komutları burada otomatik çağrılmaz.
+Önce kök [AGENTS](../../AGENTS.md), [istemci protokolü](../../docs/client-integration.md), kendi [todo](docs/todo.md) ve [sohbet devrin](docs/handover.md) okunur.
+
+## Yetki ve sınır
+
+- Uygulama `apps/web`, ortak UI `packages/ui`; plan, ilerleme, test/kabul ve sohbet devri `apps/web/docs` sahibindedir.
+- Backend kodu/belgeleri, ortak sözleşmeler ve backend CI/kabul kapıları salt okunur. Frontend ilerlemesi için kök `/docs` güncellenmez.
+- Tek koordinasyon istisnası [ortak talep kaydında](../../docs/requests.md) kendi talep/değerlendirme/onay alanındır. Karşı taraf adına onay verme; kendi todo/devir dosyanda yalnız talep kimliğine bağlan.
+- Kapsam dışı veya belirsiz yetkide, dosya/bölüm ve gerekçeyi açıklayıp kullanıcı onayı iste; onaydan önce değiştirme. Aynı görev için verilmiş açık yetkiyi tekrar sorma. Ayrıntının sahibi kök [yazma sınırıdır](../../AGENTS.md#belge-yazma-sınırı).
+
+## Uygulama ve kabul
+
+Todo’daki aktif bölüm bitmeden sonraki bölüme geçilmez. Ekran/API seçmeden önce ilgili [WF](../../docs/workflows.md) ve [API eşlemesi](../../docs/functions.md) okunur. PR; WF kimliği, gerçek okuma→preview→komut sırası, rol/plan/tenant sınırı, hata/kurtarma, başarı sonrası yeniden okuma ve açık gerçek kabulü belirtir. İş kuralı endpoint adı veya mock’tan çıkarılmaz; eksik selector için sahte endpoint/doğrudan tablo erişimi kullanılmaz.
+
+Tasarım ayrı kapsamdır; mevcut taslak, CRM menüsü veya dashboard kendiliğinden kabul edilmiş sayılmaz. Önce shadcn/ui ve hazır blokları kullan; özel bileşen gerekçeli olur, kaynak/lisans izi korunur. [Geliştirme rehberi](docs/development.md).
+
+Tipler `@ftksaas/api-contracts`, transport aynı paketin `/client` export’udur. Ayrıcalıklı anahtar/token/gerçek veri fixture veya log’a yazılmaz; sahte başarı fallback’i ve test Auth bypass’ı eklenmez. Vitest/Testing Library/MSW ile Playwright/axe korunur. Mock başarı gerçek Auth/Edge/DB/hosted kabulü değildir. `pnpm check:frontend` ve `pnpm test:frontend:e2e` frontend doğrulamasıdır; backend komutları otomatik çağrılmaz.
 
 <!-- BEGIN:nextjs-agent-rules -->
 
@@ -17,9 +26,3 @@ This version has breaking changes — APIs, conventions, and file structure may 
 This block is written and re-added by `next dev` — verify at `node_modules/next/dist/server/lib/generate-agent-files.js`. Removing it from a diff only re-creates the uncommitted change; committing it with your work keeps the tree clean.
 
 <!-- END:nextjs-agent-rules -->
-
-## İş akışı önkoşulu
-
-Ekran/API seçmeden önce proje [iş akışlarını](../../docs/workflows.md), [API–akış haritasını](../../docs/functions.md) ve ilgili alan devrini oku. PR'de WF kimliği, okuma→preview→komut sırası, rol/plan/tenant sınırı, hata ve sonucu bilinmeyen işlem kurtarması, başarı sonrası yeniden okuma ve gerçek kabul eksikleri belirtilir. Yeni ekran iş kuralını endpoint isminden veya mock fixture'dan çıkaramaz. Eksik katalog/selector/backend davranışı bağımlılık olarak kaydedilir; doğrudan tabloya veya uydurulmuş endpoint'e geçilmez.
-
-Geliştirme/tasarım/kabul notları `apps/web/docs`, teknik kullanım [development.md](docs/development.md) içindedir. Proje iş akışı ve normatif kararlar kök `/docs` sahibindedir. Runtime consumer/hosted kanıtı tamamlanmadan yalnız tasarım veya MSW başarısıyla iş akışı kapatılmaz.

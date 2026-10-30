@@ -4,7 +4,7 @@
   "description": "Supabase backend, domain SQL, Edge functions and isolated acceptance",
   "scripts": {
     "generate": "python3 scripts/generate-settings-catalog.py && python3 scripts/generate-runtime.py && node scripts/generate-validators.mjs && node scripts/build-edge.mjs && node scripts/generate.mjs && python3 scripts/render_catalogs.py && node scripts/update-docs.mjs --write",
-    "verify": "node scripts/update-docs.mjs --check && python3 scripts/generate-settings-catalog.py --check && python3 scripts/check-migrations.py && python3 scripts/generate-runtime.py --check && node scripts/generate-validators.mjs --check && node scripts/build-edge.mjs --check && node scripts/generate.mjs --check && python3 scripts/render_catalogs.py --check && node scripts/audit.mjs && node scripts/governance.mjs && tsc --noEmit && node --test tests/contract.test.mjs tests/governance.test.mjs && node --test tests/ci-policy.test.mjs",
+    "verify": "node scripts/update-docs.mjs --check && python3 scripts/generate-settings-catalog.py --check && python3 scripts/check-migrations.py && python3 scripts/generate-runtime.py --check && node scripts/generate-validators.mjs --check && node scripts/build-edge.mjs --check && node scripts/generate.mjs --check && python3 scripts/render_catalogs.py --check && node scripts/audit.mjs && node scripts/governance.mjs && tsc --noEmit && node --test tests/contract.test.mjs tests/governance.test.mjs tests/restore-guard.test.mjs && node --test tests/ci-policy.test.mjs",
     "test:db": "node --test tests/database.test.mjs tests/event-scope.test.mjs",
     "test": "pnpm run verify && pnpm run test:db && pnpm run test:api",
     "dev:start": "node scripts/start-dev.mjs",

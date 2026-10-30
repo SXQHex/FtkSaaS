@@ -1,10 +1,8 @@
-# FtkSaaS — fiziksel şema · 0.2.0-rc.3
+# Domain şema referansı
 
-90 domain tablosu; 83 sıralı migration. Güncel kaynak/kabul ve kapsam: `apps/backend/docs/00-FtkSaaS-yeni-sohbet-devir.md`, `docs/client-integration.md`. `docs/history/reports/qe02-verification.json` yalnız tarihsel Q-E02 snapshot’ının kanıtıdır. Aşağıdaki alan listesi makine sözleşmesi 08’den üretilir. Kesin PostgreSQL DDL kaynağı `apps/backend/supabase/migrations`; uygulanan migration değiştirilmez.
+Üretilmiştir: `packages/api-contracts/schema/contract.json` → `render_catalogs.py`. Elle düzenleme. Bu görünüm domain alanlarını anlatır; bütün fiziksel/private tabloların nihai DDL dökümü değildir. Kesin DDL [migration zinciri](../database.md), transaction tasarımı [fiziksel değişmezler](../physical-invariants.md), normatif davranış [teknik sözleşme](02-FtkSaaS-teknik-sozlesme.md) sahibindedir.
 
-UUID/FK alanları `uuid`, parasal stringler DB’de `bigint`, Instant `timestamptz`, tarih `date`, kapalı nesneler `jsonb`. Yeni domain kimlikleri Edge içinde doğrulanmış `uuid@14.0.3` v7 üreticisinden gelir. PostgreSQL 17 DB default üreticisi zorunlu değildir; üretici bulunmadığında default kapalıdır ve v4 fallback yoktur. Auth sağlayıcı UUID’leri korunur.
-
-İstemci core/private erişimine kapalıdır. api_v1 RPC’leri yalnız backend service rolüne açıktır; doğrulanmış JWT, canlı Auth oturumu, hesap/bağlantı/rol ve tenant kontrolü gateway + transaction içinde yapılır.
+Makine sözleşmesinde 90 domain tablo tanımı. PostgreSQL tür/constraint/owner/ACL karşılığı migration ve kaynak bağlı CD metadata artifact’ından okunur; bu katalog hosted kabulü değildir.
 
 | Tablo | Scope | Alanlar | Kural |
 |---|---|---|---|
@@ -98,79 +96,3 @@ UUID/FK alanları `uuid`, parasal stringler DB’de `bigint`, Instant `timestamp
 | `person_disciplines` | C | id: FtkUuid; created_at: Instant; version: PositiveInt; org_id: FtkUuid; center_id: FtkUuid; person_id: FtkUuid; discipline_id: FtkUuid; kind: DisciplineRelationshipKind; state: RelationshipState | UQ active(org,center,discipline,person,kind); one org person may have many relationships; no login grant; student activation/deactivation uses existing org distinct-person/open-operation rules. |
 | `event_disciplines` | C | id: FtkUuid; created_at: Instant; version: PositiveInt; org_id: FtkUuid; center_id: FtkUuid; event_id: FtkUuid; discipline_id: FtkUuid | Q-D01: zero/one/many labels; UQ(org,event,discipline); same org, no access grant. Exactly one label allows matching narrow scope with explicit event eligibility; zero/many only broad scopes. No event negative credit. |
 | `event_payment_preparations` | C | id: FtkUuid; created_at: Instant; version: PositiveInt; org_id: FtkUuid; center_id: FtkUuid; person_id: FtkUuid; event_id: FtkUuid; debt_id: FtkUuid; registration_id: FtkUuid ∣ null; state: EventPaymentPreparationState; terms_snapshot: EventTerms; terms_hash: Text | Q-E01: no capacity held; one open preparation per event/person; unique scoped debt and registration; immutable financial snapshot; terminal closure cannot finance another registration. |
-
-## DS-2026-10-17 hedef depolama bağımlılıkları
-
-Bu bölüm ilk DS aktarımının hedef/kanıt ayrımını kaydeder; 90 core tablo/29 migration o hesaplaşma tesliminin tarihsel snapshotıdır. Güncel migration sayısı belge başında kaynak dosyalarından hesaplanır. Açık fiili başlangıç, immutable anlaşma/hakediş, Starter koruma ve hesaplaşma defteri uygulanmıştır; sonraki P02 hak değişikliği ve P05 belge tüketicileri de tamamlanmıştır. İlk metadata notları güncel açık iş listesi değildir. Kesin DDL supabase/migrations, callable durum docs/endpoint-inventory.json; son kaynak/CI ve ayrı PR adayları ../../apps/backend/docs/00-FtkSaaS-yeni-sohbet-devir.md içindedir. Kabul edilmiş yeni kapasite ve ayar kararları güncel teknik sözleşmededir; bu mevcut-main şema kataloğu henüz merge edilmemiş PR DTOlarını uygulanmış saymaz.
-
-Teknik private tablolar: `platform_operators`, `preview_payloads`, `invitation_deliveries`, `runtime_operations`, `person_origins`, `reservation_protections`, `lesson_deficit_movements`. Bunlar müşteriye yeni ürün varlığı veya rol vermez.
-
-Kayıt koşulları `event_registrations.terms_snapshot` ile sabitlenir. Etkinlik etiketi/zamanı değişiminde mevcut hak bağlantıları aynı transaction içinde tekrar doğrulanır; otomatik iptal yoktur. Hareket defterleri ve audit satırları append-only trigger ile korunur.
-
-## Kabul edilmiş ekler
-
-**D01.** Disiplin organizasyon düzeyinde tanımlanır; merkezler sundukları disiplinleri kullanıma açar. Aynı organizasyonun merkezleri aynı disiplin kimliğini kullanır.
-
-**D02.** Eğitmen birden fazla merkez/disiplinde görev alabilir. Öğrenci birden fazla merkez/disipline kayıt olabilir; organizasyon kişi kaydı çoğaltılmaz. Öğrenci eğitmenin alt kaydı değildir; eğitmen değişimi öğrencinin kimliğini veya haklarını değiştirmez.
-
-**D03.** Normal ders/seansın merkezi ve disiplini belirgindir. Merkezlerin program, fiyat ve eğitmen anlaşmaları ayrı kalır. Disiplin ilişkisi yeni uygulama rolü veya operasyon yetkisi vermez.
-
-**D04.** Paket kullanım kapsamları: merkez+disiplin; merkezin bütün disiplinleri; organizasyonun bütün merkezlerinde belirli disiplin; organizasyonun bütün merkez ve disiplinleri. Organizasyon sınırı aşılamaz; mevcut SaaS plan/merkez erişim sınırları korunur.
-
-**D05.** Ders/etkinlik uygunluğu kullanım kapsamından ayrı belirtilir. Organizasyon genelinde etkinlik paketi bütün normal derslerde kendiliğinden geçmez. Geniş kapsam kapalı sınıf, kapasite, tarih ve diğer uygunluk kurallarını aşmaz.
-
-**D06.** Dar kapsamlı disiplin hakları başka disiplinde kullanılamaz; başka disipline ait paket, kapsam dışındaki kredi açığını kapatamaz. Birden fazla disiplinde geçerli 10 kredilik paket toplam 10 kredi sağlar; disiplin başına ayrı 10 kredi oluşmaz.
-
-**D07.** Negatif kredi sınırı öğrenci için merkez–disiplin bazında uygulanır. Aynı kapsamdaki ayrılmış ve tüketilmiş açık birlikte sayılır; mevcut rezervasyon iki kez sayılmaz. Bir disiplindeki kredi açığı diğer disiplinin katılımını engellemez. Organizasyon geneli kişi açığı üzerinden tek katılım sınırı uygulayan eski hükümler bu kararla değiştirilmiştir.
-
-**D08.** Geniş kapsamlı paket, uygun olduğu merkez/disiplinlerdeki açıkları mevcut kapatma sırasıyla karşılayabilir: önce geçmiş tüketilmiş açık, sonra gelecek rezervasyon açığı. Uygun hak seçiminde en erken bitiş, eşitlikte önce satın alma ve mevcut kararlı eşitlik çözümü korunur. Paket kapsamı uygunluk filtresidir.
-
-**D09.** Seans başlangıcındaki limit kontrolü ve sonradan ödemenin geçmiş katılım/hakedişi değiştirmemesi korunur; kontrol artık ilgili merkez–disiplin kapsamındadır. Para borcu ile kredi açığı ayrı kavramlardır.
-
-**U01.** FtkSaaS tarafından üretilen bütün UUID değerleri için UUIDv7 zorunlu standarttır. Domain kayıtları, işlem/idempotency anahtarları, request/trace kimlikleri ve geçici teknik UUID değerleri bu kapsamdadır. UUIDv1/v4/v5 üretimi için önceki öneriler yürürlükte değildir; istisna yeni açık karar gerektirir.
-
-**U02.** Domain kayıt kimlikleri varsayılan olarak backend tarafından üretilir. UUID üretmesi gereken istemci, test verisi, seed, worker, Edge veya diğer FtkSaaS bileşeni de UUIDv7 kullanır. Bu karar istemciye yeni kayıt oluşturma veya operasyon yetkisi vermez.
-
-**U03.** Supabase Auth ve diğer dış sağlayıcıların ürettiği kimlikler aynen korunur; yeniden UUIDv7 yapılmaz. Üretim standardı ile dış kimlik kabulü ayrıdır. Mevcut UUID değerleri sırf sürümü farklı diye yeniden yazılmaz; FK ve dış referanslar bozulmaz.
-
-**U04.** Aynı kişinin farklı organizasyonlardaki kişi kayıtları bağımsız UUIDv7 alır. E-posta/telefon/isimden deterministik kimlik türetilmez; disiplin kayıtları için de aynı üretim standardı geçerlidir.
-
-**U05.** UUIDv7 RFC 9562 uyumlu, güvenli rastgelelik kullanan doğrulanmış üreticiyle üretilir; timestamp eklenmiş özel UUID algoritması yazılmaz. Seçilen Supabase/PostgreSQL ortamındaki yerleşik üretim desteği teknik kurulumda doğrulanır; yoksa denetlenmiş uyumlu üretici seçilir, v4 fallback yapılmaz. Üretici yoksa ilgili üretim açılmaz.
-
-**U06.** UUIDv7 yaklaşık üretim zamanını açığa çıkarabilir. created_at, seans zamanı ve audit zamanı ayrı alanlardır; UUID kesin küresel işlem sırası, iş tarihi veya yetki kanıtı sayılmaz. Sıralama ve eşzamanlılık kuralları açık iş alanlarına dayanır.
-
-**U07.** Davet, hesap erişimi ve benzeri bearer token değerleri UUID kimliği değildir; güvenli rastgele token standardı korunur. Tokenlar UUIDv7 ile değiştirilmez. operation_key UUIDv7 olsa da retry aynı anahtarı yeniden kullanır; her denemede yeni UUID üretmek idempotency kuralını bozar.
-
-**U08.** PostgreSQL alan tipi uuid olarak kalır. UUIDv7 üretim standardı bütün dış UUID girişlerini v7 diye reddetmek anlamına gelmez. FtkSaaS üretimi olan alanlarla sağlayıcı kimliği alanlarının şema/DTO eşlemesi teknik sohbette tamamlanır; yetki ve tenant kontrolü UUID sürümünden bağımsız uygulanır.
-
-**E01.** Payment preparation holds no seat; collection explicitly links its scoped debt; full allocated payment and capacity rechecked atomically.
-
-**E02.** Paid capacity failure closes preparation, reverses obligation and creates only the unclaimed student credit; successful capacity_closed outcome commits all journals and receipt.
-
-**E03.** Prestart complete operator cancellation removes remaining debt and credits paid amounts once; package rights released without monetary credit. Started/partial monetary cancellation requires a separate decision.
-
-**E02-01.** Katılımcının başlama sonrası kendi kaydını iptali/ayrılması parasal iade, borç indirimi veya öğrenci alacağı üretmez. Mevcut paket iptal koşulları aynen korunur.
-
-**E02-02.** Merkez iptali her aşamada etkinliğe bağlı ücret yükümlülüğünü tamamen kaldırır; kalan borç sıfır, tahsilatın daha önce alacaklaştırılmamış tamamı öğrenci alacağıdır. Nakit iade/mahsup ayrı açık yetkili işlem; otomatik nakit çıkışı yok.
-
-**E02-03.** Merkez iptali tüm ayrılmış hakları serbest bırakır, tüketilmiş hakları previous_id bağlı ters hareketle tamamen geri verir; kısmi tüketim ve paket hakkı için parasal alacak yok.
-
-**E02-04.** Önceki alacak/iade/mahsup/hak dönüşü tekrar üretilmez. Yalnız iptal edilen etkinliğe bağlı kayıtlar; başka borç/geçmiş değişmez. Önizleme+apply sürüm/finans bağımlılıkları, canlı yetki ve tek transaction audit/outbox/receipt ile korunur.
-
-**E02-05.** Fiilî başlangıç/kısmi gerçekleşme ayrı alan veya durum olarak tanımlı değildir; saat geçmesi tek başına gerçekleşme değildir. Bu tanım karar konusu olarak açık. Merkez iptalinin aşamadan bağımsız sonucu bu tanıma ihtiyaç duymaz; mevcut occurred/attendance evidence korunur.
-
-**E03-01.** Katılımcı iptalinin parasal sınırı planlanan başlangıçtır. Başlangıç anı dahil sonrasında iade, borç indirimi veya öğrenci alacağı oluşmaz. Öncesindeki iptaller mevcut kabul edilmiş koşullara tabidir.
-
-**E03-02.** Fiilî başlangıcın gecikmesi, sonradan kaydı veya düzeltmesi tamamlanmış katılımcı iptalini yeniden sınıflandırmaz; finansal yeniden hesaplama yapılmaz. Plan 21.00, iptal 21.15, fiilî başlangıç 21.30 başlangıç sonrası iptaldir.
-
-**E03-03.** Planlanan saatin gelmesi tek başına yoklama, hak tüketimi, gerçekleşme veya hakediş oluşturmaz. Katılımcı paket iptal koşulları korunur.
-
-**E03-04.** Merkez iptalinde Q-E02 aynen geçerlidir; ertesi gün kaydı veya aşama tam borç kaldırma ve bağlı para/hak dönüşlerini değiştirmez.
-
-**E03-05.** Başarılı katılımcı iptalinde backend karar zamanı, o andaki planlanan başlangıç ve parasal sınıflandırma participant_cancellation kaydında atomik sabitlenir. Önceki kayıtlara zaman kanıtı uydurulmaz; eski ve merkez iptallerinde alan null kalabilir. İstemci zaman veya sınıflandırma gönderemez.
-
-**AS-01.** Merkez yöneticisi fiilî başlangıcı expected_version ile kaydeder/düzeltir; aktör ve kayıt zamanı backend, gerçek zaman Instant olarak açık girilir. Gelecek fiilî başlangıç reddedilir. İlk kayıt bir kez; düzeltme gerekçeli audit diff ile geçmişi korur, yanlış bilginin kaldırılması null düzeltmesiyle mümkündür.
-
-**AS-02.** Bu kayıt yalnız operasyonel kanıttır; draft kabul edilmez, published/occurred/cancelled durumları değişmeden korunur. Katılımcı iptalinin Q-E03 parasal sınıflandırması, Q-E02 merkez hesaplaşması, yoklama, hak ve hakediş kendiliğinden değişmez.
-
-**AS-03.** İptalden sonra geriye dönük kayıt/düzeltme mümkündür; iptal yeniden açılmaz. Etkinlik sürümü artar; eski önizleme geçersizleşir. event_get mevcut actual_started_at değerini; yönetici/organizasyon okuyucusuna append-only actual_start_history geçmişini döndürür.

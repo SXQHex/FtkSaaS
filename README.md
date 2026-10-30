@@ -5,7 +5,7 @@ Supabase backend ve ortak API sözleşmelerini içeren pnpm/Turborepo monoreposu
 - [Kaynak indeksi](docs/source-index.md): hangi sorunun hangi dosyada cevaplandığı.
 - [Güncel kabul](apps/backend/docs/00-FtkSaaS-yeni-sohbet-devir.md): doğrulanmış backend kaynağı ve hosted sürümü.
 - [Monorepo ve ortamlar](docs/monorepo.md): geliştirme, gerçek API bağlantısı ve dağıtım sınırları.
-- [Açık işler](docs/remaining-work.md), [aktif sıra](docs/production-queue.md), [ajan kuralları](AGENTS.md).
+- [Backend işleri](apps/backend/docs/remaining-work.md), [backend sırası](apps/backend/docs/production-queue.md), [frontend bölüm planı](apps/web/docs/todo.md), [ajan kuralları](AGENTS.md).
 
 Web geliştirme ve yalnız frontend doğrulama komutları için [frontend rehberine](apps/web/docs/development.md) bak. Hızlı başlangıç: `pnpm dev:web`; kontrol: `pnpm check:frontend`.
 
@@ -27,6 +27,8 @@ Ekran tasarımı, API entegrasyonu ve gerçek hosted kabul ayrı durumlar olarak
 ## İş akışı ve ajanların çalışma sırası
 
 Projenin iş akışının sahibi backend sözleşmesidir. Backend ve frontend ajanı önce [AGENTS](AGENTS.md), [kaynak indeksi](docs/source-index.md) ve [proje iş akışlarını](docs/workflows.md) okur. [API–akış haritası](docs/functions.md) hangi operasyonun hangi amaca ait olduğunu gösterir; API adlarından ürün davranışı çıkarılmaz.
+
+**Yetki sınırı:** Her ajan yalnız kendi alanındaki ilgili kod ve belgeleri günceller. İlerleme ve sohbet devri `apps/backend/docs` veya `apps/web/docs` içinde; ortak sözleşmeler `/docs`, alanlar arası talepler [requests.md](docs/requests.md) içindedir. Kapsam dışı veya belirsiz değişiklikte dosya/bölüm ve gerekçeyle kullanıcı onayı istenir; mevcut açık yetki tekrar sorulmaz. Tek kural kaynağı [AGENTS](AGENTS.md#belge-yazma-sınırı).
 
 - Backend ajanı değişen davranışın WF kimliğini, okuma/preview/komut sırasını, yetki/planını, yan etkilerini, hata/kurtarma ve başarı sonrası okuma davranışını aynı PR'de günceller. Sözleşme, üretilmiş referans ve test eşlemesi birlikte teslim edilir.
 - Frontend ajanı ekranı ilgili WF ve alan devrine göre uygular. PR'de WF kimliği, kullanılan API'ler ve desteklenmeyen bağımlılıklar belirtilir. Bütün API'leri kullanmak hedef değildir; Starter'ın bütün gerekli kullanıcı amaçlarının kapsanması hedeflenir. Mock ve gerçek hosted kabul ayrı kaydedilir.

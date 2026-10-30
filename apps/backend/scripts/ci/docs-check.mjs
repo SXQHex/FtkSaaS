@@ -43,6 +43,8 @@ export function checkDocuments(files){
    const link=m[1];if(/^(?:[a-z][a-z0-9+.-]*:|\/)/i.test(link))continue;
    const [location,fragment]=link.split('#');const target=decodeURIComponent(location.split('?')[0]);
    const absolute=path.resolve(path.dirname(f),target||path.basename(f));
+   const relative=path.relative(repositoryRoot,absolute).replaceAll(path.sep,'/');
+   if(relative.startsWith('docs/history/')&&f!=='docs/source-index.md')throw Error('HISTORICAL_DOCUMENT_AS_CURRENT '+f+' -> '+target);
    if(!fs.existsSync(absolute))throw Error('BROKEN_LOCAL_LINK '+f+' -> '+target);
    if(fragment&&absolute.endsWith('.md')){
     if(!targets.has(absolute))targets.set(absolute,markdownAnchors(fs.readFileSync(absolute,'utf8')));
@@ -57,7 +59,7 @@ if(import.meta.url===pathToFileURL(process.argv[1]??'').href){
  process.chdir(execFileSync('git',['rev-parse','--show-toplevel'],{encoding:'utf8'}).trim());
  const args=process.argv.slice(2),changed=args.length?args:JSON.parse(fs.readFileSync(ciFile('selection.json'))).docs;
  // Inbound links, including fragments, survive deletion/move checks. Reports are source snapshots.
- const living=execFileSync('git',['ls-files','-z'],{encoding:'utf8'}).split('\0').filter(p=>p.endsWith('.md')&&!p.startsWith('docs/history/'));
+ const living=execFileSync('git',['ls-files','-z','--cached','--others','--exclude-standard'],{encoding:'utf8'}).split('\0').filter(p=>p.endsWith('.md')&&!p.startsWith('docs/history/')&&fs.existsSync(p));
  const files=[...new Set([...changed,...living])];
  for(const retired of Object.keys(JSON.parse(fs.readFileSync(new URL('./document-moves.json',import.meta.url)))))if(fs.existsSync(repoFile(retired)))throw Error('RETIRED_DOCUMENT_PATH '+retired);
  updateDocs({check:true});

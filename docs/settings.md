@@ -1,35 +1,33 @@
-> Alan devri: teknik tüketim ve kaynağına bağlı eski kabul kayıtları. Güncel kaynak/CI/hosted durum [00 devirde](00-FtkSaaS-yeni-sohbet-devir.md), açık iş [tek backlog’da](../../../docs/remaining-work.md) tutulur. Eski aday/pending ifadeleri yeni görev veya güncel durum değildir.
-
 # Ayar ve hesap API tüketicileri
 
-Güncel kabul/hosted durum [00 devirde](00-FtkSaaS-yeni-sohbet-devir.md), açık alanlar [tek backlog’da](../../../docs/remaining-work.md#ertelenmiş-ve-kapsam-dışı) tutulur.69 davranış grubunun normatif sahibi [02 sözleşmedir](../../../docs/contracts/02-FtkSaaS-teknik-sozlesme.md#ayarlar-sozlesmesi-ve-davranis-sprinti); bu belge gerçek typed alan ve tüketici eşlemesidir. Starter FD07 başlangıcı [teknik sözleşmeden](../../../docs/contracts/02-FtkSaaS-teknik-sozlesme.md#starter-başlangıç-ayarları-ve-selfpublic) okunur.
+Güncel kabul/hosted durum [00 devirde](../apps/backend/docs/00-FtkSaaS-yeni-sohbet-devir.md), ortak/backend açık alanlar [proje backlog’unda](../apps/backend/docs/remaining-work.md#ertelenmiş-ve-kapsam-dışı), frontend FD tüketimi [WEB-S12’de](../apps/web/docs/todo.md#web-s12) tutulur. 69 davranış grubunun normatif sahibi [02 sözleşmedir](contracts/02-FtkSaaS-teknik-sozlesme.md#ayarlar-sozlesmesi-ve-davranis-sprinti); bu belge gerçek typed alan ve tüketici eşlemesidir. Starter FD07 başlangıcı [teknik sözleşmeden](contracts/02-FtkSaaS-teknik-sozlesme.md#starter-başlangıç-ayarları-ve-selfpublic) okunur.
 
 ## İşlemler
 
 ### ST-03 — Starter tüketici kapsamı
 
-Kullanıcı Starter'da izinli FD01–FD12 alanlarının tamamını seçti; marka/medya, kişisel takvim ve paylaşım bu kapsamdan çıkarılmaz. Pro/Business'a kapalı F12/F17/F20–F24/F27/F29 yolları bu teslimle açılmaz. Backend davranışı, hazır istemci tüketimi ve gerçek sağlayıcı/ekran kabulü ayrı kanıtlardır. Aşağıdaki eşleme desteklenmeyen alanları kaydedilmiş gibi göstermez; açık kabulün sahibi [tek backlog](../../../docs/remaining-work.md) ve [00 devir](00-FtkSaaS-yeni-sohbet-devir.md) olarak kalır.
+Kullanıcı Starter'da izinli FD01–FD12 alanlarının tamamını seçti; marka/medya, kişisel takvim ve paylaşım bu kapsamdan çıkarılmaz. Pro/Business'a kapalı F12/F17/F20–F24/F27/F29 yolları bu teslimle açılmaz. Backend davranışı, hazır istemci tüketimi ve gerçek sağlayıcı/ekran kabulü ayrı kanıtlardır. Aşağıdaki eşleme desteklenmeyen alanları kaydedilmiş gibi göstermez; backend açık kabulü [ortak backlog](../apps/backend/docs/remaining-work.md) ve [00 devir](../apps/backend/docs/00-FtkSaaS-yeni-sohbet-devir.md), frontend alan kabulü [WEB-S12](../apps/web/docs/todo.md#web-s12) sahibindedir.
 
 | FD | Starter tüketicisi ve mevcut sınır |
 |---|---|
 | FD01 | Dil/format/timezone/tema/ölçek alanları typed; gerçek görüntüleme ve cihaz çözümü istemci kabulüdür, iş timezone'u değişmez. |
 | FD02 | Organizasyon üç isteğe bağlı #RRGGBB rengi kullanır; null sistem defaultudur. Hazır renk/font kataloğu gereksinimi kaldırıldı; aşağıdaki logo hattı korunur. |
-| FD03 | Native Auth, Google/TOTP/session/kimlik zinciri kabul edildi; aşağıdaki fotoğraf/medya tüketicisi ve izinli paylaşımı adaydır. |
+| FD03 | Native Auth, Google/TOTP/session/kimlik zinciri kabul edildi; fotoğraf/medya tüketicisi ve izinli paylaşımı aşağıda eşlenir. |
 | FD04 | in_app amaç tercihleri ve zorunlu teslim mevcut; aşağıdaki typed kullanılabilirlik kataloğu ve desteklenmeyen kanal koruması uygulanır. Starter'a F27 hatırlatma veya dış kanal açılmaz. |
 | FD05 | Kesin gelecek/devam eden ortak ders kitlesinde canlı profil/iletişim/fotoğraf ve kişisel takvim aşağıda eşlenir. İlgi filtresi ve opt-in geçmiş sırası mevcut yetkili takvim okumasında aşağıda eşlenir. |
 | FD06 | İş timezone/availability/pencereler mevcut domain API'lerinde. Program süresi ve availability hazırlıkları aşağıdaki kopya/önizleme tüketicilerine bağlıdır; gece aşan kesintisiz availability aşağıdaki açık günlük aralık birleşimiyle denetlenir. Saat adımı ve liste/görünüm cihaz/istemci tarafında tüketilir. |
 | FD07 | Yeni Starter'ın üç politikası ve plan kapıları kabul edildi; paket hazırlık şablonları ve manuel ödeme yöntemi/reference aşağıda gerçek domain komutlarına bağlanır. |
 | FD08 | Belge/yayın/etki/onay mevcut domain zincirinde; medya ve açık public alan seçimi aşağıda eşlenir. |
 | FD09 | Genel CRM Starter'a kapalı; dar ders başvurusu korunur. P08 telefon/ortak form kapsamı buraya taşınmaz. |
-| FD10 | Rapor/import motoru ST-02 ile kabul edildi. Bu adayda ImportMapping.delimiter virgül/noktalı virgül seçimini gerçek parser'a bağlar; private/ortak şablon çözümü aşağıda mevcut rapor/import isteklerini hazırlar. Otomasyon Starter'a açılmaz. |
+| FD10 | Rapor/import motoru ST-02 ile kabul edildi. ImportMapping.delimiter virgül/noktalı virgül seçimini gerçek parser'a bağlar; private/ortak şablon çözümü aşağıda mevcut rapor/import isteklerini hazırlar. Otomasyon Starter'a açılmaz. |
 | FD11 | Scope/sürüm/replay/reset/history mevcut. Yeni alanlarda kaynak/miras ve gerçek tüketici ayrı test edilir; genel yeni ikinci onay yoktur. |
 | FD12 | Mevcut hesap/org lifecycle ve abonelik komutları korunur; desteklenmeyen sağlayıcı/gerçek imha tamamlandı gösterilmez. |
 
-### Program süresi hazırlık tüketicisi — aday
+### Program süresi hazırlık tüketicisi
 
 `program_duration_minutes` organization/center kapalı integer alanıdır; minimum1, üst sınır mevcut Postgres integer temsilidir (2147483647), sistem önerisi FD06 gereği60. Org Owner/OM kapsamı ve merkezde canlı CM şartı mevcut settings kapılarından gelir. Yeni merkez, orgun o anki değeri ve sürümünü bir kez kopyalar; mevcut merkez ve programlar backfill edilmez. Sonraki org değişimi eski merkeze canlı miras değildir. Merkez `SettingsView.program_duration_source` system_default/organization_copy/center_local bilgisini, kopyada organization_version değerini döndürür. Kaynak bilgisi yazılabilir ayar değildir.
 
-Yeni program preview isteğinde duration_minutes gönderilmişse açık değer üstündür; gönderilmemişse o merkezin hazırlık değeri kullanılır ve açık preview/program spec snapshot'ına alınır. Ayarı değiştirmek mevcut programı veya onay bekleyen preview'nun yakaladığı süreyi değiştirmez. Seçili reset sistem60'a döner; güncel org şablonuna dönme olarak sunulmaz. Diğer değerler, kişisel izinler ve geçmiş snapshot'lar korunur. Bu alan katalogv3 ile başladı; istemci güncel katalog sürümünü okur. Bu tüketici ikinci politika motoru kurmaz; kaynak/native/CI kabulü tamamlanmadan aday kapanmış değildir.
+Yeni program preview isteğinde duration_minutes gönderilmişse açık değer üstündür; gönderilmemişse o merkezin hazırlık değeri kullanılır ve açık preview/program spec snapshot'ına alınır. Ayarı değiştirmek mevcut programı veya onay bekleyen preview'nun yakaladığı süreyi değiştirmez. Seçili reset sistem60'a döner; güncel org şablonuna dönme olarak sunulmaz. Diğer değerler, kişisel izinler ve geçmiş snapshot'lar korunur. Bu alan katalogv3 ile başladı; istemci güncel katalog sürümünü okur. Bu tüketici ikinci politika motoru kurmaz; kaynak/ortam kabulü güncel kabul kaydında izlenir.
 
 | İşlem | İstek/sonuç |
 |---|---|
@@ -41,7 +39,7 @@ Yeni program preview isteğinde duration_minutes gönderilmişse açık değer �
 | settings_history_get_v1 | scope + isteğe bağlı cursor; 50'lik kararlı sayfalarla settings komutlarının önce/sonra/aktör/zaman/gerekçesi. Legacy bildirim komutlarının kendi audit yolu korunur. Cursor scope ve ilk as_of sınırına bağlıdır; user/member scope anahtarı ayrıca hesabı içerir. Her sayfada güncel okuma yetkisi tekrar denetlenir. |
 | settings_template_resolve_v1 | kind:report/import, org_id, isteğe bağlı center_id, açık template scope/key/version ve typed overrides; yetkili hazırlanmış request snapshot'ı. İş/preview/apply başlatmaz. |
 
-### Katılımcı paylaşım tüketicisi — aday
+### Katılımcı paylaşım tüketicisi
 
 `session_get_v1` sonucundaki `shared_participants`, salt okunur `SharedLessonParticipant[]` alanıdır. Varsayılan boş; iki tarafın da aynı planned ve bitmemiş derste active kesin rezervasyonu, hedefin aktif kişi/hesap ve doğrulanmış canlı org bağlantısı gerekir. Başvuru/bekleme kaydı yetmez. `profile_visible` yalnız display_name, `email_visible`/`phone_visible` yalnız native doğrulanmış güncel iletişim alanını ayrı açar. `photo_visible` yalnız mevcut fotoğrafın MediaAsset metadata'sını açar; byte okuması da aynı kitle/tercih denetimini tekrar yapar. Kapalı alan hiç dönmez; pending veya doğrulanmamış iletişim, hukuki ad/soyad ve finans taşınmaz. Açık ve mevcut hiçbir alanı olmayan kişi listede de görünmez.
 
@@ -63,7 +61,7 @@ Scope user/platform organizasyonsuz; member/organization için org_id; center i�
 
 `theme_package_id`/`font_package_id` yalnız null kabul eden salt okunur yer tutucular olarak korunur. Organizasyonun `primary_color`, `secondary_color`, `accent_color` alanları null veya tam #RRGGBB (altı hex hane, büyük/küçük harf) kabul eder; boş tercih null gönderilir ve sistem varsayılanını kullanır. Boş metin/geçersiz biçim reddedilir. Canlı Owner/OM, expected_version, idempotency, bağımsız reset ve immutable değişiklik geçmişi mevcut settings API zincirinde korunur. Center override yoktur. Açık/koyu tema, kontrast, işlevsel durum renkleri ve fontlar sistem tarafından yönetilir; kişisel erişilebilirlik tercihleri korunur. Bu karar önceki hazır renk/font kataloğu gereksiniminin yerini alır.
 
-## Özel fotoğraf ve logo tüketicisi — aday
+## Özel fotoğraf ve logo tüketicisi
 
 Profilde `account_profile_update_v1.photo`, organizasyonda `settings_update_v1.logo_image` opsiyonel `SettingsImageUpload|null` alanıdır. Göndermemek korur, null açık kaldırmadır. İlk resim yoktur; kaldırmada organizasyon adı/sistem simgesi veya kişisel sistem görseli fallback'i kullanılır. Fotoğrafta mevcut profil sürümü `management_state_get_v1` ile okunur; account_get sonucu profil write sürümü yerine kullanılmaz. Logoda mevcut organization settings version gerekir. Yalnız logo değişirken patch:{} geçerlidir; başka scope/boş komutta bu istisna yoktur. Owner/OM org yazma kapısı, self profil kapısı ve canlı replay denetimleri korunur.
 
@@ -73,7 +71,7 @@ Okuma `media_get_v1` ile authenticated POST'tur; cache-control private,no-store.
 
 Eski asset ID, kaldırılmış/değişmiş pointer veya kapanmış izin NOT_FOUND verir; imzalı eski URL ile kapıyı aşma yolu yoktur. Kaldırma yeni okumayı keser; fiziksel imha ve dış kopyanın silinmesi sayılmaz. settings_history'de media_change önceki/yeni asset ID'sini gösterir; byte/sır taşımaz. Logo/fotoğraf genel tercih resetine gizlice eklenmez, açık null komutuyla kaldırılır. Public logo gösterimi ayrıca yayımlanmış org bağlamı ve seçili public alan tüketicisine bağlıdır; authenticated logo okuması tek başına public kabulü değildir.
 
-## Rapor ve import şablon tüketicisi — aday
+## Rapor ve import şablon tüketicisi
 
 Katalogv4 member/center/organization kapsamlarında kapalı `report_templates` ve `import_templates` dizilerini ekler; default[] ve otomatik iş yoktur. Member yalnız oluşturan hesabın org tercihidir. Center'a açık yazma CM, organization'a açık yazma Owner/OM ortak paylaşımıdır; mevcut yetki dışında veriye veya import çalıştırmaya izin vermez. Ortak şablon canlı seçilir, merkeze otomatik kopyalanmaz. Seçili dizi reseti default[]'a döner; başka scope, diğer alan veya mevcut job/preview değişmez.
 
@@ -137,18 +135,18 @@ Aktif/doğrulanmış link ve aktif kişi/org için güncel display/name ve canon
 
 Başlangıç görünen adı bir kez profil kaynağına alınır; raw native user_metadata güncellemesi hesap/org adını değiştirmez. Ad/soyad değişimi account_profile_update_v1 üzerinden sürüm/receipt ve yayılımla yapılır.
 
-## Teslim1 Google bağlama hazırlığı
+## Google bağlama hazırlığı
 
 account_google_link_prepare_v1 isteği client_api_version/request_id/reauth/google_id_token içerir. Reauth mevcut aynı native session’dan taze sign-in tokenıdır; MFA varsa signed+live aal2 gerekir. Önce Google Identity Services/Expo sağlayıcısından Google ID token alınır. Backend tokenın sub alanını yalnız hedef kısıtı olarak alır; bu parse imza doğrulaması veya bağlama başarısı değildir. Yanıt {provider:google,status:ready,expires_in:10}; ardından native Auth ID-token grant/link_identity=true aynı Google token ve gerekli nonce ile tamamlanır. Native imza/issuer/audience/nonce kontrolleri atlanmaz. Yetki yalnız exact Google subject/hesap/session/süre içindir; farklı subject, eski session, ban/silinme ve süresi dolmuş niyet reddedilir. Son kullanılabilir yöntem silinmez. Redirect URL üreten eski taslak kullanılmaz. Token/nonce/reauth receipt, audit veya log’a yazılmaz.
 
-E-posta/telefon request/resend/verify native Auth SDK’sındadır. account_get_v1.identity doğrulanmış güncel ve pending alanları ayırır; pending org kayıtlarına yayılmaz. E-posta değişiminde çift doğrulama ve eski proof/expiry kapıları native sağlayıcıda kalır. Native email değişimi oturum tokenını yenilerse dönen oturum kullanılmalıdır; eski tokenla tekrar denenmez. Şimdiki hosted phone provider disabled: gerçek SMS teslimi hazır gösterilmez.
+E-posta/telefon request/resend/verify native Auth SDK’sındadır. account_get_v1.identity doğrulanmış güncel ve pending alanları ayırır; pending org kayıtlarına yayılmaz. E-posta değişiminde çift doğrulama ve eski proof/expiry kapıları native sağlayıcıda kalır. Native email değişimi oturum tokenını yenilerse dönen oturum kullanılmalıdır; eski tokenla tekrar denenmez. SMS sağlayıcı kabulü ayrı ortam işidir; numara kaydı gerçek SMS teslimi olarak gösterilmez.
 
-Doğrulanmamış telefon account_profile_update_v1.unverified_phone ile E.164 biçiminde kaydedilir; null yalnız bu doğrulanmamış kaydı temizler, alanın gönderilmemesi mevcut değeri korur. account_get_v1.identity.unverified_phone ayrı döner; identity.phone/phone_verified_at yalnız native doğrulama kaynağındandır. Aynı numaranın doğrulanmış native değer olması halinde doğrulanmamış kopya gösterilmez. Org canonical iletişimlerine otomatik yayılmaz, giriş/sahiplik kanıtı değildir. Native SMS pending_phone ile aynı alan değildir. Sürüm/receipt/profile audit mevcut yol üzerinden korunur. Yerel149 yapısal kontrol geçti; eklenen native regression henüz koşulmadı, önceki10/10 sonucu bu yeni alana taşınmaz.
+Doğrulanmamış telefon account_profile_update_v1.unverified_phone ile E.164 biçiminde kaydedilir; null yalnız bu doğrulanmamış kaydı temizler, alanın gönderilmemesi mevcut değeri korur. account_get_v1.identity.unverified_phone ayrı döner; identity.phone/phone_verified_at yalnız native doğrulama kaynağındandır. Aynı numaranın doğrulanmış native değer olması halinde doğrulanmamış kopya gösterilmez. Org canonical iletişimlerine otomatik yayılmaz, giriş/sahiplik kanıtı değildir. Native SMS pending_phone ile aynı alan değildir. Sürüm/receipt/profile audit mevcut yol üzerinden korunur. Kaynak ve ortam kabulü güncel kabul kaydında izlenir.
 
 
 Native Auth CAPTCHA/token seçenekleri sağlayıcı yapılandırmasına göre kullanılır; public Turnstile ile karıştırılmaz. Kurtarmada mevcut native oturum korunur, istemci zorunlu global signOut/ikinci completion RPC çağırmaz. Gerçek SMS kapalı/erteli olduğunda numara kaydı doğrulama başarısı olarak gösterilmez.
 
-## Public işletme alanları tüketicisi — aday
+## Public işletme alanları tüketicisi
 
 Katalogv5 organization/center `public_profile_enabled:false`, `public_fields:[]`, `public_hours:[]` ekler. Org Owner/OM ve merkezde canlı CM mevcut yazma/sürüm/replay/history kapısını kullanır. Başka scope veya serbest alan yazılamaz. Her scope seçimi yereldir, otomatik miras/kopya yoktur; seçili reset yalnız o alanı sistem defaultuna döndürür. Org public_profile_enabled yayın üst kapısıdır; center ayrıca kendi açık yayınını ve alanlarını ister. Varsayılanlar isim dahil tanıtımı açmaz.
 
@@ -158,15 +156,15 @@ Alan beyaz listesi name/description/logo/address/contact/hours'tur. Billing, ki�
 
 public_hours açık tanıtım saatleri dizisidir; her satır ISO1–7 weekdays, HH:mm:ss local_start/local_end ve geçerli IANA timezone ister. Gece aşımı desteklenir; eşit başlangıç/bitiş reddedilir. Default[] saat ilan etmez.100 satır mevcut yapılandırılmış JSON dizi tavanıdır, plan kotası değildir. Bu bilgi oda/eğitmen availability veya rezervasyon kapısı yerine geçmez; iş takvimi değişikliği kendi domain komutudur. UTC seanslar, mevcut program ve ücret snapshotları değiştirilmez.
 
-## Manuel tahsilat yöntemi — aday
+## Manuel tahsilat yöntemi
 
 `collection_record_v1.payment` opsiyonel kapalı ManualCollectionPayment nesnesidir: method cash/bank_transfer/card_pos, reference opsiyonel string|null. Banka ve kart/POS için boş olmayan reference zorunludur; yalnız whitespace geçerli referans değildir. Nakit referansı isteğe bağlıdır; gönderilirse aynı biçim koşulu geçerlidir. Eski payment göndermeyen istemci/kayıtta değer null (belirtilmemiş) kalır; tarihsel tahsilata nakit yöntemi atanmaz. Yeni istemci açık seçilen yöntemi gönderir, otomatik tahsilat/ödeme sağlayıcısı açılmaz.
 
 Snapshot gerçek cash_movements INSERT'i ile mevcut borç dağıtımı/öğrenci alacağı/receipt transaction'ında saklanır. Retry yeni hareket yaratmaz. SQL CHECK aynı kapalı nesne ve whitespace denetimini uygular. finance_get_v1.movements.items[].payment yalnız mevcut canlı finans read yetkisiyle okunur; kişisel paylaşım/public takvimde yoktur. Geçmiş kayıt ve düzeltmeler yöntemi değiştirmez; payment:null bilinmeyendir, cash değildir. Tutar, currency, finans yetkisi ve bağımsız iade/düzeltme komutları korunur.
 
-## Kişisel takvim bağlantısı — aday
+## Kişisel takvim bağlantısı
 
-29 Ekim kullanıcı doğrulaması: gerçek seans ekranı henüz yoktur. Bu nedenle FTK_CALENDAR_SESSION_URL_TEMPLATE için onaylı gerçek route mevcut değildir; sentetik route veya login yönlendirmesi hosted kabul yerine geçmez. Gerçek ekran/route sonrası development host/config, GET/HEAD→Edge→SQL→ICS→yetkili seans ekranı ve rotate/revoke/erişim kaybı tek kabul PR'sinde tamamlanır. Bu frontend tasarımı/ekranı burada uygulanmaz; WEB-01 bağımlılığı [backlog'dadır](../../../docs/remaining-work.md).
+Gerçek korumalı `/organizasyon/{org_id}/seans/{session_id}` route’u kaynakta vardır. FTK_CALENDAR_SESSION_URL_TEMPLATE, development host ve GET/HEAD→Edge→SQL→ICS→yetkili seans ekranı zincirinin gerçek ortam kabulü, rotate/revoke/erişim kaybıyla birlikte ST-03 kapsamında izlenir. Route varlığı hosted template/config kabulü değildir; açık işin tek sahibi [backlog](../apps/backend/docs/remaining-work.md).
 
 Yeni own-account API'leri calendar_links_get_v1, calendar_link_create_v1, calendar_link_rotate_v1 ve calendar_link_revoke_v1'dir. Otomatik bağlantı yoktur. Oluşturma explicit organization_scope:{org_id} ve boş olmayan unique kinds:[lessons,duties] seçimi ister; bu global hesap kaynağına başka actor/account/person seçicisi eklenmez. Starter event/F29 açılmaz. Ders kesin active kendi reservation, görev active kendi instructor/assistant ataması ve canlı rol ile gelir; aynı seans iki yoldan uygunsa tek item'dır. Merkez, Starter scope_required ve selected session read guard'ları korunur. Gelecek/devam eden planned seanslar okunur; intent/waitlist/başka katılımcı veya finans kaydı yoktur.
 
@@ -182,7 +180,7 @@ Takvim uygulamaları custom JWT header gönderemediğinden backend HTTP adapter 
 
 Edge yönetilen config: FTK_CALENDAR_ORIGIN adapter'ın root HTTPS origin'i; FTK_CALENDAR_SESSION_URL_TEMPLATE frontend'in gerçek, org_id/session_id placeholder'lı tam route şablonu; FTK_CALENDAR_SIGNING_KEY32byte küçük harf hex secret. Route veya hostname uydurulmaz; alanlar tanımsızken service_ready:false ve create/rotate SERVICE_UNAVAILABLE, mevcut metadata/revoke kullanılabilir. Native CI yalnız loopback adapter origin'i, sentetik uygulama route'u ve ephemeral key üretir; hosted secret/deploy değildir. Native test gerçek HTTP GET→Edge→SQL→ICS üzerinden koşar; provider/gerçek frontend route kabulü ayrı kalır.
 
-### Availability ve paket hazırlıkları — aday
+### Availability ve paket hazırlıkları
 
 Organization/center `availability_templates` ve `package_templates` default boş dizidir. Hazırlıklar resource availability, ürün, satış veya hak oluşturmaz. Yeni merkez, açık org dizisini ve org belge sürümünü bir kez kopyalar; mevcut merkezler backfill edilmez, sonraki org değişimi eski merkezi değiştirmez. `SettingsView.preparation_sources` her alan için system_default/organization_copy/center_local ve kopyada organization_version döndürür. Eşit değerin açık yerel yazımı da center_local olur. Seçili reset sistem boş dizisine döner; güncel org şablonunu, uygulanan availability kaydını, ürünü veya satışı değiştirmez.
 
@@ -192,14 +190,14 @@ Availability hazırlığı resource seçimini içermez. İstemci açık resource
 
 Paket hazırlığı açık disiplin, terms ve başlangıç/bitiş tarihlerini ister. Starter terms kredili veya süreli; freeze kapalı, refund.method açık seçimdir. Eksik refund none sayılmaz; kredi için pozitif PG integer, parasal tutar için mevcut bigint ve quota için mevcut güvenli sayı sınırı korunur. `preparation_templates.package_currency_suggestion` yeni taslak için TRY'dir; eksik fiyat/hak/geçerlilik türetilmez. Çözüm hedef merkez+disiplin ve lesson kullanım kapsamıyla `product_publish_v1` terms snapshot'ı ve açık sale_dates döndürür. Öğrenci veya satış seçmez; gerçek publish→sale_preview→sale_apply zinciri kendi güncel yetki ve uygunluk kontrollerini tekrar yapar. Sonraki şablon/reset yayınlanmış ürünü veya satış koşulunu değiştirmez.
 
-### Bildirim kullanılabilirliği — aday
+### Bildirim kullanılabilirliği
 
 `SettingsCatalog.notification_delivery` salt okunur `NotificationDeliverySupport` nesnesidir; kanal/provider açma ayarı değildir. Şu an in_app hazır; email/push uygulama teslim kanalı hazır değildir. `notification_preferences_set_v1` desteklenmeyen kanalı SERVICE_UNAVAILABLE ile receipt replay'inden önce reddeder; email isteği in_app tercihini değiştiremez. Native Auth doğrulama/kurtarma e-postası bu uygulama kanalından ayrıdır. Zorunlu transactional in_app kapatılamaz.
 
 Katalog güvenlik, rezervasyon/talep sonucu, iptal/değişiklik, yer teklifi, tahsilat/iade ve erişim değişimini mandatory_when_available listesinde açıklar. İlk in_app teslimi sessiz saat veya özete ertelenmez; timing/quiet-hours/digest controls_available false'tur. Katalogdaki24saat ders,7gün paket,3gün vade; instant/daily18/weeklySunday18 ve quiet-hours defaultoff değerleri kabul edilmiş seçenek/default bilgisidir, çalışan zamanlama mekanizması değildir. F27 lisansı ayrıca reminders.feature_licensed olarak döner; Starter false'tur. Desteklenmeyen kontrolün kaydedilmiş veya dış tesliminin yapılmış olduğu gösterilmez; yeni member/platform marketing default kapalıdır.
 
 
-### Üye ilgi filtresi ve geçmiş takvim sırası — aday
+### Üye ilgi filtresi ve geçmiş takvim sırası
 
 Mevcut authenticated `calendar_get_v1` isteğinde opsiyonel `interest_filter:true`, yalnız kendi member interest_center_ids/interest_discipline_ids seçimlerini uygular. İki boş olmayan boyut kesişir; boş boyut sınırlamaz. İstek verilmezse açık ilgi dahi genel takvimi değiştirmez. UUID yazım büyüklüğü kimliği değiştirmez. Filtre, zaten o an okuyabildiği takvim kayıtlarını daraltır; yeni session/katılımcı/başka merkez yetkisi vermez. Starter'da event türü açılmaz.
 
@@ -207,7 +205,7 @@ Mevcut authenticated `calendar_get_v1` isteğinde opsiyonel `interest_filter:tru
 
 Aktör/context backend tarafından bağlanır; account/person veya iç skor seçicisi isteğe eklenemez. İç geçmiş/skor yanıta açılmaz. Cursor request/aktör/effective preference sürümü ve kullanılan geçmiş sayımlarına bağlıdır; tercih, opt-out veya geçmiş düzeltmesi eski sayfayı VALIDATION_FAILED ile kapatır ve yeniden okuma gerekir. Seçili reset ilgi dizilerini boşaltır, geçmiş kullanımını kapatır; gerçek attendance/iş geçmişini silmez.
 
-### Kesintisiz günlük availability sınırları — aday
+### Kesintisiz günlük availability sınırları
 
 `AvailabilityRule` ve hazırlık karşılığı günlük başlangıçta00:00:00–23:59:59, bitişte buna ek yalnız24:00:00 kabul eder. Gece22:00–02:00 açıkça ilk gün22:00–24:00 ve ertesi gün00:00–02:00 olarak kaydedilir; weekday ve valid_from/valid_until her günlük parçaya aittir, valid_until exclusive kalır. Public tanıtım saatleri ayrı bilgi alanıdır.
 
