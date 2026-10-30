@@ -8,26 +8,25 @@ import { Label } from "@ftksaas/ui/components/label";
 import { browserClient } from "../../lib/supabase/client";
 import { appOrigin } from "../../lib/config";
 import { rememberAuthReturn } from "../../lib/auth-return";
-import { accountCall } from "../../lib/account";
 
 export function IdentityForm({ account, onSaved }: { account: AccountView; onSaved: () => void }) {
   const t = useTranslations("account");
   const [busy, setBusy] = useState(false);
   const [notice, setNotice] = useState("");
-  const [error, setError] = useState(false);
+  const [error, setError] = useState("");
   const lock = useRef(false);
   async function run(task: () => Promise<unknown>, message: string) {
     if (lock.current) return;
     lock.current = true;
     setBusy(true);
     setNotice("");
-    setError(false);
+    setError("");
     try {
       await task();
       setNotice(message);
       onSaved();
     } catch {
-      setError(true);
+      setError("providerFailed");
     } finally {
       lock.current = false;
       setBusy(false);
@@ -62,7 +61,7 @@ export function IdentityForm({ account, onSaved }: { account: AccountView; onSav
           ),
         )}
       </dl>
-      {error && <p role="alert">{t("providerFailed")}</p>}
+      {error && <p role="alert">{t(error)}</p>}
       {notice && (
         <output className="block" aria-live="polite">
           {t(notice)}
@@ -140,16 +139,6 @@ export function IdentityForm({ account, onSaved }: { account: AccountView; onSav
       <details className="space-y-4 border-t pt-5">
         <summary className="cursor-pointer font-medium">{t("password")}</summary>
         <p className="text-sm text-muted-foreground">{t("passwordHint")}</p>
-        <Button
-          type="button"
-          variant="outline"
-          disabled={busy}
-          onClick={() =>
-            void run(() => accountCall("account_password_change_v1", {}), "nonceRequested")
-          }
-        >
-          {t("sendNonce")}
-        </Button>
         <form
           className="space-y-3"
           onSubmit={(event) => {
@@ -157,19 +146,29 @@ export function IdentityForm({ account, onSaved }: { account: AccountView; onSav
             const form = event.currentTarget;
             const data = new FormData(form);
             if (data.get("password") !== data.get("confirm")) {
-              setError(true);
+              setNotice("");
+              setError("passwordMismatch");
               return;
             }
             void run(async () => {
               const result = await browserClient().auth.updateUser({
                 password: String(data.get("password")),
-                nonce: String(data.get("nonce")),
+                current_password: String(data.get("current_password")),
               });
               if (result.error) throw result.error;
               form.reset();
-            }, "saved");
+            }, "passwordChanged");
           }}
         >
+          <Label htmlFor="current-password">{t("currentPassword")}</Label>
+          <Input
+            id="current-password"
+            name="current_password"
+            type="password"
+            autoComplete="current-password"
+            required
+            disabled={busy}
+          />
           <Label htmlFor="new-password">{t("newPassword")}</Label>
           <Input
             id="new-password"
@@ -187,14 +186,6 @@ export function IdentityForm({ account, onSaved }: { account: AccountView; onSav
             type="password"
             autoComplete="new-password"
             minLength={8}
-            required
-            disabled={busy}
-          />
-          <Label htmlFor="password-nonce">{t("nonce")}</Label>
-          <Input
-            id="password-nonce"
-            name="nonce"
-            autoComplete="one-time-code"
             required
             disabled={busy}
           />

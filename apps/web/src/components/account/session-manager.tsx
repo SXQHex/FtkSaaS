@@ -41,7 +41,6 @@ function SessionRow({
           {format.dateTime(new Date(item.last_refreshed_at), {
             dateStyle: "medium",
             timeStyle: "short",
-            timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone,
           })}
         </dd>
       </dl>
