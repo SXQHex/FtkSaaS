@@ -23,8 +23,11 @@ export function findNativeAuth(status){
    if(!['auth','gotrue'].includes(path.basename(executable)))continue;
    const env=Object.fromEntries(fs.readFileSync('/proc/'+entry+'/environ','utf8').split('\0').filter(Boolean).map(line=>{const i=line.indexOf('=');return [line.slice(0,i),line.slice(i+1)];}));
    if(dbAddress(env.GOTRUE_DB_DATABASE_URL)!==target||!loopback(env.GOTRUE_API_HOST)||!loopback(env.GOTRUE_SMTP_HOST)||Number(env.GOTRUE_SMTP_PORT)!==smtp.port)continue;
-   const endpoint=status.endpoints?.['auth.http'];
-   if(endpoint&&Number(env.GOTRUE_API_PORT)!==endpoint.port)continue;
+   // status auth.http is the shared API proxy; native Auth binds a separately
+   // reserved private port (CLI ProcessRecipe.reserveEndpoints). DB + SMTP
+   // still identify this exact local stack; never match the public API port.
+   const port=Number(env.GOTRUE_API_PORT);
+   if(!Number.isInteger(port)||port<1||port>65535)continue;
    matches.push({executable,env});
   }catch{/* Unrelated, inaccessible or already exited processes are not candidates. */}
  }

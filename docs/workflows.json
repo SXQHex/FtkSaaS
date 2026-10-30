@@ -255,7 +255,7 @@
       ],
       "review": {
         "fingerprint": "8c43aa0f9b469570009c64f527ebb2e799857360ba870ecad4e41c2a89a789ef",
-        "reason": "PR94 per_worker politikası ve PR99 native Auth ayarları birlikte incelendi; istek başına kimlik ve oturum kontrolleri korunur."
+        "reason": "Native Auth discovery regresyon testi incelendi; public proxy/iç port farkı düzeltmesi, exact DB/SMTP ve tek süreç reddi korunur."
       }
     },
     {
@@ -335,8 +335,8 @@
         "account_signup_request_v1"
       ],
       "review": {
-        "fingerprint": "5ff4704ad34464bfd0f10b42c79640d49799f59aff216bc877c2eb2ab8f5b748",
-        "reason": "Birleşik config incelendi: per_worker kullanımı current_password, 24 saat/nonce, bildirim ve recovery sözleşmesini değiştirmez."
+        "fingerprint": "79b5f3261efa175a8b944fb50583cc99c991b9ac16684d69d14840c3eea501c9",
+        "reason": "CLI 2.122 ProcessRecipe/Auth kaynakları ve gerçek proc fixture incelendi; auth.http public proxy portudur, native Auth iç portu ayrı ayrılır."
       }
     },
     {
