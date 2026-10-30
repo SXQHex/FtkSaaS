@@ -15,6 +15,7 @@ const mocks = vi.hoisted(() => ({
   setTheme: vi.fn<(theme: string) => void>(),
   unsubscribe: vi.fn<() => void>(),
   signOut: vi.fn<() => Promise<{ error: Error | null }>>(),
+  setup: vi.fn<(operation: string, input: Record<string, unknown>) => Promise<unknown>>(),
   listener: null as null | ((event: string) => void),
 }));
 const router = { replace: mocks.replace, refresh: mocks.refresh };
@@ -27,6 +28,10 @@ vi.mock("../src/lib/api", async (original) => ({
   getUserSettings: mocks.settings,
   getCenters: mocks.centers,
   getCalendar: mocks.calendar,
+}));
+vi.mock("../src/lib/studio-setup", async (original) => ({
+  ...(await original<typeof import("../src/lib/studio-setup")>()),
+  setupCall: mocks.setup,
 }));
 vi.mock("../src/lib/supabase/client", () => ({
   browserClient: () => ({
@@ -86,6 +91,27 @@ beforeEach(() => {
       version: 1,
     },
   ]);
+  mocks.setup.mockImplementation(async (operation, input) => {
+    if (operation === "organization_get_v1")
+      return organizations.find((org) => org.id === input.org_id);
+    if (operation === "centers_list_v1")
+      return {
+        items: [
+          {
+            id: "center-a",
+            name: "A Merkezi",
+            timezone: "Europe/Istanbul",
+            state: "active",
+            accessible: true,
+            version: 1,
+          },
+        ],
+        next_cursor: null,
+      };
+    if (operation === "subscription_get_v1")
+      return { plan: "starter", limits: { entries: [] }, usage: { entries: [] } };
+    return { items: [], next_cursor: null };
+  });
   mocks.signOut.mockResolvedValue({ error: null });
   HTMLElement.prototype.scrollIntoView = vi.fn<HTMLElement["scrollIntoView"]>();
   HTMLElement.prototype.hasPointerCapture = () => false;
@@ -97,8 +123,12 @@ test("live shell reads accessible studios without selectors, sample records or c
   render(<StudioWorkspace />);
   await screen.findByRole("heading", { name: "Merhaba, Test Yöneticisi" });
   await user.click(screen.getAllByRole("button", { name: "Stüdyo" })[0]);
+  await user.click(await screen.findByRole("button", { name: "Kuruluş A" }));
   expect(await screen.findByRole("heading", { name: "A Merkezi" })).toBeVisible();
   expect(screen.queryByText("Gizli Merkez")).not.toBeInTheDocument();
+  expect(mocks.setup.mock.calls.every(([, input]) => input.org_id !== organizations[1].id)).toBe(
+    true,
+  );
   expect(mocks.centers).toHaveBeenCalledExactlyOnceWith(organizations[0].id);
   expect(screen.queryByRole("combobox", { name: "Kuruluş seç" })).not.toBeInTheDocument();
   expect(screen.queryByText("Örnek Yönetici")).not.toBeInTheDocument();
