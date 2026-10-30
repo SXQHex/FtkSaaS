@@ -399,7 +399,8 @@ PR92 head `e92f4efbb57fb6b64c8c3adef8d8d6a23cedf3d1` için [frontend40998175873]
 
 ### Canlı kabul ve e-posta teşhisi
 
-PR92/95/96 main'e birleşti. Main `8ae10cc2fa030539bbfc823bb2b435caf148f4fa` için frontend41026132804, merge proof41026132825, main proof41026132932, frontend compatibility41026132877 ve development delivery41026172427 completed/success doğrulandı. Vercel production `dpl_2kjmQmJQPZExrcSa2qrGpQAZnNzy` aynı SHA'dan Git kaynağıyla READY oldu ve `uye.fethiyetango.com` alias'ını taşıyor; otomatik dağıtım engeli kaldırıldı.
+PR92/95/96/98 main'e birleşti. Main `17ee1ebcf7b900b8e420d44903b589a9ebd22830` için frontend41029219573, merge proof41029219505, main proof41029219526 ve development delivery41029271073 completed/success doğrulandı; compatibility scope başarılı, test job'u skipped. Vercel production `dpl_HeWvnkhJRxdXEEh6E8Vvh8iz8KmK` aynı SHA'dan Git kaynağıyla READY ve `uye.fethiyetango.com` alias'ını taşıyor. PR98 CI'da Chromium/Firefox/WebKit/mobil E2E, coverage ve frontend kontrolleri geçti.
+
 
 - Admin native çıkış/yeniden giriş, hesap okumaları ve oturum etiketi yazma/taze okuma kabul edildi; etiket eski değerine döndürüldü. Silme preview sahiplik devri engelini gösterdi, apply yapılmadı. Console error/warn yoktu.
 - E-posta gelmemesinin nedeni mevcut admin hesabına farklı adresli Google kimliğinin bağlı olmasıydı. Auth kimlik/hesap eşlemesiyle doğrulandı; otomatik doldurma kök neden değildi. Mevcut kimlikle tekrar kayıt yeni hesap/e-posta üretmedi. Açık “hesap mevcut” bildirimi [XREQ-001](../../../docs/requests.md#xreq-001-kayıtta-mevcut-hesap-bildirimi) kapsamında backend değerlendirmesindedir.
@@ -408,12 +409,15 @@ PR92/95/96 main'e birleşti. Main `8ae10cc2fa030539bbfc823bb2b435caf148f4fa` iç
 
 ### S01 hesap düzeltmeleri
 
-Ortak `next-intl` sağlayıcısı tarayıcı saat dilimini hydration sonrasında uygular; hesap tarihleri ortak varsayılanı kullanır, açık merkez takvimi saat dilimi korunur. Parola formu mevcut + yeni + tekrar alanlarına indirildi; native `current_password` doğrulaması kullanılır, challenge/nonce girişi kaldırıldı. Güvenlik e-postasındaki kurtarma davranışı [XREQ-002](../../../docs/requests.md#xreq-002-parola-değişimi-güvenlik-e-postası) değerlendirmesinde; uygulanmış “geri al” gibi gösterilmez. Yerel `pnpm check:frontend` başarılı: 151 web + 1 UI testi, lint/format/typecheck/build; frontend isolation başarılı. Parola eşleşme koşulunu ters çeviren mutation testi beklenen biçimde başarısız oldu ve kaynak geri yüklendi. Bağımsız incelemede bulunan talep tablosu biçimi düzeltildi; runtime engeli bulunmadı. Yerel Playwright E2E gerekli browser revision bulunmadığından başlayamadı; indirme bozuk ZIP döndürdü. CI ve hosted kabulü ayrı açıktır.
+Ortak `next-intl` sağlayıcısı tarayıcı saat dilimini hydration sonrasında uygular; hesap tarihleri ortak varsayılanı kullanır, açık merkez takvimi saat dilimi korunur. Parola formu mevcut + yeni + tekrar alanlarına indirildi; native `current_password` doğrulaması kullanılır, challenge/nonce girişi kaldırıldı. Güvenlik e-postasındaki kurtarma davranışı [XREQ-002](../../../docs/requests.md#xreq-002-parola-değişimi-güvenlik-e-postası) değerlendirmesinde; uygulanmış “geri al” gibi gösterilmez. Chrome'da yeni üç alanlı parola formu ve oturum açılış/yenilenme saatlerinin cihaz diliminde tutarlılığı görüldü; parola değişimi ve dış bildirim teslimi henüz denenmedi.
+
+Kullanıcının hesap ekranı sadeleştirmesi: boş kimlik satırları/doğrulanmamış telefon özeti, genel bölüm açıklamaları ve sayfa başındaki silme takibi/genel güncelle kaldırıldı. Zorunlu form alanlarında kırmızı yıldız ve placeholder; native doğrulama ve parola tekrar hatasında kırmızı çerçeve/hover/focus ile alan altı kısa hata metni var. Kritik silme etkisi/onay uyarıları ve başarısız okuma yeniden denemesi korunur. Yerel `pnpm check:frontend` (158 web + 1 UI testi, lint/format/typecheck/build), coverage ve frontend isolation başarılı. Boş kimlik satırı filtresi ters çevrilince regresyon testi başarısız oldu; kaynak geri yüklendi. Bağımsız incelemede engel bulunmadı. Yeni kaynak için CI ve dağıtım sonrası görsel/klavye/mobil kabulü açık.
+
 
 ### Açık kapılar
 
 - Parola değiştirme/kurtarma, kullanılmış/süresi dolmuş bağlantı ve doğrulama yeniden gönderme; yeni parola girişi ve gönderimi kullanıcı adımıdır.
 - Fotoğraf, iki oturum ve revoke sonrası Edge erişimi, TOTP, Google giriş/bağlama, doğru/yanlış/expired davet ve ayrı hesapta silme/replay/own-foreign job açık. Google bağlama web client ID eksik. SMS ayrı sağlayıcı entegrasyonudur.
-- Saat dilimi ve yeni parola formunun gerçek dağıtım sonrası tarayıcı kabulü açık. Native password-changed bildirimi açıktır; yeni değişiklikten doğan gerçek teslim ayrıca doğrulanır.
+- Yeni hesap sadeleştirmesi ve parola değişiminin uçtan uca tarayıcı kabulü açık. Native password-changed bildirimi açıktır; yeni değişiklikten doğan gerçek teslim ayrıca doğrulanır.
 
 S01 kapanmadı. Gerçek kullanıcı hesabı silinmedi; job başarısı fiziksel imha kabulü sayılmaz.

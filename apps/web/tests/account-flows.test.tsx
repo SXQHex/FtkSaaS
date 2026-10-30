@@ -4,6 +4,7 @@ import userEvent from "@testing-library/user-event";
 import { render } from "./render";
 import { AccountDelete } from "../src/components/account/account-delete";
 import { MfaManager } from "../src/components/account/mfa-manager";
+import { ProfileForm } from "../src/components/account/profile-form";
 import { IdentityForm } from "../src/components/account/identity-form";
 import { InvitationAccept } from "../src/components/account/invitation-accept";
 import { SessionManager } from "../src/components/account/session-manager";
@@ -326,4 +327,72 @@ test("rejected current password never announces a successful change", async () =
   expect(await screen.findByRole("alert")).toHaveTextContent("Kimlik sağlayıcısı");
   expect(screen.queryByRole("status")).not.toBeInTheDocument();
   expect(mocks.saved).not.toHaveBeenCalled();
+});
+
+test("identity lists only populated verified or pending contact records", () => {
+  render(
+    <IdentityForm
+      account={{
+        id: actor,
+        state: "active",
+        display_name: "Synthetic",
+        identity: {
+          email: "verified@example.invalid",
+          email_verified_at: "2026-10-30T00:00:00Z",
+          phone_verified_at: null,
+          pending_email: "pending@example.invalid",
+          phone: null,
+          pending_phone: null,
+          unverified_phone: null,
+          given_name: null,
+          family_name: null,
+        },
+      }}
+      onSaved={mocks.saved}
+    />,
+  );
+  expect(screen.getByText("verified@example.invalid")).toBeVisible();
+  expect(screen.getByText("pending@example.invalid")).toBeVisible();
+  expect(screen.queryByText("Doğrulanmış telefon")).not.toBeInTheDocument();
+  expect(screen.queryByText("Doğrulama bekleyen telefon")).not.toBeInTheDocument();
+  expect(screen.queryByText("Doğrulanmamış telefon")).not.toBeInTheDocument();
+  expect(screen.queryByText("Kayıt yok")).not.toBeInTheDocument();
+});
+test("password mismatch belongs to the confirmation field", async () => {
+  await fillPasswordForm("Synthetic-other-42");
+  const confirm = screen.getByLabelText("Yeni parolayı tekrar yaz");
+  expect(confirm).toHaveAttribute("aria-invalid", "true");
+  expect(confirm).toHaveAccessibleDescription("Parolalar eşleşmiyor.");
+  expect(screen.getByRole("alert")).toHaveClass("text-destructive");
+});
+
+test("profile phone accepts an international number and keeps it optional", async () => {
+  const user = userEvent.setup();
+  render(
+    <ProfileForm
+      account={{
+        id: actor,
+        state: "active",
+        display_name: "Synthetic",
+        identity: {
+          email: "verified@example.invalid",
+          email_verified_at: "2026-10-30T00:00:00Z",
+          phone_verified_at: null,
+          pending_email: null,
+          phone: null,
+          pending_phone: null,
+          unverified_phone: null,
+          given_name: null,
+          family_name: null,
+        },
+      }}
+      version={1}
+      onSaved={mocks.saved}
+    />,
+  );
+  const phone = screen.getByLabelText("Doğrulanmamış telefon") as HTMLInputElement;
+  expect(phone).not.toBeRequired();
+  expect(phone.checkValidity()).toBe(true);
+  await user.type(phone, "+905551234567");
+  expect(phone.checkValidity()).toBe(true);
 });

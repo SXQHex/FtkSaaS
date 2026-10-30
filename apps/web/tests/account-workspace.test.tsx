@@ -1,4 +1,5 @@
 import { beforeEach, expect, test, vi } from "vitest";
+import userEvent from "@testing-library/user-event";
 import { act, screen } from "@testing-library/react";
 import { render } from "./render";
 import { AccountWorkspace } from "../src/components/account/account-workspace";
@@ -14,9 +15,10 @@ vi.mock("../src/lib/account", async (load) => ({
   accountProfile: mocks.profile,
 }));
 vi.mock("../src/components/preferences", () => ({ Preferences: () => null }));
-vi.mock("next/navigation", () => ({
-  useRouter: () => ({ replace: mocks.replace, refresh: mocks.refresh }),
-}));
+vi.mock("next/navigation", () => {
+  const router = { replace: mocks.replace, refresh: mocks.refresh };
+  return { useRouter: () => router };
+});
 vi.mock("../src/lib/supabase/client", () => ({
   browserClient: () => ({
     auth: {
@@ -40,6 +42,8 @@ test("sign-out discards a late profile response and returns to canonical login",
       }),
   );
   render(<AccountWorkspace authUserId="native-one" />);
+  expect(screen.queryByRole("link", { name: "Silme talebini takip et" })).not.toBeInTheDocument();
+  expect(screen.queryByRole("button", { name: "Güncelle" })).not.toBeInTheDocument();
   await act(async () => {
     mocks.listener?.("SIGNED_OUT", null);
     finish({
@@ -68,4 +72,16 @@ test("changing native accounts prevents the previous account's response from ent
   });
   expect(mocks.replace).toHaveBeenCalledWith("/login?next=/account");
   expect(screen.queryByRole("heading", { name: "Hesap profili" })).not.toBeInTheDocument();
+});
+
+test("failed account reads retain an explicit retry without the top deletion link", async () => {
+  mocks.profile
+    .mockRejectedValueOnce(new Error("unavailable"))
+    .mockImplementationOnce(() => new Promise(() => {}));
+  const user = userEvent.setup();
+  render(<AccountWorkspace authUserId="native-one" />);
+  await screen.findByRole("alert");
+  expect(screen.queryByRole("link", { name: "Silme talebini takip et" })).not.toBeInTheDocument();
+  await user.click(screen.getByRole("button", { name: "Yeniden dene" }));
+  expect(mocks.profile).toHaveBeenCalledTimes(2);
 });
