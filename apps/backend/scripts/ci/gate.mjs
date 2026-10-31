@@ -8,8 +8,10 @@ export function validateBinding({binding,pr,run,jobs,tested,currentTree,workflow
  if(run.event!=='pull_request'||run.path!=='.github/workflows/ci-full.yml'||run.conclusion!=='success'||run.status!=='completed')throw Error('No successful candidate workflow');
  if(binding.run_id!==run.id||binding.attempt!==run.run_attempt||binding.pr!==pr.number||binding.head!==pr.head.sha||binding.base!==pr.base.sha||run.head_sha!==binding.head)throw Error('Stale head/base/attempt');
  if(binding.merge!==tested.sha||binding.tree!==tested.tree.sha||binding.tree!==currentTree||tested.parents.length!==2||tested.parents[0].sha!==binding.base||tested.parents[1].sha!==binding.head)throw Error('Tested merge parents/tree mismatch');
- if(binding.kind!=='full'||binding.profile!=='four-isolated-v1'||binding.coverage!==coverageHash())throw Error('Unrecognized/incomplete full coverage');
- validateJobs(jobs,run,{benchmark:binding.benchmark,collector:true});
+ if(binding.kind!=='full'||!['four-isolated-v1','four-isolated-v2'].includes(binding.profile)||binding.coverage!==coverageHash())throw Error('Unrecognized/incomplete full coverage');
+ const currentProfile=binding.profile==='four-isolated-v2';
+ if(currentProfile&&(!Number.isSafeInteger(binding.source_attempt)||binding.source_attempt<1||binding.source_attempt>binding.attempt))throw Error('Invalid original source attempt');
+ validateJobs(jobs,run,{benchmark:binding.benchmark,collector:true,sourceChecks:currentProfile});
  return true;
 }
 export async function receipt(github,repo,run,kind="full"){
@@ -19,7 +21,8 @@ export async function receipt(github,repo,run,kind="full"){
  try{const file=join(dir,'receipt.zip');writeFileSync(file,Buffer.from(zip.data));return JSON.parse(execFileSync('unzip',['-p',file,'binding.json'],{encoding:'utf8',maxBuffer:16000}));}finally{rmSync(dir,{recursive:true,force:true});}
 }
 // A cancelled, stale or incomplete run cannot shadow a valid receipt for the
-// same live source. Each attempt is validated independently; proofs never mix.
+// same live source. Use GitHub's current attempt view, including retained jobs;
+// never select an older success to replace a newer failed execution.
 export async function findCandidateProof(github,repo,pr,kind,currentTree,policyBase){
  const runs=await github.paginate(github.rest.actions.listWorkflowRuns,{...repo,workflow_id:'ci-full.yml',head_sha:pr.head.sha,event:'pull_request',per_page:100});
  const workflowMatches=await policyMatches(github,repo,policyBase,pr.head.sha);
@@ -33,10 +36,17 @@ export async function findCandidateProof(github,repo,pr,kind,currentTree,policyB
    const binding=await receipt(github,repo,run,kind);
    const tested=(await github.rest.git.getCommit({...repo,commit_sha:binding.merge})).data;
    (kind==='documentation'?validateDocumentBinding:validateBinding)({binding,pr,run,jobs,tested,currentTree,workflowMatches});
-   return {binding,run};
+   const live=(await github.rest.actions.getWorkflowRun({...repo,run_id:run.id})).data;
+   if(live.id!==run.id||live.run_attempt!==run.run_attempt||live.head_sha!==run.head_sha||live.status!=='completed'||live.conclusion!=='success')throw Error('Candidate run changed during proof verification');
+   return {binding,run:live};
   }catch(e){reason=String(e.message);}
  }
  throw Error(reason);
+}
+export function schemaBaselineName(binding){
+ if(binding.profile==='four-isolated-v2')return 'documentation-baseline';
+ if(binding.profile==='four-isolated-v1')return `documentation-baseline-${binding.attempt}`;
+ throw Error('Unrecognized baseline profile');
 }
 export async function checkPr(github,context,number){
  const repo=context.repo;const pr=(await github.rest.pulls.get({...repo,pull_number:number})).data;if(pr.state!=='open')return;

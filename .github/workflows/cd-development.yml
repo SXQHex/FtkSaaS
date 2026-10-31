@@ -87,7 +87,7 @@ jobs:
             const b=await gate.verifyMerged(github,{repo:context.repo,sha:process.env.ACCEPTED_SHA,runId:Number(process.env.ACCEPTANCE_RUN_ID)},core);
             if(b.kind!=='full')throw Error('Documentation needs source-bound full acceptance');
             const artifacts=await github.paginate(github.rest.actions.listWorkflowRunArtifacts,{...context.repo,run_id:b.run_id,per_page:100});
-            const found=artifacts.filter(a=>!a.expired&&a.name===`documentation-baseline-${b.attempt}`);
+            const found=artifacts.filter(a=>!a.expired&&a.name===gate.schemaBaselineName(b));
             if(found.length!==1)throw Error('Missing/ambiguous source-bound schema baseline');
             const zip=await github.rest.actions.downloadArtifact({...context.repo,artifact_id:found[0].id,archive_format:'zip'});
             const fs=await import('node:fs'),os=await import('node:os'),path=await import('node:path'),cp=await import('node:child_process');
