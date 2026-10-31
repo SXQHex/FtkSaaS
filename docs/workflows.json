@@ -254,8 +254,8 @@
         "management_state_get_v1"
       ],
       "review": {
-        "fingerprint": "470ed682b6aefeb9b20fc29ba700513d668138208022afa5463747e958ef6c96",
-        "reason": "Reviewed config-only per_worker reuse against WF00, client protocol, request-local handler Auth/session context and existing tenant/race acceptance. API, JWT, RPC and business semantics remain unchanged; native candidate acceptance and timing comparison are still required."
+        "fingerprint": "912852deec932606a28c0ebc1fe70844c85cb17c208d88fcb0e8eacbd8d06291",
+        "reason": "CI rerun kabulü incelendi: ilk event merge/base/head sabit; güncel GitHub attempt görünümündeki core ve dört API başarısı, v2 baseline ve main/CD tekrar doğrulaması test edildi. WF00 istemci protokolü ve ürün davranışı değişmedi."
       }
     },
     {

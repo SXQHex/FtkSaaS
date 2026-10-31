@@ -63,7 +63,7 @@ export function shardPlan(suites=apiSuites,seconds=durations.seconds){
 export const apiBalancePolicy=Object.freeze({version:'api-wall-v1',max_ratio:1.25,min_gap_s:120});
 export function coverageHash(){return createHash('sha256').update(JSON.stringify({balance:apiBalancePolicy,api:[...apiSuites].sort(),plan:shardPlan(),core:['verify','test:db','dev:seed','dev:health','db:advisors'],reset:'34-or-current-manifest; empty auth/tenant/receipts per runner',concurrency:2})).digest('hex');}
 export const roleName=j=>j.name.split(' / ').at(-1);
-export function validateJobs(jobs,run,{benchmark=false,collector=false}={}){
+export function validateJobs(jobs,run,{benchmark=false,collector=false,sourceChecks=false}={}){
  const names=['core','api-1','api-2','api-3','api-4',...(benchmark?['serial-reference']:[]),...(collector?['full-clean']:[])];
  for(const name of names){
   const matches=jobs.filter(j=>roleName(j)===name);
@@ -72,6 +72,12 @@ export function validateJobs(jobs,run,{benchmark=false,collector=false}={}){
   if(j.conclusion!=='success'||j.status!=='completed'||j.run_id!==run.id||j.run_attempt!==run.run_attempt||j.head_sha!==run.head_sha)throw Error('Failed/skipped/cancelled/stale job: '+name);
   const step=name==='full-clean'?'Verify all required jobs':'Clean acceptance';
   if(!j.steps?.some(s=>s.name===step&&s.conclusion==='success'))throw Error('Unexecuted acceptance step: '+name);
+  if(sourceChecks&&name!=='full-clean'){
+   for(const required of ['Verify tested merge','Clean acceptance',...(name==='core'?['Upload schema baseline']:[])]){
+    const steps=j.steps.filter(s=>s.name===required);
+    if(steps.length!==1||steps[0].conclusion!=='success')throw Error('Missing/duplicate/unexecuted source step: '+name+' / '+required);
+   }
+  }
  }
  return true;
 }

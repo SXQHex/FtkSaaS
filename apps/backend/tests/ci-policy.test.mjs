@@ -1,4 +1,4 @@
-import {repositoryRoot,repoFile} from '../scripts/paths.mjs';
+import {repositoryRoot,repoFile,ciFile} from '../scripts/paths.mjs';
 process.chdir(repositoryRoot);
 import test from 'node:test';import assert from 'node:assert/strict';import fs from 'node:fs';
 import {deploymentSource,resolveAcceptedSource,revalidateDeployment} from '../scripts/ci/deployment-source.mjs';
@@ -109,7 +109,7 @@ test('atomic migration preparation keeps source bytes and rejects missing envelo
  for(const invalid of ['begin;begin;commit;commit;','commit;','begin;select 1;commit;select 2;','begin;select $$unterminated;commit;','begin;/* unfinished','begin;select \'unfinished'])assert.throws(()=>migrationBody(invalid));
 });
 import {select,parseChanges,apiSuites} from '../scripts/ci/select-tests.mjs';
-import {validateBinding} from '../scripts/ci/gate.mjs';
+import {validateBinding,schemaBaselineName} from '../scripts/ci/gate.mjs';
 import {analyzeDelta} from '../scripts/ci/delta-analysis.mjs';
 import {runApiPhases} from '../scripts/ci/run-targeted.mjs';
 const plan=p=>select([{path:p,status:'M'}]);
@@ -302,7 +302,7 @@ test('documentation proof is separate, source bound and rejects stale/missing/sk
 });
 
 import {shardPlan,coverageHash,validateJobs,apiBalancePolicy,apiTimeBalance} from '../scripts/ci/shards.mjs';
-import {measurements} from '../scripts/ci/collect.mjs';
+import {measurements,collect} from '../scripts/ci/collect.mjs';
 test('four deterministic measured shards partition every suite exactly once with bounded weight imbalance',()=>{
  const bins=shardPlan();assert.equal(bins.length,4);
  assert.deepEqual(bins.flatMap(b=>b.suites).sort(),[...apiSuites].sort());
@@ -313,7 +313,7 @@ test('four deterministic measured shards partition every suite exactly once with
  assert.throws(()=>shardPlan([...apiSuites,'apps/backend/tests/unknown.test.mjs']));
  assert.throws(()=>shardPlan(apiSuites.slice(1)));
 });
-test('all required shard jobs must execute in the same run attempt and head; benchmark cannot be omitted',()=>{
+test('all required shard jobs must succeed in the same run attempt view and head; benchmark cannot be omitted',()=>{
  const v=valid();assert(validateJobs(v.jobs,v.run,{collector:true}));
  for(const mutate of [x=>x.jobs.splice(2,1),x=>x.jobs.push(structuredClone(x.jobs[1])),x=>x.jobs[1].conclusion='skipped',x=>x.jobs[2].conclusion='cancelled',x=>x.jobs[3].conclusion='failure',x=>x.jobs[4].run_attempt=2,x=>x.jobs[4].run_id=6,x=>x.jobs[4].head_sha='other',x=>x.jobs[4].steps[0].conclusion='skipped',x=>x.binding.coverage='other',x=>x.binding.benchmark=true]){
   const x=valid();mutate(x);assert.throws(()=>validateBinding(x));
@@ -454,7 +454,7 @@ test('repository graph and documentation scope are identical from backend and ro
 }));
 
 import {classifyChanges,ownerOf,localScope,ownership} from '../scripts/ci/scope.mjs';
-import {remoteSourceScope,backendUnchanged,resolveCandidate} from '../scripts/ci/source.mjs';
+import {remoteSourceScope,backendUnchanged,resolveCandidate,currentAttemptBinding} from '../scripts/ci/source.mjs';
 import {checkPr} from '../scripts/ci/gate.mjs';
 const change=path=>({path,status:'M'});
 test('positive ownership separates backend frontend prose and shared inputs, rejecting unknown scope',()=>{
@@ -516,7 +516,7 @@ test('frontend-only PR passes backend scope without inventing a full-test receip
 });
 test('frontend candidate never starts backend clean, while actual merge verifies parents before non-backend classification',async()=>{
  const {github,pr}=scopedGithub(['apps/web/page.tsx']);const outputs={},core={setOutput:(k,v)=>outputs[k]=v,summary:{addRaw(){return this;},async write(){}}};
- await resolveCandidate(github,{repo:{},issue:{number:9},payload:{pull_request:pr},runId:1},core,'full');assert.equal(outputs.eligible,'false');assert.equal(outputs.merge,undefined);
+ await resolveCandidate(github,{repo:{},issue:{number:9},payload:{pull_request:pr},runId:1,sha:'M'},core,'full');assert.equal(outputs.eligible,'false');assert.equal(outputs.merge,undefined);
  assert.equal((await verifyMerged(github,{repo:{},sha:'M'},core)).kind,'frontend');assert.equal(outputs.kind,'frontend');
  github.rest.git.getCommit=async()=>({data:{sha:'M',tree:{sha:'T'},parents:[{sha:'X'},{sha:'H'}]}});
  await assert.rejects(verifyMerged(github,{repo:{},sha:'M'},core),/parents/);
@@ -642,12 +642,13 @@ test('previous delivery receipts require a trusted main run and executed same-at
  const v={run,jobs};assert(trustedDeliveryRun(run,jobs,'SXQHex/FtkSaaS'));
  for(const mutate of [v=>v.run.event='pull_request',v=>v.run.head_repository.full_name='fork/FtkSaaS',v=>v.run.repository.full_name='fork/FtkSaaS',v=>v.run.head_branch='feature',v=>v.jobs[0].conclusion='skipped',v=>v.jobs[0].run_attempt=1,v=>v.jobs[0].head_sha='other',v=>v.jobs[0].steps[0].conclusion='skipped',v=>v.jobs.push(structuredClone(v.jobs[0]))]){const x=structuredClone(v);mutate(x);assert(!trustedDeliveryRun(x.run,x.jobs,'SXQHex/FtkSaaS'));}
 });
-function candidateProofFixture(dir,{kind='full'}={}){
+function candidateProofFixture(dir,{kind='full',rerun=false}={}){
  const v=valid(),pr={...v.pr,state:'closed',draft:false,merged_at:'now',merge_commit_sha:'A',labels:[]};
+ if(rerun){v.run.run_attempt=2;v.binding={...v.binding,profile:'four-isolated-v2',attempt:2,source_attempt:1};v.jobs.forEach(j=>j.run_attempt=2);v.jobs[0].steps.push({name:'Upload schema baseline',conclusion:'success'});}
  if(kind==='documentation'){v.binding.kind=kind;v.jobs=[{...v.jobs[0],name:'documentation',steps:[{name:'Documentation acceptance',conclusion:'success'},{name:'Verify tested merge',conclusion:'success'}]}];}
  writeFileSync(join(dir,'binding.json'),JSON.stringify(v.binding));execFileSync('zip',['-q',join(dir,'proof.zip'),'binding.json'],{cwd:dir});const zip=fs.readFileSync(join(dir,'proof.zip'));
  const repo={owner:'synthetic',repo:'test'};
- const github={rest:{git:{getTree:async({tree_sha})=>({data:{tree:[{path:kind==='documentation'?'README.md':'apps/backend/database/kernel.sql',type:'blob',mode:'100644',sha:tree_sha}]}}),getBlob:async()=>({data:{encoding:'base64',content:Buffer.from('regular prose').toString('base64')}}),getCommit:async({commit_sha})=>({data:{...v.tested,sha:commit_sha,tree:{sha:commit_sha==='bad-tree'?'wrong':'T'}}})},repos:{listPullRequestsAssociatedWithCommit:'prs'},actions:{listWorkflowRuns:'runs',listJobsForWorkflowRun:'jobs',listWorkflowRunArtifacts:'artifacts',downloadArtifact:async()=>({data:zip})}},paginate:async(method,args)=>method==='prs'?[pr]:method==='runs'?[{...v.run,id:10,conclusion:'cancelled'},{...v.run,id:9},{...v.run,id:7},v.run]:method==='jobs'?v.jobs.map(j=>({...j,run_id:args.run_id})):args.run_id===9?[]:[{id:1,name:(kind==='documentation'?'document-binding-':'candidate-binding-')+'1'}]};
+ const github={rest:{git:{getTree:async({tree_sha})=>({data:{tree:[{path:kind==='documentation'?'README.md':'apps/backend/database/kernel.sql',type:'blob',mode:'100644',sha:tree_sha}]}}),getBlob:async()=>({data:{encoding:'base64',content:Buffer.from('regular prose').toString('base64')}}),getCommit:async({commit_sha})=>({data:{...v.tested,sha:commit_sha,tree:{sha:commit_sha==='bad-tree'?'wrong':'T'}}})},repos:{listPullRequestsAssociatedWithCommit:'prs'},actions:{getWorkflowRun:async({run_id})=>({data:{...v.run,id:run_id}}),listWorkflowRuns:'runs',listJobsForWorkflowRun:'jobs',listWorkflowRunArtifacts:'artifacts',downloadArtifact:async()=>({data:zip})}},paginate:async(method,args)=>method==='prs'?[pr]:method==='runs'?[{...v.run,id:10,conclusion:'cancelled'},{...v.run,id:9},{...v.run,id:7},v.run]:method==='jobs'?v.jobs.map(j=>({...j,run_id:args.run_id})):args.run_id===9?[]:[{id:1,name:(kind==='documentation'?'document-binding-':'candidate-binding-')+v.run.run_attempt}]};
  return {v,pr,repo,github};
 }
 test('cancelled incomplete and stale successful runs cannot shadow valid source-bound full or documentation evidence',async()=>{
@@ -663,12 +664,13 @@ test('cancelled incomplete and stale successful runs cannot shadow valid source-
 });
 
 test('proof-only main authorizes CD only after candidate jobs are independently revalidated',async()=>{
+ for(const rerun of [false,true]){
  const dir=mkdtempSync(join(tmpdir(),'ci-main-proof-'));
  try{
-  const f=candidateProofFixture(dir),sha='a'.repeat(40),repository='synthetic/test';f.pr.merge_commit_sha=sha;
-  const main={...f.v.run,id:20,path:'.github/workflows/backend.yml',event:'push',head_branch:'main',head_sha:sha,repository:{full_name:repository},head_repository:{full_name:repository}};
+  const f=candidateProofFixture(dir,{rerun}),sha='a'.repeat(40),repository='synthetic/test';f.pr.merge_commit_sha=sha;
+  const main={...f.v.run,id:20,run_attempt:1,path:'.github/workflows/backend.yml',event:'push',head_branch:'main',head_sha:sha,repository:{full_name:repository},head_repository:{full_name:repository}};
   const mainJobs=['source','acceptance'].map(name=>({name,run_id:20,run_attempt:1,head_sha:sha,status:'completed',conclusion:'success',steps:name==='acceptance'?[{name:'Main acceptance proof',conclusion:'success'}]:[]}));
-  f.github.rest.actions.getWorkflowRun=async()=>({data:main});f.github.rest.git.getRef=async()=>({data:{object:{sha}}});
+  f.github.rest.actions.getWorkflowRun=async({run_id})=>({data:run_id===20?main:f.v.run});f.github.rest.git.getRef=async()=>({data:{object:{sha}}});
   const original=f.github.paginate;let broken=false;
   f.github.paginate=async(method,args)=>{
    if(method==='jobs'&&args.run_id===20)return mainJobs;
@@ -680,6 +682,7 @@ test('proof-only main authorizes CD only after candidate jobs are independently 
   broken=true;await assert.rejects(revalidateDeployment(f.github,f.repo,proof),/job/);
   const cd=fs.readFileSync('.github/workflows/cd-development.yml','utf8');assert(cd.includes('pull-requests: read'));assert(!cd.includes('statuses: write'));assert(!cd.includes('contents: write'));
  }finally{rmSync(dir,{recursive:true,force:true});}
+ }
 });
 test('measurement maintenance accepts actual PR clean logs but rejects proof-only main as test evidence',()=>{
  const input=measuredMainBundle();input.run={...input.run,name:'PR #78 · exact-head',path:'.github/workflows/ci-full.yml',event:'pull_request',head_branch:'candidate'};
@@ -688,7 +691,7 @@ test('measurement maintenance accepts actual PR clean logs but rejects proof-onl
 });
 test('automatic candidate tests Draft source, binds the live main base and rejects retarget or moved head',async()=>{
  for(const [paths,kind] of [[['apps/backend/database/kernel.sql'],'full'],[['README.md'],'documentation']]){
-  const {github,pr}=scopedGithub(paths);pr.draft=true;const out={},context={repo:{},issue:{number:9},payload:{pull_request:structuredClone(pr)},runId:8};
+  const {github,pr}=scopedGithub(paths);pr.draft=true;const out={},context={repo:{},issue:{number:9},payload:{pull_request:structuredClone(pr)},runId:8,sha:'M'};
   await resolveCandidate(github,context,{setOutput:(k,v)=>out[k]=v},'auto');assert.equal(out.kind,kind);assert.equal(out.merge,'M');assert.throws(()=>assertReady(pr));
   pr.base.ref='feature';await assert.rejects(resolveCandidate(github,context,{setOutput(){}},'auto'),/target main/);
   pr.base.ref='main';pr.head.sha='moved';await assert.rejects(resolveCandidate(github,context,{setOutput(){}},'auto'),/Candidate changed/);
@@ -725,15 +728,17 @@ test('collector publishes functional proof despite imbalance or unavailable timi
  try{
   for(const unavailable of [false,true]){
    const v=jobsWithApiSeconds([1154,1239,1488,1629]),warnings=[];
+   v.binding.profile='four-isolated-v2';v.jobs[0].steps.push({name:'Upload schema baseline',conclusion:'success'});
+   const context={repo:{},runId:5,sha:'M',payload:{pull_request:v.pr}};
    if(unavailable)delete v.jobs[1].steps[0].started_at;
    const github={rest:{actions:{getWorkflowRun:async()=>({data:{...v.run,created_at:'2026-01-01T00:00:00Z'}}),listJobsForWorkflowRunAttempt:'jobs'}},paginate:async()=>v.jobs};
    const core={warning:s=>warnings.push(s),summary:{addRaw(){return this;},async write(){}}};
-   await collect(github,{repo:{},runId:5},core,v.binding);
+   await collect(github,context,core,v.binding);
    assert.equal(JSON.parse(fs.readFileSync(file)).head,'H');assert.equal(warnings.length,1);
    const report=JSON.parse(fs.readFileSync(reportFile));assert.equal(report.balance.balanced,unavailable?null:false);
    if(unavailable)assert.equal(report.balance.status,'unavailable');
-   v.jobs[1].conclusion='failure';await assert.rejects(collect(github,{repo:{},runId:5},core,v.binding),/Failed/);assert(!fs.existsSync(file));
-   v.jobs[1].conclusion='success';v.binding.attempt=2;await assert.rejects(collect(github,{repo:{},runId:5},core,v.binding),/mismatch/);assert(!fs.existsSync(file));
+   v.jobs[1].conclusion='failure';await assert.rejects(collect(github,context,core,v.binding),/Failed/);assert(!fs.existsSync(file));
+   v.jobs[1].conclusion='success';v.binding.attempt=2;await assert.rejects(collect(github,context,core,v.binding),/mismatch/);assert(!fs.existsSync(file));
   }
  }finally{
   if(previous===undefined)delete process.env.GITHUB_RUN_ATTEMPT;else process.env.GITHUB_RUN_ATTEMPT=previous;
@@ -825,4 +830,101 @@ test('workflow prose cannot recommend an operation absent from the machine contr
  // A removed operation is still cited by the guide: prose validation must reject it before mapping/coverage.
  contract['x-contract'].operations=contract['x-contract'].operations.filter(o=>o.name!=='preview_get_v1');
  assert.throws(()=>validateWorkflows(manifest,contract,root),/UNKNOWN_WORKFLOW_API preview_get_v1/);
+});
+
+
+const rerunFixture=()=>{
+ const binding={kind:'full',profile:'four-isolated-v2',coverage:coverageHash(),pr:9,head:'H',base:'B',merge:'M',tree:'T',run_id:5,attempt:1,benchmark:false};
+ const pr={number:9,state:'open',draft:false,head:{sha:'H'},base:{sha:'B',ref:'main'}};
+ const run={id:5,run_attempt:2,head_sha:'H',event:'pull_request',path:'.github/workflows/ci-full.yml',status:'in_progress',created_at:'2026-01-01T00:00:00Z'};
+ // GitHub's attempt view carries retained successes under the current attempt
+ // and new job IDs, while preserving their original execution timestamps.
+ const jobs=['core','api-1','api-2','api-3','api-4'].map((name,i)=>({id:100+i,name:'clean / '+name,run_id:5,run_attempt:2,head_sha:'H',status:'completed',conclusion:'success',created_at:run.created_at,started_at:'2026-01-01T00:00:01Z',completed_at:'2026-01-01T00:02:00Z',steps:[{name:'Verify tested merge',conclusion:'success'},{name:'Clean acceptance',conclusion:'success',started_at:'2026-01-01T00:00:02Z',completed_at:'2026-01-01T00:01:02Z'}]}));
+ jobs[0].steps.push({name:'Upload schema baseline',conclusion:'success'});
+ const context={repo:{},runId:5,sha:'M',payload:{pull_request:structuredClone(pr)}};
+ const github={rest:{actions:{getWorkflowRun:async()=>({data:run}),listJobsForWorkflowRunAttempt:'attempt-jobs'}},paginate:async(method,args)=>{assert.equal(method,'attempt-jobs');assert.equal(args.attempt_number,2);return jobs;}};
+ const core={warning(){},summary:{addRaw(){return this;},async write(){}}};
+ return{binding,pr,run,jobs,context,github,core};
+};
+
+async function collectorFiles(fn){
+ const files=['binding.json','measurements.json'].map(name=>ciFile(name)),previous=process.env.GITHUB_RUN_ATTEMPT;
+ const saved=files.map(p=>fs.existsSync(p)?fs.readFileSync(p):null);
+ process.env.GITHUB_RUN_ATTEMPT='2';
+ try{await fn();}finally{
+  if(previous===undefined)delete process.env.GITHUB_RUN_ATTEMPT;else process.env.GITHUB_RUN_ATTEMPT=previous;
+  files.forEach((p,i)=>{if(saved[i]===null)fs.rmSync(p,{force:true});else fs.writeFileSync(p,saved[i]);});
+ }
+}
+
+test('failed-job rerun accepts GitHub retained successes on the exact original source',async()=>collectorFiles(async()=>{
+ const f=rerunFixture();await collect(f.github,f.context,f.core,f.binding);
+ const binding=JSON.parse(fs.readFileSync(ciFile('binding.json')));
+ assert.equal(binding.attempt,2);assert.equal(binding.source_attempt,1);assert.equal(binding.merge,'M');assert.equal(binding.profile,'four-isolated-v2');
+ const collector={id:200,name:'clean / full-clean',status:'completed',conclusion:'success',run_id:5,run_attempt:2,head_sha:'H',steps:[{name:'Verify all required jobs',conclusion:'success'}]};
+ assert(validateBinding({binding,pr:f.pr,run:{...f.run,status:'completed',conclusion:'success'},jobs:[...f.jobs,collector],tested:{sha:'M',tree:{sha:'T'},parents:[{sha:'B'},{sha:'H'}]},currentTree:'T',workflowMatches:true}));
+}));
+
+test('rerun cannot borrow another source, run, future attempt or missing acceptance',async()=>collectorFiles(async()=>{
+ for(const mutate of [
+  f=>f.binding.run_id=6,f=>f.binding.head='other',f=>f.binding.base='other',f=>f.binding.pr=10,f=>f.binding.merge='other',f=>f.binding.coverage='other',f=>f.binding.attempt=3,f=>f.binding.attempt=0,f=>f.run.run_attempt=3,f=>f.run.event='push',f=>f.run.path='.github/workflows/other.yml',
+  f=>f.jobs[1].conclusion='failure',f=>f.jobs[1].conclusion='cancelled',f=>f.jobs[1].conclusion='skipped',f=>f.jobs[1].run_id=6,f=>f.jobs[1].head_sha='other',f=>f.jobs[1].run_attempt=1,f=>f.jobs[1].steps[0].conclusion='skipped',f=>f.jobs[1].steps[1].conclusion='skipped',f=>f.jobs[0].steps[2].conclusion='skipped',f=>f.jobs.splice(1,1),f=>f.jobs.push(structuredClone(f.jobs[1]))
+ ]){
+  const f=rerunFixture();mutate(f);await assert.rejects(collect(f.github,f.context,f.core,f.binding));assert(!fs.existsSync(ciFile('binding.json')));
+ }
+}));
+
+test('a newer failed execution cannot be replaced by an older success or collector-only rerun',async()=>collectorFiles(async()=>{
+ const f=rerunFixture();f.jobs[1].conclusion='failure';
+ await assert.rejects(collect(f.github,f.context,f.core,f.binding),/Failed/);
+ const older={...f.jobs[1],id:50,run_attempt:1,conclusion:'success'};f.jobs.push(older);
+ await assert.rejects(collect(f.github,f.context,f.core,f.binding),/duplicate/);
+}));
+
+test('candidate resolution stays on the original event merge even if the merge ref is regenerated',async()=>{
+ const f=rerunFixture(),outputs={};
+ f.context.issue={number:9};
+ f.github.rest.pulls={get:async()=>({data:f.pr})};
+ f.github.rest.git={getRef:async()=>{throw Error('Mutable merge ref must not be read');},getCommit:async({commit_sha})=>{assert.equal(commit_sha,'M');return{data:{sha:'M',tree:{sha:'T'},parents:[{sha:'B'},{sha:'H'}]}};},getTree:async({tree_sha})=>({data:{tree:[{type:'blob',mode:'100644',path:'apps/backend/database/kernel.sql',sha:tree_sha}]}})};
+ await resolveCandidate(f.github,f.context,{setOutput:(k,v)=>outputs[k]=v},'auto');assert.equal(outputs.merge,'M');
+ f.pr.base.sha='new-main';await assert.rejects(resolveCandidate(f.github,f.context,{setOutput(){}},'auto'),/base/);
+});
+
+test('retained core baseline is run scoped; historical accepted receipts keep their original name',()=>{
+ assert.equal(schemaBaselineName({profile:'four-isolated-v2',attempt:7,source_attempt:3}),'documentation-baseline');
+ assert.equal(schemaBaselineName({profile:'four-isolated-v1',attempt:3}),'documentation-baseline-3');
+ assert.throws(()=>schemaBaselineName({profile:'unknown'}));
+});
+
+test('documentation failed-job rerun records the accepting attempt on the original source',async()=>collectorFiles(async()=>{
+ const f=rerunFixture(),binding={...f.binding,kind:'documentation'};
+ const accepted=currentAttemptBinding(binding,f.context);
+ assert.equal(accepted.attempt,2);assert.equal(accepted.source_attempt,1);assert.equal(accepted.merge,binding.merge);
+}));
+
+test('collector rejects a new attempt starting while job evidence is being read',async()=>collectorFiles(async()=>{
+ const f=rerunFixture();let reads=0;
+ f.github.rest.actions.getWorkflowRun=async()=>({data:{...f.run,run_attempt:++reads===1?2:3}});
+ await assert.rejects(collect(f.github,f.context,f.core,f.binding),/changed during collection/);
+ assert(!fs.existsSync(ciFile('binding.json')));
+}));
+
+test('merge proof rechecks current attempt and success after downloading evidence',async()=>{
+ for(const change of [{run_attempt:2},{status:'in_progress',conclusion:null},{conclusion:'failure'}]){
+  const dir=mkdtempSync(join(tmpdir(),'ci-rerun-race-'));
+  try{
+   const f=candidateProofFixture(dir);f.github.rest.actions.getWorkflowRun=async()=>({data:{...f.v.run,...change}});
+   await assert.rejects(findCandidateProof(f.github,f.repo,f.pr,'full','T','B'),/changed during proof/);
+  }finally{rmSync(dir,{recursive:true,force:true});}
+ }
+});
+
+test('v2 merge proof retains source and upload obligations for inherited jobs',()=>{
+ const f=rerunFixture(),binding={...f.binding,attempt:2,source_attempt:1};
+ const collector={name:'clean / full-clean',status:'completed',conclusion:'success',run_id:5,run_attempt:2,head_sha:'H',steps:[{name:'Verify all required jobs',conclusion:'success'}]};
+ const v={binding,pr:f.pr,run:{...f.run,status:'completed',conclusion:'success'},jobs:[...f.jobs,collector],tested:{sha:'M',tree:{sha:'T'},parents:[{sha:'B'},{sha:'H'}]},currentTree:'T',workflowMatches:true};
+ assert(validateBinding(v));
+ for(const mutate of [x=>x.binding.source_attempt=0,x=>x.binding.source_attempt=3,x=>delete x.binding.source_attempt,x=>x.binding.tree='other',x=>x.binding.coverage='other',x=>x.pr.base.sha='other',x=>x.jobs[0].conclusion='failure',x=>x.jobs[0].steps[2].conclusion='failure',x=>x.jobs[0].steps.push(structuredClone(x.jobs[0].steps[0])),x=>x.jobs[1].steps[0].conclusion='skipped']){
+  const x=structuredClone(v);mutate(x);assert.throws(()=>validateBinding(x));
+ }
 });

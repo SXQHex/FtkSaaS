@@ -67,7 +67,11 @@ export async function resolveCandidate(github,context,core,kind){
  if(kind==='auto'){if(p.state!=='open')throw Error('Closed PR cannot be tested');}else assertReady(p);
  if(p.base.ref!=='main')throw Error('Candidate must target main');
  if(p.head.sha!==context.payload.pull_request.head.sha)throw Error('Candidate changed');
- const merge=(await github.rest.git.getRef({...context.repo,ref:`pull/${p.number}/merge`})).data.object.sha;
+ // Re-runs retain the original event SHA. Never re-resolve the mutable PR ref:
+ // otherwise successful retained jobs could describe a different merge tree.
+ if(p.base.sha!==context.payload.pull_request.base.sha)throw Error('Candidate base changed; start a new run');
+ const merge=context.sha;
+ if(!merge)throw Error('Missing original event merge SHA');
  const commit=(await github.rest.git.getCommit({...context.repo,commit_sha:merge})).data;
  assertParents(commit,p.base.sha,p.head.sha);
  const sourceScope=await remoteSourceScope(github,context.repo,p.base.sha,p.head.sha);
@@ -77,8 +81,13 @@ export async function resolveCandidate(github,context,core,kind){
  const scope={safe:sourceScope.kind==='documentation'};
  if(kind==='full'&&scope.safe)throw Error('Documentation-only source uses documentation acceptance, not full clean');
  if(kind==='documentation'&&!scope.safe){core.setOutput('eligible','false');return;}
- const binding={kind,coverage:kind==='full'?coverageHash():undefined,pr:p.number,head:p.head.sha,base:p.base.sha,merge,tree:commit.tree.sha,run_id:context.runId,attempt:Number(process.env.GITHUB_RUN_ATTEMPT),benchmark:false};
+ const binding={kind,profile:kind==='full'?'four-isolated-v2':undefined,coverage:kind==='full'?coverageHash():undefined,pr:p.number,head:p.head.sha,base:p.base.sha,merge,tree:commit.tree.sha,run_id:context.runId,attempt:Number(process.env.GITHUB_RUN_ATTEMPT),benchmark:false};
  core.setOutput('eligible','true');core.setOutput('merge',merge);core.setOutput('binding',JSON.stringify(binding));
+}
+export function currentAttemptBinding(binding,context){
+ const attempt=Number(process.env.GITHUB_RUN_ATTEMPT),pr=context.payload?.pull_request;
+ if(!Number.isSafeInteger(attempt)||attempt<1||!Number.isSafeInteger(binding.attempt)||binding.attempt<1||binding.attempt>attempt||binding.run_id!==context.runId||!context.sha||binding.merge!==context.sha||!pr||binding.pr!==pr.number||binding.head!==pr.head.sha||binding.base!==pr.base.sha)throw Error('Collector source/run/attempt mismatch');
+ return {...binding,source_attempt:binding.attempt,attempt};
 }
 export async function resolveMerged(github,context){
  const prs=await github.paginate(github.rest.repos.listPullRequestsAssociatedWithCommit,{...context.repo,commit_sha:context.sha,per_page:100});
