@@ -2,6 +2,7 @@ import test,{resources} from './p07-diagnostics.mjs';
 import assert from 'node:assert/strict';
 import {build} from 'esbuild';
 import {authUser,must,call,context} from './api-client.mjs';
+import {timedFetch} from './request-diagnostics.mjs';
 import {newUuidV7 as id} from '../scripts/uuid.mjs';
 import {signPublicRequest} from '../scripts/p04-public-ingress.mjs';
 const compiled=await build({entryPoints:['supabase/functions/backend-v1/account-signup.ts'],bundle:true,platform:'browser',format:'esm',write:false});
@@ -11,16 +12,16 @@ test('XREQ-001: email-only check covers primary, linked Google, unconfirmed and 
  const cfg={FTK_PUBLIC_INGRESS_SECRET:'synthetic-local-signup-ingress-secret-32',FTK_PUBLIC_HASH_SECRET:'synthetic-local-signup-hash-secret-32'};
  const path='/functions/v1/backend-v1/account_signup_check_v1',email=()=>`signup-${id()}@ftksaas.invalid`;
  const rpc=async(request,aux)=>{
-  const res=await fetch(env.API_URL+'/rest/v1/rpc/account_signup_check_v1',{method:'POST',headers:{authorization:'Bearer '+env.SERVICE_ROLE_KEY,apikey:env.SERVICE_ROLE_KEY,'Content-Profile':'api_v1','content-type':'application/json'},body:JSON.stringify({p_request:request,p_actor_auth_id:null,p_session_id:null,p_ids:[id()],p_aux:aux}),signal:AbortSignal.timeout(15000)});
+  const res=await timedFetch('signup.check_rpc',env.API_URL+'/rest/v1/rpc/account_signup_check_v1',{method:'POST',headers:{authorization:'Bearer '+env.SERVICE_ROLE_KEY,apikey:env.SERVICE_ROLE_KEY,'Content-Profile':'api_v1','content-type':'application/json'},body:JSON.stringify({p_request:request,p_actor_auth_id:null,p_session_id:null,p_ids:[id()],p_aux:aux}),signal:AbortSignal.timeout(15000)});
   assert.equal(res.status,200);return res.json();
  };
  const check=address=>{const request={client_api_version:1,request_id:id(),email:address},body=JSON.stringify(request);return accountSignupCheck(new Request(env.API_URL+path,{method:'POST',body,headers:signPublicRequest(body,'192.0.2.89',cfg.FTK_PUBLIC_INGRESS_SECRET,path)}),body,request,k=>cfg[k],rpc);};
- const messages=async address=>{const res=await fetch(env.MAILPIT_URL+'/api/v1/messages?limit=1000');assert(res.ok);return (await res.json()).messages.filter(m=>m.To.some(x=>x.Address.toLowerCase()===address.toLowerCase())).map(x=>x.ID).sort();};
+ const messages=async address=>{const res=await timedFetch('signup.mailbox',env.MAILPIT_URL+'/api/v1/messages?limit=1000');assert(res.ok);return (await res.json()).messages.filter(m=>m.To.some(x=>x.Address.toLowerCase()===address.toLowerCase())).map(x=>x.ID).sort();};
  const state=async address=>(await db.query('select id,email,email_confirmed_at,confirmation_sent_at from auth.users where lower(email)=$1 order by id',[address.toLowerCase()])).rows;
  const unchanged=async(address,status='account_exists')=>{const before=await state(address),mail=await messages(address);assert.deepEqual(await check(' '+address.toUpperCase()+' '),{data:{status}});assert.deepEqual(await state(address),before);assert.deepEqual(await messages(address),mail);};
- const signup=async address=>{const res=await fetch(env.API_URL+'/auth/v1/signup',{method:'POST',headers:{apikey:env.ANON_KEY,'content-type':'application/json'},body:JSON.stringify({email:address,password:'Synthetic-local-signup-password!42'})});assert.equal(res.status,200);return res.json();};
+ const signup=async address=>{const res=await timedFetch('signup.native',env.API_URL+'/auth/v1/signup',{method:'POST',headers:{apikey:env.ANON_KEY,'content-type':'application/json'},body:JSON.stringify({email:address,password:'Synthetic-local-signup-password!42'})});assert.equal(res.status,200);return res.json();};
  await t.test('lookup RPC remains private and unsigned public calls are rejected',async()=>{
-  for(const key of [env.ANON_KEY,(await authUser('signup-rpc-denied')).jwt]){const res=await fetch(env.API_URL+'/rest/v1/rpc/account_signup_check_v1',{method:'POST',headers:{authorization:'Bearer '+key,apikey:env.ANON_KEY,'Content-Profile':'api_v1','content-type':'application/json'},body:JSON.stringify({p_request:{email:email()},p_actor_auth_id:null,p_session_id:null,p_ids:[id()],p_aux:{}})});assert([401,403,404].includes(res.status));}
+  for(const key of [env.ANON_KEY,(await authUser('signup-rpc-denied')).jwt]){const res=await timedFetch('signup.rpc_denied',env.API_URL+'/rest/v1/rpc/account_signup_check_v1',{method:'POST',headers:{authorization:'Bearer '+key,apikey:env.ANON_KEY,'Content-Profile':'api_v1','content-type':'application/json'},body:JSON.stringify({p_request:{email:email()},p_actor_auth_id:null,p_session_id:null,p_ids:[id()],p_aux:{}})});await res.arrayBuffer();assert([401,403,404].includes(res.status));}
   const denied=await call({jwt:env.ANON_KEY},'account_signup_check_v1',{email:email()});assert.equal(denied.result.error.code,'TEMPORARY_FAILURE');
   const extra=await call({jwt:env.ANON_KEY},'account_signup_check_v1',{email:email(),password:'must-not-be-accepted'});assert.equal(extra.result.error.code,'VALIDATION_FAILED');
  });

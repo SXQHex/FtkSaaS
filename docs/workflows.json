@@ -253,8 +253,8 @@
         "management_state_get_v1"
       ],
       "review": {
-        "fingerprint": "efe396385a5946d6039ac9890f9405cda3abf4f8eaed00765e09d576eaa63b15",
-        "reason": "Final native-only kaynak: Auth adapterleri ve kullanılmayan proxy parola hatası kaldırıldı; mevcut uygulama güvenliği ve email-only ön kontrol incelendi."
+        "fingerprint": "7e8b29dc96f83168783b8df0b49a84051950b2e55156e9383992be1c19daf70f",
+        "reason": "PR102 main ile native Auth kaynağı birlikte incelendi: CI kaynak/deneme kabulü main ile birebir; ortak istemci protokolü ve güvenlik kapıları değişmiyor."
       }
     },
     {
@@ -330,8 +330,8 @@
         "account_signup_check_v1"
       ],
       "review": {
-        "fingerprint": "36b309c4f4e0b5ebfa79b93e5e0bfb3fe46429988c3d9b9b910cf3328ccb69b7",
-        "reason": "Native MFA negatif testi bağımsız AAL1 oturum kuruyor; güncel native oturum AAL şartı, korunan uygulama JWT kapıları ve frontend SDK geçiş eşlemesi kaynakta incelendi."
+        "fingerprint": "47587fd42bfcbacb726d587393ea2a30f6b50ce171b984fef9108af4c742aaf7",
+        "reason": "Native Auth rehberi ve kayıt kabul testi incelendi: mevcut HTTP timeout yardımcısı kullanılıyor, ret yanıtı tüketiliyor; account_exists, veri/posta yan etkisi ve yetki assertionları korunuyor."
       }
     },
     {
