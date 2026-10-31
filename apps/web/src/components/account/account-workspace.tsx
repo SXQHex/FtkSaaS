@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
@@ -18,9 +18,12 @@ export function AccountWorkspace({ authUserId }: { authUserId: string }) {
   const t = useTranslations("account");
   const common = useTranslations("common");
   const router = useRouter();
-  const [profile, setProfile] = useState<Awaited<ReturnType<typeof accountProfile>> | null>(null);
+  const [profile, setProfile] = useState<
+    (Awaited<ReturnType<typeof accountProfile>> & { readRevision: number }) | null
+  >(null);
   const [error, setError] = useState("");
   const [retry, setRetry] = useState(0);
+  const nextRead = useRef(0);
   useEffect(() => {
     let active = true;
     const { data } = browserClient().auth.onAuthStateChange((event, session) => {
@@ -34,14 +37,16 @@ export function AccountWorkspace({ authUserId }: { authUserId: string }) {
     void accountProfile()
       .then((result) => {
         if (active) {
-          setProfile(result);
+          setProfile({ ...result, readRevision: retry });
           setError("");
         }
       })
       .catch((cause) => {
         if (active) {
-          setProfile(null);
-          setError(accountError(cause));
+          const message = accountError(cause);
+          if (["AUTH_REQUIRED", "SESSION_REVOKED", "FORBIDDEN", "NOT_FOUND"].includes(message))
+            setProfile(null);
+          setError(message);
         }
       });
     return () => {
@@ -49,7 +54,11 @@ export function AccountWorkspace({ authUserId }: { authUserId: string }) {
       data.subscription.unsubscribe();
     };
   }, [retry, router, authUserId]);
-  const saved = () => setRetry((n) => n + 1);
+  const saved = () => {
+    nextRead.current += 1;
+    setRetry(nextRead.current);
+    return nextRead.current;
+  };
   return (
     <main
       id="main-content"
@@ -81,9 +90,9 @@ export function AccountWorkspace({ authUserId }: { authUserId: string }) {
       {profile && (
         <div key={profile.account.id} className="space-y-10 divide-y [&>section]:pb-8">
           <ProfileForm
-            key={`profile:${profile.version}`}
             account={profile.account}
             version={profile.version}
+            readRevision={profile.readRevision}
             onSaved={saved}
           />
           <IdentityForm account={profile.account} onSaved={saved} />

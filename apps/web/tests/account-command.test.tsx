@@ -12,7 +12,7 @@ import {
 import { ApiFailure } from "../src/lib/api";
 const mocks = vi.hoisted(() => ({
   call: vi.fn<(operation: string, input: Record<string, unknown>) => Promise<unknown>>(),
-  saved: vi.fn<() => void>(),
+  saved: vi.fn<() => number>(() => 1),
   signOut: vi.fn<() => Promise<{ error: null }>>(),
 }));
 vi.mock("../src/lib/account", async (load) => ({
@@ -33,7 +33,9 @@ test("profile uncertainty survives remount and retries the exact saved payload a
     .mockRejectedValueOnce(new Error("lost response"))
     .mockResolvedValueOnce({ primary_id: actor });
   const user = userEvent.setup();
-  const view = render(<ProfileForm account={profile} version={7} onSaved={mocks.saved} />);
+  const view = render(
+    <ProfileForm readRevision={0} account={profile} version={7} onSaved={mocks.saved} />,
+  );
   await user.clear(screen.getByLabelText("Görünen ad"));
   await user.type(screen.getByLabelText("Görünen ad"), "Updated Person");
   await user.click(screen.getByRole("button", { name: "Profili kaydet" }));
@@ -45,7 +47,7 @@ test("profile uncertainty survives remount and retries the exact saved payload a
   expect(screen.getByLabelText("Görünen ad")).toBeDisabled();
   const original = mocks.call.mock.calls[0];
   view.unmount();
-  render(<ProfileForm account={profile} version={9} onSaved={mocks.saved} />);
+  render(<ProfileForm readRevision={0} account={profile} version={9} onSaved={mocks.saved} />);
   await user.click(screen.getByRole("button", { name: "Aynı işlemi yeniden gönder" }));
   expect(mocks.call.mock.calls[1]).toEqual(original);
   expect(mocks.call.mock.calls[1][1].expected_version).toBe(7);
@@ -55,7 +57,7 @@ test("profile uncertainty survives remount and retries the exact saved payload a
 test("later forbidden or NOT_FOUND does not discard an uncertain mutation", async () => {
   mocks.call.mockRejectedValueOnce(new Error("lost"));
   const user = userEvent.setup();
-  render(<ProfileForm account={profile} version={1} onSaved={mocks.saved} />);
+  render(<ProfileForm readRevision={0} account={profile} version={1} onSaved={mocks.saved} />);
   await user.click(screen.getByRole("button", { name: "Profili kaydet" }));
   await screen.findByText(/Sonuç belirsiz/);
   mocks.call.mockRejectedValue(
@@ -75,11 +77,13 @@ test("expired result disables replay across remounts even after NOT_FOUND", asyn
     }),
   );
   const user = userEvent.setup();
-  const view = render(<ProfileForm account={profile} version={1} onSaved={mocks.saved} />);
+  const view = render(
+    <ProfileForm readRevision={0} account={profile} version={1} onSaved={mocks.saved} />,
+  );
   await user.click(screen.getByRole("button", { name: "Profili kaydet" }));
   await screen.findByText(/Sonuç belirsiz/);
   view.unmount();
-  render(<ProfileForm account={profile} version={1} onSaved={mocks.saved} />);
+  render(<ProfileForm readRevision={0} account={profile} version={1} onSaved={mocks.saved} />);
   expect(
     screen.queryByRole("button", { name: "Aynı işlemi yeniden gönder" }),
   ).not.toBeInTheDocument();
@@ -91,7 +95,7 @@ test("storage failure prevents sending a new profile mutation", async () => {
   });
   try {
     const user = userEvent.setup();
-    render(<ProfileForm account={profile} version={1} onSaved={mocks.saved} />);
+    render(<ProfileForm readRevision={0} account={profile} version={1} onSaved={mocks.saved} />);
     await user.click(screen.getByRole("button", { name: "Profili kaydet" }));
     expect(mocks.call).not.toHaveBeenCalled();
     expect(await screen.findByRole("alert")).toHaveTextContent("Güvenli işlem takibi");

@@ -40,7 +40,7 @@ const mocks = vi.hoisted(() => ({
   refresh: vi.fn<() => Promise<{ error: Error | null }>>(),
   unenroll: vi.fn<() => Promise<{ error: null }>>(),
   verify: vi.fn<() => Promise<{ error: Error | null }>>(),
-  saved: vi.fn<() => void>(),
+  saved: vi.fn<() => number>(() => 1),
   remember: vi.fn<() => Promise<void>>(),
 }));
 vi.mock("../src/lib/account", async (load) => ({
@@ -426,6 +426,7 @@ test("password mismatch belongs to the confirmation field", async () => {
 function renderProfilePhone() {
   render(
     <ProfileForm
+      readRevision={0}
       account={{
         id: actor,
         state: "active",

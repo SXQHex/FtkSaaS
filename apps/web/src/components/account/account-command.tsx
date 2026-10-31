@@ -114,7 +114,7 @@ export function recoverAccountCommand(actor: string, slot: string): Pending | "i
 export function useAccountCommand(
   actor: string,
   slot: string,
-  onCommitted: () => void,
+  onCommitted: (command: AccountCommand) => void,
   nativeUserId?: string,
 ) {
   const [pending, setPending] = useState(() => recoverAccountCommand(actor, slot));
@@ -177,7 +177,7 @@ export function useAccountCommand(
       }
       clear();
       setMessage("saved");
-      onCommitted();
+      onCommitted(saved.command);
       if (currentRevoked) {
         try {
           const result = await browserClient().auth.signOut({ scope: "local" });
@@ -248,7 +248,7 @@ export function useAccountCommand(
           );
         clear();
         setMessage("saved");
-        onCommitted();
+        onCommitted(pending.command);
         if (
           pending.command.operation === "account_sessions_revoke_v1" &&
           pending.command.input.mode === "current"
@@ -281,15 +281,19 @@ export function useAccountCommand(
 export function CommandFeedback({
   command,
   sensitive = false,
+  successMessage = "saved",
 }: {
   command: ReturnType<typeof useAccountCommand>;
   sensitive?: boolean;
+  successMessage?: string;
 }) {
   const t = useTranslations("account");
   return (
     <div className="space-y-3">
       {command.message && (
-        <p role={command.message === "saved" ? "status" : "alert"}>{t(command.message)}</p>
+        <p role={command.message === "saved" ? "status" : "alert"}>
+          {t(command.message === "saved" ? successMessage : command.message)}
+        </p>
       )}
       {command.pending && (
         <div className="space-y-3 rounded-lg border p-4 text-sm">
