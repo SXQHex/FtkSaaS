@@ -255,7 +255,7 @@
       ],
       "review": {
         "fingerprint": "8c43aa0f9b469570009c64f527ebb2e799857360ba870ecad4e41c2a89a789ef",
-        "reason": "Pinned Auth paketinin shell exec yapısı ve dar süreç seçimi incelendi; local DB/SMTP, tek süreç ve CI güvenlik kapıları değişmedi."
+        "reason": "Native Auth 2.197.0 tel hata kodu current_password_invalid olarak doğrulandı; HTTP 400 ve mevcut parola/nonce zorunlulukları korunuyor."
       }
     },
     {
@@ -335,8 +335,8 @@
         "account_signup_request_v1"
       ],
       "review": {
-        "fingerprint": "d9409a8c67ae1dc9fca46fb46e336532bf33db12e22a1830cd07aa90d97ec64a",
-        "reason": "Gerçek auth-v2.197.0-r0 arşivinde .auth-wrapped doğrulandı; wrapper regresyonu eski seçicide aynı hatayı üretiyor, mevcut parola ve nonce kabul assertionları korunuyor."
+        "fingerprint": "df20c994d5cdbcefcf06c035f5b79cf48e9e9e0347355813bafe4de2cb267b77",
+        "reason": "İlk parola fixtureı normal taze session ve tek sentetik kullanıcıda NULL parola önkoşulunu doğruluyor; yeni magiclinkin rastgele parolalı signup üretmesi native kaynakla teyit edildi; recovery exception ve sonraki current-password zorunluluğu ayrıldı."
       }
     },
     {

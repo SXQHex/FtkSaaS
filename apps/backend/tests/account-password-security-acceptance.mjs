@@ -50,7 +50,7 @@ test('XREQ-002: native current password, reauthentication, security mail and rec
  };
  await t.test('missing and wrong current passwords fail even in a fresh session without changing credentials or sending mail',async()=>{
   const user=await authUser('password-rejected'),before=await messageIds(user.email),next=password();
-  for(const current of [undefined,'',password()]){const rejected=await change(user,next,current);assert.equal(rejected.status,400);assert.equal(rejected.data.error_code,current?'current_password_mismatch':'current_password_required');}
+  for(const current of [undefined,'',password()]){const rejected=await change(user,next,current);assert.equal(rejected.status,400);assert.equal(rejected.data.error_code,current?'current_password_invalid':'current_password_required');}
   assert.deepEqual(await messageIds(user.email),before);await login(user);
   assert.equal((await native('/token?grant_type=password','POST',{email:user.email,password:next})).status,400);
  });
@@ -94,7 +94,7 @@ test('XREQ-002: native current password, reauthentication, security mail and rec
    const user=await authUser('password-reauth-current'),next=password();
    await db.query("update auth.sessions set created_at=now()-interval '25 hours' where id=$1",[user.session_id]);
    const nonce=await reauthenticate(user),rejected=await change(user,next,current,nonce);
-   assert.equal(rejected.status,400);assert.equal(rejected.data.error_code,current?'current_password_mismatch':'current_password_required');
+   assert.equal(rejected.status,400);assert.equal(rejected.data.error_code,current?'current_password_invalid':'current_password_required');
    assert.equal((await messages(user.email)).filter(m=>m.Subject===policy.mailer_subjects_password_changed_notification).length,0);
    await login(user);assert.equal((await native('/token?grant_type=password','POST',{email:user.email,password:next})).status,400);
   }
@@ -122,10 +122,19 @@ test('XREQ-002: native current password, reauthentication, security mail and rec
   assert.equal((await verify(newest)).status,403);await login(user);
  });
  await t.test('first password remains possible when no prior password exists',async()=>{
-  // Native passwordless account fixture; this is not a claim of real Google OAuth acceptance.
-  const email='password-first-'+id()+'@ftksaas.invalid';
-  const generated=await native('/admin/generate_link','POST',{type:'magiclink',email},env.SERVICE_ROLE_KEY);assert.equal(generated.status,200);
-  const verified=await native('/verify','POST',{type:'magiclink',token_hash:generated.data.hashed_token});assert.equal(verified.status,200);
-  const next=password();assert.equal((await change({jwt:verified.data.access_token},next)).status,200);await login({email,password:next});
+  // Isolated synthetic state, not real OAuth acceptance. generate_link(magiclink)
+  // for a new address creates a signup with a random password, not a passwordless user.
+  const user=await authUser('password-first'),next=password();
+  const claims=JSON.parse(Buffer.from(user.jwt.split('.')[1],'base64url'));
+  assert(claims.amr.some(entry=>entry.method==='password'));assert(!claims.amr.some(entry=>entry.method==='recovery'));
+  const session=await db.query("select created_at>now()-interval '24 hours' as fresh from auth.sessions where id=$1 and user_id=$2",[user.session_id,user.id]);
+  assert.equal(session.rowCount,1);assert.equal(session.rows[0].fresh,true);
+  const prepared=await db.query('update auth.users set encrypted_password=null where id=$1 returning encrypted_password is null as passwordless',[user.id]);
+  assert.equal(prepared.rowCount,1);assert.equal(prepared.rows[0].passwordless,true);
+  assert.equal((await native('/token?grant_type=password','POST',{email:user.email,password:user.password})).status,400);
+  // Keep the normal existing session: recovery must not supply this exception.
+  assert.equal((await change(user,next)).status,200);const fresh=await login(user,next);
+  const rejected=await change(fresh,password());assert.equal(rejected.status,400);assert.equal(rejected.data.error_code,'current_password_required');
+  await login(user,next);
  });
 });
