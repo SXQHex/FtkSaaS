@@ -216,29 +216,33 @@ export function StudioWorkspace() {
         </Alert>
       )}
       {!snapshot && !error && (
-        <output
-          aria-live="polite"
-          className="block rounded-xl border bg-card p-6 text-sm text-muted-foreground"
-        >
-          {t("loading")}
+        <output aria-live="polite" className="block space-y-4">
+          <span className="sr-only">{t("loading")}</span>
+          <span aria-hidden="true" className="block space-y-3 rounded-xl border bg-card p-6">
+            <span className="block h-4 w-40 animate-pulse rounded bg-muted" />
+            <span className="block h-4 w-full max-w-md animate-pulse rounded bg-muted" />
+            <span className="block h-4 w-2/3 max-w-sm animate-pulse rounded bg-muted" />
+          </span>
         </output>
       )}
       {snapshot && section === "overview" && (
         <div className="space-y-7">
-          <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+          <div className="flex flex-wrap gap-2">
             {shortcuts.map(({ section: key, icon: Icon }) => (
-              <button
+              <Button
                 key={key}
                 type="button"
+                variant="outline"
+                className="group min-h-11 gap-2 pr-3"
                 onClick={() => navigate(key)}
-                className="group flex min-h-28 items-center justify-between gap-4 rounded-xl border bg-card p-5 text-left transition-colors hover:bg-muted"
               >
-                <span>
-                  <Icon className="mb-4 size-5 text-muted-foreground" aria-hidden="true" />
-                  <span className="text-sm font-medium">{nav(`nav.${key}`)}</span>
-                </span>
-                <ArrowUpRight className="size-4 text-muted-foreground" aria-hidden="true" />
-              </button>
+                <Icon className="size-4 text-muted-foreground" aria-hidden="true" />
+                {nav(`nav.${key}`)}
+                <ArrowUpRight
+                  className="size-3.5 text-muted-foreground transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5"
+                  aria-hidden="true"
+                />
+              </Button>
             ))}
           </div>
           <div className="grid gap-6 2xl:grid-cols-[minmax(0,1fr)_300px]">
