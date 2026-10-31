@@ -40,9 +40,9 @@ test('Native TOTP enrollment, proof, stale-token rejection, mandatory security h
   await t.test('only a native strong owner can remove the factor; removal produces no secret-bearing history',async()=>{
    const weakOwner=await native('/factors/'+factor,'DELETE',undefined,user);assert.equal(weakOwner.response.ok,false,'own stale aal1 token cannot remove a verified factor');
    const denied=await native('/factors/'+factor,'DELETE',undefined,other);assert.equal(denied.response.ok,false);
-   const directStrong=await native('/factors/'+factor,'DELETE',undefined,strong);assert.equal(directStrong.response.ok,false,'direct native removal needs an explicitly approved backend intent');const fid=factor;const removed=await must(strong,'account_totp_remove_v1',{factor_id:fid,reauth:strong.jwt});assert.equal(removed.removed,true);assert.equal((await must(strong,'account_totp_remove_v1',{factor_id:fid,reauth:strong.jwt})).removed,true);factor=null;
+   const directStrong=await native('/factors/'+factor,'DELETE',undefined,strong);assert.equal(directStrong.response.ok,true,'native AAL2 removal needs no application approval');factor=null;
    await must(strong,'account_get_v1');const history=await must(strong,'account_security_history_get_v1');assert.equal(history.items.filter(e=>e.action==='totp_disabled').length,1);assert(history.items.every(e=>!('secret' in e)&&!('code' in e)));
    assert.equal((await db.query("select count(*)::int n from auth.mfa_factors where user_id=$1 and status::text='verified'",[user.id])).rows[0].n,0);
   });
- }finally{if(factor){try{if(strong!==user)await must(strong,'account_totp_remove_v1',{factor_id:factor,reauth:strong.jwt});else await native('/factors/'+factor,'DELETE',undefined,strong);}catch{}}if(previousConfig.length)await db.query('update private.p07_lifecycle_config set reauth_max_age_seconds=$1 where singleton',[previousConfig[0].reauth_max_age_seconds]);else await db.query('delete from private.p07_lifecycle_config');await db.end();}
+ }finally{if(factor){try{await native('/factors/'+factor,'DELETE',undefined,strong);}catch{}}if(previousConfig.length)await db.query('update private.p07_lifecycle_config set reauth_max_age_seconds=$1 where singleton',[previousConfig[0].reauth_max_age_seconds]);else await db.query('delete from private.p07_lifecycle_config');await db.end();}
 });

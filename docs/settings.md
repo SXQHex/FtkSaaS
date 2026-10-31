@@ -113,7 +113,7 @@ Aynı operation_key+payload için startup_context yazma retry’si de güncel ka
 
 ## Hesap oturum ve TOTP API devri
 
-Bütün beş işlem global kendi hesap kapsamındadır; org/center/account/actor seçicisi yoktur. `session_id` ve `factor_id` native ProviderUuid’dir, uygulama FtkUuid biçimine zorlanmaz. Diğer kullanıcının session/factor verisi okunamaz/değiştirilemez. Typed istek/sonuçlar contracts08 ve üretilen SDK’dan alınır.
+Bütün dört işlem global kendi hesap kapsamındadır; org/center/account/actor seçicisi yoktur. `session_id` ve `factor_id` native ProviderUuid’dir, uygulama FtkUuid biçimine zorlanmaz. Diğer kullanıcının session/factor verisi okunamaz/değiştirilemez. Typed istek/sonuçlar contracts08 ve üretilen SDK’dan alınır.
 
 | İşlem | İstek ve davranış |
 |---|---|
@@ -121,11 +121,10 @@ Bütün beş işlem global kendi hesap kapsamındadır; org/center/account/actor
 | account_session_label_v1 | session_id, label:null veya1–80 karakter, expected_version, operation_key. İlk sürüm0; null etiketi temizler, sürüm ilerler. |
 | account_sessions_revoke_v1 | operation_key ve kapalı mode:selected/current/others. selected session_id ister. others aynı bearer session’dan taze native giriş proof’u reauth ister; doğrulanmış factor varsa hem caller hem proof aal2 olmalıdır. Taze giriş benimsenip others çağrılır; bu session korunur. Replay daha sonra açılmış session’ları kapatmaz. current çıkışı zayıf token ile de mümkündür. |
 | account_security_history_get_v1 | Opsiyonel cursor;50 kendi değişmez global olay, kararlı as_of. Faktör etkinleştirme/kaldırma olayları tek faktörün geçişidir, tüm MFA durumunun özeti değildir. Secret/code/reauth saklanmaz. |
-| account_totp_remove_v1 | factor_id ve reauth; operation_key yoktur. Aynı taze, güçlü mevcut session proof’u exact own verified TOTP için10sn onay oluşturur. Edge native DELETE yapar; native silme, onay tüketimi ve geçmiş tek transaction’dır. Başarı yalnız completed onay+faktör yokluğuyla; tekrar aynı tamamlanan sonucu okur, yeni işlem yapmaz. |
 
-Enrollment/challenge/verify native Supabase Auth SDK ile; yalnız doğrulanmış TOTP kaldırma Ftk API’sinden yapılır. Native doğrudan verified-factor unenroll, güçlü tokenla bile önceden backend onayı yoksa reddedilir. DB native isteğin JWT’sini görmediği için koruma istek-JWT bağlama iddiası taşımaz: güçlü onay yalnız exact factor/account, canlı aal2 session ve10sn sınırında tüketilir. Onay penceresinde başka istek ancak aynı onaylı kaldırmayı tamamlayabilir. Doğrulanmamış enrollment iptali native kalır. Yerleşik deletion_pending hesap imhası kendi güçlü onay yolundan geçer; bu istisna imha tamamlandı iddiası değildir.
+Enrollment/challenge/verify/unenroll native Supabase Auth SDK ile yapılır. Doğrulanmış faktörü kaldırırken native sağlayıcı kendi faktör sahipliği ve AAL2 koşulunu uygular; uygulama onay tokenı, 10 saniyelik niyet veya ikinci silme tetikleyicisi yoktur. Native hata veya belirsiz ağ sonucu başarı sayılmaz; faktör listesi yeniden okunur.
 
-Verified native factor varsa eski aal1 token session DB aal2 olsa bile uygulamaya erişemez. JWT assurance user_metadata’dan alınmaz; Edge native user doğrular ve SQL ayrıca canlı session/factor durumunu denetler. Geç history yazma hatası native silmeyi de geri alır; provider timeout/eksik commit başarıya çevrilmez. Rolün MFA zorunluluğu politikası, recovery kodu, güvenilen cihaz/passkey/SMS desteği bu paketle ilan edilmez. Hosted provider ayarları ayrı doğrulanır; local config CD’nin hosted Auth ayarını değiştirdiği anlamına gelmez.
+Verified native factor varsa eski aal1 token session DB aal2 olsa bile uygulamaya erişemez. JWT assurance user_metadata’dan alınmaz; Edge native user doğrular ve SQL ayrıca canlı session/factor durumunu denetler. Faktör etkinleştirme/kaldırma geçmişi korunur. Rolün MFA zorunluluğu politikası, recovery kodu, güvenilen cihaz/passkey/SMS desteği bu paketle ilan edilmez. Hosted provider ayarları ayrı doğrulanır; local config CD’nin hosted Auth ayarını değiştirdiği anlamına gelmez.
 
 ## Hesap kimligi iletisim 20261026
 
@@ -135,11 +134,13 @@ Aktif/doğrulanmış link ve aktif kişi/org için güncel display/name ve canon
 
 Başlangıç görünen adı bir kez profil kaynağına alınır; raw native user_metadata güncellemesi hesap/org adını değiştirmez. Ad/soyad değişimi account_profile_update_v1 üzerinden sürüm/receipt ve yayılımla yapılır.
 
-## Google bağlama hazırlığı
+## Google bağlama ve native iletişim
 
-account_google_link_prepare_v1 isteği client_api_version/request_id/reauth/google_id_token içerir. Reauth mevcut aynı native session’dan taze sign-in tokenıdır; MFA varsa signed+live aal2 gerekir. Önce Google Identity Services/Expo sağlayıcısından Google ID token alınır. Backend tokenın sub alanını yalnız hedef kısıtı olarak alır; bu parse imza doğrulaması veya bağlama başarısı değildir. Yanıt {provider:google,status:ready,expires_in:10}; ardından native Auth ID-token grant/link_identity=true aynı Google token ve gerekli nonce ile tamamlanır. Native imza/issuer/audience/nonce kontrolleri atlanmaz. Yetki yalnız exact Google subject/hesap/session/süre içindir; farklı subject, eski session, ban/silinme ve süresi dolmuş niyet reddedilir. Son kullanılabilir yöntem silinmez. Redirect URL üreten eski taslak kullanılmaz. Token/nonce/reauth receipt, audit veya log’a yazılmaz.
+Google giriş/otomatik kimlik bağlama, manuel `supabase.auth.linkIdentity({provider:'google'})` ve `unlinkIdentity(identity)` doğrudan Supabase Auth tarafından yönetilir. Sağlayıcının doğrulanmış e-posta, kimlik sahipliği, OAuth/nonce ve en az bir kimlik bırakma kuralları geçerlidir. Uygulama Google ID tokenı doğrulamaz, ek reauth proof veya kısa süreli bağlama izni üretmez; native otomatik bağlamayı tetikleyiciyle engellemez.
 
-Hesap iletişimi için e-posta/telefon request/resend/verify native Auth SDK’sındadır; ilk e-posta/parola kaydı aşağıdaki kayıt tüketicisini kullanır. account_get_v1.identity doğrulanmış güncel ve pending alanları ayırır; pending org kayıtlarına yayılmaz. E-posta değişiminde çift doğrulama ve eski proof/expiry kapıları native sağlayıcıda kalır. Native email değişimi oturum tokenını yenilerse dönen oturum kullanılmalıdır; eski tokenla tekrar denenmez. SMS sağlayıcı kabulü ayrı ortam işidir; numara kaydı gerçek SMS teslimi olarak gösterilmez.
+Uygulamanın Google prepare ve TOTP remove endpoint’leri kaldırılmıştır. Frontend doğrudan native SDK’ya geçer; geçici uyumluluk yolu yoktur.
+
+E-posta/telefon request/resend/verify native Auth SDK’sındadır. account_get_v1.identity doğrulanmış güncel ve pending alanları ayırır; pending org kayıtlarına yayılmaz. E-posta değişiminde çift doğrulama ve eski proof/expiry kapıları native sağlayıcıda kalır. Native işlem oturum yenilerse dönen oturum kullanılmalıdır. SMS sağlayıcı kabulü ayrı ortam işidir; numara kaydı gerçek SMS teslimi olarak gösterilmez.
 
 ### Parola değişimi ve güvenlik bildirimi
 
@@ -153,17 +154,20 @@ Native parola güncellemesi işlem yapılan oturumu korur, diğer native oturuml
 
 ### E-posta parola kayıt tüketicisi
 
-`account_signup_request_v1` (H, anonim, `auth.signup`) için typed request: `client_api_version`, `request_id`, `email`, `password`; opsiyonel `email_redirect_to`, birlikte verilen `code_challenge`/`code_challenge_method: "s256"`, native CAPTCHA açıksa `captcha_token`. PKCE verifier istemcide kalır; callback’te native `exchangeCodeForSession` akışı kullanılır. Redirect izin listesini native Auth uygular. Provider user/session yanıtı bu operasyondan dönmez; metadata, hesap veya rol alanı gönderilmez.
+`account_signup_check_v1` (E, anonim, `auth.signup`) yalnız `client_api_version:1`, UUID `request_id` ve `email` kabul eder. Hesap/kimlik tablosunu güvenli sunucu tarafında sorgular; parola, metadata, CAPTCHA, PKCE veya redirect kabul etmez. Ana e-posta ve bağlı Google e-postası, doğrulanmamış kayıt dahil, normalize edilerek kontrol edilir.
 
 | Typed sonuç | İstemci davranışı |
 |---|---|
-| `ok:true, data.status:"account_exists"` | [XREQ-001 ürün kuralındaki](contracts/02-FtkSaaS-teknik-sozlesme.md#kayıtta-mevcut-adres-xreq-001) mesajı göster; giriş/Google/parola yenileme seçeneklerini sun. Otomatik resend veya ikinci native signup yapma. |
-| `ok:true, data.status:"confirmation_required"` | Native e-posta doğrulamasına yönlendir; oturum açılmış sayma. |
-| `WEAK_PASSWORD` / `BOT_VERIFICATION_FAILED` | Native parola kuralına uygun yeni parola veya taze native CAPTCHA ile kullanıcı yeniden deneyebilir. |
-| `RATE_LIMITED` | Backend IP sınırı; bekle ve kullanıcı denemesiyle sürdür. |
-| `RESULT_NOT_CONFIRMED` | Sonuç belirsiz; otomatik tekrar/native fallback yok. Giriş/kurtarma seçenekleri ve gerektiğinde destek. `operation_status_get_v1` bu Auth dispatch’inin takip API’si değildir. |
+| `ok:true, data.status:"account_exists"` | [XREQ-001 mesajını](contracts/02-FtkSaaS-teknik-sozlesme.md#kayıtta-mevcut-adres-xreq-001) göster. Signup/resend çağırma. |
+| `ok:true, data.status:"available"` | Native `supabase.auth.signUp({email,password,options})` ile devam et; CAPTCHA, PKCE, redirect ve e-posta doğrulamasını SDK/sağlayıcı yönetir. |
+| `RATE_LIMITED` | 30/5dk/IP kontrol sınırıdır; kullanıcı tekrar denemeden önce bekler. |
+| `TEMPORARY_FAILURE` / `SERVICE_UNAVAILABLE` | Kontrol tamamlanmadı; signup'a geçme. Okuma daha sonra yeniden denenebilir. |
 
-Tarayıcı secret taşımaz. Backend’in [Vercel transport’u](../apps/backend/transports/account-signup-gateway.mjs) frontend sunucu route’una bağlanır; platformun üzerine yazdığı bağlantı IP’si, tam body/path/time HMAC imzasına katılır. `FTK_SIGNUP_HOSTNAME`, `FTK_PUBLIC_BACKEND_ORIGIN`, `FTK_PUBLIC_ANON_KEY`, sunucuda `FTK_PUBLIC_INGRESS_SECRET` gerekir. Edge aynı ingress secret ve `FTK_PUBLIC_HASH_SECRET` kullanır; hosted native gönderim `FTK_P07_AUTH_DELIVERY_ENABLED=true` ile açık olmalıdır. Native Auth’ta e-posta kaydı ve e-posta doğrulaması açık olmalıdır; sağlayıcı ayarı uygun değilse kapalı kalır. Native CAPTCHA tokenı yalnız Auth’a bir kez gider; ayrıca Turnstile zorunluluğu getirilmez. Frontend route’u ve gerçek hosted ekran/provider kabulü ayrı entegrasyon işidir.
+`account_exists` HTTP 200 içindeki ayrık sonuçtur; HTTP hata kodu değildir. Kontrol hesabı oluşturmaz, posta göndermez, adresi rezerve etmez. `available` yalnız okuma anını anlatır: kontrol ile native signup arasındaki başka bir kayıt/kimlik değişimi atomik olarak engellenmez. Native signup hatası/yanıtı ayrıca işlenir; otomatik tekrar veya otomatik resend yapılmaz. Hesap ID’si, ana adres, sağlayıcı ve rol dönmez.
+
+Tarayıcı secret taşımaz. Backend’in [Vercel transport’undaki](../apps/backend/transports/account-signup-gateway.mjs) `handleAccountSignupCheck` frontend sunucu route’una bağlanır. Platformun üzerine yazdığı bağlantı IP’si, tam body/path/time HMAC imzasına katılır. `FTK_SIGNUP_HOSTNAME`, `FTK_PUBLIC_BACKEND_ORIGIN`, `FTK_PUBLIC_ANON_KEY` ve sunucuda `FTK_PUBLIC_INGRESS_SECRET`; Edge’de aynı ingress secret ve `FTK_PUBLIC_HASH_SECRET` gerekir. JWT gate ve service-only RPC korunur; cevap `no-store` olur. Native Auth ayarları her kontrolde tekrar okunmaz; ortam kurulumu/readback ayrı yapılır. Route, native SDK tüketimi ve gerçek ekran kabulü frontend sahibindedir.
+
+Uygulamanın parola challenge ve recovery endpoint’leri kaldırılmıştır. Parola güncelleme/kod isteme/kurtarma doğrudan `updateUser`, `reauthenticate` ve `resetPasswordForEmail` ile yapılır.
 
 Doğrulanmamış telefon account_profile_update_v1.unverified_phone ile E.164 biçiminde kaydedilir; null yalnız bu doğrulanmamış kaydı temizler, alanın gönderilmemesi mevcut değeri korur. account_get_v1.identity.unverified_phone ayrı döner; identity.phone/phone_verified_at yalnız native doğrulama kaynağındandır. Aynı numaranın doğrulanmış native değer olması halinde doğrulanmamış kopya gösterilmez. Org canonical iletişimlerine otomatik yayılmaz, giriş/sahiplik kanıtı değildir. Native SMS pending_phone ile aynı alan değildir. Sürüm/receipt/profile audit mevcut yol üzerinden korunur. Kaynak ve ortam kabulü güncel kabul kaydında izlenir.
 

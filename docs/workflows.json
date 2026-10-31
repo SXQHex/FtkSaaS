@@ -126,7 +126,6 @@
         "apps/backend/scripts/uuid.mjs",
         "apps/backend/scripts/wait-local.mjs",
         "apps/backend/supabase/config.toml",
-        "apps/backend/supabase/functions/backend-v1/account-auth.ts",
         "apps/backend/supabase/functions/backend-v1/calendar-feed.ts",
         "apps/backend/supabase/functions/backend-v1/calendar-token.ts",
         "apps/backend/supabase/functions/backend-v1/contract.json",
@@ -254,8 +253,8 @@
         "management_state_get_v1"
       ],
       "review": {
-        "fingerprint": "8c43aa0f9b469570009c64f527ebb2e799857360ba870ecad4e41c2a89a789ef",
-        "reason": "Native Auth 2.197.0 tel hata kodu current_password_invalid olarak doğrulandı; HTTP 400 ve mevcut parola/nonce zorunlulukları korunuyor."
+        "fingerprint": "efe396385a5946d6039ac9890f9405cda3abf4f8eaed00765e09d576eaa63b15",
+        "reason": "Final native-only kaynak: Auth adapterleri ve kullanılmayan proxy parola hatası kaldırıldı; mevcut uygulama güvenliği ve email-only ön kontrol incelendi."
       }
     },
     {
@@ -270,14 +269,14 @@
         "apps/backend/tests/account-mfa-acceptance.mjs",
         "apps/backend/tests/account-signup-adapter.mjs",
         "apps/backend/tests/account-signup-acceptance.mjs",
-        "apps/backend/tests/auth-password-security-unit.mjs",
-        "apps/backend/tests/account-password-security-acceptance.mjs",
-        "apps/backend/tests/native-password-auth.mjs"
+        "apps/backend/tests/auth-password-security-unit.mjs"
       ],
       "sources": [
         "apps/backend/database/account-identity-projection.sql",
         "apps/backend/database/account-session-management-wrappers.sql",
         "apps/backend/database/account-session-management.sql",
+        "apps/backend/database/account-signup-wrappers.sql",
+        "apps/backend/database/account-signup.sql",
         "apps/backend/database/active-discipline-projection-wrappers.sql",
         "apps/backend/database/active-discipline-projection.sql",
         "apps/backend/database/availability-policies-wrappers.sql",
@@ -291,6 +290,7 @@
         "apps/backend/database/event-cancellation-dispatch.sql",
         "apps/backend/database/event-payment-dispatch.sql",
         "apps/backend/database/instructor-earnings-wrappers.sql",
+        "apps/backend/database/native-auth-signup-check.sql",
         "apps/backend/database/p07-account-auth.sql",
         "apps/backend/database/p07-account-profile-auth-merge-wrappers.sql",
         "apps/backend/database/p07-account-profile.sql",
@@ -311,32 +311,27 @@
         "apps/backend/database/starter-attendance-protection-wrappers.sql",
         "apps/backend/database/starter-settings-media.sql",
         "apps/backend/database/wrappers.sql",
-        "docs/settings.md",
-        "apps/backend/database/account-signup.sql",
-        "apps/backend/database/account-signup-wrappers.sql",
+        "apps/backend/scripts/auth-password-security.mjs",
+        "apps/backend/supabase/config.toml",
         "apps/backend/supabase/functions/backend-v1/account-signup.ts",
         "apps/backend/supabase/migrations/20261030083856_account_signup_guard.sql",
-        "apps/backend/transports/account-signup-gateway.mjs",
-        "apps/backend/scripts/auth-password-security.mjs",
+        "apps/backend/supabase/migrations/20261031074421_native_auth_signup_check.sql",
         "apps/backend/supabase/templates/password_changed_notification.html",
-        "apps/backend/supabase/config.toml"
+        "apps/backend/transports/account-signup-gateway.mjs",
+        "docs/settings.md"
       ],
       "operations": [
         "account_get_v1",
         "account_profile_update_v1",
-        "account_password_change_v1",
-        "account_password_reset_request_v1",
         "account_sessions_list_v1",
         "account_session_label_v1",
         "account_sessions_revoke_v1",
         "account_security_history_get_v1",
-        "account_totp_remove_v1",
-        "account_google_link_prepare_v1",
-        "account_signup_request_v1"
+        "account_signup_check_v1"
       ],
       "review": {
-        "fingerprint": "df20c994d5cdbcefcf06c035f5b79cf48e9e9e0347355813bafe4de2cb267b77",
-        "reason": "İlk parola fixtureı normal taze session ve tek sentetik kullanıcıda NULL parola önkoşulunu doğruluyor; yeni magiclinkin rastgele parolalı signup üretmesi native kaynakla teyit edildi; recovery exception ve sonraki current-password zorunluluğu ayrıldı."
+        "fingerprint": "8cd8a04c65154446da53c965c2529d47d937788958d42730efce21733ec77a87",
+        "reason": "Google/TOTP/password challenge ve recovery adapterleri tamamen kaldırıldı; native SDK sözleşmesi, migration ve uygulama entegrasyon testleri incelendi."
       }
     },
     {
@@ -416,8 +411,8 @@
         "center_discipline_set_v1"
       ],
       "review": {
-        "fingerprint": "8f44129de14838877e873784f8ee680331bade4936f5c957fa86499faea3bbaf",
-        "reason": "XREQ-001 only appends a service-only signup wrapper; existing operation wrappers and this workflow behavior remain unchanged after source and guide review."
+        "fingerprint": "25b34a7d4e8136fe9c8143012a537b0d801ed05b52134cc9009ff9c72c1379ff",
+        "reason": "Ortak runtime wrapper farkı yalnız Auth endpoint emekliliği ve signup check; bu akışın API/RPC gövdesi ve yetkileri aynı, rehber geçerli."
       }
     },
     {
@@ -500,8 +495,8 @@
         "class_assignment_set_v1"
       ],
       "review": {
-        "fingerprint": "a6995d4c548b1e521a3a0c8e23b0c46bc7bba18da15c924455f7f34970f8523b",
-        "reason": "XREQ-001 only appends a service-only signup wrapper; existing operation wrappers and this workflow behavior remain unchanged after source and guide review."
+        "fingerprint": "8397d4fb63ea62c6a0657a0e2506cebda403c6b5f9008a843b865fde4536c387",
+        "reason": "Ortak runtime wrapper farkı yalnız Auth endpoint emekliliği ve signup check; bu akışın API/RPC gövdesi ve yetkileri aynı, rehber geçerli."
       }
     },
     {
@@ -569,8 +564,8 @@
         "person_discipline_set_v1"
       ],
       "review": {
-        "fingerprint": "58202e3e41bac92afbaf52848663c9ca56a6790b32196ae823a4aa5177bc1603",
-        "reason": "Only password-security suite import added to person-registry entrypoint; person/CRM implementations and assertions unchanged; WF04 guide remains accurate."
+        "fingerprint": "4547a67c6ef6e49dd445776b1bc761512c722152a2687b655e11af0ee1ecde6b",
+        "reason": "Ortak RPC yalnız Auth emekliliği içeriyor; person registry testleri native session reddini account_get üzerinde koruyor."
       }
     },
     {
@@ -654,8 +649,8 @@
         "negative_limits_get_v1"
       ],
       "review": {
-        "fingerprint": "7a70ebd9efcbc11464293bde9af8b629fdd3c59048fa267beb07890dce358253",
-        "reason": "XREQ-001 only appends a service-only signup wrapper; existing operation wrappers and this workflow behavior remain unchanged after source and guide review."
+        "fingerprint": "e63552dbdf35fa4b79dea808b11c90e90f492fa0105173690c1ff64b8cbe5794",
+        "reason": "Ortak runtime wrapper farkı yalnız Auth endpoint emekliliği ve signup check; bu akışın API/RPC gövdesi ve yetkileri aynı, rehber geçerli."
       }
     },
     {
@@ -722,8 +717,8 @@
         "reservation_capacity_override_v1"
       ],
       "review": {
-        "fingerprint": "14a08ef54f4229293e9c701759d19ff315d756fac4c13d230a2953b7fcdbafc2",
-        "reason": "XREQ-001 only appends a service-only signup wrapper; existing operation wrappers and this workflow behavior remain unchanged after source and guide review."
+        "fingerprint": "3bed915606cb0122d31f577a5427649164be8e07faf5521a461c98c556ab2956",
+        "reason": "Ortak runtime wrapper farkı yalnız Auth endpoint emekliliği ve signup check; bu akışın API/RPC gövdesi ve yetkileri aynı, rehber geçerli."
       }
     },
     {
@@ -780,8 +775,8 @@
         "attendance_start_v1"
       ],
       "review": {
-        "fingerprint": "7aee57a530b598ed296f9da21796ddd822c30f0f0d8592f586c250cfc4a61a76",
-        "reason": "XREQ-001 only appends a service-only signup wrapper; existing operation wrappers and this workflow behavior remain unchanged after source and guide review."
+        "fingerprint": "a4c2e4c4b82c20ce12ac1337537cd8d88f8e0cbe5de0047873dc56c6d3fe9831",
+        "reason": "Ortak runtime wrapper farkı yalnız Auth endpoint emekliliği ve signup check; bu akışın API/RPC gövdesi ve yetkileri aynı, rehber geçerli."
       }
     },
     {
@@ -837,8 +832,8 @@
         "debt_adjust_v1"
       ],
       "review": {
-        "fingerprint": "ab5b16cf9ff35d71f9d65dfb80b42b69174b4a30dd041a5b07e477602f0a1a16",
-        "reason": "XREQ-001 only appends a service-only signup wrapper; existing operation wrappers and this workflow behavior remain unchanged after source and guide review."
+        "fingerprint": "eb7a9b50a2e1e5774533fb06c3d444de49cc9586f90ca8501cabc15916c0259e",
+        "reason": "Ortak runtime wrapper farkı yalnız Auth endpoint emekliliği ve signup check; bu akışın API/RPC gövdesi ve yetkileri aynı, rehber geçerli."
       }
     },
     {
@@ -878,8 +873,8 @@
         "calendar_feed_get_v1"
       ],
       "review": {
-        "fingerprint": "d90474415f9a278e13053a21caa1e9c7096b322a80345778afb8bba67aa22406",
-        "reason": "Reviewed shared ingress signer: existing public-application path and signature are byte-equivalent; only the signup path was added."
+        "fingerprint": "1ec20e7ea84ba3db4a70d16d5ef531e023272e946db400697e216b5d402f6993",
+        "reason": "Ortak RPC Auth emekliliği ve imza allowlist değişikliği incelendi; public application/Turnstile yolu aynı."
       }
     },
     {
@@ -919,8 +914,8 @@
         "file_upload_complete_v1"
       ],
       "review": {
-        "fingerprint": "b7d84c4dc80f8e013a82ae71bc311243142060e4964dfb251186538e3c1aae73",
-        "reason": "XREQ-001 only appends a service-only signup wrapper; existing operation wrappers and this workflow behavior remain unchanged after source and guide review."
+        "fingerprint": "9dfaf9a44598d64b7e230a837e096b2e25a485df8de7180cc1b617c01b2e9eb6",
+        "reason": "Ortak runtime wrapper farkı yalnız Auth endpoint emekliliği ve signup check; bu akışın API/RPC gövdesi ve yetkileri aynı, rehber geçerli."
       }
     },
     {
@@ -953,8 +948,8 @@
         "document_publication_preview_v1"
       ],
       "review": {
-        "fingerprint": "f460c205aa5d477160a7824d32b73cd71d47f9c21df7bc74c8c8ff6546269b69",
-        "reason": "XREQ-001 only appends a service-only signup wrapper; existing operation wrappers and this workflow behavior remain unchanged after source and guide review."
+        "fingerprint": "71f686191c15c4d9b8e31d92c9a6de2419680f50c410f6858f2df789c02501d1",
+        "reason": "Ortak runtime wrapper farkı yalnız Auth endpoint emekliliği ve signup check; bu akışın API/RPC gövdesi ve yetkileri aynı, rehber geçerli."
       }
     },
     {
@@ -1000,8 +995,8 @@
         "settings_preparation_resolve_v1"
       ],
       "review": {
-        "fingerprint": "1cb0c8ef9daccc1666b3b158356dce49dd2c13e9e6052d18fb5ce94ce13950bd",
-        "reason": "XREQ-001 only appends a service-only signup wrapper; existing operation wrappers and this workflow behavior remain unchanged after source and guide review."
+        "fingerprint": "44dd4f5fb9d732cdbd29d0aba7c24c91612b3d21b12f298f24a92696254cce74",
+        "reason": "Ortak runtime wrapper farkı yalnız Auth endpoint emekliliği ve signup check; bu akışın API/RPC gövdesi ve yetkileri aynı, rehber geçerli."
       }
     },
     {
@@ -1060,8 +1055,8 @@
         "saas_payment_submit_v1"
       ],
       "review": {
-        "fingerprint": "802bba9dba69a1e1f64e3688e7ce187f06394f1046a553510bc1f318dbccd1f2",
-        "reason": "XREQ-001 only appends a service-only signup wrapper; existing operation wrappers and this workflow behavior remain unchanged after source and guide review."
+        "fingerprint": "0710417699b0d51c6a87582c091bdd3fef8eadb53603301a2dd01e158f2ecc29",
+        "reason": "Ortak runtime wrapper farkı yalnız Auth endpoint emekliliği ve signup check; bu akışın API/RPC gövdesi ve yetkileri aynı, rehber geçerli."
       }
     },
     {
@@ -1094,8 +1089,8 @@
         "instructor_agreements_list_v1"
       ],
       "review": {
-        "fingerprint": "00b632240455cf831f58dfcdc79920e151186c5ea17d855026a738b507f5a550",
-        "reason": "XREQ-001 only appends a service-only signup wrapper; existing operation wrappers and this workflow behavior remain unchanged after source and guide review."
+        "fingerprint": "8772758bad930e06f8da18e632d88bf997da914be20c15e84380e019fe7e0d3a",
+        "reason": "Ortak runtime wrapper farkı yalnız Auth endpoint emekliliği ve signup check; bu akışın API/RPC gövdesi ve yetkileri aynı, rehber geçerli."
       }
     },
     {
@@ -1160,8 +1155,8 @@
         "event_actual_start_correct_v1"
       ],
       "review": {
-        "fingerprint": "910cdb126d08b981c4d2442215b2eda2af464445aadeea0d5530cb0ea1696586",
-        "reason": "XREQ-001 only appends a service-only signup wrapper; existing operation wrappers and this workflow behavior remain unchanged after source and guide review."
+        "fingerprint": "65fc38fe6d318d033cc932e5ff23fccf5e58a32feafcc1601a81021664710db7",
+        "reason": "Ortak runtime wrapper farkı yalnız Auth endpoint emekliliği ve signup check; bu akışın API/RPC gövdesi ve yetkileri aynı, rehber geçerli."
       }
     },
     {
@@ -1197,8 +1192,8 @@
         "automation_save_v1"
       ],
       "review": {
-        "fingerprint": "2ae1a178bdade029d98257d2283f20466ddf89d8f5b3751823fc9873b49009e9",
-        "reason": "XREQ-001 only appends a service-only signup wrapper; existing operation wrappers and this workflow behavior remain unchanged after source and guide review."
+        "fingerprint": "82748e43994ce3a3d28108bd4c24b852161bcbd7a9ef32bb56979d343a4e55e3",
+        "reason": "Ortak runtime wrapper farkı yalnız Auth endpoint emekliliği ve signup check; bu akışın API/RPC gövdesi ve yetkileri aynı, rehber geçerli."
       }
     },
     {
@@ -1267,8 +1262,8 @@
         "platform_owner_remove_v1"
       ],
       "review": {
-        "fingerprint": "26c0b3db564ca337801c8459d68b60a8303c608bfd84f532fc2eada96049f7da",
-        "reason": "XREQ-001 only appends a service-only signup wrapper; existing operation wrappers and this workflow behavior remain unchanged after source and guide review."
+        "fingerprint": "c963b56b3f49fb6b3d44b3a4f288500586adfd71e81b6614259f659250ea396f",
+        "reason": "Ortak runtime wrapper farkı yalnız Auth endpoint emekliliği ve signup check; bu akışın API/RPC gövdesi ve yetkileri aynı, rehber geçerli."
       }
     },
     {
@@ -1298,8 +1293,8 @@
         "settlement_authority_set_v1"
       ],
       "review": {
-        "fingerprint": "6d5540bde93f800b0c7c6f9c82e6208d1e3e182fbe3723ae2e66c8cb46858ad2",
-        "reason": "XREQ-001 only appends a service-only signup wrapper; existing operation wrappers and this workflow behavior remain unchanged after source and guide review."
+        "fingerprint": "99d2970ada3ab54854377b079ff1fb795042c76e148fc18f9c278c889e993700",
+        "reason": "Ortak runtime wrapper farkı yalnız Auth endpoint emekliliği ve signup check; bu akışın API/RPC gövdesi ve yetkileri aynı, rehber geçerli."
       }
     },
     {
@@ -1324,8 +1319,8 @@
         "seat_offer_reject_v1"
       ],
       "review": {
-        "fingerprint": "77600742202c80f98ad4dcfc48e4e83656c93f680e55f462dc5efa0276121f63",
-        "reason": "XREQ-001 only appends a service-only signup wrapper; existing operation wrappers and this workflow behavior remain unchanged after source and guide review."
+        "fingerprint": "8df8ef10fceb080cd03136f8f253ba78957505af5b3458398c93ad7f111643d4",
+        "reason": "Ortak runtime wrapper farkı yalnız Auth endpoint emekliliği ve signup check; bu akışın API/RPC gövdesi ve yetkileri aynı, rehber geçerli."
       }
     },
     {
@@ -1379,8 +1374,8 @@
         "subscription_boundary_apply_v1"
       ],
       "review": {
-        "fingerprint": "056861e3472f918bf2417af29fcc85277ef7881b36039421058f8bc71f2332f6",
-        "reason": "XREQ-001 only appends a service-only signup wrapper; existing operation wrappers and this workflow behavior remain unchanged after source and guide review."
+        "fingerprint": "c738d0bc445d3d1d49d73fc20b9f3eb7cecf73f4d325ac94ef8fd3f30ab3eb80",
+        "reason": "Ortak runtime wrapper farkı yalnız Auth endpoint emekliliği ve signup check; bu akışın API/RPC gövdesi ve yetkileri aynı, rehber geçerli."
       }
     }
   ]

@@ -3,8 +3,6 @@ import type * as T from './generated.js';
 export interface Operations {
   account_get_v1: {request: T.RequestAccountGet; response: T.SuccessAccountGet};
   account_profile_update_v1: {request: T.RequestAccountProfileUpdate; response: T.SuccessAccountProfileUpdate};
-  account_password_change_v1: {request: T.RequestAccountPasswordChange; response: T.SuccessAccountPasswordChange};
-  account_password_reset_request_v1: {request: T.RequestAccountPasswordResetRequest; response: T.SuccessAccountPasswordResetRequest};
   account_delete_preview_v1: {request: T.RequestAccountDeletePreview; response: T.SuccessAccountDeletePreview};
   account_delete_apply_v1: {request: T.RequestAccountDeleteApply; response: T.SuccessAccountDeleteApply};
   organizations_list_v1: {request: T.RequestOrganizationsList; response: T.SuccessOrganizationsList};
@@ -212,8 +210,6 @@ export interface Operations {
   account_session_label_v1: {request: T.RequestAccountSessionLabel; response: T.SuccessAccountSessionLabel};
   account_sessions_revoke_v1: {request: T.RequestAccountSessionsRevoke; response: T.SuccessAccountSessionsRevoke};
   account_security_history_get_v1: {request: T.RequestAccountSecurityHistoryGet; response: T.SuccessAccountSecurityHistoryGet};
-  account_totp_remove_v1: {request: T.RequestAccountTotpRemove; response: T.SuccessAccountTotpRemove};
-  account_google_link_prepare_v1: {request: T.RequestAccountGoogleLinkPrepare; response: T.SuccessAccountGoogleLinkPrepare};
   media_get_v1: {request: T.RequestMediaGet; response: T.SuccessMediaGet};
   settings_template_resolve_v1: {request: T.RequestSettingsTemplateResolve; response: T.SuccessSettingsTemplateResolve};
   calendar_links_get_v1: {request: T.RequestCalendarLinksGet; response: T.SuccessCalendarLinksGet};
@@ -222,5 +218,5 @@ export interface Operations {
   calendar_link_revoke_v1: {request: T.RequestCalendarLinkRevoke; response: T.SuccessCalendarLinkRevoke};
   calendar_feed_get_v1: {request: T.RequestCalendarFeedGet; response: T.SuccessCalendarFeedGet};
   settings_preparation_resolve_v1: {request: T.RequestSettingsPreparationResolve; response: T.SuccessSettingsPreparationResolve};
-  account_signup_request_v1: {request: T.RequestAccountSignupRequest; response: T.SuccessAccountSignupRequest};
+  account_signup_check_v1: {request: T.RequestAccountSignupCheck; response: T.SuccessAccountSignupCheck};
 }

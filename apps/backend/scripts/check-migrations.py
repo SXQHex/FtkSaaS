@@ -153,10 +153,12 @@ for variant in settings_defs['SettingsCatalog']['oneOf']:
 
 assert next(Path('supabase/migrations').glob('*_account_session_management.sql')).read_text()==Path('database/account-session-management.sql').read_text()+Path('database/account-session-management-wrappers.sql').read_text(),'Account sessions source drift'
 
-account_session_names=['account_sessions_list_v1','account_session_label_v1','account_sessions_revoke_v1','account_security_history_get_v1','account_totp_remove_v1']
+account_session_names=['account_sessions_list_v1','account_session_label_v1','account_sessions_revoke_v1','account_security_history_get_v1']
 account_session_entries=[line for line in Path('database/runtime-wrappers-current.sql').read_text().splitlines() if any("'"+name+"'" in line or 'api_v1.'+name+'(' in line for name in account_session_names)]
 assert len(account_session_entries)==4*len(account_session_names),'Account session wrapper inventory'
-assert Path('database/account-session-management-wrappers.sql').read_text()=="begin;\n"+'\n'.join(account_session_entries)+"\nnotify pgrst,'reload schema';\ncommit;\n",'Account sessions wrapper drift or privilege expansion'
+historical_session_entries=[line for line in Path('database/account-session-management-wrappers.sql').read_text().splitlines() if any("'"+name+"'" in line or 'api_v1.'+name+'(' in line for name in account_session_names)]
+assert historical_session_entries==account_session_entries,'Account sessions wrapper drift or privilege expansion'
+assert 'account_totp_remove_v1' not in Path('database/runtime-wrappers-current.sql').read_text(),'Retired MFA adapter remains callable'
 
 assert next(Path('supabase/migrations').glob('*_account_identity_projection.sql')).read_text()==Path('database/account-identity-projection.sql').read_text(),'Account identity source drift'
 
@@ -197,3 +199,5 @@ assert next(Path("supabase/migrations").glob("*_starter_availability_management_
 assert next(Path('supabase/migrations').glob('*_organization_brand_colors.sql')).read_text()==Path('database/organization-brand-colors.sql').read_text(),'Organization brand colors migration source drift'
 
 assert next(Path('supabase/migrations').glob('*_account_signup_guard.sql')).read_text()==Path('database/account-signup.sql').read_text()+Path('database/account-signup-wrappers.sql').read_text(),'Signup guard source drift'
+
+assert next(Path('supabase/migrations').glob('*_native_auth_signup_check.sql')).read_text()==Path('database/native-auth-signup-check.sql').read_text(),'Native Auth signup check source drift'

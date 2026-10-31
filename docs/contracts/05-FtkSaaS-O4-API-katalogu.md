@@ -2,14 +2,12 @@
 
 Üretilmiştir: `packages/api-contracts/schema/contract.json` ve `implemented.json` → `render_catalogs.py`. Elle düzenleme. DTO/enum/izin için makine sözleşmesi tek kaynaktır; çağrı sırası [WF rehberi](../workflows.md), transport [istemci protokolü](../client-integration.md) sahibindedir.
 
-222 sözleşme operasyonu; 222 kaynak envanterinde, 0 contract-only. Kaynakta bulunmak tüm selector/provider/özellik veya hosted kabulünün tamamlandığını göstermez. Backend-only worker işlemleri tarayıcı çağrısı değildir.
+218 sözleşme operasyonu; 218 kaynak envanterinde, 0 contract-only. Kaynakta bulunmak tüm selector/provider/özellik veya hosted kabulünün tamamlandığını göstermez. Backend-only worker işlemleri tarayıcı çağrısı değildir.
 
 | İşlem | Kaynak durumu / tüketici | İzin | Tür / abonelik | İstek | Yanıt |
 |---|---|---|---|---|---|
 | `account_get_v1` | runtime / ilgili WF’yi oku | `account.self` | R / exempt | client_api_version: 1; request_id: FtkUuid | Success_account_get |
 | `account_profile_update_v1` | runtime / ilgili WF’yi oku | `account.self` | W / exempt | client_api_version: 1; request_id: FtkUuid; operation_key: FtkUuid; expected_version: PositiveInt; display_name: Text; given_name?: string ∣ null; family_name?: string ∣ null; unverified_phone?: string ∣ null; photo?: SettingsImageUpload ∣ null | Success_account_profile_update |
-| `account_password_change_v1` | runtime / ilgili WF’yi oku | `account.self` | H / exempt | client_api_version: 1; request_id: FtkUuid | Success_account_password_change |
-| `account_password_reset_request_v1` | runtime / ilgili WF’yi oku | `auth.recover` | H / exempt | client_api_version: 1; request_id: FtkUuid; email: Text | Success_account_password_reset_request |
 | `account_delete_preview_v1` | runtime / ilgili WF’yi oku | `account.self` | P / exempt | client_api_version: 1; request_id: FtkUuid | Success_account_delete_preview |
 | `account_delete_apply_v1` | runtime / ilgili WF’yi oku | `account.self` | E / exempt | client_api_version: 1; request_id: FtkUuid; operation_key: FtkUuid; preview: PreviewToken; reauth: ReauthProof | Success_account_delete_apply |
 | `organizations_list_v1` | runtime / ilgili WF’yi oku | `account.self` | R / exempt | client_api_version: 1; request_id: FtkUuid; page: Page | Success_organizations_list |
@@ -217,8 +215,6 @@
 | `account_session_label_v1` | runtime / ilgili WF’yi oku | `account.self` | W / exempt | client_api_version: 1; request_id: FtkUuid; operation_key: FtkUuid; session_id: ProviderUuid; expected_version: SettingsVersion; label: string ∣ null | Success_account_session_label |
 | `account_sessions_revoke_v1` | runtime / ilgili WF’yi oku | `account.self` | W / exempt | client_api_version: 1; request_id: FtkUuid; operation_key: FtkUuid; mode: selected / current / others; session_id?: ProviderUuid; reauth?: ReauthProof | Success_account_sessions_revoke |
 | `account_security_history_get_v1` | runtime / ilgili WF’yi oku | `account.self` | R / exempt | client_api_version: 1; request_id: FtkUuid; cursor?: string | Success_account_security_history_get |
-| `account_totp_remove_v1` | runtime / ilgili WF’yi oku | `account.self` | H / exempt | client_api_version: 1; request_id: FtkUuid; factor_id: ProviderUuid; reauth: ReauthProof | Success_account_totp_remove |
-| `account_google_link_prepare_v1` | runtime / ilgili WF’yi oku | `account.self` | H / exempt | client_api_version: 1; request_id: FtkUuid; reauth: ReauthProof; google_id_token: string | Success_account_google_link_prepare |
 | `media_get_v1` | runtime / ilgili WF’yi oku | `media.read` | R / read | client_api_version: 1; request_id: FtkUuid; scope: user / organization / lesson_participant; asset_id: FtkUuid; org_id?: FtkUuid; session_id?: FtkUuid; person_id?: FtkUuid | Success_media_get |
 | `settings_template_resolve_v1` | runtime / ilgili WF’yi oku | `templates.resolve` | R / read | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; center_id?: FtkUuid ∣ null; kind: report / import; template: WorkTemplateReference; overrides?: ReportTemplateOverrides ∣ ImportTemplateOverrides | Success_settings_template_resolve |
 | `calendar_links_get_v1` | runtime / ilgili WF’yi oku | `calendar.self` | R / read | client_api_version: 1; request_id: FtkUuid; page: Page | Success_calendar_links_get |
@@ -227,7 +223,7 @@
 | `calendar_link_revoke_v1` | runtime / ilgili WF’yi oku | `calendar.self` | W / config | client_api_version: 1; request_id: FtkUuid; operation_key: FtkUuid; link_id: FtkUuid; expected_version: PositiveInt | Success_calendar_link_revoke |
 | `calendar_feed_get_v1` | runtime / ilgili WF’yi oku | `calendar.feed` | R / read | client_api_version: 1; request_id: FtkUuid; token: string | Success_calendar_feed_get |
 | `settings_preparation_resolve_v1` | runtime / ilgili WF’yi oku | `preparation.resolve` | R / read | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; center_id: FtkUuid; kind: availability / package; source: PreparationSourceReference; resource?: ResourceRef; rule_index?: integer | Success_settings_preparation_resolve |
-| `account_signup_request_v1` | runtime / ilgili WF’yi oku | `auth.signup` | H / exempt | client_api_version: 1; request_id: FtkUuid; email: string; password: string; code_challenge?: string; code_challenge_method?: s256; email_redirect_to?: string; captcha_token?: string | Success_account_signup_request |
+| `account_signup_check_v1` | runtime / ilgili WF’yi oku | `auth.signup` | E / exempt | client_api_version: 1; request_id: FtkUuid; email: string | Success_account_signup_check |
 
 ## Sürüm ve okuma desteği
 
@@ -237,8 +233,6 @@
 |---|---|---|---|---|---|
 | account_get_v1 | read | none | None | implemented |  |
 | account_profile_update_v1 | command | row_version | management_state_get_v1 | implemented | accounts.versioned_domain_change |
-| account_password_change_v1 | auth | none | None | implemented |  |
-| account_password_reset_request_v1 | auth | none | None | implemented |  |
 | account_delete_preview_v1 | preview | preview_dependencies | management_state_get_v1 | implemented |  |
 | account_delete_apply_v1 | apply | preview_dependencies | account_delete_preview_v1 | implemented | accounts.versioned_domain_change |
 | organizations_list_v1 | read | none | None | contract_only |  |
@@ -446,8 +440,6 @@
 | account_session_label_v1 | auth | row_version | account_sessions_list_v1 | implemented | auth_session_metadata_or_revocation, account_security_event, receipt |
 | account_sessions_revoke_v1 | auth | none | account_sessions_list_v1 | implemented | auth_session_metadata_or_revocation, account_security_event, receipt |
 | account_security_history_get_v1 | read | none | None | uygulanmaz |  |
-| account_totp_remove_v1 | auth | none | None | implemented |  |
-| account_google_link_prepare_v1 | auth | none | account_get_v1 | implemented | bounded_google_link_intent |
 | media_get_v1 | read | none | None | not_required |  |
 | settings_template_resolve_v1 | read | none | None | not_required |  |
 | calendar_links_get_v1 | read | none | None | not_required |  |
@@ -456,7 +448,7 @@
 | calendar_link_revoke_v1 | auth | row_version | calendar_links_get_v1 | implemented | personal_calendar_credential_change, personal_calendar_metadata_history, receipt |
 | calendar_feed_get_v1 | read | none | None | not_required |  |
 | settings_preparation_resolve_v1 | read | none | None | not_required |  |
-| account_signup_request_v1 | auth | none | None | implemented |  |
+| account_signup_check_v1 | auth | none | None | implemented |  |
 
 ## Sunucunun hesaplaşma yetki bağlamı
 

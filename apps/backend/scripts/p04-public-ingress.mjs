@@ -7,7 +7,7 @@ export function signPublicApplication(body,clientIp,secret,now=Date.now()){
  return signPublicRequest(body,clientIp,secret,publicSubmitPath,now);
 }
 export function signPublicRequest(body,clientIp,secret,path,now=Date.now()){
- if(![publicSubmitPath,'/functions/v1/backend-v1/account_signup_request_v1'].includes(path))throw Error('Unsupported public path');
+ if(![publicSubmitPath,'/functions/v1/backend-v1/account_signup_check_v1'].includes(path))throw Error('Unsupported public path');
  if(typeof body!=='string'||Buffer.byteLength(body,'utf8')>2097152)throw Error('Invalid raw request body');
  const family=typeof clientIp==='string'?isIP(clientIp):0;
  if(!family)throw Error('Verified connection IP required');

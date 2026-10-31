@@ -703,8 +703,6 @@
       "enum": [
         "account_get_v1",
         "account_profile_update_v1",
-        "account_password_change_v1",
-        "account_password_reset_request_v1",
         "account_delete_preview_v1",
         "account_delete_apply_v1",
         "organizations_list_v1",
@@ -912,8 +910,6 @@
         "account_session_label_v1",
         "account_sessions_revoke_v1",
         "account_security_history_get_v1",
-        "account_totp_remove_v1",
-        "account_google_link_prepare_v1",
         "media_get_v1",
         "settings_template_resolve_v1",
         "calendar_links_get_v1",
@@ -922,7 +918,7 @@
         "calendar_link_revoke_v1",
         "calendar_feed_get_v1",
         "settings_preparation_resolve_v1",
-        "account_signup_request_v1"
+        "account_signup_check_v1"
       ]
     },
     "EntityType": {
@@ -2801,8 +2797,7 @@
             "ACCOUNT_ALREADY_LINKED",
             "ACCOUNT_LINK_REQUIRED",
             "SUBSCRIPTION_NOT_STARTED",
-            "PARTICIPATION_BLOCKED",
-            "WEAK_PASSWORD"
+            "PARTICIPATION_BLOCKED"
           ]
         },
         "retryable": {
@@ -5307,36 +5302,6 @@
       ],
       "additionalProperties": false
     },
-    "AuthResult": {
-      "type": "object",
-      "properties": {
-        "provider": {
-          "const": "supabase_auth"
-        },
-        "status": {
-          "enum": [
-            "accepted",
-            "challenge_required",
-            "succeeded"
-          ]
-        },
-        "safe_error_code": {
-          "anyOf": [
-            {
-              "$ref": "#/$defs/Text"
-            },
-            {
-              "type": "null"
-            }
-          ]
-        }
-      },
-      "required": [
-        "provider",
-        "status"
-      ],
-      "additionalProperties": false
-    },
     "SupabaseAuthPasswordRequest": {
       "type": "object",
       "properties": {
@@ -6318,82 +6283,6 @@
         },
         "data": {
           "$ref": "#/$defs/Mutation"
-        },
-        "trace_id": {
-          "$ref": "#/$defs/FtkUuid"
-        }
-      },
-      "required": [
-        "ok",
-        "data",
-        "trace_id"
-      ],
-      "additionalProperties": false
-    },
-    "Request_account_password_change": {
-      "type": "object",
-      "properties": {
-        "client_api_version": {
-          "const": 1
-        },
-        "request_id": {
-          "$ref": "#/$defs/FtkUuid"
-        }
-      },
-      "required": [
-        "client_api_version",
-        "request_id"
-      ],
-      "additionalProperties": false
-    },
-    "Success_account_password_change": {
-      "type": "object",
-      "properties": {
-        "ok": {
-          "const": true
-        },
-        "data": {
-          "$ref": "#/$defs/AuthResult"
-        },
-        "trace_id": {
-          "$ref": "#/$defs/FtkUuid"
-        }
-      },
-      "required": [
-        "ok",
-        "data",
-        "trace_id"
-      ],
-      "additionalProperties": false
-    },
-    "Request_account_password_reset_request": {
-      "type": "object",
-      "properties": {
-        "client_api_version": {
-          "const": 1
-        },
-        "request_id": {
-          "$ref": "#/$defs/FtkUuid"
-        },
-        "email": {
-          "$ref": "#/$defs/Text"
-        }
-      },
-      "required": [
-        "client_api_version",
-        "request_id",
-        "email"
-      ],
-      "additionalProperties": false
-    },
-    "Success_account_password_reset_request": {
-      "type": "object",
-      "properties": {
-        "ok": {
-          "const": true
-        },
-        "data": {
-          "$ref": "#/$defs/GenericAccepted"
         },
         "trace_id": {
           "$ref": "#/$defs/FtkUuid"
@@ -47644,70 +47533,6 @@
       ],
       "additionalProperties": false
     },
-    "Request_account_totp_remove": {
-      "type": "object",
-      "properties": {
-        "client_api_version": {
-          "const": 1
-        },
-        "request_id": {
-          "$ref": "#/$defs/FtkUuid"
-        },
-        "factor_id": {
-          "$ref": "#/$defs/ProviderUuid"
-        },
-        "reauth": {
-          "$ref": "#/$defs/ReauthProof"
-        }
-      },
-      "required": [
-        "client_api_version",
-        "request_id",
-        "factor_id",
-        "reauth"
-      ],
-      "additionalProperties": false
-    },
-    "AccountTotpRemoval": {
-      "type": "object",
-      "properties": {
-        "factor_id": {
-          "$ref": "#/$defs/ProviderUuid"
-        },
-        "removed": {
-          "const": true
-        },
-        "provider": {
-          "const": "supabase_auth"
-        }
-      },
-      "required": [
-        "factor_id",
-        "removed",
-        "provider"
-      ],
-      "additionalProperties": false
-    },
-    "Success_account_totp_remove": {
-      "type": "object",
-      "properties": {
-        "ok": {
-          "const": true
-        },
-        "data": {
-          "$ref": "#/$defs/AccountTotpRemoval"
-        },
-        "trace_id": {
-          "$ref": "#/$defs/FtkUuid"
-        }
-      },
-      "required": [
-        "ok",
-        "data",
-        "trace_id"
-      ],
-      "additionalProperties": false
-    },
     "AccountIdentityView": {
       "type": "object",
       "properties": {
@@ -47798,72 +47623,6 @@
         "phone_verified_at",
         "unverified_phone"
       ]
-    },
-    "Request_account_google_link_prepare": {
-      "type": "object",
-      "properties": {
-        "client_api_version": {
-          "const": 1
-        },
-        "request_id": {
-          "$ref": "#/$defs/FtkUuid"
-        },
-        "reauth": {
-          "$ref": "#/$defs/ReauthProof"
-        },
-        "google_id_token": {
-          "type": "string",
-          "minLength": 32,
-          "maxLength": 16384
-        }
-      },
-      "required": [
-        "client_api_version",
-        "request_id",
-        "reauth",
-        "google_id_token"
-      ],
-      "additionalProperties": false
-    },
-    "GoogleLinkAuthorization": {
-      "type": "object",
-      "properties": {
-        "provider": {
-          "const": "google"
-        },
-        "status": {
-          "const": "ready"
-        },
-        "expires_in": {
-          "const": 10
-        }
-      },
-      "required": [
-        "provider",
-        "status",
-        "expires_in"
-      ],
-      "additionalProperties": false
-    },
-    "Success_account_google_link_prepare": {
-      "type": "object",
-      "properties": {
-        "ok": {
-          "const": true
-        },
-        "data": {
-          "$ref": "#/$defs/GoogleLinkAuthorization"
-        },
-        "trace_id": {
-          "$ref": "#/$defs/FtkUuid"
-        }
-      },
-      "required": [
-        "ok",
-        "data",
-        "trace_id"
-      ],
-      "additionalProperties": false
     },
     "StarterRetainedScope": {
       "type": "object",
@@ -50293,7 +50052,7 @@
       "type": "string",
       "pattern": "^(([01][0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9]|24:00:00)$"
     },
-    "Request_account_signup_request": {
+    "Request_account_signup_check": {
       "type": "object",
       "properties": {
         "client_api_version": {
@@ -50306,45 +50065,14 @@
           "type": "string",
           "minLength": 3,
           "maxLength": 254
-        },
-        "password": {
-          "type": "string",
-          "minLength": 1,
-          "maxLength": 4096
-        },
-        "code_challenge": {
-          "type": "string",
-          "pattern": "^[A-Za-z0-9_-]{43}$"
-        },
-        "code_challenge_method": {
-          "const": "s256"
-        },
-        "email_redirect_to": {
-          "type": "string",
-          "format": "uri",
-          "maxLength": 2048
-        },
-        "captcha_token": {
-          "type": "string",
-          "minLength": 1,
-          "maxLength": 4096
         }
       },
       "required": [
         "client_api_version",
         "request_id",
-        "email",
-        "password"
+        "email"
       ],
-      "additionalProperties": false,
-      "dependentRequired": {
-        "code_challenge": [
-          "code_challenge_method"
-        ],
-        "code_challenge_method": [
-          "code_challenge"
-        ]
-      }
+      "additionalProperties": false
     },
     "AccountSignupResult": {
       "type": "object",
@@ -50352,7 +50080,7 @@
         "status": {
           "enum": [
             "account_exists",
-            "confirmation_required"
+            "available"
           ]
         }
       },
@@ -50361,7 +50089,7 @@
       ],
       "additionalProperties": false
     },
-    "Success_account_signup_request": {
+    "Success_account_signup_check": {
       "type": "object",
       "properties": {
         "ok": {
@@ -52585,170 +52313,6 @@
           "open_dependencies": [],
           "target_request": {
             "$ref": "#/$defs/Request_account_profile_update"
-          }
-        }
-      },
-      {
-        "name": "account_password_change_v1",
-        "module": "M02",
-        "features": [
-          "F06"
-        ],
-        "permission": "account.self",
-        "actor_source": "server_verified",
-        "transport": "H",
-        "billing_class": "exempt",
-        "request": {
-          "$ref": "#/$defs/Request_account_password_change"
-        },
-        "success": {
-          "$ref": "#/$defs/Success_account_password_change"
-        },
-        "errors": [
-          "AUTH_REQUIRED",
-          "BILLING_OPERATION_RESTRICTED",
-          "CLIENT_UPDATE_REQUIRED",
-          "FORBIDDEN",
-          "NOT_FOUND",
-          "PLAN_FEATURE_UNAVAILABLE",
-          "PLAN_LIMIT_REACHED",
-          "POLICY_NOT_CONFIGURED",
-          "SERVICE_UNAVAILABLE",
-          "SESSION_REVOKED",
-          "SUBSCRIPTION_NOT_STARTED",
-          "TEMPORARY_FAILURE",
-          "VALIDATION_FAILED",
-          "VERSION_CONFLICT"
-        ],
-        "transaction_class": "auth",
-        "transaction_guarantee": "Atomic accounts.versioned_domain_change; trusted actor and scoped provider/job result. External delivery never determines the domain commit.",
-        "transition": {
-          "effect": "account_password_change_append_or_explicit_update",
-          "from": [],
-          "to": [],
-          "invariant": "Targeted version/permission checks in operation_contract; no lifecycle reopen implied."
-        },
-        "semantic_guards": [
-          "live_actor_and_scope",
-          "billing_gate_exempt",
-          "required_feature_gates_separate_from_references"
-        ],
-        "audit": false,
-        "notification": "outbox_if_user_visible_business_result",
-        "concurrency": "Live original permission/tenant scope on every request; target/aggregate lock; none; idempotent receipt and all declared effects rollback together",
-        "expected_version_subject": "accounts: none; captured target/scope dependencies, no client row version",
-        "acceptance_scenario_ids": [
-          "A01",
-          "A02",
-          "A03",
-          "A23",
-          "A24",
-          "A25",
-          "A46",
-          "A47",
-          "A55"
-        ],
-        "configuration_policy": "numeric plan limits/prices and legal approval are deployment configuration, never arbitrary allow/deny",
-        "implementation_status": "operational_development_limited",
-        "required_features": [
-          "F06"
-        ],
-        "runtime_required_features": [],
-        "conditional_features": [],
-        "operation_contract": {
-          "kind": "auth",
-          "target_entity": "accounts",
-          "version_mode": "none",
-          "version_field": null,
-          "read_operation": null,
-          "atomic_effects": [],
-          "business_commit": false,
-          "read_path_status": "implemented",
-          "source_decision": "DS-2026-10-17"
-        },
-        "decision_delivery": {
-          "accepted_contract": "DS-2026-10-17",
-          "runtime_conformance": "implemented_pending_ci",
-          "open_dependencies": [],
-          "target_request": {
-            "$ref": "#/$defs/Request_account_password_change"
-          }
-        }
-      },
-      {
-        "name": "account_password_reset_request_v1",
-        "module": "M02",
-        "features": [
-          "F06"
-        ],
-        "permission": "auth.recover",
-        "actor_source": "public_request_context",
-        "transport": "H",
-        "billing_class": "exempt",
-        "request": {
-          "$ref": "#/$defs/Request_account_password_reset_request"
-        },
-        "success": {
-          "$ref": "#/$defs/Success_account_password_reset_request"
-        },
-        "errors": [
-          "RATE_LIMITED",
-          "TEMPORARY_FAILURE",
-          "VALIDATION_FAILED"
-        ],
-        "transaction_class": "auth",
-        "transaction_guarantee": "Atomic accounts.versioned_domain_change; trusted actor and scoped provider/job result. External delivery never determines the domain commit.",
-        "transition": {
-          "effect": "account_password_reset_request_append_or_explicit_update",
-          "from": [],
-          "to": [],
-          "invariant": "Targeted version/permission checks in operation_contract; no lifecycle reopen implied."
-        },
-        "semantic_guards": [
-          "billing_gate_exempt",
-          "required_feature_gates_separate_from_references",
-          "public_rate_and_bot_gate",
-          "server_public_scope_no_identity_or_tenant_inference"
-        ],
-        "audit": false,
-        "notification": "outbox_if_user_visible_business_result",
-        "concurrency": "Live original permission/tenant scope on every request; target/aggregate lock; none; idempotent receipt and all declared effects rollback together",
-        "expected_version_subject": "accounts: none; captured target/scope dependencies, no client row version",
-        "acceptance_scenario_ids": [
-          "A01",
-          "A02",
-          "A03",
-          "A23",
-          "A24",
-          "A25",
-          "A46",
-          "A47",
-          "A55"
-        ],
-        "configuration_policy": "numeric plan limits/prices and legal approval are deployment configuration, never arbitrary allow/deny",
-        "implementation_status": "operational_development_limited",
-        "required_features": [
-          "F06"
-        ],
-        "runtime_required_features": [],
-        "conditional_features": [],
-        "operation_contract": {
-          "kind": "auth",
-          "target_entity": "accounts",
-          "version_mode": "none",
-          "version_field": null,
-          "read_operation": null,
-          "atomic_effects": [],
-          "business_commit": false,
-          "read_path_status": "implemented",
-          "source_decision": "DS-2026-10-17"
-        },
-        "decision_delivery": {
-          "accepted_contract": "DS-2026-10-17",
-          "runtime_conformance": "implemented_pending_ci",
-          "open_dependencies": [],
-          "target_request": {
-            "$ref": "#/$defs/Request_account_password_reset_request"
           }
         }
       },
@@ -77361,198 +76925,6 @@
         }
       },
       {
-        "name": "account_totp_remove_v1",
-        "module": "M02",
-        "features": [
-          "F06"
-        ],
-        "permission": "account.self",
-        "actor_source": "server_verified",
-        "transport": "H",
-        "billing_class": "exempt",
-        "request": {
-          "$ref": "#/$defs/Request_account_totp_remove"
-        },
-        "success": {
-          "$ref": "#/$defs/Success_account_totp_remove"
-        },
-        "errors": [
-          "AUTH_REQUIRED",
-          "BILLING_OPERATION_RESTRICTED",
-          "CLIENT_UPDATE_REQUIRED",
-          "FORBIDDEN",
-          "NOT_FOUND",
-          "PLAN_FEATURE_UNAVAILABLE",
-          "PLAN_LIMIT_REACHED",
-          "POLICY_NOT_CONFIGURED",
-          "SERVICE_UNAVAILABLE",
-          "SESSION_REVOKED",
-          "SUBSCRIPTION_NOT_STARTED",
-          "TEMPORARY_FAILURE",
-          "VALIDATION_FAILED",
-          "VERSION_CONFLICT"
-        ],
-        "transaction_class": "auth",
-        "transaction_guarantee": "Prepare commits only expiring intent. Native factor deletion, intent completion and security history commit atomically. Timeout/retry reports removed only from committed completion.",
-        "transition": {
-          "effect": "native_verified_totp_remove",
-          "from": [
-            "verified"
-          ],
-          "to": [
-            "removed"
-          ],
-          "invariant": "Same account, exact factor, live approving AAL2 session; no raw proof retained."
-        },
-        "semantic_guards": [
-          "live_actor_and_scope",
-          "billing_gate_exempt",
-          "required_feature_gates_separate_from_references"
-        ],
-        "audit": true,
-        "notification": "global_account_security_history",
-        "concurrency": "Live original permission/tenant scope on every request; target/aggregate lock; none; idempotent receipt and all declared effects rollback together",
-        "expected_version_subject": "accounts: none; captured target/scope dependencies, no client row version",
-        "acceptance_scenario_ids": [
-          "A01",
-          "A02",
-          "A03",
-          "A23",
-          "A24",
-          "A25",
-          "A46",
-          "A47",
-          "A55"
-        ],
-        "configuration_policy": "numeric plan limits/prices and legal approval are deployment configuration, never arbitrary allow/deny",
-        "implementation_status": "operational_development_limited",
-        "required_features": [
-          "F06"
-        ],
-        "runtime_required_features": [],
-        "conditional_features": [],
-        "operation_contract": {
-          "kind": "auth",
-          "target_entity": "accounts",
-          "version_mode": "none",
-          "version_field": null,
-          "read_operation": null,
-          "atomic_effects": [],
-          "business_commit": false,
-          "read_path_status": "implemented",
-          "source_decision": "DS-2026-10-17"
-        },
-        "decision_delivery": {
-          "accepted_contract": "DS-2026-10-17",
-          "runtime_conformance": "implemented_pending_ci",
-          "open_dependencies": [],
-          "target_request": {
-            "$ref": "#/$defs/Request_account_totp_remove"
-          }
-        },
-        "runtime_path": "/functions/v1/backend-v1/account_totp_remove_v1",
-        "runtime_rpc": "api_v1.account_totp_remove_v1",
-        "runtime_external_path": "/functions/v1/backend-v1/account_totp_remove_v1",
-        "runtime_limits": [
-          "Verified TOTP removal requires fresh strong current proof and one-time bounded exact-factor intent; native direct verified-factor deletion is fenced."
-        ]
-      },
-      {
-        "name": "account_google_link_prepare_v1",
-        "module": "M02",
-        "features": [
-          "F06"
-        ],
-        "permission": "account.self",
-        "actor_source": "server_verified",
-        "transport": "H",
-        "billing_class": "exempt",
-        "request": {
-          "$ref": "#/$defs/Request_account_google_link_prepare"
-        },
-        "success": {
-          "$ref": "#/$defs/Success_account_google_link_prepare"
-        },
-        "errors": [
-          "AUTH_REQUIRED",
-          "BILLING_OPERATION_RESTRICTED",
-          "CLIENT_UPDATE_REQUIRED",
-          "FORBIDDEN",
-          "NOT_FOUND",
-          "PLAN_FEATURE_UNAVAILABLE",
-          "PLAN_LIMIT_REACHED",
-          "POLICY_NOT_CONFIGURED",
-          "SERVICE_UNAVAILABLE",
-          "SESSION_REVOKED",
-          "SUBSCRIPTION_NOT_STARTED",
-          "TEMPORARY_FAILURE",
-          "VALIDATION_FAILED",
-          "VERSION_CONFLICT"
-        ],
-        "transaction_class": "auth",
-        "transaction_guarantee": "Fresh own native proof authorizes a bounded Google linking intent; actual provider identity insert and immutable security history commit atomically.",
-        "transition": {
-          "effect": "prepare_google_identity_link",
-          "from": [],
-          "to": [],
-          "invariant": "Existing account fresh reauth and new Google proof are both required."
-        },
-        "semantic_guards": [
-          "live_actor_and_scope",
-          "billing_gate_exempt",
-          "required_feature_gates_separate_from_references"
-        ],
-        "audit": true,
-        "notification": "native_identity_linked_security_notification",
-        "concurrency": "Exact Google subject and fresh own session; 10-second account mutex-protected intent. Actual native identity insertion and security event commit together; no business receipt or OAuth redirect intent.",
-        "expected_version_subject": "none",
-        "acceptance_scenario_ids": [
-          "A01",
-          "A02",
-          "A03",
-          "A23",
-          "A24",
-          "A25",
-          "A46",
-          "A47",
-          "A55"
-        ],
-        "configuration_policy": "numeric plan limits/prices and legal approval are deployment configuration, never arbitrary allow/deny",
-        "implementation_status": "operational_development_limited",
-        "required_features": [
-          "F06"
-        ],
-        "runtime_required_features": [],
-        "conditional_features": [],
-        "operation_contract": {
-          "kind": "auth",
-          "target_entity": "accounts",
-          "version_mode": "none",
-          "version_field": null,
-          "read_operation": "account_get_v1",
-          "atomic_effects": [
-            "bounded_google_link_intent"
-          ],
-          "business_commit": false,
-          "read_path_status": "implemented",
-          "source_decision": "S05"
-        },
-        "decision_delivery": {
-          "accepted_contract": "DS-2026-10-17",
-          "runtime_conformance": "implemented_pending_ci",
-          "open_dependencies": [],
-          "target_request": {
-            "$ref": "#/$defs/Request_account_google_link_prepare"
-          }
-        },
-        "runtime_path": "/functions/v1/backend-v1/account_google_link_prepare_v1",
-        "runtime_rpc": "api_v1.account_google_link_prepare_v1",
-        "runtime_external_path": "/functions/v1/backend-v1/account_google_link_prepare_v1",
-        "runtime_limits": [
-          "Obtain Google ID token first. Prepare with fresh current native reauth; within 10 seconds call native id_token grant with link_identity=true and matching Google token/nonce. Native signature, issuer, audience and nonce checks are mandatory."
-        ]
-      },
-      {
         "name": "media_get_v1",
         "module": "M02",
         "features": [],
@@ -78413,49 +77785,45 @@
         }
       },
       {
-        "name": "account_signup_request_v1",
+        "name": "account_signup_check_v1",
         "module": "M02",
         "features": [
           "F06"
         ],
         "permission": "auth.signup",
         "actor_source": "public_request_context",
-        "transport": "H",
+        "transport": "E",
         "billing_class": "exempt",
         "request": {
-          "$ref": "#/$defs/Request_account_signup_request"
+          "$ref": "#/$defs/Request_account_signup_check"
         },
         "success": {
-          "$ref": "#/$defs/Success_account_signup_request"
+          "$ref": "#/$defs/Success_account_signup_check"
         },
         "errors": [
           "RATE_LIMITED",
           "TEMPORARY_FAILURE",
           "SERVICE_UNAVAILABLE",
           "VALIDATION_FAILED",
-          "WEAK_PASSWORD",
-          "BOT_VERIFICATION_FAILED",
-          "RESULT_NOT_CONFIRMED"
+          "CLIENT_UPDATE_REQUIRED"
         ],
         "transaction_class": "auth",
-        "transaction_guarantee": "Durable per-address dispatch claim before native signup. Existing primary/Google identity email returns account_exists without provider signup or email. Native Auth owns account creation and verification.",
+        "transaction_guarantee": "Read-only Auth existence lookup with the existing IP rate counter. Never creates accounts, sends mail or handles credentials.",
         "transition": {
-          "effect": "native_signup_or_account_exists",
+          "effect": "check_email_availability",
           "from": [],
           "to": [],
-          "invariant": "No new signup call for an existing address or unresolved dispatch."
+          "invariant": "Return only account_exists or available; no account identifiers or primary address."
         },
         "semantic_guards": [
           "billing_gate_exempt",
           "required_feature_gates_separate_from_references",
           "signed_public_ingress_and_ip_rate",
-          "native_signup_password_captcha_pkce",
-          "explicit_signup_existence_without_identity_or_tenant_disclosure",
-          "durable_dispatch_no_unknown_outcome_retry"
+          "explicit_signup_existence_without_identity_or_tenant_disclosure"
         ],
         "audit": false,
         "notification": "none",
-        "concurrency": "Per-address proxy dispatch claim; unknown outcomes never expire or automatically retry. Native signup/OAuth/link/email changes are outside this fence.",
+        "concurrency": "Advisory snapshot, not a reservation or atomic fence around later native signup/OAuth/link/email changes.",
         "expected_version_subject": "none",
         "acceptance_scenario_ids": [
           "A01",
@@ -78494,9 +77862,12 @@
             "hosted_signup_acceptance"
           ],
           "target_request": {
-            "$ref": "#/$defs/Request_account_signup_request"
+            "$ref": "#/$defs/Request_account_signup_check"
           }
-        }
+        },
+        "runtime_limits": [
+          "Existing primary email or linked Google identity email includes unconfirmed accounts. available means no match at check time; the client then calls native signUp. No password, CAPTCHA, PKCE or metadata accepted."
+        ]
       }
     ],
     "policy_value_map": {
@@ -79415,30 +78786,6 @@
       },
       {
         "path": "#/$defs/Success_account_profile_update/properties/trace_id",
-        "origin": "ftksaas",
-        "acceptance": "generic_uuid",
-        "generation": "uuidv7"
-      },
-      {
-        "path": "#/$defs/Request_account_password_change/properties/request_id",
-        "origin": "ftksaas",
-        "acceptance": "generic_uuid",
-        "generation": "uuidv7"
-      },
-      {
-        "path": "#/$defs/Success_account_password_change/properties/trace_id",
-        "origin": "ftksaas",
-        "acceptance": "generic_uuid",
-        "generation": "uuidv7"
-      },
-      {
-        "path": "#/$defs/Request_account_password_reset_request/properties/request_id",
-        "origin": "ftksaas",
-        "acceptance": "generic_uuid",
-        "generation": "uuidv7"
-      },
-      {
-        "path": "#/$defs/Success_account_password_reset_request/properties/trace_id",
         "origin": "ftksaas",
         "acceptance": "generic_uuid",
         "generation": "uuidv7"
@@ -93286,42 +92633,6 @@
         "generation": "uuidv7"
       },
       {
-        "path": "#/$defs/Request_account_totp_remove/properties/request_id",
-        "origin": "ftksaas",
-        "acceptance": "generic_uuid",
-        "generation": "uuidv7"
-      },
-      {
-        "path": "#/$defs/Request_account_totp_remove/properties/factor_id",
-        "origin": "provider",
-        "acceptance": "generic_uuid",
-        "generation": "preserve"
-      },
-      {
-        "path": "#/$defs/AccountTotpRemoval/properties/factor_id",
-        "origin": "provider",
-        "acceptance": "generic_uuid",
-        "generation": "preserve"
-      },
-      {
-        "path": "#/$defs/Success_account_totp_remove/properties/trace_id",
-        "origin": "ftksaas",
-        "acceptance": "generic_uuid",
-        "generation": "uuidv7"
-      },
-      {
-        "path": "#/$defs/Request_account_google_link_prepare/properties/request_id",
-        "origin": "ftksaas",
-        "acceptance": "generic_uuid",
-        "generation": "uuidv7"
-      },
-      {
-        "path": "#/$defs/Success_account_google_link_prepare/properties/trace_id",
-        "origin": "ftksaas",
-        "acceptance": "generic_uuid",
-        "generation": "uuidv7"
-      },
-      {
         "path": "#/$defs/StarterRetainedScope/properties/room_id/anyOf/0",
         "origin": "ftksaas",
         "acceptance": "generic_uuid",
@@ -93868,13 +93179,13 @@
         "generation": "uuidv7"
       },
       {
-        "path": "#/$defs/Request_account_signup_request/properties/request_id",
+        "path": "#/$defs/Request_account_signup_check/properties/request_id",
         "origin": "ftksaas",
         "acceptance": "generic_uuid",
         "generation": "uuidv7"
       },
       {
-        "path": "#/$defs/Success_account_signup_request/properties/trace_id",
+        "path": "#/$defs/Success_account_signup_check/properties/trace_id",
         "origin": "ftksaas",
         "acceptance": "generic_uuid",
         "generation": "uuidv7"
@@ -94054,8 +93365,6 @@
       "implemented_operations": [
         "account_get_v1",
         "account_profile_update_v1",
-        "account_password_change_v1",
-        "account_password_reset_request_v1",
         "account_delete_preview_v1",
         "account_delete_apply_v1",
         "organizations_list_v1",
@@ -94263,8 +93572,6 @@
         "account_session_label_v1",
         "account_sessions_revoke_v1",
         "account_security_history_get_v1",
-        "account_totp_remove_v1",
-        "account_google_link_prepare_v1",
         "media_get_v1",
         "settings_template_resolve_v1",
         "calendar_links_get_v1",
@@ -94273,13 +93580,13 @@
         "calendar_link_revoke_v1",
         "calendar_feed_get_v1",
         "settings_preparation_resolve_v1",
-        "account_signup_request_v1"
+        "account_signup_check_v1"
       ],
       "auth": "Supabase getUser + live auth.sessions + current account/link/role; no request actor claims",
       "uuid": "backend uuid@14.0.3 v7 for all inserted IDs; DB defaults not required",
       "external_transport": "POST /functions/v1/backend-v1/{operation}; direct typed request body",
       "internal_rpc": "service-only api_v1 named functions; actor/session/UUID bank supplied by verified gateway",
-      "migration_count": 84,
+      "migration_count": 85,
       "acceptance_source": "apps/backend/docs/00-FtkSaaS-yeni-sohbet-devir.md"
     },
     "decision_sprint": {
@@ -94967,8 +94274,6 @@
         "account_session_label_v1",
         "account_sessions_revoke_v1",
         "account_security_history_get_v1",
-        "account_totp_remove_v1",
-        "account_google_link_prepare_v1",
         "media_get_v1",
         "settings_template_resolve_v1",
         "calendar_links_get_v1",
@@ -94977,7 +94282,7 @@
         "calendar_link_revoke_v1",
         "calendar_feed_get_v1",
         "settings_preparation_resolve_v1",
-        "account_signup_request_v1"
+        "account_signup_check_v1"
       ],
       "runtime_deliveries": {
         "starter_attendance_protection": {
@@ -95057,7 +94362,17 @@
           "evidence_suite": "tests/cross-center-settlement.test.mjs",
           "source_ci_policy": "Verify final head CI independently; test-path metadata alone is not a CI receipt."
         }
-      }
+      },
+      "retired_operations": [
+        "account_google_link_prepare_v1",
+        "account_password_change_v1",
+        "account_password_reset_request_v1",
+        "account_totp_remove_v1"
+      ],
+      "retired_baseline_operations": [
+        "account_password_change_v1",
+        "account_password_reset_request_v1"
+      ]
     },
     "feature_delivery": {
       "F01": {
@@ -95331,8 +94646,6 @@
         "technical_operations": [
           "account_get_v1",
           "account_profile_update_v1",
-          "account_password_change_v1",
-          "account_password_reset_request_v1",
           "account_delete_preview_v1",
           "account_delete_apply_v1",
           "account_access_send_v1",
@@ -95349,9 +94662,7 @@
           "account_session_label_v1",
           "account_sessions_revoke_v1",
           "account_security_history_get_v1",
-          "account_totp_remove_v1",
-          "account_google_link_prepare_v1",
-          "account_signup_request_v1"
+          "account_signup_check_v1"
         ],
         "dependencies": [
           "plan_gate_alignment",
@@ -95364,8 +94675,6 @@
         "implemented_operations": [
           "account_get_v1",
           "account_profile_update_v1",
-          "account_password_change_v1",
-          "account_password_reset_request_v1",
           "account_delete_preview_v1",
           "account_delete_apply_v1",
           "account_access_send_v1",
@@ -95382,9 +94691,7 @@
           "account_session_label_v1",
           "account_sessions_revoke_v1",
           "account_security_history_get_v1",
-          "account_totp_remove_v1",
-          "account_google_link_prepare_v1",
-          "account_signup_request_v1"
+          "account_signup_check_v1"
         ],
         "contract_only_operations": [],
         "acceptance_case_ids": [

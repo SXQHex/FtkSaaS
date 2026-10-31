@@ -248,9 +248,8 @@ otp_expiry = 3600
 enabled = true
 subject = "Parolanız değiştirildi"
 # CLI 2.122 native mode rejects content_path and omits the current-password setting.
-# Keep the custom template in the hosted config tool and isolated Auth fixture.
-# Hosted settings: scripts/auth-password-security.mjs; real native acceptance:
-# tests/account-password-security-acceptance.mjs (isolated CLI-owned binary).
+# Hosted settings and template: scripts/auth-password-security.mjs.
+# Do not fork the native Auth process to reimplement provider acceptance.
 
 [auth.sms]
 # Allow/disallow new user signups via SMS to your project.

@@ -1,6 +1,6 @@
-## Kayıt sonucu ve parola reddi
+## Kayıt ön kontrolü ve native Auth hataları
 
-`account_signup_request_v1` için `account_exists` hata değil kapalı bir iş sonucudur. Anonim kullanıcı yalnız adresin mevcut olduğunu öğrenir. `WEAK_PASSWORD` native parola gücü reddidir; provider’ın özel mesajı veya hesap bilgisi aktarılmaz. `RESULT_NOT_CONFIRMED` belirsiz kayıt dispatch’inde otomatik retry’ı kapatır. [Typed tüketici ve kurtarma](../settings.md#e-posta-parola-kayıt-tüketicisi).
+`account_signup_check_v1` için `account_exists / available` HTTP 200 içindeki ayrık iş sonucudur. Anonim kullanıcı yalnız adres varlığını öğrenir; kontrol parola almaz, kayıt veya posta oluşturmaz. Native signup/parola/reauth hataları Supabase SDK’dan gelir ve Edge hata zarfına çevrilmez. [Typed tüketici](../settings.md#e-posta-parola-kayıt-tüketicisi).
 
 ## Tek stüdyo ürün adı hata eşlemesi — 67 kabulü
 
