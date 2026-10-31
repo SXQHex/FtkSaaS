@@ -255,7 +255,7 @@
       ],
       "review": {
         "fingerprint": "8c43aa0f9b469570009c64f527ebb2e799857360ba870ecad4e41c2a89a789ef",
-        "reason": "Auth fixture readiness ve yalnız sayısal süreç eleme tanısı incelendi; exact DB/SMTP ve tek aday koşulları korunur, gerçek CI kök nedeni açık kalır."
+        "reason": "Pinned Auth paketinin shell exec yapısı ve dar süreç seçimi incelendi; local DB/SMTP, tek süreç ve CI güvenlik kapıları değişmedi."
       }
     },
     {
@@ -335,8 +335,8 @@
         "account_signup_request_v1"
       ],
       "review": {
-        "fingerprint": "56466278ea03bb532460f632c3c907c919ccfbb94576730ec6e9ccb12b5d8d92",
-        "reason": "Pinned CLI lazy Auth yaşam döngüsü, loopback health hazırlığı ve HTTP/proc regresyonu incelendi; native parola assertionları korunur, hata sayaçları secret içermez."
+        "fingerprint": "d9409a8c67ae1dc9fca46fb46e336532bf33db12e22a1830cd07aa90d97ec64a",
+        "reason": "Gerçek auth-v2.197.0-r0 arşivinde .auth-wrapped doğrulandı; wrapper regresyonu eski seçicide aynı hatayı üretiyor, mevcut parola ve nonce kabul assertionları korunuyor."
       }
     },
     {

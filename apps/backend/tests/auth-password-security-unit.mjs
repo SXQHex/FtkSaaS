@@ -35,14 +35,26 @@ test('security notice is informational with one trusted token-free recovery entr
  assert.equal(policy.security_update_password_require_current_password,true);assert.equal(policy.security_update_password_require_reauthentication,true);assert.equal(policy.mailer_otp_exp,3600);
 });
 
-test('native Auth discovery distinguishes the private listener from the public API proxy and rejects foreign or ambiguous processes',{skip:process.platform!=='linux'},async()=>{
- const directory=fs.mkdtempSync(path.join(os.tmpdir(),'native-auth-discovery-')),executable=path.join(directory,'auth'),children=[];
+test('native Auth discovery follows the packaged wrapper and rejects foreign or ambiguous processes',{skip:process.platform!=='linux'},async()=>{
+ const directory=fs.mkdtempSync(path.join(os.tmpdir(),'native-auth-discovery-')),launcher=path.join(directory,'auth'),executable=path.join(directory,'.auth-wrapped'),children=[];
  // A real /proc process fixture tests discovery only; it does not stand in for Auth acceptance.
  fs.copyFileSync('/bin/sleep',executable);
+ // The pinned slim-services release wraps auth with a shell exec, so /proc/exe
+ // names .auth-wrapped rather than the launcher (auth).
+ fs.writeFileSync(launcher,'#!/bin/sh\nexec "'+executable+'" "$@"\n',{mode:0o700});
  const port=40000+Math.floor(Math.random()*10000),database='/discovery_'+path.basename(directory),db='postgresql://fixture:synthetic@127.0.0.1:'+port+database;
  const status={env:{DB_URL:db,ANON_KEY:'synthetic'},endpoints:{'mail.smtp':{address:'127.0.0.1',port:port+1},'auth.http':{address:'127.0.0.1',port:port+2}}};
  const env={...process.env,GOTRUE_DB_DATABASE_URL:db,GOTRUE_API_HOST:'127.0.0.1',GOTRUE_API_PORT:String(port+3),GOTRUE_SMTP_HOST:'127.0.0.1',GOTRUE_SMTP_PORT:String(port+1)};
- const launch=async()=>{const child=spawn(executable,['60'],{env,stdio:'ignore'});children.push(child);await once(child,'spawn');};
+ const launch=async()=>{
+  const child=spawn(launcher,['60'],{env,stdio:'ignore'});children.push(child);await once(child,'spawn');
+  // Wait for the shell's exec without assuming child.pid shares /proc's namespace.
+  for(let i=0;i<100;i++){
+   const count=fs.readdirSync('/proc').filter(entry=>{try{return /^\d+$/.test(entry)&&fs.readlinkSync('/proc/'+entry+'/exe')===executable;}catch{return false;}}).length;
+   if(count===children.length)return;
+   await new Promise(resolve=>setTimeout(resolve,10));
+  }
+  throw Error('WRAPPED_FIXTURE_NOT_READY');
+ };
  let healthRequests=0;
  const server=createServer(async(req,res)=>{
   if(req.url!=='/auth/v1/health'||req.headers.apikey!=='synthetic'){res.writeHead(400);res.end();return;}

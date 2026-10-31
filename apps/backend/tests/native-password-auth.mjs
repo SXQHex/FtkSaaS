@@ -21,7 +21,9 @@ export function findNativeAuth(status){
   let executable;
   try{executable=fs.readlinkSync('/proc/'+entry+'/exe');}catch{rejected.executable_unreadable++;continue;}
   try{
-   if(!['auth','gotrue'].includes(path.basename(executable)))continue;
+   // slim-services auth-v2.197.0-r0/bin/auth execs .auth-wrapped (nix/packages.nix).
+   // /proc exposes the final ELF, not the launcher; all stack identity checks follow.
+   if(!['auth','gotrue','.auth-wrapped'].includes(path.basename(executable)))continue;
    rejected.auth_executables++;
    const env=Object.fromEntries(fs.readFileSync('/proc/'+entry+'/environ','utf8').split('\0').filter(Boolean).map(line=>{const i=line.indexOf('=');return [line.slice(0,i),line.slice(i+1)];}));
    let address;try{address=dbAddress(env.GOTRUE_DB_DATABASE_URL);}catch{rejected.invalid_db++;continue;}
