@@ -330,8 +330,8 @@
         "account_signup_check_v1"
       ],
       "review": {
-        "fingerprint": "8cd8a04c65154446da53c965c2529d47d937788958d42730efce21733ec77a87",
-        "reason": "Google/TOTP/password challenge ve recovery adapterleri tamamen kaldırıldı; native SDK sözleşmesi, migration ve uygulama entegrasyon testleri incelendi."
+        "fingerprint": "36b309c4f4e0b5ebfa79b93e5e0bfb3fe46429988c3d9b9b910cf3328ccb69b7",
+        "reason": "Native MFA negatif testi bağımsız AAL1 oturum kuruyor; güncel native oturum AAL şartı, korunan uygulama JWT kapıları ve frontend SDK geçiş eşlemesi kaynakta incelendi."
       }
     },
     {

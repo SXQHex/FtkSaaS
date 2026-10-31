@@ -122,7 +122,7 @@ Bütün dört işlem global kendi hesap kapsamındadır; org/center/account/acto
 | account_sessions_revoke_v1 | operation_key ve kapalı mode:selected/current/others. selected session_id ister. others aynı bearer session’dan taze native giriş proof’u reauth ister; doğrulanmış factor varsa hem caller hem proof aal2 olmalıdır. Taze giriş benimsenip others çağrılır; bu session korunur. Replay daha sonra açılmış session’ları kapatmaz. current çıkışı zayıf token ile de mümkündür. |
 | account_security_history_get_v1 | Opsiyonel cursor;50 kendi değişmez global olay, kararlı as_of. Faktör etkinleştirme/kaldırma olayları tek faktörün geçişidir, tüm MFA durumunun özeti değildir. Secret/code/reauth saklanmaz. |
 
-Enrollment/challenge/verify/unenroll native Supabase Auth SDK ile yapılır. Doğrulanmış faktörü kaldırırken native sağlayıcı kendi faktör sahipliği ve AAL2 koşulunu uygular; uygulama onay tokenı, 10 saniyelik niyet veya ikinci silme tetikleyicisi yoktur. Native hata veya belirsiz ağ sonucu başarı sayılmaz; faktör listesi yeniden okunur.
+Enrollment/challenge/verify/unenroll native Supabase Auth SDK ile yapılır. Doğrulanmış faktörü kaldırırken native sağlayıcı kendi faktör sahipliği ve AAL2 koşulunu uygular; uygulama onay tokenı, 10 saniyelik niyet veya ikinci silme tetikleyicisi yoktur. Native hata veya belirsiz ağ sonucu başarı sayılmaz; faktör listesi yeniden okunur. MFA doğrulanmamış ayrı oturum faktör kaldıramaz. Native kaldırma kontrolü oturumun güncel AAL seviyesini kullanır; MFA ile yükseltilmiş aynı oturumun eski JWT’si ayrı bir AAL1 oturum sayılmaz. İstemci her zaman native doğrulamanın döndürdüğü güncel oturumu kullanır. Başarılı kaldırmadan sonra `refreshSession()` ve `mfa.listFactors()` ile oturum/faktör görünümü yenilenir; hesap ve güvenlik geçmişi yeniden okunur.
 
 Verified native factor varsa eski aal1 token session DB aal2 olsa bile uygulamaya erişemez. JWT assurance user_metadata’dan alınmaz; Edge native user doğrular ve SQL ayrıca canlı session/factor durumunu denetler. Faktör etkinleştirme/kaldırma geçmişi korunur. Rolün MFA zorunluluğu politikası, recovery kodu, güvenilen cihaz/passkey/SMS desteği bu paketle ilan edilmez. Hosted provider ayarları ayrı doğrulanır; local config CD’nin hosted Auth ayarını değiştirdiği anlamına gelmez.
 
@@ -141,6 +141,20 @@ Google giriş/otomatik kimlik bağlama, manuel `supabase.auth.linkIdentity({prov
 Uygulamanın Google prepare ve TOTP remove endpoint’leri kaldırılmıştır. Frontend doğrudan native SDK’ya geçer; geçici uyumluluk yolu yoktur.
 
 E-posta/telefon request/resend/verify native Auth SDK’sındadır. account_get_v1.identity doğrulanmış güncel ve pending alanları ayırır; pending org kayıtlarına yayılmaz. E-posta değişiminde çift doğrulama ve eski proof/expiry kapıları native sağlayıcıda kalır. Native işlem oturum yenilerse dönen oturum kullanılmalıdır. SMS sağlayıcı kabulü ayrı ortam işidir; numara kaydı gerçek SMS teslimi olarak gösterilmez.
+
+### Native Auth tüketici eşlemesi
+
+Aşağıdaki eski uygulama endpoint’leri aktif API sözleşmesinde ve runtime’da yoktur. Çağıran frontend kodu doğrudan native karşılığına geçer; geçici endpoint/uyumluluk adapter’ı yoktur. Native Auth yanıtları Supabase SDK sözleşmesidir; uygulamanın `Operations` tipine veya Edge `SafeError` zarfına eklenmez.
+
+| Kaldırılan uygulama endpoint’i | Yeni tüketim |
+|---|---|
+| `account_signup_request_v1` | Önce yalnız e-posta ile `account_signup_check_v1`. `account_exists` durumunda dur; yalnız `available` durumunda native `signUp`. |
+| `account_google_link_prepare_v1` | Doğrudan `linkIdentity({provider:'google'})`; giriş/kayıt için `signInWithOAuth({provider:'google'})`. |
+| `account_totp_remove_v1` | Native MFA challenge/verify ile AAL2 oturum, ardından `mfa.unenroll({factorId})`. |
+| `account_password_change_v1` | `updateUser({password,current_password})`; native `reauthentication_needed` gelirse `reauthenticate()` ve kullanıcı koduyla `updateUser({password,current_password,nonce})`. |
+| `account_password_reset_request_v1` | `resetPasswordForEmail(email,{redirectTo})`; mevcut callback/PKCE sonrası native recovery oturumunda `updateUser({password})`. |
+
+Hesap profili, oturum listesi/etiketi/iptali ve güvenlik geçmişi uygulama API’lerinde kalır. Kayıt ön kontrolünün kapalı request/response ve sunucu transport sözleşmesi [aşağıdaki kayıt bölümündedir](#e-posta-parola-kayıt-tüketicisi). UI route, form ve callback uygulaması frontend sahibindedir.
 
 ### Parola değişimi ve güvenlik bildirimi
 
