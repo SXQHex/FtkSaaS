@@ -33,9 +33,9 @@ test.each([
   await expect(checkSignup("test@example.invalid")).rejects.toThrow("signupCheckUnavailable");
 });
 function gatewayEnv() {
-  vi.stubEnv("FTK_SIGNUP_HOSTNAME", "app.example.invalid");
-  vi.stubEnv("FTK_PUBLIC_BACKEND_ORIGIN", "https://project.example.invalid");
-  vi.stubEnv("FTK_PUBLIC_ANON_KEY", "synthetic-public-key");
+  vi.stubEnv("NEXT_PUBLIC_APP_ORIGIN", "https://app.example.invalid");
+  vi.stubEnv("NEXT_PUBLIC_SUPABASE_URL", "https://project.example.invalid");
+  vi.stubEnv("NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY", "synthetic-publishable-key");
   vi.stubEnv("FTK_PUBLIC_INGRESS_SECRET", "synthetic-ingress-secret-at-least-32-bytes");
 }
 function signupRequest(origin = "https://app.example.invalid") {
@@ -68,6 +68,7 @@ test("server route delegates to the backend transport with platform IP and serve
     "https://project.example.invalid/functions/v1/backend-v1/account_signup_check_v1",
   );
   expect(options?.headers).toMatchObject({
+    apikey: "synthetic-publishable-key",
     "x-ftk-client-ip": "192.0.2.1",
     "x-ftk-ingress-signature": expect.stringMatching(/^[0-9a-f]{64}$/),
   });
@@ -84,11 +85,28 @@ test("gateway rejects a foreign origin without making an upstream request", asyn
   expect((await POST(signupRequest("https://foreign.example.invalid"))).status).toBe(403);
   expect(fetcher).not.toHaveBeenCalled();
 });
-test("missing gateway config fails closed without an upstream request", async () => {
+test.each([
+  "NEXT_PUBLIC_APP_ORIGIN",
+  "NEXT_PUBLIC_SUPABASE_URL",
+  "NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY",
+  "FTK_PUBLIC_INGRESS_SECRET",
+])("missing %s fails closed without an upstream request", async (name) => {
   gatewayEnv();
-  vi.stubEnv("FTK_PUBLIC_INGRESS_SECRET", "");
+  vi.stubEnv(name, "");
   const fetcher = vi.fn<typeof fetch>();
   vi.stubGlobal("fetch", fetcher);
   expect((await POST(signupRequest())).status).toBe(503);
   expect(fetcher).not.toHaveBeenCalled();
 });
+
+test.each(["not-a-url", "http://app.example.invalid", "javascript:alert(1)"])(
+  "invalid app origin %s fails closed without using the request host",
+  async (origin) => {
+    gatewayEnv();
+    vi.stubEnv("NEXT_PUBLIC_APP_ORIGIN", origin);
+    const fetcher = vi.fn<typeof fetch>();
+    vi.stubGlobal("fetch", fetcher);
+    expect((await POST(signupRequest())).status).toBe(503);
+    expect(fetcher).not.toHaveBeenCalled();
+  },
+);
