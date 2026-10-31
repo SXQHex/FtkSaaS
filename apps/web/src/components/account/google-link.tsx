@@ -1,6 +1,6 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
-import type { UserIdentity } from "@supabase/supabase-js";
+import { isAuthApiError, type UserIdentity } from "@supabase/supabase-js";
 import { useTranslations } from "next-intl";
 import { Button } from "@ftksaas/ui/components/button";
 import { browserClient } from "../../lib/supabase/client";
@@ -12,7 +12,7 @@ export function GoogleLink({ actorId, onSaved }: { actorId: string; onSaved?: ()
   const [identities, setIdentities] = useState<UserIdentity[] | null>(null);
   const [retry, setRetry] = useState(0);
   const [busy, setBusy] = useState(false);
-  const [error, setError] = useState(false);
+  const [error, setError] = useState<"" | "providerFailed" | "lastIdentity">("");
   const lock = useRef(false);
   useEffect(() => {
     let active = true;
@@ -20,11 +20,11 @@ export function GoogleLink({ actorId, onSaved }: { actorId: string; onSaved?: ()
       .auth.getUserIdentities()
       .then((result) => {
         if (!active) return;
-        if (result.error) setError(true);
+        if (result.error) setError("providerFailed");
         setIdentities(result.error ? null : result.data.identities);
       })
       .catch(() => {
-        if (active) setError(true);
+        if (active) setError("providerFailed");
       });
     return () => {
       active = false;
@@ -34,7 +34,7 @@ export function GoogleLink({ actorId, onSaved }: { actorId: string; onSaved?: ()
     if (lock.current) return;
     lock.current = true;
     setBusy(true);
-    setError(false);
+    setError("");
     try {
       await rememberAuthReturn("/account");
       const result = await browserClient().auth.linkIdentity({
@@ -43,7 +43,7 @@ export function GoogleLink({ actorId, onSaved }: { actorId: string; onSaved?: ()
       });
       if (result.error) throw result.error;
     } catch {
-      setError(true);
+      setError("providerFailed");
       setBusy(false);
       lock.current = false;
     }
@@ -52,7 +52,7 @@ export function GoogleLink({ actorId, onSaved }: { actorId: string; onSaved?: ()
     if (lock.current) return;
     lock.current = true;
     setBusy(true);
-    setError(false);
+    setError("");
     try {
       const auth = browserClient().auth;
       const result = await auth.unlinkIdentity(identity);
@@ -60,8 +60,12 @@ export function GoogleLink({ actorId, onSaved }: { actorId: string; onSaved?: ()
       const refreshed = await auth.refreshSession();
       if (refreshed.error) throw refreshed.error;
       onSaved?.();
-    } catch {
-      setError(true);
+    } catch (cause) {
+      setError(
+        isAuthApiError(cause) && cause.code === "single_identity_not_deletable"
+          ? "lastIdentity"
+          : "providerFailed",
+      );
     } finally {
       setRetry((value) => value + 1);
       setBusy(false);
@@ -73,7 +77,7 @@ export function GoogleLink({ actorId, onSaved }: { actorId: string; onSaved?: ()
       <h2 id="google-heading" className="text-xl font-semibold">
         {t("googleLink")}
       </h2>
-      {error && <p role="alert">{t("providerFailed")}</p>}
+      {error && <p role="alert">{t(error)}</p>}
       {identities
         ?.filter((identity) => identity.provider === "google")
         .map((identity) => (
@@ -105,7 +109,7 @@ export function GoogleLink({ actorId, onSaved }: { actorId: string; onSaved?: ()
           variant="outline"
           disabled={busy}
           onClick={() => {
-            setError(false);
+            setError("");
             setRetry((value) => value + 1);
           }}
         >

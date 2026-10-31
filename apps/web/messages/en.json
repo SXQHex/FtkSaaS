@@ -666,6 +666,7 @@
     "saved": "Action completed.",
     "failed": "The action could not be confirmed. Check your connection and access, then retry.",
     "providerFailed": "The identity provider did not complete the action. Check the details, code expiry and provider setup.",
+    "lastIdentity": "Your last sign-in method cannot be removed. Add another sign-in method to your account first.",
     "imageInvalid": "Photo could not be read. Use PNG, JPEG or WebP up to 1 MB.",
     "reauthNeeded": "Verify a fresh sign-in to continue.",
     "storageFailed": "Recovery tracking could not be read or saved. No new action was sent in this tab; contact support about any uncertain earlier action.",
