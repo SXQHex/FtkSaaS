@@ -33,8 +33,19 @@ const SchedulerEngine = dynamic(() => import("./scheduler-engine"), {
 function CalendarLoading() {
   const t = useTranslations("calendar");
   return (
-    <output className="block p-10 text-center text-sm text-muted-foreground" aria-live="polite">
-      {t("loading")}
+    <output className="block" aria-live="polite">
+      <span className="sr-only">{t("loading")}</span>
+      <span aria-hidden="true" className="block divide-y rounded-xl border bg-card">
+        {[0, 1, 2].map((row) => (
+          <span key={row} className="flex items-center gap-5 px-5 py-4">
+            <span className="w-16 space-y-2">
+              <span className="block h-4 w-12 animate-pulse rounded bg-muted" />
+              <span className="block h-3 w-9 animate-pulse rounded bg-muted" />
+            </span>
+            <span className="block h-4 flex-1 max-w-56 animate-pulse rounded bg-muted" />
+          </span>
+        ))}
+      </span>
     </output>
   );
 }
@@ -71,6 +82,8 @@ export function SessionCalendar({
   const [query, setQuery] = useState("");
   const [kind, setKind] = useState("all");
   const [layout, setLayout] = useState<"list" | "grid">("list");
+  const [clockDay] = useState(() => dateInZone(new Date(), timeZone));
+  const todayKey = today ?? clockDay;
   const licensed = Boolean(process.env.NEXT_PUBLIC_SYNCFUSION_LICENSE_KEY);
   const formatDay = (day: string, options: Intl.DateTimeFormatOptions) =>
     new Intl.DateTimeFormat(locale, { ...options, timeZone: "UTC" }).format(
@@ -109,10 +122,7 @@ export function SessionCalendar({
           >
             <ChevronLeft />
           </Button>
-          <Button
-            variant="outline"
-            onClick={() => onDateChange(today ?? dateInZone(new Date(), timeZone))}
-          >
+          <Button variant="outline" onClick={() => onDateChange(todayKey)}>
             {t("today")}
           </Button>
           <Button
@@ -163,6 +173,13 @@ export function SessionCalendar({
               <span id={`${id}-day-${day}`} className="text-base font-semibold tabular-nums">
                 {number}
               </span>
+              <span
+                aria-hidden="true"
+                className={cn(
+                  "size-1 rounded-full",
+                  day === todayKey ? "bg-current" : "bg-transparent",
+                )}
+              />
             </button>
           );
         })}
@@ -173,6 +190,7 @@ export function SessionCalendar({
           return (
             <span key={day} id={`${id}-date-${day}`}>
               {formatDay(day, { weekday: "long", day: "numeric", month: "long" })}
+              {day === todayKey ? `, ${t("today")}` : ""}
             </span>
           );
         })}
@@ -296,7 +314,7 @@ export function SessionCalendar({
           onSelect={onSelect}
         />
       ) : (
-        <div className="space-y-6">
+        <div className="space-y-7">
           {days.map((day) => {
             const dayItems = visible.filter(
               (entry) =>
@@ -306,61 +324,79 @@ export function SessionCalendar({
             if (!dayItems.length) return null;
             return (
               <section key={day} aria-label={formatDay(day, { dateStyle: "full" })}>
-                <h3 className="mb-3 text-sm font-medium">
+                <h3 className="mb-2 flex items-baseline gap-2 text-sm font-medium">
                   {formatDay(day, { weekday: "long", day: "numeric", month: "long" })}
+                  {day === todayKey && (
+                    <span className="rounded-full bg-primary px-2 py-0.5 text-xs font-medium text-primary-foreground">
+                      {t("today")}
+                    </span>
+                  )}
                 </h3>
-                <div className="space-y-3">
-                  {dayItems.map((entry) => (
-                    <button
-                      key={entryKey(entry)}
-                      type="button"
-                      onClick={() => onSelect(entry)}
-                      className="group flex w-full flex-wrap items-center gap-4 rounded-xl border bg-card p-5 text-left transition-colors hover:border-foreground/30 hover:bg-muted/40"
-                    >
-                      <div className="flex min-w-24 items-baseline gap-2 sm:block">
-                        <span className="block text-lg font-semibold tabular-nums">
-                          {formatTime(entry.startsAt)}
-                        </span>
-                        <span className="text-xs text-muted-foreground">
-                          {formatTime(entry.endsAt)}
-                        </span>
-                      </div>
-                      <div className="min-w-0 flex-1 basis-40">
-                        <span className="mb-2 inline-block text-xs text-muted-foreground">
-                          {t(entry.kind)}
-                        </span>
-                        <h4 className="font-semibold">{entry.title}</h4>
-                        {dateInZone(new Date(entry.startsAt), timeZone) !==
-                          dateInZone(new Date(entry.endsAt), timeZone) && (
-                          <p className="mt-1 text-xs text-muted-foreground">
-                            <Clock3 className="mr-1 inline size-3" aria-hidden="true" />
-                            {t("ends", {
-                              date: new Intl.DateTimeFormat(locale, {
-                                timeZone,
-                                month: "short",
-                                day: "numeric",
-                                hour: "2-digit",
-                                minute: "2-digit",
-                              }).format(new Date(entry.endsAt)),
-                            })}
-                          </p>
-                        )}
-                      </div>
-                      <div className="flex max-w-full flex-wrap items-center gap-3">
-                        {entry.capacity && (
-                          <Badge variant="outline" className="gap-1.5">
-                            <Users className="size-3" aria-hidden="true" />
-                            {t("remaining", { count: entry.capacity.remaining })}
-                          </Badge>
-                        )}
-                        <ChevronRight
-                          className="size-4 shrink-0 text-muted-foreground"
-                          aria-hidden="true"
-                        />
-                      </div>
-                    </button>
-                  ))}
-                </div>
+                <ul className="divide-y overflow-hidden rounded-xl border bg-card">
+                  {dayItems.map((entry) => {
+                    const full = entry.capacity ? entry.capacity.remaining <= 0 : false;
+                    return (
+                      <li key={entryKey(entry)}>
+                        <button
+                          type="button"
+                          onClick={() => onSelect(entry)}
+                          className="group flex w-full flex-wrap items-center gap-x-5 gap-y-2 px-5 py-4 text-left transition-colors hover:bg-muted/50"
+                        >
+                          <div className="flex w-16 shrink-0 items-baseline gap-2 sm:block">
+                            <span className="block text-lg font-semibold leading-tight tabular-nums">
+                              {formatTime(entry.startsAt)}
+                            </span>
+                            <span className="text-xs tabular-nums text-muted-foreground">
+                              {formatTime(entry.endsAt)}
+                            </span>
+                          </div>
+                          <div className="min-w-0 flex-1 basis-40">
+                            <h4 className="font-medium">{entry.title}</h4>
+                            {(entry.kind === "event" ||
+                              dateInZone(new Date(entry.startsAt), timeZone) !==
+                                dateInZone(new Date(entry.endsAt), timeZone)) && (
+                              <p className="mt-1 flex flex-wrap gap-x-3 text-xs text-muted-foreground">
+                                {entry.kind === "event" && (
+                                  <span className="font-medium text-foreground">{t("event")}</span>
+                                )}
+                                {dateInZone(new Date(entry.startsAt), timeZone) !==
+                                  dateInZone(new Date(entry.endsAt), timeZone) && (
+                                  <span>
+                                    <Clock3 className="mr-1 inline size-3" aria-hidden="true" />
+                                    {t("ends", {
+                                      date: new Intl.DateTimeFormat(locale, {
+                                        timeZone,
+                                        month: "short",
+                                        day: "numeric",
+                                        hour: "2-digit",
+                                        minute: "2-digit",
+                                      }).format(new Date(entry.endsAt)),
+                                    })}
+                                  </span>
+                                )}
+                              </p>
+                            )}
+                          </div>
+                          <div className="flex max-w-full items-center gap-3">
+                            {entry.capacity && (
+                              <Badge
+                                variant={full ? "secondary" : "outline"}
+                                className="gap-1.5 tabular-nums"
+                              >
+                                <Users className="size-3" aria-hidden="true" />
+                                {t("remaining", { count: entry.capacity.remaining })}
+                              </Badge>
+                            )}
+                            <ChevronRight
+                              className="size-4 shrink-0 text-muted-foreground transition-transform group-hover:translate-x-0.5"
+                              aria-hidden="true"
+                            />
+                          </div>
+                        </button>
+                      </li>
+                    );
+                  })}
+                </ul>
               </section>
             );
           })}
