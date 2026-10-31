@@ -66,3 +66,9 @@ test("verified native session renders only the requested tenant and session IDs"
   const page = await SessionRoute({ params: Promise.resolve(ids) });
   expect(page.props).toEqual({ ...ids, actorId: "user" });
 });
+
+test("password recovery without a native session returns to the recovery request screen", async () => {
+  mocks.user.mockResolvedValue({ data: { user: null }, error: null });
+  const { default: UpdatePasswordPage } = await import("../src/app/(auth)/reset-password/page");
+  await expect(UpdatePasswordPage()).rejects.toThrow("redirect:/forgot-password?error=session");
+});

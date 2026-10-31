@@ -23,6 +23,8 @@ export async function GET(request: Request) {
     const { error } = await client.auth.exchangeCodeForSession(code);
     if (!error) return NextResponse.redirect(new URL(next, origin));
   }
+  if (next === "/reset-password")
+    return NextResponse.redirect(new URL("/forgot-password?error=callback", origin));
   const target = new URL("/login?error=callback", origin);
   if (next !== "/") target.searchParams.set("next", next);
   return NextResponse.redirect(target);

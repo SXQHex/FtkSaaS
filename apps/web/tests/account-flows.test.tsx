@@ -32,6 +32,7 @@ const mocks = vi.hoisted(() => ({
   >(),
   factors:
     vi.fn<() => Promise<{ error: null; data: { totp: { id: string; status: string }[] } }>>(),
+  refresh: vi.fn<() => Promise<{ error: Error | null }>>(),
   unenroll: vi.fn<() => Promise<{ error: null }>>(),
   verify: vi.fn<() => Promise<{ error: Error | null }>>(),
   saved: vi.fn<() => void>(),
@@ -47,6 +48,7 @@ vi.mock("../src/lib/supabase/client", () => ({
   browserClient: () => ({
     auth: {
       updateUser: mocks.update,
+      refreshSession: mocks.refresh,
       onAuthStateChange: () => ({ data: { subscription: { unsubscribe: () => {} } } }),
       mfa: {
         listFactors: mocks.factors,
@@ -70,6 +72,7 @@ const preview: Preview = {
 beforeEach(() => {
   vi.resetAllMocks();
   sessionStorage.clear();
+  mocks.refresh.mockResolvedValue({ error: null });
   mocks.proof.mockResolvedValue("synthetic-proof");
   mocks.factors.mockResolvedValue({ error: null, data: { totp: [] } });
   vi.stubEnv("NEXT_PUBLIC_APP_ORIGIN", "https://app.example.invalid");
@@ -117,7 +120,7 @@ test("deletion persists only preview/key and a native-user-scoped job reference,
   expect(sessionStorage.getItem("ftksaas:account-deletion-job:native-owner")).toBe(actor);
   expect(JSON.stringify(sessionStorage)).not.toContain("synthetic-proof");
 });
-test("verified TOTP removal uses backend approval, unverified enrollment cancellation stays native", async () => {
+test("verified TOTP removal challenges then unenrolls natively; enrollment cancellation stays native", async () => {
   mocks.factors.mockResolvedValue({
     error: null,
     data: {
@@ -128,19 +131,20 @@ test("verified TOTP removal uses backend approval, unverified enrollment cancell
     },
   });
   mocks.unenroll.mockResolvedValue({ error: null });
-  mocks.call.mockResolvedValue({ removed: true });
+  mocks.verify.mockResolvedValue({ error: null });
   const user = userEvent.setup();
   render(<MfaManager actorId={actor} />);
   await user.click(await screen.findByRole("button", { name: "Kurulumu iptal et" }));
   expect(mocks.unenroll).toHaveBeenCalledWith({ factorId: "pending-factor" });
   await user.click(screen.getByRole("button", { name: "Doğrulamayı kaldır" }));
+  await user.type(screen.getByLabelText("Uygulamadaki doğrulama kodu"), "123456");
   await user.click(screen.getByRole("button", { name: "Doğrula ve kaldır" }));
   expect(await screen.findByRole("status")).toHaveTextContent("kaldırıldı");
-  expect(mocks.call).toHaveBeenCalledWith("account_totp_remove_v1", {
-    factor_id: "verified-factor",
-    reauth: "synthetic-proof",
-  });
-  expect(mocks.unenroll).toHaveBeenCalledOnce();
+  expect(mocks.verify).toHaveBeenCalledWith({ factorId: "verified-factor", code: "123456" });
+  expect(mocks.unenroll).toHaveBeenLastCalledWith({ factorId: "verified-factor" });
+  expect(mocks.refresh).toHaveBeenCalledOnce();
+  expect(mocks.proof).not.toHaveBeenCalled();
+  expect(mocks.call).not.toHaveBeenCalled();
 });
 test("failed native contact changes show provider errors without a success notification", async () => {
   mocks.update.mockResolvedValue({ error: new Error("provider unavailable") });
@@ -459,4 +463,23 @@ test("invalid profile phone blocks saving and shows its own inline error", async
   expect(mocks.call).not.toHaveBeenCalled();
   expect(phone).toHaveAccessibleDescription("Geçerli bir telefon numarası gir.");
   expect(phone).toHaveFocus();
+});
+
+test("failed native MFA challenge never unenrolls and re-reads factors without a success notice", async () => {
+  mocks.factors.mockResolvedValue({
+    error: null,
+    data: { totp: [{ id: "verified-factor", status: "verified" }] },
+  });
+  mocks.verify.mockResolvedValue({ error: new Error("invalid code") });
+  const user = userEvent.setup();
+  render(<MfaManager actorId={actor} onSaved={mocks.saved} />);
+  await user.click(await screen.findByRole("button", { name: "Doğrulamayı kaldır" }));
+  await user.type(screen.getByLabelText("Uygulamadaki doğrulama kodu"), "123456");
+  await user.click(screen.getByRole("button", { name: "Doğrula ve kaldır" }));
+  expect(await screen.findByRole("alert")).toHaveTextContent("Kimlik sağlayıcısı");
+  await waitFor(() => expect(mocks.factors).toHaveBeenCalledTimes(2));
+  expect(mocks.unenroll).not.toHaveBeenCalled();
+  expect(mocks.call).not.toHaveBeenCalled();
+  expect(mocks.saved).not.toHaveBeenCalled();
+  expect(screen.queryByRole("status")).not.toBeInTheDocument();
 });

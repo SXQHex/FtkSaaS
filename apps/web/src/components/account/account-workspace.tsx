@@ -87,9 +87,9 @@ export function AccountWorkspace({ authUserId }: { authUserId: string }) {
             onSaved={saved}
           />
           <IdentityForm account={profile.account} onSaved={saved} />
-          <SessionManager actorId={profile.account.id} />
-          <MfaManager actorId={profile.account.id} />
-          <GoogleLink actorId={profile.account.id} />
+          <SessionManager key={`sessions:${retry}`} actorId={profile.account.id} />
+          <MfaManager actorId={profile.account.id} onSaved={saved} />
+          <GoogleLink actorId={profile.account.id} onSaved={saved} />
           <AccountDelete actorId={profile.account.id} nativeUserId={authUserId} />
         </div>
       )}

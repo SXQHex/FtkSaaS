@@ -70,7 +70,10 @@ test("expired callback returns a usable error and password update requires a ses
     "Giriş bağlantısı geçersiz",
   );
   await page.goto("/reset-password");
-  await expect(page).toHaveURL(/\/login\?error=session$/);
+  await expect(page).toHaveURL(/\/forgot-password\?error=session$/);
+  await expect(page.getByRole("alert")).toContainText("Kurtarma bağlantısı geçersiz");
+  await page.goto("/auth/callback?next=/reset-password");
+  await expect(page).toHaveURL(/\/forgot-password\?error=callback$/);
 });
 
 test("language switching persists across reload and recovery without changing routes", async ({

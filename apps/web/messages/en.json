@@ -71,7 +71,12 @@
     "brandCaption": "Every new day is a chance to move together.",
     "brandFooter": "Studio management",
     "nameRequired": "Enter your full name.",
-    "resendSignup": "Resend confirmation email"
+    "resendSignup": "Resend confirmation email",
+    "accountExists": "An account associated with this email address already exists. Sign in, continue with Google, or reset your password.",
+    "signupCheckUnavailable": "The signup check could not be completed. Please try again.",
+    "recoveryRequired": "Request a new recovery link to reset your password.",
+    "requestRecovery": "Request a new recovery link",
+    "recoveryLinkError": "The recovery link is invalid or expired. Request a new link."
   },
   "api": {
     "AUTH_REQUIRED": "Your session has expired. Sign in again.",
@@ -637,7 +642,6 @@
     "enroll": "Add authenticator",
     "enrollmentHint": "Add this key to your authenticator app. Keep it private; it is only shown during setup.",
     "verifyEnrollment": "Verify setup",
-    "removeFactorHint": "Verify a fresh sign-in to remove this authenticator.",
     "confirmRemoveFactor": "Verify and remove",
     "factorRemoved": "Authenticator removed.",
     "factorEnabled": "Two-step verification enabled.",
@@ -715,8 +719,6 @@
       "student_credit_accounts": "Student credit accounts"
     },
     "googleLink": "Link a Google account",
-    "googleNotConfigured": "Google account linking requires web client configuration. Existing Google sign-in is separate.",
-    "prepareGoogle": "Verify and choose Google account",
     "googleLinked": "Google sign-in method linked.",
     "deletionProgress": "Track deletion request",
     "deletionProgressHint": "Check the last deletion request in this tab or enter its reference. The server checks access and request ownership.",
@@ -751,6 +753,18 @@
       "backups": "Backups"
     },
     "findPendingDeletion": "Find a deletion with a lost response",
-    "noPendingDeletion": "No pending deletion is saved for this account in this tab."
+    "noPendingDeletion": "No pending deletion is saved for this account in this tab.",
+    "linkGoogle": "Link a Google account",
+    "unlinkGoogle": "Unlink Google account",
+    "passwordCode": "Verification code",
+    "requestPasswordCode": "Send verification code",
+    "resendPasswordCode": "Send a new code",
+    "passwordCodeRequired": "This session requires verification. Send a code to your registered address.",
+    "passwordCodeSent": "Code request received. Enter the code at your registered address.",
+    "passwordCodeInvalid": "The code is invalid or expired. Request a new code.",
+    "current_password_required": "Enter your current password.",
+    "current_password_invalid": "The current password is incorrect.",
+    "weak_password": "The new password does not meet security requirements.",
+    "same_password": "The new password must differ from the current password."
   }
 }

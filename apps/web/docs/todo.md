@@ -107,8 +107,8 @@ Her modülün “bitti” ölçütü kendi aşağıdaki kabul senaryosu **ve** b
 - [ ] `account_access_accept_v1` ile giriş yapmış doğru hesabın davet kabulünü bağla; yanlış hesap, süresi dolma, iptal ve mevcut bağlantı çakışmasını açık göster.
 - [ ] Hesap profili ile organizasyon kişi kaydını ayrı düzenle. `account_profile_update_v1` için kendi profil sürümünü gerçek management okumasından al; fotoğrafı özel medya hattıyla yükle/kaldır/oku.
 - [ ] E-posta/telefon değişikliğinde native kimlik, bekleyen doğrulama ve doğrulanmış iletişim durumlarını ayır; kişi iletişimi güncellemesini global Auth kimliği değişikliği sayma.
-- [ ] Parola değişikliğini native sağlayıcının güncel ayarıyla tamamla; sağlayıcı bir challenge/nonce istediğinde onun akışını kullan. Mevcut kabulde kapalı olan secure-password/current-password zorunluluğunu frontend ek koşuluyla geri getirme; ayrı lifecycle reauth kuralları korunur. Google hesap bağlama hazırlığını `account_google_link_prepare_v1` ile mevcut native akışa bağla.
-- [ ] `account_sessions_list_v1`, `account_session_label_v1`, `account_sessions_revoke_v1`, `account_security_history_get_v1`, `account_totp_remove_v1` için oturum listesi, adlandırma, iptal ve güvenlik görünümü oluştur.
+- [ ] Native parola değişimi/current_password ve gerektiğinde reauthenticate/nonce; native Google linkIdentity/unlinkIdentity ve TOTP challenge/verify/unenroll tüketicilerini settings.md sözleşmesine göre gerçek ortamda kabul et. Uygulama prepare/challenge/remove/completion endpoint’i yoktur.
+- [ ] `account_sessions_list_v1`, `account_session_label_v1`, `account_sessions_revoke_v1`, `account_security_history_get_v1` için oturum listesi, adlandırma, iptal ve güvenlik görünümü oluştur.
 - [ ] `account_delete_preview_v1` → `account_delete_apply_v1`: taze doğrulama, sahiplik engelleri, açık etkiler, iş durumu ve kayıp yanıtı tamamla. Talep kabulünü fiziksel imha tamamlandı olarak gösterme.
 
 **Kabul:** Öğrenci daveti doğru hesapla kabul eder, korumalı hedefe döner; iptal edilen oturum yeniden veri okuyamaz; başka hesaba ait oturum/kişi erişilemez. Silme/reauth ve sağlayıcı kabulü gerçek ortam kanıtıyla kapanır. **Bağımlılık:** B03, S13'ün erişim durumları.
@@ -409,15 +409,23 @@ PR92/95/96/98 main'e birleşti. Main `17ee1ebcf7b900b8e420d44903b589a9ebd22830` 
 
 ### S01 hesap düzeltmeleri
 
-Ortak `next-intl` sağlayıcısı tarayıcı saat dilimini hydration sonrasında uygular; hesap tarihleri ortak varsayılanı kullanır, açık merkez takvimi saat dilimi korunur. Parola formu mevcut + yeni + tekrar alanlarına indirildi; native `current_password` doğrulaması kullanılır, challenge/nonce girişi kaldırıldı. Güvenlik e-postasındaki kurtarma davranışı [XREQ-002](../../../docs/requests.md#xreq-002-parola-değişimi-güvenlik-e-postası) değerlendirmesinde; uygulanmış “geri al” gibi gösterilmez. Chrome'da yeni üç alanlı parola formu ve oturum açılış/yenilenme saatlerinin cihaz diliminde tutarlılığı görüldü; parola değişimi ve dış bildirim teslimi henüz denenmedi.
+Ortak `next-intl` sağlayıcısı tarayıcı saat dilimini hydration sonrasında uygular; hesap tarihleri ortak varsayılanı kullanır, açık merkez takvimi saat dilimi korunur. Parola formu mevcut + yeni + tekrar alanlarına indirildi; native `current_password` doğrulaması kullanılır, challenge/nonce girişi kaldırıldı. Güvenlik bildirimi ve kurtarma, PR99’daki native Auth sözleşmesiyle izlenir; eski parolayı geri alma özelliği yoktur. Chrome'da yeni üç alanlı parola formu ve oturum açılış/yenilenme saatlerinin cihaz diliminde tutarlılığı görüldü; parola değişimi ve dış bildirim teslimi henüz denenmedi.
 
 Kullanıcının hesap ekranı sadeleştirmesi: boş kimlik satırları/doğrulanmamış telefon özeti, genel bölüm açıklamaları ve sayfa başındaki silme takibi/genel güncelle kaldırıldı. Telefon biçimi/ülke doğrulaması ve E.164 dönüşümü `libphonenumber-js/max` ile, varsayılan `TR` olarak yapılır; yerel ve uluslararası numaralar kütüphanenin çıktısıyla native Auth/profil komutuna gider. Zorunlu form alanlarında kırmızı yıldız ve placeholder; native doğrulama ve parola tekrar hatasında kırmızı çerçeve/hover/focus ile alan altı kısa hata metni var. Kritik silme etkisi/onay uyarıları ve başarısız okuma yeniden denemesi korunur. Yerel `pnpm check:frontend` (172 web + 1 UI testi, lint/format/typecheck/build), coverage ve frontend isolation başarılı. Varsayılan ülkeyi TR yerine US yapan mutation testi başarısız oldu; kaynak geri yüklendi. Telefon incelemesinde engel bulunmadı. Boş kimlik satırı filtresi ters çevrilince regresyon testi başarısız oldu; kaynak geri yüklendi. Bağımsız incelemede engel bulunmadı. Yeni kaynak için CI ve dağıtım sonrası görsel/klavye/mobil kabulü açık.
 
 
+### Native Auth sözleşmesine uyarlama
+
+Kullanıcının seçtiği `35efd9b35ce2f47bf79728c2ee5b6585f525b368` settings.md kaynağı açık PR99’un başıdır; frontend devam dalı bu kaynak üzerine kuruludur. Main başlangıcı `65d64aed54716a53cda14963b1438a3523451afa`; aynı kaynağın main proof41043771480, frontend41043771471 ve merge proof41043771460 completed/success. Frontend değişikliği PR99’a bağımlıdır; henüz main sözleşmesi veya hosted kabul değildir.
+
+Kayıt ön kontrolü ve sunucu route’u; native Google link/unlink, native TOTP kaldırma, native parola hata/nonce akışı ve kurtarma ekranına dönüş uygulandı. Kaldırılmış üç uygulama operasyonu frontend transport birliğinden çıkarıldı; uyumluluk yolu eklenmedi. Profil/oturum/silme uygulama komutları ve libphonenumber-js/TR/E.164 davranışı korunur. Yerel `pnpm check:frontend`200web+1UI testi, lint/format/typecheck/build başarılı. Workspace coverage ve frontend isolation başarılıdır. account_exists koşulunu ters çeviren mutation iki regresyonu başarısız yaptı; kaynak geri yüklendi. Bağımsız incelemede engel bulunmadı; hata sonrası TOTP yeniden okuma ve süresi dolmuş recovery dönüşü regresyonları eklendi. Gerçek sağlayıcı kabulü değildir.
+
+Vercel ftksaas-web ortam değişkeni adlarının salt okunur kontrolünde gerekli `FTK_SIGNUP_HOSTNAME`, `FTK_PUBLIC_BACKEND_ORIGIN`, `FTK_PUBLIC_ANON_KEY`, `FTK_PUBLIC_INGRESS_SECRET` bulunmadı. Hosted kayıt ön kontrolü, aynı secret ile backend ortam kurulumu ve doğru platform IP zinciri kabul edilene kadar kapalı kalır. Secret/env değişikliği yapılmadı. Yerel Playwright browser kurulumu bozuk ZIP nedeniyle başarısız; E2E ve gerçek OAuth/nonce/SMS kabulü bu kaynak için açık.
+
 ### Açık kapılar
 
 - Parola değiştirme/kurtarma, kullanılmış/süresi dolmuş bağlantı ve doğrulama yeniden gönderme; yeni parola girişi ve gönderimi kullanıcı adımıdır.
-- Fotoğraf, iki oturum ve revoke sonrası Edge erişimi, TOTP, Google giriş/bağlama, doğru/yanlış/expired davet ve ayrı hesapta silme/replay/own-foreign job açık. Google bağlama web client ID eksik. SMS ayrı sağlayıcı entegrasyonudur.
+- Fotoğraf, iki oturum ve revoke sonrası Edge erişimi, TOTP, Google giriş/bağlama, doğru/yanlış/expired davet ve ayrı hesapta silme/replay/own-foreign job açık. SMS ayrı sağlayıcı entegrasyonudur.
 - Yeni hesap sadeleştirmesi ve parola değişiminin uçtan uca tarayıcı kabulü açık. Native password-changed bildirimi açıktır; yeni değişiklikten doğan gerçek teslim ayrıca doğrulanır.
 
 S01 kapanmadı. Gerçek kullanıcı hesabı silinmedi; job başarısı fiziksel imha kabulü sayılmaz.

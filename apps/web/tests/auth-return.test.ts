@@ -59,3 +59,13 @@ test("failed exchange keeps the destination on the login error without reporting
   expect(url.searchParams.get("error")).toBe("callback");
   expect(url.searchParams.get("next")).toBe(mocks.saved);
 });
+
+test("expired recovery exchange returns to recovery without leaking proof or a saved destination", async () => {
+  mocks.exchange.mockResolvedValue({ error: new Error("expired") });
+  const result = await GET(
+    new Request("https://app.example.invalid/auth/callback?code=synthetic&next=/reset-password"),
+  );
+  expect(result.headers.get("location")).toBe(
+    "https://app.example.invalid/forgot-password?error=callback",
+  );
+});
