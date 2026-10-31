@@ -25,6 +25,7 @@ export default defineConfig({
     ? undefined
     : {
         command: "pnpm start",
+        env: { NEXT_PUBLIC_APP_ORIGIN: "http://127.0.0.1:3000" },
         url: "http://127.0.0.1:3000/login",
         reuseExistingServer: !process.env.CI,
         timeout: 120000,

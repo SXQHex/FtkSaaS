@@ -5,6 +5,7 @@ import userEvent from "@testing-library/user-event";
 import { AuthFields } from "../src/components/auth/auth-fields";
 type AuthResult = Promise<{ error: { code: string } | null }>;
 const mocks = vi.hoisted(() => ({
+  check: vi.fn<typeof import("../src/lib/signup-check").checkSignup>(),
   signIn: vi.fn<(credentials: { email: string; password: string }) => AuthResult>(),
   recover: vi.fn<(email: string, options: { redirectTo: string }) => AuthResult>(),
   signup:
@@ -19,6 +20,7 @@ const mocks = vi.hoisted(() => ({
   oauth: vi.fn<() => AuthResult>(),
   resend: vi.fn<() => AuthResult>(),
 }));
+vi.mock("../src/lib/signup-check", () => ({ checkSignup: mocks.check }));
 vi.mock("../src/lib/auth-return", () => ({ rememberAuthReturn: mocks.remember }));
 vi.mock("next/navigation", () => ({
   useRouter: () => ({ replace: mocks.replace, refresh: mocks.refresh }),
@@ -38,6 +40,11 @@ vi.mock("../src/lib/supabase/client", () => ({
 }));
 beforeEach(() => {
   vi.clearAllMocks();
+  mocks.check.mockResolvedValue({
+    ok: true,
+    data: { status: "available" },
+    trace_id: "019a2b3c-4d5e-7000-8000-000000000001",
+  });
   vi.stubEnv("NEXT_PUBLIC_APP_ORIGIN", "http://127.0.0.1:3000");
 });
 
@@ -275,4 +282,62 @@ test("English signup keeps an enumeration-safe notice and identifies the submitt
   ).toBeVisible();
   expect(screen.getByRole("status")).toHaveTextContent("If this address needs verification");
   expect(screen.getByRole("button", { name: "Correct email address" })).toBeEnabled();
+});
+
+test.each(["tr", "en"] as const)(
+  "%s existing signup never invokes native signup or resend",
+  async (locale) => {
+    mocks.check.mockResolvedValue({
+      ok: true,
+      data: { status: "account_exists" },
+      trace_id: "019a2b3c-4d5e-7000-8000-000000000001",
+    });
+    const user = userEvent.setup();
+    render(<AuthFields mode="signup" />, locale);
+    await user.type(screen.getByRole("textbox", { name: /Ad soyad|Full name/ }), "Synthetic");
+    await user.type(
+      screen.getByRole("textbox", { name: /E-posta adresi|Email address/ }),
+      "existing@example.invalid",
+    );
+    await user.type(screen.getByLabelText(/^Parola$|^Password$/), "synthetic-password");
+    await user.type(
+      screen.getByLabelText(/Yeni parolayı tekrar yaz|Confirm new password/),
+      "synthetic-password",
+    );
+    await user.click(screen.getByRole("button", { name: /Hesap oluştur|Create account/ }));
+    expect(await screen.findByRole("alert")).toHaveTextContent(/zaten var|already exists/);
+    expect(mocks.signup).not.toHaveBeenCalled();
+    expect(mocks.resend).not.toHaveBeenCalled();
+  },
+);
+
+test.each(["RATE_LIMITED", "TEMPORARY_FAILURE", "SERVICE_UNAVAILABLE"] as const)(
+  "signup check %s never falls through to native signup",
+  async (code) => {
+    mocks.check.mockResolvedValue({
+      ok: false,
+      error: {
+        code,
+        retryable: code === "TEMPORARY_FAILURE",
+        trace_id: "019a2b3c-4d5e-7000-8000-000000000001",
+      },
+    });
+    const user = userEvent.setup();
+    render(<AuthFields mode="signup" />);
+    await user.type(screen.getByLabelText("Ad soyad"), "Synthetic");
+    await user.type(screen.getByLabelText("E-posta adresi"), "test@example.invalid");
+    await user.type(screen.getByLabelText("Parola", { exact: true }), "synthetic-password");
+    await user.type(screen.getByLabelText("Yeni parolayı tekrar yaz"), "synthetic-password");
+    await user.click(screen.getByRole("button", { name: "Hesap oluştur" }));
+    expect(await screen.findByRole("alert")).toBeVisible();
+    expect(mocks.signup).not.toHaveBeenCalled();
+    expect(mocks.remember).not.toHaveBeenCalled();
+  },
+);
+
+test("opening the security-email recovery entry never sends mail without an explicit submit", () => {
+  render(<AuthFields mode="recovery" initialError />);
+  expect(screen.getByRole("alert")).toHaveTextContent("Kurtarma bağlantısı geçersiz");
+  expect(mocks.recover).not.toHaveBeenCalled();
+  expect(mocks.update).not.toHaveBeenCalled();
 });

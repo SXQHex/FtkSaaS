@@ -9,6 +9,7 @@ import { Button } from "@ftksaas/ui/components/button";
 import { Input } from "@ftksaas/ui/components/input";
 import { Label } from "@ftksaas/ui/components/label";
 import { Alert, AlertDescription } from "@ftksaas/ui/components/alert";
+import { checkSignup } from "../../lib/signup-check";
 import { browserClient } from "../../lib/supabase/client";
 import { appOrigin, safeReturnPath } from "../../lib/config";
 import { rememberAuthReturn } from "../../lib/auth-return";
@@ -16,12 +17,15 @@ import { rememberAuthReturn } from "../../lib/auth-return";
 type Mode = "login" | "signup" | "recovery" | "update" | "mfa";
 function authMessage(error: unknown) {
   const code = error && typeof error === "object" && "code" in error ? error.code : undefined;
+  if (code === "user_already_exists" || code === "email_exists") return "accountExists";
   if (code === "invalid_credentials") return "invalidCredentials";
   if (code === "email_not_confirmed") return "emailUnconfirmed";
   if (code === "over_request_rate_limit" || code === "over_email_send_rate_limit")
     return "rateLimit";
   if (code === "mfa_verification_failed") return "invalidCode";
   if (code === "weak_password") return "weakPassword";
+  if (code === "reauthentication_needed" || code === "current_password_required")
+    return "recoveryRequired";
   if (code === "signup_disabled") return "signupDisabled";
   return "failed";
 }
@@ -43,7 +47,9 @@ export function AuthFields({
   const common = useTranslations("common");
   const pending = useRef(false);
   const [busy, setBusy] = useState(false);
-  const [error, setError] = useState(initialError ? "callbackError" : "");
+  const [error, setError] = useState(
+    initialError ? (mode === "recovery" ? "recoveryLinkError" : "callbackError") : "",
+  );
   const [notice, setNotice] = useState("");
   const [signupIdentity, setSignupIdentity] = useState({ email: "", name: "" });
   const [resendRequested, setResendRequested] = useState(false);
@@ -80,6 +86,15 @@ export function AuthFields({
       } else if (mode === "signup") {
         if (!String(form.get("name") ?? "").trim()) {
           setError("nameRequired");
+          return;
+        }
+        const check = await checkSignup(email);
+        if (!check.ok) {
+          setError(check.error.code === "RATE_LIMITED" ? "rateLimit" : "signupCheckUnavailable");
+          return;
+        }
+        if (check.data.status === "account_exists") {
+          setError("accountExists");
           return;
         }
         await rememberAuthReturn(destination);
@@ -190,6 +205,11 @@ export function AuthFields({
         <Alert variant="destructive" role="alert" aria-label={t("errorLabel")}>
           <AlertDescription>{t(error)}</AlertDescription>
         </Alert>
+      )}
+      {mode === "update" && error === "recoveryRequired" && (
+        <Link href="/forgot-password" className="text-sm underline">
+          {t("requestRecovery")}
+        </Link>
       )}
       {notice && (
         <output

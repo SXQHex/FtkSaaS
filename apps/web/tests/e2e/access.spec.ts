@@ -62,15 +62,47 @@ test("auth pages reflow at 320px with 200 percent text without clipping controls
     }
   }
 });
-test("expired callback returns a usable error and password update requires a session", async ({
-  page,
-}) => {
+test("expired login callback displays a usable error", async ({ page }) => {
   await page.goto("/login?error=callback");
-  await expect(page.getByRole("alert", { name: "Giriş hatası" })).toContainText(
+  await expect(page.getByRole("alert", { name: "Giriş hatası", exact: true })).toContainText(
     "Giriş bağlantısı geçersiz",
   );
+});
+
+test("password update requires a session and returns to recovery", async ({ page }) => {
   await page.goto("/reset-password");
-  await expect(page).toHaveURL(/\/login\?error=session$/);
+  await expect(page).toHaveURL(/\/forgot-password\?error=session$/);
+  await expect(page.getByRole("alert", { name: "Giriş hatası", exact: true })).toContainText(
+    "Kurtarma bağlantısı geçersiz",
+  );
+});
+
+test("recovery callback without a code returns a usable error", async ({ page }) => {
+  await page.goto("/auth/callback?next=/reset-password");
+  await expect(page).toHaveURL(/\/forgot-password\?error=callback$/);
+  await expect(page.getByRole("alert", { name: "Giriş hatası", exact: true })).toContainText(
+    "Kurtarma bağlantısı geçersiz",
+  );
+});
+
+test("callback HTTP redirects use the configured origin and reject external destinations", async ({
+  request,
+  baseURL,
+}) => {
+  for (const [next, target] of [
+    ["/reset-password", "/forgot-password?error=callback"],
+    ["/account", "/login?error=callback&next=%2Faccount"],
+    ["//attacker.invalid", "/login?error=callback"],
+  ] as const) {
+    const response = await request.get(`/auth/callback?next=${encodeURIComponent(next)}`, {
+      maxRedirects: 0,
+    });
+    expect(response.status()).toBe(307);
+    expect(response.headers().location).toBe(new URL(target, baseURL).href);
+    expect(response.headers()["set-cookie"]).toContain("ftksaas_auth_return=;");
+    expect(response.headers()["set-cookie"]).toContain("Path=/auth/callback");
+    expect(response.headers()["set-cookie"]).toContain("Max-Age=0");
+  }
 });
 
 test("language switching persists across reload and recovery without changing routes", async ({

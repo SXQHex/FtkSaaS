@@ -71,7 +71,12 @@
     "brandCaption": "Her yeni gün, birlikte hareket etmek için.",
     "brandFooter": "Stüdyo yönetimi",
     "nameRequired": "Adını ve soyadını yaz.",
-    "resendSignup": "Doğrulama e-postasını tekrar gönder"
+    "resendSignup": "Doğrulama e-postasını tekrar gönder",
+    "accountExists": "Bu e-posta adresiyle ilişkili bir hesap zaten var. Giriş yapın, Google ile devam edin veya parolanızı yenileyin.",
+    "signupCheckUnavailable": "Kayıt kontrolü tamamlanamadı. Lütfen yeniden dene.",
+    "recoveryRequired": "Parolanı yenilemek için yeni bir kurtarma bağlantısı iste.",
+    "requestRecovery": "Yeni kurtarma bağlantısı iste",
+    "recoveryLinkError": "Kurtarma bağlantısı geçersiz veya süresi dolmuş. Yeni bir bağlantı iste."
   },
   "api": {
     "AUTH_REQUIRED": "Oturumun sona erdi. Yeniden giriş yap.",
@@ -637,7 +642,6 @@
     "enroll": "Doğrulama uygulaması ekle",
     "enrollmentHint": "Bu anahtarı doğrulama uygulamana ekle. Anahtarı başkasıyla paylaşma; yalnız bu kurulum sırasında gösterilir.",
     "verifyEnrollment": "Kurulumu doğrula",
-    "removeFactorHint": "Bu doğrulama yöntemini kaldırmak için yeniden girişini doğrula.",
     "confirmRemoveFactor": "Doğrula ve kaldır",
     "factorRemoved": "Doğrulama uygulaması kaldırıldı.",
     "factorEnabled": "İki adımlı doğrulama etkinleştirildi.",
@@ -715,8 +719,6 @@
       "student_credit_accounts": "Öğrenci alacak hesapları"
     },
     "googleLink": "Google hesabını bağla",
-    "googleNotConfigured": "Google hesap bağlama için web istemci yapılandırması gerekiyor. Mevcut Google girişi ayrı çalışır.",
-    "prepareGoogle": "Doğrula ve Google hesabını seç",
     "googleLinked": "Google giriş yöntemi bağlandı.",
     "deletionProgress": "Silme talebini takip et",
     "deletionProgressHint": "Bu sekmedeki son silme talebini kontrol et veya talep referansını gir. Erişimini ve kendi talebini sunucu doğrular.",
@@ -751,6 +753,18 @@
       "backups": "Yedekler"
     },
     "findPendingDeletion": "Yanıtı kaybolan silme işlemini bul",
-    "noPendingDeletion": "Bu hesap için bu sekmede bekleyen silme işlemi yok."
+    "noPendingDeletion": "Bu hesap için bu sekmede bekleyen silme işlemi yok.",
+    "linkGoogle": "Google hesabını bağla",
+    "unlinkGoogle": "Google bağlantısını kaldır",
+    "passwordCode": "Doğrulama kodu",
+    "requestPasswordCode": "Doğrulama kodu gönder",
+    "resendPasswordCode": "Yeni kod gönder",
+    "passwordCodeRequired": "Bu oturum için doğrulama gerekiyor. Kayıtlı adresine kod gönder.",
+    "passwordCodeSent": "Kod gönderme isteği alındı. Kayıtlı adresindeki kodu gir.",
+    "passwordCodeInvalid": "Kod geçersiz veya süresi dolmuş. Yeni kod iste.",
+    "current_password_required": "Mevcut parolanı gir.",
+    "current_password_invalid": "Mevcut parola hatalı.",
+    "weak_password": "Yeni parola güvenlik koşullarını karşılamıyor.",
+    "same_password": "Yeni parola mevcut paroladan farklı olmalı."
   }
 }

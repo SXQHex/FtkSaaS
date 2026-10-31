@@ -4,12 +4,10 @@ import { useTranslations } from "next-intl";
 import { Button } from "@ftksaas/ui/components/button";
 import { AccountField } from "./account-field";
 import { browserClient } from "../../lib/supabase/client";
-import { accountCall, freshAccountProof } from "../../lib/account";
-import { ReauthFields } from "./session-manager";
 
 type Factor = { id: string; status: "verified" | "unverified"; friendly_name?: string };
 type Enrollment = { id: string; secret: string; uri: string; qr_code: string };
-export function MfaManager({ actorId }: { actorId: string }) {
+export function MfaManager({ actorId, onSaved }: { actorId: string; onSaved?: () => void }) {
   const t = useTranslations("account");
   const [factors, setFactors] = useState<Factor[] | null>(null);
   const [enrollment, setEnrollment] = useState<Enrollment | null>(null);
@@ -30,7 +28,6 @@ export function MfaManager({ actorId }: { actorId: string }) {
           setFactors(null);
         } else {
           setFactors(result.data.totp);
-          setError(false);
         }
       })
       .catch(() => {
@@ -51,10 +48,11 @@ export function MfaManager({ actorId }: { actorId: string }) {
     setNotice("");
     try {
       await task();
-      setRetry((n) => n + 1);
+      onSaved?.();
     } catch {
       setError(true);
     } finally {
+      setRetry((n) => n + 1);
       lock.current = false;
       setBusy(false);
     }
@@ -64,13 +62,17 @@ export function MfaManager({ actorId }: { actorId: string }) {
     const form = event.currentTarget;
     const data = new FormData(form);
     void run(async () => {
-      const proof = await freshAccountProof(
-        actorId,
-        String(data.get("password")),
-        String(data.get("code")),
-      );
+      const auth = browserClient().auth;
+      const verified = await auth.mfa.challengeAndVerify({
+        factorId: removing!,
+        code: String(data.get("code")),
+      });
+      if (verified.error) throw verified.error;
+      const removed = await auth.mfa.unenroll({ factorId: removing! });
+      if (removed.error) throw removed.error;
       form.reset();
-      await accountCall("account_totp_remove_v1", { factor_id: removing!, reauth: proof });
+      const refreshed = await auth.refreshSession();
+      if (refreshed.error) throw refreshed.error;
       setRemoving(null);
       setNotice("factorRemoved");
     });
@@ -95,7 +97,10 @@ export function MfaManager({ actorId }: { actorId: string }) {
         type="button"
         variant="outline"
         disabled={busy}
-        onClick={() => setRetry((n) => n + 1)}
+        onClick={() => {
+          setError(false);
+          setRetry((n) => n + 1);
+        }}
       >
         {t("refresh")}
       </Button>
@@ -181,8 +186,17 @@ export function MfaManager({ actorId }: { actorId: string }) {
       )}
       {removing && (
         <form onSubmit={remove} className="space-y-4 rounded-lg border p-4">
-          <p>{t("removeFactorHint")}</p>
-          <ReauthFields disabled={busy} />
+          <AccountField
+            id="remove-factor-code"
+            name="code"
+            label={t("totpCode")}
+            placeholder="123456"
+            inputMode="numeric"
+            autoComplete="one-time-code"
+            pattern="[0-9]{6}"
+            required
+            disabled={busy}
+          />
           <div className="flex flex-wrap gap-3">
             <Button variant="destructive" disabled={busy}>
               {t("confirmRemoveFactor")}

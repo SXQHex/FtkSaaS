@@ -3,6 +3,7 @@ import { useRef, useState, type FormEvent } from "react";
 import { useTranslations } from "next-intl";
 import type { AccountView } from "@ftksaas/api-contracts";
 import { Button } from "@ftksaas/ui/components/button";
+import { PasswordChange } from "./password-change";
 import { AccountField } from "./account-field";
 import { normalizePhone } from "../../lib/phone";
 import { browserClient } from "../../lib/supabase/client";
@@ -14,7 +15,6 @@ export function IdentityForm({ account, onSaved }: { account: AccountView; onSav
   const [busy, setBusy] = useState(false);
   const [notice, setNotice] = useState("");
   const [error, setError] = useState("");
-  const [passwordError, setPasswordError] = useState("");
   const [phoneError, setPhoneError] = useState("");
   const lock = useRef(false);
   async function run(task: () => Promise<unknown>, message: string) {
@@ -150,68 +150,7 @@ export function IdentityForm({ account, onSaved }: { account: AccountView; onSav
           <Button disabled={busy}>{t("verify")}</Button>
         </form>
       )}
-      <details className="space-y-4 border-t pt-5">
-        <summary className="cursor-pointer font-medium">{t("password")}</summary>
-        <form
-          className="space-y-3"
-          onSubmit={(event) => {
-            event.preventDefault();
-            const form = event.currentTarget;
-            const data = new FormData(form);
-            if (data.get("password") !== data.get("confirm")) {
-              setNotice("");
-              setError("");
-              setPasswordError(t("passwordMismatch"));
-              form.querySelector<HTMLInputElement>('[name="confirm"]')?.focus();
-              return;
-            }
-            setPasswordError("");
-            void run(async () => {
-              const result = await browserClient().auth.updateUser({
-                password: String(data.get("password")),
-                current_password: String(data.get("current_password")),
-              });
-              if (result.error) throw result.error;
-              form.reset();
-            }, "passwordChanged");
-          }}
-        >
-          <AccountField
-            label={t("currentPassword")}
-            id="current-password"
-            name="current_password"
-            type="password"
-            autoComplete="current-password"
-            required
-            disabled={busy}
-          />
-          <AccountField
-            label={t("newPassword")}
-            placeholder={t("passwordPlaceholder")}
-            id="new-password"
-            name="password"
-            onChange={() => setPasswordError("")}
-            type="password"
-            autoComplete="new-password"
-            minLength={8}
-            required
-            disabled={busy}
-          />
-          <AccountField
-            label={t("confirmPassword")}
-            error={passwordError}
-            onChange={() => setPasswordError("")}
-            id="confirm-password"
-            name="confirm"
-            type="password"
-            autoComplete="new-password"
-            minLength={8}
-            required
-            disabled={busy}
-          />
-          <Button disabled={busy}>{t("changePassword")}</Button>
-        </form>
-      </details>
+      <PasswordChange onSaved={onSaved} />
     </section>
   );
 }

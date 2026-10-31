@@ -1,95 +1,83 @@
-import { useEffect } from "react";
+import type { UserIdentity } from "@supabase/supabase-js";
 import { beforeEach, expect, test, vi } from "vitest";
-import { act, screen, waitFor } from "@testing-library/react";
+import { screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { render } from "./render";
 import { GoogleLink } from "../src/components/account/google-link";
 const mocks = vi.hoisted(() => ({
-  call: vi.fn<(operation: string, input: Record<string, unknown>) => Promise<unknown>>(),
-  proof: vi.fn<() => Promise<string>>(),
-  nativeLink: vi.fn<() => Promise<{ error: Error | null }>>(),
-  callback: null as null | ((result: { credential: string }) => void),
-  initialize: vi.fn<(options: { callback: (result: { credential: string }) => void }) => void>(),
-  cancel: vi.fn<() => void>(),
+  identities: vi.fn<() => Promise<{ data: { identities: UserIdentity[] }; error: Error | null }>>(),
+  link: vi.fn<() => Promise<{ error: Error | null }>>(),
+  unlink: vi.fn<() => Promise<{ error: Error | null }>>(),
+  refresh: vi.fn<() => Promise<{ error: Error | null }>>(),
+  remember: vi.fn<() => Promise<void>>(),
+  saved: vi.fn<() => void>(),
 }));
-vi.mock("../src/lib/account", async (load) => ({
-  ...(await load<typeof import("../src/lib/account")>()),
-  accountCall: mocks.call,
-  freshAccountProof: mocks.proof,
-}));
+vi.mock("../src/lib/auth-return", () => ({ rememberAuthReturn: mocks.remember }));
 vi.mock("../src/lib/supabase/client", () => ({
-  browserClient: () => ({ auth: { linkIdentity: mocks.nativeLink } }),
+  browserClient: () => ({
+    auth: {
+      getUserIdentities: mocks.identities,
+      linkIdentity: mocks.link,
+      unlinkIdentity: mocks.unlink,
+      refreshSession: mocks.refresh,
+    },
+  }),
 }));
-vi.mock("next/script", () => ({
-  default: function ProviderScript({ onReady }: { onReady: () => void }) {
-    useEffect(onReady, [onReady]);
-    return null;
-  },
-}));
+const identity: UserIdentity = {
+  id: "google-subject",
+  identity_id: "native-identity",
+  user_id: "native-user",
+  provider: "google",
+  identity_data: { email: "linked@example.invalid" },
+};
 beforeEach(() => {
   vi.resetAllMocks();
-  vi.stubEnv("NEXT_PUBLIC_GOOGLE_CLIENT_ID", "synthetic-client");
-  mocks.callback = null;
-  mocks.proof.mockResolvedValue("synthetic-fresh-proof");
-  mocks.initialize.mockImplementation((options) => {
-    mocks.callback = options.callback;
-  });
-  vi.stubGlobal("google", {
-    accounts: {
-      id: { initialize: mocks.initialize, renderButton: () => {}, cancel: mocks.cancel },
-    },
-  });
+  vi.stubEnv("NEXT_PUBLIC_APP_ORIGIN", "https://app.example.invalid");
+  mocks.identities.mockResolvedValue({ data: { identities: [] }, error: null });
+  mocks.link.mockResolvedValue({ error: null });
+  mocks.unlink.mockResolvedValue({ error: null });
+  mocks.refresh.mockResolvedValue({ error: null });
 });
-test("Google linking obtains backend approval before native ID-token linking and uses the same token", async () => {
-  const order: string[] = [];
-  mocks.call.mockImplementation(async (operation) => {
-    order.push(operation);
-    return operation === "account_get_v1" ? { id: "actor" } : { status: "ready" };
-  });
-  mocks.nativeLink.mockImplementation(async () => {
-    order.push("native-link");
-    return { error: null };
-  });
+test("Google linking uses native OAuth without a GIS client ID, token, or backend prepare", async () => {
   const user = userEvent.setup();
   render(<GoogleLink actorId="actor" />);
-  await user.click(await screen.findByRole("button", { name: "Doğrula ve Google hesabını seç" }));
-  await waitFor(() => expect(mocks.callback).not.toBeNull());
-  await act(async () => {
-    mocks.callback!({ credential: "synthetic-google-token" });
+  const button = await screen.findByRole("button", { name: "Google hesabını bağla" });
+  await waitFor(() => expect(button).toBeEnabled());
+  await user.click(button);
+  expect(mocks.remember).toHaveBeenCalledWith("/account");
+  expect(mocks.link).toHaveBeenCalledExactlyOnceWith({
+    provider: "google",
+    options: { redirectTo: "https://app.example.invalid/auth/callback" },
   });
-  expect(await screen.findByRole("status")).toHaveTextContent("bağlandı");
-  expect(order).toEqual(["account_get_v1", "account_google_link_prepare_v1", "native-link"]);
-  expect(mocks.call).toHaveBeenLastCalledWith("account_google_link_prepare_v1", {
-    reauth: "synthetic-fresh-proof",
-    google_id_token: "synthetic-google-token",
-  });
-  expect(mocks.nativeLink).toHaveBeenCalledWith(
-    expect.objectContaining({
-      provider: "google",
-      token: "synthetic-google-token",
-      nonce: expect.any(String),
-    }),
-  );
-});
-test("backend approval failure never attempts native linking or reports success", async () => {
-  mocks.call.mockImplementation(async (operation) => {
-    if (operation === "account_get_v1") return { id: "actor" };
-    throw new Error("approval denied");
-  });
-  const user = userEvent.setup();
-  render(<GoogleLink actorId="actor" />);
-  await user.click(await screen.findByRole("button", { name: "Doğrula ve Google hesabını seç" }));
-  await waitFor(() => expect(mocks.callback).not.toBeNull());
-  await act(async () => {
-    mocks.callback!({ credential: "synthetic-google-token" });
-  });
-  expect(await screen.findByRole("alert")).toHaveTextContent("Kimlik sağlayıcısı");
-  expect(mocks.nativeLink).not.toHaveBeenCalled();
   expect(screen.queryByRole("status")).not.toBeInTheDocument();
 });
-test("missing Google client configuration does not expose a nonfunctional linking button", () => {
-  vi.stubEnv("NEXT_PUBLIC_GOOGLE_CLIENT_ID", "");
+test("native linking failure stays an error", async () => {
+  mocks.link.mockResolvedValue({ error: new Error("provider rejected") });
+  const user = userEvent.setup();
   render(<GoogleLink actorId="actor" />);
-  expect(screen.getByText(/web istemci yapılandırması gerekiyor/)).toBeVisible();
-  expect(screen.queryByRole("button")).not.toBeInTheDocument();
+  const button = await screen.findByRole("button", { name: "Google hesabını bağla" });
+  await waitFor(() => expect(button).toBeEnabled());
+  await user.click(button);
+  expect(await screen.findByRole("alert")).toHaveTextContent("Kimlik sağlayıcısı");
+  expect(button).toBeEnabled();
+});
+test("unlink refreshes native identities and account data only after success", async () => {
+  mocks.identities.mockResolvedValueOnce({ data: { identities: [identity] }, error: null });
+  const user = userEvent.setup();
+  render(<GoogleLink actorId="actor" onSaved={mocks.saved} />);
+  await user.click(await screen.findByRole("button", { name: "Google bağlantısını kaldır" }));
+  await waitFor(() => expect(screen.queryByText("linked@example.invalid")).not.toBeInTheDocument());
+  expect(mocks.unlink).toHaveBeenCalledWith(identity);
+  expect(mocks.refresh).toHaveBeenCalledOnce();
+  expect(mocks.saved).toHaveBeenCalledOnce();
+});
+test("native last-identity rejection preserves the identity", async () => {
+  mocks.identities.mockResolvedValue({ data: { identities: [identity] }, error: null });
+  mocks.unlink.mockResolvedValue({ error: new Error("last identity") });
+  const user = userEvent.setup();
+  render(<GoogleLink actorId="actor" onSaved={mocks.saved} />);
+  await user.click(await screen.findByRole("button", { name: "Google bağlantısını kaldır" }));
+  expect(await screen.findByRole("alert")).toHaveTextContent("Kimlik sağlayıcısı");
+  expect(screen.getByText("linked@example.invalid")).toBeVisible();
+  expect(mocks.saved).not.toHaveBeenCalled();
 });

@@ -4,10 +4,18 @@ import { publicConfig } from "../../../lib/config";
 export async function generateMetadata() {
   return { title: (await getTranslations("auth"))("recoveryTitle") };
 }
-export default function RecoveryPage() {
+export default async function RecoveryPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ error?: string }>;
+}) {
   return (
     <>
-      <AuthFields mode="recovery" configured={!!publicConfig()} />
+      <AuthFields
+        mode="recovery"
+        configured={!!publicConfig()}
+        initialError={!!(await searchParams).error}
+      />
     </>
   );
 }

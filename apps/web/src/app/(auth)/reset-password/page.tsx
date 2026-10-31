@@ -8,7 +8,7 @@ export async function generateMetadata() {
 export default async function UpdatePasswordPage() {
   const client = await serverClient();
   const result = client ? await client.auth.getUser() : null;
-  if (!result?.data.user || result.error) redirect("/login?error=session");
+  if (!result?.data.user || result.error) redirect("/forgot-password?error=session");
   return (
     <>
       <AuthFields mode="update" />
