@@ -118,31 +118,19 @@ test('P07 account profile and manual cross-center alias merge',async t=>{
    const after=await must(owner,'person_get_v1',scope({person_id:target}));const restored=after.contacts.find(c=>c.value===oldEmail);assert(restored);assert.equal(restored.verified_at,null);assert(after.contacts.some(c=>c.value===newEmail&&c.verified_at));
    assert((await rows('select * from core.person_contacts where org_id=$1 and person_id=$2 and value=$3 and account_projection_retired',[org,source,oldEmail])).length>0);
   });
-  await t.test('recovery rate gates are atomic under concurrent callers and do not store addresses',async()=>{
-   await db.query('insert into private.p07_recovery_config values(true,86400,1,1)');
-   const clients=[await guard.connect(context().env.DB_URL),await guard.connect(context().env.DB_URL)],request={client_api_version:1,request_id:key(),email:'synthetic@ftksaas.invalid'},aux={ip_hash:createHash('sha256').update(key()).digest('hex'),target_hash:createHash('sha256').update(key()).digest('hex'),bot_verified:true};
-   try{
-    for(const c of clients)await c.query("select set_config('request.jwt.claim.role','service_role',false)");
-    const results=await Promise.all(clients.map(c=>c.query('select api_v1.account_password_reset_request_v1($1::jsonb,null,null,$2::uuid[],$3::jsonb) result',[request,Array.from({length:32},key),aux])));
-    const values=results.map(x=>x.rows[0].result);assert.equal(values.filter(x=>x._internal_recovery_ready).length,1);assert.equal(values.find(x=>!x._internal_recovery_ready).error.code,'RATE_LIMITED');
-    const stored=await rows('select * from private.p07_recovery_rates where fingerprint in ($1,$2)',[aux.ip_hash,aux.target_hash]);assert.equal(stored.length,2);assert.equal(stored.every(x=>x.hits===1),true);assert.equal(JSON.stringify(stored).includes(request.email),false);
-   }finally{for(const c of clients)await c.end();await db.query('delete from private.p07_recovery_rates where fingerprint in ($1,$2)',[aux.ip_hash,aux.target_hash]);await db.query('delete from private.p07_recovery_config');}
-  });
-  await t.test('Auth handoff uses live original session; public recovery stays closed without ingress/config',async()=>{
-   const challenge=await must(member,'account_password_change_v1');assert.equal(challenge.provider,'supabase_auth');assert.equal(challenge.status,'challenge_required');
-   const unknown=await call({jwt:context().env.ANON_KEY},'account_password_reset_request_v1',{email:'unknown-'+key()+'@ftksaas.invalid'});assert.equal(unknown.result.error.code,'TEMPORARY_FAILURE');
+  await t.test('Native password update keeps application live-session revocation enforcement',async()=>{
    const {env}=context(),nextPassword='P07-Changed-'+key();const updated=await timedFetch('auth.password_update',env.API_URL+'/auth/v1/user',{method:'PUT',headers:{apikey:env.ANON_KEY,authorization:'Bearer '+member.jwt,'content-type':'application/json'},body:JSON.stringify({password:nextPassword})});assert.equal(updated.ok,true,'native provider password completion');await updated.arrayBuffer();
    const login=await timedFetch('auth.changed_password_login',env.API_URL+'/auth/v1/token?grant_type=password',{method:'POST',headers:{apikey:env.ANON_KEY,'content-type':'application/json'},body:JSON.stringify({email:member.email,password:nextPassword})});assert.equal(login.ok,true,'new password accepted by real Auth');await login.arrayBuffer();
    assert.equal((await db.query('delete from auth.sessions where id=$1',[member.session_id])).rowCount,1);
    assert.equal((await rows('select count(*)::int n from auth.sessions where id=$1',[member.session_id]))[0].n,0);
    // Native Auth rejects this revoked JWT before the Edge can reach the SQL gate.
    const stale=await timedFetch('auth.revoked_session',env.API_URL+'/auth/v1/user',{headers:{apikey:env.ANON_KEY,authorization:'Bearer '+member.jwt}});assert.equal(stale.status,403);assert.equal((await stale.json()).error_code,'session_not_found');
-   const denied=await call(member,'account_password_change_v1');assert.equal(denied.status,401);assert.equal(denied.result.ok,false);assert.equal(denied.result.error.code,'AUTH_REQUIRED');
+   const denied=await call(member,'account_get_v1');assert.equal(denied.status,401);assert.equal(denied.result.ok,false);assert.equal(denied.result.error.code,'AUTH_REQUIRED');
    // Keep the independent SQL live-session fence exact: a service-only handoff
    // with the original verified user/session must still yield SESSION_REVOKED.
    await db.query('begin');try{
     await db.query("select set_config('request.jwt.claim.role','service_role',true)");
-    const result=(await rows('select api_v1.account_password_change_v1($1::jsonb,$2::uuid,$3::uuid,$4::uuid[]) result',[{client_api_version:1,request_id:key()},member.id,member.session_id,Array.from({length:32},key)]))[0].result;
+    const result=(await rows('select api_v1.account_get_v1($1::jsonb,$2::uuid,$3::uuid,$4::uuid[]) result',[{client_api_version:1,request_id:key()},member.id,member.session_id,Array.from({length:32},key)]))[0].result;
     assert.equal(result.ok,false);assert.equal(result.error.code,'SESSION_REVOKED');
    }finally{await db.query('rollback');}
   });

@@ -126,7 +126,6 @@
         "apps/backend/scripts/uuid.mjs",
         "apps/backend/scripts/wait-local.mjs",
         "apps/backend/supabase/config.toml",
-        "apps/backend/supabase/functions/backend-v1/account-auth.ts",
         "apps/backend/supabase/functions/backend-v1/calendar-feed.ts",
         "apps/backend/supabase/functions/backend-v1/calendar-token.ts",
         "apps/backend/supabase/functions/backend-v1/contract.json",
@@ -254,8 +253,8 @@
         "management_state_get_v1"
       ],
       "review": {
-        "fingerprint": "912852deec932606a28c0ebc1fe70844c85cb17c208d88fcb0e8eacbd8d06291",
-        "reason": "CI rerun kabulü incelendi: ilk event merge/base/head sabit; güncel GitHub attempt görünümündeki core ve dört API başarısı, v2 baseline ve main/CD tekrar doğrulaması test edildi. WF00 istemci protokolü ve ürün davranışı değişmedi."
+        "fingerprint": "7e8b29dc96f83168783b8df0b49a84051950b2e55156e9383992be1c19daf70f",
+        "reason": "PR102 main ile native Auth kaynağı birlikte incelendi: CI kaynak/deneme kabulü main ile birebir; ortak istemci protokolü ve güvenlik kapıları değişmiyor."
       }
     },
     {
@@ -267,12 +266,17 @@
       "tests": [
         "apps/backend/tests/account-identity-acceptance.mjs",
         "apps/backend/tests/account-session-management-acceptance.mjs",
-        "apps/backend/tests/account-mfa-acceptance.mjs"
+        "apps/backend/tests/account-mfa-acceptance.mjs",
+        "apps/backend/tests/account-signup-adapter.mjs",
+        "apps/backend/tests/account-signup-acceptance.mjs",
+        "apps/backend/tests/auth-password-security-unit.mjs"
       ],
       "sources": [
         "apps/backend/database/account-identity-projection.sql",
         "apps/backend/database/account-session-management-wrappers.sql",
         "apps/backend/database/account-session-management.sql",
+        "apps/backend/database/account-signup-wrappers.sql",
+        "apps/backend/database/account-signup.sql",
         "apps/backend/database/active-discipline-projection-wrappers.sql",
         "apps/backend/database/active-discipline-projection.sql",
         "apps/backend/database/availability-policies-wrappers.sql",
@@ -286,6 +290,7 @@
         "apps/backend/database/event-cancellation-dispatch.sql",
         "apps/backend/database/event-payment-dispatch.sql",
         "apps/backend/database/instructor-earnings-wrappers.sql",
+        "apps/backend/database/native-auth-signup-check.sql",
         "apps/backend/database/p07-account-auth.sql",
         "apps/backend/database/p07-account-profile-auth-merge-wrappers.sql",
         "apps/backend/database/p07-account-profile.sql",
@@ -306,23 +311,27 @@
         "apps/backend/database/starter-attendance-protection-wrappers.sql",
         "apps/backend/database/starter-settings-media.sql",
         "apps/backend/database/wrappers.sql",
+        "apps/backend/scripts/auth-password-security.mjs",
+        "apps/backend/supabase/config.toml",
+        "apps/backend/supabase/functions/backend-v1/account-signup.ts",
+        "apps/backend/supabase/migrations/20261030083856_account_signup_guard.sql",
+        "apps/backend/supabase/migrations/20261031074421_native_auth_signup_check.sql",
+        "apps/backend/supabase/templates/password_changed_notification.html",
+        "apps/backend/transports/account-signup-gateway.mjs",
         "docs/settings.md"
       ],
       "operations": [
         "account_get_v1",
         "account_profile_update_v1",
-        "account_password_change_v1",
-        "account_password_reset_request_v1",
         "account_sessions_list_v1",
         "account_session_label_v1",
         "account_sessions_revoke_v1",
         "account_security_history_get_v1",
-        "account_totp_remove_v1",
-        "account_google_link_prepare_v1"
+        "account_signup_check_v1"
       ],
       "review": {
-        "fingerprint": "ff63ce47ce278dd272b32a47f26d8e41ae9d028a1625c87d67ac27e4eaef0ba9",
-        "reason": "Settings consumer guidance now routes frontend acceptance to the PR91 web plan; typed settings behavior and API contract remain unchanged."
+        "fingerprint": "47587fd42bfcbacb726d587393ea2a30f6b50ce171b984fef9108af4c742aaf7",
+        "reason": "Native Auth rehberi ve kayıt kabul testi incelendi: mevcut HTTP timeout yardımcısı kullanılıyor, ret yanıtı tüketiliyor; account_exists, veri/posta yan etkisi ve yetki assertionları korunuyor."
       }
     },
     {
@@ -402,8 +411,8 @@
         "center_discipline_set_v1"
       ],
       "review": {
-        "fingerprint": "ec4db659d1f98c536d13288a727fc0732a121373a85a8d1281f0d4e22a48e7fa",
-        "reason": "İlk ortak rehber güncel sözleşme ve alan kaynaklarıyla eşlendi; ortak kaynaklar WF00, public/ICS WF09, worker WF20 açık bağımlılığıdır. Test dosyası hosted kabul kanıtı değildir."
+        "fingerprint": "25b34a7d4e8136fe9c8143012a537b0d801ed05b52134cc9009ff9c72c1379ff",
+        "reason": "Ortak runtime wrapper farkı yalnız Auth endpoint emekliliği ve signup check; bu akışın API/RPC gövdesi ve yetkileri aynı, rehber geçerli."
       }
     },
     {
@@ -486,8 +495,8 @@
         "class_assignment_set_v1"
       ],
       "review": {
-        "fingerprint": "a5e0155ed3ffa7560a0cccd0d84e34fcbc47c5836c7f5f4d78ff8bb2dccd4ca2",
-        "reason": "İlk ortak rehber güncel sözleşme ve alan kaynaklarıyla eşlendi; ortak kaynaklar WF00, public/ICS WF09, worker WF20 açık bağımlılığıdır. Test dosyası hosted kabul kanıtı değildir."
+        "fingerprint": "8397d4fb63ea62c6a0657a0e2506cebda403c6b5f9008a843b865fde4536c387",
+        "reason": "Ortak runtime wrapper farkı yalnız Auth endpoint emekliliği ve signup check; bu akışın API/RPC gövdesi ve yetkileri aynı, rehber geçerli."
       }
     },
     {
@@ -555,8 +564,8 @@
         "person_discipline_set_v1"
       ],
       "review": {
-        "fingerprint": "ef5d985452b8447f2a25ed5a48c7dde085c776adfb6efd0122bf0b1883d16e8d",
-        "reason": "İlk ortak rehber güncel sözleşme ve alan kaynaklarıyla eşlendi; ortak kaynaklar WF00, public/ICS WF09, worker WF20 açık bağımlılığıdır. Test dosyası hosted kabul kanıtı değildir."
+        "fingerprint": "4547a67c6ef6e49dd445776b1bc761512c722152a2687b655e11af0ee1ecde6b",
+        "reason": "Ortak RPC yalnız Auth emekliliği içeriyor; person registry testleri native session reddini account_get üzerinde koruyor."
       }
     },
     {
@@ -640,8 +649,8 @@
         "negative_limits_get_v1"
       ],
       "review": {
-        "fingerprint": "b93c2d45b4ad52c2e70fab2bf646439d58008160d7b6164189e7cbb080b61564",
-        "reason": "Removed historical acceptance-tracking runtime_notes from sale refund contracts; request, response, permission, guards and sale workflow behavior are unchanged."
+        "fingerprint": "e63552dbdf35fa4b79dea808b11c90e90f492fa0105173690c1ff64b8cbe5794",
+        "reason": "Ortak runtime wrapper farkı yalnız Auth endpoint emekliliği ve signup check; bu akışın API/RPC gövdesi ve yetkileri aynı, rehber geçerli."
       }
     },
     {
@@ -708,8 +717,8 @@
         "reservation_capacity_override_v1"
       ],
       "review": {
-        "fingerprint": "f8c197220266633f51985755671991396af28671ea880053acba58ba15ade37f",
-        "reason": "İlk ortak rehber güncel sözleşme ve alan kaynaklarıyla eşlendi; ortak kaynaklar WF00, public/ICS WF09, worker WF20 açık bağımlılığıdır. Test dosyası hosted kabul kanıtı değildir."
+        "fingerprint": "3bed915606cb0122d31f577a5427649164be8e07faf5521a461c98c556ab2956",
+        "reason": "Ortak runtime wrapper farkı yalnız Auth endpoint emekliliği ve signup check; bu akışın API/RPC gövdesi ve yetkileri aynı, rehber geçerli."
       }
     },
     {
@@ -766,8 +775,8 @@
         "attendance_start_v1"
       ],
       "review": {
-        "fingerprint": "a18e8e9d496b5965e5df550822af27b1516e0a957c9cfaabb6e51d29297b4b35",
-        "reason": "İlk ortak rehber güncel sözleşme ve alan kaynaklarıyla eşlendi; ortak kaynaklar WF00, public/ICS WF09, worker WF20 açık bağımlılığıdır. Test dosyası hosted kabul kanıtı değildir."
+        "fingerprint": "a4c2e4c4b82c20ce12ac1337537cd8d88f8e0cbe5de0047873dc56c6d3fe9831",
+        "reason": "Ortak runtime wrapper farkı yalnız Auth endpoint emekliliği ve signup check; bu akışın API/RPC gövdesi ve yetkileri aynı, rehber geçerli."
       }
     },
     {
@@ -823,8 +832,8 @@
         "debt_adjust_v1"
       ],
       "review": {
-        "fingerprint": "d7dda63a8f22d0b59f579ff14fdfaec6b1b7baf198b1095c62b1576e4a5fe0fb",
-        "reason": "Removed development-status pointers from finance and collection correction metadata; actual finance transaction contracts and workflow behavior are unchanged."
+        "fingerprint": "eb7a9b50a2e1e5774533fb06c3d444de49cc9586f90ca8501cabc15916c0259e",
+        "reason": "Ortak runtime wrapper farkı yalnız Auth endpoint emekliliği ve signup check; bu akışın API/RPC gövdesi ve yetkileri aynı, rehber geçerli."
       }
     },
     {
@@ -864,8 +873,8 @@
         "calendar_feed_get_v1"
       ],
       "review": {
-        "fingerprint": "4b162255127fb99e991ffe7313a77ad7ee3deba3e06140186f718c5cc8cb0b55",
-        "reason": "İlk ortak rehber güncel sözleşme ve alan kaynaklarıyla eşlendi; ortak kaynaklar WF00, public/ICS WF09, worker WF20 açık bağımlılığıdır. Test dosyası hosted kabul kanıtı değildir."
+        "fingerprint": "1ec20e7ea84ba3db4a70d16d5ef531e023272e946db400697e216b5d402f6993",
+        "reason": "Ortak RPC Auth emekliliği ve imza allowlist değişikliği incelendi; public application/Turnstile yolu aynı."
       }
     },
     {
@@ -905,8 +914,8 @@
         "file_upload_complete_v1"
       ],
       "review": {
-        "fingerprint": "251f6f91bcee256ea248ee0a289edeed410b6a2aa4a603cfa449356e55408892",
-        "reason": "İlk ortak rehber güncel sözleşme ve alan kaynaklarıyla eşlendi; ortak kaynaklar WF00, public/ICS WF09, worker WF20 açık bağımlılığıdır. Test dosyası hosted kabul kanıtı değildir."
+        "fingerprint": "9dfaf9a44598d64b7e230a837e096b2e25a485df8de7180cc1b617c01b2e9eb6",
+        "reason": "Ortak runtime wrapper farkı yalnız Auth endpoint emekliliği ve signup check; bu akışın API/RPC gövdesi ve yetkileri aynı, rehber geçerli."
       }
     },
     {
@@ -939,8 +948,8 @@
         "document_publication_preview_v1"
       ],
       "review": {
-        "fingerprint": "aeb9e209926ac8d5f44dc45a72e9b2bbe3c2c8e176629315083590cad10c1b64",
-        "reason": "İlk ortak rehber güncel sözleşme ve alan kaynaklarıyla eşlendi; ortak kaynaklar WF00, public/ICS WF09, worker WF20 açık bağımlılığıdır. Test dosyası hosted kabul kanıtı değildir."
+        "fingerprint": "71f686191c15c4d9b8e31d92c9a6de2419680f50c410f6858f2df789c02501d1",
+        "reason": "Ortak runtime wrapper farkı yalnız Auth endpoint emekliliği ve signup check; bu akışın API/RPC gövdesi ve yetkileri aynı, rehber geçerli."
       }
     },
     {
@@ -986,8 +995,8 @@
         "settings_preparation_resolve_v1"
       ],
       "review": {
-        "fingerprint": "7aaf29d5afab8ccd944f775642270c3d81f9aa799c5f4a923edb4c0cb8158bd5",
-        "reason": "İlk ortak rehber güncel sözleşme ve alan kaynaklarıyla eşlendi; ortak kaynaklar WF00, public/ICS WF09, worker WF20 açık bağımlılığıdır. Test dosyası hosted kabul kanıtı değildir."
+        "fingerprint": "44dd4f5fb9d732cdbd29d0aba7c24c91612b3d21b12f298f24a92696254cce74",
+        "reason": "Ortak runtime wrapper farkı yalnız Auth endpoint emekliliği ve signup check; bu akışın API/RPC gövdesi ve yetkileri aynı, rehber geçerli."
       }
     },
     {
@@ -1046,8 +1055,8 @@
         "saas_payment_submit_v1"
       ],
       "review": {
-        "fingerprint": "003cfedd3c095c436d9a1524bb22237b6e527eb70a00ee6a4afddaf8d72a8ac3",
-        "reason": "İlk ortak rehber güncel sözleşme ve alan kaynaklarıyla eşlendi; ortak kaynaklar WF00, public/ICS WF09, worker WF20 açık bağımlılığıdır. Test dosyası hosted kabul kanıtı değildir."
+        "fingerprint": "0710417699b0d51c6a87582c091bdd3fef8eadb53603301a2dd01e158f2ecc29",
+        "reason": "Ortak runtime wrapper farkı yalnız Auth endpoint emekliliği ve signup check; bu akışın API/RPC gövdesi ve yetkileri aynı, rehber geçerli."
       }
     },
     {
@@ -1080,8 +1089,8 @@
         "instructor_agreements_list_v1"
       ],
       "review": {
-        "fingerprint": "18949f7366503bd826eafaed84b10b9ac6cabdbf75c9ba59e1376f34f4d3e88e",
-        "reason": "Removed development-status pointers from instructor payment metadata; earning/payment rules, permissions and acceptance obligations are unchanged."
+        "fingerprint": "8772758bad930e06f8da18e632d88bf997da914be20c15e84380e019fe7e0d3a",
+        "reason": "Ortak runtime wrapper farkı yalnız Auth endpoint emekliliği ve signup check; bu akışın API/RPC gövdesi ve yetkileri aynı, rehber geçerli."
       }
     },
     {
@@ -1146,8 +1155,8 @@
         "event_actual_start_correct_v1"
       ],
       "review": {
-        "fingerprint": "43fc903096d3b0203e403e9ddf2b5cae1bc45260aa3f2d982b603b4060374004",
-        "reason": "İlk ortak rehber güncel sözleşme ve alan kaynaklarıyla eşlendi; ortak kaynaklar WF00, public/ICS WF09, worker WF20 açık bağımlılığıdır. Test dosyası hosted kabul kanıtı değildir."
+        "fingerprint": "65fc38fe6d318d033cc932e5ff23fccf5e58a32feafcc1601a81021664710db7",
+        "reason": "Ortak runtime wrapper farkı yalnız Auth endpoint emekliliği ve signup check; bu akışın API/RPC gövdesi ve yetkileri aynı, rehber geçerli."
       }
     },
     {
@@ -1183,8 +1192,8 @@
         "automation_save_v1"
       ],
       "review": {
-        "fingerprint": "aac859e4b242a0157c6172ccaa91e882b3681e56681aaf3f78ce6edeb46e3716",
-        "reason": "İlk ortak rehber güncel sözleşme ve alan kaynaklarıyla eşlendi; ortak kaynaklar WF00, public/ICS WF09, worker WF20 açık bağımlılığıdır. Test dosyası hosted kabul kanıtı değildir."
+        "fingerprint": "82748e43994ce3a3d28108bd4c24b852161bcbd7a9ef32bb56979d343a4e55e3",
+        "reason": "Ortak runtime wrapper farkı yalnız Auth endpoint emekliliği ve signup check; bu akışın API/RPC gövdesi ve yetkileri aynı, rehber geçerli."
       }
     },
     {
@@ -1253,8 +1262,8 @@
         "platform_owner_remove_v1"
       ],
       "review": {
-        "fingerprint": "198bc26b8c3e02513831b75993af0cef7225abd8522d257b03f932473c973fc7",
-        "reason": "PR91 document ownership only: account and settings behavior unchanged; frontend acceptance pointers updated without changing runtime or restore guards."
+        "fingerprint": "c963b56b3f49fb6b3d44b3a4f288500586adfd71e81b6614259f659250ea396f",
+        "reason": "Ortak runtime wrapper farkı yalnız Auth endpoint emekliliği ve signup check; bu akışın API/RPC gövdesi ve yetkileri aynı, rehber geçerli."
       }
     },
     {
@@ -1284,8 +1293,8 @@
         "settlement_authority_set_v1"
       ],
       "review": {
-        "fingerprint": "f8a03179c08a76ffbf5553f35221488c23bd92ef5f71cbb243b4ae5a91a3e763",
-        "reason": "İlk ortak rehber güncel sözleşme ve alan kaynaklarıyla eşlendi; ortak kaynaklar WF00, public/ICS WF09, worker WF20 açık bağımlılığıdır. Test dosyası hosted kabul kanıtı değildir."
+        "fingerprint": "99d2970ada3ab54854377b079ff1fb795042c76e148fc18f9c278c889e993700",
+        "reason": "Ortak runtime wrapper farkı yalnız Auth endpoint emekliliği ve signup check; bu akışın API/RPC gövdesi ve yetkileri aynı, rehber geçerli."
       }
     },
     {
@@ -1310,8 +1319,8 @@
         "seat_offer_reject_v1"
       ],
       "review": {
-        "fingerprint": "ba0ba0736c682b29a012d9f6eda7fd99b2e98e1f2e0455f8ba44f84143a3f2b4",
-        "reason": "İlk ortak rehber güncel sözleşme ve alan kaynaklarıyla eşlendi; ortak kaynaklar WF00, public/ICS WF09, worker WF20 açık bağımlılığıdır. Test dosyası hosted kabul kanıtı değildir."
+        "fingerprint": "8df8ef10fceb080cd03136f8f253ba78957505af5b3458398c93ad7f111643d4",
+        "reason": "Ortak runtime wrapper farkı yalnız Auth endpoint emekliliği ve signup check; bu akışın API/RPC gövdesi ve yetkileri aynı, rehber geçerli."
       }
     },
     {
@@ -1365,8 +1374,8 @@
         "subscription_boundary_apply_v1"
       ],
       "review": {
-        "fingerprint": "888ccd8ef2662f15123fdcb6dc6e373c05cd129f06e03dc75e9c25b06ce20caf",
-        "reason": "İlk ortak rehber güncel sözleşme ve alan kaynaklarıyla eşlendi; ortak kaynaklar WF00, public/ICS WF09, worker WF20 açık bağımlılığıdır. Test dosyası hosted kabul kanıtı değildir."
+        "fingerprint": "c738d0bc445d3d1d49d73fc20b9f3eb7cecf73f4d325ac94ef8fd3f30ab3eb80",
+        "reason": "Ortak runtime wrapper farkı yalnız Auth endpoint emekliliği ve signup check; bu akışın API/RPC gövdesi ve yetkileri aynı, rehber geçerli."
       }
     }
   ]

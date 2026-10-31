@@ -2,6 +2,22 @@
 
 Bu belge kurulum, dağıtım, worker ve restore prosedürünün sahibidir. Kaynak/ortam kabulü [güncel kabul kaydında](00-FtkSaaS-yeni-sohbet-devir.md), açık işler [backlog’da](remaining-work.md), ürün davranışı [ortak iş akışlarında](../../../docs/workflows.md) tutulur. Geçmiş denemeler canlı talimat olarak burada yinelenmez.
 
+## Native parola güvenliği (XREQ-002)
+
+Native Auth'ın mevcut parola kontrolü ve güvenlik e-postası [tek tüketici sözleşmesine](../../../docs/settings.md#parola-değişimi-ve-güvenlik-bildirimi) göre yapılandırılır. Kaynak [auth-password-security.mjs](../scripts/auth-password-security.mjs), ileti [native şablondur](../supabase/templates/password_changed_notification.html). Yalnız mevcut development projesi desteklenir. Kabul edilmiş kaynakta, backend dizininden:
+
+```sh
+node scripts/auth-password-security.mjs --plan
+node scripts/auth-password-security.mjs --check gwyprhenabtpkbojephw
+node scripts/auth-password-security.mjs --apply gwyprhenabtpkbojephw
+```
+
+Check/apply `SUPABASE_ACCESS_TOKEN` ortam değişkenini kullanır; secret komut satırına/yazıya konmaz. Plan ağ çağrısı yapmaz, check yalnız okur. Apply yalnız mevcut-parola/nonce, password_changed etkinlik/konu/şablon ve native e-posta OTP süresi alanlarını Management API ile yazar; sonra bağımsız GET ile birebir doğrular. SMTP/anahtar/Google/JWT/redirect izin listesi değiştirilmez; tam config veya credential çıktı verilmez. Auth SiteURL HTTPS kök origin olmalıdır; gerçek `/forgot-password` ve mevcut `/auth/callback?next=/reset-password` redirect izinleri önceden doğrulanır. Bu ayrı işletim adımıdır; SQL/Edge CD veya config.toml hosted ayarları otomatik uygulamaz.
+
+CLI 2.122.0 TOML mevcut-parola zorunluluğunu sunmaz ve custom content_path desteği sınırlıdır. Yerel TOML yalnız native reauthentication ve bildirim etkinliği/konusunu taşır; hosted HTML ve iki güvenlik ayarı development config aracıyla yönetilir. Test için ikinci bir Auth süreci çalıştırılmaz. Uygulamanın native oturum/MFA/kimlik entegrasyonu CI'da; mevcut-parola/nonce ve gerçek dış posta kabulü hedef hosted sağlayıcıda doğrulanır.
+
+Hosted kabul: eksik/yanlış mevcut parola reddi; 24 saatten yeni/eski oturum, refresh sonrası eski oturumun nonce zorunluluğu, yanlış/süresi dolmuş/tüketilmiş nonce ve doğru mevcut parola + nonce ile değişim; yalnız kayıtlı ana adrese bildirim; gerçek bağlantıdan recovery/PKCE ve yeni parola; eski/yanlış/süresi dolmuş/tekrarlanmış proof reddi; diğer session refresh ve Edge erişiminin reddi, current recovery session'ın korunması. Parola tekrar eşleşmesi frontend kabulündedir. Native bildirim gönderimi best effort'tür: SMTP başarısızlığı parolayı geri almaz; Auth/provider logları kişisel veri/sırlar dışarı çıkarılmadan kontrol edilir. Production dağıtımı bu komutun kapsamı değildir.
+
 ## Ortam ve dağıtım
 
 Geliştirme hedefi `gwyprhenabtpkbojephw` FtkSaaS Supabase projesinin production adlı branch’idir; bu ad müşteri production kabulü değildir. Gerçek kurulum verisi vardır. Reset/clean/seed yalnız izole loopback ortamında çalışır. Git SQL/Edge kaynağını taşır; çalışma verisini, sağlayıcı ayarını, secret’ı veya Storage baytlarını geri getirmez.
@@ -36,7 +52,7 @@ Kaynak ve hedef ayrı ve açık tanımlanır; deneme hedefi izole olmalıdır. M
 
 Restore doğrulaması tablo içerik checksum’ları, etkin ACL (NULL için acldefault), RLS/policy ve fonksiyon owner/security-definer/config/EXECUTE karşılaştırmasını kapsar. Native kullanıcı gerçek girişle ve aynı UUID ile denenir; eski access token’ın farklı projede geçerliliği varsayılmaz. Edge aynı kabul edilmiş kaynaktan kurulur. Storage metadata ve bütün nesne baytları ayrı taşınıp checksum/erişimle doğrulanır. Scheduler/binding, gerçek iş yükü ve kesinti toparlanması ayrıca sınanır. Tek dosya veya idle worker deneyi bütün envanter kabulü değildir.
 
-`auth.mfa_factors` üzerindeki history/removal-fence ve kimlik projeksiyon trigger’ları, private identity/contact/Google-link-intent tabloları owner/ACL ve purge envanterine dahildir. Faktör secret/OTP/token loga veya uygulama audit’ine taşınmaz. Kaldırılmış özel account_password_transactions/reset trigger taslağı restore listesine eklenmez. RPO/RTO; hazırlık, veri, Auth, Edge, Storage, config ve worker geri dönüşünü kapsayan gerçek ölçüm ister.
+`auth.mfa_factors` history ve kimlik projeksiyon trigger’ları, private identity/contact tabloları owner/ACL ve purge envanterine dahildir. Google-link/TOTP intent ve fence katmanları kaldırılmıştır. Faktör secret/OTP/token loga veya uygulama audit’ine taşınmaz. Kaldırılmış özel account_password_transactions/reset trigger taslağı restore listesine eklenmez. RPO/RTO; hazırlık, veri, Auth, Edge, Storage, config ve worker geri dönüşünü kapsayan gerçek ölçüm ister.
 
 ## P08 kurulum kaydı
 
@@ -64,3 +80,12 @@ Snapshot project_ref ve tables dizisi içerir; tablolar schema/table/rows biçim
 Bu modül hukuki onay veya purge kanıtı üretmez. İmzalama anahtarı yalnız doğrulanmış silme sonucunu kaydeden orkestratöre verilmelidir. Sicil dizini/anahtar ve rollback'i engelleyen güncel head checkpoint'i restore kapsamının dışında, ayrı yetki ve yedeklemeyle işletilmelidir. Yerel test dosyaları üretim sicili kurulumu değildir. Saklama/expiry, anahtar yönetimi ve bağımsız kalıcı depolama kabulü henüz açıktır.
 
 `guarded-restore.mjs` aynı sicil kilidi altında guard'ı çalıştırır; adaptöre yalnız doğrulanmış ve recursive frozen snapshot'ı verir. Guard reddinde adaptör çağrılmaz; adaptör hatası yukarı taşınır. Son head yeniden kontrol edilir. Caller adaptörü transaction/rollback ve yeniden deneme sınırını kendisi sağlamalıdır; callback başarısı hizmet açma izni veya tüm DB/Auth/Storage restore kanıtı değildir. Mevcut hosted SQL yükleyicinin bu adaptöre bağlanması ve erişim kapısı entegrasyonu henüz tamamlanmadı.
+## XREQ-001 e-posta kayıt ön kontrolü
+
+[WF01 kayıt tüketicisi](../../../docs/settings.md#e-posta-parola-kayıt-tüketicisi) için frontend sunucu route’u backend’in `handleAccountSignupCheck` adapter’ına bağlanır. Vercel dışında `x-vercel-forwarded-for` güvenilir kabul edilmez; platformun doğruladığı bağlantı IP’sinden imza üreten adapter gerekir. Caller authorization/cookie/x-ftk başlıkları upstream’e geçirilmez. Host/origin, body boyutu, kapalı request/response ve `no-store` korunur.
+
+Gateway `FTK_SIGNUP_HOSTNAME`, `FTK_PUBLIC_BACKEND_ORIGIN`, `FTK_PUBLIC_ANON_KEY`, `FTK_PUBLIC_INGRESS_SECRET`; Edge aynı ingress secret, `FTK_PUBLIC_HASH_SECRET` ve platform service anahtarını kullanır. Secret’lar istemci bundle/log’una konmaz. Bu kontrol Auth maili göndermediğinden `FTK_P07_AUTH_DELIVERY_ENABLED` gerekmez. Native email signup/confirmation/CAPTCHA ayarları ortam kurulumu sırasında doğrulanır; her kontrol için Auth settings çağrısı yapılmaz.
+
+`private.account_signup_rates` yalnız kabul edilmiş 30/5dk/IP ön kontrol limitini tutar. Dispatch claim’i, kalıcı e-posta kilidi ve belirsiz signup kurtarma prosedürü yoktur. `available` anlık bilgidir; kontrol sonrası native signup ile atomik değildir. İstemci `account_exists` durumunda signup/resend yapmaz.
+
+CI kabulü gerçek Auth, service-only RPC, sentetik farklı adresli Google kimliği ve SMTP sink üzerinde dört ürün senaryosunu doğrular. Ön kontrolün kullanıcı/posta oluşturmadığı ve ardından yeni adreste native signup’ın çalıştığı ayrıca ölçülür. Sentetik Google kimliği gerçek OAuth/browser kanıtı değildir. Hosted route/config ve gerçek ekran/provider kabulü ayrıca doğrulanır.

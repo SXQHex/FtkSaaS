@@ -1,6 +1,6 @@
 # API ve iş akışı haritası
 
-Üretilmiştir: `node apps/backend/scripts/update-docs.mjs --write`. Elle düzenleme. Kaynak içerik özeti: `57bdfd51d4fee9809ff1e51a5af69dd00d86a140c5c068eccc5425b425be5c92`. Bu özet CI/hosted kabulü değildir; dağıtılan SHA ve ortam CD artifact'ında bulunur.
+Üretilmiştir: `node apps/backend/scripts/update-docs.mjs --write`. Elle düzenleme. Kaynak içerik özeti: `2f28b43eb031ff178a114f9ff1693faa23cfaafd5b340622af1148ede8a023db`. Bu özet CI/hosted kabulü değildir; dağıtılan SHA ve ortam CD artifact'ında bulunur.
 
 DTO/izin/hata/yan etkiler [üretilmiş API kataloğu](contracts/05-FtkSaaS-O4-API-katalogu.md) ve [makine sözleşmesinden](../packages/api-contracts/schema/contract.json) gelir. Edge kodu [backend-v1](../apps/backend/supabase/functions/backend-v1/index.ts) altındadır; SQL domain davranışını Edge dosyasından tek başına çıkarma. `implemented.json` içindeki varlık tüm selector/provider/ürün kabulünün tamamlandığı anlamına gelmez. Backend-only satırları tarayıcı endpoint önerisi değildir.
 
@@ -8,8 +8,6 @@ DTO/izin/hata/yan etkiler [üretilmiş API kataloğu](contracts/05-FtkSaaS-O4-AP
 |---|---|---|---|---|
 | `account_get_v1` | runtime (sınırları oku) | read | account.self | [WF01](workflows.md#wf01) / starter |
 | `account_profile_update_v1` | runtime (sınırları oku) | command | account.self | [WF01](workflows.md#wf01) / starter |
-| `account_password_change_v1` | runtime (sınırları oku) | auth | account.self | [WF01](workflows.md#wf01) / starter |
-| `account_password_reset_request_v1` | runtime (sınırları oku) | auth | auth.recover | [WF01](workflows.md#wf01) / starter |
 | `account_delete_preview_v1` | runtime (sınırları oku) | preview | account.self | [WF17](workflows.md#wf17) / restricted |
 | `account_delete_apply_v1` | runtime (sınırları oku) | apply | account.self | [WF17](workflows.md#wf17) / restricted |
 | `organizations_list_v1` | runtime (sınırları oku) | read | account.self | [WF02](workflows.md#wf02) / starter |
@@ -217,8 +215,6 @@ DTO/izin/hata/yan etkiler [üretilmiş API kataloğu](contracts/05-FtkSaaS-O4-AP
 | `account_session_label_v1` | runtime (sınırları oku) | auth | account.self | [WF01](workflows.md#wf01) / starter |
 | `account_sessions_revoke_v1` | runtime (sınırları oku) | auth | account.self | [WF01](workflows.md#wf01) / starter |
 | `account_security_history_get_v1` | runtime (sınırları oku) | read | account.self | [WF01](workflows.md#wf01) / starter |
-| `account_totp_remove_v1` | runtime (sınırları oku) | auth | account.self | [WF01](workflows.md#wf01) / starter |
-| `account_google_link_prepare_v1` | runtime (sınırları oku) | auth | account.self | [WF01](workflows.md#wf01) / starter |
 | `media_get_v1` | runtime (sınırları oku) | read | media.read | [WF12](workflows.md#wf12) / starter |
 | `settings_template_resolve_v1` | runtime (sınırları oku) | read | templates.resolve | [WF12](workflows.md#wf12) / starter |
 | `calendar_links_get_v1` | runtime (sınırları oku) | read | calendar.self | [WF09](workflows.md#wf09) / starter |
@@ -227,13 +223,14 @@ DTO/izin/hata/yan etkiler [üretilmiş API kataloğu](contracts/05-FtkSaaS-O4-AP
 | `calendar_link_revoke_v1` | runtime (sınırları oku) | auth | calendar.self | [WF09](workflows.md#wf09) / starter |
 | `calendar_feed_get_v1` | runtime (sınırları oku) | read | calendar.feed | [WF09](workflows.md#wf09) / starter |
 | `settings_preparation_resolve_v1` | runtime (sınırları oku) | read | preparation.resolve | [WF12](workflows.md#wf12) / starter |
+| `account_signup_check_v1` | runtime (sınırları oku) | auth | auth.signup | [WF01](workflows.md#wf01) / starter |
 
 ## Akış kanıt kaynakları
 
 Test dosyası bağlantısı çalıştırılmış test başarısı değildir. Kaynak bağlı CI/hosted sonuçları güncel kabul belgesinin sahibidir.
 
 - [WF00 — Ortak istemci protokolü](workflows.md#wf00): [alan devri](client-integration.md); [contract.test.mjs](../apps/backend/tests/contract.test.mjs), [api-acceptance.test.mjs](../apps/backend/tests/api-acceptance.test.mjs)
-- [WF01 — Kimlik ve hesap güvenliği](workflows.md#wf01): [alan devri](settings.md); [account-identity-acceptance.mjs](../apps/backend/tests/account-identity-acceptance.mjs), [account-session-management-acceptance.mjs](../apps/backend/tests/account-session-management-acceptance.mjs), [account-mfa-acceptance.mjs](../apps/backend/tests/account-mfa-acceptance.mjs)
+- [WF01 — Kimlik ve hesap güvenliği](workflows.md#wf01): [alan devri](settings.md); [account-identity-acceptance.mjs](../apps/backend/tests/account-identity-acceptance.mjs), [account-session-management-acceptance.mjs](../apps/backend/tests/account-session-management-acceptance.mjs), [account-mfa-acceptance.mjs](../apps/backend/tests/account-mfa-acceptance.mjs), [account-signup-adapter.mjs](../apps/backend/tests/account-signup-adapter.mjs), [account-signup-acceptance.mjs](../apps/backend/tests/account-signup-acceptance.mjs), [auth-password-security-unit.mjs](../apps/backend/tests/auth-password-security-unit.mjs)
 - [WF02 — Stüdyo kurulumu ve yetki](workflows.md#wf02): [alan devri](workflows.md); [registry.test.mjs](../apps/backend/tests/registry.test.mjs), [room-role-registry.test.mjs](../apps/backend/tests/room-role-registry.test.mjs), [starter-plan-gates-acceptance.mjs](../apps/backend/tests/starter-plan-gates-acceptance.mjs)
 - [WF03 — Program ve seans yaşam döngüsü](workflows.md#wf03): [alan devri](workflows.md); [program-session-lifecycle.test.mjs](../apps/backend/tests/program-session-lifecycle.test.mjs), [schedule-reads.test.mjs](../apps/backend/tests/schedule-reads.test.mjs), [availability-policies.test.mjs](../apps/backend/tests/availability-policies.test.mjs)
 - [WF04 — Kişi ve öğrencilik](workflows.md#wf04): [alan devri](client-integration.md); [person-registry.test.mjs](../apps/backend/tests/person-registry.test.mjs)

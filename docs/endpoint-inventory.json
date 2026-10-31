@@ -50,52 +50,6 @@
       "limits": []
     },
     {
-      "name": "account_password_change_v1",
-      "status": "operational_development_limited",
-      "external_path": "/functions/v1/backend-v1/account_password_change_v1",
-      "permission": "account.self",
-      "features": [
-        "F06"
-      ],
-      "required_features": [
-        "F06"
-      ],
-      "runtime_required_features": [],
-      "decision_delivery": {
-        "accepted_contract": "DS-2026-10-17",
-        "runtime_conformance": "implemented_pending_ci",
-        "open_dependencies": [],
-        "target_request": {
-          "$ref": "#/$defs/Request_account_password_change"
-        }
-      },
-      "billing_class": "exempt",
-      "limits": []
-    },
-    {
-      "name": "account_password_reset_request_v1",
-      "status": "operational_development_limited",
-      "external_path": "/functions/v1/backend-v1/account_password_reset_request_v1",
-      "permission": "auth.recover",
-      "features": [
-        "F06"
-      ],
-      "required_features": [
-        "F06"
-      ],
-      "runtime_required_features": [],
-      "decision_delivery": {
-        "accepted_contract": "DS-2026-10-17",
-        "runtime_conformance": "implemented_pending_ci",
-        "open_dependencies": [],
-        "target_request": {
-          "$ref": "#/$defs/Request_account_password_reset_request"
-        }
-      },
-      "billing_class": "exempt",
-      "limits": []
-    },
-    {
       "name": "account_delete_preview_v1",
       "status": "operational_development_limited",
       "external_path": "/functions/v1/backend-v1/account_delete_preview_v1",
@@ -5700,56 +5654,6 @@
       ]
     },
     {
-      "name": "account_totp_remove_v1",
-      "status": "operational_development_limited",
-      "external_path": "/functions/v1/backend-v1/account_totp_remove_v1",
-      "permission": "account.self",
-      "features": [
-        "F06"
-      ],
-      "required_features": [
-        "F06"
-      ],
-      "runtime_required_features": [],
-      "decision_delivery": {
-        "accepted_contract": "DS-2026-10-17",
-        "runtime_conformance": "implemented_pending_ci",
-        "open_dependencies": [],
-        "target_request": {
-          "$ref": "#/$defs/Request_account_totp_remove"
-        }
-      },
-      "billing_class": "exempt",
-      "limits": [
-        "Verified TOTP removal requires fresh strong current proof and one-time bounded exact-factor intent; native direct verified-factor deletion is fenced."
-      ]
-    },
-    {
-      "name": "account_google_link_prepare_v1",
-      "status": "operational_development_limited",
-      "external_path": "/functions/v1/backend-v1/account_google_link_prepare_v1",
-      "permission": "account.self",
-      "features": [
-        "F06"
-      ],
-      "required_features": [
-        "F06"
-      ],
-      "runtime_required_features": [],
-      "decision_delivery": {
-        "accepted_contract": "DS-2026-10-17",
-        "runtime_conformance": "implemented_pending_ci",
-        "open_dependencies": [],
-        "target_request": {
-          "$ref": "#/$defs/Request_account_google_link_prepare"
-        }
-      },
-      "billing_class": "exempt",
-      "limits": [
-        "Obtain Google ID token first. Prepare with fresh current native reauth; within 10 seconds call native id_token grant with link_identity=true and matching Google token/nonce. Native signature, issuer, audience and nonce checks are mandatory."
-      ]
-    },
-    {
       "name": "media_get_v1",
       "status": "operational_development_limited",
       "external_path": "/functions/v1/backend-v1/media_get_v1",
@@ -5946,6 +5850,34 @@
         "Read-only explicit template/source/version selection. Resolve grants no execution permission and creates no rule, product, sale or job.",
         "New centers copy org preparation arrays once; existing centers and business snapshots do not live-inherit.",
         "Package dates and refund method are explicit; no automatic rolling validity or implicit none."
+      ]
+    },
+    {
+      "name": "account_signup_check_v1",
+      "status": "operational_development_limited",
+      "external_path": "/functions/v1/backend-v1/account_signup_check_v1",
+      "permission": "auth.signup",
+      "features": [
+        "F06"
+      ],
+      "required_features": [
+        "F06"
+      ],
+      "runtime_required_features": [],
+      "decision_delivery": {
+        "accepted_contract": "DS-2026-10-17",
+        "runtime_conformance": "implemented_pending_ci",
+        "open_dependencies": [
+          "frontend_signup_proxy_integration",
+          "hosted_signup_acceptance"
+        ],
+        "target_request": {
+          "$ref": "#/$defs/Request_account_signup_check"
+        }
+      },
+      "billing_class": "exempt",
+      "limits": [
+        "Existing primary email or linked Google identity email includes unconfirmed accounts. available means no match at check time; the client then calls native signUp. No password, CAPTCHA, PKCE or metadata accepted."
       ]
     }
   ]

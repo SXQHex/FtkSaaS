@@ -8,6 +8,8 @@ Güncel kaynak/hosted kabulü [00 devirde](../apps/backend/docs/00-FtkSaaS-yeni-
 
 İnsan işlemleri `POST {API_URL}/functions/v1/backend-v1/{operation}` üzerinden typed Request JSON ile yapılır. Başlıklar `Authorization: Bearer <native Supabase access_token>`, `apikey: <publishable key>`, `Content-Type: application/json`. core/private tablo ve service-only RPC istemci yolu değildir. JWT doğrulaması açık kalır; native Auth ana yoldur.
 
+Anonim kayıt ön kontrolü `account_signup_check_v1` için [kayıt transport sözleşmesini](settings.md#e-posta-parola-kayıt-tüketicisi) kullanır. Yalnız `account_exists / available` döner; ardından gerekiyorsa native SDK signup çağırır. Gateway public/anon anahtar taşır; Edge→RPC service anahtarı istemciye verilmez. Kontrol parola almaz, hesap oluşturmaz veya posta göndermez.
+
 ## İşlem bütünlüğü
 
 - request_id ve gereken operation_key doğrulanmış UUIDv7; sağlayıcı kimlikleri aynen korunur. Aynı kullanıcı işleminin retry’ında operation_key korunur, transport request_id değişebilir.

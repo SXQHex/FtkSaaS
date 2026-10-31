@@ -1,7 +1,7 @@
 import {calendarFeed} from './calendar-feed.ts';
 import {calendarToken,calendarTokenHash,calendarOrigin,calendarSubscriptionUrl,calendarAppUrl} from './calendar-token.ts';
 import {lifecycleReauth} from './lifecycle-auth.ts';
-import {passwordChallenge,passwordRecovery} from './account-auth.ts';
+import {accountSignupCheck} from './account-signup.ts';
 import {publicIngress,verifyPublicBot,publicBotHostname} from "./public-ingress.ts";
 import {importStorage,parseImportCsv} from "./import-file.ts";
 import {documentStorage} from "./document-storage.ts";
@@ -20,16 +20,17 @@ Deno.serve(async req=>{
   
   if(!implemented.has(operation))return failure("NOT_FOUND",404);
   const body=await req.text();if(body.length>2097152)return failure("VALIDATION_FAILED");
-  const request=JSON.parse(body);if(request.client_api_version!==1)return operation==='account_password_reset_request_v1'?failure("VALIDATION_FAILED"):failure("CLIENT_UPDATE_REQUIRED",426);const validate=(validators as any)["request_"+operation];
+  const request=JSON.parse(body);if(request.client_api_version!==1)return failure("CLIENT_UPDATE_REQUIRED",426);const validate=(validators as any)["request_"+operation];
   if(!validate?.(request))return failure("VALIDATION_FAILED");
   const base=Deno.env.get("SUPABASE_URL")!,key=Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
-  if(operation==='account_password_reset_request_v1'){
-   const result=await passwordRecovery(req,body,request,base,key,n=>Deno.env.get(n),async aux=>{
-    const rpc=await fetch(base+'/rest/v1/rpc/'+operation,{method:'POST',headers:{authorization:'Bearer '+key,apikey:key,'content-type':'application/json','Content-Profile':'api_v1'},body:JSON.stringify({p_request:request,p_actor_auth_id:null,p_session_id:null,p_ids:Array.from({length:32},()=>v7()),p_aux:aux})});
-    if(!rpc.ok)throw Error('RECOVERY_RPC_UNAVAILABLE');return rpc.json();
+  if(operation==='account_signup_check_v1'){
+   const result=await accountSignupCheck(req,body,request,n=>Deno.env.get(n),async(safeRequest,aux)=>{
+    const rpc=await fetch(base+'/rest/v1/rpc/'+operation,{method:'POST',headers:{authorization:'Bearer '+key,apikey:key,'content-type':'application/json','Content-Profile':'api_v1'},body:JSON.stringify({p_request:safeRequest,p_actor_auth_id:null,p_session_id:null,p_ids:[v7(),v7()],p_aux:aux}),signal:AbortSignal.timeout(10000)});
+    if(!rpc.ok)throw Error('SIGNUP_RPC_UNAVAILABLE');return rpc.json();
    });
-   if(result.error)return failure(result.error);if(result.ok===false)return json(result);
-   const out={ok:true,data:result.data,trace_id:v7()};if(!(validators as any)['success_'+operation](out))return failure('INTEGRITY_VIOLATION',500);return json(out);
+   const out=result.error?{ok:false,error:{code:result.error,retryable:result.error==='TEMPORARY_FAILURE',trace_id:v7()}}:{ok:true,data:result.data,trace_id:v7()};
+   if(out.ok&&!(validators as any)['success_'+operation](out))return failure('INTEGRITY_VIOLATION',500);
+   return json(out,200,true);
   }
   if(operation==='calendar_feed_get_v1'){
    const appTemplate=Deno.env.get('FTK_CALENDAR_SESSION_URL_TEMPLATE');try{calendarAppUrl(appTemplate,'00000000-0000-0000-0000-000000000000','00000000-0000-0000-0000-000000000000');}catch{return failure('SERVICE_UNAVAILABLE',503);}
@@ -98,7 +99,7 @@ Deno.serve(async req=>{
     invite={token_hash,sealed_token:JSON.stringify({iv:b64(iv),cipher:b64(new Uint8Array(cipher))})};
    }
   }
-  if(operation==='account_delete_apply_v1'||operation==='organization_delete_apply_v1'||operation==='account_totp_remove_v1'||operation==='account_google_link_prepare_v1'||(operation==='account_sessions_revoke_v1'&&request.mode==='others')||(operation==='job_status_get_v1'&&request.org_id===null)){
+  if(operation==='account_delete_apply_v1'||operation==='organization_delete_apply_v1'||(operation==='account_sessions_revoke_v1'&&request.mode==='others')||(operation==='job_status_get_v1'&&request.org_id===null)){
    const proof=await lifecycleReauth(base,key,(operation==='job_status_get_v1'?authorization.slice(7):request.reauth),user.id);if(proof.error)return failure(proof.error,proof.error==='AUTH_REQUIRED'?401:503);invite=proof.context!;
   }
   const storage=documentStorage(base,key);
@@ -121,29 +122,6 @@ Deno.serve(async req=>{
    const r=await fetch(base+'/rest/v1/rpc/'+operation,{method:'POST',headers:{authorization:'Bearer '+key,apikey:key,'content-type':'application/json','Content-Profile':'api_v1'},body:JSON.stringify({p_request:request,p_actor_auth_id:user.id,p_session_id:claims.session_id,p_ids:Array.from({length:count},()=>v7()),p_aux:{...(aux as object??{}),...authAux}})});
    if(!r.ok)throw Error('RPC_UNAVAILABLE');return r.json();
   };
-  if(operation==='account_google_link_prepare_v1'){
-   // This parses only a restrictive target. Native Auth must still verify the
-   // token's signature, issuer, audience and nonce in the subsequent link call.
-   let subject:string;try{const part=request.google_id_token.split('.')[1];subject=JSON.parse(atob(part.replaceAll('-','+').replaceAll('_','/'))).sub;if(typeof subject!=='string'||subject.length<1||subject.length>255)throw Error();}catch{return failure('VALIDATION_FAILED');}
-   const prepared=await rpcContext({...invite,google_subject:subject});if(!prepared._internal_google_link)return json(prepared);
-   const out={ok:true,data:{provider:'google',status:'ready',expires_in:10},trace_id:v7()};if(!(validators as any)['success_'+operation](out))return failure('INTEGRITY_VIOLATION',500);return json(out);
-  }
-  if(operation==='account_totp_remove_v1'){
-   const prepared=await rpcContext({...invite,phase:'totp_prepare'});
-   if(prepared._internal_totp_remove){
-    if(prepared._internal_totp_remove.factor_id!==request.factor_id)return failure('INTEGRITY_VIOLATION',500);
-    // Even a network timeout may follow a committed native deletion. Confirm its DB intent.
-    try{const response=await fetch(base+'/auth/v1/factors/'+encodeURIComponent(request.factor_id),{method:'DELETE',headers:{authorization,apikey:key},signal:AbortSignal.timeout(10000)});await response.body?.cancel();}catch{}
-    const completed=await rpcContext({...invite,phase:'totp_complete'});
-    if(completed.ok&&!(validators as any)['success_'+operation](completed))return failure('INTEGRITY_VIOLATION',500);return json(completed);
-   }
-   if(prepared.ok&&!(validators as any)['success_'+operation](prepared))return failure('INTEGRITY_VIOLATION',500);return json(prepared);
-  }
-  if(operation==='account_password_change_v1'){
-   const result=await passwordChallenge(base,key,authorization,n=>Deno.env.get(n),rpcContext);
-   if(result.error)return failure(result.error);if(result.ok===false)return json(result);
-   const out={ok:true,data:result.data,trace_id:v7()};if(!(validators as any)['success_'+operation](out))return failure('INTEGRITY_VIOLATION',500);return json(out);
-  }
   if(operation==='import_preview_v1'){
    const context=await rpcContext({phase:'p06_import_file'});
    if(!context._internal_import){if(context.ok&&!(validators as any)['success_'+operation](context))return failure('INTEGRITY_VIOLATION',500);return json(context);}

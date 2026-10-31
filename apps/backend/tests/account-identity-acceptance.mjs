@@ -75,21 +75,15 @@ test('Global identity current projections, safe links, immutable scope and trans
    assert((await verify(newProof)).status>=400,'completed native proof cannot be reused');
    const history=await must(user,'account_security_history_get_v1');assert.equal(history.items.filter(e=>e.action==='email_changed').length,1);assert(!JSON.stringify(history).includes(newProof));assert(!(await must(other,'account_security_history_get_v1')).items.some(e=>e.action==='email_changed'));
   });
-  await t.test('native unlink and SQL guard preserve the last usable login method and one audit event',async()=>{
+  await t.test('native identity linking and unlinking need no app approval and still record history',async()=>{
    // A synthetic second identity exercises the DB/provider unlink path only.
    // It is not Google OAuth proof; the hosted real-provider acceptance is separate.
    const id=key(),sub=key();
    const insertIdentity=()=>db.query("insert into auth.identities(id,user_id,provider,provider_id,identity_data,created_at,updated_at,last_sign_in_at) values($1,$2,'google',$3,$4,now(),now(),now())",[id,user.id,sub,{sub,email:user.email,email_verified:true}]);
-   await assert.rejects(insertIdentity(),e=>e.code==='P0001'&&e.message==='AUTH_REQUIRED');
-   // Internal fixture intent is not a substitute for actual provider linking acceptance.
-   await db.query("insert into private.account_google_link_intents values($1,$2,now()+interval '1 minute',false,$3)",[account.id,user.session_id,sub]);
-   const config=(await db.query('select reauth_max_age_seconds from private.p07_lifecycle_config')).rows;
-   if(!config.length)await db.query('insert into private.p07_lifecycle_config values(true,900)');
-   try{await insertIdentity();}finally{if(!config.length)await db.query('delete from private.p07_lifecycle_config');}
+   await insertIdentity();
    const {env}=context(),response=await fetch(env.API_URL+'/auth/v1/user/identities/'+id,{method:'DELETE',headers:{apikey:env.ANON_KEY,authorization:'Bearer '+user.jwt},signal:AbortSignal.timeout(15000)});const removedBody=await response.json();assert.equal(response.ok,true,JSON.stringify({status:response.status,code:removedBody.error_code,message:removedBody.msg}));
    const email=(await db.query("select id from auth.identities where user_id=$1 and provider='email'",[user.id])).rows[0].id;
    const last=await fetch(env.API_URL+'/auth/v1/user/identities/'+email,{method:'DELETE',headers:{apikey:env.ANON_KEY,authorization:'Bearer '+user.jwt},signal:AbortSignal.timeout(15000)});assert.equal(last.ok,false);await last.arrayBuffer();
-   await assert.rejects(db.query('delete from auth.identities where id=$1',[email]),e=>e.code==='P0001'&&e.message==='FORBIDDEN');
    assert.equal((await must(user,'account_get_v1')).id,account.id);
    const h=await must(user,'account_security_history_get_v1');assert.equal(h.items.filter(e=>e.action==='identity_linked').length,1);assert.equal(h.items.filter(e=>e.action==='identity_unlinked').length,1);
   });

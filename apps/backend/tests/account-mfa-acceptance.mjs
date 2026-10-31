@@ -38,11 +38,20 @@ test('Native TOTP enrollment, proof, stale-token rejection, mandatory security h
    const noDirect=await fetch(env.API_URL+'/rest/v1/rpc/account_sessions_revoke_v1',{method:'POST',headers:{apikey:env.ANON_KEY,authorization:'Bearer '+user.jwt,'content-type':'application/json','Content-Profile':'api_v1'},body:JSON.stringify({p_request:{client_api_version:1,request_id:key(),operation_key:key(),mode:'current'},p_actor_auth_id:user.id,p_session_id:user.session_id,p_ids:Array.from({length:32},key),p_aux:{verified_aal:'aal2'}}),signal:AbortSignal.timeout(60000)});assert.equal(noDirect.ok,false);
   });
   await t.test('only a native strong owner can remove the factor; removal produces no secret-bearing history',async()=>{
-   const weakOwner=await native('/factors/'+factor,'DELETE',undefined,user);assert.equal(weakOwner.response.ok,false,'own stale aal1 token cannot remove a verified factor');
+   // MFA verification upgraded the original session. Native unenroll checks the
+   // live session AAL, so its old JWT is not an independent weak-session fixture.
+   const login=await native('/token?grant_type=password','POST',{email:user.email,password:user.password});assert.equal(login.response.status,200);
+   const claims=JSON.parse(Buffer.from(login.data.access_token.split('.')[1],'base64url'));
+   assert.equal(claims.sub,user.id);assert.equal(claims.aal,'aal1');assert.notEqual(claims.session_id,strong.session_id);
+   const weakSession={...user,jwt:login.data.access_token,session_id:claims.session_id};
+   const assurance=await db.query('select id,aal::text from auth.sessions where user_id=$1 and id=any($2::uuid[])',[user.id,[weakSession.session_id,strong.session_id]]);
+   assert.deepEqual(Object.fromEntries(assurance.rows.map(row=>[row.id,row.aal])),{[weakSession.session_id]:'aal1',[strong.session_id]:'aal2'});
+   const weakOwner=await native('/factors/'+factor,'DELETE',undefined,weakSession);assert.equal(weakOwner.response.status,422);assert.equal(weakOwner.data.error_code,'insufficient_aal');
    const denied=await native('/factors/'+factor,'DELETE',undefined,other);assert.equal(denied.response.ok,false);
-   const directStrong=await native('/factors/'+factor,'DELETE',undefined,strong);assert.equal(directStrong.response.ok,false,'direct native removal needs an explicitly approved backend intent');const fid=factor;const removed=await must(strong,'account_totp_remove_v1',{factor_id:fid,reauth:strong.jwt});assert.equal(removed.removed,true);assert.equal((await must(strong,'account_totp_remove_v1',{factor_id:fid,reauth:strong.jwt})).removed,true);factor=null;
+   assert.deepEqual((await db.query('select status::text from auth.mfa_factors where id=$1 and user_id=$2',[factor,user.id])).rows,[{status:'verified'}]);
+   const directStrong=await native('/factors/'+factor,'DELETE',undefined,strong);assert.equal(directStrong.response.ok,true,'native AAL2 removal needs no application approval');factor=null;
    await must(strong,'account_get_v1');const history=await must(strong,'account_security_history_get_v1');assert.equal(history.items.filter(e=>e.action==='totp_disabled').length,1);assert(history.items.every(e=>!('secret' in e)&&!('code' in e)));
    assert.equal((await db.query("select count(*)::int n from auth.mfa_factors where user_id=$1 and status::text='verified'",[user.id])).rows[0].n,0);
   });
- }finally{if(factor){try{if(strong!==user)await must(strong,'account_totp_remove_v1',{factor_id:factor,reauth:strong.jwt});else await native('/factors/'+factor,'DELETE',undefined,strong);}catch{}}if(previousConfig.length)await db.query('update private.p07_lifecycle_config set reauth_max_age_seconds=$1 where singleton',[previousConfig[0].reauth_max_age_seconds]);else await db.query('delete from private.p07_lifecycle_config');await db.end();}
+ }finally{if(factor){try{await native('/factors/'+factor,'DELETE',undefined,strong);}catch{}}if(previousConfig.length)await db.query('update private.p07_lifecycle_config set reauth_max_age_seconds=$1 where singleton',[previousConfig[0].reauth_max_age_seconds]);else await db.query('delete from private.p07_lifecycle_config');await db.end();}
 });
