@@ -666,6 +666,7 @@
     "saved": "İşlem tamamlandı.",
     "failed": "İşlem doğrulanamadı. Bağlantını ve yetkini kontrol edip yeniden dene.",
     "providerFailed": "Kimlik sağlayıcısı işlemi tamamlamadı. Bilgileri, kodun süresini ve sağlayıcı kurulumunu kontrol et.",
+    "lastIdentity": "Son giriş yöntemi kaldırılamaz. Önce hesabına başka bir giriş yöntemi ekle.",
     "imageInvalid": "Fotoğraf okunamadı. PNG, JPEG veya WebP ve en fazla 1 MB olmalı.",
     "reauthNeeded": "İşlemi sürdürmek için yeniden doğrula.",
     "storageFailed": "Güvenli işlem takibi okunamıyor veya yazılamıyor. Bu sekmede yeni işlem gönderilmedi; önceki belirsiz işlemi destekle kontrol et.",

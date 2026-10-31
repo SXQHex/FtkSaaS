@@ -27,7 +27,7 @@ export function MfaManager({ actorId, onSaved }: { actorId: string; onSaved?: ()
           setError(true);
           setFactors(null);
         } else {
-          setFactors(result.data.totp);
+          setFactors(result.data.all.filter((factor) => factor.factor_type === "totp"));
         }
       })
       .catch(() => {

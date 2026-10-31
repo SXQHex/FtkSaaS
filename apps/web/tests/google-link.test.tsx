@@ -1,4 +1,4 @@
-import type { UserIdentity } from "@supabase/supabase-js";
+import { AuthApiError, type UserIdentity } from "@supabase/supabase-js";
 import { beforeEach, expect, test, vi } from "vitest";
 import { screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
@@ -73,11 +73,14 @@ test("unlink refreshes native identities and account data only after success", a
 });
 test("native last-identity rejection preserves the identity", async () => {
   mocks.identities.mockResolvedValue({ data: { identities: [identity] }, error: null });
-  mocks.unlink.mockResolvedValue({ error: new Error("last identity") });
+  mocks.unlink.mockResolvedValue({
+    error: new AuthApiError("last identity", 422, "single_identity_not_deletable"),
+  });
   const user = userEvent.setup();
   render(<GoogleLink actorId="actor" onSaved={mocks.saved} />);
   await user.click(await screen.findByRole("button", { name: "Google bağlantısını kaldır" }));
-  expect(await screen.findByRole("alert")).toHaveTextContent("Kimlik sağlayıcısı");
+  expect(await screen.findByRole("alert")).toHaveTextContent("Son giriş yöntemi kaldırılamaz");
   expect(screen.getByText("linked@example.invalid")).toBeVisible();
+  expect(mocks.refresh).not.toHaveBeenCalled();
   expect(mocks.saved).not.toHaveBeenCalled();
 });

@@ -13,6 +13,11 @@ import { Providers } from "../src/components/providers";
 import { ApiFailure } from "../src/lib/api";
 import type { Preview } from "@ftksaas/api-contracts";
 import type { ReactNode } from "react";
+import type {
+  AuthMFAEnrollTOTPResponse,
+  AuthMFAListFactorsResponse,
+  Factor,
+} from "@supabase/supabase-js";
 vi.mock("next-themes", () => ({
   ThemeProvider: ({ children }: { children: ReactNode }) => children,
 }));
@@ -30,8 +35,8 @@ const mocks = vi.hoisted(() => ({
       options?: unknown,
     ) => Promise<{ error: Error | null }>
   >(),
-  factors:
-    vi.fn<() => Promise<{ error: null; data: { totp: { id: string; status: string }[] } }>>(),
+  factors: vi.fn<() => Promise<AuthMFAListFactorsResponse>>(),
+  enroll: vi.fn<() => Promise<AuthMFAEnrollTOTPResponse>>(),
   refresh: vi.fn<() => Promise<{ error: Error | null }>>(),
   unenroll: vi.fn<() => Promise<{ error: null }>>(),
   verify: vi.fn<() => Promise<{ error: Error | null }>>(),
@@ -52,6 +57,7 @@ vi.mock("../src/lib/supabase/client", () => ({
       onAuthStateChange: () => ({ data: { subscription: { unsubscribe: () => {} } } }),
       mfa: {
         listFactors: mocks.factors,
+        enroll: mocks.enroll,
         unenroll: mocks.unenroll,
         challengeAndVerify: mocks.verify,
       },
@@ -60,6 +66,19 @@ vi.mock("../src/lib/supabase/client", () => ({
 }));
 vi.mock("../src/components/preferences", () => ({ Preferences: () => null }));
 const actor = "019a2b3c-4d5e-7000-8000-000000000001";
+const verifiedFactor: Factor<"totp", "verified"> = {
+  id: "verified-factor",
+  factor_type: "totp",
+  status: "verified",
+  created_at: "2026-01-01T00:00:00Z",
+  updated_at: "2026-01-01T00:00:00Z",
+};
+const pendingFactor: Factor<"totp", "unverified"> = {
+  ...verifiedFactor,
+  id: "pending-factor",
+  status: "unverified",
+};
+const emptyFactors = { all: [], totp: [], phone: [], webauthn: [], recovery_code: [] };
 const preview: Preview = {
   id: actor,
   token: "synthetic-preview",
@@ -74,7 +93,7 @@ beforeEach(() => {
   sessionStorage.clear();
   mocks.refresh.mockResolvedValue({ error: null });
   mocks.proof.mockResolvedValue("synthetic-proof");
-  mocks.factors.mockResolvedValue({ error: null, data: { totp: [] } });
+  mocks.factors.mockResolvedValue({ error: null, data: emptyFactors });
   vi.stubEnv("NEXT_PUBLIC_APP_ORIGIN", "https://app.example.invalid");
 });
 test("ownership blockers prevent account deletion and fresh authentication", async () => {
@@ -124,10 +143,13 @@ test("verified TOTP removal challenges then unenrolls natively; enrollment cance
   mocks.factors.mockResolvedValue({
     error: null,
     data: {
-      totp: [
-        { id: "verified-factor", status: "verified" },
-        { id: "pending-factor", status: "unverified" },
+      ...emptyFactors,
+      all: [
+        verifiedFactor,
+        pendingFactor,
+        { ...pendingFactor, id: "phone-factor", factor_type: "phone", friendly_name: "SMS factor" },
       ],
+      totp: [verifiedFactor],
     },
   });
   mocks.unenroll.mockResolvedValue({ error: null });
@@ -136,6 +158,7 @@ test("verified TOTP removal challenges then unenrolls natively; enrollment cance
   render(<MfaManager actorId={actor} />);
   await user.click(await screen.findByRole("button", { name: "Kurulumu iptal et" }));
   expect(mocks.unenroll).toHaveBeenCalledWith({ factorId: "pending-factor" });
+  expect(screen.queryByText(/SMS factor/)).not.toBeInTheDocument();
   await user.click(screen.getByRole("button", { name: "Doğrulamayı kaldır" }));
   await user.type(screen.getByLabelText("Uygulamadaki doğrulama kodu"), "123456");
   await user.click(screen.getByRole("button", { name: "Doğrula ve kaldır" }));
@@ -145,6 +168,32 @@ test("verified TOTP removal challenges then unenrolls natively; enrollment cance
   expect(mocks.refresh).toHaveBeenCalledOnce();
   expect(mocks.proof).not.toHaveBeenCalled();
   expect(mocks.call).not.toHaveBeenCalled();
+});
+test("new unverified TOTP enrollment can be cancelled and its setup key disappears", async () => {
+  mocks.factors
+    .mockResolvedValueOnce({ error: null, data: emptyFactors })
+    .mockResolvedValueOnce({ error: null, data: { ...emptyFactors, all: [pendingFactor] } })
+    .mockResolvedValue({ error: null, data: emptyFactors });
+  mocks.enroll.mockResolvedValue({
+    error: null,
+    data: {
+      id: pendingFactor.id,
+      type: "totp",
+      totp: { secret: "SYNTHETIC-SETUP-KEY", uri: "", qr_code: "" },
+    },
+  });
+  mocks.unenroll.mockResolvedValue({ error: null });
+  const user = userEvent.setup();
+  render(<MfaManager actorId={actor} />);
+  const enroll = screen.getByRole("button", { name: "Doğrulama uygulaması ekle" });
+  await waitFor(() => expect(enroll).toBeEnabled());
+  await user.click(enroll);
+  expect(await screen.findByText("SYNTHETIC-SETUP-KEY")).toBeVisible();
+  await user.click(await screen.findByRole("button", { name: "Kurulumu iptal et" }));
+  await waitFor(() => expect(screen.queryByText("SYNTHETIC-SETUP-KEY")).not.toBeInTheDocument());
+  expect(mocks.unenroll).toHaveBeenCalledExactlyOnceWith({ factorId: pendingFactor.id });
+  expect(mocks.verify).not.toHaveBeenCalled();
+  expect(await screen.findByRole("button", { name: "Doğrulama uygulaması ekle" })).toBeEnabled();
 });
 test("failed native contact changes show provider errors without a success notification", async () => {
   mocks.update.mockResolvedValue({ error: new Error("provider unavailable") });
@@ -468,7 +517,7 @@ test("invalid profile phone blocks saving and shows its own inline error", async
 test("failed native MFA challenge never unenrolls and re-reads factors without a success notice", async () => {
   mocks.factors.mockResolvedValue({
     error: null,
-    data: { totp: [{ id: "verified-factor", status: "verified" }] },
+    data: { ...emptyFactors, all: [verifiedFactor], totp: [verifiedFactor] },
   });
   mocks.verify.mockResolvedValue({ error: new Error("invalid code") });
   const user = userEvent.setup();
