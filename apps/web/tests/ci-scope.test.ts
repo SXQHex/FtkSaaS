@@ -26,8 +26,26 @@ test("frontend checks retain build, coverage, isolation and all four browsers", 
     "mobile",
   ]);
   const commands = config.jobs.checks.steps.map((step: { run?: string }) => step.run);
-  expect(commands).toContain("pnpm check:frontend");
-  expect(commands).toContain("pnpm test:frontend:coverage");
+  expect(commands).toContain(
+    "pnpm exec turbo run lint typecheck build test:coverage --filter=@ftksaas/web --filter=@ftksaas/ui",
+  );
+  expect(commands).not.toContain("pnpm check:frontend");
+  expect(config.jobs.browsers.needs).toEqual(["scope", "checks"]);
+  const browserCommands = config.jobs.browsers.steps.map(
+    (step: { run?: string }) => step.run ?? "",
+  );
+  expect(browserCommands).toContain(
+    'pnpm --filter @ftksaas/web exec playwright test --project="$BROWSER_PROJECT"',
+  );
+  expect(browserCommands.some((command: string) => command.includes("turbo run test:e2e"))).toBe(
+    false,
+  );
+  const download = config.jobs.browsers.steps.find(
+    (step: { name?: string }) => step.name === "Download verified build",
+  );
+  expect(download.with["artifact-ids"]).toBe("${{ needs.checks.outputs.build_id }}");
+  expect(download.with["digest-mismatch"]).toBe("error");
+  expect(commands).not.toContain("pnpm test:frontend:coverage");
   expect(commands).toContain("pnpm --filter @ftksaas/web test:isolation");
 });
 test("shared compatibility workflow performs type and graph checks without either application's test suite", () => {
@@ -83,7 +101,7 @@ test.each([
       ...(output === "frontend" ? ["node apps/web/scripts/ci-proof.mjs frontend"] : []),
     ]);
     for (const name of jobs) {
-      expect(config.jobs[name].needs).toBe("scope");
+      expect(config.jobs[name].needs).toEqual(name === "browsers" ? ["scope", "checks"] : "scope");
       expect(config.jobs[name].if).toBe(`needs.scope.outputs.${output} == 'true'`);
     }
   },

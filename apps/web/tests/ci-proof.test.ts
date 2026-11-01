@@ -42,14 +42,20 @@ function fixture(kind = "frontend", attempt = 1) {
     ...(kind === "frontend"
       ? {
           checks: [
-            "Run pnpm check:frontend",
+            "Frontend checks, coverage and build",
             "Run pnpm --filter @ftksaas/web test:isolation",
-            "Run pnpm test:frontend:coverage",
+            "Package verified build",
+            "Upload verified build",
           ],
           ...Object.fromEntries(
             ["chromium", "firefox", "webkit", "mobile"].map((b) => [
               `browsers (${b})`,
-              ["Install selected browser", "Test selected browser"],
+              [
+                "Install selected browser",
+                "Download verified build",
+                "Verify and restore build",
+                "Test selected browser",
+              ],
             ]),
           ),
         }
@@ -299,4 +305,17 @@ test("candidate receipt records the event merge and rejects changed checkout", (
   } finally {
     rmSync(dir, { recursive: true, force: true });
   }
+});
+
+test.each([
+  "Package verified build",
+  "Upload verified build",
+  "Download verified build",
+  "Verify and restore build",
+])("main rejects missing build transfer step %s", (step) => {
+  const { binding, proof } = fixture();
+  proof.jobs.forEach((job) => {
+    job.steps = job.steps.filter((s) => s.name !== step);
+  });
+  expect(() => validateProof(binding, proof)).toThrow("REQUIRED_CANDIDATE_JOBS");
 });

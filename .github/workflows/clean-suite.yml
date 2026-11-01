@@ -40,7 +40,7 @@ jobs:
         with:
           node-version-file: '.nvmrc'
       - run: corepack enable
-      - run: pnpm install --frozen-lockfile
+      - run: pnpm --filter @ftksaas/backend... --filter ftksaas install --frozen-lockfile
         working-directory: .
       - name: Clean acceptance
         env:
@@ -101,18 +101,13 @@ jobs:
         with:
           node-version-file: '.nvmrc'
       - run: corepack enable
-      - run: pnpm install --frozen-lockfile
+      - run: pnpm --filter @ftksaas/backend... --filter ftksaas install --frozen-lockfile
         working-directory: .
       - name: Clean acceptance
         env:
           FTK_TEST_TIMINGS: '1'
           SHARD: ${{ matrix.shard }}
-        run: |
-          if [ "$SHARD" = '1' ]; then
-            node scripts/ci/observe-api.mjs node scripts/test-clean.mjs api "$SHARD"
-          else
-            node scripts/test-clean.mjs api "$SHARD"
-          fi
+        run: FTK_EDGE_MEMORY_GUARD=1 node scripts/ci/observe-api.mjs node scripts/test-clean.mjs api "$SHARD"
       - if: always()
         run: node scripts/ci/summarize-timings.mjs
       - if: always()
@@ -155,7 +150,7 @@ jobs:
         with:
           node-version-file: '.nvmrc'
       - run: corepack enable
-      - run: pnpm install --frozen-lockfile
+      - run: pnpm --filter @ftksaas/backend... --filter ftksaas install --frozen-lockfile
         working-directory: .
       - name: Clean acceptance
         env:

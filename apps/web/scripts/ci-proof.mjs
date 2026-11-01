@@ -113,11 +113,17 @@ function requiredSteps(name) {
     return ["Select frontend scope", "Record candidate source", "Upload candidate source"];
   if (name === "checks")
     return [
-      "Run pnpm check:frontend",
+      "Frontend checks, coverage and build",
       "Run pnpm --filter @ftksaas/web test:isolation",
-      "Run pnpm test:frontend:coverage",
+      "Package verified build",
+      "Upload verified build",
     ];
-  return ["Install selected browser", "Test selected browser"];
+  return [
+    "Install selected browser",
+    "Download verified build",
+    "Verify and restore build",
+    "Test selected browser",
+  ];
 }
 
 export function readBinding(archive) {
