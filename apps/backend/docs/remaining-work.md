@@ -58,11 +58,13 @@ Bu tablo yalnız izdir; eski kabul metinleri ikinci kez tutulmaz.
 - **Doğrulama senaryosu:** Her F kimliğine en az bir görev ve gerçek mevcut test/kanıt bağını denetle; sahipsiz operasyon bırakma.
 - **Kaynak alanı:** contract.json x-contract; workflows.json; backend backlog
 
-### S04 hesap erişimi okuma bağımlılığı
+**Uygulama alt adımları:**
 
-- [ ] [XREQ-005](../../../docs/requests.md): mevcut yönetim okumasında kişiyle davet/bağlantı keşfi ve izinli eylem/sürüm. Starter S04 tüketicisi; F04/F06/F07/F33.
-- **Kabul:** Yenilemeden sonra kimlik elle girilmeden revoke/remove seçilir. Yanlış tenant/merkez/hesap, yetki kaybı, eski sürüm ve cursor kapsam/değişim reddi mevcut gerçek Auth→Edge→RPC suite’lerinde doğrulanır. Birleşmiş kişi alias’ındaki davetler de keşfedilir. Teslim ve frontend kabulü ayrı kalır; kanıt devir sahibindedir.
-- XREQ-006 çok merkezli onay keşfi Starter bağımlılığı değildir; bu teslimde genişletilmez.
+- [ ] A03.1 — Her F01–F33 için normatif karar/plan kapsamını mevcut operasyon ve WF kaynaklarıyla eşleştir; metadata eksikliğini runtime eksikliğinden ayır.
+- [ ] A03.2 — Bağlı gerçek testleri ve kaynak/run/ortam kanıtını incele; doğrulanmamış, eksik veya uygulanamaz katmanı gerekçesiyle ayır. Sırf test dosyası bulunması başarı kanıtı değildir.
+- [ ] A03.3 — Her gerçek boşluğu mevcut görev kimliğine bağla; sahipsiz operasyon veya çelişen kabul bırakma. Makine metadata'sını yalnız doğrulanmış kanıtla güncelle; mevcut sağlam işlevi yeniden yazma.
+
+**Dilim kabulü:** 33 özelliğin her birinde karar→kaynak→test→ortam→plan izi ve açık boşluğun görev sahibi bulunur. İncelenmemiş katman tamamlandı gösterilmez; yeni bir kanıt/roadmap dosyası açılmaz.
 
 ## Starter ve ortak ürün temeli
 
@@ -76,6 +78,14 @@ Bu tablo yalnız izdir; eski kabul metinleri ikinci kez tutulmaz.
 - **Doğrulama senaryosu:** Oluştur→yeniden oku→sürümle güncelle; eski sürüm ve başka merkez reddi.
 - **Kaynak alanı:** database oda/management kaynakları; room-role-registry.test.mjs; contract.json
 
+**Uygulama alt adımları:**
+
+- [ ] S01.1 — Mevcut oda yazma ve yönetim okuma kaynaklarını incele; liste, ayrıntı, selector ve düzenleme sürümü boşluklarını belirle. Desteklenen alanları mevcut DTO/yetki sözleşmesinden al.
+- [ ] S01.2 — Eksik okumaları mevcut mimari içinde tamamla; merkez/tenant scope, desteklenen filtre ve sayfalama davranışını sözleşme/üretilmiş tiplerle birlikte sun.
+- [ ] S01.3 — Gerçek Auth→Edge→RPC yolunda oluştur→yeni oturumdan bul→ayrıntı/sürüm oku→güncelle→yeniden oku zincirini doğrula; mevcut oda/rol suite'ini kullan.
+
+**Dilim kabulü:** Eski sürümle yazma, başka tenant/izinsiz merkez erişimi ve yetki kaybı reddedilir. Starter ikinci aktif oda açamaz; mevcut kapasite ve tek mantıksal oda kuralları korunur. Backend okuma teslimi frontend ekran kabulü diye kapatılmaz.
+
 <a id="s02"></a>
 ### S02 — Sınıf ve program yönetim okumaları
 
@@ -85,6 +95,14 @@ Bu tablo yalnız izdir; eski kabul metinleri ikinci kez tutulmaz.
 - **Sınır/olumsuz durum:** Yazma var diye okuma tamam sayılmaz; sayfalama ve yetki uygulanır.
 - **Doğrulama senaryosu:** Kayıtlı programı yeni oturumdan bul/düzenle; çakışma ve stale sürüm; frontend B01 bağı kapanır.
 - **Kaynak alanı:** database program/management; program-session-lifecycle.test.mjs; contract.json
+
+**Uygulama alt adımları:**
+
+- [ ] S02.1 — Mevcut sınıf/program yazmalarının ihtiyaç duyduğu kimlik, selector, alan ve sürüm okumalarını incele; oda okumasını S01'den tüket, ikinci kaynak kurma.
+- [ ] S02.2 — Kayıtlı sınıf/programın liste/ayrıntı ve düzenleme okumalarını desteklenen scope/filtre/sayfalama ile tamamla; DTO ve hata sözleşmesini eşitle.
+- [ ] S02.3 — Programı bir oturumda oluşturup yeni oturumda bul/düzenle/yeniden oku; stale sürüm, yetki kaybı ve kaynak çakışmasını mevcut program/session suite'inde doğrula.
+
+**Dilim kabulü:** İstemci önceki oluşturma yanıtını saklamadan düzenlenecek kaydı bulabilir. Yetkisiz kapsam ve eski sürüm reddedilir; oda/eğitmen çakışması ile Starter tek kaynak sınırları gevşemez. Frontend B01'in yalnız bu okumalarla ilgili backend bağımlılığı teslim edilir; ekran kabulü kendi sahibinde kalır.
 
 <a id="s03"></a>
 ### S03 — Abone No tahsis ve arama
@@ -96,6 +114,14 @@ Bu tablo yalnız izdir; eski kabul metinleri ikinci kez tutulmaz.
 - **Doğrulama senaryosu:** Aynı kişiye paralel aktivasyon, iki org, pasifleştir/aktifleştir ve hesap bağlama testleri.
 - **Kaynak alanı:** database kişi ilişkileri; yeni migration; person-registry.test.mjs; contract.json
 
+**Uygulama alt adımları:**
+
+- [ ] S03.1 — [P08 kararına](../../../docs/decisions/P08-accepted-scope.md#organizasyon-bazında-sabit-abone-numarası) göre ilk öğrencilik/tahsis sınırını mevcut kişi yaşam döngüsüne bağla; hesap şartı koyma. Yalnız aday/eğitmen/personel olmanın numara üretmediğini doğrula.
+- [ ] S03.2 — Yeni migration ve domain işlemiyle org bazlı tekil tahsisi atomik kur; değişmezlik ve tekrar güvenliğini mevcut komut/replay mekanizmasına bağla. No araması mevcut yetkili kişi çözümlemesini kullanır.
+- [ ] S03.3 — Aynı kişiye paralel aktivasyon, farklı kişilere eşzamanlı tahsis, aynı komutun tekrarı ve iki organizasyonu gerçek kişi registry suite'inde sınayarak tahsis/arama sonucunu doğrula.
+
+**Dilim kabulü:** İlk öğrencilikte 1001'den başlayan org numarası alınır; pasifleştir/aktifleştir, iletişim değişimi ve hesap bağlama yeni numara üretmez. Boşluksuz sıra vaadi verilmez; numara yeniden kullanılmaz veya yetki kanıtı sayılmaz. Tenant dışından No ile çözümleme reddedilir.
+
 <a id="s04"></a>
 ### S04 — Abone No ilk aktarımı ve birleşim
 
@@ -106,6 +132,14 @@ Bu tablo yalnız izdir; eski kabul metinleri ikinci kez tutulmaz.
 - **Doğrulama senaryosu:** İki numaralı/tek numaralı merge, alias zinciri, paralel yeni öğrenci ve aktarımın yeniden çalışması.
 - **Kaynak alanı:** kişi merge/aktarım kaynakları; yeni migration; ilgili acceptance testi
 
+**Uygulama alt adımları:**
+
+- [ ] S04.1 — Mevcut aktif/pasif öğrencileri ilk öğrenci ilişkisi tarihi, eşitlikte kişi UUID'siyle sıralayan tekrar güvenli ilk aktarımı hazırla; çok merkez ilişkisini org içinde tek kişi olarak ele al.
+- [ ] S04.2 — Mevcut merge akışına P08 numara koruma ve alias davranışını bağla: iki numarada ilk tahsis edileni, tek numarada mevcut olanı koru; eski numaralar aynı canonical kişiye ulaşsın.
+- [ ] S04.3 — İlk aktarımı tekrar çalıştır; aktarım ile yeni öğrencilik yarışını, tek/iki numaralı birleşimi ve alias zincirini izole kabulde doğrula. Canlı veri aktarımı bu planın yetkisi değildir.
+
+**Dilim kabulü:** Verilmiş numaralar yeniden numaralanmaz; alias başka kişiye tahsis edilmez. Birleşim hak/borç/satış geçmişini ve mevcut onay/yetki kapılarını korur. Geçmiş makbuz ve dış listeler yeniden yazılmaz; retry ve geç hata atomikliği mevcut akışla doğrulanır.
+
 <a id="s05"></a>
 ### S05 — Abone No operasyon projeksiyonları
 
@@ -115,6 +149,14 @@ Bu tablo yalnız izdir; eski kabul metinleri ikinci kez tutulmaz.
 - **Sınır/olumsuz durum:** UUID teknik ilişki olarak kalır; No ile yetkisiz çözümleme yok; geçmiş dış belgeler yeniden yazılmaz.
 - **Doğrulama senaryosu:** No ile bul→UUID komut→raporda No; alias araması ve yetki kaybı; frontend sözleşme devri.
 - **Kaynak alanı:** kişi/list/report/export projeksiyonları; contract.json; ilgili test
+
+**Uygulama alt adımları:**
+
+- [ ] S05.1 — Kişi referansı kullanan mevcut arama/liste/rapor/export projeksiyonlarını envanterden tara; Abone No gereken yüzeyleri ve mevcut izin kapsamlarını belirle.
+- [ ] S05.2 — Gerekli DTO/projeksiyonlara No'yu taşı; komut ve ilişkilerde UUID'yi koru. Değişen makine sözleşmesinden tip/katalogları üret; ilgili WF/API eşlemesini incele.
+- [ ] S05.3 — No ile bul→UUID komut→yeniden oku→rapor/export zincirini doğrula; alias araması, scope ve yetki kaybını sınayarak frontend'e sözleşme devrini yap.
+
+**Dilim kabulü:** Aynı kişi izinli operasyon yüzeylerinde tutarlı numarayla görünür. Numara kişisel/finans verisine ek erişim sağlamaz; yeni export mevcut yetkiyi uygular. Önceden üretilmiş dış belge değişmez; frontend'in ekran uyarlaması/kabulü backend adına kapatılmaz.
 
 <a id="s06"></a>
 ### S06 — Davet işi takibindeki kopukluk
