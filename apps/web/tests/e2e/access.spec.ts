@@ -137,7 +137,10 @@ test("first email confirmation survives the HTTP redirect, retains its destinati
   );
   expect((await new AxeBuilder({ page }).analyze()).violations).toEqual([]);
   await page.getByRole("link", { name: "Hesap ve güvenlik" }).click();
-  await expect(page).toHaveURL(/\/login\?next=%2Faccount$/);
+  await expect(page).toHaveURL(
+    (url) =>
+      url.pathname === "/login" && url.searchParams.get("next") === "/account" && url.hash === "",
+  );
 });
 
 test("expired email confirmation shows recovery instructions and removes provider details", async ({
@@ -149,10 +152,13 @@ test("expired email confirmation shows recovery instructions and removes provide
     error_description: "Synthetic expired link",
   });
   await page.goto(`/auth/callback?next=/account#${fragment}`);
-  await expect(page.getByRole("alert")).toContainText("Bağlantı doğrulanamadı");
+  await expect(page.getByRole("main").getByRole("alert")).toContainText("Bağlantı doğrulanamadı");
   expect(new URL(page.url()).hash).toBe("");
   await page.getByRole("link", { name: "Giriş ekranına dön" }).click();
-  await expect(page).toHaveURL(/\/login\?next=%2Faccount$/);
+  await expect(page).toHaveURL(
+    (url) =>
+      url.pathname === "/login" && url.searchParams.get("next") === "/account" && url.hash === "",
+  );
 });
 
 test("language switching persists across reload and recovery without changing routes", async ({

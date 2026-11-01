@@ -455,3 +455,5 @@ Kullanıcının ek isteğiyle mevcut Google kimliği varken “Google hesabını
 - TOTP kurulum UX: sağlayıcının döndürdüğü `qr_code` ve `uri` istemcide alınmasına rağmen ekranda yalnız elle girilen anahtar gösteriliyor. QR kodu ve kısa doğrulama uygulaması yönergesi eklenmeli; mevcut elle kurulum anahtarı korunmalı. Bu kabul kaydı UI değişikliği uygulanmış sayılmaz.
 
 Davet kullanıcı isteğiyle bu devam turunun dışındadır; XREQ-003 ve davet kabulü açık kalır. S01 kapanmadı. Bir test hesabında silme talebi uygulanmıştır; fiziksel imha ve bütün sağlayıcı akışlarının kabulü tamamlanmamıştır.
+
+PR111 ilk dört tarayıcı koşusunda her projede 23 test geçti; iki yeni test URL kodlama yazımı ve Next.js route announcer ile çakışan alert seçicisi nedeniyle başarısız oldu. Testler login yolu, çözülmüş next hedefi ve boş fragmenti doğrulayacak, hata alanını main içinde seçecek şekilde düzeltildi. Yeni kaynak için dört tarayıcı kabulü bekler.
