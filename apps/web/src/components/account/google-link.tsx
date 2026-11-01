@@ -24,12 +24,19 @@ export function GoogleLink({ actorId, onSaved }: { actorId: string; onSaved?: ()
         setIdentities(result.error ? null : result.data.identities);
       })
       .catch(() => {
-        if (active) setError("providerFailed");
+        if (active) {
+          setIdentities(null);
+          setError("providerFailed");
+        }
       });
     return () => {
       active = false;
     };
   }, [actorId, retry]);
+  function reloadIdentities() {
+    setIdentities(null);
+    setRetry((value) => value + 1);
+  }
   async function link() {
     if (lock.current) return;
     lock.current = true;
@@ -67,7 +74,7 @@ export function GoogleLink({ actorId, onSaved }: { actorId: string; onSaved?: ()
           : "providerFailed",
       );
     } finally {
-      setRetry((value) => value + 1);
+      reloadIdentities();
       setBusy(false);
       lock.current = false;
     }
@@ -95,14 +102,11 @@ export function GoogleLink({ actorId, onSaved }: { actorId: string; onSaved?: ()
             </Button>
           </div>
         ))}
-      <Button
-        type="button"
-        variant="outline"
-        disabled={busy || !identities}
-        onClick={() => void link()}
-      >
-        {t("linkGoogle")}
-      </Button>
+      {identities && !identities.some((identity) => identity.provider === "google") && (
+        <Button type="button" variant="outline" disabled={busy} onClick={() => void link()}>
+          {t("linkGoogle")}
+        </Button>
+      )}
       {error && (
         <Button
           type="button"
@@ -110,7 +114,7 @@ export function GoogleLink({ actorId, onSaved }: { actorId: string; onSaved?: ()
           disabled={busy}
           onClick={() => {
             setError("");
-            setRetry((value) => value + 1);
+            reloadIdentities();
           }}
         >
           {t("refresh")}

@@ -89,20 +89,76 @@ test("callback HTTP redirects use the configured origin and reject external dest
   request,
   baseURL,
 }) => {
-  for (const [next, target] of [
-    ["/reset-password", "/forgot-password?error=callback"],
-    ["/account", "/login?error=callback&next=%2Faccount"],
-    ["//attacker.invalid", "/login?error=callback"],
+  for (const [next, target, consumed] of [
+    ["/reset-password", "/forgot-password?error=callback", true],
+    ["/account", "/auth/confirmation?next=%2Faccount", false],
+    ["//attacker.invalid", "/auth/confirmation", false],
   ] as const) {
     const response = await request.get(`/auth/callback?next=${encodeURIComponent(next)}`, {
       maxRedirects: 0,
     });
     expect(response.status()).toBe(307);
     expect(response.headers().location).toBe(new URL(target, baseURL).href);
-    expect(response.headers()["set-cookie"]).toContain("ftksaas_auth_return=;");
-    expect(response.headers()["set-cookie"]).toContain("Path=/auth/callback");
-    expect(response.headers()["set-cookie"]).toContain("Max-Age=0");
+    if (consumed) {
+      expect(response.headers()["set-cookie"]).toContain("ftksaas_auth_return=;");
+      expect(response.headers()["set-cookie"]).toContain("Path=/auth/callback");
+      expect(response.headers()["set-cookie"]).toContain("Max-Age=0");
+    } else {
+      expect(response.headers()["set-cookie"] ?? "").not.toContain("ftksaas_auth_return=;");
+    }
   }
+});
+
+test("first email confirmation survives the HTTP redirect, retains its destination, and grants no access", async ({
+  page,
+  context,
+  baseURL,
+}) => {
+  await context.addCookies([
+    {
+      name: "ftksaas_auth_return",
+      value: "/account",
+      domain: new URL(baseURL!).hostname,
+      path: "/auth/callback",
+      httpOnly: true,
+      sameSite: "Lax",
+      expires: Date.now() / 1000 + 600,
+    },
+  ]);
+  const fragment = new URLSearchParams({
+    message: "Confirmation link accepted. Please proceed to confirm link sent to the other email",
+    sb: "",
+  });
+  await page.goto(`/auth/callback#${fragment}`);
+  await expect(page.getByRole("status")).toContainText("Diğer adrese gönderilen bağlantıyı da aç");
+  await expect(page).toHaveURL(/\/auth\/confirmation\?next=%2Faccount$/);
+  expect(await context.cookies()).toContainEqual(
+    expect.objectContaining({ name: "ftksaas_auth_return", value: "/account", httpOnly: true }),
+  );
+  expect((await new AxeBuilder({ page }).analyze()).violations).toEqual([]);
+  await page.getByRole("link", { name: "Hesap ve güvenlik" }).click();
+  await expect(page).toHaveURL(
+    (url) =>
+      url.pathname === "/login" && url.searchParams.get("next") === "/account" && url.hash === "",
+  );
+});
+
+test("expired email confirmation shows recovery instructions and removes provider details", async ({
+  page,
+}) => {
+  const fragment = new URLSearchParams({
+    error: "access_denied",
+    error_code: "otp_expired",
+    error_description: "Synthetic expired link",
+  });
+  await page.goto(`/auth/callback?next=/account#${fragment}`);
+  await expect(page.getByRole("main").getByRole("alert")).toContainText("Bağlantı doğrulanamadı");
+  expect(new URL(page.url()).hash).toBe("");
+  await page.getByRole("link", { name: "Giriş ekranına dön" }).click();
+  await expect(page).toHaveURL(
+    (url) =>
+      url.pathname === "/login" && url.searchParams.get("next") === "/account" && url.hash === "",
+  );
 });
 
 test("language switching persists across reload and recovery without changing routes", async ({
