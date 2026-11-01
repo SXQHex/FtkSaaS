@@ -248,3 +248,38 @@ test("retired Turkish auth paths are absent and do not redirect", async ({ page 
     await expect(page.getByRole("heading", { name: "Sayfa bulunamadı" })).toBeVisible();
   }
 });
+
+test("invitation fragment survives login and signup navigation without entering HTTP requests", async ({
+  page,
+}) => {
+  const leaked: string[] = [];
+  page.on("request", (request) => {
+    if (
+      request.url().split("#")[0].includes("synthetic-invitation-proof") ||
+      request.postData()?.includes("synthetic-invitation-proof")
+    )
+      leaked.push(request.url());
+  });
+  await page.goto("/invite#token=synthetic-invitation-proof");
+  await expect(page.getByRole("heading", { name: "Hesabına giriş yap" })).toBeVisible();
+  await expect.poll(() => new URL(page.url()).hash).toBe("");
+  expect(await page.evaluate(() => sessionStorage.getItem("ftksaas:pending-invitation"))).toBe(
+    "synthetic-invitation-proof",
+  );
+  await page.getByRole("link", { name: "Hesap oluştur", exact: true }).click();
+  await expect(page.getByLabel("Ad soyad")).toBeVisible();
+  expect(new URL(page.url()).searchParams.get("next")).toBe("/invite");
+  expect(await page.evaluate(() => sessionStorage.getItem("ftksaas:pending-invitation"))).toBe(
+    "synthetic-invitation-proof",
+  );
+  await page.reload();
+  await expect(page.getByLabel("Ad soyad")).toBeVisible();
+  expect(await page.evaluate(() => sessionStorage.getItem("ftksaas:pending-invitation"))).toBe(
+    "synthetic-invitation-proof",
+  );
+  expect(leaked).toEqual([]);
+  await page.goto("/login");
+  await expect
+    .poll(() => page.evaluate(() => sessionStorage.getItem("ftksaas:pending-invitation")))
+    .toBeNull();
+});

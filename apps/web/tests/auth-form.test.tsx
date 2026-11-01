@@ -39,7 +39,10 @@ vi.mock("../src/lib/supabase/client", () => ({
   }),
 }));
 beforeEach(() => {
+  vi.restoreAllMocks();
   vi.clearAllMocks();
+  sessionStorage.clear();
+  window.history.replaceState(null, "", "/");
   mocks.check.mockResolvedValue({
     ok: true,
     data: { status: "available" },
@@ -381,3 +384,90 @@ test.each(["signup", "update"] as const)(
     expect(mocks.update).not.toHaveBeenCalled();
   },
 );
+
+test.each(["login", "mfa"] as const)(
+  "%s keeps invitation proof in the tab, never in the return URL",
+  async (mode) => {
+    window.history.replaceState(null, "", `/${mode}?next=/invite#token=synthetic-invitation`);
+    mocks.signIn.mockResolvedValue({ error: null });
+    mocks.factors.mockResolvedValue({
+      error: null,
+      data: { totp: [{ id: "factor", status: "verified" }] },
+    });
+    mocks.verify.mockResolvedValue({ error: null });
+    const user = userEvent.setup();
+    render(<AuthFields mode={mode} returnTo="/invite" />);
+    expect(window.location.hash).toBe("");
+    if (mode === "login") {
+      await user.type(screen.getByLabelText("E-posta adresi"), "test@example.invalid");
+      await user.type(screen.getByLabelText("Parola", { exact: true }), "synthetic-password");
+      await user.click(screen.getByRole("button", { name: "Giriş yap" }));
+    } else {
+      await user.type(screen.getByLabelText("Doğrulama kodu"), "123456");
+      await user.click(screen.getByRole("button", { name: "Doğrula" }));
+    }
+    expect(mocks.replace).toHaveBeenCalledWith("/invite");
+    expect(sessionStorage.getItem("ftksaas:pending-invitation")).toBe("synthetic-invitation");
+  },
+);
+
+test("Google preserves invitation proof across provider navigation without transmitting it to the return action", async () => {
+  window.history.replaceState(null, "", "/login?next=/invite#token=synthetic-invitation");
+  mocks.oauth.mockResolvedValue({ error: null });
+  const user = userEvent.setup();
+  render(<AuthFields returnTo="/invite" />);
+  await user.click(screen.getByRole("button", { name: /Google/ }));
+  expect(mocks.remember).toHaveBeenCalledWith("/invite");
+  expect(JSON.stringify(mocks.oauth.mock.calls)).not.toContain("synthetic-invitation");
+  expect(sessionStorage.getItem("ftksaas:pending-invitation")).toBe("synthetic-invitation");
+  expect(window.location.hash).toBe("");
+});
+
+test("a normal login discards an abandoned invitation", () => {
+  sessionStorage.setItem("ftksaas:pending-invitation", "synthetic-old");
+  render(<AuthFields />);
+  expect(sessionStorage.getItem("ftksaas:pending-invitation")).toBeNull();
+});
+
+test("blocked tab storage does not prevent unrelated password or Google login", async () => {
+  vi.spyOn(Storage.prototype, "removeItem").mockImplementation(() => {
+    throw new DOMException("Blocked", "SecurityError");
+  });
+  mocks.signIn.mockResolvedValue({ error: null });
+  mocks.oauth.mockResolvedValue({ error: null });
+  const user = userEvent.setup();
+  render(<AuthFields />);
+  await user.type(screen.getByLabelText("E-posta adresi"), "test@example.invalid");
+  await user.type(screen.getByLabelText("Parola", { exact: true }), "synthetic-password");
+  await user.click(screen.getByRole("button", { name: "Giriş yap" }));
+  expect(mocks.signIn).toHaveBeenCalled();
+  await user.click(screen.getByRole("button", { name: /Google/ }));
+  expect(mocks.oauth).toHaveBeenCalled();
+});
+
+test("invitation storage failure retains proof and explains how to recover without starting OAuth", async () => {
+  window.history.replaceState(null, "", "/login?next=/invite#token=synthetic-invitation");
+  vi.spyOn(Storage.prototype, "setItem").mockImplementation(() => {
+    throw new DOMException("Blocked", "SecurityError");
+  });
+  const user = userEvent.setup();
+  render(<AuthFields returnTo="/invite" />);
+  await user.click(screen.getByRole("button", { name: /Google/ }));
+  expect(await screen.findByRole("alert")).toHaveTextContent("Davet bağlantısı korunamadı");
+  expect(window.location.hash).toBe("#token=synthetic-invitation");
+  expect(mocks.oauth).not.toHaveBeenCalled();
+});
+
+test("storage failure blocks login to signup navigation without losing invitation proof", async () => {
+  window.history.replaceState(null, "", "/login?next=/invite#token=synthetic-invitation");
+  vi.spyOn(Storage.prototype, "setItem").mockImplementation(() => {
+    throw new DOMException("Blocked", "SecurityError");
+  });
+  const user = userEvent.setup();
+  render(<AuthFields returnTo="/invite" />);
+  await user.click(screen.getByRole("link", { name: "Hesap oluştur" }));
+  expect(await screen.findByRole("alert")).toHaveTextContent("Davet bağlantısı korunamadı");
+  expect(window.location.pathname).toBe("/login");
+  expect(window.location.hash).toBe("#token=synthetic-invitation");
+  expect(mocks.signup).not.toHaveBeenCalled();
+});

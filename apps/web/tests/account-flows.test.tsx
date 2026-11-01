@@ -1,3 +1,5 @@
+import { NextIntlClientProvider } from "next-intl";
+import tr from "../messages/tr.json";
 import { beforeEach, expect, test, vi } from "vitest";
 import { screen, within, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
@@ -12,7 +14,7 @@ import { DeletionProgress } from "../src/components/account/deletion-progress";
 import { Providers } from "../src/components/providers";
 import { ApiFailure } from "../src/lib/api";
 import type { Preview } from "@ftksaas/api-contracts";
-import type { ReactNode } from "react";
+import { StrictMode, type ReactNode } from "react";
 import type {
   AuthMFAEnrollTOTPResponse,
   AuthMFAListFactorsResponse,
@@ -579,4 +581,58 @@ test("TOTP setup survives a rejected code and clears its QR and key after verifi
   await waitFor(() => expect(screen.queryByRole("img")).not.toBeInTheDocument());
   expect(screen.queryByText("SYNTHETIC-SETUP-KEY")).not.toBeInTheDocument();
   expect(mocks.verify).toHaveBeenLastCalledWith({ factorId: pendingFactor.id, code: "123456" });
+});
+
+test("invitation handoff survives StrictMode and consumes tab proof before acceptance", async () => {
+  window.history.replaceState(null, "", "/invite");
+  sessionStorage.setItem("ftksaas:pending-invitation", "synthetic-handoff");
+  mocks.call.mockResolvedValue({ id: actor, display_name: "Synthetic" });
+  const user = userEvent.setup();
+  render(
+    <StrictMode>
+      <InvitationAccept nativeUserId="native-owner" />
+    </StrictMode>,
+  );
+  await screen.findByText("Kabul eden hesap: Synthetic");
+  expect(screen.getByLabelText("Davet kodu")).toHaveValue("synthetic-handoff");
+  expect(sessionStorage.getItem("ftksaas:pending-invitation")).toBeNull();
+  expect(mocks.call.mock.calls.every(([operation]) => operation === "account_get_v1")).toBe(true);
+  await user.click(screen.getByRole("button", { name: "Daveti kabul et" }));
+  expect(mocks.call).toHaveBeenCalledWith(
+    "account_access_accept_v1",
+    expect.objectContaining({ token: "synthetic-handoff" }),
+  );
+  expect(await screen.findByRole("status")).toHaveTextContent("Davet kabul edildi");
+  expect(JSON.stringify(sessionStorage)).not.toContain("synthetic-handoff");
+});
+
+test("a fresh invitation fragment replaces stale tab proof and retains an explicit account-switch link", async () => {
+  window.history.replaceState(null, "", "/invite#token=synthetic-new");
+  sessionStorage.setItem("ftksaas:pending-invitation", "synthetic-old");
+  mocks.call.mockResolvedValue({ id: actor, display_name: "Synthetic" });
+  render(<InvitationAccept nativeUserId="native-owner" />);
+  await screen.findByText("Kabul eden hesap: Synthetic");
+  expect(screen.getByLabelText("Davet kodu")).toHaveValue("synthetic-new");
+  expect(window.location.hash).toBe("");
+  expect(sessionStorage.getItem("ftksaas:pending-invitation")).toBeNull();
+  expect(screen.getByRole("link", { name: "Doğru hesapla yeniden giriş yap" })).toHaveAttribute(
+    "href",
+    "/login?next=/invite#token=synthetic-new",
+  );
+});
+
+test("changing the native account remounts the invitation and never carries old proof", async () => {
+  window.history.replaceState(null, "", "/invite#token=synthetic-first-account");
+  mocks.call.mockResolvedValue({ id: actor, display_name: "Synthetic" });
+  const view = render(<InvitationAccept nativeUserId="first-user" />);
+  await screen.findByText("Kabul eden hesap: Synthetic");
+  expect(screen.getByLabelText("Davet kodu")).toHaveValue("synthetic-first-account");
+  view.rerender(
+    <NextIntlClientProvider locale="tr" messages={tr} timeZone="UTC">
+      <InvitationAccept nativeUserId="second-user" />
+    </NextIntlClientProvider>,
+  );
+  await screen.findByText("Kabul eden hesap: Synthetic");
+  expect(screen.getByLabelText("Davet kodu")).toHaveValue("");
+  expect(mocks.call.mock.calls.every(([operation]) => operation === "account_get_v1")).toBe(true);
 });
