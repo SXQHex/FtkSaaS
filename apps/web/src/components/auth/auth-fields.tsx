@@ -24,6 +24,7 @@ function authMessage(error: unknown) {
     return "rateLimit";
   if (code === "mfa_verification_failed") return "invalidCode";
   if (code === "weak_password") return "weakPassword";
+  if (code === "same_password") return "samePassword";
   if (code === "reauthentication_needed" || code === "current_password_required")
     return "recoveryRequired";
   if (code === "signup_disabled") return "signupDisabled";
@@ -54,6 +55,7 @@ export function AuthFields({
   const [signupIdentity, setSignupIdentity] = useState({ email: "", name: "" });
   const [resendRequested, setResendRequested] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const [showConfirm, setShowConfirm] = useState(false);
   const social = mode === "login" || mode === "signup";
   const newPassword = mode === "signup" || mode === "update";
   const confirmed = mode === "signup" && notice === "signupNotice";
@@ -316,15 +318,30 @@ export function AuthFields({
           {newPassword && (
             <div className="space-y-2">
               <Label htmlFor="confirm">{t("confirm")}</Label>
-              <Input
-                id="confirm"
-                name="confirm"
-                type="password"
-                autoComplete="new-password"
-                required
-                disabled={busy || !configured}
-                className="min-h-11"
-              />
+              <div className="relative">
+                <Input
+                  id="confirm"
+                  name="confirm"
+                  type={showConfirm ? "text" : "password"}
+                  autoComplete="new-password"
+                  required
+                  disabled={busy || !configured}
+                  className="min-h-11 pr-12"
+                />
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="icon"
+                  className="absolute right-0 top-0 size-11"
+                  aria-label={t(showConfirm ? "hideConfirmPassword" : "showConfirmPassword")}
+                  aria-controls="confirm"
+                  aria-pressed={showConfirm}
+                  onClick={() => setShowConfirm(!showConfirm)}
+                  disabled={busy || !configured}
+                >
+                  {showConfirm ? <EyeOff aria-hidden="true" /> : <Eye aria-hidden="true" />}
+                </Button>
+              </div>
             </div>
           )}
           {mode === "mfa" && (
