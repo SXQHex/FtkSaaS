@@ -11,16 +11,16 @@ on:
 defaults:
   run:
     working-directory: apps/backend
-permissions:
-  contents: read
-  actions: read
+permissions: {}
 jobs:
   core:
+    permissions:
+      contents: read
     name: core
     runs-on: ubuntu-24.04
     timeout-minutes: 65
     steps:
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           ref: ${{ inputs.tested_sha }}
           fetch-depth: 0
@@ -36,7 +36,7 @@ jobs:
           const git=(...a)=>execFileSync('git',a,{encoding:'utf8'}).trim();
           if(git('rev-parse','HEAD')!==process.env.EXPECTED||git('rev-parse','HEAD^{tree}')!==b.tree||(b.actual??b.merge)!==process.env.EXPECTED)throw Error('Source mismatch');
           JS
-      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
           node-version-file: '.nvmrc'
       - run: corepack enable
@@ -47,7 +47,7 @@ jobs:
           FTK_TEST_TIMINGS: '1'
         run: node scripts/test-clean.mjs core
       - name: Upload schema baseline
-        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           # Only core writes this run-scoped artifact. Retained core success
           # retains it; a successful re-execution replaces it on the same source.
@@ -63,7 +63,7 @@ jobs:
       - if: always()
         run: node scripts/ci/cleanup.mjs
       - if: always()
-        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: timings-core-${{ github.run_attempt }}
           path: .artifacts/ci/timings/*.json
@@ -71,6 +71,8 @@ jobs:
           include-hidden-files: true
           archive: true
   api:
+    permissions:
+      contents: read
     name: api-${{ matrix.shard }}
     strategy:
       fail-fast: false
@@ -79,10 +81,10 @@ jobs:
     runs-on: ubuntu-24.04
     timeout-minutes: 65
     steps:
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           ref: ${{ inputs.tested_sha }}
-          fetch-depth: 0
+          fetch-depth: 1
           persist-credentials: false
       - name: Verify tested merge
         env:
@@ -95,7 +97,7 @@ jobs:
           const git=(...a)=>execFileSync('git',a,{encoding:'utf8'}).trim();
           if(git('rev-parse','HEAD')!==process.env.EXPECTED||git('rev-parse','HEAD^{tree}')!==b.tree||(b.actual??b.merge)!==process.env.EXPECTED)throw Error('Source mismatch');
           JS
-      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
           node-version-file: '.nvmrc'
       - run: corepack enable
@@ -111,7 +113,7 @@ jobs:
       - if: always()
         run: node scripts/ci/cleanup.mjs
       - if: always()
-        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: timings-api-${{ matrix.shard }}-${{ github.run_attempt }}
           path: .artifacts/ci/timings/*.json
@@ -119,12 +121,14 @@ jobs:
           include-hidden-files: true
           archive: true
   serial-reference:
+    permissions:
+      contents: read
     name: serial-reference
     if: fromJSON(inputs.binding).benchmark == true
     runs-on: ubuntu-24.04
     timeout-minutes: 65
     steps:
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           ref: ${{ inputs.tested_sha }}
           fetch-depth: 0
@@ -140,7 +144,7 @@ jobs:
           const git=(...a)=>execFileSync('git',a,{encoding:'utf8'}).trim();
           if(git('rev-parse','HEAD')!==process.env.EXPECTED||git('rev-parse','HEAD^{tree}')!==b.tree||(b.actual??b.merge)!==process.env.EXPECTED)throw Error('Source mismatch');
           JS
-      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
           node-version-file: '.nvmrc'
       - run: corepack enable
@@ -155,7 +159,7 @@ jobs:
       - if: always()
         run: node scripts/ci/cleanup.mjs
       - if: always()
-        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: timings-serial-reference-${{ github.run_attempt }}
           path: .artifacts/ci/timings/*.json
@@ -163,17 +167,21 @@ jobs:
           include-hidden-files: true
           archive: true
   full-clean:
+    permissions:
+      contents: read
+      actions: read
     name: full-clean
     needs: [core, api, serial-reference]
     if: always()
     runs-on: ubuntu-24.04
+    timeout-minutes: 10
     steps:
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           ref: ${{ inputs.tested_sha }}
           persist-credentials: false
       - name: Verify all required jobs
-        uses: actions/github-script@ed597411d8f924073f98dfc5c65a23a2325f34cd
+        uses: actions/github-script@ed597411d8f924073f98dfc5c65a23a2325f34cd # v8.0.0
         env:
           BINDING: ${{ inputs.binding }}
         with:
@@ -181,7 +189,7 @@ jobs:
             const collector=await import(`${process.env.GITHUB_WORKSPACE}/apps/backend/scripts/ci/collect.mjs`);
             await collector.collect(github,context,core,JSON.parse(process.env.BINDING));
       - if: always()
-        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: ${{ fromJSON(inputs.binding).actual && 'main-binding' || 'candidate-binding' }}-${{ github.run_attempt }}
           path: |

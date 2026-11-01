@@ -7,35 +7,39 @@ on:
 defaults:
   run:
     working-directory: apps/backend
-permissions:
-  contents: read
-  actions: read
-  pull-requests: read
+permissions: {}
 concurrency:
   group: backend-pr-${{ github.event.pull_request.number }}-${{ github.event.action == 'edited' && github.event.changes.base == null && 'metadata' || 'source' }}
   cancel-in-progress: true
 jobs:
   candidate:
+    permissions:
+      contents: read
+      pull-requests: read
     # GitHub exposes retargeting as edited; title/body edits start no jobs.
     if: github.event.action != 'edited' || github.event.changes.base != null
     runs-on: ubuntu-24.04
+    timeout-minutes: 10
     outputs:
       merge: ${{ steps.candidate.outputs.merge }}
       kind: ${{ steps.candidate.outputs.kind }}
       binding: ${{ steps.candidate.outputs.binding }}
     steps:
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           ref: ${{ github.event.pull_request.head.sha }}
           persist-credentials: false
       - name: Resolve candidate
         id: candidate
-        uses: actions/github-script@ed597411d8f924073f98dfc5c65a23a2325f34cd
+        uses: actions/github-script@ed597411d8f924073f98dfc5c65a23a2325f34cd # v8.0.0
         with:
           script: |
             const source=await import(`${process.env.GITHUB_WORKSPACE}/apps/backend/scripts/ci/source.mjs`);
             await source.resolveCandidate(github,context,core,'auto');
   clean:
+    permissions:
+      contents: read
+      actions: read
     needs: candidate
     if: needs.candidate.outputs.kind == 'full'
     uses: ./.github/workflows/clean-suite.yml
@@ -43,11 +47,14 @@ jobs:
       tested_sha: ${{ needs.candidate.outputs.merge }}
       binding: ${{ needs.candidate.outputs.binding }}
   documentation:
+    permissions:
+      contents: read
     needs: candidate
     if: needs.candidate.outputs.kind == 'documentation'
     runs-on: ubuntu-24.04
+    timeout-minutes: 10
     steps:
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           ref: ${{ needs.candidate.outputs.merge }}
           fetch-depth: 0
@@ -56,7 +63,7 @@ jobs:
         env:
           EXPECTED: ${{ needs.candidate.outputs.merge }}
         run: test "$(git rev-parse HEAD)" = "$EXPECTED"
-      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
           node-version-file: '.nvmrc'
       - name: Documentation acceptance
@@ -73,7 +80,7 @@ jobs:
           fs.mkdirSync('../../.artifacts/ci',{recursive:true});
           fs.writeFileSync('../../.artifacts/ci/binding.json',JSON.stringify(binding));
           JS
-      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: document-binding-${{ github.run_attempt }}
           path: .artifacts/ci/binding.json

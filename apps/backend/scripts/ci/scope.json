@@ -15,7 +15,8 @@
     ".gitignore",
     "docs/history/manifest.json",
     "docs/endpoint-inventory.json",
-    "docs/feature-delivery.json"
+    "docs/feature-delivery.json",
+    ".github/dependabot.yml"
   ],
   "frontendPrefixes": [
     "apps/web/",

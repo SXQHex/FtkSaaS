@@ -55,17 +55,21 @@ test.each([
   "%s gates existing jobs behind a dependency-free, source-bound selector",
   (file, output, jobs) => {
     const config = workflow(file);
-    for (const event of ["push", "pull_request"]) {
+    for (const event of ["pull_request"]) {
       expect(config.on[event].paths).toBeUndefined();
       expect(config.on[event]["paths-ignore"]).toBeUndefined();
       expect(config.on[event].branches).toEqual(["main"]);
     }
     expect(config.on.pull_request.types).toEqual(["opened", "synchronize", "reopened", "edited"]);
     expect(config.on.workflow_dispatch).toBeNull();
+    expect(config.on.push).toBeUndefined();
     expect(config.concurrency.group).toContain(
       "github.event.changes.base == null && 'metadata' || 'source'",
     );
-    expect(config.permissions).toEqual({ contents: "read" });
+    expect(config.permissions).toEqual({});
+    for (const job of Object.values(config.jobs) as { permissions: Record<string, string> }[]) {
+      expect(job.permissions).toEqual({ contents: "read" });
+    }
     const scope = config.jobs.scope;
     expect(scope.if).toBe("github.event.action != 'edited' || github.event.changes.base != null");
     expect(scope.outputs[output]).toBe(`\${{ steps.scope.outputs.${output} }}`);
@@ -76,6 +80,7 @@ test.each([
     });
     expect(scope.steps.flatMap((step: { run?: string }) => (step.run ? [step.run] : []))).toEqual([
       "node apps/web/scripts/ci-scope.mjs",
+      ...(output === "frontend" ? ["node apps/web/scripts/ci-proof.mjs frontend"] : []),
     ]);
     for (const name of jobs) {
       expect(config.jobs[name].needs).toBe("scope");

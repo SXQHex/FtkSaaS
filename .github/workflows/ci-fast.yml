@@ -13,8 +13,7 @@ on:
         type: string
 env:
   FTK_MANUAL_SOURCE_ROOT: ${{ github.workspace }}/source
-permissions:
-  contents: read
+permissions: {}
 concurrency:
   group: manual-targeted-${{ inputs.base_sha }}-${{ inputs.tested_sha }}
   cancel-in-progress: true
@@ -23,25 +22,28 @@ defaults:
     working-directory: source/apps/backend
 jobs:
   selection:
+    permissions:
+      contents: read
     if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-24.04
+    timeout-minutes: 10
     outputs:
       matrix: ${{ steps.plan.outputs.matrix }}
       plan: ${{ steps.plan.outputs.plan }}
       setup: ${{ steps.plan.outputs.setup }}
     steps:
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           ref: ${{ inputs.tested_sha }}
           fetch-depth: 0
           persist-credentials: false
           path: source
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           ref: ${{ github.sha }}
           persist-credentials: false
           path: policy
-      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
           node-version-file: 'source/.nvmrc'
       - name: Select exact range
@@ -53,22 +55,24 @@ jobs:
           node "$GITHUB_WORKSPACE/policy/apps/backend/scripts/ci/manual-targeted.mjs" plan "$BASE" "$HEAD"
           node -e "require('fs').appendFileSync(process.env.GITHUB_OUTPUT,'plan='+JSON.stringify(JSON.parse(require('fs').readFileSync('../../.artifacts/ci/selection.json')))+'\n')"
   core:
+    permissions:
+      contents: read
     needs: selection
     runs-on: ubuntu-24.04
     timeout-minutes: 65
     steps:
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           ref: ${{ inputs.tested_sha }}
           fetch-depth: 0
           persist-credentials: false
           path: source
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           ref: ${{ github.sha }}
           persist-credentials: false
           path: policy
-      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
           node-version-file: 'source/.nvmrc'
       - if: needs.selection.outputs.setup == 'true'
@@ -86,7 +90,7 @@ jobs:
           node -e "require('fs').writeFileSync('../../.artifacts/ci/selection.json',process.env.PLAN)"
           node "$GITHUB_WORKSPACE/policy/apps/backend/scripts/ci/manual-targeted.mjs" core "$BASE" "$HEAD"
       - if: always()
-        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: targeted-core-${{ github.run_attempt }}
           path: |
@@ -97,6 +101,8 @@ jobs:
           retention-days: 7
           archive: true
   api:
+    permissions:
+      contents: read
     name: targeted-api-${{ matrix.shard }}
     needs: selection
     if: fromJSON(needs.selection.outputs.matrix).include[0].shard != 0
@@ -106,18 +112,18 @@ jobs:
       fail-fast: false
       matrix: ${{ fromJSON(needs.selection.outputs.matrix) }}
     steps:
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           ref: ${{ inputs.tested_sha }}
           fetch-depth: 0
           persist-credentials: false
           path: source
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           ref: ${{ github.sha }}
           persist-credentials: false
           path: policy
-      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
           node-version-file: 'source/.nvmrc'
       - run: corepack enable
@@ -134,7 +140,7 @@ jobs:
           node -e "require('fs').writeFileSync('../../.artifacts/ci/selection.json',process.env.PLAN)"
           node "$GITHUB_WORKSPACE/policy/apps/backend/scripts/ci/manual-targeted.mjs" api "$BASE" "$HEAD" "$SHARD"
       - if: always()
-        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: targeted-api-${{ matrix.shard }}-${{ github.run_attempt }}
           path: |
@@ -145,9 +151,11 @@ jobs:
           retention-days: 7
           archive: true
   summary:
+    permissions: {}
     needs: [selection, core, api]
     if: always()
     runs-on: ubuntu-24.04
+    timeout-minutes: 10
     steps:
       - name: Diagnostic result (not merge acceptance)
         working-directory: .
