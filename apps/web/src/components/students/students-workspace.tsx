@@ -36,6 +36,8 @@ import {
   disciplineActions,
   type DisciplineActions,
 } from "../../lib/student-management";
+import { PersonAccess } from "./person-access";
+import { accessActions, type AccessActions } from "../../lib/person-access";
 import { PersonDisciplines } from "./person-disciplines";
 
 const buttonClass = "h-auto min-h-11 max-w-full whitespace-normal";
@@ -92,6 +94,7 @@ export function StudentsWorkspace({
         actions={studentActions}
         disciplines={disciplineActions}
         merging={mergeActions}
+        access={accessActions}
       />
     </div>
   );
@@ -163,12 +166,14 @@ export function StudentDirectory({
   actions,
   disciplines,
   merging,
+  access,
 }: {
   scope: StudentScope;
   centerName: string;
   actions: StudentActions;
   disciplines?: DisciplineActions;
   merging?: MergeActions;
+  access?: AccessActions;
 }) {
   const t = useTranslations("students");
   const api = useTranslations("api");
@@ -416,6 +421,7 @@ export function StudentDirectory({
               actions={actions}
               disciplines={disciplines}
               merging={merging}
+              access={access}
               onMerged={(id) => {
                 refresh();
                 setSelected({ id });
@@ -440,6 +446,7 @@ function StudentDetail({
   disciplines,
   merging,
   onMerged,
+  access,
 }: {
   scope: StudentScope;
   personId: string;
@@ -450,10 +457,12 @@ function StudentDetail({
   onMerged: (id: string) => void;
   disciplines?: DisciplineActions;
   merging?: MergeActions;
+  access?: AccessActions;
 }) {
   const t = useTranslations("students");
   const api = useTranslations("api");
   const [attempt, setAttempt] = useState(0);
+  const [accessRevision, setAccessRevision] = useState(0);
   const [changeRevision, setChangeRevision] = useState(0);
   const [result, setResult] = useState<{
     attempt: number;
@@ -577,7 +586,23 @@ function StudentDetail({
       {person && merging && (
         <PersonMerge scope={scope} person={person} actions={merging} onMerged={onMerged} />
       )}
-      {person && <PersonInvitation scope={scope} person={person} actions={actions} />}
+      {person && (
+        <PersonInvitation
+          scope={scope}
+          person={person}
+          actions={actions}
+          onSaved={() => setAccessRevision((v) => v + 1)}
+        />
+      )}
+      {person && access && (
+        <PersonAccess
+          scope={scope}
+          personId={person.id}
+          actions={access}
+          revision={accessRevision}
+          onSaved={refreshPersonAndList}
+        />
+      )}
       <StudentChange
         key={changeRevision}
         scope={scope}

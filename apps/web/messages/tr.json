@@ -454,7 +454,6 @@
     "mergeApprovalRequired": "{count} başka merkez için yönetici onayı gerekiyor. Bu önizleme ile henüz birleştirme yapılamaz.",
     "mergeConfirm": "Kayıtları birleştirmeyi onayla",
     "mergeUncertain": "Birleştirmenin sonucu doğrulanamadı. Yeni bir birleştirme başlatmadan önce mevcut işlemin sonucunu kontrol et.",
-
     "disciplineTitle": "Öğrenci disiplinleri",
     "disciplineHint": "Bu merkezde öğrencinin hangi disipline katıldığını ve aktiflik durumunu düzenle.",
     "disciplineRecorded": "Kayıtlı disiplin",
@@ -464,7 +463,6 @@
     "disciplineState": "Disiplin öğrenciliği durumu",
     "disciplineSave": "Disiplin ilişkisini kaydet",
     "disciplineUncertain": "İşlemin sonucu doğrulanamadı. Yeni bir değişiklik yapmadan önce mevcut işlemi kontrol et.",
-
     "directory": "Öğrenci listesi",
     "search": "Öğrenci ara",
     "searchPlaceholder": "Ad veya soyad",
@@ -603,7 +601,33 @@
       "cancelled": "Davet gönderim işi iptal edildi. Yeni davet gönderebilirsin."
     },
     "documents": "Gerekli belgeler",
-    "documentStatusHint": "Belge gereklilikleri rezervasyon, satış veya katılım gibi gerçek işlem bağlamında backend tarafından değerlendirilir. Profil için bağlamsız bir belge özeti API’si yoktur."
+    "documentStatusHint": "Belge gereklilikleri rezervasyon, satış veya katılım gibi gerçek işlem bağlamında backend tarafından değerlendirilir. Profil için bağlamsız bir belge özeti API’si yoktur.",
+    "accessInvitations": "Hesap davetleri",
+    "accessLinks": "Hesap bağlantıları",
+    "accessInvitationsHint": "Bu merkez için kayıtlı davetlerin güncel durumu. Postanın gönderilmesi, hesap bağlantısının kurulduğu anlamına gelmez.",
+    "accessLinksHint": "Bu kişiye bağlı organizasyon hesapları. Kaldırma işlemi organizasyon kapsamındadır; ek yetki veya sahiplik devri gerekebilir.",
+    "accessReference": "Kayıt: {id}",
+    "accessExpires": "Son geçerlilik: {date}",
+    "accessNotActionable": "Bu kayıt için işlem izni yok veya kayıt artık değiştirilemez.",
+    "accessNoInvitations": "Bu merkezde kayıtlı davet yok.",
+    "accessNoLinks": "Gösterilebilen hesap bağlantısı yok.",
+    "accessStateUnknown": "Durum bilgisi yok",
+    "revokeInvitation": "Daveti iptal et",
+    "removeAccountLink": "Hesap bağlantısını kaldır",
+    "revokeInvitationHint": "Seçili daveti iptal edeceksiniz. Bu davetle hesap erişimi kabul edilemeyecek.",
+    "removeAccountLinkHint": "Seçili hesap ile kişi arasındaki organizasyon bağlantısını kaldıracaksınız. Kişi kaydı ve geçmişi korunur.",
+    "removeAccountLinkReason": "Kaldırma gerekçesi",
+    "confirmRevokeInvitation": "İptali onayla",
+    "confirmRemoveAccountLink": "Kaldırmayı onayla",
+    "accessUncertain": "Sonuç belirsiz. Yeni işlem başlatmadan mevcut işlemin sonucunu kontrol edin.",
+    "accessStates": {
+      "pending": "Bekleyen davet",
+      "accepted": "Kabul edilmiş davet",
+      "revoked": "İptal edilmiş",
+      "expired": "Süresi dolmuş",
+      "active": "Aktif hesap bağlantısı",
+      "inactive": "Pasif hesap bağlantısı"
+    }
   },
   "account": {
     "title": "Hesabım",

@@ -4,12 +4,14 @@ import { useState } from "react";
 import Link from "next/link";
 import { useTranslations } from "next-intl";
 import { Preferences } from "../preferences";
+import { createSampleAccessActions } from "./person-access-fixtures";
 import { StudentDirectory } from "../students/students-workspace";
 import { createSampleStudentActions, sampleStudentScope } from "./student-fixtures";
 
 export function StudentsPreview() {
   const t = useTranslations("students");
   const [actions] = useState(createSampleStudentActions);
+  const [access] = useState(createSampleAccessActions);
   return (
     <main
       id="main-content"
@@ -32,6 +34,7 @@ export function StudentsPreview() {
         actions={actions}
         disciplines={actions.disciplines}
         merging={actions.merging}
+        access={access}
       />
     </main>
   );

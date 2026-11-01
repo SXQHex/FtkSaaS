@@ -454,7 +454,6 @@
     "mergeApprovalRequired": "Manager approval is required for {count} other centers. This preview cannot yet be applied.",
     "mergeConfirm": "Confirm merging records",
     "mergeUncertain": "The merge result could not be confirmed. Check the existing operation before starting another merge.",
-
     "disciplineTitle": "Student disciplines",
     "disciplineHint": "Manage which discipline the student attends in this center and whether the relationship is active.",
     "disciplineRecorded": "Recorded discipline",
@@ -464,7 +463,6 @@
     "disciplineState": "Discipline enrollment state",
     "disciplineSave": "Save discipline relationship",
     "disciplineUncertain": "The result could not be confirmed. Check the existing operation before making another change.",
-
     "directory": "Student list",
     "search": "Search students",
     "searchPlaceholder": "First or last name",
@@ -603,7 +601,33 @@
       "cancelled": "The invitation delivery job was cancelled. You can send a new invitation."
     },
     "documents": "Required documents",
-    "documentStatusHint": "Document requirements are evaluated by the backend in the context of an actual operation, such as a reservation, sale, or attendance. There is no context-free document summary API for this profile."
+    "documentStatusHint": "Document requirements are evaluated by the backend in the context of an actual operation, such as a reservation, sale, or attendance. There is no context-free document summary API for this profile.",
+    "accessInvitations": "Account invitations",
+    "accessLinks": "Account links",
+    "accessInvitationsHint": "Current invitations for this center. Email delivery does not mean an account has been linked.",
+    "accessLinksHint": "Organization accounts linked to this person. Removal affects the organization and may require additional permissions or ownership transfer.",
+    "accessReference": "Record: {id}",
+    "accessExpires": "Expires: {date}",
+    "accessNotActionable": "You cannot change this record or it is no longer actionable.",
+    "accessNoInvitations": "No invitations recorded for this center.",
+    "accessNoLinks": "No account links available to display.",
+    "accessStateUnknown": "Status unavailable",
+    "revokeInvitation": "Revoke invitation",
+    "removeAccountLink": "Remove account link",
+    "revokeInvitationHint": "You will revoke the selected invitation. It can no longer be accepted for account access.",
+    "removeAccountLinkHint": "You will remove the organization link between this account and person. The person record and history are preserved.",
+    "removeAccountLinkReason": "Reason for removal",
+    "confirmRevokeInvitation": "Confirm revocation",
+    "confirmRemoveAccountLink": "Confirm removal",
+    "accessUncertain": "The outcome is uncertain. Check this operation before starting another.",
+    "accessStates": {
+      "pending": "Pending invitation",
+      "accepted": "Accepted invitation",
+      "revoked": "Revoked",
+      "expired": "Expired",
+      "active": "Active account link",
+      "inactive": "Inactive account link"
+    }
   },
   "account": {
     "title": "My account",
