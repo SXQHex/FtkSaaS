@@ -580,7 +580,7 @@
     "profileSaved": "Person details updated.",
     "refreshProfile": "Show current details",
     "accountAccess": "Account access",
-    "inviteHint": "An access invitation job is started for this person. The invitation job and acceptance are separate states; an account link exists only after acceptance. This environment has no external email provider configured, so job status does not confirm real email delivery.",
+    "inviteHint": "An account access invitation is sent for this person. Delivery processing and invitation acceptance are separate states; the account link is established only after acceptance. Delivery status alone does not confirm arrival in the recipient’s inbox.",
     "inviteNeedsEmail": "Add an email address to this person record before sending an invitation.",
     "sendInvite": "Send access invitation",
     "retryInvite": "Send a new access invitation",
