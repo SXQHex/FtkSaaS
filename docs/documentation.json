@@ -58,6 +58,14 @@
       "purpose": "Belge üretim ve kaynak inceleme prosedürü"
     },
     {
+      "path": "apps/backend/docs/physical-invariants.md",
+      "role": "guide",
+      "topics": [
+        "physical-integrity-design"
+      ],
+      "purpose": "Transaction, kilit ve veri bütünlüğü tasarımı"
+    },
+    {
       "path": "apps/backend/docs/production-queue.md",
       "role": "queue",
       "topics": [
@@ -191,7 +199,7 @@
       "topics": [
         "p08-product-scope"
       ],
-      "purpose": "P08 kabulü ve açık ürün tercihleri"
+      "purpose": "Abone No, ortak başvuru ve etkinlik davranışının kabul edilmiş kapsamı"
     },
     {
       "path": "docs/documentation-map.md",
@@ -224,14 +232,6 @@
         "workspace-architecture"
       ],
       "purpose": "Repo, paket ve ortam yerleşimi"
-    },
-    {
-      "path": "docs/physical-invariants.md",
-      "role": "guide",
-      "topics": [
-        "physical-integrity-design"
-      ],
-      "purpose": "Transaction, kilit ve veri bütünlüğü tasarımı"
     },
     {
       "path": "docs/requests.md",

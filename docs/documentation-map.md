@@ -11,6 +11,7 @@
 | [apps/backend/README.md](../apps/backend/README.md) | entry | Backend komut girişleri | backend-entry |
 | [apps/backend/docs/00-FtkSaaS-yeni-sohbet-devir.md](../apps/backend/docs/00-FtkSaaS-yeni-sohbet-devir.md) | status | Repo/backend kaynak, CI ve ortam kabul snapshot’ı | current-acceptance |
 | [apps/backend/docs/documentation-development.md](../apps/backend/docs/documentation-development.md) | guide | Belge üretim ve kaynak inceleme prosedürü | documentation-tooling |
+| [apps/backend/docs/physical-invariants.md](../apps/backend/docs/physical-invariants.md) | guide | Transaction, kilit ve veri bütünlüğü tasarımı | physical-integrity-design |
 | [apps/backend/docs/production-queue.md](../apps/backend/docs/production-queue.md) | queue | Backend geliştirme sırası ve koordinasyon | active-order |
 | [apps/backend/docs/remaining-work.md](../apps/backend/docs/remaining-work.md) | backlog | Backend açık işleri ve alanlar arası bağımlılıkları | open-work |
 | [apps/backend/docs/remote-backend-setup.md](../apps/backend/docs/remote-backend-setup.md) | guide | Dağıtım, worker ve restore işletimi | backend-operations |
@@ -27,12 +28,11 @@
 | [docs/contracts/05-FtkSaaS-O4-API-katalogu.md](contracts/05-FtkSaaS-O4-API-katalogu.md) | generated | Makine sözleşmesinden DTO ve operasyon görünümü | api-contract-view |
 | [docs/contracts/06-FtkSaaS-O4-durum-hata-izin.md](contracts/06-FtkSaaS-O4-durum-hata-izin.md) | guide | Wire durum, hata ve izin açıklamaları | state-error-permission |
 | [docs/database.md](database.md) | generated | Migration kaynağı ve içerik hash’leri | migration-inventory |
-| [docs/decisions/P08-accepted-scope.md](decisions/P08-accepted-scope.md) | authority | P08 kabulü ve açık ürün tercihleri | p08-product-scope |
+| [docs/decisions/P08-accepted-scope.md](decisions/P08-accepted-scope.md) | authority | Abone No, ortak başvuru ve etkinlik davranışının kabul edilmiş kapsamı | p08-product-scope |
 | [docs/documentation-map.md](documentation-map.md) | generated | Makine sahiplik envanterinin görünümü | documentation-map |
 | [docs/feature-delivery.md](feature-delivery.md) | generated | F01–F33 kaynak/API ve gerçek test referansları | feature-api-coverage |
 | [docs/functions.md](functions.md) | generated | Her API’nin birincil WF sahibi | api-workflow-map |
 | [docs/monorepo.md](monorepo.md) | guide | Repo, paket ve ortam yerleşimi | workspace-architecture |
-| [docs/physical-invariants.md](physical-invariants.md) | guide | Transaction, kilit ve veri bütünlüğü tasarımı | physical-integrity-design |
 | [docs/requests.md](requests.md) | coordination | Backend/frontend alanlar arası talep, onay ve teslim kabulü | cross-area-requests |
 | [docs/security.md](security.md) | generated | Güvenlik DDL kaynak envanteri | security-source-inventory |
 | [docs/settings.md](settings.md) | guide | Typed ayar ve native hesap tüketimi | settings-consumers |

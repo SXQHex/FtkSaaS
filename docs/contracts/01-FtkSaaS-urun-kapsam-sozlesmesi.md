@@ -48,17 +48,6 @@ Plan kapsamı bu belgenin; ayrıntılı davranış, geçiş ve güvenlik kararla
 
 Plan değişiminin sürümlü kapsam seçimi, dönem sınırı ve kapalı kaynaklardaki eski işlemlerin davranışı [teknik sözleşmede](02-FtkSaaS-teknik-sozlesme.md#starter-kapsam-seçimi-ve-kapı-uygulaması) tanımlıdır. Geçmiş kayıt korunumu operasyon yetkisi sağlamaz.
 
-#### F01–F33 değişim izi
-
-- **F01/F04/F08/F10/F32:** Starter tek merkez/oda/disiplin/eğitmen + 100 aktif öğrenci; Pro tek merkez ve tam faaliyet yapısı; Business beş merkez. Mevcut altyapı rol/scope modeli korunur.
-- **F11:** Starter dahil; tek disiplin sabit programla yetkili öğrenci self rezervasyonu. **F12** bekleme/yer teklifi Pro/Business'ta kalır.
-- **F13/F20:** İkinci aktif eğitmen/ücretli görevlendirme Starter'da kapalı; Starter F14 anlaşmasız ve hakedişsiz kapanır.
-- **F15/F16:** Starter tek disiplinli kredili ve süreli/sınırsız ürün kapsamı; gelişmiş dondurma/plan değişimi F17 Pro'da.
-- **F21–F24:** Genel CRM, yenileme/kampanya, davranış segmenti ve takip otomasyonu Pro+Business; Business'a özgü olan merkezler arası birleşik görünüm/merkez kapsamı, tek merkezde gelişmiş CRM değildir.
-- **F25:** Starter temel ders takvimi ve ders başvurusu, Pro/Business geniş kayıt/kampanya/etkinlik.
-- **F29:** Bağımsız etkinlikler Pro+Business; Starter'daki sabit dersin mevcut iptal/telafi yolu F14'tür.
-- **F26/F27/F28/F30/F31/F33:** Temel işlemsel bildirim, rapor, belge, import, izlenebilirlik korunur. Önce önerilen Starter otomatik paket/ders hatırlatma F27 genişlemesi veya ticari yeni sayısal limit **bu kararla kabul edilmiş sayılmaz**.
-
 #### Lokasyon, özel teklif ve limit temsili
 
 Pro’nun odaları aynı fiziksel işletme lokasyonunun ders alanlarıdır. Ayrı lokasyon ayrı merkezdir ve Business gerektirir; oda adını değiştirmek bu sınırı kaldırmaz. Yazılım oda adından fiziksel adresi kanıtlamaz; aktif öğrenci kotası kötüye kullanımın ölçeğini sınırlar, tek başına lokasyon doğrulaması değildir.
@@ -74,7 +63,6 @@ Bu belge, geliştirme için yazılı kapsam sözleşmesi ve esas başvuru kayna�
 - Kapsam durumu: Kabul edildi / Sonraki aşama / Kapsam dışı.
 - API kaynak kapsamı üretilmiş özellik haritasındadır; işlem sayısı ürün tamamlanma oranı değildir. Kabul, kaynak ve ortam kanıtıyla ayrıca izlenir.
 - Planlar: Starter, Pro ve Business aynı backend iş modelini kullanır; plan farkı erişim ve kullanım limitidir.
-- **26 Ekim plan kararı:** Starter 1 merkez/1 aktif oda/1 disiplin/1 eğitmen/100 aktif öğrencidir; Pro 1 merkez, Business en fazla 5 merkezdir. Pro/Business öğrenci, oda ve eğitmen sınırlarının güncel tek sahibi yukarıdaki bağlayıcı tablodur; fiyatlar seçilmedi. İlk paket şablonundaki tarihsel sayılar evrensel limit değildir.
 - Pro özellikleri Business'a da dahildir. Temel güvenlik, veri bütünlüğü ve kayıt geçmişi bütün planlarda geçerlidir.
 - Starter'ın ortak temel özellikleri Pro ve Business'a da dahildir. Bir modülün ayarını etkinleştirmek, abonelik planında bulunmayan özelliğe erişim sağlamaz.
 - Ayarlanabilir sayısal değerlerin kesinleşmemiş olması ortak altyapı geliştirmesini engellemez. Başlangıç değerleri ve ayrıca karar gerektiren davranışlar aşağıda ayrılmıştır.
@@ -102,7 +90,7 @@ Bu modüller ayrı servis veya ayrı uygulama zorunluluğu değildir. Yeni backe
 
 ## Özellik ve plan matrisi
 
-Tablo kabul edilmiş plan erişimini gösterir; aynı plan bayrakları makine sözleşmesiyle CI’da karşılaştırılır. API kaynak kapsamı üretilmiş [özellik haritasında](../feature-delivery.md), gerçek kabul güncel kabul kaydındadır.
+Tablo kabul edilmiş plan erişimini gösterir; aynı plan bayrakları makine sözleşmesiyle CI’da karşılaştırılır. Sayısal/ticari sınırlar yukarıdaki bağlayıcı tablodadır; makine sözleşmesindeki `accepted_plan_limits` bu hedefin denetlenen aktarımıdır, runtime limiti veya teslim kabulü değildir. API kaynak kapsamı üretilmiş [özellik haritasında](../feature-delivery.md), gerçek kabul güncel kabul kaydındadır.
 
 “Temel” ve “gelişmiş” ifadelerinin sınırları teknik sözleşmedeki davranışlarla belirlenir. Çizgi o planda kapsam dışında demektir. Her satırın uygulama/kabul sınırı feature_delivery haritasında ayrıca izlenir.
 

@@ -4,17 +4,15 @@
 
 ## Kaynak tabanı
 
-Başlangıçta incelenen main `3855b74a6d207da1b1d1fa653053909a8e3224a8` idi; PR108 için aynı SHA’nın [Main proof](https://github.com/SXQHex/FtkSaaS/actions/runs/41264430757) ve [Development delivery](https://github.com/SXQHex/FtkSaaS/actions/runs/41264465868) sonuçları başarılıdır.
-
-Bu dal hazırlanırken PR109 birleşti; bütünleştirilen güncel main `d144addf72947b823eea53cf8008dabb4084c47d`. Aynı SHA’nın [Main proof](https://github.com/SXQHex/FtkSaaS/actions/runs/41267135661) ve [Merge proof](https://github.com/SXQHex/FtkSaaS/actions/runs/41267135650) sonuçları başarılıdır. [Development delivery](https://github.com/SXQHex/FtkSaaS/actions/runs/41267158282) son okumada devam ediyordu; tamamlandı sayılmaz. PR108’in eski başarısı yeni kaynağın teslim kanıtı yerine geçmez. Main proof ağır test tekrarı değil aday kaynak/başarı kanıtıdır; CD başarısı bütün gerçek ekran/provider/restore kabulü değildir. Ayrıntılı metadata/receipt değerlendirmesi A03’te yapılır.
+PR113 için 1 Kasım 2026’da GitHub’dan doğrulanan main tabanı `4776df7af5695a657d162aec771f4c1873d06f48`; aday bu tabanı içerir. Eski PR108/109 başarıları bu kaynağa veya yeni adaya taşınmaz. Bu SSoT düzeltmesinde main/CD’nin güncel başarılı olduğu iddia edilmiyor; tam kaynak ve receipt uzlaştırması A03’te yapılır. Main proof adayın kaynak/başarı kanıtıdır; CD başarısı bütün gerçek ekran/provider/restore kabulü değildir.
 
 PR99 bu main’in atasıdır; yeni bir aday/merge işi olarak yeniden açılmaz. Kaynak teslimi ile XREQ-001/002 gerçek tüketici/hosted kabulü [ortak talepte](../../../docs/requests.md) ayrıdır. PR102 dönemindeki tek seferlik yönetici kurulum/bypass izni güncel dal veya sonraki PR’lara taşınmaz; o tarihte kaldırıldığı doğrulanmıştı, bugünkü ruleset readback’i bu belge güncellemesinde yapılmadı.
 
-## Bu belge değişikliğinin durumu
+## Güncel adayın durumu
 
-Onaylanan bütün backend kararları mevcut normatif sahiplerine aktarıldı. Geliştirme görevleri tek backlog’da, bağımlı sıra tek kuyrukta toplandı. Eski PR99 bekleme/kronoloji metinleri ve P08’deki çözümlenmiş karar soruları kaldırıldı; tenant ve eski site inceleme girdileri işletim kaydına taşındı. Yeni paralel roadmap/spec/todo kurulmadı.
+PR113 kalite/SSoT adayı main’den ayrıdır. `309b10cb18ff1e86fca8f3ef83d9477d2978987f` kaynağındaki backend run `41271493375` core kabulü `PRODUCT_PLAN_SCOPE F01` nedeniyle başarısız oldu; quality job başarılıydı. Bu sonuç adayın veya main’in tam kabulü değildir.
 
-Bu değişiklik Markdown dokümantasyonudur: makine sözleşmesi, generated API tipleri, SQL/migration, Edge, test davranışı veya frontend değiştirilmedi. Karar kabulü uygulama kabulü değildir. Yeni limitler, Abone No, dönem geçişi, P08/hatırlatma hedeflerinin teknik aktarımı backlog’da açıktır. Bu dalın inceleme/CI/merge sonucu, gerçekleşmeden başarılı ilan edilmez. Production dağıtımı, dış e-posta veya canlı aktarım yapılmadı.
+Düzeltme, ürün sözleşmesindeki F01/F26 kapsamını makine izine ve kabul edilmiş plan limitlerini ayrı hedef metadata’sına aktarır. Governance hem özellik kapsamını hem limit tablosunu denetler; runtime SQL/kapı veya DTO desteği bu metadata’dan türetilmez. Tekrarlı plan özetleri ve ikinci sahiplik tablosu kaldırıldı. Pro/Business limit uygulaması, Abone No, dönem geçişi ve P08/hatırlatma hedeflerinin gerçek teknik aktarımı backlog’da açık kalır. Yerel backend verify içindeki 250 test, governance, üretilmiş çıktı kontrolleri ve 35 belge/1001 yerel bağlantı denetimi geçti; Turbo quality sıfır bulgu verdi. PR114 main değişikliği çatışmasız alındı; birleşim sonrası Turbo frontend/UI lint, typecheck ve test görevleri geçti. Bunlar yeni full clean/merge/hosted başarısı değildir.
 
 ## Mevcut kaynak ve gerçek kabul sınırları
 

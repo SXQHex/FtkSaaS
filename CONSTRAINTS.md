@@ -19,7 +19,7 @@
 | Tip | 0 hata; mevcut kontrat ve tip denetimleri korunur | `pnpm typecheck`; alan CI’larının mevcut typecheck görevleri | İlgili alanın yerel/CI doğrulaması |
 | Frontend lint | 0 hata ve 0 uyarı; mevcut taban | `pnpm exec turbo run lint --filter=@ftksaas/web --filter=@ftksaas/ui` | Frontend değişikliğinde |
 | Import sınırı | Tanımlı sınırda 0 yasak import; iş kuralı kopyalamayı önler | Mevcut Oxlint `no-restricted-imports` | Frontend/UI lint |
-| SSoT ve belge sahipliği | 0 kayıtsız/çift sahipli belge; alan ilerlemesi ortak dizine taşınmaz | `pnpm --filter @ftksaas/backend docs:check` | Belge/ilgili kaynak kabulü |
+| SSoT ve belge sahipliği | 0 kayıtsız/çift sahipli belge; alan ilerlemesi ortak dizine taşınmaz. Ürün plan kapsamı ve hedef limitleri makine iziyle eşleşir. | `pnpm --filter @ftksaas/backend docs:check`; `pnpm --filter @ftksaas/backend test:governance` | Belge/ilgili kaynak kabulü; ürün/makine karşılaştırması backend verify içinde |
 | Fonksiyon ve kaynak kabulü | Gerekli işlerde 0 başarısız/eksik kanıt; mevcut CI protokolü | [CI politikası](docs/ci-policy.md) ve kaynak bağlı merge/main doğrulayıcıları | Kapsama göre aday; main’de kanıt doğrulama |
 | Erişilebilirlik | Mevcut Axe taranan durumlarında 0 ihlal; bugünkü çıta korunur | `pnpm test:frontend:e2e` | Mevcut dört tarayıcı projesi; bütün ekranların kapsandığı iddia edilmez |
 

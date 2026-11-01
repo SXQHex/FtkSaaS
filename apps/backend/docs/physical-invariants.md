@@ -6,7 +6,7 @@
 
 ## Eşzamanlılık ve indeks planı
 
-Kapasite davranışının tek normatif kaynağı [teknik sözleşmedir](contracts/02-FtkSaaS-teknik-sozlesme.md#oda-seans-kapasite-karari). Bu belge veri yapısı/transaction tasarımının referansıdır; çalıştırılmış kabul iddiası değildir.
+Kapasite davranışının tek normatif kaynağı [teknik sözleşmedir](../../../docs/contracts/02-FtkSaaS-teknik-sozlesme.md#oda-seans-kapasite-karari). Bu belge veri yapısı/transaction tasarımının referansıdır; çalıştırılmış kabul iddiası değildir.
 
 Kilitler tenant/aktör yetki kapısı → etkilenen person/org-limit satırları UUID sırasıyla → kaynak takvim satırları UUID sırasıyla → seans/etkinlik UUID sırasıyla → hak hesapları ve finans cüzdanları UUID sırasıyla → alt kayıtlar şeklinde tek toplam sırayla alınır. Çoklu işlem önce tam bağımlılık kümesini toplar; alt komut yukarı sıradaki bir kilidi sonradan alamaz. Yetki kaldırma/kapama ile yazma yarışı aynı erişim kapısı üzerinde koordine edilir. Bu plan deadlock’u azaltır; sıfır deadlock garantisi değildir, sınırlı DB transaction tekrarı aynı idempotency ile yapılır.
 

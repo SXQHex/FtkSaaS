@@ -1,6 +1,6 @@
 # Domain şema referansı
 
-Üretilmiştir: `packages/api-contracts/schema/contract.json` → `render_catalogs.py`. Elle düzenleme. Bu görünüm domain alanlarını anlatır; bütün fiziksel/private tabloların nihai DDL dökümü değildir. Kesin DDL [migration zinciri](../database.md), transaction tasarımı [fiziksel değişmezler](../physical-invariants.md), normatif davranış [teknik sözleşme](02-FtkSaaS-teknik-sozlesme.md) sahibindedir.
+Üretilmiştir: `packages/api-contracts/schema/contract.json` → `render_catalogs.py`. Elle düzenleme. Bu görünüm domain alanlarını anlatır; bütün fiziksel/private tabloların nihai DDL dökümü değildir. Kesin DDL [migration zinciri](../database.md), transaction tasarımı [fiziksel değişmezler](../../apps/backend/docs/physical-invariants.md), normatif davranış [teknik sözleşme](02-FtkSaaS-teknik-sozlesme.md) sahibindedir.
 
 Makine sözleşmesinde 90 domain tablo tanımı. PostgreSQL tür/constraint/owner/ACL karşılığı migration ve kaynak bağlı CD metadata artifact’ından okunur; bu katalog hosted kabulü değildir.
 

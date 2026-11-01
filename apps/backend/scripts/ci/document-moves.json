@@ -51,6 +51,7 @@
   "docs/p05-handover.md": "docs/workflows.md",
   "docs/p06-handover.md": "docs/workflows.md",
   "docs/p07-a-handover.md": "docs/workflows.md",
+  "docs/physical-invariants.md": "apps/backend/docs/physical-invariants.md",
   "docs/production-queue.md": "apps/backend/docs/production-queue.md",
   "docs/program-session-handover.md": "docs/workflows.md",
   "docs/remaining-work.md": "apps/backend/docs/remaining-work.md",

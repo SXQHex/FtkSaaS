@@ -341,3 +341,43 @@ test("opening the security-email recovery entry never sends mail without an expl
   expect(mocks.recover).not.toHaveBeenCalled();
   expect(mocks.update).not.toHaveBeenCalled();
 });
+
+test("recovery explains native same-password rejection without claiming a connection failure", async () => {
+  mocks.update.mockResolvedValue({ error: { code: "same_password" } });
+  const user = userEvent.setup();
+  render(<AuthFields mode="update" />);
+  await user.type(screen.getByLabelText("Yeni parola", { exact: true }), "synthetic-password");
+  await user.type(screen.getByLabelText("Yeni parolayı tekrar yaz"), "synthetic-password");
+  await user.click(screen.getByRole("button", { name: "Parolayı kaydet" }));
+  expect(await screen.findByRole("alert")).toHaveTextContent(
+    "Yeni parolanız eski parolanızla aynı olamaz.",
+  );
+  expect(screen.getByRole("alert")).not.toHaveTextContent("Bağlantını kontrol");
+  expect(screen.queryByRole("status")).not.toBeInTheDocument();
+});
+
+test.each(["signup", "update"] as const)(
+  "%s confirmation visibility is independent and does not submit the form",
+  async (mode) => {
+    const user = userEvent.setup();
+    render(<AuthFields mode={mode} />);
+    const confirmation = screen.getByLabelText("Yeni parolayı tekrar yaz");
+    const password = screen.getByLabelText(mode === "update" ? "Yeni parola" : "Parola", {
+      exact: true,
+    });
+    await user.type(confirmation, "synthetic-password");
+    const toggle = screen.getByRole("button", { name: "Tekrar parolayı göster" });
+    expect(confirmation).toHaveAttribute("type", "password");
+    expect(toggle).toHaveAttribute("aria-controls", confirmation.id);
+    await user.click(toggle);
+    expect(confirmation).toHaveAttribute("type", "text");
+    expect(confirmation).toHaveValue("synthetic-password");
+    expect(password).toHaveAttribute("type", "password");
+    expect(toggle).toHaveAttribute("aria-pressed", "true");
+    await user.keyboard("{Enter}");
+    expect(confirmation).toHaveAttribute("type", "password");
+    expect(toggle).toHaveAttribute("aria-pressed", "false");
+    expect(mocks.signup).not.toHaveBeenCalled();
+    expect(mocks.update).not.toHaveBeenCalled();
+  },
+);

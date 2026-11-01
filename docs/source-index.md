@@ -1,30 +1,12 @@
 # Kaynak indeksi
 
-Başlangıç: [AGENTS](../AGENTS.md) → [güncel kaynak/kabul](../apps/backend/docs/00-FtkSaaS-yeni-sohbet-devir.md) → [backlog](../apps/backend/docs/remaining-work.md) → [sıra](../apps/backend/docs/production-queue.md). Ardından görevle ilgili tek konu sahibi seçilir. Main’in tam SHA’sı ve aynı kaynağın kanıtı doğrulanır.
+Başlangıç: [AGENTS](../AGENTS.md) → çalışılan alanın README/AGENTS dosyaları → o alanın plan ve devir kaydı. Backend için [backend girişi](../apps/backend/README.md), frontend için [web girişi](../apps/web/README.md) kullanılır. Diğer alan yalnız ilgili sözleşme veya bağımlılık için okunur. Main’in tam SHA’sı ve aynı kaynağın kanıtı doğrulanır.
 
 ## Tek konu sahibi
 
-| Konu | Yetkili kaynak |
-|---|---|
-| Ürün modülleri ve plan erişimi | [01 ürün kapsamı](contracts/01-FtkSaaS-urun-kapsam-sozlesmesi.md) |
-| Yürürlükteki domain/ayar davranışı; D/U/Q/DS/FD kararları | [02 teknik sözleşme](contracts/02-FtkSaaS-teknik-sozlesme.md) |
-| Abone No, ortak başvuru ve etkinlik genişletmelerinin kabul edilmiş davranışı | [P08](decisions/P08-accepted-scope.md) |
-| DTO, enum, operasyon, izin ve sürüm alanları | [Makine sözleşmesi](../packages/api-contracts/schema/contract.json); [üretilmiş API](contracts/05-FtkSaaS-O4-API-katalogu.md) |
-| Durum/hata/izin açıklaması | [06 referansı](contracts/06-FtkSaaS-O4-durum-hata-izin.md) |
-| API sırası, rol/plan, yan etki ve kurtarma | [WF00–WF20](workflows.md); [API eşlemesi](functions.md) |
-| Ortak istemci transport’u | [Entegrasyon protokolü](client-integration.md) |
-| Typed ayar ve native hesap tüketicileri | [Ayar rehberi](settings.md) |
-| Fiziksel şema/güvenlik kaynakları | [Migration referansı](database.md), [güvenlik referansı](security.md); kesin DDL migration zinciri |
-| Ortak kalite sınırları ve denetim bütünlüğü | [CONSTRAINTS](../CONSTRAINTS.md) |
-| Repo düzeni ve CI kabul kuralları | [Monorepo](monorepo.md), [CI politikası](ci-policy.md) |
-| Backend dokümantasyon üretimi ve işletimi | [Dokümantasyon](../apps/backend/docs/documentation-development.md), [işletim](../apps/backend/docs/remote-backend-setup.md) |
-| Frontend geliştirme/ekran uygulaması | [Web rehberi](../apps/web/docs/development.md) |
-| Frontend modül planı, aktif bölüm, bağımlılık ve kabul | [Tek frontend yol haritası](../apps/web/docs/todo.md) |
-| Backend/frontend talep, karşı alanın onayı ve teslim kabulü | [Tek talep kaydı](requests.md) |
-| Frontend sohbet devri | [Frontend devir kaydı](../apps/web/docs/handover.md) |
-| Bütün yaşayan belgelerin rolü ve konu sahipliği | [Üretilmiş belge haritası](documentation-map.md) |
+Yaşayan belge ve konu sahiplerinin tek envanteri `documentation.json`, okunabilir görünümü [üretilmiş belge haritasıdır](documentation-map.md). Burada ikinci bir sahiplik tablosu tutulmaz. Görevle ilgili konu sahibini haritadan seç; API çağrı sırası için [WF rehberine](workflows.md), DTO/izin/hata için [makine sözleşmesine](../packages/api-contracts/schema/contract.json) git.
 
-Bir karar yalnız sahibinde güncellenir; eski hükmü bırakıp yeni tarihli zıt ek yazılmaz. WF uygulama sırasını, generated katalog makine sözleşmesini, durum kaydı kaynak/ortam kanıtını gösterir; bu roller yeni ürün kararı oluşturamaz. API sayısı, dosya bağlantısı veya mock başarı tam özellik kabulü değildir.
+Bir karar yalnız sahibinde güncellenir; eski hükmü bırakıp yeni tarihli zıt ek yazılmaz. Ürün sözleşmesi kabul edilmiş hedefi, makine sözleşmesinin hedef metadata’sı onun denetlenen aktarımını, runtime alanları mevcut desteği gösterir. WF uygulama sırasını, generated katalog makine görünümünü, alanın durum kaydı kaynak/ortam kanıtını taşır. API sayısı, dosya bağlantısı veya mock başarı tam özellik kabulü değildir.
 
 ## Arşiv sınırı
 
