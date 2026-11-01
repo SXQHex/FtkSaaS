@@ -23,6 +23,9 @@ Son açık kullanıcı kararı üstündür; kabul edilmiş D01–D09/U01–U08/Q
 
 ## Tek kaynak ve dosya sahipliği
 
+**SSoT kesin ilkedir:** Her karar, görev, sıra ve kabul bilgisinin tek sahibi vardır. Başka belgede aynı hükmü veya güncellenen iş listesini kopyalama; sahibine bağlantı ver. Yeni roadmap/todo/özet dosyası açmadan mevcut sahibini kullan. Gereksiz dosyanın eşsiz hükmü varsa önce sahibine taşı; sonra dosyayı ve artık referanslarını kaldır. Tarihsel kanıtı silme; eski yaşayan anlatımı Git geçmişinde bırak. Onaylanan hedef davranış ile mevcut makine sözleşmesi/runtime desteğini aynı şey gibi yazma.
+
+
 [Belge haritası](docs/documentation-map.md) her yaşayan dosyanın rolünü ve tek konu sahibini gösterir. Backend durum kaydı 00 devir, açık işi remaining-work, sırası production-queue; frontend plan/kabulü todo, sohbet devri handover sahibindedir. Başka dosyalar durumu kopyalamaz, sahibine bağlanır. Tarihsel `docs/history` byte’ları korunur; kaynak/commit/hash izi manifesttedir. Üretilmiş katalog/tipler üreticiden güncellenir; ikinci sözleşme ağacı kurulmaz.
 
 SXQHex/FtkSaaS tek geliştirme reposudur; diğer repolar bağlam dışıdır. Frontend uygulaması apps/web, ortak hazır bileşenler packages/ui içindedir. Güncel tasarım/geliştirme rehberi apps/web/docs/development.md, frontend açık kapsam ve bölüm kabulü apps/web/docs/todo.md sahibindedir. Geçmiş geri alma/göç notundan yeni runtime görevi türetilmez. apps/backend backend kod/test/CI araçlarının tek sahibidir; Frontend çalışması backend runtime veya mevcut kabul kapılarını değiştirme yetkisi vermez. Root package.json yalnız workspace yönetir. packages/api-contracts/schema/contract.json tek makine kaynağı, aynı paketin src/ dizini üretilmiş tip sahibidir. Ortak TS ayarı packages/typescript-config içindedir; yeni runtime çıktısı .artifacts altında, private yerel durum apps/backend/.dev altında kalır.

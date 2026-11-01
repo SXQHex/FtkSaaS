@@ -40,6 +40,9 @@ CD main'e veya ayrı dala otomatik commit atmaz. Üretilmiş referans eskimesi P
 
 ## Birleştirme ve arşiv kuralı
 
+Backend geliştirme yol haritasının görev/kabul sahibi `remaining-work.md`, sıra ve kontrol noktası sahibi `production-queue.md`, kaynak/test/hosted durum sahibi `00-FtkSaaS-yeni-sohbet-devir.md` dosyasıdır. Yeni paralel `roadmap.md`, `todo.md` veya karar özeti kurulmaz. Backlog’daki test senaryosu normatif kararın yerine geçmez; ürün değerleri sözleşmeden alınır. Gelecek hedef için typed alan uygulanmış gösterilmez; tüketici rehberi mevcut desteği, sözleşme hedefi açıkça ayırır.
+
+
 Her yaşayan Markdown documentation.json içinde rol, amaç ve tek konu kimliğiyle kayıtlıdır. Durum/backlog/kuyruk rolleri yalnız apps/backend/docs veya apps/web/docs altında bulunabilir; kök docs içine taşınmaları reddedilir. Tek `coordination` kaydı docs/requests.md olabilir; ikinci bir alanlar arası talep dosyası veya bu kaydın rolünün kaldırılması reddedilir. Bu konum kontrolü belge içindeki her cümlenin anlamını, tablo hücresini yazan tarafı veya ajanın görev yetkisini doğrulamaz. Yeni dosya, eksik/tekrarlı konu sahibi, silinmiş dosya kaydı ve symlink reddedilir. Emekli yol document-moves.json içinde final sahibine bağlanır; eski dosyanın yeniden gelmesi reddedilir. Exact prose allowlist eski silme yolunu ve yeni hedefi kapsar; JSON/üreteç/politika değişimi full kapsamdır.
 
 Aktif belgeler docs/history dosyalarına talimat olarak bağlanamaz; arşiv kapısı yalnız source-index’tir. Eski snapshot byte/hash’i değişmez. Yeni emekli belge Git geçmişinde tutulur, history’ye ikinci kopya eklenmez. docs:context yalnız yaşayan belge sahiplerini içerir. Bu yapısal kontroller semantik çelişkiyi kendiliğinden kanıtlamaz; son kaynak bağımsız incelemesi gereklidir.

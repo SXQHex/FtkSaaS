@@ -12,7 +12,7 @@ Plan kapsamı bu belgenin; ayrıntılı davranış, geçiş ve güvenlik kararla
 #### Ürün konumlandırması
 
 - **Starter:** Sabit yürüyen tek disiplinli ders programını, öğrencilerini, sınıf/seans rezervasyonlarını, paketlerini, yoklama ve temel finansını yöneten bağımsız eğitmen/küçük stüdyo.
-- **Pro:** **Bir merkez** içinde çok oda, çok disiplin ve/veya çok eğitmen, tüm ders/program/etkinlik/CRM/iş otomasyonu/eğitmen hakedişi fonksiyonları olan hareket/eğitim merkezi.
+- **Pro:** **Bir fiziksel lokasyon** içinde çok oda, çok disiplin ve/veya çok eğitmen, tüm ders/program/etkinlik/CRM/iş otomasyonu/eğitmen hakedişi fonksiyonları olan hareket/eğitim merkezi.
 - **Business:** Pro kapsamı + **en fazla beş merkez**; merkezler kendi erişim, operasyon ve finans yetkilerinde izole, organizasyon altında bağlı; mevcut koşullarla merkezler arası kullanım ve onaylı hesaplaşma.
 - **Beş merkez üzeri:** Otomatik sınırsızlık veya genel bypass değil, teklif/özel sözleşme kapsamında müşteri başına sürümlü, açıkça kabul edilmiş merkez limitinin ve gerekiyorsa alan davranışlarının ayrı tanımlanması. Tenant izolasyonu, mali bütünlük, gizlilik, kimlik, audit ve güvenlik kapıları özel teklifle devre dışı bırakılamaz. Standart yeni bir dördüncü plan veya fiyat bu kararla oluşturulmadı.
 
@@ -21,10 +21,10 @@ Plan kapsamı bu belgenin; ayrıntılı davranış, geçiş ve güvenlik kararla
 | Kural | Starter | Pro | Business |
 |---|---|---|---|
 | Aktif merkez | 1 | 1 | 5'e kadar |
-| Sisteme tanımlanabilen **aktif ders/aktivite odası** | 1 | Birden fazla; ticari sayı henüz seçilmedi | Merkezlere göre birden fazla; ticari sayı henüz seçilmedi |
+| Sisteme tanımlanabilen **aktif ders/aktivite odası** | 1 | Ticari sınırsız | Merkezler içinde ticari sınırsız |
 | Aktif disiplin | 1 | Birden fazla | Birden fazla |
-| Aktif eğitmen | 1 | Birden fazla | Birden fazla |
-| Aktif öğrenci/üye | **100** | Henüz kesin sayısal limit seçilmedi | Henüz kesin sayısal limit seçilmedi |
+| Aktif eğitmen | 1 | Ticari sınırsız | Ticari sınırsız |
+| Aktif öğrenci/üye | **100** | **250** | Organizasyon genelinde **1.250**; merkez başına kota yok |
 | Düzenli sınıf/program, temel özel ders talebi, öğrenci self rezervasyonu, temel public ders takvimi ve başvuru | Var, aynı tek kaynak/disiplinle | Var | Var |
 | Tek disiplinli kredili, süreli/sınırsız paket; uygun rezervasyon, yoklama, borç/tahsilat | Var | Var | Var |
 | Bağımsız workshop/parti/atölye/etkinlik yaşam döngüsü (F29) | **Yok** | Var | Var |
@@ -42,7 +42,7 @@ Plan kapsamı bu belgenin; ayrıntılı davranış, geçiş ve güvenlik kararla
 
 **Starter public/self:** Temel halka açık ders takvimi ve yalnız programa ilişkin başvuru; doğrulanmış öğrencinin geçerli hak/katılım koşullarıyla kendi rezervasyon/iptal işlemi. Hesapsız başvuru **kesin rezervasyon, satış, kredi, aktif hesap veya pazarlama rızası yaratmaz**; bot/rate/tenant/yetki doğrulaması korunur. Başvuruyu görme ve gerektiğinde öğrenci ilişkisine bağlama için dar operasyonel değerlendirme sunulur; genel CRM `lead_*`, reklam entegrasyonu, kampanya, segment, otomasyon yetkileri Starter'a bu yüzden açılmaz. Provider ve tarayıcı kabulü backlog’da ayrı izlenir; Native Auth SMTP ile uygulama dış bildirim kanalları farklıdır. Online ödeme/gateway bu plan kararıyla otomatik açılmaz.
 
-**Aktif öğrenci sınırı:** Önceden kabul edilmiş `RelationshipState=active` öğrenci sayımı esas alınır; hesapsız öğrenciler dahildir, aynı organizasyon kişisi bir kez sayılır, yalnız aday/eğitmen/personel olanlar sayılmaz. En çok 100; yeni aktive/yeniden aktive ve ilgili kesinleştirmede eşzamanlı atomik kontrol yapılır. Limit aşıldığında mevcut hak, borç, yoklama ve kesin rezervasyonlar silinmez veya otomatik iptal edilmez. Açık işlemi olan öğrenci kotayı boşaltmak için keyfî pasifleştirilemez. Pro/Business sayısal üye/eğitmen/oda sınırları veya ücretleri burada uydurulmaz.
+**Aktif öğrenci sınırı:** Önceden kabul edilmiş `RelationshipState=active` öğrenci sayımı esas alınır; hesapsız öğrenciler dahildir, aynı organizasyon kişisi bir kez sayılır, yalnız aday/eğitmen/personel olanlar sayılmaz. Seçili planın bağlayıcı tablodaki sınırı yeni aktive/yeniden aktive ve ilgili kesinleştirmede eşzamanlı atomik kontrol edilir. Limit aşıldığında mevcut hak, borç, yoklama ve kesin rezervasyonlar silinmez veya otomatik iptal edilmez. Açık işlemi olan öğrenci kotayı boşaltmak için keyfî pasifleştirilemez. Pro/Business öğrenci sınırları da aynı sayım ve korumayı kullanır. Business’ta farklı merkezlere bağlı aynı kişi organizasyonda bir kez sayılır; merkez başına öğrenci kotası yoktur. Ticari sınırsız oda/eğitmen teknik hız ve iş yükü korumalarını kaldırmaz. Fiyat bu kararla belirlenmez.
 
 #### Plan geçişleri ve kaynak bütünlüğü
 
@@ -59,9 +59,11 @@ Plan değişiminin sürümlü kapsam seçimi, dönem sınırı ve kapalı kaynak
 - **F29:** Bağımsız etkinlikler Pro+Business; Starter'daki sabit dersin mevcut iptal/telafi yolu F14'tür.
 - **F26/F27/F28/F30/F31/F33:** Temel işlemsel bildirim, rapor, belge, import, izlenebilirlik korunur. Önce önerilen Starter otomatik paket/ders hatırlatma F27 genişlemesi veya ticari yeni sayısal limit **bu kararla kabul edilmiş sayılmaz**.
 
-#### Kesinleştirilmemiş değerler
+#### Lokasyon, özel teklif ve limit temsili
 
-Pro/Business diğer sayısal limitleri ve özel teklifin wire temsili [P08](../decisions/P08-accepted-scope.md) kapsamında ayrıdır. Kaynakta tanımlı limit ticari kararın yerini alamaz; yeni sayı veya sınırsızlık uydurulmaz.
+Pro’nun odaları aynı fiziksel işletme lokasyonunun ders alanlarıdır. Ayrı lokasyon ayrı merkezdir ve Business gerektirir; oda adını değiştirmek bu sınırı kaldırmaz. Yazılım oda adından fiziksel adresi kanıtlamaz; aktif öğrenci kotası kötüye kullanımın ölçeğini sınırlar, tek başına lokasyon doğrulaması değildir.
+
+Business standart merkez veya öğrenci sınırının üzeri müşteri başına sürümlü, açıkça kabul edilmiş özel sözleşme gerektirir. Standart dördüncü plan, genel bypass veya otomatik sınırsız merkez yoktur. Oda/eğitmen için sınırsızlık API/DB/okuma/doğrulayıcı/kapılarda açık ve aynı anlamda temsil edilir; 0 veya sihirli büyük sayı kullanılmaz. Ürün kararı runtime/hosted kabulü değildir; aktarım [backend backlog’unun](../../apps/backend/docs/remaining-work.md#p01) sorumluluğundadır.
 
 ## Belgenin durumu
 
@@ -72,7 +74,7 @@ Bu belge, geliştirme için yazılı kapsam sözleşmesi ve esas başvuru kayna�
 - Kapsam durumu: Kabul edildi / Sonraki aşama / Kapsam dışı.
 - API kaynak kapsamı üretilmiş özellik haritasındadır; işlem sayısı ürün tamamlanma oranı değildir. Kabul, kaynak ve ortam kanıtıyla ayrıca izlenir.
 - Planlar: Starter, Pro ve Business aynı backend iş modelini kullanır; plan farkı erişim ve kullanım limitidir.
-- **26 Ekim plan kararı:** Starter 1 merkez/1 aktif oda/1 disiplin/1 eğitmen/100 aktif öğrencidir; Pro 1 merkez, Business en fazla 5 merkezdir. Pro/Business diğer öğrenci/eğitmen/oda sayısal sınırları ve fiyatlar kesinleşmedi; ilk paket şablonundaki tarihsel sayılar evrensel limit değildir.
+- **26 Ekim plan kararı:** Starter 1 merkez/1 aktif oda/1 disiplin/1 eğitmen/100 aktif öğrencidir; Pro 1 merkez, Business en fazla 5 merkezdir. Pro/Business öğrenci, oda ve eğitmen sınırlarının güncel tek sahibi yukarıdaki bağlayıcı tablodur; fiyatlar seçilmedi. İlk paket şablonundaki tarihsel sayılar evrensel limit değildir.
 - Pro özellikleri Business'a da dahildir. Temel güvenlik, veri bütünlüğü ve kayıt geçmişi bütün planlarda geçerlidir.
 - Starter'ın ortak temel özellikleri Pro ve Business'a da dahildir. Bir modülün ayarını etkinleştirmek, abonelik planında bulunmayan özelliğe erişim sağlamaz.
 - Ayarlanabilir sayısal değerlerin kesinleşmemiş olması ortak altyapı geliştirmesini engellemez. Başlangıç değerleri ve ayrıca karar gerektiren davranışlar aşağıda ayrılmıştır.
@@ -106,7 +108,7 @@ Tablo kabul edilmiş plan erişimini gösterir; aynı plan bayrakları makine s�
 
 | ID | Özellik | Sahip | Starter | Pro | Business | Kapsam durumu |
 |---|---|---|---|---|---|---|
-| F01 | İşletme, merkez, oda ve kaynak tanımı | M01 | 1 aktif merkez/oda/disiplin/eğitmen; 100 aktif öğrenci | Tek merkez | Çoklu merkez | Kabul edildi |
+| F01 | İşletme, merkez, oda ve kaynak tanımı | M01 | Bağlayıcı plan tablosu | Bağlayıcı plan tablosu | Bağlayıcı plan tablosu | Kabul edildi |
 | F02 | Çalışma saatleri, izin ve uygunluk | M01/M04 | Temel | Tam | Tam | Kabul edildi |
 | F03 | İşletme kuralları ve merkez istisnaları | M01 | İşletme ayarları | İşletme ayarları | Zorunlu/tavsiye merkez hiyerarşisi | Kabul edildi |
 | F04 | Hesap eşleştirme, çoklu rol, kapsamlı yetkilendirme | M02/M03 | Var | Var | Merkez kapsamlarıyla | Kabul edildi |
@@ -131,7 +133,7 @@ Tablo kabul edilmiş plan erişimini gösterir; aynı plan bayrakları makine s�
 | F23 | Yenileme ve hareketsiz öğrenci takip listeleri | M09 | — | Var | Var | Kabul edildi |
 | F24 | Davranışa dayalı segmentler ve takip otomasyonu | M09/M10 | — | Var | Var | Kabul edildi |
 | F25 | Paylaşılabilir işletme takvimi ve başvuru/kayıt sayfası | M04/M09/M13 | Yalnız ders takvimi/başvurusu; genel CRM veya etkinlik değil | Var | Var | Kabul edildi |
-| F26 | Talep sonucu, ders değişikliği ve benzeri işlemsel bildirimler | M10 | Uygulama içi | Var | Var | Kabul edildi |
+| F26 | Talep sonucu, ders değişikliği ve benzeri işlemsel bildirimler | M10 | Uygulama içi | Uygulama içi + e-posta | Uygulama içi + e-posta | Kabul edildi |
 | F27 | Otomatik yaklaşan ders/paket bitiş hatırlatmaları | M10 | — | Var | Var | Kabul edildi |
 | F28 | Operasyon ve finans raporları, tarih filtresi, dışa aktarım | M11 | Temel | Tam | Birleşik ve merkez bazlı | Kabul edildi |
 | F29 | Atölye/etkinlik, kontenjan, kayıt ve katılım | M13 | — | Var | Var | Kabul edildi |
@@ -155,6 +157,13 @@ Tam web sitesi oluşturucu kapsam dışıdır; paylaşılabilir takvim/başvuru 
 | Öğrenci gelişim takibi ve veli hesabı | Kapsam dışında |
 | Bordro, işe alım, tam muhasebe, stok/ürün satışı | Kapsam dışında |
 
+
+<a id="ilk-tam-sürüm-ve-sonraki-aşama-sınırı"></a>
+### İlk tam sürüm ve sonraki aşama sınırı
+
+İlk tam sürümde Pro/Business e-postası işlemsel bildirimler ve hizmet hatırlatmaları içindir. Kampanya/indirim/geri kazanım e-postası ertelidir; F21–F24 segmentleri, deneme, takip listeleri ve CRM görev otomasyonu kapsamda kalır. SMS, WhatsApp ve mobil push ile günlük/haftalık özet sonraki aşamadadır. Starter’ın uygulama içi sınırı korunur; Native Auth e-postaları uygulama dış kanal lisansından ayrıdır. Zamanlama ve sessiz saat davranışının tek sahibi teknik sözleşmedeki FD04’tür.
+
+Lead/follow/switch rol dengesi ve partnerli rezervasyon sonraki aşamadadır; mevcut kategori kontenjanı korunur. Çok aktiviteli/kombine bilet de ertelidir: ilk tam sürümde workshop/parti ayrı etkinlik kaydı ve katılım koşullarıyla yürür. Pakete bağlı kredi tüketmeyen katılım ilk tam sürümdedir; davranış [P08’de](../decisions/P08-accepted-scope.md#pakete-bağlı-kredi-tüketmeyen-etkinlik-katılımı) tanımlıdır. Abone No Starter’dan itibaren bütün planlardadır; yaşam döngüsünün tek sahibi [P08](../decisions/P08-accepted-scope.md#organizasyon-bazında-sabit-abone-numarası).
 
 ## Davranış kararlarına geçiş
 

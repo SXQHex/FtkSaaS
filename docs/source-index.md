@@ -8,7 +8,7 @@ Başlangıç: [AGENTS](../AGENTS.md) → [güncel kaynak/kabul](../apps/backend/
 |---|---|
 | Ürün modülleri ve plan erişimi | [01 ürün kapsamı](contracts/01-FtkSaaS-urun-kapsam-sozlesmesi.md) |
 | Yürürlükteki domain/ayar davranışı; D/U/Q/DS/FD kararları | [02 teknik sözleşme](contracts/02-FtkSaaS-teknik-sozlesme.md) |
-| Henüz uygulamaya ayrılmamış P08 kabulü ve açık ürün tercihleri | [P08](decisions/P08-accepted-scope.md) |
+| Abone No, ortak başvuru ve etkinlik genişletmelerinin kabul edilmiş davranışı | [P08](decisions/P08-accepted-scope.md) |
 | DTO, enum, operasyon, izin ve sürüm alanları | [Makine sözleşmesi](../packages/api-contracts/schema/contract.json); [üretilmiş API](contracts/05-FtkSaaS-O4-API-katalogu.md) |
 | Durum/hata/izin açıklaması | [06 referansı](contracts/06-FtkSaaS-O4-durum-hata-izin.md) |
 | API sırası, rol/plan, yan etki ve kurtarma | [WF00–WF20](workflows.md); [API eşlemesi](functions.md) |

@@ -234,6 +234,8 @@ Paket hazırlığı açık disiplin, terms ve başlangıç/bitiş tarihlerini is
 
 ### Bildirim kullanılabilirliği
 
+Bu bölüm mevcut typed tüketici desteğini anlatır. Son kabul edilen hedef davranışın tek sahibi [FD04](contracts/02-FtkSaaS-teknik-sozlesme.md#fd04--bildirim-hatırlatma-ve-pazarlama-kabul-edildi), ilk sürüm/erteli erişimin sahibi [ürün kapsamıdır](contracts/01-FtkSaaS-urun-kapsam-sozlesmesi.md#ilk-tam-sürüm-ve-sonraki-aşama-sınırı). Karar onayı aşağıdaki unavailable alanları çalışır yapmaz; uygulama sırasında support projeksiyonu ve bu tüketici rehberi birlikte güncellenir.
+
 `SettingsCatalog.notification_delivery` salt okunur `NotificationDeliverySupport` nesnesidir; kanal/provider açma ayarı değildir. Şu an in_app hazır; email/push uygulama teslim kanalı hazır değildir. `notification_preferences_set_v1` desteklenmeyen kanalı SERVICE_UNAVAILABLE ile receipt replay'inden önce reddeder; email isteği in_app tercihini değiştiremez. Native Auth doğrulama/kurtarma e-postası bu uygulama kanalından ayrıdır. Zorunlu transactional in_app kapatılamaz.
 
 Katalog güvenlik, rezervasyon/talep sonucu, iptal/değişiklik, yer teklifi, tahsilat/iade ve erişim değişimini mandatory_when_available listesinde açıklar. İlk in_app teslimi sessiz saat veya özete ertelenmez; timing/quiet-hours/digest controls_available false'tur. Katalogdaki24saat ders,7gün paket,3gün vade; instant/daily18/weeklySunday18 ve quiet-hours defaultoff değerleri kabul edilmiş seçenek/default bilgisidir, çalışan zamanlama mekanizması değildir. F27 lisansı ayrıca reminders.feature_licensed olarak döner; Starter false'tur. Desteklenmeyen kontrolün kaydedilmiş veya dış tesliminin yapılmış olduğu gösterilmez; yeni member/platform marketing default kapalıdır.
