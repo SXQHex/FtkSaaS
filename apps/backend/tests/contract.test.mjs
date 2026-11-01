@@ -147,3 +147,11 @@ test('organization brand colors validate exact hex or null and cannot appear in 
  }
  assert.deepEqual(props.theme_package_id,{type:'null'});assert.deepEqual(props.font_package_id,{type:'null'});
 });
+
+test('person access discovery has exclusive typed selectors',()=>{
+ for(const op of ['account_access_revoke_v1','account_link_remove_v1']){
+  assert(valid('ManagementSelector_'+op,{operation:op,key:{person_id:id}}));
+  assert(!valid('ManagementSelector_'+op,{operation:op,key:{}}));
+  assert(!valid('ManagementSelector_'+op,{operation:op,key:{person_id:id,...(op==='account_access_revoke_v1'?{invitation_id:id}:{link_id:id})}}));
+ }
+});

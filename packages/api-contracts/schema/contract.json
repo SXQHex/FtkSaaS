@@ -31581,6 +31581,18 @@
           "properties": {
             "invitation_id": {
               "$ref": "#/$defs/FtkUuid"
+            },
+            "person_id": {
+              "$ref": "#/$defs/FtkUuid"
+            },
+            "actionable": {
+              "type": "boolean"
+            },
+            "center_id": {
+              "$ref": "#/$defs/FtkUuid"
+            },
+            "expires_at": {
+              "$ref": "#/$defs/Instant"
             }
           },
           "required": [],
@@ -31623,6 +31635,12 @@
           "properties": {
             "link_id": {
               "$ref": "#/$defs/FtkUuid"
+            },
+            "person_id": {
+              "$ref": "#/$defs/FtkUuid"
+            },
+            "actionable": {
+              "type": "boolean"
             }
           },
           "required": [],
@@ -36287,16 +36305,32 @@
           "const": "account_access_revoke_v1"
         },
         "key": {
-          "type": "object",
-          "properties": {
-            "invitation_id": {
-              "$ref": "#/$defs/FtkUuid"
+          "oneOf": [
+            {
+              "type": "object",
+              "properties": {
+                "invitation_id": {
+                  "$ref": "#/$defs/FtkUuid"
+                }
+              },
+              "required": [
+                "invitation_id"
+              ],
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "person_id": {
+                  "$ref": "#/$defs/FtkUuid"
+                }
+              },
+              "required": [
+                "person_id"
+              ],
+              "additionalProperties": false
             }
-          },
-          "required": [
-            "invitation_id"
-          ],
-          "additionalProperties": false
+          ]
         }
       },
       "required": [
@@ -36331,16 +36365,32 @@
           "const": "account_link_remove_v1"
         },
         "key": {
-          "type": "object",
-          "properties": {
-            "link_id": {
-              "$ref": "#/$defs/FtkUuid"
+          "oneOf": [
+            {
+              "type": "object",
+              "properties": {
+                "link_id": {
+                  "$ref": "#/$defs/FtkUuid"
+                }
+              },
+              "required": [
+                "link_id"
+              ],
+              "additionalProperties": false
+            },
+            {
+              "type": "object",
+              "properties": {
+                "person_id": {
+                  "$ref": "#/$defs/FtkUuid"
+                }
+              },
+              "required": [
+                "person_id"
+              ],
+              "additionalProperties": false
             }
-          },
-          "required": [
-            "link_id"
-          ],
-          "additionalProperties": false
+          ]
         }
       },
       "required": [
@@ -90191,13 +90241,13 @@
         "generation": "uuidv7"
       },
       {
-        "path": "#/$defs/ManagementSelector_account_access_revoke_v1/properties/key/properties/invitation_id",
+        "path": "#/$defs/ManagementSelector_account_access_revoke_v1/properties/key/oneOf/0/properties/invitation_id",
         "origin": "ftksaas",
         "acceptance": "generic_uuid",
         "generation": "uuidv7"
       },
       {
-        "path": "#/$defs/ManagementSelector_account_link_remove_v1/properties/key/properties/link_id",
+        "path": "#/$defs/ManagementSelector_account_link_remove_v1/properties/key/oneOf/0/properties/link_id",
         "origin": "ftksaas",
         "acceptance": "generic_uuid",
         "generation": "uuidv7"
@@ -93201,6 +93251,36 @@
         "origin": "ftksaas",
         "acceptance": "generic_uuid",
         "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/ManagementProjection_account_access_revoke_v1/properties/values/properties/person_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/ManagementProjection_account_access_revoke_v1/properties/values/properties/center_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/ManagementProjection_account_link_remove_v1/properties/values/properties/person_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/ManagementSelector_account_access_revoke_v1/properties/key/oneOf/1/properties/person_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/ManagementSelector_account_link_remove_v1/properties/key/oneOf/1/properties/person_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
       }
     ],
     "open_product_decisions": [],
@@ -93598,7 +93678,7 @@
       "uuid": "backend uuid@14.0.3 v7 for all inserted IDs; DB defaults not required",
       "external_transport": "POST /functions/v1/backend-v1/{operation}; direct typed request body",
       "internal_rpc": "service-only api_v1 named functions; actor/session/UUID bank supplied by verified gateway",
-      "migration_count": 86,
+      "migration_count": 87,
       "acceptance_source": "apps/backend/docs/00-FtkSaaS-yeni-sohbet-devir.md"
     },
     "decision_sprint": {

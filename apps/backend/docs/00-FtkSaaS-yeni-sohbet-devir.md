@@ -4,11 +4,13 @@
 
 ## Kaynak tabanı
 
-Güncel kabul edilen main `3065e3a75958b25ae9e95b691c8e14df4cddc93b` (PR118 bağımsız worker imzası). [Aday full clean](https://github.com/SXQHex/FtkSaaS/actions/runs/41325500610), [main proof](https://github.com/SXQHex/FtkSaaS/actions/runs/41327917060) ve [development teslimi](https://github.com/SXQHex/FtkSaaS/actions/runs/41327953400) başarılı doğrulandı. Native Auth, JWT doğrulaması ve CI/kalite kapıları korunmuştur.
+Güncel taban main `7cd5aa68d5031cd740ce1469fc2bcd74f8d65e35` (PR124). Aynı SHA’nın [main proof](https://github.com/SXQHex/FtkSaaS/actions/runs/41346290299), [merge proof](https://github.com/SXQHex/FtkSaaS/actions/runs/41346290405) ve [development teslimi](https://github.com/SXQHex/FtkSaaS/actions/runs/41346327690) başarılı doğrulandı. Bu başarı yeni adayın kabulü değildir.
 
 ## Güncel adayın durumu
 
-`docs/xreq003-operational-acceptance` yalnız yetkili backend kabul/devri, öncelik ve ortak talep kaydını günceller. Runtime veya frontend değişikliği yoktur. Main'den devralınan tam-parmak-izi assertion istisnaları makine sicilindedir; SXQHex sahipliğinde ilk doğal bakımda kaldırılmalıdır (30 Kasım bitişi korunur).
+PR125 `feat/backend-person-access-merge-reads`, kullanıcının son Starter kapsamı ve “PR push” talimatıyla yalnız XREQ-005’e daraltıldı; güncel main birleştirildi. XREQ-006’nın onay kutusu/durum okuması, bunların selector/projection alanları ve yeni kabul senaryoları adaydan çıkarıldı; mevcut merge komutları ve negatifleri korunur. Frontend dosyaları yalnız main’den devralınır, bu görevde değiştirilmez. Birleştirilmiş kişinin eski davetini keşfetme regresyonu XREQ-005 kapsamında kalır. Eklenen migration henüz main’e alınmadığından aynı aday dosyası daraltıldı; uygulanmış migration değiştirilmedi.
+
+Yerelde Docker yok; gerçek Auth/Edge/DB kabulü yeni aday full clean ile doğrulanacak. Daraltılmış kaynakta yerel backend verify geçti: 21 statik denetim, 157 contract/governance/restore, 103 CI politika/gözlemci ve 9 kalite testi. Ayrı check:quality sıfır bulgu; son bağımsız kaynak incelemesinde engelleyici bulgu yok. Önceki geniş adayın gerçek DB/API sonucu bu kaynağa taşınmaz. Kalite job’ında testler geçti; Gitleaks mevcut native Auth migration checksum’unun yalnız eklenen virgül yüzünden diff’e giren satırını generic-api-key olarak işaretledi. Manifest değerleri korunarak yeni kayıt eski son kaydın önüne alındı; eski aday geçmişindeki aynı yanlış eşleşmenin taranmaması için PR adayı main tabanlı tek commit olarak yeniden hazırlandı. Gitleaks kuralı/allowlist/istisna değiştirilmedi. CI/development/karşı alan kabulü tamamlanmadan XREQ-005 kapalı sayılmaz. Main’den devralınan tam-parmak-izi assertion istisnaları makine sicilindedir; ilk doğal bakımda kaldırılma ve 30 Kasım bitişi korunur.
 
 ## Mevcut kaynak ve gerçek kabul sınırları
 

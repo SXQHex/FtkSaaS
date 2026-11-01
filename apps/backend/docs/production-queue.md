@@ -20,7 +20,7 @@ Bu dosya yalnız **sıra, bağımlı teslim paketleri ve kontrol noktalarının*
 | 11 | [P14](remaining-work.md#p14)–[P16](remaining-work.md#p16) | E-posta teslim→zamanlama/sessiz saat→otomasyon |
 | 12 | [B01](remaining-work.md#b01)–[B05](remaining-work.md#b05) | Business scope, ortak inbox, hesaplaşma, rapor ve özel teklif |
 
-**Aktif kullanıcı önceliği:** [A03](remaining-work.md#a03) kanıt eşlemesi, ardından S01–S05 sırası. [XREQ-003](../../../docs/requests.md#xreq-003-gerçek-davet-teslimi-ve-iş-takibi) backend tesliminden sonraki kabul edilmiş sıraya dönülür; frontend kendi davet ekran kabulünü yürütür. Kaynak/CI/hosted durum yalnız devirde tutulur; CI süre optimizasyonu ürün sırasının önüne geçmez.
+**Aktif kullanıcı önceliği:** Kullanıcının “Frontend taleplerini karşıla” talimatıyla [XREQ-005](../../../docs/requests.md) Starter hesap erişimi okuma bağımlılığı önce tamamlanır; içerik/kabul [backlog](remaining-work.md#s04-hesap-erişimi-okuma-bağımlılığı) sahibindedir. Ardından A03 ve S01–S05 sırasına dönülür. Frontend’in kendi ekran/kabul sırası değişmez; CI süre optimizasyonu ürün sırasının önüne geçmez.
 
 ## Ortak işletim hattı
 
