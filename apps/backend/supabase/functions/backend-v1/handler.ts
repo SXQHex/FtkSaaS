@@ -2,6 +2,7 @@ import {calendarFeed} from './calendar-feed.ts';
 import {calendarToken,calendarTokenHash,calendarOrigin,calendarSubscriptionUrl,calendarAppUrl} from './calendar-token.ts';
 import {lifecycleReauth} from './lifecycle-auth.ts';
 import {accountSignupCheck} from './account-signup.ts';
+import {invitationTick} from './invitation-delivery.ts';
 import {publicIngress,verifyPublicBot,publicBotHostname} from "./public-ingress.ts";
 import {importStorage,parseImportCsv} from "./import-file.ts";
 import {documentStorage} from "./document-storage.ts";
@@ -17,6 +18,7 @@ Deno.serve(async req=>{
  if(req.method!=="POST")return failure("VALIDATION_FAILED");
  try{
   const operation=new URL(req.url).pathname.split("/").filter(Boolean).at(-1)!;
+  if(operation==='invitation_delivery_tick')return invitationTick(req,n=>Deno.env.get(n));
   
   if(!implemented.has(operation))return failure("NOT_FOUND",404);
   const body=await req.text();if(body.length>2097152)return failure("VALIDATION_FAILED");
@@ -162,7 +164,7 @@ Deno.serve(async req=>{
     item.content={mime:file.mime,encoding:'base64',data:btoa(raw)};
    }
    if(operation==='calendar_links_get_v1'){
-    let ready=false;try{calendarOrigin(Deno.env.get('FTK_CALENDAR_ORIGIN'));calendarAppUrl(Deno.env.get('FTK_CALENDAR_SESSION_URL_TEMPLATE'),'00000000-0000-0000-0000-000000000000','00000000-0000-0000-0000-000000000000');ready=/^[a-f0-9]{64}$/.test(Deno.env.get('FTK_CALENDAR_SIGNING_KEY')??'');}catch{}
+    let ready=false;try{calendarOrigin(Deno.env.get('FTK_CALENDAR_ORIGIN'));calendarAppUrl(Deno.env.get('FTK_CALENDAR_SESSION_URL_TEMPLATE'),'00000000-0000-0000-0000-000000000000','00000000-0000-0000-0000-000000000000');ready=/^[a-f0-9]{64}$/.test(Deno.env.get('FTK_CALENDAR_SIGNING_KEY')??'');}catch{ready=false;}
     result.data.service_ready=ready;result.data.supported_kinds=['lessons','duties'];
    }
    if(calendarCredential&&calendarPublicOrigin)result.data.subscription_url=calendarSubscriptionUrl(calendarPublicOrigin,calendarCredential.token);

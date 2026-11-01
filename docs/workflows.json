@@ -243,6 +243,7 @@
         "apps/backend/tests/event-scope.test.mjs",
         "apps/backend/tests/fixtures/p07-subscription-lifecycle.sql",
         "apps/backend/tests/governance.test.mjs",
+        "apps/backend/tests/invitation-delivery-unit.mjs",
         "apps/backend/tests/p07-account-profile-merge-acceptance.mjs",
         "apps/backend/tests/p07-auth-adapter.mjs",
         "apps/backend/tests/p07-diagnostics.mjs",
@@ -265,8 +266,8 @@
         "management_state_get_v1"
       ],
       "review": {
-        "fingerprint": "dab3b070736df09a92d67d85d6e12d09d99d0872f41e2c689fceb698273cc0f4",
-        "reason": "Bağımsız incelenmiş tam-parmak-izi istisnalarının bitişi 30 Kasım olarak kesinleştirildi; son kaynak parmak izi yenilendi. API, test assertionları ve kabul kapıları değişmedi."
+        "fingerprint": "dd49cdbcd3b0d004a4f6c68b3700f1bac123ba9c1ae3ad169b761dd4bf34d4c1",
+        "reason": "Güncel main ve davet kaynağı incelendi; kalite kontrolünün yakaladığı iki catch açık güvenli sonuç atar; native Auth ve kaynak kabulü korunur."
       }
     },
     {
@@ -342,8 +343,8 @@
         "account_signup_check_v1"
       ],
       "review": {
-        "fingerprint": "3dc21fa6b358d9d3a17333e25aa366a266201f93a8702e9668248365de0e43c4",
-        "reason": "Hesap ve native Auth runtime değişmedi; hosted smoke kontrollerinin negatif testleri güçlendirildi ve nonexistent resource kanıtının adı daraltıldı; ayrılmış CI testleri aynı kaynak kapsamını korur."
+        "fingerprint": "21048b654c800c0d529d6b83fdd323a18ae2ad570e56dd0721e648198d8bb9d1",
+        "reason": "Main üzerindeki native Auth ve hosted smoke testleri korunur; ortak outbox wrapper farkı yalnız service-only davet handoff’udur, insan kimlik akışı değişmez."
       }
     },
     {
@@ -423,8 +424,8 @@
         "center_discipline_set_v1"
       ],
       "review": {
-        "fingerprint": "25b34a7d4e8136fe9c8143012a537b0d801ed05b52134cc9009ff9c72c1379ff",
-        "reason": "Ortak runtime wrapper farkı yalnız Auth endpoint emekliliği ve signup check; bu akışın API/RPC gövdesi ve yetkileri aynı, rehber geçerli."
+        "fingerprint": "6842a752fd7a2dd535649fe3c7b3a59b5294022665d5d86efe8c96e88ab22da0",
+        "reason": "Ortak generated wrapper farkı yalnız outbox_deliver_v1 service-only davet handoff’udur; bu akışın kendi wrapper ve domain kaynakları değişmedi, rehber ve mevcut insan yetki sırası incelendi."
       }
     },
     {
@@ -507,8 +508,8 @@
         "class_assignment_set_v1"
       ],
       "review": {
-        "fingerprint": "8397d4fb63ea62c6a0657a0e2506cebda403c6b5f9008a843b865fde4536c387",
-        "reason": "Ortak runtime wrapper farkı yalnız Auth endpoint emekliliği ve signup check; bu akışın API/RPC gövdesi ve yetkileri aynı, rehber geçerli."
+        "fingerprint": "2665037f0c976e3f847e30e4acbd21283de57b99841e9905022c07704760600b",
+        "reason": "Ortak generated wrapper farkı yalnız outbox_deliver_v1 service-only davet handoff’udur; bu akışın kendi wrapper ve domain kaynakları değişmedi, rehber ve mevcut insan yetki sırası incelendi."
       }
     },
     {
@@ -518,6 +519,7 @@
       "guide": "docs/workflows.md#wf04",
       "detail": "docs/client-integration.md",
       "tests": [
+        "apps/backend/tests/invitation-delivery-acceptance.mjs",
         "apps/backend/tests/person-registry.test.mjs"
       ],
       "sources": [
@@ -535,6 +537,7 @@
         "apps/backend/database/event-payment-dispatch.sql",
         "apps/backend/database/frontend-settings.sql",
         "apps/backend/database/instructor-earnings-wrappers.sql",
+        "apps/backend/database/invitation-delivery.sql",
         "apps/backend/database/p07-account-profile-auth-merge-wrappers.sql",
         "apps/backend/database/p07-account-profile.sql",
         "apps/backend/database/p07-account-revocation-wrappers.sql",
@@ -576,8 +579,8 @@
         "person_discipline_set_v1"
       ],
       "review": {
-        "fingerprint": "4547a67c6ef6e49dd445776b1bc761512c722152a2687b655e11af0ee1ecde6b",
-        "reason": "Ortak RPC yalnız Auth emekliliği içeriyor; person registry testleri native session reddini account_get üzerinde koruyor."
+        "fingerprint": "6f166e15863e0f1dfdfe83b71aff13dfff4a87c35bf8f015bea955efab8827bc",
+        "reason": "Son davet kaynakları incelendi; outbox worker’ın mevcut F26 kapısı gönderimde korunur, özgün gönderenin yetkili iş okuması ayrı kalır."
       }
     },
     {
@@ -661,8 +664,8 @@
         "negative_limits_get_v1"
       ],
       "review": {
-        "fingerprint": "e63552dbdf35fa4b79dea808b11c90e90f492fa0105173690c1ff64b8cbe5794",
-        "reason": "Ortak runtime wrapper farkı yalnız Auth endpoint emekliliği ve signup check; bu akışın API/RPC gövdesi ve yetkileri aynı, rehber geçerli."
+        "fingerprint": "7a481e17ca219ec264751017da018e2a592bc8a99aa7f74062d5bb1811114af7",
+        "reason": "Ortak generated wrapper farkı yalnız outbox_deliver_v1 service-only davet handoff’udur; bu akışın kendi wrapper ve domain kaynakları değişmedi, rehber ve mevcut insan yetki sırası incelendi."
       }
     },
     {
@@ -729,8 +732,8 @@
         "reservation_capacity_override_v1"
       ],
       "review": {
-        "fingerprint": "3bed915606cb0122d31f577a5427649164be8e07faf5521a461c98c556ab2956",
-        "reason": "Ortak runtime wrapper farkı yalnız Auth endpoint emekliliği ve signup check; bu akışın API/RPC gövdesi ve yetkileri aynı, rehber geçerli."
+        "fingerprint": "225d0f4db14a04a84bf3723bd6a383a47679106a40e07dd93e222472a448d3e7",
+        "reason": "Ortak generated wrapper farkı yalnız outbox_deliver_v1 service-only davet handoff’udur; bu akışın kendi wrapper ve domain kaynakları değişmedi, rehber ve mevcut insan yetki sırası incelendi."
       }
     },
     {
@@ -787,8 +790,8 @@
         "attendance_start_v1"
       ],
       "review": {
-        "fingerprint": "a4c2e4c4b82c20ce12ac1337537cd8d88f8e0cbe5de0047873dc56c6d3fe9831",
-        "reason": "Ortak runtime wrapper farkı yalnız Auth endpoint emekliliği ve signup check; bu akışın API/RPC gövdesi ve yetkileri aynı, rehber geçerli."
+        "fingerprint": "bef2c3d33f4ce71b75f8d1771f3ed087f3d635eadf82df78d5636dde3f756014",
+        "reason": "Ortak generated wrapper farkı yalnız outbox_deliver_v1 service-only davet handoff’udur; bu akışın kendi wrapper ve domain kaynakları değişmedi, rehber ve mevcut insan yetki sırası incelendi."
       }
     },
     {
@@ -844,8 +847,8 @@
         "debt_adjust_v1"
       ],
       "review": {
-        "fingerprint": "eb7a9b50a2e1e5774533fb06c3d444de49cc9586f90ca8501cabc15916c0259e",
-        "reason": "Ortak runtime wrapper farkı yalnız Auth endpoint emekliliği ve signup check; bu akışın API/RPC gövdesi ve yetkileri aynı, rehber geçerli."
+        "fingerprint": "a825ab6d1758ada76e929acb809e3fb3eef0dd7b4113ea8996311433daa0f9d3",
+        "reason": "Ortak generated wrapper farkı yalnız outbox_deliver_v1 service-only davet handoff’udur; bu akışın kendi wrapper ve domain kaynakları değişmedi, rehber ve mevcut insan yetki sırası incelendi."
       }
     },
     {
@@ -885,8 +888,8 @@
         "calendar_feed_get_v1"
       ],
       "review": {
-        "fingerprint": "1ec20e7ea84ba3db4a70d16d5ef531e023272e946db400697e216b5d402f6993",
-        "reason": "Ortak RPC Auth emekliliği ve imza allowlist değişikliği incelendi; public application/Turnstile yolu aynı."
+        "fingerprint": "454c9ec8dcd67c2d6114d01140ca55908ab4cb0921f38adab2dc293dd5f9dd4e",
+        "reason": "Takvim config doğrulama hatası service_ready=false olarak açık atanır; önceki false varsayılanıyla davranış eşdeğerdir, kaynak veya secret açılmaz."
       }
     },
     {
@@ -926,8 +929,8 @@
         "file_upload_complete_v1"
       ],
       "review": {
-        "fingerprint": "9dfaf9a44598d64b7e230a837e096b2e25a485df8de7180cc1b617c01b2e9eb6",
-        "reason": "Ortak runtime wrapper farkı yalnız Auth endpoint emekliliği ve signup check; bu akışın API/RPC gövdesi ve yetkileri aynı, rehber geçerli."
+        "fingerprint": "3ed19b6c60acf30ee94ce3f146d30d6f6866684e9f5f1f7d2c7ba3bff9e79fe1",
+        "reason": "Job takibine davet dalı eklendi; mevcut report/import erişim ve result yolu byte olarak korunuyor. Rehberdeki rapor/import sırası incelendi."
       }
     },
     {
@@ -960,8 +963,8 @@
         "document_publication_preview_v1"
       ],
       "review": {
-        "fingerprint": "71f686191c15c4d9b8e31d92c9a6de2419680f50c410f6858f2df789c02501d1",
-        "reason": "Ortak runtime wrapper farkı yalnız Auth endpoint emekliliği ve signup check; bu akışın API/RPC gövdesi ve yetkileri aynı, rehber geçerli."
+        "fingerprint": "1ccb6ff45256619502b8c69c57a47f0519b886777a5a04fad7f46eceb9f38ed1",
+        "reason": "Ortak generated wrapper farkı yalnız outbox_deliver_v1 service-only davet handoff’udur; bu akışın kendi wrapper ve domain kaynakları değişmedi, rehber ve mevcut insan yetki sırası incelendi."
       }
     },
     {
@@ -1007,8 +1010,8 @@
         "settings_preparation_resolve_v1"
       ],
       "review": {
-        "fingerprint": "44dd4f5fb9d732cdbd29d0aba7c24c91612b3d21b12f298f24a92696254cce74",
-        "reason": "Ortak runtime wrapper farkı yalnız Auth endpoint emekliliği ve signup check; bu akışın API/RPC gövdesi ve yetkileri aynı, rehber geçerli."
+        "fingerprint": "149abb6e1a991616bce6e4cb9d01b63293b1084ebd7c4536e6d3f03bbbad7f2b",
+        "reason": "Ortak generated wrapper farkı yalnız outbox_deliver_v1 service-only davet handoff’udur; bu akışın kendi wrapper ve domain kaynakları değişmedi, rehber ve mevcut insan yetki sırası incelendi."
       }
     },
     {
@@ -1067,8 +1070,8 @@
         "saas_payment_submit_v1"
       ],
       "review": {
-        "fingerprint": "0710417699b0d51c6a87582c091bdd3fef8eadb53603301a2dd01e158f2ecc29",
-        "reason": "Ortak runtime wrapper farkı yalnız Auth endpoint emekliliği ve signup check; bu akışın API/RPC gövdesi ve yetkileri aynı, rehber geçerli."
+        "fingerprint": "f0bd3c4c804f2674116cc88b13c37c6c848290b31094447e6f9e6bdb184ea418",
+        "reason": "Ortak generated wrapper farkı yalnız outbox_deliver_v1 service-only davet handoff’udur; bu akışın kendi wrapper ve domain kaynakları değişmedi, rehber ve mevcut insan yetki sırası incelendi."
       }
     },
     {
@@ -1101,8 +1104,8 @@
         "instructor_agreements_list_v1"
       ],
       "review": {
-        "fingerprint": "8772758bad930e06f8da18e632d88bf997da914be20c15e84380e019fe7e0d3a",
-        "reason": "Ortak runtime wrapper farkı yalnız Auth endpoint emekliliği ve signup check; bu akışın API/RPC gövdesi ve yetkileri aynı, rehber geçerli."
+        "fingerprint": "5e956436ddf43b703fe524e2ed840f06e15379b67e5617141d9971c84a762de7",
+        "reason": "Ortak generated wrapper farkı yalnız outbox_deliver_v1 service-only davet handoff’udur; bu akışın kendi wrapper ve domain kaynakları değişmedi, rehber ve mevcut insan yetki sırası incelendi."
       }
     },
     {
@@ -1167,8 +1170,8 @@
         "event_actual_start_correct_v1"
       ],
       "review": {
-        "fingerprint": "65fc38fe6d318d033cc932e5ff23fccf5e58a32feafcc1601a81021664710db7",
-        "reason": "Ortak runtime wrapper farkı yalnız Auth endpoint emekliliği ve signup check; bu akışın API/RPC gövdesi ve yetkileri aynı, rehber geçerli."
+        "fingerprint": "701b53e3939d351e85e5a6e52e71c1ff46a368fa556ff3281a1714d639d0a920",
+        "reason": "Ortak generated wrapper farkı yalnız outbox_deliver_v1 service-only davet handoff’udur; bu akışın kendi wrapper ve domain kaynakları değişmedi, rehber ve mevcut insan yetki sırası incelendi."
       }
     },
     {
@@ -1204,8 +1207,8 @@
         "automation_save_v1"
       ],
       "review": {
-        "fingerprint": "82748e43994ce3a3d28108bd4c24b852161bcbd7a9ef32bb56979d343a4e55e3",
-        "reason": "Ortak runtime wrapper farkı yalnız Auth endpoint emekliliği ve signup check; bu akışın API/RPC gövdesi ve yetkileri aynı, rehber geçerli."
+        "fingerprint": "2e50d7402b869dd4f8d75f88925c813f10f9b0edc4c1c5222e2922a38efed392",
+        "reason": "Ortak generated wrapper farkı yalnız outbox_deliver_v1 service-only davet handoff’udur; bu akışın kendi wrapper ve domain kaynakları değişmedi, rehber ve mevcut insan yetki sırası incelendi."
       }
     },
     {
@@ -1274,8 +1277,8 @@
         "platform_owner_remove_v1"
       ],
       "review": {
-        "fingerprint": "c963b56b3f49fb6b3d44b3a4f288500586adfd71e81b6614259f659250ea396f",
-        "reason": "Ortak runtime wrapper farkı yalnız Auth endpoint emekliliği ve signup check; bu akışın API/RPC gövdesi ve yetkileri aynı, rehber geçerli."
+        "fingerprint": "1c7cf44d3a9752e82e9e073f300773f13ec2550a0ea22e90a8b0591d831785d6",
+        "reason": "Ortak generated wrapper farkı yalnız outbox_deliver_v1 service-only davet handoff’udur; bu akışın kendi wrapper ve domain kaynakları değişmedi, rehber ve mevcut insan yetki sırası incelendi."
       }
     },
     {
@@ -1305,8 +1308,8 @@
         "settlement_authority_set_v1"
       ],
       "review": {
-        "fingerprint": "99d2970ada3ab54854377b079ff1fb795042c76e148fc18f9c278c889e993700",
-        "reason": "Ortak runtime wrapper farkı yalnız Auth endpoint emekliliği ve signup check; bu akışın API/RPC gövdesi ve yetkileri aynı, rehber geçerli."
+        "fingerprint": "52ac242dc7b399bce9a2d09b0a2a3938c714d91513bfc7a2d2cebb7d6b4e5f5a",
+        "reason": "Ortak generated wrapper farkı yalnız outbox_deliver_v1 service-only davet handoff’udur; bu akışın kendi wrapper ve domain kaynakları değişmedi, rehber ve mevcut insan yetki sırası incelendi."
       }
     },
     {
@@ -1331,8 +1334,8 @@
         "seat_offer_reject_v1"
       ],
       "review": {
-        "fingerprint": "8df8ef10fceb080cd03136f8f253ba78957505af5b3458398c93ad7f111643d4",
-        "reason": "Ortak runtime wrapper farkı yalnız Auth endpoint emekliliği ve signup check; bu akışın API/RPC gövdesi ve yetkileri aynı, rehber geçerli."
+        "fingerprint": "167e2ef73fd3796c7ff7e79659d5e889467546d084aa252c381e680b9b900d29",
+        "reason": "Ortak generated wrapper farkı yalnız outbox_deliver_v1 service-only davet handoff’udur; bu akışın kendi wrapper ve domain kaynakları değişmedi, rehber ve mevcut insan yetki sırası incelendi."
       }
     },
     {
@@ -1342,10 +1345,13 @@
       "guide": "docs/workflows.md#wf20",
       "detail": "docs/workflows.md",
       "tests": [
+        "apps/backend/tests/invitation-delivery-acceptance.mjs",
+        "apps/backend/tests/invitation-delivery-unit.mjs",
         "apps/backend/tests/ops-hosted-acceptance.mjs",
         "apps/backend/tests/p01-waitlist-workers.test.mjs"
       ],
       "sources": [
+        "apps/backend/database/invitation-delivery.sql",
         "apps/backend/database/p01-final-scope-guards.sql",
         "apps/backend/database/p01-waitlist-workers-wrappers.sql",
         "apps/backend/database/p01-waitlist-workers.sql",
@@ -1366,12 +1372,16 @@
         "apps/backend/database/p07-subscription-lifecycle-wrappers.sql",
         "apps/backend/database/p07-subscription-workers.sql",
         "apps/backend/database/runtime-wrappers-current.sql",
-        "docs/workflows.md",
+        "apps/backend/scripts/configure-invitation-delivery.mjs",
+        "apps/backend/scripts/invitation-cron-install.sql",
         "apps/backend/scripts/ops-cron-health.sql",
         "apps/backend/scripts/ops-cron-install.sql",
         "apps/backend/scripts/p01-worker.mjs",
         "apps/backend/scripts/p05-worker.mjs",
-        "apps/backend/scripts/p06-worker.mjs"
+        "apps/backend/scripts/p06-worker.mjs",
+        "apps/backend/supabase/functions/backend-v1/invitation-delivery.ts",
+        "apps/backend/supabase/migrations/20261101040221_invitation_delivery_tracking.sql",
+        "docs/workflows.md"
       ],
       "operations": [
         "seat_offer_issue_v1",
@@ -1386,8 +1396,8 @@
         "subscription_boundary_apply_v1"
       ],
       "review": {
-        "fingerprint": "c738d0bc445d3d1d49d73fc20b9f3eb7cecf73f4d325ac94ef8fd3f30ab3eb80",
-        "reason": "Ortak runtime wrapper farkı yalnız Auth endpoint emekliliği ve signup check; bu akışın API/RPC gövdesi ve yetkileri aynı, rehber geçerli."
+        "fingerprint": "67ca0283e6d741932261b1618e03c9200913d9e168a7d36c89756ca2c3cd92dc",
+        "reason": "Gitleaks yanlış pozitif düzeltmesi incelendi: Vault config UPSERT aynı üç sütunu row assignment ile günceller; manifest hash değerleri aynıdır, tarama politikası değişmedi."
       }
     }
   ]

@@ -745,7 +745,8 @@
       },
       "billing_class": "invite",
       "limits": [
-        "local_synthetic_SMTP_delivery_only; external provider unconfigured"
+        "Creates an account invitation and pending delivery job atomically; sender can track the job with live original scope.",
+        "External invitation delivery requires explicit tenant sender configuration, Vault credentials and installed native Cron tick; provider acceptance is not inbox delivery."
       ]
     },
     {
@@ -4013,8 +4014,10 @@
       "external_path": "/functions/v1/backend-v1/job_status_get_v1",
       "permission": "account.self",
       "features": [
-        "F31",
-        "F28"
+        "F04",
+        "F06",
+        "F28",
+        "F31"
       ],
       "required_features": [],
       "runtime_required_features": [],
@@ -4028,8 +4031,7 @@
       },
       "billing_class": "read",
       "limits": [
-        "Development/test only; final source candidate/main clean required.",
-        "Explicit tenant limits and dedicated scoped worker; hosted scheduling remains OPS-W01."
+        "Tracks original report/import jobs, authorized invitation jobs and account privacy jobs; original actor and current permission are required."
       ]
     },
     {
@@ -4167,8 +4169,8 @@
       },
       "billing_class": "worker",
       "limits": [
-        "Development/test only; final source candidate/main clean required.",
-        "No external email; dedicated scoped DB worker; hosted scheduling remains separate."
+        "In-app lane keeps dedicated scoped DB workers.",
+        "Invitation delivery uses a private HMAC-signed native Cron tick, service-only RPC handoff, bounded leases and stable provider idempotency; no human Auth session is created."
       ]
     },
     {

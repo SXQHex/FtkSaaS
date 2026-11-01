@@ -55209,7 +55209,8 @@
         "runtime_transport": "authenticated Edge adapter -> service-only RPC; rules/transaction in PostgreSQL",
         "runtime_external_path": "/functions/v1/backend-v1/account_access_send_v1",
         "runtime_limits": [
-          "local_synthetic_SMTP_delivery_only; external provider unconfigured"
+          "Creates an account invitation and pending delivery job atomically; sender can track the job with live original scope.",
+          "External invitation delivery requires explicit tenant sender configuration, Vault credentials and installed native Cron tick; provider acceptance is not inbox delivery."
         ],
         "required_features": [
           "F04",
@@ -69726,8 +69727,10 @@
         "name": "job_status_get_v1",
         "module": "X",
         "features": [
-          "F31",
-          "F28"
+          "F04",
+          "F06",
+          "F28",
+          "F31"
         ],
         "permission": "account.self",
         "actor_source": "server_verified",
@@ -69799,6 +69802,16 @@
             "feature": "F28",
             "when": "report_job",
             "mode": "required_if_selected"
+          },
+          {
+            "feature": "F04",
+            "when": "invitation_job",
+            "mode": "required_if_selected"
+          },
+          {
+            "feature": "F06",
+            "when": "invitation_job",
+            "mode": "required_if_selected"
           }
         ],
         "operation_contract": {
@@ -69821,8 +69834,7 @@
           }
         },
         "runtime_limits": [
-          "Development/test only; final source candidate/main clean required.",
-          "Explicit tenant limits and dedicated scoped worker; hosted scheduling remains OPS-W01."
+          "Tracks original report/import jobs, authorized invitation jobs and account privacy jobs; original actor and current permission are required."
         ]
       },
       {
@@ -70426,8 +70438,8 @@
           }
         },
         "runtime_limits": [
-          "Development/test only; final source candidate/main clean required.",
-          "No external email; dedicated scoped DB worker; hosted scheduling remains separate."
+          "In-app lane keeps dedicated scoped DB workers.",
+          "Invitation delivery uses a private HMAC-signed native Cron tick, service-only RPC handoff, bounded leases and stable provider idempotency; no human Auth session is created."
         ]
       },
       {
@@ -93586,7 +93598,7 @@
       "uuid": "backend uuid@14.0.3 v7 for all inserted IDs; DB defaults not required",
       "external_transport": "POST /functions/v1/backend-v1/{operation}; direct typed request body",
       "internal_rpc": "service-only api_v1 named functions; actor/session/UUID bank supplied by verified gateway",
-      "migration_count": 85,
+      "migration_count": 86,
       "acceptance_source": "apps/backend/docs/00-FtkSaaS-yeni-sohbet-devir.md"
     },
     "decision_sprint": {
@@ -94531,7 +94543,8 @@
           "center_manager_revoke_v1",
           "settlement_authority_get_v1",
           "settlement_delegation_set_v1",
-          "settlement_authority_set_v1"
+          "settlement_authority_set_v1",
+          "job_status_get_v1"
         ],
         "dependencies": [
           "plan_gate_alignment"
@@ -94557,7 +94570,8 @@
           "center_manager_revoke_v1",
           "settlement_authority_get_v1",
           "settlement_delegation_set_v1",
-          "settlement_authority_set_v1"
+          "settlement_authority_set_v1",
+          "job_status_get_v1"
         ],
         "contract_only_operations": [],
         "acceptance_case_ids": [
@@ -94662,7 +94676,8 @@
           "account_session_label_v1",
           "account_sessions_revoke_v1",
           "account_security_history_get_v1",
-          "account_signup_check_v1"
+          "account_signup_check_v1",
+          "job_status_get_v1"
         ],
         "dependencies": [
           "plan_gate_alignment",
@@ -94691,7 +94706,8 @@
           "account_session_label_v1",
           "account_sessions_revoke_v1",
           "account_security_history_get_v1",
-          "account_signup_check_v1"
+          "account_signup_check_v1",
+          "job_status_get_v1"
         ],
         "contract_only_operations": [],
         "acceptance_case_ids": [

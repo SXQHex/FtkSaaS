@@ -1,6 +1,6 @@
 # Güvenlik kaynak referansı
 
-Üretilmiştir: `node apps/backend/scripts/update-docs.mjs --write`. Elle düzenleme. Kaynak içerik özeti: `aacd3b5b79ce45ded49c0c20a145ad7512f8d6de4274a4651621a5159982b4c3`. Bu özet CI/hosted kabulü değildir; dağıtılan SHA ve ortam CD artifact'ında bulunur.
+Üretilmiştir: `node apps/backend/scripts/update-docs.mjs --write`. Elle düzenleme. Kaynak içerik özeti: `068ab92bd37b6d780ff328d47b36b03bd54622a28a4b6c85bcb02369581011a9`. Bu özet CI/hosted kabulü değildir; dağıtılan SHA ve ortam CD artifact'ında bulunur.
 
 İnsan istemci native Auth → JWT doğrulanan Edge → service-only RPC yolunu kullanır. Canlı oturum/MFA/tenant/rol/plan kontrolü tekrar denetlenir; core/private erişimi istemciye açılmaz. Worker ve public credential transport ayrı yetki yollarıdır. RLS tek başına Edge iş yetkisi değildir. [İstemci değişmezleri](client-integration.md), [teknik sözleşme](contracts/02-FtkSaaS-teknik-sozlesme.md) ve [iş akışları](workflows.md#wf00) normatif ayrıntıyı taşır.
 
@@ -33,6 +33,7 @@ Aşağıdaki liste güvenlik DDL içeren kaynak dosyalarıdır; son policy/grant
 | [frontend-settings.sql](../apps/backend/database/frontend-settings.sql) | `0adf8101fa535de52c0066d6580399599e77e83587f304b647d9ac1895cbf06d` |
 | [instructor-earnings-wrappers.sql](../apps/backend/database/instructor-earnings-wrappers.sql) | `5173eee5f8ab7c17841f12a3a95b974f69ae0d5515b115337fd0a3c3d778777a` |
 | [instructor-earnings.sql](../apps/backend/database/instructor-earnings.sql) | `21f7dd89c69c3c442b229ea5fec408957623040ab137c6fd806d40296a830156` |
+| [invitation-delivery.sql](../apps/backend/database/invitation-delivery.sql) | `23b2826e79268e2326992c47a504192c6441fc9be153f702b3bd22e12e7500b6` |
 | [native-auth-signup-check.sql](../apps/backend/database/native-auth-signup-check.sql) | `6acf9d503533661d721afa98e157e59bb0c869f617ca006561024b0ee1ccc186` |
 | [ops-hosted-workers.sql](../apps/backend/database/ops-hosted-workers.sql) | `f43952f01f12589a38e10527859227c0c340f5455bcbcbcc9237063115fd635c` |
 | [p01-catalog-entitlement-reads-wrappers.sql](../apps/backend/database/p01-catalog-entitlement-reads-wrappers.sql) | `5ae3fbad90da5d5f90a44d7464c23e13817eb96503dd94599974c78c742e824d` |
@@ -110,7 +111,7 @@ Aşağıdaki liste güvenlik DDL içeren kaynak dosyalarıdır; son policy/grant
 | [room-and-role-registry-wrappers.sql](../apps/backend/database/room-and-role-registry-wrappers.sql) | `74d64f1fe3e2b5d5024a45f2f280449f1171a55fe3f2e006bd05766c7786d69e` |
 | [room-and-role-registry.sql](../apps/backend/database/room-and-role-registry.sql) | `459c399404c06bd4d2eb81556a1496639f5a73fcde0288f7f7a6d8f544bca780` |
 | [runtime-read-projection.sql](../apps/backend/database/runtime-read-projection.sql) | `3e2f98633b4f9e879ccee43df2fb622a028e8fa0827ba0a60a34fe20939c1357` |
-| [runtime-wrappers-current.sql](../apps/backend/database/runtime-wrappers-current.sql) | `c505bfc56547070bc7ef7f6983c5bad3d82790471f5b9e40e4159af2c4459b81` |
+| [runtime-wrappers-current.sql](../apps/backend/database/runtime-wrappers-current.sql) | `b549e4f430476d4a470824b3ab77852ee950cd446c28d22486fcaa8196d8bd23` |
 | [runtime-wrappers.sql](../apps/backend/database/runtime-wrappers.sql) | `5b6289b205052a72b7049f54c124bc8c3d454426801ce62895a1bc9b82f66771` |
 | [runtime.sql](../apps/backend/database/runtime.sql) | `a6604816aadf0a2005b2c99f222b34ba10828de80a535d525eef0af5a62d07dd` |
 | [schedule-reads-wrappers.sql](../apps/backend/database/schedule-reads-wrappers.sql) | `12b3a79f852e099bde79aaa2bf7e23656463645b4886eb56ab4e3fb7f52b5fbf` |
@@ -137,6 +138,7 @@ Aşağıdaki liste güvenlik DDL içeren kaynak dosyalarıdır; son policy/grant
 | [starter-work-templates.sql](../apps/backend/database/starter-work-templates.sql) | `f7425be4272f35a200a28482149c60795aa64883922efc3422387b0efd78b09a` |
 | [user-settings-context.sql](../apps/backend/database/user-settings-context.sql) | `5e8db303c5e326ca40e18a7dd232b4c27cbbf4007eef0dcbbf987ac95784f183` |
 | [wrappers.sql](../apps/backend/database/wrappers.sql) | `ff1b4e487ff5aba58483f7f1e2c8c6a3412ab4fd6d3916e51caa5fd6c766b592` |
+| [invitation-cron-install.sql](../apps/backend/scripts/invitation-cron-install.sql) | `44f8a1915d5c645ddcffc181ca15051493bdf47e95bc0ff54e8bf95426e96090` |
 | [ops-cron-install.sql](../apps/backend/scripts/ops-cron-install.sql) | `e5c13c16f17268efe53a595da9c1959d1d8f89396db96706c361fb5223d99af3` |
 | [20261015152146_discipline_uuidv7_baseline.sql](../apps/backend/supabase/migrations/20261015152146_discipline_uuidv7_baseline.sql) | `4b6353fa9c5052f8fe597edce6f0b81ff2d8320c60822dae24e2044241504874` |
 | [20261015160836_event_discipline_scope.sql](../apps/backend/supabase/migrations/20261015160836_event_discipline_scope.sql) | `ab684d302c508eba33ec665bf2c3e91bf7034073b2b21884add7412f3de4794c` |
@@ -211,3 +213,4 @@ Aşağıdaki liste güvenlik DDL içeren kaynak dosyalarıdır; son policy/grant
 | [20261028175405_starter_availability_management.sql](../apps/backend/supabase/migrations/20261028175405_starter_availability_management.sql) | `55c5f4129982e88f7dcf49173fb7d8f97af48bd57de54d9b20a42ce2e3a93d4d` |
 | [20261030083856_account_signup_guard.sql](../apps/backend/supabase/migrations/20261030083856_account_signup_guard.sql) | `77d60f6021952100ccb7907513f2f49866726d08dcd600da50f521569e7b588d` |
 | [20261031074421_native_auth_signup_check.sql](../apps/backend/supabase/migrations/20261031074421_native_auth_signup_check.sql) | `6acf9d503533661d721afa98e157e59bb0c869f617ca006561024b0ee1ccc186` |
+| [20261101040221_invitation_delivery_tracking.sql](../apps/backend/supabase/migrations/20261101040221_invitation_delivery_tracking.sql) | `23b2826e79268e2326992c47a504192c6441fc9be153f702b3bd22e12e7500b6` |
