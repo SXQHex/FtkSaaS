@@ -260,8 +260,8 @@
         "management_state_get_v1"
       ],
       "review": {
-        "fingerprint": "42044f7452550b45a6bd8fb595640e77a815823d84a9b0dfaf49d3398f025281",
-        "reason": "F01/F26 ve hedef plan limitleri denetlendi; kaynak başlığı, backend transaction belge sahipliği ve root kalite sözleşmesi kaydı düzeltildi; WF00 runtime protokolü değişmedi."
+        "fingerprint": "a3f801855dca7a2c0ed9af49e234abed4c47d52118d9c454960082480ed021fc",
+        "reason": "Native Edge A/B ölçümüne göre yalnız yerel/CI worker ömrü oneshot oldu; WF00 auth/tenant/wire/atomiklik hükümleri değişmedi."
       }
     },
     {
@@ -337,8 +337,8 @@
         "account_signup_check_v1"
       ],
       "review": {
-        "fingerprint": "47587fd42bfcbacb726d587393ea2a30f6b50ce171b984fef9108af4c742aaf7",
-        "reason": "Native Auth rehberi ve kayıt kabul testi incelendi: mevcut HTTP timeout yardımcısı kullanılıyor, ret yanıtı tüketiliyor; account_exists, veri/posta yan etkisi ve yetki assertionları korunuyor."
+        "fingerprint": "3dc21fa6b358d9d3a17333e25aa366a266201f93a8702e9668248365de0e43c4",
+        "reason": "Onaylı oneshot yerel/CI yaşam döngüsü değişimi incelendi; native Auth ayarları, JWT, MFA ve hesap API protokolü değişmedi."
       }
     },
     {
