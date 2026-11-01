@@ -39,7 +39,7 @@ export const ciSources=new Set([
  '.github/workflows/cd-development.yml','apps/backend/scripts/ci/deployment-source.mjs','apps/backend/scripts/ci/deploy-development.mjs',
  '.github/workflows/backend.yml','.github/workflows/ci-fast.yml','.github/workflows/ci-full.yml','.github/workflows/ci-gate.yml','.github/workflows/clean-suite.yml',
  'apps/backend/scripts/ci/select-tests.mjs','apps/backend/scripts/ci/delta-analysis.mjs','apps/backend/scripts/ci/run-targeted.mjs','apps/backend/scripts/ci/manual-targeted.mjs','apps/backend/scripts/ci/gate.mjs','apps/backend/scripts/ci/source.mjs','apps/backend/scripts/ci/document-scope.mjs','apps/backend/scripts/ci/document-paths.json','apps/backend/scripts/ci/renderer-proof.py','apps/backend/scripts/ci/cleanup.mjs','apps/backend/scripts/ci/shards.mjs','apps/backend/scripts/ci/suite-durations.json','apps/backend/scripts/ci/collect.mjs','apps/backend/scripts/ci/timings.mjs','apps/backend/scripts/ci/summarize-timings.mjs','apps/backend/scripts/ci/reset-local.mjs','apps/backend/scripts/ci/docs-check.mjs',
- 'apps/backend/scripts/test-clean.mjs','apps/backend/scripts/start-dev.mjs','apps/backend/scripts/paths.mjs','apps/backend/tests/ci-policy.test.mjs'
+ 'apps/backend/scripts/test-clean.mjs','apps/backend/scripts/start-dev.mjs','apps/backend/scripts/paths.mjs','apps/backend/tests/ci-policy.test.mjs','apps/backend/tests/ci-selection.test.mjs','apps/backend/tests/ci-documentation.test.mjs','apps/backend/tests/ci-deployment.test.mjs','apps/backend/tests/ci-shards.test.mjs','apps/backend/tests/ci-fixtures.mjs'
 ]);
 export function select(changes,{diffAvailable=true,headMatches=true,evidence,ciOnly=false}={}) {
  const reasons=[],chosen=new Set();let structural=false,broad=false;const docs=[];
@@ -66,7 +66,7 @@ export function select(changes,{diffAvailable=true,headMatches=true,evidence,ciO
   if(p.startsWith('docs/contracts/')||p.startsWith('packages/')||p.startsWith('apps/backend/supabase/')||p.startsWith('.github/')||['package.json','pnpm-lock.yaml','pnpm-workspace.yaml','turbo.json','tsconfig.json'].includes(p)){
    all(p+': shared schema/gateway/migration/build or CI dependency');continue;
   }
-  if(/^apps\/backend\/tests\/(contract|governance|ci-policy|ci-observer|quality-guard)\.test\.mjs$/.test(p)||p==='apps/backend/tests/types.test.ts'){structural=true;reasons.push(p+': structural checks');continue;}
+  if(/^apps\/backend\/tests\/(contract|governance|ci-policy|ci-selection|ci-documentation|ci-deployment|ci-shards|ci-observer|quality-guard)\.test\.mjs$/.test(p)||p==='apps/backend/tests/types.test.ts'){structural=true;reasons.push(p+': structural checks');continue;}
   if(apiSuites.includes(p)){structural=true;chosen.add(p);chosen.add(apiSuites[0]);reasons.push(p+': explicit API suite + shared authorization/rights regressions');continue;}
   const m=modules.find(m=>(m.sources.some(n=>p==='apps/backend/database/'+n+'.sql'||p==='apps/backend/database/'+n+'-wrappers.sql')||m.runtimeSources?.includes(p)));
   if(m){structural=true;chosen.add(apiSuites[0]);for(const n of m.suites)chosen.add('apps/backend/tests/'+n+'.test.mjs');reasons.push(p+': '+m.id+' dependency graph + shared authorization/rights regressions');continue;}

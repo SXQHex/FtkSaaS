@@ -83,6 +83,7 @@
         "apps/backend/scripts/build-edge.mjs",
         "apps/backend/scripts/capture-docs.mjs",
         "apps/backend/scripts/check-migrations.py",
+        "apps/backend/scripts/ci/check-quality.mjs",
         "apps/backend/scripts/ci/cleanup.mjs",
         "apps/backend/scripts/ci/collect.mjs",
         "apps/backend/scripts/ci/delta-analysis.mjs",
@@ -92,8 +93,12 @@
         "apps/backend/scripts/ci/document-moves.json",
         "apps/backend/scripts/ci/document-paths.json",
         "apps/backend/scripts/ci/document-scope.mjs",
+        "apps/backend/scripts/ci/floor-exceptions.json",
+        "apps/backend/scripts/ci/floor-guard.mjs",
         "apps/backend/scripts/ci/gate.mjs",
         "apps/backend/scripts/ci/manual-targeted.mjs",
+        "apps/backend/scripts/ci/observe-api.mjs",
+        "apps/backend/scripts/ci/quality-proof.mjs",
         "apps/backend/scripts/ci/refresh-suite-durations.mjs",
         "apps/backend/scripts/ci/renderer-proof.py",
         "apps/backend/scripts/ci/reset-local.mjs",
@@ -110,6 +115,7 @@
         "apps/backend/scripts/deliver-dev-invitations.mjs",
         "apps/backend/scripts/dev-info.mjs",
         "apps/backend/scripts/dev-seed.mjs",
+        "apps/backend/scripts/document-registry.mjs",
         "apps/backend/scripts/documentation-catalog.sql",
         "apps/backend/scripts/generate-runtime.py",
         "apps/backend/scripts/generate-settings-catalog.py",
@@ -227,7 +233,12 @@
         "apps/backend/tests/availability-day-boundaries-acceptance.mjs",
         "apps/backend/tests/calendar-preferences-acceptance.mjs",
         "apps/backend/tests/canonical-settings-migration-acceptance.mjs",
+        "apps/backend/tests/ci-deployment.test.mjs",
+        "apps/backend/tests/ci-documentation.test.mjs",
+        "apps/backend/tests/ci-fixtures.mjs",
         "apps/backend/tests/ci-policy.test.mjs",
+        "apps/backend/tests/ci-selection.test.mjs",
+        "apps/backend/tests/ci-shards.test.mjs",
         "apps/backend/tests/database.test.mjs",
         "apps/backend/tests/event-scope.test.mjs",
         "apps/backend/tests/fixtures/p07-subscription-lifecycle.sql",
@@ -238,19 +249,13 @@
         "apps/backend/tests/request-diagnostics.mjs",
         "apps/backend/tests/settings-media-unit.mjs",
         "docs/client-integration.md",
+        "docs/documentation.json",
         "packages/api-contracts/schema/contract.json",
         "packages/api-contracts/src/client.ts",
         "packages/api-contracts/src/generated.ts",
         "packages/api-contracts/src/index.ts",
         "packages/api-contracts/src/operations.ts",
-        "packages/api-contracts/src/runtime.ts",
-        "docs/documentation.json",
-        "apps/backend/scripts/document-registry.mjs",
-        "apps/backend/scripts/ci/observe-api.mjs",
-        "apps/backend/scripts/ci/floor-guard.mjs",
-        "apps/backend/scripts/ci/floor-exceptions.json",
-        "apps/backend/scripts/ci/quality-proof.mjs",
-        "apps/backend/scripts/ci/check-quality.mjs"
+        "packages/api-contracts/src/runtime.ts"
       ],
       "operations": [
         "operation_status_get_v1",
@@ -260,8 +265,8 @@
         "management_state_get_v1"
       ],
       "review": {
-        "fingerprint": "a3f801855dca7a2c0ed9af49e234abed4c47d52118d9c454960082480ed021fc",
-        "reason": "Native Edge A/B ölçümüne göre yalnız yerel/CI worker ömrü oneshot oldu; WF00 auth/tenant/wire/atomiklik hükümleri değişmedi."
+        "fingerprint": "dab3b070736df09a92d67d85d6e12d09d99d0872f41e2c689fceb698273cc0f4",
+        "reason": "Bağımsız incelenmiş tam-parmak-izi istisnalarının bitişi 30 Kasım olarak kesinleştirildi; son kaynak parmak izi yenilendi. API, test assertionları ve kabul kapıları değişmedi."
       }
     },
     {
@@ -338,7 +343,7 @@
       ],
       "review": {
         "fingerprint": "3dc21fa6b358d9d3a17333e25aa366a266201f93a8702e9668248365de0e43c4",
-        "reason": "Onaylı oneshot yerel/CI yaşam döngüsü değişimi incelendi; native Auth ayarları, JWT, MFA ve hesap API protokolü değişmedi."
+        "reason": "Hesap ve native Auth runtime değişmedi; hosted smoke kontrollerinin negatif testleri güçlendirildi ve nonexistent resource kanıtının adı daraltıldı; ayrılmış CI testleri aynı kaynak kapsamını korur."
       }
     },
     {

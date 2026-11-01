@@ -73,7 +73,7 @@ export function applyExceptions(findings, entries, now = new Date()) {
     const created=new Date(e.created), expires=new Date(e.expires);
     if(!['silenced-checker','test-disabled','test-deleted','assertion-changed','unfinished-work'].includes(e.rule)
       || typeof e.path!=='string' || e.path.startsWith('/') || e.path.split('/').includes('..')
-      || !/^[a-f0-9]{64}$/.test(e.fingerprint) || !e.owner?.trim() || e.reason?.trim().length<20
+      || !/^[a-f0-9]{64}$/.test(e.fingerprint) || !e.owner?.trim() || typeof e.reason!=='string' || e.reason.trim().length<20
       || !/^\d{4}-\d{2}-\d{2}$/.test(e.created) || !/^\d{4}-\d{2}-\d{2}$/.test(e.expires)
       || !Number.isFinite(+created) || !Number.isFinite(+expires) || expires<=created
       || expires-created>90*86400000 || e.created>today || e.expires<today || seen.has(id)) throw Error('Invalid quality exception');

@@ -1,0 +1,349 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import {select,apiSuites,parseChanges} from '../scripts/ci/select-tests.mjs';
+import {analyzeDelta} from '../scripts/ci/delta-analysis.mjs';
+import fs,{mkdirSync,writeFileSync} from 'node:fs';
+import {join,resolve} from 'node:path';
+import {execFileSync} from 'node:child_process';
+import {runApiPhases} from '../scripts/ci/run-targeted.mjs';
+import {repositoryRoot} from '../scripts/paths.mjs';
+import {gitDocumentScope} from '../scripts/ci/document-scope.mjs';
+import {classifyChanges,ownerOf,localScope} from '../scripts/ci/scope.mjs';
+import {policyPath,resolveCandidate,assertReady} from '../scripts/ci/source.mjs';
+import {targetedPartitions,assertManualInventory,assertManualRange} from '../scripts/ci/manual-targeted.mjs';
+import {fixture,change,scopedGithub} from './ci-fixtures.mjs';
+process.chdir(repositoryRoot);
+
+const p01Suite='apps/backend/tests/p01-catalog-entitlement-reads.test.mjs';
+const profile={id:'p01-reads',sources:['p01-catalog-entitlement-reads'],operations:['products_list_v1','entitlements_get_v1'],migrationCheckLabel:'P01 reads source drift',suites:[p01Suite]};
+const source='apps/backend/database/p01-catalog-entitlement-reads.sql',wrapper='apps/backend/database/p01-catalog-entitlement-reads-wrappers.sql';
+
+const plan=p=>select([{path:p,status:'M'}]);
+
+const migration='apps/backend/supabase/migrations/20990101000000_p01_catalog_entitlement_reads.sql';
+
+const contractPath='packages/api-contracts/schema/contract.json';
+
+function deltaFixture(){
+ const defs={Uuid:{type:'string'},Input:{type:'object',properties:{id:{$ref:'#/$defs/Uuid'}}},Output:{type:'object',properties:{id:{$ref:'#/$defs/Uuid'}}},OtherInput:{type:'object',properties:{id:{$ref:'#/$defs/Uuid'}}}};
+ const contract={$schema:'synthetic', $defs:defs,'x-contract':{operations:[
+  {name:'entitlements_get_v1',request:{$ref:'#/$defs/Input'},success:{$ref:'#/$defs/Output'}},
+  {name:'unmapped_v1',request:{$ref:'#/$defs/OtherInput'},success:{$ref:'#/$defs/Uuid'}}
+ ],permissions:{read:true},tables:[],uuid_field_map:[],feature_delivery:{}}};
+ const oldPackage={name:'synthetic',scripts:{'test:api':'node --test --test-concurrency=2 tests/api-acceptance.test.mjs'},dependencies:{pinned:'1.0.0'}};
+ const base={[contractPath]:JSON.stringify(contract),'apps/backend/database/migrations.sha256.json':JSON.stringify({'old.sql':'old'}),'apps/backend/scripts/check-migrations.py':'# original\n','apps/backend/package.json':JSON.stringify(oldPackage),'apps/backend/supabase/functions/backend-v1/implemented.json':JSON.stringify({operations:['entitlements_get_v1']}),'apps/backend/supabase/functions/backend-v1/index.ts':'old generated'};
+ const head=structuredClone(base),c=structuredClone(contract);
+ c.$defs.Input.properties.session_id={$ref:'#/$defs/Uuid'};head[contractPath]=JSON.stringify(c);
+ head[source]='begin;\n-- mapped source\ncommit;\n';head[wrapper]='begin;\n-- wrappers\ncommit;\n';head[migration]=head[source]+head[wrapper];
+ head['apps/backend/database/migrations.sha256.json']=JSON.stringify({'old.sql':'old',[migration.split('/').at(-1)]:'new'});
+ head['apps/backend/scripts/check-migrations.py']=base['apps/backend/scripts/check-migrations.py']+"\nassert next(Path('supabase/migrations').glob('*_p01_catalog_entitlement_reads.sql')).read_text()==Path('database/p01-catalog-entitlement-reads.sql').read_text()+Path('database/p01-catalog-entitlement-reads-wrappers.sql').read_text(),'P01 reads source drift'\n";
+ head['apps/backend/package.json']=JSON.stringify({...oldPackage,scripts:{...oldPackage.scripts,'test:api':oldPackage.scripts['test:api']+' '+p01Suite.replace('apps/backend/','')}});
+ head['apps/backend/supabase/functions/backend-v1/index.ts']='new generated';head[p01Suite]='// new behavior test';
+ const changes=()=>[...new Set([...Object.keys(base),...Object.keys(head)])].filter(p=>base[p]!==head[p]).map(path=>({path,status:!(path in head)?'D':!(path in base)?'A':'M'}));
+ return {base,head,changes,run(){const c=changes();const read=(side,path)=>(side==='base'?base:head)[path]??null;const evidence=analyzeDelta(c,read,[profile]);return select(c,{evidence});}};
+}
+
+test('documentation only has no backend setup and retains link checks',()=>{const p=plan('apps/backend/docs/remaining-work.md');assert.equal(p.db,false);assert.equal(p.structural,false);assert.equal(p.docs.length,1);});
+
+test('module changes include explicitly declared shared economic consumers',()=>{const p=plan('apps/backend/database/instructor-earnings.sql');for(const n of ['instructor-earnings','cross-center-settlement','starter-attendance-protection','program-session-lifecycle','api-acceptance'])assert(p.api.includes('apps/backend/tests/'+n+'.test.mjs'));assert(!p.api.includes('apps/backend/tests/person-registry.test.mjs'));});
+
+test('shared auth tenant finance gateway migrations infrastructure and unknown files expand safely',()=>{for(const p of ['apps/backend/database/kernel.sql','apps/backend/database/dispatch.sql','apps/backend/supabase/migrations/next.sql','apps/backend/tests/api-client.mjs','apps/backend/scripts/new-unknown.mjs','docs/contracts/example.json','.github/workflows/ci-fast.yml'])assert.deepEqual(plan(p).api,apiSuites,p);});
+
+test('contract generator/shared types cannot silently omit structural coverage',()=>{for(const p of ['docs/contracts/08.json','docs/contracts/01-product.md','docs/decisions/example.md','apps/backend/scripts/generate.mjs','packages/api-contracts/index.ts'])assert(plan(p).structural);});
+
+test('rename and deletion cover both source and destination; malformed diffs reject',()=>{const c=parseChanges('R100\0database/instructor-earnings.sql\0docs/moved.md\0D\0tests/api-client.mjs\0');assert.equal(c.length,3);assert.deepEqual(select(c).api,apiSuites);assert.throws(()=>parseChanges('R100\0one\0'));});
+
+test('missing diff, empty set, missing path and moved checkout expand to all suites',()=>{for(const p of [select([]),select([{status:'M'}]),select([{path:'docs/a.md'}],{diffAvailable:false}),select([{path:'docs/a.md'}],{headMatches:false})])assert.deepEqual(p.api,apiSuites);});
+
+test('API suite inventory exactly matches package test command; no shard loses tests',()=>{const command=JSON.parse(fs.readFileSync('apps/backend/package.json')).scripts['test:api'];assert.deepEqual([...command.matchAll(/tests\/[\w-]+\.test\.mjs/g)].map(m=>'apps/backend/'+m[0]).sort(),[...apiSuites].sort());});
+
+test('automatic PR acceptance and manual diagnostics have disjoint event and cancellation boundaries',()=>{
+ const fast=fs.readFileSync('.github/workflows/ci-fast.yml','utf8'),full=fs.readFileSync('.github/workflows/ci-full.yml','utf8'),main=fs.readFileSync('.github/workflows/backend.yml','utf8');
+ assert(fast.includes('workflow_dispatch:'));assert(!fast.includes('  push:'));assert(!fast.includes('  pull_request:'));
+ assert(full.includes('types: [opened, synchronize, reopened, edited]'));assert(!full.includes('labeled'));assert(full.includes("if: github.event.action != 'edited' || github.event.changes.base != null"));assert(!full.includes('workflow_dispatch'));
+ assert(full.includes('backend-pr-${{ github.event.pull_request.number }}'));assert(full.includes('cancel-in-progress: true'));assert(full.includes("github.event.action == 'edited' && github.event.changes.base == null && 'metadata' || 'source'"));
+ assert(main.includes('main-acceptance-${{ github.sha }}'));assert(main.includes('cancel-in-progress: false'));assert(!main.includes('workflow_dispatch'));assert(!main.includes('uses: ./.github/workflows/clean-suite.yml'));
+});
+
+test('cumulative selector retains canceled API commit coverage when next commit changes docs',()=>fixture((dir,git)=>{mkdirSync(join(dir,'apps/backend/database'),{recursive:true});writeFileSync(join(dir,'apps/backend/database/instructor-earnings.sql'),'-- synthetic');git('add','.');git('commit','-m','module');const before=git('rev-parse','HEAD');writeFileSync(join(dir,'README.md'),'Later documentation\n');git('add','.');git('commit','-m','docs');const head=git('rev-parse','HEAD');execFileSync(process.execPath,[resolve('apps/backend/scripts/ci/select-tests.mjs'),before,head],{cwd:dir});const p=JSON.parse(fs.readFileSync(join(dir,'.artifacts/ci/selection.json')));assert(p.api.includes('apps/backend/tests/cross-center-settlement.test.mjs'));assert(p.db);}));
+
+test('module contract, generated bundle and exact appended migration select only mapped behavior plus common regression',()=>{
+ const f=deltaFixture(),p=f.run();assert.equal(p.broad,false);assert(p.structural&&p.db);
+ assert.deepEqual(p.api,['apps/backend/tests/api-acceptance.test.mjs',p01Suite]);assert.deepEqual(p.priority,[p01Suite]);
+ assert(p.reasons.some(r=>r.includes('transitive definition consumers')));assert(p.reasons.some(r=>r.includes('exactly matches mapped source')));
+});
+
+test('shared definition consumer or shared permission change forces broad fallback',()=>{
+ for(const mutate of [
+  c=>c.$defs.Uuid.type='number',
+  c=>c['x-contract'].permissions.read=false,
+  c=>c.$defs.Orphan={type:'boolean'},
+  c=>c['x-contract'].operations.push({name:'unknown_new_v1',request:{$ref:'#/$defs/Input'}}),
+  c=>c.$defs.Table_sales={type:'object'},
+  c=>c.$schema='changed',
+  c=>c.$defs.Input.properties.external={$ref:'https://example.invalid/schema'}
+ ]){
+  const f=deltaFixture(),c=JSON.parse(f.head[contractPath]);mutate(c);f.head[contractPath]=JSON.stringify(c);assert.deepEqual(f.run().api,apiSuites);
+ }
+});
+
+test('persistent table transitive consumers force broad fallback in either snapshot',()=>{
+ for(const side of ['base','head']){
+  const f=deltaFixture(),c=JSON.parse(f[side][contractPath]);
+  c.$defs.Table_rights={type:'object',properties:{nested:{$ref:'#/$defs/TableLink'}}};
+  c.$defs.TableLink={$ref:'#/$defs/Input'};f[side][contractPath]=JSON.stringify(c);
+  // Keep table definitions identical, so only the existing mapped Input delta
+  // changes. Its indirect persistent-table consumer must still force broad.
+  const other=side==='base'?'head':'base',o=JSON.parse(f[other][contractPath]);
+  o.$defs.Table_rights=c.$defs.Table_rights;o.$defs.TableLink=c.$defs.TableLink;f[other][contractPath]=JSON.stringify(o);
+  assert.equal(f.run().broad,true);
+ }
+});
+
+test('diagnostic report alone requires structural verification without API setup',()=>{
+ const p=plan('docs/history/reports/p01-a-targeted-diagnosis.json');assert(p.structural);assert.equal(p.db,false);
+});
+
+test('unknown, altered historical or unbound migration cannot use a known module filename as proof',()=>{
+ for(const mutate of [
+  f=>f.head[migration]+='-- unbound DDL\n',
+  f=>{f.base[migration]='-- historical';},
+  f=>{f.head['apps/backend/supabase/migrations/20990102000000_unknown.sql']='-- unknown';},
+  f=>{delete f.head[source];},
+  f=>{f.head['apps/backend/scripts/check-migrations.py']=f.head['apps/backend/scripts/check-migrations.py'].replace('# original','# rewritten');},
+  f=>{f.head['apps/backend/database/migrations.sha256.json']=JSON.stringify({'old.sql':'changed',[migration.split('/').at(-1)]:'new'});}
+ ]){const f=deltaFixture();mutate(f);assert.deepEqual(f.run().api,apiSuites);}
+});
+
+test('shared package dependency, changed runner flags, test removal or unknown suite remains broad',()=>{
+ for(const mutate of [
+  p=>p.dependencies.pinned='2.0.0',
+  p=>p.scripts['test:api']=p.scripts['test:api'].replace('--test-concurrency=2','--test-concurrency=4'),
+  p=>p.scripts['test:api']='node --test --test-concurrency=2 '+p01Suite,
+  p=>p.scripts['test:api']+=' tests/unknown.test.mjs',
+  p=>p.scripts['test:api']+=' ; echo unexpected',
+  p=>p.scripts['test:api']+=' '+p01Suite,
+  p=>p.scripts.verify='skip verification'
+ ]){const f=deltaFixture(),p=JSON.parse(f.head['apps/backend/package.json']);mutate(p);f.head['apps/backend/package.json']=JSON.stringify(p);assert.deepEqual(f.run().api,apiSuites);}
+});
+
+test('standalone generated edit, unmapped registration or shared kernel edit cannot silently narrow',()=>{
+ const f=deltaFixture();for(const p of Object.keys(f.head))delete f.head[p];Object.assign(f.head,f.base);f.head['apps/backend/supabase/functions/backend-v1/index.ts']='unexplained';
+ assert.deepEqual(f.run().api,apiSuites);
+ for(const mutate of [
+  x=>x.head['apps/backend/supabase/functions/backend-v1/handler.ts']='shared gateway',
+  x=>x.head['apps/backend/database/kernel.sql']='shared rights kernel',
+  x=>x.head['apps/backend/scripts/generate-validators.mjs']='shared generator',
+  x=>x.head['apps/backend/supabase/functions/backend-v1/implemented.json']=JSON.stringify({operations:['entitlements_get_v1','unknown_v1']}),
+  x=>x.head['apps/backend/supabase/functions/backend-v1/implemented.json']=JSON.stringify({operations:[]}),
+  x=>x.head['packages/api-contracts/src/unknown.ts']='unknown shared type',
+  x=>x.head['apps/backend/scripts/ci/unknown-runner.mjs']='unknown infrastructure'
+ ]){const x=deltaFixture();mutate(x);assert.deepEqual(x.run().api,apiSuites);}
+});
+
+test('mapped priorities never drop another selected suite and a failed priority does not start deferred work',()=>{
+ const f=deltaFixture(),p=f.run(),calls=[];
+ runApiPhases(p,(cmd,args)=>calls.push(args.slice(2).map(p=>p.replace(repositoryRoot,''))));
+ assert.deepEqual(calls,[[p01Suite],['apps/backend/tests/api-acceptance.test.mjs']]);
+ const attempted=[];assert.throws(()=>runApiPhases(p,(cmd,args)=>{attempted.push(args.slice(2).map(p=>p.replace(repositoryRoot,'')));throw Error('synthetic behavior failure');}),/synthetic behavior failure/);
+ assert.deepEqual(attempted,[[p01Suite]]);
+ const broad={...p,api:apiSuites},all=[];runApiPhases(broad,(cmd,args)=>all.push(...args.slice(2).map(p=>p.replace(repositoryRoot,''))));
+ assert.deepEqual([...all].sort(),[...apiSuites].sort());assert.equal(new Set(all).size,apiSuites.length);
+});
+
+test('actual P01-A branch delta selects two suites even with accumulated generated, contract and migration edits',t=>{
+ const base='9ce0a5639417f959111b11f70157156733e3de18',head='635e148651b2a85b18f5d40fe1fdea938ea94bf2';
+ // This regression fixture is optional in shallow external test checkouts;
+ // normal workflow uses full git history and the pure snapshot cases above always run.
+ try{execFileSync('git',['cat-file','-e',head+'^{commit}'],{stdio:'pipe'});}catch{t.skip('Historical snapshot unavailable in shallow checkout; pure snapshot cases still run');return;}
+ const frozenPath=p=>p.startsWith('packages/contracts/')?p.replace('packages/contracts/','packages/api-contracts/'):p==='contracts/08-FtkSaaS-tip-ve-operasyon-sozlesmesi.json'?'packages/api-contracts/schema/contract.json':p==='package.json'||/^(database|supabase|scripts|tests)\//.test(p)?'apps/backend/'+p:p;
+ const originalPath=p=>p==='packages/api-contracts/schema/contract.json'?'contracts/08-FtkSaaS-tip-ve-operasyon-sozlesmesi.json':p.startsWith('packages/api-contracts/')?p.replace('packages/api-contracts/','packages/contracts/'):p.replace(/^apps\/backend\//,'');
+ const changes=parseChanges(execFileSync('git',['diff','--name-status','-z',base,head],{encoding:'utf8'})).map(c=>({...c,path:frozenPath(c.path)}));
+ const cache=new Map(),read=(side,path)=>{const k=side+':'+path;if(!cache.has(k)){try{cache.set(k,execFileSync('git',['show',(side==='base'?base:head)+':'+originalPath(path)],{encoding:'utf8',maxBuffer:20*1024*1024,stdio:'pipe'}));}catch{cache.set(k,null);}}return cache.get(k);};
+ const p=select(changes,{evidence:analyzeDelta(changes,read,[profile])});
+ assert.equal(p.broad,false);assert.deepEqual(p.api,['apps/backend/tests/api-acceptance.test.mjs',p01Suite]);assert.deepEqual(p.priority,[p01Suite]);
+});
+
+test('request projection focus cannot own unrelated shared management contract changes',()=>{
+ const path=contractPath,owned='lesson_request_create_v1',suite='apps/backend/tests/p01-lesson-requests.test.mjs';
+ const p={id:'requests',sources:[],operations:[owned],managementRequestProjection:true,suites:[suite]};
+ const snapshot={$defs:{ManagementStateView:{type:'object',properties:{current:{type:'string'}},required:['current']},Request_management_state_get:{type:'object',properties:{page:{type:'string'}},allOf:[]}},'x-contract':{operations:[{name:'management_state_get_v1',request:{$ref:'#/$defs/Request_management_state_get'},success:{$ref:'#/$defs/ManagementStateView'},features:[],conditional_features:[],runtime_selectors:['negcredit_valuation_set_v1'],permission:'management.inspect'}]}};
+ const focused=structuredClone(snapshot);focused.$defs.ManagementStateView.properties.request_detail={$ref:'#/$defs/LessonRequestView'};focused.$defs.LessonRequestView={type:'object',properties:{id:{type:'string'}}};
+ focused['x-contract'].operations[0].runtime_selectors.push(owned);
+ const changes=[{status:'M',path}],run=head=>select(changes,{evidence:analyzeDelta(changes,(side,file)=>file===path?JSON.stringify(side==='base'?snapshot:head):null,[p])});
+ assert.equal(run(focused).broad,false);
+ for(const mutate of [
+  h=>h.$defs.ManagementStateView.properties.current.type='number',
+  h=>h.$defs.Request_management_state_get.properties.page.type='number',
+  h=>h['x-contract'].operations[0].permission='account.self',
+  h=>h['x-contract'].operations[0].runtime_selectors.push('unrelated_v1'),
+  h=>h.$defs.ManagementStateView.required.push('request_detail')
+ ]){const h=structuredClone(focused);mutate(h);assert.equal(run(h).broad,true);}
+});
+
+test('CI-only cumulative proof cannot hide runtime or unknown markdown in later documentation commits',()=>fixture((dir,git)=>{
+ mkdirSync(join(dir,'.github/workflows'),{recursive:true});writeFileSync(join(dir,'.github/workflows/ci-full.yml'),'# synthetic harness');git('add','.');git('commit','-m','ci');
+ const run=()=>{execFileSync(process.execPath,[resolve('apps/backend/scripts/ci/select-tests.mjs'),'unused',git('rev-parse','HEAD')],{cwd:dir});return JSON.parse(fs.readFileSync(join(dir,'.artifacts/ci/selection.json')));};
+ assert.equal(run().db,false);assert(run().structural);
+ writeFileSync(join(dir,'README.md'),'Later docs');git('add','README.md');git('commit','-m','docs');assert.equal(run().db,false);
+ mkdirSync(join(dir,'apps/backend/database'),{recursive:true});writeFileSync(join(dir,'apps/backend/database/kernel.sql'),'-- runtime');git('add','apps/backend/database');git('commit','-m','runtime');assert.equal(run().db,true);
+ writeFileSync(join(dir,'README.md'),'Final docs');git('add','README.md');git('commit','-m','final docs');assert.equal(run().api.length,apiSuites.length);
+}));
+
+test('every test file is accounted for in structural DB or API clean obligations',()=>{
+ const actual=fs.readdirSync('apps/backend/tests').filter(p=>p.endsWith('.test.mjs')).map(p=>'apps/backend/tests/'+p).sort();
+ const scripts=JSON.parse(fs.readFileSync('apps/backend/package.json')).scripts;
+ const commands=[scripts.verify,scripts['test:db'],scripts['test:api']].join(' ');
+ const executed=[...commands.matchAll(/tests\/[\w-]+\.test\.mjs/g)].map(m=>'apps/backend/'+m[0]).sort();
+ assert.deepEqual(actual,executed);
+});
+
+test('workspace and lock changes retain broad backend coverage and pinned frozen installs',()=>{
+ for(const p of ['pnpm-lock.yaml','pnpm-workspace.yaml','turbo.json','packages/api-contracts/package.json'])assert.deepEqual(plan(p).api,apiSuites,p);
+ for(const f of ['ci-fast','clean-suite','cd-development']){
+  const s=fs.readFileSync('.github/workflows/'+f+'.yml','utf8');assert(s.includes('corepack enable'));const install='pnpm --filter @ftksaas/backend... --filter ftksaas install --frozen-lockfile';assert(s.includes(install));assert(!s.includes('npm ci'));
+ }
+ const p=JSON.parse(fs.readFileSync('package.json'));assert.equal(p.packageManager,'pnpm@12.15.0');assert(!fs.existsSync('package-lock.json'));
+ const turbo=JSON.parse(fs.readFileSync('turbo.json'));assert.equal(turbo.tasks['test:clean'].cache,false);assert.equal(turbo.tasks.verify.cache,false);
+});
+
+test('repository graph and documentation scope are identical from backend and root cwd',()=>fixture((dir,git)=>{
+ const backend=join(dir,'apps/backend');mkdirSync(backend,{recursive:true});mkdirSync(join(dir,'.github/workflows'),{recursive:true});
+ const base=git('rev-parse','HEAD');writeFileSync(join(dir,'.github/workflows/ci-full.yml'),'# synthetic trusted harness');writeFileSync(join(dir,'README.md'),'Changed docs');git('add','.');git('commit','-m','ci and docs');const head=git('rev-parse','HEAD');
+ const command=resolve('apps/backend/scripts/ci/select-tests.mjs'),plans=[];
+ for(const cwd of [dir,backend]){execFileSync(process.execPath,[command,base,head],{cwd,stdio:'pipe'});plans.push(JSON.parse(fs.readFileSync(join(dir,'.artifacts/ci/selection.json'))));}
+ assert.deepEqual(plans[0],plans[1]);assert.equal(plans[1].db,false);assert(plans[1].structural);
+ writeFileSync(join(dir,'README.md'),'Only docs now');git('add','README.md');git('commit','-m','docs only');const docs=git('rev-parse','HEAD');
+ assert(gitDocumentScope(head,docs,dir).safe);assert(gitDocumentScope(head,docs,backend).safe);
+}));
+
+test('positive ownership separates backend frontend prose and shared inputs, rejecting unknown scope',()=>{
+ for(const path of ['apps/web/src/app/page.tsx','packages/ui/src/button.tsx','.github/workflows/frontend.yml','vercel.json']){
+  const scope=classifyChanges([change(path)]);assert.equal(scope.backend,false);assert.equal(scope.kind,'frontend');assert.equal(select([change(path)]).db,false);
+ }
+ for(const path of ['apps/backend/database/kernel.sql','packages/api-contracts/schema/contract.json','packages/typescript-config/base.json','pnpm-lock.yaml','package.json','pnpm-workspace.yaml','turbo.json','.nvmrc','.github/workflows/ci-fast.yml'])assert.equal(classifyChanges([change(path)]).backend,true,path);
+ assert.equal(classifyChanges([change('README.md')]).kind,'documentation');
+ assert.equal(classifyChanges([change('apps/web/page.tsx'),change('apps/backend/database/kernel.sql')]).kind,'full');
+ assert.equal(classifyChanges([change('apps/web/page.tsx'),change('README.md')]).kind,'documentation');
+ for(const path of ['apps/unknown/file.ts','packages/unknown/index.ts','docs/unreviewed.md','../apps/web/file.ts','apps/web/../../backend/file.ts','apps/web//file.ts','apps\\web\\file.ts'])assert.throws(()=>ownerOf(path));
+ assert.throws(()=>classifyChanges([]));assert.throws(()=>classifyChanges([{path:'apps/web/a.ts',status:'U'}]));
+ assert.equal(policyPath('.github/workflows/frontend.yml'),true);assert.equal(policyPath('.github/workflows/ci-full.yml'),true);
+});
+
+test('one main proof gate covers all pushes and manual targeted cannot auto-run or install for prose',()=>{
+ const main=fs.readFileSync('.github/workflows/backend.yml','utf8');
+ assert.match(main,/push:\n    branches: \[main\]/);
+ assert(!main.includes('    paths:'));assert(!main.includes('paths-ignore:'));
+ assert(main.includes('eventScope(context.eventName, context.payload, context.sha)'));
+ assert(main.includes("['frontend']"));
+ assert(!main.includes("kind: 'compatibility'"));
+ assert(main.includes('await verifyMain({ github, context, kind })'));
+ assert(main.includes('await gate.verifyMerged(github,context,core)'));
+ assert(policyPath('apps/web/scripts/ci-proof.mjs'));
+ assert(policyPath('apps/web/scripts/ci-scope.mjs'));
+ for(const path of ['docs/workflows.md','apps/backend/docs/documentation-development.md','apps/web/docs/development.md'])assert.equal(classifyChanges([change(path)]).kind,'documentation');
+ for(const path of ['docs/workflows.json','apps/backend/scripts/update-docs.mjs','apps/backend/scripts/capture-docs.mjs'])assert.equal(classifyChanges([change(path)]).kind,'full');
+ assert(!main.includes('pnpm install'));assert(!main.includes('test:clean'));assert(!main.includes('recovery'));
+ const fast=fs.readFileSync('.github/workflows/ci-fast.yml','utf8');assert(fast.includes("if: needs.selection.outputs.setup == 'true'"));assert(fast.includes("if: github.ref == 'refs/heads/main'"));assert(!fast.includes('statuses: write'));assert(!fast.includes('pull_request:'));assert(!fast.includes('push:'));
+ const full=fs.readFileSync('.github/workflows/ci-full.yml','utf8');const docs=full.slice(full.indexOf('  documentation:'));assert(!docs.includes('pnpm'));assert(!docs.includes('test:db'));assert(docs.includes('docs-check.mjs'));
+});
+
+test('cumulative scope covers rename old endpoints and retains runtime after a later frontend or prose commit',()=>fixture((dir,git)=>{
+ const base=git('rev-parse','HEAD');mkdirSync(join(dir,'apps/web'),{recursive:true});writeFileSync(join(dir,'apps/web/page.tsx'),'frontend');git('add','.');git('commit','-m','frontend');
+ assert.equal(localScope(base,git('rev-parse','HEAD'),dir).backend,false);
+ mkdirSync(join(dir,'apps/backend/database'),{recursive:true});writeFileSync(join(dir,'apps/backend/database/kernel.sql'),'runtime');git('add','.');git('commit','-m','backend');
+ const beforeRename=git('rev-parse','HEAD');git('mv','apps/backend/database/kernel.sql','apps/web/moved.sql');git('commit','-m','rename');
+ assert.equal(localScope(beforeRename,git('rev-parse','HEAD'),dir).backend,true);
+ writeFileSync(join(dir,'README.md'),'later docs');git('add','.');git('commit','-m','docs');
+ // The removed backend source endpoint stays in the cumulative diff.
+ assert.equal(localScope(beforeRename,git('rev-parse','HEAD'),dir).backend,true);
+ const beforeLink=git('rev-parse','HEAD');fs.unlinkSync(join(dir,'README.md'));fs.symlinkSync('apps/web/page.tsx',join(dir,'README.md'));git('add','.');git('commit','-m','unsafe prose');
+ assert.throws(()=>localScope(beforeLink,git('rev-parse','HEAD'),dir),/UNSAFE_DOCUMENT/);
+}));
+
+test('scope CLI runs before dependency installation and emits only the cumulative backend requirement',()=>fixture((dir,git)=>{
+ mkdirSync(join(dir,'apps/web'),{recursive:true});writeFileSync(join(dir,'apps/web/page.tsx'),'frontend');git('add','.');git('commit','-m','frontend');
+ const output=join(dir,'outputs');
+ const run=()=>{
+  writeFileSync(output,'');execFileSync(process.execPath,[resolve('apps/backend/scripts/ci/scope.mjs')],{cwd:dir,env:{...process.env,HEAD:git('rev-parse','HEAD'),GITHUB_OUTPUT:output},stdio:'pipe'});
+  return fs.readFileSync(output,'utf8');
+ };
+ assert(run().includes('backend=false'));assert(run().includes('kind=frontend'));
+ mkdirSync(join(dir,'apps/backend/database'),{recursive:true});writeFileSync(join(dir,'apps/backend/database/kernel.sql'),'runtime');git('add','apps/backend');git('commit','-m','backend');
+ writeFileSync(join(dir,'README.md'),'later docs');git('add','README.md');git('commit','-m','prose');
+ assert(run().includes('backend=true'));assert(run().includes('documentation=true'));
+}));
+
+test('real Turbo dependency filters run backend and frontend independently and include shared consumers',()=>fixture((dir)=>{
+ writeFileSync(join(dir,'package.json'),JSON.stringify({name:'scope-probe',private:true,packageManager:'pnpm@12.15.0'}));
+ writeFileSync(join(dir,'pnpm-workspace.yaml'),'packages:\n  - apps/*\n  - packages/*\n');
+ writeFileSync(join(dir,'turbo.json'),JSON.stringify({tasks:{verify:{dependsOn:['^typecheck'],cache:false},typecheck:{cache:false}}}));
+ for(const [folder,name,deps] of [['apps/backend','@ftksaas/backend',{'@ftksaas/api-contracts':'workspace:*'}],['apps/web','@ftksaas/web',{'@ftksaas/api-contracts':'workspace:*','@ftksaas/ui':'workspace:*'}],['packages/ui','@ftksaas/ui',{}],['packages/api-contracts','@ftksaas/api-contracts',{}]]){
+  mkdirSync(join(dir,folder),{recursive:true});writeFileSync(join(dir,folder,'package.json'),JSON.stringify({name,private:true,dependencies:deps,scripts:{verify:'exit 1',typecheck:'exit 1'}}));
+ }
+ const graph=filter=>JSON.parse(execFileSync(resolve('node_modules/.bin/turbo'),['run','verify','--filter='+filter,'--dry=json'],{cwd:dir,encoding:'utf8',stdio:['ignore','pipe','pipe']}));
+ const installed=JSON.parse(execFileSync(resolve('node_modules/.bin/turbo'),['run','verify','--filter=@ftksaas/backend...','--dry=json'],{encoding:'utf8',stdio:['ignore','pipe','pipe']}));
+ for(const task of installed.tasks)assert(!['@ftksaas/web','@ftksaas/ui'].includes(task.package),'Backend must not depend on frontend packages');
+ const backend=graph('@ftksaas/backend...').tasks.map(t=>t.package),frontend=graph('@ftksaas/web...').tasks.map(t=>t.package);
+ assert(backend.includes('@ftksaas/backend'));assert(backend.includes('@ftksaas/api-contracts'));assert(!backend.includes('@ftksaas/web'));assert(!backend.includes('@ftksaas/ui'));
+ assert(frontend.includes('@ftksaas/web'));assert(frontend.includes('@ftksaas/api-contracts'));assert(frontend.includes('@ftksaas/ui'));assert(!frontend.includes('@ftksaas/backend'));
+}));
+
+test('scope and its pre-install CLI give identical full-tree decisions from repository root and backend cwd',()=>fixture((dir,git)=>{
+ const backend=join(dir,'apps/backend');mkdirSync(backend,{recursive:true});
+ const base=git('rev-parse','HEAD');
+ writeFileSync(join(dir,'README.md'),'Changed prose');git('add','.');git('commit','-m','docs');
+ let head=git('rev-parse','HEAD');
+ assert.deepEqual(localScope(base,head,backend),localScope(base,head,dir));
+ assert.equal(localScope(base,head,backend).kind,'documentation');
+ mkdirSync(join(backend,'database'),{recursive:true});writeFileSync(join(backend,'database/kernel.sql'),'runtime');git('add','.');git('commit','-m','backend');head=git('rev-parse','HEAD');
+ assert.deepEqual(localScope(base,head,backend),localScope(base,head,dir));assert.equal(localScope(base,head,backend).backend,true);
+ for(const cwd of [dir,backend]){
+  const output=join(dir,'scope-output');writeFileSync(output,'');
+  execFileSync(process.execPath,[resolve('apps/backend/scripts/ci/scope.mjs')],{cwd,env:{...process.env,HEAD:head,GITHUB_OUTPUT:output},stdio:'pipe'});
+  assert(fs.readFileSync(output,'utf8').includes('backend=true'));
+ }
+ const beforeLink=head;fs.unlinkSync(join(dir,'README.md'));fs.symlinkSync('apps/backend/database/kernel.sql',join(dir,'README.md'));git('add','README.md');git('commit','-m','symlink');head=git('rev-parse','HEAD');
+ for(const cwd of [dir,backend])assert.throws(()=>localScope(beforeLink,head,cwd),/UNSAFE_DOCUMENT/);
+}));
+
+test('frontend-only main marker runs without checkout from runner workspace root',()=>{
+ const source=fs.readFileSync('.github/workflows/backend.yml','utf8');
+ const marker=source.slice(source.indexOf('  frontend:\n'),source.indexOf('  clean:\n'));
+ assert(marker.includes('working-directory: .'));
+ assert(marker.includes('Backend unchanged (no backend acceptance)'));
+});
+
+test('manual shards retain every selected API suite once and reject unknown or duplicate inventory',()=>{
+ for(const api of [[],[apiSuites[0]],apiSuites.slice(2,8),apiSuites]){
+  const bins=targetedPartitions({api});assert.deepEqual(bins.flatMap(b=>b.suites).sort(),[...api].sort());assert(bins.length<=4);
+ }
+ for(const api of [[apiSuites[0],apiSuites[0]],['tests/unknown.test.mjs']])assert.throws(()=>targetedPartitions({api}));
+ const pkg=JSON.parse(fs.readFileSync('apps/backend/package.json'));assertManualInventory(pkg);
+ for(const command of [pkg.scripts['test:api']+' tests/new-api.test.mjs',pkg.scripts['test:api'].replace('tests/registry.test.mjs',''),pkg.scripts['test:api'].replace('--test-concurrency=2','--test-concurrency=4')])assert.throws(()=>assertManualInventory({scripts:{'test:api':command}}));
+});
+
+test('manual exact range rejects abbreviated SHA, wrong checkout and non-ancestor base',()=>fixture((dir,git)=>{
+ const base=git('rev-parse','HEAD');writeFileSync(join(dir,'README.md'),'New source');git('add','.');git('commit','-m','head');const head=git('rev-parse','HEAD');
+ assertManualRange(base,head,git);assert.throws(()=>assertManualRange(base.slice(0,7),head,git));assert.throws(()=>assertManualRange(base,base,git));
+ git('checkout','--orphan','unrelated');git('commit','--allow-empty','-m','unrelated');assert.throws(()=>assertManualRange(base,git('rev-parse','HEAD'),git));
+}));
+
+test('manual CLI plans an explicit commit range independently of origin/main and creates no merge receipt',()=>fixture((dir,git)=>{
+ const pkg=JSON.parse(fs.readFileSync('apps/backend/package.json'));mkdirSync(join(dir,'apps/backend'),{recursive:true});writeFileSync(join(dir,'apps/backend/package.json'),JSON.stringify(pkg));git('add','.');git('commit','-m','package');const base=git('rev-parse','HEAD');
+ mkdirSync(join(dir,'apps/backend/database'),{recursive:true});writeFileSync(join(dir,'apps/backend/database/kernel.sql'),'runtime');git('add','.');git('commit','-m','runtime');
+ const singleBase=git('rev-parse','HEAD');writeFileSync(join(dir,'README.md'),'Prose after runtime');git('add','.');git('commit','-m','prose');const head=git('rev-parse','HEAD'),output=join(dir,'output');
+ const run=from=>{writeFileSync(output,'');execFileSync(process.execPath,[resolve('apps/backend/scripts/ci/manual-targeted.mjs'),'plan',from,head],{cwd:dir,env:{...process.env,FTK_MANUAL_SOURCE_ROOT:dir,GITHUB_OUTPUT:output},stdio:'pipe'});return JSON.parse(fs.readFileSync(join(dir,'.artifacts/ci/selection.json')));};
+ assert.equal(run(singleBase).api.length,0);assert(fs.readFileSync(output,'utf8').includes('setup=false'));
+ assert.equal(run(base).api.length,apiSuites.length);assert(fs.readFileSync(output,'utf8').includes('setup=true'));assert(!fs.existsSync(join(dir,'.artifacts/ci/binding.json')));
+}));
+
+test('automatic candidate tests Draft source, binds the live main base and rejects retarget or moved head',async()=>{
+ for(const [paths,kind] of [[['apps/backend/database/kernel.sql'],'full'],[['README.md'],'documentation']]){
+  const {github,pr}=scopedGithub(paths);pr.draft=true;const out={},context={repo:{},issue:{number:9},payload:{pull_request:structuredClone(pr)},runId:8,sha:'M'};
+  await resolveCandidate(github,context,{setOutput:(k,v)=>out[k]=v},'auto');assert.equal(out.kind,kind);assert.equal(out.merge,'M');assert.throws(()=>assertReady(pr));
+  pr.base.ref='feature';await assert.rejects(resolveCandidate(github,context,{setOutput(){}},'auto'),/target main/);
+  pr.base.ref='main';pr.head.sha='moved';await assert.rejects(resolveCandidate(github,context,{setOutput(){}},'auto'),/Candidate changed/);
+ }
+ const gate=fs.readFileSync('.github/workflows/ci-gate.yml','utf8');assert(gate.includes("github.event.action != 'edited' || github.event.changes.base != null"));
+});

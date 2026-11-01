@@ -78,7 +78,7 @@ jobs:
       - if: needs.selection.outputs.setup == 'true'
         run: corepack enable
       - if: needs.selection.outputs.setup == 'true'
-        run: pnpm install --frozen-lockfile
+        run: pnpm --filter @ftksaas/backend... --filter ftksaas install --frozen-lockfile
         working-directory: source
       - name: Selected core and DB tests
         env:
@@ -127,7 +127,7 @@ jobs:
         with:
           node-version-file: 'source/.nvmrc'
       - run: corepack enable
-      - run: pnpm install --frozen-lockfile
+      - run: pnpm --filter @ftksaas/backend... --filter ftksaas install --frozen-lockfile
         working-directory: source
       - name: Selected API shard
         env:

@@ -1,4 +1,4 @@
-import fs from 'node:fs';import {spawnSync} from 'node:child_process';
+import fs from 'node:fs';import {spawnSync} from 'node:child_process';import {performance} from 'node:perf_hooks';
 fs.mkdirSync('.dev',{recursive:true,mode:0o700});const fd=fs.openSync('.dev/native-start.log','w',0o600);
 if(process.env.CI)fs.writeFileSync('.dev/ci-stack-attempted','1');
 // Native calendar acceptance uses only an isolated loopback origin and an
@@ -14,8 +14,11 @@ if(process.env.CI||process.env.FTK_CALENDAR_TEST_FIXTURE==='1'){
   fs.writeFileSync(marker,JSON.stringify({origin,port}),{mode:0o600});
  }
 }
+const nativeStart=performance.now();
 const run=spawnSync('node_modules/.bin/supabase',['start','--runtime','native','--preparation','on-demand','--exclude','analytics,realtime,pooler'],{stdio:['ignore',fd,fd]});fs.closeSync(fd);
 if(run.error)throw run.error;if(run.status!==0){console.error('Local stack start failed; inspect .dev/native-start.log locally.');process.exit(run.status??1);}
 console.log('Isolated local backend started. Run pnpm run dev:info for public connection details.');
 
+const nativeReady=performance.now();
 await import('./wait-local.mjs');
+fs.writeFileSync('.dev/start-timings.json',JSON.stringify({native_start_s:(nativeReady-nativeStart)/1000,initial_readiness_s:(performance.now()-nativeReady)/1000}));

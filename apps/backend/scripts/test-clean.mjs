@@ -19,13 +19,18 @@ console.log('Supabase CLI:',execFileSync('node_modules/.bin/supabase',['--versio
 console.log('Clean coverage:',coverageHash(),'role:',role,'shard:',shard?.shard??'none');
 const phaseStart=performance.now();
 run('pnpm',['run','dev:start']);
+const startDone=performance.now();
+const startTiming=JSON.parse(fs.readFileSync('.dev/start-timings.json','utf8'));
 const url=stackStatus().env?.DB_URL;
 if(!url||!['127.0.0.1','localhost'].includes(new URL(url).hostname))throw new Error('LOCAL_DB_REQUIRED');
 fs.mkdirSync('.dev',{recursive:true,mode:0o700});
 const fd=fs.openSync('.dev/clean-reset.log','w',0o600);
+const resetStart=performance.now();
 try { run('node_modules/.bin/supabase',['db','reset','--local','--no-seed','--yes'],{stdio:['ignore',fd,fd]}); }
 finally { fs.closeSync(fd); }
+const resetDone=performance.now();
 await import('./wait-local.mjs');
+const readyAt=performance.now();
 const db=await connect();
 try {
  const expected=Object.keys(JSON.parse(fs.readFileSync('database/migrations.sha256.json'))).map(x=>x.split('_')[0]).sort();
@@ -56,7 +61,7 @@ console.log('Clean acceptance completed: migrations, tests, synthetic seed and s
 }
 console.log('Completed clean role:',role,shard?.shard??'',coverageHash());
 
-const phases={role,shard:shard?.shard??null,coverage:coverageHash(),backend_setup_s:(preparedAt-phaseStart)/1000,tests_s:(testsAt-preparedAt)/1000,seed_health_advisors_s:(performance.now()-testsAt)/1000};
+const phases={role,shard:shard?.shard??null,coverage:coverageHash(),backend_setup_s:(preparedAt-phaseStart)/1000,setup:{...startTiming,start_command_s:(startDone-phaseStart)/1000,reset_migrations_s:(resetDone-resetStart)/1000,post_reset_readiness_s:(readyAt-resetDone)/1000,empty_database_verification_s:(preparedAt-readyAt)/1000},tests_s:(testsAt-preparedAt)/1000,seed_health_advisors_s:(performance.now()-testsAt)/1000};
 fs.mkdirSync(ciFile('timings'),{recursive:true});fs.writeFileSync(ciFile('timings','clean-'+role+(shard?.shard??'')+'.json'),JSON.stringify({clean_phases:phases}));
 console.log('Clean phase timings:',JSON.stringify(phases));
 if(process.env.GITHUB_STEP_SUMMARY)fs.appendFileSync(process.env.GITHUB_STEP_SUMMARY,'\nClean phase timings (backend setup separate from tests):\n```json\n'+JSON.stringify(phases,null,2)+'\n```\n');

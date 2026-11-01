@@ -5,6 +5,25 @@ import {constants} from 'node:os';
 import {pathToFileURL} from 'node:url';
 import {ciFile} from '../paths.mjs';
 
+// API-1 oneshot acceptance peaked at 1.19 GiB in run 41297723495.
+// 3 GiB leaves >2x measured headroom while bounding the previous 14 GiB failure.
+export const EDGE_MEMORY_LIMIT_KIB=3*1024*1024;
+const edgeProcess=p=>/^\.?edge-runtime(?:-w)?$/.test(p.name??'');
+export function edgeMemoryBudget(){
+ let samples=0,peak=0,reason=null;
+ return {
+  unavailable(){reason='EDGE_SAMPLE_UNAVAILABLE';},
+  sample(snapshot){
+   const workers=snapshot.processes.filter(edgeProcess);
+   if(!workers.length)return;
+   if(workers.some(p=>!Number.isSafeInteger(p.rss_kib)||p.rss_kib<0)){reason='EDGE_SAMPLE_INVALID';return;}
+   samples++;peak=Math.max(peak,workers.reduce((sum,p)=>sum+p.rss_kib,0));
+   if(peak>EDGE_MEMORY_LIMIT_KIB)reason='EDGE_RSS_LIMIT';
+  },
+  result(){return {passed:!reason&&samples>=2,reason:reason??(samples>=2?null:'EDGE_SAMPLES_MISSING'),samples,peak_kib:peak,limit_kib:EDGE_MEMORY_LIMIT_KIB};}
+ };
+}
+
 export function memorySnapshot(root='/proc'){
  const text=fs.readFileSync(path.join(root,'meminfo'),'utf8');
  const memory=Object.fromEntries([...text.matchAll(/^(MemTotal|MemAvailable|SwapTotal|SwapFree):\s+(\d+) kB$/gm)].map(m=>[m[1]+'_kib',Number(m[2])]));
@@ -15,7 +34,9 @@ export function memorySnapshot(root='/proc'){
    processes.push({pid:Number(pid),ppid:Number(field('PPid')),name:field('Name'),rss_kib:Number(field('VmRSS')?.split(' ')[0]??0)});
   }catch{/* A process can exit between directory listing and reading status. */}
  }
- return {memory,processes:processes.sort((a,b)=>b.rss_kib-a.rss_kib).slice(0,15)};
+ const ranked=processes.sort((a,b)=>b.rss_kib-a.rss_kib);
+ // Keep every Edge process even when unrelated processes occupy the top 15.
+ return {memory,processes:ranked.filter((p,i)=>i<15||edgeProcess(p))};
 }
 export function signalEvent(line,readStatus=tid=>fs.readFileSync(`/proc/${tid}/status`,'utf8')){
  // trace_pipe's prefix identifies the sender thread, not necessarily its TGID.
@@ -54,7 +75,7 @@ if [ -d "$instance" ]; then
 fi
 `;
 
-export async function observe(command,args,{intervalMs=5000,trace=true,docker=true,output=ciFile('diagnostics',`api-1-${process.env.GITHUB_RUN_ATTEMPT??'local'}.jsonl`)}={}){
+export async function observe(command,args,{intervalMs=5000,trace=true,docker=true,memoryGuard=process.env.FTK_EDGE_MEMORY_GUARD==='1',readMemory=memorySnapshot,output=ciFile('diagnostics',`api-${/^[1-4]$/.test(process.env.SHARD??'')?process.env.SHARD:'local'}-${process.env.GITHUB_RUN_ATTEMPT??'local'}.jsonl`)}={}){
  fs.mkdirSync(path.dirname(output),{recursive:true});
  const record=(kind,data)=>{
   const line=JSON.stringify({at:new Date().toISOString(),kind,...data});
@@ -63,6 +84,14 @@ export async function observe(command,args,{intervalMs=5000,trace=true,docker=tr
   fs.appendFileSync(output,line+'\n');process.stdout.write('[host-observer] '+line+'\n');
  };
  const children=[];let instance;let stopped=false;
+ const budget=memoryGuard?edgeMemoryBudget():null;let child,limitTimer;
+ // A fresh process group contains only this command and its descendants.
+ const signalCommand=signal=>{if(!child?.pid)return;try{if(process.platform==='win32')child.kill(signal);else process.kill(-child.pid,signal);}catch(error){if(error.code!=='ESRCH')throw error;}};
+ const stopForMemory=()=>{
+  if(limitTimer||!child)return;
+  record('observer.memory_stop',{reason:budget.result().reason});signalCommand('SIGTERM');
+  limitTimer=setTimeout(()=>signalCommand('SIGKILL'),2000);
+ };
  const stream=(name,cmd,argv,parse)=>{
   const child=spawn(cmd,argv,{stdio:['ignore','pipe','pipe']});children.push(child);
   let pending='';child.stdout.on('data',bytes=>{pending+=bytes.toString();let end;while((end=pending.indexOf('\n'))>=0){const line=pending.slice(0,end);pending=pending.slice(end+1);try{const data=parse(line);if(data)record(name,data);}catch{record('observer.warning',{component:name,reason:'INVALID_EVENT'});}}});
@@ -73,7 +102,7 @@ export async function observe(command,args,{intervalMs=5000,trace=true,docker=tr
  };
  record('observer.start',{pid:process.pid,command:path.basename(command),run:process.env.GITHUB_RUN_ID??null,attempt:process.env.GITHUB_RUN_ATTEMPT??null});
  if(trace){
-  const name=`ftk-api1-${process.pid}`;
+  const name=`ftk-api-${process.pid}`;
   const r=spawnSync('sudo',['-n','sh','-s','--',name],{input:setupTrace,encoding:'utf8',timeout:10000,maxBuffer:65536});
   if(r.status===0&&r.stdout.trim()===`/sys/kernel/tracing/instances/${name}`){instance=name;stream('signal','sudo',['-n','cat',`${r.stdout.trim()}/trace_pipe`],signalEvent);record('observer.trace',{available:true});}
   else{spawnSync('sudo',['-n','sh','-s','--',name],{input:removeTrace,timeout:5000,stdio:['pipe','ignore','ignore']});record('observer.warning',{component:'signal',reason:'TRACEFS_UNAVAILABLE',code:r.status});}
@@ -83,7 +112,9 @@ export async function observe(command,args,{intervalMs=5000,trace=true,docker=tr
  async function sample(){
   if(busy||stopped)return;busy=true;
   try{
-   try{record('memory',memorySnapshot());}catch{record('observer.warning',{component:'memory',reason:'PROC_UNAVAILABLE'});}
+   try{const snapshot=readMemory();record('memory',snapshot);budget?.sample(snapshot);
+    if(budget&&['EDGE_RSS_LIMIT','EDGE_SAMPLE_INVALID'].includes(budget.result().reason))stopForMemory();
+   }catch{budget?.unavailable();record('observer.warning',{component:'memory',reason:'PROC_UNAVAILABLE'});}
    try{const files=['memory.current','memory.peak','memory.max','memory.events'];const values={};for(const f of files){try{values[f]=fs.readFileSync('/sys/fs/cgroup/'+f,'utf8').trim();}catch{}}record('cgroup',{values});}catch{}
    if(docker){
     const stats=spawn('docker',['stats','--no-stream','--format','{{json .}}'],{stdio:['ignore','pipe','ignore']});children.push(stats);let data='';
@@ -95,19 +126,22 @@ export async function observe(command,args,{intervalMs=5000,trace=true,docker=tr
   }finally{busy=false;}
  }
  await sample();const timer=setInterval(()=>{sampling=sample();},intervalMs);
- const child=spawn(command,args,{stdio:'inherit'});
- const forward=signal=>{record('observer.signal',{signal});child.kill(signal);};
+ child=spawn(command,args,{stdio:'inherit',detached:process.platform!=='win32'});
+ if(budget&&['EDGE_RSS_LIMIT','EDGE_SAMPLE_INVALID'].includes(budget.result().reason))setImmediate(stopForMemory);
+ const forward=signal=>{record('observer.signal',{signal});signalCommand(signal);};
  const onInt=()=>forward('SIGINT'),onTerm=()=>forward('SIGTERM');process.on('SIGINT',onInt);process.on('SIGTERM',onTerm);
  let result;
  try{result=await new Promise(resolve=>{child.once('error',error=>resolve({code:1,error:error.code}));child.once('exit',(code,signal)=>resolve({code,signal}));});record('test.exit',result);}
  finally{
-  stopped=true;clearInterval(timer);process.off('SIGINT',onInt);process.off('SIGTERM',onTerm);
+  stopped=true;clearInterval(timer);if(limitTimer){clearTimeout(limitTimer);signalCommand('SIGKILL');}process.off('SIGINT',onInt);process.off('SIGTERM',onTerm);
   for(const c of children)if(c.exitCode===null&&!c.killed)c.kill('SIGTERM');
   await sampling;
   await Promise.all(children.filter(c=>c.exitCode===null&&c.signalCode===null).map(c=>new Promise(resolve=>{const timeout=setTimeout(resolve,1000);c.once('close',()=>{clearTimeout(timeout);resolve();});})));
   if(instance)spawnSync('sudo',['-n','sh','-s','--',instance],{input:removeTrace,timeout:5000,stdio:['pipe','ignore','ignore']});
  }
- return result.code??(128+(constants.signals[result.signal]??1));
+ const code=result.code??(128+(constants.signals[result.signal]??1));
+ if(budget){const acceptance=budget.result();record('memory.acceptance',acceptance);if(!acceptance.passed)return code||1;}
+ return code;
 }
 if(import.meta.url===pathToFileURL(process.argv[1]??'').href){
  const [command,...args]=process.argv.slice(2);if(!command)throw Error('OBSERVED_COMMAND_REQUIRED');

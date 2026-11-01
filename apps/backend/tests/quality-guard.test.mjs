@@ -77,3 +77,12 @@ test('exception is specific, time bounded, and never hides another finding', () 
     assert.throws(()=>applyExceptions(findings,[{...entry,...edit}],new Date('2026-11-02')));
   }
 });
+
+test('quality exceptions reject absent reasons and independently expired dates', () => {
+  const entry={rule:'assertion-changed',path:'tests/example.test.mjs',fingerprint:'a'.repeat(64),owner:'reviewer',reason:'Reviewed synthetic exception with bounded lifetime.',created:'2026-10-01',expires:'2026-11-15'};
+  for(const reason of [undefined,null,'','   ','too short']) {
+    assert.throws(()=>applyExceptions([],[{...entry,reason}],new Date('2026-11-02')));
+  }
+  assert.throws(()=>applyExceptions([],[{...entry,expires:'2026-10-31'}],new Date('2026-11-02')));
+  assert.deepEqual(applyExceptions([],[entry],new Date('2026-11-02')),[]);
+});

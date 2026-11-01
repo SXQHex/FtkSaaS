@@ -233,7 +233,7 @@ export async function hostedSmoke(api,sql,record){
   record('real_auth_login',session.status===200&&!!token&&session.data.user?.id===authId);
   const account=await edge('account_get_v1');record('auth_edge_rpc_account',account.status===200&&account.data.ok===true);
   const orgs=await edge('organizations_list_v1',{page:{}});record('organizations_read',orgs.status===200&&orgs.data.ok===true);
-  const finance=await edge('finance_get_v1',{org_id:uuid(),center_id:uuid(),person_id:uuid(),currency:'TRY',page:{}});record('finance_tenant_boundary',finance.status===200&&finance.data.ok===false&&finance.data.error?.code==='NOT_FOUND');
+  const finance=await edge('finance_get_v1',{org_id:uuid(),center_id:uuid(),person_id:uuid(),currency:'TRY',page:{}});record('nonexistent_finance_resource_rejected',finance.status===200&&finance.data.ok===false&&finance.data.error?.code==='NOT_FOUND');
   const direct=await http('/rest/v1/rpc/finance_get_v1',{token,headers:{'Content-Profile':'api_v1'},body:{p_request:{},p_actor_auth_id:authId,p_session_id:uuid(),p_ids:[],p_aux:null}});record('direct_rpc_rejected',direct.status===403&&direct.data.code==='42501');
   const invalid=await http('/functions/v1/backend-v1/account_get_v1',{token:'invalid-jwt',body:{client_api_version:1,request_id:uuid()}});record('invalid_jwt_rejected',invalid.status===401);
   const logout=await http('/auth/v1/logout',{token,body:{}});record('logout',logout.status===200||logout.status===204);

@@ -1,292 +1,48 @@
-import {repositoryRoot,repoFile,ciFile} from '../scripts/paths.mjs';
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import {coverageHash,validateJobs} from '../scripts/ci/shards.mjs';
+import {ciFile,repoFile,repositoryRoot} from '../scripts/paths.mjs';
+import fs,{rmSync,writeFileSync,mkdtempSync} from 'node:fs';
+import {validateBinding,verifyMerged,validateDocumentBinding,checkPr,findCandidateProof,schemaBaselineName} from '../scripts/ci/gate.mjs';
+import {assertReady,assertParents,policyPath,resolveCandidate,currentAttemptBinding} from '../scripts/ci/source.mjs';
+import {measurements,collect} from '../scripts/ci/collect.mjs';
+import {classifyChanges} from '../scripts/ci/scope.mjs';
+import {join} from 'node:path';
+import {tmpdir} from 'node:os';
+import {valid,scopedGithub,change,candidateProofFixture,jobsWithApiSeconds} from './ci-fixtures.mjs';
 process.chdir(repositoryRoot);
-import test from 'node:test';import assert from 'node:assert/strict';import fs from 'node:fs';
-import {deploymentSource,resolveAcceptedSource,revalidateDeployment} from '../scripts/ci/deployment-source.mjs';
-import {registryPath,livingMarkdown,validateDocumentRegistry,renderDocumentMap} from '../scripts/document-registry.mjs';
-import {sameMigration,migrationPlan,migrationBody,migrationBatch,hostedSmoke,unchangedEdge,project} from '../scripts/ci/deploy-development.mjs';
 
-test('unchanged Edge requires both trusted source receipt and live version/JWT match',()=>{
- const previous={success:true,project,edge_version:3,edge_source_sha256:'hash'},edge={version:3,status:'ACTIVE',verify_jwt:true};
- assert(unchangedEdge(previous,edge,'hash'));
- for(const [p,e,h] of [[null,edge,'hash'],[{...previous,success:false},edge,'hash'],[{...previous,project:'other'},edge,'hash'],[previous,{...edge,version:4},'hash'],[previous,{...edge,verify_jwt:false},'hash'],[previous,edge,'changed']])assert(!unchangedEdge(p,e,h));
-});
-test('hosted smoke checks real request sequence and cleans its exact UUID even on a failed assertion',async()=>{
- const original=globalThis.fetch;
- try{for(const captchaEnabled of [false,true])for(const failure of [false,true]){
-  let id,password,deleted=false,loggedOut=false,accountRemoved=false;const checks=[];
-  globalThis.fetch=async(url,options)=>{
-   const body=options.body?JSON.parse(options.body):null;
-   const response=(status,data)=>({status,text:async()=>status===204?'':JSON.stringify(data)});
-   if(url.endsWith('/auth/v1/admin/users')){id=body.id;password=body.password;assert.equal(body.email_confirm,true);return response(200,{id});}
-   if(url.includes('/auth/v1/admin/users/')){assert(url.endsWith(id));assert(accountRemoved);deleted=true;return response(200,{});}
-   if(url.includes('/auth/v1/token?')){
-    assert.equal(body.email,'cd-'+id+'@example.invalid');
-    if(options.headers.apikey==='synthetic-public'){
-     assert.equal(options.headers.Authorization,undefined);assert(body.password!==password);
-     return response(400,{error_code:captchaEnabled?'captcha_failed':'invalid_credentials'});
-    }
-    assert.equal(options.headers.apikey,'synthetic-admin');assert.equal(options.headers.Authorization,'Bearer synthetic-admin');
-    return body.password===password?response(200,{access_token:'synthetic-jwt',user:{id}}):response(400,{error_code:'invalid_credentials'});
-   }
-   if(url.endsWith('/auth/v1/logout')){loggedOut=true;return response(204,{});}
-   if(url.includes('/rest/v1/rpc/'))return response(403,{code:'42501'});
-   if(options.headers.Authorization==='Bearer invalid-jwt')return response(401,{});
-   if(url.endsWith('/account_get_v1')){assert.equal(options.headers.Authorization,'Bearer synthetic-jwt');assert.equal(options.headers.apikey,'synthetic-public');return failure?response(500,{}):loggedOut?response(401,{ok:false,error:{code:'AUTH_REQUIRED'}}):response(200,{ok:true,data:{id:'synthetic-account'}});}
-   if(url.endsWith('/organizations_list_v1'))return response(200,{ok:true});
-   if(url.endsWith('/finance_get_v1'))return response(200,{ok:false,error:{code:'NOT_FOUND'}});
-   throw Error('Unexpected hosted request');
-  };
-  const api=async()=>[{type:'publishable',api_key:'synthetic-public'},{name:'service_role',api_key:'synthetic-admin'}];
-  const sql=async(query)=>{assert(query.includes(id));if(query.startsWith('do $ftk_smoke_cleanup$')){assert(query.includes('delete from private.p07_profiles where account_id in (select id from core.accounts where auth_user_id='));assert(query.indexOf('delete from private.p07_profiles')<query.indexOf('delete from core.accounts'));assert.equal(query.split(id).length-1,2);accountRemoved=true;return [];}assert(deleted);return [{accounts:0,users:0}];};
-  const record=(name,passed)=>{checks.push({name,passed});assert(passed,name);};
-  if(failure)await assert.rejects(hostedSmoke(api,sql,record),/auth_edge_rpc_account/);else await hostedSmoke(api,sql,record);
-  assert(accountRemoved&&deleted);assert(checks.some(c=>c.name==='synthetic_fixture_removed'&&c.passed));
-  for(const name of ['public_invalid_login_rejected','trusted_invalid_password_rejected','real_auth_login'])assert(checks.some(c=>c.name===name&&c.passed));
-  if(!failure)assert(checks.some(c=>c.name==='revoked_session_rejected'&&c.passed));
- }}finally{globalThis.fetch=original;}
-});
+const rerunFixture=()=>{
+ const binding={kind:'full',profile:'four-isolated-v2',coverage:coverageHash(),pr:9,head:'H',base:'B',merge:'M',tree:'T',run_id:5,attempt:1,benchmark:false};
+ const pr={number:9,state:'open',draft:false,head:{sha:'H'},base:{sha:'B',ref:'main'}};
+ const run={id:5,run_attempt:2,head_sha:'H',event:'pull_request',path:'.github/workflows/ci-full.yml',status:'in_progress',created_at:'2026-01-01T00:00:00Z'};
+ // GitHub's attempt view carries retained successes under the current attempt
+ // and new job IDs, while preserving their original execution timestamps.
+ const jobs=['core','api-1','api-2','api-3','api-4'].map((name,i)=>({id:100+i,name:'clean / '+name,run_id:5,run_attempt:2,head_sha:'H',status:'completed',conclusion:'success',created_at:run.created_at,started_at:'2026-01-01T00:00:01Z',completed_at:'2026-01-01T00:02:00Z',steps:[{name:'Verify tested merge',conclusion:'success'},{name:'Clean acceptance',conclusion:'success',started_at:'2026-01-01T00:00:02Z',completed_at:'2026-01-01T00:01:02Z'}]}));
+ jobs[0].steps.push({name:'Upload schema baseline',conclusion:'success'});
+ const context={repo:{},runId:5,sha:'M',payload:{pull_request:structuredClone(pr)}};
+ const github={rest:{actions:{getWorkflowRun:async()=>({data:run}),listJobsForWorkflowRunAttempt:'attempt-jobs'}},paginate:async(method,args)=>{assert.equal(method,'attempt-jobs');assert.equal(args.attempt_number,2);return jobs;}};
+ const core={warning(){},summary:{addRaw(){return this;},async write(){}}};
+ return{binding,pr,run,jobs,context,github,core};
+};
 
-test('CD accepts only current successful main full acceptance with every executed job',()=>{
- const v=valid();v.run={...v.run,path:'.github/workflows/backend.yml',event:'push',head_branch:'main',head_sha:'a'.repeat(40),repository:{full_name:'SXQHex/FtkSaaS'},head_repository:{full_name:'SXQHex/FtkSaaS'}};
- v.jobs=v.jobs.map(j=>({...j,head_sha:v.run.head_sha}));
- v.jobs.push({name:'source',status:'completed',conclusion:'success',run_id:5,run_attempt:1,head_sha:v.run.head_sha});
- const x={run:v.run,jobs:v.jobs,currentMain:v.run.head_sha,repository:'SXQHex/FtkSaaS',attempt:1};
- assert.equal(deploymentSource(x).deploy,true);
- assert.equal(deploymentSource({...x,currentMain:'b'.repeat(40)}).deploy,false);
- for(const mutate of [z=>z.run.event='pull_request',z=>z.run.path='.github/workflows/ci-full.yml',z=>z.run.head_repository.full_name='fork/repo',z=>z.run.conclusion='failure',z=>z.run.head_branch='feature',z=>z.attempt=2,z=>z.jobs.splice(2,1),z=>z.jobs[0].conclusion='skipped',z=>z.jobs.at(-1).head_sha='other']){const z=structuredClone(x);mutate(z);assert.throws(()=>deploymentSource(z));}
- const doc={name:'documentation',status:'completed',conclusion:'success',run_id:5,run_attempt:1,head_sha:v.run.head_sha,steps:[{name:'Documentation main acceptance (no full clean)',conclusion:'success'}]};
- assert.equal(deploymentSource({...x,jobs:[v.jobs.at(-1),doc]}).deploy,false);
-});
-test('CD catches up accepted runtime through docs-only main in either completion order and rejects runtime supersession',async()=>{
- const repo={owner:'SXQHex',repo:'FtkSaaS'},a='a'.repeat(40),b='b'.repeat(40),v=valid();
- const run={...v.run,path:'.github/workflows/backend.yml',event:'push',head_branch:'main',head_sha:a,repository:{full_name:'SXQHex/FtkSaaS'},head_repository:{full_name:'SXQHex/FtkSaaS'}};
- const source={name:'source',status:'completed',conclusion:'success',run_id:5,run_attempt:1,head_sha:a};
- const jobs=[...v.jobs.map(j=>({...j,head_sha:a})),source];
- const docs={...run,id:6,head_sha:b},docJobs=[{...source,run_id:6,head_sha:b},{name:'documentation',status:'completed',conclusion:'success',run_id:6,run_attempt:1,head_sha:b,steps:[{name:'Documentation main acceptance (no full clean)',conclusion:'success'}]}];
- let fullFinished=false,runtimeChanged=false,liveAttempt=1,conclusion='success';
- const github={rest:{
-  git:{getRef:async()=>({data:{object:{sha:b}}}),getTree:async({tree_sha})=>({data:{tree:[{path:'README.md',mode:'100644',type:'blob',sha:tree_sha+'doc'},{path:'apps/backend/database/kernel.sql',mode:'100644',type:'blob',sha:runtimeChanged&&tree_sha===b?'changed':'same'}]}}),getBlob:async()=>({data:{encoding:'base64',content:Buffer.from('Safe documentation').toString('base64')}})},
-  repos:{compareCommitsWithBasehead:async()=>({data:{status:'ahead'}})},
-  actions:{getWorkflowRun:async()=>({data:{...run,run_attempt:liveAttempt,conclusion}}),listJobsForWorkflowRun:'jobs',listWorkflowRuns:async()=>({data:{workflow_runs:fullFinished?[run]:[]}})}},paginate:async()=>jobs};
- assert.equal((await resolveAcceptedSource(github,repo,docs,docJobs,b)).deploy,false);
- fullFinished=true;
- const afterFull=await resolveAcceptedSource(github,repo,run,jobs,b,1);
- assert.equal(afterFull.deploy,true);assert.equal(afterFull.sha,a);assert.equal(afterFull.expected_main,b);
- const afterDocs=await resolveAcceptedSource(github,repo,docs,docJobs,b);
- assert.equal(afterDocs.deploy,true);assert.equal(afterDocs.run_id,5);assert.equal(afterDocs.documentation_run_id,6);
- assert.equal((await revalidateDeployment(github,repo,afterDocs)).sha,a);
- liveAttempt=2;await assert.rejects(revalidateDeployment(github,repo,afterDocs),/attempt changed/);
- liveAttempt=1;conclusion='failure';await assert.rejects(revalidateDeployment(github,repo,afterDocs),/acceptance failed/);
- conclusion='success';runtimeChanged=true;
- assert.equal((await resolveAcceptedSource(github,repo,run,jobs,b,1)).deploy,false);
- await assert.rejects(revalidateDeployment(github,repo,afterDocs),/equivalence/);
-});
-test('migration readback accepts verbatim CLI chunks and MCP file but rejects drift or hidden SQL',()=>{
- const sql="-- frozen\nbegin;\nselect 'a; b';\n/* between */ select 2;\ncommit;\n";
- assert(sameMigration(sql,[sql]));
- const chunks=["-- frozen\nbegin","select 'a; b'","/* between */ select 2","commit"];
- assert(sameMigration(sql,chunks));
- for(const changed of [["begin","select 'a;b'","select 2","commit"],["begin","select 'a; b'","commit"],["begin","select 'a; b'","select 2","drop table x","commit"],[],null])assert(!sameMigration(sql,changed));
- const local=[{version:'1',sql},{version:'2',sql:'select 3;'}];
- assert.deepEqual(migrationPlan(local,[{version:'1',statements:chunks}]),[local[1]]);
- assert.throws(()=>migrationPlan(local,[{version:'3',statements:['select 3']}]),/mismatch/);
- assert.throws(()=>migrationPlan(local,[{version:'1',statements:['select 2']}]),/mismatch/);
- assert.throws(()=>migrationPlan(local,[{version:'1',statements:[sql]},{version:'1',statements:[sql]}]),/mismatch/);
-});
-test('atomic migration preparation keeps source bytes and rejects missing envelopes or changed history',()=>{
- const sql="-- frozen\nbegin;\nselect 'commit; and \\n';\ncommit;\n";
- assert.equal(migrationBody(sql),"-- frozen\n      \nselect 'commit; and \\n';\n       \n");
- for(const s of ['select 1;','begin;select 1;','select 1;commit;'])assert.throws(()=>migrationBody(s),/envelope/);
- const local=[{name:'20261021190000_probe.sql',version:'20261021190000',sql}];
- assert.equal(migrationBatch(local,[{version:local[0].version,name:'probe',statements:[sql]}]),null);
- assert.throws(()=>migrationBatch(local,[{version:local[0].version,statements:['select 2']}]),/mismatch/);
- assert.throws(()=>migrationBatch([{...local[0],name:'other.sql'}],[]),/identity/);
- // Every frozen repository migration must support the atomic transport.
- for(const name of fs.readdirSync('apps/backend/supabase/migrations'))if(name.endsWith('.sql'))assert(migrationBody(fs.readFileSync('apps/backend/supabase/migrations/'+name,'utf8')).trim(),name);
- const complex="-- 😀 Türkçe\nbegin;select 'begin;commit;it''s';commit;/* nested /* commit; */ begin; */begin;do $tag$begin perform 'commit;';end$tag$;select E'escaped\\\'commit;', \"commit;\";commit;";
- const transformed=migrationBody(complex);
- for(const preserved of ["-- 😀 Türkçe","'begin;commit;it''s'","/* nested /* commit; */ begin; */",'do $tag$begin perform \'commit;\';end$tag$;',"E'escaped\\\'commit;'",'"commit;"'])assert(transformed.includes(preserved),preserved);
- for(const invalid of ['begin;begin;commit;commit;','commit;','begin;select 1;commit;select 2;','begin;select $$unterminated;commit;','begin;/* unfinished','begin;select \'unfinished'])assert.throws(()=>migrationBody(invalid));
-});
-import {select,parseChanges,apiSuites} from '../scripts/ci/select-tests.mjs';
-import {validateBinding,schemaBaselineName} from '../scripts/ci/gate.mjs';
-import {analyzeDelta} from '../scripts/ci/delta-analysis.mjs';
-import {runApiPhases} from '../scripts/ci/run-targeted.mjs';
-const plan=p=>select([{path:p,status:'M'}]);
-test('documentation only has no backend setup and retains link checks',()=>{const p=plan('apps/backend/docs/remaining-work.md');assert.equal(p.db,false);assert.equal(p.structural,false);assert.equal(p.docs.length,1);});
-test('module changes include explicitly declared shared economic consumers',()=>{const p=plan('apps/backend/database/instructor-earnings.sql');for(const n of ['instructor-earnings','cross-center-settlement','starter-attendance-protection','program-session-lifecycle','api-acceptance'])assert(p.api.includes('apps/backend/tests/'+n+'.test.mjs'));assert(!p.api.includes('apps/backend/tests/person-registry.test.mjs'));});
-test('shared auth tenant finance gateway migrations infrastructure and unknown files expand safely',()=>{for(const p of ['apps/backend/database/kernel.sql','apps/backend/database/dispatch.sql','apps/backend/supabase/migrations/next.sql','apps/backend/tests/api-client.mjs','apps/backend/scripts/new-unknown.mjs','docs/contracts/example.json','.github/workflows/ci-fast.yml'])assert.deepEqual(plan(p).api,apiSuites,p);});
-test('contract generator/shared types cannot silently omit structural coverage',()=>{for(const p of ['docs/contracts/08.json','docs/contracts/01-product.md','docs/decisions/example.md','apps/backend/scripts/generate.mjs','packages/api-contracts/index.ts'])assert(plan(p).structural);});
-test('rename and deletion cover both source and destination; malformed diffs reject',()=>{const c=parseChanges('R100\0database/instructor-earnings.sql\0docs/moved.md\0D\0tests/api-client.mjs\0');assert.equal(c.length,3);assert.deepEqual(select(c).api,apiSuites);assert.throws(()=>parseChanges('R100\0one\0'));});
-test('missing diff, empty set, missing path and moved checkout expand to all suites',()=>{for(const p of [select([]),select([{status:'M'}]),select([{path:'docs/a.md'}],{diffAvailable:false}),select([{path:'docs/a.md'}],{headMatches:false})])assert.deepEqual(p.api,apiSuites);});
-test('API suite inventory exactly matches package test command; no shard loses tests',()=>{const command=JSON.parse(fs.readFileSync('apps/backend/package.json')).scripts['test:api'];assert.deepEqual([...command.matchAll(/tests\/[\w-]+\.test\.mjs/g)].map(m=>'apps/backend/'+m[0]).sort(),[...apiSuites].sort());});
-const valid=()=>({binding:{kind:'full',profile:'four-isolated-v1',balance_policy:'api-wall-v1',coverage:coverageHash(),pr:1,head:'H',base:'B',merge:'M',tree:'T',run_id:5,attempt:1},pr:{number:1,head:{sha:'H'},base:{sha:'B'}},run:{id:5,run_attempt:1,head_sha:'H',event:'pull_request',path:'.github/workflows/ci-full.yml',status:'completed',conclusion:'success'},tested:{sha:'M',tree:{sha:'T'},parents:[{sha:'B'},{sha:'H'}]},currentTree:'T',workflowMatches:true,jobs:['core','api-1','api-2','api-3','api-4','full-clean'].map(name=>({name,status:'completed',conclusion:'success',run_id:5,run_attempt:1,head_sha:'H',steps:[{name:name==='full-clean'?'Verify all required jobs':'Clean acceptance',conclusion:'success',started_at:'2026-01-01T00:00:00Z',completed_at:'2026-01-01T00:01:00Z'},{name:'Verify tested merge',conclusion:'success'}]}))});
-test('merge acceptance binds live head base merge tree workflow and attempt',()=>{assert(validateBinding(valid()));for(const mutate of [v=>v.pr.head.sha='new',v=>v.pr.base.sha='new',v=>v.currentTree='new',v=>v.binding.attempt=2,v=>v.run.event='push',v=>v.workflowMatches=false,v=>v.tested.parents[1].sha='other']){const v=valid();mutate(v);assert.throws(()=>validateBinding(v));}});
-test('label, skipped job or skipped clean step never constitutes acceptance',()=>{for(const mutate of [v=>v.jobs=[],v=>v.jobs[0].conclusion='skipped',v=>v.jobs[0].steps[0].conclusion='skipped',v=>v.run.conclusion='cancelled']){const v=valid();mutate(v);assert.throws(()=>validateBinding(v));}});
-test('automatic PR acceptance and manual diagnostics have disjoint event and cancellation boundaries',()=>{
- const fast=fs.readFileSync('.github/workflows/ci-fast.yml','utf8'),full=fs.readFileSync('.github/workflows/ci-full.yml','utf8'),main=fs.readFileSync('.github/workflows/backend.yml','utf8');
- assert(fast.includes('workflow_dispatch:'));assert(!fast.includes('  push:'));assert(!fast.includes('  pull_request:'));
- assert(full.includes('types: [opened, synchronize, reopened, edited]'));assert(!full.includes('labeled'));assert(full.includes("if: github.event.action != 'edited' || github.event.changes.base != null"));assert(!full.includes('workflow_dispatch'));
- assert(full.includes('backend-pr-${{ github.event.pull_request.number }}'));assert(full.includes('cancel-in-progress: true'));assert(full.includes("github.event.action == 'edited' && github.event.changes.base == null && 'metadata' || 'source'"));
- assert(main.includes('main-acceptance-${{ github.sha }}'));assert(main.includes('cancel-in-progress: false'));assert(!main.includes('workflow_dispatch'));assert(!main.includes('uses: ./.github/workflows/clean-suite.yml'));
-});
-
-import {mkdtempSync,mkdirSync,writeFileSync,rmSync} from 'node:fs';import {tmpdir} from 'node:os';import {resolve,join} from 'node:path';import {execFileSync} from 'node:child_process';
-function fixture(fn){const dir=mkdtempSync(join(tmpdir(),'ci-selection-'));const git=(...a)=>execFileSync('git',a,{cwd:dir,encoding:'utf8',stdio:['ignore','pipe','pipe']}).trim();try{git('init','-b','main');git('config','user.name','Synthetic');git('config','user.email','synthetic@example.invalid');writeFileSync(join(dir,'README.md'),'Initial\n');git('add','.');git('commit','-m','base');git('update-ref','refs/remotes/origin/main',git('rev-parse','HEAD'));return fn(dir,git);}finally{rmSync(dir,{recursive:true,force:true});}}
-test('cumulative selector retains canceled API commit coverage when next commit changes docs',()=>fixture((dir,git)=>{mkdirSync(join(dir,'apps/backend/database'),{recursive:true});writeFileSync(join(dir,'apps/backend/database/instructor-earnings.sql'),'-- synthetic');git('add','.');git('commit','-m','module');const before=git('rev-parse','HEAD');writeFileSync(join(dir,'README.md'),'Later documentation\n');git('add','.');git('commit','-m','docs');const head=git('rev-parse','HEAD');execFileSync(process.execPath,[resolve('apps/backend/scripts/ci/select-tests.mjs'),before,head],{cwd:dir});const p=JSON.parse(fs.readFileSync(join(dir,'.artifacts/ci/selection.json')));assert(p.api.includes('apps/backend/tests/cross-center-settlement.test.mjs'));assert(p.db);}));
-test('deleting or renaming referenced documentation is detected through unchanged inbound links',()=>fixture((dir,git)=>{writeFileSync(join(dir,'README.md'),'[Target](target.md)\n');writeFileSync(join(dir,'target.md'),'Target\n');git('add','.');git('commit','-m','links');fs.renameSync(join(dir,'target.md'),join(dir,'renamed.md'));assert.throws(()=>execFileSync(process.execPath,[resolve('apps/backend/scripts/ci/docs-check.mjs'),'target.md'],{cwd:dir,stdio:'pipe'}),/Command failed/);}));
-
-import {verifyMerged} from '../scripts/ci/gate.mjs';
-test('main verification rejects missing proof before running expensive acceptance',async()=>{const g={rest:{repos:{listPullRequestsAssociatedWithCommit:'prs'},actions:{listWorkflowRuns:'runs'}},paginate:async method=>method==='prs'?[{number:1,merged_at:'now',merge_commit_sha:'M',head:{sha:'H'},base:{sha:'B'}}]:[]};g.rest.git={getTree:async({tree_sha})=>({data:{tree:[{path:'apps/backend/database/kernel.sql',type:'blob',mode:'100644',sha:tree_sha+'kernel'}],truncated:false}}),getCommit:async()=>({data:{sha:'M',tree:{sha:'T'},parents:[{sha:'B'},{sha:'H'}]}})};await assert.rejects(()=>verifyMerged(g,{repo:{owner:'synthetic',repo:'test'},sha:'M'},{summary:{}}),/No successful source-bound full acceptance/);});
-test('main verification rejects direct push without a merged PR proof',async()=>{const g={rest:{repos:{listPullRequestsAssociatedWithCommit:'prs'}},paginate:async()=>[]};await assert.rejects(()=>verifyMerged(g,{repo:{},sha:'direct'},{}),/PR merge/);});
-const p01Suite='apps/backend/tests/p01-catalog-entitlement-reads.test.mjs';
-const profile={id:'p01-reads',sources:['p01-catalog-entitlement-reads'],operations:['products_list_v1','entitlements_get_v1'],migrationCheckLabel:'P01 reads source drift',suites:[p01Suite]};
-const source='apps/backend/database/p01-catalog-entitlement-reads.sql',wrapper='apps/backend/database/p01-catalog-entitlement-reads-wrappers.sql';
-const migration='apps/backend/supabase/migrations/20990101000000_p01_catalog_entitlement_reads.sql';
-const contractPath='packages/api-contracts/schema/contract.json';
-function deltaFixture(){
- const defs={Uuid:{type:'string'},Input:{type:'object',properties:{id:{$ref:'#/$defs/Uuid'}}},Output:{type:'object',properties:{id:{$ref:'#/$defs/Uuid'}}},OtherInput:{type:'object',properties:{id:{$ref:'#/$defs/Uuid'}}}};
- const contract={$schema:'synthetic', $defs:defs,'x-contract':{operations:[
-  {name:'entitlements_get_v1',request:{$ref:'#/$defs/Input'},success:{$ref:'#/$defs/Output'}},
-  {name:'unmapped_v1',request:{$ref:'#/$defs/OtherInput'},success:{$ref:'#/$defs/Uuid'}}
- ],permissions:{read:true},tables:[],uuid_field_map:[],feature_delivery:{}}};
- const oldPackage={name:'synthetic',scripts:{'test:api':'node --test --test-concurrency=2 tests/api-acceptance.test.mjs'},dependencies:{pinned:'1.0.0'}};
- const base={[contractPath]:JSON.stringify(contract),'apps/backend/database/migrations.sha256.json':JSON.stringify({'old.sql':'old'}),'apps/backend/scripts/check-migrations.py':'# original\n','apps/backend/package.json':JSON.stringify(oldPackage),'apps/backend/supabase/functions/backend-v1/implemented.json':JSON.stringify({operations:['entitlements_get_v1']}),'apps/backend/supabase/functions/backend-v1/index.ts':'old generated'};
- const head=structuredClone(base),c=structuredClone(contract);
- c.$defs.Input.properties.session_id={$ref:'#/$defs/Uuid'};head[contractPath]=JSON.stringify(c);
- head[source]='begin;\n-- mapped source\ncommit;\n';head[wrapper]='begin;\n-- wrappers\ncommit;\n';head[migration]=head[source]+head[wrapper];
- head['apps/backend/database/migrations.sha256.json']=JSON.stringify({'old.sql':'old',[migration.split('/').at(-1)]:'new'});
- head['apps/backend/scripts/check-migrations.py']=base['apps/backend/scripts/check-migrations.py']+"\nassert next(Path('supabase/migrations').glob('*_p01_catalog_entitlement_reads.sql')).read_text()==Path('database/p01-catalog-entitlement-reads.sql').read_text()+Path('database/p01-catalog-entitlement-reads-wrappers.sql').read_text(),'P01 reads source drift'\n";
- head['apps/backend/package.json']=JSON.stringify({...oldPackage,scripts:{...oldPackage.scripts,'test:api':oldPackage.scripts['test:api']+' '+p01Suite.replace('apps/backend/','')}});
- head['apps/backend/supabase/functions/backend-v1/index.ts']='new generated';head[p01Suite]='// new behavior test';
- const changes=()=>[...new Set([...Object.keys(base),...Object.keys(head)])].filter(p=>base[p]!==head[p]).map(path=>({path,status:!(path in head)?'D':!(path in base)?'A':'M'}));
- return {base,head,changes,run(){const c=changes();const read=(side,path)=>(side==='base'?base:head)[path]??null;const evidence=analyzeDelta(c,read,[profile]);return select(c,{evidence});}};
+async function collectorFiles(fn){
+ const files=['binding.json','measurements.json'].map(name=>ciFile(name)),previous=process.env.GITHUB_RUN_ATTEMPT;
+ const saved=files.map(p=>fs.existsSync(p)?fs.readFileSync(p):null);
+ process.env.GITHUB_RUN_ATTEMPT='2';
+ try{await fn();}finally{
+  if(previous===undefined)delete process.env.GITHUB_RUN_ATTEMPT;else process.env.GITHUB_RUN_ATTEMPT=previous;
+  files.forEach((p,i)=>{if(saved[i]===null)fs.rmSync(p,{force:true});else fs.writeFileSync(p,saved[i]);});
+ }
 }
-test('module contract, generated bundle and exact appended migration select only mapped behavior plus common regression',()=>{
- const f=deltaFixture(),p=f.run();assert.equal(p.broad,false);assert(p.structural&&p.db);
- assert.deepEqual(p.api,['apps/backend/tests/api-acceptance.test.mjs',p01Suite]);assert.deepEqual(p.priority,[p01Suite]);
- assert(p.reasons.some(r=>r.includes('transitive definition consumers')));assert(p.reasons.some(r=>r.includes('exactly matches mapped source')));
-});
-test('shared definition consumer or shared permission change forces broad fallback',()=>{
- for(const mutate of [
-  c=>c.$defs.Uuid.type='number',
-  c=>c['x-contract'].permissions.read=false,
-  c=>c.$defs.Orphan={type:'boolean'},
-  c=>c['x-contract'].operations.push({name:'unknown_new_v1',request:{$ref:'#/$defs/Input'}}),
-  c=>c.$defs.Table_sales={type:'object'},
-  c=>c.$schema='changed',
-  c=>c.$defs.Input.properties.external={$ref:'https://example.invalid/schema'}
- ]){
-  const f=deltaFixture(),c=JSON.parse(f.head[contractPath]);mutate(c);f.head[contractPath]=JSON.stringify(c);assert.deepEqual(f.run().api,apiSuites);
- }
-});
-test('persistent table transitive consumers force broad fallback in either snapshot',()=>{
- for(const side of ['base','head']){
-  const f=deltaFixture(),c=JSON.parse(f[side][contractPath]);
-  c.$defs.Table_rights={type:'object',properties:{nested:{$ref:'#/$defs/TableLink'}}};
-  c.$defs.TableLink={$ref:'#/$defs/Input'};f[side][contractPath]=JSON.stringify(c);
-  // Keep table definitions identical, so only the existing mapped Input delta
-  // changes. Its indirect persistent-table consumer must still force broad.
-  const other=side==='base'?'head':'base',o=JSON.parse(f[other][contractPath]);
-  o.$defs.Table_rights=c.$defs.Table_rights;o.$defs.TableLink=c.$defs.TableLink;f[other][contractPath]=JSON.stringify(o);
-  assert.equal(f.run().broad,true);
- }
-});
-test('diagnostic report alone requires structural verification without API setup',()=>{
- const p=plan('docs/history/reports/p01-a-targeted-diagnosis.json');assert(p.structural);assert.equal(p.db,false);
-});
-test('unknown, altered historical or unbound migration cannot use a known module filename as proof',()=>{
- for(const mutate of [
-  f=>f.head[migration]+='-- unbound DDL\n',
-  f=>{f.base[migration]='-- historical';},
-  f=>{f.head['apps/backend/supabase/migrations/20990102000000_unknown.sql']='-- unknown';},
-  f=>{delete f.head[source];},
-  f=>{f.head['apps/backend/scripts/check-migrations.py']=f.head['apps/backend/scripts/check-migrations.py'].replace('# original','# rewritten');},
-  f=>{f.head['apps/backend/database/migrations.sha256.json']=JSON.stringify({'old.sql':'changed',[migration.split('/').at(-1)]:'new'});}
- ]){const f=deltaFixture();mutate(f);assert.deepEqual(f.run().api,apiSuites);}
-});
-test('shared package dependency, changed runner flags, test removal or unknown suite remains broad',()=>{
- for(const mutate of [
-  p=>p.dependencies.pinned='2.0.0',
-  p=>p.scripts['test:api']=p.scripts['test:api'].replace('--test-concurrency=2','--test-concurrency=4'),
-  p=>p.scripts['test:api']='node --test --test-concurrency=2 '+p01Suite,
-  p=>p.scripts['test:api']+=' tests/unknown.test.mjs',
-  p=>p.scripts['test:api']+=' ; echo unexpected',
-  p=>p.scripts['test:api']+=' '+p01Suite,
-  p=>p.scripts.verify='skip verification'
- ]){const f=deltaFixture(),p=JSON.parse(f.head['apps/backend/package.json']);mutate(p);f.head['apps/backend/package.json']=JSON.stringify(p);assert.deepEqual(f.run().api,apiSuites);}
-});
-test('standalone generated edit, unmapped registration or shared kernel edit cannot silently narrow',()=>{
- const f=deltaFixture();for(const p of Object.keys(f.head))delete f.head[p];Object.assign(f.head,f.base);f.head['apps/backend/supabase/functions/backend-v1/index.ts']='unexplained';
- assert.deepEqual(f.run().api,apiSuites);
- for(const mutate of [
-  x=>x.head['apps/backend/supabase/functions/backend-v1/handler.ts']='shared gateway',
-  x=>x.head['apps/backend/database/kernel.sql']='shared rights kernel',
-  x=>x.head['apps/backend/scripts/generate-validators.mjs']='shared generator',
-  x=>x.head['apps/backend/supabase/functions/backend-v1/implemented.json']=JSON.stringify({operations:['entitlements_get_v1','unknown_v1']}),
-  x=>x.head['apps/backend/supabase/functions/backend-v1/implemented.json']=JSON.stringify({operations:[]}),
-  x=>x.head['packages/api-contracts/src/unknown.ts']='unknown shared type',
-  x=>x.head['apps/backend/scripts/ci/unknown-runner.mjs']='unknown infrastructure'
- ]){const x=deltaFixture();mutate(x);assert.deepEqual(x.run().api,apiSuites);}
-});
-test('mapped priorities never drop another selected suite and a failed priority does not start deferred work',()=>{
- const f=deltaFixture(),p=f.run(),calls=[];
- runApiPhases(p,(cmd,args)=>calls.push(args.slice(2).map(p=>p.replace(repositoryRoot,''))));
- assert.deepEqual(calls,[[p01Suite],['apps/backend/tests/api-acceptance.test.mjs']]);
- const attempted=[];assert.throws(()=>runApiPhases(p,(cmd,args)=>{attempted.push(args.slice(2).map(p=>p.replace(repositoryRoot,'')));throw Error('synthetic behavior failure');}),/synthetic behavior failure/);
- assert.deepEqual(attempted,[[p01Suite]]);
- const broad={...p,api:apiSuites},all=[];runApiPhases(broad,(cmd,args)=>all.push(...args.slice(2).map(p=>p.replace(repositoryRoot,''))));
- assert.deepEqual([...all].sort(),[...apiSuites].sort());assert.equal(new Set(all).size,apiSuites.length);
-});
-test('actual P01-A branch delta selects two suites even with accumulated generated, contract and migration edits',t=>{
- const base='9ce0a5639417f959111b11f70157156733e3de18',head='635e148651b2a85b18f5d40fe1fdea938ea94bf2';
- // This regression fixture is optional in shallow external test checkouts;
- // normal workflow uses full git history and the pure snapshot cases above always run.
- try{execFileSync('git',['cat-file','-e',head+'^{commit}'],{stdio:'pipe'});}catch{t.skip('Historical snapshot unavailable in shallow checkout; pure snapshot cases still run');return;}
- const frozenPath=p=>p.startsWith('packages/contracts/')?p.replace('packages/contracts/','packages/api-contracts/'):p==='contracts/08-FtkSaaS-tip-ve-operasyon-sozlesmesi.json'?'packages/api-contracts/schema/contract.json':p==='package.json'||/^(database|supabase|scripts|tests)\//.test(p)?'apps/backend/'+p:p;
- const originalPath=p=>p==='packages/api-contracts/schema/contract.json'?'contracts/08-FtkSaaS-tip-ve-operasyon-sozlesmesi.json':p.startsWith('packages/api-contracts/')?p.replace('packages/api-contracts/','packages/contracts/'):p.replace(/^apps\/backend\//,'');
- const changes=parseChanges(execFileSync('git',['diff','--name-status','-z',base,head],{encoding:'utf8'})).map(c=>({...c,path:frozenPath(c.path)}));
- const cache=new Map(),read=(side,path)=>{const k=side+':'+path;if(!cache.has(k)){try{cache.set(k,execFileSync('git',['show',(side==='base'?base:head)+':'+originalPath(path)],{encoding:'utf8',maxBuffer:20*1024*1024,stdio:'pipe'}));}catch{cache.set(k,null);}}return cache.get(k);};
- const p=select(changes,{evidence:analyzeDelta(changes,read,[profile])});
- assert.equal(p.broad,false);assert.deepEqual(p.api,['apps/backend/tests/api-acceptance.test.mjs',p01Suite]);assert.deepEqual(p.priority,[p01Suite]);
-});
 
-test('request projection focus cannot own unrelated shared management contract changes',()=>{
- const path=contractPath,owned='lesson_request_create_v1',suite='apps/backend/tests/p01-lesson-requests.test.mjs';
- const p={id:'requests',sources:[],operations:[owned],managementRequestProjection:true,suites:[suite]};
- const snapshot={$defs:{ManagementStateView:{type:'object',properties:{current:{type:'string'}},required:['current']},Request_management_state_get:{type:'object',properties:{page:{type:'string'}},allOf:[]}},'x-contract':{operations:[{name:'management_state_get_v1',request:{$ref:'#/$defs/Request_management_state_get'},success:{$ref:'#/$defs/ManagementStateView'},features:[],conditional_features:[],runtime_selectors:['negcredit_valuation_set_v1'],permission:'management.inspect'}]}};
- const focused=structuredClone(snapshot);focused.$defs.ManagementStateView.properties.request_detail={$ref:'#/$defs/LessonRequestView'};focused.$defs.LessonRequestView={type:'object',properties:{id:{type:'string'}}};
- focused['x-contract'].operations[0].runtime_selectors.push(owned);
- const changes=[{status:'M',path}],run=head=>select(changes,{evidence:analyzeDelta(changes,(side,file)=>file===path?JSON.stringify(side==='base'?snapshot:head):null,[p])});
- assert.equal(run(focused).broad,false);
- for(const mutate of [
-  h=>h.$defs.ManagementStateView.properties.current.type='number',
-  h=>h.$defs.Request_management_state_get.properties.page.type='number',
-  h=>h['x-contract'].operations[0].permission='account.self',
-  h=>h['x-contract'].operations[0].runtime_selectors.push('unrelated_v1'),
-  h=>h.$defs.ManagementStateView.required.push('request_detail')
- ]){const h=structuredClone(focused);mutate(h);assert.equal(run(h).broad,true);}
-});
+test('merge acceptance binds live head base merge tree workflow and attempt',()=>{assert(validateBinding(valid()));for(const mutate of [v=>v.pr.head.sha='new',v=>v.pr.base.sha='new',v=>v.currentTree='new',v=>v.binding.attempt=2,v=>v.run.event='push',v=>v.workflowMatches=false,v=>v.tested.parents[1].sha='other']){const v=valid();mutate(v);assert.throws(()=>validateBinding(v));}});
 
-import {documentScope,rendererOnlyProse,gitDocumentScope} from '../scripts/ci/document-scope.mjs';
-import {assertReady,assertParents,policyPath} from '../scripts/ci/source.mjs';
-import {validateDocumentBinding} from '../scripts/ci/gate.mjs';
-test('reviewed documentation scope excludes runtime with document-looking paths or labels',()=>{
- const read=()=>'',mode=()=>'100644';
- assert(documentScope([{path:'README.md',status:'M'}],read,mode).safe);
- for(const path of ['docs/runtime.md','../../docs/endpoint-inventory.json','packages/api-contracts/schema/contract.json','packages/api-contracts/index.ts','apps/backend/scripts/ci/gate.mjs','.github/workflows/ci-full.yml','package-lock.json','apps/backend/supabase/migrations/document.md'])assert(!documentScope([{path,status:'M'}],read,mode).safe,path);
- assert(!documentScope([{path:'README.md',status:'M'}],read,()=>'120000').safe);
- assert(!documentScope([{path:'README.md',status:'M'},{path:'apps/backend/database/kernel.sql',status:'M'}],read,mode).safe);
- assert(!documentScope([],read,mode).safe);
-});
-test('renderer prose proof retains historical evidence and rejects current executable path changes',()=>{
- const base='7577b2f1873c6b1fcf83390bfa94a34374c44082',head='4e80716fdd6f12c3972635903c9435f253b34905';
- const old=execFileSync('git',['show',base+':scripts/render_catalogs.py'],{encoding:'utf8'}),historical=execFileSync('git',['show',head+':scripts/render_catalogs.py'],{encoding:'utf8'}),now=fs.readFileSync('apps/backend/scripts/render_catalogs.py','utf8');
- assert(rendererOnlyProse(old,historical));
- assert(!rendererOnlyProse(old,now)); // Moving executable input/output paths requires full acceptance.
- assert(!rendererOnlyProse(now,now.replace('domain tablo tanımı','domain tablo listesi'))); // New renderer has no inherited prose-only exception.
- for(const source of [now.replace("inventory={'runtime_version'","inventory={'injected':True,'runtime_version'"),now.replace("emit('../../docs/endpoint-inventory.json'","emit('docs/runtime.json'"),now+"\nimport os\nos.system('false')\n",now.replace("len(c['tables'])","len(c['operations'])")])assert(!rendererOnlyProse(now,source));
-});
+test('label, skipped job or skipped clean step never constitutes acceptance',()=>{for(const mutate of [v=>v.jobs=[],v=>v.jobs[0].conclusion='skipped',v=>v.jobs[0].steps[0].conclusion='skipped',v=>v.run.conclusion='cancelled']){const v=valid();mutate(v);assert.throws(()=>validateBinding(v));}});
+
+test('main verification rejects missing proof before running expensive acceptance',async()=>{const g={rest:{repos:{listPullRequestsAssociatedWithCommit:'prs'},actions:{listWorkflowRuns:'runs'}},paginate:async method=>method==='prs'?[{number:1,merged_at:'now',merge_commit_sha:'M',head:{sha:'H'},base:{sha:'B'}}]:[]};g.rest.git={getTree:async({tree_sha})=>({data:{tree:[{path:'apps/backend/database/kernel.sql',type:'blob',mode:'100644',sha:tree_sha+'kernel'}],truncated:false}}),getCommit:async()=>({data:{sha:'M',tree:{sha:'T'},parents:[{sha:'B'},{sha:'H'}]}})};await assert.rejects(()=>verifyMerged(g,{repo:{owner:'synthetic',repo:'test'},sha:'M'},{summary:{}}),/No successful source-bound full acceptance/);});
+
+test('main verification rejects direct push without a merged PR proof',async()=>{const g={rest:{repos:{listPullRequestsAssociatedWithCommit:'prs'}},paginate:async()=>[]};await assert.rejects(()=>verifyMerged(g,{repo:{},sha:'direct'},{}),/PR merge/);});
 
 test('Draft and closed PR cannot merge even with successful automatic tests',()=>{
  for(const p of [{state:'open',draft:true,labels:[]},{state:'closed',draft:false,labels:[]}])assert.throws(()=>assertReady(p));
@@ -295,30 +51,20 @@ test('Draft and closed PR cannot merge even with successful automatic tests',()=
  assert.throws(()=>assertParents({parents:[{sha:'B'},{sha:'X'}]},'B','H'));
  assert(policyPath('apps/backend/scripts/ci/document-paths.json'));assert(policyPath('docs/history/manifest.json'));assert(policyPath('.github/workflows/ci-docs.yml'));
 });
+
 test('documentation proof is separate, source bound and rejects stale/missing/skipped evidence',()=>{
  const v=valid();v.binding.kind='documentation';v.run.path='.github/workflows/ci-full.yml';v.jobs[0].name='documentation';v.jobs[0].steps[0].name='Documentation acceptance';
  assert(validateDocumentBinding(v));
  for(const mutate of [x=>x.binding.kind='full',x=>x.run.path='.github/workflows/ci-docs.yml',x=>x.pr.base.sha='new',x=>x.binding.attempt=2,x=>x.currentTree='new',x=>x.workflowMatches=false,x=>x.jobs=[],x=>x.jobs[0].steps[0].conclusion='skipped']){const x=structuredClone(v);mutate(x);assert.throws(()=>validateDocumentBinding(x));}
 });
 
-import {shardPlan,coverageHash,validateJobs,apiBalancePolicy,apiTimeBalance} from '../scripts/ci/shards.mjs';
-import {measurements,collect} from '../scripts/ci/collect.mjs';
-test('four deterministic measured shards partition every suite exactly once with bounded weight imbalance',()=>{
- const bins=shardPlan();assert.equal(bins.length,4);
- assert.deepEqual(bins.flatMap(b=>b.suites).sort(),[...apiSuites].sort());
- assert.equal(new Set(bins.flatMap(b=>b.suites)).size,apiSuites.length);
- assert.deepEqual(bins,shardPlan([...apiSuites].reverse()));
- assert(Math.max(...bins.map(b=>b.weight))/Math.min(...bins.map(b=>b.weight))<1.08);
- assert.throws(()=>shardPlan([...apiSuites,apiSuites[0]]));
- assert.throws(()=>shardPlan([...apiSuites,'apps/backend/tests/unknown.test.mjs']));
- assert.throws(()=>shardPlan(apiSuites.slice(1)));
-});
 test('all required shard jobs must succeed in the same run attempt view and head; benchmark cannot be omitted',()=>{
  const v=valid();assert(validateJobs(v.jobs,v.run,{collector:true}));
  for(const mutate of [x=>x.jobs.splice(2,1),x=>x.jobs.push(structuredClone(x.jobs[1])),x=>x.jobs[1].conclusion='skipped',x=>x.jobs[2].conclusion='cancelled',x=>x.jobs[3].conclusion='failure',x=>x.jobs[4].run_attempt=2,x=>x.jobs[4].run_id=6,x=>x.jobs[4].head_sha='other',x=>x.jobs[4].steps[0].conclusion='skipped',x=>x.binding.coverage='other',x=>x.binding.benchmark=true]){
   const x=valid();mutate(x);assert.throws(()=>validateBinding(x));
  }
 });
+
 test('reusable full clean retains all obligations while automatic admission and privileged merge are separate',()=>{
  const clean=fs.readFileSync('.github/workflows/clean-suite.yml','utf8'),runner=fs.readFileSync('apps/backend/scripts/test-clean.mjs','utf8');
  assert(clean.includes('shard: [1, 2, 3, 4]'));assert(clean.includes('fail-fast: false'));assert(!clean.includes('max-parallel: 1'));
@@ -332,20 +78,7 @@ test('reusable full clean retains all obligations while automatic admission and 
  assert(gate.includes('converted_to_draft'));assert(gate.includes('branches: [main]'));assert(gate.includes('ref: main'));assert(gate.includes('statuses: write'));
 
 });
-test('CI-only cumulative proof cannot hide runtime or unknown markdown in later documentation commits',()=>fixture((dir,git)=>{
- mkdirSync(join(dir,'.github/workflows'),{recursive:true});writeFileSync(join(dir,'.github/workflows/ci-full.yml'),'# synthetic harness');git('add','.');git('commit','-m','ci');
- const run=()=>{execFileSync(process.execPath,[resolve('apps/backend/scripts/ci/select-tests.mjs'),'unused',git('rev-parse','HEAD')],{cwd:dir});return JSON.parse(fs.readFileSync(join(dir,'.artifacts/ci/selection.json')));};
- assert.equal(run().db,false);assert(run().structural);
- writeFileSync(join(dir,'README.md'),'Later docs');git('add','README.md');git('commit','-m','docs');assert.equal(run().db,false);
- mkdirSync(join(dir,'apps/backend/database'),{recursive:true});writeFileSync(join(dir,'apps/backend/database/kernel.sql'),'-- runtime');git('add','apps/backend/database');git('commit','-m','runtime');assert.equal(run().db,true);
- writeFileSync(join(dir,'README.md'),'Final docs');git('add','README.md');git('commit','-m','final docs');assert.equal(run().api.length,apiSuites.length);
-}));
-test('measurement distinguishes queue setup test wall and runner time',()=>{
- const rows=measurements([{name:'clean / api-1',status:'completed',conclusion:'success',created_at:'2026-01-01T00:00:00Z',started_at:'2026-01-01T00:00:10Z',completed_at:'2026-01-01T00:02:00Z',steps:[{name:'Clean acceptance',started_at:'2026-01-01T00:00:30Z',completed_at:'2026-01-01T00:01:50Z'}]}],'2026-01-01T00:00:00Z');
- assert.equal(rows[0].queue_s,10);assert.equal(rows[0].setup_s,20);assert.equal(rows[0].test_s,80);assert.equal(rows[0].runner_s,110);
-});
 
-test('every test file is accounted for in structural DB or API clean obligations',()=>{const actual=fs.readdirSync('apps/backend/tests').filter(p=>p.endsWith('.test.mjs')).map(p=>'apps/backend/tests/'+p).sort();assert.deepEqual(actual,[...apiSuites,...['contract','governance','ci-policy','ci-observer','quality-guard','database','event-scope','restore-guard'].map(n=>'apps/backend/tests/'+n+'.test.mjs')].sort());});
 test('metadata-only serial labels do not invalidate automatic acceptance or create extra tests',()=>{
  const v=valid();v.pr.labels=[{name:'ci:measure-serial'}];assert(validateBinding(v));
  v.binding.benchmark=true;assert.throws(()=>validateBinding(v));
@@ -366,152 +99,6 @@ test('routine main collector measures five executed roles and excludes skipped o
  }
 });
 
-import {durationSnapshot} from '../scripts/ci/refresh-suite-durations.mjs';
-import {durations,predictedWall} from '../scripts/ci/shards.mjs';
-function measuredMainBundle(){
- const run={id:99,run_attempt:2,head_sha:'a'.repeat(40),head_branch:'main',event:'push',name:'Main clean acceptance',status:'completed',conclusion:'success'};
- const jobs=['core','api-1','api-2','api-3','api-4','full-clean'].map((role,i)=>({id:i+10,name:'clean / '+role,run_id:run.id,run_attempt:run.run_attempt,head_sha:run.head_sha,status:'completed',conclusion:'success',steps:[{name:role==='full-clean'?'Verify all required jobs':'Clean acceptance',conclusion:'success'}]}));
- const logs={};for(let i=0;i<4;i++){
-  const samples=apiSuites.filter((_,j)=>j%4===i).map(p=>'### '+p.split('/').at(-1)+'\n\nProcess wall: 10.00 s (includes setup/waits);').join('\n');
-  logs[jobs[i+1].id]='Supabase CLI: 2.122.0\nClean phase timings: '+JSON.stringify({role:'api',shard:i+1,tests_s:100})+'\n'+samples+'\n';
- }
- return {run,jobs,logs};
-}
-test('duration refresh requires successful same-source same-attempt executed jobs and one complete measured inventory',()=>{
- const source=measuredMainBundle(),snapshot=durationSnapshot(source);
- assert.equal(snapshot.source,source.run.head_sha);assert.equal(snapshot.run_attempt,2);assert.equal(snapshot.cli_version,'2.122.0');assert.equal(Object.keys(snapshot.seconds).length,apiSuites.length);
- for(const mutate of [
-  x=>x.run.conclusion='failure',x=>x.run.event='pull_request',x=>x.run.head_branch='other',x=>x.run.head_sha='invalid',
-  x=>x.jobs[2].run_attempt=1,x=>x.jobs[2].head_sha='b'.repeat(40),x=>x.jobs[5].conclusion='failure',x=>x.jobs[1].steps[0].conclusion='skipped',
-  x=>delete x.logs[11],x=>x.logs[11]=x.logs[11].replace('Process wall: 10.00','Process wall: 0.00'),
-  x=>x.logs[11]+='### unknown.test.mjs\n\nProcess wall: 1.00 s\n',
-  x=>x.logs[11]+=x.logs[12].split('Clean phase timings:')[0]+'### '+apiSuites[0].split('/').at(-1)+'\n\nProcess wall: 10.00 s\n',
-  x=>x.logs[11]=x.logs[11].replace('2.122.0','2.121.0'),x=>x.logs[11]+='Supabase CLI: 2.121.0\n',x=>x.logs[11]+='currently installed v2.121.0)\n',x=>x.logs[11]=x.logs[11].replace('"shard":1','"shard":2'),
-  x=>x.logs[11]=x.logs[11].replace('### '+apiSuites[0].split('/').at(-1),'### missing')
- ]){const input=measuredMainBundle();mutate(input);assert.throws(()=>durationSnapshot(input));}
-});
-test('current two-slot balance avoids the late long-suite queue and retains the measured weight bound',()=>{
- assert.equal(predictedWall(['apps/backend/tests/c.test.mjs','apps/backend/tests/b.test.mjs','apps/backend/tests/a.test.mjs'],{a:1,b:1,c:100}),101);
- const bins=shardPlan(),walls=bins.map(b=>predictedWall(b.suites));
- assert(Math.max(...walls)/Math.min(...walls)<=apiBalancePolicy.max_ratio);
- const lowerBound=Math.max(...Object.values(durations.seconds),Object.values(durations.seconds).reduce((a,b)=>a+b,0)/8);
- assert(Math.max(...walls)<=lowerBound*1.08);
- // A caller cannot alter a later runner's cached coverage/scheduling decision.
- const copy=shardPlan();copy[0].suites.pop();assert.deepEqual(shardPlan([...apiSuites].reverse()),bins);
- for(const bad of [0,-1,NaN,Infinity])assert.throws(()=>shardPlan(apiSuites,{...durations.seconds,[Object.keys(durations.seconds)[0]]:bad}));
-});
-
-test('installed Node runner really queues explicit files lexically in the two process slots modeled by the planner',()=>{
- const dir=mkdtempSync(join(tmpdir(),'ftk-queue-model-')),trace=join(dir,'starts.jsonl');
- try{
-  for(const name of ['a','b','c']){
-   const script=["import fs from 'node:fs';import test from 'node:test';",`test('${name}',async()=>{`,
-    ` const trace=${JSON.stringify(trace)};fs.appendFileSync(trace,JSON.stringify('${name}')+'\\n');`,
-    ` if('${name}'!=='c'){const deadline=Date.now()+4000;while(!['a','b'].every(n=>fs.readFileSync(trace,'utf8').trim().split('\\n').map(JSON.parse).includes(n))){if(Date.now()>deadline)throw Error('First two runner slots did not start');await new Promise(r=>setTimeout(r,5));}}`,
-    '});'].join('\n');
-   writeFileSync(join(dir,name+'.test.mjs'),script);
-  }
-  execFileSync(process.execPath,['--test','--test-concurrency=2',...['c','b','a'].map(n=>join(dir,n+'.test.mjs'))],{stdio:'pipe',timeout:10000,env:Object.fromEntries(Object.entries(process.env).filter(([name])=>!name.startsWith('NODE_TEST_')))});
-  const starts=fs.readFileSync(trace,'utf8').trim().split('\n').map(JSON.parse);
-  assert.deepEqual(starts.slice(0,2).sort(),['a','b']);assert.equal(starts[2],'c');
- }finally{rmSync(dir,{recursive:true,force:true});}
-});
-
-import {markdownAnchors,checkDocuments,historicalSnapshot} from '../scripts/ci/docs-check.mjs';
-test('document links reject missing fragments and ignore fenced example headings',()=>fixture((dir)=>{
- const target=join(dir,'target.md'),source=join(dir,'source.md');
- writeFileSync(target,'# Güncel kabul\n\n# Güncel kabul\n\n```md\n# Örnek\n```\n<a id="stable-wire"></a>\n');
- const anchors=markdownAnchors(fs.readFileSync(target,'utf8'));
- assert(anchors.has('güncel-kabul'));assert(anchors.has('güncel-kabul-1'));assert(anchors.has('stable-wire'));assert(!anchors.has('örnek'));
- writeFileSync(source,'[Kabul](target.md#güncel-kabul-1) [Wire](target.md#stable-wire)');assert.equal(checkDocuments([source]),2);
- writeFileSync(source,'[Yanlış](target.md#örnek)');assert.throws(()=>checkDocuments([source]),/BROKEN_LOCAL_ANCHOR/);
- writeFileSync(source,'[Silindi](deleted.md)');assert.throws(()=>checkDocuments([source]),/BROKEN_LOCAL_LINK/);
-}));
-test('workspace and lock changes retain broad backend coverage and pinned frozen installs',()=>{
- for(const p of ['pnpm-lock.yaml','pnpm-workspace.yaml','turbo.json','packages/api-contracts/package.json'])assert.deepEqual(plan(p).api,apiSuites,p);
- for(const f of ['ci-fast','clean-suite','cd-development']){
-  const s=fs.readFileSync('.github/workflows/'+f+'.yml','utf8');assert(s.includes('corepack enable'));assert(s.includes('pnpm install --frozen-lockfile'));assert(!s.includes('npm ci'));
- }
- const p=JSON.parse(fs.readFileSync('package.json'));assert.equal(p.packageManager,'pnpm@12.15.0');assert(!fs.existsSync('package-lock.json'));
- const turbo=JSON.parse(fs.readFileSync('turbo.json'));assert.equal(turbo.tasks['test:clean'].cache,false);assert.equal(turbo.tasks.verify.cache,false);
-});
-
-test('only exact source-manifest snapshots retain historical link context',()=>{
- const records=JSON.parse(fs.readFileSync('docs/history/manifest.json')).files;
- for(const {path:file} of records){const text=fs.readFileSync(file,'utf8');assert(historicalSnapshot(file,text));assert.throws(()=>historicalSnapshot(file,text+'tampered'),/HISTORICAL_SNAPSHOT_DRIFT/);}
- assert.equal(historicalSnapshot('docs/history/reports/unreviewed.md','[bad](missing.md)'),false);
- assert.equal(checkDocuments(records.filter(r=>r.path.endsWith('.md')).map(r=>r.path)),0);
-});
-
-test('repository graph and documentation scope are identical from backend and root cwd',()=>fixture((dir,git)=>{
- const backend=join(dir,'apps/backend');mkdirSync(backend,{recursive:true});mkdirSync(join(dir,'.github/workflows'),{recursive:true});
- const base=git('rev-parse','HEAD');writeFileSync(join(dir,'.github/workflows/ci-full.yml'),'# synthetic trusted harness');writeFileSync(join(dir,'README.md'),'Changed docs');git('add','.');git('commit','-m','ci and docs');const head=git('rev-parse','HEAD');
- const command=resolve('apps/backend/scripts/ci/select-tests.mjs'),plans=[];
- for(const cwd of [dir,backend]){execFileSync(process.execPath,[command,base,head],{cwd,stdio:'pipe'});plans.push(JSON.parse(fs.readFileSync(join(dir,'.artifacts/ci/selection.json'))));}
- assert.deepEqual(plans[0],plans[1]);assert.equal(plans[1].db,false);assert(plans[1].structural);
- writeFileSync(join(dir,'README.md'),'Only docs now');git('add','README.md');git('commit','-m','docs only');const docs=git('rev-parse','HEAD');
- assert(gitDocumentScope(head,docs,dir).safe);assert(gitDocumentScope(head,docs,backend).safe);
-}));
-
-import {classifyChanges,ownerOf,localScope,ownership} from '../scripts/ci/scope.mjs';
-import {remoteSourceScope,backendUnchanged,resolveCandidate,currentAttemptBinding} from '../scripts/ci/source.mjs';
-import {checkPr} from '../scripts/ci/gate.mjs';
-const change=path=>({path,status:'M'});
-test('positive ownership separates backend frontend prose and shared inputs, rejecting unknown scope',()=>{
- for(const path of ['apps/web/src/app/page.tsx','packages/ui/src/button.tsx','.github/workflows/frontend.yml','vercel.json']){
-  const scope=classifyChanges([change(path)]);assert.equal(scope.backend,false);assert.equal(scope.kind,'frontend');assert.equal(select([change(path)]).db,false);
- }
- for(const path of ['apps/backend/database/kernel.sql','packages/api-contracts/schema/contract.json','packages/typescript-config/base.json','pnpm-lock.yaml','package.json','pnpm-workspace.yaml','turbo.json','.nvmrc','.github/workflows/ci-fast.yml'])assert.equal(classifyChanges([change(path)]).backend,true,path);
- assert.equal(classifyChanges([change('README.md')]).kind,'documentation');
- assert.equal(classifyChanges([change('apps/web/page.tsx'),change('apps/backend/database/kernel.sql')]).kind,'full');
- assert.equal(classifyChanges([change('apps/web/page.tsx'),change('README.md')]).kind,'documentation');
- for(const path of ['apps/unknown/file.ts','packages/unknown/index.ts','docs/unreviewed.md','../apps/web/file.ts','apps/web/../../backend/file.ts','apps/web//file.ts','apps\\web\\file.ts'])assert.throws(()=>ownerOf(path));
- assert.throws(()=>classifyChanges([]));assert.throws(()=>classifyChanges([{path:'apps/web/a.ts',status:'U'}]));
- assert.equal(policyPath('.github/workflows/frontend.yml'),true);assert.equal(policyPath('.github/workflows/ci-full.yml'),true);
-});
-test('one main proof gate covers all pushes and manual targeted cannot auto-run or install for prose',()=>{
- const main=fs.readFileSync('.github/workflows/backend.yml','utf8');
- assert.match(main,/push:\n    branches: \[main\]/);
- assert(!main.includes('    paths:'));assert(!main.includes('paths-ignore:'));
- assert(main.includes('eventScope(context.eventName, context.payload, context.sha)'));
- assert(main.includes("['frontend']"));
- assert(!main.includes("kind: 'compatibility'"));
- assert(main.includes('await verifyMain({ github, context, kind })'));
- assert(main.includes('await gate.verifyMerged(github,context,core)'));
- assert(policyPath('apps/web/scripts/ci-proof.mjs'));
- assert(policyPath('apps/web/scripts/ci-scope.mjs'));
- for(const path of ['docs/workflows.md','apps/backend/docs/documentation-development.md','apps/web/docs/development.md'])assert.equal(classifyChanges([change(path)]).kind,'documentation');
- for(const path of ['docs/workflows.json','apps/backend/scripts/update-docs.mjs','apps/backend/scripts/capture-docs.mjs'])assert.equal(classifyChanges([change(path)]).kind,'full');
- assert(!main.includes('pnpm install'));assert(!main.includes('test:clean'));assert(!main.includes('recovery'));
- const fast=fs.readFileSync('.github/workflows/ci-fast.yml','utf8');assert(fast.includes("if: needs.selection.outputs.setup == 'true'"));assert(fast.includes("if: github.ref == 'refs/heads/main'"));assert(!fast.includes('statuses: write'));assert(!fast.includes('pull_request:'));assert(!fast.includes('push:'));
- const full=fs.readFileSync('.github/workflows/ci-full.yml','utf8');const docs=full.slice(full.indexOf('  documentation:'));assert(!docs.includes('pnpm'));assert(!docs.includes('test:db'));assert(docs.includes('docs-check.mjs'));
-});
-test('cumulative scope covers rename old endpoints and retains runtime after a later frontend or prose commit',()=>fixture((dir,git)=>{
- const base=git('rev-parse','HEAD');mkdirSync(join(dir,'apps/web'),{recursive:true});writeFileSync(join(dir,'apps/web/page.tsx'),'frontend');git('add','.');git('commit','-m','frontend');
- assert.equal(localScope(base,git('rev-parse','HEAD'),dir).backend,false);
- mkdirSync(join(dir,'apps/backend/database'),{recursive:true});writeFileSync(join(dir,'apps/backend/database/kernel.sql'),'runtime');git('add','.');git('commit','-m','backend');
- const beforeRename=git('rev-parse','HEAD');git('mv','apps/backend/database/kernel.sql','apps/web/moved.sql');git('commit','-m','rename');
- assert.equal(localScope(beforeRename,git('rev-parse','HEAD'),dir).backend,true);
- writeFileSync(join(dir,'README.md'),'later docs');git('add','.');git('commit','-m','docs');
- // The removed backend source endpoint stays in the cumulative diff.
- assert.equal(localScope(beforeRename,git('rev-parse','HEAD'),dir).backend,true);
- const beforeLink=git('rev-parse','HEAD');fs.unlinkSync(join(dir,'README.md'));fs.symlinkSync('apps/web/page.tsx',join(dir,'README.md'));git('add','.');git('commit','-m','unsafe prose');
- assert.throws(()=>localScope(beforeLink,git('rev-parse','HEAD'),dir),/UNSAFE_DOCUMENT/);
-}));
-function scopedGithub(paths,{truncated=false,moved=false}={}){
- const pr={number:9,state:'open',draft:false,labels:[],base:{sha:'B',ref:'main'},head:{sha:'H'},merged_at:'now',merge_commit_sha:'M'};
- const statuses=[];
- const github={rest:{
-  pulls:{get:async()=>({data:moved?{...pr,head:{sha:'changed'}}:pr})},
-  git:{getRef:async()=>({data:{object:{sha:'M'}}}),getCommit:async()=>({data:{sha:'M',tree:{sha:'T'},parents:[{sha:'B'},{sha:'H'}]}}),
-   getTree:async({tree_sha})=>({data:{truncated,tree:paths.map(path=>({path,type:'blob',mode:'100644',sha:tree_sha+path}))}}),
-   getBlob:async()=>({data:{encoding:'base64',content:Buffer.from('prose').toString('base64')}})},
-  repos:{listPullRequestsAssociatedWithCommit:'prs',createCommitStatus:async s=>{statuses.push(s);}},
-  actions:{listWorkflowRuns:'runs'}
- },paginate:async method=>method==='prs'?[pr]:[]};
- attachQualityFixture(github,pr);
- return {github,pr,statuses};
-}
 test('frontend-only PR passes backend scope without inventing a full-test receipt; mixed and unknown scope cannot skip',async()=>{
  for(const paths of [['apps/web/page.tsx'],['apps/web/page.tsx','apps/backend/database/kernel.sql'],['packages/unknown/a.ts']]){
   const {github,statuses}=scopedGithub(paths);const result=await checkPr(github,{repo:{}},9);
@@ -520,6 +107,7 @@ test('frontend-only PR passes backend scope without inventing a full-test receip
  }
  const {github}=scopedGithub(['apps/web/a.ts'],{truncated:true});assert.equal((await checkPr(github,{repo:{}},9)).state,'failure');
 });
+
 test('frontend candidate never starts backend clean, while actual merge verifies parents before non-backend classification',async()=>{
  const {github,pr}=scopedGithub(['apps/web/page.tsx']);const outputs={},core={setOutput:(k,v)=>outputs[k]=v,summary:{addRaw(){return this;},async write(){}}};
  await resolveCandidate(github,{repo:{},issue:{number:9},payload:{pull_request:pr},runId:1,sha:'M'},core,'full');assert.equal(outputs.eligible,'false');assert.equal(outputs.merge,undefined);
@@ -527,115 +115,7 @@ test('frontend candidate never starts backend clean, while actual merge verifies
  github.rest.git.getCommit=async()=>({data:{sha:'M',tree:{sha:'T'},parents:[{sha:'X'},{sha:'H'}]}});
  await assert.rejects(verifyMerged(github,{repo:{},sha:'M'},core),/parents/);
 });
-test('CD source equivalence accepts frontend progress only with unchanged backend and complete trees',async()=>{
- for(const [paths,options,expected] of [
-  [['apps/web/page.tsx'],{},true],
-  [['apps/web/page.tsx','README.md'],{},true],
-  [['apps/web/page.tsx','apps/backend/database/kernel.sql'],{},false],
-  [['pnpm-lock.yaml'],{},false],
-  [['apps/web/page.tsx'],{truncated:true},false],
-  [['packages/unknown/a.ts'],{},false]
- ]){const {github}=scopedGithub(paths,options);assert.equal(await backendUnchanged(github,{},'B','H'),expected);}
-});
-test('frontend scope marker cannot authorize CD or substitute for missing executed full jobs',()=>{
- const v=valid(),sha='a'.repeat(40),run={...v.run,path:'.github/workflows/backend.yml',event:'push',head_branch:'main',head_sha:sha,repository:{full_name:'SXQHex/FtkSaaS'},head_repository:{full_name:'SXQHex/FtkSaaS'}};
- const source={name:'source',status:'completed',conclusion:'success',run_id:run.id,run_attempt:run.run_attempt,head_sha:sha};
- const marker={...source,name:'frontend',steps:[{name:'Backend unchanged (no backend acceptance)',conclusion:'success'}]};
- const input={run,jobs:[source,marker],currentMain:sha,repository:'SXQHex/FtkSaaS'};
- assert.equal(deploymentSource(input).deploy,false);
- for(const mutate of [x=>x.jobs[1].conclusion='skipped',x=>x.jobs[1].run_attempt=9,x=>x.jobs[1].head_sha='other',x=>x.jobs[1].steps[0].conclusion='skipped']){
-  const x=structuredClone(input);mutate(x);assert.throws(()=>deploymentSource(x));
- }
-});
-test('scope CLI runs before dependency installation and emits only the cumulative backend requirement',()=>fixture((dir,git)=>{
- mkdirSync(join(dir,'apps/web'),{recursive:true});writeFileSync(join(dir,'apps/web/page.tsx'),'frontend');git('add','.');git('commit','-m','frontend');
- const output=join(dir,'outputs');
- const run=()=>{
-  writeFileSync(output,'');execFileSync(process.execPath,[resolve('apps/backend/scripts/ci/scope.mjs')],{cwd:dir,env:{...process.env,HEAD:git('rev-parse','HEAD'),GITHUB_OUTPUT:output},stdio:'pipe'});
-  return fs.readFileSync(output,'utf8');
- };
- assert(run().includes('backend=false'));assert(run().includes('kind=frontend'));
- mkdirSync(join(dir,'apps/backend/database'),{recursive:true});writeFileSync(join(dir,'apps/backend/database/kernel.sql'),'runtime');git('add','apps/backend');git('commit','-m','backend');
- writeFileSync(join(dir,'README.md'),'later docs');git('add','README.md');git('commit','-m','prose');
- assert(run().includes('backend=true'));assert(run().includes('documentation=true'));
-}));
-test('an accepted backend finishing after a frontend-only merge keeps its full proof and revalidates before CD writes',async()=>{
- const repo={owner:'SXQHex',repo:'FtkSaaS'},a='a'.repeat(40),b='b'.repeat(40),v=valid();
- const run={...v.run,path:'.github/workflows/backend.yml',event:'push',head_branch:'main',head_sha:a,repository:{full_name:'SXQHex/FtkSaaS'},head_repository:{full_name:'SXQHex/FtkSaaS'}};
- const jobs=[...v.jobs.map(j=>({...j,head_sha:a})),{name:'source',status:'completed',conclusion:'success',run_id:run.id,run_attempt:run.run_attempt,head_sha:a}];
- let backendChanged=false;
- const {github}=scopedGithub(['apps/web/page.tsx']);
- github.rest.git.getRef=async()=>({data:{object:{sha:b}}});
- github.rest.git.getTree=async({tree_sha})=>({data:{tree:[{path:'apps/web/page.tsx',type:'blob',mode:'100644',sha:tree_sha+'web'},{path:'apps/backend/database/kernel.sql',type:'blob',mode:'100644',sha:backendChanged&&tree_sha===b?'changed':'same'}]}});
- github.rest.repos.compareCommitsWithBasehead=async()=>({data:{status:'ahead'}});
- github.rest.actions.getWorkflowRun=async()=>({data:run});github.rest.actions.listJobsForWorkflowRun='jobs';github.paginate=async()=>jobs;
- const proof=await resolveAcceptedSource(github,repo,run,jobs,b,1);assert.equal(proof.deploy,true);assert.equal(proof.sha,a);assert.equal(proof.expected_main,b);
- assert.equal((await revalidateDeployment(github,repo,proof)).sha,a);
- backendChanged=true;await assert.rejects(revalidateDeployment(github,repo,proof),/equivalence/);
-});
-test('real Turbo dependency filters run backend and frontend independently and include shared consumers',()=>fixture((dir)=>{
- writeFileSync(join(dir,'package.json'),JSON.stringify({name:'scope-probe',private:true,packageManager:'pnpm@12.15.0'}));
- writeFileSync(join(dir,'pnpm-workspace.yaml'),'packages:\n  - apps/*\n  - packages/*\n');
- writeFileSync(join(dir,'turbo.json'),JSON.stringify({tasks:{verify:{dependsOn:['^typecheck'],cache:false},typecheck:{cache:false}}}));
- for(const [folder,name,deps] of [['apps/backend','@ftksaas/backend',{'@ftksaas/api-contracts':'workspace:*'}],['apps/web','@ftksaas/web',{'@ftksaas/api-contracts':'workspace:*','@ftksaas/ui':'workspace:*'}],['packages/ui','@ftksaas/ui',{}],['packages/api-contracts','@ftksaas/api-contracts',{}]]){
-  mkdirSync(join(dir,folder),{recursive:true});writeFileSync(join(dir,folder,'package.json'),JSON.stringify({name,private:true,dependencies:deps,scripts:{verify:'exit 1',typecheck:'exit 1'}}));
- }
- const graph=filter=>JSON.parse(execFileSync(resolve('node_modules/.bin/turbo'),['run','verify','--filter='+filter,'--dry=json'],{cwd:dir,encoding:'utf8',stdio:['ignore','pipe','pipe']}));
- const installed=JSON.parse(execFileSync(resolve('node_modules/.bin/turbo'),['run','verify','--filter=@ftksaas/backend...','--dry=json'],{encoding:'utf8',stdio:['ignore','pipe','pipe']}));
- for(const task of installed.tasks)assert(!['@ftksaas/web','@ftksaas/ui'].includes(task.package),'Backend must not depend on frontend packages');
- const backend=graph('@ftksaas/backend...').tasks.map(t=>t.package),frontend=graph('@ftksaas/web...').tasks.map(t=>t.package);
- assert(backend.includes('@ftksaas/backend'));assert(backend.includes('@ftksaas/api-contracts'));assert(!backend.includes('@ftksaas/web'));assert(!backend.includes('@ftksaas/ui'));
- assert(frontend.includes('@ftksaas/web'));assert(frontend.includes('@ftksaas/api-contracts'));assert(frontend.includes('@ftksaas/ui'));assert(!frontend.includes('@ftksaas/backend'));
-}));
-test('scope and its pre-install CLI give identical full-tree decisions from repository root and backend cwd',()=>fixture((dir,git)=>{
- const backend=join(dir,'apps/backend');mkdirSync(backend,{recursive:true});
- const base=git('rev-parse','HEAD');
- writeFileSync(join(dir,'README.md'),'Changed prose');git('add','.');git('commit','-m','docs');
- let head=git('rev-parse','HEAD');
- assert.deepEqual(localScope(base,head,backend),localScope(base,head,dir));
- assert.equal(localScope(base,head,backend).kind,'documentation');
- mkdirSync(join(backend,'database'),{recursive:true});writeFileSync(join(backend,'database/kernel.sql'),'runtime');git('add','.');git('commit','-m','backend');head=git('rev-parse','HEAD');
- assert.deepEqual(localScope(base,head,backend),localScope(base,head,dir));assert.equal(localScope(base,head,backend).backend,true);
- for(const cwd of [dir,backend]){
-  const output=join(dir,'scope-output');writeFileSync(output,'');
-  execFileSync(process.execPath,[resolve('apps/backend/scripts/ci/scope.mjs')],{cwd,env:{...process.env,HEAD:head,GITHUB_OUTPUT:output},stdio:'pipe'});
-  assert(fs.readFileSync(output,'utf8').includes('backend=true'));
- }
- const beforeLink=head;fs.unlinkSync(join(dir,'README.md'));fs.symlinkSync('apps/backend/database/kernel.sql',join(dir,'README.md'));git('add','README.md');git('commit','-m','symlink');head=git('rev-parse','HEAD');
- for(const cwd of [dir,backend])assert.throws(()=>localScope(beforeLink,head,cwd),/UNSAFE_DOCUMENT/);
-}));
 
-test('frontend-only main marker runs without checkout from runner workspace root',()=>{
- const source=fs.readFileSync('.github/workflows/backend.yml','utf8');
- const marker=source.slice(source.indexOf('  frontend:\n'),source.indexOf('  clean:\n'));
- assert(marker.includes('working-directory: .'));
- assert(marker.includes('Backend unchanged (no backend acceptance)'));
-});
-
-import {targetedPartitions,assertManualRange,assertManualInventory} from '../scripts/ci/manual-targeted.mjs';
-import {trustedDeliveryRun} from '../scripts/ci/deployment-source.mjs';
-import {findCandidateProof} from '../scripts/ci/gate.mjs';
-test('manual shards retain every selected API suite once and reject unknown or duplicate inventory',()=>{
- for(const api of [[],[apiSuites[0]],apiSuites.slice(2,8),apiSuites]){
-  const bins=targetedPartitions({api});assert.deepEqual(bins.flatMap(b=>b.suites).sort(),[...api].sort());assert(bins.length<=4);
- }
- for(const api of [[apiSuites[0],apiSuites[0]],['tests/unknown.test.mjs']])assert.throws(()=>targetedPartitions({api}));
- const pkg=JSON.parse(fs.readFileSync('apps/backend/package.json'));assertManualInventory(pkg);
- for(const command of [pkg.scripts['test:api']+' tests/new-api.test.mjs',pkg.scripts['test:api'].replace('tests/registry.test.mjs',''),pkg.scripts['test:api'].replace('--test-concurrency=2','--test-concurrency=4')])assert.throws(()=>assertManualInventory({scripts:{'test:api':command}}));
-});
-test('manual exact range rejects abbreviated SHA, wrong checkout and non-ancestor base',()=>fixture((dir,git)=>{
- const base=git('rev-parse','HEAD');writeFileSync(join(dir,'README.md'),'New source');git('add','.');git('commit','-m','head');const head=git('rev-parse','HEAD');
- assertManualRange(base,head,git);assert.throws(()=>assertManualRange(base.slice(0,7),head,git));assert.throws(()=>assertManualRange(base,base,git));
- git('checkout','--orphan','unrelated');git('commit','--allow-empty','-m','unrelated');assert.throws(()=>assertManualRange(base,git('rev-parse','HEAD'),git));
-}));
-test('manual CLI plans an explicit commit range independently of origin/main and creates no merge receipt',()=>fixture((dir,git)=>{
- const pkg=JSON.parse(fs.readFileSync('apps/backend/package.json'));mkdirSync(join(dir,'apps/backend'),{recursive:true});writeFileSync(join(dir,'apps/backend/package.json'),JSON.stringify(pkg));git('add','.');git('commit','-m','package');const base=git('rev-parse','HEAD');
- mkdirSync(join(dir,'apps/backend/database'),{recursive:true});writeFileSync(join(dir,'apps/backend/database/kernel.sql'),'runtime');git('add','.');git('commit','-m','runtime');
- const singleBase=git('rev-parse','HEAD');writeFileSync(join(dir,'README.md'),'Prose after runtime');git('add','.');git('commit','-m','prose');const head=git('rev-parse','HEAD'),output=join(dir,'output');
- const run=from=>{writeFileSync(output,'');execFileSync(process.execPath,[resolve('apps/backend/scripts/ci/manual-targeted.mjs'),'plan',from,head],{cwd:dir,env:{...process.env,FTK_MANUAL_SOURCE_ROOT:dir,GITHUB_OUTPUT:output},stdio:'pipe'});return JSON.parse(fs.readFileSync(join(dir,'.artifacts/ci/selection.json')));};
- assert.equal(run(singleBase).api.length,0);assert(fs.readFileSync(output,'utf8').includes('setup=false'));
- assert.equal(run(base).api.length,apiSuites.length);assert(fs.readFileSync(output,'utf8').includes('setup=true'));assert(!fs.existsSync(join(dir,'.artifacts/ci/binding.json')));
-}));
 test('every workflow is trusted policy including frontend; its scope marker cannot authorize policy installation',async()=>{
  assert(policyPath('.github/dependabot.yml'));assert.equal(classifyChanges([change('.github/dependabot.yml')]).kind,'full');
  assert(policyPath('.github/workflows/frontend.yml'));assert(policyPath('.github/workflows/new.yml'));
@@ -643,23 +123,7 @@ test('every workflow is trusted policy including frontend; its scope marker cann
  assert.equal(classifyChanges([{path:'.github/workflows/ci-docs.yml',status:'D'}]).kind,'full');
  const {github}=scopedGithub(['.github/workflows/frontend.yml']);const result=await checkPr(github,{repo:{}},9);assert.equal(result.state,'failure');assert(result.description.includes('policy installation'));
 });
-test('previous delivery receipts require a trusted main run and executed same-attempt deploy',()=>{
- const run={id:8,run_attempt:2,path:'.github/workflows/cd-development.yml',event:'workflow_run',head_branch:'main',head_sha:'a'.repeat(40),repository:{full_name:'SXQHex/FtkSaaS'},head_repository:{full_name:'SXQHex/FtkSaaS'},status:'completed',conclusion:'success'};
- const jobs=[{name:'deploy',run_id:8,run_attempt:2,head_sha:run.head_sha,status:'completed',conclusion:'success',steps:[{name:'Deliver accepted source and verify hosted backend',conclusion:'success'}]}];
- const v={run,jobs};assert(trustedDeliveryRun(run,jobs,'SXQHex/FtkSaaS'));
- for(const mutate of [v=>v.run.event='pull_request',v=>v.run.head_repository.full_name='fork/FtkSaaS',v=>v.run.repository.full_name='fork/FtkSaaS',v=>v.run.head_branch='feature',v=>v.jobs[0].conclusion='skipped',v=>v.jobs[0].run_attempt=1,v=>v.jobs[0].head_sha='other',v=>v.jobs[0].steps[0].conclusion='skipped',v=>v.jobs.push(structuredClone(v.jobs[0]))]){const x=structuredClone(v);mutate(x);assert(!trustedDeliveryRun(x.run,x.jobs,'SXQHex/FtkSaaS'));}
-});
-function candidateProofFixture(dir,{kind='full',rerun=false}={}){
- const v=valid(),pr={...v.pr,state:'closed',draft:false,merged_at:'now',merge_commit_sha:'A',labels:[]};
- if(rerun){v.run.run_attempt=2;v.binding={...v.binding,profile:'four-isolated-v2',attempt:2,source_attempt:1};v.jobs.forEach(j=>j.run_attempt=2);v.jobs[0].steps.push({name:'Upload schema baseline',conclusion:'success'});}
- if(kind==='documentation'){v.binding.kind=kind;v.jobs=[{...v.jobs[0],name:'documentation',steps:[{name:'Documentation acceptance',conclusion:'success'},{name:'Verify tested merge',conclusion:'success'}]}];}
- writeFileSync(join(dir,'binding.json'),JSON.stringify(v.binding));execFileSync('zip',['-q',join(dir,'proof.zip'),'binding.json'],{cwd:dir});const zip=fs.readFileSync(join(dir,'proof.zip'));
- const qualityZip=qualityFixture(dir,rerun?{...v.run,run_attempt:1}:v.run,pr);
- v.jobs.push(qualityJob(v.run));
- const repo={owner:'synthetic',repo:'test'};
- const github={rest:{git:{getTree:async({tree_sha})=>({data:{tree:[{path:kind==='documentation'?'README.md':'apps/backend/database/kernel.sql',type:'blob',mode:'100644',sha:tree_sha}]}}),getBlob:async()=>({data:{encoding:'base64',content:Buffer.from('regular prose').toString('base64')}}),getCommit:async({commit_sha})=>({data:{...v.tested,sha:commit_sha,tree:{sha:commit_sha==='bad-tree'?'wrong':'T'}}})},repos:{listPullRequestsAssociatedWithCommit:'prs'},actions:{getWorkflowRun:async({run_id})=>({data:{...v.run,id:run_id}}),listWorkflowRuns:'runs',listJobsForWorkflowRun:'jobs',listWorkflowRunArtifacts:'artifacts',downloadArtifact:async({artifact_id})=>({data:artifact_id===2?qualityZip:zip})}},paginate:async(method,args)=>method==='prs'?[pr]:method==='runs'?[{...v.run,id:10,conclusion:'cancelled'},{...v.run,id:9},{...v.run,id:7},v.run]:method==='jobs'?v.jobs.map(j=>({...j,run_id:args.run_id})):args.run_id===9?[]:[{id:1,name:(kind==='documentation'?'document-binding-':'candidate-binding-')+v.run.run_attempt},{id:2,name:'quality-binding'}]};
- return {v,pr,repo,github};
-}
+
 test('cancelled incomplete and stale successful runs cannot shadow valid source-bound full or documentation evidence',async()=>{
  for(const kind of ['full','documentation']){
   const dir=mkdtempSync(join(tmpdir(),'ci-proof-'));
@@ -670,64 +134,6 @@ test('cancelled incomplete and stale successful runs cannot shadow valid source-
    f.github.paginate=async(method,args)=>method==='runs'?[{...f.v.run,conclusion:'cancelled'}]:[];await assert.rejects(findCandidateProof(f.github,f.repo,f.pr,kind,'T','B'),/No successful/);
   }finally{rmSync(dir,{recursive:true,force:true});}
  }
-});
-
-test('proof-only main authorizes CD only after candidate jobs are independently revalidated',async()=>{
- for(const rerun of [false,true]){
- const dir=mkdtempSync(join(tmpdir(),'ci-main-proof-'));
- try{
-  const f=candidateProofFixture(dir,{rerun}),sha='a'.repeat(40),repository='synthetic/test';f.pr.merge_commit_sha=sha;
-  const main={...f.v.run,id:20,run_attempt:1,path:'.github/workflows/backend.yml',event:'push',head_branch:'main',head_sha:sha,repository:{full_name:repository},head_repository:{full_name:repository}};
-  const mainJobs=['source','acceptance'].map(name=>({name,run_id:20,run_attempt:1,head_sha:sha,status:'completed',conclusion:'success',steps:name==='acceptance'?[{name:'Main acceptance proof',conclusion:'success'}]:[]}));
-  f.github.rest.actions.getWorkflowRun=async({run_id})=>({data:run_id===20?main:f.v.run});f.github.rest.git.getRef=async()=>({data:{object:{sha}}});
-  const original=f.github.paginate;let broken=false;
-  f.github.paginate=async(method,args)=>{
-   if(method==='jobs'&&args.run_id===20)return mainJobs;
-   const rows=await original(method,args);
-   return broken&&method==='jobs'?rows.map(j=>j.name==='api-3'?{...j,conclusion:'skipped'}:j):rows;
-  };
-  const proof=await resolveAcceptedSource(f.github,f.repo,main,mainJobs,sha,1);assert(proof.deploy);assert(proof.proofRequired);assert.equal(proof.sha,sha);
-  assert.equal((await revalidateDeployment(f.github,f.repo,proof)).sha,sha);
-  broken=true;await assert.rejects(revalidateDeployment(f.github,f.repo,proof),/job/);
-  const cd=fs.readFileSync('.github/workflows/cd-development.yml','utf8');assert(cd.includes('pull-requests: read'));assert(!cd.includes('statuses: write'));assert(!cd.includes('contents: write'));
- }finally{rmSync(dir,{recursive:true,force:true});}
- }
-});
-test('measurement maintenance accepts actual PR clean logs but rejects proof-only main as test evidence',()=>{
- const input=measuredMainBundle();input.run={...input.run,name:'PR #78 · exact-head',path:'.github/workflows/ci-full.yml',event:'pull_request',head_branch:'candidate'};
- assert.equal(Object.keys(durationSnapshot(input).seconds).length,apiSuites.length);
- input.run={...input.run,name:'Main acceptance',path:'.github/workflows/backend.yml',event:'push',head_branch:'main'};assert.throws(()=>durationSnapshot(input),/full clean run/);
-});
-test('automatic candidate tests Draft source, binds the live main base and rejects retarget or moved head',async()=>{
- for(const [paths,kind] of [[['apps/backend/database/kernel.sql'],'full'],[['README.md'],'documentation']]){
-  const {github,pr}=scopedGithub(paths);pr.draft=true;const out={},context={repo:{},issue:{number:9},payload:{pull_request:structuredClone(pr)},runId:8,sha:'M'};
-  await resolveCandidate(github,context,{setOutput:(k,v)=>out[k]=v},'auto');assert.equal(out.kind,kind);assert.equal(out.merge,'M');assert.throws(()=>assertReady(pr));
-  pr.base.ref='feature';await assert.rejects(resolveCandidate(github,context,{setOutput(){}},'auto'),/target main/);
-  pr.base.ref='main';pr.head.sha='moved';await assert.rejects(resolveCandidate(github,context,{setOutput(){}},'auto'),/Candidate changed/);
- }
- const gate=fs.readFileSync('.github/workflows/ci-gate.yml','utf8');assert(gate.includes("github.event.action != 'edited' || github.event.changes.base != null"));
-});
-
-test('historical suite measurement still retains its original eight-percent predicted-wall regression',()=>{
- const seconds={'api-acceptance':353.15,'availability-policies':157.42,'cross-center-settlement':646.05,'event-cancellation':801.18,'event-payment':663.4,'instructor-earnings':649.3,'p01-catalog-entitlement-reads':161.7,'p01-lesson-requests':169.06,'p01-waitlist-workers':141.83,'person-registry':310.53,'program-session-lifecycle':723.19,registry:855.73,'room-role-registry':122.54,'schedule-reads':228.36,'starter-attendance-protection':433.87};
- const walls=shardPlan(apiSuites,seconds).map(b=>predictedWall(b.suites,seconds));assert(Math.max(...walls)/Math.min(...walls)<1.08);
-});
-function jobsWithApiSeconds(values){
- const v=valid();for(let i=0;i<4;i++){const job=v.jobs.find(j=>j.name==='api-'+(i+1));job.steps[0].completed_at=new Date(Date.parse(job.steps[0].started_at)+values[i]*1000).toISOString();}return v;
-}
-test('real PR77 imbalance is visible without blocking successful functional and source acceptance',()=>{
- const v=jobsWithApiSeconds([1651,1102,793,1167]),report=apiTimeBalance(v.jobs,v.run);
- assert.equal(report.gap_s,858);assert(report.ratio>2);assert.equal(report.balanced,false);assert.equal(report.balanced,false);
- assert(validateBinding(v));
- const balanced=jobsWithApiSeconds([1600,1450,1490,1400]);assert(validateBinding(balanced));
- // New assertions inside an existing file require no inventory delta to be caught.
- balanced.jobs.find(j=>j.name==='api-3').steps[0].completed_at='2026-01-01T00:40:00Z';assert(validateBinding(balanced));assert.equal(apiTimeBalance(balanced.jobs,balanced.run).balanced,false);
-});
-test('actual balance uses explicit jitter bounds and rejects missing mixed or duplicate timing evidence',()=>{
- for(const values of [[600,600,600,750],[60,60,60,180]]){const v=jobsWithApiSeconds(values);assert.equal(apiTimeBalance(v.jobs,v.run).balanced,true);}
- const tooSlow=jobsWithApiSeconds([600,600,600,751]);assert.equal(apiTimeBalance(tooSlow.jobs,tooSlow.run).balanced,false);
- for(const mutate of [v=>v.jobs.splice(1,1),v=>v.jobs.push(structuredClone(v.jobs[1])),v=>v.jobs[1].run_attempt=2,v=>v.jobs[1].head_sha='other',v=>v.jobs[1].conclusion='skipped',v=>delete v.jobs[1].steps[0].started_at,v=>v.jobs[1].steps[0].completed_at='invalid',v=>v.jobs[1].steps[0].completed_at=v.jobs[1].steps[0].started_at,v=>v.jobs[1].steps.push(structuredClone(v.jobs[1].steps[0]))]){const v=valid();mutate(v);assert.throws(()=>apiTimeBalance(v.jobs,v.run));}
- const old=valid();delete old.binding.balance_policy;assert(validateBinding(old));
 });
 
 test('collector publishes functional proof despite imbalance or unavailable timing but rejects failed or mixed source jobs',async()=>{
@@ -754,117 +160,6 @@ test('collector publishes functional proof despite imbalance or unavailable timi
   for(const [p,bytes] of preserved){if(bytes===null)fs.rmSync(p,{force:true});else fs.writeFileSync(p,bytes);}
  }
 });
-
-// Documentation is an integration contract, not merely a list of Markdown links.
-import {validateWorkflows,renderReferences,workflowPath} from '../scripts/update-docs.mjs';
-import {structure,validateCapture} from '../scripts/capture-docs.mjs';
-test('workflow map rejects missing duplicate unknown APIs and worker promotion to UI',()=>{
- const root=resolve('.'),manifest=JSON.parse(fs.readFileSync(workflowPath)),contract=JSON.parse(fs.readFileSync('packages/api-contracts/schema/contract.json'));
- assert.equal(validateWorkflows(manifest,contract,root).size,contract['x-contract'].operations.length);
- for(const mutate of [
-  m=>m.flows[0].operations.pop(),
-  m=>m.flows[0].operations.push(m.flows[1].operations[0]),
-  m=>m.flows[0].operations.push('invented_operation_v1'),
-  m=>m.flows.find(f=>f.audience==='backend-only').audience='starter',
-  m=>m.flows[0].guide='docs/workflows.md#missing',
-  m=>m.flows[0].tests=['apps/backend/tests/missing.mjs'],
-  m=>m.flows[0].sources=['../.env'],
-  m=>m.flows[0].review.fingerprint='0'.repeat(64)
- ]){const m=structuredClone(manifest);mutate(m);assert.throws(()=>validateWorkflows(m,contract,root));}
- const changed=structuredClone(contract);changed['x-contract'].operations[0].permission='different';
- assert.throws(()=>validateWorkflows(manifest,changed,root),/WORKFLOW_REVIEW_REQUIRED/);
- const outputs=renderReferences(root,manifest,contract).outputs;
- for(const [p,content] of Object.entries(outputs))assert.equal(fs.readFileSync(p,'utf8'),content,p);
-});
-test('documentation metadata comparison distinguishes schema drift from environment ACL and requires exact successful CD',()=>{
- const catalog={format:1,relations:[{name:'example',rls:true,columns:[{name:'id',type:'uuid'}]}],functions:[],policies:[],grants:{relations:[]}};
- const reordered={grants:{relations:['different worker role']},policies:[],functions:[],relations:catalog.relations,format:1};
- assert.equal(structure(catalog),structure(reordered));
- const drift=structuredClone(catalog);drift.relations[0].rls=false;assert.notEqual(structure(catalog),structure(drift));
- const source='a'.repeat(40),receipt={success:true,project:'gwyprhenabtpkbojephw',source};validateCapture(receipt,source);
- for(const invalid of [{...receipt,success:false},{...receipt,project:'other'},{...receipt,source:'b'.repeat(40)}])assert.throws(()=>validateCapture(invalid,source));
-});
-test('every staged document move is classifiable at both ends and retired paths cannot silently return',()=>{
- const moves=JSON.parse(fs.readFileSync('apps/backend/scripts/ci/document-moves.json'));
- for(const [oldPath,newPath] of Object.entries(moves)){
-  assert.equal(classifyChanges([change(oldPath)]).kind,'documentation',oldPath);
-  assert.equal(classifyChanges([change(newPath)]).kind,'documentation',newPath);
-  assert(!fs.existsSync(oldPath),oldPath);assert(fs.existsSync(newPath),newPath);
- }
- // Inspect the actual complete branch delta, including deleted rename sources.
- const changes=parseChanges(execFileSync('git',['diff','--name-status','-z','--no-renames','HEAD'],{encoding:'utf8'}));
- for(const item of changes)assert.doesNotThrow(()=>ownerOf(item.path),item.path);
-});
-test('unassigned integration runtime sources and transport dependency drift require review',()=>{
- const root=resolve('.'),p='apps/backend/transports/unassigned-documentation-fixture.mjs';
- const manifest=JSON.parse(fs.readFileSync(workflowPath)),contract=JSON.parse(fs.readFileSync('packages/api-contracts/schema/contract.json'));
- assert(manifest.flows.find(f=>f.id==='WF09').sources.includes('apps/backend/transports/calendar-proxy.mjs'));
- for(const name of ['p01-worker.mjs','p05-worker.mjs','p06-worker.mjs'])assert(manifest.flows.find(f=>f.id==='WF20').sources.includes('apps/backend/scripts/'+name));
- fs.writeFileSync(p,'// test fixture; no execution\n');
- try{assert.throws(()=>validateWorkflows(manifest,contract,root),/UNASSIGNED_WORKFLOW_SOURCE/);}finally{fs.rmSync(p);}
- const altered=structuredClone(manifest),flow=altered.flows.find(f=>f.id==='WF09');flow.sources=flow.sources.filter(p=>!p.includes('calendar-proxy'));
- assert.throws(()=>validateWorkflows(altered,contract,root),/WORKFLOW_REVIEW_REQUIRED|UNASSIGNED_WORKFLOW_SOURCE/);
-});
-
-test('document ownership rejects unregistered prose, duplicate topic authorities and stale records',()=>{
- const root=resolve('.'),registry=JSON.parse(fs.readFileSync(registryPath)),files=livingMarkdown(root);
- assert.equal(validateDocumentRegistry(registry,files,root),files.length);
- const duplicate=structuredClone(registry);duplicate.documents[1].topics=[registry.documents[0].topics[0]];
- assert.throws(()=>validateDocumentRegistry(duplicate,files,root),/DUPLICATE_TOPIC_OWNER/);
- assert.throws(()=>validateDocumentRegistry(registry,[...files,'docs/unreviewed-topic.md'],root),/UNREGISTERED_DOCUMENT/);
- assert.throws(()=>validateDocumentRegistry(registry,files.slice(1),root),/STALE_DOCUMENT_REGISTRY/);
- const archived=structuredClone(registry);archived.documents[0].path='docs/history/reports/decision-sprint-review.md';
- assert.throws(()=>validateDocumentRegistry(archived,files,root),/INVALID_LIVING_DOCUMENT/);
- const traversal=structuredClone(registry);traversal.documents[0].path='../outside.md';
- assert.throws(()=>validateDocumentRegistry(traversal,files,root),/INVALID_LIVING_DOCUMENT/);
- for(const role of ['status','backlog','queue']){
-  const misplaced=structuredClone(registry);misplaced.documents.find(d=>d.path==='docs/workflows.md').role=role;
-  assert.throws(()=>validateDocumentRegistry(misplaced,files,root),/DEVELOPMENT_STATE_OUTSIDE_APP_DOCS/);
- }
- const secondRequests=structuredClone(registry);secondRequests.documents.find(d=>d.path==='docs/workflows.md').role='coordination';
- assert.throws(()=>validateDocumentRegistry(secondRequests,files,root),/INVALID_COORDINATION_DOCUMENT/);
- const lostRequestsOwner=structuredClone(registry);lostRequestsOwner.documents.find(d=>d.path==='docs/requests.md').role='guide';
- assert.throws(()=>validateDocumentRegistry(lostRequestsOwner,files,root),/INVALID_COORDINATION_DOCUMENT/);
- assert.equal(fs.readFileSync('docs/documentation-map.md','utf8'),renderDocumentMap(registry));
-});
-
-test('active documentation cannot use historical snapshots as current instructions',()=>{
- const p='.artifacts/docs-current-history-negative.md';fs.mkdirSync('.artifacts',{recursive:true});
- fs.writeFileSync(p,'[old decision](../docs/history/reports/decision-sprint-review.md)\n');
- try{assert.throws(()=>checkDocuments([p]),/HISTORICAL_DOCUMENT_AS_CURRENT/);}finally{fs.rmSync(p);}
-});
-
-test('workflow prose cannot recommend an operation absent from the machine contract',()=>{
- const root=resolve('.'),manifest=JSON.parse(fs.readFileSync(workflowPath)),contract=JSON.parse(fs.readFileSync('packages/api-contracts/schema/contract.json'));
- // A removed operation is still cited by the guide: prose validation must reject it before mapping/coverage.
- contract['x-contract'].operations=contract['x-contract'].operations.filter(o=>o.name!=='preview_get_v1');
- assert.throws(()=>validateWorkflows(manifest,contract,root),/UNKNOWN_WORKFLOW_API preview_get_v1/);
-});
-
-
-const rerunFixture=()=>{
- const binding={kind:'full',profile:'four-isolated-v2',coverage:coverageHash(),pr:9,head:'H',base:'B',merge:'M',tree:'T',run_id:5,attempt:1,benchmark:false};
- const pr={number:9,state:'open',draft:false,head:{sha:'H'},base:{sha:'B',ref:'main'}};
- const run={id:5,run_attempt:2,head_sha:'H',event:'pull_request',path:'.github/workflows/ci-full.yml',status:'in_progress',created_at:'2026-01-01T00:00:00Z'};
- // GitHub's attempt view carries retained successes under the current attempt
- // and new job IDs, while preserving their original execution timestamps.
- const jobs=['core','api-1','api-2','api-3','api-4'].map((name,i)=>({id:100+i,name:'clean / '+name,run_id:5,run_attempt:2,head_sha:'H',status:'completed',conclusion:'success',created_at:run.created_at,started_at:'2026-01-01T00:00:01Z',completed_at:'2026-01-01T00:02:00Z',steps:[{name:'Verify tested merge',conclusion:'success'},{name:'Clean acceptance',conclusion:'success',started_at:'2026-01-01T00:00:02Z',completed_at:'2026-01-01T00:01:02Z'}]}));
- jobs[0].steps.push({name:'Upload schema baseline',conclusion:'success'});
- const context={repo:{},runId:5,sha:'M',payload:{pull_request:structuredClone(pr)}};
- const github={rest:{actions:{getWorkflowRun:async()=>({data:run}),listJobsForWorkflowRunAttempt:'attempt-jobs'}},paginate:async(method,args)=>{assert.equal(method,'attempt-jobs');assert.equal(args.attempt_number,2);return jobs;}};
- const core={warning(){},summary:{addRaw(){return this;},async write(){}}};
- return{binding,pr,run,jobs,context,github,core};
-};
-
-async function collectorFiles(fn){
- const files=['binding.json','measurements.json'].map(name=>ciFile(name)),previous=process.env.GITHUB_RUN_ATTEMPT;
- const saved=files.map(p=>fs.existsSync(p)?fs.readFileSync(p):null);
- process.env.GITHUB_RUN_ATTEMPT='2';
- try{await fn();}finally{
-  if(previous===undefined)delete process.env.GITHUB_RUN_ATTEMPT;else process.env.GITHUB_RUN_ATTEMPT=previous;
-  files.forEach((p,i)=>{if(saved[i]===null)fs.rmSync(p,{force:true});else fs.writeFileSync(p,saved[i]);});
- }
-}
 
 test('failed-job rerun accepts GitHub retained successes on the exact original source',async()=>collectorFiles(async()=>{
  const f=rerunFixture();await collect(f.github,f.context,f.core,f.binding);
@@ -937,20 +232,6 @@ test('v2 merge proof retains source and upload obligations for inherited jobs',(
   const x=structuredClone(v);mutate(x);assert.throws(()=>validateBinding(x));
  }
 });
-
-function qualityJob(run){return {name:'quality',run_id:run.id,run_attempt:run.run_attempt,head_sha:run.head_sha,status:'completed',conclusion:'success',steps:['Verify quality source','Quality floor','Secret scan','Upload quality binding'].map(name=>({name,conclusion:'success'}))};}
-function qualityFixture(dir,run,pr){
- writeFileSync(join(dir,'binding.json'),JSON.stringify({kind:'quality-v1',pr:pr.number,head:pr.head.sha,base:pr.base.sha,tree:'T',run_id:run.id,attempt:run.run_attempt}));
- execFileSync('zip',['-q',join(dir,'quality.zip'),'binding.json'],{cwd:dir});return fs.readFileSync(join(dir,'quality.zip'));
-}
-function attachQualityFixture(github,pr){
- const dir=mkdtempSync(join(tmpdir(),'quality-proof-'));
- const run={id:5,run_attempt:1,head_sha:'H',path:'.github/workflows/ci-full.yml',event:'pull_request',status:'completed',conclusion:'success'};
- let zip;try{zip=qualityFixture(dir,run,pr);}finally{rmSync(dir,{recursive:true,force:true});}
- Object.assign(github.rest.actions,{listJobsForWorkflowRun:'quality-jobs',listWorkflowRunArtifacts:'quality-artifacts',downloadArtifact:async()=>({data:zip}),getWorkflowRun:async()=>({data:run})});
- const original=github.paginate;
- github.paginate=async(method,args)=>method==='runs'?[run]:method==='quality-jobs'?[qualityJob(run)]:method==='quality-artifacts'?[{id:2,name:'quality-binding'}]:original(method,args);
-}
 
 test('quality thresholds and nested checker config cannot escape trusted policy', () => {
  for(const file of ['CONSTRAINTS.md','apps/web/.gitignore','apps/web/src/.ignore','apps/web/tsconfig.json','packages/typescript-config/base.json','packages/api-contracts/package.json','apps/web/src/nested/.oxlintrc.json','apps/web/vitest.config.ts','apps/web/scripts/verify-isolation.mjs','turbo.json']) assert(policyPath(file),file);
