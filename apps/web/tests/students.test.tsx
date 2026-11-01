@@ -1,4 +1,4 @@
-import { act, screen, within } from "@testing-library/react";
+import { act, screen, within, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { beforeEach, expect, test, vi } from "vitest";
 import type { FailureEnvelope, PersonView } from "@ftksaas/api-contracts";
@@ -376,4 +376,27 @@ test("activation is explicit, has no fabricated version or reason and reports th
   expect(api.change.mock.calls[0][0].operation).toBe("student_activate_v1");
   expect(api.change.mock.calls[0][0].input).not.toHaveProperty("reason");
   expect(api.change.mock.calls[0][0].input).not.toHaveProperty("expected_version");
+});
+
+test("saving a person edit refreshes the directory as well as the profile", async () => {
+  const api = actions();
+  api.update.mockResolvedValue({
+    operation_id: person.id,
+    primary_id: person.id,
+    related: [],
+    replayed: false,
+  });
+  api.list
+    .mockResolvedValueOnce(page())
+    .mockResolvedValue(page([{ ...person, display_name: "Yeni ad" }]));
+  const user = userEvent.setup();
+  directory(api);
+  await user.click(await screen.findByRole("button", { name: /Deniz Örnek/ }));
+  await user.click(await screen.findByRole("button", { name: "Kişi bilgilerini düzenle" }));
+  const field = screen.getByLabelText("Ad soyad");
+  await user.clear(field);
+  await user.type(field, "Yeni ad");
+  await user.click(screen.getByRole("button", { name: "Bilgileri kaydet" }));
+  await waitFor(() => expect(api.list).toHaveBeenCalledTimes(2));
+  expect(api.person).toHaveBeenCalledTimes(2);
 });

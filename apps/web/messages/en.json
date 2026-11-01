@@ -443,6 +443,28 @@
     }
   },
   "students": {
+    "mergeTitle": "Merge person records",
+    "mergeHint": "Merge two records for the same person. This record is the source; the selected target is retained. Review the impact first.",
+    "mergeOpen": "Start merge",
+    "mergeSearch": "Search target person",
+    "mergeDirection": "Source: {source} → Retained target: {target}",
+    "mergePreview": "Review merge impact",
+    "mergeHistory": "Historical sales and debt keep their original identifiers and remain readable through the combined person.",
+    "mergeCenters": "Affected centers: {count}",
+    "mergeApprovalRequired": "Manager approval is required for {count} other centers. This preview cannot yet be applied.",
+    "mergeConfirm": "Confirm merging records",
+    "mergeUncertain": "The merge result could not be confirmed. Check the existing operation before starting another merge.",
+
+    "disciplineTitle": "Student disciplines",
+    "disciplineHint": "Manage which discipline the student attends in this center and whether the relationship is active.",
+    "disciplineRecorded": "Recorded discipline",
+    "disciplineEdit": "Edit discipline relationship",
+    "disciplineLabel": "Discipline",
+    "disciplineSelect": "Choose a discipline",
+    "disciplineState": "Discipline enrollment state",
+    "disciplineSave": "Save discipline relationship",
+    "disciplineUncertain": "The result could not be confirmed. Check the existing operation before making another change.",
+
     "directory": "Student list",
     "search": "Search students",
     "searchPlaceholder": "First or last name",
@@ -514,6 +536,7 @@
     "demoBack": "Back to design",
     "demoLink": "Open student operation design",
     "errors": {
+      "PREVIEW_STALE": "The preview is no longer valid. Review the effects again.",
       "network": "Connection lost. Check whether the operation was saved.",
       "OPEN_OPERATIONS_EXIST": "This student has open operations. Complete open records such as reservations, waitlist entries, lesson requests or prepared payments, then try again.",
       "FORBIDDEN": "You do not have permission to change student status at this center. Contact your center manager.",

@@ -1,5 +1,7 @@
 // Fictional, isolated design data. Never imported by the live workspace as a fallback.
-import type { PersonView } from "@ftksaas/api-contracts";
+import { v7 } from "uuid";
+import type { DisciplineActions, MergeActions } from "../../lib/student-management";
+import type { PersonView, Preview } from "@ftksaas/api-contracts";
 import { ApiFailure } from "../../lib/api";
 import type { StudentActions, StudentScope } from "../../lib/students";
 
@@ -36,10 +38,102 @@ export const sampleStudents: PersonView[] = [
     contacts: [{ kind: "email", value: "ece@example.invalid" }],
   },
 ];
-export function createSampleStudentActions(): StudentActions {
+export function createSampleStudentActions(): StudentActions & {
+  disciplines: DisciplineActions;
+  merging: MergeActions;
+} {
   const people = structuredClone(sampleStudents);
   const completed = new Map<string, string>();
+  const previews = new Map<string, Preview>();
   return {
+    disciplines: {
+      list: async () => [
+        { id: "019a2b3c-4d5e-7000-8000-000000000080", name: "Tango", state: "active", version: 1 },
+      ],
+      save: async (input) => {
+        const person = people.find((p) => p.id === input.person_id)!;
+        const existing = person.discipline_relationships.find(
+          (r) => r.discipline_id === input.discipline_id && r.center_id === input.center_id,
+        );
+        if (!completed.has(input.operation_key)) {
+          if (existing) {
+            existing.state = input.state;
+            existing.version++;
+          } else
+            person.discipline_relationships.push({
+              center_id: input.center_id,
+              discipline_id: input.discipline_id,
+              kind: "student",
+              state: input.state,
+              version: 1,
+            });
+        }
+        completed.set(input.operation_key, "person_discipline_set_v1");
+        return {
+          operation_id: input.operation_key,
+          primary_id: input.discipline_id,
+          related: [],
+          replayed: false,
+        };
+      },
+      status: async (_org, operation, key) => ({
+        operation,
+        key,
+        status: completed.has(key) ? "succeeded" : "in_progress",
+        result_available: false,
+        result_reference: null,
+      }),
+    },
+    merging: {
+      search: async (_org, _center, query) => ({
+        items: structuredClone(
+          people.filter((p) =>
+            p.display_name.toLocaleLowerCase("tr").includes(query.toLocaleLowerCase("tr")),
+          ),
+        ),
+        next_cursor: null,
+        as_of: new Date().toISOString(),
+      }),
+      preview: async (input) => {
+        const preview: Preview = {
+          id: v7(),
+          token: "synthetic-design-preview",
+          scope_hash: "design",
+          expires_at: new Date(Date.now() + 60000).toISOString(),
+          dependencies: { versions: [], policy_hashes: [], permission_hash: "design" },
+          effects: [],
+          blockers: [],
+          merge_summary: {
+            source_id: input.source_id,
+            target_id: input.target_id,
+            affected_center_ids: [sampleStudentScope.centerId],
+            required_approval_center_ids: [],
+            linked_history: true,
+          },
+        };
+        previews.set(preview.id, preview);
+        return preview;
+      },
+      apply: async (input) => {
+        const preview = previews.get(input.preview.id)!;
+        const target = people.find((p) => p.id === preview.merge_summary!.target_id)!;
+        target.linked_person_ids = [preview.merge_summary!.source_id];
+        completed.set(input.operation_key, target.id);
+        return {
+          operation_id: input.operation_key,
+          primary_id: target.id,
+          related: [],
+          replayed: false,
+        };
+      },
+      status: async (_org, operation, key) => ({
+        operation,
+        key,
+        status: completed.has(key) ? "succeeded" : "in_progress",
+        result_available: completed.has(key),
+        result_reference: completed.has(key) ? { type: "people", id: completed.get(key)! } : null,
+      }),
+    },
     list: async ({ query, cursor }) => {
       const filtered = people.filter((person) =>
         person.display_name.toLocaleLowerCase("tr").includes(query.toLocaleLowerCase("tr")),

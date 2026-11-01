@@ -101,3 +101,39 @@ test("student list and confirmation reflow at 320px and 200% text with full axe 
     expect((await new AxeBuilder({ page }).analyze()).violations).toEqual([]);
   }
 });
+
+test("discipline and merge controls remain accessible at each supported width without live calls", async ({
+  page,
+}) => {
+  const domainRequests: string[] = [];
+  page.on("request", (request) => {
+    if (request.url().includes("/backend-v1/")) domainRequests.push(request.url());
+  });
+  for (const width of [320, 768, 1024, 1440]) {
+    await page.setViewportSize({ width, height: 950 });
+    await page.goto("/tasarim/ogrenciler");
+    await page.getByRole("button", { name: /Deniz Örnek/ }).click();
+    const detail = page.getByRole("dialog");
+    await detail.getByRole("button", { name: "Disiplin ilişkisini düzenle" }).click();
+    await detail.getByLabel("Disiplin", { exact: true }).selectOption({ label: "Tango" });
+    await detail.getByRole("button", { name: "Disiplin ilişkisini kaydet" }).click();
+    await expect(detail.getByText("Tango — Aktif", { exact: true })).toBeVisible();
+    await detail.getByRole("button", { name: "Birleştirmeyi başlat" }).click();
+    const merge = detail.getByRole("region", { name: "Kişi kayıtlarını birleştir" });
+    await merge.getByLabel("Hedef kişiyi ara").fill("Selin");
+    await merge.getByRole("button", { name: "Ara", exact: true }).click();
+    await merge.getByRole("button", { name: "Selin Örnek", exact: true }).click();
+    const preview = merge.getByRole("button", { name: "Birleştirme etkilerini incele" });
+    await preview.focus();
+    await page.keyboard.press("Enter");
+    await expect(
+      merge.getByRole("button", { name: "Kayıtları birleştirmeyi onayla" }),
+    ).toBeEnabled();
+    expect((await new AxeBuilder({ page }).analyze()).violations).toEqual([]);
+    expect(await detail.evaluate((node) => node.scrollWidth - node.clientWidth)).toBe(0);
+    expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBe(width);
+    await merge.getByRole("button", { name: "Kayıtları birleştirmeyi onayla" }).click();
+    await expect(detail.getByRole("heading", { name: "Selin Örnek" })).toBeVisible();
+  }
+  expect(domainRequests).toEqual([]);
+});

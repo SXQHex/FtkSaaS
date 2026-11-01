@@ -26,7 +26,13 @@ export function StudentsPreview() {
         <h1 className="text-2xl font-semibold tracking-tight sm:text-3xl">{t("demoTitle")}</h1>
         <p className="max-w-2xl text-sm leading-6 text-muted-foreground">{t("demoHint")}</p>
       </div>
-      <StudentDirectory scope={sampleStudentScope} centerName="Fethiye" actions={actions} />
+      <StudentDirectory
+        scope={sampleStudentScope}
+        centerName="Fethiye"
+        actions={actions}
+        disciplines={actions.disciplines}
+        merging={actions.merging}
+      />
     </main>
   );
 }

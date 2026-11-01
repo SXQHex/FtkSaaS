@@ -443,6 +443,28 @@
     }
   },
   "students": {
+    "mergeTitle": "Kişi kayıtlarını birleştir",
+    "mergeHint": "Aynı kişiye ait iki kaydı birleştir. Bu kayıt kaynak olur; seçtiğin hedef kayıt korunur. İşlem öncesi etkileri incele.",
+    "mergeOpen": "Birleştirmeyi başlat",
+    "mergeSearch": "Hedef kişiyi ara",
+    "mergeDirection": "Kaynak: {source} → Korunacak hedef: {target}",
+    "mergePreview": "Birleştirme etkilerini incele",
+    "mergeHistory": "Tarihsel satış ve borç kayıtları kendi kimlikleriyle korunur; ortak kişi üzerinden okunur.",
+    "mergeCenters": "Etkilenen merkez sayısı: {count}",
+    "mergeApprovalRequired": "{count} başka merkez için yönetici onayı gerekiyor. Bu önizleme ile henüz birleştirme yapılamaz.",
+    "mergeConfirm": "Kayıtları birleştirmeyi onayla",
+    "mergeUncertain": "Birleştirmenin sonucu doğrulanamadı. Yeni bir birleştirme başlatmadan önce mevcut işlemin sonucunu kontrol et.",
+
+    "disciplineTitle": "Öğrenci disiplinleri",
+    "disciplineHint": "Bu merkezde öğrencinin hangi disipline katıldığını ve aktiflik durumunu düzenle.",
+    "disciplineRecorded": "Kayıtlı disiplin",
+    "disciplineEdit": "Disiplin ilişkisini düzenle",
+    "disciplineLabel": "Disiplin",
+    "disciplineSelect": "Disiplin seç",
+    "disciplineState": "Disiplin öğrenciliği durumu",
+    "disciplineSave": "Disiplin ilişkisini kaydet",
+    "disciplineUncertain": "İşlemin sonucu doğrulanamadı. Yeni bir değişiklik yapmadan önce mevcut işlemi kontrol et.",
+
     "directory": "Öğrenci listesi",
     "search": "Öğrenci ara",
     "searchPlaceholder": "Ad veya soyad",
@@ -514,6 +536,7 @@
     "demoBack": "Tasarıma dön",
     "demoLink": "Öğrenci işlem tasarımını aç",
     "errors": {
+      "PREVIEW_STALE": "Önizleme artık geçerli değil. Etkileri yeniden incele.",
       "network": "Bağlantı kesildi. İşlemin kaydedilip kaydedilmediğini kontrol et.",
       "OPEN_OPERATIONS_EXIST": "Bu öğrencinin açık işlemleri var. Rezervasyon, bekleme listesi, özel ders talebi veya hazırlanan ödeme gibi açık kayıtları tamamladıktan sonra yeniden dene.",
       "FORBIDDEN": "Bu merkezde öğrencilik durumunu değiştirme yetkin yok. Merkez yöneticinle görüş.",
