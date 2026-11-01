@@ -20,6 +20,8 @@ Bu dosya yalnız **sıra, bağımlı teslim paketleri ve kontrol noktalarının*
 | 11 | [P14](remaining-work.md#p14)–[P16](remaining-work.md#p16) | E-posta teslim→zamanlama/sessiz saat→otomasyon |
 | 12 | [B01](remaining-work.md#b01)–[B05](remaining-work.md#b05) | Business scope, ortak inbox, hesaplaşma, rapor ve özel teklif |
 
+**Aktif kontrol noktası:** A03 kaynak/plan/WF eşlemesi ve S01 mevcut oda okumasının sözleşme/test dilimi adayda. A03 özellik bazlı kaynak/run/ortam ve boşluk uzlaştırması açık. S01 gerçek API regresyonu doğrulanmadan S02 uygulamasına geçilmez; A03–S05 aynı Draft PR kapsamında kalır.
+
 **Aktif kullanıcı önceliği:** [A03](remaining-work.md#a03) → [S01](remaining-work.md#s01) → [S02](remaining-work.md#s02) → [S03](remaining-work.md#s03) → [S04](remaining-work.md#s04) → [S05](remaining-work.md#s05). Frontend'in kendi ekran/kabul sırası değişmez; CI süre optimizasyonu ürün sırasının önüne geçmez.
 
 ### A03–S05 teslim paketi ve kontrol noktaları

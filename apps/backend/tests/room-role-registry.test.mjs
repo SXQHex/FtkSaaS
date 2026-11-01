@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {createHash} from 'node:crypto';
-import {authUser,fixturePlatform,must,call} from './api-client.mjs';
+import {authUser,fixturePlatform,must,call,context} from './api-client.mjs';
 import {connect} from '../scripts/db.mjs';
 import {newUuidV7 as key} from '../scripts/uuid.mjs';
 
@@ -68,6 +68,37 @@ test('Room configuration and scoped role reads through real Auth/API',async t=>{
   await fail('room_save_v1',{center_id:null,name:'denied',capacity:10},'FORBIDDEN');
   await fail('room_save_v1',{room_id:key(),expected_version:1,name:'missing',capacity:10},'NOT_FOUND');
  });
+ await t.test('new login discovers rooms and edits from the current projection without the create response',async()=>{
+  const {env}=context();
+  const response=await fetch(env.API_URL+'/auth/v1/token?grant_type=password',{method:'POST',headers:{apikey:env.ANON_KEY,'content-type':'application/json'},body:JSON.stringify({email:owner.email,password:owner.password}),signal:AbortSignal.timeout(60000)});
+  assert.equal(response.ok,true);const session=await response.json(),reader={...owner,jwt:session.access_token};
+  const read=body=>must(reader,'management_state_get_v1',scope({operation:'room_save_v1',selector:{operation:'room_save_v1',key:{}},page:{},...body}));
+  const page=await read({});const found=page.items.find(x=>x.current.values.name==='Rollback');assert(found);
+  const detail=await read({selector:{operation:'room_save_v1',key:{room_id:found.entity.id}}});
+  assert.equal(detail.items.length,1);assert.deepEqual(detail.items[0].current.values,found.current.values);
+  assert.equal(found.versions[0].version,4);assert.equal(found.entity.id,room);
+  const values=detail.items[0].current.values,version=detail.items[0].versions[0].version;
+  const changed=await mutate('room_save_v1',{...values,name:'Discovered room',expected_version:version},key(),reader);
+  assert.equal(changed.version,version+1);
+  const reread=await read({selector:{operation:'room_save_v1',key:{room_id:found.entity.id}}});
+  assert.equal(reread.items[0].current.values.name,'Discovered room');assert.equal(reread.items[0].versions[0].version,changed.version);
+  await fail('room_save_v1',{...values,name:'Stale write',expected_version:version},'VERSION_CONFLICT',reader);
+ });
+ await t.test('room discovery paginates equal timestamps and binds cursor to the selector and live scope',async()=>{
+  const secondRoom=(await mutate('room_save_v1',{name:'Second discovered room',capacity:8})).primary_id;
+  await db.query("update core.rooms set created_at='2026-01-01T00:00:00Z' where org_id=$1 and center_id=$2",[org,center]);
+  const request={operation:'room_save_v1',selector:{operation:'room_save_v1',key:{}},page:{limit:1}};
+  const first=await must(owner,'management_state_get_v1',scope(request));assert.equal(first.items.length,1);assert(first.next_cursor);
+  const next=await must(owner,'management_state_get_v1',scope({...request,page:{limit:1,cursor:first.next_cursor}}));
+  assert.equal(next.items.length,1);assert.equal(next.next_cursor,null);
+  assert.deepEqual([first.items[0].entity.id,next.items[0].entity.id],[room,secondRoom].sort());
+  await fail('management_state_get_v1',{...request,selector:{operation:'room_save_v1',key:{room_id:room}},page:{cursor:first.next_cursor}},'VALIDATION_FAILED');
+  await fail('management_state_get_v1',{...request,page:{cursor:'bad'}},'VALIDATION_FAILED');
+  await fail('management_state_get_v1',{...request,page:{sort:'display_name_asc'}},'VALIDATION_FAILED');
+  await fail('management_state_get_v1',{...request,center_id:other},'FORBIDDEN');
+  await fail('management_state_get_v1',request,'NOT_FOUND',stranger);
+  const absent=await must(owner,'management_state_get_v1',scope({...request,selector:{operation:'room_save_v1',key:{room_id:key()}}}));assert.deepEqual(absent.items,[]);
+ });
  await mutate('center_manager_assign_v1',{center_id:other,person_id:ownerPerson});
  async function linked(label,role,c=center){
   const p=(await mutate('person_create_v1',{center_id:c,display_name:label,contacts:[]})).primary_id;
@@ -129,6 +160,7 @@ test('Room configuration and scoped role reads through real Auth/API',async t=>{
   await mutate('center_manager_revoke_v1',{person_id:manager.p,expected_version:1,reason:'synthetic revoke'});
   await fail('roles_list_v1',{center_id:null,page:{cursor:first.next_cursor}},'FORBIDDEN',manager.u);
   await fail('room_save_v1',{room_id:room,expected_version:4,name:'denied',capacity:10},'FORBIDDEN',manager.u);
+  await fail('management_state_get_v1',{operation:'room_save_v1',selector:{operation:'room_save_v1',key:{room_id:room}}},'FORBIDDEN',manager.u);
   assert.equal((await list(owner,{person_id:manager.p})).items[0].state,'inactive');
  });
  }finally{
