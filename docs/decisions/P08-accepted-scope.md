@@ -1,44 +1,47 @@
-# P08 — kabul edilmiş kapsam ve kurulum kararları
+# P08 — Abone No, ortak başvuru ve etkinlik davranışı
+
+Bu dosya bu üç ürün davranışının tek normatif sahibidir. Plan erişimi/ticari limitler [ürün kapsamında](../contracts/01-FtkSaaS-urun-kapsam-sozlesmesi.md), bildirim ve SaaS dönem davranışı [teknik sözleşmede](../contracts/02-FtkSaaS-teknik-sozlesme.md), uygulama işleri [backend backlog’da](../../apps/backend/docs/remaining-work.md), tenant kurulum girdileri [işletim kaydında](../../apps/backend/docs/remote-backend-setup.md#p08-kurulum-kaydı) tutulur. Kabul edilmiş karar; uygulanmış DTO/migration, test veya canlı kabul demek değildir.
 
 ## Organizasyon bazında sabit abone numarası
 
-23 Ekim kullanıcı kararı: organizasyonun ekran/arama/rapor ve tarihsel takip anahtarı abone numarasıdır; platform UUID kimliği ve ilişkileri korunur. Numara organizasyon içinde benzersiz, değişmez ve yeniden kullanılmaz. Aynı kişinin başka organizasyondaki numarası farklı olabilir; global izleme numarası değildir. Ad veya doğrulanmış iletişim değişikliği numarayı, üyeliği, hakları veya finans bağlantılarını değiştirmez. Numara tek başına kimlik doğrulama/erişim yetkisi sağlamaz.
-
-Format, başlangıç, adaya hangi aşamada tahsis, mevcut kayıt aktarımı ve kişi birleşiminde geçerli/eski numara alias davranışı uygulamadan önce netleştirilir. Eşzamanlı tekillik, idempotent tahsis, tenant izolasyonu, silme/yeniden katılımda yeniden kullanmama ve tarihsel izlenebilirlik kabul edilir. Bu yalnız P08 kaydıdır; migration/API/canlı veri değişmez.
-
-
-22 Ekim kullanıcı kararı: mevcut kurulum mevcut API’lerle ilerler; aşağıdaki genişletmeler P08 kapsamındadır, mevcut runtime kabulünden ayrı uygulanır. API sayısı/DTO/runtime/migration bu kayıtla değişmez.
+- UUID teknik kimlik ve ilişkiler için korunur; fiziksel operasyonun arama/liste/ekran/rapor kimliği **Abone No**’dur. No üzerinden bulunan kişiyle komutlar yine UUID/yetki denetimiyle yürür. Numara kimlik doğrulama veya erişim yetkisi değildir.
+- Kişi organizasyonda ilk kez öğrenci olduğunda hesabı bulunmasa da otomatik tahsis edilir. Yalnız aday/eğitmen/personel olmak tahsis nedeni değildir; öğrenci ilişkisi açılırsa tahsis edilir. Hesap bağlama tahsis ön koşulu değildir.
+- Organizasyon içinde 1001’den başlayan artan, ön eksiz sayı; benzersiz/değişmez ve yeniden kullanılmaz. Boşluklar doldurulmaz, kesintisiz sıra garantisi yoktur. Ad/iletişim/merkez ve aktiflik değişimi numarayı değiştirmez. Başka organizasyonda aynı kişinin numarası bağımsızdır.
+- Mevcut aktif/pasif öğrenciler ilk öğrenci ilişkisinin oluşturulma tarihine, eşitlikte kişi UUID’sine göre sıralanarak tahsis edilir. Bir kişinin birden çok merkez ilişkisi ayrı numara üretmez. Yeniden çalıştırma verilmiş numarayı değiştirmez; yeni tahsisle yarış atomik korunur.
+- Kişi birleşiminde iki numara varsa ilk tahsis edilen korunur; diğeri aynı birleşik kişiye arama sağlayan eski numara/alias olur. Yalnız bir kayıtta numara varsa o korunur. Alias yeniden tahsis edilmez; geçmiş makbuz/listeler yeniden yazılmaz.
+- Eşzamanlı tekillik, idempotent tahsis, tenant izolasyonu, silme/yeniden katılımda numarayı başka kişiye vermeme ve tarihsel izlenebilirlik korunur. Hukuki imha/saklama kuralları numara gerekçesiyle gevşetilmez.
 
 ## Çok kaynaklı ortak CRM başvuru toplama — 23 Ekim 2026 kullanıcı kararı
 
 - Farklı formlar için ayrı başvuru tabloları açılmaz; birden çok form aynı ortak başvuru tablosuna alınır. Organizasyon/merkez kapsamı korunur; Fethiye Tango Kulübü kayıtları yalnız kendi CRM yetkililerine görünür. Mevcut public_applications modelinin genişletilmesi veya ortak modele taşınması uygulama bağımlılık incelemesinde seçilir; ikinci paralel başvuru deposu kurulmaz.
 - Ortak alanlar kullanılır ve zorunlu bir kaynak sütunu ile kaydın hangi form/kanaldan geldiği izlenir. İlk kaynaklar: fethiyetango.com/tr/iletisim, fethiyetango.com/tr/kayit, Instagram, Facebook ve Google reklam formları. Kanal ile belirli formun kimliği karıştırılmaz; sağlayıcı/form kimliği ve mevcutsa kampanya/reklam kimliği, UTM ve sayfa adresi kaynak ayrıntısı olarak korunur. Kaynak bilgisi güvenilir entegrasyon eşlemesinden gelir; istemcinin gönderdiği organizasyon/kaynak beyanı tek başına yetki sağlamaz.
-- 23 Ekim inceleme girdisi (entegrasyon öncesinde güncel handler/DTO yeniden okunmalı): iletişim POST /api/contact ile name/phone/level/consent/marketingConsent gönderir; kayıt POST /api/kayit ile fullName/phone/level/mode/partnerName/consent/marketingConsent gönderir. Kayıt formunda partnerli seçimde partner adı vardır. İkisinde e-posta ve serbest mesaj alanı yoktur. Ad, normalize telefon, seviye ve ayrı zorunlu onay/pazarlama izni ortak modele eşlenir; partner ve kayıt biçimi gibi forma özgü alanlar kaybolmadan saklanır. Nihai şema/DTO adları bu karar kaydıyla belirlenmiş sayılmaz.
-- Kullanıcı mevcut sitede Upstash'ın hız sınırlama yaptığını doğruladı. Mevcut site sunucu uç noktaları ve Upstash koruması korunarak FtkSaaS başvuru API'sine bağlantı planlanır. Mevcut ayrı Supabase projesi fethiyetango (tycmjtboljppdwvgqagy) erişilebilir; ancak tabloları, sunucu handler'ları ve mevcut verinin aktarım ihtiyacı henüz incelenmedi. Eski kayıtlar kendiliğinden taşınmaz veya silinmez.
 - Instagram/Facebook/Google reklamlarındaki yerel formlardan da aynı tabloya alım desteklenmeli. Her sağlayıcı için gerekli hesap erişimi, webhook veya çekme yolu, doğrulanmış gönderici, izin kapsamı ve alan eşlemesi ayrıca doğrulanır; entegrasyonların bugün kurulmuş olduğu varsayılmaz. Reklamdan web formuna yönlendirme ile sağlayıcının kendi formundan alım ayrı giriş yollarıdır.
-- Mevcut public_application_submit_v1 yayın kimliği ve e-posta ister; bu telefon tabanlı genel CRM başvurusunu bugün karşılamaz. Genel başvuru kabulü, yetkili inbox/liste/inceleme ve mevcut kişi/aday eşlemesi birlikte ele alınır. Başvuru otomatik öğrenci, kullanıcı hesabı, satış, rezervasyon veya pazarlama onayı üretmez.
 - Kabul: tenant/merkez izolasyonu, yetkisiz doğrudan tablo/RPC yazımının reddi, web hız/bot koruması ve sağlayıcı doğrulaması, aynı dış başvuru/form gönderiminin tekrarında tek kayıt, aynı kişinin farklı gerçek başvurularının kaynak geçmişini kaybetmemesi, telefon normalizasyonu, ayrı onayların sürüm/zaman/kaynak kanıtı, webhook tekrarları ve geç hata rollback'i. Genel kişi eşleme politikası doğrulanmış iletişim/izin kapılarını aşmaz.
-- Bu madde P08 plan kaydıdır: kod, migration, DTO/envanter, site tasarımı, canlı entegrasyon veya veri aktarımı şimdi değiştirilmez; CI/CD tetiklenmez.
 
+Başvuru otomatik öğrenci, kullanıcı hesabı, satış, rezervasyon veya pazarlama onayı üretmez; bunlar ayrı yetkili işlemlerdir.
 
+### Telefon eşleme ve başvuru tekilliği
 
-- Ders kategori kontenjanı mevcut kapasite kararıyla uygulanmıştır; P08 bunu yeniden açmaz.
-- Sınırsız etkinlik kapasitesinin açık temsili: sihirli büyük sayı veya0 ile taklit edilmemeli. Tenant kurulum değerleri operasyonel kayıt sahibindedir.
-- Pakete bağlı, ders kredisi tüketmeyen etkinlik katılımı: bu paket4 ders sağlar; etkinlik için ayrıca4 hak veya sayaç yoktur. İzin verilen “Pratik” etkinliğine ücretsiz katılım, etkinlik tarihinde paketin iki aylık geçerliliği VE kullanılabilir ders hakkı sürerken mümkündür; süre veya ders hakkı hangisi önce biterse uygunluk kapanır. Etkinlik kaydı yalnız etkinliğin kontenjanından yer ayırır; ders kredisini reserve/consume etmez. Etkinlik yoklaması alınabilir ve ders bakiyesini değiştirmez. Diğer paketler için ayrı etkinlik hak sayacı seçeneği ayrıca tartışılabilir; bu pakete zorunlu değildir. Mevcut event_register/reserve_right ortak havuzdan1 kredi ayırdığından bu davranış uygulanmış değildir. “Pratik” etkinliğin adıdır; mevcut core.events modeli kullanılır, yeni pratik modülü açılmaz.
-- Uygunluk ve paket hareketleri: her harekette bütün etkinlik kayıtlarına durum kopyalamak yerine güncel paket/kapsam/bakiye/geçerlilikten uygunluk hesaplanmalı; kayıt ve katılım kapılarında atomik tekrar kontrolü/yarışlar doğrulanmalı. Hak tüketimi/iadesi, süre uzatma/kısaltma, dondurma/sonlandırma gibi değişiklikler hesabı etkiler. Geçmiş yoklama ve kesin kayıtlar sessizce silinmez/iptal edilmez; mevcut kesin rezervasyon koruması ve açık yönetici çözümü korunur. İlk kayıt, katılım anı ve önceden kesinleşmiş kayıtların korunması birlikte kabul senaryolarına bağlanmalı.
-- Tartışılacak: Business için sınırsız öğrenci/eğitmen/merkez kullanımının uçtan uca temsili. Mevcut private.plan_limit unlimited=true okur; PlanLimit API sözleşmesi ise yalnız key/value kabul eder ve ek alanı reddeder. Sözleşme, okuma yanıtları, doğrulayıcılar ve limit kapılarının ortak modeli P08’de kararlaştırılacak; şimdi runtime değişikliği yapılmaz. Tenant’a özel geçici limitler genel Business limiti değildir.
-- İlk kurulumdaki doğrulanmış owner Auth hesabı ve Business planının fiyat/dönem/limit tanımı operasyonel ön koşullardır; yeni geliştirme gibi veya hazırmış gibi gösterilmez. Gerçek doğrulama/konfigürasyon olmadan hesap doğrulanmış, ödeme yapılmış veya ücretsiz Business planı var sayılmaz.
+Aynı dış gönderimin tekrar teslimi tek başvurudur; aynı telefonla farklı gerçek başvurular ayrı kaynak geçmişi taşır. Telefon normalizasyonu sonrası mevcut kişi eşleşmesi yalnız öneridir; otomatik kişi birleşimi veya doğrulanmış hesap bağlantısı üretmez. Yetkili kişi mevcut kayda bağlar veya ayrı kişi oluşturur. Genel kişi eşleme/izin kapıları korunur.
 
-Mevcut kurulum kararı: sonlu100 haftalık tekrar, toplam kontenjan20, paket başına4 ders; paket geçerliliği2 ay; geçerli ve ders bakiyesi olan pakete bağlı ücretsiz Pratik katılımı (ayrı sayaç yok). Bu kurulumdaki ikinci paket henüz sipariş aşamasındadır; kendiliğinden ikinci satış/borç/hak değildir. Bu örnek mevcut borçlu satış kurallarını genel olarak kaldırmaz. Gerçek ödenmemiş borç katılımı engeller; ders için negatif hak alt sınırı−2, etkinlikte negatif kredi yasağı korunur. Kapalı grupta öğrenci iptali hak iadesi sağlamaz; fiilî yoklama gerçeği kaydedilir.
+### Merkeze yönlendirme
 
-“Sonraki hafta” ek pratik süresi kaldırılmıştır ve açık iş değildir. Süresiz tekrar isteği mevcut kurulumda100 tekrar ile karşılanır; bu nedenle ayrıca süresiz program geliştirmesi açılmaz. Son kaynak incelemesi ve full/main clean kapıları hiçbir P08 maddesiyle gevşetilmez.
+Merkeze bağlı form/reklam güvenilir eşlemesindeki merkeze düşer. Merkez seçilmemiş genel form organizasyon gelen kutusuna düşer; organizasyon yöneticisi atar. Merkez personeli yalnız kendi merkezine atanmış başvuruları, yetkili organizasyon yöneticisi tamamını görür. Merkezler arası aktarım kopya yaratmaz; kaynak, onay ve işlem geçmişi korunur. Tek merkezli planlar kendi merkezine yönlenir; Starter’ın temel ders başvurusu sınırı genel CRM/reklam yetkisi vermez.
 
+### Geçmiş kayıtların aktarımı
 
+Eski kayıtlar otomatik taşınmaz. Alan eşlemesi, mükerrerlik ve onay kanıtlarını gösteren önizlemeden seçilen kayıtlar yetkili onayıyla aktarılır. Kaynak veri silinmez. Kanıtı bulunmayan pazarlama izni verilmiş sayılmaz. Aktarım tekrarları yeni kişi/başvuru üretmez; farklı gerçek başvuruların geçmişi kaybolmaz. Bu karar canlı aktarım çalıştırma yetkisi değildir.
 
+## Etkinlik kapasitesi
 
-Instagram ile giriş/kayıt/hesap bağlama kapsam dışıdır. Buradaki Instagram/Facebook/Google reklam başvuru kaynakları ayrı ortak CRM/P08 veri alımıdır; sosyal login yöntemi veya kurulmuş entegrasyon değildir.
+Odaya bağlı etkinlikte **sınırsız seçilemez**; sayısal kontenjan zorunludur ve oda fiziksel kapasitesini aşamaz. Odaya bağlı olmayan etkinlikte sayısal veya sınırsız kapasite seçilebilir. Sınırsızlık açık temsil edilir; 0 veya büyük sayı ile taklit edilmez. Sınırsız etkinliğe sonradan oda bağlanacaksa geçerli sayısal kapasite gerekir. Mevcut kesin kayıtlar sessizce iptal edilmez; doluluğa aykırı kapasite/oda değişimi açık çözüm olmadan uygulanmaz. Ders kategori kontenjanı kararı değiştirilmez.
 
+## Pakete bağlı kredi tüketmeyen etkinlik katılımı
 
+“Pratik” etkinlik adıdır, ayrı modül değildir; mevcut etkinlik modeli kullanılır. Paket, kapsamındaki etkinlik tarihinde geçerli **ve kullanılabilir ders hakkına sahip** olmalıdır. Süre veya kullanılabilir hak hangisi önce biterse uygunluk kapanır. Kayıt yalnız etkinlik kontenjanında yer ayırır; ders kredisini reserve/consume etmez, ayrı etkinlik hak sayacı zorunlu değildir. Yoklama ders bakiyesini değiştirmez. Tenant paket ders sayısı/süresi genel default değildir.
 
+Uygunluk güncel paket/kapsam/bakiye/geçerlilikten hesaplanır; her paket hareketinde bütün kayıtlara durum kopyalanmaz. Kayıt ve katılım kapılarında atomik tekrar kontrol yapılır. Tüketim/iade, süre değişimi, dondurma/sonlandırma ve yeni uygun paket sonucu etkiler.
 
-Güncel uygulama durumu ve açık işler [tek backlog’dan](../../apps/backend/docs/remaining-work.md), geçmiş izinli operasyonel aktarım [hosted kaydından](../../apps/backend/docs/remote-backend-setup.md#p08-kurulum-kaydı) okunur. Bu karar kaydı veri aktarımı çalıştırma yetkisi değildir.
+Kayıttan sonra uygunluk kaybedilirse kesin kayıt ve yer otomatik iptal edilmez; **Katılım koşulu sağlanmıyor** uyarısı gösterilir. Katılım anında uygun paket yoksa ücretsiz katılım onaylanmaz. Koşul yeniden sağlanınca katılım mümkün olur. Gerçekte katılmış kişinin yoklama gerçeği silinmez; uygunsuz katılım ayrıca işaretlenir. Mevcut borç/negatif kredi ve iptal/iade kuralları korunur.
+
+Süresiz program veya “sonraki hafta” ek Pratik süresi bu kapsamın gereksinimi değildir. Instagram/Facebook/Google reklam alımı sosyal login değildir; Instagram ile giriş/kayıt/hesap bağlama kapsam dışı kalır.

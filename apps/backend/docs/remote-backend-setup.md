@@ -58,6 +58,12 @@ Restore doğrulaması tablo içerik checksum’ları, etkin ACL (NULL için acld
 
 23 Ekim’deki izinli tekil kurulum/aktarımın immutable kaynağı [main üzerindeki tarihli kayıt](https://github.com/SXQHex/FtkSaaS/blob/fe650618503be24eb117297dc412c4ae6fd8018c/apps/backend/docs/remote-backend-setup.md#p08-kurulum-kaydı) içindedir. Bu geçmiş durum güncel veri readback’i veya yeniden yönetici aktarımı yetkisi değildir. Tenant’a özel fiyat, dönem, limit ve ders sayıları genel ürün defaultu değildir. Sipariş/satış/tahsilat/yoklama birbirine çevrilmez. Yeni kapsamın tek sahibi [P08 kararıdır](../../../docs/decisions/P08-accepted-scope.md).
 
+### Kurulum ve eski site inceleme girdileri
+
+Bu bölüm 22–23 Ekim kurulum kararının girdisidir; yeni canlı readback veya veri aktarımı yetkisi değildir. Sonlu 100 haftalık tekrar, toplam kontenjan 20, paket başına 4 ders ve 2 ay geçerlilik tenant değerleridir. İkinci paket sipariş aşamasında kaydedilmişti; güncel ödeme/satış/hak durumu yeniden okunmadan tahsil edilmiş sayılmaz. Bu örnek genel borçlu satış kurallarını kaldırmaz. Gerçek ödenmemiş borç katılımı engeller; kurulumda ders negatif hak alt sınırı −2, etkinlikte negatif kredi yasağı; kapalı grup öğrenci iptalinde iade yok, fiilî yoklama gerçeği korunur. İlk owner Auth doğrulaması ve Business fiyat/dönem/limit konfigürasyonu gerçek kanıt ister; ücretsiz/ödenmiş plan varsayılmaz.
+
+Eski site inceleme girdisi: `POST /api/contact` name/phone/level/consent/marketingConsent; `POST /api/kayit` fullName/phone/level/mode/partnerName/consent/marketingConsent gönderiyordu. Partnerli seçimde partner adı vardı; e-posta/serbest mesaj alanı yoktu. Entegrasyondan önce güncel handler/DTO yeniden okunur. Kullanıcı mevcut Upstash hız sınırlamasını doğruladı; site sunucu uçları ve koruması korunur. Ayrı fethiyetango Supabase projesi `tycmjtboljppdwvgqagy` için veri/handler incelemesi ve kontrollü aktarım önizlemesi gerekir. Kaynak veri kendiliğinden taşınmaz veya silinmez. Genel davranış [P08’de](../../../docs/decisions/P08-accepted-scope.md), uygulama işleri [P07–P10](remaining-work.md#p07) altında tutulur.
+
 ## Restore ve yeniden canlanma engeli
 
 `apps/backend/scripts/restore-guard.mjs` restore öncesinde silinmiş subject referanslarını denetler. Restore/purge yapmaz, erişim açmaz. Başarılı çıktı yalnız JSON referans taramasıdır; Storage, config, WAL/MVCC ve backup expiry ayrıca doğrulanır. Genel privacy orkestrasyonu ve hosted uçtan uca kabul açık kalır.

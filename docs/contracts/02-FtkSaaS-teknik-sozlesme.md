@@ -41,13 +41,13 @@ E-posta/parola, gerçek Google giriş/bağlama ve doğrulayıcı uygulama TOTP i
 
 ## 26 Ekim 2026 — SaaS plan güvenlik ve kullanım sınırı (normatif hedef)
 
-[Plan kapsamı kabul kararı](01-FtkSaaS-urun-kapsam-sozlesmesi.md) eski F01/F11/F16/F21–F25 plan dağılımındaki çelişen hükümleri değiştirir; Starter runtime/API uyarlaması PR56 ile kabul edildi. Pro/Business diğer limit/özel teklif işleri ayrı kalır. **Starter**: tek merkez, tek aktif oda kaynağı, tek disiplin, tek aktif eğitmen ve en fazla 100 aktif öğrenci. Bütün ders/seans/kayıtlar aynı `room_id` ve `discipline_id` ile sınırlandırılır; ikinci oda veya disiplin oluşturma/aktifleştirme; ikinci aktif eğitmen görevlendirme; 101. öğrenci aktifleştirme atomik plan kapısından reddedilir. Öğrenci aktifliğinin mevcut organizasyon tekil sayımı korunur.
+[Plan kapsamı kabul kararı](01-FtkSaaS-urun-kapsam-sozlesmesi.md) eski F01/F11/F16/F21–F25 plan dağılımındaki çelişen hükümleri değiştirir; Starter runtime/API uyarlaması PR56 ile kabul edildi. Pro/Business ticari limitlerin tek sahibi ürün kapsamındaki bağlayıcı tablodur; uygulama kabulü backend backlog’da izlenir. **Starter**: tek merkez, tek aktif oda kaynağı, tek disiplin, tek aktif eğitmen ve en fazla 100 aktif öğrenci. Bütün ders/seans/kayıtlar aynı `room_id` ve `discipline_id` ile sınırlandırılır; ikinci oda veya disiplin oluşturma/aktifleştirme; ikinci aktif eğitmen görevlendirme; 101. öğrenci aktifleştirme atomik plan kapısından reddedilir. Öğrenci aktifliğinin mevcut organizasyon tekil sayımı korunur.
 
 Oda fiziksel kapasitesi (örn. 50) seans toplam/kategori kapasitesinden (örn. aynı mantıksal odada ayrı saatlerde 40 ve 5) ayrıdır. Tek odada eşzamanlı iki seans, gerçek işletmede farklı fiziksel mekânlar olsa bile çakışır; gerçek fiziksel salon kapasitesini işletme doğru seans limitiyle beyan eder, sistem tek başına bilemez. Mevcut fiziksel oda tavanı ve kontrollü aşım korumaları korunur.
 
 Starter ürün/paket isminin **kayıtlı disiplin adıyla başlayan** gösterimi/saklama doğrulaması ve gerçek disiplin kimliği bağlaması zorunludur; isim tek başına disiplin yetkisi oluşturmaz. Düzenli grup programı, sınırlı özel ders, tek disiplinli kredili/süreli/sınırsız hak, F11 self rezervasyon, F25 temel public ders takvimi/başvurusu ve F14 kapanış korunur. Starter'da ikinci aktif eğitmen, ayrı etkinlik (F29), CRM/lead/otomasyon (F21–F24) ve hakediş (F20) kapalıdır. Starter'ın temel başvuru değerlendirmesi CRM veya kesin yer/satış yaratmaz. F12/F17/F22 ve gelişmiş plan işlevleri önceki izin sınırlarını korur. Pro bütün tek merkezli program/etkinlik/CRM/otomasyon/hakediş işlevlerini açar. Business beş merkez ve A→B hesaplaşmayı açar; 5 üstü ayrı sözleşmeli özel limit, genel bypass değildir.
 
-Önceki **plan düşürmede veri korunur** hükmü geçerlidir; mevcut rezervasyon/hak/satış geçmişi otomatik silinmez. Üst plan kayıtlarının tek merkez/oda/disiplin/eğitmen/üye kapsamına geçişi `expected_version`, `kept_center_id` ve `kept_scope` ile açıkça seçilir; abonelik dönem sınırında atomik uygulanır. Typed alanlar ve korunmuş geçmiş davranışı PR56 ile kabul edilmiştir. Starter kararının makine sözleşmesi, `PlanLimit`, DTO/validator, Edge/RPC, etkili limit/özellik kataloğu, paket guardları, F01–F33 plan izi ve gerçek test eşlemesi PR56 tesliminde birlikte güncellendi. Pro/Business diğer sayısal limit/özel teklif aktarımı ayrı kalır. Yeni enum/limit anahtarı veya izin adı bu belgeyle icat edilmez.
+Önceki **plan düşürmede veri korunur** hükmü geçerlidir; mevcut rezervasyon/hak/satış geçmişi otomatik silinmez. Üst plan kayıtlarının tek merkez/oda/disiplin/eğitmen/üye kapsamına geçişi `expected_version`, `kept_center_id` ve `kept_scope` ile açıkça seçilir; abonelik dönem sınırında atomik uygulanır. Typed alanlar ve korunmuş geçmiş davranışı PR56 ile kabul edilmiştir. Starter kararının makine sözleşmesi, `PlanLimit`, DTO/validator, Edge/RPC, etkili limit/özellik kataloğu, paket guardları, F01–F33 plan izi ve gerçek test eşlemesi PR56 tesliminde birlikte güncellendi. Güncel Pro/Business limitlerinin teknik aktarımı [P01/B05](../../apps/backend/docs/remaining-work.md#p01) kapsamındadır. Yeni enum/limit anahtarı veya izin adı bu belgeyle icat edilmez.
 
 
 <a id="oda-seans-kapasite-karari"></a>
@@ -89,7 +89,7 @@ Eski disiplin bazlı oda değerleri fiziksel kapasite kanıtı değildir. Eski o
 
 Seans toplam/kategori indirimi mevcut kesin kayıtları otomatik iptal etmez. Kategorisiz mevcut aktif kayıt/teklifler varken kategorili yapıya geçiş, kategori tahmini yapılarak tamamlanmaz. Böyle bir geçiş `VALIDATION_FAILED` ile reddedilir; mevcut işlemler açık ve yetkili yollarla çözülmelidir. Kategoriler arası FIFO uygulanabilir kontenjan içinde korunur; dolu kategorinin bekleyeni diğer kategorinin boşluğunu bloke etmez.
 
-Birden çok oda atanmışsa her birinin fiziksel sınırı korunur; oda kapasiteleri toplanmaz. Oda atanmamış mevcut açık alan/uzaktan seans modellerine yeni bir oda zorunluluğu eklenmez. Etkinliklerde sınırsız kapasite ve diğer P08 işleri bu teslimle kapanmaz.
+Birden çok oda atanmışsa her birinin fiziksel sınırı korunur; oda kapasiteleri toplanmaz. Oda atanmamış mevcut açık alan/uzaktan seans modellerine yeni bir oda zorunluluğu eklenmez. Etkinliklerin sonlu/sınırsız kapasite davranışının tek sahibi [P08](../decisions/P08-accepted-scope.md#etkinlik-kapasitesi); kaynak ve ortam kabulü backend backlog’dadır.
 
 
 Kapasite-only seans değişikliği kaynak/görevleri yeniden yazmaz. Bekleme keşif anahtarı oda kapasitesi ve kategori doluluğunu içerir; toplam yer değişmeden kategori boşluğu açılması yeniden keşif üretir.
@@ -370,9 +370,15 @@ Ek süre yenileme tarihini uzatmaz, kısmi ödeme yeniden başlatmaz. İstisnai 
 
 ### Yükseltme ve yenilemeyi durdurma
 
-Yükseltme, ödeme doğrulanıp gecikmiş SaaS borcu kapatıldığında hemen açılır. Fiyat farkı kalan dönem oranıyla hesaplanır: (yeni dönem fiyatı − mevcut dönem fiyatı) × kalan dönem oranı. Dönem zamanları esas alınır; yenileme tarihi korunur. Sonraki yenilemede yeni tam bedel alınır. Teklif süreli korunur, ödeme anında sessizce değişmez. İlk kapsam aynı faturalama dönemi içindeki plan değişimleridir; aylık/yıllık dönüşüm ayrıca karardır.
+Yükseltme, ödeme doğrulanıp gecikmiş SaaS borcu kapatıldığında hemen açılır. Fiyat farkı kalan dönem oranıyla hesaplanır: (yeni dönem fiyatı − mevcut dönem fiyatı) × kalan dönem oranı. Dönem zamanları esas alınır; yenileme tarihi korunur. Sonraki yenilemede yeni tam bedel alınır. Teklif süreli korunur, ödeme anında sessizce değişmez. Bu yükseltme hesabı aynı faturalama dönemi içindeki plan değişimi içindir; aylık/yıllık dönüşüm aşağıdaki ayrı kurala tabidir.
 
 Owner yenilemeyi durdurursa ödenmiş dönem sonuna kadar kullanım sürer; sonra organizasyon hizmeti kapanır, veri korunur. Gönüllü iptale ödeme gecikmesi ek süresi uygulanmaz. Dönem bitmeden talep geri çekilebilir; yeni abonelik/ek ücret oluşmaz. Dönem bittikten sonraki dönüş yeni abonelik başlangıcıdır; seçilen plan kapsamında eski verilere erişim açılır.
+
+### SaaS faturalama dönemi değişikliği
+
+Bütün planlarda aylık→yıllık ve yıllık→aylık geçiş mevcut **ödenmiş dönemin sonunda** yürürlüğe girer; mevcut dönemin süresi değişmez. Organizasyon için aynı anda tek bekleyen talep vardır. Yetkili yürürlük öncesi iptal edebilir veya sürümlü talebi değiştirebilir. Yeni dönemin fiyatı ve başlangıç tarihi açıkça kabul edilir; kabul edilen fiyat sonradan sessizce değiştirilmez.
+
+Talep oluşturmak ödeme yapılmış sayılmaz; yeni dönem aktivasyonunda mevcut ödeme ve abonelik erişim kuralları uygulanır. Eşzamanlı değişiklik/iptal/dönem işleme tek sonuç üretir. Öğrenci paketi ve aynı dönem içindeki plan yükseltme/düşürme kurallarıyla karıştırılmaz. Karar teknik uygulanmışlık değildir; [S16](../../apps/backend/docs/remaining-work.md#s16) kaynak/test/hosted kabulünü izler.
 
 ## 13. Belge, paylaşım, aktarım ve bildirim
 
@@ -380,7 +386,7 @@ Owner yenilemeyi durdurursa ödenmiş dönem sonuna kadar kullanım sürer; sonr
 - Herkese açık takvim/kayıt yalnız yayımlanmış ders/etkinlik, ücret/koşulları sunar. Katılımcı listeleri, iletişim, borç/kredi ve iç notlar açılmaz. Hesapsız başvuru alınabilir; kullanıcının kendi kesin rezervasyonu doğrulanmış hesap–kişi bağı gerektirir. Merkezin hesapsız kişi adına işlem yapması engellenmez.
 - Aktarım önizleme, doğrulama, alan eşleme ve satır sonucu içerir. Kişi/açılış kredisi/açılış borcu ilgili modüllerde izlenebilir oluşturulur. Tekrar çalışma mükerrer kayıt oluşturmaz; başarılı satırlar yeniden işlenmez, hatalılar gerekçeli raporlanır. Merkez kapsamlı özel içe aktarma izni gerekir; sıradan kişi ekleme izni yeterli değildir.
 - Rapor/dışa aktarım yetkili ve filtrelenmiş bütün sonucu kapsar; yalnız açık sayfa değildir. Kaynak modül yerine para/kredi/hakediş üretmez.
-- Gerekli işlem bildirimlerinin uygulama içinde görünmesi pazarlama tercihine bağlı değildir. İsteğe bağlı hatırlatma/pazarlama ve dış kanallar kendi izin/tercihlerine tabidir. Dış kanal/sağlayıcı/maliyeti seçilmemiştir; kabul edilmiş e-posta davet ihtiyacı için sağlayıcı kurulumu ayrıca yapılacaktır.
+- Gerekli işlem bildirimlerinin uygulama içinde görünmesi pazarlama tercihine bağlı değildir. İsteğe bağlı hatırlatma/pazarlama ve dış kanallar kendi izin/tercihlerine tabidir. Kanalın ilk sürüm/erteli kapsamı ürün sözleşmesinde, zamanlama ve tercih davranışı FD04’tedir. Sağlayıcı/maliyet/gerçek teslim yapılandırması ayrıca doğrulanır; davet/native Auth teslimi uygulama pazarlama kanalı sayılmaz.
 
 ## 14. Operasyon sözleşmesi ve doğrulama
 
@@ -1091,17 +1097,19 @@ Teknik süre/rate backend işidir. Native Auth SMTP Resend kapsamındadır; uygu
 
 ##### FD04 — bildirim hatırlatma ve pazarlama (kabul edildi)
 
-| Alan | Kabul edilen seçenek/default |
-|---|---|
-| İlk çalışan kanal | in_app. E-posta/push entegrasyon hazır olduğunda seçilir; enum veya ürün onayı dış teslim kanıtı değil. |
-| Zorunlu olaylar | Güvenlik; rezervasyon/talep sonucu; iptal/değişiklik; yer teklifi; tahsilat/iade; erişim değişikliği in_app zorunlu. Diğer olayların zorunluluğu bu listeye sessiz eklenmez. |
-| Hatırlatma | Organizasyon bazında ayrı, başlangıç açık. Ders/etkinlik: 1/3/24 saat, default 24 saat. Paket bitişi: 3/7/14 gün, default 7 gün. Ödeme vadesi: 1/3/7 gün, default 3 gün. |
-| Pazarlama | Platform ve her org ayrı, default kapalı; kanal bazında açılır. Üç reklam/analitik açık-kapatılabilir tercihi ayrı korunur. |
-| Bilgilendirme sıklığı | Uygun olaylarda anlık/günlük/haftalık; default anlık. Günlük 18.00, haftalık pazar 18.00; seçili kullanıcı timezone'unda. |
-| Sessiz saat | Default kapalı; kullanıcı gün/aralık seçer. Güvenlik, merkez iptali, sonraki 24 saatteki ders/event değişimi ve süreli yer teklifi istisna. İstisna kapatılmış dış kanalı açmaz; in_app görünür. |
-| Tekrar/özet | in_app kaydı korunur; hazır dış kanallar ayrı seçilir. Zaman duyarlı olay özete bırakılmaz; geçersiz hatırlatma gönderilmez. |
+İlk sürüm ve sonraki aşama kanal/amaç kapsamının tek sahibi [ürün sözleşmesidir](01-FtkSaaS-urun-kapsam-sozlesmesi.md#ilk-tam-sürüm-ve-sonraki-aşama-sınırı). Aşağıdaki davranış kararı gerçek sağlayıcı kurulumu veya çalışan DTO anlamına gelmez; tüketici [destek projeksiyonunu](../settings.md#bildirim-kullanılabilirliği) esas alır.
 
-ST-03 bildirim kullanılabilirliği `SettingsCatalog.notification_delivery` ile typed okunur. Hazır olmayan email/push uygulama kanalı preference komutunda replay öncesi SERVICE_UNAVAILABLE verir; in_app tercihini değiştirmez. Starter F27 kapalı, zamanlama/sessiz saat/özet kontrolleri unavailable; ilk zorunlu in_app teslim ertelenmez. [Tüketici sınırı](../settings.md).
+| Alan | Kabul edilen davranış |
+|---|---|
+| Zorunlu olaylar | Güvenlik; rezervasyon/talep sonucu; iptal/değişiklik; yer teklifi; tahsilat/iade; erişim değişikliği in_app zorunlu. Diğer olaylar sessizce zorunlu sınıfa eklenmez. |
+| Hatırlatma | Ders ve paket bitişi ayrı açılır/kapanır ve önceden gönderim zamanı ayarlanır; mevcut başlangıç açık tercihi korunur. Mevcut seçenek/defaultlar: ders/etkinlik 1/3/24 saat (24); paket 3/7/14 gün (7); ödeme vadesi 1/3/7 gün (3). Yeni karar vade hatırlatmasının önceki ayarını kaldırmaz. |
+| Miras ve olay zamanı | Organizasyon varsayılanı merkezlere miras kalır; Business’ta organizasyon izin verirse merkez değiştirebilir. Olayın zaman hesabında ilgili merkezin saat dilimi kullanılır. |
+| Kullanıcı tercihleri | İsteğe bağlı hatırlatma ve dış kanal tercihleri korunur; kapalı dış kanal istisna gerekçesiyle açılmaz. Platform ve her org pazarlama tercihi ayrı ve başlangıçta kapalıdır; reklam/analitik tercihleri ayrıca korunur. Tercih saklanması erteli pazarlama gönderimini açmaz. |
+| Sessiz saat | Başlangıçta kapalı; kullanıcı gün/aralık seçebilir. E-posta hatırlatması kullanıcının saat dilimindeki sessiz aralığın sonuna ertelenir. O anda ders başlamış/paket bitmiş veya olay artık geçersizse gönderilmez. |
+| Bekletilmeyen olaylar | Ders iptali/değişikliği, talep sonucu gibi işlemsel bildirimler sessiz saate ertelenmez. İlk in_app kayıt hemen oluşur. Native Auth güvenlik postaları bu tercihlerden bağımsızdır. |
+| Tekrar/özet | Geçersiz hatırlatma gönderilmez, in_app kaydı korunur. Günlük/haftalık özet ilk tam sürümde çalışır seçenek olarak sunulmaz; eski saat/default katalog girdisi çalışan özet mekanizması değildir. |
+
+Hazır kanal/işlev `SettingsCatalog.notification_delivery` ile okunur; desteklenmeyen tercihin kaydedilmiş veya teslim edilmiş olduğu gösterilmez. Source/worker/provider/hosted kabulü ayrı tamamlanır; ilgili işler [P14–P16](../../apps/backend/docs/remaining-work.md#p14) kapsamındadır.
 
 ##### FD05 — member görünürlük ilgi ve takvim (kabul edildi)
 
