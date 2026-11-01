@@ -65,7 +65,10 @@ test.each([
     expect(config.concurrency.group).toContain(
       "github.event.changes.base == null && 'metadata' || 'source'",
     );
-    expect(config.permissions).toEqual({ contents: "read" });
+    expect(config.permissions).toEqual({});
+    for (const job of Object.values(config.jobs) as { permissions: Record<string, string> }[]) {
+      expect(job.permissions).toEqual({ contents: "read" });
+    }
     const scope = config.jobs.scope;
     expect(scope.if).toBe("github.event.action != 'edited' || github.event.changes.base != null");
     expect(scope.outputs[output]).toBe(`\${{ steps.scope.outputs.${output} }}`);
