@@ -28,6 +28,12 @@ Erişilebilir geçmişte aynı shutdown mesajının en eski kaydı [PR94 ilk ada
 
 Birleşik kaynakta `pnpm --filter @ftksaas/backend verify` başarılıdır: üreteç/doküman drift, migration bütünlüğü, audit/governance, TypeScript ve 146 contract/governance/restore + 90 CI politika testi geçti. Hedefli signup/native Auth/parola config testleri 6/6 geçti. Bağımsız süreç kapanışı incelemesinde timeout düzeltmesinden sonra açık P1/P2 bulgu kalmadı. Gerçek DB/Auth/SMTP ve dört API shard kabulü yeni aday full clean ile doğrulanmalıdır; yerel sonuç merge/development kabulü değildir.
 
+## API-1 kapanış ölçümü — aday değişiklik
+
+PR108 API-1 ikinci denemenin runner arşivi worker'ın `UserCancelled` kapanış yoluna girdiğini gösterir; normal job cancellation mesajı veya OOM kanıtı yoktur. Bu enum manuel kullanıcı iptalini kanıtlamaz. Native hesap testi geçmiştir; kesilme daha sonraki renk yaşam döngüsü fixture'ında görülür. Kök neden ve sinyali gönderen süreç henüz belirlenmedi.
+
+Yalnız API-1 için `scripts/ci/observe-api.mjs` gözlemcisi hazırlanmıştır: özel tracefs instance'ında SIGINT/SIGTERM/SIGKILL gönderici thread/comm ve hedef, süreç hâlâ varsa TGID; beş saniyede bir bellek/swap, cgroup memory sayaçları, en yüksek RSS süreçleri ve Docker kaynakları; ayrıca seçilmiş Docker container olayları. Argv/env/label veya iş verisi kaydedilmez. Kayıtlar anlık job loguna ve `.artifacts/ci/diagnostics/api-1-ATTEMPT.jsonl` dosyasına gider. Normal kapanışta timings artifact'ına eklenir; tanı `always()` upload başarısına dayanmaz. VM tamamen kaybolursa son kayıtlar da kaybolabilir; VM dışındaki sağlayıcı eylemi kanıtlanmaz. Trace erişilemezse/stream kapanırsa açık uyarı yazılır; test sonucu veya kabul koşulları değiştirilmez. Kullanıcı push yetkisi vermiştir; değişiklik ayrı main tabanlı Draft PR ile aday kabulüne sunulur. Gerçek kernel/Docker gözlemi CI'da henüz doğrulanmamıştır.
+
 ## XREQ-001 / XREQ-002 teslim sınırı
 
 Son kapsam: `account_signup_check_v1` yalnız e-posta kabul edip `account_exists / available` döndürür. Ana/bağlı Google adresi ve doğrulanmamış kayıt denetlenir; hesap/posta yan etkisi yoktur. `available` anlık sonuçtur, native signup ile atomik değildir. Frontend mevcut adreste durur; yeni adreste native SDK signup çağırır. Route ve ekran tüketimi frontend sahibindedir; bu görev frontend kodunu değiştirmez.

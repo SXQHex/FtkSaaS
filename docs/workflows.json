@@ -9,7 +9,8 @@
       "detail": "docs/client-integration.md",
       "tests": [
         "apps/backend/tests/contract.test.mjs",
-        "apps/backend/tests/api-acceptance.test.mjs"
+        "apps/backend/tests/api-acceptance.test.mjs",
+        "apps/backend/tests/ci-observer.test.mjs"
       ],
       "sources": [
         "apps/backend/database/canonical-settings-scope.sql",
@@ -243,7 +244,8 @@
         "packages/api-contracts/src/operations.ts",
         "packages/api-contracts/src/runtime.ts",
         "docs/documentation.json",
-        "apps/backend/scripts/document-registry.mjs"
+        "apps/backend/scripts/document-registry.mjs",
+        "apps/backend/scripts/ci/observe-api.mjs"
       ],
       "operations": [
         "operation_status_get_v1",
@@ -253,8 +255,8 @@
         "management_state_get_v1"
       ],
       "review": {
-        "fingerprint": "f104c1eec5e6be3bafcba21f5fd0bf94806a277f2816234f6302a178799db007",
-        "reason": "Ortak Main acceptance tum main push olaylarinda gerekli backend/belge ve frontend aday kanitini dogrular; sozlesme compatibility yalniz PR tani sinyalidir ve backend merge/main kabulu sarti degildir; frontend yardimcilari trusted yuzeydedir, ayni kaynak failed-job rerun kabul edilir."
+        "fingerprint": "65fa9d015874b778a369e1bd5671689e23f7f49cc111cfe18a45b540c918a58c",
+        "reason": "API-1 gozlemcisi, argv siz Docker lifecycle allowlist ve regressionlar core verify/test envanterine alindi; structural selector ci-observer testini tanir; test ve kabul siniri korunur, push/CI yok."
       }
     },
     {
