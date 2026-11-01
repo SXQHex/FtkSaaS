@@ -8,6 +8,7 @@ import { Label } from "@ftksaas/ui/components/label";
 import { studentError, uncertainStudentChange, type StudentScope } from "../../lib/students";
 import { ApiFailure } from "../../lib/api";
 import type { DisciplineActions, DisciplineInput } from "../../lib/student-management";
+const buttonClass = "h-auto min-h-11 max-w-full whitespace-normal";
 type Pending = { input: DisciplineInput; blocked?: boolean };
 const uuid = /^[a-f0-9]{8}-[a-f0-9]{4}-7[a-f0-9]{3}-[89ab][a-f0-9]{3}-[a-f0-9]{12}$/i;
 function recover(key: string, scope: StudentScope, personId: string): Pending | "invalid" | null {
@@ -221,7 +222,10 @@ export function PersonDisciplines({
     });
   }
   return (
-    <section className="space-y-4 border-t pt-6" aria-label={t("disciplineTitle")}>
+    <section
+      className="min-w-0 space-y-4 border-t pt-6 wrap-anywhere"
+      aria-label={t("disciplineTitle")}
+    >
       <h3 className="font-semibold">{t("disciplineTitle")}</h3>
       <p className="text-sm text-muted-foreground">{t("disciplineHint")}</p>
       {relations.map((r) => (
@@ -231,7 +235,7 @@ export function PersonDisciplines({
         </p>
       ))}
       {!opened && (
-        <Button variant="outline" onClick={() => setOpened(true)}>
+        <Button className={buttonClass} variant="outline" onClick={() => setOpened(true)}>
           {t("disciplineEdit")}
         </Button>
       )}
@@ -243,11 +247,16 @@ export function PersonDisciplines({
       ) : pending ? (
         <div className="space-y-3">
           <p>{t("disciplineUncertain")}</p>
-          <Button disabled={busy} onClick={() => void check(pending)}>
+          <Button className={buttonClass} disabled={busy} onClick={() => void check(pending)}>
             {t("check")}
           </Button>
           {!pending.blocked && replayReady && (
-            <Button variant="outline" disabled={busy} onClick={() => void save(pending)}>
+            <Button
+              className={buttonClass}
+              variant="outline"
+              disabled={busy}
+              onClick={() => void save(pending)}
+            >
               {t("retrySame")}
             </Button>
           )}
@@ -257,6 +266,7 @@ export function PersonDisciplines({
           <form onSubmit={submit} className="space-y-3">
             {catalogFailed ? (
               <Button
+                className={buttonClass}
                 type="button"
                 variant="outline"
                 onClick={() => {
@@ -303,7 +313,9 @@ export function PersonDisciplines({
                   <option value="active">{t("states.active")}</option>
                   <option value="inactive">{t("states.inactive")}</option>
                 </select>
-                <Button disabled={busy || !selected}>{t("disciplineSave")}</Button>
+                <Button className={buttonClass} disabled={busy || !selected}>
+                  {t("disciplineSave")}
+                </Button>
               </>
             )}
           </form>

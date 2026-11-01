@@ -9,6 +9,7 @@ import { Label } from "@ftksaas/ui/components/label";
 import { ApiFailure, errorMessageKey } from "../../lib/api";
 import type { MergeActions, MergeInput } from "../../lib/student-management";
 import { studentError, uncertainStudentChange, type StudentScope } from "../../lib/students";
+const buttonClass = "h-auto min-h-11 max-w-full whitespace-normal";
 type Pending = { input: MergeInput; targetId: string; blocked?: boolean };
 function recover(key: string, scope: StudentScope): Pending | "invalid" | null {
   try {
@@ -251,7 +252,7 @@ export function PersonMerge({
     !Number.isFinite(Date.parse(preview.expires_at)) ||
     Date.parse(preview.expires_at) <= clock;
   return (
-    <section className="space-y-4 border-t pt-6" aria-label={t("mergeTitle")}>
+    <section className="min-w-0 space-y-4 border-t pt-6 wrap-anywhere" aria-label={t("mergeTitle")}>
       <h3 className="font-semibold">{t("mergeTitle")}</h3>
       <p className="text-sm leading-6 text-muted-foreground">{t("mergeHint")}</p>
       {pending === "invalid" ? (
@@ -262,11 +263,16 @@ export function PersonMerge({
       {pending && pending !== "invalid" ? (
         <div className="space-y-3">
           <p>{t("mergeUncertain")}</p>
-          <Button disabled={busy} onClick={() => void check(pending)}>
+          <Button className={buttonClass} disabled={busy} onClick={() => void check(pending)}>
             {t("check")}
           </Button>
           {!pending.blocked && replayReady && (
-            <Button disabled={busy} variant="outline" onClick={() => void apply(pending)}>
+            <Button
+              className={buttonClass}
+              disabled={busy}
+              variant="outline"
+              onClick={() => void apply(pending)}
+            >
               {t("retrySame")}
             </Button>
           )}
@@ -275,7 +281,7 @@ export function PersonMerge({
       {!pending && (
         <>
           {!opened ? (
-            <Button variant="outline" onClick={() => setOpened(true)}>
+            <Button className={buttonClass} variant="outline" onClick={() => setOpened(true)}>
               {t("mergeOpen")}
             </Button>
           ) : (
@@ -293,7 +299,9 @@ export function PersonMerge({
                   }}
                   disabled={busy}
                 />
-                <Button disabled={busy}>{t("searchButton")}</Button>
+                <Button className={buttonClass} disabled={busy}>
+                  {t("searchButton")}
+                </Button>
               </form>
               {results && (
                 <div className="space-y-2">
@@ -315,6 +323,7 @@ export function PersonMerge({
                   ))}
                   {results.next && (
                     <Button
+                      className={buttonClass}
                       variant="outline"
                       disabled={busy}
                       onClick={() => void search(undefined, results.next ?? undefined)}
@@ -332,7 +341,7 @@ export function PersonMerge({
                       target: target.display_name,
                     })}
                   </p>
-                  <Button disabled={busy} onClick={() => void inspect()}>
+                  <Button className={buttonClass} disabled={busy} onClick={() => void inspect()}>
                     {t("mergePreview")}
                   </Button>
                 </div>
@@ -363,6 +372,7 @@ export function PersonMerge({
                     </p>
                   )}
                   <Button
+                    className={buttonClass}
                     variant="destructive"
                     disabled={busy || blocked}
                     onClick={() => {

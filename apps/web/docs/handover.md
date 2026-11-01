@@ -4,7 +4,7 @@ Bu dosya yalnız devam için gereken çalışma bağlamını taşır. Aktif böl
 
 ## Çalışma bağlamı
 
-Aktif dal `feat/web-s04-completion`, taban main `029667d17e6df30b75b5ef0a2a46c080a7b0f16c`; aynı kaynak main proof (41339801085), merge proof (41339801102) ve development teslimi (41339837912) başarılıdır. S01 temel teslimi kullanıcı onayıyla kapalıdır; aktif bölüm [S04](todo.md#web-s04). Disiplin ilişkisi düzenleme ve tek yönetici kapsamlı kişi birleştirme geliştiriliyor; kaynak henüz PR/hosted kabulü değildir. Genel hesap erişimi keşfi ve çok yöneticili birleştirme onayı için talepler ortak kayıt sahibinde tutulur.
+Aktif dal `feat/web-s04-completion`, taban main `029667d17e6df30b75b5ef0a2a46c080a7b0f16c`; aynı kaynak main proof (41339801085), merge proof (41339801102) ve development teslimi (41339837912) başarılıdır. S01 temel teslimi kullanıcı onayıyla kapalıdır; aktif bölüm [S04](todo.md#web-s04). Disiplin ilişkisi düzenleme ve tek yönetici kapsamlı kişi birleştirme Draft PR #123 içindedir. Code Simplification incelemesi sonrası tekrar eden süzme/yenileme ve render katmanları azaltıldı; önceki aday CI’daki büyütülmüş metin taşması için ayrı düğme düzeltmesi hazırlandı. Son test ve kabul durumu yalnız S04 kaydındadır; hosted kabulü değildir. Genel hesap erişimi keşfi ve çok yöneticili birleştirme onayı için talepler ortak kayıt sahibinde tutulur.
 
 Kullanıcı, **Frontend UI Engineering** ve **frontend-design-assistant** becerilerinin sohbetin tamamındaki frontend çalışmalarında kullanılmasını açıkça istedi. Her ikisi uygulanır; mevcut shadcn/ui ve kabul edilmiş ürün tasarım tercihleri korunur. Ekranların amacı, bilgi sırası, mobil davranışı ve hata/kurtarma durumları koddan önce belirlenir.
 
