@@ -5,7 +5,7 @@ import {constants} from 'node:os';
 import {pathToFileURL} from 'node:url';
 import {ciFile} from '../paths.mjs';
 
-export function memorySnapshot(root='/proc'){
+export function memorySnapshot(root='/proc',limit=15){
  const text=fs.readFileSync(path.join(root,'meminfo'),'utf8');
  const memory=Object.fromEntries([...text.matchAll(/^(MemTotal|MemAvailable|SwapTotal|SwapFree):\s+(\d+) kB$/gm)].map(m=>[m[1]+'_kib',Number(m[2])]));
  const processes=[];
@@ -15,7 +15,7 @@ export function memorySnapshot(root='/proc'){
    processes.push({pid:Number(pid),ppid:Number(field('PPid')),name:field('Name'),rss_kib:Number(field('VmRSS')?.split(' ')[0]??0)});
   }catch{/* A process can exit between directory listing and reading status. */}
  }
- return {memory,processes:processes.sort((a,b)=>b.rss_kib-a.rss_kib).slice(0,15)};
+ return {memory,processes:processes.sort((a,b)=>b.rss_kib-a.rss_kib).slice(0,limit)};
 }
 export function signalEvent(line,readStatus=tid=>fs.readFileSync(`/proc/${tid}/status`,'utf8')){
  // trace_pipe's prefix identifies the sender thread, not necessarily its TGID.

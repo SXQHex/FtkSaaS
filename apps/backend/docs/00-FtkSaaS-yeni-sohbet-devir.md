@@ -38,3 +38,7 @@ Yalnız API-1 için `scripts/ci/observe-api.mjs` gözlemcisi PR109 ile main’e 
 ## Alanlar arası koordinasyon
 
 Frontend kaynak/ekran kabulünün sahibi [frontend devri](../../web/docs/handover.md) ve [frontend planıdır](../../web/docs/todo.md). Backend bunları değiştirmez veya karşı taraf adına kapatmaz. Somut teslim/ret/erteleme yalnız [ortak taleplerde](../../../docs/requests.md) kendi alanına yazılır. Sonraki doğal belge değişikliğinde doğrulanmış güncel snapshot değiştirilir; run linki için sonsuz commit veya ikinci durum tablosu kurulmaz.
+
+## Edge bellek tanısı
+
+PR113 f27435a kaynağındaki 41272661320 koşusunda core/quality başarılı; API-1 ölçümünde aynı Edge PID’si 402 MiB’den 14,1 GiB RSS’ye büyüdü, swap tükendi ve kernel SIGKILL ardından runner shutdown görüldü. Bunun uygulama heap’i veya worker/runtime birikimi olduğu henüz ayrıştırılmadı. `diagnostic/edge-memory-ab` dalındaki tek seferlik push workflow’u aynı kaynak ve sabit salt okunur istek yükünü per_worker/oneshot ile ayrı izole runner’larda karşılaştırır. 2 GiB toplam Edge RSS veya 1 GiB’den az kullanılabilir host belleğinde yük durdurulur. Sonuçlar `.artifacts/ci/edge-memory` JSONL/JSON çıktılarıdır; credential içeren CLI logları yüklenmez. Bu deney full clean/merge kabulü veya kalıcı worker politikası değişikliği değildir.

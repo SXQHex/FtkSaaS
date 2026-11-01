@@ -11,7 +11,8 @@
         "apps/backend/tests/contract.test.mjs",
         "apps/backend/tests/api-acceptance.test.mjs",
         "apps/backend/tests/ci-observer.test.mjs",
-        "apps/backend/tests/quality-guard.test.mjs"
+        "apps/backend/tests/quality-guard.test.mjs",
+        "apps/backend/tests/edge-memory-ab.test.mjs"
       ],
       "sources": [
         "apps/backend/database/canonical-settings-scope.sql",
@@ -250,7 +251,8 @@
         "apps/backend/scripts/ci/floor-guard.mjs",
         "apps/backend/scripts/ci/floor-exceptions.json",
         "apps/backend/scripts/ci/quality-proof.mjs",
-        "apps/backend/scripts/ci/check-quality.mjs"
+        "apps/backend/scripts/ci/check-quality.mjs",
+        "apps/backend/scripts/ci/edge-memory-ab.mjs"
       ],
       "operations": [
         "operation_status_get_v1",
@@ -260,8 +262,8 @@
         "management_state_get_v1"
       ],
       "review": {
-        "fingerprint": "42044f7452550b45a6bd8fb595640e77a815823d84a9b0dfaf49d3398f025281",
-        "reason": "F01/F26 ve hedef plan limitleri denetlendi; kaynak başlığı, backend transaction belge sahipliği ve root kalite sözleşmesi kaydı düzeltildi; WF00 runtime protokolü değişmedi."
+        "fingerprint": "3fb6f86fab283e0223adee469c07aa0f39c380740d5a187cb01d25a3f98719a4",
+        "reason": "Edge bellek tanısı tüm süreçleri sayar; CLI metadata okumaları timeout ve kapalı stderr ile sınırlandırıldı; kullanıcı akışı değişmedi."
       }
     },
     {
