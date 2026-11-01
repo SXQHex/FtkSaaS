@@ -93195,7 +93195,7 @@
     "accepted_product_decisions": [
       {
         "id": "Q-D01",
-        "source": "10-FtkSaaS-Q-D01-kabul-karari.md",
+        "source": "docs/contracts/02-FtkSaaS-teknik-sozlesme.md",
         "product_status": "accepted_closed",
         "technical_status": "verified_real_auth_rpc_and_shared_pool_races",
         "event_labels": "zero_one_many_same_org_not_grants",
@@ -94425,9 +94425,9 @@
         "contract_only_operations": [],
         "acceptance_case_ids": [],
         "plan_scope": {
-          "starter": "1 aktif merkez/oda/disiplin/eğitmen; 100 aktif öğrenci",
-          "pro": "Tek merkez",
-          "business": "Çoklu merkez"
+          "starter": "Bağlayıcı plan tablosu",
+          "pro": "Bağlayıcı plan tablosu",
+          "business": "Bağlayıcı plan tablosu"
         },
         "completed_dependencies": [],
         "acceptance_source": "apps/backend/docs/00-FtkSaaS-yeni-sohbet-devir.md"
@@ -95871,8 +95871,8 @@
         "acceptance_case_ids": [],
         "plan_scope": {
           "starter": "Uygulama içi",
-          "pro": "Var",
-          "business": "Var"
+          "pro": "Uygulama içi + e-posta",
+          "business": "Uygulama içi + e-posta"
         },
         "completed_dependencies": [],
         "acceptance_source": "apps/backend/docs/00-FtkSaaS-yeni-sohbet-devir.md"
@@ -96332,6 +96332,34 @@
         "existing_policies": "unchanged; no backfill",
         "consumer_read": "policies_get_v1 and existing policy_at/lesson/reservation consumers",
         "unconfigured_business_values": "explicit setup required; no invented windows, hours, terms or pricing"
+      }
+    },
+    "accepted_plan_limits": {
+      "source": "docs/contracts/01-FtkSaaS-urun-kapsam-sozlesmesi.md#bağlayıcı-kapsam",
+      "status": "accepted_target_not_runtime_evidence",
+      "unlimited_representation": "commercial_unlimited",
+      "plans": {
+        "starter": {
+          "centers": 1,
+          "rooms": 1,
+          "disciplines": 1,
+          "instructors": 1,
+          "active_students": 100
+        },
+        "pro": {
+          "centers": 1,
+          "rooms": "commercial_unlimited",
+          "disciplines": "multiple",
+          "instructors": "commercial_unlimited",
+          "active_students": 250
+        },
+        "business": {
+          "centers": 5,
+          "rooms": "commercial_unlimited",
+          "disciplines": "multiple",
+          "instructors": "commercial_unlimited",
+          "active_students": 1250
+        }
       }
     }
   }

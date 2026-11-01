@@ -233,6 +233,31 @@ export function validateGovernance(p,implemented){
 
 
 export function validateProductMatrix(p,source=fs.readFileSync('../../docs/contracts/01-FtkSaaS-urun-kapsam-sozlesmesi.md','utf8')){
+ const target=p['x-contract'].accepted_plan_limits;
+ assert.equal(target?.status,'accepted_target_not_runtime_evidence','PRODUCT_LIMIT_STATUS');
+ assert.equal(target.source,'docs/contracts/01-FtkSaaS-urun-kapsam-sozlesmesi.md#bağlayıcı-kapsam','PRODUCT_LIMIT_SOURCE');
+ assert.equal(target.unlimited_representation,'commercial_unlimited','PRODUCT_LIMIT_UNLIMITED');
+ assert.deepEqual(Object.keys(target.plans).sort(),['business','pro','starter'],'PRODUCT_LIMIT_PLANS');
+ const labels={centers:'Aktif merkez',rooms:'Sisteme tanımlanabilen aktif ders/aktivite odası',disciplines:'Aktif disiplin',instructors:'Aktif eğitmen',active_students:'Aktif öğrenci/üye'};
+ for(const [plan,limits] of Object.entries(target.plans)){
+  assert.deepEqual(Object.keys(limits).sort(),Object.keys(labels).sort(),'PRODUCT_LIMIT_KEYS '+plan);
+  for(const [key,value] of Object.entries(limits))assert(Number.isSafeInteger(value)&&value>0||value==='commercial_unlimited'&&['rooms','instructors'].includes(key)||value==='multiple'&&key==='disciplines','PRODUCT_LIMIT_VALUE '+plan+'/'+key);
+ }
+ assert.deepEqual(target.plans.starter,p['x-contract'].starter_plan_policy.limits,'STARTER_TARGET_LIMIT_DRIFT');
+ const table=source.split('\n').filter(l=>l.startsWith('|')).map(l=>l.split('|').slice(1,-1).map(v=>v.trim().replaceAll('**','')));
+ for(const [key,label] of Object.entries(labels)){
+  const matches=table.filter(row=>row[0]===label);
+  assert.equal(matches.length,1,'PRODUCT_LIMIT_ROW '+key);
+  const expected=['starter','pro','business'].map(plan=>{
+   const value=target.plans[plan][key];
+   if(value==='commercial_unlimited')return plan==='business'&&key==='rooms'?'Merkezler içinde ticari sınırsız':'Ticari sınırsız';
+   if(value==='multiple')return 'Birden fazla';
+   if(plan==='business'&&key==='centers')return value+"'e kadar";
+   if(plan==='business'&&key==='active_students')return 'Organizasyon genelinde '+String(value).replace(/\B(?=(\d{3})+(?!\d))/g,'.')+'; merkez başına kota yok';
+   return String(value);
+  });
+  assert.deepEqual(matches[0].slice(1),expected,'PRODUCT_PLAN_LIMIT '+key);
+ }
  const rows=source.split('\n').filter(l=>/^\| F\d{2} \|/.test(l));
  assert.equal(rows.length,33,'PRODUCT_PLAN_MATRIX_ROWS');
  for(const line of rows){

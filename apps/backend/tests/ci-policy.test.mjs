@@ -345,7 +345,7 @@ test('measurement distinguishes queue setup test wall and runner time',()=>{
  assert.equal(rows[0].queue_s,10);assert.equal(rows[0].setup_s,20);assert.equal(rows[0].test_s,80);assert.equal(rows[0].runner_s,110);
 });
 
-test('every test file is accounted for in structural DB or API clean obligations',()=>{const actual=fs.readdirSync('apps/backend/tests').filter(p=>p.endsWith('.test.mjs')).map(p=>'apps/backend/tests/'+p).sort();assert.deepEqual(actual,[...apiSuites,...['contract','governance','ci-policy','ci-observer','database','event-scope','restore-guard'].map(n=>'apps/backend/tests/'+n+'.test.mjs')].sort());});
+test('every test file is accounted for in structural DB or API clean obligations',()=>{const actual=fs.readdirSync('apps/backend/tests').filter(p=>p.endsWith('.test.mjs')).map(p=>'apps/backend/tests/'+p).sort();assert.deepEqual(actual,[...apiSuites,...['contract','governance','ci-policy','ci-observer','quality-guard','database','event-scope','restore-guard'].map(n=>'apps/backend/tests/'+n+'.test.mjs')].sort());});
 test('metadata-only serial labels do not invalidate automatic acceptance or create extra tests',()=>{
  const v=valid();v.pr.labels=[{name:'ci:measure-serial'}];assert(validateBinding(v));
  v.binding.benchmark=true;assert.throws(()=>validateBinding(v));
@@ -509,6 +509,7 @@ function scopedGithub(paths,{truncated=false,moved=false}={}){
   repos:{listPullRequestsAssociatedWithCommit:'prs',createCommitStatus:async s=>{statuses.push(s);}},
   actions:{listWorkflowRuns:'runs'}
  },paginate:async method=>method==='prs'?[pr]:[]};
+ attachQualityFixture(github,pr);
  return {github,pr,statuses};
 }
 test('frontend-only PR passes backend scope without inventing a full-test receipt; mixed and unknown scope cannot skip',async()=>{
@@ -653,8 +654,10 @@ function candidateProofFixture(dir,{kind='full',rerun=false}={}){
  if(rerun){v.run.run_attempt=2;v.binding={...v.binding,profile:'four-isolated-v2',attempt:2,source_attempt:1};v.jobs.forEach(j=>j.run_attempt=2);v.jobs[0].steps.push({name:'Upload schema baseline',conclusion:'success'});}
  if(kind==='documentation'){v.binding.kind=kind;v.jobs=[{...v.jobs[0],name:'documentation',steps:[{name:'Documentation acceptance',conclusion:'success'},{name:'Verify tested merge',conclusion:'success'}]}];}
  writeFileSync(join(dir,'binding.json'),JSON.stringify(v.binding));execFileSync('zip',['-q',join(dir,'proof.zip'),'binding.json'],{cwd:dir});const zip=fs.readFileSync(join(dir,'proof.zip'));
+ const qualityZip=qualityFixture(dir,rerun?{...v.run,run_attempt:1}:v.run,pr);
+ v.jobs.push(qualityJob(v.run));
  const repo={owner:'synthetic',repo:'test'};
- const github={rest:{git:{getTree:async({tree_sha})=>({data:{tree:[{path:kind==='documentation'?'README.md':'apps/backend/database/kernel.sql',type:'blob',mode:'100644',sha:tree_sha}]}}),getBlob:async()=>({data:{encoding:'base64',content:Buffer.from('regular prose').toString('base64')}}),getCommit:async({commit_sha})=>({data:{...v.tested,sha:commit_sha,tree:{sha:commit_sha==='bad-tree'?'wrong':'T'}}})},repos:{listPullRequestsAssociatedWithCommit:'prs'},actions:{getWorkflowRun:async({run_id})=>({data:{...v.run,id:run_id}}),listWorkflowRuns:'runs',listJobsForWorkflowRun:'jobs',listWorkflowRunArtifacts:'artifacts',downloadArtifact:async()=>({data:zip})}},paginate:async(method,args)=>method==='prs'?[pr]:method==='runs'?[{...v.run,id:10,conclusion:'cancelled'},{...v.run,id:9},{...v.run,id:7},v.run]:method==='jobs'?v.jobs.map(j=>({...j,run_id:args.run_id})):args.run_id===9?[]:[{id:1,name:(kind==='documentation'?'document-binding-':'candidate-binding-')+v.run.run_attempt}]};
+ const github={rest:{git:{getTree:async({tree_sha})=>({data:{tree:[{path:kind==='documentation'?'README.md':'apps/backend/database/kernel.sql',type:'blob',mode:'100644',sha:tree_sha}]}}),getBlob:async()=>({data:{encoding:'base64',content:Buffer.from('regular prose').toString('base64')}}),getCommit:async({commit_sha})=>({data:{...v.tested,sha:commit_sha,tree:{sha:commit_sha==='bad-tree'?'wrong':'T'}}})},repos:{listPullRequestsAssociatedWithCommit:'prs'},actions:{getWorkflowRun:async({run_id})=>({data:{...v.run,id:run_id}}),listWorkflowRuns:'runs',listJobsForWorkflowRun:'jobs',listWorkflowRunArtifacts:'artifacts',downloadArtifact:async({artifact_id})=>({data:artifact_id===2?qualityZip:zip})}},paginate:async(method,args)=>method==='prs'?[pr]:method==='runs'?[{...v.run,id:10,conclusion:'cancelled'},{...v.run,id:9},{...v.run,id:7},v.run]:method==='jobs'?v.jobs.map(j=>({...j,run_id:args.run_id})):args.run_id===9?[]:[{id:1,name:(kind==='documentation'?'document-binding-':'candidate-binding-')+v.run.run_attempt},{id:2,name:'quality-binding'}]};
  return {v,pr,repo,github};
 }
 test('cancelled incomplete and stale successful runs cannot shadow valid source-bound full or documentation evidence',async()=>{
@@ -933,4 +936,22 @@ test('v2 merge proof retains source and upload obligations for inherited jobs',(
  for(const mutate of [x=>x.binding.source_attempt=0,x=>x.binding.source_attempt=3,x=>delete x.binding.source_attempt,x=>x.binding.tree='other',x=>x.binding.coverage='other',x=>x.pr.base.sha='other',x=>x.jobs[0].conclusion='failure',x=>x.jobs[0].steps[2].conclusion='failure',x=>x.jobs[0].steps.push(structuredClone(x.jobs[0].steps[0])),x=>x.jobs[1].steps[0].conclusion='skipped']){
   const x=structuredClone(v);mutate(x);assert.throws(()=>validateBinding(x));
  }
+});
+
+function qualityJob(run){return {name:'quality',run_id:run.id,run_attempt:run.run_attempt,head_sha:run.head_sha,status:'completed',conclusion:'success',steps:['Verify quality source','Quality floor','Secret scan','Upload quality binding'].map(name=>({name,conclusion:'success'}))};}
+function qualityFixture(dir,run,pr){
+ writeFileSync(join(dir,'binding.json'),JSON.stringify({kind:'quality-v1',pr:pr.number,head:pr.head.sha,base:pr.base.sha,tree:'T',run_id:run.id,attempt:run.run_attempt}));
+ execFileSync('zip',['-q',join(dir,'quality.zip'),'binding.json'],{cwd:dir});return fs.readFileSync(join(dir,'quality.zip'));
+}
+function attachQualityFixture(github,pr){
+ const dir=mkdtempSync(join(tmpdir(),'quality-proof-'));
+ const run={id:5,run_attempt:1,head_sha:'H',path:'.github/workflows/ci-full.yml',event:'pull_request',status:'completed',conclusion:'success'};
+ let zip;try{zip=qualityFixture(dir,run,pr);}finally{rmSync(dir,{recursive:true,force:true});}
+ Object.assign(github.rest.actions,{listJobsForWorkflowRun:'quality-jobs',listWorkflowRunArtifacts:'quality-artifacts',downloadArtifact:async()=>({data:zip}),getWorkflowRun:async()=>({data:run})});
+ const original=github.paginate;
+ github.paginate=async(method,args)=>method==='runs'?[run]:method==='quality-jobs'?[qualityJob(run)]:method==='quality-artifacts'?[{id:2,name:'quality-binding'}]:original(method,args);
+}
+
+test('quality thresholds and nested checker config cannot escape trusted policy', () => {
+ for(const file of ['CONSTRAINTS.md','apps/web/.gitignore','apps/web/src/.ignore','apps/web/tsconfig.json','packages/typescript-config/base.json','packages/api-contracts/package.json','apps/web/src/nested/.oxlintrc.json','apps/web/vitest.config.ts','apps/web/scripts/verify-isolation.mjs','turbo.json']) assert(policyPath(file),file);
 });

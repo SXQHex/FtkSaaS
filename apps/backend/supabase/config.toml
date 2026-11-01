@@ -372,9 +372,9 @@ allow_dynamic_registration = false
 
 [edge_runtime]
 enabled = true
-# Reuse the bundled gateway across requests; oneshot reloads it for every API call.
-# Each clean job still starts with its own isolated runtime and freshly reset DB.
-policy = "per_worker"
+# Isolate local/CI requests: per_worker retained memory in the native runtime.
+# Evidence and acceptance limits: ../docs/00-FtkSaaS-yeni-sohbet-devir.md
+policy = "oneshot"
 # Port to attach the Chrome inspector for debugging edge functions.
 # The Deno major version to use.
 deno_version = 2

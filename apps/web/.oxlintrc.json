@@ -15,6 +15,17 @@
       {
         "maxArgs": 2
       }
+    ],
+    "no-restricted-imports": [
+      "error",
+      {
+        "patterns": [
+          {
+            "group": ["@ftksaas/backend", "@ftksaas/backend/**", "**/backend/**"],
+            "message": "Use the public shared package contract; application internals are owned by their application."
+          }
+        ]
+      }
     ]
   },
   "overrides": [
@@ -22,6 +33,27 @@
       "files": ["src/components/preferences.tsx"],
       "rules": {
         "react/set-state-in-effect": "off"
+      }
+    },
+    {
+      "files": ["src/app/api/auth/signup-check/route.ts"],
+      "rules": {
+        "no-restricted-imports": [
+          "error",
+          {
+            "patterns": [
+              {
+                "group": [
+                  "@ftksaas/backend",
+                  "@ftksaas/backend/**",
+                  "**/backend/**",
+                  "!../../../../../../backend/transports/account-signup-gateway.mjs"
+                ],
+                "message": "Use the public shared package contract; application internals are owned by their application."
+              }
+            ]
+          }
+        ]
       }
     }
   ]

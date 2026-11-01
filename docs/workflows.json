@@ -10,7 +10,8 @@
       "tests": [
         "apps/backend/tests/contract.test.mjs",
         "apps/backend/tests/api-acceptance.test.mjs",
-        "apps/backend/tests/ci-observer.test.mjs"
+        "apps/backend/tests/ci-observer.test.mjs",
+        "apps/backend/tests/quality-guard.test.mjs"
       ],
       "sources": [
         "apps/backend/database/canonical-settings-scope.sql",
@@ -245,7 +246,11 @@
         "packages/api-contracts/src/runtime.ts",
         "docs/documentation.json",
         "apps/backend/scripts/document-registry.mjs",
-        "apps/backend/scripts/ci/observe-api.mjs"
+        "apps/backend/scripts/ci/observe-api.mjs",
+        "apps/backend/scripts/ci/floor-guard.mjs",
+        "apps/backend/scripts/ci/floor-exceptions.json",
+        "apps/backend/scripts/ci/quality-proof.mjs",
+        "apps/backend/scripts/ci/check-quality.mjs"
       ],
       "operations": [
         "operation_status_get_v1",
@@ -255,8 +260,8 @@
         "management_state_get_v1"
       ],
       "review": {
-        "fingerprint": "65fa9d015874b778a369e1bd5671689e23f7f49cc111cfe18a45b540c918a58c",
-        "reason": "API-1 gozlemcisi, argv siz Docker lifecycle allowlist ve regressionlar core verify/test envanterine alindi; structural selector ci-observer testini tanir; test ve kabul siniri korunur, push/CI yok."
+        "fingerprint": "a3f801855dca7a2c0ed9af49e234abed4c47d52118d9c454960082480ed021fc",
+        "reason": "Native Edge A/B ölçümüne göre yalnız yerel/CI worker ömrü oneshot oldu; WF00 auth/tenant/wire/atomiklik hükümleri değişmedi."
       }
     },
     {
@@ -332,8 +337,8 @@
         "account_signup_check_v1"
       ],
       "review": {
-        "fingerprint": "47587fd42bfcbacb726d587393ea2a30f6b50ce171b984fef9108af4c742aaf7",
-        "reason": "Native Auth rehberi ve kayıt kabul testi incelendi: mevcut HTTP timeout yardımcısı kullanılıyor, ret yanıtı tüketiliyor; account_exists, veri/posta yan etkisi ve yetki assertionları korunuyor."
+        "fingerprint": "3dc21fa6b358d9d3a17333e25aa366a266201f93a8702e9668248365de0e43c4",
+        "reason": "Onaylı oneshot yerel/CI yaşam döngüsü değişimi incelendi; native Auth ayarları, JWT, MFA ve hesap API protokolü değişmedi."
       }
     },
     {

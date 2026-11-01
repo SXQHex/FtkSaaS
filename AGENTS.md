@@ -1,8 +1,10 @@
 # FtkSaaS çalışma kuralları
 
+Kod yazmadan önce [CONSTRAINTS.md](CONSTRAINTS.md) kalite sözleşmesini oku; bir değişikliği geçirmek için zayıflatma.
+
 ## Başlangıç ve kaynak önceliği
 
-Önce bu belgeyi, [kaynak indeksini](docs/source-index.md), [güncel kabulü](apps/backend/docs/00-FtkSaaS-yeni-sohbet-devir.md), [açık işleri](apps/backend/docs/remaining-work.md) ve [aktif sırayı](apps/backend/docs/production-queue.md) oku. Ardından belge haritasından tek konu sahibini ve ilgili WF/typed consumer kaynağını seç. Varsayılan belge aramasında `docs/history/**` ve eski Git sürümlerini dışla. Arşiv yalnız açık tarihsel soru için okunur; güncel kural, iş veya kabul kanıtı olamaz. Tam başlangıç SHA’sını ve aynı SHA’nın gerçek CI sonucunu doğrula. Eski başarı yeni kaynağa taşınmaz.
+Önce bu belgeyi, [kaynak indeksini](docs/source-index.md) ve görevin alanındaki README/AGENTS dosyalarını oku. Alanın planı, kabulü ve devri kendi `apps/backend/docs` veya `apps/web/docs` klasöründen alınır; diğer alan yalnız ilgili sözleşme/bağımlılık için okunur. Ardından belge haritasından tek konu sahibini ve ilgili WF/typed consumer kaynağını seç. Varsayılan belge aramasında `docs/history/**` ve eski Git sürümlerini dışla. Arşiv yalnız açık tarihsel soru için okunur; güncel kural, iş veya kabul kanıtı olamaz. Tam başlangıç SHA’sını ve aynı SHA’nın gerçek CI sonucunu doğrula. Eski başarı yeni kaynağa taşınmaz.
 
 Son açık kullanıcı kararı üstündür; kabul edilmiş D01–D09/U01–U08/Q-D01/Q-E02/Q-E03 ve FD01–FD12 hükümleri korunur. Bilinmeyen ürün, fiyat, politika veya config değeri uydurulmaz. Karar, uygulama, test, merge ve hosted kabulü ayrı durumlardır.
 
