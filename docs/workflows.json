@@ -253,8 +253,8 @@
         "management_state_get_v1"
       ],
       "review": {
-        "fingerprint": "63fd55dc19ba712d385f29970c0edb7fc02e6fbd12d0e3b1d0f33ee76cc2e322",
-        "reason": "Reviewed CI scope and source policy: Dependabot configuration is trusted backend/full input; job permissions, bounded verifier timeouts and native reviewed auto-merge preserve exact-source acceptance, tenant and Auth behavior."
+        "fingerprint": "f104c1eec5e6be3bafcba21f5fd0bf94806a277f2816234f6302a178799db007",
+        "reason": "Ortak Main acceptance tum main push olaylarinda gerekli backend/belge ve frontend aday kanitini dogrular; sozlesme compatibility yalniz PR tani sinyalidir ve backend merge/main kabulu sarti degildir; frontend yardimcilari trusted yuzeydedir, ayni kaynak failed-job rerun kabul edilir."
       }
     },
     {

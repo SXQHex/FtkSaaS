@@ -3,8 +3,6 @@ on:
   pull_request:
     branches: [main]
     types: [opened, synchronize, reopened, edited]
-  push:
-    branches: [main]
   workflow_dispatch:
 permissions: {}
 concurrency:
@@ -31,6 +29,19 @@ jobs:
       - name: Select frontend scope
         id: scope
         run: node apps/web/scripts/ci-scope.mjs
+      - name: Record candidate source
+        if: github.event_name == 'pull_request'
+        run: node apps/web/scripts/ci-proof.mjs frontend
+      - name: Upload candidate source
+        if: github.event_name == 'pull_request'
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: frontend-source-frontend-${{ github.run_attempt }}
+          path: .artifacts/ci/frontend-source.json
+          if-no-files-found: error
+          retention-days: 30
+          include-hidden-files: true
+          archive: true
   checks:
     permissions:
       contents: read

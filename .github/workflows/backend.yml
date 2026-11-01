@@ -3,120 +3,6 @@ run-name: 'Main proof · ${{ github.sha }}'
 on:
   push:
     branches: [main]
-    paths:
-      - 'apps/backend/**'
-      - 'packages/api-contracts/**'
-      - 'packages/typescript-config/**'
-      - '.devcontainer/**'
-      - '.github/workflows/**'
-      - 'package.json'
-      - 'pnpm-lock.yaml'
-      - 'pnpm-workspace.yaml'
-      - 'turbo.json'
-      - '.nvmrc'
-      - '.gitignore'
-      - 'docs/history/manifest.json'
-      - 'docs/endpoint-inventory.json'
-      - 'docs/feature-delivery.json'
-      - '.github/dependabot.yml'
-      - '!.github/workflows/frontend.yml'
-      - '!.github/workflows/frontend-compatibility.yml'
-      - 'docs/*.json'
-      - 'AGENTS.md'
-      - 'CHANGELOG.md'
-      - 'README.md'
-      - 'apps/backend/AGENTS.md'
-      - 'apps/backend/README.md'
-      - 'apps/backend/docs/00-FtkSaaS-yeni-sohbet-devir.md'
-      - 'apps/backend/docs/actual-start-handover.md'
-      - 'apps/backend/docs/branch-protection-review.md'
-      - 'apps/backend/docs/ci-performance.md'
-      - 'apps/backend/docs/ci02-handover.md'
-      - 'apps/backend/docs/decision-sprint-handover.md'
-      - 'apps/backend/docs/documentation-development.md'
-      - 'apps/backend/docs/frontend-settings-handover.md'
-      - 'apps/backend/docs/instructor-earnings-handover.md'
-      - 'apps/backend/docs/ops-w01-handover.md'
-      - 'apps/backend/docs/p01-handover.md'
-      - 'apps/backend/docs/p02-handover.md'
-      - 'apps/backend/docs/p03-handover.md'
-      - 'apps/backend/docs/p04-handover.md'
-      - 'apps/backend/docs/p05-handover.md'
-      - 'apps/backend/docs/p06-handover.md'
-      - 'apps/backend/docs/p07-a-handover.md'
-      - 'apps/backend/docs/production-queue.md'
-      - 'apps/backend/docs/program-session-handover.md'
-      - 'apps/backend/docs/remaining-work.md'
-      - 'apps/backend/docs/remote-backend-setup.md'
-      - 'apps/backend/docs/schedule-read-handover.md'
-      - 'apps/backend/docs/settlement-handover.md'
-      - 'apps/backend/docs/starter-attendance-protection-handover.md'
-      - 'apps/backend/docs/starter-plan-gates-handover.md'
-      - 'apps/web/AGENTS.md'
-      - 'apps/web/README.md'
-      - 'apps/web/docs/development.md'
-      - 'apps/web/docs/handover.md'
-      - 'apps/web/docs/todo.md'
-      - 'apps/web/todo.md'
-      - 'docs/actual-start-handover.md'
-      - 'docs/api-invariants.md'
-      - 'docs/branch-protection-review.md'
-      - 'docs/ci-performance.md'
-      - 'docs/ci-policy.md'
-      - 'docs/ci02-handover.md'
-      - 'docs/claude-handover.md'
-      - 'docs/client-integration.md'
-      - 'docs/contracts/00-FtkSaaS-yeni-sohbet-devir.md'
-      - 'docs/contracts/01-FtkSaaS-urun-kapsam-sozlesmesi.md'
-      - 'docs/contracts/02-FtkSaaS-teknik-sozlesme.md'
-      - 'docs/contracts/03-FtkSaaS-kodlama-sorumluluklari.md'
-      - 'docs/contracts/04-FtkSaaS-O4-veri-semasi.md'
-      - 'docs/contracts/05-FtkSaaS-O4-API-katalogu.md'
-      - 'docs/contracts/06-FtkSaaS-O4-durum-hata-izin.md'
-      - 'docs/contracts/10-FtkSaaS-Q-D01-kabul-karari.md'
-      - 'docs/contracts/12-FtkSaaS-Q-E02-kabul-karari.md'
-      - 'docs/database.md'
-      - 'docs/decision-sprint-handover.md'
-      - 'docs/decisions/CI-2026-10-20.md'
-      - 'docs/decisions/DS-2026-10-17-settlement-center-scope.md'
-      - 'docs/decisions/DS-2026-10-17-settlement-revision.md'
-      - 'docs/decisions/DS-2026-10-17.md'
-      - 'docs/decisions/DS-2026-10-25-session-capacity.md'
-      - 'docs/decisions/P08-accepted-scope.md'
-      - 'docs/decisions/Q-E01-accepted.md'
-      - 'docs/decisions/Q-E01.md'
-      - 'docs/decisions/Q-E02.md'
-      - 'docs/decisions/Q-E03.md'
-      - 'docs/documentation-map.md'
-      - 'docs/feature-delivery.md'
-      - 'docs/frontend-settings-handover.md'
-      - 'docs/functions.md'
-      - 'docs/instructor-earnings-handover.md'
-      - 'docs/karar-sohbetine-Q-D01.md'
-      - 'docs/monorepo.md'
-      - 'docs/ops-w01-handover.md'
-      - 'docs/p01-handover.md'
-      - 'docs/p02-handover.md'
-      - 'docs/p03-handover.md'
-      - 'docs/p04-handover.md'
-      - 'docs/p05-handover.md'
-      - 'docs/p06-handover.md'
-      - 'docs/p07-a-handover.md'
-      - 'docs/physical-invariants.md'
-      - 'docs/production-queue.md'
-      - 'docs/program-session-handover.md'
-      - 'docs/remaining-work.md'
-      - 'docs/remote-backend-setup.md'
-      - 'docs/requests.md'
-      - 'docs/schedule-read-handover.md'
-      - 'docs/security.md'
-      - 'docs/settings.md'
-      - 'docs/settlement-handover.md'
-      - 'docs/source-index.md'
-      - 'docs/starter-attendance-protection-handover.md'
-      - 'docs/starter-plan-gates-handover.md'
-      - 'docs/workflows.md'
-      - 'packages/api-contracts/README.md'
 defaults:
   run:
     working-directory: apps/backend
@@ -139,14 +25,33 @@ jobs:
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
           persist-credentials: false
       - name: Verify merged candidate relation
         id: source
         uses: actions/github-script@ed597411d8f924073f98dfc5c65a23a2325f34cd # v8.0.0
         with:
           script: |
+            const { eventScope } = await import(`${process.env.GITHUB_WORKSPACE}/apps/web/scripts/ci-scope.mjs`);
+            const { verifyMain } = await import(`${process.env.GITHUB_WORKSPACE}/apps/web/scripts/ci-proof.mjs`);
+            const scope = eventScope(context.eventName, context.payload, context.sha);
+            const proofs = [];
+            for (const kind of ['frontend']) {
+              if (scope[kind]) {
+                const proof = await verifyMain({ github, context, kind });
+                proofs.push(proof);
+                await core.summary.addRaw(`${kind}: ${JSON.stringify(proof)}\n`).write();
+              }
+            }
             const gate=await import(`${process.env.GITHUB_WORKSPACE}/apps/backend/scripts/ci/gate.mjs`);
             await gate.verifyMerged(github,context,core);
+            for (const proof of proofs) {
+              const { data: run } = await github.rest.actions.getWorkflowRun({ ...context.repo, run_id: proof.run });
+              if (run.run_attempt !== proof.attempt || run.status !== 'completed' || run.conclusion !== 'success') {
+                throw new Error('Candidate changed during combined main verification');
+              }
+            }
   frontend:
     permissions: {}
     needs: source

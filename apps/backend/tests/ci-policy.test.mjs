@@ -469,12 +469,17 @@ test('positive ownership separates backend frontend prose and shared inputs, rej
  assert.throws(()=>classifyChanges([]));assert.throws(()=>classifyChanges([{path:'apps/web/a.ts',status:'U'}]));
  assert.equal(policyPath('.github/workflows/frontend.yml'),true);assert.equal(policyPath('.github/workflows/ci-full.yml'),true);
 });
-test('main positive paths match ownership and manual targeted cannot auto-run or install for prose',()=>{
- const patterns=[...ownership.backendPrefixes.map(p=>p+'**'),...ownership.backendFiles,...ownership.frontendFiles.filter(p=>p.startsWith('.github/workflows/')).map(p=>'!'+p),'docs/*.json',...JSON.parse(fs.readFileSync('apps/backend/scripts/ci/document-paths.json'))];
+test('one main proof gate covers all pushes and manual targeted cannot auto-run or install for prose',()=>{
  const main=fs.readFileSync('.github/workflows/backend.yml','utf8');
- const configured=[...main.matchAll(/^      - '([^']+)'$/gm)].map(m=>m[1]);assert.deepEqual(configured,[...new Set(patterns)]);
- const reviewedProse=new Set(JSON.parse(fs.readFileSync('apps/backend/scripts/ci/document-paths.json')));
- assert(!configured.some(p=>p==='apps/**'||p==='packages/**'||p==='**'||(p.includes('apps/web')&&!reviewedProse.has(p))||p.includes('packages/ui')));
+ assert.match(main,/push:\n    branches: \[main\]/);
+ assert(!main.includes('    paths:'));assert(!main.includes('paths-ignore:'));
+ assert(main.includes('eventScope(context.eventName, context.payload, context.sha)'));
+ assert(main.includes("['frontend']"));
+ assert(!main.includes("kind: 'compatibility'"));
+ assert(main.includes('await verifyMain({ github, context, kind })'));
+ assert(main.includes('await gate.verifyMerged(github,context,core)'));
+ assert(policyPath('apps/web/scripts/ci-proof.mjs'));
+ assert(policyPath('apps/web/scripts/ci-scope.mjs'));
  for(const path of ['docs/workflows.md','apps/backend/docs/documentation-development.md','apps/web/docs/development.md'])assert.equal(classifyChanges([change(path)]).kind,'documentation');
  for(const path of ['docs/workflows.json','apps/backend/scripts/update-docs.mjs','apps/backend/scripts/capture-docs.mjs'])assert.equal(classifyChanges([change(path)]).kind,'full');
  assert(!main.includes('pnpm install'));assert(!main.includes('test:clean'));assert(!main.includes('recovery'));

@@ -5,7 +5,13 @@ import { pathToFileURL } from "node:url";
 const documentRegistry = "apps/backend/scripts/ci/document-paths.json";
 const selector = "apps/web/scripts/ci-scope.mjs";
 const selectorTests = "apps/web/tests/ci-scope.test.ts";
-const sharedPolicy = [documentRegistry, selector, selectorTests];
+const sharedPolicy = [
+  documentRegistry,
+  selector,
+  selectorTests,
+  "apps/web/scripts/ci-proof.mjs",
+  "apps/web/tests/ci-proof.test.ts",
+];
 const selectionPaths = {
   frontend: [
     "apps/web/**",
