@@ -42,6 +42,38 @@ test("successful callback consumes the local destination and clears the correctl
     expect.objectContaining({ maxAge: 0, path: "/auth/callback" }),
   );
 });
+test("the first email confirmation preserves the destination until the second PKCE callback", async () => {
+  mocks.saved = "/account";
+  const partial = await GET(new Request("https://app.example.invalid/auth/callback"));
+  expect(partial.headers.get("location")).toBe(
+    "https://app.example.invalid/auth/confirmation?next=%2Faccount",
+  );
+  expect(mocks.set).not.toHaveBeenCalled();
+  expect(mocks.exchange).not.toHaveBeenCalled();
+  const completed = await GET(
+    new Request("https://app.example.invalid/auth/callback?code=synthetic"),
+  );
+  expect(completed.headers.get("location")).toBe("https://app.example.invalid/account");
+  expect(mocks.exchange).toHaveBeenCalledWith("synthetic");
+  expect(mocks.set).toHaveBeenCalledWith(
+    "ftksaas_auth_return",
+    "",
+    expect.objectContaining({ maxAge: 0, path: "/auth/callback" }),
+  );
+});
+test("a first confirmation in another browser still reaches the informational page", async () => {
+  mocks.saved = undefined;
+  const result = await GET(new Request("https://app.example.invalid/auth/callback"));
+  expect(result.headers.get("location")).toBe("https://app.example.invalid/auth/confirmation");
+  expect(mocks.exchange).not.toHaveBeenCalled();
+});
+test("an explicit provider error stays an error even with an email confirmation fragment", async () => {
+  const result = await GET(
+    new Request("https://app.example.invalid/auth/callback?error=access_denied"),
+  );
+  expect(new URL(result.headers.get("location")!).pathname).toBe("/login");
+  expect(mocks.exchange).not.toHaveBeenCalled();
+});
 test("password recovery overrides a saved destination, and untrusted redirects are rejected", async () => {
   const recovery = await GET(
     new Request("https://app.example.invalid/auth/callback?code=synthetic&next=/reset-password"),
