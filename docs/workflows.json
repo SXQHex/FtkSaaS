@@ -265,8 +265,8 @@
         "management_state_get_v1"
       ],
       "review": {
-        "fingerprint": "94a10bbaf93ef41dcb3d77ebb8569f7e5724e47f3bea9aab733d80f16e055d88",
-        "reason": "Tüm API shardlarında oneshot bellek kabulü; 41297723495 başarılı aynı-attempt ölçümleriyle dört shard dengesi güncellendi. Test ayrımı ve dar bağımlılık kurulumu mevcut kontrolleri korur."
+        "fingerprint": "dab3b070736df09a92d67d85d6e12d09d99d0872f41e2c689fceb698273cc0f4",
+        "reason": "Bağımsız incelenmiş tam-parmak-izi istisnalarının bitişi 30 Kasım olarak kesinleştirildi; son kaynak parmak izi yenilendi. API, test assertionları ve kabul kapıları değişmedi."
       }
     },
     {
