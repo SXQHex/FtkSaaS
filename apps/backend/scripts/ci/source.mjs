@@ -53,7 +53,7 @@ export async function backendUnchanged(github,repo,base,head){
  if(base===head)return true;
  try{return !(await remoteSourceScope(github,repo,base,head)).backend;}catch{return false;}
 }
-export const policyPath=p=>p==='docs/history/manifest.json'||p.startsWith('.github/workflows/')||p.startsWith('apps/backend/scripts/ci/')||['apps/backend/scripts/test-clean.mjs','apps/backend/scripts/start-dev.mjs','apps/backend/scripts/paths.mjs'].includes(p);
+export const policyPath=p=>p==='docs/history/manifest.json'||p==='.github/dependabot.yml'||p.startsWith('.github/workflows/')||p.startsWith('apps/backend/scripts/ci/')||['apps/backend/scripts/test-clean.mjs','apps/backend/scripts/start-dev.mjs','apps/backend/scripts/paths.mjs'].includes(p);
 export async function policyMatches(github,repo,base,head){
  const values=await Promise.all([base,head].map(async tree_sha=>{
   const t=(await github.rest.git.getTree({...repo,tree_sha,recursive:'1'})).data;

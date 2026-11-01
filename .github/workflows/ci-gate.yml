@@ -12,25 +12,27 @@ on:
 defaults:
   run:
     working-directory: apps/backend
-permissions:
-  contents: read
-  actions: read
-  pull-requests: read
-  statuses: write
+permissions: {}
 concurrency:
   group: merge-gate-${{ github.event.pull_request.number || github.event.workflow_run.id || github.sha }}-${{ github.event.action == 'edited' && github.event.changes.base == null && 'metadata' || 'source' }}
   cancel-in-progress: false
 jobs:
   verify:
+    permissions:
+      contents: read
+      actions: read
+      pull-requests: read
+      statuses: write # Verifier publishes the source-bound merge status.
     if: github.event_name != 'pull_request_target' || github.event.action != 'edited' || github.event.changes.base != null
     runs-on: ubuntu-24.04
+    timeout-minutes: 10
     steps:
       # Privileged verifier executes default-branch code only, never candidate code.
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1; Node 24
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           ref: main
           persist-credentials: false
-      - uses: actions/github-script@ed597411d8f924073f98dfc5c65a23a2325f34cd
+      - uses: actions/github-script@ed597411d8f924073f98dfc5c65a23a2325f34cd # v8.0.0
         with:
           script: |
             const gate=await import(`${process.env.GITHUB_WORKSPACE}/apps/backend/scripts/ci/gate.mjs`);

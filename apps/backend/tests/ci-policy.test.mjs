@@ -631,6 +631,7 @@ test('manual CLI plans an explicit commit range independently of origin/main and
  assert.equal(run(base).api.length,apiSuites.length);assert(fs.readFileSync(output,'utf8').includes('setup=true'));assert(!fs.existsSync(join(dir,'.artifacts/ci/binding.json')));
 }));
 test('every workflow is trusted policy including frontend; its scope marker cannot authorize policy installation',async()=>{
+ assert(policyPath('.github/dependabot.yml'));assert.equal(classifyChanges([change('.github/dependabot.yml')]).kind,'full');
  assert(policyPath('.github/workflows/frontend.yml'));assert(policyPath('.github/workflows/new.yml'));
  assert.equal(classifyChanges([change('.github/workflows/new.yml')]).kind,'full');
  assert.equal(classifyChanges([{path:'.github/workflows/ci-docs.yml',status:'D'}]).kind,'full');

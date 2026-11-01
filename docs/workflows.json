@@ -253,8 +253,8 @@
         "management_state_get_v1"
       ],
       "review": {
-        "fingerprint": "7e8b29dc96f83168783b8df0b49a84051950b2e55156e9383992be1c19daf70f",
-        "reason": "PR102 main ile native Auth kaynağı birlikte incelendi: CI kaynak/deneme kabulü main ile birebir; ortak istemci protokolü ve güvenlik kapıları değişmiyor."
+        "fingerprint": "63fd55dc19ba712d385f29970c0edb7fc02e6fbd12d0e3b1d0f33ee76cc2e322",
+        "reason": "Reviewed CI scope and source policy: Dependabot configuration is trusted backend/full input; job permissions, bounded verifier timeouts and native reviewed auto-merge preserve exact-source acceptance, tenant and Auth behavior."
       }
     },
     {

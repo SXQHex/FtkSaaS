@@ -18,6 +18,7 @@ on:
       - 'docs/history/manifest.json'
       - 'docs/endpoint-inventory.json'
       - 'docs/feature-delivery.json'
+      - '.github/dependabot.yml'
       - '!.github/workflows/frontend.yml'
       - '!.github/workflows/frontend-compatibility.yml'
       - 'docs/*.json'
@@ -119,43 +120,49 @@ on:
 defaults:
   run:
     working-directory: apps/backend
-permissions:
-  contents: read
-  actions: read
-  pull-requests: read
+permissions: {}
 concurrency:
   group: main-acceptance-${{ github.sha }}-${{ github.event_name }}
   cancel-in-progress: false
 jobs:
   source:
+    permissions:
+      contents: read
+      actions: read
+      pull-requests: read
     if: github.event_name == 'push'
     runs-on: ubuntu-24.04
+    timeout-minutes: 10
     outputs:
       kind: ${{ steps.source.outputs.kind }}
       binding: ${{ steps.source.outputs.binding }}
     steps:
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
       - name: Verify merged candidate relation
         id: source
-        uses: actions/github-script@ed597411d8f924073f98dfc5c65a23a2325f34cd
+        uses: actions/github-script@ed597411d8f924073f98dfc5c65a23a2325f34cd # v8.0.0
         with:
           script: |
             const gate=await import(`${process.env.GITHUB_WORKSPACE}/apps/backend/scripts/ci/gate.mjs`);
             await gate.verifyMerged(github,context,core);
   frontend:
+    permissions: {}
     needs: source
     if: needs.source.outputs.kind == 'frontend'
     runs-on: ubuntu-24.04
+    timeout-minutes: 10
     steps:
       - name: Backend unchanged (no backend acceptance)
         working-directory: .
         run: echo 'Frontend-only merge; backend tests and delivery are not required.'
   acceptance:
+    permissions: {}
     needs: source
     if: needs.source.outputs.kind == 'full'
     runs-on: ubuntu-24.04
+    timeout-minutes: 10
     steps:
       - name: Main acceptance proof
         working-directory: .
@@ -166,16 +173,18 @@ jobs:
           mkdir -p "$RUNNER_TEMP/main-proof"
           printf '%s' "$BINDING" > "$RUNNER_TEMP/main-proof/binding.json"
         working-directory: .
-      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: main-binding-${{ github.run_attempt }}
           path: ${{ runner.temp }}/main-proof/binding.json
           if-no-files-found: error
           archive: true
   documentation:
+    permissions: {}
     needs: source
     if: needs.source.outputs.kind == 'documentation'
     runs-on: ubuntu-24.04
+    timeout-minutes: 10
     steps:
       - name: Documentation main acceptance (no full clean)
         working-directory: .
@@ -187,7 +196,7 @@ jobs:
           mkdir -p "$RUNNER_TEMP/main-proof"
           printf '%s' "$BINDING" > "$RUNNER_TEMP/main-proof/binding.json"
           echo 'Documentation acceptance only; no backend full clean or deploy.' >> "$GITHUB_STEP_SUMMARY"
-      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: main-documentation-${{ github.run_attempt }}
           path: ${{ runner.temp }}/main-proof/binding.json

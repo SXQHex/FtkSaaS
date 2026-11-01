@@ -56,6 +56,10 @@ Toplayıcı-only rerun yalnız aynı kaynakta bütün zorunlu işler başarılı
 
 Merge normal iki parent’lı merge olmalıdır; squash/rebase’e kanıt taşınmaz. Head/base/tree değişirse yeni kabul gerekir. Main yeniden test yerine gerçek parent/tree’nin test edilen adayla aynılığını ve başarılı adayın güncel attempt/job sonuçlarını doğrular. Böylece test maliyeti tekrarlanmaz; kaynak güveni kaldırılmaz.
 
+İnceleme tamamlandıktan sonra GitHub’ın yerleşik auto-merge özelliği PR üzerinde **merge commit** yöntemiyle etkinleştirilir; CI bitene kadar elle beklemek gerekmez. Açık, Draft olmayan PR’nin incelenmiş güncel head SHA’sı doğrulanır. Auto-merge etkinleştirme inceleme onayı veya başarılı status üretmez; gerekli CI, kaynak kanıtı, review ve trusted politika kurulum şartları korunur. Sonraki kaynak değişikliği yeniden inceleme gerektirir; auto-merge beklerken kaynak güncellemesi yapılacaksa auto-merge önce kapatılır. Ek ayrıcalıklı bot workflow’u, otomatik approval veya bypass kullanılmaz.
+
+[Dependabot](../.github/dependabot.yml) başlangıçta yalnız GitHub Actions minor/patch güncellemelerini haftalık, 7 günlük bekleme ve tek grup ile önerir; en fazla iki açık güncelleme PR’ı vardır. Major güncellemeler ve uygulama paketleri bu otomasyonun dışındadır. Dependabot PR’ları da inceleme sonrası aynı auto-merge akışını kullanır; bot adına otomatik approval veya workflow politika muafiyeti yoktur.
+
 <a id="api-süre-dengesi--zorunlu-kabul"></a>
 ## API süre dengesi — uyarı ve ölçüm
 
@@ -67,7 +71,7 @@ Yeni testler eksiksiz suite/shard envanterinde bulunur, dört bağımsız runner
 
 ## Güvenilir politika ve dağıtım
 
-`ftksaas/merge-clean` status’unu yalnız main’den çalışan doğrulayıcı üretir. Aday testleri salt-okuma token kullanır, secrets/status-write yetkisi almaz. Yetkili doğrulayıcı aday kodu veya artifact executable’ı çalıştırmaz. Bütün `.github/workflows/*`, `scripts/ci` ve clean/start/path runner blob/mode kümesi trusted yüzeydir. Frontend-only sınıflandırma dahi workflow politika değişikliğine otomatik izin vermez.
+`ftksaas/merge-clean` status’unu yalnız main’den çalışan doğrulayıcı üretir. Aday testleri salt-okuma token kullanır, secrets/status-write yetkisi almaz. Yetkili doğrulayıcı aday kodu veya artifact executable’ı çalıştırmaz. Bütün `.github/workflows/*`, `.github/dependabot.yml`, `scripts/ci` ve clean/start/path runner blob/mode kümesi trusted yüzeydir. Frontend-only sınıflandırma dahi workflow politika değişikliğine otomatik izin vermez.
 
 Trusted yüzey değişen PR’de bağımsız son kaynak incelemesi, gerçek aday başarısı ve tam kaynağa özel açık kurulum yetkisi gerekir. Önceki PR izinleri taşınmaz. Sahte status, bypass, direct push veya koruma gevşetme yoktur. Required-check/strict-base/bypass ve review düzeninin son doğrulanmış durumu [güncel kabul kaydındadır](../apps/backend/docs/00-FtkSaaS-yeni-sohbet-devir.md); bağımsız ajan incelemesi zorunludur.
 
