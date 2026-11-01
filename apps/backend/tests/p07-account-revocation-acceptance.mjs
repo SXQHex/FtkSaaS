@@ -24,6 +24,19 @@ test('P07 draft: scoped invitation and account-link revocation',async t=>{
   const unrelatedPerson=(await mut('person_create_v1',{display_name:'P07 untouched',contacts:[]})).primary_id;
   const unrelatedInvite=await invitation(unrelatedPerson);
   const inv=await invitation(person),revokeKey=key(),revokeBody={invitation_id:inv.id,expected_version:1};
+  await t.test('person selector discovers only scoped invitations, pages stably and rejects outsiders',async()=>{
+   const extra=await invitation(person);
+   const query={operation:'account_access_revoke_v1',selector:{operation:'account_access_revoke_v1',key:{person_id:person}},page:{limit:1}};
+   const first=await must(owner,'management_state_get_v1',scope(query));assert.equal(first.items.length,1);assert(first.next_cursor);
+   const next=await must(owner,'management_state_get_v1',scope({...query,page:{limit:1,cursor:first.next_cursor}}));assert.equal(next.items.length,1);assert.notEqual(first.items[0].entity.id,next.items[0].entity.id);
+   assert.deepEqual(new Set([first.items[0].entity.id,next.items[0].entity.id]),new Set([inv.id,extra.id]));
+   for(const row of [...first.items,...next.items]){assert.equal(row.current.values.person_id,person);assert.equal(row.current.values.actionable,true);assert.equal(row.versions[0].version,1);}
+   const encoded=JSON.stringify(first);assert.equal(encoded.includes(member.email),false);assert.equal(encoded.includes(inv.token),false);assert.equal(encoded.includes('token_hash'),false);
+   await fail('management_state_get_v1',query,'NOT_FOUND',key(),stranger);
+   await fail('management_state_get_v1',{...query,center_id:other},'FORBIDDEN');
+   await db.query("update core.invitations set state='revoked',version=version+1 where id=$1",[extra.id]);
+   await fail('management_state_get_v1',{...query,page:{limit:1,cursor:first.next_cursor}},'VERSION_CONFLICT');
+  });
   await t.test('versioned management read, wrong center, stale version, revoke and single receipt replay',async()=>{
    const m=(await manage('account_access_revoke_v1',inv.id)).items[0];assert.equal(m.state,'pending');assert.equal(m.versions[0].version,1);assert.equal(JSON.stringify(m).includes(member.email),false);
    await fail('account_access_revoke_v1',{...revokeBody,center_id:other},'NOT_FOUND');await fail('account_access_revoke_v1',{...revokeBody,expected_version:2},'VERSION_CONFLICT');
@@ -49,10 +62,14 @@ test('P07 draft: scoped invitation and account-link revocation',async t=>{
   const body={link_id:link,expected_version:1,reason:'Synthetic link revocation'},removeKey=key();
   await t.test('global link change requires every affected center and protects the owner',async()=>{
    await fail('account_link_remove_v1',body,'FORBIDDEN');
+   const query={operation:'account_link_remove_v1',selector:{operation:'account_link_remove_v1',key:{person_id:person}}};
+   const before=await must(owner,'management_state_get_v1',scope(query));assert.equal(before.items[0].entity.id,link);assert.equal(before.items[0].current.values.actionable,false);assert.equal(JSON.stringify(before).includes(memberAccount.id),false);
+
    await mut('center_manager_assign_v1',{center_id:other,person_id:ownerPerson});
    const ownerLink=(await rows("select id from core.account_links where org_id=$1 and person_id=$2 and state='active'",[org,ownerPerson]))[0].id;
    await fail('account_link_remove_v1',{link_id:ownerLink,expected_version:1,reason:'Owner must transfer first'},'OPEN_OPERATIONS_EXIST');
    assert.equal((await manage('account_link_remove_v1',link)).items[0].versions[0].version,1);
+   const discovered=await must(owner,'management_state_get_v1',scope(query));assert.equal(discovered.items[0].current.values.actionable,true);
   });
   await t.test('late audit error rolls link, roles, grants, receipt and outbox back together',async()=>{
    trigger='p07_fail_'+key().replaceAll('-','');await db.query(`create function private.${trigger}() returns trigger language plpgsql as $$begin if new.org_id='${org}'::uuid and new.action='account_link_remove_v1' then raise exception using errcode='23514',message='synthetic audit failure';end if;return new;end$$`);await db.query(`create trigger ${trigger} before insert on core.audit_events for each row execute function private.${trigger}()`);

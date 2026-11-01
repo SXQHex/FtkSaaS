@@ -16594,6 +16594,16 @@ values: {
  * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
  */
 invitation_id?: string
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+person_id?: string
+actionable?: boolean
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+center_id?: string
+expires_at?: Instant
 }
 }
 /**
@@ -16617,6 +16627,11 @@ values: {
  * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
  */
 link_id?: string
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+person_id?: string
+actionable?: boolean
 }
 }
 /**
@@ -19118,12 +19133,17 @@ person_id: string
  */
 export interface ManagementSelectorAccountAccessRevokeV1 {
 operation: "account_access_revoke_v1"
-key: {
+key: ({
 /**
  * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
  */
 invitation_id: string
-}
+} | {
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+person_id: string
+})
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -19141,12 +19161,17 @@ key: {
  */
 export interface ManagementSelectorAccountLinkRemoveV1 {
 operation: "account_link_remove_v1"
-key: {
+key: ({
 /**
  * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
  */
 link_id: string
-}
+} | {
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+person_id: string
+})
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema

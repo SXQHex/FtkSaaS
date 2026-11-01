@@ -266,8 +266,8 @@
         "management_state_get_v1"
       ],
       "review": {
-        "fingerprint": "5d2596db5f135ecbb4aef07296c9be05a45536b0c196a9ad6b0dde2d935bd08d",
-        "reason": "Worker tick artık service-role metninden bağımsız scoped secret gerektirir; imza/boş config regresyonu, native Auth ve ortak güvenlik sınırı incelendi."
+        "fingerprint": "d57d6eca2751905dc9230fd9cff995237ef2b1e4eb747581ee6eaf3b845c7661",
+        "reason": "Reviewed regenerated validators and Edge bundle after removing XREQ-006 schema extensions; only XREQ-005 selector/projection additions remain."
       }
     },
     {
@@ -544,6 +544,7 @@
         "apps/backend/database/p07-account-revocation.sql",
         "apps/backend/database/p07-person-merge-bind.sql",
         "apps/backend/database/p07-person-merge.sql",
+        "apps/backend/database/person-management-discovery.sql",
         "apps/backend/database/person-registry-wrappers.sql",
         "apps/backend/database/person-registry.sql",
         "apps/backend/database/planned-start-cancellation.sql",
@@ -560,6 +561,7 @@
         "apps/backend/database/starter-attendance-protection-wrappers.sql",
         "apps/backend/database/starter-plan-gates.sql",
         "apps/backend/database/wrappers.sql",
+        "apps/backend/supabase/migrations/20261101210000_person_management_discovery.sql",
         "docs/client-integration.md"
       ],
       "operations": [
@@ -579,8 +581,8 @@
         "person_discipline_set_v1"
       ],
       "review": {
-        "fingerprint": "a2f67d427f3e6d2a9f116a2d28d919756ec80b0e4cf774c9f91e2e50a13856b4",
-        "reason": "Gerçek DB config rotasyon regresyonu ve test-only operational env incelendi; mevcut Auth/RPC/provider assertion satırları birebir korunur, aynı scoped secret testte açık verilir."
+        "fingerprint": "f4239d880af207bd83481d421d743e7c54453cbf662bcd0e43c7618c9e47bebb",
+        "reason": "Reviewed narrowed XREQ-005 migration and registry tests; XREQ-006 discovery removed, alias invitation discovery retained."
       }
     },
     {
@@ -1277,8 +1279,8 @@
         "platform_owner_remove_v1"
       ],
       "review": {
-        "fingerprint": "1c7cf44d3a9752e82e9e073f300773f13ec2550a0ea22e90a8b0591d831785d6",
-        "reason": "Ortak generated wrapper farkı yalnız outbox_deliver_v1 service-only davet handoff’udur; bu akışın kendi wrapper ve domain kaynakları değişmedi, rehber ve mevcut insan yetki sırası incelendi."
+        "fingerprint": "4a24ffe0899ab6d343245134aa725e5adeb1a8f204fba69fad9b7f70f7cbf377",
+        "reason": "Reviewed unchanged original merge/revoke lifecycle against narrowed registry tests; original write and cross-center rejection semantics preserved."
       }
     },
     {

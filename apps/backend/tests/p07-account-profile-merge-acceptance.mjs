@@ -92,6 +92,13 @@ test('P07 account profile and manual cross-center alias merge',async t=>{
    for(const person_id of [source,target]){const f=await must(member,'finance_get_v1',scope({person_id,currency:'TRY',page:{}}));assert.equal(f.debts.find(x=>x.id===debt).remaining_minor,'1700');}
    await fail('person_merge_apply_v1',body,'PREVIEW_STALE');
   });
+  await t.test('canonical and historical person selectors discover an alias invitation after merge',async()=>{
+   const invitation=key();await db.query("insert into core.invitations(id,org_id,center_id,person_id,email,token_hash,inviter_account_id,expires_at,state) values($1,$2,$3,$4,$5,$6,$7,clock_timestamp()+interval '1 day','pending')",[invitation,org,c1,source,'synthetic-merge@ftksaas.invalid',createHash('sha256').update(key()).digest('hex'),account.id]);
+   for(const person_id of [source,target]){
+    const result=await must(owner,'management_state_get_v1',scope({operation:'account_access_revoke_v1',selector:{operation:'account_access_revoke_v1',key:{person_id}}}));
+    const found=result.items.find(x=>x.entity.id===invitation);assert(found);assert.equal(found.current.values.person_id,source);assert.equal(found.current.values.actionable,true);
+   }
+  });
   await t.test('old debt continues to block participation/booking; old paid right and credit remain actionable',async()=>{
    assert.equal((await rows('select limit_count from core.negative_limit_overrides where org_id=$1 and center_id=$2 and person_id=$3 and discipline_id=$4',[org,c1,target,discipline]))[0].limit_count,'0');
    const eligibility=(await rows('select private.lesson_eligibility($1,$2) code',[org,existingReservation]))[0].code;assert.equal(eligibility.eligible,false);assert.equal(eligibility.reason,'debt_policy');

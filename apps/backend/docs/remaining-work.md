@@ -58,6 +58,12 @@ Bu tablo yalnız izdir; eski kabul metinleri ikinci kez tutulmaz.
 - **Doğrulama senaryosu:** Her F kimliğine en az bir görev ve gerçek mevcut test/kanıt bağını denetle; sahipsiz operasyon bırakma.
 - **Kaynak alanı:** contract.json x-contract; workflows.json; backend backlog
 
+### S04 hesap erişimi okuma bağımlılığı
+
+- [ ] [XREQ-005](../../../docs/requests.md): mevcut yönetim okumasında kişiyle davet/bağlantı keşfi ve izinli eylem/sürüm. Starter S04 tüketicisi; F04/F06/F07/F33.
+- **Kabul:** Yenilemeden sonra kimlik elle girilmeden revoke/remove seçilir. Yanlış tenant/merkez/hesap, yetki kaybı, eski sürüm ve cursor kapsam/değişim reddi mevcut gerçek Auth→Edge→RPC suite’lerinde doğrulanır. Birleşmiş kişi alias’ındaki davetler de keşfedilir. Teslim ve frontend kabulü ayrı kalır; kanıt devir sahibindedir.
+- XREQ-006 çok merkezli onay keşfi Starter bağımlılığı değildir; bu teslimde genişletilmez.
+
 ## Starter ve ortak ürün temeli
 
 <a id="s01"></a>
