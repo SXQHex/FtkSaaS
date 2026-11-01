@@ -12,6 +12,7 @@ import {
   changeStudent,
   getStudentChangeStatus,
 } from "../src/lib/api";
+import { listStudentDisciplines, searchMergePeople } from "../src/lib/student-management";
 import type { FailureEnvelope, Operations } from "@ftksaas/api-contracts";
 vi.mock("../src/lib/supabase/client", () => ({
   browserClient: () => ({
@@ -299,4 +300,55 @@ test("session apply replay keeps its operation key and token while each transpor
     { client_api_version: 1, ...command },
   ]);
   expect(calls[0].request_id).not.toBe(calls[1].request_id);
+});
+
+test("discipline catalogue follows all cursors and merge target search does not restrict people to students", async () => {
+  const pages: Operations["disciplines_list_v1"]["request"][] = [];
+  server.use(
+    http.post(
+      "https://project.example.invalid/functions/v1/backend-v1/disciplines_list_v1",
+      async ({ request }) => {
+        const body = (await request.json()) as Operations["disciplines_list_v1"]["request"];
+        pages.push(body);
+        return HttpResponse.json({
+          ok: true,
+          data: {
+            items: [
+              {
+                id: body.page.cursor ? "second" : "first",
+                name: "Tango",
+                state: "active",
+                version: 1,
+              },
+            ],
+            next_cursor: body.page.cursor ? null : "catalogue-page-2",
+          },
+          trace_id: body.request_id,
+        } satisfies Operations["disciplines_list_v1"]["response"]);
+      },
+    ),
+    http.post(
+      "https://project.example.invalid/functions/v1/backend-v1/people_list_v1",
+      async ({ request }) => {
+        const body = (await request.json()) as Operations["people_list_v1"]["request"];
+        expect(body).toMatchObject({
+          org_id: "org",
+          center_id: "center",
+          query: "Selin",
+          page: { limit: 25, sort: "created_at_asc", cursor: "people-page-2" },
+        });
+        expect(body).not.toHaveProperty("relationship");
+        return HttpResponse.json({
+          ok: true,
+          data: { items: [], next_cursor: null, as_of: "2030-01-01T00:00:00Z" },
+          trace_id: body.request_id,
+        } satisfies Operations["people_list_v1"]["response"]);
+      },
+    ),
+  );
+  expect((await listStudentDisciplines("org")).map((d) => d.id)).toEqual(["first", "second"]);
+  expect(pages.map((p) => p.page.cursor)).toEqual([undefined, "catalogue-page-2"]);
+  expect(pages.every((p) => p.org_id === "org")).toBe(true);
+  expect(pages[0].request_id).not.toBe(pages[1].request_id);
+  await searchMergePeople("org", "center", "Selin", "people-page-2");
 });

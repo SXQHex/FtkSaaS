@@ -29,6 +29,10 @@ import { StudentChange } from "./student-change";
 import { PersonEdit } from "./person-edit";
 import { PersonCreate } from "./person-create";
 import { PersonInvitation } from "./person-invitation";
+import { PersonMerge } from "./person-merge";
+import { mergeActions, type MergeActions } from "../../lib/student-management";
+import { PersonDisciplines } from "./person-disciplines";
+import { disciplineActions, type DisciplineActions } from "../../lib/student-management";
 
 const buttonClass = "h-auto min-h-11 max-w-full whitespace-normal";
 export function StudentsWorkspace({
@@ -82,6 +86,8 @@ export function StudentsWorkspace({
         scope={{ actorId, orgId: scope.organization.id, centerId: scope.center.id }}
         centerName={scope.center.name}
         actions={studentActions}
+        disciplines={disciplineActions}
+        merging={mergeActions}
       />
     </div>
   );
@@ -151,10 +157,14 @@ export function StudentDirectory({
   scope,
   centerName,
   actions,
+  disciplines,
+  merging,
 }: {
   scope: StudentScope;
   centerName: string;
   actions: StudentActions;
+  disciplines?: DisciplineActions;
+  merging?: MergeActions;
 }) {
   const t = useTranslations("students");
   const api = useTranslations("api");
@@ -400,6 +410,12 @@ export function StudentDirectory({
               personId={selected.id}
               centerName={centerName}
               actions={actions}
+              disciplines={disciplines}
+              merging={merging}
+              onMerged={(id) => {
+                refresh();
+                setSelected({ id });
+              }}
               onSaved={refresh}
               onActivated={onActivated}
             />
@@ -417,6 +433,9 @@ function StudentDetail({
   actions,
   onSaved,
   onActivated,
+  disciplines,
+  merging,
+  onMerged,
 }: {
   scope: StudentScope;
   personId: string;
@@ -424,6 +443,9 @@ function StudentDetail({
   actions: StudentActions;
   onSaved: () => void;
   onActivated: (personId: string) => void;
+  onMerged: (id: string) => void;
+  disciplines?: DisciplineActions;
+  merging?: MergeActions;
 }) {
   const t = useTranslations("students");
   const api = useTranslations("api");
@@ -534,8 +556,25 @@ function StudentDetail({
         personId={personId}
         person={person}
         actions={actions}
-        onSaved={() => setAttempt((value) => value + 1)}
+        onSaved={() => {
+          setAttempt((value) => value + 1);
+          onSaved();
+        }}
       />
+      {person && disciplines && (
+        <PersonDisciplines
+          scope={scope}
+          person={person}
+          actions={disciplines}
+          onSaved={() => {
+            setAttempt((value) => value + 1);
+            onSaved();
+          }}
+        />
+      )}
+      {person && merging && (
+        <PersonMerge scope={scope} person={person} actions={merging} onMerged={onMerged} />
+      )}
       {person && <PersonInvitation scope={scope} person={person} actions={actions} />}
       <StudentChange
         key={changeRevision}
