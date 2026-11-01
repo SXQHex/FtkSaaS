@@ -66,7 +66,7 @@ export function select(changes,{diffAvailable=true,headMatches=true,evidence,ciO
   if(p.startsWith('docs/contracts/')||p.startsWith('packages/')||p.startsWith('apps/backend/supabase/')||p.startsWith('.github/')||['package.json','pnpm-lock.yaml','pnpm-workspace.yaml','turbo.json','tsconfig.json'].includes(p)){
    all(p+': shared schema/gateway/migration/build or CI dependency');continue;
   }
-  if(/^apps\/backend\/tests\/(contract|governance|ci-policy)\.test\.mjs$/.test(p)||p==='apps/backend/tests/types.test.ts'){structural=true;reasons.push(p+': structural checks');continue;}
+  if(/^apps\/backend\/tests\/(contract|governance|ci-policy|ci-observer)\.test\.mjs$/.test(p)||p==='apps/backend/tests/types.test.ts'){structural=true;reasons.push(p+': structural checks');continue;}
   if(apiSuites.includes(p)){structural=true;chosen.add(p);chosen.add(apiSuites[0]);reasons.push(p+': explicit API suite + shared authorization/rights regressions');continue;}
   const m=modules.find(m=>(m.sources.some(n=>p==='apps/backend/database/'+n+'.sql'||p==='apps/backend/database/'+n+'-wrappers.sql')||m.runtimeSources?.includes(p)));
   if(m){structural=true;chosen.add(apiSuites[0]);for(const n of m.suites)chosen.add('apps/backend/tests/'+n+'.test.mjs');reasons.push(p+': '+m.id+' dependency graph + shared authorization/rights regressions');continue;}
