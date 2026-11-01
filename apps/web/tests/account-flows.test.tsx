@@ -598,9 +598,12 @@ test("invitation handoff survives StrictMode and consumes tab proof before accep
   expect(sessionStorage.getItem("ftksaas:pending-invitation")).toBeNull();
   expect(mocks.call.mock.calls.every(([operation]) => operation === "account_get_v1")).toBe(true);
   await user.click(screen.getByRole("button", { name: "Daveti kabul et" }));
-  expect(mocks.call).toHaveBeenCalledWith(
-    "account_access_accept_v1",
-    expect.objectContaining({ token: "synthetic-handoff" }),
+  // Acceptance awaits the native SHA-256 fingerprint before calling the backend.
+  await waitFor(() =>
+    expect(mocks.call).toHaveBeenCalledWith(
+      "account_access_accept_v1",
+      expect.objectContaining({ token: "synthetic-handoff" }),
+    ),
   );
   expect(await screen.findByRole("status")).toHaveTextContent("Davet kabul edildi");
   expect(JSON.stringify(sessionStorage)).not.toContain("synthetic-handoff");

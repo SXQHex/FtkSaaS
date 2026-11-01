@@ -71,10 +71,12 @@ export function PersonInvitation({
   scope,
   person,
   actions,
+  onSaved,
 }: {
   scope: StudentScope;
   person: PersonView;
   actions: StudentActions;
+  onSaved?: () => void;
 }) {
   const t = useTranslations("students");
   const [record, setRecord] = useState<StoredInvitation>(() => recover(scope, person.id));
@@ -139,6 +141,7 @@ export function PersonInvitation({
     try {
       const job = await actions.invite(value.input);
       write({ job_id: job.job_id, state: job.state });
+      onSaved?.();
     } catch (cause) {
       const code = studentError(cause);
       if (replay || uncertainStudentChange(cause)) {
@@ -201,6 +204,7 @@ export function PersonInvitation({
       const result = await actions.jobStatus(scope.orgId, scope.centerId, jobId);
       if (result.id !== jobId) throw new Error("Unexpected job status");
       write({ job_id: result.id, state: result.state });
+      onSaved?.();
       if (result.safe_error_code) setError(result.safe_error_code);
     } catch (cause) {
       setError(studentError(cause));
