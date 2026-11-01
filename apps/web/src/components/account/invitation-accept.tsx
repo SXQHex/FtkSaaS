@@ -8,9 +8,14 @@ import { Input } from "@ftksaas/ui/components/input";
 import { Label } from "@ftksaas/ui/components/label";
 import { accountCall, accountError } from "../../lib/account";
 import { browserClient } from "../../lib/supabase/client";
+import { consumeInvitationReturn } from "../../lib/invitation-return";
 import { Preferences } from "../preferences";
 
 export function InvitationAccept({ nativeUserId }: { nativeUserId: string }) {
+  return <InvitationForm key={nativeUserId} nativeUserId={nativeUserId} />;
+}
+
+function InvitationForm({ nativeUserId }: { nativeUserId: string }) {
   const t = useTranslations("account");
   const [account, setAccount] = useState<{ id: string; display_name: string } | null>(null);
   const [token, setToken] = useState("");
@@ -18,6 +23,7 @@ export function InvitationAccept({ nativeUserId }: { nativeUserId: string }) {
   const [busy, setBusy] = useState(false);
   const [accepted, setAccepted] = useState(false);
   const lock = useRef(false);
+  const initialToken = useRef<string | null>(null);
   useEffect(() => {
     let active = true;
     const { data } = browserClient().auth.onAuthStateChange((event, session) => {
@@ -25,19 +31,18 @@ export function InvitationAccept({ nativeUserId }: { nativeUserId: string }) {
         active = false;
         setAccount(null);
         setToken("");
+        initialToken.current = "";
       }
     });
-    // Fragments are never sent to the server. Consume immediately, keeping secrets out of history.
-    const hash = new URLSearchParams(window.location.hash.slice(1));
-    const value = hash.get("token");
-    if (value) {
-      window.history.replaceState(null, "", window.location.pathname + window.location.search);
-    }
-    void accountCall("account_get_v1", {})
+    void Promise.resolve()
+      .then(() => {
+        if (initialToken.current === null) initialToken.current = consumeInvitationReturn();
+        return accountCall("account_get_v1", {});
+      })
       .then((result) => {
         if (active) {
           setAccount(result);
-          if (value) setToken(value);
+          setToken(initialToken.current ?? "");
         }
       })
       .catch((cause) => {
@@ -71,6 +76,7 @@ export function InvitationAccept({ nativeUserId }: { nativeUserId: string }) {
         sessionStorage.setItem(storageKey, key);
       }
       await accountCall("account_access_accept_v1", { operation_key: key, token: token.trim() });
+      initialToken.current = "";
       setAccepted(true);
       setToken("");
       setMessage("invitationAccepted");
@@ -125,7 +131,11 @@ export function InvitationAccept({ nativeUserId }: { nativeUserId: string }) {
         </Button>
       )}
       <p className="text-sm">
-        <Link href="/login?next=/invite" className="underline">
+        <Link
+          href={`/login?next=/invite${token ? `#token=${encodeURIComponent(token)}` : ""}`}
+          prefetch={false}
+          className="underline"
+        >
           {t("differentAccount")}
         </Link>
       </p>

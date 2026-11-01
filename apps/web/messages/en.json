@@ -63,6 +63,7 @@
     "passwordHint": "Use at least 8 characters.",
     "showConfirmPassword": "Show confirmation password",
     "hideConfirmPassword": "Hide confirmation password",
+    "invitationReturnFailed": "The invitation link could not be preserved. Allow browser storage and reopen the link from your email.",
     "samePassword": "Your new password must be different from your current password.",
     "weakPassword": "Choose a stronger password with more characters and a wider mix of characters.",
     "signupDisabled": "Registration is currently closed. Contact your studio manager.",

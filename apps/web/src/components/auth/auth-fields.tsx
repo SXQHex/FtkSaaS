@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState, type FormEvent } from "react";
+import { useEffect, useRef, useState, type FormEvent } from "react";
 import { useTranslations } from "next-intl";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -14,6 +14,8 @@ import { browserClient } from "../../lib/supabase/client";
 import { appOrigin, safeReturnPath } from "../../lib/config";
 import { rememberAuthReturn } from "../../lib/auth-return";
 
+import { preserveInvitationReturn } from "../../lib/invitation-return";
+
 type Mode = "login" | "signup" | "recovery" | "update" | "mfa";
 function authMessage(error: unknown) {
   const code = error && typeof error === "object" && "code" in error ? error.code : undefined;
@@ -23,6 +25,7 @@ function authMessage(error: unknown) {
   if (code === "over_request_rate_limit" || code === "over_email_send_rate_limit")
     return "rateLimit";
   if (code === "mfa_verification_failed") return "invalidCode";
+  if (code === "invitation_return_failed") return "invitationReturnFailed";
   if (code === "weak_password") return "weakPassword";
   if (code === "same_password") return "samePassword";
   if (code === "reauthentication_needed" || code === "current_password_required")
@@ -61,6 +64,23 @@ export function AuthFields({
   const confirmed = mode === "signup" && notice === "signupNotice";
   const destination = safeReturnPath(returnTo);
   const returnQuery = destination === "/" ? "" : `?next=${encodeURIComponent(destination)}`;
+  useEffect(() => {
+    try {
+      preserveInvitationReturn(destination);
+    } catch {
+      // Keep the fragment intact; submit retries storage and explains failure.
+      return;
+    }
+  }, [destination]);
+  function preserveInvitation() {
+    try {
+      preserveInvitationReturn(destination);
+    } catch {
+      throw Object.assign(new Error("Invitation return storage unavailable"), {
+        code: "invitation_return_failed",
+      });
+    }
+  }
   function enter() {
     router.replace(destination);
     router.refresh();
@@ -74,6 +94,7 @@ export function AuthFields({
     setNotice("");
     const form = new FormData(event.currentTarget);
     try {
+      preserveInvitation();
       if (newPassword && form.get("password") !== form.get("confirm")) {
         setError("passwordMismatch");
         return;
@@ -154,6 +175,7 @@ export function AuthFields({
     setError("");
     setResendRequested(false);
     try {
+      preserveInvitation();
       await rememberAuthReturn(destination);
       const result = await browserClient().auth.resend({
         type: "signup",
@@ -175,6 +197,7 @@ export function AuthFields({
     setBusy(true);
     setError("");
     try {
+      preserveInvitation();
       await rememberAuthReturn(destination);
       const result = await browserClient().auth.signInWithOAuth({
         provider: "google",
@@ -417,6 +440,14 @@ export function AuthFields({
           {t(mode === "login" ? "noAccount" : "haveAccount")}{" "}
           <Link
             href={`${mode === "login" ? "/signup" : "/login"}${returnQuery}`}
+            onClick={(event) => {
+              try {
+                preserveInvitation();
+              } catch (cause) {
+                event.preventDefault();
+                setError(authMessage(cause));
+              }
+            }}
             className="font-medium text-foreground underline underline-offset-4"
           >
             {t(mode === "login" ? "signupLink" : "loginSubmit")}
