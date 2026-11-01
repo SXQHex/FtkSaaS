@@ -4,11 +4,11 @@
 
 ## Kaynak tabanı
 
-Güncel main `5b848e7716e847bbedffe31f60e9a21d0ec08379`: PR115 uygulama daveti kaynağı ve PR117 ortak teslim kayıtları birleşti. PR115 aday `41307840130`, main proof `41310466403`, development teslimi `41310495115`; PR117 main proof `41313592802` ve development teslimi `41313619012` başarılıdır. Kaynak CI dış posta veya frontend son kabulü değildir.
+Güncel kabul edilen main `3065e3a75958b25ae9e95b691c8e14df4cddc93b` (PR118 bağımsız worker imzası). [Aday full clean](https://github.com/SXQHex/FtkSaaS/actions/runs/41325500610), [main proof](https://github.com/SXQHex/FtkSaaS/actions/runs/41327917060) ve [development teslimi](https://github.com/SXQHex/FtkSaaS/actions/runs/41327953400) başarılı doğrulandı. Native Auth, JWT doğrulaması ve CI/kalite kapıları korunmuştur.
 
 ## Güncel adayın durumu
 
-`fix/invitation-worker-signing`, XREQ-003 operasyonel kabulünde görülen worker imza reddini düzeltir. Native Auth, JWT doğrulaması, service-only RPC, oneshot, kaynak/kalite/bellek kapıları korunur. Bu dalın yeni aday kabulü henüz yoktur. Main'den devralınan tam-parmak-izi assertion istisnaları makine sicilindedir; SXQHex sahipliğinde ilk doğal bakımda kaldırılmalıdır (30 Kasım bitişi korunur).
+`docs/xreq003-operational-acceptance` yalnız yetkili backend kabul/devri, öncelik ve ortak talep kaydını günceller. Runtime veya frontend değişikliği yoktur. Main'den devralınan tam-parmak-izi assertion istisnaları makine sicilindedir; SXQHex sahipliğinde ilk doğal bakımda kaldırılmalıdır (30 Kasım bitişi korunur).
 
 ## Mevcut kaynak ve gerçek kabul sınırları
 
@@ -17,7 +17,7 @@ Güncel main `5b848e7716e847bbedffe31f60e9a21d0ec08379`: PR115 uygulama daveti k
 | Temel domain | Rezervasyon koruması, atomik hak/finans, yoklama, hakediş ve hesaplaşma kaynakları mevcut; eksik metadata bunları sıfırdan iş yapmaz. |
 | F01–F33 | Makine envanterinde 218 operasyon ve 33 özellik var; feature_delivery kabul alanları pending_feature_acceptance. Kanıt uzlaştırılmadan tamamlanma yüzdesi çıkarılmaz. |
 | Native Auth | PR99 native sadeleştirme kaynağı main’de. Auth SMTP/Google/TOTP kabulü uygulama davet/marketing/SMS teslimi değildir. Gerçek route/config/PKCE ve tüketici kabulü ayrı. |
-| Davet/job | XREQ-003 hosted gözleminin tam kaydı ortak talepte; komut başarısı gönderim ve hesap bağı başarısı değildir. |
+| Davet/job | XREQ-003 backend kurulum, gerçek dış teslim ve iş takibi kabulü tamamlandı; aşağıdaki hosted kanıt ve ortak talep kaydı esas alınır. Posta teslimi hesap bağı veya frontend ekran kabulü değildir. |
 | Worker/export | PR83 bounded report backlog/retry/kesinti/rebind ve export expiry dilimi kayıtlıdır; genel beş lane, privacy purge ve tam restore bundan çıkarılamaz. |
 | Restore | PR84 guard/sicil/callback araçları mevcut; gerçek hosted loader, fiziksel imha ve DB/Auth/Storage restore tamamlığı değildir. |
 | Public/ICS | Backend kaynakları mevcut; gerçek widget/action/hostname ve gerçek takvim host’u/route kabulü ayrıca gerekir. |
@@ -37,10 +37,12 @@ Kullanıcının onayıyla yerel/CI `edge_runtime.policy` değeri `oneshot` seçi
 
 ## XREQ-003 operasyonel kabulü
 
-Kullanıcının kurulum/gerçek posta kabulünü tamamlama talimatıyla development/test `gwyprhenabtpkbojephw` üzerinde yalnız yetkili davetin tenant'ı etkinleştirildi. Geçerli davet unexpired, özgün gönderen/merkez/F04-F06-F26 yetkileri geçerli ve mevcut hesap bağı yoktur. Eski davet revoked durumundadır; alıcı/token kaynak veya rapora alınmaz.
+1 Kasım 2026 development/test `gwyprhenabtpkbojephw` üzerinde kullanıcının yetkilendirdiği gerçek davet teslim edildi. Talep/kapanış sahibi [XREQ-003](../../../docs/requests.md#xreq-003-gerçek-davet-teslimi-ve-iş-takibi); bu kayıt backend test/ortam kanıtıdır, frontend adına onay değildir.
 
-Domain'e kısıtlı sending-only Resend credential Vault'a kaydedildi; mevcut Auth SMTP ayarı değiştirilmedi. pg_net ve kabul edilmiş kaynak scriptiyle 30 saniyelik `ftksaas-invitations` Cron kuruldu; sahibi `ftk_ops_invitation`, rol üyeliği yoktur. Diğer beş lane korunur. Advisor farkı yoktur; mevcut private.ops_run search_path ve leaked-password protection uyarıları bu kurulumda değiştirilmedi.
+- Tek yetkili tenant'ın sender/Vault yapılandırması etkin; domain'e kısıtlı sending-only Resend credential kullanılır. Mevcut Auth SMTP ve insan kimlik akışı değişmedi.
+- Native pg_net ve 30 saniyelik `ftksaas-invitations` Cron etkin; sahibi `ftk_ops_invitation`, rol üyeliği yoktur. Önceki beş lane etkin kalır. Scoped Edge/Vault secret SHA256 parmak izleri eşleşti; secret/değer, gerçek adres ve davet token'ı bu kayda alınmadı.
+- İlk 403 sonrası dispatch durmuştu; PR118 kabul/development tesliminden sonra eşleştirme yapılıp yeniden açıldı. Gerçek imzalı tick HTTP200 döndü. Revoked eski iş `cancelled`, attempts=0, provider reference yok; geçerli iş `succeeded`, attempts=1, provider reference var ve lease temizdir. Sonraki tickler claimed=0 döner; iş yeniden gönderilmedi.
+- Resend aynı provider reference için `delivered` bildirdi: 1 Kasım 19:49 Türkiye saati. Gönderici/alıcının yetkili test girdisiyle eşleşmesi ve yalnız `/invite#token=…` fragment hedefi doğrulandı. Kullanıcının Gmail görüntüsü gerçek alıcı kutusu kabulünü sağladı; otomatik incelemenin engellediği posta kutusu erişimine devam edilmedi.
+- Hosted DB'de özgün gönderenin kapsamıyla gerçek iş takibi `succeeded`, progress=1/total=1, safe_error=null ve invitation referansı döndürdü. Yanlış hesap/tenant/merkez üç negatif kontrolünde NOT_FOUND doğrulandı. Bunlar yönetim bağlantısıyla iç projeksiyon/scope kontrolleridir; frontend HTTP/native oturum testi diye raporlanmaz. Son aday CI gerçek native Auth/RPC kabulünü içerir.
 
-İlk iki Cron isteği 403 FORBIDDEN döndü, tick tüketimi ve gönderim denemesi sıfır kaldı. Dispatch `enabled=false` yapıldı; işler/provider teslimi oluşmadı. PostgreSQL/Node HMAC eşitliği, imza uzunluğu ve saat penceresi doğrulandı. Panel legacy anahtarının rol/proje metadatası doğru; eski ciphertext bu anahtarla çözülemedi. Runtime/panel anahtar farkı olası açıklamadır, doğrudan karşılaştırılmadı. Kanıtlanan kusur, operasyonel HMAC’ın iki yüzeyde aynı service-role metni varsayımına bağlı olmasıdır. İmzanın geniş yetkili service-role metnine bağlanması kaldırılır; aynı scoped `FTK_INVITATION_TICK_SECRET` Edge ve Vault'a verilir. Setup aracı secret eşitlemesi bitmeden Cron'u açmaz; worker eksik/bozuk secret'ta kapalı kalır. Davet token şifrelemesi ve native Auth akışı değişmez.
-
-Bağımsız worker imzası regresyonu eski kaynakta 403/200 farkıyla kırmızı, düzeltmede yeşildir. Dokuz Edge/provider/config testi geçer; tam backend verify 156 contract/governance/restore + 103 CI politika/gözlemci + 9 kalite testiyle başarılıdır. Ayrı quality kontrolü 0 bulgu ve 9 testle geçti. Gitleaks ve yeni aday kaynak kabulü ayrıca doğrulanır. Kaynak kabulünden sonra aynı scoped secret iki tarafta doğrulanarak dispatch açılacak; revoked işin gönderilmemesi, gerçek provider/alıcı teslimi ve yetkili job takibi tamamlanacaktır. Frontend ekran ve doğru/yanlış hesap davet kabulü karşı alanın son kabulüdür. Bu kaynak veya mevcut kurulum gerçek posta teslimi olarak kapatılmaz.
+PR118 kaynak doğrulaması: önce kırmızı sonra yeşil bağımsız worker imzası regresyonu; dokuz Edge/provider/config testi, toplam 156 contract/governance/restore + 103 CI politika/gözlemci + 9 kalite testi; ayrı kalite ve Gitleaks sıfır bulgu. İlk kurulum/rotasyon UPSERT'i dispatch'i kapatır; Edge secret eşitlemesi başarısızsa Cron açılmaz. Bu kaynak ve gerçek teslimden genel provider/restore/marketing veya bütün frontend kabulü çıkarılmaz. Kullanıcının login görüntüsü üzerine salt okunur frontend incelemesi, giriş dönüşünde davet fragmentinin taşınmadığını gösterdi; [XREQ-004](../../../docs/requests.md#xreq-004-giriş-boyunca-davet-fragmentini-koruma) kendi talep alanımıza kaydedildi. Frontend kodu/devir/todo değiştirilmedi. Gerçek frontend davet kabulü, yanlış hesap/expired/revoked/link çakışması S01 sahibinde kalır; başka alana işaret konmadı.
