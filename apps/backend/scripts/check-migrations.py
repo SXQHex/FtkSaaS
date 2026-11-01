@@ -201,3 +201,5 @@ assert next(Path('supabase/migrations').glob('*_organization_brand_colors.sql'))
 assert next(Path('supabase/migrations').glob('*_account_signup_guard.sql')).read_text()==Path('database/account-signup.sql').read_text()+Path('database/account-signup-wrappers.sql').read_text(),'Signup guard source drift'
 
 assert next(Path('supabase/migrations').glob('*_native_auth_signup_check.sql')).read_text()==Path('database/native-auth-signup-check.sql').read_text(),'Native Auth signup check source drift'
+
+assert next(Path('supabase/migrations').glob('*_invitation_delivery_tracking.sql')).read_text()==Path('database/invitation-delivery.sql').read_text(),'Invitation delivery source drift'

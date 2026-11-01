@@ -20,7 +20,7 @@ Bu dosya yalnız **sıra, bağımlı teslim paketleri ve kontrol noktalarının*
 | 11 | [P14](remaining-work.md#p14)–[P16](remaining-work.md#p16) | E-posta teslim→zamanlama/sessiz saat→otomasyon |
 | 12 | [B01](remaining-work.md#b01)–[B05](remaining-work.md#b05) | Business scope, ortak inbox, hesaplaşma, rapor ve özel teklif |
 
-**İlk açık iş:** A03 kanıt eşlemesini kaynak üzerinden tamamla; ardından S01–S05. A01/A02 belge aktarımı bu dalda hazırlanmıştır; merge/kabul durumu yalnız devirde tutulur. CI süre optimizasyonu bu ürün sırasının önüne geçmez.
+**Aktif kullanıcı talebi:** [XREQ-003](../../../docs/requests.md#xreq-003-gerçek-davet-teslimi-ve-iş-takibi) için [S06](remaining-work.md#s06) → [S07](remaining-work.md#s07). Bu teslimden sonra A03 kanıt eşlemesi ve S01–S05 sırasına dönülür. Kaynak/CI/hosted durum yalnız devirde tutulur; CI süre optimizasyonu ürün sırasının önüne geçmez.
 
 ## Ortak işletim hattı
 

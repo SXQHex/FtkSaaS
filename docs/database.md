@@ -1,10 +1,10 @@
 # Veritabanı kaynak referansı
 
-Üretilmiştir: `node apps/backend/scripts/update-docs.mjs --write`. Elle düzenleme. Kaynak içerik özeti: `aacd3b5b79ce45ded49c0c20a145ad7512f8d6de4274a4651621a5159982b4c3`. Bu özet CI/hosted kabulü değildir; dağıtılan SHA ve ortam CD artifact'ında bulunur.
+Üretilmiştir: `node apps/backend/scripts/update-docs.mjs --write`. Elle düzenleme. Kaynak içerik özeti: `068ab92bd37b6d780ff328d47b36b03bd54622a28a4b6c85bcb02369581011a9`. Bu özet CI/hosted kabulü değildir; dağıtılan SHA ve ortam CD artifact'ında bulunur.
 
 Alan/scope/değişmez görünümü [fiziksel şema kataloğundadır](contracts/04-FtkSaaS-O4-veri-semasi.md). Bu dosya ikinci DDL sözleşmesi değildir. Etkin PostgreSQL şeması migration zincirinin uygulanmasıyla oluşur; dosyaları regex ile birleştirmek nihai şema çıkarımı sayılmaz.
 
-Sıralı migration: 85. Uygulanmış içerik manifesti: [migrations.sha256.json](../apps/backend/database/migrations.sha256.json). CD, migration içeriklerini canlı geçmişle doğrular; dokümantasyon capture adımı ayrıca read-only pg_catalog snapshot ve Supabase CLI DB tiplerini alır. İş verisi/Auth satırı/secret toplanmaz.
+Sıralı migration: 86. Uygulanmış içerik manifesti: [migrations.sha256.json](../apps/backend/database/migrations.sha256.json). CD, migration içeriklerini canlı geçmişle doğrular; dokümantasyon capture adımı ayrıca read-only pg_catalog snapshot ve Supabase CLI DB tiplerini alır. İş verisi/Auth satırı/secret toplanmaz.
 
 | Migration | SHA256 |
 |---|---|
@@ -93,3 +93,4 @@ Sıralı migration: 85. Uygulanmış içerik manifesti: [migrations.sha256.json]
 | [20261028203952_organization_brand_colors.sql](../apps/backend/supabase/migrations/20261028203952_organization_brand_colors.sql) | `b0631f4fe4abd1144fcfc742284f153d74cf47a923c9a92928e3a2894a670b64` |
 | [20261030083856_account_signup_guard.sql](../apps/backend/supabase/migrations/20261030083856_account_signup_guard.sql) | `77d60f6021952100ccb7907513f2f49866726d08dcd600da50f521569e7b588d` |
 | [20261031074421_native_auth_signup_check.sql](../apps/backend/supabase/migrations/20261031074421_native_auth_signup_check.sql) | `6acf9d503533661d721afa98e157e59bb0c869f617ca006561024b0ee1ccc186` |
+| [20261101040221_invitation_delivery_tracking.sql](../apps/backend/supabase/migrations/20261101040221_invitation_delivery_tracking.sql) | `23b2826e79268e2326992c47a504192c6441fc9be153f702b3bd22e12e7500b6` |

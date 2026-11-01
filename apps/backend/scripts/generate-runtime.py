@@ -23,6 +23,7 @@ for o in ops:
  entry=f"private.p04_public('{o['name']}',p_request,p_ids,p_aux)" if o['name'] in ('public_calendar_get_v1','public_application_submit_v1') else f"private.execute_operation('{o['name']}',p_request,p_actor_auth_id,p_session_id,p_ids,p_aux)"
  if o['name']=='calendar_feed_get_v1':entry='private.personal_calendar_feed(p_request,p_ids,p_aux)'
  if o['name']=='account_signup_check_v1':entry='private.account_signup_check(p_request,p_ids,p_aux)'
+ if o['name']=='outbox_deliver_v1':entry="case when p_actor_auth_id is null and p_session_id is null and p_aux ? 'invitation_phase' then private.invitation_worker(p_request,p_aux) else private.execute_operation('outbox_deliver_v1',p_request,p_actor_auth_id,p_session_id,p_ids,p_aux) end"
  sql.append(f"create or replace function api_v1.{o['name']}(p_request jsonb,p_actor_auth_id uuid,p_session_id uuid,p_ids uuid[],p_aux jsonb default null) returns jsonb language sql security invoker set search_path='' as $$select {entry}$$;")
  sql.append(f"revoke all on function api_v1.{o['name']}(jsonb,uuid,uuid,uuid[],jsonb) from public,anon,authenticated;")
  sql.append(f"grant execute on function api_v1.{o['name']}(jsonb,uuid,uuid,uuid[],jsonb) to service_role;")
