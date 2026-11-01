@@ -271,126 +271,125 @@ export function PersonMerge({
             </Button>
           )}
         </div>
-      ) : (
-        !pending && (
-          <>
-            {!opened ? (
-              <Button variant="outline" onClick={() => setOpened(true)}>
-                {t("mergeOpen")}
-              </Button>
-            ) : (
-              <>
-                <form onSubmit={(event) => void search(event)} className="space-y-3">
-                  <Label htmlFor="merge-search">{t("mergeSearch")}</Label>
-                  <Input
-                    id="merge-search"
-                    value={query}
-                    onChange={(event) => {
-                      setQuery(event.target.value);
-                      setResults(null);
-                      setTarget(null);
-                      setPreview(null);
-                    }}
-                    disabled={busy}
-                  />
-                  <Button disabled={busy}>{t("searchButton")}</Button>
-                </form>
-                {results && (
-                  <div className="space-y-2">
-                    {results.items.length === 0 && <p>{t("noResults")}</p>}
-                    {results.items.map((p) => (
-                      <Button
-                        key={p.id}
-                        className="h-auto min-h-11 w-full whitespace-normal"
-                        variant="outline"
-                        disabled={busy}
-                        aria-pressed={target?.id === p.id}
-                        onClick={() => {
-                          setTarget(p);
-                          setPreview(null);
-                        }}
-                      >
-                        {p.display_name}
-                      </Button>
-                    ))}
-                    {results.next && (
-                      <Button
-                        variant="outline"
-                        disabled={busy}
-                        onClick={() => void search(undefined, results.next ?? undefined)}
-                      >
-                        {t("next")}
-                      </Button>
-                    )}
-                  </div>
-                )}
-                {target && (
-                  <div className="space-y-3">
-                    <p>
-                      {t("mergeDirection", {
-                        source: person.display_name,
-                        target: target.display_name,
-                      })}
-                    </p>
-                    <Button disabled={busy} onClick={() => void inspect()}>
-                      {t("mergePreview")}
-                    </Button>
-                  </div>
-                )}
-                {preview && (
-                  <div className="space-y-3 rounded-lg border p-4">
-                    <p>{t("mergeHistory")}</p>
-                    <p>
-                      {t("mergeCenters", {
-                        count: preview.merge_summary?.affected_center_ids.length ?? 0,
-                      })}
-                    </p>
-                    {Date.parse(preview.expires_at) <= clock && (
-                      <p role="alert">{message("PREVIEW_STALE")}</p>
-                    )}
-                    {preview.blockers.map((b, i) => (
-                      <p role="alert" key={i}>
-                        {t.has(`errors.${b.code}`)
-                          ? message(b.code)
-                          : api(errorMessageKey(new ApiFailure({ ok: false, error: b })))}
-                      </p>
-                    ))}
-                    {!!preview.merge_summary?.required_approval_center_ids.length && (
-                      <p role="alert">
-                        {t("mergeApprovalRequired", {
-                          count: preview.merge_summary.required_approval_center_ids.length,
-                        })}
-                      </p>
-                    )}
+      ) : null}
+      {!pending && (
+        <>
+          {!opened ? (
+            <Button variant="outline" onClick={() => setOpened(true)}>
+              {t("mergeOpen")}
+            </Button>
+          ) : (
+            <>
+              <form onSubmit={(event) => void search(event)} className="space-y-3">
+                <Label htmlFor="merge-search">{t("mergeSearch")}</Label>
+                <Input
+                  id="merge-search"
+                  value={query}
+                  onChange={(event) => {
+                    setQuery(event.target.value);
+                    setResults(null);
+                    setTarget(null);
+                    setPreview(null);
+                  }}
+                  disabled={busy}
+                />
+                <Button disabled={busy}>{t("searchButton")}</Button>
+              </form>
+              {results && (
+                <div className="space-y-2">
+                  {results.items.length === 0 && <p>{t("noResults")}</p>}
+                  {results.items.map((p) => (
                     <Button
-                      variant="destructive"
-                      disabled={busy || blocked}
+                      key={p.id}
+                      className="h-auto min-h-11 w-full whitespace-normal"
+                      variant="outline"
+                      disabled={busy}
+                      aria-pressed={target?.id === p.id}
                       onClick={() => {
-                        if (!target || blocked) return;
-                        if (Date.parse(preview.expires_at) <= Date.now()) {
-                          setPreview(null);
-                          setError("PREVIEW_STALE");
-                          return;
-                        }
-                        void apply({
-                          targetId: target.id,
-                          input: {
-                            org_id: scope.orgId,
-                            center_id: scope.centerId,
-                            operation_key: v7(),
-                            preview: { id: preview.id, token: preview.token },
-                          },
-                        });
+                        setTarget(p);
+                        setPreview(null);
                       }}
                     >
-                      {t("mergeConfirm")}
+                      {p.display_name}
                     </Button>
-                  </div>
-                )}
-              </>
-            )}
-          </>
-        )
+                  ))}
+                  {results.next && (
+                    <Button
+                      variant="outline"
+                      disabled={busy}
+                      onClick={() => void search(undefined, results.next ?? undefined)}
+                    >
+                      {t("next")}
+                    </Button>
+                  )}
+                </div>
+              )}
+              {target && (
+                <div className="space-y-3">
+                  <p>
+                    {t("mergeDirection", {
+                      source: person.display_name,
+                      target: target.display_name,
+                    })}
+                  </p>
+                  <Button disabled={busy} onClick={() => void inspect()}>
+                    {t("mergePreview")}
+                  </Button>
+                </div>
+              )}
+              {preview && (
+                <div className="space-y-3 rounded-lg border p-4">
+                  <p>{t("mergeHistory")}</p>
+                  <p>
+                    {t("mergeCenters", {
+                      count: preview.merge_summary?.affected_center_ids.length ?? 0,
+                    })}
+                  </p>
+                  {Date.parse(preview.expires_at) <= clock && (
+                    <p role="alert">{message("PREVIEW_STALE")}</p>
+                  )}
+                  {preview.blockers.map((b, i) => (
+                    <p role="alert" key={i}>
+                      {t.has(`errors.${b.code}`)
+                        ? message(b.code)
+                        : api(errorMessageKey(new ApiFailure({ ok: false, error: b })))}
+                    </p>
+                  ))}
+                  {!!preview.merge_summary?.required_approval_center_ids.length && (
+                    <p role="alert">
+                      {t("mergeApprovalRequired", {
+                        count: preview.merge_summary.required_approval_center_ids.length,
+                      })}
+                    </p>
+                  )}
+                  <Button
+                    variant="destructive"
+                    disabled={busy || blocked}
+                    onClick={() => {
+                      if (!target || blocked) return;
+                      if (Date.parse(preview.expires_at) <= Date.now()) {
+                        setPreview(null);
+                        setError("PREVIEW_STALE");
+                        return;
+                      }
+                      void apply({
+                        targetId: target.id,
+                        input: {
+                          org_id: scope.orgId,
+                          center_id: scope.centerId,
+                          operation_key: v7(),
+                          preview: { id: preview.id, token: preview.token },
+                        },
+                      });
+                    }}
+                  >
+                    {t("mergeConfirm")}
+                  </Button>
+                </div>
+              )}
+            </>
+          )}
+        </>
       )}
     </section>
   );

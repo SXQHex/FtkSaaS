@@ -30,9 +30,13 @@ import { PersonEdit } from "./person-edit";
 import { PersonCreate } from "./person-create";
 import { PersonInvitation } from "./person-invitation";
 import { PersonMerge } from "./person-merge";
-import { mergeActions, type MergeActions } from "../../lib/student-management";
+import {
+  mergeActions,
+  type MergeActions,
+  disciplineActions,
+  type DisciplineActions,
+} from "../../lib/student-management";
 import { PersonDisciplines } from "./person-disciplines";
-import { disciplineActions, type DisciplineActions } from "../../lib/student-management";
 
 const buttonClass = "h-auto min-h-11 max-w-full whitespace-normal";
 export function StudentsWorkspace({
@@ -473,6 +477,10 @@ function StudentDetail({
   const current = result?.attempt === attempt ? result : null;
   const person = current?.person;
   const relationships = person?.relationships.filter((item) => item.center_id === scope.centerId);
+  function refreshPersonAndList() {
+    setAttempt((value) => value + 1);
+    onSaved();
+  }
   return (
     <div className="min-w-0 space-y-6 px-5 pb-8">
       {!current && (
@@ -556,20 +564,14 @@ function StudentDetail({
         personId={personId}
         person={person}
         actions={actions}
-        onSaved={() => {
-          setAttempt((value) => value + 1);
-          onSaved();
-        }}
+        onSaved={refreshPersonAndList}
       />
       {person && disciplines && (
         <PersonDisciplines
           scope={scope}
           person={person}
           actions={disciplines}
-          onSaved={() => {
-            setAttempt((value) => value + 1);
-            onSaved();
-          }}
+          onSaved={refreshPersonAndList}
         />
       )}
       {person && merging && (

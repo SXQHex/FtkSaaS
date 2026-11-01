@@ -72,9 +72,10 @@ export function PersonDisciplines({
   const [state, setState] = useState<"active" | "inactive">("active");
   const lock = useRef(false);
   const mounted = useRef(true);
-  const hasRelations = person.discipline_relationships.some(
+  const relations = person.discipline_relationships.filter(
     (r) => r.center_id === scope.centerId && r.kind === "student",
   );
+  const hasRelations = relations.length > 0;
   useEffect(() => {
     mounted.current = true;
     return () => {
@@ -150,9 +151,7 @@ export function PersonDisciplines({
           setPending("invalid");
         }
         setError(code);
-      } else {
-        if (clear()) setError(code);
-      }
+      } else if (clear()) setError(code);
     } finally {
       lock.current = false;
       if (mounted.current) setBusy(false);
@@ -207,9 +206,7 @@ export function PersonDisciplines({
       !catalog?.some((d) => d.id === selected && (d.state === "active" || state === "inactive"))
     )
       return;
-    const relation = person.discipline_relationships.find(
-      (r) => r.center_id === scope.centerId && r.discipline_id === selected && r.kind === "student",
-    );
+    const relation = relations.find((r) => r.discipline_id === selected);
     void save({
       input: {
         org_id: scope.orgId,
@@ -223,9 +220,6 @@ export function PersonDisciplines({
       },
     });
   }
-  const relations = person.discipline_relationships.filter(
-    (r) => r.center_id === scope.centerId && r.kind === "student",
-  );
   return (
     <section className="space-y-4 border-t pt-6" aria-label={t("disciplineTitle")}>
       <h3 className="font-semibold">{t("disciplineTitle")}</h3>
