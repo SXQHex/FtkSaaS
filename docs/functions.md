@@ -1,6 +1,6 @@
 # API ve iş akışı haritası
 
-Üretilmiştir: `node apps/backend/scripts/update-docs.mjs --write`. Elle düzenleme. Kaynak içerik özeti: `c344e7f7c681c355c6b262c68ed8a7a1e80043750cc63cc36319c0b701610acc`. Bu özet CI/hosted kabulü değildir; dağıtılan SHA ve ortam CD artifact'ında bulunur.
+Üretilmiştir: `node apps/backend/scripts/update-docs.mjs --write`. Elle düzenleme. Kaynak içerik özeti: `c0c1422bc705ab55d52179c691e6817f708337199924c89e031c751a7f8a8631`. Bu özet CI/hosted kabulü değildir; dağıtılan SHA ve ortam CD artifact'ında bulunur.
 
 DTO/izin/hata/yan etkiler [üretilmiş API kataloğu](contracts/05-FtkSaaS-O4-API-katalogu.md) ve [makine sözleşmesinden](../packages/api-contracts/schema/contract.json) gelir. Edge kodu [backend-v1](../apps/backend/supabase/functions/backend-v1/index.ts) altındadır; SQL domain davranışını Edge dosyasından tek başına çıkarma. `implemented.json` içindeki varlık tüm selector/provider/ürün kabulünün tamamlandığı anlamına gelmez. Backend-only satırları tarayıcı endpoint önerisi değildir.
 
@@ -229,7 +229,7 @@ DTO/izin/hata/yan etkiler [üretilmiş API kataloğu](contracts/05-FtkSaaS-O4-AP
 
 Test dosyası bağlantısı çalıştırılmış test başarısı değildir. Kaynak bağlı CI/hosted sonuçları güncel kabul belgesinin sahibidir.
 
-- [WF00 — Ortak istemci protokolü](workflows.md#wf00): [alan devri](client-integration.md); [contract.test.mjs](../apps/backend/tests/contract.test.mjs), [api-acceptance.test.mjs](../apps/backend/tests/api-acceptance.test.mjs)
+- [WF00 — Ortak istemci protokolü](workflows.md#wf00): [alan devri](client-integration.md); [contract.test.mjs](../apps/backend/tests/contract.test.mjs), [api-acceptance.test.mjs](../apps/backend/tests/api-acceptance.test.mjs), [ci-observer.test.mjs](../apps/backend/tests/ci-observer.test.mjs)
 - [WF01 — Kimlik ve hesap güvenliği](workflows.md#wf01): [alan devri](settings.md); [account-identity-acceptance.mjs](../apps/backend/tests/account-identity-acceptance.mjs), [account-session-management-acceptance.mjs](../apps/backend/tests/account-session-management-acceptance.mjs), [account-mfa-acceptance.mjs](../apps/backend/tests/account-mfa-acceptance.mjs), [account-signup-adapter.mjs](../apps/backend/tests/account-signup-adapter.mjs), [account-signup-acceptance.mjs](../apps/backend/tests/account-signup-acceptance.mjs), [auth-password-security-unit.mjs](../apps/backend/tests/auth-password-security-unit.mjs)
 - [WF02 — Stüdyo kurulumu ve yetki](workflows.md#wf02): [alan devri](workflows.md); [registry.test.mjs](../apps/backend/tests/registry.test.mjs), [room-role-registry.test.mjs](../apps/backend/tests/room-role-registry.test.mjs), [starter-plan-gates-acceptance.mjs](../apps/backend/tests/starter-plan-gates-acceptance.mjs)
 - [WF03 — Program ve seans yaşam döngüsü](workflows.md#wf03): [alan devri](workflows.md); [program-session-lifecycle.test.mjs](../apps/backend/tests/program-session-lifecycle.test.mjs), [schedule-reads.test.mjs](../apps/backend/tests/schedule-reads.test.mjs), [availability-policies.test.mjs](../apps/backend/tests/availability-policies.test.mjs)

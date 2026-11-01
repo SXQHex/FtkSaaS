@@ -107,7 +107,12 @@ jobs:
         env:
           FTK_TEST_TIMINGS: '1'
           SHARD: ${{ matrix.shard }}
-        run: node scripts/test-clean.mjs api "$SHARD"
+        run: |
+          if [ "$SHARD" = '1' ]; then
+            node scripts/ci/observe-api.mjs node scripts/test-clean.mjs api "$SHARD"
+          else
+            node scripts/test-clean.mjs api "$SHARD"
+          fi
       - if: always()
         run: node scripts/ci/summarize-timings.mjs
       - if: always()
@@ -116,7 +121,9 @@ jobs:
         uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: timings-api-${{ matrix.shard }}-${{ github.run_attempt }}
-          path: .artifacts/ci/timings/*.json
+          path: |
+            .artifacts/ci/timings/*.json
+            .artifacts/ci/diagnostics/*.jsonl
           if-no-files-found: ignore
           include-hidden-files: true
           archive: true
