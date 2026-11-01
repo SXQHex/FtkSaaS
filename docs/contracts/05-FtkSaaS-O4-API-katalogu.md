@@ -247,7 +247,7 @@
 | centers_list_v1 | read | none | None | contract_only |  |
 | center_create_v1 | command | append_or_current_scope_lock | management_state_get_v1 | contract_only | centers.versioned_domain_change |
 | center_update_v1 | command | row_version | centers_list_v1 | implemented | centers.versioned_domain_change |
-| room_save_v1 | command | create_absent_update_requires_version | centers_list_v1 | implemented | rooms.versioned_domain_change |
+| room_save_v1 | command | create_absent_update_requires_version | management_state_get_v1 | implemented | rooms.versioned_domain_change |
 | availability_save_v1 | command | create_absent_update_requires_version | management_state_get_v1 | contract_only | availability_rules.versioned_domain_change |
 | availability_exception_save_v1 | command | row_version | management_state_get_v1 | contract_only | availability_exceptions.append, centers.configuration_version |
 | policies_get_v1 | read | none | None | contract_only |  |

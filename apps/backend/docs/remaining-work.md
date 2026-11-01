@@ -60,7 +60,7 @@ Bu tablo yalnız izdir; eski kabul metinleri ikinci kez tutulmaz.
 
 **Uygulama alt adımları:**
 
-- [ ] A03.1 — Her F01–F33 için normatif karar/plan kapsamını mevcut operasyon ve WF kaynaklarıyla eşleştir; metadata eksikliğini runtime eksikliğinden ayır.
+- [x] A03.1 — Her F01–F33 için normatif karar/plan kapsamını mevcut operasyon ve WF kaynaklarıyla eşleştir; metadata eksikliğini runtime eksikliğinden ayır.
 - [ ] A03.2 — Bağlı gerçek testleri ve kaynak/run/ortam kanıtını incele; doğrulanmamış, eksik veya uygulanamaz katmanı gerekçesiyle ayır. Sırf test dosyası bulunması başarı kanıtı değildir.
 - [ ] A03.3 — Her gerçek boşluğu mevcut görev kimliğine bağla; sahipsiz operasyon veya çelişen kabul bırakma. Makine metadata'sını yalnız doğrulanmış kanıtla güncelle; mevcut sağlam işlevi yeniden yazma.
 
@@ -80,8 +80,8 @@ Bu tablo yalnız izdir; eski kabul metinleri ikinci kez tutulmaz.
 
 **Uygulama alt adımları:**
 
-- [ ] S01.1 — Mevcut oda yazma ve yönetim okuma kaynaklarını incele; liste, ayrıntı, selector ve düzenleme sürümü boşluklarını belirle. Desteklenen alanları mevcut DTO/yetki sözleşmesinden al.
-- [ ] S01.2 — Eksik okumaları mevcut mimari içinde tamamla; merkez/tenant scope, desteklenen filtre ve sayfalama davranışını sözleşme/üretilmiş tiplerle birlikte sun.
+- [x] S01.1 — Mevcut oda yazma ve yönetim okuma kaynaklarını incele; liste, ayrıntı, selector ve düzenleme sürümü boşluklarını belirle. Desteklenen alanları mevcut DTO/yetki sözleşmesinden al.
+- [x] S01.2 — Eksik okumaları mevcut mimari içinde tamamla; merkez/tenant scope, desteklenen filtre ve sayfalama davranışını sözleşme/üretilmiş tiplerle birlikte sun.
 - [ ] S01.3 — Gerçek Auth→Edge→RPC yolunda oluştur→yeni oturumdan bul→ayrıntı/sürüm oku→güncelle→yeniden oku zincirini doğrula; mevcut oda/rol suite'ini kullan.
 
 **Dilim kabulü:** Eski sürümle yazma, başka tenant/izinsiz merkez erişimi ve yetki kaybı reddedilir. Starter ikinci aktif oda açamaz; mevcut kapasite ve tek mantıksal oda kuralları korunur. Backend okuma teslimi frontend ekran kabulü diye kapatılmaz.
@@ -618,43 +618,45 @@ Bu tablo yalnız izdir; eski kabul metinleri ikinci kez tutulmaz.
 
 ## F01–F33 kapsama izi
 
+A03 incelemesi mevcut 218 operasyonun tamamını tek WF sahibine bağladı: 211 operasyonun F01–F33 ve normatif plan izi vardır; `features=[]` olan yedi ortak ayar/medya operasyonu WF12 üzerinden S10 kapsamındadır. Ortak altyapıya yapay F etiketi atanmadı. Aşağıdaki akışların kaynak/test bağları `docs/workflows.json`, okunabilir görünümü [API haritası](../../../docs/functions.md) sahibindedir. Eksik WF test bağları mevcut gerçek test/SQL fixture kaynaklarıyla tamamlandı; yeni runtime başarısı iddia edilmez. Abonelik yükseltme/iptal testlerinin SQL dispatcher kabulü gerçek HTTP kabulünden ayrılır; grace uzatmanın negatif yetki kontrolü olumlu uzatma kabulü değildir. Bu eksikler S16 ve O10 kapsamında kalır. Her özelliğin hosted/plan bütünlük kabulü ilgili S/P/B/O ve G görevlerinde açık kalır; aday kaynağın test/ortam sonucu yalnız devirde tutulur.
+
 A03 ve G03 genel iz/kabul kapılarıdır. Aşağıdaki tablo görev navigasyonudur; ikinci durum veya plan erişimi matrisi değildir. Plan erişimi yalnız ürün sözleşmesinden alınır.
 
-| Özellik | Ad | Görevler |
-|---|---|---|
-| F01 | İşletme, merkez, oda ve kaynak tanımı | S01, P01, P02, B01, B05 |
-| F02 | Çalışma saatleri, izin ve uygunluk | S09, S10, P02 |
-| F03 | İşletme kuralları ve merkez istisnaları | S01, S10, P15, B01 |
-| F04 | Hesap eşleştirme, çoklu rol, kapsamlı yetkilendirme | S06–S08, S10, B01 |
-| F05 | Resepsiyon/operasyon personeli izinleri | P02, B01 |
-| F06 | Öğrenci/eğitmen panelleri, profil ve şifre işlemleri | S06–S08, S10 |
-| F07 | Tek kişi kaydı, adaydan öğrenciye dönüşüm | S03–S05, S12, P01, P05, P06, B01 |
-| F08 | Birleşik takvim ve kaynak çakışma kontrolü | S02, S09, S15, P02 |
-| F09 | Özel ders talep, onay, ret ve alternatif saat | S09, P03 |
-| F10 | Tekrarlayan grup programı ve sabit gruba kayıt | S02, S09 |
-| F11 | Kontenjanlı açık grup dersine öğrencinin kaydolması | S09 |
-| F12 | Bekleme listesi ve süreli yer teklifi | P03, O01 |
-| F13 | Eğitmen değişikliği | S09, P02, P04 |
-| F14 | Yoklama, gelmeme, iptal, erteleme ve yerine seans düzenleme | S09, P13 |
-| F15 | Ders sayılı paket, geçerlilik ve kredi hareketleri | S09, P13 |
-| F16 | Süreli/sınırsız üyelik, dönemsel kullanım sınırı | S09, P13 |
-| F17 | Üyelik/paket dondurma ve plan değişimi | P03, P13 |
-| F18 | Merkezler arasında kullanım hakkı ve onaylı hesaplaşma | B03 |
-| F19 | Manuel tahsilat, kısmi ödeme, iade/düzeltme ve alacak | S09, S12, P04, B03 |
-| F20 | Eğitmen hakedişi ve ödeme takibi | P04, B03 |
-| F21 | Aday, kaynak, ilgi, takip ve dönüşüm | P05–P11, B02, B04 |
-| F22 | Deneme teklifi ve kontrollü indirim | P11 |
-| F23 | Yenileme ve hareketsiz öğrenci takip listeleri | P11, P16, B04 |
-| F24 | Davranışa dayalı segmentler ve takip otomasyonu | P11, P14–P16, B04 |
-| F25 | Paylaşılabilir işletme takvimi ve başvuru/kayıt sayfası | S14, S15, P05, P07–P09, B02 |
-| F26 | Talep sonucu, ders değişikliği ve benzeri işlemsel bildirimler | S06, S07, P14, P16 |
-| F27 | Otomatik yaklaşan ders/paket bitiş hatırlatmaları | P15, P16 |
-| F28 | Operasyon ve finans raporları, tarih filtresi, dışa aktarım | S05, S11, B04, O05 |
-| F29 | Atölye/etkinlik, kontenjan, kayıt ve katılım | P12, P13 |
-| F30 | Temel form ve sürümlü belge onayı | S13, O05, O08 |
-| F31 | Öğrenci, kalan kredi ve borç için veri içe aktarma | S04, S12, P10 |
-| F32 | İşletme aboneliği, erişim ve kullanım limitleri | S16, P01, B05 |
-| F33 | Denetlenebilir geçmiş ve yinelenen işlem koruması | A02, O01–O10 |
+| Özellik | Ad | Görevler | Kaynak/test akışı |
+|---|---|---|---|
+| F01 | İşletme, merkez, oda ve kaynak tanımı | S01, P01, P02, B01, B05 | [WF02](../../../docs/workflows.md#wf02), [WF17](../../../docs/workflows.md#wf17) |
+| F02 | Çalışma saatleri, izin ve uygunluk | S09, S10, P02 | [WF03](../../../docs/workflows.md#wf03), [WF12](../../../docs/workflows.md#wf12) |
+| F03 | İşletme kuralları ve merkez istisnaları | S01, S10, P15, B01 | [WF03](../../../docs/workflows.md#wf03) |
+| F04 | Hesap eşleştirme, çoklu rol, kapsamlı yetkilendirme | S06–S08, S10, B01 | [WF00](../../../docs/workflows.md#wf00), [WF02](../../../docs/workflows.md#wf02), [WF04](../../../docs/workflows.md#wf04), [WF17](../../../docs/workflows.md#wf17), [WF18](../../../docs/workflows.md#wf18) |
+| F05 | Resepsiyon/operasyon personeli izinleri | P02, B01 | [WF02](../../../docs/workflows.md#wf02) |
+| F06 | Öğrenci/eğitmen panelleri, profil ve şifre işlemleri | S06–S08, S10 | [WF00](../../../docs/workflows.md#wf00), [WF01](../../../docs/workflows.md#wf01), [WF04](../../../docs/workflows.md#wf04), [WF05](../../../docs/workflows.md#wf05), [WF06](../../../docs/workflows.md#wf06), [WF08](../../../docs/workflows.md#wf08), [WF10](../../../docs/workflows.md#wf10), [WF17](../../../docs/workflows.md#wf17), [WF20](../../../docs/workflows.md#wf20) |
+| F07 | Tek kişi kaydı, adaydan öğrenciye dönüşüm | S03–S05, S12, P01, P05, P06, B01 | [WF04](../../../docs/workflows.md#wf04), [WF10](../../../docs/workflows.md#wf10), [WF16](../../../docs/workflows.md#wf16), [WF20](../../../docs/workflows.md#wf20) |
+| F08 | Birleşik takvim ve kaynak çakışma kontrolü | S02, S09, S15, P02 | [WF03](../../../docs/workflows.md#wf03), [WF09](../../../docs/workflows.md#wf09) |
+| F09 | Özel ders talep, onay, ret ve alternatif saat | S09, P03 | [WF00](../../../docs/workflows.md#wf00), [WF03](../../../docs/workflows.md#wf03), [WF06](../../../docs/workflows.md#wf06), [WF20](../../../docs/workflows.md#wf20) |
+| F10 | Tekrarlayan grup programı ve sabit gruba kayıt | S02, S09 | [WF03](../../../docs/workflows.md#wf03), [WF05](../../../docs/workflows.md#wf05), [WF06](../../../docs/workflows.md#wf06) |
+| F11 | Kontenjanlı açık grup dersine öğrencinin kaydolması | S09 | [WF03](../../../docs/workflows.md#wf03), [WF06](../../../docs/workflows.md#wf06) |
+| F12 | Bekleme listesi ve süreli yer teklifi | P03, O01 | [WF00](../../../docs/workflows.md#wf00), [WF19](../../../docs/workflows.md#wf19), [WF20](../../../docs/workflows.md#wf20) |
+| F13 | Eğitmen değişikliği | S09, P02, P04 | [WF03](../../../docs/workflows.md#wf03) |
+| F14 | Yoklama, gelmeme, iptal, erteleme ve yerine seans düzenleme | S09, P13 | [WF03](../../../docs/workflows.md#wf03), [WF06](../../../docs/workflows.md#wf06), [WF07](../../../docs/workflows.md#wf07) |
+| F15 | Ders sayılı paket, geçerlilik ve kredi hareketleri | S09, P13 | [WF05](../../../docs/workflows.md#wf05), [WF06](../../../docs/workflows.md#wf06), [WF10](../../../docs/workflows.md#wf10), [WF12](../../../docs/workflows.md#wf12), [WF14](../../../docs/workflows.md#wf14), [WF20](../../../docs/workflows.md#wf20) |
+| F16 | Süreli/sınırsız üyelik, dönemsel kullanım sınırı | S09, P13 | [WF05](../../../docs/workflows.md#wf05), [WF12](../../../docs/workflows.md#wf12) |
+| F17 | Üyelik/paket dondurma ve plan değişimi | P03, P13 | [WF05](../../../docs/workflows.md#wf05) |
+| F18 | Merkezler arasında kullanım hakkı ve onaylı hesaplaşma | B03 | [WF05](../../../docs/workflows.md#wf05), [WF10](../../../docs/workflows.md#wf10), [WF18](../../../docs/workflows.md#wf18), [WF20](../../../docs/workflows.md#wf20) |
+| F19 | Manuel tahsilat, kısmi ödeme, iade/düzeltme ve alacak | S09, S12, P04, B03 | [WF05](../../../docs/workflows.md#wf05), [WF08](../../../docs/workflows.md#wf08), [WF10](../../../docs/workflows.md#wf10), [WF20](../../../docs/workflows.md#wf20) |
+| F20 | Eğitmen hakedişi ve ödeme takibi | P04, B03 | [WF07](../../../docs/workflows.md#wf07), [WF10](../../../docs/workflows.md#wf10), [WF14](../../../docs/workflows.md#wf14), [WF15](../../../docs/workflows.md#wf15), [WF20](../../../docs/workflows.md#wf20) |
+| F21 | Aday, kaynak, ilgi, takip ve dönüşüm | P05–P11, B02, B04 | [WF09](../../../docs/workflows.md#wf09), [WF10](../../../docs/workflows.md#wf10), [WF16](../../../docs/workflows.md#wf16), [WF20](../../../docs/workflows.md#wf20) |
+| F22 | Deneme teklifi ve kontrollü indirim | P11 | [WF16](../../../docs/workflows.md#wf16) |
+| F23 | Yenileme ve hareketsiz öğrenci takip listeleri | P11, P16, B04 | [WF16](../../../docs/workflows.md#wf16) |
+| F24 | Davranışa dayalı segmentler ve takip otomasyonu | P11, P14–P16, B04 | [WF16](../../../docs/workflows.md#wf16), [WF20](../../../docs/workflows.md#wf20) |
+| F25 | Paylaşılabilir işletme takvimi ve başvuru/kayıt sayfası | S14, S15, P05, P07–P09, B02 | [WF09](../../../docs/workflows.md#wf09), [WF15](../../../docs/workflows.md#wf15) |
+| F26 | Talep sonucu, ders değişikliği ve benzeri işlemsel bildirimler | S06, S07, P14, P16 | [WF11](../../../docs/workflows.md#wf11), [WF12](../../../docs/workflows.md#wf12), [WF20](../../../docs/workflows.md#wf20) |
+| F27 | Otomatik yaklaşan ders/paket bitiş hatırlatmaları | P15, P16 | [WF12](../../../docs/workflows.md#wf12), [WF20](../../../docs/workflows.md#wf20) |
+| F28 | Operasyon ve finans raporları, tarih filtresi, dışa aktarım | S05, S11, B04, O05 | [WF00](../../../docs/workflows.md#wf00), [WF10](../../../docs/workflows.md#wf10), [WF12](../../../docs/workflows.md#wf12), [WF20](../../../docs/workflows.md#wf20) |
+| F29 | Atölye/etkinlik, kontenjan, kayıt ve katılım | P12, P13 | [WF15](../../../docs/workflows.md#wf15) |
+| F30 | Temel form ve sürümlü belge onayı | S13, O05, O08 | [WF10](../../../docs/workflows.md#wf10), [WF11](../../../docs/workflows.md#wf11) |
+| F31 | Öğrenci, kalan kredi ve borç için veri içe aktarma | S04, S12, P10 | [WF00](../../../docs/workflows.md#wf00), [WF10](../../../docs/workflows.md#wf10), [WF12](../../../docs/workflows.md#wf12), [WF20](../../../docs/workflows.md#wf20) |
+| F32 | İşletme aboneliği, erişim ve kullanım limitleri | S16, P01, B05 | [WF02](../../../docs/workflows.md#wf02), [WF04](../../../docs/workflows.md#wf04), [WF13](../../../docs/workflows.md#wf13), [WF17](../../../docs/workflows.md#wf17), [WF20](../../../docs/workflows.md#wf20) |
+| F33 | Denetlenebilir geçmiş ve yinelenen işlem koruması | A02, O01–O10 | [WF00](../../../docs/workflows.md#wf00), [WF05](../../../docs/workflows.md#wf05), [WF08](../../../docs/workflows.md#wf08), [WF14](../../../docs/workflows.md#wf14), [WF17](../../../docs/workflows.md#wf17), [WF20](../../../docs/workflows.md#wf20) |
 
 ## Doğrulama ve kayıt
 
