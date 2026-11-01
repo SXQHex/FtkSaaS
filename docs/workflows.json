@@ -266,8 +266,8 @@
         "management_state_get_v1"
       ],
       "review": {
-        "fingerprint": "dd49cdbcd3b0d004a4f6c68b3700f1bac123ba9c1ae3ad169b761dd4bf34d4c1",
-        "reason": "Güncel main ve davet kaynağı incelendi; kalite kontrolünün yakaladığı iki catch açık güvenli sonuç atar; native Auth ve kaynak kabulü korunur."
+        "fingerprint": "5d2596db5f135ecbb4aef07296c9be05a45536b0c196a9ad6b0dde2d935bd08d",
+        "reason": "Worker tick artık service-role metninden bağımsız scoped secret gerektirir; imza/boş config regresyonu, native Auth ve ortak güvenlik sınırı incelendi."
       }
     },
     {
@@ -579,8 +579,8 @@
         "person_discipline_set_v1"
       ],
       "review": {
-        "fingerprint": "6f166e15863e0f1dfdfe83b71aff13dfff4a87c35bf8f015bea955efab8827bc",
-        "reason": "Son davet kaynakları incelendi; outbox worker’ın mevcut F26 kapısı gönderimde korunur, özgün gönderenin yetkili iş okuması ayrı kalır."
+        "fingerprint": "a2f67d427f3e6d2a9f116a2d28d919756ec80b0e4cf774c9f91e2e50a13856b4",
+        "reason": "Gerçek DB config rotasyon regresyonu ve test-only operational env incelendi; mevcut Auth/RPC/provider assertion satırları birebir korunur, aynı scoped secret testte açık verilir."
       }
     },
     {
@@ -1396,8 +1396,8 @@
         "subscription_boundary_apply_v1"
       ],
       "review": {
-        "fingerprint": "67ca0283e6d741932261b1618e03c9200913d9e168a7d36c89756ca2c3cd92dc",
-        "reason": "Gitleaks yanlış pozitif düzeltmesi incelendi: Vault config UPSERT aynı üç sütunu row assignment ile günceller; manifest hash değerleri aynıdır, tarama politikası değişmedi."
+        "fingerprint": "25cd86d06f26801e13404d82112a9ae6bfea6e7f2f9f8423e35b427c02d77f76",
+        "reason": "Son worker test harnessi ve config rotasyon regresyonu incelendi; scoped secret iki tarafta zorunlu, mevcut dispatch UPSERTte kapanır; üretim Auth/JWT/lease/replay sınırı değişmez."
       }
     }
   ]

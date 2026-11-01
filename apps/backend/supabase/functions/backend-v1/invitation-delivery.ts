@@ -5,7 +5,6 @@ const enc=new TextEncoder();
 const hex=(bytes:ArrayBuffer)=>Array.from(new Uint8Array(bytes),x=>x.toString(16).padStart(2,'0')).join('');
 const uuid=/^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$/;
 const reply=(status:number,value:unknown)=>new Response(JSON.stringify(value),{status,headers:{'content-type':'application/json','cache-control':'no-store'}});
-export async function invitationSigningKey(serviceKey:string){return hex(await crypto.subtle.digest('SHA-256',enc.encode('ftksaas.invitation.tick.v1:'+serviceKey)));}
 async function signature(key:string,value:string){
  const hmac=await crypto.subtle.importKey('raw',enc.encode(key),{name:'HMAC',hash:'SHA-256'},false,['sign']);
  return hex(await crypto.subtle.sign('HMAC',hmac,enc.encode(value)));
@@ -26,14 +25,14 @@ function validClaim(x:any):x is Claim{
 // Auth session or expose a new frontend operation. Request contains no job/PII.
 export async function invitationTick(req:Request,env:Env,send:Fetch=fetch,now=Date.now()){
  try{
-  const serviceKey=env('SUPABASE_SERVICE_ROLE_KEY'),base=env('SUPABASE_URL');
-  if(!serviceKey||!base)return reply(503,{error:'SERVICE_UNAVAILABLE'});
+  const serviceKey=env('SUPABASE_SERVICE_ROLE_KEY'),base=env('SUPABASE_URL'),signingKey=env('FTK_INVITATION_TICK_SECRET');
+  if(!serviceKey||!base||!signingKey||!/^[a-f0-9]{64}$/.test(signingKey))return reply(503,{error:'SERVICE_UNAVAILABLE'});
   const raw=await req.text();if(raw.length>256)return reply(400,{error:'VALIDATION_FAILED'});
   const request=JSON.parse(raw);
   if(Object.keys(request).length!==1||typeof request.request_id!=='string'||!uuid.test(request.request_id))return reply(400,{error:'VALIDATION_FAILED'});
   const at=req.headers.get('x-ftk-worker-time')??'',provided=req.headers.get('x-ftk-worker-signature')??'';
   if(!/^\d{10}$/.test(at)||Math.abs(now/1000-Number(at))>30||!/^[a-f0-9]{64}$/.test(provided))return reply(403,{error:'FORBIDDEN'});
-  if(!equal(provided,await signature(await invitationSigningKey(serviceKey),at+'.'+request.request_id)))return reply(403,{error:'FORBIDDEN'});
+  if(!equal(provided,await signature(signingKey,at+'.'+request.request_id)))return reply(403,{error:'FORBIDDEN'});
   const rpc=async(body:unknown,aux:unknown)=>{
    const res=await send(base+'/rest/v1/rpc/outbox_deliver_v1',{method:'POST',headers:{authorization:'Bearer '+serviceKey,apikey:serviceKey,'content-type':'application/json','Content-Profile':'api_v1'},
     body:JSON.stringify({p_request:body,p_actor_auth_id:null,p_session_id:null,p_ids:[],p_aux:aux}),signal:AbortSignal.timeout(10000)});
