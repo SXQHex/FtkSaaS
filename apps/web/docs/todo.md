@@ -151,18 +151,30 @@ Her modülün “bitti” ölçütü kendi aşağıdaki kabul senaryosu **ve** b
 
 ### WEB-S04 — Öğrenci ve kişi yönetimi
 
-**Ekranlar:** Mevcut liste/profil; disiplin ilişkisi; hesap erişimi; kişi birleştirme etki/onay ekranı; öğrencinin paket/rezervasyon/finans bağlantıları.
+**Kapsam:** Starter’ın tek merkezinde kişi/öğrenci listesi ve profili, disiplin ilişkisi, hesap erişimi ve kişi birleştirme. Yeni kişi kaydı, aktif öğrencilik ve kullanıcı hesabı birbirinden ayrıdır.
 
-- [ ] Mevcut arama/cursor/detay/oluşturma/düzenleme/etkinleştirme/pasifleştirme akışını gerçek yetkili hesapla kabul et; yeni kişi ile aktif öğrencilik ayrımını koru.
-- [ ] `person_discipline_set_v1` ile seçili merkez/disiplin ilişkisini düzenle; kişi ve ilişki durumlarını ayrı göster.
-- [ ] Davet gönderme/iş takibine davet kabulü sonrası taze veri, `account_access_revoke_v1` ve `account_link_remove_v1` için mevcut izinli yönetim akışını ekle. B02 çözülmeden profilin hesap bağlı etiketini tahmin etme.
-- [ ] `person_merge_preview_v1` → gereken `person_merge_approve_v1` → `person_merge_apply_v1`: kaynak/hedef seçimi, etkiler, gereken merkez onayları, hesap/rezervasyon/limit çakışmaları ve süresi dolan onay. Tarihsel borç ve satışın görünürlüğünü doğrula.
-- [ ] Profilde gerçek haklar, borç/alacak, rezervasyonlar ve geçmişe bağlantı kur. Her bölüm kendi yetkili okumasıyla yüklenir; bir bölüm hatası diğerine sahte veri koymaz.
-- [ ] Profil adı/iletişim değişikliğinden sonra detay ve ilgili liste satırını tazele; oluşturulan kişinin yenileme/etkinleştirme sonrası bulunabilirliğini tamamla. Liste ve detay birlikte tazeleme regresyonu yerelde geçti; hosted kabulü açık.
+**Durum: Aktif; kaynak tesliminin bir bölümü main’de, gerçek ortam kabulü açık.** [PR123](https://github.com/SXQHex/FtkSaaS/pull/123) main `4cbb5ca5cd3486608a370b17275f98cc82aa3791` ile birleşti. Bölümün tamamı kapatılmadı.
 
-**Geliştirme durumu:** Disiplin düzenleme ve tek yönetici preview→apply arayüzü modül dalında uygulandı. Kayıp yanıtta aynı komut saklanır; canonical hedefe dönen kişi okuması da bekleyen birleştirmeyi bulur. Expired receipt ve depolama hatasında yeniden gönderim durur. `pnpm check:frontend` son kaynakta geçti: 295 web + 1 UI testi, lint/typecheck/build. `pnpm check:quality` sıfır bulgu ile geçti. Tasarım önizlemesi gerçek API kullanmadan yeni kontrolleri gösterir; dört genişlikte Axe/klavye/taşma E2E testi eklendi, Yerel `pnpm test:frontend:e2e` 4 HTTP testini geçti; 104 tarayıcı testi eksik Playwright executable nedeniyle başlayamadı. İlk adayın frontend CI kontrolü (41341610724) başarısız: Chromium kaydı 320px/%200 yazıda öğrenci detayının 319px alanda 447px taşmasını gösterdi. Yeni disiplin/birleştirme düğmeleri mevcut öğrenci bileşenlerindeki satır kaydırma ve genişlik sınırına uyarlandı; aynı E2E assertion’ları korunur. Code Simplification incelemesinde disiplin süzmesi ve detay/liste yenileme tekrarları kaldırıldı, birleştirme render koşulu düzleştirildi; işlem saklama/status/replay korumaları korunur. Son kaynakta 295 web + 1 UI testi, lint/typecheck/build ve sıfır bulgulu kalite kontrolü geçti. Yerel Chromium kurulumu geçersiz indirme arşivi nedeniyle başarısız; düzeltmenin tarayıcı CI ve hosted kabulü henüz tamamlanmadı. Genel hesap erişimi keşfi [XREQ-005](../../../docs/requests.md), çok yöneticili onay keşfi/durumu [XREQ-006](../../../docs/requests.md) nedeniyle engellidir; manuel UUID/token girişiyle geçilmez. Profil hak/finans/rezervasyon alt bölümleri S05/S06/S08 teslimindedir. S04 henüz kapalı değildir.
+**Uygulananlar:** Aşağıdaki işaretler kaynak teslimini gösterir; gerçek ortam kabulü ayrıca aşağıda izlenir.
 
-**Kabul:** Aynı kişi oluşturulur/düzenlenir/etkinleştirilir; açık işlemi varken pasifleştirme reddedilir; birleştirme sonrası eski hak/borç kaybolmaz; kayıp yanıtta mükerrer kişi veya davet oluşmaz. **Bağımlılık:** S01, B02/B03; profil alt bölümleri S05/S06/S08.
+- [x] Mevcut arama/cursor/detay/kişi oluşturma ve düzenleme, öğrenciliği etkinleştirme/gerekçeli pasifleştirme ve davet gönderme/iş takibi tüketicileri.
+- [x] `person_discipline_set_v1` ile seçili merkezde öğrenci-disiplin ilişkisini düzenleme; kişi ve ilişki durumlarını ayrı gösterme, mevcut ilişkinin gerçek version değerini kullanma.
+- [x] Tek merkezli `person_merge_preview_v1` → açık yönetici onayı → `person_merge_apply_v1`: kaynak/hedef ve etki gösterimi; hesap/rezervasyon/limit çakışmaları, backend blocker’ları ve süresi dolmuş önizlemede uygulamayı engelleme.
+- [x] Kişi adı/iletişim ve disiplin değişikliğinden sonra detay ile listeyi yeniden okuma; birleştirme sonrası hedef kişiye geçme.
+- [x] Disiplin/birleştirmede kayıp yanıtı aynı anahtar ve payload ile takip etme; yeniden açılışta status kontrolü; canonical hedefte kaynak işlemi koruma; expired receipt ve depolama hatasında güvenli durma.
+
+**Kalan Starter işleri:**
+
+- [ ] [XREQ-005](../../../docs/requests.md) tesliminden sonra kişinin mevcut davet ve hesap bağlantılarını gerçek kimlik/durum/version ile oku; `account_access_revoke_v1` ve `account_link_remove_v1` işlemlerini izinli hedefe bağla. Yenilemede hedef kaybolmamalı; hesap bağlı etiketi tahmin edilmez.
+- [ ] Davet kabulü ve erişim değişikliklerinden sonra ilgili kişi/erişim verisini tazele; yanlış hesap/tenant ve kaybedilmiş yetkide veri açılmadığını doğrula.
+- [ ] Gerçek yetkili hesapla arama/sayfalama → kişi oluşturma/düzenleme → öğrenciliği etkinleştirme/pasifleştirme akışını kabul et; yeni kişi ile aktif öğrencilik ayrımını ve işlem sonrası bulunabilirliği doğrula.
+- [ ] Gerçek ortamda disiplin ilişkisi yazma/yeniden okuma, detay/liste yenilemesi ve tek merkezli kişi birleştirmeyi kabul et. Birleştirmede eski hak/borç/satış geçmişinin korunduğunu, kayıp yanıtın mükerrer işlem üretmediğini doğrula; mevcut yetkili kayıtları kullan, eksik kanıtı mock ile kapatma.
+
+**Doğrulanmış kaynak ve yayın:** PR123 kaynak ağacında 295 web + 1 UI testi, lint/typecheck/build, isolation ve sıfır bulgulu kalite kontrolü geçti; bağımsız incelemede Required/Critical bulgu kalmadı. [Frontend CI](https://github.com/SXQHex/FtkSaaS/actions/runs/41342388685) Chromium, Firefox, WebKit ve mobil projelerinde başarılıdır. Yeni disiplin/birleştirme kontrollerinin 320/768/1024/1440px, klavye ve Axe senaryoları ile önceki adayda yakalanan 320px/%200 metin taşması düzeltmesi geçti; assertion’lar gevşetilmedi. Aynı main kaynağının [merge proof](https://github.com/SXQHex/FtkSaaS/actions/runs/41344667277), [main proof](https://github.com/SXQHex/FtkSaaS/actions/runs/41344667282) ve [development teslimi](https://github.com/SXQHex/FtkSaaS/actions/runs/41344706454) başarılıdır. Vercel’de `uye.fethiyetango.com` aynı `4cbb5ca` kaynağını READY olarak yayımlar. Bunlar gerçek öğrenci CRUD/disiplin/birleştirme kabulünün yerine geçmez.
+
+**Starter kapanışına dahil olmayanlar:** Çok merkezli birleştirme onaylarını keşfetme/toplama ve `person_merge_approve_v1` arayüzü Pro/Business kapsamıdır; [XREQ-006](../../../docs/requests.md) Starter bağımlılığı veya kapanış engeli değildir. Backend’in çok merkezli/geçersiz birleştirme reddi korunur; istemciden aşılmaz. Profilde hak, finans ve rezervasyon alt görünümleri S05/S08/S06 teslimlerinde gerçek okumalarla bağlanır; S04 içinde sahte özet veya henüz çalışmayan işlem bağlantısı eklenmez.
+
+**Kabul:** Aynı kişi oluşturulur/düzenlenir/etkinleştirilir; açık işlemi varken pasifleştirme reddedilir; tek merkezli birleştirme sonrası eski hak/borç kaybolmaz; kayıp yanıtta mükerrer kişi veya davet oluşmaz. **Bağımlılık:** S01, B02/B03; mevcut Starter hesap erişimi yönetimi için XREQ-005. Sonraki profil alt görünümleri kendi S05/S08/S06 bölümlerinde tamamlanır.
 
 <a id="web-s05"></a>
 
@@ -306,14 +318,14 @@ Her modülün “bitti” ölçütü kendi aşağıdaki kabul senaryosu **ve** b
 
 ## 7. Bölüm bölüm teslim: tek aktif bölüm
 
-Kullanıcının son kararı: **Bir bölüm bitmeden sonraki bölümün uygulamasına geçilmez.** Frontend'in aktif bölümü ve sırası bu bölümde tutulur. **WEB-S01 temel teslimi kullanıcı onayıyla kapandı. Sıradaki teslim bölümü: Öğrenci yönetimi — S04.** Öğrenci yönetiminin kalan kabulü açık kalır. S01’in açık ek testleri kendi bölümünde izlenir ve temel teslimi yeniden açmaz. Aşağıdaki liste bağımlılık sırasını gösterir. Aynı anda birden çok yarım bölüm veya yeni modül dalı açılmaz.
+Kullanıcının son kararı: **Bir bölüm bitmeden sonraki bölümün uygulamasına geçilmez.** Frontend'in aktif bölümü ve sırası bu bölümde tutulur. **WEB-S01 temel teslimi kullanıcı onayıyla kapandı. Aktif teslim bölümü: Starter öğrenci yönetimi — S04.** Öğrenci yönetiminin kalan kabulü açık kalır. S01’in açık ek testleri kendi bölümünde izlenir ve temel teslimi yeniden açmaz. Aşağıdaki liste bağımlılık sırasını gösterir. Aynı anda birden çok yarım bölüm veya yeni modül dalı açılmaz.
 
 S01–S13 işlev kapsamını izler. Teslim bölümleri ise kullanıcının baştan sona kullanabildiği akışlardır: örneğin davet kabulü öğrenci bölümünde, satışın zorunlu belge adımı satış bölümünde çalışır. Ortak bir bağımlılık önce kullanılacağı bölümün içinde tamamlanır ve daha sonra yeniden yazılmaz. Bölümün kabulü ileride yazılacak bir ekrana bağlanmaz: gerektiğinde yetkilendirilmiş mevcut kayıt kullanılır; yeni ekranlar arasındaki uçtan uca bağlantı, bağlantıyı kullanan sonraki bölümün açık kabul maddesidir. Gerekli gerçek kayıt/okuma yoksa bölüm engelli kalır, mock ile kapanmaz. Başka bir bölüme ait henüz yapılmamış işlem, mevcut bölümde çalışıyormuş gibi düğme/özet olarak sunulmaz.
 
 | Sıra | Tamamlanacak bölüm | Bölüm kapanışının somut sonucu |
 |---|---|---|
 | 1 | **Hesap ve güvenlik — temel teslim kapalı** — S01, kendi tercihleri için S12 | Giriş/kayıt/kurtarma/Google/TOTP, profil, oturumlar, güvenlik ve hesap lifecycle akışları tamam. |
-| 2 | **Öğrenci yönetimi** — S04 çekirdeği ve gereken S01 davet kabulü | Mevcut liste/profil/oluşturma/düzenleme/öğrencilik akışları; disiplin, birleştirme ve hesap erişimi dahil gerçek kabul. Paket/finans alt görünümü kendi sonraki bölümünün sorumluluğudur; bu aşamada sahte özet eklenmez. |
+| 2 | **Öğrenci yönetimi** — S04 çekirdeği ve gereken S01 davet kabulü | Mevcut liste/profil/oluşturma/düzenleme/öğrencilik akışları; disiplin, tek merkezli birleştirme ve hesap erişimi dahil gerçek kabul. Çok merkezli onay keşfi bu kapanışa dahil değildir. Paket/finans alt görünümü kendi sonraki bölümünün sorumluluğudur; bu aşamada sahte özet eklenmez. |
 | 3 | **Stüdyo kurulumu ve işletme erişimi** — S02, gereken S12 politikaları ve S13 temel plan görünümü | Gerçek kaynak katalogları, merkez/oda/disiplin/eğitmen/uygunluk ve plan sınırlarıyla stüdyo program oluşturmaya hazır. B01 burada çözülür. |
 | 4 | **Belgeler ve işlemsel bildirimler** — S11 | Özel yükleme/yayın, bağlamsal okuma/onay, inbox ve izinli geçmiş tamam; sonraki iş formlarına bağlanacak çalışan bileşenler hazır. |
 | 5 | **Program ve seanslar** — S03 | Sınıf/program/tek seans oluşturma; kaynak ataması, değişiklik, iptal/telafi, Scheduler ve gerçek çakışma kabulü tamam. |
