@@ -53913,7 +53913,7 @@
           "target_entity": "rooms",
           "version_mode": "create_absent_update_requires_version",
           "version_field": "room_id",
-          "read_operation": "centers_list_v1",
+          "read_operation": "management_state_get_v1",
           "atomic_effects": [
             "rooms.versioned_domain_change"
           ],

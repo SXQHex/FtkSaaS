@@ -11,7 +11,9 @@
         "apps/backend/tests/contract.test.mjs",
         "apps/backend/tests/api-acceptance.test.mjs",
         "apps/backend/tests/ci-observer.test.mjs",
-        "apps/backend/tests/quality-guard.test.mjs"
+        "apps/backend/tests/quality-guard.test.mjs",
+        "apps/backend/tests/p06-acceptance.mjs",
+        "apps/backend/tests/invitation-delivery-acceptance.mjs"
       ],
       "sources": [
         "apps/backend/database/canonical-settings-scope.sql",
@@ -266,8 +268,8 @@
         "management_state_get_v1"
       ],
       "review": {
-        "fingerprint": "d57d6eca2751905dc9230fd9cff995237ef2b1e4eb747581ee6eaf3b845c7661",
-        "reason": "Reviewed regenerated validators and Edge bundle after removing XREQ-006 schema extensions; only XREQ-005 selector/projection additions remain."
+        "fingerprint": "44d62ca2fff3342de0e3668055a09e3ef2416d5f1a54dfffb8a31285cf7ab887",
+        "reason": "A03: mevcut status/audit/job/management davranış testleri bağlandı; S01 oda okuma sözleşmesi regresyonu ve üretilmiş Edge metadata incelendi. Yeni runtime kabulü değil."
       }
     },
     {
@@ -356,7 +358,9 @@
       "tests": [
         "apps/backend/tests/registry.test.mjs",
         "apps/backend/tests/room-role-registry.test.mjs",
-        "apps/backend/tests/starter-plan-gates-acceptance.mjs"
+        "apps/backend/tests/starter-plan-gates-acceptance.mjs",
+        "apps/backend/tests/api-acceptance.test.mjs",
+        "apps/backend/tests/p07-account-revocation-acceptance.mjs"
       ],
       "sources": [
         "apps/backend/database/account-session-management.sql",
@@ -424,8 +428,8 @@
         "center_discipline_set_v1"
       ],
       "review": {
-        "fingerprint": "6842a752fd7a2dd535649fe3c7b3a59b5294022665d5d86efe8c96e88ab22da0",
-        "reason": "Ortak generated wrapper farkı yalnız outbox_deliver_v1 service-only davet handoff’udur; bu akışın kendi wrapper ve domain kaynakları değişmedi, rehber ve mevcut insan yetki sırası incelendi."
+        "fingerprint": "d34a7b7d91edd2a087262e2d1654cfa6a7dd69d3ccd615acd64064af65454b30",
+        "reason": "S01: mevcut oda management sayfası, canlı merkez yetkisi, cursor ve sürümlü değerler incelendi; okuma rehberi düzeltildi. Yeni login ve sayfalama API regresyonu CI bekliyor."
       }
     },
     {
@@ -520,7 +524,10 @@
       "detail": "docs/client-integration.md",
       "tests": [
         "apps/backend/tests/invitation-delivery-acceptance.mjs",
-        "apps/backend/tests/person-registry.test.mjs"
+        "apps/backend/tests/person-registry.test.mjs",
+        "apps/backend/tests/p07-account-profile-merge-acceptance.mjs",
+        "apps/backend/tests/p07-account-revocation-acceptance.mjs",
+        "apps/backend/tests/registry.test.mjs"
       ],
       "sources": [
         "apps/backend/database/active-discipline-projection-wrappers.sql",
@@ -581,8 +588,8 @@
         "person_discipline_set_v1"
       ],
       "review": {
-        "fingerprint": "f4239d880af207bd83481d421d743e7c54453cbf662bcd0e43c7618c9e47bebb",
-        "reason": "Reviewed narrowed XREQ-005 migration and registry tests; XREQ-006 discovery removed, alias invitation discovery retained."
+        "fingerprint": "02f44977f08e841df199f995803ab7777ac044de620f62fe9078ba18974736dd",
+        "reason": "A03: Kişi ve öğrencilik rehberi korundu; mevcut gerçek davranış testlerinin operasyon/olumsuz senaryo bağları incelenip eksik WF test referansları tamamlandı. Test kaynağı yeni head başarısı değildir."
       }
     },
     {
@@ -593,7 +600,10 @@
       "detail": "docs/workflows.md",
       "tests": [
         "apps/backend/tests/p01-catalog-entitlement-reads.test.mjs",
-        "apps/backend/tests/starter-studio-acceptance.mjs"
+        "apps/backend/tests/starter-studio-acceptance.mjs",
+        "apps/backend/tests/program-session-lifecycle.test.mjs",
+        "apps/backend/tests/starter-attendance-protection.test.mjs",
+        "apps/backend/tests/event-payment.test.mjs"
       ],
       "sources": [
         "apps/backend/database/active-discipline-projection-wrappers.sql",
@@ -666,8 +676,8 @@
         "negative_limits_get_v1"
       ],
       "review": {
-        "fingerprint": "7a481e17ca219ec264751017da018e2a592bc8a99aa7f74062d5bb1811114af7",
-        "reason": "Ortak generated wrapper farkı yalnız outbox_deliver_v1 service-only davet handoff’udur; bu akışın kendi wrapper ve domain kaynakları değişmedi, rehber ve mevcut insan yetki sırası incelendi."
+        "fingerprint": "ebeffe30ab7962e18ef78891e47dc2f5e3f0d64fd09aa4a9840e6d967e995ed9",
+        "reason": "A03: Ürün, satış ve hak rehberi korundu; mevcut gerçek davranış testlerinin operasyon/olumsuz senaryo bağları incelenip eksik WF test referansları tamamlandı. Test kaynağı yeni head başarısı değildir."
       }
     },
     {
@@ -678,7 +688,9 @@
       "detail": "docs/workflows.md",
       "tests": [
         "apps/backend/tests/p01-lesson-requests.test.mjs",
-        "apps/backend/tests/p01-catalog-entitlement-reads.test.mjs"
+        "apps/backend/tests/p01-catalog-entitlement-reads.test.mjs",
+        "apps/backend/tests/api-acceptance.test.mjs",
+        "apps/backend/tests/program-session-lifecycle.test.mjs"
       ],
       "sources": [
         "apps/backend/database/active-discipline-projection-wrappers.sql",
@@ -734,8 +746,8 @@
         "reservation_capacity_override_v1"
       ],
       "review": {
-        "fingerprint": "225d0f4db14a04a84bf3723bd6a383a47679106a40e07dd93e222472a448d3e7",
-        "reason": "Ortak generated wrapper farkı yalnız outbox_deliver_v1 service-only davet handoff’udur; bu akışın kendi wrapper ve domain kaynakları değişmedi, rehber ve mevcut insan yetki sırası incelendi."
+        "fingerprint": "a5b99fce198d3ecfe70886495d3f0add2bcc761b4e492c97a37be4e5de066e6e",
+        "reason": "A03: Rezervasyon ve özel ders talebi rehberi korundu; mevcut gerçek davranış testlerinin operasyon/olumsuz senaryo bağları incelenip eksik WF test referansları tamamlandı. Test kaynağı yeni head başarısı değildir."
       }
     },
     {
@@ -745,7 +757,8 @@
       "guide": "docs/workflows.md#wf07",
       "detail": "docs/workflows.md",
       "tests": [
-        "apps/backend/tests/starter-attendance-protection.test.mjs"
+        "apps/backend/tests/starter-attendance-protection.test.mjs",
+        "apps/backend/tests/instructor-earnings.test.mjs"
       ],
       "sources": [
         "apps/backend/database/active-discipline-projection-wrappers.sql",
@@ -792,8 +805,8 @@
         "attendance_start_v1"
       ],
       "review": {
-        "fingerprint": "bef2c3d33f4ce71b75f8d1771f3ed087f3d635eadf82df78d5636dde3f756014",
-        "reason": "Ortak generated wrapper farkı yalnız outbox_deliver_v1 service-only davet handoff’udur; bu akışın kendi wrapper ve domain kaynakları değişmedi, rehber ve mevcut insan yetki sırası incelendi."
+        "fingerprint": "d36dbe2e6b0d811cd9a8884ddd5d91585501ecfcaf5658843d14b36e15fc44d9",
+        "reason": "A03: Yoklama ve hak tüketimi rehberi korundu; mevcut gerçek davranış testlerinin operasyon/olumsuz senaryo bağları incelenip eksik WF test referansları tamamlandı. Test kaynağı yeni head başarısı değildir."
       }
     },
     {
@@ -804,7 +817,8 @@
       "detail": "docs/workflows.md",
       "tests": [
         "apps/backend/tests/api-acceptance.test.mjs",
-        "apps/backend/tests/starter-operations-acceptance.mjs"
+        "apps/backend/tests/starter-operations-acceptance.mjs",
+        "apps/backend/tests/event-payment.test.mjs"
       ],
       "sources": [
         "apps/backend/database/active-discipline-projection-wrappers.sql",
@@ -849,8 +863,8 @@
         "debt_adjust_v1"
       ],
       "review": {
-        "fingerprint": "a825ab6d1758ada76e929acb809e3fb3eef0dd7b4113ea8996311433daa0f9d3",
-        "reason": "Ortak generated wrapper farkı yalnız outbox_deliver_v1 service-only davet handoff’udur; bu akışın kendi wrapper ve domain kaynakları değişmedi, rehber ve mevcut insan yetki sırası incelendi."
+        "fingerprint": "7aa3e73bb12c910a72dc99abd916c8c37f65b130630e3223720987c017c1bcfa",
+        "reason": "A03: Borç, tahsilat ve öğrenci alacağı rehberi korundu; mevcut gerçek davranış testlerinin operasyon/olumsuz senaryo bağları incelenip eksik WF test referansları tamamlandı. Test kaynağı yeni head başarısı değildir."
       }
     },
     {
@@ -861,7 +875,9 @@
       "detail": "docs/workflows.md",
       "tests": [
         "apps/backend/tests/personal-calendar-acceptance.mjs",
-        "apps/backend/tests/calendar-feed-unit.mjs"
+        "apps/backend/tests/calendar-feed-unit.mjs",
+        "apps/backend/tests/person-registry.test.mjs",
+        "apps/backend/tests/starter-studio-acceptance.mjs"
       ],
       "sources": [
         "apps/backend/api/public-application.js",
@@ -890,8 +906,8 @@
         "calendar_feed_get_v1"
       ],
       "review": {
-        "fingerprint": "454c9ec8dcd67c2d6114d01140ca55908ab4cb0921f38adab2dc293dd5f9dd4e",
-        "reason": "Takvim config doğrulama hatası service_ready=false olarak açık atanır; önceki false varsayılanıyla davranış eşdeğerdir, kaynak veya secret açılmaz."
+        "fingerprint": "0922c698e4d39ab9e178f96f9c6d0243b12b703a73f907db0042788e6d6f4968",
+        "reason": "A03: Public başvuru ve kişisel takvim rehberi korundu; mevcut gerçek davranış testlerinin operasyon/olumsuz senaryo bağları incelenip eksik WF test referansları tamamlandı. Test kaynağı yeni head başarısı değildir."
       }
     },
     {
@@ -977,7 +993,8 @@
       "detail": "docs/settings.md",
       "tests": [
         "apps/backend/tests/frontend-settings-acceptance.mjs",
-        "apps/backend/tests/starter-preparation-acceptance.mjs"
+        "apps/backend/tests/starter-preparation-acceptance.mjs",
+        "apps/backend/tests/starter-operations-acceptance.mjs"
       ],
       "sources": [
         "apps/backend/config/frontend-settings.json",
@@ -1012,8 +1029,8 @@
         "settings_preparation_resolve_v1"
       ],
       "review": {
-        "fingerprint": "149abb6e1a991616bce6e4cb9d01b63293b1084ebd7c4536e6d3f03bbbad7f2b",
-        "reason": "Ortak generated wrapper farkı yalnız outbox_deliver_v1 service-only davet handoff’udur; bu akışın kendi wrapper ve domain kaynakları değişmedi, rehber ve mevcut insan yetki sırası incelendi."
+        "fingerprint": "451d5753d92ed6ab839bcaa7dc1dd5031aca7cc85599c77765ffacde4dca4401",
+        "reason": "A03: Ayarlar ve medya rehberi korundu; mevcut gerçek davranış testlerinin operasyon/olumsuz senaryo bağları incelenip eksik WF test referansları tamamlandı. Test kaynağı yeni head başarısı değildir."
       }
     },
     {
@@ -1024,7 +1041,9 @@
       "detail": "docs/workflows.md",
       "tests": [
         "apps/backend/tests/p07-subscription-lifecycle-acceptance.mjs",
-        "apps/backend/tests/starter-plan-gates-acceptance.mjs"
+        "apps/backend/tests/starter-plan-gates-acceptance.mjs",
+        "apps/backend/tests/fixtures/p07-subscription-lifecycle.sql",
+        "apps/backend/tests/p07-lifecycle-acceptance.mjs"
       ],
       "sources": [
         "apps/backend/database/active-discipline-projection-wrappers.sql",
@@ -1072,8 +1091,8 @@
         "saas_payment_submit_v1"
       ],
       "review": {
-        "fingerprint": "f0bd3c4c804f2674116cc88b13c37c6c848290b31094447e6f9e6bdb184ea418",
-        "reason": "Ortak generated wrapper farkı yalnız outbox_deliver_v1 service-only davet handoff’udur; bu akışın kendi wrapper ve domain kaynakları değişmedi, rehber ve mevcut insan yetki sırası incelendi."
+        "fingerprint": "385cddbb25cebde5db5f2d023520dc2df11a16a8a4e4a2561e34a6a573077546",
+        "reason": "A03: yükseltme/iptal/dönem fixture assertionları SQL dispatcher ve yanıt validator kapsamındadır; gerçek HTTP veya hosted kabulü değildir."
       }
     },
     {
@@ -1083,7 +1102,8 @@
       "guide": "docs/workflows.md#wf14",
       "detail": "docs/workflows.md",
       "tests": [
-        "apps/backend/tests/instructor-earnings.test.mjs"
+        "apps/backend/tests/instructor-earnings.test.mjs",
+        "apps/backend/tests/event-payment.test.mjs"
       ],
       "sources": [
         "apps/backend/database/cross-center-settlement-wrappers.sql",
@@ -1106,8 +1126,8 @@
         "instructor_agreements_list_v1"
       ],
       "review": {
-        "fingerprint": "5e956436ddf43b703fe524e2ed840f06e15379b67e5617141d9971c84a762de7",
-        "reason": "Ortak generated wrapper farkı yalnız outbox_deliver_v1 service-only davet handoff’udur; bu akışın kendi wrapper ve domain kaynakları değişmedi, rehber ve mevcut insan yetki sırası incelendi."
+        "fingerprint": "66abfd3de8fb9f43dd4c30bbd9bd39c7337aba8a0516d6ce816aad46a1799f93",
+        "reason": "A03: Anlaşma, hakediş ve eğitmen ödemesi rehberi korundu; mevcut gerçek davranış testlerinin operasyon/olumsuz senaryo bağları incelenip eksik WF test referansları tamamlandı. Test kaynağı yeni head başarısı değildir."
       }
     },
     {
@@ -1118,7 +1138,8 @@
       "detail": "docs/workflows.md",
       "tests": [
         "apps/backend/tests/event-payment.test.mjs",
-        "apps/backend/tests/event-cancellation.test.mjs"
+        "apps/backend/tests/event-cancellation.test.mjs",
+        "apps/backend/tests/api-acceptance.test.mjs"
       ],
       "sources": [
         "apps/backend/database/active-discipline-projection-wrappers.sql",
@@ -1172,8 +1193,8 @@
         "event_actual_start_correct_v1"
       ],
       "review": {
-        "fingerprint": "701b53e3939d351e85e5a6e52e71c1ff46a368fa556ff3281a1714d639d0a920",
-        "reason": "Ortak generated wrapper farkı yalnız outbox_deliver_v1 service-only davet handoff’udur; bu akışın kendi wrapper ve domain kaynakları değişmedi, rehber ve mevcut insan yetki sırası incelendi."
+        "fingerprint": "fbae8c7a285c532507d42aa046ef350b50212617ff36be6fd82eee2e84df56c2",
+        "reason": "A03: Etkinlik kayıt, ödeme ve iptal rehberi korundu; mevcut gerçek davranış testlerinin operasyon/olumsuz senaryo bağları incelenip eksik WF test referansları tamamlandı. Test kaynağı yeni head başarısı değildir."
       }
     },
     {
@@ -1183,7 +1204,8 @@
       "guide": "docs/workflows.md#wf16",
       "detail": "docs/workflows.md",
       "tests": [
-        "apps/backend/tests/p05-acceptance.mjs"
+        "apps/backend/tests/p05-acceptance.mjs",
+        "apps/backend/tests/person-registry.test.mjs"
       ],
       "sources": [
         "apps/backend/database/p04-crm-public-wrappers.sql",
@@ -1209,8 +1231,8 @@
         "automation_save_v1"
       ],
       "review": {
-        "fingerprint": "2e50d7402b869dd4f8d75f88925c813f10f9b0edc4c1c5222e2922a38efed392",
-        "reason": "Ortak generated wrapper farkı yalnız outbox_deliver_v1 service-only davet handoff’udur; bu akışın kendi wrapper ve domain kaynakları değişmedi, rehber ve mevcut insan yetki sırası incelendi."
+        "fingerprint": "3c9542e3bf2c3eea2b098f78dc7fd719b9bb88fdcf5c43145abb16e64ddd122a",
+        "reason": "A03: Genel CRM ve otomasyon rehberi korundu; mevcut gerçek davranış testlerinin operasyon/olumsuz senaryo bağları incelenip eksik WF test referansları tamamlandı. Test kaynağı yeni head başarısı değildir."
       }
     },
     {
@@ -1222,7 +1244,9 @@
       "tests": [
         "apps/backend/tests/p07-lifecycle-acceptance.mjs",
         "apps/backend/tests/p07-account-revocation-acceptance.mjs",
-        "apps/backend/tests/restore-guard.test.mjs"
+        "apps/backend/tests/restore-guard.test.mjs",
+        "apps/backend/tests/api-acceptance.test.mjs",
+        "apps/backend/tests/fixtures/p07-subscription-lifecycle.sql"
       ],
       "sources": [
         "apps/backend/database/account-session-management.sql",
@@ -1279,8 +1303,8 @@
         "platform_owner_remove_v1"
       ],
       "review": {
-        "fingerprint": "4a24ffe0899ab6d343245134aa725e5adeb1a8f204fba69fad9b7f70f7cbf377",
-        "reason": "Reviewed unchanged original merge/revoke lifecycle against narrowed registry tests; original write and cross-center rejection semantics preserved."
+        "fingerprint": "62abb4f84af0fecaa7bbdfd0f9ded2070de5617340c52454e88717be5730741b",
+        "reason": "A03: platform yönetimi testleri ile grace yönetim okumasının negatif yetki fixture bağı incelendi; olumlu grace uzatma/hosted kabulü açık."
       }
     },
     {
@@ -1350,7 +1374,11 @@
         "apps/backend/tests/invitation-delivery-acceptance.mjs",
         "apps/backend/tests/invitation-delivery-unit.mjs",
         "apps/backend/tests/ops-hosted-acceptance.mjs",
-        "apps/backend/tests/p01-waitlist-workers.test.mjs"
+        "apps/backend/tests/p01-waitlist-workers.test.mjs",
+        "apps/backend/tests/p05-acceptance.mjs",
+        "apps/backend/tests/p06-acceptance.mjs",
+        "apps/backend/tests/p07-lifecycle-acceptance.mjs",
+        "apps/backend/tests/starter-plan-gates-acceptance.mjs"
       ],
       "sources": [
         "apps/backend/database/invitation-delivery.sql",
@@ -1398,8 +1426,8 @@
         "subscription_boundary_apply_v1"
       ],
       "review": {
-        "fingerprint": "25cd86d06f26801e13404d82112a9ae6bfea6e7f2f9f8423e35b427c02d77f76",
-        "reason": "Son worker test harnessi ve config rotasyon regresyonu incelendi; scoped secret iki tarafta zorunlu, mevcut dispatch UPSERTte kapanır; üretim Auth/JWT/lease/replay sınırı değişmez."
+        "fingerprint": "79d4d0c79f27107913c4542649b2e03292fd3bbad80930058daec0c8eda24eb8",
+        "reason": "A03: Worker ve işletim rehberi korundu; mevcut gerçek davranış testlerinin operasyon/olumsuz senaryo bağları incelenip eksik WF test referansları tamamlandı. Test kaynağı yeni head başarısı değildir."
       }
     }
   ]

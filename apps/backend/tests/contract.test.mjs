@@ -22,6 +22,17 @@ test('P05 Storage adapter checks actual bytes/hash/mime/size and returns no inte
  const fakePdf=documentStorage('http://private-kong.invalid','synthetic',async()=>new Response('not a pdf',{headers:{'content-type':'application/pdf'}}));await assert.rejects(fakePdf.download(object),/MIME/);
 });
 const p=JSON.parse(fs.readFileSync('../../packages/api-contracts/schema/contract.json'));const a=new Ajv({strict:false,allErrors:true});addFormats(a);a.addSchema(p,'contract');const valid=(n,x)=>a.getSchema('contract#/$defs/'+n)(x);const id=newUuidV7();
+test('room editing advertises its discoverable management reader with typed values and row version',()=>{
+ const write=p['x-contract'].operations.find(o=>o.name==='room_save_v1');
+ assert.equal(write.operation_contract.read_operation,'management_state_get_v1');
+ assert.equal(write.operation_contract.read_path_status,'implemented');
+ const request={client_api_version:1,request_id:id,org_id:id,center_id:id,operation:'room_save_v1',selector:{operation:'room_save_v1',key:{}},page:{limit:1}};
+ assert(valid('Request_management_state_get',request));
+ assert(valid('Request_management_state_get',{...request,selector:{operation:'room_save_v1',key:{room_id:id}}}));
+ const item={operation:'room_save_v1',entity:{type:'rooms',id},exists:true,state:'active',versions:[{entity:{type:'rooms',id},version:4}],as_of:new Date().toISOString(),current:{operation:'room_save_v1',values:{room_id:id,name:'Studio',capacity:10}}};
+ assert(valid('ManagementStateView',item));
+ assert(valid('Request_room_save',{client_api_version:1,request_id:id,org_id:id,center_id:id,operation_key:id,...item.current.values,expected_version:item.versions[0].version}));
+});
 test('UUIDv7 generator: RFC version/variant, uniqueness, current approximate timestamp',()=>{const before=Date.now();const ids=Array.from({length:20000},newUuidV7);const after=Date.now();assert.equal(new Set(ids).size,ids.length);for(const x of ids){assert(validate(x));assert.equal(version(x),7);const ms=parseInt(x.replaceAll('-','').slice(0,12),16);assert(ms>=before&&ms<=after);}});
 test('retry preserves frozen operation key',()=>{const operation=newOperation();const attempt2={...operation,request_id:newUuidV7()};assert.equal(operation.operation_key,attempt2.operation_key);assert.notEqual(operation.request_id,attempt2.request_id);});
 test('external/provider and existing UUIDv4 acceptance retained, v7 production validator distinct',()=>{const existing='550e8400-e29b-41d4-a716-446655440000';assert(valid('ProviderUuid',existing));assert(valid('FtkUuid',existing));assert(!valid('FtkGeneratedUuidV7',existing));assert(valid('FtkGeneratedUuidV7',id));});
