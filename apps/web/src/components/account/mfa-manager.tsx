@@ -1,5 +1,6 @@
 "use client";
 import { useEffect, useRef, useState, type FormEvent } from "react";
+import Image from "next/image";
 import { useTranslations } from "next-intl";
 import { Button } from "@ftksaas/ui/components/button";
 import { AccountField } from "./account-field";
@@ -150,6 +151,15 @@ export function MfaManager({ actorId, onSaved }: { actorId: string; onSaved?: ()
       {enrollment && (
         <div className="space-y-4 rounded-lg border p-4 wrap-anywhere">
           <p>{t("enrollmentHint")}</p>
+          <Image
+            src={enrollment.qr_code}
+            alt={t("enrollmentQrAlt")}
+            width={240}
+            height={240}
+            unoptimized
+            className="h-auto max-w-full rounded-md bg-white p-3"
+          />
+          <p className="text-sm text-muted-foreground">{t("enrollmentManual")}</p>
           <p className="select-all font-mono text-sm">{enrollment.secret}</p>
           <form
             className="space-y-3"
