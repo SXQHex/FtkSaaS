@@ -179,7 +179,11 @@ test("new unverified TOTP enrollment can be cancelled and its setup key disappea
     data: {
       id: pendingFactor.id,
       type: "totp",
-      totp: { secret: "SYNTHETIC-SETUP-KEY", uri: "", qr_code: "" },
+      totp: {
+        secret: "SYNTHETIC-SETUP-KEY",
+        uri: "",
+        qr_code: "data:image/svg+xml;utf-8,<svg xmlns='http://www.w3.org/2000/svg'></svg>",
+      },
     },
   });
   mocks.unenroll.mockResolvedValue({ error: null });
@@ -189,8 +193,16 @@ test("new unverified TOTP enrollment can be cancelled and its setup key disappea
   await waitFor(() => expect(enroll).toBeEnabled());
   await user.click(enroll);
   expect(await screen.findByText("SYNTHETIC-SETUP-KEY")).toBeVisible();
+  expect(
+    screen.getByRole("img", { name: "Doğrulama uygulaması kurulumu için QR kodu" }),
+  ).toHaveAttribute(
+    "src",
+    "data:image/svg+xml;utf-8,<svg xmlns='http://www.w3.org/2000/svg'></svg>",
+  );
+  expect(screen.getByText(/6 haneli kodu/)).toBeVisible();
   await user.click(await screen.findByRole("button", { name: "Kurulumu iptal et" }));
   await waitFor(() => expect(screen.queryByText("SYNTHETIC-SETUP-KEY")).not.toBeInTheDocument());
+  expect(screen.queryByRole("img")).not.toBeInTheDocument();
   expect(mocks.unenroll).toHaveBeenCalledExactlyOnceWith({ factorId: pendingFactor.id });
   expect(mocks.verify).not.toHaveBeenCalled();
   expect(await screen.findByRole("button", { name: "Doğrulama uygulaması ekle" })).toBeEnabled();
@@ -532,4 +544,39 @@ test("failed native MFA challenge never unenrolls and re-reads factors without a
   expect(mocks.call).not.toHaveBeenCalled();
   expect(mocks.saved).not.toHaveBeenCalled();
   expect(screen.queryByRole("status")).not.toBeInTheDocument();
+});
+
+test("TOTP setup survives a rejected code and clears its QR and key after verification", async () => {
+  mocks.enroll.mockResolvedValue({
+    error: null,
+    data: {
+      id: pendingFactor.id,
+      type: "totp",
+      totp: {
+        secret: "SYNTHETIC-SETUP-KEY",
+        uri: "",
+        qr_code: "data:image/svg+xml;utf-8,<svg xmlns='http://www.w3.org/2000/svg'></svg>",
+      },
+    },
+  });
+  mocks.verify
+    .mockResolvedValueOnce({ error: new Error("invalid code") })
+    .mockResolvedValue({ error: null });
+  const user = userEvent.setup();
+  render(<MfaManager actorId={actor} />);
+  const enroll = screen.getByRole("button", { name: "Doğrulama uygulaması ekle" });
+  await waitFor(() => expect(enroll).toBeEnabled());
+  await user.click(enroll);
+  const code = await screen.findByLabelText("Uygulamadaki doğrulama kodu");
+  await user.type(code, "000000");
+  await user.click(screen.getByRole("button", { name: "Kurulumu doğrula" }));
+  expect(await screen.findByRole("alert")).toBeVisible();
+  expect(screen.getByRole("img")).toBeVisible();
+  expect(screen.getByText("SYNTHETIC-SETUP-KEY")).toBeVisible();
+  await user.clear(code);
+  await user.type(code, "123456");
+  await user.click(screen.getByRole("button", { name: "Kurulumu doğrula" }));
+  await waitFor(() => expect(screen.queryByRole("img")).not.toBeInTheDocument());
+  expect(screen.queryByText("SYNTHETIC-SETUP-KEY")).not.toBeInTheDocument();
+  expect(mocks.verify).toHaveBeenLastCalledWith({ factorId: pendingFactor.id, code: "123456" });
 });
