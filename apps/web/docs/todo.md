@@ -422,6 +422,8 @@ Kullanıcının native Supabase Auth davranışını koruma kararıyla çift ona
 
 Kullanıcının ek isteğiyle mevcut Google kimliği varken “Google hesabını bağla” gizlenir; bağlı hesap ve kaldırma seçeneği korunur. Düğme yalnız native kimlik okuması başarılı ve Google kimliği yoksa görünür. Her yeniden okuma önce önceki kimlik listesini temizler; hata durumunda eski boş liste bağlama düğmesini açamaz. Başarılı kaldırma sonrası güncel okuma düğmeyi yeniden açar; son-kimlik reddi mevcut bağlantıyı ve gizli bağlama durumunu korur. Native [kimlik bağlama kaynak kodu](https://github.com/supabase/auth/blob/master/internal/api/identity.go) farklı provider subject kimliklerine izin verir; yeni sunucu/kimlik kısıtı eklenmedi. 1 Kasım yeni Google girişinde bağlı kimlik ve kaldırma düğmesi görünürken yeniden bağlama düğmesinin gizli olduğu canlıda doğrulandı.
 
+Kayıt ve kurtarma formlarında tekrar parola alanı bağımsız, klavyeyle kullanılabilen göster/gizle denetimine sahiptir. Native `same_password` reddi “Yeni parolanız eski parolanızla aynı olamaz.” mesajıyla gösterilir. Bu ek düzeltmelerde `pnpm check:frontend` başarılıdır: 260 web + 1 UI testi, lint/typecheck/build. Yeni kaynak için dört tarayıcı CI kabulü bekliyor. XREQ-001/002 hosted kabulünün tek sahibi [ortak talep kaydındaki frontend alanlarıdır](../../../docs/requests.md).
+
 ### Gerçek ortamda doğrulananlar
 
 31 Ekim–1 Kasım 2026 Chrome eklentisiyle `uye.fethiyetango.com` üzerinde test hesapları kullanıldı. SQL yalnız sonucu okumak için kullanıldı; kullanıcı akışlarının yerine doğrudan tablo yazma, reset veya seed yapılmadı.
