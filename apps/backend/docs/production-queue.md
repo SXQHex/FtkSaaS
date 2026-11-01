@@ -20,7 +20,20 @@ Bu dosya yalnız **sıra, bağımlı teslim paketleri ve kontrol noktalarının*
 | 11 | [P14](remaining-work.md#p14)–[P16](remaining-work.md#p16) | E-posta teslim→zamanlama/sessiz saat→otomasyon |
 | 12 | [B01](remaining-work.md#b01)–[B05](remaining-work.md#b05) | Business scope, ortak inbox, hesaplaşma, rapor ve özel teklif |
 
-**Aktif kullanıcı önceliği:** Kullanıcının “Frontend taleplerini karşıla” talimatıyla [XREQ-005](../../../docs/requests.md) Starter hesap erişimi okuma bağımlılığı önce tamamlanır; içerik/kabul [backlog](remaining-work.md#s04-hesap-erişimi-okuma-bağımlılığı) sahibindedir. Ardından A03 ve S01–S05 sırasına dönülür. Frontend’in kendi ekran/kabul sırası değişmez; CI süre optimizasyonu ürün sırasının önüne geçmez.
+**Aktif kullanıcı önceliği:** [A03](remaining-work.md#a03) → [S01](remaining-work.md#s01) → [S02](remaining-work.md#s02) → [S03](remaining-work.md#s03) → [S04](remaining-work.md#s04) → [S05](remaining-work.md#s05). Frontend'in kendi ekran/kabul sırası değişmez; CI süre optimizasyonu ürün sırasının önüne geçmez.
+
+### A03–S05 teslim paketi ve kontrol noktaları
+
+Alt adımlar ve ölçülebilir dilim kabulü yalnız [backlog'daki ilgili görevlerde](remaining-work.md#a03) tutulur. Uygulama tek Draft PR içinde dilim dilim ilerler; her fonksiyon için ayrı PR açılmaz. Bu belge PR'si uygulama teslimi veya A03–S05 kapanışı değildir.
+
+| Kontrol noktası | Sıra ve sonraki adım |
+|---|---|
+| A03 sonrası | Mevcut kanıt ile gerçek geliştirme boşluğu ayrılmış olmalı; S01'e geçilir. |
+| S02 sonrası | S01→S02 oda/sınıf/program okuma-düzenleme kabulü incelenir; S03'e geçilir. |
+| S04 sonrası | S03→S04 tahsis/ilk aktarım/birleşim ve yarış kabulü birlikte incelenir; S05'e geçilir. |
+| S05 sonrası | Etkilenen sözleşme/üretilmiş çıktı/WF devri ve son kaynak incelemesi tamamlanır; yürürlükteki CI politikasına göre aday kabulüne geçilir. |
+
+S03'ün teknik bağımlılığı A01 olsa da bu pakette kullanıcı sırası korunur. Her dilimde değişen davranışın uygun odak testi ve gerekli sözleşme/devri aynı dalda tamamlanır; sırf kontrol noktası için boş commit veya mükerrer clean üretilmez. S06 ve sonrası bu paketin kapsamına kendiliğinden eklenmez.
 
 ## Ortak işletim hattı
 
