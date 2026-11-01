@@ -10,7 +10,8 @@
       "tests": [
         "apps/backend/tests/contract.test.mjs",
         "apps/backend/tests/api-acceptance.test.mjs",
-        "apps/backend/tests/ci-observer.test.mjs"
+        "apps/backend/tests/ci-observer.test.mjs",
+        "apps/backend/tests/quality-guard.test.mjs"
       ],
       "sources": [
         "apps/backend/database/canonical-settings-scope.sql",
@@ -245,7 +246,11 @@
         "packages/api-contracts/src/runtime.ts",
         "docs/documentation.json",
         "apps/backend/scripts/document-registry.mjs",
-        "apps/backend/scripts/ci/observe-api.mjs"
+        "apps/backend/scripts/ci/observe-api.mjs",
+        "apps/backend/scripts/ci/floor-guard.mjs",
+        "apps/backend/scripts/ci/floor-exceptions.json",
+        "apps/backend/scripts/ci/quality-proof.mjs",
+        "apps/backend/scripts/ci/check-quality.mjs"
       ],
       "operations": [
         "operation_status_get_v1",
@@ -255,8 +260,8 @@
         "management_state_get_v1"
       ],
       "review": {
-        "fingerprint": "65fa9d015874b778a369e1bd5671689e23f7f49cc111cfe18a45b540c918a58c",
-        "reason": "API-1 gozlemcisi, argv siz Docker lifecycle allowlist ve regressionlar core verify/test envanterine alindi; structural selector ci-observer testini tanir; test ve kabul siniri korunur, push/CI yok."
+        "fingerprint": "717132aa243c873b93ac8f85e9f823952c9c41f7c801894b08aea915a73d979a",
+        "reason": "Bağımsız inceleme sonrası bounded checker, nested ignore/config ve rerun kanıtı doğrulandı; WF00 domain/native akışı aynı."
       }
     },
     {

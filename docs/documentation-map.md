@@ -5,6 +5,7 @@
 | Belge | Rol | Tek sorumluluk | Konu kimlikleri |
 |---|---|---|---|
 | [AGENTS.md](../AGENTS.md) | authority | Alan, karar, kaynak seçimi ve işlem yetkisi | agent-policy |
+| [CONSTRAINTS.md](../CONSTRAINTS.md) | authority | İki alanın ortak kalite tabanı, mekanizmaları ve sınırları | shared-quality-constraints |
 | [README.md](../README.md) | entry | Proje başlangıcı | project-entry |
 | [apps/backend/AGENTS.md](../apps/backend/AGENTS.md) | authority | Backend ajan çalışma yükümlülükleri | backend-agent |
 | [apps/backend/README.md](../apps/backend/README.md) | entry | Backend komut girişleri | backend-entry |

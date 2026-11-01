@@ -8,5 +8,26 @@
     "browser": true,
     "node": true
   },
-  "ignorePatterns": ["node_modules/**", ".next/**", "coverage/**", "next-env.d.ts"]
+  "ignorePatterns": ["node_modules/**", ".next/**", "coverage/**", "next-env.d.ts"],
+  "rules": {
+    "no-restricted-imports": [
+      "error",
+      {
+        "patterns": [
+          {
+            "group": [
+              "@ftksaas/backend",
+              "@ftksaas/backend/**",
+              "@ftksaas/web",
+              "@ftksaas/web/**",
+              "**/apps/**",
+              "**/backend/**",
+              "**/web/src/**"
+            ],
+            "message": "Use the public shared package contract; application internals are owned by their application."
+          }
+        ]
+      }
+    ]
+  }
 }

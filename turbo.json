@@ -65,6 +65,13 @@
       "outputs": [
         "coverage/**"
       ]
+    },
+    "quality": {
+      "cache": false,
+      "env": [
+        "QUALITY_BASE"
+      ],
+      "outputs": []
     }
   }
 }

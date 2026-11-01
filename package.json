@@ -20,7 +20,8 @@
     "test:backend": "turbo run test --filter=@ftksaas/backend",
     "check:frontend": "turbo run lint typecheck test build --filter=@ftksaas/web --filter=@ftksaas/ui",
     "dev:web": "turbo run dev --filter=@ftksaas/web",
-    "build:web": "turbo run build --filter=@ftksaas/web"
+    "build:web": "turbo run build --filter=@ftksaas/web",
+    "check:quality": "turbo run quality --filter=@ftksaas/backend"
   },
   "devDependencies": {
     "turbo": "2.11.10"

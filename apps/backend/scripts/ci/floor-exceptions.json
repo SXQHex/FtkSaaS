@@ -1,0 +1,11 @@
+[
+  {
+    "rule": "assertion-changed",
+    "path": "apps/backend/tests/ci-policy.test.mjs",
+    "fingerprint": "cab103a8a7b7cba884a8a7b873645dffc998f8723ec99699f90bbb57fc0741a3",
+    "reason": "Test envanteri assertionı quality-guard suiteini de zorunlu tutacak şekilde genişletildi; mevcut suite çıkarılmadı.",
+    "owner": "SXQHex",
+    "created": "2026-11-01",
+    "expires": "2026-11-30"
+  }
+]

@@ -1,0 +1,3 @@
+# Default upstream rules; no project allowlists or inline suppression.
+[extend]
+useDefault = true

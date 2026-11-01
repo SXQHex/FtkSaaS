@@ -1,3 +1,4 @@
+import {validateQuality} from './quality-proof.mjs';
 import {validateJobs,coverageHash,roleName} from './shards.mjs';
 import {assertReady,assertParents,policyMatches,resolveMerged,remoteSourceScope} from './source.mjs';
 import {mkdtempSync,writeFileSync,rmSync} from 'node:fs';import {tmpdir} from 'node:os';import {join} from 'node:path';import {execFileSync} from 'node:child_process';
@@ -16,7 +17,7 @@ export function validateBinding({binding,pr,run,jobs,tested,currentTree,workflow
 }
 export async function receipt(github,repo,run,kind="full"){
  const artifacts=await github.paginate(github.rest.actions.listWorkflowRunArtifacts,{...repo,run_id:run.id,per_page:100});
- const matches=artifacts.filter(a=>a.name===(kind==='documentation'?'document-binding-':'candidate-binding-')+run.run_attempt&&!a.expired);const a=matches[0];if(matches.length!==1)throw Error('Missing source binding');
+ const matches=artifacts.filter(a=>a.name===(kind==='quality'?'quality-binding':(kind==='documentation'?'document-binding-':'candidate-binding-')+run.run_attempt)&&!a.expired);const a=matches[0];if(matches.length!==1)throw Error('Missing source binding');
  const zip=await github.rest.actions.downloadArtifact({...repo,artifact_id:a.id,archive_format:'zip'});const dir=mkdtempSync(join(tmpdir(),'ftk-binding-'));
  try{const file=join(dir,'receipt.zip');writeFileSync(file,Buffer.from(zip.data));return JSON.parse(execFileSync('unzip',['-p',file,'binding.json'],{encoding:'utf8',maxBuffer:16000}));}finally{rmSync(dir,{recursive:true,force:true});}
 }
@@ -34,6 +35,7 @@ export async function findCandidateProof(github,repo,pr,kind,currentTree,policyB
    const jobs=await github.paginate(github.rest.actions.listJobsForWorkflowRun,{...repo,run_id:run.id,filter:'latest',per_page:100});
    if(!jobs.some(j=>roleName(j)===(kind==='documentation'?'documentation':'full-clean')&&j.conclusion==='success'))continue;
    const binding=await receipt(github,repo,run,kind);
+   validateQuality({binding:await receipt(github,repo,run,'quality'),pr,run,jobs,currentTree});
    const tested=(await github.rest.git.getCommit({...repo,commit_sha:binding.merge})).data;
    (kind==='documentation'?validateDocumentBinding:validateBinding)({binding,pr,run,jobs,tested,currentTree,workflowMatches});
    const live=(await github.rest.actions.getWorkflowRun({...repo,run_id:run.id})).data;
@@ -42,6 +44,20 @@ export async function findCandidateProof(github,repo,pr,kind,currentTree,policyB
   }catch(e){reason=String(e.message);}
  }
  throw Error(reason);
+}
+export async function findQualityProof(github,repo,pr,currentTree){
+ const runs=await github.paginate(github.rest.actions.listWorkflowRuns,{...repo,workflow_id:'ci-full.yml',head_sha:pr.head.sha,event:'pull_request',per_page:100});
+ for(const run of runs){
+  if(run.status!=='completed'||run.conclusion!=='success')continue;
+  try{
+   const jobs=await github.paginate(github.rest.actions.listJobsForWorkflowRun,{...repo,run_id:run.id,filter:'latest',per_page:100});
+   validateQuality({binding:await receipt(github,repo,run,'quality'),pr,run,jobs,currentTree});
+   const live=(await github.rest.actions.getWorkflowRun({...repo,run_id:run.id})).data;
+   if(live.run_attempt!==run.run_attempt||live.status!=='completed'||live.conclusion!=='success')throw Error('Quality run changed');
+   return live;
+  }catch{continue;}
+ }
+ throw Error('No successful source-bound quality proof');
 }
 export function schemaBaselineName(binding){
  if(binding.profile==='four-isolated-v2')return 'documentation-baseline';
@@ -61,6 +77,7 @@ export async function checkPr(github,context,number){
   const kind=scope.kind;
   if(kind==='frontend'){
    if(!await policyMatches(github,repo,pr.base.sha,pr.head.sha))throw Error('Workflow policy installation requires review and explicit authorization');
+   await findQualityProof(github,repo,pr,currentCommit.tree.sha);
    const live=(await github.rest.pulls.get({...repo,pull_number:number})).data;assertReady(live);
    if(live.head.sha!==pr.head.sha||live.base.sha!==pr.base.sha)throw Error('Head/base moved during verification');
    state='success';description='Backend scope unchanged; no backend tests accepted; frontend checks are independent';
@@ -107,6 +124,7 @@ export async function verifyMerged(github,context,core){
  const scope=await remoteSourceScope(github,repo,pr.base.sha,pr.head.sha);
  const kind=scope.kind;
  if(kind==='frontend'){
+  await findQualityProof(github,repo,pr,merged.tree.sha);
   core.setOutput('kind','frontend');
   await core.summary.addRaw('Actual merge parents verified; backend scope unchanged. No backend test or frontend acceptance claimed.\n').write();
   return {kind:'frontend',actual:sha};

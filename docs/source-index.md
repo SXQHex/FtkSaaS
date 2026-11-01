@@ -15,6 +15,7 @@ Başlangıç: [AGENTS](../AGENTS.md) → [güncel kaynak/kabul](../apps/backend/
 | Ortak istemci transport’u | [Entegrasyon protokolü](client-integration.md) |
 | Typed ayar ve native hesap tüketicileri | [Ayar rehberi](settings.md) |
 | Fiziksel şema/güvenlik kaynakları | [Migration referansı](database.md), [güvenlik referansı](security.md); kesin DDL migration zinciri |
+| Ortak kalite sınırları ve denetim bütünlüğü | [CONSTRAINTS](../CONSTRAINTS.md) |
 | Repo düzeni ve CI kabul kuralları | [Monorepo](monorepo.md), [CI politikası](ci-policy.md) |
 | Backend dokümantasyon üretimi ve işletimi | [Dokümantasyon](../apps/backend/docs/documentation-development.md), [işletim](../apps/backend/docs/remote-backend-setup.md) |
 | Frontend geliştirme/ekran uygulaması | [Web rehberi](../apps/web/docs/development.md) |

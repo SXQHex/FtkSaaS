@@ -10,6 +10,14 @@
       "purpose": "Alan, karar, kaynak seçimi ve işlem yetkisi"
     },
     {
+      "path": "CONSTRAINTS.md",
+      "role": "authority",
+      "topics": [
+        "shared-quality-constraints"
+      ],
+      "purpose": "İki alanın ortak kalite tabanı, mekanizmaları ve sınırları"
+    },
+    {
       "path": "README.md",
       "role": "entry",
       "topics": [
