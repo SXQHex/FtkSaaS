@@ -5,8 +5,12 @@ import {createHmac} from 'node:crypto';
 import {authUser,fixturePlatform,must,call,context} from './api-client.mjs';
 import {newUuidV7 as id} from '../scripts/uuid.mjs';
 import {timedFetch} from './request-diagnostics.mjs';
+import {configurationSql} from '../scripts/configure-invitation-delivery.mjs';
 const compiled=await build({entryPoints:['supabase/functions/backend-v1/invitation-delivery.ts'],bundle:true,platform:'browser',format:'esm',write:false});
-const {invitationTick,invitationSigningKey}=await import('data:text/javascript;base64,'+Buffer.from(compiled.outputFiles[0].text).toString('base64'));
+const {invitationTick:runtimeTick}=await import('data:text/javascript;base64,'+Buffer.from(compiled.outputFiles[0].text).toString('base64'));
+const workerSigning='b'.repeat(64);
+// Test-only operational environment; all existing Auth/RPC assertions stay intact.
+const invitationTick=(request,env,send,now)=>runtimeTick(request,name=>name==='FTK_INVITATION_TICK_SECRET'?workerSigning:env(name),send,now);
 test('XREQ-003: native Auth invitation job scope, durable leases and provider handoff',async t=>{
  const {env}=context(),guard=resources(t),db=await guard.connect(env.DB_URL),{platform,plan}=await fixturePlatform();
  const owner=await authUser('invite-owner'),member=await authUser('invite-recipient'),foreign=await authUser('invite-foreign');
@@ -88,9 +92,18 @@ test('XREQ-003: native Auth invitation job scope, durable leases and provider ha
    try{assert.equal(await claim(),null);assert.equal((await status(job)).state,'cancelled');assert.equal((await db.query('select attempts::int from core.outbox_jobs where id=$1',[job])).rows[0].attempts,0);}
    finally{await db.query('update core.saas_plan_versions set features=$2 where id=$1',[plan,features]);}
   });
+  await t.test('reconfiguration closes an already enabled dispatch before Edge secret synchronization',async()=>{
+   await db.query('begin');
+   try{
+    const source={org,origin:'https://invitation.ftksaas.invalid',from:'sender@ftksaas.invalid',providerKey:'re_synthetic_install',anonKey:'synthetic-anon',signingKey:'c'.repeat(64)};
+    await db.query(configurationSql(source));await db.query('update private.invitation_dispatch_config set enabled=true where singleton');
+    await db.query(configurationSql({...source,signingKey:'d'.repeat(64)}));
+    assert.equal((await db.query('select enabled from private.invitation_dispatch_config where singleton')).rows[0].enabled,false);
+   }finally{await db.query('rollback');}
+  });
   await t.test('provider acceptance persists; invitation token uses native account verification on acceptance',async()=>{
    job=(await send()).job_id;const sent=[],now=Date.now(),at=String(Math.floor(now/1000)),request_id=id();
-   const signing=await invitationSigningKey(env.SERVICE_ROLE_KEY),signature=createHmac('sha256',signing).update(at+'.'+request_id).digest('hex');
+   const signing=workerSigning,signature=createHmac('sha256',signing).update(at+'.'+request_id).digest('hex');
    const fetcher=async(url,options)=>{
     if(url==='https://api.resend.com/emails'){sent.push(JSON.parse(options.body));return Response.json({id:id()});}
     return timedFetch('invitation.acceptance_rpc',url,options);

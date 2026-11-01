@@ -5,10 +5,10 @@ import {build} from 'esbuild';
 import {newUuidV7 as id} from '../scripts/uuid.mjs';
 import {configure,configurationSql,project} from '../scripts/configure-invitation-delivery.mjs';
 const compiled=await build({entryPoints:['supabase/functions/backend-v1/invitation-delivery.ts'],bundle:true,platform:'browser',format:'esm',write:false});
-const {invitationTick,invitationSigningKey}=await import('data:text/javascript;base64,'+Buffer.from(compiled.outputFiles[0].text).toString('base64'));
-const service='synthetic-invitation-service-key',now=Date.now(),at=String(Math.floor(now/1000)),env=n=>({SUPABASE_URL:'https://test.supabase.co',SUPABASE_SERVICE_ROLE_KEY:service})[n];
+const {invitationTick}=await import('data:text/javascript;base64,'+Buffer.from(compiled.outputFiles[0].text).toString('base64'));
+const workerSigning='a'.repeat(64),service='synthetic-invitation-service-key',now=Date.now(),at=String(Math.floor(now/1000)),env=n=>({SUPABASE_URL:'https://test.supabase.co',SUPABASE_SERVICE_ROLE_KEY:service,FTK_INVITATION_TICK_SECRET:workerSigning})[n];
 async function request({time=at,request_id=id(),body,signingKey}={}){
- signingKey??=await invitationSigningKey(service);
+ signingKey??=workerSigning;
  const signature=createHmac('sha256',signingKey).update(time+'.'+request_id).digest('hex');
  return new Request('https://test.supabase.co/functions/v1/backend-v1/invitation_delivery_tick',{method:'POST',headers:{'x-ftk-worker-time':time,'x-ftk-worker-signature':signature},body:JSON.stringify(body??{request_id})});
 }
@@ -37,6 +37,18 @@ test('invitation tick rejects unsigned, expired, future, wrong-purpose and extra
  }
  assert.equal(calls,0);
 });
+test('worker signing is independent of the service-role credential and missing config fails closed',async()=>{
+ const workerKey='b'.repeat(64);let calls=0;
+ const send=async()=>{calls++;return Response.json({_internal_invitation:null});};
+ const workerEnv=n=>({SUPABASE_URL:'https://test.supabase.co',SUPABASE_SERVICE_ROLE_KEY:'a-different-valid-internal-credential',FTK_INVITATION_TICK_SECRET:workerKey})[n];
+ const res=await invitationTick(await request({signingKey:workerKey}),workerEnv,send,now);
+ assert.equal(res.status,200);assert.deepEqual(await res.json(),{claimed:0});assert.equal(calls,1);
+ for(const absent of [undefined,'invalid']){
+  const unavailable=n=>n==='FTK_INVITATION_TICK_SECRET'?absent:workerEnv(n);
+  assert.equal((await invitationTick(await request({signingKey:workerKey}),unavailable,send,now)).status,503);
+ }
+ assert.equal(calls,1);
+});
 test('invitation delivery decrypts only for an authorized claim and returns no token, recipient, key or lease',async()=>{
  const f=await fixture();const res=await f.run();assert.equal(res.status,200);const text=await res.text();
  for(const value of [f.token,f.claim.recipient,f.claim.api_key,f.claim.lease_token,service])assert(!text.includes(value));
@@ -62,12 +74,31 @@ test('lost completion is surfaced and an empty/replayed claim never sends',async
  const empty=await fixture({claimOverride:null});assert.deepEqual(await (await empty.run()).json(),{claimed:0});assert.equal(empty.sent.length,0);
 });
 test('invitation installation defaults to read-only and scopes credentials to the explicit tenant',async()=>{
- const calls=[],org=id();const source={org,origin:'https://app.ftksaas.invalid',from:'sender@ftksaas.invalid',providerKey:'re_synthetic_provider',anonKey:'synthetic-anon',serviceKey:service};
+ const calls=[],org=id();const source={org,origin:'https://app.ftksaas.invalid',from:'sender@ftksaas.invalid',providerKey:'re_synthetic_provider',anonKey:'synthetic-anon',signingKey:workerSigning};
  const query=configurationSql(source);assert(query.includes(Buffer.from('ftk_invitation_resend_'+org).toString('hex')));assert(!query.includes(service));
  for(const change of [{origin:'http://app.ftksaas.invalid'},{origin:'https://app.ftksaas.invalid/other'},{from:'sender@ftksaas.invalid\r\nBcc: other@ftksaas.invalid'},{org:"';invalid"}])assert.throws(()=>configurationSql({...source,...change}));
  const adversarial=configurationSql({...source,from:'sender+$config$@ftksaas.invalid',providerKey:'re_$config$quote\'payload'});assert.equal(adversarial.split('$config$').length,3);assert(!adversarial.includes('quote\'payload'));
- const result=await configure({org,origin:source.origin,from:source.from,token:'synthetic-management-token',providerKey:source.providerKey,request:async(url,options)=>{
+ const result=await configure({org,origin:source.origin,from:source.from,token:'synthetic-management-token',providerKey:source.providerKey,signingKey:source.signingKey,request:async(url,options)=>{
   calls.push({url,method:options.method});assert(url.startsWith('https://api.supabase.com/v1/projects/'+project));
   if(url.endsWith('/config/auth'))return Response.json({});return Response.json([{name:'anon',api_key:source.anonKey},{name:'service_role',api_key:service}]);
  }});assert.equal(result.mode,'read-only');assert(calls.every(c=>c.method==='GET'));assert(!JSON.stringify(result).includes('synthetic'));
+});
+test('installation synchronizes the scoped Edge secret before scheduling and stops on secret update failure',async()=>{
+ const signingKey='c'.repeat(64),org=id();
+ for(const failSecret of [false,true]){
+  const phases=[];let configuredSql='';
+  const request=async(url,options)=>{
+   if(url.endsWith('/api-keys?reveal=true'))return Response.json([{name:'anon',api_key:'synthetic-anon'}]);
+   const body=JSON.parse(options.body);
+   if(url.endsWith('/secrets')){phases.push('secret');assert.deepEqual(body,[{name:'FTK_INVITATION_TICK_SECRET',value:signingKey}]);return Response.json({}, {status:failSecret?503:201});}
+   assert(url.endsWith('/database/query'));
+   if(body.query.startsWith('do $config$')){phases.push('config');configuredSql=body.query;return Response.json([]);}
+   if(body.query.includes('cron.schedule')){phases.push('scheduler');return Response.json([]);}
+   return Response.json([{enabled:true,enabled_tenants:1,scheduler_count:1}]);
+  };
+  const run=()=>configure({org,origin:'https://app.ftksaas.invalid',from:'sender@ftksaas.invalid',apply:true,token:'synthetic-management-token',providerKey:'re_synthetic_provider',signingKey,request});
+  if(failSecret){await assert.rejects(run,/HTTP 503/);assert.deepEqual(phases,['config','secret']);}
+  else{const result=await run();assert.equal(result.mode,'applied');assert(!JSON.stringify(result).includes(signingKey));assert.deepEqual(phases,['config','secret','scheduler']);}
+  assert(configuredSql.includes(Buffer.from(signingKey).toString('hex')),'the Vault and Edge must receive the same signing value');
+ }
 });
