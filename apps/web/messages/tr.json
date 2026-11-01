@@ -580,7 +580,7 @@
     "profileSaved": "Kişi bilgileri güncellendi.",
     "refreshProfile": "Güncel bilgileri göster",
     "accountAccess": "Hesap erişimi",
-    "inviteHint": "Kişi için erişim davet işi başlatılır. Davet işi ve davetin kabulü ayrı durumlardır; hesap bağı ancak kabul sonrasında oluşur. Bu ortamda dış e-posta sağlayıcısı yapılandırılmadığından iş durumu gerçek e-posta teslimini doğrulamaz.",
+    "inviteHint": "Kişi için hesap erişimi daveti gönderilir. Gönderim işinin tamamlanması ile davetin kabulü ayrı durumlardır; hesap bağlantısı ancak davet kabul edildiğinde kurulur. Gönderim durumu, postanın gelen kutusuna ulaştığını tek başına doğrulamaz.",
     "inviteNeedsEmail": "Davet göndermek için kişi kaydına e-posta ekle.",
     "sendInvite": "Erişim daveti gönder",
     "retryInvite": "Yeni erişim daveti gönder",
