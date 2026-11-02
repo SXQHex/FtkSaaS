@@ -1,10 +1,12 @@
 # Güncel kaynak ve kabul
 
-2 Kasım 2026 başlangıç kontrolü. Açık işler ve kapanış ölçütleri [backlog](remaining-work.md), sıra [kuyruk](production-queue.md), ürün/API davranışı [kaynak indeksi](../../../docs/source-index.md) sahibindedir. Burada karar veya görev metni tekrar edilmez.
+2 Kasım 2026 kaynak ve hosted teslim kontrolü. Açık işler ve kapanış ölçütleri [backlog](remaining-work.md), sıra [kuyruk](production-queue.md), ürün/API davranışı [kaynak indeksi](../../../docs/source-index.md) sahibindedir. Burada karar veya görev metni tekrar edilmez.
 
 ## Kaynak tabanı
 
-Güncel çalışma tabanı main `2901f4ce3339a5bbc47408f98a0609241ebd7378` (frontend PR138). Aynı SHA için [main proof](https://github.com/SXQHex/FtkSaaS/actions/runs/41444322590), [merge proof](https://github.com/SXQHex/FtkSaaS/actions/runs/41444322429) ve [development zinciri](https://github.com/SXQHex/FtkSaaS/actions/runs/41444424771) completed/success doğrulandı. Backend teslim kaynağı `aa52a873fc363aaa41eb851c538dd510122b0602` (PR137). Aynı SHA'nın [main proof](https://github.com/SXQHex/FtkSaaS/actions/runs/41442842244), [merge proof](https://github.com/SXQHex/FtkSaaS/actions/runs/41442842200) ve [development teslimi](https://github.com/SXQHex/FtkSaaS/actions/runs/41442898421) doğrulandı. Development attempt2 completed/success; hosted backend ve dokümantasyon doğrulaması geçti. İlk CD denemesinde migration uygulandı, Edge CLI yüklemesi başarısız oldu; aynı kaynaklı tekrar tamamlandı, ilk CLI hatasının ayrıntılı nedeni eldeki kayıttan çıkarılamadı. Bu kabul yeni S05 adayının veya frontend ekranının kabulü değildir. PR135 için verilen kontrollü bypass yalnız o teslim içindi; kalıcı politika kurulum işi yok.
+Güncel çalışma tabanı main `a21a87208b3cbca9fc1a877fa41fd7c746fe55cd` (PR139). Aynı SHA için [main proof](https://github.com/SXQHex/FtkSaaS/actions/runs/41450827285), [merge proof](https://github.com/SXQHex/FtkSaaS/actions/runs/41450826811) ve [development teslimi](https://github.com/SXQHex/FtkSaaS/actions/runs/41450894731), attempt1 completed/success doğrulandı. Bu teslim S05'in aşağıdaki beş okuma projeksiyonunu kapsar; genel S05 veya frontend ekran kabulü değildir.
+
+S01.5'in PR137 main kaynağı `aa52a873fc363aaa41eb851c538dd510122b0602`; [main proof](https://github.com/SXQHex/FtkSaaS/actions/runs/41442842244), [merge proof](https://github.com/SXQHex/FtkSaaS/actions/runs/41442842200) ve [development teslimi](https://github.com/SXQHex/FtkSaaS/actions/runs/41442898421) başarılıdır. Development attempt2 hosted backend ve dokümantasyon doğrulamasını geçti. İlk CD denemesinde migration uygulandı, Edge CLI yüklemesi başarısız oldu; aynı kaynaklı tekrar tamamlandı, ilk CLI hatasının ayrıntılı nedeni eldeki kayıttan çıkarılamadı. PR135 için verilen kontrollü bypass yalnız o teslim içindi; kalıcı politika kurulum işi yok.
 
 ## S01–S02 backend kabulü
 
@@ -12,25 +14,28 @@ PR131'in [aday full clean'i](https://github.com/SXQHex/FtkSaaS/actions/runs/4136
 
 S01 oda keşfi/ayrıntısı ve düzenleme sürümü; S02 sınıf keşfi/düzenlemesi ile değişmez program sürümünün özgün tanımı teslim edildi. Gerçek Auth→Edge→RPC testleri yeni oturumdan keşif ve yeniden okuma, stale sürüm, çakışma, cursor/selector/kapsam, rol/plan kaybı, Starter kaynak sınırı, eski snapshot yokluğu ve kategori kapasitesini kapsar. Program okuması yeni preview/apply yetkisi vermez; sınıf/program tanımı ile gerçekleşen seans görünümü ayrıdır. DTO/selector/izin ayrıntısının sahibi [WF02–WF03](../../../docs/workflows.md#wf02) ve makine sözleşmesidir.
 
-S01–S02 backend teslimi kaynak, aday kabulü, merge/main kanıtı ve development doğrulamasıyla kapalıdır. Frontend ekran entegrasyonu/gerçek kullanıcı kabulü kendi alanında kalır; genel Starter veya F01–F33 bütün özellik kabulü bu teslimden çıkarılmaz.
+S01–S02 backend teslimi PR131 main `73700e37c3403dc309a5df61989837edbca24b96` üzerinde [main proof](https://github.com/SXQHex/FtkSaaS/actions/runs/41386709580) ve [development teslimi](https://github.com/SXQHex/FtkSaaS/actions/runs/41386745640) attempt1 success ile kapalıdır. Frontend ekran entegrasyonu/gerçek kullanıcı kabulü kendi alanında kalır; genel Starter veya F01–F33 bütün özellik kabulü bu teslimden çıkarılmaz.
 
 ## Starter yapılandırma okumaları kabulü
 
-XREQ-007/008 için PR134'ün [son adayı](https://github.com/SXQHex/FtkSaaS/actions/runs/41397475140), attempt1 head `457a5451fac9ce4977937ab513dc7969858731eb`, base `b0d468d14fccde2816fb4cc6744038a608c80b84`, tested merge `77147bc3d0095d5b09405941c5aef951b95bbaa8` üzerinde core+dört API shard, quality/Secret scan ve full-clean toplayıcısını geçti. Önceki başarısız aday bu kabulün kanıtı değildir. Yukarıdaki main/development kabulüyle backend teslimi tamamlandı; frontend gerçek tüketici kabulü kendi sahibindedir. DTO/selector/izin sahibi [WF02](../../../docs/workflows.md#wf02); talep durumu [ortak kayıtta](../../../docs/requests.md) tutulur.
+XREQ-007/008 için PR134'ün [son adayı](https://github.com/SXQHex/FtkSaaS/actions/runs/41397475140), attempt1 head `457a5451fac9ce4977937ab513dc7969858731eb`, base `b0d468d14fccde2816fb4cc6744038a608c80b84`, tested merge `77147bc3d0095d5b09405941c5aef951b95bbaa8` üzerinde core+dört API shard, quality/Secret scan ve full-clean toplayıcısını geçti. Önceki başarısız aday bu kabulün kanıtı değildir. PR134 main `61137c86c9ae015e2fc8f9dfef250a372bc1211d` için [main proof](https://github.com/SXQHex/FtkSaaS/actions/runs/41400798811) ve [development teslimi](https://github.com/SXQHex/FtkSaaS/actions/runs/41400845196) attempt1 success ile backend teslimi tamamlandı; frontend gerçek tüketici kabulü kendi sahibindedir. DTO/selector/izin sahibi [WF02](../../../docs/workflows.md#wf02); talep durumu [ortak kayıtta](../../../docs/requests.md) tutulur.
 
-## Abone No yeni aday kapsamı
+<a id="abone-no-yeni-aday-kapsamı"></a>
+## Abone No tahsis ve ilk aktarım kabulü
 
-S03/S04 tahsis, tekrar güvenli ilk aktarım, birleşimde numara/alias koruma ve kişi araması kaynakları hazırlandı. Kişi detay/liste, güncel rapor ve yeni CSV projeksiyonları aynı adayda; diğer operasyon DTO'ları için S05 açık kalır. Davranışın tek sahibi [P08](../../../docs/decisions/P08-accepted-scope.md#organizasyon-bazında-sabit-abone-numarası), tüketim [WF04](../../../docs/workflows.md#wf04) ve [WF10](../../../docs/workflows.md#wf10) kapsamındadır.
+S03/S04 tahsis, tekrar güvenli ilk aktarım, birleşimde numara/alias koruma ve kişi araması PR135 ile teslim edildi. Kişi detay/liste, güncel rapor ve yeni CSV projeksiyonları aynı teslimdedir; diğer operasyon DTO'ları için S05 açık kalır. Davranışın tek sahibi [P08](../../../docs/decisions/P08-accepted-scope.md#organizasyon-bazında-sabit-abone-numarası), tüketim [WF04](../../../docs/workflows.md#wf04) ve [WF10](../../../docs/workflows.md#wf10) kapsamındadır.
 
-[Son PR135 adayı](https://github.com/SXQHex/FtkSaaS/actions/runs/41409837224), head `4ef70c72f817668a5f73baf4715b014a139a1432`, base `61137c86c9ae015e2fc8f9dfef250a372bc1211d`, tested merge `a6f9531cddf8c7c16c934ea42bd622d97a8183af`, attempt1 üzerinde quality/Secret scan, core ve dört API Clean acceptance ile full-clean toplayıcısını geçti. İlk başarısız adayın fixture düzeltmeleri Git/PR geçmişindedir. Yerel SQL/API çalıştırması artifact DNS hatasıyla engelliydi; gerçek kabul bu başarılı CI kaynağıdır. Yukarıdaki main/development kanıtıyla S03/S04 ve S05 kişi/rapor/CSV temeli teslim edildi; diğer operasyon DTO'ları ve genel Starter kabulü açık.
+[Son PR135 adayı](https://github.com/SXQHex/FtkSaaS/actions/runs/41409837224), head `4ef70c72f817668a5f73baf4715b014a139a1432`, base `61137c86c9ae015e2fc8f9dfef250a372bc1211d`, tested merge `a6f9531cddf8c7c16c934ea42bd622d97a8183af`, attempt1 üzerinde quality/Secret scan, core ve dört API Clean acceptance ile full-clean toplayıcısını geçti. İlk başarısız adayın fixture düzeltmeleri Git/PR geçmişindedir. Yerel SQL/API çalıştırması artifact DNS hatasıyla engelliydi; gerçek kabul bu başarılı CI kaynağıdır. PR135 main `0ade1417d5c24383d086496fcab47b7fb17f5873` için [main proof](https://github.com/SXQHex/FtkSaaS/actions/runs/41416100142) ve [development teslimi](https://github.com/SXQHex/FtkSaaS/actions/runs/41416179330) attempt1 success ile S03/S04 ve S05 kişi/rapor/CSV temeli teslim edildi; diğer operasyon DTO'ları ve genel Starter kabulü açık.
 
 ## S01.5 eğitmen yönetimi kabulü
 
 PR137 [aday full clean](https://github.com/SXQHex/FtkSaaS/actions/runs/41437372390), attempt1 head `8e7b3d3740e0e146c6b35e0385cbbff246caf75a`, base `d0a6b5639ba12809d6b5a5b61ca7f02ab485db31`, tested merge `159e9e4e672333e4bd836d470a4271943981026b` üzerinde core, dört API shard, quality ve full-clean toplayıcısını geçti. Yukarıdaki main/CD kabulüyle S01.5 backend teslimi kapalıdır. Önceki başarısız fixture denemeleri Git/PR geçmişindedir. Eğitmen keşfi, etki onayı ve normal seans yaşam döngüsü gerçek API'de doğrulandı; frontend ekran kabulü ortak talep sahibindedir.
 
-## S05 operasyon projeksiyonları adayı
+## S05 operasyon projeksiyonları kabulü
 
-Beş yetkili okuma DTO'suna Abone No ekleniyor: ReservationView, AttendanceEntryView, EntitlementView, FinanceView ve NegativeLimitsView. Sözleşme regresyonu eksik alanda kırmızı, additive DTO değişikliğinde yeşildir. Mevcut gerçek API suite'lerine tutarlılık, self/tenant sınırı, alias→UUID→finans ve okumanın numara tahsis etmemesi senaryoları eklendi. Yerel PostgreSQL çalıştırması ortamın chown yetkisi olmadığı için engellidir; yeni migration ve gerçek API kabulü henüz yok. Diğer operasyon DTO'ları için S05 açık.
+PR139 [aday full clean](https://github.com/SXQHex/FtkSaaS/actions/runs/41445290413), attempt1 head `e9fda3cf9003cbba577a1ec6cde8571cac2a8ac8`, base `2901f4ce3339a5bbc47408f98a0609241ebd7378`, tested merge `a5201619bce98caba6dfbf7eb15917c1381dcc31` üzerinde core, dört API shard, quality ve full-clean toplayıcısını geçti. Yukarıdaki aynı-main proof ve development teslimiyle bu dilimin backend kabulü tamamlandı.
+
+ReservationView, AttendanceEntryView, EntitlementView, FinanceView ve NegativeLimitsView nullable Abone No taşır. Gerçek API kabulü tutarlılık, self/tenant sınırı, alias→UUID→finans ve okumanın numara tahsis etmemesini kapsar. Yerel PostgreSQL çalıştırması ortamın chown yetkisi olmadığı için engelliydi; migration/API kabulünün kaynağı başarılı aday CI'dır. Diğer operasyon DTO'ları için S05 ve frontend ekran kabulü açık.
 
 ## Devam noktası
 
@@ -41,7 +46,7 @@ A03.1 kaynak/plan/WF eşlemesi main'de; A03.2/A03.3 genel özellik bazlı kanıt
 | Alan | Kaynak/kanıt sınırı |
 |---|---|
 | Temel domain | Rezervasyon koruması, atomik hak/finans, yoklama, hakediş ve hesaplaşma kaynakları mevcut; eksik metadata bunları sıfırdan iş yapmaz. |
-| F01–F33 | Makine envanterinde 218 operasyon ve 33 özellik var; feature_delivery kabul alanları pending_feature_acceptance. Kanıt uzlaştırılmadan tamamlanma yüzdesi çıkarılmaz. |
+| F01–F33 | Güncel operasyon/özellik ve kabul envanteri [üretilmiş feature-delivery görünümündedir](../../../docs/feature-delivery.md); feature_delivery kabul alanları pending_feature_acceptance. Kanıt uzlaştırılmadan tamamlanma yüzdesi çıkarılmaz. |
 | Native Auth | PR99 native sadeleştirme kaynağı main’de. Auth SMTP/Google/TOTP kabulü uygulama davet/marketing/SMS teslimi değildir. Gerçek route/config/PKCE ve tüketici kabulü ayrı. |
 | Davet/job | XREQ-003 backend kurulum, gerçek dış teslim ve iş takibi kabulü tamamlandı; aşağıdaki hosted kanıt ve ortak talep kaydı esas alınır. Posta teslimi hesap bağı veya frontend ekran kabulü değildir. |
 | Worker/export | PR83 bounded report backlog/retry/kesinti/rebind ve export expiry dilimi kayıtlıdır; genel beş lane, privacy purge ve tam restore bundan çıkarılamaz. |

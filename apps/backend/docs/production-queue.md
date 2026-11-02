@@ -24,7 +24,7 @@ Bu dosya yalnız **sıra, bağımlı teslim paketleri ve kontrol noktalarının*
 
 **Güncel öncelik:** [S01.4](remaining-work.md#s01) ek okuma tesliminin backend kabulü doğrulandı; frontend gerçek kabulü [ortak talep](../../../docs/requests.md) sahibinde kalır. PR135 ile S03/S04 ve S05 kişi/rapor/export temeli teslim edildi. S01.5/XREQ-009 backend kabulü tamamlandı; aktif paket S05 kalan operasyon projeksiyonlarıdır.
 
-**Sonraki işler:** S05 beş okuma projeksiyonunun aday/main/development kabulü → A03.2/A03.3 kanıt/boşluk uzlaştırmasını doğrulanan dilimlerle sürdür; S05'te kalan operasyon projeksiyonları → S06–S08. S03–S05 atomik tahsis, ilk aktarım/birleşim ve operasyon projeksiyonları olarak anlamlı teslim sınırında yürür. Her dilimde uygun odak testi, etkilenen sözleşme/üretilmiş çıktı/WF ve alan devri birlikte güncellenir. Aday kabulü ve yeni kapsamın merge yetkisi ayrıca korunur.
+**Sonraki işler:** S05'in beş okuma projeksiyonu aday/main/development kabulünü tamamladı; kalan operasyon projeksiyonlarıyla devam et. A03.2/A03.3 kanıt/boşluk uzlaştırmasını doğrulanan dilimlerle sürdür → S07'nin gerçek tüketici bağı ve S08. S06 ve S07'nin backend dış teslim hattı tamamlandı; yeniden uygulama işi değildir. S03–S05 atomik tahsis, ilk aktarım/birleşim ve operasyon projeksiyonları olarak anlamlı teslim sınırında yürür. Her dilimde uygun odak testi, etkilenen sözleşme/üretilmiş çıktı/WF ve alan devri birlikte güncellenir. Aday kabulü ve yeni kapsamın merge yetkisi ayrıca korunur.
 
 ## Ortak işletim hattı
 
