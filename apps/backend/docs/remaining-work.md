@@ -88,6 +88,7 @@ Bu tablo yalnız izdir; eski kabul metinleri ikinci kez tutulmaz.
 - [x] S01.4 — XREQ-007/008 ek yapılandırma okumalarının backend teslimi tamamlandı; kaynak/run/ortam kanıtı [devirde](00-FtkSaaS-yeni-sohbet-devir.md#starter-yapılandırma-okumaları-kabulü). Frontend gerçek tüketici kabulü ortak talep sahibinde kalır.
 
 - [x] S01.5 — XREQ-009 dar eğitmen yönetimi backend teslimi tamamlandı; [aday/main/development kanıtı](00-FtkSaaS-yeni-sohbet-devir.md#s015-eğitmen-yönetimi-kabulü). Frontend ekran kabulü ortak talepte kalır.
+- [ ] S01.6 — XREQ-011: merkez eğitmenliğini tek rol kaynağına taşı; legacy/offline keşif, kota, rol kaldırma, seans koruması ve başka merkez izolasyonunu aynı gerçek API kabulünde doğrula. İki aktiflik kaynağını senkronlayan yeni yaşam döngüsü kurulmaz.
 
 <a id="s02"></a>
 ### S02 — Sınıf ve program yönetim okumaları

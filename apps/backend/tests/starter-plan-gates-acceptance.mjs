@@ -52,8 +52,9 @@ test('Starter real Auth/API resource limits, downgrade scope and receipt gates',
   });
   await db.query("insert into core.people(id,org_id,display_name,state) values($1,$3,'Instructor','active'),($2,$3,'Other instructor','active')",[instructor,otherInstructor,org]);
   await t.test('instructor database invariant also protects non-HTTP writers',async()=>{
-   await db.query("insert into core.center_relationships(id,org_id,center_id,person_id,kind,state,started_at) values($1,$2,$3,$4,'instructor','active',now())",[key(),org,center,instructor]);
+   await db.query("insert into core.role_assignments(id,org_id,scope_center_id,person_id,role,state,account_link_id) values($1,$2,$3,$4,'instructor','active',null)",[key(),org,center,instructor]);
    await assert.rejects(db.query("insert into core.center_relationships(id,org_id,center_id,person_id,kind,state,started_at) values($1,$2,$3,$4,'instructor','active',now())",[key(),org,center,otherInstructor]),/PLAN_LIMIT_REACHED/);
+   await assert.rejects(db.query("insert into core.role_assignments(id,org_id,scope_center_id,person_id,role,state,account_link_id) values($1,$2,$3,$4,'instructor','active',null)",[key(),org,center,otherInstructor]),/PLAN_LIMIT_REACHED/);
   });
   let students=[];
   await t.test('99 students plus two simultaneous activations admit exactly one, then reject 101',async()=>{
@@ -128,7 +129,7 @@ test('Starter real Auth/API resource limits, downgrade scope and receipt gates',
    const pending=await invoke('subscription_get_v1',{});assert.deepEqual(pending.pending_starter_scope,{center_id:center,scope:body.kept_scope});assert.equal(pending.subscription_version,Number(sub.version)+1);
    await db.query("update core.saas_change_requests set effective_at=now()-interval '1 second' where id=$1",[change]);
    // Revocation after scheduling must not strand the due boundary.
-   await db.query("update core.center_relationships set state='inactive',version=version+1 where org_id=$1 and person_id=$2 and kind='instructor'",[org,instructor]);
+   await db.query("update core.role_assignments set state='inactive',version=version+1 where org_id=$1 and person_id=$2 and role='instructor'",[org,instructor]);
    const boundary=key();
    await db.query("insert into core.operation_receipts(id,org_id,actor_account_id,actor_fingerprint,operation,key_hash,payload_hash,state,result_expires_at) values($1,$2,$3::uuid,$3::uuid::text,'subscription_boundary_apply_v1',repeat('a',64),repeat('b',64),'in_progress',now()+interval '1 day')",[boundary,org,account.id]);
    await db.query("select private.p07_boundary($1,$2,$3,$4)",[org,sub.id,boundary,Array.from({length:32},key)]);
@@ -151,7 +152,7 @@ test('Starter real Auth/API resource limits, downgrade scope and receipt gates',
    assert.equal((await invoke('subscription_get_v1',{})).starter_scope.scope.instructor_id,staffPerson);
    await db.query('select private.starter_schedule_guard($1,$2)',[org,{center_id:center,discipline_id:disc,resources:[{kind:'room',id:room}],assignments:[{person_id:staffPerson,duty:'instructor'}]}]);
    for(const resource of [{kind:'room',id:extraRoom},{kind:'person',id:instructor}])await reject('availability_save_v1',{resource,rule:{weekdays:[1],local_start:'09:00:00',local_end:'10:00:00',valid_from:'2020-01-01'}},'PLAN_FEATURE_UNAVAILABLE');
-   await db.query("insert into core.center_relationships(id,org_id,center_id,person_id,kind,state,started_at) values($1,$2,$3,$4,'instructor','inactive',now())",[key(),org,center,selected[1]]);
+   await db.query("insert into core.role_assignments(id,org_id,scope_center_id,person_id,role,state,account_link_id) values($1,$2,$3,$4,'instructor','inactive',null)",[key(),org,center,selected[1]]);
    await invoke('availability_save_v1',{resource:{kind:'person',id:selected[1]},rule:{weekdays:[1],local_start:'09:00:00',local_end:'10:00:00',valid_from:'2020-01-01'}});
    for(const resource of [{kind:'room',id:room},{kind:'person',id:staffPerson}])await invoke('availability_save_v1',{resource,rule:{weekdays:[1,2,3,4,5,6,7],local_start:'00:00:00',local_end:'23:59:59',valid_from:'2020-01-01'}});
    const start=new Date(+legacyStart+4*3600000);

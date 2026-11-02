@@ -257,3 +257,8 @@ test('operational student views expose optional org subscriber numbers without a
  assert(!valid('ReservationView',{...base,subscriber_number:'student-1001'}));
  assert(!valid('Request_reservation_create',{client_api_version:1,request_id:id,operation_key:id,org_id:id,center_id:id,session_id:id,subscriber_number:'1001',mode:'flexible'}));
 });
+
+test('offline instructor membership uses the canonical role without granting an account capability',()=>{
+ const role={id,created_at:'2026-11-02T00:00:00Z',org_id:id,person_id:id,role:'instructor',scope_center_id:id,state:'active',account_link_id:null};
+ assert.equal(valid('Table_role_assignments',role),true);
+});
