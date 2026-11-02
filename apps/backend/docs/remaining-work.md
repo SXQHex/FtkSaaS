@@ -209,14 +209,14 @@ Bu tablo yalnız izdir; eski kabul metinleri ikinci kez tutulmaz.
 <a id="s09"></a>
 ### S09 — Starter günlük ders ve hak akışı
 
-- [ ] **Tür:** D · **Plan:** Starter ve miras alanlar · **Özellik:** F02,F08,F09,F10,F11,F13,F14,F15,F16,F19
+- [x] **Tür:** D · **Plan:** Starter ve miras alanlar · **Özellik:** F02,F08,F09,F10,F11,F13,F14,F15,F16,F19
 - **Bağımlılık:** S02,S03
 - **Kabul:** Program→paket→manuel tahsilat→self rezervasyon→yoklama→düzeltme zinciri çalışır.
 - **Sınır/olumsuz durum:** Tek oda/disiplin/eğitmen, borç/hak/kapasite korunur; Starter hakediş üretmez.
 - **Doğrulama senaryosu:** Son yer/son hak yarışı; iptal-telafi ve tekrar kapanış; mevcut güçlü testleri yeniden yazmadan eksik akışı tamamla.
 - **Kaynak alanı:** mevcut Starter, schedule, reservation, attendance, entitlement testleri
 
-**Bu paketin backend dilimi:** Mevcut Starter harness’ine sonlu program→bir kredili paket→borca gerçek manuel tahsilat/replay→iki öğrencinin son yer yarışı→aynı öğrencinin son hak yarışı→atanmış eğitmenin taslağı→CM kapanışı/replay→gerekçeli düzeltme/replay→öğrencinin iptali zinciri eklendi. Kişisel sıfır negatif limit açık fixture seçimidir; merkez varsayımı veya mevcut iki kredili testin değişikliği değildir. Mali geçmişin korunması, negatif bakiye ve Starter hakedişi oluşmaması denetlenir. Mevcut iptal/telafi ve atomiklik testleri korunur; sonucun [kaynak/ortam kaydı](00-FtkSaaS-yeni-sohbet-devir.md#s07s10-kabul-paketi) aday/main tesliminden ayrıdır.
+**Bu paketin backend dilimi:** Mevcut Starter harness’ine sonlu program→bir kredili paket→borca gerçek manuel tahsilat/replay→iki öğrencinin son yer yarışı→aynı öğrencinin son hak yarışı→atanmış eğitmenin taslağı→CM kapanışı/replay→gerekçeli düzeltme/replay→öğrencinin iptali zinciri eklendi. Kişisel sıfır negatif limit açık fixture seçimidir; merkez varsayımı veya mevcut iki kredili testin değişikliği değildir. Mali geçmişin korunması, negatif bakiye ve Starter hakedişi oluşmaması denetlenir. Mevcut iptal/telafi ve atomiklik testleri korunur; PR150 aday/main/development kabulüyle backend günlük zincir teslimi kapalıdır; [kaynak/ortam kanıtı](00-FtkSaaS-yeni-sohbet-devir.md#s07s10-kabul-paketi). Frontend ekran veya genel Starter kabulü değildir.
 
 <a id="s10"></a>
 ### S10 — Ayar ve eylem yetkisi tüketicileri
@@ -240,6 +240,8 @@ Bu tablo yalnız izdir; eski kabul metinleri ikinci kez tutulmaz.
 - **Doğrulama senaryosu:** Gerçek payload/filtre/tarih/No, yetki kaybı/eski URL; PR83 değişmeyen kanıtı tekrar üretme.
 - **Kaynak alanı:** p06 rapor worker/projeksiyon; mevcut p06 acceptance
 
+**Backend dilimi:** Mevcut gerçek Starter worker→rapor→authenticated CSV ve No/filtre/toplam kabulü korunur. Süresi dolan descriptor’ın aynı gerçek HTTP download yolunda da ret verdiği eklendi; içerik dönmez. PR83’ün değişmeyen lease/retention kanıtı yeniden üretilmedi. Kaynak ve yerel sonuç [devirde](00-FtkSaaS-yeni-sohbet-devir.md#s11s13-dosya-ve-belge-kabulü); bu yeni dilimin aday/main/development ve gerçek hosted tüketici kabulü henüz kapanmadı.
+
 <a id="s12"></a>
 ### S12 — Öğrenci/kredi/borç importu
 
@@ -250,6 +252,8 @@ Bu tablo yalnız izdir; eski kabul metinleri ikinci kez tutulmaz.
 - **Doğrulama senaryosu:** Kısmi hata, yinelenen dosya, kota sınırı ve kaynak-sonuç mutabakatı; gerçek iş çıktısı.
 - **Kaynak alanı:** p06 import kaynakları; mevcut acceptance
 
+**Backend dilimi:** Mevcut Starter private CSV→preview→açık apply→worker→kısmi sonuç, hak/borç ve 100 öğrenci sınırı korunur. Aynı kaynak tekrarı kişi/satış/borçla birlikte Abone No’yu da korur; son boş slot numara alır, taşan satırın kişi/borç/sayaç etkisi geri alınır. Yeni import motoru veya politika limiti eklenmedi. [Kaynak/yerel kanıt](00-FtkSaaS-yeni-sohbet-devir.md#s11s13-dosya-ve-belge-kabulü); yeni dilimin teslim ve hosted kabulü bekler.
+
 <a id="s13"></a>
 ### S13 — Sürümlü belge ve onay akışı
 
@@ -259,6 +263,8 @@ Bu tablo yalnız izdir; eski kabul metinleri ikinci kez tutulmaz.
 - **Sınır/olumsuz durum:** Hash/bayt/sürüm ve tenant korunur; bağlamsız kişi özeti otomatik gereksinim değildir.
 - **Doğrulama senaryosu:** Yanlış sürüm, yetkisiz/eski download ve required belge eksikliği; gerçek Storage bayt kabulü.
 - **Kaynak alanı:** p05 document/private Storage; mevcut acceptance
+
+**Backend dilimi:** Mevcut registry harness’inde ayrı sınırlı Starter belge kökü eklendi. Gerçek native Auth ve private Storage baytları, iki farklı hash/sürüm, self onay olmadan ret, onay sonrası aynı komutla rezervasyon, eski rezervasyon/byte/onay geçmişinin korunması ve link kaybında içerik/replay reddi doğrulanır. Ürün davranışı, Storage grantları veya private dosya transport’u değişmedi. Yerel gerçek Storage kabulü hosted/gerçek tüketici kabulü olarak sunulmaz; [kaynak ve sonuç](00-FtkSaaS-yeni-sohbet-devir.md#s11s13-dosya-ve-belge-kabulü).
 
 <a id="s14"></a>
 ### S14 — Temel public başvuru kabulü

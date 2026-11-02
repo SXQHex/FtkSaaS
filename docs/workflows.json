@@ -442,8 +442,8 @@
         "role_revoke_preview_v1"
       ],
       "review": {
-        "fingerprint": "c0026b846d2e4911d992a40c490a4ed4a5f1fb8c8f8c21654cbb5247f34869cf",
-        "reason": "Rol liste DTOsu ve tek kaynaklı eğitmen temizliğinin kaynak/test/rehber bağı birlikte incelendi; nullable numara yetki açmıyor, Starter genel rol listesi kapalı kalıyor."
+        "fingerprint": "686e0059ab63221858926b09da21097ff397bae7cc0ed7f55301886715dd7593",
+        "reason": "Registry harnessine ayrı Starter private belge kökü eklendi; kendi merkez/oda/eğitmen fixtureı mevcut komutlarla kurulur, kurulum akışı ve yönetim sözleşmesi değişmedi."
       }
     },
     {
@@ -548,7 +548,8 @@
         "apps/backend/tests/p07-account-profile-merge-acceptance.mjs",
         "apps/backend/tests/p07-account-revocation-acceptance.mjs",
         "apps/backend/tests/registry.test.mjs",
-        "apps/backend/tests/subscriber-number-acceptance.mjs"
+        "apps/backend/tests/subscriber-number-acceptance.mjs",
+        "apps/backend/tests/starter-operations-acceptance.mjs"
       ],
       "sources": [
         "apps/backend/database/active-discipline-projection-wrappers.sql",
@@ -615,8 +616,8 @@
         "person_discipline_set_v1"
       ],
       "review": {
-        "fingerprint": "90723ef85475e46cc07e5a4bb1e646596f0adbf84b00f2baa5b9234b8ad1ddb0",
-        "reason": "XREQ-012 rol kaynağı, eski veri silme kontrolü ve nullable Abone No projeksiyonları; değişen kaynak/testler ve ilgili rehber incelendi, plan/izin/worker protokolü korunuyor."
+        "fingerprint": "9cb1f59f5ae3c33e178c074556bc9a381077a0b3cd87f0d3280f7354bb0ab75c",
+        "reason": "Starter importta mevcut ve yeni kişinin Abone No benzersizliği, source replay değişmezliği ve kota taşmasında numara sayacı rollbacki gerçek mevcut harness içinde doğrulanıyor; kişi/rol/alias sözleşmesi değişmedi."
       }
     },
     {
@@ -720,7 +721,8 @@
         "apps/backend/tests/p01-catalog-entitlement-reads.test.mjs",
         "apps/backend/tests/api-acceptance.test.mjs",
         "apps/backend/tests/program-session-lifecycle.test.mjs",
-        "apps/backend/tests/starter-attendance-protection.test.mjs"
+        "apps/backend/tests/starter-attendance-protection.test.mjs",
+        "apps/backend/tests/starter-document-acceptance.mjs"
       ],
       "sources": [
         "apps/backend/database/active-discipline-projection-wrappers.sql",
@@ -778,8 +780,8 @@
         "reservation_capacity_override_v1"
       ],
       "review": {
-        "fingerprint": "97b3a767ce135a02a51c01000952e17f2da26c37c7337190e51d8d5d6348466a",
-        "reason": "Güncel günlük testte son yer yarışından sonra gerçek boş seans seçilir; sıfır limitte son hak reddi final SQLe göre CREDIT_LIMIT_EXCEEDED, mevcut P01 önkoşulu değişmez."
+        "fingerprint": "2fb2da83ba65276773d82fb776be1446f5714c2a17ad88a9b164eb16a2380d79",
+        "reason": "Starter belge sürümüne self onay olmadan rezervasyon reddi ve aynı komutla sonradan başarı; yeni sürüm eski rezervasyonu korur, yeni kayıt yeni kabul ister."
       }
     },
     {
@@ -896,8 +898,8 @@
         "debt_adjust_v1"
       ],
       "review": {
-        "fingerprint": "3ffc74971dd66d1a1635b1ebdc7374939a6fa31e722cec25105a261e95ff3a6f",
-        "reason": "Güncel günlük testte gerçek borca banka tahsilatı ve replay, hak tüketimi/düzeltme/iptal sonrası aynı mali iş kayıtlarıyla karşılaştırılır; yalnız pagination as_of değişebilir."
+        "fingerprint": "1b0161c7c98b4a1f3ce2fa093e4445711418c919b732bf61da2d0330d5232d65",
+        "reason": "Ortak Starter testindeki No ve expired download assertion ekleri mali ledger/rapor semantiğini değiştirmiyor; mevcut collection ve opening debt tutar kontrolleri korundu."
       }
     },
     {
@@ -983,8 +985,8 @@
         "file_upload_complete_v1"
       ],
       "review": {
-        "fingerprint": "04ab01fb90d75dde4e7b9d5966cc550ca130c2a101b1f14d6d0c6b2c06a96a34",
-        "reason": "Reviewed canonical instructor role authority, legacy migration, offline account/merge boundaries and equivalent fixtures; no second active relationship lifecycle remains."
+        "fingerprint": "5ce6582d07147c401be84a9d41785dcddf81b334aa22e4d96ea52b87bb0d8fe8",
+        "reason": "Starter import source dedupe, kota ve No tahsisi ile gerçek expired CSV HTTP ret bağları incelendi; worker/download transport ve PR83 retention davranışı korunur."
       }
     },
     {
@@ -995,7 +997,8 @@
       "detail": "docs/workflows.md",
       "tests": [
         "apps/backend/tests/p05-acceptance.mjs",
-        "apps/backend/tests/starter-operations-acceptance.mjs"
+        "apps/backend/tests/starter-operations-acceptance.mjs",
+        "apps/backend/tests/starter-document-acceptance.mjs"
       ],
       "sources": [
         "apps/backend/database/p05-bind.sql",
@@ -1017,8 +1020,8 @@
         "document_publication_preview_v1"
       ],
       "review": {
-        "fingerprint": "899a4dda0a28130d0b581a44d2989202ef7f74c1532237d4b68dc02d68ac56c1",
-        "reason": "Ortak üretilmiş runtime wrapper farkı yalnız yeni role_revoke_preview_v1 F04 service-only entrypoint ekler; bu akışın komut/izin/etki zinciri değişmedi, mevcut rehber korunur."
+        "fingerprint": "9927e6d2f4f8599f99cce1a945a55ab0bb77bb427de4d2e039dbd45cb8811227",
+        "reason": "Gerçek Starter private Storage baytları ve iki farklı belge sürümü; self consent, eski rezervasyon/byte/onay geçmişi ve revoked link sonrası içerik/replay sınırı mevcut APIlerde doğrulanıyor."
       }
     },
     {
@@ -1068,8 +1071,8 @@
         "settings_preparation_resolve_v1"
       ],
       "review": {
-        "fingerprint": "111ccb9ecf0d56cf878694547e88c7555d4cf2f84b73871da63257b928a34498",
-        "reason": "Ortak üretilmiş runtime wrapper farkı yalnız yeni role_revoke_preview_v1 F04 service-only entrypoint ekler; bu akışın komut/izin/etki zinciri değişmedi, mevcut rehber korunur."
+        "fingerprint": "faa70fd2020af704b7032a24d72c9edda0c8da629cb2b288ede87e863d08c859",
+        "reason": "Paylaşılan Starter operations testindeki No ve download ret ekleri ayar/template kaynak ve snapshot tüketicisini değiştirmedi; mevcut yetki/reset/provenance assertionları korundu."
       }
     },
     {

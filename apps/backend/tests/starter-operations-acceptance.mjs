@@ -82,6 +82,9 @@ test('ST-02 Starter import, reports and transactional inbox',{timeout:300000},as
    await denied('preview_get_v1',{preview_id:preview.id},'NOT_FOUND',student);
    const k=key(),body={preview:token(preview)};await api('import_apply_v1',body,owner,k);assert.equal((await api('import_apply_v1',body,owner,k)).job_id,importJob);await drain(p06,importTick);
    const result=await api('import_rows_list_v1',{job_id:importJob,page:{}});assert.deepEqual(result.items.map(x=>x.state),['applied','applied','invalid']);assert.equal(result.items[2].error_code,'VALIDATION_FAILED');
+   const importedPeople=result.items.filter(x=>x.state==='applied').map(x=>x.created_references.find(r=>r.type==='people').id);
+   const numbers=()=>rows('select id,private.subscriber_number($1,id) n from core.people where org_id=$1 and id=any($2::uuid[]) order by id',[org,importedPeople]),originalNumbers=await numbers();
+   assert.equal(originalNumbers.length,2);for(const p of originalNumbers)assert.match(p.n,/^[1-9][0-9]+$/);assert.equal(new Set(originalNumbers.map(p=>p.n)).size,2);
    const sale=result.items[0].created_references.find(x=>x.type==='sales').id;
    assert.equal((await rows('select private.credit_available($1,$2)::int n',[org,sale]))[0].n,2);
    assert.equal((await rows('select count(*)::int n from core.cash_movements where org_id=$1',[org]))[0].n,0);
@@ -90,6 +93,7 @@ test('ST-02 Starter import, reports and transactional inbox',{timeout:300000},as
    const repeat=await previewFile(uploaded,'st02-opening');assert.equal(repeat.preview.import_summary.replayed_rows,2);await api('import_apply_v1',{preview:token(repeat.preview)});await drain(p06,importTick);
    assert.equal((await rows('select count(*)::int n from core.sales where org_id=$1',[org]))[0].n,1);
    assert.equal((await rows('select sum(amount_minor)::text n from core.debts where org_id=$1',[org]))[0].n,'300');
+   assert.deepEqual(await numbers(),originalNumbers);
   });
   await t.test('Starter CSV delimiter selection is explicit, typed and consumed before preview/apply',async()=>{
    const f=await upload('id;name;ref\r\nsemicolon;"Synthetic; comma, member";'+studentPerson+'\r\n');
@@ -177,6 +181,8 @@ test('ST-02 Starter import, reports and transactional inbox',{timeout:300000},as
    const response=await download(owner);assert(response.ok);assert.match(response.headers.get('cache-control'),/no-store/);assert.match(response.headers.get('content-type'),/^text\/csv/);assert.equal((await response.text()).split('\r\n').filter(Boolean).length,3);
    const forbidden=await download(student);assert.equal((await forbidden.json()).ok,false);
    await db.query("update core.report_jobs set expires_at=now()-interval '1 second' where id=$1",[exportJob]);await denied('report_file_get_v1',{job_id:exportJob},'OPERATION_RESULT_EXPIRED');
+   const expired=await download(owner),expiredBody=await expired.json();assert.equal(expiredBody.ok,false);assert.equal(expiredBody.error.code,'OPERATION_RESULT_EXPIRED');assert.equal(expiredBody.data,undefined);
+
   });
   await t.test('transactional completion reaches only requester inbox; preferences, read versions and replay never create loops',async()=>{
    await must(owner,'settings_update_v1',{scope:'member',org_id:org,expected_version:(await settings('member')).version,patch:{in_app_reminders:false,in_app_marketing:false}},key());
@@ -223,9 +229,12 @@ test('ST-02 Starter import, reports and transactional inbox',{timeout:300000},as
   await t.test('import apply rechecks quota per row: final slot succeeds, overflow rolls back person and debt',async()=>{
    const active=Number((await rows('select private.starter_student_count($1) n',[org]))[0].n);
    for(let i=active;i<99;i++){const p=key();await db.query("insert into core.people(id,org_id,display_name,state) values($1,$2,'Synthetic quota','active')",[p,org]);await db.query("insert into core.center_relationships(id,org_id,center_id,person_id,kind,state,started_at) values($1,$2,$3,$4,'student','active',now())",[key(),org,center,p]);}
+   const counterBefore=Number((await rows('select last_number from private.subscriber_counters where org_id=$1',[org]))[0].last_number);
    const f=await upload(headers.join(',')+'\nslot,Synthetic final slot,,,,10,TRY,,,\noverflow,Synthetic overflow,,,,20,TRY,,,\n');
    const next=await previewFile(f,'st02-quota');assert.equal(next.preview.import_summary.valid_rows,2);await api('import_apply_v1',{preview:token(next.preview)});await drain(p06,importTick);
    const result=await api('import_rows_list_v1',{job_id:next.job,page:{}});assert.equal(result.items[0].state,'applied');assert.equal(result.items[1].state,'failed');assert.equal(result.items[1].error_code,'PLAN_LIMIT_REACHED');
+   assert.equal(Number((await rows('select last_number from private.subscriber_counters where org_id=$1',[org]))[0].last_number),counterBefore+1);
+   const finalPerson=result.items[0].created_references.find(x=>x.type==='people').id;assert.match((await rows('select private.subscriber_number($1,$2) n',[org,finalPerson]))[0].n,/^[1-9][0-9]+$/);
    assert.equal((await rows('select private.starter_student_count($1) n',[org]))[0].n,'100');assert.equal((await rows("select count(*)::int n from core.people where org_id=$1 and display_name='Synthetic overflow'",[org]))[0].n,0);assert.equal((await rows('select sum(amount_minor)::text n from core.debts where org_id=$1',[org]))[0].n,'310');
   });
   await t.test('live manager revocation fences queued import and old result recovery',async()=>{
