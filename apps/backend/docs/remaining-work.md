@@ -204,6 +204,8 @@ Bu tablo yalnız izdir; eski kabul metinleri ikinci kez tutulmaz.
 - **Doğrulama senaryosu:** Mevcut/yeni/doğrulanmamış/Google adresi; gerçek PKCE/nonce ekranı frontend sahibinde; kaynak teslimi tekrar yapılmaz.
 - **Kaynak alanı:** native Auth config/readback; mevcut hesap acceptance; runbook
 
+**Bu paketin backend dilimi:** Mevcut hesap-oturum harness’inde native parola değişimi sonrası işlem yapılan oturumun korunması, diğer native session’ın silinmesi, henüz süresi dolmamış JWT ve refresh isteğinin reddi eklendi. Bu kaynak testi hosted mevcut-parola/24 saat nonce, gerçek PKCE/recovery/posta veya eski ortamların fiziksel temizliği kabulü değildir; S08 bu dış kabul sınırlarıyla açık kalır. Yeni sağlayıcı harness’i/özel Auth katmanı kurulmadı. Gerçek çalışma sonucu ve aday/main/ortam aşaması [devirde](00-FtkSaaS-yeni-sohbet-devir.md#s07s10-kabul-paketi).
+
 <a id="s09"></a>
 ### S09 — Starter günlük ders ve hak akışı
 
@@ -214,15 +216,19 @@ Bu tablo yalnız izdir; eski kabul metinleri ikinci kez tutulmaz.
 - **Doğrulama senaryosu:** Son yer/son hak yarışı; iptal-telafi ve tekrar kapanış; mevcut güçlü testleri yeniden yazmadan eksik akışı tamamla.
 - **Kaynak alanı:** mevcut Starter, schedule, reservation, attendance, entitlement testleri
 
+**Bu paketin backend dilimi:** Mevcut Starter harness’ine sonlu program→bir kredili paket→borca gerçek manuel tahsilat/replay→iki öğrencinin son yer yarışı→aynı öğrencinin son hak yarışı→atanmış eğitmenin taslağı→CM kapanışı/replay→gerekçeli düzeltme/replay→öğrencinin iptali zinciri eklendi. Kişisel sıfır negatif limit açık fixture seçimidir; merkez varsayımı veya mevcut iki kredili testin değişikliği değildir. Mali geçmişin korunması, negatif bakiye ve Starter hakedişi oluşmaması denetlenir. Mevcut iptal/telafi ve atomiklik testleri korunur; sonucun [kaynak/ortam kaydı](00-FtkSaaS-yeni-sohbet-devir.md#s07s10-kabul-paketi) aday/main tesliminden ayrıdır.
+
 <a id="s10"></a>
 ### S10 — Ayar ve eylem yetkisi tüketicileri
 
 - [ ] **Tür:** D · **Plan:** Tümü; ilk kabul Starter · **Özellik:** F02,F03,F04,F06
 - **Bağımlılık:** A03
-- **Kabul:** Kabul edilmiş 69 grup alan, varsayılan/miras, yetki ve gerçek davranışla eşlenir.
+- **Kabul:** Kabul edilmiş 69 davranış grubu, varsayılan/miras, yetki ve gerçek davranışla eşlenir; bu gruplar typed katalogdaki alan sayısı değildir.
 - **Sınır/olumsuz durum:** Unsupported alan etkin gösterilmez; availability okuması zaten var; kalıcı yeni ayar uydurulmaz.
 - **Doğrulama senaryosu:** Owner/merkez/personel/self ve plan kapıları; değişiklik→yeniden okuma→etkilenen işlem; Pro bildirim alanları P14/P15 ile kapanır. Hatırlatma/quiet-hours hedefi P15, mevcut availability okuması kaynakta mevcuttur.
 - **Kaynak alanı:** docs/settings.md; typed settings/management SQL; ilgili test
+
+**İncelenen kapsam:** 69 normatif davranış grubu ile mevcut 67 typed alan aynı sayım değildir. Beş scope’un katalog/typed round-trip, yetki, sürüm/reset/replay testleri frontend-settings-acceptance; org kopyası/merkez seçimi, program süresi, availability, paket, medya/paylaşım/public ve tahsilat tüketicileri starter-preparation-acceptance içindedir. Mevcut çalışan testler tekrar yazılmaz; bu pakette kaynak/gerçek koşu kanıtı uzlaştırılır. Bunlardan bütün 69 grubun, gerçek frontend/hosted davranışının veya Pro bildirim/zamanlama kabulünün kapandığı sonucu çıkarılmaz; P14/P15 ve gerekli ortam kabulleri açık kalır. [Kaynak/ortam kaydı](00-FtkSaaS-yeni-sohbet-devir.md#s07s10-kabul-paketi).
 
 <a id="s11"></a>
 ### S11 — Rapor ve güvenli indirme

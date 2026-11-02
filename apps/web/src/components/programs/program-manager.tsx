@@ -8,6 +8,9 @@ import { Badge } from "@ftksaas/ui/components/badge";
 import { classValues, getClasses, getProgramCatalog } from "../../lib/program";
 import { setupError, type SetupScope } from "../../lib/studio-setup";
 import { errorKey } from "../setup/setup-command";
+import { ProgramRecovery } from "./program-recovery";
+import { SingleSessionForm } from "./single-session-form";
+import { ClassDuty } from "./class-duty";
 import { ClassForm } from "./class-form";
 import { ProgramHistory } from "./program-history";
 import { ProgramForm, type ProgramCatalog } from "./program-form";
@@ -69,7 +72,12 @@ export function ProgramManager({
       </div>
       {savedNotice && <output aria-live="polite">{t("saved")}</output>}
       {!current && <output aria-live="polite">{t("loading")}</output>}
-      {current?.error && <p role="alert">{errors(current.error)}</p>}
+      {current?.error && (
+        <>
+          <p role="alert">{errors(current.error)}</p>
+          <ProgramRecovery key={key} scope={scope} onSaved={saved} />
+        </>
+      )}
       {current?.catalog && current.classes && (
         <div className="grid min-w-0 gap-5 lg:grid-cols-[minmax(0,1fr)_minmax(0,2fr)]">
           <div className="min-w-0 space-y-3">
@@ -123,6 +131,22 @@ export function ProgramManager({
                 />
               </CardContent>
             </Card>
+            <Card className="min-w-0 shadow-none">
+              <CardHeader>
+                <CardTitle>
+                  <h3>{t("createSession")}</h3>
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <SingleSessionForm
+                  scope={scope}
+                  timeZone={timeZone}
+                  catalog={current.catalog}
+                  classes={current.classes.map((c) => classValues(c)!)}
+                  onSaved={saved}
+                />
+              </CardContent>
+            </Card>
             {value && (
               <Card className="min-w-0 shadow-none">
                 <CardHeader>
@@ -131,6 +155,19 @@ export function ProgramManager({
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
+                  <ClassDuty
+                    scope={scope}
+                    classId={value.id}
+                    people={
+                      current.catalog.duties ??
+                      current.catalog.instructors.map((p) => ({
+                        ...p,
+                        duty: "instructor" as const,
+                      }))
+                    }
+                    onSaved={saved}
+                  />
+                  <div className="my-6 border-t" />
                   <ProgramForm
                     key={value.id}
                     scope={scope}

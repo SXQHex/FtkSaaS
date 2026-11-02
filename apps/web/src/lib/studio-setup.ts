@@ -6,6 +6,7 @@ import type {
   ManagementStateView,
 } from "@ftksaas/api-contracts";
 import { apiClient, ApiFailure } from "./api";
+import { sessionCapacity } from "./session-create";
 export const setupWrites = [
   "organization_update_v1",
   "center_create_v1",
@@ -24,6 +25,8 @@ export const setupWrites = [
   "center_discipline_set_v1",
   "class_save_v1",
   "program_apply_v1",
+  "class_assignment_set_v1",
+  "session_create_v1",
 ] as const;
 export type SetupWrite = (typeof setupWrites)[number];
 type SetupRead =
@@ -85,6 +88,17 @@ const fields: Record<SetupWrite, string[]> = {
   center_discipline_set_v1: ["discipline_id", "state", "expected_version"],
   class_save_v1: ["class_id", "name", "external_open", "discipline_id", "expected_version"],
   program_apply_v1: ["preview"],
+  class_assignment_set_v1: ["class_id", "person_id", "duty", "state", "expected_version"],
+  session_create_v1: [
+    "class_id",
+    "interval",
+    "resources",
+    "assignments",
+    "capacity",
+    "discipline_id",
+    "format",
+    "inherit_class_assignments",
+  ],
 };
 export function recoverSetup(scope: SetupScope, slot: string): PendingSetup | "invalid" | null {
   try {
@@ -102,6 +116,8 @@ export function recoverSetup(scope: SetupScope, slot: string): PendingSetup | "i
       (value.blocked !== undefined && typeof value.blocked !== "boolean")
     )
       return "invalid";
+    if (command.operation === "session_create_v1")
+      sessionCapacity(input.capacity.total, input.capacity.categories);
     const allowed = [
       "org_id",
       "center_id",
@@ -118,6 +134,7 @@ export function recoverSetup(scope: SetupScope, slot: string): PendingSetup | "i
       return "invalid";
     if (input.timezone !== undefined && typeof input.timezone !== "string") return "invalid";
     if (
+      command.operation !== "session_create_v1" &&
       input.capacity !== undefined &&
       (!Number.isSafeInteger(input.capacity) || input.capacity < 0)
     )

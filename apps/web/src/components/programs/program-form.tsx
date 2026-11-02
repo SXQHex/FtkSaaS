@@ -13,6 +13,7 @@ export type ProgramCatalog = {
   rooms: NamedOption[];
   instructors: NamedOption[];
   disciplines: NamedOption[];
+  duties?: import("./class-duty").DutyOption[];
 };
 export function ProgramForm({
   scope,

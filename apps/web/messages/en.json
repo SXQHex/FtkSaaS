@@ -1109,6 +1109,31 @@
       "sessions": "Session",
       "program_versions": "Program",
       "classes": "Class"
-    }
+    },
+    "categoryCapacity": "Use category capacities",
+    "male": "Male capacity",
+    "female": "Female capacity",
+    "inheritDuties": "Use default class duties",
+    "defaultDuties": "Default class duties",
+    "dutyImpact": "Defaults also update eligible future sessions. Explicit session-level duty overrides are preserved.",
+    "dutyPerson": "Person to assign",
+    "dutyActive": "Default duty is active.",
+    "dutyInactive": "Default duty is not active.",
+    "confirmDutyImpact": "I confirm the class and future session effects",
+    "removeDuty": "Remove default duty",
+    "addDuty": "Activate default duty",
+    "assistant": "Assistant",
+    "createSession": "Create session",
+    "sessionClass": "Linked class",
+    "standalone": "Standalone session",
+    "format": "Session type",
+    "group": "Group lesson",
+    "private": "Private lesson",
+    "sessionStart": "Session start",
+    "sessionEnd": "Session end",
+    "timeOffset": "UTC offset for {label}",
+    "recovery": "Pending calendar operations",
+    "recoveryHint": "Even if catalogs are unavailable, check a previous operation or replay the same request.",
+    "recoveryUnavailable": "The operation journal cannot be read. Verify the current result before sending a new operation."
   }
 }

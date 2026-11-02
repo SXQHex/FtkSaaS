@@ -37,3 +37,23 @@ test("zero capacity survives and missing duration is not defaulted", () => {
     "invalidForm",
   );
 });
+
+test("inherited duties send no explicit instructor and preserve category limits", () => {
+  const schedule = buildProgram(
+    {
+      ...input,
+      local_start: "12:00",
+      person_id: "",
+      inherit_class_assignments: true,
+      categories: { male: 0, female: 20 },
+    },
+    "Europe/Istanbul",
+    {},
+  );
+  expect(schedule.assignments).toEqual([]);
+  expect(schedule.inherit_class_assignments).toBe(true);
+  expect(schedule.capacity).toEqual({ total: 20, categories: { male: 0, female: 20 } });
+  expect(() =>
+    buildProgram({ ...input, local_start: "12:00", person_id: "" }, "Europe/Istanbul", {}),
+  ).toThrow("invalidForm");
+});

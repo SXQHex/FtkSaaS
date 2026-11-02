@@ -1,6 +1,7 @@
 "use client";
 import { useId, useMemo } from "react";
 import { useTranslations } from "next-intl";
+import { CapacityFields } from "./capacity-fields";
 import { Button } from "@ftksaas/ui/components/button";
 import { Input } from "@ftksaas/ui/components/input";
 import { Label } from "@ftksaas/ui/components/label";
@@ -103,6 +104,14 @@ export function ProgramFields({
           ))}
         </div>
       </fieldset>
+      <label className="flex min-h-11 items-center gap-3 text-sm">
+        <input
+          type="checkbox"
+          checked={!!draft.inherit_class_assignments}
+          onChange={(e) => setDraft({ ...draft, inherit_class_assignments: e.target.checked })}
+        />
+        {t("inheritDuties")}
+      </label>
       <div className="grid gap-4 sm:grid-cols-2">
         {(
           [
@@ -114,7 +123,8 @@ export function ProgramFields({
             <Label htmlFor={`${id}-${name}`}>{t(label)}</Label>
             <select
               id={`${id}-${name}`}
-              required
+              required={!draft.inherit_class_assignments || name === "room_id"}
+              disabled={name === "person_id" && draft.inherit_class_assignments}
               value={draft[name]}
               onChange={(event) => setDraft({ ...draft, [name]: event.target.value })}
               className="min-h-11 w-full rounded-md border bg-background px-3 text-sm"
@@ -129,7 +139,11 @@ export function ProgramFields({
           </div>
         ))}
       </div>
-      {field("total", "capacity", "number")}
+      <CapacityFields
+        total={draft.total}
+        categories={draft.categories}
+        onChange={(total, categories) => setDraft({ ...draft, total, categories })}
+      />
       {ambiguous.map(({ date, choices }) => (
         <div key={date} className="space-y-2">
           <Label htmlFor={`${id}-${date}`}>{t("offset", { date })}</Label>

@@ -1,4 +1,5 @@
 import type { ManagementStateView, ProgramSpec } from "@ftksaas/api-contracts";
+import { sessionCapacity } from "./session-create";
 import { localTimeChoices } from "./session-change";
 import { setupCall, type SetupScope } from "./studio-setup";
 
@@ -37,6 +38,8 @@ export type ProgramInput = {
   room_id: string;
   person_id: string;
   total: number;
+  categories?: ProgramSpec["capacity"]["categories"];
+  inherit_class_assignments?: boolean;
 };
 export function buildProgram(
   input: ProgramInput,
@@ -45,7 +48,7 @@ export function buildProgram(
 ): ProgramSpec {
   if (
     !input.room_id ||
-    !input.person_id ||
+    (!input.person_id && !input.inherit_class_assignments) ||
     !Number.isSafeInteger(input.total) ||
     input.total < 0 ||
     !Number.isSafeInteger(input.duration_minutes) ||
@@ -69,10 +72,12 @@ export function buildProgram(
     ends_on: input.ends_on,
     duration_minutes: input.duration_minutes,
     room_id: input.room_id,
-    assignments: [{ person_id: input.person_id, duty: "instructor" }],
-    capacity: { total: input.total },
+    assignments: input.inherit_class_assignments
+      ? []
+      : [{ person_id: input.person_id, duty: "instructor" }],
+    capacity: sessionCapacity(input.total, input.categories),
     offset_choices: choices,
-    inherit_class_assignments: false,
+    inherit_class_assignments: input.inherit_class_assignments ?? false,
   };
 }
 export async function getClasses(scope: SetupScope) {
@@ -130,11 +135,14 @@ export async function getProgramCatalog(scope: SetupScope) {
   const relations = await Promise.all(
     candidates.map((d) => getCenterDiscipline(scope.orgId, scope.centerId!, d.id)),
   );
-  const instructors = roles.filter(
-    (r) => r.role === "instructor" && r.state === "active" && r.scope_center_id === scope.centerId,
+  const duties = roles.filter(
+    (r) =>
+      ["instructor", "assistant"].includes(r.role) &&
+      r.state === "active" &&
+      r.scope_center_id === scope.centerId,
   );
   const people = await Promise.all(
-    instructors.map((r) =>
+    duties.map((r) =>
       setupCall("person_get_v1", {
         org_id: scope.orgId,
         center_id: scope.centerId,
@@ -153,6 +161,13 @@ export async function getProgramCatalog(scope: SetupScope) {
           throw Error("unreadableRoom");
         return { id: r.entity.id, name: r.current.values.name };
       }),
-    instructors: people.map((p) => ({ id: p.id, name: p.display_name })),
+    instructors: people
+      .filter((_, i) => duties[i].role === "instructor")
+      .map((p) => ({ id: p.id, name: p.display_name })),
+    duties: people.map((p, i) => ({
+      id: p.id,
+      name: p.display_name,
+      duty: duties[i].role as "instructor" | "assistant",
+    })),
   };
 }

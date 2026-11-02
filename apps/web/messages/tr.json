@@ -1109,6 +1109,31 @@
       "sessions": "Seans",
       "program_versions": "Program",
       "classes": "Sınıf"
-    }
+    },
+    "categoryCapacity": "Kategori kontenjanı kullan",
+    "male": "Erkek kontenjanı",
+    "female": "Kadın kontenjanı",
+    "inheritDuties": "Sınıfın varsayılan görevlerini kullan",
+    "defaultDuties": "Sınıfın varsayılan görevleri",
+    "dutyImpact": "Varsayılan görevler uygun gelecek seanslara da yansır. Seansa özel açık görev değişiklikleri korunur.",
+    "dutyPerson": "Görevlendirilecek kişi",
+    "dutyActive": "Varsayılan görev etkin.",
+    "dutyInactive": "Varsayılan görev etkin değil.",
+    "confirmDutyImpact": "Sınıf ve gelecek seans etkilerini onaylıyorum",
+    "removeDuty": "Varsayılan görevi kaldır",
+    "addDuty": "Varsayılan görevi etkinleştir",
+    "assistant": "Asistan",
+    "createSession": "Seansı oluştur",
+    "sessionClass": "Bağlı sınıf",
+    "standalone": "Bağımsız seans",
+    "format": "Seans türü",
+    "group": "Grup dersi",
+    "private": "Özel ders",
+    "sessionStart": "Seans başlangıcı",
+    "sessionEnd": "Seans bitişi",
+    "timeOffset": "{label} için UTC farkı",
+    "recovery": "Bekleyen takvim işlemleri",
+    "recoveryHint": "Katalog okunamasa da önceki işlemin sonucunu kontrol edebilir veya aynı isteği yeniden gönderebilirsiniz.",
+    "recoveryUnavailable": "Bu sekmedeki işlem kaydı okunamıyor. Yeni işlem göndermeden mevcut sonucu doğrulayın."
   }
 }

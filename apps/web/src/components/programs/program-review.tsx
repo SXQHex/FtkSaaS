@@ -59,6 +59,12 @@ export function ProgramReview({
             —{" "}
             {format.dateTime(new Date(session.interval.ends_at), { timeZone, timeStyle: "short" })}{" "}
             · {t("places", { count: session.capacity.total })}
+            {session.capacity.categories && (
+              <p className="mt-1 text-muted-foreground">
+                {t("male")}: {session.capacity.categories.male} · {t("female")}:{" "}
+                {session.capacity.categories.female}
+              </p>
+            )}
           </li>
         ))}
       </ul>
