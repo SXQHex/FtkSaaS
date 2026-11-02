@@ -66,6 +66,8 @@ test('P01-A catalog and purchased-right reads through real Auth -> Edge -> RPC',
   assert.equal(item.terms.name,base.name); // Existing publisher retains the product identity name.
   assert(!list.items.some(x=>x.version_id===version||x.version_id===remoteVersion||x.version_id===timedVersion));
   assert.equal((await read()).find(x=>x.sale_id===sold).product_version_id,version);
+  const numbered=await must(owner,'person_get_v1',scope({person_id:self.p}));
+  const rightRows=await read();assert(rightRows.length>0);assert(rightRows.every(x=>x.person_id===self.p&&x.subscriber_number===numbered.subscriber_number));
   const price=(await rows('select net_minor::text amount from core.sales where id=$1',[sold]))[0].amount;assert.equal(price,'0');
   const saved=await rows('select effective_at from core.product_versions where id=$1',[updated]);
   await db.query("update core.product_versions set effective_at=now()+interval '1 day' where id=$1",[updated]);
