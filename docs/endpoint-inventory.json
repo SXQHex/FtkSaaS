@@ -4889,7 +4889,9 @@
       "permission": "management.inspect",
       "features": [
         "F09",
-        "F12"
+        "F12",
+        "F10",
+        "F08"
       ],
       "required_features": [],
       "runtime_required_features": [],
@@ -4903,7 +4905,7 @@
       },
       "billing_class": "read",
       "limits": [
-        "Original live write authority; negative valuation, P01 request and person/session waitlist selectors only. Other selectors unavailable."
+        "Original live authority and supported selectors are listed in runtime_selectors. Class/program discovery requires explicit organization/center and live schedule.manage; program reuse requires a fresh preview, never a saved approval."
       ]
     },
     {

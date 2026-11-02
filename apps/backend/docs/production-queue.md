@@ -20,22 +20,13 @@ Bu dosya yalnız **sıra, bağımlı teslim paketleri ve kontrol noktalarının*
 | 11 | [P14](remaining-work.md#p14)–[P16](remaining-work.md#p16) | E-posta teslim→zamanlama/sessiz saat→otomasyon |
 | 12 | [B01](remaining-work.md#b01)–[B05](remaining-work.md#b05) | Business scope, ortak inbox, hesaplaşma, rapor ve özel teklif |
 
-**Aktif kontrol noktası:** A03 kaynak/plan/WF eşlemesi ve S01 mevcut oda okumasının sözleşme/test dilimi adayda. A03 özellik bazlı kaynak/run/ortam ve boşluk uzlaştırması açık. S01 gerçek API regresyonu doğrulanmadan S02 uygulamasına geçilmez; A03–S05 aynı Draft PR kapsamında kalır.
+**Aktif kullanıcı önceliği:** S01–S02 ayrı bir geliştirme PR'sinde tamamlanır. S01'in PR129 kaynak/CI/main/development kabulü doğrulandı; S02 sınıf/program okuma dilimi aynı mevcut mimaride geliştirilir. A03.2/A03.3 bağımsız açık kalır; bu ayrı teslimin ön koşulu sayılmaz. S03–S05 bu PR'nin kapsamına alınmaz. Frontend'in kendi sırası değişmez.
 
-**Aktif kullanıcı önceliği:** [A03](remaining-work.md#a03) → [S01](remaining-work.md#s01) → [S02](remaining-work.md#s02) → [S03](remaining-work.md#s03) → [S04](remaining-work.md#s04) → [S05](remaining-work.md#s05). Frontend'in kendi ekran/kabul sırası değişmez; CI süre optimizasyonu ürün sırasının önüne geçmez.
+### S01–S02 kontrol noktaları
 
-### A03–S05 teslim paketi ve kontrol noktaları
+Alt adımlar ve kapanış ölçütleri [backlog](remaining-work.md#s01), kaynak/run/ortam kanıtı [devir](00-FtkSaaS-yeni-sohbet-devir.md) sahibindedir. Mevcut oda yönetim okuması yeniden kurulmaz; sınıf/program keşfi, özgün program tanımı ve güncel sürüm/izin sınırı birlikte incelenir. S02 gerçek API/son kaynak kabulü geçince bu teslim merge adayı olur; yeni özellik veya frontend ekran kabulü kendiliğinden kapanmaz.
 
-Alt adımlar ve ölçülebilir dilim kabulü yalnız [backlog'daki ilgili görevlerde](remaining-work.md#a03) tutulur. Uygulama tek Draft PR içinde dilim dilim ilerler; her fonksiyon için ayrı PR açılmaz. Bu belge PR'si uygulama teslimi veya A03–S05 kapanışı değildir.
-
-| Kontrol noktası | Sıra ve sonraki adım |
-|---|---|
-| A03 sonrası | Mevcut kanıt ile gerçek geliştirme boşluğu ayrılmış olmalı; S01'e geçilir. |
-| S02 sonrası | S01→S02 oda/sınıf/program okuma-düzenleme kabulü incelenir; S03'e geçilir. |
-| S04 sonrası | S03→S04 tahsis/ilk aktarım/birleşim ve yarış kabulü birlikte incelenir; S05'e geçilir. |
-| S05 sonrası | Etkilenen sözleşme/üretilmiş çıktı/WF devri ve son kaynak incelemesi tamamlanır; yürürlükteki CI politikasına göre aday kabulüne geçilir. |
-
-S03'ün teknik bağımlılığı A01 olsa da bu pakette kullanıcı sırası korunur. Her dilimde değişen davranışın uygun odak testi ve gerekli sözleşme/devri aynı dalda tamamlanır; sırf kontrol noktası için boş commit veya mükerrer clean üretilmez. S06 ve sonrası bu paketin kapsamına kendiliğinden eklenmez.
+Sonraki ürün sırası A03 kalan uzlaştırma ve S03→S04→S05'tir. S06 ve sonrası kapsam dışıdır. Anlamlı modül sınırı korunur; sırf durum için boş commit veya tekrarlı clean üretilmez.
 
 ## Ortak işletim hattı
 
