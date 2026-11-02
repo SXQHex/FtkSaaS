@@ -744,3 +744,38 @@ test("invalid closure interval is announced and associated with both date fields
   expect(end).toHaveAccessibleDescription(expect.stringContaining(alert.textContent!));
   expect(mocks.send).not.toHaveBeenCalled();
 });
+
+test("room and instructor availability landmarks have distinct resource names", async () => {
+  render(
+    <>
+      <AvailabilityEditor
+        scope={{ ...scope, centerId: center.id }}
+        resource={{ kind: "room", id: center.id }}
+        resourceName="Shared Resource"
+      />
+      <AvailabilityEditor
+        scope={{ ...scope, centerId: center.id }}
+        resource={{ kind: "person", id: center.id }}
+        resourceName="Shared Resource"
+      />
+    </>,
+  );
+  expect(
+    await screen.findByRole("region", {
+      name: "Haftalık uygunluk — Oda: Shared Resource",
+    }),
+  ).toBeVisible();
+  expect(
+    screen.getByRole("region", {
+      name: "Haftalık uygunluk — Eğitmen: Shared Resource",
+    }),
+  ).toBeVisible();
+  expect(
+    screen.getByRole("region", { name: "Kayıtlı kapanışlar — Oda: Shared Resource" }),
+  ).toBeVisible();
+  expect(
+    screen.getByRole("region", {
+      name: "Kayıtlı kapanışlar — Eğitmen: Shared Resource",
+    }),
+  ).toBeVisible();
+});

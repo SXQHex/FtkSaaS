@@ -1029,6 +1029,8 @@
     "noInstructorTasks": "No sessions require an instructor.",
     "inspectSession": "Review current session",
     "replacementInstructor": "Replacement instructor",
-    "assignSessionInstructor": "Assign instructor to session"
+    "assignSessionInstructor": "Assign instructor to session",
+    "availabilityFor": "Weekly availability — {resource}",
+    "closuresFor": "Recorded closures — {resource}"
   }
 }

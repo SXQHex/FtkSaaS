@@ -311,6 +311,7 @@ export function RoleSetup({ scope, onChanged }: { scope: SetupScope; onChanged: 
                 <AvailabilityEditor
                   scope={scope}
                   resource={{ kind: "person", id: role.person_id }}
+                  resourceName={name ?? t("nameUnavailable")}
                 />
               </div>
             ))}

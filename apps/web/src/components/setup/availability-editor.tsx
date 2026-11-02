@@ -135,9 +135,11 @@ function RuleForm({
 export function AvailabilityEditor({
   scope,
   resource,
+  resourceName,
 }: {
   scope: SetupScope;
   resource: ResourceRef;
+  resourceName?: string;
 }) {
   const t = useTranslations("setup");
   const [rules, setRules] = useState<ManagementStateView[] | null>(null);
@@ -168,7 +170,16 @@ export function AvailabilityEditor({
     setRetry((n) => n + 1);
   };
   return (
-    <section className="space-y-4" aria-label={t("availability")}>
+    <section
+      className="space-y-4"
+      aria-label={
+        resourceName
+          ? t("availabilityFor", {
+              resource: `${t(resource.kind === "room" ? "limits.rooms" : "roles.instructor")}: ${resourceName}`,
+            })
+          : t("availability")
+      }
+    >
       <h3 className="text-lg font-semibold">{t("availability")}</h3>
       <p className="text-sm text-muted-foreground">{t("availabilityHint")}</p>
       <Button type="button" variant="outline" onClick={saved}>
@@ -195,7 +206,13 @@ export function AvailabilityEditor({
           <RuleForm key={`new:${retry}`} scope={scope} resource={resource} onSaved={saved} />
         </div>
       )}
-      <ClosureList key={retry} scope={scope} resource={resource} revision={retry} />
+      <ClosureList
+        key={retry}
+        scope={scope}
+        resource={resource}
+        revision={retry}
+        resourceName={resourceName}
+      />
       <ExceptionForm scope={scope} resource={resource} onSaved={saved} />
     </section>
   );

@@ -1029,6 +1029,8 @@
     "noInstructorTasks": "Eğitmen atanması gereken seans yok.",
     "inspectSession": "Güncel seansı incele",
     "replacementInstructor": "Yeni eğitmen",
-    "assignSessionInstructor": "Eğitmeni seansa ata"
+    "assignSessionInstructor": "Eğitmeni seansa ata",
+    "availabilityFor": "Haftalık uygunluk — {resource}",
+    "closuresFor": "Kayıtlı kapanışlar — {resource}"
   }
 }
