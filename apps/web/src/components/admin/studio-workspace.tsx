@@ -232,7 +232,7 @@ export function StudioWorkspace() {
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <ScheduleWorkspace studios={snapshot.studios} />
+                <ScheduleWorkspace studios={snapshot.studios} actorId={snapshot.account.id} />
               </CardContent>
             </Card>
             <Card className="shadow-none">
@@ -292,7 +292,9 @@ export function StudioWorkspace() {
           </Card>
         </div>
       )}
-      {snapshot && section === "schedule" && <ScheduleWorkspace studios={snapshot.studios} />}
+      {snapshot && section === "schedule" && (
+        <ScheduleWorkspace studios={snapshot.studios} actorId={snapshot.account.id} />
+      )}
       {snapshot && section === "students" && (
         <StudentsWorkspace studios={snapshot.studios} actorId={snapshot.account.id} />
       )}
