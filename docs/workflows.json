@@ -269,7 +269,7 @@
       ],
       "review": {
         "fingerprint": "cb4812c4ba4884aaa0d45a938398d4846b0203e0e47ad4b0a2969d4728c9775b",
-        "reason": "Final migration inventory adds the new digest without rewriting existing historical manifest entries; canonical instructor source and request protocol reviewed."
+        "reason": "CI diagnosis: remove duplicate canonical role fixture; preserve scoped inactive-instructor CM access while staff, foreign-center, tenant and revoked-manager reads remain denied; pagination assertion unchanged."
       }
     },
     {
@@ -437,8 +437,8 @@
         "role_revoke_preview_v1"
       ],
       "review": {
-        "fingerprint": "c3d722a0089da76604359a19f4a16ffe34842ed76a6d989161d0907c2ebfc0e1",
-        "reason": "One instructor role authority; existing merge scope remapper reused, offline acceptance uses live owner, original history pagination and revoked-CM assertions retained."
+        "fingerprint": "6bc63f76e671231deeedd730cdd61a172260ce2099aef97af01fa8de0e653aff",
+        "reason": "CI diagnosis: remove duplicate canonical role fixture; preserve scoped inactive-instructor CM access while staff, foreign-center, tenant and revoked-manager reads remain denied; pagination assertion unchanged."
       }
     },
     {
@@ -524,8 +524,8 @@
         "class_assignment_set_v1"
       ],
       "review": {
-        "fingerprint": "030ce39a1859e3ed5a9d17da0aaa7113079f79c6f34f8637b50061639950ff20",
-        "reason": "Reviewed canonical instructor role authority, legacy migration, offline account/merge boundaries and equivalent fixtures; no second active relationship lifecycle remains."
+        "fingerprint": "2baa0923d0ca9429bb30145c18499aa99f5b8fde4650abe6151463843611854c",
+        "reason": "CI diagnosis: remove duplicate canonical role fixture; preserve scoped inactive-instructor CM access while staff, foreign-center, tenant and revoked-manager reads remain denied; pagination assertion unchanged."
       }
     },
     {

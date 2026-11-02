@@ -41,6 +41,12 @@ begin
   b:=replace(b,'delete from __physical_center_relationships','delete from core.center_relationships');
   execute b;
  end loop;
+ -- Inactive instructor history must not hide an existing center person from
+ -- its live manager. Staff still need an active operational relationship.
+ b:=pg_get_functiondef('private.person_operational_access(uuid,uuid,uuid,uuid)'::regprocedure);
+ anchor:=$a$and cr.state='active'$a$;
+ if array_length(string_to_array(b,anchor),1)<>2 then raise exception 'Historical instructor person scope anchor drift';end if;
+ execute replace(b,anchor,$a$and (cr.state='active' or (cr.kind='instructor' and private.is_manager(org,actor,center)))$a$);
  b:=pg_get_functiondef('private.execute_operation(text,jsonb,uuid,uuid,uuid[],jsonb)'::regprocedure);
  anchor:=$a$  insert into core.role_assignments(id,org_id,person_id,role,scope_center_id,state,account_link_id) values(record_id,org,target,role_name,center,'active',linked);$a$;
  if array_length(string_to_array(b,anchor),1)<>2 then raise exception 'Canonical instructor assignment anchor drift';end if;

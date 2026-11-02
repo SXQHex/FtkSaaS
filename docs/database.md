@@ -1,6 +1,6 @@
 # Veritabanı kaynak referansı
 
-Üretilmiştir: `node apps/backend/scripts/update-docs.mjs --write`. Elle düzenleme. Kaynak içerik özeti: `54767cd56f1eff862c4714d4752610b86ed86bfbf9fce3ee4f8d136f6918a96d`. Bu özet CI/hosted kabulü değildir; dağıtılan SHA ve ortam CD artifact'ında bulunur.
+Üretilmiştir: `node apps/backend/scripts/update-docs.mjs --write`. Elle düzenleme. Kaynak içerik özeti: `9411bf193ad48a16e3fe7227a0e6a4316d2ed56f91d765c38f5e00b9a12b2ad1`. Bu özet CI/hosted kabulü değildir; dağıtılan SHA ve ortam CD artifact'ında bulunur.
 
 Alan/scope/değişmez görünümü [fiziksel şema kataloğundadır](contracts/04-FtkSaaS-O4-veri-semasi.md). Bu dosya ikinci DDL sözleşmesi değildir. Etkin PostgreSQL şeması migration zincirinin uygulanmasıyla oluşur; dosyaları regex ile birleştirmek nihai şema çıkarımı sayılmaz.
 
@@ -101,4 +101,4 @@ Sıralı migration: 94. Uygulanmış içerik manifesti: [migrations.sha256.json]
 | [20261102070247_subscriber_report_catalog.sql](../apps/backend/supabase/migrations/20261102070247_subscriber_report_catalog.sql) | `ce269916150b64bd31e6771696d61c5ade0c483162daf48e3edc71992256e6b6` |
 | [20261102100000_starter_instructor_management.sql](../apps/backend/supabase/migrations/20261102100000_starter_instructor_management.sql) | `fe6109e2d0b36954964cf1f3274c5512d1011d23a53210e2c47957dde7a98887` |
 | [20261102121549_subscriber_operation_projections.sql](../apps/backend/supabase/migrations/20261102121549_subscriber_operation_projections.sql) | `0ec457747aca9a1bec1ead5dab0a684272c652eb7da4bf7e41a39135f4a14570` |
-| [20261102144907_instructor_center_lifecycle.sql](../apps/backend/supabase/migrations/20261102144907_instructor_center_lifecycle.sql) | `2c5300b2e678d4280ac85e03261ff010421a9a600ed88a47980ecb7f6524fc2e` |
+| [20261102144907_instructor_center_lifecycle.sql](../apps/backend/supabase/migrations/20261102144907_instructor_center_lifecycle.sql) | `d8e82033aacff591ec61b9dab110b8c37fcec91293ad66cae249eb169162df35` |

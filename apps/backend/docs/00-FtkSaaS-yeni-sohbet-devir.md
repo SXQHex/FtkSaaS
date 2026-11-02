@@ -41,7 +41,7 @@ ReservationView, AttendanceEntryView, EntitlementView, FinanceView ve NegativeLi
 
 ## Merkez eğitmen yaşam döngüsü düzeltmesi adayı
 
-XREQ-011 / S01.6 kullanıcı kararıyla rol atamasını tek eğitmen aktiflik kaynağı yapar. Eski ilişki geçmişi korunur; kişi/kota/yetkili keşif aynı projeksiyonu kullanır. Offline görev hesabı olmadan korunur; doğrulanmış hesap bağı olmadan erişim açılmaz. Kaynak ve gerçek API regresyonları hazırlandı. Yerel sözleşme/üretim/typecheck/governance/CI-politika kontrolleri geçti; native SQL/API kabulü bu çalışma ortamında çalıştırılamadı. Yeni migration/aday/main/hosted kabulü henüz yok. Önceki PR137/141 kabulü bu veri modeli düzeltmesinin kanıtı değildir.
+XREQ-011 / S01.6 kullanıcı kararıyla rol atamasını tek eğitmen aktiflik kaynağı yapar. Eski ilişki geçmişi korunur; kişi/kota/yetkili keşif aynı projeksiyonu kullanır. Offline görev hesabı olmadan korunur; doğrulanmış hesap bağı olmadan erişim açılmaz. Kaynak ve gerçek API regresyonları hazırlandı. Yerel sözleşme/üretim/typecheck/governance/CI-politika kontrolleri geçti; native SQL/API kabulü bu çalışma ortamında çalıştırılamadı. İlk PR143 adayı (head `838abe84f659482035613f8b0f4f46967df1c32e`, [run](https://github.com/SXQHex/FtkSaaS/actions/runs/41469441170)) core, API-1 ve API-4 kabulünü geçti; API-3 fixture’ında mükerrer rol ekleme ve API-2’de kaldırılan eğitmenin CM kişi okumasını engelleyen scope regresyonu kaldı. Sayfalama hatası, ilk alt test yarıda kaldığı için eksik fixture oluşmasının sonucudur; sayfalama assertion’ı değiştirilmedi. Kaynak düzeltmesi bu iki kök nedeni giderir; yeni aday/main/hosted kabulü henüz yok. Önceki PR137/141 kabulü bu veri modeli düzeltmesinin kanıtı değildir.
 
 ## Devam noktası
 

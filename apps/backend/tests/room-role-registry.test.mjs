@@ -174,6 +174,10 @@ test('Room configuration and scoped role reads through real Auth/API',async t=>{
   assert.equal((await rows("select count(*)::int n from core.center_relationships where org_id=$1 and person_id=$2 and kind='instructor'",[org,teacher.p]))[0].n,0);
   const remoteSnapshot=async()=>JSON.stringify({relationships:(await relationships()).filter(x=>x.center_id===other),roles:await rows('select * from core.role_assignments where id=$1',[remoteGrant.primary_id])});
   const remoteBefore=await remoteSnapshot();
+  const historyManager=await linked('rooms-instructor-history-manager','center_manager');
+  const historyStaff=await linked('rooms-instructor-history-staff','staff');
+  await db.query("insert into core.permission_overrides(id,org_id,center_id,person_id,permission,enabled) values($1,$2,$3,$4,'person.manage',true)",[key(),org,center,historyStaff.p]);
+  assert((await must(historyStaff.u,'person_get_v1',scope({person_id:teacher.p}))).relationships.some(x=>x.kind==='instructor'&&x.state==='active'));
   const command={assignment_id:teacher.grant.primary_id,expected_version:teacher.grant.version,reason:'Remove the whole instructor center lifecycle'};
   const preview=()=>mutate('role_revoke_preview_v1',{assignment_id:command.assignment_id,expected_version:command.expected_version});
   const stale=await preview();
@@ -188,6 +192,13 @@ test('Room configuration and scoped role reads through real Auth/API',async t=>{
   const revoked=await mutate('role_revoke_v1',body,k);
   const local=(await relationships()).filter(x=>x.center_id===center);assert.equal(local.length,1);assert.equal(local[0].state,'inactive');
   assert.deepEqual(await personRelationships(),[{center_id:center,kind:'instructor',state:'inactive'}]);
+  const historical=await must(historyManager.u,'person_get_v1',scope({person_id:teacher.p}));
+  assert.deepEqual(historical.relationships.filter(x=>x.kind==='instructor'),[{center_id:center,kind:'instructor',state:'inactive'}]);
+  await fail('person_get_v1',{person_id:teacher.p},'NOT_FOUND',historyStaff.u);
+  await fail('person_get_v1',{person_id:teacher.p,center_id:other},'NOT_FOUND',historyManager.u);
+  await fail('person_get_v1',{person_id:teacher.p},'NOT_FOUND',stranger);
+  await mutate('center_manager_revoke_v1',{person_id:historyManager.p,expected_version:historyManager.grant.version,reason:'History reader permission removed'});
+  await fail('person_get_v1',{person_id:teacher.p},'NOT_FOUND',historyManager.u);
   assert.equal((await rows("select count(*)::int n from core.role_assignments where org_id=$1 and scope_center_id=$2 and person_id=$3 and role='instructor' and state='active'",[org,center,teacher.p]))[0].n,0);
   assert.equal(await remoteSnapshot(),remoteBefore);
   const after=JSON.stringify(await relationships());
