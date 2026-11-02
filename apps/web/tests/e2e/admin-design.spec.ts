@@ -175,3 +175,38 @@ test("desktop shell collapses and English pages support enlarged text", async ({
     await expectNoHorizontalOverflow(page, route);
   }
 });
+
+test("mobile menu keeps keyboard focus inside and returns it to the trigger on Escape", async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 320, height: 950 });
+  await page.goto("/tasarim#studio");
+  const trigger = page.getByRole("button", { name: "Menüyü aç", exact: true });
+  await trigger.focus();
+  await page.keyboard.press("Enter");
+  const dialog = page.getByRole("dialog", { name: "Ana menü", exact: true });
+  const close = dialog.getByRole("button", { name: "Kapat", exact: true });
+  await expect(close).toBeFocused();
+  await page.keyboard.press("Shift+Tab");
+  await expect(dialog.getByRole("button", { name: /Hesap ve görünüm/ })).toBeFocused();
+  await page.keyboard.press("Tab");
+  await expect(close).toBeFocused();
+  await page.keyboard.press("Escape");
+  await expect(dialog).toBeHidden();
+  await expect(trigger).toBeFocused();
+  await page.keyboard.press("Enter");
+  await dialog.getByRole("button", { name: "Ayarlar", exact: true }).click();
+  await expect(page.getByRole("heading", { name: "Ayarlar", exact: true })).toBeVisible();
+  await expect(page.getByRole("main")).toBeFocused();
+  await trigger.click();
+  await dialog.getByRole("button", { name: "Yardım", exact: true }).click();
+  const help = page.getByRole("dialog", { name: "Yardım", exact: true });
+  await expect(dialog).toBeHidden();
+  await expect(help.getByRole("button", { name: "Kapat", exact: true })).toBeFocused();
+  await help.getByRole("button", { name: "Kapat", exact: true }).click();
+  await trigger.click();
+  await dialog.getByRole("button", { name: /Hesap ve görünüm/ }).click();
+  const preferences = page.getByRole("dialog", { name: "Hesap ve görünüm", exact: true });
+  await expect(dialog).toBeHidden();
+  await expect(preferences.getByRole("button", { name: "Kapat", exact: true })).toBeFocused();
+});

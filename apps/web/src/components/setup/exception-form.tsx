@@ -85,17 +85,37 @@ export function ExceptionForm({
       }}
     >
       <h4 className="font-medium">{t("closureTitle")}</h4>
-      <p className="text-sm text-muted-foreground">{t("closureHint")}</p>
+      <p id={`${id}-hint`} className="text-sm text-muted-foreground">
+        {t("closureHint")}
+      </p>
       <fieldset disabled={!version || command.busy || !!command.pending} className="space-y-4">
         <Label htmlFor={`${id}-start`}>{t("closureStart")}</Label>
-        <Input id={`${id}-start`} name="start" placeholder="2030-01-01T18:00:00+03:00" required />
+        <Input
+          id={`${id}-start`}
+          name="start"
+          aria-invalid={error === "invalidInterval" || undefined}
+          aria-describedby={`${id}-hint${error === "invalidInterval" ? ` ${id}-error` : ""}`}
+          placeholder="2030-01-01T18:00:00+03:00"
+          required
+        />
         <Label htmlFor={`${id}-end`}>{t("closureEnd")}</Label>
-        <Input id={`${id}-end`} name="end" placeholder="2030-01-01T20:00:00+03:00" required />
+        <Input
+          id={`${id}-end`}
+          name="end"
+          aria-invalid={error === "invalidInterval" || undefined}
+          aria-describedby={`${id}-hint${error === "invalidInterval" ? ` ${id}-error` : ""}`}
+          placeholder="2030-01-01T20:00:00+03:00"
+          required
+        />
         <Label htmlFor={`${id}-reason`}>{t("closureReason")}</Label>
         <Input id={`${id}-reason`} name="reason" required />
         <Button>{t("saveClosure")}</Button>
       </fieldset>
-      {error && <p role="alert">{t(error)}</p>}
+      {error && (
+        <p id={`${id}-error`} role="alert">
+          {t(error)}
+        </p>
+      )}
       <Button type="button" variant="outline" onClick={refresh}>
         {t("refresh")}
       </Button>

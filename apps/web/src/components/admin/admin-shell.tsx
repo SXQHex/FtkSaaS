@@ -32,6 +32,7 @@ import {
   SheetDescription,
   SheetHeader,
   SheetTitle,
+  SheetTrigger,
 } from "@ftksaas/ui/components/sheet";
 import { cn } from "@ftksaas/ui/lib/utils";
 import { Preferences } from "../preferences";
@@ -92,6 +93,7 @@ export function AdminShell({
   const [preferencesOpen, setPreferencesOpen] = useState(false);
   const [query, setQuery] = useState("");
   const contentRef = useRef<HTMLElement>(null);
+  const mobileNavigationRef = useRef(false);
   useEffect(() => {
     function shortcut(event: KeyboardEvent) {
       if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === "k") {
@@ -103,6 +105,7 @@ export function AdminShell({
     return () => document.removeEventListener("keydown", shortcut);
   }, []);
   function navigate(next: AdminSection) {
+    mobileNavigationRef.current = mobileOpen;
     onNavigate(next);
     setMobileOpen(false);
     setSearchOpen(false);
@@ -246,15 +249,48 @@ export function AdminShell({
           >
             {collapsed ? <PanelLeftOpen /> : <PanelLeftClose />}
           </Button>
-          <Button
-            variant="ghost"
-            size="icon"
-            className="shrink-0 lg:hidden"
-            aria-label={t("openMenu")}
-            onClick={() => setMobileOpen(true)}
-          >
-            <Menu />
-          </Button>
+          <Sheet open={mobileOpen} onOpenChange={setMobileOpen}>
+            <SheetTrigger asChild>
+              <Button
+                variant="ghost"
+                size="icon"
+                className="shrink-0 lg:hidden"
+                aria-label={t("openMenu")}
+              >
+                <Menu />
+              </Button>
+            </SheetTrigger>
+            <SheetContent
+              side="left"
+              onCloseAutoFocus={(event) => {
+                if (mobileNavigationRef.current) {
+                  event.preventDefault();
+                  mobileNavigationRef.current = false;
+                  contentRef.current?.focus();
+                } else if (helpOpen || preferencesOpen) {
+                  event.preventDefault();
+                }
+              }}
+              showCloseButton={false}
+              className="w-[min(300px,90vw)] gap-0 overflow-y-auto bg-muted"
+            >
+              <SheetHeader className="sr-only">
+                <SheetTitle>{t("navigation")}</SheetTitle>
+                <SheetDescription>{t("choosePage")}</SheetDescription>
+              </SheetHeader>
+              <SheetClose asChild>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="absolute right-2 top-2"
+                  aria-label={t("close")}
+                >
+                  <X />
+                </Button>
+              </SheetClose>
+              {navigation(false)}
+            </SheetContent>
+          </Sheet>
           <div className="flex min-w-0 flex-1 items-center gap-3 text-sm">
             <span className="hidden text-muted-foreground sm:inline">{t("management")}</span>
             <ChevronRight
@@ -311,29 +347,7 @@ export function AdminShell({
           </footer>
         </main>
       </div>
-      <Sheet open={mobileOpen} onOpenChange={setMobileOpen}>
-        <SheetContent
-          side="left"
-          showCloseButton={false}
-          className="w-[min(300px,90vw)] gap-0 overflow-y-auto bg-muted"
-        >
-          <SheetHeader className="sr-only">
-            <SheetTitle>{t("navigation")}</SheetTitle>
-            <SheetDescription>{t("choosePage")}</SheetDescription>
-          </SheetHeader>
-          <SheetClose asChild>
-            <Button
-              variant="ghost"
-              size="icon"
-              className="absolute right-2 top-2"
-              aria-label={t("close")}
-            >
-              <X />
-            </Button>
-          </SheetClose>
-          {navigation(false)}
-        </SheetContent>
-      </Sheet>
+
       <Sheet open={searchOpen} onOpenChange={setSearchOpen}>
         <SheetContent showCloseButton={false} className="w-full sm:max-w-md">
           <SheetHeader>

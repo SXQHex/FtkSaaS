@@ -44,7 +44,7 @@ function PlanSummary({ orgId }: { orgId: string }) {
   return (
     <section className="space-y-4" aria-label={t("planTitle")}>
       <div className="flex flex-wrap items-center justify-between gap-3">
-        <h3 className="text-lg font-semibold">{t("planTitle")}</h3>
+        <h2 className="text-lg font-semibold">{t("planTitle")}</h2>
         <Button
           type="button"
           variant="outline"
@@ -353,7 +353,7 @@ export function StudioSetup({
   const [selected, setSelected] = useState(organizations.length === 1 ? organizations[0].id : "");
   const organization = organizations.find((row) => row.id === selected);
   return (
-    <div className="max-w-3xl space-y-6">
+    <div className="max-w-3xl space-y-6 [&_button]:h-auto [&_button]:min-h-9 [&_button]:whitespace-normal [&_fieldset]:min-w-0">
       <p className="text-sm text-muted-foreground">{t("intro")}</p>
       {organizations.length === 0 && <p>{t("noOrganization")}</p>}
       {organizations.length > 1 && (
