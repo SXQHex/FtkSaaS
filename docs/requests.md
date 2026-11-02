@@ -132,11 +132,11 @@ Onaylanmış talep bitmiş iş değildir; başarılı CI da gerçek tüketici ka
 
 ## XREQ-011 Starter eski aktif eğitmen ilişkisini normal akışla sonlandırma
 
-**Durum / sahiplik:** Frontend talebi; 2 Kasım 2026 kullanıcı talimatıyla backend değerlendirmesine iletildi. XREQ-009'un teslim edilmiş rol/seans consumer kabulünü geri almaz; aktif eski merkez ilişkisi bulunan kişide kaldırma/değiştirme açığını tamamlar. Backend teknik kararı, uygulama ve kabulü beklenir; bu kayıt backend adına onay değildir.
+**Durum / sahiplik:** Frontend talebi; PR143 sonrası işlevsel frontend kabulü tamamlandı. Eski ilişki bulunan Business kaydı ve ayrı Starter slot/değiştirme kabulünün ortam/sınır ayrıntıları [WEB-S02](../apps/web/docs/todo.md#web-s02) sahibindedir. Backend adına teknik onay verilmez. Kullanıcının eski ilişki satırları ve gereksiz legacy kodunu kaldırma yönündeki yeni talebi XREQ-012 altında ayrıca izlenir.
 
 **Sorun ve kaynak kanıtı:** Main `eb0f1df91deeb031d890f8b0b2978d6f8a617317` incelemesinde `starter-plan-gates.sql` içindeki `starter_claim_instructor`, rol guard'ı ve kullanım okuması aktif eğitmen rollerinin yanında aktif `center_relationships(kind=instructor)` kayıtlarını da sayıyor. `role_revoke_v1` ve `instructor_revoke_effect` rol/gelecek seans görevlerini kaldırıyor; merkez ilişkisini sonlandırmıyor. Dar management keşfi rol tablosunu okuduğu için yalnız eski ilişkiden kaynaklanan doluluk görünmeyebilir. [Backend kabul testi](../apps/backend/tests/starter-instructor-acceptance.mjs) içindeki “active relationship keeps the slot occupied after role revoke” senaryosu, ilişki aktifken rolü API'den kaldırdıktan sonra başka eğitmen atamasının `PLAN_LIMIT_REACHED` vermesini bekliyor; devam etmek için ilişkiyi SQL ile pasifleştiriyor. Bu test `room-role-registry.test.mjs` tarafından içe alınıyor. PR137 migration'ı ile ilgili SQL kaynak dosyası birebir aynı. Bu incelemede canlı veritabanında yeni yazma/test yapılmadı.
 
-**İstenen sonuç:** Yetkili CM, eski aktif merkez eğitmen ilişkisi bulunan kişiyi de desteklenen, gerekçeli ve sürüm kontrollü normal API akışıyla eğitmenlikten çıkarıp başka doğrulanmış kişiyi tek aktif eğitmen olarak atayabilsin. Slotu tutan kaydın güncel kimlik/durum/sürümü gerektiğinde typed okumayla keşfedilebilsin. Mevcut kaldırmada birlikte sonlandırma veya ayrı sözleşmeli işlem seçimi backend'e aittir; frontend endpoint/ürün kuralı icat etmez.
+**İstenen sonuç:** Yetkili CM, eski aktif merkez eğitmen ilişkisi bulunan kişiyi de desteklenen, gerekçeli ve sürüm kontrollü normal API akışıyla eğitmenlikten çıkarıp başka doğrulanmış kişiyi tek aktif eğitmen olarak atayabilsin. Slotu tutan kaydın güncel kimlik/durum/sürümü gerektiğinde typed okumayla keşfedilebilsin. Kullanıcının son kararıyla mevcut rol tek aktiflik kaynağıdır; ayrı ilişşik kesme API'si eklenmez. Frontend mevcut keşif/önizleme/kaldırma consumer'ını kullanır.
 
 **Kabul ölçütleri:**
 
@@ -148,6 +148,18 @@ Onaylanmış talep bitmiş iş değildir; başarılı CI da gerçek tüketici ka
 - Backend native Auth→Edge→DB regresyonu, eski ilişki fixture'ını hazırladıktan sonra iş akışında doğrudan SQL temizliği kullanmadan sonlandırma→başka eğitmen atama→yeniden okuma zincirini kanıtlar. Mevcut testteki ret beklentisi yeni desteklenen davranışla uyumlu güncellenir; tek aktif eğitmen ve koruma assertion'ları azaltılmaz.
 - Backend tesliminden sonra frontend gerçek Starter ekranında bu veri durumuyla kabul yapar. Mevcut ilişkisiz Starter1 kabulü bunun yerine sayılmaz.
 
-**Frontend etkisi:** S02'nin tam kapanışı bu talebin backend teslimi ve frontend entegrasyon/kabulüne bağlıdır. Tamamlanmış XREQ-009 canlı kabulü ve yayın kontrolleri tekrar açık iş yapılmaz. Bölüm takibinin tek sahibi [WEB-S02](../apps/web/docs/todo.md#web-s02); backend backlog/devir belgeleri frontend tarafından değiştirilmez.
+**Frontend etkisi:** PR143 sonrası işlevsel frontend kabulü tamamdır; geçmiş ilişki bulunan Business kaydı ile Starter slot senaryosu ayrı ortam/fixture olarak raporlanmıştır. Tamamlanmış XREQ-009/011 kabulü tekrar açık iş yapılmaz. İlave temizlik XREQ-012'dir; bölüm takibinin tek sahibi [WEB-S02](../apps/web/docs/todo.md#web-s02). Backend backlog/devir belgeleri frontend tarafından değiştirilmez.
 
 **XREQ-011 backend değerlendirmesi — kullanıcı kararı:** Ayrı ilişşik kesme API’si eklenmez. Merkez eğitmenliği tek rol yaşam döngüsüne taşınır; eski ilişki salt tarihsel kayıttır ve aktiflik/kota kaynağı olamaz. Mevcut dar keşif, etki önizlemesi ve rol kaldırma kullanılır. Uygulama/kaynak/gerçek kabul durumu [backend devrindedir](../apps/backend/docs/00-FtkSaaS-yeni-sohbet-devir.md); frontend kabulü kendi sahibindedir.
+
+<a id="xreq-012"></a>
+
+## XREQ-012 Kullanılmayan instructor ilişki verisi ve legacy kodunu temizleme
+
+**Talep / kullanıcı kararı — 2 Kasım 2026:** Kullanıcı, eski `center_relationships(kind=instructor)` satırlarının pasif tarihçe olarak bile tutulmasını istemiyor; yinelenen ilişki verisinin silinmesini ve temiz codebase kalmasını istiyor. PR143'teki rolün tek aktiflik kaynağı olması korunur. Bu yeni talep, PR143 backend değerlendirmesinin eski satırları tarihçe olarak koruma seçimini veri/kod temizliği bakımından değiştirir; önceki teknik değerlendirme frontend tarafından yeniden yazılmaz.
+
+**Kapsam / beklenen sonuç:** Backend, kanonik role aktarım ve bağımlılık kontrolünden sonra eski instructor ilişki satırlarını yeni migration ile kaldırır. Diğer ilişki türleri ve mevcut rol/seans/finans/audit geçmişi korunur. Yalnız bu eski veriyi yaşatmak için kalan kullanılmayan legacy dalları, çift yazım/senkronizasyon veya fallback kodu kaldırılır; rol kaynağından türetilen gerekli güncel projeksiyon sırf görünüm olduğu için ikinci kaynak sayılmaz. Uygulanmış migration geçmişi değiştirilmez; yeni kalıcı legacy kayıt veya temizlik endpoint'i eklenmez.
+
+**Kabul:** Eski instructor ilişki satırı sayısı sıfır; yeni normal işlemler bu tür satır üretmiyor. Eğitmen keşfi/rol kaldırma/yeniden atama ve Starter slot/yarış kontrolleri tek rol kaynağıyla çalışıyor. Kişi birleşimi kaldırılmış rolü canlandırmıyor; hesap bağı, merkez/tenant izolasyonu, geçmiş seans ve finans/audit bağları korunuyor. Backend ilgili migration ve davranış regresyonlarını doğrular; assertion/kalite kapıları gevşetilmez. Backend veri hazırlığı/temizliği frontend tarafından hosted SQL ile yapılmaz.
+
+**Durum / sahiplik:** Kullanıcının açık talebiyle backend değerlendirme/uygulamasına iletildi; henüz uygulanmış veya kabul edilmiş sayılmaz. XREQ-011'in tamamlanan işlevsel frontend kabulünü geri almaz. Temizliğin frontend tüketimine etkisi ve S02 son kapanışı [WEB-S02](../apps/web/docs/todo.md#web-s02) sahibindedir.
