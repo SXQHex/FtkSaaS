@@ -22,6 +22,21 @@ test('P05 Storage adapter checks actual bytes/hash/mime/size and returns no inte
  const fakePdf=documentStorage('http://private-kong.invalid','synthetic',async()=>new Response('not a pdf',{headers:{'content-type':'application/pdf'}}));await assert.rejects(fakePdf.download(object),/MIME/);
 });
 const p=JSON.parse(fs.readFileSync('../../packages/api-contracts/schema/contract.json'));const a=new Ajv({strict:false,allErrors:true});addFormats(a);a.addSchema(p,'contract');const valid=(n,x)=>a.getSchema('contract#/$defs/'+n)(x);const id=newUuidV7();
+test('Starter instructor discovery exposes assignment versions without broadening writes',()=>{
+ const reader=p['x-contract'].operations.find(o=>o.name==='management_state_get_v1');
+ assert(reader.runtime_selectors.includes('role_assign_v1'));
+ const key={role:'instructor',scope:{center_id:id}};
+ const r={client_api_version:1,request_id:id,org_id:id,center_id:id,operation:'role_assign_v1',selector:{operation:'role_assign_v1',key},page:{limit:1}};
+ assert(valid('Request_management_state_get',r));
+ assert(valid('Request_management_state_get',{...r,selector:{...r.selector,key:{...key,person_id:id}}}));
+ assert(!valid('Request_management_state_get',{...r,center_id:null}));
+ assert(!valid('Request_management_state_get',{...r,selector:{...r.selector,key:{role:'instructor'}}}));
+ assert(!valid('Request_role_assign',{client_api_version:1,request_id:id,org_id:id,center_id:id,operation_key:id,...key}));
+ const entity={type:'role_assignments',id};
+ const item={operation:'role_assign_v1',entity,exists:true,state:'inactive',versions:[{entity,version:2}],as_of:new Date().toISOString(),current:{operation:'role_assign_v1',values:{person_id:id,...key}}};
+ assert(valid('ManagementStateView',item));
+ assert(!valid('ManagementStateView',{...item,current:{...item.current,values:{...item.current.values,account_link_id:id}}}));
+});
 test('room editing advertises its discoverable management reader with typed values and row version',()=>{
  const write=p['x-contract'].operations.find(o=>o.name==='room_save_v1');
  assert.equal(write.operation_contract.read_operation,'management_state_get_v1');
@@ -214,4 +229,20 @@ test('person access discovery has exclusive typed selectors',()=>{
   assert(!valid('ManagementSelector_'+op,{operation:op,key:{}}));
   assert(!valid('ManagementSelector_'+op,{operation:op,key:{person_id:id,...(op==='account_access_revoke_v1'?{invitation_id:id}:{link_id:id})}}));
  }
+});
+test('instructor revoke requires a typed impact preview and manager attention is separate from session lifecycle',()=>{
+ const r={client_api_version:1,request_id:id,org_id:id,center_id:id,assignment_id:id,expected_version:1};
+ assert(valid('Request_role_revoke_preview',r));
+ assert(!valid('Request_role_revoke_preview',{...r,center_id:null}));
+ assert(valid('Request_role_revoke',{...r,operation_key:id,reason:'Explicit confirmation',impact_approval:{id,token:'a'.repeat(64)}}));
+ const interval={starts_at:'2030-01-01T00:00:00Z',ends_at:'2030-02-01T00:00:00Z'};
+ assert(valid('Request_calendar_get',{client_api_version:1,request_id:id,org_id:id,center_id:id,interval,page:{},needs_instructor:true}));
+ assert(valid('CalendarItem',{id,type:'session',center_id:id,...interval,discipline_id:id,title:'Synthetic',management_attention:'instructor_required'}));
+ assert(!valid('CalendarItem',{id,type:'session',center_id:id,...interval,discipline_id:id,title:'Synthetic',management_attention:'unknown'}));
+});
+
+test('unassigned session work list has no calendar horizon and requires explicit center',()=>{
+ const r={client_api_version:1,request_id:id,org_id:id,center_id:id,operation:'session_assignment_set_v1',selector:{operation:'session_assignment_set_v1',key:{}},page:{sort:'starts_at_asc'}};
+ assert(valid('Request_management_state_get',r));assert(!valid('Request_management_state_get',{...r,center_id:null}));
+ assert(p['x-contract'].operations.find(o=>o.name==='management_state_get_v1').runtime_selectors.includes('session_assignment_set_v1'));
 });

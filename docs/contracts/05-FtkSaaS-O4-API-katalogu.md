@@ -2,7 +2,7 @@
 
 Üretilmiştir: `packages/api-contracts/schema/contract.json` ve `implemented.json` → `render_catalogs.py`. Elle düzenleme. DTO/enum/izin için makine sözleşmesi tek kaynaktır; çağrı sırası [WF rehberi](../workflows.md), transport [istemci protokolü](../client-integration.md) sahibindedir.
 
-218 sözleşme operasyonu; 218 kaynak envanterinde, 0 contract-only. Kaynakta bulunmak tüm selector/provider/özellik veya hosted kabulünün tamamlandığını göstermez. Backend-only worker işlemleri tarayıcı çağrısı değildir.
+219 sözleşme operasyonu; 219 kaynak envanterinde, 0 contract-only. Kaynakta bulunmak tüm selector/provider/özellik veya hosted kabulünün tamamlandığını göstermez. Backend-only worker işlemleri tarayıcı çağrısı değildir.
 
 | İşlem | Kaynak durumu / tüketici | İzin | Tür / abonelik | İstek | Yanıt |
 |---|---|---|---|---|---|
@@ -29,7 +29,7 @@
 | `policy_publish_v1` | runtime / ilgili WF’yi oku | `policy.manage` | W / config | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; center_id?: FtkUuid ∣ null; operation_key: FtkUuid; key: PolicyKey; value: PolicyValue; effective_at: Instant; mandatory: Bool; impact_approval?: PreviewToken; accepted_reservation_ids?: FtkUuid[] | Success_policy_publish |
 | `roles_list_v1` | runtime / ilgili WF’yi oku | `org.read` | R / read | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; center_id?: FtkUuid ∣ null; person_id?: FtkUuid ∣ null; page: Page | Success_roles_list |
 | `role_assign_v1` | runtime / ilgili WF’yi oku | `center.manage` | W / config | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; center_id?: FtkUuid ∣ null; operation_key: FtkUuid; person_id: FtkUuid; role: OperationalRole; scope: RoleScope | Success_role_assign |
-| `role_revoke_v1` | runtime / ilgili WF’yi oku | `center.manage` | W / config | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; center_id?: FtkUuid ∣ null; operation_key: FtkUuid; expected_version: PositiveInt; assignment_id: FtkUuid; reason: Text | Success_role_revoke |
+| `role_revoke_v1` | runtime / ilgili WF’yi oku | `center.manage` | W / config | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; center_id?: FtkUuid ∣ null; operation_key: FtkUuid; expected_version: PositiveInt; assignment_id: FtkUuid; reason: Text; impact_approval?: PreviewToken | Success_role_revoke |
 | `permission_set_v1` | runtime / ilgili WF’yi oku | `center.manage` | W / config | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; center_id?: FtkUuid ∣ null; operation_key: FtkUuid; expected_version: PositiveInt; person_id: FtkUuid; permission: Permission; enabled: Bool | Success_permission_set |
 | `org_manager_assign_v1` | runtime / ilgili WF’yi oku | `org.owner` | W / config | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; center_id?: FtkUuid ∣ null; operation_key: FtkUuid; person_id: FtkUuid | Success_org_manager_assign |
 | `org_manager_revoke_v1` | runtime / ilgili WF’yi oku | `org.owner` | W / config | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; center_id?: FtkUuid ∣ null; operation_key: FtkUuid; expected_version: PositiveInt; person_id: FtkUuid; reason: Text | Success_org_manager_revoke |
@@ -47,7 +47,7 @@
 | `person_merge_preview_v1` | runtime / ilgili WF’yi oku | `person.merge` | P / maintenance | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; center_id?: FtkUuid ∣ null; source_id: FtkUuid; target_id: FtkUuid | Success_person_merge_preview |
 | `person_merge_approve_v1` | runtime / ilgili WF’yi oku | `person.merge` | W / maintenance | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; center_id?: FtkUuid ∣ null; operation_key: FtkUuid; preview: PreviewToken; approval_center_id: FtkUuid | Success_person_merge_approve |
 | `person_merge_apply_v1` | runtime / ilgili WF’yi oku | `person.merge` | A / maintenance | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; center_id?: FtkUuid ∣ null; operation_key: FtkUuid; preview: PreviewToken | Success_person_merge_apply |
-| `calendar_get_v1` | runtime / ilgili WF’yi oku | `schedule.read` | R / read | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; center_id?: FtkUuid ∣ null; interval: Interval; resource?: ResourceRef ∣ null; page: CalendarPage; interest_filter?: boolean | Success_calendar_get |
+| `calendar_get_v1` | runtime / ilgili WF’yi oku | `schedule.read` | R / read | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; center_id?: FtkUuid ∣ null; interval: Interval; resource?: ResourceRef ∣ null; page: CalendarPage; interest_filter?: boolean; needs_instructor?: Bool | Success_calendar_get |
 | `class_save_v1` | runtime / ilgili WF’yi oku | `schedule.manage` | W / new | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; center_id?: FtkUuid ∣ null; operation_key: FtkUuid; expected_version?: PositiveInt; class_id?: FtkUuid ∣ null; name: Text; external_open: Bool; discipline_id: FtkUuid | Success_class_save |
 | `program_preview_v1` | runtime / ilgili WF’yi oku | `schedule.manage` | P / new | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; center_id?: FtkUuid ∣ null; class_id: FtkUuid; schedule: ProgramSpec | Success_program_preview |
 | `program_apply_v1` | runtime / ilgili WF’yi oku | `schedule.manage` | A / new | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; center_id?: FtkUuid ∣ null; operation_key: FtkUuid; preview: PreviewToken | Success_program_apply |
@@ -224,6 +224,7 @@
 | `calendar_feed_get_v1` | runtime / ilgili WF’yi oku | `calendar.feed` | R / read | client_api_version: 1; request_id: FtkUuid; token: string | Success_calendar_feed_get |
 | `settings_preparation_resolve_v1` | runtime / ilgili WF’yi oku | `preparation.resolve` | R / read | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; center_id: FtkUuid; kind: availability / package; source: PreparationSourceReference; resource?: ResourceRef; rule_index?: integer | Success_settings_preparation_resolve |
 | `account_signup_check_v1` | runtime / ilgili WF’yi oku | `auth.signup` | E / exempt | client_api_version: 1; request_id: FtkUuid; email: string | Success_account_signup_check |
+| `role_revoke_preview_v1` | runtime / ilgili WF’yi oku | `center.manage` | P / config | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; center_id: FtkUuid; expected_version: PositiveInt; assignment_id: FtkUuid | Success_role_revoke_preview |
 
 ## Sürüm ve okuma desteği
 
@@ -253,7 +254,7 @@
 | policies_get_v1 | read | none | None | contract_only |  |
 | policy_publish_v1 | command | append_or_current_scope_lock | policies_get_v1 | implemented | policy_versions.immutable, protected_reservation_obligations_if_affected, reservation_protections.append_causal_obligation_proof |
 | roles_list_v1 | read | none | None | contract_only |  |
-| role_assign_v1 | command | append_or_current_scope_lock | management_state_get_v1 | contract_only | role_assignments.active, no_account_link_creation |
+| role_assign_v1 | command | append_or_current_scope_lock | management_state_get_v1 | implemented | role_assignments.active, no_account_link_creation |
 | role_revoke_v1 | command | row_version | roles_list_v1 | implemented | role_assignments.inactive_live_next_request |
 | permission_set_v1 | command | row_version | person_get_v1 | implemented | permission_overrides, people.permission_aggregate_version |
 | org_manager_assign_v1 | command | append_or_current_scope_lock | management_state_get_v1 | contract_only | role_assignments.org_manager, no_implicit_center_operation_grant |
@@ -449,6 +450,7 @@
 | calendar_feed_get_v1 | read | none | None | not_required |  |
 | settings_preparation_resolve_v1 | read | none | None | not_required |  |
 | account_signup_check_v1 | auth | none | None | implemented |  |
+| role_revoke_preview_v1 | preview | row_version | management_state_get_v1 | contract_only |  |
 
 ## Sunucunun hesaplaşma yetki bağlamı
 

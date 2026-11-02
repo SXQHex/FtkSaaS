@@ -1,6 +1,6 @@
 # Güvenlik kaynak referansı
 
-Üretilmiştir: `node apps/backend/scripts/update-docs.mjs --write`. Elle düzenleme. Kaynak içerik özeti: `00ff45740a57283b1f6656d8ba072baff6c601a972fe3aaac7dd605f9b72ddee`. Bu özet CI/hosted kabulü değildir; dağıtılan SHA ve ortam CD artifact'ında bulunur.
+Üretilmiştir: `node apps/backend/scripts/update-docs.mjs --write`. Elle düzenleme. Kaynak içerik özeti: `e83c25e6331868941f202965ad33024ca2546940390694882d786481d74b3143`. Bu özet CI/hosted kabulü değildir; dağıtılan SHA ve ortam CD artifact'ında bulunur.
 
 İnsan istemci native Auth → JWT doğrulanan Edge → service-only RPC yolunu kullanır. Canlı oturum/MFA/tenant/rol/plan kontrolü tekrar denetlenir; core/private erişimi istemciye açılmaz. Worker ve public credential transport ayrı yetki yollarıdır. RLS tek başına Edge iş yetkisi değildir. [İstemci değişmezleri](client-integration.md), [teknik sözleşme](contracts/02-FtkSaaS-teknik-sozlesme.md) ve [iş akışları](workflows.md#wf00) normatif ayrıntıyı taşır.
 
@@ -112,7 +112,7 @@ Aşağıdaki liste güvenlik DDL içeren kaynak dosyalarıdır; son policy/grant
 | [room-and-role-registry-wrappers.sql](../apps/backend/database/room-and-role-registry-wrappers.sql) | `74d64f1fe3e2b5d5024a45f2f280449f1171a55fe3f2e006bd05766c7786d69e` |
 | [room-and-role-registry.sql](../apps/backend/database/room-and-role-registry.sql) | `459c399404c06bd4d2eb81556a1496639f5a73fcde0288f7f7a6d8f544bca780` |
 | [runtime-read-projection.sql](../apps/backend/database/runtime-read-projection.sql) | `3e2f98633b4f9e879ccee43df2fb622a028e8fa0827ba0a60a34fe20939c1357` |
-| [runtime-wrappers-current.sql](../apps/backend/database/runtime-wrappers-current.sql) | `b549e4f430476d4a470824b3ab77852ee950cd446c28d22486fcaa8196d8bd23` |
+| [runtime-wrappers-current.sql](../apps/backend/database/runtime-wrappers-current.sql) | `e0809a59686b7e24acfd4dd4fadbde396956c89fad10309e3bf1a4cded56dc4b` |
 | [runtime-wrappers.sql](../apps/backend/database/runtime-wrappers.sql) | `5b6289b205052a72b7049f54c124bc8c3d454426801ce62895a1bc9b82f66771` |
 | [runtime.sql](../apps/backend/database/runtime.sql) | `a6604816aadf0a2005b2c99f222b34ba10828de80a535d525eef0af5a62d07dd` |
 | [schedule-reads-wrappers.sql](../apps/backend/database/schedule-reads-wrappers.sql) | `12b3a79f852e099bde79aaa2bf7e23656463645b4886eb56ab4e3fb7f52b5fbf` |
@@ -126,6 +126,7 @@ Aşağıdaki liste güvenlik DDL içeren kaynak dosyalarıdır; son policy/grant
 | [starter-collection-methods.sql](../apps/backend/database/starter-collection-methods.sql) | `885509449945adb772066b3cb94bbc364a8955b716f04d7cbab5b0b6c429725f` |
 | [starter-domain-preparations-wrappers.sql](../apps/backend/database/starter-domain-preparations-wrappers.sql) | `d1ed3cc19e422239f93cc8f210bc21452bc60b635a6b24fc6cc028520155cc00` |
 | [starter-domain-preparations.sql](../apps/backend/database/starter-domain-preparations.sql) | `09ca659808611897a8b68c641d32451794ad06cb752e855f31a906c1dee08d12` |
+| [starter-instructor-management.sql](../apps/backend/database/starter-instructor-management.sql) | `fe6109e2d0b36954964cf1f3274c5512d1011d23a53210e2c47957dde7a98887` |
 | [starter-notification-support.sql](../apps/backend/database/starter-notification-support.sql) | `a66eef347d4ac8f0a887253ed2436dccf1f569430084f25b900053bed9de1b8e` |
 | [starter-onboarding-defaults.sql](../apps/backend/database/starter-onboarding-defaults.sql) | `9c5f3b1e09029ba88ca5b99c4532c74408b4fdff4d1b00ee5211e6c9237fbfe9` |
 | [starter-peer-sharing.sql](../apps/backend/database/starter-peer-sharing.sql) | `cb8aa9ab50ec5ca748aa5c2a7466052052ca9671e7726dd78702104ab4f3cd90` |
@@ -222,3 +223,4 @@ Aşağıdaki liste güvenlik DDL içeren kaynak dosyalarıdır; son policy/grant
 | [20261101232810_studio_management_reads.sql](../apps/backend/supabase/migrations/20261101232810_studio_management_reads.sql) | `09ab1ed05f7e7b50f50b8ff484bc2c6027c5588978465826b64e3d752fc43445` |
 | [20261102052010_starter_resource_discovery.sql](../apps/backend/supabase/migrations/20261102052010_starter_resource_discovery.sql) | `51feebd1723e8d3264ae22326cb3a680981fa2f7902c6810df53e8977fb15aa5` |
 | [20261102064534_subscriber_numbers.sql](../apps/backend/supabase/migrations/20261102064534_subscriber_numbers.sql) | `52684678ed0a4dc4356d9b538c6073323e7d700465e342aeb5613830a3976eb6` |
+| [20261102100000_starter_instructor_management.sql](../apps/backend/supabase/migrations/20261102100000_starter_instructor_management.sql) | `fe6109e2d0b36954964cf1f3274c5512d1011d23a53210e2c47957dde7a98887` |
