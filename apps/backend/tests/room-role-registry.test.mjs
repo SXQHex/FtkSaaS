@@ -2,6 +2,7 @@ import './starter-instructor-acceptance.mjs';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {createHash} from 'node:crypto';
+import {readFileSync} from 'node:fs';
 import {authUser,fixturePlatform,must,call,context} from './api-client.mjs';
 import {connect} from '../scripts/db.mjs';
 import {newUuidV7 as key} from '../scripts/uuid.mjs';
@@ -163,6 +164,97 @@ test('Room configuration and scoped role reads through real Auth/API',async t=>{
   await fail('room_save_v1',{room_id:room,expected_version:4,name:'denied',capacity:10},'FORBIDDEN',manager.u);
   await fail('management_state_get_v1',{operation:'room_save_v1',selector:{operation:'room_save_v1',key:{room_id:room}}},'FORBIDDEN',manager.u);
   assert.equal((await list(owner,{person_id:manager.p})).items[0].state,'inactive');
+ });
+ await t.test('instructor relationships derive from the canonical center role and preserve other centers',async()=>{
+  const teacher=await linked('rooms-canonical-instructor','instructor');
+  const remoteGrant=await mutate('role_assign_v1',{center_id:other,person_id:teacher.p,role:'instructor',scope:{center_id:other}});
+  const relationships=()=>rows("select * from private.person_center_relationships where org_id=$1 and person_id=$2 and kind='instructor' order by center_id,id",[org,teacher.p]);
+  const personRelationships=async()=> (await must(owner,'person_get_v1',scope({person_id:teacher.p}))).relationships.filter(x=>x.kind==='instructor');
+  assert.deepEqual(await personRelationships(),[{center_id:center,kind:'instructor',state:'active'}]);
+  assert.equal((await rows("select count(*)::int n from core.center_relationships where org_id=$1 and person_id=$2 and kind='instructor'",[org,teacher.p]))[0].n,0);
+  const remoteSnapshot=async()=>JSON.stringify({relationships:(await relationships()).filter(x=>x.center_id===other),roles:await rows('select * from core.role_assignments where id=$1',[remoteGrant.primary_id])});
+  const remoteBefore=await remoteSnapshot();
+  const historyManager=await linked('rooms-instructor-history-manager','center_manager');
+  const historyStaff=await linked('rooms-instructor-history-staff','staff');
+  await db.query("insert into core.permission_overrides(id,org_id,center_id,person_id,permission,enabled) values($1,$2,$3,$4,'person.manage',true)",[key(),org,center,historyStaff.p]);
+  assert((await must(historyStaff.u,'person_get_v1',scope({person_id:teacher.p}))).relationships.some(x=>x.kind==='instructor'&&x.state==='active'));
+  const command={assignment_id:teacher.grant.primary_id,expected_version:teacher.grant.version,reason:'Remove the whole instructor center lifecycle'};
+  const preview=()=>mutate('role_revoke_preview_v1',{assignment_id:command.assignment_id,expected_version:command.expected_version});
+  const stale=await preview();
+  await db.query('update core.role_assignments set version=version+1 where id=$1',[command.assignment_id]);
+  const beforeRejected=JSON.stringify(await relationships());
+  await fail('role_revoke_v1',{...command,impact_approval:{id:stale.id,token:stale.token}},'VERSION_CONFLICT');
+  command.expected_version++;
+  await fail('role_revoke_v1',{...command,impact_approval:{id:stale.id,token:stale.token}},'PREVIEW_STALE');
+  assert.equal(JSON.stringify(await relationships()),beforeRejected);
+  assert.equal((await rows('select state from core.role_assignments where id=$1',[command.assignment_id]))[0].state,'active');
+  const approved=await preview(),body={...command,impact_approval:{id:approved.id,token:approved.token}},k=key();
+  const revoked=await mutate('role_revoke_v1',body,k);
+  const local=(await relationships()).filter(x=>x.center_id===center);assert.equal(local.length,1);assert.equal(local[0].state,'inactive');
+  assert.deepEqual(await personRelationships(),[{center_id:center,kind:'instructor',state:'inactive'}]);
+  const historical=await must(historyManager.u,'person_get_v1',scope({person_id:teacher.p}));
+  assert.deepEqual(historical.relationships.filter(x=>x.kind==='instructor'),[{center_id:center,kind:'instructor',state:'inactive'}]);
+  await fail('person_get_v1',{person_id:teacher.p},'NOT_FOUND',historyStaff.u);
+  await fail('person_get_v1',{person_id:teacher.p,center_id:other},'NOT_FOUND',historyManager.u);
+  await fail('person_get_v1',{person_id:teacher.p},'NOT_FOUND',stranger);
+  await mutate('center_manager_revoke_v1',{person_id:historyManager.p,expected_version:historyManager.grant.version,reason:'History reader permission removed'});
+  await fail('person_get_v1',{person_id:teacher.p},'NOT_FOUND',historyManager.u);
+  assert.equal((await rows("select count(*)::int n from core.role_assignments where org_id=$1 and scope_center_id=$2 and person_id=$3 and role='instructor' and state='active'",[org,center,teacher.p]))[0].n,0);
+  assert.equal(await remoteSnapshot(),remoteBefore);
+  const after=JSON.stringify(await relationships());
+  assert.equal((await mutate('role_revoke_v1',body,k)).replayed,true);assert.equal(JSON.stringify(await relationships()),after);
+  assert.equal((await rows('select count(*)::int n from core.audit_events where operation_id=$1',[revoked.operation_id]))[0].n,1);
+  const replacementKey=key(),replacement={person_id:teacher.p,role:'instructor',scope:{center_id:center}};
+  const assigned=await mutate('role_assign_v1',replacement,replacementKey);
+  assert.equal((await mutate('role_assign_v1',replacement,replacementKey)).replayed,true);
+  assert.equal((await relationships()).filter(x=>x.center_id===center&&x.state==='active').length,1);
+  assert.deepEqual(await personRelationships(),[{center_id:center,kind:'instructor',state:'active'}]);
+  assert.equal((await rows("select count(*)::int n from core.center_relationships where org_id=$1 and person_id=$2 and kind='instructor'",[org,teacher.p]))[0].n,0);
+  assert.deepEqual((await list(owner,{center_id:center,person_id:teacher.p})).items.filter(x=>x.state==='active').map(x=>x.id),[assigned.primary_id]);
+  assert.equal(await remoteSnapshot(),remoteBefore);
+ });
+ await t.test('account unlink removes capability while the canonical instructor duty stays offline until explicit reassignment',async()=>{
+  const teacher=await linked('rooms-offline-unlink','instructor');
+  const grant=(await rows('select * from core.role_assignments where id=$1',[teacher.grant.primary_id]))[0];
+  const link=(await rows('select * from core.account_links where id=$1',[grant.account_link_id]))[0];
+  await mutate('account_link_remove_v1',{link_id:link.id,expected_version:Number(link.version),reason:'Remove account access only'});
+  const offline=(await rows('select * from core.role_assignments where id=$1',[grant.id]))[0];
+  assert.equal(offline.state,'active');assert.equal(offline.account_link_id,null);
+  assert.equal((await rows("select private.has_role($1,$2,'instructor',$3) allowed",[org,teacher.p,center]))[0].allowed,false);
+  await rows("insert into core.account_links(id,org_id,account_id,person_id,state,verified_at) values($1,$2,$3,$4,'active',now())",[key(),org,link.account_id,teacher.p]);
+  assert.equal((await rows("select private.has_role($1,$2,'instructor',$3) allowed",[org,teacher.p,center]))[0].allowed,false);
+  const rebound=await mutate('role_assign_v1',{person_id:teacher.p,role:'instructor',scope:{center_id:center}});assert.equal(rebound.primary_id,grant.id);
+  assert.equal((await rows("select private.has_role($1,$2,'instructor',$3) allowed",[org,teacher.p,center]))[0].allowed,true);
+  await mutate('role_revoke_v1',{assignment_id:grant.id,expected_version:rebound.version,reason:'Remove the center duty explicitly'});
+ });
+ await t.test('legacy instructor backfill preserves offline membership and gives existing role state precedence',async()=>{
+  const migration=readFileSync(new URL('../supabase/migrations/20261102144907_instructor_center_lifecycle.sql',import.meta.url),'utf8');
+  const backfill=migration.match(/alter table core\.role_assignments disable trigger starter_roles;[\s\S]*?alter table core\.role_assignments enable trigger starter_roles;/)?.[0];
+  const archive=migration.match(/update core\.center_relationships set state='inactive'[\s\S]*?where kind='instructor' and state='active';/)?.[0];
+  assert(backfill);assert(archive);
+  await db.query('begin');
+  try{
+   await db.query('alter table core.center_relationships drop constraint instructor_membership_is_role');
+   const people=Array.from({length:4},key),legacy=Array.from({length:4},key),existing=[key(),key()];
+   const created='2025-01-02T12:00:00.000Z';
+   for(let i=0;i<people.length;i++){
+    await db.query("insert into core.people(id,org_id,display_name,state) values($1,$2,'Legacy instructor backfill fixture','active')",[people[i],org]);
+    await db.query("insert into core.center_relationships(id,org_id,center_id,person_id,kind,state,created_at,started_at,version) values($1,$2,$3,$4,'instructor',$5,$6,$6,7)",[legacy[i],org,center,people[i],i===1?'inactive':'active',created]);
+   }
+   for(let i=0;i<existing.length;i++)await db.query("insert into core.role_assignments(id,org_id,scope_center_id,person_id,role,state,account_link_id) values($1,$2,$3,$4,'instructor',$5,null)",[existing[i],org,center,people[i+2],i===0?'inactive':'active']);
+   await db.query('set constraints all immediate');
+   await db.query(backfill);await db.query(archive);
+   const roles=await rows("select id,person_id,state,account_link_id,created_at,version from core.role_assignments where org_id=$1 and person_id=any($2::uuid[]) order by person_id,id",[org,people]);
+   assert.equal(roles.length,4);
+   for(let i=0;i<people.length;i++){
+    const role=roles.find(x=>x.person_id===people[i]);assert.equal(role.id,i<2?legacy[i]:existing[i-2]);assert.equal(role.state,i===1||i===2?'inactive':'active');assert.equal(role.account_link_id,null);
+    if(i<2){assert.equal(role.created_at.toISOString(),created);assert.equal(role.version,'7');}
+    assert.equal((await rows("select private.has_role($1,$2,'instructor',$3) allowed",[org,people[i],center]))[0].allowed,false);
+   }
+   assert((await rows("select state from core.center_relationships where id=any($1::uuid[])",[legacy])).every(x=>x.state==='inactive'));
+   await db.query(backfill);
+   assert.deepEqual(await rows("select id,person_id,state,account_link_id,created_at,version from core.role_assignments where org_id=$1 and person_id=any($2::uuid[]) order by person_id,id",[org,people]),roles);
+  }finally{await db.query('rollback');}
  });
  }finally{
   if(trigger){await db.query('drop trigger if exists '+trigger+' on core.audit_events');await db.query('drop function if exists private.'+trigger+'()');}

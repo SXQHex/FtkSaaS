@@ -126,7 +126,8 @@ test('Availability and policies through real Auth -> Edge -> RPC',async t=>{
   await inspectFail(op,{resource:{kind:'room',id:key()}},'NOT_FOUND');
   await inspectFail(op,k,'VALIDATION_FAILED',{page:{cursor:'not-a-cursor'}});
   const instructor=await linked('closure-instructor','instructor');
-  await db.query("insert into core.center_relationships(id,org_id,center_id,person_id,kind,state,started_at) values($1,$2,$3,$4,'instructor','active',now())",[key(),org,center,instructor.p]);
+  const instructorRecord=await must(owner,'person_get_v1',scope({person_id:instructor.p}));
+  assert(instructorRecord.relationships.some(x=>x.center_id===center&&x.kind==='instructor'&&x.state==='active'));
   const personResource={kind:'person',id:instructor.p};
   const personClosure=await mut(op,{resource:personResource,interval,reason:'Private instructor absence',expected_version:await centerVersion()});
   const personView=await inspect(op,{resource:personResource});assert.equal(personView.items.length,1);assert.equal(personView.items[0].entity.id,personClosure.primary_id);assert(!('reason' in personView.items[0].current.values));
