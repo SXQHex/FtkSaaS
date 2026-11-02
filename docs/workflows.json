@@ -268,8 +268,8 @@
         "management_state_get_v1"
       ],
       "review": {
-        "fingerprint": "9419cdb6ac10476d105f589e7e81fbafd66e67abb5d80ef68407d95f95f84926",
-        "reason": "XREQ-007/008 ortak sözleşme, selector/DTO ve test farkları incelendi; org/merkez, canlı yetki ve cursor kuralları korundu; WF02 ayrıntıları güncellendi."
+        "fingerprint": "994546853bd377217208c335fef39f043dbc0831bb4c53a7a9a8713e2917b191",
+        "reason": "Final Abone No ve katalog10 typed kaynak/validator farkları incelendi; request_id/UUID/cursor/tek komut protokolü değişmedi ve yeni şema regresyonları runtime katalog kopyalarını karşılaştırır."
       }
     },
     {
@@ -431,8 +431,8 @@
         "center_discipline_set_v1"
       ],
       "review": {
-        "fingerprint": "073af50b1753d82bb79dc5486b8bdefefbb27ce8607ba01a62e954746c2238df",
-        "reason": "PR134 API-1 logu ve merkez liste sözleşmesi incelendi: Starter fixture zorunlu page alanını atlıyordu; yalnız geçerli sayfalı istek eklendi; assertion, runtime ve yetki değişmedi."
+        "fingerprint": "b3b00fdb936ef3cd5620a3569926d3f6060be5c809e378f01c63c722018cb126",
+        "reason": "Paylaşılan Starter testine atomik 100 öğrenci numara tekilliği eklendi; stüdyo kurulumu/tek kaynak limitleri ve mevcut assertionlar değişmedi."
       }
     },
     {
@@ -518,8 +518,8 @@
         "class_assignment_set_v1"
       ],
       "review": {
-        "fingerprint": "f0f02f17c2305c300a0b450c934f2ec1ef8c2d00623434a0c3186a4200af7056",
-        "reason": "Paylaşılan Starter fixture düzeltmesi incelendi: merkez listesine zorunlu page eklendi; program/seans ve gerçek API assertionları korunur."
+        "fingerprint": "6a3e8c52d2b8dbd47d098d684bc35be50094d07e78cf12c15b57cb8917c30f43",
+        "reason": "Paylaşılan Starter ve sözleşme test farkları incelendi; Abone No kişi kimliği projeksiyonudur, seans/program yaşam döngüsü değişmedi."
       }
     },
     {
@@ -533,7 +533,8 @@
         "apps/backend/tests/person-registry.test.mjs",
         "apps/backend/tests/p07-account-profile-merge-acceptance.mjs",
         "apps/backend/tests/p07-account-revocation-acceptance.mjs",
-        "apps/backend/tests/registry.test.mjs"
+        "apps/backend/tests/registry.test.mjs",
+        "apps/backend/tests/subscriber-number-acceptance.mjs"
       ],
       "sources": [
         "apps/backend/database/active-discipline-projection-wrappers.sql",
@@ -575,7 +576,9 @@
         "apps/backend/database/starter-plan-gates.sql",
         "apps/backend/database/wrappers.sql",
         "apps/backend/supabase/migrations/20261101210000_person_management_discovery.sql",
-        "docs/client-integration.md"
+        "docs/client-integration.md",
+        "apps/backend/database/subscriber-numbers.sql",
+        "apps/backend/supabase/migrations/20261102064534_subscriber_numbers.sql"
       ],
       "operations": [
         "account_access_send_v1",
@@ -594,8 +597,8 @@
         "person_discipline_set_v1"
       ],
       "review": {
-        "fingerprint": "02f44977f08e841df199f995803ab7777ac044de620f62fe9078ba18974736dd",
-        "reason": "A03: Kişi ve öğrencilik rehberi korundu; mevcut gerçek davranış testlerinin operasyon/olumsuz senaryo bağları incelenip eksik WF test referansları tamamlandı. Test kaynağı yeni head başarısı değildir."
+        "fingerprint": "e21275b6fb5d91b5461e0f604d5fa46fe4ad85971eb8818749b01970047c57c9",
+        "reason": "Abone No final kaynak ve fixture: canonical legacy sıralama, eksik tahsis backfill/new student yarışı, private erişim reddi, snapshot stale ve late rollback incelendi; WF04 davranışı kaynakla uyumlu."
       }
     },
     {
@@ -869,8 +872,8 @@
         "debt_adjust_v1"
       ],
       "review": {
-        "fingerprint": "7aa3e73bb12c910a72dc99abd916c8c37f65b130630e3223720987c017c1bcfa",
-        "reason": "A03: Borç, tahsilat ve öğrenci alacağı rehberi korundu; mevcut gerçek davranış testlerinin operasyon/olumsuz senaryo bağları incelenip eksik WF test referansları tamamlandı. Test kaynağı yeni head başarısı değildir."
+        "fingerprint": "a9444801689d77f3068e999b17b0aaf0fe82770c08339f1c6bef4f711f303793",
+        "reason": "Paylaşılan Starter operasyon testine yalnız Abone No rapor şablon/CSV zinciri eklendi; tahsilat, borç düzeltme ve finans assertionları aynen korundu."
       }
     },
     {
@@ -912,8 +915,8 @@
         "calendar_feed_get_v1"
       ],
       "review": {
-        "fingerprint": "0922c698e4d39ab9e178f96f9c6d0243b12b703a73f907db0042788e6d6f4968",
-        "reason": "A03: Public başvuru ve kişisel takvim rehberi korundu; mevcut gerçek davranış testlerinin operasyon/olumsuz senaryo bağları incelenip eksik WF test referansları tamamlandı. Test kaynağı yeni head başarısı değildir."
+        "fingerprint": "0bccab9a2a8a007fc094c6e89975b4d71e5427a9eae78597bb7fc29fdb6b4178",
+        "reason": "Paylaşılan kişi registry testi yeni Abone No suite import ediyor; public/ICS kaynakları ve yetki/hata akışı değişmedi, rehber geçerli."
       }
     },
     {
@@ -925,7 +928,8 @@
       "tests": [
         "apps/backend/tests/p06-acceptance.mjs",
         "apps/backend/tests/p06-parser.mjs",
-        "apps/backend/tests/starter-operations-acceptance.mjs"
+        "apps/backend/tests/starter-operations-acceptance.mjs",
+        "apps/backend/tests/subscriber-number-acceptance.mjs"
       ],
       "sources": [
         "apps/backend/database/p05-bind.sql",
@@ -940,7 +944,9 @@
         "apps/backend/database/p06-wrappers.sql",
         "apps/backend/database/p07-lifecycle.sql",
         "apps/backend/database/runtime-wrappers-current.sql",
-        "docs/workflows.md"
+        "docs/workflows.md",
+        "apps/backend/database/subscriber-numbers.sql",
+        "apps/backend/database/settings-catalog-v10.sql"
       ],
       "operations": [
         "report_get_v1",
@@ -953,8 +959,8 @@
         "file_upload_complete_v1"
       ],
       "review": {
-        "fingerprint": "3ed19b6c60acf30ee94ce3f146d30d6f6866684e9f5f1f7d2c7ba3bff9e79fe1",
-        "reason": "Job takibine davet dalı eklendi; mevcut report/import erişim ve result yolu byte olarak korunuyor. Rehberdeki rapor/import sırası incelendi."
+        "fingerprint": "c1252d6d9756a8e032a6f219e1c79fad83fe447617e3c4218ee9efddece15b99",
+        "reason": "Final katalog10 ve ReportColumns onuncu alanı birlikte incelendi; gerçek template save-resolve-report-workerCSV zinciri ve varsayılan CSV testleri eklendi; mevcut rapor/hassasiyet/assertionlar korunur."
       }
     },
     {
@@ -987,8 +993,8 @@
         "document_publication_preview_v1"
       ],
       "review": {
-        "fingerprint": "1ccb6ff45256619502b8c69c57a47f0519b886777a5a04fad7f46eceb9f38ed1",
-        "reason": "Ortak generated wrapper farkı yalnız outbox_deliver_v1 service-only davet handoff’udur; bu akışın kendi wrapper ve domain kaynakları değişmedi, rehber ve mevcut insan yetki sırası incelendi."
+        "fingerprint": "abb5d72b33763d8825a07834e657adfcd387ed4fd9a1fd39b8a463c9680ab749",
+        "reason": "Paylaşılan Starter operasyon testinin yeni rapor şablonu/CSV senaryoları incelendi; belge ve inbox çalışma/yetki akışı değişmedi, mevcut assertionlar korunur."
       }
     },
     {
@@ -1020,7 +1026,10 @@
         "apps/backend/database/starter-settings-media.sql",
         "apps/backend/database/starter-work-templates-wrappers.sql",
         "apps/backend/database/starter-work-templates.sql",
-        "docs/settings.md"
+        "docs/settings.md",
+        "apps/backend/database/settings-catalog-v10.sql",
+        "apps/backend/supabase/migrations/20261102070247_subscriber_report_catalog.sql",
+        "apps/backend/database/subscriber-report-catalog.sql"
       ],
       "operations": [
         "notification_preferences_set_v1",
@@ -1035,8 +1044,8 @@
         "settings_preparation_resolve_v1"
       ],
       "review": {
-        "fingerprint": "451d5753d92ed6ab839bcaa7dc1dd5031aca7cc85599c77765ffacde4dca4401",
-        "reason": "A03: Ayarlar ve medya rehberi korundu; mevcut gerçek davranış testlerinin operasyon/olumsuz senaryo bağları incelenip eksik WF test referansları tamamlandı. Test kaynağı yeni head başarısı değildir."
+        "fingerprint": "ce71849715e00e53b557a4d3ad774fac2e5e6c926cebf3a5479406db08e0acab",
+        "reason": "Katalog10 yeni immutable migration ile member/center/org report_templates subscriber_number sütununu kabul eder; typed SettingsValues ve runtime catalog_version10 eşleşir; eski katalog migrationları korunur."
       }
     },
     {
@@ -1097,8 +1106,8 @@
         "saas_payment_submit_v1"
       ],
       "review": {
-        "fingerprint": "5e258f78bebd324d90df081bb5234809480280ae41f3d1bcf4f3ed1c2c137d71",
-        "reason": "Downgrade okuma assertion hatası önceki kapanış fixture oluşturulamamasının sonucuydu; zorunlu merkez liste sayfalaması düzeltildi, retained/excluded kapsam assertionları korunur."
+        "fingerprint": "a4a1c316c93dc371dcd11d77d9ace15d5438e6eb3d848a47cb6916dfb16e7d0e",
+        "reason": "Paylaşılan Starter paralel öğrenci kabulü numara sicilini de doğrular; plan/downgrade limitleri ve mevcut assertionlar korunur."
       }
     },
     {
@@ -1237,8 +1246,8 @@
         "automation_save_v1"
       ],
       "review": {
-        "fingerprint": "3c9542e3bf2c3eea2b098f78dc7fd719b9bb88fdcf5c43145abb16e64ddd122a",
-        "reason": "A03: Genel CRM ve otomasyon rehberi korundu; mevcut gerçek davranış testlerinin operasyon/olumsuz senaryo bağları incelenip eksik WF test referansları tamamlandı. Test kaynağı yeni head başarısı değildir."
+        "fingerprint": "714b226a5e991c57d8426d1a4264768da92812f154ca2011be1fd52d4316a9ca",
+        "reason": "Ortak P06 ve kişi registry test farkları incelendi; yalnız Abone No kaynakları/senaryoları eklendi, genel CRM yetkisi veya yeni entegrasyon değişmedi."
       }
     },
     {
@@ -1417,7 +1426,8 @@
         "apps/backend/scripts/p06-worker.mjs",
         "apps/backend/supabase/functions/backend-v1/invitation-delivery.ts",
         "apps/backend/supabase/migrations/20261101040221_invitation_delivery_tracking.sql",
-        "docs/workflows.md"
+        "docs/workflows.md",
+        "apps/backend/database/subscriber-numbers.sql"
       ],
       "operations": [
         "seat_offer_issue_v1",
@@ -1432,8 +1442,8 @@
         "subscription_boundary_apply_v1"
       ],
       "review": {
-        "fingerprint": "2349813d8134dc374a138bc571f71c52e2ca63bf209fed09c039e403369aa08a",
-        "reason": "Paylaşılan Starter test farkı ve CI logu incelendi; yalnız merkez listesine zorunlu page eklendi; worker kaynakları/işletim akışı değişmedi ve rehber geçerli."
+        "fingerprint": "fcb3df6e7bd687f893d9ae2578211d207ab3b1866d36a459ed957308ab47b8aa",
+        "reason": "Final varsayılan/seçili CSV kaynakları ve gerçek scoped P06 worker testi incelendi; claim/lease, byte sınırı ve finans yetkileri değişmedi; yeni helperlar client erişimine kapalı."
       }
     }
   ]

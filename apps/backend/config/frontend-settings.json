@@ -1,5 +1,5 @@
 {
-  "version": 9,
+  "version": 10,
   "fields": [
     {
       "scope": "user",
@@ -752,11 +752,12 @@
                   "amount_minor",
                   "credits",
                   "ratio_bps",
-                  "basis_count"
+                  "basis_count",
+                  "subscriber_number"
                 ]
               },
               "minItems": 1,
-              "maxItems": 9,
+              "maxItems": 10,
               "uniqueItems": true
             },
             "report_order": {
@@ -982,11 +983,12 @@
                   "amount_minor",
                   "credits",
                   "ratio_bps",
-                  "basis_count"
+                  "basis_count",
+                  "subscriber_number"
                 ]
               },
               "minItems": 1,
-              "maxItems": 9,
+              "maxItems": 10,
               "uniqueItems": true
             },
             "report_order": {
@@ -1212,11 +1214,12 @@
                   "amount_minor",
                   "credits",
                   "ratio_bps",
-                  "basis_count"
+                  "basis_count",
+                  "subscriber_number"
                 ]
               },
               "minItems": 1,
-              "maxItems": 9,
+              "maxItems": 10,
               "uniqueItems": true
             },
             "report_order": {

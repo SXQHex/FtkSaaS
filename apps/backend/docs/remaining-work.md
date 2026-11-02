@@ -85,7 +85,7 @@ Bu tablo yalnız izdir; eski kabul metinleri ikinci kez tutulmaz.
 
 **Dilim kabulü:** Eski sürümle yazma, başka tenant/izinsiz merkez erişimi ve yetki kaybı reddedilir. Starter ikinci aktif oda açamaz; mevcut kapasite ve tek mantıksal oda kuralları korunur. Backend okuma teslimi frontend ekran kabulü diye kapatılmaz.
 
-- [ ] S01.4 — XREQ-007/008 ek yapılandırma okumaları: merkez–disiplin ilişkisinin kendi kimlik/sürüm/yokluk sonucu ve kaynak bazlı kapanış listesi. Kaynak/sözleşme ve regresyon senaryoları hazır; aday CI, main/development teslimi ve frontend gerçek tüketici kabulü bekliyor. Önceki S01 oda kabulünü yeniden açmaz.
+- [x] S01.4 — XREQ-007/008 ek yapılandırma okumalarının backend teslimi tamamlandı; kaynak/run/ortam kanıtı [devirde](00-FtkSaaS-yeni-sohbet-devir.md#starter-yapılandırma-okumaları-kabulü). Frontend gerçek tüketici kabulü ortak talep sahibinde kalır.
 
 <a id="s02"></a>
 ### S02 — Sınıf ve program yönetim okumaları
@@ -119,6 +119,8 @@ Bu tablo yalnız izdir; eski kabul metinleri ikinci kez tutulmaz.
 - [ ] S03.2 — Yeni migration ve domain işlemiyle org bazlı tekil tahsisi atomik kur; değişmezlik ve tekrar güvenliğini mevcut komut/replay mekanizmasına bağla. No araması mevcut yetkili kişi çözümlemesini kullanır.
 - [ ] S03.3 — Aynı kişiye paralel aktivasyon, farklı kişilere eşzamanlı tahsis, aynı komutun tekrarı ve iki organizasyonu gerçek kişi registry suite'inde sınayarak tahsis/arama sonucunu doğrula.
 
+**Aday durumu:** Tahsis/arama SQL, değişmez sicil, sözleşme ve gerçek API senaryoları hazır; yeni aday CI/main/development kabulü beklenir.
+
 **Dilim kabulü:** İlk öğrencilikte 1001'den başlayan org numarası alınır; pasifleştir/aktifleştir, iletişim değişimi ve hesap bağlama yeni numara üretmez. Boşluksuz sıra vaadi verilmez; numara yeniden kullanılmaz veya yetki kanıtı sayılmaz. Tenant dışından No ile çözümleme reddedilir.
 
 <a id="s04"></a>
@@ -137,6 +139,8 @@ Bu tablo yalnız izdir; eski kabul metinleri ikinci kez tutulmaz.
 - [ ] S04.2 — Mevcut merge akışına P08 numara koruma ve alias davranışını bağla: iki numarada ilk tahsis edileni, tek numarada mevcut olanı koru; eski numaralar aynı canonical kişiye ulaşsın.
 - [ ] S04.3 — İlk aktarımı tekrar çalıştır; aktarım ile yeni öğrencilik yarışını, tek/iki numaralı birleşimi ve alias zincirini izole kabulde doğrula. Canlı veri aktarımı bu planın yetkisi değildir.
 
+**Aday durumu:** İlk aktarım ve merge/alias kaynakları; sıralama, tekrar, yarış ve rollback senaryoları hazır. Yeni aday kabulü beklenir; hosted canlı veri aktarımı bu çalışma kapsamında çalıştırılmaz.
+
 **Dilim kabulü:** Verilmiş numaralar yeniden numaralanmaz; alias başka kişiye tahsis edilmez. Birleşim hak/borç/satış geçmişini ve mevcut onay/yetki kapılarını korur. Geçmiş makbuz ve dış listeler yeniden yazılmaz; retry ve geç hata atomikliği mevcut akışla doğrulanır.
 
 <a id="s05"></a>
@@ -154,6 +158,8 @@ Bu tablo yalnız izdir; eski kabul metinleri ikinci kez tutulmaz.
 - [ ] S05.1 — Kişi referansı kullanan mevcut arama/liste/rapor/export projeksiyonlarını envanterden tara; Abone No gereken yüzeyleri ve mevcut izin kapsamlarını belirle.
 - [ ] S05.2 — Gerekli DTO/projeksiyonlara No'yu taşı; komut ve ilişkilerde UUID'yi koru. Değişen makine sözleşmesinden tip/katalogları üret; ilgili WF/API eşlemesini incele.
 - [ ] S05.3 — No ile bul→UUID komut→yeniden oku→rapor/export zincirini doğrula; alias araması, scope ve yetki kaybını sınayarak frontend'e sözleşme devrini yap.
+
+**İncelenen yüzeyler:** PersonSummary/PersonView ile ReportRow ve yeni CSV kaynakları adayda güncellendi. RoleView, ReservationView, AttendanceEntryView, EntitlementView, FinanceView, EarningView, LeadView, EventRegistrationView, EventDutyView, EventPaymentPreparationView, ClassAssignmentView, AgreementVersionView, ProtectedObligationView, SettlementAuthorityView, NegativeLimitsView, LessonRequestView, SeatOfferView, WaitlistEntryView ve CrmFollowupView sonraki ilgili operasyon diliminde mevcut plan/izin sınırlarıyla ele alınacak; S05 kapanmadı.
 
 **Dilim kabulü:** Aynı kişi izinli operasyon yüzeylerinde tutarlı numarayla görünür. Numara kişisel/finans verisine ek erişim sağlamaz; yeni export mevcut yetkiyi uygular. Önceden üretilmiş dış belge değişmez; frontend'in ekran uyarlaması/kabulü backend adına kapatılmaz.
 

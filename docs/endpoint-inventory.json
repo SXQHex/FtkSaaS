@@ -849,7 +849,8 @@
       "limits": [
         "Operational readers/writers supply center_id; assignment readers receive no contacts or other-center relations.",
         "Pagination supports created_at_asc; cursor is bound to filters and scope.",
-        "Operational access requires an active center relation or matching creation-center provenance before the first relationship. Historical/unassigned records do not grant cross-center access."
+        "Operational access requires an active center relation or matching creation-center provenance before the first relationship. Historical/unassigned records do not grant cross-center access.",
+        "query matches display name or exact decimal subscriber number, including old merge aliases; original tenant/center/actor/Starter scope precedes pagination. Subscriber numbers never grant access."
       ]
     },
     {
@@ -880,7 +881,8 @@
       "billing_class": "read",
       "limits": [
         "Operational readers/writers supply center_id; assignment readers receive no contacts or other-center relations.",
-        "Operational access requires an active center relation or matching creation-center provenance before the first relationship. Historical/unassigned records do not grant cross-center access."
+        "Operational access requires an active center relation or matching creation-center provenance before the first relationship. Historical/unassigned records do not grant cross-center access.",
+        "subscriber_number is a nullable decimal string; merged identities return the earliest allocated number. UUID remains the command identity."
       ]
     },
     {
@@ -3122,7 +3124,8 @@
       "billing_class": "read",
       "limits": [
         "Development/test only; final source candidate/main clean required.",
-        "Explicit tenant limits and dedicated scoped worker; hosted scheduling remains OPS-W01."
+        "Explicit tenant limits and dedicated scoped worker; hosted scheduling remains OPS-W01.",
+        "Current person-bearing report rows and newly generated CSV exports include subscriber_number. Existing export bytes and historical person UUIDs are unchanged; no new access is granted."
       ]
     },
     {
@@ -3155,7 +3158,8 @@
       "billing_class": "read",
       "limits": [
         "Development/test only; final source candidate/main clean required.",
-        "Explicit tenant limits and dedicated scoped worker; hosted scheduling remains OPS-W01."
+        "Explicit tenant limits and dedicated scoped worker; hosted scheduling remains OPS-W01.",
+        "Current person-bearing report rows and newly generated CSV exports include subscriber_number. Existing export bytes and historical person UUIDs are unchanged; no new access is granted."
       ]
     },
     {

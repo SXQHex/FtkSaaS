@@ -4,7 +4,7 @@
 
 ## Kaynak tabanı
 
-Main `b0d468d14fccde2816fb4cc6744038a608c80b84` (PR133). Aynı SHA'nın [main proof](https://github.com/SXQHex/FtkSaaS/actions/runs/41392859595), [merge proof](https://github.com/SXQHex/FtkSaaS/actions/runs/41392859644) ve [development teslimi](https://github.com/SXQHex/FtkSaaS/actions/runs/41392911722) GitHub'dan completed/success olarak doğrulandı. Bu taban kabulü yeni aday veya frontend gerçek ekran kabulü değildir.
+Main `61137c86c9ae015e2fc8f9dfef250a372bc1211d` (PR134). Aynı SHA'nın [main proof](https://github.com/SXQHex/FtkSaaS/actions/runs/41400798811), [merge proof](https://github.com/SXQHex/FtkSaaS/actions/runs/41400798958) ve [development teslimi](https://github.com/SXQHex/FtkSaaS/actions/runs/41400845196) attempt1 completed/success olarak doğrulandı. Development deploy job'ının hosted backend ve dağıtılmış dokümantasyon doğrulama/capture adımları da başarılıdır. Bu taban kabulü yeni aday veya frontend gerçek ekran kabulü değildir.
 
 ## S01–S02 backend kabulü
 
@@ -14,15 +14,19 @@ S01 oda keşfi/ayrıntısı ve düzenleme sürümü; S02 sınıf keşfi/düzenle
 
 S01–S02 backend teslimi kaynak, aday kabulü, merge/main kanıtı ve development doğrulamasıyla kapalıdır. Frontend ekran entegrasyonu/gerçek kullanıcı kabulü kendi alanında kalır; genel Starter veya F01–F33 bütün özellik kabulü bu teslimden çıkarılmaz.
 
-## Starter frontend talepleri için yeni aday
+## Starter yapılandırma okumaları kabulü
 
-XREQ-007/008 kapsamında merkez–disiplin ve kaynak kapanışı yönetim okumaları eklendi; DTO/selector/izin sahibi [WF02](../../../docs/workflows.md#wf02). Yeni sözleşme regresyonu eksik runtime metadata'sında kırmızı, değişiklik sonrası yeşil oldu. Gerçek Auth→Edge→RPC senaryoları ilişki yokluğu/kendi sürümü/stale yazma, kapanış append/yeniden okuma, cursor/hesap/kaynak, rol kaybı, F01/F02 kaybı ve Starter sınırlarını kapsayacak biçimde eklendi. Yerel native stack PostgreSQL artifact DNS ETIMEOUT nedeniyle başlatılamadı; bu gerçek API senaryoları yerelde geçmiş sayılmaz. İlk [PR134 adayı](https://github.com/SXQHex/FtkSaaS/actions/runs/41394141146) head `e82b67ba4db1d233b88bdd4498e4116195202567` üzerinde core/API-2/3/4 ve kaliteyi geçti; API-1 yeni Starter fixture içindeki zorunlu `page` alanı eksik `centers_list_v1` isteğinde reddedildi. Kapanış oluşturulmadığı için sonraki downgrade okuma assertion’ı da başarısız oldu. Yalnız test isteğine sayfalama eklendi; runtime ve assertion’lar korundu. Yeni aday CI, merge/main ve development teslimi bekleniyor; frontend adına kabul verilmedi.
+XREQ-007/008 için PR134'ün [son adayı](https://github.com/SXQHex/FtkSaaS/actions/runs/41397475140), attempt1 head `457a5451fac9ce4977937ab513dc7969858731eb`, base `b0d468d14fccde2816fb4cc6744038a608c80b84`, tested merge `77147bc3d0095d5b09405941c5aef951b95bbaa8` üzerinde core+dört API shard, quality/Secret scan ve full-clean toplayıcısını geçti. Önceki başarısız aday bu kabulün kanıtı değildir. Yukarıdaki main/development kabulüyle backend teslimi tamamlandı; frontend gerçek tüketici kabulü kendi sahibindedir. DTO/selector/izin sahibi [WF02](../../../docs/workflows.md#wf02); talep durumu [ortak kayıtta](../../../docs/requests.md) tutulur.
 
-XREQ-005 için kişi bazlı davet/bağ keşfi mevcut `person-management-discovery.sql` ve kendi gerçek API testlerinde bulundu; bu görevde yeniden uygulanmadı veya eski “uygulanıyor” kaydı kanıtsız kapatılmadı. XREQ-006 Starter dışında ertelenmiş kalır. XREQ-002'nin gerçek native recovery/oturum kabulü ayrı açık kalır. Görev ve sıra kendi sahiplerindedir.
+## Abone No yeni aday kapsamı
+
+S03/S04 tahsis, tekrar güvenli ilk aktarım, birleşimde numara/alias koruma ve kişi araması kaynakları hazırlandı. Kişi detay/liste, güncel rapor ve yeni CSV projeksiyonları aynı adayda; diğer operasyon DTO'ları için S05 açık kalır. Davranışın tek sahibi [P08](../../../docs/decisions/P08-accepted-scope.md#organizasyon-bazında-sabit-abone-numarası), tüketim [WF04](../../../docs/workflows.md#wf04) ve [WF10](../../../docs/workflows.md#wf10) kapsamındadır.
+
+Yeni şema regresyonu eksik SubscriberNumber tanımında kırmızı, decimal string/null DTO'larıyla yeşil oldu. Yeni gerçek API senaryoları eşzamanlı tahsis/replay, bağımsız org, aktif/pasif ilk aktarım/sıralama/tekrar, hesap bağı, tek/iki numaralı merge/alias zinciri, geç audit rollback ve kişi bağı temizlenmiş numaranın tekrar kullanılmamasını sınar. Yerel native stack yeniden denendi; PostgreSQL artifact indirmesi DNS ETIMEOUT nedeniyle başlayamadı. Bu gerçek SQL/API senaryoları yerelde geçmiş sayılmaz. Bu izole fixture, hosted fiziksel imha veya canlı veri aktarımı kabulü değildir. Aday CI/main/development doğrulaması beklenir; mevcut main başarısı yeni kaynağa taşınmaz.
 
 ## Devam noktası
 
-A03.1 kaynak/plan/WF eşlemesi main'de; A03.2/A03.3 özellik bazlı kanıt/ortam ve gerçek boşluk uzlaştırması açık. Öncelik mevcut frontend Starter taleplerinin ek okuma dilimi, ardından S03–S05'tir. Görev/ölçütler [backlog](remaining-work.md), uygulama sırası [kuyruk](production-queue.md) sahibindedir. Yeni aday ek yönetim okumaları ve migration içerir; yeni ürün kararı içermez. Aday/main/development kabulü bekliyor.
+A03.1 kaynak/plan/WF eşlemesi main'de; A03.2/A03.3 genel özellik bazlı kanıt ve boşluk uzlaştırması açık. S01.4 backend teslimi tamamlandı. Aktif paket S03/S04 ve temel S05 projeksiyonlarıdır; görev/ölçütler [backlog](remaining-work.md), sıra [kuyruk](production-queue.md) sahibindedir. Genel Starter veya F01–F33 kabulü kapatılmadı.
 
 ## Mevcut kaynak ve gerçek kabul sınırları
 

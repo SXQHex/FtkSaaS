@@ -3474,6 +3474,16 @@
           "minLength": 1,
           "maxLength": 100,
           "pattern": "^(?=.*\\S)[^\\u0000-\\u001f\\u007f]*$"
+        },
+        "subscriber_number": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/SubscriberNumber"
+            },
+            {
+              "type": "null"
+            }
+          ]
         }
       },
       "required": [
@@ -3536,6 +3546,16 @@
           "minLength": 1,
           "maxLength": 100,
           "pattern": "^(?=.*\\S)[^\\u0000-\\u001f\\u007f]*$"
+        },
+        "subscriber_number": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/SubscriberNumber"
+            },
+            {
+              "type": "null"
+            }
+          ]
         }
       },
       "required": [
@@ -4491,6 +4511,16 @@
           "anyOf": [
             {
               "$ref": "#/$defs/Count"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "subscriber_number": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/SubscriberNumber"
             },
             {
               "type": "null"
@@ -42919,11 +42949,12 @@
                     "amount_minor",
                     "credits",
                     "ratio_bps",
-                    "basis_count"
+                    "basis_count",
+                    "subscriber_number"
                   ]
                 },
                 "minItems": 1,
-                "maxItems": 9,
+                "maxItems": 10,
                 "uniqueItems": true
               },
               "report_order": {
@@ -43171,11 +43202,12 @@
                     "amount_minor",
                     "credits",
                     "ratio_bps",
-                    "basis_count"
+                    "basis_count",
+                    "subscriber_number"
                   ]
                 },
                 "minItems": 1,
-                "maxItems": 9,
+                "maxItems": 10,
                 "uniqueItems": true
               },
               "report_order": {
@@ -43767,11 +43799,12 @@
                     "amount_minor",
                     "credits",
                     "ratio_bps",
-                    "basis_count"
+                    "basis_count",
+                    "subscriber_number"
                   ]
                 },
                 "minItems": 1,
-                "maxItems": 9,
+                "maxItems": 10,
                 "uniqueItems": true
               },
               "report_order": {
@@ -45044,7 +45077,7 @@
           "$ref": "#/$defs/SettingsScope"
         },
         "catalog_version": {
-          "const": 9
+          "const": 10
         },
         "fields": {
           "type": "array",
@@ -45112,7 +45145,7 @@
               "const": "user"
             },
             "catalog_version": {
-              "const": 9
+              "const": 10
             },
             "fields": {
               "type": "array",
@@ -45164,7 +45197,7 @@
               "const": "member"
             },
             "catalog_version": {
-              "const": 9
+              "const": 10
             },
             "fields": {
               "type": "array",
@@ -45216,7 +45249,7 @@
               "const": "center"
             },
             "catalog_version": {
-              "const": 9
+              "const": 10
             },
             "fields": {
               "type": "array",
@@ -45268,7 +45301,7 @@
               "const": "organization"
             },
             "catalog_version": {
-              "const": 9
+              "const": 10
             },
             "fields": {
               "type": "array",
@@ -45320,7 +45353,7 @@
               "const": "platform"
             },
             "catalog_version": {
-              "const": 9
+              "const": 10
             },
             "fields": {
               "type": "array",
@@ -48055,11 +48088,12 @@
           "amount_minor",
           "credits",
           "ratio_bps",
-          "basis_count"
+          "basis_count",
+          "subscriber_number"
         ]
       },
       "minItems": 1,
-      "maxItems": 9,
+      "maxItems": 10,
       "uniqueItems": true
     },
     "ReportPreparationOrder": {
@@ -50178,6 +50212,12 @@
         "trace_id"
       ],
       "additionalProperties": false
+    },
+    "SubscriberNumber": {
+      "type": "string",
+      "pattern": "^(?:100[1-9]|10[1-9][0-9]|1[1-9][0-9]{2}|[2-9][0-9]{3}|[1-9][0-9]{4,18})$",
+      "maxLength": 19,
+      "description": "Organization-scoped immutable student number, starting at 1001. Decimal string preserves bigint precision; never an authentication proof."
     }
   },
   "x-contract": {
@@ -55722,7 +55762,8 @@
         "runtime_limits": [
           "Operational readers/writers supply center_id; assignment readers receive no contacts or other-center relations.",
           "Pagination supports created_at_asc; cursor is bound to filters and scope.",
-          "Operational access requires an active center relation or matching creation-center provenance before the first relationship. Historical/unassigned records do not grant cross-center access."
+          "Operational access requires an active center relation or matching creation-center provenance before the first relationship. Historical/unassigned records do not grant cross-center access.",
+          "query matches display name or exact decimal subscriber number, including old merge aliases; original tenant/center/actor/Starter scope precedes pagination. Subscriber numbers never grant access."
         ],
         "required_features": [
           "F07"
@@ -55821,7 +55862,8 @@
         "runtime_rpc": "api_v1.person_get_v1",
         "runtime_limits": [
           "Operational readers/writers supply center_id; assignment readers receive no contacts or other-center relations.",
-          "Operational access requires an active center relation or matching creation-center provenance before the first relationship. Historical/unassigned records do not grant cross-center access."
+          "Operational access requires an active center relation or matching creation-center provenance before the first relationship. Historical/unassigned records do not grant cross-center access.",
+          "subscriber_number is a nullable decimal string; merged identities return the earliest allocated number. UUID remains the command identity."
         ],
         "required_features": [
           "F06",
@@ -56173,7 +56215,8 @@
           "read_operation": "management_state_get_v1",
           "atomic_effects": [
             "center_relationships.active",
-            "organization_unique_student_limit"
+            "organization_unique_student_limit",
+            "subscriber_numbers.first_student_allocation"
           ],
           "business_commit": true,
           "read_path_status": "contract_only",
@@ -56591,7 +56634,8 @@
             "people.alias",
             "account_link_resolution",
             "scoped_relationship_references",
-            "merge_approvals.consume"
+            "merge_approvals.consume",
+            "subscriber_numbers.canonical_alias_rebind"
           ],
           "business_commit": true,
           "read_path_status": "implemented",
@@ -65898,7 +65942,8 @@
         },
         "runtime_limits": [
           "Development/test only; final source candidate/main clean required.",
-          "Explicit tenant limits and dedicated scoped worker; hosted scheduling remains OPS-W01."
+          "Explicit tenant limits and dedicated scoped worker; hosted scheduling remains OPS-W01.",
+          "Current person-bearing report rows and newly generated CSV exports include subscriber_number. Existing export bytes and historical person UUIDs are unchanged; no new access is granted."
         ]
       },
       {
@@ -66031,7 +66076,8 @@
         },
         "runtime_limits": [
           "Development/test only; final source candidate/main clean required.",
-          "Explicit tenant limits and dedicated scoped worker; hosted scheduling remains OPS-W01."
+          "Explicit tenant limits and dedicated scoped worker; hosted scheduling remains OPS-W01.",
+          "Current person-bearing report rows and newly generated CSV exports include subscriber_number. Existing export bytes and historical person UUIDs are unchanged; no new access is granted."
         ]
       },
       {
@@ -93756,7 +93802,7 @@
       "uuid": "backend uuid@14.0.3 v7 for all inserted IDs; DB defaults not required",
       "external_transport": "POST /functions/v1/backend-v1/{operation}; direct typed request body",
       "internal_rpc": "service-only api_v1 named functions; actor/session/UUID bank supplied by verified gateway",
-      "migration_count": 89,
+      "migration_count": 91,
       "acceptance_source": "apps/backend/docs/00-FtkSaaS-yeni-sohbet-devir.md"
     },
     "decision_sprint": {
