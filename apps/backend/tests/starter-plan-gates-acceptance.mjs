@@ -38,7 +38,7 @@ test('Starter real Auth/API resource limits, downgrade scope and receipt gates',
    const read=(operation,k)=>invoke('management_state_get_v1',{operation,selector:{operation,key:k}});
    const relation=(await read('center_discipline_set_v1',{discipline_id:disc})).items[0];assert.equal(relation.exists,true);assert.equal(relation.entity.type,'center_disciplines');assert.equal(relation.versions[0].version,1);
    const resource={kind:'room',id:room};assert.deepEqual((await read('availability_exception_save_v1',{resource})).items,[]);
-   const current=(await invoke('centers_list_v1',{})).items.find(x=>x.id===center);
+   const current=(await invoke('centers_list_v1',{page:{limit:200}})).items.find(x=>x.id===center);
    const closed=await invoke('availability_exception_save_v1',{resource,interval:{starts_at:'2032-01-01T00:00:00Z',ends_at:'2032-01-02T00:00:00Z'},reason:'Synthetic closure',expected_version:current.version});
    const view=(await read('availability_exception_save_v1',{resource})).items[0];assert.equal(view.entity.id,closed.primary_id);assert.equal(view.versions[0].version,current.version+1);assert(!('reason' in view.current.values));
   });

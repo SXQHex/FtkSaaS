@@ -431,8 +431,8 @@
         "center_discipline_set_v1"
       ],
       "review": {
-        "fingerprint": "2e776c1719270de2c2bf2a81cb41a249f5cab142bf8b8389f2cf4a1db93bba2e",
-        "reason": "XREQ-007/008 son kaynak ve test fixture incelendi; Business eğitmen kapanışı için gerçek aktif merkez ilişkisi kurulur; üretim assert_resource/CM/plan sınırları değişmez."
+        "fingerprint": "073af50b1753d82bb79dc5486b8bdefefbb27ce8607ba01a62e954746c2238df",
+        "reason": "PR134 API-1 logu ve merkez liste sözleşmesi incelendi: Starter fixture zorunlu page alanını atlıyordu; yalnız geçerli sayfalı istek eklendi; assertion, runtime ve yetki değişmedi."
       }
     },
     {
@@ -518,8 +518,8 @@
         "class_assignment_set_v1"
       ],
       "review": {
-        "fingerprint": "00cf585ca9f2f9709b16ab6a77aa4a4c40978e20029b6213e926ad98980a046b",
-        "reason": "Paylaşılan uygunluk pozitif kişi kapanışı fixture gerçek aktif eğitmen merkez ilişkisi kurar; kaynak ve seans/program yetki kuralları değişmez."
+        "fingerprint": "f0f02f17c2305c300a0b450c934f2ec1ef8c2d00623434a0c3186a4200af7056",
+        "reason": "Paylaşılan Starter fixture düzeltmesi incelendi: merkez listesine zorunlu page eklendi; program/seans ve gerçek API assertionları korunur."
       }
     },
     {
@@ -1097,8 +1097,8 @@
         "saas_payment_submit_v1"
       ],
       "review": {
-        "fingerprint": "e82ca28159bd2ba548a5b2777bdcd5cd9657b6ee62004e3c9ebf8150ca0147cb",
-        "reason": "Starter retained scope guard ve downgrade sonrası okuma regresyonları incelendi; plan sınırları ve dönem değişim akışı korundu; yeni runtime kabulü iddia edilmez."
+        "fingerprint": "5e258f78bebd324d90df081bb5234809480280ae41f3d1bcf4f3ed1c2c137d71",
+        "reason": "Downgrade okuma assertion hatası önceki kapanış fixture oluşturulamamasının sonucuydu; zorunlu merkez liste sayfalaması düzeltildi, retained/excluded kapsam assertionları korunur."
       }
     },
     {
@@ -1432,8 +1432,8 @@
         "subscription_boundary_apply_v1"
       ],
       "review": {
-        "fingerprint": "fe7f63c8e42214d8b790b59421fcd193dbd7d729888711b769009818c3c9d3de",
-        "reason": "Üretilmiş Edge sözleşmesi ve ortak contract test farkları incelendi; worker yürütme/claim/teslim kaynakları değişmedi; mevcut rehber geçerli."
+        "fingerprint": "2349813d8134dc374a138bc571f71c52e2ca63bf209fed09c039e403369aa08a",
+        "reason": "Paylaşılan Starter test farkı ve CI logu incelendi; yalnız merkez listesine zorunlu page eklendi; worker kaynakları/işletim akışı değişmedi ve rehber geçerli."
       }
     }
   ]
