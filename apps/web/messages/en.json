@@ -1016,6 +1016,19 @@
     "noClosures": "No closures for this resource.",
     "unreadableClosure": "The closure interval could not be verified for this resource.",
     "setupVerified": "Resource and policy preflight checks passed. The program preview must still verify specific times and conflicts.",
-    "processing": "Processing…"
+    "processing": "Processing…",
+    "inspectRemoval": "Review affected sessions",
+    "removalEffects": "Sessions affected by removal",
+    "noRemovalEffects": "No sessions are affected by this removal.",
+    "instructorRemovalHint": "Review the current effects before explicitly approving this removal.",
+    "instructorRequired": "Instructor required",
+    "instructorRemains": "Another instructor will remain assigned",
+    "removalPreservesSessions": "Sessions and existing reservations are preserved and normal session operations continue. The approving manager is responsible for providing an instructor. Assign the replacement separately.",
+    "PREVIEW_STALE": "The effects changed or expired. Review and approve a fresh preview.",
+    "instructorTasks": "Instructor required — {center}",
+    "noInstructorTasks": "No sessions require an instructor.",
+    "inspectSession": "Review current session",
+    "replacementInstructor": "Replacement instructor",
+    "assignSessionInstructor": "Assign instructor to session"
   }
 }

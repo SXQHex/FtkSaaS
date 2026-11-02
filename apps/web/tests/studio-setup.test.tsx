@@ -681,13 +681,23 @@ test("instructor revocation uses the actual scoped assignment and reason", async
         next_cursor: null,
       };
     if (operation === "person_get_v1") return { display_name: "Synthetic Instructor" };
+    if (operation === "role_revoke_preview_v1")
+      return {
+        id: assignment,
+        token: "synthetic-preview",
+        expires_at: "2099-01-01T00:00:00Z",
+        assignment_id: assignment,
+        assignment_version: 5,
+        sessions: [],
+      };
     return { items: [], next_cursor: null };
   });
   mocks.send.mockResolvedValue({});
   const user = userEvent.setup();
   render(<RoleSetup scope={{ ...scope, centerId: center.id }} onChanged={mocks.saved} />);
   await user.click(await screen.findByRole("button", { name: "Görevi kaldır" }));
-  await user.type(screen.getByLabelText("Kaldırma gerekçesi"), "Görev sona erdi");
+  await user.click(screen.getByRole("button", { name: "Etkilenen seansları incele" }));
+  await user.type(await screen.findByLabelText("Kaldırma gerekçesi"), "Görev sona erdi");
   await user.click(screen.getByRole("button", { name: "Görevi kaldırmayı onayla" }));
   expect(mocks.send.mock.calls[0][0]).toMatchObject({
     operation: "role_revoke_v1",

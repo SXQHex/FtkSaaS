@@ -11,6 +11,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@ftksaas/ui/components
 import { Alert, AlertDescription } from "@ftksaas/ui/components/alert";
 import { ScheduleWorkspace } from "../calendar/schedule-workspace";
 import { StudentsWorkspace } from "../students/students-workspace";
+import { InstructorTasks } from "../setup/instructor-tasks";
 import { StudioSetup } from "../setup/studio-setup";
 import { Preferences } from "../preferences";
 import { AdminShell, sections, type AdminSection } from "./admin-shell";
@@ -186,6 +187,23 @@ export function StudioWorkspace() {
           </span>
         </output>
       )}
+      {snapshot &&
+        ["overview", "studio"].includes(section) &&
+        snapshot.studios.flatMap(({ organization, centers }) =>
+          organization.access_mode === "normal"
+            ? centers.map((center) => (
+                <InstructorTasks
+                  key={`${snapshot.account.id}:${organization.id}:${center.id}:${retry}`}
+                  scope={{
+                    actorId: snapshot.account.id,
+                    orgId: organization.id,
+                    centerId: center.id,
+                  }}
+                  centerName={center.name}
+                />
+              ))
+            : [],
+        )}
       {snapshot && section === "overview" && (
         <div className="space-y-7">
           <div className="flex flex-wrap gap-2">

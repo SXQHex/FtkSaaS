@@ -12,6 +12,7 @@ import {
   setupError,
   type SetupScope,
 } from "../../lib/studio-setup";
+import { getSetupRoles } from "../../lib/instructor-setup";
 import { setupPolicyKeys } from "../../lib/setup-policy";
 import { errorKey } from "./setup-command";
 
@@ -37,17 +38,7 @@ export function SetupChecklist({ scope, timezone }: { scope: SetupScope; timezon
         setupCall("policies_get_v1", { org_id: scope.orgId, keys: [...setupPolicyKeys] }),
         getSetupDisciplines(scope.orgId),
       ]);
-      const roles = [];
-      let cursor: string | null | undefined;
-      do {
-        const result = await setupCall("roles_list_v1", {
-          org_id: scope.orgId,
-          center_id: scope.centerId,
-          page: { limit: 50, sort: "created_at_asc", ...(cursor ? { cursor } : {}) },
-        });
-        roles.push(...result.items);
-        cursor = result.next_cursor;
-      } while (cursor);
+      const roles = await getSetupRoles({ orgId: scope.orgId, centerId: scope.centerId });
       const activeDisciplines = disciplines.filter((row) => row.state === "active");
       const relation =
         activeDisciplines.length === 1
