@@ -87,7 +87,7 @@ Bu tablo yalnız izdir; eski kabul metinleri ikinci kez tutulmaz.
 
 - [x] S01.4 — XREQ-007/008 ek yapılandırma okumalarının backend teslimi tamamlandı; kaynak/run/ortam kanıtı [devirde](00-FtkSaaS-yeni-sohbet-devir.md#starter-yapılandırma-okumaları-kabulü). Frontend gerçek tüketici kabulü ortak talep sahibinde kalır.
 
-- [ ] S01.5 — [XREQ-009](../../../docs/requests.md#xreq-009-starter-rol-listesi): Starter tek eğitmeninin atama kimlik/durum/sürümüyle keşfi, gerekçeli kaldırma ve değiştirme. F05 açılmadan canlı CM/merkez kapsamı; yeni oturum, stale/yetki kaybı, ikinci eğitmen/yarış ve program/rezervasyon etkileri gerçek API kabulüyle ayrı runtime paketinde tamamlanacak.
+- [ ] S01.5 — [XREQ-009](../../../docs/requests.md#xreq-009-starter-rol-listesi): Starter tek eğitmeninin atama kimlik/durum/sürümüyle keşfi, gerekçeli kaldırma ve değiştirme. F05 açılmadan canlı CM/merkez kapsamı; yeni oturum, stale/yetki kaybı, ikinci eğitmen/yarış, etki önizleme→açık onay→gelecek görevleri kaldırma, rezervasyon/geçmiş koruma, eğitmen eksikliğinde normal seans yaşam döngüsünün ek kısıtlama olmadan sürmesi, yönetici iş listesi ve manuel seans ataması gerçek API kabulüyle ayrı runtime paketinde tamamlanacak.
 
 <a id="s02"></a>
 ### S02 — Sınıf ve program yönetim okumaları
@@ -108,7 +108,7 @@ Bu tablo yalnız izdir; eski kabul metinleri ikinci kez tutulmaz.
 <a id="s03"></a>
 ### S03 — Abone No tahsis ve arama
 
-- [ ] **Tür:** K · **Plan:** Tümü · **Özellik:** F07
+- [x] **Tür:** K · **Plan:** Tümü · **Özellik:** F07
 - **Bağımlılık:** A01
 - **Kabul:** İlk öğrencilikte org bazlı 1001+ numara tahsis edilir; No ile kişi bulunur.
 - **Sınır/olumsuz durum:** Hesap gerektirmez; tekrar istek ve eşzamanlı aktivasyon yeni/çift numara yaratmaz; tenant sızmaz.
@@ -117,18 +117,18 @@ Bu tablo yalnız izdir; eski kabul metinleri ikinci kez tutulmaz.
 
 **Uygulama alt adımları:**
 
-- [ ] S03.1 — [P08 kararına](../../../docs/decisions/P08-accepted-scope.md#organizasyon-bazında-sabit-abone-numarası) göre ilk öğrencilik/tahsis sınırını mevcut kişi yaşam döngüsüne bağla; hesap şartı koyma. Yalnız aday/eğitmen/personel olmanın numara üretmediğini doğrula.
-- [ ] S03.2 — Yeni migration ve domain işlemiyle org bazlı tekil tahsisi atomik kur; değişmezlik ve tekrar güvenliğini mevcut komut/replay mekanizmasına bağla. No araması mevcut yetkili kişi çözümlemesini kullanır.
-- [ ] S03.3 — Aynı kişiye paralel aktivasyon, farklı kişilere eşzamanlı tahsis, aynı komutun tekrarı ve iki organizasyonu gerçek kişi registry suite'inde sınayarak tahsis/arama sonucunu doğrula.
+- [x] S03.1 — [P08 kararına](../../../docs/decisions/P08-accepted-scope.md#organizasyon-bazında-sabit-abone-numarası) göre ilk öğrencilik/tahsis sınırını mevcut kişi yaşam döngüsüne bağla; hesap şartı koyma. Yalnız aday/eğitmen/personel olmanın numara üretmediğini doğrula.
+- [x] S03.2 — Yeni migration ve domain işlemiyle org bazlı tekil tahsisi atomik kur; değişmezlik ve tekrar güvenliğini mevcut komut/replay mekanizmasına bağla. No araması mevcut yetkili kişi çözümlemesini kullanır.
+- [x] S03.3 — Aynı kişiye paralel aktivasyon, farklı kişilere eşzamanlı tahsis, aynı komutun tekrarı ve iki organizasyonu gerçek kişi registry suite'inde sınayarak tahsis/arama sonucunu doğrula.
 
-**Aday durumu:** Tahsis/arama SQL, değişmez sicil, sözleşme ve gerçek API senaryoları hazır; yeni aday CI/main/development kabulü beklenir.
+**Teslim durumu:** S03/S04 ve S05 kişi/rapor/CSV temeli PR135 ile kabul edildi; kaynak/run/ortam kanıtı [devirde](00-FtkSaaS-yeni-sohbet-devir.md#abone-no-yeni-aday-kapsamı). Diğer operasyon projeksiyonları açık.
 
 **Dilim kabulü:** İlk öğrencilikte 1001'den başlayan org numarası alınır; pasifleştir/aktifleştir, iletişim değişimi ve hesap bağlama yeni numara üretmez. Boşluksuz sıra vaadi verilmez; numara yeniden kullanılmaz veya yetki kanıtı sayılmaz. Tenant dışından No ile çözümleme reddedilir.
 
 <a id="s04"></a>
 ### S04 — Abone No ilk aktarımı ve birleşim
 
-- [ ] **Tür:** K · **Plan:** Tümü · **Özellik:** F07,F31
+- [x] **Tür:** K · **Plan:** Tümü · **Özellik:** F07,F31
 - **Bağımlılık:** S03
 - **Kabul:** Aktif/pasif öğrenciler ilk ilişki tarihi/UUID sırasıyla numaralanır; eski numarayla birleşik kişi bulunur.
 - **Sınır/olumsuz durum:** Numara tekrar kullanılmaz; tekrar aktarım mevcut numarayı değiştirmez, aynı kişi farklı merkezde çoğalmaz.
@@ -137,11 +137,11 @@ Bu tablo yalnız izdir; eski kabul metinleri ikinci kez tutulmaz.
 
 **Uygulama alt adımları:**
 
-- [ ] S04.1 — Mevcut aktif/pasif öğrencileri ilk öğrenci ilişkisi tarihi, eşitlikte kişi UUID'siyle sıralayan tekrar güvenli ilk aktarımı hazırla; çok merkez ilişkisini org içinde tek kişi olarak ele al.
-- [ ] S04.2 — Mevcut merge akışına P08 numara koruma ve alias davranışını bağla: iki numarada ilk tahsis edileni, tek numarada mevcut olanı koru; eski numaralar aynı canonical kişiye ulaşsın.
-- [ ] S04.3 — İlk aktarımı tekrar çalıştır; aktarım ile yeni öğrencilik yarışını, tek/iki numaralı birleşimi ve alias zincirini izole kabulde doğrula. Canlı veri aktarımı bu planın yetkisi değildir.
+- [x] S04.1 — Mevcut aktif/pasif öğrencileri ilk öğrenci ilişkisi tarihi, eşitlikte kişi UUID'siyle sıralayan tekrar güvenli ilk aktarımı hazırla; çok merkez ilişkisini org içinde tek kişi olarak ele al.
+- [x] S04.2 — Mevcut merge akışına P08 numara koruma ve alias davranışını bağla: iki numarada ilk tahsis edileni, tek numarada mevcut olanı koru; eski numaralar aynı canonical kişiye ulaşsın.
+- [x] S04.3 — İlk aktarımı tekrar çalıştır; aktarım ile yeni öğrencilik yarışını, tek/iki numaralı birleşimi ve alias zincirini izole kabulde doğrula. Canlı veri aktarımı bu planın yetkisi değildir.
 
-**Aday durumu:** İlk aktarım ve merge/alias kaynakları; sıralama, tekrar, yarış ve rollback senaryoları hazır. Yeni aday kabulü beklenir; hosted canlı veri aktarımı bu çalışma kapsamında çalıştırılmaz.
+**Teslim durumu:** PR135 aday/main/development kabulü tamamlandı; kanıt [devirde](00-FtkSaaS-yeni-sohbet-devir.md#abone-no-yeni-aday-kapsamı). Hosted canlı veri aktarımı bu çalışma kapsamında çalıştırılmadı.
 
 **Dilim kabulü:** Verilmiş numaralar yeniden numaralanmaz; alias başka kişiye tahsis edilmez. Birleşim hak/borç/satış geçmişini ve mevcut onay/yetki kapılarını korur. Geçmiş makbuz ve dış listeler yeniden yazılmaz; retry ve geç hata atomikliği mevcut akışla doğrulanır.
 
@@ -625,7 +625,7 @@ Bu tablo yalnız izdir; eski kabul metinleri ikinci kez tutulmaz.
 
 ## F01–F33 kapsama izi
 
-A03 incelemesi mevcut 218 operasyonun tamamını tek WF sahibine bağladı: 211 operasyonun F01–F33 ve normatif plan izi vardır; `features=[]` olan yedi ortak ayar/medya operasyonu WF12 üzerinden S10 kapsamındadır. Ortak altyapıya yapay F etiketi atanmadı. Aşağıdaki akışların kaynak/test bağları `docs/workflows.json`, okunabilir görünümü [API haritası](../../../docs/functions.md) sahibindedir. Eksik WF test bağları mevcut gerçek test/SQL fixture kaynaklarıyla tamamlandı; yeni runtime başarısı iddia edilmez. Abonelik yükseltme/iptal testlerinin SQL dispatcher kabulü gerçek HTTP kabulünden ayrılır; grace uzatmanın negatif yetki kontrolü olumlu uzatma kabulü değildir. Bu eksikler S16 ve O10 kapsamında kalır. Her özelliğin hosted/plan bütünlük kabulü ilgili S/P/B/O ve G görevlerinde açık kalır; aday kaynağın test/ortam sonucu yalnız devirde tutulur.
+A03 ilk incelemesi PR135 tabanındaki 218 operasyonun tamamını tek WF sahibine bağladı: 211 operasyonun F01–F33 ve normatif plan izi vardır; `features=[]` olan yedi ortak ayar/medya operasyonu WF12 üzerinden S10 kapsamındadır. Ortak altyapıya yapay F etiketi atanmadı. Aşağıdaki akışların kaynak/test bağları `docs/workflows.json`, okunabilir görünümü [API haritası](../../../docs/functions.md) sahibindedir. Eksik WF test bağları mevcut gerçek test/SQL fixture kaynaklarıyla tamamlandı; yeni runtime başarısı iddia edilmez. Abonelik yükseltme/iptal testlerinin SQL dispatcher kabulü gerçek HTTP kabulünden ayrılır; grace uzatmanın negatif yetki kontrolü olumlu uzatma kabulü değildir. Bu eksikler S16 ve O10 kapsamında kalır. Her özelliğin hosted/plan bütünlük kabulü ilgili S/P/B/O ve G görevlerinde açık kalır; aday kaynağın test/ortam sonucu yalnız devirde tutulur.
 
 A03 ve G03 genel iz/kabul kapılarıdır. Aşağıdaki tablo görev navigasyonudur; ikinci durum veya plan erişimi matrisi değildir. Plan erişimi yalnız ürün sözleşmesinden alınır.
 

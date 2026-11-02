@@ -268,8 +268,8 @@
         "management_state_get_v1"
       ],
       "review": {
-        "fingerprint": "8e012bbf9551610965ec8301aca8c8fca15a72c55ee7c7db85dd8800864d26cc",
-        "reason": "PR135 CI loglarıyla fixture düzeltmeleri ve dört kesin assertion istisnası incelendi; checker/eşik değişmedi, bağımsız inceleme ve kaynak-özel politika kurulum yetkisi korunur."
+        "fingerprint": "dbb135a1eff0575689673cb826ce7c113208832faa018eb042c6a2e8d34f734b",
+        "reason": "Eğitmen kaldırma testlerinin açık önizleme onayına uyarlanması ve ortak üretilmiş sözleşme farkı incelendi; bu akışın kendi yetki/iş kuralları değişmedi."
       }
     },
     {
@@ -345,8 +345,8 @@
         "account_signup_check_v1"
       ],
       "review": {
-        "fingerprint": "21048b654c800c0d529d6b83fdd323a18ae2ad570e56dd0721e648198d8bb9d1",
-        "reason": "Main üzerindeki native Auth ve hosted smoke testleri korunur; ortak outbox wrapper farkı yalnız service-only davet handoff’udur, insan kimlik akışı değişmez."
+        "fingerprint": "be66cd14f8b1fa063de1ece83da5706e73a847bc205ae68c7d4537c9ecf26f1f",
+        "reason": "Ortak üretilmiş runtime wrapper farkı yalnız yeni role_revoke_preview_v1 F04 service-only entrypoint ekler; bu akışın komut/izin/etki zinciri değişmedi, mevcut rehber korunur."
       }
     },
     {
@@ -361,7 +361,8 @@
         "apps/backend/tests/starter-plan-gates-acceptance.mjs",
         "apps/backend/tests/api-acceptance.test.mjs",
         "apps/backend/tests/p07-account-revocation-acceptance.mjs",
-        "apps/backend/tests/availability-policies.test.mjs"
+        "apps/backend/tests/availability-policies.test.mjs",
+        "apps/backend/tests/starter-instructor-acceptance.mjs"
       ],
       "sources": [
         "apps/backend/database/account-session-management.sql",
@@ -406,7 +407,9 @@
         "apps/backend/database/wrappers.sql",
         "docs/workflows.md",
         "apps/backend/database/starter-resource-discovery.sql",
-        "apps/backend/supabase/migrations/20261102052010_starter_resource_discovery.sql"
+        "apps/backend/supabase/migrations/20261102052010_starter_resource_discovery.sql",
+        "apps/backend/database/starter-instructor-management.sql",
+        "apps/backend/supabase/migrations/20261102100000_starter_instructor_management.sql"
       ],
       "operations": [
         "organizations_list_v1",
@@ -428,11 +431,12 @@
         "center_manager_revoke_v1",
         "disciplines_list_v1",
         "discipline_save_v1",
-        "center_discipline_set_v1"
+        "center_discipline_set_v1",
+        "role_revoke_preview_v1"
       ],
       "review": {
-        "fingerprint": "b3b00fdb936ef3cd5620a3569926d3f6060be5c809e378f01c63c722018cb126",
-        "reason": "Paylaşılan Starter testine atomik 100 öğrenci numara tekilliği eklendi; stüdyo kurulumu/tek kaynak limitleri ve mevcut assertionlar değişmedi."
+        "fingerprint": "28f80853b109e8bac3ac19d02f854e3033b4e3d07a3e86a60de946d08b9d5dcf",
+        "reason": "Eğitmen kaldırma onayı ve normal seans yaşam döngüsü incelendi; rezervasyon, kapasite, zaman ve yoklama mevcut kontrollerle sürer."
       }
     },
     {
@@ -518,8 +522,8 @@
         "class_assignment_set_v1"
       ],
       "review": {
-        "fingerprint": "6a3e8c52d2b8dbd47d098d684bc35be50094d07e78cf12c15b57cb8917c30f43",
-        "reason": "Paylaşılan Starter ve sözleşme test farkları incelendi; Abone No kişi kimliği projeksiyonudur, seans/program yaşam döngüsü değişmedi."
+        "fingerprint": "39192d4708e82f4212dc8f7e33397bf83eaffc3ea227a1b6f5554ab69ee4f902",
+        "reason": "Eğitmen kaldırma onayı ve normal seans yaşam döngüsü incelendi; rezervasyon, kapasite, zaman ve yoklama mevcut kontrollerle sürer."
       }
     },
     {
@@ -597,8 +601,8 @@
         "person_discipline_set_v1"
       ],
       "review": {
-        "fingerprint": "031a9d69c29afabf992d525b1eed813c00388071f081daf390319057c3a9bac8",
-        "reason": "Deferred constraint olayları DDL öncesi SET CONSTRAINTS ile doğrulanır; bağlı ad yazması FORBIDDEN sınanır, numara koruyan bağımsız kişi güncellemesi yetkili API kullanır; runtime değişmedi."
+        "fingerprint": "1c06e2c7681881b43569167cbd1cc7aa517791b1abf9dce92b78524cece7c8fd",
+        "reason": "Eğitmen kaldırma testlerinin açık önizleme onayına uyarlanması ve ortak üretilmiş sözleşme farkı incelendi; bu akışın kendi yetki/iş kuralları değişmedi."
       }
     },
     {
@@ -685,8 +689,8 @@
         "negative_limits_get_v1"
       ],
       "review": {
-        "fingerprint": "5bb54232e5dfd7de9ab97e3585266ec01b20c9f7c037519a77691ccee6019fb3",
-        "reason": "S02: paylaşılan program/session testine yalnız yeni login ile yönetim okuma kabulü eklendi; mevcut satış/hak assertionları korunuyor."
+        "fingerprint": "14cc5818ed1683846cc4e2c97797b66919d1b712f48346d5361732c97878da5e",
+        "reason": "Eğitmen kaldırma testlerinin açık önizleme onayına uyarlanması ve ortak üretilmiş sözleşme farkı incelendi; bu akışın kendi yetki/iş kuralları değişmedi."
       }
     },
     {
@@ -755,8 +759,8 @@
         "reservation_capacity_override_v1"
       ],
       "review": {
-        "fingerprint": "028ac09fad8286bba729a7032827108d7cb5ffaf7d5f9efe57764779db76fc4b",
-        "reason": "S02: paylaşılan program/session testinde yeni login ile program keşfi var; mevcut rezervasyon/kapasite assertionları değişmedi."
+        "fingerprint": "d1f3f8fda9a3f3f49f9efa133d1b4f2789f8509b46259a1fbd2ab3dfe4548698",
+        "reason": "Eğitmen kaldırma onayı ve normal seans yaşam döngüsü incelendi; rezervasyon, kapasite, zaman ve yoklama mevcut kontrollerle sürer."
       }
     },
     {
@@ -814,8 +818,8 @@
         "attendance_start_v1"
       ],
       "review": {
-        "fingerprint": "d36dbe2e6b0d811cd9a8884ddd5d91585501ecfcaf5658843d14b36e15fc44d9",
-        "reason": "A03: Yoklama ve hak tüketimi rehberi korundu; mevcut gerçek davranış testlerinin operasyon/olumsuz senaryo bağları incelenip eksik WF test referansları tamamlandı. Test kaynağı yeni head başarısı değildir."
+        "fingerprint": "d153a65401b306c133cc9414dd16f1ea6b0886255a28d89d2f7f5608c7399fd4",
+        "reason": "Eğitmen kaldırma onayı ve normal seans yaşam döngüsü incelendi; rezervasyon, kapasite, zaman ve yoklama mevcut kontrollerle sürer."
       }
     },
     {
@@ -872,8 +876,8 @@
         "debt_adjust_v1"
       ],
       "review": {
-        "fingerprint": "a9444801689d77f3068e999b17b0aaf0fe82770c08339f1c6bef4f711f303793",
-        "reason": "Paylaşılan Starter operasyon testine yalnız Abone No rapor şablon/CSV zinciri eklendi; tahsilat, borç düzeltme ve finans assertionları aynen korundu."
+        "fingerprint": "c305692673d9aa8e9277223cf684e0d39ae6dc9037fededdfee3ed29aa1d6dd9",
+        "reason": "Ortak üretilmiş runtime wrapper farkı yalnız yeni role_revoke_preview_v1 F04 service-only entrypoint ekler; bu akışın komut/izin/etki zinciri değişmedi, mevcut rehber korunur."
       }
     },
     {
@@ -915,8 +919,8 @@
         "calendar_feed_get_v1"
       ],
       "review": {
-        "fingerprint": "0bccab9a2a8a007fc094c6e89975b4d71e5427a9eae78597bb7fc29fdb6b4178",
-        "reason": "Paylaşılan kişi registry testi yeni Abone No suite import ediyor; public/ICS kaynakları ve yetki/hata akışı değişmedi, rehber geçerli."
+        "fingerprint": "f092de64f817f5b958376532db81923830ba861cd25126b8cb2ff8b312cc6330",
+        "reason": "Eğitmen kaldırma testlerinin açık önizleme onayına uyarlanması ve ortak üretilmiş sözleşme farkı incelendi; bu akışın kendi yetki/iş kuralları değişmedi."
       }
     },
     {
@@ -959,8 +963,8 @@
         "file_upload_complete_v1"
       ],
       "review": {
-        "fingerprint": "ec8d439667422df1ed43c8d489b07b629c60c6d39360c4189d8154056f1559db",
-        "reason": "Subscriber fixture ve typed katalog beklenti düzeltmeleri incelendi; rapor/CSV kaynağı ve mevcut finans assertionları değişmedi, kabul yeni adaya bağlıdır."
+        "fingerprint": "6e68f766a9e5621a996b8e74db4face07128760f71c9f028b21c90f2ff691efd",
+        "reason": "Ortak üretilmiş runtime wrapper farkı yalnız yeni role_revoke_preview_v1 F04 service-only entrypoint ekler; bu akışın komut/izin/etki zinciri değişmedi, mevcut rehber korunur."
       }
     },
     {
@@ -993,8 +997,8 @@
         "document_publication_preview_v1"
       ],
       "review": {
-        "fingerprint": "abb5d72b33763d8825a07834e657adfcd387ed4fd9a1fd39b8a463c9680ab749",
-        "reason": "Paylaşılan Starter operasyon testinin yeni rapor şablonu/CSV senaryoları incelendi; belge ve inbox çalışma/yetki akışı değişmedi, mevcut assertionlar korunur."
+        "fingerprint": "899a4dda0a28130d0b581a44d2989202ef7f74c1532237d4b68dc02d68ac56c1",
+        "reason": "Ortak üretilmiş runtime wrapper farkı yalnız yeni role_revoke_preview_v1 F04 service-only entrypoint ekler; bu akışın komut/izin/etki zinciri değişmedi, mevcut rehber korunur."
       }
     },
     {
@@ -1044,8 +1048,8 @@
         "settings_preparation_resolve_v1"
       ],
       "review": {
-        "fingerprint": "e1cc0b915ce81bd05946a80bc071cf68b162b80c3ca0e32fac668d1cd1868ea2",
-        "reason": "Katalog testleri eski sabit9 yerine mevcut config sürümüne tam eşitlik doğrular; renk/default/consumer assertionları korunur, dar iki istisna bağımsız incelendi."
+        "fingerprint": "111ccb9ecf0d56cf878694547e88c7555d4cf2f84b73871da63257b928a34498",
+        "reason": "Ortak üretilmiş runtime wrapper farkı yalnız yeni role_revoke_preview_v1 F04 service-only entrypoint ekler; bu akışın komut/izin/etki zinciri değişmedi, mevcut rehber korunur."
       }
     },
     {
@@ -1106,8 +1110,8 @@
         "saas_payment_submit_v1"
       ],
       "review": {
-        "fingerprint": "a4a1c316c93dc371dcd11d77d9ace15d5438e6eb3d848a47cb6916dfb16e7d0e",
-        "reason": "Paylaşılan Starter paralel öğrenci kabulü numara sicilini de doğrular; plan/downgrade limitleri ve mevcut assertionlar korunur."
+        "fingerprint": "8777ebaa886402660dc3f264380931be1fc19e43fe16715e05df62a3fab976fe",
+        "reason": "Ortak üretilmiş runtime wrapper farkı yalnız yeni role_revoke_preview_v1 F04 service-only entrypoint ekler; bu akışın komut/izin/etki zinciri değişmedi, mevcut rehber korunur."
       }
     },
     {
@@ -1141,8 +1145,8 @@
         "instructor_agreements_list_v1"
       ],
       "review": {
-        "fingerprint": "66abfd3de8fb9f43dd4c30bbd9bd39c7337aba8a0516d6ce816aad46a1799f93",
-        "reason": "A03: Anlaşma, hakediş ve eğitmen ödemesi rehberi korundu; mevcut gerçek davranış testlerinin operasyon/olumsuz senaryo bağları incelenip eksik WF test referansları tamamlandı. Test kaynağı yeni head başarısı değildir."
+        "fingerprint": "6fa48aa8a61873c3b124d57beb96ca145fcb9b3d26bb4f5de763d774df92736d",
+        "reason": "Eğitmen kaldırma testlerinin açık önizleme onayına uyarlanması ve ortak üretilmiş sözleşme farkı incelendi; bu akışın kendi yetki/iş kuralları değişmedi."
       }
     },
     {
@@ -1208,8 +1212,8 @@
         "event_actual_start_correct_v1"
       ],
       "review": {
-        "fingerprint": "fbae8c7a285c532507d42aa046ef350b50212617ff36be6fd82eee2e84df56c2",
-        "reason": "A03: Etkinlik kayıt, ödeme ve iptal rehberi korundu; mevcut gerçek davranış testlerinin operasyon/olumsuz senaryo bağları incelenip eksik WF test referansları tamamlandı. Test kaynağı yeni head başarısı değildir."
+        "fingerprint": "be7de7c89e7146e322c70d8c377ab13deec93212d5d15aeafb3cdbba02e6a5df",
+        "reason": "Ortak üretilmiş runtime wrapper farkı yalnız yeni role_revoke_preview_v1 F04 service-only entrypoint ekler; bu akışın komut/izin/etki zinciri değişmedi, mevcut rehber korunur."
       }
     },
     {
@@ -1246,8 +1250,8 @@
         "automation_save_v1"
       ],
       "review": {
-        "fingerprint": "714b226a5e991c57d8426d1a4264768da92812f154ca2011be1fd52d4316a9ca",
-        "reason": "Ortak P06 ve kişi registry test farkları incelendi; yalnız Abone No kaynakları/senaryoları eklendi, genel CRM yetkisi veya yeni entegrasyon değişmedi."
+        "fingerprint": "0404c2a045d83458b5738cb44c95bee434a360f6ebc22df575b6d686f13226cc",
+        "reason": "Eğitmen kaldırma testlerinin açık önizleme onayına uyarlanması ve ortak üretilmiş sözleşme farkı incelendi; bu akışın kendi yetki/iş kuralları değişmedi."
       }
     },
     {
@@ -1318,8 +1322,8 @@
         "platform_owner_remove_v1"
       ],
       "review": {
-        "fingerprint": "62abb4f84af0fecaa7bbdfd0f9ded2070de5617340c52454e88717be5730741b",
-        "reason": "A03: platform yönetimi testleri ile grace yönetim okumasının negatif yetki fixture bağı incelendi; olumlu grace uzatma/hosted kabulü açık."
+        "fingerprint": "867083c190c8e0ae3211c15cf387fc83de69046e259f2bfb90c25797493e56f2",
+        "reason": "Ortak üretilmiş runtime wrapper farkı yalnız yeni role_revoke_preview_v1 F04 service-only entrypoint ekler; bu akışın komut/izin/etki zinciri değişmedi, mevcut rehber korunur."
       }
     },
     {
@@ -1349,8 +1353,8 @@
         "settlement_authority_set_v1"
       ],
       "review": {
-        "fingerprint": "52ac242dc7b399bce9a2d09b0a2a3938c714d91513bfc7a2d2cebb7d6b4e5f5a",
-        "reason": "Ortak generated wrapper farkı yalnız outbox_deliver_v1 service-only davet handoff’udur; bu akışın kendi wrapper ve domain kaynakları değişmedi, rehber ve mevcut insan yetki sırası incelendi."
+        "fingerprint": "5e30abc42072847e8b3f3bcce4a28759bebd2185c37b6bd94ad778895bfde7ed",
+        "reason": "Ortak üretilmiş runtime wrapper farkı yalnız yeni role_revoke_preview_v1 F04 service-only entrypoint ekler; bu akışın komut/izin/etki zinciri değişmedi, mevcut rehber korunur."
       }
     },
     {
@@ -1375,8 +1379,8 @@
         "seat_offer_reject_v1"
       ],
       "review": {
-        "fingerprint": "167e2ef73fd3796c7ff7e79659d5e889467546d084aa252c381e680b9b900d29",
-        "reason": "Ortak generated wrapper farkı yalnız outbox_deliver_v1 service-only davet handoff’udur; bu akışın kendi wrapper ve domain kaynakları değişmedi, rehber ve mevcut insan yetki sırası incelendi."
+        "fingerprint": "20a3ea26ad0aa4f8c1709096234bc6c773213cb5cea9dea8517bb987ba2200ae",
+        "reason": "Ortak üretilmiş runtime wrapper farkı yalnız yeni role_revoke_preview_v1 F04 service-only entrypoint ekler; bu akışın komut/izin/etki zinciri değişmedi, mevcut rehber korunur."
       }
     },
     {
@@ -1442,8 +1446,8 @@
         "subscription_boundary_apply_v1"
       ],
       "review": {
-        "fingerprint": "fcb3df6e7bd687f893d9ae2578211d207ab3b1866d36a459ed957308ab47b8aa",
-        "reason": "Final varsayılan/seçili CSV kaynakları ve gerçek scoped P06 worker testi incelendi; claim/lease, byte sınırı ve finans yetkileri değişmedi; yeni helperlar client erişimine kapalı."
+        "fingerprint": "40b19e3db123a34c8205ff58d1584968684d4bb320e728a7c73de7247b73b588",
+        "reason": "Ortak üretilmiş runtime wrapper farkı yalnız yeni role_revoke_preview_v1 F04 service-only entrypoint ekler; bu akışın komut/izin/etki zinciri değişmedi, mevcut rehber korunur."
       }
     }
   ]

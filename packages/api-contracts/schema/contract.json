@@ -918,7 +918,8 @@
         "calendar_link_revoke_v1",
         "calendar_feed_get_v1",
         "settings_preparation_resolve_v1",
-        "account_signup_check_v1"
+        "account_signup_check_v1",
+        "role_revoke_preview_v1"
       ]
     },
     "EntityType": {
@@ -3619,6 +3620,11 @@
         },
         "discipline_ids": {
           "$ref": "#/$defs/EventDisciplineIds"
+        },
+        "management_attention": {
+          "enum": [
+            "instructor_required"
+          ]
         }
       },
       "required": [
@@ -3740,6 +3746,11 @@
           "items": {
             "$ref": "#/$defs/SharedLessonParticipant"
           }
+        },
+        "management_attention": {
+          "enum": [
+            "instructor_required"
+          ]
         }
       },
       "required": [
@@ -7636,6 +7647,9 @@
         },
         "reason": {
           "$ref": "#/$defs/Text"
+        },
+        "impact_approval": {
+          "$ref": "#/$defs/PreviewToken"
         }
       },
       "required": [
@@ -8749,6 +8763,9 @@
         "interest_filter": {
           "type": "boolean",
           "default": false
+        },
+        "needs_instructor": {
+          "$ref": "#/$defs/Bool"
         }
       },
       "required": [
@@ -25207,6 +25224,14 @@
         },
         "waitlist_detail": {
           "$ref": "#/$defs/WaitlistEntryView"
+        },
+        "session_detail": {
+          "$ref": "#/$defs/SessionView"
+        },
+        "management_attention": {
+          "enum": [
+            "instructor_required"
+          ]
         }
       },
       "required": [
@@ -26490,10 +26515,14 @@
               },
               "org_id": {
                 "$ref": "#/$defs/FtkUuid"
+              },
+              "center_id": {
+                "$ref": "#/$defs/FtkUuid"
               }
             },
             "required": [
-              "org_id"
+              "org_id",
+              "center_id"
             ]
           }
         },
@@ -27275,10 +27304,14 @@
               },
               "org_id": {
                 "$ref": "#/$defs/FtkUuid"
+              },
+              "center_id": {
+                "$ref": "#/$defs/FtkUuid"
               }
             },
             "required": [
-              "org_id"
+              "org_id",
+              "center_id"
             ]
           }
         },
@@ -30390,6 +30423,39 @@
                 }
               }
             }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "operation": {
+                "const": "role_revoke_preview_v1"
+              }
+            },
+            "required": [
+              "operation"
+            ]
+          },
+          "then": {
+            "properties": {
+              "selector": {
+                "properties": {
+                  "operation": {
+                    "const": "role_revoke_preview_v1"
+                  }
+                }
+              },
+              "org_id": {
+                "$ref": "#/$defs/FtkUuid"
+              },
+              "center_id": {
+                "$ref": "#/$defs/FtkUuid"
+              }
+            },
+            "required": [
+              "org_id",
+              "center_id"
+            ]
           }
         }
       ]
@@ -35629,6 +35695,9 @@
         },
         {
           "$ref": "#/$defs/ManagementProjection_reservation_capacity_override_v1"
+        },
+        {
+          "$ref": "#/$defs/ManagementProjection_role_revoke_preview_v1"
         }
       ]
     },
@@ -35786,7 +35855,8 @@
         "settings_update_v1",
         "settings_reset_preview_v1",
         "settings_reset_apply_v1",
-        "reservation_capacity_override_v1"
+        "reservation_capacity_override_v1",
+        "role_revoke_preview_v1"
       ]
     },
     "ManagementSelector_account_profile_update_v1": {
@@ -36180,7 +36250,6 @@
             }
           },
           "required": [
-            "person_id",
             "role",
             "scope"
           ],
@@ -36929,11 +36998,7 @@
               ]
             }
           },
-          "required": [
-            "session_id",
-            "person_id",
-            "duty"
-          ],
+          "required": [],
           "additionalProperties": false
         }
       },
@@ -40201,6 +40266,9 @@
         },
         {
           "$ref": "#/$defs/ManagementSelector_reservation_capacity_override_v1"
+        },
+        {
+          "$ref": "#/$defs/ManagementSelector_role_revoke_preview_v1"
         }
       ]
     },
@@ -50218,6 +50286,169 @@
       "pattern": "^(?:100[1-9]|10[1-9][0-9]|1[1-9][0-9]{2}|[2-9][0-9]{3}|[1-9][0-9]{4,18})$",
       "maxLength": 19,
       "description": "Organization-scoped immutable student number, starting at 1001. Decimal string preserves bigint precision; never an authentication proof."
+    },
+    "Request_role_revoke_preview": {
+      "type": "object",
+      "properties": {
+        "client_api_version": {
+          "const": 1
+        },
+        "request_id": {
+          "$ref": "#/$defs/FtkUuid"
+        },
+        "org_id": {
+          "$ref": "#/$defs/FtkUuid"
+        },
+        "center_id": {
+          "$ref": "#/$defs/FtkUuid"
+        },
+        "expected_version": {
+          "$ref": "#/$defs/PositiveInt"
+        },
+        "assignment_id": {
+          "$ref": "#/$defs/FtkUuid"
+        }
+      },
+      "required": [
+        "client_api_version",
+        "request_id",
+        "org_id",
+        "expected_version",
+        "assignment_id",
+        "center_id"
+      ],
+      "additionalProperties": false
+    },
+    "InstructorRevocationSession": {
+      "type": "object",
+      "properties": {
+        "session_id": {
+          "$ref": "#/$defs/FtkUuid"
+        },
+        "starts_at": {
+          "$ref": "#/$defs/Instant"
+        },
+        "ends_at": {
+          "$ref": "#/$defs/Instant"
+        },
+        "version": {
+          "$ref": "#/$defs/PositiveInt"
+        },
+        "will_require_instructor": {
+          "$ref": "#/$defs/Bool"
+        }
+      },
+      "required": [
+        "session_id",
+        "starts_at",
+        "ends_at",
+        "version",
+        "will_require_instructor"
+      ],
+      "additionalProperties": false
+    },
+    "InstructorRevocationPreview": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/FtkUuid"
+        },
+        "token": {
+          "$ref": "#/$defs/OpaqueToken"
+        },
+        "expires_at": {
+          "$ref": "#/$defs/Instant"
+        },
+        "assignment_id": {
+          "$ref": "#/$defs/FtkUuid"
+        },
+        "assignment_version": {
+          "$ref": "#/$defs/PositiveInt"
+        },
+        "sessions": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/InstructorRevocationSession"
+          }
+        }
+      },
+      "required": [
+        "id",
+        "token",
+        "expires_at",
+        "assignment_id",
+        "assignment_version",
+        "sessions"
+      ],
+      "additionalProperties": false
+    },
+    "Success_role_revoke_preview": {
+      "type": "object",
+      "properties": {
+        "ok": {
+          "const": true
+        },
+        "data": {
+          "$ref": "#/$defs/InstructorRevocationPreview"
+        },
+        "trace_id": {
+          "$ref": "#/$defs/FtkUuid"
+        }
+      },
+      "required": [
+        "ok",
+        "data",
+        "trace_id"
+      ],
+      "additionalProperties": false
+    },
+    "ManagementSelector_role_revoke_preview_v1": {
+      "type": "object",
+      "properties": {
+        "operation": {
+          "const": "role_revoke_preview_v1"
+        },
+        "key": {
+          "type": "object",
+          "properties": {
+            "assignment_id": {
+              "$ref": "#/$defs/FtkUuid"
+            }
+          },
+          "required": [
+            "assignment_id"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "required": [
+        "operation",
+        "key"
+      ],
+      "additionalProperties": false
+    },
+    "ManagementProjection_role_revoke_preview_v1": {
+      "type": "object",
+      "properties": {
+        "operation": {
+          "const": "role_revoke_preview_v1"
+        },
+        "values": {
+          "type": "object",
+          "properties": {
+            "assignment_id": {
+              "$ref": "#/$defs/FtkUuid"
+            }
+          },
+          "required": [],
+          "additionalProperties": false
+        }
+      },
+      "required": [
+        "operation",
+        "values"
+      ],
+      "additionalProperties": false
     }
   },
   "x-contract": {
@@ -54598,7 +54829,9 @@
         "runtime_rpc": "api_v1.role_assign_v1",
         "runtime_transport": "authenticated Edge adapter -> service-only RPC; rules/transaction in PostgreSQL",
         "runtime_external_path": "/functions/v1/backend-v1/role_assign_v1",
-        "runtime_limits": [],
+        "runtime_limits": [
+          "management_state_get_v1 supports instructor assignment discovery only; writes still require person_id and a verified active account link."
+        ],
         "required_features": [
           "F04"
         ],
@@ -54623,7 +54856,7 @@
             "no_account_link_creation"
           ],
           "business_commit": true,
-          "read_path_status": "contract_only",
+          "read_path_status": "implemented",
           "source_decision": "DS-2026-10-17"
         },
         "decision_delivery": {
@@ -54724,7 +54957,11 @@
         "runtime_rpc": "api_v1.role_revoke_v1",
         "runtime_transport": "authenticated Edge adapter -> service-only RPC; rules/transaction in PostgreSQL",
         "runtime_external_path": "/functions/v1/backend-v1/role_revoke_v1",
-        "runtime_limits": [],
+        "runtime_limits": [
+          "Starter instructor assignment ID/version is discoverable with management_state_get_v1 role_assign_v1 selector. Instructor revoke requires an account-bound impact_approval when future unstarted sessions are affected; exact replay does not detach twice.",
+          "Confirmed revoke preserves sessions, rooms, student reservations and completed/begun history; removes future instructor duties with explicit overrides and increments session versions. No automatic replacement.",
+          "Missing instructor imposes no additional restriction on the existing session lifecycle: normal reservation, schedule, capacity and attendance operations keep their existing authorization, plan, rights and time rules. No automatic cancellation, suspension or replacement; the revoking manager is responsible for arranging an instructor."
+        ],
         "required_features": [
           "F04"
         ],
@@ -56752,7 +56989,8 @@
           }
         },
         "runtime_limits": [
-          "25 October session capacity revision: single total/category limits and physical room ceiling; acceptance pending."
+          "25 October session capacity revision: single total/category limits and physical room ceiling; acceptance pending.",
+          "needs_instructor=true requires explicit center and live manager authority; returns only open unstarted sessions requiring instructor assignment. management_attention is manager-only."
         ]
       },
       {
@@ -57385,7 +57623,8 @@
           }
         },
         "runtime_limits": [
-          "25 October session capacity revision: single total/category limits and physical room ceiling; acceptance pending."
+          "25 October session capacity revision: single total/category limits and physical room ceiling; acceptance pending.",
+          "manager-only management_attention=instructor_required flags open unstarted sessions, including overdue; missing instructor does not hide an existing session/reservation."
         ]
       },
       {
@@ -73766,7 +74005,9 @@
           "F10",
           "F08",
           "F01",
-          "F02"
+          "F02",
+          "F04",
+          "F13"
         ],
         "required_features": [],
         "runtime_required_features": [],
@@ -73799,6 +74040,16 @@
           {
             "feature": "F02",
             "when": "availability_exception_save_selector",
+            "mode": "required_if_selected"
+          },
+          {
+            "feature": "F04",
+            "when": "instructor_role_assign_selector",
+            "mode": "required_if_selected"
+          },
+          {
+            "feature": "F13",
+            "when": "unassigned_session_work_list",
             "mode": "required_if_selected"
           }
         ],
@@ -73892,7 +74143,9 @@
         "runtime_rpc": "api_v1.management_state_get_v1",
         "runtime_transport": "authenticated Edge adapter -> service-only RPC; rules/transaction in PostgreSQL",
         "runtime_limits": [
-          "Original live authority and supported selectors are listed in runtime_selectors. Class/program discovery requires explicit organization/center and live schedule.manage; program reuse requires a fresh preview, never a saved approval."
+          "Original live authority and supported selectors are listed in runtime_selectors. Class/program discovery requires explicit organization/center and live schedule.manage; program reuse requires a fresh preview, never a saved approval.",
+          "role_assign_v1 selector supports instructor only, explicit matching center/scope and live center manager authority; optional person_id discovers active/inactive assignment IDs and row versions. No account link IDs or general F05 personnel listing.",
+          "session_assignment_set_v1 selector key={} or {session_id} lists open unstarted sessions requiring instructor assignment, including overdue; explicit center/live manager, starts_at_asc keyset, real session version and session_detail. No implicit appointment or calendar time window."
         ],
         "runtime_selectors": [
           "negcredit_valuation_set_v1",
@@ -73944,7 +74197,9 @@
           "class_save_v1",
           "program_preview_v1",
           "center_discipline_set_v1",
-          "availability_exception_save_v1"
+          "availability_exception_save_v1",
+          "role_assign_v1",
+          "session_assignment_set_v1"
         ]
       },
       {
@@ -78023,6 +78278,123 @@
         },
         "runtime_limits": [
           "Existing primary email or linked Google identity email includes unconfirmed accounts. available means no match at check time; the client then calls native signUp. No password, CAPTCHA, PKCE or metadata accepted."
+        ]
+      },
+      {
+        "name": "role_revoke_preview_v1",
+        "module": "M02",
+        "features": [
+          "F04"
+        ],
+        "permission": "center.manage",
+        "actor_source": "server_verified",
+        "transport": "P",
+        "billing_class": "config",
+        "request": {
+          "$ref": "#/$defs/Request_role_revoke_preview"
+        },
+        "success": {
+          "$ref": "#/$defs/Success_role_revoke_preview"
+        },
+        "errors": [
+          "ATTENDANCE_CLOSED",
+          "ATTENDANCE_INCOMPLETE",
+          "AUTH_REQUIRED",
+          "BILLING_OPERATION_RESTRICTED",
+          "CLIENT_UPDATE_REQUIRED",
+          "FORBIDDEN",
+          "INTEGRITY_VIOLATION",
+          "INVALID_STATE_TRANSITION",
+          "NOT_FOUND",
+          "PARTICIPATION_BLOCKED",
+          "PLAN_FEATURE_UNAVAILABLE",
+          "PLAN_LIMIT_REACHED",
+          "POLICY_NOT_CONFIGURED",
+          "SERVICE_UNAVAILABLE",
+          "SESSION_REVOKED",
+          "SUBSCRIPTION_NOT_STARTED",
+          "TEMPORARY_FAILURE",
+          "VALIDATION_FAILED",
+          "VERSION_CONFLICT"
+        ],
+        "transaction_class": "preview",
+        "transaction_guarantee": "Compute current instructor-revocation session impact and a source-bound confirmation token; no business mutation.",
+        "transition": {
+          "effect": "technical_preview_only",
+          "from": [],
+          "to": []
+        },
+        "semantic_guards": [
+          "live_actor_and_scope",
+          "required_feature_gates_separate_from_references",
+          "no_business_commit",
+          "authorized_projection_only"
+        ],
+        "audit": false,
+        "notification": "none",
+        "concurrency": "Live original permission/tenant scope on every request; relevant dependencies captured, no business commit",
+        "expected_version_subject": "role_assignments",
+        "acceptance_scenario_ids": [
+          "A01",
+          "A02",
+          "A03",
+          "A13",
+          "A14",
+          "A15",
+          "A16",
+          "A23",
+          "A24",
+          "A25",
+          "A28",
+          "A29",
+          "A30",
+          "A31",
+          "A46",
+          "A47",
+          "A51",
+          "A52",
+          "A53",
+          "A54",
+          "A55",
+          "D-A02",
+          "D-A07",
+          "D-A09",
+          "D-A12"
+        ],
+        "configuration_policy": "numeric plan limits/prices and legal approval are deployment configuration, never arbitrary allow/deny",
+        "implementation_status": "operational_development_limited",
+        "required_features": [
+          "F04"
+        ],
+        "runtime_required_features": [
+          "F04"
+        ],
+        "conditional_features": [],
+        "operation_contract": {
+          "kind": "preview",
+          "target_entity": "role_assignments",
+          "version_mode": "row_version",
+          "version_field": "assignment_id",
+          "read_operation": "management_state_get_v1",
+          "atomic_effects": [],
+          "business_commit": false,
+          "read_path_status": "contract_only",
+          "source_decision": "DS-2026-10-17"
+        },
+        "decision_delivery": {
+          "accepted_contract": "DS-2026-10-17",
+          "runtime_conformance": "implemented_pending_acceptance",
+          "open_dependencies": [],
+          "target_request": {
+            "$ref": "#/$defs/Request_role_revoke_preview"
+          }
+        },
+        "runtime_path": "/functions/v1/backend-v1/role_revoke_preview_v1",
+        "runtime_external_path": "/functions/v1/backend-v1/role_revoke_preview_v1",
+        "runtime_rpc": "api_v1.role_revoke_preview_v1",
+        "runtime_transport": "authenticated Edge adapter -> service-only RPC; rules/transaction in PostgreSQL",
+        "runtime_limits": [
+          "Preview is account/organization/center/assignment/version and complete affected-session snapshot bound; no role, session or reservation mutation."
         ]
       }
     ],
@@ -88169,6 +88541,12 @@
         "generation": "uuidv7"
       },
       {
+        "path": "#/$defs/Request_management_state_get/allOf/14/then/properties/center_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
         "path": "#/$defs/Request_management_state_get/allOf/15/then/properties/org_id",
         "origin": "ftksaas",
         "acceptance": "generic_uuid",
@@ -88176,6 +88554,12 @@
       },
       {
         "path": "#/$defs/Request_management_state_get/allOf/16/then/properties/org_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Request_management_state_get/allOf/16/then/properties/center_id",
         "origin": "ftksaas",
         "acceptance": "generic_uuid",
         "generation": "uuidv7"
@@ -88277,7 +88661,19 @@
         "generation": "uuidv7"
       },
       {
+        "path": "#/$defs/Request_management_state_get/allOf/33/then/properties/center_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
         "path": "#/$defs/Request_management_state_get/allOf/34/then/properties/org_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Request_management_state_get/allOf/34/then/properties/center_id",
         "origin": "ftksaas",
         "acceptance": "generic_uuid",
         "generation": "uuidv7"
@@ -88332,6 +88728,12 @@
       },
       {
         "path": "#/$defs/Request_management_state_get/allOf/43/then/properties/org_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Request_management_state_get/allOf/43/then/properties/center_id",
         "origin": "ftksaas",
         "acceptance": "generic_uuid",
         "generation": "uuidv7"
@@ -89039,6 +89441,18 @@
         "generation": "uuidv7"
       },
       {
+        "path": "#/$defs/Request_management_state_get/allOf/150/then/properties/org_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Request_management_state_get/allOf/150/then/properties/center_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
         "path": "#/$defs/Success_management_state_get/properties/trace_id",
         "origin": "ftksaas",
         "acceptance": "generic_uuid",
@@ -89405,7 +89819,25 @@
         "generation": "uuidv7"
       },
       {
+        "path": "#/$defs/ManagementProjection_account_access_revoke_v1/properties/values/properties/person_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/ManagementProjection_account_access_revoke_v1/properties/values/properties/center_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
         "path": "#/$defs/ManagementProjection_account_link_remove_v1/properties/values/properties/link_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/ManagementProjection_account_link_remove_v1/properties/values/properties/person_id",
         "origin": "ftksaas",
         "acceptance": "generic_uuid",
         "generation": "uuidv7"
@@ -89460,6 +89892,12 @@
       },
       {
         "path": "#/$defs/ManagementProjection_program_preview_v1/properties/values/properties/class_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/ManagementProjection_program_preview_v1/properties/values/properties/program_id",
         "origin": "ftksaas",
         "acceptance": "generic_uuid",
         "generation": "uuidv7"
@@ -90341,7 +90779,19 @@
         "generation": "uuidv7"
       },
       {
+        "path": "#/$defs/ManagementSelector_account_access_revoke_v1/properties/key/oneOf/1/properties/person_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
         "path": "#/$defs/ManagementSelector_account_link_remove_v1/properties/key/oneOf/0/properties/link_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/ManagementSelector_account_link_remove_v1/properties/key/oneOf/1/properties/person_id",
         "origin": "ftksaas",
         "acceptance": "generic_uuid",
         "generation": "uuidv7"
@@ -90408,6 +90858,12 @@
       },
       {
         "path": "#/$defs/ManagementSelector_program_preview_v1/properties/key/properties/class_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/ManagementSelector_program_preview_v1/properties/key/properties/program_id",
         "origin": "ftksaas",
         "acceptance": "generic_uuid",
         "generation": "uuidv7"
@@ -92009,6 +92465,72 @@
         "generation": "uuidv7"
       },
       {
+        "path": "#/$defs/MemberSettingsValues/properties/report_templates/items/properties/filters/properties/center_ids/items",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/MemberSettingsValues/properties/report_templates/items/properties/filters/properties/person_ids/items",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/MemberSettingsValues/properties/import_templates/items/properties/center_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/CenterSettingsValues/properties/report_templates/items/properties/filters/properties/center_ids/items",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/CenterSettingsValues/properties/report_templates/items/properties/filters/properties/person_ids/items",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/CenterSettingsValues/properties/import_templates/items/properties/center_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/CenterSettingsValues/properties/package_templates/items/properties/discipline_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/OrganizationSettingsValues/properties/report_templates/items/properties/filters/properties/center_ids/items",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/OrganizationSettingsValues/properties/report_templates/items/properties/filters/properties/person_ids/items",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/OrganizationSettingsValues/properties/import_templates/items/properties/center_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/OrganizationSettingsValues/properties/package_templates/items/properties/discipline_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
         "path": "#/$defs/SettingsResetPreview/properties/id",
         "origin": "ftksaas",
         "acceptance": "generic_uuid",
@@ -92045,6 +92567,12 @@
         "generation": "uuidv7"
       },
       {
+        "path": "#/$defs/Request_settings_catalog_get/properties/template_center_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
         "path": "#/$defs/Request_settings_catalog_get/oneOf/0/properties/request_id",
         "origin": "ftksaas",
         "acceptance": "generic_uuid",
@@ -92058,6 +92586,12 @@
       },
       {
         "path": "#/$defs/Request_settings_catalog_get/oneOf/1/properties/org_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Request_settings_catalog_get/oneOf/1/properties/template_center_id",
         "origin": "ftksaas",
         "acceptance": "generic_uuid",
         "generation": "uuidv7"
@@ -92939,72 +93473,6 @@
         "generation": "uuidv7"
       },
       {
-        "path": "#/$defs/MemberSettingsValues/properties/report_templates/items/properties/filters/properties/center_ids/items",
-        "origin": "ftksaas",
-        "acceptance": "generic_uuid",
-        "generation": "uuidv7"
-      },
-      {
-        "path": "#/$defs/MemberSettingsValues/properties/report_templates/items/properties/filters/properties/person_ids/items",
-        "origin": "ftksaas",
-        "acceptance": "generic_uuid",
-        "generation": "uuidv7"
-      },
-      {
-        "path": "#/$defs/MemberSettingsValues/properties/import_templates/items/properties/center_id",
-        "origin": "ftksaas",
-        "acceptance": "generic_uuid",
-        "generation": "uuidv7"
-      },
-      {
-        "path": "#/$defs/CenterSettingsValues/properties/report_templates/items/properties/filters/properties/center_ids/items",
-        "origin": "ftksaas",
-        "acceptance": "generic_uuid",
-        "generation": "uuidv7"
-      },
-      {
-        "path": "#/$defs/CenterSettingsValues/properties/report_templates/items/properties/filters/properties/person_ids/items",
-        "origin": "ftksaas",
-        "acceptance": "generic_uuid",
-        "generation": "uuidv7"
-      },
-      {
-        "path": "#/$defs/CenterSettingsValues/properties/import_templates/items/properties/center_id",
-        "origin": "ftksaas",
-        "acceptance": "generic_uuid",
-        "generation": "uuidv7"
-      },
-      {
-        "path": "#/$defs/OrganizationSettingsValues/properties/report_templates/items/properties/filters/properties/center_ids/items",
-        "origin": "ftksaas",
-        "acceptance": "generic_uuid",
-        "generation": "uuidv7"
-      },
-      {
-        "path": "#/$defs/OrganizationSettingsValues/properties/report_templates/items/properties/filters/properties/person_ids/items",
-        "origin": "ftksaas",
-        "acceptance": "generic_uuid",
-        "generation": "uuidv7"
-      },
-      {
-        "path": "#/$defs/OrganizationSettingsValues/properties/import_templates/items/properties/center_id",
-        "origin": "ftksaas",
-        "acceptance": "generic_uuid",
-        "generation": "uuidv7"
-      },
-      {
-        "path": "#/$defs/Request_settings_catalog_get/properties/template_center_id",
-        "origin": "ftksaas",
-        "acceptance": "generic_uuid",
-        "generation": "uuidv7"
-      },
-      {
-        "path": "#/$defs/Request_settings_catalog_get/oneOf/1/properties/template_center_id",
-        "origin": "ftksaas",
-        "acceptance": "generic_uuid",
-        "generation": "uuidv7"
-      },
-      {
         "path": "#/$defs/WorkTemplateReference/properties/center_id",
         "origin": "ftksaas",
         "acceptance": "generic_uuid",
@@ -93245,18 +93713,6 @@
         "generation": "uuidv7"
       },
       {
-        "path": "#/$defs/CenterSettingsValues/properties/package_templates/items/properties/discipline_id",
-        "origin": "ftksaas",
-        "acceptance": "generic_uuid",
-        "generation": "uuidv7"
-      },
-      {
-        "path": "#/$defs/OrganizationSettingsValues/properties/package_templates/items/properties/discipline_id",
-        "origin": "ftksaas",
-        "acceptance": "generic_uuid",
-        "generation": "uuidv7"
-      },
-      {
         "path": "#/$defs/StarterPackageTemplate/properties/discipline_id",
         "origin": "ftksaas",
         "acceptance": "generic_uuid",
@@ -93347,61 +93803,61 @@
         "generation": "uuidv7"
       },
       {
-        "path": "#/$defs/ManagementProjection_account_access_revoke_v1/properties/values/properties/person_id",
+        "path": "#/$defs/Request_role_revoke_preview/properties/request_id",
         "origin": "ftksaas",
         "acceptance": "generic_uuid",
         "generation": "uuidv7"
       },
       {
-        "path": "#/$defs/ManagementProjection_account_access_revoke_v1/properties/values/properties/center_id",
+        "path": "#/$defs/Request_role_revoke_preview/properties/org_id",
         "origin": "ftksaas",
         "acceptance": "generic_uuid",
         "generation": "uuidv7"
       },
       {
-        "path": "#/$defs/ManagementProjection_account_link_remove_v1/properties/values/properties/person_id",
+        "path": "#/$defs/Request_role_revoke_preview/properties/center_id",
         "origin": "ftksaas",
         "acceptance": "generic_uuid",
         "generation": "uuidv7"
       },
       {
-        "path": "#/$defs/ManagementSelector_account_access_revoke_v1/properties/key/oneOf/1/properties/person_id",
+        "path": "#/$defs/Request_role_revoke_preview/properties/assignment_id",
         "origin": "ftksaas",
         "acceptance": "generic_uuid",
         "generation": "uuidv7"
       },
       {
-        "path": "#/$defs/ManagementSelector_account_link_remove_v1/properties/key/oneOf/1/properties/person_id",
+        "path": "#/$defs/InstructorRevocationSession/properties/session_id",
         "origin": "ftksaas",
         "acceptance": "generic_uuid",
         "generation": "uuidv7"
       },
       {
-        "path": "#/$defs/ManagementSelector_program_preview_v1/properties/key/properties/program_id",
+        "path": "#/$defs/InstructorRevocationPreview/properties/id",
         "origin": "ftksaas",
         "acceptance": "generic_uuid",
         "generation": "uuidv7"
       },
       {
-        "path": "#/$defs/ManagementProjection_program_preview_v1/properties/values/properties/program_id",
+        "path": "#/$defs/InstructorRevocationPreview/properties/assignment_id",
         "origin": "ftksaas",
         "acceptance": "generic_uuid",
         "generation": "uuidv7"
       },
       {
-        "path": "#/$defs/Request_management_state_get/allOf/33/then/properties/center_id",
+        "path": "#/$defs/Success_role_revoke_preview/properties/trace_id",
         "origin": "ftksaas",
         "acceptance": "generic_uuid",
         "generation": "uuidv7"
       },
       {
-        "path": "#/$defs/Request_management_state_get/allOf/34/then/properties/center_id",
+        "path": "#/$defs/ManagementSelector_role_revoke_preview_v1/properties/key/properties/assignment_id",
         "origin": "ftksaas",
         "acceptance": "generic_uuid",
         "generation": "uuidv7"
       },
       {
-        "path": "#/$defs/Request_management_state_get/allOf/14/then/properties/center_id",
+        "path": "#/$defs/ManagementProjection_role_revoke_preview_v1/properties/values/properties/assignment_id",
         "origin": "ftksaas",
         "acceptance": "generic_uuid",
         "generation": "uuidv7"
@@ -93796,13 +94252,14 @@
         "calendar_link_revoke_v1",
         "calendar_feed_get_v1",
         "settings_preparation_resolve_v1",
-        "account_signup_check_v1"
+        "account_signup_check_v1",
+        "role_revoke_preview_v1"
       ],
       "auth": "Supabase getUser + live auth.sessions + current account/link/role; no request actor claims",
       "uuid": "backend uuid@14.0.3 v7 for all inserted IDs; DB defaults not required",
       "external_transport": "POST /functions/v1/backend-v1/{operation}; direct typed request body",
       "internal_rpc": "service-only api_v1 named functions; actor/session/UUID bank supplied by verified gateway",
-      "migration_count": 91,
+      "migration_count": 92,
       "acceptance_source": "apps/backend/docs/00-FtkSaaS-yeni-sohbet-devir.md"
     },
     "decision_sprint": {
@@ -94498,7 +94955,8 @@
         "calendar_link_revoke_v1",
         "calendar_feed_get_v1",
         "settings_preparation_resolve_v1",
-        "account_signup_check_v1"
+        "account_signup_check_v1",
+        "role_revoke_preview_v1"
       ],
       "runtime_deliveries": {
         "starter_attendance_protection": {
@@ -94662,8 +95120,8 @@
         "technical_operations": [
           "availability_save_v1",
           "availability_exception_save_v1",
-          "settings_preparation_resolve_v1",
-          "management_state_get_v1"
+          "management_state_get_v1",
+          "settings_preparation_resolve_v1"
         ],
         "dependencies": [],
         "implementation": "source_operations_present",
@@ -94672,8 +95130,8 @@
         "implemented_operations": [
           "availability_save_v1",
           "availability_exception_save_v1",
-          "settings_preparation_resolve_v1",
-          "management_state_get_v1"
+          "management_state_get_v1",
+          "settings_preparation_resolve_v1"
         ],
         "contract_only_operations": [],
         "acceptance_case_ids": [],
@@ -94745,14 +95203,16 @@
           "account_access_revoke_v1",
           "account_access_accept_v1",
           "account_link_remove_v1",
+          "job_status_get_v1",
           "platform_owner_set_v1",
           "platform_owner_remove_v1",
           "center_manager_assign_v1",
           "center_manager_revoke_v1",
+          "management_state_get_v1",
           "settlement_authority_get_v1",
           "settlement_delegation_set_v1",
           "settlement_authority_set_v1",
-          "job_status_get_v1"
+          "role_revoke_preview_v1"
         ],
         "dependencies": [
           "plan_gate_alignment"
@@ -94772,14 +95232,16 @@
           "account_access_revoke_v1",
           "account_access_accept_v1",
           "account_link_remove_v1",
+          "job_status_get_v1",
           "platform_owner_set_v1",
           "platform_owner_remove_v1",
           "center_manager_assign_v1",
           "center_manager_revoke_v1",
+          "management_state_get_v1",
           "settlement_authority_get_v1",
           "settlement_delegation_set_v1",
           "settlement_authority_set_v1",
-          "job_status_get_v1"
+          "role_revoke_preview_v1"
         ],
         "contract_only_operations": [],
         "acceptance_case_ids": [
@@ -94879,13 +95341,13 @@
           "report_get_v1",
           "report_export_start_v1",
           "report_file_get_v1",
+          "job_status_get_v1",
           "report_build_v1",
           "account_sessions_list_v1",
           "account_session_label_v1",
           "account_sessions_revoke_v1",
           "account_security_history_get_v1",
-          "account_signup_check_v1",
-          "job_status_get_v1"
+          "account_signup_check_v1"
         ],
         "dependencies": [
           "plan_gate_alignment",
@@ -94909,13 +95371,13 @@
           "report_get_v1",
           "report_export_start_v1",
           "report_file_get_v1",
+          "job_status_get_v1",
           "report_build_v1",
           "account_sessions_list_v1",
           "account_session_label_v1",
           "account_sessions_revoke_v1",
           "account_security_history_get_v1",
-          "account_signup_check_v1",
-          "job_status_get_v1"
+          "account_signup_check_v1"
         ],
         "contract_only_operations": [],
         "acceptance_case_ids": [
@@ -95002,13 +95464,12 @@
           "session_change_preview_v1",
           "session_change_apply_v1",
           "session_capacity_set_v1",
-          "calendar_get_v1",
+          "management_state_get_v1",
           "calendar_links_get_v1",
           "calendar_link_create_v1",
           "calendar_link_rotate_v1",
           "calendar_link_revoke_v1",
-          "calendar_feed_get_v1",
-          "management_state_get_v1"
+          "calendar_feed_get_v1"
         ],
         "dependencies": [],
         "implementation": "source_operations_present",
@@ -95023,13 +95484,12 @@
           "session_change_preview_v1",
           "session_change_apply_v1",
           "session_capacity_set_v1",
-          "calendar_get_v1",
+          "management_state_get_v1",
           "calendar_links_get_v1",
           "calendar_link_create_v1",
           "calendar_link_rotate_v1",
           "calendar_link_revoke_v1",
-          "calendar_feed_get_v1",
-          "management_state_get_v1"
+          "calendar_feed_get_v1"
         ],
         "contract_only_operations": [],
         "acceptance_case_ids": [
@@ -95120,8 +95580,8 @@
           "sale_preview_v1",
           "sale_apply_v1",
           "class_assignment_set_v1",
-          "reservation_capacity_override_v1",
-          "management_state_get_v1"
+          "management_state_get_v1",
+          "reservation_capacity_override_v1"
         ],
         "dependencies": [
           "sale_scope_and_backdating",
@@ -95139,8 +95599,8 @@
           "sale_preview_v1",
           "sale_apply_v1",
           "class_assignment_set_v1",
-          "reservation_capacity_override_v1",
-          "management_state_get_v1"
+          "management_state_get_v1",
+          "reservation_capacity_override_v1"
         ],
         "contract_only_operations": [],
         "acceptance_case_ids": [
@@ -95268,7 +95728,8 @@
         "technical_operations": [
           "session_change_preview_v1",
           "session_change_apply_v1",
-          "session_assignment_set_v1"
+          "session_assignment_set_v1",
+          "management_state_get_v1"
         ],
         "dependencies": [],
         "implementation": "source_operations_present",
@@ -95277,7 +95738,8 @@
         "implemented_operations": [
           "session_change_preview_v1",
           "session_change_apply_v1",
-          "session_assignment_set_v1"
+          "session_assignment_set_v1",
+          "management_state_get_v1"
         ],
         "contract_only_operations": [],
         "acceptance_case_ids": [

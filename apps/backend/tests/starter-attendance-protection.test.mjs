@@ -157,7 +157,8 @@ test('Starter attendance and protected reservation through Auth -> Edge -> RPC',
   assert.equal((await must(instructor.u,'attendance_get_v1',scope({session_id:legacy}))).session_id,legacy);
   await db.query("update core.sessions set assignment_mode='explicit' where id=$1",[legacy]);
   await fail('attendance_get_v1',{session_id:legacy},'FORBIDDEN',instructor.u);
-  await mut('role_revoke_v1',{assignment_id:instructor.grant.primary_id,expected_version:instructor.grant.version,reason:'Live role revoke'});
+  const revokeImpact=await mut('role_revoke_preview_v1',{assignment_id:instructor.grant.primary_id,expected_version:instructor.grant.version});
+  await mut('role_revoke_v1',{impact_approval:{id:revokeImpact.id,token:revokeImpact.token},assignment_id:instructor.grant.primary_id,expected_version:instructor.grant.version,reason:'Live role revoke'});
   await fail('attendance_get_v1',{session_id:assigned},'FORBIDDEN',instructor.u);
   await fail('attendance_close_v1',{session_id:assigned,expected_version:v.session_version},'FORBIDDEN',instructor.u);
   instructor.grant=await mut('role_assign_v1',{person_id:instructor.p,role:'instructor',scope:{center_id:center}});

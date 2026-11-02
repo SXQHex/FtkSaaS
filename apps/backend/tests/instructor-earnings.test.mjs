@@ -328,7 +328,8 @@ test('Instructor agreement and earnings through Auth -> Edge -> RPC',async t=>{
  });
 
  await t.test('live role revocation blocks instructor read and manager receipt replay',async()=>{
-  await mut('role_revoke_v1',{assignment_id:instructor.grant.primary_id,expected_version:instructor.grant.version,reason:'Revoke instructor access'});
+  const revokeImpact=await mut('role_revoke_preview_v1',{assignment_id:instructor.grant.primary_id,expected_version:instructor.grant.version});
+  await mut('role_revoke_v1',{impact_approval:{id:revokeImpact.id,token:revokeImpact.token},assignment_id:instructor.grant.primary_id,expected_version:instructor.grant.version,reason:'Revoke instructor access'});
   await fail('attendance_start_v1',startReceipt.payload,'FORBIDDEN',instructor.u,startReceipt.k);
   await fail('earnings_list_v1',{person_id:instructor.p,interval:{starts_at:'2020-01-01T00:00:00Z',ends_at:'2030-01-01T00:00:00Z'},page:{}},'FORBIDDEN',instructor.u);
   await mut('center_manager_revoke_v1',{person_id:person,expected_version:1,reason:'Revoke operation access'});
