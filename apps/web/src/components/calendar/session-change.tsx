@@ -3,7 +3,7 @@
 import { useRef, useState, type FormEvent } from "react";
 import { useLocale, useTranslations } from "next-intl";
 import { v7, validate as isUuid } from "uuid";
-import type { ChangeScope, Preview, SessionView } from "@ftksaas/api-contracts";
+import type { ChangeScope, Preview, SessionView, LocalOffsetChoice } from "@ftksaas/api-contracts";
 import { Button } from "@ftksaas/ui/components/button";
 import { Input } from "@ftksaas/ui/components/input";
 import { Label } from "@ftksaas/ui/components/label";
@@ -16,10 +16,15 @@ import {
   uncertainChange,
 } from "../../lib/session-change";
 
+import { resourcePatch, type ResourceDraft } from "../../lib/session-resources";
+import { SessionResources } from "./session-resources";
+import { SeriesOffsets } from "./series-offsets";
+
 type Pending = { operation_key: string; preview: { id: string; token: string } };
 type Props = {
   session: SessionView;
   orgId: string;
+  centerId?: string;
   actorId: string;
   timeZone: string;
   onClose: () => void;
@@ -78,6 +83,7 @@ export function SessionChangeFlow({
   session,
   orgId,
   actorId,
+  centerId,
   timeZone,
   onClose,
   onSaved,
@@ -97,6 +103,8 @@ export function SessionChangeFlow({
   const [male, setMale] = useState(String(session.capacity.categories?.male ?? ""));
   const [female, setFemale] = useState(String(session.capacity.categories?.female ?? ""));
   const [scope, setScope] = useState<ChangeScope>("single");
+  const [resources, setResources] = useState<ResourceDraft>({});
+  const [offsets, setOffsets] = useState<LocalOffsetChoice[]>([]);
   const [reason, setReason] = useState("");
   const starts = localTimeChoices(start, timeZone);
   const ends = localTimeChoices(end, timeZone);
@@ -146,6 +154,12 @@ export function SessionChangeFlow({
       total: Number(total),
       categories: categories ? { male: Number(male), female: Number(female) } : null,
     });
+    try {
+      Object.assign(patch, resourcePatch(session, resources));
+    } catch {
+      setStage({ phase: "edit", error: "invalidForm" });
+      return;
+    }
     if (!Object.keys(patch).length) {
       setStage({ phase: "edit", error: "noChanges" });
       return;
@@ -159,6 +173,10 @@ export function SessionChangeFlow({
         patch,
         scope,
         reason: reason.trim(),
+        ...(centerId ? { center_id: centerId } : {}),
+        ...(scope === "this_and_future" && patch.interval && offsets.length
+          ? { offset_choices: offsets }
+          : {}),
       });
       setStage({ phase: "review", preview: result, operationKey: v7() });
     } catch (error) {
@@ -249,6 +267,7 @@ export function SessionChangeFlow({
             if (kind === "start") {
               setStart(event.target.value);
               setStartChoice("");
+              setOffsets([]);
             } else {
               setEnd(event.target.value);
               setEndChoice("");
@@ -355,6 +374,13 @@ export function SessionChangeFlow({
                 </div>
               </div>
             )}
+            {centerId && (
+              <SessionResources
+                scope={{ actorId, orgId, centerId }}
+                value={resources}
+                onChange={setResources}
+              />
+            )}
             <div className="space-y-2">
               <Label htmlFor="change-scope">{t("scope")}</Label>
               <select
@@ -368,6 +394,14 @@ export function SessionChangeFlow({
               </select>
               <p className="text-xs leading-5 text-muted-foreground">{t("scopeHint")}</p>
             </div>
+            {scope === "this_and_future" && centerId && (
+              <SeriesOffsets
+                start={start}
+                timeZone={timeZone}
+                value={offsets}
+                onChange={setOffsets}
+              />
+            )}
             <div className="space-y-2">
               <Label htmlFor="change-reason">{t("reason")}</Label>
               <textarea
@@ -391,6 +425,7 @@ export function SessionChangeFlow({
       )}
       {stage.phase === "review" && (
         <div className="space-y-5">
+          <p className="text-sm font-medium">{t(scope === "single" ? "single" : "future")}</p>
           <h3 className="font-medium">
             {t("affected", { count: stage.preview.sessions?.length ?? 0 })}
           </h3>
@@ -404,6 +439,23 @@ export function SessionChangeFlow({
                   {dateTime(item.interval.starts_at)} – {dateTime(item.interval.ends_at)}
                 </p>
                 <p>{t("previewCapacity", { count: item.capacity.total })}</p>
+                {item.resources.some((r) => r.kind === "room" && r.id === resources.roomId) && (
+                  <p>
+                    {t("newRoom")}: {resources.roomName}
+                  </p>
+                )}
+                {item.assignments.some(
+                  (a) => a.duty === "instructor" && a.person_id === resources.instructorId,
+                ) && (
+                  <p>
+                    {t("newInstructor")}: {resources.instructorName}
+                  </p>
+                )}
+
+                <p>
+                  {t("previewResources", { count: item.resources.length })} ·{" "}
+                  {t("previewDuties", { count: item.assignments.length })}
+                </p>
                 {item.capacity.categories && (
                   <p>{t("previewCategories", { ...item.capacity.categories })}</p>
                 )}

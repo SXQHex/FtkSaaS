@@ -17,6 +17,7 @@ import {
 } from "@ftksaas/ui/components/sheet";
 import { errorMessageKey, getSession } from "../../lib/api";
 import type { CalendarEntry } from "../../lib/schedule";
+import { SessionChange } from "./session-change";
 import { sessionPath } from "../../lib/session-route";
 
 export function SessionDetail({
@@ -24,7 +25,11 @@ export function SessionDetail({
   timeZone,
   onClose,
   scope,
+  actorId,
+  onChanged,
 }: {
+  actorId?: string;
+  onChanged?: () => void;
   entry: CalendarEntry;
   timeZone: string;
   onClose: () => void;
@@ -60,6 +65,8 @@ export function SessionDetail({
             <LiveSessionDetail
               key={`${scope.orgId}:${entry.id}`}
               entry={entry}
+              actorId={actorId}
+              onChanged={onChanged}
               scope={scope}
               timeZone={timeZone}
             />
@@ -76,7 +83,11 @@ function LiveSessionDetail({
   entry,
   scope,
   timeZone,
+  actorId,
+  onChanged,
 }: {
+  actorId?: string;
+  onChanged?: () => void;
   entry: CalendarEntry;
   scope: { orgId: string; centerId: string };
   timeZone: string;
@@ -84,6 +95,7 @@ function LiveSessionDetail({
   const t = useTranslations("calendar");
   const api = useTranslations("api");
   const [attempt, setAttempt] = useState(0);
+  const [editing, setEditing] = useState(false);
   const [result, setResult] = useState<{
     attempt: number;
     session?: SessionView;
@@ -117,9 +129,34 @@ function LiveSessionDetail({
         </Button>
       </div>
     );
+  if (editing && actorId)
+    return (
+      <SessionChange
+        key={`${scope.orgId}:${scope.centerId}:${entry.id}:${attempt}:${actorId}`}
+        session={result.session}
+        orgId={scope.orgId}
+        centerId={scope.centerId}
+        actorId={actorId}
+        timeZone={timeZone}
+        onClose={() => {
+          setEditing(false);
+          setAttempt((n) => n + 1);
+        }}
+        onSaved={() => {
+          setEditing(false);
+          setAttempt((n) => n + 1);
+          onChanged?.();
+        }}
+      />
+    );
   return (
     <>
       <SessionSummary session={result.session} timeZone={timeZone} />
+      {actorId && (
+        <Button variant="outline" onClick={() => setEditing(true)}>
+          {t("changeSession")}
+        </Button>
+      )}
       <Button asChild variant="outline" className="h-auto min-h-11 whitespace-normal">
         <Link href={sessionPath(scope.orgId, entry.id)}>{t("openPage")}</Link>
       </Button>

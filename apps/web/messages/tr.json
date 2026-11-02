@@ -440,7 +440,25 @@
       "in_progress": "İşlem hâlâ devam ediyor. Sonucunu tekrar kontrol edebilirsin.",
       "result_expired": "İşlem sonucu saklama süresi dolmuş. Yeni işlem göndermeden kayıtları kontrol ettir.",
       "succeeded": "İşlem başarılı görünüyor ancak seansla eşleştirilemedi. Yeni işlem göndermeden destek al."
-    }
+    },
+    "resourcesTitle": "Oda ve eğitmen değişikliği",
+    "resourcesHint": "Yalnız seçtiğiniz alanlar değiştirilir. Oda seçimi seansın kaynak listesini seçilen odayla değiştirir. Eğitmen seçiminde asistan görevleri korunur. Sonuçlar önizlemede denetlenir. Eğitmen seçimi seansa özel görev listesi oluşturur; sonraki sınıf varsayılanı değişiklikleri bu seansı değiştirmez.",
+    "replaceRoom": "Odayı değiştir",
+    "replaceInstructor": "Eğitmeni değiştir",
+    "newRoom": "Yeni oda",
+    "newInstructor": "Yeni eğitmen",
+    "chooseResource": "Seçin",
+    "catalogLoading": "Merkezin güncel kaynakları okunuyor…",
+    "catalogFailed": "Kaynaklar okunamadı. Düzenlemeyi kapatıp yeniden deneyin veya kaynak değişikliği seçimini kaldırın.",
+    "seriesOffsets": "Serinin çift saat seçimleri",
+    "seriesOffsetsHint": "Sonraki oluşumların yeni başlangıç saati {timezone} saat diliminde iki kez yaşanıyorsa her tarih için UTC farkını seçin. Tarihleri takvimden kontrol edin; eksik veya ilgisiz seçimleri backend reddeder.",
+    "offsetDate": "Çift saat yaşanacak tarih",
+    "notAmbiguous": "Bu tarihte ve başlangıç saatinde çift saat yok.",
+    "useOffset": "{offset} kullan",
+    "offsetMinutes": "{offset}",
+    "removeOffset": "{date} seçimini kaldır",
+    "previewResources": "{count} kaynak",
+    "previewDuties": "{count} görev"
   },
   "students": {
     "mergeTitle": "Kişi kayıtlarını birleştir",

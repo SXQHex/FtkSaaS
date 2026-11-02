@@ -158,6 +158,8 @@ function CalendarContent({
       />
       {selected && (
         <SessionDetail
+          actorId={actorId}
+          onChanged={() => setAttempt((value) => value + 1)}
           entry={selected}
           timeZone={center.timezone}
           scope={{ orgId, centerId: center.id }}

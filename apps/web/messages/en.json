@@ -440,7 +440,25 @@
       "in_progress": "The operation is still in progress. You can check its result again.",
       "result_expired": "The stored result expired. Get the records checked before sending a new operation.",
       "succeeded": "The operation succeeded but could not be matched to this session. Get help before starting a new operation."
-    }
+    },
+    "resourcesTitle": "Room and instructor changes",
+    "resourcesHint": "Only selected fields change. Choosing a room replaces the session resource list with that room. Instructor changes preserve assistant duties. The preview validates the result. Choosing an instructor creates explicit session duties; later class default changes do not update this session.",
+    "replaceRoom": "Change room",
+    "replaceInstructor": "Change instructor",
+    "newRoom": "New room",
+    "newInstructor": "New instructor",
+    "chooseResource": "Select",
+    "catalogLoading": "Reading current center resources…",
+    "catalogFailed": "Resources could not be read. Close and reopen the editor to retry, or deselect resource changes.",
+    "seriesOffsets": "Ambiguous times in the series",
+    "seriesOffsetsHint": "When a later occurrence starts twice at its new local time in {timezone}, select a UTC offset for that date. Check dates in the calendar; the backend rejects missing or unrelated choices.",
+    "offsetDate": "Date with an ambiguous time",
+    "notAmbiguous": "This date and start time are not ambiguous.",
+    "useOffset": "Use {offset}",
+    "offsetMinutes": "{offset}",
+    "removeOffset": "Remove choice for {date}",
+    "previewResources": "{count} resources",
+    "previewDuties": "{count} duties"
   },
   "students": {
     "mergeTitle": "Merge person records",
