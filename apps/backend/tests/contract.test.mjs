@@ -33,6 +33,24 @@ test('room editing advertises its discoverable management reader with typed valu
  assert(valid('ManagementStateView',item));
  assert(valid('Request_room_save',{client_api_version:1,request_id:id,org_id:id,center_id:id,operation_key:id,...item.current.values,expected_version:item.versions[0].version}));
 });
+test('studio discovery accepts class filters and program identity without a previous write response',()=>{
+ const request=(operation,key)=>({client_api_version:1,request_id:id,org_id:id,center_id:id,operation,selector:{operation,key},page:{limit:1}});
+ for(const key of [{},{class_id:id},{discipline_id:id},{class_id:id,discipline_id:id}])assert(valid('Request_management_state_get',request('class_save_v1',key)));
+ assert(valid('Request_management_state_get',request('program_preview_v1',{class_id:id,program_id:id})));
+ assert(!valid('Request_management_state_get',request('program_preview_v1',{program_id:id})));
+ assert(!valid('Request_management_state_get',request('class_save_v1',{untrusted_filter:id})));
+ const reader=p['x-contract'].operations.find(o=>o.name==='management_state_get_v1');
+ for(const operation of ['class_save_v1','program_preview_v1'])assert(reader.runtime_selectors.includes(operation));
+ assert.equal(p['x-contract'].operations.find(o=>o.name==='class_save_v1').operation_contract.read_path_status,'implemented');
+});
+test('saved program management projection uses wire capacity and leaves unavailable legacy schedule absent',()=>{
+ const values={class_id:id,program_id:id,timezone:'Europe/Istanbul'};
+ const item={operation:'program_preview_v1',entity:{type:'program_versions',id},exists:true,state:'active',versions:[{entity:{type:'program_versions',id},version:1}],as_of:new Date().toISOString(),current:{operation:'program_preview_v1',values}};
+ assert(valid('ManagementStateView',item));
+ const schedule={weekdays:[1],local_start:'12:00:00',duration_minutes:60,starts_on:'2027-01-04',ends_on:'2027-02-01',assignments:[],capacity:{total:8}};
+ assert(valid('ManagementStateView',{...item,current:{...item.current,values:{...values,schedule}}}));
+ assert(!valid('ManagementStateView',{...item,current:{...item.current,values:{...values,schedule:{...schedule,capacity:{nominal:8,maximum:8}}}}}));
+});
 test('UUIDv7 generator: RFC version/variant, uniqueness, current approximate timestamp',()=>{const before=Date.now();const ids=Array.from({length:20000},newUuidV7);const after=Date.now();assert.equal(new Set(ids).size,ids.length);for(const x of ids){assert(validate(x));assert.equal(version(x),7);const ms=parseInt(x.replaceAll('-','').slice(0,12),16);assert(ms>=before&&ms<=after);}});
 test('retry preserves frozen operation key',()=>{const operation=newOperation();const attempt2={...operation,request_id:newUuidV7()};assert.equal(operation.operation_key,attempt2.operation_key);assert.notEqual(operation.request_id,attempt2.request_id);});
 test('external/provider and existing UUIDv4 acceptance retained, v7 production validator distinct',()=>{const existing='550e8400-e29b-41d4-a716-446655440000';assert(valid('ProviderUuid',existing));assert(valid('FtkUuid',existing));assert(!valid('FtkGeneratedUuidV7',existing));assert(valid('FtkGeneratedUuidV7',id));});

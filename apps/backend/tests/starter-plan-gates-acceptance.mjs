@@ -35,6 +35,13 @@ test('Starter real Auth/API resource limits, downgrade scope and receipt gates',
    assert.equal((await db.query("select count(*) n from core.rooms where org_id=$1 and state='active'",[org])).rows[0].n,'1');
   });
   const instructor=key(),otherInstructor=key();
+  await t.test('Starter discovers its existing room and class through management reads',async()=>{
+   const classId=(await invoke('class_save_v1',{name:'Yoga class',discipline_id:disc,external_open:true})).primary_id;
+   const read=(operation,k)=>invoke('management_state_get_v1',{operation,selector:{operation,key:k},page:{limit:10}});
+   const rooms=await read('room_save_v1',{});assert.equal(rooms.items.length,1);assert.equal(rooms.items[0].entity.id,room);
+   const classes=await read('class_save_v1',{});assert.equal(classes.items.length,1);assert.equal(classes.items[0].entity.id,classId);assert.equal(classes.items[0].versions[0].version,1);
+   assert.deepEqual((await read('program_preview_v1',{class_id:classId})).items,[]);
+  });
   await db.query("insert into core.people(id,org_id,display_name,state) values($1,$3,'Instructor','active'),($2,$3,'Other instructor','active')",[instructor,otherInstructor,org]);
   await t.test('instructor database invariant also protects non-HTTP writers',async()=>{
    await db.query("insert into core.center_relationships(id,org_id,center_id,person_id,kind,state,started_at) values($1,$2,$3,$4,'instructor','active',now())",[key(),org,center,instructor]);

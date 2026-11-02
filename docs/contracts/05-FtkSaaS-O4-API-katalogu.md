@@ -273,8 +273,8 @@
 | person_merge_approve_v1 | command | preview_dependencies | management_state_get_v1 | implemented | people.versioned_domain_change |
 | person_merge_apply_v1 | apply | preview_dependencies | person_merge_preview_v1 | implemented | people.alias, account_link_resolution, scoped_relationship_references, merge_approvals.consume |
 | calendar_get_v1 | read | none | None | contract_only |  |
-| class_save_v1 | command | create_absent_update_requires_version | management_state_get_v1 | contract_only | classes.versioned_domain_change |
-| program_preview_v1 | preview | preview_dependencies | management_state_get_v1 | contract_only |  |
+| class_save_v1 | command | create_absent_update_requires_version | management_state_get_v1 | implemented | classes.versioned_domain_change |
+| program_preview_v1 | preview | preview_dependencies | management_state_get_v1 | implemented |  |
 | program_apply_v1 | apply | preview_dependencies | program_preview_v1 | implemented | program_versions.immutable, sessions.finite_batch, session_assignments, resource_bookings |
 | session_create_v1 | command | append_or_current_scope_lock | management_state_get_v1 | contract_only | sessions.planned, session_assignments, resource_bookings |
 | session_get_v1 | read | none | None | implemented |  |

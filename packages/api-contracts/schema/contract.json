@@ -26943,10 +26943,14 @@
               },
               "org_id": {
                 "$ref": "#/$defs/FtkUuid"
+              },
+              "center_id": {
+                "$ref": "#/$defs/FtkUuid"
               }
             },
             "required": [
-              "org_id"
+              "org_id",
+              "center_id"
             ]
           }
         },
@@ -26972,10 +26976,14 @@
               },
               "org_id": {
                 "$ref": "#/$defs/FtkUuid"
+              },
+              "center_id": {
+                "$ref": "#/$defs/FtkUuid"
               }
             },
             "required": [
-              "org_id"
+              "org_id",
+              "center_id"
             ]
           }
         },
@@ -31875,10 +31883,17 @@
             },
             "schedule": {
               "$ref": "#/$defs/ProgramSpec"
+            },
+            "program_id": {
+              "$ref": "#/$defs/FtkUuid"
+            },
+            "timezone": {
+              "$ref": "#/$defs/IanaZone"
             }
           },
           "required": [],
-          "additionalProperties": false
+          "additionalProperties": false,
+          "x-invariant": "Saved immutable program identity and original timezone/spec snapshot; schedule absent for legacy rows without a snapshot. Wire capacity uses total/categories. Preview rechecks current scope, resources, assignments and dependencies; this read never authorizes an apply."
         }
       },
       "required": [
@@ -36599,9 +36614,7 @@
               "$ref": "#/$defs/FtkUuid"
             }
           },
-          "required": [
-            "discipline_id"
-          ],
+          "required": [],
           "additionalProperties": false
         }
       },
@@ -36621,6 +36634,9 @@
           "type": "object",
           "properties": {
             "class_id": {
+              "$ref": "#/$defs/FtkUuid"
+            },
+            "program_id": {
               "$ref": "#/$defs/FtkUuid"
             }
           },
@@ -56803,7 +56819,7 @@
             "classes.versioned_domain_change"
           ],
           "business_commit": true,
-          "read_path_status": "contract_only",
+          "read_path_status": "implemented",
           "source_decision": "DS-2026-10-17"
         },
         "decision_delivery": {
@@ -56919,7 +56935,7 @@
           "read_operation": "management_state_get_v1",
           "atomic_effects": [],
           "business_commit": false,
-          "read_path_status": "contract_only",
+          "read_path_status": "implemented",
           "source_decision": "DS-2026-10-17"
         },
         "decision_delivery": {
@@ -73696,7 +73712,9 @@
         "module": "X",
         "features": [
           "F09",
-          "F12"
+          "F12",
+          "F10",
+          "F08"
         ],
         "required_features": [],
         "runtime_required_features": [],
@@ -73709,6 +73727,16 @@
           {
             "feature": "F12",
             "when": "waitlist_selector",
+            "mode": "required_if_selected"
+          },
+          {
+            "feature": "F10",
+            "when": "class_save_or_program_preview_selector",
+            "mode": "required_if_selected"
+          },
+          {
+            "feature": "F08",
+            "when": "program_preview_selector",
             "mode": "required_if_selected"
           }
         ],
@@ -73802,7 +73830,7 @@
         "runtime_rpc": "api_v1.management_state_get_v1",
         "runtime_transport": "authenticated Edge adapter -> service-only RPC; rules/transaction in PostgreSQL",
         "runtime_limits": [
-          "Original live write authority; negative valuation, P01 request and person/session waitlist selectors only. Other selectors unavailable."
+          "Original live authority and supported selectors are listed in runtime_selectors. Class/program discovery requires explicit organization/center and live schedule.manage; program reuse requires a fresh preview, never a saved approval."
         ],
         "runtime_selectors": [
           "negcredit_valuation_set_v1",
@@ -73850,7 +73878,9 @@
           "organization_close_preview_v1",
           "organization_reopen_v1",
           "organization_delete_preview_v1",
-          "room_save_v1"
+          "room_save_v1",
+          "class_save_v1",
+          "program_preview_v1"
         ]
       },
       {
@@ -93281,6 +93311,30 @@
         "origin": "ftksaas",
         "acceptance": "generic_uuid",
         "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/ManagementSelector_program_preview_v1/properties/key/properties/program_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/ManagementProjection_program_preview_v1/properties/values/properties/program_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Request_management_state_get/allOf/33/then/properties/center_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Request_management_state_get/allOf/34/then/properties/center_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
       }
     ],
     "open_product_decisions": [],
@@ -93678,7 +93732,7 @@
       "uuid": "backend uuid@14.0.3 v7 for all inserted IDs; DB defaults not required",
       "external_transport": "POST /functions/v1/backend-v1/{operation}; direct typed request body",
       "internal_rpc": "service-only api_v1 named functions; actor/session/UUID bank supplied by verified gateway",
-      "migration_count": 87,
+      "migration_count": 88,
       "acceptance_source": "apps/backend/docs/00-FtkSaaS-yeni-sohbet-devir.md"
     },
     "decision_sprint": {
@@ -94879,7 +94933,8 @@
           "calendar_link_create_v1",
           "calendar_link_rotate_v1",
           "calendar_link_revoke_v1",
-          "calendar_feed_get_v1"
+          "calendar_feed_get_v1",
+          "management_state_get_v1"
         ],
         "dependencies": [],
         "implementation": "source_operations_present",
@@ -94899,7 +94954,8 @@
           "calendar_link_create_v1",
           "calendar_link_rotate_v1",
           "calendar_link_revoke_v1",
-          "calendar_feed_get_v1"
+          "calendar_feed_get_v1",
+          "management_state_get_v1"
         ],
         "contract_only_operations": [],
         "acceptance_case_ids": [
@@ -94990,7 +95046,8 @@
           "sale_preview_v1",
           "sale_apply_v1",
           "class_assignment_set_v1",
-          "reservation_capacity_override_v1"
+          "reservation_capacity_override_v1",
+          "management_state_get_v1"
         ],
         "dependencies": [
           "sale_scope_and_backdating",
@@ -95008,7 +95065,8 @@
           "sale_preview_v1",
           "sale_apply_v1",
           "class_assignment_set_v1",
-          "reservation_capacity_override_v1"
+          "reservation_capacity_override_v1",
+          "management_state_get_v1"
         ],
         "contract_only_operations": [],
         "acceptance_case_ids": [
