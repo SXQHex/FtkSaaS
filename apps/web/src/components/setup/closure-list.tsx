@@ -10,10 +10,12 @@ export function ClosureList({
   scope,
   resource,
   revision,
+  resourceName,
 }: {
   scope: SetupScope;
   resource: ResourceRef;
   revision: number;
+  resourceName?: string;
 }) {
   const t = useTranslations("setup"),
     format = useFormatter();
@@ -40,7 +42,16 @@ export function ClosureList({
     };
   }, [scope.orgId, scope.centerId, resource.kind, resource.id, revision, retry]);
   return (
-    <section className="space-y-4" aria-label={t("closuresTitle")}>
+    <section
+      className="space-y-4"
+      aria-label={
+        resourceName
+          ? t("closuresFor", {
+              resource: `${t(resource.kind === "room" ? "limits.rooms" : "roles.instructor")}: ${resourceName}`,
+            })
+          : t("closuresTitle")
+      }
+    >
       <h4 className="font-medium">{t("closuresTitle")}</h4>
       <p className="text-sm text-muted-foreground">{t("closuresHint")}</p>
       <Button

@@ -8,6 +8,8 @@ import { Input } from "@ftksaas/ui/components/input";
 import { Label } from "@ftksaas/ui/components/label";
 import { setupCall, setupError, type SetupScope } from "../../lib/studio-setup";
 import { SetupFeedback, errorKey, useSetupCommand } from "./setup-command";
+import { getSetupRoles } from "../../lib/instructor-setup";
+import { RevokeInstructor } from "./revoke-instructor";
 import { AvailabilityEditor } from "./availability-editor";
 
 type NamedRole = { role: RoleView; name: string | null };
@@ -224,17 +226,7 @@ export function RoleSetup({ scope, onChanged }: { scope: SetupScope; onChanged: 
   useEffect(() => {
     let active = true;
     async function load() {
-      const rows: RoleView[] = [];
-      let cursor: string | null | undefined;
-      do {
-        const result = await setupCall("roles_list_v1", {
-          org_id: scope.orgId,
-          center_id: scope.centerId,
-          page: { limit: 50, sort: "created_at_asc", ...(cursor ? { cursor } : {}) },
-        });
-        rows.push(...result.items);
-        cursor = result.next_cursor;
-      } while (cursor);
+      const rows = await getSetupRoles({ orgId: scope.orgId, centerId: scope.centerId });
       const entries = await Promise.all(
         rows
           .filter(
@@ -301,9 +293,12 @@ export function RoleSetup({ scope, onChanged }: { scope: SetupScope; onChanged: 
                   {t(`roles.${entry.role.role}`)} ·{" "}
                   {t(entry.role.state === "active" ? "active" : "inactive")}
                 </p>
-                {entry.role.state === "active" && (
-                  <RevokeRole scope={scope} entry={entry} onSaved={saved} />
-                )}
+                {entry.role.state === "active" &&
+                  (entry.role.role === "instructor" ? (
+                    <RevokeInstructor scope={scope} role={entry.role} onSaved={saved} />
+                  ) : (
+                    <RevokeRole scope={scope} entry={entry} onSaved={saved} />
+                  ))}
               </li>
             ))}
           </ul>
@@ -316,6 +311,7 @@ export function RoleSetup({ scope, onChanged }: { scope: SetupScope; onChanged: 
                 <AvailabilityEditor
                   scope={scope}
                   resource={{ kind: "person", id: role.person_id }}
+                  resourceName={name ?? t("nameUnavailable")}
                 />
               </div>
             ))}

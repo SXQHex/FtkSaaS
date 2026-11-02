@@ -123,6 +123,7 @@ export function errorKey(code: string) {
     "FORBIDDEN",
     "NOT_FOUND",
     "VERSION_CONFLICT",
+    "PREVIEW_STALE",
     "PLAN_LIMIT_REACHED",
     "PLAN_FEATURE_UNAVAILABLE",
     "SUBSCRIPTION_NOT_STARTED",

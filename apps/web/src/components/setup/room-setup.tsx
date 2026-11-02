@@ -64,7 +64,15 @@ export function RoomSetup({ scope, onChanged }: { scope: SetupScope; onChanged: 
               </summary>
               <RoomCreate scope={scope} room={room} onSaved={saved} />
               {room.entity && (
-                <AvailabilityEditor scope={scope} resource={{ kind: "room", id: room.entity.id }} />
+                <AvailabilityEditor
+                  scope={scope}
+                  resource={{ kind: "room", id: room.entity.id }}
+                  resourceName={
+                    room.current?.operation === "room_save_v1"
+                      ? room.current.values.name
+                      : t("unreadableRoom")
+                  }
+                />
               )}
             </details>
           ))}

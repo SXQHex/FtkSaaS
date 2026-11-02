@@ -15,6 +15,7 @@ export const setupWrites = [
   "manager_self_assign_center_v1",
   "role_assign_v1",
   "role_revoke_v1",
+  "session_assignment_set_v1",
   "center_manager_assign_v1",
   "center_manager_revoke_v1",
   "availability_save_v1",
@@ -28,6 +29,8 @@ type SetupRead =
   | "centers_list_v1"
   | "disciplines_list_v1"
   | "subscription_get_v1"
+  | "role_revoke_preview_v1"
+  | "session_get_v1"
   | "roles_list_v1"
   | "people_list_v1"
   | "person_get_v1"
@@ -69,7 +72,8 @@ const fields: Record<SetupWrite, string[]> = {
   discipline_save_v1: ["name", "state", "discipline_id", "expected_version"],
   manager_self_assign_center_v1: ["target_center_id"],
   role_assign_v1: ["person_id", "role", "scope"],
-  role_revoke_v1: ["assignment_id", "expected_version", "reason"],
+  role_revoke_v1: ["assignment_id", "expected_version", "reason", "impact_approval"],
+  session_assignment_set_v1: ["session_id", "person_id", "duty", "expected_version"],
   center_manager_assign_v1: ["person_id"],
   center_manager_revoke_v1: ["person_id", "expected_version", "reason"],
   availability_save_v1: ["rule_id", "resource", "rule", "expected_version"],
