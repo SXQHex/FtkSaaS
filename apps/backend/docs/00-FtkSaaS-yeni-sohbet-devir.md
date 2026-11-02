@@ -4,7 +4,7 @@
 
 ## Kaynak tabanı
 
-Güncel çalışma tabanı main `ba62bb7e95607e6d29e22d5c534a0702249de39b` (PR144). Aynı SHA için [main proof](https://github.com/SXQHex/FtkSaaS/actions/runs/41494180087), [merge proof](https://github.com/SXQHex/FtkSaaS/actions/runs/41494180121) ve [development teslimi](https://github.com/SXQHex/FtkSaaS/actions/runs/41494307268) completed/success doğrulandı. XREQ-009/011 gerçek frontend tüketici kabulü [ortak talepte](../../../docs/requests.md#xreq-011) tamamlandı; yeni XREQ-012 temizlik talebi bu işlevsel kabulü geri açmaz.
+Güncel çalışma tabanı main `eba8597beda7b08c27b8b05da0768484ddf53fe3` (PR145). Aynı SHA için [main proof](https://github.com/SXQHex/FtkSaaS/actions/runs/41511385623), [merge proof](https://github.com/SXQHex/FtkSaaS/actions/runs/41511385708) ve [development teslimi](https://github.com/SXQHex/FtkSaaS/actions/runs/41511489528), attempt1 completed/success doğrulandı. Development tesliminde hosted backend ve dokümantasyon doğrulama adımları başarılıdır. XREQ-009/011 gerçek frontend tüketici kabulü [ortak talepte](../../../docs/requests.md#xreq-011) tamamlandı; yeni XREQ-012 temizlik talebi bu işlevsel kabulü geri açmaz.
 
 S05'in beş okuma projeksiyonunun backend teslim kaynağı main `a21a87208b3cbca9fc1a877fa41fd7c746fe55cd` (PR139). Aynı SHA için [main proof](https://github.com/SXQHex/FtkSaaS/actions/runs/41450827285), [merge proof](https://github.com/SXQHex/FtkSaaS/actions/runs/41450826811) ve [development teslimi](https://github.com/SXQHex/FtkSaaS/actions/runs/41450894731), attempt1 completed/success doğrulandı. Bu teslim S05'in aşağıdaki beş okuma projeksiyonunu kapsar; genel S05 veya frontend ekran kabulü değildir.
 
@@ -43,9 +43,9 @@ ReservationView, AttendanceEntryView, EntitlementView, FinanceView ve NegativeLi
 
 PR143 son adayı head `66ae71a6970f5ad743d37a258881af2e60f29c52`, base `152bdcba16f8b26e810cbe2dd91f0a46d5260a9e`, tested merge `26fbbe63f1d93aa942fd9fae0ac83061489473c4` için [full clean](https://github.com/SXQHex/FtkSaaS/actions/runs/41477822697), attempt1 core ve dört API shard, quality ve toplayıcı completed/success doğrulandı. Main `2f2f083b54e59d997c375d90bc05528a69344fbe` için [main proof](https://github.com/SXQHex/FtkSaaS/actions/runs/41484288190), [merge proof](https://github.com/SXQHex/FtkSaaS/actions/runs/41484288154) ve [development teslimi](https://github.com/SXQHex/FtkSaaS/actions/runs/41484366762), attempt1 completed/success; hosted backend ve belge doğrulaması başarılıdır. İlk başarısız aday bu kabulün kaynağı değildir.
 
-## Aktif temizlik ve kişi projeksiyonu paketi
+## Temizlik ve Starter kişi projeksiyonları kabulü
 
-XREQ-012 / S01.7 ile S05’in kalan Starter kişi okumaları aynı PR paketinde hazırlanıyor. İki yeni migration; eski instructor satırları için aktarım kontrolü, fiziksel silme/yeniden yazım yasağı, gereksiz çift kaynak dallarının kaldırılması ve altı operasyon DTO’sunda nullable Abone No içerir. F04/F07/F09/F10/F12/F13/F32/F33 kaynak/test izi ilgili WF’lerde korunur; F12 Starter’da açılmaz. Toplam 96 migration ve 219 çağrılabilir operasyon vardır; yeni API eklenmez.
+XREQ-012 / S01.7 ile S05’in kalan Starter kişi okumaları PR145 ile teslim edildi. İki yeni migration; eski instructor satırları için aktarım kontrolü, fiziksel silme/yeniden yazım yasağı, gereksiz çift kaynak dallarının kaldırılması ve altı operasyon DTO’sunda nullable Abone No içerir. F04/F07/F09/F10/F12/F13/F32/F33 kaynak/test izi ilgili WF’lerde korunur; F12 Starter’da açılmaz. Toplam 96 migration ve 219 çağrılabilir operasyon vardır; yeni API eklenmez.
 
 Yerel geçici izole Supabase native ortamı çalıştırıldı. Pasif instructor ilişki satırının eski şemada eklenebildiği kırmızı testle doğrulandı; yeni fiziksel kural ve her iki migration yerel DB’ye uygulandı. DTO sözleşme testi önce RoleView alanı eksikliğiyle kırmızı, ardından altı yeni alanla yeşil oldu.
 
@@ -56,17 +56,17 @@ Yerel geçici izole Supabase native ortamı çalıştırıldı. Pasif instructor
 - Aktarım eksikliğinde ret, canonical alias üzerinden taşınmış rolün kabulü, diğer tabloların tam snapshot eşitliği, sıfır eski instructor satırı ve yasak yeni fiziksel yazım gerçek DB fixture’ında geçti. Silme koşulunu tersine çeviren mutasyon veritabanı CHECK ile yakalandı ve rollback edildi. Authenticated projeksiyon erişimi ve anon rol-probe yetkisi false doğrulandı.
 - Yerel advisors yalnız belgeli mevcut private.ops_run search_path WARN verdi; yeni advisor bulgusu yok. Bağımsız son kaynak incelemesinde açık Critical/Required davranış bulgusu kalmadı.
 
-Aday/main/hosted kabulü henüz yok; onaylanan kalite kaydı aşağıdadır. Hosted veriye bu çalışma sırasında SQL yazılmadı.
+[PR145 aday full clean](https://github.com/SXQHex/FtkSaaS/actions/runs/41504091971), attempt1 head `e9d68769284db79df51c0c86fd86445c13475cef`, base `ba62bb7e95607e6d29e22d5c534a0702249de39b`, tested merge `3f1ec9ab3ef47f0a1578c7e0c176216b3404fe31` üzerinde core, dört API shard, quality ve toplayıcı completed/success doğrulandı. Test edilen ağaç `669e97e914ae15fcb44329f81abc017dca584901`, yukarıdaki PR145 main ağacıyla aynıdır. Aynı-main proof ve development kabulüyle S01.7 ve S05 Starter projeksiyon alt teslimi kapalıdır; genel S05’in üst-plan işleri ve Starter bütünlük kabulü açık kalır. Hosted değişiklikler kabul edilmiş development CD ile uygulandı; elle hosted SQL/seed/reset çalıştırılmadı.
 
 ### Onaylanan kalite kaydı ve XREQ-012 kapanışı
 
-Kullanıcı 2 Kasım 2026 tarihinde yalnız `starter-plan-gates-acceptance.mjs:56` assertion değişikliğinin parmak izine bağlı, 30 Kasım bitişli dar istisnayı açıkça onayladı. Kayıt `scripts/ci/floor-exceptions.json` sahibine eklendi; ikinci kanonik rolün PLAN_LIMIT_REACHED assertion’ı korunur. Checker, eşik ve workflow değiştirilmedi. Yeni kayıt bağımsız son kaynak incelemesine ve gerçek aday kabulüne tabidir.
+Kullanıcı 2 Kasım 2026 tarihinde yalnız `starter-plan-gates-acceptance.mjs:56` assertion değişikliğinin parmak izine bağlı, 30 Kasım bitişli dar istisnayı açıkça onayladı. Kayıt `scripts/ci/floor-exceptions.json` sahibine eklendi; ikinci kanonik rolün PLAN_LIMIT_REACHED assertion’ı korunur. Checker, eşik ve workflow değiştirilmedi. Bu kayıt dahil son kaynak bağımsız inceleme ve yukarıdaki gerçek aday kabulünden geçti. Bu onay yeni bir istisna veya CI/kalite politikası değişikliği yetkisi değildir.
 
-XREQ-012 backend uygulama ve yerel doğrulama kapanış kaydı kullanıcı talimatıyla [ortak talebe](../../../docs/requests.md#xreq-012) yazıldı. Bu, henüz çalışmamış aday CI, merge veya hosted migration kabulü değildir. Bu katmanlar başarılı aynı kaynak kanıtıyla doğrulanınca teslim kapanışı tamamlanır.
+XREQ-012 backend uygulama ve yerel doğrulama kapanış kaydı kullanıcı talimatıyla [ortak talebe](../../../docs/requests.md#xreq-012) yazıldı. Yukarıdaki aday/main/development kanıtlarıyla backend teslim kapanışı tamamlandı. Frontend S02 son kapanışının sahibi frontend alanıdır; bu kayıt onun adına kabul vermez.
 
 ## Devam noktası
 
-A03.1 kaynak/plan/WF eşlemesi main'de; A03.2/A03.3 genel özellik bazlı kanıt ve boşluk uzlaştırması açık. S01.4 backend teslimi tamamlandı. S01.5/XREQ-009 backend teslimi tamamlandı; aktif paket XREQ-012 temizlik ve S05 Starter operasyon projeksiyonlarıdır; görev/ölçütler [backlog](remaining-work.md), sıra [kuyruk](production-queue.md) sahibindedir. Genel Starter veya F01–F33 kabulü kapatılmadı.
+A03.1 kaynak/plan/WF eşlemesi main'de; A03.2/A03.3 genel özellik bazlı kanıt ve boşluk uzlaştırması açık. S01.4 backend teslimi tamamlandı. S01.5/XREQ-009, S01.7/XREQ-012 ve S05’in Starter operasyon projeksiyonları teslim edildi; sıradaki paket S07 kanıt uzlaştırması ile S08/S09/S10 backend kabul boşluklarıdır; görev/ölçütler [backlog](remaining-work.md), sıra [kuyruk](production-queue.md) sahibindedir. Genel Starter veya F01–F33 kabulü kapatılmadı.
 
 ## Mevcut kaynak ve gerçek kabul sınırları
 
