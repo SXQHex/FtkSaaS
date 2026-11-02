@@ -4,6 +4,7 @@ import fs from 'node:fs';
 import {authUser,fixturePlatform,must,call,context} from './api-client.mjs';
 import {newUuidV7 as key} from '../scripts/uuid.mjs';
 
+const settingsCatalogVersion=JSON.parse(fs.readFileSync('config/frontend-settings.json','utf8')).version;
 test('Frontend settings scoped persistence, live authority, reset and delivery preferences',async t=>{
  const guard=resources(t),{platform,plan}=await fixturePlatform();
  const owner=await authUser('settings-owner'),other=await authUser('settings-other');
@@ -214,7 +215,7 @@ test('Organization brand color lifecycle acceptance',async t=>{
    const preview=await must(owner,'settings_reset_preview_v1',{...q,fields:['secondary_color','accent_color']});
    await must(owner,'settings_reset_apply_v1',{...q,expected_version:preview.version,preview:{id:preview.id,token:preview.token}},key());
    const reset=await read(owner,q);for(const f of fields)assert.equal(reset.values[f],null);
-   const catalog=await must(owner,'settings_catalog_get_v1',q);assert.equal(catalog.catalog_version,9);for(const f of fields)assert(catalog.fields.some(x=>x.key===f&&x.writable));
+   const catalog=await must(owner,'settings_catalog_get_v1',q);assert.equal(catalog.catalog_version,settingsCatalogVersion);for(const f of fields)assert(catalog.fields.some(x=>x.key===f&&x.writable));
    assert(catalog.fields.some(x=>x.key==='font_package_id'&&!x.writable));assert(catalog.fields.some(x=>x.key==='theme_package_id'&&!x.writable));
 
  }finally{await db.end();}

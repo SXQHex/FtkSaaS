@@ -1,3 +1,4 @@
+import './subscriber-number-acceptance.mjs';
 import './account-signup-acceptance.mjs';
 import './invitation-delivery-acceptance.mjs';
 import './account-identity-acceptance.mjs';
