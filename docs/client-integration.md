@@ -1,6 +1,6 @@
 # İstemci entegrasyon protokolü
 
-Güncel kaynak/hosted kabulü [00 devirde](../apps/backend/docs/00-FtkSaaS-yeni-sohbet-devir.md); repo ve ortam düzeni [monorepo devrinde](monorepo.md). Bu belge projenin ortak istemci tüketim kurallarını taşır. Web istemcisi apps/web, ortak bileşenler packages/ui içindedir. Çalışma durumu ve sohbet devri uygulamanın geliştirme belgelerindedir.
+Güncel kaynak/hosted kabulü [00 devirde](../apps/backend/docs/00-FtkSaaS-yeni-sohbet-devir.md); repo ve ortam düzeni [repo ve ortam rehberinde](monorepo.md). Bu belge projenin ortak istemci tüketim kurallarını taşır. Web istemcisi apps/web, ortak bileşenler packages/ui içindedir. Çalışma durumu ve sohbet devri uygulamanın geliştirme belgelerindedir.
 
 ## Gerçek sözleşme
 

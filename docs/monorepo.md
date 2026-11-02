@@ -64,6 +64,6 @@ GitHub Actions kabul ve dağıtımın sahibi kalır. Turbo paket görevlerini ç
 
 Frontend bağımsız test/typecheck/build zincirinin sahibidir. Shared kaynakta backend kabulü de gerekir; aynı main kanıtı sonrası backend CD ve gerçek frontend/Auth/API kabulü ayrıdır. Production/DNS ve eski studiosaas uygulaması ayrı yetki kapsamıdır.
 
-## CI geçiş sınırı
+## CI kaynak sınırı
 
-Bu taşıma CI politika yollarını değiştirdiği için trusted-base kurulum sınırına tabidir. Gate gevşetilmez; sahte status/bypass veya repository yönetim ayarı değişikliği yoktur. Güncel kaynak/CI/hosted kabulü [00 devirde](../apps/backend/docs/00-FtkSaaS-yeni-sohbet-devir.md), ortak/backend açık iş [proje backlog’unda](../apps/backend/docs/remaining-work.md), frontend bölüm/kabul takibi [web planında](../apps/web/docs/todo.md) tutulur. İptal edilen eski full clean yeni kaynağın kabulü değildir; önce son kaynak incelemesi ve otomatik PR kapsam kabulü alınır; main aday kanıtını test tekrarı olmadan doğrular.
+CI politika yollarını değiştiren yeni çalışma trusted-base kurulum sınırına tabidir; tamamlanmış monorepo taşıması açık kurulum işi değildir. Gate gevşetilmez; sahte status/bypass veya repository yönetim ayarı değişikliği yoktur. Güncel kaynak/CI/hosted kabulü [00 devirde](../apps/backend/docs/00-FtkSaaS-yeni-sohbet-devir.md), ortak/backend açık iş [proje backlog’unda](../apps/backend/docs/remaining-work.md), frontend bölüm/kabul takibi [web planında](../apps/web/docs/todo.md) tutulur. İptal edilen eski full clean yeni kaynağın kabulü değildir; önce son kaynak incelemesi ve otomatik PR kapsam kabulü alınır; main aday kanıtını test tekrarı olmadan doğrular.

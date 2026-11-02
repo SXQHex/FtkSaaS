@@ -5,7 +5,7 @@ Bu dosya **Starter, Pro ve Business’ın tamamı için backend görevlerinin te
 ## Takip ve tamamlanma kuralı
 
 - K: yeni/değişen backend işlevi. D: mevcut kaynak/kanıtı incele, yalnız gerçek boşluğu düzelt. H: gerçek ortam kabulü. D işinde eksik kanıt bütün modülün kodunun yok olduğu anlamına gelmez.
-- Karar, kaynak uygulaması, test ve hosted kabul ayrı durumdur. Görev ancak kendisine uygulanabilir katmanlar kanıtlıysa kapanır. Kaynak/SHA/run/attempt bilgisi burada kopyalanmaz; devir kaydına bağlanır. 218 operasyon veya boş feature evidence listesi tamamlanma yüzdesi değildir.
+- Karar, kaynak uygulaması, test ve hosted kabul ayrı durumdur. Görev ancak kendisine uygulanabilir katmanlar kanıtlıysa kapanır. Kaynak/SHA/run/attempt bilgisi burada kopyalanmaz; devir kaydına bağlanır. Operasyon sayısı veya boş feature evidence listesi tamamlanma yüzdesi değildir.
 - Görev dosya alanları başlangıç incelemesi içindir. Her dilim bir kullanıcı/backend akışını doğrular; bağımsız alt sistemler tek uygulama oturumuna yığılmaz. Büyük çıkan iş aynı kimliğin alt adımlarına bölünür. PR sınırı tek fonksiyon değil tamamlanan anlamlı modüldür.
 - Sorumlu backend’dir. Frontend ekran/tasarım/kabulü bu planın işi değildir; yalnız gerçek API tüketicisi gerektiren bağımlılık [ortak taleple](../../../docs/requests.md) izlenir. Backend frontend adına kapanış vermez.
 - Test/doğrulama yöntemi [aşağıda](#doğrulama-ve-kayıt); saf belge işi DB/API çalıştırmayı gerektirmez. Hosted reset/seed, yeni dış gönderim, production dağıtımı veya canlı veri aktarımı bu planın yazılmasıyla başlamaz.
@@ -161,19 +161,21 @@ Bu tablo yalnız izdir; eski kabul metinleri ikinci kez tutulmaz.
 - [ ] S05.2 — Gerekli DTO/projeksiyonlara No'yu taşı; komut ve ilişkilerde UUID'yi koru. Değişen makine sözleşmesinden tip/katalogları üret; ilgili WF/API eşlemesini incele.
 - [ ] S05.3 — No ile bul→UUID komut→yeniden oku→rapor/export zincirini doğrula; alias araması, scope ve yetki kaybını sınayarak frontend'e sözleşme devrini yap.
 
-**İncelenen yüzeyler:** PersonSummary/PersonView ile ReportRow ve yeni CSV kaynakları teslim edildi. ReservationView, AttendanceEntryView, EntitlementView, FinanceView ve NegativeLimitsView bu adayda uygulanıyor; gerçek migration/API kabulü açık. RoleView, EarningView, LeadView, EventRegistrationView, EventDutyView, EventPaymentPreparationView, ClassAssignmentView, AgreementVersionView, ProtectedObligationView, SettlementAuthorityView, LessonRequestView, SeatOfferView, WaitlistEntryView ve CrmFollowupView sonraki ilgili operasyon diliminde mevcut plan/izin sınırlarıyla ele alınacak; S05 kapanmadı.
+**İncelenen yüzeyler:** PersonSummary/PersonView ile ReportRow ve yeni CSV kaynakları teslim edildi. ReservationView, AttendanceEntryView, EntitlementView, FinanceView ve NegativeLimitsView PR139 ile teslim edildi; [aday/main/development kabulü](00-FtkSaaS-yeni-sohbet-devir.md#s05-operasyon-projeksiyonları-kabulü) tamamlandı. RoleView, EarningView, LeadView, EventRegistrationView, EventDutyView, EventPaymentPreparationView, ClassAssignmentView, AgreementVersionView, ProtectedObligationView, SettlementAuthorityView, LessonRequestView, SeatOfferView, WaitlistEntryView ve CrmFollowupView sonraki ilgili operasyon diliminde mevcut plan/izin sınırlarıyla ele alınacak; S05 kapanmadı.
 
 **Dilim kabulü:** Aynı kişi izinli operasyon yüzeylerinde tutarlı numarayla görünür. Numara kişisel/finans verisine ek erişim sağlamaz; yeni export mevcut yetkiyi uygular. Önceden üretilmiş dış belge değişmez; frontend'in ekran uyarlaması/kabulü backend adına kapatılmaz.
 
 <a id="s06"></a>
 ### S06 — Davet işi takibindeki kopukluk
 
-- [ ] **Tür:** K/D · **Plan:** Tümü · **Özellik:** F04,F06,F26
-- **Bağımlılık:** A03
+- [x] **Tür:** K/D · **Plan:** Tümü · **Özellik:** F04,F06,F26
+- **Bağımlılık:** XREQ-003 önceki bağımsız teslimi; A03 genel kanıt uzlaştırması açık
 - **Kabul:** XREQ-003 dönen iş kimliği doğru yetkiyle okunur; attempts/sonuç tutarlı görünür.
 - **Sınır/olumsuz durum:** Outbox/p06 ayrımı gerçek kaynakta teşhis edilir; NOT_FOUND’u gizleyen sahte başarı yok.
 - **Doğrulama senaryosu:** Auth→Edge→komut→job okuma; başka hesap/tenant reddi, iş tekrarında tek sonuç.
 - **Kaynak alanı:** account-access/job-status SQL; worker; ilgili API testi
+
+**Teslim durumu:** XREQ-003 backend iş takibi kabulü tamamlandı; [kaynak/CI ve hosted kanıt](00-FtkSaaS-yeni-sohbet-devir.md#xreq-003-operasyonel-kabulü). Gönderenin aynı işi okuması ve hesap/tenant/merkez olumsuz kontrolleri doğrulandı. Frontend ekranından daveti kabul etme bu kapanışa dahil değildir.
 
 <a id="s07"></a>
 ### S07 — Davet teslim yaşam döngüsü
@@ -184,6 +186,10 @@ Bu tablo yalnız izdir; eski kabul metinleri ikinci kez tutulmaz.
 - **Sınır/olumsuz durum:** İptal/eski/expired davet gönderilmez; belirsiz sağlayıcı sonucu kör tekrar edilmez.
 - **Doğrulama senaryosu:** Kesinti/retry ve yanlış alıcı; yerel teslim testi ile yetkili gerçek alıcı kabulü ayrı kaydedilir.
 - **Kaynak alanı:** davet worker/adaptör; ilgili teslim acceptance testi
+
+**Tamamlanan dilim:** XREQ-003 backend worker/sağlayıcı teslimi, iş takibi ve yetkili gerçek alıcı kutusu kabulü tamamlandı; [kanıt](00-FtkSaaS-yeni-sohbet-devir.md#xreq-003-operasyonel-kabulü). Native hesap kabulü ve yanlış hesap/expired/revoked/link çakışması kaynak testleri gerçek frontend bağlantı kabulünden ayrıdır.
+
+**Açık kabul:** Teslim edilen bağlantının gerçek native giriş dönüşünden sonra doğru hesapla kabulü ve olumsuz senaryoların gerçek tüketicide doğrulanması frontend sahibinde kalır; [XREQ-004](../../../docs/requests.md#xreq-004-giriş-boyunca-davet-fragmentini-koruma) ile koordine edilir. S07 bu bağımlılık nedeniyle açık; tamamlanan teslim hattı yeniden kurulmaz.
 
 <a id="s08"></a>
 ### S08 — Native hesap ve güvenlik kapanışı
@@ -625,7 +631,7 @@ Bu tablo yalnız izdir; eski kabul metinleri ikinci kez tutulmaz.
 
 ## F01–F33 kapsama izi
 
-A03 ilk incelemesi PR135 tabanındaki 218 operasyonun tamamını tek WF sahibine bağladı: 211 operasyonun F01–F33 ve normatif plan izi vardır; `features=[]` olan yedi ortak ayar/medya operasyonu WF12 üzerinden S10 kapsamındadır. Ortak altyapıya yapay F etiketi atanmadı. Aşağıdaki akışların kaynak/test bağları `docs/workflows.json`, okunabilir görünümü [API haritası](../../../docs/functions.md) sahibindedir. Eksik WF test bağları mevcut gerçek test/SQL fixture kaynaklarıyla tamamlandı; yeni runtime başarısı iddia edilmez. Abonelik yükseltme/iptal testlerinin SQL dispatcher kabulü gerçek HTTP kabulünden ayrılır; grace uzatmanın negatif yetki kontrolü olumlu uzatma kabulü değildir. Bu eksikler S16 ve O10 kapsamında kalır. Her özelliğin hosted/plan bütünlük kabulü ilgili S/P/B/O ve G görevlerinde açık kalır; aday kaynağın test/ortam sonucu yalnız devirde tutulur.
+A03.1 operasyonları tek WF sahibine ve F01–F33 normatif plan izine bağladı; güncel eşleme ve operasyon envanteri [üretilmiş API haritasından](../../../docs/functions.md) okunur. `features=[]` olan ortak ayar/medya operasyonları WF12 üzerinden S10 kapsamındadır. Ortak altyapıya yapay F etiketi atanmadı. Aşağıdaki akışların kaynak/test bağları `docs/workflows.json`, okunabilir görünümü [API haritası](../../../docs/functions.md) sahibindedir. Eksik WF test bağları mevcut gerçek test/SQL fixture kaynaklarıyla tamamlandı; yeni runtime başarısı iddia edilmez. Abonelik yükseltme/iptal testlerinin SQL dispatcher kabulü gerçek HTTP kabulünden ayrılır; grace uzatmanın negatif yetki kontrolü olumlu uzatma kabulü değildir. Bu eksikler S16 ve O10 kapsamında kalır. Her özelliğin hosted/plan bütünlük kabulü ilgili S/P/B/O ve G görevlerinde açık kalır; aday kaynağın test/ortam sonucu yalnız devirde tutulur.
 
 A03 ve G03 genel iz/kabul kapılarıdır. Aşağıdaki tablo görev navigasyonudur; ikinci durum veya plan erişimi matrisi değildir. Plan erişimi yalnız ürün sözleşmesinden alınır.
 
