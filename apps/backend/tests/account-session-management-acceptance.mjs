@@ -68,6 +68,19 @@ test('Native account sessions: own scope, optimistic labels, revocation, fresh p
    const sessions=Array.from({length:51},randomUUID);await db.query("insert into auth.sessions(id,user_id,created_at,updated_at) select id,$2::uuid,now()-interval '1 day',now()-interval '1 day' from unnest($1::uuid[]) id",[sessions,owner.id]);
    try{const p=await list(owner);assert.equal(p.items.length,50);assert(p.next_cursor);const q=await must(owner,'account_sessions_list_v1',{cursor:p.next_cursor});assert.equal(q.items.length,2);assert.equal(q.next_cursor,null);assert.equal(new Set([...p.items,...q.items].map(x=>x.session_id)).size,52);await fail('VALIDATION_FAILED',other,'account_sessions_list_v1',{cursor:p.next_cursor});}finally{await db.query('delete from auth.sessions where id=any($1::uuid[])',[sessions]);}
   });
+  await t.test('native password change keeps the current account usable and denies the other still-unexpired JWT',async()=>{
+   const user=await authUser('password-session-boundary');
+   const ownAccount=await must(user,'account_get_v1'),retired=await login(user),password=randomUUID()+'Aa9!';
+   const before=await list(user);assert.equal(before.items.length,2);assert(before.items.some(s=>s.session_id===retired.session_id));
+   assert(JSON.parse(Buffer.from(retired.jwt.split('.')[1],'base64url')).exp*1000>Date.now(),'retired JWT has not expired');
+   const response=await fetch(env.API_URL+'/auth/v1/user',{method:'PUT',headers:{apikey:env.ANON_KEY,authorization:'Bearer '+user.jwt,'content-type':'application/json'},body:JSON.stringify({password,current_password:user.password}),signal:AbortSignal.timeout(15000)});
+   assert.equal(response.status,200,'native password change must succeed');
+   assert.equal((await must(user,'account_get_v1')).id,ownAccount.id);
+   const after=await list(user);assert.deepEqual(after.items.map(s=>s.session_id),[user.session_id]);assert.equal(after.items[0].current,true);
+   assert.equal((await db.query('select count(*)::int n from auth.sessions where id=$1',[retired.session_id])).rows[0].n,0);
+   await denied(retired);await refreshDenied(retired);
+   const fresh=await login({...user,password});assert.equal((await must(fresh,'account_get_v1')).id,ownAccount.id);
+  });
  }finally{
   if(trigger){await db.query(`drop trigger if exists ${trigger} on private.account_security_events`);await db.query(`drop function if exists private.${trigger}()`);}
   if(previousConfig.length)await db.query('update private.p07_lifecycle_config set reauth_max_age_seconds=$1 where singleton',[previousConfig[0].reauth_max_age_seconds]);else await db.query('delete from private.p07_lifecycle_config');

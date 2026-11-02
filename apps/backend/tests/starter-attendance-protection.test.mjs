@@ -201,6 +201,62 @@ test('Starter attendance and protected reservation through Auth -> Edge -> RPC',
   await mut('attendance_correct_apply_v1',{preview:token(correction)});
   assert.equal((await rows('select state from core.entitlement_allocations where reservation_id=$1',[rv]))[0].state,'released');
  });
+ await t.test('paid daily journey preserves money and rights through self-service races, closure and correction',async()=>{
+  const learners=[await linked('daily-one'),await linked('daily-two')];
+  const date=offset=>{const d=new Date();d.setUTCDate(d.getUTCDate()+offset);return d.toISOString().slice(0,10);};
+  const cls=(await mut('class_save_v1',{name:'Daily Starter class',discipline_id:discipline,external_open:true})).primary_id;
+  const weekdays=[2,3,4].map(offset=>{const d=new Date(date(offset)+'T00:00:00Z');return d.getUTCDay()||7;});
+  const program=await must(owner,'program_preview_v1',scope({class_id:cls,schedule:{room_id:room,weekdays,local_start:'22:00:00',duration_minutes:60,starts_on:date(2),ends_on:date(5),assignments:[{person_id:instructor.p,duty:'instructor'}],capacity:{total:1}}}));
+  assert.deepEqual(program.blockers,[]);assert.equal(program.sessions.length,3);
+  const programKey=key(),programBody={preview:token(program)};
+  await mut('program_apply_v1',programBody,programKey);assert.equal((await mut('program_apply_v1',programBody,programKey)).replayed,true);
+  const sessions=program.sessions.map(s=>s.session_id);
+  const product=(await mut('product_publish_v1',{terms:{name:'Starter lesson · daily paid right',kind:'credits',booking_mode:'flexible',credits:1,price_minor:'1000',currency:'TRY',freeze:{enabled:false,extends_validity:false},refund:{method:'none'},scopes:[{scope_kind:'center_discipline',center_id:center,discipline_id:discipline,usage_targets:['lesson']}]}})).primary_id;
+  const finance=async p=>{const view=await must(p.u,'finance_get_v1',scope({person_id:p.p,currency:'TRY',page:{}}));return {...view,movements:{items:view.movements.items,next_cursor:view.movements.next_cursor}};};
+  const rights=async p=>(await must(p.u,'entitlements_get_v1',scope({person_id:p.p}))).find(e=>e.sale_id===p.sale);
+  for(const p of learners){
+   // Zero is this person's explicit limit, independent of the suite's two-credit default.
+   const reason='Daily fixture uses purchased rights only',change={kind:'negative_limit',person_id:p.p,discipline_id:discipline,allowed_negative_credits:0};
+   const impact=await must(owner,'reservation_impact_preview_v1',scope({change,reason}));
+   assert.deepEqual(impact.affected,[]);
+   const limits=await must(owner,'negative_limits_get_v1',scope({person_id:p.p,discipline_id:discipline}));
+   await mut('negative_limit_set_v1',{person_id:p.p,discipline_id:discipline,allowed_negative_credits:0,reason,expected_version:limits.version,impact_approval:token(impact.preview),accepted_reservation_ids:[]});
+   assert.equal((await must(owner,'negative_limits_get_v1',scope({person_id:p.p,discipline_id:discipline}))).effective_limit,0);
+   const pv=await must(owner,'sale_preview_v1',scope({person_id:p.p,product_version_id:product,start_date:date(-90),end_date:date(14)}));
+   p.sale=(await mut('sale_apply_v1',{preview:token(pv)})).primary_id;
+   const debt=await finance(p);assert.equal(debt.debts.reduce((n,d)=>n+BigInt(d.remaining_minor),0n),1000n);
+   const body={person_id:p.p,amount_minor:'1000',currency:'TRY',occurred_at:new Date().toISOString(),debt_ids:debt.debts.map(d=>d.id),payment:{method:'bank_transfer',reference:'SYNTHETIC DAILY COLLECTION'}},k=key();
+   p.collection=(await mut('collection_record_v1',body,k)).primary_id;assert.equal((await mut('collection_record_v1',body,k)).replayed,true);
+   p.paid=await finance(p);assert(p.paid.debts.every(d=>d.remaining_minor==='0'));assert.equal(p.paid.movements.items.filter(m=>m.id===p.collection).length,1);
+   assert.deepEqual(p.paid.movements.items.find(m=>m.id===p.collection).payment,body.payment);
+   assert.equal((await rights(p)).available,1);
+  }
+  const request=(p,session_id)=>({session_id,person_id:p.p,source_sale_id:p.sale,mode:'flexible'});
+  const compete=await Promise.all(learners.map(p=>call(p.u,'reservation_create_v1',scope(request(p,sessions[0])),key())));
+  assert.equal(compete.filter(r=>r.result.ok).length,1);assert.equal(compete.find(r=>!r.result.ok).result.error.code,'CAPACITY_FULL');
+  const winner=learners[compete.findIndex(r=>r.result.ok)],loser=learners.find(p=>p!==winner),reservation=compete.find(r=>r.result.ok).result.data;
+  const lastRight=await Promise.all(sessions.slice(1).map(s=>call(loser.u,'reservation_create_v1',scope(request(loser,s)),key())));
+  assert.equal(lastRight.filter(r=>r.result.ok).length,1);assert.equal(lastRight.find(r=>!r.result.ok).result.error.code,'CREDIT_LIMIT_EXCEEDED');
+  const otherReservation=lastRight.find(r=>r.result.ok).result.data,emptySession=sessions.slice(1)[lastRight.findIndex(r=>!r.result.ok)];
+  for(const p of learners){const e=await rights(p);assert.equal(e.available,0);assert.equal(e.reserved,1);assert.equal(e.consumed,0);assert.equal(e.deficit,0);}
+  await fail('reservation_create_v1',request(winner,emptySession),'CREDIT_LIMIT_EXCEEDED',winner.u);
+  await fixturePastSession(sessions[0]);
+  let v=await get(sessions[0]);await mut('attendance_mark_v1',{reservation_id:reservation.primary_id,expected_version:v.entries[0].version,result:'attended'},key(),instructor.u);
+  assert.equal((await rights(winner)).reserved,1);assert.equal((await rights(winner)).consumed,0);
+  v=await get(sessions[0]);const closeKey=key(),closeBody={session_id:sessions[0],expected_version:v.session_version};
+  await mut('attendance_close_v1',closeBody,closeKey);assert.equal((await mut('attendance_close_v1',closeBody,closeKey)).replayed,true);
+  let e=await rights(winner);assert.equal(e.reserved,0);assert.equal(e.consumed,1);assert.equal(e.available,0);
+  const correction=await must(owner,'attendance_correct_preview_v1',scope({session_id:sessions[0],corrections:[{reservation_id:reservation.primary_id,result:'no_show'}],reason:'Daily attendance correction'}));
+  const correctionKey=key(),correctionBody={preview:token(correction)};
+  await mut('attendance_correct_apply_v1',correctionBody,correctionKey);assert.equal((await mut('attendance_correct_apply_v1',correctionBody,correctionKey)).replayed,true);
+  e=await rights(winner);assert.equal(e.available,1);assert.equal(e.reserved,0);assert.equal(e.consumed,0);
+  const cancelKey=key(),cancelBody={reservation_id:otherReservation.primary_id,expected_version:otherReservation.version,reason:'Student daily cancellation'};
+  await mut('reservation_cancel_v1',cancelBody,cancelKey,loser.u);assert.equal((await mut('reservation_cancel_v1',cancelBody,cancelKey,loser.u)).replayed,true);
+  assert.equal((await rights(loser)).available,1);assert.equal((await rights(loser)).reserved,0);
+  for(const p of learners){assert.deepEqual(await finance(p),p.paid);assert.equal((await rights(p)).deficit,0);}
+  assert.equal((await rows('select count(*)::int n from core.credit_deficits where org_id=$1 and person_id=any($2::uuid[])',[org,learners.map(p=>p.p)]))[0].n,0);
+  assert.equal((await rows('select count(*)::int n from core.earnings where org_id=$1',[org]))[0].n,0);
+ });
  await t.test('late closure failure rolls back rights, reservation, session, history and receipt',async()=>{
   const p=await linked('rollback-student'),p2=await linked('rollback-student-two'),ses=(await makeSession()).primary_id,rv=(await book(ses,p.p)).primary_id;await book(ses,p2.p);
   await fixturePastSession(ses);
