@@ -2,6 +2,8 @@
 
 1 Kasım 2026 kararı: mevcut tabanı koru; güvenlik ve mimari ihlallerini engelle; yeni yerel kalite kontrolünü en fazla 90 saniyede tamamla. Bu dosya iki alanın ortak kalite sözleşmesidir. Alanların geliştirme durumu burada tutulmaz. Ürün/API davranışı [kaynak indeksindeki](docs/source-index.md) sahiplerde, CI kabul protokolü [CI politikasında](docs/ci-policy.md) kalır.
 
+Kapsam: `apps/web1/**` deneysel tasarım alanı kullanıcı kararıyla bu CI kalite tabanının dışındadır; izolasyon ve karma değişiklik kuralları [CI politikasında](docs/ci-policy.md#deneysel-tasarım-alanı) tanımlıdır. Diğer bütün yollar mevcut tabana tabidir.
+
 ## Değiştirilemeyen taban
 
 - Denetim susturma: yeni tip/lint/coverage/güvenlik susturması eklenmez. Eski borcu yeniden tarayıp keyfî bir hedef dayatmak yerine yeni fark denetlenir.

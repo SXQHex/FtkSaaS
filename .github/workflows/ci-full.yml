@@ -13,9 +13,10 @@ concurrency:
   cancel-in-progress: true
 jobs:
   quality:
+    needs: candidate
     permissions:
       contents: read
-    if: github.event.action != 'edited' || github.event.changes.base != null
+    if: needs.candidate.outputs.kind != 'sandbox' && (github.event.action != 'edited' || github.event.changes.base != null)
     runs-on: ubuntu-24.04
     timeout-minutes: 5
     defaults:

@@ -1,10 +1,11 @@
+import {isDesignSandbox} from './design-sandbox.mjs';
 // Adapted from constraint-driven-development/references/floor-guard.md.
 // Diff-only heuristic: reports locations, never source text or secret values.
 import {execFileSync} from 'node:child_process';
 import fs from 'node:fs';
 import {createHash} from 'node:crypto';
 import {pathToFileURL} from 'node:url';
-const source = p => /\.(?:[cm]?[jt]sx?|py|sql|sh)$/.test(p);
+const source = p => !isDesignSandbox(p) && /\.(?:[cm]?[jt]sx?|py|sql|sh)$/.test(p);
 const testFile = p => /(?:^|\/)(?:tests?|__tests__)\/|\.(?:test|spec)\./.test(p);
 const suppression = /@ts-(?:ignore|nocheck|expect-error)|(?:eslint|oxlint)-disable|biome[-]ignore|#\s*(?:noqa|type:\s*ignore)|istanbul\s+ignore|c8\s+ignore|v8\s+ignore|no[s]emgrep|gitleaks[: ]allow|Stryker\s+disable/;
 const skips = /\b(?:test|it|describe|t|context)\s*\.\s*(?:skip|todo|only|skipIf|runIf|fails)\b|\b(?:xit|xdescribe|xtest)\s*\(|\b(?:skip|todo|only)\s*:\s*(?:true|['"])/;
@@ -55,10 +56,12 @@ export function collectDiff(base, cwd = process.cwd()) {
   const ancestor = git(['merge-base', base, 'HEAD']).trim();
   if (!ancestor) throw Error('Missing merge base');
   for(const path of git(['diff','--name-only','-z',ancestor,'--']).split('\0').filter(Boolean)) {
+    if(isDesignSandbox(path))continue;
     if(/[\n\r\t"]/.test(path)) throw Error('Unsupported tracked path');
   }
-  let diff = git(['diff','--no-ext-diff','--no-renames','--unified=0',ancestor,'--']);
+  let diff = git(['diff','--no-ext-diff','--no-renames','--unified=0',ancestor,'--','.',':(exclude)apps/web1/**']);
   for (const path of git(['ls-files','--others','--exclude-standard','-z']).split('\0').filter(Boolean)) {
+    if(isDesignSandbox(path))continue;
     // Fail closed for ambiguous/control-character paths and non-regular inputs.
     if (/[\n\r\t"]/.test(path) || !fs.lstatSync(root+'/'+path).isFile()) throw Error('Unsupported new file');
     try { diff += git(['diff','--no-ext-diff','--no-index','--unified=0','/dev/null',path]); }

@@ -1,3 +1,4 @@
+import {isDesignSandbox} from './design-sandbox.mjs';
 import {classifyChanges,ownerOf} from './scope.mjs';
 import {coverageHash} from './shards.mjs';
 import {documentScope} from './document-scope.mjs';
@@ -14,7 +15,7 @@ export async function remoteDocumentScope(github,repo,base,head,{allowFrontend=f
   return new Map(t.tree.filter(x=>x.type==='blob'||x.mode==='160000').map(x=>[x.path,x]));
  }));
  const changes=[...new Set([...trees[0].keys(),...trees[1].keys()])].filter(p=>trees[0].get(p)?.sha!==trees[1].get(p)?.sha||trees[0].get(p)?.mode!==trees[1].get(p)?.mode).map(path=>({path,status:!trees[0].has(path)?'A':!trees[1].has(path)?'D':'M'}));
- if(allowFrontend){for(let i=changes.length-1;i>=0;i--)if(ownerOf(changes[i].path)==='frontend')changes.splice(i,1);}
+ if(allowFrontend){for(let i=changes.length-1;i>=0;i--)if(['frontend','sandbox'].includes(ownerOf(changes[i].path)))changes.splice(i,1);}
  const contents=new Map();
  for(const c of changes)for(let i=0;i<2;i++){
   const f=trees[i].get(c.path);if(!f)continue;
@@ -54,14 +55,14 @@ export async function backendUnchanged(github,repo,base,head){
  try{return !(await remoteSourceScope(github,repo,base,head)).backend;}catch{return false;}
 }
 // Protect the commands and config that define the bar, including new nested configs.
-export const policyPath=p=>
+export const policyPath=p=>!isDesignSandbox(p)&&(
  ['CONSTRAINTS.md','turbo.json','.gitignore','docs/history/manifest.json','.github/dependabot.yml'].includes(p)
  || /(^|\/)(?:package\.json|\.gitignore|\.ignore|\.eslintignore|\.oxlintignore)$/.test(p)
  || /(^|\/)tsconfig(?:\.[^/]+)?\.json$/.test(p)
  || /(^|\/)(?:\.oxlintrc\.json|(?:oxlint|eslint|vitest|playwright)\.config\.[^/]+)$/.test(p)
  || p.startsWith('packages/typescript-config/') || p.startsWith('apps/web/scripts/')
  || p.startsWith('.github/workflows/') || p.startsWith('apps/backend/scripts/ci/')
- || ['apps/backend/scripts/test-clean.mjs','apps/backend/scripts/start-dev.mjs','apps/backend/scripts/paths.mjs'].includes(p);
+ || ['apps/backend/scripts/test-clean.mjs','apps/backend/scripts/start-dev.mjs','apps/backend/scripts/paths.mjs'].includes(p));
 
 export async function policyMatches(github,repo,base,head){
  const values=await Promise.all([base,head].map(async tree_sha=>{
@@ -85,7 +86,7 @@ export async function resolveCandidate(github,context,core,kind){
  assertParents(commit,p.base.sha,p.head.sha);
  const sourceScope=await remoteSourceScope(github,context.repo,p.base.sha,p.head.sha);
  core.setOutput('kind',sourceScope.kind);
- if(sourceScope.kind==='frontend'){core.setOutput('eligible','false');return;}
+ if(['frontend','sandbox'].includes(sourceScope.kind)){core.setOutput('eligible','false');return;}
  if(kind==='auto')kind=sourceScope.kind;
  const scope={safe:sourceScope.kind==='documentation'};
  if(kind==='full'&&scope.safe)throw Error('Documentation-only source uses documentation acceptance, not full clean');

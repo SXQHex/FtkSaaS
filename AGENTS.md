@@ -34,6 +34,8 @@ SXQHex/FtkSaaS tek geliştirme reposudur; diğer repolar bağlam dışıdır. Fr
 
 Backend/frontend test tetiklemeleri [CI kaynak sınırına](docs/ci-policy.md#ci-split--frontendbackend-kaynak-sınırı) göre ayrıdır. Backend/shared pozitif yollar ve incelenmiş belgeler `apps/backend/scripts/ci/scope.json` ile workflow listelerinde birlikte tutulur. Frontend kendi test yapısının sahibidir. Saf belge değişikliğinde backend DB/API/full clean yoktur; karma ve ortak kaynakta gerekli backend kapsamı korunur. Backend verify yalnız `@ftksaas/backend...` Turbo grafiğini çalıştırır. Frontend kapsam status'u frontend test kabulü yerine geçmez.
 
+`apps/web1` bağımsız deneysel tasarım alanıdır. Geliştirme ve kendi bağımlılıkları bu klasör içinde kalır; ortak CI kabulüne dahil edilmez. Sınır ve karma değişiklik kuralları [CI politikasında](docs/ci-policy.md#deneysel-tasarım-alanı) tanımlıdır. Bu muafiyet diğer uygulama veya ortak dosyaları değiştirme yetkisi vermez.
+
 ## Güvenlik ve ortamlar
 
 Uygulanmış migration değiştirilmez. Secrets/token/parola/kişisel veri kaynaklara ve raporlara yazılmaz. Yeni istemci Supabase native Auth ve Edge backend-v1 kullanır; core/private tablo veya service-only RPC erişimi yoktur. JWT doğrulaması açık kalır. Bariz güvenlik/fonksiyon açığı yoksa sağlayıcı davranışını tekrar eden bakım katmanı eklenmez.

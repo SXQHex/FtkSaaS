@@ -55,7 +55,7 @@ jobs:
   frontend:
     permissions: {}
     needs: source
-    if: needs.source.outputs.kind == 'frontend'
+    if: needs.source.outputs.kind == 'frontend' || needs.source.outputs.kind == 'sandbox'
     runs-on: ubuntu-24.04
     timeout-minutes: 10
     steps:
