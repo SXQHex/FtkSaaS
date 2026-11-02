@@ -1016,6 +1016,21 @@
     "noClosures": "Bu kaynak için kapanış kaydı yok.",
     "unreadableClosure": "Kapanış aralığı bu kaynak için doğrulanamadı.",
     "setupVerified": "Kaynak ve politika ön kontrolleri tamamlandı. Belirli ders saatinin uygunluğu ve çakışmalar program önizlemesinde ayrıca doğrulanır.",
-    "processing": "İşlem sürüyor…"
+    "processing": "İşlem sürüyor…",
+    "inspectRemoval": "Etkilenen seansları incele",
+    "removalEffects": "Kaldırmanın etkileyeceği seanslar",
+    "noRemovalEffects": "Bu kaldırmadan etkilenecek seans yok.",
+    "instructorRemovalHint": "Önce güncel etki listesini incele. Kaldırma ancak bu liste için açık onayınla uygulanır.",
+    "instructorRequired": "Eğitmen atanmalı",
+    "instructorRemains": "Seansın diğer eğitmeni korunacak",
+    "removalPreservesSessions": "Seanslar ve mevcut rezervasyonlar korunur; normal seans işlemleri sürer. Eğitmeni sağlamak kaldırmayı onaylayan yöneticinin sorumluluğundadır. Yeni eğitmeni ayrıca ata.",
+    "PREVIEW_STALE": "Etki listesi değişmiş veya süresi dolmuş. Güncel listeyi yeniden inceleyip onayla.",
+    "instructorTasks": "Eğitmen atanmalı — {center}",
+    "noInstructorTasks": "Eğitmen atanması gereken seans yok.",
+    "inspectSession": "Güncel seansı incele",
+    "replacementInstructor": "Yeni eğitmen",
+    "assignSessionInstructor": "Eğitmeni seansa ata",
+    "availabilityFor": "Haftalık uygunluk — {resource}",
+    "closuresFor": "Kayıtlı kapanışlar — {resource}"
   }
 }

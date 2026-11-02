@@ -15,6 +15,7 @@ const mocks = vi.hoisted(() => ({
   setTheme: vi.fn<(theme: string) => void>(),
   unsubscribe: vi.fn<() => void>(),
   signOut: vi.fn<() => Promise<{ error: Error | null }>>(),
+  send: vi.fn<(command: import("../src/lib/studio-setup").SetupCommand) => Promise<unknown>>(),
   setup: vi.fn<(operation: string, input: Record<string, unknown>) => Promise<unknown>>(),
   listener: null as null | ((event: string) => void),
 }));
@@ -32,6 +33,7 @@ vi.mock("../src/lib/api", async (original) => ({
 vi.mock("../src/lib/studio-setup", async (original) => ({
   ...(await original<typeof import("../src/lib/studio-setup")>()),
   setupCall: mocks.setup,
+  sendSetupCommand: mocks.send,
   getSetupDisciplines: async () => [],
 }));
 vi.mock("../src/lib/supabase/client", () => ({
@@ -114,6 +116,8 @@ beforeEach(() => {
       return { plan: "starter", limits: { entries: [] }, usage: { entries: [] } };
     return { items: [], next_cursor: null };
   });
+  mocks.send.mockResolvedValue({});
+  sessionStorage.clear();
   mocks.signOut.mockResolvedValue({ error: null });
   HTMLElement.prototype.scrollIntoView = vi.fn<HTMLElement["scrollIntoView"]>();
   HTMLElement.prototype.hasPointerCapture = () => false;
@@ -168,4 +172,36 @@ test("account theme initializes an unset device but never overwrites a saved dev
   render(<StudioWorkspace />);
   await screen.findByRole("heading", { name: "Merhaba, Test Yöneticisi" });
   expect(mocks.setTheme).not.toHaveBeenCalled();
+});
+
+test("self center-manager assignment rereads the previously forbidden task list", async () => {
+  const { ApiFailure } = await import("../src/lib/api");
+  let granted = false;
+  const original = mocks.setup.getMockImplementation()!;
+  mocks.setup.mockImplementation(async (op, input) => {
+    if (
+      op === "management_state_get_v1" &&
+      input.operation === "session_assignment_set_v1" &&
+      !granted
+    )
+      throw new ApiFailure({
+        ok: false,
+        error: { code: "FORBIDDEN", retryable: false, trace_id: account.id },
+      });
+    return original(op, input);
+  });
+  mocks.send.mockImplementation(async () => {
+    granted = true;
+    return {};
+  });
+  const user = userEvent.setup();
+  render(<StudioWorkspace />);
+  await screen.findByRole("heading", { name: "Merhaba, Test Yöneticisi" });
+  await user.click(screen.getAllByRole("button", { name: "Stüdyo" })[0]);
+  await user.click(await screen.findByRole("button", { name: "Kuruluş A" }));
+  await user.click(
+    await screen.findByRole("button", { name: "Bu merkezin yöneticiliğini üstlen" }),
+  );
+  expect(await screen.findByText("Eğitmen atanması gereken seans yok.")).toBeVisible();
+  expect(mocks.send.mock.calls[0][0].operation).toBe("manager_self_assign_center_v1");
 });
