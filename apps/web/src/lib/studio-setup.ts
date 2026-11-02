@@ -22,6 +22,8 @@ export const setupWrites = [
   "availability_exception_save_v1",
   "policy_publish_v1",
   "center_discipline_set_v1",
+  "class_save_v1",
+  "program_apply_v1",
 ] as const;
 export type SetupWrite = (typeof setupWrites)[number];
 type SetupRead =
@@ -29,6 +31,7 @@ type SetupRead =
   | "centers_list_v1"
   | "disciplines_list_v1"
   | "subscription_get_v1"
+  | "program_preview_v1"
   | "role_revoke_preview_v1"
   | "session_get_v1"
   | "roles_list_v1"
@@ -80,6 +83,8 @@ const fields: Record<SetupWrite, string[]> = {
   availability_exception_save_v1: ["resource", "interval", "reason", "expected_version"],
   policy_publish_v1: ["key", "value", "effective_at", "mandatory"],
   center_discipline_set_v1: ["discipline_id", "state", "expected_version"],
+  class_save_v1: ["class_id", "name", "external_open", "discipline_id", "expected_version"],
+  program_apply_v1: ["preview"],
 };
 export function recoverSetup(scope: SetupScope, slot: string): PendingSetup | "invalid" | null {
   try {
@@ -115,6 +120,23 @@ export function recoverSetup(scope: SetupScope, slot: string): PendingSetup | "i
     if (
       input.capacity !== undefined &&
       (!Number.isSafeInteger(input.capacity) || input.capacity < 0)
+    )
+      return "invalid";
+    if (
+      command.operation === "program_apply_v1" &&
+      (!input.preview ||
+        typeof input.preview.id !== "string" ||
+        typeof input.preview.token !== "string" ||
+        !input.preview.token)
+    )
+      return "invalid";
+    if (
+      command.operation === "class_save_v1" &&
+      (typeof input.name !== "string" ||
+        !input.name.trim() ||
+        typeof input.external_open !== "boolean" ||
+        typeof input.discipline_id !== "string" ||
+        !input.discipline_id)
     )
       return "invalid";
     if (

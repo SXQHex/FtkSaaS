@@ -15,10 +15,13 @@ import {
 import { getCalendar, errorMessageKey } from "../../lib/api";
 import { SessionCalendar } from "./session-calendar";
 import { SessionDetail } from "./session-detail";
+import { ProgramManager } from "../programs/program-manager";
 
 export function ScheduleWorkspace({
   studios,
+  actorId,
 }: {
+  actorId?: string;
   studios: { organization: OrganizationView; centers: CenterView[] }[];
 }) {
   const t = useTranslations("calendar");
@@ -63,6 +66,7 @@ export function ScheduleWorkspace({
       </div>
       <CalendarContent
         key={`${scope.organization.id}:${scope.center.id}`}
+        actorId={actorId}
         orgId={scope.organization.id}
         center={scope.center}
       />
@@ -70,7 +74,17 @@ export function ScheduleWorkspace({
   );
 }
 
-function CalendarContent({ orgId, center }: { orgId: string; center: CenterView }) {
+function CalendarContent({
+  orgId,
+  center,
+  actorId,
+}: {
+  orgId: string;
+  center: CenterView;
+  actorId?: string;
+}) {
+  const program = useTranslations("program");
+  const [managing, setManaging] = useState(false);
   const api = useTranslations("api");
   const [date, setDate] = useState(() => dateInZone(new Date(), center.timezone));
   const [range, setRange] = useState<CalendarRange>("day");
@@ -103,6 +117,24 @@ function CalendarContent({ orgId, center }: { orgId: string; center: CenterView 
   const current = result?.key === key ? result : null;
   return (
     <>
+      {actorId && (
+        <div className="space-y-5">
+          <Button variant="outline" aria-expanded={managing} onClick={() => setManaging(!managing)}>
+            {program(managing ? "hideManager" : "showManager")}
+          </Button>
+          {managing && (
+            <ProgramManager
+              key={`${actorId}:${orgId}:${center.id}`}
+              scope={{ actorId, orgId, centerId: center.id }}
+              timeZone={center.timezone}
+              onChanged={() => {
+                setSelected(null);
+                setAttempt((value) => value + 1);
+              }}
+            />
+          )}
+        </div>
+      )}
       <SessionCalendar
         date={date}
         range={range}

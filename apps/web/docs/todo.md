@@ -178,6 +178,10 @@ Eski merkez instructor ilişki satırı yalnız Business test organizasyonunda b
 
 ### WEB-S03 — Program, takvim ve seans yaşam döngüsü
 
+**Durum: Aktif geliştirme.** 3 Kasım 2026 ilk kaynak paketi: mevcut shadcn bileşenleriyle sınıf oluşturma/düzenleme, açık/sabit grup ve gerçek sınıf sürümü; merkez/disiplin/oda/eğitmen katalogları; sonlu program önizleme/onay/apply; kayıtlı programın özgün tanımı/cursor okuması ve başarı sonrası takvim/sınıf yenilemesi bağlandı. Program önizlemesi için merkez saat dilimi, bitiş-hariç tarihler, hafta günleri, açık süre, oda/eğitmen ve toplam kontenjan kullanılır. DST boş saati sessiz kaydırılmaz; aralıktaki her çift saat için açık offset seçilir. Backend blocker veya süresi dolmuş preview uygulanmaz. Mevcut actor/org/center/slot işlem günlüğü yeni komutlar için genişletildi; kayıp yanıtta aynı preview/payload/key ile status/replay, depolama hatasında yazmadan durma korunur. Runtime tasarım fixture'ı veya yeni bağımlılık eklenmedi.
+
+**Bu paketin kabul sınırı:** Odak testlerinde gerçek DTO'yu kullanan sahte transport ve bileşen davranışı; izole Chromium kontrolünde gerçek bileşenlerin sentetik verili form/önizleme durumu doğrulandı. 320/768/1024/1440px'de yatay taşma, Axe ihlali ve JavaScript hatası yok; tarayıcıdan domain isteği gönderilmedi. Bu kontrol hosted/native Auth→Edge→DB kabulü değildir. Yeni kaynağın CI/main/hosted teslimi henüz yoktur. Sınıf varsayılan eğitmen/asistan görevi, kategori kontenjanı, tek seans, tam kaynak/seri değişikliği, iptal/telafi ve modülün gerçek uçtan uca kabulü aşağıda açık kalır; S03 kapatılmadı.
+
 **Ekranlar:** Mevcut takvim/detay; sınıflar ve sabit grup; program oluşturma; tek seans; değişiklik/iptal/telafi etki özeti.
 
 - [ ] Mevcut takvimde gerçek lisanslı Scheduler, liste, saat dilimi, filtre/sayfalama ve güncel detay kabulünü tamamla. Syncfusion dahili editörü iş kurallarının sahibi olmaz.
