@@ -20,13 +20,9 @@ Bu dosya yalnız **sıra, bağımlı teslim paketleri ve kontrol noktalarının*
 | 11 | [P14](remaining-work.md#p14)–[P16](remaining-work.md#p16) | E-posta teslim→zamanlama/sessiz saat→otomasyon |
 | 12 | [B01](remaining-work.md#b01)–[B05](remaining-work.md#b05) | Business scope, ortak inbox, hesaplaşma, rapor ve özel teklif |
 
-**Aktif kullanıcı önceliği:** S01–S02 ayrı bir geliştirme PR'sinde tamamlanır. S01'in PR129 kaynak/CI/main/development kabulü doğrulandı; S02 sınıf/program okuma dilimi aynı mevcut mimaride geliştirilir. A03.2/A03.3 bağımsız açık kalır; bu ayrı teslimin ön koşulu sayılmaz. S03–S05 bu PR'nin kapsamına alınmaz. Frontend'in kendi sırası değişmez.
+**S01–S02 kontrol noktası:** Ayrı teslimin backend kapanışı doğrulandı; [görev kabulü](remaining-work.md#s01) ve [kaynak/ortam kanıtı](00-FtkSaaS-yeni-sohbet-devir.md#s01s02-backend-kabulü) kendi sahiplerindedir. Frontend ekran sırası ve kabulü değişmez.
 
-### S01–S02 kontrol noktaları
-
-Alt adımlar ve kapanış ölçütleri [backlog](remaining-work.md#s01), kaynak/run/ortam kanıtı [devir](00-FtkSaaS-yeni-sohbet-devir.md) sahibindedir. Mevcut oda yönetim okuması yeniden kurulmaz; sınıf/program keşfi, özgün program tanımı ve güncel sürüm/izin sınırı birlikte incelenir. S02 gerçek API/son kaynak kabulü geçince bu teslim merge adayı olur; yeni özellik veya frontend ekran kabulü kendiliğinden kapanmaz.
-
-Sonraki ürün sırası A03 kalan uzlaştırma ve S03→S04→S05'tir. S06 ve sonrası kapsam dışıdır. Anlamlı modül sınırı korunur; sırf durum için boş commit veya tekrarlı clean üretilmez.
+**Sıradaki açık işler:** [A03.2→A03.3](remaining-work.md#a03) kanıt/boşluk uzlaştırması → [S03](remaining-work.md#s03) → [S04](remaining-work.md#s04) → [S05](remaining-work.md#s05). S03–S05 atomik tahsis, ilk aktarım/birleşim ve operasyon projeksiyonları olarak anlamlı teslim sınırında yürür. Her dilimde uygun odak testi, etkilenen sözleşme/üretilmiş çıktı/WF ve alan devri birlikte güncellenir. Aday kabulü ve yeni kapsamın merge yetkisi ayrıca korunur.
 
 ## Ortak işletim hattı
 

@@ -78,29 +78,25 @@ Bu tablo yalnız izdir; eski kabul metinleri ikinci kez tutulmaz.
 - **Doğrulama senaryosu:** Oluştur→yeniden oku→sürümle güncelle; eski sürüm ve başka merkez reddi.
 - **Kaynak alanı:** database oda/management kaynakları; room-role-registry.test.mjs; contract.json
 
-**Uygulama alt adımları:**
+**Tamamlanan alt adımlar:**
 
-- [x] S01.1 — Mevcut oda yazma ve yönetim okuma kaynaklarını incele; liste, ayrıntı, selector ve düzenleme sürümü boşluklarını belirle. Desteklenen alanları mevcut DTO/yetki sözleşmesinden al.
-- [x] S01.2 — Eksik okumaları mevcut mimari içinde tamamla; merkez/tenant scope, desteklenen filtre ve sayfalama davranışını sözleşme/üretilmiş tiplerle birlikte sun.
-- [x] S01.3 — Gerçek Auth→Edge→RPC yolunda oluştur→yeni oturumdan bul→ayrıntı/sürüm oku→güncelle→yeniden oku zincirini doğrula; mevcut oda/rol suite'ini kullan.
+- [x] S01.1–S01.3 — Mevcut oda liste/ayrıntı/sürüm okuması, sözleşme devri ve gerçek Auth→Edge→RPC regresyonları tamamlandı. Kaynak/run/ortam kanıtı [devirde](00-FtkSaaS-yeni-sohbet-devir.md#s01s02-backend-kabulü).
 
 **Dilim kabulü:** Eski sürümle yazma, başka tenant/izinsiz merkez erişimi ve yetki kaybı reddedilir. Starter ikinci aktif oda açamaz; mevcut kapasite ve tek mantıksal oda kuralları korunur. Backend okuma teslimi frontend ekran kabulü diye kapatılmaz.
 
 <a id="s02"></a>
 ### S02 — Sınıf ve program yönetim okumaları
 
-- [ ] **Tür:** K/D · **Plan:** Tümü · **Özellik:** F08,F10
+- [x] **Tür:** K/D · **Plan:** Tümü · **Özellik:** F08,F10
 - **Bağımlılık:** S01
 - **Kabul:** Mevcut sınıf/program düzenleme için gerekli selector, alan ve sürümü döndürür.
 - **Sınır/olumsuz durum:** Yazma var diye okuma tamam sayılmaz; sayfalama ve yetki uygulanır.
 - **Doğrulama senaryosu:** Kayıtlı programı yeni oturumdan bul/düzenle; çakışma ve stale sürüm; frontend B01 bağı kapanır.
 - **Kaynak alanı:** database program/management; program-session-lifecycle.test.mjs; contract.json
 
-**Uygulama alt adımları:**
+**Tamamlanan alt adımlar:**
 
-- [x] S02.1 — Mevcut sınıf/program yazmalarının ihtiyaç duyduğu kimlik, selector, alan ve sürüm okumalarını incele; oda okumasını S01'den tüket, ikinci kaynak kurma.
-- [x] S02.2 — Kayıtlı sınıf/programın liste/ayrıntı ve düzenleme okumalarını desteklenen scope/filtre/sayfalama ile tamamla; DTO ve hata sözleşmesini eşitle.
-- [ ] S02.3 — Programı bir oturumda oluşturup yeni oturumda bul/düzenle/yeniden oku; stale sürüm, yetki kaybı ve kaynak çakışmasını mevcut program/session suite'inde doğrula.
+- [x] S02.1–S02.3 — Sınıf/program selector ve değer/sürüm okumaları, üretilmiş sözleşme/WF devri ve yeni oturumdan gerçek API kabulü tamamlandı. Kaynak/run/ortam kanıtı [devirde](00-FtkSaaS-yeni-sohbet-devir.md#s01s02-backend-kabulü).
 
 **Dilim kabulü:** İstemci önceki oluşturma yanıtını saklamadan düzenlenecek kaydı bulabilir. Yetkisiz kapsam ve eski sürüm reddedilir; oda/eğitmen çakışması ile Starter tek kaynak sınırları gevşemez. Frontend B01'in yalnız bu okumalarla ilgili backend bağımlılığı teslim edilir; ekran kabulü kendi sahibinde kalır.
 
