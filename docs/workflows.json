@@ -345,8 +345,8 @@
         "account_signup_check_v1"
       ],
       "review": {
-        "fingerprint": "8514aa44387a0957e541b3108e386dcd149f54c4dfa6771cef8e12378cbe4eac",
-        "reason": "Kimlik testinin hata enjeksiyonu yalnız kendi kişi UUIDlerine sınırlandı; gerçek paralel koşuda ilgisiz hesap bağlamayı bozan global trigger giderildi, özgün rollback assertionları korundu. İlgili rehberde ürün/Auth akışı değişmedi."
+        "fingerprint": "96eb7f99a6b91f8ce1e6ee5ab1092c62b8ad26007abaa3f4f04e0adb6ebe49f6",
+        "reason": "Native parola değişiminden sonra canlı session, eski JWT ve refresh sınırı mevcut hesap harnessinde doğrulanıyor; native mevcut parola/nonce ve gerçek posta kabulü ayrıca açık, yeni Auth katmanı yok."
       }
     },
     {
@@ -455,7 +455,8 @@
         "apps/backend/tests/program-session-lifecycle.test.mjs",
         "apps/backend/tests/schedule-reads.test.mjs",
         "apps/backend/tests/availability-policies.test.mjs",
-        "apps/backend/tests/starter-plan-gates-acceptance.mjs"
+        "apps/backend/tests/starter-plan-gates-acceptance.mjs",
+        "apps/backend/tests/starter-attendance-protection.test.mjs"
       ],
       "sources": [
         "apps/backend/database/active-discipline-projection-wrappers.sql",
@@ -530,8 +531,8 @@
         "class_assignment_set_v1"
       ],
       "review": {
-        "fingerprint": "5797d28dd54f4c61ca3fab050444fcc3476b6a5a0a2ebd38539641321a87aa38",
-        "reason": "XREQ-012 rol kaynağı, eski veri silme kontrolü ve nullable Abone No projeksiyonları; değişen kaynak/testler ve ilgili rehber incelendi, plan/izin/worker protokolü korunuyor."
+        "fingerprint": "1284fd35256fa93c87abf07b2577222bc3f97bb71c026c94cb58d2b0e75bfeac",
+        "reason": "Güncel Starter günlük testinde program bitişi hariçtir; üç oluşum ve güncel gerçek seans kimlikleriyle zincir kuruluyor."
       }
     },
     {
@@ -703,8 +704,8 @@
         "negative_limits_get_v1"
       ],
       "review": {
-        "fingerprint": "1f898d3eb912826be9d092375f41ab514a88caf0ae3a93964b5f3cf73851b62b",
-        "reason": "Korunan yükümlülük DTOsu ve gerçek etki önizleme testindeki Abone No projeksiyonu incelendi; geçmiş snapshotlar yeniden yazılmıyor, hak/finans/onay etkileri değişmedi."
+        "fingerprint": "4a2b9db45f469929262065f89cc79fe6fdf12683b483c3f28eb810544a12b5f0",
+        "reason": "Güncel günlük test kaynak incelemesi: gerçek satış/tek hak ve sıfır kişisel negatif limit aynı akışta; mali karşılaştırmadan yalnız sayfalama zamanı ayrılır, tarih ve yarış sonucu koşulları gerçek semantiğe uyar."
       }
     },
     {
@@ -717,7 +718,8 @@
         "apps/backend/tests/p01-lesson-requests.test.mjs",
         "apps/backend/tests/p01-catalog-entitlement-reads.test.mjs",
         "apps/backend/tests/api-acceptance.test.mjs",
-        "apps/backend/tests/program-session-lifecycle.test.mjs"
+        "apps/backend/tests/program-session-lifecycle.test.mjs",
+        "apps/backend/tests/starter-attendance-protection.test.mjs"
       ],
       "sources": [
         "apps/backend/database/active-discipline-projection-wrappers.sql",
@@ -775,8 +777,8 @@
         "reservation_capacity_override_v1"
       ],
       "review": {
-        "fingerprint": "119df9b8da57b1149751b4674ae52ab51096e93c7aa60c4fb19c38bb06ae38de",
-        "reason": "XREQ-012 rol kaynağı, eski veri silme kontrolü ve nullable Abone No projeksiyonları; değişen kaynak/testler ve ilgili rehber incelendi, plan/izin/worker protokolü korunuyor."
+        "fingerprint": "97b3a767ce135a02a51c01000952e17f2da26c37c7337190e51d8d5d6348466a",
+        "reason": "Güncel günlük testte son yer yarışından sonra gerçek boş seans seçilir; sıfır limitte son hak reddi final SQLe göre CREDIT_LIMIT_EXCEEDED, mevcut P01 önkoşulu değişmez."
       }
     },
     {
@@ -834,8 +836,8 @@
         "attendance_start_v1"
       ],
       "review": {
-        "fingerprint": "50d8afda501d6b9531bc2013fb7ce81a695112d9211eb578aa96f0c488d52c8a",
-        "reason": "S05 yetkili DTO alanları ve mevcut SQL/test kapsamı incelendi; No yalnız mevcut izinli kişi satırına eklenir, UUID/yetki/plan/sayfalama değişmez. Ortak metadata üretimi diğer akış davranışını değiştirmez."
+        "fingerprint": "193906687ea72b53d392c827db1ccab0bc4727fa388e49f35932b5eecbd7afb1",
+        "reason": "Güncel günlük test kaynak incelemesi: eğitmen taslağı, CM kapanışı ve correction replay hak havuzunu korur; doğru core.earnings tablosunda Starter hakedişi yoktur."
       }
     },
     {
@@ -847,7 +849,8 @@
       "tests": [
         "apps/backend/tests/api-acceptance.test.mjs",
         "apps/backend/tests/starter-operations-acceptance.mjs",
-        "apps/backend/tests/event-payment.test.mjs"
+        "apps/backend/tests/event-payment.test.mjs",
+        "apps/backend/tests/starter-attendance-protection.test.mjs"
       ],
       "sources": [
         "apps/backend/database/active-discipline-projection-wrappers.sql",
@@ -892,8 +895,8 @@
         "debt_adjust_v1"
       ],
       "review": {
-        "fingerprint": "02c7ab8a14725e3137470a33e84ea7a155ea1054b40237544150809fb9462679",
-        "reason": "S05 yetkili DTO alanları ve mevcut SQL/test kapsamı incelendi; No yalnız mevcut izinli kişi satırına eklenir, UUID/yetki/plan/sayfalama değişmez. Ortak metadata üretimi diğer akış davranışını değiştirmez."
+        "fingerprint": "3ffc74971dd66d1a1635b1ebdc7374939a6fa31e722cec25105a261e95ff3a6f",
+        "reason": "Güncel günlük testte gerçek borca banka tahsilatı ve replay, hak tüketimi/düzeltme/iptal sonrası aynı mali iş kayıtlarıyla karşılaştırılır; yalnız pagination as_of değişebilir."
       }
     },
     {
