@@ -87,7 +87,7 @@ Bu tablo yalnız izdir; eski kabul metinleri ikinci kez tutulmaz.
 
 - [x] S01.4 — XREQ-007/008 ek yapılandırma okumalarının backend teslimi tamamlandı; kaynak/run/ortam kanıtı [devirde](00-FtkSaaS-yeni-sohbet-devir.md#starter-yapılandırma-okumaları-kabulü). Frontend gerçek tüketici kabulü ortak talep sahibinde kalır.
 
-- [ ] S01.5 — [XREQ-009](../../../docs/requests.md#xreq-009-starter-rol-listesi): Starter tek eğitmeninin atama kimlik/durum/sürümüyle keşfi, gerekçeli kaldırma ve değiştirme. F05 açılmadan canlı CM/merkez kapsamı; yeni oturum, stale/yetki kaybı, ikinci eğitmen/yarış, etki önizleme→açık onay→gelecek görevleri kaldırma, rezervasyon/geçmiş koruma, eğitmen eksikliğinde normal seans yaşam döngüsünün ek kısıtlama olmadan sürmesi, yönetici iş listesi ve manuel seans ataması gerçek API kabulüyle ayrı runtime paketinde tamamlanacak.
+- [x] S01.5 — XREQ-009 dar eğitmen yönetimi backend teslimi tamamlandı; [aday/main/development kanıtı](00-FtkSaaS-yeni-sohbet-devir.md#s015-eğitmen-yönetimi-kabulü). Frontend ekran kabulü ortak talepte kalır.
 
 <a id="s02"></a>
 ### S02 — Sınıf ve program yönetim okumaları
@@ -161,7 +161,7 @@ Bu tablo yalnız izdir; eski kabul metinleri ikinci kez tutulmaz.
 - [ ] S05.2 — Gerekli DTO/projeksiyonlara No'yu taşı; komut ve ilişkilerde UUID'yi koru. Değişen makine sözleşmesinden tip/katalogları üret; ilgili WF/API eşlemesini incele.
 - [ ] S05.3 — No ile bul→UUID komut→yeniden oku→rapor/export zincirini doğrula; alias araması, scope ve yetki kaybını sınayarak frontend'e sözleşme devrini yap.
 
-**İncelenen yüzeyler:** PersonSummary/PersonView ile ReportRow ve yeni CSV kaynakları adayda güncellendi. RoleView, ReservationView, AttendanceEntryView, EntitlementView, FinanceView, EarningView, LeadView, EventRegistrationView, EventDutyView, EventPaymentPreparationView, ClassAssignmentView, AgreementVersionView, ProtectedObligationView, SettlementAuthorityView, NegativeLimitsView, LessonRequestView, SeatOfferView, WaitlistEntryView ve CrmFollowupView sonraki ilgili operasyon diliminde mevcut plan/izin sınırlarıyla ele alınacak; S05 kapanmadı.
+**İncelenen yüzeyler:** PersonSummary/PersonView ile ReportRow ve yeni CSV kaynakları teslim edildi. ReservationView, AttendanceEntryView, EntitlementView, FinanceView ve NegativeLimitsView bu adayda uygulanıyor; gerçek migration/API kabulü açık. RoleView, EarningView, LeadView, EventRegistrationView, EventDutyView, EventPaymentPreparationView, ClassAssignmentView, AgreementVersionView, ProtectedObligationView, SettlementAuthorityView, LessonRequestView, SeatOfferView, WaitlistEntryView ve CrmFollowupView sonraki ilgili operasyon diliminde mevcut plan/izin sınırlarıyla ele alınacak; S05 kapanmadı.
 
 **Dilim kabulü:** Aynı kişi izinli operasyon yüzeylerinde tutarlı numarayla görünür. Numara kişisel/finans verisine ek erişim sağlamaz; yeni export mevcut yetkiyi uygular. Önceden üretilmiş dış belge değişmez; frontend'in ekran uyarlaması/kabulü backend adına kapatılmaz.
 
