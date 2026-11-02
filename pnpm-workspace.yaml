@@ -1,5 +1,7 @@
 packages:
   - apps/*
+  - "!apps/web1"
+  - "!apps/web1/**"
   - packages/*
 
 catalog:

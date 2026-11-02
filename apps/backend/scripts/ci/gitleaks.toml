@@ -1,3 +1,7 @@
-# Default upstream rules; no project allowlists or inline suppression.
+# Default upstream rules; only the explicitly excluded design sandbox is omitted.
 [extend]
 useDefault = true
+
+[[allowlists]]
+description = "Isolated web1 design sandbox (user-authorized CI exclusion)"
+paths = ['''^apps/web1/''']
