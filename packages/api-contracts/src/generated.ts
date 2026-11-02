@@ -16753,6 +16753,11 @@ values: {
  */
 class_id?: string
 schedule?: ProgramSpec
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+program_id?: string
+timezone?: IanaZone
 }
 }
 /**
@@ -19280,7 +19285,7 @@ class_id?: (string | null)
 /**
  * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
  */
-discipline_id: string
+discipline_id?: string
 }
 }
 /**
@@ -19294,6 +19299,10 @@ key: {
  * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
  */
 class_id: string
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+program_id?: string
 }
 }
 /**

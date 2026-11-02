@@ -63,6 +63,8 @@ test('Program lifecycle through real Auth -> Edge -> RPC',async t=>{
  }
  async function clearFault(){await db.query('drop trigger '+fault+' on core.audit_events');await db.query('drop function private.'+fault+'()');fault=null;}
  let base,sids;
+ let discoveredClass,discoveredProgram;
+ const management=(op,k={},extra={},u=owner)=>must(u,'management_state_get_v1',scope({operation:op,selector:{operation:op,key:k},page:{},...extra}));
  await t.test('preview is business-read-only; apply creates finite program, duties, bookings, and existing reads expose it',async()=>{
   await mut('class_assignment_set_v1',{class_id:class1,person_id:i1.p,duty:'instructor'});
   const before=await counts();base=await preview(class1,spec({room_id:room}));assert.deepEqual(base.blockers,[]);assert.deepEqual(await counts(),before);
@@ -78,6 +80,63 @@ test('Program lifecycle through real Auth -> Edge -> RPC',async t=>{
   assert.deepEqual((await must(i1.u,'reservation_list_v1',scope({session_id:sids[0],page:{}}))).items,[]);
   assert.equal((await rows('select count(*)::int n from core.resource_bookings where org_id=$1 and session_id=any($2) and state=\'active\'',[org,sids]))[0].n,8);
  });
+ await t.test('new login discovers classes, reads live version and reuses the saved wire program through a fresh preview',async()=>{
+  await cls('Discoverable class');
+  const {env}=context();
+  const loginOwner=async()=>{
+   const response=await fetch(env.API_URL+'/auth/v1/token?grant_type=password',{method:'POST',headers:{apikey:env.ANON_KEY,'content-type':'application/json'},body:JSON.stringify({email:owner.email,password:owner.password}),signal:AbortSignal.timeout(60000)});
+   assert.equal(response.ok,true);const login=await response.json();return {...owner,jwt:login.access_token};
+  };
+  const fresh=await loginOwner();
+  const found=(await management('class_save_v1',{}, {},fresh)).items.find(x=>x.current.values.name==='Discoverable class');assert(found);
+  discoveredClass=found.entity.id;assert.equal(found.versions[0].version,1);
+  const detail=(await management('class_save_v1',{class_id:discoveredClass},{},fresh)).items[0];assert.deepEqual(detail.current.values,found.current.values);
+  const values={...detail.current.values,name:'Discovered and edited',expected_version:detail.versions[0].version};
+  assert.equal((await mut('class_save_v1',values,key(),fresh)).version,2);
+  await fail('class_save_v1',values,'VERSION_CONFLICT',fresh);
+  assert.equal((await management('class_save_v1',{class_id:discoveredClass},{},fresh)).items[0].current.values.name,values.name);
+  const schedule=spec({room_id:room,starts_on:'2027-08-02',ends_on:'2027-08-16',local_start:'06:00:00',capacity:{total:8,categories:{male:4,female:4}}});
+  const p=await preview(discoveredClass,schedule,c1,fresh);assert.deepEqual(p.blockers,[]);discoveredProgram=(await apply(p,key(),c1,fresh)).primary_id;
+  const reopened=await loginOwner();
+  const before=await counts(),saved=await management('program_preview_v1',{class_id:discoveredClass},{},reopened);
+  assert.deepEqual(await counts(),before);assert.equal(saved.items.length,1);
+  const item=saved.items[0];assert.equal(item.entity.id,discoveredProgram);assert.equal(item.current.values.program_id,discoveredProgram);
+  assert.equal(item.current.values.timezone,'Europe/Istanbul');assert.deepEqual(item.current.values.schedule,schedule);
+  assert.deepEqual(item.versions.map(x=>[x.entity.type,x.version]),[['program_versions',1],['classes',2]]);
+  const reused=await preview(discoveredClass,item.current.values.schedule,c1,fresh);assert(reused.blockers.some(x=>x.code==='RESOURCE_CONFLICT'));
+  const moved=await preview(discoveredClass,{...item.current.values.schedule,starts_on:'2027-08-16',ends_on:'2027-08-30'},c1,fresh);assert.deepEqual(moved.blockers,[]);await apply(moved,key(),c1,fresh);
+  const unchanged=await management('program_preview_v1',{class_id:discoveredClass,program_id:discoveredProgram},{},fresh);
+  assert.deepEqual(unchanged.items[0].current.values.schedule,schedule);assert.equal(unchanged.items[0].versions[0].version,1);
+ });
+ await t.test('class/program discovery scopes, pagination and legacy snapshots never grant write authority',async()=>{
+  await cls('Paginated class');
+  await db.query("update core.classes set created_at='2026-01-01T00:00:00Z' where org_id=$1 and center_id=$2",[org,c1]);
+  const all=await management('class_save_v1'),ids=[];let cursor;
+  do{const page=await management('class_save_v1',{}, {page:{limit:1,...(cursor?{cursor}:{})}});assert.equal(page.items.length,1);ids.push(page.items[0].entity.id);cursor=page.next_cursor;}while(cursor);
+  assert.deepEqual(ids,all.items.map(x=>x.entity.id));assert.deepEqual(ids,[...ids].sort());
+  assert.equal((await management('class_save_v1',{discipline_id:discipline})).items.length,ids.length);
+  assert.deepEqual((await management('class_save_v1',{class_id:key()})).items,[]);
+  const first=await management('class_save_v1',{}, {page:{limit:1}});assert(first.next_cursor);
+  await fail('management_state_get_v1',{operation:'class_save_v1',selector:{operation:'class_save_v1',key:{discipline_id:discipline}},page:{cursor:first.next_cursor}},'VALIDATION_FAILED');
+  await fail('management_state_get_v1',{operation:'class_save_v1',selector:{operation:'class_save_v1',key:{}},page:{cursor:first.next_cursor}},'VALIDATION_FAILED',cm.u);
+  await fail('management_state_get_v1',{operation:'class_save_v1',selector:{operation:'class_save_v1',key:{}},page:{cursor:'bad'}},'VALIDATION_FAILED');
+  await fail('management_state_get_v1',{operation:'class_save_v1',selector:{operation:'class_save_v1',key:{}},page:{sort:'display_name_asc'}},'VALIDATION_FAILED');
+  for(const u of [student.u,i1.u,staff.u,outsider])for(const [op,k] of [['class_save_v1',{}],['program_preview_v1',{class_id:discoveredClass}]])await fail('management_state_get_v1',{operation:op,selector:{operation:op,key:k}},u===outsider?'NOT_FOUND':'FORBIDDEN',u);
+  assert.deepEqual((await management('class_save_v1',{class_id:discoveredClass},{center_id:c2})).items,[]);
+  await fail('management_state_get_v1',{center_id:c2,operation:'program_preview_v1',selector:{operation:'program_preview_v1',key:{class_id:discoveredClass}}},'NOT_FOUND');
+  await fail('management_state_get_v1',{operation:'class_save_v1',entity:{type:'classes',id:key()},selector:{operation:'class_save_v1',key:{class_id:discoveredClass}}},'NOT_FOUND');
+  const programs=await management('program_preview_v1',{class_id:discoveredClass},{page:{limit:1}});assert(programs.next_cursor);
+  const second=await management('program_preview_v1',{class_id:discoveredClass},{page:{limit:1,cursor:programs.next_cursor}});assert.equal(second.items.length,1);assert.equal(second.next_cursor,null);assert.notEqual(second.items[0].entity.id,programs.items[0].entity.id);assert.equal(second.as_of,programs.as_of);
+  const legacy=key();await db.query("insert into core.program_versions(id,org_id,center_id,class_id,weekdays,local_start,duration_minutes,starts_on,ends_on,state) values($1,$2,$3,$4,array[1], '06:00:00',60,'2026-01-01','2026-02-01','active')",[legacy,org,c1,discoveredClass]);
+  const old=(await management('program_preview_v1',{class_id:discoveredClass,program_id:legacy})).items[0];assert(old);assert.equal('schedule' in old.current.values,false);assert.equal('timezone' in old.current.values,false);
+  const originalFeatures=(await rows('select features from core.saas_plan_versions where id=$1',[plan]))[0].features;
+  try{
+   await db.query("update core.saas_plan_versions set features=array_remove(features,'F10') where id=$1",[plan]);
+   for(const [op,k] of [['class_save_v1',{}],['program_preview_v1',{class_id:discoveredClass}]])await fail('management_state_get_v1',{operation:op,selector:{operation:op,key:k}},'PLAN_FEATURE_UNAVAILABLE');
+   await db.query("update core.saas_plan_versions set features=array_remove($2::text[],'F08') where id=$1",[plan,originalFeatures]);
+   await fail('management_state_get_v1',{operation:'program_preview_v1',selector:{operation:'program_preview_v1',key:{class_id:discoveredClass}}},'PLAN_FEATURE_UNAVAILABLE');
+  }finally{await db.query('update core.saas_plan_versions set features=$2 where id=$1',[plan,originalFeatures]);}
+ });
  await t.test('role/tenant scopes, wrong actor and wrong center cannot apply or replay a program',async()=>{
   const cl=await cls('Authority'),p=await preview(cl,spec({local_start:'18:00:00'}));
   for(const u of [student.u,i1.u,staff.u])await fail('program_preview_v1',{class_id:cl,schedule:spec()},'FORBIDDEN',u);
@@ -90,6 +149,7 @@ test('Program lifecycle through real Auth -> Edge -> RPC',async t=>{
   await fail('program_preview_v1',{org_id:foreignOrg,class_id:cl,schedule:spec()},'NOT_FOUND',outsider);
   const p2=await preview(cl,spec({local_start:'19:00:00'}),c1,cm.u),k=key();await apply(p2,k,c1,cm.u);
   await mut('center_manager_revoke_v1',{person_id:cm.p,expected_version:1,reason:'Synthetic live revoke'});
+  await fail('management_state_get_v1',{operation:'class_save_v1',selector:{operation:'class_save_v1',key:{class_id:discoveredClass}}},'FORBIDDEN',cm.u);
   await fail('program_apply_v1',{preview:token(p2)},'FORBIDDEN',cm.u,k);
   await fail('session_capacity_set_v1',{session_id:sids[0],expected_version:1,capacity:{total:1},reason:'Denied'},'FORBIDDEN',cm.u);
   await mut('center_manager_revoke_v1',{center_id:c2,person_id:ownerPerson,expected_version:1,reason:'Owner must hold operational center role'});

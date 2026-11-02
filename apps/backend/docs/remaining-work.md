@@ -71,8 +71,8 @@ Bu tablo yalnız izdir; eski kabul metinleri ikinci kez tutulmaz.
 <a id="s01"></a>
 ### S01 — Oda yönetim okumalarını tamamla
 
-- [ ] **Tür:** K/D · **Plan:** Tümü · **Özellik:** F01,F03
-- **Bağımlılık:** A03
+- [x] **Tür:** K/D · **Plan:** Tümü · **Özellik:** F01,F03
+- **Bağımlılık:** A03.1; kullanıcının ayrı S01–S02 teslim önceliğiyle A03.2/A03.3 bağımsız açık
 - **Kabul:** Mevcut odalar listelenir, ayrıntı ve düzenleme sürümü okunur.
 - **Sınır/olumsuz durum:** Tenant/merkez scope ve Starter tek oda kuralı korunur.
 - **Doğrulama senaryosu:** Oluştur→yeniden oku→sürümle güncelle; eski sürüm ve başka merkez reddi.
@@ -82,7 +82,7 @@ Bu tablo yalnız izdir; eski kabul metinleri ikinci kez tutulmaz.
 
 - [x] S01.1 — Mevcut oda yazma ve yönetim okuma kaynaklarını incele; liste, ayrıntı, selector ve düzenleme sürümü boşluklarını belirle. Desteklenen alanları mevcut DTO/yetki sözleşmesinden al.
 - [x] S01.2 — Eksik okumaları mevcut mimari içinde tamamla; merkez/tenant scope, desteklenen filtre ve sayfalama davranışını sözleşme/üretilmiş tiplerle birlikte sun.
-- [ ] S01.3 — Gerçek Auth→Edge→RPC yolunda oluştur→yeni oturumdan bul→ayrıntı/sürüm oku→güncelle→yeniden oku zincirini doğrula; mevcut oda/rol suite'ini kullan.
+- [x] S01.3 — Gerçek Auth→Edge→RPC yolunda oluştur→yeni oturumdan bul→ayrıntı/sürüm oku→güncelle→yeniden oku zincirini doğrula; mevcut oda/rol suite'ini kullan.
 
 **Dilim kabulü:** Eski sürümle yazma, başka tenant/izinsiz merkez erişimi ve yetki kaybı reddedilir. Starter ikinci aktif oda açamaz; mevcut kapasite ve tek mantıksal oda kuralları korunur. Backend okuma teslimi frontend ekran kabulü diye kapatılmaz.
 
@@ -98,8 +98,8 @@ Bu tablo yalnız izdir; eski kabul metinleri ikinci kez tutulmaz.
 
 **Uygulama alt adımları:**
 
-- [ ] S02.1 — Mevcut sınıf/program yazmalarının ihtiyaç duyduğu kimlik, selector, alan ve sürüm okumalarını incele; oda okumasını S01'den tüket, ikinci kaynak kurma.
-- [ ] S02.2 — Kayıtlı sınıf/programın liste/ayrıntı ve düzenleme okumalarını desteklenen scope/filtre/sayfalama ile tamamla; DTO ve hata sözleşmesini eşitle.
+- [x] S02.1 — Mevcut sınıf/program yazmalarının ihtiyaç duyduğu kimlik, selector, alan ve sürüm okumalarını incele; oda okumasını S01'den tüket, ikinci kaynak kurma.
+- [x] S02.2 — Kayıtlı sınıf/programın liste/ayrıntı ve düzenleme okumalarını desteklenen scope/filtre/sayfalama ile tamamla; DTO ve hata sözleşmesini eşitle.
 - [ ] S02.3 — Programı bir oturumda oluşturup yeni oturumda bul/düzenle/yeniden oku; stale sürüm, yetki kaybı ve kaynak çakışmasını mevcut program/session suite'inde doğrula.
 
 **Dilim kabulü:** İstemci önceki oluşturma yanıtını saklamadan düzenlenecek kaydı bulabilir. Yetkisiz kapsam ve eski sürüm reddedilir; oda/eğitmen çakışması ile Starter tek kaynak sınırları gevşemez. Frontend B01'in yalnız bu okumalarla ilgili backend bağımlılığı teslim edilir; ekran kabulü kendi sahibinde kalır.
@@ -631,9 +631,9 @@ A03 ve G03 genel iz/kabul kapılarıdır. Aşağıdaki tablo görev navigasyonud
 | F05 | Resepsiyon/operasyon personeli izinleri | P02, B01 | [WF02](../../../docs/workflows.md#wf02) |
 | F06 | Öğrenci/eğitmen panelleri, profil ve şifre işlemleri | S06–S08, S10 | [WF00](../../../docs/workflows.md#wf00), [WF01](../../../docs/workflows.md#wf01), [WF04](../../../docs/workflows.md#wf04), [WF05](../../../docs/workflows.md#wf05), [WF06](../../../docs/workflows.md#wf06), [WF08](../../../docs/workflows.md#wf08), [WF10](../../../docs/workflows.md#wf10), [WF17](../../../docs/workflows.md#wf17), [WF20](../../../docs/workflows.md#wf20) |
 | F07 | Tek kişi kaydı, adaydan öğrenciye dönüşüm | S03–S05, S12, P01, P05, P06, B01 | [WF04](../../../docs/workflows.md#wf04), [WF10](../../../docs/workflows.md#wf10), [WF16](../../../docs/workflows.md#wf16), [WF20](../../../docs/workflows.md#wf20) |
-| F08 | Birleşik takvim ve kaynak çakışma kontrolü | S02, S09, S15, P02 | [WF03](../../../docs/workflows.md#wf03), [WF09](../../../docs/workflows.md#wf09) |
+| F08 | Birleşik takvim ve kaynak çakışma kontrolü | S02, S09, S15, P02 | [WF00](../../../docs/workflows.md#wf00), [WF03](../../../docs/workflows.md#wf03), [WF09](../../../docs/workflows.md#wf09) |
 | F09 | Özel ders talep, onay, ret ve alternatif saat | S09, P03 | [WF00](../../../docs/workflows.md#wf00), [WF03](../../../docs/workflows.md#wf03), [WF06](../../../docs/workflows.md#wf06), [WF20](../../../docs/workflows.md#wf20) |
-| F10 | Tekrarlayan grup programı ve sabit gruba kayıt | S02, S09 | [WF03](../../../docs/workflows.md#wf03), [WF05](../../../docs/workflows.md#wf05), [WF06](../../../docs/workflows.md#wf06) |
+| F10 | Tekrarlayan grup programı ve sabit gruba kayıt | S02, S09 | [WF00](../../../docs/workflows.md#wf00), [WF03](../../../docs/workflows.md#wf03), [WF05](../../../docs/workflows.md#wf05), [WF06](../../../docs/workflows.md#wf06) |
 | F11 | Kontenjanlı açık grup dersine öğrencinin kaydolması | S09 | [WF03](../../../docs/workflows.md#wf03), [WF06](../../../docs/workflows.md#wf06) |
 | F12 | Bekleme listesi ve süreli yer teklifi | P03, O01 | [WF00](../../../docs/workflows.md#wf00), [WF19](../../../docs/workflows.md#wf19), [WF20](../../../docs/workflows.md#wf20) |
 | F13 | Eğitmen değişikliği | S09, P02, P04 | [WF03](../../../docs/workflows.md#wf03) |

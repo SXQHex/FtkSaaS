@@ -268,8 +268,8 @@
         "management_state_get_v1"
       ],
       "review": {
-        "fingerprint": "44d62ca2fff3342de0e3668055a09e3ef2416d5f1a54dfffb8a31285cf7ab887",
-        "reason": "A03: mevcut status/audit/job/management davranış testleri bağlandı; S01 oda okuma sözleşmesi regresyonu ve üretilmiş Edge metadata incelendi. Yeni runtime kabulü değil."
+        "fingerprint": "9377b8ad5a99bb2e32f30758f57f9e4a713e31b77b00599da55c59a7064dc824",
+        "reason": "PR131 Secret scan: mevcut Auth migration checksum satırı byte olarak korunur; yeni manifest girdisi önce eklenir, değerler/SQL/kural aynı. Güncel main tabanı incelendi."
       }
     },
     {
@@ -428,8 +428,8 @@
         "center_discipline_set_v1"
       ],
       "review": {
-        "fingerprint": "d34a7b7d91edd2a087262e2d1654cfa6a7dd69d3ccd615acd64064af65454b30",
-        "reason": "S01: mevcut oda management sayfası, canlı merkez yetkisi, cursor ve sürümlü değerler incelendi; okuma rehberi düzeltildi. Yeni login ve sayfalama API regresyonu CI bekliyor."
+        "fingerprint": "0c01f03880a98a66e25c59f2f58206581d5d65eb2e9d213b5e86866333a37d32",
+        "reason": "S01–S02: paylaşılan program/session ve Starter regresyon dosyasına yalnız yönetim okuma/scope testleri eklendi; mevcut Stüdyo kurulumu ve yetki akışı ve güvenlik/finans assertionları korundu. Yeni runtime kabulü değildir."
       }
     },
     {
@@ -441,7 +441,8 @@
       "tests": [
         "apps/backend/tests/program-session-lifecycle.test.mjs",
         "apps/backend/tests/schedule-reads.test.mjs",
-        "apps/backend/tests/availability-policies.test.mjs"
+        "apps/backend/tests/availability-policies.test.mjs",
+        "apps/backend/tests/starter-plan-gates-acceptance.mjs"
       ],
       "sources": [
         "apps/backend/database/active-discipline-projection-wrappers.sql",
@@ -489,7 +490,9 @@
         "apps/backend/database/starter-calendar-preferences.sql",
         "apps/backend/database/starter-plan-gates.sql",
         "apps/backend/database/wrappers.sql",
-        "docs/workflows.md"
+        "docs/workflows.md",
+        "apps/backend/database/studio-management-reads.sql",
+        "apps/backend/supabase/migrations/20261101232810_studio_management_reads.sql"
       ],
       "operations": [
         "availability_save_v1",
@@ -512,8 +515,8 @@
         "class_assignment_set_v1"
       ],
       "review": {
-        "fingerprint": "2665037f0c976e3f847e30e4acbd21283de57b99841e9905022c07704760600b",
-        "reason": "Ortak generated wrapper farkı yalnız outbox_deliver_v1 service-only davet handoff’udur; bu akışın kendi wrapper ve domain kaynakları değişmedi, rehber ve mevcut insan yetki sırası incelendi."
+        "fingerprint": "0fa387542c643f3c5c010aa8fffb7ff4760b883bf920dc21c3572d53ecafefd8",
+        "reason": "S02: sınıf oluşturma sonrası yeni login ve program apply sonrası ikinci login ile keşif testleri, immutable snapshot ve kapsam sınırları incelendi; gerçek API kabulü CI bekliyor."
       }
     },
     {
@@ -676,8 +679,8 @@
         "negative_limits_get_v1"
       ],
       "review": {
-        "fingerprint": "ebeffe30ab7962e18ef78891e47dc2f5e3f0d64fd09aa4a9840e6d967e995ed9",
-        "reason": "A03: Ürün, satış ve hak rehberi korundu; mevcut gerçek davranış testlerinin operasyon/olumsuz senaryo bağları incelenip eksik WF test referansları tamamlandı. Test kaynağı yeni head başarısı değildir."
+        "fingerprint": "5bb54232e5dfd7de9ab97e3585266ec01b20c9f7c037519a77691ccee6019fb3",
+        "reason": "S02: paylaşılan program/session testine yalnız yeni login ile yönetim okuma kabulü eklendi; mevcut satış/hak assertionları korunuyor."
       }
     },
     {
@@ -746,8 +749,8 @@
         "reservation_capacity_override_v1"
       ],
       "review": {
-        "fingerprint": "a5b99fce198d3ecfe70886495d3f0add2bcc761b4e492c97a37be4e5de066e6e",
-        "reason": "A03: Rezervasyon ve özel ders talebi rehberi korundu; mevcut gerçek davranış testlerinin operasyon/olumsuz senaryo bağları incelenip eksik WF test referansları tamamlandı. Test kaynağı yeni head başarısı değildir."
+        "fingerprint": "028ac09fad8286bba729a7032827108d7cb5ffaf7d5f9efe57764779db76fc4b",
+        "reason": "S02: paylaşılan program/session testinde yeni login ile program keşfi var; mevcut rezervasyon/kapasite assertionları değişmedi."
       }
     },
     {
@@ -1091,8 +1094,8 @@
         "saas_payment_submit_v1"
       ],
       "review": {
-        "fingerprint": "385cddbb25cebde5db5f2d023520dc2df11a16a8a4e4a2561e34a6a573077546",
-        "reason": "A03: yükseltme/iptal/dönem fixture assertionları SQL dispatcher ve yanıt validator kapsamındadır; gerçek HTTP veya hosted kabulü değildir."
+        "fingerprint": "581e808055535509ba1dd2b58204839c0ccd8b726fc438b1336270392c811a23",
+        "reason": "S01–S02: paylaşılan program/session ve Starter regresyon dosyasına yalnız yönetim okuma/scope testleri eklendi; mevcut Abonelik ve plan erişimi akışı ve güvenlik/finans assertionları korundu. Yeni runtime kabulü değildir."
       }
     },
     {
@@ -1426,8 +1429,8 @@
         "subscription_boundary_apply_v1"
       ],
       "review": {
-        "fingerprint": "79d4d0c79f27107913c4542649b2e03292fd3bbad80930058daec0c8eda24eb8",
-        "reason": "A03: Worker ve işletim rehberi korundu; mevcut gerçek davranış testlerinin operasyon/olumsuz senaryo bağları incelenip eksik WF test referansları tamamlandı. Test kaynağı yeni head başarısı değildir."
+        "fingerprint": "5943d44283cb937875f55c37597d78c46075c18bfb650a940385db2491eeb65d",
+        "reason": "S01–S02: paylaşılan program/session ve Starter regresyon dosyasına yalnız yönetim okuma/scope testleri eklendi; mevcut Worker ve işletim akışı ve güvenlik/finans assertionları korundu. Yeni runtime kabulü değildir."
       }
     }
   ]
