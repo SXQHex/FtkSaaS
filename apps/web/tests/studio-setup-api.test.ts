@@ -9,6 +9,8 @@ import {
   weeklyRule,
   getRooms,
   exceptionInterval,
+  getCenterDiscipline,
+  getClosures,
 } from "../src/lib/studio-setup";
 import type { SetupCommand } from "../src/lib/studio-setup";
 import { policyValue } from "../src/lib/setup-policy";
@@ -28,6 +30,87 @@ beforeEach(() => {
   sessionStorage.clear();
   vi.stubEnv("NEXT_PUBLIC_SUPABASE_URL", "https://setup.example.invalid");
   vi.stubEnv("NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY", "synthetic-key");
+});
+test("center-discipline discovery preserves explicit absence and the relationship's own version", async () => {
+  const bodies: Record<string, unknown>[] = [];
+  server.use(
+    http.post(`${base}/management_state_get_v1`, async ({ request }) => {
+      bodies.push((await request.json()) as Record<string, unknown>);
+      return HttpResponse.json({
+        ok: true,
+        data: {
+          items: [
+            {
+              operation: "center_discipline_set_v1",
+              entity: null,
+              exists: false,
+              state: null,
+              versions: [],
+              current: { operation: "center_discipline_set_v1", values: { discipline_id: org } },
+            },
+          ],
+          next_cursor: null,
+        },
+      });
+    }),
+  );
+  expect(await getCenterDiscipline(org, org, org)).toMatchObject({
+    exists: false,
+    entity: null,
+    versions: [],
+  });
+  expect(bodies[0]).toMatchObject({
+    org_id: org,
+    center_id: org,
+    operation: "center_discipline_set_v1",
+    selector: { operation: "center_discipline_set_v1", key: { discipline_id: org } },
+  });
+});
+test.each(["missing_entity", "missing_version", "different_state"])(
+  "unreadable active relationship (%s) is rejected before readiness",
+  async (fault) => {
+    const item = {
+      operation: "center_discipline_set_v1",
+      entity: fault === "missing_entity" ? null : { type: "center_disciplines", id: org },
+      exists: true,
+      state: "active",
+      versions:
+        fault === "missing_version"
+          ? []
+          : [{ entity: { type: "center_disciplines", id: org }, version: 4 }],
+      current: {
+        operation: "center_discipline_set_v1",
+        values: { discipline_id: org, state: fault === "different_state" ? "inactive" : "active" },
+      },
+    };
+    server.use(
+      http.post(`${base}/management_state_get_v1`, () =>
+        HttpResponse.json({ ok: true, data: { items: [item], next_cursor: null } }),
+      ),
+    );
+    await expect(getCenterDiscipline(org, org, org)).rejects.toThrow("unreadableRelation");
+  },
+);
+test("closure discovery follows the resource-bound cursor without inventing closure versions", async () => {
+  const requests: Record<string, unknown>[] = [];
+  server.use(
+    http.post(`${base}/management_state_get_v1`, async ({ request }) => {
+      requests.push((await request.json()) as Record<string, unknown>);
+      return HttpResponse.json({
+        ok: true,
+        data: { items: [], next_cursor: requests.length === 1 ? "second" : null },
+      });
+    }),
+  );
+  expect(await getClosures(org, org, { kind: "room", id: org })).toEqual([]);
+  expect(requests[1]).toMatchObject({
+    operation: "availability_exception_save_v1",
+    selector: {
+      operation: "availability_exception_save_v1",
+      key: { resource: { kind: "room", id: org } },
+    },
+    page: { cursor: "second", sort: "created_at_asc" },
+  });
 });
 test("policy forms require explicit choices and preserve false and zero", () => {
   const data = new FormData();

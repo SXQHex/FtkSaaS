@@ -152,7 +152,15 @@ export function SetupFeedback({ command }: { command: ReturnType<typeof useSetup
         ))}
       {command.pending && (
         <div className="space-y-3 rounded-lg border p-4">
-          <p>{t(command.pending === "invalid" ? "storageFailed" : "pending")}</p>
+          <p>
+            {t(
+              command.pending === "invalid"
+                ? "storageFailed"
+                : command.busy
+                  ? "processing"
+                  : "pending",
+            )}
+          </p>
           {command.pending !== "invalid" && (
             <div className="flex flex-wrap gap-3">
               <Button

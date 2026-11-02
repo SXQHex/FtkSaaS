@@ -951,7 +951,7 @@
     "unreadableRoom": "Current room values or version could not be read. Refresh.",
     "noRooms": "No rooms in this center.",
     "closureTitle": "Close a time interval",
-    "closureHint": "Enter times with an explicit UTC offset (e.g. +03:00) in the center time zone. This appends a closure. Existing closures cannot yet be listed; weekly rules are preserved.",
+    "closureHint": "Enter center-local times with an explicit UTC offset (e.g. +03:00). This appends a closure and preserves weekly rules.",
     "closureStart": "Closure start",
     "closureEnd": "Closure end",
     "closureReason": "Closure reason",
@@ -1001,7 +1001,21 @@
       "instructor": "One active instructor",
       "roomHours": "Current room weekly hours",
       "instructorHours": "Current instructor weekly hours",
-      "policies": "Operating policies"
-    }
+      "policies": "Operating policies",
+      "discipline": "Active discipline linked to center"
+    },
+    "centerDisciplines": "Center disciplines",
+    "noDisciplines": "Create an organization discipline first.",
+    "disciplineLinked": "Discipline is active in this center.",
+    "disciplineUnlinked": "Discipline is not active in this center.",
+    "linkDiscipline": "Link to center",
+    "unlinkDiscipline": "Deactivate center link",
+    "unreadableRelation": "The relationship state or its own version could not be verified. Refresh.",
+    "closuresTitle": "Recorded closures",
+    "closuresHint": "Times use the browser time zone. Closures are append-only; existing entries cannot be edited or deleted here. Personal reasons are not shared.",
+    "noClosures": "No closures for this resource.",
+    "unreadableClosure": "The closure interval could not be verified for this resource.",
+    "setupVerified": "Resource and policy preflight checks passed. The program preview must still verify specific times and conflicts.",
+    "processing": "Processing…"
   }
 }

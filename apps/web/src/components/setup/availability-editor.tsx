@@ -7,6 +7,7 @@ import { Button } from "@ftksaas/ui/components/button";
 import { Input } from "@ftksaas/ui/components/input";
 import { Label } from "@ftksaas/ui/components/label";
 import { getAvailability, setupError, weeklyRule, type SetupScope } from "../../lib/studio-setup";
+import { ClosureList } from "./closure-list";
 import { ExceptionForm } from "./exception-form";
 import { errorKey, SetupFeedback, useSetupCommand } from "./setup-command";
 
@@ -194,7 +195,8 @@ export function AvailabilityEditor({
           <RuleForm key={`new:${retry}`} scope={scope} resource={resource} onSaved={saved} />
         </div>
       )}
-      <ExceptionForm scope={scope} resource={resource} />
+      <ClosureList key={retry} scope={scope} resource={resource} revision={retry} />
+      <ExceptionForm scope={scope} resource={resource} onSaved={saved} />
     </section>
   );
 }

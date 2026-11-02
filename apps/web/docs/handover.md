@@ -1,15 +1,15 @@
 # Frontend sohbet devri
 
-Bu dosya yalnız devam için gereken çalışma bağlamını taşır. Aktif bölüm, uygulama, kaynak, test ve gerçek kabulün tek sahibi [frontend todo kaydıdır](todo.md).
+Aktif bölüm, kaynak ve kabulün tek sahibi [frontend todo kaydıdır](todo.md#web-s02).
 
-## Çalışma bağlamı
+## Devam bağlamı
 
-Aktif dal `feat/web-s02-completion`, taban main `73700e37c3403dc309a5df61989837edbca24b96`; main proof, merge proof ve development teslimi başlangıçta başarılı doğrulandı. Çalışma checkout'u `FtkSaaS-s02` dizinidir; önceki `FtkSaaS` worktree kaydı taşınmış eski konuma işaret ettiği için yeni temiz clone kullanıldı. Eski S02 PR93 kullanıcı isteğiyle kapalıdır; yeni dal eski taslağın yalnız ilgili kaynak parçalarını güncel main'e uyarladı.
+PR136 dalı `feat/web-s02-discovery-acceptance`, main `0ade1417d5c24383d086496fcab47b7fb17f5873` (PR135) ile eşitlendi. Çalışma checkout'u `FtkSaaS-s02`; yerel `local/s02-pr136-sync` aynı uzak PR dalının aktarım checkout'udur. Ortak requests çatışmasında main'deki backend değerlendirmeleri bütünüyle korundu; ortak/backend kaynağına frontend değişikliği eklenmedi. GitHub aktarımında dosya ağacı birebir doğrulanır.
 
-S02 kapanmadı. Kaynak uygulaması ve açık kabulün sahibi [S02 kaydıdır](todo.md#web-s02). Eksik merkez–disiplin ilişki okuması ve mevcut kapanış keşfi kendi frontend talep alanlarında [XREQ-007/008](../../../docs/requests.md) olarak kaydedildi; backend adına teslim/onay verilmedi. İstisna append sürümü merkez aggregate'inden okunur; bu kısım eksik selector gerekçesiyle kapatılmadı. Bu iki okuma ve hosted kabul tamamlanmadan S03'e geçilmez.
+XREQ-010 backend tarafından main'e eklenen dar kayıtlarla kalite kontrolünü geçiriyor. Frontend istisna sicili/checker veya kalıcı politika kurulumu değiştirmedi. Kullanıcı PR135'i kontrollü izinle birleştirdiğini ve kalıcı politika kurulumu istemediğini belirtti; bu tercih korunur. Eşitlenmiş kaynakta frontend test/build, kalite ve belge kontrolü başarılı; yeni PR CI ve kaynak bağlı kabul ayrıca gerekir. Kullanıcının başarılı CI ve inceleme sonrası frontend PR'ını tekrar onay beklemeden merge etme yetkisi sürer.
 
-Kullanıcı test sunucusunda mock veri yazmaya izin verdi. Bu S02 kaynak çalışmasında hosted veri veya Auth ayarı değiştirilmedi; native oturum/MFA/rol kapıları korunur. Gerçek hesap kabulünde mevcut tarayıcı/oturum yeniden doğrulanmalı; eski oturum var sayılmaz. Secrets veya test parolası kaynaklara yazılmaz. Eski S04 test finans/hak kanıtı bu işle değiştirilmez.
+S02 kapanmadı; S03 başlatılmaz. Sonraki bağımlılık [XREQ-009](../../../docs/requests.md#xreq-009-starter-rol-listesi): genel rol listesi/F05 açılması zorunlu değil; tek eğitmen atamasının gerçek kimlik/durum/sürümüyle keşfi, gerekçeli kaldırma ve başka eğitmenle değiştirme backend sözleşmesini bekler. PR135 bu runtime'ı teslim etmedi. PR136 kaynak tesliminden sonra yeni ilişki/kapanış ekranlarının gerçek Starter kabulü, kalan 101. öğrenci ve kayıp yanıt ekran kanıtı tamamlanır.
 
-Frontend UI Engineering, frontend-design-assistant, TDD, Code Simplification ve kod inceleme becerileri uygulanır. Mevcut shadcn teması korunur; yeni genel form framework'ü, yeni bağımlılık veya backend/CI değişikliği yapılmaz. Kayıp yanıtta aynı payload/key, yeni request_id; scope değişimi/unmount ve yanlış receipt kimliği korunur.
+Starter1 test kurulumu kullanıcı yetkisiyle hazırdır; Pro1'e eğitmen atanmadı. Kurulum ve gerçek kabul ayrıntıları yalnız todo sahibindedir. Native Auth/MFA/tenant/rol/plan kapıları korunur; güncel tarayıcı oturumu yeniden doğrulanmalı. Hesap parolası/token veya gerçek iletişim kaynaklara yazılmaz.
 
-Yerel testte `NODE_USE_ENV_PROXY=0` süreç değişkeni kullanılır. Playwright Chromium indirmesi bozuk ZIP ile başarısız; browser veya hosted kabul yapılmış gösterilmez. Son frontend test/inceleme/CI durumu todo sahibinde tutulur. Sırf SHA/run yazmak için ek belge commit'i açılmaz. Full clean başlarsa kök AGENTS devir kuralı uygulanır.
+Frontend-design-assistant, Frontend UI Engineering, TDD, Code Simplification ve bağımsız Code Review uygulanmış kaynak korunur. Mevcut shadcn teması ve hazır bileşenler kullanılır; yeni bağımlılık yoktur. `NODE_USE_ENV_PROXY=0` yalnız yerel test sürecindedir. Yerel Playwright binary'leri yok; CI tarayıcı sonucu ile gerçek hosted ekran kabulü ayrı doğrulanır. Yeni CI başlarsa kök AGENTS devir kuralı uygulanır.

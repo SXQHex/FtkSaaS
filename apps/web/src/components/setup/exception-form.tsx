@@ -9,7 +9,15 @@ import { Label } from "@ftksaas/ui/components/label";
 import { exceptionInterval, setupCall, setupError, type SetupScope } from "../../lib/studio-setup";
 import { SetupFeedback, useSetupCommand, errorKey } from "./setup-command";
 
-export function ExceptionForm({ scope, resource }: { scope: SetupScope; resource: ResourceRef }) {
+export function ExceptionForm({
+  scope,
+  resource,
+  onSaved,
+}: {
+  scope: SetupScope;
+  resource: ResourceRef;
+  onSaved?: () => void;
+}) {
   const t = useTranslations("setup");
   const [version, setVersion] = useState<number | null>(null);
   const [error, setError] = useState("");
@@ -19,7 +27,10 @@ export function ExceptionForm({ scope, resource }: { scope: SetupScope; resource
     setError("");
     setRetry((n) => n + 1);
   }
-  const command = useSetupCommand(scope, `exception:${resource.kind}:${resource.id}`, refresh);
+  const command = useSetupCommand(scope, `exception:${resource.kind}:${resource.id}`, () => {
+    refresh();
+    onSaved?.();
+  });
   useEffect(() => {
     let active = true;
     async function load() {

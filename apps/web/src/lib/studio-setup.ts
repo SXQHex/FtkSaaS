@@ -1,5 +1,10 @@
 import { v7 } from "uuid";
-import type { AvailabilityRule, Operations, ResourceRef } from "@ftksaas/api-contracts";
+import type {
+  AvailabilityRule,
+  Operations,
+  ResourceRef,
+  ManagementStateView,
+} from "@ftksaas/api-contracts";
 import { apiClient, ApiFailure } from "./api";
 export const setupWrites = [
   "organization_update_v1",
@@ -15,6 +20,7 @@ export const setupWrites = [
   "availability_save_v1",
   "availability_exception_save_v1",
   "policy_publish_v1",
+  "center_discipline_set_v1",
 ] as const;
 export type SetupWrite = (typeof setupWrites)[number];
 type SetupRead =
@@ -69,6 +75,7 @@ const fields: Record<SetupWrite, string[]> = {
   availability_save_v1: ["rule_id", "resource", "rule", "expected_version"],
   availability_exception_save_v1: ["resource", "interval", "reason", "expected_version"],
   policy_publish_v1: ["key", "value", "effective_at", "mandatory"],
+  center_discipline_set_v1: ["discipline_id", "state", "expected_version"],
 };
 export function recoverSetup(scope: SetupScope, slot: string): PendingSetup | "invalid" | null {
   try {
@@ -200,6 +207,84 @@ export async function getRooms(orgId: string, centerId: string) {
       center_id: centerId,
       operation: "room_save_v1",
       selector: { operation: "room_save_v1", key: {} },
+      page: { limit: 50, sort: "created_at_asc", ...(cursor ? { cursor } : {}) },
+    });
+    items.push(...data.items);
+    cursor = data.next_cursor;
+  } while (cursor);
+  return items;
+}
+
+export function readableCenterDiscipline(
+  item: ManagementStateView | null | undefined,
+  disciplineId: string,
+) {
+  if (
+    !item ||
+    item.operation !== "center_discipline_set_v1" ||
+    item.current?.operation !== "center_discipline_set_v1" ||
+    item.current.values.discipline_id !== disciplineId ||
+    !Array.isArray(item.versions)
+  )
+    return false;
+  if (item.exists === false)
+    return (
+      item.entity === null &&
+      item.state === null &&
+      item.versions.length === 0 &&
+      item.current.values.state === undefined
+    );
+  const version = item.versions[0];
+  return (
+    item.exists === true &&
+    item.entity?.type === "center_disciplines" &&
+    ["active", "inactive"].includes(item.state ?? "") &&
+    item.current.values.state === item.state &&
+    item.versions.length === 1 &&
+    version?.entity.type === "center_disciplines" &&
+    version.entity.id === item.entity.id &&
+    Number.isSafeInteger(version.version) &&
+    version.version > 0
+  );
+}
+
+export async function getCenterDiscipline(orgId: string, centerId: string, disciplineId: string) {
+  const data = await setupCall("management_state_get_v1", {
+    org_id: orgId,
+    center_id: centerId,
+    operation: "center_discipline_set_v1",
+    selector: { operation: "center_discipline_set_v1", key: { discipline_id: disciplineId } },
+    page: { limit: 1, sort: "created_at_asc" },
+  });
+  const item = data.items[0];
+  if (data.items.length !== 1 || !readableCenterDiscipline(item, disciplineId))
+    throw Error("unreadableRelation");
+  return item;
+}
+
+export async function getSetupDisciplines(orgId: string) {
+  const items: Operations["disciplines_list_v1"]["response"]["data"]["items"] = [];
+  let cursor: string | null | undefined;
+  do {
+    const data = await setupCall("disciplines_list_v1", {
+      org_id: orgId,
+      page: { limit: 50, ...(cursor ? { cursor } : {}) },
+    });
+    items.push(...data.items);
+    cursor = data.next_cursor;
+  } while (cursor);
+  return items;
+}
+
+export async function getClosures(orgId: string, centerId: string, resource: ResourceRef) {
+  const items: Operations["management_state_get_v1"]["response"]["data"]["items"] = [];
+  let cursor: string | null | undefined;
+  do {
+    const data = await setupCall("management_state_get_v1", {
+      org_id: orgId,
+      center_id: centerId,
+      operation: "availability_exception_save_v1",
+      selector: { operation: "availability_exception_save_v1", key: { resource } },
       page: { limit: 50, sort: "created_at_asc", ...(cursor ? { cursor } : {}) },
     });
     items.push(...data.items);

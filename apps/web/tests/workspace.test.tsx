@@ -32,6 +32,7 @@ vi.mock("../src/lib/api", async (original) => ({
 vi.mock("../src/lib/studio-setup", async (original) => ({
   ...(await original<typeof import("../src/lib/studio-setup")>()),
   setupCall: mocks.setup,
+  getSetupDisciplines: async () => [],
 }));
 vi.mock("../src/lib/supabase/client", () => ({
   browserClient: () => ({
