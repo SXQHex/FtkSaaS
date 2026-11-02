@@ -87,6 +87,8 @@ Bu tablo yalnız izdir; eski kabul metinleri ikinci kez tutulmaz.
 
 - [x] S01.4 — XREQ-007/008 ek yapılandırma okumalarının backend teslimi tamamlandı; kaynak/run/ortam kanıtı [devirde](00-FtkSaaS-yeni-sohbet-devir.md#starter-yapılandırma-okumaları-kabulü). Frontend gerçek tüketici kabulü ortak talep sahibinde kalır.
 
+- [ ] S01.5 — [XREQ-009](../../../docs/requests.md#xreq-009-starter-rol-listesi): Starter tek eğitmeninin atama kimlik/durum/sürümüyle keşfi, gerekçeli kaldırma ve değiştirme. F05 açılmadan canlı CM/merkez kapsamı; yeni oturum, stale/yetki kaybı, ikinci eğitmen/yarış ve program/rezervasyon etkileri gerçek API kabulüyle ayrı runtime paketinde tamamlanacak.
+
 <a id="s02"></a>
 ### S02 — Sınıf ve program yönetim okumaları
 

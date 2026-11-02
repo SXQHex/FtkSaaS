@@ -117,7 +117,7 @@ test('Abone No allocation, backfill, alias merge and scoped discovery through re
     const alias=key();await db.query("insert into core.people(id,org_id,display_name,state,merged_into_id) values($1,$2,'Legacy alias','merged',$3)",[alias,legacyOrg,people[2]]);
     await db.query("insert into core.center_relationships(id,org_id,center_id,person_id,kind,state,created_at,started_at) values($1,$2,$3,$4,'student','inactive','2019-01-01','2019-01-01')",[key(),legacyOrg,legacyCenter,alias]);
     await db.query('select private.subscriber_backfill($1)',[legacyOrg]);
-    await db.query('alter table core.center_relationships enable trigger subscriber_student');await db.query('commit');
+    await db.query('set constraints all immediate');await db.query('alter table core.center_relationships enable trigger subscriber_student');await db.query('commit');
    }catch(error){await db.query('rollback');throw error;}
    const read=async()=>(await db.query('select person_id,number::text from private.subscriber_numbers where org_id=$1 order by number',[legacyOrg])).rows;
    assert.deepEqual(await read(),[{person_id:people[2],number:'1001'},{person_id:people[0],number:'1002'},{person_id:people[1],number:'1003'}]);
@@ -134,7 +134,7 @@ test('Abone No allocation, backfill, alias merge and scoped discovery through re
     await db.query('alter table core.center_relationships disable trigger subscriber_student');
     for(const id of [missing,newStudent])await db.query("insert into core.people(id,org_id,display_name,state) values($1,$2,'Backfill race fixture','active')",[id,legacyOrg]);
     await db.query("insert into core.center_relationships(id,org_id,center_id,person_id,kind,state,created_at,started_at) values($1,$2,$3,$4,'student','inactive','2018-01-01','2018-01-01')",[key(),legacyOrg,legacyCenter,missing]);
-    await db.query('alter table core.center_relationships enable trigger subscriber_student');await db.query('commit');
+    await db.query('set constraints all immediate');await db.query('alter table core.center_relationships enable trigger subscriber_student');await db.query('commit');
    }catch(error){await db.query('rollback');throw error;}
    const backfill=await connect();let enrolling;
    try{
@@ -147,7 +147,8 @@ test('Abone No allocation, backfill, alias merge and scoped discovery through re
   await t.test('backfill is repeatable; numbers and assignment timestamps are immutable',async()=>{
    const before=await ledger(),seq=await counter();await db.query('select private.subscriber_backfill($1)',[org]);await db.query('select private.subscriber_backfill($1)',[org]);assert.deepEqual(await ledger(),before);assert.equal(await counter(),seq);
    await assert.rejects(db.query('update private.subscriber_numbers set number=number+10000 where org_id=$1 and number=1001',[org]),/INVALID_STATE_TRANSITION/);
-   const beforeNo=await number(first);await db.query('update core.people set display_name=$2,version=version+1 where id=$1',[first,'Renamed subscriber']);assert.equal(await number(first),beforeNo);
+   const beforeNo=await number(first);await assert.rejects(db.query('update core.people set display_name=$2,version=version+1 where id=$1',[first,'Renamed subscriber']),/FORBIDDEN/);assert.equal(await number(first),beforeNo);
+   const unlinked=await get(second),beforeUnlinked=await number(second);await mut('person_update_v1',{person_id:second,expected_version:unlinked.version,patch:{display_name:'Renamed unlinked subscriber'}});assert.equal(await number(second),beforeUnlinked);
   });
  }finally{await db.end();}
 });

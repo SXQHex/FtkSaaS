@@ -268,8 +268,8 @@
         "management_state_get_v1"
       ],
       "review": {
-        "fingerprint": "994546853bd377217208c335fef39f043dbc0831bb4c53a7a9a8713e2917b191",
-        "reason": "Final Abone No ve katalog10 typed kaynak/validator farkları incelendi; request_id/UUID/cursor/tek komut protokolü değişmedi ve yeni şema regresyonları runtime katalog kopyalarını karşılaştırır."
+        "fingerprint": "8e012bbf9551610965ec8301aca8c8fca15a72c55ee7c7db85dd8800864d26cc",
+        "reason": "PR135 CI loglarıyla fixture düzeltmeleri ve dört kesin assertion istisnası incelendi; checker/eşik değişmedi, bağımsız inceleme ve kaynak-özel politika kurulum yetkisi korunur."
       }
     },
     {
@@ -597,8 +597,8 @@
         "person_discipline_set_v1"
       ],
       "review": {
-        "fingerprint": "e21275b6fb5d91b5461e0f604d5fa46fe4ad85971eb8818749b01970047c57c9",
-        "reason": "Abone No final kaynak ve fixture: canonical legacy sıralama, eksik tahsis backfill/new student yarışı, private erişim reddi, snapshot stale ve late rollback incelendi; WF04 davranışı kaynakla uyumlu."
+        "fingerprint": "031a9d69c29afabf992d525b1eed813c00388071f081daf390319057c3a9bac8",
+        "reason": "Deferred constraint olayları DDL öncesi SET CONSTRAINTS ile doğrulanır; bağlı ad yazması FORBIDDEN sınanır, numara koruyan bağımsız kişi güncellemesi yetkili API kullanır; runtime değişmedi."
       }
     },
     {
@@ -959,8 +959,8 @@
         "file_upload_complete_v1"
       ],
       "review": {
-        "fingerprint": "c1252d6d9756a8e032a6f219e1c79fad83fe447617e3c4218ee9efddece15b99",
-        "reason": "Final katalog10 ve ReportColumns onuncu alanı birlikte incelendi; gerçek template save-resolve-report-workerCSV zinciri ve varsayılan CSV testleri eklendi; mevcut rapor/hassasiyet/assertionlar korunur."
+        "fingerprint": "ec8d439667422df1ed43c8d489b07b629c60c6d39360c4189d8154056f1559db",
+        "reason": "Subscriber fixture ve typed katalog beklenti düzeltmeleri incelendi; rapor/CSV kaynağı ve mevcut finans assertionları değişmedi, kabul yeni adaya bağlıdır."
       }
     },
     {
@@ -1044,8 +1044,8 @@
         "settings_preparation_resolve_v1"
       ],
       "review": {
-        "fingerprint": "ce71849715e00e53b557a4d3ad774fac2e5e6c926cebf3a5479406db08e0acab",
-        "reason": "Katalog10 yeni immutable migration ile member/center/org report_templates subscriber_number sütununu kabul eder; typed SettingsValues ve runtime catalog_version10 eşleşir; eski katalog migrationları korunur."
+        "fingerprint": "e1cc0b915ce81bd05946a80bc071cf68b162b80c3ca0e32fac668d1cd1868ea2",
+        "reason": "Katalog testleri eski sabit9 yerine mevcut config sürümüne tam eşitlik doğrular; renk/default/consumer assertionları korunur, dar iki istisna bağımsız incelendi."
       }
     },
     {
