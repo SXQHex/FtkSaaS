@@ -38,6 +38,41 @@ test('Availability and policies through real Auth -> Edge -> RPC',async t=>{
   return {u,p};
  }
  try{
+ const inspect=(operation,k,b={},u=owner)=>must(u,'management_state_get_v1',scope({operation,selector:{operation,key:k},...b}));
+ const inspectFail=async(operation,k,code,b={},u=owner)=>fail('management_state_get_v1',{operation,selector:{operation,key:k},...b},code,u);
+ await t.test('center discipline discovery returns absence, its own identity/version, updates and stale rejection',async()=>{
+  const fresh=(await must(owner,'discipline_save_v1',{org_id:org,name:'Discovery',state:'active'},key())).primary_id;
+  const k={discipline_id:fresh},absent=(await inspect('center_discipline_set_v1',k)).items;
+  assert.equal(absent.length,1);assert.equal(absent[0].exists,false);assert.equal(absent[0].entity,null);assert.deepEqual(absent[0].versions,[]);
+  const created=await mut('center_discipline_set_v1',{discipline_id:fresh,state:'active'});
+  const v=(await inspect('center_discipline_set_v1',k)).items[0];
+  assert.deepEqual(v.entity,{type:'center_disciplines',id:created.primary_id});assert.equal(v.versions[0].version,1);assert.equal(v.current.values.state,'active');
+  await mut('center_discipline_set_v1',{...v.current.values,state:'inactive',expected_version:v.versions[0].version});
+  const updated=(await inspect('center_discipline_set_v1',k)).items[0];assert.equal(updated.state,'inactive');assert.equal(updated.versions[0].version,2);
+  await fail('center_discipline_set_v1',{discipline_id:fresh,state:'active',expected_version:1},'VERSION_CONFLICT');
+  await inspectFail('center_discipline_set_v1',{discipline_id:key()},'NOT_FOUND');
+  await inspectFail('center_discipline_set_v1',k,'NOT_FOUND',{entity:{type:'disciplines',id:fresh}});
+  await inspectFail('center_discipline_set_v1',k,'VALIDATION_FAILED',{page:{cursor:'invalid'}});
+  await inspectFail('center_discipline_set_v1',k,'FORBIDDEN',{center_id:other});
+ });
+ await t.test('configuration discovery requires live center management, tenant and feature scope',async()=>{
+  const staff=await linked('resource-read-staff','staff');
+  for(const [operation,k] of [['center_discipline_set_v1',{discipline_id:discipline}],['availability_exception_save_v1',{resource}]]){
+   await inspectFail(operation,k,'FORBIDDEN',{},staff.u);
+   const result=await call(stranger,'management_state_get_v1',scope({operation,selector:{operation,key:k}}));assert.equal(result.result.ok,false);
+  }
+  const manager=await linked('resource-read-manager','center_manager');
+  assert.equal((await inspect('center_discipline_set_v1',{discipline_id:discipline},{},manager.u)).items[0].exists,true);
+  await mut('center_manager_revoke_v1',{person_id:manager.p,expected_version:1,reason:'Synthetic live revoke'});
+  await inspectFail('center_discipline_set_v1',{discipline_id:discipline},'FORBIDDEN',{},manager.u);
+  const features=(await rows('select features from core.saas_plan_versions where id=$1',[plan]))[0].features;
+  try{
+   for(const [feature,operation,k] of [['F01','center_discipline_set_v1',{discipline_id:discipline}],['F02','availability_exception_save_v1',{resource}]]){
+    await db.query('update core.saas_plan_versions set features=array_remove($2::text[],$3) where id=$1',[plan,features,feature]);
+    await inspectFail(operation,k,'PLAN_FEATURE_UNAVAILABLE');
+   }
+  }finally{await db.query('update core.saas_plan_versions set features=$2 where id=$1',[plan,features]);}
+ });
  await t.test('unconfigured resource does not silently accept a new session; no partial session',async()=>{
   const n=(await rows('select count(*)::int n from core.sessions where org_id=$1',[org]))[0].n;
   await fail('session_create_v1',sessionBody,'POLICY_NOT_CONFIGURED');
@@ -75,6 +110,35 @@ test('Availability and policies through real Auth -> Edge -> RPC',async t=>{
   const v2=await centerVersion(),rs=await Promise.all([1,2].map(n=>call(owner,'availability_exception_save_v1',scope({resource,interval:{starts_at:new Date(+at+n*86400000).toISOString(),ends_at:new Date(+at+n*86400000+3600000).toISOString()},reason:'Race',expected_version:v2}),key())));
   assert.equal(rs.filter(x=>x.result.ok).length,1);assert.equal(rs.find(x=>!x.result.ok).result.error.code,'VERSION_CONFLICT');
   await fail('availability_exception_save_v1',{...b,expected_version:await centerVersion(),interval:{starts_at:interval.ends_at,ends_at:interval.starts_at}},'VALIDATION_FAILED');
+ });
+ await t.test('closure discovery is bounded, cursor-scoped, reason-free and uses live center aggregate versions',async()=>{
+  const op='availability_exception_save_v1',k={resource};
+  const first=await inspect(op,k,{page:{limit:1}});assert.equal(first.items.length,1);assert(first.next_cursor);
+  const one=first.items[0];assert.equal(one.entity.type,'availability_exceptions');assert.deepEqual(one.current.values.resource,resource);
+  assert(!('reason' in one.current.values));assert.equal(one.versions[0].entity.type,'centers');assert.equal(one.versions[0].entity.id,center);
+  const second=await inspect(op,k,{page:{limit:1,cursor:first.next_cursor}});assert.equal(second.items.length,1);assert.notEqual(second.items[0].entity.id,one.entity.id);assert.equal(second.as_of,first.as_of);
+  const exact=await inspect(op,k,{entity:one.entity});assert.equal(exact.items.length,1);assert.equal(exact.items[0].entity.id,one.entity.id);
+  const manager=await linked('closure-reader','center_manager');await inspectFail(op,k,'VALIDATION_FAILED',{page:{limit:1,cursor:first.next_cursor}},manager.u);
+  const secondRoom=(await mut('room_save_v1',{name:'Other resource',capacity:5})).primary_id;
+  await inspectFail(op,{resource:{kind:'room',id:secondRoom}},'VALIDATION_FAILED',{page:{limit:1,cursor:first.next_cursor}});
+  assert.deepEqual((await inspect(op,{resource:{kind:'room',id:secondRoom}})).items,[]);
+  await inspectFail(op,{resource:{kind:'room',id:secondRoom}},'NOT_FOUND',{entity:one.entity});
+  await inspectFail(op,{resource:{kind:'room',id:key()}},'NOT_FOUND');
+  await inspectFail(op,k,'VALIDATION_FAILED',{page:{cursor:'not-a-cursor'}});
+  const instructor=await linked('closure-instructor','instructor');
+  await db.query("insert into core.center_relationships(id,org_id,center_id,person_id,kind,state,started_at) values($1,$2,$3,$4,'instructor','active',now())",[key(),org,center,instructor.p]);
+  const personResource={kind:'person',id:instructor.p};
+  const personClosure=await mut(op,{resource:personResource,interval,reason:'Private instructor absence',expected_version:await centerVersion()});
+  const personView=await inspect(op,{resource:personResource});assert.equal(personView.items.length,1);assert.equal(personView.items[0].entity.id,personClosure.primary_id);assert(!('reason' in personView.items[0].current.values));
+  await inspectFail(op,{resource:personResource},'VALIDATION_FAILED',{page:{cursor:first.next_cursor}});
+  await mut('center_manager_assign_v1',{center_id:other,person_id:person});
+  const otherResource=(await mut('room_save_v1',{center_id:other,name:'Foreign center room',capacity:5})).primary_id;
+  await inspectFail(op,{resource:{kind:'room',id:otherResource}},'NOT_FOUND');
+  const v=(await inspect(op,k,{entity:one.entity})).items[0].versions[0].version;
+  const appended=await mut(op,{resource,interval:{starts_at:'2032-01-01T00:00:00Z',ends_at:'2032-01-02T00:00:00Z'},reason:'Private maintenance',expected_version:v});
+  const latest=await inspect(op,k,{entity:{type:'availability_exceptions',id:appended.primary_id}});assert.equal(latest.items[0].versions[0].version,v+1);
+  await fail(op,{resource,interval,reason:'Stale append',expected_version:v},'VERSION_CONFLICT');
+  const bounded=await inspect(op,k,{page:{limit:200,cursor:first.next_cursor}});assert(!bounded.items.some(x=>x.entity.id===appended.primary_id));
  });
  await t.test('advisory organization policy allows a center exception; mandatory supersedes it at its effective time',async()=>{
   await publish('reservation_window',{kind:'window',opens_minutes_before:10080,closes_minutes_before:0,manager_exception:false});

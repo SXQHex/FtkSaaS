@@ -51,6 +51,22 @@ test('saved program management projection uses wire capacity and leaves unavaila
  assert(valid('ManagementStateView',{...item,current:{...item.current,values:{...values,schedule}}}));
  assert(!valid('ManagementStateView',{...item,current:{...item.current,values:{...values,schedule:{...schedule,capacity:{nominal:8,maximum:8}}}}}));
 });
+test('Starter resource discovery exposes only implemented typed selectors and requires a center',()=>{
+ const reader=p['x-contract'].operations.find(o=>o.name==='management_state_get_v1');
+ for(const operation of ['center_discipline_set_v1','availability_exception_save_v1']){
+  assert(reader.runtime_selectors.includes(operation));
+  assert.equal(p['x-contract'].operations.find(o=>o.name===operation).operation_contract.read_path_status,'implemented');
+  const key=operation==='center_discipline_set_v1'?{discipline_id:id}:{resource:{kind:'room',id}};
+  const r={client_api_version:1,request_id:id,org_id:id,center_id:id,operation,selector:{operation,key}};
+  assert(valid('Request_management_state_get',r));
+  assert(!valid('Request_management_state_get',{...r,center_id:null}));
+ }
+ const absence={operation:'center_discipline_set_v1',entity:null,exists:false,state:null,versions:[],as_of:new Date().toISOString(),current:{operation:'center_discipline_set_v1',values:{discipline_id:id}}};
+ assert(valid('ManagementStateView',absence));
+ const closure={...absence,operation:'availability_exception_save_v1',entity:{type:'availability_exceptions',id},exists:true,state:'active',versions:[{entity:{type:'centers',id},version:5}],current:{operation:'availability_exception_save_v1',values:{resource:{kind:'room',id},interval:{starts_at:'2030-01-01T00:00:00Z',ends_at:'2030-01-02T00:00:00Z'}}}};
+ assert(valid('ManagementStateView',closure));
+ assert(!valid('ManagementStateView',{...closure,current:{...closure.current,values:{...closure.current.values,reason:'private'}}}));
+});
 test('UUIDv7 generator: RFC version/variant, uniqueness, current approximate timestamp',()=>{const before=Date.now();const ids=Array.from({length:20000},newUuidV7);const after=Date.now();assert.equal(new Set(ids).size,ids.length);for(const x of ids){assert(validate(x));assert.equal(version(x),7);const ms=parseInt(x.replaceAll('-','').slice(0,12),16);assert(ms>=before&&ms<=after);}});
 test('retry preserves frozen operation key',()=>{const operation=newOperation();const attempt2={...operation,request_id:newUuidV7()};assert.equal(operation.operation_key,attempt2.operation_key);assert.notEqual(operation.request_id,attempt2.request_id);});
 test('external/provider and existing UUIDv4 acceptance retained, v7 production validator distinct',()=>{const existing='550e8400-e29b-41d4-a716-446655440000';assert(valid('ProviderUuid',existing));assert(valid('FtkUuid',existing));assert(!valid('FtkGeneratedUuidV7',existing));assert(valid('FtkGeneratedUuidV7',id));});

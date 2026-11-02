@@ -268,8 +268,8 @@
         "management_state_get_v1"
       ],
       "review": {
-        "fingerprint": "9377b8ad5a99bb2e32f30758f57f9e4a713e31b77b00599da55c59a7064dc824",
-        "reason": "PR131 Secret scan: mevcut Auth migration checksum satırı byte olarak korunur; yeni manifest girdisi önce eklenir, değerler/SQL/kural aynı. Güncel main tabanı incelendi."
+        "fingerprint": "9419cdb6ac10476d105f589e7e81fbafd66e67abb5d80ef68407d95f95f84926",
+        "reason": "XREQ-007/008 ortak sözleşme, selector/DTO ve test farkları incelendi; org/merkez, canlı yetki ve cursor kuralları korundu; WF02 ayrıntıları güncellendi."
       }
     },
     {
@@ -360,7 +360,8 @@
         "apps/backend/tests/room-role-registry.test.mjs",
         "apps/backend/tests/starter-plan-gates-acceptance.mjs",
         "apps/backend/tests/api-acceptance.test.mjs",
-        "apps/backend/tests/p07-account-revocation-acceptance.mjs"
+        "apps/backend/tests/p07-account-revocation-acceptance.mjs",
+        "apps/backend/tests/availability-policies.test.mjs"
       ],
       "sources": [
         "apps/backend/database/account-session-management.sql",
@@ -403,7 +404,9 @@
         "apps/backend/database/starter-plan-gates.sql",
         "apps/backend/database/starter-settings-media.sql",
         "apps/backend/database/wrappers.sql",
-        "docs/workflows.md"
+        "docs/workflows.md",
+        "apps/backend/database/starter-resource-discovery.sql",
+        "apps/backend/supabase/migrations/20261102052010_starter_resource_discovery.sql"
       ],
       "operations": [
         "organizations_list_v1",
@@ -428,8 +431,8 @@
         "center_discipline_set_v1"
       ],
       "review": {
-        "fingerprint": "0c01f03880a98a66e25c59f2f58206581d5d65eb2e9d213b5e86866333a37d32",
-        "reason": "S01–S02: paylaşılan program/session ve Starter regresyon dosyasına yalnız yönetim okuma/scope testleri eklendi; mevcut Stüdyo kurulumu ve yetki akışı ve güvenlik/finans assertionları korundu. Yeni runtime kabulü değildir."
+        "fingerprint": "073af50b1753d82bb79dc5486b8bdefefbb27ce8607ba01a62e954746c2238df",
+        "reason": "PR134 API-1 logu ve merkez liste sözleşmesi incelendi: Starter fixture zorunlu page alanını atlıyordu; yalnız geçerli sayfalı istek eklendi; assertion, runtime ve yetki değişmedi."
       }
     },
     {
@@ -515,8 +518,8 @@
         "class_assignment_set_v1"
       ],
       "review": {
-        "fingerprint": "0fa387542c643f3c5c010aa8fffb7ff4760b883bf920dc21c3572d53ecafefd8",
-        "reason": "S02: sınıf oluşturma sonrası yeni login ve program apply sonrası ikinci login ile keşif testleri, immutable snapshot ve kapsam sınırları incelendi; gerçek API kabulü CI bekliyor."
+        "fingerprint": "f0f02f17c2305c300a0b450c934f2ec1ef8c2d00623434a0c3186a4200af7056",
+        "reason": "Paylaşılan Starter fixture düzeltmesi incelendi: merkez listesine zorunlu page eklendi; program/seans ve gerçek API assertionları korunur."
       }
     },
     {
@@ -1094,8 +1097,8 @@
         "saas_payment_submit_v1"
       ],
       "review": {
-        "fingerprint": "581e808055535509ba1dd2b58204839c0ccd8b726fc438b1336270392c811a23",
-        "reason": "S01–S02: paylaşılan program/session ve Starter regresyon dosyasına yalnız yönetim okuma/scope testleri eklendi; mevcut Abonelik ve plan erişimi akışı ve güvenlik/finans assertionları korundu. Yeni runtime kabulü değildir."
+        "fingerprint": "5e258f78bebd324d90df081bb5234809480280ae41f3d1bcf4f3ed1c2c137d71",
+        "reason": "Downgrade okuma assertion hatası önceki kapanış fixture oluşturulamamasının sonucuydu; zorunlu merkez liste sayfalaması düzeltildi, retained/excluded kapsam assertionları korunur."
       }
     },
     {
@@ -1429,8 +1432,8 @@
         "subscription_boundary_apply_v1"
       ],
       "review": {
-        "fingerprint": "5943d44283cb937875f55c37597d78c46075c18bfb650a940385db2491eeb65d",
-        "reason": "S01–S02: paylaşılan program/session ve Starter regresyon dosyasına yalnız yönetim okuma/scope testleri eklendi; mevcut Worker ve işletim akışı ve güvenlik/finans assertionları korundu. Yeni runtime kabulü değildir."
+        "fingerprint": "2349813d8134dc374a138bc571f71c52e2ca63bf209fed09c039e403369aa08a",
+        "reason": "Paylaşılan Starter test farkı ve CI logu incelendi; yalnız merkez listesine zorunlu page eklendi; worker kaynakları/işletim akışı değişmedi ve rehber geçerli."
       }
     }
   ]

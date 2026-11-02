@@ -34,6 +34,14 @@ test('Starter real Auth/API resource limits, downgrade scope and receipt gates',
    await reject('discipline_save_v1',{name:'Tango',state:'active'},'PLAN_LIMIT_REACHED');
    assert.equal((await db.query("select count(*) n from core.rooms where org_id=$1 and state='active'",[org])).rows[0].n,'1');
   });
+  await t.test('Starter discovers center discipline identity and appended closures without enabling another resource',async()=>{
+   const read=(operation,k)=>invoke('management_state_get_v1',{operation,selector:{operation,key:k}});
+   const relation=(await read('center_discipline_set_v1',{discipline_id:disc})).items[0];assert.equal(relation.exists,true);assert.equal(relation.entity.type,'center_disciplines');assert.equal(relation.versions[0].version,1);
+   const resource={kind:'room',id:room};assert.deepEqual((await read('availability_exception_save_v1',{resource})).items,[]);
+   const current=(await invoke('centers_list_v1',{page:{limit:200}})).items.find(x=>x.id===center);
+   const closed=await invoke('availability_exception_save_v1',{resource,interval:{starts_at:'2032-01-01T00:00:00Z',ends_at:'2032-01-02T00:00:00Z'},reason:'Synthetic closure',expected_version:current.version});
+   const view=(await read('availability_exception_save_v1',{resource})).items[0];assert.equal(view.entity.id,closed.primary_id);assert.equal(view.versions[0].version,current.version+1);assert(!('reason' in view.current.values));
+  });
   const instructor=key(),otherInstructor=key();
   await t.test('Starter discovers its existing room and class through management reads',async()=>{
    const classId=(await invoke('class_save_v1',{name:'Yoga class',discipline_id:disc,external_open:true})).primary_id;
@@ -123,6 +131,11 @@ test('Starter real Auth/API resource limits, downgrade scope and receipt gates',
    const boundary=key();
    await db.query("insert into core.operation_receipts(id,org_id,actor_account_id,actor_fingerprint,operation,key_hash,payload_hash,state,result_expires_at) values($1,$2,$3::uuid,$3::uuid::text,'subscription_boundary_apply_v1',repeat('a',64),repeat('b',64),'in_progress',now()+interval '1 day')",[boundary,org,account.id]);
    await db.query("select private.p07_boundary($1,$2,$3,$4)",[org,sub.id,boundary,Array.from({length:32},key)]);
+   const discover=(operation,k)=>invoke('management_state_get_v1',{operation,selector:{operation,key:k}});
+   assert.equal((await discover('center_discipline_set_v1',{discipline_id:disc})).items[0].exists,true);
+   assert.equal((await discover('availability_exception_save_v1',{resource:{kind:'room',id:room}})).items.length,1);
+   await reject('management_state_get_v1',{operation:'center_discipline_set_v1',selector:{operation:'center_discipline_set_v1',key:{discipline_id:extraDisc}}},'PLAN_FEATURE_UNAVAILABLE');
+   for(const resource of [{kind:'room',id:extraRoom},{kind:'person',id:otherInstructor}])await reject('management_state_get_v1',{operation:'availability_exception_save_v1',selector:{operation:'availability_exception_save_v1',key:{resource}}},'PLAN_FEATURE_UNAVAILABLE');
    const staffDenied=await call(staff,'person_create_v1',{org_id:org,center_id:center,display_name:'Starter staff denied candidate',contacts:[]},key());assert.equal(staffDenied.result.error?.code,'FORBIDDEN');
    const reportDenied=await call(staff,'report_get_v1',reportBody);assert.equal(reportDenied.result.error?.code,'FORBIDDEN');
    await invoke('session_get_v1',{session_id:legacySession});

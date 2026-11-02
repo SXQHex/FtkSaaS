@@ -22,6 +22,8 @@ Bu dosya yalnız **sıra, bağımlı teslim paketleri ve kontrol noktalarının*
 
 **S01–S02 kontrol noktası:** Ayrı teslimin backend kapanışı doğrulandı; [görev kabulü](remaining-work.md#s01) ve [kaynak/ortam kanıtı](00-FtkSaaS-yeni-sohbet-devir.md#s01s02-backend-kabulü) kendi sahiplerindedir. Frontend ekran sırası ve kabulü değişmez.
 
+**Güncel öncelik:** Kullanıcının frontend Starter ihtiyaçlarını giderme talimatıyla [S01.4](remaining-work.md#s01) / [XREQ-007–008](../../../docs/requests.md) ek yapılandırma okumaları → aday kabulü ve main/development doğrulaması. Sonra aşağıdaki sıra sürer.
+
 **Sıradaki açık işler:** [A03.2→A03.3](remaining-work.md#a03) kanıt/boşluk uzlaştırması → [S03](remaining-work.md#s03) → [S04](remaining-work.md#s04) → [S05](remaining-work.md#s05). S03–S05 atomik tahsis, ilk aktarım/birleşim ve operasyon projeksiyonları olarak anlamlı teslim sınırında yürür. Her dilimde uygun odak testi, etkilenen sözleşme/üretilmiş çıktı/WF ve alan devri birlikte güncellenir. Aday kabulü ve yeni kapsamın merge yetkisi ayrıca korunur.
 
 ## Ortak işletim hattı
