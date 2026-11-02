@@ -150,7 +150,7 @@ Onaylanmış talep bitmiş iş değildir; başarılı CI da gerçek tüketici ka
 
 **Frontend etkisi:** PR143 sonrası işlevsel frontend kabulü tamamdır; geçmiş ilişki bulunan Business kaydı ile Starter slot senaryosu ayrı ortam/fixture olarak raporlanmıştır. Tamamlanmış XREQ-009/011 kabulü tekrar açık iş yapılmaz. İlave temizlik XREQ-012'dir; bölüm takibinin tek sahibi [WEB-S02](../apps/web/docs/todo.md#web-s02). Backend backlog/devir belgeleri frontend tarafından değiştirilmez.
 
-**XREQ-011 backend değerlendirmesi — kullanıcı kararı:** Ayrı ilişşik kesme API’si eklenmez. Merkez eğitmenliği tek rol yaşam döngüsüne taşınır; eski ilişki salt tarihsel kayıttır ve aktiflik/kota kaynağı olamaz. Mevcut dar keşif, etki önizlemesi ve rol kaldırma kullanılır. Uygulama/kaynak/gerçek kabul durumu [backend devrindedir](../apps/backend/docs/00-FtkSaaS-yeni-sohbet-devir.md); frontend kabulü kendi sahibindedir.
+**XREQ-011 backend değerlendirmesi — kullanıcı kararı:** Ayrı ilişşik kesme API’si eklenmez. Merkez eğitmenliği tek rol yaşam döngüsüne taşınır; ayrı ilişki aktiflik/kota kaynağı olamaz. Eski fiziksel ilişki satırları hakkındaki sonraki kullanıcı kararı [XREQ-012](#xreq-012) sahibindedir. Mevcut dar keşif, etki önizlemesi ve rol kaldırma kullanılır. Uygulama/kaynak/gerçek kabul durumu [backend devrindedir](../apps/backend/docs/00-FtkSaaS-yeni-sohbet-devir.md); frontend kabulü kendi sahibindedir.
 
 <a id="xreq-012"></a>
 
@@ -163,3 +163,5 @@ Onaylanmış talep bitmiş iş değildir; başarılı CI da gerçek tüketici ka
 **Kabul:** Eski instructor ilişki satırı sayısı sıfır; yeni normal işlemler bu tür satır üretmiyor. Eğitmen keşfi/rol kaldırma/yeniden atama ve Starter slot/yarış kontrolleri tek rol kaynağıyla çalışıyor. Kişi birleşimi kaldırılmış rolü canlandırmıyor; hesap bağı, merkez/tenant izolasyonu, geçmiş seans ve finans/audit bağları korunuyor. Backend ilgili migration ve davranış regresyonlarını doğrular; assertion/kalite kapıları gevşetilmez. Backend veri hazırlığı/temizliği frontend tarafından hosted SQL ile yapılmaz.
 
 **Durum / sahiplik:** Kullanıcının açık talebiyle backend değerlendirme/uygulamasına iletildi; henüz uygulanmış veya kabul edilmiş sayılmaz. XREQ-011'in tamamlanan işlevsel frontend kabulünü geri almaz. Temizliğin frontend tüketimine etkisi ve S02 son kapanışı [WEB-S02](../apps/web/docs/todo.md#web-s02) sahibindedir.
+
+**XREQ-012 backend değerlendirmesi:** Kullanıcının açık uygulama yetkisiyle yeni migration ve runtime sadeleştirmesi hazırlanıyor. Aktarım kontrolü başarısızsa silme transaction’ı tamamlanmaz; diğer ilişki türleri ve iş geçmişi korunur. Yeni endpoint veya kalıcı legacy depo eklenmez. Kaynak ve gerçek kabulün tek sahibi [backend devridir](../apps/backend/docs/00-FtkSaaS-yeni-sohbet-devir.md); aday/main/development kabulü henüz yok.

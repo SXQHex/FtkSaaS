@@ -114,10 +114,17 @@ test('Room configuration and scoped role reads through real Auth/API',async t=>{
  const list=(u,b={})=>must(u,'roles_list_v1',{org_id:org,page:{},...b});
  await t.test('organization readers see all assignments; center manager excludes other center and org-level roles',async()=>{
   const all=await list(owner);assert(all.items.some(x=>x.id===orgManager.grant.primary_id));assert(all.items.some(x=>x.id===remote.grant.primary_id));assert(Number.isFinite(Date.parse(all.as_of)));
+  for(const item of all.items)assert.equal(item.subscriber_number,(await rows('select private.subscriber_number($1,$2) n',[org,item.person_id]))[0].n);
   assert.deepEqual((await list(orgManager.u)).items,all.items);
   const scoped=await list(manager.u);assert(scoped.items.length>0);assert(scoped.items.every(x=>x.scope_center_id===center));
   assert(!(await list(manager.u,{person_id:remote.p})).items.length);
   await fail('roles_list_v1',{center_id:other,page:{}},'FORBIDDEN',manager.u);
+  assert.equal(all.items.find(x=>x.person_id===instructor.p).subscriber_number,null);
+  await mutate('student_activate_v1',{person_id:instructor.p});
+  const number=(await rows('select private.subscriber_number($1,$2) n',[org,instructor.p]))[0].n;assert.match(number,/^[1-9][0-9]*$/);
+  const numbers=await rows('select * from private.subscriber_numbers where org_id=$1 order by number',[org]);
+  assert.equal((await list(owner)).items.find(x=>x.person_id===instructor.p).subscriber_number,number);
+  assert.deepEqual(await rows('select * from private.subscriber_numbers where org_id=$1 order by number',[org]),numbers);
  });
  await t.test('student, instructor and foreign tenant cannot list roles or configure rooms',async()=>{
   for(const u of [student.u,instructor.u]){
@@ -234,7 +241,8 @@ test('Room configuration and scoped role reads through real Auth/API',async t=>{
   assert(backfill);assert(archive);
   await db.query('begin');
   try{
-   await db.query('alter table core.center_relationships drop constraint instructor_membership_is_role');
+   await db.query('alter table core.center_relationships drop constraint if exists instructor_membership_is_role');
+   await db.query('alter table core.center_relationships drop constraint center_relationships_kind_check');
    const people=Array.from({length:4},key),legacy=Array.from({length:4},key),existing=[key(),key()];
    const created='2025-01-02T12:00:00.000Z';
    for(let i=0;i<people.length;i++){
@@ -254,6 +262,45 @@ test('Room configuration and scoped role reads through real Auth/API',async t=>{
    assert((await rows("select state from core.center_relationships where id=any($1::uuid[])",[legacy])).every(x=>x.state==='inactive'));
    await db.query(backfill);
    assert.deepEqual(await rows("select id,person_id,state,account_link_id,created_at,version from core.role_assignments where org_id=$1 and person_id=any($2::uuid[]) order by person_id,id",[org,people]),roles);
+   const student=key();
+   await db.query("insert into core.center_relationships(id,org_id,center_id,person_id,kind,state,started_at) values($1,$2,$3,$4,'student','active',now())",[student,org,center,people[0]]);
+   const snapshot=async()=>{
+    const result={};
+    for(const table of ['role_assignments','account_links','people','sessions','resource_bookings','reservations','sales','debts','audit_events']){
+     result[table]=await rows('select * from core.'+table+' where org_id=$1 order by id',[org]);
+    }
+    result.relationships=await rows("select * from core.center_relationships where org_id=$1 and kind<>'instructor' order by id",[org]);
+    return result;
+   };
+   const beforeCleanup=await snapshot();
+   await db.query("alter table core.center_relationships add constraint instructor_membership_is_role check(kind<>'instructor' or state='inactive')");
+   await db.query("alter table core.center_relationships add constraint center_relationships_kind_check check(kind in ('student','instructor','staff','candidate'))");
+   const cleanup=readFileSync(new URL('../database/instructor-legacy-cleanup.sql',import.meta.url),'utf8').split('-- Offline duty')[0].replace(/^begin;\s*/,'');
+   const transferGuard=cleanup.match(/do \$check\$[\s\S]*?end\$check\$;/)?.[0];assert(transferGuard);
+   await db.query('savepoint missing_canonical_role');
+   await db.query('delete from core.role_assignments where id=$1',[legacy[0]]);
+   await assert.rejects(db.query(transferGuard),/requires canonical role transfer/);
+   await db.query('rollback to savepoint missing_canonical_role');
+   assert.deepEqual(await snapshot(),beforeCleanup);
+   await db.query('savepoint canonical_alias');
+   const canonical=key();
+   await db.query("insert into core.people(id,org_id,display_name,state) values($1,$2,'Canonical cleanup fixture','active')",[canonical,org]);
+   await db.query("update core.people set state='merged',merged_into_id=$2 where id=$1",[people[0],canonical]);
+   await db.query('update core.role_assignments set person_id=$2,version=version+1 where id=$1',[legacy[0],canonical]);
+   await db.query(transferGuard);
+   assert.equal((await rows('select private.p07_person_root($1,$2) root',[org,people[0]]))[0].root,canonical);
+   await db.query('rollback to savepoint canonical_alias');
+   assert.deepEqual(await snapshot(),beforeCleanup);
+   await db.query(cleanup);
+   assert.equal((await rows("select count(*)::int n from core.center_relationships where kind='instructor'"))[0].n,0);
+   assert.deepEqual(await snapshot(),beforeCleanup);
+   assert.deepEqual(await rows("select id,person_id,state,account_link_id,created_at,version from core.role_assignments where org_id=$1 and person_id=any($2::uuid[]) order by person_id,id",[org,people]),roles);
+   const projected=await rows("select person_id,state from private.person_center_relationships where org_id=$1 and person_id=any($2::uuid[]) and kind='instructor' order by person_id",[org,people]);
+   assert.deepEqual(projected,roles.map(({person_id,state})=>({person_id,state})));
+   await db.query('savepoint legacy_write');
+   await assert.rejects(db.query("insert into core.center_relationships(id,org_id,center_id,person_id,kind,state,started_at) values($1,$2,$3,$4,'instructor','inactive',now())",[key(),org,center,people[0]]),/center_relationships_kind_check/);
+   await db.query('rollback to savepoint legacy_write');
+
   }finally{await db.query('rollback');}
  });
  }finally{

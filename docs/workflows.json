@@ -268,8 +268,8 @@
         "management_state_get_v1"
       ],
       "review": {
-        "fingerprint": "cb4812c4ba4884aaa0d45a938398d4846b0203e0e47ad4b0a2969d4728c9775b",
-        "reason": "CI diagnosis: remove duplicate canonical role fixture; preserve scoped inactive-instructor CM access while staff, foreign-center, tenant and revoked-manager reads remain denied; pagination assertion unchanged."
+        "fingerprint": "e279a7860077039c0a3c335ce0249ca780e56d0c30a90eb087643917d8d17d23",
+        "reason": "Son kaynakta fiziksel ilişki yasağı ve rol projeksiyonu testleri, numaralı/numarasız API okumaları ve ProtectedObligation assertionı incelendi; izin/plan ve tarihsel kayıt korumaları aynı."
       }
     },
     {
@@ -345,8 +345,8 @@
         "account_signup_check_v1"
       ],
       "review": {
-        "fingerprint": "be66cd14f8b1fa063de1ece83da5706e73a847bc205ae68c7d4537c9ecf26f1f",
-        "reason": "Ortak üretilmiş runtime wrapper farkı yalnız yeni role_revoke_preview_v1 F04 service-only entrypoint ekler; bu akışın komut/izin/etki zinciri değişmedi, mevcut rehber korunur."
+        "fingerprint": "8514aa44387a0957e541b3108e386dcd149f54c4dfa6771cef8e12378cbe4eac",
+        "reason": "Kimlik testinin hata enjeksiyonu yalnız kendi kişi UUIDlerine sınırlandı; gerçek paralel koşuda ilgisiz hesap bağlamayı bozan global trigger giderildi, özgün rollback assertionları korundu. İlgili rehberde ürün/Auth akışı değişmedi."
       }
     },
     {
@@ -411,7 +411,11 @@
         "apps/backend/database/starter-instructor-management.sql",
         "apps/backend/supabase/migrations/20261102100000_starter_instructor_management.sql",
         "apps/backend/database/instructor-center-lifecycle.sql",
-        "apps/backend/supabase/migrations/20261102144907_instructor_center_lifecycle.sql"
+        "apps/backend/supabase/migrations/20261102144907_instructor_center_lifecycle.sql",
+        "apps/backend/database/instructor-legacy-cleanup.sql",
+        "apps/backend/supabase/migrations/20261102180252_instructor_legacy_cleanup.sql",
+        "apps/backend/database/starter-subscriber-projections.sql",
+        "apps/backend/supabase/migrations/20261102180626_starter_subscriber_projections.sql"
       ],
       "operations": [
         "organizations_list_v1",
@@ -437,8 +441,8 @@
         "role_revoke_preview_v1"
       ],
       "review": {
-        "fingerprint": "6bc63f76e671231deeedd730cdd61a172260ce2099aef97af01fa8de0e653aff",
-        "reason": "CI diagnosis: remove duplicate canonical role fixture; preserve scoped inactive-instructor CM access while staff, foreign-center, tenant and revoked-manager reads remain denied; pagination assertion unchanged."
+        "fingerprint": "c0026b846d2e4911d992a40c490a4ed4a5f1fb8c8f8c21654cbb5247f34869cf",
+        "reason": "Rol liste DTOsu ve tek kaynaklı eğitmen temizliğinin kaynak/test/rehber bağı birlikte incelendi; nullable numara yetki açmıyor, Starter genel rol listesi kapalı kalıyor."
       }
     },
     {
@@ -501,7 +505,9 @@
         "apps/backend/database/wrappers.sql",
         "docs/workflows.md",
         "apps/backend/database/studio-management-reads.sql",
-        "apps/backend/supabase/migrations/20261101232810_studio_management_reads.sql"
+        "apps/backend/supabase/migrations/20261101232810_studio_management_reads.sql",
+        "apps/backend/database/starter-subscriber-projections.sql",
+        "apps/backend/supabase/migrations/20261102180626_starter_subscriber_projections.sql"
       ],
       "operations": [
         "availability_save_v1",
@@ -524,8 +530,8 @@
         "class_assignment_set_v1"
       ],
       "review": {
-        "fingerprint": "2baa0923d0ca9429bb30145c18499aa99f5b8fde4650abe6151463843611854c",
-        "reason": "CI diagnosis: remove duplicate canonical role fixture; preserve scoped inactive-instructor CM access while staff, foreign-center, tenant and revoked-manager reads remain denied; pagination assertion unchanged."
+        "fingerprint": "5797d28dd54f4c61ca3fab050444fcc3476b6a5a0a2ebd38539641321a87aa38",
+        "reason": "XREQ-012 rol kaynağı, eski veri silme kontrolü ve nullable Abone No projeksiyonları; değişen kaynak/testler ve ilgili rehber incelendi, plan/izin/worker protokolü korunuyor."
       }
     },
     {
@@ -586,7 +592,9 @@
         "apps/backend/database/subscriber-numbers.sql",
         "apps/backend/supabase/migrations/20261102064534_subscriber_numbers.sql",
         "apps/backend/database/subscriber-operation-projections.sql",
-        "apps/backend/supabase/migrations/20261102121549_subscriber_operation_projections.sql"
+        "apps/backend/supabase/migrations/20261102121549_subscriber_operation_projections.sql",
+        "apps/backend/database/starter-subscriber-projections.sql",
+        "apps/backend/supabase/migrations/20261102180626_starter_subscriber_projections.sql"
       ],
       "operations": [
         "account_access_send_v1",
@@ -605,8 +613,8 @@
         "person_discipline_set_v1"
       ],
       "review": {
-        "fingerprint": "aac77bb180e5e04ccb79334b17db2925627866b30627f7b7b2e69e8ac994b6c1",
-        "reason": "Reviewed canonical instructor role authority, legacy migration, offline account/merge boundaries and equivalent fixtures; no second active relationship lifecycle remains."
+        "fingerprint": "90723ef85475e46cc07e5a4bb1e646596f0adbf84b00f2baa5b9234b8ad1ddb0",
+        "reason": "XREQ-012 rol kaynağı, eski veri silme kontrolü ve nullable Abone No projeksiyonları; değişen kaynak/testler ve ilgili rehber incelendi, plan/izin/worker protokolü korunuyor."
       }
     },
     {
@@ -665,7 +673,9 @@
         "apps/backend/database/starter-domain-preparations.sql",
         "apps/backend/database/starter-plan-gates.sql",
         "apps/backend/database/wrappers.sql",
-        "docs/workflows.md"
+        "docs/workflows.md",
+        "apps/backend/database/starter-subscriber-projections.sql",
+        "apps/backend/supabase/migrations/20261102180626_starter_subscriber_projections.sql"
       ],
       "operations": [
         "products_list_v1",
@@ -693,8 +703,8 @@
         "negative_limits_get_v1"
       ],
       "review": {
-        "fingerprint": "52f36a953d27d99960e1f6933cec3fc6b809f03f1e1d885fc7942fd46522fa3d",
-        "reason": "S05 yetkili DTO alanları ve mevcut SQL/test kapsamı incelendi; No yalnız mevcut izinli kişi satırına eklenir, UUID/yetki/plan/sayfalama değişmez. Ortak metadata üretimi diğer akış davranışını değiştirmez."
+        "fingerprint": "1f898d3eb912826be9d092375f41ab514a88caf0ae3a93964b5f3cf73851b62b",
+        "reason": "Korunan yükümlülük DTOsu ve gerçek etki önizleme testindeki Abone No projeksiyonu incelendi; geçmiş snapshotlar yeniden yazılmıyor, hak/finans/onay etkileri değişmedi."
       }
     },
     {
@@ -748,7 +758,9 @@
         "apps/backend/database/starter-attendance-protection.sql",
         "apps/backend/database/starter-plan-gates.sql",
         "apps/backend/database/wrappers.sql",
-        "docs/workflows.md"
+        "docs/workflows.md",
+        "apps/backend/database/starter-subscriber-projections.sql",
+        "apps/backend/supabase/migrations/20261102180626_starter_subscriber_projections.sql"
       ],
       "operations": [
         "lesson_request_create_v1",
@@ -763,8 +775,8 @@
         "reservation_capacity_override_v1"
       ],
       "review": {
-        "fingerprint": "b1148d87b4558ebb6484ffc41deb30b7cc9753b423deab7e0717b9a434954011",
-        "reason": "S05 yetkili DTO alanları ve mevcut SQL/test kapsamı incelendi; No yalnız mevcut izinli kişi satırına eklenir, UUID/yetki/plan/sayfalama değişmez. Ortak metadata üretimi diğer akış davranışını değiştirmez."
+        "fingerprint": "119df9b8da57b1149751b4674ae52ab51096e93c7aa60c4fb19c38bb06ae38de",
+        "reason": "XREQ-012 rol kaynağı, eski veri silme kontrolü ve nullable Abone No projeksiyonları; değişen kaynak/testler ve ilgili rehber incelendi, plan/izin/worker protokolü korunuyor."
       }
     },
     {
@@ -1114,8 +1126,8 @@
         "saas_payment_submit_v1"
       ],
       "review": {
-        "fingerprint": "f805be206f0d28df496545679d50937153bc559afc28b351ab52786cb3735426",
-        "reason": "Reviewed canonical instructor role authority, legacy migration, offline account/merge boundaries and equivalent fixtures; no second active relationship lifecycle remains."
+        "fingerprint": "961199545c8b5a25836420c3626f958aa6f48af7196eeb0444d47dc4dab89d9e",
+        "reason": "XREQ-012 rol kaynağı, eski veri silme kontrolü ve nullable Abone No projeksiyonları; değişen kaynak/testler ve ilgili rehber incelendi, plan/izin/worker protokolü korunuyor."
       }
     },
     {
@@ -1374,7 +1386,9 @@
         "apps/backend/database/p01-waitlist-workers-wrappers.sql",
         "apps/backend/database/p01-waitlist-workers.sql",
         "apps/backend/database/runtime-wrappers-current.sql",
-        "docs/workflows.md"
+        "docs/workflows.md",
+        "apps/backend/database/starter-subscriber-projections.sql",
+        "apps/backend/supabase/migrations/20261102180626_starter_subscriber_projections.sql"
       ],
       "operations": [
         "waitlist_join_v1",
@@ -1383,8 +1397,8 @@
         "seat_offer_reject_v1"
       ],
       "review": {
-        "fingerprint": "20a3ea26ad0aa4f8c1709096234bc6c773213cb5cea9dea8517bb987ba2200ae",
-        "reason": "Ortak üretilmiş runtime wrapper farkı yalnız yeni role_revoke_preview_v1 F04 service-only entrypoint ekler; bu akışın komut/izin/etki zinciri değişmedi, mevcut rehber korunur."
+        "fingerprint": "d2c054ef8b254a194c5868d2eb2f5d25238b6220e4b5eab1e79cd4df4278ce87",
+        "reason": "XREQ-012 rol kaynağı, eski veri silme kontrolü ve nullable Abone No projeksiyonları; değişen kaynak/testler ve ilgili rehber incelendi, plan/izin/worker protokolü korunuyor."
       }
     },
     {
@@ -1450,8 +1464,8 @@
         "subscription_boundary_apply_v1"
       ],
       "review": {
-        "fingerprint": "73663ddaf46da1f1aaea9ff50a3481f46cd53ad1a1233f6bf12c434cc83502ee",
-        "reason": "Reviewed canonical instructor role authority, legacy migration, offline account/merge boundaries and equivalent fixtures; no second active relationship lifecycle remains."
+        "fingerprint": "ab76f4592cb289206ecb6f83b1643de30fa124ef717b18d532e00bde4ba6874c",
+        "reason": "XREQ-012 rol kaynağı, eski veri silme kontrolü ve nullable Abone No projeksiyonları; değişen kaynak/testler ve ilgili rehber incelendi, plan/izin/worker protokolü korunuyor."
       }
     }
   ]

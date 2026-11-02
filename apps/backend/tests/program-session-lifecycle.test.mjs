@@ -70,6 +70,7 @@ test('Program lifecycle through real Auth -> Edge -> RPC',async t=>{
   const before=await counts();base=await preview(class1,spec({room_id:room}));assert.deepEqual(base.blockers,[]);assert.deepEqual(await counts(),before);
   assert.equal(base.sessions.length,4);assert.deepEqual(base.sessions.map(x=>x.interval.starts_at),['2027-01-04T09:00:00+00:00','2027-01-11T09:00:00+00:00','2027-01-18T09:00:00+00:00','2027-01-25T09:00:00+00:00']);
   assert(base.sessions.every(x=>x.assignments[0].agreement_id===i1.agreement));
+  for(const item of base.class_assignments)assert.equal(item.subscriber_number,(await rows('select private.subscriber_number($1,$2) n',[org,item.person_id]))[0].n);
   assert.equal(base.class_assignments[0].version,1);assert.equal(base.class_version,2);
   const k=key(),made=await apply(base,k);sids=base.sessions.map(x=>x.session_id);assert.equal(made.related.length,4);
   assert.equal((await apply(base,k)).replayed,true);await fail('program_apply_v1',{preview:{id:base.id,token:'changed-token-value'}},'IDEMPOTENCY_PAYLOAD_MISMATCH',owner,k);
@@ -365,6 +366,7 @@ test('Program lifecycle through real Auth -> Edge -> RPC',async t=>{
   const reason='Explicit synthetic correction',change={kind:'credit_adjust',sale_id:sale,quantity:10,direction:'decrease'},previewImpact=change=>must(owner,'reservation_impact_preview_v1',scope({change,reason}));
   const dep=(await rows('select private.p02_dependencies($1,$2,$3,$4) value',[org,c1,account.id,sale]))[0].value;assert(dep.versions.some(x=>x.entity.id===sale));
   const p=await previewImpact(change);assert(p.affected.some(x=>x.reservation_id===rid));assert.equal(p.preserves_reservations,true);
+  assert.equal(p.affected.find(x=>x.reservation_id===rid).subscriber_number,(await rows('select private.subscriber_number($1,$2) n',[org,student.p]))[0].n);
   const request={sale_id:sale,quantity:10,direction:'decrease',reason,impact_approval:token(p.preview),accepted_reservation_ids:p.affected.map(x=>x.reservation_id)};
   await fail('credit_adjust_v1',{...request,quantity:9},'PREVIEW_STALE');await fail('credit_adjust_v1',{...request,accepted_reservation_ids:[]},'VALIDATION_FAILED');
   const k=key(),before=await counts();await inject('credit_adjust_v1');await fail('credit_adjust_v1',request,'INTEGRITY_VIOLATION',owner,k);assert.deepEqual(await counts(),before);await clearFault();await mut('credit_adjust_v1',request,k);assert.equal((await mut('credit_adjust_v1',request,k)).replayed,true);

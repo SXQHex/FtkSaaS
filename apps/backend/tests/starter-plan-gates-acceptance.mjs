@@ -53,7 +53,7 @@ test('Starter real Auth/API resource limits, downgrade scope and receipt gates',
   await db.query("insert into core.people(id,org_id,display_name,state) values($1,$3,'Instructor','active'),($2,$3,'Other instructor','active')",[instructor,otherInstructor,org]);
   await t.test('instructor database invariant also protects non-HTTP writers',async()=>{
    await db.query("insert into core.role_assignments(id,org_id,scope_center_id,person_id,role,state,account_link_id) values($1,$2,$3,$4,'instructor','active',null)",[key(),org,center,instructor]);
-   await assert.rejects(db.query("insert into core.center_relationships(id,org_id,center_id,person_id,kind,state,started_at) values($1,$2,$3,$4,'instructor','active',now())",[key(),org,center,otherInstructor]),/PLAN_LIMIT_REACHED/);
+   await assert.rejects(db.query("insert into core.center_relationships(id,org_id,center_id,person_id,kind,state,started_at) values($1,$2,$3,$4,'instructor','active',now())",[key(),org,center,otherInstructor]),/center_relationships_kind_check/);
    await assert.rejects(db.query("insert into core.role_assignments(id,org_id,scope_center_id,person_id,role,state,account_link_id) values($1,$2,$3,$4,'instructor','active',null)",[key(),org,center,otherInstructor]),/PLAN_LIMIT_REACHED/);
   });
   let students=[];
