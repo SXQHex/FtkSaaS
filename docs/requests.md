@@ -149,3 +149,5 @@ Onaylanmış talep bitmiş iş değildir; başarılı CI da gerçek tüketici ka
 - Backend tesliminden sonra frontend gerçek Starter ekranında bu veri durumuyla kabul yapar. Mevcut ilişkisiz Starter1 kabulü bunun yerine sayılmaz.
 
 **Frontend etkisi:** S02'nin tam kapanışı bu talebin backend teslimi ve frontend entegrasyon/kabulüne bağlıdır. Tamamlanmış XREQ-009 canlı kabulü ve yayın kontrolleri tekrar açık iş yapılmaz. Bölüm takibinin tek sahibi [WEB-S02](../apps/web/docs/todo.md#web-s02); backend backlog/devir belgeleri frontend tarafından değiştirilmez.
+
+**XREQ-011 backend değerlendirmesi — kullanıcı kararı:** Ayrı ilişşik kesme API’si eklenmez. Merkez eğitmenliği tek rol yaşam döngüsüne taşınır; eski ilişki salt tarihsel kayıttır ve aktiflik/kota kaynağı olamaz. Mevcut dar keşif, etki önizlemesi ve rol kaldırma kullanılır. Uygulama/kaynak/gerçek kabul durumu [backend devrindedir](../apps/backend/docs/00-FtkSaaS-yeni-sohbet-devir.md); frontend kabulü kendi sahibindedir.

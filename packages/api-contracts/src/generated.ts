@@ -13456,10 +13456,7 @@ person_id: string
 role: Role
 scope_center_id?: (string | null)
 state: RecordState
-/**
- * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
- */
-account_link_id: string
+account_link_id: (string | null)
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema

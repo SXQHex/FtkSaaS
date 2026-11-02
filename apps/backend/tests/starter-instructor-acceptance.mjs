@@ -64,14 +64,13 @@ test('Starter instructor discovery, revoke and replacement preserve one live slo
    await fail('management_state_get_v1',{...request,center_id:foreignCenter},'NOT_FOUND',reader);
    await fail('role_assign_v1',{person_id:b.p,role:'instructor',scope:{center_id:center}},'PLAN_LIMIT_REACHED',reader);
   });
-  await t.test('active relationship keeps the slot occupied after role revoke; inactive grants remain discoverable',async()=>{
-   const relation=key();
-   await db.query("insert into core.center_relationships(id,org_id,center_id,person_id,kind,state,started_at) values($1,$2,$3,$4,'instructor','active',now())",[relation,org,center,a.p]);
+  await t.test('canonical instructor revoke releases the slot; inactive grants remain discoverable',async()=>{
+   assert.equal((await mut('person_get_v1',{person_id:a.p},reader)).relationships.find(x=>x.kind==='instructor').state,'active');
+   await fail('role_assign_v1',{person_id:b.p,role:'instructor',scope:{center_id:center}},'PLAN_LIMIT_REACHED',reader);
    const k=key(),done=await revoke(first,reader,k);assert.equal(done.version,2);assert.equal((await revoke(first,reader,k)).replayed,true);
    assert.equal((await read(reader)).items[0].state,'inactive');
-   await fail('role_assign_v1',{person_id:b.p,role:'instructor',scope:{center_id:center}},'PLAN_LIMIT_REACHED',reader);
    await fail('role_revoke_v1',{assignment_id:first.entity.id,expected_version:1,reason:'Stale'},'VERSION_CONFLICT',reader);
-   await db.query("update core.center_relationships set state='inactive',version=version+1 where id=$1",[relation]);
+   assert.equal((await mut('person_get_v1',{person_id:a.p},reader)).relationships.find(x=>x.kind==='instructor').state,'inactive');
    const again=await assign(a.p,reader);active=(await read(reader)).items.find(x=>x.entity.id===again.primary_id);
    assert.equal(active.state,'active');assert.equal(active.versions[0].version,1);
    await revoke(active,reader);assert((await read(reader)).items.every(x=>x.state==='inactive'));
@@ -221,6 +220,26 @@ test('Starter instructor discovery, revoke and replacement preserve one live slo
    await mut('session_cancel_apply_v1',{preview:{id:cancellation.id,token:cancellation.token}});
    assert.deepEqual((await mut('calendar_get_v1',{interval,page:{},needs_instructor:true})).items,[]);
    assert.deepEqual((await mut('management_state_get_v1',workRequest)).items,[]);
+  });
+  await t.test('offline canonical membership is discoverable and removable without granting login; verified assignment adopts it',async()=>{
+   const occupied=(await read()).items.find(x=>x.state==='active');
+   if(occupied){
+    const p=await mut('role_revoke_preview_v1',{assignment_id:occupied.entity.id,expected_version:occupied.versions[0].version});
+    await mut('role_revoke_v1',{assignment_id:occupied.entity.id,expected_version:occupied.versions[0].version,reason:'Prepare offline membership acceptance',impact_approval:{id:p.id,token:p.token}});
+   }
+   const replacement=await assign(b.p);await revoke((await read()).items.find(x=>x.entity.id===replacement.primary_id));
+   const offline=key();
+   await db.query("insert into core.role_assignments(id,org_id,scope_center_id,person_id,role,state,account_link_id) values($1,$2,$3,$4,'instructor','active',null)",[offline,org,center,b.p]);
+   assert.equal((await rows("select private.has_role($1,$2,'instructor',$3) allowed",[org,b.p,center]))[0].allowed,false);
+   const item=(await read()).items.find(x=>x.entity.id===offline);assert.equal(item.state,'active');
+   const adopted=await assign(b.p);assert.equal(adopted.primary_id,offline);assert.equal(adopted.version,2);
+   assert.equal((await rows("select private.has_role($1,$2,'instructor',$3) allowed",[org,b.p,center]))[0].allowed,true);
+   await revoke((await read()).items.find(x=>x.entity.id===offline));
+   const unlinked=(await mut('person_create_v1',{display_name:'Offline legacy instructor',contacts:[]})).primary_id,offlineId=key();
+   await db.query("insert into core.role_assignments(id,org_id,scope_center_id,person_id,role,state,account_link_id) values($1,$2,$3,$4,'instructor','active',null)",[offlineId,org,center,unlinked]);
+   await fail('role_assign_v1',{person_id:unlinked,role:'instructor',scope:{center_id:center}},'ACCOUNT_LINK_REQUIRED');
+   await revoke((await read()).items.find(x=>x.entity.id===offlineId));
+   assert((await read()).items.every(x=>x.state==='inactive'));
   });
  }finally{await db.end();}
 });

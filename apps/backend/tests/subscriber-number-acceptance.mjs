@@ -29,7 +29,7 @@ test('Abone No allocation, backfill, alias merge and scoped discovery through re
   await t.test('candidates and instructors do not allocate; concurrent first student intents allocate exactly once',async()=>{
    first=await person('First numbered candidate');second=await person('Second numbered candidate');
    assert.equal(await number(first),null);assert.deepEqual(await ledger(),[]);
-   await db.query("insert into core.center_relationships(id,org_id,center_id,person_id,kind,state,started_at) values($1,$2,$3,$4,'instructor','active',now())",[key(),org,center,second]);
+   await db.query("insert into core.role_assignments(id,org_id,scope_center_id,person_id,role,state,account_link_id) values($1,$2,$3,$4,'instructor','active',null)",[key(),org,center,second]);
    assert.equal(await number(second),null);assert.deepEqual(await ledger(),[]);
    const k=key(),body={person_id:first};const responses=await Promise.all([mut('student_activate_v1',body,k),mut('student_activate_v1',body,k)]);
    assert.equal(responses[0].primary_id,responses[1].primary_id);assert(responses.some(x=>x.replayed));assert.equal(await number(first),'1001');
@@ -152,6 +152,38 @@ test('Abone No allocation, backfill, alias merge and scoped discovery through re
    await assert.rejects(db.query('update private.subscriber_numbers set number=number+10000 where org_id=$1 and number=1001',[org]),/INVALID_STATE_TRANSITION/);
    const beforeNo=await number(first);await assert.rejects(db.query('update core.people set display_name=$2,version=version+1 where id=$1',[first,'Renamed subscriber']),/FORBIDDEN/);assert.equal(await number(first),beforeNo);
    const unlinked=await get(second),beforeUnlinked=await number(second);await mut('person_update_v1',{person_id:second,expected_version:unlinked.version,patch:{display_name:'Renamed unlinked subscriber'}});assert.equal(await number(second),beforeUnlinked);
+  });
+  await t.test('offline instructor membership survives person merge without becoming an account capability',async()=>{
+   for(const scenario of ['unlinked','linked-source','duplicate-target']){
+    const source=await person('Offline merge source '+scenario),target=await person('Offline merge target '+scenario);
+    await db.query("insert into core.role_assignments(id,org_id,scope_center_id,person_id,role,state,account_link_id) values($1,$2,$3,$4,'instructor','active',null)",[key(),org,center,source]);
+    if(scenario==='duplicate-target')await db.query("insert into core.role_assignments(id,org_id,scope_center_id,person_id,role,state,account_link_id) values($1,$2,$3,$4,'instructor','active',null)",[key(),org,center,target]);
+    if(scenario==='linked-source'){
+     const user=await authUser('offline-linked-source'),account=await must(user,'account_get_v1');
+     await db.query("insert into core.account_links(id,org_id,account_id,person_id,state,verified_at) values($1,$2,$3,$4,'active',now())",[key(),org,account.id,source]);
+    }
+    const p=await preview(source,target);assert.deepEqual(p.blockers,[],scenario);const mergeKey=key();await apply(p,mergeKey);
+    assert.equal((await apply(p,mergeKey)).replayed,true);
+    const active=(await db.query("select person_id,account_link_id from core.role_assignments where org_id=$1 and scope_center_id=$2 and person_id=any($3::uuid[]) and role='instructor' and state='active'",[org,center,[source,target]])).rows;
+    assert.deepEqual(active,[{person_id:target,account_link_id:null}],scenario);
+    assert.equal((await db.query("select private.has_role($1,$2,'instructor',$3) allowed",[org,target,center])).rows[0].allowed,false,scenario);
+    const personView=await get(target);assert.deepEqual(personView.relationships.filter(x=>x.kind==='instructor'&&x.state==='active'),[{center_id:center,kind:'instructor',state:'active'}],scenario);
+    assert.equal((await db.query("select count(*)::int n from private.person_center_relationships where org_id=$1 and center_id=$2 and person_id=$3 and kind='instructor' and state='active'",[org,center,target])).rows[0].n,1,scenario);
+    if(scenario==='linked-source')assert.equal((await db.query("select count(*)::int n from core.account_links where org_id=$1 and person_id=$2 and state='active' and verified_at is not null",[org,target])).rows[0].n,1);
+   }
+  });
+  await t.test('merging a former instructor into a normal student preserves inactive history without promoting a role',async()=>{
+   const source=await person('Former instructor merge source'),target=await person('Normal student merge target'),role=key();
+   await mut('student_activate_v1',{person_id:target});
+   await db.query("insert into core.role_assignments(id,org_id,scope_center_id,person_id,role,state,account_link_id) values($1,$2,$3,$4,'instructor','inactive',null)",[role,org,center,source]);
+   const historical=(await db.query('select * from core.role_assignments where id=$1',[role])).rows;
+   const p=await preview(source,target);assert.deepEqual(p.blockers,[]);await apply(p);
+   assert.deepEqual((await db.query('select * from core.role_assignments where id=$1',[role])).rows,historical);
+   assert.deepEqual((await db.query('select state,merged_into_id from core.people where id=$1',[source])).rows,[{state:'merged',merged_into_id:target}]);
+   assert.equal((await db.query('select private.p07_same_person($1,$2,$3) same',[org,source,target])).rows[0].same,true);
+   assert.equal((await db.query("select count(*)::int n from core.role_assignments where org_id=$1 and person_id=any($2::uuid[]) and role='instructor' and state='active'",[org,[source,target]])).rows[0].n,0);
+   const view=await get(target);assert(view.relationships.some(x=>x.kind==='student'&&x.state==='active'));assert(!view.relationships.some(x=>x.kind==='instructor'&&x.state==='active'));
+   assert.equal((await db.query("select private.has_role($1,$2,'instructor',$3) allowed",[org,target,center])).rows[0].allowed,false);
   });
  }finally{await db.end();}
 });

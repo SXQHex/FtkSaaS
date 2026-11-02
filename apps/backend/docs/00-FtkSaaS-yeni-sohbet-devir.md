@@ -4,7 +4,7 @@
 
 ## Kaynak tabanı
 
-Güncel çalışma tabanı main `5137b69fc436e49ca46dc47af86d1e88ea1a5766` (frontend PR141). Aynı SHA için [main proof](https://github.com/SXQHex/FtkSaaS/actions/runs/41458486442), [merge proof](https://github.com/SXQHex/FtkSaaS/actions/runs/41458486529) ve [development teslimi](https://github.com/SXQHex/FtkSaaS/actions/runs/41458609116) completed/success doğrulandı. XREQ-009 gerçek frontend tüketici kabulü [ortak talepte](../../../docs/requests.md#xreq-009-frontend-kabul) tamamlandı; frontend yayın/ekran kanıtının sahibi kendi alanıdır.
+Güncel çalışma tabanı main `152bdcba16f8b26e810cbe2dd91f0a46d5260a9e`. Aynı SHA için [main proof](https://github.com/SXQHex/FtkSaaS/actions/runs/41463231637), [merge proof](https://github.com/SXQHex/FtkSaaS/actions/runs/41463231424) ve [development teslimi](https://github.com/SXQHex/FtkSaaS/actions/runs/41463403985) completed/success doğrulandı. XREQ-009 gerçek frontend tüketici kabulü [ortak talepte](../../../docs/requests.md#xreq-009-frontend-kabul) tamamlandı; XREQ-011 tek eğitmen yaşam döngüsü düzeltmesinin yeni kabulü bundan ayrıdır.
 
 S05'in beş okuma projeksiyonunun backend teslim kaynağı main `a21a87208b3cbca9fc1a877fa41fd7c746fe55cd` (PR139). Aynı SHA için [main proof](https://github.com/SXQHex/FtkSaaS/actions/runs/41450827285), [merge proof](https://github.com/SXQHex/FtkSaaS/actions/runs/41450826811) ve [development teslimi](https://github.com/SXQHex/FtkSaaS/actions/runs/41450894731), attempt1 completed/success doğrulandı. Bu teslim S05'in aşağıdaki beş okuma projeksiyonunu kapsar; genel S05 veya frontend ekran kabulü değildir.
 
@@ -38,6 +38,10 @@ PR137 [aday full clean](https://github.com/SXQHex/FtkSaaS/actions/runs/414373723
 PR139 [aday full clean](https://github.com/SXQHex/FtkSaaS/actions/runs/41445290413), attempt1 head `e9fda3cf9003cbba577a1ec6cde8571cac2a8ac8`, base `2901f4ce3339a5bbc47408f98a0609241ebd7378`, tested merge `a5201619bce98caba6dfbf7eb15917c1381dcc31` üzerinde core, dört API shard, quality ve full-clean toplayıcısını geçti. Yukarıdaki aynı-main proof ve development teslimiyle bu dilimin backend kabulü tamamlandı.
 
 ReservationView, AttendanceEntryView, EntitlementView, FinanceView ve NegativeLimitsView nullable Abone No taşır. Gerçek API kabulü tutarlılık, self/tenant sınırı, alias→UUID→finans ve okumanın numara tahsis etmemesini kapsar. Yerel PostgreSQL çalıştırması ortamın chown yetkisi olmadığı için engelliydi; migration/API kabulünün kaynağı başarılı aday CI'dır. Diğer operasyon DTO'ları için S05 ve frontend ekran kabulü açık.
+
+## Merkez eğitmen yaşam döngüsü düzeltmesi adayı
+
+XREQ-011 / S01.6 kullanıcı kararıyla rol atamasını tek eğitmen aktiflik kaynağı yapar. Eski ilişki geçmişi korunur; kişi/kota/yetkili keşif aynı projeksiyonu kullanır. Offline görev hesabı olmadan korunur; doğrulanmış hesap bağı olmadan erişim açılmaz. Kaynak ve gerçek API regresyonları hazırlandı. Yerel sözleşme/üretim/typecheck/governance/CI-politika kontrolleri geçti; native SQL/API kabulü bu çalışma ortamında çalıştırılamadı. Yeni migration/aday/main/hosted kabulü henüz yok. Önceki PR137/141 kabulü bu veri modeli düzeltmesinin kanıtı değildir.
 
 ## Devam noktası
 
