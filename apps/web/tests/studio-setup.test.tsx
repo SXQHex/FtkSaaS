@@ -11,7 +11,10 @@ import { RoomSetup } from "../src/components/setup/room-setup";
 import { ExceptionForm } from "../src/components/setup/exception-form";
 import { PolicySetup } from "../src/components/setup/policy-setup";
 import { SetupChecklist } from "../src/components/setup/setup-checklist";
+import { CenterDiscipline } from "../src/components/setup/center-disciplines";
+import { ClosureList } from "../src/components/setup/closure-list";
 import { setupStorageKey } from "../src/lib/studio-setup";
+import { setupPolicyKeys } from "../src/lib/setup-policy";
 import { ApiFailure } from "../src/lib/api";
 const mocks = vi.hoisted(() => ({
   call: vi.fn<(operation: string, input: Record<string, unknown>) => Promise<unknown>>(),
@@ -21,12 +24,18 @@ const mocks = vi.hoisted(() => ({
   saved: vi.fn<() => void>(),
   availability: vi.fn<() => Promise<import("@ftksaas/api-contracts").ManagementStateView[]>>(),
   rooms: vi.fn<() => Promise<import("@ftksaas/api-contracts").ManagementStateView[]>>(),
+  relation: vi.fn<() => Promise<import("@ftksaas/api-contracts").ManagementStateView>>(),
+  disciplines: vi.fn<() => Promise<import("@ftksaas/api-contracts").DisciplineView[]>>(),
+  closures: vi.fn<() => Promise<import("@ftksaas/api-contracts").ManagementStateView[]>>(),
 }));
 vi.mock("../src/lib/studio-setup", async (load) => ({
   ...(await load<typeof import("../src/lib/studio-setup")>()),
   setupCall: mocks.call,
   getAvailability: mocks.availability,
   getRooms: mocks.rooms,
+  getCenterDiscipline: mocks.relation,
+  getClosures: mocks.closures,
+  getSetupDisciplines: mocks.disciplines,
   sendSetupCommand: mocks.send,
 }));
 const scope = { actorId: "actor", orgId: "019a2b3c-4d5e-7000-8000-000000000002" };
@@ -56,6 +65,79 @@ beforeEach(() => {
   sessionStorage.clear();
   mocks.availability.mockResolvedValue([]);
   mocks.rooms.mockResolvedValue([]);
+  mocks.closures.mockResolvedValue([]);
+  mocks.disciplines.mockResolvedValue([]);
+});
+test.each([false, true])(
+  "center-discipline write uses only its own relationship version (exists=%s)",
+  async (exists) => {
+    const id = "019a2b3c-4d5e-7000-8000-000000000077";
+    mocks.relation.mockResolvedValue({
+      operation: "center_discipline_set_v1",
+      entity: exists ? { type: "center_disciplines", id } : null,
+      exists,
+      state: exists ? "inactive" : null,
+      versions: exists ? [{ entity: { type: "center_disciplines", id }, version: 8 }] : [],
+      as_of: "2030-01-01T00:00:00Z",
+      current: {
+        operation: "center_discipline_set_v1",
+        values: { discipline_id: id, ...(exists ? { state: "inactive" as const } : {}) },
+      },
+    });
+    mocks.send.mockResolvedValue({});
+    const user = userEvent.setup();
+    render(
+      <CenterDiscipline
+        scope={{ ...scope, centerId: center.id }}
+        discipline={{ id, name: "Tango", state: "active", version: 41 }}
+        onChanged={mocks.saved}
+      />,
+    );
+    await user.click(await screen.findByRole("button", { name: "Merkeze bağla" }));
+    expect(mocks.send.mock.calls[0][0]).toMatchObject({
+      operation: "center_discipline_set_v1",
+      input: {
+        center_id: center.id,
+        discipline_id: id,
+        state: "active",
+        ...(exists ? { expected_version: 8 } : {}),
+      },
+    });
+    expect(Object.hasOwn(mocks.send.mock.calls[0][0].input, "expected_version")).toBe(exists);
+  },
+);
+test("closure list shows UTC intervals without offering edit/delete or an invented reason", async () => {
+  mocks.closures.mockResolvedValue([
+    {
+      operation: "availability_exception_save_v1",
+      entity: { type: "availability_exceptions", id: center.id },
+      exists: true,
+      state: "active",
+      versions: [{ entity: { type: "centers", id: center.id }, version: 11 }],
+      as_of: "2030-01-01T00:00:00Z",
+      current: {
+        operation: "availability_exception_save_v1",
+        values: {
+          resource: { kind: "room", id: center.id },
+          interval: { starts_at: "2030-01-01T10:00:00Z", ends_at: "2030-01-01T11:00:00Z" },
+        },
+      },
+    },
+  ]);
+  render(
+    <ClosureList
+      scope={{ ...scope, centerId: center.id }}
+      resource={{ kind: "room", id: center.id }}
+      revision={0}
+    />,
+  );
+  await screen.findByRole("list");
+  expect(await screen.findAllByText(/1 Oca/)).toHaveLength(2);
+  expect(Array.from(document.querySelectorAll("time")).map((el) => el.dateTime)).toEqual([
+    "2030-01-01T10:00:00Z",
+    "2030-01-01T11:00:00Z",
+  ]);
+  expect(screen.queryByRole("button", { name: /Düzenle|Sil/ })).not.toBeInTheDocument();
 });
 test("Starter policy publication uses organization scope and an explicit false value", async () => {
   mocks.call.mockResolvedValue([
@@ -93,6 +175,18 @@ test("Starter policy publication uses organization scope and an explicit false v
   expect(mocks.send.mock.calls[0][0].input).not.toHaveProperty("expected_version");
 });
 test("the checklist never substitutes discipline counts for an unreadable center link", async () => {
+  mocks.disciplines.mockResolvedValue([
+    { id: center.id, name: "Tango", state: "active", version: 3 },
+  ]);
+  mocks.relation.mockResolvedValue({
+    operation: "center_discipline_set_v1",
+    entity: null,
+    exists: false,
+    state: null,
+    versions: [],
+    as_of: "2030-01-01T00:00:00Z",
+    current: { operation: "center_discipline_set_v1", values: { discipline_id: center.id } },
+  });
   mocks.call.mockResolvedValue({ items: [], next_cursor: null });
   mocks.call.mockImplementation(async (operation) =>
     operation === "policies_get_v1" ? [] : { items: [], next_cursor: null },
@@ -100,10 +194,95 @@ test("the checklist never substitutes discipline counts for an unreadable center
   const user = userEvent.setup();
   render(<SetupChecklist scope={{ ...scope, centerId: center.id }} timezone="Europe/Istanbul" />);
   await user.click(screen.getByRole("button", { name: "Kurulumu kontrol et" }));
-  expect(await screen.findByText(/Disiplinin merkezle güncel/)).toBeVisible();
+  expect(await screen.findByText("Merkeze bağlı aktif disiplin")).toBeVisible();
   expect(screen.getByText(/Kurulum henüz tamamlanmış olarak doğrulanmadı/)).toBeVisible();
-  expect(screen.getAllByText("Kurulum gerekiyor")).toHaveLength(5);
+  expect(screen.getAllByText("Kurulum gerekiyor")).toHaveLength(6);
+  expect(mocks.relation).toHaveBeenCalledWith(scope.orgId, center.id, center.id);
 });
+test.each([null, 0, 40])(
+  "setup preflight requires a positive physical capacity (capacity=%s)",
+  async (capacity) => {
+    mocks.rooms.mockResolvedValue([
+      {
+        operation: "room_save_v1",
+        entity: { type: "rooms", id: center.id },
+        exists: true,
+        state: "active",
+        versions: [],
+        as_of: "2030-01-01T00:00:00Z",
+        current: {
+          operation: "room_save_v1",
+          values: { room_id: center.id, name: "Room", capacity },
+        },
+      },
+    ]);
+    mocks.disciplines.mockResolvedValue([
+      { id: center.id, name: "Tango", state: "active", version: 3 },
+    ]);
+    mocks.relation.mockResolvedValue({
+      operation: "center_discipline_set_v1",
+      entity: { type: "center_disciplines", id: center.id },
+      exists: true,
+      state: "active",
+      versions: [{ entity: { type: "center_disciplines", id: center.id }, version: 8 }],
+      as_of: "2030-01-01T00:00:00Z",
+      current: {
+        operation: "center_discipline_set_v1",
+        values: { discipline_id: center.id, state: "active" },
+      },
+    });
+    mocks.availability.mockResolvedValue([
+      {
+        operation: "availability_save_v1",
+        entity: { type: "availability_rules", id: center.id },
+        exists: true,
+        state: "active",
+        versions: [],
+        as_of: "2030-01-01T00:00:00Z",
+        current: {
+          operation: "availability_save_v1",
+          values: {
+            resource: { kind: "room", id: center.id },
+            rule: {
+              weekdays: [1],
+              local_start: "09:00:00",
+              local_end: "10:00:00",
+              valid_from: "2000-01-01",
+              valid_until: "2099-01-01",
+            },
+          },
+        },
+      },
+    ]);
+    mocks.call.mockImplementation(async (operation) =>
+      operation === "policies_get_v1"
+        ? setupPolicyKeys.map((key) => ({ key }))
+        : {
+            items: [
+              {
+                id: center.id,
+                person_id: center.id,
+                role: "instructor",
+                scope_center_id: center.id,
+                state: "active",
+                version: 1,
+              },
+            ],
+            next_cursor: null,
+          },
+    );
+    const user = userEvent.setup();
+    render(<SetupChecklist scope={{ ...scope, centerId: center.id }} timezone="Europe/Istanbul" />);
+    await user.click(screen.getByRole("button", { name: "Kurulumu kontrol et" }));
+    const ready = capacity === 40;
+    expect(
+      await screen.findByText(
+        ready ? /Kaynak ve politika ön kontrolleri tamamlandı/ : "Kurulum gerekiyor",
+      ),
+    ).toBeVisible();
+    expect(screen.queryByText(/Kaynak ve politika ön kontrolleri tamamlandı/) !== null).toBe(ready);
+  },
+);
 test("an expired result stays blocked when persisting the block fails", async () => {
   mocks.send.mockRejectedValue(new Error("lost"));
   mocks.call.mockImplementation(async (_operation, input) => ({
@@ -180,6 +359,30 @@ test("a late write cannot refresh or announce success in another account context
     complete();
   });
   expect(mocks.saved).not.toHaveBeenCalled();
+});
+test("an ordinary in-flight write is processing, not an uncertain result", async () => {
+  let fail!: (error: Error) => void;
+  mocks.send.mockImplementation(
+    () =>
+      new Promise((_resolve, reject) => {
+        fail = reject;
+      }),
+  );
+  const user = userEvent.setup();
+  render(
+    <SourceForm
+      scope={scope}
+      target={{ kind: "organization", organization }}
+      onSaved={mocks.saved}
+    />,
+  );
+  await user.click(screen.getByRole("button", { name: "Değişiklikleri kaydet" }));
+  expect(screen.getByText("İşlem sürüyor…")).toBeVisible();
+  expect(screen.queryByText(/Sonucu belirsiz bir işlem var/)).not.toBeInTheDocument();
+  await act(async () => {
+    fail(new Error("lost reply"));
+  });
+  expect(await screen.findByText(/Sonucu belirsiz bir işlem var/)).toBeVisible();
 });
 test("a closure appends with the freshly read center aggregate version and explicit interval", async () => {
   mocks.call.mockResolvedValue({ items: [{ ...center, version: 17 }], next_cursor: null });

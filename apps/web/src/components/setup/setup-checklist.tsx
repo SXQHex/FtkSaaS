@@ -5,6 +5,9 @@ import { Button } from "@ftksaas/ui/components/button";
 import {
   getRooms,
   getAvailability,
+  getSetupDisciplines,
+  getCenterDiscipline,
+  readableCenterDiscipline,
   setupCall,
   setupError,
   type SetupScope,
@@ -14,6 +17,7 @@ import { errorKey } from "./setup-command";
 
 type Checks = {
   rooms: boolean;
+  discipline: boolean;
   instructor: boolean;
   roomHours: boolean;
   instructorHours: boolean;
@@ -28,9 +32,10 @@ export function SetupChecklist({ scope, timezone }: { scope: SetupScope; timezon
     if (!request) return;
     let active = true;
     async function load() {
-      const [rooms, policies] = await Promise.all([
+      const [rooms, policies, disciplines] = await Promise.all([
         getRooms(scope.orgId, scope.centerId!),
         setupCall("policies_get_v1", { org_id: scope.orgId, keys: [...setupPolicyKeys] }),
+        getSetupDisciplines(scope.orgId),
       ]);
       const roles = [];
       let cursor: string | null | undefined;
@@ -43,6 +48,11 @@ export function SetupChecklist({ scope, timezone }: { scope: SetupScope; timezon
         roles.push(...result.items);
         cursor = result.next_cursor;
       } while (cursor);
+      const activeDisciplines = disciplines.filter((row) => row.state === "active");
+      const relation =
+        activeDisciplines.length === 1
+          ? await getCenterDiscipline(scope.orgId, scope.centerId!, activeDisciplines[0].id)
+          : null;
       const activeRooms = rooms.filter((room) => room.state === "active" && room.entity);
       const instructors = roles.filter(
         (role) =>
@@ -84,7 +94,16 @@ export function SetupChecklist({ scope, timezone }: { scope: SetupScope; timezon
         });
       if (active)
         setChecks({
-          rooms: activeRooms.length === 1,
+          rooms:
+            activeRooms.length === 1 &&
+            activeRooms[0].current?.operation === "room_save_v1" &&
+            typeof activeRooms[0].current.values.capacity === "number" &&
+            activeRooms[0].current.values.capacity > 0,
+          discipline:
+            activeDisciplines.length === 1 &&
+            readableCenterDiscipline(relation, activeDisciplines[0].id) &&
+            relation?.exists === true &&
+            relation.state === "active",
           instructor: instructors.length === 1,
           roomHours: currentHours(roomRules),
           instructorHours: currentHours(instructorRules),
@@ -125,10 +144,11 @@ export function SetupChecklist({ scope, timezone }: { scope: SetupScope; timezon
               <span>{t(value ? "verified" : "needsSetup")}</span>
             </li>
           ))}
-          <li className="py-3">{t("disciplineConnectionBlocked")}</li>
         </ul>
       )}
-      <p className="text-sm">{t("setupIncomplete")}</p>
+      <p className="text-sm">
+        {t(checks && Object.values(checks).every(Boolean) ? "setupVerified" : "setupIncomplete")}
+      </p>
     </section>
   );
 }

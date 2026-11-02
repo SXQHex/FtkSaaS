@@ -951,7 +951,7 @@
     "unreadableRoom": "Odanın güncel değerleri veya sürümü okunamadı. Yenileyin.",
     "noRooms": "Bu merkezde oda yok.",
     "closureTitle": "Tarih aralığını kapat",
-    "closureHint": "Merkezin saat dilimindeki zamanları UTC farkıyla yazın (ör. +03:00). Bu işlem yeni bir kapanış ekler. Mevcut kapanışların liste okuması henüz sunulmuyor; kayıtlı haftalık saatler silinmez.",
+    "closureHint": "Merkezin saat dilimindeki zamanları UTC farkıyla yazın (ör. +03:00). Bu işlem yeni bir kapanış ekler; haftalık saatleri değiştirmez.",
     "closureStart": "Kapanış başlangıcı",
     "closureEnd": "Kapanış bitişi",
     "closureReason": "Kapanış gerekçesi",
@@ -1001,7 +1001,21 @@
       "instructor": "Tek aktif eğitmen",
       "roomHours": "Odanın geçerli haftalık saatleri",
       "instructorHours": "Eğitmenin geçerli haftalık saatleri",
-      "policies": "İşletim politikaları"
-    }
+      "policies": "İşletim politikaları",
+      "discipline": "Merkeze bağlı aktif disiplin"
+    },
+    "centerDisciplines": "Merkezin disiplinleri",
+    "noDisciplines": "Önce organizasyon disiplini oluşturun.",
+    "disciplineLinked": "Disiplin bu merkeze bağlı ve etkin.",
+    "disciplineUnlinked": "Disiplin bu merkezde etkin değil.",
+    "linkDiscipline": "Merkeze bağla",
+    "unlinkDiscipline": "Merkez bağlantısını pasifleştir",
+    "unreadableRelation": "İlişkinin kendi durumu veya sürümü doğrulanamadı. Yenileyin.",
+    "closuresTitle": "Kayıtlı kapanışlar",
+    "closuresHint": "Saatler tarayıcı saat diliminde gösterilir. Kapanışlar yalnız eklenir; mevcut kayıtlar bu ekranda düzenlenmez veya silinmez. Kişisel gerekçeler paylaşılmaz.",
+    "noClosures": "Bu kaynak için kapanış kaydı yok.",
+    "unreadableClosure": "Kapanış aralığı bu kaynak için doğrulanamadı.",
+    "setupVerified": "Kaynak ve politika ön kontrolleri tamamlandı. Belirli ders saatinin uygunluğu ve çakışmalar program önizlemesinde ayrıca doğrulanır.",
+    "processing": "İşlem sürüyor…"
   }
 }

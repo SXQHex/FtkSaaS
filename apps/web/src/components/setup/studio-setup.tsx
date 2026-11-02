@@ -10,6 +10,7 @@ import type {
 import { Button } from "@ftksaas/ui/components/button";
 import { setupCall, setupError, type SetupScope } from "../../lib/studio-setup";
 import { SourceForm, DisciplineForm, SelfCenterAccess } from "./source-forms";
+import { CenterDisciplines } from "./center-disciplines";
 import { SetupChecklist } from "./setup-checklist";
 import { PolicySetup } from "./policy-setup";
 import { RoomSetup } from "./room-setup";
@@ -153,7 +154,6 @@ function DisciplinesSetup({ scope, onChanged }: { scope: SetupScope; onChanged: 
           </details>
         </div>
       )}
-      <p className="text-sm text-muted-foreground">{t("disciplineConnectionBlocked")}</p>
     </section>
   );
 }
@@ -193,6 +193,7 @@ function CenterSetup({
             onSaved={onChanged}
           />
           <SetupChecklist scope={scope} timezone={center.timezone} />
+          <CenterDisciplines scope={scope} onChanged={onChanged} />
           <RoomSetup scope={scope} onChanged={onChanged} />
           <RoleSetup scope={scope} onChanged={onChanged} />
         </>
