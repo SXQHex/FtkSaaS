@@ -121,14 +121,21 @@ Her modülün “bitti” ölçütü kendi aşağıdaki kabul senaryosu **ve** b
 
 **Ekranlar:** Stüdyo kurulum kontrol listesi; organizasyon/merkez bilgisi; oda; disiplin; tek eğitmen ve yönetici kapsamı; haftalık uygunluk/istisnalar.
 
-- [ ] Organizasyon bulunmaması, bootstrap/kapalı organizasyon, CM atanmaması ve eksik işletim ayarlarını ayrı kurulum adımları göster. Kayıt olan hesaba otomatik owner/organizasyon yaratma.
-- [ ] `organization_get_v1`/`organization_update_v1`, `centers_list_v1`/`center_create_v1`/`center_update_v1` ile izinli kurulum ve düzenleme. Organizasyon yaratma mevcut platform yetkisine bağlı kalır.
-- [ ] `room_save_v1`, `disciplines_list_v1`, `discipline_save_v1`, `center_discipline_set_v1`: oda kapasitesi, disiplin ve merkez kapsamını gerçek kayıt/sürümle yönet.
-- [ ] `roles_list_v1`, izinli `role_assign_v1`/`role_revoke_v1`, CM atama/kaldırma ve `manager_self_assign_center_v1` akışlarını role uygun sun. Tek eğitmen seçimini uygula; personel izin matrisi açma.
-- [ ] `availability_save_v1`/`availability_exception_save_v1`: günlük aralıklar, kapalı gün/istisna, gece aşımı ve DST sınırlarını göster; mevcut kural sürümünü desteklenen management selector'ından oku.
-- [ ] Kurulum tamamlanması için oda/disiplin/eğitmen, saat dilimi, uygunluk ve gerekli politikaları gerçek okumalardan doğrula. Sadece sihirbazın son adımına ulaşmak “hazır” sayılmaz.
+**Durum: Aktif; kapanmadı.** Eski Draft PR93 kullanıcı isteğiyle birleştirilmeden kapatıldı. Yeni uygulama güncel main `73700e37c3403dc309a5df61989837edbca24b96` üzerinden `feat/web-s02-completion` dalındadır. Aşağıdaki işaretler kaynak uygulamasını belirtir; gerçek ortam/CI/main kabulü ayrıca bekler.
 
-**Kabul:** Yetkili kullanıcı boş stüdyoyu ilk program için hazırlar; ikinci aktif kaynak ve 101. öğrenci backend reddi anlaşılırdır. Owner'ın CM olmadan domain yazması reddedilir. **Bağımlılık:** B01/B06, S12 politika tüketimi, S13 plan okuması.
+- [x] Organizasyon bulunmaması, bootstrap/kapalı/grace erişimi ve merkez seçimi ayrı gösterilir; kayıt olan hesaba otomatik owner/organizasyon yaratılmaz. Bootstrap yalnız merkez oluşturma/self CM eylemlerini açar; normal domain yazmaları açılmaz.
+- [x] `organization_get_v1`/`organization_update_v1`, `centers_list_v1`/`center_create_v1`/`center_update_v1`: güncel entity sürümleri, açık IANA saat dilimi ve başarı sonrası yeniden okuma. Platform organizasyon yaratma yetkisi self-service yapılmaz.
+- [ ] Kaynak yönetimi: `room_save_v1` için gerçek management liste/cursor/sürüm okuması ve mevcut oda düzenleme; sıfır kapasite korunur. `disciplines_list_v1`/`discipline_save_v1` org disiplini oluşturma/düzenlemeye bağlıdır. Merkez–disiplin ilişkisinin kendi durum/sürüm okuması [XREQ-007](../../../docs/requests.md) bekliyor; bu ilişkinin komutu başka entity sürümüyle gönderilmez.
+- [x] `roles_list_v1`, `role_assign_v1`/`role_revoke_v1`, `center_manager_assign_v1`/`center_manager_revoke_v1`, `manager_self_assign_center_v1`: gerçek kişi arama/cursor ve atama sürümü/gerekçesi kullanılır. Backend rol/plan reddi açık gösterilir; owner CM sayılmaz. Personel izin matrisi eklenmez.
+- [ ] `availability_save_v1` mevcut kaynak kuralını kendi sürümüyle okur/düzenler; saniye hassasiyeti korunur, gece aşımı iki günlük aralıkla girilir. `availability_exception_save_v1` append komutu güncel merkez aggregate sürümünü `centers_list_v1` üzerinden alır; açık UTC farkıyla DST seçimi kullanıcıdadır. Mevcut kapanışların yeniden keşfi [XREQ-008](../../../docs/requests.md) bekliyor; haftalık kurallar kapanış listesi gibi sunulmaz.
+- [x] Gerekli S12 politika tüketicisi: Starter organizasyon kapsamındaki iptal, rezervasyon/talep penceresi, eksi limit, borç ve engellenen katılım politikaları canlı okunur; açık değer/yürürlük seçimiyle `policy_publish_v1` yeni sürüm yayımlar. Mevcut rezervasyon etkisi reddi aşılmaz; Business merkez override'ı açılmaz. S13 temel plan/limit/kullanım okuması ayrı paneldedir.
+- [ ] Kurulum kontrol listesi oda/eğitmen, geçerli haftalık saatler ve politika kayıtlarını açık yenilemeyle doğrular. İlişki/kapanış okuması ve gerçek kabul eksikken “stüdyo programa hazır” denmez; belirli saat için program önizlemesi ayrıca gerekir.
+
+**Kaynak doğrulaması:** Vitest/Testing Library/MSW; oda keşfi/cursor, entity sürümü, sıfır kapasite, merkez sürümlü kapanış/DST offset, org-scope false/zero politika, bootstrap, eski org yanıtı, unmount sonrası yazma, aynı key/payload replay, depolama engeli, expired receipt ve yanlış operation/key receipt regresyonları vardır. İlk bağımsız incelemenin çakışan form kimliği, receipt kimliği ve saniye yuvarlama bulguları önce kırmızı testle gösterilip düzeltildi. `pnpm check:frontend` lint/format/typecheck/build ve 333 web + 1 UI testiyle başarılı; sonraki receipt anahtarı ayrımı hedefli testte doğrulanır. Isolation backend testi çalıştırmadan geçti. Son kaynak coverage koşusu 334 web + 1 UI testiyle başarılıdır. Receipt operation koşulunu tersine çeviren mutasyon testi kırdı; kaynak birebir geri alındı ve 26 hedefli test geçti. Kalite guard dokuz testi ve 0 bulguyla geçti. Son bağımsız incelemede kalan Critical/Required runtime bulgu yoktur; inceleme testleri tekrar çalıştırmadı. PR CI kabulü ayrıca bekler.
+
+**Açık gerçek kabul:** Yeni ekranların yetkili yönetici/eğitmen hesabıyla gerçek Auth→Edge→DB ve tarayıcı kabulü yapılmadı. Boş stüdyo kurulumu, owner/CM ayrımı, ikinci kaynak/101. öğrenci reddi, kayıp yanıt ve yabancı kapsam bu kaynağın hosted kabulünde bekler. Yerel Playwright Chromium kurulumu bozuk/eksik ZIP nedeniyle başarısız oldu; test/config/kalite kapıları gevşetilmedi. Önceki PR93 testleri bu yeni kaynağın kabulü sayılmaz.
+
+**Kabul:** Yetkili kullanıcı boş stüdyoyu ilk program için hazırlar; ikinci aktif kaynak ve 101. öğrenci backend reddi anlaşılırdır. Owner'ın CM olmadan domain yazması reddedilir. **Bağımlılık:** [XREQ-007/008](../../../docs/requests.md), B06 ve bu kaynağın gerçek ortam/CI/main kabulü. S02 kapanmadan S03 uygulamasına geçilmez.
 
 <a id="web-s03"></a>
 
@@ -324,7 +331,7 @@ Her modülün “bitti” ölçütü kendi aşağıdaki kabul senaryosu **ve** b
 
 ## 7. Bölüm bölüm teslim: tek aktif bölüm
 
-Kullanıcının son kararı: **Bir bölüm bitmeden sonraki bölümün uygulamasına geçilmez.** Frontend'in aktif bölümü ve sırası bu bölümde tutulur. **WEB-S01 temel teslimi kullanıcı onayıyla kapandı. WEB-S04 geliştirme/kabulü tamamlandı; aktif teslim adımı S04 kapanış kaydının PR/main teslimidir.** Bu teslimden sonra sıradaki bölüm S02’dir; bu dalda S02 uygulaması başlatılmadı. S01’in açık ek testleri kendi bölümünde izlenir ve temel teslimi yeniden açmaz. Aşağıdaki liste bağımlılık sırasını gösterir. Aynı anda birden çok yarım bölüm veya yeni modül dalı açılmaz.
+Kullanıcının son kararı: **Bir bölüm bitmeden sonraki bölümün uygulamasına geçilmez.** Frontend'in aktif bölümü ve sırası bu bölümde tutulur. **WEB-S01 temel teslimi kullanıcı onayıyla kapandı. WEB-S04 PR130 ile main’e alındı; main `67b1ae704a6837fd0cc79057ea2ecb88df9e08a4` için [main proof](https://github.com/SXQHex/FtkSaaS/actions/runs/41363167208) ve [development teslimi](https://github.com/SXQHex/FtkSaaS/actions/runs/41363197120) başarılıdır. Aktif bölüm WEB-S02’dir.** S02 bağımlılıkları ve gerçek kabul tamamlanmadan sıradaki S03 başlatılmaz. S01’in açık ek testleri kendi bölümünde izlenir ve temel teslimi yeniden açmaz. Aşağıdaki liste bağımlılık sırasını gösterir. Aynı anda birden çok yarım bölüm veya yeni modül dalı açılmaz.
 
 S01–S13 işlev kapsamını izler. Teslim bölümleri ise kullanıcının baştan sona kullanabildiği akışlardır: örneğin davet kabulü öğrenci bölümünde, satışın zorunlu belge adımı satış bölümünde çalışır. Ortak bir bağımlılık önce kullanılacağı bölümün içinde tamamlanır ve daha sonra yeniden yazılmaz. Bölümün kabulü ileride yazılacak bir ekrana bağlanmaz: gerektiğinde yetkilendirilmiş mevcut kayıt kullanılır; yeni ekranlar arasındaki uçtan uca bağlantı, bağlantıyı kullanan sonraki bölümün açık kabul maddesidir. Gerekli gerçek kayıt/okuma yoksa bölüm engelli kalır, mock ile kapanmaz. Başka bir bölüme ait henüz yapılmamış işlem, mevcut bölümde çalışıyormuş gibi düğme/özet olarak sunulmaz.
 
@@ -411,7 +418,7 @@ Kapsam dışı feature'ların tam listesi bölüm 2'dedir. Yeni karar veya backe
 
 ## 11. WEB-S01 güncel kabul durumu
 
-**S01 temel teslimi 1 Kasım 2026 kullanıcı onayıyla kapandı.** Kullanıcı, ek testlerin açık ve takipli kalmasını kabul ederek temel teslim kapanışını açıkça onayladı. Bu karar yapılmamış testleri başarılı göstermez; [açık ek kabul kontrolleri](#açık-ek-kabul-kontrolleri) aynı dosyada izlenir. S02 ayrı [Draft PR93](https://github.com/SXQHex/FtkSaaS/pull/93) içinde bekler. WF00/WF01/WF04/WF12/WF17/WF20 sınırları korunur.
+**S01 temel teslimi 1 Kasım 2026 kullanıcı onayıyla kapandı.** Kullanıcı, ek testlerin açık ve takipli kalmasını kabul ederek temel teslim kapanışını açıkça onayladı. Bu karar yapılmamış testleri başarılı göstermez; [açık ek kabul kontrolleri](#açık-ek-kabul-kontrolleri) aynı dosyada izlenir. Eski [PR93](https://github.com/SXQHex/FtkSaaS/pull/93) kullanıcı isteğiyle birleştirilmeden kapatıldı; güncel S02 işi kendi bölümünde izlenir. WF00/WF01/WF04/WF12/WF17/WF20 sınırları korunur.
 
 ### Kaynak ve dağıtım
 
