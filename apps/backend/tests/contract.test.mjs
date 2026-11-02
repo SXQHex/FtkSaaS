@@ -248,7 +248,7 @@ test('unassigned session work list has no calendar horizon and requires explicit
 });
 
 test('operational student views expose optional org subscriber numbers without accepting them as command identities',()=>{
- for(const name of ['ReservationView','AttendanceEntryView','EntitlementView','FinanceView','NegativeLimitsView']){
+ for(const name of ['ReservationView','AttendanceEntryView','EntitlementView','FinanceView','NegativeLimitsView','RoleView','ClassAssignmentView','ProtectedObligationView','LessonRequestView','SeatOfferView','WaitlistEntryView']){
   assert.deepEqual(p.$defs[name].properties.subscriber_number,p.$defs.PersonSummary.properties.subscriber_number,name);
  }
  const base={id,session_id:id,person_id:id,state:'active',mode:'flexible',version:1};
@@ -261,4 +261,8 @@ test('operational student views expose optional org subscriber numbers without a
 test('offline instructor membership uses the canonical role without granting an account capability',()=>{
  const role={id,created_at:'2026-11-02T00:00:00Z',org_id:id,person_id:id,role:'instructor',scope_center_id:id,state:'active',account_link_id:null};
  assert.equal(valid('Table_role_assignments',role),true);
+ const relationship={id,created_at:'2026-11-02T00:00:00Z',org_id:id,center_id:id,person_id:id,kind:'student',state:'active',started_at:'2026-11-02T00:00:00Z'};
+ assert.equal(valid('Table_center_relationships',relationship),true);
+ assert.equal(valid('Table_center_relationships',{...relationship,kind:'instructor',state:'inactive'}),false);
+ assert.equal(valid('RelationshipView',{center_id:id,kind:'instructor',state:'inactive'}),true);
 });

@@ -156,7 +156,11 @@ test('Global identity current projections, safe links, immutable scope and trans
   await t.test('late projection failure rolls back names, account version, receipt and notices together',async()=>{
    const before=await must(user,'account_get_v1'),v=await version();trigger='identity_failure_'+key().replaceAll('-','');
    await db.query(`create function private.${trigger}() returns trigger language plpgsql as $$begin raise exception using errcode='23514',message='synthetic identity projection failure';end$$`);
-   await db.query(`create trigger ${trigger} before update on core.people for each row execute function private.${trigger}()`);
+   await db.query(`create trigger ${trigger} before update on core.people for each row when (new.id in (${people.map(id=>"'"+id+"'::uuid").join(',')})) execute function private.${trigger}()`);
+   const unrelated=key();
+   await db.query("insert into core.people(id,org_id,display_name,state) values($1,$2,'Independent projection fixture','active')",[unrelated,orgs[0]]);
+   const unaffected=await db.query("update core.people set display_name='Independent update' where id=$1 returning display_name",[unrelated]);
+   assert.equal(unaffected.rows[0].display_name,'Independent update');
    const failed=await call(user,'account_profile_update_v1',{expected_version:v,display_name:'Must rollback',given_name:'Rollback'},key());
    assert.equal(failed.result.ok,false);assert.equal(failed.result.error.code,'INTEGRITY_VIOLATION');assert.deepEqual(await must(user,'account_get_v1'),before);assert.equal(await version(),v);
    await db.query(`drop trigger ${trigger} on core.people`);await db.query(`drop function private.${trigger}()`);trigger=null;

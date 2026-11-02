@@ -51,7 +51,9 @@ test('P01-B request intent, alternatives and atomic guarded approval through Aut
   await fail('lesson_request_offer_alternative_v1',{lesson_request_id:r.primary_id,expected_version:1,alternatives},'FORBIDDEN');
   const offered=await mut('lesson_request_offer_alternative_v1',{lesson_request_id:r.primary_id,expected_version:1,alternatives,window_exception:true,reason:'synthetic CM window approval'});
   assert.equal((await rows('select reason from core.audit_events where org_id=$1 and operation_id=$2',[org,offered.operation_id]))[0].reason,'synthetic CM window approval');
-  const alt=(await view(r.primary_id)).alternatives[0];
+  const requestDetail=await view(r.primary_id);
+  assert.equal(requestDetail.subscriber_number,(await rows('select private.subscriber_number($1,$2) n',[org,student.p]))[0].n);
+  const alt=requestDetail.alternatives[0];
   await fail('lesson_request_accept_alternative_v1',{lesson_request_id:r.primary_id,alternative_id:alt.id,expected_version:2},'FORBIDDEN',student.u);
   await pub('request_window',window(180));await mut('lesson_request_accept_alternative_v1',{lesson_request_id:r.primary_id,alternative_id:alt.id,expected_version:2},student.u);
   await mut('lesson_request_withdraw_v1',{lesson_request_id:r.primary_id,expected_version:3},student.u);

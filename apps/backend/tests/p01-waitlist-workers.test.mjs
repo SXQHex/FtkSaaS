@@ -45,6 +45,8 @@ test('P01-C waitlist -> scoped worker -> held offer -> guarded reservation and c
   await assert.rejects(worker.query('select api_v1.p01_jobs_claim($1,$2,1)',[key(),ids()]),/FORBIDDEN/);
   const cli=await execute(process.execPath,['scripts/p01-worker.mjs'],{env:{...process.env,P01_WORKER_DATABASE_URL:workerUrl.toString(),P01_WORKER_ORG_ID:org}});assert.match(cli.stdout,/"succeeded":1/);
   const entries=await view(sid);assert.equal(entries[0].id,w.primary_id);assert.equal(entries[0].state,'offered');assert.equal(await holds(sid),1);assert.equal((await view(sid,second))[0].state,'waiting');
+  const number=(await rows('select private.subscriber_number($1,$2) n',[org,first.p]))[0].n;
+  assert.equal(entries[0].subscriber_number,number);assert.equal(entries[0].offers[0].subscriber_number,number);
   const offer=entries[0].offers[0];assert(Date.parse(offer.expires_at)<=Date.now()+30*60000+1000);
   const blocked=await call(owner,'reservation_create_v1',scope({session_id:sid,person_id:second.p,mode:'flexible'}),key());assert.equal(blocked.result.error.code,'CAPACITY_FULL');
   const b={offer_id:offer.id,expected_version:offer.version},k=key();const noRight=await call(first.u,'seat_offer_accept_v1',scope(b),k);assert.equal(noRight.result.ok,false);assert(['ENTITLEMENT_UNAVAILABLE','CREDIT_LIMIT_EXCEEDED','PARTICIPATION_BLOCKED'].includes(noRight.result.error.code),JSON.stringify(noRight.result));

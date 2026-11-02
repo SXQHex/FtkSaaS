@@ -4,7 +4,7 @@
 
 ## Kaynak tabanı
 
-Güncel çalışma tabanı main `152bdcba16f8b26e810cbe2dd91f0a46d5260a9e`. Aynı SHA için [main proof](https://github.com/SXQHex/FtkSaaS/actions/runs/41463231637), [merge proof](https://github.com/SXQHex/FtkSaaS/actions/runs/41463231424) ve [development teslimi](https://github.com/SXQHex/FtkSaaS/actions/runs/41463403985) completed/success doğrulandı. XREQ-009 gerçek frontend tüketici kabulü [ortak talepte](../../../docs/requests.md#xreq-009-frontend-kabul) tamamlandı; XREQ-011 tek eğitmen yaşam döngüsü düzeltmesinin yeni kabulü bundan ayrıdır.
+Güncel çalışma tabanı main `ba62bb7e95607e6d29e22d5c534a0702249de39b` (PR144). Aynı SHA için [main proof](https://github.com/SXQHex/FtkSaaS/actions/runs/41494180087), [merge proof](https://github.com/SXQHex/FtkSaaS/actions/runs/41494180121) ve [development teslimi](https://github.com/SXQHex/FtkSaaS/actions/runs/41494307268) completed/success doğrulandı. XREQ-009/011 gerçek frontend tüketici kabulü [ortak talepte](../../../docs/requests.md#xreq-011) tamamlandı; yeni XREQ-012 temizlik talebi bu işlevsel kabulü geri açmaz.
 
 S05'in beş okuma projeksiyonunun backend teslim kaynağı main `a21a87208b3cbca9fc1a877fa41fd7c746fe55cd` (PR139). Aynı SHA için [main proof](https://github.com/SXQHex/FtkSaaS/actions/runs/41450827285), [merge proof](https://github.com/SXQHex/FtkSaaS/actions/runs/41450826811) ve [development teslimi](https://github.com/SXQHex/FtkSaaS/actions/runs/41450894731), attempt1 completed/success doğrulandı. Bu teslim S05'in aşağıdaki beş okuma projeksiyonunu kapsar; genel S05 veya frontend ekran kabulü değildir.
 
@@ -39,13 +39,34 @@ PR139 [aday full clean](https://github.com/SXQHex/FtkSaaS/actions/runs/414452904
 
 ReservationView, AttendanceEntryView, EntitlementView, FinanceView ve NegativeLimitsView nullable Abone No taşır. Gerçek API kabulü tutarlılık, self/tenant sınırı, alias→UUID→finans ve okumanın numara tahsis etmemesini kapsar. Yerel PostgreSQL çalıştırması ortamın chown yetkisi olmadığı için engelliydi; migration/API kabulünün kaynağı başarılı aday CI'dır. Diğer operasyon DTO'ları için S05 ve frontend ekran kabulü açık.
 
-## Merkez eğitmen yaşam döngüsü düzeltmesi adayı
+## Merkez eğitmen yaşam döngüsü kabulü
 
-XREQ-011 / S01.6 kullanıcı kararıyla rol atamasını tek eğitmen aktiflik kaynağı yapar. Eski ilişki geçmişi korunur; kişi/kota/yetkili keşif aynı projeksiyonu kullanır. Offline görev hesabı olmadan korunur; doğrulanmış hesap bağı olmadan erişim açılmaz. Kaynak ve gerçek API regresyonları hazırlandı. Yerel sözleşme/üretim/typecheck/governance/CI-politika kontrolleri geçti; native SQL/API kabulü bu çalışma ortamında çalıştırılamadı. İlk PR143 adayı (head `838abe84f659482035613f8b0f4f46967df1c32e`, [run](https://github.com/SXQHex/FtkSaaS/actions/runs/41469441170)) core, API-1 ve API-4 kabulünü geçti; API-3 fixture’ında mükerrer rol ekleme ve API-2’de kaldırılan eğitmenin CM kişi okumasını engelleyen scope regresyonu kaldı. Sayfalama hatası, ilk alt test yarıda kaldığı için eksik fixture oluşmasının sonucudur; sayfalama assertion’ı değiştirilmedi. Kaynak düzeltmesi bu iki kök nedeni giderir; yeni aday/main/hosted kabulü henüz yok. Önceki PR137/141 kabulü bu veri modeli düzeltmesinin kanıtı değildir.
+PR143 son adayı head `66ae71a6970f5ad743d37a258881af2e60f29c52`, base `152bdcba16f8b26e810cbe2dd91f0a46d5260a9e`, tested merge `26fbbe63f1d93aa942fd9fae0ac83061489473c4` için [full clean](https://github.com/SXQHex/FtkSaaS/actions/runs/41477822697), attempt1 core ve dört API shard, quality ve toplayıcı completed/success doğrulandı. Main `2f2f083b54e59d997c375d90bc05528a69344fbe` için [main proof](https://github.com/SXQHex/FtkSaaS/actions/runs/41484288190), [merge proof](https://github.com/SXQHex/FtkSaaS/actions/runs/41484288154) ve [development teslimi](https://github.com/SXQHex/FtkSaaS/actions/runs/41484366762), attempt1 completed/success; hosted backend ve belge doğrulaması başarılıdır. İlk başarısız aday bu kabulün kaynağı değildir.
+
+## Aktif temizlik ve kişi projeksiyonu paketi
+
+XREQ-012 / S01.7 ile S05’in kalan Starter kişi okumaları aynı PR paketinde hazırlanıyor. İki yeni migration; eski instructor satırları için aktarım kontrolü, fiziksel silme/yeniden yazım yasağı, gereksiz çift kaynak dallarının kaldırılması ve altı operasyon DTO’sunda nullable Abone No içerir. F04/F07/F09/F10/F12/F13/F32/F33 kaynak/test izi ilgili WF’lerde korunur; F12 Starter’da açılmaz. Toplam 96 migration ve 219 çağrılabilir operasyon vardır; yeni API eklenmez.
+
+Yerel geçici izole Supabase native ortamı çalıştırıldı. Pasif instructor ilişki satırının eski şemada eklenebildiği kırmızı testle doğrulandı; yeni fiziksel kural ve her iki migration yerel DB’ye uygulandı. DTO sözleşme testi önce RoleView alanı eksikliğiyle kırmızı, ardından altı yeni alanla yeşil oldu.
+
+- Backend verify: 168 sözleşme/yönetişim/restore + 103 CI politika + 9 kalite birim testi başarılı. Belge kontrolü 35 yaşayan dosya / 1245 yerel bağlantıyı doğruladı.
+- Gerçek Auth→Edge→RPC: availability-policies, p01-lesson-requests, p01-waitlist-workers, person-registry, program-session-lifecycle ve room-role-registry mevcut harness’lerinde concurrency2 ile toplam 184 test geçti; atlama/iptal yok. Sınıf/rol/talep/teklif/yükümlülük No alanları, numarasız okuma, tahsis yapmama, alias/birleşim, hesap bağı, geçmiş ve yetki sınırları korundu.
+- Registry harness’inde yalnız Starter plan-gates kökü: 11 test, 278,4 saniye, mevcut 300 saniye sınırında başarılı. Önceki yoğun paralel yerel koşunun süre aşımı başarı sayılmadı; timeout veya assertion eşiği değiştirilmedi.
+- Gerçek paralel koşuda hesap kimliği testinin global fault trigger’ı başka fixture’ın kişi güncellemesini düşürdü. Trigger yalnız kendi kişi UUID’lerine sınırlandı; ilgisiz kişi güncellemesi için assertion eklendi, özgün hata/rollback kontrolleri korundu. Güncel kimlik kökü ayrı gerçek harness tekrarında 12 test ile başarılı.
+- Aktarım eksikliğinde ret, canonical alias üzerinden taşınmış rolün kabulü, diğer tabloların tam snapshot eşitliği, sıfır eski instructor satırı ve yasak yeni fiziksel yazım gerçek DB fixture’ında geçti. Silme koşulunu tersine çeviren mutasyon veritabanı CHECK ile yakalandı ve rollback edildi. Authenticated projeksiyon erişimi ve anon rol-probe yetkisi false doğrulandı.
+- Yerel advisors yalnız belgeli mevcut private.ops_run search_path WARN verdi; yeni advisor bulgusu yok. Bağımsız son kaynak incelemesinde açık Critical/Required davranış bulgusu kalmadı.
+
+Aday/main/hosted kabulü henüz yok; onaylanan kalite kaydı aşağıdadır. Hosted veriye bu çalışma sırasında SQL yazılmadı.
+
+### Onaylanan kalite kaydı ve XREQ-012 kapanışı
+
+Kullanıcı 2 Kasım 2026 tarihinde yalnız `starter-plan-gates-acceptance.mjs:56` assertion değişikliğinin parmak izine bağlı, 30 Kasım bitişli dar istisnayı açıkça onayladı. Kayıt `scripts/ci/floor-exceptions.json` sahibine eklendi; ikinci kanonik rolün PLAN_LIMIT_REACHED assertion’ı korunur. Checker, eşik ve workflow değiştirilmedi. Yeni kayıt bağımsız son kaynak incelemesine ve gerçek aday kabulüne tabidir.
+
+XREQ-012 backend uygulama ve yerel doğrulama kapanış kaydı kullanıcı talimatıyla [ortak talebe](../../../docs/requests.md#xreq-012) yazıldı. Bu, henüz çalışmamış aday CI, merge veya hosted migration kabulü değildir. Bu katmanlar başarılı aynı kaynak kanıtıyla doğrulanınca teslim kapanışı tamamlanır.
 
 ## Devam noktası
 
-A03.1 kaynak/plan/WF eşlemesi main'de; A03.2/A03.3 genel özellik bazlı kanıt ve boşluk uzlaştırması açık. S01.4 backend teslimi tamamlandı. S01.5/XREQ-009 backend teslimi tamamlandı; aktif paket S05 operasyon projeksiyonlarıdır; görev/ölçütler [backlog](remaining-work.md), sıra [kuyruk](production-queue.md) sahibindedir. Genel Starter veya F01–F33 kabulü kapatılmadı.
+A03.1 kaynak/plan/WF eşlemesi main'de; A03.2/A03.3 genel özellik bazlı kanıt ve boşluk uzlaştırması açık. S01.4 backend teslimi tamamlandı. S01.5/XREQ-009 backend teslimi tamamlandı; aktif paket XREQ-012 temizlik ve S05 Starter operasyon projeksiyonlarıdır; görev/ölçütler [backlog](remaining-work.md), sıra [kuyruk](production-queue.md) sahibindedir. Genel Starter veya F01–F33 kabulü kapatılmadı.
 
 ## Mevcut kaynak ve gerçek kabul sınırları
 

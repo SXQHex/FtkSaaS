@@ -4279,6 +4279,7 @@ person_id: string
 duty: Duty
 state: RecordState
 version: PositiveInt
+subscriber_number?: (SubscriberNumber | null)
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -6009,6 +6010,7 @@ role: Role
 scope_center_id: (string | null)
 state: RecordState
 version: PositiveInt
+subscriber_number?: (SubscriberNumber | null)
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -13581,7 +13583,7 @@ center_id: string
  * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
  */
 person_id: string
-kind: RelationshipKind
+kind: ("student" | "staff" | "candidate")
 state: RelationshipState
 started_at: Instant
 ended_at?: (Instant | null)
@@ -13998,6 +14000,7 @@ deficit_ids: string[]
 quantity: Count
 source_sale_id: (string | null)
 existing_version: PositiveInt
+subscriber_number?: (SubscriberNumber | null)
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -18609,6 +18612,7 @@ expires_at?: (Instant | null)
  */
 discipline_id: string
 alternatives: LessonRequestAlternativeView[]
+subscriber_number?: (SubscriberNumber | null)
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -18658,6 +18662,7 @@ joined_at: Instant
 state: WaitState
 offers: SeatOfferView[]
 booking_category?: (BookingCategory | null)
+subscriber_number?: (SubscriberNumber | null)
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -18685,6 +18690,7 @@ person_id: string
 expires_at: Instant
 state: OfferState
 booking_category?: (BookingCategory | null)
+subscriber_number?: (SubscriberNumber | null)
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema

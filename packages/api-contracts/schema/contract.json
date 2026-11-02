@@ -3367,6 +3367,16 @@
         },
         "version": {
           "$ref": "#/$defs/PositiveInt"
+        },
+        "subscriber_number": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/SubscriberNumber"
+            },
+            {
+              "type": "null"
+            }
+          ]
         }
       },
       "required": [
@@ -18496,7 +18506,12 @@
           "$ref": "#/$defs/FtkUuid"
         },
         "kind": {
-          "$ref": "#/$defs/RelationshipKind"
+          "type": "string",
+          "enum": [
+            "student",
+            "staff",
+            "candidate"
+          ]
         },
         "state": {
           "$ref": "#/$defs/RelationshipState"
@@ -24995,6 +25010,16 @@
         },
         "version": {
           "$ref": "#/$defs/PositiveInt"
+        },
+        "subscriber_number": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/SubscriberNumber"
+            },
+            {
+              "type": "null"
+            }
+          ]
         }
       },
       "required": [
@@ -25453,6 +25478,16 @@
         },
         "existing_version": {
           "$ref": "#/$defs/PositiveInt"
+        },
+        "subscriber_number": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/SubscriberNumber"
+            },
+            {
+              "type": "null"
+            }
+          ]
         }
       },
       "required": [
@@ -41874,6 +41909,16 @@
           "items": {
             "$ref": "#/$defs/LessonRequestAlternativeView"
           }
+        },
+        "subscriber_number": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/SubscriberNumber"
+            },
+            {
+              "type": "null"
+            }
+          ]
         }
       },
       "required": [
@@ -41983,6 +42028,16 @@
               "type": "null"
             }
           ]
+        },
+        "subscriber_number": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/SubscriberNumber"
+            },
+            {
+              "type": "null"
+            }
+          ]
         }
       },
       "required": [
@@ -42034,6 +42089,16 @@
           "anyOf": [
             {
               "$ref": "#/$defs/BookingCategory"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "subscriber_number": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/SubscriberNumber"
             },
             {
               "type": "null"
@@ -94326,7 +94391,7 @@
       "uuid": "backend uuid@14.0.3 v7 for all inserted IDs; DB defaults not required",
       "external_transport": "POST /functions/v1/backend-v1/{operation}; direct typed request body",
       "internal_rpc": "service-only api_v1 named functions; actor/session/UUID bank supplied by verified gateway",
-      "migration_count": 94,
+      "migration_count": 96,
       "acceptance_source": "apps/backend/docs/00-FtkSaaS-yeni-sohbet-devir.md"
     },
     "decision_sprint": {
