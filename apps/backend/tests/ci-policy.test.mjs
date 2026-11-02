@@ -236,3 +236,16 @@ test('v2 merge proof retains source and upload obligations for inherited jobs',(
 test('quality thresholds and nested checker config cannot escape trusted policy', () => {
  for(const file of ['CONSTRAINTS.md','apps/web/.gitignore','apps/web/src/.ignore','apps/web/tsconfig.json','packages/typescript-config/base.json','packages/api-contracts/package.json','apps/web/src/nested/.oxlintrc.json','apps/web/vitest.config.ts','apps/web/scripts/verify-isolation.mjs','turbo.json']) assert(policyPath(file),file);
 });
+
+test('sandbox merge proves exact source without borrowing application acceptance',async()=>{
+ const {github}=scopedGithub(['apps/web1/package.json','apps/web1/demo.ts']);
+ github.paginate=async method=>{if(method==='prs')return [{number:9,state:'closed',merged_at:'now',merge_commit_sha:'M',base:{sha:'B'},head:{sha:'H'}}];throw Error('Sandbox must not request test receipts');};
+ assert.equal((await checkPr(github,{repo:{}},9)).state,'success');
+ const outputs={};assert.equal((await verifyMerged(github,{repo:{},sha:'M'},{setOutput:(k,v)=>outputs[k]=v,summary:{addRaw:()=>({write:async()=>{}})}})).kind,'sandbox');
+ assert.equal(outputs.kind,'sandbox');
+ for(const options of [{truncated:true},{moved:true}]){
+  const {github:g}=scopedGithub(['apps/web1/demo.ts'],options);assert.equal((await checkPr(g,{repo:{}},9)).state,'failure');
+ }
+ const {github:g}=scopedGithub(['apps/web1/demo.ts','apps/backend/database/kernel.sql']);g.paginate=async()=>[];
+ assert.equal((await checkPr(g,{repo:{}},9)).state,'failure');
+});

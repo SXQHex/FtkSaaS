@@ -258,7 +258,8 @@
         "packages/api-contracts/src/generated.ts",
         "packages/api-contracts/src/index.ts",
         "packages/api-contracts/src/operations.ts",
-        "packages/api-contracts/src/runtime.ts"
+        "packages/api-contracts/src/runtime.ts",
+        "apps/backend/scripts/ci/design-sandbox.mjs"
       ],
       "operations": [
         "operation_status_get_v1",
@@ -268,8 +269,8 @@
         "management_state_get_v1"
       ],
       "review": {
-        "fingerprint": "a5bcf0d52e04c89b2d7ce2279d75020a11a7e75ec0c87e721b277aaf612f0b8f",
-        "reason": "Kullanıcının 2 Kasım açık onayıyla yalnız incelenmiş assertion parmak izine bağlı 30 Kasım bitişli kalite kaydı eklendi; checker, eşikler ve workflow aynı. Backend uygulama kapanışı CI/main/hosted kabulünden ayrı yazıldı."
+        "fingerprint": "726f3e607136b65bb486bd74f49e34636d30316924e1b2690e19d265e4e6fc4e",
+        "reason": "web1 kullanıcı kararıyla bağımsız npm tasarım alanıdır; saf sandbox ve karma kaynak kapıları, rename ve ölçüm dışı kapsam doğrulandı. Ürün kontrolleri korunur."
       }
     },
     {

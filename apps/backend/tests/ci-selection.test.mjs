@@ -347,3 +347,15 @@ test('automatic candidate tests Draft source, binds the live main base and rejec
  }
  const gate=fs.readFileSync('.github/workflows/ci-gate.yml','utf8');assert(gate.includes("github.event.action != 'edited' || github.event.changes.base != null"));
 });
+
+test('web1 design files are isolated while mixed and renamed production paths retain checks',()=>{
+ for(const p of ['apps/web1/package.json','apps/web1/src/page.tsx','apps/web1/tests/demo.test.ts','apps/web1/docs/notes.md','apps/web1/nested/tsconfig.json']){
+  assert.equal(ownerOf(p),'sandbox');assert.equal(classifyChanges([change(p)]).kind,'sandbox');assert.equal(policyPath(p),false);assert.equal(select([change(p)]).db,false);
+ }
+ for(const p of ['apps/web10/a.ts','apps/web1/../web/a.ts','apps/web1'])assert.throws(()=>ownerOf(p));
+ for(const p of ['package.json','pnpm-lock.yaml','pnpm-workspace.yaml','apps/backend/database/kernel.sql'])assert.equal(classifyChanges([change('apps/web1/demo.ts'),change(p)]).kind,'full');
+ assert.equal(classifyChanges([change('apps/web1/demo.ts'),change('apps/web/page.tsx')]).kind,'frontend');
+ assert.equal(classifyChanges([change('apps/web1/demo.ts'),change('README.md')]).kind,'documentation');
+ const rename=parseChanges('R100\0apps/backend/tests/api-acceptance.test.mjs\0apps/web1/demo.test.mjs\0');assert.equal(classifyChanges(rename).kind,'full');
+ assert.equal(policyPath('apps/web/package.json'),true);assert.equal(policyPath('apps/web1/../web/package.json'),true);
+});

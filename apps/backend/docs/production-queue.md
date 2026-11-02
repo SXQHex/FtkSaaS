@@ -28,7 +28,7 @@ Bu dosya yalnız **sıra, bağımlı teslim paketleri ve kontrol noktalarının*
 
 ### Aktif paketin kalan teslim adımları
 
-1. Önce açık PR149’un CI politika/kapsam tesliminin main sonucunu doğrula; bekleme kaydı [devirde](00-FtkSaaS-yeni-sohbet-devir.md#s07s10-kabul-paketi). Hazır mevcut dalı o tabana taşı, değişen kontrolleri hedefli doğrula; yerel doğrulama ve bağımsız incelemesi tamamlanan S08/S09 eklemeleri ile S10 kanıt uzlaştırmasını tek kabul PR’sinde teslim et. Görev sınırları [S07–S10](remaining-work.md#s07), sonuçlar [devir](00-FtkSaaS-yeni-sohbet-devir.md#s07s10-kabul-paketi) sahibindedir. Gerekli full clean başlayınca kaynak/run bilgilerini paylaş ve turu bitir; polling yapma. Yeni Auth katmanı, kalite istisnası veya CI politikası değişikliği yoktur.
+1. PR149’un main/development kabulü doğrulandı; hazır dal yeni tabanla eşitlendi. S08/S09 eklemeleri ve S10 kanıt uzlaştırmasını tek kabul PR’sinde teslim et. Görev sınırları [S07–S10](remaining-work.md#s07), sonuçlar [devir](00-FtkSaaS-yeni-sohbet-devir.md#s07s10-kabul-paketi) sahibindedir. Gerekli full clean başlayınca kaynak/run bilgilerini paylaş ve turu bitir; polling yapma. Yeni Auth katmanı, kalite istisnası veya CI politikası değişikliği yoktur.
 2. Başarılı aday ve ayrı merge yetkisi sonrası aynı-main/development kabulünü doğrula. Tamamlanan backend dilimlerini kapatırken S07/S08 gerçek tüketici/ortam ve S10 Pro teslim bağımlılıklarını silme. Ardından sıradaki büyük kaynak paketi [S11–S13](remaining-work.md#s11); üst-plan S05 DTO işleri Starter’ı bekletmez.
 
 ## Ortak işletim hattı

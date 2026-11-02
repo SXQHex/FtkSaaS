@@ -86,3 +86,11 @@ test('quality exceptions reject absent reasons and independently expired dates',
   assert.throws(()=>applyExceptions([],[{...entry,expires:'2026-10-31'}],new Date('2026-11-02')));
   assert.deepEqual(applyExceptions([],[entry],new Date('2026-11-02')),[]);
 });
+
+test('design sandbox floor exclusion does not hide removed production assertions',()=>{
+ const added=p=>`diff --git a/${p} b/${p}\n--- a/${p}\n+++ b/${p}\n@@ -0,0 +1 @@\n+${'test'+'.skip'}('demo',()=>{});\n`;
+ assert.deepEqual(inspectDiff(added('apps/web1/demo.test.ts')),[]);
+ assert.equal(inspectDiff(added('apps/web/demo.test.ts')).length,1);
+ const moved="diff --git a/apps/web/tests/a.test.ts b/apps/web/tests/a.test.ts\n--- a/apps/web/tests/a.test.ts\n+++ b/apps/web/tests/a.test.ts\n@@ -1 +0,0 @@\n-assert.equal(value,true);\n";
+ assert.equal(inspectDiff(moved+added('apps/web1/demo.test.ts'))[0].rule,'assertion-changed');
+});

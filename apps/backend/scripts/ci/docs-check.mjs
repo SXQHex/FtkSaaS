@@ -1,3 +1,4 @@
+import {isDesignSandbox} from './design-sandbox.mjs';
 import {repositoryRoot,repoFile} from '../paths.mjs';
 import {ciFile} from '../paths.mjs';
 import fs from 'node:fs';
@@ -36,7 +37,7 @@ export function markdownAnchors(text){
 export function checkDocuments(files){
  let count=0;const targets=new Map();
  for(const f of [...new Set(files)]){
-  if(!fs.existsSync(f))continue;
+  if(isDesignSandbox(f)||!fs.existsSync(f))continue;
   const text=fs.readFileSync(f,'utf8');if(/^(<<<<<<<|=======|>>>>>>>) /m.test(text))throw Error('MERGE_MARKER '+f);
   if(!f.endsWith('.md')||historicalSnapshot(f,text))continue;
   for(const m of text.matchAll(/\[[^\]]*\]\(([^)\s]+)(?:\s+"[^"]*")?\)/g)){
@@ -59,7 +60,7 @@ if(import.meta.url===pathToFileURL(process.argv[1]??'').href){
  process.chdir(execFileSync('git',['rev-parse','--show-toplevel'],{encoding:'utf8'}).trim());
  const args=process.argv.slice(2),changed=args.length?args:JSON.parse(fs.readFileSync(ciFile('selection.json'))).docs;
  // Inbound links, including fragments, survive deletion/move checks. Reports are source snapshots.
- const living=execFileSync('git',['ls-files','-z','--cached','--others','--exclude-standard'],{encoding:'utf8'}).split('\0').filter(p=>p.endsWith('.md')&&!p.startsWith('docs/history/')&&fs.existsSync(p));
+ const living=execFileSync('git',['ls-files','-z','--cached','--others','--exclude-standard'],{encoding:'utf8'}).split('\0').filter(p=>p.endsWith('.md')&&!isDesignSandbox(p)&&!p.startsWith('docs/history/')&&fs.existsSync(p));
  const files=[...new Set([...changed,...living])];
  for(const retired of Object.keys(JSON.parse(fs.readFileSync(new URL('./document-moves.json',import.meta.url)))))if(fs.existsSync(repoFile(retired)))throw Error('RETIRED_DOCUMENT_PATH '+retired);
  updateDocs({check:true});

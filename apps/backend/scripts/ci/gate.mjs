@@ -75,12 +75,12 @@ export async function checkPr(github,context,number){
   assertParents(currentCommit,pr.base.sha,pr.head.sha);
   const scope=await remoteSourceScope(github,repo,pr.base.sha,pr.head.sha);
   const kind=scope.kind;
-  if(kind==='frontend'){
+  if(kind==='frontend'||kind==='sandbox'){
    if(!await policyMatches(github,repo,pr.base.sha,pr.head.sha))throw Error('Workflow policy installation requires review and explicit authorization');
-   await findQualityProof(github,repo,pr,currentCommit.tree.sha);
+   if(kind!=='sandbox')await findQualityProof(github,repo,pr,currentCommit.tree.sha);
    const live=(await github.rest.pulls.get({...repo,pull_number:number})).data;assertReady(live);
    if(live.head.sha!==pr.head.sha||live.base.sha!==pr.base.sha)throw Error('Head/base moved during verification');
-   state='success';description='Backend scope unchanged; no backend tests accepted; frontend checks are independent';
+   state='success';description=kind==='sandbox'?'Isolated web1 design change; no application acceptance claimed':'Backend scope unchanged; no backend tests accepted; frontend checks are independent';
   }else{
   const {binding,run}=await findCandidateProof(github,repo,pr,kind,currentCommit.tree.sha,pr.base.sha);
   const live=(await github.rest.pulls.get({...repo,pull_number:number})).data;
@@ -123,11 +123,11 @@ export async function verifyMerged(github,context,core){
  const {pr,merged}=await resolveMerged(github,context);
  const scope=await remoteSourceScope(github,repo,pr.base.sha,pr.head.sha);
  const kind=scope.kind;
- if(kind==='frontend'){
-  await findQualityProof(github,repo,pr,merged.tree.sha);
-  core.setOutput('kind','frontend');
+ if(kind==='frontend'||kind==='sandbox'){
+  if(kind!=='sandbox')await findQualityProof(github,repo,pr,merged.tree.sha);
+  core.setOutput('kind',kind);
   await core.summary.addRaw('Actual merge parents verified; backend scope unchanged. No backend test or frontend acceptance claimed.\n').write();
-  return {kind:'frontend',actual:sha};
+  return {kind,actual:sha};
  }
  // Installed policy must be identical to the candidate; original base changes
  // still need the separate reviewed, source-specific installation process.

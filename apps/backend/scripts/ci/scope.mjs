@@ -1,3 +1,4 @@
+import {isDesignSandbox} from './design-sandbox.mjs';
 import fs from 'node:fs';
 import {execFileSync} from 'node:child_process';
 import {pathToFileURL} from 'node:url';
@@ -7,6 +8,7 @@ export const ownership=JSON.parse(fs.readFileSync(new URL('./scope.json',import.
 const documents=new Set(JSON.parse(fs.readFileSync(new URL('./document-paths.json',import.meta.url))));
 export function ownerOf(p){
  if(typeof p!=='string'||!p||p.includes('\\')||p.startsWith('/')||p.split('/').some(s=>!s||s==='.'||s==='..'))throw Error('INVALID_SOURCE_PATH '+p);
+ if(isDesignSandbox(p))return 'sandbox';
  // Reviewed prose wins over its containing application directory.
  if(documents.has(p))return 'documentation';
  for(const owner of ['frontend','backend'])if(ownership[owner+'Files'].includes(p)||ownership[owner+'Prefixes'].some(prefix=>p.startsWith(prefix)))return owner;
@@ -21,7 +23,7 @@ export function classifyChanges(changes){
   if(!/^[ACDMRT][0-9]*$/.test(c.status))throw Error('INVALID_SOURCE_STATUS');
   const owner=ownerOf(c.path);scope[owner]=true;scope.paths.push({path:c.path,owner});
  }
- scope.kind=scope.backend?'full':scope.documentation?'documentation':'frontend';
+ scope.kind=scope.backend?'full':scope.documentation?'documentation':scope.frontend?'frontend':'sandbox';
  return scope;
 }
 export function localScope(base,head,cwd=process.cwd()){
