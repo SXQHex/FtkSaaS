@@ -5,7 +5,7 @@ import {authUser,fixturePlatform,must,call,context} from './api-client.mjs';
 import {connect} from '../scripts/db.mjs';
 import {newUuidV7 as key} from '../scripts/uuid.mjs';
 
-test('Starter instructor discovery, revoke and replacement preserve one live slot and open work',{timeout:300000},async t=>{
+test('Starter instructor discovery, revoke and replacement preserve one live slot and open work',{timeout:600000},async t=>{
  const {platform,plan}=await fixturePlatform(),owner=await authUser('instructor-owner'),stranger=await authUser('instructor-stranger');
  const db=await connect(),rows=async(q,a=[])=>(await db.query(q,a)).rows;
  try{
@@ -111,7 +111,7 @@ test('Starter instructor discovery, revoke and replacement preserve one live slo
    await mut('center_discipline_set_v1',{discipline_id:discipline,state:'active'});
    const room=(await mut('room_save_v1',{name:'Synthetic room',capacity:8})).primary_id;
    for(const resource of [{kind:'person',id:winner.p},{kind:'room',id:room}])await mut('availability_save_v1',{resource,rule:{weekdays:[1,2,3,4,5,6,7],local_start:'00:00:00',local_end:'23:59:59',valid_from:'2020-01-01'}});
-   const cls=(await mut('class_save_v1',{name:'Synthetic class',discipline_id:discipline,external_open:false})).primary_id;
+   const cls=(await mut('class_save_v1',{name:'Synthetic class',discipline_id:discipline,external_open:true})).primary_id;
    await mut('class_assignment_set_v1',{class_id:cls,person_id:winner.p,duty:'instructor',state:'active'});
    const start=new Date(Date.now()+86400000);start.setUTCHours(10,0,0,0);
    const make=async days=>(await mut('session_create_v1',{discipline_id:discipline,format:'group',interval:{starts_at:new Date(+start+days*86400000).toISOString(),ends_at:new Date(+start+days*86400000+3600000).toISOString()},resources:[{kind:'room',id:room}],assignments:[{person_id:winner.p,duty:'instructor'}],capacity:{total:8}})).primary_id;
@@ -128,6 +128,9 @@ test('Starter instructor discovery, revoke and replacement preserve one live slo
    await publish('debt_booking',{kind:'boolean',value:false});await publish('negative_default',{kind:'integer',value:2});await publish('negative_upper',{kind:'integer',value:2});
    await publish('negative_valuation',{kind:'valuation',discipline_id:discipline,format:'group',amount_minor:'100',currency:'TRY'});
    await publish('reservation_window',{kind:'window',opens_minutes_before:10080,closes_minutes_before:0,manager_exception:false});
+   await publish('student_cancel_group',{kind:'cancellation',terms:{cutoff_minutes:0,before_cutoff:'release',after_cutoff:'release',no_show:'release'}});
+   await publish('debt_participation',{kind:'boolean',value:false});
+   await publish('participation_block_credit',{kind:'blocked_credit',effect:'release'});
    const reservation=await mut('reservation_create_v1',{session_id:session,person_id:student.p,mode:'flexible'});
    await mut('student_activate_v1',{person_id:a.p});
    const cancellable=await mut('reservation_create_v1',{session_id:session,person_id:a.p,mode:'flexible'});

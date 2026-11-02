@@ -435,8 +435,8 @@
         "role_revoke_preview_v1"
       ],
       "review": {
-        "fingerprint": "28f80853b109e8bac3ac19d02f854e3033b4e3d07a3e86a60de946d08b9d5dcf",
-        "reason": "Eğitmen kaldırma onayı ve normal seans yaşam döngüsü incelendi; rezervasyon, kapasite, zaman ve yoklama mevcut kontrollerle sürer."
+        "fingerprint": "b4e3b554601528c4020760eab9382539a213d3e6a857f8c19e770beff3a5252f",
+        "reason": "CI rezervasyon fixture eksik grup iptal politikası ve sınıf erişimi düzeltildi; gerçek seans yaşam döngüsü assertionları korunuyor"
       }
     },
     {
