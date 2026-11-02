@@ -56,17 +56,13 @@ Yerel geçici izole Supabase native ortamı çalıştırıldı. Pasif instructor
 - Aktarım eksikliğinde ret, canonical alias üzerinden taşınmış rolün kabulü, diğer tabloların tam snapshot eşitliği, sıfır eski instructor satırı ve yasak yeni fiziksel yazım gerçek DB fixture’ında geçti. Silme koşulunu tersine çeviren mutasyon veritabanı CHECK ile yakalandı ve rollback edildi. Authenticated projeksiyon erişimi ve anon rol-probe yetkisi false doğrulandı.
 - Yerel advisors yalnız belgeli mevcut private.ops_run search_path WARN verdi; yeni advisor bulgusu yok. Bağımsız son kaynak incelemesinde açık Critical/Required davranış bulgusu kalmadı.
 
-Aday/main/hosted kabulü henüz yok; kalite bekleme noktası aşağıdadır. Hosted veriye bu çalışma sırasında SQL yazılmadı.
+Aday/main/hosted kabulü henüz yok; onaylanan kalite kaydı aşağıdadır. Hosted veriye bu çalışma sırasında SQL yazılmadı.
 
-### Kalite inceleme bekleme noktası
+### Onaylanan kalite kaydı ve XREQ-012 kapanışı
 
-Floor guard yalnız `apps/backend/tests/starter-plan-gates-acceptance.mjs:56` için `assertion-changed` bulgusu verdi. Yasak eski tablo yazımı artık kota yerine fiziksel kind CHECK ile reddediliyor; ikinci kanonik rolün PLAN_LIMIT_REACHED assertion’ı korunuyor. Bağımsız inceleme bunu test zayıflatması olarak değerlendirmedi. Checker, workflow ve istisna dosyası değiştirilmedi. [Trusted politika yetkisi](../../../docs/ci-policy.md#güvenilir-politika-ve-dağıtım) olmadan aşağıdaki dar kayıt uygulanmaz; gereksiz başarısız full clean başlatılmaz.
+Kullanıcı 2 Kasım 2026 tarihinde yalnız `starter-plan-gates-acceptance.mjs:56` assertion değişikliğinin parmak izine bağlı, 30 Kasım bitişli dar istisnayı açıkça onayladı. Kayıt `scripts/ci/floor-exceptions.json` sahibine eklendi; ikinci kanonik rolün PLAN_LIMIT_REACHED assertion’ı korunur. Checker, eşik ve workflow değiştirilmedi. Yeni kayıt bağımsız son kaynak incelemesine ve gerçek aday kabulüne tabidir.
 
-İncelemeye sunulan tek kayıt:
-
-```json
-{"rule":"assertion-changed","path":"apps/backend/tests/starter-plan-gates-acceptance.mjs","fingerprint":"652c18d9b73ffd3e9988978b67a06e187081048ea4c9160223065ef2727c005e","reason":"Legacy instructor ilişki yazımı yeni fiziksel kind CHECK ile yasaklandı; ikinci kanonik rolün kota assertionı aynen korunuyor. Bağımsız inceleme davranış uyarlamasını doğruladı.","owner":"SXQHex","created":"2026-11-02","expires":"2026-11-30"}
-```
+XREQ-012 backend uygulama ve yerel doğrulama kapanış kaydı kullanıcı talimatıyla [ortak talebe](../../../docs/requests.md#xreq-012) yazıldı. Bu, henüz çalışmamış aday CI, merge veya hosted migration kabulü değildir. Bu katmanlar başarılı aynı kaynak kanıtıyla doğrulanınca teslim kapanışı tamamlanır.
 
 ## Devam noktası
 

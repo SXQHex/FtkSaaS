@@ -268,8 +268,8 @@
         "management_state_get_v1"
       ],
       "review": {
-        "fingerprint": "e279a7860077039c0a3c335ce0249ca780e56d0c30a90eb087643917d8d17d23",
-        "reason": "Son kaynakta fiziksel ilişki yasağı ve rol projeksiyonu testleri, numaralı/numarasız API okumaları ve ProtectedObligation assertionı incelendi; izin/plan ve tarihsel kayıt korumaları aynı."
+        "fingerprint": "a5bcf0d52e04c89b2d7ce2279d75020a11a7e75ec0c87e721b277aaf612f0b8f",
+        "reason": "Kullanıcının 2 Kasım açık onayıyla yalnız incelenmiş assertion parmak izine bağlı 30 Kasım bitişli kalite kaydı eklendi; checker, eşikler ve workflow aynı. Backend uygulama kapanışı CI/main/hosted kabulünden ayrı yazıldı."
       }
     },
     {
