@@ -2,6 +2,7 @@ import test from 'node:test';import assert from 'node:assert/strict';
 import {authUser,fixturePlatform,must,call,context} from './api-client.mjs';
 import {connect} from '../scripts/db.mjs';import {newUuidV7 as key} from '../scripts/uuid.mjs';
 import fs from 'node:fs';import {createHash} from 'node:crypto';
+const settingsCatalogVersion=JSON.parse(fs.readFileSync('config/frontend-settings.json','utf8')).version;
 test('ST-03 Starter preparation defaults copy, authority, reset and program consumer',{timeout:600000},async t=>{
  const {platform,plan}=await fixturePlatform(),owner=await authUser('st03-preparation-owner'),student=await authUser('st03-preparation-student');
  const db=await connect(),rows=async(sql,args=[])=>(await db.query(sql,args)).rows;let org,center,room,discipline,person,studentPerson,roomRule,initialPreparationOrgVersion,packageTemplate;
@@ -33,7 +34,7 @@ test('ST-03 Starter preparation defaults copy, authority, reset and program cons
   await t.test('new center copies approved org proposal; subsequent template edits do not move it',async()=>{
    const v=await read('center');assert.equal(v.values.program_duration_minutes,45);assert.equal(v.program_duration_source.kind,'organization_copy');assert.equal(v.program_duration_source.organization_version,(await read('organization')).version);
    await change('organization',{program_duration_minutes:90});assert.equal((await read('center')).values.program_duration_minutes,45);
-   const catalog=await must(owner,'settings_catalog_get_v1',q('center'));assert.equal(catalog.catalog_version,9);assert.equal(catalog.defaults.program_duration_minutes,60);assert.equal(catalog.fields.find(x=>x.key==='program_duration_minutes').consumer,'schedule_build_program');
+   const catalog=await must(owner,'settings_catalog_get_v1',q('center'));assert.equal(catalog.catalog_version,settingsCatalogVersion);assert.equal(catalog.defaults.program_duration_minutes,60);assert.equal(catalog.fields.find(x=>x.key==='program_duration_minutes').consumer,'schedule_build_program');
   });
   await t.test('an explicit local selection equal to the copy records local provenance',async()=>{
    await change('center',{program_duration_minutes:45});assert.equal((await read('center')).program_duration_source.kind,'center_local');

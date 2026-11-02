@@ -67,6 +67,21 @@ test('Starter resource discovery exposes only implemented typed selectors and re
  assert(valid('ManagementStateView',closure));
  assert(!valid('ManagementStateView',{...closure,current:{...closure.current,values:{...closure.current.values,reason:'private'}}}));
 });
+test('subscriber numbers are lossless decimal identifiers on person and report projections',()=>{
+ for(const n of ['1001','9223372036854775807'])assert(valid('SubscriberNumber',n));
+ for(const n of ['1000','001001','1e3',1001,'-1001'])assert(!valid('SubscriberNumber',n));
+ const person={id,display_name:'Synthetic student',relationships:[],subscriber_number:'1001'};
+ assert(valid('PersonSummary',person));assert(valid('PersonSummary',{...person,subscriber_number:null}));
+ assert(valid('PersonView',{...person,version:1,discipline_relationships:[]}));
+ assert(valid('ReportRow',{group_key:'outstanding_debt',person_id:id,subscriber_number:'1001'}));
+ assert(valid('ReportColumns',['group_key','subscriber_number']));
+ assert(!valid('PersonSummary',{...person,subscriber_number:1001}));
+});
+test('subscriber report column is supported by every persisted template catalogue',()=>{
+ const config=JSON.parse(fs.readFileSync('config/frontend-settings.json'));
+ const fields=config.fields.filter(x=>x.key==='report_templates');assert.equal(fields.length,3);
+ for(const field of fields){const columns=field.schema.items.properties.columns;assert(columns.items.enum.includes('subscriber_number'),field.scope);assert.equal(columns.maxItems,p.$defs.ReportColumns.maxItems);assert.deepEqual(new Set(columns.items.enum),new Set(p.$defs.ReportColumns.items.enum));}
+});
 test('UUIDv7 generator: RFC version/variant, uniqueness, current approximate timestamp',()=>{const before=Date.now();const ids=Array.from({length:20000},newUuidV7);const after=Date.now();assert.equal(new Set(ids).size,ids.length);for(const x of ids){assert(validate(x));assert.equal(version(x),7);const ms=parseInt(x.replaceAll('-','').slice(0,12),16);assert(ms>=before&&ms<=after);}});
 test('retry preserves frozen operation key',()=>{const operation=newOperation();const attempt2={...operation,request_id:newUuidV7()};assert.equal(operation.operation_key,attempt2.operation_key);assert.notEqual(operation.request_id,attempt2.request_id);});
 test('external/provider and existing UUIDv4 acceptance retained, v7 production validator distinct',()=>{const existing='550e8400-e29b-41d4-a716-446655440000';assert(valid('ProviderUuid',existing));assert(valid('FtkUuid',existing));assert(!valid('FtkGeneratedUuidV7',existing));assert(valid('FtkGeneratedUuidV7',id));});

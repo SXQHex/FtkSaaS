@@ -102,6 +102,8 @@ test('P06 actual Auth/private CSV/preview/ledger/report/recovery/scoped worker a
   const k=key();exportJob=(await mut('report_export_start_v1',{report:'collections_debts',filters,format:'csv'},k)).job_id;assert.equal((await mut('report_export_start_v1',{report:'collections_debts',filters,format:'csv'},k)).job_id,exportJob);await drain();
   const ref=await mut('report_file_get_v1',{job_id:exportJob});assert(!ref.download_path.includes('token='));
   const response=await fetch(context().env.API_URL+ref.download_path,{method:'POST',headers:{apikey:context().env.ANON_KEY,authorization:'Bearer '+owner.jwt,'content-type':'application/json'},body:JSON.stringify({client_api_version:1,request_id:key(),org_id:org,center_id:center,operation_key:key(),job_id:exportJob})});assert(response.ok);assert.match(response.headers.get('content-type'),/^text\/csv/);const csv=await response.text();assert.equal(csv.split('\r\n').filter(Boolean).length,29);assert.match(response.headers.get('cache-control'),/no-store/);
+  assert.match(csv.split('\r\n')[0],/,subscriber_number$/);
+  assert(csv.split('\r\n').slice(1).some(row=>row.endsWith(',\"1001\"')));
   assert.equal((await rows("select private.p06_csv_cell('=1+1') cell"))[0].cell,"\"'=1+1\"");
   const audit=await must(owner,'audit_list_v1',scope({subject:{type:'import_jobs',id:job},interval,page:{}}));assert(audit.items.length);assert(audit.items.every(x=>!JSON.stringify(x).includes('worker_role')));
  });

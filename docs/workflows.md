@@ -74,6 +74,10 @@ Takvim aralığı UTC overlap ile, merkez IANA saat dilimi korunarak okunur. CM 
 
 **Hata/kurtarma:** İletişim doğrulaması hesap bağı değildir.101. aktif öğrenci/çözümlenmemiş iş/yanlış merkez reddi otomatik pasifleştirme veya veri silmeyle aşılmaz. **Sonuç/yan etki:** Kişi yaratmak kendiliğinden native hesap, satış veya tahsilat yaratmaz; liste/detay ve etkilenen roller güncellenir. Timeout WF00'a göre takip edilir.
 
+**Abone No:** İlk öğrenci ilişkisinde hesap gerektirmeden organizasyonun 1001'den başlayan numarası tahsis edilir. Kişi detay/liste DTO'sundaki `subscriber_number`, bigint hassasiyetini koruyan ondalık string veya henüz öğrencilik yoksa `null` olur. İstemci tahsis veya düzenleme alanı göndermez; pasifleştirme, yeniden aktivasyon, merkez veya hesap bağı değişimi numarayı değiştirmez. `people_list_v1.query` ad aramasına ek olarak tam numarayı ve birleşmiş eski numarayı arar; yetki/tenant/merkez/Starter kapsamı aynen uygulanır. Sonuçtaki UUID ile mevcut komut çağrılır. Numara ve alias kimlik doğrulama kanıtı değildir.
+
+İlk aktarım, mevcut aktif/pasif öğrenci ilişkilerinin canonical kişi grubundaki en eski `created_at` değerine, eşitlikte kişi UUID'sine göre yapılır; tekrar mevcut tahsisi değiştirmez. Numara tahsisi, merge ve ilk aktarım aynı organizasyon kilidini kullanır. Birleşimde numaralar ilişki taşınmadan önce atomik hedefe bağlanır: iki numarada ilk tahsis edilen (küçük numara), tek numarada mevcut olan korunur; diğer numaralar aynı canonical kişiyi bulan alias olur. Numara sicili merge snapshot'ına dahildir; değişen öğrenci bağı/numara eski preview'u geçersiz kılar. Eski borç/makbuz/export UUID ve byte'ları yeniden yazılmaz. Fiziksel kişi imhasında sicilin kişi bağı temizlenebilir, numara rezervasyonu/sayaç korunur; bu mekanizma privacy purge sürecinin tamamlandığını göstermez.
+
 ## WF05
 
 **Amaç/aktör:** Satış yetkilisi öğrenciye uygun ürün sürümünü satar; hak yaşam döngüsünü yönetir.
@@ -143,6 +147,8 @@ Rapor toplamları sayfanın değil bütün filtreli sonucun toplamıdır; para b
 Export çıktısı private DB byte nesnesidir; public Storage yolu değildir. Job hazır olunca dosya descriptor'ı, sonra authenticated Edge POST ile CSV alınır; `no-store`, 7 günlük erişim süresi ve özgün istek sahibinin canlı yetkileri korunur. Import preview önce job döndürür: worker tamamlandıktan sonra `job.result_reference` ile `preview_get_v1`, ardından satırlar okunur. Apply da job'dır. Upload izni kalıcı domain yazma yetkisi değildir.
 
 Mevcut kişi yalnız `person_ref` ile seçilir; e-postadan otomatik merge yoktur. `opening_credit_value_minor` kalan kredinin değil özgün tüm paketin net bedelidir; açılış borcu ayrı girilir. Geçmiş veri yoksa yalnız desteklenen none/credit_ratio iade yöntemi kullanılabilir; eski katılım/hakediş veya kuruş dilimleri tahmin edilmez. Kalıcı org/namespace/source_key tekilliği, 25 satırlık fenced batch ve satır alt transaction'ı korunur; geç batch hatası bütün batch'i geri alır, başarılı kaynak yeniden uygulanmaz.
+
+Kişi referansı olan güncel rapor satırları nullable `subscriber_number` taşır. Merge alias'ına bağlı tarihsel kişi UUID'si korunurken numara canonical kişinin ilk tahsisini gösterir. Varsayılan yeni CSV dosyaları son sütunda `subscriber_number` içerir; açık `columns` seçiminde bu sütun ayrıca seçilebilir. Merkez/toplam gruplaması kişi numarası üretmez; daha önce üretilmiş dosyalar değiştirilmez. Rapor/export yetkisi ve merkez/plan filtreleri genişlemez; numaradan bulunan kişiyle komutlar UUID üzerinden yürür.
 
 ## WF11
 

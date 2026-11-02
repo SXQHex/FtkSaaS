@@ -267,11 +267,11 @@
 | person_get_v1 | read | none | None | implemented |  |
 | person_create_v1 | command | append_or_current_scope_lock | management_state_get_v1 | contract_only | people.versioned_domain_change |
 | person_update_v1 | command | row_version | person_get_v1 | implemented | people.versioned_domain_change |
-| student_activate_v1 | command | append_or_current_scope_lock | management_state_get_v1 | contract_only | center_relationships.active, organization_unique_student_limit |
+| student_activate_v1 | command | append_or_current_scope_lock | management_state_get_v1 | contract_only | center_relationships.active, organization_unique_student_limit, subscriber_numbers.first_student_allocation |
 | student_deactivate_v1 | command | append_or_current_scope_lock | management_state_get_v1 | contract_only | center_relationships.inactive, preserved_history_finance, reject_open_operations |
 | person_merge_preview_v1 | preview | preview_dependencies | management_state_get_v1 | implemented |  |
 | person_merge_approve_v1 | command | preview_dependencies | management_state_get_v1 | implemented | people.versioned_domain_change |
-| person_merge_apply_v1 | apply | preview_dependencies | person_merge_preview_v1 | implemented | people.alias, account_link_resolution, scoped_relationship_references, merge_approvals.consume |
+| person_merge_apply_v1 | apply | preview_dependencies | person_merge_preview_v1 | implemented | people.alias, account_link_resolution, scoped_relationship_references, merge_approvals.consume, subscriber_numbers.canonical_alias_rebind |
 | calendar_get_v1 | read | none | None | contract_only |  |
 | class_save_v1 | command | create_absent_update_requires_version | management_state_get_v1 | implemented | classes.versioned_domain_change |
 | program_preview_v1 | preview | preview_dependencies | management_state_get_v1 | implemented |  |

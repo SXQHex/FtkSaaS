@@ -63,6 +63,7 @@ test('Starter real Auth/API resource limits, downgrade scope and receipt gates',
    const responses=await Promise.all(students.slice(99).map(person_id=>call(owner,'student_activate_v1',{org_id:org,center_id:center,person_id},key())));
    assert.equal(responses.filter(x=>x.result.ok).length,1);assert.equal(responses.filter(x=>x.result.error?.code==='PLAN_LIMIT_REACHED').length,1);
    assert.equal((await db.query("select count(distinct person_id) n from core.center_relationships where org_id=$1 and kind='student' and state='active'",[org])).rows[0].n,'100');
+   const assigned=(await db.query('select count(*)::int n,min(number)::text first,max(number)::text last from private.subscriber_numbers where org_id=$1',[org])).rows[0];assert.deepEqual(assigned,{n:100,first:'1001',last:'1100'});
   });
   await t.test('CRM and event feature gate applies even when old catalog contains all features',async()=>{
    await reject('leads_list_v1',{page:{limit:10}},'PLAN_FEATURE_UNAVAILABLE');
