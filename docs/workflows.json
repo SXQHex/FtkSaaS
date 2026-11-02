@@ -435,8 +435,8 @@
         "role_revoke_preview_v1"
       ],
       "review": {
-        "fingerprint": "b4e3b554601528c4020760eab9382539a213d3e6a857f8c19e770beff3a5252f",
-        "reason": "CI rezervasyon fixture eksik grup iptal politikası ve sınıf erişimi düzeltildi; gerçek seans yaşam döngüsü assertionları korunuyor"
+        "fingerprint": "76c5793e29f7768d3ecc3a74aec51d0a96778d88e29e2929f4be8483f72e14ef",
+        "reason": "CI kredi reddi yeni org sıfır politikasının daha güncel olmasından kaynaklandı; fixture güncel etkin değerleri okur; UTC geçmiş saatleri gün sınırını aşmaz"
       }
     },
     {

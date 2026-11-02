@@ -124,13 +124,23 @@ test('Starter instructor discovery, revoke and replacement preserve one live slo
    await db.query("update core.sessions set state='occurred',attendance_state='closed' where id=$1",[closed]);
    const history=async()=>JSON.stringify({sessions:await rows('select * from core.sessions where id=any($1::uuid[]) order by id',[[begun,closed]]),duties:await rows('select * from core.session_assignments where session_id=any($1::uuid[]) order by id',[[begun,closed]]),classes:await rows('select * from core.class_assignments where class_id=$1 order by id',[cls])});
    const oldHistory=await history(),student=await linked('instructor-protected-student');await mut('student_activate_v1',{person_id:student.p});
-   const publish=(k,value)=>mut('policy_publish_v1',{center_id:null,key:k,value,effective_at:'2020-01-01T00:00:00Z',mandatory:true});
-   await publish('debt_booking',{kind:'boolean',value:false});await publish('negative_default',{kind:'integer',value:2});await publish('negative_upper',{kind:'integer',value:2});
+   const expectedPolicies=new Map();
+   const publish=async(k,value)=>{
+    await mut('policy_publish_v1',{center_id:null,key:k,value,effective_at:new Date().toISOString(),mandatory:true});
+    expectedPolicies.set(k,value);
+   };
+   await publish('debt_booking',{kind:'boolean',value:false});await publish('negative_upper',{kind:'integer',value:2});
    await publish('negative_valuation',{kind:'valuation',discipline_id:discipline,format:'group',amount_minor:'100',currency:'TRY'});
    await publish('reservation_window',{kind:'window',opens_minutes_before:10080,closes_minutes_before:0,manager_exception:false});
    await publish('student_cancel_group',{kind:'cancellation',terms:{cutoff_minutes:0,before_cutoff:'release',after_cutoff:'release',no_show:'release'}});
    await publish('debt_participation',{kind:'boolean',value:false});
    await publish('participation_block_credit',{kind:'blocked_credit',effect:'release'});
+   await publish('negative_default',{kind:'integer',value:2});
+   const effectivePolicies=await mut('policies_get_v1',{keys:[...expectedPolicies.keys()]});
+   assert.equal(effectivePolicies.length,expectedPolicies.size);
+   for(const policy of effectivePolicies)assert.deepEqual(policy.value,expectedPolicies.get(policy.key),policy.key);
+   const effectiveLimits=await mut('negative_limits_get_v1',{person_id:student.p,discipline_id:discipline});
+   assert.equal(effectiveLimits.default_limit,2);assert.equal(effectiveLimits.upper_limit,2);assert.equal(effectiveLimits.effective_limit,2);
    const reservation=await mut('reservation_create_v1',{session_id:session,person_id:student.p,mode:'flexible'});
    await mut('student_activate_v1',{person_id:a.p});
    const cancellable=await mut('reservation_create_v1',{session_id:session,person_id:a.p,mode:'flexible'});
@@ -159,7 +169,7 @@ test('Starter instructor discovery, revoke and replacement preserve one live slo
    const view=await mut('session_get_v1',{session_id:session});assert.equal(view.id,session);assert.equal(view.state,'planned');assert.equal(view.management_attention,'instructor_required');assert.deepEqual(view.assignments,[]);
    assert.equal((await mut('session_get_v1',{session_id:legacy})).management_attention,'instructor_required');
    // Missing instructor does not stop the normal manager-controlled lifecycle.
-   const closeAt=new Date(Date.now()-3600000);
+   const closeAt=new Date();closeAt.setUTCDate(closeAt.getUTCDate()-1);closeAt.setUTCHours(12,0,0,0);
    await db.query('update core.sessions set starts_at=$2,ends_at=$3 where id=$1',[toClose,closeAt,new Date(+closeAt+1800000)]);
    await db.query('update core.resource_bookings set starts_at=$2,ends_at=$3 where session_id=$1',[toClose,closeAt,new Date(+closeAt+1800000)]);
    const attendance=await mut('attendance_get_v1',{session_id:toClose});
@@ -202,7 +212,7 @@ test('Starter instructor discovery, revoke and replacement preserve one live slo
    assert.deepEqual((await mut('calendar_get_v1',{interval,page:{},needs_instructor:true})).items.map(x=>x.id),[legacy]);
    assert.equal((await rows('select state from core.reservations where id=$1',[reservation.primary_id]))[0].state,'active');
    assert.equal(await history(),oldHistory);
-   const overdue=new Date(Date.now()-86400000);
+   const overdue=new Date();overdue.setUTCDate(overdue.getUTCDate()-1);overdue.setUTCHours(10,0,0,0);
    await db.query('update core.sessions set starts_at=$2,ends_at=$3 where id=$1',[legacy,overdue,new Date(+overdue+3600000)]);
    await db.query('update core.resource_bookings set starts_at=$2,ends_at=$3 where session_id=$1',[legacy,overdue,new Date(+overdue+3600000)]);
    assert.deepEqual((await mut('management_state_get_v1',workRequest)).items.map(x=>x.entity.id),[legacy]);
