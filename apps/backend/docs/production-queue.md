@@ -22,9 +22,9 @@ Bu dosya yalnız **sıra, bağımlı teslim paketleri ve kontrol noktalarının*
 
 **S01–S02 kontrol noktası:** Ayrı teslimin backend kapanışı doğrulandı; [görev kabulü](remaining-work.md#s01) ve [kaynak/ortam kanıtı](00-FtkSaaS-yeni-sohbet-devir.md#s01s02-backend-kabulü) kendi sahiplerindedir. Frontend ekran sırası ve kabulü değişmez.
 
-**Güncel öncelik:** [S01.4](remaining-work.md#s01) ek okuma tesliminin backend kabulü doğrulandı; frontend gerçek kabulü [ortak talep](../../../docs/requests.md) sahibinde kalır. Aktif paket [S03](remaining-work.md#s03)→[S04](remaining-work.md#s04) ve [S05](remaining-work.md#s05) kişi/rapor/export temeli; ayrı aday kabulü ve main/development doğrulaması gerekir.
+**Güncel öncelik:** [S01.4](remaining-work.md#s01) ek okuma tesliminin backend kabulü doğrulandı; frontend gerçek kabulü [ortak talep](../../../docs/requests.md) sahibinde kalır. PR135 ile S03/S04 ve S05 kişi/rapor/export temeli teslim edildi. Aktif paket [S01.5/XREQ-009](remaining-work.md#s01); kendi aday/main/development kabulü gerekir.
 
-**Sonraki işler:** PR135 düzeltme/kabulünün ardından Starter kurulumunu bloke eden [S01.5/XREQ-009](remaining-work.md#s01) → A03.2/A03.3 kanıt/boşluk uzlaştırmasını doğrulanan dilimlerle sürdür; S05'te kalan operasyon projeksiyonları → S06–S08. S03–S05 atomik tahsis, ilk aktarım/birleşim ve operasyon projeksiyonları olarak anlamlı teslim sınırında yürür. Her dilimde uygun odak testi, etkilenen sözleşme/üretilmiş çıktı/WF ve alan devri birlikte güncellenir. Aday kabulü ve yeni kapsamın merge yetkisi ayrıca korunur.
+**Sonraki işler:** S01.5 kabulünün ardından → A03.2/A03.3 kanıt/boşluk uzlaştırmasını doğrulanan dilimlerle sürdür; S05'te kalan operasyon projeksiyonları → S06–S08. S03–S05 atomik tahsis, ilk aktarım/birleşim ve operasyon projeksiyonları olarak anlamlı teslim sınırında yürür. Her dilimde uygun odak testi, etkilenen sözleşme/üretilmiş çıktı/WF ve alan devri birlikte güncellenir. Aday kabulü ve yeni kapsamın merge yetkisi ayrıca korunur.
 
 ## Ortak işletim hattı
 

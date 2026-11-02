@@ -185,8 +185,9 @@ test('Schedule reads through real Auth -> Edge -> RPC',async t=>{
   await mut('permission_set_v1',{center_id:c1,person_id:staff.p,expected_version:2,permission:'reservation.write',enabled:false});
   await fail(staff.u,'reservation_list_v1',{page:{cursor:saved.next_cursor}},'FORBIDDEN');
   const savedI=await list(instructor.u,{page:{limit:1}});assert(savedI.next_cursor);
+  const revokeImpact=await mut('role_revoke_preview_v1',{center_id:c1,assignment_id:instructor.grant.primary_id,expected_version:1});
   const raced=await Promise.all([
-   mut('role_revoke_v1',{center_id:c1,assignment_id:instructor.grant.primary_id,expected_version:1,reason:'Schedule revoke'}),
+   mut('role_revoke_v1',{center_id:c1,assignment_id:instructor.grant.primary_id,expected_version:1,reason:'Schedule revoke',impact_approval:{id:revokeImpact.id,token:revokeImpact.token}}),
    call(instructor.u,'reservation_list_v1',scope({page:{cursor:savedI.next_cursor}}))
   ]);
   const read=raced[1].result;

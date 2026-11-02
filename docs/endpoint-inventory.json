@@ -590,7 +590,9 @@
         }
       },
       "billing_class": "config",
-      "limits": []
+      "limits": [
+        "management_state_get_v1 supports instructor assignment discovery only; writes still require person_id and a verified active account link."
+      ]
     },
     {
       "name": "role_revoke_v1",
@@ -616,7 +618,11 @@
         }
       },
       "billing_class": "config",
-      "limits": []
+      "limits": [
+        "Starter instructor assignment ID/version is discoverable with management_state_get_v1 role_assign_v1 selector. Instructor revoke requires an account-bound impact_approval when future unstarted sessions are affected; exact replay does not detach twice.",
+        "Confirmed revoke preserves sessions, rooms, student reservations and completed/begun history; removes future instructor duties with explicit overrides and increments session versions. No automatic replacement.",
+        "Missing instructor imposes no additional restriction on the existing session lifecycle: normal reservation, schedule, capacity and attendance operations keep their existing authorization, plan, rights and time rules. No automatic cancellation, suspension or replacement; the revoking manager is responsible for arranging an instructor."
+      ]
     },
     {
       "name": "permission_set_v1",
@@ -1087,7 +1093,8 @@
       },
       "billing_class": "read",
       "limits": [
-        "25 October session capacity revision: single total/category limits and physical room ceiling; acceptance pending."
+        "25 October session capacity revision: single total/category limits and physical room ceiling; acceptance pending.",
+        "needs_instructor=true requires explicit center and live manager authority; returns only open unstarted sessions requiring instructor assignment. management_attention is manager-only."
       ]
     },
     {
@@ -1237,7 +1244,8 @@
       },
       "billing_class": "read",
       "limits": [
-        "25 October session capacity revision: single total/category limits and physical room ceiling; acceptance pending."
+        "25 October session capacity revision: single total/category limits and physical room ceiling; acceptance pending.",
+        "manager-only management_attention=instructor_required flags open unstarted sessions, including overdue; missing instructor does not hide an existing session/reservation."
       ]
     },
     {
@@ -4897,7 +4905,9 @@
         "F10",
         "F08",
         "F01",
-        "F02"
+        "F02",
+        "F04",
+        "F13"
       ],
       "required_features": [],
       "runtime_required_features": [],
@@ -4911,7 +4921,9 @@
       },
       "billing_class": "read",
       "limits": [
-        "Original live authority and supported selectors are listed in runtime_selectors. Class/program discovery requires explicit organization/center and live schedule.manage; program reuse requires a fresh preview, never a saved approval."
+        "Original live authority and supported selectors are listed in runtime_selectors. Class/program discovery requires explicit organization/center and live schedule.manage; program reuse requires a fresh preview, never a saved approval.",
+        "role_assign_v1 selector supports instructor only, explicit matching center/scope and live center manager authority; optional person_id discovers active/inactive assignment IDs and row versions. No account link IDs or general F05 personnel listing.",
+        "session_assignment_set_v1 selector key={} or {session_id} lists open unstarted sessions requiring instructor assignment, including overdue; explicit center/live manager, starts_at_asc keyset, real session version and session_detail. No implicit appointment or calendar time window."
       ]
     },
     {
@@ -5888,6 +5900,33 @@
       "billing_class": "exempt",
       "limits": [
         "Existing primary email or linked Google identity email includes unconfirmed accounts. available means no match at check time; the client then calls native signUp. No password, CAPTCHA, PKCE or metadata accepted."
+      ]
+    },
+    {
+      "name": "role_revoke_preview_v1",
+      "status": "operational_development_limited",
+      "external_path": "/functions/v1/backend-v1/role_revoke_preview_v1",
+      "permission": "center.manage",
+      "features": [
+        "F04"
+      ],
+      "required_features": [
+        "F04"
+      ],
+      "runtime_required_features": [
+        "F04"
+      ],
+      "decision_delivery": {
+        "accepted_contract": "DS-2026-10-17",
+        "runtime_conformance": "implemented_pending_acceptance",
+        "open_dependencies": [],
+        "target_request": {
+          "$ref": "#/$defs/Request_role_revoke_preview"
+        }
+      },
+      "billing_class": "config",
+      "limits": [
+        "Preview is account/organization/center/assignment/version and complete affected-session snapshot bound; no role, session or reservation mutation."
       ]
     }
   ]

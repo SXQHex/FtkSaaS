@@ -79,7 +79,8 @@ test('Person registry real Auth/API authorization and contact privacy',async t=>
   const view=await get(instructor,p);assert.equal(view.id,p);assert(!('contacts' in view));assert(view.relationships.every(x=>x.center_id===center));
   await fail('person_get_v1',{person_id:p2},'NOT_FOUND',instructor);
   const list=await must(instructor,'people_list_v1',scope({page:{},query:'Student'}));assert.deepEqual(list.items.map(x=>x.id),[p]);assert(!('contacts' in list.items[0]));
-  await mutate('role_revoke_v1',{assignment_id:instructorGrant.primary_id,expected_version:1,reason:'synthetic revoke'});await fail('person_get_v1',{person_id:p},'NOT_FOUND',instructor);
+  const revokeImpact=await mutate('role_revoke_preview_v1',{assignment_id:instructorGrant.primary_id,expected_version:1});
+  await mutate('role_revoke_v1',{impact_approval:{id:revokeImpact.id,token:revokeImpact.token},assignment_id:instructorGrant.primary_id,expected_version:1,reason:'synthetic revoke'});await fail('person_get_v1',{person_id:p},'NOT_FOUND',instructor);
  });
  // Organization-owned contacts remain editable; linked current identity is tested separately.
  const editable=await create('Editable org person');

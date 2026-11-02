@@ -1,10 +1,10 @@
 # Veritabanı kaynak referansı
 
-Üretilmiştir: `node apps/backend/scripts/update-docs.mjs --write`. Elle düzenleme. Kaynak içerik özeti: `00ff45740a57283b1f6656d8ba072baff6c601a972fe3aaac7dd605f9b72ddee`. Bu özet CI/hosted kabulü değildir; dağıtılan SHA ve ortam CD artifact'ında bulunur.
+Üretilmiştir: `node apps/backend/scripts/update-docs.mjs --write`. Elle düzenleme. Kaynak içerik özeti: `e83c25e6331868941f202965ad33024ca2546940390694882d786481d74b3143`. Bu özet CI/hosted kabulü değildir; dağıtılan SHA ve ortam CD artifact'ında bulunur.
 
 Alan/scope/değişmez görünümü [fiziksel şema kataloğundadır](contracts/04-FtkSaaS-O4-veri-semasi.md). Bu dosya ikinci DDL sözleşmesi değildir. Etkin PostgreSQL şeması migration zincirinin uygulanmasıyla oluşur; dosyaları regex ile birleştirmek nihai şema çıkarımı sayılmaz.
 
-Sıralı migration: 91. Uygulanmış içerik manifesti: [migrations.sha256.json](../apps/backend/database/migrations.sha256.json). CD, migration içeriklerini canlı geçmişle doğrular; dokümantasyon capture adımı ayrıca read-only pg_catalog snapshot ve Supabase CLI DB tiplerini alır. İş verisi/Auth satırı/secret toplanmaz.
+Sıralı migration: 92. Uygulanmış içerik manifesti: [migrations.sha256.json](../apps/backend/database/migrations.sha256.json). CD, migration içeriklerini canlı geçmişle doğrular; dokümantasyon capture adımı ayrıca read-only pg_catalog snapshot ve Supabase CLI DB tiplerini alır. İş verisi/Auth satırı/secret toplanmaz.
 
 | Migration | SHA256 |
 |---|---|
@@ -99,3 +99,4 @@ Sıralı migration: 91. Uygulanmış içerik manifesti: [migrations.sha256.json]
 | [20261102052010_starter_resource_discovery.sql](../apps/backend/supabase/migrations/20261102052010_starter_resource_discovery.sql) | `51feebd1723e8d3264ae22326cb3a680981fa2f7902c6810df53e8977fb15aa5` |
 | [20261102064534_subscriber_numbers.sql](../apps/backend/supabase/migrations/20261102064534_subscriber_numbers.sql) | `52684678ed0a4dc4356d9b538c6073323e7d700465e342aeb5613830a3976eb6` |
 | [20261102070247_subscriber_report_catalog.sql](../apps/backend/supabase/migrations/20261102070247_subscriber_report_catalog.sql) | `ce269916150b64bd31e6771696d61c5ade0c483162daf48e3edc71992256e6b6` |
+| [20261102100000_starter_instructor_management.sql](../apps/backend/supabase/migrations/20261102100000_starter_instructor_management.sql) | `fe6109e2d0b36954964cf1f3274c5512d1011d23a53210e2c47957dde7a98887` |

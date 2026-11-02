@@ -134,6 +134,14 @@ Free plan limitlerinin güncel rakamları değişebilir; kalıcı iş kuralı ol
 - Merkez görevi kaldırıldığında yalnızca ilgili yetkiler kalkar. Hesap–kişi bağlantısı kaldırıldığında o organizasyon kaydına erişim biter; diğer organizasyonlar, roller ve geçmiş silinmez. Yanlış bağlantı kaldırılıp doğru hesaba yeni davet verilebilir.
 - Backend her işlemde güncel rol/bağlantı durumunu kontrol eder. Açık oturum veya eski bağlantı kaldırılmış yetkiyi sürdürmez. Değişiklikler yapan kişi ve zamanla kaydedilir.
 
+### Eğitmen rolünü kaldırma ve seansın korunması
+
+2 Kasım 2026 kullanıcı kararı: esas kayıt seanstır; eğitmen seansa atanır. Merkezdeki eğitmen rolünü kaldırmak seansı silmez, Starter kapsamından düşürmez veya yeni eğitmene otomatik taşımaz. İşlemden önce yöneticiye ilgili merkezde eğitmensiz kalacak planlı, henüz başlamamış ve yoklaması açık seansların listesi gösterilir. Yönetici bu etkiyi açıkça onaylamadan ilgili eğitmen ve seans atamaları kaldırılmaz. Liste, kayıt sürümleri veya yetki değişirse eski onay geçersizdir ve güncel etki yeniden gösterilir.
+
+Onaylı işlem rol kaldırmayı ve ilgili gelecekteki eğitmen atamalarını aynı transaction'da uygular. Seans kimliği, zamanı, oda, kapasite, öğrenci rezervasyonları ve hak/finans kayıtları korunur. Başlamış/tamamlanmış seanslar ile geçmiş fiilî görev ve hakediş değiştirilmez. Sınıf/program şablonu yetki kanıtı değildir; seanstaki açık kaldırma eski varsayılandan kendiliğinden canlanmaz.
+
+Eğitmen atamasının kaldırılması seansın normal yaşam döngüsüne ek kısıtlama getirmez; yeni rezervasyon, kapasite/saat değişikliği ve yoklama mevcut yetki, plan, hak, kapasite ve zaman kurallarıyla devam eder. Bu karar yeni bir rezervasyon yetkisi vermez. Platform eğitmen eksikliği nedeniyle otomatik iptal, durdurma veya yeni eğitmen ataması yapmaz. Seans saatine kadar eğitmen sağlama sorumluluğu atamayı kaldıran yöneticidedir. Eğitmensiz seans iptal edilmiş sayılmaz. Yöneticiye açık “eğitmen atanmalı” bilgisiyle ilgilenilmesi gereken işlerin başında gösterilir; bu yönetim uyarısı öğrenciye veya yetkisiz eğitmene açılmaz. Öğrencinin mevcut rezervasyon ve seans görünürlüğü korunur. Yeni eğitmenin merkezde atanması bu işi kapatmaz; yönetici yeni eğitmeni ilgili seansa mevcut sürüm, yetki, uygunluk ve çakışma denetimleriyle elle atar. Başarılı atama sonrası uyarı güncel kayıttan kalkar.
+
 ### Mükerrer kişi birleştirme
 
 Aynı organizasyondaki mükerrer kayıtlar otomatik değil, yetkili yönetici işlemiyle birleştirilir. Hesap bağlantıları, rezervasyonlar, kullanım hakları ve finans kayıtları önceden kontrol edilir; geçmiş ve merkez aidiyeti korunur. Organizasyonlar arası birleştirme yoktur.
