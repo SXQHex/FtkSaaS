@@ -65,6 +65,22 @@ test('Starter attendance and protected reservation through Auth -> Edge -> RPC',
   sid=(await makeSession()).primary_id;rid=(await book(sid)).primary_id;
   assert.equal((await rows('select count(*)::int n from core.instructor_agreements where org_id=$1',[org]))[0].n,0);
  });
+ await t.test('subscriber identity is consistent in authorized reservation, attendance, finance and limit reads',async()=>{
+  const personView=await must(owner,'person_get_v1',scope({person_id:student.p}));
+  const number=personView.subscriber_number;assert.match(number,/^[1-9][0-9]+$/);
+  const before=await rows('select last_number::text n from private.subscriber_counters where org_id=$1',[org]);
+  const roster=await must(student.u,'reservation_list_v1',scope({person_id:student.p,session_id:sid,page:{}}));
+  assert.equal(roster.items.find(x=>x.id===rid).subscriber_number,number);
+  assert.equal((await get(sid)).entries.find(x=>x.reservation_id===rid).subscriber_number,number);
+  const finance=await must(student.u,'finance_get_v1',scope({person_id:student.p,currency:'TRY',page:{}}));
+  assert.equal(finance.subscriber_number,number);assert.equal(finance.person_id,student.p);
+  const limits=await must(owner,'negative_limits_get_v1',scope({person_id:student.p,discipline_id:discipline}));
+  assert.equal(limits.subscriber_number,number);
+  const managerFinance=await must(owner,'finance_get_v1',scope({person_id:person,currency:'TRY',page:{}}));
+  assert.equal(managerFinance.subscriber_number,null);
+  assert.deepEqual(await rows('select last_number::text n from private.subscriber_counters where org_id=$1',[org]),before);
+  await fail('finance_get_v1',{person_id:student.p,currency:'TRY',page:{}},'NOT_FOUND',outsider);
+ });
  await t.test('Starter keeps paid and self-service plan boundaries conditional',async()=>{
   await mut('class_save_v1',{name:'Starter self-service class',discipline_id:discipline,external_open:true});
   await fail('role_assign_v1',{person_id:instructor.p,role:'staff',scope:{center_id:center}},'PLAN_FEATURE_UNAVAILABLE');

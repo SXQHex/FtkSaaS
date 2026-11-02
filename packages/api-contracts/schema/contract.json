@@ -3798,6 +3798,16 @@
               "type": "null"
             }
           ]
+        },
+        "subscriber_number": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/SubscriberNumber"
+            },
+            {
+              "type": "null"
+            }
+          ]
         }
       },
       "required": [
@@ -3835,6 +3845,16 @@
           "anyOf": [
             {
               "$ref": "#/$defs/EligibilitySnapshot"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "subscriber_number": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/SubscriberNumber"
             },
             {
               "type": "null"
@@ -4015,6 +4035,16 @@
           "items": {
             "$ref": "#/$defs/Table_freezes"
           }
+        },
+        "subscriber_number": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/SubscriberNumber"
+            },
+            {
+              "type": "null"
+            }
+          ]
         }
       },
       "required": [
@@ -4143,6 +4173,16 @@
         },
         "movements": {
           "$ref": "#/$defs/Page_CashSummary"
+        },
+        "subscriber_number": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/SubscriberNumber"
+            },
+            {
+              "type": "null"
+            }
+          ]
         }
       },
       "required": [
@@ -41122,6 +41162,16 @@
               "type": "null"
             }
           ]
+        },
+        "subscriber_number": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/SubscriberNumber"
+            },
+            {
+              "type": "null"
+            }
+          ]
         }
       },
       "required": [
@@ -59743,7 +59793,10 @@
           "target_request": {
             "$ref": "#/$defs/Request_reservation_list"
           }
-        }
+        },
+        "runtime_limits": [
+          "Authorized person rows include optional subscriber_number (org-scoped canonical student number, null when none); UUID inputs and live permissions remain unchanged. No number allocation or additional person access is granted by this read."
+        ]
       },
       {
         "name": "waitlist_join_v1",
@@ -60413,7 +60466,8 @@
         "runtime_external_path": "/functions/v1/backend-v1/attendance_get_v1",
         "runtime_rpc": "api_v1.attendance_get_v1",
         "runtime_limits": [
-          "Cross-center settlement accrual/reversal remains a separate delivery; instructor payment commands remain contract-only."
+          "Cross-center settlement accrual/reversal remains a separate delivery; instructor payment commands remain contract-only.",
+          "Authorized person rows include optional subscriber_number (org-scoped canonical student number, null when none); UUID inputs and live permissions remain unchanged. No number allocation or additional person access is granted by this read."
         ]
       },
       {
@@ -61627,7 +61681,8 @@
         "runtime_transport": "authenticated Edge adapter -> service-only RPC; rules/transaction in PostgreSQL",
         "runtime_external_path": "/functions/v1/backend-v1/entitlements_get_v1",
         "runtime_limits": [
-          "P01-A pool/catalog read only; no seat/right/booking guarantee. Request/waitlist/workers pending."
+          "P01-A pool/catalog read only; no seat/right/booking guarantee. Request/waitlist/workers pending.",
+          "Authorized person rows include optional subscriber_number (org-scoped canonical student number, null when none); UUID inputs and live permissions remain unchanged. No number allocation or additional person access is granted by this read."
         ],
         "required_features": [
           "F06",
@@ -63651,7 +63706,10 @@
           "target_request": {
             "$ref": "#/$defs/Request_finance_get"
           }
-        }
+        },
+        "runtime_limits": [
+          "Authorized person rows include optional subscriber_number (org-scoped canonical student number, null when none); UUID inputs and live permissions remain unchanged. No number allocation or additional person access is granted by this read."
+        ]
       },
       {
         "name": "collection_record_v1",
@@ -75922,7 +75980,9 @@
         "runtime_path": "/functions/v1/backend-v1/negative_limits_get_v1",
         "runtime_external_path": "/functions/v1/backend-v1/negative_limits_get_v1",
         "runtime_rpc": "api_v1.negative_limits_get_v1",
-        "runtime_limits": []
+        "runtime_limits": [
+          "Authorized person rows include optional subscriber_number (org-scoped canonical student number, null when none); UUID inputs and live permissions remain unchanged. No number allocation or additional person access is granted by this read."
+        ]
       },
       {
         "name": "attendance_start_v1",
@@ -94259,7 +94319,7 @@
       "uuid": "backend uuid@14.0.3 v7 for all inserted IDs; DB defaults not required",
       "external_transport": "POST /functions/v1/backend-v1/{operation}; direct typed request body",
       "internal_rpc": "service-only api_v1 named functions; actor/session/UUID bank supplied by verified gateway",
-      "migration_count": 92,
+      "migration_count": 93,
       "acceptance_source": "apps/backend/docs/00-FtkSaaS-yeni-sohbet-devir.md"
     },
     "decision_sprint": {

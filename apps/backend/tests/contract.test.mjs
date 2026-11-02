@@ -246,3 +246,14 @@ test('unassigned session work list has no calendar horizon and requires explicit
  assert(valid('Request_management_state_get',r));assert(!valid('Request_management_state_get',{...r,center_id:null}));
  assert(p['x-contract'].operations.find(o=>o.name==='management_state_get_v1').runtime_selectors.includes('session_assignment_set_v1'));
 });
+
+test('operational student views expose optional org subscriber numbers without accepting them as command identities',()=>{
+ for(const name of ['ReservationView','AttendanceEntryView','EntitlementView','FinanceView','NegativeLimitsView']){
+  assert.deepEqual(p.$defs[name].properties.subscriber_number,p.$defs.PersonSummary.properties.subscriber_number,name);
+ }
+ const base={id,session_id:id,person_id:id,state:'active',mode:'flexible',version:1};
+ assert(valid('ReservationView',{...base,subscriber_number:'1001'}));
+ assert(valid('ReservationView',{...base,subscriber_number:null}));
+ assert(!valid('ReservationView',{...base,subscriber_number:'student-1001'}));
+ assert(!valid('Request_reservation_create',{client_api_version:1,request_id:id,operation_key:id,org_id:id,center_id:id,session_id:id,subscriber_number:'1001',mode:'flexible'}));
+});

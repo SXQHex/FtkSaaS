@@ -268,8 +268,8 @@
         "management_state_get_v1"
       ],
       "review": {
-        "fingerprint": "dbb135a1eff0575689673cb826ce7c113208832faa018eb042c6a2e8d34f734b",
-        "reason": "Eğitmen kaldırma testlerinin açık önizleme onayına uyarlanması ve ortak üretilmiş sözleşme farkı incelendi; bu akışın kendi yetki/iş kuralları değişmedi."
+        "fingerprint": "81cdef0b6dbcae59103a88fea68192a6f1abf85a15b2a9fd2d865950863c2624",
+        "reason": "Güncel main üzerinde S05 yetkili No DTO alanları, migration envanteri ve testler incelendi; UUID/yetki/sayfalama ve diğer akış davranışları korunur."
       }
     },
     {
@@ -582,7 +582,9 @@
         "apps/backend/supabase/migrations/20261101210000_person_management_discovery.sql",
         "docs/client-integration.md",
         "apps/backend/database/subscriber-numbers.sql",
-        "apps/backend/supabase/migrations/20261102064534_subscriber_numbers.sql"
+        "apps/backend/supabase/migrations/20261102064534_subscriber_numbers.sql",
+        "apps/backend/database/subscriber-operation-projections.sql",
+        "apps/backend/supabase/migrations/20261102121549_subscriber_operation_projections.sql"
       ],
       "operations": [
         "account_access_send_v1",
@@ -601,8 +603,8 @@
         "person_discipline_set_v1"
       ],
       "review": {
-        "fingerprint": "1c06e2c7681881b43569167cbd1cc7aa517791b1abf9dce92b78524cece7c8fd",
-        "reason": "Eğitmen kaldırma testlerinin açık önizleme onayına uyarlanması ve ortak üretilmiş sözleşme farkı incelendi; bu akışın kendi yetki/iş kuralları değişmedi."
+        "fingerprint": "7e359586b0915226a17221f5f366fea15e398ec72a5b20b9b8b8276ae48508a4",
+        "reason": "S05 yetkili DTO alanları ve mevcut SQL/test kapsamı incelendi; No yalnız mevcut izinli kişi satırına eklenir, UUID/yetki/plan/sayfalama değişmez. Ortak metadata üretimi diğer akış davranışını değiştirmez."
       }
     },
     {
@@ -689,8 +691,8 @@
         "negative_limits_get_v1"
       ],
       "review": {
-        "fingerprint": "14cc5818ed1683846cc4e2c97797b66919d1b712f48346d5361732c97878da5e",
-        "reason": "Eğitmen kaldırma testlerinin açık önizleme onayına uyarlanması ve ortak üretilmiş sözleşme farkı incelendi; bu akışın kendi yetki/iş kuralları değişmedi."
+        "fingerprint": "52f36a953d27d99960e1f6933cec3fc6b809f03f1e1d885fc7942fd46522fa3d",
+        "reason": "S05 yetkili DTO alanları ve mevcut SQL/test kapsamı incelendi; No yalnız mevcut izinli kişi satırına eklenir, UUID/yetki/plan/sayfalama değişmez. Ortak metadata üretimi diğer akış davranışını değiştirmez."
       }
     },
     {
@@ -759,8 +761,8 @@
         "reservation_capacity_override_v1"
       ],
       "review": {
-        "fingerprint": "d1f3f8fda9a3f3f49f9efa133d1b4f2789f8509b46259a1fbd2ab3dfe4548698",
-        "reason": "Eğitmen kaldırma onayı ve normal seans yaşam döngüsü incelendi; rezervasyon, kapasite, zaman ve yoklama mevcut kontrollerle sürer."
+        "fingerprint": "b1148d87b4558ebb6484ffc41deb30b7cc9753b423deab7e0717b9a434954011",
+        "reason": "S05 yetkili DTO alanları ve mevcut SQL/test kapsamı incelendi; No yalnız mevcut izinli kişi satırına eklenir, UUID/yetki/plan/sayfalama değişmez. Ortak metadata üretimi diğer akış davranışını değiştirmez."
       }
     },
     {
@@ -818,8 +820,8 @@
         "attendance_start_v1"
       ],
       "review": {
-        "fingerprint": "d153a65401b306c133cc9414dd16f1ea6b0886255a28d89d2f7f5608c7399fd4",
-        "reason": "Eğitmen kaldırma onayı ve normal seans yaşam döngüsü incelendi; rezervasyon, kapasite, zaman ve yoklama mevcut kontrollerle sürer."
+        "fingerprint": "50d8afda501d6b9531bc2013fb7ce81a695112d9211eb578aa96f0c488d52c8a",
+        "reason": "S05 yetkili DTO alanları ve mevcut SQL/test kapsamı incelendi; No yalnız mevcut izinli kişi satırına eklenir, UUID/yetki/plan/sayfalama değişmez. Ortak metadata üretimi diğer akış davranışını değiştirmez."
       }
     },
     {
@@ -876,8 +878,8 @@
         "debt_adjust_v1"
       ],
       "review": {
-        "fingerprint": "c305692673d9aa8e9277223cf684e0d39ae6dc9037fededdfee3ed29aa1d6dd9",
-        "reason": "Ortak üretilmiş runtime wrapper farkı yalnız yeni role_revoke_preview_v1 F04 service-only entrypoint ekler; bu akışın komut/izin/etki zinciri değişmedi, mevcut rehber korunur."
+        "fingerprint": "02c7ab8a14725e3137470a33e84ea7a155ea1054b40237544150809fb9462679",
+        "reason": "S05 yetkili DTO alanları ve mevcut SQL/test kapsamı incelendi; No yalnız mevcut izinli kişi satırına eklenir, UUID/yetki/plan/sayfalama değişmez. Ortak metadata üretimi diğer akış davranışını değiştirmez."
       }
     },
     {
@@ -963,8 +965,8 @@
         "file_upload_complete_v1"
       ],
       "review": {
-        "fingerprint": "6e68f766a9e5621a996b8e74db4face07128760f71c9f028b21c90f2ff691efd",
-        "reason": "Ortak üretilmiş runtime wrapper farkı yalnız yeni role_revoke_preview_v1 F04 service-only entrypoint ekler; bu akışın komut/izin/etki zinciri değişmedi, mevcut rehber korunur."
+        "fingerprint": "ba2f7d948bee66abb56db3c07e224030f6cf01f6f36e29630827d2caa0610d48",
+        "reason": "S05 yetkili DTO alanları ve mevcut SQL/test kapsamı incelendi; No yalnız mevcut izinli kişi satırına eklenir, UUID/yetki/plan/sayfalama değişmez. Ortak metadata üretimi diğer akış davranışını değiştirmez."
       }
     },
     {

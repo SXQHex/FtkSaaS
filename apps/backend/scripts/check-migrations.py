@@ -205,3 +205,5 @@ assert next(Path('supabase/migrations').glob('*_native_auth_signup_check.sql')).
 assert next(Path('supabase/migrations').glob('*_invitation_delivery_tracking.sql')).read_text()==Path('database/invitation-delivery.sql').read_text(),'Invitation delivery source drift'
 
 assert next(Path('supabase/migrations').glob('*_starter_instructor_management.sql')).read_text()==Path('database/starter-instructor-management.sql').read_text(),'Starter instructor management source drift'
+
+assert next(Path('supabase/migrations').glob('*_subscriber_operation_projections.sql')).read_text()==Path('database/subscriber-operation-projections.sql').read_text(),'Subscriber operation projections source drift'

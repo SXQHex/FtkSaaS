@@ -70,6 +70,9 @@ test('Abone No allocation, backfill, alias merge and scoped discovery through re
    const next=await person('Chain target');await apply(await preview(target,next));
    for(const no of [sourceNo,targetNo]){const result=await find(no);assert.deepEqual(result.items.map(x=>x.id),[next]);assert.equal(result.items[0].subscriber_number,sourceNo);}
    const unnamed=await person('Unnumbered source');await apply(await preview(unnamed,next));assert.equal(await counter(),before);assert.equal(await number(next),sourceNo);
+   const aliasPerson=(await find(targetNo)).items[0];
+   const currentFinance=await must(owner,'finance_get_v1',scope({person_id:aliasPerson.id,currency:'TRY',page:{}}));
+   assert.equal(currentFinance.subscriber_number,sourceNo);assert.equal(await counter(),before);
    const report=await must(owner,'report_get_v1',scope({report:'collections_debts',filters:{center_ids:[center],interval:{starts_at:new Date(Date.now()-86400000).toISOString(),ends_at:new Date(Date.now()+86400000).toISOString()}},page:{limit:200}}));
    assert.equal(report.rows.items.find(x=>x.person_id===source&&x.group_key==='outstanding_debt').subscriber_number,sourceNo);
    assert(report.columns.includes('subscriber_number'));

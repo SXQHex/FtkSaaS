@@ -6168,6 +6168,7 @@ state: ReservationState
 mode: BookingMode
 version: PositiveInt
 booking_category?: (BookingCategory | null)
+subscriber_number?: (SubscriberNumber | null)
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -6187,6 +6188,7 @@ blocked_reason?: BlockReason
 version: PositiveInt
 protected: Bool
 eligibility_snapshot: (EligibilitySnapshot | null)
+subscriber_number?: (SubscriberNumber | null)
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -6293,6 +6295,7 @@ account_id?: string
 sale_version?: PositiveInt
 sale_state?: SaleState
 freezes?: TableFreezes[]
+subscriber_number?: (SubscriberNumber | null)
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -6393,6 +6396,7 @@ currency: Currency
 debts: DebtSummary[]
 credit_available_minor: Money
 movements: Page_CashSummary
+subscriber_number?: (SubscriberNumber | null)
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -21482,6 +21486,7 @@ consumed_deficit: Count
  */
 policy_version_ids: string[]
 override_version: (PositiveInt | null)
+subscriber_number?: (SubscriberNumber | null)
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema

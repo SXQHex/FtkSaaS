@@ -1682,7 +1682,9 @@
         }
       },
       "billing_class": "read",
-      "limits": []
+      "limits": [
+        "Authorized person rows include optional subscriber_number (org-scoped canonical student number, null when none); UUID inputs and live permissions remain unchanged. No number allocation or additional person access is granted by this read."
+      ]
     },
     {
       "name": "waitlist_join_v1",
@@ -1818,7 +1820,8 @@
       },
       "billing_class": "read",
       "limits": [
-        "Cross-center settlement accrual/reversal remains a separate delivery; instructor payment commands remain contract-only."
+        "Cross-center settlement accrual/reversal remains a separate delivery; instructor payment commands remain contract-only.",
+        "Authorized person rows include optional subscriber_number (org-scoped canonical student number, null when none); UUID inputs and live permissions remain unchanged. No number allocation or additional person access is granted by this read."
       ]
     },
     {
@@ -2095,7 +2098,8 @@
       },
       "billing_class": "read",
       "limits": [
-        "P01-A pool/catalog read only; no seat/right/booking guarantee. Request/waitlist/workers pending."
+        "P01-A pool/catalog read only; no seat/right/booking guarantee. Request/waitlist/workers pending.",
+        "Authorized person rows include optional subscriber_number (org-scoped canonical student number, null when none); UUID inputs and live permissions remain unchanged. No number allocation or additional person access is granted by this read."
       ]
     },
     {
@@ -2508,7 +2512,9 @@
         }
       },
       "billing_class": "read",
-      "limits": []
+      "limits": [
+        "Authorized person rows include optional subscriber_number (org-scoped canonical student number, null when none); UUID inputs and live permissions remain unchanged. No number allocation or additional person access is granted by this read."
+      ]
     },
     {
       "name": "collection_record_v1",
@@ -5355,7 +5361,9 @@
         }
       },
       "billing_class": "read",
-      "limits": []
+      "limits": [
+        "Authorized person rows include optional subscriber_number (org-scoped canonical student number, null when none); UUID inputs and live permissions remain unchanged. No number allocation or additional person access is granted by this read."
+      ]
     },
     {
       "name": "attendance_start_v1",
