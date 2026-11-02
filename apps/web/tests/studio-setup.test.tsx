@@ -700,3 +700,37 @@ test("instructor revocation uses the actual scoped assignment and reason", async
     },
   });
 });
+
+test("plan summary follows the page title without skipping a heading level", async () => {
+  mocks.call.mockImplementation(async (operation) => {
+    if (operation === "organization_get_v1") return organization;
+    if (operation === "subscription_get_v1") return plan;
+    if (operation === "policies_get_v1") return [];
+    return { items: [], next_cursor: null };
+  });
+  render(<StudioSetup actorId="actor" organizations={[organization]} onChanged={mocks.saved} />);
+  expect(await screen.findByRole("heading", { name: "Plan ve kullanım", level: 2 })).toBeVisible();
+});
+
+test("invalid closure interval is announced and associated with both date fields", async () => {
+  mocks.call.mockResolvedValue({ items: [center], next_cursor: null });
+  const user = userEvent.setup();
+  render(
+    <ExceptionForm
+      scope={{ ...scope, centerId: center.id }}
+      resource={{ kind: "room", id: center.id }}
+    />,
+  );
+  const start = screen.getByLabelText("Kapanış başlangıcı");
+  const end = screen.getByLabelText("Kapanış bitişi");
+  await user.type(start, "2030-01-01T18:00:00");
+  await user.type(end, "2030-01-01T19:00:00");
+  await user.type(screen.getByLabelText("Kapanış gerekçesi"), "Synthetic closure");
+  await user.click(screen.getByRole("button", { name: "Kapanışı kaydet" }));
+  const alert = await screen.findByRole("alert");
+  expect(start).toBeInvalid();
+  expect(end).toBeInvalid();
+  expect(start).toHaveAccessibleDescription(expect.stringContaining(alert.textContent!));
+  expect(end).toHaveAccessibleDescription(expect.stringContaining(alert.textContent!));
+  expect(mocks.send).not.toHaveBeenCalled();
+});
