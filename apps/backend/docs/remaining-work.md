@@ -18,6 +18,7 @@ Bu tablo yalnız izdir; eski kabul metinleri ikinci kez tutulmaz.
 |---|---|
 | XREQ-001 / XREQ-002 | [S08](#s08); ortak talebin teslim/kabul durumu yalnız docs/requests.md |
 | XREQ-003 | [S06](#s06), [S07](#s07) |
+| XREQ-007 / XREQ-008 | [S01](#s01) ek Starter yapılandırma okumaları; talep/teslim durumu yalnız [ortak kayıt](../../../docs/requests.md) |
 | DOCS-01 | [A01](#a01), [A02](#a02), [A03](#a03); metadata kanıtı devirde |
 | WEB-01 | Yalnız gerçek tüketici bağımlılığı: S08/S14/S15 ve G kabulü; frontend aktif sıra sahibi değişmez |
 | PUBLIC-01 / ST-03 | [S14](#s14), [S15](#s15), [S10](#s10), [P15](#p15) |
@@ -83,6 +84,8 @@ Bu tablo yalnız izdir; eski kabul metinleri ikinci kez tutulmaz.
 - [x] S01.1–S01.3 — Mevcut oda liste/ayrıntı/sürüm okuması, sözleşme devri ve gerçek Auth→Edge→RPC regresyonları tamamlandı. Kaynak/run/ortam kanıtı [devirde](00-FtkSaaS-yeni-sohbet-devir.md#s01s02-backend-kabulü).
 
 **Dilim kabulü:** Eski sürümle yazma, başka tenant/izinsiz merkez erişimi ve yetki kaybı reddedilir. Starter ikinci aktif oda açamaz; mevcut kapasite ve tek mantıksal oda kuralları korunur. Backend okuma teslimi frontend ekran kabulü diye kapatılmaz.
+
+- [ ] S01.4 — XREQ-007/008 ek yapılandırma okumaları: merkez–disiplin ilişkisinin kendi kimlik/sürüm/yokluk sonucu ve kaynak bazlı kapanış listesi. Kaynak/sözleşme ve regresyon senaryoları hazır; aday CI, main/development teslimi ve frontend gerçek tüketici kabulü bekliyor. Önceki S01 oda kabulünü yeniden açmaz.
 
 <a id="s02"></a>
 ### S02 — Sınıf ve program yönetim okumaları

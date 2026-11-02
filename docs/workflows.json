@@ -268,8 +268,8 @@
         "management_state_get_v1"
       ],
       "review": {
-        "fingerprint": "9377b8ad5a99bb2e32f30758f57f9e4a713e31b77b00599da55c59a7064dc824",
-        "reason": "PR131 Secret scan: mevcut Auth migration checksum satırı byte olarak korunur; yeni manifest girdisi önce eklenir, değerler/SQL/kural aynı. Güncel main tabanı incelendi."
+        "fingerprint": "9419cdb6ac10476d105f589e7e81fbafd66e67abb5d80ef68407d95f95f84926",
+        "reason": "XREQ-007/008 ortak sözleşme, selector/DTO ve test farkları incelendi; org/merkez, canlı yetki ve cursor kuralları korundu; WF02 ayrıntıları güncellendi."
       }
     },
     {
@@ -360,7 +360,8 @@
         "apps/backend/tests/room-role-registry.test.mjs",
         "apps/backend/tests/starter-plan-gates-acceptance.mjs",
         "apps/backend/tests/api-acceptance.test.mjs",
-        "apps/backend/tests/p07-account-revocation-acceptance.mjs"
+        "apps/backend/tests/p07-account-revocation-acceptance.mjs",
+        "apps/backend/tests/availability-policies.test.mjs"
       ],
       "sources": [
         "apps/backend/database/account-session-management.sql",
@@ -403,7 +404,9 @@
         "apps/backend/database/starter-plan-gates.sql",
         "apps/backend/database/starter-settings-media.sql",
         "apps/backend/database/wrappers.sql",
-        "docs/workflows.md"
+        "docs/workflows.md",
+        "apps/backend/database/starter-resource-discovery.sql",
+        "apps/backend/supabase/migrations/20261102052010_starter_resource_discovery.sql"
       ],
       "operations": [
         "organizations_list_v1",
@@ -428,8 +431,8 @@
         "center_discipline_set_v1"
       ],
       "review": {
-        "fingerprint": "0c01f03880a98a66e25c59f2f58206581d5d65eb2e9d213b5e86866333a37d32",
-        "reason": "S01–S02: paylaşılan program/session ve Starter regresyon dosyasına yalnız yönetim okuma/scope testleri eklendi; mevcut Stüdyo kurulumu ve yetki akışı ve güvenlik/finans assertionları korundu. Yeni runtime kabulü değildir."
+        "fingerprint": "2e776c1719270de2c2bf2a81cb41a249f5cab142bf8b8389f2cf4a1db93bba2e",
+        "reason": "XREQ-007/008 son kaynak ve test fixture incelendi; Business eğitmen kapanışı için gerçek aktif merkez ilişkisi kurulur; üretim assert_resource/CM/plan sınırları değişmez."
       }
     },
     {
@@ -515,8 +518,8 @@
         "class_assignment_set_v1"
       ],
       "review": {
-        "fingerprint": "0fa387542c643f3c5c010aa8fffb7ff4760b883bf920dc21c3572d53ecafefd8",
-        "reason": "S02: sınıf oluşturma sonrası yeni login ve program apply sonrası ikinci login ile keşif testleri, immutable snapshot ve kapsam sınırları incelendi; gerçek API kabulü CI bekliyor."
+        "fingerprint": "00cf585ca9f2f9709b16ab6a77aa4a4c40978e20029b6213e926ad98980a046b",
+        "reason": "Paylaşılan uygunluk pozitif kişi kapanışı fixture gerçek aktif eğitmen merkez ilişkisi kurar; kaynak ve seans/program yetki kuralları değişmez."
       }
     },
     {
@@ -1094,8 +1097,8 @@
         "saas_payment_submit_v1"
       ],
       "review": {
-        "fingerprint": "581e808055535509ba1dd2b58204839c0ccd8b726fc438b1336270392c811a23",
-        "reason": "S01–S02: paylaşılan program/session ve Starter regresyon dosyasına yalnız yönetim okuma/scope testleri eklendi; mevcut Abonelik ve plan erişimi akışı ve güvenlik/finans assertionları korundu. Yeni runtime kabulü değildir."
+        "fingerprint": "e82ca28159bd2ba548a5b2777bdcd5cd9657b6ee62004e3c9ebf8150ca0147cb",
+        "reason": "Starter retained scope guard ve downgrade sonrası okuma regresyonları incelendi; plan sınırları ve dönem değişim akışı korundu; yeni runtime kabulü iddia edilmez."
       }
     },
     {
@@ -1429,8 +1432,8 @@
         "subscription_boundary_apply_v1"
       ],
       "review": {
-        "fingerprint": "5943d44283cb937875f55c37597d78c46075c18bfb650a940385db2491eeb65d",
-        "reason": "S01–S02: paylaşılan program/session ve Starter regresyon dosyasına yalnız yönetim okuma/scope testleri eklendi; mevcut Worker ve işletim akışı ve güvenlik/finans assertionları korundu. Yeni runtime kabulü değildir."
+        "fingerprint": "fe7f63c8e42214d8b790b59421fcd193dbd7d729888711b769009818c3c9d3de",
+        "reason": "Üretilmiş Edge sözleşmesi ve ortak contract test farkları incelendi; worker yürütme/claim/teslim kaynakları değişmedi; mevcut rehber geçerli."
       }
     }
   ]

@@ -249,7 +249,7 @@
 | center_update_v1 | command | row_version | centers_list_v1 | implemented | centers.versioned_domain_change |
 | room_save_v1 | command | create_absent_update_requires_version | management_state_get_v1 | implemented | rooms.versioned_domain_change |
 | availability_save_v1 | command | create_absent_update_requires_version | management_state_get_v1 | contract_only | availability_rules.versioned_domain_change |
-| availability_exception_save_v1 | command | row_version | management_state_get_v1 | contract_only | availability_exceptions.append, centers.configuration_version |
+| availability_exception_save_v1 | command | row_version | management_state_get_v1 | implemented | availability_exceptions.append, centers.configuration_version |
 | policies_get_v1 | read | none | None | contract_only |  |
 | policy_publish_v1 | command | append_or_current_scope_lock | policies_get_v1 | implemented | policy_versions.immutable, protected_reservation_obligations_if_affected, reservation_protections.append_causal_obligation_proof |
 | roles_list_v1 | read | none | None | contract_only |  |
@@ -405,7 +405,7 @@
 | negcredit_valuation_set_v1 | command | row_version | management_state_get_v1 | implemented | policy_versions.negative_valuation, centers.configuration_version, future_reservation_snapshots_only |
 | disciplines_list_v1 | read | none | None | contract_only |  |
 | discipline_save_v1 | command | create_absent_update_requires_version | management_state_get_v1 | contract_only | disciplines.versioned_domain_change |
-| center_discipline_set_v1 | command | create_absent_update_requires_version | management_state_get_v1 | contract_only | center_disciplines.versioned_domain_change |
+| center_discipline_set_v1 | command | create_absent_update_requires_version | management_state_get_v1 | implemented | center_disciplines.versioned_domain_change |
 | person_discipline_set_v1 | command | create_absent_update_requires_version | management_state_get_v1 | contract_only | person_disciplines.versioned_domain_change |
 | event_get_v1 | read | none | None | implemented |  |
 | event_registration_preview_v1 | preview | preview_dependencies | management_state_get_v1 | contract_only |  |

@@ -26398,10 +26398,14 @@
               },
               "org_id": {
                 "$ref": "#/$defs/FtkUuid"
+              },
+              "center_id": {
+                "$ref": "#/$defs/FtkUuid"
               }
             },
             "required": [
-              "org_id"
+              "org_id",
+              "center_id"
             ]
           }
         },
@@ -54143,7 +54147,7 @@
             "centers.configuration_version"
           ],
           "business_commit": true,
-          "read_path_status": "contract_only",
+          "read_path_status": "implemented",
           "source_decision": "DS-2026-10-17"
         },
         "decision_delivery": {
@@ -72893,7 +72897,7 @@
             "center_disciplines.versioned_domain_change"
           ],
           "business_commit": true,
-          "read_path_status": "contract_only",
+          "read_path_status": "implemented",
           "source_decision": "DS-2026-10-17"
         },
         "decision_delivery": {
@@ -73714,7 +73718,9 @@
           "F09",
           "F12",
           "F10",
-          "F08"
+          "F08",
+          "F01",
+          "F02"
         ],
         "required_features": [],
         "runtime_required_features": [],
@@ -73737,6 +73743,16 @@
           {
             "feature": "F08",
             "when": "program_preview_selector",
+            "mode": "required_if_selected"
+          },
+          {
+            "feature": "F01",
+            "when": "center_discipline_set_selector",
+            "mode": "required_if_selected"
+          },
+          {
+            "feature": "F02",
+            "when": "availability_exception_save_selector",
             "mode": "required_if_selected"
           }
         ],
@@ -73880,7 +73896,9 @@
           "organization_delete_preview_v1",
           "room_save_v1",
           "class_save_v1",
-          "program_preview_v1"
+          "program_preview_v1",
+          "center_discipline_set_v1",
+          "availability_exception_save_v1"
         ]
       },
       {
@@ -93335,6 +93353,12 @@
         "origin": "ftksaas",
         "acceptance": "generic_uuid",
         "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Request_management_state_get/allOf/14/then/properties/center_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
       }
     ],
     "open_product_decisions": [],
@@ -93732,7 +93756,7 @@
       "uuid": "backend uuid@14.0.3 v7 for all inserted IDs; DB defaults not required",
       "external_transport": "POST /functions/v1/backend-v1/{operation}; direct typed request body",
       "internal_rpc": "service-only api_v1 named functions; actor/session/UUID bank supplied by verified gateway",
-      "migration_count": 88,
+      "migration_count": 89,
       "acceptance_source": "apps/backend/docs/00-FtkSaaS-yeni-sohbet-devir.md"
     },
     "decision_sprint": {
@@ -94545,7 +94569,8 @@
           "room_save_v1",
           "disciplines_list_v1",
           "discipline_save_v1",
-          "center_discipline_set_v1"
+          "center_discipline_set_v1",
+          "management_state_get_v1"
         ],
         "dependencies": [],
         "implementation": "source_operations_present",
@@ -94566,7 +94591,8 @@
           "room_save_v1",
           "disciplines_list_v1",
           "discipline_save_v1",
-          "center_discipline_set_v1"
+          "center_discipline_set_v1",
+          "management_state_get_v1"
         ],
         "contract_only_operations": [],
         "acceptance_case_ids": [],
@@ -94590,7 +94616,8 @@
         "technical_operations": [
           "availability_save_v1",
           "availability_exception_save_v1",
-          "settings_preparation_resolve_v1"
+          "settings_preparation_resolve_v1",
+          "management_state_get_v1"
         ],
         "dependencies": [],
         "implementation": "source_operations_present",
@@ -94599,7 +94626,8 @@
         "implemented_operations": [
           "availability_save_v1",
           "availability_exception_save_v1",
-          "settings_preparation_resolve_v1"
+          "settings_preparation_resolve_v1",
+          "management_state_get_v1"
         ],
         "contract_only_operations": [],
         "acceptance_case_ids": [],
