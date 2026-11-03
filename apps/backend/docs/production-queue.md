@@ -24,15 +24,11 @@ Bu dosya yalnız **sıra, bağımlı teslim paketleri ve kontrol noktalarının*
 
 **Güncel öncelik:** S14–S16 backend kaynak paketi PR156 ile aday/main/development kabulünü geçti; [kaynak/ortam kanıtı](00-FtkSaaS-yeni-sohbet-devir.md#s14s16-kaynak-paketi) ve açık hosted/tüketici sınırları [backlog](remaining-work.md#s14) sahibindedir.
 
-### Aktif kaynak paketi: P01–P04
+### Aktif kaynak paketi: P12–P13
 
-1. [P01](remaining-work.md#p01) backend teslimi tamamlandı; [tam kaynak/ortam kanıtı](00-FtkSaaS-yeni-sohbet-devir.md#p01-ticari-limit-kaynak-paketi) sahibindedir. Frontend limit tüketimi XREQ-014 kendi kabulünü bekler.
-2. [P02](remaining-work.md#p02) PR167 ile aday/main/development kabulünü geçti; backend teslimi tamamlandı. Kaynak paketi için mükerrer PR açılmaz. Ayrı PR168'de [P03](remaining-work.md#p03) ileri rezervasyon/paket ve [P04](remaining-work.md#p04) anlaşma/hakediş kanıtları tamamlanır. Mevcut sağlam işlev yeniden yazılmaz; FIN-01 dar regresyonu genel P04 kabulü değildir.
-3. PR159 backend kaynak teslimi doğrulandı; XREQ-013 özgün Business/native tüketici kabulü [ortak talepte](../../../docs/requests.md#xreq-013) kendi sahibinde açık kalır. S14/S15 gerçek widget/host/seans route'u ve diğer Starter hosted bağımlılıkları da kendi kimliklerinde açıktır; bunlar bağımsız kaynak paketini durdurmaz.
+P01–P04 backend teslimleri doğrulandı; görev/kabul ve kaynak/ortam kanıtları kendi sahiplerinde tutulur. Kullanıcının 4 Kasım sıralama kararıyla P05–P11 CRM paketi ertelenir; tamamlandı veya kapsam dışı sayılmaz. CRM'e bağlı sonraki işler kendi bağımlılıklarını korur.
 
-### Ayrı paralel kaynak paketi: P03/P04
-
-4 Kasım kullanıcı talimatıyla `feature/pro-lifecycle-earnings-acceptance` branch'i P03/P04 için main'den ayrı hazırlanır. PR167 main'e alındıktan sonra PR168 güncel main ile senkronize edilir; P02 teslim kanıtı kendi devir kaydında korunur. İç sıra: mevcut kaynak/kabul incelemesi → bağlı Pro/Business paket/teklif ve hakediş/ödeme kanıtı → kendi aday kabulü. Kullanıcı talimatıyla PR169 CLI/deney değişikliği PR168 dalına alınır; yalnız birleşik PR168 aday kabulü çalıştırılır ve PR169 main'e alınmadan kapatılır. Nihai P03/P04 kapanışı kendi kaynak/ortam kanıtlarıyla yapılır. Görev ayrıntısı [P03](remaining-work.md#p03)/[P04](remaining-work.md#p04), kaynak/ortam [devir](00-FtkSaaS-yeni-sohbet-devir.md#p03p04-paralel-kaynak-paketi) sahibindedir.
+Önce [P12](remaining-work.md#p12) etkinlik kapasitesi → [P13](remaining-work.md#p13) pakete bağlı kredi tüketmeyen katılım aynı branch/PR'de tamamlanır. Bağımlılıklar P02/P03 teslimleriyle hazırdır. Mevcut etkinlik modelinde ortak kapasite ve canlı uygunluk kontrolü kullanılır; finans ve iptal korumaları korunur. Kuyruk bu paket için kaynak incelemesi → sözleşme/native regresyon → aday kabulü → yetkili merge/main/development teslimidir. Kaynak ve test sonucu yalnız [devir](00-FtkSaaS-yeni-sohbet-devir.md#p12p13-etkinlik-kaynak-paketi) sahibindedir.
 
 ## Ortak işletim hattı
 

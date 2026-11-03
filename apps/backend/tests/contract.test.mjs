@@ -320,3 +320,19 @@ test('class duty management migration matches its reviewed native source',()=>{
  const migration=fs.readdirSync('supabase/migrations').find(n=>n.endsWith('_class_duty_management.sql'));
  assert(migration);assert.equal(fs.readFileSync('supabase/migrations/'+migration,'utf8'),fs.readFileSync('database/class-duty-management.sql','utf8'));
 });
+
+test('P12 event capacity is explicitly finite or unlimited without changing lesson capacity',()=>{
+ assert(valid('EventCapacity',{nominal:4,maximum:4}));
+ assert(valid('EventCapacity',{kind:'unlimited'}));
+ assert(!valid('EventCapacity',{kind:'unlimited',nominal:0,maximum:0}));
+ assert(!valid('Capacity',{kind:'unlimited'}));
+ assert(!valid('EventCapacity',{nominal:null,maximum:null}));
+});
+test('P13 package eligibility mode and factual ineligible attendance are closed typed inputs',()=>{
+ const terms={fee_minor:'0',currency:'TRY',full_payment_required:false,allowed_product_version_ids:[id],cancellation:{before_cutoff:'release',after_cutoff:'release',no_show:'release'},refund:{method:'none'},package_usage:'eligibility_only'};
+ assert(valid('EventTerms',terms));
+ assert(!valid('EventTerms',{...terms,package_usage:'unknown'}));
+ const r={client_api_version:1,request_id:id,org_id:id,center_id:id,operation_key:id,registration_id:id,expected_version:1,result:'attended',record_ineligible_attendance:true,reason:'Observed actual attendance'};
+ assert(valid('Request_event_attendance_mark',r));
+ assert(!valid('Request_event_attendance_mark',{...r,reason:undefined}));
+});
