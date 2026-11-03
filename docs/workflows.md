@@ -73,6 +73,10 @@ Sınıf görevlendirmesi eğitmen/asistan duty atamasıdır; öğrenci sabit gru
 
 Takvim aralığı UTC overlap ile, merkez IANA saat dilimi korunarak okunur. CM kendi merkezini, eğitmen/asistan canlı görevlendirmesini, öğrenci kendi yetkili kayıtlarını görür. Cursor filtre/scope'a bağlı keyset ve `as_of` taşır; dondurulmuş veri snapshot'ı değildir. `session_get_v1` merkez kapsamını seans üzerinden çözer. Kapasite alanları ve ayrı kontrollü aşımın tek normatif kaynağı [kapasite bölümü](contracts/02-FtkSaaS-teknik-sozlesme.md#oda-seans-kapasite-karari).
 
+Pro/Business programında eğitmen duty'si için aynı organizasyon/merkez/kişi/disiplin ve seans formatında, her oluşumun başlangıcında geçerli yayımlanmış ücret anlaşması gerekir. `agreement_id` verilmezse backend canonical yürürlük sürümünü çözer; istemci yeni bir anlaşma kimliği uydurmaz. Eksik veya uygun olmayan anlaşma `POLICY_NOT_CONFIGURED` üretebilir. Bu genel kod tek başına eksik politikanın türünü kanıtlamaz; yetkili anlaşma okuması ve kaynak bağlı trace ile ayrıştırılır. Anlaşma tamamlama [WF14](#wf14) yolundadır; Starter anlaşmasız akışı korunur.
+
+Program/seans değişikliği preview'sinde bu doğrulama noktasında geçerli anlaşma çözülemezse isteğe bağlı `configuration_requirement` döner: `kind=instructor_agreement`, `blocker_index=0`, `person_id`, `discipline_id`, `format` ve `starts_at`. Organizasyon/merkez yetkili preview kapsamıdır; kişi ve başlangıç ilgili görevlendirme/oluşumu tanımlar. Bu ilk hatanın tanısıdır, bütün eksiklerin envanteri değildir. Süresi dolmuş veya açıkça yanlış seçilmiş anlaşma da aynı tanıyı üretebilir; “hiç anlaşma kaydı yok” anlamı çıkarılmaz. Diğer politika/kaynak hatalarında alan bulunmaz; `SafeError` değişmez, ham SQL ayrıntısı/ücret/anlaşma kimliği açılmaz. Bu alan anlaşma yönetme yetkisi vermez: mevcut `earnings.manage` sınırıyla WF14 tüketilir; yetkisi olmayan operatör engeli yetkiliye iletir. Yapılandırma sonrası eski preview atılır, yeni preview alınır ve engelsiz sonuca ayrı etki onayı verilir. Starter'da anlaşma önkoşulu/tanısı üretilmez.
+
 ## WF04
 
 **Amaç/aktör:** Yetkili merkez kullanıcısı kişi ve öğrencilik ilişkisini yönetir; hesap bağlantısını ayrıca kurar.
@@ -198,7 +202,13 @@ Talep ödemeyi veya mevcut ödenmiş dönemi değiştirmez. Erken doğrulanan fo
 
 ## WF14
 
-Pro/Business ücretli eğitmen görevlendirmesi içindir; Starter'da çağrılmaz. `instructor_agreements_list_v1` → yeni ileri yürürlük sürümü yayımla → görev/yoklama (WF03/WF07) → `earnings_list_v1` → seçili hakedişlere ödeme/düzeltme → hakediş/ödeme geçmişini yeniden oku. Kapalı hakediş eski şartlarını korur; ücret koşulları yerinde değiştirilmez. Geçersiz anlaşma veya fazla ödeme reddi istemcide hesaplanarak aşılmaz. Kişi başı/yüzde ücret açık anlaşma olmadan varsayılmaz.
+Pro/Business ücretli eğitmen görevlendirmesi içindir; Starter'da çağrılmaz.
+
+`instructor_agreements_list_v1(org_id,center_id,person_id,page)` ile mevcut immutable sürümler okunur. Yetkili `earnings.manage` aktörü gerçek ücret şartlarını seçtikten sonra `instructor_agreement_publish_v1` çağrısında aynı org/center/person/discipline, format, `valid.starts_at/ends_at`, `terms`, `reason` ve sabit operation key gönderir. Yeni zincirde predecessor/version yoktur; değiştirmede `supersedes_id + expected_version` birlikte gerekir. Merkez ve bütün oluşumları kapsayan yürürlük açık seçilir; ücret/model/oda payı varsayılmaz.
+
+Başarı sonrası liste ve yeni program preview yeniden okunur; önceki preview anlaşma bağımlılığı değiştiğinden kullanılmaz. Yeni preview'de engel yoksa ayrı etki onayıyla apply yapılır. Eksik anlaşmayı düzeltmek başka kaynak/yetki/çakışma engellerinin de kalktığı garantisi değildir.
+
+`instructor_agreements_list_v1` → yeni ileri yürürlük sürümü yayımla → görev/yoklama (WF03/WF07) → `earnings_list_v1` → seçili hakedişlere ödeme/düzeltme → hakediş/ödeme geçmişini yeniden oku. Kapalı hakediş eski şartlarını korur; ücret koşulları yerinde değiştirilmez. Geçersiz anlaşma veya fazla ödeme reddi istemcide hesaplanarak aşılmaz. Kişi başı/yüzde ücret açık anlaşma olmadan varsayılmaz.
 
 Yayımlanmış anlaşma zinciri immutable'dır; yerine geçen sürüm açık predecessor/version ile bağlanır, bağımsız çakışan yürürlük reddedilir. Henüz başlamamış seans yürürlükteki yeni şartı, fiilî başlangıcı kaydedilmiş seans sabitlenen anlaşmayı kullanır. Kapanışta fiilen görev yapan eğitmenler açık seçilir. Paket override'ı genel bileşenin yerine geçer, sabit seans ücreti bir kez hesaplanır. Tüketen no-show/geç iptal ilgili tabana girer; blocked/deneme girmez. Kaynaksız negatif katılım önceden sabitlenen değerlemeyi kullanır; sonraki tahsilat geçmiş hakedişi fiyatlandırmaz.
 
