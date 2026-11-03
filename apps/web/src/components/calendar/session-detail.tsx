@@ -17,6 +17,10 @@ import {
 } from "@ftksaas/ui/components/sheet";
 import { errorMessageKey, getSession } from "../../lib/api";
 import type { CalendarEntry } from "../../lib/schedule";
+import { SessionCancellation } from "./session-cancellation";
+import { ReplacementSession } from "./replacement-session";
+import { ProgramRecovery } from "../programs/program-recovery";
+import { SessionChange } from "./session-change";
 import { sessionPath } from "../../lib/session-route";
 
 export function SessionDetail({
@@ -24,7 +28,11 @@ export function SessionDetail({
   timeZone,
   onClose,
   scope,
+  actorId,
+  onChanged,
 }: {
+  actorId?: string;
+  onChanged?: () => void;
   entry: CalendarEntry;
   timeZone: string;
   onClose: () => void;
@@ -60,6 +68,8 @@ export function SessionDetail({
             <LiveSessionDetail
               key={`${scope.orgId}:${entry.id}`}
               entry={entry}
+              actorId={actorId}
+              onChanged={onChanged}
               scope={scope}
               timeZone={timeZone}
             />
@@ -76,14 +86,21 @@ function LiveSessionDetail({
   entry,
   scope,
   timeZone,
+  actorId,
+  onChanged,
 }: {
+  actorId?: string;
+  onChanged?: () => void;
   entry: CalendarEntry;
   scope: { orgId: string; centerId: string };
   timeZone: string;
 }) {
   const t = useTranslations("calendar");
   const api = useTranslations("api");
+  const lifecycle = useTranslations("sessionLifecycle");
   const [attempt, setAttempt] = useState(0);
+  const [replacementId, setReplacementId] = useState<string | null>(null);
+  const [editing, setEditing] = useState<"change" | "cancel" | "replace" | null>(null);
   const [result, setResult] = useState<{
     attempt: number;
     session?: SessionView;
@@ -102,6 +119,16 @@ function LiveSessionDetail({
       active = false;
     };
   }, [scope.orgId, scope.centerId, entry.id, attempt]);
+  function refresh() {
+    setEditing(null);
+    setAttempt((n) => n + 1);
+  }
+  function saved(createdId?: string) {
+    if (editing === "replace" && createdId) setReplacementId(createdId);
+    refresh();
+    onChanged?.();
+  }
+  const commandScope = actorId ? { ...scope, actorId } : null;
   if (!result || result.attempt !== attempt)
     return (
       <output className="block py-8 text-sm text-muted-foreground" aria-live="polite">
@@ -110,16 +137,108 @@ function LiveSessionDetail({
     );
   if (result.error || !result.session)
     return (
-      <div role="alert" className="space-y-4 rounded-lg border p-5">
-        <p>{api(result.error ?? "unknown")}</p>
+      <div className="space-y-4 rounded-lg border p-5">
+        <p role="alert">{api(result.error ?? "unknown")}</p>
+        {commandScope && (
+          <ProgramRecovery
+            key={`${attempt}:${actorId}`}
+            scope={commandScope}
+            onReplacementCreated={setReplacementId}
+            onSaved={() => saved()}
+          />
+        )}
         <Button variant="outline" onClick={() => setAttempt((value) => value + 1)}>
           {t("retry")}
         </Button>
       </div>
     );
+  if ((editing === "cancel" || editing === "replace") && commandScope)
+    return (
+      <div className="space-y-5">
+        <h2 className="text-xl font-semibold">
+          {lifecycle(editing === "cancel" ? "cancelTitle" : "replacementTitle")}
+        </h2>
+        {editing === "cancel" ? (
+          <SessionCancellation
+            scope={commandScope}
+            sessionId={result.session.id}
+            timeZone={timeZone}
+            onSaved={saved}
+          />
+        ) : (
+          <ReplacementSession
+            scope={commandScope}
+            source={result.session}
+            timeZone={timeZone}
+            onSaved={saved}
+          />
+        )}
+        <Button variant="ghost" onClick={refresh}>
+          {lifecycle("back")}
+        </Button>
+      </div>
+    );
+  if (editing === "change" && actorId)
+    return (
+      <SessionChange
+        key={`${scope.orgId}:${scope.centerId}:${entry.id}:${attempt}:${actorId}`}
+        session={result.session}
+        orgId={scope.orgId}
+        centerId={scope.centerId}
+        actorId={actorId}
+        timeZone={timeZone}
+        onClose={() => {
+          setEditing(null);
+          setAttempt((n) => n + 1);
+        }}
+        onSaved={() => {
+          setEditing(null);
+          setAttempt((n) => n + 1);
+          onChanged?.();
+        }}
+      />
+    );
   return (
     <>
       <SessionSummary session={result.session} timeZone={timeZone} />
+      {replacementId && (
+        <Button asChild variant="outline">
+          <Link href={sessionPath(scope.orgId, replacementId)}>{lifecycle("viewReplacement")}</Link>
+        </Button>
+      )}
+      {commandScope && (
+        <ProgramRecovery
+          key={`${attempt}:${actorId}`}
+          scope={commandScope}
+          onReplacementCreated={setReplacementId}
+          onSaved={() => saved()}
+        />
+      )}
+      {commandScope &&
+        result.session.state === "planned" &&
+        result.session.attendance_state === "open" && (
+          <Button
+            variant="outline"
+            className="h-auto min-h-11 whitespace-normal"
+            onClick={() => setEditing("cancel")}
+          >
+            {lifecycle("cancelTitle")}
+          </Button>
+        )}
+      {commandScope && result.session.state === "cancelled" && (
+        <Button
+          variant="outline"
+          className="h-auto min-h-11 whitespace-normal"
+          onClick={() => setEditing("replace")}
+        >
+          {lifecycle("replacementTitle")}
+        </Button>
+      )}
+      {actorId && (
+        <Button variant="outline" onClick={() => setEditing("change")}>
+          {t("changeSession")}
+        </Button>
+      )}
       <Button asChild variant="outline" className="h-auto min-h-11 whitespace-normal">
         <Link href={sessionPath(scope.orgId, entry.id)}>{t("openPage")}</Link>
       </Button>

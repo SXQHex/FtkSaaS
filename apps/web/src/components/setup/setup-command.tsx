@@ -13,7 +13,11 @@ import {
   type SetupScope,
 } from "../../lib/studio-setup";
 
-export function useSetupCommand(scope: SetupScope, slot: string, onSaved: () => void) {
+export function useSetupCommand(
+  scope: SetupScope,
+  slot: string,
+  onSaved: (primaryId?: string) => void,
+) {
   const [pending, setPending] = useState(() => recoverSetup(scope, slot));
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState("");
@@ -42,11 +46,11 @@ export function useSetupCommand(scope: SetupScope, slot: string, onSaved: () => 
       sessionStorage.setItem(key, JSON.stringify(record));
       setPending(record);
       sent = true;
-      await sendSetupCommand(record.command);
+      const result = await sendSetupCommand(record.command);
       if (!mounted.current) return;
       clear();
       setMessage("saved");
-      onSaved();
+      onSaved(result?.primary_id);
     } catch (cause) {
       if (!mounted.current) return;
       if (sent && !pending && !isUncertainSetup(cause) && cause instanceof ApiFailure) {
@@ -99,7 +103,7 @@ export function useSetupCommand(scope: SetupScope, slot: string, onSaved: () => 
       if (result.status === "succeeded") {
         clear();
         setMessage("saved");
-        onSaved();
+        onSaved(result.result_reference?.id);
       } else if (result.status === "failed_final") {
         clear();
         setMessage("failed");

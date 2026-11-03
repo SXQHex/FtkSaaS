@@ -8,6 +8,8 @@ const operations = [
   "class_assignment_set_v1",
   "program_apply_v1",
   "session_create_v1",
+  "session_cancel_apply_v1",
+  "replacement_session_create_v1",
 ];
 // Reads only this actor/organization/center journal, independently of catalog permissions.
 function slots(scope: SetupScope) {
@@ -27,7 +29,15 @@ function slots(scope: SetupScope) {
     return null;
   }
 }
-export function ProgramRecovery({ scope, onSaved }: { scope: SetupScope; onSaved: () => void }) {
+export function ProgramRecovery({
+  scope,
+  onSaved,
+  onReplacementCreated,
+}: {
+  scope: SetupScope;
+  onSaved: () => void;
+  onReplacementCreated?: (id: string) => void;
+}) {
   const t = useTranslations("program");
   const [pendingSlots] = useState(() => slots(scope));
   if (pendingSlots?.length === 0) return null;
@@ -37,7 +47,13 @@ export function ProgramRecovery({ scope, onSaved }: { scope: SetupScope; onSaved
       <p className="text-sm text-muted-foreground">{t("recoveryHint")}</p>
       {pendingSlots ? (
         pendingSlots.map((slot) => (
-          <RecoveryItem key={slot} scope={scope} slot={slot} onSaved={onSaved} />
+          <RecoveryItem
+            key={slot}
+            scope={scope}
+            slot={slot}
+            onSaved={onSaved}
+            onReplacementCreated={onReplacementCreated}
+          />
         ))
       ) : (
         <p role="alert">{t("recoveryUnavailable")}</p>
@@ -49,11 +65,23 @@ function RecoveryItem({
   scope,
   slot,
   onSaved,
+  onReplacementCreated,
 }: {
   scope: SetupScope;
   slot: string;
   onSaved: () => void;
+  onReplacementCreated?: (id: string) => void;
 }) {
-  const command = useSetupCommand(scope, slot, onSaved);
+  const pending = recoverSetup(scope, slot);
+  const command = useSetupCommand(scope, slot, (id) => {
+    if (
+      id &&
+      pending &&
+      pending !== "invalid" &&
+      pending.command.operation === "replacement_session_create_v1"
+    )
+      onReplacementCreated?.(id);
+    onSaved();
+  });
   return <SetupFeedback command={command} />;
 }

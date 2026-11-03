@@ -27,6 +27,8 @@ export const setupWrites = [
   "program_apply_v1",
   "class_assignment_set_v1",
   "session_create_v1",
+  "session_cancel_apply_v1",
+  "replacement_session_create_v1",
 ] as const;
 export type SetupWrite = (typeof setupWrites)[number];
 type SetupRead =
@@ -34,6 +36,7 @@ type SetupRead =
   | "centers_list_v1"
   | "disciplines_list_v1"
   | "subscription_get_v1"
+  | "session_cancel_preview_v1"
   | "program_preview_v1"
   | "role_revoke_preview_v1"
   | "session_get_v1"
@@ -88,6 +91,8 @@ const fields: Record<SetupWrite, string[]> = {
   center_discipline_set_v1: ["discipline_id", "state", "expected_version"],
   class_save_v1: ["class_id", "name", "external_open", "discipline_id", "expected_version"],
   program_apply_v1: ["preview"],
+  session_cancel_apply_v1: ["preview"],
+  replacement_session_create_v1: ["replaces_id", "interval", "resources", "capacity"],
   class_assignment_set_v1: ["class_id", "person_id", "duty", "state", "expected_version"],
   session_create_v1: [
     "class_id",
@@ -116,7 +121,7 @@ export function recoverSetup(scope: SetupScope, slot: string): PendingSetup | "i
       (value.blocked !== undefined && typeof value.blocked !== "boolean")
     )
       return "invalid";
-    if (command.operation === "session_create_v1")
+    if (["session_create_v1", "replacement_session_create_v1"].includes(command.operation))
       sessionCapacity(input.capacity.total, input.capacity.categories);
     const allowed = [
       "org_id",
@@ -134,13 +139,13 @@ export function recoverSetup(scope: SetupScope, slot: string): PendingSetup | "i
       return "invalid";
     if (input.timezone !== undefined && typeof input.timezone !== "string") return "invalid";
     if (
-      command.operation !== "session_create_v1" &&
+      !["session_create_v1", "replacement_session_create_v1"].includes(command.operation) &&
       input.capacity !== undefined &&
       (!Number.isSafeInteger(input.capacity) || input.capacity < 0)
     )
       return "invalid";
     if (
-      command.operation === "program_apply_v1" &&
+      ["program_apply_v1", "session_cancel_apply_v1"].includes(command.operation) &&
       (!input.preview ||
         typeof input.preview.id !== "string" ||
         typeof input.preview.token !== "string" ||
