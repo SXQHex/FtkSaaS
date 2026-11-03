@@ -274,8 +274,8 @@
         "management_state_get_v1"
       ],
       "review": {
-        "fingerprint": "52f46d58f7f6498a543ec0747a447f932d07ecd0e90174daa70090c2956e8347",
-        "reason": "ST03 dört kabul kökünün deney source hash eşlemesi ve ana suite sahipliği incelendi; byte-exact assertion satırları korunur. Runner/checker/workflow ve ortak protokol değişmedi."
+        "fingerprint": "cc14017ce0b0f564e864bdf18ed44434305713fd0dd923f7e3bcb54498e35552",
+        "reason": "PR164 güncel kaynak hash ve kabul modülleri ile ST03 dört native kökü korunarak ST02 dedicated runner dağıtımı birleştirildi; 50 birim eksiksiz, beş global fixture fazı ve özgün test bütçeleri korunur. Üretim dört shard ve ortak protokol değişmez."
       }
     },
     {

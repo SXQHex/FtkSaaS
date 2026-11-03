@@ -13,7 +13,8 @@ export function buildInventory(root,{manifest=definition,read=p=>fs.readFileSync
  const original=command.slice(prefix.length).split(/\s+/).map(p=>'apps/backend/'+p).sort();
  const declared=manifest.suites.map(s=>s.path).sort();
  if(JSON.stringify(original)!==JSON.stringify(declared))throw Error('Original suite inventory changed');
- const units=[],owned=new Set();let splitOriginals=0;
+ const units=[],owned=new Set(),dedicated=manifest.dedicatedRunners??[];let splitOriginals=0;
+ if(!Array.isArray(dedicated)||new Set(dedicated).size!==dedicated.length)throw Error('Invalid dedicated runner inventory');
  const checked=(p,expected)=>{const text=read(p);if(hash(text)!==expected)throw Error('Experiment source changed: '+p);return text;};
  for(const suite of manifest.suites){
   const source=checked(suite.path,suite.sha256),lines=source.match(/[^\n]*\n|[^\n]+$/g),coverage=Array(lines.length).fill(0);
@@ -48,20 +49,27 @@ export function buildInventory(root,{manifest=definition,read=p=>fs.readFileSync
   for(const member of members){
    const exclusive=manifest.exclusive.includes(member.id);
    if(/p07_lifecycle_config|ops_worker_health|invitation_dispatch_config|alter role/i.test(member.code)&&!exclusive)throw Error('Global fixture must run exclusively: '+member.id);
-   units.push({...member,exclusive,estimated_seconds:suite.estimated_seconds*member.code.length/size});
+   units.push({...member,exclusive,dedicated:dedicated.includes(member.id),estimated_seconds:suite.estimated_seconds*member.code.length/size});
   }
   if(members.length>1)splitOriginals++;
  }
  if(new Set(units.map(u=>u.id)).size!==units.length)throw Error('Duplicate experimental unit');
+ if(dedicated.some(id=>!units.some(u=>u.id===id)))throw Error('Unknown dedicated runner unit');
  return {root,version:manifest.version,originals:manifest.suites.length,splitOriginals,units};
 }
 
 export function partition(units){
  if(new Set(units.map(u=>u.id)).size!==units.length)throw Error('Duplicate experimental unit');
  const bins=Array.from({length:8},(_,i)=>({shard:i+1,estimated_seconds:0,units:[]}));
- for(const unit of [...units].sort((a,b)=>b.estimated_seconds-a.estimated_seconds||a.id.localeCompare(b.id))){
-  if(!Number.isFinite(unit.estimated_seconds)||unit.estimated_seconds<=0)throw Error('Invalid experiment weight');
-  const bin=[...bins].sort((a,b)=>a.estimated_seconds-b.estimated_seconds||a.shard-b.shard)[0];
+ for(const unit of units)if(!Number.isFinite(unit.estimated_seconds)||unit.estimated_seconds<=0)throw Error('Invalid experiment weight');
+ const dedicated=units.filter(u=>u.dedicated).sort((a,b)=>a.id.localeCompare(b.id));
+ if(dedicated.length>=bins.length)throw Error('Too many dedicated experiment runners');
+ for(const [i,unit] of dedicated.entries()){
+  bins[i].units.push(unit);bins[i].estimated_seconds=unit.estimated_seconds;
+ }
+ const shared=bins.slice(dedicated.length);
+ for(const unit of units.filter(u=>!u.dedicated).sort((a,b)=>b.estimated_seconds-a.estimated_seconds||a.id.localeCompare(b.id))){
+  const bin=[...shared].sort((a,b)=>a.estimated_seconds-b.estimated_seconds||a.shard-b.shard)[0];
   bin.units.push(unit);bin.estimated_seconds+=unit.estimated_seconds;
  }
  if(bins.some(b=>!b.units.length))throw Error('Empty experiment shard');
