@@ -1,3 +1,4 @@
+import './class-duty-management-acceptance.mjs';
 import './program-configuration-acceptance.mjs';
 import test from 'node:test';
 import assert from 'node:assert/strict';

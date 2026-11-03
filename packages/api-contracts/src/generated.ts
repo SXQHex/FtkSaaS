@@ -18126,12 +18126,12 @@ values: {
 /**
  * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
  */
-class_id?: string
+class_id: string
 /**
  * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
  */
-person_id?: string
-duty?: Duty
+person_id: string
+duty: Duty
 state?: RecordState
 }
 }
