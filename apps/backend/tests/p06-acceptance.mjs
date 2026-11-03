@@ -137,6 +137,24 @@ await fail('report_file_get_v1',{job_id:s},'FORBIDDEN',staff);await fail('job_st
   await db.query("update core.saas_plan_versions set name='starter' where id=$1",[plan]);await fail('report_get_v1',{report:'renewal',filters,page:{}},'PLAN_FEATURE_UNAVAILABLE');await db.query("update core.saas_plan_versions set name='business' where id=$1",[plan]);
   await db.query('delete from private.p06_worker_scopes where db_role=$1',[role]);await assert.rejects(claim(),/FORBIDDEN/);await db.query('insert into private.p06_worker_scopes values($1,$2)',[role,org]);
  });
+ await t.test('Business import preview and apply worker enforce the live organization student cap',async()=>{
+  const used=Number((await rows('select private.starter_student_count($1) n',[org]))[0].n);
+  const filler=Array.from({length:1249-used},key),relationships=filler.map(key);
+  await db.query("insert into core.people(id,org_id,display_name,state) select id,$1,'Synthetic import capacity','active' from unnest($2::uuid[]) id",[org,filler]);
+  await db.query("insert into core.center_relationships(id,org_id,center_id,person_id,kind,state,started_at) select id,$1,$2,person_id,'student','active',now() from unnest($3::uuid[],$4::uuid[]) x(id,person_id)",[org,center,relationships,filler]);
+  const file=await upload('source_key,display_name\nlast-import,Synthetic final import\n'),capacityMapping={columns:['source_key','display_name'].map(target=>({source_column:target,target}))};
+  const pending=await beginPreview(file,'p06-commercial-cap',capacityMapping);await drain();const p=await getPreview(pending.job_id);
+  assert.equal(p.import_summary.valid_rows,1);await mut('import_apply_v1',{preview:{id:p.id,token:p.token}});
+  const contender=(await mut('person_create_v1',{display_name:'Synthetic interactive contender',contacts:[]})).primary_id;
+  await mut('student_activate_v1',{person_id:contender});await drain();
+  const applied=await must(owner,'import_rows_list_v1',scope({job_id:pending.job_id,page:{}}));
+  assert.equal(applied.items[0].state,'failed');assert.equal(applied.items[0].error_code,'PLAN_LIMIT_REACHED');
+  assert.equal(Number((await rows('select private.starter_student_count($1) n',[org]))[0].n),1250);
+  assert.equal((await rows("select count(*)::int n from private.p06_sources where org_id=$1 and source_namespace='p06-commercial-cap'",[org]))[0].n,0);
+  const denied=await beginPreview(file,'p06-commercial-full',capacityMapping);await drain();const invalid=await getPreview(denied.job_id);
+  assert.equal(invalid.import_summary.invalid_rows,1);const deniedRows=await must(owner,'import_rows_list_v1',scope({job_id:denied.job_id,page:{}}));
+  assert.equal(deniedRows.items[0].error_code,'PLAN_LIMIT_REACHED');
+ });
  await t.test('cash reports expose separate collection and refund totals on the append-only ledger',async()=>{
   // Last fixture: append-only ledger rows stay in the disposable clean-test DB.
   const cashIds=[key(),key()];

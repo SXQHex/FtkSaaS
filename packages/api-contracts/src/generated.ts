@@ -667,6 +667,16 @@ export type ReportRatioBps = number
 export type ReportColumns = [("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count" | "subscriber_number")]|[("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count" | "subscriber_number"), ("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count" | "subscriber_number")]|[("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count" | "subscriber_number"), ("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count" | "subscriber_number"), ("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count" | "subscriber_number")]|[("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count" | "subscriber_number"), ("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count" | "subscriber_number"), ("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count" | "subscriber_number"), ("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count" | "subscriber_number")]|[("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count" | "subscriber_number"), ("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count" | "subscriber_number"), ("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count" | "subscriber_number"), ("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count" | "subscriber_number"), ("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count" | "subscriber_number")]|[("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count" | "subscriber_number"), ("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count" | "subscriber_number"), ("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count" | "subscriber_number"), ("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count" | "subscriber_number"), ("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count" | "subscriber_number"), ("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count" | "subscriber_number")]|[("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count" | "subscriber_number"), ("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count" | "subscriber_number"), ("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count" | "subscriber_number"), ("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count" | "subscriber_number"), ("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count" | "subscriber_number"), ("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count" | "subscriber_number"), ("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count" | "subscriber_number")]|[("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count" | "subscriber_number"), ("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count" | "subscriber_number"), ("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count" | "subscriber_number"), ("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count" | "subscriber_number"), ("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count" | "subscriber_number"), ("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count" | "subscriber_number"), ("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count" | "subscriber_number"), ("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count" | "subscriber_number")]|[("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count" | "subscriber_number"), ("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count" | "subscriber_number"), ("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count" | "subscriber_number"), ("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count" | "subscriber_number"), ("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count" | "subscriber_number"), ("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count" | "subscriber_number"), ("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count" | "subscriber_number"), ("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count" | "subscriber_number"), ("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count" | "subscriber_number")]|[("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count" | "subscriber_number"), ("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count" | "subscriber_number"), ("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count" | "subscriber_number"), ("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count" | "subscriber_number"), ("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count" | "subscriber_number"), ("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count" | "subscriber_number"), ("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count" | "subscriber_number"), ("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count" | "subscriber_number"), ("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count" | "subscriber_number"), ("group_key" | "center_id" | "person_id" | "currency" | "count" | "amount_minor" | "credits" | "ratio_bps" | "basis_count" | "subscriber_number")]
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "PlanLimit".
+ */
+export type PlanLimit = (FinitePlanLimit | UnlimitedPlanLimit)
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "PlanLimitKey".
+ */
+export type PlanLimitKey = ("active_students" | "instructors" | "centers" | "rooms" | "disciplines")
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
  * via the `definition` "Request_policy_publish".
  */
 export type RequestPolicyPublish = {
@@ -3565,6 +3575,10 @@ Success_subscription_period_change_request?: SuccessSubscriptionPeriodChangeRequ
 ManagementSelector_subscription_period_change_request_v1?: ManagementSelectorSubscriptionPeriodChangeRequestV1
 ManagementProjection_subscription_period_change_request_v1?: ManagementProjectionSubscriptionPeriodChangeRequestV1
 ScheduleConfigurationRequirement?: ScheduleConfigurationRequirement
+PlanLimitKey?: PlanLimitKey
+FinitePlanLimit?: FinitePlanLimit
+UnlimitedPlanLimit?: UnlimitedPlanLimit
+PlanUsage?: PlanUsage
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -6638,11 +6652,19 @@ expires_at: Instant
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
- * via the `definition` "PlanLimit".
+ * via the `definition` "FinitePlanLimit".
  */
-export interface PlanLimit {
-key: ("active_students" | "instructors" | "centers" | "rooms" | "disciplines")
+export interface FinitePlanLimit {
+key: PlanLimitKey
 value: Count
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "UnlimitedPlanLimit".
+ */
+export interface UnlimitedPlanLimit {
+key: ("rooms" | "instructors")
+unlimited: true
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -6664,12 +6686,19 @@ grace_until: (Instant | null)
 cancel_at_period_end: Bool
 pending_change: (EntityRef | null)
 limits: PlanLimits
-usage: PlanLimits
+usage: PlanUsage
 subscription_version?: PositiveInt
 starter_scope?: (StarterScopeSelection | null)
 pending_starter_scope?: (StarterScopeSelection | null)
 starter_scope_required?: boolean
 billing?: SubscriptionBillingView
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "PlanUsage".
+ */
+export interface PlanUsage {
+entries: FinitePlanLimit[]
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema

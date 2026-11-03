@@ -4767,26 +4767,14 @@
       "additionalProperties": false
     },
     "PlanLimit": {
-      "type": "object",
-      "properties": {
-        "key": {
-          "enum": [
-            "active_students",
-            "instructors",
-            "centers",
-            "rooms",
-            "disciplines"
-          ]
+      "oneOf": [
+        {
+          "$ref": "#/$defs/FinitePlanLimit"
         },
-        "value": {
-          "$ref": "#/$defs/Count"
+        {
+          "$ref": "#/$defs/UnlimitedPlanLimit"
         }
-      },
-      "required": [
-        "key",
-        "value"
-      ],
-      "additionalProperties": false
+      ]
     },
     "PlanLimits": {
       "type": "object",
@@ -4859,7 +4847,7 @@
           "$ref": "#/$defs/PlanLimits"
         },
         "usage": {
-          "$ref": "#/$defs/PlanLimits"
+          "$ref": "#/$defs/PlanUsage"
         },
         "subscription_version": {
           "$ref": "#/$defs/PositiveInt"
@@ -50910,6 +50898,65 @@
       ],
       "additionalProperties": false,
       "description": "First failed program/session-change occurrence: a valid instructor agreement could not be resolved. Scope is the authorized preview org/center. No fee, agreement identifier or new permission is exposed; fresh preview is mandatory after configuration."
+    },
+    "PlanLimitKey": {
+      "enum": [
+        "active_students",
+        "instructors",
+        "centers",
+        "rooms",
+        "disciplines"
+      ]
+    },
+    "FinitePlanLimit": {
+      "type": "object",
+      "properties": {
+        "key": {
+          "$ref": "#/$defs/PlanLimitKey"
+        },
+        "value": {
+          "$ref": "#/$defs/Count"
+        }
+      },
+      "required": [
+        "key",
+        "value"
+      ],
+      "additionalProperties": false
+    },
+    "UnlimitedPlanLimit": {
+      "type": "object",
+      "properties": {
+        "key": {
+          "enum": [
+            "rooms",
+            "instructors"
+          ]
+        },
+        "unlimited": {
+          "const": true
+        }
+      },
+      "required": [
+        "key",
+        "unlimited"
+      ],
+      "additionalProperties": false
+    },
+    "PlanUsage": {
+      "type": "object",
+      "properties": {
+        "entries": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/FinitePlanLimit"
+          }
+        }
+      },
+      "required": [
+        "entries"
+      ],
+      "additionalProperties": false
     }
   },
   "x-contract": {
@@ -94936,7 +94983,7 @@
       "uuid": "backend uuid@14.0.3 v7 for all inserted IDs; DB defaults not required",
       "external_transport": "POST /functions/v1/backend-v1/{operation}; direct typed request body",
       "internal_rpc": "service-only api_v1 named functions; actor/session/UUID bank supplied by verified gateway",
-      "migration_count": 98,
+      "migration_count": 99,
       "acceptance_source": "apps/backend/docs/00-FtkSaaS-yeni-sohbet-devir.md"
     },
     "decision_sprint": {

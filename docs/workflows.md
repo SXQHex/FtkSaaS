@@ -200,6 +200,8 @@ Talep ödemeyi veya mevcut ödenmiş dönemi değiştirmez. Erken doğrulanan fo
 
 **Hata/kurtarma:** Yeni işlem, düzeltme, okuma ve worker için billing sınıfı aynı değildir; bütün API'ler tek abonelik boolean'ıyla açılmaz. **Sonuç/yan etki:** Ödeme bildirimi doğrulanmış abonelik değildir. Plan/quota değişimi yeni işlemde canlı denetlenir; mevcut kesin rezervasyon koruması dikkate alınır. Sadece Starter özelliği olan akışlarla üst-plan menüleri karıştırılmaz.
 
+Standart planın etkin ticari limitleri geçmiş katalog/fiyat satırı değiştirilmeden tek backend çözümlemesinden gelir. Sayısal kapsamın tek sahibi [bağlayıcı plan tablosudur](contracts/01-FtkSaaS-urun-kapsam-sozlesmesi.md#bağlayıcı-kapsam). Pro/Business oda ve eğitmen limiti `{key,unlimited:true}`, sayısal limit `{key,value}` biçimindedir; ikisi birlikte gönderilmez. Üst-plan disiplinleri çokludur; kabul edilmiş sayısal kota bulunmadığından bu key için bir sayısal limit üretilmez. `usage` ise bütün planlarda sonlu sayımlardır; sınırsızlık bir kullanım sayısı veya 0/büyük sayı değildir. UI bu iki şekli ayırır. Aktif öğrenci, hesapsız dahil canonical organizasyon kişisi olarak bir kez sayılır; Business'ta ikinci merkez bağlantısı ek kota tüketmez. Mevcut limit üstü kayıtlar silinmez veya kendiliğinden pasifleştirilmez; yeni kapasite tüketimi atomik sınanır. Standart üzeri Business özel sözleşme akışı bu teslimde açılmaz. Dönem değişiminin limit uyumu aynı etkin modeli kullanır; eski raw katalog ve kabul edilmiş fiyat şartları yeniden yazılmaz.
+
 ## WF14
 
 Pro/Business ücretli eğitmen görevlendirmesi içindir; Starter'da çağrılmaz.
