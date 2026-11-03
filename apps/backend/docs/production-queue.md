@@ -22,13 +22,13 @@ Bu dosya yalnız **sıra, bağımlı teslim paketleri ve kontrol noktalarının*
 
 **S01–S02 kontrol noktası:** Ayrı teslimin backend kapanışı doğrulandı; [görev kabulü](remaining-work.md#s01) ve [kaynak/ortam kanıtı](00-FtkSaaS-yeni-sohbet-devir.md#s01s02-backend-kabulü) kendi sahiplerindedir. Frontend ekran sırası ve kabulü değişmez.
 
-**Güncel öncelik:** PR150’nin S07–S10 backend kabul paketi main/development kabulünü tamamladı; kapsam ve açık dış kabul sınırları [backlog](remaining-work.md#s07) ile [devir](00-FtkSaaS-yeni-sohbet-devir.md#s07s10-kabul-paketi) sahibindedir. S09 günlük zincir kapanışı tamamdır. Üst-plan S05 işleri ve S07/S08/S10 dış kabul bağımlılıkları Starter’ın bağımsız kaynak işlerini bekletmez.
+**Güncel öncelik:** S11–S13 backend kaynak kabul paketi teslim edildi; [kaynak/ortam kanıtı](00-FtkSaaS-yeni-sohbet-devir.md#s11s13-dosya-ve-belge-kabulü) ve kalan hosted/tüketici ölçütleri [backlog](remaining-work.md#s11) sahibindedir. Üst-plan S05 işleri ve S07/S08/S10/S11–S13 dış kabul bağımlılıkları Starter’ın bağımsız kaynak işlerini bekletmez.
 
-### Aktif büyük paket: S11–S13
+### Sıradaki büyük paket: S14–S16
 
-1. Hazır S11–S13 kabul dilimini tek Draft PR’de teslim et. Görev/ölçüt ve açık hosted sınırları [backlog](remaining-work.md#s11), gerçek kaynak/test sonucu [devir](00-FtkSaaS-yeni-sohbet-devir.md#s11s13-dosya-ve-belge-kabulü) sahibindedir. Mevcut worker/import/Storage transport’unu veya PR83 retention davranışını yeniden uygulama; CI/kalite istisnası yoktur.
-2. Full clean başlayınca kaynak/run bilgileriyle turu bitir; polling yapma. Başarılı adaydan sonra ayrı merge yetkisi ve aynı-main/development kabulü korunur; hosted dosya/gerçek tüketici kabulü yerel Storage byte kabulüne eşitlenmez.
-3. Sonraki büyük bağımsız kaynak paketi [S14–S16](remaining-work.md#s14); kalan gerçek ortam bağımlılıkları kendi kimliklerinde açık kalır.
+1. [S14–S16](remaining-work.md#s14) mevcut public/ICS/abonelik kaynaklarını ve açık branch/PR’leri incele; çalışan davranışı yeniden uygulama. S14 gerçek token/action/hostname ve S15 gerçek takvim host’u/seans route’u kabulünü yerel testten ayır; tüketici/ortam bağımlılığını kendi görevinde açık tut.
+2. S16 dönem değişimi için mevcut DTO, SQL ve test desteğini normatif dönem sonu kuralıyla karşılaştır; yalnız gerçek uygulama boşluğunu aynı büyük Draft PR’de tamamla. Ödenmiş dönem, açık fiyat/tarih kabulü, tek bekleyen talep ve tekrar güvenliği korunur; yeni ürün/politika değeri uydurulmaz.
+3. Hazır bağımsız dilimleri tek anlamlı PR’de teslim et; görev/ölçüt sahibi backlog, kaynak/test/ortam sahibi devirdir. Yeni full clean başlayınca kaynak/run bilgileriyle turu bitir; polling yapma. Başarılı adaydan sonra ayrı merge yetkisi ve aynı-main/development kabulü korunur. Gerçek ortam bağımlılıkları kendi kimliklerinde açık kalır.
 
 ## Ortak işletim hattı
 
