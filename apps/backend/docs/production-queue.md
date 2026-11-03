@@ -22,14 +22,13 @@ Bu dosya yalnız **sıra, bağımlı teslim paketleri ve kontrol noktalarının*
 
 **S01–S02 kontrol noktası:** Ayrı teslimin backend kapanışı doğrulandı; [görev kabulü](remaining-work.md#s01) ve [kaynak/ortam kanıtı](00-FtkSaaS-yeni-sohbet-devir.md#s01s02-backend-kabulü) kendi sahiplerindedir. Frontend ekran sırası ve kabulü değişmez.
 
-**Güncel öncelik:** [S01.4](remaining-work.md#s01) ek okuma tesliminin backend kabulü doğrulandı; frontend gerçek kabulü [ortak talep](../../../docs/requests.md) sahibinde kalır. PR135 ile S03/S04 ve S05 kişi/rapor/export temeli teslim edildi. S01.5/XREQ-009 backend kabulü tamamlandı; XREQ-011 / S01.6 tek eğitmen yaşam döngüsü teslim edildi. PR145 ile XREQ-012 eski instructor verisi/kod temizliği ve S05 kalan Starter kişi okumaları aday/main/development kabulünü tamamladı. Güncel paket: S08 oturum sınırı, S09 bağlı günlük zincir ve S10 kaynak/test kanıtı uzlaştırması. S07 özgün XREQ-004 dönüş kabulü backend tarafından işlendi; genişletilmiş tüketici negatifleri açık.
+**Güncel öncelik:** PR150’nin S07–S10 backend kabul paketi main/development kabulünü tamamladı; kapsam ve açık dış kabul sınırları [backlog](remaining-work.md#s07) ile [devir](00-FtkSaaS-yeni-sohbet-devir.md#s07s10-kabul-paketi) sahibindedir. S09 günlük zincir kapanışı tamamdır. Üst-plan S05 işleri ve S07/S08/S10 dış kabul bağımlılıkları Starter’ın bağımsız kaynak işlerini bekletmez.
 
-**Sonraki işler:** Üst-plan S05 DTO işleri Starter kapanışını bekletmez. S06/S07 teslim hattı yeniden kurulmaz; tamamlanan frontend dönüş kabulü ile açık olumsuz tüketici senaryoları ayrılır. Büyük PR sınırı native hesap/günlük akış/ayar etkisi kabul paketidir; mevcut çalışan davranış sırf kabul eksik diye yeniden tasarlanmaz. A03.2/A03.3 kanıt uzlaştırması doğrulanan dilimlerle sürdürülür.
+### Aktif büyük paket: S11–S13
 
-### Aktif paketin kalan teslim adımları
-
-1. PR149’un main/development kabulü doğrulandı; hazır dal yeni tabanla eşitlendi. S08/S09 eklemeleri ve S10 kanıt uzlaştırmasını tek kabul PR’sinde teslim et. Görev sınırları [S07–S10](remaining-work.md#s07), sonuçlar [devir](00-FtkSaaS-yeni-sohbet-devir.md#s07s10-kabul-paketi) sahibindedir. Gerekli full clean başlayınca kaynak/run bilgilerini paylaş ve turu bitir; polling yapma. Yeni Auth katmanı, kalite istisnası veya CI politikası değişikliği yoktur.
-2. Başarılı aday ve ayrı merge yetkisi sonrası aynı-main/development kabulünü doğrula. Tamamlanan backend dilimlerini kapatırken S07/S08 gerçek tüketici/ortam ve S10 Pro teslim bağımlılıklarını silme. Ardından sıradaki büyük kaynak paketi [S11–S13](remaining-work.md#s11); üst-plan S05 DTO işleri Starter’ı bekletmez.
+1. Hazır S11–S13 kabul dilimini tek Draft PR’de teslim et. Görev/ölçüt ve açık hosted sınırları [backlog](remaining-work.md#s11), gerçek kaynak/test sonucu [devir](00-FtkSaaS-yeni-sohbet-devir.md#s11s13-dosya-ve-belge-kabulü) sahibindedir. Mevcut worker/import/Storage transport’unu veya PR83 retention davranışını yeniden uygulama; CI/kalite istisnası yoktur.
+2. Full clean başlayınca kaynak/run bilgileriyle turu bitir; polling yapma. Başarılı adaydan sonra ayrı merge yetkisi ve aynı-main/development kabulü korunur; hosted dosya/gerçek tüketici kabulü yerel Storage byte kabulüne eşitlenmez.
+3. Sonraki büyük bağımsız kaynak paketi [S14–S16](remaining-work.md#s14); kalan gerçek ortam bağımlılıkları kendi kimliklerinde açık kalır.
 
 ## Ortak işletim hattı
 

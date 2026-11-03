@@ -1153,5 +1153,35 @@
     "recovery": "Pending calendar operations",
     "recoveryHint": "Even if catalogs are unavailable, check a previous operation or replay the same request.",
     "recoveryUnavailable": "The operation journal cannot be read. Verify the current result before sending a new operation."
+  },
+  "sessionLifecycle": {
+    "cancelTitle": "Cancel session",
+    "cancelHint": "Only this session is cancelled. The preview shows effects on reservations, rights and waitlists. Creating a replacement is a separate action.",
+    "reason": "Cancellation reason",
+    "preview": "Preview cancellation effects",
+    "effects": "Cancellation effects",
+    "confirm": "I confirm the displayed cancellation effects",
+    "apply": "Confirm and cancel session",
+    "back": "Back to form",
+    "expires": "Confirm before: {date}",
+    "expired": "This preview has expired. Request a new preview.",
+    "missingCurrency": "The effect has no currency. Request a new preview.",
+    "quantity": "Quantity: {count}",
+    "record": "Record",
+    "entity": {
+      "sessions": "Session",
+      "reservations": "Reservation",
+      "entitlement_allocations": "Entitlement allocation",
+      "waitlist_entries": "Waitlist entry",
+      "seat_offers": "Seat offer"
+    },
+    "replacementTitle": "Create replacement session",
+    "replacementHint": "The source session duties are copied to the replacement. Cancelled reservations are not transferred; new reservations must be made separately.",
+    "replacementSource": "Cancelled source session: {date}",
+    "replacementConfirm": "I confirm the source session and the need for new reservations",
+    "replacementCreate": "Create replacement session",
+    "replacementUnavailable": "A replacement requires a cancelled source session.",
+    "resourcesUnavailable": "The room catalog could not be read. Retry; no new session was created.",
+    "viewReplacement": "Open the new replacement session"
   }
 }

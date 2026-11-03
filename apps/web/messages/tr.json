@@ -1153,5 +1153,35 @@
     "recovery": "Bekleyen takvim işlemleri",
     "recoveryHint": "Katalog okunamasa da önceki işlemin sonucunu kontrol edebilir veya aynı isteği yeniden gönderebilirsiniz.",
     "recoveryUnavailable": "Bu sekmedeki işlem kaydı okunamıyor. Yeni işlem göndermeden mevcut sonucu doğrulayın."
+  },
+  "sessionLifecycle": {
+    "cancelTitle": "Seansı iptal et",
+    "cancelHint": "İptal yalnız bu seansı kapsar. Rezervasyon, hak ve bekleme listesi etkileri önizlemede gösterilir. Telafi ayrı bir işlemdir.",
+    "reason": "İptal gerekçesi",
+    "preview": "İptal etkilerini önizle",
+    "effects": "İptal etkileri",
+    "confirm": "Gösterilen iptal etkilerini onaylıyorum",
+    "apply": "Onayla ve seansı iptal et",
+    "back": "Forma dön",
+    "expires": "Onay süresi: {date}",
+    "expired": "Önizlemenin süresi doldu. Yeni önizleme alın.",
+    "missingCurrency": "Etkinin para birimi eksik; yeni önizleme alın.",
+    "quantity": "Miktar: {count}",
+    "record": "Kayıt",
+    "entity": {
+      "sessions": "Seans",
+      "reservations": "Rezervasyon",
+      "entitlement_allocations": "Hak kullanımı",
+      "waitlist_entries": "Bekleme kaydı",
+      "seat_offers": "Yer teklifi"
+    },
+    "replacementTitle": "Telafi seansı oluştur",
+    "replacementHint": "Kaynak seansın görevleri yeni seansa alınır. İptal edilen rezervasyonlar taşınmaz; yeni rezervasyonlar ayrıca yapılır.",
+    "replacementSource": "İptal edilen kaynak seans: {date}",
+    "replacementConfirm": "Kaynak seansı ve yeni rezervasyon gerektiğini onaylıyorum",
+    "replacementCreate": "Telafi seansını oluştur",
+    "replacementUnavailable": "Telafi yalnız iptal edilmiş bir seans için oluşturulabilir.",
+    "resourcesUnavailable": "Oda kataloğu okunamadı. Yeniden deneyin; yeni seans oluşturulmadı.",
+    "viewReplacement": "Yeni telafi seansını aç"
   }
 }

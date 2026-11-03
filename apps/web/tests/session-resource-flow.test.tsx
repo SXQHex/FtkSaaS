@@ -1,8 +1,15 @@
 import { beforeEach, expect, test, vi } from "vitest";
-import { screen } from "@testing-library/react";
+import { screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { render } from "./render";
 import { SessionDetail } from "../src/components/calendar/session-detail";
+const lifecycleWrite = vi.hoisted(() =>
+  vi.fn<typeof import("../src/lib/studio-setup").sendSetupCommand>(),
+);
+vi.mock("../src/lib/studio-setup", async (original) => ({
+  ...(await original<typeof import("../src/lib/studio-setup")>()),
+  sendSetupCommand: lifecycleWrite,
+}));
 const sessionRead = vi.hoisted(() => vi.fn<typeof import("../src/lib/api").getSession>());
 vi.mock("../src/lib/api", async (original) => ({
   ...(await original<typeof import("../src/lib/api")>()),
@@ -169,4 +176,50 @@ test("changing the local start discards previously approved future offsets", asy
   expect(
     screen.queryByRole("button", { name: "2030-10-27 seçimini kaldır" }),
   ).not.toBeInTheDocument();
+});
+
+test("calendar replacement creation rereads the source and links the actual new session", async () => {
+  const newId = "019a2b3c-4d5e-7000-8000-000000000099";
+  const changed = vi.fn<() => void>();
+  sessionRead.mockResolvedValue({ ...sampleSession, state: "cancelled" });
+  lifecycleWrite.mockResolvedValue({
+    operation_id: "op",
+    primary_id: newId,
+    version: 1,
+    replayed: false,
+    related: [],
+  });
+  render(
+    <SessionDetail
+      entry={{
+        id: sampleSession.id,
+        kind: "session",
+        title: "İptal ders",
+        startsAt: sampleSession.starts_at,
+        endsAt: sampleSession.ends_at,
+      }}
+      scope={{ orgId: "org", centerId: "center" }}
+      actorId="actor"
+      timeZone="Europe/Istanbul"
+      onClose={() => {}}
+      onChanged={changed}
+    />,
+  );
+  const user = userEvent.setup();
+  await user.click(await screen.findByRole("button", { name: "Telafi seansı oluştur" }));
+  await user.selectOptions(await screen.findByLabelText("Oda"), "room");
+  await user.type(screen.getByLabelText("Seans başlangıcı"), "2030-11-01T19:30");
+  await user.type(screen.getByLabelText("Seans bitişi"), "2030-11-01T20:30");
+  await user.type(screen.getByLabelText("Kontenjan"), "20");
+  await user.click(
+    screen.getByLabelText("Kaynak seansı ve yeni rezervasyon gerektiğini onaylıyorum"),
+  );
+  await user.click(screen.getByRole("button", { name: "Telafi seansını oluştur" }));
+  expect(await screen.findByRole("link", { name: "Yeni telafi seansını aç" })).toHaveAttribute(
+    "href",
+    `/organizasyon/org/seans/${newId}`,
+  );
+  await waitFor(() => expect(changed).toHaveBeenCalledOnce());
+  expect(sessionRead).toHaveBeenCalledTimes(2);
+  expect(screen.queryByRole("button", { name: "Seansı iptal et" })).not.toBeInTheDocument();
 });
