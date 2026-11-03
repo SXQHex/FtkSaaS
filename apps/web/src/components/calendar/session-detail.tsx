@@ -1,10 +1,19 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
-import { useLocale, useTranslations } from "next-intl";
+import { useFormatter, useLocale, useTranslations } from "next-intl";
 import type { SessionView } from "@ftksaas/api-contracts";
-import { CalendarDays, Clock3, Users, X } from "lucide-react";
+import {
+  ArrowLeft,
+  ArrowUpRight,
+  CalendarDays,
+  CalendarPlus,
+  Clock3,
+  Pencil,
+  X,
+  XCircle,
+} from "lucide-react";
 import { Button } from "@ftksaas/ui/components/button";
 import { Badge } from "@ftksaas/ui/components/badge";
 import {
@@ -22,6 +31,7 @@ import { ReplacementSession } from "./replacement-session";
 import { ProgramRecovery } from "../programs/program-recovery";
 import { SessionChange } from "./session-change";
 import { sessionPath } from "../../lib/session-route";
+import { SessionCapacity } from "./session-capacity";
 
 export function SessionDetail({
   entry,
@@ -39,6 +49,7 @@ export function SessionDetail({
   scope?: { orgId: string; centerId: string };
 }) {
   const t = useTranslations("calendar");
+  const opener = useRef<HTMLElement | null>(null);
   return (
     <Sheet
       open
@@ -46,27 +57,37 @@ export function SessionDetail({
         if (!open) onClose();
       }}
     >
-      <SheetContent showCloseButton={false} className="w-full overflow-y-auto sm:max-w-lg">
-        <SheetHeader className="pr-14">
-          <SheetTitle>{entry.title}</SheetTitle>
-          <SheetDescription>
-            {t(entry.kind)} · {timeZone}
-          </SheetDescription>
+      <SheetContent
+        showCloseButton={false}
+        className="w-full gap-0 overflow-y-auto sm:scroll-pt-28 sm:max-w-xl"
+        onOpenAutoFocus={() => {
+          opener.current =
+            document.activeElement instanceof HTMLElement ? document.activeElement : null;
+        }}
+        onCloseAutoFocus={(event) => {
+          if (opener.current?.isConnected) {
+            event.preventDefault();
+            opener.current.focus();
+          }
+        }}
+      >
+        <SheetHeader className="top-0 z-10 flex-row items-start justify-between gap-3 border-b bg-background p-5 sm:sticky">
+          <div className="min-w-0 space-y-1">
+            <SheetTitle className="break-words">{entry.title}</SheetTitle>
+            <SheetDescription className="break-words">
+              {t(entry.kind)} · {timeZone}
+            </SheetDescription>
+          </div>
+          <SheetClose asChild>
+            <Button variant="ghost" size="icon" className="shrink-0" aria-label={t("close")}>
+              <X aria-hidden="true" />
+            </Button>
+          </SheetClose>
         </SheetHeader>
-        <SheetClose asChild>
-          <Button
-            variant="ghost"
-            size="icon"
-            className="absolute right-2 top-2"
-            aria-label={t("close")}
-          >
-            <X />
-          </Button>
-        </SheetClose>
-        <div className="space-y-6 px-5 pb-8">
+        <div className="min-w-0 space-y-6 px-5 py-6 wrap-anywhere">
           {scope && entry.kind === "session" ? (
             <LiveSessionDetail
-              key={`${scope.orgId}:${entry.id}`}
+              key={`${actorId ?? "read"}:${scope.orgId}:${scope.centerId}:${entry.id}`}
               entry={entry}
               actorId={actorId}
               onChanged={onChanged}
@@ -98,9 +119,16 @@ function LiveSessionDetail({
   const t = useTranslations("calendar");
   const api = useTranslations("api");
   const lifecycle = useTranslations("sessionLifecycle");
+  const format = useFormatter();
   const [attempt, setAttempt] = useState(0);
   const [replacementId, setReplacementId] = useState<string | null>(null);
   const [editing, setEditing] = useState<"change" | "cancel" | "replace" | null>(null);
+  const editContext = useRef<HTMLElement | null>(null);
+  const actionsTitle = useRef<HTMLHeadingElement | null>(null);
+  const actionButtons = useRef<
+    Partial<Record<"change" | "cancel" | "replace", HTMLButtonElement | null>>
+  >({});
+  const returnTo = useRef<typeof editing>(null);
   const [result, setResult] = useState<{
     attempt: number;
     session?: SessionView;
@@ -119,7 +147,15 @@ function LiveSessionDetail({
       active = false;
     };
   }, [scope.orgId, scope.centerId, entry.id, attempt]);
+  useEffect(() => {
+    if (editing) editContext.current?.focus();
+    else if (returnTo.current && result?.attempt === attempt && result.session) {
+      (actionButtons.current[returnTo.current] ?? actionsTitle.current)?.focus();
+      returnTo.current = null;
+    }
+  }, [editing, attempt, result]);
   function refresh() {
+    returnTo.current = editing;
     setEditing(null);
     setAttempt((n) => n + 1);
   }
@@ -152,13 +188,63 @@ function LiveSessionDetail({
         </Button>
       </div>
     );
-  if ((editing === "cancel" || editing === "replace") && commandScope)
+  if (editing && commandScope)
     return (
       <div className="space-y-5">
-        <h2 className="text-xl font-semibold">
-          {lifecycle(editing === "cancel" ? "cancelTitle" : "replacementTitle")}
-        </h2>
-        {editing === "cancel" ? (
+        <section
+          ref={editContext}
+          tabIndex={-1}
+          aria-label={t("editingSession")}
+          className="space-y-2 rounded-xl border bg-muted/30 p-4 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
+        >
+          <p className="text-xs text-muted-foreground">{t("editingSession")}</p>
+          <p className="text-sm font-medium">
+            {format.dateTime(new Date(result.session.starts_at), { timeZone, dateStyle: "long" })}
+          </p>
+          <p className="text-sm tabular-nums">
+            {format.dateTime(new Date(result.session.starts_at), {
+              timeZone,
+              timeStyle: "short",
+              hourCycle: "h23",
+            })}
+            {" – "}
+            {format.dateTime(new Date(result.session.ends_at), {
+              timeZone,
+              timeStyle: "short",
+              hourCycle: "h23",
+            })}
+          </p>
+          {format.dateTime(new Date(result.session.starts_at), { timeZone, dateStyle: "long" }) !==
+            format.dateTime(new Date(result.session.ends_at), { timeZone, dateStyle: "long" }) && (
+            <p className="text-xs text-muted-foreground">
+              {t("ends", {
+                date: format.dateTime(new Date(result.session.ends_at), {
+                  timeZone,
+                  dateStyle: "long",
+                }),
+              })}
+            </p>
+          )}
+          <p className="text-xs text-muted-foreground">{timeZone}</p>
+          <Badge variant="outline">{t(`state.${result.session.state}`)}</Badge>
+        </section>
+        {editing !== "change" && (
+          <h2 className="text-xl font-semibold">
+            {lifecycle(editing === "cancel" ? "cancelTitle" : "replacementTitle")}
+          </h2>
+        )}
+        {editing === "change" ? (
+          <SessionChange
+            key={`${scope.orgId}:${scope.centerId}:${entry.id}:${attempt}:${actorId}`}
+            session={result.session}
+            orgId={scope.orgId}
+            centerId={scope.centerId}
+            actorId={commandScope.actorId}
+            timeZone={timeZone}
+            onClose={refresh}
+            onSaved={() => saved()}
+          />
+        ) : editing === "cancel" ? (
           <SessionCancellation
             scope={commandScope}
             sessionId={result.session.id}
@@ -173,30 +259,13 @@ function LiveSessionDetail({
             onSaved={saved}
           />
         )}
-        <Button variant="ghost" onClick={refresh}>
-          {lifecycle("back")}
-        </Button>
+        {editing !== "change" && (
+          <Button variant="ghost" className="h-auto min-h-11 whitespace-normal" onClick={refresh}>
+            <ArrowLeft aria-hidden="true" />
+            {t("backToDetail")}
+          </Button>
+        )}
       </div>
-    );
-  if (editing === "change" && actorId)
-    return (
-      <SessionChange
-        key={`${scope.orgId}:${scope.centerId}:${entry.id}:${attempt}:${actorId}`}
-        session={result.session}
-        orgId={scope.orgId}
-        centerId={scope.centerId}
-        actorId={actorId}
-        timeZone={timeZone}
-        onClose={() => {
-          setEditing(null);
-          setAttempt((n) => n + 1);
-        }}
-        onSaved={() => {
-          setEditing(null);
-          setAttempt((n) => n + 1);
-          onChanged?.();
-        }}
-      />
     );
   return (
     <>
@@ -214,33 +283,63 @@ function LiveSessionDetail({
           onSaved={() => saved()}
         />
       )}
-      {commandScope &&
-        result.session.state === "planned" &&
-        result.session.attendance_state === "open" && (
-          <Button
-            variant="outline"
-            className="h-auto min-h-11 whitespace-normal"
-            onClick={() => setEditing("cancel")}
-          >
-            {lifecycle("cancelTitle")}
-          </Button>
-        )}
-      {commandScope && result.session.state === "cancelled" && (
-        <Button
-          variant="outline"
-          className="h-auto min-h-11 whitespace-normal"
-          onClick={() => setEditing("replace")}
-        >
-          {lifecycle("replacementTitle")}
-        </Button>
+      {commandScope && (
+        <section className="space-y-3 border-t pt-5" aria-label={t("sessionActions")}>
+          <h3 ref={actionsTitle} tabIndex={-1} className="font-medium">
+            {t("sessionActions")}
+          </h3>
+          <div className="grid min-w-0 gap-3">
+            <Button
+              ref={(node) => {
+                actionButtons.current.change = node;
+              }}
+              variant="outline"
+              className="h-auto min-h-11 justify-start whitespace-normal text-left"
+              onClick={() => setEditing("change")}
+            >
+              <Pencil aria-hidden="true" />
+              {t("changeSession")}
+            </Button>
+            {result.session.state === "cancelled" && (
+              <Button
+                ref={(node) => {
+                  actionButtons.current.replace = node;
+                }}
+                variant="outline"
+                className="h-auto min-h-11 justify-start whitespace-normal text-left"
+                onClick={() => setEditing("replace")}
+              >
+                <CalendarPlus aria-hidden="true" />
+                {lifecycle("replacementTitle")}
+              </Button>
+            )}
+            {result.session.state === "planned" && result.session.attendance_state === "open" && (
+              <div className="border-t pt-3">
+                <Button
+                  ref={(node) => {
+                    actionButtons.current.cancel = node;
+                  }}
+                  variant="ghost"
+                  className="h-auto min-h-11 max-w-full justify-start whitespace-normal text-left text-destructive hover:text-destructive"
+                  onClick={() => setEditing("cancel")}
+                >
+                  <XCircle aria-hidden="true" />
+                  {lifecycle("cancelTitle")}
+                </Button>
+              </div>
+            )}
+          </div>
+        </section>
       )}
-      {actorId && (
-        <Button variant="outline" onClick={() => setEditing("change")}>
-          {t("changeSession")}
-        </Button>
-      )}
-      <Button asChild variant="outline" className="h-auto min-h-11 whitespace-normal">
-        <Link href={sessionPath(scope.orgId, entry.id)}>{t("openPage")}</Link>
+      <Button
+        asChild
+        variant="outline"
+        className="h-auto min-h-11 w-full justify-between whitespace-normal text-left"
+      >
+        <Link href={sessionPath(scope.orgId, entry.id)}>
+          {t("openPage")}
+          <ArrowUpRight aria-hidden="true" />
+        </Link>
       </Button>
     </>
   );
@@ -261,10 +360,10 @@ export function SessionSummary({ session, timeZone }: { session: SessionView; ti
           title: t("detailTitle"),
           startsAt: session.starts_at,
           endsAt: session.ends_at,
-          capacity: session.capacity,
         }}
         timeZone={timeZone}
       />
+      <SessionCapacity capacity={session.capacity} />
       <div className="flex flex-wrap items-center justify-between gap-3 border-t pt-5">
         <span className="text-sm text-muted-foreground">{t("attendance")}</span>
         <Badge variant="outline">{t(`attendanceState.${session.attendance_state}`)}</Badge>
@@ -310,23 +409,7 @@ function SessionFacts({ entry, timeZone }: { entry: CalendarEntry; timeZone: str
           </dd>
         </div>
       </dl>
-      {entry.capacity && (
-        <section>
-          <h3 className="mb-4 flex items-center gap-2 font-medium">
-            <Users className="size-4" aria-hidden="true" />
-            {t("capacity")}
-          </h3>
-          <dl className="grid grid-cols-1 gap-4 rounded-xl border p-4 min-[400px]:grid-cols-3">
-            {(["total", "held", "remaining"] as const).map((key) => (
-              <div key={key}>
-                <dt className="text-xs text-muted-foreground">{t(`capacityLabels.${key}`)}</dt>
-                <dd className="mt-2 text-2xl font-semibold tabular-nums">{entry.capacity![key]}</dd>
-              </div>
-            ))}
-          </dl>
-          <p className="mt-3 text-xs leading-5 text-muted-foreground">{t("capacityHint")}</p>
-        </section>
-      )}
+      {entry.capacity && <SessionCapacity capacity={entry.capacity} />}
     </>
   );
 }
