@@ -24,11 +24,11 @@ Bu dosya yalnız **sıra, bağımlı teslim paketleri ve kontrol noktalarının*
 
 **Güncel öncelik:** S11–S13 backend kaynak kabul paketi teslim edildi; [kaynak/ortam kanıtı](00-FtkSaaS-yeni-sohbet-devir.md#s11s13-dosya-ve-belge-kabulü) ve kalan hosted/tüketici ölçütleri [backlog](remaining-work.md#s11) sahibindedir. Üst-plan S05 işleri ve S07/S08/S10/S11–S13 dış kabul bağımlılıkları Starter’ın bağımsız kaynak işlerini bekletmez.
 
-### Sıradaki büyük paket: S14–S16
+### Aktif büyük paket: S14–S16
 
-1. [S14–S16](remaining-work.md#s14) mevcut public/ICS/abonelik kaynaklarını ve açık branch/PR’leri incele; çalışan davranışı yeniden uygulama. S14 gerçek token/action/hostname ve S15 gerçek takvim host’u/seans route’u kabulünü yerel testten ayır; tüketici/ortam bağımlılığını kendi görevinde açık tut.
-2. S16 dönem değişimi için mevcut DTO, SQL ve test desteğini normatif dönem sonu kuralıyla karşılaştır; yalnız gerçek uygulama boşluğunu aynı büyük Draft PR’de tamamla. Ödenmiş dönem, açık fiyat/tarih kabulü, tek bekleyen talep ve tekrar güvenliği korunur; yeni ürün/politika değeri uydurulmaz.
-3. Hazır bağımsız dilimleri tek anlamlı PR’de teslim et; görev/ölçüt sahibi backlog, kaynak/test/ortam sahibi devirdir. Yeni full clean başlayınca kaynak/run bilgileriyle turu bitir; polling yapma. Başarılı adaydan sonra ayrı merge yetkisi ve aynı-main/development kabulü korunur. Gerçek ortam bağımlılıkları kendi kimliklerinde açık kalır.
+1. Public/ICS mevcut kaynak ve gerçek yerel kabulü incelendi; S16 dönem değişimi hazırlandı. Uygulama ve açık hosted/tüketici ölçütleri [backlog](remaining-work.md#s14), yerel sonuçlar [devir](00-FtkSaaS-yeni-sohbet-devir.md#s14s16-kaynak-paketi) sahibindedir. Tek Draft PR’de kaynak bağlı full clean kabulüne teslim et; polling yapma.
+2. Başarılı aday ve ayrı merge yetkisi sonrası aynı-main/development kabulünü doğrula. S14/S15 gerçek widget/host/seans route’u ve diğer Starter hosted bağımlılıklarını yerel test veya CD şema doğrulamasıyla kapatma.
+3. Sonraki bağımsız kaynak paketi [P01–P04](remaining-work.md#p01) sırasındadır; açık Starter gerçek ortam kabulleri kendi kimliklerinde kalır. S16 kaynak teslimi genel Starter veya F01–F33 kabulü değildir.
 
 ## Ortak işletim hattı
 

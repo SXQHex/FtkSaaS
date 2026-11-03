@@ -4,6 +4,8 @@ import { beforeEach, expect, test, vi } from "vitest";
 import { render as renderComponent, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { render } from "./render";
+import { setupStorageKey } from "../src/lib/studio-setup";
+import { ApiFailure } from "../src/lib/api";
 import { ProgramManager } from "../src/components/programs/program-manager";
 const mocks = vi.hoisted(() => ({
   classes: vi.fn<typeof import("../src/lib/program").getClasses>(),
@@ -86,4 +88,57 @@ test("changing scope dismisses an open editor before the next catalog arrives", 
   expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
   expect(screen.queryByLabelText("Sınıf adı")).not.toBeInTheDocument();
   expect(screen.getByRole("status")).toHaveTextContent("Yükleniyor");
+});
+
+function pendingProgram() {
+  const key = setupStorageKey(scope, "program:class");
+  const saved = JSON.stringify({
+    command: {
+      operation: "program_apply_v1",
+      input: {
+        org_id: scope.orgId,
+        center_id: scope.centerId,
+        operation_key: "019a2b3c-4d5e-7000-8000-000000000004",
+        preview: { id: "019a2b3c-4d5e-7000-8000-000000000005", token: "synthetic" },
+      },
+    },
+  });
+  sessionStorage.setItem(key, saved);
+  return { key, saved };
+}
+
+test("closing and reopening the program editor preserves the pending command and one recovery surface", async () => {
+  const pending = pendingProgram();
+  render(<ProgramManager scope={scope} timeZone="Europe/Istanbul" onChanged={() => {}} />);
+  await screen.findByRole("region", { name: "Bekleyen takvim işlemleri" });
+  const user = userEvent.setup();
+  await user.click(screen.getByRole("button", { name: "Sınıfı yönet: Tango Başlangıç" }));
+  const plan = screen.getByRole("button", { name: "Programı planla" });
+  for (let attempt = 0; attempt < 2; attempt++) {
+    await user.click(plan);
+    expect(await screen.findByRole("dialog", { name: "Program oluştur" })).toBeVisible();
+    expect(screen.getByRole("button", { name: "Programı önizle" })).toBeDisabled();
+    expect(screen.getAllByRole("button", { name: "Aynı işlemi yeniden gönder" })).toHaveLength(1);
+    await user.keyboard("{Escape}");
+    expect(await screen.findByRole("region", { name: "Bekleyen takvim işlemleri" })).toBeVisible();
+    expect(screen.getAllByRole("button", { name: "İşlem sonucunu kontrol et" })).toHaveLength(1);
+    expect(sessionStorage.getItem(pending.key)).toBe(pending.saved);
+    await waitFor(() => expect(plan).toHaveFocus());
+  }
+});
+
+test("catalog access loss keeps pending program recovery available without a write form", async () => {
+  const pending = pendingProgram();
+  mocks.catalog.mockRejectedValue(
+    new ApiFailure({
+      ok: false,
+      error: { code: "FORBIDDEN", retryable: false, trace_id: "synthetic" },
+    }),
+  );
+  render(<ProgramManager scope={scope} timeZone="Europe/Istanbul" onChanged={() => {}} />);
+  expect(await screen.findByRole("alert")).toHaveTextContent("Bu işlem için gerekli yetkin yok.");
+  expect(screen.getByRole("region", { name: "Bekleyen takvim işlemleri" })).toBeVisible();
+  expect(screen.getByRole("button", { name: "İşlem sonucunu kontrol et" })).toBeEnabled();
+  expect(screen.queryByRole("button", { name: "Sınıf oluştur" })).not.toBeInTheDocument();
+  expect(sessionStorage.getItem(pending.key)).toBe(pending.saved);
 });

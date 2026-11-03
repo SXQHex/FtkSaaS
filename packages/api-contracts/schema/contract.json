@@ -919,7 +919,8 @@
         "calendar_feed_get_v1",
         "settings_preparation_resolve_v1",
         "account_signup_check_v1",
-        "role_revoke_preview_v1"
+        "role_revoke_preview_v1",
+        "subscription_period_change_request_v1"
       ]
     },
     "EntityType": {
@@ -4857,6 +4858,9 @@
         },
         "starter_scope_required": {
           "type": "boolean"
+        },
+        "billing": {
+          "$ref": "#/$defs/SubscriptionBillingView"
         }
       },
       "required": [
@@ -21852,6 +21856,26 @@
         },
         "state": {
           "$ref": "#/$defs/ChangeState"
+        },
+        "source_plan_id": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/FtkUuid"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "subscription_id": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/FtkUuid"
+            },
+            {
+              "type": "null"
+            }
+          ]
         }
       },
       "required": [
@@ -30539,6 +30563,35 @@
               "center_id"
             ]
           }
+        },
+        {
+          "if": {
+            "properties": {
+              "operation": {
+                "const": "subscription_period_change_request_v1"
+              }
+            },
+            "required": [
+              "operation"
+            ]
+          },
+          "then": {
+            "properties": {
+              "selector": {
+                "properties": {
+                  "operation": {
+                    "const": "subscription_period_change_request_v1"
+                  }
+                }
+              },
+              "org_id": {
+                "$ref": "#/$defs/FtkUuid"
+              }
+            },
+            "required": [
+              "org_id"
+            ]
+          }
         }
       ]
     },
@@ -35780,6 +35833,9 @@
         },
         {
           "$ref": "#/$defs/ManagementProjection_role_revoke_preview_v1"
+        },
+        {
+          "$ref": "#/$defs/ManagementProjection_subscription_period_change_request_v1"
         }
       ]
     },
@@ -35938,7 +35994,8 @@
         "settings_reset_preview_v1",
         "settings_reset_apply_v1",
         "reservation_capacity_override_v1",
-        "role_revoke_preview_v1"
+        "role_revoke_preview_v1",
+        "subscription_period_change_request_v1"
       ]
     },
     "ManagementSelector_account_profile_update_v1": {
@@ -40351,6 +40408,9 @@
         },
         {
           "$ref": "#/$defs/ManagementSelector_role_revoke_preview_v1"
+        },
+        {
+          "$ref": "#/$defs/ManagementSelector_subscription_period_change_request_v1"
         }
       ]
     },
@@ -50571,6 +50631,224 @@
         "values"
       ],
       "additionalProperties": false
+    },
+    "SubscriptionPlanTerms": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/FtkUuid"
+        },
+        "period": {
+          "$ref": "#/$defs/SaasPeriod"
+        },
+        "amount_minor": {
+          "$ref": "#/$defs/Money"
+        },
+        "currency": {
+          "$ref": "#/$defs/Currency"
+        }
+      },
+      "required": [
+        "id",
+        "period",
+        "amount_minor",
+        "currency"
+      ],
+      "additionalProperties": false
+    },
+    "SubscriptionPeriodChange": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/FtkUuid"
+        },
+        "version": {
+          "$ref": "#/$defs/PositiveInt"
+        },
+        "target": {
+          "$ref": "#/$defs/SubscriptionPlanTerms"
+        },
+        "effective_at": {
+          "$ref": "#/$defs/Instant"
+        }
+      },
+      "required": [
+        "id",
+        "version",
+        "target",
+        "effective_at"
+      ],
+      "additionalProperties": false
+    },
+    "SubscriptionBillingView": {
+      "type": "object",
+      "properties": {
+        "current": {
+          "$ref": "#/$defs/SubscriptionPlanTerms"
+        },
+        "period_change_options": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/SubscriptionPlanTerms"
+          }
+        },
+        "pending_period_change": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/SubscriptionPeriodChange"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "current",
+        "period_change_options",
+        "pending_period_change"
+      ],
+      "additionalProperties": false
+    },
+    "Request_subscription_period_change_request": {
+      "type": "object",
+      "properties": {
+        "client_api_version": {
+          "const": 1
+        },
+        "request_id": {
+          "$ref": "#/$defs/FtkUuid"
+        },
+        "org_id": {
+          "$ref": "#/$defs/FtkUuid"
+        },
+        "center_id": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/FtkUuid"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "operation_key": {
+          "$ref": "#/$defs/FtkUuid"
+        },
+        "expected_version": {
+          "$ref": "#/$defs/PositiveInt"
+        },
+        "target_plan_id": {
+          "$ref": "#/$defs/FtkUuid"
+        },
+        "amount_minor": {
+          "$ref": "#/$defs/Money"
+        },
+        "currency": {
+          "$ref": "#/$defs/Currency"
+        },
+        "effective_at": {
+          "$ref": "#/$defs/Instant"
+        }
+      },
+      "required": [
+        "client_api_version",
+        "request_id",
+        "org_id",
+        "operation_key",
+        "expected_version",
+        "target_plan_id",
+        "amount_minor",
+        "currency",
+        "effective_at"
+      ],
+      "additionalProperties": false
+    },
+    "Success_subscription_period_change_request": {
+      "type": "object",
+      "properties": {
+        "ok": {
+          "const": true
+        },
+        "data": {
+          "$ref": "#/$defs/Mutation"
+        },
+        "trace_id": {
+          "$ref": "#/$defs/FtkUuid"
+        }
+      },
+      "required": [
+        "ok",
+        "data",
+        "trace_id"
+      ],
+      "additionalProperties": false
+    },
+    "ManagementSelector_subscription_period_change_request_v1": {
+      "type": "object",
+      "properties": {
+        "operation": {
+          "const": "subscription_period_change_request_v1"
+        },
+        "key": {
+          "type": "object",
+          "properties": {
+            "target_plan_id": {
+              "$ref": "#/$defs/FtkUuid"
+            }
+          },
+          "required": [
+            "target_plan_id"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "required": [
+        "operation",
+        "key"
+      ],
+      "additionalProperties": false
+    },
+    "ManagementProjection_subscription_period_change_request_v1": {
+      "type": "object",
+      "properties": {
+        "operation": {
+          "const": "subscription_period_change_request_v1"
+        },
+        "values": {
+          "type": "object",
+          "properties": {
+            "target_plan_id": {
+              "$ref": "#/$defs/FtkUuid"
+            },
+            "expected_version": {
+              "$ref": "#/$defs/PositiveInt"
+            },
+            "amount_minor": {
+              "$ref": "#/$defs/Money"
+            },
+            "currency": {
+              "$ref": "#/$defs/Currency"
+            },
+            "effective_at": {
+              "$ref": "#/$defs/Instant"
+            }
+          },
+          "required": [
+            "target_plan_id",
+            "expected_version",
+            "amount_minor",
+            "currency",
+            "effective_at"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "required": [
+        "operation",
+        "values"
+      ],
+      "additionalProperties": false
     }
   },
   "x-contract": {
@@ -52045,9 +52323,19 @@
             "column": "quote_id",
             "target": "saas_quotes",
             "same_tenant": true
+          },
+          {
+            "column": "source_plan_id",
+            "target": "saas_plan_versions",
+            "same_tenant": false
+          },
+          {
+            "column": "subscription_id",
+            "target": "saas_subscriptions",
+            "same_tenant": true
           }
         ],
-        "invariants": "Business düşüşünde merkez zorunlu; dönem sonu. Upgrade doğrulanmış ödeme + gecikmiş borç kapanışı."
+        "invariants": "One scheduled change per organization. Period-only request pins source/target plan versions and subscription; starts at paid period end only with verified funds; explicit accepted price/currency/date and row version."
       },
       {
         "name": "saas_quotes",
@@ -74329,7 +74617,8 @@
           "center_discipline_set_v1",
           "availability_exception_save_v1",
           "role_assign_v1",
-          "session_assignment_set_v1"
+          "session_assignment_set_v1",
+          "subscription_period_change_request_v1"
         ]
       },
       {
@@ -78528,6 +78817,110 @@
         "runtime_limits": [
           "Preview is account/organization/center/assignment/version and complete affected-session snapshot bound; no role, session or reservation mutation."
         ]
+      },
+      {
+        "name": "subscription_period_change_request_v1",
+        "module": "M12",
+        "features": [
+          "F32"
+        ],
+        "permission": "subscription.owner",
+        "actor_source": "server_verified",
+        "transport": "W",
+        "billing_class": "exempt",
+        "request": {
+          "$ref": "#/$defs/Request_subscription_period_change_request"
+        },
+        "success": {
+          "$ref": "#/$defs/Success_subscription_period_change_request"
+        },
+        "errors": [
+          "ACCOUNT_LINK_CONFLICT",
+          "ACCOUNT_LINK_REQUIRED",
+          "AUTH_REQUIRED",
+          "BILLING_OPERATION_RESTRICTED",
+          "CLIENT_UPDATE_REQUIRED",
+          "FORBIDDEN",
+          "IDEMPOTENCY_PAYLOAD_MISMATCH",
+          "INTEGRITY_VIOLATION",
+          "INVALID_STATE_TRANSITION",
+          "NOT_FOUND",
+          "OPEN_OPERATIONS_EXIST",
+          "OPERATION_IN_PROGRESS",
+          "OPERATION_RESULT_EXPIRED",
+          "PLAN_FEATURE_UNAVAILABLE",
+          "PLAN_LIMIT_REACHED",
+          "POLICY_NOT_CONFIGURED",
+          "SERVICE_UNAVAILABLE",
+          "SESSION_REVOKED",
+          "SUBSCRIPTION_NOT_STARTED",
+          "TEMPORARY_FAILURE",
+          "VALIDATION_FAILED",
+          "VERSION_CONFLICT"
+        ],
+        "transaction_class": "org_limit",
+        "transaction_guarantee": "Atomically replace the one pending period request, pin accepted plan terms, bump subscription version and record receipt/audit/in-app outbox; no payment or period activation.",
+        "transition": {
+          "effect": "schedule_versioned_same_plan_period_change_at_paid_period_end",
+          "from": [],
+          "to": [],
+          "invariant": "Targeted version/permission checks in operation_contract; no lifecycle reopen implied."
+        },
+        "semantic_guards": [
+          "live_actor_and_scope",
+          "billing_gate_exempt",
+          "same_key_same_payload_replay",
+          "receipt_audit_outbox_atomic_domain_commit",
+          "required_feature_gates_separate_from_references"
+        ],
+        "audit": true,
+        "notification": "outbox_if_user_visible_business_result",
+        "concurrency": "Live original permission/tenant scope on every request; target/aggregate lock; row_version; idempotent receipt and all declared effects rollback together",
+        "expected_version_subject": "saas_subscriptions",
+        "acceptance_scenario_ids": [
+          "A01",
+          "A02",
+          "A03",
+          "A23",
+          "A24",
+          "A25",
+          "A33",
+          "A34",
+          "A35",
+          "A36",
+          "A46",
+          "A47",
+          "A48",
+          "A55"
+        ],
+        "configuration_policy": "numeric plan limits/prices and legal approval are deployment configuration, never arbitrary allow/deny",
+        "implementation_status": "operational_development_limited",
+        "required_features": [
+          "F32"
+        ],
+        "runtime_required_features": [],
+        "conditional_features": [],
+        "operation_contract": {
+          "kind": "command",
+          "target_entity": "saas_subscriptions",
+          "version_mode": "row_version",
+          "version_field": "org_id",
+          "read_operation": "management_state_get_v1",
+          "atomic_effects": [
+            "saas_subscriptions.versioned_domain_change"
+          ],
+          "business_commit": true,
+          "read_path_status": "implemented",
+          "source_decision": "DS-2026-10-17"
+        },
+        "decision_delivery": {
+          "accepted_contract": "DS-2026-10-17",
+          "runtime_conformance": "implemented_pending_ci",
+          "open_dependencies": [],
+          "target_request": {
+            "$ref": "#/$defs/Request_subscription_period_change_request"
+          }
+        }
       }
     ],
     "policy_value_map": {
@@ -85434,12 +85827,6 @@
       },
       {
         "path": "#/$defs/Table_role_assignments/properties/scope_center_id/anyOf/0",
-        "origin": "ftksaas",
-        "acceptance": "generic_uuid",
-        "generation": "uuidv7"
-      },
-      {
-        "path": "#/$defs/Table_role_assignments/properties/account_link_id",
         "origin": "ftksaas",
         "acceptance": "generic_uuid",
         "generation": "uuidv7"
@@ -93993,6 +94380,90 @@
         "origin": "ftksaas",
         "acceptance": "generic_uuid",
         "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Table_role_assignments/properties/account_link_id/anyOf/0",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Table_saas_change_requests/properties/source_plan_id/anyOf/0",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Table_saas_change_requests/properties/subscription_id/anyOf/0",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/SubscriptionPlanTerms/properties/id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/SubscriptionPeriodChange/properties/id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Request_subscription_period_change_request/properties/request_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Request_subscription_period_change_request/properties/org_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Request_subscription_period_change_request/properties/center_id/anyOf/0",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Request_subscription_period_change_request/properties/operation_key",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Request_subscription_period_change_request/properties/target_plan_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Success_subscription_period_change_request/properties/trace_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Request_management_state_get/allOf/151/then/properties/org_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/ManagementSelector_subscription_period_change_request_v1/properties/key/properties/target_plan_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/ManagementProjection_subscription_period_change_request_v1/properties/values/properties/target_plan_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
       }
     ],
     "open_product_decisions": [],
@@ -94385,13 +94856,14 @@
         "calendar_feed_get_v1",
         "settings_preparation_resolve_v1",
         "account_signup_check_v1",
-        "role_revoke_preview_v1"
+        "role_revoke_preview_v1",
+        "subscription_period_change_request_v1"
       ],
       "auth": "Supabase getUser + live auth.sessions + current account/link/role; no request actor claims",
       "uuid": "backend uuid@14.0.3 v7 for all inserted IDs; DB defaults not required",
       "external_transport": "POST /functions/v1/backend-v1/{operation}; direct typed request body",
       "internal_rpc": "service-only api_v1 named functions; actor/session/UUID bank supplied by verified gateway",
-      "migration_count": 96,
+      "migration_count": 97,
       "acceptance_source": "apps/backend/docs/00-FtkSaaS-yeni-sohbet-devir.md"
     },
     "decision_sprint": {
@@ -95088,7 +95560,8 @@
         "calendar_feed_get_v1",
         "settings_preparation_resolve_v1",
         "account_signup_check_v1",
-        "role_revoke_preview_v1"
+        "role_revoke_preview_v1",
+        "subscription_period_change_request_v1"
       ],
       "runtime_deliveries": {
         "starter_attendance_protection": {
@@ -96944,7 +97417,8 @@
           "saas_payment_submit_v1",
           "saas_payment_verify_v1",
           "saas_grace_extend_v1",
-          "subscription_boundary_apply_v1"
+          "subscription_boundary_apply_v1",
+          "subscription_period_change_request_v1"
         ],
         "dependencies": [],
         "implementation": "source_operations_present",
@@ -96965,7 +97439,8 @@
           "saas_payment_submit_v1",
           "saas_payment_verify_v1",
           "saas_grace_extend_v1",
-          "subscription_boundary_apply_v1"
+          "subscription_boundary_apply_v1",
+          "subscription_period_change_request_v1"
         ],
         "contract_only_operations": [],
         "acceptance_case_ids": [],

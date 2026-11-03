@@ -187,6 +187,13 @@ Bildirim opt-in default ve miras kuralları [ayar sözleşmesinden](contracts/02
 
 **Sıra:** `subscription_get_v1` → uygun upgrade quote veya downgrade request → gerekiyorsa `saas_payment_submit_v1` → abonelik ve değişiklik durumunu yeniden oku. Cancel ve renewal tercihi ayrı komutlardır. Platform ödeme doğrulaması/ek süre WF17'dir; müşteri tarafı kendi ödemesini doğrulayamaz.
 
+Aylık↔yıllık geçiş aynı plan içinde ayrı `subscription_period_change_request_v1` komutudur. `subscription_get_v1.billing` güncel plan sürümünü/dönemi/fiyatı, aynı planın diğer dönem seçeneklerini ve varsa bekleyen dönem talebinin kimlik/sürüm/şartlarını verir; `subscription_version` bütün planlarda güncel yazma sürümüdür. İstemci seçili `target_plan_id` ile `management_state_get_v1(operation=subscription_period_change_request_v1, selector.key={target_plan_id})` üzerinden dar güncel değerleri ve abonelik sürümünü okur. Komutta açık kabul edilen `amount_minor/currency/effective_at` ve `expected_version` gönderir. Fiyat, tarih veya sürüm değişmişse `VERSION_CONFLICT`; aynı dönem, başka plan/para birimi/özellik/limit hedefi geçerli dönem değişimi değildir.
+
+Organizasyonda tek bekleyen değişiklik tutulur. Yeni sürümlü dönem talebi önceki dönem talebini iptal ederek değiştirir; mevcut plan değiştirme talebi önce açıkça iptal edilmelidir. Bekleyen dönem talebi varken upgrade/downgrade veya yenilemeyi durdurma `OPEN_OPERATIONS_EXIST` verir; `subscription_change_cancel_v1` önce güncel talep kimlik/sürümüyle kullanılır. Yenilemesi durdurulmuş abonelik yeni dönem talebi alamaz. Oluşturma/değiştirme/iptal abonelik sürümünü artırır; eski teklif veya sürüm kullanılamaz.
+
+Talep ödemeyi veya mevcut ödenmiş dönemi değiştirmez. Erken doğrulanan fon mevcut dönem sonuna kadar bekler. Sınırda worker veya ödeme doğrulaması aynı abonelik kilidi ve fon tahsis yolunu kullanır; yeterli doğrulanmış fonla hedef dönem bir kez açılır. Fon yetersizse eski plan/dönem ve bekleyen talep korunur, normal grace/askı kuralları işler; sırf dönem isteği bekliyor diye günlük işlemlere ek engel konmaz. Dönem başlangıcı kabul edilen eski dönem sonudur; gecikmiş işleme borçlu dönemleri atlamaz. Kabul edilmiş kaynak/hedef plan sürümlerinin fiyat/para birimi/dönem/özellik/limitleri sonradan değiştirilemez; yeni şart yeni plan sürümüdür. Starter'ın seçili kaynak kapsamı korunur.
+
+
 **Hata/kurtarma:** Yeni işlem, düzeltme, okuma ve worker için billing sınıfı aynı değildir; bütün API'ler tek abonelik boolean'ıyla açılmaz. **Sonuç/yan etki:** Ödeme bildirimi doğrulanmış abonelik değildir. Plan/quota değişimi yeni işlemde canlı denetlenir; mevcut kesin rezervasyon koruması dikkate alınır. Sadece Starter özelliği olan akışlarla üst-plan menüleri karıştırılmaz.
 
 ## WF14

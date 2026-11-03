@@ -1,3 +1,4 @@
+import './subscription-period-acceptance.mjs';
 import './starter-document-acceptance.mjs';
 import './frontend-settings-acceptance.mjs';
 import test from 'node:test';
