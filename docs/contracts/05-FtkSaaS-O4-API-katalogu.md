@@ -2,7 +2,7 @@
 
 Üretilmiştir: `packages/api-contracts/schema/contract.json` ve `implemented.json` → `render_catalogs.py`. Elle düzenleme. DTO/enum/izin için makine sözleşmesi tek kaynaktır; çağrı sırası [WF rehberi](../workflows.md), transport [istemci protokolü](../client-integration.md) sahibindedir.
 
-219 sözleşme operasyonu; 219 kaynak envanterinde, 0 contract-only. Kaynakta bulunmak tüm selector/provider/özellik veya hosted kabulünün tamamlandığını göstermez. Backend-only worker işlemleri tarayıcı çağrısı değildir.
+220 sözleşme operasyonu; 220 kaynak envanterinde, 0 contract-only. Kaynakta bulunmak tüm selector/provider/özellik veya hosted kabulünün tamamlandığını göstermez. Backend-only worker işlemleri tarayıcı çağrısı değildir.
 
 | İşlem | Kaynak durumu / tüketici | İzin | Tür / abonelik | İstek | Yanıt |
 |---|---|---|---|---|---|
@@ -225,6 +225,7 @@
 | `settings_preparation_resolve_v1` | runtime / ilgili WF’yi oku | `preparation.resolve` | R / read | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; center_id: FtkUuid; kind: availability / package; source: PreparationSourceReference; resource?: ResourceRef; rule_index?: integer | Success_settings_preparation_resolve |
 | `account_signup_check_v1` | runtime / ilgili WF’yi oku | `auth.signup` | E / exempt | client_api_version: 1; request_id: FtkUuid; email: string | Success_account_signup_check |
 | `role_revoke_preview_v1` | runtime / ilgili WF’yi oku | `center.manage` | P / config | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; center_id: FtkUuid; expected_version: PositiveInt; assignment_id: FtkUuid | Success_role_revoke_preview |
+| `subscription_period_change_request_v1` | runtime / ilgili WF’yi oku | `subscription.owner` | W / exempt | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; center_id?: FtkUuid ∣ null; operation_key: FtkUuid; expected_version: PositiveInt; target_plan_id: FtkUuid; amount_minor: Money; currency: Currency; effective_at: Instant | Success_subscription_period_change_request |
 
 ## Sürüm ve okuma desteği
 
@@ -451,6 +452,7 @@
 | settings_preparation_resolve_v1 | read | none | None | not_required |  |
 | account_signup_check_v1 | auth | none | None | implemented |  |
 | role_revoke_preview_v1 | preview | row_version | management_state_get_v1 | contract_only |  |
+| subscription_period_change_request_v1 | command | row_version | management_state_get_v1 | implemented | saas_subscriptions.versioned_domain_change |
 
 ## Sunucunun hesaplaşma yetki bağlamı
 

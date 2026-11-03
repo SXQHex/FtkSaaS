@@ -5936,6 +5936,29 @@
       "limits": [
         "Preview is account/organization/center/assignment/version and complete affected-session snapshot bound; no role, session or reservation mutation."
       ]
+    },
+    {
+      "name": "subscription_period_change_request_v1",
+      "status": "operational_development_limited",
+      "external_path": "/functions/v1/backend-v1/subscription_period_change_request_v1",
+      "permission": "subscription.owner",
+      "features": [
+        "F32"
+      ],
+      "required_features": [
+        "F32"
+      ],
+      "runtime_required_features": [],
+      "decision_delivery": {
+        "accepted_contract": "DS-2026-10-17",
+        "runtime_conformance": "implemented_pending_ci",
+        "open_dependencies": [],
+        "target_request": {
+          "$ref": "#/$defs/Request_subscription_period_change_request"
+        }
+      },
+      "billing_class": "exempt",
+      "limits": []
     }
   ]
 }
