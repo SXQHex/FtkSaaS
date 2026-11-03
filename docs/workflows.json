@@ -274,8 +274,8 @@
         "management_state_get_v1"
       ],
       "review": {
-        "fingerprint": "e7d830eb7c788d6bf997b739df224d79f3dab73c2016170dd7909f0436c8b176",
-        "reason": "PR164 main senkronizasyonunda deney ve ticari limit kaynak bağları korundu; değişen owning suite/P06 hash ve satır sahipliği 50 birime eşitlendi. Runner, checker, exclusive ve ağırlık kuralları değişmedi; 9 deney ön kontrolü geçti."
+        "fingerprint": "52f46d58f7f6498a543ec0747a447f932d07ecd0e90174daa70090c2956e8347",
+        "reason": "ST03 dört kabul kökünün deney source hash eşlemesi ve ana suite sahipliği incelendi; byte-exact assertion satırları korunur. Runner/checker/workflow ve ortak protokol değişmedi."
       }
     },
     {
@@ -1046,7 +1046,8 @@
       "tests": [
         "apps/backend/tests/frontend-settings-acceptance.mjs",
         "apps/backend/tests/starter-preparation-acceptance.mjs",
-        "apps/backend/tests/starter-operations-acceptance.mjs"
+        "apps/backend/tests/starter-operations-acceptance.mjs",
+        "apps/backend/tests/starter-preparation-fixture.mjs"
       ],
       "sources": [
         "apps/backend/config/frontend-settings.json",
@@ -1084,8 +1085,8 @@
         "settings_preparation_resolve_v1"
       ],
       "review": {
-        "fingerprint": "d29c68cd5594ffd5c07c6c8eb9b7d1777baf6d1c68cb97a20b37fc2d9b2b1f06",
-        "reason": "Ortak üretilmiş wrapper farkı yalnız S16 owner abonelik dönem komutunu ekler; bu akışın mevcut operasyon/görev/izin/plan ve davranış kaynakları değişmedi, ilgili rehber incelendi."
+        "fingerprint": "f640fad506fe9f67cf80df0ce54af09487745811b65be2944db55fc290980965",
+        "reason": "ST03 dört izole native tenant kökü, aynı14 senaryo ve154 birebir assertion ile korunur. Başarılı owner settings yanıtı ve gerçek yarış kazananı sürümü izlenir; explicit okumalar,600000ms sınırı ve native consumer akışı değişmez."
       }
     },
     {
