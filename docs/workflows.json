@@ -274,8 +274,8 @@
         "management_state_get_v1"
       ],
       "review": {
-        "fingerprint": "da6b34d4c05c4c5795187d7f6ff512825fb01cf4973c178649427cd36f6653da",
-        "reason": "Sekiz shard deneyinde özgün 300s bütçeli ST-02 ile uzun ST-03 aynı runtimea atanmıştı. Yeni envanter/planner ST-02yi tek runnera ayırır; 48 gövde, test bütçeleri, global fixture fazları ve üretim dört shard kabulü korunur. Ortak istemci protokolü değişmez."
+        "fingerprint": "cc14017ce0b0f564e864bdf18ed44434305713fd0dd923f7e3bcb54498e35552",
+        "reason": "PR164 güncel kaynak hash ve kabul modülleri ile ST03 dört native kökü korunarak ST02 dedicated runner dağıtımı birleştirildi; 50 birim eksiksiz, beş global fixture fazı ve özgün test bütçeleri korunur. Üretim dört shard ve ortak protokol değişmez."
       }
     },
     {
@@ -447,8 +447,8 @@
         "role_revoke_preview_v1"
       ],
       "review": {
-        "fingerprint": "78634d039ba245e19ec19785caa597cbd8384233ed9914d7c12d770295334c91",
-        "reason": "Registry harnessine sınırlı S16 kökü bağlandı; ortak wrappera tek service-only abonelik komutu eklendi. Bu akışın mevcut kurulum/rol/kişi kaynağı ve rehber davranışı değişmedi."
+        "fingerprint": "72d56c42f0e98270f720d9c26c82be0033ccd4d12e3902f6ad317b9ee97adf5e",
+        "reason": "Registry harness yeni ticari limit regresyonunu içeri alıyor; mevcut oda/rol yetki kuralları değişmedi, üst-plan limit gösterimi WF13 sahibinde."
       }
     },
     {
@@ -557,7 +557,8 @@
         "apps/backend/tests/p07-account-revocation-acceptance.mjs",
         "apps/backend/tests/registry.test.mjs",
         "apps/backend/tests/subscriber-number-acceptance.mjs",
-        "apps/backend/tests/starter-operations-acceptance.mjs"
+        "apps/backend/tests/starter-operations-acceptance.mjs",
+        "apps/backend/tests/commercial-plan-acceptance.mjs"
       ],
       "sources": [
         "apps/backend/database/active-discipline-projection-wrappers.sql",
@@ -605,7 +606,9 @@
         "apps/backend/database/subscriber-operation-projections.sql",
         "apps/backend/supabase/migrations/20261102121549_subscriber_operation_projections.sql",
         "apps/backend/database/starter-subscriber-projections.sql",
-        "apps/backend/supabase/migrations/20261102180626_starter_subscriber_projections.sql"
+        "apps/backend/supabase/migrations/20261102180626_starter_subscriber_projections.sql",
+        "apps/backend/database/commercial-plan-limits.sql",
+        "apps/backend/supabase/migrations/20261103141306_commercial_plan_limits.sql"
       ],
       "operations": [
         "account_access_send_v1",
@@ -624,8 +627,8 @@
         "person_discipline_set_v1"
       ],
       "review": {
-        "fingerprint": "952d6d8ab823c5af203870b4c10c3a196e26c67e99c3576d402055381e2d44c2",
-        "reason": "Registry harnessine sınırlı S16 kökü bağlandı; ortak wrappera tek service-only abonelik komutu eklendi. Bu akışın mevcut kurulum/rol/kişi kaynağı ve rehber davranışı değişmedi."
+        "fingerprint": "3fd949dfca6d2b715d468f99f280143acc41b903ce4769b585739bb92e8da6b9",
+        "reason": "Ticari limit SSoT canonical org öğrenci sayımı, son slot yarışı, ikinci merkez, reactivation ve merge testleri; CRM raw-limit fixture yerine gerçek kapasite dolduruldu."
       }
     },
     {
@@ -714,8 +717,8 @@
         "negative_limits_get_v1"
       ],
       "review": {
-        "fingerprint": "aee580909da279ffef0a4b6d551d02ef990744f726d4d4c0e8f530d73554333e",
-        "reason": "Shared contract test adds schedule prerequisite validation only; sale, credit and entitlement semantics and this guide remain unchanged."
+        "fingerprint": "939ed8c4a85fd505beeffa7c6d7c1f32964be450b9371e498d79521f3be47e6e",
+        "reason": "Event-payment harness FIN-01 native regresyonunu içeri alıyor; satış/paket davranışı ve rehberi değişmedi."
       }
     },
     {
@@ -906,8 +909,8 @@
         "debt_adjust_v1"
       ],
       "review": {
-        "fingerprint": "ea671f967b1d7af5fdc3dc5c582afd287783f4836ac8f010629dda4be0232849",
-        "reason": "Ortak üretilmiş wrapper farkı yalnız S16 owner abonelik dönem komutunu ekler; bu akışın mevcut operasyon/görev/izin/plan ve davranış kaynakları değişmedi, ilgili rehber incelendi."
+        "fingerprint": "53c8403dd37d100688284134bf37cee91eb5fdca846afadd9d49d3086f2a39ba",
+        "reason": "Event-payment harness seçili hakediş regresyonunu içeri alıyor; collection/debt nakit akışı değiştirilmedi."
       }
     },
     {
@@ -949,8 +952,8 @@
         "calendar_feed_get_v1"
       ],
       "review": {
-        "fingerprint": "68a59b5c8a7c3a2c435f5dd75cb506b18d40b36a66acaf7d77d134767dc7eb17",
-        "reason": "Mevcut gerçek GET takvim kabulüne gerçek native HEAD boş gövde/uzunluk/no-store kontrolü eklendi; hosted widget ve gerçek seans ekranı kabulü ayrı kalır."
+        "fingerprint": "d7331d951f62e9802d0220f69dee3e91715990708969491eb390f3c837f40e82",
+        "reason": "Person registry dosyasında yalnız gerçek ticari kapasite fixture değişti; public/ICS davranışı ve rehberi değişmedi."
       }
     },
     {
@@ -980,7 +983,9 @@
         "apps/backend/database/runtime-wrappers-current.sql",
         "docs/workflows.md",
         "apps/backend/database/subscriber-numbers.sql",
-        "apps/backend/database/settings-catalog-v10.sql"
+        "apps/backend/database/settings-catalog-v10.sql",
+        "apps/backend/database/commercial-plan-limits.sql",
+        "apps/backend/supabase/migrations/20261103141306_commercial_plan_limits.sql"
       ],
       "operations": [
         "report_get_v1",
@@ -993,8 +998,8 @@
         "file_upload_complete_v1"
       ],
       "review": {
-        "fingerprint": "cf20cd590f642e94826ae11ddb4f1a255ec8a3c8cbd93882be589874923b9978",
-        "reason": "Ortak üretilmiş wrapper farkı yalnız S16 owner abonelik dönem komutunu ekler; bu akışın mevcut operasyon/görev/izin/plan ve davranış kaynakları değişmedi, ilgili rehber incelendi."
+        "fingerprint": "c0e4f49bf685983884ed2e09ef13bb1abd8bf2fea599ab8cde860c690052c4ac",
+        "reason": "Native CSV preview/apply worker son slot yarışında canlı ticari kotayı tekrar sınar; mevcut fenced row transaction ve invalid/failed sonuçları korunur."
       }
     },
     {
@@ -1041,7 +1046,8 @@
       "tests": [
         "apps/backend/tests/frontend-settings-acceptance.mjs",
         "apps/backend/tests/starter-preparation-acceptance.mjs",
-        "apps/backend/tests/starter-operations-acceptance.mjs"
+        "apps/backend/tests/starter-operations-acceptance.mjs",
+        "apps/backend/tests/starter-preparation-fixture.mjs"
       ],
       "sources": [
         "apps/backend/config/frontend-settings.json",
@@ -1079,8 +1085,8 @@
         "settings_preparation_resolve_v1"
       ],
       "review": {
-        "fingerprint": "d29c68cd5594ffd5c07c6c8eb9b7d1777baf6d1c68cb97a20b37fc2d9b2b1f06",
-        "reason": "Ortak üretilmiş wrapper farkı yalnız S16 owner abonelik dönem komutunu ekler; bu akışın mevcut operasyon/görev/izin/plan ve davranış kaynakları değişmedi, ilgili rehber incelendi."
+        "fingerprint": "f640fad506fe9f67cf80df0ce54af09487745811b65be2944db55fc290980965",
+        "reason": "ST03 dört izole native tenant kökü, aynı14 senaryo ve154 birebir assertion ile korunur. Başarılı owner settings yanıtı ve gerçek yarış kazananı sürümü izlenir; explicit okumalar,600000ms sınırı ve native consumer akışı değişmez."
       }
     },
     {
@@ -1094,7 +1100,8 @@
         "apps/backend/tests/starter-plan-gates-acceptance.mjs",
         "apps/backend/tests/fixtures/p07-subscription-lifecycle.sql",
         "apps/backend/tests/p07-lifecycle-acceptance.mjs",
-        "apps/backend/tests/subscription-period-acceptance.mjs"
+        "apps/backend/tests/subscription-period-acceptance.mjs",
+        "apps/backend/tests/commercial-plan-acceptance.mjs"
       ],
       "sources": [
         "apps/backend/database/active-discipline-projection-wrappers.sql",
@@ -1133,7 +1140,9 @@
         "apps/backend/database/wrappers.sql",
         "docs/workflows.md",
         "apps/backend/database/subscription-period-change.sql",
-        "apps/backend/supabase/migrations/20261103101412_subscription_period_change.sql"
+        "apps/backend/supabase/migrations/20261103101412_subscription_period_change.sql",
+        "apps/backend/database/commercial-plan-limits.sql",
+        "apps/backend/supabase/migrations/20261103141306_commercial_plan_limits.sql"
       ],
       "operations": [
         "subscription_get_v1",
@@ -1145,8 +1154,8 @@
         "subscription_period_change_request_v1"
       ],
       "review": {
-        "fingerprint": "c0e9343b2ae0bd8ee348b6ea5673e297e2c448d8ac02f3da6a8effe649d50dc7",
-        "reason": "S16 aynı plan dönem değişimi, açık fiyat/tarih/sürüm, dar management okuması, tek talep ve doğrulanmış fonla worker/ödeme ortak tahsisi kaynak ve rehberle incelendi."
+        "fingerprint": "9dd7c93ad5b33ba7f592580eca4bb09209b932fdea45cff5ddd960b2edc150ac",
+        "reason": "Etkin ticari limit tek helper; fiyat/geçmiş raw catalog korunur, farklı raw limitli dönem seçeneği ve request aynı etkin kapsamla uyumludur."
       }
     },
     {
@@ -1158,7 +1167,8 @@
       "tests": [
         "apps/backend/tests/instructor-earnings.test.mjs",
         "apps/backend/tests/event-payment.test.mjs",
-        "apps/backend/tests/program-configuration-acceptance.mjs"
+        "apps/backend/tests/program-configuration-acceptance.mjs",
+        "apps/backend/tests/earning-payment-selection-acceptance.mjs"
       ],
       "sources": [
         "apps/backend/database/cross-center-settlement-wrappers.sql",
@@ -1183,8 +1193,8 @@
         "instructor_agreements_list_v1"
       ],
       "review": {
-        "fingerprint": "4f060aa7ebc47aee04eff6fb256334d8f74a9c3c85e4b1e6090b8e4d257e9a6a",
-        "reason": "Native agreement publication/list and program recovery share the new scoped prerequisite acceptance; immutable terms, fresh preview and permission separation reviewed."
+        "fingerprint": "d200d9dfa302ffd8eee482624aec178d46dd51bc823636d418744c5b612c5598",
+        "reason": "FIN-01 mevcut bütün earning_ids doğrulamasını gerçek native ödeme/replay ve atomik ret testiyle korur; finans runtime davranışı değişmedi."
       }
     },
     {
@@ -1250,8 +1260,8 @@
         "event_actual_start_correct_v1"
       ],
       "review": {
-        "fingerprint": "506f0bd674447ec153981a5bd64707c458dd58fd3b9749ff2fa54c1a746dde89",
-        "reason": "Ortak üretilmiş wrapper farkı yalnız S16 owner abonelik dönem komutunu ekler; bu akışın mevcut operasyon/görev/izin/plan ve davranış kaynakları değişmedi, ilgili rehber incelendi."
+        "fingerprint": "726a0f56fb5aad6c56022297f250d46915fcb92db23c4f68a7ed322735deeb0c",
+        "reason": "Event-payment harness yeni hakediş kapsam regresyonunu içeri alıyor; etkinlik kayıt/ödeme/iptal davranışı ve rehberi değişmedi."
       }
     },
     {
@@ -1288,8 +1298,8 @@
         "automation_save_v1"
       ],
       "review": {
-        "fingerprint": "ed3aa1651293a5bae300271a6f77ef4d902cb524c93e53c6bc4c59d3d7b0159d",
-        "reason": "Ortak üretilmiş wrapper farkı yalnız S16 owner abonelik dönem komutunu ekler; bu akışın mevcut operasyon/görev/izin/plan ve davranış kaynakları değişmedi, ilgili rehber incelendi."
+        "fingerprint": "92b723d102faf2a0173c03a5788853a1f618c5ce9bcea2d0f2f60f29b2c4580b",
+        "reason": "CRM quota fixture sıfır raw limit değiştirmek yerine etkin Business kapasitesini dolduruyor; aynı PLAN_LIMIT ve geçmiş koruma assertionları korunur."
       }
     },
     {
@@ -1486,8 +1496,8 @@
         "subscription_boundary_apply_v1"
       ],
       "review": {
-        "fingerprint": "50c245f654e850b9bae266e0c3be515a62476bdcda4e71e5e5d6356cc69290d9",
-        "reason": "Ortak üretilmiş wrapper farkı yalnız S16 owner abonelik dönem komutunu ekler; bu akışın mevcut operasyon/görev/izin/plan ve davranış kaynakları değişmedi, ilgili rehber incelendi."
+        "fingerprint": "066692e59dc6ce5fda469ded738c1259a026d65db288af400d63c392d43bf8ee",
+        "reason": "P06 scoped worker testinde preview sonrası interaktif kapasite tüketimi denetleniyor; worker claim/lease/retry yetkileri ve runtime değişmedi."
       }
     }
   ]

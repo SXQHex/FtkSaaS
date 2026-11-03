@@ -254,9 +254,13 @@ test('P04 CRM/public intent -> review -> trial -> student, real Auth/Edge and is
   assert.equal((await rows("select count(*)::int n from core.entitlement_allocations where org_id=$1 and reservation_id=$2 and sale_id=$3 and state='reserved'",[org,reservation.id,sale]))[0].n,1);
  });
  await t.test('conversion enforces distinct org student limit, idempotency, plan gating and preserves free history',async()=>{
-  const before=(await rows('select limits from core.saas_plan_versions where id=$1',[plan]))[0].limits;
-  await db.query('update core.saas_plan_versions set limits=$2 where id=$1',[plan,{entries:[{key:'active_students',value:0},{key:'centers',value:10},{key:'instructors',value:50}]}]);
-  try{await fail('lead_convert_v1',{lead_id:lead},'PLAN_LIMIT_REACHED');}finally{await db.query('update core.saas_plan_versions set limits=$2 where id=$1',[plan,before]);}
+  // Exercise the accepted Business bound instead of inventing a zero-limit plan.
+  const used=Number((await rows('select private.starter_student_count($1) n',[org]))[0].n);
+  const filler=Array.from({length:1250-used},()=>key()),links=filler.map(()=>key());
+  await db.query("insert into core.people(id,org_id,display_name,state) select id,$1,'Synthetic conversion capacity','active' from unnest($2::uuid[]) id",[org,filler]);
+  await db.query("insert into core.center_relationships(id,org_id,center_id,person_id,kind,state,started_at) select id,$1,$2,person_id,'student','active',now() from unnest($3::uuid[],$4::uuid[]) x(id,person_id)",[org,center,links,filler]);
+  try{await fail('lead_convert_v1',{lead_id:lead},'PLAN_LIMIT_REACHED');}
+  finally{await db.query("update core.center_relationships set state='inactive' where org_id=$1 and id=any($2)",[org,links]);}
   const k=key();await mut('lead_convert_v1',{lead_id:lead},owner,k);assert.equal((await mut('lead_convert_v1',{lead_id:lead},owner,k)).replayed,true);await fail('lead_convert_v1',{lead_id:lead},'INVALID_STATE_TRANSITION');
   assert.equal((await rows("select count(*)::int n from core.center_relationships where org_id=$1 and person_id=$2 and kind='student' and state='active'",[org,person]))[0].n,1);
   assert.equal((await rows('select source_sale_id from core.reservations where org_id=$1 and person_id=$2',[org,person]))[0].source_sale_id,null);

@@ -1,36 +1,18 @@
 import test from 'node:test';import assert from 'node:assert/strict';
-import {authUser,fixturePlatform,must,call,context} from './api-client.mjs';
-import {connect} from '../scripts/db.mjs';import {newUuidV7 as key} from '../scripts/uuid.mjs';
+import {call,context} from './api-client.mjs';
+import {newUuidV7 as key} from '../scripts/uuid.mjs';
+import {preparationFixture} from './starter-preparation-fixture.mjs';
 import fs from 'node:fs';import {createHash} from 'node:crypto';
+const denied=async(u,op,b,code)=>{const r=await call(u,op,b,key());assert.equal(r.result.ok,false);assert.equal(r.result.error.code,code,JSON.stringify(r.result));};
 const settingsCatalogVersion=JSON.parse(fs.readFileSync('config/frontend-settings.json','utf8')).version;
-test('ST-03 Starter preparation defaults copy, authority, reset and program consumer',{timeout:600000},async t=>{
- const {platform,plan}=await fixturePlatform(),owner=await authUser('st03-preparation-owner'),student=await authUser('st03-preparation-student');
- const db=await connect(),rows=async(sql,args=[])=>(await db.query(sql,args)).rows;let org,center,room,discipline,person,studentPerson,roomRule,initialPreparationOrgVersion,packageTemplate;
- const scoped=b=>({org_id:org,center_id:center,...b}),api=(op,b={},u=owner,k=key())=>must(u,op,scoped(b),k);
- const q=scope=>({scope,org_id:org,...(scope==='center'?{center_id:center}:{})});
- const read=scope=>must(owner,'settings_get_v1',q(scope));
- const change=async(scope,patch)=>{const v=await read(scope);return must(owner,'settings_update_v1',{...q(scope),expected_version:v.version,patch},key());};
- const denied=async(u,op,b,code)=>{const r=await call(u,op,b,key());assert.equal(r.result.ok,false);assert.equal(r.result.error.code,code,JSON.stringify(r.result));};
- const day=n=>new Date(Date.now()+n*86400000).toISOString().slice(0,10);
- const availabilityTemplate={key:'weekday',name:'Explicit weekly preparation',rules:[{weekdays:[1,2,3,4,5,6,7],local_start:'08:00:00',local_end:'19:00:00',valid_from:'2020-01-01'}]};
- let classId;
- const preview=hour=>api('program_preview_v1',{class_id:classId,schedule:{room_id:room,weekdays:[1,2,3,4,5,6,7],local_start:hour+':00:00',starts_on:day(1),ends_on:day(2),assignments:[{person_id:person,duty:'instructor'}],capacity:{total:10}}});
- const duration=p=>{assert.equal(p.sessions.length,1);return (Date.parse(p.sessions[0].interval.ends_at)-Date.parse(p.sessions[0].interval.starts_at))/60000;};
+const duration=p=>{assert.equal(p.sessions.length,1);return (Date.parse(p.sessions[0].interval.ends_at)-Date.parse(p.sessions[0].interval.starts_at))/60000;};
+
+test('ST-03 program defaults, copy, concurrency and reset',{timeout:600000},async t=>{
+ const fixture=await preparationFixture({"schedule": true, "templates": true});
+ t.diagnostic('Isolated fixture setup: '+fixture.setup_ms.toFixed(1)+' ms');
+ let {platform,plan,owner,student,db,rows,org,center,room,discipline,person,studentPerson,roomRule,initialPreparationOrgVersion,packageTemplate,account,scoped,api,q,read,change,day,availabilityTemplate,classId,preview,must,observe}=fixture;
  try{
-  await db.query("update core.saas_plan_versions set name='starter' where id=$1",[plan]);const account=await must(owner,'account_get_v1');
-  org=(await must(platform,'organization_create_v1',{verified_account_id:account.id,name:'Synthetic ST03 defaults',initial_plan_id:plan},key())).primary_id;
-  const pay=await api('saas_payment_submit_v1',{amount_minor:'1000',currency:'TRY',reference:'SYNTHETIC ST03',occurred_at:new Date().toISOString()});await api('saas_payment_verify_v1',{payment_id:pay.primary_id,accepted:true},platform);
-  discipline=(await must(owner,'discipline_save_v1',{org_id:org,name:'Yoga',state:'active'},key())).primary_id;
-  packageTemplate={key:'credit',name:'Explicit credits preparation',discipline_id:discipline,terms:{name:'Yoga · prepared credits',kind:'credits',booking_mode:'flexible',credits:4,price_minor:'400',currency:'TRY',freeze:{enabled:false,extends_validity:false},refund:{method:'credit_ratio'},quota:null},start_date:day(1),end_date:day(61)};
-  await must(owner,'settings_update_v1',{scope:'organization',org_id:org.toUpperCase(),expected_version:0,patch:{program_duration_minutes:45,availability_templates:[availabilityTemplate],package_templates:[packageTemplate]}},key());initialPreparationOrgVersion=(await read('organization')).version;
   assert.equal((await read('organization')).values.program_duration_minutes,45);
-  center=(await api('center_create_v1',{name:'Copied preparation',timezone:'UTC'})).primary_id;
-  person=(await rows('select owner_person_id from core.organizations where id=$1',[org]))[0].owner_person_id;
-  await api('center_manager_assign_v1',{person_id:person});
-  await api('center_discipline_set_v1',{discipline_id:discipline,state:'active'});
-  room=(await api('room_save_v1',{name:'Only room',capacity:10})).primary_id;await api('role_assign_v1',{person_id:person,role:'instructor',scope:{center_id:center}});
-  for(const resource of [{kind:'room',id:room},{kind:'person',id:person}]){const saved=await api('availability_save_v1',{resource,rule:{weekdays:[1,2,3,4,5,6,7],local_start:'00:00:00',local_end:'23:59:59',valid_from:'2020-01-01'}});if(resource.kind==='room')roomRule=saved.primary_id;}
-  classId=(await api('class_save_v1',{name:'Preparation Yoga',discipline_id:discipline,external_open:false})).primary_id;
   await t.test('new center copies approved org proposal; subsequent template edits do not move it',async()=>{
    const v=await read('center');assert.equal(v.values.program_duration_minutes,45);assert.equal(v.program_duration_source.kind,'organization_copy');assert.equal(v.program_duration_source.organization_version,(await read('organization')).version);
    await change('organization',{program_duration_minutes:90});assert.equal((await read('center')).values.program_duration_minutes,45);
@@ -42,6 +24,7 @@ test('ST-03 Starter preparation defaults copy, authority, reset and program cons
   await t.test('mixed UUID spelling shares one version and concurrency lock',async()=>{
    const version=(await read('center')).version;
    const attempts=await Promise.all([false,true].map(upper=>call(owner,'settings_update_v1',{scope:'center',org_id:upper?org.toUpperCase():org,center_id:upper?center.toUpperCase():center,expected_version:version,patch:{program_duration_minutes:upper?55:65}},key())));
+   const winner=attempts.find(x=>x.result.ok);if(winner)observe('center',winner.result.data);
    assert.equal(attempts.filter(x=>x.result.ok).length,1);assert.equal(attempts.find(x=>!x.result.ok).result.error.code,'VERSION_CONFLICT');await change('center',{program_duration_minutes:45});
   });
   await t.test('preview freezes copied duration; later local edits do not rewrite approved proposal or program',async()=>{
@@ -55,6 +38,14 @@ test('ST-03 Starter preparation defaults copy, authority, reset and program cons
    await must(owner,'settings_reset_apply_v1',{...q('center'),expected_version:p.version,preview:{id:p.id,token:p.token}},key());
    assert.equal((await read('center')).program_duration_source.kind,'system_default');assert.equal(duration(await preview('13')),60);assert.equal(Number((await rows('select duration_minutes from core.program_versions where org_id=$1',[org]))[0].duration_minutes),45);
   });
+ }finally{await db.end();}
+});
+
+test('ST-03 member privacy, calendar, media and public visibility',{timeout:600000},async t=>{
+ const fixture=await preparationFixture({"schedule": true, "studentUser": true, "session": true});
+ t.diagnostic('Isolated fixture setup: '+fixture.setup_ms.toFixed(1)+' ms');
+ let {platform,plan,owner,student,db,rows,org,center,room,discipline,person,studentPerson,roomRule,initialPreparationOrgVersion,packageTemplate,account,scoped,api,q,read,change,day,availabilityTemplate,classId,preview,must,observe}=fixture;
+ try{
   await t.test('peer fields require opt-in and live confirmed co-attendance; end, cancellation and unlink close visibility',async()=>{
    const member=await must(student,'account_get_v1');studentPerson=(await api('person_create_v1',{display_name:'Synthetic ST03 member',contacts:[]})).primary_id;await api('student_activate_v1',{person_id:studentPerson});
    const link=key();await db.query("insert into core.account_links(id,org_id,account_id,person_id,state,verified_at) values($1,$2,$3,$4,'active',now())",[link,org,member.id,studentPerson]);
@@ -138,6 +129,47 @@ test('ST-03 Starter preparation defaults copy, authority, reset and program cons
    await change('organization',{public_profile_enabled:true});v=await publicRead();assert.deepEqual(v.center_profile,{});
    await change('organization',{public_profile_enabled:false});
   });
+ }finally{await db.end();}
+});
+
+test('ST-03 availability and package preparation consumers',{timeout:600000},async t=>{
+ const fixture=await preparationFixture({"schedule": true, "templates": true, "studentUser": true, "studentMembership": true});
+ t.diagnostic('Isolated fixture setup: '+fixture.setup_ms.toFixed(1)+' ms');
+ let {platform,plan,owner,student,db,rows,org,center,room,discipline,person,studentPerson,roomRule,initialPreparationOrgVersion,packageTemplate,account,scoped,api,q,read,change,day,availabilityTemplate,classId,preview,must,observe}=fixture;
+ try{
+  await t.test('availability proposals copy once, resolve to real domain input and reset without erasing active hours',async()=>{
+   let c=await read('center');assert.deepEqual(c.values.availability_templates,[availabilityTemplate]);assert.equal(c.preparation_sources.availability_templates.kind,'organization_copy');assert.equal(c.preparation_sources.availability_templates.organization_version,initialPreparationOrgVersion);
+   await change('organization',{availability_templates:[{...availabilityTemplate,rules:[{...availabilityTemplate.rules[0],local_end:'18:00:00'}]}]});assert.deepEqual((await read('center')).values.availability_templates,[availabilityTemplate]);
+   const catalog=await must(owner,'settings_catalog_get_v1',q('center')),choice=catalog.preparation_templates.availability.find(x=>x.source.scope==='center');assert(choice);const resource={kind:'room',id:room},body={kind:'availability',source:choice.source,resource,rule_index:0};
+   const prepared=await api('settings_preparation_resolve_v1',body);assert.deepEqual(prepared.request,{resource,rule:availabilityTemplate.rules[0]});
+   await denied(student,'settings_preparation_resolve_v1',scoped(body),'FORBIDDEN');
+   await change('center',{availability_templates:[availabilityTemplate]});assert.equal((await read('center')).preparation_sources.availability_templates.kind,'center_local');await denied(owner,'settings_preparation_resolve_v1',scoped(body),'VERSION_CONFLICT');
+   const managed=await api('management_state_get_v1',{operation:'availability_save_v1',selector:{operation:'availability_save_v1',key:{resource,rule_id:roomRule}}});assert(managed.items[0].exists);await denied(student,'management_state_get_v1',scoped({operation:'availability_save_v1',selector:{operation:'availability_save_v1',key:{resource,rule_id:roomRule}}}),'FORBIDDEN');
+   await api('availability_save_v1',{...prepared.request,rule_id:roomRule,expected_version:managed.items[0].versions[0].version});
+   const after=await api('management_state_get_v1',{operation:'availability_save_v1',selector:{operation:'availability_save_v1',key:{resource,rule_id:roomRule}}});assert.equal(after.items[0].current.values.rule.local_end,'19:00:00');
+   const blocked=await call(owner,'program_preview_v1',scoped({class_id:classId,schedule:{room_id:room,weekdays:[1,2,3,4,5,6,7],local_start:'20:00:00',starts_on:day(1),ends_on:day(2),assignments:[{person_id:person,duty:'instructor'}],capacity:{total:10}}}),key());assert.equal(blocked.result.ok,true);assert(blocked.result.data.blockers.some(x=>x.code==='RESOURCE_CONFLICT'));const sessionCount=Number((await rows('select count(*) n from core.sessions where org_id=$1',[org]))[0].n);await denied(owner,'program_apply_v1',scoped({preview:{id:blocked.result.data.id,token:blocked.result.data.token}}),'RESOURCE_CONFLICT');assert.equal(Number((await rows('select count(*) n from core.sessions where org_id=$1',[org]))[0].n),sessionCount);
+   const orgBefore=await read('organization');for(const times of [['25:00:00','26:00:00'],['10:00:00','09:00:00']])await denied(owner,'settings_update_v1',{...q('organization'),expected_version:orgBefore.version,patch:{availability_templates:[{...availabilityTemplate,rules:[{...availabilityTemplate.rules[0],local_start:times[0],local_end:times[1]}]}]}},'VALIDATION_FAILED');const orgAfter=await read('organization');assert.equal(orgAfter.version,orgBefore.version);assert.deepEqual(orgAfter.values.availability_templates,orgBefore.values.availability_templates);
+   const reset=await must(owner,'settings_reset_preview_v1',{...q('center'),fields:['availability_templates']});await must(owner,'settings_reset_apply_v1',{...q('center'),expected_version:reset.version,preview:{id:reset.id,token:reset.token}},key());c=await read('center');assert.deepEqual(c.values.availability_templates,[]);assert.equal(c.preparation_sources.availability_templates.kind,'system_default');assert.equal((await api('management_state_get_v1',{operation:'availability_save_v1',selector:{operation:'availability_save_v1',key:{resource,rule_id:roomRule}}})).items[0].current.values.rule.local_end,'19:00:00');
+  });
+  await t.test('package proposal publishes real version and sale dates; source edits/reset do not rewrite rights, money or validity',async()=>{
+   let c=await read('center');assert.deepEqual(c.values.package_templates,[packageTemplate]);assert.equal(c.preparation_sources.package_templates.kind,'organization_copy');assert.equal(c.preparation_sources.package_templates.organization_version,initialPreparationOrgVersion);
+   const catalog=await must(owner,'settings_catalog_get_v1',q('center')),choice=catalog.preparation_templates.packages.find(x=>x.source.scope==='center');assert(choice);const prepared=await api('settings_preparation_resolve_v1',{kind:'package',source:choice.source});assert.deepEqual(prepared.sale_dates,{start_date:packageTemplate.start_date,end_date:packageTemplate.end_date});assert.deepEqual(prepared.product_request.terms.scopes,[{scope_kind:'center_discipline',center_id:center,discipline_id:discipline,usage_targets:['lesson']}]);
+   const count=Number((await rows('select count(*) n from core.product_versions where org_id=$1',[org]))[0].n);await change('organization',{package_templates:[{...packageTemplate,terms:{...packageTemplate.terms,credits:8,price_minor:'900'}}]});assert.equal(Number((await rows('select count(*) n from core.product_versions where org_id=$1',[org]))[0].n),count);
+   const version=(await api('product_publish_v1',prepared.product_request)).primary_id,published=(await api('products_list_v1',{page:{},include_timed_products:true})).items.find(x=>x.version_id===version);assert(published);assert.equal(published.terms.credits,4);assert.equal(published.terms.price_minor,'400');assert.equal(published.terms.refund.method,'credit_ratio');
+   const quote=await api('sale_preview_v1',{person_id:studentPerson,product_version_id:version,...prepared.sale_dates}),sale=(await api('sale_apply_v1',{preview:{id:quote.id,token:quote.token}})).primary_id;
+   const saved=(await rows('select product_version_id,start_date::text,end_date::text,net_minor::text from core.sales where id=$1',[sale]))[0];assert.deepEqual(saved,{product_version_id:version,start_date:packageTemplate.start_date,end_date:packageTemplate.end_date,net_minor:'400'});
+   const reset=await must(owner,'settings_reset_preview_v1',{...q('center'),fields:['package_templates']});await must(owner,'settings_reset_apply_v1',{...q('center'),expected_version:reset.version,preview:{id:reset.id,token:reset.token}},key());c=await read('center');assert.deepEqual(c.values.package_templates,[]);assert.equal(c.preparation_sources.package_templates.kind,'system_default');assert.equal((await api('products_list_v1',{page:{},include_timed_products:true})).items.find(x=>x.version_id===version).terms.credits,4);assert.deepEqual((await rows('select product_version_id,start_date::text,end_date::text,net_minor::text from core.sales where id=$1',[sale]))[0],saved);
+   await denied(owner,'settings_preparation_resolve_v1',scoped({kind:'package',source:choice.source}),'VERSION_CONFLICT');
+   await denied(owner,'settings_update_v1',{...q('organization'),expected_version:(await read('organization')).version,patch:{package_templates:[{...packageTemplate,terms:{...packageTemplate.terms,refund:{}}}]}},'VALIDATION_FAILED');
+  });
+ }finally{await db.end();}
+});
+
+test('ST-03 collection methods, notification support and live authority',{timeout:600000},async t=>{
+ const fixture=await preparationFixture({"roomOnly": true, "studentUser": true, "studentMembership": true});
+ t.diagnostic('Isolated fixture setup: '+fixture.setup_ms.toFixed(1)+' ms');
+ let {platform,plan,owner,student,db,rows,org,center,room,discipline,person,studentPerson,roomRule,initialPreparationOrgVersion,packageTemplate,account,scoped,api,q,read,change,day,availabilityTemplate,classId,preview,must,observe}=fixture;
+ try{
   await t.test('manual collection methods persist real references without inventing a legacy payment method',async()=>{
    const body={person_id:person,amount_minor:'1',currency:'TRY',occurred_at:new Date().toISOString()},ids=[];
    for(const payment of [{method:'cash'},{method:'bank_transfer',reference:'SYNTHETIC BANK'},{method:'card_pos',reference:'SYNTHETIC POS'}]){
@@ -165,31 +197,6 @@ test('ST-03 Starter preparation defaults copy, authority, reset and program cons
    const legacy=await call(owner,'notification_preferences_set_v1',legacyBody,legacyKey);assert.equal(legacy.result.ok,false);assert.equal(legacy.result.error.code,'SERVICE_UNAVAILABLE');assert.deepEqual(await rows('select id,channel,purpose,enabled,version from core.notification_preferences where org_id=$1 and person_id=$2 order by id',[org,person]),before);
    await denied(owner,'notification_preferences_set_v1',scoped({channel:'in_app',purpose:'transactional',enabled:false,expected_version:1}),'FORBIDDEN');
    await denied(owner,'settings_update_v1',{...q('member'),expected_version:(await read('member')).version,patch:{quiet_hours:{enabled:true}}},'VALIDATION_FAILED');
-  });
-  await t.test('availability proposals copy once, resolve to real domain input and reset without erasing active hours',async()=>{
-   let c=await read('center');assert.deepEqual(c.values.availability_templates,[availabilityTemplate]);assert.equal(c.preparation_sources.availability_templates.kind,'organization_copy');assert.equal(c.preparation_sources.availability_templates.organization_version,initialPreparationOrgVersion);
-   await change('organization',{availability_templates:[{...availabilityTemplate,rules:[{...availabilityTemplate.rules[0],local_end:'18:00:00'}]}]});assert.deepEqual((await read('center')).values.availability_templates,[availabilityTemplate]);
-   const catalog=await must(owner,'settings_catalog_get_v1',q('center')),choice=catalog.preparation_templates.availability.find(x=>x.source.scope==='center');assert(choice);const resource={kind:'room',id:room},body={kind:'availability',source:choice.source,resource,rule_index:0};
-   const prepared=await api('settings_preparation_resolve_v1',body);assert.deepEqual(prepared.request,{resource,rule:availabilityTemplate.rules[0]});
-   await denied(student,'settings_preparation_resolve_v1',scoped(body),'FORBIDDEN');
-   await change('center',{availability_templates:[availabilityTemplate]});assert.equal((await read('center')).preparation_sources.availability_templates.kind,'center_local');await denied(owner,'settings_preparation_resolve_v1',scoped(body),'VERSION_CONFLICT');
-   const managed=await api('management_state_get_v1',{operation:'availability_save_v1',selector:{operation:'availability_save_v1',key:{resource,rule_id:roomRule}}});assert(managed.items[0].exists);await denied(student,'management_state_get_v1',scoped({operation:'availability_save_v1',selector:{operation:'availability_save_v1',key:{resource,rule_id:roomRule}}}),'FORBIDDEN');
-   await api('availability_save_v1',{...prepared.request,rule_id:roomRule,expected_version:managed.items[0].versions[0].version});
-   const after=await api('management_state_get_v1',{operation:'availability_save_v1',selector:{operation:'availability_save_v1',key:{resource,rule_id:roomRule}}});assert.equal(after.items[0].current.values.rule.local_end,'19:00:00');
-   const blocked=await call(owner,'program_preview_v1',scoped({class_id:classId,schedule:{room_id:room,weekdays:[1,2,3,4,5,6,7],local_start:'20:00:00',starts_on:day(1),ends_on:day(2),assignments:[{person_id:person,duty:'instructor'}],capacity:{total:10}}}),key());assert.equal(blocked.result.ok,true);assert(blocked.result.data.blockers.some(x=>x.code==='RESOURCE_CONFLICT'));const sessionCount=Number((await rows('select count(*) n from core.sessions where org_id=$1',[org]))[0].n);await denied(owner,'program_apply_v1',scoped({preview:{id:blocked.result.data.id,token:blocked.result.data.token}}),'RESOURCE_CONFLICT');assert.equal(Number((await rows('select count(*) n from core.sessions where org_id=$1',[org]))[0].n),sessionCount);
-   const orgBefore=await read('organization');for(const times of [['25:00:00','26:00:00'],['10:00:00','09:00:00']])await denied(owner,'settings_update_v1',{...q('organization'),expected_version:orgBefore.version,patch:{availability_templates:[{...availabilityTemplate,rules:[{...availabilityTemplate.rules[0],local_start:times[0],local_end:times[1]}]}]}},'VALIDATION_FAILED');const orgAfter=await read('organization');assert.equal(orgAfter.version,orgBefore.version);assert.deepEqual(orgAfter.values.availability_templates,orgBefore.values.availability_templates);
-   const reset=await must(owner,'settings_reset_preview_v1',{...q('center'),fields:['availability_templates']});await must(owner,'settings_reset_apply_v1',{...q('center'),expected_version:reset.version,preview:{id:reset.id,token:reset.token}},key());c=await read('center');assert.deepEqual(c.values.availability_templates,[]);assert.equal(c.preparation_sources.availability_templates.kind,'system_default');assert.equal((await api('management_state_get_v1',{operation:'availability_save_v1',selector:{operation:'availability_save_v1',key:{resource,rule_id:roomRule}}})).items[0].current.values.rule.local_end,'19:00:00');
-  });
-  await t.test('package proposal publishes real version and sale dates; source edits/reset do not rewrite rights, money or validity',async()=>{
-   let c=await read('center');assert.deepEqual(c.values.package_templates,[packageTemplate]);assert.equal(c.preparation_sources.package_templates.kind,'organization_copy');assert.equal(c.preparation_sources.package_templates.organization_version,initialPreparationOrgVersion);
-   const catalog=await must(owner,'settings_catalog_get_v1',q('center')),choice=catalog.preparation_templates.packages.find(x=>x.source.scope==='center');assert(choice);const prepared=await api('settings_preparation_resolve_v1',{kind:'package',source:choice.source});assert.deepEqual(prepared.sale_dates,{start_date:packageTemplate.start_date,end_date:packageTemplate.end_date});assert.deepEqual(prepared.product_request.terms.scopes,[{scope_kind:'center_discipline',center_id:center,discipline_id:discipline,usage_targets:['lesson']}]);
-   const count=Number((await rows('select count(*) n from core.product_versions where org_id=$1',[org]))[0].n);await change('organization',{package_templates:[{...packageTemplate,terms:{...packageTemplate.terms,credits:8,price_minor:'900'}}]});assert.equal(Number((await rows('select count(*) n from core.product_versions where org_id=$1',[org]))[0].n),count);
-   const version=(await api('product_publish_v1',prepared.product_request)).primary_id,published=(await api('products_list_v1',{page:{},include_timed_products:true})).items.find(x=>x.version_id===version);assert(published);assert.equal(published.terms.credits,4);assert.equal(published.terms.price_minor,'400');assert.equal(published.terms.refund.method,'credit_ratio');
-   const quote=await api('sale_preview_v1',{person_id:studentPerson,product_version_id:version,...prepared.sale_dates}),sale=(await api('sale_apply_v1',{preview:{id:quote.id,token:quote.token}})).primary_id;
-   const saved=(await rows('select product_version_id,start_date::text,end_date::text,net_minor::text from core.sales where id=$1',[sale]))[0];assert.deepEqual(saved,{product_version_id:version,start_date:packageTemplate.start_date,end_date:packageTemplate.end_date,net_minor:'400'});
-   const reset=await must(owner,'settings_reset_preview_v1',{...q('center'),fields:['package_templates']});await must(owner,'settings_reset_apply_v1',{...q('center'),expected_version:reset.version,preview:{id:reset.id,token:reset.token}},key());c=await read('center');assert.deepEqual(c.values.package_templates,[]);assert.equal(c.preparation_sources.package_templates.kind,'system_default');assert.equal((await api('products_list_v1',{page:{},include_timed_products:true})).items.find(x=>x.version_id===version).terms.credits,4);assert.deepEqual((await rows('select product_version_id,start_date::text,end_date::text,net_minor::text from core.sales where id=$1',[sale]))[0],saved);
-   await denied(owner,'settings_preparation_resolve_v1',scoped({kind:'package',source:choice.source}),'VERSION_CONFLICT');
-   await denied(owner,'settings_update_v1',{...q('organization'),expected_version:(await read('organization')).version,patch:{package_templates:[{...packageTemplate,terms:{...packageTemplate.terms,refund:{}}}]}},'VALIDATION_FAILED');
   });
   await t.test('typed limits and live CM ownership prevent arbitrary setting writes and replay after revocation',async()=>{
    await denied(student,'settings_get_v1',q('center'),'FORBIDDEN');

@@ -26,7 +26,7 @@
         {
           "line": 1,
           "path": "apps/backend/tests/starter-preparation-acceptance.mjs",
-          "sha256": "f3f40e0afd15bd56a8c2b84afbc5942726598716eb905050caee3bfc3364ea8d"
+          "sha256": "81961408b6343c4b6985e622511552287c5b9c6f2ea8946fab440f8bc56ac2e9"
         }
       ],
       "estimated_seconds": 960.91
@@ -168,15 +168,15 @@
     },
     {
       "path": "apps/backend/tests/event-payment.test.mjs",
-      "sha256": "b2969e4ec6cbb8e7b2963f16fc6bac139de7548f7eda351a5466be91f407a942",
+      "sha256": "affb01d8370dc42749dd2db7dd75671882f0457357b980651c524d9489ec3a1a",
       "shared": [
         [
-          1,
-          7
+          2,
+          8
         ],
         [
-          220,
-          221
+          221,
+          222
         ]
       ],
       "parts": [
@@ -184,8 +184,8 @@
           "id": "event-payment-root-1",
           "ranges": [
             [
-              8,
-              219
+              9,
+              220
             ]
           ]
         },
@@ -193,13 +193,19 @@
           "id": "event-payment-root-2",
           "ranges": [
             [
-              222,
-              397
+              223,
+              398
             ]
           ]
         }
       ],
-      "imports": [],
+      "imports": [
+        {
+          "line": 1,
+          "path": "apps/backend/tests/earning-payment-selection-acceptance.mjs",
+          "sha256": "25c9aaf511f3b64bf1c1a5049953a4cc3e9c3224e81724846778562e1f1b8ba6"
+        }
+      ],
       "estimated_seconds": 799.78
     },
     {
@@ -296,7 +302,7 @@
     },
     {
       "path": "apps/backend/tests/person-registry.test.mjs",
-      "sha256": "ca3e2659234f48eaaf899537b69ac57edc20c9756b108b1b307ecae44f96c0ab",
+      "sha256": "ea0d18d57621bed245000b380568096ad9b4dd6a45d6ff83ce4b7bdbf651beee",
       "shared": [
         [
           7,
@@ -322,7 +328,7 @@
           "ranges": [
             [
               116,
-              273
+              277
             ]
           ]
         }
@@ -405,27 +411,27 @@
     },
     {
       "path": "apps/backend/tests/registry.test.mjs",
-      "sha256": "7d74c7595fa6104b8632820a127ac5686ca7d82b29d85eaedbee2cc47709a7cf",
+      "sha256": "a30e46db3bcd4d8b9947e0e4994fcbfbbc3696a8a19971a2ed56fb8cc73ffe79",
       "shared": [
         [
-          4,
-          4
+          5,
+          5
         ],
         [
-          9,
-          14
+          10,
+          15
         ],
         [
-          128,
-          128
+          129,
+          129
         ],
         [
-          134,
-          134
+          135,
+          135
         ],
         [
-          136,
-          136
+          137,
+          137
         ]
       ],
       "parts": [
@@ -433,8 +439,8 @@
           "id": "registry-root-1",
           "ranges": [
             [
-              15,
-              127
+              16,
+              128
             ]
           ]
         }
@@ -442,71 +448,76 @@
       "imports": [
         {
           "line": 1,
+          "path": "apps/backend/tests/commercial-plan-acceptance.mjs",
+          "sha256": "dda8dfa2da7b4f1847830a3b3513d7b36a9ab4a07cd25676433eb23866d568f8"
+        },
+        {
+          "line": 2,
           "path": "apps/backend/tests/subscription-period-acceptance.mjs",
           "sha256": "dfb6779769c432c242ca9522aa7ad97cc0deb2e357b477734f91acbf9f64e322"
         },
         {
-          "line": 2,
+          "line": 3,
           "path": "apps/backend/tests/starter-document-acceptance.mjs",
           "sha256": "2c269e74392c3855c747d468b31aea7b37b6717155bcf7e9d0bfd7ed4e73ac18"
         },
         {
-          "line": 3,
+          "line": 4,
           "path": "apps/backend/tests/frontend-settings-acceptance.mjs",
           "sha256": "c3b468a0b490064b18f9fd6e0526f45a3022567cfc601bc4bd0971ff7060b74f"
         },
         {
-          "line": 5,
+          "line": 6,
           "path": "apps/backend/tests/p05-acceptance.mjs",
           "sha256": "de065faf50f294106005197bfed64881081dabe427840a3c0452f9776e322f79"
         },
         {
-          "line": 6,
+          "line": 7,
           "path": "apps/backend/tests/p06-acceptance.mjs",
-          "sha256": "174b42d37f89eb055d7ec2251fd647e6fe02f70ff46197e7f35c006516372d4b"
+          "sha256": "df7b3040cce7bd6291cd8caa28806e76b301997ceced52d28e8518add9fbf242"
         },
         {
-          "line": 7,
+          "line": 8,
           "path": "apps/backend/tests/starter-operations-acceptance.mjs",
           "sha256": "5de235408ed2861d739d1298ddde3fbd0142abce5f587203b8160e4c05782abc"
         },
         {
-          "line": 8,
+          "line": 9,
           "path": "apps/backend/tests/canonical-settings-migration-acceptance.mjs",
           "sha256": "923be16ae737f6ee56fb1febc42618d4bafac41ff8b2a88d2d268b4cb69c1acb"
         },
         {
-          "line": 129,
+          "line": 130,
           "path": "apps/backend/tests/ops-hosted-acceptance.mjs",
           "sha256": "a170349e1e3ef4c3cc3b4e6bce4f44507fd0042ce410700822a5b48e38fbe676"
         },
         {
-          "line": 130,
+          "line": 131,
           "path": "apps/backend/tests/p07-account-revocation-acceptance.mjs",
           "sha256": "e755d94ebd85f355bb4e0c279b295e65a1ea6dacddfa296c6ccc2f0f53c2c05e"
         },
         {
-          "line": 131,
+          "line": 132,
           "path": "apps/backend/tests/p07-account-profile-merge-acceptance.mjs",
           "sha256": "a30965646b9012c3b400e9c1c0b1d8556a56a90127a150f44841336d09b7b39c"
         },
         {
-          "line": 132,
+          "line": 133,
           "path": "apps/backend/tests/p07-subscription-lifecycle-acceptance.mjs",
           "sha256": "08cab358e5d1834b26196ba6c5cbc6c1c3d1a3739488f58b9c1580685b2c2831"
         },
         {
-          "line": 133,
+          "line": 134,
           "path": "apps/backend/tests/p07-lifecycle-acceptance.mjs",
           "sha256": "86e84e20ba3be770247174a6cc1a5054d8e406f20f0b17f5db2f9d6eee05481e"
         },
         {
-          "line": 135,
+          "line": 136,
           "path": "apps/backend/tests/starter-plan-gates-acceptance.mjs",
           "sha256": "c2cbc191466371b912cd2f78159e0cb1235513caa2e9153268d4e735e5538537"
         },
         {
-          "line": 137,
+          "line": 138,
           "path": "apps/backend/tests/starter-studio-acceptance.mjs",
           "sha256": "32e3d59bec63c7730d0d3f8217f729b7ee268bccca3441607ec2b8ae2dce2926"
         }
