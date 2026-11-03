@@ -1,33 +1,39 @@
 @import "@syncfusion/ej2-tailwind3-theme/styles/schedule/index.css";
 
-.session-scheduler .e-schedule,
-.session-scheduler .e-schedule .e-date-header-wrap,
-.session-scheduler .e-schedule .e-time-cells-wrap table td,
-.session-scheduler .e-schedule .e-header-cells,
-.session-scheduler .e-schedule .e-work-cells,
-.session-scheduler .e-schedule .e-all-day-cells,
-.session-scheduler .e-schedule .e-resource-cells,
-.session-scheduler .e-schedule .e-content-wrap {
+.session-scheduler .e-schedule.ftk-scheduler,
+.session-scheduler .e-schedule.ftk-scheduler .e-date-header-wrap,
+.session-scheduler .e-schedule.ftk-scheduler .e-time-cells-wrap table td,
+.session-scheduler .e-schedule.ftk-scheduler .e-header-cells,
+.session-scheduler .e-schedule.ftk-scheduler .e-work-cells,
+.session-scheduler .e-schedule.ftk-scheduler .e-all-day-cells,
+.session-scheduler .e-schedule.ftk-scheduler .e-resource-cells,
+.session-scheduler .e-schedule.ftk-scheduler .e-content-wrap {
   background: var(--card);
   color: var(--foreground);
   border-color: var(--border);
   font-family: inherit;
 }
-.session-scheduler .e-schedule .e-work-hours {
+.session-scheduler .e-schedule.ftk-scheduler .e-work-hours {
   background: var(--muted);
 }
-.session-scheduler .e-schedule .e-appointment {
+.session-scheduler .e-schedule.ftk-scheduler .e-appointment {
   background: var(--primary);
   color: var(--primary-foreground);
+  border-color: var(--primary);
   border-radius: var(--radius);
 }
-.session-scheduler .e-schedule .e-appointment .e-subject {
+.session-scheduler .e-schedule.ftk-scheduler .e-appointment .e-subject,
+.session-scheduler .e-schedule.ftk-scheduler .e-appointment .e-time {
   color: inherit;
 }
-.session-scheduler .e-schedule .e-current-day {
+.session-scheduler .e-schedule.ftk-scheduler .e-appointment:focus-visible {
+  outline: 2px solid var(--ring);
+  outline-offset: 2px;
+}
+.session-scheduler .e-schedule.ftk-scheduler .e-current-day {
   color: var(--foreground);
   font-weight: 700;
 }
-.session-scheduler .e-schedule .e-date-header-wrap table td {
+.session-scheduler .e-schedule.ftk-scheduler .e-date-header-wrap table td {
   border-color: var(--border);
 }
