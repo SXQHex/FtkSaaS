@@ -240,7 +240,7 @@ Bu tablo yalnız izdir; eski kabul metinleri ikinci kez tutulmaz.
 - **Doğrulama senaryosu:** Gerçek payload/filtre/tarih/No, yetki kaybı/eski URL; PR83 değişmeyen kanıtı tekrar üretme.
 - **Kaynak alanı:** p06 rapor worker/projeksiyon; mevcut p06 acceptance
 
-**Backend dilimi:** Mevcut gerçek Starter worker→rapor→authenticated CSV ve No/filtre/toplam kabulü korunur. Süresi dolan descriptor’ın aynı gerçek HTTP download yolunda da ret verdiği eklendi; içerik dönmez. PR83’ün değişmeyen lease/retention kanıtı yeniden üretilmedi. Kaynak ve yerel sonuç [devirde](00-FtkSaaS-yeni-sohbet-devir.md#s11s13-dosya-ve-belge-kabulü); bu yeni dilimin aday/main/development ve gerçek hosted tüketici kabulü henüz kapanmadı.
+**Backend dilimi:** Mevcut gerçek Starter worker→rapor→authenticated CSV ve No/filtre/toplam kabulü korunur. Süresi dolan descriptor’ın aynı gerçek HTTP download yolunda da ret verdiği eklendi; içerik dönmez. PR83’ün değişmeyen lease/retention kanıtı yeniden üretilmedi. Backend diliminin aday/main/development teslimi tamamlandı; [kaynak ve ortam kanıtı](00-FtkSaaS-yeni-sohbet-devir.md#s11s13-dosya-ve-belge-kabulü). Gerçek hosted dosya/ekran tüketicisi kabulü açık kaldığından genel S11 kapanmadı.
 
 <a id="s12"></a>
 ### S12 — Öğrenci/kredi/borç importu
@@ -252,7 +252,7 @@ Bu tablo yalnız izdir; eski kabul metinleri ikinci kez tutulmaz.
 - **Doğrulama senaryosu:** Kısmi hata, yinelenen dosya, kota sınırı ve kaynak-sonuç mutabakatı; gerçek iş çıktısı.
 - **Kaynak alanı:** p06 import kaynakları; mevcut acceptance
 
-**Backend dilimi:** Mevcut Starter private CSV→preview→açık apply→worker→kısmi sonuç, hak/borç ve 100 öğrenci sınırı korunur. Aynı kaynak tekrarı kişi/satış/borçla birlikte Abone No’yu da korur; son boş slot numara alır, taşan satırın kişi/borç/sayaç etkisi geri alınır. Yeni import motoru veya politika limiti eklenmedi. [Kaynak/yerel kanıt](00-FtkSaaS-yeni-sohbet-devir.md#s11s13-dosya-ve-belge-kabulü); yeni dilimin teslim ve hosted kabulü bekler.
+**Backend dilimi:** Mevcut Starter private CSV→preview→açık apply→worker→kısmi sonuç, hak/borç ve 100 öğrenci sınırı korunur. Aynı kaynak tekrarı kişi/satış/borçla birlikte Abone No’yu da korur; son boş slot numara alır, taşan satırın kişi/borç/sayaç etkisi geri alınır. Yeni import motoru veya politika limiti eklenmedi. Backend diliminin aday/main/development teslimi tamamlandı; [kaynak ve ortam kanıtı](00-FtkSaaS-yeni-sohbet-devir.md#s11s13-dosya-ve-belge-kabulü). Gerçek hosted import tüketicisi ve Pro/Business limit kabulü açık kalır; genel S12 kapanmadı.
 
 <a id="s13"></a>
 ### S13 — Sürümlü belge ve onay akışı
@@ -264,7 +264,7 @@ Bu tablo yalnız izdir; eski kabul metinleri ikinci kez tutulmaz.
 - **Doğrulama senaryosu:** Yanlış sürüm, yetkisiz/eski download ve required belge eksikliği; gerçek Storage bayt kabulü.
 - **Kaynak alanı:** p05 document/private Storage; mevcut acceptance
 
-**Backend dilimi:** Mevcut registry harness’inde ayrı sınırlı Starter belge kökü eklendi. Gerçek native Auth ve private Storage baytları, iki farklı hash/sürüm, self onay olmadan ret, onay sonrası aynı komutla rezervasyon, eski rezervasyon/byte/onay geçmişinin korunması ve link kaybında içerik/replay reddi doğrulanır. Ürün davranışı, Storage grantları veya private dosya transport’u değişmedi. Yerel gerçek Storage kabulü hosted/gerçek tüketici kabulü olarak sunulmaz; [kaynak ve sonuç](00-FtkSaaS-yeni-sohbet-devir.md#s11s13-dosya-ve-belge-kabulü).
+**Backend dilimi:** Mevcut registry harness’inde ayrı sınırlı Starter belge kökü eklendi. Gerçek native Auth ve private Storage baytları, iki farklı hash/sürüm, self onay olmadan ret, onay sonrası aynı komutla rezervasyon, eski rezervasyon/byte/onay geçmişinin korunması ve link kaybında içerik/replay reddi doğrulanır. Ürün davranışı, Storage grantları veya private dosya transport’u değişmedi. Backend diliminin aday/main/development teslimi tamamlandı; [kaynak ve ortam kanıtı](00-FtkSaaS-yeni-sohbet-devir.md#s11s13-dosya-ve-belge-kabulü). Gerçek hosted Storage/ekran tüketicisi kabulü açık kalır; yerel gerçek Storage ve CD şema doğrulaması bu kabul yerine geçmez, genel S13 kapanmadı.
 
 <a id="s14"></a>
 ### S14 — Temel public başvuru kabulü
