@@ -132,3 +132,16 @@ test('collector compares matched core/API costs and rejects missing experimental
   await assert.rejects(()=>summarize(github,context,core,reference),/Unexecuted/);
  }finally{process.chdir(cwd);rmSync(dir,{recursive:true,force:true});}
 });
+
+test('latency-sensitive ST-02 workflow has one dedicated runner with its original timeout and complete body',()=>{
+ const inventory=buildInventory(repositoryRoot);
+ const bins=partition(inventory.units);
+ const bin=bins.find(b=>b.units.some(u=>u.id==='starter-operations-acceptance'));
+ assert.equal(bin.units.length,1,'ST-02 cannot compete with ST-03 or another file for the same native Edge runtime');
+ const unit=bin.units[0];
+ assert.equal(unit.code,fs.readFileSync(path.join(repositoryRoot,unit.source),'utf8'));
+ assert(unit.code.includes('{timeout:300000}'));
+ assert.equal(bins.length,8);
+ assert.deepEqual(bins.flatMap(b=>b.units.map(u=>u.id)).sort(),inventory.units.map(u=>u.id).sort());
+ assert.deepEqual(bins,partition([...inventory.units].reverse()));
+});

@@ -274,8 +274,8 @@
         "management_state_get_v1"
       ],
       "review": {
-        "fingerprint": "e4980d152ffa2218d0cf22ccc0cc1c416d14c2f4e21e8aadec935e847118007f",
-        "reason": "Final reader DTO and runtime-selector/F14/UUID inventories reviewed; two contract tests verify explicit scope, closed projection and immutable migration copy; Auth/Edge/service-only protocol unchanged."
+        "fingerprint": "5f8afc78eab2794b93f5df0e2040050f4e5c9efa14c851dff3acc6ee7c775dd6",
+        "reason": "PR165 dedicated ST02 runner and new integrity assertion retained byte-for-byte while PR167 class duty reader/typed DTO/migration tests and new import remain intact; combined 51-unit inventory reviewed, original bodies/timeout/global phases and four-shard production protocol preserved."
       }
     },
     {

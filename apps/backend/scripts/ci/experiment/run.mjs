@@ -11,7 +11,7 @@ const git=(...args)=>execFileSync('git',args,{cwd:root,encoding:'utf8'}).trim();
 const reference=JSON.parse(process.env.EXPERIMENT_REFERENCE??'null');
 if(!reference||git('rev-parse','HEAD')!==reference.merge||git('rev-parse','HEAD^{tree}')!==reference.tree)throw Error('Experiment source mismatch');
 const output=path.join(root,'.artifacts/ci/experiment');fs.mkdirSync(output,{recursive:true});
-const plan={reference,originals:inventory.originals,splitOriginals:inventory.splitOriginals,units:inventory.units.length,bins:bins.map(b=>({shard:b.shard,estimated_seconds:b.estimated_seconds,units:b.units.map(u=>({id:u.id,source:u.source,exclusive:u.exclusive}))})),note:'Estimated weights are scheduling seeds, never measured fragment timings. Cancellation wrapper roots increase by four; scenario bodies remain byte-identical.'};
+const plan={reference,originals:inventory.originals,splitOriginals:inventory.splitOriginals,units:inventory.units.length,bins:bins.map(b=>({shard:b.shard,estimated_seconds:b.estimated_seconds,units:b.units.map(u=>({id:u.id,source:u.source,exclusive:u.exclusive,dedicated:u.dedicated}))})),note:'Estimated weights are scheduling seeds, never measured fragment timings. Cancellation wrapper roots increase by four; scenario bodies remain byte-identical.'};
 fs.writeFileSync(path.join(output,'plan.json'),JSON.stringify(plan,null,2)+'\n');
 if(mode==='api'){
  const bin=bins.find(b=>String(b.shard)===shardText);if(!bin)throw Error('Invalid experiment shard');
