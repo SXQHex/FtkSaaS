@@ -2,13 +2,17 @@
 
 3 Kasım 2026 kaynak ve kabul kontrolü. Açık işler ve kapanış ölçütleri [backlog](remaining-work.md), sıra [kuyruk](production-queue.md), ürün/API davranışı [kaynak indeksi](../../../docs/source-index.md) sahibindedir. Burada karar veya görev metni tekrar edilmez.
 
-## Sekiz shard deney hazırlığı
+## Sekiz shard deney durumu
 
-3 Kasım 2026 kullanıcı kararıyla tek PR'de, mevcut dört shard CI/development zincirini koruyan manuel sekiz shard karşılaştırması hazırlanıyor.
+PR161 main'e birleşti. Deney protokolünün tek sahibi [CI politikasıdır](../../../docs/ci-policy.md#sekiz-shard-karşılaştırma-deneyi); mevcut üretim dört shard kabulü ve development bağlantısı değişmedi. 15 özgün suite'in 9'u, aynı test kaynaklarından 48 deney birimi üretir. Özgün test gövdeleri, timeout'lar ve assertion'lar korunur.
 
-15 özgün suite'in 9'u bağımsız kabul/kök/senaryo sınırlarında toplam 48 deney birimine ayrıldı. Özgün testler ve mevcut runner/workflow/envanter değişmedi. Singleton ayarı değiştiren beş parça ayrı fazda çalışır. Deney protokolünün tek sahibi [CI politikasıdır](../../../docs/ci-policy.md#sekiz-shard-karşılaştırma-deneyi). Gerçek API deneyi ve hız/maliyet karşılaştırması henüz yapılmadı; mevcut akışa geçiş kabulü verilmez. Bu PR'nin test edilmiş tam kaynağı için kullanıcı özel kurulumla birleştirme talimatı verdi; önceki PR yetkisi devralınmadı.
+İlk [sekiz shard deneyi](https://github.com/SXQHex/FtkSaaS/actions/runs/41657114004), başarılı [PR161 referansını](https://github.com/SXQHex/FtkSaaS/actions/runs/41649563364) test etti: merge `f77556ee6968f3d72bf3055acfdf1d075fd54a0e`, tree `dd331869b5cde21c509f4a7496c8ec160efbdcfc`, definition `2da1ef2d3be46d07e6824fd682ac919502fed60d`, attempt1. Core ve yedi API shard geçti; API-6 ST-02 ana testinin özgün 300 saniye sınırını aşmasıyla başarısız oldu. API-6 bellek kabulü başarılıydı (1.22 GiB tepe). Alt test iptalleri bu timeout'un ardından geldi; toplayıcı eksik başarıyı kabul etmedi.
 
-Main senkronizasyonunda XREQ-013'ün yeni program yapılandırma kabulü bağımsız deney birimi olarak eklendi; özgün test kaynakları değişmedi. Yeni kaynakta backend verify 285/285, deney ön kontrolleri 9/9, kalite tabanı 0 bulgu ve belge kontrolü 35 dosya/1322 bağlantı başarılıdır. Bağımsız inceleme önceki 47 parça gövdesi ve izolasyon işaretlerinin değişmediğini, yeni testin bir kez dahil edildiğini ve main'in runtime/test/frontend/sözleşme dosyalarının birebir korunduğunu doğruladı; açık Critical/Required bulgu yok. Aynı PR161'e push sonrası yeni aday kabulü gerekir; önceki aday başarısı yeni kaynağa taşınmaz. Gerçek sekiz shard API deneyi henüz çalıştırılmadı.
+Referansta ST-02 246.88 saniyede geçti; peer dosya daha önce bitmişti. Deneyde ST-02, yaklaşık 597.45 saniyelik ST-03 ile aynı native runtime'da neredeyse bütün bütçesi boyunca örtüştü. Bu yeni eşzamanlılık gözlenen koşul farkıdır; CPU/Edge/DB gecikmesinin payları bu kayıttan ayrı ayrı kanıtlanmaz. Başarısız deneyin core+API yürütme penceresi 35:13 → 21:34, runner-dakikası 110.6 → 135.4 idi; kapsam tamamlanmadığından hız/maliyet kabulü değildir.
+
+Düzeltme, ST-02'nin bağlı senaryolarını bölmeden sekiz runner'dan birinde yalnız çalışmasını zorunlu kılar. Diğer 47 birim kalan yedi runner'a eksiksiz/tekrarsız dağıtılır; beş global fixture'ın ayrı fazları korunur. Scheduler regresyonu önce mevcut dağıtımda kırmızı oldu; düzeltmeden sonra tam deney ön kontrolleri 10/10 ve backend verify 285/285 geçti. Kalite tabanı 0 bulgu, belge kabulü 35 dosya/1322 bağlantı; izolasyon koşulunu kaldıran mutasyon yeni testle yakalandı. Bağımsız incelemede açık Critical/Required bulgu yok. Mevcut dört shard kaynakları veya ürün kodu değiştirilmez. Gerçek uzak doğrulama henüz yapılmadı; çözüm kabulü yeni başarılı deneyden sonra verilir.
+
+Düzeltme CI araçlarının trusted kaynağını değiştirdiği için yeni PR'nin kendi dört shard kabulü tamamlanır, ardından aynı yeni kaynak referansıyla deney çalıştırılır. Eski başarısız deney rerun edilirse eski tanımı çalıştıracağından düzeltme kanıtı olmaz. Hedefli kabul politikasına geçiş bu deneye karıştırılmaz.
 
 ## Kaynak tabanı
 

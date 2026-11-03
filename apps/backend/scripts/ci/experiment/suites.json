@@ -606,5 +606,9 @@
     "invitation-delivery-acceptance",
     "ops-hosted-acceptance",
     "p07-lifecycle-acceptance"
-  ]
+  ],
+  "dedicatedRunners": [
+    "starter-operations-acceptance"
+  ],
+  "dedicatedReason": "Run 41657114004: ST-02 exceeded its unchanged 300s root timeout while overlapping ST-03 on the same native runtime; baseline 41649563364 passed in 246.88s after its peer file finished. Keep the complete stateful workflow on one of the eight runners without another test file; validate remotely before claiming resolution."
 }
