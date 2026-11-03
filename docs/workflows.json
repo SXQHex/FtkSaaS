@@ -264,7 +264,9 @@
         "apps/backend/scripts/ci/experiment/reference.mjs",
         "apps/backend/scripts/ci/experiment/run.mjs",
         "apps/backend/scripts/ci/experiment/suites.mjs",
-        "apps/backend/scripts/ci/experiment/suites.json"
+        "apps/backend/scripts/ci/experiment/suites.json",
+        "apps/backend/scripts/ci/experiment/measurement-test.mjs",
+        "apps/backend/scripts/ci/experiment/timing-reporter.mjs"
       ],
       "operations": [
         "operation_status_get_v1",
@@ -274,8 +276,8 @@
         "management_state_get_v1"
       ],
       "review": {
-        "fingerprint": "cc14017ce0b0f564e864bdf18ed44434305713fd0dd923f7e3bcb54498e35552",
-        "reason": "PR164 güncel kaynak hash ve kabul modülleri ile ST03 dört native kökü korunarak ST02 dedicated runner dağıtımı birleştirildi; 50 birim eksiksiz, beş global fixture fazı ve özgün test bütçeleri korunur. Üretim dört shard ve ortak protokol değişmez."
+        "fingerprint": "65887d6d730bd472430c1a9206e93867b3c2a7bd194a729ac05ca6703ace15b6",
+        "reason": "Deney API kayıt adapterı kök ve alt test timeoutunu Infinity yapar; p07 dekoratörü, request/SQL sınırları, assertion hataları ve cleanup korunur. Native lexical dosya kuyruğunda iki hat/exclusive faz planlaması47 tamamlanmış gövde bağlı süreyi kullanır; eski örnek açık tahmine döner. JSONL sonuçları ölçüm içindir; üretim kabulü değişmez."
       }
     },
     {

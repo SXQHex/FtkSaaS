@@ -49,13 +49,26 @@ export function buildInventory(root,{manifest=definition,read=p=>fs.readFileSync
   for(const member of members){
    const exclusive=manifest.exclusive.includes(member.id);
    if(/p07_lifecycle_config|ops_worker_health|invitation_dispatch_config|alter role/i.test(member.code)&&!exclusive)throw Error('Global fixture must run exclusively: '+member.id);
-   units.push({...member,exclusive,dedicated:dedicated.includes(member.id),estimated_seconds:suite.estimated_seconds*member.code.length/size});
+   const sample=manifest.measurements?.units[member.id];
+   const measured=sample&&sample.sha256===hash(member.code);
+   if(measured&&(!Number.isFinite(sample.seconds)||sample.seconds<=0))throw Error('Invalid measured duration');
+   units.push({...member,exclusive,dedicated:dedicated.includes(member.id),estimated_seconds:measured?sample.seconds:suite.estimated_seconds*member.code.length/size,weight_source:measured?'measured':'source-size-seed'});
   }
   if(members.length>1)splitOriginals++;
  }
  if(new Set(units.map(u=>u.id)).size!==units.length)throw Error('Duplicate experimental unit');
  if(dedicated.some(id=>!units.some(u=>u.id===id)))throw Error('Unknown dedicated runner unit');
  return {root,version:manifest.version,originals:manifest.suites.length,splitOriginals,units};
+}
+
+function projectedWall(units){
+ const lanes=[0,0];let serial=0;
+ // Node's explicit file queue is lexical, regardless of argv order.
+ for(const unit of [...units].sort((a,b)=>a.id.localeCompare(b.id))){
+  if(unit.exclusive)serial+=unit.estimated_seconds;
+  else{const i=lanes[0]<=lanes[1]?0:1;lanes[i]+=unit.estimated_seconds;}
+ }
+ return serial+Math.max(...lanes);
 }
 
 export function partition(units){
@@ -69,11 +82,11 @@ export function partition(units){
  }
  const shared=bins.slice(dedicated.length);
  for(const unit of units.filter(u=>!u.dedicated).sort((a,b)=>b.estimated_seconds-a.estimated_seconds||a.id.localeCompare(b.id))){
-  const bin=[...shared].sort((a,b)=>a.estimated_seconds-b.estimated_seconds||a.shard-b.shard)[0];
+  const bin=[...shared].sort((a,b)=>projectedWall([...a.units,unit])-projectedWall([...b.units,unit])||a.shard-b.shard)[0];
   bin.units.push(unit);bin.estimated_seconds+=unit.estimated_seconds;
  }
  if(bins.some(b=>!b.units.length))throw Error('Empty experiment shard');
- return bins;
+ return bins.map(bin=>({...bin,projected_wall_seconds:projectedWall(bin.units)}));
 }
 
 export function executionPhases(units){
@@ -82,14 +95,19 @@ export function executionPhases(units){
  return [...exclusive,...(parallel.length?[{concurrency:2,units:parallel}]:[])];
 }
 
-export function materialize(inventory,directory){
+export function materialize(inventory,directory,{measurement=false}={}){
  fs.mkdirSync(directory,{recursive:true});
  return inventory.units.map(unit=>{
   const original=pathToFileURL(path.resolve(inventory.root??process.cwd(),unit.source)).href;
   // Native ESM hooks retain the ORIGINAL module URL. Relative static/dynamic
   // imports and import.meta.url therefore resolve exactly as in the baseline.
   // Only this one module is replaced; helpers and runtime use original sources.
-  const wrapper=`import {registerHooks} from 'node:module';\nconst target=${JSON.stringify(original)};\nconst source=${JSON.stringify(unit.code)};\nregisterHooks({load(url,context,next){const result=next(url,context);return url===target?{...result,source}:result;}});\nawait import(target);\n`;
+  const tests=pathToFileURL(path.resolve(inventory.root??process.cwd(),'apps/backend/tests')+path.sep).href;
+  // Synthetic tests may use a different root, but the same test-only hook.
+  const testRoot=unit.source.startsWith('apps/backend/')?tests:pathToFileURL(path.resolve(inventory.root??process.cwd(),'tests')+path.sep).href;
+  const adapter=new URL('./measurement-test.mjs',import.meta.url).href;
+  const resolve=measurement?`resolve(specifier,context,next){return specifier==='node:test'&&context.parentURL?.startsWith(${JSON.stringify(testRoot)})?{url:${JSON.stringify(adapter)},shortCircuit:true}:next(specifier,context);},`:'';
+  const wrapper=`import {registerHooks} from 'node:module';\nconst target=${JSON.stringify(original)};\nconst source=${JSON.stringify(unit.code)};\nregisterHooks({${resolve}load(url,context,next){const result=next(url,context);return url===target?{...result,source}:result;}});\nawait import(target);\n`;
   const file=path.join(directory,unit.id+'.test.mjs');fs.writeFileSync(file,wrapper);return file;
  });
 }
