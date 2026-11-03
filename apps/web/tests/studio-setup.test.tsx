@@ -722,6 +722,77 @@ test("plan summary follows the page title without skipping a heading level", asy
   expect(await screen.findByRole("heading", { name: "Plan ve kullanım", level: 2 })).toBeVisible();
 });
 
+test.each([
+  ["pro", "tr", "Sınırsız", "Plan ve kullanım"],
+  ["business", "tr", "Sınırsız", "Plan ve kullanım"],
+  ["pro", "en", "Unlimited", "Plan and usage"],
+  ["business", "en", "Unlimited", "Plan and usage"],
+] as const)(
+  "%s plan keeps finite usage beside explicit unlimited limits (%s)",
+  async (planName, locale, unlimited, title) => {
+    const studentLimit = planName === "business" ? 1250 : 250;
+    mocks.call.mockImplementation(async (operation) => {
+      if (operation === "organization_get_v1") return organization;
+      if (operation === "policies_get_v1") return [];
+      if (operation === "subscription_get_v1")
+        return {
+          ...plan,
+          plan: planName,
+          limits: {
+            entries: [
+              { key: "rooms", unlimited: true },
+              { key: "instructors", unlimited: true },
+              { key: "active_students", value: studentLimit },
+            ],
+          },
+          usage: {
+            entries: [
+              { key: "rooms", value: 0 },
+              { key: "instructors", value: 2 },
+              { key: "active_students", value: 0 },
+              { key: "disciplines", value: 3 },
+            ],
+          },
+        };
+      return { items: [], next_cursor: null };
+    });
+    render(
+      <StudioSetup actorId="actor" organizations={[organization]} onChanged={mocks.saved} />,
+      locale,
+    );
+    const summary = await screen.findByRole("region", { name: title });
+    expect(await within(summary).findByText(`0 / ${unlimited}`)).toBeVisible();
+    expect(within(summary).getByText(`2 / ${unlimited}`)).toBeVisible();
+    expect(within(summary).getByText(`0 / ${studentLimit}`)).toBeVisible();
+    expect(within(summary).getByText("3")).toBeVisible();
+    expect(within(summary).queryByText(/^3\s*\//)).not.toBeInTheDocument();
+    expect(within(summary).getAllByRole("term")).toHaveLength(4);
+  },
+);
+
+test("finite zero limits remain zero and missing usage remains unavailable", async () => {
+  mocks.call.mockImplementation(async (operation) => {
+    if (operation === "organization_get_v1") return organization;
+    if (operation === "policies_get_v1") return [];
+    if (operation === "subscription_get_v1")
+      return {
+        ...plan,
+        limits: {
+          entries: [
+            { key: "rooms", value: 0 },
+            { key: "instructors", value: 1 },
+          ],
+        },
+      };
+    return { items: [], next_cursor: null };
+  });
+  render(<StudioSetup actorId="actor" organizations={[organization]} onChanged={mocks.saved} />);
+  const summary = await screen.findByRole("region", { name: "Plan ve kullanım" });
+  expect(await within(summary).findByText("0 / 0")).toBeVisible();
+  expect(within(summary).getByText("— / 1")).toBeVisible();
+  expect(within(summary).queryByText(/Sınırsız/)).not.toBeInTheDocument();
+});
+
 test("invalid closure interval is announced and associated with both date fields", async () => {
   mocks.call.mockResolvedValue({ items: [center], next_cursor: null });
   const user = userEvent.setup();

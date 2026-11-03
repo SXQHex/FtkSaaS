@@ -877,6 +877,7 @@
     "ownerVsManager": "Organization ownership does not grant operational access to lessons, students or resources. Assign your center management separately; the server authorizes the action.",
     "selfAssign": "Assign myself to this center",
     "planTitle": "Plan and usage",
+    "unlimited": "Unlimited",
     "scopeRequired": "Starter scope has not been selected. Choose the plan scope before completing setup.",
     "starterHint": "Starter operates with one active center, room, discipline and instructor. The server enforces limits and action scope.",
     "selectedCenter": "Selected center: {name}",
