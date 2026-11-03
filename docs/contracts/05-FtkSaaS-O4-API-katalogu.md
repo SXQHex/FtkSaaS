@@ -394,7 +394,7 @@
 | report_build_v1 | worker | append_or_current_scope_lock | management_state_get_v1 | implemented | report_jobs.versioned_domain_change |
 | privacy_execute_v1 | worker | append_or_current_scope_lock | job_status_get_v1 | implemented | privacy_execute.authorized_result |
 | subscription_boundary_apply_v1 | worker | append_or_current_scope_lock | subscription_get_v1 | implemented | saas_subscriptions.versioned_domain_change |
-| class_assignment_set_v1 | command | create_absent_update_requires_version | management_state_get_v1 | contract_only | class_assignments.version, eligible_future_inherited_session_duties, resource_bookings |
+| class_assignment_set_v1 | command | create_absent_update_requires_version | management_state_get_v1 | implemented | class_assignments.version, eligible_future_inherited_session_duties, resource_bookings |
 | event_attendance_mark_v1 | draft | row_version | management_state_get_v1 | contract_only | event_registrations.versioned_domain_change |
 | platform_owner_set_v1 | command | append_or_current_scope_lock | management_state_get_v1 | contract_only | organizations.owner_person, verified_target_link |
 | platform_owner_remove_v1 | command | append_or_current_scope_lock | management_state_get_v1 | contract_only | organizations.owner_person_removed, no_customer_owner_self_transfer |

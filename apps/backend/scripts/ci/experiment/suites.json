@@ -369,15 +369,15 @@
     },
     {
       "path": "apps/backend/tests/program-session-lifecycle.test.mjs",
-      "sha256": "20018c293003b6a6484d519d6b61e9c3e14c98b62ae86186f05eeb963ec14eb3",
+      "sha256": "a746a2e833cd43f13d66289ec31e31bd93fd0c4136ae2423bd8fb4f2eaf010d6",
       "shared": [
         [
-          2,
-          8
+          3,
+          9
         ],
         [
-          470,
-          470
+          471,
+          471
         ]
       ],
       "parts": [
@@ -385,8 +385,8 @@
           "id": "program-session-lifecycle-root-1",
           "ranges": [
             [
-              9,
-              469
+              10,
+              470
             ]
           ]
         },
@@ -394,8 +394,8 @@
           "id": "program-session-lifecycle-root-2",
           "ranges": [
             [
-              471,
-              590
+              472,
+              591
             ]
           ]
         }
@@ -403,6 +403,11 @@
       "imports": [
         {
           "line": 1,
+          "path": "apps/backend/tests/class-duty-management-acceptance.mjs",
+          "sha256": "dce0bdf16509acd8bdda9877a23e44308dce39844eb090689c8335211498e007"
+        },
+        {
+          "line": 2,
           "path": "apps/backend/tests/program-configuration-acceptance.mjs",
           "sha256": "ab2011311522525807f956d30a66b5981e687efe91c4d7c69fb8558521bf776e"
         }

@@ -304,3 +304,19 @@ test('commercial limits distinguish explicit unlimited from finite usage without
  assert(valid('PlanUsage',{entries:[{key:'rooms',value:2}]}));
  assert(!valid('PlanUsage',{entries:[{key:'rooms',unlimited:true}]}));
 });
+
+test('class duty management requires explicit center scope and exposes assignment selector values',()=>{
+ const op=p['x-contract'].operations.find(x=>x.name==='class_assignment_set_v1');
+ assert.equal(op.operation_contract.read_path_status,'implemented');
+ assert(p['x-contract'].operations.find(x=>x.name==='management_state_get_v1').runtime_selectors.includes('class_assignment_set_v1'));
+ const request={client_api_version:1,request_id:id,org_id:id,center_id:id,operation:'class_assignment_set_v1',selector:{operation:'class_assignment_set_v1',key:{class_id:id,person_id:id,duty:'instructor'}}};
+ assert(valid('Request_management_state_get',request));
+ const {center_id,...unscoped}=request;assert(!valid('Request_management_state_get',unscoped));
+ assert(valid('ManagementProjection_class_assignment_set_v1',{operation:'class_assignment_set_v1',values:request.selector.key}));
+ assert(!valid('ManagementProjection_class_assignment_set_v1',{operation:'class_assignment_set_v1',values:{}}));
+});
+
+test('class duty management migration matches its reviewed native source',()=>{
+ const migration=fs.readdirSync('supabase/migrations').find(n=>n.endsWith('_class_duty_management.sql'));
+ assert(migration);assert.equal(fs.readFileSync('supabase/migrations/'+migration,'utf8'),fs.readFileSync('database/class-duty-management.sql','utf8'));
+});
