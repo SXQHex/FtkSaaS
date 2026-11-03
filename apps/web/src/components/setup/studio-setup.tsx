@@ -72,10 +72,18 @@ function PlanSummary({ orgId }: { orgId: string }) {
                 <dt>{t(`limits.${limit.key}`)}</dt>
                 <dd>
                   {plan.usage.entries.find((entry) => entry.key === limit.key)?.value ?? "—"} /{" "}
-                  {limit.value}
+                  {"value" in limit ? limit.value : t("unlimited")}
                 </dd>
               </div>
             ))}
+            {plan.usage.entries
+              .filter((entry) => !plan.limits.entries.some((limit) => limit.key === entry.key))
+              .map((entry) => (
+                <div key={entry.key} className="flex flex-wrap justify-between gap-3 py-3 text-sm">
+                  <dt>{t(`limits.${entry.key}`)}</dt>
+                  <dd>{entry.value}</dd>
+                </div>
+              ))}
           </dl>
           {plan.starter_scope_required === true && <p role="alert">{t("scopeRequired")}</p>}
           {plan.plan === "starter" && (

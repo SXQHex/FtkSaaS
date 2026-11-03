@@ -877,6 +877,7 @@
     "ownerVsManager": "Organizasyon sahibi olmak merkezde ders, öğrenci veya kaynak işlemi yapma yetkisi vermez. Kendi merkez yöneticiliğini ayrıca tanımla; işlemi sunucu yetkilendirir.",
     "selfAssign": "Bu merkezin yöneticiliğini üstlen",
     "planTitle": "Plan ve kullanım",
+    "unlimited": "Sınırsız",
     "scopeRequired": "Starter kapsamı henüz seçilmemiş. Kurulumu tamamlamadan önce plan kapsamı belirlenmeli.",
     "starterHint": "Starter tek aktif merkez, oda, disiplin ve eğitmenle çalışır. Limitleri ve işlemlerin kapsamını sunucu denetler.",
     "selectedCenter": "Seçili merkez: {name}",
