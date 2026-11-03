@@ -210,11 +210,11 @@
     },
     {
       "path": "apps/backend/tests/instructor-earnings.test.mjs",
-      "sha256": "e14e4b99d309954059d73ca5a3df8b06803e74757f9874c249c0a2a0df79b813",
+      "sha256": "94d2548cbd6f014557b2d5c57cf56d7dc555c1f9c0be061e8dfe689319176598",
       "shared": [
         [
-          1,
-          6
+          2,
+          7
         ]
       ],
       "parts": [
@@ -222,13 +222,19 @@
           "id": "instructor-earnings-root-1",
           "ranges": [
             [
-              7,
-              339
+              8,
+              340
             ]
           ]
         }
       ],
-      "imports": [],
+      "imports": [
+        {
+          "line": 1,
+          "path": "apps/backend/tests/pro-lifecycle-earnings-acceptance.mjs",
+          "sha256": "d40456222d07929ec30116603fe61991c742dc24ae6135354b25f0dc3d554084"
+        }
+      ],
       "estimated_seconds": 780.97
     },
     {
@@ -623,8 +629,247 @@
     "ops-hosted-acceptance",
     "p07-lifecycle-acceptance"
   ],
-  "dedicatedRunners": [
-    "starter-operations-acceptance"
-  ],
-  "dedicatedReason": "Run 41657114004: ST-02 exceeded its unchanged 300s root timeout while overlapping ST-03 on the same native runtime; baseline 41649563364 passed in 246.88s after its peer file finished. Keep the complete stateful workflow on one of the eight runners without another test file; validate remotely before claiming resolution."
+  "measurements": {
+    "run_id": 41714591061,
+    "attempt": 1,
+    "source_merge": "a291195b4a277d12f0ed2cba51fa257e1e53a228",
+    "note": "Completed unit process-wall samples from an overall failed run. Scheduling inputs only, not successful experiment acceptance. Frontend-settings timed out and has no completed sample; other missing samples retain source-size seeds. Concurrent load and changed sources can change future durations.",
+    "units": {
+      "starter-operations-acceptance": {
+        "seconds": 218.86,
+        "sha256": "5de235408ed2861d739d1298ddde3fbd0142abce5f587203b8160e4c05782abc",
+        "job_id": 126191412055
+      },
+      "ops-hosted-acceptance": {
+        "seconds": 27.34,
+        "sha256": "a170349e1e3ef4c3cc3b4e6bce4f44507fd0042ce410700822a5b48e38fbe676",
+        "job_id": 126191412074
+      },
+      "account-identity-acceptance": {
+        "seconds": 70.95,
+        "sha256": "65ce301c91ac3f47e1d3ffa945971e6d2f95d04ac04981e38baae57df8be15dd",
+        "job_id": 126191412074
+      },
+      "instructor-earnings-root-1": {
+        "seconds": 682.05,
+        "sha256": "e14e4b99d309954059d73ca5a3df8b06803e74757f9874c249c0a2a0df79b813",
+        "job_id": 126191412074
+      },
+      "p01-waitlist-workers-root-1": {
+        "seconds": 190.14,
+        "sha256": "5159dbbd5f96d89f44133acb2d605e1d4a424600b3119d35a59d206768012280",
+        "job_id": 126191412074
+      },
+      "program-configuration-acceptance": {
+        "seconds": 191.55,
+        "sha256": "ab2011311522525807f956d30a66b5981e687efe91c4d7c69fb8558521bf776e",
+        "job_id": 126191412074
+      },
+      "program-session-lifecycle-root-2": {
+        "seconds": 228.04,
+        "sha256": "73e235975fe408637aec0764ad90b42e585db7aae967bdbe0a8338e84f2c327b",
+        "job_id": 126191412074
+      },
+      "account-session-management-acceptance": {
+        "seconds": 72.15,
+        "sha256": "e19ed9722521850b3a35b97117f342cda93b1fab8a75ab794451fa7335913e81",
+        "job_id": 126191412092
+      },
+      "commercial-plan-acceptance": {
+        "seconds": 308.81,
+        "sha256": "dda8dfa2da7b4f1847830a3b3513d7b36a9ab4a07cd25676433eb23866d568f8",
+        "job_id": 126191412092
+      },
+      "event-cancellation-package": {
+        "seconds": 220.64,
+        "sha256": "1933c0b7ef50c9e36d650f965566695b9d2864375ff66450c74d2b37a9ffdbb9",
+        "job_id": 126191412092
+      },
+      "event-cancellation-settlement-races": {
+        "seconds": 436.19,
+        "sha256": "a10ae6eb61dbd8fc0ff7bc0d14ec9f0739c94903ceec49d13921d0ad9eba053e",
+        "job_id": 126191412092
+      },
+      "p06-acceptance": {
+        "seconds": 244.37,
+        "sha256": "df7b3040cce7bd6291cd8caa28806e76b301997ceced52d28e8518add9fbf242",
+        "job_id": 126191412092
+      },
+      "person-registry-root-2": {
+        "seconds": 199.94,
+        "sha256": "93d09d6533683e7600c8baba736775f9b9b1c19f4c9b81eb868ee75158ab8de7",
+        "job_id": 126191412092
+      },
+      "starter-preparation-acceptance": {
+        "seconds": 507.67,
+        "sha256": "81961408b6343c4b6985e622511552287c5b9c6f2ea8946fab440f8bc56ac2e9",
+        "job_id": 126191412092
+      },
+      "starter-studio-acceptance": {
+        "seconds": 272.13,
+        "sha256": "32e3d59bec63c7730d0d3f8217f729b7ee268bccca3441607ec2b8ae2dce2926",
+        "job_id": 126191412092
+      },
+      "account-signup-acceptance": {
+        "seconds": 8.41,
+        "sha256": "73fc0e5077434c106ec0aa4d7b370a851c00bb3d9dc524046f88696c04d191ed",
+        "job_id": 126191412099
+      },
+      "api-acceptance-root-1": {
+        "seconds": 595.74,
+        "sha256": "d5bdb608c6db9f37d0c7590e7ff474193e0fd521641b6f0d27aab867637cd4da",
+        "job_id": 126191412099
+      },
+      "event-cancellation-monetary": {
+        "seconds": 419.94,
+        "sha256": "007a712d202d1c20e4f98d07a4ff944185aa6b77a014b8ecba8100cbc855add0",
+        "job_id": 126191412099
+      },
+      "p07-account-profile-merge-acceptance": {
+        "seconds": 176.34,
+        "sha256": "a30965646b9012c3b400e9c1c0b1d8556a56a90127a150f44841336d09b7b39c",
+        "job_id": 126191412099
+      },
+      "schedule-reads-root-1": {
+        "seconds": 396.94,
+        "sha256": "a72fd8cecd815804875a2c495ce4ca5a8d8b21327799368efd77a822aaa29052",
+        "job_id": 126191412099
+      },
+      "subscriber-number-acceptance": {
+        "seconds": 294.73,
+        "sha256": "d4d99e4915601dc82dcaf4732e8dba9bc012ee44a43efdb85d4554bc00db21dc",
+        "job_id": 126191412099
+      },
+      "subscription-period-acceptance": {
+        "seconds": 151.12,
+        "sha256": "dfb6779769c432c242ca9522aa7ad97cc0deb2e357b477734f91acbf9f64e322",
+        "job_id": 126191412099
+      },
+      "p07-lifecycle-acceptance": {
+        "seconds": 50.02,
+        "sha256": "86e84e20ba3be770247174a6cc1a5054d8e406f20f0b17f5db2f9d6eee05481e",
+        "job_id": 126191412101
+      },
+      "account-mfa-acceptance": {
+        "seconds": 23.22,
+        "sha256": "9b5471a8601c0ec13ec5e01164e15e28d7b33e564438edef417bae7fa87c7bf0",
+        "job_id": 126191412101
+      },
+      "p01-lesson-requests-root-1": {
+        "seconds": 224.26,
+        "sha256": "ae008d1bfccecf555cb2d13a74708d0b74ab405534d03b6c3b937e5454833838",
+        "job_id": 126191412101
+      },
+      "program-session-lifecycle-root-1": {
+        "seconds": 1272.29,
+        "sha256": "32a8de1475d30c8a2311eccbeef09262aa5279fbfc3d6155b8a9b1dfa9170bb1",
+        "job_id": 126191412101
+      },
+      "registry-root-1": {
+        "seconds": 170.81,
+        "sha256": "4b02688fabdaed54ff9a6153190b64e1ddfc6ca754226da8b5c587ef83ca12ed",
+        "job_id": 126191412101
+      },
+      "starter-attendance-protection-root-1": {
+        "seconds": 817.4,
+        "sha256": "d3055ef662701d80d3a24279f1226e4b7d95e6483ce4fe5d6f40a6d374cf8f9a",
+        "job_id": 126191412101
+      },
+      "availability-day-boundaries-acceptance": {
+        "seconds": 67.15,
+        "sha256": "3208c6eceee01113de0e1bf6d262f89e5ee49c4ae377ee199b02fd2ac7670690",
+        "job_id": 126191412122
+      },
+      "availability-policies-root-1": {
+        "seconds": 283.48,
+        "sha256": "1fe5d593d985f969dfe929a6156cfccc15c10150a19c8a958f57054013cf8edd",
+        "job_id": 126191412122
+      },
+      "event-cancellation-actual-start": {
+        "seconds": 292.2,
+        "sha256": "5ce4884e35769b77344c309853360a60a16cd87f2b764d60bf8d0a3af7bb6a8b",
+        "job_id": 126191412122
+      },
+      "event-payment-root-2": {
+        "seconds": 184.68,
+        "sha256": "1c568690d90d09e67ba7facca0a4c4cf9c270ba89d8b1bcb2383bd14cc8453df",
+        "job_id": 126191412122
+      },
+      "p05-acceptance": {
+        "seconds": 185.52,
+        "sha256": "de065faf50f294106005197bfed64881081dabe427840a3c0452f9776e322f79",
+        "job_id": 126191412122
+      },
+      "person-registry-root-1": {
+        "seconds": 181.64,
+        "sha256": "5a55806a3c7ae762cf368f4590f94360f2f0ab01a538ec02c22cde984218f1cd",
+        "job_id": 126191412122
+      },
+      "personal-calendar-acceptance": {
+        "seconds": 105.78,
+        "sha256": "8c78b25b4b03d8fcc03e96d1541e0797c7f00edec3dadfcf9a87a90f1d0f1061",
+        "job_id": 126191412122
+      },
+      "starter-document-acceptance": {
+        "seconds": 42.76,
+        "sha256": "2c269e74392c3855c747d468b31aea7b37b6717155bcf7e9d0bfd7ed4e73ac18",
+        "job_id": 126191412122
+      },
+      "earning-payment-selection-acceptance": {
+        "seconds": 39.18,
+        "sha256": "25c9aaf511f3b64bf1c1a5049953a4cc3e9c3224e81724846778562e1f1b8ba6",
+        "job_id": 126191412385
+      },
+      "event-cancellation-planned-time": {
+        "seconds": 348.18,
+        "sha256": "5b01d5bc219875ba6604d9f11315fcc14ed3270370d5e50424bda53b8f51eb3a",
+        "job_id": 126191412385
+      },
+      "event-payment-root-1": {
+        "seconds": 601.06,
+        "sha256": "238fabaad2636eb6ead51df04cef69c2bac47b1907ce9710a857c708353bc492",
+        "job_id": 126191412385
+      },
+      "p01-catalog-entitlement-reads-root-1": {
+        "seconds": 263.92,
+        "sha256": "203d1b6f77cde8f27f45019e3ff44246385e3ee46e77c89714778c0e97d078a6",
+        "job_id": 126191412385
+      },
+      "room-role-registry-root-1": {
+        "seconds": 341.01,
+        "sha256": "f7d6bfac0844cfa354179939e887f75fd918721d2ffc835c5ae424b07deb1f1e",
+        "job_id": 126191412385
+      },
+      "starter-instructor-acceptance": {
+        "seconds": 398.35,
+        "sha256": "c751eb4f6f337cc95bef8227a9e4f38d43e296e27d49ffbdfe2fae1b650eb7ab",
+        "job_id": 126191412385
+      },
+      "starter-plan-gates-acceptance": {
+        "seconds": 172.88,
+        "sha256": "c2cbc191466371b912cd2f78159e0cb1235513caa2e9153268d4e735e5538537",
+        "job_id": 126191412385
+      },
+      "invitation-delivery-acceptance": {
+        "seconds": 47.98,
+        "sha256": "e14014089c4ef788c78c249f8460e073edf48d598e07e92e4bb336e1b6f7bb8e",
+        "job_id": 126191412566
+      },
+      "calendar-preferences-acceptance": {
+        "seconds": 117.23,
+        "sha256": "1edc9cb92239b8313813701cfe48530644c11fe5b9d18cb072deb98f771fb3f6",
+        "job_id": 126191412566
+      },
+      "cross-center-settlement-root-1": {
+        "seconds": 770.91,
+        "sha256": "e3159fd8a6abd025145b269d0e72222beefc5b9ba9cd9776e333a01418750b45",
+        "job_id": 126191412566
+      },
+      "p07-account-revocation-acceptance": {
+        "seconds": 105.37,
+        "sha256": "e755d94ebd85f355bb4e0c279b295e65a1ea6dacddfa296c6ccc2f0f53c2c05e",
+        "job_id": 126191412566
+      }
+    }
+  }
 }

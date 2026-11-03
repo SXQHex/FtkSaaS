@@ -47,7 +47,7 @@ export async function captureHosted(){
  // Pinned workspace CLI was already installed by frozen pnpm install. Never
  // install latest, print stdout/stderr or include provider/Auth schemas.
  const cli=repoFile('apps/backend/node_modules/.bin/supabase');
- const result=spawnSync(cli,['gen','types','--lang','typescript','--project-id',receipt.project,'--schema',appSchemas],{cwd:backendRoot,encoding:'utf8',timeout:180000,maxBuffer:20*1024*1024,env:process.env});
+ const result=spawnSync(cli,['gen','types','--lang','typescript','--remote='+receipt.project,'--schema',appSchemas],{cwd:backendRoot,encoding:'utf8',timeout:180000,maxBuffer:20*1024*1024,env:process.env});
  if(result.error||result.status!==0||!result.stdout.includes('export type Database'))throw Error('DOCS_TYPES_GENERATION_FAILED; CLI output withheld');
  fs.writeFileSync(dir+'/database.types.ts',result.stdout);
  fs.writeFileSync(dir+'/context.json',JSON.stringify({...generated.context,source,receipt:report},null,2)+'\n');

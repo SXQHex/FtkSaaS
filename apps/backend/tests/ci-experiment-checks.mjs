@@ -133,8 +133,10 @@ test('collector compares matched core/API costs and rejects missing experimental
  }finally{process.chdir(cwd);rmSync(dir,{recursive:true,force:true});}
 });
 
-test('latency-sensitive ST-02 workflow has one dedicated runner with its original timeout and complete body',()=>{
- const inventory=buildInventory(repositoryRoot);
+test('optional dedicated placement retains the original complete ST-02 body and timeout',()=>{
+ const manifest=JSON.parse(fs.readFileSync(new URL('../scripts/ci/experiment/suites.json',import.meta.url)));
+ manifest.dedicatedRunners=['starter-operations-acceptance'];
+ const inventory=buildInventory(repositoryRoot,{manifest});
  const bins=partition(inventory.units);
  const bin=bins.find(b=>b.units.some(u=>u.id==='starter-operations-acceptance'));
  assert.equal(bin.units.length,1,'ST-02 cannot compete with ST-03 or another file for the same native Edge runtime');
@@ -144,4 +146,53 @@ test('latency-sensitive ST-02 workflow has one dedicated runner with its origina
  assert.equal(bins.length,8);
  assert.deepEqual(bins.flatMap(b=>b.units.map(u=>u.id)).sort(),inventory.units.map(u=>u.id).sort());
  assert.deepEqual(bins,partition([...inventory.units].reverse()));
+});
+
+test('measurement balances eight active runners with completed source-bound samples',()=>{
+ const inventory=buildInventory(repositoryRoot),bins=partition(inventory.units);
+ assert.equal(inventory.units.filter(u=>u.weight_source==='measured').length,47);
+ assert(bins.find(b=>b.units.some(u=>u.id==='starter-operations-acceptance')).units.length>1);
+ assert.equal(inventory.units.find(u=>u.id==='starter-operations-acceptance').dedicated,false);
+ const heavy=bins.map(b=>b.projected_wall_seconds);
+ const lowerBound=Math.max(...inventory.units.map(u=>u.estimated_seconds),inventory.units.reduce((sum,u)=>sum+u.estimated_seconds,0)/16);
+ assert(Math.max(...heavy)<=lowerBound*1.05);
+});
+
+test('measurement removes root and nested test budgets while request deadlines and assertions still fail',()=>{
+ const dir=mkdtempSync(path.join(tmpdir(),'ftk-measurement-'));
+ try{
+  const env=Object.fromEntries(Object.entries(process.env).filter(([key])=>key!=='NODE_TEST_CONTEXT'));
+  const source=path.join(dir,'tests','probe.mjs');fs.mkdirSync(path.dirname(source));
+  const body=`import test from 'node:test'; import assert from 'node:assert/strict';
+const wait=ms=>new Promise(resolve=>setTimeout(resolve,ms));
+test('root',{timeout:1},async t=>{await wait(30); const original=t.test.bind(t);t.test=(name,options,fn)=>original(name,{timeout:1,...options},fn); await t.test('nested',{timeout:1},async t=>{await wait(30);await t.test('deep',{timeout:1},async()=>{await wait(30);assert.equal(2,2);});});});`;
+  fs.writeFileSync(source,body);
+  const inventory={root:dir,units:[{id:'probe',source:'tests/probe.mjs',code:body}]};
+  const [file]=materialize(inventory,path.join(dir,'normal'));
+  assert.throws(()=>execFileSync(process.execPath,['--test',file],{stdio:'pipe',env}));
+  const [measured]=materialize(inventory,path.join(dir,'measurement'),{measurement:true});
+  const report=path.join(dir,'tests.jsonl');
+  const reporter=new URL('../scripts/ci/experiment/timing-reporter.mjs',import.meta.url).pathname;
+  const result=execFileSync(process.execPath,['--test','--test-reporter=spec','--test-reporter-destination=stdout','--test-reporter='+reporter,'--test-reporter-destination='+report,measured],{encoding:'utf8',env});
+  assert(result.includes('pass 3'));
+  const rows=fs.readFileSync(report,'utf8').trim().split('\n').map(row=>JSON.parse(row));
+  assert.deepEqual(rows.map(row=>row.name).sort(),['deep','nested','root']);
+  assert(rows.every(row=>row.type==='test:pass'&&row.duration_ms>=30));
+  assert.equal(fs.readFileSync(source,'utf8'),body);
+  for(const failing of [body.replace('assert.equal(2,2)','assert.equal(2,3)'),body.replace('await wait(30);assert.equal(2,2);','await new Promise((resolve,reject)=>{const timer=setTimeout(()=>reject(Error("REQUEST_DEADLINE")),10);});')]){
+   const [bad]=materialize({...inventory,units:[{id:'failing',source:'tests/probe.mjs',code:failing}]},path.join(dir,'failure'),{measurement:true});
+   assert.throws(()=>execFileSync(process.execPath,['--test',bad],{stdio:'pipe',env}));
+  }
+ }finally{rmSync(dir,{recursive:true,force:true});}
+});
+
+test('stale duration samples fall back to explicit seeds and invalid matching samples fail closed',()=>{
+ const manifest=JSON.parse(fs.readFileSync(new URL('../scripts/ci/experiment/suites.json',import.meta.url)));
+ const id='starter-operations-acceptance';
+ manifest.measurements.units[id].sha256='0'.repeat(64);
+ const stale=buildInventory(repositoryRoot,{manifest}).units.find(unit=>unit.id===id);
+ assert.equal(stale.weight_source,'source-size-seed');
+ const current=JSON.parse(fs.readFileSync(new URL('../scripts/ci/experiment/suites.json',import.meta.url)));
+ current.measurements.units[id].seconds=-1;
+ assert.throws(()=>buildInventory(repositoryRoot,{manifest:current}),/Invalid measured duration/);
 });

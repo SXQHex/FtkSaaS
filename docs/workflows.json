@@ -264,7 +264,9 @@
         "apps/backend/scripts/ci/experiment/reference.mjs",
         "apps/backend/scripts/ci/experiment/run.mjs",
         "apps/backend/scripts/ci/experiment/suites.mjs",
-        "apps/backend/scripts/ci/experiment/suites.json"
+        "apps/backend/scripts/ci/experiment/suites.json",
+        "apps/backend/scripts/ci/experiment/measurement-test.mjs",
+        "apps/backend/scripts/ci/experiment/timing-reporter.mjs"
       ],
       "operations": [
         "operation_status_get_v1",
@@ -274,8 +276,8 @@
         "management_state_get_v1"
       ],
       "review": {
-        "fingerprint": "5f8afc78eab2794b93f5df0e2040050f4e5c9efa14c851dff3acc6ee7c775dd6",
-        "reason": "PR165 dedicated ST02 runner and new integrity assertion retained byte-for-byte while PR167 class duty reader/typed DTO/migration tests and new import remain intact; combined 51-unit inventory reviewed, original bodies/timeout/global phases and four-shard production protocol preserved."
+        "fingerprint": "05bfb00af0a9ee2f02865b12ca39eac2ab72adbbe76b7fb5858a12aec7d8ea56",
+        "reason": "PR169 integrated into PR168: pinned CLI3 and explicit remote targets, experiment-only registration adapter and source-bound scheduling retained; combined 52 units preserve original acceptance bodies and current import hashes, normal four-shard gates unchanged."
       }
     },
     {
@@ -544,7 +546,7 @@
       ],
       "review": {
         "fingerprint": "3ed4faacaf19a139df56f09dda9a9936c66c3dbf86c13b6cbe7613e0badfa43c",
-        "reason": "Final native class duty reader reviewed including canonical UUID comparison for selector and optional entity, real assignment versions/absence, live scope/features and Starter existing-versus-new session guard; original lifecycle bodies/assertions retained."
+        "reason": "PR168 main synchronization reviewed: native class-duty reader and existing-session Starter guard retained from accepted PR167; original program and instructor bodies unchanged, both independent acceptance imports preserved; no workflow rule changed."
       }
     },
     {
@@ -645,7 +647,8 @@
         "apps/backend/tests/starter-studio-acceptance.mjs",
         "apps/backend/tests/program-session-lifecycle.test.mjs",
         "apps/backend/tests/starter-attendance-protection.test.mjs",
-        "apps/backend/tests/event-payment.test.mjs"
+        "apps/backend/tests/event-payment.test.mjs",
+        "apps/backend/tests/pro-lifecycle-earnings-acceptance.mjs"
       ],
       "sources": [
         "apps/backend/database/active-discipline-projection-wrappers.sql",
@@ -720,8 +723,8 @@
         "negative_limits_get_v1"
       ],
       "review": {
-        "fingerprint": "db09563df5e480326686c527c6984dddea6848fae9df0914cc2d3b2813fe1107",
-        "reason": "Existing product, sale, freeze, termination, renewal, change and refund bodies/assertions remain byte-identical; owning program harness imports a separate class-duty acceptance only. Reviewed guide and reservation-preserving lifecycle source; no product behavior change."
+        "fingerprint": "5360ff2f9e02733e96a8968b47948f4f5f8bc14a973685ff1fee951e365fbd86",
+        "reason": "PR168 main synchronization reviewed: native class-duty reader and existing-session Starter guard retained from accepted PR167; original program and instructor bodies unchanged, both independent acceptance imports preserved; no workflow rule changed."
       }
     },
     {
@@ -736,7 +739,8 @@
         "apps/backend/tests/api-acceptance.test.mjs",
         "apps/backend/tests/program-session-lifecycle.test.mjs",
         "apps/backend/tests/starter-attendance-protection.test.mjs",
-        "apps/backend/tests/starter-document-acceptance.mjs"
+        "apps/backend/tests/starter-document-acceptance.mjs",
+        "apps/backend/tests/pro-lifecycle-earnings-acceptance.mjs"
       ],
       "sources": [
         "apps/backend/database/active-discipline-projection-wrappers.sql",
@@ -794,8 +798,8 @@
         "reservation_capacity_override_v1"
       ],
       "review": {
-        "fingerprint": "2b6fa291bf6f9e17048a05a0727cd22d048d5b32eee770fa75dc547748dc5fe2",
-        "reason": "Reviewed reservation and lesson intent flow with live scope and selected entitlement checks; existing owning program test bodies unchanged by new import, no booking writer or right/capacity guard changed."
+        "fingerprint": "f262e43d7c128fdb74f235e625b6e0810509c7b12e3d2984a287ec647c553a60",
+        "reason": "PR168 main synchronization reviewed: native class-duty reader and existing-session Starter guard retained from accepted PR167; original program and instructor bodies unchanged, both independent acceptance imports preserved; no workflow rule changed."
       }
     },
     {
@@ -806,7 +810,8 @@
       "detail": "docs/workflows.md",
       "tests": [
         "apps/backend/tests/starter-attendance-protection.test.mjs",
-        "apps/backend/tests/instructor-earnings.test.mjs"
+        "apps/backend/tests/instructor-earnings.test.mjs",
+        "apps/backend/tests/pro-lifecycle-earnings-acceptance.mjs"
       ],
       "sources": [
         "apps/backend/database/active-discipline-projection-wrappers.sql",
@@ -853,8 +858,8 @@
         "attendance_start_v1"
       ],
       "review": {
-        "fingerprint": "fe33f7eb4ab31778633f7c9c20dfc7dab7ccffd4770cffdf356acc379b795a67",
-        "reason": "Ortak üretilmiş wrapper farkı yalnız S16 owner abonelik dönem komutunu ekler; bu akışın mevcut operasyon/görev/izin/plan ve davranış kaynakları değişmedi, ilgili rehber incelendi."
+        "fingerprint": "e6dc4bd3da55524ca1b56187c7e88470f3c271d77809bf943292f5af1742704e",
+        "reason": "Final Pro/Business native chain reviewed against existing workflow; approval session reuses the selected alternative interval across local midnight, all original scopes/history/ledger checks retained; native execution remains pending."
       }
     },
     {
@@ -867,7 +872,8 @@
         "apps/backend/tests/api-acceptance.test.mjs",
         "apps/backend/tests/starter-operations-acceptance.mjs",
         "apps/backend/tests/event-payment.test.mjs",
-        "apps/backend/tests/starter-attendance-protection.test.mjs"
+        "apps/backend/tests/starter-attendance-protection.test.mjs",
+        "apps/backend/tests/pro-lifecycle-earnings-acceptance.mjs"
       ],
       "sources": [
         "apps/backend/database/active-discipline-projection-wrappers.sql",
@@ -912,8 +918,8 @@
         "debt_adjust_v1"
       ],
       "review": {
-        "fingerprint": "53c8403dd37d100688284134bf37cee91eb5fdca846afadd9d49d3086f2a39ba",
-        "reason": "Event-payment harness seçili hakediş regresyonunu içeri alıyor; collection/debt nakit akışı değiştirilmedi."
+        "fingerprint": "b4342b58df1e4fdadf6fddf9cc12f18b11cf3492b9142db0ae9336d7a01e631c",
+        "reason": "Final Pro/Business native chain reviewed against existing workflow; approval session reuses the selected alternative interval across local midnight, all original scopes/history/ledger checks retained; native execution remains pending."
       }
     },
     {
@@ -1171,7 +1177,8 @@
         "apps/backend/tests/instructor-earnings.test.mjs",
         "apps/backend/tests/event-payment.test.mjs",
         "apps/backend/tests/program-configuration-acceptance.mjs",
-        "apps/backend/tests/earning-payment-selection-acceptance.mjs"
+        "apps/backend/tests/earning-payment-selection-acceptance.mjs",
+        "apps/backend/tests/pro-lifecycle-earnings-acceptance.mjs"
       ],
       "sources": [
         "apps/backend/database/cross-center-settlement-wrappers.sql",
@@ -1196,8 +1203,8 @@
         "instructor_agreements_list_v1"
       ],
       "review": {
-        "fingerprint": "d200d9dfa302ffd8eee482624aec178d46dd51bc823636d418744c5b612c5598",
-        "reason": "FIN-01 mevcut bütün earning_ids doğrulamasını gerçek native ödeme/replay ve atomik ret testiyle korur; finans runtime davranışı değişmedi."
+        "fingerprint": "3ba31d0a4aa9c37a70e753ecb13395ec4001d684a143e9c1c623f95f1ee71e4d",
+        "reason": "Final Pro/Business native chain reviewed against existing workflow; approval session reuses the selected alternative interval across local midnight, all original scopes/history/ledger checks retained; native execution remains pending."
       }
     },
     {
@@ -1415,7 +1422,8 @@
       "guide": "docs/workflows.md#wf19",
       "detail": "docs/workflows.md",
       "tests": [
-        "apps/backend/tests/p01-waitlist-workers.test.mjs"
+        "apps/backend/tests/p01-waitlist-workers.test.mjs",
+        "apps/backend/tests/pro-lifecycle-earnings-acceptance.mjs"
       ],
       "sources": [
         "apps/backend/database/p01-waitlist-workers-wrappers.sql",
@@ -1432,8 +1440,8 @@
         "seat_offer_reject_v1"
       ],
       "review": {
-        "fingerprint": "609e5c630dd5ba12ef862f9e91e6d436d66929de60f52a59e0a8e0d6afc96914",
-        "reason": "Ortak üretilmiş wrapper farkı yalnız S16 owner abonelik dönem komutunu ekler; bu akışın mevcut operasyon/görev/izin/plan ve davranış kaynakları değişmedi, ilgili rehber incelendi."
+        "fingerprint": "87a02f0d7aba3340af83bc690a5cd7dea8820c5fd25bd8ce13aa9cdc12dccd63",
+        "reason": "Final Pro/Business native chain reviewed against existing workflow; approval session reuses the selected alternative interval across local midnight, all original scopes/history/ledger checks retained; native execution remains pending."
       }
     },
     {

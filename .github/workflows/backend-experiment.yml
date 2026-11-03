@@ -70,7 +70,7 @@ jobs:
     permissions:
       contents: read
     runs-on: ubuntu-24.04
-    timeout-minutes: 65
+    timeout-minutes: 90
     defaults:
       run:
         working-directory: source/apps/backend
@@ -117,6 +117,7 @@ jobs:
             source/.artifacts/ci/timings/*.json
             source/.artifacts/ci/diagnostics/*.jsonl
             source/.artifacts/ci/experiment/*.json
+            source/.artifacts/ci/experiment/*.jsonl
           include-hidden-files: true
           if-no-files-found: error
           archive: true
@@ -126,7 +127,7 @@ jobs:
     permissions:
       contents: read
     runs-on: ubuntu-24.04
-    timeout-minutes: 65
+    timeout-minutes: 90
     defaults:
       run:
         working-directory: source/apps/backend
@@ -188,6 +189,7 @@ jobs:
             source/.artifacts/ci/timings/*.json
             source/.artifacts/ci/diagnostics/*.jsonl
             source/.artifacts/ci/experiment/*.json
+            source/.artifacts/ci/experiment/*.jsonl
           include-hidden-files: true
           if-no-files-found: error
           archive: true

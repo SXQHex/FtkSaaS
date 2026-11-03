@@ -27,8 +27,12 @@ Bu dosya yalnız **sıra, bağımlı teslim paketleri ve kontrol noktalarının*
 ### Aktif kaynak paketi: P01–P04
 
 1. [P01](remaining-work.md#p01) backend teslimi tamamlandı; [tam kaynak/ortam kanıtı](00-FtkSaaS-yeni-sohbet-devir.md#p01-ticari-limit-kaynak-paketi) sahibindedir. Frontend limit tüketimi XREQ-014 kendi kabulünü bekler.
-2. Aktif paket [P02](remaining-work.md#p02): çok kaynak/personel native regresyonu ve XREQ-015 varsayılan sınıf görevi okuması. Mevcut `feature/pro-scheduling-lifecycle-closure` branch'i kullanılır; mükerrer PR açılmaz. Ardından [P03](remaining-work.md#p03) ileri rezervasyon/paket ve [P04](remaining-work.md#p04) anlaşma/hakediş kanıtları tamamlanır. Mevcut sağlam işlev yeniden yazılmaz; FIN-01 dar regresyonu genel P04 kabulü değildir.
+2. [P02](remaining-work.md#p02) PR167 ile aday/main/development kabulünü geçti; backend teslimi tamamlandı. Kaynak paketi için mükerrer PR açılmaz. Ayrı PR168'de [P03](remaining-work.md#p03) ileri rezervasyon/paket ve [P04](remaining-work.md#p04) anlaşma/hakediş kanıtları tamamlanır. Mevcut sağlam işlev yeniden yazılmaz; FIN-01 dar regresyonu genel P04 kabulü değildir.
 3. PR159 backend kaynak teslimi doğrulandı; XREQ-013 özgün Business/native tüketici kabulü [ortak talepte](../../../docs/requests.md#xreq-013) kendi sahibinde açık kalır. S14/S15 gerçek widget/host/seans route'u ve diğer Starter hosted bağımlılıkları da kendi kimliklerinde açıktır; bunlar bağımsız kaynak paketini durdurmaz.
+
+### Ayrı paralel kaynak paketi: P03/P04
+
+4 Kasım kullanıcı talimatıyla `feature/pro-lifecycle-earnings-acceptance` branch'i P03/P04 için main'den ayrı hazırlanır. PR167 main'e alındıktan sonra PR168 güncel main ile senkronize edilir; P02 teslim kanıtı kendi devir kaydında korunur. İç sıra: mevcut kaynak/kabul incelemesi → bağlı Pro/Business paket/teklif ve hakediş/ödeme kanıtı → kendi aday kabulü. Kullanıcı talimatıyla PR169 CLI/deney değişikliği PR168 dalına alınır; yalnız birleşik PR168 aday kabulü çalıştırılır ve PR169 main'e alınmadan kapatılır. Nihai P03/P04 kapanışı kendi kaynak/ortam kanıtlarıyla yapılır. Görev ayrıntısı [P03](remaining-work.md#p03)/[P04](remaining-work.md#p04), kaynak/ortam [devir](00-FtkSaaS-yeni-sohbet-devir.md#p03p04-paralel-kaynak-paketi) sahibindedir.
 
 ## Ortak işletim hattı
 
