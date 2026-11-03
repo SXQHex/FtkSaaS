@@ -1,0 +1,610 @@
+{
+  "version": 1,
+  "note": "Line ranges are 1-based inclusive; all non-import bytes are assigned exactly once or explicitly shared. Hash drift requires review, never automatic regeneration. Weights only seed the first experiment; they are NOT measured fragment durations.",
+  "suites": [
+    {
+      "path": "apps/backend/tests/api-acceptance.test.mjs",
+      "sha256": "1ce98e6fc17fb97418231021216b214ffc846937b7550e38cffef77e1fdda127",
+      "shared": [
+        [
+          2,
+          4
+        ]
+      ],
+      "parts": [
+        {
+          "id": "api-acceptance-root-1",
+          "ranges": [
+            [
+              5,
+              333
+            ]
+          ]
+        }
+      ],
+      "imports": [
+        {
+          "line": 1,
+          "path": "apps/backend/tests/starter-preparation-acceptance.mjs",
+          "sha256": "f3f40e0afd15bd56a8c2b84afbc5942726598716eb905050caee3bfc3364ea8d"
+        }
+      ],
+      "estimated_seconds": 960.91
+    },
+    {
+      "path": "apps/backend/tests/availability-policies.test.mjs",
+      "sha256": "c8a5a4d814fb777164ff2efb04c9c1ef5df5d8c844e57e141a6ef3562ea5accb",
+      "shared": [
+        [
+          2,
+          8
+        ]
+      ],
+      "parts": [
+        {
+          "id": "availability-policies-root-1",
+          "ranges": [
+            [
+              9,
+              260
+            ]
+          ]
+        }
+      ],
+      "imports": [
+        {
+          "line": 1,
+          "path": "apps/backend/tests/availability-day-boundaries-acceptance.mjs",
+          "sha256": "3208c6eceee01113de0e1bf6d262f89e5ee49c4ae377ee199b02fd2ac7670690"
+        }
+      ],
+      "estimated_seconds": 287.12
+    },
+    {
+      "path": "apps/backend/tests/cross-center-settlement.test.mjs",
+      "sha256": "e3159fd8a6abd025145b269d0e72222beefc5b9ba9cd9776e333a01418750b45",
+      "shared": [
+        [
+          1,
+          6
+        ]
+      ],
+      "parts": [
+        {
+          "id": "cross-center-settlement-root-1",
+          "ranges": [
+            [
+              7,
+              388
+            ]
+          ]
+        }
+      ],
+      "imports": [],
+      "estimated_seconds": 1089.21
+    },
+    {
+      "path": "apps/backend/tests/event-cancellation.test.mjs",
+      "sha256": "ed61c124a5f640f948865552457c4444e0c3d4a769358dac1446e93c9fae361d",
+      "shared": [
+        [
+          1,
+          60
+        ],
+        [
+          83,
+          107
+        ],
+        [
+          135,
+          141
+        ],
+        [
+          245,
+          248
+        ],
+        [
+          354,
+          382
+        ],
+        [
+          462,
+          464
+        ]
+      ],
+      "parts": [
+        {
+          "id": "event-cancellation-monetary",
+          "ranges": [
+            [
+              61,
+              82
+            ]
+          ]
+        },
+        {
+          "id": "event-cancellation-package",
+          "ranges": [
+            [
+              108,
+              134
+            ]
+          ]
+        },
+        {
+          "id": "event-cancellation-planned-time",
+          "ranges": [
+            [
+              142,
+              244
+            ]
+          ]
+        },
+        {
+          "id": "event-cancellation-actual-start",
+          "ranges": [
+            [
+              249,
+              333
+            ]
+          ]
+        },
+        {
+          "id": "event-cancellation-settlement-races",
+          "ranges": [
+            [
+              334,
+              353
+            ],
+            [
+              383,
+              461
+            ]
+          ]
+        }
+      ],
+      "imports": [],
+      "estimated_seconds": 1230.1
+    },
+    {
+      "path": "apps/backend/tests/event-payment.test.mjs",
+      "sha256": "b2969e4ec6cbb8e7b2963f16fc6bac139de7548f7eda351a5466be91f407a942",
+      "shared": [
+        [
+          1,
+          7
+        ],
+        [
+          220,
+          221
+        ]
+      ],
+      "parts": [
+        {
+          "id": "event-payment-root-1",
+          "ranges": [
+            [
+              8,
+              219
+            ]
+          ]
+        },
+        {
+          "id": "event-payment-root-2",
+          "ranges": [
+            [
+              222,
+              397
+            ]
+          ]
+        }
+      ],
+      "imports": [],
+      "estimated_seconds": 799.78
+    },
+    {
+      "path": "apps/backend/tests/instructor-earnings.test.mjs",
+      "sha256": "e14e4b99d309954059d73ca5a3df8b06803e74757f9874c249c0a2a0df79b813",
+      "shared": [
+        [
+          1,
+          6
+        ]
+      ],
+      "parts": [
+        {
+          "id": "instructor-earnings-root-1",
+          "ranges": [
+            [
+              7,
+              339
+            ]
+          ]
+        }
+      ],
+      "imports": [],
+      "estimated_seconds": 780.97
+    },
+    {
+      "path": "apps/backend/tests/p01-catalog-entitlement-reads.test.mjs",
+      "sha256": "203d1b6f77cde8f27f45019e3ff44246385e3ee46e77c89714778c0e97d078a6",
+      "shared": [
+        [
+          1,
+          6
+        ]
+      ],
+      "parts": [
+        {
+          "id": "p01-catalog-entitlement-reads-root-1",
+          "ranges": [
+            [
+              7,
+              188
+            ]
+          ]
+        }
+      ],
+      "imports": [],
+      "estimated_seconds": 214.02
+    },
+    {
+      "path": "apps/backend/tests/p01-lesson-requests.test.mjs",
+      "sha256": "ae008d1bfccecf555cb2d13a74708d0b74ab405534d03b6c3b937e5454833838",
+      "shared": [
+        [
+          1,
+          6
+        ]
+      ],
+      "parts": [
+        {
+          "id": "p01-lesson-requests-root-1",
+          "ranges": [
+            [
+              7,
+              123
+            ]
+          ]
+        }
+      ],
+      "imports": [],
+      "estimated_seconds": 173.83
+    },
+    {
+      "path": "apps/backend/tests/p01-waitlist-workers.test.mjs",
+      "sha256": "5159dbbd5f96d89f44133acb2d605e1d4a424600b3119d35a59d206768012280",
+      "shared": [
+        [
+          1,
+          6
+        ]
+      ],
+      "parts": [
+        {
+          "id": "p01-waitlist-workers-root-1",
+          "ranges": [
+            [
+              7,
+              184
+            ]
+          ]
+        }
+      ],
+      "imports": [],
+      "estimated_seconds": 193.56
+    },
+    {
+      "path": "apps/backend/tests/person-registry.test.mjs",
+      "sha256": "ca3e2659234f48eaaf899537b69ac57edc20c9756b108b1b307ecae44f96c0ab",
+      "shared": [
+        [
+          7,
+          13
+        ],
+        [
+          115,
+          115
+        ]
+      ],
+      "parts": [
+        {
+          "id": "person-registry-root-1",
+          "ranges": [
+            [
+              14,
+              114
+            ]
+          ]
+        },
+        {
+          "id": "person-registry-root-2",
+          "ranges": [
+            [
+              116,
+              273
+            ]
+          ]
+        }
+      ],
+      "imports": [
+        {
+          "line": 1,
+          "path": "apps/backend/tests/subscriber-number-acceptance.mjs",
+          "sha256": "d4d99e4915601dc82dcaf4732e8dba9bc012ee44a43efdb85d4554bc00db21dc"
+        },
+        {
+          "line": 2,
+          "path": "apps/backend/tests/account-signup-acceptance.mjs",
+          "sha256": "73fc0e5077434c106ec0aa4d7b370a851c00bb3d9dc524046f88696c04d191ed"
+        },
+        {
+          "line": 3,
+          "path": "apps/backend/tests/invitation-delivery-acceptance.mjs",
+          "sha256": "e14014089c4ef788c78c249f8460e073edf48d598e07e92e4bb336e1b6f7bb8e"
+        },
+        {
+          "line": 4,
+          "path": "apps/backend/tests/account-identity-acceptance.mjs",
+          "sha256": "65ce301c91ac3f47e1d3ffa945971e6d2f95d04ac04981e38baae57df8be15dd"
+        },
+        {
+          "line": 5,
+          "path": "apps/backend/tests/account-mfa-acceptance.mjs",
+          "sha256": "9b5471a8601c0ec13ec5e01164e15e28d7b33e564438edef417bae7fa87c7bf0"
+        },
+        {
+          "line": 6,
+          "path": "apps/backend/tests/account-session-management-acceptance.mjs",
+          "sha256": "e19ed9722521850b3a35b97117f342cda93b1fab8a75ab794451fa7335913e81"
+        }
+      ],
+      "estimated_seconds": 651.01
+    },
+    {
+      "path": "apps/backend/tests/program-session-lifecycle.test.mjs",
+      "sha256": "20018c293003b6a6484d519d6b61e9c3e14c98b62ae86186f05eeb963ec14eb3",
+      "shared": [
+        [
+          2,
+          8
+        ],
+        [
+          470,
+          470
+        ]
+      ],
+      "parts": [
+        {
+          "id": "program-session-lifecycle-root-1",
+          "ranges": [
+            [
+              9,
+              469
+            ]
+          ]
+        },
+        {
+          "id": "program-session-lifecycle-root-2",
+          "ranges": [
+            [
+              471,
+              590
+            ]
+          ]
+        }
+      ],
+      "imports": [
+        {
+          "line": 1,
+          "path": "apps/backend/tests/program-configuration-acceptance.mjs",
+          "sha256": "ab2011311522525807f956d30a66b5981e687efe91c4d7c69fb8558521bf776e"
+        }
+      ],
+      "estimated_seconds": 813.86
+    },
+    {
+      "path": "apps/backend/tests/registry.test.mjs",
+      "sha256": "7d74c7595fa6104b8632820a127ac5686ca7d82b29d85eaedbee2cc47709a7cf",
+      "shared": [
+        [
+          4,
+          4
+        ],
+        [
+          9,
+          14
+        ],
+        [
+          128,
+          128
+        ],
+        [
+          134,
+          134
+        ],
+        [
+          136,
+          136
+        ]
+      ],
+      "parts": [
+        {
+          "id": "registry-root-1",
+          "ranges": [
+            [
+              15,
+              127
+            ]
+          ]
+        }
+      ],
+      "imports": [
+        {
+          "line": 1,
+          "path": "apps/backend/tests/subscription-period-acceptance.mjs",
+          "sha256": "dfb6779769c432c242ca9522aa7ad97cc0deb2e357b477734f91acbf9f64e322"
+        },
+        {
+          "line": 2,
+          "path": "apps/backend/tests/starter-document-acceptance.mjs",
+          "sha256": "2c269e74392c3855c747d468b31aea7b37b6717155bcf7e9d0bfd7ed4e73ac18"
+        },
+        {
+          "line": 3,
+          "path": "apps/backend/tests/frontend-settings-acceptance.mjs",
+          "sha256": "c3b468a0b490064b18f9fd6e0526f45a3022567cfc601bc4bd0971ff7060b74f"
+        },
+        {
+          "line": 5,
+          "path": "apps/backend/tests/p05-acceptance.mjs",
+          "sha256": "de065faf50f294106005197bfed64881081dabe427840a3c0452f9776e322f79"
+        },
+        {
+          "line": 6,
+          "path": "apps/backend/tests/p06-acceptance.mjs",
+          "sha256": "174b42d37f89eb055d7ec2251fd647e6fe02f70ff46197e7f35c006516372d4b"
+        },
+        {
+          "line": 7,
+          "path": "apps/backend/tests/starter-operations-acceptance.mjs",
+          "sha256": "5de235408ed2861d739d1298ddde3fbd0142abce5f587203b8160e4c05782abc"
+        },
+        {
+          "line": 8,
+          "path": "apps/backend/tests/canonical-settings-migration-acceptance.mjs",
+          "sha256": "923be16ae737f6ee56fb1febc42618d4bafac41ff8b2a88d2d268b4cb69c1acb"
+        },
+        {
+          "line": 129,
+          "path": "apps/backend/tests/ops-hosted-acceptance.mjs",
+          "sha256": "a170349e1e3ef4c3cc3b4e6bce4f44507fd0042ce410700822a5b48e38fbe676"
+        },
+        {
+          "line": 130,
+          "path": "apps/backend/tests/p07-account-revocation-acceptance.mjs",
+          "sha256": "e755d94ebd85f355bb4e0c279b295e65a1ea6dacddfa296c6ccc2f0f53c2c05e"
+        },
+        {
+          "line": 131,
+          "path": "apps/backend/tests/p07-account-profile-merge-acceptance.mjs",
+          "sha256": "a30965646b9012c3b400e9c1c0b1d8556a56a90127a150f44841336d09b7b39c"
+        },
+        {
+          "line": 132,
+          "path": "apps/backend/tests/p07-subscription-lifecycle-acceptance.mjs",
+          "sha256": "08cab358e5d1834b26196ba6c5cbc6c1c3d1a3739488f58b9c1580685b2c2831"
+        },
+        {
+          "line": 133,
+          "path": "apps/backend/tests/p07-lifecycle-acceptance.mjs",
+          "sha256": "86e84e20ba3be770247174a6cc1a5054d8e406f20f0b17f5db2f9d6eee05481e"
+        },
+        {
+          "line": 135,
+          "path": "apps/backend/tests/starter-plan-gates-acceptance.mjs",
+          "sha256": "c2cbc191466371b912cd2f78159e0cb1235513caa2e9153268d4e735e5538537"
+        },
+        {
+          "line": 137,
+          "path": "apps/backend/tests/starter-studio-acceptance.mjs",
+          "sha256": "32e3d59bec63c7730d0d3f8217f729b7ee268bccca3441607ec2b8ae2dce2926"
+        }
+      ],
+      "estimated_seconds": 1356.24
+    },
+    {
+      "path": "apps/backend/tests/room-role-registry.test.mjs",
+      "sha256": "90156be5c8c44812654e2c87baef12ee207fe99cfdcbe17b0263f7aed9fa8544",
+      "shared": [
+        [
+          2,
+          9
+        ]
+      ],
+      "parts": [
+        {
+          "id": "room-role-registry-root-1",
+          "ranges": [
+            [
+              10,
+              310
+            ]
+          ]
+        }
+      ],
+      "imports": [
+        {
+          "line": 1,
+          "path": "apps/backend/tests/starter-instructor-acceptance.mjs",
+          "sha256": "c751eb4f6f337cc95bef8227a9e4f38d43e296e27d49ffbdfe2fae1b650eb7ab"
+        }
+      ],
+      "estimated_seconds": 211
+    },
+    {
+      "path": "apps/backend/tests/schedule-reads.test.mjs",
+      "sha256": "f6cb0902988c956d14996329cc745191c71c10b6c6a7f1e258df7ad0e55a2c9a",
+      "shared": [
+        [
+          3,
+          8
+        ]
+      ],
+      "parts": [
+        {
+          "id": "schedule-reads-root-1",
+          "ranges": [
+            [
+              9,
+              238
+            ]
+          ]
+        }
+      ],
+      "imports": [
+        {
+          "line": 1,
+          "path": "apps/backend/tests/calendar-preferences-acceptance.mjs",
+          "sha256": "1edc9cb92239b8313813701cfe48530644c11fe5b9d18cb072deb98f771fb3f6"
+        },
+        {
+          "line": 2,
+          "path": "apps/backend/tests/personal-calendar-acceptance.mjs",
+          "sha256": "8c78b25b4b03d8fcc03e96d1541e0797c7f00edec3dadfcf9a87a90f1d0f1061"
+        }
+      ],
+      "estimated_seconds": 537.08
+    },
+    {
+      "path": "apps/backend/tests/starter-attendance-protection.test.mjs",
+      "sha256": "d3055ef662701d80d3a24279f1226e4b7d95e6483ce4fe5d6f40a6d374cf8f9a",
+      "shared": [
+        [
+          1,
+          6
+        ]
+      ],
+      "parts": [
+        {
+          "id": "starter-attendance-protection-root-1",
+          "ranges": [
+            [
+              7,
+              386
+            ]
+          ]
+        }
+      ],
+      "imports": [],
+      "estimated_seconds": 240.63
+    }
+  ],
+  "exclusive": [
+    "account-mfa-acceptance",
+    "account-session-management-acceptance",
+    "invitation-delivery-acceptance",
+    "ops-hosted-acceptance",
+    "p07-lifecycle-acceptance"
+  ]
+}

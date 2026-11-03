@@ -2,9 +2,17 @@
 
 3 Kasım 2026 kaynak ve kabul kontrolü. Açık işler ve kapanış ölçütleri [backlog](remaining-work.md), sıra [kuyruk](production-queue.md), ürün/API davranışı [kaynak indeksi](../../../docs/source-index.md) sahibindedir. Burada karar veya görev metni tekrar edilmez.
 
+## Sekiz shard deney hazırlığı
+
+3 Kasım 2026 kullanıcı kararıyla tek PR'de, mevcut dört shard CI/development zincirini koruyan manuel sekiz shard karşılaştırması hazırlanıyor.
+
+15 özgün suite'in 9'u bağımsız kabul/kök/senaryo sınırlarında toplam 48 deney birimine ayrıldı. Özgün testler ve mevcut runner/workflow/envanter değişmedi. Singleton ayarı değiştiren beş parça ayrı fazda çalışır. Deney protokolünün tek sahibi [CI politikasıdır](../../../docs/ci-policy.md#sekiz-shard-karşılaştırma-deneyi). Gerçek API deneyi ve hız/maliyet karşılaştırması henüz yapılmadı; mevcut akışa geçiş kabulü verilmez. Bu PR'nin test edilmiş tam kaynağı için kullanıcı özel kurulumla birleştirme talimatı verdi; önceki PR yetkisi devralınmadı.
+
+Main senkronizasyonunda XREQ-013'ün yeni program yapılandırma kabulü bağımsız deney birimi olarak eklendi; özgün test kaynakları değişmedi. Yeni kaynakta backend verify 285/285, deney ön kontrolleri 9/9, kalite tabanı 0 bulgu ve belge kontrolü 35 dosya/1322 bağlantı başarılıdır. Bağımsız inceleme önceki 47 parça gövdesi ve izolasyon işaretlerinin değişmediğini, yeni testin bir kez dahil edildiğini ve main'in runtime/test/frontend/sözleşme dosyalarının birebir korunduğunu doğruladı; açık Critical/Required bulgu yok. Aynı PR161'e push sonrası yeni aday kabulü gerekir; önceki aday başarısı yeni kaynağa taşınmaz. Gerçek sekiz shard API deneyi henüz çalıştırılmadı.
+
 ## Kaynak tabanı
 
-Güncel çalışma tabanı main `9aa974e3192b05fa60faab768a086c5d1c575be3`. [Main belge/kaynak kabulü](https://github.com/SXQHex/FtkSaaS/actions/runs/41636533972), [merge proof](https://github.com/SXQHex/FtkSaaS/actions/runs/41636534179) ve [development source](https://github.com/SXQHex/FtkSaaS/actions/runs/41636608539), attempt1 completed/success doğrulandı; deploy skipped olduğundan yeni runtime teslimi sayılmaz. Önceki çalışma tabanı PR158 main `76aec859caf7b8b811a8b4b35680fe38fc12eb98` idi. Sonraki main farkı yalnız sekiz frontend dosyasıdır; backend/typed/CI kaynakları değişmedi. PR159'ın yayımlanmış head'i korunarak main senkronizasyonu alındı; aşağıdaki yeni backend düzeltmesi aynı PR159'dadır ve kendi aday/main/development kabulünü bekler.
+Güncel çalışma tabanı main `6151041b92557422dac6e5c9fa6d68cf21d55fb6` (PR162). Aynı kaynağın [main proof](https://github.com/SXQHex/FtkSaaS/actions/runs/41647466976), [merge proof](https://github.com/SXQHex/FtkSaaS/actions/runs/41647467139) ve [development koşusu](https://github.com/SXQHex/FtkSaaS/actions/runs/41648300364) completed/success doğrulandı. PR161 bu main ile senkronize edildi; bu sonuç PR161'in yeni aday kabulü veya sekiz shard deney başarısı değildir. Main'den gelen XREQ-013 kaynak/test/şema değişiklikleri ve diğer alanın belgeleri korunur.
 
 Son backend teslim kaynağı PR156 main `22f23f4e5bfefdc0cac71a7b4b3d61d7e8a0b5c4`. Bu SHA için [main proof](https://github.com/SXQHex/FtkSaaS/actions/runs/41630369785), [merge proof](https://github.com/SXQHex/FtkSaaS/actions/runs/41630369780) ve [development teslimi](https://github.com/SXQHex/FtkSaaS/actions/runs/41630426765), attempt1 completed/success doğrulandı. CD'nin gerçek hosted backend ve dokümantasyon şema doğrulaması adımları başarılıdır. Bu kanıt frontend ekran/gerçek widget/ICS host kabulü yerine geçmez. S14–S16 kaynak kabulü ve sınırlar aşağıdadır.
 
