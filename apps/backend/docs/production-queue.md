@@ -26,13 +26,13 @@ Bu dosya yalnız **sıra, bağımlı teslim paketleri ve kontrol noktalarının*
 
 ### Aktif kaynak paketi: P01–P04
 
-1. [P01](remaining-work.md#p01) etkin ticari limit kaynağı, atomik kapasite tüketimi ve dönem uyumu aynı paket içinde hazırlanır; [kaynak/test/ortam kanıtı](00-FtkSaaS-yeni-sohbet-devir.md#p01-ticari-limit-kaynak-paketi) kesinleşmeden kapanmaz. Mevcut branch kullanılır; mükerrer PR açılmaz.
-2. Ardından [P02](remaining-work.md#p02) çok kaynak/personel, [P03](remaining-work.md#p03) ileri rezervasyon/paket ve [P04](remaining-work.md#p04) anlaşma/hakediş kaynakları incelenir. Mevcut sağlam işlev yeniden yazılmaz. FIN-01 dar regresyonu genel P04 kabulü değildir.
+1. [P01](remaining-work.md#p01) backend teslimi tamamlandı; [tam kaynak/ortam kanıtı](00-FtkSaaS-yeni-sohbet-devir.md#p01-ticari-limit-kaynak-paketi) sahibindedir. Frontend limit tüketimi XREQ-014 kendi kabulünü bekler.
+2. [P02](remaining-work.md#p02) PR167 ile main'e alındı; development kabulü ve teslim kapanışı beklenir. Kaynak paketi için mükerrer PR açılmaz. Ayrı PR168'de [P03](remaining-work.md#p03) ileri rezervasyon/paket ve [P04](remaining-work.md#p04) anlaşma/hakediş kanıtları tamamlanır. Mevcut sağlam işlev yeniden yazılmaz; FIN-01 dar regresyonu genel P04 kabulü değildir.
 3. PR159 backend kaynak teslimi doğrulandı; XREQ-013 özgün Business/native tüketici kabulü [ortak talepte](../../../docs/requests.md#xreq-013) kendi sahibinde açık kalır. S14/S15 gerçek widget/host/seans route'u ve diğer Starter hosted bağımlılıkları da kendi kimliklerinde açıktır; bunlar bağımsız kaynak paketini durdurmaz.
 
 ### Ayrı paralel kaynak paketi: P03/P04
 
-4 Kasım kullanıcı talimatıyla `feature/pro-lifecycle-earnings-acceptance` branch'i P03/P04 için main'den ayrı hazırlanır. P02 kaynağı ve sonucu PR167'de kalır; bu çalışma PR167'yi izlemez/değiştirmez ve P02'yi tamamlandı saymaz. İç sıra: mevcut kaynak/kabul incelemesi → bağlı Pro/Business paket/teklif ve hakediş/ödeme kanıtı → kendi aday kabulü. P02 sonucu geldiğinde P02 teslim kapanışı ayrıca yapılır; bağımlı nihai P03/P04 kapanışı kanıtlarıyla uzlaştırılır. Görev ayrıntısı [P03](remaining-work.md#p03)/[P04](remaining-work.md#p04), kaynak/ortam [devir](00-FtkSaaS-yeni-sohbet-devir.md#p03p04-paralel-kaynak-paketi) sahibindedir.
+4 Kasım kullanıcı talimatıyla `feature/pro-lifecycle-earnings-acceptance` branch'i P03/P04 için main'den ayrı hazırlanır. PR167 main'e alındıktan sonra PR168 güncel main ile senkronize edilir; P02 development kapanışı ayrı kalır. İç sıra: mevcut kaynak/kabul incelemesi → bağlı Pro/Business paket/teklif ve hakediş/ödeme kanıtı → kendi aday kabulü. P02 sonucu geldiğinde P02 teslim kapanışı ayrıca yapılır; bağımlı nihai P03/P04 kapanışı kanıtlarıyla uzlaştırılır. Görev ayrıntısı [P03](remaining-work.md#p03)/[P04](remaining-work.md#p04), kaynak/ortam [devir](00-FtkSaaS-yeni-sohbet-devir.md#p03p04-paralel-kaynak-paketi) sahibindedir.
 
 ## Ortak işletim hattı
 

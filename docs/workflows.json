@@ -274,8 +274,8 @@
         "management_state_get_v1"
       ],
       "review": {
-        "fingerprint": "8ea7726696634a3d905f014d6085d3572b8b7fba89fddb202028c35e2696fb27",
-        "reason": "Final Pro/Business native chain reviewed against existing workflow; approval session reuses the selected alternative interval across local midnight, all original scopes/history/ledger checks retained; native execution remains pending."
+        "fingerprint": "b2f06635c6dc1c37b77ba2a4fb14a1695491248ce895b29b698bb8b12e6da8a7",
+        "reason": "PR168 main synchronization reviewed: both acceptance imports and source inventory preserved, CI executable policy unchanged."
       }
     },
     {
@@ -463,7 +463,8 @@
         "apps/backend/tests/availability-policies.test.mjs",
         "apps/backend/tests/starter-plan-gates-acceptance.mjs",
         "apps/backend/tests/starter-attendance-protection.test.mjs",
-        "apps/backend/tests/program-configuration-acceptance.mjs"
+        "apps/backend/tests/program-configuration-acceptance.mjs",
+        "apps/backend/tests/class-duty-management-acceptance.mjs"
       ],
       "sources": [
         "apps/backend/database/active-discipline-projection-wrappers.sql",
@@ -517,7 +518,9 @@
         "apps/backend/database/starter-subscriber-projections.sql",
         "apps/backend/supabase/migrations/20261102180626_starter_subscriber_projections.sql",
         "apps/backend/database/program-configuration-requirements.sql",
-        "apps/backend/supabase/migrations/20261103123239_program_configuration_requirements.sql"
+        "apps/backend/supabase/migrations/20261103123239_program_configuration_requirements.sql",
+        "apps/backend/database/class-duty-management.sql",
+        "apps/backend/supabase/migrations/20261103194514_class_duty_management.sql"
       ],
       "operations": [
         "availability_save_v1",
@@ -540,8 +543,8 @@
         "class_assignment_set_v1"
       ],
       "review": {
-        "fingerprint": "9f56f4e3455272df3fa6a4ef7ed10cdb7f6e3e69d80697760373fc6f00813426",
-        "reason": "Final native fixture covers decoder closed allowlist, original agreement failure contexts, nonmanager/tenant denial, native publishing recovery, stale preview and unchanged Starter; scope and guide reviewed."
+        "fingerprint": "3ed4faacaf19a139df56f09dda9a9936c66c3dbf86c13b6cbe7613e0badfa43c",
+        "reason": "PR168 main synchronization reviewed: native class-duty reader and existing-session Starter guard retained from accepted PR167; original program and instructor bodies unchanged, both independent acceptance imports preserved; no workflow rule changed."
       }
     },
     {
@@ -718,8 +721,8 @@
         "negative_limits_get_v1"
       ],
       "review": {
-        "fingerprint": "702cbd00ecd4d1e170d6049394a5adb45687b6b379cefa6224069e17f5af724a",
-        "reason": "Final Pro/Business native chain reviewed against existing workflow; approval session reuses the selected alternative interval across local midnight, all original scopes/history/ledger checks retained; native execution remains pending."
+        "fingerprint": "5360ff2f9e02733e96a8968b47948f4f5f8bc14a973685ff1fee951e365fbd86",
+        "reason": "PR168 main synchronization reviewed: native class-duty reader and existing-session Starter guard retained from accepted PR167; original program and instructor bodies unchanged, both independent acceptance imports preserved; no workflow rule changed."
       }
     },
     {
@@ -793,8 +796,8 @@
         "reservation_capacity_override_v1"
       ],
       "review": {
-        "fingerprint": "527cb3fce8e53088d303cb330b1e8936ab78b14b6a9e3af8831c58ec95712384",
-        "reason": "Final Pro/Business native chain reviewed against existing workflow; approval session reuses the selected alternative interval across local midnight, all original scopes/history/ledger checks retained; native execution remains pending."
+        "fingerprint": "f262e43d7c128fdb74f235e625b6e0810509c7b12e3d2984a287ec647c553a60",
+        "reason": "PR168 main synchronization reviewed: native class-duty reader and existing-session Starter guard retained from accepted PR167; original program and instructor bodies unchanged, both independent acceptance imports preserved; no workflow rule changed."
       }
     },
     {
