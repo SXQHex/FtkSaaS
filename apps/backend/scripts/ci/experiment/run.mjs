@@ -11,7 +11,7 @@ const git=(...args)=>execFileSync('git',args,{cwd:root,encoding:'utf8'}).trim();
 const reference=JSON.parse(process.env.EXPERIMENT_REFERENCE??'null');
 if(!reference||git('rev-parse','HEAD')!==reference.merge||git('rev-parse','HEAD^{tree}')!==reference.tree)throw Error('Experiment source mismatch');
 const output=path.join(root,'.artifacts/ci/experiment');fs.mkdirSync(output,{recursive:true});
-const plan={reference,originals:inventory.originals,splitOriginals:inventory.splitOriginals,units:inventory.units.length,bins:bins.map(b=>({shard:b.shard,estimated_seconds:b.estimated_seconds,units:b.units.map(u=>({id:u.id,source:u.source,exclusive:u.exclusive,dedicated:u.dedicated}))})),note:'Estimated weights are scheduling seeds, never measured fragment timings. Cancellation wrapper roots increase by four; scenario bodies remain byte-identical.'};
+const plan={kind:'measurement-only',test_timeout:'unlimited',job_timeout_minutes:90,reference,originals:inventory.originals,splitOriginals:inventory.splitOriginals,units:inventory.units.length,bins:bins.map(b=>({shard:b.shard,estimated_seconds:b.estimated_seconds,projected_wall_seconds:b.projected_wall_seconds,units:b.units.map(u=>({id:u.id,source:u.source,exclusive:u.exclusive,weight_source:u.weight_source}))})),note:'Source-bound completed process-wall samples guide scheduling; unmatched samples use source-size seeds. Projected wall includes serial fixtures and two parallel lanes, not a speed claim. Test registration timeout is Infinity only in the experiment; request/SQL deadlines and assertions are unchanged. Not equivalent timeout acceptance to baseline.'};
 fs.writeFileSync(path.join(output,'plan.json'),JSON.stringify(plan,null,2)+'\n');
 if(mode==='api'){
  const bin=bins.find(b=>String(b.shard)===shardText);if(!bin)throw Error('Invalid experiment shard');
@@ -22,9 +22,11 @@ if(mode==='api'){
  // Reuse the existing isolated migration/empty Auth/tenant/receipt verifier.
  run(['scripts/ci/reset-local.mjs']);
  const prepared=performance.now();
+ let phaseIndex=0;
  for(const phase of executionPhases(bin.units)){
-  const files=materialize({...inventory,units:phase.units},path.join(cwd,'.artifacts/eight-shard'));
-  run(['--test','--test-concurrency='+phase.concurrency,...files]);
+  const files=materialize({...inventory,units:phase.units},path.join(cwd,'.artifacts/eight-shard'),{measurement:true});
+  const reporter=new URL('./timing-reporter.mjs',import.meta.url).pathname;
+  run(['--test','--test-concurrency='+phase.concurrency,'--test-reporter=spec','--test-reporter-destination=stdout','--test-reporter='+reporter,'--test-reporter-destination='+path.join(output,'tests-'+bin.shard+'-'+(++phaseIndex)+'.jsonl'),...files]);
  }
  const timings={reference,shard:bin.shard,setup_s:(prepared-before)/1000,tests_s:(performance.now()-prepared)/1000,units:bin.units.map(u=>u.id)};
  fs.writeFileSync(path.join(output,'shard-'+bin.shard+'.json'),JSON.stringify(timings,null,2)+'\n');
