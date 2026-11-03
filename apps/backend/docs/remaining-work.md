@@ -319,14 +319,14 @@ Bu tablo yalnız izdir; eski kabul metinleri ikinci kez tutulmaz.
 <a id="p02"></a>
 ### P02 — Çoklu kaynak ve operasyon personeli
 
-- [ ] **Tür:** D · **Plan:** Pro/Business · **Özellik:** F01,F02,F03,F05,F08,F13
+- [x] **Tür:** D · **Plan:** Pro/Business · **Özellik:** F01,F02,F03,F05,F08,F13
 - **Bağımlılık:** P01,S10
 - **Kabul:** Çok oda/disiplin/eğitmen programı ve izinli resepsiyon işlemleri çalışır.
 - **Sınır/olumsuz durum:** Fiziksel oda ve eğitmen çakışması; izinli personel yönetici/indirim yetkisini kazanmaz.
 - **Doğrulama senaryosu:** Eşzamanlı iki farklı oda ve aynı eğitmen; izin değişikliği sonrası capability/komut reddi.
 - **Kaynak alanı:** room/role/availability/schedule SQL; ilgili testler
 
-**Aktif kaynak dilimi:** Mevcut çok kaynak/izin yollarının native regresyonu ve [XREQ-015](../../../docs/requests.md#xreq-015) tam class/person/duty yönetim okuması aynı pakette PR167 ile main'e alındı. Varsayılan sınıf görevi okuması yeni yetki veya anlaşma önkoşulu açmaz; kaynak/test/ortam durumu [devir](00-FtkSaaS-yeni-sohbet-devir.md#p02-native-kaynak-paketi) sahibindedir. Aday/main/development ve kalan P02 kabulü kesinleşmeden genel kapanış verilmez.
+**Backend teslimi:** Mevcut çok kaynak/izin yollarının native regresyonu ve [XREQ-015](../../../docs/requests.md#xreq-015) tam class/person/duty yönetim okuması aynı pakette PR167 ile main'e alındı. Varsayılan sınıf görevi okuması yeni yetki veya anlaşma önkoşulu açmaz; kaynak/test/ortam durumu [devir](00-FtkSaaS-yeni-sohbet-devir.md#p02-native-kaynak-paketi) sahibindedir. Aday/main/development kabulü doğrulandı; P02 backend teslimi tamamlandı.
 
 <a id="p03"></a>
 ### P03 — İleri rezervasyon ve paket yaşam döngüsü
@@ -338,7 +338,7 @@ Bu tablo yalnız izdir; eski kabul metinleri ikinci kez tutulmaz.
 - **Doğrulama senaryosu:** Expiry ile kabul yarışı, teklif reddi, paket değişimi sonrası uygunluk; kaynak boşluğu bulunursa ayrı dar düzeltme.
 - **Kaynak alanı:** p01 lesson/waitlist; paket lifecycle; mevcut test
 
-**Paralel kaynak paketi:** Kullanıcının 4 Kasım talimatıyla P02/PR167 sonucu beklenmeden ayrı P03/P04 branch'inde Pro ve Business için bağlı native kabul hazırlanır. Alternatif seçimi→CM onayı, worker teklifi→dondurmada canlı hak reddi→açık paket değişimi sonrası kabul, korunan kayıtlar→sonlandırma→bağımsız yenileme ve ret/expiry yarışı birlikte sınanır. Mevcut Business kaynak kabulleri korunur; yeni native sonuç henüz doğrulanmış değildir. [Kaynak/ortam sınırı](00-FtkSaaS-yeni-sohbet-devir.md#p03p04-paralel-kaynak-paketi) sahibindedir. P02 kapanışı ve genel P03 kabulü açık kalır.
+**Paralel kaynak paketi:** Kullanıcının 4 Kasım talimatıyla P02/PR167 sonucu beklenmeden ayrı P03/P04 branch'inde Pro ve Business için bağlı native kabul hazırlanır. Alternatif seçimi→CM onayı, worker teklifi→dondurmada canlı hak reddi→açık paket değişimi sonrası kabul, korunan kayıtlar→sonlandırma→bağımsız yenileme ve ret/expiry yarışı birlikte sınanır. Mevcut Business kaynak kabulleri korunur; yeni native sonuç henüz doğrulanmış değildir. [Kaynak/ortam sınırı](00-FtkSaaS-yeni-sohbet-devir.md#p03p04-paralel-kaynak-paketi) sahibindedir. P02 backend teslimi doğrulandı; genel P03 kabulü açık kalır.
 
 <a id="p04"></a>
 ### P04 — Eğitmen anlaşma ve hakediş kapanışı

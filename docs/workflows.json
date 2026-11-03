@@ -264,7 +264,9 @@
         "apps/backend/scripts/ci/experiment/reference.mjs",
         "apps/backend/scripts/ci/experiment/run.mjs",
         "apps/backend/scripts/ci/experiment/suites.mjs",
-        "apps/backend/scripts/ci/experiment/suites.json"
+        "apps/backend/scripts/ci/experiment/suites.json",
+        "apps/backend/scripts/ci/experiment/measurement-test.mjs",
+        "apps/backend/scripts/ci/experiment/timing-reporter.mjs"
       ],
       "operations": [
         "operation_status_get_v1",
@@ -274,8 +276,8 @@
         "management_state_get_v1"
       ],
       "review": {
-        "fingerprint": "b2f06635c6dc1c37b77ba2a4fb14a1695491248ce895b29b698bb8b12e6da8a7",
-        "reason": "PR168 main synchronization reviewed: both acceptance imports and source inventory preserved, CI executable policy unchanged."
+        "fingerprint": "05bfb00af0a9ee2f02865b12ca39eac2ab72adbbe76b7fb5858a12aec7d8ea56",
+        "reason": "PR169 integrated into PR168: pinned CLI3 and explicit remote targets, experiment-only registration adapter and source-bound scheduling retained; combined 52 units preserve original acceptance bodies and current import hashes, normal four-shard gates unchanged."
       }
     },
     {

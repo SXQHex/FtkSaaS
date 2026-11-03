@@ -185,7 +185,7 @@ export async function deliver(){
   const previous=fs.existsSync(ciFile('previous-development-delivery.json'))?JSON.parse(fs.readFileSync(ciFile('previous-development-delivery.json'))):null;
   const before=await api('/functions/backend-v1');
   receipt.edge_unchanged=unchangedEdge(previous,before,receipt.edge_source_sha256);
-  if(!receipt.edge_unchanged)cli(['functions','deploy','backend-v1','--project-ref',project,'--use-api','--workdir',temp,'--yes']);
+  if(!receipt.edge_unchanged)cli(['functions','deploy','backend-v1','--remote='+project,'--use-api','--workdir',temp,'--yes']);
   const edge=await api('/functions/backend-v1');
   record('edge_active_jwt_required',edge.status==='ACTIVE'&&edge.verify_jwt===true);receipt.edge_version=edge.version;receipt.edge_bundle_sha256=edge.ezbr_sha256??null;
   stage='database permissions';
