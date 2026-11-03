@@ -293,14 +293,14 @@ Bu tablo yalnız izdir; eski kabul metinleri ikinci kez tutulmaz.
 <a id="s16"></a>
 ### S16 — SaaS aylık-yıllık bekleyen talep
 
-- [ ] **Tür:** K · **Plan:** Tümü · **Özellik:** F32
+- [x] **Tür:** K · **Plan:** Tümü · **Özellik:** F32
 - **Bağımlılık:** A01
 - **Kabul:** Tek bekleyen talep dönem sonunda yürür; iptal/değişiklik ve kabul edilmiş fiyat/tarih görünür.
 - **Sınır/olumsuz durum:** Talep ödeme değildir; mevcut ödenmiş dönem değişmez; öğrenci paketine veya plan değişimine karışmaz.
 - **Doğrulama senaryosu:** Aylık→yıllık/yıllık→aylık, dönem sınırı yarışı, iptal/yenileme ve ödenmemiş yeni dönem; tekrar worker tek sonuç.
 - **Kaynak alanı:** p07 subscription SQL; contract.json; subscription acceptance
 
-**Uygulanan kaynak:** Tek `subscription_period_change_request_v1` owner komutu, `subscription_get_v1.billing` dönem/fiyat/seçenek/talep okuması ve gerçek abonelik sürümlü dar management selector eklendi. Mevcut `saas_change_requests` ve fon tahsis yolu kullanılır; aynı plan içinde geçiş ödenmiş dönem sonunda yeterli doğrulanmış fonla uygulanır. Yetersiz fonda normal grace, erken ödeme, iptal/değiştirme ve yarış/replay korumaları sürer. Güncel API sırası [WF13](../../../docs/workflows.md#wf13), yerel gerçek kaynak/test sonucu [devir](00-FtkSaaS-yeni-sohbet-devir.md#s14s16-kaynak-paketi) sahibindedir. Aday/main/development kabulü beklediğinden S16 henüz kapanmadı.
+**Uygulanan kaynak:** Tek `subscription_period_change_request_v1` owner komutu, `subscription_get_v1.billing` dönem/fiyat/seçenek/talep okuması ve gerçek abonelik sürümlü dar management selector eklendi. Mevcut `saas_change_requests` ve fon tahsis yolu kullanılır; aynı plan içinde geçiş ödenmiş dönem sonunda yeterli doğrulanmış fonla uygulanır. Yetersiz fonda normal grace, erken ödeme, iptal/değiştirme ve yarış/replay korumaları sürer. Güncel API sırası [WF13](../../../docs/workflows.md#wf13), yerel gerçek kaynak/test sonucu [devir](00-FtkSaaS-yeni-sohbet-devir.md#s14s16-kaynak-paketi) sahibindedir. PR156 aday/main/development kabulü doğrulandı; S16 backend teslimi kapalıdır. Genel Starter ve S14/S15 gerçek hosted/tüketici kabulü bundan çıkarılmaz.
 
 ## Pro işlevleri
 
@@ -343,6 +343,8 @@ Bu tablo yalnız izdir; eski kabul metinleri ikinci kez tutulmaz.
 - **Sınır/olumsuz durum:** İleri yürürlük geçmiş hakedişi değiştirmez; FIN-01 trailing earning_ids dar kontrolü.
 - **Doğrulama senaryosu:** Sürüm/anlaşma değişimi, kapanmış ders düzeltmesi ve yanlış merkez/earning id; mevcut kabul korunur.
 - **Kaynak alanı:** instructor-earnings SQL/test; ödeme okuması
+
+**XREQ-013 inceleme alt adımı:** [PR158](https://github.com/SXQHex/FtkSaaS/pull/158) Business program engeli için backend kaynak/salt okunur canlı neden [devirde](00-FtkSaaS-yeni-sohbet-devir.md#xreq-013-backend-incelemesi) doğrulandı. Aynı Business native Auth→Edge yeniden üretimi, kullanıcı tarafından belirlenmiş gerçek şartlarla izinli tamamlama ve frontend consumer tekrarı açık kalır. Eksik anlaşma güvenli reddedilir; otomatik ücret/varsayılan anlaşma veya Starter'a anlaşma şartı eklenmez. Bu dar inceleme P01–P04 genel teslimi veya frontend S03 kapanışı değildir. Kullanıcının son talimatıyla çözüm native akışta kalır: typed önkoşul tanısı ve mevcut anlaşma yönetimini tüketen plan/yetki uyumlu yönlendirme tasarımı değerlendirilecek; yeni kural/varsayılan/istisna veya blocker bypass yapılmaz. Frontend kendi ekranının sahibidir.
 
 <a id="p05"></a>
 ### P05 — Telefon temelli ortak başvuru modeli
