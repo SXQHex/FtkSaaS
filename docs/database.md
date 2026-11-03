@@ -1,10 +1,10 @@
 # Veritabanı kaynak referansı
 
-Üretilmiştir: `node apps/backend/scripts/update-docs.mjs --write`. Elle düzenleme. Kaynak içerik özeti: `8729ecf29b297d10b05b8438986f2c16719cc0af4fd17e5131cacc82116a810f`. Bu özet CI/hosted kabulü değildir; dağıtılan SHA ve ortam CD artifact'ında bulunur.
+Üretilmiştir: `node apps/backend/scripts/update-docs.mjs --write`. Elle düzenleme. Kaynak içerik özeti: `db2ebd2a927e4c0d4040c94ed861cdfef7be19ed472224cea6c0b42d6bdf0962`. Bu özet CI/hosted kabulü değildir; dağıtılan SHA ve ortam CD artifact'ında bulunur.
 
 Alan/scope/değişmez görünümü [fiziksel şema kataloğundadır](contracts/04-FtkSaaS-O4-veri-semasi.md). Bu dosya ikinci DDL sözleşmesi değildir. Etkin PostgreSQL şeması migration zincirinin uygulanmasıyla oluşur; dosyaları regex ile birleştirmek nihai şema çıkarımı sayılmaz.
 
-Sıralı migration: 98. Uygulanmış içerik manifesti: [migrations.sha256.json](../apps/backend/database/migrations.sha256.json). CD, migration içeriklerini canlı geçmişle doğrular; dokümantasyon capture adımı ayrıca read-only pg_catalog snapshot ve Supabase CLI DB tiplerini alır. İş verisi/Auth satırı/secret toplanmaz.
+Sıralı migration: 99. Uygulanmış içerik manifesti: [migrations.sha256.json](../apps/backend/database/migrations.sha256.json). CD, migration içeriklerini canlı geçmişle doğrular; dokümantasyon capture adımı ayrıca read-only pg_catalog snapshot ve Supabase CLI DB tiplerini alır. İş verisi/Auth satırı/secret toplanmaz.
 
 | Migration | SHA256 |
 |---|---|
@@ -106,3 +106,4 @@ Sıralı migration: 98. Uygulanmış içerik manifesti: [migrations.sha256.json]
 | [20261102180626_starter_subscriber_projections.sql](../apps/backend/supabase/migrations/20261102180626_starter_subscriber_projections.sql) | `53828e887618d51b378a4d6c405bfb9854d043b17f09d51edddb21404ee6aa76` |
 | [20261103101412_subscription_period_change.sql](../apps/backend/supabase/migrations/20261103101412_subscription_period_change.sql) | `fe050a9b4df4d3ca498fbcc147e967a5971cb0d8caafbd8903e5d2328e6bb506` |
 | [20261103123239_program_configuration_requirements.sql](../apps/backend/supabase/migrations/20261103123239_program_configuration_requirements.sql) | `1902c23b1a4842b8fc775ac6141a2d1575381183b1d6eb7d702803375f4a72af` |
+| [20261103141306_commercial_plan_limits.sql](../apps/backend/supabase/migrations/20261103141306_commercial_plan_limits.sql) | `b5dd6eb0f8d30806ff9828b39d084b7344194a02477394e28b3ce2e75fa1ed37` |

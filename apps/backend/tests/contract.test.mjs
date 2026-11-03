@@ -293,3 +293,14 @@ test('schedule configuration requirements identify the first blocker without ext
  assert(!valid('Preview',{...preview,blockers:[{...preview.blockers[0],code:'RESOURCE_CONFLICT'}]}));
  assert(!valid('SafeError',{...preview.blockers[0],configuration_requirement:requirement}));
 });
+
+test('commercial limits distinguish explicit unlimited from finite usage without numeric sentinels',()=>{
+ assert(valid('PlanLimit',{key:'rooms',unlimited:true}));
+ assert(valid('PlanLimit',{key:'instructors',unlimited:true}));
+ assert(valid('PlanLimit',{key:'active_students',value:250}));
+ assert(!valid('PlanLimit',{key:'rooms',unlimited:true,value:0}));
+ assert(!valid('PlanLimit',{key:'rooms',unlimited:false}));
+ assert(!valid('PlanLimit',{key:'centers',unlimited:true}));
+ assert(valid('PlanUsage',{entries:[{key:'rooms',value:2}]}));
+ assert(!valid('PlanUsage',{entries:[{key:'rooms',unlimited:true}]}));
+});

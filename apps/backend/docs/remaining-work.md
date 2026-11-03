@@ -314,6 +314,8 @@ Bu tablo yalnız izdir; eski kabul metinleri ikinci kez tutulmaz.
 - **Doğrulama senaryosu:** 249→250→251 ve 1249→1250→1251 paralel aktivasyon, import/merge/yeniden aktivasyon; 5→6 merkez reddi.
 - **Kaynak alanı:** plan-limit/runtime gate; contract.json; yeni migration/test
 
+**Aktif kaynak dilimi:** Etkin ticari limit SSoT, açık sınırsız DTO ve mevcut kapasite tüketim yollarının regresyonları aynı backend paketinde hazırlanıyor. Kaynak/test/ortam kabulünün tek sahibi [devir](00-FtkSaaS-yeni-sohbet-devir.md#p01-ticari-limit-kaynak-paketi). Yeni kaynak teslim edilmeden bu görev tamamlandı sayılmaz. Açık sınırsız DTO için frontend tüketici bağımlılığı [XREQ-014](../../../docs/requests.md#xreq-014) sahibindedir.
+
 <a id="p02"></a>
 ### P02 — Çoklu kaynak ve operasyon personeli
 
@@ -344,7 +346,7 @@ Bu tablo yalnız izdir; eski kabul metinleri ikinci kez tutulmaz.
 - **Doğrulama senaryosu:** Sürüm/anlaşma değişimi, kapanmış ders düzeltmesi ve yanlış merkez/earning id; mevcut kabul korunur.
 - **Kaynak alanı:** instructor-earnings SQL/test; ödeme okuması
 
-**XREQ-013 backend düzeltmesi:** [Ortak talep](../../../docs/requests.md#xreq-013) için native anlaşma çözümlemesinden üretilen typed preview önkoşul tanısı PR159'da uygulandı; [yerel kaynak/gerçek test kanıtı](00-FtkSaaS-yeni-sohbet-devir.md#xreq-013-backend-incelemesi) sahibindedir. Aday/main/development kabulü ve özgün hosted Business/consumer tekrarı açık. Mevcut anlaşma okuma/yayımlama → yeni preview → açık onaylı apply kullanılır; ek kural/ücret varsayımı, istisna veya blocker bypass yoktur. Starter anlaşmasız kalır. Frontend yönlendirme/ekranının sahibi kendi alanıdır; bu dar düzeltme P04 genel kapanışı değildir.
+**XREQ-013 backend düzeltmesi:** [Ortak talep](../../../docs/requests.md#xreq-013) için native anlaşma çözümlemesinden üretilen typed preview önkoşul tanısı PR159'da uygulandı; [yerel kaynak/gerçek test kanıtı](00-FtkSaaS-yeni-sohbet-devir.md#xreq-013-backend-incelemesi) sahibindedir. Backend aday/main/development teslimi doğrulandı; özgün hosted Business/consumer tekrarı açık. Mevcut anlaşma okuma/yayımlama → yeni preview → açık onaylı apply kullanılır; ek kural/ücret varsayımı, istisna veya blocker bypass yoktur. Starter anlaşmasız kalır. Frontend yönlendirme/ekranının sahibi kendi alanıdır; bu dar düzeltme P04 genel kapanışı değildir.
 
 <a id="p05"></a>
 ### P05 — Telefon temelli ortak başvuru modeli

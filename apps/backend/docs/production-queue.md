@@ -24,11 +24,11 @@ Bu dosya yalnız **sıra, bağımlı teslim paketleri ve kontrol noktalarının*
 
 **Güncel öncelik:** S14–S16 backend kaynak paketi PR156 ile aday/main/development kabulünü geçti; [kaynak/ortam kanıtı](00-FtkSaaS-yeni-sohbet-devir.md#s14s16-kaynak-paketi) ve açık hosted/tüketici sınırları [backlog](remaining-work.md#s14) sahibindedir.
 
-### Aktif teslim: XREQ-013; sonraki büyük paket P01–P04
+### Aktif kaynak paketi: P01–P04
 
-1. [PR158](https://github.com/SXQHex/FtkSaaS/pull/158) talebinin backend incelemesi [P04 alt adımında](remaining-work.md#p04) izlenir. PR159 içinde typed native önkoşul düzeltmesi ve yerel kabul hazır; aday/main/development kabulünü doğrula; [açık native Business/consumer kabulü](00-FtkSaaS-yeni-sohbet-devir.md#xreq-013-backend-incelemesi) tamamlanmadan talebi kapatma. Frontend alanını veya onun talep eden kaydını değiştirme.
-2. S14/S15 gerçek widget/host/seans route'u ve diğer Starter hosted bağımlılıkları kendi kimliklerinde açık kalır; yerel test/CD şema doğrulaması bunların yerine geçmez.
-3. Sonraki bağımsız kaynak paketi [P01–P04](remaining-work.md#p01) sırasındadır. XREQ-013 için canlı ücret veya politika tahmin etme; önceden kabul edilmiş sağlam program/hakediş kaynağını yeniden kurma.
+1. [P01](remaining-work.md#p01) etkin ticari limit kaynağı, atomik kapasite tüketimi ve dönem uyumu aynı paket içinde hazırlanır; [kaynak/test/ortam kanıtı](00-FtkSaaS-yeni-sohbet-devir.md#p01-ticari-limit-kaynak-paketi) kesinleşmeden kapanmaz. Mevcut branch kullanılır; mükerrer PR açılmaz.
+2. Ardından [P02](remaining-work.md#p02) çok kaynak/personel, [P03](remaining-work.md#p03) ileri rezervasyon/paket ve [P04](remaining-work.md#p04) anlaşma/hakediş kaynakları incelenir. Mevcut sağlam işlev yeniden yazılmaz. FIN-01 dar regresyonu genel P04 kabulü değildir.
+3. PR159 backend kaynak teslimi doğrulandı; XREQ-013 özgün Business/native tüketici kabulü [ortak talepte](../../../docs/requests.md#xreq-013) kendi sahibinde açık kalır. S14/S15 gerçek widget/host/seans route'u ve diğer Starter hosted bağımlılıkları da kendi kimliklerinde açıktır; bunlar bağımsız kaynak paketini durdurmaz.
 
 ## Ortak işletim hattı
 
