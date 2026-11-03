@@ -1152,7 +1152,16 @@
     "timeOffset": "{label} için UTC farkı",
     "recovery": "Bekleyen takvim işlemleri",
     "recoveryHint": "Katalog okunamasa da önceki işlemin sonucunu kontrol edebilir veya aynı isteği yeniden gönderebilirsiniz.",
-    "recoveryUnavailable": "Bu sekmedeki işlem kaydı okunamıyor. Yeni işlem göndermeden mevcut sonucu doğrulayın."
+    "recoveryUnavailable": "Bu sekmedeki işlem kaydı okunamıyor. Yeni işlem göndermeden mevcut sonucu doğrulayın.",
+    "managerHint": "Sınıfları yönetin, ders programını planlayın.",
+    "singleAction": "Tek seans",
+    "classList": "Sınıflar",
+    "classDetail": "Sınıf ayrıntısı",
+    "manageNamedClass": "Sınıfı yönet: {name}",
+    "planAction": "Programı planla",
+    "chooseClass": "Bir sınıf seçin",
+    "chooseClassHint": "Programını, varsayılan görevlerini ve sınıf bilgilerini buradan yönetin.",
+    "editorContext": "Merkez saat dilimi: {timezone}"
   },
   "sessionLifecycle": {
     "cancelTitle": "Seansı iptal et",

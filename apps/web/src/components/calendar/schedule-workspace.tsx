@@ -119,7 +119,14 @@ function CalendarContent({
     <>
       {actorId && (
         <div className="space-y-5">
-          <Button variant="outline" aria-expanded={managing} onClick={() => setManaging(!managing)}>
+          <Button
+            variant="outline"
+            aria-expanded={managing}
+            onClick={() => {
+              setSelected(null);
+              setManaging(!managing);
+            }}
+          >
             {program(managing ? "hideManager" : "showManager")}
           </Button>
           {managing && (
@@ -135,28 +142,30 @@ function CalendarContent({
           )}
         </div>
       )}
-      <SessionCalendar
-        date={date}
-        range={range}
-        timeZone={center.timezone}
-        entries={current?.entries ?? []}
-        loading={!current}
-        error={current?.error ? api(current.error) : undefined}
-        onDateChange={(value) => {
-          setSelected(null);
-          setDate(value);
-        }}
-        onRangeChange={(value) => {
-          setSelected(null);
-          setRange(value);
-        }}
-        onSelect={setSelected}
-        onRefresh={() => {
-          setSelected(null);
-          setAttempt((value) => value + 1);
-        }}
-      />
-      {selected && (
+      {!managing && (
+        <SessionCalendar
+          date={date}
+          range={range}
+          timeZone={center.timezone}
+          entries={current?.entries ?? []}
+          loading={!current}
+          error={current?.error ? api(current.error) : undefined}
+          onDateChange={(value) => {
+            setSelected(null);
+            setDate(value);
+          }}
+          onRangeChange={(value) => {
+            setSelected(null);
+            setRange(value);
+          }}
+          onSelect={setSelected}
+          onRefresh={() => {
+            setSelected(null);
+            setAttempt((value) => value + 1);
+          }}
+        />
+      )}
+      {!managing && selected && (
         <SessionDetail
           actorId={actorId}
           onChanged={() => setAttempt((value) => value + 1)}
