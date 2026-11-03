@@ -274,8 +274,8 @@
         "management_state_get_v1"
       ],
       "review": {
-        "fingerprint": "cc14017ce0b0f564e864bdf18ed44434305713fd0dd923f7e3bcb54498e35552",
-        "reason": "PR164 güncel kaynak hash ve kabul modülleri ile ST03 dört native kökü korunarak ST02 dedicated runner dağıtımı birleştirildi; 50 birim eksiksiz, beş global fixture fazı ve özgün test bütçeleri korunur. Üretim dört shard ve ortak protokol değişmez."
+        "fingerprint": "8ea7726696634a3d905f014d6085d3572b8b7fba89fddb202028c35e2696fb27",
+        "reason": "Final Pro/Business native chain reviewed against existing workflow; approval session reuses the selected alternative interval across local midnight, all original scopes/history/ledger checks retained; native execution remains pending."
       }
     },
     {
@@ -642,7 +642,8 @@
         "apps/backend/tests/starter-studio-acceptance.mjs",
         "apps/backend/tests/program-session-lifecycle.test.mjs",
         "apps/backend/tests/starter-attendance-protection.test.mjs",
-        "apps/backend/tests/event-payment.test.mjs"
+        "apps/backend/tests/event-payment.test.mjs",
+        "apps/backend/tests/pro-lifecycle-earnings-acceptance.mjs"
       ],
       "sources": [
         "apps/backend/database/active-discipline-projection-wrappers.sql",
@@ -717,8 +718,8 @@
         "negative_limits_get_v1"
       ],
       "review": {
-        "fingerprint": "939ed8c4a85fd505beeffa7c6d7c1f32964be450b9371e498d79521f3be47e6e",
-        "reason": "Event-payment harness FIN-01 native regresyonunu içeri alıyor; satış/paket davranışı ve rehberi değişmedi."
+        "fingerprint": "702cbd00ecd4d1e170d6049394a5adb45687b6b379cefa6224069e17f5af724a",
+        "reason": "Final Pro/Business native chain reviewed against existing workflow; approval session reuses the selected alternative interval across local midnight, all original scopes/history/ledger checks retained; native execution remains pending."
       }
     },
     {
@@ -733,7 +734,8 @@
         "apps/backend/tests/api-acceptance.test.mjs",
         "apps/backend/tests/program-session-lifecycle.test.mjs",
         "apps/backend/tests/starter-attendance-protection.test.mjs",
-        "apps/backend/tests/starter-document-acceptance.mjs"
+        "apps/backend/tests/starter-document-acceptance.mjs",
+        "apps/backend/tests/pro-lifecycle-earnings-acceptance.mjs"
       ],
       "sources": [
         "apps/backend/database/active-discipline-projection-wrappers.sql",
@@ -791,8 +793,8 @@
         "reservation_capacity_override_v1"
       ],
       "review": {
-        "fingerprint": "3366af20427a7c834572f64035b60ee672f86cd9afbfe281f42e17cf3e15f906",
-        "reason": "Shared contract test adds schedule prerequisite validation only; reservation, rights and protected-booking semantics and this guide remain unchanged."
+        "fingerprint": "527cb3fce8e53088d303cb330b1e8936ab78b14b6a9e3af8831c58ec95712384",
+        "reason": "Final Pro/Business native chain reviewed against existing workflow; approval session reuses the selected alternative interval across local midnight, all original scopes/history/ledger checks retained; native execution remains pending."
       }
     },
     {
@@ -803,7 +805,8 @@
       "detail": "docs/workflows.md",
       "tests": [
         "apps/backend/tests/starter-attendance-protection.test.mjs",
-        "apps/backend/tests/instructor-earnings.test.mjs"
+        "apps/backend/tests/instructor-earnings.test.mjs",
+        "apps/backend/tests/pro-lifecycle-earnings-acceptance.mjs"
       ],
       "sources": [
         "apps/backend/database/active-discipline-projection-wrappers.sql",
@@ -850,8 +853,8 @@
         "attendance_start_v1"
       ],
       "review": {
-        "fingerprint": "fe33f7eb4ab31778633f7c9c20dfc7dab7ccffd4770cffdf356acc379b795a67",
-        "reason": "Ortak üretilmiş wrapper farkı yalnız S16 owner abonelik dönem komutunu ekler; bu akışın mevcut operasyon/görev/izin/plan ve davranış kaynakları değişmedi, ilgili rehber incelendi."
+        "fingerprint": "e6dc4bd3da55524ca1b56187c7e88470f3c271d77809bf943292f5af1742704e",
+        "reason": "Final Pro/Business native chain reviewed against existing workflow; approval session reuses the selected alternative interval across local midnight, all original scopes/history/ledger checks retained; native execution remains pending."
       }
     },
     {
@@ -864,7 +867,8 @@
         "apps/backend/tests/api-acceptance.test.mjs",
         "apps/backend/tests/starter-operations-acceptance.mjs",
         "apps/backend/tests/event-payment.test.mjs",
-        "apps/backend/tests/starter-attendance-protection.test.mjs"
+        "apps/backend/tests/starter-attendance-protection.test.mjs",
+        "apps/backend/tests/pro-lifecycle-earnings-acceptance.mjs"
       ],
       "sources": [
         "apps/backend/database/active-discipline-projection-wrappers.sql",
@@ -909,8 +913,8 @@
         "debt_adjust_v1"
       ],
       "review": {
-        "fingerprint": "53c8403dd37d100688284134bf37cee91eb5fdca846afadd9d49d3086f2a39ba",
-        "reason": "Event-payment harness seçili hakediş regresyonunu içeri alıyor; collection/debt nakit akışı değiştirilmedi."
+        "fingerprint": "b4342b58df1e4fdadf6fddf9cc12f18b11cf3492b9142db0ae9336d7a01e631c",
+        "reason": "Final Pro/Business native chain reviewed against existing workflow; approval session reuses the selected alternative interval across local midnight, all original scopes/history/ledger checks retained; native execution remains pending."
       }
     },
     {
@@ -1168,7 +1172,8 @@
         "apps/backend/tests/instructor-earnings.test.mjs",
         "apps/backend/tests/event-payment.test.mjs",
         "apps/backend/tests/program-configuration-acceptance.mjs",
-        "apps/backend/tests/earning-payment-selection-acceptance.mjs"
+        "apps/backend/tests/earning-payment-selection-acceptance.mjs",
+        "apps/backend/tests/pro-lifecycle-earnings-acceptance.mjs"
       ],
       "sources": [
         "apps/backend/database/cross-center-settlement-wrappers.sql",
@@ -1193,8 +1198,8 @@
         "instructor_agreements_list_v1"
       ],
       "review": {
-        "fingerprint": "d200d9dfa302ffd8eee482624aec178d46dd51bc823636d418744c5b612c5598",
-        "reason": "FIN-01 mevcut bütün earning_ids doğrulamasını gerçek native ödeme/replay ve atomik ret testiyle korur; finans runtime davranışı değişmedi."
+        "fingerprint": "3ba31d0a4aa9c37a70e753ecb13395ec4001d684a143e9c1c623f95f1ee71e4d",
+        "reason": "Final Pro/Business native chain reviewed against existing workflow; approval session reuses the selected alternative interval across local midnight, all original scopes/history/ledger checks retained; native execution remains pending."
       }
     },
     {
@@ -1412,7 +1417,8 @@
       "guide": "docs/workflows.md#wf19",
       "detail": "docs/workflows.md",
       "tests": [
-        "apps/backend/tests/p01-waitlist-workers.test.mjs"
+        "apps/backend/tests/p01-waitlist-workers.test.mjs",
+        "apps/backend/tests/pro-lifecycle-earnings-acceptance.mjs"
       ],
       "sources": [
         "apps/backend/database/p01-waitlist-workers-wrappers.sql",
@@ -1429,8 +1435,8 @@
         "seat_offer_reject_v1"
       ],
       "review": {
-        "fingerprint": "609e5c630dd5ba12ef862f9e91e6d436d66929de60f52a59e0a8e0d6afc96914",
-        "reason": "Ortak üretilmiş wrapper farkı yalnız S16 owner abonelik dönem komutunu ekler; bu akışın mevcut operasyon/görev/izin/plan ve davranış kaynakları değişmedi, ilgili rehber incelendi."
+        "fingerprint": "87a02f0d7aba3340af83bc690a5cd7dea8820c5fd25bd8ce13aa9cdc12dccd63",
+        "reason": "Final Pro/Business native chain reviewed against existing workflow; approval session reuses the selected alternative interval across local midnight, all original scopes/history/ledger checks retained; native execution remains pending."
       }
     },
     {

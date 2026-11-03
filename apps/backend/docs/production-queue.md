@@ -30,6 +30,10 @@ Bu dosya yalnız **sıra, bağımlı teslim paketleri ve kontrol noktalarının*
 2. Ardından [P02](remaining-work.md#p02) çok kaynak/personel, [P03](remaining-work.md#p03) ileri rezervasyon/paket ve [P04](remaining-work.md#p04) anlaşma/hakediş kaynakları incelenir. Mevcut sağlam işlev yeniden yazılmaz. FIN-01 dar regresyonu genel P04 kabulü değildir.
 3. PR159 backend kaynak teslimi doğrulandı; XREQ-013 özgün Business/native tüketici kabulü [ortak talepte](../../../docs/requests.md#xreq-013) kendi sahibinde açık kalır. S14/S15 gerçek widget/host/seans route'u ve diğer Starter hosted bağımlılıkları da kendi kimliklerinde açıktır; bunlar bağımsız kaynak paketini durdurmaz.
 
+### Ayrı paralel kaynak paketi: P03/P04
+
+4 Kasım kullanıcı talimatıyla `feature/pro-lifecycle-earnings-acceptance` branch'i P03/P04 için main'den ayrı hazırlanır. P02 kaynağı ve sonucu PR167'de kalır; bu çalışma PR167'yi izlemez/değiştirmez ve P02'yi tamamlandı saymaz. İç sıra: mevcut kaynak/kabul incelemesi → bağlı Pro/Business paket/teklif ve hakediş/ödeme kanıtı → kendi aday kabulü. P02 sonucu geldiğinde P02 teslim kapanışı ayrıca yapılır; bağımlı nihai P03/P04 kapanışı kanıtlarıyla uzlaştırılır. Görev ayrıntısı [P03](remaining-work.md#p03)/[P04](remaining-work.md#p04), kaynak/ortam [devir](00-FtkSaaS-yeni-sohbet-devir.md#p03p04-paralel-kaynak-paketi) sahibindedir.
+
 ## Ortak işletim hattı
 
 [A03](remaining-work.md#a03) sonrası [O01](remaining-work.md#o01)–[O03](remaining-work.md#o03) başlayabilir. Ardından [O04](remaining-work.md#o04)/[O05](remaining-work.md#o05) → [O06](remaining-work.md#o06) → [O07](remaining-work.md#o07) → [O08](remaining-work.md#o08) → [O09](remaining-work.md#o09). [O10](remaining-work.md#o10) gerekli alarm/restore kaynaklarıyla yürür. E-posta gerçek yük kabulü P14–P16’yı bekler. Ortak işletim bütün ürün işlerinin sonuna ertelenmez.

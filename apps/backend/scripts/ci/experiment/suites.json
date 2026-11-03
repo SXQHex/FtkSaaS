@@ -210,11 +210,11 @@
     },
     {
       "path": "apps/backend/tests/instructor-earnings.test.mjs",
-      "sha256": "e14e4b99d309954059d73ca5a3df8b06803e74757f9874c249c0a2a0df79b813",
+      "sha256": "94d2548cbd6f014557b2d5c57cf56d7dc555c1f9c0be061e8dfe689319176598",
       "shared": [
         [
-          1,
-          6
+          2,
+          7
         ]
       ],
       "parts": [
@@ -222,13 +222,19 @@
           "id": "instructor-earnings-root-1",
           "ranges": [
             [
-              7,
-              339
+              8,
+              340
             ]
           ]
         }
       ],
-      "imports": [],
+      "imports": [
+        {
+          "line": 1,
+          "path": "apps/backend/tests/pro-lifecycle-earnings-acceptance.mjs",
+          "sha256": "d40456222d07929ec30116603fe61991c742dc24ae6135354b25f0dc3d554084"
+        }
+      ],
       "estimated_seconds": 780.97
     },
     {
