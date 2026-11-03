@@ -1,0 +1,225 @@
+name: Backend experiment
+run-name: 'Eight shards · reference ${{ inputs.reference_run_id }}'
+on:
+  workflow_dispatch:
+    inputs:
+      reference_run_id:
+        description: Successful original Backend CI full-clean run ID
+        required: true
+        type: string
+permissions: {}
+concurrency:
+  group: backend-experiment-${{ inputs.reference_run_id }}
+  cancel-in-progress: true
+jobs:
+  reference:
+    name: reference
+    permissions:
+      contents: read
+      actions: read
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    outputs:
+      reference: ${{ steps.reference.outputs.reference }}
+      merge: ${{ steps.reference.outputs.merge }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ github.sha }}
+          path: definition
+          fetch-depth: 1
+          persist-credentials: false
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version-file: 'definition/.nvmrc'
+      - name: Validate baseline
+        id: reference
+        uses: actions/github-script@ed597411d8f924073f98dfc5c65a23a2325f34cd # v8.0.0
+        env:
+          REFERENCE_RUN_ID: ${{ inputs.reference_run_id }}
+        with:
+          script: |
+            const module=await import(`${process.env.GITHUB_WORKSPACE}/definition/apps/backend/scripts/ci/experiment/reference.mjs`);
+            const reference=await module.resolveReference(github,context,process.env.REFERENCE_RUN_ID);
+            core.setOutput('reference',JSON.stringify(reference));
+            core.setOutput('merge',reference.merge);
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ steps.reference.outputs.merge }}
+          path: source
+          fetch-depth: 1
+          persist-credentials: false
+      - name: Validate experiment inventory
+        env:
+          EXPERIMENT_REFERENCE: ${{ steps.reference.outputs.reference }}
+        run: |
+          set -euo pipefail
+          node --test definition/apps/backend/tests/ci-experiment-checks.mjs
+          node definition/apps/backend/scripts/ci/experiment/run.mjs "$GITHUB_WORKSPACE/source" plan
+      - name: Upload experiment plan
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: experiment-plan-${{ github.run_attempt }}
+          path: source/.artifacts/ci/experiment/plan.json
+          include-hidden-files: true
+          if-no-files-found: error
+          archive: true
+  core:
+    name: core
+    needs: reference
+    permissions:
+      contents: read
+    runs-on: ubuntu-24.04
+    timeout-minutes: 65
+    defaults:
+      run:
+        working-directory: source/apps/backend
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ needs.reference.outputs.merge }}
+          path: source
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Verify source checkout
+        env:
+          EXPERIMENT_REFERENCE: ${{ needs.reference.outputs.reference }}
+        run: |
+          set -euo pipefail
+          node --input-type=module - <<'JS'
+          import {execFileSync} from 'node:child_process';
+          const reference=JSON.parse(process.env.EXPERIMENT_REFERENCE);
+          const git=(...args)=>execFileSync('git',args,{encoding:'utf8'}).trim();
+          if(git('rev-parse','HEAD')!==reference.merge||git('rev-parse','HEAD^{tree}')!==reference.tree)throw Error('Source mismatch');
+          JS
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version-file: 'source/.nvmrc'
+      - run: |
+          set -euo pipefail
+          corepack enable
+          pnpm --filter @ftksaas/backend... --filter ftksaas install --frozen-lockfile
+        working-directory: source
+      - name: Clean acceptance
+        env:
+          FTK_TEST_TIMINGS: '1'
+        run: node scripts/test-clean.mjs core
+      - if: always()
+        run: node scripts/ci/summarize-timings.mjs
+      - if: always()
+        run: node scripts/ci/cleanup.mjs
+      - name: Upload experiment measurements
+        if: always()
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: experiment-core-${{ github.run_attempt }}
+          path: |
+            source/.artifacts/ci/timings/*.json
+            source/.artifacts/ci/diagnostics/*.jsonl
+            source/.artifacts/ci/experiment/*.json
+          include-hidden-files: true
+          if-no-files-found: error
+          archive: true
+  api:
+    name: experiment-api-${{ matrix.shard }}
+    needs: reference
+    permissions:
+      contents: read
+    runs-on: ubuntu-24.04
+    timeout-minutes: 65
+    defaults:
+      run:
+        working-directory: source/apps/backend
+    strategy:
+      fail-fast: false
+      matrix:
+        shard: [1, 2, 3, 4, 5, 6, 7, 8]
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ needs.reference.outputs.merge }}
+          path: source
+          fetch-depth: 1
+          persist-credentials: false
+      - name: Verify source checkout
+        env:
+          EXPERIMENT_REFERENCE: ${{ needs.reference.outputs.reference }}
+        run: |
+          set -euo pipefail
+          node --input-type=module - <<'JS'
+          import {execFileSync} from 'node:child_process';
+          const reference=JSON.parse(process.env.EXPERIMENT_REFERENCE);
+          const git=(...args)=>execFileSync('git',args,{encoding:'utf8'}).trim();
+          if(git('rev-parse','HEAD')!==reference.merge||git('rev-parse','HEAD^{tree}')!==reference.tree)throw Error('Source mismatch');
+          JS
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ github.sha }}
+          path: definition
+          fetch-depth: 1
+          persist-credentials: false
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version-file: 'source/.nvmrc'
+      - run: |
+          set -euo pipefail
+          corepack enable
+          pnpm --filter @ftksaas/backend... --filter ftksaas install --frozen-lockfile
+        working-directory: source
+      - name: Experimental API tests
+        env:
+          FTK_TEST_TIMINGS: '1'
+          FTK_EDGE_MEMORY_GUARD: '1'
+          EXPERIMENT_REFERENCE: ${{ needs.reference.outputs.reference }}
+          SHARD: ${{ matrix.shard }}
+        run: |
+          set -euo pipefail
+          node scripts/ci/observe-api.mjs node "$GITHUB_WORKSPACE/definition/apps/backend/scripts/ci/experiment/run.mjs" "$GITHUB_WORKSPACE/source" api "$SHARD"
+      - if: always()
+        run: node scripts/ci/summarize-timings.mjs
+      - if: always()
+        run: node scripts/ci/cleanup.mjs
+      - name: Upload experiment measurements
+        if: always()
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: experiment-api-${{ matrix.shard }}-${{ github.run_attempt }}
+          path: |
+            source/.artifacts/ci/timings/*.json
+            source/.artifacts/ci/diagnostics/*.jsonl
+            source/.artifacts/ci/experiment/*.json
+          include-hidden-files: true
+          if-no-files-found: error
+          archive: true
+  comparison:
+    name: comparison
+    needs: [reference, core, api]
+    if: always() && needs.reference.result == 'success'
+    permissions:
+      contents: read
+      actions: read
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ github.sha }}
+          path: definition
+          fetch-depth: 1
+          persist-credentials: false
+      - name: Compare successful jobs
+        uses: actions/github-script@ed597411d8f924073f98dfc5c65a23a2325f34cd # v8.0.0
+        env:
+          EXPERIMENT_REFERENCE: ${{ needs.reference.outputs.reference }}
+        with:
+          script: |
+            const module=await import(`${process.env.GITHUB_WORKSPACE}/definition/apps/backend/scripts/ci/experiment/reference.mjs`);
+            await module.summarize(github,context,core,JSON.parse(process.env.EXPERIMENT_REFERENCE));
+      - name: Upload comparison
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: experiment-comparison-${{ github.run_attempt }}
+          path: .artifacts/ci/experiment/comparison.json
+          include-hidden-files: true
+          if-no-files-found: error
+          archive: true

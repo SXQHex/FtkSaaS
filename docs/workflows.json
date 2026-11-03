@@ -13,7 +13,8 @@
         "apps/backend/tests/ci-observer.test.mjs",
         "apps/backend/tests/quality-guard.test.mjs",
         "apps/backend/tests/p06-acceptance.mjs",
-        "apps/backend/tests/invitation-delivery-acceptance.mjs"
+        "apps/backend/tests/invitation-delivery-acceptance.mjs",
+        "apps/backend/tests/ci-experiment-checks.mjs"
       ],
       "sources": [
         "apps/backend/database/canonical-settings-scope.sql",
@@ -259,7 +260,11 @@
         "packages/api-contracts/src/index.ts",
         "packages/api-contracts/src/operations.ts",
         "packages/api-contracts/src/runtime.ts",
-        "apps/backend/scripts/ci/design-sandbox.mjs"
+        "apps/backend/scripts/ci/design-sandbox.mjs",
+        "apps/backend/scripts/ci/experiment/reference.mjs",
+        "apps/backend/scripts/ci/experiment/run.mjs",
+        "apps/backend/scripts/ci/experiment/suites.mjs",
+        "apps/backend/scripts/ci/experiment/suites.json"
       ],
       "operations": [
         "operation_status_get_v1",
@@ -269,8 +274,8 @@
         "management_state_get_v1"
       ],
       "review": {
-        "fingerprint": "d90d244467e7ff11f1e080db52771158f883019e1d0aecf95ae5ecfd3f4a7dee",
-        "reason": "P01 PlanLimit finite/unlimited ayrımı ve sonlu usage; üretilmiş Edge kaynakları ile sözleşme ve P06 testi incelendi. Ortak Auth/receipt protokolü değişmedi."
+        "fingerprint": "e7d830eb7c788d6bf997b739df224d79f3dab73c2016170dd7909f0436c8b176",
+        "reason": "PR164 main senkronizasyonunda deney ve ticari limit kaynak bağları korundu; değişen owning suite/P06 hash ve satır sahipliği 50 birime eşitlendi. Runner, checker, exclusive ve ağırlık kuralları değişmedi; 9 deney ön kontrolü geçti."
       }
     },
     {
