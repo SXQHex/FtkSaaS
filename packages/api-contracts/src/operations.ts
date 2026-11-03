@@ -220,4 +220,5 @@ export interface Operations {
   settings_preparation_resolve_v1: {request: T.RequestSettingsPreparationResolve; response: T.SuccessSettingsPreparationResolve};
   account_signup_check_v1: {request: T.RequestAccountSignupCheck; response: T.SuccessAccountSignupCheck};
   role_revoke_preview_v1: {request: T.RequestRoleRevokePreview; response: T.SuccessRoleRevokePreview};
+  subscription_period_change_request_v1: {request: T.RequestSubscriptionPeriodChangeRequest; response: T.SuccessSubscriptionPeriodChangeRequest};
 }

@@ -276,6 +276,8 @@ Bu tablo yalnız izdir; eski kabul metinleri ikinci kez tutulmaz.
 - **Doğrulama senaryosu:** Gerçek token/action/hostname, replay ve rate testi; public→inbox→inceleme; frontend PUBLIC-01 bağı.
 - **Kaynak alanı:** public ingress/review; provider config; runbook
 
+**Backend kaynak dilimi:** Mevcut public intent→review→davet/hesap→ayrı satış/tahsilat→self rezervasyon zinciri incelendi ve mevcut Starter harness’inde doğrulandı; yeni public motoru kurulmadı. Yerel Edge-owned verified context gerçek widget/token/action/hostname veya frontend ekranı değildir; S14 bu hosted sınırıyla açık kalır. [Kaynak/ortam sonucu](00-FtkSaaS-yeni-sohbet-devir.md#s14s16-kaynak-paketi).
+
 <a id="s15"></a>
 ### S15 — Gerçek takvim aboneliği
 
@@ -286,6 +288,8 @@ Bu tablo yalnız izdir; eski kabul metinleri ikinci kez tutulmaz.
 - **Doğrulama senaryosu:** Abonelik URL→ICS→gerçek seans ekranı; sentetik template/login yönlendirmesi yeterli değil; ST-03 bağı.
 - **Kaynak alanı:** transports/calendar-proxy.mjs; calendar kaynak/test; config
 
+**Backend kaynak dilimi:** Mevcut gerçek HTTP GET kabulüne native HEAD boş gövde/content-length/no-store kontrolü eklendi; rotate/revoke ve canlı erişim kaybı mevcut testte korundu. Loopback proxy ve sentetik route template’i gerçek takvim host’u/seans ekranı kabulünü kapatmaz; S15 açık. [Kaynak/ortam sonucu](00-FtkSaaS-yeni-sohbet-devir.md#s14s16-kaynak-paketi).
+
 <a id="s16"></a>
 ### S16 — SaaS aylık-yıllık bekleyen talep
 
@@ -295,6 +299,8 @@ Bu tablo yalnız izdir; eski kabul metinleri ikinci kez tutulmaz.
 - **Sınır/olumsuz durum:** Talep ödeme değildir; mevcut ödenmiş dönem değişmez; öğrenci paketine veya plan değişimine karışmaz.
 - **Doğrulama senaryosu:** Aylık→yıllık/yıllık→aylık, dönem sınırı yarışı, iptal/yenileme ve ödenmemiş yeni dönem; tekrar worker tek sonuç.
 - **Kaynak alanı:** p07 subscription SQL; contract.json; subscription acceptance
+
+**Uygulanan kaynak:** Tek `subscription_period_change_request_v1` owner komutu, `subscription_get_v1.billing` dönem/fiyat/seçenek/talep okuması ve gerçek abonelik sürümlü dar management selector eklendi. Mevcut `saas_change_requests` ve fon tahsis yolu kullanılır; aynı plan içinde geçiş ödenmiş dönem sonunda yeterli doğrulanmış fonla uygulanır. Yetersiz fonda normal grace, erken ödeme, iptal/değiştirme ve yarış/replay korumaları sürer. Güncel API sırası [WF13](../../../docs/workflows.md#wf13), yerel gerçek kaynak/test sonucu [devir](00-FtkSaaS-yeni-sohbet-devir.md#s14s16-kaynak-paketi) sahibindedir. Aday/main/development kabulü beklediğinden S16 henüz kapanmadı.
 
 ## Pro işlevleri
 

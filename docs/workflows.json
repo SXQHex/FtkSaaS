@@ -269,8 +269,8 @@
         "management_state_get_v1"
       ],
       "review": {
-        "fingerprint": "726f3e607136b65bb486bd74f49e34636d30316924e1b2690e19d265e4e6fc4e",
-        "reason": "web1 kullanıcı kararıyla bağımsız npm tasarım alanıdır; saf sandbox ve karma kaynak kapıları, rename ve ölçüm dışı kapsam doğrulandı. Ürün kontrolleri korunur."
+        "fingerprint": "f8da71e7ac98202e298998f5d5eba8ad3dcd5fa870e1fcf8257b5009d630234e",
+        "reason": "S16 tek owner komutu, abonelik billing DTOları ve enum/UUID envanteri ile üretilmiş service-only wrapper/tip/validator farkları incelendi; ortak Auth/session/tenant/receipt protokolü korunuyor."
       }
     },
     {
@@ -346,8 +346,8 @@
         "account_signup_check_v1"
       ],
       "review": {
-        "fingerprint": "96eb7f99a6b91f8ce1e6ee5ab1092c62b8ad26007abaa3f4f04e0adb6ebe49f6",
-        "reason": "Native parola değişiminden sonra canlı session, eski JWT ve refresh sınırı mevcut hesap harnessinde doğrulanıyor; native mevcut parola/nonce ve gerçek posta kabulü ayrıca açık, yeni Auth katmanı yok."
+        "fingerprint": "d9fa5eaff3b20948b70b452993969dc6487e2a9172e7c4c49224925e3af8d9ae",
+        "reason": "Ortak üretilmiş wrapper farkı yalnız S16 owner abonelik dönem komutunu ekler; bu akışın mevcut operasyon/görev/izin/plan ve davranış kaynakları değişmedi, ilgili rehber incelendi."
       }
     },
     {
@@ -442,8 +442,8 @@
         "role_revoke_preview_v1"
       ],
       "review": {
-        "fingerprint": "686e0059ab63221858926b09da21097ff397bae7cc0ed7f55301886715dd7593",
-        "reason": "Registry harnessine ayrı Starter private belge kökü eklendi; kendi merkez/oda/eğitmen fixtureı mevcut komutlarla kurulur, kurulum akışı ve yönetim sözleşmesi değişmedi."
+        "fingerprint": "78634d039ba245e19ec19785caa597cbd8384233ed9914d7c12d770295334c91",
+        "reason": "Registry harnessine sınırlı S16 kökü bağlandı; ortak wrappera tek service-only abonelik komutu eklendi. Bu akışın mevcut kurulum/rol/kişi kaynağı ve rehber davranışı değişmedi."
       }
     },
     {
@@ -532,8 +532,8 @@
         "class_assignment_set_v1"
       ],
       "review": {
-        "fingerprint": "1284fd35256fa93c87abf07b2577222bc3f97bb71c026c94cb58d2b0e75bfeac",
-        "reason": "Güncel Starter günlük testinde program bitişi hariçtir; üç oluşum ve güncel gerçek seans kimlikleriyle zincir kuruluyor."
+        "fingerprint": "d6258c150993f9f3e18d66b825c925540b0bf2f07e2dac141831a363b6eab582",
+        "reason": "Ortak üretilmiş wrapper farkı yalnız S16 owner abonelik dönem komutunu ekler; bu akışın mevcut operasyon/görev/izin/plan ve davranış kaynakları değişmedi, ilgili rehber incelendi."
       }
     },
     {
@@ -616,8 +616,8 @@
         "person_discipline_set_v1"
       ],
       "review": {
-        "fingerprint": "9cb1f59f5ae3c33e178c074556bc9a381077a0b3cd87f0d3280f7354bb0ab75c",
-        "reason": "Starter importta mevcut ve yeni kişinin Abone No benzersizliği, source replay değişmezliği ve kota taşmasında numara sayacı rollbacki gerçek mevcut harness içinde doğrulanıyor; kişi/rol/alias sözleşmesi değişmedi."
+        "fingerprint": "952d6d8ab823c5af203870b4c10c3a196e26c67e99c3576d402055381e2d44c2",
+        "reason": "Registry harnessine sınırlı S16 kökü bağlandı; ortak wrappera tek service-only abonelik komutu eklendi. Bu akışın mevcut kurulum/rol/kişi kaynağı ve rehber davranışı değişmedi."
       }
     },
     {
@@ -706,8 +706,8 @@
         "negative_limits_get_v1"
       ],
       "review": {
-        "fingerprint": "4a2b9db45f469929262065f89cc79fe6fdf12683b483c3f28eb810544a12b5f0",
-        "reason": "Güncel günlük test kaynak incelemesi: gerçek satış/tek hak ve sıfır kişisel negatif limit aynı akışta; mali karşılaştırmadan yalnız sayfalama zamanı ayrılır, tarih ve yarış sonucu koşulları gerçek semantiğe uyar."
+        "fingerprint": "3b8c3c6301836f43a98c28fb2971ffa843670c4861ef776fd4df622520c1fcb4",
+        "reason": "Ortak üretilmiş wrapper farkı yalnız S16 owner abonelik dönem komutunu ekler; bu akışın mevcut operasyon/görev/izin/plan ve davranış kaynakları değişmedi, ilgili rehber incelendi."
       }
     },
     {
@@ -780,8 +780,8 @@
         "reservation_capacity_override_v1"
       ],
       "review": {
-        "fingerprint": "2fb2da83ba65276773d82fb776be1446f5714c2a17ad88a9b164eb16a2380d79",
-        "reason": "Starter belge sürümüne self onay olmadan rezervasyon reddi ve aynı komutla sonradan başarı; yeni sürüm eski rezervasyonu korur, yeni kayıt yeni kabul ister."
+        "fingerprint": "67b6e2330bda64274cfa8e319a7fd1851231687532172cbf011ba2dbf319c625",
+        "reason": "Ortak üretilmiş wrapper farkı yalnız S16 owner abonelik dönem komutunu ekler; bu akışın mevcut operasyon/görev/izin/plan ve davranış kaynakları değişmedi, ilgili rehber incelendi."
       }
     },
     {
@@ -839,8 +839,8 @@
         "attendance_start_v1"
       ],
       "review": {
-        "fingerprint": "193906687ea72b53d392c827db1ccab0bc4727fa388e49f35932b5eecbd7afb1",
-        "reason": "Güncel günlük test kaynak incelemesi: eğitmen taslağı, CM kapanışı ve correction replay hak havuzunu korur; doğru core.earnings tablosunda Starter hakedişi yoktur."
+        "fingerprint": "fe33f7eb4ab31778633f7c9c20dfc7dab7ccffd4770cffdf356acc379b795a67",
+        "reason": "Ortak üretilmiş wrapper farkı yalnız S16 owner abonelik dönem komutunu ekler; bu akışın mevcut operasyon/görev/izin/plan ve davranış kaynakları değişmedi, ilgili rehber incelendi."
       }
     },
     {
@@ -898,8 +898,8 @@
         "debt_adjust_v1"
       ],
       "review": {
-        "fingerprint": "1b0161c7c98b4a1f3ce2fa093e4445711418c919b732bf61da2d0330d5232d65",
-        "reason": "Ortak Starter testindeki No ve expired download assertion ekleri mali ledger/rapor semantiğini değiştirmiyor; mevcut collection ve opening debt tutar kontrolleri korundu."
+        "fingerprint": "ea671f967b1d7af5fdc3dc5c582afd287783f4836ac8f010629dda4be0232849",
+        "reason": "Ortak üretilmiş wrapper farkı yalnız S16 owner abonelik dönem komutunu ekler; bu akışın mevcut operasyon/görev/izin/plan ve davranış kaynakları değişmedi, ilgili rehber incelendi."
       }
     },
     {
@@ -941,8 +941,8 @@
         "calendar_feed_get_v1"
       ],
       "review": {
-        "fingerprint": "f092de64f817f5b958376532db81923830ba861cd25126b8cb2ff8b312cc6330",
-        "reason": "Eğitmen kaldırma testlerinin açık önizleme onayına uyarlanması ve ortak üretilmiş sözleşme farkı incelendi; bu akışın kendi yetki/iş kuralları değişmedi."
+        "fingerprint": "68a59b5c8a7c3a2c435f5dd75cb506b18d40b36a66acaf7d77d134767dc7eb17",
+        "reason": "Mevcut gerçek GET takvim kabulüne gerçek native HEAD boş gövde/uzunluk/no-store kontrolü eklendi; hosted widget ve gerçek seans ekranı kabulü ayrı kalır."
       }
     },
     {
@@ -985,8 +985,8 @@
         "file_upload_complete_v1"
       ],
       "review": {
-        "fingerprint": "5ce6582d07147c401be84a9d41785dcddf81b334aa22e4d96ea52b87bb0d8fe8",
-        "reason": "Starter import source dedupe, kota ve No tahsisi ile gerçek expired CSV HTTP ret bağları incelendi; worker/download transport ve PR83 retention davranışı korunur."
+        "fingerprint": "cf20cd590f642e94826ae11ddb4f1a255ec8a3c8cbd93882be589874923b9978",
+        "reason": "Ortak üretilmiş wrapper farkı yalnız S16 owner abonelik dönem komutunu ekler; bu akışın mevcut operasyon/görev/izin/plan ve davranış kaynakları değişmedi, ilgili rehber incelendi."
       }
     },
     {
@@ -1020,8 +1020,8 @@
         "document_publication_preview_v1"
       ],
       "review": {
-        "fingerprint": "9927e6d2f4f8599f99cce1a945a55ab0bb77bb427de4d2e039dbd45cb8811227",
-        "reason": "Gerçek Starter private Storage baytları ve iki farklı belge sürümü; self consent, eski rezervasyon/byte/onay geçmişi ve revoked link sonrası içerik/replay sınırı mevcut APIlerde doğrulanıyor."
+        "fingerprint": "c34985e2e08e5092430c951842323d547691a342e7cc52a7241ed0e9037efa57",
+        "reason": "Ortak üretilmiş wrapper farkı yalnız S16 owner abonelik dönem komutunu ekler; bu akışın mevcut operasyon/görev/izin/plan ve davranış kaynakları değişmedi, ilgili rehber incelendi."
       }
     },
     {
@@ -1071,8 +1071,8 @@
         "settings_preparation_resolve_v1"
       ],
       "review": {
-        "fingerprint": "faa70fd2020af704b7032a24d72c9edda0c8da629cb2b288ede87e863d08c859",
-        "reason": "Paylaşılan Starter operations testindeki No ve download ret ekleri ayar/template kaynak ve snapshot tüketicisini değiştirmedi; mevcut yetki/reset/provenance assertionları korundu."
+        "fingerprint": "d29c68cd5594ffd5c07c6c8eb9b7d1777baf6d1c68cb97a20b37fc2d9b2b1f06",
+        "reason": "Ortak üretilmiş wrapper farkı yalnız S16 owner abonelik dönem komutunu ekler; bu akışın mevcut operasyon/görev/izin/plan ve davranış kaynakları değişmedi, ilgili rehber incelendi."
       }
     },
     {
@@ -1085,7 +1085,8 @@
         "apps/backend/tests/p07-subscription-lifecycle-acceptance.mjs",
         "apps/backend/tests/starter-plan-gates-acceptance.mjs",
         "apps/backend/tests/fixtures/p07-subscription-lifecycle.sql",
-        "apps/backend/tests/p07-lifecycle-acceptance.mjs"
+        "apps/backend/tests/p07-lifecycle-acceptance.mjs",
+        "apps/backend/tests/subscription-period-acceptance.mjs"
       ],
       "sources": [
         "apps/backend/database/active-discipline-projection-wrappers.sql",
@@ -1122,7 +1123,9 @@
         "apps/backend/database/starter-attendance-protection-wrappers.sql",
         "apps/backend/database/starter-plan-gates.sql",
         "apps/backend/database/wrappers.sql",
-        "docs/workflows.md"
+        "docs/workflows.md",
+        "apps/backend/database/subscription-period-change.sql",
+        "apps/backend/supabase/migrations/20261103101412_subscription_period_change.sql"
       ],
       "operations": [
         "subscription_get_v1",
@@ -1130,11 +1133,12 @@
         "subscription_downgrade_request_v1",
         "subscription_change_cancel_v1",
         "subscription_renewal_set_v1",
-        "saas_payment_submit_v1"
+        "saas_payment_submit_v1",
+        "subscription_period_change_request_v1"
       ],
       "review": {
-        "fingerprint": "961199545c8b5a25836420c3626f958aa6f48af7196eeb0444d47dc4dab89d9e",
-        "reason": "XREQ-012 rol kaynağı, eski veri silme kontrolü ve nullable Abone No projeksiyonları; değişen kaynak/testler ve ilgili rehber incelendi, plan/izin/worker protokolü korunuyor."
+        "fingerprint": "c0e9343b2ae0bd8ee348b6ea5673e297e2c448d8ac02f3da6a8effe649d50dc7",
+        "reason": "S16 aynı plan dönem değişimi, açık fiyat/tarih/sürüm, dar management okuması, tek talep ve doğrulanmış fonla worker/ödeme ortak tahsisi kaynak ve rehberle incelendi."
       }
     },
     {
@@ -1168,8 +1172,8 @@
         "instructor_agreements_list_v1"
       ],
       "review": {
-        "fingerprint": "6fa48aa8a61873c3b124d57beb96ca145fcb9b3d26bb4f5de763d774df92736d",
-        "reason": "Eğitmen kaldırma testlerinin açık önizleme onayına uyarlanması ve ortak üretilmiş sözleşme farkı incelendi; bu akışın kendi yetki/iş kuralları değişmedi."
+        "fingerprint": "2bc7d560bfa513193b33d84aefde0571616a504284d4f5e1b031aef17d9eb41f",
+        "reason": "Ortak üretilmiş wrapper farkı yalnız S16 owner abonelik dönem komutunu ekler; bu akışın mevcut operasyon/görev/izin/plan ve davranış kaynakları değişmedi, ilgili rehber incelendi."
       }
     },
     {
@@ -1235,8 +1239,8 @@
         "event_actual_start_correct_v1"
       ],
       "review": {
-        "fingerprint": "be7de7c89e7146e322c70d8c377ab13deec93212d5d15aeafb3cdbba02e6a5df",
-        "reason": "Ortak üretilmiş runtime wrapper farkı yalnız yeni role_revoke_preview_v1 F04 service-only entrypoint ekler; bu akışın komut/izin/etki zinciri değişmedi, mevcut rehber korunur."
+        "fingerprint": "506f0bd674447ec153981a5bd64707c458dd58fd3b9749ff2fa54c1a746dde89",
+        "reason": "Ortak üretilmiş wrapper farkı yalnız S16 owner abonelik dönem komutunu ekler; bu akışın mevcut operasyon/görev/izin/plan ve davranış kaynakları değişmedi, ilgili rehber incelendi."
       }
     },
     {
@@ -1273,8 +1277,8 @@
         "automation_save_v1"
       ],
       "review": {
-        "fingerprint": "0404c2a045d83458b5738cb44c95bee434a360f6ebc22df575b6d686f13226cc",
-        "reason": "Eğitmen kaldırma testlerinin açık önizleme onayına uyarlanması ve ortak üretilmiş sözleşme farkı incelendi; bu akışın kendi yetki/iş kuralları değişmedi."
+        "fingerprint": "ed3aa1651293a5bae300271a6f77ef4d902cb524c93e53c6bc4c59d3d7b0159d",
+        "reason": "Ortak üretilmiş wrapper farkı yalnız S16 owner abonelik dönem komutunu ekler; bu akışın mevcut operasyon/görev/izin/plan ve davranış kaynakları değişmedi, ilgili rehber incelendi."
       }
     },
     {
@@ -1345,8 +1349,8 @@
         "platform_owner_remove_v1"
       ],
       "review": {
-        "fingerprint": "867083c190c8e0ae3211c15cf387fc83de69046e259f2bfb90c25797493e56f2",
-        "reason": "Ortak üretilmiş runtime wrapper farkı yalnız yeni role_revoke_preview_v1 F04 service-only entrypoint ekler; bu akışın komut/izin/etki zinciri değişmedi, mevcut rehber korunur."
+        "fingerprint": "731e8adc49bbdea36a8dee702d2ea01ca35bfcf2b590256ec3e05ec43c38d5df",
+        "reason": "Ortak üretilmiş wrapper farkı yalnız S16 owner abonelik dönem komutunu ekler; bu akışın mevcut operasyon/görev/izin/plan ve davranış kaynakları değişmedi, ilgili rehber incelendi."
       }
     },
     {
@@ -1376,8 +1380,8 @@
         "settlement_authority_set_v1"
       ],
       "review": {
-        "fingerprint": "5e30abc42072847e8b3f3bcce4a28759bebd2185c37b6bd94ad778895bfde7ed",
-        "reason": "Ortak üretilmiş runtime wrapper farkı yalnız yeni role_revoke_preview_v1 F04 service-only entrypoint ekler; bu akışın komut/izin/etki zinciri değişmedi, mevcut rehber korunur."
+        "fingerprint": "b82f35a8cf35a1595787c6e5b8e4a16efc89a44a363c8220a99c179ba946aa01",
+        "reason": "Ortak üretilmiş wrapper farkı yalnız S16 owner abonelik dönem komutunu ekler; bu akışın mevcut operasyon/görev/izin/plan ve davranış kaynakları değişmedi, ilgili rehber incelendi."
       }
     },
     {
@@ -1404,8 +1408,8 @@
         "seat_offer_reject_v1"
       ],
       "review": {
-        "fingerprint": "d2c054ef8b254a194c5868d2eb2f5d25238b6220e4b5eab1e79cd4df4278ce87",
-        "reason": "XREQ-012 rol kaynağı, eski veri silme kontrolü ve nullable Abone No projeksiyonları; değişen kaynak/testler ve ilgili rehber incelendi, plan/izin/worker protokolü korunuyor."
+        "fingerprint": "609e5c630dd5ba12ef862f9e91e6d436d66929de60f52a59e0a8e0d6afc96914",
+        "reason": "Ortak üretilmiş wrapper farkı yalnız S16 owner abonelik dönem komutunu ekler; bu akışın mevcut operasyon/görev/izin/plan ve davranış kaynakları değişmedi, ilgili rehber incelendi."
       }
     },
     {
@@ -1471,8 +1475,8 @@
         "subscription_boundary_apply_v1"
       ],
       "review": {
-        "fingerprint": "ab76f4592cb289206ecb6f83b1643de30fa124ef717b18d532e00bde4ba6874c",
-        "reason": "XREQ-012 rol kaynağı, eski veri silme kontrolü ve nullable Abone No projeksiyonları; değişen kaynak/testler ve ilgili rehber incelendi, plan/izin/worker protokolü korunuyor."
+        "fingerprint": "50c245f654e850b9bae266e0c3be515a62476bdcda4e71e5e5d6356cc69290d9",
+        "reason": "Ortak üretilmiş wrapper farkı yalnız S16 owner abonelik dönem komutunu ekler; bu akışın mevcut operasyon/görev/izin/plan ve davranış kaynakları değişmedi, ilgili rehber incelendi."
       }
     }
   ]

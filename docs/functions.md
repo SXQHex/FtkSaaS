@@ -1,6 +1,6 @@
 # API ve iş akışı haritası
 
-Üretilmiştir: `node apps/backend/scripts/update-docs.mjs --write`. Elle düzenleme. Kaynak içerik özeti: `162084d0543ed8262e44fcbc08a4d0f13f23412360c38d78d82e4614e154fc4f`. Bu özet CI/hosted kabulü değildir; dağıtılan SHA ve ortam CD artifact'ında bulunur.
+Üretilmiştir: `node apps/backend/scripts/update-docs.mjs --write`. Elle düzenleme. Kaynak içerik özeti: `949a27d61e9e8279ac84dd8ccac7cdc2df67540925a0ec813562c5dd2ca0384b`. Bu özet CI/hosted kabulü değildir; dağıtılan SHA ve ortam CD artifact'ında bulunur.
 
 DTO/izin/hata/yan etkiler [üretilmiş API kataloğu](contracts/05-FtkSaaS-O4-API-katalogu.md) ve [makine sözleşmesinden](../packages/api-contracts/schema/contract.json) gelir. Edge kodu [backend-v1](../apps/backend/supabase/functions/backend-v1/index.ts) altındadır; SQL domain davranışını Edge dosyasından tek başına çıkarma. `implemented.json` içindeki varlık tüm selector/provider/ürün kabulünün tamamlandığı anlamına gelmez. Backend-only satırları tarayıcı endpoint önerisi değildir.
 
@@ -225,6 +225,7 @@ DTO/izin/hata/yan etkiler [üretilmiş API kataloğu](contracts/05-FtkSaaS-O4-AP
 | `settings_preparation_resolve_v1` | runtime (sınırları oku) | read | preparation.resolve | [WF12](workflows.md#wf12) / starter |
 | `account_signup_check_v1` | runtime (sınırları oku) | auth | auth.signup | [WF01](workflows.md#wf01) / starter |
 | `role_revoke_preview_v1` | runtime (sınırları oku) | preview | center.manage | [WF02](workflows.md#wf02) / starter |
+| `subscription_period_change_request_v1` | runtime (sınırları oku) | command | subscription.owner | [WF13](workflows.md#wf13) / starter |
 
 ## Akış kanıt kaynakları
 
@@ -243,7 +244,7 @@ Test dosyası bağlantısı çalıştırılmış test başarısı değildir. Kay
 - [WF10 — Rapor ve import](workflows.md#wf10): [alan devri](workflows.md); [p06-acceptance.mjs](../apps/backend/tests/p06-acceptance.mjs), [p06-parser.mjs](../apps/backend/tests/p06-parser.mjs), [starter-operations-acceptance.mjs](../apps/backend/tests/starter-operations-acceptance.mjs), [subscriber-number-acceptance.mjs](../apps/backend/tests/subscriber-number-acceptance.mjs)
 - [WF11 — Belgeler ve işlemsel inbox](workflows.md#wf11): [alan devri](workflows.md); [p05-acceptance.mjs](../apps/backend/tests/p05-acceptance.mjs), [starter-operations-acceptance.mjs](../apps/backend/tests/starter-operations-acceptance.mjs), [starter-document-acceptance.mjs](../apps/backend/tests/starter-document-acceptance.mjs)
 - [WF12 — Ayarlar ve medya](workflows.md#wf12): [alan devri](settings.md); [frontend-settings-acceptance.mjs](../apps/backend/tests/frontend-settings-acceptance.mjs), [starter-preparation-acceptance.mjs](../apps/backend/tests/starter-preparation-acceptance.mjs), [starter-operations-acceptance.mjs](../apps/backend/tests/starter-operations-acceptance.mjs)
-- [WF13 — Abonelik ve plan erişimi](workflows.md#wf13): [alan devri](workflows.md); [p07-subscription-lifecycle-acceptance.mjs](../apps/backend/tests/p07-subscription-lifecycle-acceptance.mjs), [starter-plan-gates-acceptance.mjs](../apps/backend/tests/starter-plan-gates-acceptance.mjs), [p07-subscription-lifecycle.sql](../apps/backend/tests/fixtures/p07-subscription-lifecycle.sql), [p07-lifecycle-acceptance.mjs](../apps/backend/tests/p07-lifecycle-acceptance.mjs)
+- [WF13 — Abonelik ve plan erişimi](workflows.md#wf13): [alan devri](workflows.md); [p07-subscription-lifecycle-acceptance.mjs](../apps/backend/tests/p07-subscription-lifecycle-acceptance.mjs), [starter-plan-gates-acceptance.mjs](../apps/backend/tests/starter-plan-gates-acceptance.mjs), [p07-subscription-lifecycle.sql](../apps/backend/tests/fixtures/p07-subscription-lifecycle.sql), [p07-lifecycle-acceptance.mjs](../apps/backend/tests/p07-lifecycle-acceptance.mjs), [subscription-period-acceptance.mjs](../apps/backend/tests/subscription-period-acceptance.mjs)
 - [WF14 — Anlaşma, hakediş ve eğitmen ödemesi](workflows.md#wf14): [alan devri](workflows.md); [instructor-earnings.test.mjs](../apps/backend/tests/instructor-earnings.test.mjs), [event-payment.test.mjs](../apps/backend/tests/event-payment.test.mjs)
 - [WF15 — Etkinlik kayıt, ödeme ve iptal](workflows.md#wf15): [alan devri](workflows.md); [event-payment.test.mjs](../apps/backend/tests/event-payment.test.mjs), [event-cancellation.test.mjs](../apps/backend/tests/event-cancellation.test.mjs), [api-acceptance.test.mjs](../apps/backend/tests/api-acceptance.test.mjs)
 - [WF16 — Genel CRM ve otomasyon](workflows.md#wf16): [alan devri](workflows.md); [p05-acceptance.mjs](../apps/backend/tests/p05-acceptance.mjs), [person-registry.test.mjs](../apps/backend/tests/person-registry.test.mjs)

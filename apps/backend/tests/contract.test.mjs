@@ -266,3 +266,16 @@ test('offline instructor membership uses the canonical role without granting an 
  assert.equal(valid('Table_center_relationships',{...relationship,kind:'instructor',state:'inactive'}),false);
  assert.equal(valid('RelationshipView',{center_id:id,kind:'instructor',state:'inactive'}),true);
 });
+
+test('subscription period changes require explicit accepted terms and expose a versioned billing read',()=>{
+ const operation=p['x-contract'].operations.find(o=>o.name==='subscription_period_change_request_v1');
+ assert(operation,'period changes must be a callable owner operation');
+ assert.equal(operation.permission,'subscription.owner');assert.equal(operation.billing_class,'exempt');
+ const body={client_api_version:1,request_id:id,org_id:id,operation_key:id,target_plan_id:id,expected_version:3,amount_minor:'12000',currency:'TRY',effective_at:'2027-01-01T00:00:00Z'};
+ assert(valid('Request_subscription_period_change_request',body));
+ for(const field of ['expected_version','amount_minor','currency','effective_at']){const incomplete={...body};delete incomplete[field];assert(!valid('Request_subscription_period_change_request',incomplete));}
+ assert(!valid('Request_subscription_period_change_request',{...body,amount_minor:12000}));
+ const terms={id,period:'yearly',amount_minor:'12000',currency:'TRY'};
+ assert(valid('SubscriptionBillingView',{current:terms,period_change_options:[terms],pending_period_change:{id,version:1,target:terms,effective_at:body.effective_at}}));
+ assert(!valid('SubscriptionBillingView',{current:terms,period_change_options:[],pending_period_change:{id,target:terms,effective_at:body.effective_at}}));
+});
