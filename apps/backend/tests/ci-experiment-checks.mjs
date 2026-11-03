@@ -1,0 +1,134 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import fs from 'node:fs';
+import {execFileSync} from 'node:child_process';
+import {mkdtempSync,rmSync} from 'node:fs';
+import {tmpdir} from 'node:os';
+import path from 'node:path';
+import {repositoryRoot} from '../scripts/paths.mjs';
+import {buildInventory,partition,materialize,executionPhases} from '../scripts/ci/experiment/suites.mjs';
+
+test('experimental inventory covers every original byte and every imported acceptance exactly once',()=>{
+ const inventory=buildInventory(repositoryRoot);
+ assert.equal(inventory.originals,15);
+ assert(inventory.splitOriginals>=9);
+ assert(inventory.units.length>30);
+ assert.equal(new Set(inventory.units.map(u=>u.id)).size,inventory.units.length);
+ const bins=partition(inventory.units);
+ assert.equal(bins.length,8);
+ assert(bins.every(b=>b.units.length>0));
+ assert.deepEqual(bins.flatMap(b=>b.units.map(u=>u.id)).sort(),inventory.units.map(u=>u.id).sort());
+ assert.deepEqual(bins,partition([...inventory.units].reverse()));
+ assert.throws(()=>partition([...inventory.units,inventory.units[0]]),/Duplicate/);
+});
+
+test('changed source, missing source, range gap and duplicate ownership fail before running any API',()=>{
+ const manifest=JSON.parse(fs.readFileSync(new URL('../scripts/ci/experiment/suites.json',import.meta.url)));
+ const read=p=>fs.readFileSync(path.join(repositoryRoot,p),'utf8');
+ assert.throws(()=>buildInventory(repositoryRoot,{read:p=>read(p)+'\n'}),/source changed/);
+ assert.throws(()=>buildInventory(repositoryRoot,{read:()=>{throw Error('missing');}}),/missing/);
+ const gap=structuredClone(manifest);gap.suites.find(s=>s.shared).shared[0][0]++;
+ assert.throws(()=>buildInventory(repositoryRoot,{manifest:gap}),/coverage/);
+ const duplicate=structuredClone(manifest);duplicate.suites[0].parts.push(structuredClone(duplicate.suites[0].parts[0]));
+ assert.throws(()=>buildInventory(repositoryRoot,{manifest:duplicate}),/coverage|Duplicate/);
+});
+
+test('generated fragments compile with original import locations and unchanged assertion bodies',()=>{
+ const dir=mkdtempSync(path.join(tmpdir(),'ftk-experiment-'));
+ try{
+  const inventory=buildInventory(repositoryRoot);
+  const files=materialize(inventory,dir);
+  assert.equal(files.length,inventory.units.length);
+  for(const file of files)execFileSync(process.execPath,['--check',file],{stdio:'pipe'});
+  for(const unit of inventory.units)execFileSync(process.execPath,['--input-type=module','--check'],{input:unit.code,stdio:['pipe','pipe','pipe']});
+  const room=inventory.units.find(u=>u.id==='room-role-registry-root-1');
+  assert(room.code.includes('import.meta.url'));
+  const output=fs.readFileSync(files[inventory.units.indexOf(room)],'utf8');
+  assert(output.includes(JSON.stringify(path.join(repositoryRoot,'apps/backend/tests/room-role-registry.test.mjs')).slice(1,-1)));
+ }finally{rmSync(dir,{recursive:true,force:true});}
+});
+
+// Execute the actual native hook, including relative dynamic import and module URL.
+test('fragment execution keeps original module URLs and does not execute excluded source',()=>{
+ const dir=mkdtempSync(path.join(tmpdir(),'ftk-hook-'));
+ try{
+  fs.writeFileSync(path.join(dir,'original.mjs'),"throw Error('original body must be replaced');\n");
+  fs.writeFileSync(path.join(dir,'helper.mjs'),"export default 42;\n");
+  const code="import value from './helper.mjs'; const dynamic=await import('./helper.mjs'); if(value!==42||dynamic.default!==42)throw Error('import mismatch'); console.log(import.meta.url);";
+  const [file]=materialize({root:dir,units:[{id:'probe',source:'original.mjs',code}]},path.join(dir,'generated'));
+  assert.equal(execFileSync(process.execPath,[file],{encoding:'utf8'}).trim(),new URL('file://'+path.join(dir,'original.mjs')).href);
+  assert(fs.readFileSync(path.join(dir,'original.mjs'),'utf8').startsWith('throw Error'));
+ }finally{rmSync(dir,{recursive:true,force:true});}
+});
+
+import {resolveReference,assertUnchangedRun,jobMeasurements,summarize} from '../scripts/ci/experiment/reference.mjs';
+test('baseline changes and failed attempts cannot be used in a comparison',()=>{
+ const reference={run_id:12,attempt:2,head:'head'};
+ const live={id:12,run_attempt:2,head_sha:'head',status:'completed',conclusion:'success'};
+ assertUnchangedRun(reference,live);
+ for(const delta of [{id:13},{run_attempt:3},{head_sha:'other'},{status:'in_progress'},{conclusion:'failure'}])assert.throws(()=>assertUnchangedRun(reference,{...live,...delta}),/changed/);
+});
+
+test('comparison separates queue, executed runner and clean test wall time',()=>{
+ const rows=jobMeasurements([{name:'api',conclusion:'success',created_at:'2026-01-01T00:00:00Z',started_at:'2026-01-01T00:00:10Z',completed_at:'2026-01-01T00:02:00Z',steps:[{name:'Experimental API tests',started_at:'2026-01-01T00:00:30Z',completed_at:'2026-01-01T00:01:50Z'}]}]);
+ assert.deepEqual(rows,[{name:'api',conclusion:'success',started_at:'2026-01-01T00:00:10Z',completed_at:'2026-01-01T00:02:00Z',queue_s:10,runner_s:110,test_s:80}]);
+});
+
+import {candidateProofFixture} from './ci-fixtures.mjs';
+test('reference requires complete original candidate and quality receipts on the same source/attempt',async()=>{
+ const dir=mkdtempSync(path.join(tmpdir(),'ftk-reference-'));
+ try{
+  for(const mutation of [null,'event','path','job','quality','attempt','manual-branch']){
+   const f=candidateProofFixture(dir,{rerun:true});
+   const context={repo:f.repo,sha:'installed',ref:'refs/heads/main',eventName:'workflow_dispatch'};
+   f.github.rest.actions.listJobsForWorkflowRunAttempt='attempt-jobs';
+   const paginate=f.github.paginate;
+   f.github.paginate=async(method,args)=>method==='attempt-jobs'?f.v.jobs:paginate(method,args);
+   if(mutation==='event')f.v.run.event='push';
+   if(mutation==='path')f.v.run.path='.github/workflows/backend-experiment.yml';
+   if(mutation==='job')f.v.jobs.find(j=>j.name==='api-1').conclusion='failure';
+   if(mutation==='quality')f.v.jobs.find(j=>j.name==='quality').steps[2].conclusion='skipped';
+   if(mutation==='attempt')f.v.run.run_attempt=3;
+   if(mutation==='manual-branch')context.ref='refs/heads/other';
+   if(mutation)await assert.rejects(()=>resolveReference(f.github,context,'5'));
+   else{const result=await resolveReference(f.github,context,'5');assert.equal(result.merge,'M');assert.equal(result.attempt,2);}
+  }
+ }finally{rmSync(dir,{recursive:true,force:true});}
+});
+
+test('global worker and security fixtures never overlap another file in the same database',()=>{
+ const inventory=buildInventory(repositoryRoot);
+ const exclusive=inventory.units.filter(u=>u.exclusive);
+ assert.equal(exclusive.length,5);
+ const phases=executionPhases(inventory.units);
+ assert.equal(phases.filter(p=>p.concurrency===1).length,5);
+ for(const phase of phases){
+  if(phase.units.some(u=>u.exclusive)){assert.equal(phase.concurrency,1);assert.equal(phase.units.length,1);}
+ }
+ assert.deepEqual(phases.flatMap(p=>p.units.map(u=>u.id)).sort(),inventory.units.map(u=>u.id).sort());
+ const manifest=JSON.parse(fs.readFileSync(new URL('../scripts/ci/experiment/suites.json',import.meta.url)));
+ manifest.exclusive=[];
+ assert.throws(()=>buildInventory(repositoryRoot,{manifest}),/Global fixture/);
+});
+
+test('collector compares matched core/API costs and rejects missing experimental source steps',async()=>{
+ const dir=mkdtempSync(path.join(tmpdir(),'ftk-compare-')),cwd=process.cwd();
+ try{
+  process.chdir(dir);
+  const reference={run_id:5,attempt:1,head:'H'};
+  const current={id:50,run_attempt:1,head_sha:'D',status:'in_progress'};
+  const baseline={id:5,run_attempt:1,head_sha:'H',status:'completed',conclusion:'success'};
+  const make=(name,run)=>({name,run_id:run.id,run_attempt:run.run_attempt,head_sha:run.head_sha,status:'completed',conclusion:'success',created_at:'2026-01-01T00:00:00Z',started_at:'2026-01-01T00:00:10Z',completed_at:'2026-01-01T00:01:10Z',steps:(name==='reference'?['Validate baseline','Validate experiment inventory']:['Verify source checkout',name==='core'?'Clean acceptance':'Experimental API tests']).map(name=>({name,conclusion:'success'}))});
+  const jobs=['reference','core',...Array.from({length:8},(_,i)=>'experiment-api-'+(i+1))].map(n=>make(n,current));
+  const old=['core','api-1','api-2','api-3','api-4','quality','full-clean'].map(n=>make(n,baseline));
+  const github={rest:{actions:{getWorkflowRun:async({run_id})=>({data:run_id===5?baseline:current}),listJobsForWorkflowRunAttempt:'jobs'}},paginate:async(method,args)=>args.run_id===5?old:jobs};
+  const context={repo:{},runId:50,sha:'D'},core={summary:{addRaw(){return this;},async write(){}}};
+  await summarize(github,context,core,reference);
+  const result=JSON.parse(fs.readFileSync('.artifacts/ci/experiment/comparison.json'));
+  assert.deepEqual(result.matched_core_api.runner_minutes,{baseline:5,experiment:9});
+  assert.deepEqual(result.matched_core_api.execution_window_s,{baseline:60,experiment:60});
+  assert.equal(result.overhead.baseline.length,2);assert.equal(result.overhead.experiment.length,1);
+  jobs[2].steps[0].conclusion='failure';
+  await assert.rejects(()=>summarize(github,context,core,reference),/Unexecuted/);
+ }finally{process.chdir(cwd);rmSync(dir,{recursive:true,force:true});}
+});

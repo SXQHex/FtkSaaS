@@ -13,7 +13,8 @@
         "apps/backend/tests/ci-observer.test.mjs",
         "apps/backend/tests/quality-guard.test.mjs",
         "apps/backend/tests/p06-acceptance.mjs",
-        "apps/backend/tests/invitation-delivery-acceptance.mjs"
+        "apps/backend/tests/invitation-delivery-acceptance.mjs",
+        "apps/backend/tests/ci-experiment-checks.mjs"
       ],
       "sources": [
         "apps/backend/database/canonical-settings-scope.sql",
@@ -259,7 +260,11 @@
         "packages/api-contracts/src/index.ts",
         "packages/api-contracts/src/operations.ts",
         "packages/api-contracts/src/runtime.ts",
-        "apps/backend/scripts/ci/design-sandbox.mjs"
+        "apps/backend/scripts/ci/design-sandbox.mjs",
+        "apps/backend/scripts/ci/experiment/reference.mjs",
+        "apps/backend/scripts/ci/experiment/run.mjs",
+        "apps/backend/scripts/ci/experiment/suites.mjs",
+        "apps/backend/scripts/ci/experiment/suites.json"
       ],
       "operations": [
         "operation_status_get_v1",
@@ -269,8 +274,8 @@
         "management_state_get_v1"
       ],
       "review": {
-        "fingerprint": "b96683ca51028d32e49c32a6299b7dc510708d4105a1d20c7f873c2868955a11",
-        "reason": "XREQ-013 additive Preview configuration_requirement and generated validators/types reviewed; generic SafeError, operation catalog, Auth/session and transport are unchanged."
+        "fingerprint": "d9452a985710b046d03666ba86cd6c4f983499060cdf3fb1b4a25eb8bbf1d3c5",
+        "reason": "PR161 main senkronizasyonunda mainin kabul edilmiş XREQ-013 kaynak ve ortak protokol eşlemesi korundu; deney kaynakları buna eklendi. Yeni program yapılandırma kabulü hash/satır sahipliğiyle 48 parçalık envantere dahil; istemci protokolü bu PR ile değişmez."
       }
     },
     {
