@@ -1,4 +1,4 @@
-import { act, screen } from "@testing-library/react";
+import { act, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { beforeEach, expect, test, vi } from "vitest";
 import type {
@@ -17,6 +17,13 @@ vi.mock("../src/lib/api", async (original) => ({
   ...(await original<typeof import("../src/lib/api")>()),
   getCalendar: mocks.calendar,
   getSession: mocks.session,
+}));
+vi.mock("../src/components/programs/program-manager", () => ({
+  ProgramManager: ({ onChanged }: { onChanged: () => void }) => (
+    <section aria-label="Test program yönetimi">
+      <button onClick={onChanged}>Test kaydet</button>
+    </section>
+  ),
 }));
 const organization: OrganizationView = {
   id: "org",
@@ -125,4 +132,22 @@ test("closed organizations and inaccessible centers do not issue calendar reques
   );
   expect(screen.getByText("Ders programı için erişilebilir merkez yok")).toBeVisible();
   expect(mocks.calendar).not.toHaveBeenCalled();
+});
+
+test("management replaces the calendar and returns to the preserved period with fresh entries", async () => {
+  const user = userEvent.setup();
+  render(<ScheduleWorkspace studios={studios} actorId="actor" />);
+  await screen.findByText("Bu aralıkta ders yok");
+  await user.click(screen.getByRole("button", { name: "Sonraki dönem" }));
+  await waitFor(() => expect(mocks.calendar).toHaveBeenCalledTimes(2));
+  const period = mocks.calendar.mock.calls[1][0].interval;
+  await user.click(screen.getByRole("button", { name: "Sınıf ve program yönetimi" }));
+  expect(screen.getByRole("region", { name: "Test program yönetimi" })).toBeVisible();
+  expect(screen.queryByRole("button", { name: "Sonraki dönem" })).not.toBeInTheDocument();
+  await user.click(screen.getByRole("button", { name: "Test kaydet" }));
+  await waitFor(() => expect(mocks.calendar).toHaveBeenCalledTimes(3));
+  expect(mocks.calendar.mock.calls[2][0].interval).toEqual(period);
+  await user.click(screen.getByRole("button", { name: "Takvime dön" }));
+  expect(screen.getByRole("button", { name: "Sonraki dönem" })).toBeVisible();
+  expect(screen.queryByRole("region", { name: "Test program yönetimi" })).not.toBeInTheDocument();
 });
