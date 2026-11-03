@@ -26,8 +26,8 @@ Bu dosya yalnız **sıra, bağımlı teslim paketleri ve kontrol noktalarının*
 
 ### Aktif kaynak paketi: P01–P04
 
-1. [P01](remaining-work.md#p01) etkin ticari limit kaynağı, atomik kapasite tüketimi ve dönem uyumu aynı paket içinde hazırlanır; [kaynak/test/ortam kanıtı](00-FtkSaaS-yeni-sohbet-devir.md#p01-ticari-limit-kaynak-paketi) kesinleşmeden kapanmaz. Mevcut branch kullanılır; mükerrer PR açılmaz.
-2. Ardından [P02](remaining-work.md#p02) çok kaynak/personel, [P03](remaining-work.md#p03) ileri rezervasyon/paket ve [P04](remaining-work.md#p04) anlaşma/hakediş kaynakları incelenir. Mevcut sağlam işlev yeniden yazılmaz. FIN-01 dar regresyonu genel P04 kabulü değildir.
+1. [P01](remaining-work.md#p01) backend teslimi tamamlandı; [tam kaynak/ortam kanıtı](00-FtkSaaS-yeni-sohbet-devir.md#p01-ticari-limit-kaynak-paketi) sahibindedir. Frontend limit tüketimi XREQ-014 kendi kabulünü bekler.
+2. Aktif paket [P02](remaining-work.md#p02): çok kaynak/personel native regresyonu ve XREQ-015 varsayılan sınıf görevi okuması. Mevcut `feature/pro-scheduling-lifecycle-closure` branch'i kullanılır; mükerrer PR açılmaz. Ardından [P03](remaining-work.md#p03) ileri rezervasyon/paket ve [P04](remaining-work.md#p04) anlaşma/hakediş kanıtları tamamlanır. Mevcut sağlam işlev yeniden yazılmaz; FIN-01 dar regresyonu genel P04 kabulü değildir.
 3. PR159 backend kaynak teslimi doğrulandı; XREQ-013 özgün Business/native tüketici kabulü [ortak talepte](../../../docs/requests.md#xreq-013) kendi sahibinde açık kalır. S14/S15 gerçek widget/host/seans route'u ve diğer Starter hosted bağımlılıkları da kendi kimliklerinde açıktır; bunlar bağımsız kaynak paketini durdurmaz.
 
 ## Ortak işletim hattı

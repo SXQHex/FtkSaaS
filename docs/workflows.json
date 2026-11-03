@@ -276,8 +276,8 @@
         "management_state_get_v1"
       ],
       "review": {
-        "fingerprint": "65887d6d730bd472430c1a9206e93867b3c2a7bd194a729ac05ca6703ace15b6",
-        "reason": "Deney API kayıt adapterı kök ve alt test timeoutunu Infinity yapar; p07 dekoratörü, request/SQL sınırları, assertion hataları ve cleanup korunur. Native lexical dosya kuyruğunda iki hat/exclusive faz planlaması47 tamamlanmış gövde bağlı süreyi kullanır; eski örnek açık tahmine döner. JSONL sonuçları ölçüm içindir; üretim kabulü değişmez."
+        "fingerprint": "86751dc457ae21ac632c450a6276659ce4e7870bfdbc11b7c56b0261312982f9",
+        "reason": "Main PR167 yeni class-duty kabulü/hashi korunarak51 deney birimi senkronize edildi. CLI3.0.0 tam pin ve lock, açık remote hedefleri, mevcut yes/kaynak/JWT kapıları incelendi. Deney kayıt adapterı ve lexical iki hat/exclusive planlama47 eski tamamlanmış gövde süresini tahmini girdi kullanır; süre kabulü veya yeni sürüm ölçümü değildir."
       }
     },
     {
@@ -465,7 +465,8 @@
         "apps/backend/tests/availability-policies.test.mjs",
         "apps/backend/tests/starter-plan-gates-acceptance.mjs",
         "apps/backend/tests/starter-attendance-protection.test.mjs",
-        "apps/backend/tests/program-configuration-acceptance.mjs"
+        "apps/backend/tests/program-configuration-acceptance.mjs",
+        "apps/backend/tests/class-duty-management-acceptance.mjs"
       ],
       "sources": [
         "apps/backend/database/active-discipline-projection-wrappers.sql",
@@ -519,7 +520,9 @@
         "apps/backend/database/starter-subscriber-projections.sql",
         "apps/backend/supabase/migrations/20261102180626_starter_subscriber_projections.sql",
         "apps/backend/database/program-configuration-requirements.sql",
-        "apps/backend/supabase/migrations/20261103123239_program_configuration_requirements.sql"
+        "apps/backend/supabase/migrations/20261103123239_program_configuration_requirements.sql",
+        "apps/backend/database/class-duty-management.sql",
+        "apps/backend/supabase/migrations/20261103194514_class_duty_management.sql"
       ],
       "operations": [
         "availability_save_v1",
@@ -542,8 +545,8 @@
         "class_assignment_set_v1"
       ],
       "review": {
-        "fingerprint": "9f56f4e3455272df3fa6a4ef7ed10cdb7f6e3e69d80697760373fc6f00813426",
-        "reason": "Final native fixture covers decoder closed allowlist, original agreement failure contexts, nonmanager/tenant denial, native publishing recovery, stale preview and unchanged Starter; scope and guide reviewed."
+        "fingerprint": "3ed4faacaf19a139df56f09dda9a9936c66c3dbf86c13b6cbe7613e0badfa43c",
+        "reason": "Final native class duty reader reviewed including canonical UUID comparison for selector and optional entity, real assignment versions/absence, live scope/features and Starter existing-versus-new session guard; original lifecycle bodies/assertions retained."
       }
     },
     {
@@ -719,8 +722,8 @@
         "negative_limits_get_v1"
       ],
       "review": {
-        "fingerprint": "939ed8c4a85fd505beeffa7c6d7c1f32964be450b9371e498d79521f3be47e6e",
-        "reason": "Event-payment harness FIN-01 native regresyonunu içeri alıyor; satış/paket davranışı ve rehberi değişmedi."
+        "fingerprint": "db09563df5e480326686c527c6984dddea6848fae9df0914cc2d3b2813fe1107",
+        "reason": "Existing product, sale, freeze, termination, renewal, change and refund bodies/assertions remain byte-identical; owning program harness imports a separate class-duty acceptance only. Reviewed guide and reservation-preserving lifecycle source; no product behavior change."
       }
     },
     {
@@ -793,8 +796,8 @@
         "reservation_capacity_override_v1"
       ],
       "review": {
-        "fingerprint": "3366af20427a7c834572f64035b60ee672f86cd9afbfe281f42e17cf3e15f906",
-        "reason": "Shared contract test adds schedule prerequisite validation only; reservation, rights and protected-booking semantics and this guide remain unchanged."
+        "fingerprint": "2b6fa291bf6f9e17048a05a0727cd22d048d5b32eee770fa75dc547748dc5fe2",
+        "reason": "Reviewed reservation and lesson intent flow with live scope and selected entitlement checks; existing owning program test bodies unchanged by new import, no booking writer or right/capacity guard changed."
       }
     },
     {

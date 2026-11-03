@@ -307,14 +307,14 @@ Bu tablo yalnız izdir; eski kabul metinleri ikinci kez tutulmaz.
 <a id="p01"></a>
 ### P01 — Ticari limitleri atomik uygula
 
-- [ ] **Tür:** K · **Plan:** Pro/Business ve Starter regresyon · **Özellik:** F01,F07,F32
+- [x] **Tür:** K · **Plan:** Pro/Business ve Starter regresyon · **Özellik:** F01,F07,F32
 - **Bağımlılık:** A01,S12
 - **Kabul:** Pro 250, Business org 1250; oda/eğitmen açık sınırsız modeliyle tutarlı okunur/uygulanır.
 - **Sınır/olumsuz durum:** Business 5 merkez, Starter 100/1/1/1 korunur; aktif kişi org bazında bir sayılır.
 - **Doğrulama senaryosu:** 249→250→251 ve 1249→1250→1251 paralel aktivasyon, import/merge/yeniden aktivasyon; 5→6 merkez reddi.
 - **Kaynak alanı:** plan-limit/runtime gate; contract.json; yeni migration/test
 
-**Aktif kaynak dilimi:** Etkin ticari limit SSoT, açık sınırsız DTO ve mevcut kapasite tüketim yollarının regresyonları aynı backend paketinde hazırlanıyor. Kaynak/test/ortam kabulünün tek sahibi [devir](00-FtkSaaS-yeni-sohbet-devir.md#p01-ticari-limit-kaynak-paketi). Yeni kaynak teslim edilmeden bu görev tamamlandı sayılmaz. Açık sınırsız DTO için frontend tüketici bağımlılığı [XREQ-014](../../../docs/requests.md#xreq-014) sahibindedir.
+**Backend teslimi:** PR164 aday/main/development kabulüyle tamamlandı; [tam kaynak/ortam kanıtı](00-FtkSaaS-yeni-sohbet-devir.md#p01-ticari-limit-kaynak-paketi) sahibindedir. Açık sınırsız DTO'nun frontend tüketici bağımlılığı [XREQ-014](../../../docs/requests.md#xreq-014) kendi sahibinde açık kalır; Business özel teklif B05 kapsamındadır.
 
 <a id="p02"></a>
 ### P02 — Çoklu kaynak ve operasyon personeli
@@ -325,6 +325,8 @@ Bu tablo yalnız izdir; eski kabul metinleri ikinci kez tutulmaz.
 - **Sınır/olumsuz durum:** Fiziksel oda ve eğitmen çakışması; izinli personel yönetici/indirim yetkisini kazanmaz.
 - **Doğrulama senaryosu:** Eşzamanlı iki farklı oda ve aynı eğitmen; izin değişikliği sonrası capability/komut reddi.
 - **Kaynak alanı:** room/role/availability/schedule SQL; ilgili testler
+
+**Aktif kaynak dilimi:** Mevcut çok kaynak/izin yollarının native regresyonu ve [XREQ-015](../../../docs/requests.md#xreq-015) tam class/person/duty yönetim okuması aynı pakette hazırlanıyor. Varsayılan sınıf görevi okuması yeni yetki veya anlaşma önkoşulu açmaz; kaynak/test/ortam durumu [devir](00-FtkSaaS-yeni-sohbet-devir.md#p02-native-kaynak-paketi) sahibindedir. Aday/main/development ve kalan P02 kabulü kesinleşmeden genel kapanış verilmez.
 
 <a id="p03"></a>
 ### P03 — İleri rezervasyon ve paket yaşam döngüsü
