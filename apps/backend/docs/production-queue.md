@@ -22,13 +22,13 @@ Bu dosya yalnız **sıra, bağımlı teslim paketleri ve kontrol noktalarının*
 
 **S01–S02 kontrol noktası:** Ayrı teslimin backend kapanışı doğrulandı; [görev kabulü](remaining-work.md#s01) ve [kaynak/ortam kanıtı](00-FtkSaaS-yeni-sohbet-devir.md#s01s02-backend-kabulü) kendi sahiplerindedir. Frontend ekran sırası ve kabulü değişmez.
 
-**Güncel öncelik:** S11–S13 backend kaynak kabul paketi teslim edildi; [kaynak/ortam kanıtı](00-FtkSaaS-yeni-sohbet-devir.md#s11s13-dosya-ve-belge-kabulü) ve kalan hosted/tüketici ölçütleri [backlog](remaining-work.md#s11) sahibindedir. Üst-plan S05 işleri ve S07/S08/S10/S11–S13 dış kabul bağımlılıkları Starter’ın bağımsız kaynak işlerini bekletmez.
+**Güncel öncelik:** S14–S16 backend kaynak paketi PR156 ile aday/main/development kabulünü geçti; [kaynak/ortam kanıtı](00-FtkSaaS-yeni-sohbet-devir.md#s14s16-kaynak-paketi) ve açık hosted/tüketici sınırları [backlog](remaining-work.md#s14) sahibindedir.
 
-### Aktif büyük paket: S14–S16
+### Aktif teslim: XREQ-013; sonraki büyük paket P01–P04
 
-1. Public/ICS mevcut kaynak ve gerçek yerel kabulü incelendi; S16 dönem değişimi hazırlandı. Uygulama ve açık hosted/tüketici ölçütleri [backlog](remaining-work.md#s14), yerel sonuçlar [devir](00-FtkSaaS-yeni-sohbet-devir.md#s14s16-kaynak-paketi) sahibindedir. Tek Draft PR’de kaynak bağlı full clean kabulüne teslim et; polling yapma.
-2. Başarılı aday ve ayrı merge yetkisi sonrası aynı-main/development kabulünü doğrula. S14/S15 gerçek widget/host/seans route’u ve diğer Starter hosted bağımlılıklarını yerel test veya CD şema doğrulamasıyla kapatma.
-3. Sonraki bağımsız kaynak paketi [P01–P04](remaining-work.md#p01) sırasındadır; açık Starter gerçek ortam kabulleri kendi kimliklerinde kalır. S16 kaynak teslimi genel Starter veya F01–F33 kabulü değildir.
+1. [PR158](https://github.com/SXQHex/FtkSaaS/pull/158) talebinin backend incelemesi [P04 alt adımında](remaining-work.md#p04) izlenir. PR159 içinde typed native önkoşul düzeltmesi ve yerel kabul hazır; aday/main/development kabulünü doğrula; [açık native Business/consumer kabulü](00-FtkSaaS-yeni-sohbet-devir.md#xreq-013-backend-incelemesi) tamamlanmadan talebi kapatma. Frontend alanını veya onun talep eden kaydını değiştirme.
+2. S14/S15 gerçek widget/host/seans route'u ve diğer Starter hosted bağımlılıkları kendi kimliklerinde açık kalır; yerel test/CD şema doğrulaması bunların yerine geçmez.
+3. Sonraki bağımsız kaynak paketi [P01–P04](remaining-work.md#p01) sırasındadır. XREQ-013 için canlı ücret veya politika tahmin etme; önceden kabul edilmiş sağlam program/hakediş kaynağını yeniden kurma.
 
 ## Ortak işletim hattı
 

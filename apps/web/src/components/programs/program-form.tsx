@@ -110,6 +110,7 @@ export function ProgramForm({
         <ProgramReview
           key={preview.id}
           preview={preview}
+          catalog={catalog}
           timeZone={timeZone}
           disabled={disabled}
           onBack={() => {

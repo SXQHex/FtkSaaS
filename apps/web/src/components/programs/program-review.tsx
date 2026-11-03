@@ -4,15 +4,19 @@ import { useFormatter, useTranslations } from "next-intl";
 import type { Preview } from "@ftksaas/api-contracts";
 import { errorKey } from "../setup/setup-command";
 import { Button } from "@ftksaas/ui/components/button";
+import { ScheduleConfiguration } from "./schedule-configuration";
+import type { ProgramCatalog } from "./program-form";
 export function ProgramReview({
   preview,
   timeZone,
+  catalog,
   disabled,
   onApply,
   onBack,
 }: {
   preview: Preview;
   timeZone: string;
+  catalog?: ProgramCatalog;
   disabled: boolean;
   onApply: () => void;
   onBack: () => void;
@@ -48,6 +52,12 @@ export function ProgramReview({
           {errors(errorKey(blocker.code))}
         </p>
       ))}
+      <ScheduleConfiguration
+        preview={preview}
+        timeZone={timeZone}
+        people={catalog?.instructors}
+        disciplines={catalog?.disciplines}
+      />
       <ul className="max-h-72 space-y-2 overflow-y-auto text-sm" aria-label={t("sessions")}>
         {preview.sessions?.map((session) => (
           <li key={session.session_id} className="rounded-md border p-3">
@@ -97,6 +107,7 @@ export function ProgramReview({
       <div className="flex flex-wrap gap-3">
         <Button
           type="button"
+          className="h-auto min-h-11 max-w-full whitespace-normal"
           disabled={disabled || !confirmed || expired || preview.blockers.length > 0}
           onClick={() => {
             if (Date.parse(preview.expires_at) <= Date.now()) setExpired(true);
@@ -105,7 +116,13 @@ export function ProgramReview({
         >
           {t("apply")}
         </Button>
-        <Button type="button" variant="outline" disabled={disabled} onClick={onBack}>
+        <Button
+          type="button"
+          variant="outline"
+          disabled={disabled}
+          onClick={onBack}
+          className="h-auto min-h-11 max-w-full whitespace-normal"
+        >
           {t("back")}
         </Button>
       </div>

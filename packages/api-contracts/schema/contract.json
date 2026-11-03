@@ -3028,6 +3028,9 @@
         },
         "lifecycle_impact": {
           "$ref": "#/$defs/LifecycleImpact"
+        },
+        "configuration_requirement": {
+          "$ref": "#/$defs/ScheduleConfigurationRequirement"
         }
       },
       "required": [
@@ -3039,7 +3042,32 @@
         "blockers",
         "expires_at"
       ],
-      "additionalProperties": false
+      "additionalProperties": false,
+      "allOf": [
+        {
+          "if": {
+            "required": [
+              "configuration_requirement"
+            ]
+          },
+          "then": {
+            "properties": {
+              "blockers": {
+                "minItems": 1,
+                "prefixItems": [
+                  {
+                    "properties": {
+                      "code": {
+                        "const": "POLICY_NOT_CONFIGURED"
+                      }
+                    }
+                  }
+                ]
+              }
+            }
+          }
+        }
+      ]
     },
     "Mutation": {
       "type": "object",
@@ -50849,6 +50877,39 @@
         "values"
       ],
       "additionalProperties": false
+    },
+    "ScheduleConfigurationRequirement": {
+      "type": "object",
+      "properties": {
+        "blocker_index": {
+          "const": 0
+        },
+        "kind": {
+          "const": "instructor_agreement"
+        },
+        "person_id": {
+          "$ref": "#/$defs/FtkUuid"
+        },
+        "discipline_id": {
+          "$ref": "#/$defs/FtkUuid"
+        },
+        "format": {
+          "$ref": "#/$defs/SessionFormat"
+        },
+        "starts_at": {
+          "$ref": "#/$defs/Instant"
+        }
+      },
+      "required": [
+        "blocker_index",
+        "kind",
+        "person_id",
+        "discipline_id",
+        "format",
+        "starts_at"
+      ],
+      "additionalProperties": false,
+      "description": "First failed program/session-change occurrence: a valid instructor agreement could not be resolved. Scope is the authorized preview org/center. No fee, agreement identifier or new permission is exposed; fresh preview is mandatory after configuration."
     }
   },
   "x-contract": {
@@ -94464,6 +94525,18 @@
         "origin": "ftksaas",
         "acceptance": "generic_uuid",
         "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/ScheduleConfigurationRequirement/properties/person_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/ScheduleConfigurationRequirement/properties/discipline_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
       }
     ],
     "open_product_decisions": [],
@@ -94863,7 +94936,7 @@
       "uuid": "backend uuid@14.0.3 v7 for all inserted IDs; DB defaults not required",
       "external_transport": "POST /functions/v1/backend-v1/{operation}; direct typed request body",
       "internal_rpc": "service-only api_v1 named functions; actor/session/UUID bank supplied by verified gateway",
-      "migration_count": 97,
+      "migration_count": 98,
       "acceptance_source": "apps/backend/docs/00-FtkSaaS-yeni-sohbet-devir.md"
     },
     "decision_sprint": {

@@ -279,3 +279,17 @@ test('subscription period changes require explicit accepted terms and expose a v
  assert(valid('SubscriptionBillingView',{current:terms,period_change_options:[terms],pending_period_change:{id,version:1,target:terms,effective_at:body.effective_at}}));
  assert(!valid('SubscriptionBillingView',{current:terms,period_change_options:[],pending_period_change:{id,target:terms,effective_at:body.effective_at}}));
 });
+
+test('schedule configuration requirements identify the first blocker without extending generic errors',()=>{
+ const requirement={blocker_index:0,kind:'instructor_agreement',person_id:id,discipline_id:id,format:'group',starts_at:'2027-01-04T09:00:00Z'};
+ assert(p.$defs.ScheduleConfigurationRequirement);
+ assert(valid('ScheduleConfigurationRequirement',requirement));
+ assert(!valid('ScheduleConfigurationRequirement',{...requirement,kind:'arbitrary_policy'}));
+ assert(!valid('ScheduleConfigurationRequirement',{...requirement,blocker_index:1}));
+ assert(!valid('ScheduleConfigurationRequirement',{...requirement,terms:{amount_minor:'1'}}));
+ const preview={id,token:'synthetic-preview-token',scope_hash:'synthetic-scope',dependencies:{versions:[],policy_hashes:[],permission_hash:'permission'},effects:[],blockers:[{code:'POLICY_NOT_CONFIGURED',retryable:false,trace_id:id}],expires_at:'2027-01-04T10:00:00Z',configuration_requirement:requirement};
+ assert(valid('Preview',preview));
+ assert(!valid('Preview',{...preview,blockers:[]}));
+ assert(!valid('Preview',{...preview,blockers:[{...preview.blockers[0],code:'RESOURCE_CONFLICT'}]}));
+ assert(!valid('SafeError',{...preview.blockers[0],configuration_requirement:requirement}));
+});

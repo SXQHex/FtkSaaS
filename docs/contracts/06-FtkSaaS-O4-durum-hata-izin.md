@@ -178,6 +178,9 @@ RPC domain error ve transport ayrı normalize edilir; düz metin ayrıştırılm
 | `SUBSCRIPTION_NOT_STARTED` | hayır | İlk ödeme doğrulanmadı; yalnız kuruluş/ödeme kapısı açık. |
 | `PARTICIPATION_BLOCKED` | hayır | Seans başlangıcındaki kredi limit aşımı; geriye ödeme sonucu değiştirmez. |
 
+Program/seans değişikliği preview'sinde anlaşma çözümlemesi başarısızsa `Preview.configuration_requirement` ilk `POLICY_NOT_CONFIGURED` blocker'ını ilgili görevlendirme ve oluşumla typed biçimde ilişkilendirir. Alanın yokluğu belirli bir eksiklik tanısı vermez; genel hata kodundan anlaşma veya ücret varsayılmaz. Aynı merkezde geçerli anlaşmayı mevcut yetkiyle tamamlama ve yeni preview sırası [WF03/WF14](../workflows.md#wf03) sahibindedir. Bu ek, hata kodu/retryable semantiğini, `SafeError` alanlarını veya apply/plan/yetki kapılarını değiştirmez.
+
+
 08 operations.errors her işlem için izinli kod kümesini içerir; permission/transition/semantic_guards ve transaction sınıfıyla birlikte değerlendirilir. Örn. role owner beyanı doğrulama/forbidden, source-less negative basis eksikliği POLICY_NOT_CONFIGURED, başlangıç limit aşımı PARTICIPATION_BLOCKED, closed correction yetkisi yoksa FORBIDDEN. İş sonucunu sızdırabilecek NOT_FOUND/FORBIDDEN ayrımı tenant varlığı açıklamayacak şekilde maskelenir. Public/hesap kurtarma yanıtı hesap varlığını açıklamaz.
 
 ## Sonuçların kaydı

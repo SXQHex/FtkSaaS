@@ -139,6 +139,48 @@ test("backend blockers and expired previews cannot be applied", async () => {
   expect(await screen.findByRole("button", { name: "Onayla ve oluştur" })).toBeDisabled();
   expect(mocks.send).not.toHaveBeenCalled();
 });
+test("typed agreement diagnosis uses returned references and requires a fresh confirmed program preview", async () => {
+  mocks.call.mockResolvedValueOnce({
+    ...preview,
+    blockers: [{ code: "POLICY_NOT_CONFIGURED", retryable: false, trace_id: "synthetic" }],
+    configuration_requirement: {
+      blocker_index: 0,
+      kind: "instructor_agreement",
+      person_id: "teacher",
+      discipline_id: "discipline",
+      format: "group",
+      starts_at: "2030-01-07T16:30:00Z",
+    },
+  });
+  render(
+    <ProgramForm
+      scope={scope}
+      selected={selected}
+      catalog={catalog}
+      timeZone="Europe/Istanbul"
+      onSaved={mocks.saved}
+    />,
+  );
+  const user = await fillProgram();
+  expect(
+    await screen.findByRole("region", { name: "Eğitmen anlaşması doğrulanamadı" }),
+  ).toHaveTextContent("Test Eğitmen");
+  expect(screen.getByRole("button", { name: "Onayla ve oluştur" })).toBeDisabled();
+  expect(mocks.send).not.toHaveBeenCalled();
+  await user.click(screen.getByRole("button", { name: "Forma dön" }));
+  await user.click(screen.getByRole("button", { name: "Programı önizle" }));
+  expect(await screen.findByRole("button", { name: "Onayla ve oluştur" })).toBeDisabled();
+  expect(
+    screen.queryByRole("region", { name: "Eğitmen anlaşması doğrulanamadı" }),
+  ).not.toBeInTheDocument();
+  expect(mocks.call).toHaveBeenCalledTimes(2);
+  await user.click(screen.getByRole("checkbox", { name: "Gösterilen etkileri onaylıyorum" }));
+  await user.click(screen.getByRole("button", { name: "Onayla ve oluştur" }));
+  await waitFor(() => expect(mocks.saved).toHaveBeenCalledOnce());
+  expect(mocks.send.mock.calls[0][0]).toMatchObject({
+    input: { preview: { id: preview.id, token: preview.token } },
+  });
+});
 test("uncertain program apply recovers the same payload and key after remount", async () => {
   const pending = {
     command: {

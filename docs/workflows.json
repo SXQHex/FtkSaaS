@@ -274,8 +274,8 @@
         "management_state_get_v1"
       ],
       "review": {
-        "fingerprint": "3899cd0ebac2b02cae22ffa9d0e180a6ec1d7828f8b41c9ff6c9510684925a3e",
-        "reason": "Ayrı manuel sekiz shard ön kontrolleri ve karşılaştırma kaynakları incelendi; özgün API/verify envanteri korunur. Tam kaynak kanıtı, satır/hash eşlemesi, singleton faz izolasyonu ve eş kapsamlı ölçüm istemci protokolünü değiştirmez."
+        "fingerprint": "d9452a985710b046d03666ba86cd6c4f983499060cdf3fb1b4a25eb8bbf1d3c5",
+        "reason": "PR161 main senkronizasyonunda mainin kabul edilmiş XREQ-013 kaynak ve ortak protokol eşlemesi korundu; deney kaynakları buna eklendi. Yeni program yapılandırma kabulü hash/satır sahipliğiyle 48 parçalık envantere dahil; istemci protokolü bu PR ile değişmez."
       }
     },
     {
@@ -462,7 +462,8 @@
         "apps/backend/tests/schedule-reads.test.mjs",
         "apps/backend/tests/availability-policies.test.mjs",
         "apps/backend/tests/starter-plan-gates-acceptance.mjs",
-        "apps/backend/tests/starter-attendance-protection.test.mjs"
+        "apps/backend/tests/starter-attendance-protection.test.mjs",
+        "apps/backend/tests/program-configuration-acceptance.mjs"
       ],
       "sources": [
         "apps/backend/database/active-discipline-projection-wrappers.sql",
@@ -514,7 +515,9 @@
         "apps/backend/database/studio-management-reads.sql",
         "apps/backend/supabase/migrations/20261101232810_studio_management_reads.sql",
         "apps/backend/database/starter-subscriber-projections.sql",
-        "apps/backend/supabase/migrations/20261102180626_starter_subscriber_projections.sql"
+        "apps/backend/supabase/migrations/20261102180626_starter_subscriber_projections.sql",
+        "apps/backend/database/program-configuration-requirements.sql",
+        "apps/backend/supabase/migrations/20261103123239_program_configuration_requirements.sql"
       ],
       "operations": [
         "availability_save_v1",
@@ -537,8 +540,8 @@
         "class_assignment_set_v1"
       ],
       "review": {
-        "fingerprint": "d6258c150993f9f3e18d66b825c925540b0bf2f07e2dac141831a363b6eab582",
-        "reason": "Ortak üretilmiş wrapper farkı yalnız S16 owner abonelik dönem komutunu ekler; bu akışın mevcut operasyon/görev/izin/plan ve davranış kaynakları değişmedi, ilgili rehber incelendi."
+        "fingerprint": "9f56f4e3455272df3fa6a4ef7ed10cdb7f6e3e69d80697760373fc6f00813426",
+        "reason": "Final native fixture covers decoder closed allowlist, original agreement failure contexts, nonmanager/tenant denial, native publishing recovery, stale preview and unchanged Starter; scope and guide reviewed."
       }
     },
     {
@@ -711,8 +714,8 @@
         "negative_limits_get_v1"
       ],
       "review": {
-        "fingerprint": "3b8c3c6301836f43a98c28fb2971ffa843670c4861ef776fd4df622520c1fcb4",
-        "reason": "Ortak üretilmiş wrapper farkı yalnız S16 owner abonelik dönem komutunu ekler; bu akışın mevcut operasyon/görev/izin/plan ve davranış kaynakları değişmedi, ilgili rehber incelendi."
+        "fingerprint": "aee580909da279ffef0a4b6d551d02ef990744f726d4d4c0e8f530d73554333e",
+        "reason": "Shared contract test adds schedule prerequisite validation only; sale, credit and entitlement semantics and this guide remain unchanged."
       }
     },
     {
@@ -785,8 +788,8 @@
         "reservation_capacity_override_v1"
       ],
       "review": {
-        "fingerprint": "67b6e2330bda64274cfa8e319a7fd1851231687532172cbf011ba2dbf319c625",
-        "reason": "Ortak üretilmiş wrapper farkı yalnız S16 owner abonelik dönem komutunu ekler; bu akışın mevcut operasyon/görev/izin/plan ve davranış kaynakları değişmedi, ilgili rehber incelendi."
+        "fingerprint": "3366af20427a7c834572f64035b60ee672f86cd9afbfe281f42e17cf3e15f906",
+        "reason": "Shared contract test adds schedule prerequisite validation only; reservation, rights and protected-booking semantics and this guide remain unchanged."
       }
     },
     {
@@ -1154,7 +1157,8 @@
       "detail": "docs/workflows.md",
       "tests": [
         "apps/backend/tests/instructor-earnings.test.mjs",
-        "apps/backend/tests/event-payment.test.mjs"
+        "apps/backend/tests/event-payment.test.mjs",
+        "apps/backend/tests/program-configuration-acceptance.mjs"
       ],
       "sources": [
         "apps/backend/database/cross-center-settlement-wrappers.sql",
@@ -1166,7 +1170,9 @@
         "apps/backend/database/p03-refund-identity.sql",
         "apps/backend/database/runtime-wrappers-current.sql",
         "apps/backend/database/starter-availability-management.sql",
-        "docs/workflows.md"
+        "docs/workflows.md",
+        "apps/backend/database/program-configuration-requirements.sql",
+        "apps/backend/supabase/migrations/20261103123239_program_configuration_requirements.sql"
       ],
       "operations": [
         "instructor_agreement_publish_v1",
@@ -1177,8 +1183,8 @@
         "instructor_agreements_list_v1"
       ],
       "review": {
-        "fingerprint": "2bc7d560bfa513193b33d84aefde0571616a504284d4f5e1b031aef17d9eb41f",
-        "reason": "Ortak üretilmiş wrapper farkı yalnız S16 owner abonelik dönem komutunu ekler; bu akışın mevcut operasyon/görev/izin/plan ve davranış kaynakları değişmedi, ilgili rehber incelendi."
+        "fingerprint": "4f060aa7ebc47aee04eff6fb256334d8f74a9c3c85e4b1e6090b8e4d257e9a6a",
+        "reason": "Native agreement publication/list and program recovery share the new scoped prerequisite acceptance; immutable terms, fresh preview and permission separation reviewed."
       }
     },
     {

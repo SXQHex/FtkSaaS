@@ -547,6 +547,48 @@ export type PolicyKey = ("student_cancel_private" | "student_cancel_group" | "re
  */
 export type PolicyValue = (IntegerPolicy | BooleanPolicy | WindowPolicy | CancellationPolicy | BlockCreditPolicy | NegativeValuationPolicy | DocumentPolicy)
 /**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "Preview".
+ */
+export type Preview = {
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+id: string
+token: OpaqueToken
+scope_hash: Text
+dependencies: PreviewDependencies
+effects: Effect[]
+blockers: SafeError[]
+expires_at: Instant
+sessions?: SchedulePreviewItem[]
+class_assignments?: ClassAssignmentView[]
+class_version?: PositiveInt
+sale_lifecycle?: SaleLifecyclePreviewDetails
+import_summary?: ImportPreviewSummary
+merge_summary?: {
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+source_id: string
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+target_id: string
+/**
+ * Items: Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+affected_center_ids: string[]
+/**
+ * Items: Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+required_approval_center_ids: string[]
+linked_history: true
+}
+lifecycle_impact?: LifecycleImpact
+configuration_requirement?: ScheduleConfigurationRequirement
+}
+/**
  * Organization-scoped immutable student number, starting at 1001. Decimal string preserves bigint precision; never an authentication proof.
  *
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -3522,6 +3564,7 @@ Request_subscription_period_change_request?: RequestSubscriptionPeriodChangeRequ
 Success_subscription_period_change_request?: SuccessSubscriptionPeriodChangeRequest
 ManagementSelector_subscription_period_change_request_v1?: ManagementSelectorSubscriptionPeriodChangeRequestV1
 ManagementProjection_subscription_period_change_request_v1?: ManagementProjectionSubscriptionPeriodChangeRequestV1
+ScheduleConfigurationRequirement?: ScheduleConfigurationRequirement
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -4216,47 +4259,6 @@ blockers: SafeError[]
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
- * via the `definition` "Preview".
- */
-export interface Preview {
-/**
- * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
- */
-id: string
-token: OpaqueToken
-scope_hash: Text
-dependencies: PreviewDependencies
-effects: Effect[]
-blockers: SafeError[]
-expires_at: Instant
-sessions?: SchedulePreviewItem[]
-class_assignments?: ClassAssignmentView[]
-class_version?: PositiveInt
-sale_lifecycle?: SaleLifecyclePreviewDetails
-import_summary?: ImportPreviewSummary
-merge_summary?: {
-/**
- * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
- */
-source_id: string
-/**
- * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
- */
-target_id: string
-/**
- * Items: Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
- */
-affected_center_ids: string[]
-/**
- * Items: Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
- */
-required_approval_center_ids: string[]
-linked_history: true
-}
-lifecycle_impact?: LifecycleImpact
-}
-/**
- * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
  * via the `definition` "SchedulePreviewItem".
  */
 export interface SchedulePreviewItem {
@@ -4369,6 +4371,26 @@ export_operation: "report_export_start_v1"
 export_requires_scope_check: true
 export_before_closure: true
 physical_erasure_complete: false
+}
+/**
+ * First failed program/session-change occurrence: a valid instructor agreement could not be resolved. Scope is the authorized preview org/center. No fee, agreement identifier or new permission is exposed; fresh preview is mandatory after configuration.
+ *
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "ScheduleConfigurationRequirement".
+ */
+export interface ScheduleConfigurationRequirement {
+blocker_index: 0
+kind: "instructor_agreement"
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+person_id: string
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+discipline_id: string
+format: SessionFormat
+starts_at: Instant
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
