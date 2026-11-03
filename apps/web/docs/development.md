@@ -122,6 +122,10 @@ Giriş ve MFA `next` yerel hedefini korur. Google/kayıt başlatılmadan önce s
 
 `ProgramManager` takvimde açık kullanıcı eylemiyle, aktör/org/merkez anahtarıyla açılır. Sınıflar `management_state_get_v1(class_save_v1)`, özgün program tanımları `management_state_get_v1(program_preview_v1)` selector/cursor okumalarından gelir. `classValues` sınıfın kendi sürümünü seçer; varsayılan eğitmen/asistan görevi kendi kişi/duty selector'ü ve assignment sürümüyle yönetilir. Oda ve etkin merkez disiplini/eğitmen seçenekleri canlı kataloglardan alınır. Backend okuma reddi sentetik katalogla örtülmez.
 
+Sınıf listesi ve seçilen sınıfın özeti iki sütunlu çalışma alanındadır; mobilde alt alta gelir. Sınıf oluşturma/düzenleme, program, varsayılan görev ve tek seans formları ilgili eylemle mevcut shadcn `Sheet` panelinde açılır. Aynı anda tek form görünür; panel Escape ile kapandığında odak açan düğmeye, başarılı kayıt sonrası düğme artık yoksa yönetim başlığına döner. Katalog okunmadan veya okuma reddedildiğinde yeni yazma formu açılmaz. Panel kapatmak bekleyen komutu silmez; yönetim görünümündeki `ProgramRecovery` aynı aktör/org/merkez günlüğünden kurtarmayı sunar. Merkez değişince önceki kapsamın paneli ve kayıtları gizlenir.
+
+Takvim ve sınıf/program yönetimi ayrı görünümlerdir. Yönetime geçiş açık seans detayını kapatır; takvime dönüş seçilmiş tarih/aralığı korur. Başarılı komut sınıf/katalog ve takvim okumalarını yeniler. Formların preview/onay, sürüm ve idempotency davranışı bu görünüm düzeninden bağımsız mevcut tüketicilerde kalır.
+
 `ProgramForm` sonlu, bitiş-hariç aralık ve merkez saat diliminde tekrar kuralı üretir; boş DST saati kaydırılmaz ve her çift saat için açık UTC farkı gerekir. Toplam/kategori kontenjanları sıfır değerlerini korur. Sınıf varsayılan görevi devralma veya açık eğitmen seçimi ayrı girdidir. `program_preview_v1` sonucu onaylanmadan `program_apply_v1` gönderilmez. Tek seans `SingleSessionForm` ile sınıfa bağlı veya bağımsız oluşturulur; sahte preview çağrısı eklenmez. İş kurallarının sahibi [WF03](../../../docs/workflows.md#wf03), bölüm durumu [S03 kaydıdır](todo.md#web-s03).
 
 ## Seans değişikliğini önizleme ve uygulama

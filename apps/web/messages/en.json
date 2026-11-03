@@ -1152,7 +1152,16 @@
     "timeOffset": "UTC offset for {label}",
     "recovery": "Pending calendar operations",
     "recoveryHint": "Even if catalogs are unavailable, check a previous operation or replay the same request.",
-    "recoveryUnavailable": "The operation journal cannot be read. Verify the current result before sending a new operation."
+    "recoveryUnavailable": "The operation journal cannot be read. Verify the current result before sending a new operation.",
+    "managerHint": "Manage classes and plan your schedule.",
+    "singleAction": "Single session",
+    "classList": "Classes",
+    "classDetail": "Class details",
+    "manageNamedClass": "Manage class: {name}",
+    "planAction": "Plan schedule",
+    "chooseClass": "Select a class",
+    "chooseClassHint": "Manage its schedule, default duties and class details here.",
+    "editorContext": "Center timezone: {timezone}"
   },
   "sessionLifecycle": {
     "cancelTitle": "Cancel session",
