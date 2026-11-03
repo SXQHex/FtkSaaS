@@ -2,9 +2,17 @@
 
 3 Kasım 2026 kaynak ve kabul kontrolü. Açık işler ve kapanış ölçütleri [backlog](remaining-work.md), sıra [kuyruk](production-queue.md), ürün/API davranışı [kaynak indeksi](../../../docs/source-index.md) sahibindedir. Burada karar veya görev metni tekrar edilmez.
 
+## Sekiz shard deney hazırlığı
+
+3 Kasım 2026 kullanıcı kararıyla tek PR'de, mevcut dört shard CI/development zincirini koruyan manuel sekiz shard karşılaştırması hazırlanıyor.
+
+15 özgün suite'in 9'u bağımsız kabul/kök/senaryo sınırlarında toplam 47 deney birimine ayrıldı. Özgün testler ve mevcut runner/workflow/envanter değişmedi. Singleton ayarı değiştiren beş parça ayrı fazda çalışır. Deney protokolünün tek sahibi [CI politikasıdır](../../../docs/ci-policy.md#sekiz-shard-karşılaştırma-deneyi). Gerçek API deneyi ve hız/maliyet karşılaştırması henüz yapılmadı; mevcut akışa geçiş kabulü verilmez. Bu PR'nin test edilmiş tam kaynağı için kullanıcı özel kurulumla birleştirme talimatı verdi; önceki PR yetkisi devralınmadı.
+
+Yerel doğrulama: backend verify 284/284, deney ön kontrolleri 9/9 başarılı; kalite tabanı 0 bulgu, belge kontrolü 35 dosya/1305 bağlantı. Actionlint, Zizmor ve pinact yeni workflow için temizdir. Poutine yeni workflow'da 0 bulgu verdi; değişmeyen clean-suite.yml içindeki üç mevcut untrusted_checkout_exec uyarısı başlangıçta da aynıdır, susturulmadı. Bağımsız incelemede açık Critical/Required bulgu kalmadı. Gerçek yerel API başlatması PostgreSQL'in root/nobody kullanıcı kısıtıyla durdu; uzak API kabulü varmış gibi raporlanmaz.
+
 ## Kaynak tabanı
 
-Güncel çalışma tabanı main `8fb016d92f60ee8193390e1adf038c6e6a37c0a4` (PR155). Bu SHA için [main proof](https://github.com/SXQHex/FtkSaaS/actions/runs/41620302389) ve [merge proof](https://github.com/SXQHex/FtkSaaS/actions/runs/41620302484), attempt1 completed/success doğrulandı. Main belge kabulü başarılıdır; ağır backend testi tekrar edilmedi. [Development kaynağı](https://github.com/SXQHex/FtkSaaS/actions/runs/41620362895) başarılı, deploy işi kapsam gereği skipped’dır; yeni runtime dağıtımı yapıldı denmez. İlk çalışma tabanı PR154 main `d53bbc7b82ad1225d957ec03071259a7753d3b07` idi; araya giren PR153/155 farkı yalnız `apps/web/**` dosyalarıdır. Backend, ortak sözleşme, CI/paket kaynakları değişmediği Git farkıyla doğrulandı; dal güncel main ile eşitlendi.
+Güncel çalışma tabanı main `9aa974e3192b05fa60faab768a086c5d1c575be3` (PR160). Aynı kaynağın [main proof](https://github.com/SXQHex/FtkSaaS/actions/runs/41636533972), [merge proof](https://github.com/SXQHex/FtkSaaS/actions/runs/41636534179) ve [development](https://github.com/SXQHex/FtkSaaS/actions/runs/41636608539) completed/success doğrulandı. Bu frontend teslimi yeni backend full-clean veya hosted runtime dağıtımı kabulü değildir; önceki backend dilimlerinin kanıtları aşağıdaki kendi kayıtlarındadır.
 
 Son backend teslimi PR152 main `33b9a6805ca70ab07dac1709333193943ce87b40` için [main proof](https://github.com/SXQHex/FtkSaaS/actions/runs/41613511287), [merge proof](https://github.com/SXQHex/FtkSaaS/actions/runs/41613511352) ve [development teslimi](https://github.com/SXQHex/FtkSaaS/actions/runs/41613580838), attempt1 completed/success doğrulandı. Gerçek hosted backend ve dokümantasyon şema karşılaştırma adımları başarılıdır. Bu CD sonucu S11–S13 gerçek kullanıcı dosya/ekran kabulünün yerine geçmez. XREQ-009/011/012 teslim ve tüketici kabulünün tek koordinasyon sahibi [ortak taleptir](../../../docs/requests.md#xreq-012).
 

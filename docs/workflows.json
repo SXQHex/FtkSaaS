@@ -13,7 +13,8 @@
         "apps/backend/tests/ci-observer.test.mjs",
         "apps/backend/tests/quality-guard.test.mjs",
         "apps/backend/tests/p06-acceptance.mjs",
-        "apps/backend/tests/invitation-delivery-acceptance.mjs"
+        "apps/backend/tests/invitation-delivery-acceptance.mjs",
+        "apps/backend/tests/ci-experiment-checks.mjs"
       ],
       "sources": [
         "apps/backend/database/canonical-settings-scope.sql",
@@ -259,7 +260,11 @@
         "packages/api-contracts/src/index.ts",
         "packages/api-contracts/src/operations.ts",
         "packages/api-contracts/src/runtime.ts",
-        "apps/backend/scripts/ci/design-sandbox.mjs"
+        "apps/backend/scripts/ci/design-sandbox.mjs",
+        "apps/backend/scripts/ci/experiment/reference.mjs",
+        "apps/backend/scripts/ci/experiment/run.mjs",
+        "apps/backend/scripts/ci/experiment/suites.mjs",
+        "apps/backend/scripts/ci/experiment/suites.json"
       ],
       "operations": [
         "operation_status_get_v1",
@@ -269,8 +274,8 @@
         "management_state_get_v1"
       ],
       "review": {
-        "fingerprint": "f8da71e7ac98202e298998f5d5eba8ad3dcd5fa870e1fcf8257b5009d630234e",
-        "reason": "S16 tek owner komutu, abonelik billing DTOları ve enum/UUID envanteri ile üretilmiş service-only wrapper/tip/validator farkları incelendi; ortak Auth/session/tenant/receipt protokolü korunuyor."
+        "fingerprint": "3899cd0ebac2b02cae22ffa9d0e180a6ec1d7828f8b41c9ff6c9510684925a3e",
+        "reason": "Ayrı manuel sekiz shard ön kontrolleri ve karşılaştırma kaynakları incelendi; özgün API/verify envanteri korunur. Tam kaynak kanıtı, satır/hash eşlemesi, singleton faz izolasyonu ve eş kapsamlı ölçüm istemci protokolünü değiştirmez."
       }
     },
     {
