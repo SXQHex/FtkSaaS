@@ -339,6 +339,9 @@
       "held": "Held",
       "remaining": "Remaining"
     },
+    "capacityCategories": { "male": "Male", "female": "Female" },
+    "roomCapacity": "Room capacity: {count}",
+    "capacityUnavailable": "Unavailable",
     "capacityHint": "Availability reflects the last refresh. Eligibility is checked when a reservation is made.",
     "state": {
       "planned": "Planned",
@@ -361,6 +364,9 @@
     "backToSchedule": "Back to schedule",
     "refreshDetail": "Refresh details",
     "deviceTimezone": "Times are shown in your device time zone: {timezone}",
+    "editingSession": "Selected session",
+    "sessionActions": "Session actions",
+    "backToDetail": "Back to session details",
     "changeSession": "Edit session"
   },
   "sessionChange": {

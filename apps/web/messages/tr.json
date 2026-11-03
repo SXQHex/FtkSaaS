@@ -339,6 +339,9 @@
       "held": "Ayrılan",
       "remaining": "Kalan"
     },
+    "capacityCategories": { "male": "Erkek", "female": "Kadın" },
+    "roomCapacity": "Oda kapasitesi: {count}",
+    "capacityUnavailable": "Bilgi yok",
     "capacityHint": "Yer sayısı son okuma anına aittir. Kesin uygunluk rezervasyon sırasında kontrol edilir.",
     "state": {
       "planned": "Planlandı",
@@ -361,6 +364,9 @@
     "backToSchedule": "Programa dön",
     "refreshDetail": "Bilgileri yenile",
     "deviceTimezone": "Saatler cihazının saat diliminde gösteriliyor: {timezone}",
+    "editingSession": "İşlem yapılan seans",
+    "sessionActions": "Seans işlemleri",
+    "backToDetail": "Seans detayına dön",
     "changeSession": "Seansı düzenle"
   },
   "sessionChange": {

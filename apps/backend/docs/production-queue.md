@@ -24,9 +24,9 @@ Bu dosya yalnız **sıra, bağımlı teslim paketleri ve kontrol noktalarının*
 
 **Güncel öncelik:** S14–S16 backend kaynak paketi PR156 ile aday/main/development kabulünü geçti; [kaynak/ortam kanıtı](00-FtkSaaS-yeni-sohbet-devir.md#s14s16-kaynak-paketi) ve açık hosted/tüketici sınırları [backlog](remaining-work.md#s14) sahibindedir.
 
-### Aktif değerlendirme: XREQ-013; sonraki büyük paket P01–P04
+### Aktif teslim: XREQ-013; sonraki büyük paket P01–P04
 
-1. [PR158](https://github.com/SXQHex/FtkSaaS/pull/158) talebinin backend incelemesi [P04 alt adımında](remaining-work.md#p04) izlenir. Kaynak ve salt okunur canlı neden doğrulandı; [açık native Business/consumer kabulü](00-FtkSaaS-yeni-sohbet-devir.md#xreq-013-backend-incelemesi) tamamlanmadan talebi kapatma. Frontend alanını veya onun talep eden kaydını değiştirme.
+1. [PR158](https://github.com/SXQHex/FtkSaaS/pull/158) talebinin backend incelemesi [P04 alt adımında](remaining-work.md#p04) izlenir. PR159 içinde typed native önkoşul düzeltmesi ve yerel kabul hazır; aday/main/development kabulünü doğrula; [açık native Business/consumer kabulü](00-FtkSaaS-yeni-sohbet-devir.md#xreq-013-backend-incelemesi) tamamlanmadan talebi kapatma. Frontend alanını veya onun talep eden kaydını değiştirme.
 2. S14/S15 gerçek widget/host/seans route'u ve diğer Starter hosted bağımlılıkları kendi kimliklerinde açık kalır; yerel test/CD şema doğrulaması bunların yerine geçmez.
 3. Sonraki bağımsız kaynak paketi [P01–P04](remaining-work.md#p01) sırasındadır. XREQ-013 için canlı ücret veya politika tahmin etme; önceden kabul edilmiş sağlam program/hakediş kaynağını yeniden kurma.
 

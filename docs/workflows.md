@@ -75,6 +75,8 @@ Takvim aralığı UTC overlap ile, merkez IANA saat dilimi korunarak okunur. CM 
 
 Pro/Business programında eğitmen duty'si için aynı organizasyon/merkez/kişi/disiplin ve seans formatında, her oluşumun başlangıcında geçerli yayımlanmış ücret anlaşması gerekir. `agreement_id` verilmezse backend canonical yürürlük sürümünü çözer; istemci yeni bir anlaşma kimliği uydurmaz. Eksik veya uygun olmayan anlaşma `POLICY_NOT_CONFIGURED` üretebilir. Bu genel kod tek başına eksik politikanın türünü kanıtlamaz; yetkili anlaşma okuması ve kaynak bağlı trace ile ayrıştırılır. Anlaşma tamamlama [WF14](#wf14) yolundadır; Starter anlaşmasız akışı korunur.
 
+Program/seans değişikliği preview'sinde bu doğrulama noktasında geçerli anlaşma çözülemezse isteğe bağlı `configuration_requirement` döner: `kind=instructor_agreement`, `blocker_index=0`, `person_id`, `discipline_id`, `format` ve `starts_at`. Organizasyon/merkez yetkili preview kapsamıdır; kişi ve başlangıç ilgili görevlendirme/oluşumu tanımlar. Bu ilk hatanın tanısıdır, bütün eksiklerin envanteri değildir. Süresi dolmuş veya açıkça yanlış seçilmiş anlaşma da aynı tanıyı üretebilir; “hiç anlaşma kaydı yok” anlamı çıkarılmaz. Diğer politika/kaynak hatalarında alan bulunmaz; `SafeError` değişmez, ham SQL ayrıntısı/ücret/anlaşma kimliği açılmaz. Bu alan anlaşma yönetme yetkisi vermez: mevcut `earnings.manage` sınırıyla WF14 tüketilir; yetkisi olmayan operatör engeli yetkiliye iletir. Yapılandırma sonrası eski preview atılır, yeni preview alınır ve engelsiz sonuca ayrı etki onayı verilir. Starter'da anlaşma önkoşulu/tanısı üretilmez.
+
 ## WF04
 
 **Amaç/aktör:** Yetkili merkez kullanıcısı kişi ve öğrencilik ilişkisini yönetir; hesap bağlantısını ayrıca kurar.
