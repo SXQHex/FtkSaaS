@@ -1198,5 +1198,18 @@
     "replacementUnavailable": "A replacement requires a cancelled source session.",
     "resourcesUnavailable": "The room catalog could not be read. Retry; no new session was created.",
     "viewReplacement": "Open the new replacement session"
+  },
+  "scheduleConfiguration": {
+    "title": "Instructor agreement could not be verified",
+    "explanation": "A valid published fee agreement could not be verified for this assignment and session start. This does not mean that no agreement record exists.",
+    "person": "Instructor / person reference",
+    "discipline": "Discipline / record reference",
+    "format": "Session format",
+    "group": "Group class",
+    "private": "Private lesson",
+    "occurrence": "Affected session start",
+    "timeZone": "Time zone",
+    "nextStep": "Someone authorized to manage fee agreements at this center must check the agreement scope and effective dates. After configuration, return to the form, request a new preview and separately confirm its current effects.",
+    "limited": "Only the first identified agreement blocker is shown. A new preview may reveal other blockers."
   }
 }

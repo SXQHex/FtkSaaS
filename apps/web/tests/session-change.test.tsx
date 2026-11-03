@@ -83,6 +83,35 @@ test("backend blockers prevent applying and edits invalidate the preview", async
   expect(screen.queryByRole("button", { name: "Değişiklikleri uygula" })).not.toBeInTheDocument();
   expect(actions.apply).not.toHaveBeenCalled();
 });
+test("session changes show typed agreement context and discard it on a fresh preview", async () => {
+  actions.preview.mockImplementationOnce(async (input) => ({
+    ...samplePreview(input),
+    blockers: [{ code: "POLICY_NOT_CONFIGURED", retryable: false, trace_id: "synthetic" }],
+    configuration_requirement: {
+      blocker_index: 0,
+      kind: "instructor_agreement",
+      person_id: "affected-person",
+      discipline_id: "affected-discipline",
+      format: "group",
+      starts_at: "2030-01-07T16:30:00Z",
+    },
+  }));
+  render(<SessionChangeFlow {...props} />);
+  const user = await prepare();
+  expect(screen.getByRole("region", { name: "Eğitmen anlaşması doğrulanamadı" })).toHaveTextContent(
+    "affected-person",
+  );
+  expect(screen.getByRole("button", { name: "Değişiklikleri uygula" })).toBeDisabled();
+  expect(actions.apply).not.toHaveBeenCalled();
+  await user.click(screen.getByRole("button", { name: "Forma dön" }));
+  await user.click(screen.getByRole("button", { name: "Değişikliği önizle" }));
+  expect(await screen.findByRole("button", { name: "Değişiklikleri uygula" })).toBeEnabled();
+  expect(
+    screen.queryByRole("region", { name: "Eğitmen anlaşması doğrulanamadı" }),
+  ).not.toBeInTheDocument();
+  expect(actions.preview).toHaveBeenCalledTimes(2);
+  expect(actions.apply).not.toHaveBeenCalled();
+});
 test("expired previews are never applied", async () => {
   actions.preview.mockImplementation(async (input) => ({
     ...samplePreview(input),

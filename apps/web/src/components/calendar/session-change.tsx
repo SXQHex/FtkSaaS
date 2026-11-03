@@ -19,6 +19,7 @@ import {
 import { resourcePatch, type ResourceDraft } from "../../lib/session-resources";
 import { SessionResources } from "./session-resources";
 import { SeriesOffsets } from "./series-offsets";
+import { ScheduleConfiguration } from "../programs/schedule-configuration";
 
 type Pending = { operation_key: string; preview: { id: string; token: string } };
 type Props = {
@@ -472,6 +473,15 @@ export function SessionChangeFlow({
               </ul>
             </div>
           )}
+          <ScheduleConfiguration
+            preview={stage.preview}
+            timeZone={timeZone}
+            people={
+              resources.instructorId && resources.instructorName
+                ? [{ id: resources.instructorId, name: resources.instructorName }]
+                : []
+            }
+          />
           <div className="flex flex-wrap gap-3">
             <Button
               variant="outline"

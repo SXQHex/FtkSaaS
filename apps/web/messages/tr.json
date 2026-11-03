@@ -1198,5 +1198,18 @@
     "replacementUnavailable": "Telafi yalnız iptal edilmiş bir seans için oluşturulabilir.",
     "resourcesUnavailable": "Oda kataloğu okunamadı. Yeniden deneyin; yeni seans oluşturulmadı.",
     "viewReplacement": "Yeni telafi seansını aç"
+  },
+  "scheduleConfiguration": {
+    "title": "Eğitmen anlaşması doğrulanamadı",
+    "explanation": "Bu görevlendirme ve seans başlangıcı için geçerli, yayımlanmış bir ücret anlaşması doğrulanamadı. Bu sonuç, hiç anlaşma kaydı olmadığı anlamına gelmez.",
+    "person": "Eğitmen / kişi kaydı",
+    "discipline": "Disiplin / kayıt kimliği",
+    "format": "Seans türü",
+    "group": "Grup dersi",
+    "private": "Özel ders",
+    "occurrence": "İlgili seans başlangıcı",
+    "timeZone": "Saat dilimi",
+    "nextStep": "Bu merkezde ücret anlaşmalarını yönetme yetkisi olan kişi, ilgili anlaşmanın kapsamını ve yürürlüğünü kontrol etmelidir. Yapılandırma tamamlandıktan sonra forma dönüp yeni bir önizleme al ve güncel etkileri ayrıca onayla.",
+    "limited": "Yalnız ilk belirlenen anlaşma engeli gösterilir. Yeni önizlemede başka engeller çıkabilir."
   }
 }
