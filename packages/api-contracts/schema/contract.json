@@ -51844,6 +51844,22 @@
           }
         }
       ]
+    },
+    "CrmProviderReceipt": {
+      "type": "object",
+      "properties": {
+        "application_id": {
+          "$ref": "#/$defs/FtkUuid"
+        },
+        "replayed": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "application_id",
+        "replayed"
+      ],
+      "additionalProperties": false
     }
   },
   "x-contract": {
@@ -95572,6 +95588,12 @@
         "origin": "ftksaas",
         "acceptance": "generic_uuid",
         "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/CrmProviderReceipt/properties/application_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
       }
     ],
     "open_product_decisions": [],
@@ -95743,6 +95765,10 @@
       {
         "function": "private.crm_provider_submit",
         "kind": "native_receiver_form_scoped_atomic_common_intake"
+      },
+      {
+        "function": "private.crm_provider_authorize",
+        "kind": "native_receiver_form_admission_before_provider_io"
       }
     ],
     "runtime": {
@@ -95975,7 +96001,7 @@
       "uuid": "backend uuid@14.0.3 v7 for all inserted IDs; DB defaults not required",
       "external_transport": "POST /functions/v1/backend-v1/{operation}; direct typed request body",
       "internal_rpc": "service-only api_v1 named functions; actor/session/UUID bank supplied by verified gateway",
-      "migration_count": 105,
+      "migration_count": 106,
       "acceptance_source": "apps/backend/docs/00-FtkSaaS-yeni-sohbet-devir.md"
     },
     "decision_sprint": {

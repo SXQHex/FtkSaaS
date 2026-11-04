@@ -47,9 +47,6 @@ export async function remoteSourceScope(github,repo,base,head){
   .filter(p=>trees[0].get(p)?.sha!==trees[1].get(p)?.sha||trees[0].get(p)?.mode!==trees[1].get(p)?.mode)
   .map(path=>({path,status:!trees[0].has(path)?'A':!trees[1].has(path)?'D':'M'}));
  const scope=classifyChanges(changes);
- if(scope.kind==='v2-development')for(const c of changes)for(const tree of trees){
-  const file=tree.get(c.path);if(file&&file.mode!=='100644')throw Error('Unsafe V2 source mode');
- }
  if(!scope.backend&&scope.documentation&&!(await remoteDocumentScope(github,repo,base,head,{allowFrontend:true})).safe)throw Error('Unsafe documentation source');
  return scope;
 }

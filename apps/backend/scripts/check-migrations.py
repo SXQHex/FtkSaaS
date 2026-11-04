@@ -211,3 +211,5 @@ assert next(Path('supabase/migrations').glob('*_subscriber_operation_projections
 assert next(Path('supabase/migrations').glob('*_event_capacity_practice.sql')).read_bytes()==Path('database/event-capacity-practice.sql').read_bytes(),'Event capacity/package source drift'
 
 assert next(Path('supabase/migrations').glob('*_crm_provider_intake.sql')).read_bytes()==Path('database/crm-provider-intake.sql').read_bytes(),'Provider intake source drift'
+
+assert next(Path('supabase/migrations').glob('*_crm_provider_route.sql')).read_bytes()==Path('database/crm-provider-route.sql').read_bytes(),'Provider route source drift'

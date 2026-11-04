@@ -1,6 +1,8 @@
 import './crm-meta-lead-unit.mjs';
 import './crm-meta-graph-unit.mjs';
 import './crm-provider-intake-unit.mjs';
+import './crm-provider-mapping-unit.mjs';
+import './crm-provider-webhook-unit.mjs';
 import './crm-google-lead-unit.mjs';
 import './crm-web-form-unit.mjs';
 import './document-self-contract-unit.mjs';

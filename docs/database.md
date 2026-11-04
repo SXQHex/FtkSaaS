@@ -1,10 +1,10 @@
 # Veritabanı kaynak referansı
 
-Üretilmiştir: `node apps/backend/scripts/update-docs.mjs --write`. Elle düzenleme. Kaynak içerik özeti: `0521e5cb21830b094b02f8ad42630af90c74eaaaafb332efe01a12844c5c28bf`. Bu özet CI/hosted kabulü değildir; dağıtılan SHA ve ortam CD artifact'ında bulunur.
+Üretilmiştir: `node apps/backend/scripts/update-docs.mjs --write`. Elle düzenleme. Kaynak içerik özeti: `34a4f49afde0f760cc651779111df92dade76968f84e90906c4d749671b130bc`. Bu özet CI/hosted kabulü değildir; dağıtılan SHA ve ortam CD artifact'ında bulunur.
 
 Alan/scope/değişmez görünümü [fiziksel şema kataloğundadır](contracts/04-FtkSaaS-O4-veri-semasi.md). Bu dosya ikinci DDL sözleşmesi değildir. Etkin PostgreSQL şeması migration zincirinin uygulanmasıyla oluşur; dosyaları regex ile birleştirmek nihai şema çıkarımı sayılmaz.
 
-Sıralı migration: 105. Uygulanmış içerik manifesti: [migrations.sha256.json](../apps/backend/database/migrations.sha256.json). CD, migration içeriklerini canlı geçmişle doğrular; dokümantasyon capture adımı ayrıca read-only pg_catalog snapshot ve Supabase CLI DB tiplerini alır. İş verisi/Auth satırı/secret toplanmaz.
+Sıralı migration: 106. Uygulanmış içerik manifesti: [migrations.sha256.json](../apps/backend/database/migrations.sha256.json). CD, migration içeriklerini canlı geçmişle doğrular; dokümantasyon capture adımı ayrıca read-only pg_catalog snapshot ve Supabase CLI DB tiplerini alır. İş verisi/Auth satırı/secret toplanmaz.
 
 | Migration | SHA256 |
 |---|---|
@@ -113,3 +113,4 @@ Sıralı migration: 105. Uygulanmış içerik manifesti: [migrations.sha256.json
 | [20261104131914_document_self_requirements.sql](../apps/backend/supabase/migrations/20261104131914_document_self_requirements.sql) | `02e541abadfb19f63141c10e33cc27698755fa7e10032200bd94fe453ed48291` |
 | [20261104131917_crm_application_intake.sql](../apps/backend/supabase/migrations/20261104131917_crm_application_intake.sql) | `65ea718668a031095265e936981bce6457759cfb538d1c4d525534249460e3ba` |
 | [20261105012400_crm_provider_intake.sql](../apps/backend/supabase/migrations/20261105012400_crm_provider_intake.sql) | `00fd9a3d81be075942172c873aa6cf07ec1317981152886e80893d7c059744bf` |
+| [20261105024500_crm_provider_route.sql](../apps/backend/supabase/migrations/20261105024500_crm_provider_route.sql) | `7d9349675a11a56cf4d86a7bf3e4574eb5dbc6c12588ba04fa1012d6216478d7` |

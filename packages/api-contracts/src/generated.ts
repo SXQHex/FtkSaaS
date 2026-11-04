@@ -3744,6 +3744,7 @@ CrmApplicationRouting?: CrmApplicationRouting
 CrmPhoneMatch?: CrmPhoneMatch
 CrmProviderAttribution?: CrmProviderAttribution
 CrmProviderDelivery?: CrmProviderDelivery
+CrmProviderReceipt?: CrmProviderReceipt
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -23379,4 +23380,15 @@ data: Mutation
  * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
  */
 trace_id: string
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "CrmProviderReceipt".
+ */
+export interface CrmProviderReceipt {
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+application_id: string
+replayed: boolean
 }

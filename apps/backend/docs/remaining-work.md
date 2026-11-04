@@ -427,6 +427,8 @@ Değişen dilimin sözleşme, üretilmiş tip/envanter, WF/F01–F33 izi ve alan
 - [ ] P08.2b.1 — Meta Graph sunucu okuma katmanının kaynak/native kabulü: sabit Graph hostu, açık sürüm/credential ve Page/form sınırı, lead/form/ad tutarlılığı, ayrı field_data/custom_disclaimer_responses kanıtı. HTTP/payload sınırları küçük unit suite ile doğrulanır; gerçek Page token/form erişimi ayrıca gerekir. Bu katman ortak inbox yazımı veya onay normalizasyonu değildir.
 - [ ] P08.2b.2 — Ortak native kalıcı alımın kaynak/aday kabulü: güvenilir provider/form tek eşlemesi, gerçek receiver LOGIN/form scope’u, kilit altında canlı yetki/plan, aynı tabloya dış lead tekilliği ve kapalı kaynak/onay görünümü. Meta/Google aynı sınırı kullanır; iki küçük native kökte yarış/inbox ve iptal/plan/rollback doğrulanır. Kaynak hazırlanması gerçek CI/hosted/provider kabulü değildir.
 - [ ] P08.2b — Güvenilir Page/form eşlemesiyle yetkili Graph lead verisini ve custom_disclaimer_responses yanıtlarını al; ardından aynı ortak başvuru modeline kalıcı dış kimlik tekilliğiyle yaz. Instagram platformunu Page nesnesinden tahmin etme; gerçek form/reklam kanıtıyla koru. Güvenilir token/yetki, native/gerçek sağlayıcı kabulü açık kalır.
+- [ ] P08.2c — HTTP/mapping adapter aday kabulü: imza → gerçek native form admission → Graph → açık alan/checkbox eşlemesi → receipt → ACK; küçük unit ve ayrı native HTTP kökü. Bu kaynak handler’ı hosted mount değildir.
+- [ ] P08.2d — Canlı mount öncesi Meta batch toplam süre bütçesini/kalıcı iş kuyruğunu çöz; commit prefix’ini yeniden okuyarak sonraki kayıtları host timeout’unda aç bırakma. Gerçek URL, credential, form/onay readback ve teslim/tekrar kabulü bundan sonra yapılır.
 - [ ] P08.3 — Yetkili gerçek Meta formundan tek kayıt ve retry kabulünü doğrula; yetkili inbox yeniden okumasıyla bağla. Sentetik payload başarıları gerçek sağlayıcı erişimi/teslimi yerine geçmez. Hesap erişimi veya entegrasyon kurulumu gerektiğinde somut eksik üzerinden ilerle.
 
 <a id="p09"></a>
@@ -446,6 +448,7 @@ Değişen dilimin sözleşme, üretilmiş tip/envanter, WF/F01–F33 izi ve alan
 - [ ] P09.2a — Google anahtar/form doğrulama ve normalizasyon kaynağının aday/main kabulü: int64 hassasiyeti, column_id eşlemesi, test/zaman/atfın korunması. [Kaynak/kanıt](00-FtkSaaS-yeni-sohbet-devir.md#p08p09-sağlayıcı-doğrulama-kaynak-dilimi); endpoint veya inbox yazımı değildir.
 - [ ] P09.2b.1 — P08.2b.2 ortak native alımını Google kaynak kimliği/test/zaman/atıf verisiyle doğrula; ayrı başvuru deposu kurulmaz. HTTP receiver/custom soru-onay eşlemesi ve gerçek Google teslimi ayrıca açık kalır.
 - [ ] P09.2b — Güvenilir provider/form→tenant eşlemesi, kalıcı lead_id tekilliği, custom soru/onay alanları, test kayıtları ve HTTP retry/ack ile ortak alımı tamamla. Provider kaynağını web_form gibi gösterme; web CAPTCHA'yı sentetik proof/bot_verified ile aşma.
+- [ ] P09.2c — Google HTTP200{} yalnız kalıcı receipt sonrası; kimlik/payload4xx ile geçici işlem5xx ayrımı, yalnız açık column_id alan/onay eşlemesi ve ortak native inbox readback kabulü. Gerçek form metni/sürümü/soru kimliği ve hosted URL doğrulanmadan live kapanış yoktur.
 - [ ] P09.3 — Yetkili gerçek Google formu→inbox ve tekrar teslimini doğrula; Meta başarısını Google kabulü sayma. Gerçek erişim eksikse mevcut bağımsız kaynak/test dilimlerini durdurma, bu kabulü açık bırak.
 
 <a id="p10"></a>

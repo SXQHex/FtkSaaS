@@ -18,7 +18,9 @@ function providerId(value){
  if(typeof value!=='string'||!/^[1-9][0-9]{0,18}$/.test(value)||BigInt(value)>9223372036854775807n)throw Error('PROVIDER_PAYLOAD');
  return value;
 }
-export function parseGoogleLead(raw,config){
+export function parseGoogleLead(raw,config,{extractColumns=[]}={}){
+ if(!Array.isArray(extractColumns)||extractColumns.length>100||new Set(extractColumns).size!==extractColumns.length||extractColumns.some(id=>!string(id,256)))throw Error('PROVIDER_CONFIG');
+ const selected=new Set([...columns,...extractColumns]);
  if(!object(config)||Object.keys(config).length!==2||!Object.hasOwn(config,'google_key')||!Object.hasOwn(config,'form_id')||!string(config.google_key,4096)||typeof config.form_id!=='string')throw Error('PROVIDER_CONFIG');
  let expectedForm;try{expectedForm=providerId(config.form_id);}catch{throw Error('PROVIDER_CONFIG');}
  let body;
@@ -40,7 +42,7 @@ export function parseGoogleLead(raw,config){
  if(Object.hasOwn(body,'lead_source')&&body.lead_source!=='LEAD_FORM')throw Error('PROVIDER_PAYLOAD');
  const fields=new Map();
  for(const item of body.user_column_data){
-  if(!object(item)||!columns.has(item.column_id))continue; // Provider extensions are not a closed DTO.
+  if(!object(item)||!selected.has(item.column_id))continue; // Provider extensions are not a closed DTO.
   if(fields.has(item.column_id)||typeof item.string_value!=='string')throw Error('PROVIDER_PAYLOAD');
   fields.set(item.column_id,item.string_value);
  }
@@ -50,9 +52,9 @@ export function parseGoogleLead(raw,config){
  const intake={display_name:display,phone,...(fields.has('EMAIL')?{email:fields.get('EMAIL')}:{}),consents:[]};
  if(!validIntake(intake))throw Error('PROVIDER_PAYLOAD');
  let submitted=null;
- if(Object.hasOwn(body,'lead_submit_time')){if(!validTime(body.lead_submit_time))throw Error('PROVIDER_PAYLOAD');submitted=new Date(body.lead_submit_time).toISOString();}
+ if(Object.hasOwn(body,'lead_submit_time')){if(!validTime(body.lead_submit_time)||!Number.isFinite(Date.parse(body.lead_submit_time)))throw Error('PROVIDER_PAYLOAD');submitted=new Date(body.lead_submit_time).toISOString();}
  const attribution={};
  for(const key of ['campaign_id','adgroup_id','creative_id','asset_group_id'])if(Object.hasOwn(body,key))attribution[key]=providerId(body[key]);
  if(Object.hasOwn(body,'gcl_id')){if(!string(body.gcl_id,2048))throw Error('PROVIDER_PAYLOAD');attribution.gcl_id=body.gcl_id;}
- return {provider:'google_ads',external_form_id:expectedForm,external_lead_id:body.lead_id,is_test:body.is_test??false,lead_source:body.lead_source??null,submitted_at:submitted,attribution,intake};
+ return {...(extractColumns.length?{mapped_answers:Object.fromEntries(extractColumns.filter(id=>fields.has(id)).map(id=>[id,fields.get(id)]))}:{}),provider:'google_ads',external_form_id:expectedForm,external_lead_id:body.lead_id,is_test:body.is_test??false,lead_source:body.lead_source??null,submitted_at:submitted,attribution,intake};
 }
