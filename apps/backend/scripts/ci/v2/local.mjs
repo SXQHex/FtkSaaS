@@ -31,7 +31,7 @@ else if(command==='prepare'){
  fs.writeFileSync(marker,JSON.stringify(identity),{mode:0o600});
  const output=repoFile('.artifacts','ci-v2');fs.mkdirSync(output,{recursive:true});
  fs.writeFileSync(path.join(output,'source.json'),JSON.stringify({
-  ...identity,tree:git('rev-parse','HEAD^{tree}'),mode:'shadow',scope:process.env.CI_V2_BACKEND_SHARD?'backend-shadow':'room-pilot',full_clean:false,
+  ...identity,tree:git('rev-parse','HEAD^{tree}'),mode:'shadow',scope:process.env.CI_V2_CORE==='true'?'core-shadow':process.env.CI_V2_BACKEND_SHARD?'backend-shadow':'room-pilot',full_clean:false,
   backend_shard:process.env.CI_V2_BACKEND_SHARD??null
  },null,2)+'\n');
  run('pnpm',['run','dev:start']);
