@@ -267,13 +267,13 @@
     "id": "starter-operations-acceptance",
     "file": "apps/backend/tests/v2/backend/starter-operations-acceptance.test.mjs",
     "legacy_source": "apps/backend/tests/starter-operations-acceptance.mjs",
-    "estimated_seconds": 87.57683894821211
+    "estimated_seconds": 75.02473297559894
   },
   {
     "id": "starter-operations-reports",
     "file": "apps/backend/tests/v2/backend/starter-operations-reports.test.mjs",
     "legacy_source": "apps/backend/tests/starter-operations-acceptance.mjs",
-    "estimated_seconds": 109.8480060501073
+    "estimated_seconds": 49.030287433827304
   },
   {
     "id": "canonical-settings-migration-acceptance",
@@ -400,5 +400,29 @@
     "file": "apps/backend/tests/crm-application-review-acceptance.mjs",
     "legacy_source": "apps/backend/tests/crm-application-review-acceptance.mjs",
     "estimated_seconds": 45.837029525083345
+  },
+  {
+    "id": "starter-operations-report-shaping",
+    "file": "apps/backend/tests/v2/backend/starter-operations-report-shaping.test.mjs",
+    "legacy_source": "apps/backend/tests/starter-operations-acceptance.mjs",
+    "estimated_seconds": 45.09947123727795
+  },
+  {
+    "id": "starter-operations-import-templates",
+    "file": "apps/backend/tests/v2/backend/starter-operations-import-templates.test.mjs",
+    "legacy_source": "apps/backend/tests/starter-operations-acceptance.mjs",
+    "estimated_seconds": 37.87082614985135
+  },
+  {
+    "id": "starter-operations-report-access",
+    "file": "apps/backend/tests/v2/backend/starter-operations-report-access.test.mjs",
+    "legacy_source": "apps/backend/tests/starter-operations-acceptance.mjs",
+    "estimated_seconds": 37.23084450930995
+  },
+  {
+    "id": "starter-operations-inbox",
+    "file": "apps/backend/tests/v2/backend/starter-operations-inbox.test.mjs",
+    "legacy_source": "apps/backend/tests/starter-operations-acceptance.mjs",
+    "estimated_seconds": 43.21449799000028
   }
 ]

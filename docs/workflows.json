@@ -298,8 +298,8 @@
         "management_state_get_v1"
       ],
       "review": {
-        "fingerprint": "2009bf6cba9b4698020889675f5a936a0701c66abd85c83a611c1b354ad7cf57",
-        "reason": "Reviewed exact-source V2 scoped shadow dispatch: common baseline always required, frontend/backend independent, reusable manual guards, core+20API retained, four browsers reuse source-bound build, no deploy or production acceptance; regular-file diff and failed/skipped summaries fail closed."
+        "fingerprint": "d19b35c45bd41fc92986ce60602d0b45ca3d69dd2f9a98da23cb575c7741b1b9",
+        "reason": "Reviewed source-selected V2 shadow with current main ST-02 six direct roots; exact expiring assertion relocation fingerprints preserve all copied bodies under unchanged byte parity. Twenty shards, source guards, production proof and deployment remain unchanged."
       }
     },
     {
@@ -611,7 +611,11 @@
         "apps/backend/tests/v2/backend/person-registry-root-2.test.mjs",
         "apps/backend/tests/v2/backend/registry-root-1.test.mjs",
         "apps/backend/tests/v2/backend/starter-operations-acceptance.test.mjs",
-        "apps/backend/tests/v2/backend/starter-operations-reports.test.mjs"
+        "apps/backend/tests/v2/backend/starter-operations-reports.test.mjs",
+        "apps/backend/tests/v2/backend/starter-operations-report-shaping.test.mjs",
+        "apps/backend/tests/v2/backend/starter-operations-import-templates.test.mjs",
+        "apps/backend/tests/v2/backend/starter-operations-report-access.test.mjs",
+        "apps/backend/tests/v2/backend/starter-operations-inbox.test.mjs"
       ],
       "sources": [
         "apps/backend/database/active-discipline-projection-wrappers.sql",
@@ -680,8 +684,8 @@
         "person_discipline_set_v1"
       ],
       "review": {
-        "fingerprint": "798e4d7919641c7d8612502bf6789593fc96acd0a7dc5b6ae1ed545bc2ffa978",
-        "reason": "Main PR185 V2 kaynak/test bağları ile PR182 CRM/self bağları birlikte incelendi;67 gerçek birim parity kontrolünde aynı gövdeleri korur, üretim kabul kapıları değişmez."
+        "fingerprint": "28c280aaea9832d754caedd067943bfc3a1ba47177f872d57348b0d2252d8d12",
+        "reason": "Reviewed main ST-02 split and direct V2 copies: six independent roots preserve current production bodies and assertions with import/resource relocation only; copied shared setup and estimated weights remain explicit, twenty nonempty diagnostic shards retained, no production acceptance changes."
       }
     },
     {
@@ -959,7 +963,11 @@
         "apps/backend/tests/v2/backend/starter-attendance-revisions.test.mjs",
         "apps/backend/tests/v2/backend/starter-attendance-authority.test.mjs",
         "apps/backend/tests/v2/backend/starter-attendance-ledger.test.mjs",
-        "apps/backend/tests/v2/backend/starter-attendance-policy.test.mjs"
+        "apps/backend/tests/v2/backend/starter-attendance-policy.test.mjs",
+        "apps/backend/tests/v2/backend/starter-operations-report-shaping.test.mjs",
+        "apps/backend/tests/v2/backend/starter-operations-import-templates.test.mjs",
+        "apps/backend/tests/v2/backend/starter-operations-report-access.test.mjs",
+        "apps/backend/tests/v2/backend/starter-operations-inbox.test.mjs"
       ],
       "sources": [
         "apps/backend/database/active-discipline-projection-wrappers.sql",
@@ -1004,8 +1012,8 @@
         "debt_adjust_v1"
       ],
       "review": {
-        "fingerprint": "a1529207cbb01c12e091caa2b0d2d277eac4babc3d76510f0abe0fea5898c8f7",
-        "reason": "Direct V2 shadow migration: byte-equivalence and module/resource relocation checks preserve the owning legacy test bodies; runtime and guide behavior unchanged. Twenty-runner execution remains diagnostic only."
+        "fingerprint": "c34113a0610ccd428b765c0b813af0b21e518c5839ceaf362aac5afe19b0efa3",
+        "reason": "Reviewed main ST-02 split and direct V2 copies: six independent roots preserve current production bodies and assertions with import/resource relocation only; copied shared setup and estimated weights remain explicit, twenty nonempty diagnostic shards retained, no production acceptance changes."
       }
     },
     {
@@ -1073,7 +1081,11 @@
         "apps/backend/tests/starter-operations-acceptance.mjs",
         "apps/backend/tests/subscriber-number-acceptance.mjs",
         "apps/backend/tests/v2/backend/starter-operations-acceptance.test.mjs",
-        "apps/backend/tests/v2/backend/starter-operations-reports.test.mjs"
+        "apps/backend/tests/v2/backend/starter-operations-reports.test.mjs",
+        "apps/backend/tests/v2/backend/starter-operations-report-shaping.test.mjs",
+        "apps/backend/tests/v2/backend/starter-operations-import-templates.test.mjs",
+        "apps/backend/tests/v2/backend/starter-operations-report-access.test.mjs",
+        "apps/backend/tests/v2/backend/starter-operations-inbox.test.mjs"
       ],
       "sources": [
         "apps/backend/database/p05-bind.sql",
@@ -1105,8 +1117,8 @@
         "file_upload_complete_v1"
       ],
       "review": {
-        "fingerprint": "27f7c327a21554c5c9d0871aee7436245cefb0f097248767dc96b33fba8317a4",
-        "reason": "Direct V2 shadow migration: byte-equivalence and module/resource relocation checks preserve the owning legacy test bodies; runtime and guide behavior unchanged. Twenty-runner execution remains diagnostic only."
+        "fingerprint": "b3ecd0086c777052b942ebd1f0438e8d12ff23bf0d02e5cef9336cc006926e1d",
+        "reason": "Reviewed main ST-02 split and direct V2 copies: six independent roots preserve current production bodies and assertions with import/resource relocation only; copied shared setup and estimated weights remain explicit, twenty nonempty diagnostic shards retained, no production acceptance changes."
       }
     },
     {
@@ -1122,7 +1134,11 @@
         "apps/backend/tests/document-self-requirements-acceptance.mjs",
         "apps/backend/tests/document-self-contract-unit.mjs",
         "apps/backend/tests/v2/backend/starter-operations-acceptance.test.mjs",
-        "apps/backend/tests/v2/backend/starter-operations-reports.test.mjs"
+        "apps/backend/tests/v2/backend/starter-operations-reports.test.mjs",
+        "apps/backend/tests/v2/backend/starter-operations-report-shaping.test.mjs",
+        "apps/backend/tests/v2/backend/starter-operations-import-templates.test.mjs",
+        "apps/backend/tests/v2/backend/starter-operations-report-access.test.mjs",
+        "apps/backend/tests/v2/backend/starter-operations-inbox.test.mjs"
       ],
       "sources": [
         "apps/backend/database/p05-bind.sql",
@@ -1146,8 +1162,8 @@
         "document_publication_preview_v1"
       ],
       "review": {
-        "fingerprint": "24e7d3763c462a56fec5273f32cb1fa9e0f7b29317047e9fe421718c64d0b142",
-        "reason": "Main PR185 V2 kaynak/test bağları ile PR182 CRM/self bağları birlikte incelendi;67 gerçek birim parity kontrolünde aynı gövdeleri korur, üretim kabul kapıları değişmez."
+        "fingerprint": "fa1d01182dd1b9d64d0ddc1afe7d64f6ae657eef02885b8d4728be7cd8290646",
+        "reason": "Reviewed main ST-02 split and direct V2 copies: six independent roots preserve current production bodies and assertions with import/resource relocation only; copied shared setup and estimated weights remain explicit, twenty nonempty diagnostic shards retained, no production acceptance changes."
       }
     },
     {
@@ -1166,7 +1182,11 @@
         "apps/backend/tests/v2/backend/settings-startup-context.test.mjs",
         "apps/backend/tests/v2/backend/settings-brand-colors.test.mjs",
         "apps/backend/tests/v2/backend/starter-operations-acceptance.test.mjs",
-        "apps/backend/tests/v2/backend/starter-operations-reports.test.mjs"
+        "apps/backend/tests/v2/backend/starter-operations-reports.test.mjs",
+        "apps/backend/tests/v2/backend/starter-operations-report-shaping.test.mjs",
+        "apps/backend/tests/v2/backend/starter-operations-import-templates.test.mjs",
+        "apps/backend/tests/v2/backend/starter-operations-report-access.test.mjs",
+        "apps/backend/tests/v2/backend/starter-operations-inbox.test.mjs"
       ],
       "sources": [
         "apps/backend/config/frontend-settings.json",
@@ -1204,8 +1224,8 @@
         "settings_preparation_resolve_v1"
       ],
       "review": {
-        "fingerprint": "de8465cf52a9a782a050bc667556d9ed1e394a129f552fcd97b9f21693061491",
-        "reason": "Direct V2 shadow migration: byte-equivalence and module/resource relocation checks preserve the owning legacy test bodies; runtime and guide behavior unchanged. Twenty-runner execution remains diagnostic only."
+        "fingerprint": "9f31855598c39e102f53ffd8abe0534655f19da82b3466a94d85dee73a4a269d",
+        "reason": "Reviewed main ST-02 split and direct V2 copies: six independent roots preserve current production bodies and assertions with import/resource relocation only; copied shared setup and estimated weights remain explicit, twenty nonempty diagnostic shards retained, no production acceptance changes."
       }
     },
     {

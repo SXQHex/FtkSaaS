@@ -261,8 +261,8 @@ test('eight-shard acceptance requires all eight source-bound jobs and rejects le
  const v=promoteFixture(valid());v.binding.source_attempt=1;v.jobs[0].steps.push({name:'Upload schema baseline',conclusion:'success'});
  assert(validateBinding(v));
  assert.equal(acceptancePlan().length,8);
- const currentPlan=acceptancePlan(),added=new Set(['document-self-requirements-acceptance','crm-application-intake-acceptance','crm-application-review-acceptance']);
- const allIds=currentPlan.flatMap(b=>b.units.map(u=>u.id));assert.equal(allIds.length,67);assert.equal(new Set(allIds).size,allIds.length);
+ const currentPlan=acceptancePlan(),added=new Set(['document-self-requirements-acceptance','crm-application-intake-acceptance','crm-application-review-acceptance','starter-operations-report-shaping','starter-operations-import-templates','starter-operations-report-access','starter-operations-inbox']);
+ const allIds=currentPlan.flatMap(b=>b.units.map(u=>u.id));assert.equal(allIds.length,64+added.size);assert.equal(new Set(allIds).size,allIds.length);
  for(const id of added)assert(allIds.includes(id),'Missing new acceptance unit '+id);
  {
   const acceptancePlan=()=>currentPlan.map(b=>({...b,units:b.units.filter(u=>!added.has(u.id))}));

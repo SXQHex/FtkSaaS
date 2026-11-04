@@ -2,6 +2,8 @@
 
 Bu dosya yalnız **sıra, bağımlı teslim paketleri ve kontrol noktalarının** sahibidir. Görev içeriği/kabul/dosya alanı [remaining-work.md](remaining-work.md), gerçek kaynak/test/hosted durum [00 devir](00-FtkSaaS-yeni-sohbet-devir.md) sahibindedir. Frontend’in aktif modülü ve sırası değiştirilmez. İkinci roadmap/todo açılmaz.
 
+**Aktif kabul onarımı:** Kullanıcının ayrı sonraki PR talimatıyla önce [ST-02 rapor kökü bölünmesi](remaining-work.md#takip-ve-tamamlanma-kuralı), ardından main kabulü ve PR190 senkronizasyonu yürür. Aynı başarısız kaynağa üçüncü kör tekrar açılmaz; P08–P11 kapsamı kendi sırasında korunur.
+
 ## Uygulama sırası
 
 **4 Kasım telefon kontrol noktası:** [S08 native telefon backend dilimi](remaining-work.md#s08), PR183 aday/main/development kabulüyle tamamlandı; [kanıt](00-FtkSaaS-yeni-sohbet-devir.md#native-telefon-test-numarası-dilimi). Kalan frontend consumer/ekran kabulü [XREQ-017](../../../docs/requests.md#xreq-017) ve PR184 sahibindedir. CRM PR182 ve CI PR185 ayrı yürütülür; bu kapanış onların kaynağını veya sırasını değiştirmez.
