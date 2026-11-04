@@ -229,6 +229,10 @@ A03.1 kaynak/plan/WF eşlemesi main'de; A03.2/A03.3 genel özellik bazlı kanıt
 | Limit/CRM/Pratik | P01 etkin limit ve açık sınırsız DTO backend teslimi tamamlandı; frontend XREQ-014, telefon temelli genel alım ve kredi tüketmeyen katılım kendi backlog sahiplerinde açık. |
 | CI kapanış teşhisi | Önceki timeout düzeltmesi ve başarılı rerun sinyali gönderen süreç/host kaynağının kanıtı değildir. Yeni olay olmadan kök neden ilan edilmez; mevcut başarılı kaynak kabulü keyfî geri açılmaz. |
 
+## CRM karar aktarımı
+
+4 Kasım kullanıcı kararı mevcut [P08](../../../docs/decisions/P08-accepted-scope.md) ve [ürün kapsamı](../../../docs/contracts/01-FtkSaaS-urun-kapsam-sozlesmesi.md) sahiplerine işlendi. Backend işi/kabulü [P05](remaining-work.md#p05), iç sıra [kuyruk](production-queue.md) sahibindedir. Bu dilim yalnız belge aktarımıdır; yeni runtime, migration, API veya hosted kabulü yoktur. Aktif P12/P13 PR172 ve frontend S03 kabulü bu işlemle kapanmaz veya durdurulmaz. Uygulama ajanı işe başlarken güncel kaynak/CI ve açık PR'leri yeniden doğrular.
+
 ## Alanlar arası koordinasyon
 
 Frontend kaynak/ekran kabulünün sahibi [frontend devri](../../web/docs/handover.md) ve [frontend planıdır](../../web/docs/todo.md). Backend bunları değiştirmez veya karşı taraf adına kapatmaz. Somut teslim/ret/erteleme yalnız [ortak taleplerde](../../../docs/requests.md) kendi alanına yazılır. Sonraki doğal belge değişikliğinde doğrulanmış güncel snapshot değiştirilir; run linki için sonsuz commit veya ikinci durum tablosu kurulmaz.

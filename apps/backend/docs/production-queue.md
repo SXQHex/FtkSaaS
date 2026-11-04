@@ -34,6 +34,18 @@ Bu dosya yalnız **sıra, bağımlı teslim paketleri ve kontrol noktalarının*
 
 4 Kasım kullanıcı talimatıyla `feature/pro-lifecycle-earnings-acceptance` branch'i P03/P04 için main'den ayrı hazırlanır. PR167 main'e alındıktan sonra PR168 güncel main ile senkronize edilir; P02 teslim kanıtı kendi devir kaydında korunur. İç sıra: mevcut kaynak/kabul incelemesi → bağlı Pro/Business paket/teklif ve hakediş/ödeme kanıtı → kendi aday kabulü. Kullanıcı talimatıyla PR169 CLI/deney değişikliği PR168 dalına alınır; yalnız birleşik PR168 aday kabulü çalıştırılır ve PR169 main'e alınmadan kapatılır. Nihai P03/P04 kapanışı kendi kaynak/ortam kanıtlarıyla yapılır. Görev ayrıntısı [P03](remaining-work.md#p03)/[P04](remaining-work.md#p04), kaynak/ortam [devir](00-FtkSaaS-yeni-sohbet-devir.md#p03p04-paralel-kaynak-paketi) sahibindedir.
 
+## CRM paketinin iç sırası
+
+[CRM kararının](../../../docs/decisions/P08-accepted-scope.md) aktarımı mevcut P05–P11 paketine yapılır; ayrı karar sprinti açılmaz. Bu belge değişikliği açık PR172'nin P12/P13 çalışmasını veya diğer aktif paketi öne/geriye taşımaz. Görev ayrıntısı ve kabulün tek sahibi [P05](remaining-work.md#p05) ve devamındaki işlerdir.
+
+1. Kısa mevcut karar/runtime uyumu; yalnız gerçek ürün boşluklarını ayırma.
+2. P05 Starter temel dilimi ve frontend'e okuma/yazma sözleşme devri.
+3. P05/P06 ortak kutu ve inceleme/eşleme, ardından P07 web formu.
+4. Gerçek kullanım ve erişime göre P08/P09'dan ilk sağlayıcı, sonra diğeri. Görev numarası ilk sağlayıcının seçildiği anlamına gelmez.
+5. P10 kontrollü eski kayıt aktarımı ve P11 ileri CRM, kendi bağımlılık ve yetkileriyle; Starter kapanışı bunları beklemez.
+
+Reklam performans/harcama ve dönüşüm geri bildirimi sonraki ayrı dilimlerdir. Kaynak desteği ile gerçek sağlayıcı/ekran kabulü aynı kapanış değildir.
+
 ## Ortak işletim hattı
 
 [A03](remaining-work.md#a03) sonrası [O01](remaining-work.md#o01)–[O03](remaining-work.md#o03) başlayabilir. Ardından [O04](remaining-work.md#o04)/[O05](remaining-work.md#o05) → [O06](remaining-work.md#o06) → [O07](remaining-work.md#o07) → [O08](remaining-work.md#o08) → [O09](remaining-work.md#o09). [O10](remaining-work.md#o10) gerekli alarm/restore kaynaklarıyla yürür. E-posta gerçek yük kabulü P14–P16’yı bekler. Ortak işletim bütün ürün işlerinin sonuna ertelenmez.
