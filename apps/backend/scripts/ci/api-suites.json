@@ -352,7 +352,7 @@
     },
     {
       "path": "apps/backend/tests/person-registry.test.mjs",
-      "sha256": "ea0d18d57621bed245000b380568096ad9b4dd6a45d6ff83ce4b7bdbf651beee",
+      "sha256": "01bd26129b397f3e49a05d56a8da1e9a85c21a2d598f09a33f18e3180512f2fa",
       "shared": [
         [
           7,
@@ -378,7 +378,7 @@
           "ranges": [
             [
               116,
-              277
+              353
             ]
           ]
         }
@@ -663,15 +663,15 @@
         {
           "line": 136,
           "path": "apps/backend/tests/starter-plan-gates-acceptance.mjs",
-          "sha256": "dc94dc90b03a6f736632632742aecc745cda83d6ae38d047630f3d71b9263a11",
+          "sha256": "d3d05ce84d70c457f0c5ba69c741752d50eaf90464f7bebbc81d9146fdb00de2",
           "shared": [
             [
               1,
               27
             ],
             [
-              106,
-              106
+              107,
+              107
             ]
           ],
           "parts": [
@@ -680,7 +680,7 @@
               "ranges": [
                 [
                   28,
-                  105
+                  106
                 ]
               ]
             },
@@ -688,8 +688,8 @@
               "id": "starter-plan-downgrade",
               "ranges": [
                 [
-                  107,
-                  260
+                  108,
+                  261
                 ]
               ]
             }

@@ -1,6 +1,6 @@
 # API ve iş akışı haritası
 
-Üretilmiştir: `node apps/backend/scripts/update-docs.mjs --write`. Elle düzenleme. Kaynak içerik özeti: `ae8935d916e29d6f1da1c1fb95d86bfb1fa0d92ede1559cce099e98cc55d74d3`. Bu özet CI/hosted kabulü değildir; dağıtılan SHA ve ortam CD artifact'ında bulunur.
+Üretilmiştir: `node apps/backend/scripts/update-docs.mjs --write`. Elle düzenleme. Kaynak içerik özeti: `5de234bf87e3fb63ecd3f3b0606aeebf20e825e7efda97b37e68ffbb7e216487`. Bu özet CI/hosted kabulü değildir; dağıtılan SHA ve ortam CD artifact'ında bulunur.
 
 DTO/izin/hata/yan etkiler [üretilmiş API kataloğu](contracts/05-FtkSaaS-O4-API-katalogu.md) ve [makine sözleşmesinden](../packages/api-contracts/schema/contract.json) gelir. Edge kodu [backend-v1](../apps/backend/supabase/functions/backend-v1/index.ts) altındadır; SQL domain davranışını Edge dosyasından tek başına çıkarma. `implemented.json` içindeki varlık tüm selector/provider/ürün kabulünün tamamlandığı anlamına gelmez. Backend-only satırları tarayıcı endpoint önerisi değildir.
 
@@ -109,15 +109,15 @@ DTO/izin/hata/yan etkiler [üretilmiş API kataloğu](contracts/05-FtkSaaS-O4-AP
 | `earnings_list_v1` | runtime (sınırları oku) | read | earnings.read | [WF14](workflows.md#wf14) / upper-plan |
 | `instructor_payment_record_v1` | runtime (sınırları oku) | command | earnings.manage | [WF14](workflows.md#wf14) / upper-plan |
 | `instructor_payment_correct_v1` | runtime (sınırları oku) | correction | earnings.manage | [WF14](workflows.md#wf14) / upper-plan |
-| `leads_list_v1` | runtime (sınırları oku) | read | crm.daily | [WF16](workflows.md#wf16) / upper-plan |
-| `lead_save_v1` | runtime (sınırları oku) | command | crm.daily | [WF16](workflows.md#wf16) / upper-plan |
-| `crm_activity_save_v1` | runtime (sınırları oku) | command | crm.daily | [WF16](workflows.md#wf16) / upper-plan |
-| `trial_offer_create_v1` | runtime (sınırları oku) | command | crm.daily | [WF16](workflows.md#wf16) / upper-plan |
-| `trial_registration_confirm_v1` | runtime (sınırları oku) | command | crm.daily | [WF16](workflows.md#wf16) / upper-plan |
-| `lead_convert_v1` | runtime (sınırları oku) | command | crm.daily | [WF16](workflows.md#wf16) / upper-plan |
-| `crm_followup_list_v1` | runtime (sınırları oku) | read | crm.daily | [WF16](workflows.md#wf16) / upper-plan |
-| `segment_save_v1` | runtime (sınırları oku) | command | crm.manage | [WF16](workflows.md#wf16) / upper-plan |
-| `automation_save_v1` | runtime (sınırları oku) | command | crm.manage | [WF16](workflows.md#wf16) / upper-plan |
+| `leads_list_v1` | runtime (sınırları oku) | read | crm.daily | [WF16](workflows.md#wf16) / common |
+| `lead_save_v1` | runtime (sınırları oku) | command | crm.daily | [WF16](workflows.md#wf16) / common |
+| `crm_activity_save_v1` | runtime (sınırları oku) | command | crm.daily | [WF16](workflows.md#wf16) / common |
+| `trial_offer_create_v1` | runtime (sınırları oku) | command | crm.daily | [WF16](workflows.md#wf16) / common |
+| `trial_registration_confirm_v1` | runtime (sınırları oku) | command | crm.daily | [WF16](workflows.md#wf16) / common |
+| `lead_convert_v1` | runtime (sınırları oku) | command | crm.daily | [WF16](workflows.md#wf16) / common |
+| `crm_followup_list_v1` | runtime (sınırları oku) | read | crm.daily | [WF16](workflows.md#wf16) / common |
+| `segment_save_v1` | runtime (sınırları oku) | command | crm.manage | [WF16](workflows.md#wf16) / common |
+| `automation_save_v1` | runtime (sınırları oku) | command | crm.manage | [WF16](workflows.md#wf16) / common |
 | `notifications_list_v1` | runtime (sınırları oku) | read | notification.self | [WF11](workflows.md#wf11) / starter |
 | `notification_mark_read_v1` | runtime (sınırları oku) | command | notification.self | [WF11](workflows.md#wf11) / starter |
 | `notification_preferences_set_v1` | runtime (sınırları oku) | command | notification.self | [WF12](workflows.md#wf12) / starter |
@@ -247,7 +247,7 @@ Test dosyası bağlantısı çalıştırılmış test başarısı değildir. Kay
 - [WF13 — Abonelik ve plan erişimi](workflows.md#wf13): [alan devri](workflows.md); [p07-subscription-lifecycle-acceptance.mjs](../apps/backend/tests/p07-subscription-lifecycle-acceptance.mjs), [starter-plan-gates-acceptance.mjs](../apps/backend/tests/starter-plan-gates-acceptance.mjs), [p07-subscription-lifecycle.sql](../apps/backend/tests/fixtures/p07-subscription-lifecycle.sql), [p07-lifecycle-acceptance.mjs](../apps/backend/tests/p07-lifecycle-acceptance.mjs), [subscription-period-acceptance.mjs](../apps/backend/tests/subscription-period-acceptance.mjs), [commercial-plan-acceptance.mjs](../apps/backend/tests/commercial-plan-acceptance.mjs)
 - [WF14 — Anlaşma, hakediş ve eğitmen ödemesi](workflows.md#wf14): [alan devri](workflows.md); [instructor-earnings.test.mjs](../apps/backend/tests/instructor-earnings.test.mjs), [event-payment.test.mjs](../apps/backend/tests/event-payment.test.mjs), [program-configuration-acceptance.mjs](../apps/backend/tests/program-configuration-acceptance.mjs), [earning-payment-selection-acceptance.mjs](../apps/backend/tests/earning-payment-selection-acceptance.mjs), [pro-lifecycle-earnings-acceptance.mjs](../apps/backend/tests/pro-lifecycle-earnings-acceptance.mjs)
 - [WF15 — Etkinlik kayıt, ödeme ve iptal](workflows.md#wf15): [alan devri](workflows.md); [event-payment.test.mjs](../apps/backend/tests/event-payment.test.mjs), [event-cancellation.test.mjs](../apps/backend/tests/event-cancellation.test.mjs), [api-acceptance.test.mjs](../apps/backend/tests/api-acceptance.test.mjs), [event-capacity-package-acceptance.mjs](../apps/backend/tests/event-capacity-package-acceptance.mjs)
-- [WF16 — Genel CRM ve otomasyon](workflows.md#wf16): [alan devri](workflows.md); [p05-acceptance.mjs](../apps/backend/tests/p05-acceptance.mjs), [person-registry.test.mjs](../apps/backend/tests/person-registry.test.mjs)
+- [WF16 — Temel aday takibi, genel CRM ve otomasyon](workflows.md#wf16): [alan devri](workflows.md); [p05-acceptance.mjs](../apps/backend/tests/p05-acceptance.mjs), [person-registry.test.mjs](../apps/backend/tests/person-registry.test.mjs)
 - [WF17 — Kapatma, silme ve platform yönetimi](workflows.md#wf17): [alan devri](workflows.md); [p07-lifecycle-acceptance.mjs](../apps/backend/tests/p07-lifecycle-acceptance.mjs), [p07-account-revocation-acceptance.mjs](../apps/backend/tests/p07-account-revocation-acceptance.mjs), [restore-guard.test.mjs](../apps/backend/tests/restore-guard.test.mjs), [api-acceptance.test.mjs](../apps/backend/tests/api-acceptance.test.mjs), [p07-subscription-lifecycle.sql](../apps/backend/tests/fixtures/p07-subscription-lifecycle.sql)
 - [WF18 — Merkezler arası hesaplaşma](workflows.md#wf18): [alan devri](workflows.md); [cross-center-settlement.test.mjs](../apps/backend/tests/cross-center-settlement.test.mjs)
 - [WF19 — Bekleme listesi ve yer teklifi](workflows.md#wf19): [alan devri](workflows.md); [p01-waitlist-workers.test.mjs](../apps/backend/tests/p01-waitlist-workers.test.mjs), [pro-lifecycle-earnings-acceptance.mjs](../apps/backend/tests/pro-lifecycle-earnings-acceptance.mjs)

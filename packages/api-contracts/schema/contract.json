@@ -65741,14 +65741,18 @@
         "configuration_policy": "numeric plan limits/prices and legal approval are deployment configuration, never arbitrary allow/deny",
         "implementation_status": "operational_development_limited",
         "required_features": [
-          "F21",
-          "F23"
+          "F21"
         ],
         "runtime_required_features": [
-          "F21",
-          "F23"
+          "F21"
         ],
-        "conditional_features": [],
+        "conditional_features": [
+          {
+            "feature": "F23",
+            "when": "person_only_followup",
+            "mode": "required_if_selected"
+          }
+        ],
         "operation_contract": {
           "kind": "command",
           "target_entity": "crm_activities",
@@ -95158,7 +95162,7 @@
       "uuid": "backend uuid@14.0.3 v7 for all inserted IDs; DB defaults not required",
       "external_transport": "POST /functions/v1/backend-v1/{operation}; direct typed request body",
       "internal_rpc": "service-only api_v1 named functions; actor/session/UUID bank supplied by verified gateway",
-      "migration_count": 101,
+      "migration_count": 102,
       "acceptance_source": "apps/backend/docs/00-FtkSaaS-yeni-sohbet-devir.md"
     },
     "decision_sprint": {
@@ -97254,7 +97258,7 @@
         "name": "Aday, kaynak, ilgi, takip ve dönüşüm",
         "owner": "M09",
         "plans": {
-          "starter": false,
+          "starter": true,
           "pro": true,
           "business": true
         },
@@ -97288,7 +97292,7 @@
         "contract_only_operations": [],
         "acceptance_case_ids": [],
         "plan_scope": {
-          "starter": "—",
+          "starter": "Temel aday takibi",
           "pro": "Tam",
           "business": "Tam; merkez/organizasyon kapsamıyla"
         },
@@ -97926,6 +97930,22 @@
         "existing_policies": "unchanged; no backfill",
         "consumer_read": "policies_get_v1 and existing policy_at/lesson/reservation consumers",
         "unconfigured_business_values": "explicit setup required; no invented windows, hours, terms or pricing"
+      },
+      "basic_crm": {
+        "operations": [
+          "leads_list_v1",
+          "lead_save_v1",
+          "crm_activity_save_v1"
+        ],
+        "activity_target": "lead_only",
+        "center": "explicit_accessible_center",
+        "read_operation": "management_state_get_v1",
+        "advanced_features": "unchanged; lead conversion, trials, segments, provider intake and no-lead followups remain outside Starter basic CRM",
+        "sources": [
+          "manual",
+          "phone",
+          "whatsapp"
+        ]
       }
     },
     "accepted_plan_limits": {

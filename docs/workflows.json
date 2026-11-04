@@ -279,8 +279,8 @@
         "management_state_get_v1"
       ],
       "review": {
-        "fingerprint": "5aa2b8cc178d395fac3deb3c6bd7f3056132fc4b27cbdd04eae665e5dda6db0e",
-        "reason": "Üretim sekiz shard, native timeout ve exact-source incelemesi; iki assertion izi yalnız dört yerine sekiz iş/profil beklentisi için dar kayıtlıdır."
+        "fingerprint": "6ff07d5af1767e149fbd5dd1309adc3b5a4243ee52cb3138d1092a06317a9bef",
+        "reason": "P05 CI fixture incelemesi: zorunlu sayfalama, temel CRM olumlu ve ileri takip olumsuz kabulü; runtime ve güvenlik sınırları değişmedi."
       }
     },
     {
@@ -356,8 +356,8 @@
         "account_signup_check_v1"
       ],
       "review": {
-        "fingerprint": "d9fa5eaff3b20948b70b452993969dc6487e2a9172e7c4c49224925e3af8d9ae",
-        "reason": "Ortak üretilmiş wrapper farkı yalnız S16 owner abonelik dönem komutunu ekler; bu akışın mevcut operasyon/görev/izin/plan ve davranış kaynakları değişmedi, ilgili rehber incelendi."
+        "fingerprint": "f4dc19aa4102bf74be46c9f58f8ca3e57bc02d130fd267615285bcde0bb5e26f",
+        "reason": "P05 Starter basic CRM reviewed: existing person/lead/activity registry, exact request/source admission before replay; F23 retained for person-only followup. Native Starter/Pro/Business scope/version/replay tests and migration102 source equality included; other WF behavior unchanged."
       }
     },
     {
@@ -455,8 +455,8 @@
         "role_revoke_preview_v1"
       ],
       "review": {
-        "fingerprint": "280054a691ce13a92236d3b83b6349fce27bc1c0d6dcbeeecb1b4838a841a054",
-        "reason": "Merged main PR173 native test-root splitting and PR171 CRM documentation with PR172 P12/P13 runtime and corrected internal venue timezones. Both source/test mappings retained; guide behavior unchanged."
+        "fingerprint": "81de43bca8795677055d1be0e4e3d685ea785fe60035d0165fa94c1ddda1dfc9",
+        "reason": "P05 CI fixture incelemesi: zorunlu sayfalama, temel CRM olumlu ve ileri takip olumsuz kabulü; runtime ve güvenlik sınırları değişmedi."
       }
     },
     {
@@ -551,8 +551,8 @@
         "class_assignment_set_v1"
       ],
       "review": {
-        "fingerprint": "8f631cf0eec0a71acd2b5e77c01bfdc381e5b2b7dc3366ae75317b7f4694834f",
-        "reason": "Native kabul kökleri bağımsız tenant ve anlamlı iş akışlarına ayrıldı; özgün assertion ve80 alt test gövdesi, yarış/rollback ve API sırası korundu. Shared fixture yalnız gereken native önkoşulları kurar; ürün/scope/permission anlatımı değişmez. Deney import köklerinde tam satır sahipliği ve singleton platform yazıcılarının aynı birimde sırası incelendi."
+        "fingerprint": "5a7e4cc73b760b68525911e8ff5c48c5aba08d374e8ac5565cc36c09e43c0887",
+        "reason": "P05 CI fixture incelemesi: zorunlu sayfalama, temel CRM olumlu ve ileri takip olumsuz kabulü; runtime ve güvenlik sınırları değişmedi."
       }
     },
     {
@@ -638,8 +638,8 @@
         "person_discipline_set_v1"
       ],
       "review": {
-        "fingerprint": "f3923f0126e957cf1ed18492027a8e4ffaf0eabf441d4e8bb482ab2010468313",
-        "reason": "Native kabul kökleri bağımsız tenant ve anlamlı iş akışlarına ayrıldı; özgün assertion ve80 alt test gövdesi, yarış/rollback ve API sırası korundu. Shared fixture yalnız gereken native önkoşulları kurar; ürün/scope/permission anlatımı değişmez. Deney import köklerinde tam satır sahipliği ve singleton platform yazıcılarının aynı birimde sırası incelendi."
+        "fingerprint": "50cb7f7bbdee63291dfdf14a33fb1a6333cebaa6de4f6b6799117dc619e33c9c",
+        "reason": "P05 CI fixture incelemesi: zorunlu sayfalama, temel CRM olumlu ve ileri takip olumsuz kabulü; runtime ve güvenlik sınırları değişmedi."
       }
     },
     {
@@ -732,8 +732,8 @@
         "negative_limits_get_v1"
       ],
       "review": {
-        "fingerprint": "a201ed67ce81bcce1f7e26630e2eb35d1beb282e82f624ac4cdd67773301c856",
-        "reason": "Merged main PR173 native test-root splitting and PR171 CRM documentation with PR172 P12/P13 runtime and corrected internal venue timezones. Both source/test mappings retained; guide behavior unchanged."
+        "fingerprint": "77e5e6c31f693bb7e8f6f529074a3b981c4d9c6339b97b3df38899c88494a41a",
+        "reason": "P05 Starter basic CRM reviewed: existing person/lead/activity registry, exact request/source admission before replay; F23 retained for person-only followup. Native Starter/Pro/Business scope/version/replay tests and migration102 source equality included; other WF behavior unchanged."
       }
     },
     {
@@ -810,8 +810,8 @@
         "reservation_capacity_override_v1"
       ],
       "review": {
-        "fingerprint": "f4b239bd19deeffb828497fca7c664aa55bf559a37ed2e54139201397766e799",
-        "reason": "Merged main PR173 native test-root splitting and PR171 CRM documentation with PR172 P12/P13 runtime and corrected internal venue timezones. Both source/test mappings retained; guide behavior unchanged."
+        "fingerprint": "82e4095ebd5fcfbe85b143e16f9bdc1a89d1be23f735f3e0bc4434106d5f8b4a",
+        "reason": "P05 Starter basic CRM reviewed: existing person/lead/activity registry, exact request/source admission before replay; F23 retained for person-only followup. Native Starter/Pro/Business scope/version/replay tests and migration102 source equality included; other WF behavior unchanged."
       }
     },
     {
@@ -873,8 +873,8 @@
         "attendance_start_v1"
       ],
       "review": {
-        "fingerprint": "16720015ef0c942aaa6d19bf86fc0a5bd36d63e03523985e0660236d8b9872a6",
-        "reason": "Merged main PR173 native test-root splitting and PR171 CRM documentation with PR172 P12/P13 runtime and corrected internal venue timezones. Both source/test mappings retained; guide behavior unchanged."
+        "fingerprint": "8c914e939552f89ca0e5ac09cdc4de4b7b268c3f8e8043928eb3f47e999b93a8",
+        "reason": "P05 Starter basic CRM reviewed: existing person/lead/activity registry, exact request/source admission before replay; F23 retained for person-only followup. Native Starter/Pro/Business scope/version/replay tests and migration102 source equality included; other WF behavior unchanged."
       }
     },
     {
@@ -933,8 +933,8 @@
         "debt_adjust_v1"
       ],
       "review": {
-        "fingerprint": "6c5c7843a70360fcdc2a5a6a9627619a8277210095fed57b4ab4c66c530b2fe0",
-        "reason": "Merged main PR173 native test-root splitting and PR171 CRM documentation with PR172 P12/P13 runtime and corrected internal venue timezones. Both source/test mappings retained; guide behavior unchanged."
+        "fingerprint": "ef3125e2959df20dac2f31a51b84fcc682294251dcb38119f890bca8345d5ef4",
+        "reason": "Final P05 native roots reviewed in existing CRM unit: generated request preflight, explicit linked unauthorized actor, real foreign tenant center, note/followup and lead edits, replay/version/plan boundaries. All original tests and64-unit coverage preserved; other workflow behavior unchanged."
       }
     },
     {
@@ -976,8 +976,8 @@
         "calendar_feed_get_v1"
       ],
       "review": {
-        "fingerprint": "d7331d951f62e9802d0220f69dee3e91715990708969491eb390f3c837f40e82",
-        "reason": "Person registry dosyasında yalnız gerçek ticari kapasite fixture değişti; public/ICS davranışı ve rehberi değişmedi."
+        "fingerprint": "ce24359a7491a4a14ba34fa50991fd0c0e3484aeb262cf7fbeb5143fce40403c",
+        "reason": "P05 CI fixture incelemesi: zorunlu sayfalama, temel CRM olumlu ve ileri takip olumsuz kabulü; runtime ve güvenlik sınırları değişmedi."
       }
     },
     {
@@ -1022,8 +1022,8 @@
         "file_upload_complete_v1"
       ],
       "review": {
-        "fingerprint": "7fe9545d303a302cd2bee54ed84c143b0f4f4c34a2bf2aaa19e9c98f7384de15",
-        "reason": "Native kabul kökleri bağımsız tenant ve anlamlı iş akışlarına ayrıldı; özgün assertion ve80 alt test gövdesi, yarış/rollback ve API sırası korundu. Shared fixture yalnız gereken native önkoşulları kurar; ürün/scope/permission anlatımı değişmez. Deney import köklerinde tam satır sahipliği ve singleton platform yazıcılarının aynı birimde sırası incelendi."
+        "fingerprint": "5e90c67a27c2f96a0953df122ca4ad95cf30e5ee0ae348d4ba7c9021a22efab2",
+        "reason": "P05 Starter basic CRM reviewed: existing person/lead/activity registry, exact request/source admission before replay; F23 retained for person-only followup. Native Starter/Pro/Business scope/version/replay tests and migration102 source equality included; other WF behavior unchanged."
       }
     },
     {
@@ -1057,8 +1057,8 @@
         "document_publication_preview_v1"
       ],
       "review": {
-        "fingerprint": "6d3ea0bafdf13a633e095f55814992c580f672a5929fb6a140ab7922f38aba3d",
-        "reason": "Native kabul kökleri bağımsız tenant ve anlamlı iş akışlarına ayrıldı; özgün assertion ve80 alt test gövdesi, yarış/rollback ve API sırası korundu. Shared fixture yalnız gereken native önkoşulları kurar; ürün/scope/permission anlatımı değişmez. Deney import köklerinde tam satır sahipliği ve singleton platform yazıcılarının aynı birimde sırası incelendi."
+        "fingerprint": "24eb06b2db80cc71d17d88fcf527ba7a6cf5e39bf5a03c4c796bcdb09f1b7b4a",
+        "reason": "P05 Starter basic CRM reviewed: existing person/lead/activity registry, exact request/source admission before replay; F23 retained for person-only followup. Native Starter/Pro/Business scope/version/replay tests and migration102 source equality included; other WF behavior unchanged."
       }
     },
     {
@@ -1109,8 +1109,8 @@
         "settings_preparation_resolve_v1"
       ],
       "review": {
-        "fingerprint": "cf486988df91127c49a277db839862528ff3b3bc29274ee52e08c45d3e6697e0",
-        "reason": "Native kabul kökleri bağımsız tenant ve anlamlı iş akışlarına ayrıldı; özgün assertion ve80 alt test gövdesi, yarış/rollback ve API sırası korundu. Shared fixture yalnız gereken native önkoşulları kurar; ürün/scope/permission anlatımı değişmez. Deney import köklerinde tam satır sahipliği ve singleton platform yazıcılarının aynı birimde sırası incelendi."
+        "fingerprint": "c2a9468ae0476f752015eb6849e72e23016cc5e4c9cd52d9bb895fbeff185bb7",
+        "reason": "P05 Starter basic CRM reviewed: existing person/lead/activity registry, exact request/source admission before replay; F23 retained for person-only followup. Native Starter/Pro/Business scope/version/replay tests and migration102 source equality included; other WF behavior unchanged."
       }
     },
     {
@@ -1178,8 +1178,8 @@
         "subscription_period_change_request_v1"
       ],
       "review": {
-        "fingerprint": "9b49c279802d890d7f103fa998020782f29c29250c765133899b6c66fa038b70",
-        "reason": "Native kabul kökleri bağımsız tenant ve anlamlı iş akışlarına ayrıldı; özgün assertion ve80 alt test gövdesi, yarış/rollback ve API sırası korundu. Shared fixture yalnız gereken native önkoşulları kurar; ürün/scope/permission anlatımı değişmez. Deney import köklerinde tam satır sahipliği ve singleton platform yazıcılarının aynı birimde sırası incelendi."
+        "fingerprint": "ff255ef011cc946e938da4b28fdfc483dd3d6b39f0effa9f99d11a5d7795c96e",
+        "reason": "P05 CI fixture incelemesi: zorunlu sayfalama, temel CRM olumlu ve ileri takip olumsuz kabulü; runtime ve güvenlik sınırları değişmedi."
       }
     },
     {
@@ -1218,8 +1218,8 @@
         "instructor_agreements_list_v1"
       ],
       "review": {
-        "fingerprint": "227fe26de057fae6839ff592741826859e2ff0770bd00102c5f7e2374787097a",
-        "reason": "P12/P13 reviewed: explicit event unlimited/physical room ceiling and existing org locks; immutable package usage with live lesson/event scope and freeze-aware positive rights; factual attendance separate, no credit allocation; existing paid/cancellation workflows and original test bodies preserved."
+        "fingerprint": "e82966d12bfa799db402a4ffb5412acc620a7f64b50926e8859db03f1ac21dff",
+        "reason": "P05 Starter basic CRM reviewed: existing person/lead/activity registry, exact request/source admission before replay; F23 retained for person-only followup. Native Starter/Pro/Business scope/version/replay tests and migration102 source equality included; other WF behavior unchanged."
       }
     },
     {
@@ -1288,14 +1288,14 @@
         "event_actual_start_correct_v1"
       ],
       "review": {
-        "fingerprint": "47b1c7796441fa84c0a5ed25e03a2d957f7d73d2f86f071edfbef464f31308bb",
-        "reason": "Merged main PR173 native test-root splitting and PR171 CRM documentation with PR172 P12/P13 runtime and corrected internal venue timezones. Both source/test mappings retained; guide behavior unchanged."
+        "fingerprint": "90fd1a79e476190139db0f13ce5dbfc8c1e81ee87f9470426706d23fff2eff53",
+        "reason": "P05 Starter basic CRM reviewed: existing person/lead/activity registry, exact request/source admission before replay; F23 retained for person-only followup. Native Starter/Pro/Business scope/version/replay tests and migration102 source equality included; other WF behavior unchanged."
       }
     },
     {
       "id": "WF16",
-      "title": "Genel CRM ve otomasyon",
-      "audience": "upper-plan",
+      "title": "Temel aday takibi, genel CRM ve otomasyon",
+      "audience": "common",
       "guide": "docs/workflows.md#wf16",
       "detail": "docs/workflows.md",
       "tests": [
@@ -1312,7 +1312,9 @@
         "apps/backend/database/p05-wrappers.sql",
         "apps/backend/database/runtime-wrappers-current.sql",
         "apps/backend/database/session-capacity.sql",
-        "docs/workflows.md"
+        "docs/workflows.md",
+        "apps/backend/database/starter-basic-crm.sql",
+        "apps/backend/supabase/migrations/20261104111220_starter_basic_crm.sql"
       ],
       "operations": [
         "leads_list_v1",
@@ -1326,8 +1328,8 @@
         "automation_save_v1"
       ],
       "review": {
-        "fingerprint": "92b723d102faf2a0173c03a5788853a1f618c5ce9bcea2d0f2f60f29b2c4580b",
-        "reason": "CRM quota fixture sıfır raw limit değiştirmek yerine etkin Business kapasitesini dolduruyor; aynı PLAN_LIMIT ve geçmiş koruma assertionları korunur."
+        "fingerprint": "3d8b16d38ab05ac160187bd5a47b185046aabe029f9b4b69e85d91e73b7c5c9c",
+        "reason": "P05 CI fixture incelemesi: zorunlu sayfalama, temel CRM olumlu ve ileri takip olumsuz kabulü; runtime ve güvenlik sınırları değişmedi."
       }
     },
     {
@@ -1398,8 +1400,8 @@
         "platform_owner_remove_v1"
       ],
       "review": {
-        "fingerprint": "731e8adc49bbdea36a8dee702d2ea01ca35bfcf2b590256ec3e05ec43c38d5df",
-        "reason": "Ortak üretilmiş wrapper farkı yalnız S16 owner abonelik dönem komutunu ekler; bu akışın mevcut operasyon/görev/izin/plan ve davranış kaynakları değişmedi, ilgili rehber incelendi."
+        "fingerprint": "ded05ca85acf99ef0a8a5036d86c98d8c51aa67aed530d78c0bf4531420be3d8",
+        "reason": "Final P05 native roots reviewed in existing CRM unit: generated request preflight, explicit linked unauthorized actor, real foreign tenant center, note/followup and lead edits, replay/version/plan boundaries. All original tests and64-unit coverage preserved; other workflow behavior unchanged."
       }
     },
     {
@@ -1429,8 +1431,8 @@
         "settlement_authority_set_v1"
       ],
       "review": {
-        "fingerprint": "ca45fc691e777dd0807426392d30ac78978c25127b3550cdc678db8b290fad46",
-        "reason": "Native kabul kökleri bağımsız tenant ve anlamlı iş akışlarına ayrıldı; özgün assertion ve80 alt test gövdesi, yarış/rollback ve API sırası korundu. Shared fixture yalnız gereken native önkoşulları kurar; ürün/scope/permission anlatımı değişmez. Deney import köklerinde tam satır sahipliği ve singleton platform yazıcılarının aynı birimde sırası incelendi."
+        "fingerprint": "9ddd0fc779ba4a9179264c1165890324f5a7604b7d4fe145ad1c6d28a30df295",
+        "reason": "P05 Starter basic CRM reviewed: existing person/lead/activity registry, exact request/source admission before replay; F23 retained for person-only followup. Native Starter/Pro/Business scope/version/replay tests and migration102 source equality included; other WF behavior unchanged."
       }
     },
     {
@@ -1458,8 +1460,8 @@
         "seat_offer_reject_v1"
       ],
       "review": {
-        "fingerprint": "87a02f0d7aba3340af83bc690a5cd7dea8820c5fd25bd8ce13aa9cdc12dccd63",
-        "reason": "Final Pro/Business native chain reviewed against existing workflow; approval session reuses the selected alternative interval across local midnight, all original scopes/history/ledger checks retained; native execution remains pending."
+        "fingerprint": "3904b0858a28788d61fa23f9ab3c312723c26990d67f3f91b64f51308dd62b61",
+        "reason": "P05 Starter basic CRM reviewed: existing person/lead/activity registry, exact request/source admission before replay; F23 retained for person-only followup. Native Starter/Pro/Business scope/version/replay tests and migration102 source equality included; other WF behavior unchanged."
       }
     },
     {
@@ -1525,8 +1527,8 @@
         "subscription_boundary_apply_v1"
       ],
       "review": {
-        "fingerprint": "8d1de752c7505c88fb98097b1aabcb9aaa204573c036ffeac84251169e8e1faa",
-        "reason": "Native kabul kökleri bağımsız tenant ve anlamlı iş akışlarına ayrıldı; özgün assertion ve80 alt test gövdesi, yarış/rollback ve API sırası korundu. Shared fixture yalnız gereken native önkoşulları kurar; ürün/scope/permission anlatımı değişmez. Deney import köklerinde tam satır sahipliği ve singleton platform yazıcılarının aynı birimde sırası incelendi."
+        "fingerprint": "d9eb2eed47cdd30cb3a68f91832a6360d853d670ce37cff423e06e0231b0d913",
+        "reason": "P05 CI fixture incelemesi: zorunlu sayfalama, temel CRM olumlu ve ileri takip olumsuz kabulü; runtime ve güvenlik sınırları değişmedi."
       }
     }
   ]

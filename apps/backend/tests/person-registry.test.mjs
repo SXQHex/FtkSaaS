@@ -275,3 +275,79 @@ test('P04 CRM/public intent -> review -> trial -> student, real Auth/Edge and is
  });
  }finally{await db.end();}
 });
+
+// P05 basic CRM native roots share the existing CRM owning suite.
+for(const planName of ['starter','pro','business']){
+ test('P05 '+planName+' manual candidate notes and followups keep scope and replay safety',async()=>{
+  const db=await connect();
+  const validators=await import('../supabase/functions/backend-v1/validators.js');
+  try{
+   const {platform,plan}=await fixturePlatform(),owner=await authUser('basic-crm-'+planName),outsider=await authUser('basic-crm-outsider');
+   const account=await must(owner,'account_get_v1'),outsiderAccount=await must(outsider,'account_get_v1');
+   await db.query('update core.saas_plan_versions set name=$1 where id=$2',[planName,plan]);
+   const org=(await must(platform,'organization_create_v1',{verified_account_id:account.id,name:'Synthetic basic CRM',initial_plan_id:plan},key())).primary_id;
+   const center=(await must(owner,'center_create_v1',{org_id:org,name:'CRM center',timezone:'Europe/Istanbul'},key())).primary_id;
+   const scope=b=>({org_id:org,center_id:center,...b});
+   const request=(op,b)=>scope(op==='leads_list_v1'?{page:{},...b}:b);
+   const api=(op,b={},k=key())=>must(owner,op,request(op,b),k);
+   const fail=async(op,b,code,u=owner,k=key())=>{const x=await call(u,op,scope(b),k);assert.equal(validators['request_'+op](x.request),true,JSON.stringify(validators['request_'+op].errors));assert.equal(x.result.ok,false,JSON.stringify(x.result));assert.equal(x.result.error.code,code,JSON.stringify(x.result));};
+   const ownerPerson=(await db.query('select owner_person_id from core.organizations where id=$1',[org])).rows[0].owner_person_id;
+   await api('center_manager_assign_v1',{person_id:ownerPerson});
+   const pay=await api('saas_payment_submit_v1',{amount_minor:'1000',currency:'TRY',reference:'Synthetic CRM',occurred_at:new Date().toISOString()});
+   await must(platform,'saas_payment_verify_v1',scope({payment_id:pay.primary_id,accepted:true}),key());
+   const outsiderPerson=(await api('person_create_v1',{display_name:'Unauthorized CRM actor',contacts:[]})).primary_id;
+   await db.query("insert into core.account_links(id,org_id,account_id,person_id,state,verified_at) values($1,$2,$3,$4,'active',now())",[key(),org,outsiderAccount.id,outsiderPerson]);
+   const person=(await api('person_create_v1',{display_name:'Synthetic candidate',contacts:[{kind:'phone',value:'+905550000001'}]})).primary_id;
+   const body={person_id:person,source:'phone',interest:'Synthetic lesson'},operationKey=key();
+   const lead=await api('lead_save_v1',body,operationKey);
+   assert.equal((await api('lead_save_v1',body,operationKey)).replayed,true);
+   await fail('lead_save_v1',{...body,interest:'Changed'},'IDEMPOTENCY_PAYLOAD_MISMATCH',owner,operationKey);
+   const page=await api('leads_list_v1',{page:{limit:1}});assert.equal(page.items.length,1);assert.equal(page.items[0].id,lead.primary_id);
+   const managed=async(operation,k)=>api('management_state_get_v1',{operation,selector:{operation,key:k},page:{limit:20}});
+   const found=(await managed('lead_save_v1',{person_id:person,lead_id:lead.primary_id})).items[0];
+   assert.equal(found.current.values.source,'phone');
+   const contact={lead_id:lead.primary_id,kind:'contact',note:'Called; asked for a later followup'},contactKey=key();
+   const note=await api('crm_activity_save_v1',contact,contactKey);
+   assert.equal((await api('crm_activity_save_v1',contact,contactKey)).replayed,true);
+   const due='2030-01-15T08:30:00Z';
+   const followup=await api('crm_activity_save_v1',{lead_id:lead.primary_id,kind:'followup',due_at:due,note:'Call again'});
+   const activities=await managed('crm_activity_save_v1',{lead_id:lead.primary_id});
+   assert.equal(activities.items.length,2);
+   assert.equal(activities.items.find(x=>x.entity.id===note.primary_id).current.values.note,contact.note);
+   const follow=activities.items.find(x=>x.entity.id===followup.primary_id);
+   assert.equal(Date.parse(follow.current.values.due_at),Date.parse(due));
+   assert.equal(Date.parse((await api('leads_list_v1')).items[0].due_followup),Date.parse(due));
+   const reschedule={lead_id:lead.primary_id,activity_id:followup.primary_id,expected_version:followup.version,kind:'followup',due_at:'2030-01-16T08:30:00Z',note:'Rescheduled'};
+   await api('crm_activity_save_v1',reschedule);
+   assert.equal(Date.parse((await api('leads_list_v1')).items[0].due_followup),Date.parse(reschedule.due_at));
+   await fail('crm_activity_save_v1',reschedule,'VERSION_CONFLICT');
+   const latest=(await api('leads_list_v1')).items[0];
+   await api('lead_save_v1',{...body,lead_id:lead.primary_id,expected_version:latest.version,source:'whatsapp'});
+   assert.equal((await managed('lead_save_v1',{person_id:person,lead_id:lead.primary_id})).items[0].current.values.source,'whatsapp');
+   const update={...contact,activity_id:note.primary_id,expected_version:note.version,note:'Updated call note'};
+   await api('crm_activity_save_v1',update);
+   await fail('crm_activity_save_v1',update,'VERSION_CONFLICT');
+   await fail('leads_list_v1',{page:{}},'FORBIDDEN',outsider);
+   await fail('management_state_get_v1',{operation:'crm_activity_save_v1',selector:{operation:'crm_activity_save_v1',key:{lead_id:lead.primary_id}},page:{}},'FORBIDDEN',outsider);
+   const foreignOrg=(await must(platform,'organization_create_v1',{verified_account_id:outsiderAccount.id,name:'Foreign CRM tenant',initial_plan_id:plan},key())).primary_id;
+   const foreignCenter=(await must(outsider,'center_create_v1',{org_id:foreignOrg,name:'Foreign CRM center',timezone:'Europe/Istanbul'},key())).primary_id;
+   await fail('lead_save_v1',{...body,center_id:foreignCenter},'NOT_FOUND');
+   await fail('crm_activity_save_v1',{...contact,lead_id:key()},'NOT_FOUND');
+   const counts=(await db.query("select (select count(*) from core.center_relationships where org_id=$1 and person_id=$2 and kind='student')::int students,(select count(*) from core.account_links where org_id=$1 and person_id=$2)::int links,(select count(*) from core.sales where org_id=$1 and person_id=$2)::int sales,(select count(*) from core.reservations where org_id=$1 and person_id=$2)::int reservations",[org,person])).rows[0];
+   assert.deepEqual(counts,{students:0,links:0,sales:0,reservations:0});
+   assert.equal((await db.query("select count(*)::int n from core.center_relationships where org_id=$1 and person_id=$2 and kind='candidate' and state='active'",[org,person])).rows[0].n,1);
+   if(planName==='starter'){
+    await fail('lead_save_v1',{...body,source:'public_application',lead_id:lead.primary_id,expected_version:lead.version},'PLAN_FEATURE_UNAVAILABLE');
+    await fail('crm_activity_save_v1',{person_id:person,kind:'followup',due_at:due},'PLAN_FEATURE_UNAVAILABLE');
+    await fail('crm_activity_save_v1',{lead_id:lead.primary_id,kind:'followup'},'VALIDATION_FAILED');
+    await fail('lead_convert_v1',{lead_id:lead.primary_id},'PLAN_FEATURE_UNAVAILABLE');
+    await fail('report_get_v1',{report:'crm_conversion',filters:{interval:{starts_at:'2026-01-01T00:00:00Z',ends_at:'2026-02-01T00:00:00Z'},center_ids:[center]},page:{}},'PLAN_FEATURE_UNAVAILABLE');
+    await fail('leads_list_v1',{center_id:null,page:{}},'VALIDATION_FAILED');
+    await fail('management_state_get_v1',{operation:'crm_activity_save_v1',selector:{operation:'crm_activity_save_v1',key:{person_id:person}},page:{}},'PLAN_FEATURE_UNAVAILABLE');
+   }
+   // Losing live center authority also denies replay of an old successful command.
+   await db.query("update core.role_assignments set state='inactive',version=version+1 where org_id=$1 and person_id=$2 and role='center_manager'",[org,ownerPerson]);
+   await fail('lead_save_v1',body,'FORBIDDEN',owner,operationKey);
+  }finally{await db.end();}
+ });
+}
