@@ -1,0 +1,137 @@
+name: CI V2 Scope
+run-name: 'V2 scoped shadow · ${{ github.sha }}'
+on:
+  workflow_dispatch:
+    inputs:
+      base_sha:
+        description: Exact ancestor SHA to compare against the selected ref
+        required: true
+        type: string
+      scope:
+        description: Auto source impact, or explicitly widen backend/full
+        required: true
+        type: choice
+        options: [auto, backend, full]
+        default: auto
+permissions: {}
+# The reusable domain workflows own their cancellation groups. A frontend-only
+# dispatch must not cancel an independent backend shadow execution.
+jobs:
+  plan:
+    name: Plan Independent Domains
+    permissions:
+      contents: read
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    outputs:
+      baseline: ${{ steps.plan.outputs.baseline }}
+      frontend: ${{ steps.plan.outputs.frontend }}
+      backend: ${{ steps.plan.outputs.backend }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version-file: .nvmrc
+      - name: Validate Manual Source
+        run: node apps/backend/scripts/ci/v2/local.mjs preflight
+      - name: Select Execution Domains
+        id: plan
+        env:
+          CI_V2_BASE_SHA: ${{ inputs.base_sha }}
+          CI_V2_MODE: ${{ inputs.scope }}
+        run: node apps/backend/scripts/ci/v2/dispatch.mjs plan
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: ci-v2-dispatch-${{ github.run_id }}-${{ github.run_attempt }}
+          path: .artifacts/ci-v2-dispatch/
+          if-no-files-found: error
+          retention-days: 7
+          archive: true
+  common:
+    name: Common Security Controls
+    needs: plan
+    if: needs.plan.outputs.baseline == 'true'
+    permissions:
+      contents: read
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version-file: .nvmrc
+      - name: Validate Manual Source
+        run: node apps/backend/scripts/ci/v2/local.mjs preflight
+      - name: Quality Floor
+        env:
+          QUALITY_BASE: ${{ inputs.base_sha }}
+        run: node apps/backend/scripts/ci/check-quality.mjs
+      - name: Source And Scope Tests
+        run: node --test apps/backend/tests/v2/safety.test.mjs apps/backend/tests/v2/scope.test.mjs apps/backend/tests/v2/plan.test.mjs apps/backend/tests/v2/dispatch.test.mjs
+      - name: Documentation Links
+        run: node apps/backend/scripts/ci/docs-check.mjs README.md
+      - name: Install Pinned Secret Scanner
+        run: bash apps/backend/scripts/ci/install-gitleaks.sh "$RUNNER_TEMP/ftk-gitleaks"
+      - name: Secret Scan
+        env:
+          BASE_SHA: ${{ inputs.base_sha }}
+          HEAD_SHA: ${{ github.sha }}
+        run: >-
+          "$RUNNER_TEMP/ftk-gitleaks/gitleaks" git . --redact=100 --no-banner
+          --ignore-gitleaks-allow --gitleaks-ignore-path /dev/null
+          --config apps/backend/scripts/ci/gitleaks.toml
+          --log-opts="$BASE_SHA..$HEAD_SHA"
+  frontend:
+    name: Frontend Shadow
+    needs: [plan, common]
+    if: needs.plan.outputs.frontend == 'true'
+    permissions:
+      contents: read
+      actions: read
+    uses: ./.github/workflows/ci-v2-frontend.yml
+  backend:
+    name: Backend Shadow
+    needs: [plan, common]
+    if: needs.plan.outputs.backend == 'true'
+    permissions:
+      contents: read
+    uses: ./.github/workflows/ci-v2-backend.yml
+    with:
+      scope: full
+  summary:
+    name: Verify Selected Domains
+    needs: [plan, common, frontend, backend]
+    if: always()
+    permissions:
+      contents: read
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version-file: .nvmrc
+      - name: Require Selected Execution
+        env:
+          PLAN_RESULT: ${{ needs.plan.result }}
+          V2_BASELINE: ${{ needs.plan.outputs.baseline }}
+          V2_FRONTEND: ${{ needs.plan.outputs.frontend }}
+          V2_BACKEND: ${{ needs.plan.outputs.backend }}
+          COMMON_RESULT: ${{ needs.common.result }}
+          FRONTEND_RESULT: ${{ needs.frontend.result }}
+          BACKEND_RESULT: ${{ needs.backend.result }}
+        run: |
+          set -euo pipefail
+          test "$PLAN_RESULT" = success
+          node apps/backend/scripts/ci/v2/dispatch.mjs summary

@@ -22,7 +22,8 @@
         "apps/backend/tests/v2/backend.test.mjs",
         "apps/backend/tests/v2/backend/api-acceptance-root-1.test.mjs",
         "apps/backend/tests/ci-v2-development-unit.mjs",
-        "apps/backend/tests/v2/core.test.mjs"
+        "apps/backend/tests/v2/core.test.mjs",
+        "apps/backend/tests/v2/dispatch.test.mjs"
       ],
       "sources": [
         "apps/backend/database/canonical-settings-scope.sql",
@@ -286,7 +287,8 @@
         "apps/backend/scripts/ci/v2/settings.mjs",
         "apps/backend/tests/v2/backend-suites.json",
         "apps/backend/scripts/ci/v2-development.mjs",
-        "apps/backend/scripts/ci/v2/core.mjs"
+        "apps/backend/scripts/ci/v2/core.mjs",
+        "apps/backend/scripts/ci/v2/dispatch.mjs"
       ],
       "operations": [
         "operation_status_get_v1",
@@ -296,8 +298,8 @@
         "management_state_get_v1"
       ],
       "review": {
-        "fingerprint": "d451c6f5ac353b5622c2c676e4667677d7b4f611deb3021c55efe25e1298dacf",
-        "reason": "Yalnız üretim ST-02 envanteri 71 birime çıktı; 67→71 sayımı tek süreli exact-fingerprint kayıtla incelendi. Bağımsız V2 projesine dokunulmaz."
+        "fingerprint": "d19b35c45bd41fc92986ce60602d0b45ca3d69dd2f9a98da23cb575c7741b1b9",
+        "reason": "Reviewed source-selected V2 shadow with current main ST-02 six direct roots; exact expiring assertion relocation fingerprints preserve all copied bodies under unchanged byte parity. Twenty shards, source guards, production proof and deployment remain unchanged."
       }
     },
     {
@@ -609,7 +611,11 @@
         "apps/backend/tests/v2/backend/person-registry-root-2.test.mjs",
         "apps/backend/tests/v2/backend/registry-root-1.test.mjs",
         "apps/backend/tests/v2/backend/starter-operations-acceptance.test.mjs",
-        "apps/backend/tests/v2/backend/starter-operations-reports.test.mjs"
+        "apps/backend/tests/v2/backend/starter-operations-reports.test.mjs",
+        "apps/backend/tests/v2/backend/starter-operations-report-shaping.test.mjs",
+        "apps/backend/tests/v2/backend/starter-operations-import-templates.test.mjs",
+        "apps/backend/tests/v2/backend/starter-operations-report-access.test.mjs",
+        "apps/backend/tests/v2/backend/starter-operations-inbox.test.mjs"
       ],
       "sources": [
         "apps/backend/database/active-discipline-projection-wrappers.sql",
@@ -678,8 +684,8 @@
         "person_discipline_set_v1"
       ],
       "review": {
-        "fingerprint": "d7e0ae2af83e51101ef7259b5496a9425176a969c6faf6cc9a5fbbdda3a5973c",
-        "reason": "Üretim ST-02 kişi önkoşulları ve Abone No kontrolleri korundu; bağımsız V2 kaynakları main ile aynı."
+        "fingerprint": "28c280aaea9832d754caedd067943bfc3a1ba47177f872d57348b0d2252d8d12",
+        "reason": "Reviewed main ST-02 split and direct V2 copies: six independent roots preserve current production bodies and assertions with import/resource relocation only; copied shared setup and estimated weights remain explicit, twenty nonempty diagnostic shards retained, no production acceptance changes."
       }
     },
     {
@@ -957,7 +963,11 @@
         "apps/backend/tests/v2/backend/starter-attendance-revisions.test.mjs",
         "apps/backend/tests/v2/backend/starter-attendance-authority.test.mjs",
         "apps/backend/tests/v2/backend/starter-attendance-ledger.test.mjs",
-        "apps/backend/tests/v2/backend/starter-attendance-policy.test.mjs"
+        "apps/backend/tests/v2/backend/starter-attendance-policy.test.mjs",
+        "apps/backend/tests/v2/backend/starter-operations-report-shaping.test.mjs",
+        "apps/backend/tests/v2/backend/starter-operations-import-templates.test.mjs",
+        "apps/backend/tests/v2/backend/starter-operations-report-access.test.mjs",
+        "apps/backend/tests/v2/backend/starter-operations-inbox.test.mjs"
       ],
       "sources": [
         "apps/backend/database/active-discipline-projection-wrappers.sql",
@@ -1002,8 +1012,8 @@
         "debt_adjust_v1"
       ],
       "review": {
-        "fingerprint": "d3ded3a8491288e27f95c01925e226f2379ff0f0dd070230a470e840e0839c1e",
-        "reason": "Üretim ST-02 açılış borç fixture ve finans kontrolleri bağımsız köklerde korundu; V2 kapsam dışıdır."
+        "fingerprint": "c34113a0610ccd428b765c0b813af0b21e518c5839ceaf362aac5afe19b0efa3",
+        "reason": "Reviewed main ST-02 split and direct V2 copies: six independent roots preserve current production bodies and assertions with import/resource relocation only; copied shared setup and estimated weights remain explicit, twenty nonempty diagnostic shards retained, no production acceptance changes."
       }
     },
     {
@@ -1071,7 +1081,11 @@
         "apps/backend/tests/starter-operations-acceptance.mjs",
         "apps/backend/tests/subscriber-number-acceptance.mjs",
         "apps/backend/tests/v2/backend/starter-operations-acceptance.test.mjs",
-        "apps/backend/tests/v2/backend/starter-operations-reports.test.mjs"
+        "apps/backend/tests/v2/backend/starter-operations-reports.test.mjs",
+        "apps/backend/tests/v2/backend/starter-operations-report-shaping.test.mjs",
+        "apps/backend/tests/v2/backend/starter-operations-import-templates.test.mjs",
+        "apps/backend/tests/v2/backend/starter-operations-report-access.test.mjs",
+        "apps/backend/tests/v2/backend/starter-operations-inbox.test.mjs"
       ],
       "sources": [
         "apps/backend/database/p05-bind.sql",
@@ -1103,8 +1117,8 @@
         "file_upload_complete_v1"
       ],
       "review": {
-        "fingerprint": "bf0c52d419b64a0a897964195cf00b64279cde0e3e1711a450d26361043df4a6",
-        "reason": "Yalnız üretim ST-02 rapor, import ve export callbackleri byte-exact bağımsız köklere taşındı; V2 değiştirilmedi."
+        "fingerprint": "b3ecd0086c777052b942ebd1f0438e8d12ff23bf0d02e5cef9336cc006926e1d",
+        "reason": "Reviewed main ST-02 split and direct V2 copies: six independent roots preserve current production bodies and assertions with import/resource relocation only; copied shared setup and estimated weights remain explicit, twenty nonempty diagnostic shards retained, no production acceptance changes."
       }
     },
     {
@@ -1120,7 +1134,11 @@
         "apps/backend/tests/document-self-requirements-acceptance.mjs",
         "apps/backend/tests/document-self-contract-unit.mjs",
         "apps/backend/tests/v2/backend/starter-operations-acceptance.test.mjs",
-        "apps/backend/tests/v2/backend/starter-operations-reports.test.mjs"
+        "apps/backend/tests/v2/backend/starter-operations-reports.test.mjs",
+        "apps/backend/tests/v2/backend/starter-operations-report-shaping.test.mjs",
+        "apps/backend/tests/v2/backend/starter-operations-import-templates.test.mjs",
+        "apps/backend/tests/v2/backend/starter-operations-report-access.test.mjs",
+        "apps/backend/tests/v2/backend/starter-operations-inbox.test.mjs"
       ],
       "sources": [
         "apps/backend/database/p05-bind.sql",
@@ -1144,8 +1162,8 @@
         "document_publication_preview_v1"
       ],
       "review": {
-        "fingerprint": "5f14d2f2bcbc809fb502eb4e4658e44fc64f31ce43ed5e19ceb64e6e1f3e226e",
-        "reason": "Üretim ST-02 inbox kendi gerçek import/export işlerini kurar; requester ve replay assertionları korundu. V2 kapsam dışıdır."
+        "fingerprint": "fa1d01182dd1b9d64d0ddc1afe7d64f6ae657eef02885b8d4728be7cd8290646",
+        "reason": "Reviewed main ST-02 split and direct V2 copies: six independent roots preserve current production bodies and assertions with import/resource relocation only; copied shared setup and estimated weights remain explicit, twenty nonempty diagnostic shards retained, no production acceptance changes."
       }
     },
     {
@@ -1164,7 +1182,11 @@
         "apps/backend/tests/v2/backend/settings-startup-context.test.mjs",
         "apps/backend/tests/v2/backend/settings-brand-colors.test.mjs",
         "apps/backend/tests/v2/backend/starter-operations-acceptance.test.mjs",
-        "apps/backend/tests/v2/backend/starter-operations-reports.test.mjs"
+        "apps/backend/tests/v2/backend/starter-operations-reports.test.mjs",
+        "apps/backend/tests/v2/backend/starter-operations-report-shaping.test.mjs",
+        "apps/backend/tests/v2/backend/starter-operations-import-templates.test.mjs",
+        "apps/backend/tests/v2/backend/starter-operations-report-access.test.mjs",
+        "apps/backend/tests/v2/backend/starter-operations-inbox.test.mjs"
       ],
       "sources": [
         "apps/backend/config/frontend-settings.json",
@@ -1202,8 +1224,8 @@
         "settings_preparation_resolve_v1"
       ],
       "review": {
-        "fingerprint": "dc0ca5ac7b4c1c3a3e0a635a97ee05ce70a54c8e94e3689007025d9ca9413ae6",
-        "reason": "Üretim ST-02 şablon önkoşulları bağımsız hazırlandı; özgün yetki/reset callbackleri ve V2 kaynakları korundu."
+        "fingerprint": "9f31855598c39e102f53ffd8abe0534655f19da82b3466a94d85dee73a4a269d",
+        "reason": "Reviewed main ST-02 split and direct V2 copies: six independent roots preserve current production bodies and assertions with import/resource relocation only; copied shared setup and estimated weights remain explicit, twenty nonempty diagnostic shards retained, no production acceptance changes."
       }
     },
     {

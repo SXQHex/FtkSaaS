@@ -3,7 +3,7 @@ import path from 'node:path';
 import {execFileSync} from 'node:child_process';
 import {pathToFileURL} from 'node:url';
 // Trusted production selector: this file deliberately lives outside the V2 area.
-const workflows=new Set(['.github/workflows/ci-v2-pilot.yml','.github/workflows/ci-v2-backend.yml']);
+const workflows=new Set(['.github/workflows/ci-v2-pilot.yml','.github/workflows/ci-v2-backend.yml','.github/workflows/ci-v2-frontend.yml','.github/workflows/ci-v2-scope.yml']);
 export function isV2DevelopmentPath(path){
  return typeof path==='string'&&!path.includes('\\')&&!path.split('/').some(p=>!p||p==='.'||p==='..')&&(
   workflows.has(path)||/^apps\/backend\/scripts\/ci\/v2\/[a-z0-9-]+\.mjs$/.test(path)
