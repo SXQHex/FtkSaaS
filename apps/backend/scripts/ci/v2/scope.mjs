@@ -1,6 +1,7 @@
 import webTasks from '../../../../web/turbo.json' with {type:'json'};
 
-export const backendShardCount=20;
+import {backendShardCount} from './settings.mjs';
+export {backendShardCount} from './settings.mjs';
 const webServerInputs=webTasks.tasks.build.inputs.filter(input=>input.startsWith('$TURBO_ROOT$/apps/backend/')).map(input=>{
  if(/[?*{}]/.test(input))throw Error('CI_V2_UNSUPPORTED_WEB_INPUT');
  return input.slice('$TURBO_ROOT$/'.length);
@@ -37,7 +38,7 @@ export function selectImpact(paths,mode='auto'){
    plan.common=true;
    if(file.startsWith('apps/backend/scripts/ci/'))backend(false);
    else if(file==='.github/workflows/frontend.yml'||file==='.github/workflows/frontend-compatibility.yml')frontend(false);
-   else if(['.github/workflows/ci-full.yml','.github/workflows/clean-suite.yml','.github/workflows/ci-fast.yml','.github/workflows/backend-experiment.yml'].includes(file))backend(false);
+   else if(['.github/workflows/ci-full.yml','.github/workflows/clean-suite.yml','.github/workflows/ci-fast.yml','.github/workflows/backend-experiment.yml','.github/workflows/ci-v2-backend.yml'].includes(file))backend(false);
    else if(file.startsWith('.github/workflows/')&&!['.github/workflows/ci-v2-pilot.yml','.github/workflows/backend.yml','.github/workflows/ci-gate.yml','.github/workflows/cd-development.yml'].includes(file))shared(false);
    continue;
   }
