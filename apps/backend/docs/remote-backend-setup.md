@@ -64,6 +64,25 @@ P05/P06 ortak alımında `private.crm_intake_forms` operatör yapılandırmasıd
 
 Mevcut public gateway/HMAC ve Turnstile hostname/action yapılandırması korunur; provider doğrulaması veya IP/telefon hız kapısı atlanmaz. Telefon uluslararası +/00 önekiyle gönderilir; ülke tahmini yapılmaz. Kampanya/UTM alanları istemci iddiasıdır; güvenilir kanal/form/URL kaydı ve onay received_at bilgisi sunucuda ayrıca korunur. Hesap/kişi bağlama, öğrenci aktivasyonu veya pazarlama izni üretmez. Gerçek form eşlemeleri ve teslim kabulü P07, yerel reklam sağlayıcıları P08/P09 kapsamındadır; bu kaynak değişikliği canlı form kaydı veya dış gönderim başlatma yetkisi değildir.
 
+### P07 site sunucusu adaptörü
+
+`transports/crm-web-form-gateway.mjs` içindeki `createCrmWebFormHandler(kind, config, env)` yalnız sunucu içindir. Sunucu kind=contact/kayit seçer; sırasıyla tam `/api/contact` veya `/api/kayit` kabul edilir. Mevcut Upstash/honeypot/validasyon handler çağrısından önce korunur. Adaptör okunmamış Request gövdesi bekler; site validasyonu request.clone() üzerinden kendi boyut sınırıyla okumalı veya doğrulanmış bağlantı bilgisini koruyan eşdeğer Request sağlamalıdır. Adaptör public gateway'nin HTTPS host/origin,64KiB gövde, Vercel tarafından ezilen bağlantı IP'si ve HMAC korumasını kullanır. Vercel dışı proxy için bu IP başlığı güvenilir varsayılmaz. Caller authorization/cookie/x-ftk başlıkları taşınmaz. Başarı yalnız `{ok:true,data:{accepted:true},trace_id}` cevabıdır; HTTP200 içindeki ok:false da hatadır. Timeout/belirsiz sonuçta aynı gönderim anahtarı/payload korunur.
+
+Sunucu config'i tam olarak `{form_id, consent:{purpose,version}, marketingConsent:{purpose,version}}` içerir. İki purpose farklı, version gerçek site metnine bağlı olmalıdır; varsayılan sürüm seçilmez. form_id [güvenilir form kaydına](#ortak-crm-form-kaydı) karşılık gelir. Farklı formlar ayrı config/kimlik kullanır. Kullanıcı JSON'unda form_id/org_id/source/center_id kabul edilmez. Config kullanıcı girdisi veya public env değişkeninden alınmaz. Mevcut `FTK_PUBLIC_APPLICATION_HOSTNAME`, `FTK_PUBLIC_INGRESS_SECRET`, `FTK_PUBLIC_ANON_KEY` (legacy anon JWT) ve isteğe bağlı `FTK_PUBLIC_BACKEND_ORIGIN` kullanılır; secret istemciye verilmez. Turnstile gerçek public_application action/tam hostname ve sayılan preflight Edge'de kalır.
+
+Her iki form JSON'una UUID request_id, UUID client_request_key, gerçek bot_proof ve `submitted_at` (UTC ISO milisaniye, `.000Z` biçimi) gerekir. Site bunları yeni gönderimde bir kez üretir; belirsiz retry boyunca key/zaman/payload aynı kalır. Yeni gerçek başvuru yeni key alır. request_id izleme içindir. submitted_at tüketicinin beyan ettiği gönderim zamanıdır; kanıtlanmış onay tıklama zamanı değildir. Backend ayrıca güvenilir received_at/kaynak kanıtını saklar. Tarihsel kaydın zamanını bugüne çekerek onay kanıtı üretilmez; P10 önizleme yolu kullanılır. İki boolean onay eksikse reddedilir; false true'ya çevrilmez. Key/token/sürüm/zaman uydurulmaz.
+
+| Site alanı | Ortak alım karşılığı |
+|---|---|
+| contact.name / kayit.fullName | intake.display_name |
+| phone | intake.phone; Edge uluslararası +/00 normalizasyonunu yapar, ülke tahmin edilmez |
+| level (gönderilmişse) | intake.interest |
+| kayit.mode / partnerName (gönderilmişse) | intake.mode / partner_name |
+| consent / marketingConsent | Ayrı purpose/version/accepted/occurred_at; pazarlama izni üretmez |
+| attribution (gönderilmişse) | Yayımlanmış campaign_id/ad_id/UTM/page_url; istemci iddiası |
+
+Eski handler/DTO bu tarihsel girdiden güncel sayılmaz. Güncel alanlar/boş değer davranışı, onay metin sürümleri ve bot_proof üretimi site sahibiyle doğrulanır. Generic CRM DTO'sundaki e-posta/mesaj tarihsel contact/kayit formunda varmış gibi eklenmez; gerekirse güncel handler kanıtıyla dar eşleme genişletilir. Partnerli modun alan zorunlulukları site validasyonunda korunur; mode enum'u uydurulmaz. Gerçek form→backend→yetkili inbox/retry kabulü [P07](remaining-work.md#p07), sınır devri [XREQ-018](../../../docs/requests.md#xreq-018) sahibindedir.
+
 ### Kurulum ve eski site inceleme girdileri
 
 Bu bölüm 22–23 Ekim kurulum kararının girdisidir; yeni canlı readback veya veri aktarımı yetkisi değildir. Sonlu 100 haftalık tekrar, toplam kontenjan 20, paket başına 4 ders ve 2 ay geçerlilik tenant değerleridir. İkinci paket sipariş aşamasında kaydedilmişti; güncel ödeme/satış/hak durumu yeniden okunmadan tahsil edilmiş sayılmaz. Bu örnek genel borçlu satış kurallarını kaldırmaz. Gerçek ödenmemiş borç katılımı engeller; kurulumda ders negatif hak alt sınırı −2, etkinlikte negatif kredi yasağı; kapalı grup öğrenci iptalinde iade yok, fiilî yoklama gerçeği korunur. İlk owner Auth doğrulaması ve Business fiyat/dönem/limit konfigürasyonu gerçek kanıt ister; ücretsiz/ödenmiş plan varsayılmaz.
