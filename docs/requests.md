@@ -23,7 +23,7 @@ Bu dosya alanlar arası talep ve teslim kabulünün tek kaydıdır. Sohbet devri
 
 | XREQ-015 | Frontend; S03 sınıf varsayılan görevi canlı kabulü | Backend | [WF03](workflows.md#wf03), `management_state_get_v1` / `class_assignment_set_v1`; [gözlem ve kabul](#xreq-015). | Yetkili Starter CM, seçilen sınıf/kişi/duty atamasının varlığını, durumunu ve kendi sürümünü desteklenen normal okuyucudan alabilir; güvenli ekleme/kaldırma consumer girdisi belirlenir. | Kapandı | Frontend 4 Kasım: PR167 aynı-main/development teslimi doğrulandı; gerçek Starter ekranında mevcut durumu okuma, açık onayla etkinleştirme ve güncel etkin durumu okuma, açık onayla kaldırma ve güncel etkin değil durumu okuma geçti. Kanıt/sınırlar aşağıdaki frontend kabulündedir. |
 
-| XREQ-016 | Frontend; S11 bağlamsal belge kabulü | Backend | [WF11](workflows.md#wf11), `document_requirements_get_v1` / `document_accept_v1`; [somut sınır ve kabul](#xreq-016). | Native oturumun gerçek organizasyon kişisi backend tarafından çözülerek kendi işlem bağlamındaki gerekli sürüm/özel dosya okunabilir; frontend kişi kimliği tahmin etmeden aynı bağlamda yalnız kendi kabulünü sunabilir. | Backend değerlendirmesi bekliyor | Frontend 4 Kasım: hesap ve kişi kimlikleri farklıdır; mevcut required person_id ve self kişi keşfi boşluğu aşağıda kanıtlandı. Bu kayıt yeni selector uygulaması, backend onayı veya kendi adına kabulün teslimi değildir. |
+| XREQ-016 | Frontend; S11 bağlamsal belge kabulü | Backend | [WF11](workflows.md#wf11), `document_requirements_get_v1` / `document_accept_v1`; [somut sınır ve kabul](#xreq-016). | Native oturumun gerçek organizasyon kişisi backend tarafından çözülerek kendi işlem bağlamındaki gerekli sürüm/özel dosya okunabilir; frontend kişi kimliği tahmin etmeden aynı bağlamda yalnız kendi kabulünü sunabilir. | Backend kaynak hazır; aday kabulü bekleniyor | Frontend 4 Kasım: hesap ve kişi kimlikleri farklıdır; mevcut required person_id ve self kişi keşfi boşluğu aşağıda kanıtlandı. Bu kayıt yeni selector uygulaması, backend onayı veya kendi adına kabulün teslimi değildir. |
 | XREQ-017 | Backend | Frontend | [WF01](workflows.md#wf01), [native telefon tüketicisi](settings.md#native-telefon-doğrulama-tüketicisi) | Telefon kodunu yeniden isteme, pending numaraya authenticated updateUser ile yeni istek üretir; yeni telefon doğrulanana kadar mevcut telefon korunur. | Frontend değerlendirmesi/kabulü bekleniyor | Kullanıcının native telefon test numarası dilimi; backend native aday kabulü ayrıca bekleniyor. |
 
 Alanların kendi planlarındaki bağımlılık gözlemleri otomatik olarak talep, onay veya işe başlama yetkisi sayılmaz; somut talep bu tabloya kaydedildiğinde `XREQ-001` biçiminde sabit bir kimlik alır.
@@ -268,6 +268,14 @@ Makine sözleşmesindeki `ManagementSelector_class_assignment_set_v1` aynı clas
 
 Frontend, açık hedefi gerçek rezervasyondan gelen yetkili gereklilik ve byte okumasını bağımsız tamamlar. Self selector yayımlanmadan bu okuyucuda kabul düğmesi, hesap/kişi tahmini veya sahte onay fallback'i yoktur. Backend değerlendirme/onay alanı frontend tarafından doldurulmamıştır.
 
+
+### Backend değerlendirmesi — XREQ-016
+
+Kişi belirtilmeyen `document_requirements_get_v1` isteği yalnız canlı native oturumun mevcut organizasyon kişisini seçer; `context` zorunludur. Açık `person_id` ile mevcut yetkili okuma geriye uyumlu kalır; explicit null self seçimi değildir. Backend aynı aktör çözümünü gereklilik ve özel byte okumasında kullanır; `content_file_id` yalnız bu kişinin bu bağlamda dönen güncel gereklilik sürümünde bulunursa açılır. Owner/OM/CM/eğitmen olmak self hedefini başka kişiye çeviremez. Kabul komutu yine yalnız kendi kişisi için, mevcut bağlam/sürüm ve canlı yetki kapılarıyla çalışır; vekalet eklenmez.
+
+Frontend compatibility tanısında `apps/web/src/lib/document-requirements.ts:63`, opsiyonel person_id değerini zorunlu string kabul eden yardımcıya aktarıyor. Consumer açık hedef helper'ında person_id varlığını daraltmalı veya yayımlanan self okuma yolunu ayrı tüketmelidir; hesap/kişi tahminiyle doldurulmaz. Bu XREQ-016 tüketici uyumudur, backend native kabulü veya frontend ekran kapanışı değildir.
+
+Kaynak uygulaması ve küçük sözleşme/native suiteleri bu PR'de hazırlanır; aday/main/development ve frontend native/hosted kabulü doğrulanmadan talep kapandı sayılmaz. Backend teknik değerlendirmesi ayrı endpoint veya genel hesap–kişi dizini gerektirmedi.
 
 <a id="xreq-017"></a>
 ## XREQ-017 Native telefon kodunu yeniden isteme

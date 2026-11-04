@@ -3,7 +3,7 @@ import {calendarToken,calendarTokenHash,calendarOrigin,calendarSubscriptionUrl,c
 import {lifecycleReauth} from './lifecycle-auth.ts';
 import {accountSignupCheck} from './account-signup.ts';
 import {invitationTick} from './invitation-delivery.ts';
-import {publicIngress,verifyPublicBot,publicBotHostname} from "./public-ingress.ts";
+import {crmIntakePhone,publicIngress,verifyPublicBot,publicBotHostname} from "./public-ingress.ts";
 import {importStorage,parseImportCsv} from "./import-file.ts";
 import {documentStorage} from "./document-storage.ts";
 import {verifySettingsImage} from './settings-image.ts';
@@ -56,7 +56,9 @@ Deno.serve(async req=>{
    if(operation==='public_application_submit_v1'){
     if(!env('FTK_TURNSTILE_SECRET')||!publicBotHostname(env))return failure('SERVICE_UNAVAILABLE',503);
     const ingress=await publicIngress(req,body,env);if(!ingress)return failure('SERVICE_UNAVAILABLE',503);
-    aux={phase:'preflight',ip_hash:ingress.ip_hash,target_hash:await ingress.targetHash(request.contact)};
+    let target=request.contact;
+    if(request.form_id){try{target=crmIntakePhone(request.intake?.phone);}catch{return failure('VALIDATION_FAILED');}}
+    aux={phase:'preflight',ip_hash:ingress.ip_hash,target_hash:await ingress.targetHash(target)};
     const preflight=await rpcPublic(aux);
     if(!preflight.ok)return json(preflight);
     if(preflight.data?.accepted===true)return json(preflight);

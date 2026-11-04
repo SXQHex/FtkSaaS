@@ -396,7 +396,7 @@ export type DocumentGate = ("sale" | "reservation" | "attendance" | "event_regis
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
  * via the `definition` "ApplicationAction".
  */
-export type ApplicationAction = ("match_existing" | "create_candidate" | "close")
+export type ApplicationAction = ("match_existing" | "create_candidate" | "close" | "assign_center")
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
  * via the `definition` "OrdinaryAttendanceResult".
@@ -1033,6 +1033,36 @@ preparation_id?: (string | null)
  * via the `definition` "EventRegistrationResult".
  */
 export type EventRegistrationResult = (EventRegistered | EventCapacityClosed)
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "Request_public_application_submit".
+ */
+export type RequestPublicApplicationSubmit = ({
+client_api_version: 1
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+request_id: string
+center_id?: (string | null)
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+publication_id?: string
+contact?: Text
+bot_proof: Secret
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+client_request_key: string
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+form_id?: string
+intake?: CrmIntake
+} & RequestPublicApplicationSubmit1)
+export type RequestPublicApplicationSubmit1 = {
+[k: string]: unknown
+}
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
  * via the `definition` "Request_event_attendance_mark".
@@ -3670,6 +3700,13 @@ FinitePlanLimit?: FinitePlanLimit
 UnlimitedPlanLimit?: UnlimitedPlanLimit
 PlanUsage?: PlanUsage
 EventCapacity?: EventCapacity
+CrmIntakeSource?: CrmIntakeSource
+CrmIntakeConsent?: CrmIntakeConsent
+CrmIntake?: CrmIntake
+CrmIntakeConsentEvidence?: CrmIntakeConsentEvidence
+CrmIntakeView?: CrmIntakeView
+CrmApplicationRouting?: CrmApplicationRouting
+CrmPhoneMatch?: CrmPhoneMatch
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -12276,7 +12313,7 @@ center_id?: (string | null)
 /**
  * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
  */
-person_id: string
+person_id?: string
 context: AcceptanceContext
 /**
  * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
@@ -12409,25 +12446,40 @@ trace_id: string
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
- * via the `definition` "Request_public_application_submit".
+ * via the `definition` "CrmIntake".
  */
-export interface RequestPublicApplicationSubmit {
-client_api_version: 1
+export interface CrmIntake {
+display_name: string
+phone: string
+email?: string
+interest?: string
+message?: string
+partner_name?: string
+mode?: string
+attribution?: {
+campaign_id?: string
+ad_id?: string
+utm_source?: string
+utm_medium?: string
+utm_campaign?: string
+utm_term?: string
+utm_content?: string
+page_url?: string
+}
 /**
- * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ * @maxItems 20
  */
-request_id: string
-center_id?: (string | null)
+consents: []|[CrmIntakeConsent]|[CrmIntakeConsent, CrmIntakeConsent]|[CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent]|[CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent]|[CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent]|[CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent]|[CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent]|[CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent]|[CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent]|[CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent]|[CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent]|[CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent]|[CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent]|[CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent]|[CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent]|[CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent]|[CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent]|[CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent]|[CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent]|[CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent]
+}
 /**
- * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "CrmIntakeConsent".
  */
-publication_id: string
-contact: Text
-bot_proof: Secret
-/**
- * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
- */
-client_request_key: string
+export interface CrmIntakeConsent {
+purpose: string
+accepted: boolean
+version: string
+occurred_at: string
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -12466,6 +12518,11 @@ operation_key: string
 application_id: string
 action: ApplicationAction
 person_id?: (string | null)
+expected_version?: PositiveInt
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+target_center_id?: string
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -15714,20 +15771,88 @@ version?: PositiveInt
  * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
  */
 org_id: string
-/**
- * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
- */
-center_id: string
-/**
- * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
- */
-publication_id: string
+center_id: (string | null)
+publication_id: (string | null)
 target_contact: Text
 target_hash: Text
 state: ApplicationState
 bot_verified_at: Instant
 request_reference?: (string | null)
 person_id?: (string | null)
+crm_form_id?: (string | null)
+source_snapshot?: (CrmIntakeSource | {
+
+})
+intake?: (CrmIntakeView | null)
+routing_history?: CrmApplicationRouting[]
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "CrmIntakeSource".
+ */
+export interface CrmIntakeSource {
+channel: "web_form"
+form_key: string
+source_url: string
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+form_id: string
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "CrmIntakeView".
+ */
+export interface CrmIntakeView {
+display_name: string
+phone: string
+email?: string
+interest?: string
+message?: string
+partner_name?: string
+mode?: string
+attribution?: {
+campaign_id?: string
+ad_id?: string
+utm_source?: string
+utm_medium?: string
+utm_campaign?: string
+utm_term?: string
+utm_content?: string
+page_url?: string
+}
+/**
+ * @maxItems 20
+ */
+consents: []|[CrmIntakeConsentEvidence]|[CrmIntakeConsentEvidence, CrmIntakeConsentEvidence]|[CrmIntakeConsentEvidence, CrmIntakeConsentEvidence, CrmIntakeConsentEvidence]|[CrmIntakeConsentEvidence, CrmIntakeConsentEvidence, CrmIntakeConsentEvidence, CrmIntakeConsentEvidence]|[CrmIntakeConsentEvidence, CrmIntakeConsentEvidence, CrmIntakeConsentEvidence, CrmIntakeConsentEvidence, CrmIntakeConsentEvidence]|[CrmIntakeConsentEvidence, CrmIntakeConsentEvidence, CrmIntakeConsentEvidence, CrmIntakeConsentEvidence, CrmIntakeConsentEvidence, CrmIntakeConsentEvidence]|[CrmIntakeConsentEvidence, CrmIntakeConsentEvidence, CrmIntakeConsentEvidence, CrmIntakeConsentEvidence, CrmIntakeConsentEvidence, CrmIntakeConsentEvidence, CrmIntakeConsentEvidence]|[CrmIntakeConsentEvidence, CrmIntakeConsentEvidence, CrmIntakeConsentEvidence, CrmIntakeConsentEvidence, CrmIntakeConsentEvidence, CrmIntakeConsentEvidence, CrmIntakeConsentEvidence, CrmIntakeConsentEvidence]|[CrmIntakeConsentEvidence, CrmIntakeConsentEvidence, CrmIntakeConsentEvidence, CrmIntakeConsentEvidence, CrmIntakeConsentEvidence, CrmIntakeConsentEvidence, CrmIntakeConsentEvidence, CrmIntakeConsentEvidence, CrmIntakeConsentEvidence]|[CrmIntakeConsentEvidence, CrmIntakeConsentEvidence, CrmIntakeConsentEvidence, CrmIntakeConsentEvidence, CrmIntakeConsentEvidence, CrmIntakeConsentEvidence, CrmIntakeConsentEvidence, CrmIntakeConsentEvidence, CrmIntakeConsentEvidence, CrmIntakeConsentEvidence]|[CrmIntakeConsentEvidence, CrmIntakeConsentEvidence, CrmIntakeConsentEvidence, CrmIntakeConsentEvidence, CrmIntakeConsentEvidence, CrmIntakeConsentEvidence, CrmIntakeConsentEvidence, CrmIntakeConsentEvidence, CrmIntakeConsentEvidence, CrmIntakeConsentEvidence, CrmIntakeConsentEvidence]|[CrmIntakeConsentEvidence, CrmIntakeConsentEvidence, CrmIntakeConsentEvidence, CrmIntakeConsentEvidence, CrmIntakeConsentEvidence, CrmIntakeConsentEvidence, CrmIntakeConsentEvidence, CrmIntakeConsentEvidence, CrmIntakeConsentEvidence, CrmIntakeConsentEvidence, CrmIntakeConsentEvidence, CrmIntakeConsentEvidence]|[CrmIntakeConsentEvidence, CrmIntakeConsentEvidence, CrmIntakeConsentEvidence, CrmIntakeConsentEvidence, CrmIntakeConsentEvidence, CrmIntakeConsentEvidence, CrmIntakeConsentEvidence, CrmIntakeConsentEvidence, CrmIntakeConsentEvidence, CrmIntakeConsentEvidence, CrmIntakeConsentEvidence, CrmIntakeConsentEvidence, CrmIntakeConsentEvidence]|[CrmIntakeConsentEvidence, CrmIntakeConsentEvidence, CrmIntakeConsentEvidence, CrmIntakeConsentEvidence, CrmIntakeConsentEvidence, CrmIntakeConsentEvidence, CrmIntakeConsentEvidence, CrmIntakeConsentEvidence, CrmIntakeConsentEvidence, CrmIntakeConsentEvidence, CrmIntakeConsentEvidence, CrmIntakeConsentEvidence, CrmIntakeConsentEvidence, CrmIntakeConsentEvidence]|[CrmIntakeConsentEvidence, CrmIntakeConsentEvidence, CrmIntakeConsentEvidence, CrmIntakeConsentEvidence, CrmIntakeConsentEvidence, CrmIntakeConsentEvidence, CrmIntakeConsentEvidence, CrmIntakeConsentEvidence, CrmIntakeConsentEvidence, CrmIntakeConsentEvidence, CrmIntakeConsentEvidence, CrmIntakeConsentEvidence, CrmIntakeConsentEvidence, CrmIntakeConsentEvidence, CrmIntakeConsentEvidence]|[CrmIntakeConsentEvidence, CrmIntakeConsentEvidence, CrmIntakeConsentEvidence, CrmIntakeConsentEvidence, CrmIntakeConsentEvidence, CrmIntakeConsentEvidence, CrmIntakeConsentEvidence, CrmIntakeConsentEvidence, CrmIntakeConsentEvidence, CrmIntakeConsentEvidence, CrmIntakeConsentEvidence, CrmIntakeConsentEvidence, CrmIntakeConsentEvidence, CrmIntakeConsentEvidence, CrmIntakeConsentEvidence, CrmIntakeConsentEvidence]|[CrmIntakeConsentEvidence, CrmIntakeConsentEvidence, CrmIntakeConsentEvidence, CrmIntakeConsentEvidence, CrmIntakeConsentEvidence, CrmIntakeConsentEvidence, CrmIntakeConsentEvidence, CrmIntakeConsentEvidence, CrmIntakeConsentEvidence, CrmIntakeConsentEvidence, CrmIntakeConsentEvidence, CrmIntakeConsentEvidence, CrmIntakeConsentEvidence, CrmIntakeConsentEvidence, CrmIntakeConsentEvidence, CrmIntakeConsentEvidence, CrmIntakeConsentEvidence]|[CrmIntakeConsentEvidence, CrmIntakeConsentEvidence, CrmIntakeConsentEvidence, CrmIntakeConsentEvidence, CrmIntakeConsentEvidence, CrmIntakeConsentEvidence, CrmIntakeConsentEvidence, CrmIntakeConsentEvidence, CrmIntakeConsentEvidence, CrmIntakeConsentEvidence, CrmIntakeConsentEvidence, CrmIntakeConsentEvidence, CrmIntakeConsentEvidence, CrmIntakeConsentEvidence, CrmIntakeConsentEvidence, CrmIntakeConsentEvidence, CrmIntakeConsentEvidence, CrmIntakeConsentEvidence]|[CrmIntakeConsentEvidence, CrmIntakeConsentEvidence, CrmIntakeConsentEvidence, CrmIntakeConsentEvidence, CrmIntakeConsentEvidence, CrmIntakeConsentEvidence, CrmIntakeConsentEvidence, CrmIntakeConsentEvidence, CrmIntakeConsentEvidence, CrmIntakeConsentEvidence, CrmIntakeConsentEvidence, CrmIntakeConsentEvidence, CrmIntakeConsentEvidence, CrmIntakeConsentEvidence, CrmIntakeConsentEvidence, CrmIntakeConsentEvidence, CrmIntakeConsentEvidence, CrmIntakeConsentEvidence, CrmIntakeConsentEvidence]|[CrmIntakeConsentEvidence, CrmIntakeConsentEvidence, CrmIntakeConsentEvidence, CrmIntakeConsentEvidence, CrmIntakeConsentEvidence, CrmIntakeConsentEvidence, CrmIntakeConsentEvidence, CrmIntakeConsentEvidence, CrmIntakeConsentEvidence, CrmIntakeConsentEvidence, CrmIntakeConsentEvidence, CrmIntakeConsentEvidence, CrmIntakeConsentEvidence, CrmIntakeConsentEvidence, CrmIntakeConsentEvidence, CrmIntakeConsentEvidence, CrmIntakeConsentEvidence, CrmIntakeConsentEvidence, CrmIntakeConsentEvidence, CrmIntakeConsentEvidence]
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "CrmIntakeConsentEvidence".
+ */
+export interface CrmIntakeConsentEvidence {
+purpose: string
+accepted: boolean
+version: string
+occurred_at: string
+source: CrmIntakeSource
+received_at: string
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "CrmApplicationRouting".
+ */
+export interface CrmApplicationRouting {
+from_center_id: (string | null)
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+to_center_id: string
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+actor_person_id: string
+occurred_at: string
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -18140,7 +18265,31 @@ contact?: Text
  * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
  */
 publication_id?: string
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+form_id?: string
+center_id?: (string | null)
+source?: CrmIntakeSource
+intake?: CrmIntakeView
+routing_history?: CrmApplicationRouting[]
+/**
+ * @maxItems 50
+ */
+phone_matches?: CrmPhoneMatch[]
+phone_matches_truncated?: boolean
 }
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "CrmPhoneMatch".
+ */
+export interface CrmPhoneMatch {
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+person_id: string
+display_name: string
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema

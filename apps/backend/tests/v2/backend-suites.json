@@ -382,5 +382,23 @@
     "file": "apps/backend/tests/v2/backend/starter-attendance-policy.test.mjs",
     "legacy_source": "apps/backend/tests/starter-attendance-protection.test.mjs",
     "estimated_seconds": 61.70541878524544
+  },
+  {
+    "id": "document-self-requirements-acceptance",
+    "file": "apps/backend/tests/document-self-requirements-acceptance.mjs",
+    "legacy_source": "apps/backend/tests/document-self-requirements-acceptance.mjs",
+    "estimated_seconds": 47.02830495278781
+  },
+  {
+    "id": "crm-application-intake-acceptance",
+    "file": "apps/backend/tests/crm-application-intake-acceptance.mjs",
+    "legacy_source": "apps/backend/tests/crm-application-intake-acceptance.mjs",
+    "estimated_seconds": 22.35575315627219
+  },
+  {
+    "id": "crm-application-review-acceptance",
+    "file": "apps/backend/tests/crm-application-review-acceptance.mjs",
+    "legacy_source": "apps/backend/tests/crm-application-review-acceptance.mjs",
+    "estimated_seconds": 45.837029525083345
   }
 ]

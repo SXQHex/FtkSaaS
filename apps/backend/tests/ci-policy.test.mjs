@@ -261,7 +261,14 @@ test('eight-shard acceptance requires all eight source-bound jobs and rejects le
  const v=promoteFixture(valid());v.binding.source_attempt=1;v.jobs[0].steps.push({name:'Upload schema baseline',conclusion:'success'});
  assert(validateBinding(v));
  assert.equal(acceptancePlan().length,8);
+ const currentPlan=acceptancePlan(),added=new Set(['document-self-requirements-acceptance','crm-application-intake-acceptance','crm-application-review-acceptance']);
+ const allIds=currentPlan.flatMap(b=>b.units.map(u=>u.id));assert.equal(allIds.length,67);assert.equal(new Set(allIds).size,allIds.length);
+ for(const id of added)assert(allIds.includes(id),'Missing new acceptance unit '+id);
+ {
+  const acceptancePlan=()=>currentPlan.map(b=>({...b,units:b.units.filter(u=>!added.has(u.id))}));
  const ids=acceptancePlan().flatMap(b=>b.units.map(u=>u.id));assert.equal(ids.length,64);assert.equal(new Set(ids).size,ids.length);
+ }
+
  for(let n=5;n<=8;n++)for(const mutate of [x=>x.jobs.splice(x.jobs.findIndex(j=>j.name==='api-'+n),1),x=>x.jobs.find(j=>j.name==='api-'+n).conclusion='failure',x=>x.jobs.find(j=>j.name==='api-'+n).run_attempt=2,x=>x.jobs.find(j=>j.name==='api-'+n).head_sha='other',x=>x.jobs.find(j=>j.name==='api-'+n).steps[0].conclusion='skipped',x=>x.jobs.push(structuredClone(x.jobs.find(j=>j.name==='api-'+n)))]){
   const x=structuredClone(v);mutate(x);assert.throws(()=>validateBinding(x));
  }

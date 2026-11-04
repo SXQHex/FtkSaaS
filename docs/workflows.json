@@ -292,8 +292,8 @@
         "management_state_get_v1"
       ],
       "review": {
-        "fingerprint": "f1d682f22e8f5e23ecd66b5a93c506a193a90552f78528161ff8442c4ef3ba31",
-        "reason": "Reviewed merged production API inventory and local phone fixture changes together with direct V2 suite mapping; assertions and production gates preserved, shadow-only execution unchanged."
+        "fingerprint": "e38787143fda6a33318abf2dd22958474cacd48eb08db4fb11af878478de325c",
+        "reason": "Main PR185 V2 kaynak/test bağları ile PR182 CRM/self bağları birlikte incelendi;67 gerçek birim parity kontrolünde aynı gövdeleri korur, üretim kabul kapıları değişmez."
       }
     },
     {
@@ -370,7 +370,7 @@
       ],
       "review": {
         "fingerprint": "fe45d4085da08370f663b2d0b0ac058e44561e0cfc0e82bb21bf9b8b9ba04471",
-        "reason": "Reviewed native phone-change consumer against pinned Auth v2.197.0: repeat authenticated updateUser for pending phone and require sent-at advance. Verified projection/history tests and XREQ-017 frontend boundary; fixed OTPs do not prove delivery, expiry or rotation."
+        "reason": "Main native telefon/XREQ-017 kaynağı korunarak senkronizasyon; CRM fixture UUID bind tip çakışması gerçek PG red/green kontrolüyle düzeltildi. Runtime/assertion/deadline değişmedi."
       }
     },
     {
@@ -476,8 +476,8 @@
         "role_revoke_preview_v1"
       ],
       "review": {
-        "fingerprint": "5bdffa107721ba2f621fcfbbada0bf6815a260919486d7af5b250051efeedfda",
-        "reason": "Direct V2 shadow migration: byte-equivalence and module/resource relocation checks preserve the owning legacy test bodies; runtime and guide behavior unchanged. Twenty-runner execution remains diagnostic only."
+        "fingerprint": "644f6d5ea0d6d0b78b652be5427fd4c35e269c4b2ff041d04abbc564f468a0d0",
+        "reason": "Main PR185 V2 kaynak/test bağları ile PR182 CRM/self bağları birlikte incelendi;67 gerçek birim parity kontrolünde aynı gövdeleri korur, üretim kabul kapıları değişmez."
       }
     },
     {
@@ -674,8 +674,8 @@
         "person_discipline_set_v1"
       ],
       "review": {
-        "fingerprint": "4b6202e840107dc7a69bf8aab5ca2df1b73a9610880f8330e195c69ffc7f7cdf",
-        "reason": "Direct V2 shadow migration: byte-equivalence and module/resource relocation checks preserve the owning legacy test bodies; runtime and guide behavior unchanged. Twenty-runner execution remains diagnostic only."
+        "fingerprint": "798e4d7919641c7d8612502bf6789593fc96acd0a7dc5b6ae1ed545bc2ffa978",
+        "reason": "Main PR185 V2 kaynak/test bağları ile PR182 CRM/self bağları birlikte incelendi;67 gerçek birim parity kontrolünde aynı gövdeleri korur, üretim kabul kapıları değişmez."
       }
     },
     {
@@ -776,8 +776,8 @@
         "negative_limits_get_v1"
       ],
       "review": {
-        "fingerprint": "a19e00320bd79aee5e1f5b8d24de4bb0f8546765873383aa069979fc387ceb96",
-        "reason": "Direct V2 shadow migration: byte-equivalence and module/resource relocation checks preserve the owning legacy test bodies; runtime and guide behavior unchanged. Twenty-runner execution remains diagnostic only."
+        "fingerprint": "1dec80f8ba8fd453fa5f5a052db43cfe8684eb2dd838784297f7e37f043fa80e",
+        "reason": "Main PR185 V2 kaynak/test bağları ile PR182 CRM/self bağları birlikte incelendi;67 gerçek birim parity kontrolünde aynı gövdeleri korur, üretim kabul kapıları değişmez."
       }
     },
     {
@@ -1013,6 +1013,9 @@
         "apps/backend/tests/calendar-feed-unit.mjs",
         "apps/backend/tests/person-registry.test.mjs",
         "apps/backend/tests/starter-studio-acceptance.mjs",
+        "apps/backend/tests/crm-application-intake-acceptance.mjs",
+        "apps/backend/tests/crm-application-contract-unit.mjs",
+        "apps/backend/tests/crm-ingress-unit.mjs",
         "apps/backend/tests/v2/backend/person-registry-root-1.test.mjs",
         "apps/backend/tests/v2/backend/person-registry-root-2.test.mjs"
       ],
@@ -1029,7 +1032,10 @@
         "apps/backend/scripts/p04-public-ingress.mjs",
         "apps/backend/scripts/p04-trial-config.mjs",
         "apps/backend/scripts/public-application-gateway.mjs",
-        "apps/backend/transports/calendar-proxy.mjs"
+        "apps/backend/transports/calendar-proxy.mjs",
+        "apps/backend/database/crm-application-intake.sql",
+        "apps/backend/supabase/migrations/20261104131917_crm_application_intake.sql",
+        "apps/backend/scripts/crm-intake-form-config.mjs"
       ],
       "operations": [
         "publication_set_v1",
@@ -1043,8 +1049,8 @@
         "calendar_feed_get_v1"
       ],
       "review": {
-        "fingerprint": "2b4b469b47e1c80214ce71470f85380c60c177780897833fa86d5e272a9b8542",
-        "reason": "Direct V2 shadow migration: byte-equivalence and module/resource relocation checks preserve the owning legacy test bodies; runtime and guide behavior unchanged. Twenty-runner execution remains diagnostic only."
+        "fingerprint": "613f4f8dd6ec47fd141f2c3ec7a3364e7b7de592f58b6afb7ac0964768241b6b",
+        "reason": "Main PR185 V2 kaynak/test bağları ile PR182 CRM/self bağları birlikte incelendi;67 gerçek birim parity kontrolünde aynı gövdeleri korur, üretim kabul kapıları değişmez."
       }
     },
     {
@@ -1105,6 +1111,8 @@
         "apps/backend/tests/p05-acceptance.mjs",
         "apps/backend/tests/starter-operations-acceptance.mjs",
         "apps/backend/tests/starter-document-acceptance.mjs",
+        "apps/backend/tests/document-self-requirements-acceptance.mjs",
+        "apps/backend/tests/document-self-contract-unit.mjs",
         "apps/backend/tests/v2/backend/starter-operations-acceptance.test.mjs",
         "apps/backend/tests/v2/backend/starter-operations-reports.test.mjs"
       ],
@@ -1116,7 +1124,9 @@
         "apps/backend/database/p05-wrappers.sql",
         "apps/backend/database/p06-bind.sql",
         "apps/backend/database/runtime-wrappers-current.sql",
-        "docs/workflows.md"
+        "docs/workflows.md",
+        "apps/backend/database/document-self-requirements.sql",
+        "apps/backend/supabase/migrations/20261104131914_document_self_requirements.sql"
       ],
       "operations": [
         "notifications_list_v1",
@@ -1128,8 +1138,8 @@
         "document_publication_preview_v1"
       ],
       "review": {
-        "fingerprint": "df4c5a6f1eeb20ebcf6851bc5ea3210231da22a5ae7d6388087eedb01b42acb5",
-        "reason": "Direct V2 shadow migration: byte-equivalence and module/resource relocation checks preserve the owning legacy test bodies; runtime and guide behavior unchanged. Twenty-runner execution remains diagnostic only."
+        "fingerprint": "24e7d3763c462a56fec5273f32cb1fa9e0f7b29317047e9fe421718c64d0b142",
+        "reason": "Main PR185 V2 kaynak/test bağları ile PR182 CRM/self bağları birlikte incelendi;67 gerçek birim parity kontrolünde aynı gövdeleri korur, üretim kabul kapıları değişmez."
       }
     },
     {
@@ -1391,6 +1401,7 @@
       "tests": [
         "apps/backend/tests/p05-acceptance.mjs",
         "apps/backend/tests/person-registry.test.mjs",
+        "apps/backend/tests/crm-application-review-acceptance.mjs",
         "apps/backend/tests/v2/backend/person-registry-root-1.test.mjs",
         "apps/backend/tests/v2/backend/person-registry-root-2.test.mjs"
       ],
@@ -1406,7 +1417,9 @@
         "apps/backend/database/session-capacity.sql",
         "docs/workflows.md",
         "apps/backend/database/starter-basic-crm.sql",
-        "apps/backend/supabase/migrations/20261104111220_starter_basic_crm.sql"
+        "apps/backend/supabase/migrations/20261104111220_starter_basic_crm.sql",
+        "apps/backend/database/crm-application-intake.sql",
+        "apps/backend/supabase/migrations/20261104131917_crm_application_intake.sql"
       ],
       "operations": [
         "leads_list_v1",
@@ -1420,8 +1433,8 @@
         "automation_save_v1"
       ],
       "review": {
-        "fingerprint": "66f01382d719b722c21375f2064d7e7a1a1372d28d0400c143a588f5ba8b2fb2",
-        "reason": "Direct V2 shadow migration: byte-equivalence and module/resource relocation checks preserve the owning legacy test bodies; runtime and guide behavior unchanged. Twenty-runner execution remains diagnostic only."
+        "fingerprint": "f6d912f9cac15a553852ffd8c6629f26d94cdb36627bae2e3a9e236b031e9966",
+        "reason": "Main PR185 V2 kaynak/test bağları ile PR182 CRM/self bağları birlikte incelendi;67 gerçek birim parity kontrolünde aynı gövdeleri korur, üretim kabul kapıları değişmez."
       }
     },
     {
