@@ -31,3 +31,35 @@ test("document publication approval is keyboard accessible and reflows at narrow
   ).toBeVisible();
   expect(domainRequests).toEqual([]);
 });
+
+test("private document reader supports keyboard, safe download and narrow enlarged text without domain writes", async ({
+  page,
+}) => {
+  const domainRequests: string[] = [];
+  page.on("request", (request) => {
+    if (request.url().includes("/functions/v1/") || request.url().includes("/storage/v1/"))
+      domainRequests.push(request.url());
+  });
+  await page.setViewportSize({ width: 320, height: 950 });
+  await page.goto("/tasarim/belgeler");
+  const open = page.getByRole("button", { name: "Örnek katılım koşulları belgesini aç" });
+  await open.press("Enter");
+  await expect(page.getByRole("article")).toContainText(
+    "Sentetik belge. Okumak veya indirmek kabul kaydı oluşturmaz.",
+  );
+  await expect(page.getByRole("article").getByRole("heading")).toBeFocused();
+  await expect(page.getByRole("link", { name: "Dosyayı indir" })).toHaveAttribute("href", /^blob:/);
+  await expect(page.getByRole("button", { name: /Kabul et|Onayla/ })).toHaveCount(0);
+  await page.evaluate(async () => {
+    document.documentElement.style.fontSize = "200%";
+    await document.fonts.ready;
+  });
+  expect(await page.locator("main").evaluate((node) => node.scrollWidth <= node.clientWidth)).toBe(
+    true,
+  );
+  expect((await new AxeBuilder({ page }).analyze()).violations).toEqual([]);
+  await page.getByRole("button", { name: "Belgeyi kapat" }).press("Enter");
+  await expect(open).toBeFocused();
+  await expect(page.getByRole("link", { name: "Dosyayı indir" })).toHaveCount(0);
+  expect(domainRequests).toEqual([]);
+});

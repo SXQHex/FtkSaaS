@@ -12,6 +12,7 @@ import { browserClient } from "../../lib/supabase/client";
 import { sessionPath } from "../../lib/session-route";
 import { Preferences } from "../preferences";
 import { SessionSummary } from "./session-detail";
+import { SessionDocuments } from "../documents/session-documents";
 import { SessionChange } from "./session-change";
 
 export function SessionPage({
@@ -132,6 +133,11 @@ export function SessionPage({
       ) : current.session ? (
         <div className="space-y-6">
           <SessionSummary session={current.session} timeZone={current.timeZone ?? "UTC"} />
+          <SessionDocuments
+            key={`${actorId}:${orgId}:${sessionId}`}
+            scope={{ actorId, orgId }}
+            sessionId={sessionId}
+          />
           <Button
             variant="outline"
             className="h-auto min-h-11 whitespace-normal"
