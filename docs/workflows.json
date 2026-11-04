@@ -286,8 +286,8 @@
         "management_state_get_v1"
       ],
       "review": {
-        "fingerprint": "7393ef06e6969eb8a612b86d50207d9952544f0e2f2f2c111acb69edf0bf4cb2",
-        "reason": "Reviewed V2 diagnostic scope, fixed twenty-backend plan, exact Git ancestor/clean-source guards and signup bridge transitive inputs from the existing web Turbo graph. Production acceptance and deployment remain unchanged."
+        "fingerprint": "d36646ed70c419ccedfd87e026e8db28df568438ccbf56781ee64fc6d4a307ea",
+        "reason": "Reviewed production API inventory hash for extended identity tests and local-only second phone fixture; no timeout, assertion, provider signup, hosted config or CI gate relaxed."
       }
     },
     {
@@ -363,8 +363,8 @@
         "account_signup_check_v1"
       ],
       "review": {
-        "fingerprint": "f4dc19aa4102bf74be46c9f58f8ca3e57bc02d130fd267615285bcde0bb5e26f",
-        "reason": "P05 Starter basic CRM reviewed: existing person/lead/activity registry, exact request/source admission before replay; F23 retained for person-only followup. Native Starter/Pro/Business scope/version/replay tests and migration102 source equality included; other WF behavior unchanged."
+        "fingerprint": "fe45d4085da08370f663b2d0b0ac058e44561e0cfc0e82bb21bf9b8b9ba04471",
+        "reason": "Reviewed native phone-change consumer against pinned Auth v2.197.0: repeat authenticated updateUser for pending phone and require sent-at advance. Verified projection/history tests and XREQ-017 frontend boundary; fixed OTPs do not prove delivery, expiry or rotation."
       }
     },
     {

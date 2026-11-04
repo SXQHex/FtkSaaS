@@ -101,10 +101,64 @@ test('Global identity current projections, safe links, immutable scope and trans
     const pending=await must(user,'account_get_v1');assert.equal(pending.identity.phone,null);assert.equal(pending.identity.unverified_phone,'+'+phone);assert.equal(pending.identity.pending_phone,phone);
     for(const p of people)assert((await contacts(p)).every(c=>c.kind!=='phone'));
     const bad=await native('/verify','POST',{type:'phone_change',phone,token:'000000'});assert(bad.status>=400);
+    assert.deepEqual((await must(user,'account_get_v1')).identity,pending.identity);
+    for(const p of people)assert((await contacts(p)).every(c=>c.kind!=='phone'));
     const good=await native('/verify','POST',{type:'phone_change',phone,token:'654321'});assert.equal(good.status,200);assert(good.data.access_token);user.jwt=good.data.access_token;user.session_id=JSON.parse(Buffer.from(user.jwt.split('.')[1],'base64url')).session_id;
     const current=await must(user,'account_get_v1');assert.equal(current.id,account.id);assert.equal(current.identity.phone,phone);assert(current.identity.phone_verified_at);assert.equal(current.identity.unverified_phone,null);assert.equal(current.identity.email,user.email);
     for(const p of people)assert((await contacts(p)).some(c=>c.kind==='phone'&&c.value===phone&&c.verified_at));
     assert.equal((await must(other,'account_get_v1')).identity.phone,null);
+    assert.equal(current.identity.pending_phone,null);
+    const reused=await native('/verify','POST',{type:'phone_change',phone,token:'654321'});assert(reused.status>=400);
+    assert.deepEqual((await must(user,'account_get_v1')).identity,current.identity);
+   }finally{
+    await db.query("update auth.users set phone=$2,phone_confirmed_at=$3,phone_change='',phone_change_token='' where id=$1",[user.id,saved.phone,saved.phone_confirmed_at]);
+    await write({expected_version:await version(),display_name:'Current display',unverified_phone:null});
+   }
+  });
+  await t.test('native phone replacement and resend preserve verified identity until proof; collisions do not link accounts',async()=>{
+   const phone='12025550101',replacement='12025550102',{env}=context();
+   const saved=(await db.query('select phone,phone_confirmed_at from auth.users where id=$1',[user.id])).rows[0];
+   const native=async(actor,path,method,body)=>{
+    const response=await fetch(env.API_URL+'/auth/v1'+path,{method,headers:{apikey:env.ANON_KEY,authorization:'Bearer '+actor.jwt,'content-type':'application/json'},body:JSON.stringify(body),signal:AbortSignal.timeout(15000)});
+    return {status:response.status,data:await response.json()};
+   };
+   const verify=async(number,token)=>{
+    const result=await native(user,'/verify','POST',{type:'phone_change',phone:number,token});assert.equal(result.status,200);assert.equal(result.data.user.id,user.id);assert(result.data.access_token);
+    user.jwt=result.data.access_token;user.session_id=JSON.parse(Buffer.from(user.jwt.split('.')[1],'base64url')).session_id;
+   };
+   const changes=async actor=>(await must(actor,'account_security_history_get_v1')).items.filter(e=>e.action==='phone_changed');
+   try{
+    // The prior test sent this number recently; retain the configured native cooldown.
+    await new Promise(resolve=>setTimeout(resolve,5100));
+    assert.equal((await native(user,'/user','PUT',{phone})).status,200);await verify(phone,'654321');
+    const before=await must(user,'account_get_v1'),otherBefore=await must(other,'account_get_v1'),historyBefore=await changes(user);
+    const contactsBefore=await Promise.all(people.map(contacts));
+    const collision=await native(other,'/user','PUT',{phone});assert.equal(collision.status,422);assert.equal(collision.data.error_code,'phone_exists');
+    assert.deepEqual(await must(other,'account_get_v1'),otherBefore);assert.deepEqual(await must(user,'account_get_v1'),before);
+    await write({expected_version:await version(),display_name:'Current display',unverified_phone:'+'+replacement});
+    await new Promise(resolve=>setTimeout(resolve,5100));
+    assert.equal((await native(user,'/user','PUT',{phone:replacement})).status,200);
+    const pending=await must(user,'account_get_v1');assert.equal(pending.id,account.id);assert.equal(pending.identity.phone,phone);assert.equal(pending.identity.phone_verified_at,before.identity.phone_verified_at);assert.equal(pending.identity.pending_phone,replacement);assert.equal(pending.identity.unverified_phone,'+'+replacement);
+    assert.deepEqual(await Promise.all(people.map(contacts)),contactsBefore);assert.deepEqual(await changes(user),historyBefore);
+    // Replaced request and wrong-code attempts must not replace the current contact.
+    assert((await native(user,'/verify','POST',{type:'phone_change',phone,token:'654321'})).status>=400);
+    assert((await native(user,'/verify','POST',{type:'phone_change',phone:replacement,token:'000000'})).status>=400);
+    assert.deepEqual((await must(user,'account_get_v1')).identity,pending.identity);
+    const sentAt=(await db.query('select phone_change_sent_at from auth.users where id=$1',[user.id])).rows[0].phone_change_sent_at;
+    await new Promise(resolve=>setTimeout(resolve,5100));
+    // Auth v2.197.0 /resend looks up the current phone and requires phone login.
+    // Repeat the authenticated change request instead; leave phone signup disabled.
+    assert.equal((await native(user,'/user','PUT',{phone:replacement})).status,200);
+    const resentAt=(await db.query('select phone_change_sent_at from auth.users where id=$1',[user.id])).rows[0].phone_change_sent_at;
+    assert(sentAt&&resentAt&&resentAt>sentAt,'native phone change must actually issue a fresh request');
+    assert.deepEqual((await must(user,'account_get_v1')).identity,pending.identity);assert.deepEqual(await Promise.all(people.map(contacts)),contactsBefore);assert.deepEqual(await changes(user),historyBefore);
+    // Fixed test OTPs intentionally cannot prove expiry or resend-code rotation.
+    await verify(replacement,'654322');
+    const current=await must(user,'account_get_v1');assert.equal(current.id,account.id);assert.equal(current.identity.email,user.email);assert.equal(current.identity.phone,replacement);assert(current.identity.phone_verified_at);assert.equal(current.identity.pending_phone,null);assert.equal(current.identity.unverified_phone,null);
+    for(const p of people){const values=await contacts(p);assert(values.some(c=>c.kind==='phone'&&c.value===replacement&&c.verified_at));assert(values.every(c=>c.kind!=='phone'||c.value!==phone));}
+    const history=await changes(user);assert.equal(history.length,historyBefore.length+1);assert(history.every(e=>!JSON.stringify(e).includes(replacement)&&!JSON.stringify(e).includes('654322')));
+    assert.deepEqual(await must(other,'account_get_v1'),otherBefore);assert.deepEqual(await changes(other),[]);
+    assert((await native(user,'/verify','POST',{type:'phone_change',phone:replacement,token:'654322'})).status>=400);assert.deepEqual(await changes(user),history);
    }finally{
     await db.query("update auth.users set phone=$2,phone_confirmed_at=$3,phone_change='',phone_change_token='' where id=$1",[user.id,saved.phone,saved.phone_confirmed_at]);
     await write({expected_version:await version(),display_name:'Current display',unverified_phone:null});

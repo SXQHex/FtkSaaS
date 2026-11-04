@@ -24,6 +24,7 @@ Bu dosya alanlar arası talep ve teslim kabulünün tek kaydıdır. Sohbet devri
 | XREQ-015 | Frontend; S03 sınıf varsayılan görevi canlı kabulü | Backend | [WF03](workflows.md#wf03), `management_state_get_v1` / `class_assignment_set_v1`; [gözlem ve kabul](#xreq-015). | Yetkili Starter CM, seçilen sınıf/kişi/duty atamasının varlığını, durumunu ve kendi sürümünü desteklenen normal okuyucudan alabilir; güvenli ekleme/kaldırma consumer girdisi belirlenir. | Kapandı | Frontend 4 Kasım: PR167 aynı-main/development teslimi doğrulandı; gerçek Starter ekranında mevcut durumu okuma, açık onayla etkinleştirme ve güncel etkin durumu okuma, açık onayla kaldırma ve güncel etkin değil durumu okuma geçti. Kanıt/sınırlar aşağıdaki frontend kabulündedir. |
 
 | XREQ-016 | Frontend; S11 bağlamsal belge kabulü | Backend | [WF11](workflows.md#wf11), `document_requirements_get_v1` / `document_accept_v1`; [somut sınır ve kabul](#xreq-016). | Native oturumun gerçek organizasyon kişisi backend tarafından çözülerek kendi işlem bağlamındaki gerekli sürüm/özel dosya okunabilir; frontend kişi kimliği tahmin etmeden aynı bağlamda yalnız kendi kabulünü sunabilir. | Backend değerlendirmesi bekliyor | Frontend 4 Kasım: hesap ve kişi kimlikleri farklıdır; mevcut required person_id ve self kişi keşfi boşluğu aşağıda kanıtlandı. Bu kayıt yeni selector uygulaması, backend onayı veya kendi adına kabulün teslimi değildir. |
+| XREQ-017 | Backend | Frontend | [WF01](workflows.md#wf01), [native telefon tüketicisi](settings.md#native-telefon-doğrulama-tüketicisi) | Telefon kodunu yeniden isteme, pending numaraya authenticated updateUser ile yeni istek üretir; yeni telefon doğrulanana kadar mevcut telefon korunur. | Frontend değerlendirmesi/kabulü bekleniyor | Kullanıcının native telefon test numarası dilimi; backend native aday kabulü ayrıca bekleniyor. |
 
 Alanların kendi planlarındaki bağımlılık gözlemleri otomatik olarak talep, onay veya işe başlama yetkisi sayılmaz; somut talep bu tabloya kaydedildiğinde `XREQ-001` biçiminde sabit bir kimlik alır.
 
@@ -266,3 +267,15 @@ Makine sözleşmesindeki `ManagementSelector_class_assignment_set_v1` aynı clas
 5. Normal generated kontrat/runtime/types ve mevcut negatif/yarış testleri kaynakla teslim edilir. Yeni frontend consumer'ın native/hosted kabulü frontend'in kendi teslim kaydında kalır.
 
 Frontend, açık hedefi gerçek rezervasyondan gelen yetkili gereklilik ve byte okumasını bağımsız tamamlar. Self selector yayımlanmadan bu okuyucuda kabul düğmesi, hesap/kişi tahmini veya sahte onay fallback'i yoktur. Backend değerlendirme/onay alanı frontend tarafından doldurulmamıştır.
+
+
+<a id="xreq-017"></a>
+## XREQ-017 Native telefon kodunu yeniden isteme
+
+**Talep eden / durum — Backend, 4 Kasım 2026:** Native telefon test numarası diliminde frontend consumer uyumsuzluğu bulundu. Frontend değerlendirmesi/uyarlaması ve gerçek ekran kabulü açık; bu kayıt karşı alan adına onay veya kapanış değildir.
+
+**Somut kaynak:** Main `1df2fe5b13368286162f7d738db88fb84c0fc1d9` içindeki `apps/web/src/components/account/identity-form.tsx`, telefon kodunu yeniden istemede pending_phone ile `auth.resend({type:'phone_change',phone})` kullanıyor. Sabitlenmiş Supabase Auth v2.197.0 `resend.go` telefon sağlayıcısını açık ister ve mevcut phone üzerinden kullanıcı arar; pending numarayla istek ya reddedilir ya da kullanıcı bulunmadığı için HTTP200 ile gönderimsiz dönebilir. Telefonla kayıt/giriş açmak bu uyumsuzluğun çözümü değildir.
+
+**İstenen dar uyarlama:** [Native tüketici rehberindeki](settings.md#native-telefon-doğrulama-tüketicisi) authenticated updateUser ile pending numaraya yeniden kod isteme yolunu kullan. Native bekleme/hata davranışını ve doğrulama tamamlanana kadar mevcut verified telefonu koru. Tamamlanınca SDK oturumu korunup hesap ve güvenlik geçmişi yeniden okunsun. E-posta resend yolu, tasarım ve diğer kimlik akışları bu talebin dışında kalır. Backend frontend dosyasını değiştirmez.
+
+**Kabul:** İzole test numarasıyla ilk istek→yanlış kod→yeniden istek→doğru kod→hesap yeniden okuma ve mevcut verified telefondan yeni telefona geçiş gerçek native akışta doğrulansın. HTTP200 tek başına yeniden kod üretimi kanıtı sayılmasın; backend testindeki phone_change_sent_at ilerlemesiyle ayrım doğrulanır. Sabit OTP gerçek SMS/expiry/rotasyon kabulü değildir. Kaynak/CI kanıtı [backend telefon devrinde](../apps/backend/docs/00-FtkSaaS-yeni-sohbet-devir.md#native-telefon-test-numarası-dilimi), frontend ekran kabulü kendi sahibinde kalır.
