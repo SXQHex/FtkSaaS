@@ -22,17 +22,17 @@ Bu dosya yalnız **sıra, bağımlı teslim paketleri ve kontrol noktalarının*
 
 **S01–S02 kontrol noktası:** Ayrı teslimin backend kapanışı doğrulandı; [görev kabulü](remaining-work.md#s01) ve [kaynak/ortam kanıtı](00-FtkSaaS-yeni-sohbet-devir.md#s01s02-backend-kabulü) kendi sahiplerindedir. Frontend ekran sırası ve kabulü değişmez.
 
-**Güncel öncelik:** S14–S16 backend kaynak paketi PR156 ile aday/main/development kabulünü geçti; [kaynak/ortam kanıtı](00-FtkSaaS-yeni-sohbet-devir.md#s14s16-kaynak-paketi) ve açık hosted/tüketici sınırları [backlog](remaining-work.md#s14) sahibindedir.
+**S14–S16 kontrol noktası:** S14–S16 backend kaynak paketi PR156 ile aday/main/development kabulünü geçti; [kaynak/ortam kanıtı](00-FtkSaaS-yeni-sohbet-devir.md#s14s16-kaynak-paketi) ve açık hosted/tüketici sınırları [backlog](remaining-work.md#s14) sahibindedir.
 
-### Aktif kaynak paketi: P12–P13
+### Aktif kaynak paketi: P05 — CRM temel dilimi
 
-P01–P04 backend teslimleri doğrulandı; görev/kabul ve kaynak/ortam kanıtları kendi sahiplerinde tutulur. Kullanıcının 4 Kasım sıralama kararıyla P05–P11 CRM paketi ertelenir; tamamlandı veya kapsam dışı sayılmaz. CRM'e bağlı sonraki işler kendi bağımlılıklarını korur.
+P01–P04 ve P12/P13 backend teslimleri tamamlandı; kaynak/ortam kanıtı [devir](00-FtkSaaS-yeni-sohbet-devir.md) sahibindedir. Kullanıcının güncel talimatıyla CRM ertelemesi kaldırıldı. İlk açık kaynak işi [P05](remaining-work.md#p05): mevcut karar/runtime uyumu → Starter elle aday/not/takip → frontend sözleşme devri ve temel kabul. Ardından aşağıdaki CRM iç sırası izlenir; sağlayıcı erişimleri temel Starter dilimini bekletmez.
 
-Önce [P12](remaining-work.md#p12) etkinlik kapasitesi → [P13](remaining-work.md#p13) pakete bağlı kredi tüketmeyen katılım aynı branch/PR'de tamamlanır. Bağımlılıklar P02/P03 teslimleriyle hazırdır. Mevcut etkinlik modelinde ortak kapasite ve canlı uygunluk kontrolü kullanılır; finans ve iptal korumaları korunur. Kuyruk bu paket için kaynak incelemesi → sözleşme/native regresyon → aday kabulü → yetkili merge/main/development teslimidir. Kaynak ve test sonucu yalnız [devir](00-FtkSaaS-yeni-sohbet-devir.md#p12p13-etkinlik-kaynak-paketi) sahibindedir.
+Dış e-posta ertelemesi de kaldırıldı; mevcut kurulum yeniden sıfırdan başlatılmaz. P14/P15 mevcut kaynak/sağlayıcı incelemesiyle kendi sırasında yürütülür; P16, P11/P15 bağımlılıklarını korur. Posta kurulumunun varlığı bütün bildirim olaylarının teslim kabulü değildir.
 
 ## CRM paketinin iç sırası
 
-[CRM kararının](../../../docs/decisions/P08-accepted-scope.md) aktarımı mevcut P05–P11 paketine yapılır; ayrı karar sprinti açılmaz. Bu belge değişikliği açık PR172'nin P12/P13 çalışmasını veya diğer aktif paketi öne/geriye taşımaz. Görev ayrıntısı ve kabulün tek sahibi [P05](remaining-work.md#p05) ve devamındaki işlerdir.
+[CRM kararının](../../../docs/decisions/P08-accepted-scope.md) aktarımı mevcut P05–P11 paketine yapılır; ayrı karar sprinti açılmaz. P12/P13 kapanışından sonra aktif kaynak işi P05'tir. Görev ayrıntısı ve kabulün tek sahibi [P05](remaining-work.md#p05) ve devamındaki işlerdir.
 
 1. Kısa mevcut karar/runtime uyumu; yalnız gerçek ürün boşluklarını ayırma.
 2. P05 Starter temel dilimi ve frontend'e okuma/yazma sözleşme devri.

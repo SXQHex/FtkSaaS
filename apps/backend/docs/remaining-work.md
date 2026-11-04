@@ -436,26 +436,26 @@ Değişen dilimin sözleşme, üretilmiş tip/envanter, WF/F01–F33 izi ve alan
 <a id="p12"></a>
 ### P12 — Etkinlik kapasitesi modeli
 
-- [ ] **Tür:** K · **Plan:** Pro/Business · **Özellik:** F29
+- [x] **Tür:** K · **Plan:** Pro/Business · **Özellik:** F29
 - **Bağımlılık:** P02
 - **Kabul:** Odaya bağlı etkinlik sonlu ve oda tavanı içinde; odasızda sonlu/sınırsız seçim.
 - **Sınır/olumsuz durum:** 0/büyük sayı sentinel yok; sınırsıza oda bağlama ve kapasite düşürmede mevcut kesin kayıt korunur.
 - **Doğrulama senaryosu:** Son yer yarışı; oda tavanı; uyumsuz oda bağlama açık ret/çözüm; mevcut iptal/iade regresyonu.
 - **Kaynak alanı:** event/capacity SQL; contract.json; migration; event test
 
-**Aktif kaynak paketi:** Kullanıcının 4 Kasım kararıyla CRM P05–P11 sırası ertelenerek P12/P13 aynı PR'de hazırlanır. Mevcut etkinlik/ödeme/iptal akışı kullanılır; yeni modül veya ikinci hak ledger'ı kurulmaz. Uygulama ve kabul sınırı [P12/P13 devrindedir](00-FtkSaaS-yeni-sohbet-devir.md#p12p13-etkinlik-kaynak-paketi). Native aday/main/development kabulü olmadan kapanmaz.
+**Backend teslimi:** PR172 aday/main/development kabulüyle tamamlandı. Uygulama, kaynak/ortam kanıtı ve frontend kabul sınırı [P12/P13 devrindedir](00-FtkSaaS-yeni-sohbet-devir.md#p12p13-etkinlik-kaynak-paketi).
 
 <a id="p13"></a>
 ### P13 — Kredi tüketmeyen paketli Pratik
 
-- [ ] **Tür:** K · **Plan:** Pro/Business · **Özellik:** F15,F16,F17,F29,F14
+- [x] **Tür:** K · **Plan:** Pro/Business · **Özellik:** F15,F16,F17,F29,F14
 - **Bağımlılık:** P12,P03
 - **Kabul:** Geçerli/pozitif kullanılabilir hakla kayıt; yalnız etkinlik yeri ayrılır, ders bakiyesi değişmez.
 - **Sınır/olumsuz durum:** Sonradan uygunsuz kayıt silinmez; katılım tekrar kontrol, uygunsuz fiilî katılım gerçeği kaydedilir.
 - **Doğrulama senaryosu:** Son ders tüketimiyle kayıt/katılım yarışı, dondurma/iade/yeni paket, borç; öncesi-sonrası kredi ledger eşitliği.
 - **Kaynak alanı:** event eligibility/register/attendance SQL; contract.json; ilgili test
 
-**Aktif kaynak paketi:** Kullanıcının 4 Kasım kararıyla CRM P05–P11 sırası ertelenerek P12/P13 aynı PR'de hazırlanır. Mevcut etkinlik/ödeme/iptal akışı kullanılır; yeni modül veya ikinci hak ledger'ı kurulmaz. Uygulama ve kabul sınırı [P12/P13 devrindedir](00-FtkSaaS-yeni-sohbet-devir.md#p12p13-etkinlik-kaynak-paketi). Native aday/main/development kabulü olmadan kapanmaz.
+**Backend teslimi:** PR172 aday/main/development kabulüyle tamamlandı. Uygulama, kaynak/ortam kanıtı ve frontend kabul sınırı [P12/P13 devrindedir](00-FtkSaaS-yeni-sohbet-devir.md#p12p13-etkinlik-kaynak-paketi).
 
 <a id="p14"></a>
 ### P14 — İşlemsel e-posta teslimi
