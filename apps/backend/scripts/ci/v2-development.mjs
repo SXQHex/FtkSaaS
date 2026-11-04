@@ -31,6 +31,9 @@ export function assertV2Isolation(files,read){
   if(isV2DevelopmentPath(file)||file==='apps/backend/scripts/ci/v2-development.mjs'||file==='apps/backend/tests/ci-v2-development-unit.mjs'||file.startsWith('apps/web1/')||file.startsWith('docs/')||file.includes('/docs/'))continue;
   if(!/\.(?:mjs|cjs|js|jsx|ts|tsx|json|ya?ml|sql|sh)$/.test(file))continue;
   let text=read(file);
+  // Exception paths identify reviewed source rows; they are not executable imports.
+  // Strip only recognized V2 path metadata, preserving every other field for scanning.
+  if(file==='apps/backend/scripts/ci/floor-exceptions.json')text=JSON.stringify(JSON.parse(text).map(entry=>({...entry,path:isV2DevelopmentPath(entry.path)?'<v2-source-row>':entry.path})));
   if(file==='.github/workflows/ci-full.yml')text=text.replace(/\n  v2-development:\n[\s\S]*?(?=\n  [a-z][a-z-]*:\n|$)/,'');
   if(/(?:scripts\/ci\/v2\/|tests\/v2\/|['"`]\.{1,2}\/(?:[^'"`\n]*\/)?v2\/)/.test(text))throw Error('PRODUCTION_DEPENDS_ON_V2 '+file);
  }

@@ -13,10 +13,14 @@ export function createDispatchPlan(options){
   const metadata=/^:(\d{6}) (\d{6}) [a-f0-9]{40} [a-f0-9]{40} [ADMT]$/.exec(raw[i]);
   if(!metadata||metadata.slice(1).some(mode=>!['000000','100644','100755'].includes(mode)))throw Error('CI_V2_UNSAFE_SOURCE_MODE');
  }
- return {...plan,kind:'shadow-dispatch',backend_execution:plan.impact.backend?'selected-core-and-twenty-api':'not-selected',frontend_execution:plan.impact.frontend?'selected':'not-selected'};
+ return {...plan,kind:'shadow-dispatch',backend_execution:plan.impact.backend?'selected-core-and-twelve-api':'not-selected',frontend_execution:plan.impact.frontend?'selected':'not-selected'};
+}
+export function validateDispatchImpact(impact){
+ if(!impact||!['baseline','frontend','backend'].every(key=>typeof impact[key]==='boolean')||!Array.isArray(impact.backend_matrix)||impact.backend_matrix.length!==(impact.backend?12:0)||!impact.backend_matrix.every((entry,index)=>entry?.shard===index+1)||(impact.frontend||impact.backend)&&!impact.baseline)throw Error('CI_V2_INVALID_DISPATCH');
+ return impact;
 }
 export function assertShadowResults(impact,results){
- if(!impact||!['baseline','frontend','backend'].every(key=>typeof impact[key]==='boolean')||!Array.isArray(impact.backend_matrix)||impact.backend_matrix.length!==(impact.backend?20:0)||!impact.backend_matrix.every((entry,index)=>entry?.shard===index+1)||(impact.frontend||impact.backend)&&!impact.baseline)throw Error('CI_V2_INVALID_DISPATCH');
+ validateDispatchImpact(impact);
  for(const [job,selected] of [['common',impact.baseline],['frontend',impact.frontend],['backend',impact.backend]]){
   if(results[job]!== (selected?'success':'skipped'))throw Error('CI_V2_INCOMPLETE_SHADOW: '+job);
  }
@@ -32,7 +36,7 @@ if(import.meta.url===pathToFileURL(process.argv[1]??'').href){
   console.log(summary);if(process.env.GITHUB_STEP_SUMMARY)fs.appendFileSync(process.env.GITHUB_STEP_SUMMARY,summary);
  }else if(process.argv[2]==='summary'){
   const boolean=name=>{const value=process.env[name];if(!['true','false'].includes(value))throw Error('CI_V2_INVALID_DISPATCH_OUTPUT');return value==='true';};
-  const impact={baseline:boolean('V2_BASELINE'),frontend:boolean('V2_FRONTEND'),backend:boolean('V2_BACKEND')};impact.backend_matrix=impact.backend?Array.from({length:20},(_,index)=>({shard:index+1})):[];
+  const impact={baseline:boolean('V2_BASELINE'),frontend:boolean('V2_FRONTEND'),backend:boolean('V2_BACKEND')};impact.backend_matrix=impact.backend?Array.from({length:12},(_,index)=>({shard:index+1})):[];
   assertShadowResults(impact,{common:process.env.COMMON_RESULT,frontend:process.env.FRONTEND_RESULT,backend:process.env.BACKEND_RESULT});
   fs.appendFileSync(process.env.GITHUB_STEP_SUMMARY,'Selected V2 domains succeeded; unselected domains skipped. Shadow execution only: no merge/CD acceptance or deployment.\n');
  }else throw Error('Expected plan or summary');

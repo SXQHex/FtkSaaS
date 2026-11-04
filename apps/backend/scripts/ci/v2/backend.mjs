@@ -28,9 +28,9 @@ if(import.meta.url===pathToFileURL(process.argv[1]??'').href){
  if(process.argv[2]==='plan'){
   fs.writeFileSync(path.join(output,'backend-plan.json'),JSON.stringify({kind:'shadow',acceptance:false,source:process.env.GITHUB_SHA,plan},null,2)+'\n');
   if(process.env.GITHUB_OUTPUT)fs.appendFileSync(process.env.GITHUB_OUTPUT,'matrix='+JSON.stringify({include:plan.map(({shard})=>({shard}))})+'\n');
-  console.log('Twenty nonempty backend shards planned; estimated weights are not current measurements.');
+  console.log('Twelve nonempty backend shards planned; estimated weights are not current measurements.');
  }else{
-  const shard=process.argv[2];if(!/^(?:[1-9]|1[0-9]|20)$/.test(shard??''))throw Error('CI_V2_INVALID_SHARD');
+  const shard=process.argv[2];if(!/^(?:[1-9]|1[0-2])$/.test(shard??''))throw Error('CI_V2_INVALID_SHARD');
   const job=plan.find(job=>String(job.shard)===shard);
   const result=spawnSync(process.execPath,['--test','--test-concurrency=1','--test-reporter=spec','--test-reporter-destination=stdout',
    '--test-reporter=junit','--test-reporter-destination='+path.join(output,'backend-'+shard+'.junit.xml'),...job.files.map(file=>repoFile(file))],{cwd:backendRoot,stdio:'inherit'});

@@ -23,7 +23,8 @@
         "apps/backend/tests/v2/backend/api-acceptance-root-1.test.mjs",
         "apps/backend/tests/ci-v2-development-unit.mjs",
         "apps/backend/tests/v2/core.test.mjs",
-        "apps/backend/tests/v2/dispatch.test.mjs"
+        "apps/backend/tests/v2/dispatch.test.mjs",
+        "apps/backend/tests/v2/domain.test.mjs"
       ],
       "sources": [
         "apps/backend/database/canonical-settings-scope.sql",
@@ -288,7 +289,8 @@
         "apps/backend/tests/v2/backend-suites.json",
         "apps/backend/scripts/ci/v2-development.mjs",
         "apps/backend/scripts/ci/v2/core.mjs",
-        "apps/backend/scripts/ci/v2/dispatch.mjs"
+        "apps/backend/scripts/ci/v2/dispatch.mjs",
+        "apps/backend/scripts/ci/v2/domain.mjs"
       ],
       "operations": [
         "operation_status_get_v1",
@@ -298,8 +300,8 @@
         "management_state_get_v1"
       ],
       "review": {
-        "fingerprint": "d19b35c45bd41fc92986ce60602d0b45ca3d69dd2f9a98da23cb575c7741b1b9",
-        "reason": "Reviewed source-selected V2 shadow with current main ST-02 six direct roots; exact expiring assertion relocation fingerprints preserve all copied bodies under unchanged byte parity. Twenty shards, source guards, production proof and deployment remain unchanged."
+        "fingerprint": "940793a60be9e7286e19eb15ba95017405ef49e5c7461f4d2f66f5db70c324e4",
+        "reason": "Reviewed independent V2 shadow decisions,12shards, exact expiring count fingerprints and narrow exception-path isolation. API-only contract changes select backend only; frontend compatibility belongs to frontend main delivery, own backend contract checks retained. Explicit source/mixed/full scope tests, production CD unchanged."
       }
     },
     {

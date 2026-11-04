@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
     inputs:
       scope:
-        description: Backend API (20 shards), core DB/security only, or both; shadow diagnostics only
+        description: Backend API (12 shards), core DB/security only, or both; shadow diagnostics only
         type: choice
         options: [backend, core, full]
         default: backend
@@ -58,7 +58,7 @@ jobs:
           set -euo pipefail
           TURBO_TELEMETRY_DISABLED=1 DO_NOT_TRACK=1 pnpm --dir ../.. exec turbo run verify --filter=@ftksaas/backend...
           node --test tests/v2/backend.test.mjs tests/v2/safety.test.mjs tests/v2/scope.test.mjs tests/v2/plan.test.mjs tests/v2/core.test.mjs
-      - name: Plan twenty nonempty shards
+      - name: Plan twelve nonempty shards
         id: plan
         run: node scripts/ci/v2/backend.mjs plan
       - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
@@ -78,7 +78,7 @@ jobs:
     timeout-minutes: 90
     strategy:
       fail-fast: false
-      max-parallel: 20
+      max-parallel: 12
       matrix: ${{ fromJSON(needs.inventory.outputs.matrix) }}
     env:
       CI_V2_BACKEND_SHARD: ${{ matrix.shard }}
@@ -188,4 +188,4 @@ jobs:
             full) test "$CORE" = success; test "$BACKEND" = success ;;
             *) exit 1 ;;
           esac
-          printf '%s\n' "V2 $V2_SCOPE shadow succeeded. Backend/full always executes twenty API shards. This is not production merge/CD acceptance." >> "$GITHUB_STEP_SUMMARY"
+          printf '%s\n' "V2 $V2_SCOPE shadow succeeded. Backend/full always executes twelve API shards. This is not production merge/CD acceptance." >> "$GITHUB_STEP_SUMMARY"
