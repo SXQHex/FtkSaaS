@@ -359,3 +359,10 @@ test('web1 design files are isolated while mixed and renamed production paths re
  const rename=parseChanges('R100\0apps/backend/tests/api-acceptance.test.mjs\0apps/web1/demo.test.mjs\0');assert.equal(classifyChanges(rename).kind,'full');
  assert.equal(policyPath('apps/web/package.json'),true);assert.equal(policyPath('apps/web1/../web/package.json'),true);
 });
+
+test('retired experiment sources have no lightweight acceptance exemption',()=>{
+ for(const path of ['.github/workflows/ci-v2-scope.yml','apps/backend/scripts/ci/v2/settings.mjs','apps/backend/tests/v2/backend.test.mjs']){
+  const scope=classifyChanges([{path,status:'D'}]);
+  assert.equal(scope.kind,'full');assert.equal(scope.backend,true);
+ }
+});

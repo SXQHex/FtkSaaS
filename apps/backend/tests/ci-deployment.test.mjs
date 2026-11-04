@@ -188,3 +188,20 @@ test('proof-only main authorizes CD only after candidate jobs are independently 
  }finally{rmSync(dir,{recursive:true,force:true});}
  }
 });
+
+test('Historical retired V2 marker never deploys or searches historical runtime proofs; malformed markers fail closed',async()=>{
+ const sha='a'.repeat(40);
+ const run={id:8,path:'.github/workflows/backend.yml',event:'push',head_branch:'main',repository:{full_name:'x/y'},head_repository:{full_name:'x/y'},head_sha:sha,status:'completed',conclusion:'success',run_attempt:2};
+ const job=name=>({name,run_id:8,run_attempt:2,head_sha:sha,status:'completed',conclusion:'success',steps:[{name:'V2 development only (no runtime acceptance)',conclusion:'success'}]});
+ const jobs=[job('source'),job('v2-development')];
+ assert.equal(deploymentSource({run,jobs,currentMain:sha,repository:'x/y'}).deploy,false);
+ const unexpected=new Proxy({},{get(){throw Error('Historical search forbidden');}});
+ assert.equal((await resolveAcceptedSource(unexpected,{owner:'x',repo:'y'},run,jobs,sha,2)).v2,true);
+ const acceptance={...job('acceptance'),steps:[{name:'Main acceptance proof',conclusion:'success'}]};
+ const skipped={...job('v2-development'),conclusion:'skipped',steps:[]};
+ assert.equal(deploymentSource({run,jobs:[job('source'),acceptance,skipped],currentMain:sha,repository:'x/y'}).deploy,true);
+ const frontend={...job('frontend'),steps:[{name:'Backend unchanged (no backend acceptance)',conclusion:'success'}]};
+ assert.equal(deploymentSource({run,jobs:[job('source'),frontend,skipped],currentMain:sha,repository:'x/y'}).frontend,true);
+
+ for(const mutate of [x=>x.push(x[1]),x=>x[1].conclusion='failure',x=>x[1].steps=[],x=>x[1].run_attempt=1]){const bad=structuredClone(jobs);mutate(bad);assert.throws(()=>deploymentSource({run,jobs:bad,currentMain:sha,repository:'x/y'}));}
+});

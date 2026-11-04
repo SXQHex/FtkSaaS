@@ -197,9 +197,6 @@ importers:
       ajv-formats:
         specifier: 3.0.1
         version: 3.0.1(ajv@8.20.0)
-      es-module-lexer:
-        specifier: 2.3.2
-        version: 2.3.2
       esbuild:
         specifier: 0.28.2
         version: 0.28.2
