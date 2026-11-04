@@ -1,3 +1,4 @@
+import {validateV2Development} from './v2-development.mjs';
 import {validateQuality} from './quality-proof.mjs';
 import {validateJobs,coverageHash,roleName} from './shards.mjs';
 import {assertReady,assertParents,policyMatches,resolveMerged,remoteSourceScope} from './source.mjs';
@@ -17,7 +18,7 @@ export function validateBinding({binding,pr,run,jobs,tested,currentTree,workflow
 }
 export async function receipt(github,repo,run,kind="full"){
  const artifacts=await github.paginate(github.rest.actions.listWorkflowRunArtifacts,{...repo,run_id:run.id,per_page:100});
- const matches=artifacts.filter(a=>a.name===(kind==='quality'?'quality-binding':(kind==='documentation'?'document-binding-':'candidate-binding-')+run.run_attempt)&&!a.expired);const a=matches[0];if(matches.length!==1)throw Error('Missing source binding');
+ const matches=artifacts.filter(a=>a.name===(kind==='quality'?'quality-binding':(kind==='v2-development'?'v2-development-binding-':kind==='documentation'?'document-binding-':'candidate-binding-')+run.run_attempt)&&!a.expired);const a=matches[0];if(matches.length!==1)throw Error('Missing source binding');
  const zip=await github.rest.actions.downloadArtifact({...repo,artifact_id:a.id,archive_format:'zip'});const dir=mkdtempSync(join(tmpdir(),'ftk-binding-'));
  try{const file=join(dir,'receipt.zip');writeFileSync(file,Buffer.from(zip.data));return JSON.parse(execFileSync('unzip',['-p',file,'binding.json'],{encoding:'utf8',maxBuffer:16000}));}finally{rmSync(dir,{recursive:true,force:true});}
 }
@@ -33,11 +34,11 @@ export async function findCandidateProof(github,repo,pr,kind,currentTree,policyB
   if(run.status!=='completed'||run.conclusion!=='success')continue;
   try{
    const jobs=await github.paginate(github.rest.actions.listJobsForWorkflowRun,{...repo,run_id:run.id,filter:'latest',per_page:100});
-   if(!jobs.some(j=>roleName(j)===(kind==='documentation'?'documentation':'full-clean')&&j.conclusion==='success'))continue;
+   if(!jobs.some(j=>roleName(j)===(kind==='v2-development'?'v2-development':kind==='documentation'?'documentation':'full-clean')&&j.conclusion==='success'))continue;
    const binding=await receipt(github,repo,run,kind);
    validateQuality({binding:await receipt(github,repo,run,'quality'),pr,run,jobs,currentTree});
    const tested=(await github.rest.git.getCommit({...repo,commit_sha:binding.merge})).data;
-   (kind==='documentation'?validateDocumentBinding:validateBinding)({binding,pr,run,jobs,tested,currentTree,workflowMatches});
+   (kind==='v2-development'?validateV2Development:kind==='documentation'?validateDocumentBinding:validateBinding)({binding,pr,run,jobs,tested,currentTree,workflowMatches});
    const live=(await github.rest.actions.getWorkflowRun({...repo,run_id:run.id})).data;
    if(live.id!==run.id||live.run_attempt!==run.run_attempt||live.head_sha!==run.head_sha||live.status!=='completed'||live.conclusion!=='success')throw Error('Candidate run changed during proof verification');
    return {binding,run:live};
@@ -86,7 +87,7 @@ export async function checkPr(github,context,number){
   const live=(await github.rest.pulls.get({...repo,pull_number:number})).data;
   assertReady(live);
   if(live.head.sha!==pr.head.sha||live.base.sha!==pr.base.sha)throw Error('Head/base moved during verification');
-  state='success';description=kind==='documentation'?'Verified source-bound documentation acceptance (no full clean)':'Verified head/base/merge tree and executed full clean';target_url=run.html_url;
+  state='success';description=kind==='v2-development'?'Verified isolated V2 development; no runtime acceptance':kind==='documentation'?'Verified source-bound documentation acceptance (no full clean)':'Verified head/base/merge tree and executed full clean';target_url=run.html_url;
   }
  }catch(e){description=String(e.message).slice(0,140);}
  await github.rest.repos.createCommitStatus({...repo,sha:pr.head.sha,state,context:gateContext,description,...(target_url?{target_url}:{})});

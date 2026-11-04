@@ -20,7 +20,8 @@
         "apps/backend/tests/v2/scope.test.mjs",
         "apps/backend/tests/v2/plan.test.mjs",
         "apps/backend/tests/v2/backend.test.mjs",
-        "apps/backend/tests/v2/backend/api-acceptance-root-1.test.mjs"
+        "apps/backend/tests/v2/backend/api-acceptance-root-1.test.mjs",
+        "apps/backend/tests/ci-v2-development-unit.mjs"
       ],
       "sources": [
         "apps/backend/database/canonical-settings-scope.sql",
@@ -282,7 +283,8 @@
         "apps/backend/scripts/ci/v2/backend.mjs",
         "apps/backend/scripts/ci/v2/migration.mjs",
         "apps/backend/scripts/ci/v2/settings.mjs",
-        "apps/backend/tests/v2/backend-suites.json"
+        "apps/backend/tests/v2/backend-suites.json",
+        "apps/backend/scripts/ci/v2-development.mjs"
       ],
       "operations": [
         "operation_status_get_v1",
@@ -292,8 +294,8 @@
         "management_state_get_v1"
       ],
       "review": {
-        "fingerprint": "e38787143fda6a33318abf2dd22958474cacd48eb08db4fb11af878478de325c",
-        "reason": "Main PR185 V2 kaynak/test bağları ile PR182 CRM/self bağları birlikte incelendi;67 gerçek birim parity kontrolünde aynı gövdeleri korur, üretim kabul kapıları değişmez."
+        "fingerprint": "a3eb3abf92c0218c41bfe69068184789165e172a415f026cf7de59b3e6cf0493",
+        "reason": "Reviewed isolated V2 development lane: finite complete-tree scope, regular files, mixed source full fallback, distinct source-bound non-runtime receipt, unchanged trusted policy installation and explicit no-CD marker; production obligations preserved."
       }
     },
     {

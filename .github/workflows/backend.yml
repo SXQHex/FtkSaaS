@@ -107,3 +107,16 @@ jobs:
           path: ${{ runner.temp }}/main-proof/binding.json
           if-no-files-found: error
           archive: true
+
+  v2-development:
+    permissions: {}
+    needs: source
+    if: needs.source.outputs.kind == 'v2-development'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    defaults:
+      run:
+        working-directory: .
+    steps:
+      - name: V2 development only (no runtime acceptance)
+        run: echo 'Isolated V2 checks verified; no backend runtime acceptance or deployment.'
