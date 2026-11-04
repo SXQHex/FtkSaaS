@@ -54,6 +54,7 @@ test('P06 explicit review preserves shared-phone identity, routing scope and rec
   // The shared action enum must not make a legacy publication application create an identity accidentally.
   const legacyDiscipline=key(),legacySession=key(),legacyPublication=key(),legacyApplication=key();
   await db.query("insert into core.disciplines(id,org_id,name,state) values($1,$2,'Legacy CRM test','active')",[legacyDiscipline,org]);
+  await api('center_discipline_set_v1',{discipline_id:legacyDiscipline,state:'active'});
   await db.query("insert into core.sessions(id,org_id,center_id,discipline_id,format,starts_at,ends_at,nominal,maximum,state,attendance_state) values($1,$2,$3,$4,'group',now()+interval '5 days',now()+interval '5 days 1 hour',10,10,'planned','open')",[legacySession,org,center,legacyDiscipline]);
   await db.query("insert into core.publications(id,org_id,center_id,slug,session_id,published) values($1,$2,$3,$2::text,$4,false)",[legacyPublication,org,center,legacySession]);
   await db.query("insert into core.public_applications(id,org_id,center_id,publication_id,target_contact,target_hash,state,bot_verified_at) values($1,$2,$3,$4,'legacy@ftksaas.invalid',repeat('e',64),'pending',now())",[legacyApplication,org,center,legacyPublication]);

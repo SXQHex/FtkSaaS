@@ -8,6 +8,7 @@ import type {
 import { apiClient, ApiFailure } from "./api";
 import { sessionCapacity } from "./session-create";
 export const setupWrites = [
+  "settings_update_v1",
   "document_version_publish_v1",
   "notification_mark_read_v1",
   "organization_update_v1",
@@ -35,6 +36,8 @@ export const setupWrites = [
 export type SetupWrite = (typeof setupWrites)[number];
 type SetupUpload = "document_upload_prepare_v1" | "file_upload_complete_v1";
 type SetupRead =
+  | "settings_catalog_get_v1"
+  | "settings_get_v1"
   | "document_requirements_get_v1"
   | "reservation_list_v1"
   | "document_publication_preview_v1"
@@ -82,6 +85,7 @@ export const setupStorageKey = (scope: SetupScope, slot: string) =>
 export type PendingSetup = { command: SetupCommand; blocked?: boolean };
 const keyPattern = /^[a-f0-9]{8}-[a-f0-9]{4}-7[a-f0-9]{3}-[89ab][a-f0-9]{3}-[a-f0-9]{12}$/i;
 const fields: Record<SetupWrite, string[]> = {
+  settings_update_v1: ["scope", "patch", "expected_version"],
   document_version_publish_v1: [
     "document_id",
     "file_id",
@@ -149,7 +153,19 @@ export function recoverSetup(scope: SetupScope, slot: string): PendingSetup | "i
     if (Object.keys(input).some((key) => !allowed.includes(key))) return "invalid";
     if (
       input.expected_version !== undefined &&
-      (!Number.isSafeInteger(input.expected_version) || input.expected_version < 1)
+      (!Number.isSafeInteger(input.expected_version) ||
+        input.expected_version < (command.operation === "settings_update_v1" ? 0 : 1))
+    )
+      return "invalid";
+    if (
+      command.operation === "settings_update_v1" &&
+      (input.scope !== "member" ||
+        input.center_id !== undefined ||
+        !Number.isSafeInteger(input.expected_version) ||
+        input.expected_version < 0 ||
+        !input.patch ||
+        Object.keys(input.patch).length !== 1 ||
+        typeof input.patch.in_app_marketing !== "boolean")
     )
       return "invalid";
     if (

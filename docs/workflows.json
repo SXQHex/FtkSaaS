@@ -15,7 +15,10 @@
         "apps/backend/tests/p06-acceptance.mjs",
         "apps/backend/tests/invitation-delivery-acceptance.mjs",
         "apps/backend/tests/ci-experiment-checks.mjs",
-        "apps/backend/tests/ci-api-suites.test.mjs"
+        "apps/backend/tests/ci-api-suites.test.mjs",
+        "apps/backend/tests/v2/safety.test.mjs",
+        "apps/backend/tests/v2/scope.test.mjs",
+        "apps/backend/tests/v2/plan.test.mjs"
       ],
       "sources": [
         "apps/backend/database/canonical-settings-scope.sql",
@@ -269,7 +272,11 @@
         "packages/api-contracts/src/generated.ts",
         "packages/api-contracts/src/index.ts",
         "packages/api-contracts/src/operations.ts",
-        "packages/api-contracts/src/runtime.ts"
+        "packages/api-contracts/src/runtime.ts",
+        "apps/backend/scripts/ci/v2/local.mjs",
+        "apps/backend/scripts/ci/v2/safety.mjs",
+        "apps/backend/scripts/ci/v2/scope.mjs",
+        "apps/backend/scripts/ci/v2/plan.mjs"
       ],
       "operations": [
         "operation_status_get_v1",
@@ -279,8 +286,8 @@
         "management_state_get_v1"
       ],
       "review": {
-        "fingerprint": "d5afda36ad69a326f694ed077306110d30640b109c1a60d254529dda33f65892",
-        "reason": "Son test entegrasyonu incelendi: üç küçük native birim ve sözleşme unit importları; eski64 ve tam67 kaynak kabulü ile sekiz shard korunur."
+        "fingerprint": "65e82897079eed098bf2e4413cc6e7745112c7fd29460840a2d0cb4912cac84d",
+        "reason": "Starter bağımsız fixture son incelemesi: özgün8 alt senaryo/46 assertion satırı ve300s korunur; yoklamada superseded eski kredi sürümü gerçek republish zinciriyle hazırlanır."
       }
     },
     {
@@ -374,7 +381,8 @@
         "apps/backend/tests/p07-account-revocation-acceptance.mjs",
         "apps/backend/tests/availability-policies.test.mjs",
         "apps/backend/tests/starter-instructor-acceptance.mjs",
-        "apps/backend/tests/event-capacity-package-acceptance.mjs"
+        "apps/backend/tests/event-capacity-package-acceptance.mjs",
+        "apps/backend/tests/v2/room.test.mjs"
       ],
       "sources": [
         "apps/backend/database/account-session-management.sql",
@@ -429,7 +437,8 @@
         "apps/backend/database/starter-subscriber-projections.sql",
         "apps/backend/supabase/migrations/20261102180626_starter_subscriber_projections.sql",
         "apps/backend/database/event-capacity-practice.sql",
-        "apps/backend/supabase/migrations/20261103233454_event_capacity_practice.sql"
+        "apps/backend/supabase/migrations/20261103233454_event_capacity_practice.sql",
+        "apps/backend/tests/v2/room-fixture.mjs"
       ],
       "operations": [
         "organizations_list_v1",
@@ -455,8 +464,8 @@
         "role_revoke_preview_v1"
       ],
       "review": {
-        "fingerprint": "36783bb6c8e7da68847cc65460ae379c942ffd14d16784bf93eb3f710b1eed57",
-        "reason": "XREQ-016 self kişi/bağlam ve P05/P06 ortak başvuru modeli, kaynak/yetki/test bağları incelendi; eski operasyon ve64 kabul birimi korunur."
+        "fingerprint": "6a78299bea41f53d48aefee8b88a09160dd8236983391afbd6ea107ba0ba3e98",
+        "reason": "PR182 CI fixture düzeltmeleri ve Starter üç bağımsız kök incelendi; özgün assertion/deadline korunur. Main CI v2 ve frontend kaynakları değişmeden eşlendi."
       }
     },
     {
@@ -732,8 +741,8 @@
         "negative_limits_get_v1"
       ],
       "review": {
-        "fingerprint": "77e5e6c31f693bb7e8f6f529074a3b981c4d9c6339b97b3df38899c88494a41a",
-        "reason": "P05 Starter basic CRM reviewed: existing person/lead/activity registry, exact request/source admission before replay; F23 retained for person-only followup. Native Starter/Pro/Business scope/version/replay tests and migration102 source equality included; other WF behavior unchanged."
+        "fingerprint": "12b278ddcc9a4302c91e34968fae92bd46e0321230c4aa4997426e1c626cd3fd",
+        "reason": "Starter bağımsız fixture son incelemesi: özgün8 alt senaryo/46 assertion satırı ve300s korunur; yoklamada superseded eski kredi sürümü gerçek republish zinciriyle hazırlanır."
       }
     },
     {
@@ -982,8 +991,8 @@
         "calendar_feed_get_v1"
       ],
       "review": {
-        "fingerprint": "1866ce25ac503536de902d7f7c03195b43c84abaa0f27b8c849deac9b497b995",
-        "reason": "Son test entegrasyonu incelendi: üç küçük native birim ve sözleşme unit importları; eski64 ve tam67 kaynak kabulü ile sekiz shard korunur."
+        "fingerprint": "24f4a3256cd45fa17beb6aa2ba5ca3df670e0795f10ad5bffe9c9b0ee9fb9214",
+        "reason": "Starter bağımsız fixture son incelemesi: özgün8 alt senaryo/46 assertion satırı ve300s korunur; yoklamada superseded eski kredi sürümü gerçek republish zinciriyle hazırlanır."
       }
     },
     {
@@ -1067,8 +1076,8 @@
         "document_publication_preview_v1"
       ],
       "review": {
-        "fingerprint": "445e57b8c4fd567f12682876298b5518af190bd34c4c7c95f12e60196e132f65",
-        "reason": "Son test entegrasyonu incelendi: üç küçük native birim ve sözleşme unit importları; eski64 ve tam67 kaynak kabulü ile sekiz shard korunur."
+        "fingerprint": "93cecfb1483d849deb728591bfccde71fabb10f6841b49c93f9cef57ea82aad2",
+        "reason": "PR182 CI fixture düzeltmeleri ve Starter üç bağımsız kök incelendi; özgün assertion/deadline korunur. Main CI v2 ve frontend kaynakları değişmeden eşlendi."
       }
     },
     {
@@ -1341,8 +1350,8 @@
         "automation_save_v1"
       ],
       "review": {
-        "fingerprint": "4a1295e4f3e54fff6707a442fbad2d60d4e07a2ead675f46adc83a7fe66cc830",
-        "reason": "Son kaynak incelemesi: XREQ-016 self, P05/P06 ortak alım/eşleme; UUID ve F21/F25 izi, güvenli form config, legacy eylem ve eski origin kapsamı regresyonları doğrulandı."
+        "fingerprint": "f1735fb25385006f6012e9bf9a1dccbdd9b3de991d812df8840835f927a6b4fd",
+        "reason": "PR182 CI fixture düzeltmeleri ve Starter üç bağımsız kök incelendi; özgün assertion/deadline korunur. Main CI v2 ve frontend kaynakları değişmeden eşlendi."
       }
     },
     {

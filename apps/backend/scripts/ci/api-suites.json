@@ -702,12 +702,12 @@
         {
           "line": 138,
           "path": "apps/backend/tests/starter-studio-acceptance.mjs",
-          "sha256": "32e3d59bec63c7730d0d3f8217f729b7ee268bccca3441607ec2b8ae2dce2926"
+          "sha256": "f9b6646b79b69b30007ac0f5d408b09f7119977fd902af84822299ed1341a1f3"
         },
         {
           "line": 140,
           "path": "apps/backend/tests/document-self-requirements-acceptance.mjs",
-          "sha256": "8352a2ebde6d9778403e70a6855b0096277773f4158337342eea8d0053ccb55a"
+          "sha256": "c71d21409d151be93f6867a476828e412c7a6935f106a5220eb4a58f2f2dca05"
         },
         {
           "line": 141,
@@ -717,7 +717,7 @@
         {
           "line": 142,
           "path": "apps/backend/tests/crm-application-review-acceptance.mjs",
-          "sha256": "4f64cc50ab32c5926a8b96dad7912e4cd095168c91e3367c487e0cdf76efb451"
+          "sha256": "06e3325fce993f2bfd5876a18ad9b0e8d6bdfabd61c21a192084c9287e0d159c"
         }
       ],
       "estimated_seconds": 1356.24

@@ -60,7 +60,7 @@ test('XREQ-016 missing or revoked self identity and wrong lifecycle/context neve
  await f.fail('document_requirements_get_v1',body,'NOT_FOUND',f.stranger);
  await f.fail('document_requirements_get_v1',{...body,context:{gate:'sale',subject:{type:'sales',id:key()}}},'NOT_FOUND');
  await f.fail('document_requirements_get_v1',{...body,center_id:key()},'NOT_FOUND');
- await f.db.query("update core.people set state='inactive',version=version+1 where id=$1",[f.person]);await f.fail('document_requirements_get_v1',body,'NOT_FOUND');
+ await f.db.query("update core.people set state='merged',version=version+1 where id=$1",[f.person]);await f.fail('document_requirements_get_v1',body,'NOT_FOUND');
  await f.db.query("update core.people set state='active',version=version+1 where id=$1",[f.person]);
  await f.db.query("update core.center_relationships set state='inactive',version=version+1 where org_id=$1 and person_id=$2 and kind='student'",[f.org,f.person]);await f.fail('document_requirements_get_v1',body,'FORBIDDEN');
  await f.db.query("update core.center_relationships set state='active',version=version+1 where org_id=$1 and person_id=$2 and kind='student'",[f.org,f.person]);
@@ -78,7 +78,8 @@ test('XREQ-016 organization manager and instructor self reads never inherit anot
   const person=(await f.api('person_create_v1',{display_name:'Synthetic self document '+role,contacts:[]})).primary_id;
   await f.api('student_activate_v1',{person_id:person});
   await f.db.query("insert into core.account_links(id,org_id,account_id,person_id,state,verified_at) values($1,$2,$3,$4,'active',now())",[key(),f.org,account.id,person]);
-  await f.api('role_assign_v1',{person_id:person,role,scope:{center_id:role==='org_manager'?null:f.center}});
+  if(role==='org_manager')await f.api('org_manager_assign_v1',{center_id:null,person_id:person});
+  else await f.api('role_assign_v1',{person_id:person,role,scope:{center_id:f.center}});
   const own=await f.api('document_requirements_get_v1',{context:f.productContext,content_file_id:published.file},user);
   assert.equal(own[0].accepted,false);assert.equal(own[0].version_id,published.version);assert.deepEqual(Buffer.from(own[0].content.data,'base64'),published.bytes);
   await f.fail('document_requirements_get_v1',{context:f.saleContext,content_file_id:published.file},'NOT_FOUND',user);

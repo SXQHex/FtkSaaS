@@ -1258,7 +1258,18 @@
       "session_cancelled_by_center": "Stüdyo seansı iptal etti",
       "seat_offer": "Kontenjan teklifi",
       "p01_expired": "İşlem süresi doldu"
-    }
+    },
+    "preferencesTitle": "Bildirim tercihleri",
+    "mandatoryHint": "Güvenlik ve işlem sonuçları uygulama içinde zorunludur; pazarlama tercihi bunları kapatmaz.",
+    "preferencesError": "Bildirim tercihleri okunamadı. Mevcut seçimin değiştirilmedi.",
+    "preferencesUnavailable": "Bu üyelikte uygulama içi pazarlama tercihi şu anda değiştirilemiyor.",
+    "marketingEnabled": "Uygulama içi pazarlama açık.",
+    "marketingDisabled": "Uygulama içi pazarlama kapalı.",
+    "marketingChoice": "Bu stüdyodan uygulama içi pazarlama bildirimleri almak istiyorum.",
+    "enableMarketingConfirm": "Bu stüdyo için uygulama içi pazarlama bildirimlerini açacaksın.",
+    "disableMarketingConfirm": "Bu stüdyo için uygulama içi pazarlama bildirimlerini kapatacaksın. Zorunlu işlem sonuçları devam eder.",
+    "savePreferences": "Tercihimi kaydet",
+    "reviewPreferences": "Değişikliği incele"
   },
   "documents": {
     "uploadTitle": "Belge dosyası yükle",
