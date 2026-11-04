@@ -15,7 +15,10 @@
         "apps/backend/tests/p06-acceptance.mjs",
         "apps/backend/tests/invitation-delivery-acceptance.mjs",
         "apps/backend/tests/ci-experiment-checks.mjs",
-        "apps/backend/tests/ci-api-suites.test.mjs"
+        "apps/backend/tests/ci-api-suites.test.mjs",
+        "apps/backend/tests/v2/safety.test.mjs",
+        "apps/backend/tests/v2/scope.test.mjs",
+        "apps/backend/tests/v2/plan.test.mjs"
       ],
       "sources": [
         "apps/backend/database/canonical-settings-scope.sql",
@@ -269,7 +272,11 @@
         "packages/api-contracts/src/generated.ts",
         "packages/api-contracts/src/index.ts",
         "packages/api-contracts/src/operations.ts",
-        "packages/api-contracts/src/runtime.ts"
+        "packages/api-contracts/src/runtime.ts",
+        "apps/backend/scripts/ci/v2/local.mjs",
+        "apps/backend/scripts/ci/v2/safety.mjs",
+        "apps/backend/scripts/ci/v2/scope.mjs",
+        "apps/backend/scripts/ci/v2/plan.mjs"
       ],
       "operations": [
         "operation_status_get_v1",
@@ -279,8 +286,8 @@
         "management_state_get_v1"
       ],
       "review": {
-        "fingerprint": "6ff07d5af1767e149fbd5dd1309adc3b5a4243ee52cb3138d1092a06317a9bef",
-        "reason": "P05 CI fixture incelemesi: zorunlu sayfalama, temel CRM olumlu ve ileri takip olumsuz kabulü; runtime ve güvenlik sınırları değişmedi."
+        "fingerprint": "7393ef06e6969eb8a612b86d50207d9952544f0e2f2f2c111acb69edf0bf4cb2",
+        "reason": "Reviewed V2 diagnostic scope, fixed twenty-backend plan, exact Git ancestor/clean-source guards and signup bridge transitive inputs from the existing web Turbo graph. Production acceptance and deployment remain unchanged."
       }
     },
     {
@@ -374,7 +381,8 @@
         "apps/backend/tests/p07-account-revocation-acceptance.mjs",
         "apps/backend/tests/availability-policies.test.mjs",
         "apps/backend/tests/starter-instructor-acceptance.mjs",
-        "apps/backend/tests/event-capacity-package-acceptance.mjs"
+        "apps/backend/tests/event-capacity-package-acceptance.mjs",
+        "apps/backend/tests/v2/room.test.mjs"
       ],
       "sources": [
         "apps/backend/database/account-session-management.sql",
@@ -429,7 +437,8 @@
         "apps/backend/database/starter-subscriber-projections.sql",
         "apps/backend/supabase/migrations/20261102180626_starter_subscriber_projections.sql",
         "apps/backend/database/event-capacity-practice.sql",
-        "apps/backend/supabase/migrations/20261103233454_event_capacity_practice.sql"
+        "apps/backend/supabase/migrations/20261103233454_event_capacity_practice.sql",
+        "apps/backend/tests/v2/room-fixture.mjs"
       ],
       "operations": [
         "organizations_list_v1",
@@ -455,8 +464,8 @@
         "role_revoke_preview_v1"
       ],
       "review": {
-        "fingerprint": "81de43bca8795677055d1be0e4e3d685ea785fe60035d0165fa94c1ddda1dfc9",
-        "reason": "P05 CI fixture incelemesi: zorunlu sayfalama, temel CRM olumlu ve ileri takip olumsuz kabulü; runtime ve güvenlik sınırları değişmedi."
+        "fingerprint": "d62875375723855948e3a71f19553aa6b6cca0723bcacbaa1220017d63948646",
+        "reason": "Merged current main room/runtime evidence while retaining direct V2 diagnostic tests; reviewed live selector and optimistic version behavior."
       }
     },
     {
