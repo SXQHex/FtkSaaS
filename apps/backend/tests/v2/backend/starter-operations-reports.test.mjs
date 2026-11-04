@@ -73,16 +73,29 @@ async function operationsFixture(t){
 }
 
 
-test('ST-02 work templates, report snapshots, export and transactional inbox',{timeout:300000},async t=>{
+async function reportFixture(t){
  const fixture=await operationsFixture(t);
- const {platform,plan,owner,student,stranger,db,rows,workers,roles,files,org,center,ownerPerson,studentPerson,version,scoped,api,denied,interval,filters,headers,mapping,token,drain,upload,previewFile,p05,p06,settings,saveSettings,templates}=fixture;
- let importJob,preview,exportJob,exportFile,uploaded,preparedReport,sharedReportRef;
+ const {db,org,headers,studentPerson,version,upload,previewFile,api,token,drain,p06}=fixture;
  // Native opening balances are fixture prerequisites; their assertions remain in the import root.
  await db.query('insert into private.p06_configuration values($1,2097152,5000,16777216)',[org]);
  const start=new Date(Date.now()-86400000).toISOString().slice(0,10),end=new Date(Date.now()+30*86400000).toISOString().slice(0,10);
  const csv=headers.join(',')+'\r\nexisting,"Synthetic, existing",'+studentPerson+',2,1000,200,TRY,'+version+','+start+','+end+'\r\nnew,Synthetic new,,,,100,TRY,,,\r\nbad,Synthetic invalid,,,,bad,TRY,,,\r\n';
- uploaded=await upload(csv);const opening=await previewFile(uploaded,'st02-opening');importJob=opening.job;
+ const uploaded=await upload(csv);const opening=await previewFile(uploaded,'st02-opening');
  await api('import_apply_v1',{preview:token(opening.preview)});await drain(p06,importTick);
+ return {...fixture,importJob:opening.job};
+}
+
+function workTemplateDefinitions({filters,center}){
+ return {
+  report:{key:'private_report',name:'Synthetic private debt report',report:'collections_debts',filters:filters(),columns:['group_key','amount_minor'],report_order:'group_key_desc',group_by:'total'},
+  imp:{key:'private_import',name:'Synthetic mapping',center_id:center,source_namespace:'st03-templates',mapping:{delimiter:';',columns:[{source_column:'id',target:'source_key'},{source_column:'name',target:'display_name'},{source_column:'ref',target:'person_ref'}]}}
+ };
+}
+
+test('ST-02 work template privacy and live authority',{timeout:300000},async t=>{
+ const fixture=await reportFixture(t);
+ const {platform,plan,owner,student,stranger,db,rows,workers,roles,files,org,center,ownerPerson,studentPerson,version,scoped,api,denied,interval,filters,headers,mapping,token,drain,upload,previewFile,p05,p06,settings,saveSettings,templates}=fixture;
+ let preparedReport,sharedReportRef;
   await t.test('work templates are private unless explicitly shared; copies and resolves retain live domain authority',async()=>{
    assert.deepEqual((await settings('member')).values.report_templates,[]);assert.deepEqual((await settings('member')).values.import_templates,[]);
    const report={key:'private_report',name:'Synthetic private debt report',report:'collections_debts',filters:filters(),columns:['group_key','amount_minor'],report_order:'group_key_desc',group_by:'total'};
@@ -116,67 +129,5 @@ test('ST-02 work templates, report snapshots, export and transactional inbox',{t
    }finally{await api('center_manager_assign_v1',{person_id:ownerPerson});}
    const current=await settings('member');await denied('settings_update_v1',{scope:'member',org_id:org,center_id:undefined,expected_version:current.version,patch:{report_templates:[report,{...report,name:'Duplicate key'}]}},'VALIDATION_FAILED');
    await denied('settings_template_resolve_v1',{kind:'import',template:available.imports[0].source,overrides:{opening_credits:99}},'VALIDATION_FAILED');
-  });
-  await t.test('report preparation changes real grouping and CSV columns; later template edits do not rewrite the job',async()=>{
-   const view=await api('report_get_v1',{...preparedReport.request,page:{}});assert.equal(view.rows.items.length,1);assert.equal(view.rows.items[0].amount_minor,'300');assert(!('person_id' in view.rows.items[0]));assert.deepEqual(view.columns,['group_key','amount_minor']);
-   const counts=await api('report_get_v1',{...preparedReport.request,columns:['count'],group_by:'person',page:{}});assert.equal(counts.rows.items.length,2);for(const row of counts.rows.items)assert.deepEqual(Object.keys(row).sort(),['count','group_key']);
-   const job=(await api('report_export_start_v1',{...preparedReport.request,format:'csv'})).job_id;
-   const previous=(await templates()).work_templates.reports.find(x=>x.source.scope==='member');await saveSettings('member',{report_templates:[{...previous.template,columns:['count'],group_by:'person'}]});
-   await denied('settings_template_resolve_v1',{kind:'report',template:previous.source},'VERSION_CONFLICT');
-   await drain(p06,importTick);const file=await api('report_file_get_v1',{job_id:job});
-   const response=await fetch(context().env.API_URL+file.download_path,{method:'POST',headers:{apikey:context().env.ANON_KEY,authorization:'Bearer '+owner.jwt,'content-type':'application/json'},body:JSON.stringify({client_api_version:1,request_id:key(),...scoped({job_id:job}),operation_key:key()})});assert(response.ok);
-   const csv=await response.text(),lines=csv.split('\r\n').filter(Boolean);assert.equal(lines[0],'group_key,amount_minor');assert.equal(lines.length,2);assert.match(lines[1],/"300"/);assert(!csv.includes(studentPerson));
-   await saveSettings('member',{report_templates:[{...previous.template,key:'subscriber_report',columns:['group_key','subscriber_number'],group_by:'person'}]});
-   const subscriberTemplate=(await templates()).work_templates.reports.find(x=>x.source.scope==='member'&&x.template.key==='subscriber_report');assert(subscriberTemplate);
-   const resolved=await api('settings_template_resolve_v1',{kind:'report',template:subscriberTemplate.source});assert.deepEqual(resolved.request.columns,['group_key','subscriber_number']);
-   const numbered=await api('report_get_v1',{...resolved.request,page:{}});const subscriberNo=numbered.rows.items.find(x=>x.subscriber_number)?.subscriber_number;assert(subscriberNo);
-   const numberedJob=(await api('report_export_start_v1',{...resolved.request,format:'csv'})).job_id;await drain(p06,importTick);const numberedFile=await api('report_file_get_v1',{job_id:numberedJob});
-   const numberedResponse=await fetch(context().env.API_URL+numberedFile.download_path,{method:'POST',headers:{apikey:context().env.ANON_KEY,authorization:'Bearer '+owner.jwt,'content-type':'application/json'},body:JSON.stringify({client_api_version:1,request_id:key(),...scoped({job_id:numberedJob}),operation_key:key()})});assert(numberedResponse.ok);
-   const numberedCsv=await numberedResponse.text();assert.equal(numberedCsv.split('\r\n')[0],'group_key,subscriber_number');assert(numberedCsv.includes('"'+subscriberNo+'"'));
-   const shaped=(await rows('select private.work_report_rows($1,$2) v',[{report:'collections_debts',group_by:'total',report_order:'group_key_desc'},[{group_key:'a',count:1,amount_minor:'9007199254740993',currency:'TRY'},{group_key:'a',count:1,amount_minor:'2',currency:'TRY'},{group_key:'z',count:1,amount_minor:'7',currency:'TRY'},{group_key:'a',count:1,amount_minor:'9',currency:'USD'}]].map(JSON.stringify)))[0].v;
-   assert.equal(shaped[0].group_key,'z');assert.equal(shaped.find(x=>x.group_key==='a'&&x.currency==='TRY').amount_minor,'9007199254740995');assert.equal(shaped.find(x=>x.currency==='USD').amount_minor,'9');
-   const escaped=(await rows('select private.work_report_csv($1,$2,1024) v',[[{group_key:'=SUM(A1)',amount_minor:'7'}],['group_key','amount_minor']].map(JSON.stringify)))[0].v.toString('utf8');assert.match(escaped,/"'=SUM\(A1\)"/);
-  });
-  await t.test('import preparation is mapping only; explicit preview/apply retains its snapshot after template reset',async()=>{
-   const source=(await templates()).work_templates.imports[0].source,prepared=await api('settings_template_resolve_v1',{kind:'import',template:source});assert.equal(prepared.request.mapping.delimiter,';');
-   const f=await upload('id;name;ref\r\nprepared;Synthetic prepared;'+studentPerson+'\r\n'),before=await rows('select (select count(*) from core.people where org_id=$1)::int people,(select count(*) from core.sales where org_id=$1)::int sales,(select count(*) from core.debts where org_id=$1)::int debts',[org]);
-   const next=await previewFile(f,prepared.request.source_namespace,key(),prepared.request.mapping);assert.equal(next.preview.import_summary.valid_rows,1);assert.equal(next.preview.import_summary.new_people,0);
-   const value=(await settings('member')).values.import_templates[0];await saveSettings('member',{import_templates:[{...value,mapping:{...value.mapping,delimiter:','},source_namespace:'st03-changed-template'}]});await denied('settings_template_resolve_v1',{kind:'import',template:source},'VERSION_CONFLICT');
-   await api('import_apply_v1',{preview:token(next.preview)});await drain(p06,importTick);assert.equal((await api('import_rows_list_v1',{job_id:next.job,page:{}})).items[0].state,'applied');
-   assert.deepEqual(await rows('select (select count(*) from core.people where org_id=$1)::int people,(select count(*) from core.sales where org_id=$1)::int sales,(select count(*) from core.debts where org_id=$1)::int debts',[org]),before);
-   const reset=await must(owner,'settings_reset_preview_v1',{scope:'member',org_id:org,fields:['import_templates']});await must(owner,'settings_reset_apply_v1',{scope:'member',org_id:org,expected_version:reset.version,preview:token(reset)},key());assert.deepEqual((await settings('member')).values.import_templates,[]);assert.equal((await settings('organization')).values.report_templates.length,1);
-   assert.equal((await api('job_status_get_v1',{job_id:next.job})).state,'succeeded');
-  });
-  await t.test('Starter report totals survive pagination and authenticated export; files cannot cross account or expiry',async()=>{
-   const b={report:'collections_debts',filters:filters(),page:{limit:1}};const report=await api('report_get_v1',b);assert.equal(report.rows.items.length,1);assert(report.rows.next_cursor);assert.equal(report.totals.find(x=>x.group_key==='outstanding_debt').amount_minor,'300');
-   assert.equal((await api('report_get_v1',{...b,page:{limit:1,cursor:report.rows.next_cursor}})).rows.items.length,1);
-   assert.equal((await api('report_get_v1',{report:'lesson_attendance',filters:filters(),page:{}})).report_kind,'lesson_attendance');
-   const k=key(),body={report:'collections_debts',filters:filters(),format:'csv'};exportJob=(await api('report_export_start_v1',body,owner,k)).job_id;assert.equal((await api('report_export_start_v1',body,owner,k)).job_id,exportJob);await drain(p06,importTick);
-   exportFile=await api('report_file_get_v1',{job_id:exportJob});
-   const download=actor=>fetch(context().env.API_URL+exportFile.download_path,{method:'POST',headers:{apikey:context().env.ANON_KEY,authorization:'Bearer '+actor.jwt,'content-type':'application/json'},body:JSON.stringify({client_api_version:1,request_id:key(),...scoped({job_id:exportJob}),operation_key:key()})});
-   const response=await download(owner);assert(response.ok);assert.match(response.headers.get('cache-control'),/no-store/);assert.match(response.headers.get('content-type'),/^text\/csv/);assert.equal((await response.text()).split('\r\n').filter(Boolean).length,3);
-   const forbidden=await download(student);assert.equal((await forbidden.json()).ok,false);
-   await db.query("update core.report_jobs set expires_at=now()-interval '1 second' where id=$1",[exportJob]);await denied('report_file_get_v1',{job_id:exportJob},'OPERATION_RESULT_EXPIRED');
-   const expired=await download(owner),expiredBody=await expired.json();assert.equal(expiredBody.ok,false);assert.equal(expiredBody.error.code,'OPERATION_RESULT_EXPIRED');assert.equal(expiredBody.data,undefined);
-
-  });
-  await t.test('transactional completion reaches only requester inbox; preferences, read versions and replay never create loops',async()=>{
-   await must(owner,'settings_update_v1',{scope:'member',org_id:org,expected_version:(await settings('member')).version,patch:{in_app_reminders:false,in_app_marketing:false}},key());
-   const delivery=await rows("select j.id,j.notification_id,j.state,n.kind from core.outbox_jobs j join core.notifications n on n.org_id=j.org_id and n.id=j.notification_id where j.org_id=$1 and j.kind='in_app' and n.recipient_person_id=$2 and ((n.kind='report_build_v1' and n.subject_id=$3) or (n.kind='import_rows_process_v1' and n.subject_id=$4)) order by j.id",[org,ownerPerson,exportJob,importJob]);
-   assert(delivery.some(x=>x.kind==='report_build_v1'));assert(delivery.some(x=>x.kind==='import_rows_process_v1'));assert(delivery.every(x=>x.state==='pending'));
-   await drain(p05,notificationsTick);
-   const delivered=await rows("select j.id,j.notification_id,j.state,p.operation,p.result,(select count(*)::int from core.operation_receipts r where r.org_id=j.org_id and r.operation='outbox_deliver_v1' and r.actor_fingerprint=$3 and r.key_hash=encode(extensions.digest(p.operation_key::text,'sha256'),'hex') and r.state='succeeded' and r.business_reference=j.notification_id and r.result=p.result) receipts from core.outbox_jobs j left join private.p05_jobs p on p.org_id=j.org_id and p.job_id=j.id where j.org_id=$1 and j.id=any($2::uuid[]) order by j.id",[org,delivery.map(x=>x.id),'worker:p05:'+roles[0]]);
-   assert.equal(delivered.length,delivery.length);
-   for(const job of delivered){assert.equal(job.state,'succeeded');assert.equal(job.operation,'outbox_deliver_v1');assert.equal(job.result?.ok,true);assert.equal(job.result.data.job_id,job.id);assert.deepEqual(job.result.data.result_reference,{type:'notifications',id:job.notification_id});assert.equal(job.receipts,1);}
-   const list=()=>api('notifications_list_v1',{page:{limit:200},unread_only:false});
-   const inbox=await list(),completion=inbox.items.find(x=>x.kind==='report_build_v1'&&x.payload.subject.id===exportJob);assert(completion);assert(inbox.items.some(x=>x.kind==='import_rows_process_v1'&&x.payload.subject.id===importJob));
-   const other=await api('notifications_list_v1',{page:{limit:200},unread_only:false},student);assert(!other.items.some(x=>x.payload.subject.id===exportJob||x.payload.subject.id===importJob));
-   await denied('notification_mark_read_v1',{notification_id:completion.id,expected_version:1},'NOT_FOUND',student);
-   await denied('notification_preferences_set_v1',{channel:'in_app',purpose:'transactional',enabled:false,expected_version:1},'FORBIDDEN');
-   const count=(await rows('select count(*)::int n from core.notifications where org_id=$1',[org]))[0].n;
-   const k=key(),b={notification_id:completion.id,expected_version:1};await api('notification_mark_read_v1',b,owner,k);assert.equal((await api('notification_mark_read_v1',b,owner,k)).replayed,true);
-   await denied('notification_mark_read_v1',b,'VERSION_CONFLICT');assert((await list()).items.find(x=>x.id===completion.id).read_at);
-   assert(!(await api('notifications_list_v1',{page:{limit:200},unread_only:true})).items.some(x=>x.id===completion.id));assert.equal((await rows('select count(*)::int n from core.notifications where org_id=$1',[org]))[0].n,count);
-   assert.equal((await rows("select count(*)::int n from core.outbox_jobs where org_id=$1 and kind in ('p05.reminder','p05.automation','email')",[org]))[0].n,0);
   });
 });

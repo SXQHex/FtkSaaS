@@ -72,6 +72,26 @@ async function operationsFixture(t){
  return {platform,plan,owner,student,stranger,db,rows,workers,roles,files,org,center,ownerPerson,studentPerson,version,scoped,api,denied,interval,filters,headers,mapping,token,drain,upload,previewFile,p05,p06,settings,saveSettings,templates};
 }
 
+
+async function reportFixture(t){
+ const fixture=await operationsFixture(t);
+ const {db,org,headers,studentPerson,version,upload,previewFile,api,token,drain,p06}=fixture;
+ // Native opening balances are fixture prerequisites; their assertions remain in the import root.
+ await db.query('insert into private.p06_configuration values($1,2097152,5000,16777216)',[org]);
+ const start=new Date(Date.now()-86400000).toISOString().slice(0,10),end=new Date(Date.now()+30*86400000).toISOString().slice(0,10);
+ const csv=headers.join(',')+'\r\nexisting,"Synthetic, existing",'+studentPerson+',2,1000,200,TRY,'+version+','+start+','+end+'\r\nnew,Synthetic new,,,,100,TRY,,,\r\nbad,Synthetic invalid,,,,bad,TRY,,,\r\n';
+ const uploaded=await upload(csv);const opening=await previewFile(uploaded,'st02-opening');
+ await api('import_apply_v1',{preview:token(opening.preview)});await drain(p06,importTick);
+ return {...fixture,importJob:opening.job};
+}
+
+function workTemplateDefinitions({filters,center}){
+ return {
+  report:{key:'private_report',name:'Synthetic private debt report',report:'collections_debts',filters:filters(),columns:['group_key','amount_minor'],report_order:'group_key_desc',group_by:'total'},
+  imp:{key:'private_import',name:'Synthetic mapping',center_id:center,source_namespace:'st03-templates',mapping:{delimiter:';',columns:[{source_column:'id',target:'source_key'},{source_column:'name',target:'display_name'},{source_column:'ref',target:'person_ref'}]}}
+ };
+}
+
 test('ST-02 import, entitlement consumption, quota and live revocation',{timeout:300000},async t=>{
  const fixture=await operationsFixture(t);
  const {platform,plan,owner,student,stranger,db,rows,workers,roles,files,org,center,ownerPerson,studentPerson,version,scoped,api,denied,interval,filters,headers,mapping,token,drain,upload,previewFile,p05,p06,settings,saveSettings,templates}=fixture;
@@ -166,4 +186,3 @@ test('ST-02 import, entitlement consumption, quota and live revocation',{timeout
    assert.equal((await rows('select count(*)::int n from core.sales where org_id=$1',[org]))[0].n,1);
   });
 });
-
