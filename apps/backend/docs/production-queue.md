@@ -4,7 +4,7 @@ Bu dosya yalnız **sıra, bağımlı teslim paketleri ve kontrol noktalarının*
 
 ## Uygulama sırası
 
-**4 Kasım kullanıcı önceliği:** [S08 native telefon test numarası dilimi](remaining-work.md#s08) ayrı teslim olarak öne alınır. Açık CRM PR182'nin kaynağına müdahale edilmez; CRM'nin kendi iç sırası korunur. Telefon dilimi için kaynak/CI bekleme noktası [devirde](00-FtkSaaS-yeni-sohbet-devir.md#native-telefon-test-numarası-dilimi) izlenir.
+**4 Kasım telefon kontrol noktası:** [S08 native telefon backend dilimi](remaining-work.md#s08), PR183 aday/main/development kabulüyle tamamlandı; [kanıt](00-FtkSaaS-yeni-sohbet-devir.md#native-telefon-test-numarası-dilimi). Kalan frontend consumer/ekran kabulü [XREQ-017](../../../docs/requests.md#xreq-017) ve PR184 sahibindedir. CRM PR182 ve CI PR185 ayrı yürütülür; bu kapanış onların kaynağını veya sırasını değiştirmez.
 
 | Sıra | Görev paketi | Bağımlılık ve kontrol noktası |
 |---|---|---|
