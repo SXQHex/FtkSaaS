@@ -13,6 +13,7 @@ import { ScheduleWorkspace } from "../calendar/schedule-workspace";
 import { StudentsWorkspace } from "../students/students-workspace";
 import { InstructorTasks } from "../setup/instructor-tasks";
 import { StudioSetup } from "../setup/studio-setup";
+import { InboxWorkspace } from "../inbox/inbox-workspace";
 import { Preferences } from "../preferences";
 import { AdminShell, sections, type AdminSection } from "./admin-shell";
 import {
@@ -298,8 +299,14 @@ export function StudioWorkspace() {
       {snapshot && section === "students" && (
         <StudentsWorkspace studios={snapshot.studios} actorId={snapshot.account.id} />
       )}
+      {snapshot && section === "inbox" && (
+        <InboxWorkspace
+          actorId={snapshot.account.id}
+          organizations={snapshot.studios.map(({ organization }) => organization)}
+        />
+      )}
       {snapshot &&
-        !["overview", "studio", "settings", "schedule", "students"].includes(section) && (
+        !["overview", "studio", "settings", "schedule", "students", "inbox"].includes(section) && (
           <Card className="shadow-none">
             <CardContent className="flex min-h-72 flex-col items-center justify-center px-5 py-12 text-center">
               <Layers3 aria-hidden="true" className="mb-5 size-8 text-muted-foreground" />

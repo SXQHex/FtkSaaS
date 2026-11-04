@@ -339,7 +339,10 @@
       "held": "Ayrılan",
       "remaining": "Kalan"
     },
-    "capacityCategories": { "male": "Erkek", "female": "Kadın" },
+    "capacityCategories": {
+      "male": "Erkek",
+      "female": "Kadın"
+    },
     "roomCapacity": "Oda kapasitesi: {count}",
     "capacityUnavailable": "Bilgi yok",
     "capacityHint": "Yer sayısı son okuma anına aittir. Kesin uygunluk rezervasyon sırasında kontrol edilir.",
@@ -1212,5 +1215,47 @@
     "timeZone": "Saat dilimi",
     "nextStep": "Bu merkezde ücret anlaşmalarını yönetme yetkisi olan kişi, ilgili anlaşmanın kapsamını ve yürürlüğünü kontrol etmelidir. Yapılandırma tamamlandıktan sonra forma dönüp yeni bir önizleme al ve güncel etkileri ayrıca onayla.",
     "limited": "Yalnız ilk belirlenen anlaşma engeli gösterilir. Yeni önizlemede başka engeller çıkabilir."
+  },
+  "inbox": {
+    "title": "Bildirim kutusu",
+    "notice": "İşlemsel bildirim",
+    "read": "Okunmuş",
+    "unread": "Okunmamış",
+    "unreadOnly": "Yalnız okunmamış",
+    "markRead": "Okundu olarak işaretle",
+    "confirmRead": "Bu bildirimi okundu olarak işaretle",
+    "confirm": "Okundu olarak onayla",
+    "cancel": "Vazgeç",
+    "next": "Sonraki sayfa",
+    "reload": "Yeniden yükle",
+    "loading": "Yükleniyor…",
+    "empty": "Bu görünümde bildirim yok.",
+    "loadError": "Bildirimler okunamadı. Erişiminiz değişmiş olabilir; yeniden yükleyin.",
+    "versionError": "Bildirimin güncel durumu okunamadı. Yeniden deneyin.",
+    "openTarget": "Seansı aç",
+    "targetUnsupported": "Bu kayıt için doğrudan ekran bağlantısı henüz yok.",
+    "history": "Kayıt geçmişi",
+    "historyHint": "Yalnız güncel yetkinizin izin verdiği kayıt geçmişi gösterilir.",
+    "historyError": "Geçmiş okunamadı veya bu kayda erişiminiz yok. Tarih aralığını kontrol edip yeniden yükleyin.",
+    "emptyHistory": "Bu aralıkta geçmiş kaydı yok.",
+    "from": "Başlangıç tarihi",
+    "until": "Bitiş tarihi (hariç)",
+    "utcRange": "Tarih aralığı UTC gün sınırlarıyla uygulanır.",
+    "filter": "Filtrele",
+    "organization": "Organizasyon",
+    "noOrganization": "Bildirim kutusu için erişilebilir organizasyon bulunamadı.",
+    "recordAction": "Kayıt işlemi",
+    "actions": {
+      "session_change_apply_v1": "Seans değiştirildi",
+      "session_cancel_apply_v1": "Seans iptal edildi",
+      "reservation_create_v1": "Rezervasyon oluşturuldu",
+      "reservation_cancel_v1": "Rezervasyon iptal edildi",
+      "notification_mark_read_v1": "Bildirim okundu"
+    },
+    "kinds": {
+      "session_cancelled_by_center": "Stüdyo seansı iptal etti",
+      "seat_offer": "Kontenjan teklifi",
+      "p01_expired": "İşlem süresi doldu"
+    }
   }
 }

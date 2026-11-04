@@ -339,7 +339,10 @@
       "held": "Held",
       "remaining": "Remaining"
     },
-    "capacityCategories": { "male": "Male", "female": "Female" },
+    "capacityCategories": {
+      "male": "Male",
+      "female": "Female"
+    },
     "roomCapacity": "Room capacity: {count}",
     "capacityUnavailable": "Unavailable",
     "capacityHint": "Availability reflects the last refresh. Eligibility is checked when a reservation is made.",
@@ -1212,5 +1215,47 @@
     "timeZone": "Time zone",
     "nextStep": "Someone authorized to manage fee agreements at this center must check the agreement scope and effective dates. After configuration, return to the form, request a new preview and separately confirm its current effects.",
     "limited": "Only the first identified agreement blocker is shown. A new preview may reveal other blockers."
+  },
+  "inbox": {
+    "title": "Inbox",
+    "notice": "Transactional notification",
+    "read": "Read",
+    "unread": "Unread",
+    "unreadOnly": "Unread only",
+    "markRead": "Mark as read",
+    "confirmRead": "Mark this notification as read",
+    "confirm": "Confirm read",
+    "cancel": "Cancel",
+    "next": "Next page",
+    "reload": "Reload",
+    "loading": "Loading…",
+    "empty": "No notifications in this view.",
+    "loadError": "Could not load notifications. Your access may have changed; reload to retry.",
+    "versionError": "Could not read the current notification state. Try again.",
+    "openTarget": "Open session",
+    "targetUnsupported": "A direct screen link is not available for this record yet.",
+    "history": "Record history",
+    "historyHint": "Only history permitted by your current access is shown.",
+    "historyError": "History could not be loaded or access is denied. Check the date range and reload.",
+    "emptyHistory": "No history in this interval.",
+    "from": "Start date",
+    "until": "End date (exclusive)",
+    "utcRange": "The date interval uses UTC day boundaries.",
+    "filter": "Filter",
+    "organization": "Organization",
+    "noOrganization": "No accessible organization for the inbox.",
+    "recordAction": "Record action",
+    "actions": {
+      "session_change_apply_v1": "Session changed",
+      "session_cancel_apply_v1": "Session cancelled",
+      "reservation_create_v1": "Reservation created",
+      "reservation_cancel_v1": "Reservation cancelled",
+      "notification_mark_read_v1": "Notification read"
+    },
+    "kinds": {
+      "session_cancelled_by_center": "Session cancelled by studio",
+      "seat_offer": "Seat offer",
+      "p01_expired": "Operation expired"
+    }
   }
 }

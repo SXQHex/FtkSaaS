@@ -8,6 +8,7 @@ import type {
 import { apiClient, ApiFailure } from "./api";
 import { sessionCapacity } from "./session-create";
 export const setupWrites = [
+  "notification_mark_read_v1",
   "organization_update_v1",
   "center_create_v1",
   "center_update_v1",
@@ -32,6 +33,8 @@ export const setupWrites = [
 ] as const;
 export type SetupWrite = (typeof setupWrites)[number];
 type SetupRead =
+  | "notifications_list_v1"
+  | "audit_list_v1"
   | "organization_get_v1"
   | "centers_list_v1"
   | "disciplines_list_v1"
@@ -74,6 +77,7 @@ export const setupStorageKey = (scope: SetupScope, slot: string) =>
 export type PendingSetup = { command: SetupCommand; blocked?: boolean };
 const keyPattern = /^[a-f0-9]{8}-[a-f0-9]{4}-7[a-f0-9]{3}-[89ab][a-f0-9]{3}-[a-f0-9]{12}$/i;
 const fields: Record<SetupWrite, string[]> = {
+  notification_mark_read_v1: ["notification_id", "expected_version"],
   organization_update_v1: ["name", "expected_version"],
   center_create_v1: ["name", "timezone"],
   center_update_v1: ["name", "timezone", "expected_version"],
@@ -133,6 +137,14 @@ export function recoverSetup(scope: SetupScope, slot: string): PendingSetup | "i
     if (
       input.expected_version !== undefined &&
       (!Number.isSafeInteger(input.expected_version) || input.expected_version < 1)
+    )
+      return "invalid";
+    if (
+      command.operation === "notification_mark_read_v1" &&
+      (typeof input.notification_id !== "string" ||
+        !/^[a-f0-9]{8}(?:-[a-f0-9]{4}){3}-[a-f0-9]{12}$/i.test(input.notification_id) ||
+        !Number.isSafeInteger(input.expected_version) ||
+        input.expected_version < 1)
     )
       return "invalid";
     if (input.name !== undefined && (typeof input.name !== "string" || !input.name.trim()))
