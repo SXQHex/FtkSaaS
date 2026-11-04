@@ -533,6 +533,25 @@ usage_targets: [UsageTarget, ...(UsageTarget)[]]
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "EventTerms".
+ */
+export type EventTerms = {
+fee_minor: Money
+currency: Currency
+full_payment_required: Bool
+/**
+ * Items: Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+allowed_product_version_ids: string[]
+cancellation: CancellationTerms
+refund: RefundTerms
+/**
+ * Omitted means existing credit-consuming event. Eligibility-only requires a current applicable lesson right and never allocates or consumes it.
+ */
+package_usage?: ("consume" | "eligibility_only")
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
  * via the `definition` "ImportTarget".
  */
 export type ImportTarget = ("display_name" | "email" | "phone" | "source_key" | "person_ref" | "opening_credits" | "opening_debt_minor" | "currency" | "product_version_ref" | "start_date" | "end_date" | "opening_credit_value_minor")
@@ -675,6 +694,15 @@ export type PlanLimit = (FinitePlanLimit | UnlimitedPlanLimit)
  * via the `definition` "PlanLimitKey".
  */
 export type PlanLimitKey = ("active_students" | "instructors" | "centers" | "rooms" | "disciplines")
+/**
+ * Numeric finite capacity, or explicit unlimited only for venues without a room. No numeric sentinel.
+ *
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "EventCapacity".
+ */
+export type EventCapacity = (Capacity | {
+kind: "unlimited"
+})
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
  * via the `definition` "Request_policy_publish".
@@ -1005,6 +1033,68 @@ preparation_id?: (string | null)
  * via the `definition` "EventRegistrationResult".
  */
 export type EventRegistrationResult = (EventRegistered | EventCapacityClosed)
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "Request_event_attendance_mark".
+ */
+export type RequestEventAttendanceMark = {
+client_api_version: 1
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+request_id: string
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+org_id: string
+center_id?: (string | null)
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+operation_key: string
+expected_version: PositiveInt
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+registration_id: string
+result: AttendanceResult
+/**
+ * CM-only explicit recording of actual attendance despite failed package eligibility; grants no entitlement.
+ */
+record_ineligible_attendance?: boolean
+reason?: Text
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "Request_event_attendance_correct".
+ */
+export type RequestEventAttendanceCorrect = {
+client_api_version: 1
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+request_id: string
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+org_id: string
+center_id?: (string | null)
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+operation_key: string
+expected_version: PositiveInt
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+registration_id: string
+result: AttendanceResult
+reason: Text
+/**
+ * CM-only explicit recording of actual attendance despite failed package eligibility; grants no entitlement.
+ */
+record_ineligible_attendance?: boolean
+}
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
  * via the `definition` "LessonFinancialSnapshot".
@@ -3579,6 +3669,7 @@ PlanLimitKey?: PlanLimitKey
 FinitePlanLimit?: FinitePlanLimit
 UnlimitedPlanLimit?: UnlimitedPlanLimit
 PlanUsage?: PlanUsage
+EventCapacity?: EventCapacity
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -3975,21 +4066,6 @@ cutoff_minutes?: (Count | null)
 before_cutoff: ("release" | "consume")
 after_cutoff: ("release" | "consume")
 no_show: ("release" | "consume")
-}
-/**
- * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
- * via the `definition` "EventTerms".
- */
-export interface EventTerms {
-fee_minor: Money
-currency: Currency
-full_payment_required: Bool
-/**
- * Items: Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
- */
-allowed_product_version_ids: string[]
-cancellation: CancellationTerms
-refund: RefundTerms
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -6780,7 +6856,7 @@ timezone: IanaZone
 venue: VenueSpec
 terms: EventTerms
 state: EventState
-capacity: Capacity
+capacity: EventCapacity
 attendance_state: AttendanceClosure
 assignments: DutyInput[]
 version: PositiveInt
@@ -6809,6 +6885,8 @@ state: EventRegistrationState
 attendance_result: AttendanceResult
 version: PositiveInt
 participant_cancellation?: (ParticipantCancellationBasis | null)
+package_eligible?: (boolean | null)
+package_eligible_at_attendance?: (boolean | null)
 }
 /**
  * Immutable backend decision evidence. Planned start is captured at cancellation; actual occurrence recording never reclassifies it.
@@ -11772,7 +11850,7 @@ name: Text
 interval: Interval
 timezone: IanaZone
 venue: VenueSpec
-capacity: Capacity
+capacity: EventCapacity
 terms: EventTerms
 assignments: EventDutyInput[]
 discipline_ids: EventDisciplineIds
@@ -12934,32 +13012,6 @@ trace_id: string
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
- * via the `definition` "Request_event_attendance_mark".
- */
-export interface RequestEventAttendanceMark {
-client_api_version: 1
-/**
- * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
- */
-request_id: string
-/**
- * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
- */
-org_id: string
-center_id?: (string | null)
-/**
- * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
- */
-operation_key: string
-expected_version: PositiveInt
-/**
- * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
- */
-registration_id: string
-result: AttendanceResult
-}
-/**
- * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
  * via the `definition` "Success_event_attendance_mark".
  */
 export interface SuccessEventAttendanceMark {
@@ -13189,33 +13241,6 @@ data: Mutation
  * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
  */
 trace_id: string
-}
-/**
- * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
- * via the `definition` "Request_event_attendance_correct".
- */
-export interface RequestEventAttendanceCorrect {
-client_api_version: 1
-/**
- * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
- */
-request_id: string
-/**
- * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
- */
-org_id: string
-center_id?: (string | null)
-/**
- * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
- */
-operation_key: string
-expected_version: PositiveInt
-/**
- * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
- */
-registration_id: string
-result: AttendanceResult
-reason: Text
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -15302,8 +15327,8 @@ starts_at: Instant
 ends_at: Instant
 timezone: Text
 venue: VenueSpec
-nominal: Int
-maximum: Int
+nominal: (Count | null)
+maximum: (Count | null)
 state: EventState
 terms: EventTerms
 published: Bool
@@ -15381,6 +15406,7 @@ state: EventRegistrationState
 attendance_result: AttendanceResult
 terms_snapshot: EventTerms
 participant_cancellation?: (ParticipantCancellationBasis | null)
+package_eligible_at_attendance: (boolean | null)
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema

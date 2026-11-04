@@ -1,6 +1,6 @@
 import {isDesignSandbox} from './design-sandbox.mjs';
 import {classifyChanges,ownerOf} from './scope.mjs';
-import {coverageHash} from './shards.mjs';
+import {coverageHash,acceptanceProfile} from './shards.mjs';
 import {documentScope} from './document-scope.mjs';
 export function assertReady(pr){
  if(pr.state!=='open'||pr.draft)throw Error('Draft or closed candidate cannot merge');
@@ -91,7 +91,7 @@ export async function resolveCandidate(github,context,core,kind){
  const scope={safe:sourceScope.kind==='documentation'};
  if(kind==='full'&&scope.safe)throw Error('Documentation-only source uses documentation acceptance, not full clean');
  if(kind==='documentation'&&!scope.safe){core.setOutput('eligible','false');return;}
- const binding={kind,profile:kind==='full'?'four-isolated-v2':undefined,coverage:kind==='full'?coverageHash():undefined,pr:p.number,head:p.head.sha,base:p.base.sha,merge,tree:commit.tree.sha,run_id:context.runId,attempt:Number(process.env.GITHUB_RUN_ATTEMPT),benchmark:false};
+ const binding={kind,profile:kind==='full'?acceptanceProfile:undefined,coverage:kind==='full'?coverageHash(acceptanceProfile):undefined,pr:p.number,head:p.head.sha,base:p.base.sha,merge,tree:commit.tree.sha,run_id:context.runId,attempt:Number(process.env.GITHUB_RUN_ATTEMPT),benchmark:false};
  core.setOutput('eligible','true');core.setOutput('merge',merge);core.setOutput('binding',JSON.stringify(binding));
 }
 export function currentAttemptBinding(binding,context){

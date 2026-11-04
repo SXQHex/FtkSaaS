@@ -2013,6 +2013,13 @@
         },
         "refund": {
           "$ref": "#/$defs/RefundTerms"
+        },
+        "package_usage": {
+          "enum": [
+            "consume",
+            "eligibility_only"
+          ],
+          "description": "Omitted means existing credit-consuming event. Eligibility-only requires a current applicable lesson right and never allocates or consumes it."
         }
       },
       "required": [
@@ -2023,7 +2030,31 @@
         "cancellation",
         "refund"
       ],
-      "additionalProperties": false
+      "additionalProperties": false,
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "package_usage": {
+                "const": "eligibility_only"
+              }
+            },
+            "required": [
+              "package_usage"
+            ]
+          },
+          "then": {
+            "properties": {
+              "fee_minor": {
+                "const": "0"
+              },
+              "allowed_product_version_ids": {
+                "minItems": 1
+              }
+            }
+          }
+        }
+      ]
     },
     "DocumentRequirement": {
       "type": "object",
@@ -4920,7 +4951,7 @@
           "$ref": "#/$defs/EventState"
         },
         "capacity": {
-          "$ref": "#/$defs/Capacity"
+          "$ref": "#/$defs/EventCapacity"
         },
         "attendance_state": {
           "$ref": "#/$defs/AttendanceClosure"
@@ -15090,7 +15121,7 @@
           "$ref": "#/$defs/VenueSpec"
         },
         "capacity": {
-          "$ref": "#/$defs/Capacity"
+          "$ref": "#/$defs/EventCapacity"
         },
         "terms": {
           "$ref": "#/$defs/EventTerms"
@@ -17222,6 +17253,13 @@
         },
         "result": {
           "$ref": "#/$defs/AttendanceResult"
+        },
+        "record_ineligible_attendance": {
+          "type": "boolean",
+          "description": "CM-only explicit recording of actual attendance despite failed package eligibility; grants no entitlement."
+        },
+        "reason": {
+          "$ref": "#/$defs/Text"
         }
       },
       "required": [
@@ -17233,7 +17271,34 @@
         "registration_id",
         "result"
       ],
-      "additionalProperties": false
+      "additionalProperties": false,
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "record_ineligible_attendance": {
+                "const": true
+              }
+            },
+            "required": [
+              "record_ineligible_attendance"
+            ]
+          },
+          "then": {
+            "required": [
+              "reason"
+            ],
+            "properties": {
+              "result": {
+                "const": "attended"
+              },
+              "reason": {
+                "$ref": "#/$defs/Text"
+              }
+            }
+          }
+        }
+      ]
     },
     "Success_event_attendance_mark": {
       "type": "object",
@@ -17674,6 +17739,10 @@
         },
         "reason": {
           "$ref": "#/$defs/Text"
+        },
+        "record_ineligible_attendance": {
+          "type": "boolean",
+          "description": "CM-only explicit recording of actual attendance despite failed package eligibility; grants no entitlement."
         }
       },
       "required": [
@@ -17686,7 +17755,34 @@
         "result",
         "reason"
       ],
-      "additionalProperties": false
+      "additionalProperties": false,
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "record_ineligible_attendance": {
+                "const": true
+              }
+            },
+            "required": [
+              "record_ineligible_attendance"
+            ]
+          },
+          "then": {
+            "required": [
+              "reason"
+            ],
+            "properties": {
+              "result": {
+                "const": "attended"
+              },
+              "reason": {
+                "$ref": "#/$defs/Text"
+              }
+            }
+          }
+        }
+      ]
     },
     "Success_event_attendance_correct": {
       "type": "object",
@@ -22058,10 +22154,24 @@
           "$ref": "#/$defs/VenueSpec"
         },
         "nominal": {
-          "$ref": "#/$defs/Int"
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Count"
+            },
+            {
+              "type": "null"
+            }
+          ]
         },
         "maximum": {
-          "$ref": "#/$defs/Int"
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Count"
+            },
+            {
+              "type": "null"
+            }
+          ]
         },
         "state": {
           "$ref": "#/$defs/EventState"
@@ -22238,6 +22348,12 @@
               "type": "null"
             }
           ]
+        },
+        "package_eligible_at_attendance": {
+          "type": [
+            "boolean",
+            "null"
+          ]
         }
       },
       "required": [
@@ -22252,7 +22368,8 @@
         "terms_hash",
         "state",
         "attendance_result",
-        "terms_snapshot"
+        "terms_snapshot",
+        "package_eligible_at_attendance"
       ],
       "additionalProperties": false,
       "description": " Q-E02: center cancellation full linked settlement; existing occurrence/attendance evidence and append-only journals preserved."
@@ -24373,6 +24490,18 @@
             {
               "type": "null"
             }
+          ]
+        },
+        "package_eligible": {
+          "type": [
+            "boolean",
+            "null"
+          ]
+        },
+        "package_eligible_at_attendance": {
+          "type": [
+            "boolean",
+            "null"
           ]
         }
       },
@@ -50965,6 +51094,26 @@
         "entries"
       ],
       "additionalProperties": false
+    },
+    "EventCapacity": {
+      "oneOf": [
+        {
+          "$ref": "#/$defs/Capacity"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "kind": {
+              "const": "unlimited"
+            }
+          },
+          "required": [
+            "kind"
+          ],
+          "additionalProperties": false
+        }
+      ],
+      "description": "Numeric finite capacity, or explicit unlimited only for venues without a room. No numeric sentinel."
     }
   },
   "x-contract": {
@@ -68381,7 +68530,9 @@
           "event_terms_not_lesson_defaults",
           "active_student_limit_no_candidate_event_exception",
           "Q_D01_event_labels_same_org_not_grants",
-          "required_feature_gates_separate_from_references"
+          "required_feature_gates_separate_from_references",
+          "P08_explicit_event_capacity",
+          "P08_live_package_eligibility_without_credit_consumption"
         ],
         "audit": true,
         "notification": "outbox_if_user_visible_business_result",
@@ -68679,7 +68830,9 @@
           "Q_E01_scoped_payment_preparation",
           "Q_E01_no_duplicate_refund_claim",
           "Q_E01_prestart_operator_cancel_full_reversal",
-          "required_feature_gates_separate_from_references"
+          "required_feature_gates_separate_from_references",
+          "P08_explicit_event_capacity",
+          "P08_live_package_eligibility_without_credit_consumption"
         ],
         "audit": true,
         "notification": "outbox_if_user_visible_business_result",
@@ -72195,7 +72348,9 @@
           "active_student_limit_no_candidate_event_exception",
           "Q_D01_event_labels_same_org_not_grants",
           "required_feature_gates_separate_from_references",
-          "draft_has_no_rights_or_earning_side_effect"
+          "draft_has_no_rights_or_earning_side_effect",
+          "P08_explicit_event_capacity",
+          "P08_live_package_eligibility_without_credit_consumption"
         ],
         "audit": true,
         "notification": "outbox_if_user_visible_business_result",
@@ -73110,7 +73265,9 @@
           "Q_D01_no_event_negative_credit",
           "required_feature_gates_separate_from_references",
           "expected_target_version",
-          "linked_history_not_overwrite"
+          "linked_history_not_overwrite",
+          "P08_explicit_event_capacity",
+          "P08_live_package_eligibility_without_credit_consumption"
         ],
         "audit": true,
         "notification": "outbox_if_user_visible_business_result",
@@ -74001,7 +74158,9 @@
           "Q_E01_prestart_operator_cancel_full_reversal",
           "required_feature_gates_separate_from_references",
           "no_business_commit",
-          "scope_filter_before_pagination"
+          "scope_filter_before_pagination",
+          "P08_explicit_event_capacity",
+          "P08_live_package_eligibility_without_credit_consumption"
         ],
         "audit": false,
         "notification": "none",
@@ -94999,7 +95158,7 @@
       "uuid": "backend uuid@14.0.3 v7 for all inserted IDs; DB defaults not required",
       "external_transport": "POST /functions/v1/backend-v1/{operation}; direct typed request body",
       "internal_rpc": "service-only api_v1 named functions; actor/session/UUID bank supplied by verified gateway",
-      "migration_count": 100,
+      "migration_count": 101,
       "acceptance_source": "apps/backend/docs/00-FtkSaaS-yeni-sohbet-devir.md"
     },
     "decision_sprint": {

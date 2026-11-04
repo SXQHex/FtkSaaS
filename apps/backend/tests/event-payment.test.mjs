@@ -1,3 +1,4 @@
+import './event-capacity-package-acceptance.mjs';
 import './earning-payment-selection-acceptance.mjs';
 import test from 'node:test';
 import assert from 'node:assert/strict';
