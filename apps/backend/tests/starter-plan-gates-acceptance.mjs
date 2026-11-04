@@ -5,15 +5,15 @@ import {authUser,fixturePlatform,must,call,context} from './api-client.mjs';
 import {connect} from '../scripts/db.mjs';
 import {newUuidV7 as key} from '../scripts/uuid.mjs';
 
-test('Starter real Auth/API resource limits, downgrade scope and receipt gates',{timeout:300000},async t=>{
+async function starterGateFixture(t){
  const {platform,plan}=await fixturePlatform(),owner=await authUser('starter-owner');
  const db=await connect();
  const contract=JSON.parse(fs.readFileSync('../../packages/api-contracts/schema/contract.json'));
  const bodyFor=(op,b)=>{const o=contract['x-contract'].operations.find(x=>x.name===op);const props=contract.$defs[o.request.$ref.split('/').at(-1)].properties;return {org_id:org,...('center_id' in props?{center_id:center}:{}),...b};};
  const invoke=(op,b,k=key())=>must(owner,op,bodyFor(op,b),k);
  const reject=async(op,b,code,k=key())=>{const r=await call(owner,op,bodyFor(op,b),k);assert.equal(r.result.ok,false,op);assert.equal(r.result.error.code,code,JSON.stringify(r.result));};
- let org,center,room,disc;
- try{
+ let org,center;
+ t.after(async()=>{try{await db.query('rollback');}finally{await db.end();}});
   await db.query("update core.saas_plan_versions set name='starter' where id=$1",[plan]);
   const account=await must(owner,'account_get_v1');
   org=(await must(platform,'organization_create_v1',{verified_account_id:account.id,name:'Starter plan acceptance',initial_plan_id:plan},key())).primary_id;
@@ -22,6 +22,12 @@ test('Starter real Auth/API resource limits, downgrade scope and receipt gates',
   await invoke('center_manager_assign_v1',{person_id:ownerPerson});
   const pay=await invoke('saas_payment_submit_v1',{amount_minor:'1000',currency:'TRY',reference:'SYNTHETIC STARTER',occurred_at:new Date().toISOString()});
   await must(platform,'saas_payment_verify_v1',{org_id:org,center_id:center,payment_id:pay.primary_id,accepted:true},key());
+ return {platform,plan,owner,db,contract,bodyFor,invoke,reject,org,center,account,ownerPerson};
+}
+
+test('Starter resource limits, concurrent capacity and feature gates',{timeout:300000},async t=>{
+ const {platform,plan,owner,db,contract,bodyFor,invoke,reject,org,center,account,ownerPerson}=await starterGateFixture(t);
+ let room,disc;
   await t.test('effective catalog enforces accepted limits despite a permissive old plan snapshot',async()=>{
    const view=await invoke('subscription_get_v1',{});const limits=Object.fromEntries(view.limits.entries.map(x=>[x.key,x.value]));assert.deepEqual(limits,{centers:1,rooms:1,disciplines:1,instructors:1,active_students:100});
    await reject('center_create_v1',{name:'Second center',timezone:'UTC'},'PLAN_LIMIT_REACHED');
@@ -96,6 +102,21 @@ test('Starter real Auth/API resource limits, downgrade scope and receipt gates',
    assert.equal((await db.query('select name from core.products where id=$1',[legacyProduct])).rows[0].name,terms.name);
 
   });
+});
+
+test('Starter versioned downgrade, preserved history and canonical replacement',{timeout:300000},async t=>{
+ const {platform,plan,owner,db,contract,bodyFor,invoke,reject,org,center,account,ownerPerson}=await starterGateFixture(t);
+ const room=(await invoke('room_save_v1',{name:'Only room',capacity:50})).primary_id;
+ const disc=(await invoke('discipline_save_v1',{name:'Yoga',state:'active'})).primary_id;
+ await invoke('center_discipline_set_v1',{discipline_id:disc,state:'active'});
+ const current=(await invoke('centers_list_v1',{page:{limit:200}})).items.find(x=>x.id===center);
+ await invoke('availability_exception_save_v1',{resource:{kind:'room',id:room},interval:{starts_at:'2032-01-01T00:00:00Z',ends_at:'2032-01-02T00:00:00Z'},reason:'Synthetic closure',expected_version:current.version});
+ const instructor=key(),otherInstructor=key();
+ await db.query("insert into core.people(id,org_id,display_name,state) values($1,$3,'Instructor','active'),($2,$3,'Other instructor','active')",[instructor,otherInstructor,org]);
+ await db.query("insert into core.role_assignments(id,org_id,scope_center_id,person_id,role,state,account_link_id) values($1,$2,$3,$4,'instructor','active',null)",[key(),org,center,instructor]);
+ const students=Array.from({length:100},key);
+ await db.query("insert into core.people(id,org_id,display_name,state) select x,$1,'Synthetic student','active' from unnest($2::uuid[]) x",[org,students]);
+ await db.query("insert into core.center_relationships(id,org_id,center_id,person_id,kind,state,started_at) select x.id,$1,$2,x.person_id,'student','active',now() from unnest($3::uuid[],$4::uuid[]) x(person_id,id)",[org,center,students,students.map(key)]);
   await t.test('versioned downgrade keeps explicit resources and closes excluded ones without deleting history',async()=>{
    await db.query("update core.saas_plan_versions set name='pro' where id=$1",[plan]);
    const staff=await authUser('starter-legacy-staff'),staffAccount=await must(staff,'account_get_v1');
@@ -236,5 +257,4 @@ test('Starter real Auth/API resource limits, downgrade scope and receipt gates',
 
 
   });
- }finally{try{await db.query('rollback');}finally{await db.end();}}
 });
