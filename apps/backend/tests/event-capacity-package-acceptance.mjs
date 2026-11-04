@@ -33,16 +33,16 @@ for(const planName of ['pro','business']){
   const f=await fixture(planName),{db,org,api,student,fail,event,input,read,edit}=f;
   try{
    const room=(await api('room_save_v1',{name:'Synthetic room',capacity:2})).primary_id;
-   await fail('event_save_v1',input({venue:{kind:'internal',room_id:room},capacity:{kind:'unlimited'}}),'VALIDATION_FAILED');
-   await fail('event_save_v1',input({venue:{kind:'internal',room_id:room},capacity:{nominal:2,maximum:3}}),'CAPACITY_FULL');
+   await fail('event_save_v1',input({venue:{kind:'internal',room_id:room,timezone:'Europe/Istanbul'},capacity:{kind:'unlimited'}}),'VALIDATION_FAILED');
+   await fail('event_save_v1',input({venue:{kind:'internal',room_id:room,timezone:'Europe/Istanbul'},capacity:{nominal:2,maximum:3}}),'CAPACITY_FULL');
    const e=await event({capacity:{kind:'unlimited'}}),a=await student(),b=await student();
    const register=p=>api('event_register_v1',{event_id:e,person_id:p});
    const one=await register(a),two=await register(b);assert.equal(one.outcome,'registered');assert.equal(two.outcome,'registered');
    assert.deepEqual((await read(e)).capacity,{kind:'unlimited'});
    const registrations=(await read(e)).registrations.map(r=>r.id).sort();
-   await fail('event_save_v1',await edit(e,{venue:{kind:'internal',room_id:room},capacity:{nominal:1,maximum:1}}),'CAPACITY_FULL');
+   await fail('event_save_v1',await edit(e,{venue:{kind:'internal',room_id:room,timezone:'Europe/Istanbul'},capacity:{nominal:1,maximum:1}}),'CAPACITY_FULL');
    assert.deepEqual((await read(e)).capacity,{kind:'unlimited'});
-   await api('event_save_v1',await edit(e,{venue:{kind:'internal',room_id:room},capacity:{nominal:2,maximum:2}}));
+   await api('event_save_v1',await edit(e,{venue:{kind:'internal',room_id:room,timezone:'Europe/Istanbul'},capacity:{nominal:2,maximum:2}}));
    assert.deepEqual((await read(e)).registrations.map(r=>r.id).sort(),registrations);
    const rm=(await db.query('select version from core.rooms where org_id=$1 and id=$2',[org,room])).rows[0];
    await fail('room_save_v1',{room_id:room,expected_version:Number(rm.version),name:'Synthetic room',capacity:1},'CAPACITY_FULL');

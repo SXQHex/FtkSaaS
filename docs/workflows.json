@@ -276,8 +276,8 @@
         "management_state_get_v1"
       ],
       "review": {
-        "fingerprint": "c30afa8eb6f815a6be52e9d6672ebfec4a6e5eeb956a9aa019e74e04ed69185f",
-        "reason": "Unapplied migration/source renamed event_capacity_practice to accurately name P12/P13 and avoid a generic-key false positive on public migration checksums. SQL and test bytes unchanged; all original gates retained."
+        "fingerprint": "c330c1494802957d5c247e35dd1ae8a3d26f79a3ddd2bc563a7e481b99902a4f",
+        "reason": "PR172 CI failure traced to four internal VenueSpec fixtures missing required timezone. Added Europe/Istanbul only; all assertions, expected errors, runtime, scopes and attendance/credit behavior preserved. Reviewed source and unchanged guide; experiment import hash follows exact test bytes."
       }
     },
     {
@@ -452,8 +452,8 @@
         "role_revoke_preview_v1"
       ],
       "review": {
-        "fingerprint": "ee61e75d3d9bf37171646bdf75b34bc41b3a44db981665c0d3e407ca0bfa7766",
-        "reason": "Unapplied migration/source renamed event_capacity_practice to accurately name P12/P13 and avoid a generic-key false positive on public migration checksums. SQL and test bytes unchanged; all original gates retained."
+        "fingerprint": "7f01033c4f9fb92861a94024875b4f47f201a6e1e54e5496a6e5a82dc15b9971",
+        "reason": "PR172 CI failure traced to four internal VenueSpec fixtures missing required timezone. Added Europe/Istanbul only; all assertions, expected errors, runtime, scopes and attendance/credit behavior preserved. Reviewed source and unchanged guide; experiment import hash follows exact test bytes."
       }
     },
     {
@@ -729,8 +729,8 @@
         "negative_limits_get_v1"
       ],
       "review": {
-        "fingerprint": "29fd669198ad13509576d78da9be3dbbdd5d5e8e4993b06b50acd4fd25a315e8",
-        "reason": "Unapplied migration/source renamed event_capacity_practice to accurately name P12/P13 and avoid a generic-key false positive on public migration checksums. SQL and test bytes unchanged; all original gates retained."
+        "fingerprint": "34e26a7cbdea8e1e667427aa3fdbb32a5ca0ec586d8ada89e93e3d66571f87c6",
+        "reason": "PR172 CI failure traced to four internal VenueSpec fixtures missing required timezone. Added Europe/Istanbul only; all assertions, expected errors, runtime, scopes and attendance/credit behavior preserved. Reviewed source and unchanged guide; experiment import hash follows exact test bytes."
       }
     },
     {
@@ -807,8 +807,8 @@
         "reservation_capacity_override_v1"
       ],
       "review": {
-        "fingerprint": "576ad712a3269326da552a454497653ccc3d4ca60ea1240b143bb31469cbad30",
-        "reason": "Unapplied migration/source renamed event_capacity_practice to accurately name P12/P13 and avoid a generic-key false positive on public migration checksums. SQL and test bytes unchanged; all original gates retained."
+        "fingerprint": "98b738714622abf6205c3dc5fab7e818dd92d9320224dcc19a38b1f5dfad9191",
+        "reason": "PR172 CI failure traced to four internal VenueSpec fixtures missing required timezone. Added Europe/Istanbul only; all assertions, expected errors, runtime, scopes and attendance/credit behavior preserved. Reviewed source and unchanged guide; experiment import hash follows exact test bytes."
       }
     },
     {
@@ -870,8 +870,8 @@
         "attendance_start_v1"
       ],
       "review": {
-        "fingerprint": "00edcdaf277263a5904729a48834b0e90b9ec1b527b6182ead167c67ef3d9622",
-        "reason": "Unapplied migration/source renamed event_capacity_practice to accurately name P12/P13 and avoid a generic-key false positive on public migration checksums. SQL and test bytes unchanged; all original gates retained."
+        "fingerprint": "3b0fc2f63becc7b083eda1d0eb087e65a43c592ff69fb45ca88c2e4bf448c62f",
+        "reason": "PR172 CI failure traced to four internal VenueSpec fixtures missing required timezone. Added Europe/Istanbul only; all assertions, expected errors, runtime, scopes and attendance/credit behavior preserved. Reviewed source and unchanged guide; experiment import hash follows exact test bytes."
       }
     },
     {
@@ -1285,8 +1285,8 @@
         "event_actual_start_correct_v1"
       ],
       "review": {
-        "fingerprint": "bc464dec5371f5dfe74b4cb4feff198888452102dc25b3fb96d9d485f6c381ae",
-        "reason": "Unapplied migration/source renamed event_capacity_practice to accurately name P12/P13 and avoid a generic-key false positive on public migration checksums. SQL and test bytes unchanged; all original gates retained."
+        "fingerprint": "47b1c7796441fa84c0a5ed25e03a2d957f7d73d2f86f071edfbef464f31308bb",
+        "reason": "PR172 CI failure traced to four internal VenueSpec fixtures missing required timezone. Added Europe/Istanbul only; all assertions, expected errors, runtime, scopes and attendance/credit behavior preserved. Reviewed source and unchanged guide; experiment import hash follows exact test bytes."
       }
     },
     {
