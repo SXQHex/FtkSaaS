@@ -28,7 +28,8 @@ Plan kapsamı bu belgenin; ayrıntılı davranış, geçiş ve güvenlik kararla
 | Düzenli sınıf/program, temel özel ders talebi, öğrenci self rezervasyonu, temel public ders takvimi ve başvuru | Var, aynı tek kaynak/disiplinle | Var | Var |
 | Tek disiplinli kredili, süreli/sınırsız paket; uygun rezervasyon, yoklama, borç/tahsilat | Var | Var | Var |
 | Bağımsız workshop/parti/atölye/etkinlik yaşam döngüsü (F29) | **Yok** | Var | Var |
-| Gelişmiş CRM, reklam/lead kaynakları, kampanya, segment, otomasyon (F21–F24) | **Yok**; yalnız gelen temel ders başvurusunun incelenmesi | Var | Var; merkez bazlı/organizasyon birleşik |
+| Temel aday takibi (F21'in dar kapsamı) | Elle aday kaydı, not ve tekrar arama/takip tarihi | Var | Var |
+| Gelişmiş CRM, reklam/lead kaynakları, kampanya, segment, otomasyon (F21–F24) | **Yok**; temel aday takibi ve dar ders başvurusu değerlendirmesi ayrı kapsamdır | Var | Var; merkez bazlı/organizasyon birleşik |
 | Bağımsız operasyon personeli yönetimi ve eğitmen anlaşma/hakedişi | Yok | Var | Var |
 | Merkezler arası paket kullanımı ve A→B hesaplaşma | Yok | Yok | Var |
 
@@ -39,6 +40,8 @@ Plan kapsamı bu belgenin; ayrıntılı davranış, geçiş ve güvenlik kararla
 **Starter tek eğitmen:** Bir etkin öğretmen/görevli eğitim ilişkisi; dersler bu eğitmenle yürür. İkinci aktif eğitmen, paralel eğitmen programı, bağımsız personel yetkisi Pro gerektirir. Önceden önerilen dört yedek seans/30 gün ve ikinci geçici eğitmen istisnası **kabul edilmiş bir kural değildir**. Starter F14 yoklama/hak tüketimi ücret anlaşması olmadan kapanır, F20 hakediş/ücretli görevlendirme üretmez. Pro/Business ücretli görevlendirme ve hakediş için mevcut geçerli anlaşma şartları aynen korunur.
 
 **Starter tek disiplinli sabit program:** Düzenli tekrarlayan grup sınıfları, temel bireysel ders talebi ve bunların değişiklik/iptal/telafi yaşam döngüsü; öncelikli veya esnek hakları, ders sayılı ve süreli/sınırsız paketleri, standart öğrenci self rezervasyonu, yoklama, borç ve manuel tahsilat korunur. Mevcut dersin meşru gerekçeli telafisi ayrı workshop/etkinlik hakkı vermez. Etkinlik/parti/workshop bileti ve `event_*` yaşam döngüsü, CRM satış/deneme/kampanya akışları Starter planında kapalıdır. Tekrarlanan sınıf adını “Workshop” yazmak tek başına kesin teknik sınıflandırma değildir; gerçek işlem türü, kaynak/plan kapısı ve kötüye kullanım politikası birlikte uygulanmalıdır.
+
+**Starter temel aday takibi:** 4 Kasım kullanıcı kararıyla telefon veya WhatsApp üzerinden gelen adayın elle kaydı, notu ve tekrar arama/takip tarihi tutulabilir. Genel reklam alımı, kampanya, deneme teklifi, segment, otomasyon ve Pro/Business dönüşüm akışları bu dar kapsamla açılmaz. Hesap/öğrenci/satış/rezervasyon/pazarlama izni otomatik oluşturulmaz. Bu ürün hedefidir; mevcut API desteği ve kabul backend/frontend sahiplerinde ayrı doğrulanır. Mimari ve ortak alım davranışı [P08](../decisions/P08-accepted-scope.md) sahibindedir.
 
 **Starter public/self:** Temel halka açık ders takvimi ve yalnız programa ilişkin başvuru; doğrulanmış öğrencinin geçerli hak/katılım koşullarıyla kendi rezervasyon/iptal işlemi. Hesapsız başvuru **kesin rezervasyon, satış, kredi, aktif hesap veya pazarlama rızası yaratmaz**; bot/rate/tenant/yetki doğrulaması korunur. Başvuruyu görme ve gerektiğinde öğrenci ilişkisine bağlama için dar operasyonel değerlendirme sunulur; genel CRM `lead_*`, reklam entegrasyonu, kampanya, segment, otomasyon yetkileri Starter'a bu yüzden açılmaz. Provider ve tarayıcı kabulü backlog’da ayrı izlenir; Native Auth SMTP ile uygulama dış bildirim kanalları farklıdır. Online ödeme/gateway bu plan kararıyla otomatik açılmaz.
 
@@ -90,9 +93,9 @@ Bu modüller ayrı servis veya ayrı uygulama zorunluluğu değildir. Yeni backe
 
 ## Özellik ve plan matrisi
 
-Tablo kabul edilmiş plan erişimini gösterir; aynı plan bayrakları makine sözleşmesiyle CI’da karşılaştırılır. Sayısal/ticari sınırlar yukarıdaki bağlayıcı tablodadır; makine sözleşmesindeki `accepted_plan_limits` bu hedefin denetlenen aktarımıdır, runtime limiti veya teslim kabulü değildir. API kaynak kapsamı üretilmiş [özellik haritasında](../feature-delivery.md), gerçek kabul güncel kabul kaydındadır.
+Tablo makine sözleşmesine aktarılmış plan erişimini gösterir; aynı plan bayrakları CI’da karşılaştırılır. **F21 aktarım farkı:** Yukarıdaki 4 Kasım Starter temel aday takibi kararı kabul edilmiştir; F21 satırının Starter hücresi henüz eski makine eşlemesini taşır. Bu hücre yeni dar kapsamı iptal etmez veya runtime desteği kanıtlamaz. Hedef metadata, gerekli runtime ve üretilmiş görünüm aktarımı [P05](../../apps/backend/docs/remaining-work.md#p05) içinde birlikte doğrulanacaktır. Sayısal/ticari sınırlar yukarıdaki bağlayıcı tablodadır; makine sözleşmesindeki `accepted_plan_limits` bu hedefin denetlenen aktarımıdır, runtime limiti veya teslim kabulü değildir. API kaynak kapsamı üretilmiş [özellik haritasında](../feature-delivery.md), gerçek kabul güncel kabul kaydındadır.
 
-“Temel” ve “gelişmiş” ifadelerinin sınırları teknik sözleşmedeki davranışlarla belirlenir. Çizgi o planda kapsam dışında demektir. Her satırın uygulama/kabul sınırı feature_delivery haritasında ayrıca izlenir.
+“Temel” ve “gelişmiş” ifadelerinin sınırları teknik sözleşmedeki davranışlarla belirlenir. Çizgi, yukarıda açıkça belirtilen F21 aktarım farkı dışında o planda kapsam dışında demektir. Her satırın uygulama/kabul sınırı feature_delivery haritasında ayrıca izlenir.
 
 | ID | Özellik | Sahip | Starter | Pro | Business | Kapsam durumu |
 |---|---|---|---|---|---|---|

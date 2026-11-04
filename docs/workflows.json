@@ -276,8 +276,8 @@
         "management_state_get_v1"
       ],
       "review": {
-        "fingerprint": "c330c1494802957d5c247e35dd1ae8a3d26f79a3ddd2bc563a7e481b99902a4f",
-        "reason": "PR172 CI failure traced to four internal VenueSpec fixtures missing required timezone. Added Europe/Istanbul only; all assertions, expected errors, runtime, scopes and attendance/credit behavior preserved. Reviewed source and unchanged guide; experiment import hash follows exact test bytes."
+        "fingerprint": "44b1295ddb80830103a6cf42e4cd60204be17f47732d9ae85c94278ad81f30c7",
+        "reason": "Merged main PR173 native test-root splitting and PR171 CRM documentation with PR172 P12/P13 runtime and corrected internal venue timezones. Both source/test mappings retained; guide behavior unchanged."
       }
     },
     {
@@ -452,8 +452,8 @@
         "role_revoke_preview_v1"
       ],
       "review": {
-        "fingerprint": "7f01033c4f9fb92861a94024875b4f47f201a6e1e54e5496a6e5a82dc15b9971",
-        "reason": "PR172 CI failure traced to four internal VenueSpec fixtures missing required timezone. Added Europe/Istanbul only; all assertions, expected errors, runtime, scopes and attendance/credit behavior preserved. Reviewed source and unchanged guide; experiment import hash follows exact test bytes."
+        "fingerprint": "280054a691ce13a92236d3b83b6349fce27bc1c0d6dcbeeecb1b4838a841a054",
+        "reason": "Merged main PR173 native test-root splitting and PR171 CRM documentation with PR172 P12/P13 runtime and corrected internal venue timezones. Both source/test mappings retained; guide behavior unchanged."
       }
     },
     {
@@ -548,8 +548,8 @@
         "class_assignment_set_v1"
       ],
       "review": {
-        "fingerprint": "3ed4faacaf19a139df56f09dda9a9936c66c3dbf86c13b6cbe7613e0badfa43c",
-        "reason": "PR168 main synchronization reviewed: native class-duty reader and existing-session Starter guard retained from accepted PR167; original program and instructor bodies unchanged, both independent acceptance imports preserved; no workflow rule changed."
+        "fingerprint": "8f631cf0eec0a71acd2b5e77c01bfdc381e5b2b7dc3366ae75317b7f4694834f",
+        "reason": "Native kabul kökleri bağımsız tenant ve anlamlı iş akışlarına ayrıldı; özgün assertion ve80 alt test gövdesi, yarış/rollback ve API sırası korundu. Shared fixture yalnız gereken native önkoşulları kurar; ürün/scope/permission anlatımı değişmez. Deney import köklerinde tam satır sahipliği ve singleton platform yazıcılarının aynı birimde sırası incelendi."
       }
     },
     {
@@ -635,8 +635,8 @@
         "person_discipline_set_v1"
       ],
       "review": {
-        "fingerprint": "3fd949dfca6d2b715d468f99f280143acc41b903ce4769b585739bb92e8da6b9",
-        "reason": "Ticari limit SSoT canonical org öğrenci sayımı, son slot yarışı, ikinci merkez, reactivation ve merge testleri; CRM raw-limit fixture yerine gerçek kapasite dolduruldu."
+        "fingerprint": "f3923f0126e957cf1ed18492027a8e4ffaf0eabf441d4e8bb482ab2010468313",
+        "reason": "Native kabul kökleri bağımsız tenant ve anlamlı iş akışlarına ayrıldı; özgün assertion ve80 alt test gövdesi, yarış/rollback ve API sırası korundu. Shared fixture yalnız gereken native önkoşulları kurar; ürün/scope/permission anlatımı değişmez. Deney import köklerinde tam satır sahipliği ve singleton platform yazıcılarının aynı birimde sırası incelendi."
       }
     },
     {
@@ -729,8 +729,8 @@
         "negative_limits_get_v1"
       ],
       "review": {
-        "fingerprint": "34e26a7cbdea8e1e667427aa3fdbb32a5ca0ec586d8ada89e93e3d66571f87c6",
-        "reason": "PR172 CI failure traced to four internal VenueSpec fixtures missing required timezone. Added Europe/Istanbul only; all assertions, expected errors, runtime, scopes and attendance/credit behavior preserved. Reviewed source and unchanged guide; experiment import hash follows exact test bytes."
+        "fingerprint": "a201ed67ce81bcce1f7e26630e2eb35d1beb282e82f624ac4cdd67773301c856",
+        "reason": "Merged main PR173 native test-root splitting and PR171 CRM documentation with PR172 P12/P13 runtime and corrected internal venue timezones. Both source/test mappings retained; guide behavior unchanged."
       }
     },
     {
@@ -807,8 +807,8 @@
         "reservation_capacity_override_v1"
       ],
       "review": {
-        "fingerprint": "98b738714622abf6205c3dc5fab7e818dd92d9320224dcc19a38b1f5dfad9191",
-        "reason": "PR172 CI failure traced to four internal VenueSpec fixtures missing required timezone. Added Europe/Istanbul only; all assertions, expected errors, runtime, scopes and attendance/credit behavior preserved. Reviewed source and unchanged guide; experiment import hash follows exact test bytes."
+        "fingerprint": "f4b239bd19deeffb828497fca7c664aa55bf559a37ed2e54139201397766e799",
+        "reason": "Merged main PR173 native test-root splitting and PR171 CRM documentation with PR172 P12/P13 runtime and corrected internal venue timezones. Both source/test mappings retained; guide behavior unchanged."
       }
     },
     {
@@ -870,8 +870,8 @@
         "attendance_start_v1"
       ],
       "review": {
-        "fingerprint": "3b0fc2f63becc7b083eda1d0eb087e65a43c592ff69fb45ca88c2e4bf448c62f",
-        "reason": "PR172 CI failure traced to four internal VenueSpec fixtures missing required timezone. Added Europe/Istanbul only; all assertions, expected errors, runtime, scopes and attendance/credit behavior preserved. Reviewed source and unchanged guide; experiment import hash follows exact test bytes."
+        "fingerprint": "16720015ef0c942aaa6d19bf86fc0a5bd36d63e03523985e0660236d8b9872a6",
+        "reason": "Merged main PR173 native test-root splitting and PR171 CRM documentation with PR172 P12/P13 runtime and corrected internal venue timezones. Both source/test mappings retained; guide behavior unchanged."
       }
     },
     {
@@ -930,8 +930,8 @@
         "debt_adjust_v1"
       ],
       "review": {
-        "fingerprint": "e6e67bdb8d27d1e79addb4be074a95b48f59279de53d6db11d7ee47e29e1b426",
-        "reason": "P12/P13 reviewed: explicit event unlimited/physical room ceiling and existing org locks; immutable package usage with live lesson/event scope and freeze-aware positive rights; factual attendance separate, no credit allocation; existing paid/cancellation workflows and original test bodies preserved."
+        "fingerprint": "6c5c7843a70360fcdc2a5a6a9627619a8277210095fed57b4ab4c66c530b2fe0",
+        "reason": "Merged main PR173 native test-root splitting and PR171 CRM documentation with PR172 P12/P13 runtime and corrected internal venue timezones. Both source/test mappings retained; guide behavior unchanged."
       }
     },
     {
@@ -1019,8 +1019,8 @@
         "file_upload_complete_v1"
       ],
       "review": {
-        "fingerprint": "c0e4f49bf685983884ed2e09ef13bb1abd8bf2fea599ab8cde860c690052c4ac",
-        "reason": "Native CSV preview/apply worker son slot yarışında canlı ticari kotayı tekrar sınar; mevcut fenced row transaction ve invalid/failed sonuçları korunur."
+        "fingerprint": "7fe9545d303a302cd2bee54ed84c143b0f4f4c34a2bf2aaa19e9c98f7384de15",
+        "reason": "Native kabul kökleri bağımsız tenant ve anlamlı iş akışlarına ayrıldı; özgün assertion ve80 alt test gövdesi, yarış/rollback ve API sırası korundu. Shared fixture yalnız gereken native önkoşulları kurar; ürün/scope/permission anlatımı değişmez. Deney import köklerinde tam satır sahipliği ve singleton platform yazıcılarının aynı birimde sırası incelendi."
       }
     },
     {
@@ -1054,8 +1054,8 @@
         "document_publication_preview_v1"
       ],
       "review": {
-        "fingerprint": "c34985e2e08e5092430c951842323d547691a342e7cc52a7241ed0e9037efa57",
-        "reason": "Ortak üretilmiş wrapper farkı yalnız S16 owner abonelik dönem komutunu ekler; bu akışın mevcut operasyon/görev/izin/plan ve davranış kaynakları değişmedi, ilgili rehber incelendi."
+        "fingerprint": "6d3ea0bafdf13a633e095f55814992c580f672a5929fb6a140ab7922f38aba3d",
+        "reason": "Native kabul kökleri bağımsız tenant ve anlamlı iş akışlarına ayrıldı; özgün assertion ve80 alt test gövdesi, yarış/rollback ve API sırası korundu. Shared fixture yalnız gereken native önkoşulları kurar; ürün/scope/permission anlatımı değişmez. Deney import köklerinde tam satır sahipliği ve singleton platform yazıcılarının aynı birimde sırası incelendi."
       }
     },
     {
@@ -1106,8 +1106,8 @@
         "settings_preparation_resolve_v1"
       ],
       "review": {
-        "fingerprint": "f640fad506fe9f67cf80df0ce54af09487745811b65be2944db55fc290980965",
-        "reason": "ST03 dört izole native tenant kökü, aynı14 senaryo ve154 birebir assertion ile korunur. Başarılı owner settings yanıtı ve gerçek yarış kazananı sürümü izlenir; explicit okumalar,600000ms sınırı ve native consumer akışı değişmez."
+        "fingerprint": "cf486988df91127c49a277db839862528ff3b3bc29274ee52e08c45d3e6697e0",
+        "reason": "Native kabul kökleri bağımsız tenant ve anlamlı iş akışlarına ayrıldı; özgün assertion ve80 alt test gövdesi, yarış/rollback ve API sırası korundu. Shared fixture yalnız gereken native önkoşulları kurar; ürün/scope/permission anlatımı değişmez. Deney import köklerinde tam satır sahipliği ve singleton platform yazıcılarının aynı birimde sırası incelendi."
       }
     },
     {
@@ -1175,8 +1175,8 @@
         "subscription_period_change_request_v1"
       ],
       "review": {
-        "fingerprint": "9dd7c93ad5b33ba7f592580eca4bb09209b932fdea45cff5ddd960b2edc150ac",
-        "reason": "Etkin ticari limit tek helper; fiyat/geçmiş raw catalog korunur, farklı raw limitli dönem seçeneği ve request aynı etkin kapsamla uyumludur."
+        "fingerprint": "9b49c279802d890d7f103fa998020782f29c29250c765133899b6c66fa038b70",
+        "reason": "Native kabul kökleri bağımsız tenant ve anlamlı iş akışlarına ayrıldı; özgün assertion ve80 alt test gövdesi, yarış/rollback ve API sırası korundu. Shared fixture yalnız gereken native önkoşulları kurar; ürün/scope/permission anlatımı değişmez. Deney import köklerinde tam satır sahipliği ve singleton platform yazıcılarının aynı birimde sırası incelendi."
       }
     },
     {
@@ -1286,7 +1286,7 @@
       ],
       "review": {
         "fingerprint": "47b1c7796441fa84c0a5ed25e03a2d957f7d73d2f86f071edfbef464f31308bb",
-        "reason": "PR172 CI failure traced to four internal VenueSpec fixtures missing required timezone. Added Europe/Istanbul only; all assertions, expected errors, runtime, scopes and attendance/credit behavior preserved. Reviewed source and unchanged guide; experiment import hash follows exact test bytes."
+        "reason": "Merged main PR173 native test-root splitting and PR171 CRM documentation with PR172 P12/P13 runtime and corrected internal venue timezones. Both source/test mappings retained; guide behavior unchanged."
       }
     },
     {
@@ -1426,8 +1426,8 @@
         "settlement_authority_set_v1"
       ],
       "review": {
-        "fingerprint": "b82f35a8cf35a1595787c6e5b8e4a16efc89a44a363c8220a99c179ba946aa01",
-        "reason": "Ortak üretilmiş wrapper farkı yalnız S16 owner abonelik dönem komutunu ekler; bu akışın mevcut operasyon/görev/izin/plan ve davranış kaynakları değişmedi, ilgili rehber incelendi."
+        "fingerprint": "ca45fc691e777dd0807426392d30ac78978c25127b3550cdc678db8b290fad46",
+        "reason": "Native kabul kökleri bağımsız tenant ve anlamlı iş akışlarına ayrıldı; özgün assertion ve80 alt test gövdesi, yarış/rollback ve API sırası korundu. Shared fixture yalnız gereken native önkoşulları kurar; ürün/scope/permission anlatımı değişmez. Deney import köklerinde tam satır sahipliği ve singleton platform yazıcılarının aynı birimde sırası incelendi."
       }
     },
     {
@@ -1522,8 +1522,8 @@
         "subscription_boundary_apply_v1"
       ],
       "review": {
-        "fingerprint": "066692e59dc6ce5fda469ded738c1259a026d65db288af400d63c392d43bf8ee",
-        "reason": "P06 scoped worker testinde preview sonrası interaktif kapasite tüketimi denetleniyor; worker claim/lease/retry yetkileri ve runtime değişmedi."
+        "fingerprint": "8d1de752c7505c88fb98097b1aabcb9aaa204573c036ffeac84251169e8e1faa",
+        "reason": "Native kabul kökleri bağımsız tenant ve anlamlı iş akışlarına ayrıldı; özgün assertion ve80 alt test gövdesi, yarış/rollback ve API sırası korundu. Shared fixture yalnız gereken native önkoşulları kurar; ürün/scope/permission anlatımı değişmez. Deney import köklerinde tam satır sahipliği ve singleton platform yazıcılarının aynı birimde sırası incelendi."
       }
     }
   ]

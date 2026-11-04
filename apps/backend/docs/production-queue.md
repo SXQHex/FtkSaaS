@@ -30,6 +30,18 @@ P01–P04 backend teslimleri doğrulandı; görev/kabul ve kaynak/ortam kanıtla
 
 Önce [P12](remaining-work.md#p12) etkinlik kapasitesi → [P13](remaining-work.md#p13) pakete bağlı kredi tüketmeyen katılım aynı branch/PR'de tamamlanır. Bağımlılıklar P02/P03 teslimleriyle hazırdır. Mevcut etkinlik modelinde ortak kapasite ve canlı uygunluk kontrolü kullanılır; finans ve iptal korumaları korunur. Kuyruk bu paket için kaynak incelemesi → sözleşme/native regresyon → aday kabulü → yetkili merge/main/development teslimidir. Kaynak ve test sonucu yalnız [devir](00-FtkSaaS-yeni-sohbet-devir.md#p12p13-etkinlik-kaynak-paketi) sahibindedir.
 
+## CRM paketinin iç sırası
+
+[CRM kararının](../../../docs/decisions/P08-accepted-scope.md) aktarımı mevcut P05–P11 paketine yapılır; ayrı karar sprinti açılmaz. Bu belge değişikliği açık PR172'nin P12/P13 çalışmasını veya diğer aktif paketi öne/geriye taşımaz. Görev ayrıntısı ve kabulün tek sahibi [P05](remaining-work.md#p05) ve devamındaki işlerdir.
+
+1. Kısa mevcut karar/runtime uyumu; yalnız gerçek ürün boşluklarını ayırma.
+2. P05 Starter temel dilimi ve frontend'e okuma/yazma sözleşme devri.
+3. P05/P06 ortak kutu ve inceleme/eşleme, ardından P07 web formu.
+4. Gerçek kullanım ve erişime göre P08/P09'dan ilk sağlayıcı, sonra diğeri. Görev numarası ilk sağlayıcının seçildiği anlamına gelmez.
+5. P10 kontrollü eski kayıt aktarımı ve P11 ileri CRM, kendi bağımlılık ve yetkileriyle; Starter kapanışı bunları beklemez.
+
+Reklam performans/harcama ve dönüşüm geri bildirimi sonraki ayrı dilimlerdir. Kaynak desteği ile gerçek sağlayıcı/ekran kabulü aynı kapanış değildir.
+
 ## Ortak işletim hattı
 
 [A03](remaining-work.md#a03) sonrası [O01](remaining-work.md#o01)–[O03](remaining-work.md#o03) başlayabilir. Ardından [O04](remaining-work.md#o04)/[O05](remaining-work.md#o05) → [O06](remaining-work.md#o06) → [O07](remaining-work.md#o07) → [O08](remaining-work.md#o08) → [O09](remaining-work.md#o09). [O10](remaining-work.md#o10) gerekli alarm/restore kaynaklarıyla yürür. E-posta gerçek yük kabulü P14–P16’yı bekler. Ortak işletim bütün ürün işlerinin sonuna ertelenmez.
