@@ -26,15 +26,17 @@ Bu dosya yalnız **sıra, bağımlı teslim paketleri ve kontrol noktalarının*
 
 **S14–S16 kontrol noktası:** S14–S16 backend kaynak paketi PR156 ile aday/main/development kabulünü geçti; [kaynak/ortam kanıtı](00-FtkSaaS-yeni-sohbet-devir.md#s14s16-kaynak-paketi) ve açık hosted/tüketici sınırları [backlog](remaining-work.md#s14) sahibindedir.
 
-### Aktif kaynak paketi: P07 web formu adaptörü
+### Aktif kaynak paketi: P08–P11 CRM sağlayıcı/aktarım/yaşam döngüsü
 
-P01–P04, P12/P13, PR177 Starter CRM ve PR182 P05/P06 + XREQ-016 backend teslimleri tamamlandı; kaynak/ortam kanıtı [devir](00-FtkSaaS-yeni-sohbet-devir.md) sahibindedir. Sıradaki dilim [P07](remaining-work.md#p07): mevcut contact/kayit sunucu akışları için ortak alım adaptörü ve site sahibine sözleşme devri. Güncel handler/config ve gerçek web formu kabulü doğrulanmadan P07 bütünü kapanmaz. Ardından CRM iç sırasındaki P08/P09 sağlayıcıları kendi erişim/kabul koşullarıyla yürür.
+P01–P04, P12/P13, PR177 Starter CRM, PR182 P05/P06 + XREQ-016 ve PR188 P07 backend adaptörü teslimleri tamamlandı; [kaynak/ortam kanıtı](00-FtkSaaS-yeni-sohbet-devir.md) sahibindedir. P07'nin gerçek site bağlantısı ve form→inbox kabulü [XREQ-018](../../../docs/requests.md#xreq-018) altında açık; frontend deploy kısıtı bu kabulü bekletir, P05/P06'ya bağlı P08–P11 backend kaynağını durdurmaz.
+
+Kullanıcının güncel isteğiyle [P08](remaining-work.md#p08)–[P11](remaining-work.md#p11) tek Draft PR'de başlatılır. Alt dilimlerin kabul/görev sahibi backlog'dur. İlk adım mevcut ortak alım ve CRM kaynaklarına karşı sağlayıcı/aktarım boşluk incelemesidir. Gerçek Meta/Google erişim ve resmi teslim yöntemi doğrulaması hangi sağlayıcının önce uygulanabileceğini belirler; eksik erişim bağımsız P10/P11 kaynak incelemesini durdurmaz. Ortak sözleşme/migration değişiklikleri seri tutulur. İki–üç kaynak diliminde küçük hedefli test ve bağımsız inceleme kontrol noktası, merge adayında yürürlükteki tam kabul korunur. Gerçek provider veya hosted veri aktarımı doğrulanmamışsa kaynak hazır olsa bile ilgili görev kapalı gösterilmez.
 
 Dış e-posta ertelemesi de kaldırıldı; mevcut kurulum yeniden sıfırdan başlatılmaz. P14/P15 mevcut kaynak/sağlayıcı incelemesiyle kendi sırasında yürütülür; P16, P11/P15 bağımlılıklarını korur. Posta kurulumunun varlığı bütün bildirim olaylarının teslim kabulü değildir.
 
 ## CRM paketinin iç sırası
 
-[CRM kararının](../../../docs/decisions/P08-accepted-scope.md) aktarımı mevcut P05–P11 paketine yapılır; ayrı karar sprinti açılmaz. P05/P06 backend kapanışından sonra aktif kaynak işi P07'dir. Görev ayrıntısı ve kabulün tek sahibi [P05](remaining-work.md#p05) ve devamındaki işlerdir.
+[CRM kararının](../../../docs/decisions/P08-accepted-scope.md) aktarımı mevcut P05–P11 paketine yapılır; ayrı karar sprinti açılmaz. P07 backend kaynak tesliminden sonra aktif kaynak paketi P08–P11'dir; P07 canlı site kabulü ayrı açık kalır. Görev ayrıntısı ve kabulün tek sahibi [P05](remaining-work.md#p05) ve devamındaki işlerdir.
 
 1. Kısa mevcut karar/runtime uyumu; yalnız gerçek ürün boşluklarını ayırma.
 2. PR177 ile teslim edilen Starter temel dilimini yeniden geliştirme; frontend ekran kabulü kendi alanında kalır.

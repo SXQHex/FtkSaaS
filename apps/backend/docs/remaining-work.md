@@ -415,6 +415,12 @@ Değişen dilimin sözleşme, üretilmiş tip/envanter, WF/F01–F33 izi ve alan
 - **Doğrulama senaryosu:** Resmi erişim/yöntem uygulama anında doğrulanır; imza/izin, replay/retry ve alan eşleme; gerçek provider kanıtı.
 - **Kaynak alanı:** sağlayıcı adapter/credential eşleme; ilgili test
 
+**Uygulama dilimleri (P08–P11 ortak PR):**
+
+- [ ] P08.1 — Resmi güncel Meta yöntemi, uygulama/hesap/sayfa/form yetkileri ve örnek alan sözleşmesini doğrula. Token paylaşmadan erişim eksiklerini ayır; gerçek erişim yoksa canlı kabul kapalı kalsın. Kaynak alanı: sağlayıcı transport/config; doğrulama: resmi kaynak ve yetki/form readback'i.
+- [ ] P08.2 — Doğrulanmış sağlayıcı bildirimi→güvenilir form/tenant eşlemesi→mevcut ortak başvuru zincirini uygula. Sağlayıcı başvuru kimliğinde tekillik, yeniden teslim, geç hata rollback'i, kaynak/onay kanıtı ve telefon önerisi korunsun; ikinci başvuru deposu kurulmasın. Küçük imza/eşleme testleri ve izole native alım suite'i kullan; invalid sender, yanlış form/tenant ve yarış negatif olsun.
+- [ ] P08.3 — Yetkili gerçek Meta formundan tek kayıt ve retry kabulünü doğrula; yetkili inbox yeniden okumasıyla bağla. Sentetik payload başarıları gerçek sağlayıcı erişimi/teslimi yerine geçmez. Hesap erişimi veya entegrasyon kurulumu gerektiğinde somut eksik üzerinden ilerle.
+
 <a id="p09"></a>
 ### P09 — Google yerel reklam formu alımı
 
@@ -424,6 +430,12 @@ Değişen dilimin sözleşme, üretilmiş tip/envanter, WF/F01–F33 izi ve alan
 - **Sınır/olumsuz durum:** Web forma yönlendirme ile native form ayrıdır; Meta kabulü Google kanıtı değildir.
 - **Doğrulama senaryosu:** Güncel resmi erişim/yöntem incelemesi, gönderici doğrulama, dedupe/geri doldurma ve gerçek sağlayıcı kabulü.
 - **Kaynak alanı:** Google adapter/config; ilgili test
+
+**Uygulama dilimleri:**
+
+- [ ] P09.1 — Güncel Google yerel lead formunun resmi teslim/yetkilendirme ve alan/kimlik sözleşmesini doğrula. Reklamdan web forma yönlendirmeyi bu yolla karıştırma; Meta token/yetki/alanlarını Google'a taşıma. Kaynak alanı: ayrı Google transport/config; doğrulama: resmi kaynak ve gerçek form erişimi.
+- [ ] P09.2 — Doğrulanmış gönderici ve güvenilir form eşlemesiyle ortak alıma bağla; aynı dış kimlik retry tek kayıt, farklı gerçek başvurular ayrı geçmiş olsun. Sağlayıcı yeniden teslim/geri doldurma yolu varsa aynı tekillik kuralını uygula. Küçük doğrulama/alan testi ve izole native ortak alım kabulü; geçersiz kimlik, yanlış eşleme ve kısmi hata negatif olsun.
+- [ ] P09.3 — Yetkili gerçek Google formu→inbox ve tekrar teslimini doğrula; Meta başarısını Google kabulü sayma. Gerçek erişim eksikse mevcut bağımsız kaynak/test dilimlerini durdurma, bu kabulü açık bırak.
 
 <a id="p10"></a>
 ### P10 — Eski başvuru kontrollü aktarımı
@@ -435,6 +447,12 @@ Değişen dilimin sözleşme, üretilmiş tip/envanter, WF/F01–F33 izi ve alan
 - **Doğrulama senaryosu:** Örnek veriyle tekrar/rollback/mutabakat; gerçek aktarım için ayrı somut önizleme ve kullanıcı yetkisi.
 - **Kaynak alanı:** import preview/CRM mapping; aktarım runbook/test
 
+**Uygulama dilimleri:**
+
+- [ ] P10.1 — Mevcut import preview/apply altyapısını ve eski başvuru alanlarını incele; yalnız eksik CRM eşlemesini ekle. Önizleme kaynak kimliği, alan hatası, olası mükerrerlik, kaynak/onay kanıtı ve seçilebilir satırları göstermeli. Eksik onay sürümü/zamanı uydurulmasın; gerçek kişisel veri test fixture'ı yapılmasın. Kaynak alanı: mevcut import/CRM kaynakları ve ayrı küçük parser/preview testi.
+- [ ] P10.2 — Onaylanmış sabit önizleme/kaynak üzerinden yalnız seçilen kayıtları uygula; scope/plan/rol değişimini yeniden denetle. Aynı aktarım replay tek kayıt; değiştirilmiş snapshot/seçim ve geç hata reddi atomik olsun. İzole native preview→apply→readback, yarış/rollback ve sayım mutabakatı kullan.
+- [ ] P10.3 — Gerçek kaynak için somut önizleme ve seçilecek satırlar kullanıcı tarafından onaylanmadan hosted aktarım yapma. Kaynağı silme/değiştirme; çıktı/rapora kişisel veri veya secret yazma. Bu PR kaynak uygulaması canlı aktarım yetkisi değildir.
+
 <a id="p11"></a>
 ### P11 — Deneme, takip ve segment tam akışı
 
@@ -444,6 +462,12 @@ Değişen dilimin sözleşme, üretilmiş tip/envanter, WF/F01–F33 izi ve alan
 - **Sınır/olumsuz durum:** Segment liste/detail kaynakta var; baştan icat edilmez; otomatik pazarlama gönderimi kapalı.
 - **Doğrulama senaryosu:** Tenant config süre/tekrar, kontrollü indirim, segment sonucu ve tekrar çalışmada çift görev olmaması.
 - **Kaynak alanı:** p04 CRM/p05 segment-automation; mevcut acceptance
+
+**Uygulama dilimleri:**
+
+- [ ] P11.1 — Mevcut lead/trial/activity/convert ve segment liste/detail/config/worker kodunu senaryo bazında eşle; kaynakta çalışan yolu yeniden yazma. Yalnız doğrulanmış sözleşme/runtime/kabul boşluklarını düzelt. Kaynak alanı: p04 CRM, p05 segment/automation ve mevcut kabul testleri; F22/F23/F24 izi aynı dilimde güncellensin.
+- [ ] P11.2 — Lead→deneme→sonuç/takip→açık öğrenci dönüşümü için tenant konfigürasyonu, süre/tekrar ve izinli indirim sınırlarını native testle doğrula. Başvuru tek başına öğrencilik/No/satış/rezervasyon açmasın; dönüşüm mevcut No/kota/kimlik kapılarını kullansın. Stale sürüm, canlı rol/plan kaybı, aynı komut replay ve geç hata negatif olsun.
+- [ ] P11.3 — Yenileme/hareketsizlik ve segment kapsamı ile tekrarlı çalışmada çift görev oluşmamasını doğrula. Var olan worker sınırını kullan; kampanya/pazarlama e-postası açma. P14–P16 bildirim teslimi/otomasyon genişletmesini bu kaynak kapanışına taşımadan bağımlılıklarını koru.
 
 <a id="p12"></a>
 ### P12 — Etkinlik kapasitesi modeli
