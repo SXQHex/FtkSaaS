@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useTranslations } from "next-intl";
 import {
   Bell,
+  FileText,
   Building2,
   CalendarDays,
   ChartNoAxesCombined,
@@ -47,6 +48,7 @@ export const sections = [
   "studio",
   "settings",
   "inbox",
+  "documents",
 ] as const;
 export type AdminSection = (typeof sections)[number];
 const icons = {
@@ -59,11 +61,12 @@ const icons = {
   studio: Building2,
   settings: Settings2,
   inbox: Bell,
+  documents: FileText,
 };
 const groups: AdminSection[][] = [
   ["overview", "schedule", "students"],
   ["packages", "finance", "reports"],
-  ["studio", "settings"],
+  ["studio", "documents", "settings"],
 ];
 
 // sidebar-07 composition adapted to the existing shadcn primitives. No domain access decisions live here.
