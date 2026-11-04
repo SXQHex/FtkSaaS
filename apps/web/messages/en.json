@@ -1258,7 +1258,18 @@
       "session_cancelled_by_center": "Session cancelled by studio",
       "seat_offer": "Seat offer",
       "p01_expired": "Operation expired"
-    }
+    },
+    "preferencesTitle": "Notification preferences",
+    "mandatoryHint": "Security and transaction results are required in the app; your marketing preference does not disable them.",
+    "preferencesError": "Notification preferences could not be read. Your current choice was not changed.",
+    "preferencesUnavailable": "In-app marketing preferences cannot currently be changed for this membership.",
+    "marketingEnabled": "In-app marketing is on.",
+    "marketingDisabled": "In-app marketing is off.",
+    "marketingChoice": "I want to receive in-app marketing notifications from this studio.",
+    "enableMarketingConfirm": "You will enable in-app marketing notifications for this studio.",
+    "disableMarketingConfirm": "You will disable in-app marketing notifications for this studio. Required transaction results will continue.",
+    "savePreferences": "Save my preference",
+    "reviewPreferences": "Review change"
   },
   "documents": {
     "uploadTitle": "Upload a document file",
