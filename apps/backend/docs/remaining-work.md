@@ -272,7 +272,7 @@ Bu tablo yalnız izdir; eski kabul metinleri ikinci kez tutulmaz.
 - [ ] **Tür:** D/H · **Plan:** Tümü; Starter dar kapsam · **Özellik:** F25
 - **Bağımlılık:** S06
 - **Kabul:** Gerçek ders yayını başvurusu tek merkeze düşer ve yetkili inceler.
-- **Sınır/olumsuz durum:** Başvuru hesap/satış/rezervasyon/pazarlama izni yaratmaz; genel CRM Starter kapalı.
+- **Sınır/olumsuz durum:** Başvuru hesap/satış/rezervasyon/pazarlama izni yaratmaz; Starter'ın ayrı temel aday takibi P05 kapsamındadır, genel reklam/CRM yetkisi açılmaz.
 - **Doğrulama senaryosu:** Gerçek token/action/hostname, replay ve rate testi; public→inbox→inceleme; frontend PUBLIC-01 bağı.
 - **Kaynak alanı:** public ingress/review; provider config; runbook
 
@@ -357,7 +357,16 @@ Bu tablo yalnız izdir; eski kabul metinleri ikinci kez tutulmaz.
 <a id="p05"></a>
 ### P05 — Telefon temelli ortak başvuru modeli
 
-- [ ] **Tür:** K · **Plan:** Pro/Business; Starter sınır regresyon · **Özellik:** F07,F21,F25
+**Karar uyumu ve ilk teslim:** [CRM kararı](../../../docs/decisions/P08-accepted-scope.md) ile [plan kapsamını](../../../docs/contracts/01-FtkSaaS-urun-kapsam-sozlesmesi.md) mevcut kişi/CRM/API kaynaklarına eşleştir; ayrı karar sprinti veya paralel backlog açma. Var olan kodu koru. Mevcut aşama/plan/kimlik kuralları yeniden sorulmaz; yalnız karşılığı olmayan ürün davranışı kullanıcıya getirilir. Fiziksel tablo/indeks/webhook teknik seçimlerini backend çözer. Ayrı fırsat nesnesini ilk teslim için varsayma.
+
+- [ ] **F21 makine aktarımı:** Yeni dar Starter hedefini makine metadata’sı, ürün matrisinin F21 hücresi, gerekli runtime/plan kapıları ve üretilmiş görünümle birlikte uzlaştır. Belge kararı nedeniyle genel CRM bayrağını koşulsuz açma; kabul edilmiş hedef ile gerçek desteği ayrı kanıtla.
+- [ ] **Starter temel dilimi (F21):** Elle aday kaydı, not, takip tarihi ve bunların liste/ayrıntı üzerinden yeniden okunması; yetki/plan ve tarih/saat anlamları açık sözleşme. P11'in ileri deneme/segment kapsamı bu dilime taşınmaz.
+- [ ] **Frontend sözleşme devri:** Mevcut makine kaynağından üretilmiş DTO/tip; gerekli okuma/yazma ve seçim verileri; WF sırası; yetki/plan, doğrulama/hata, başarı sonrası yeniden okuma ve belirsiz sonuç/replay davranışı. Desteklenmeyen yüzey hazır gösterilmez; frontend adına kabul verilmez.
+- [ ] **Temel kabul:** Yetkisiz tenant/merkez/aktör ve plan erişimi, not/takip kalıcılığı, aynı komutun tekrarında tek kayıt, farklı gerçek başvuruda geçmiş koruma, belirsiz telefon eşleşmesi ve otomatik hesap/öğrenci/satış/izin oluşmaması. Runtime, aday ve hosted kanıt ayrı tutulur.
+
+Değişen dilimin sözleşme, üretilmiş tip/envanter, WF/F01–F33 izi ve alan devri aynı PR'da güncellenir. İş sırası [kuyruktadır](production-queue.md); bu görev aktif paketi değiştirmez. Sağlayıcı resmi erişim/izin/alan eşlemesi ve gerçek teslim/retry kabulü P08/P09'a aittir; Starter dilimini engellemez.
+
+- [ ] **Tür:** K · **Plan:** Starter temel dilim; Pro/Business ortak alım · **Özellik:** F07,F21,F25
 - **Bağımlılık:** S03,A01
 - **Kabul:** Telefon, form/kaynak/kampanya ve ayrı onay kanıtı tek ortak modelde tutulur.
 - **Sınır/olumsuz durum:** İkinci paralel kişi/başvuru deposu yok; telefon doğrulanmış Auth iletişimi sayılmaz.
@@ -688,7 +697,7 @@ A03 ve G03 genel iz/kabul kapılarıdır. Aşağıdaki tablo görev navigasyonud
 | F18 | Merkezler arasında kullanım hakkı ve onaylı hesaplaşma | B03 | [WF05](../../../docs/workflows.md#wf05), [WF10](../../../docs/workflows.md#wf10), [WF18](../../../docs/workflows.md#wf18), [WF20](../../../docs/workflows.md#wf20) |
 | F19 | Manuel tahsilat, kısmi ödeme, iade/düzeltme ve alacak | S09, S12, P04, B03 | [WF05](../../../docs/workflows.md#wf05), [WF08](../../../docs/workflows.md#wf08), [WF10](../../../docs/workflows.md#wf10), [WF20](../../../docs/workflows.md#wf20) |
 | F20 | Eğitmen hakedişi ve ödeme takibi | P04, B03 | [WF07](../../../docs/workflows.md#wf07), [WF10](../../../docs/workflows.md#wf10), [WF14](../../../docs/workflows.md#wf14), [WF15](../../../docs/workflows.md#wf15), [WF20](../../../docs/workflows.md#wf20) |
-| F21 | Aday, kaynak, ilgi, takip ve dönüşüm | P05–P11, B02, B04 | [WF09](../../../docs/workflows.md#wf09), [WF10](../../../docs/workflows.md#wf10), [WF16](../../../docs/workflows.md#wf16), [WF20](../../../docs/workflows.md#wf20) |
+| F21 | Aday, kaynak, ilgi, takip ve dönüşüm | P05 Starter temel; P05–P11, B02, B04 üst-plan | [WF09](../../../docs/workflows.md#wf09), [WF10](../../../docs/workflows.md#wf10), [WF16](../../../docs/workflows.md#wf16), [WF20](../../../docs/workflows.md#wf20) |
 | F22 | Deneme teklifi ve kontrollü indirim | P11 | [WF16](../../../docs/workflows.md#wf16) |
 | F23 | Yenileme ve hareketsiz öğrenci takip listeleri | P11, P16, B04 | [WF16](../../../docs/workflows.md#wf16) |
 | F24 | Davranışa dayalı segmentler ve takip otomasyonu | P11, P14–P16, B04 | [WF16](../../../docs/workflows.md#wf16), [WF20](../../../docs/workflows.md#wf20) |

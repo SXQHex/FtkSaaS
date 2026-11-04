@@ -29,7 +29,7 @@ Bu liste [01 ürün kapsamının](../../../docs/contracts/01-FtkSaaS-urun-kapsam
 - Tüm seanslar tek mantıksal oda ve geçerli eğitmen kapsamında yürür. Seans/kategori kontenjanı fiziksel oda kapasitesiyle tutarlı olmalıdır.
 - Kredili, dönemsel kotalı ve sınırsız süreli ürünler desteklenir. Paket seçili merkez/disiplin kapsamındadır; adı kayıtlı disiplin adıyla başlar. Eski satışın koşulları yeni ürün sürümüyle değiştirilmez.
 - Öğrenci self rezervasyonu, özel ders talebi, dar public ders başvurusu, anlaşmasız/hakedişsiz yoklama ve manuel finans akışları kapsamdadır.
-- Starter'a personel izin yönetimi (F05), bekleme/yer teklifi (F12), paket dondurma/değişim (F17), merkezler arası hesaplaşma (F18), hakediş (F20), genel CRM/deneme kampanyası/takip/otomasyon (F21–F24), otomatik hatırlatmalar (F27) ve etkinlik/workshop/parti (F29) eklenmez. Ortak API ailesindeki alt işlem ayrıca plan kapısından geçirilir.
+- Starter'a personel izin yönetimi (F05), bekleme/yer teklifi (F12), paket dondurma/değişim (F17), merkezler arası hesaplaşma (F18), hakediş (F20), gelişmiş CRM/deneme kampanyası/segment/otomasyon (F21–F24), otomatik hatırlatmalar (F27) ve etkinlik/workshop/parti (F29) eklenmez. Ortak API ailesindeki alt işlem ayrıca plan kapısından geçirilir. Starter'ın yeni elle aday kaydı/not/takip kapsamı [CRM ek diliminde](#crm-temel-aday-takibi) ayrı açık tutulur; bu karar runtime desteği değildir.
 - SaaS planı yükseltme/düşürme F32'dir; öğrenci paketinin F17 kapsamındaki değişimiyle karıştırılmaz. F25 ders başvurusu da genel CRM yetkisi değildir.
 - Fiyat, çalışma saati, iptal penceresi, vade, hukuki metin, özel limit ve sağlayıcı ayarı uydurulmaz. Backend'in açık defaultu dışında eksik değer kurulum gerektirir.
 - Syncfusion `SessionCalendar` içinde kalır. Yeni modülleri somut geliştirme faydası varsa değerlendirilir; tek ürün ailesini kullanmak teslim koşulu değildir. Expo bu planın dışındadır.
@@ -310,6 +310,22 @@ XREQ-014: Yeni main’in PlanLimit union’ına doğrudan value tüketimi uyarla
 **Test verisinin son durumu:** Sayfalama kayıtları pasiftir. İlk temel hedef/Tango ilişkisi ile finans hedefinin ve erişim kontrolünde geçici açılan test öğrenciliğinin son durumu pasiftir; aktif öğrenci kontenjanı tüketilmez. Temel/finans/replay kaynakları birleştirilmiş geçmiş olarak korunur. Finans fixture’ındaki 1000 kuruş test borcu ve 3 kredi, geçmiş koruma kanıtı için yerinde bırakıldı; ödeme/tahsilat yoktur. Mock davet ve mock hesap bağı iptal edildi; bekleyen test ders talebi reddedildi. Mock yabancı organizasyona gerçek hesap bağlantısı/rolü verilmedi. Mevcut kişilerin finansı, rolleri ve native hesap bağları değiştirilmedi. CLI test girişleri test sonunda yalnız kendi native oturumları kapsamında kapatıldı; credential/tokenlar kaynaklara veya kabul raporuna konmaz.
 
 **Starter dışında:** Çok merkezli birleştirme onayı toplama ve `person_merge_approve_v1` arayüzü Pro/Business kapsamıdır; [XREQ-006](../../../docs/requests.md) Starter kapanış engeli değildir. Çok merkez/geçersiz birleştirme backend reddi korunur. Profilin hak/finans/rezervasyon alt görünümleri S05/S08/S06 sahibi olarak kalır. S04’ün tamamlanması bu sonraki modüllerin teslimi anlamına gelmez.
+
+<a id="crm-temel-aday-takibi"></a>
+
+#### CRM temel aday takibi — S04'e bağlı açık ek kapsam
+
+**Durum:** 4 Kasım [ürün kararı](../../../docs/contracts/01-FtkSaaS-urun-kapsam-sozlesmesi.md) ve [CRM mimarisi](../../../docs/decisions/P08-accepted-scope.md) kabul edildi; bu yeni dilimin uygulama/hosted kabulü açık. Önceki S04 teslim kanıtı yeni kapsama taşınmaz. Aktif S03 ve [bölüm sırası](#7-bölüm-bölüm-teslim-tek-aktif-bölüm) değişmez; sonraki uygulamaya geçişte bu ek kapsam açık iş olarak hesaba katılır.
+
+- [ ] Yayımlanmış API ile elle aday oluştur → listede/aramada bul → ayrıntı → not → takip tarihi → yenileyip yeniden oku zincirini tamamla. Form zorunlulukları, tarih/saat ve desteklenen güncelleme/tamamlama anlamı sözleşmeden alınır.
+- [ ] Mevcut shadcn/ui, yönetici kabuğu ve geliştirme rehberini kullan; hazır bileşenle alternatif auth/backend taşıma. İlk dilime fırsat/pipeline, şirket, fatura, proje veya posta kutusu ekranı varsayma.
+- [ ] Yükleme/boş/hata durumlarını ayır; başarı sonrası yeniden oku. Çift tıklama/kayıp yanıtı mevcut komut/replay sözleşmesiyle kurtar. Native Auth/Edge yolunu kullan; doğrudan private tablo veya sahte başarı fallback'i yok.
+- [ ] Kişi ile ayrı başvuruları ve kaynak geçmişini ayır; telefon eşleşmesini otomatik birleşim veya doğrulanmış kimlik sayma. Başvuru sonucunu öğrenci/satış/ödeme/izin başarısı gibi gösterme. Plan/merkez/aktör görünürlüğü API'den gelir.
+- [ ] next-intl/timezone sözleşmesi, klavye, odak, etiket, hata mesajı ve mobil görünümü doğrula. Gerçek yetkili test hesabında kayıt/not/takibin yenileme sonrası kalıcılığı; plan/yetki ve kurtarma durumları sınanır. Backend suite veya mock sonucu hosted ekran kabulü değildir.
+
+**Bağımlılık yönetimi:** Backend [P05](../../backend/docs/remaining-work.md#p05) sözleşme devri. Sözleşme varsa kontrollü fixture ile bileşen/erişilebilirlik çalışması yapılabilir; runtime yoksa entegrasyon tamamlandı sayılmaz. Sözleşme eksikse DTO/endpoint/izin uydurma; eksik yüzeyi [ortak talebin](../../../docs/requests.md) kendi alanında belirt. Backend runtime/sözleşme/CI politikasını değiştirme. Sırası geldiğinde ortak kutu ve sağlayıcı ekranları gerçek desteğe göre genişler; Starter bunları beklemez. İlk sağlayıcı veya Pro/Business yetkileri frontend tarafından seçilmez.
+
+**Teslim:** PR ilgili WF, gerçek API sırası, izin/plan sınırı, hata kurtarma ve yeniden okumayı açıklar; kod, yerel test, aday/main ve hosted kanıtları ayrı yazılır. Mevcut alan sahipliği ve CI/devir kuralları uygulanır.
 
 <a id="web-s05"></a>
 

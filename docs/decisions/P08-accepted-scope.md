@@ -13,6 +13,20 @@ Bu dosya bu üç ürün davranışının tek normatif sahibidir. Plan erişimi/t
 
 ## Çok kaynaklı ortak CRM başvuru toplama — 23 Ekim 2026 kullanıcı kararı
 
+### CRM geliştirme yönü — 4 Kasım 2026 kullanıcı kararı
+
+FtkSaaS'ın kendi Supabase altyapısında yaşayan modüler B2C CRM geliştirilecektir. Veri modeli ve iş kuralları FtkSaaS'a aittir; hazır arayüz bileşenlerinden yararlanılabilir. Bu seçim mevcut çalışan kişi/CRM/satış kodunu sıfırdan yeniden yazma veya ikinci kişi deposu kurma kararı değildir. Plan erişiminin tek sahibi [ürün kapsamıdır](../contracts/01-FtkSaaS-urun-kapsam-sozlesmesi.md).
+
+**Bağlam ve gerekçe:** Telefon/WhatsApp üzerinden gelen adayı kaydetme, görüşme notu ve gelecek takip ihtiyacı mevcut kişi ve operasyon akışlarına bağlıdır. Bütün bir açık kaynak CRM'in auth/backend modelini uyarlama seçeneği yerine mevcut FtkSaaS altyapısı üzerinde kendi modülü seçilmiştir. Hazır arayüz kullanımı bu tercihle uyumludur. Veri bütünlüğü, izin, tekrar teslim ve sağlayıcı bakımının sorumluluğu FtkSaaS'ta kalır; genel amaçlı CRM ürününün bütün işlevleri hedeflenmez.
+
+**Çekirdek:** Kişiye bağlı başvuru, ilgi, sorumlu, aşama/sonuç, not, gerçekleşmiş temas ve gelecek takip. Kaynak bağlantıları ortak başvuru modelini besler; sağlayıcıya özgü payload/API davranışı çekirdeğe yayılmaz. Fiziksel tablo/indeks ve işleme yöntemi backend'in teknik seçimidir. Ayrı satış fırsatı nesnesinin ilk teslimde zorunlu olduğu kararlaştırılmamıştır. CRM sonucu tahsilat veya öğrenci aktivasyonu yerine geçmez; mevcut operasyonlara geçiş ayrı yetkili işlemdir.
+
+Reklam platformunun yerel formundan alım ile reklamdan kendi web formuna yönlendirme ayrı yollardır; mevcut kampanya/UTM bilgileri korunur. Reklam harcama/performans raporları ve dönüşüm geri bildirimi sonraki ayrı dilimlerdir. Elle WhatsApp kaynaklı aday kaydı otomatik WhatsApp entegrasyonu değildir. Posta kutusu, proje, fatura ve genel belge yönetimi CRM çekirdeğinin zorunlu parçaları değildir; bu karar dış gönderim/Resend başlatma yetkisi vermez.
+
+Ayrı karar sprinti açılmaz. Mevcut karar ve runtime eşlemesindeki gerçek ürün boşlukları kullanıcıya getirilir; aşağıda tanımlı telefon eşleme ve yönlendirme yeniden karar bekleyen konular sayılmaz. Görev/kabul [backend backlog'unda](../../apps/backend/docs/remaining-work.md#p05), teslim sırası [üretim kuyruğunda](../../apps/backend/docs/production-queue.md) tutulur. Kabul edilmiş hedef, uygulanmış API veya canlı kabul anlamına gelmez.
+
+### Ortak alım kuralları
+
 - Farklı formlar için ayrı başvuru tabloları açılmaz; birden çok form aynı ortak başvuru tablosuna alınır. Organizasyon/merkez kapsamı korunur; Fethiye Tango Kulübü kayıtları yalnız kendi CRM yetkililerine görünür. Mevcut public_applications modelinin genişletilmesi veya ortak modele taşınması uygulama bağımlılık incelemesinde seçilir; ikinci paralel başvuru deposu kurulmaz.
 - Ortak alanlar kullanılır ve zorunlu bir kaynak sütunu ile kaydın hangi form/kanaldan geldiği izlenir. İlk kaynaklar: fethiyetango.com/tr/iletisim, fethiyetango.com/tr/kayit, Instagram, Facebook ve Google reklam formları. Kanal ile belirli formun kimliği karıştırılmaz; sağlayıcı/form kimliği ve mevcutsa kampanya/reklam kimliği, UTM ve sayfa adresi kaynak ayrıntısı olarak korunur. Kaynak bilgisi güvenilir entegrasyon eşlemesinden gelir; istemcinin gönderdiği organizasyon/kaynak beyanı tek başına yetki sağlamaz.
 - Instagram/Facebook/Google reklamlarındaki yerel formlardan da aynı tabloya alım desteklenmeli. Her sağlayıcı için gerekli hesap erişimi, webhook veya çekme yolu, doğrulanmış gönderici, izin kapsamı ve alan eşlemesi ayrıca doğrulanır; entegrasyonların bugün kurulmuş olduğu varsayılmaz. Reklamdan web formuna yönlendirme ile sağlayıcının kendi formundan alım ayrı giriş yollarıdır.
