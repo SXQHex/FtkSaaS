@@ -357,6 +357,8 @@ Bu tablo yalnız izdir; eski kabul metinleri ikinci kez tutulmaz.
 <a id="p05"></a>
 ### P05 — Telefon temelli ortak başvuru modeli
 
+**Aktif kaynak dilimi:** Starter temel aday/not/takip ve frontend sözleşme devri `feature/p05-starter-crm` dalında hazırlandı; gerçek native aday/main/development kabulü beklenir. Telefon temelli genel alım ve ortak başvuru geçmişi kapanmış sayılmaz. Kaynak/test sınırı [P05 devrindedir](00-FtkSaaS-yeni-sohbet-devir.md#p05-starter-temel-crm-kaynak-dilimi).
+
 **Karar uyumu ve ilk teslim:** [CRM kararı](../../../docs/decisions/P08-accepted-scope.md) ile [plan kapsamını](../../../docs/contracts/01-FtkSaaS-urun-kapsam-sozlesmesi.md) mevcut kişi/CRM/API kaynaklarına eşleştir; ayrı karar sprinti veya paralel backlog açma. Var olan kodu koru. Mevcut aşama/plan/kimlik kuralları yeniden sorulmaz; yalnız karşılığı olmayan ürün davranışı kullanıcıya getirilir. Fiziksel tablo/indeks/webhook teknik seçimlerini backend çözer. Ayrı fırsat nesnesini ilk teslim için varsayma.
 
 - [ ] **F21 makine aktarımı:** Yeni dar Starter hedefini makine metadata’sı, ürün matrisinin F21 hücresi, gerekli runtime/plan kapıları ve üretilmiş görünümle birlikte uzlaştır. Belge kararı nedeniyle genel CRM bayrağını koşulsuz açma; kabul edilmiş hedef ile gerçek desteği ayrı kanıtla.
