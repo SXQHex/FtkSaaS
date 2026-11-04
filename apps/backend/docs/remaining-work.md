@@ -204,6 +204,8 @@ Bu tablo yalnız izdir; eski kabul metinleri ikinci kez tutulmaz.
 - **Doğrulama senaryosu:** Mevcut/yeni/doğrulanmamış/Google adresi; gerçek PKCE/nonce ekranı frontend sahibinde; kaynak teslimi tekrar yapılmaz.
 - **Kaynak alanı:** native Auth config/readback; mevcut hesap acceptance; runbook
 
+**Öncelikli native telefon dilimi:** Kullanıcının 4 Kasım kararıyla önce mevcut native telefon değişikliği yerel sabit OTP'li numaralarla tamamlanır; Descope köprüsü kurulmaz. Mevcut kimlik kabulüne yanlış kod sonrası projeksiyonun korunması, resend, tamamlanmış isteğin tekrar reddi, doğrulanmış numara değişikliği, çakışmada hesap izolasyonu ve güvenlik geçmişi senaryoları eklenir. İkinci yerel test numarası yalnız config fixture'ıdır; yeni domain API/migration yoktur. Sabit kodla expiry/kod rotasyonu, gerçek +90 teslimatı ve frontend ekran kabulü kapanmaz. Frontend telefon yeniden isteme tüketicisi için [XREQ-017](../../../docs/requests.md#xreq-017) açık kalır; backend karşı alanı değiştirmez. Kaynak/run durumu [telefon devrindedir](00-FtkSaaS-yeni-sohbet-devir.md#native-telefon-test-numarası-dilimi); gerçek native aday kabulü doğrulanmadan bu dilim tamamlandı sayılmaz.
+
 **Bu paketin backend dilimi:** Mevcut hesap-oturum harness’inde native parola değişimi sonrası işlem yapılan oturumun korunması, diğer native session’ın silinmesi, henüz süresi dolmamış JWT ve refresh isteğinin reddi eklendi. Bu kaynak testi hosted mevcut-parola/24 saat nonce, gerçek PKCE/recovery/posta veya eski ortamların fiziksel temizliği kabulü değildir; S08 bu dış kabul sınırlarıyla açık kalır. Yeni sağlayıcı harness’i/özel Auth katmanı kurulmadı. Gerçek çalışma sonucu ve aday/main/ortam aşaması [devirde](00-FtkSaaS-yeni-sohbet-devir.md#s07s10-kabul-paketi).
 
 <a id="s09"></a>
