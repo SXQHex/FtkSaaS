@@ -13,7 +13,7 @@ export function localDateTime(instant: string, timeZone: string) {
     hourCycle: "h23",
   }).formatToParts(new Date(instant));
   const p = (type: string) => parts.find((part) => part.type === type)!.value;
-  return `${p("year")}-${p("month")}-${p("day")}T${p("hour")}:${p("minute")}:${p("second")}`;
+  return `${p("year").padStart(4, "0")}-${p("month")}-${p("day")}T${p("hour")}:${p("minute")}:${p("second")}`;
 }
 
 // Resolve only real instants; daylight-saving gaps are never silently shifted.
