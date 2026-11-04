@@ -1,1 +1,1 @@
-export const backendShardCount=20;
+export const backendShardCount=12;

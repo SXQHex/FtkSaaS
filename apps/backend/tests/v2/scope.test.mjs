@@ -10,11 +10,11 @@ test('frontend source never selects backend tests or Supabase delivery',()=>{
  assert.equal(p.backend_matrix.length,0);
 });
 
-test('backend runtime selects exactly twenty shards without frontend execution',()=>{
+test('backend runtime selects exactly twelve shards without frontend execution',()=>{
  const p=selectImpact(['apps/backend/supabase/migrations/20261104000000_room.sql']);
  assert.equal(p.frontend,false);assert.equal(p.backend,true);
  assert.deepEqual(p.deploy,{vercel:false,supabase:true});
- assert.deepEqual(p.backend_matrix,Array.from({length:20},(_,i)=>({shard:i+1})));
+ assert.deepEqual(p.backend_matrix,Array.from({length:12},(_,i)=>({shard:i+1})));
 });
 
 test('test, documentation and CI changes do not authorize application deployment',()=>{
@@ -30,12 +30,12 @@ test('test, documentation and CI changes do not authorize application deployment
  assert.equal(docs.backend,false);assert.equal(docs.frontend,false);assert.equal(docs.common,true);
 });
 
-test('common runtime dependencies select both consumers; compatibility stays diagnostic',()=>{
- for(const file of ['packages/api-contracts/schema/contract.json','packages/typescript-config/base.json','pnpm-lock.yaml']){
+test('common runtime dependencies select both consumers; API compatibility belongs to frontend delivery',()=>{
+ for(const file of ['packages/typescript-config/base.json','pnpm-lock.yaml']){
   const p=selectImpact([file]);assert.equal(p.common,true);assert.equal(p.frontend,true);assert.equal(p.backend,true);
   assert.deepEqual(p.deploy,{vercel:true,supabase:true});
  }
- assert.equal(selectImpact(['packages/api-contracts/src/generated.ts']).compatibility,'diagnostic');
+ assert.equal(selectImpact(['packages/api-contracts/src/generated.ts']).compatibility,'frontend-delivery');
 });
 
 test('the actual server bridge is a web input, not a Supabase deployment',()=>{
@@ -59,11 +59,11 @@ test('unknown scope fails wide and sandbox renames cannot hide a removed product
  assert.equal(selectImpact(['apps/web1/page.tsx']).backend,false);
 });
 
-test('full and backend requests always retain twenty backend shards',()=>{
+test('full and backend requests always retain twelve backend shards',()=>{
  const backend=selectImpact(['docs/workflows.md'],'backend');
- assert.equal(backend.backend_matrix.length,20);assert.equal(backend.frontend,false);
+ assert.equal(backend.backend_matrix.length,12);assert.equal(backend.frontend,false);
  const full=selectImpact(['docs/workflows.md'],'full');
- assert.equal(full.backend_matrix.length,20);assert.equal(full.frontend,true);assert.equal(full.common,true);
+ assert.equal(full.backend_matrix.length,12);assert.equal(full.frontend,true);assert.equal(full.common,true);
  // A wider verification request never turns a docs change into deployment.
  assert.deepEqual(full.deploy,{vercel:false,supabase:false});
 });
@@ -74,4 +74,13 @@ test('truncated, invalid or empty change lists cannot become successful no-op pl
  }
  for(const raw of ['M\0file','R100\0old\0','X\0file\0'])assert.throws(()=>parseNameStatus(raw));
  assert.throws(()=>selectImpact(['README.md'],'fast'));
+});
+
+ test('API contract changes never schedule frontend checks or Vercel delivery by themselves',()=>{
+ for(const file of ['packages/api-contracts/schema/contract.json','packages/api-contracts/src/generated.ts']){
+  const p=selectImpact([file]);assert.equal(p.frontend,false);assert.equal(p.backend,true);
+  assert.deepEqual(p.deploy,{vercel:false,supabase:true});
+ }
+ const mixed=selectImpact(['packages/api-contracts/src/generated.ts','apps/web/src/page.tsx']);
+ assert.equal(mixed.frontend,true);assert.equal(mixed.deploy.vercel,true);
 });

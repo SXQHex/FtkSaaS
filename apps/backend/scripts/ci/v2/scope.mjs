@@ -46,7 +46,7 @@ export function selectImpact(paths,mode='auto'){
    plan.common=true;continue;
   }
   if(file.startsWith('packages/api-contracts/')){
-   shared(true);plan.compatibility='diagnostic';continue;
+   plan.common=true;backend(true);plan.compatibility='frontend-delivery';continue;
   }
   if(['package.json','pnpm-lock.yaml','pnpm-workspace.yaml','turbo.json','.nvmrc','.gitignore'].includes(file)||file.startsWith('packages/typescript-config/')){
    shared(true);continue;

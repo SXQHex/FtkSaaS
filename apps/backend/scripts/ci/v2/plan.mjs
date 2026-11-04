@@ -23,7 +23,7 @@ if(import.meta.url===pathToFileURL(process.argv[1]??'').href){
  const summary=['## CI v2 diagnostic plan','',`Source: ${plan.source.head}`,
   `Baseline controls: ${baseline}; common: ${common}; frontend: ${frontend}; backend: ${backend}.`,
   `Backend matrix: ${backend_matrix.length}; Vercel impact: ${deploy.vercel}; Supabase impact: ${deploy.supabase}.`,
-  'Planning only: twenty backend shards are not executed or accepted by this job. No deployment authorization.',''].join('\n');
+  'Planning only: twelve backend shards are not executed or accepted by this job. No deployment authorization.',''].join('\n');
  fs.writeFileSync(path.join(output,'summary.md'),summary);
  if(process.env.GITHUB_STEP_SUMMARY)fs.appendFileSync(process.env.GITHUB_STEP_SUMMARY,summary);
  console.log(summary);
