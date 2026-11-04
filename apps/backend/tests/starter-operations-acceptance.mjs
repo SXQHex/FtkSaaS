@@ -72,6 +72,26 @@ async function operationsFixture(t){
  return {platform,plan,owner,student,stranger,db,rows,workers,roles,files,org,center,ownerPerson,studentPerson,version,scoped,api,denied,interval,filters,headers,mapping,token,drain,upload,previewFile,p05,p06,settings,saveSettings,templates};
 }
 
+
+async function reportFixture(t){
+ const fixture=await operationsFixture(t);
+ const {db,org,headers,studentPerson,version,upload,previewFile,api,token,drain,p06}=fixture;
+ // Native opening balances are fixture prerequisites; their assertions remain in the import root.
+ await db.query('insert into private.p06_configuration values($1,2097152,5000,16777216)',[org]);
+ const start=new Date(Date.now()-86400000).toISOString().slice(0,10),end=new Date(Date.now()+30*86400000).toISOString().slice(0,10);
+ const csv=headers.join(',')+'\r\nexisting,"Synthetic, existing",'+studentPerson+',2,1000,200,TRY,'+version+','+start+','+end+'\r\nnew,Synthetic new,,,,100,TRY,,,\r\nbad,Synthetic invalid,,,,bad,TRY,,,\r\n';
+ const uploaded=await upload(csv);const opening=await previewFile(uploaded,'st02-opening');
+ await api('import_apply_v1',{preview:token(opening.preview)});await drain(p06,importTick);
+ return {...fixture,importJob:opening.job};
+}
+
+function workTemplateDefinitions({filters,center}){
+ return {
+  report:{key:'private_report',name:'Synthetic private debt report',report:'collections_debts',filters:filters(),columns:['group_key','amount_minor'],report_order:'group_key_desc',group_by:'total'},
+  imp:{key:'private_import',name:'Synthetic mapping',center_id:center,source_namespace:'st03-templates',mapping:{delimiter:';',columns:[{source_column:'id',target:'source_key'},{source_column:'name',target:'display_name'},{source_column:'ref',target:'person_ref'}]}}
+ };
+}
+
 test('ST-02 import, entitlement consumption, quota and live revocation',{timeout:300000},async t=>{
  const fixture=await operationsFixture(t);
  const {platform,plan,owner,student,stranger,db,rows,workers,roles,files,org,center,ownerPerson,studentPerson,version,scoped,api,denied,interval,filters,headers,mapping,token,drain,upload,previewFile,p05,p06,settings,saveSettings,templates}=fixture;
@@ -166,17 +186,10 @@ test('ST-02 import, entitlement consumption, quota and live revocation',{timeout
    assert.equal((await rows('select count(*)::int n from core.sales where org_id=$1',[org]))[0].n,1);
   });
 });
-
-test('ST-02 work templates, report snapshots, export and transactional inbox',{timeout:300000},async t=>{
- const fixture=await operationsFixture(t);
+test('ST-02 work template privacy and live authority',{timeout:300000},async t=>{
+ const fixture=await reportFixture(t);
  const {platform,plan,owner,student,stranger,db,rows,workers,roles,files,org,center,ownerPerson,studentPerson,version,scoped,api,denied,interval,filters,headers,mapping,token,drain,upload,previewFile,p05,p06,settings,saveSettings,templates}=fixture;
- let importJob,preview,exportJob,exportFile,uploaded,preparedReport,sharedReportRef;
- // Native opening balances are fixture prerequisites; their assertions remain in the import root.
- await db.query('insert into private.p06_configuration values($1,2097152,5000,16777216)',[org]);
- const start=new Date(Date.now()-86400000).toISOString().slice(0,10),end=new Date(Date.now()+30*86400000).toISOString().slice(0,10);
- const csv=headers.join(',')+'\r\nexisting,"Synthetic, existing",'+studentPerson+',2,1000,200,TRY,'+version+','+start+','+end+'\r\nnew,Synthetic new,,,,100,TRY,,,\r\nbad,Synthetic invalid,,,,bad,TRY,,,\r\n';
- uploaded=await upload(csv);const opening=await previewFile(uploaded,'st02-opening');importJob=opening.job;
- await api('import_apply_v1',{preview:token(opening.preview)});await drain(p06,importTick);
+ let preparedReport,sharedReportRef;
   await t.test('work templates are private unless explicitly shared; copies and resolves retain live domain authority',async()=>{
    assert.deepEqual((await settings('member')).values.report_templates,[]);assert.deepEqual((await settings('member')).values.import_templates,[]);
    const report={key:'private_report',name:'Synthetic private debt report',report:'collections_debts',filters:filters(),columns:['group_key','amount_minor'],report_order:'group_key_desc',group_by:'total'};
@@ -211,6 +224,14 @@ test('ST-02 work templates, report snapshots, export and transactional inbox',{t
    const current=await settings('member');await denied('settings_update_v1',{scope:'member',org_id:org,center_id:undefined,expected_version:current.version,patch:{report_templates:[report,{...report,name:'Duplicate key'}]}},'VALIDATION_FAILED');
    await denied('settings_template_resolve_v1',{kind:'import',template:available.imports[0].source,overrides:{opening_credits:99}},'VALIDATION_FAILED');
   });
+});
+test('ST-02 report shaping and immutable export snapshots',{timeout:300000},async t=>{
+ const fixture=await reportFixture(t);
+ const {platform,plan,owner,student,stranger,db,rows,workers,roles,files,org,center,ownerPerson,studentPerson,version,scoped,api,denied,interval,filters,headers,mapping,token,drain,upload,previewFile,p05,p06,settings,saveSettings,templates}=fixture;
+ const {report}=workTemplateDefinitions(fixture);
+ await saveSettings('member',{report_templates:[report]});
+ const source=(await templates()).work_templates.reports.find(x=>x.source.scope==='member').source;
+ const preparedReport=await api('settings_template_resolve_v1',{kind:'report',template:source,overrides:{filters:{currency:'TRY'}}});
   await t.test('report preparation changes real grouping and CSV columns; later template edits do not rewrite the job',async()=>{
    const view=await api('report_get_v1',{...preparedReport.request,page:{}});assert.equal(view.rows.items.length,1);assert.equal(view.rows.items[0].amount_minor,'300');assert(!('person_id' in view.rows.items[0]));assert.deepEqual(view.columns,['group_key','amount_minor']);
    const counts=await api('report_get_v1',{...preparedReport.request,columns:['count'],group_by:'person',page:{}});assert.equal(counts.rows.items.length,2);for(const row of counts.rows.items)assert.deepEqual(Object.keys(row).sort(),['count','group_key']);
@@ -231,6 +252,13 @@ test('ST-02 work templates, report snapshots, export and transactional inbox',{t
    assert.equal(shaped[0].group_key,'z');assert.equal(shaped.find(x=>x.group_key==='a'&&x.currency==='TRY').amount_minor,'9007199254740995');assert.equal(shaped.find(x=>x.currency==='USD').amount_minor,'9');
    const escaped=(await rows('select private.work_report_csv($1,$2,1024) v',[[{group_key:'=SUM(A1)',amount_minor:'7'}],['group_key','amount_minor']].map(JSON.stringify)))[0].v.toString('utf8');assert.match(escaped,/"'=SUM\(A1\)"/);
   });
+});
+test('ST-02 import template preparation and reset',{timeout:300000},async t=>{
+ const fixture=await reportFixture(t);
+ const {platform,plan,owner,student,stranger,db,rows,workers,roles,files,org,center,ownerPerson,studentPerson,version,scoped,api,denied,interval,filters,headers,mapping,token,drain,upload,previewFile,p05,p06,settings,saveSettings,templates}=fixture;
+ const {report,imp}=workTemplateDefinitions(fixture);
+ await saveSettings('member',{import_templates:[imp]});
+ await saveSettings('organization',{report_templates:[{...report,key:'shared_report'}]});
   await t.test('import preparation is mapping only; explicit preview/apply retains its snapshot after template reset',async()=>{
    const source=(await templates()).work_templates.imports[0].source,prepared=await api('settings_template_resolve_v1',{kind:'import',template:source});assert.equal(prepared.request.mapping.delimiter,';');
    const f=await upload('id;name;ref\r\nprepared;Synthetic prepared;'+studentPerson+'\r\n'),before=await rows('select (select count(*) from core.people where org_id=$1)::int people,(select count(*) from core.sales where org_id=$1)::int sales,(select count(*) from core.debts where org_id=$1)::int debts',[org]);
@@ -241,6 +269,11 @@ test('ST-02 work templates, report snapshots, export and transactional inbox',{t
    const reset=await must(owner,'settings_reset_preview_v1',{scope:'member',org_id:org,fields:['import_templates']});await must(owner,'settings_reset_apply_v1',{scope:'member',org_id:org,expected_version:reset.version,preview:token(reset)},key());assert.deepEqual((await settings('member')).values.import_templates,[]);assert.equal((await settings('organization')).values.report_templates.length,1);
    assert.equal((await api('job_status_get_v1',{job_id:next.job})).state,'succeeded');
   });
+});
+test('ST-02 report pagination and authenticated download',{timeout:300000},async t=>{
+ const fixture=await reportFixture(t);
+ const {platform,plan,owner,student,stranger,db,rows,workers,roles,files,org,center,ownerPerson,studentPerson,version,scoped,api,denied,interval,filters,headers,mapping,token,drain,upload,previewFile,p05,p06,settings,saveSettings,templates}=fixture;
+ let exportJob,exportFile;
   await t.test('Starter report totals survive pagination and authenticated export; files cannot cross account or expiry',async()=>{
    const b={report:'collections_debts',filters:filters(),page:{limit:1}};const report=await api('report_get_v1',b);assert.equal(report.rows.items.length,1);assert(report.rows.next_cursor);assert.equal(report.totals.find(x=>x.group_key==='outstanding_debt').amount_minor,'300');
    assert.equal((await api('report_get_v1',{...b,page:{limit:1,cursor:report.rows.next_cursor}})).rows.items.length,1);
@@ -254,6 +287,14 @@ test('ST-02 work templates, report snapshots, export and transactional inbox',{t
    const expired=await download(owner),expiredBody=await expired.json();assert.equal(expiredBody.ok,false);assert.equal(expiredBody.error.code,'OPERATION_RESULT_EXPIRED');assert.equal(expiredBody.data,undefined);
 
   });
+});
+test('ST-02 transactional completion inbox and replay',{timeout:300000},async t=>{
+ const fixture=await reportFixture(t);
+ const {platform,plan,owner,student,stranger,db,rows,workers,roles,files,org,center,ownerPerson,studentPerson,version,scoped,api,denied,interval,filters,headers,mapping,token,drain,upload,previewFile,p05,p06,settings,saveSettings,templates}=fixture;
+ const {importJob}=fixture;
+ const exportJob=(await api('report_export_start_v1',{report:'collections_debts',filters:filters(),format:'csv'})).job_id;
+ await drain(p06,importTick);
+ await db.query("update core.report_jobs set expires_at=now()-interval '1 second' where id=$1",[exportJob]);
   await t.test('transactional completion reaches only requester inbox; preferences, read versions and replay never create loops',async()=>{
    await must(owner,'settings_update_v1',{scope:'member',org_id:org,expected_version:(await settings('member')).version,patch:{in_app_reminders:false,in_app_marketing:false}},key());
    const delivery=await rows("select j.id,j.notification_id,j.state,n.kind from core.outbox_jobs j join core.notifications n on n.org_id=j.org_id and n.id=j.notification_id where j.org_id=$1 and j.kind='in_app' and n.recipient_person_id=$2 and ((n.kind='report_build_v1' and n.subject_id=$3) or (n.kind='import_rows_process_v1' and n.subject_id=$4)) order by j.id",[org,ownerPerson,exportJob,importJob]);

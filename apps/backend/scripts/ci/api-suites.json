@@ -602,15 +602,11 @@
         {
           "line": 8,
           "path": "apps/backend/tests/starter-operations-acceptance.mjs",
-          "sha256": "d56aba6a07a54cd439c96ac02708ce43279da44069aa7b7da77f0fec1f664c29",
+          "sha256": "9eba90c529f4cda60ad56ab9254f5dde38bb4edf9bb35bf1726faddb65d78737",
           "shared": [
             [
               1,
-              74
-            ],
-            [
-              169,
-              169
+              94
             ]
           ],
           "parts": [
@@ -618,8 +614,8 @@
               "id": "starter-operations-acceptance",
               "ranges": [
                 [
-                  75,
-                  168
+                  95,
+                  188
                 ]
               ]
             },
@@ -627,8 +623,44 @@
               "id": "starter-operations-reports",
               "ranges": [
                 [
-                  170,
-                  276
+                  189,
+                  227
+                ]
+              ]
+            },
+            {
+              "id": "starter-operations-report-shaping",
+              "ranges": [
+                [
+                  228,
+                  255
+                ]
+              ]
+            },
+            {
+              "id": "starter-operations-import-templates",
+              "ranges": [
+                [
+                  256,
+                  272
+                ]
+              ]
+            },
+            {
+              "id": "starter-operations-report-access",
+              "ranges": [
+                [
+                  273,
+                  290
+                ]
+              ]
+            },
+            {
+              "id": "starter-operations-inbox",
+              "ranges": [
+                [
+                  291,
+                  317
                 ]
               ]
             }
