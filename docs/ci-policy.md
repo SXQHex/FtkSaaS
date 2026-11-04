@@ -125,7 +125,7 @@ Kabulün yeniden kullanımı ancak ilgili alanın kaynak, bağımlılık ve test
 
 Test kökleri bağımsız çalışabilen en küçük anlamlı davranış/işlem zincirine indirilecek; yarış/atomiklik/rollback senaryosunun iç bütünlüğü bölünmeyecek, önceki kökün fixture çıktısı devralınmayacak. Runtime satır kesme/ESM kancası yerine doğrudan test dosyaları kullanılacak. Test azaltımı yalnız tekrarları kaldırarak ve gerekli katmana taşıyarak, eşdeğer hata yakalama kanıtıyla yapılacak; sayısal test azalması başarı ölçütü değildir.
 
-**Bu dilimin sınırı:** Seçici backend/full için tam 20 kayıtlı matrix planı üretir; 20 backend test işi henüz yürütülmez. Plan `acceptance:false` ve `backend_execution:not-implemented` taşır. Dört köklü oda pilotu bu matrix'e 20 boş/tekrarlı iş olarak dağıtılmaz ve full backend kabulü diye sunulmaz. Doğrudan test envanteri/kök dönüşümü tamamlanmadan üretim veya gölge tam backend yürütmesi devralınmaz.
+**Plan ve yürütme ayrımı:** Seçici backend/full için tam 20 kayıtlı matrix planı üretir; plan job'u test yürütmez veya kabul üretmez. Gerçek yirmi işin manuel gölge yürütmesi aşağıdaki ayrı backend workflow'unun sorumluluğudur. Dört köklü oda pilotu 20 boş/tekrarlı iş olarak dağıtılmaz. Mevcut üretim kabulüne devir ayrıca kanıt gerektirir.
 
 ### Yapı ve komutlar
 
@@ -165,6 +165,20 @@ Pilot dört bağımsız kökte oluşturma/aynı anahtar tekrarı/liste-ayrıntı
 JUnit sonuçları ile tam commit/tree/run/attempt ve `full_clean:false` kapsam kaydı `.artifacts/ci-v2` altında yedi günlük tanı artifact'ıdır. `.dev`, bağlantı bilgileri, oturum/fixture ve yerel servis logları artifact'a alınmaz. Yerleşik Node assertion stili kullanılır; küçük, açık testler ve parametrik SQL korunur. İlk dilimde runtime/migration/sözleşme/paket sürümü ve lockfile değiştirilmez.
 
 Sonraki alan bazlı geçiş için aynı tam kaynakta mevcut kabul ile V2 sonuçları karşılaştırılmalı; eski assertion'ların yeni sahipleri ve açık eksikler gösterilmeli; seçilmiş gerçek yetki/veri hatalarıyla hata yakalama kanıtlanmalı; süre ve runner maliyeti ayrı ölçülmelidir. Yalnız hızlı/yeşil pilot alanı devralamaz. Test katmanı veya required-check/CD devri ayrı incelenmiş değişikliktir. Gölge koşuları seçilmiş checkpoint'lerde yürür; her ürün push'unda ikinci full clean oluşturulmaz.
+
+### Yirmi gerçek backend shard — manuel gölge yürütme
+
+[CI V2 Backend](../.github/workflows/ci-v2-backend.yml) yalnız manuel, sabit `github.sha` üzerinde çalışır. Inventory işi mevcut backend verify ve V2 kapsam/Git/taşıma testlerini geçirir; ardından dinamik matrix tam **20 boş olmayan backend işi** açar. `fail-fast:false` ve `max-parallel:20` kullanılır; gerçek eşzamanlılık sağlayıcı kotasına tabidir. Frontend koşusu veya Vercel/Supabase dağıtımı tetiklemez, status/secret/deploy yetkisi almaz. Mevcut üretim sekiz shard kapısı değişmez.
+
+`tests/v2/backend-suites.json` yalnız id, doğrudan dosya, köken ve açıkça tahmin olan planlama ağırlığını taşır; runtime hash/satır aralığı manifesti değildir. 64 mevcut kabul birimi 31 özgün bağımsız dosya ve 33 normal taşınmış dosya üzerinden yürür. Node test runner dosyaları doğrudan yükler; runtime kaynak kesme, eval veya ESM gövde kancası yoktur. Ayrı migration/parity yardımcıları yalnız doğrulamada eski kapsamla eşdeğerliği denetler, test yürütme yoluna girmez. `es-module-lexer` mevcut lockfile sürümü 2.3.2 ile yalnız geliştirme bağımlılığıdır; gerçek import/import.meta konumlarını ayırarak gövde/assertion byte'larını korur. Bu geçişin 33 dosyalık gölge kopyası kalıcı ikinci test sistemi değildir; devirde eski karşılık ve migration kontrolü birlikte emekli edilir.
+
+Her backend işi kendine ait runner/temiz yerel stack, sıralı migration ve boş Auth/tenant/receipt doğrulaması kullanır. Dosyalar runner içinde concurrency=1 çalışır; global fixture çakışması önlenirken test gövdelerindeki gerçek yarışlar korunur. Oneshot/istek deadline'ları/3 GiB Edge koruması, sahipli cleanup ve dar artifact sınırı korunur. Kaynak kaydı `backend-shadow` kapsamını ve shard numarasını taşır. JUnit sonuçları ve estimated plan bir merge/CD makbuzu değildir. İptal/atlanmış/başarısız matrix tamamlama işi başarı sayılmaz.
+
+Repo kökünde taşıma ve matrix doğrulaması: `node --test apps/backend/tests/v2/backend.test.mjs`. Backend içinden `node scripts/ci/v2/backend.mjs plan` tam, tekrarsız dağılımı üretir; hazır disposable stack'te `node scripts/ci/v2/backend.mjs SHARD` yalnız 1–20 arası seçili işi yürütür. Tahmini süreler güncel ölçüm veya hız kazancı değildir. En uzun program kökü hâlâ ayrı bir darboğazdır; yirmi işin kurulması en küçük anlamlı köklere dönüşümün tamamlandığı anlamına gelmez.
+
+**Kapsam sınırı:** Bu workflow backend verify ve API envanterini sınar; eski core işindeki `test:db`, seed/health/advisors ve pristine schema baseline adımlarını henüz devralmaz. API gövde eşdeğerliği bütün eski core+API kabulünün tamamlandığı anlamına gelmez. Dar observer JSONL tanıları JUnit ile birlikte saklanır; `.dev` veya servis/fixture logları alınmaz.
+
+Güncel job/step başarıları, süre/bellek, eksik core yükümlülükleri ve kontrollü hata yakalama kanıtı görülmeden üretim devri yapılmaz. Uzun sıralı kökler bağımsız fixture'lı anlamlı senaryolara dönüştürülecek; yarış/atomiklik/rollback sınırları ve bütün assertion'lar korunacaktır. Bu workflow varsayılan dala kurulmadan gerçek GitHub koşusu yapılmış kabul edilmez.
 
 ## Güvenilir politika ve dağıtım
 

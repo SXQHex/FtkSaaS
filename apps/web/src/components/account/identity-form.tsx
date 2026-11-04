@@ -111,7 +111,7 @@ export function IdentityForm({ account, onSaved }: { account: AccountView; onSav
                           email: value,
                           options: { emailRedirectTo: `${appOrigin()}/auth/callback` },
                         })
-                      : await browserClient().auth.resend({ type: "phone_change", phone: value });
+                      : await browserClient().auth.updateUser({ phone: value });
                   if (result.error) throw result.error;
                 }, "verificationRequested")
               }

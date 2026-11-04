@@ -35,3 +35,11 @@ export async function verifyPublicBot(token:string,ip:string,env:PublicEnv,fetch
   return proof.success===true&&proof.hostname===hostname&&proof.action===action;
  }catch{return false;}
 }
+
+// The normalized application phone is contact evidence, never Auth verification.
+export function crmIntakePhone(value:unknown):string{
+ if(typeof value!=='string')throw Error('VALIDATION_FAILED');
+ const phone=value.trim().replace(/[\s().-]/g,'').replace(/^00/,'+');
+ if(!/^\+[1-9][0-9]{6,14}$/.test(phone))throw Error('VALIDATION_FAILED');
+ return phone;
+}

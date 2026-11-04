@@ -136,3 +136,7 @@ import './p07-lifecycle-acceptance.mjs';
 import './starter-plan-gates-acceptance.mjs';
 
 import './starter-studio-acceptance.mjs';
+
+import './document-self-requirements-acceptance.mjs';
+import './crm-application-intake-acceptance.mjs';
+import './crm-application-review-acceptance.mjs';

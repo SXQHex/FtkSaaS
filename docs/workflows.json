@@ -18,7 +18,9 @@
         "apps/backend/tests/ci-api-suites.test.mjs",
         "apps/backend/tests/v2/safety.test.mjs",
         "apps/backend/tests/v2/scope.test.mjs",
-        "apps/backend/tests/v2/plan.test.mjs"
+        "apps/backend/tests/v2/plan.test.mjs",
+        "apps/backend/tests/v2/backend.test.mjs",
+        "apps/backend/tests/v2/backend/api-acceptance-root-1.test.mjs"
       ],
       "sources": [
         "apps/backend/database/canonical-settings-scope.sql",
@@ -276,7 +278,11 @@
         "apps/backend/scripts/ci/v2/local.mjs",
         "apps/backend/scripts/ci/v2/safety.mjs",
         "apps/backend/scripts/ci/v2/scope.mjs",
-        "apps/backend/scripts/ci/v2/plan.mjs"
+        "apps/backend/scripts/ci/v2/plan.mjs",
+        "apps/backend/scripts/ci/v2/backend.mjs",
+        "apps/backend/scripts/ci/v2/migration.mjs",
+        "apps/backend/scripts/ci/v2/settings.mjs",
+        "apps/backend/tests/v2/backend-suites.json"
       ],
       "operations": [
         "operation_status_get_v1",
@@ -286,8 +292,8 @@
         "management_state_get_v1"
       ],
       "review": {
-        "fingerprint": "d36646ed70c419ccedfd87e026e8db28df568438ccbf56781ee64fc6d4a307ea",
-        "reason": "Reviewed production API inventory hash for extended identity tests and local-only second phone fixture; no timeout, assertion, provider signup, hosted config or CI gate relaxed."
+        "fingerprint": "e38787143fda6a33318abf2dd22958474cacd48eb08db4fb11af878478de325c",
+        "reason": "Main PR185 V2 kaynak/test bağları ile PR182 CRM/self bağları birlikte incelendi;67 gerçek birim parity kontrolünde aynı gövdeleri korur, üretim kabul kapıları değişmez."
       }
     },
     {
@@ -364,7 +370,7 @@
       ],
       "review": {
         "fingerprint": "fe45d4085da08370f663b2d0b0ac058e44561e0cfc0e82bb21bf9b8b9ba04471",
-        "reason": "Reviewed native phone-change consumer against pinned Auth v2.197.0: repeat authenticated updateUser for pending phone and require sent-at advance. Verified projection/history tests and XREQ-017 frontend boundary; fixed OTPs do not prove delivery, expiry or rotation."
+        "reason": "Main native telefon/XREQ-017 kaynağı korunarak senkronizasyon; CRM fixture UUID bind tip çakışması gerçek PG red/green kontrolüyle düzeltildi. Runtime/assertion/deadline değişmedi."
       }
     },
     {
@@ -382,7 +388,13 @@
         "apps/backend/tests/availability-policies.test.mjs",
         "apps/backend/tests/starter-instructor-acceptance.mjs",
         "apps/backend/tests/event-capacity-package-acceptance.mjs",
-        "apps/backend/tests/v2/room.test.mjs"
+        "apps/backend/tests/v2/room.test.mjs",
+        "apps/backend/tests/v2/backend/api-acceptance-root-1.test.mjs",
+        "apps/backend/tests/v2/backend/availability-policies-root-1.test.mjs",
+        "apps/backend/tests/v2/backend/registry-root-1.test.mjs",
+        "apps/backend/tests/v2/backend/starter-plan-resources.test.mjs",
+        "apps/backend/tests/v2/backend/starter-plan-downgrade.test.mjs",
+        "apps/backend/tests/v2/backend/room-role-registry-root-1.test.mjs"
       ],
       "sources": [
         "apps/backend/database/account-session-management.sql",
@@ -464,8 +476,8 @@
         "role_revoke_preview_v1"
       ],
       "review": {
-        "fingerprint": "d62875375723855948e3a71f19553aa6b6cca0723bcacbaa1220017d63948646",
-        "reason": "Merged current main room/runtime evidence while retaining direct V2 diagnostic tests; reviewed live selector and optimistic version behavior."
+        "fingerprint": "644f6d5ea0d6d0b78b652be5427fd4c35e269c4b2ff041d04abbc564f468a0d0",
+        "reason": "Main PR185 V2 kaynak/test bağları ile PR182 CRM/self bağları birlikte incelendi;67 gerçek birim parity kontrolünde aynı gövdeleri korur, üretim kabul kapıları değişmez."
       }
     },
     {
@@ -481,7 +493,17 @@
         "apps/backend/tests/starter-plan-gates-acceptance.mjs",
         "apps/backend/tests/starter-attendance-protection.test.mjs",
         "apps/backend/tests/program-configuration-acceptance.mjs",
-        "apps/backend/tests/class-duty-management-acceptance.mjs"
+        "apps/backend/tests/class-duty-management-acceptance.mjs",
+        "apps/backend/tests/v2/backend/availability-policies-root-1.test.mjs",
+        "apps/backend/tests/v2/backend/program-session-lifecycle-root-1.test.mjs",
+        "apps/backend/tests/v2/backend/program-session-lifecycle-root-2.test.mjs",
+        "apps/backend/tests/v2/backend/starter-plan-resources.test.mjs",
+        "apps/backend/tests/v2/backend/starter-plan-downgrade.test.mjs",
+        "apps/backend/tests/v2/backend/schedule-reads-root-1.test.mjs",
+        "apps/backend/tests/v2/backend/starter-attendance-revisions.test.mjs",
+        "apps/backend/tests/v2/backend/starter-attendance-authority.test.mjs",
+        "apps/backend/tests/v2/backend/starter-attendance-ledger.test.mjs",
+        "apps/backend/tests/v2/backend/starter-attendance-policy.test.mjs"
       ],
       "sources": [
         "apps/backend/database/active-discipline-projection-wrappers.sql",
@@ -560,8 +582,8 @@
         "class_assignment_set_v1"
       ],
       "review": {
-        "fingerprint": "5a7e4cc73b760b68525911e8ff5c48c5aba08d374e8ac5565cc36c09e43c0887",
-        "reason": "P05 CI fixture incelemesi: zorunlu sayfalama, temel CRM olumlu ve ileri takip olumsuz kabulü; runtime ve güvenlik sınırları değişmedi."
+        "fingerprint": "38fb0d7bdf806c4507617a46f3da12724b86c23e37ecad917e7392bcdaf8244c",
+        "reason": "Direct V2 shadow migration: byte-equivalence and module/resource relocation checks preserve the owning legacy test bodies; runtime and guide behavior unchanged. Twenty-runner execution remains diagnostic only."
       }
     },
     {
@@ -578,7 +600,12 @@
         "apps/backend/tests/registry.test.mjs",
         "apps/backend/tests/subscriber-number-acceptance.mjs",
         "apps/backend/tests/starter-operations-acceptance.mjs",
-        "apps/backend/tests/commercial-plan-acceptance.mjs"
+        "apps/backend/tests/commercial-plan-acceptance.mjs",
+        "apps/backend/tests/v2/backend/person-registry-root-1.test.mjs",
+        "apps/backend/tests/v2/backend/person-registry-root-2.test.mjs",
+        "apps/backend/tests/v2/backend/registry-root-1.test.mjs",
+        "apps/backend/tests/v2/backend/starter-operations-acceptance.test.mjs",
+        "apps/backend/tests/v2/backend/starter-operations-reports.test.mjs"
       ],
       "sources": [
         "apps/backend/database/active-discipline-projection-wrappers.sql",
@@ -647,8 +674,8 @@
         "person_discipline_set_v1"
       ],
       "review": {
-        "fingerprint": "50cb7f7bbdee63291dfdf14a33fb1a6333cebaa6de4f6b6799117dc619e33c9c",
-        "reason": "P05 CI fixture incelemesi: zorunlu sayfalama, temel CRM olumlu ve ileri takip olumsuz kabulü; runtime ve güvenlik sınırları değişmedi."
+        "fingerprint": "798e4d7919641c7d8612502bf6789593fc96acd0a7dc5b6ae1ed545bc2ffa978",
+        "reason": "Main PR185 V2 kaynak/test bağları ile PR182 CRM/self bağları birlikte incelendi;67 gerçek birim parity kontrolünde aynı gövdeleri korur, üretim kabul kapıları değişmez."
       }
     },
     {
@@ -664,7 +691,15 @@
         "apps/backend/tests/starter-attendance-protection.test.mjs",
         "apps/backend/tests/event-payment.test.mjs",
         "apps/backend/tests/pro-lifecycle-earnings-acceptance.mjs",
-        "apps/backend/tests/event-capacity-package-acceptance.mjs"
+        "apps/backend/tests/event-capacity-package-acceptance.mjs",
+        "apps/backend/tests/v2/backend/event-payment-root-1.test.mjs",
+        "apps/backend/tests/v2/backend/event-payment-root-2.test.mjs",
+        "apps/backend/tests/v2/backend/program-session-lifecycle-root-1.test.mjs",
+        "apps/backend/tests/v2/backend/program-session-lifecycle-root-2.test.mjs",
+        "apps/backend/tests/v2/backend/starter-attendance-revisions.test.mjs",
+        "apps/backend/tests/v2/backend/starter-attendance-authority.test.mjs",
+        "apps/backend/tests/v2/backend/starter-attendance-ledger.test.mjs",
+        "apps/backend/tests/v2/backend/starter-attendance-policy.test.mjs"
       ],
       "sources": [
         "apps/backend/database/active-discipline-projection-wrappers.sql",
@@ -741,8 +776,8 @@
         "negative_limits_get_v1"
       ],
       "review": {
-        "fingerprint": "77e5e6c31f693bb7e8f6f529074a3b981c4d9c6339b97b3df38899c88494a41a",
-        "reason": "P05 Starter basic CRM reviewed: existing person/lead/activity registry, exact request/source admission before replay; F23 retained for person-only followup. Native Starter/Pro/Business scope/version/replay tests and migration102 source equality included; other WF behavior unchanged."
+        "fingerprint": "1dec80f8ba8fd453fa5f5a052db43cfe8684eb2dd838784297f7e37f043fa80e",
+        "reason": "Main PR185 V2 kaynak/test bağları ile PR182 CRM/self bağları birlikte incelendi;67 gerçek birim parity kontrolünde aynı gövdeleri korur, üretim kabul kapıları değişmez."
       }
     },
     {
@@ -759,7 +794,14 @@
         "apps/backend/tests/starter-attendance-protection.test.mjs",
         "apps/backend/tests/starter-document-acceptance.mjs",
         "apps/backend/tests/pro-lifecycle-earnings-acceptance.mjs",
-        "apps/backend/tests/event-capacity-package-acceptance.mjs"
+        "apps/backend/tests/event-capacity-package-acceptance.mjs",
+        "apps/backend/tests/v2/backend/api-acceptance-root-1.test.mjs",
+        "apps/backend/tests/v2/backend/program-session-lifecycle-root-1.test.mjs",
+        "apps/backend/tests/v2/backend/program-session-lifecycle-root-2.test.mjs",
+        "apps/backend/tests/v2/backend/starter-attendance-revisions.test.mjs",
+        "apps/backend/tests/v2/backend/starter-attendance-authority.test.mjs",
+        "apps/backend/tests/v2/backend/starter-attendance-ledger.test.mjs",
+        "apps/backend/tests/v2/backend/starter-attendance-policy.test.mjs"
       ],
       "sources": [
         "apps/backend/database/active-discipline-projection-wrappers.sql",
@@ -819,8 +861,8 @@
         "reservation_capacity_override_v1"
       ],
       "review": {
-        "fingerprint": "82e4095ebd5fcfbe85b143e16f9bdc1a89d1be23f735f3e0bc4434106d5f8b4a",
-        "reason": "P05 Starter basic CRM reviewed: existing person/lead/activity registry, exact request/source admission before replay; F23 retained for person-only followup. Native Starter/Pro/Business scope/version/replay tests and migration102 source equality included; other WF behavior unchanged."
+        "fingerprint": "85c54a5c70fb7ce4abea7e931f01f1fe1ebe776c3f991f261ef8ebc56175fde5",
+        "reason": "Direct V2 shadow migration: byte-equivalence and module/resource relocation checks preserve the owning legacy test bodies; runtime and guide behavior unchanged. Twenty-runner execution remains diagnostic only."
       }
     },
     {
@@ -833,7 +875,12 @@
         "apps/backend/tests/starter-attendance-protection.test.mjs",
         "apps/backend/tests/instructor-earnings.test.mjs",
         "apps/backend/tests/pro-lifecycle-earnings-acceptance.mjs",
-        "apps/backend/tests/event-capacity-package-acceptance.mjs"
+        "apps/backend/tests/event-capacity-package-acceptance.mjs",
+        "apps/backend/tests/v2/backend/instructor-earnings-root-1.test.mjs",
+        "apps/backend/tests/v2/backend/starter-attendance-revisions.test.mjs",
+        "apps/backend/tests/v2/backend/starter-attendance-authority.test.mjs",
+        "apps/backend/tests/v2/backend/starter-attendance-ledger.test.mjs",
+        "apps/backend/tests/v2/backend/starter-attendance-policy.test.mjs"
       ],
       "sources": [
         "apps/backend/database/active-discipline-projection-wrappers.sql",
@@ -882,8 +929,8 @@
         "attendance_start_v1"
       ],
       "review": {
-        "fingerprint": "8c914e939552f89ca0e5ac09cdc4de4b7b268c3f8e8043928eb3f47e999b93a8",
-        "reason": "P05 Starter basic CRM reviewed: existing person/lead/activity registry, exact request/source admission before replay; F23 retained for person-only followup. Native Starter/Pro/Business scope/version/replay tests and migration102 source equality included; other WF behavior unchanged."
+        "fingerprint": "65e075dce81a33d05dd92056a6e3980a62be81744b00fbbfe41ba9dcd372d366",
+        "reason": "Direct V2 shadow migration: byte-equivalence and module/resource relocation checks preserve the owning legacy test bodies; runtime and guide behavior unchanged. Twenty-runner execution remains diagnostic only."
       }
     },
     {
@@ -897,7 +944,16 @@
         "apps/backend/tests/starter-operations-acceptance.mjs",
         "apps/backend/tests/event-payment.test.mjs",
         "apps/backend/tests/starter-attendance-protection.test.mjs",
-        "apps/backend/tests/pro-lifecycle-earnings-acceptance.mjs"
+        "apps/backend/tests/pro-lifecycle-earnings-acceptance.mjs",
+        "apps/backend/tests/v2/backend/api-acceptance-root-1.test.mjs",
+        "apps/backend/tests/v2/backend/event-payment-root-1.test.mjs",
+        "apps/backend/tests/v2/backend/event-payment-root-2.test.mjs",
+        "apps/backend/tests/v2/backend/starter-operations-acceptance.test.mjs",
+        "apps/backend/tests/v2/backend/starter-operations-reports.test.mjs",
+        "apps/backend/tests/v2/backend/starter-attendance-revisions.test.mjs",
+        "apps/backend/tests/v2/backend/starter-attendance-authority.test.mjs",
+        "apps/backend/tests/v2/backend/starter-attendance-ledger.test.mjs",
+        "apps/backend/tests/v2/backend/starter-attendance-policy.test.mjs"
       ],
       "sources": [
         "apps/backend/database/active-discipline-projection-wrappers.sql",
@@ -942,8 +998,8 @@
         "debt_adjust_v1"
       ],
       "review": {
-        "fingerprint": "ef3125e2959df20dac2f31a51b84fcc682294251dcb38119f890bca8345d5ef4",
-        "reason": "Final P05 native roots reviewed in existing CRM unit: generated request preflight, explicit linked unauthorized actor, real foreign tenant center, note/followup and lead edits, replay/version/plan boundaries. All original tests and64-unit coverage preserved; other workflow behavior unchanged."
+        "fingerprint": "a1529207cbb01c12e091caa2b0d2d277eac4babc3d76510f0abe0fea5898c8f7",
+        "reason": "Direct V2 shadow migration: byte-equivalence and module/resource relocation checks preserve the owning legacy test bodies; runtime and guide behavior unchanged. Twenty-runner execution remains diagnostic only."
       }
     },
     {
@@ -956,7 +1012,12 @@
         "apps/backend/tests/personal-calendar-acceptance.mjs",
         "apps/backend/tests/calendar-feed-unit.mjs",
         "apps/backend/tests/person-registry.test.mjs",
-        "apps/backend/tests/starter-studio-acceptance.mjs"
+        "apps/backend/tests/starter-studio-acceptance.mjs",
+        "apps/backend/tests/crm-application-intake-acceptance.mjs",
+        "apps/backend/tests/crm-application-contract-unit.mjs",
+        "apps/backend/tests/crm-ingress-unit.mjs",
+        "apps/backend/tests/v2/backend/person-registry-root-1.test.mjs",
+        "apps/backend/tests/v2/backend/person-registry-root-2.test.mjs"
       ],
       "sources": [
         "apps/backend/api/public-application.js",
@@ -971,7 +1032,10 @@
         "apps/backend/scripts/p04-public-ingress.mjs",
         "apps/backend/scripts/p04-trial-config.mjs",
         "apps/backend/scripts/public-application-gateway.mjs",
-        "apps/backend/transports/calendar-proxy.mjs"
+        "apps/backend/transports/calendar-proxy.mjs",
+        "apps/backend/database/crm-application-intake.sql",
+        "apps/backend/supabase/migrations/20261104131917_crm_application_intake.sql",
+        "apps/backend/scripts/crm-intake-form-config.mjs"
       ],
       "operations": [
         "publication_set_v1",
@@ -985,8 +1049,8 @@
         "calendar_feed_get_v1"
       ],
       "review": {
-        "fingerprint": "ce24359a7491a4a14ba34fa50991fd0c0e3484aeb262cf7fbeb5143fce40403c",
-        "reason": "P05 CI fixture incelemesi: zorunlu sayfalama, temel CRM olumlu ve ileri takip olumsuz kabulü; runtime ve güvenlik sınırları değişmedi."
+        "fingerprint": "613f4f8dd6ec47fd141f2c3ec7a3364e7b7de592f58b6afb7ac0964768241b6b",
+        "reason": "Main PR185 V2 kaynak/test bağları ile PR182 CRM/self bağları birlikte incelendi;67 gerçek birim parity kontrolünde aynı gövdeleri korur, üretim kabul kapıları değişmez."
       }
     },
     {
@@ -999,7 +1063,9 @@
         "apps/backend/tests/p06-acceptance.mjs",
         "apps/backend/tests/p06-parser.mjs",
         "apps/backend/tests/starter-operations-acceptance.mjs",
-        "apps/backend/tests/subscriber-number-acceptance.mjs"
+        "apps/backend/tests/subscriber-number-acceptance.mjs",
+        "apps/backend/tests/v2/backend/starter-operations-acceptance.test.mjs",
+        "apps/backend/tests/v2/backend/starter-operations-reports.test.mjs"
       ],
       "sources": [
         "apps/backend/database/p05-bind.sql",
@@ -1031,8 +1097,8 @@
         "file_upload_complete_v1"
       ],
       "review": {
-        "fingerprint": "5e90c67a27c2f96a0953df122ca4ad95cf30e5ee0ae348d4ba7c9021a22efab2",
-        "reason": "P05 Starter basic CRM reviewed: existing person/lead/activity registry, exact request/source admission before replay; F23 retained for person-only followup. Native Starter/Pro/Business scope/version/replay tests and migration102 source equality included; other WF behavior unchanged."
+        "fingerprint": "27f7c327a21554c5c9d0871aee7436245cefb0f097248767dc96b33fba8317a4",
+        "reason": "Direct V2 shadow migration: byte-equivalence and module/resource relocation checks preserve the owning legacy test bodies; runtime and guide behavior unchanged. Twenty-runner execution remains diagnostic only."
       }
     },
     {
@@ -1044,7 +1110,11 @@
       "tests": [
         "apps/backend/tests/p05-acceptance.mjs",
         "apps/backend/tests/starter-operations-acceptance.mjs",
-        "apps/backend/tests/starter-document-acceptance.mjs"
+        "apps/backend/tests/starter-document-acceptance.mjs",
+        "apps/backend/tests/document-self-requirements-acceptance.mjs",
+        "apps/backend/tests/document-self-contract-unit.mjs",
+        "apps/backend/tests/v2/backend/starter-operations-acceptance.test.mjs",
+        "apps/backend/tests/v2/backend/starter-operations-reports.test.mjs"
       ],
       "sources": [
         "apps/backend/database/p05-bind.sql",
@@ -1054,7 +1124,9 @@
         "apps/backend/database/p05-wrappers.sql",
         "apps/backend/database/p06-bind.sql",
         "apps/backend/database/runtime-wrappers-current.sql",
-        "docs/workflows.md"
+        "docs/workflows.md",
+        "apps/backend/database/document-self-requirements.sql",
+        "apps/backend/supabase/migrations/20261104131914_document_self_requirements.sql"
       ],
       "operations": [
         "notifications_list_v1",
@@ -1066,8 +1138,8 @@
         "document_publication_preview_v1"
       ],
       "review": {
-        "fingerprint": "24eb06b2db80cc71d17d88fcf527ba7a6cf5e39bf5a03c4c796bcdb09f1b7b4a",
-        "reason": "P05 Starter basic CRM reviewed: existing person/lead/activity registry, exact request/source admission before replay; F23 retained for person-only followup. Native Starter/Pro/Business scope/version/replay tests and migration102 source equality included; other WF behavior unchanged."
+        "fingerprint": "24e7d3763c462a56fec5273f32cb1fa9e0f7b29317047e9fe421718c64d0b142",
+        "reason": "Main PR185 V2 kaynak/test bağları ile PR182 CRM/self bağları birlikte incelendi;67 gerçek birim parity kontrolünde aynı gövdeleri korur, üretim kabul kapıları değişmez."
       }
     },
     {
@@ -1080,7 +1152,13 @@
         "apps/backend/tests/frontend-settings-acceptance.mjs",
         "apps/backend/tests/starter-preparation-acceptance.mjs",
         "apps/backend/tests/starter-operations-acceptance.mjs",
-        "apps/backend/tests/starter-preparation-fixture.mjs"
+        "apps/backend/tests/starter-preparation-fixture.mjs",
+        "apps/backend/tests/v2/backend/settings-user-history.test.mjs",
+        "apps/backend/tests/v2/backend/settings-tenant-authority.test.mjs",
+        "apps/backend/tests/v2/backend/settings-startup-context.test.mjs",
+        "apps/backend/tests/v2/backend/settings-brand-colors.test.mjs",
+        "apps/backend/tests/v2/backend/starter-operations-acceptance.test.mjs",
+        "apps/backend/tests/v2/backend/starter-operations-reports.test.mjs"
       ],
       "sources": [
         "apps/backend/config/frontend-settings.json",
@@ -1118,8 +1196,8 @@
         "settings_preparation_resolve_v1"
       ],
       "review": {
-        "fingerprint": "c2a9468ae0476f752015eb6849e72e23016cc5e4c9cd52d9bb895fbeff185bb7",
-        "reason": "P05 Starter basic CRM reviewed: existing person/lead/activity registry, exact request/source admission before replay; F23 retained for person-only followup. Native Starter/Pro/Business scope/version/replay tests and migration102 source equality included; other WF behavior unchanged."
+        "fingerprint": "de8465cf52a9a782a050bc667556d9ed1e394a129f552fcd97b9f21693061491",
+        "reason": "Direct V2 shadow migration: byte-equivalence and module/resource relocation checks preserve the owning legacy test bodies; runtime and guide behavior unchanged. Twenty-runner execution remains diagnostic only."
       }
     },
     {
@@ -1134,7 +1212,9 @@
         "apps/backend/tests/fixtures/p07-subscription-lifecycle.sql",
         "apps/backend/tests/p07-lifecycle-acceptance.mjs",
         "apps/backend/tests/subscription-period-acceptance.mjs",
-        "apps/backend/tests/commercial-plan-acceptance.mjs"
+        "apps/backend/tests/commercial-plan-acceptance.mjs",
+        "apps/backend/tests/v2/backend/starter-plan-resources.test.mjs",
+        "apps/backend/tests/v2/backend/starter-plan-downgrade.test.mjs"
       ],
       "sources": [
         "apps/backend/database/active-discipline-projection-wrappers.sql",
@@ -1187,8 +1267,8 @@
         "subscription_period_change_request_v1"
       ],
       "review": {
-        "fingerprint": "ff255ef011cc946e938da4b28fdfc483dd3d6b39f0effa9f99d11a5d7795c96e",
-        "reason": "P05 CI fixture incelemesi: zorunlu sayfalama, temel CRM olumlu ve ileri takip olumsuz kabulü; runtime ve güvenlik sınırları değişmedi."
+        "fingerprint": "4c933c3701e1888d13a33b602ab44c119d6373fe2af3bc8a226d525369df25f4",
+        "reason": "Direct V2 shadow migration: byte-equivalence and module/resource relocation checks preserve the owning legacy test bodies; runtime and guide behavior unchanged. Twenty-runner execution remains diagnostic only."
       }
     },
     {
@@ -1202,7 +1282,10 @@
         "apps/backend/tests/event-payment.test.mjs",
         "apps/backend/tests/program-configuration-acceptance.mjs",
         "apps/backend/tests/earning-payment-selection-acceptance.mjs",
-        "apps/backend/tests/pro-lifecycle-earnings-acceptance.mjs"
+        "apps/backend/tests/pro-lifecycle-earnings-acceptance.mjs",
+        "apps/backend/tests/v2/backend/event-payment-root-1.test.mjs",
+        "apps/backend/tests/v2/backend/event-payment-root-2.test.mjs",
+        "apps/backend/tests/v2/backend/instructor-earnings-root-1.test.mjs"
       ],
       "sources": [
         "apps/backend/database/cross-center-settlement-wrappers.sql",
@@ -1227,8 +1310,8 @@
         "instructor_agreements_list_v1"
       ],
       "review": {
-        "fingerprint": "e82966d12bfa799db402a4ffb5412acc620a7f64b50926e8859db03f1ac21dff",
-        "reason": "P05 Starter basic CRM reviewed: existing person/lead/activity registry, exact request/source admission before replay; F23 retained for person-only followup. Native Starter/Pro/Business scope/version/replay tests and migration102 source equality included; other WF behavior unchanged."
+        "fingerprint": "e1068c5e8b4efe522f0e33f8d5f02e462ea5a15b95c61efc9636697beb458bb4",
+        "reason": "Direct V2 shadow migration: byte-equivalence and module/resource relocation checks preserve the owning legacy test bodies; runtime and guide behavior unchanged. Twenty-runner execution remains diagnostic only."
       }
     },
     {
@@ -1241,7 +1324,15 @@
         "apps/backend/tests/event-payment.test.mjs",
         "apps/backend/tests/event-cancellation.test.mjs",
         "apps/backend/tests/api-acceptance.test.mjs",
-        "apps/backend/tests/event-capacity-package-acceptance.mjs"
+        "apps/backend/tests/event-capacity-package-acceptance.mjs",
+        "apps/backend/tests/v2/backend/api-acceptance-root-1.test.mjs",
+        "apps/backend/tests/v2/backend/event-cancellation-monetary.test.mjs",
+        "apps/backend/tests/v2/backend/event-cancellation-package.test.mjs",
+        "apps/backend/tests/v2/backend/event-cancellation-planned-time.test.mjs",
+        "apps/backend/tests/v2/backend/event-cancellation-actual-start.test.mjs",
+        "apps/backend/tests/v2/backend/event-cancellation-settlement-races.test.mjs",
+        "apps/backend/tests/v2/backend/event-payment-root-1.test.mjs",
+        "apps/backend/tests/v2/backend/event-payment-root-2.test.mjs"
       ],
       "sources": [
         "apps/backend/database/active-discipline-projection-wrappers.sql",
@@ -1297,8 +1388,8 @@
         "event_actual_start_correct_v1"
       ],
       "review": {
-        "fingerprint": "90fd1a79e476190139db0f13ce5dbfc8c1e81ee87f9470426706d23fff2eff53",
-        "reason": "P05 Starter basic CRM reviewed: existing person/lead/activity registry, exact request/source admission before replay; F23 retained for person-only followup. Native Starter/Pro/Business scope/version/replay tests and migration102 source equality included; other WF behavior unchanged."
+        "fingerprint": "7b3d54c3da3f6b6bfdac1fd119bb0540ec38f06277183ce4f08d9e8816f791d6",
+        "reason": "Direct V2 shadow migration: byte-equivalence and module/resource relocation checks preserve the owning legacy test bodies; runtime and guide behavior unchanged. Twenty-runner execution remains diagnostic only."
       }
     },
     {
@@ -1309,7 +1400,10 @@
       "detail": "docs/workflows.md",
       "tests": [
         "apps/backend/tests/p05-acceptance.mjs",
-        "apps/backend/tests/person-registry.test.mjs"
+        "apps/backend/tests/person-registry.test.mjs",
+        "apps/backend/tests/crm-application-review-acceptance.mjs",
+        "apps/backend/tests/v2/backend/person-registry-root-1.test.mjs",
+        "apps/backend/tests/v2/backend/person-registry-root-2.test.mjs"
       ],
       "sources": [
         "apps/backend/database/p04-crm-public-wrappers.sql",
@@ -1323,7 +1417,9 @@
         "apps/backend/database/session-capacity.sql",
         "docs/workflows.md",
         "apps/backend/database/starter-basic-crm.sql",
-        "apps/backend/supabase/migrations/20261104111220_starter_basic_crm.sql"
+        "apps/backend/supabase/migrations/20261104111220_starter_basic_crm.sql",
+        "apps/backend/database/crm-application-intake.sql",
+        "apps/backend/supabase/migrations/20261104131917_crm_application_intake.sql"
       ],
       "operations": [
         "leads_list_v1",
@@ -1337,8 +1433,8 @@
         "automation_save_v1"
       ],
       "review": {
-        "fingerprint": "3d8b16d38ab05ac160187bd5a47b185046aabe029f9b4b69e85d91e73b7c5c9c",
-        "reason": "P05 CI fixture incelemesi: zorunlu sayfalama, temel CRM olumlu ve ileri takip olumsuz kabulü; runtime ve güvenlik sınırları değişmedi."
+        "fingerprint": "f6d912f9cac15a553852ffd8c6629f26d94cdb36627bae2e3a9e236b031e9966",
+        "reason": "Main PR185 V2 kaynak/test bağları ile PR182 CRM/self bağları birlikte incelendi;67 gerçek birim parity kontrolünde aynı gövdeleri korur, üretim kabul kapıları değişmez."
       }
     },
     {
@@ -1352,7 +1448,8 @@
         "apps/backend/tests/p07-account-revocation-acceptance.mjs",
         "apps/backend/tests/restore-guard.test.mjs",
         "apps/backend/tests/api-acceptance.test.mjs",
-        "apps/backend/tests/fixtures/p07-subscription-lifecycle.sql"
+        "apps/backend/tests/fixtures/p07-subscription-lifecycle.sql",
+        "apps/backend/tests/v2/backend/api-acceptance-root-1.test.mjs"
       ],
       "sources": [
         "apps/backend/database/account-session-management.sql",
@@ -1409,8 +1506,8 @@
         "platform_owner_remove_v1"
       ],
       "review": {
-        "fingerprint": "ded05ca85acf99ef0a8a5036d86c98d8c51aa67aed530d78c0bf4531420be3d8",
-        "reason": "Final P05 native roots reviewed in existing CRM unit: generated request preflight, explicit linked unauthorized actor, real foreign tenant center, note/followup and lead edits, replay/version/plan boundaries. All original tests and64-unit coverage preserved; other workflow behavior unchanged."
+        "fingerprint": "b52b7077168991427224c5c5818559c249505e470cd4d931066dacbd716a3e8a",
+        "reason": "Direct V2 shadow migration: byte-equivalence and module/resource relocation checks preserve the owning legacy test bodies; runtime and guide behavior unchanged. Twenty-runner execution remains diagnostic only."
       }
     },
     {
@@ -1420,7 +1517,11 @@
       "guide": "docs/workflows.md#wf18",
       "detail": "docs/workflows.md",
       "tests": [
-        "apps/backend/tests/cross-center-settlement.test.mjs"
+        "apps/backend/tests/cross-center-settlement.test.mjs",
+        "apps/backend/tests/v2/backend/cross-center-payments.test.mjs",
+        "apps/backend/tests/v2/backend/cross-center-provenance.test.mjs",
+        "apps/backend/tests/v2/backend/cross-center-authority.test.mjs",
+        "apps/backend/tests/v2/backend/cross-center-atomic.test.mjs"
       ],
       "sources": [
         "apps/backend/database/cross-center-settlement-wrappers.sql",
@@ -1440,8 +1541,8 @@
         "settlement_authority_set_v1"
       ],
       "review": {
-        "fingerprint": "9ddd0fc779ba4a9179264c1165890324f5a7604b7d4fe145ad1c6d28a30df295",
-        "reason": "P05 Starter basic CRM reviewed: existing person/lead/activity registry, exact request/source admission before replay; F23 retained for person-only followup. Native Starter/Pro/Business scope/version/replay tests and migration102 source equality included; other WF behavior unchanged."
+        "fingerprint": "21e389cb6ad9fa54febf2d6174abd7e47cef49861cfb3493a63441ed7730d829",
+        "reason": "Direct V2 shadow migration: byte-equivalence and module/resource relocation checks preserve the owning legacy test bodies; runtime and guide behavior unchanged. Twenty-runner execution remains diagnostic only."
       }
     },
     {
@@ -1487,7 +1588,9 @@
         "apps/backend/tests/p05-acceptance.mjs",
         "apps/backend/tests/p06-acceptance.mjs",
         "apps/backend/tests/p07-lifecycle-acceptance.mjs",
-        "apps/backend/tests/starter-plan-gates-acceptance.mjs"
+        "apps/backend/tests/starter-plan-gates-acceptance.mjs",
+        "apps/backend/tests/v2/backend/starter-plan-resources.test.mjs",
+        "apps/backend/tests/v2/backend/starter-plan-downgrade.test.mjs"
       ],
       "sources": [
         "apps/backend/database/invitation-delivery.sql",
@@ -1536,8 +1639,8 @@
         "subscription_boundary_apply_v1"
       ],
       "review": {
-        "fingerprint": "d9eb2eed47cdd30cb3a68f91832a6360d853d670ce37cff423e06e0231b0d913",
-        "reason": "P05 CI fixture incelemesi: zorunlu sayfalama, temel CRM olumlu ve ileri takip olumsuz kabulü; runtime ve güvenlik sınırları değişmedi."
+        "fingerprint": "c5f8243e44acbd3506421e5541d521d389bf468579774daffbd12799613e3ac7",
+        "reason": "Direct V2 shadow migration: byte-equivalence and module/resource relocation checks preserve the owning legacy test bodies; runtime and guide behavior unchanged. Twenty-runner execution remains diagnostic only."
       }
     }
   ]
