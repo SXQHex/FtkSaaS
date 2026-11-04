@@ -237,7 +237,8 @@
       "reports": "Raporlar",
       "studio": "Stüdyo",
       "settings": "Ayarlar",
-      "inbox": "Bildirimler"
+      "inbox": "Bildirimler",
+      "documents": "Belgeler"
     },
     "groups": {
       "0": "Günlük akış",
@@ -297,7 +298,8 @@
       "reports": "Stüdyonun dönemsel özeti.",
       "studio": "Hesabının erişebildiği stüdyolar ve merkezler.",
       "settings": "Dil, görünüm ve hesap tercihlerin.",
-      "inbox": "Hesabına gelen güncellemeler."
+      "inbox": "Hesabına gelen güncellemeler.",
+      "documents": "Özel belge dosyalarını yükleyin, sürümleri ve yayın etkilerini yönetin."
     }
   },
   "calendar": {
@@ -1257,5 +1259,69 @@
       "seat_offer": "Kontenjan teklifi",
       "p01_expired": "İşlem süresi doldu"
     }
+  },
+  "documents": {
+    "uploadTitle": "Belge dosyası yükle",
+    "uploadHint": "Yalnız PDF veya UTF-8 düz metin, en çok 2 MiB. Dosya özel alanda saklanır; yüklemek belgeyi yayımlamaz.",
+    "nextVersion": "Mevcut belgenin yeni sürümü için dosya yüklüyorsunuz.",
+    "file": "Belge dosyası",
+    "uploadReady": "{name} doğrulandı; yayın ayarlarını açabilirsiniz.",
+    "openPublication": "Yayın bilgilerini aç",
+    "newUpload": "Başka dosya yükle",
+    "resumeHint": "Bekleyen yükleme: {name}. Gerekirse aynı dosyayı yeniden seçerek sürdürün.",
+    "blockedUpload": "İşlem makbuzu artık güvenle yinelenemiyor. Yeni anahtar üretmeden kayıt durumunu yetkili incelemeyle doğrulayın.",
+    "uploading": "Yükleniyor…",
+    "resumeUpload": "Aynı yüklemeyi sürdür",
+    "startUpload": "Dosyayı yükle ve doğrula",
+    "storageFailed": "Yükleme takibi okunamadı veya kaydedilemedi. Yeni işlem gönderilmedi; bu sekmedeki kaydı inceleyin.",
+    "invalidFile": "PDF veya UTF-8 düz metin dosyası seçin. Dosya boş olmamalı ve 2 MiB sınırını aşmamalı.",
+    "sameFileRequired": "İlk yüklemedeki aynı ad, tür, boyut ve içeriğe sahip dosyayı seçin.",
+    "invalidUpload": "Yükleme izni geçersiz veya süresi dolmuş. Dosya yayımlanmadı.",
+    "uploadFailed": "Yükleme sonucu doğrulanamadı. Aynı yüklemeyi sürdürün; dosya yeniden yazılmaz.",
+    "publicationTitle": "Belge sürümünü yayımla",
+    "publicationHint": "Bu kapsamın tamamına uygulanacak işlem kapılarını seçin. Yeni sürüm yayımlamak önceki kabul kanıtını silmez.",
+    "versionLabel": "Sürüm etiketi",
+    "requiredAt": "Belgenin gerekli olduğu işlemler",
+    "gates": {
+      "sale": "Satış",
+      "reservation": "Rezervasyon ve ders talebi",
+      "attendance": "Yoklama"
+    },
+    "renewed": "Önceki sürümü kabul edenlerden yeniden kabul iste",
+    "previewing": "Etki okunuyor…",
+    "preview": "Yayın etkisini incele",
+    "chooseGate": "En az bir işlem seçin.",
+    "previewExpired": "Önizlemenin süresi doldu. Güncel etkiyi yeniden inceleyin.",
+    "affected": "Korunacak mevcut kesin kayıt: {count}",
+    "preserves": "Listelenen kesin rezervasyonlar korunur. Bu koruma kişi adına belge kabulü veya yeni kayıtlar için muafiyet oluşturmaz.",
+    "affectedRecord": "Kayıt: {id} · sürüm {version}",
+    "affectedPerson": "Kişi: {id} · merkez: {center}",
+    "expiresAt": "Önizleme geçerlilik sonu: {time}",
+    "publicationBlocked": "Yayın önizlemesinde engel var. Verileri güncelledikten sonra yeniden inceleyin.",
+    "approveEffects": "Bu sürümün kapsamını, yeniden kabul seçimini ve listelenen bütün kayıtların korunmasını onaylıyorum.",
+    "publish": "Sürümü yayımla",
+    "newDocument": "Yeni belge yükle",
+    "reload": "Yeniden yükle",
+    "pendingUpload": "Önce bu kapsamdaki bekleyen yüklemeyi aynı işlemle tamamlayın.",
+    "libraryTitle": "Yüklediğiniz belge dosyaları",
+    "loading": "Yükleniyor…",
+    "emptyFiles": "Bu kapsamda yüklediğiniz belge dosyası yok.",
+    "fileReady": "Dosya doğrulandı",
+    "filePending": "Dosya yüklemesi tamamlanmamış",
+    "next": "Sonraki sayfa",
+    "publishedTitle": "Dosyanın yayın durumu",
+    "publishedVersion": "Yayımlanmış sürüm: {label}",
+    "uploadNextVersion": "Bu belgenin yeni sürümünü yükle",
+    "scope": "Belgenin kapsamı",
+    "organizationScope": "Organizasyon geneli",
+    "scopeHint": "Kapsam, dosyanın ve yayın kurallarının ait olduğu organizasyon veya merkezdir. Yetki her işlemde yeniden denetlenir.",
+    "noOrganization": "Belge yönetimi için erişilebilir organizasyon yok.",
+    "demoTitle": "Belge yayını önizlemesi",
+    "demoHint": "Sentetik tasarım örneği. Bu ekran gerçek belge yüklemez, yayımlamaz veya kişi adına onay vermez.",
+    "demoSaved": "Örnek yayın onayı alındı; gerçek dosya veya kayıt değiştirilmedi.",
+    "checkUpload": "Yükleme durumunu doğrula",
+    "checkFailed": "Yükleme durumu doğrulanamadı. Aynı işlem anahtarı korunuyor.",
+    "checkPending": "İşlem hâlâ sonuçlanmadı. Aynı yüklemeyi sürdürün veya yeniden durum doğrulayın.",
+    "restartUpload": "Bu yüklemeyi bırak ve yeni dosya başlat"
   }
 }

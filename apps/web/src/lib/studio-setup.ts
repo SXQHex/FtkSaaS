@@ -8,6 +8,7 @@ import type {
 import { apiClient, ApiFailure } from "./api";
 import { sessionCapacity } from "./session-create";
 export const setupWrites = [
+  "document_version_publish_v1",
   "notification_mark_read_v1",
   "organization_update_v1",
   "center_create_v1",
@@ -32,7 +33,9 @@ export const setupWrites = [
   "replacement_session_create_v1",
 ] as const;
 export type SetupWrite = (typeof setupWrites)[number];
+type SetupUpload = "document_upload_prepare_v1" | "file_upload_complete_v1";
 type SetupRead =
+  | "document_publication_preview_v1"
   | "notifications_list_v1"
   | "audit_list_v1"
   | "organization_get_v1"
@@ -49,14 +52,14 @@ type SetupRead =
   | "management_state_get_v1"
   | "operation_status_get_v1"
   | "policies_get_v1";
-export type SetupInput<K extends SetupWrite | SetupRead> = Omit<
+export type SetupInput<K extends SetupWrite | SetupRead | SetupUpload> = Omit<
   Operations[K]["request"],
   "request_id" | "client_api_version"
 >;
 export type SetupCommand = {
   [K in SetupWrite]: { operation: K; input: SetupInput<K> };
 }[SetupWrite];
-export async function setupCall<K extends SetupWrite | SetupRead>(
+export async function setupCall<K extends SetupWrite | SetupRead | SetupUpload>(
   operation: K,
   input: SetupInput<K>,
 ) {
@@ -77,6 +80,14 @@ export const setupStorageKey = (scope: SetupScope, slot: string) =>
 export type PendingSetup = { command: SetupCommand; blocked?: boolean };
 const keyPattern = /^[a-f0-9]{8}-[a-f0-9]{4}-7[a-f0-9]{3}-[89ab][a-f0-9]{3}-[a-f0-9]{12}$/i;
 const fields: Record<SetupWrite, string[]> = {
+  document_version_publish_v1: [
+    "document_id",
+    "file_id",
+    "version_label",
+    "requirements",
+    "scope",
+    "impact_approval",
+  ],
   notification_mark_read_v1: ["notification_id", "expected_version"],
   organization_update_v1: ["name", "expected_version"],
   center_create_v1: ["name", "timezone"],
@@ -145,6 +156,21 @@ export function recoverSetup(scope: SetupScope, slot: string): PendingSetup | "i
         !/^[a-f0-9]{8}(?:-[a-f0-9]{4}){3}-[a-f0-9]{12}$/i.test(input.notification_id) ||
         !Number.isSafeInteger(input.expected_version) ||
         input.expected_version < 1)
+    )
+      return "invalid";
+    if (
+      command.operation === "document_version_publish_v1" &&
+      (typeof input.file_id !== "string" ||
+        !input.file_id ||
+        typeof input.version_label !== "string" ||
+        !input.version_label.trim() ||
+        !Array.isArray(input.requirements) ||
+        !["organization", "center"].includes(input.scope?.kind) ||
+        (input.scope.kind === "center" && input.scope.center_id !== scope.centerId) ||
+        (input.scope.kind === "organization" && scope.centerId !== undefined) ||
+        !input.impact_approval?.preview?.id ||
+        !input.impact_approval?.preview?.token ||
+        !Array.isArray(input.impact_approval.accepted_subjects))
     )
       return "invalid";
     if (input.name !== undefined && (typeof input.name !== "string" || !input.name.trim()))
