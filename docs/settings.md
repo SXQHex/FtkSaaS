@@ -188,6 +188,14 @@ Doğrulanmamış telefon account_profile_update_v1.unverified_phone ile E.164 bi
 
 Native Auth CAPTCHA/token seçenekleri sağlayıcı yapılandırmasına göre kullanılır; public Turnstile ile karıştırılmaz. Kurtarmada mevcut native oturum korunur, istemci zorunlu global signOut/ikinci completion RPC çağırmaz. Gerçek SMS kapalı/erteli olduğunda numara kaydı doğrulama başarısı olarak gösterilmez.
 
+### Native telefon doğrulama tüketicisi
+
+Oturumdaki kullanıcı `supabase.auth.updateUser({phone})` ile numara değişikliği ister. `account_get_v1` yeniden okunur; `identity.pending_phone` doğrulama bekleyen numaradır, doğrulanmış `identity.phone` yerine gösterilmez. Yanlış kod veya bekleyen numaranın değiştirilmesi mevcut doğrulanmış telefonu ve organizasyon iletişim projeksiyonunu değiştirmez. Yeniden kod için native bekleme süresinden sonra aynı authenticated `supabase.auth.updateUser({phone:pending_phone})` çağrısı tekrarlanır; tamamlamak için `supabase.auth.verifyOtp({type:'phone_change',phone:pending_phone,token})` kullanılır. Native hata varsa tamamlandı sayılmaz; gönderim native bekleme sınırına tabidir.
+
+Başarıdan sonra SDK'nın döndürdüğü oturum korunur ve `account_get_v1` ile `account_security_history_get_v1` yeniden okunur. Hesap ID'si/e-posta değişmez; doğrulanan telefon yalnız mevcut aktif ve doğrulanmış hesap bağlarına yansır. Aynı numaranın doğrulanmamış profil kopyası görünümden kalkar. Başkasının kullandığı numarada native `phone_exists` reddi hesap bağlama/birleştirme oluşturmaz. Yeni telefonla giriş veya SMS MFA bu akışın kapsamı değildir. Sabitlenmiş Auth v2.197.0 sürümünde `/resend` telefon sağlayıcısının açık olmasını ister ve pending_phone yerine mevcut telefonla kullanıcı arar; bu nedenle pending numara ile resend çağrısının HTTP200 dönmesi yeniden gönderim kanıtı değildir. İstemci uyarlama ihtiyacı [XREQ-017](requests.md#xreq-017) sahibindedir.
+
+Yerel sabit OTP'li numaralar [izole test yapılandırmasında](../apps/backend/supabase/config.toml) tutulur; kod isteme, yanlış kod, tekrar gönderim, tamamlanmış isteğin tekrarı ve doğrulanmış telefonun değiştirilmesi [kimlik kabul testinde](../apps/backend/tests/account-identity-acceptance.mjs) sınanır. Sabit kod tekrar gönderimde değişmediğinden bu test OTP süresi dolumu veya kod rotasyonu kanıtı değildir. Test kodları hosted ortama taşınmaz; gerçek +90 teslimatı ve sağlayıcı kabulü ayrıca yapılır.
+
 ## Public işletme alanları tüketicisi
 
 Katalogv5 organization/center `public_profile_enabled:false`, `public_fields:[]`, `public_hours:[]` ekler. Org Owner/OM ve merkezde canlı CM mevcut yazma/sürüm/replay/history kapısını kullanır. Başka scope veya serbest alan yazılamaz. Her scope seçimi yereldir, otomatik miras/kopya yoktur; seçili reset yalnız o alanı sistem defaultuna döndürür. Org public_profile_enabled yayın üst kapısıdır; center ayrıca kendi açık yayınını ve alanlarını ister. Varsayılanlar isim dahil tanıtımı açmaz.

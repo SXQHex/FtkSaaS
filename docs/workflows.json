@@ -292,8 +292,8 @@
         "management_state_get_v1"
       ],
       "review": {
-        "fingerprint": "41f88577dbd505a22d68fb4df350163dcfeb11f31e0c1b3cc8d46c3ec3832eec",
-        "reason": "Direct V2 shadow migration: byte-equivalence and module/resource relocation checks preserve the owning legacy test bodies; runtime and guide behavior unchanged. Twenty-runner execution remains diagnostic only."
+        "fingerprint": "f1d682f22e8f5e23ecd66b5a93c506a193a90552f78528161ff8442c4ef3ba31",
+        "reason": "Reviewed merged production API inventory and local phone fixture changes together with direct V2 suite mapping; assertions and production gates preserved, shadow-only execution unchanged."
       }
     },
     {
@@ -369,8 +369,8 @@
         "account_signup_check_v1"
       ],
       "review": {
-        "fingerprint": "f4dc19aa4102bf74be46c9f58f8ca3e57bc02d130fd267615285bcde0bb5e26f",
-        "reason": "P05 Starter basic CRM reviewed: existing person/lead/activity registry, exact request/source admission before replay; F23 retained for person-only followup. Native Starter/Pro/Business scope/version/replay tests and migration102 source equality included; other WF behavior unchanged."
+        "fingerprint": "fe45d4085da08370f663b2d0b0ac058e44561e0cfc0e82bb21bf9b8b9ba04471",
+        "reason": "Reviewed native phone-change consumer against pinned Auth v2.197.0: repeat authenticated updateUser for pending phone and require sent-at advance. Verified projection/history tests and XREQ-017 frontend boundary; fixed OTPs do not prove delivery, expiry or rotation."
       }
     },
     {
