@@ -21,7 +21,8 @@
         "apps/backend/tests/v2/plan.test.mjs",
         "apps/backend/tests/v2/backend.test.mjs",
         "apps/backend/tests/v2/backend/api-acceptance-root-1.test.mjs",
-        "apps/backend/tests/ci-v2-development-unit.mjs"
+        "apps/backend/tests/ci-v2-development-unit.mjs",
+        "apps/backend/tests/v2/core.test.mjs"
       ],
       "sources": [
         "apps/backend/database/canonical-settings-scope.sql",
@@ -284,7 +285,8 @@
         "apps/backend/scripts/ci/v2/migration.mjs",
         "apps/backend/scripts/ci/v2/settings.mjs",
         "apps/backend/tests/v2/backend-suites.json",
-        "apps/backend/scripts/ci/v2-development.mjs"
+        "apps/backend/scripts/ci/v2-development.mjs",
+        "apps/backend/scripts/ci/v2/core.mjs"
       ],
       "operations": [
         "operation_status_get_v1",
@@ -294,8 +296,8 @@
         "management_state_get_v1"
       ],
       "review": {
-        "fingerprint": "4848105fa225dfc3fec1dc0f2178c297c8038658a603d831489bc9b415caca84",
-        "reason": "PR188 P07 contract import and main V2 development lane reviewed together; combined source/test bindings retained, production runtime obligations and no-CD isolation unchanged."
+        "fingerprint": "64c5c4ca699a4304eef602c821bbcd0fe55bc3b5246f092d4dd737ece35e59f5",
+        "reason": "Reviewed combined P07 web-form sources and V2 core shadow: unchanged main behavior, owned loopback reset, pristine baseline before DB/RLS checks, strict health and local advisors, filtered shared typecheck, no production acceptance change."
       }
     },
     {
