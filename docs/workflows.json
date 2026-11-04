@@ -294,8 +294,8 @@
         "management_state_get_v1"
       ],
       "review": {
-        "fingerprint": "4848105fa225dfc3fec1dc0f2178c297c8038658a603d831489bc9b415caca84",
-        "reason": "PR188 P07 contract import and main V2 development lane reviewed together; combined source/test bindings retained, production runtime obligations and no-CD isolation unchanged."
+        "fingerprint": "4ebc38ce75a593ae4ee7f820821e4a48e5b319c4691e2480b54f97f9aca37c4b",
+        "reason": "Provider unit imports reviewed; existing contract and native obligations preserved, no new endpoint or production policy change."
       }
     },
     {
@@ -1020,7 +1020,9 @@
         "apps/backend/tests/crm-ingress-unit.mjs",
         "apps/backend/tests/v2/backend/person-registry-root-1.test.mjs",
         "apps/backend/tests/v2/backend/person-registry-root-2.test.mjs",
-        "apps/backend/tests/crm-web-form-unit.mjs"
+        "apps/backend/tests/crm-web-form-unit.mjs",
+        "apps/backend/tests/crm-meta-lead-unit.mjs",
+        "apps/backend/tests/crm-google-lead-unit.mjs"
       ],
       "sources": [
         "apps/backend/api/public-application.js",
@@ -1039,7 +1041,9 @@
         "apps/backend/database/crm-application-intake.sql",
         "apps/backend/supabase/migrations/20261104131917_crm_application_intake.sql",
         "apps/backend/scripts/crm-intake-form-config.mjs",
-        "apps/backend/transports/crm-web-form-gateway.mjs"
+        "apps/backend/transports/crm-web-form-gateway.mjs",
+        "apps/backend/transports/crm-meta-lead.mjs",
+        "apps/backend/transports/crm-google-lead.mjs"
       ],
       "operations": [
         "publication_set_v1",
@@ -1053,8 +1057,8 @@
         "calendar_feed_get_v1"
       ],
       "review": {
-        "fingerprint": "f9c9a98a526a190c8aaafab37ea0e7761c0fdf3a2ef391676cb698736e583f24",
-        "reason": "P07 F21/F25 mapping/config and Edge preflight/CAPTCHA tests reviewed; test module identity isolated from legacy handler test, both run together; real site acceptance stays open."
+        "fingerprint": "4976e37982bd67019010199e208ad7d41465a5ba18c2c2009e7d9f680ac606fa",
+        "reason": "Meta token-bearing URL errors and nested unknown provider fields have red/green regressions; consumed identifiers remain strict/lossless, one shared application model and persistence gaps retained."
       }
     },
     {

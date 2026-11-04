@@ -415,10 +415,14 @@ Değişen dilimin sözleşme, üretilmiş tip/envanter, WF/F01–F33 izi ve alan
 - **Doğrulama senaryosu:** Resmi erişim/yöntem uygulama anında doğrulanır; imza/izin, replay/retry ve alan eşleme; gerçek provider kanıtı.
 - **Kaynak alanı:** sağlayıcı adapter/credential eşleme; ilgili test
 
+**Ortak veri hedefi:** Son kullanıcı talimatıyla Meta (öncelikle Instagram reklamları) ve Google Ads başvuruları mevcut `core.public_applications` tablosunda birleşir. Sağlayıcı başına başvuru/kişi tablosu kurulmaz; kaynak/form/dış başvuru kimliği ve provider atfı aynı başvurunun kanıtıdır. İmza/anahtar doğrulaması sağlayıcıya özel, kalıcı alım/inbox/eşleme/dönüşüm ortaktır. Mevcut web_form-only eşlemesinin provider desteğine genişletilmesi P08.2b/P09.2b kaynak işidir; bu ilk doğrulama katmanı henüz provider kayıtlarını yazmaz.
+
 **Uygulama dilimleri (P08–P11 ortak PR):**
 
 - [ ] P08.1 — Resmi güncel Meta yöntemi, uygulama/hesap/sayfa/form yetkileri ve örnek alan sözleşmesini doğrula. Token paylaşmadan erişim eksiklerini ayır; gerçek erişim yoksa canlı kabul kapalı kalsın. Kaynak alanı: sağlayıcı transport/config; doğrulama: resmi kaynak ve yetki/form readback'i.
 - [ ] P08.2 — Doğrulanmış sağlayıcı bildirimi→güvenilir form/tenant eşlemesi→mevcut ortak başvuru zincirini uygula. Sağlayıcı başvuru kimliğinde tekillik, yeniden teslim, geç hata rollback'i, kaynak/onay kanıtı ve telefon önerisi korunsun; ikinci başvuru deposu kurulmasın. Küçük imza/eşleme testleri ve izole native alım suite'i kullan; invalid sender, yanlış form/tenant ve yarış negatif olsun.
+- [ ] P08.2a — Instagram önceliğiyle Meta Page leadgen doğrulama kaynağının aday/main kabulü: exact challenge/token, ham gövde SHA256 imzası, tam dış kimlik ve batch/zaman ayrımı. Bu dilim endpoint/kalıcı alım değildir; [kaynak/kanıt](00-FtkSaaS-yeni-sohbet-devir.md#p08p09-sağlayıcı-doğrulama-kaynak-dilimi) sahibindedir.
+- [ ] P08.2b — Güvenilir Page/form eşlemesiyle yetkili Graph lead verisini ve custom_disclaimer_responses yanıtlarını al; ardından aynı ortak başvuru modeline kalıcı dış kimlik tekilliğiyle yaz. Instagram platformunu Page nesnesinden tahmin etme; gerçek form/reklam kanıtıyla koru. Güvenilir token/yetki, native/gerçek sağlayıcı kabulü açık kalır.
 - [ ] P08.3 — Yetkili gerçek Meta formundan tek kayıt ve retry kabulünü doğrula; yetkili inbox yeniden okumasıyla bağla. Sentetik payload başarıları gerçek sağlayıcı erişimi/teslimi yerine geçmez. Hesap erişimi veya entegrasyon kurulumu gerektiğinde somut eksik üzerinden ilerle.
 
 <a id="p09"></a>
@@ -435,6 +439,8 @@ Değişen dilimin sözleşme, üretilmiş tip/envanter, WF/F01–F33 izi ve alan
 
 - [ ] P09.1 — Güncel Google yerel lead formunun resmi teslim/yetkilendirme ve alan/kimlik sözleşmesini doğrula. Reklamdan web forma yönlendirmeyi bu yolla karıştırma; Meta token/yetki/alanlarını Google'a taşıma. Kaynak alanı: ayrı Google transport/config; doğrulama: resmi kaynak ve gerçek form erişimi.
 - [ ] P09.2 — Doğrulanmış gönderici ve güvenilir form eşlemesiyle ortak alıma bağla; aynı dış kimlik retry tek kayıt, farklı gerçek başvurular ayrı geçmiş olsun. Sağlayıcı yeniden teslim/geri doldurma yolu varsa aynı tekillik kuralını uygula. Küçük doğrulama/alan testi ve izole native ortak alım kabulü; geçersiz kimlik, yanlış eşleme ve kısmi hata negatif olsun.
+- [ ] P09.2a — Google anahtar/form doğrulama ve normalizasyon kaynağının aday/main kabulü: int64 hassasiyeti, column_id eşlemesi, test/zaman/atfın korunması. [Kaynak/kanıt](00-FtkSaaS-yeni-sohbet-devir.md#p08p09-sağlayıcı-doğrulama-kaynak-dilimi); endpoint veya inbox yazımı değildir.
+- [ ] P09.2b — Güvenilir provider/form→tenant eşlemesi, kalıcı lead_id tekilliği, custom soru/onay alanları, test kayıtları ve HTTP retry/ack ile ortak alımı tamamla. Provider kaynağını web_form gibi gösterme; web CAPTCHA'yı sentetik proof/bot_verified ile aşma.
 - [ ] P09.3 — Yetkili gerçek Google formu→inbox ve tekrar teslimini doğrula; Meta başarısını Google kabulü sayma. Gerçek erişim eksikse mevcut bağımsız kaynak/test dilimlerini durdurma, bu kabulü açık bırak.
 
 <a id="p10"></a>

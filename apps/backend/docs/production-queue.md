@@ -30,7 +30,7 @@ Bu dosya yalnız **sıra, bağımlı teslim paketleri ve kontrol noktalarının*
 
 P01–P04, P12/P13, PR177 Starter CRM, PR182 P05/P06 + XREQ-016 ve PR188 P07 backend adaptörü teslimleri tamamlandı; [kaynak/ortam kanıtı](00-FtkSaaS-yeni-sohbet-devir.md) sahibindedir. P07'nin gerçek site bağlantısı ve form→inbox kabulü [XREQ-018](../../../docs/requests.md#xreq-018) altında açık; frontend deploy kısıtı bu kabulü bekletir, P05/P06'ya bağlı P08–P11 backend kaynağını durdurmaz.
 
-Kullanıcının güncel isteğiyle [P08](remaining-work.md#p08)–[P11](remaining-work.md#p11) tek Draft PR'de başlatılır. Alt dilimlerin kabul/görev sahibi backlog'dur. İlk adım mevcut ortak alım ve CRM kaynaklarına karşı sağlayıcı/aktarım boşluk incelemesidir. Gerçek Meta/Google erişim ve resmi teslim yöntemi doğrulaması hangi sağlayıcının önce uygulanabileceğini belirler; eksik erişim bağımsız P10/P11 kaynak incelemesini durdurmaz. Ortak sözleşme/migration değişiklikleri seri tutulur. İki–üç kaynak diliminde küçük hedefli test ve bağımsız inceleme kontrol noktası, merge adayında yürürlükteki tam kabul korunur. Gerçek provider veya hosted veri aktarımı doğrulanmamışsa kaynak hazır olsa bile ilgili görev kapalı gösterilmez.
+Kullanıcının güncel isteğiyle [P08](remaining-work.md#p08)–[P11](remaining-work.md#p11) tek Draft PR'de başlatılır. Alt dilimlerin kabul/görev sahibi backlog'dur. İlk adım mevcut ortak alım ve CRM kaynaklarına karşı sağlayıcı/aktarım boşluk incelemesidir. Son kullanıcı önceliği Instagram reklamlarıdır: önce Meta Page leadgen/Graph alımının Instagram anlık formu yolu hedeflenir; Google doğrulama kaynağı korunur. Gerçek Meta/Google erişimi ayrı doğrulanır; eksik erişim bağımsız P10/P11 kaynak incelemesini durdurmaz. Ortak sözleşme/migration değişiklikleri seri tutulur. İki–üç kaynak diliminde küçük hedefli test ve bağımsız inceleme kontrol noktası, merge adayında yürürlükteki tam kabul korunur. Gerçek provider veya hosted veri aktarımı doğrulanmamışsa kaynak hazır olsa bile ilgili görev kapalı gösterilmez.
 
 Dış e-posta ertelemesi de kaldırıldı; mevcut kurulum yeniden sıfırdan başlatılmaz. P14/P15 mevcut kaynak/sağlayıcı incelemesiyle kendi sırasında yürütülür; P16, P11/P15 bağımlılıklarını korur. Posta kurulumunun varlığı bütün bildirim olaylarının teslim kabulü değildir.
 
@@ -41,7 +41,7 @@ Dış e-posta ertelemesi de kaldırıldı; mevcut kurulum yeniden sıfırdan ba�
 1. Kısa mevcut karar/runtime uyumu; yalnız gerçek ürün boşluklarını ayırma.
 2. PR177 ile teslim edilen Starter temel dilimini yeniden geliştirme; frontend ekran kabulü kendi alanında kalır.
 3. Teslim edilmiş P05/P06 ortak kutu/inceleme/eşlemeyi koruyarak P07 web formu bağlantısını tamamla.
-4. Gerçek kullanım ve erişime göre P08/P09'dan ilk sağlayıcı, sonra diğeri. Görev numarası ilk sağlayıcının seçildiği anlamına gelmez.
+4. Son kullanıcı önceliğiyle P08 Instagram reklam anlık formları; P09 Google kaynak dilimi aynı PR'de korunur. Her sağlayıcının gerçek erişim/teslim kabulü ayrıdır.
 5. P10 kontrollü eski kayıt aktarımı ve P11 ileri CRM, kendi bağımlılık ve yetkileriyle; Starter kapanışı bunları beklemez.
 
 Reklam performans/harcama ve dönüşüm geri bildirimi sonraki ayrı dilimlerdir. Kaynak desteği ile gerçek sağlayıcı/ekran kabulü aynı kapanış değildir.
