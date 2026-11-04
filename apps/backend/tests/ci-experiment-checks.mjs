@@ -136,6 +136,8 @@ test('collector compares matched core/API costs and rejects missing experimental
 test('optional dedicated placement retains the original complete ST-02 body and timeout',()=>{
  const manifest=JSON.parse(fs.readFileSync(new URL('../scripts/ci/experiment/suites.json',import.meta.url)));
  manifest.dedicatedRunners=['starter-operations-acceptance'];
+ const full=manifest.suites.flatMap(s=>s.imports).find(item=>item.path.endsWith('starter-operations-acceptance.mjs'));
+ delete full.parts;delete full.shared;
  const inventory=buildInventory(repositoryRoot,{manifest});
  const bins=partition(inventory.units);
  const bin=bins.find(b=>b.units.some(u=>u.id==='starter-operations-acceptance'));
@@ -148,9 +150,17 @@ test('optional dedicated placement retains the original complete ST-02 body and 
  assert.deepEqual(bins,partition([...inventory.units].reverse()));
 });
 
-test('measurement balances eight active runners with completed source-bound samples',()=>{
- const inventory=buildInventory(repositoryRoot),bins=partition(inventory.units);
+test('measurement balances eight active runners with completed source-bound samples',async()=>{
+ const manifest=JSON.parse(fs.readFileSync(new URL('../scripts/ci/experiment/suites.json',import.meta.url)));
+ // The historical run retains 47 samples; changed root bodies must not reuse them as current measurements.
+ let inventory={units:Object.entries(manifest.measurements.units).map(([id,sample])=>({...sample,id,weight_source:'measured'}))};
  assert.equal(inventory.units.filter(u=>u.weight_source==='measured').length,47);
+ inventory=buildInventory(repositoryRoot);const bins=partition(inventory.units);
+ const {createHash}=await import('node:crypto');
+ for(const unit of inventory.units){
+  const matches=manifest.measurements.units[unit.id]?.sha256===createHash('sha256').update(unit.code).digest('hex');
+  assert.equal(unit.weight_source==='measured',matches);
+ }
  assert(bins.find(b=>b.units.some(u=>u.id==='starter-operations-acceptance')).units.length>1);
  assert.equal(inventory.units.find(u=>u.id==='starter-operations-acceptance').dedicated,false);
  const heavy=bins.map(b=>b.projected_wall_seconds);
@@ -188,11 +198,35 @@ test('root',{timeout:1},async t=>{await wait(30); const original=t.test.bind(t);
 
 test('stale duration samples fall back to explicit seeds and invalid matching samples fail closed',()=>{
  const manifest=JSON.parse(fs.readFileSync(new URL('../scripts/ci/experiment/suites.json',import.meta.url)));
- const id='starter-operations-acceptance';
+ const id='account-identity-acceptance';
  manifest.measurements.units[id].sha256='0'.repeat(64);
  const stale=buildInventory(repositoryRoot,{manifest}).units.find(unit=>unit.id===id);
  assert.equal(stale.weight_source,'source-size-seed');
  const current=JSON.parse(fs.readFileSync(new URL('../scripts/ci/experiment/suites.json',import.meta.url)));
  current.measurements.units[id].seconds=-1;
  assert.throws(()=>buildInventory(repositoryRoot,{manifest:current}),/Invalid measured duration/);
+});
+
+
+test('imported multi-root modules have complete ownership and reject missing or duplicate root ranges',()=>{
+ const manifest=JSON.parse(fs.readFileSync(new URL('../scripts/ci/experiment/suites.json',import.meta.url)));
+ const imported=manifest.suites.flatMap(s=>s.imports).find(item=>item.path.endsWith('starter-operations-acceptance.mjs'));
+ assert.equal(imported.parts.length,2);
+ imported.parts[0].ranges[0][0]++;
+ assert.throws(()=>buildInventory(repositoryRoot,{manifest}),/coverage/);
+ const duplicate=JSON.parse(fs.readFileSync(new URL('../scripts/ci/experiment/suites.json',import.meta.url)));
+ const entry=duplicate.suites.flatMap(s=>s.imports).find(item=>item.path.endsWith('starter-operations-acceptance.mjs'));
+ entry.parts.push(structuredClone(entry.parts[0]));
+ assert.throws(()=>buildInventory(repositoryRoot,{manifest:duplicate}),/coverage|Duplicate/);
+});
+
+test('singleton platform setting writers retain one ordered file unit while user roots remain independent',()=>{
+ const units=buildInventory(repositoryRoot).units.filter(unit=>unit.source.endsWith('frontend-settings-acceptance.mjs'));
+ const tenant=units.find(unit=>unit.code.includes("test('Tenant settings authority"));
+ const catalog=units.find(unit=>unit.code.includes("test('Typed settings catalog"));
+ const user=units.find(unit=>unit.code.includes("test('User settings concurrency"));
+ assert.equal(tenant,catalog);
+ assert.notEqual(tenant,user);
+ assert(tenant.code.indexOf("test('Tenant settings authority")<tenant.code.indexOf("test('Typed settings catalog"));
+ assert.equal(units.length,4);
 });

@@ -6,6 +6,24 @@ const definition=JSON.parse(fs.readFileSync(new URL('./suites.json',import.meta.
 const hash=s=>createHash('sha256').update(s).digest('hex');
 const sideImports=s=>[...s.matchAll(/^import ['"](.+?)['"];$/gm)].map(m=>m[1]);
 
+function splitSource(definition,source,importLines=[]){
+ const lines=source.match(/[^\n]*\n|[^\n]+$/g),coverage=Array(lines.length).fill(0);
+ const take=ranges=>ranges.map(([start,end])=>{
+  if(!Number.isSafeInteger(start)||!Number.isSafeInteger(end)||start<1||end<start||end>lines.length)throw Error('Invalid range coverage');
+  for(let i=start-1;i<end;i++)coverage[i]++;
+ }).join('');
+ take(definition.shared);
+ const shared=new Set(definition.shared.flatMap(([a,b])=>Array.from({length:b-a+1},(_,i)=>a+i)));
+ const parts=definition.parts.map(part=>{
+  take(part.ranges);
+  const selected=new Set(part.ranges.flatMap(([a,b])=>Array.from({length:b-a+1},(_,i)=>a+i)));
+  return {id:part.id,source:definition.path,code:lines.filter((_,i)=>shared.has(i+1)||selected.has(i+1)).join('')};
+ });
+ for(const line of importLines)coverage[line-1]++;
+ if(coverage.some(n=>n!==1))throw Error('Incomplete/duplicate source line coverage: '+definition.path);
+ return parts;
+}
+
 export function buildInventory(root,{manifest=definition,read=p=>fs.readFileSync(path.join(root,p),'utf8')}={}){
  const pkg=JSON.parse(read('apps/backend/package.json'));
  const command=pkg.scripts['test:api'],prefix='node --test --test-concurrency=2 ';
@@ -17,32 +35,19 @@ export function buildInventory(root,{manifest=definition,read=p=>fs.readFileSync
  if(!Array.isArray(dedicated)||new Set(dedicated).size!==dedicated.length)throw Error('Invalid dedicated runner inventory');
  const checked=(p,expected)=>{const text=read(p);if(hash(text)!==expected)throw Error('Experiment source changed: '+p);return text;};
  for(const suite of manifest.suites){
-  const source=checked(suite.path,suite.sha256),lines=source.match(/[^\n]*\n|[^\n]+$/g),coverage=Array(lines.length).fill(0);
-  const take=ranges=>ranges.map(([start,end])=>{
-   if(!Number.isSafeInteger(start)||!Number.isSafeInteger(end)||start<1||end<start||end>lines.length)throw Error('Invalid range coverage');
-   for(let i=start-1;i<end;i++)coverage[i]++;
-   return lines.slice(start-1,end).join('');
-  }).join('');
-  take(suite.shared);
-  const shared=new Set(suite.shared.flatMap(([a,b])=>Array.from({length:b-a+1},(_,i)=>a+i)));
-  const parts=suite.parts.map(part=>{
-   take(part.ranges);
-   const selected=new Set(part.ranges.flatMap(([a,b])=>Array.from({length:b-a+1},(_,i)=>a+i)));
-   return {id:part.id,source:suite.path,code:lines.filter((_,i)=>shared.has(i+1)||selected.has(i+1)).join('')};
-  });
+  const source=checked(suite.path,suite.sha256),lines=source.match(/[^\n]*\n|[^\n]+$/g);
+  const parts=splitSource(suite,source,suite.imports.map(item=>item.line));
   const imports=suite.imports.map(item=>{
    if(!/^apps\/backend\/tests\/[a-z0-9-]+\.mjs$/.test(item.path)||owned.has(item.path))throw Error('Duplicate/invalid imported acceptance');
    owned.add(item.path);
    const target='./'+path.basename(item.path);
    if(lines[item.line-1]?.trim()!==`import '${target}';`)throw Error('Imported acceptance line changed');
-   coverage[item.line-1]++;
    const code=checked(item.path,item.sha256);
    if(sideImports(code).length)throw Error('Nested side-effect imports require explicit ownership');
-   return {id:path.basename(item.path,'.mjs'),source:item.path,code};
+   return item.parts?splitSource(item,code):[{id:path.basename(item.path,'.mjs'),source:item.path,code}];
   });
-  if(coverage.some(n=>n!==1))throw Error('Incomplete/duplicate source line coverage: '+suite.path);
   if(sideImports(source).length!==imports.length)throw Error('Unowned side-effect import');
-  const members=[...parts,...imports];
+  const members=[...parts,...imports.flat()];
   // Proportional source size is an explicitly unmeasured scheduling seed.
   // The collector reports real file timings; it never labels estimates as results.
   const size=members.reduce((n,u)=>n+u.code.length,0);

@@ -4,10 +4,9 @@ import fs from 'node:fs';
 import {authUser,fixturePlatform,must,call} from './api-client.mjs';
 import {connect} from '../scripts/db.mjs';
 import {newUuidV7 as key} from '../scripts/uuid.mjs';
-test('Starter attendance and protected reservation through Auth -> Edge -> RPC',async t=>{
+async function attendanceFixture(t){
  const {platform}=await fixturePlatform(),owner=await authUser('starter-owner'),outsider=await authUser('starter-outsider');
- const db=await connect(),rows=async(q,a=[])=>(await db.query(q,a)).rows;
- try{
+ const db=await connect();t.after(()=>db.end());const rows=async(q,a=[])=>(await db.query(q,a)).rows;
  const contract=JSON.parse(fs.readFileSync('../../packages/api-contracts/schema/contract.json'));
  const plan=key(),features=Object.entries(contract['x-contract'].feature_delivery).filter(([,f])=>f.plans.starter).map(([k])=>k);
  await db.query("insert into core.saas_plan_versions(id,name,effective_at,price_minor,currency,period,limits,features) values($1,'starter',now(),1000,'TRY','monthly',$2,$3)",[plan,{entries:[{key:'active_students',value:500},{key:'centers',value:1},{key:'instructors',value:50}]},features]);
@@ -56,6 +55,11 @@ test('Starter attendance and protected reservation through Auth -> Edge -> RPC',
  const get=sid=>must(owner,'attendance_get_v1',scope({session_id:sid}));
  const token=p=>({id:p.id,token:p.token});
  const preview=change=>must(owner,'reservation_impact_preview_v1',scope({change,reason:'Explicit impact approval'}));
+ return {platform,owner,outsider,db,rows,contract,plan,features,account,org,center,scope,mut,fail,person,pay,discipline,linked,student,instructor,room,syncFixtureBookings,fixturePastSession,effective_at,publish,makeSession,book,get,token,preview};
+}
+
+test('Starter protected reservation, attendance revisions and rollback',async t=>{
+ const {platform,owner,outsider,db,rows,contract,plan,features,account,org,center,scope,mut,fail,person,pay,discipline,linked,student,instructor,room,syncFixtureBookings,fixturePastSession,effective_at,publish,makeSession,book,get,token,preview}=await attendanceFixture(t);
  let sid,rid,impact;
  await t.test('Starter creates class/program with instructor and no pay agreement',async()=>{
   const cls=(await mut('class_save_v1',{name:'Starter class',discipline_id:discipline,external_open:false})).primary_id;
@@ -148,6 +152,22 @@ test('Starter attendance and protected reservation through Auth -> Edge -> RPC',
   const extra=(await makeSession()).primary_id;await book(extra);
   await fail('reservation_impact_apply_v1',{preview:token(p.preview),accepted_reservation_ids:[]},'PREVIEW_STALE');
  });
+ await t.test('late correction outbox failure rolls back linked revision, rights, audit and receipt',async()=>{
+  const pv=await must(owner,'attendance_correct_preview_v1',scope({session_id:sid,corrections:[{reservation_id:rid,result:'no_show'}],reason:'Late failure correction'}));
+  const snapshot=async()=>{const out={};for(const table of ['reservations','sessions','credit_deficits','attendance_entries','attendance_closures','operation_receipts','audit_events','outbox_jobs'])out[table]=await rows('select to_jsonb(q) v from core.'+table+' q where org_id=$1 order by id',[org]);out.history=await rows('select to_jsonb(q) v from private.lesson_deficit_movements q where org_id=$1 order by id',[org]);return out;};
+  const before=await snapshot(),fn='lesson_outbox_'+key().replaceAll('-','');
+  await db.query('create function private.'+fn+"() returns trigger language plpgsql set search_path='' as $$begin raise exception using errcode='P0001',message='INTEGRITY_VIOLATION';end$$");
+  await db.query('create trigger '+fn+" before insert on core.outbox_jobs for each row when(new.org_id='"+org+"'::uuid) execute function private."+fn+'()');
+  try{await fail('attendance_correct_apply_v1',{preview:token(pv)},'INTEGRITY_VIOLATION');assert.deepEqual(await snapshot(),before);}
+  finally{await db.query('drop trigger '+fn+' on core.outbox_jobs');await db.query('drop function private.'+fn+'()');}
+  await mut('attendance_correct_apply_v1',{preview:token(pv)});
+ });
+
+});
+
+test('Starter instructor redaction and live operational authority',async t=>{
+ const {platform,owner,outsider,db,rows,contract,plan,features,account,org,center,scope,mut,fail,person,pay,discipline,linked,student,instructor,room,syncFixtureBookings,fixturePastSession,effective_at,publish,makeSession,book,get,token,preview}=await attendanceFixture(t);
+ let sid,rid,impact;
  await t.test('assigned instructor reads redacted draft; student, outsider and wrong center cannot mutate',async()=>{
   const assigned=(await makeSession({assignments:[{person_id:instructor.p,duty:'instructor'}]})).primary_id;
   const own=(await book(assigned,(await linked('assigned-student')).p)).primary_id;
@@ -186,6 +206,11 @@ test('Starter attendance and protected reservation through Auth -> Edge -> RPC',
   await fail('reservation_impact_apply_v1',{preview:token(p.preview),accepted_reservation_ids:[]},'FORBIDDEN',owner,k);
   await mut('center_manager_assign_v1',{person_id:person});
  });
+});
+
+test('Starter package ledger, paid daily journey and closure atomicity',async t=>{
+ const {platform,owner,outsider,db,rows,contract,plan,features,account,org,center,scope,mut,fail,person,pay,discipline,linked,student,instructor,room,syncFixtureBookings,fixturePastSession,effective_at,publish,makeSession,book,get,token,preview}=await attendanceFixture(t);
+ let sid,rid,impact;
  await t.test('package-backed closure and correction use the same entitlement ledger',async()=>{
   const p=await linked('package-student');
   const product=(await mut('product_publish_v1',{terms:{name:'Starter lesson · rights',kind:'credits',booking_mode:'flexible',credits:2,price_minor:'1000',currency:'TRY',freeze:{enabled:false,extends_validity:false},refund:{method:'none'},scopes:[{scope_kind:'center_discipline',center_id:center,discipline_id:discipline,usage_targets:['lesson']}]}})).primary_id;
@@ -282,6 +307,11 @@ test('Starter attendance and protected reservation through Auth -> Edge -> RPC',
   finally{await db.query('update core.saas_subscriptions set plan_version_id=$1 where id=$2',[plan,sub]);}
  });
 
+});
+
+test('Starter policy impact, effective boundaries and sale snapshots',async t=>{
+ const {platform,owner,outsider,db,rows,contract,plan,features,account,org,center,scope,mut,fail,person,pay,discipline,linked,student,instructor,room,syncFixtureBookings,fixturePastSession,effective_at,publish,makeSession,book,get,token,preview}=await attendanceFixture(t);
+ let sid,rid,impact;
  await t.test('policy reduction requires manager impact approval and preserves confirmed rights',async()=>{
   const p=await linked('policy-student'),ses=(await makeSession()).primary_id,rv=(await book(ses,p.p)).primary_id;
   const change={kind:'policy',key:'negative_upper',value:{kind:'integer',value:0},effective_at:new Date().toISOString(),mandatory:false};
@@ -339,17 +369,6 @@ test('Starter attendance and protected reservation through Auth -> Edge -> RPC',
   await fail('reservation_create_v1',{session_id:(await makeSession()).primary_id,person_id:p.p,mode:'flexible'},'CREDIT_LIMIT_EXCEEDED');
   }finally{await publish('negative_upper',{kind:'integer',value:10});}
  });
- await t.test('late correction outbox failure rolls back linked revision, rights, audit and receipt',async()=>{
-  const pv=await must(owner,'attendance_correct_preview_v1',scope({session_id:sid,corrections:[{reservation_id:rid,result:'no_show'}],reason:'Late failure correction'}));
-  const snapshot=async()=>{const out={};for(const table of ['reservations','sessions','credit_deficits','attendance_entries','attendance_closures','operation_receipts','audit_events','outbox_jobs'])out[table]=await rows('select to_jsonb(q) v from core.'+table+' q where org_id=$1 order by id',[org]);out.history=await rows('select to_jsonb(q) v from private.lesson_deficit_movements q where org_id=$1 order by id',[org]);return out;};
-  const before=await snapshot(),fn='lesson_outbox_'+key().replaceAll('-','');
-  await db.query('create function private.'+fn+"() returns trigger language plpgsql set search_path='' as $$begin raise exception using errcode='P0001',message='INTEGRITY_VIOLATION';end$$");
-  await db.query('create trigger '+fn+" before insert on core.outbox_jobs for each row when(new.org_id='"+org+"'::uuid) execute function private."+fn+'()');
-  try{await fail('attendance_correct_apply_v1',{preview:token(pv)},'INTEGRITY_VIOLATION');assert.deepEqual(await snapshot(),before);}
-  finally{await db.query('drop trigger '+fn+' on core.outbox_jobs');await db.query('drop function private.'+fn+'()');}
-  await mut('attendance_correct_apply_v1',{preview:token(pv)});
- });
-
  await t.test('a second adverse restriction still requires exact approval of already protected reservations',async()=>{
   await publish('negative_upper',{kind:'integer',value:10});
   try{
@@ -382,5 +401,4 @@ test('Starter attendance and protected reservation through Auth -> Edge -> RPC',
   v=await get(ses);await mut('attendance_close_v1',{session_id:ses,expected_version:v.session_version});
   assert.equal((await rows('select state from core.entitlement_allocations where reservation_id=$1',[rv]))[0].state,'released');
  });
- }finally{await db.end();}
 });

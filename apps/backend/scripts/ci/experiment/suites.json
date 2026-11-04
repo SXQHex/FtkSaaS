@@ -62,20 +62,59 @@
     },
     {
       "path": "apps/backend/tests/cross-center-settlement.test.mjs",
-      "sha256": "e3159fd8a6abd025145b269d0e72222beefc5b9ba9cd9776e333a01418750b45",
+      "sha256": "e316f81229a13a8e05da68fd1e35ccc329dcebeec420f0dbd10bd7f659d11072",
       "shared": [
         [
           1,
-          6
+          91
+        ],
+        [
+          214,
+          214
+        ],
+        [
+          300,
+          300
+        ],
+        [
+          380,
+          380
         ]
       ],
       "parts": [
         {
-          "id": "cross-center-settlement-root-1",
+          "id": "cross-center-payments",
           "ranges": [
             [
-              7,
-              388
+              92,
+              213
+            ]
+          ]
+        },
+        {
+          "id": "cross-center-provenance",
+          "ranges": [
+            [
+              215,
+              299
+            ]
+          ]
+        },
+        {
+          "id": "cross-center-authority",
+          "ranges": [
+            [
+              301,
+              379
+            ]
+          ]
+        },
+        {
+          "id": "cross-center-atomic",
+          "ranges": [
+            [
+              381,
+              432
             ]
           ]
         }
@@ -475,7 +514,71 @@
         {
           "line": 4,
           "path": "apps/backend/tests/frontend-settings-acceptance.mjs",
-          "sha256": "c3b468a0b490064b18f9fd6e0526f45a3022567cfc601bc4bd0971ff7060b74f"
+          "sha256": "3cdaf5dca3a267da74a9329c89db67a83c87029536644ad30e0f4301ee563a34",
+          "shared": [
+            [
+              1,
+              28
+            ],
+            [
+              84,
+              84
+            ],
+            [
+              141,
+              141
+            ],
+            [
+              170,
+              171
+            ],
+            [
+              212,
+              213
+            ]
+          ],
+          "parts": [
+            {
+              "id": "settings-user-history",
+              "ranges": [
+                [
+                  29,
+                  83
+                ]
+              ]
+            },
+            {
+              "id": "settings-tenant-authority",
+              "ranges": [
+                [
+                  85,
+                  140
+                ],
+                [
+                  142,
+                  169
+                ]
+              ]
+            },
+            {
+              "id": "settings-startup-context",
+              "ranges": [
+                [
+                  172,
+                  211
+                ]
+              ]
+            },
+            {
+              "id": "settings-brand-colors",
+              "ranges": [
+                [
+                  214,
+                  250
+                ]
+              ]
+            }
+          ]
         },
         {
           "line": 6,
@@ -490,7 +593,37 @@
         {
           "line": 8,
           "path": "apps/backend/tests/starter-operations-acceptance.mjs",
-          "sha256": "5de235408ed2861d739d1298ddde3fbd0142abce5f587203b8160e4c05782abc"
+          "sha256": "d56aba6a07a54cd439c96ac02708ce43279da44069aa7b7da77f0fec1f664c29",
+          "shared": [
+            [
+              1,
+              74
+            ],
+            [
+              169,
+              169
+            ]
+          ],
+          "parts": [
+            {
+              "id": "starter-operations-acceptance",
+              "ranges": [
+                [
+                  75,
+                  168
+                ]
+              ]
+            },
+            {
+              "id": "starter-operations-reports",
+              "ranges": [
+                [
+                  170,
+                  276
+                ]
+              ]
+            }
+          ]
         },
         {
           "line": 9,
@@ -525,7 +658,37 @@
         {
           "line": 136,
           "path": "apps/backend/tests/starter-plan-gates-acceptance.mjs",
-          "sha256": "c2cbc191466371b912cd2f78159e0cb1235513caa2e9153268d4e735e5538537"
+          "sha256": "dc94dc90b03a6f736632632742aecc745cda83d6ae38d047630f3d71b9263a11",
+          "shared": [
+            [
+              1,
+              27
+            ],
+            [
+              106,
+              106
+            ]
+          ],
+          "parts": [
+            {
+              "id": "starter-plan-resources",
+              "ranges": [
+                [
+                  28,
+                  105
+                ]
+              ]
+            },
+            {
+              "id": "starter-plan-downgrade",
+              "ranges": [
+                [
+                  107,
+                  260
+                ]
+              ]
+            }
+          ]
         },
         {
           "line": 138,
@@ -600,20 +763,59 @@
     },
     {
       "path": "apps/backend/tests/starter-attendance-protection.test.mjs",
-      "sha256": "d3055ef662701d80d3a24279f1226e4b7d95e6483ce4fe5d6f40a6d374cf8f9a",
+      "sha256": "f5202f7070d166393dad23ff69c349817256874304a41b11f20f9ed6cdc7dc13",
       "shared": [
         [
           1,
-          6
+          60
+        ],
+        [
+          167,
+          167
+        ],
+        [
+          210,
+          210
+        ],
+        [
+          311,
+          311
         ]
       ],
       "parts": [
         {
-          "id": "starter-attendance-protection-root-1",
+          "id": "starter-attendance-revisions",
           "ranges": [
             [
-              7,
-              386
+              61,
+              166
+            ]
+          ]
+        },
+        {
+          "id": "starter-attendance-authority",
+          "ranges": [
+            [
+              168,
+              209
+            ]
+          ]
+        },
+        {
+          "id": "starter-attendance-ledger",
+          "ranges": [
+            [
+              211,
+              310
+            ]
+          ]
+        },
+        {
+          "id": "starter-attendance-policy",
+          "ranges": [
+            [
+              312,
+              404
             ]
           ]
         }
