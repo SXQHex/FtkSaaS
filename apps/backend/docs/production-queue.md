@@ -4,6 +4,8 @@ Bu dosya yalnız **sıra, bağımlı teslim paketleri ve kontrol noktalarının*
 
 ## Uygulama sırası
 
+**4 Kasım kullanıcı önceliği:** [S08 native telefon test numarası dilimi](remaining-work.md#s08) ayrı teslim olarak öne alınır. Açık CRM PR182'nin kaynağına müdahale edilmez; CRM'nin kendi iç sırası korunur. Telefon dilimi için kaynak/CI bekleme noktası [devirde](00-FtkSaaS-yeni-sohbet-devir.md#native-telefon-test-numarası-dilimi) izlenir.
+
 | Sıra | Görev paketi | Bağımlılık ve kontrol noktası |
 |---|---|---|
 | 0 | [A01](remaining-work.md#a01)–[A03](remaining-work.md#a03) | Karar aktarımı ve kaynak/kanıt uzlaştırması; sahipsiz özellik veya çelişen karar bırakma |

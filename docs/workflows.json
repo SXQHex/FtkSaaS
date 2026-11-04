@@ -286,8 +286,8 @@
         "management_state_get_v1"
       ],
       "review": {
-        "fingerprint": "65e82897079eed098bf2e4413cc6e7745112c7fd29460840a2d0cb4912cac84d",
-        "reason": "Starter bağımsız fixture son incelemesi: özgün8 alt senaryo/46 assertion satırı ve300s korunur; yoklamada superseded eski kredi sürümü gerçek republish zinciriyle hazırlanır."
+        "fingerprint": "5276ac40f2ca7693a9bb12a4ebabfacb712220b76af89ceb66915998a4f827d3",
+        "reason": "Main native telefon/XREQ-017 kaynağı korunarak senkronizasyon; CRM fixture UUID bind tip çakışması gerçek PG red/green kontrolüyle düzeltildi. Runtime/assertion/deadline değişmedi."
       }
     },
     {
@@ -363,8 +363,8 @@
         "account_signup_check_v1"
       ],
       "review": {
-        "fingerprint": "f4dc19aa4102bf74be46c9f58f8ca3e57bc02d130fd267615285bcde0bb5e26f",
-        "reason": "P05 Starter basic CRM reviewed: existing person/lead/activity registry, exact request/source admission before replay; F23 retained for person-only followup. Native Starter/Pro/Business scope/version/replay tests and migration102 source equality included; other WF behavior unchanged."
+        "fingerprint": "fe45d4085da08370f663b2d0b0ac058e44561e0cfc0e82bb21bf9b8b9ba04471",
+        "reason": "Main native telefon/XREQ-017 kaynağı korunarak senkronizasyon; CRM fixture UUID bind tip çakışması gerçek PG red/green kontrolüyle düzeltildi. Runtime/assertion/deadline değişmedi."
       }
     },
     {
@@ -1350,8 +1350,8 @@
         "automation_save_v1"
       ],
       "review": {
-        "fingerprint": "f1735fb25385006f6012e9bf9a1dccbdd9b3de991d812df8840835f927a6b4fd",
-        "reason": "PR182 CI fixture düzeltmeleri ve Starter üç bağımsız kök incelendi; özgün assertion/deadline korunur. Main CI v2 ve frontend kaynakları değişmeden eşlendi."
+        "fingerprint": "1662df9395faf74a3d6f974465d614bff35f72fb71f26af5056abc97346e1eb7",
+        "reason": "Main native telefon/XREQ-017 kaynağı korunarak senkronizasyon; CRM fixture UUID bind tip çakışması gerçek PG red/green kontrolüyle düzeltildi. Runtime/assertion/deadline değişmedi."
       }
     },
     {

@@ -266,6 +266,7 @@ max_frequency = "5s"
 # No real SMS is sent; this number and code are not hosted provider credentials.
 [auth.sms.test_otp]
 12025550101 = "654321"
+12025550102 = "654322"
 
 # Configure logged in session timeouts.
 # [auth.sessions]
