@@ -1,3 +1,4 @@
+import {apiRoles} from '../shards.mjs';
 import {receipt,validateBinding} from '../gate.mjs';
 import {validateQuality} from '../quality-proof.mjs';
 import {policyMatches} from '../source.mjs';
@@ -19,7 +20,7 @@ export async function resolveReference(github,context,id){
  validateQuality({binding:await receipt(github,repo,run,'quality'),pr,run,jobs,currentTree:tested.tree.sha});
  const live=(await github.rest.actions.getWorkflowRun({...repo,run_id:run.id})).data;
  assertUnchangedRun(run,live);
- return {run_id:run.id,attempt:run.run_attempt,head:binding.head,base:binding.base,merge:binding.merge,tree:binding.tree,definition:context.sha,url:run.html_url};
+ return {profile:binding.profile,run_id:run.id,attempt:run.run_attempt,head:binding.head,base:binding.base,merge:binding.merge,tree:binding.tree,definition:context.sha,url:run.html_url};
 }
 
 export function assertUnchangedRun(reference,live){
@@ -49,11 +50,12 @@ export async function summarize(github,context,core,reference){
  }
  const {writeFileSync,mkdirSync}=await import('node:fs');
  const role=j=>j.name.split(' / ').at(-1);
- const before=jobMeasurements(baseline.filter(j=>/^(core|api-[1-4])$/.test(role(j))));
+ const baselineRoles=new Set(['core',...apiRoles(reference.profile??'four-isolated-v2')]);
+ const before=jobMeasurements(baseline.filter(j=>baselineRoles.has(role(j))));
  const after=jobMeasurements(jobs.filter(j=>/^(core|experiment-api-[1-8])$/.test(j.name)));
  const window=rows=>(Math.max(...rows.map(r=>Date.parse(r.completed_at)))-Math.min(...rows.map(r=>Date.parse(r.started_at))))/1000;
  const cost=rows=>Math.round(rows.reduce((sum,r)=>sum+r.runner_s,0)/60*100)/100;
- const report={kind:'measurement-only',test_timeout:'unlimited in experimental API registration; baseline budgets unchanged',reference,experiment:{run_id:context.runId,attempt:run.run_attempt,definition:context.sha},baseline:before,experimental:after,matched_core_api:{runner_minutes:{baseline:cost(before),experiment:cost(after)},execution_window_s:{baseline:window(before),experiment:window(after)}},overhead:{baseline:jobMeasurements(baseline.filter(j=>!/^(core|api-[1-4])$/.test(role(j)))),experiment:jobMeasurements(jobs.filter(j=>j.name==='reference')),note:'Overhead is separate; the currently running comparison job is excluded. These are not total billed workflow minutes.'},note:'Diagnostic measurement only; test timeout policies differ, so successful experiment is not equivalent baseline timeout acceptance. No candidate/main/CD receipt. Baseline retained jobs use actual original execution timestamps. Compare per-job and queue times; successful completion is required, a single run is not proof of lasting improvement.'};
+ const report={kind:'measurement-only',test_timeout:'unlimited in experimental API registration; baseline budgets unchanged',reference,experiment:{run_id:context.runId,attempt:run.run_attempt,definition:context.sha},baseline:before,experimental:after,matched_core_api:{runner_minutes:{baseline:cost(before),experiment:cost(after)},execution_window_s:{baseline:window(before),experiment:window(after)}},overhead:{baseline:jobMeasurements(baseline.filter(j=>!baselineRoles.has(role(j)))),experiment:jobMeasurements(jobs.filter(j=>j.name==='reference')),note:'Overhead is separate; the currently running comparison job is excluded. These are not total billed workflow minutes.'},note:'Diagnostic measurement only; test timeout policies differ, so successful experiment is not equivalent baseline timeout acceptance. No candidate/main/CD receipt. Baseline retained jobs use actual original execution timestamps. Compare per-job and queue times; successful completion is required, a single run is not proof of lasting improvement.'};
  mkdirSync('.artifacts/ci/experiment',{recursive:true});writeFileSync('.artifacts/ci/experiment/comparison.json',JSON.stringify(report,null,2)+'\n');
  await core.summary.addRaw('## Eight-shard comparison\n\nDiagnostic only; existing merge and deployment acceptance unchanged.\n\n```json\n'+JSON.stringify(report,null,2)+'\n```\n').write();
  const live=(await github.rest.actions.getWorkflowRun({...repo,run_id:context.runId})).data;

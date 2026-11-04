@@ -3,8 +3,9 @@ import fs from 'node:fs';
 import assert from 'node:assert/strict';
 import {performance} from 'node:perf_hooks';
 import {spawnSync,execFileSync} from 'node:child_process';
-import {apiSuites} from './ci/select-tests.mjs';
-import {shardPlan,coverageHash} from './ci/shards.mjs';
+import {acceptancePlan,coverageHash,acceptanceProfile} from './ci/shards.mjs';
+import {buildInventory,materialize,executionPhases} from './ci/api-suites.mjs';
+import path from 'node:path';
 import {stackStatus,connect} from './db.mjs';
 function run(command,args,options={}) {
  const r=spawnSync(command,args,{stdio:'inherit',...options});
@@ -13,10 +14,10 @@ function run(command,args,options={}) {
 }
 const args=process.argv.slice(2),role=args[0]??'serial';
 if(!['serial','core','api'].includes(role)||args.length>(role==='api'?2:1))throw Error('Unknown clean role/arguments');
-const shard=role==='api'?shardPlan().find(b=>String(b.shard)===args[1]):null;
+const shard=role==='api'?acceptancePlan().find(b=>String(b.shard)===args[1]):null;
 if(role==='api'&&!shard)throw Error('Unknown shard');
 console.log('Supabase CLI:',execFileSync('node_modules/.bin/supabase',['--version'],{encoding:'utf8'}).trim());
-console.log('Clean coverage:',coverageHash(),'role:',role,'shard:',shard?.shard??'none');
+console.log('Clean coverage:',coverageHash(acceptanceProfile),'role:',role,'shard:',shard?.shard??'none');
 const phaseStart=performance.now();
 run('pnpm',['run','dev:start']);
 const startDone=performance.now();
@@ -47,7 +48,14 @@ if(role!=='api'){
  run('pnpm',['--dir',repoFile(),'exec','turbo','run','verify','--filter=@ftksaas/backend...']);
  run('pnpm',['run','test:db']);
 }
-if(role!=='core')run('node',['--test','--test-concurrency=2',...(shard?.suites??apiSuites).map(p=>repoFile(p))]);
+if(role!=='core'){
+ const inventory=buildInventory(repoFile()),units=shard?.units??inventory.units;
+ fs.mkdirSync(ciFile('api-tests'),{recursive:true});
+ for(const [index,phase] of executionPhases(units).entries()){
+  const files=materialize({...inventory,units:phase.units},path.join(ciFile('api-tests'),String(index)));
+  run('node',['--test','--test-concurrency='+phase.concurrency,'--test-reporter=spec','--test-reporter-destination=stdout','--test-reporter='+new URL('./ci/timing-reporter.mjs',import.meta.url).pathname,'--test-reporter-destination='+ciFile('api-tests','tests-'+index+'.jsonl'),...files]);
+ }
+}
 const testsAt=performance.now();
 if(role!=='api'){
 run('pnpm',['run','dev:seed']);
@@ -59,9 +67,9 @@ assert(report.checks.every(x=>x.passed));
 console.log('Clean acceptance completed: migrations, tests, synthetic seed and service health');
 
 }
-console.log('Completed clean role:',role,shard?.shard??'',coverageHash());
+console.log('Completed clean role:',role,shard?.shard??'',coverageHash(acceptanceProfile));
 
-const phases={role,shard:shard?.shard??null,coverage:coverageHash(),backend_setup_s:(preparedAt-phaseStart)/1000,setup:{...startTiming,start_command_s:(startDone-phaseStart)/1000,reset_migrations_s:(resetDone-resetStart)/1000,post_reset_readiness_s:(readyAt-resetDone)/1000,empty_database_verification_s:(preparedAt-readyAt)/1000},tests_s:(testsAt-preparedAt)/1000,seed_health_advisors_s:(performance.now()-testsAt)/1000};
+const phases={role,shard:shard?.shard??null,coverage:coverageHash(acceptanceProfile),backend_setup_s:(preparedAt-phaseStart)/1000,setup:{...startTiming,start_command_s:(startDone-phaseStart)/1000,reset_migrations_s:(resetDone-resetStart)/1000,post_reset_readiness_s:(readyAt-resetDone)/1000,empty_database_verification_s:(preparedAt-readyAt)/1000},tests_s:(testsAt-preparedAt)/1000,seed_health_advisors_s:(performance.now()-testsAt)/1000};
 fs.mkdirSync(ciFile('timings'),{recursive:true});fs.writeFileSync(ciFile('timings','clean-'+role+(shard?.shard??'')+'.json'),JSON.stringify({clean_phases:phases}));
 console.log('Clean phase timings:',JSON.stringify(phases));
 if(process.env.GITHUB_STEP_SUMMARY)fs.appendFileSync(process.env.GITHUB_STEP_SUMMARY,'\nClean phase timings (backend setup separate from tests):\n```json\n'+JSON.stringify(phases,null,2)+'\n```\n');

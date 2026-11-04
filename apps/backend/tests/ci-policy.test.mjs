@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {coverageHash,validateJobs} from '../scripts/ci/shards.mjs';
+import {coverageHash,validateJobs,acceptanceProfile,acceptancePlan} from '../scripts/ci/shards.mjs';
 import {ciFile,repoFile,repositoryRoot} from '../scripts/paths.mjs';
 import fs,{rmSync,writeFileSync,mkdtempSync} from 'node:fs';
 import {validateBinding,verifyMerged,validateDocumentBinding,checkPr,findCandidateProof,schemaBaselineName} from '../scripts/ci/gate.mjs';
@@ -12,6 +12,12 @@ import {tmpdir} from 'node:os';
 import {valid,scopedGithub,change,candidateProofFixture,jobsWithApiSeconds} from './ci-fixtures.mjs';
 process.chdir(repositoryRoot);
 
+const promoteFixture=v=>{
+ v.binding.profile=acceptanceProfile;v.binding.coverage=coverageHash(acceptanceProfile);
+ const first=v.jobs.find(j=>j.name.endsWith('api-1'));
+ for(let n=5;n<=8;n++)v.jobs.push({...structuredClone(first),id:1000+n,name:first.name.replace('api-1','api-'+n)});
+ return v;
+};
 const rerunFixture=()=>{
  const binding={kind:'full',profile:'four-isolated-v2',coverage:coverageHash(),pr:9,head:'H',base:'B',merge:'M',tree:'T',run_id:5,attempt:1,benchmark:false};
  const pr={number:9,state:'open',draft:false,head:{sha:'H'},base:{sha:'B',ref:'main'}};
@@ -23,7 +29,7 @@ const rerunFixture=()=>{
  const context={repo:{},runId:5,sha:'M',payload:{pull_request:structuredClone(pr)}};
  const github={rest:{actions:{getWorkflowRun:async()=>({data:run}),listJobsForWorkflowRunAttempt:'attempt-jobs'}},paginate:async(method,args)=>{assert.equal(method,'attempt-jobs');assert.equal(args.attempt_number,2);return jobs;}};
  const core={warning(){},summary:{addRaw(){return this;},async write(){}}};
- return{binding,pr,run,jobs,context,github,core};
+ return promoteFixture({binding,pr,run,jobs,context,github,core});
 };
 
 async function collectorFiles(fn){
@@ -67,7 +73,7 @@ test('all required shard jobs must succeed in the same run attempt view and head
 
 test('reusable full clean retains all obligations while automatic admission and privileged merge are separate',()=>{
  const clean=fs.readFileSync('.github/workflows/clean-suite.yml','utf8'),runner=fs.readFileSync('apps/backend/scripts/test-clean.mjs','utf8');
- assert(clean.includes('shard: [1, 2, 3, 4]'));assert(clean.includes('fail-fast: false'));assert(!clean.includes('max-parallel: 1'));
+ assert(clean.includes('shard: [1, 2, 3, 4, 5, 6, 7, 8]'));assert(clean.includes('fail-fast: false'));assert(!clean.includes('max-parallel: 1'));
  assert(clean.includes('needs: [core, api, serial-reference]'));assert(clean.includes('if: always()'));assert(clean.includes('Verify all required jobs'));
  for(const op of ['test:db','dev:seed','dev:health','db:advisors'])assert(runner.includes("['run','"+op+"']"));
  assert(runner.includes("['--dir',repoFile(),'exec','turbo','run','verify','--filter=@ftksaas/backend...']"));
@@ -143,7 +149,7 @@ test('collector publishes functional proof despite imbalance or unavailable timi
  try{
   for(const unavailable of [false,true]){
    const v=jobsWithApiSeconds([1154,1239,1488,1629]),warnings=[];
-   v.binding.profile='four-isolated-v2';v.jobs[0].steps.push({name:'Upload schema baseline',conclusion:'success'});
+   promoteFixture(v);v.jobs[0].steps.push({name:'Upload schema baseline',conclusion:'success'});
    const context={repo:{},runId:5,sha:'M',payload:{pull_request:v.pr}};
    if(unavailable)delete v.jobs[1].steps[0].started_at;
    const github={rest:{actions:{getWorkflowRun:async()=>({data:{...v.run,created_at:'2026-01-01T00:00:00Z'}}),listJobsForWorkflowRunAttempt:'jobs'}},paginate:async()=>v.jobs};
@@ -164,7 +170,7 @@ test('collector publishes functional proof despite imbalance or unavailable timi
 test('failed-job rerun accepts GitHub retained successes on the exact original source',async()=>collectorFiles(async()=>{
  const f=rerunFixture();await collect(f.github,f.context,f.core,f.binding);
  const binding=JSON.parse(fs.readFileSync(ciFile('binding.json')));
- assert.equal(binding.attempt,2);assert.equal(binding.source_attempt,1);assert.equal(binding.merge,'M');assert.equal(binding.profile,'four-isolated-v2');
+ assert.equal(binding.attempt,2);assert.equal(binding.source_attempt,1);assert.equal(binding.merge,'M');assert.equal(binding.profile,acceptanceProfile);
  const collector={id:200,name:'clean / full-clean',status:'completed',conclusion:'success',run_id:5,run_attempt:2,head_sha:'H',steps:[{name:'Verify all required jobs',conclusion:'success'}]};
  assert(validateBinding({binding,pr:f.pr,run:{...f.run,status:'completed',conclusion:'success'},jobs:[...f.jobs,collector],tested:{sha:'M',tree:{sha:'T'},parents:[{sha:'B'},{sha:'H'}]},currentTree:'T',workflowMatches:true}));
 }));
@@ -248,4 +254,17 @@ test('sandbox merge proves exact source without borrowing application acceptance
  }
  const {github:g}=scopedGithub(['apps/web1/demo.ts','apps/backend/database/kernel.sql']);g.paginate=async()=>[];
  assert.equal((await checkPr(g,{repo:{}},9)).state,'failure');
+});
+
+
+test('eight-shard acceptance requires all eight source-bound jobs and rejects legacy coverage',()=>{
+ const v=promoteFixture(valid());v.binding.source_attempt=1;v.jobs[0].steps.push({name:'Upload schema baseline',conclusion:'success'});
+ assert(validateBinding(v));
+ assert.equal(acceptancePlan().length,8);
+ const ids=acceptancePlan().flatMap(b=>b.units.map(u=>u.id));assert.equal(ids.length,64);assert.equal(new Set(ids).size,ids.length);
+ for(let n=5;n<=8;n++)for(const mutate of [x=>x.jobs.splice(x.jobs.findIndex(j=>j.name==='api-'+n),1),x=>x.jobs.find(j=>j.name==='api-'+n).conclusion='failure',x=>x.jobs.find(j=>j.name==='api-'+n).run_attempt=2,x=>x.jobs.find(j=>j.name==='api-'+n).head_sha='other',x=>x.jobs.find(j=>j.name==='api-'+n).steps[0].conclusion='skipped',x=>x.jobs.push(structuredClone(x.jobs.find(j=>j.name==='api-'+n)))]){
+  const x=structuredClone(v);mutate(x);assert.throws(()=>validateBinding(x));
+ }
+ const legacy=structuredClone(v);legacy.binding.coverage=coverageHash();assert.throws(()=>validateBinding(legacy));
+ assert.equal(schemaBaselineName(v.binding),'documentation-baseline');
 });

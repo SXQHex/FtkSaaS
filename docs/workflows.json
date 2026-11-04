@@ -14,7 +14,8 @@
         "apps/backend/tests/quality-guard.test.mjs",
         "apps/backend/tests/p06-acceptance.mjs",
         "apps/backend/tests/invitation-delivery-acceptance.mjs",
-        "apps/backend/tests/ci-experiment-checks.mjs"
+        "apps/backend/tests/ci-experiment-checks.mjs",
+        "apps/backend/tests/ci-api-suites.test.mjs"
       ],
       "sources": [
         "apps/backend/database/canonical-settings-scope.sql",
@@ -86,16 +87,24 @@
         "apps/backend/scripts/build-edge.mjs",
         "apps/backend/scripts/capture-docs.mjs",
         "apps/backend/scripts/check-migrations.py",
+        "apps/backend/scripts/ci/api-suites.json",
+        "apps/backend/scripts/ci/api-suites.mjs",
         "apps/backend/scripts/ci/check-quality.mjs",
         "apps/backend/scripts/ci/cleanup.mjs",
         "apps/backend/scripts/ci/collect.mjs",
         "apps/backend/scripts/ci/delta-analysis.mjs",
         "apps/backend/scripts/ci/deploy-development.mjs",
         "apps/backend/scripts/ci/deployment-source.mjs",
+        "apps/backend/scripts/ci/design-sandbox.mjs",
         "apps/backend/scripts/ci/docs-check.mjs",
         "apps/backend/scripts/ci/document-moves.json",
         "apps/backend/scripts/ci/document-paths.json",
         "apps/backend/scripts/ci/document-scope.mjs",
+        "apps/backend/scripts/ci/experiment/measurement-test.mjs",
+        "apps/backend/scripts/ci/experiment/reference.mjs",
+        "apps/backend/scripts/ci/experiment/run.mjs",
+        "apps/backend/scripts/ci/experiment/suites.mjs",
+        "apps/backend/scripts/ci/experiment/timing-reporter.mjs",
         "apps/backend/scripts/ci/floor-exceptions.json",
         "apps/backend/scripts/ci/floor-guard.mjs",
         "apps/backend/scripts/ci/gate.mjs",
@@ -113,6 +122,7 @@
         "apps/backend/scripts/ci/source.mjs",
         "apps/backend/scripts/ci/suite-durations.json",
         "apps/backend/scripts/ci/summarize-timings.mjs",
+        "apps/backend/scripts/ci/timing-reporter.mjs",
         "apps/backend/scripts/ci/timings.mjs",
         "apps/backend/scripts/db.mjs",
         "apps/backend/scripts/deliver-dev-invitations.mjs",
@@ -259,14 +269,7 @@
         "packages/api-contracts/src/generated.ts",
         "packages/api-contracts/src/index.ts",
         "packages/api-contracts/src/operations.ts",
-        "packages/api-contracts/src/runtime.ts",
-        "apps/backend/scripts/ci/design-sandbox.mjs",
-        "apps/backend/scripts/ci/experiment/reference.mjs",
-        "apps/backend/scripts/ci/experiment/run.mjs",
-        "apps/backend/scripts/ci/experiment/suites.mjs",
-        "apps/backend/scripts/ci/experiment/suites.json",
-        "apps/backend/scripts/ci/experiment/measurement-test.mjs",
-        "apps/backend/scripts/ci/experiment/timing-reporter.mjs"
+        "packages/api-contracts/src/runtime.ts"
       ],
       "operations": [
         "operation_status_get_v1",
@@ -276,8 +279,8 @@
         "management_state_get_v1"
       ],
       "review": {
-        "fingerprint": "ff50a40a411bf5b8dfd01e008b17005ee2bc1ca0150aa22e88502e71eab9955a",
-        "reason": "User scoped PR172 to production tests. Restored experiment inventory exactly to main; production event-payment harness retains P12/P13 import. Experiment source mismatch remains fail-closed and is not production acceptance."
+        "fingerprint": "5aa2b8cc178d395fac3deb3c6bd7f3056132fc4b27cbdd04eae665e5dda6db0e",
+        "reason": "Üretim sekiz shard, native timeout ve exact-source incelemesi; iki assertion izi yalnız dört yerine sekiz iş/profil beklentisi için dar kayıtlıdır."
       }
     },
     {

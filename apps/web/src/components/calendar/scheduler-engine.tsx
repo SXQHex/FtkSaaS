@@ -15,7 +15,7 @@ import trCalendar from "@syncfusion/ej2-cldr-data/main/tr/ca-gregorian.json";
 import numberingSystems from "@syncfusion/ej2-cldr-data/supplemental/numberingSystems.json";
 import trLocale from "@syncfusion/ej2-locale/src/tr.json";
 import { entryKey, type CalendarEntry, type CalendarRange } from "../../lib/schedule";
-import { preserveVisibleEventName } from "./scheduler-accessibility";
+import { configureSchedulerEvent } from "./scheduler-accessibility";
 import "./scheduler.css";
 
 loadCldr(trNumbers, trTimeZones, trCalendar, numberingSystems);
@@ -38,6 +38,12 @@ export default function SchedulerEngine({
   onSelect: (entry: CalendarEntry) => void;
 }) {
   const locale = useLocale();
+  const format = new Intl.DateTimeFormat(locale, {
+    timeZone,
+    dateStyle: "full",
+    timeStyle: "long",
+    hourCycle: "h23",
+  });
   if (!license) return null;
   const dataSource = entries.map((entry) => ({
     Id: entryKey(entry),
@@ -80,7 +86,15 @@ export default function SchedulerEngine({
           allowDeleting: false,
         }}
         eventClick={select}
-        eventRendered={({ element }) => preserveVisibleEventName(element)}
+        eventRendered={({ element, data }) => {
+          const entry = entries.find((value) => entryKey(value) === data.Id);
+          if (!entry) return;
+          configureSchedulerEvent(
+            element,
+            `${format.format(new Date(entry.startsAt))} – ${format.format(new Date(entry.endsAt))}`,
+            () => onSelect(entry),
+          );
+        }}
         popupOpen={(args) => {
           args.cancel = true;
         }}
