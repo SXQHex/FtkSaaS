@@ -95,6 +95,48 @@ Core özgün clean komutunu çalıştırır. Ayrı toplayıcı bütün deney iş
 
 Deney hiçbir candidate/main/CD kabul makbuzu veya merge status'u üretmez; üretim CI ve development dağıtımı kendi sekiz shard kabul kanıtını kullanır. Ölçüm koşusu bu kanıtın yerine geçmez. Yeni workflow ve CI araçlarının kurulumu mevcut kaynak-özel inceleme/kurulum prosedürüne tabidir; politika muafiyeti eklenmez.
 
+## CI/CD v2 — manuel oda pilotu
+
+### Amaç ve sınır
+
+V2'nin ilk dikey dilimi, [WF02](workflows.md#wf02) oda davranışını doğrudan Node test runner ile sınayan bağımsız bir tanı hattıdır. Ürün geliştirmesi ve mevcut sekiz shard kabulü devam eder. Pilotun başarısı mevcut full clean, merge/main kabulü veya development/production dağıtım yetkisi değildir. Yeni hat required check yapılmaz; mevcut workflow, status, trusted politika ve dağıtım kararları bu dilimde değiştirilmez.
+
+[CI V2 Pilot](../.github/workflows/ci-v2-pilot.yml) yalnız `workflow_dispatch` ile seçilen ref'in sabit `github.sha` kaynağını çalıştırır. PR/push/schedule tetiklemesi, keyfî ikinci kaynak girdisi, hosted secret veya status/deployment yazma yetkisi yoktur. İlk GitHub koşusu workflow'un varsayılan dala mevcut trusted kurulum prosedürüyle alınmasını gerektirir; dalda hazırlanmış kaynak çalışmış kabul edilmez. Bu workflow da trusted yüzeydir; yeni bir politika muafiyeti oluşturmaz.
+
+### Yapı ve komutlar
+
+| Kaynak | Sorumluluk |
+|---|---|
+| `apps/backend/tests/v2/room.test.mjs` | Doğrudan keşfedilen gerçek API testleri; başka kabul dosyası import etmez |
+| `apps/backend/tests/v2/room-fixture.mjs` | Her köke ayrı tenant ve DB bağlantısı; mevcut API istemcisini kullanır |
+| `apps/backend/scripts/ci/v2/safety.mjs` | Tam kaynak, manuel/disposable çalışma ve loopback sınırı |
+| `apps/backend/scripts/ci/v2/local.mjs` | İzole kurulum/reset, migration/boş DB kontrolü ve sahipli cleanup |
+| `apps/backend/tests/v2/safety.test.mjs` | Yanlış kaynak, otomatik olay ve hosted URL reddi |
+
+Repo kökünde dependency-free güvenlik testi:
+
+```sh
+node --test apps/backend/tests/v2/safety.test.mjs
+```
+
+Workflow'da temiz checkout ve backend kurulumu sonrasında `apps/backend` içinden:
+
+```sh
+node scripts/ci/v2/local.mjs prepare
+FTK_EDGE_MEMORY_GUARD=1 node scripts/ci/observe-api.mjs node --test --test-concurrency=1 --test-reporter=spec --test-reporter-destination=stdout --test-reporter=junit --test-reporter-destination=../../.artifacts/ci-v2/room.junit.xml tests/v2/room.test.mjs
+node scripts/ci/v2/local.mjs cleanup
+```
+
+Prepare yalnız manuel GitHub Actions bağlamında, tam SHA eşleşen temiz ve `.dev` içermeyen checkout'ta çalışır; mevcut native stack'e bağlanmayı reddeder. Gerçek yerel Auth/Edge/RPC kullanılır; reset yalnız doğrulanmış loopback servisinde `--local --no-seed` ile yapılır. Migration manifesti ve boş Auth/tenant/receipt kontrol edilir. Her test yeni tenant kurar; global ayar/DDL değiştirmez. Native `oneshot`, mevcut istek deadline'ları ve 3 GiB Edge koruması korunur. Kaynak satırı kesme, test gövdesi yükleme kancası ve timeout geçersiz kılma yoktur. Cleanup yalnız aynı SHA/run/attempt'in sahiplik işaretini taşıyan stack'i durdurur; hosted reset/seed veya dış posta gönderimi yoktur.
+
+### Pilot kapsamı ve geçiş kabulü
+
+Pilot dört bağımsız kökte oluşturma/aynı anahtar tekrarı/liste-ayrıntı/sürümle güncelleme/eski sürüm reddini, geçersiz fiziksel kapasiteyi, atanmamış merkez reddini ve iki gerçek tenant arasında okuma/yazma izolasyonunu sınar. Yeni API/ürün kuralı eklemez. Mevcut geniş oda/rol testinin pagination, yarış, geç hata rollback'i, rol/Starter ve migration senaryolarının tamamının yerine geçmez; eski test kaldırılmaz.
+
+JUnit sonuçları ile tam commit/tree/run/attempt ve `full_clean:false` kapsam kaydı `.artifacts/ci-v2` altında yedi günlük tanı artifact'ıdır. `.dev`, bağlantı bilgileri, oturum/fixture ve yerel servis logları artifact'a alınmaz. Yerleşik Node assertion stili kullanılır; küçük, açık testler ve parametrik SQL korunur. İlk dilimde runtime/migration/sözleşme/paket sürümü ve lockfile değiştirilmez.
+
+Sonraki alan bazlı geçiş için aynı tam kaynakta mevcut kabul ile V2 sonuçları karşılaştırılmalı; eski assertion'ların yeni sahipleri ve açık eksikler gösterilmeli; seçilmiş gerçek yetki/veri hatalarıyla hata yakalama kanıtlanmalı; süre ve runner maliyeti ayrı ölçülmelidir. Yalnız hızlı/yeşil pilot alanı devralamaz. Test katmanı veya required-check/CD devri ayrı incelenmiş değişikliktir. Gölge koşuları seçilmiş checkpoint'lerde yürür; her ürün push'unda ikinci full clean oluşturulmaz.
+
 ## Güvenilir politika ve dağıtım
 
 `ftksaas/merge-clean` status’unu yalnız main’den çalışan doğrulayıcı üretir. Aday testleri salt-okuma token kullanır, secrets/status-write yetkisi almaz. Yetkili doğrulayıcı aday kodu veya artifact executable’ı çalıştırmaz. Bütün `.github/workflows/*`, `.github/dependabot.yml`, frontend `ci-scope.mjs`/`ci-proof.mjs`, `scripts/ci` ve clean/start/path runner blob/mode kümesi trusted yüzeydir. Frontend-only sınıflandırma dahi workflow politika değişikliğine otomatik izin vermez.

@@ -15,7 +15,8 @@
         "apps/backend/tests/p06-acceptance.mjs",
         "apps/backend/tests/invitation-delivery-acceptance.mjs",
         "apps/backend/tests/ci-experiment-checks.mjs",
-        "apps/backend/tests/ci-api-suites.test.mjs"
+        "apps/backend/tests/ci-api-suites.test.mjs",
+        "apps/backend/tests/v2/safety.test.mjs"
       ],
       "sources": [
         "apps/backend/database/canonical-settings-scope.sql",
@@ -269,7 +270,9 @@
         "packages/api-contracts/src/generated.ts",
         "packages/api-contracts/src/index.ts",
         "packages/api-contracts/src/operations.ts",
-        "packages/api-contracts/src/runtime.ts"
+        "packages/api-contracts/src/runtime.ts",
+        "apps/backend/scripts/ci/v2/local.mjs",
+        "apps/backend/scripts/ci/v2/safety.mjs"
       ],
       "operations": [
         "operation_status_get_v1",
@@ -279,8 +282,8 @@
         "management_state_get_v1"
       ],
       "review": {
-        "fingerprint": "5aa2b8cc178d395fac3deb3c6bd7f3056132fc4b27cbdd04eae665e5dda6db0e",
-        "reason": "Üretim sekiz shard, native timeout ve exact-source incelemesi; iki assertion izi yalnız dört yerine sekiz iş/profil beklentisi için dar kayıtlıdır."
+        "fingerprint": "a82ae9a983e328df5261d061a1038856fe9b384f3b59e2cd9d4c1e00d810de45",
+        "reason": "CI v2 adds explicit manual pilot safety tests and exact-source loopback diagnostics; existing protocol and production obligations stay unchanged."
       }
     },
     {
@@ -374,7 +377,8 @@
         "apps/backend/tests/p07-account-revocation-acceptance.mjs",
         "apps/backend/tests/availability-policies.test.mjs",
         "apps/backend/tests/starter-instructor-acceptance.mjs",
-        "apps/backend/tests/event-capacity-package-acceptance.mjs"
+        "apps/backend/tests/event-capacity-package-acceptance.mjs",
+        "apps/backend/tests/v2/room.test.mjs"
       ],
       "sources": [
         "apps/backend/database/account-session-management.sql",
@@ -429,7 +433,8 @@
         "apps/backend/database/starter-subscriber-projections.sql",
         "apps/backend/supabase/migrations/20261102180626_starter_subscriber_projections.sql",
         "apps/backend/database/event-capacity-practice.sql",
-        "apps/backend/supabase/migrations/20261103233454_event_capacity_practice.sql"
+        "apps/backend/supabase/migrations/20261103233454_event_capacity_practice.sql",
+        "apps/backend/tests/v2/room-fixture.mjs"
       ],
       "operations": [
         "organizations_list_v1",
@@ -455,8 +460,8 @@
         "role_revoke_preview_v1"
       ],
       "review": {
-        "fingerprint": "280054a691ce13a92236d3b83b6349fce27bc1c0d6dcbeeecb1b4838a841a054",
-        "reason": "Merged main PR173 native test-root splitting and PR171 CRM documentation with PR172 P12/P13 runtime and corrected internal venue timezones. Both source/test mappings retained; guide behavior unchanged."
+        "fingerprint": "4a41d039564ad2e9cc67870baa41bcb2e6f61ba91dfdc25fc964e946f52e65bc",
+        "reason": "Reviewed native room values, timestamps and center/tenant checks against session-capacity SQL; independent V2 pilot compares stable state and preserves legacy coverage."
       }
     },
     {
