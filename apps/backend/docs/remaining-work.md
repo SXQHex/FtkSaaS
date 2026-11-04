@@ -10,6 +10,8 @@ Bu dosya **Starter, Pro ve Business’ın tamamı için backend görevlerinin te
 - Sorumlu backend’dir. Frontend ekran/tasarım/kabulü bu planın işi değildir; yalnız gerçek API tüketicisi gerektiren bağımlılık [ortak taleple](../../../docs/requests.md) izlenir. Backend frontend adına kapanış vermez.
 - Test/doğrulama yöntemi [aşağıda](#doğrulama-ve-kayıt); saf belge işi DB/API çalıştırmayı gerektirmez. Hosted reset/seed, yeni dış gönderim, production dağıtımı veya canlı veri aktarımı bu planın yazılmasıyla başlamaz.
 
+**ST-02 kabul onarımı tamamlandı:** PR192 aday/main/development kabulü doğrulandı; [kaynak kanıtı](00-FtkSaaS-yeni-sohbet-devir.md#st-02-bağımsız-rapor-kabul-kökleri). PR190 güncel main ile senkronize edilerek yeni birleşik kaynak kabulüne gider. P08–P11 ürün/sağlayıcı işleri kendi alt adımlarında açık kalır.
+
 ## Eski iş kimliklerinin tek görev karşılığı
 
 Bu tablo yalnız izdir; eski kabul metinleri ikinci kez tutulmaz.

@@ -21,7 +21,8 @@
         "apps/backend/tests/v2/plan.test.mjs",
         "apps/backend/tests/v2/backend.test.mjs",
         "apps/backend/tests/v2/backend/api-acceptance-root-1.test.mjs",
-        "apps/backend/tests/ci-v2-development-unit.mjs"
+        "apps/backend/tests/ci-v2-development-unit.mjs",
+        "apps/backend/tests/v2/core.test.mjs"
       ],
       "sources": [
         "apps/backend/database/canonical-settings-scope.sql",
@@ -284,7 +285,8 @@
         "apps/backend/scripts/ci/v2/migration.mjs",
         "apps/backend/scripts/ci/v2/settings.mjs",
         "apps/backend/tests/v2/backend-suites.json",
-        "apps/backend/scripts/ci/v2-development.mjs"
+        "apps/backend/scripts/ci/v2-development.mjs",
+        "apps/backend/scripts/ci/v2/core.mjs"
       ],
       "operations": [
         "operation_status_get_v1",
@@ -294,8 +296,8 @@
         "management_state_get_v1"
       ],
       "review": {
-        "fingerprint": "4ebc38ce75a593ae4ee7f820821e4a48e5b319c4691e2480b54f97f9aca37c4b",
-        "reason": "Provider unit imports reviewed; existing contract and native obligations preserved, no new endpoint or production policy change."
+        "fingerprint": "a78617a3a11f3972b027d72326b4bd1ca86da5dc4ab181b609390ada1975edb7",
+        "reason": "PR192 main senkronizasyonu: üretim ST-02 71 birim ve mevcut sağlayıcı unit importları birlikte incelendi; gate ve V2 davranışı değişmedi."
       }
     },
     {
@@ -676,8 +678,8 @@
         "person_discipline_set_v1"
       ],
       "review": {
-        "fingerprint": "798e4d7919641c7d8612502bf6789593fc96acd0a7dc5b6ae1ed545bc2ffa978",
-        "reason": "Main PR185 V2 kaynak/test bağları ile PR182 CRM/self bağları birlikte incelendi;67 gerçek birim parity kontrolünde aynı gövdeleri korur, üretim kabul kapıları değişmez."
+        "fingerprint": "d7e0ae2af83e51101ef7259b5496a9425176a969c6faf6cc9a5fbbdda3a5973c",
+        "reason": "Üretim ST-02 kişi önkoşulları ve Abone No kontrolleri korundu; bağımsız V2 kaynakları main ile aynı."
       }
     },
     {
@@ -1000,8 +1002,8 @@
         "debt_adjust_v1"
       ],
       "review": {
-        "fingerprint": "a1529207cbb01c12e091caa2b0d2d277eac4babc3d76510f0abe0fea5898c8f7",
-        "reason": "Direct V2 shadow migration: byte-equivalence and module/resource relocation checks preserve the owning legacy test bodies; runtime and guide behavior unchanged. Twenty-runner execution remains diagnostic only."
+        "fingerprint": "d3ded3a8491288e27f95c01925e226f2379ff0f0dd070230a470e840e0839c1e",
+        "reason": "Üretim ST-02 açılış borç fixture ve finans kontrolleri bağımsız köklerde korundu; V2 kapsam dışıdır."
       }
     },
     {
@@ -1105,8 +1107,8 @@
         "file_upload_complete_v1"
       ],
       "review": {
-        "fingerprint": "27f7c327a21554c5c9d0871aee7436245cefb0f097248767dc96b33fba8317a4",
-        "reason": "Direct V2 shadow migration: byte-equivalence and module/resource relocation checks preserve the owning legacy test bodies; runtime and guide behavior unchanged. Twenty-runner execution remains diagnostic only."
+        "fingerprint": "bf0c52d419b64a0a897964195cf00b64279cde0e3e1711a450d26361043df4a6",
+        "reason": "Yalnız üretim ST-02 rapor, import ve export callbackleri byte-exact bağımsız köklere taşındı; V2 değiştirilmedi."
       }
     },
     {
@@ -1146,8 +1148,8 @@
         "document_publication_preview_v1"
       ],
       "review": {
-        "fingerprint": "24e7d3763c462a56fec5273f32cb1fa9e0f7b29317047e9fe421718c64d0b142",
-        "reason": "Main PR185 V2 kaynak/test bağları ile PR182 CRM/self bağları birlikte incelendi;67 gerçek birim parity kontrolünde aynı gövdeleri korur, üretim kabul kapıları değişmez."
+        "fingerprint": "5f14d2f2bcbc809fb502eb4e4658e44fc64f31ce43ed5e19ceb64e6e1f3e226e",
+        "reason": "Üretim ST-02 inbox kendi gerçek import/export işlerini kurar; requester ve replay assertionları korundu. V2 kapsam dışıdır."
       }
     },
     {
@@ -1204,8 +1206,8 @@
         "settings_preparation_resolve_v1"
       ],
       "review": {
-        "fingerprint": "de8465cf52a9a782a050bc667556d9ed1e394a129f552fcd97b9f21693061491",
-        "reason": "Direct V2 shadow migration: byte-equivalence and module/resource relocation checks preserve the owning legacy test bodies; runtime and guide behavior unchanged. Twenty-runner execution remains diagnostic only."
+        "fingerprint": "dc0ca5ac7b4c1c3a3e0a635a97ee05ce70a54c8e94e3689007025d9ca9413ae6",
+        "reason": "Üretim ST-02 şablon önkoşulları bağımsız hazırlandı; özgün yetki/reset callbackleri ve V2 kaynakları korundu."
       }
     },
     {
