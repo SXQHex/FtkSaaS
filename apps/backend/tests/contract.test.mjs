@@ -336,3 +336,18 @@ test('P13 package eligibility mode and factual ineligible attendance are closed 
  assert(valid('Request_event_attendance_mark',r));
  assert(!valid('Request_event_attendance_mark',{...r,reason:undefined}));
 });
+
+test('P05 Starter basic CRM is explicit and person-only followups retain the advanced gate',()=>{
+ const f=p['x-contract'].feature_delivery.F21;
+ assert.equal(f.plans.starter,true);
+ assert.equal(f.plan_scope.starter,'Temel aday takibi');
+ const activity=p['x-contract'].operations.find(o=>o.name==='crm_activity_save_v1');
+ assert.deepEqual(activity.runtime_required_features,['F21']);
+ assert(activity.conditional_features.some(v=>v.feature==='F23'&&v.when==='person_only_followup'));
+ const scope=p['x-contract'].starter_plan_policy.basic_crm;
+ assert.deepEqual(scope.operations,['leads_list_v1','lead_save_v1','crm_activity_save_v1']);
+ assert.equal(scope.activity_target,'lead_only');
+ assert.equal(scope.read_operation,'management_state_get_v1');
+ assert.deepEqual(scope.sources,['manual','phone','whatsapp']);
+ assert.equal(fs.readFileSync('database/starter-basic-crm.sql','utf8'),fs.readFileSync('supabase/migrations/20261104111220_starter_basic_crm.sql','utf8'));
+});

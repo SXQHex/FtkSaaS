@@ -1,10 +1,10 @@
 # Veritabanı kaynak referansı
 
-Üretilmiştir: `node apps/backend/scripts/update-docs.mjs --write`. Elle düzenleme. Kaynak içerik özeti: `ae8935d916e29d6f1da1c1fb95d86bfb1fa0d92ede1559cce099e98cc55d74d3`. Bu özet CI/hosted kabulü değildir; dağıtılan SHA ve ortam CD artifact'ında bulunur.
+Üretilmiştir: `node apps/backend/scripts/update-docs.mjs --write`. Elle düzenleme. Kaynak içerik özeti: `5de234bf87e3fb63ecd3f3b0606aeebf20e825e7efda97b37e68ffbb7e216487`. Bu özet CI/hosted kabulü değildir; dağıtılan SHA ve ortam CD artifact'ında bulunur.
 
 Alan/scope/değişmez görünümü [fiziksel şema kataloğundadır](contracts/04-FtkSaaS-O4-veri-semasi.md). Bu dosya ikinci DDL sözleşmesi değildir. Etkin PostgreSQL şeması migration zincirinin uygulanmasıyla oluşur; dosyaları regex ile birleştirmek nihai şema çıkarımı sayılmaz.
 
-Sıralı migration: 101. Uygulanmış içerik manifesti: [migrations.sha256.json](../apps/backend/database/migrations.sha256.json). CD, migration içeriklerini canlı geçmişle doğrular; dokümantasyon capture adımı ayrıca read-only pg_catalog snapshot ve Supabase CLI DB tiplerini alır. İş verisi/Auth satırı/secret toplanmaz.
+Sıralı migration: 102. Uygulanmış içerik manifesti: [migrations.sha256.json](../apps/backend/database/migrations.sha256.json). CD, migration içeriklerini canlı geçmişle doğrular; dokümantasyon capture adımı ayrıca read-only pg_catalog snapshot ve Supabase CLI DB tiplerini alır. İş verisi/Auth satırı/secret toplanmaz.
 
 | Migration | SHA256 |
 |---|---|
@@ -109,3 +109,4 @@ Sıralı migration: 101. Uygulanmış içerik manifesti: [migrations.sha256.json
 | [20261103141306_commercial_plan_limits.sql](../apps/backend/supabase/migrations/20261103141306_commercial_plan_limits.sql) | `b5dd6eb0f8d30806ff9828b39d084b7344194a02477394e28b3ce2e75fa1ed37` |
 | [20261103194514_class_duty_management.sql](../apps/backend/supabase/migrations/20261103194514_class_duty_management.sql) | `0324c08549d2fb98a7604a496d6e8b418141870a140c25a3798132368984242a` |
 | [20261103233454_event_capacity_practice.sql](../apps/backend/supabase/migrations/20261103233454_event_capacity_practice.sql) | `0562a2fa7b22721d78e93490051b2bda49f139826836d4f0a984528dfc9ab2f7` |
+| [20261104111220_starter_basic_crm.sql](../apps/backend/supabase/migrations/20261104111220_starter_basic_crm.sql) | `411fdfc92c83f7f0051c02d1e73df6c51a91abbca042697535a1978689e27cda` |
