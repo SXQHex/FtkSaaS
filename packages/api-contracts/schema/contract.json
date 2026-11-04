@@ -23139,7 +23139,14 @@
           "$ref": "#/$defs/ApplicationState"
         },
         "bot_verified_at": {
-          "$ref": "#/$defs/Instant"
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Instant"
+            },
+            {
+              "type": "null"
+            }
+          ]
         },
         "request_reference": {
           "anyOf": [
@@ -23198,6 +23205,20 @@
           "items": {
             "$ref": "#/$defs/CrmApplicationRouting"
           }
+        },
+        "provider_payload_hash": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "provider_lead_id": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "maxLength": 2048
         }
       },
       "required": [
@@ -51258,7 +51279,11 @@
       "type": "object",
       "properties": {
         "channel": {
-          "const": "web_form"
+          "enum": [
+            "web_form",
+            "meta",
+            "google_ads"
+          ]
         },
         "form_key": {
           "type": "string",
@@ -51272,6 +51297,45 @@
         },
         "form_id": {
           "$ref": "#/$defs/FtkUuid"
+        },
+        "external_form_id": {
+          "type": "string",
+          "pattern": "^[1-9][0-9]{0,31}$"
+        },
+        "external_page_id": {
+          "anyOf": [
+            {
+              "type": "string",
+              "pattern": "^[1-9][0-9]{0,31}$"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "external_lead_id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 2048
+        },
+        "submitted_at": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Instant"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "is_test": {
+          "type": [
+            "boolean",
+            "null"
+          ]
+        },
+        "attribution": {
+          "$ref": "#/$defs/CrmProviderAttribution"
         }
       },
       "required": [
@@ -51280,7 +51344,72 @@
         "source_url",
         "form_id"
       ],
-      "additionalProperties": false
+      "additionalProperties": false,
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "channel": {
+                "const": "web_form"
+              }
+            }
+          },
+          "then": {
+            "maxProperties": 4
+          },
+          "else": {
+            "required": [
+              "external_form_id",
+              "external_page_id",
+              "external_lead_id",
+              "submitted_at",
+              "is_test",
+              "attribution"
+            ]
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "channel": {
+                "const": "meta"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "external_page_id": {
+                "type": "string",
+                "pattern": "^[1-9][0-9]{0,31}$"
+              },
+              "external_lead_id": {
+                "type": "string",
+                "pattern": "^[1-9][0-9]{0,31}$"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "channel": {
+                "const": "google_ads"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "external_page_id": {
+                "type": "null"
+              },
+              "external_form_id": {
+                "type": "string",
+                "pattern": "^[1-9][0-9]{0,18}$"
+              }
+            }
+          }
+        }
+      ]
     },
     "CrmIntakeConsent": {
       "type": "object",
@@ -51576,6 +51705,145 @@
         "display_name"
       ],
       "additionalProperties": false
+    },
+    "CrmProviderAttribution": {
+      "type": "object",
+      "properties": {
+        "ad_id": {
+          "type": "string",
+          "pattern": "^[1-9][0-9]{0,31}$"
+        },
+        "adset_id": {
+          "type": "string",
+          "pattern": "^[1-9][0-9]{0,31}$"
+        },
+        "campaign_id": {
+          "type": "string",
+          "pattern": "^[1-9][0-9]{0,31}$"
+        },
+        "adgroup_id": {
+          "type": "string",
+          "pattern": "^[1-9][0-9]{0,31}$"
+        },
+        "creative_id": {
+          "type": "string",
+          "pattern": "^[1-9][0-9]{0,31}$"
+        },
+        "asset_group_id": {
+          "type": "string",
+          "pattern": "^[1-9][0-9]{0,31}$"
+        },
+        "gcl_id": {
+          "type": "string",
+          "maxLength": 2048
+        },
+        "platform": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 64
+        }
+      },
+      "required": [],
+      "additionalProperties": false
+    },
+    "CrmProviderDelivery": {
+      "description": "Server-only normalized provider delivery; native receiver scope is mandatory. No human operation or HTTP acknowledgement.",
+      "type": "object",
+      "properties": {
+        "provider": {
+          "enum": [
+            "meta",
+            "google_ads"
+          ]
+        },
+        "external_form_id": {
+          "type": "string",
+          "pattern": "^[1-9][0-9]{0,31}$"
+        },
+        "external_page_id": {
+          "anyOf": [
+            {
+              "type": "string",
+              "pattern": "^[1-9][0-9]{0,31}$"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "external_lead_id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 2048
+        },
+        "submitted_at": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Instant"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "is_test": {
+          "type": [
+            "boolean",
+            "null"
+          ]
+        },
+        "attribution": {
+          "$ref": "#/$defs/CrmProviderAttribution"
+        },
+        "intake": {
+          "$ref": "#/$defs/CrmIntake"
+        }
+      },
+      "required": [
+        "provider",
+        "external_form_id",
+        "external_page_id",
+        "external_lead_id",
+        "submitted_at",
+        "is_test",
+        "attribution",
+        "intake"
+      ],
+      "additionalProperties": false,
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "provider": {
+                "const": "meta"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "external_page_id": {
+                "type": "string",
+                "pattern": "^[1-9][0-9]{0,31}$"
+              },
+              "external_lead_id": {
+                "type": "string",
+                "pattern": "^[1-9][0-9]{0,31}$"
+              }
+            }
+          },
+          "else": {
+            "properties": {
+              "external_page_id": {
+                "type": "null"
+              },
+              "external_form_id": {
+                "type": "string",
+                "pattern": "^[1-9][0-9]{0,18}$"
+              }
+            }
+          }
+        }
+      ]
     }
   },
   "x-contract": {
@@ -95471,6 +95739,10 @@
       {
         "function": "private.account_signup_gate",
         "kind": "service_only_signup_existence_and_durable_dispatch"
+      },
+      {
+        "function": "private.crm_provider_submit",
+        "kind": "native_receiver_form_scoped_atomic_common_intake"
       }
     ],
     "runtime": {
@@ -95703,7 +95975,7 @@
       "uuid": "backend uuid@14.0.3 v7 for all inserted IDs; DB defaults not required",
       "external_transport": "POST /functions/v1/backend-v1/{operation}; direct typed request body",
       "internal_rpc": "service-only api_v1 named functions; actor/session/UUID bank supplied by verified gateway",
-      "migration_count": 104,
+      "migration_count": 105,
       "acceptance_source": "apps/backend/docs/00-FtkSaaS-yeni-sohbet-devir.md"
     },
     "decision_sprint": {

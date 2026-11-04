@@ -9,7 +9,7 @@ on:
         options: [plan, room]
         default: plan
       scope:
-        description: Verification scope (backend/full plan twenty backend shards)
+        description: Verification scope (backend/full plan twelve backend shards)
         type: choice
         options: [auto, backend, full]
         default: auto

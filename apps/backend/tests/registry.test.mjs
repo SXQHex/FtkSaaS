@@ -140,3 +140,4 @@ import './starter-studio-acceptance.mjs';
 import './document-self-requirements-acceptance.mjs';
 import './crm-application-intake-acceptance.mjs';
 import './crm-application-review-acceptance.mjs';
+import './crm-provider-intake-acceptance.mjs';

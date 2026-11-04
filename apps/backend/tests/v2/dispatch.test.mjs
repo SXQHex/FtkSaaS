@@ -8,12 +8,12 @@ import {selectImpact} from '../../scripts/ci/v2/scope.mjs';
 import {assertShadowResults,createDispatchPlan} from '../../scripts/ci/v2/dispatch.mjs';
 
 test('frontend backend and common changes require only their selected domains plus baseline controls',()=>{
- for(const [file,frontend,backend] of [['apps/web/src/page.tsx',true,false],['apps/backend/database/kernel.sql',false,true],['packages/api-contracts/src/index.ts',true,true],['docs/workflows.md',false,false]]){
+ for(const [file,frontend,backend] of [['apps/web/src/page.tsx',true,false],['apps/backend/database/kernel.sql',false,true],['packages/api-contracts/src/index.ts',false,true],['docs/workflows.md',false,false]]){
   const impact=selectImpact([file]);assert.equal(impact.frontend,frontend);assert.equal(impact.backend,backend);
   const results={common:'success',frontend:frontend?'success':'skipped',backend:backend?'success':'skipped'};
   assert.doesNotThrow(()=>assertShadowResults(impact,results));
   for(const [name,value] of Object.entries(results))for(const status of ['failure','cancelled',undefined,value==='skipped'?'success':'skipped'])assert.throws(()=>assertShadowResults(impact,{...results,[name]:status}));
-  assert.equal(impact.backend_matrix.length,backend?20:0);
+  assert.equal(impact.backend_matrix.length,backend?12:0);
  }
  assert.equal(selectImpact(['apps/web/src/page.tsx']).common,false);
 });

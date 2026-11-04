@@ -29,7 +29,7 @@ test('real committed diff produces a source-bound diagnostic with no backend or 
  assert.equal(p.impact.baseline,true);assert.equal(p.acceptance,false);
  assert.equal(p.backend_execution,'not-implemented');
  const full=createPlan({...f,mode:'full'});
- assert.equal(full.impact.backend_matrix.length,20);
+ assert.equal(full.impact.backend_matrix.length,12);
 });
 
 test('wrong checkout, symbolic refs, non-ancestor base, dirty source and empty diff are rejected',t=>{

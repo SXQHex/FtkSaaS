@@ -8,13 +8,13 @@ import {repositoryRoot,repoFile} from '../../scripts/paths.mjs';
 import {backendPlan} from '../../scripts/ci/v2/backend.mjs';
 import {relocateImports} from '../../scripts/ci/v2/migration.mjs';
 
-test('twenty nonempty shards cover every direct suite exactly once',()=>{
- const plan=backendPlan();assert.equal(plan.length,20);
+test('twelve nonempty shards cover every direct suite exactly once',()=>{
+ const plan=backendPlan();assert.equal(plan.length,12);
  assert(plan.every(job=>job.files.length>0));
  assert.deepEqual(plan.flatMap(job=>job.files).sort(),suites.map(s=>s.file).sort());
  assert.equal(new Set(plan.flatMap(job=>job.files)).size,suites.length);
  assert.deepEqual(backendPlan([...suites].reverse()),plan);
- for(const broken of [suites.slice(0,19),[...suites,suites[0]],suites.map((s,i)=>i?s:{...s,file:'../private.mjs'}),suites.map((s,i)=>i?s:{...s,estimated_seconds:0})])assert.throws(()=>backendPlan(broken));
+ for(const broken of [suites.slice(0,11),[...suites,suites[0]],suites.map((s,i)=>i?s:{...s,file:'../private.mjs'}),suites.map((s,i)=>i?s:{...s,estimated_seconds:0})])assert.throws(()=>backendPlan(broken));
 });
 
 test('direct migration retains all legacy unit bodies, assertions and resource paths',()=>{

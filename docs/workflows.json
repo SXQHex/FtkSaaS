@@ -23,7 +23,8 @@
         "apps/backend/tests/v2/backend/api-acceptance-root-1.test.mjs",
         "apps/backend/tests/ci-v2-development-unit.mjs",
         "apps/backend/tests/v2/core.test.mjs",
-        "apps/backend/tests/v2/dispatch.test.mjs"
+        "apps/backend/tests/v2/dispatch.test.mjs",
+        "apps/backend/tests/v2/domain.test.mjs"
       ],
       "sources": [
         "apps/backend/database/canonical-settings-scope.sql",
@@ -288,7 +289,8 @@
         "apps/backend/tests/v2/backend-suites.json",
         "apps/backend/scripts/ci/v2-development.mjs",
         "apps/backend/scripts/ci/v2/core.mjs",
-        "apps/backend/scripts/ci/v2/dispatch.mjs"
+        "apps/backend/scripts/ci/v2/dispatch.mjs",
+        "apps/backend/scripts/ci/v2/domain.mjs"
       ],
       "operations": [
         "operation_status_get_v1",
@@ -298,8 +300,8 @@
         "management_state_get_v1"
       ],
       "review": {
-        "fingerprint": "3bc0e226a7d2b4c6ca2c79169e4302e94fb9ccc1b97108338e542c89827d64b2",
-        "reason": "PR191 main değişiklikleri korunarak Meta Graph unit suite importu eklendi; üretim kabul kapıları ve V2 kaynakları değişmedi."
+        "fingerprint": "372dc5890bbcd260cfe532bd32733dca239d8f3e40234e421698a7aa946641ac",
+        "reason": "PR193 main kaynakları aynen korunarak migration105, kapalı sağlayıcı DTOları ve 73 üretim birimi incelendi; V2 ve mevcut kabul politikası değiştirilmedi."
       }
     },
     {
@@ -482,8 +484,8 @@
         "role_revoke_preview_v1"
       ],
       "review": {
-        "fingerprint": "644f6d5ea0d6d0b78b652be5427fd4c35e269c4b2ff041d04abbc564f468a0d0",
-        "reason": "Main PR185 V2 kaynak/test bağları ile PR182 CRM/self bağları birlikte incelendi;67 gerçek birim parity kontrolünde aynı gövdeleri korur, üretim kabul kapıları değişmez."
+        "fingerprint": "7e2f1b916e729b170411f4623de00ac711137d456d7bf5c614cdf29e1ecbfa94",
+        "reason": "Registry yalnız iki izole provider kabul kökünü import eder; organizasyon/merkez kurulum API sırası ve yetkisi değişmedi."
       }
     },
     {
@@ -684,8 +686,8 @@
         "person_discipline_set_v1"
       ],
       "review": {
-        "fingerprint": "28c280aaea9832d754caedd067943bfc3a1ba47177f872d57348b0d2252d8d12",
-        "reason": "Reviewed main ST-02 split and direct V2 copies: six independent roots preserve current production bodies and assertions with import/resource relocation only; copied shared setup and estimated weights remain explicit, twenty nonempty diagnostic shards retained, no production acceptance changes."
+        "fingerprint": "b9e36d9d599ccb836e9c19a49987c45fe5516bb02bc0a5a9a67dfd3948761dd8",
+        "reason": "Registry provider kabulü ortak inbox ve phone/consent kaydını sınar; kişi/öğrenci otomatik yaratılmaz, mevcut callbackler değişmedi."
       }
     },
     {
@@ -1035,7 +1037,9 @@
         "apps/backend/tests/crm-web-form-unit.mjs",
         "apps/backend/tests/crm-meta-lead-unit.mjs",
         "apps/backend/tests/crm-google-lead-unit.mjs",
-        "apps/backend/tests/crm-meta-graph-unit.mjs"
+        "apps/backend/tests/crm-meta-graph-unit.mjs",
+        "apps/backend/tests/crm-provider-intake-unit.mjs",
+        "apps/backend/tests/crm-provider-intake-acceptance.mjs"
       ],
       "sources": [
         "apps/backend/api/public-application.js",
@@ -1057,7 +1061,11 @@
         "apps/backend/transports/crm-web-form-gateway.mjs",
         "apps/backend/transports/crm-meta-lead.mjs",
         "apps/backend/transports/crm-google-lead.mjs",
-        "apps/backend/transports/crm-meta-graph.mjs"
+        "apps/backend/transports/crm-meta-graph.mjs",
+        "apps/backend/database/crm-provider-intake.sql",
+        "apps/backend/supabase/migrations/20261105012400_crm_provider_intake.sql",
+        "apps/backend/scripts/crm-provider-intake.mjs",
+        "apps/backend/scripts/crm-provider-form-config.mjs"
       ],
       "operations": [
         "publication_set_v1",
@@ -1071,8 +1079,8 @@
         "calendar_feed_get_v1"
       ],
       "review": {
-        "fingerprint": "3624df1fe1435bc553b34dc98fc8d6d1467f6130f8c1b745f0b4929a788555ad",
-        "reason": "Meta Graph resmi Lead modeli ve kimlik/hata sınırları incelendi; bağımsız incelemede bulunan geçersiz takvim tarihi regresyonu önce kırmızı sonra AJV format kontrolüyle yeşil doğrulandı."
+        "fingerprint": "c833e4a9575322ef10197f258053fde6aadc8e6a4ac00f30194a8e3b885e3159",
+        "reason": "Son native source/migration byte eşliği, strict DB intake/email/tarih, kilitli exact form/scope ve gerçek inbox/rollback testleri incelendi; provider HTTP ve hosted kabulü açık."
       }
     },
     {

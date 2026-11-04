@@ -7,6 +7,14 @@ import {deploymentSource,resolveAcceptedSource} from '../scripts/ci/deployment-s
 const sha='a'.repeat(40),base='b'.repeat(40),merge='c'.repeat(40),tree='d'.repeat(40);
 const changes=[{path:'.github/workflows/ci-v2-backend.yml',status:'M'},{path:'apps/backend/tests/v2/backend/example.test.mjs',status:'A'}];
 
+test('exception source-row metadata is not an executable V2 dependency',()=>{
+ const file='apps/backend/scripts/ci/floor-exceptions.json';
+ const entry={path:'apps/backend/tests/v2/backend/example.test.mjs',reason:'reviewed assertion relocation'};
+ assert.doesNotThrow(()=>assertV2Isolation([file],()=>JSON.stringify([entry])));
+ assert.throws(()=>assertV2Isolation([file],()=>JSON.stringify([{...entry,import:'./v2/runtime.mjs'}])));
+ assert.throws(()=>assertV2Isolation([file],()=>'{invalid'));
+});
+
 test('V2 lane requires a nonempty exclusively isolated source delta; shared and mixed changes retain production coverage',()=>{
  assert(isV2DevelopmentOnly(changes));
  assert.equal(classifyChanges(changes).kind,'v2-development');assert.equal(classifyChanges(changes).backend,true);
