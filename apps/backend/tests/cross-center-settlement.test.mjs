@@ -4,10 +4,9 @@ import assert from 'node:assert/strict';
 import {authUser,fixturePlatform,must,call,context} from './api-client.mjs';
 import {connect} from '../scripts/db.mjs';
 import {newUuidV7 as key} from '../scripts/uuid.mjs';
-test('Cross-center settlement Auth -> Edge -> RPC',async t=>{
+async function settlementFixture(t){
  const {platform,plan}=await fixturePlatform(),owner=await authUser('settlement-owner'),outside=await authUser('settlement-outsider');
- const db=await connect(),rows=async(q,a=[])=>(await db.query(q,a)).rows;
- try{
+ const db=await connect();t.after(()=>db.end());const rows=async(q,a=[])=>(await db.query(q,a)).rows;
  const account=await must(owner,'account_get_v1');
  const org=(await must(platform,'organization_create_v1',{verified_account_id:account.id,name:'Settlement synthetic',initial_plan_id:plan},key())).primary_id;
  const A=(await must(owner,'center_create_v1',{org_id:org,name:'A',timezone:'Europe/Istanbul'},key())).primary_id;
@@ -45,20 +44,6 @@ test('Cross-center settlement Auth -> Edge -> RPC',async t=>{
  const proposal=(lines,amount)=>({kind:'payment',lines,amount_minor:String(amount),occurred_at:new Date(Date.now()-1000).toISOString()});
  const submit=(p,from=A,to=B,u=owner,extra={},k=key())=>mut('settlement_request_submit_v1',{from_center_id:from,to_center_id:to,currency:'TRY',proposal:p,reason:'Actual payment or explicit offset',...extra},from,u,k);
  const decide=(q,decision='approve',u=owner,k=key())=>mut('settlement_request_decide_v1',{settlement_request_id:q.id,expected_version:q.version,decision,reason:'B decision'},q.to_center_id,u,k);
- await t.test('DS-AUTH owner delegation and exact center grant chain does not imply operational authority',async()=>{
-  assert.equal((await authority()).version,1);
-  await fail('settlement_movements_list_v1',{currency:'TRY',page:{}},'FORBIDDEN');
-  await fail('settlement_authority_get_v1',{person_id:person},'FORBIDDEN',A,student.u);
-  await fail('settlement_authority_get_v1',{person_id:person},'NOT_FOUND',A,outside);
-  await grant(person,A);await grant(person,B);await grant(person,C);await grant(manager.p,A);
-  assert.equal((await movements()).items.length,0);
-  await fail('settlement_authority_set_v1',{person_id:student.p,expected_version:(await authority()).version,granted:true,reason:'invalid target'},'NOT_FOUND');
-  await fail('settlement_delegation_set_v1',{person_id:om.p,expected_version:(await authority()).version,granted:true,reason:'forbidden'},'FORBIDDEN',null,manager.u);
-  const v=await authority(om.p);await mut('settlement_delegation_set_v1',{person_id:om.p,expected_version:v.version,granted:true,reason:'Owner delegates'},null);
-  await grant(manager.p,B,true,om.u);
-  await fail('settlement_movements_list_v1',{currency:'TRY',page:{}},'FORBIDDEN',A,om.u);
-  await fail('settlement_authority_set_v1',{person_id:person,expected_version:1,granted:true,reason:'stale'},'VERSION_CONFLICT');
- });
  for(const c of [A,B]){
   const publish=(k,v)=>mut('policy_publish_v1',{key:k,value:v,effective_at:new Date(Date.now()-1000).toISOString(),mandatory:false},null);
   if(c===A){
@@ -101,7 +86,26 @@ test('Cross-center settlement Auth -> Edge -> RPC',async t=>{
   const pr=await read('attendance_correct_preview_v1',{session_id:l.sid,reason:'Reasoned attendance correction',corrections:result?[{reservation_id:l.rid,result}]:[],...(performed===undefined?{}:{performed,performed_instructor_ids:performed?[teacher.p]:[]})},l.c);
   return mut('attendance_correct_apply_v1',{preview:{id:pr.id,token:pr.token}},l.c);
  }
+ return {platform,plan,owner,outside,db,rows,account,org,A,B,C,person,body,mut,read,fail,D,linked,manager,student,teacher,om,authority,grant,movements,requests,get,line,proposal,submit,decide,product,sell,lesson,correct};
+}
+
+test('Cross-center payment, correction, reversal and scope chain',async t=>{
+ const {platform,plan,owner,outside,db,rows,account,org,A,B,C,person,body,mut,read,fail,D,linked,manager,student,teacher,om,authority,grant,movements,requests,get,line,proposal,submit,decide,product,sell,lesson,correct}=await settlementFixture(t);
  let sale,l1,m1,pending,approved,baseProduct;
+ await t.test('DS-AUTH owner delegation and exact center grant chain does not imply operational authority',async()=>{
+  assert.equal((await authority()).version,1);
+  await fail('settlement_movements_list_v1',{currency:'TRY',page:{}},'FORBIDDEN');
+  await fail('settlement_authority_get_v1',{person_id:person},'FORBIDDEN',A,student.u);
+  await fail('settlement_authority_get_v1',{person_id:person},'NOT_FOUND',A,outside);
+  await grant(person,A);await grant(person,B);await grant(person,C);await grant(manager.p,A);
+  assert.equal((await movements()).items.length,0);
+  await fail('settlement_authority_set_v1',{person_id:student.p,expected_version:(await authority()).version,granted:true,reason:'invalid target'},'NOT_FOUND');
+  await fail('settlement_delegation_set_v1',{person_id:om.p,expected_version:(await authority()).version,granted:true,reason:'forbidden'},'FORBIDDEN',null,manager.u);
+  const v=await authority(om.p);await mut('settlement_delegation_set_v1',{person_id:om.p,expected_version:v.version,granted:true,reason:'Owner delegates'},null);
+  await grant(manager.p,B,true,om.u);
+  await fail('settlement_movements_list_v1',{currency:'TRY',page:{}},'FORBIDDEN',A,om.u);
+  await fail('settlement_authority_set_v1',{person_id:person,expected_version:1,granted:true,reason:'stale'},'VERSION_CONFLICT');
+ });
  await t.test('DS-SET actual credited sale consumption creates A to B share independent of cash and B earning cost',async()=>{
   baseProduct=await product();sale=await sell(baseProduct);
   l1=await lesson(sale);
@@ -189,6 +193,34 @@ test('Cross-center settlement Auth -> Edge -> RPC',async t=>{
   await fail('settlement_request_submit_v1',{from_center_id:A,to_center_id:B,currency:'USD',proposal:proposal([line(m,1)],1),reason:'FX forbidden'},'CURRENCY_MISMATCH');
   await fail('settlement_request_submit_v1',{from_center_id:A,to_center_id:C,currency:'TRY',proposal:proposal([line(m,1)],1),reason:'wrong pair'},'VALIDATION_FAILED');
  });
+ await t.test('DS-SET correction rejects foreign and duplicated allocations; later correction after rights reversal preserves history',async()=>{
+  const q=await get(approved.id),rec=q.record,al=rec.allocations[0];
+  const another=(await rows('select id,version from private.settlement_allocations where org_id=$1 and record_id<>$2 limit 1',[org,rec.id]))[0];
+  const base={kind:'correction',original_record_id:rec.id,expected_version:rec.version,amount_minor:'1',allocations:[{allocation_id:another.id,expected_version:Number(another.version),amount_minor:'1'}]};
+  await fail('settlement_request_submit_v1',{from_center_id:A,to_center_id:B,currency:'TRY',proposal:base,reason:'foreign allocation'},'NOT_FOUND');
+  const selection={allocation_id:al.id,expected_version:al.version,amount_minor:'1'};
+  await fail('settlement_request_submit_v1',{from_center_id:A,to_center_id:B,currency:'TRY',proposal:{...base,amount_minor:'2',allocations:[selection,selection]},reason:'duplicate correction'},'VALIDATION_FAILED');
+  const p=await submit({...base,allocations:[selection]});await decide(await get(p.primary_id));
+  const after=await get(approved.id);assert.equal(after.record.amount_minor,'100');assert.equal(after.record.allocations[0].unreversed_minor,'59');
+ });
+ await t.test('DS-SCOPE cursor bound to actor center currency filters; unrelated center and student reads denied',async()=>{
+  const page=await movements(A,owner,{limit:1});assert(page.next_cursor);
+  await fail('settlement_movements_list_v1',{currency:'TRY',page:{limit:1,cursor:page.next_cursor}},'VALIDATION_FAILED',B);
+  await fail('settlement_movements_list_v1',{currency:'TRY',page:{}},'FORBIDDEN',A,student.u);
+  await fail('settlement_request_get_v1',{settlement_request_id:approved.id},'NOT_FOUND',C);
+  assert((await requests()).items.length>0);
+ });
+});
+
+test('Cross-center sale provenance, valuation and consumption',async t=>{
+ const {platform,plan,owner,outside,db,rows,account,org,A,B,C,person,body,mut,read,fail,D,linked,manager,student,teacher,om,authority,grant,movements,requests,get,line,proposal,submit,decide,product,sell,lesson,correct}=await settlementFixture(t);
+ let sale,l1,m1,pending,approved,baseProduct;
+ // These are real source sales, actual attendance and approved payment; no synthetic movement rows.
+ await grant(person,A);await grant(person,B);await grant(person,C);await grant(manager.p,A);
+ const authorityVersion=await authority(om.p);
+ await mut('settlement_delegation_set_v1',{person_id:om.p,expected_version:authorityVersion.version,granted:true,reason:'Native independent settlement fixture'},null);
+ await grant(manager.p,B,true,om.u);
+ baseProduct=await product();
  await t.test('DS-SET source-less negative initially creates no transfer; later eligible A sale settles past deficit without reprice',async()=>{
   const p=await linked('settlement-negative'),before=(await movements()).items.filter(x=>x.kind==='accrual').length;
   const l=await lesson(null,true,'attended',p.p);
@@ -223,16 +255,6 @@ test('Cross-center settlement Auth -> Edge -> RPC',async t=>{
   assert.equal(list.filter(x=>x.kind==='accrual').every(x=>x.amount_minor==='33'),true);
   assert.equal((await rows('select sum(amount_minor)::text n from private.settlement_credit_units where org_id=$1 and sale_id=$2',[org,s]))[0].n,'100');
  });
- await t.test('DS-SET correction rejects foreign and duplicated allocations; later correction after rights reversal preserves history',async()=>{
-  const q=await get(approved.id),rec=q.record,al=rec.allocations[0];
-  const another=(await rows('select id,version from private.settlement_allocations where org_id=$1 and record_id<>$2 limit 1',[org,rec.id]))[0];
-  const base={kind:'correction',original_record_id:rec.id,expected_version:rec.version,amount_minor:'1',allocations:[{allocation_id:another.id,expected_version:Number(another.version),amount_minor:'1'}]};
-  await fail('settlement_request_submit_v1',{from_center_id:A,to_center_id:B,currency:'TRY',proposal:base,reason:'foreign allocation'},'NOT_FOUND');
-  const selection={allocation_id:al.id,expected_version:al.version,amount_minor:'1'};
-  await fail('settlement_request_submit_v1',{from_center_id:A,to_center_id:B,currency:'TRY',proposal:{...base,amount_minor:'2',allocations:[selection,selection]},reason:'duplicate correction'},'VALIDATION_FAILED');
-  const p=await submit({...base,allocations:[selection]});await decide(await get(p.primary_id));
-  const after=await get(approved.id);assert.equal(after.record.amount_minor,'100');assert.equal(after.record.allocations[0].unreversed_minor,'59');
- });
  await t.test('DS-SET consuming no-show accrues share; pure release does not',async()=>{
   const terms={kind:'cancellation',terms:{cutoff_minutes:0,before_cutoff:'release',after_cutoff:'consume',no_show:'consume'}};
   await mut('policy_publish_v1',{key:'student_cancel_group',value:terms,effective_at:new Date(Date.now()-500).toISOString(),mandatory:false},null);
@@ -244,6 +266,51 @@ test('Cross-center settlement Auth -> Edge -> RPC',async t=>{
   const ca=(await rows('select id from core.entitlement_allocations where reservation_id=$1',[cancelled.rid]))[0];assert((await movements()).items.some(x=>x.kind==='accrual'&&x.source_allocation_id===ca.id));
   await mut('policy_publish_v1',{key:'student_cancel_group',value:{kind:'cancellation',terms:{cutoff_minutes:0,before_cutoff:'release',after_cutoff:'release',no_show:'release'}},effective_at:new Date(Date.now()-100).toISOString(),mandatory:false},null);
  });
+ await t.test('DS-SET local-only sale cannot settle B deficit and unknown selection stays hidden',async()=>{
+  const p=await linked('settlement-local-only'),negative=await lesson(null,true,'attended',p.p);
+  const prod=await product(A,'credits','100',2,[{scope_kind:'center_all_disciplines',center_id:A,discipline_id:null,usage_targets:['lesson']}]);
+  const localSale=await sell(prod,A,p.p);
+  assert.equal((await rows('select state from core.credit_deficits where org_id=$1 and reservation_id=$2',[org,negative.rid]))[0].state,'consumed');
+  assert.equal((await movements()).items.some(x=>x.source_sale_id===localSale),false);
+  const otherDiscipline=(await must(owner,'discipline_save_v1',{org_id:org,name:'Settlement unrelated discipline',state:'active'},key())).primary_id;
+  for(const c of [A,B])await mut('center_discipline_set_v1',{discipline_id:otherDiscipline,state:'active'},c);
+  const wrongDiscipline=await product(A,'credits','100',2,[{scope_kind:'organization_discipline',center_id:null,discipline_id:otherDiscipline,usage_targets:['lesson']}]);
+  const wrongSale=await sell(wrongDiscipline,A,p.p);
+  assert.equal((await rows('select state from core.credit_deficits where org_id=$1 and reservation_id=$2',[org,negative.rid]))[0].state,'consumed');
+  assert.equal((await movements()).items.some(x=>x.source_sale_id===wrongSale),false);
+  const unknown=key();await fail('settlement_request_get_v1',{settlement_request_id:unknown},'NOT_FOUND');
+  await fail('settlement_request_submit_v1',{from_center_id:A,to_center_id:B,currency:'TRY',proposal:proposal([{movement_id:unknown,expected_version:1,amount_minor:'1'}],1),reason:'unknown movement'},'NOT_FOUND');
+ });
+ await t.test('DS-SET B package override applies to A source sale independently of share',async()=>{
+  const prod=await product(),identity=(await rows('select product_id from core.product_versions where id=$1',[prod.primary_id]))[0].product_id;
+  const prev=(await read('instructor_agreements_list_v1',{person_id:teacher.p,page:{}},B)).items[0];
+  await mut('instructor_agreement_publish_v1',{person_id:teacher.p,discipline_id:D,format:'group',supersedes_id:prev.id,expected_version:prev.version,valid:{starts_at:'2021-01-01T00:00:00Z',ends_at:'2030-01-01T00:00:00Z'},terms:{model:'explicit_mixed',currency:'TRY',components:[{kind:'session_fixed',amount_minor:'75'},{kind:'per_person',amount_minor:'50'}],package_overrides:[{product_id:identity,components:[{kind:'percentage',rate_bps:2000,basis:{mode:'sale_unit'},entitlement_kind:'credits'}]}],room_fee:{kind:'free',order:'before_instructor_share'}},reason:'B explicit product override'},B);
+  const sale=await sell(prod),l=await lesson(sale);
+  assert.equal((await rows('select amount_minor from core.earnings where session_id=$1',[l.sid]))[0].amount_minor,'125');
+  assert.equal((await movements()).items.find(x=>x.source_sale_id===sale&&x.kind==='accrual').amount_minor,'250');
+ });
+ await t.test('DS-SET B source settles its past deficit without any cross-center share',async()=>{
+  const p=await linked('settlement-b-negative'),l=await lesson(null,true,'attended',p.p),before=await rows('select id,amount_minor,basis from core.earnings where session_id=$1',[l.sid]);
+  const s=await sell(await product(B),B,p.p);
+  assert.equal((await rows('select state from core.credit_deficits where reservation_id=$1',[l.rid]))[0].state,'settled');
+  assert.equal((await movements()).items.some(x=>x.source_sale_id===s),false);
+  assert.deepEqual(await rows('select id,amount_minor,basis from core.earnings where session_id=$1',[l.sid]),before);
+ });
+});
+
+test('Cross-center live authority, plan snapshots and request races',async t=>{
+ const {platform,plan,owner,outside,db,rows,account,org,A,B,C,person,body,mut,read,fail,D,linked,manager,student,teacher,om,authority,grant,movements,requests,get,line,proposal,submit,decide,product,sell,lesson,correct}=await settlementFixture(t);
+ let sale,l1,m1,pending,approved,baseProduct;
+ // These are real source sales, actual attendance and approved payment; no synthetic movement rows.
+ await grant(person,A);await grant(person,B);await grant(person,C);await grant(manager.p,A);
+ const authorityVersion=await authority(om.p);
+ await mut('settlement_delegation_set_v1',{person_id:om.p,expected_version:authorityVersion.version,granted:true,reason:'Native independent settlement fixture'},null);
+ await grant(manager.p,B,true,om.u);
+ baseProduct=await product();
+ sale=await sell(baseProduct);l1=await lesson(sale);await lesson(sale);await lesson(sale);
+ m1=(await movements()).items.find(x=>x.kind==='accrual');
+ const paymentRequest=await get((await submit(proposal([line(m1,100)],100))).primary_id);
+ await decide(paymentRequest);await correct(l1,'no_show');
  await t.test('DS-AUTH revoke versus approve serializes and cannot commit after lost live B authority',async()=>{
   const m=(await movements()).items.find(x=>x.kind==='accrual'&&x.debtor_center_id===A&&x.creditor_center_id===B&&BigInt(x.open_minor)>=1n);
   const p=await submit(proposal([line(m,1)],1)),q=await get(p.primary_id),v=await authority(manager.p,B);
@@ -293,21 +360,6 @@ test('Cross-center settlement Auth -> Edge -> RPC',async t=>{
   await fail('settlement_request_decide_v1',{settlement_request_id:q.id,expected_version:q.version,decision:'approve',reason:'B decision'},'FORBIDDEN',B,manager.u,k);
   await mut('center_manager_assign_v1',{person_id:manager.p},B);
  });
- await t.test('DS-SET local-only sale cannot settle B deficit and unknown selection stays hidden',async()=>{
-  const p=await linked('settlement-local-only'),negative=await lesson(null,true,'attended',p.p);
-  const prod=await product(A,'credits','100',2,[{scope_kind:'center_all_disciplines',center_id:A,discipline_id:null,usage_targets:['lesson']}]);
-  const localSale=await sell(prod,A,p.p);
-  assert.equal((await rows('select state from core.credit_deficits where org_id=$1 and reservation_id=$2',[org,negative.rid]))[0].state,'consumed');
-  assert.equal((await movements()).items.some(x=>x.source_sale_id===localSale),false);
-  const otherDiscipline=(await must(owner,'discipline_save_v1',{org_id:org,name:'Settlement unrelated discipline',state:'active'},key())).primary_id;
-  for(const c of [A,B])await mut('center_discipline_set_v1',{discipline_id:otherDiscipline,state:'active'},c);
-  const wrongDiscipline=await product(A,'credits','100',2,[{scope_kind:'organization_discipline',center_id:null,discipline_id:otherDiscipline,usage_targets:['lesson']}]);
-  const wrongSale=await sell(wrongDiscipline,A,p.p);
-  assert.equal((await rows('select state from core.credit_deficits where org_id=$1 and reservation_id=$2',[org,negative.rid]))[0].state,'consumed');
-  assert.equal((await movements()).items.some(x=>x.source_sale_id===wrongSale),false);
-  const unknown=key();await fail('settlement_request_get_v1',{settlement_request_id:unknown},'NOT_FOUND');
-  await fail('settlement_request_submit_v1',{from_center_id:A,to_center_id:B,currency:'TRY',proposal:proposal([{movement_id:unknown,expected_version:1,amount_minor:'1'}],1),reason:'unknown movement'},'NOT_FOUND');
- });
  await t.test('DS-SET frozen plan rejects version transitions and ABA but ignores billing bookkeeping',async()=>{
   const sub=(await rows('select id,plan_version_id from core.saas_subscriptions where org_id=$1 order by created_at desc,id desc limit 1',[org]))[0];
   const clone=async(features)=>{const id=key();await db.query("insert into core.saas_plan_versions(id,name,effective_at,price_minor,currency,period,limits,features) select $1,name,now(),price_minor,currency,period,limits,"+(features?"array_remove(features,'F18')":"features")+" from core.saas_plan_versions where id=$2",[id,sub.plan_version_id]);return id;};
@@ -324,21 +376,21 @@ test('Cross-center settlement Auth -> Edge -> RPC',async t=>{
   }finally{await db.query('update core.saas_subscriptions set plan_version_id=$2,version=version+1 where id=$1',[sub.id,sub.plan_version_id]);}
   await fail('settlement_request_decide_v1',{settlement_request_id:old.id,expected_version:old.version,decision:'approve',reason:'ABA plan'},'PREVIEW_STALE',B);
  });
- await t.test('DS-SET B package override applies to A source sale independently of share',async()=>{
-  const prod=await product(),identity=(await rows('select product_id from core.product_versions where id=$1',[prod.primary_id]))[0].product_id;
-  const prev=(await read('instructor_agreements_list_v1',{person_id:teacher.p,page:{}},B)).items[0];
-  await mut('instructor_agreement_publish_v1',{person_id:teacher.p,discipline_id:D,format:'group',supersedes_id:prev.id,expected_version:prev.version,valid:{starts_at:'2021-01-01T00:00:00Z',ends_at:'2030-01-01T00:00:00Z'},terms:{model:'explicit_mixed',currency:'TRY',components:[{kind:'session_fixed',amount_minor:'75'},{kind:'per_person',amount_minor:'50'}],package_overrides:[{product_id:identity,components:[{kind:'percentage',rate_bps:2000,basis:{mode:'sale_unit'},entitlement_kind:'credits'}]}],room_fee:{kind:'free',order:'before_instructor_share'}},reason:'B explicit product override'},B);
-  const sale=await sell(prod),l=await lesson(sale);
-  assert.equal((await rows('select amount_minor from core.earnings where session_id=$1',[l.sid]))[0].amount_minor,'125');
-  assert.equal((await movements()).items.find(x=>x.source_sale_id===sale&&x.kind==='accrual').amount_minor,'250');
- });
- await t.test('DS-SET B source settles its past deficit without any cross-center share',async()=>{
-  const p=await linked('settlement-b-negative'),l=await lesson(null,true,'attended',p.p),before=await rows('select id,amount_minor,basis from core.earnings where session_id=$1',[l.sid]);
-  const s=await sell(await product(B),B,p.p);
-  assert.equal((await rows('select state from core.credit_deficits where reservation_id=$1',[l.rid]))[0].state,'settled');
-  assert.equal((await movements()).items.some(x=>x.source_sale_id===s),false);
-  assert.deepEqual(await rows('select id,amount_minor,basis from core.earnings where session_id=$1',[l.sid]),before);
- });
+});
+
+test('Cross-center multi-line settlement and atomic ledger failures',async t=>{
+ const {platform,plan,owner,outside,db,rows,account,org,A,B,C,person,body,mut,read,fail,D,linked,manager,student,teacher,om,authority,grant,movements,requests,get,line,proposal,submit,decide,product,sell,lesson,correct}=await settlementFixture(t);
+ let sale,l1,m1,pending,approved,baseProduct;
+ // These are real source sales, actual attendance and approved payment; no synthetic movement rows.
+ await grant(person,A);await grant(person,B);await grant(person,C);await grant(manager.p,A);
+ const authorityVersion=await authority(om.p);
+ await mut('settlement_delegation_set_v1',{person_id:om.p,expected_version:authorityVersion.version,granted:true,reason:'Native independent settlement fixture'},null);
+ await grant(manager.p,B,true,om.u);
+ baseProduct=await product();
+ sale=await sell(baseProduct);l1=await lesson(sale);await lesson(sale);await lesson(sale);
+ m1=(await movements()).items.find(x=>x.kind==='accrual');
+ const paymentRequest=await get((await submit(proposal([line(m1,100)],100))).primary_id);
+ await decide(paymentRequest);await correct(l1,'no_show');
  await t.test('DS-SET linked replacement freezes changed scope and requires a new B approval',async()=>{
   const m=(await movements()).items.find(x=>x.kind==='accrual'&&x.debtor_center_id===A&&x.creditor_center_id===B&&BigInt(x.open_minor)>=2n),old=await get((await submit(proposal([line(m,1)],1))).primary_id);
   await mut('settlement_request_withdraw_v1',{settlement_request_id:old.id,expected_version:old.version,reason:'Revise proposal'});
@@ -377,12 +429,4 @@ test('Cross-center settlement Auth -> Edge -> RPC',async t=>{
    await decide(q);assert.equal((await get(q.id)).record.allocations.length,2);
   }
  });
- await t.test('DS-SCOPE cursor bound to actor center currency filters; unrelated center and student reads denied',async()=>{
-  const page=await movements(A,owner,{limit:1});assert(page.next_cursor);
-  await fail('settlement_movements_list_v1',{currency:'TRY',page:{limit:1,cursor:page.next_cursor}},'VALIDATION_FAILED',B);
-  await fail('settlement_movements_list_v1',{currency:'TRY',page:{}},'FORBIDDEN',A,student.u);
-  await fail('settlement_request_get_v1',{settlement_request_id:approved.id},'NOT_FOUND',C);
-  assert((await requests()).items.length>0);
- });
- }finally{await db.end();}
 });

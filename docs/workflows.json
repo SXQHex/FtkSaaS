@@ -276,8 +276,8 @@
         "management_state_get_v1"
       ],
       "review": {
-        "fingerprint": "05bfb00af0a9ee2f02865b12ca39eac2ab72adbbe76b7fb5858a12aec7d8ea56",
-        "reason": "PR169 integrated into PR168: pinned CLI3 and explicit remote targets, experiment-only registration adapter and source-bound scheduling retained; combined 52 units preserve original acceptance bodies and current import hashes, normal four-shard gates unchanged."
+        "fingerprint": "dfed629fe01d7107d052de1116c0a126358019cb4e3540c1d5d33cf7b0c11100",
+        "reason": "Native kök bölünmesi ve imported shared/parts sahipliği eksiksiz; singleton platform ayar yazıcıları aynı sıralı birimde kalır. Tarihsel47 kayıt ile güncel43 gövde eşleşmesi ayrıdır. Özgün468 assertion ve80 callback korunur; checker eşiği/normal bütçeler gevşetilmez."
       }
     },
     {
@@ -449,8 +449,8 @@
         "role_revoke_preview_v1"
       ],
       "review": {
-        "fingerprint": "72d56c42f0e98270f720d9c26c82be0033ccd4d12e3902f6ad317b9ee97adf5e",
-        "reason": "Registry harness yeni ticari limit regresyonunu içeri alıyor; mevcut oda/rol yetki kuralları değişmedi, üst-plan limit gösterimi WF13 sahibinde."
+        "fingerprint": "2a526d9b6e5563602eb0772e34d2380bde316977c1309f4fc0278d96605f2fe0",
+        "reason": "Native kabul kökleri bağımsız tenant ve anlamlı iş akışlarına ayrıldı; özgün assertion ve80 alt test gövdesi, yarış/rollback ve API sırası korundu. Shared fixture yalnız gereken native önkoşulları kurar; ürün/scope/permission anlatımı değişmez. Deney import köklerinde tam satır sahipliği ve singleton platform yazıcılarının aynı birimde sırası incelendi."
       }
     },
     {
@@ -545,8 +545,8 @@
         "class_assignment_set_v1"
       ],
       "review": {
-        "fingerprint": "3ed4faacaf19a139df56f09dda9a9936c66c3dbf86c13b6cbe7613e0badfa43c",
-        "reason": "PR168 main synchronization reviewed: native class-duty reader and existing-session Starter guard retained from accepted PR167; original program and instructor bodies unchanged, both independent acceptance imports preserved; no workflow rule changed."
+        "fingerprint": "8f631cf0eec0a71acd2b5e77c01bfdc381e5b2b7dc3366ae75317b7f4694834f",
+        "reason": "Native kabul kökleri bağımsız tenant ve anlamlı iş akışlarına ayrıldı; özgün assertion ve80 alt test gövdesi, yarış/rollback ve API sırası korundu. Shared fixture yalnız gereken native önkoşulları kurar; ürün/scope/permission anlatımı değişmez. Deney import köklerinde tam satır sahipliği ve singleton platform yazıcılarının aynı birimde sırası incelendi."
       }
     },
     {
@@ -632,8 +632,8 @@
         "person_discipline_set_v1"
       ],
       "review": {
-        "fingerprint": "3fd949dfca6d2b715d468f99f280143acc41b903ce4769b585739bb92e8da6b9",
-        "reason": "Ticari limit SSoT canonical org öğrenci sayımı, son slot yarışı, ikinci merkez, reactivation ve merge testleri; CRM raw-limit fixture yerine gerçek kapasite dolduruldu."
+        "fingerprint": "f3923f0126e957cf1ed18492027a8e4ffaf0eabf441d4e8bb482ab2010468313",
+        "reason": "Native kabul kökleri bağımsız tenant ve anlamlı iş akışlarına ayrıldı; özgün assertion ve80 alt test gövdesi, yarış/rollback ve API sırası korundu. Shared fixture yalnız gereken native önkoşulları kurar; ürün/scope/permission anlatımı değişmez. Deney import köklerinde tam satır sahipliği ve singleton platform yazıcılarının aynı birimde sırası incelendi."
       }
     },
     {
@@ -723,8 +723,8 @@
         "negative_limits_get_v1"
       ],
       "review": {
-        "fingerprint": "5360ff2f9e02733e96a8968b47948f4f5f8bc14a973685ff1fee951e365fbd86",
-        "reason": "PR168 main synchronization reviewed: native class-duty reader and existing-session Starter guard retained from accepted PR167; original program and instructor bodies unchanged, both independent acceptance imports preserved; no workflow rule changed."
+        "fingerprint": "a794bdb6767361a9b322bf8dcbfaa39501d5b001f4a4a01e20ee622aeec7804f",
+        "reason": "Native kabul kökleri bağımsız tenant ve anlamlı iş akışlarına ayrıldı; özgün assertion ve80 alt test gövdesi, yarış/rollback ve API sırası korundu. Shared fixture yalnız gereken native önkoşulları kurar; ürün/scope/permission anlatımı değişmez. Deney import köklerinde tam satır sahipliği ve singleton platform yazıcılarının aynı birimde sırası incelendi."
       }
     },
     {
@@ -798,8 +798,8 @@
         "reservation_capacity_override_v1"
       ],
       "review": {
-        "fingerprint": "f262e43d7c128fdb74f235e625b6e0810509c7b12e3d2984a287ec647c553a60",
-        "reason": "PR168 main synchronization reviewed: native class-duty reader and existing-session Starter guard retained from accepted PR167; original program and instructor bodies unchanged, both independent acceptance imports preserved; no workflow rule changed."
+        "fingerprint": "bfc0edf9375a6cc9172424df1e4f678923160875860563704d9137d7bf7c335d",
+        "reason": "Native kabul kökleri bağımsız tenant ve anlamlı iş akışlarına ayrıldı; özgün assertion ve80 alt test gövdesi, yarış/rollback ve API sırası korundu. Shared fixture yalnız gereken native önkoşulları kurar; ürün/scope/permission anlatımı değişmez. Deney import köklerinde tam satır sahipliği ve singleton platform yazıcılarının aynı birimde sırası incelendi."
       }
     },
     {
@@ -858,8 +858,8 @@
         "attendance_start_v1"
       ],
       "review": {
-        "fingerprint": "e6dc4bd3da55524ca1b56187c7e88470f3c271d77809bf943292f5af1742704e",
-        "reason": "Final Pro/Business native chain reviewed against existing workflow; approval session reuses the selected alternative interval across local midnight, all original scopes/history/ledger checks retained; native execution remains pending."
+        "fingerprint": "f6b54febe216d9898aed083eb54eb94a185de7538befbbc13e0d06bcb52b3d4d",
+        "reason": "Native kabul kökleri bağımsız tenant ve anlamlı iş akışlarına ayrıldı; özgün assertion ve80 alt test gövdesi, yarış/rollback ve API sırası korundu. Shared fixture yalnız gereken native önkoşulları kurar; ürün/scope/permission anlatımı değişmez. Deney import köklerinde tam satır sahipliği ve singleton platform yazıcılarının aynı birimde sırası incelendi."
       }
     },
     {
@@ -918,8 +918,8 @@
         "debt_adjust_v1"
       ],
       "review": {
-        "fingerprint": "b4342b58df1e4fdadf6fddf9cc12f18b11cf3492b9142db0ae9336d7a01e631c",
-        "reason": "Final Pro/Business native chain reviewed against existing workflow; approval session reuses the selected alternative interval across local midnight, all original scopes/history/ledger checks retained; native execution remains pending."
+        "fingerprint": "d452f3095586271ae41d8d4d75017a108a65bb52a51dc309a71bebdb71cac51a",
+        "reason": "Native kabul kökleri bağımsız tenant ve anlamlı iş akışlarına ayrıldı; özgün assertion ve80 alt test gövdesi, yarış/rollback ve API sırası korundu. Shared fixture yalnız gereken native önkoşulları kurar; ürün/scope/permission anlatımı değişmez. Deney import köklerinde tam satır sahipliği ve singleton platform yazıcılarının aynı birimde sırası incelendi."
       }
     },
     {
@@ -1007,8 +1007,8 @@
         "file_upload_complete_v1"
       ],
       "review": {
-        "fingerprint": "c0e4f49bf685983884ed2e09ef13bb1abd8bf2fea599ab8cde860c690052c4ac",
-        "reason": "Native CSV preview/apply worker son slot yarışında canlı ticari kotayı tekrar sınar; mevcut fenced row transaction ve invalid/failed sonuçları korunur."
+        "fingerprint": "7fe9545d303a302cd2bee54ed84c143b0f4f4c34a2bf2aaa19e9c98f7384de15",
+        "reason": "Native kabul kökleri bağımsız tenant ve anlamlı iş akışlarına ayrıldı; özgün assertion ve80 alt test gövdesi, yarış/rollback ve API sırası korundu. Shared fixture yalnız gereken native önkoşulları kurar; ürün/scope/permission anlatımı değişmez. Deney import köklerinde tam satır sahipliği ve singleton platform yazıcılarının aynı birimde sırası incelendi."
       }
     },
     {
@@ -1042,8 +1042,8 @@
         "document_publication_preview_v1"
       ],
       "review": {
-        "fingerprint": "c34985e2e08e5092430c951842323d547691a342e7cc52a7241ed0e9037efa57",
-        "reason": "Ortak üretilmiş wrapper farkı yalnız S16 owner abonelik dönem komutunu ekler; bu akışın mevcut operasyon/görev/izin/plan ve davranış kaynakları değişmedi, ilgili rehber incelendi."
+        "fingerprint": "6d3ea0bafdf13a633e095f55814992c580f672a5929fb6a140ab7922f38aba3d",
+        "reason": "Native kabul kökleri bağımsız tenant ve anlamlı iş akışlarına ayrıldı; özgün assertion ve80 alt test gövdesi, yarış/rollback ve API sırası korundu. Shared fixture yalnız gereken native önkoşulları kurar; ürün/scope/permission anlatımı değişmez. Deney import köklerinde tam satır sahipliği ve singleton platform yazıcılarının aynı birimde sırası incelendi."
       }
     },
     {
@@ -1094,8 +1094,8 @@
         "settings_preparation_resolve_v1"
       ],
       "review": {
-        "fingerprint": "f640fad506fe9f67cf80df0ce54af09487745811b65be2944db55fc290980965",
-        "reason": "ST03 dört izole native tenant kökü, aynı14 senaryo ve154 birebir assertion ile korunur. Başarılı owner settings yanıtı ve gerçek yarış kazananı sürümü izlenir; explicit okumalar,600000ms sınırı ve native consumer akışı değişmez."
+        "fingerprint": "cf486988df91127c49a277db839862528ff3b3bc29274ee52e08c45d3e6697e0",
+        "reason": "Native kabul kökleri bağımsız tenant ve anlamlı iş akışlarına ayrıldı; özgün assertion ve80 alt test gövdesi, yarış/rollback ve API sırası korundu. Shared fixture yalnız gereken native önkoşulları kurar; ürün/scope/permission anlatımı değişmez. Deney import köklerinde tam satır sahipliği ve singleton platform yazıcılarının aynı birimde sırası incelendi."
       }
     },
     {
@@ -1163,8 +1163,8 @@
         "subscription_period_change_request_v1"
       ],
       "review": {
-        "fingerprint": "9dd7c93ad5b33ba7f592580eca4bb09209b932fdea45cff5ddd960b2edc150ac",
-        "reason": "Etkin ticari limit tek helper; fiyat/geçmiş raw catalog korunur, farklı raw limitli dönem seçeneği ve request aynı etkin kapsamla uyumludur."
+        "fingerprint": "9b49c279802d890d7f103fa998020782f29c29250c765133899b6c66fa038b70",
+        "reason": "Native kabul kökleri bağımsız tenant ve anlamlı iş akışlarına ayrıldı; özgün assertion ve80 alt test gövdesi, yarış/rollback ve API sırası korundu. Shared fixture yalnız gereken native önkoşulları kurar; ürün/scope/permission anlatımı değişmez. Deney import köklerinde tam satır sahipliği ve singleton platform yazıcılarının aynı birimde sırası incelendi."
       }
     },
     {
@@ -1411,8 +1411,8 @@
         "settlement_authority_set_v1"
       ],
       "review": {
-        "fingerprint": "b82f35a8cf35a1595787c6e5b8e4a16efc89a44a363c8220a99c179ba946aa01",
-        "reason": "Ortak üretilmiş wrapper farkı yalnız S16 owner abonelik dönem komutunu ekler; bu akışın mevcut operasyon/görev/izin/plan ve davranış kaynakları değişmedi, ilgili rehber incelendi."
+        "fingerprint": "ca45fc691e777dd0807426392d30ac78978c25127b3550cdc678db8b290fad46",
+        "reason": "Native kabul kökleri bağımsız tenant ve anlamlı iş akışlarına ayrıldı; özgün assertion ve80 alt test gövdesi, yarış/rollback ve API sırası korundu. Shared fixture yalnız gereken native önkoşulları kurar; ürün/scope/permission anlatımı değişmez. Deney import köklerinde tam satır sahipliği ve singleton platform yazıcılarının aynı birimde sırası incelendi."
       }
     },
     {
@@ -1507,8 +1507,8 @@
         "subscription_boundary_apply_v1"
       ],
       "review": {
-        "fingerprint": "066692e59dc6ce5fda469ded738c1259a026d65db288af400d63c392d43bf8ee",
-        "reason": "P06 scoped worker testinde preview sonrası interaktif kapasite tüketimi denetleniyor; worker claim/lease/retry yetkileri ve runtime değişmedi."
+        "fingerprint": "8d1de752c7505c88fb98097b1aabcb9aaa204573c036ffeac84251169e8e1faa",
+        "reason": "Native kabul kökleri bağımsız tenant ve anlamlı iş akışlarına ayrıldı; özgün assertion ve80 alt test gövdesi, yarış/rollback ve API sırası korundu. Shared fixture yalnız gereken native önkoşulları kurar; ürün/scope/permission anlatımı değişmez. Deney import köklerinde tam satır sahipliği ve singleton platform yazıcılarının aynı birimde sırası incelendi."
       }
     }
   ]
