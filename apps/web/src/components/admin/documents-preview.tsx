@@ -2,6 +2,8 @@
 import { useState } from "react";
 import { useTranslations } from "next-intl";
 import type { Operations } from "@ftksaas/api-contracts";
+import { ContextDocuments } from "../documents/context-documents";
+import type { DocumentReadActions, DocumentQuery } from "../../lib/document-requirements";
 import { DocumentPublicationForm } from "../documents/document-publication";
 import type { useSetupCommand } from "../setup/setup-command";
 const org = "019a2b3c-4d5e-7000-8000-000000000080",
@@ -26,6 +28,35 @@ async function previewPublication(): Promise<
     preserves_reservations: true,
   };
 }
+const readingQuery: DocumentQuery = {
+  org_id: org,
+  person_id: id,
+  context: { gate: "reservation", subject: { type: "reservations", id } },
+};
+const readingActions: DocumentReadActions = {
+  read: async () => [
+    {
+      id,
+      version_id: id,
+      name: "Örnek katılım koşulları",
+      required_at: "reservation",
+      accepted: false,
+      content_hash: "synthetic-design-only",
+      file: { type: "files", id },
+    },
+  ],
+  person: async () => ({
+    id,
+    display_name: "Deniz Örnek",
+    relationships: [],
+    discipline_relationships: [],
+    version: 1,
+  }),
+  file: async () =>
+    new File(["Sentetik belge. Okumak veya indirmek kabul kaydı oluşturmaz."], "document.txt", {
+      type: "text/plain",
+    }),
+};
 export function DocumentsPreview() {
   const t = useTranslations("documents");
   const [published, setPublished] = useState(false);
@@ -59,6 +90,10 @@ export function DocumentsPreview() {
             previewPublication={previewPublication}
           />
         )}
+      </section>
+      <section className="space-y-5 rounded-xl border bg-card p-5">
+        <h2 className="text-lg font-semibold">{t("sessionDocuments")}</h2>
+        <ContextDocuments actorId={id} query={readingQuery} actions={readingActions} />
       </section>
     </main>
   );
