@@ -276,8 +276,8 @@
         "management_state_get_v1"
       ],
       "review": {
-        "fingerprint": "44b1295ddb80830103a6cf42e4cd60204be17f47732d9ae85c94278ad81f30c7",
-        "reason": "Merged main PR173 native test-root splitting and PR171 CRM documentation with PR172 P12/P13 runtime and corrected internal venue timezones. Both source/test mappings retained; guide behavior unchanged."
+        "fingerprint": "ff50a40a411bf5b8dfd01e008b17005ee2bc1ca0150aa22e88502e71eab9955a",
+        "reason": "User scoped PR172 to production tests. Restored experiment inventory exactly to main; production event-payment harness retains P12/P13 import. Experiment source mismatch remains fail-closed and is not production acceptance."
       }
     },
     {

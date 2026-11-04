@@ -1,6 +1,6 @@
 # API ve iş akışı haritası
 
-Üretilmiştir: `node apps/backend/scripts/update-docs.mjs --write`. Elle düzenleme. Kaynak içerik özeti: `57634f261b701363087b83f40b4a0fa9fd30d2b828b5136436e8aaf1a8ab6aa2`. Bu özet CI/hosted kabulü değildir; dağıtılan SHA ve ortam CD artifact'ında bulunur.
+Üretilmiştir: `node apps/backend/scripts/update-docs.mjs --write`. Elle düzenleme. Kaynak içerik özeti: `d798f5b3d98daf41f7dc9e2e17532f4d7beb31549b8aea0c30f8d8f47505b038`. Bu özet CI/hosted kabulü değildir; dağıtılan SHA ve ortam CD artifact'ında bulunur.
 
 DTO/izin/hata/yan etkiler [üretilmiş API kataloğu](contracts/05-FtkSaaS-O4-API-katalogu.md) ve [makine sözleşmesinden](../packages/api-contracts/schema/contract.json) gelir. Edge kodu [backend-v1](../apps/backend/supabase/functions/backend-v1/index.ts) altındadır; SQL domain davranışını Edge dosyasından tek başına çıkarma. `implemented.json` içindeki varlık tüm selector/provider/ürün kabulünün tamamlandığı anlamına gelmez. Backend-only satırları tarayıcı endpoint önerisi değildir.
 

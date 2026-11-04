@@ -207,15 +207,15 @@
     },
     {
       "path": "apps/backend/tests/event-payment.test.mjs",
-      "sha256": "da97fd1485821eac6f384568c84adff3af57a860abda639ac0920fb448db525f",
+      "sha256": "affb01d8370dc42749dd2db7dd75671882f0457357b980651c524d9489ec3a1a",
       "shared": [
         [
-          3,
-          9
+          2,
+          8
         ],
         [
-          222,
-          223
+          221,
+          222
         ]
       ],
       "parts": [
@@ -223,8 +223,8 @@
           "id": "event-payment-root-1",
           "ranges": [
             [
-              10,
-              221
+              9,
+              220
             ]
           ]
         },
@@ -232,8 +232,8 @@
           "id": "event-payment-root-2",
           "ranges": [
             [
-              224,
-              399
+              223,
+              398
             ]
           ]
         }
@@ -241,11 +241,6 @@
       "imports": [
         {
           "line": 1,
-          "path": "apps/backend/tests/event-capacity-package-acceptance.mjs",
-          "sha256": "a2587cde639bdcbcb7d7b308bace6ebd78add1b6b62736077c14afd87d44ceca"
-        },
-        {
-          "line": 2,
           "path": "apps/backend/tests/earning-payment-selection-acceptance.mjs",
           "sha256": "25c9aaf511f3b64bf1c1a5049953a4cc3e9c3224e81724846778562e1f1b8ba6"
         }
