@@ -9,6 +9,12 @@ on:
         options: [backend, core, full]
         default: backend
         required: true
+  workflow_call:
+    inputs:
+      scope:
+        description: Explicit manual shadow domain; validated before execution
+        required: true
+        type: string
 permissions: {}
 concurrency:
   group: ci-v2-backend-${{ github.ref }}

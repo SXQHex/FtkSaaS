@@ -22,7 +22,8 @@
         "apps/backend/tests/v2/backend.test.mjs",
         "apps/backend/tests/v2/backend/api-acceptance-root-1.test.mjs",
         "apps/backend/tests/ci-v2-development-unit.mjs",
-        "apps/backend/tests/v2/core.test.mjs"
+        "apps/backend/tests/v2/core.test.mjs",
+        "apps/backend/tests/v2/dispatch.test.mjs"
       ],
       "sources": [
         "apps/backend/database/canonical-settings-scope.sql",
@@ -286,7 +287,8 @@
         "apps/backend/scripts/ci/v2/settings.mjs",
         "apps/backend/tests/v2/backend-suites.json",
         "apps/backend/scripts/ci/v2-development.mjs",
-        "apps/backend/scripts/ci/v2/core.mjs"
+        "apps/backend/scripts/ci/v2/core.mjs",
+        "apps/backend/scripts/ci/v2/dispatch.mjs"
       ],
       "operations": [
         "operation_status_get_v1",
@@ -296,8 +298,8 @@
         "management_state_get_v1"
       ],
       "review": {
-        "fingerprint": "64c5c4ca699a4304eef602c821bbcd0fe55bc3b5246f092d4dd737ece35e59f5",
-        "reason": "Reviewed combined P07 web-form sources and V2 core shadow: unchanged main behavior, owned loopback reset, pristine baseline before DB/RLS checks, strict health and local advisors, filtered shared typecheck, no production acceptance change."
+        "fingerprint": "2009bf6cba9b4698020889675f5a936a0701c66abd85c83a611c1b354ad7cf57",
+        "reason": "Reviewed exact-source V2 scoped shadow dispatch: common baseline always required, frontend/backend independent, reusable manual guards, core+20API retained, four browsers reuse source-bound build, no deploy or production acceptance; regular-file diff and failed/skipped summaries fail closed."
       }
     },
     {
