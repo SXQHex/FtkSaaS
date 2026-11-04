@@ -95,13 +95,37 @@ Core özgün clean komutunu çalıştırır. Ayrı toplayıcı bütün deney iş
 
 Deney hiçbir candidate/main/CD kabul makbuzu veya merge status'u üretmez; üretim CI ve development dağıtımı kendi sekiz shard kabul kanıtını kullanır. Ölçüm koşusu bu kanıtın yerine geçmez. Yeni workflow ve CI araçlarının kurulumu mevcut kaynak-özel inceleme/kurulum prosedürüne tabidir; politika muafiyeti eklenmez.
 
-## CI/CD v2 — manuel oda pilotu
+## CI/CD v2 — bağımsız alan planı ve manuel oda pilotu
 
 ### Amaç ve sınır
 
 V2'nin ilk dikey dilimi, [WF02](workflows.md#wf02) oda davranışını doğrudan Node test runner ile sınayan bağımsız bir tanı hattıdır. Ürün geliştirmesi ve mevcut sekiz shard kabulü devam eder. Pilotun başarısı mevcut full clean, merge/main kabulü veya development/production dağıtım yetkisi değildir. Yeni hat required check yapılmaz; mevcut workflow, status, trusted politika ve dağıtım kararları bu dilimde değiştirilmez.
 
-[CI V2 Pilot](../.github/workflows/ci-v2-pilot.yml) yalnız `workflow_dispatch` ile seçilen ref'in sabit `github.sha` kaynağını çalıştırır. PR/push/schedule tetiklemesi, keyfî ikinci kaynak girdisi, hosted secret veya status/deployment yazma yetkisi yoktur. İlk GitHub koşusu workflow'un varsayılan dala mevcut trusted kurulum prosedürüyle alınmasını gerektirir; dalda hazırlanmış kaynak çalışmış kabul edilmez. Bu workflow da trusted yüzeydir; yeni bir politika muafiyeti oluşturmaz.
+[CI V2 Pilot](../.github/workflows/ci-v2-pilot.yml) yalnız `workflow_dispatch` ile seçilen ref'in sabit `github.sha` kaynağını çalıştırır. `operation=plan` yalnız dependency-free etki planı üretir; `operation=room` buna izole oda pilotunu ekler. `base_sha` tam 40 karakterlik ata commit'tir; başka kaynak checkout edilmez. `scope=auto`, `backend` veya `full` doğrulama isteğini seçer. PR/push/schedule tetiklemesi, hosted secret veya status/deployment yazma yetkisi yoktur. İlk GitHub koşusu workflow'un varsayılan dala mevcut trusted kurulum prosedürüyle alınmasını gerektirir; dalda hazırlanmış kaynak çalışmış kabul edilmez. Bu workflow da trusted yüzeydir; yeni bir politika muafiyeti oluşturmaz.
+
+### Hedef kabul: 20 backend shard ve bağımsız alanlar
+
+Kullanıcının 4 Kasım kararıyla V2 backend tam kabulü **20 backend shard** kullanır. Full kabul bu 20 backend shard'ına bağımsız frontend ve ortak kontrolleri ekler; 20 bütün reponun toplam job bütçesi değildir. Frontend-only ve saf belge farkları backend matrix'i açmaz. Bu hedef, mevcut üretim kabulündeki sekiz shard şartını bu PR ile değiştirmez.
+
+| Fark | Doğrulama etkisi | Dağıtım etkisi |
+|---|---|---|
+| Web/UI kaynağı | Frontend; backend yok | Vercel |
+| Backend DB/Edge/runtime | 20 backend shard planı; frontend yok | Supabase |
+| Test veya CI kaynağı | İlgili alan ve gerekli ortak kontroller | Uygulama dağıtımı yok |
+| Saf belge | Hafif ortak kontroller | Dağıtım yok |
+| Ortak paket/lockfile/build config | İki gerçek tüketici; sözleşme uyumluluğu tanı sinyali | Etkilenen iki alan; ilk seçici ortak girdide ihtiyatlı davranır |
+| Signup sunucu köprüsü ve gerçek import girdileri | Backend ve Next.js tüketicisi | Vercel; Supabase değil |
+| Bilinmeyen kaynak | Geniş ortak/frontend/backend doğrulaması | İhtiyatlı iki alan etkisi |
+
+Karar dal adına değil kaynak/bağımlılık etkisine dayanır. Signup köprüsünün `uuid.mjs` ve `p04-public-ingress.mjs` dahil gerçek backend girdileri mevcut `apps/web/turbo.json` build inputs kaydından okunur; ikinci dosya envanteri tutulmaz. Bu girdilerin dependency manifesti olan backend package.json da web'i etkiler. Temel kaynak bütünlüğü/secret/kalite kontrolleri uygulama alanından bağımsız zorunluluktur; `common=false` bunların kaldırılması değildir. `apps/web1` muafiyeti kendi mevcut sınırında kalır; rename/silmenin eski ucu bu muafiyetle saklanamaz. Lockfile importer/dependency analizi henüz daraltılmadığından ortak lockfile farkı iki alanı seçer; bu ihtiyatlı fazlalık güvenlik gevşetilerek giderilmez.
+
+Test seçimi ve dağıtım etkisi ayrı alanlardır. `backend/full` doğrulama talebi tek başına deploy etkisi eklemez. Vercel kendi otomatik dağıtımının sahibidir; GitHub'da ikinci web deploy hattı kurulmaz. Supabase yalnız kendi gerçek runtime kabulü ve dağıtım girdilerine dayanır. İlgisiz frontend/backend işleri birbirini beklemez veya iptal etmez; ortak kontrol yalnız gerçek tüketicisini engeller. Gerekli web build'i ile kendi tarayıcıları ve aynı ortama yazan migration/dağıtımların sırası korunur.
+
+Kabulün yeniden kullanımı ancak ilgili alanın kaynak, bağımlılık ve test politikası girdileri değişmediyse mümkündür. Repo genelindeki strict-base şartı bu alan ilişkisi kanıtlanmadan kaldırılmaz. Yeşil eski head tek başına kanıt değildir; yeni alan kabul protokolü ve CD devri bu tanı planının dışındadır.
+
+Test kökleri bağımsız çalışabilen en küçük anlamlı davranış/işlem zincirine indirilecek; yarış/atomiklik/rollback senaryosunun iç bütünlüğü bölünmeyecek, önceki kökün fixture çıktısı devralınmayacak. Runtime satır kesme/ESM kancası yerine doğrudan test dosyaları kullanılacak. Test azaltımı yalnız tekrarları kaldırarak ve gerekli katmana taşıyarak, eşdeğer hata yakalama kanıtıyla yapılacak; sayısal test azalması başarı ölçütü değildir.
+
+**Bu dilimin sınırı:** Seçici backend/full için tam 20 kayıtlı matrix planı üretir; 20 backend test işi henüz yürütülmez. Plan `acceptance:false` ve `backend_execution:not-implemented` taşır. Dört köklü oda pilotu bu matrix'e 20 boş/tekrarlı iş olarak dağıtılmaz ve full backend kabulü diye sunulmaz. Doğrudan test envanteri/kök dönüşümü tamamlanmadan üretim veya gölge tam backend yürütmesi devralınmaz.
 
 ### Yapı ve komutlar
 
@@ -112,14 +136,19 @@ V2'nin ilk dikey dilimi, [WF02](workflows.md#wf02) oda davranışını doğrudan
 | `apps/backend/scripts/ci/v2/safety.mjs` | Tam kaynak, manuel/disposable çalışma ve loopback sınırı |
 | `apps/backend/scripts/ci/v2/local.mjs` | İzole kurulum/reset, migration/boş DB kontrolü ve sahipli cleanup |
 | `apps/backend/tests/v2/safety.test.mjs` | Yanlış kaynak, otomatik olay ve hosted URL reddi |
+| `apps/backend/scripts/ci/v2/scope.mjs` | Frontend/backend/ortak test ve deploy etkisi; sabit 20 backend shard planı |
+| `apps/backend/scripts/ci/v2/plan.mjs` | Tam ata→head Git farkı, temiz kaynak ve tanı raporu |
+| `apps/backend/tests/v2/scope.test.mjs`, `plan.test.mjs` | Alan izolasyonu, rename/silinme, bilinmeyen kaynak ve gerçek Git kaynak sınırı |
 
 Repo kökünde dependency-free güvenlik testi:
 
 ```sh
-node --test apps/backend/tests/v2/safety.test.mjs
+node --test apps/backend/tests/v2/safety.test.mjs apps/backend/tests/v2/scope.test.mjs apps/backend/tests/v2/plan.test.mjs
 ```
 
-Workflow'da temiz checkout ve backend kurulumu sonrasında `apps/backend` içinden:
+Plan için `apps/backend` içinden `CI_V2_BASE_SHA` ve `CI_V2_HEAD_SHA` tam SHA, `CI_V2_MODE` auto/backend/full olarak verilerek `node scripts/ci/v2/plan.mjs` çalıştırılır. GitHub'da head sabit `GITHUB_SHA`dır. Dal adı, farklı checkout, ata olmayan taban, boş veya eksik fark ve kirli kaynak reddedilir. Plan artifact'ı `.artifacts/ci-v2-plan` altındadır; job dependency kurulumu, DB/API veya deploy başlatmaz.
+
+Oda workflow'unda temiz checkout ve backend kurulumu sonrasında `apps/backend` içinden:
 
 ```sh
 node scripts/ci/v2/local.mjs prepare

@@ -1,6 +1,6 @@
 # Güvenlik kaynak referansı
 
-Üretilmiştir: `node apps/backend/scripts/update-docs.mjs --write`. Elle düzenleme. Kaynak içerik özeti: `0f3f65298936167bc5ac2329c2b1ad971b1ebfc9b74eef95a9899fc02befed05`. Bu özet CI/hosted kabulü değildir; dağıtılan SHA ve ortam CD artifact'ında bulunur.
+Üretilmiştir: `node apps/backend/scripts/update-docs.mjs --write`. Elle düzenleme. Kaynak içerik özeti: `0b3e46a6d1a3dc5f1798ccf23f274f96c6fa73973e01de66b2a2b4e727c17da6`. Bu özet CI/hosted kabulü değildir; dağıtılan SHA ve ortam CD artifact'ında bulunur.
 
 İnsan istemci native Auth → JWT doğrulanan Edge → service-only RPC yolunu kullanır. Canlı oturum/MFA/tenant/rol/plan kontrolü tekrar denetlenir; core/private erişimi istemciye açılmaz. Worker ve public credential transport ayrı yetki yollarıdır. RLS tek başına Edge iş yetkisi değildir. [İstemci değişmezleri](client-integration.md), [teknik sözleşme](contracts/02-FtkSaaS-teknik-sozlesme.md) ve [iş akışları](workflows.md#wf00) normatif ayrıntıyı taşır.
 
@@ -117,7 +117,7 @@ Aşağıdaki liste güvenlik DDL içeren kaynak dosyalarıdır; son policy/grant
 | [room-and-role-registry-wrappers.sql](../apps/backend/database/room-and-role-registry-wrappers.sql) | `74d64f1fe3e2b5d5024a45f2f280449f1171a55fe3f2e006bd05766c7786d69e` |
 | [room-and-role-registry.sql](../apps/backend/database/room-and-role-registry.sql) | `459c399404c06bd4d2eb81556a1496639f5a73fcde0288f7f7a6d8f544bca780` |
 | [runtime-read-projection.sql](../apps/backend/database/runtime-read-projection.sql) | `3e2f98633b4f9e879ccee43df2fb622a028e8fa0827ba0a60a34fe20939c1357` |
-| [runtime-wrappers-current.sql](../apps/backend/database/runtime-wrappers-current.sql) | `908ce5fec641bdbe12e2b2106e98acac11ce9b132cafadf6c23c5fb0ab64d87f` |
+| [runtime-wrappers-current.sql](../apps/backend/database/runtime-wrappers-current.sql) | `3b738177df860af49ee951544e090be9d21123d56859231b8211b6715fbf235b` |
 | [runtime-wrappers.sql](../apps/backend/database/runtime-wrappers.sql) | `5b6289b205052a72b7049f54c124bc8c3d454426801ce62895a1bc9b82f66771` |
 | [runtime.sql](../apps/backend/database/runtime.sql) | `a6604816aadf0a2005b2c99f222b34ba10828de80a535d525eef0af5a62d07dd` |
 | [schedule-reads-wrappers.sql](../apps/backend/database/schedule-reads-wrappers.sql) | `12b3a79f852e099bde79aaa2bf7e23656463645b4886eb56ab4e3fb7f52b5fbf` |
@@ -127,6 +127,7 @@ Aşağıdaki liste güvenlik DDL içeren kaynak dosyalarıdır; son policy/grant
 | [starter-attendance-protection.sql](../apps/backend/database/starter-attendance-protection.sql) | `e927bc1c89cf99c20e6bab270693c81c56f5a1c4b4ec14e59c9d04cae39e5708` |
 | [starter-availability-day-boundaries.sql](../apps/backend/database/starter-availability-day-boundaries.sql) | `35b53f5de97897a7e0dbbcc395e20d1e64b7b0de9cb7dd3d5745398a694d6fee` |
 | [starter-availability-management.sql](../apps/backend/database/starter-availability-management.sql) | `55c5f4129982e88f7dcf49173fb7d8f97af48bd57de54d9b20a42ce2e3a93d4d` |
+| [starter-basic-crm.sql](../apps/backend/database/starter-basic-crm.sql) | `411fdfc92c83f7f0051c02d1e73df6c51a91abbca042697535a1978689e27cda` |
 | [starter-calendar-preferences.sql](../apps/backend/database/starter-calendar-preferences.sql) | `b6cdef115de1bef2153ca1a92150024805d4539c6a824d58e47e137087740a40` |
 | [starter-collection-methods.sql](../apps/backend/database/starter-collection-methods.sql) | `885509449945adb772066b3cb94bbc364a8955b716f04d7cbab5b0b6c429725f` |
 | [starter-domain-preparations-wrappers.sql](../apps/backend/database/starter-domain-preparations-wrappers.sql) | `d1ed3cc19e422239f93cc8f210bc21452bc60b635a6b24fc6cc028520155cc00` |
@@ -236,3 +237,4 @@ Aşağıdaki liste güvenlik DDL içeren kaynak dosyalarıdır; son policy/grant
 | [20261103141306_commercial_plan_limits.sql](../apps/backend/supabase/migrations/20261103141306_commercial_plan_limits.sql) | `b5dd6eb0f8d30806ff9828b39d084b7344194a02477394e28b3ce2e75fa1ed37` |
 | [20261103194514_class_duty_management.sql](../apps/backend/supabase/migrations/20261103194514_class_duty_management.sql) | `0324c08549d2fb98a7604a496d6e8b418141870a140c25a3798132368984242a` |
 | [20261103233454_event_capacity_practice.sql](../apps/backend/supabase/migrations/20261103233454_event_capacity_practice.sql) | `0562a2fa7b22721d78e93490051b2bda49f139826836d4f0a984528dfc9ab2f7` |
+| [20261104111220_starter_basic_crm.sql](../apps/backend/supabase/migrations/20261104111220_starter_basic_crm.sql) | `411fdfc92c83f7f0051c02d1e73df6c51a91abbca042697535a1978689e27cda` |

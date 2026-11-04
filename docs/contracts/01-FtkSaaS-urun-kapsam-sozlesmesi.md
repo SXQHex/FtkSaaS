@@ -93,9 +93,9 @@ Bu modüller ayrı servis veya ayrı uygulama zorunluluğu değildir. Yeni backe
 
 ## Özellik ve plan matrisi
 
-Tablo makine sözleşmesine aktarılmış plan erişimini gösterir; aynı plan bayrakları CI’da karşılaştırılır. **F21 aktarım farkı:** Yukarıdaki 4 Kasım Starter temel aday takibi kararı kabul edilmiştir; F21 satırının Starter hücresi henüz eski makine eşlemesini taşır. Bu hücre yeni dar kapsamı iptal etmez veya runtime desteği kanıtlamaz. Hedef metadata, gerekli runtime ve üretilmiş görünüm aktarımı [P05](../../apps/backend/docs/remaining-work.md#p05) içinde birlikte doğrulanacaktır. Sayısal/ticari sınırlar yukarıdaki bağlayıcı tablodadır; makine sözleşmesindeki `accepted_plan_limits` bu hedefin denetlenen aktarımıdır, runtime limiti veya teslim kabulü değildir. API kaynak kapsamı üretilmiş [özellik haritasında](../feature-delivery.md), gerçek kabul güncel kabul kaydındadır.
+Tablo makine sözleşmesine aktarılmış plan erişimini gösterir; aynı plan bayrakları CI’da karşılaştırılır. F21 Starter erişimi yalnız temel elle aday/not/takip kapsamını temsil eder; genel CRM/reklam/dönüşüm/segment yetkisi vermez. Kaynak ve gerçek kabul [P05](../../apps/backend/docs/remaining-work.md#p05) altında ayrı izlenir. Sayısal/ticari sınırlar yukarıdaki bağlayıcı tablodadır; makine sözleşmesindeki `accepted_plan_limits` bu hedefin denetlenen aktarımıdır, runtime limiti veya teslim kabulü değildir. API kaynak kapsamı üretilmiş [özellik haritasında](../feature-delivery.md), gerçek kabul güncel kabul kaydındadır.
 
-“Temel” ve “gelişmiş” ifadelerinin sınırları teknik sözleşmedeki davranışlarla belirlenir. Çizgi, yukarıda açıkça belirtilen F21 aktarım farkı dışında o planda kapsam dışında demektir. Her satırın uygulama/kabul sınırı feature_delivery haritasında ayrıca izlenir.
+“Temel” ve “gelişmiş” ifadelerinin sınırları teknik sözleşmedeki davranışlarla belirlenir. Çizgi, o planda kapsam dışında demektir. Her satırın uygulama/kabul sınırı feature_delivery haritasında ayrıca izlenir.
 
 | ID | Özellik | Sahip | Starter | Pro | Business | Kapsam durumu |
 |---|---|---|---|---|---|---|
@@ -119,7 +119,7 @@ Tablo makine sözleşmesine aktarılmış plan erişimini gösterir; aynı plan 
 | F18 | Merkezler arasında kullanım hakkı ve onaylı hesaplaşma | M06/M07 | — | — | Var | Kabul edildi |
 | F19 | Manuel tahsilat, kısmi ödeme, iade/düzeltme ve alacak | M07 | Var | Var | Var | Kabul edildi |
 | F20 | Eğitmen hakedişi ve ödeme takibi | M08 | — | Var | Var | Kabul edildi |
-| F21 | Aday, kaynak, ilgi, takip ve dönüşüm | M09 | — | Tam | Tam; merkez/organizasyon kapsamıyla | Kabul edildi |
+| F21 | Aday, kaynak, ilgi, takip ve dönüşüm | M09 | Temel aday takibi | Tam | Tam; merkez/organizasyon kapsamıyla | Kabul edildi |
 | F22 | Deneme teklifi ve kontrollü indirim | M09/M06/M07 | — | Var | Var | Kabul edildi |
 | F23 | Yenileme ve hareketsiz öğrenci takip listeleri | M09 | — | Var | Var | Kabul edildi |
 | F24 | Davranışa dayalı segmentler ve takip otomasyonu | M09/M10 | — | Var | Var | Kabul edildi |

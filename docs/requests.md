@@ -23,6 +23,8 @@ Bu dosya alanlar arası talep ve teslim kabulünün tek kaydıdır. Sohbet devri
 
 | XREQ-015 | Frontend; S03 sınıf varsayılan görevi canlı kabulü | Backend | [WF03](workflows.md#wf03), `management_state_get_v1` / `class_assignment_set_v1`; [gözlem ve kabul](#xreq-015). | Yetkili Starter CM, seçilen sınıf/kişi/duty atamasının varlığını, durumunu ve kendi sürümünü desteklenen normal okuyucudan alabilir; güvenli ekleme/kaldırma consumer girdisi belirlenir. | Kapandı | Frontend 4 Kasım: PR167 aynı-main/development teslimi doğrulandı; gerçek Starter ekranında mevcut durumu okuma, açık onayla etkinleştirme ve güncel etkin durumu okuma, açık onayla kaldırma ve güncel etkin değil durumu okuma geçti. Kanıt/sınırlar aşağıdaki frontend kabulündedir. |
 
+| XREQ-016 | Frontend; S11 bağlamsal belge kabulü | Backend | [WF11](workflows.md#wf11), `document_requirements_get_v1` / `document_accept_v1`; [somut sınır ve kabul](#xreq-016). | Native oturumun gerçek organizasyon kişisi backend tarafından çözülerek kendi işlem bağlamındaki gerekli sürüm/özel dosya okunabilir; frontend kişi kimliği tahmin etmeden aynı bağlamda yalnız kendi kabulünü sunabilir. | Backend değerlendirmesi bekliyor | Frontend 4 Kasım: hesap ve kişi kimlikleri farklıdır; mevcut required person_id ve self kişi keşfi boşluğu aşağıda kanıtlandı. Bu kayıt yeni selector uygulaması, backend onayı veya kendi adına kabulün teslimi değildir. |
+
 Alanların kendi planlarındaki bağımlılık gözlemleri otomatik olarak talep, onay veya işe başlama yetkisi sayılmaz; somut talep bu tabloya kaydedildiğinde `XREQ-001` biçiminde sabit bir kimlik alır.
 
 ## XREQ-001 kayıtta mevcut hesap bildirimi
@@ -241,3 +243,26 @@ Makine sözleşmesindeki `ManagementSelector_class_assignment_set_v1` aynı clas
 **Backend native ek bulgu:** İzole Starter senaryosunda varsayılan görev, gelecekte miras alan seanslar oluşturulduktan sonra kaldırılınca merkezi Starter program doğrulaması `PLAN_FEATURE_UNAVAILABLE` üretti. Kontrol yalnız zaten eğitmensiz seansın boş kalmasını kabul ediyordu. Mevcut seansın açık CM komutuyla eğitmensiz kalabilmesi, normal yaşam döngüsü kararıyla merkezi doğrulamada bu kaynak branch’inde düzeltildi; yeni Starter oluşumda seçili tek eğitmen, kaynak/rol/tenant ve rezervasyon korumaları korunuyor. Mevcut seansa özel komutun aynı canlı kaynak/yetki kontrolleri de korunuyor; platform otomatik davranış eklemiyor. Bu kaynak bulgusu özgün hosted ekran tekrarının yerine geçmez.
 
 **XREQ-015 frontend kapanış kabulü — 4 Kasım 2026:** Kullanıcının açık işleri kapatma talimatıyla PR167 main `faf447f56ff4a736562576abc1c9c6e8f203a000`, main proof ve development teslimi doğrulandı. Aynı Starter test sınıfı/kişi/duty ile mevcut panel artık hata yerine “Varsayılan görev etkin değil” gösterdi. Açık sınıf/gelecek seans etki onayıyla etkinleştirme sonrası panel kapandı ve liste yenilendi; panel yeniden açılıp aynı kişi seçilince “Varsayılan görev etkin” okundu. Yeni açık onayla kaldırma sonrası panel yeniden açıldığında “Varsayılan görev etkin değil” okundu. Başlangıçtaki etkin olmama durumu korundu; fiziksel atama satırı silindiği veya ilk yokluk kimliği varsayılmaz. Consumer, varsa aynı assignment okumasının kendi sürümünü gönderir; yoklukta expected_version eklemez. Bu UI denemesinde ham UUID/version/trace ayrıca yakalanmadı. 11/12 Kasım test seansları takvimde 8/5 boş yerle kaldı; bu okuma miras/override veya rezervasyon/hak korunmasının yeni hosted negatif testi diye sunulmaz. Bu negatiflerin backend kaynak/native kabulü kendi sahibindedir. Gerçek native okuma→açık onay→komut→yeniden okuma frontend zinciri tamamlandığından XREQ-015 kapatıldı; WEB-S03 diğer kabul maddeleriyle açık kalır. İlgili yayın kaynakları ve kanıt bağlantıları [frontend kabul kaydındadır](../apps/web/docs/todo.md#web-s03).
+
+
+<a id="xreq-016"></a>
+
+## XREQ-016 Belge gerekliliğini oturumun kendi kişisi için okuma
+
+### Frontend talebi — 4 Kasım 2026
+
+**Somut kaynak sınırı:** `Request_document_requirements_get` hem `person_id` hem gerçek `AcceptanceContext` ister. `AccountView` / `account_get_v1` yalnız hesap kimliği ve hesap bilgilerini verir; organizasyondaki `person_id` yoktur. Native Auth kimliği, `core.accounts.id` ve organizasyon kişisi birbirinin yerine kullanılamaz. `PersonView` ve `ReservationView` üzerinde bu kişinin mevcut native hesaba ait olduğunu ispatlayan self işareti yoktur. `people_list_v1` veya `reservation_list_v1` yetkili yönetici/eğitmen için birden çok kişiyi döndürebildiğinden ilk/tek satır, ad/e-posta eşleşmesi veya rol listesinden kişinin kendi kimliği çıkarılamaz. İlgili makine kaynağı [api-contracts](../packages/api-contracts/schema/contract.json), runtime örnekleri `dispatch.sql` account_get ve `schedule-reads.sql` reservation sayfasıdır.
+
+`document_accept_v1` ise hedef kişiyi kullanıcı girdisinden almaz; oturumun gerçek organizasyon kişisi için çalışır ve vekaleten onayı reddeder. Frontend başka bir kişinin gerekliliğini okuyup onu kendi gerekliliği diye sunamaz; yöneticinin başka kişi adına onay vermesine yönelik yeni yetki istenmez.
+
+**İstenen dar yetenek:** Gerçek rezervasyon/satış/katılım bağlamında kendi belge gerekliliğini backend tarafından çözülen aktör kişisiyle okumaya izin veren normal typed tüketim yolu. Tercih, mevcut `document_requirements_get_v1` üzerinde açık ve belgelenmiş self selector/kişi belirtilmeyen self kullanımının değerlendirilmesidir; yeni endpoint veya genel hesap–kişi dizini şart değildir. Kesin API/DTO ve uyumluluk tercihi backend'e aittir. Halen izinli açık `person_id` okumaları korunur. `content_file_id` aynı self bağlam ve sürüm yetkisini yeniden denetlemelidir; public dosya URL'si, service key veya core/private tablo erişimi istenmez.
+
+**Kabul ölçütleri:**
+
+1. Aktif native oturum + gerçek organizasyon bağıyla, manager olmayan öğrenci mevcut kendi işlem bağlamının gerekliliklerini ve özel byte'larını açabilir; frontend hesap/kişi eşleştirmesi yapmaz.
+2. Owner/OM/CM/eğitmen de self okumada yalnız kendi kişisinin gerekliliklerini alır; yönetim yetkisi self selector'ü başka kişiye çeviremez. Başka organizasyonun veya yanlış kişinin işlem bağlamı erişimi reddedilir.
+3. Yeni sürüm/yeniden kabul ve mevcut kesin rezervasyon koruması korunur. Gereklilik okuma, dosya okuma ve `document_accept_v1` aynı kişi/bağlam/sürümü kullanır; eski kabul yeni zorunlu sürüm için başarı diye sunulmaz.
+4. Revoked hesap bağı, person/state/merkez/yetki/plan kaybı ve MFA/native oturum kapıları yeniden denetlenir; eksik self kişi bağı boş gereklilik başarısı değildir. Vekalet alanı açılmaz.
+5. Normal generated kontrat/runtime/types ve mevcut negatif/yarış testleri kaynakla teslim edilir. Yeni frontend consumer'ın native/hosted kabulü frontend'in kendi teslim kaydında kalır.
+
+Frontend, açık hedefi gerçek rezervasyondan gelen yetkili gereklilik ve byte okumasını bağımsız tamamlar. Self selector yayımlanmadan bu okuyucuda kabul düğmesi, hesap/kişi tahmini veya sahte onay fallback'i yoktur. Backend değerlendirme/onay alanı frontend tarafından doldurulmamıştır.

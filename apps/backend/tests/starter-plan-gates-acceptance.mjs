@@ -72,8 +72,9 @@ test('Starter resource limits, concurrent capacity and feature gates',{timeout:3
    assert.equal((await db.query("select count(distinct person_id) n from core.center_relationships where org_id=$1 and kind='student' and state='active'",[org])).rows[0].n,'100');
    const assigned=(await db.query('select count(*)::int n,min(number)::text first,max(number)::text last from private.subscriber_numbers where org_id=$1',[org])).rows[0];assert.deepEqual(assigned,{n:100,first:'1001',last:'1100'});
   });
-  await t.test('CRM and event feature gate applies even when old catalog contains all features',async()=>{
-   await reject('leads_list_v1',{page:{limit:10}},'PLAN_FEATURE_UNAVAILABLE');
+  await t.test('Advanced CRM and event feature gate applies even when old catalog contains all features',async()=>{
+   const basicLeads=await invoke('leads_list_v1',{page:{limit:10}});assert(Array.isArray(basicLeads.items));
+   await reject('crm_followup_list_v1',{kind:'renewal_due',page:{limit:10}},'PLAN_FEATURE_UNAVAILABLE');
    await reject('earnings_list_v1',{person_id:instructor,interval:{starts_at:'2026-01-01T00:00:00Z',ends_at:'2028-01-01T00:00:00Z'},page:{limit:10}},'PLAN_FEATURE_UNAVAILABLE');
    const raw=await call(owner,'event_publish_v1',{org_id:org,center_id:center,event_id:key(),published:true},key());assert.equal(raw.result.ok,false);assert.equal(raw.result.error.code,'PLAN_FEATURE_UNAVAILABLE');
    // Direct service RPC with an authenticated claim must not impersonate the Edge.

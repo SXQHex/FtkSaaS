@@ -2838,12 +2838,10 @@
         "F23"
       ],
       "required_features": [
-        "F21",
-        "F23"
+        "F21"
       ],
       "runtime_required_features": [
-        "F21",
-        "F23"
+        "F21"
       ],
       "decision_delivery": {
         "accepted_contract": "DS-2026-10-17",
