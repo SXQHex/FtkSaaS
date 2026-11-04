@@ -1,4 +1,6 @@
 import fs from 'node:fs';
+import {buildInventory,partition} from './api-suites.mjs';
+import {repositoryRoot} from '../paths.mjs';
 import {createHash} from 'node:crypto';
 import {apiSuites} from './select-tests.mjs';
 export const durations=JSON.parse(fs.readFileSync(new URL('./suite-durations.json',import.meta.url)));
@@ -61,10 +63,10 @@ export function shardPlan(suites=apiSuites,seconds=durations.seconds){
  cache.set(key,best);return structuredClone(best);
 }
 export const apiBalancePolicy=Object.freeze({version:'api-wall-v1',max_ratio:1.25,min_gap_s:120});
-export function coverageHash(){return createHash('sha256').update(JSON.stringify({balance:apiBalancePolicy,api:[...apiSuites].sort(),plan:shardPlan(),core:['verify','test:db','dev:seed','dev:health','db:advisors'],reset:'34-or-current-manifest; empty auth/tenant/receipts per runner',concurrency:2})).digest('hex');}
+function legacyCoverageHash(){return createHash('sha256').update(JSON.stringify({balance:apiBalancePolicy,api:[...apiSuites].sort(),plan:shardPlan(),core:['verify','test:db','dev:seed','dev:health','db:advisors'],reset:'34-or-current-manifest; empty auth/tenant/receipts per runner',concurrency:2})).digest('hex');}
 export const roleName=j=>j.name.split(' / ').at(-1);
-export function validateJobs(jobs,run,{benchmark=false,collector=false,sourceChecks=false}={}){
- const names=['core','api-1','api-2','api-3','api-4',...(benchmark?['serial-reference']:[]),...(collector?['full-clean']:[])];
+export function validateJobs(jobs,run,{benchmark=false,collector=false,sourceChecks=false,profile='four-isolated-v2'}={}){
+ const names=['core',...apiRoles(profile),...(benchmark?['serial-reference']:[]),...(collector?['full-clean']:[])];
  for(const name of names){
   const matches=jobs.filter(j=>roleName(j)===name);
   if(matches.length!==1)throw Error('Missing/duplicate required job: '+name);
@@ -85,9 +87,9 @@ export function validateJobs(jobs,run,{benchmark=false,collector=false,sourceChe
 // Real executed Clean acceptance wall time includes isolated backend setup/reset,
 // but excludes package installation and queue time. No historical estimate can
 // substitute for these current run/attempt API timestamps.
-export function apiTimeBalance(jobs,run){
+export function apiTimeBalance(jobs,run,profile='four-isolated-v2'){
  const rows=[];
- for(let shard=1;shard<=4;shard++){
+ for(let shard=1;shard<=apiRoles(profile).length;shard++){
   const role='api-'+shard,matches=jobs.filter(j=>roleName(j)===role);
   if(matches.length!==1)throw Error('Missing/duplicate timed API job: '+role);
   const j=matches[0];
@@ -100,4 +102,17 @@ export function apiTimeBalance(jobs,run){
  }
  const times=rows.map(r=>r.clean_s),fastest=Math.min(...times),slowest=Math.max(...times),gap=slowest-fastest,ratio=slowest/fastest;
  return {...apiBalancePolicy,api:rows,fastest_s:fastest,slowest_s:slowest,gap_s:gap,ratio,balanced:ratio<=apiBalancePolicy.max_ratio||gap<=apiBalancePolicy.min_gap_s};
+}
+
+export const acceptanceProfile='eight-isolated-v1';
+export function apiRoles(profile=acceptanceProfile){
+ if(!['four-isolated-v1','four-isolated-v2',acceptanceProfile].includes(profile))throw Error('Unknown acceptance profile');
+ return Array.from({length:profile===acceptanceProfile?8:4},(_,i)=>'api-'+(i+1));
+}
+export function acceptancePlan(){return partition(buildInventory(repositoryRoot).units);}
+export function coverageHash(profile='four-isolated-v2'){
+ apiRoles(profile);
+ if(profile!==acceptanceProfile)return legacyCoverageHash();
+ const inventory=buildInventory(repositoryRoot);
+ return createHash('sha256').update(JSON.stringify({profile,balance:apiBalancePolicy,manifest:JSON.parse(fs.readFileSync(new URL('./api-suites.json',import.meta.url))),units:inventory.units.map(u=>({id:u.id,source:u.source,sha256:createHash('sha256').update(u.code).digest('hex'),exclusive:u.exclusive})),plan:partition(inventory.units).map(b=>({shard:b.shard,units:b.units.map(u=>u.id)})),core:['verify','test:db','dev:seed','dev:health','db:advisors'],reset:'current-manifest; empty auth/tenant/receipts per runner',concurrency:2,test_timeout:'native'})).digest('hex');
 }

@@ -331,26 +331,26 @@ Bu tablo yalnız izdir; eski kabul metinleri ikinci kez tutulmaz.
 <a id="p03"></a>
 ### P03 — İleri rezervasyon ve paket yaşam döngüsü
 
-- [ ] **Tür:** D · **Plan:** Pro/Business · **Özellik:** F09,F12,F17
+- [x] **Tür:** D · **Plan:** Pro/Business · **Özellik:** F09,F12,F17
 - **Bağımlılık:** P02,S09
 - **Kabul:** Bekleme teklifi ve kabul/ret; özel ders alternatifi; dondurma/değişim/sonlandırma çalışır.
 - **Sınır/olumsuz durum:** Teklif zamanı/son hak yarışı; geçmiş hak ve kesin kayıt koruması.
 - **Doğrulama senaryosu:** Expiry ile kabul yarışı, teklif reddi, paket değişimi sonrası uygunluk; kaynak boşluğu bulunursa ayrı dar düzeltme.
 - **Kaynak alanı:** p01 lesson/waitlist; paket lifecycle; mevcut test
 
-**Paralel kaynak paketi:** Kullanıcının 4 Kasım talimatıyla P02/PR167 sonucu beklenmeden ayrı P03/P04 branch'inde Pro ve Business için bağlı native kabul hazırlanır. Alternatif seçimi→CM onayı, worker teklifi→dondurmada canlı hak reddi→açık paket değişimi sonrası kabul, korunan kayıtlar→sonlandırma→bağımsız yenileme ve ret/expiry yarışı birlikte sınanır. Mevcut Business kaynak kabulleri korunur; yeni native sonuç henüz doğrulanmış değildir. [Kaynak/ortam sınırı](00-FtkSaaS-yeni-sohbet-devir.md#p03p04-paralel-kaynak-paketi) sahibindedir. P02 backend teslimi doğrulandı; genel P03 kabulü açık kalır.
+**Backend teslimi:** PR168 ile Pro/Business bağlı paket/teklif, alternatif/onay, canlı hak ve korunan kesin kayıt senaryoları aday/main/development kabulünü geçti. [Kaynak ve ortam kanıtı](00-FtkSaaS-yeni-sohbet-devir.md#p03p04-paralel-kaynak-paketi) sahibindedir.
 
 <a id="p04"></a>
 ### P04 — Eğitmen anlaşma ve hakediş kapanışı
 
-- [ ] **Tür:** D · **Plan:** Pro/Business · **Özellik:** F13,F20,F19
+- [x] **Tür:** D · **Plan:** Pro/Business · **Özellik:** F13,F20,F19
 - **Bağımlılık:** P02,S09
 - **Kabul:** Geçerli anlaşma→görevlendirme→gerçek ders→hakediş→ödeme tutarlı.
 - **Sınır/olumsuz durum:** İleri yürürlük geçmiş hakedişi değiştirmez; FIN-01 trailing earning_ids dar kontrolü.
 - **Doğrulama senaryosu:** Sürüm/anlaşma değişimi, kapanmış ders düzeltmesi ve yanlış merkez/earning id; mevcut kabul korunur.
 - **Kaynak alanı:** instructor-earnings SQL/test; ödeme okuması
 
-**Paralel kaynak paketi:** Aynı ayrı P03/P04 PR'sinde Pro/Business için tahsil edilmiş satış→rezervasyon→gerçek başlangıçta anlaşma sabitleme→hakediş→eşzamanlı ödeme→bağlı yoklama/ödeme düzeltmesi→canlı yetki kaybı zinciri hazırlanır. Mevcut FIN-01 ve bağımsız finans fixture'ları silinmez. Yeni native kabul, aday/main/development ve P02 bağımlılığı doğrulanmadan P04 kapanmaz. Kanıt tek [devir kaydındadır](00-FtkSaaS-yeni-sohbet-devir.md#p03p04-paralel-kaynak-paketi).
+**Backend teslimi:** PR168 ile Pro/Business bağlı tahsilat/rezervasyon/gerçek başlangıç/hakediş/ödeme ve gerekçeli düzeltme senaryoları aday/main/development kabulünü geçti. Mevcut FIN-01 ve finans fixture'ları korundu; [kaynak ve ortam kanıtı](00-FtkSaaS-yeni-sohbet-devir.md#p03p04-paralel-kaynak-paketi) sahibindedir.
 
 **XREQ-013 backend düzeltmesi:** [Ortak talep](../../../docs/requests.md#xreq-013) için native anlaşma çözümlemesinden üretilen typed preview önkoşul tanısı PR159'da uygulandı; [yerel kaynak/gerçek test kanıtı](00-FtkSaaS-yeni-sohbet-devir.md#xreq-013-backend-incelemesi) sahibindedir. Backend aday/main/development teslimi doğrulandı; özgün hosted Business/consumer tekrarı açık. Mevcut anlaşma okuma/yayımlama → yeni preview → açık onaylı apply kullanılır; ek kural/ücret varsayımı, istisna veya blocker bypass yoktur. Starter anlaşmasız kalır. Frontend yönlendirme/ekranının sahibi kendi alanıdır; bu dar düzeltme P04 genel kapanışı değildir.
 
@@ -443,6 +443,8 @@ Değişen dilimin sözleşme, üretilmiş tip/envanter, WF/F01–F33 izi ve alan
 - **Doğrulama senaryosu:** Son yer yarışı; oda tavanı; uyumsuz oda bağlama açık ret/çözüm; mevcut iptal/iade regresyonu.
 - **Kaynak alanı:** event/capacity SQL; contract.json; migration; event test
 
+**Aktif kaynak paketi:** Kullanıcının 4 Kasım kararıyla CRM P05–P11 sırası ertelenerek P12/P13 aynı PR'de hazırlanır. Mevcut etkinlik/ödeme/iptal akışı kullanılır; yeni modül veya ikinci hak ledger'ı kurulmaz. Uygulama ve kabul sınırı [P12/P13 devrindedir](00-FtkSaaS-yeni-sohbet-devir.md#p12p13-etkinlik-kaynak-paketi). Native aday/main/development kabulü olmadan kapanmaz.
+
 <a id="p13"></a>
 ### P13 — Kredi tüketmeyen paketli Pratik
 
@@ -452,6 +454,8 @@ Değişen dilimin sözleşme, üretilmiş tip/envanter, WF/F01–F33 izi ve alan
 - **Sınır/olumsuz durum:** Sonradan uygunsuz kayıt silinmez; katılım tekrar kontrol, uygunsuz fiilî katılım gerçeği kaydedilir.
 - **Doğrulama senaryosu:** Son ders tüketimiyle kayıt/katılım yarışı, dondurma/iade/yeni paket, borç; öncesi-sonrası kredi ledger eşitliği.
 - **Kaynak alanı:** event eligibility/register/attendance SQL; contract.json; ilgili test
+
+**Aktif kaynak paketi:** Kullanıcının 4 Kasım kararıyla CRM P05–P11 sırası ertelenerek P12/P13 aynı PR'de hazırlanır. Mevcut etkinlik/ödeme/iptal akışı kullanılır; yeni modül veya ikinci hak ledger'ı kurulmaz. Uygulama ve kabul sınırı [P12/P13 devrindedir](00-FtkSaaS-yeni-sohbet-devir.md#p12p13-etkinlik-kaynak-paketi). Native aday/main/development kabulü olmadan kapanmaz.
 
 <a id="p14"></a>
 ### P14 — İşlemsel e-posta teslimi

@@ -23,7 +23,7 @@ test('experimental inventory covers every original byte and every imported accep
 });
 
 test('changed source, missing source, range gap and duplicate ownership fail before running any API',()=>{
- const manifest=JSON.parse(fs.readFileSync(new URL('../scripts/ci/experiment/suites.json',import.meta.url)));
+ const manifest=JSON.parse(fs.readFileSync(new URL('../scripts/ci/api-suites.json',import.meta.url)));
  const read=p=>fs.readFileSync(path.join(repositoryRoot,p),'utf8');
  assert.throws(()=>buildInventory(repositoryRoot,{read:p=>read(p)+'\n'}),/source changed/);
  assert.throws(()=>buildInventory(repositoryRoot,{read:()=>{throw Error('missing');}}),/missing/);
@@ -106,7 +106,7 @@ test('global worker and security fixtures never overlap another file in the same
   if(phase.units.some(u=>u.exclusive)){assert.equal(phase.concurrency,1);assert.equal(phase.units.length,1);}
  }
  assert.deepEqual(phases.flatMap(p=>p.units.map(u=>u.id)).sort(),inventory.units.map(u=>u.id).sort());
- const manifest=JSON.parse(fs.readFileSync(new URL('../scripts/ci/experiment/suites.json',import.meta.url)));
+ const manifest=JSON.parse(fs.readFileSync(new URL('../scripts/ci/api-suites.json',import.meta.url)));
  manifest.exclusive=[];
  assert.throws(()=>buildInventory(repositoryRoot,{manifest}),/Global fixture/);
 });
@@ -128,13 +128,19 @@ test('collector compares matched core/API costs and rejects missing experimental
   assert.deepEqual(result.matched_core_api.runner_minutes,{baseline:5,experiment:9});
   assert.deepEqual(result.matched_core_api.execution_window_s,{baseline:60,experiment:60});
   assert.equal(result.overhead.baseline.length,2);assert.equal(result.overhead.experiment.length,1);
+  reference.profile='eight-isolated-v1';
+  for(let n=5;n<=8;n++)old.push(make('api-'+n,baseline));
+  await summarize(github,context,core,reference);
+  const eight=JSON.parse(fs.readFileSync('.artifacts/ci/experiment/comparison.json'));
+  assert.deepEqual(eight.matched_core_api.runner_minutes,{baseline:9,experiment:9});
+  assert.equal(eight.baseline.length,9);assert.equal(eight.overhead.baseline.length,2);
   jobs[2].steps[0].conclusion='failure';
   await assert.rejects(()=>summarize(github,context,core,reference),/Unexecuted/);
  }finally{process.chdir(cwd);rmSync(dir,{recursive:true,force:true});}
 });
 
 test('optional dedicated placement retains the original complete ST-02 body and timeout',()=>{
- const manifest=JSON.parse(fs.readFileSync(new URL('../scripts/ci/experiment/suites.json',import.meta.url)));
+ const manifest=JSON.parse(fs.readFileSync(new URL('../scripts/ci/api-suites.json',import.meta.url)));
  manifest.dedicatedRunners=['starter-operations-acceptance'];
  const full=manifest.suites.flatMap(s=>s.imports).find(item=>item.path.endsWith('starter-operations-acceptance.mjs'));
  delete full.parts;delete full.shared;
@@ -151,7 +157,7 @@ test('optional dedicated placement retains the original complete ST-02 body and 
 });
 
 test('measurement balances eight active runners with completed source-bound samples',async()=>{
- const manifest=JSON.parse(fs.readFileSync(new URL('../scripts/ci/experiment/suites.json',import.meta.url)));
+ const manifest=JSON.parse(fs.readFileSync(new URL('../scripts/ci/api-suites.json',import.meta.url)));
  // The historical run retains 47 samples; changed root bodies must not reuse them as current measurements.
  let inventory={units:Object.entries(manifest.measurements.units).map(([id,sample])=>({...sample,id,weight_source:'measured'}))};
  assert.equal(inventory.units.filter(u=>u.weight_source==='measured').length,47);
@@ -197,24 +203,24 @@ test('root',{timeout:1},async t=>{await wait(30); const original=t.test.bind(t);
 });
 
 test('stale duration samples fall back to explicit seeds and invalid matching samples fail closed',()=>{
- const manifest=JSON.parse(fs.readFileSync(new URL('../scripts/ci/experiment/suites.json',import.meta.url)));
+ const manifest=JSON.parse(fs.readFileSync(new URL('../scripts/ci/api-suites.json',import.meta.url)));
  const id='account-identity-acceptance';
  manifest.measurements.units[id].sha256='0'.repeat(64);
  const stale=buildInventory(repositoryRoot,{manifest}).units.find(unit=>unit.id===id);
  assert.equal(stale.weight_source,'source-size-seed');
- const current=JSON.parse(fs.readFileSync(new URL('../scripts/ci/experiment/suites.json',import.meta.url)));
+ const current=JSON.parse(fs.readFileSync(new URL('../scripts/ci/api-suites.json',import.meta.url)));
  current.measurements.units[id].seconds=-1;
  assert.throws(()=>buildInventory(repositoryRoot,{manifest:current}),/Invalid measured duration/);
 });
 
 
 test('imported multi-root modules have complete ownership and reject missing or duplicate root ranges',()=>{
- const manifest=JSON.parse(fs.readFileSync(new URL('../scripts/ci/experiment/suites.json',import.meta.url)));
+ const manifest=JSON.parse(fs.readFileSync(new URL('../scripts/ci/api-suites.json',import.meta.url)));
  const imported=manifest.suites.flatMap(s=>s.imports).find(item=>item.path.endsWith('starter-operations-acceptance.mjs'));
  assert.equal(imported.parts.length,2);
  imported.parts[0].ranges[0][0]++;
  assert.throws(()=>buildInventory(repositoryRoot,{manifest}),/coverage/);
- const duplicate=JSON.parse(fs.readFileSync(new URL('../scripts/ci/experiment/suites.json',import.meta.url)));
+ const duplicate=JSON.parse(fs.readFileSync(new URL('../scripts/ci/api-suites.json',import.meta.url)));
  const entry=duplicate.suites.flatMap(s=>s.imports).find(item=>item.path.endsWith('starter-operations-acceptance.mjs'));
  entry.parts.push(structuredClone(entry.parts[0]));
  assert.throws(()=>buildInventory(repositoryRoot,{manifest:duplicate}),/coverage|Duplicate/);

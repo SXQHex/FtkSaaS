@@ -14,7 +14,8 @@
         "apps/backend/tests/quality-guard.test.mjs",
         "apps/backend/tests/p06-acceptance.mjs",
         "apps/backend/tests/invitation-delivery-acceptance.mjs",
-        "apps/backend/tests/ci-experiment-checks.mjs"
+        "apps/backend/tests/ci-experiment-checks.mjs",
+        "apps/backend/tests/ci-api-suites.test.mjs"
       ],
       "sources": [
         "apps/backend/database/canonical-settings-scope.sql",
@@ -86,16 +87,24 @@
         "apps/backend/scripts/build-edge.mjs",
         "apps/backend/scripts/capture-docs.mjs",
         "apps/backend/scripts/check-migrations.py",
+        "apps/backend/scripts/ci/api-suites.json",
+        "apps/backend/scripts/ci/api-suites.mjs",
         "apps/backend/scripts/ci/check-quality.mjs",
         "apps/backend/scripts/ci/cleanup.mjs",
         "apps/backend/scripts/ci/collect.mjs",
         "apps/backend/scripts/ci/delta-analysis.mjs",
         "apps/backend/scripts/ci/deploy-development.mjs",
         "apps/backend/scripts/ci/deployment-source.mjs",
+        "apps/backend/scripts/ci/design-sandbox.mjs",
         "apps/backend/scripts/ci/docs-check.mjs",
         "apps/backend/scripts/ci/document-moves.json",
         "apps/backend/scripts/ci/document-paths.json",
         "apps/backend/scripts/ci/document-scope.mjs",
+        "apps/backend/scripts/ci/experiment/measurement-test.mjs",
+        "apps/backend/scripts/ci/experiment/reference.mjs",
+        "apps/backend/scripts/ci/experiment/run.mjs",
+        "apps/backend/scripts/ci/experiment/suites.mjs",
+        "apps/backend/scripts/ci/experiment/timing-reporter.mjs",
         "apps/backend/scripts/ci/floor-exceptions.json",
         "apps/backend/scripts/ci/floor-guard.mjs",
         "apps/backend/scripts/ci/gate.mjs",
@@ -113,6 +122,7 @@
         "apps/backend/scripts/ci/source.mjs",
         "apps/backend/scripts/ci/suite-durations.json",
         "apps/backend/scripts/ci/summarize-timings.mjs",
+        "apps/backend/scripts/ci/timing-reporter.mjs",
         "apps/backend/scripts/ci/timings.mjs",
         "apps/backend/scripts/db.mjs",
         "apps/backend/scripts/deliver-dev-invitations.mjs",
@@ -259,14 +269,7 @@
         "packages/api-contracts/src/generated.ts",
         "packages/api-contracts/src/index.ts",
         "packages/api-contracts/src/operations.ts",
-        "packages/api-contracts/src/runtime.ts",
-        "apps/backend/scripts/ci/design-sandbox.mjs",
-        "apps/backend/scripts/ci/experiment/reference.mjs",
-        "apps/backend/scripts/ci/experiment/run.mjs",
-        "apps/backend/scripts/ci/experiment/suites.mjs",
-        "apps/backend/scripts/ci/experiment/suites.json",
-        "apps/backend/scripts/ci/experiment/measurement-test.mjs",
-        "apps/backend/scripts/ci/experiment/timing-reporter.mjs"
+        "packages/api-contracts/src/runtime.ts"
       ],
       "operations": [
         "operation_status_get_v1",
@@ -276,8 +279,8 @@
         "management_state_get_v1"
       ],
       "review": {
-        "fingerprint": "dfed629fe01d7107d052de1116c0a126358019cb4e3540c1d5d33cf7b0c11100",
-        "reason": "Native kök bölünmesi ve imported shared/parts sahipliği eksiksiz; singleton platform ayar yazıcıları aynı sıralı birimde kalır. Tarihsel47 kayıt ile güncel43 gövde eşleşmesi ayrıdır. Özgün468 assertion ve80 callback korunur; checker eşiği/normal bütçeler gevşetilmez."
+        "fingerprint": "5aa2b8cc178d395fac3deb3c6bd7f3056132fc4b27cbdd04eae665e5dda6db0e",
+        "reason": "Üretim sekiz shard, native timeout ve exact-source incelemesi; iki assertion izi yalnız dört yerine sekiz iş/profil beklentisi için dar kayıtlıdır."
       }
     },
     {
@@ -370,7 +373,8 @@
         "apps/backend/tests/api-acceptance.test.mjs",
         "apps/backend/tests/p07-account-revocation-acceptance.mjs",
         "apps/backend/tests/availability-policies.test.mjs",
-        "apps/backend/tests/starter-instructor-acceptance.mjs"
+        "apps/backend/tests/starter-instructor-acceptance.mjs",
+        "apps/backend/tests/event-capacity-package-acceptance.mjs"
       ],
       "sources": [
         "apps/backend/database/account-session-management.sql",
@@ -423,7 +427,9 @@
         "apps/backend/database/instructor-legacy-cleanup.sql",
         "apps/backend/supabase/migrations/20261102180252_instructor_legacy_cleanup.sql",
         "apps/backend/database/starter-subscriber-projections.sql",
-        "apps/backend/supabase/migrations/20261102180626_starter_subscriber_projections.sql"
+        "apps/backend/supabase/migrations/20261102180626_starter_subscriber_projections.sql",
+        "apps/backend/database/event-capacity-practice.sql",
+        "apps/backend/supabase/migrations/20261103233454_event_capacity_practice.sql"
       ],
       "operations": [
         "organizations_list_v1",
@@ -449,8 +455,8 @@
         "role_revoke_preview_v1"
       ],
       "review": {
-        "fingerprint": "2a526d9b6e5563602eb0772e34d2380bde316977c1309f4fc0278d96605f2fe0",
-        "reason": "Native kabul kökleri bağımsız tenant ve anlamlı iş akışlarına ayrıldı; özgün assertion ve80 alt test gövdesi, yarış/rollback ve API sırası korundu. Shared fixture yalnız gereken native önkoşulları kurar; ürün/scope/permission anlatımı değişmez. Deney import köklerinde tam satır sahipliği ve singleton platform yazıcılarının aynı birimde sırası incelendi."
+        "fingerprint": "280054a691ce13a92236d3b83b6349fce27bc1c0d6dcbeeecb1b4838a841a054",
+        "reason": "Merged main PR173 native test-root splitting and PR171 CRM documentation with PR172 P12/P13 runtime and corrected internal venue timezones. Both source/test mappings retained; guide behavior unchanged."
       }
     },
     {
@@ -648,7 +654,8 @@
         "apps/backend/tests/program-session-lifecycle.test.mjs",
         "apps/backend/tests/starter-attendance-protection.test.mjs",
         "apps/backend/tests/event-payment.test.mjs",
-        "apps/backend/tests/pro-lifecycle-earnings-acceptance.mjs"
+        "apps/backend/tests/pro-lifecycle-earnings-acceptance.mjs",
+        "apps/backend/tests/event-capacity-package-acceptance.mjs"
       ],
       "sources": [
         "apps/backend/database/active-discipline-projection-wrappers.sql",
@@ -695,7 +702,9 @@
         "apps/backend/database/wrappers.sql",
         "docs/workflows.md",
         "apps/backend/database/starter-subscriber-projections.sql",
-        "apps/backend/supabase/migrations/20261102180626_starter_subscriber_projections.sql"
+        "apps/backend/supabase/migrations/20261102180626_starter_subscriber_projections.sql",
+        "apps/backend/database/event-capacity-practice.sql",
+        "apps/backend/supabase/migrations/20261103233454_event_capacity_practice.sql"
       ],
       "operations": [
         "products_list_v1",
@@ -723,8 +732,8 @@
         "negative_limits_get_v1"
       ],
       "review": {
-        "fingerprint": "a794bdb6767361a9b322bf8dcbfaa39501d5b001f4a4a01e20ee622aeec7804f",
-        "reason": "Native kabul kökleri bağımsız tenant ve anlamlı iş akışlarına ayrıldı; özgün assertion ve80 alt test gövdesi, yarış/rollback ve API sırası korundu. Shared fixture yalnız gereken native önkoşulları kurar; ürün/scope/permission anlatımı değişmez. Deney import köklerinde tam satır sahipliği ve singleton platform yazıcılarının aynı birimde sırası incelendi."
+        "fingerprint": "a201ed67ce81bcce1f7e26630e2eb35d1beb282e82f624ac4cdd67773301c856",
+        "reason": "Merged main PR173 native test-root splitting and PR171 CRM documentation with PR172 P12/P13 runtime and corrected internal venue timezones. Both source/test mappings retained; guide behavior unchanged."
       }
     },
     {
@@ -740,7 +749,8 @@
         "apps/backend/tests/program-session-lifecycle.test.mjs",
         "apps/backend/tests/starter-attendance-protection.test.mjs",
         "apps/backend/tests/starter-document-acceptance.mjs",
-        "apps/backend/tests/pro-lifecycle-earnings-acceptance.mjs"
+        "apps/backend/tests/pro-lifecycle-earnings-acceptance.mjs",
+        "apps/backend/tests/event-capacity-package-acceptance.mjs"
       ],
       "sources": [
         "apps/backend/database/active-discipline-projection-wrappers.sql",
@@ -783,7 +793,9 @@
         "apps/backend/database/wrappers.sql",
         "docs/workflows.md",
         "apps/backend/database/starter-subscriber-projections.sql",
-        "apps/backend/supabase/migrations/20261102180626_starter_subscriber_projections.sql"
+        "apps/backend/supabase/migrations/20261102180626_starter_subscriber_projections.sql",
+        "apps/backend/database/event-capacity-practice.sql",
+        "apps/backend/supabase/migrations/20261103233454_event_capacity_practice.sql"
       ],
       "operations": [
         "lesson_request_create_v1",
@@ -798,8 +810,8 @@
         "reservation_capacity_override_v1"
       ],
       "review": {
-        "fingerprint": "bfc0edf9375a6cc9172424df1e4f678923160875860563704d9137d7bf7c335d",
-        "reason": "Native kabul kökleri bağımsız tenant ve anlamlı iş akışlarına ayrıldı; özgün assertion ve80 alt test gövdesi, yarış/rollback ve API sırası korundu. Shared fixture yalnız gereken native önkoşulları kurar; ürün/scope/permission anlatımı değişmez. Deney import köklerinde tam satır sahipliği ve singleton platform yazıcılarının aynı birimde sırası incelendi."
+        "fingerprint": "f4b239bd19deeffb828497fca7c664aa55bf559a37ed2e54139201397766e799",
+        "reason": "Merged main PR173 native test-root splitting and PR171 CRM documentation with PR172 P12/P13 runtime and corrected internal venue timezones. Both source/test mappings retained; guide behavior unchanged."
       }
     },
     {
@@ -811,7 +823,8 @@
       "tests": [
         "apps/backend/tests/starter-attendance-protection.test.mjs",
         "apps/backend/tests/instructor-earnings.test.mjs",
-        "apps/backend/tests/pro-lifecycle-earnings-acceptance.mjs"
+        "apps/backend/tests/pro-lifecycle-earnings-acceptance.mjs",
+        "apps/backend/tests/event-capacity-package-acceptance.mjs"
       ],
       "sources": [
         "apps/backend/database/active-discipline-projection-wrappers.sql",
@@ -846,7 +859,9 @@
         "apps/backend/database/starter-attendance-protection.sql",
         "apps/backend/database/starter-plan-gates.sql",
         "apps/backend/database/wrappers.sql",
-        "docs/workflows.md"
+        "docs/workflows.md",
+        "apps/backend/database/event-capacity-practice.sql",
+        "apps/backend/supabase/migrations/20261103233454_event_capacity_practice.sql"
       ],
       "operations": [
         "attendance_get_v1",
@@ -858,8 +873,8 @@
         "attendance_start_v1"
       ],
       "review": {
-        "fingerprint": "f6b54febe216d9898aed083eb54eb94a185de7538befbbc13e0d06bcb52b3d4d",
-        "reason": "Native kabul kökleri bağımsız tenant ve anlamlı iş akışlarına ayrıldı; özgün assertion ve80 alt test gövdesi, yarış/rollback ve API sırası korundu. Shared fixture yalnız gereken native önkoşulları kurar; ürün/scope/permission anlatımı değişmez. Deney import köklerinde tam satır sahipliği ve singleton platform yazıcılarının aynı birimde sırası incelendi."
+        "fingerprint": "16720015ef0c942aaa6d19bf86fc0a5bd36d63e03523985e0660236d8b9872a6",
+        "reason": "Merged main PR173 native test-root splitting and PR171 CRM documentation with PR172 P12/P13 runtime and corrected internal venue timezones. Both source/test mappings retained; guide behavior unchanged."
       }
     },
     {
@@ -918,8 +933,8 @@
         "debt_adjust_v1"
       ],
       "review": {
-        "fingerprint": "d452f3095586271ae41d8d4d75017a108a65bb52a51dc309a71bebdb71cac51a",
-        "reason": "Native kabul kökleri bağımsız tenant ve anlamlı iş akışlarına ayrıldı; özgün assertion ve80 alt test gövdesi, yarış/rollback ve API sırası korundu. Shared fixture yalnız gereken native önkoşulları kurar; ürün/scope/permission anlatımı değişmez. Deney import köklerinde tam satır sahipliği ve singleton platform yazıcılarının aynı birimde sırası incelendi."
+        "fingerprint": "6c5c7843a70360fcdc2a5a6a9627619a8277210095fed57b4ab4c66c530b2fe0",
+        "reason": "Merged main PR173 native test-root splitting and PR171 CRM documentation with PR172 P12/P13 runtime and corrected internal venue timezones. Both source/test mappings retained; guide behavior unchanged."
       }
     },
     {
@@ -1203,8 +1218,8 @@
         "instructor_agreements_list_v1"
       ],
       "review": {
-        "fingerprint": "3ba31d0a4aa9c37a70e753ecb13395ec4001d684a143e9c1c623f95f1ee71e4d",
-        "reason": "Final Pro/Business native chain reviewed against existing workflow; approval session reuses the selected alternative interval across local midnight, all original scopes/history/ledger checks retained; native execution remains pending."
+        "fingerprint": "227fe26de057fae6839ff592741826859e2ff0770bd00102c5f7e2374787097a",
+        "reason": "P12/P13 reviewed: explicit event unlimited/physical room ceiling and existing org locks; immutable package usage with live lesson/event scope and freeze-aware positive rights; factual attendance separate, no credit allocation; existing paid/cancellation workflows and original test bodies preserved."
       }
     },
     {
@@ -1216,7 +1231,8 @@
       "tests": [
         "apps/backend/tests/event-payment.test.mjs",
         "apps/backend/tests/event-cancellation.test.mjs",
-        "apps/backend/tests/api-acceptance.test.mjs"
+        "apps/backend/tests/api-acceptance.test.mjs",
+        "apps/backend/tests/event-capacity-package-acceptance.mjs"
       ],
       "sources": [
         "apps/backend/database/active-discipline-projection-wrappers.sql",
@@ -1247,7 +1263,9 @@
         "apps/backend/database/runtime-wrappers.sql",
         "apps/backend/database/starter-attendance-protection-wrappers.sql",
         "apps/backend/database/wrappers.sql",
-        "docs/workflows.md"
+        "docs/workflows.md",
+        "apps/backend/database/event-capacity-practice.sql",
+        "apps/backend/supabase/migrations/20261103233454_event_capacity_practice.sql"
       ],
       "operations": [
         "event_save_v1",
@@ -1270,8 +1288,8 @@
         "event_actual_start_correct_v1"
       ],
       "review": {
-        "fingerprint": "726a0f56fb5aad6c56022297f250d46915fcb92db23c4f68a7ed322735deeb0c",
-        "reason": "Event-payment harness yeni hakediş kapsam regresyonunu içeri alıyor; etkinlik kayıt/ödeme/iptal davranışı ve rehberi değişmedi."
+        "fingerprint": "47b1c7796441fa84c0a5ed25e03a2d957f7d73d2f86f071edfbef464f31308bb",
+        "reason": "Merged main PR173 native test-root splitting and PR171 CRM documentation with PR172 P12/P13 runtime and corrected internal venue timezones. Both source/test mappings retained; guide behavior unchanged."
       }
     },
     {
