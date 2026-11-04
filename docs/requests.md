@@ -23,8 +23,9 @@ Bu dosya alanlar arası talep ve teslim kabulünün tek kaydıdır. Sohbet devri
 
 | XREQ-015 | Frontend; S03 sınıf varsayılan görevi canlı kabulü | Backend | [WF03](workflows.md#wf03), `management_state_get_v1` / `class_assignment_set_v1`; [gözlem ve kabul](#xreq-015). | Yetkili Starter CM, seçilen sınıf/kişi/duty atamasının varlığını, durumunu ve kendi sürümünü desteklenen normal okuyucudan alabilir; güvenli ekleme/kaldırma consumer girdisi belirlenir. | Kapandı | Frontend 4 Kasım: PR167 aynı-main/development teslimi doğrulandı; gerçek Starter ekranında mevcut durumu okuma, açık onayla etkinleştirme ve güncel etkin durumu okuma, açık onayla kaldırma ve güncel etkin değil durumu okuma geçti. Kanıt/sınırlar aşağıdaki frontend kabulündedir. |
 
-| XREQ-016 | Frontend; S11 bağlamsal belge kabulü | Backend | [WF11](workflows.md#wf11), `document_requirements_get_v1` / `document_accept_v1`; [somut sınır ve kabul](#xreq-016). | Native oturumun gerçek organizasyon kişisi backend tarafından çözülerek kendi işlem bağlamındaki gerekli sürüm/özel dosya okunabilir; frontend kişi kimliği tahmin etmeden aynı bağlamda yalnız kendi kabulünü sunabilir. | Backend kaynak hazır; aday kabulü bekleniyor | Frontend 4 Kasım: hesap ve kişi kimlikleri farklıdır; mevcut required person_id ve self kişi keşfi boşluğu aşağıda kanıtlandı. Bu kayıt yeni selector uygulaması, backend onayı veya kendi adına kabulün teslimi değildir. |
+| XREQ-016 | Frontend; S11 bağlamsal belge kabulü | Backend | [WF11](workflows.md#wf11), `document_requirements_get_v1` / `document_accept_v1`; [somut sınır ve kabul](#xreq-016). | Native oturumun gerçek organizasyon kişisi backend tarafından çözülerek kendi işlem bağlamındaki gerekli sürüm/özel dosya okunabilir; frontend kişi kimliği tahmin etmeden aynı bağlamda yalnız kendi kabulünü sunabilir. | Backend teslim edildi; frontend tüketici kabulü açık | Frontend 4 Kasım: hesap ve kişi kimlikleri farklıdır; mevcut required person_id ve self kişi keşfi boşluğu aşağıda kanıtlandı. Bu kayıt yeni selector uygulaması, backend onayı veya kendi adına kabulün teslimi değildir. |
 | XREQ-017 | Backend | Frontend | [WF01](workflows.md#wf01), [native telefon tüketicisi](settings.md#native-telefon-doğrulama-tüketicisi) | Telefon kodunu yeniden isteme, pending numaraya authenticated updateUser ile yeni istek üretir; yeni telefon doğrulanana kadar mevcut telefon korunur. | Frontend değerlendirmesi/kabulü bekleniyor | Backend native dilimi PR183 aday/main/development kabulüyle teslim edildi; [kaynak/kanıt](../apps/backend/docs/00-FtkSaaS-yeni-sohbet-devir.md#native-telefon-test-numarası-dilimi). Frontend consumer kaynağı PR184; ekran kabulü açık. |
+| XREQ-018 | Backend; P07 site bağlantısı | Site sunucu handler sahibi | [WF09](workflows.md#wf09), [adaptör sınırı](#xreq-018) ve [sunucu yapılandırması](../apps/backend/docs/remote-backend-setup.md#p07-site-sunucusu-adaptörü). | Güncel contact/kayit handler/DTO, gerçek form/onay sürümleri ve sabit retry kimliğiyle korunan ortak CRM inbox kabulü. | Backend adaptör kaynağı hazır; site tüketici doğrulaması açık | Başka repo/frontend veya canlı form config'i değiştirilmedi; backend kabulü site kabulü yerine geçmez. |
 
 Alanların kendi planlarındaki bağımlılık gözlemleri otomatik olarak talep, onay veya işe başlama yetkisi sayılmaz; somut talep bu tabloya kaydedildiğinde `XREQ-001` biçiminde sabit bir kimlik alır.
 
@@ -275,7 +276,7 @@ Kişi belirtilmeyen `document_requirements_get_v1` isteği yalnız canlı native
 
 Frontend compatibility tanısında `apps/web/src/lib/document-requirements.ts:63`, opsiyonel person_id değerini zorunlu string kabul eden yardımcıya aktarıyor. Consumer açık hedef helper'ında person_id varlığını daraltmalı veya yayımlanan self okuma yolunu ayrı tüketmelidir; hesap/kişi tahminiyle doldurulmaz. Bu XREQ-016 tüketici uyumudur, backend native kabulü veya frontend ekran kapanışı değildir.
 
-Kaynak uygulaması ve küçük sözleşme/native suiteleri bu PR'de hazırlanır; aday/main/development ve frontend native/hosted kabulü doğrulanmadan talep kapandı sayılmaz. Backend teknik değerlendirmesi ayrı endpoint veya genel hesap–kişi dizini gerektirmedi.
+Backend kaynak/sözleşme ve native aday/main/development teslimi PR182 ile tamamlandı; [kanıt](../apps/backend/docs/00-FtkSaaS-yeni-sohbet-devir.md#p05p06-ortak-alım-ve-xreq-016-kaynak-paketi). Self DTO tüketimine hazırdır; frontend native/hosted kabulü kendi alanında açık kalır. Ayrı endpoint veya genel hesap–kişi dizini gerekmedi.
 
 <a id="xreq-017"></a>
 ## XREQ-017 Native telefon kodunu yeniden isteme
@@ -294,3 +295,19 @@ Kaynak uygulaması ve küçük sözleşme/native suiteleri bu PR'de hazırlanır
 PR183'ün native telefon backend dilimi aday/main/development kabulüyle teslim edildi; tam kaynak/run/attempt ve gerçek native test kanıtı [backend kabul kaydındadır](../apps/backend/docs/00-FtkSaaS-yeni-sohbet-devir.md#native-telefon-test-numarası-dilimi). Yeniden kod istemede authenticated updateUser sonrası phone_change_sent_at ilerlemesi, yanlış kodda mevcut iletişimin korunması, doğrulanmış numara değişikliği, çakışmada hesap izolasyonu ve güvenlik geçmişi gerçek Auth→Edge→DB testinde geçti. Bu değerlendirme frontend adına kabul vermez.
 
 [PR184](https://github.com/SXQHex/FtkSaaS/pull/184) kaynak incelemesinde pending numarayla authenticated updateUser düzeltmesi ve yanlış kod/native ret/e-posta yolunun korunması regresyonları görüldü; backend talebinin teknik yolu ile uyumludur. Frontend kaynak CI/main/development ve gerçek ekran kabulü kendi sahibinde tamamlanır; backend bu PR'ı değiştirmez veya talebi kapatmaz. Hosted sabit OTP, gerçek SMS/+90 teslimatı, expiry ve kod rotasyonu ayrıca doğrulanmadan kabul edilmiş sayılmaz.
+
+<a id="xreq-018"></a>
+## XREQ-018 P07 contact/kayit sunucu adaptörü sınır devri
+
+### Backend talebi ve kaynak devri — 4 Kasım 2026
+
+Mevcut ortak başvuru API'si üzerinden contact/kayit sunucu adaptörü hazırlanır. [Alan/config devri](../apps/backend/docs/remote-backend-setup.md#p07-site-sunucusu-adaptörü), [typed DTO](../packages/api-contracts/schema/contract.json) ve [WF09](workflows.md#wf09) esas alınır. Sunucu createCrmWebFormHandler kullanır; yeni endpoint/tablo/hesap veya marketing izni oluşturulmaz. Bu kaynak başka site reposunda değişiklik yetkisi değildir.
+
+**Site sahibinin tamamlayacağı kabul:**
+
+1. Güncel `/api/contact` ve `/api/kayit` handler/DTO'sunu doğrula; tarihsel alanların bugün aynı olduğunu varsayma. Gerçek form_id ve her onayın purpose/metin version değerini sunucuda açık belirle; sahte/varsayılan değer yoktur.
+2. Mevcut Upstash ve site validasyonunu koruyarak adaptörü çağır. Sabit client_request_key, beyan edilmiş submitted_at, request_id ve gerçek public_application Turnstile token'ını sağla; hostname/action ve doğrulanmış bağlantı IP yolu açık olsun. Belirsiz teslimde yeni key/zaman üretme; yeni gerçek başvuruyu önceki telefon nedeniyle yutma.
+3. İki gerçek formdan başvur; yetkili CRM görünümünden ad/telefon/level, kayit mode/partnerName, ayrı olumlu/olumsuz onay ve varsa atfı yeniden oku. Aynı teslimde tek kayıt, farklı gerçek başvuruda ayrı geçmiş, başka tenant/merkez okumasında ret kanıtlanmalı.
+4. Timeout/ok:false hatadır; eski depoya fallback ile sahte başarı üretilmez. Geçmiş aktarımı P10'un ayrı önizleme/onay işidir; kaynak silinmez veya otomatik taşınmaz.
+
+**Backend durumu:** Adaptör kaynağı ve küçük hedefli eşleme/gateway testleri hazır; aday kanıtı [backend devrinde](../apps/backend/docs/00-FtkSaaS-yeni-sohbet-devir.md#p07-web-formu-adaptörü). Canlı handler/config/widget ve inbox kabulü doğrulanmış değildir. Site/frontend kendi kabul alanını ayrıca doldurur; backend karşı alan adına kapanış vermez.

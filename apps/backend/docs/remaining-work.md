@@ -359,18 +359,18 @@ Bu tablo yalnız izdir; eski kabul metinleri ikinci kez tutulmaz.
 <a id="p05"></a>
 ### P05 — Telefon temelli ortak başvuru modeli
 
-**Teslim edilen temel:** Starter temel aday/not/takip ve frontend sözleşme devri PR177 ile main ve development kabulünü geçti. Telefon temelli genel alım/ortak geçmiş ve P06 inceleme/eşleme kaynakları XREQ-016 ile `feature/crm-intake-review-self-documents` dalında hazırlanır; aday/main/development kabulü beklenir. Kaynak/test sınırı [P05 devrindedir](00-FtkSaaS-yeni-sohbet-devir.md#p05-starter-temel-crm-kaynak-dilimi).
+**Backend teslimi:** Starter temel aday/not/takip PR177; telefon temelli ortak alım/geçmiş ve P06 inceleme/eşleme PR182 ile aday/main/development kabulünü geçti. [Kaynak/ortam kanıtı](00-FtkSaaS-yeni-sohbet-devir.md#p05p06-ortak-alım-ve-xreq-016-kaynak-paketi) sahibindedir. Gerçek web formu ve sağlayıcı kabulü P07–P09'da kalır; frontend ekran kabulü ayrı tutulur.
 
 **Karar uyumu ve ilk teslim:** [CRM kararı](../../../docs/decisions/P08-accepted-scope.md) ile [plan kapsamını](../../../docs/contracts/01-FtkSaaS-urun-kapsam-sozlesmesi.md) mevcut kişi/CRM/API kaynaklarına eşleştir; ayrı karar sprinti veya paralel backlog açma. Var olan kodu koru. Mevcut aşama/plan/kimlik kuralları yeniden sorulmaz; yalnız karşılığı olmayan ürün davranışı kullanıcıya getirilir. Fiziksel tablo/indeks/webhook teknik seçimlerini backend çözer. Ayrı fırsat nesnesini ilk teslim için varsayma.
 
 - [x] **F21 makine aktarımı:** Yeni dar Starter hedefini makine metadata’sı, ürün matrisinin F21 hücresi, gerekli runtime/plan kapıları ve üretilmiş görünümle birlikte uzlaştır. Belge kararı nedeniyle genel CRM bayrağını koşulsuz açma; kabul edilmiş hedef ile gerçek desteği ayrı kanıtla.
 - [x] **Starter temel dilimi (F21):** Elle aday kaydı, not, takip tarihi ve bunların liste/ayrıntı üzerinden yeniden okunması; yetki/plan ve tarih/saat anlamları açık sözleşme. P11'in ileri deneme/segment kapsamı bu dilime taşınmaz.
 - [x] **Frontend sözleşme devri:** Mevcut makine kaynağından üretilmiş DTO/tip; gerekli okuma/yazma ve seçim verileri; WF sırası; yetki/plan, doğrulama/hata, başarı sonrası yeniden okuma ve belirsiz sonuç/replay davranışı. Desteklenmeyen yüzey hazır gösterilmez; frontend adına kabul verilmez.
-- [ ] **Temel kabul:** Yetkisiz tenant/merkez/aktör ve plan erişimi, not/takip kalıcılığı, aynı komutun tekrarında tek kayıt, farklı gerçek başvuruda geçmiş koruma, belirsiz telefon eşleşmesi ve otomatik hesap/öğrenci/satış/izin oluşmaması. Runtime, aday ve hosted kanıt ayrı tutulur.
+- [x] **Temel kabul:** Yetkisiz tenant/merkez/aktör ve plan erişimi, not/takip kalıcılığı, aynı komutun tekrarında tek kayıt, farklı gerçek başvuruda geçmiş koruma, belirsiz telefon eşleşmesi ve otomatik hesap/öğrenci/satış/izin oluşmaması. Runtime, aday ve hosted kanıt ayrı tutulur.
 
 Değişen dilimin sözleşme, üretilmiş tip/envanter, WF/F01–F33 izi ve alan devri aynı PR'da güncellenir. İş sırası [kuyruktadır](production-queue.md); bu görev aktif paketi değiştirmez. Sağlayıcı resmi erişim/izin/alan eşlemesi ve gerçek teslim/retry kabulü P08/P09'a aittir; Starter dilimini engellemez.
 
-- [ ] **Tür:** K · **Plan:** Starter temel dilim; Pro/Business ortak alım · **Özellik:** F07,F21,F25
+- [x] **Tür:** K · **Plan:** Starter temel dilim; Pro/Business ortak alım · **Özellik:** F07,F21,F25
 - **Bağımlılık:** S03,A01
 - **Kabul:** Telefon, form/kaynak/kampanya ve ayrı onay kanıtı tek ortak modelde tutulur.
 - **Sınır/olumsuz durum:** İkinci paralel kişi/başvuru deposu yok; telefon doğrulanmış Auth iletişimi sayılmaz.
@@ -380,12 +380,14 @@ Değişen dilimin sözleşme, üretilmiş tip/envanter, WF/F01–F33 izi ve alan
 <a id="p06"></a>
 ### P06 — Başvuru inceleme ve kişi eşleme
 
-- [ ] **Tür:** K · **Plan:** Pro/Business · **Özellik:** F07,F21
+- [x] **Tür:** K · **Plan:** Pro/Business · **Özellik:** F07,F21
 - **Bağımlılık:** P05
 - **Kabul:** Yetkili telefon eşleşme önerisini görüp mevcut kişiye bağlar veya yeni kişi oluşturur.
 - **Sınır/olumsuz durum:** Otomatik merge yok; yeni öğrencilik yalnız açık dönüşümle, No ve kota denetimiyle oluşur.
 - **Doğrulama senaryosu:** Ortak telefonlu iki kişi, kaynak geçmişi, tekrar inceleme ve sürüm çakışması.
 - **Kaynak alanı:** CRM inbox/review/convert SQL; ilgili test
+
+**P06 backend teslimi:** PR182 ile ortak telefon önerisi/açık eşleme, sürüm/replay/canlı yetki ve routing geçmişi teslim edildi; [kanıt](00-FtkSaaS-yeni-sohbet-devir.md#p05p06-ortak-alım-ve-xreq-016-kaynak-paketi). Gerçek site tüketicisi P07'de kalır.
 
 <a id="p07"></a>
 ### P07 — Web formlarını ortak alıma bağla
@@ -396,6 +398,12 @@ Değişen dilimin sözleşme, üretilmiş tip/envanter, WF/F01–F33 izi ve alan
 - **Sınır/olumsuz durum:** Mevcut site koruması korunur; istemci org/source beyanı yetki değildir; başka repo kendiliğinden değiştirilmez.
 - **Doğrulama senaryosu:** Gerçek form→backend→inbox; partnerName/mode ve ayrı onayların kaybolmaması; site sahibiyle sınır devri.
 - **Kaynak alanı:** backend ingress/adapter config; docs/requests backend devri
+
+**Alt adımlar:**
+
+- [x] P07.1 — Backend adaptör kaynağı: mevcut contact/kayit alanlarını tek yayımlanmış CRM DTO'suna eşle; ayrı onay sürümleri, sabit gönderim anahtarı/zamanı, partner/mode ve istemci atfı korunsun. Bu işaret yerel kaynak dilimidir; aday teslimi [devirde](00-FtkSaaS-yeni-sohbet-devir.md#p07-web-formu-adaptörü).
+- [ ] P07.2 — Site sahibi güncel handler/DTO, iki formun güvenilir form_id ve gerçek onay metni/sürümlerini doğrulasın; mevcut hız/validasyon korumasından sonra adaptöre bağlasın. [XREQ-018](../../../docs/requests.md#xreq-018) sınır devri; başka repo veya frontend bu dilimde değiştirilmez.
+- [ ] P07.3 — Yetkili gerçek form→Turnstile→backend→CRM inbox kabulü: iki form, ayrı onaylar/partner/mode, aynı teslim retry, yeni gerçek başvuru, yetkili kaynak/merkez okuması. Sunucu zamanı kullanılarak tarihsel onay üretilmez; site handler'ı doğrulanmadan alan eşlemesi canlı uyumluluk sayılmaz.
 
 <a id="p08"></a>
 ### P08 — Meta yerel reklam formu alımı

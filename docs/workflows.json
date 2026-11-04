@@ -292,8 +292,8 @@
         "management_state_get_v1"
       ],
       "review": {
-        "fingerprint": "e38787143fda6a33318abf2dd22958474cacd48eb08db4fb11af878478de325c",
-        "reason": "Main PR185 V2 kaynak/test bağları ile PR182 CRM/self bağları birlikte incelendi;67 gerçek birim parity kontrolünde aynı gövdeleri korur, üretim kabul kapıları değişmez."
+        "fingerprint": "15d734d084b61112deef0e88aea6ed64f5af52c0790714f08f2be65a4fa36d22",
+        "reason": "P07 contract test import and unchanged protocol/regression coverage reviewed; no API, policy, runtime or native test obligations changed."
       }
     },
     {
@@ -1017,7 +1017,8 @@
         "apps/backend/tests/crm-application-contract-unit.mjs",
         "apps/backend/tests/crm-ingress-unit.mjs",
         "apps/backend/tests/v2/backend/person-registry-root-1.test.mjs",
-        "apps/backend/tests/v2/backend/person-registry-root-2.test.mjs"
+        "apps/backend/tests/v2/backend/person-registry-root-2.test.mjs",
+        "apps/backend/tests/crm-web-form-unit.mjs"
       ],
       "sources": [
         "apps/backend/api/public-application.js",
@@ -1035,7 +1036,8 @@
         "apps/backend/transports/calendar-proxy.mjs",
         "apps/backend/database/crm-application-intake.sql",
         "apps/backend/supabase/migrations/20261104131917_crm_application_intake.sql",
-        "apps/backend/scripts/crm-intake-form-config.mjs"
+        "apps/backend/scripts/crm-intake-form-config.mjs",
+        "apps/backend/transports/crm-web-form-gateway.mjs"
       ],
       "operations": [
         "publication_set_v1",
@@ -1049,8 +1051,8 @@
         "calendar_feed_get_v1"
       ],
       "review": {
-        "fingerprint": "613f4f8dd6ec47fd141f2c3ec7a3364e7b7de592f58b6afb7ac0964768241b6b",
-        "reason": "Main PR185 V2 kaynak/test bağları ile PR182 CRM/self bağları birlikte incelendi;67 gerçek birim parity kontrolünde aynı gövdeleri korur, üretim kabul kapıları değişmez."
+        "fingerprint": "f9c9a98a526a190c8aaafab37ea0e7761c0fdf3a2ef391676cb698736e583f24",
+        "reason": "P07 F21/F25 mapping/config and Edge preflight/CAPTCHA tests reviewed; test module identity isolated from legacy handler test, both run together; real site acceptance stays open."
       }
     },
     {

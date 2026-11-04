@@ -18,7 +18,9 @@ function publicEnvelope(x,status){
  if(x.ok===false&&Object.keys(x).length===2&&e&&Object.keys(e).every(k=>['code','retryable','trace_id','retry_after_ms','field_paths'].includes(k))&&codes.has(e.code)&&typeof e.retryable==='boolean'&&uuid(e.trace_id))return {ok:false,error:{code:e.code,retryable:e.retryable,trace_id:e.trace_id}};
  return null;
 }
-export async function handlePublicApplication(req,env=process.env,fetcher=fetch){
+// Optional prepareBody is supplied by trusted server code, after bounded parsing
+// and origin checks, before the exact outgoing bytes are signed.
+export async function handlePublicApplication(req,env=process.env,fetcher=fetch,prepareBody){
  if(req.method!=='POST')return json('VALIDATION_FAILED',405);
  const host=env.FTK_PUBLIC_APPLICATION_HOSTNAME,secret=env.FTK_PUBLIC_INGRESS_SECRET,key=env.FTK_PUBLIC_ANON_KEY;
  if(!host||host.includes('/')||!secret||!key)return json('SERVICE_UNAVAILABLE',503);
@@ -26,7 +28,7 @@ export async function handlePublicApplication(req,env=process.env,fetcher=fetch)
  try{backend=new URL(env.FTK_PUBLIC_BACKEND_ORIGIN??base);if(backend.protocol!=='https:'||backend.origin!==(env.FTK_PUBLIC_BACKEND_ORIGIN??base))throw Error();}catch{return json('SERVICE_UNAVAILABLE',503);}
  if(url.protocol!=='https:'||url.hostname!==host||req.headers.get('origin')!=='https://'+host)return json('FORBIDDEN',403);
  if(!/^application\/json(?:\s*;|$)/i.test(req.headers.get('content-type')??''))return json('VALIDATION_FAILED',400);
- let body;try{body=await boundedBody(req.body);JSON.parse(body);}catch(e){return json('VALIDATION_FAILED',e.message==='SIZE'?413:400);}
+ let body;try{body=await boundedBody(req.body);const input=JSON.parse(body);if(prepareBody)body=JSON.stringify(prepareBody(input));}catch(e){return json('VALIDATION_FAILED',e.message==='SIZE'?413:400);}
  try{
   // Vercel overwrites this connection header. External proxy mode is unsupported.
   // Caller x-ftk-*, cookies and authorization are never forwarded.
