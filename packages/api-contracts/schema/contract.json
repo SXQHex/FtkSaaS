@@ -603,7 +603,8 @@
       "enum": [
         "match_existing",
         "create_candidate",
-        "close"
+        "close",
+        "assign_center"
       ]
     },
     "OrdinaryAttendanceResult": {
@@ -15920,7 +15921,6 @@
         "client_api_version",
         "request_id",
         "org_id",
-        "person_id",
         "context"
       ],
       "additionalProperties": false
@@ -16183,17 +16183,63 @@
         },
         "client_request_key": {
           "$ref": "#/$defs/FtkUuid"
+        },
+        "form_id": {
+          "$ref": "#/$defs/FtkUuid"
+        },
+        "intake": {
+          "$ref": "#/$defs/CrmIntake"
         }
       },
       "required": [
         "client_api_version",
         "request_id",
-        "publication_id",
-        "contact",
         "bot_proof",
         "client_request_key"
       ],
-      "additionalProperties": false
+      "additionalProperties": false,
+      "oneOf": [
+        {
+          "required": [
+            "publication_id",
+            "contact"
+          ],
+          "not": {
+            "anyOf": [
+              {
+                "required": [
+                  "form_id"
+                ]
+              },
+              {
+                "required": [
+                  "intake"
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "required": [
+            "form_id",
+            "intake"
+          ],
+          "not": {
+            "anyOf": [
+              {
+                "required": [
+                  "publication_id"
+                ]
+              },
+              {
+                "required": [
+                  "contact"
+                ]
+              }
+            ]
+          }
+        }
+      ]
     },
     "Success_public_application_submit": {
       "type": "object",
@@ -16255,6 +16301,12 @@
               "type": "null"
             }
           ]
+        },
+        "expected_version": {
+          "$ref": "#/$defs/PositiveInt"
+        },
+        "target_center_id": {
+          "$ref": "#/$defs/FtkUuid"
         }
       },
       "required": [
@@ -23058,10 +23110,24 @@
           "$ref": "#/$defs/FtkUuid"
         },
         "center_id": {
-          "$ref": "#/$defs/FtkUuid"
+          "anyOf": [
+            {
+              "$ref": "#/$defs/FtkUuid"
+            },
+            {
+              "type": "null"
+            }
+          ]
         },
         "publication_id": {
-          "$ref": "#/$defs/FtkUuid"
+          "anyOf": [
+            {
+              "$ref": "#/$defs/FtkUuid"
+            },
+            {
+              "type": "null"
+            }
+          ]
         },
         "target_contact": {
           "$ref": "#/$defs/Text"
@@ -23094,6 +23160,44 @@
               "type": "null"
             }
           ]
+        },
+        "crm_form_id": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/FtkUuid"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "source_snapshot": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/CrmIntakeSource"
+            },
+            {
+              "type": "object",
+              "maxProperties": 0,
+              "additionalProperties": false
+            }
+          ]
+        },
+        "intake": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/CrmIntakeView"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "routing_history": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/CrmApplicationRouting"
+          }
         }
       },
       "required": [
@@ -34856,6 +34960,41 @@
             },
             "publication_id": {
               "$ref": "#/$defs/FtkUuid"
+            },
+            "form_id": {
+              "$ref": "#/$defs/FtkUuid"
+            },
+            "center_id": {
+              "anyOf": [
+                {
+                  "$ref": "#/$defs/FtkUuid"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "source": {
+              "$ref": "#/$defs/CrmIntakeSource"
+            },
+            "intake": {
+              "$ref": "#/$defs/CrmIntakeView"
+            },
+            "routing_history": {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/CrmApplicationRouting"
+              }
+            },
+            "phone_matches": {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/CrmPhoneMatch"
+              },
+              "maxItems": 50
+            },
+            "phone_matches_truncated": {
+              "type": "boolean"
             }
           },
           "required": [],
@@ -51114,6 +51253,329 @@
         }
       ],
       "description": "Numeric finite capacity, or explicit unlimited only for venues without a room. No numeric sentinel."
+    },
+    "CrmIntakeSource": {
+      "type": "object",
+      "properties": {
+        "channel": {
+          "const": "web_form"
+        },
+        "form_key": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256
+        },
+        "source_url": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 2048
+        },
+        "form_id": {
+          "$ref": "#/$defs/FtkUuid"
+        }
+      },
+      "required": [
+        "channel",
+        "form_key",
+        "source_url",
+        "form_id"
+      ],
+      "additionalProperties": false
+    },
+    "CrmIntakeConsent": {
+      "type": "object",
+      "properties": {
+        "purpose": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 100
+        },
+        "accepted": {
+          "type": "boolean"
+        },
+        "version": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 200
+        },
+        "occurred_at": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "purpose",
+        "accepted",
+        "version",
+        "occurred_at"
+      ],
+      "additionalProperties": false
+    },
+    "CrmIntake": {
+      "type": "object",
+      "properties": {
+        "display_name": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 200
+        },
+        "phone": {
+          "type": "string",
+          "minLength": 7,
+          "maxLength": 40
+        },
+        "email": {
+          "type": "string",
+          "format": "email",
+          "maxLength": 320
+        },
+        "interest": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 1000
+        },
+        "message": {
+          "type": "string",
+          "maxLength": 10000
+        },
+        "partner_name": {
+          "type": "string",
+          "maxLength": 200
+        },
+        "mode": {
+          "type": "string",
+          "maxLength": 200
+        },
+        "attribution": {
+          "type": "object",
+          "properties": {
+            "campaign_id": {
+              "type": "string",
+              "maxLength": 2048
+            },
+            "ad_id": {
+              "type": "string",
+              "maxLength": 2048
+            },
+            "utm_source": {
+              "type": "string",
+              "maxLength": 2048
+            },
+            "utm_medium": {
+              "type": "string",
+              "maxLength": 2048
+            },
+            "utm_campaign": {
+              "type": "string",
+              "maxLength": 2048
+            },
+            "utm_term": {
+              "type": "string",
+              "maxLength": 2048
+            },
+            "utm_content": {
+              "type": "string",
+              "maxLength": 2048
+            },
+            "page_url": {
+              "type": "string",
+              "maxLength": 2048
+            }
+          },
+          "required": [],
+          "additionalProperties": false
+        },
+        "consents": {
+          "type": "array",
+          "maxItems": 20,
+          "items": {
+            "$ref": "#/$defs/CrmIntakeConsent"
+          }
+        }
+      },
+      "required": [
+        "display_name",
+        "phone",
+        "consents"
+      ],
+      "additionalProperties": false
+    },
+    "CrmIntakeConsentEvidence": {
+      "type": "object",
+      "properties": {
+        "purpose": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 100
+        },
+        "accepted": {
+          "type": "boolean"
+        },
+        "version": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 200
+        },
+        "occurred_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "source": {
+          "$ref": "#/$defs/CrmIntakeSource"
+        },
+        "received_at": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "purpose",
+        "accepted",
+        "version",
+        "occurred_at",
+        "source",
+        "received_at"
+      ],
+      "additionalProperties": false
+    },
+    "CrmIntakeView": {
+      "type": "object",
+      "properties": {
+        "display_name": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 200
+        },
+        "phone": {
+          "type": "string",
+          "minLength": 7,
+          "maxLength": 40
+        },
+        "email": {
+          "type": "string",
+          "format": "email",
+          "maxLength": 320
+        },
+        "interest": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 1000
+        },
+        "message": {
+          "type": "string",
+          "maxLength": 10000
+        },
+        "partner_name": {
+          "type": "string",
+          "maxLength": 200
+        },
+        "mode": {
+          "type": "string",
+          "maxLength": 200
+        },
+        "attribution": {
+          "type": "object",
+          "properties": {
+            "campaign_id": {
+              "type": "string",
+              "maxLength": 2048
+            },
+            "ad_id": {
+              "type": "string",
+              "maxLength": 2048
+            },
+            "utm_source": {
+              "type": "string",
+              "maxLength": 2048
+            },
+            "utm_medium": {
+              "type": "string",
+              "maxLength": 2048
+            },
+            "utm_campaign": {
+              "type": "string",
+              "maxLength": 2048
+            },
+            "utm_term": {
+              "type": "string",
+              "maxLength": 2048
+            },
+            "utm_content": {
+              "type": "string",
+              "maxLength": 2048
+            },
+            "page_url": {
+              "type": "string",
+              "maxLength": 2048
+            }
+          },
+          "required": [],
+          "additionalProperties": false
+        },
+        "consents": {
+          "type": "array",
+          "maxItems": 20,
+          "items": {
+            "$ref": "#/$defs/CrmIntakeConsentEvidence"
+          }
+        }
+      },
+      "required": [
+        "display_name",
+        "phone",
+        "consents"
+      ],
+      "additionalProperties": false
+    },
+    "CrmApplicationRouting": {
+      "type": "object",
+      "properties": {
+        "from_center_id": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/FtkUuid"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "to_center_id": {
+          "$ref": "#/$defs/FtkUuid"
+        },
+        "actor_person_id": {
+          "$ref": "#/$defs/FtkUuid"
+        },
+        "occurred_at": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "from_center_id",
+        "to_center_id",
+        "actor_person_id",
+        "occurred_at"
+      ],
+      "additionalProperties": false
+    },
+    "CrmPhoneMatch": {
+      "type": "object",
+      "properties": {
+        "person_id": {
+          "$ref": "#/$defs/FtkUuid"
+        },
+        "display_name": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 1000
+        }
+      },
+      "required": [
+        "person_id",
+        "display_name"
+      ],
+      "additionalProperties": false
     }
   },
   "x-contract": {
@@ -70052,7 +70514,8 @@
           "billing_gate_read",
           "required_feature_gates_separate_from_references",
           "no_business_commit",
-          "authorized_projection_only"
+          "authorized_projection_only",
+          "omitted_person_id_resolves_live_native_org_person"
         ],
         "audit": false,
         "notification": "none",
@@ -70100,7 +70563,8 @@
         },
         "runtime_limits": [
           "Development/test only; final source candidate/main clean required.",
-          "No external email; dedicated scoped DB worker; hosted scheduling remains separate."
+          "No external email; dedicated scoped DB worker; hosted scheduling remains separate.",
+          "Omit person_id for self requirements/content in explicit AcceptanceContext; explicit person_id retains original operational access checks."
         ]
       },
       {
@@ -70392,6 +70856,7 @@
         "name": "public_application_submit_v1",
         "module": "M09",
         "features": [
+          "F21",
           "F25"
         ],
         "permission": "public.apply",
@@ -70406,12 +70871,15 @@
         },
         "errors": [
           "BOT_VERIFICATION_FAILED",
+          "CLIENT_UPDATE_REQUIRED",
+          "IDEMPOTENCY_PAYLOAD_MISMATCH",
+          "INTEGRITY_VIOLATION",
+          "NOT_FOUND",
+          "PLAN_FEATURE_UNAVAILABLE",
           "RATE_LIMITED",
           "SERVICE_UNAVAILABLE",
           "TEMPORARY_FAILURE",
-          "VALIDATION_FAILED",
-          "CLIENT_UPDATE_REQUIRED",
-          "INTEGRITY_VIOLATION"
+          "VALIDATION_FAILED"
         ],
         "transaction_class": "public",
         "transaction_guarantee": "Atomic public_applications.versioned_domain_change; trusted actor and scoped provider/job result. External delivery never determines the domain commit.",
@@ -70427,7 +70895,10 @@
           "receipt_audit_outbox_atomic_domain_commit",
           "required_feature_gates_separate_from_references",
           "public_rate_and_bot_gate",
-          "server_public_scope_no_identity_or_tenant_inference"
+          "server_public_scope_no_identity_or_tenant_inference",
+          "trusted_form_route_no_caller_tenant_or_source_authority",
+          "same_phone_distinct_delivery_preserves_history",
+          "consent_evidence_never_grants_marketing_permission"
         ],
         "audit": true,
         "notification": "outbox_if_user_visible_business_result",
@@ -70453,7 +70924,13 @@
         "runtime_required_features": [
           "F25"
         ],
-        "conditional_features": [],
+        "conditional_features": [
+          {
+            "feature": "F21",
+            "when": "common_form_intake",
+            "mode": "required_if_selected"
+          }
+        ],
         "operation_contract": {
           "kind": "command",
           "target_entity": "public_applications",
@@ -70471,7 +70948,8 @@
           "accepted_contract": "DS-2026-10-17",
           "runtime_conformance": "implemented_pending_ci",
           "open_dependencies": [
-            "Configured signed ingress, Turnstile secret/hostname and real provider acceptance; no bypass."
+            "Configured signed ingress, Turnstile secret/hostname and real provider acceptance; no bypass.",
+            "P07 real website form integration and P08/P09 actual provider delivery acceptance remain separate."
           ],
           "target_request": {
             "$ref": "#/$defs/Request_public_application_submit"
@@ -70530,12 +71008,15 @@
           "billing_gate_new",
           "same_key_same_payload_replay",
           "receipt_audit_outbox_atomic_domain_commit",
-          "required_feature_gates_separate_from_references"
+          "required_feature_gates_separate_from_references",
+          "common_application_expected_version",
+          "phone_match_is_suggestion_only",
+          "org_inbox_routing_preserves_source_history"
         ],
         "audit": true,
         "notification": "outbox_if_user_visible_business_result",
         "concurrency": "Live original permission/tenant scope on every request; target/aggregate lock; append_or_current_scope_lock; idempotent receipt and all declared effects rollback together",
-        "expected_version_subject": "person_id",
+        "expected_version_subject": "public_applications when common form intake; legacy publication review retains its original contract",
         "acceptance_scenario_ids": [
           "A01",
           "A02",
@@ -84979,6 +85460,12 @@
         "generation": "uuidv7"
       },
       {
+        "path": "#/$defs/Request_public_application_submit/properties/form_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
         "path": "#/$defs/Success_public_application_submit/properties/trace_id",
         "origin": "ftksaas",
         "acceptance": "generic_uuid",
@@ -85016,6 +85503,12 @@
       },
       {
         "path": "#/$defs/Request_public_application_review/properties/person_id/anyOf/0",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Request_public_application_review/properties/target_center_id",
         "origin": "ftksaas",
         "acceptance": "generic_uuid",
         "generation": "uuidv7"
@@ -86108,6 +86601,12 @@
       },
       {
         "path": "#/$defs/Table_role_assignments/properties/scope_center_id/anyOf/0",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Table_role_assignments/properties/account_link_id/anyOf/0",
         "origin": "ftksaas",
         "acceptance": "generic_uuid",
         "generation": "uuidv7"
@@ -87769,6 +88268,18 @@
         "generation": "uuidv7"
       },
       {
+        "path": "#/$defs/Table_saas_change_requests/properties/source_plan_id/anyOf/0",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Table_saas_change_requests/properties/subscription_id/anyOf/0",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
         "path": "#/$defs/Table_saas_quotes/properties/id",
         "origin": "ftksaas",
         "acceptance": "generic_uuid",
@@ -88201,13 +88712,13 @@
         "generation": "uuidv7"
       },
       {
-        "path": "#/$defs/Table_public_applications/properties/center_id",
+        "path": "#/$defs/Table_public_applications/properties/center_id/anyOf/0",
         "origin": "ftksaas",
         "acceptance": "generic_uuid",
         "generation": "uuidv7"
       },
       {
-        "path": "#/$defs/Table_public_applications/properties/publication_id",
+        "path": "#/$defs/Table_public_applications/properties/publication_id/anyOf/0",
         "origin": "ftksaas",
         "acceptance": "generic_uuid",
         "generation": "uuidv7"
@@ -88220,6 +88731,12 @@
       },
       {
         "path": "#/$defs/Table_public_applications/properties/person_id/anyOf/0",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Table_public_applications/properties/crm_form_id/anyOf/0",
         "origin": "ftksaas",
         "acceptance": "generic_uuid",
         "generation": "uuidv7"
@@ -90259,6 +90776,12 @@
         "generation": "uuidv7"
       },
       {
+        "path": "#/$defs/Request_management_state_get/allOf/151/then/properties/org_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
         "path": "#/$defs/Success_management_state_get/properties/trace_id",
         "origin": "ftksaas",
         "acceptance": "generic_uuid",
@@ -91310,6 +91833,18 @@
       },
       {
         "path": "#/$defs/ManagementProjection_public_application_review_v1/properties/values/properties/publication_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/ManagementProjection_public_application_review_v1/properties/values/properties/form_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/ManagementProjection_public_application_review_v1/properties/values/properties/center_id/anyOf/0",
         "origin": "ftksaas",
         "acceptance": "generic_uuid",
         "generation": "uuidv7"
@@ -94669,24 +95204,6 @@
         "generation": "uuidv7"
       },
       {
-        "path": "#/$defs/Table_role_assignments/properties/account_link_id/anyOf/0",
-        "origin": "ftksaas",
-        "acceptance": "generic_uuid",
-        "generation": "uuidv7"
-      },
-      {
-        "path": "#/$defs/Table_saas_change_requests/properties/source_plan_id/anyOf/0",
-        "origin": "ftksaas",
-        "acceptance": "generic_uuid",
-        "generation": "uuidv7"
-      },
-      {
-        "path": "#/$defs/Table_saas_change_requests/properties/subscription_id/anyOf/0",
-        "origin": "ftksaas",
-        "acceptance": "generic_uuid",
-        "generation": "uuidv7"
-      },
-      {
         "path": "#/$defs/SubscriptionPlanTerms/properties/id",
         "origin": "ftksaas",
         "acceptance": "generic_uuid",
@@ -94735,12 +95252,6 @@
         "generation": "uuidv7"
       },
       {
-        "path": "#/$defs/Request_management_state_get/allOf/151/then/properties/org_id",
-        "origin": "ftksaas",
-        "acceptance": "generic_uuid",
-        "generation": "uuidv7"
-      },
-      {
         "path": "#/$defs/ManagementSelector_subscription_period_change_request_v1/properties/key/properties/target_plan_id",
         "origin": "ftksaas",
         "acceptance": "generic_uuid",
@@ -94760,6 +95271,36 @@
       },
       {
         "path": "#/$defs/ScheduleConfigurationRequirement/properties/discipline_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/CrmIntakeSource/properties/form_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/CrmApplicationRouting/properties/from_center_id/anyOf/0",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/CrmApplicationRouting/properties/to_center_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/CrmApplicationRouting/properties/actor_person_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/CrmPhoneMatch/properties/person_id",
         "origin": "ftksaas",
         "acceptance": "generic_uuid",
         "generation": "uuidv7"
@@ -95162,7 +95703,7 @@
       "uuid": "backend uuid@14.0.3 v7 for all inserted IDs; DB defaults not required",
       "external_transport": "POST /functions/v1/backend-v1/{operation}; direct typed request body",
       "internal_rpc": "service-only api_v1 named functions; actor/session/UUID bank supplied by verified gateway",
-      "migration_count": 102,
+      "migration_count": 104,
       "acceptance_source": "apps/backend/docs/00-FtkSaaS-yeni-sohbet-devir.md"
     },
     "decision_sprint": {
@@ -97271,10 +97812,14 @@
           "report_get_v1",
           "report_export_start_v1",
           "report_file_get_v1",
+          "public_application_submit_v1",
           "public_application_review_v1",
           "report_build_v1"
         ],
-        "dependencies": [],
+        "dependencies": [
+          "Configured signed ingress, Turnstile secret/hostname and real provider acceptance; no bypass.",
+          "P07 real website form integration and P08/P09 actual provider delivery acceptance remain separate."
+        ],
         "implementation": "source_operations_present",
         "acceptance": "pending_feature_acceptance",
         "acceptance_evidence": [],
@@ -97286,6 +97831,7 @@
           "report_get_v1",
           "report_export_start_v1",
           "report_file_get_v1",
+          "public_application_submit_v1",
           "public_application_review_v1",
           "report_build_v1"
         ],
@@ -97414,7 +97960,8 @@
         ],
         "dependencies": [
           "plan_gate_alignment",
-          "Configured signed ingress, Turnstile secret/hostname and real provider acceptance; no bypass."
+          "Configured signed ingress, Turnstile secret/hostname and real provider acceptance; no bypass.",
+          "P07 real website form integration and P08/P09 actual provider delivery acceptance remain separate."
         ],
         "implementation": "source_operations_present",
         "acceptance": "pending_feature_acceptance",

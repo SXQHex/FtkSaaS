@@ -3833,7 +3833,8 @@
       "billing_class": "read",
       "limits": [
         "Development/test only; final source candidate/main clean required.",
-        "No external email; dedicated scoped DB worker; hosted scheduling remains separate."
+        "No external email; dedicated scoped DB worker; hosted scheduling remains separate.",
+        "Omit person_id for self requirements/content in explicit AcceptanceContext; explicit person_id retains original operational access checks."
       ]
     },
     {
@@ -3920,6 +3921,7 @@
       "external_path": "/functions/v1/backend-v1/public_application_submit_v1",
       "permission": "public.apply",
       "features": [
+        "F21",
         "F25"
       ],
       "required_features": [
@@ -3932,7 +3934,8 @@
         "accepted_contract": "DS-2026-10-17",
         "runtime_conformance": "implemented_pending_ci",
         "open_dependencies": [
-          "Configured signed ingress, Turnstile secret/hostname and real provider acceptance; no bypass."
+          "Configured signed ingress, Turnstile secret/hostname and real provider acceptance; no bypass.",
+          "P07 real website form integration and P08/P09 actual provider delivery acceptance remain separate."
         ],
         "target_request": {
           "$ref": "#/$defs/Request_public_application_submit"

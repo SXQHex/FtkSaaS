@@ -466,7 +466,7 @@
     },
     {
       "path": "apps/backend/tests/registry.test.mjs",
-      "sha256": "a30e46db3bcd4d8b9947e0e4994fcbfbbc3696a8a19971a2ed56fb8cc73ffe79",
+      "sha256": "c15f8bc4baaacda0e989a92abad0cb17c367e9d6d288e85ce68814e68fdf1e84",
       "shared": [
         [
           5,
@@ -487,6 +487,10 @@
         [
           137,
           137
+        ],
+        [
+          139,
+          139
         ]
       ],
       "parts": [
@@ -699,6 +703,21 @@
           "line": 138,
           "path": "apps/backend/tests/starter-studio-acceptance.mjs",
           "sha256": "32e3d59bec63c7730d0d3f8217f729b7ee268bccca3441607ec2b8ae2dce2926"
+        },
+        {
+          "line": 140,
+          "path": "apps/backend/tests/document-self-requirements-acceptance.mjs",
+          "sha256": "8352a2ebde6d9778403e70a6855b0096277773f4158337342eea8d0053ccb55a"
+        },
+        {
+          "line": 141,
+          "path": "apps/backend/tests/crm-application-intake-acceptance.mjs",
+          "sha256": "ea64788526db258f1a30e9ec01e61b90c57da4d66570d787e1472c96b8a4acb7"
+        },
+        {
+          "line": 142,
+          "path": "apps/backend/tests/crm-application-review-acceptance.mjs",
+          "sha256": "4f64cc50ab32c5926a8b96dad7912e4cd095168c91e3367c487e0cdf76efb451"
         }
       ],
       "estimated_seconds": 1356.24

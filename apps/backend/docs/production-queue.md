@@ -24,9 +24,9 @@ Bu dosya yalnız **sıra, bağımlı teslim paketleri ve kontrol noktalarının*
 
 **S14–S16 kontrol noktası:** S14–S16 backend kaynak paketi PR156 ile aday/main/development kabulünü geçti; [kaynak/ortam kanıtı](00-FtkSaaS-yeni-sohbet-devir.md#s14s16-kaynak-paketi) ve açık hosted/tüketici sınırları [backlog](remaining-work.md#s14) sahibindedir.
 
-### Aktif kaynak paketi: P05 — CRM temel dilimi
+### Aktif kaynak paketi: P05/P06 ve XREQ-016
 
-P01–P04 ve P12/P13 backend teslimleri tamamlandı; kaynak/ortam kanıtı [devir](00-FtkSaaS-yeni-sohbet-devir.md) sahibindedir. Kullanıcının güncel talimatıyla CRM ertelemesi kaldırıldı. İlk açık kaynak işi [P05](remaining-work.md#p05): mevcut karar/runtime uyumu → Starter elle aday/not/takip → frontend sözleşme devri ve temel kabul. Ardından aşağıdaki CRM iç sırası izlenir; sağlayıcı erişimleri temel Starter dilimini bekletmez.
+P01–P04 ve P12/P13 backend teslimleri tamamlandı; kaynak/ortam kanıtı [devir](00-FtkSaaS-yeni-sohbet-devir.md) sahibindedir. Kullanıcının güncel talimatıyla CRM ertelemesi kaldırıldı. PR177 Starter elle aday/not/takip ve sözleşme devri teslim edildi. Sıradaki dilim [P05/P06](remaining-work.md#p05) ortak alım ve inceleme/eşleme ile [XREQ-016](../../../docs/requests.md#xreq-016) belge self okumasıdır; yeni kaynak aday/main/development kabulünü bekler. Ardından aşağıdaki CRM iç sırası izlenir; sağlayıcı erişimleri temel Starter dilimini bekletmez.
 
 Dış e-posta ertelemesi de kaldırıldı; mevcut kurulum yeniden sıfırdan başlatılmaz. P14/P15 mevcut kaynak/sağlayıcı incelemesiyle kendi sırasında yürütülür; P16, P11/P15 bağımlılıklarını korur. Posta kurulumunun varlığı bütün bildirim olaylarının teslim kabulü değildir.
 
@@ -35,7 +35,7 @@ Dış e-posta ertelemesi de kaldırıldı; mevcut kurulum yeniden sıfırdan ba�
 [CRM kararının](../../../docs/decisions/P08-accepted-scope.md) aktarımı mevcut P05–P11 paketine yapılır; ayrı karar sprinti açılmaz. P12/P13 kapanışından sonra aktif kaynak işi P05'tir. Görev ayrıntısı ve kabulün tek sahibi [P05](remaining-work.md#p05) ve devamındaki işlerdir.
 
 1. Kısa mevcut karar/runtime uyumu; yalnız gerçek ürün boşluklarını ayırma.
-2. P05 Starter temel dilimi ve frontend'e okuma/yazma sözleşme devri.
+2. PR177 ile teslim edilen Starter temel dilimini yeniden geliştirme; frontend ekran kabulü kendi alanında kalır.
 3. P05/P06 ortak kutu ve inceleme/eşleme, ardından P07 web formu.
 4. Gerçek kullanım ve erişime göre P08/P09'dan ilk sağlayıcı, sonra diğeri. Görev numarası ilk sağlayıcının seçildiği anlamına gelmez.
 5. P10 kontrollü eski kayıt aktarımı ve P11 ileri CRM, kendi bağımlılık ve yetkileriyle; Starter kapanışı bunları beklemez.

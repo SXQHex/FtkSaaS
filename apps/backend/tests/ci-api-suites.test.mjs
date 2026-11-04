@@ -10,7 +10,16 @@ import {buildInventory,partition,executionPhases,materialize} from '../scripts/c
 test('production inventory owns every original line and import once and compiles every payload',()=>{
  const manifest=JSON.parse(fs.readFileSync(new URL('../scripts/ci/api-suites.json',import.meta.url)));
  const inventory=buildInventory(repositoryRoot),bins=partition(inventory.units);
+ const added=new Set(['document-self-requirements-acceptance','crm-application-intake-acceptance','crm-application-review-acceptance']);
+ assert.equal(inventory.units.length,64+added.size);
+ for(const id of added)assert(inventory.units.some(u=>u.id===id),'Missing new acceptance unit '+id);
+ // Keep the original 64 acceptance units and their eight-shard invariant.
+ {
+  const inventory={units:buildInventory(repositoryRoot).units.filter(u=>!added.has(u.id))};
+  const bins=partition(inventory.units);
  assert.equal(bins.length,8);assert.equal(inventory.units.length,64);
+ }
+
  assert.deepEqual(bins.flatMap(b=>b.units.map(u=>u.id)).sort(),inventory.units.map(u=>u.id).sort());
  assert.deepEqual(partition([...inventory.units].reverse()),bins);
  assert.throws(()=>buildInventory(repositoryRoot,{read:p=>fs.readFileSync(path.join(repositoryRoot,p),'utf8')+'\n'}),/source changed/);
