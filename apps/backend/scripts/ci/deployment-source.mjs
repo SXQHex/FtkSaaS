@@ -14,6 +14,8 @@ export function deploymentSource({run,jobs,currentMain,repository,attempt}) {
  if(run.head_sha!==currentMain)return {deploy:false,reason:'Superseded main source'};
  const source=jobs.filter(j=>j.name==='source');
  if(source.length!==1||source[0].status!=='completed'||source[0].conclusion!=='success'||source[0].run_id!==run.id||source[0].run_attempt!==run.run_attempt||source[0].head_sha!==run.head_sha)throw Error('Missing main source verification');
+ // Historical experiment receipts are never runtime deployment proof.
+ // Keep this rejection when reading old main runs after the experiment is retired.
  const v2=jobs.filter(j=>j.name==='v2-development');
  if(v2.length>1)throw Error('Duplicate V2 main marker');
  if(v2.length&&v2[0].conclusion!=='skipped'){

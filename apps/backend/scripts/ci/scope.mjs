@@ -1,4 +1,3 @@
-import {isV2DevelopmentOnly} from './v2-development.mjs';
 import {isDesignSandbox} from './design-sandbox.mjs';
 import fs from 'node:fs';
 import {execFileSync} from 'node:child_process';
@@ -24,16 +23,13 @@ export function classifyChanges(changes){
   if(!/^[ACDMRT][0-9]*$/.test(c.status))throw Error('INVALID_SOURCE_STATUS');
   const owner=ownerOf(c.path);scope[owner]=true;scope.paths.push({path:c.path,owner});
  }
- scope.kind=isV2DevelopmentOnly(changes)?'v2-development':scope.backend?'full':scope.documentation?'documentation':scope.frontend?'frontend':'sandbox';
+ scope.kind=scope.backend?'full':scope.documentation?'documentation':scope.frontend?'frontend':'sandbox';
  return scope;
 }
 export function localScope(base,head,cwd=process.cwd()){
  cwd=execFileSync('git',['rev-parse','--show-toplevel'],{cwd,encoding:'utf8',stdio:['ignore','pipe','pipe']}).trim();
  const git=(...a)=>execFileSync('git',a,{cwd,encoding:'utf8',maxBuffer:24*1024*1024,stdio:['ignore','pipe','pipe']});
  const changes=parseChanges(git('diff','--name-status','-z','--find-renames',base,head)),scope=classifyChanges(changes);
- if(scope.kind==='v2-development')for(const c of changes)for(const ref of [base,head]){
-  const row=git('ls-tree',ref,'--',c.path);if(row&&!row.startsWith('100644 '))throw Error('UNSAFE_V2_SOURCE_MODE');
- }
  const docs=changes.filter(c=>ownerOf(c.path)==='documentation');
  if(docs.length){
   const read=(side,p)=>{try{return git('show',(side==='base'?base:head)+':'+p);}catch{return null;}};
