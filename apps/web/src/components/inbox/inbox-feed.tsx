@@ -13,23 +13,50 @@ import {
   SheetHeader,
   SheetTitle,
 } from "@ftksaas/ui/components/sheet";
-import { getNotificationVersion, inboxTarget, listInbox } from "../../lib/inbox";
+import { getNotificationVersion, inboxTarget, listInbox, listAudit } from "../../lib/inbox";
 import type { SetupScope } from "../../lib/studio-setup";
 import { SetupFeedback, useSetupCommand } from "../setup/setup-command";
 import { AuditHistory } from "./audit-history";
 
-export function InboxFeed({
-  scope,
-  list = listInbox,
-  version = getNotificationVersion,
-}: {
-  scope: SetupScope;
+type FeedReads = {
   list?: typeof listInbox;
   version?: typeof getNotificationVersion;
-}) {
+  historyList?: typeof listAudit;
+};
+export function InboxFeed({ scope, ...reads }: { scope: SetupScope } & FeedReads) {
+  return <ConnectedInbox key={JSON.stringify(scope)} scope={scope} {...reads} />;
+}
+function ConnectedInbox({ scope, ...reads }: { scope: SetupScope } & FeedReads) {
+  const [revision, setRevision] = useState(0),
+    [unread, setUnread] = useState(true);
+  const command = useSetupCommand(scope, "inbox-read", () => setRevision((n) => n + 1));
+  return (
+    <InboxFeedView
+      key={revision}
+      scope={scope}
+      command={command}
+      unread={unread}
+      onUnreadChange={setUnread}
+      {...reads}
+    />
+  );
+}
+export function InboxFeedView({
+  scope,
+  command,
+  unread,
+  onUnreadChange,
+  list = listInbox,
+  version = getNotificationVersion,
+  historyList = listAudit,
+}: {
+  scope: SetupScope;
+  command: ReturnType<typeof useSetupCommand>;
+  unread: boolean;
+  onUnreadChange: (value: boolean) => void;
+} & FeedReads) {
   const t = useTranslations("inbox");
   const format = useFormatter();
-  const [unread, setUnread] = useState(true);
   const [cursor, setCursor] = useState<string>();
   const [retry, setRetry] = useState(0);
   const [page, setPage] = useState<Awaited<ReturnType<typeof listInbox>> | null>(null);
@@ -42,6 +69,7 @@ export function InboxFeed({
   const [history, setHistory] = useState<EntityRef | null>(null);
   const alive = useRef(true);
   const prepareLock = useRef(false);
+  const generation = useRef(0);
   const historyTrigger = useRef<HTMLButtonElement | null>(null);
   const confirmButton = useRef<HTMLButtonElement>(null);
   const readTrigger = useRef<HTMLButtonElement | null>(null);
@@ -56,16 +84,17 @@ export function InboxFeed({
     };
   }, []);
   function reload() {
+    generation.current += 1;
+    setConfirm(null);
+    setReadError(false);
     setPage(null);
     setError(false);
     setCursor(undefined);
     setRetry((n) => n + 1);
   }
-  const command = useSetupCommand(scope, "inbox-read", () => {
-    setConfirm(null);
-    reload();
-    heading.current?.focus();
-  });
+  useEffect(() => {
+    if (command.message === "saved" || command.message === "failed") heading.current?.focus();
+  }, [command.message]);
   useEffect(() => {
     let active = true;
     void list(scope, unread, cursor)
@@ -81,17 +110,18 @@ export function InboxFeed({
   }, [scope, unread, cursor, retry, list]);
   async function prepare(notice: NotificationView) {
     if (prepareLock.current || command.pending || command.busy) return;
+    const currentGeneration = generation.current;
     prepareLock.current = true;
     setPreparing(true);
     setReadError(false);
     setConfirm(null);
     try {
       const currentVersion = await version(scope, notice.id);
-      if (!alive.current) return;
+      if (!alive.current || generation.current !== currentGeneration) return;
       if (currentVersion === null) setReadError(true);
       else setConfirm({ notice, version: currentVersion });
     } catch {
-      if (alive.current) setReadError(true);
+      if (alive.current && generation.current === currentGeneration) setReadError(true);
     } finally {
       prepareLock.current = false;
       if (alive.current) setPreparing(false);
@@ -103,7 +133,12 @@ export function InboxFeed({
         <h2 ref={heading} tabIndex={-1} className="font-semibold">
           {t("title")}
         </h2>
-        <Button variant="outline" disabled={preparing} onClick={reload}>
+        <Button
+          className="h-auto min-h-11 max-w-full whitespace-normal"
+          variant="outline"
+          disabled={preparing}
+          onClick={reload}
+        >
           {t("reload")}
         </Button>
       </div>
@@ -112,10 +147,8 @@ export function InboxFeed({
           type="checkbox"
           checked={unread}
           onChange={(event) => {
-            setPage(null);
-            setError(false);
-            setCursor(undefined);
-            setUnread(event.target.checked);
+            reload();
+            onUnreadChange(event.target.checked);
           }}
         />
         {t("unreadOnly")}
@@ -133,6 +166,7 @@ export function InboxFeed({
           </p>
           <div className="flex flex-wrap gap-3">
             <Button
+              className="h-auto min-h-11 max-w-full whitespace-normal"
               ref={confirmButton}
               disabled={command.busy}
               onClick={() => {
@@ -153,6 +187,7 @@ export function InboxFeed({
               {t("confirm")}
             </Button>
             <Button
+              className="h-auto min-h-11 max-w-full whitespace-normal"
               variant="outline"
               onClick={() => {
                 setConfirm(null);
@@ -185,7 +220,12 @@ export function InboxFeed({
                         {notice.payload.title ||
                           (t.has(`kinds.${notice.kind}`) ? t(`kinds.${notice.kind}`) : t("notice"))}
                       </h3>
-                      <Badge variant="outline">{t(notice.read_at ? "read" : "unread")}</Badge>
+                      <Badge
+                        variant="outline"
+                        className="max-w-full whitespace-normal wrap-anywhere"
+                      >
+                        {t(notice.read_at ? "read" : "unread")}
+                      </Badge>
                     </div>
                     {notice.payload.body && (
                       <p className="whitespace-pre-wrap break-words text-sm">
@@ -211,6 +251,7 @@ export function InboxFeed({
                       )}
                       {!notice.read_at && (
                         <Button
+                          className="h-auto min-h-11 max-w-full whitespace-normal"
                           variant="outline"
                           disabled={preparing || command.busy || !!command.pending}
                           onClick={(event) => {
@@ -222,6 +263,7 @@ export function InboxFeed({
                         </Button>
                       )}
                       <Button
+                        className="h-auto min-h-11 max-w-full whitespace-normal"
                         variant="ghost"
                         onClick={(event) => {
                           historyTrigger.current = event.currentTarget;
@@ -238,8 +280,12 @@ export function InboxFeed({
           )}
           {page.next_cursor && (
             <Button
+              className="h-auto min-h-11 max-w-full whitespace-normal"
               variant="outline"
               onClick={() => {
+                generation.current += 1;
+                setConfirm(null);
+                setReadError(false);
                 setPage(null);
                 setError(false);
                 setCursor(page.next_cursor ?? undefined);
@@ -272,7 +318,12 @@ export function InboxFeed({
           </SheetHeader>
           <div className="min-w-0 p-4">
             {history && (
-              <AuditHistory key={`${history.type}:${history.id}`} scope={scope} subject={history} />
+              <AuditHistory
+                key={`${history.type}:${history.id}`}
+                scope={scope}
+                subject={history}
+                list={historyList}
+              />
             )}
           </div>
         </SheetContent>

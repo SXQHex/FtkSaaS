@@ -65,7 +65,7 @@ export function AuditHistory({
   }
   return (
     <section aria-label={t("history")} className="space-y-5">
-      <form onSubmit={search} className="flex flex-wrap items-end gap-3">
+      <form onSubmit={search} className="grid items-end gap-3 sm:grid-cols-2">
         <div className="min-w-0 flex-1 space-y-2">
           <Label htmlFor={`${formId}-from`}>{t("from")}</Label>
           <Input
@@ -86,7 +86,11 @@ export function AuditHistory({
             defaultValue={interval.ends_at.slice(0, 10)}
           />
         </div>
-        <Button type="submit" variant="outline">
+        <Button
+          className="h-auto min-h-11 max-w-full whitespace-normal"
+          type="submit"
+          variant="outline"
+        >
           {t("filter")}
         </Button>
       </form>
@@ -124,6 +128,7 @@ export function AuditHistory({
           )}
           {page.next_cursor && (
             <Button
+              className="h-auto min-h-11 max-w-full whitespace-normal"
               variant="outline"
               onClick={() => {
                 reset();
@@ -136,6 +141,7 @@ export function AuditHistory({
         </>
       )}
       <Button
+        className="h-auto min-h-11 max-w-full whitespace-normal"
         variant="outline"
         onClick={() => {
           reset();

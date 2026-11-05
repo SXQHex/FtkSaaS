@@ -301,3 +301,61 @@ test("final failure recovered by status clears the journal and returns focus wit
   expect(screen.getByRole("heading", { name: "Kendi belgelerim" })).toHaveFocus();
   expect(screen.queryByText("Gereklilik karşılanıyor")).not.toBeInTheDocument();
 });
+
+async function recoverStatus(status: "succeeded" | "result_expired") {
+  const api = reads(),
+    key = setupStorageKey(scope, "document-accept");
+  api.read.mockResolvedValueOnce([doc]).mockResolvedValue([{ ...doc, accepted: true }]);
+  sessionStorage.setItem(
+    key,
+    JSON.stringify({
+      command: {
+        operation: "document_accept_v1",
+        input: { org_id: other, context, document_version_id: doc.version_id, operation_key: id },
+      },
+    }),
+  );
+  const send = vi.fn<() => void>();
+  server.use(
+    http.post(endpoint, () => {
+      send();
+      return success();
+    }),
+    http.post(
+      "https://project.example.invalid/functions/v1/backend-v1/operation_status_get_v1",
+      () =>
+        HttpResponse.json({
+          ok: true,
+          data: {
+            operation: "document_accept_v1",
+            key: id,
+            status,
+            result_available: status === "succeeded",
+            result_reference: status === "succeeded" ? { type: "documents", id } : null,
+          },
+          trace_id: id,
+        }),
+    ),
+  );
+  render(<SelfDocuments scope={scope} context={context} {...api} />);
+  await userEvent.click(screen.getByRole("button", { name: "İşlem sonucunu kontrol et" }));
+  return { api, key, send };
+}
+test("self succeeded receipt rereads requirements without a second acceptance", async () => {
+  const { api, key, send } = await recoverStatus("succeeded");
+  await screen.findByText("Gereklilik karşılanıyor");
+  expect(sessionStorage.getItem(key)).toBeNull();
+  expect(api.read).toHaveBeenCalledTimes(2);
+  expect(send).not.toHaveBeenCalled();
+});
+test("self expired receipt blocks replay without a second acceptance", async () => {
+  const { key, send } = await recoverStatus("result_expired");
+  await waitFor(() =>
+    expect(JSON.parse(sessionStorage.getItem(key) ?? "null")).toMatchObject({ blocked: true }),
+  );
+  expect(
+    screen.queryByRole("button", { name: "Aynı işlemi yeniden gönder" }),
+  ).not.toBeInTheDocument();
+  expect(screen.queryByRole("checkbox")).not.toBeInTheDocument();
+  expect(send).not.toHaveBeenCalled();
+});
