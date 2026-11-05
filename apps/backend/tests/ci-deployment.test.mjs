@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {project,unchangedEdge,hostedSmoke,sameMigration,migrationPlan,migrationBody,migrationBatch} from '../scripts/ci/deploy-development.mjs';
+import {project,unchangedEdge,unchangedResendWebhook,resendWebhookSmoke,hostedSmoke,sameMigration,migrationPlan,migrationBody,migrationBatch} from '../scripts/ci/deploy-development.mjs';
 import {deploymentSource,resolveAcceptedSource,revalidateDeployment,trustedDeliveryRun,filterSupabaseDelivery,resolveDeployment,previousReceipt} from '../scripts/ci/deployment-source.mjs';
 import fs,{mkdtempSync,rmSync} from 'node:fs';
 import {backendUnchanged} from '../scripts/ci/source.mjs';
@@ -121,6 +121,25 @@ test('unchanged Edge requires both trusted source receipt and live version/JWT m
  const previous={success:true,project,edge_version:3,edge_source_sha256:'hash'},edge={version:3,status:'ACTIVE',verify_jwt:true};
  assert(unchangedEdge(previous,edge,'hash'));
  for(const [p,e,h] of [[null,edge,'hash'],[{...previous,success:false},edge,'hash'],[{...previous,project:'other'},edge,'hash'],[previous,{...edge,version:4},'hash'],[previous,{...edge,verify_jwt:false},'hash'],[previous,edge,'changed']])assert(!unchangedEdge(p,e,h));
+});
+
+test('Resend deployment reuse requires its own source/version receipt and dedicated non-JWT configuration',()=>{
+ const previous={success:true,project,resend_webhook_version:3,resend_webhook_source_sha256:'hash'},edge={version:3,status:'ACTIVE',verify_jwt:false};
+ assert(unchangedResendWebhook(previous,edge,'hash'));
+ for(const [p,e,h] of [[null,edge,'hash'],[previous,undefined,'hash'],[{...previous,success:false},edge,'hash'],[{...previous,project:'other'},edge,'hash'],[previous,{...edge,version:4},'hash'],[previous,{...edge,verify_jwt:true},'hash'],[previous,{...edge,status:'FAILED'},'hash'],[previous,edge,'changed']])assert(!unchangedResendWebhook(p,e,h));
+});
+
+test('hosted webhook smoke rejects the JWT gateway failure and accepts only provider signature rejection without credentials',async()=>{
+ for(const status of [403,401,200,503]){
+  const checks=[];let calls=0;
+  const probe=resendWebhookSmoke((name,passed)=>{checks.push({name,passed});assert(passed);},async(url,options)=>{
+   calls++;assert.equal(url,'https://'+project+'.supabase.co/functions/v1/resend-webhook');
+   assert.equal(options.headers.authorization,undefined);assert.equal(options.headers.apikey,undefined);
+   assert.equal(options.method,'POST');return new Response('{}',{status});
+  });
+  if(status===403)await probe;else await assert.rejects(probe);
+  assert.equal(calls,1);assert.equal(checks.length,1);assert.equal(checks[0].passed,status===403);
+ }
 });
 
 test('hosted smoke checks real request sequence and cleans its exact UUID even on a failed assertion',async()=>{

@@ -28,6 +28,14 @@ export function cliFailure(result){
   signal:['SIGTERM','SIGKILL','SIGINT'].includes(result.signal)?result.signal:null,spawn_error};
 }
 export function unchangedEdge(previous,edge,hash){return previous?.success===true&&previous.project===project&&previous.edge_source_sha256===hash&&previous.edge_version===edge?.version&&edge.status==='ACTIVE'&&edge.verify_jwt===true;}
+export function unchangedResendWebhook(previous,edge,hash){return previous?.success===true&&previous.project===project&&previous.resend_webhook_source_sha256===hash&&previous.resend_webhook_version===edge?.version&&edge?.status==='ACTIVE'&&edge.verify_jwt===false;}
+export async function resendWebhookSmoke(record,send=fetch){
+ const response=await send('https://'+project+'.supabase.co/functions/v1/resend-webhook',{method:'POST',headers:{'content-type':'application/json'},body:'{}',signal:AbortSignal.timeout(15000)});
+ await response.arrayBuffer();
+ // A 401 means the provider still cannot reach signature verification. A 503
+ // means the signing secret/runtime configuration is not ready, not acceptance.
+ record('resend_webhook_unauthenticated_invalid_signature_rejected',response.status===403);
+}
 // CLI stores verbatim SQL chunks without statement separators. MCP stores one
 // complete file. Accept both representations; never normalize quoted contents.
 function separator(s,final=false){
@@ -198,13 +206,25 @@ export async function deliver(){
   const fn=path.join(temp,'supabase/functions/backend-v1');fs.mkdirSync(fn,{recursive:true});
   const bundle=fs.readFileSync('supabase/functions/backend-v1/index.ts');receipt.edge_source_sha256=sha256(bundle);
   fs.writeFileSync(path.join(fn,'index.ts'),bundle);
-  fs.writeFileSync(path.join(temp,'supabase/config.toml'),'project_id = "ftksaas-hosted-development"\n[functions.backend-v1]\nverify_jwt = true\n');
+  fs.writeFileSync(path.join(temp,'supabase/config.toml'),'project_id = "ftksaas-hosted-development"\n[functions.backend-v1]\nverify_jwt = true\n[functions.resend-webhook]\nverify_jwt = false\n');
   const previous=fs.existsSync(ciFile('previous-development-delivery.json'))?JSON.parse(fs.readFileSync(ciFile('previous-development-delivery.json'))):null;
   const before=await api('/functions/backend-v1');
   receipt.edge_unchanged=unchangedEdge(previous,before,receipt.edge_source_sha256);
   if(!receipt.edge_unchanged)cli(['functions','deploy','backend-v1','--use-api','--workdir',temp,'--output-format','json','--yes','--remote='+project]);
   const edge=await api('/functions/backend-v1');
   record('edge_active_jwt_required',edge.status==='ACTIVE'&&edge.verify_jwt===true);receipt.edge_version=edge.version;receipt.edge_bundle_sha256=edge.ezbr_sha256??null;
+  await current();stage='Resend webhook deployment';
+  const webhook=path.join(temp,'supabase/functions/resend-webhook');fs.mkdirSync(webhook,{recursive:true});
+  const webhookBundle=fs.readFileSync('supabase/functions/resend-webhook/index.ts');receipt.resend_webhook_source_sha256=sha256(webhookBundle);
+  fs.writeFileSync(path.join(webhook,'index.ts'),webhookBundle);
+  const functions=await api('/functions');
+  const beforeWebhook=functions.find(f=>f.slug==='resend-webhook');
+  receipt.resend_webhook_unchanged=unchangedResendWebhook(previous,beforeWebhook,receipt.resend_webhook_source_sha256);
+  if(!receipt.resend_webhook_unchanged)cli(['functions','deploy','resend-webhook','--use-api','--workdir',temp,'--output-format','json','--yes','--remote='+project]);
+  const webhookEdge=await api('/functions/resend-webhook');
+  record('resend_webhook_active_provider_signature_required',webhookEdge.status==='ACTIVE'&&webhookEdge.verify_jwt===false);
+  receipt.resend_webhook_version=webhookEdge.version;receipt.resend_webhook_bundle_sha256=webhookEdge.ezbr_sha256??null;
+  stage='Resend webhook smoke';await resendWebhookSmoke(record);
   stage='database permissions';
   const [permissions]=await sql("select (select count(*)::int from pg_class c join pg_namespace n on n.oid=c.relnamespace where n.nspname='core' and c.relkind='r') as core_tables, (select count(*)::int from pg_class c join pg_namespace n on n.oid=c.relnamespace where n.nspname='core' and c.relkind='r' and not c.relrowsecurity) as missing_rls, (select count(*)::int from pg_proc p join pg_namespace n on n.oid=p.pronamespace where n.nspname='api_v1' and (has_function_privilege('anon',p.oid,'EXECUTE') or has_function_privilege('authenticated',p.oid,'EXECUTE'))) as exposed_rpc");
   record('core_rls_and_direct_rpc_denied',permissions.core_tables>0&&permissions.missing_rls===0&&permissions.exposed_rpc===0);receipt.permissions=permissions;

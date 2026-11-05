@@ -1,17 +1,16 @@
+import {Webhook} from 'standardwebhooks';
 type Env=(name:string)=>string|undefined;
 const uuid=/^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$/;
 const kinds:Record<string,string>={'email.sent':'accepted','email.delivered':'delivered','email.delivery_delayed':'delayed','email.bounced':'bounced','email.complained':'complained','email.failed':'failed','email.suppressed':'failed'};
 const reply=(status:number)=>new Response(JSON.stringify(status===200?{}:{error:status===503?'TEMPORARY_FAILURE':'INVALID_WEBHOOK'}),{status,headers:{'content-type':'application/json','cache-control':'no-store','x-content-type-options':'nosniff'}});
-// Resend/Svix: HMAC of id.timestamp.raw-body. WebCrypto verifies in constant time.
+// Resend uses Svix header aliases for the Standard Webhooks protocol.
 export async function verifyEmailSignature(raw:string,headers:Headers,secret:string,now:number):Promise<boolean>{
  try{
   const id=headers.get('svix-id')??'',at=headers.get('svix-timestamp')??'',signatures=headers.get('svix-signature')??'';
   if(!/^[a-zA-Z0-9_-]{1,128}$/.test(id)||!/^\d{10}$/.test(at)||Math.abs(now/1000-Number(at))>300||signatures.length>2048||!/^whsec_[a-zA-Z0-9+/]+={0,2}$/.test(secret))return false;
   const bytes=Uint8Array.from(atob(secret.slice(6)),c=>c.charCodeAt(0));if(bytes.length<16||bytes.length>128)return false;
-  const key=await crypto.subtle.importKey('raw',bytes,{name:'HMAC',hash:'SHA-256'},false,['verify']);
-  const message=new TextEncoder().encode(id+'.'+at+'.'+raw);
-  for(const part of signatures.split(' '))if(/^v1,[a-zA-Z0-9+/]{43}=$/.test(part)&&await crypto.subtle.verify('HMAC',key,Uint8Array.from(atob(part.slice(3)),c=>c.charCodeAt(0)),message))return true;
-  return false;
+  new Webhook(secret).verify(raw,{'webhook-id':id,'webhook-timestamp':at,'webhook-signature':signatures},{jsonParse:false});
+  return true;
  }catch{return false;}
 }
 async function readBody(req:Request):Promise<string>{

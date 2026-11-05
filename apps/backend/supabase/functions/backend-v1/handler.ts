@@ -2,7 +2,6 @@ import {calendarFeed} from './calendar-feed.ts';
 import {calendarToken,calendarTokenHash,calendarOrigin,calendarSubscriptionUrl,calendarAppUrl} from './calendar-token.ts';
 import {lifecycleReauth} from './lifecycle-auth.ts';
 import {accountSignupCheck} from './account-signup.ts';
-import {emailEvents} from './email-events.ts';
 import {invitationTick} from './invitation-delivery.ts';
 import {crmIntakePhone,publicIngress,verifyPublicBot,publicBotHostname} from "./public-ingress.ts";
 import {importStorage,parseImportCsv} from "./import-file.ts";
@@ -19,7 +18,6 @@ Deno.serve(async req=>{
  if(req.method!=="POST")return failure("VALIDATION_FAILED");
  try{
   const operation=new URL(req.url).pathname.split("/").filter(Boolean).at(-1)!;
-  if(operation==='email_provider_events')return emailEvents(req,n=>Deno.env.get(n));
   if(operation==='invitation_delivery_tick')return invitationTick(req,n=>Deno.env.get(n));
   
   if(!implemented.has(operation))return failure("NOT_FOUND",404);
