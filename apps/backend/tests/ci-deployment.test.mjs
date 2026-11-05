@@ -8,6 +8,113 @@ import {join} from 'node:path';
 import {tmpdir} from 'node:os';
 import {repositoryRoot} from '../scripts/paths.mjs';
 import {valid,scopedGithub,candidateProofFixture} from './ci-fixtures.mjs';
+import {webSourceChanged,vercelRequest,validateVercelRun,selectVercelSource,deliverVercel,matchesVercelTarget} from '../scripts/ci/vercel-deployment.mjs';
+import {execFileSync} from 'node:child_process';
+
+test('Vercel deployment selection deliberately requires web src, independently of test scope',()=>{
+ assert(webSourceChanged(['apps/web/src/app/page.tsx']));
+ assert(webSourceChanged(['apps/web/src/app/deleted.tsx','docs/settings.md']));
+ for(const p of ['apps/web/public/logo.svg','apps/web/package.json','apps/web/next.config.ts','packages/ui/src/button.tsx','apps/backend/supabase/config.toml','docs/settings.md','.github/workflows/frontend.yml'])assert.equal(webSourceChanged([p]),false);
+ assert.equal(webSourceChanged([]),false);
+});
+
+test('Vercel API requests pin the project and full tested commit without exposing credentials',()=>{
+ const sha='a'.repeat(40),request=vercelRequest({sha,target:'preview',run:42});
+ assert.equal(request.gitSource.ref,sha);assert.equal(request.gitSource.sha,sha);
+ assert.equal(request.project,'prj_shLMyVjPsCo2QrejlPGJUBKguah2');
+ assert.equal(request.target,undefined);assert.equal(vercelRequest({sha,target:'production',run:42}).target,'production');
+ for(const source of [{sha:'main',target:'production'},{sha,target:'other'}])assert.throws(()=>vercelRequest(source));
+});
+
+test('Vercel only consumes successful same-repository current-attempt checks',()=>{
+ const run={id:4,run_attempt:1,path:'.github/workflows/frontend.yml',event:'pull_request',status:'completed',conclusion:'success',repository:{full_name:'SXQHex/FtkSaaS'},head_repository:{full_name:'SXQHex/FtkSaaS'}};
+ assert(validateVercelRun(run,1));
+ for(const patch of [{run_attempt:2},{conclusion:'failure'},{status:'in_progress'},{path:'.github/workflows/other.yml'},{head_repository:{full_name:'other/repo'}}])assert.throws(()=>validateVercelRun({...run,...patch},1));
+});
+
+test('Vercel preview must never report production or a custom environment as success',()=>{
+ for(const target of [null,undefined,'preview'])assert(matchesVercelTarget({target},'preview'));
+ for(const deployment of [{target:'production'},{target:'staging'},{target:null,customEnvironmentId:'env_other'},{target:null,customEnvironment:{id:'env_other'}}])assert.equal(matchesVercelTarget(deployment,'preview'),false);
+ assert(matchesVercelTarget({target:'production'},'production'));
+ for(const target of [null,'preview','staging'])assert.equal(matchesVercelTarget({target},'production'),false);
+});
+
+function vercelMain(paths=['apps/web/src/app/page.tsx']){
+ const sha='a'.repeat(40),base='b'.repeat(40),run={id:4,run_attempt:1,head_sha:sha,head_branch:'main',path:'.github/workflows/backend.yml',event:'push',status:'completed',conclusion:'success',repository:{full_name:'SXQHex/FtkSaaS'},head_repository:{full_name:'SXQHex/FtkSaaS'}};
+ const context={repo:{owner:'SXQHex',repo:'FtkSaaS'},eventName:'workflow_run',payload:{workflow_run:run}};
+ const jobs=[{name:'source',run_id:4,run_attempt:1,head_sha:sha,status:'completed',conclusion:'success',steps:[{name:'Verify merged candidate relation',conclusion:'success'}]}];
+ const github={paginate:async()=>jobs,rest:{git:{getRef:async()=>({data:{object:{sha}}}),getCommit:async()=>({data:{parents:[{sha:base},{sha:'c'.repeat(40)}]}}),getTree:async({tree_sha})=>({data:{tree:paths.map(path=>({path,type:'blob',mode:'100644',sha:tree_sha}))}})},actions:{getWorkflowRun:async()=>({data:run}),listWorkflowRuns:async()=>({data:{workflow_runs:[run]}})}}};
+ return {sha,base,run,context,jobs,github};
+}
+test('Vercel automatic main delivery skips docs and shared changes, while manual deploy uses accepted main',async()=>{
+ const f=vercelMain();assert.equal((await selectVercelSource(f.github,f.context)).target,'production');
+ for(const [before,after] of [[['apps/web/src/removed.tsx'],[]],[['apps/web/src/old.tsx'],['docs/renamed.md']],[['docs/old.md'],['apps/web/src/new.tsx']]]){
+  const v=vercelMain();v.github.rest.git.getTree=async({tree_sha})=>({data:{tree:(tree_sha===v.base?before:after).map(path=>({path,type:'blob',mode:'100644',sha:'file'}))}});
+  assert.equal((await selectVercelSource(v.github,v.context)).target,'production');
+ }
+ for(const paths of [[],['docs/settings.md'],['packages/api-contracts/src/generated.ts'],['apps/backend/tests/registry.test.mjs']]){
+  const v=vercelMain(paths);assert.equal(await selectVercelSource(v.github,v.context),null);
+  v.context={...v.context,eventName:'workflow_dispatch',ref:'refs/heads/main',sha:v.sha,payload:{inputs:{target:'preview'}}};
+  assert.equal((await selectVercelSource(v.github,v.context)).target,'preview');
+  v.context.ref='refs/heads/other';await assert.rejects(selectVercelSource(v.github,v.context),/current main/);
+ }
+ for(const mutate of [v=>v.jobs[0].conclusion='skipped',v=>v.jobs[0].steps=[],v=>v.jobs[0].run_attempt=2,v=>v.github.rest.git.getTree=async()=>({data:{truncated:true,tree:[]}})]){
+  const v=vercelMain();mutate(v);await assert.rejects(selectVercelSource(v.github,v.context));
+ }
+ const stale=vercelMain();stale.run.run_attempt=2;stale.context.payload.workflow_run={...stale.run,run_attempt:1};await assert.rejects(selectVercelSource(stale.github,stale.context));
+});
+
+test('Vercel API executes only pinned source and confirms READY project, target and commit',async()=>{
+ const f=vercelMain(),expected=await selectVercelSource(f.github,f.context),calls=[],summaries=[];
+ const provider=async(url,options)=>{
+  calls.push({url,options});let data;
+  if(url.includes('/projects/'))data={id:'prj_shLMyVjPsCo2QrejlPGJUBKguah2',accountId:'team_YifcGAWB29vV8ew4TNrHUDG3',rootDirectory:'apps/web',link:{type:'github',repoId:1192151050}};
+  else data={id:'dpl_test',projectId:'prj_shLMyVjPsCo2QrejlPGJUBKguah2',readyState:'READY',target:'production',gitSource:{sha:f.sha},url:'ftksaas-test.vercel.app'};
+  return {ok:true,json:async()=>data};
+ };
+ const core={summary:{addRaw(s){summaries.push(s);return this;},async write(){}}};
+ const result=await deliverVercel(f.github,f.context,core,expected,{token:'synthetic-test-token',fetcher:provider});
+ assert.equal(result.sha,f.sha);assert.equal(result.state,'READY');assert.equal(calls.length,2);
+ assert.equal(JSON.parse(calls[1].options.body).gitSource.sha,f.sha);assert(!summaries.join('').includes('synthetic-test-token'));
+ let polls=0,posts=0;
+ await deliverVercel(f.github,f.context,core,expected,{token:'test',pause:async()=>{},fetcher:async(url,opts)=>{
+  const response=await provider(url,opts),data=await response.json();
+  if(opts.method==='POST'){posts++;data.readyState='BUILDING';}else if(url.includes('/deployments/'))polls++;
+  return {ok:true,json:async()=>data};
+ }});assert.equal(posts,1);assert.equal(polls,1);
+ await assert.rejects(deliverVercel(f.github,f.context,core,expected,{token:'test',fetcher:async()=>({ok:false,status:401})}),/HTTP 401/);
+ await assert.rejects(deliverVercel(f.github,f.context,core,{...expected,sha:'d'.repeat(40)},{token:'test',fetcher:()=>{throw Error('Moved source must not reach Vercel');}}),/moved/);
+ for(const patch of [{gitSource:{sha:'d'.repeat(40)}},{target:'preview'},{projectId:'other'},{readyState:'ERROR'},{url:'attacker.example'}]){
+  await assert.rejects(deliverVercel(f.github,f.context,core,expected,{token:'test',fetcher:async(url,opts)=>{const response=await provider(url,opts);return {ok:true,json:async()=>({...await response.json(),...(url.includes('/deployments')?patch:{})})};}}));
+ }
+ f.context={...f.context,eventName:'workflow_dispatch',ref:'refs/heads/main',sha:f.sha,payload:{inputs:{target:'preview'}}};
+ const preview=await selectVercelSource(f.github,f.context);
+ await assert.rejects(deliverVercel(f.github,f.context,core,preview,{token:'test',fetcher:provider}),/target mismatch/);
+});
+
+test('Vercel preview consumes the exact frontend proof, not merely a successful workflow badge',async()=>{
+ const f=vercelMain(),head='d'.repeat(40),merge='e'.repeat(40),tree='f'.repeat(40);
+ const pr={number:7,state:'open',draft:false,base:{sha:f.base,ref:'main'},head:{sha:head,repo:{full_name:'SXQHex/FtkSaaS'}}};
+ const run={...f.run,path:'.github/workflows/frontend.yml',event:'pull_request',head_sha:head};
+ f.context.payload.workflow_run=run;f.github.rest.actions.getWorkflowRun=async()=>({data:run});
+ f.github.rest.pulls={list:'prs',get:async()=>({data:pr})};
+ f.github.rest.git.getRef=async({ref})=>({data:{object:{sha:ref==='heads/main'?f.sha:merge}}});
+ f.github.rest.git.getCommit=async()=>({data:{sha:merge,tree:{sha:tree},parents:[{sha:f.base},{sha:head}]}});
+ const timestamp='2026-11-05T01:00:00Z';
+ const names=['scope','checks',...['chromium','firefox','webkit','mobile'].map(b=>'browsers ('+b+')')];
+ const steps={scope:['Select frontend scope','Record candidate source','Upload candidate source'],checks:['Frontend checks, coverage and build','Run pnpm --filter @ftksaas/web test:isolation','Package verified build','Upload verified build']};
+ const jobs=names.map(name=>({name,run_id:4,run_attempt:1,head_sha:head,status:'completed',conclusion:'success',steps:(steps[name]??['Install selected browser','Download verified build','Verify and restore build','Test selected browser']).map(name=>({name,conclusion:'success',started_at:timestamp,completed_at:timestamp}))}));
+ const binding={version:1,kind:'frontend',repository:'SXQHex/FtkSaaS',pr:7,base:f.base,head,merge,tree,run:4,source_attempt:1};
+ const zip=execFileSync('python3',['-c','import io,sys,zipfile;b=io.BytesIO();z=zipfile.ZipFile(b,"w");z.writestr("frontend-source.json",sys.argv[1]);z.close();sys.stdout.buffer.write(b.getvalue())',JSON.stringify(binding)]);
+ f.github.rest.actions.downloadArtifact=async()=>({data:zip});
+ const artifacts=[{id:1,name:'frontend-source-frontend-1',created_at:timestamp,size_in_bytes:zip.length}];
+ f.github.paginate=async method=>method==='prs'?[pr]:method===f.github.rest.actions.listJobsForWorkflowRunAttempt?jobs:artifacts;
+ // Distinguish the named artifact and job APIs, as policyMatches uses Git tree reads directly.
+ f.github.rest.actions.listJobsForWorkflowRunAttempt='jobs';f.github.rest.actions.listWorkflowRunArtifacts='artifacts';
+ assert.equal((await selectVercelSource(f.github,f.context)).sha,merge);
+ jobs[2].conclusion='skipped';await assert.rejects(selectVercelSource(f.github,f.context),/JOBS/);
+ jobs[2].conclusion='success';pr.head.repo.full_name='fork/repo';assert.equal(await selectVercelSource(f.github,f.context),null);
+});
 process.chdir(repositoryRoot);
 
 test('unchanged Edge requires both trusted source receipt and live version/JWT match',()=>{
