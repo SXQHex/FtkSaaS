@@ -351,3 +351,8 @@ for(const planName of ['starter','pro','business']){
   }finally{await db.end();}
  });
 }
+import './crm-lifecycle-authority-acceptance.mjs';
+import './crm-lifecycle-acceptance.mjs';
+import './crm-followup-projections-acceptance.mjs';
+import './crm-segment-worker-acceptance.mjs';
+import './crm-followup-acceptance.mjs';

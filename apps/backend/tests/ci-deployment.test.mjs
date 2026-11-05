@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {project,unchangedEdge,hostedSmoke,sameMigration,migrationPlan,migrationBody,migrationBatch} from '../scripts/ci/deploy-development.mjs';
-import {deploymentSource,resolveAcceptedSource,revalidateDeployment,trustedDeliveryRun} from '../scripts/ci/deployment-source.mjs';
+import {deploymentSource,resolveAcceptedSource,revalidateDeployment,trustedDeliveryRun,filterSupabaseDelivery,resolveDeployment,previousReceipt} from '../scripts/ci/deployment-source.mjs';
 import fs,{mkdtempSync,rmSync} from 'node:fs';
 import {backendUnchanged} from '../scripts/ci/source.mjs';
 import {join} from 'node:path';
@@ -311,4 +311,72 @@ test('Historical retired V2 marker never deploys or searches historical runtime 
  assert.equal(deploymentSource({run,jobs:[job('source'),frontend,skipped],currentMain:sha,repository:'x/y'}).frontend,true);
 
  for(const mutate of [x=>x.push(x[1]),x=>x[1].conclusion='failure',x=>x[1].steps=[],x=>x[1].run_attempt=1]){const bad=structuredClone(jobs);mutate(bad);assert.throws(()=>deploymentSource({run,jobs:bad,currentMain:sha,repository:'x/y'}));}
+});
+
+test('Supabase delivery compares last successful delivery with accepted main, including deletions, renames and modes',async()=>{
+ const base='a'.repeat(40),head='b'.repeat(40),repo={owner:'SXQHex',repo:'FtkSaaS'};
+ const proof={deploy:true,sha:head,expected_main:head},previous={source:base};
+ const edge={path:'apps/backend/supabase/functions/backend-v1/index.ts',type:'blob',mode:'100644',sha:'edge'};
+ const outside={path:'.github/workflows/backend.yml',type:'blob',mode:'100644',sha:'old'};
+ const cases=[
+  {before:[edge,outside],after:[{...outside,sha:'new'},edge],deploy:false},
+  {before:[edge],after:[edge,{...outside,path:'docs/ci-policy.md'}],deploy:false},
+  {before:[edge],after:[{...edge,sha:'new'}],deploy:true},
+  {before:[edge],after:[],deploy:true},
+  {before:[],after:[edge],deploy:true},
+  {before:[edge],after:[{...edge,path:'docs/moved.ts'}],deploy:true},
+  {before:[outside],after:[{...outside,path:edge.path}],deploy:true},
+  {before:[edge],after:[{...edge,mode:'100755'}],deploy:true},
+  {before:[edge],after:[{path:'apps/backend/supabase',type:'commit',mode:'160000',sha:'module'}],deploy:true}
+ ];
+ for(const c of cases){
+  const github={rest:{git:{getTree:async({tree_sha})=>({data:{tree:tree_sha===base?c.before:c.after}})}}};
+  assert.equal((await filterSupabaseDelivery(github,repo,proof,previous)).deploy,c.deploy);
+ }
+ const forbidden=new Proxy({},{get(){throw Error('Unexpected API request');}});
+ assert.equal(await filterSupabaseDelivery(forbidden,repo,proof,undefined),proof);
+ const skipped={deploy:false};assert.equal(await filterSupabaseDelivery(forbidden,repo,skipped,previous),skipped);
+ for(const getTree of [async()=>({data:{truncated:true,tree:[]}}),async()=>({data:{}}),async()=>{throw Error('API unavailable');}]){
+  await assert.rejects(filterSupabaseDelivery({rest:{git:{getTree}}},repo,proof,previous));
+ }
+});
+
+test('Supabase source skips CI-only accepted main and preserves pending changes after failed delivery',async()=>{
+ const dir=mkdtempSync(join(tmpdir(),'ci-supabase-filter-'));
+ try{
+  const sha='b'.repeat(40),prior='a'.repeat(40),v=valid(),repository='SXQHex/FtkSaaS';
+  const main={...v.run,path:'.github/workflows/backend.yml',event:'push',head_branch:'main',head_sha:sha,repository:{full_name:repository},head_repository:{full_name:repository}};
+  const jobs=[...v.jobs.map(j=>({...j,head_sha:sha})),{name:'source',status:'completed',conclusion:'success',run_id:main.id,run_attempt:1,head_sha:sha}];
+  const delivered={...main,id:8,path:'.github/workflows/cd-development.yml',event:'workflow_run',head_sha:prior};
+  const deliveryJob={name:'deploy',run_id:8,run_attempt:1,head_sha:prior,status:'completed',conclusion:'success',steps:[{name:'Deliver accepted source and verify hosted backend',conclusion:'success'}]};
+  fs.writeFileSync(join(dir,'development-delivery.json'),JSON.stringify({success:true,project:'gwyprhenabtpkbojephw',source:prior}));
+  execFileSync('zip',['-q',join(dir,'receipt.zip'),'development-delivery.json'],{cwd:dir});const zip=fs.readFileSync(join(dir,'receipt.zip'));
+  let changed=false,expired=false,missing=false,unavailable=false;
+  const failed={...delivered,id:9,conclusion:'failure'};
+  const github={rest:{actions:{getWorkflowRun:async({run_id})=>({data:run_id===5?main:run_id===9?failed:delivered}),listWorkflowRuns:async(args)=>{assert.equal(args.status,'success');return {data:{workflow_runs:[failed,delivered]}};},listJobsForWorkflowRun:'jobs',listWorkflowRunArtifacts:'artifacts',downloadArtifact:async()=>({data:zip})},git:{getRef:async()=>({data:{object:{sha}}}),getTree:async({tree_sha})=>{
+   if(unavailable)throw Error('Tree unavailable');
+   return {data:{tree:[{path:'apps/backend/supabase/config.toml',type:'blob',mode:'100644',sha:changed&&tree_sha===sha?'new':'same'},{path:'docs/ci-policy.md',type:'blob',mode:'100644',sha:tree_sha}]}};
+  }}},paginate:async(method,args)=>{
+   if(method==='jobs')return args.run_id===5?jobs:[deliveryJob];
+   return missing?[]:[{id:10,name:'development-delivery-8-1',expired}];
+  }};
+  const context={repo:{owner:'SXQHex',repo:'FtkSaaS'},runId:10,payload:{workflow_run:main}};
+  const output={};const core={setOutput(k,v){output[k]=v;},summary:{addRaw(){return this;},async write(){}}};
+  await resolveDeployment(github,context,core);assert.equal(output.deploy,'false');assert.equal(output.sha,undefined);
+  changed=true;await resolveDeployment(github,context,core);assert.equal(output.deploy,'true');assert.equal(output.sha,sha);
+  unavailable=true;await assert.rejects(resolveDeployment(github,context,core),/Tree unavailable/);unavailable=false;
+  expired=true;await assert.rejects(previousReceipt(github,context),/expired/);expired=false;
+  missing=true;await assert.rejects(previousReceipt(github,context),/receipt/);missing=false;
+  const originalGet=github.rest.actions.getWorkflowRun,originalPaginate=github.paginate;let pages=[];
+  const skipped=Array.from({length:100},(_,i)=>({...delivered,id:100+i}));
+  github.rest.actions.listWorkflowRuns=async({page})=>{pages.push(page);return {data:{workflow_runs:page===1?skipped:[delivered]}};};
+  github.rest.actions.getWorkflowRun=async(args)=>args.run_id>=100?{data:skipped.find(r=>r.id===args.run_id)}:originalGet(args);
+  github.paginate=async(method,args)=>method==='jobs'&&args.run_id>=100?[]:originalPaginate(method,args);
+  assert.equal((await previousReceipt(github,context)).source,prior);assert.deepEqual(pages,[1,2]);
+  pages=[];github.rest.actions.listWorkflowRuns=async({page})=>{pages.push(page);return {data:{workflow_runs:[delivered]}};};
+  assert.equal((await previousReceipt(github,context)).source,prior);assert.deepEqual(pages,[1]);
+  github.rest.actions.listWorkflowRuns=async()=>({data:{workflow_runs:[]}});
+  assert.equal(await previousReceipt(github,context),undefined);
+  await resolveDeployment(github,context,core);assert.equal(output.deploy,'true');
+ }finally{rmSync(dir,{recursive:true,force:true});}
 });

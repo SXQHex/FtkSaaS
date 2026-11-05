@@ -79,6 +79,20 @@ export async function revalidateDeployment(github,repo,expected){
  if(!proof)throw Error('Runtime acceptance or documentation equivalence no longer valid');
  return proof;
 }
+// Compare delivered content, not the last merge: failed deliveries stay pending.
+export async function filterSupabaseDelivery(github,repo,proof,previous){
+ if(!proof.deploy||!previous)return proof;
+ if(!/^[a-f0-9]{40}$/.test(previous.source??''))throw Error('Invalid previous delivery source');
+ const snapshots=await Promise.all([previous.source,proof.expected_main].map(async tree_sha=>{
+  const {data}=await github.rest.git.getTree({...repo,tree_sha,recursive:'1'});
+  if(data.truncated||!Array.isArray(data.tree))throw Error('Incomplete Supabase deployment tree');
+  return data.tree.filter(e=>e.type!=='tree'&&(e.path==='apps/backend/supabase'||e.path.startsWith('apps/backend/supabase/')))
+   .map(e=>[e.path,e.sha,e.mode]).sort((a,b)=>a[0].localeCompare(b[0]));
+ }));
+ return JSON.stringify(snapshots[0])===JSON.stringify(snapshots[1])
+  ?{deploy:false,reason:'Supabase content unchanged since last successful delivery',previous:previous.source,current:proof.expected_main}
+  :proof;
+}
 export async function resolveDeployment(github,context,core) {
  const id=context.payload.workflow_run?.id??Number(context.payload.inputs?.acceptance_run_id);
  if(!Number.isSafeInteger(id)||id<=0)throw Error('Exact main acceptance run ID required');
@@ -87,10 +101,7 @@ export async function resolveDeployment(github,context,core) {
  const jobs=await github.paginate(github.rest.actions.listJobsForWorkflowRun,{...repo,run_id:id,filter:'latest',per_page:100});
  const currentMain=(await github.rest.git.getRef({...repo,ref:'heads/main'})).data.object.sha;
  let proof=await resolveAcceptedSource(github,repo,run,jobs,currentMain,context.payload.workflow_run?.run_attempt);
- if(proof.documentation_run_id){
-  const previous=await previousReceipt(github,context);
-  if(previous?.source===proof.sha)proof={deploy:false,reason:'Documentation-only main; accepted runtime already delivered'};
- }
+ if(proof.deploy)proof=await filterSupabaseDelivery(github,repo,proof,await previousReceipt(github,context));
  core.setOutput('deploy',String(proof.deploy));
  if(proof.deploy){core.setOutput('sha',proof.sha);core.setOutput('expected_main',proof.expected_main);core.setOutput('acceptance_run_id',String(proof.run_id));core.setOutput('acceptance_attempt',String(proof.attempt));}
  await core.summary.addRaw(JSON.stringify(proof)+'\n').write();
@@ -102,14 +113,17 @@ export function trustedDeliveryRun(run,jobs,repository){
  return deploy.length===1&&deploy[0].status==='completed'&&deploy[0].conclusion==='success'&&deploy[0].run_id===run.id&&deploy[0].run_attempt===run.run_attempt&&deploy[0].head_sha===run.head_sha&&deploy[0].steps?.some(s=>s.name==='Deliver accepted source and verify hosted backend'&&s.conclusion==='success');
 }
 export async function previousReceipt(github,context){
- const runs=(await github.rest.actions.listWorkflowRuns({...context.repo,workflow_id:'cd-development.yml',status:'success',branch:'main',per_page:20})).data.workflow_runs;
+ for(let page=1;;page++){
+ const runs=(await github.rest.actions.listWorkflowRuns({...context.repo,workflow_id:'cd-development.yml',status:'success',branch:'main',per_page:100,page})).data.workflow_runs;
  for(const run of runs){
   if(run.id===context.runId||run.path!=='.github/workflows/cd-development.yml')continue;
   const current=(await github.rest.actions.getWorkflowRun({...context.repo,run_id:run.id})).data;
   const jobs=await github.paginate(github.rest.actions.listJobsForWorkflowRun,{...context.repo,run_id:run.id,filter:'latest',per_page:100});
   if(current.run_attempt!==run.run_attempt||!trustedDeliveryRun(current,jobs,context.repo.owner+'/'+context.repo.repo))continue;
   const artifacts=await github.paginate(github.rest.actions.listWorkflowRunArtifacts,{...context.repo,run_id:run.id,per_page:100});
-  const a=artifacts.find(a=>!a.expired&&a.name===`development-delivery-${run.id}-${run.run_attempt}`);if(!a)continue;
+  const matches=artifacts.filter(a=>a.name===`development-delivery-${run.id}-${run.run_attempt}`);
+  if(matches.length!==1||matches[0].expired)throw Error('Missing or expired last successful delivery receipt');
+  const a=matches[0];
   const zip=await github.rest.actions.downloadArtifact({...context.repo,artifact_id:a.id,archive_format:'zip'});
   const dir=fs.mkdtempSync(path.join(os.tmpdir(),'ftk-cd-receipt-'));
   try{
@@ -118,6 +132,9 @@ export async function previousReceipt(github,context){
    if(receipt.success===true&&receipt.project==='gwyprhenabtpkbojephw'&&/^[a-f0-9]{40}$/.test(receipt.source??'')){
     fs.mkdirSync(ciFile(),{recursive:true});fs.writeFileSync(ciFile('previous-development-delivery.json'),JSON.stringify(receipt));return receipt;
    }
+   throw Error('Invalid last successful delivery receipt');
   }finally{fs.rmSync(dir,{recursive:true,force:true});}
+ }
+ if(runs.length<100)return;
  }
 }

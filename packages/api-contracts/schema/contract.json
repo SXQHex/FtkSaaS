@@ -2308,7 +2308,13 @@
         "product_version_ref",
         "start_date",
         "end_date",
-        "opening_credit_value_minor"
+        "opening_credit_value_minor",
+        "interest",
+        "message",
+        "partner_name",
+        "mode",
+        "consents",
+        "source_url"
       ]
     },
     "ImportColumn": {
@@ -2342,13 +2348,19 @@
             ",",
             ";"
           ]
+        },
+        "kind": {
+          "enum": [
+            "students",
+            "crm_applications"
+          ]
         }
       },
       "required": [
         "columns"
       ],
       "additionalProperties": false,
-      "x-invariant": "unique targets except contacts, permanent source_key required; existing person only explicit person_ref, never email auto merge"
+      "x-invariant": "unique targets except contacts, permanent source_key required; existing person only explicit person_ref, never email auto merge; omitted kind is students. crm_applications forbids person/financial targets and requires source_key/name/phone; native selection is explicit."
     },
     "ImportRow": {
       "type": "object",
@@ -2481,6 +2493,34 @@
             ],
             "additionalProperties": false
           }
+        },
+        "interest": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 1000
+        },
+        "message": {
+          "type": "string",
+          "maxLength": 10000
+        },
+        "partner_name": {
+          "type": "string",
+          "maxLength": 200
+        },
+        "mode": {
+          "type": "string",
+          "maxLength": 200
+        },
+        "consents": {
+          "type": "array",
+          "maxItems": 20,
+          "items": {
+            "$ref": "#/$defs/CrmIntakeConsent"
+          }
+        },
+        "source_url": {
+          "type": "string",
+          "maxLength": 2048
         }
       },
       "required": [
@@ -3139,6 +3179,9 @@
         },
         "state": {
           "$ref": "#/$defs/JobState"
+        },
+        "selected_rows_count": {
+          "$ref": "#/$defs/Count"
         }
       },
       "required": [
@@ -4748,6 +4791,39 @@
           "items": {
             "$ref": "#/$defs/EntityRef"
           }
+        },
+        "application": {
+          "oneOf": [
+            {
+              "$ref": "#/$defs/CrmImportRowPreview"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "field_errors": {
+          "type": "array",
+          "items": {
+            "enum": [
+              "source_key",
+              "display_name",
+              "phone",
+              "email",
+              "interest",
+              "message",
+              "partner_name",
+              "mode",
+              "consents",
+              "source_url",
+              "row"
+            ]
+          },
+          "maxItems": 12
+        },
+        "source_key": {
+          "type": "string",
+          "maxLength": 500
         }
       },
       "required": [
@@ -14462,6 +14538,17 @@
         },
         "preview": {
           "$ref": "#/$defs/PreviewToken"
+        },
+        "selected_row_numbers": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 5000,
+          "uniqueItems": true,
+          "items": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 5000
+          }
         }
       },
       "required": [
@@ -23012,6 +23099,25 @@
         },
         "source_namespace": {
           "$ref": "#/$defs/Text"
+        },
+        "field_errors": {
+          "type": "array",
+          "items": {
+            "enum": [
+              "source_key",
+              "display_name",
+              "phone",
+              "email",
+              "interest",
+              "message",
+              "partner_name",
+              "mode",
+              "consents",
+              "source_url",
+              "row"
+            ]
+          },
+          "maxItems": 12
         }
       },
       "required": [
@@ -23181,7 +23287,7 @@
         "source_snapshot": {
           "anyOf": [
             {
-              "$ref": "#/$defs/CrmIntakeSource"
+              "$ref": "#/$defs/CrmApplicationSource"
             },
             {
               "type": "object",
@@ -23219,6 +23325,16 @@
             "null"
           ],
           "maxLength": 2048
+        },
+        "import_row_id": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/FtkUuid"
+            },
+            {
+              "type": "null"
+            }
+          ]
         }
       },
       "required": [
@@ -34996,7 +35112,7 @@
               ]
             },
             "source": {
-              "$ref": "#/$defs/CrmIntakeSource"
+              "$ref": "#/$defs/CrmApplicationSource"
             },
             "intake": {
               "$ref": "#/$defs/CrmIntakeView"
@@ -43089,6 +43205,15 @@
           "items": {
             "$ref": "#/$defs/ImportMoneyTotal"
           }
+        },
+        "import_kind": {
+          "enum": [
+            "students",
+            "crm_applications"
+          ]
+        },
+        "new_applications": {
+          "$ref": "#/$defs/Count"
         }
       },
       "additionalProperties": false,
@@ -51550,7 +51675,7 @@
           "format": "date-time"
         },
         "source": {
-          "$ref": "#/$defs/CrmIntakeSource"
+          "$ref": "#/$defs/CrmApplicationSource"
         },
         "received_at": {
           "type": "string",
@@ -52010,6 +52135,97 @@
           "type": "integer",
           "minimum": 0,
           "maximum": 9007199254740991
+        }
+      }
+    },
+    "CrmLegacyImportSource": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "channel",
+        "form_key",
+        "source_namespace",
+        "source_key",
+        "source_url",
+        "file_checksum",
+        "import_job_id",
+        "row_number"
+      ],
+      "properties": {
+        "channel": {
+          "const": "legacy_import"
+        },
+        "form_key": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 100
+        },
+        "source_namespace": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 100
+        },
+        "source_key": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 500
+        },
+        "source_url": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "maxLength": 2048
+        },
+        "file_checksum": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "import_job_id": {
+          "$ref": "#/$defs/FtkUuid"
+        },
+        "row_number": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 5000
+        }
+      }
+    },
+    "CrmApplicationSource": {
+      "oneOf": [
+        {
+          "$ref": "#/$defs/CrmIntakeSource"
+        },
+        {
+          "$ref": "#/$defs/CrmLegacyImportSource"
+        }
+      ]
+    },
+    "CrmImportRowPreview": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "intake",
+        "source",
+        "phone_matches",
+        "phone_matches_truncated"
+      ],
+      "properties": {
+        "intake": {
+          "$ref": "#/$defs/CrmIntake"
+        },
+        "source": {
+          "$ref": "#/$defs/CrmLegacyImportSource"
+        },
+        "phone_matches": {
+          "type": "array",
+          "maxItems": 50,
+          "items": {
+            "$ref": "#/$defs/CrmPhoneMatch"
+          }
+        },
+        "phone_matches_truncated": {
+          "type": "boolean"
         }
       }
     }
@@ -68150,7 +68366,8 @@
           "F07",
           "F15",
           "F19",
-          "F18"
+          "F18",
+          "F21"
         ],
         "permission": "import.execute",
         "actor_source": "server_verified",
@@ -68183,7 +68400,7 @@
           "VERSION_CONFLICT"
         ],
         "transaction_class": "preview",
-        "transaction_guarantee": "Idempotent technical validation job and receipt only; no person, rights, debt or cash mutation. Apply requires a live dependency-bound preview.",
+        "transaction_guarantee": "Idempotent technical validation job and receipt only; no person, rights, debt or cash mutation. Apply requires a live dependency-bound preview. CRM application mode uses explicit sorted selected_row_numbers and one fenced atomic selected batch; omitted kind retains existing student import behavior.",
         "transition": {
           "effect": "technical_preview_only",
           "from": [],
@@ -68195,7 +68412,9 @@
           "same_org_center_discipline",
           "required_feature_gates_separate_from_references",
           "no_business_commit",
-          "scope_filter_before_pagination"
+          "scope_filter_before_pagination",
+          "crm_import_never_creates_person_student_sale_or_permission",
+          "crm_apply_exact_selected_rows_atomic"
         ],
         "audit": false,
         "notification": "none",
@@ -68244,6 +68463,11 @@
             "feature": "F18",
             "when": "eligible_late_cross_center_deficit_settlement",
             "mode": "required_if_selected"
+          },
+          {
+            "feature": "F21",
+            "when": "mapping_kind_crm_applications",
+            "mode": "required_if_selected"
           }
         ],
         "operation_contract": {
@@ -68278,7 +68502,8 @@
           "F07",
           "F15",
           "F19",
-          "F18"
+          "F18",
+          "F21"
         ],
         "permission": "import.execute",
         "actor_source": "server_verified",
@@ -68312,7 +68537,7 @@
           "VERSION_CONFLICT"
         ],
         "transaction_class": "import",
-        "transaction_guarantee": "Atomic import_jobs.versioned_domain_change; audit + in-app outbox + receipt. External delivery never determines the domain commit.",
+        "transaction_guarantee": "Atomic import_jobs.versioned_domain_change; audit + in-app outbox + receipt. External delivery never determines the domain commit. CRM application mode uses explicit sorted selected_row_numbers and one fenced atomic selected batch; omitted kind retains existing student import behavior.",
         "transition": {
           "effect": "import_apply_append_or_explicit_update",
           "from": [],
@@ -68327,7 +68552,9 @@
           "same_org_center_discipline",
           "required_feature_gates_separate_from_references",
           "revalidate_relevant_preview_and_versions",
-          "linked_history_not_overwrite"
+          "linked_history_not_overwrite",
+          "crm_import_never_creates_person_student_sale_or_permission",
+          "crm_apply_exact_selected_rows_atomic"
         ],
         "audit": true,
         "notification": "outbox_if_user_visible_business_result",
@@ -68376,6 +68603,11 @@
           {
             "feature": "F18",
             "when": "eligible_late_cross_center_deficit_settlement",
+            "mode": "required_if_selected"
+          },
+          {
+            "feature": "F21",
+            "when": "mapping_kind_crm_applications",
             "mode": "required_if_selected"
           }
         ],
@@ -95758,6 +95990,18 @@
         "origin": "ftksaas",
         "acceptance": "generic_uuid",
         "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/CrmLegacyImportSource/properties/import_job_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Table_public_applications/properties/import_row_id/anyOf/0",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
       }
     ],
     "open_product_decisions": [],
@@ -95953,6 +96197,30 @@
       {
         "function": "private.crm_meta_status",
         "kind": "native_form_scoped_queue_counts_without_payloads_or_identifiers"
+      },
+      {
+        "function": "private.crm_import_access",
+        "kind": "live_import_and_crm_scope"
+      },
+      {
+        "function": "private.crm_import_body",
+        "kind": "closed_common_intake_from_legacy_row"
+      },
+      {
+        "function": "private.crm_import_source",
+        "kind": "declared_file_provenance_not_provider_verification"
+      },
+      {
+        "function": "private.crm_import_row_check",
+        "kind": "kind_bound_permanent_source_identity"
+      },
+      {
+        "function": "private.crm_import_row_apply",
+        "kind": "atomic_existing_application_only_no_student"
+      },
+      {
+        "function": "private.crm_import_row_view",
+        "kind": "authorized_mapping_consent_and_phone_suggestions"
       }
     ],
     "runtime": {
@@ -96185,7 +96453,7 @@
       "uuid": "backend uuid@14.0.3 v7 for all inserted IDs; DB defaults not required",
       "external_transport": "POST /functions/v1/backend-v1/{operation}; direct typed request body",
       "internal_rpc": "service-only api_v1 named functions; actor/session/UUID bank supplied by verified gateway",
-      "migration_count": 108,
+      "migration_count": 110,
       "acceptance_source": "apps/backend/docs/00-FtkSaaS-yeni-sohbet-devir.md"
     },
     "decision_sprint": {
@@ -98296,7 +98564,9 @@
           "report_file_get_v1",
           "public_application_submit_v1",
           "public_application_review_v1",
-          "report_build_v1"
+          "report_build_v1",
+          "import_preview_v1",
+          "import_apply_v1"
         ],
         "dependencies": [
           "Configured signed ingress, Turnstile secret/hostname and real provider acceptance; no bypass.",
@@ -98315,7 +98585,9 @@
           "report_file_get_v1",
           "public_application_submit_v1",
           "public_application_review_v1",
-          "report_build_v1"
+          "report_build_v1",
+          "import_preview_v1",
+          "import_apply_v1"
         ],
         "contract_only_operations": [],
         "acceptance_case_ids": [],
