@@ -47,3 +47,68 @@ test("booking, request alternative and renewal reviews reflow without native tra
   expect((await new AxeBuilder({ page }).analyze()).violations).toEqual([]);
   expect(calls).toEqual([]);
 });
+
+for (const locale of ["tr", "en"] as const) {
+  test(`${locale} normal sale debt and deficit review is accessible at 320px and 200%`, async ({
+    page,
+  }) => {
+    const calls: string[] = [];
+    page.on("request", (request) => {
+      if (/\/(functions|storage)\/v1\//.test(request.url())) calls.push(request.url());
+    });
+    await page.setViewportSize({ width: 320, height: 950 });
+    await page.goto("/tasarim/rezervasyonlar");
+    if (locale === "en") {
+      await page.getByRole("combobox", { name: "Dil / Language" }).click();
+      await page.getByRole("option", { name: "English", exact: true }).click();
+      await page.getByRole("combobox", { name: "Appearance", exact: true }).click();
+      await page.getByRole("option", { name: "Dark", exact: true }).click();
+    }
+    const sale = page.getByRole("region", {
+      name: locale === "tr" ? "Yeni satış" : "New sale",
+      exact: true,
+    });
+    await sale.getByRole("combobox").selectOption({ index: 1 });
+    await sale.locator('input[name="start"]').fill("2027-02-01");
+    await sale.locator('input[name="end"]').fill("2027-03-01");
+    const inspect = sale.getByRole("button", {
+      name: locale === "tr" ? "Satışı incele" : "Review sale",
+      exact: true,
+    });
+    await inspect.press("Enter");
+    await expect(
+      sale.getByRole("heading", {
+        name: locale === "tr" ? "İşlemi incele" : "Review action",
+        exact: true,
+      }),
+    ).toBeFocused();
+    await expect(
+      sale.getByText(locale === "tr" ? "Oluşacak borç" : "Debt to create", { exact: true }),
+    ).toBeVisible();
+    await expect(
+      sale.getByText(
+        locale === "tr"
+          ? "Bu satışla karşılanacak; mevcut rezervasyon korunur."
+          : "Settled by this sale; the existing reservation is preserved.",
+        { exact: true },
+      ),
+    ).toBeVisible();
+    await page.evaluate(async () => {
+      document.documentElement.style.fontSize = "200%";
+      await document.fonts.ready;
+    });
+    expect(
+      await page.locator("main").evaluate((node) => node.scrollWidth <= node.clientWidth),
+    ).toBe(true);
+    expect(await sale.evaluate((node) => node.scrollWidth <= node.clientWidth)).toBe(true);
+    expect((await new AxeBuilder({ page }).analyze()).violations).toEqual([]);
+    await sale
+      .getByRole("button", {
+        name: locale === "tr" ? "Düzenlemeye dön" : "Back to editing",
+        exact: true,
+      })
+      .press("Enter");
+    await expect(inspect).toBeFocused();
+    expect(calls).toEqual([]);
+  });
+}

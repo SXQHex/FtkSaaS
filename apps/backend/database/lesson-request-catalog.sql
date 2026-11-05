@@ -18,7 +18,7 @@ begin
   union all
   select p.id,p.created_at,coalesce(p.version,1),p.display_name,'people','preferred_instructor_id' from core.people p
   where kind='instructors' and p.org_id=org and p.state='active' and coalesce(private.starter_selected(org,'instructor',p.id),false) and private.has_role(org,p.id,'instructor',center)
-  and (private.current_plan_name(org)='starter' or exists(select 1 from core.center_relationships c where c.org_id=org and c.center_id=center and c.person_id=p.id and c.state='active'))
+  and (private.current_plan_name(org)='starter' or exists(select 1 from private.person_center_relationships c where c.org_id=org and c.center_id=center and c.person_id=p.id and c.state='active'))
  ), page as(select * from choices where (last_id is null or (created_at,id)>(last_at,last_id)) order by created_at,id limit lim+1)
  select coalesce(jsonb_agg(jsonb_build_object('operation','lesson_request_create_v1','entity',jsonb_build_object('type',typ,'id',id),'exists',true,'state','active',
  'versions',jsonb_build_array(jsonb_build_object('entity',jsonb_build_object('type',typ,'id',id),'version',version)),'as_of',clock_timestamp(),

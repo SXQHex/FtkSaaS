@@ -1578,7 +1578,6 @@
     "noPrivateSession": "No exactly matching private session exists. Create the appropriate private session in calendar management, then reload requests.",
     "sales": "Sales and renewals",
     "openSales": "Open sales and renewals",
-    "saleBlocked": "New sales are unavailable until a real rights and debt impact preview is ready.",
     "renewal": "Package renewal",
     "previousSale": "Sale to renew",
     "product": "New product version",
@@ -1632,6 +1631,19 @@
     "rightsReloaded": "Purchased rights reloaded.",
     "demoTitle": "Sales and booking examples",
     "demoHint": "This screen uses synthetic data only; it creates no real operations or sessions.",
-    "noRequestActions": "No permitted actions are available for this request."
+    "noRequestActions": "No permitted actions are available for this request.",
+    "newSale": "New sale",
+    "inspectSale": "Review sale",
+    "saleHint": "Review the debt, validity and changes to rights before approving.",
+    "saleDebt": "Debt to create",
+    "saleValidity": "Validity and center time zone",
+    "saleGranted": "Credits to grant",
+    "noCollection": "This action does not collect payment.",
+    "saleDeficits": "Effect on existing deficits",
+    "noDeficits": "No linked deficits in this preview.",
+    "deficitSettled": "Settled by this sale; the existing reservation is preserved.",
+    "deficitUnchanged": "This sale will leave the deficit unchanged.",
+    "sessionRestricted": "Your access does not include this session detail.",
+    "deficitNumber": "Deficit {number}"
   }
 }

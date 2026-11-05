@@ -1,6 +1,7 @@
 import { validate } from "uuid";
 export const bookingFields = {
   sale_renew_apply_v1: ["preview"],
+  sale_apply_v1: ["preview"],
   reservation_create_v1: ["person_id", "session_id", "source_sale_id", "mode", "booking_category"],
   reservation_capacity_override_v1: [
     "person_id",
@@ -80,7 +81,7 @@ export function validBookingCommand(
   if (value.window_exception !== undefined && typeof value.window_exception !== "boolean")
     return false;
   if (value.window_exception === true && !text(value.reason)) return false;
-  if (operation === "sale_renew_apply_v1")
+  if (operation === "sale_renew_apply_v1" || operation === "sale_apply_v1")
     return (
       record(value.preview) &&
       Object.keys(value.preview).length === 2 &&
