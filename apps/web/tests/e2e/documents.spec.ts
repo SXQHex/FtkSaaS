@@ -63,3 +63,41 @@ test("private document reader supports keyboard, safe download and narrow enlarg
   await expect(page.getByRole("link", { name: "Dosyayı indir" })).toHaveCount(0);
   expect(domainRequests).toEqual([]);
 });
+
+test("self acceptance requires explicit consent and supports keyboard at narrow enlarged text", async ({
+  page,
+}) => {
+  const requests: string[] = [];
+  page.on("request", (request) => {
+    if (request.url().includes("/functions/v1/") || request.url().includes("/storage/v1/"))
+      requests.push(request.url());
+  });
+  await page.setViewportSize({ width: 320, height: 950 });
+  await page.goto("/tasarim/belgeler");
+  const self = page.getByRole("region", { name: "Kendi belgelerim" });
+  const open = self.getByRole("button", { name: "Örnek kendi kabul belgesi belgesini aç" });
+  await open.press("Enter");
+  await expect(self.getByRole("article").getByRole("heading")).toBeFocused();
+  const accept = self.getByRole("button", { name: "Kendi adıma kabul et" });
+  await expect(accept).toBeDisabled();
+  const consent = self.getByRole("checkbox");
+  await page.evaluate(async () => {
+    document.documentElement.style.fontSize = "200%";
+    await document.fonts.ready;
+  });
+  expect(await page.locator("main").evaluate((node) => node.scrollWidth <= node.clientWidth)).toBe(
+    true,
+  );
+  expect((await new AxeBuilder({ page }).analyze()).violations).toEqual([]);
+  await consent.press("Space");
+  await expect(consent).toBeChecked();
+  await self.getByRole("button", { name: "Belgeyi kapat" }).press("Enter");
+  await expect(open).toBeFocused();
+  await open.press("Enter");
+  await expect(self.getByRole("checkbox")).not.toBeChecked();
+  await self.getByRole("checkbox").press("Space");
+  await accept.press("Enter");
+  await expect(self.getByText("Gereklilik karşılanıyor")).toBeVisible();
+  await expect(self.getByRole("checkbox")).toHaveCount(0);
+  expect(requests).toEqual([]);
+});
