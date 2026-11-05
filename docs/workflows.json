@@ -279,8 +279,8 @@
         "management_state_get_v1"
       ],
       "review": {
-        "fingerprint": "4d13c665b8e0e4011292fa9d3c6c0291f1b60498ace8f1f9dbdb8f714fcb72b9",
-        "reason": "Reviewed merged PR195 behavior splits with provider units preserved; bounded Node ingress, native queue status, scheduler lifecycle, source/service setup and focused/native tests reviewed."
+        "fingerprint": "73862a6625d1ed16e2f42d5768f485ce2422fcb54143452877b4e7f2904aa0ac",
+        "reason": "Reviewed synchronization with main PR196: twelve-shard source-bound acceptance and refreshed measurements preserved; provider test ownership retained without application behavior changes."
       }
     },
     {
@@ -456,7 +456,7 @@
       ],
       "review": {
         "fingerprint": "72bea3b719930d027da5bcda69347b99b90f98f3fc30f983df01ab4ae30f5d02",
-        "reason": "Reviewed merged PR195 behavior splits with provider units preserved; bounded Node ingress, native queue status, scheduler lifecycle, source/service setup and focused/native tests reviewed."
+        "reason": "Reviewed synchronization with main PR196: twelve-shard source-bound acceptance and refreshed measurements preserved; provider test ownership retained without application behavior changes."
       }
     },
     {
@@ -639,7 +639,7 @@
       ],
       "review": {
         "fingerprint": "3b88720e72c237c2ce082303d37845d1e981a7fc711773413ba6245b794bea0d",
-        "reason": "Reviewed merged PR195 behavior splits with provider units preserved; bounded Node ingress, native queue status, scheduler lifecycle, source/service setup and focused/native tests reviewed."
+        "reason": "Reviewed synchronization with main PR196: twelve-shard source-bound acceptance and refreshed measurements preserved; provider test ownership retained without application behavior changes."
       }
     },
     {
@@ -1019,7 +1019,7 @@
       ],
       "review": {
         "fingerprint": "b0dcadeb8d18f29e10004ceb9714d15969d29a9619abe046c81d960b48764695",
-        "reason": "Reviewed merged PR195 behavior splits with provider units preserved; bounded Node ingress, native queue status, scheduler lifecycle, source/service setup and focused/native tests reviewed."
+        "reason": "Reviewed synchronization with main PR196: twelve-shard source-bound acceptance and refreshed measurements preserved; provider test ownership retained without application behavior changes."
       }
     },
     {

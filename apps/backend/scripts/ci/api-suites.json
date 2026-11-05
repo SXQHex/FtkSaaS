@@ -1117,245 +1117,427 @@
     "p07-lifecycle-acceptance"
   ],
   "measurements": {
-    "run_id": 41714591061,
+    "run_id": 41943910333,
     "attempt": 1,
-    "source_merge": "a291195b4a277d12f0ed2cba51fa257e1e53a228",
-    "note": "Completed unit process-wall samples from an overall failed run. Scheduling inputs only, not successful experiment acceptance. Frontend-settings timed out and has no completed sample; other missing samples retain source-size seeds. Concurrent load and changed sources can change future durations.",
+    "source_merge": "0132fc3302595546d47b61f91d5f12c4c550f49b",
+    "source_head": "24de174640679e75ba91722d396289c804d56a15",
+    "cli_version": "3.0.0",
+    "note": "Completed process-wall seconds from successful PR195 native acceptance job summaries, rounded by the existing summary reporter. Overlapping at concurrency=2, not additive wall time. The two SQL-only units have no request process summary and retain explicit source-size seeds; their native root durations are not process-wall samples. Historical weights are replaced, not mixed with this run. This snapshot guides scheduling only, never acceptance.",
     "units": {
-      "starter-operations-acceptance": {
-        "seconds": 218.86,
-        "sha256": "5de235408ed2861d739d1298ddde3fbd0142abce5f587203b8160e4c05782abc",
-        "job_id": 126191412055
-      },
-      "ops-hosted-acceptance": {
-        "seconds": 27.34,
-        "sha256": "a170349e1e3ef4c3cc3b4e6bce4f44507fd0042ce410700822a5b48e38fbe676",
-        "job_id": 126191412074
-      },
       "account-identity-acceptance": {
-        "seconds": 70.95,
-        "sha256": "65ce301c91ac3f47e1d3ffa945971e6d2f95d04ac04981e38baae57df8be15dd",
-        "job_id": 126191412074
-      },
-      "instructor-earnings-root-1": {
-        "seconds": 682.05,
-        "sha256": "e14e4b99d309954059d73ca5a3df8b06803e74757f9874c249c0a2a0df79b813",
-        "job_id": 126191412074
-      },
-      "p01-waitlist-workers-root-1": {
-        "seconds": 190.14,
-        "sha256": "5159dbbd5f96d89f44133acb2d605e1d4a424600b3119d35a59d206768012280",
-        "job_id": 126191412074
-      },
-      "program-configuration-acceptance": {
-        "seconds": 191.55,
-        "sha256": "ab2011311522525807f956d30a66b5981e687efe91c4d7c69fb8558521bf776e",
-        "job_id": 126191412074
-      },
-      "program-session-lifecycle-root-2": {
-        "seconds": 228.04,
-        "sha256": "73e235975fe408637aec0764ad90b42e585db7aae967bdbe0a8338e84f2c327b",
-        "job_id": 126191412074
-      },
-      "account-session-management-acceptance": {
-        "seconds": 72.15,
-        "sha256": "e19ed9722521850b3a35b97117f342cda93b1fab8a75ab794451fa7335913e81",
-        "job_id": 126191412092
-      },
-      "commercial-plan-acceptance": {
-        "seconds": 308.81,
-        "sha256": "dda8dfa2da7b4f1847830a3b3513d7b36a9ab4a07cd25676433eb23866d568f8",
-        "job_id": 126191412092
-      },
-      "event-cancellation-package": {
-        "seconds": 220.64,
-        "sha256": "1933c0b7ef50c9e36d650f965566695b9d2864375ff66450c74d2b37a9ffdbb9",
-        "job_id": 126191412092
-      },
-      "event-cancellation-settlement-races": {
-        "seconds": 436.19,
-        "sha256": "a10ae6eb61dbd8fc0ff7bc0d14ec9f0739c94903ceec49d13921d0ad9eba053e",
-        "job_id": 126191412092
-      },
-      "p06-acceptance": {
-        "seconds": 244.37,
-        "sha256": "df7b3040cce7bd6291cd8caa28806e76b301997ceced52d28e8518add9fbf242",
-        "job_id": 126191412092
-      },
-      "person-registry-root-2": {
-        "seconds": 199.94,
-        "sha256": "93d09d6533683e7600c8baba736775f9b9b1c19f4c9b81eb868ee75158ab8de7",
-        "job_id": 126191412092
-      },
-      "starter-preparation-acceptance": {
-        "seconds": 507.67,
-        "sha256": "81961408b6343c4b6985e622511552287c5b9c6f2ea8946fab440f8bc56ac2e9",
-        "job_id": 126191412092
-      },
-      "starter-studio-acceptance": {
-        "seconds": 272.13,
-        "sha256": "32e3d59bec63c7730d0d3f8217f729b7ee268bccca3441607ec2b8ae2dce2926",
-        "job_id": 126191412092
-      },
-      "account-signup-acceptance": {
-        "seconds": 8.41,
-        "sha256": "73fc0e5077434c106ec0aa4d7b370a851c00bb3d9dc524046f88696c04d191ed",
-        "job_id": 126191412099
-      },
-      "api-acceptance-root-1": {
-        "seconds": 595.74,
-        "sha256": "d5bdb608c6db9f37d0c7590e7ff474193e0fd521641b6f0d27aab867637cd4da",
-        "job_id": 126191412099
-      },
-      "event-cancellation-monetary": {
-        "seconds": 419.94,
-        "sha256": "007a712d202d1c20e4f98d07a4ff944185aa6b77a014b8ecba8100cbc855add0",
-        "job_id": 126191412099
-      },
-      "p07-account-profile-merge-acceptance": {
-        "seconds": 176.34,
-        "sha256": "a30965646b9012c3b400e9c1c0b1d8556a56a90127a150f44841336d09b7b39c",
-        "job_id": 126191412099
-      },
-      "schedule-reads-root-1": {
-        "seconds": 396.94,
-        "sha256": "a72fd8cecd815804875a2c495ce4ca5a8d8b21327799368efd77a822aaa29052",
-        "job_id": 126191412099
-      },
-      "subscriber-number-acceptance": {
-        "seconds": 294.73,
-        "sha256": "d4d99e4915601dc82dcaf4732e8dba9bc012ee44a43efdb85d4554bc00db21dc",
-        "job_id": 126191412099
-      },
-      "subscription-period-acceptance": {
-        "seconds": 151.12,
-        "sha256": "dfb6779769c432c242ca9522aa7ad97cc0deb2e357b477734f91acbf9f64e322",
-        "job_id": 126191412099
-      },
-      "p07-lifecycle-acceptance": {
-        "seconds": 50.02,
-        "sha256": "86e84e20ba3be770247174a6cc1a5054d8e406f20f0b17f5db2f9d6eee05481e",
-        "job_id": 126191412101
+        "seconds": 125.87,
+        "sha256": "df5551c42269a124360a2897faa7a75be70f20ec1bfe547ada564480a8771ff6",
+        "job_id": 126971318484
       },
       "account-mfa-acceptance": {
-        "seconds": 23.22,
+        "seconds": 22.73,
         "sha256": "9b5471a8601c0ec13ec5e01164e15e28d7b33e564438edef417bae7fa87c7bf0",
-        "job_id": 126191412101
+        "job_id": 126971318355
       },
-      "p01-lesson-requests-root-1": {
-        "seconds": 224.26,
-        "sha256": "ae008d1bfccecf555cb2d13a74708d0b74ab405534d03b6c3b937e5454833838",
-        "job_id": 126191412101
+      "account-session-management-acceptance": {
+        "seconds": 45.87,
+        "sha256": "e19ed9722521850b3a35b97117f342cda93b1fab8a75ab794451fa7335913e81",
+        "job_id": 126971318453
       },
-      "program-session-lifecycle-root-1": {
-        "seconds": 508.76,
-        "sha256": "32a8de1475d30c8a2311eccbeef09262aa5279fbfc3d6155b8a9b1dfa9170bb1",
-        "job_id": 126191412101
+      "account-signup-acceptance": {
+        "seconds": 6.85,
+        "sha256": "73fc0e5077434c106ec0aa4d7b370a851c00bb3d9dc524046f88696c04d191ed",
+        "job_id": 126971318499
       },
-      "registry-root-1": {
-        "seconds": 170.81,
-        "sha256": "4b02688fabdaed54ff9a6153190b64e1ddfc6ca754226da8b5c587ef83ca12ed",
-        "job_id": 126191412101
+      "api-bootstrap": {
+        "seconds": 59.55,
+        "sha256": "687544758d564c1cdbcb538a7c99f2737929f320d44a6c7ec633cb1826cba3b6",
+        "job_id": 126971318324
       },
-      "starter-attendance-protection-root-1": {
-        "seconds": 817.4,
-        "sha256": "d3055ef662701d80d3a24279f1226e4b7d95e6483ce4fe5d6f40a6d374cf8f9a",
-        "job_id": 126191412101
+      "api-event-finance": {
+        "seconds": 238.09,
+        "sha256": "eac8031d3c048a6baa11640515e281908917e58cf817e61a746f375110cb7d4c",
+        "job_id": 126971318453
+      },
+      "api-live-authority": {
+        "seconds": 175.65,
+        "sha256": "1dead14b71a6d72601f941a089c51f996548977f6428079179f7505fba28605c",
+        "job_id": 126971318307
+      },
+      "api-shared-rights": {
+        "seconds": 133.57,
+        "sha256": "18cef273dc24cc960456f2641f346e8608071f9612b932066a028aae881fcb40",
+        "job_id": 126971318499
       },
       "availability-day-boundaries-acceptance": {
-        "seconds": 67.15,
+        "seconds": 75.09,
         "sha256": "3208c6eceee01113de0e1bf6d262f89e5ee49c4ae377ee199b02fd2ac7670690",
-        "job_id": 126191412122
+        "job_id": 126971318484
       },
       "availability-policies-root-1": {
-        "seconds": 283.48,
+        "seconds": 332.19,
         "sha256": "1fe5d593d985f969dfe929a6156cfccc15c10150a19c8a958f57054013cf8edd",
-        "job_id": 126191412122
-      },
-      "event-cancellation-actual-start": {
-        "seconds": 292.2,
-        "sha256": "5ce4884e35769b77344c309853360a60a16cd87f2b764d60bf8d0a3af7bb6a8b",
-        "job_id": 126191412122
-      },
-      "event-payment-root-2": {
-        "seconds": 184.68,
-        "sha256": "1c568690d90d09e67ba7facca0a4c4cf9c270ba89d8b1bcb2383bd14cc8453df",
-        "job_id": 126191412122
-      },
-      "p05-acceptance": {
-        "seconds": 185.52,
-        "sha256": "de065faf50f294106005197bfed64881081dabe427840a3c0452f9776e322f79",
-        "job_id": 126191412122
-      },
-      "person-registry-root-1": {
-        "seconds": 181.64,
-        "sha256": "5a55806a3c7ae762cf368f4590f94360f2f0ab01a538ec02c22cde984218f1cd",
-        "job_id": 126191412122
-      },
-      "personal-calendar-acceptance": {
-        "seconds": 105.78,
-        "sha256": "8c78b25b4b03d8fcc03e96d1541e0797c7f00edec3dadfcf9a87a90f1d0f1061",
-        "job_id": 126191412122
-      },
-      "starter-document-acceptance": {
-        "seconds": 42.76,
-        "sha256": "2c269e74392c3855c747d468b31aea7b37b6717155bcf7e9d0bfd7ed4e73ac18",
-        "job_id": 126191412122
-      },
-      "earning-payment-selection-acceptance": {
-        "seconds": 39.18,
-        "sha256": "25c9aaf511f3b64bf1c1a5049953a4cc3e9c3224e81724846778562e1f1b8ba6",
-        "job_id": 126191412385
-      },
-      "event-cancellation-planned-time": {
-        "seconds": 348.18,
-        "sha256": "5b01d5bc219875ba6604d9f11315fcc14ed3270370d5e50424bda53b8f51eb3a",
-        "job_id": 126191412385
-      },
-      "event-payment-root-1": {
-        "seconds": 601.06,
-        "sha256": "238fabaad2636eb6ead51df04cef69c2bac47b1907ce9710a857c708353bc492",
-        "job_id": 126191412385
-      },
-      "p01-catalog-entitlement-reads-root-1": {
-        "seconds": 263.92,
-        "sha256": "203d1b6f77cde8f27f45019e3ff44246385e3ee46e77c89714778c0e97d078a6",
-        "job_id": 126191412385
-      },
-      "room-role-registry-root-1": {
-        "seconds": 341.01,
-        "sha256": "f7d6bfac0844cfa354179939e887f75fd918721d2ffc835c5ae424b07deb1f1e",
-        "job_id": 126191412385
-      },
-      "starter-instructor-acceptance": {
-        "seconds": 398.35,
-        "sha256": "c751eb4f6f337cc95bef8227a9e4f38d43e296e27d49ffbdfe2fae1b650eb7ab",
-        "job_id": 126191412385
-      },
-      "starter-plan-gates-acceptance": {
-        "seconds": 172.88,
-        "sha256": "c2cbc191466371b912cd2f78159e0cb1235513caa2e9153268d4e735e5538537",
-        "job_id": 126191412385
-      },
-      "invitation-delivery-acceptance": {
-        "seconds": 47.98,
-        "sha256": "e14014089c4ef788c78c249f8460e073edf48d598e07e92e4bb336e1b6f7bb8e",
-        "job_id": 126191412566
+        "job_id": 126971318499
       },
       "calendar-preferences-acceptance": {
-        "seconds": 117.23,
+        "seconds": 84.23,
         "sha256": "1edc9cb92239b8313813701cfe48530644c11fe5b9d18cb072deb98f771fb3f6",
-        "job_id": 126191412566
+        "job_id": 126971318453
       },
-      "cross-center-settlement-root-1": {
-        "seconds": 770.91,
-        "sha256": "e3159fd8a6abd025145b269d0e72222beefc5b9ba9cd9776e333a01418750b45",
-        "job_id": 126191412566
+      "class-duty-management-acceptance": {
+        "seconds": 479.56,
+        "sha256": "dce0bdf16509acd8bdda9877a23e44308dce39844eb090689c8335211498e007",
+        "job_id": 126971318484
+      },
+      "commercial-plan-acceptance": {
+        "seconds": 306.97,
+        "sha256": "dda8dfa2da7b4f1847830a3b3513d7b36a9ab4a07cd25676433eb23866d568f8",
+        "job_id": 126971318355
+      },
+      "crm-application-intake-acceptance": {
+        "seconds": 18.31,
+        "sha256": "ea64788526db258f1a30e9ec01e61b90c57da4d66570d787e1472c96b8a4acb7",
+        "job_id": 126971318307
+      },
+      "crm-application-review-acceptance": {
+        "seconds": 66.47,
+        "sha256": "999f1ebeb3233cfd71e85b59c50081d6af87ce0a8df60e05e467ae8451c0800c",
+        "job_id": 126971318324
+      },
+      "cross-center-atomic": {
+        "seconds": 266.29,
+        "sha256": "0c2290798f844f897d730275da7e96aa03976edbcddf1346040540998af5d581",
+        "job_id": 126971318324
+      },
+      "cross-center-authority": {
+        "seconds": 409.54,
+        "sha256": "fc49058fe248d362ddb42d3a1e489ea6101f890ca7e07ec33fd6afab85cc9fce",
+        "job_id": 126971318355
+      },
+      "cross-center-deficit-sources": {
+        "seconds": 204.2,
+        "sha256": "86977a0ed4c17884c74313486c52facd2874a3e7e5e75850f737fa73961b5b22",
+        "job_id": 126971318499
+      },
+      "cross-center-no-transfer": {
+        "seconds": 316.74,
+        "sha256": "3adfb4f463dabc95dc000f1349668db008fb00def31bb15b1151c5217da59c91",
+        "job_id": 126971318355
+      },
+      "cross-center-payments": {
+        "seconds": 352.37,
+        "sha256": "00ae57c953ed8a0483fa8b759a35d55ab18b68f42b3f01f4f15f822d45fe7679",
+        "job_id": 126971318499
+      },
+      "cross-center-rounding": {
+        "seconds": 172.6,
+        "sha256": "cf71516cef52f89dbdba6d12a36e5d66fac1fc5667cb21ed76eefc0c75d5ae77",
+        "job_id": 126971318324
+      },
+      "cross-center-source-scope": {
+        "seconds": 180.66,
+        "sha256": "ee5221c6dea0260e146548c14fa2ac3714b673c44dc0202665b4b9fc8f252c40",
+        "job_id": 126971318324
+      },
+      "document-self-requirements-acceptance": {
+        "seconds": 227.26,
+        "sha256": "c71d21409d151be93f6867a476828e412c7a6935f106a5220eb4a58f2f2dca05",
+        "job_id": 126971318499
+      },
+      "earning-payment-selection-acceptance": {
+        "seconds": 40.15,
+        "sha256": "25c9aaf511f3b64bf1c1a5049953a4cc3e9c3224e81724846778562e1f1b8ba6",
+        "job_id": 126971318355
+      },
+      "earnings-occurrence-authority": {
+        "seconds": 362.28,
+        "sha256": "c64654a4d294fa3344b32e99b08d912b488b63f6ab0e317d4c0249604cba9391",
+        "job_id": 126971318355
+      },
+      "earnings-packages-corrections": {
+        "seconds": 213.9,
+        "sha256": "776e65d37861b0bbd291503e4074fb31f7c82745b798c7ec4689e6758095a917",
+        "job_id": 126971318355
+      },
+      "earnings-pilot": {
+        "seconds": 105.89,
+        "sha256": "f78b2654a074a8411c8147f43e39bd259d191b7945af538dbebdc8d9ea52cb7e",
+        "job_id": 126971318499
+      },
+      "earnings-publication": {
+        "seconds": 113.05,
+        "sha256": "9835d63353baf07766ccd175e3ca1937d1238ba9e17565416cf5ad2250225454",
+        "job_id": 126971318355
+      },
+      "earnings-valuation-closure": {
+        "seconds": 198.82,
+        "sha256": "fe6545447cae0c17ea617ae0b6f95c58d7dd36860c093fa65c47e4b70b145804",
+        "job_id": 126971318453
+      },
+      "event-cancellation-actual-start": {
+        "seconds": 341.06,
+        "sha256": "7bdbf1e4e52e4c90c2d5daf44eace49253924d2636cc0667058f82251d995d15",
+        "job_id": 126971318307
+      },
+      "event-cancellation-center-money": {
+        "seconds": 235.71,
+        "sha256": "bfea77bb40c5b410ab7384fc1c3a8f93753d9f085fd091485339fd69c5ee66bb",
+        "job_id": 126971318453
+      },
+      "event-cancellation-package": {
+        "seconds": 148.93,
+        "sha256": "c9f144d76d00268e7d0552fc9a49a98131c5671eb6da66a89d8a8c1eb3b295c1",
+        "job_id": 126971318324
+      },
+      "event-cancellation-participant-money": {
+        "seconds": 79.25,
+        "sha256": "559a2a18be12785915e59a9d106687451da30358c4cd3591b2b94dc413bca242",
+        "job_id": 126971318499
+      },
+      "event-cancellation-planned-time": {
+        "seconds": 352.84,
+        "sha256": "07c3fd5e5c30507f593ecefc84334971f810be2c5f7386753620e61fdcae6b07",
+        "job_id": 126971318355
+      },
+      "event-cancellation-settlement-races": {
+        "seconds": 292.57,
+        "sha256": "d216fd70f328af205c546abee21eb59447ea964a97ca049efe3af82aa4e41d28",
+        "job_id": 126971318324
+      },
+      "event-capacity-package-acceptance": {
+        "seconds": 598.79,
+        "sha256": "a2587cde639bdcbcb7d7b308bace6ebd78add1b6b62736077c14afd87d44ceca",
+        "job_id": 126971318502
+      },
+      "event-financial-cancellation": {
+        "seconds": 249.54,
+        "sha256": "7828e9dd4137b4d599286a5fbe9ed754db7692e45d117bf4603c433a505ffce8",
+        "job_id": 126971318502
+      },
+      "event-paid-capacity": {
+        "seconds": 109.36,
+        "sha256": "119cad5bd0fadb3d3c66d804b6c495386faa1e59a915d2f7af95bf612e4f3b8b",
+        "job_id": 126971318484
+      },
+      "event-payment-authority": {
+        "seconds": 136.56,
+        "sha256": "5391aad1c0dceddd43b0392d109b9e994a0fb92ba9e85d8f643a2944ef7d4f66",
+        "job_id": 126971318502
+      },
+      "event-payment-root-2": {
+        "seconds": 204.16,
+        "sha256": "a6b3acac0407b7a82b3067672fd42fe4076688643ea07bbcc9cc1f0dad940ea8",
+        "job_id": 126971318484
+      },
+      "event-preparation": {
+        "seconds": 120,
+        "sha256": "8465c28e754f6e746e87bd2d0c8a280d42e4f1d4c18f8caf7413f46f38b25f8b",
+        "job_id": 126971318499
+      },
+      "invitation-delivery-acceptance": {
+        "seconds": 43.6,
+        "sha256": "e14014089c4ef788c78c249f8460e073edf48d598e07e92e4bb336e1b6f7bb8e",
+        "job_id": 126971318307
+      },
+      "ops-hosted-acceptance": {
+        "seconds": 25.49,
+        "sha256": "a170349e1e3ef4c3cc3b4e6bce4f44507fd0042ce410700822a5b48e38fbe676",
+        "job_id": 126971318324
+      },
+      "p01-catalog-entitlement-reads-root-1": {
+        "seconds": 226.35,
+        "sha256": "203d1b6f77cde8f27f45019e3ff44246385e3ee46e77c89714778c0e97d078a6",
+        "job_id": 126971318499
+      },
+      "p01-lesson-requests-root-1": {
+        "seconds": 171.25,
+        "sha256": "ae008d1bfccecf555cb2d13a74708d0b74ab405534d03b6c3b937e5454833838",
+        "job_id": 126971318499
+      },
+      "p01-waitlist-workers-root-1": {
+        "seconds": 193.59,
+        "sha256": "5159dbbd5f96d89f44133acb2d605e1d4a424600b3119d35a59d206768012280",
+        "job_id": 126971318484
+      },
+      "p05-acceptance": {
+        "seconds": 202.77,
+        "sha256": "de065faf50f294106005197bfed64881081dabe427840a3c0452f9776e322f79",
+        "job_id": 126971318307
+      },
+      "p06-acceptance": {
+        "seconds": 236.24,
+        "sha256": "df7b3040cce7bd6291cd8caa28806e76b301997ceced52d28e8518add9fbf242",
+        "job_id": 126971318502
+      },
+      "p07-account-profile-merge-acceptance": {
+        "seconds": 154.12,
+        "sha256": "a30965646b9012c3b400e9c1c0b1d8556a56a90127a150f44841336d09b7b39c",
+        "job_id": 126971318484
       },
       "p07-account-revocation-acceptance": {
-        "seconds": 105.37,
+        "seconds": 96.74,
         "sha256": "e755d94ebd85f355bb4e0c279b295e65a1ea6dacddfa296c6ccc2f0f53c2c05e",
-        "job_id": 126191412566
+        "job_id": 126971318307
+      },
+      "p07-lifecycle-acceptance": {
+        "seconds": 45.12,
+        "sha256": "86e84e20ba3be770247174a6cc1a5054d8e406f20f0b17f5db2f9d6eee05481e",
+        "job_id": 126971318502
+      },
+      "person-registry-root-1": {
+        "seconds": 231.11,
+        "sha256": "5a55806a3c7ae762cf368f4590f94360f2f0ab01a538ec02c22cde984218f1cd",
+        "job_id": 126971318502
+      },
+      "person-registry-root-2": {
+        "seconds": 401.68,
+        "sha256": "67e144165dde46e978c11545c37e457b4ee933a162cc615520bd499eb95b4bdd",
+        "job_id": 126971318307
+      },
+      "personal-calendar-acceptance": {
+        "seconds": 116.56,
+        "sha256": "8c78b25b4b03d8fcc03e96d1541e0797c7f00edec3dadfcf9a87a90f1d0f1061",
+        "job_id": 126971318307
+      },
+      "pro-lifecycle-earnings-acceptance": {
+        "seconds": 546.53,
+        "sha256": "d40456222d07929ec30116603fe61991c742dc24ae6135354b25f0dc3d554084",
+        "job_id": 126971318502
+      },
+      "program-configuration-acceptance": {
+        "seconds": 195.07,
+        "sha256": "ab2011311522525807f956d30a66b5981e687efe91c4d7c69fb8558521bf776e",
+        "job_id": 126971318307
+      },
+      "program-session-lifecycle-root-1": {
+        "seconds": 508.8,
+        "sha256": "32a8de1475d30c8a2311eccbeef09262aa5279fbfc3d6155b8a9b1dfa9170bb1",
+        "job_id": 126971318325
+      },
+      "program-session-lifecycle-root-2": {
+        "seconds": 274.99,
+        "sha256": "73e235975fe408637aec0764ad90b42e585db7aae967bdbe0a8338e84f2c327b",
+        "job_id": 126971318355
+      },
+      "registry-root-1": {
+        "seconds": 115.47,
+        "sha256": "d003215901030173818cc13a66e89d6edead65fa80eb6bda513ee6cf8f16b10d",
+        "job_id": 126971318324
+      },
+      "room-role-registry-root-1": {
+        "seconds": 295.49,
+        "sha256": "f7d6bfac0844cfa354179939e887f75fd918721d2ffc835c5ae424b07deb1f1e",
+        "job_id": 126971318484
+      },
+      "schedule-reads-root-1": {
+        "seconds": 409.48,
+        "sha256": "a72fd8cecd815804875a2c495ce4ca5a8d8b21327799368efd77a822aaa29052",
+        "job_id": 126971318502
+      },
+      "settings-brand-colors": {
+        "seconds": 74.75,
+        "sha256": "cece77e98820182585503a5411d7b667470cda00e4c907f06c122aa70b0e3810",
+        "job_id": 126971318502
+      },
+      "settings-startup-context": {
+        "seconds": 92.7,
+        "sha256": "9ada3140751dd9ab0a543640d3a608f254df11a77b50c312c98c54356af09c2b",
+        "job_id": 126971318307
+      },
+      "settings-tenant-authority": {
+        "seconds": 141.79,
+        "sha256": "293a2862f3b5e038f87a40c78d77b9520ff654561e1102ac6783bf943663cdc9",
+        "job_id": 126971318453
+      },
+      "settings-user-history": {
+        "seconds": 92.75,
+        "sha256": "21d602fcb2181f10eeb811952cfbf490a843352578ef58da97c137264941f5dd",
+        "job_id": 126971318484
+      },
+      "starter-attendance-authority": {
+        "seconds": 148.27,
+        "sha256": "39e1838aef408df0d93a5c33db5c137de3f0e0b2b566ef97a010ca33d9ad1508",
+        "job_id": 126971318502
+      },
+      "starter-attendance-ledger": {
+        "seconds": 312.77,
+        "sha256": "58604f6e781f8f3a933bae287a5970e5267e421321b768ca8f89fbe90204eefb",
+        "job_id": 126971318502
+      },
+      "starter-attendance-policy": {
+        "seconds": 255.06,
+        "sha256": "22dbe36cb99f62e0c072bef81ea2af3224d389fcf263d1931e4f39723d692937",
+        "job_id": 126971318355
+      },
+      "starter-attendance-revisions": {
+        "seconds": 224.38,
+        "sha256": "adc61a6dd65fa0e026ff2ad7f993f4375c7f9cbfa533eed3f65968b23c090ab6",
+        "job_id": 126971318502
+      },
+      "starter-document-acceptance": {
+        "seconds": 115.69,
+        "sha256": "2c269e74392c3855c747d468b31aea7b37b6717155bcf7e9d0bfd7ed4e73ac18",
+        "job_id": 126971318355
+      },
+      "starter-instructor-acceptance": {
+        "seconds": 283.81,
+        "sha256": "c751eb4f6f337cc95bef8227a9e4f38d43e296e27d49ffbdfe2fae1b650eb7ab",
+        "job_id": 126971318324
+      },
+      "starter-operations-acceptance": {
+        "seconds": 144.58,
+        "sha256": "3f9a41879852c614069ad90c7365393c9d68fd5d4b0bc9ee775462111c32bcd8",
+        "job_id": 126971318502
+      },
+      "starter-operations-import-templates": {
+        "seconds": 81.77,
+        "sha256": "480ca5f2d887b452ec188cbd75dbad1605ac7e0d5c1ba691f8d323b98e1f0023",
+        "job_id": 126971318324
+      },
+      "starter-operations-inbox": {
+        "seconds": 60.19,
+        "sha256": "b45327e1c8016dd7102e063ea4fba77b1424bbac06a94f39b8ac49c6788840f5",
+        "job_id": 126971318324
+      },
+      "starter-operations-report-access": {
+        "seconds": 35.02,
+        "sha256": "f27c5dcfb5788b6fb395b3a8bd4447add9fe8c0a210f6c191fdf158540efb97f",
+        "job_id": 126971318499
+      },
+      "starter-operations-report-shaping": {
+        "seconds": 90.14,
+        "sha256": "418d72bf69385d3a18c211bd87fafc0b061078712811cfdbd7885efc54d89611",
+        "job_id": 126971318484
+      },
+      "starter-operations-reports": {
+        "seconds": 144.48,
+        "sha256": "03d4cf4528ee04de41a7e75dc496f41c03611880bcd1861511eaa1f3d51626e0",
+        "job_id": 126971318355
+      },
+      "starter-plan-downgrade": {
+        "seconds": 175.65,
+        "sha256": "6b62b8c07d37e6a01907cfe314f29ab54b6b124eb0d27a3a9912de258f8f6f1f",
+        "job_id": 126971318484
+      },
+      "starter-plan-resources": {
+        "seconds": 64.32,
+        "sha256": "660af94f279f407c4ccc7415b63230e675ac110e89b7b108d6872b66a8f5d94d",
+        "job_id": 126971318324
+      },
+      "starter-preparation-acceptance": {
+        "seconds": 230.09,
+        "sha256": "81961408b6343c4b6985e622511552287c5b9c6f2ea8946fab440f8bc56ac2e9",
+        "job_id": 126971318453
+      },
+      "starter-studio-acceptance": {
+        "seconds": 262.28,
+        "sha256": "f9b6646b79b69b30007ac0f5d408b09f7119977fd902af84822299ed1341a1f3",
+        "job_id": 126971318484
+      },
+      "subscriber-number-acceptance": {
+        "seconds": 174.99,
+        "sha256": "d4d99e4915601dc82dcaf4732e8dba9bc012ee44a43efdb85d4554bc00db21dc",
+        "job_id": 126971318307
+      },
+      "subscription-period-acceptance": {
+        "seconds": 103.53,
+        "sha256": "dfb6779769c432c242ca9522aa7ad97cc0deb2e357b477734f91acbf9f64e322",
+        "job_id": 126971318324
       }
     }
   }

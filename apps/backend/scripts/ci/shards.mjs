@@ -104,15 +104,15 @@ export function apiTimeBalance(jobs,run,profile='four-isolated-v2'){
  return {...apiBalancePolicy,api:rows,fastest_s:fastest,slowest_s:slowest,gap_s:gap,ratio,balanced:ratio<=apiBalancePolicy.max_ratio||gap<=apiBalancePolicy.min_gap_s};
 }
 
-export const acceptanceProfile='eight-isolated-v1';
+export const acceptanceProfile='twelve-isolated-v1';
 export function apiRoles(profile=acceptanceProfile){
- if(!['four-isolated-v1','four-isolated-v2',acceptanceProfile].includes(profile))throw Error('Unknown acceptance profile');
- return Array.from({length:profile===acceptanceProfile?8:4},(_,i)=>'api-'+(i+1));
+ if(!['four-isolated-v1','four-isolated-v2','eight-isolated-v1',acceptanceProfile].includes(profile))throw Error('Unknown acceptance profile');
+ return Array.from({length:profile===acceptanceProfile?12:profile==='eight-isolated-v1'?8:4},(_,i)=>'api-'+(i+1));
 }
-export function acceptancePlan(){return partition(buildInventory(repositoryRoot).units);}
+export function acceptancePlan(){return partition(buildInventory(repositoryRoot).units,apiRoles().length);}
 export function coverageHash(profile='four-isolated-v2'){
  apiRoles(profile);
- if(profile!==acceptanceProfile)return legacyCoverageHash();
+ if(profile.startsWith('four-isolated-'))return legacyCoverageHash();
  const inventory=buildInventory(repositoryRoot);
- return createHash('sha256').update(JSON.stringify({profile,balance:apiBalancePolicy,manifest:JSON.parse(fs.readFileSync(new URL('./api-suites.json',import.meta.url))),units:inventory.units.map(u=>({id:u.id,source:u.source,sha256:createHash('sha256').update(u.code).digest('hex'),exclusive:u.exclusive})),plan:partition(inventory.units).map(b=>({shard:b.shard,units:b.units.map(u=>u.id)})),core:['verify','test:db','dev:seed','dev:health','db:advisors'],reset:'current-manifest; empty auth/tenant/receipts per runner',concurrency:2,test_timeout:'native'})).digest('hex');
+ return createHash('sha256').update(JSON.stringify({profile,balance:apiBalancePolicy,manifest:JSON.parse(fs.readFileSync(new URL('./api-suites.json',import.meta.url))),units:inventory.units.map(u=>({id:u.id,source:u.source,sha256:createHash('sha256').update(u.code).digest('hex'),exclusive:u.exclusive})),plan:partition(inventory.units,apiRoles(profile).length).map(b=>({shard:b.shard,units:b.units.map(u=>u.id)})),core:['verify','test:db','dev:seed','dev:health','db:advisors'],reset:'current-manifest; empty auth/tenant/receipts per runner',concurrency:2,test_timeout:'native'})).digest('hex');
 }
