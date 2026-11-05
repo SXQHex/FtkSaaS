@@ -186,6 +186,7 @@ test("create validates authoritative discipline and local times without allocati
   const user = await start(reads);
   await user.click(screen.getByRole("button", { name: "Özel ders talebi oluştur" }));
   await user.selectOptions(await screen.findByRole("combobox", { name: "Disiplin" }), id);
+  expect(reads.catalog).toHaveBeenCalledWith(scope, person);
   await user.type(screen.getByLabelText("Başlangıç"), "2027-01-03T10:00");
   await user.type(screen.getByLabelText("Bitiş"), "2027-01-03T11:00");
   await user.click(screen.getByRole("button", { name: "Talebi incele" }));

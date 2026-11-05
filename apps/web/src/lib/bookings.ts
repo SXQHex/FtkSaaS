@@ -2,8 +2,56 @@ import { documentReadActions } from "./document-requirements";
 import type { BookingMode, LessonRequestView } from "@ftksaas/api-contracts";
 import { ApiFailure, getStudents, getCalendar, getSession } from "./api";
 import { setupCall, type SetupScope } from "./studio-setup";
-import { getSetupRoles } from "./instructor-setup";
 import { productDisciplines } from "./products";
+async function requestChoices(
+  scope: SetupScope,
+  personId: string,
+  catalog: "disciplines" | "instructors",
+) {
+  if (!scope.centerId || !personId) throw Error("invalidForm");
+  const choices: { id: string; name: string }[] = [],
+    ids = new Set<string>(),
+    cursors = new Set<string>();
+  let cursor: string | null | undefined;
+  do {
+    const result = await setupCall("management_state_get_v1", {
+      org_id: scope.orgId,
+      center_id: scope.centerId,
+      operation: "lesson_request_create_v1",
+      selector: { operation: "lesson_request_create_v1", key: { person_id: personId, catalog } },
+      page: { limit: 200, sort: "created_at_asc", ...(cursor ? { cursor } : {}) },
+    });
+    for (const item of result.items) {
+      if (
+        item.operation !== "lesson_request_create_v1" ||
+        item.current?.operation !== "lesson_request_create_v1"
+      )
+        throw Error("invalidForm");
+      const values = item.current.values,
+        id = catalog === "disciplines" ? values.discipline_id : values.preferred_instructor_id,
+        name = values.display_name;
+      if (
+        !id ||
+        typeof name !== "string" ||
+        !name.trim() ||
+        !item.exists ||
+        item.state !== "active" ||
+        item.entity?.type !== (catalog === "disciplines" ? "disciplines" : "people") ||
+        item.entity.id !== id ||
+        ids.has(id)
+      )
+        throw Error("invalidForm");
+      ids.add(id);
+      choices.push({ id, name });
+    }
+    cursor = result.next_cursor;
+    if (cursor) {
+      if (cursors.has(cursor)) throw Error("invalidForm");
+      cursors.add(cursor);
+    }
+  } while (cursor);
+  return choices;
+}
 export const bookingApi = {
   documents: documentReadActions,
   capacity: async (scope: SetupScope, person_id: string, session_id: string) => {
@@ -108,32 +156,12 @@ export const bookingApi = {
       (action) => allowed.includes(action),
     );
   },
-  catalog: async (scope: SetupScope) => {
-    const [disciplines, roles] = await Promise.all([
-      productDisciplines(scope),
-      getSetupRoles(scope),
+  catalog: async (scope: SetupScope, personId: string) => {
+    const [disciplines, instructors] = await Promise.all([
+      requestChoices(scope, personId, "disciplines"),
+      requestChoices(scope, personId, "instructors"),
     ]);
-    const ids = [
-      ...new Set(
-        roles
-          .filter(
-            (role) =>
-              role.role === "instructor" &&
-              role.state === "active" &&
-              role.scope_center_id === scope.centerId,
-          )
-          .map((role) => role.person_id),
-      ),
-    ];
-    const people = await Promise.all(
-      ids.map((person_id) =>
-        setupCall("person_get_v1", { org_id: scope.orgId, center_id: scope.centerId, person_id }),
-      ),
-    );
-    return {
-      disciplines: disciplines.map((row) => ({ id: row.id, name: row.name })),
-      instructors: people.map((row) => ({ id: row.id, name: row.display_name })),
-    };
+    return { disciplines, instructors };
   },
   people: (scope: SetupScope, query: string, cursor?: string) => {
     if (!scope.centerId) throw Error("invalidForm");

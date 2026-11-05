@@ -1,16 +1,17 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import type { SessionView } from "@ftksaas/api-contracts";
 import { ArrowLeft, RefreshCw } from "lucide-react";
 import { Button } from "@ftksaas/ui/components/button";
-import { ApiFailure, errorMessageKey, getSession } from "../../lib/api";
+import { ApiFailure, errorMessageKey, getAccount, getSession } from "../../lib/api";
 import { browserClient } from "../../lib/supabase/client";
 import { sessionPath } from "../../lib/session-route";
 import { Preferences } from "../preferences";
+import { SessionBookings } from "../bookings/session-bookings";
 import { SessionSummary } from "./session-detail";
 import { SessionDocuments } from "../documents/session-documents";
 import { SessionChange } from "./session-change";
@@ -18,11 +19,14 @@ import { SessionChange } from "./session-change";
 export function SessionPage({
   orgId,
   sessionId,
-  actorId,
+  actorId: authUserId,
+  centerId,
 }: {
   orgId: string;
   sessionId: string;
+  // Native Auth identity; command scopes use account_get_v1.id.
   actorId: string;
+  centerId?: string;
 }) {
   const router = useRouter();
   const t = useTranslations("calendar");
@@ -32,25 +36,32 @@ export function SessionPage({
   const [result, setResult] = useState<{
     key: string;
     session?: SessionView;
+    accountId?: string;
     timeZone?: string;
     error?: string;
   } | null>(null);
-  const key = `${orgId}:${sessionId}:${attempt}`;
+  const key = `${authUserId}:${orgId}:${centerId ?? "unscoped"}:${sessionId}:${attempt}`;
   useEffect(() => {
     let active = true;
     function leave() {
       active = false;
       setResult(null);
-      router.replace(`/login?next=${encodeURIComponent(sessionPath(orgId, sessionId))}`);
+      router.replace(`/login?next=${encodeURIComponent(sessionPath(orgId, sessionId, centerId))}`);
       router.refresh();
     }
-    const { data } = browserClient().auth.onAuthStateChange((event) => {
-      if (event === "SIGNED_OUT") leave();
+    const { data } = browserClient().auth.onAuthStateChange((event, session) => {
+      if (event === "SIGNED_OUT" || (event === "SIGNED_IN" && session?.user.id !== authUserId))
+        leave();
     });
-    getSession(orgId, undefined, sessionId)
-      .then((session) => {
+    Promise.all([getSession(orgId, centerId, sessionId), getAccount()])
+      .then(([session, account]) => {
         if (active)
-          setResult({ key, session, timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone });
+          setResult({
+            key,
+            session,
+            accountId: account.id,
+            timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+          });
       })
       .catch((cause: unknown) => {
         if (!active) return;
@@ -67,7 +78,17 @@ export function SessionPage({
       active = false;
       data.subscription.unsubscribe();
     };
-  }, [orgId, sessionId, key, router]);
+  }, [authUserId, orgId, centerId, sessionId, key, router]);
+  const bookingChanged = useCallback(
+    (session: SessionView) => {
+      setResult((previous) =>
+        previous?.key === key && previous.session?.id === session.id
+          ? { ...previous, session }
+          : previous,
+      );
+    },
+    [key],
+  );
   const current = result?.key === key ? result : null;
   return (
     <main
@@ -116,10 +137,11 @@ export function SessionPage({
         </div>
       ) : current.session && editing ? (
         <SessionChange
-          key={`${key}:${actorId}`}
+          key={`${key}:${current.accountId}`}
           session={current.session}
           orgId={orgId}
-          actorId={actorId}
+          centerId={centerId}
+          actorId={current.accountId!}
           timeZone={current.timeZone ?? "UTC"}
           onClose={() => {
             setEditing(false);
@@ -133,9 +155,16 @@ export function SessionPage({
       ) : current.session ? (
         <div className="space-y-6">
           <SessionSummary session={current.session} timeZone={current.timeZone ?? "UTC"} />
+          {centerId && (
+            <SessionBookings
+              scope={{ actorId: current.accountId!, orgId, centerId }}
+              session={current.session}
+              onChanged={bookingChanged}
+            />
+          )}
           <SessionDocuments
-            key={`${actorId}:${orgId}:${sessionId}`}
-            scope={{ actorId, orgId }}
+            key={`${current.accountId}:${orgId}:${centerId ?? "unscoped"}:${sessionId}`}
+            scope={{ actorId: current.accountId!, orgId, centerId }}
             sessionId={sessionId}
           />
           <Button

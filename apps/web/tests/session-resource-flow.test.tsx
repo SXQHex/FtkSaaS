@@ -217,7 +217,7 @@ test("calendar replacement creation rereads the source and links the actual new 
   await user.click(screen.getByRole("button", { name: "Telafi seansını oluştur" }));
   expect(await screen.findByRole("link", { name: "Yeni telafi seansını aç" })).toHaveAttribute(
     "href",
-    `/organizasyon/org/seans/${newId}`,
+    `/organizasyon/org/seans/${newId}?center=center`,
   );
   await waitFor(() => expect(changed).toHaveBeenCalledOnce());
   expect(sessionRead).toHaveBeenCalledTimes(2);

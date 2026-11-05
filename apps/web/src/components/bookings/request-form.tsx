@@ -37,7 +37,7 @@ export function RequestForm({
   useEffect(() => {
     let active = true;
     void api
-      .catalog(scope)
+      .catalog(scope, personId)
       .then((value) => {
         if (active) setCatalog(value);
       })
@@ -47,7 +47,7 @@ export function RequestForm({
     return () => {
       active = false;
     };
-  }, [api, scope]);
+  }, [api, scope, personId]);
   return (
     <section className="min-w-0 space-y-4" aria-label={t("newRequest")}>
       <h4 className="font-semibold">{t("newRequest")}</h4>

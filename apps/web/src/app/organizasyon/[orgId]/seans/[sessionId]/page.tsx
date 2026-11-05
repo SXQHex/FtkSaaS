@@ -14,12 +14,16 @@ export async function generateMetadata() {
 }
 export default async function SessionRoute({
   params,
+  searchParams,
 }: {
   params: Promise<{ orgId: string; sessionId: string }>;
+  searchParams?: Promise<{ center?: string | string[] }>;
 }) {
   const { orgId, sessionId } = await params;
   if (!isUuid(orgId) || !isUuid(sessionId)) notFound();
-  const next = encodeURIComponent(sessionPath(orgId, sessionId));
+  const center = (await searchParams)?.center;
+  if (center !== undefined && (typeof center !== "string" || !isUuid(center))) notFound();
+  const next = encodeURIComponent(sessionPath(orgId, sessionId, center));
   const client = await serverClient();
   if (!client) redirect(`/login?next=${next}`);
   const result = await client.auth.getUser();
@@ -30,10 +34,11 @@ export default async function SessionRoute({
     redirect(`/mfa?next=${next}`);
   return (
     <SessionPage
-      key={`${orgId}:${sessionId}:${result.data.user.id}`}
+      key={`${orgId}:${sessionId}:${center ?? "unscoped"}:${result.data.user.id}`}
       orgId={orgId}
       sessionId={sessionId}
       actorId={result.data.user.id}
+      {...(center ? { centerId: center } : {})}
     />
   );
 }
