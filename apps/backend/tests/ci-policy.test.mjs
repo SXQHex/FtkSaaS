@@ -1,3 +1,5 @@
+import {execFileSync} from 'node:child_process';
+import {createHash} from 'node:crypto';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {coverageHash,validateJobs,acceptanceProfile,acceptancePlan} from '../scripts/ci/shards.mjs';
@@ -6,12 +8,12 @@ import {buildInventory} from '../scripts/ci/api-suites.mjs';
 import {ciFile,repoFile,repositoryRoot} from '../scripts/paths.mjs';
 import fs,{rmSync,writeFileSync,mkdtempSync} from 'node:fs';
 import {validateBinding,verifyMerged,validateDocumentBinding,checkPr,findCandidateProof,schemaBaselineName} from '../scripts/ci/gate.mjs';
-import {assertReady,assertParents,policyPath,resolveCandidate,currentAttemptBinding} from '../scripts/ci/source.mjs';
+import {assertReady,assertParents,policyPath,policyMatches,resolveCandidate,currentAttemptBinding} from '../scripts/ci/source.mjs';
 import {measurements,collect} from '../scripts/ci/collect.mjs';
 import {classifyChanges} from '../scripts/ci/scope.mjs';
 import {join} from 'node:path';
 import {tmpdir} from 'node:os';
-import {valid,scopedGithub,change,candidateProofFixture,jobsWithApiSeconds} from './ci-fixtures.mjs';
+import {valid,scopedGithub,change,candidateProofFixture,jobsWithApiSeconds,historicalApiUnitIds,declaredApiUnitIds} from './ci-fixtures.mjs';
 process.chdir(repositoryRoot);
 
 const promoteFixture=v=>{
@@ -80,7 +82,7 @@ test('reusable full clean retains all obligations while automatic admission and 
  assert(clean.includes('needs: [core, api, serial-reference]'));assert(clean.includes('if: always()'));assert(clean.includes('Verify all required jobs'));
  for(const op of ['test:db','dev:seed','dev:health','db:advisors'])assert(runner.includes("['run','"+op+"']"));
  assert(runner.includes("['--dir',repoFile(),'exec','turbo','run','verify','--filter=@ftksaas/backend...']"));
- assert(runner.includes("['db','reset','--local','--no-seed','--yes']"));assert(runner.includes("'auth.users'"));
+ assert(runner.includes("['db','reset','--no-seed','--yes']"));assert(runner.includes("'auth.users'"));
  const full=fs.readFileSync('.github/workflows/ci-full.yml','utf8'),gate=fs.readFileSync('.github/workflows/ci-gate.yml','utf8');
  assert(full.includes("needs.candidate.outputs.kind == 'full'"));assert(full.includes("needs.candidate.outputs.kind == 'documentation'"));assert(full.includes('synchronize'));assert(!full.includes('statuses: write'));assert(!full.includes('secrets:'));
  assert(!fs.existsSync('.github/workflows/ci-docs.yml'));assert(!fs.existsSync('apps/backend/scripts/ci/recovery.mjs'));
@@ -271,10 +273,10 @@ test('twelve-shard acceptance requires all twelve source-bound jobs and rejects 
  // Each split retains one representative of its original acceptance obligation.
  // The full behavior inventory and retirement checks live in ci-api-suites.test.
  for(const id of ['earnings-packages-corrections','earnings-valuation-closure','earnings-occurrence-authority','earnings-pilot','cross-center-no-transfer','cross-center-rounding','cross-center-source-scope','event-paid-capacity','event-financial-cancellation','event-payment-authority','api-shared-rights','api-live-authority','api-event-finance','event-cancellation-participant-money'])added.add(id);
- const allIds=currentPlan.flatMap(b=>b.units.map(u=>u.id));assert.equal(allIds.length,64+added.size);assert.equal(new Set(allIds).size,allIds.length);
+ const allIds=currentPlan.flatMap(b=>b.units.map(u=>u.id));assert.deepEqual([...allIds].sort(),declaredApiUnitIds().sort());assert.equal(new Set(allIds).size,allIds.length);
  for(const id of added)assert(allIds.includes(id),'Missing new acceptance unit '+id);
  {
-  const acceptancePlan=()=>currentPlan.map(b=>({...b,units:b.units.filter(u=>!added.has(u.id))}));
+  const acceptancePlan=()=>currentPlan.map(b=>({...b,units:b.units.filter(u=>historicalApiUnitIds.includes(u.id))}));
  const ids=acceptancePlan().flatMap(b=>b.units.map(u=>u.id));assert.equal(ids.length,64);assert.equal(new Set(ids).size,ids.length);
  }
 
@@ -283,4 +285,114 @@ test('twelve-shard acceptance requires all twelve source-bound jobs and rejects 
  }
  const legacy=structuredClone(v);legacy.binding.coverage=coverageHash();assert.throws(()=>validateBinding(legacy));
  assert.equal(schemaBaselineName(v.binding),'documentation-baseline');
+});
+
+function growingInventory({root=false}={}){
+ const manifest=JSON.parse(fs.readFileSync(repoFile('apps/backend/scripts/ci/api-suites.json'),'utf8'));
+ const pkg=JSON.parse(fs.readFileSync(repoFile('apps/backend/package.json'),'utf8'));
+ const added=root?'apps/backend/tests/new-regression.test.mjs':'apps/backend/tests/new-regression.mjs',code="throw Error('Candidate code must never execute');\n";
+ const overrides=new Map([[added,code]]);
+ if(root){
+  manifest.suites.push({path:added,sha256:createHash('sha256').update(code).digest('hex'),shared:[],parts:[{id:'new-regression',ranges:[[1,1]]}],imports:[],estimated_seconds:1});
+  pkg.scripts['test:api']+=' tests/new-regression.test.mjs';overrides.set('apps/backend/package.json',JSON.stringify(pkg));
+ }else{
+  const suite=manifest.suites[0],original=fs.readFileSync(repoFile(suite.path),'utf8');
+  const source=original+"import './new-regression.mjs';\n";
+  suite.sha256=createHash('sha256').update(source).digest('hex');
+  suite.imports.push({path:added,line:original.match(/[^\n]*\n|[^\n]+$/g).length+1,sha256:createHash('sha256').update(code).digest('hex')});
+  overrides.set(suite.path,source);
+ }
+ overrides.set('apps/backend/scripts/ci/api-suites.json',JSON.stringify(manifest));
+ const read=p=>overrides.has(p)?overrides.get(p):fs.readFileSync(repoFile(p),'utf8');
+ const inventory=buildInventory(repositoryRoot,{manifest,read});
+ const paths=['apps/backend/package.json','apps/backend/scripts/ci/api-suites.json','apps/backend/scripts/ci/gate.mjs',...manifest.suites.flatMap(s=>[s.path,...s.imports.map(i=>i.path)])];
+ const blobs=new Map(),tree=paths.map(path=>{
+  const content=Buffer.from(read(path));const sha=createHash('sha1').update(Buffer.concat([Buffer.from('blob '+content.length+'\0'),content])).digest('hex');
+  blobs.set(sha,content);return {path,sha,type:'blob',mode:'100644'};
+ });
+ const base=tree.filter(e=>e.path!==added).map(e=>{
+  if(!overrides.has(e.path))return {...e};
+  const content=Buffer.from(fs.readFileSync(repoFile(e.path)));const sha=createHash('sha1').update(Buffer.concat([Buffer.from('blob '+content.length+'\0'),content])).digest('hex');blobs.set(sha,content);return {...e,sha};
+ });
+ const github={rest:{git:{getTree:async({tree_sha})=>({data:{tree:tree_sha==='BASE'?base:tree}}),getBlob:async({file_sha})=>({data:{encoding:'base64',content:blobs.get(file_sha).toString('base64')}})}}};
+ return {manifest,pkg,inventory,read,tree,base,blobs,github};
+}
+
+test('routine added test modules and inventory updates pass policy comparison without installing executable policy',async()=>{
+ for(const root of [false,true]){const f=growingInventory({root});assert(await policyMatches(f.github,{},'BASE','CANDIDATE'));}
+});
+
+test('candidate full coverage and schedule validate against candidate tests rather than main inventory',()=>{
+ const f=growingInventory(),v=promoteFixture(valid());v.binding.source_attempt=1;v.jobs[0].steps.push({name:'Upload schema baseline',conclusion:'success'});
+ v.binding.coverage=coverageHash(acceptanceProfile,{manifest:f.manifest,inventory:f.inventory});
+ assert.notEqual(v.binding.coverage,coverageHash(acceptanceProfile));
+ v.binding.schedule=freezeSchedule(f.inventory.units);
+ assert(validateBinding({...v,candidateInventory:{manifest:f.manifest,inventory:f.inventory}}));
+ for(const mutate of [x=>x.binding.coverage=coverageHash(acceptanceProfile),x=>x.binding.schedule=freezeSchedule(buildInventory(repositoryRoot).units),x=>x.jobs.find(j=>j.name==='api-12').conclusion='skipped']){
+  const x=structuredClone(v);mutate(x);assert.throws(()=>validateBinding({...x,candidateInventory:{manifest:f.manifest,inventory:f.inventory}}));
+ }
+});
+
+test('test inventory extensions cannot remove old ownership or singleton isolation or change executable policy',async()=>{
+ for(const mutate of [
+  m=>m.suites.shift(),
+  m=>m.suites.find(s=>s.imports.length).imports.shift(),
+  m=>m.exclusive.shift(),
+  m=>m.version=2,
+  m=>m.dedicatedRunners=['new-regression'],
+  m=>m.suites.at(-1).path='../escape.mjs'
+ ]){
+  const f=growingInventory();mutate(f.manifest);
+  const content=Buffer.from(JSON.stringify(f.manifest)),sha=createHash('sha1').update(Buffer.concat([Buffer.from('blob '+content.length+'\0'),content])).digest('hex');
+  f.tree.find(e=>e.path==='apps/backend/scripts/ci/api-suites.json').sha=sha;f.blobs.set(sha,content);
+  try{assert.equal(await policyMatches(f.github,{},'BASE','CANDIDATE'),false);}catch(e){assert.match(e.message,/inventory|test|exclusive/i);}
+ }
+ for(const mutate of [p=>p.scripts.verify='true',p=>p.scripts['test:api']='node --test --test-concurrency=1 tests/new-regression.test.mjs',p=>p.scripts['test:api']+='; echo unsafe',p=>p.dependencies={unsafe:'1'}]){
+  const f=growingInventory();mutate(f.pkg);
+  const content=Buffer.from(JSON.stringify(f.pkg)),sha=createHash('sha1').update(Buffer.concat([Buffer.from('blob '+content.length+'\0'),content])).digest('hex');
+  f.tree.find(e=>e.path==='apps/backend/package.json').sha=sha;f.blobs.set(sha,content);
+  try{assert.equal(await policyMatches(f.github,{},'BASE','CANDIDATE'),false);}catch(e){assert.match(e.message,/test command/);}
+ }
+ const f=growingInventory();f.tree.find(e=>e.path.endsWith('/gate.mjs')).sha='changed';
+ assert.equal(await policyMatches(f.github,{},'BASE','CANDIDATE'),false);
+});
+
+test('trusted candidate inventory loader reads exact Git blobs as bounded data and rejects missing unsafe or incomplete sources',async()=>{
+ const {loadCandidateInventory}=await import('../scripts/ci/candidate-inventory.mjs');
+ const f=growingInventory();let downloads=0;const getBlob=f.github.rest.git.getBlob;
+ f.github.rest.git.getBlob=async a=>{downloads++;return getBlob(a);};
+ const loaded=await loadCandidateInventory(f.github,{},'TESTED_TREE');
+ const missing=[...new Set(f.tree.map(e=>e.sha))].filter(sha=>{try{execFileSync('git',['cat-file','-e',sha],{stdio:'ignore'});return false;}catch{return true;}}).length;
+ assert(downloads<=missing,'Unchanged Git objects should not be downloaded again');
+ assert.equal(loaded.inventory.units.length,f.inventory.units.length);
+ assert.equal(coverageHash(acceptanceProfile,loaded),coverageHash(acceptanceProfile,f));
+ for(const mutate of [
+  g=>{const raw=Buffer.from([255]),sha=createHash('sha1').update(Buffer.concat([Buffer.from('blob 1\0'),raw])).digest('hex');g.tree.at(-1).sha=sha;g.blobs.set(sha,raw);},
+  g=>g.tree.pop(),
+  g=>g.tree.at(-1).mode='120000',
+  g=>g.tree.at(-1).type='commit',
+  g=>g.tree.at(-1).sha='invalid-sha',
+  g=>g.github.rest.git.getTree=async()=>({data:{truncated:true,tree:g.tree}}),
+  g=>g.github.rest.git.getBlob=async()=>({data:{encoding:'base64',content:Buffer.from('forged').toString('base64')}}),
+  g=>g.github.rest.git.getBlob=async()=>({data:{encoding:'base64',content:'a'.repeat(6*1024*1024+1)}})
+ ]){const g=growingInventory();mutate(g);await assert.rejects(loadCandidateInventory(g.github,{},'TESTED_TREE',{localBlob:()=>null}));}
+});
+
+test('merge proof accepts a newly added test using exact candidate coverage and schedule without executing candidate code',async()=>{
+ for(const root of [false,true]){
+ const dir=mkdtempSync(join(tmpdir(),'ci-new-tests-'));
+ try{
+  const f=candidateProofFixture(dir),data=growingInventory({root});promoteFixture(f.v);
+  f.v.binding.source_attempt=1;f.v.jobs[0].steps.push({name:'Upload schema baseline',conclusion:'success'});
+  f.v.binding.coverage=coverageHash(acceptanceProfile,data);f.v.binding.schedule=freezeSchedule(data.inventory.units);
+  fs.writeFileSync(join(dir,'binding.json'),JSON.stringify(f.v.binding));execFileSync('zip',['-q',join(dir,'proof.zip'),'binding.json'],{cwd:dir});
+  const archive=fs.readFileSync(join(dir,'proof.zip')),download=f.github.rest.actions.downloadArtifact;
+  f.github.rest.actions.downloadArtifact=async a=>a.artifact_id===1?{data:archive}:download(a);
+  f.github.rest.git.getTree=a=>data.github.rest.git.getTree({...a,tree_sha:a.tree_sha==='B'?'BASE':a.tree_sha});
+  f.github.rest.git.getBlob=data.github.rest.git.getBlob;
+  assert.equal((await findCandidateProof(f.github,f.repo,f.pr,'full','T','B')).binding.coverage,f.v.binding.coverage);
+  const core={setOutput(){},summary:{addRaw(){return this;},async write(){}}};
+  assert.equal((await verifyMerged(f.github,{repo:f.repo,sha:'A',runId:6},core)).coverage,f.v.binding.coverage);
+ }finally{rmSync(dir,{recursive:true,force:true});}
+ }
 });

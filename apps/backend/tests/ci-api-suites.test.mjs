@@ -1,3 +1,4 @@
+import {historicalApiUnitIds,declaredApiUnitIds} from './ci-fixtures.mjs';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
@@ -31,7 +32,7 @@ test('all completed process samples are required, including SQL-only units',()=>
  const samples={},jobs=schedule.plan.map(b=>({id:b.shard+100,name:'clean / api-'+b.shard}));
  for(const b of schedule.plan)samples['api-'+b.shard]={role:'api-'+b.shard,run_id:4,attempt:1,head:binding.head,merge:binding.merge,schedule:schedule.sha256,units:b.units.map(id=>({id,sha256:schedule.units[id].sha256,seconds:2,exit_code:0}))};
  const reference=measuredReference(binding,jobs,samples);
- assert.equal(Object.keys(reference.units).length,98);
+ assert.deepEqual(Object.keys(reference.units).sort(),units.map(u=>u.id).sort());
  assert(reference.units['canonical-settings-migration-acceptance']);
  const frozen=freezeSchedule(units,reference);assert(Object.values(frozen.units).every(u=>u.origin==='previous-success'&&u.seconds===2));
  for(const mutate of [x=>x['api-12'].units.pop(),x=>x['api-1'].attempt=3,x=>x['api-1'].run_id=5,x=>x['api-1'].schedule='other',x=>x['api-1'].units[0].sha256='other',x=>x['api-1'].units[0].seconds=0,x=>x['api-1'].units[0].exit_code=1]){
@@ -106,11 +107,11 @@ test('production inventory owns every original line and import once and compiles
   // One representative replaces the original unit; other behaviors add capacity.
   for(const id of parts.slice(1))added.add(id);
  }
- assert.equal(inventory.units.length,64+added.size);
+ assert.deepEqual(inventory.units.map(u=>u.id).sort(),declaredApiUnitIds().sort());
  for(const id of added)assert(inventory.units.some(u=>u.id===id),'Missing new acceptance unit '+id);
  // Keep 64 original units/representatives and their eight-shard invariant.
  {
-  const inventory={units:buildInventory(repositoryRoot).units.filter(u=>!added.has(u.id))};
+  const inventory={units:buildInventory(repositoryRoot).units.filter(u=>historicalApiUnitIds.includes(u.id))};
   const bins=partition(inventory.units);
  assert.equal(bins.length,8);assert.equal(inventory.units.length,64);
  }

@@ -10,7 +10,7 @@ import {buildInventory,partition,materialize,executionPhases} from '../scripts/c
 
 test('experimental inventory covers every original byte and every imported acceptance exactly once',()=>{
  const inventory=buildInventory(repositoryRoot);
- assert.equal(inventory.originals,15);
+ assert.equal(inventory.originals,JSON.parse(fs.readFileSync(new URL('../scripts/ci/api-suites.json',import.meta.url))).suites.length);
  assert(inventory.splitOriginals>=9);
  assert(inventory.units.length>30);
  assert.equal(new Set(inventory.units.map(u=>u.id)).size,inventory.units.length);

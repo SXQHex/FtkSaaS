@@ -15,7 +15,8 @@
         "apps/backend/tests/p06-acceptance.mjs",
         "apps/backend/tests/invitation-delivery-acceptance.mjs",
         "apps/backend/tests/ci-experiment-checks.mjs",
-        "apps/backend/tests/ci-api-suites.test.mjs"
+        "apps/backend/tests/ci-api-suites.test.mjs",
+        "apps/backend/tests/deployment-cli-unit.mjs"
       ],
       "sources": [
         "apps/backend/database/canonical-settings-scope.sql",
@@ -89,6 +90,7 @@
         "apps/backend/scripts/check-migrations.py",
         "apps/backend/scripts/ci/api-suites.json",
         "apps/backend/scripts/ci/api-suites.mjs",
+        "apps/backend/scripts/ci/candidate-inventory.mjs",
         "apps/backend/scripts/ci/check-quality.mjs",
         "apps/backend/scripts/ci/cleanup.mjs",
         "apps/backend/scripts/ci/collect.mjs",
@@ -281,8 +283,8 @@
         "management_state_get_v1"
       ],
       "review": {
-        "fingerprint": "99e472e820ace7cd6a947efdf6c1ab69b6fce5375e67c955462e985f1dbe00aa",
-        "reason": "Güncel main kabulü korunarak Supabase CD kaynak seçimi ve testleri incelendi; sayfalı son başarılı teslimden Supabase ağaç farkı filtrelenir, WF00 istemci protokolü korunur."
+        "fingerprint": "d9a314aab02973f69544c25b496f853784e31eef3b1f8b0a65801c4f364f6cdd",
+        "reason": "Güncel main CLI v3 tanı kaynakları korunarak PR201 teslim filtresi ve PR203 aday test envanteri/kök genişlemesi birlikte incelendi; tüm kaynak/run/attempt ve eski test sahipliği/exclusive kontrolleri korunur."
       }
     },
     {
