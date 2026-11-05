@@ -6761,6 +6761,42 @@ kind: Text
 payload: NotificationPayload
 created_at: Instant
 read_at: (Instant | null)
+/**
+ * Optional own-recipient transactional delivery status, read only via the notification inbox. Job success is provider acceptance; email_delivery is separate evidence.
+ */
+email_job?: (JobStatusView | null)
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "JobStatusView".
+ */
+export interface JobStatusView {
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+id: string
+state: JobState
+progress_count: Count
+total_count: (Count | null)
+result_reference: (EntityRef | null)
+safe_error_code: (Text | null)
+privacy?: PrivacyProgress
+/**
+ * Optional invitation email delivery evidence. Job succeeded means provider acceptance; delivered means recipient mail-server acceptance, not inbox placement or reading. Terminal adverse evidence wins over earlier/later delivery events. Null until the job owns a provider reference.
+ */
+email_delivery?: ({
+state: ("accepted" | "delayed" | "delivered" | "bounced" | "complained" | "failed")
+occurred_at: (string | null)
+} | null)
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "PrivacyProgress".
+ */
+export interface PrivacyProgress {
+request_state: PrivacyState
+completed_at: (Instant | null)
+pending_scopes: ("database" | "auth" | "storage" | "exports" | "backups")[]
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -7188,38 +7224,6 @@ result_reference: (EntityRef | null)
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
- * via the `definition` "JobStatusView".
- */
-export interface JobStatusView {
-/**
- * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
- */
-id: string
-state: JobState
-progress_count: Count
-total_count: (Count | null)
-result_reference: (EntityRef | null)
-safe_error_code: (Text | null)
-privacy?: PrivacyProgress
-/**
- * Optional invitation email delivery evidence. Job succeeded means provider acceptance; delivered means recipient mail-server acceptance, not inbox placement or reading. Terminal adverse evidence wins over earlier/later delivery events. Null until the job owns a provider reference.
- */
-email_delivery?: ({
-state: ("accepted" | "delayed" | "delivered" | "bounced" | "complained" | "failed")
-occurred_at: (string | null)
-} | null)
-}
-/**
- * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
- * via the `definition` "PrivacyProgress".
- */
-export interface PrivacyProgress {
-request_state: PrivacyState
-completed_at: (Instant | null)
-pending_scopes: ("database" | "auth" | "storage" | "exports" | "backups")[]
-}
-/**
- * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
  * via the `definition` "AuditView".
  */
 export interface AuditView {
@@ -7412,6 +7416,11 @@ export interface Page_NotificationView {
 items: NotificationView[]
 next_cursor?: (OpaqueToken | null)
 as_of: Instant
+email_preference?: {
+enabled: boolean
+version: PositiveInt
+available: boolean
+}
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema

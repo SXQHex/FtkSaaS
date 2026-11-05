@@ -1,4 +1,5 @@
 {
+  "20261105150001_transactional_notification_email.sql": "8771d001fb86eaa673fe1ebbc41f444de9c184da2562cb16ff2407df74de9d36",
   "20261105150000_email_delivery_events.sql": "c2bf9cbe60885dc70b3336534ce0688ce6c9c452f38281dfeee8c3377ed4e275",
   "20261015152146_discipline_uuidv7_baseline.sql": "4b6353fa9c5052f8fe597edce6f0b81ff2d8320c60822dae24e2044241504874",
   "20261015153414_discipline_reference_integrity.sql": "d5d08b67b29c07838941d5abd88fd7567aaf5ec204b7ac73688eae61a42e9da5",

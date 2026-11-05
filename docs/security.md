@@ -1,6 +1,6 @@
 # Güvenlik kaynak referansı
 
-Üretilmiştir: `node apps/backend/scripts/update-docs.mjs --write`. Elle düzenleme. Kaynak içerik özeti: `f8bb8f8b4ada1f69c5a74648594dc18542ded2eaa018153c636eaae681f40bfc`. Bu özet CI/hosted kabulü değildir; dağıtılan SHA ve ortam CD artifact'ında bulunur.
+Üretilmiştir: `node apps/backend/scripts/update-docs.mjs --write`. Elle düzenleme. Kaynak içerik özeti: `8279c7b356c3443aa2c1e4966b6acfc22bed50a990801dad465d5ebb8576a831`. Bu özet CI/hosted kabulü değildir; dağıtılan SHA ve ortam CD artifact'ında bulunur.
 
 İnsan istemci native Auth → JWT doğrulanan Edge → service-only RPC yolunu kullanır. Canlı oturum/MFA/tenant/rol/plan kontrolü tekrar denetlenir; core/private erişimi istemciye açılmaz. Worker ve public credential transport ayrı yetki yollarıdır. RLS tek başına Edge iş yetkisi değildir. [İstemci değişmezleri](client-integration.md), [teknik sözleşme](contracts/02-FtkSaaS-teknik-sozlesme.md) ve [iş akışları](workflows.md#wf00) normatif ayrıntıyı taşır.
 
@@ -124,7 +124,7 @@ Aşağıdaki liste güvenlik DDL içeren kaynak dosyalarıdır; son policy/grant
 | [room-and-role-registry-wrappers.sql](../apps/backend/database/room-and-role-registry-wrappers.sql) | `74d64f1fe3e2b5d5024a45f2f280449f1171a55fe3f2e006bd05766c7786d69e` |
 | [room-and-role-registry.sql](../apps/backend/database/room-and-role-registry.sql) | `459c399404c06bd4d2eb81556a1496639f5a73fcde0288f7f7a6d8f544bca780` |
 | [runtime-read-projection.sql](../apps/backend/database/runtime-read-projection.sql) | `3e2f98633b4f9e879ccee43df2fb622a028e8fa0827ba0a60a34fe20939c1357` |
-| [runtime-wrappers-current.sql](../apps/backend/database/runtime-wrappers-current.sql) | `32b240749d540b1cfc3b2761fe10971d40719bcd0f59dcbd44392c5a24609da0` |
+| [runtime-wrappers-current.sql](../apps/backend/database/runtime-wrappers-current.sql) | `8b51d32b71b0814848737069894b17b16aff282dd7dad77e2309286b510df6ca` |
 | [runtime-wrappers.sql](../apps/backend/database/runtime-wrappers.sql) | `5b6289b205052a72b7049f54c124bc8c3d454426801ce62895a1bc9b82f66771` |
 | [runtime.sql](../apps/backend/database/runtime.sql) | `a6604816aadf0a2005b2c99f222b34ba10828de80a535d525eef0af5a62d07dd` |
 | [schedule-reads-wrappers.sql](../apps/backend/database/schedule-reads-wrappers.sql) | `12b3a79f852e099bde79aaa2bf7e23656463645b4886eb56ab4e3fb7f52b5fbf` |
@@ -155,6 +155,7 @@ Aşağıdaki liste güvenlik DDL içeren kaynak dosyalarıdır; son policy/grant
 | [studio-management-reads.sql](../apps/backend/database/studio-management-reads.sql) | `09ab1ed05f7e7b50f50b8ff484bc2c6027c5588978465826b64e3d752fc43445` |
 | [subscriber-numbers.sql](../apps/backend/database/subscriber-numbers.sql) | `52684678ed0a4dc4356d9b538c6073323e7d700465e342aeb5613830a3976eb6` |
 | [subscription-period-change.sql](../apps/backend/database/subscription-period-change.sql) | `44642e971242c9927b976d55407ffe80d71b852ccfaae7475602d6ddd889461d` |
+| [transactional-email.sql](../apps/backend/database/transactional-email.sql) | `8771d001fb86eaa673fe1ebbc41f444de9c184da2562cb16ff2407df74de9d36` |
 | [user-settings-context.sql](../apps/backend/database/user-settings-context.sql) | `5e8db303c5e326ca40e18a7dd232b4c27cbbf4007eef0dcbbf987ac95784f183` |
 | [wrappers.sql](../apps/backend/database/wrappers.sql) | `ff1b4e487ff5aba58483f7f1e2c8c6a3412ab4fd6d3916e51caa5fd6c766b592` |
 | [invitation-cron-install.sql](../apps/backend/scripts/invitation-cron-install.sql) | `44f8a1915d5c645ddcffc181ca15051493bdf47e95bc0ff54e8bf95426e96090` |
@@ -252,3 +253,4 @@ Aşağıdaki liste güvenlik DDL içeren kaynak dosyalarıdır; son policy/grant
 | [20261105055000_crm_provider_health.sql](../apps/backend/supabase/migrations/20261105055000_crm_provider_health.sql) | `f05445ab1d121bd21e23618246e8ad6389cedcbd54ec5c5c484c4cb721f1d5cc` |
 | [20261105080000_crm_legacy_import.sql](../apps/backend/supabase/migrations/20261105080000_crm_legacy_import.sql) | `cc7418d3f4d295cce8962f2cf61427a9a2c8f0769608379d25875add29421719` |
 | [20261105150000_email_delivery_events.sql](../apps/backend/supabase/migrations/20261105150000_email_delivery_events.sql) | `c2bf9cbe60885dc70b3336534ce0688ce6c9c452f38281dfeee8c3377ed4e275` |
+| [20261105150001_transactional_notification_email.sql](../apps/backend/supabase/migrations/20261105150001_transactional_notification_email.sql) | `8771d001fb86eaa673fe1ebbc41f444de9c184da2562cb16ff2407df74de9d36` |

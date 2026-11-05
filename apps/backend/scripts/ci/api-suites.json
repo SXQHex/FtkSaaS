@@ -669,31 +669,31 @@
     },
     {
       "path": "apps/backend/tests/registry.test.mjs",
-      "sha256": "977321db895258cc0051dadf584ca287ab530342dc4c119d4cacf0dbdc1a0d4f",
+      "sha256": "97d395e67988a86cccd99e090be74755d36a54d9b8ddedfc69d7fd3b10defdbd",
       "shared": [
         [
-          5,
-          5
+          6,
+          6
         ],
         [
-          10,
-          15
+          11,
+          16
         ],
         [
-          129,
-          129
+          130,
+          130
         ],
         [
-          135,
-          135
+          136,
+          136
         ],
         [
-          137,
-          137
+          138,
+          138
         ],
         [
-          139,
-          139
+          140,
+          140
         ]
       ],
       "parts": [
@@ -701,8 +701,8 @@
           "id": "registry-root-1",
           "ranges": [
             [
-              16,
-              128
+              17,
+              129
             ]
           ]
         }
@@ -710,21 +710,26 @@
       "imports": [
         {
           "line": 1,
+          "path": "apps/backend/tests/transactional-email-acceptance.mjs",
+          "sha256": "ee049912f6bc0dc9e9d27a2c94a0bddd29667320ed11bc41707b48fc5b961e56"
+        },
+        {
+          "line": 2,
           "path": "apps/backend/tests/commercial-plan-acceptance.mjs",
           "sha256": "dda8dfa2da7b4f1847830a3b3513d7b36a9ab4a07cd25676433eb23866d568f8"
         },
         {
-          "line": 2,
+          "line": 3,
           "path": "apps/backend/tests/subscription-period-acceptance.mjs",
           "sha256": "dfb6779769c432c242ca9522aa7ad97cc0deb2e357b477734f91acbf9f64e322"
         },
         {
-          "line": 3,
+          "line": 4,
           "path": "apps/backend/tests/starter-document-acceptance.mjs",
           "sha256": "2c269e74392c3855c747d468b31aea7b37b6717155bcf7e9d0bfd7ed4e73ac18"
         },
         {
-          "line": 4,
+          "line": 5,
           "path": "apps/backend/tests/frontend-settings-acceptance.mjs",
           "sha256": "3cdaf5dca3a267da74a9329c89db67a83c87029536644ad30e0f4301ee563a34",
           "shared": [
@@ -793,17 +798,17 @@
           ]
         },
         {
-          "line": 6,
+          "line": 7,
           "path": "apps/backend/tests/p05-acceptance.mjs",
           "sha256": "30bacb89320b514fa3641eb1574a5c1b9cf2e746d75c7227643467d816a8091c"
         },
         {
-          "line": 7,
+          "line": 8,
           "path": "apps/backend/tests/p06-acceptance.mjs",
           "sha256": "df7b3040cce7bd6291cd8caa28806e76b301997ceced52d28e8518add9fbf242"
         },
         {
-          "line": 8,
+          "line": 9,
           "path": "apps/backend/tests/starter-operations-acceptance.mjs",
           "sha256": "9eba90c529f4cda60ad56ab9254f5dde38bb4edf9bb35bf1726faddb65d78737",
           "shared": [
@@ -870,37 +875,37 @@
           ]
         },
         {
-          "line": 9,
+          "line": 10,
           "path": "apps/backend/tests/canonical-settings-migration-acceptance.mjs",
           "sha256": "923be16ae737f6ee56fb1febc42618d4bafac41ff8b2a88d2d268b4cb69c1acb"
         },
         {
-          "line": 130,
+          "line": 131,
           "path": "apps/backend/tests/ops-hosted-acceptance.mjs",
           "sha256": "a170349e1e3ef4c3cc3b4e6bce4f44507fd0042ce410700822a5b48e38fbe676"
         },
         {
-          "line": 131,
+          "line": 132,
           "path": "apps/backend/tests/p07-account-revocation-acceptance.mjs",
           "sha256": "e755d94ebd85f355bb4e0c279b295e65a1ea6dacddfa296c6ccc2f0f53c2c05e"
         },
         {
-          "line": 132,
+          "line": 133,
           "path": "apps/backend/tests/p07-account-profile-merge-acceptance.mjs",
           "sha256": "a30965646b9012c3b400e9c1c0b1d8556a56a90127a150f44841336d09b7b39c"
         },
         {
-          "line": 133,
+          "line": 134,
           "path": "apps/backend/tests/p07-subscription-lifecycle-acceptance.mjs",
           "sha256": "08cab358e5d1834b26196ba6c5cbc6c1c3d1a3739488f58b9c1580685b2c2831"
         },
         {
-          "line": 134,
+          "line": 135,
           "path": "apps/backend/tests/p07-lifecycle-acceptance.mjs",
           "sha256": "86e84e20ba3be770247174a6cc1a5054d8e406f20f0b17f5db2f9d6eee05481e"
         },
         {
-          "line": 136,
+          "line": 137,
           "path": "apps/backend/tests/starter-plan-gates-acceptance.mjs",
           "sha256": "d3d05ce84d70c457f0c5ba69c741752d50eaf90464f7bebbc81d9146fdb00de2",
           "shared": [
@@ -935,27 +940,27 @@
           ]
         },
         {
-          "line": 138,
+          "line": 139,
           "path": "apps/backend/tests/starter-studio-acceptance.mjs",
           "sha256": "f9b6646b79b69b30007ac0f5d408b09f7119977fd902af84822299ed1341a1f3"
         },
         {
-          "line": 140,
+          "line": 141,
           "path": "apps/backend/tests/document-self-requirements-acceptance.mjs",
           "sha256": "c71d21409d151be93f6867a476828e412c7a6935f106a5220eb4a58f2f2dca05"
         },
         {
-          "line": 141,
+          "line": 142,
           "path": "apps/backend/tests/crm-application-intake-acceptance.mjs",
           "sha256": "ea64788526db258f1a30e9ec01e61b90c57da4d66570d787e1472c96b8a4acb7"
         },
         {
-          "line": 142,
+          "line": 143,
           "path": "apps/backend/tests/crm-application-review-acceptance.mjs",
           "sha256": "999f1ebeb3233cfd71e85b59c50081d6af87ce0a8df60e05e467ae8451c0800c"
         },
         {
-          "line": 143,
+          "line": 144,
           "path": "apps/backend/tests/crm-provider-intake-acceptance.mjs",
           "sha256": "c54e0810890a76848c6e829630b4debb1c172e74707a45ad8662368c18f8aab8",
           "shared": [
@@ -986,32 +991,32 @@
           ]
         },
         {
-          "line": 144,
+          "line": 145,
           "path": "apps/backend/tests/crm-provider-webhook-acceptance.mjs",
           "sha256": "44518d5b6bc6b7fceac9fa29985cfd8f755cd14a635fdc0551d20201ff58cc32"
         },
         {
-          "line": 145,
+          "line": 146,
           "path": "apps/backend/tests/crm-meta-queue-acceptance.mjs",
           "sha256": "b51c9068c8b2f35270d3a59f5424232969cd79c4ee953a50679e9ce7ed16dcbe"
         },
         {
-          "line": 146,
+          "line": 147,
           "path": "apps/backend/tests/crm-meta-queue-authority-acceptance.mjs",
           "sha256": "e4793fd5442a5c5dc29c3aa2b4036852a442f405f7b7cbab1ea71724931a14d6"
         },
         {
-          "line": 147,
+          "line": 148,
           "path": "apps/backend/tests/crm-provider-host-acceptance.mjs",
           "sha256": "b0742d774364a2274bd279e79c0729538c77f3c535197c701d8ee1a85e6b93a0"
         },
         {
-          "line": 148,
+          "line": 149,
           "path": "apps/backend/tests/crm-import-acceptance.mjs",
           "sha256": "c978928caebc3e8a339f75eca00a24416e8fabc7f4086de02eea75516a80a487"
         },
         {
-          "line": 149,
+          "line": 150,
           "path": "apps/backend/tests/crm-import-authority-acceptance.mjs",
           "sha256": "20a0ab62a84af439b432a4cc6318484771f9c915ed136c0c9885124e8d1c3424"
         }

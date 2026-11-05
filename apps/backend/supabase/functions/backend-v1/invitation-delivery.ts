@@ -1,3 +1,4 @@
+import {deliverTransactionalEmail} from './transactional-email.ts';
 import {sendEmail} from './email-provider.ts';
 type Env=(name:string)=>string|undefined;
 type Fetch=typeof fetch;
@@ -40,6 +41,7 @@ export async function invitationTick(req:Request,env:Env,send:Fetch=fetch,now=Da
    if(!res.ok){await res.arrayBuffer();throw Error('DELIVERY_RPC_UNAVAILABLE');}return res.json();
   };
   const claimed=await rpc(request,{invitation_phase:'claim'}),item=claimed._internal_invitation;
+  if(claimed._internal_email)return reply(200,await deliverTransactionalEmail(claimed._internal_email,request.request_id,rpc,send));
   if(item===null)return reply(200,{claimed:0});
   if(!validClaim(item))return reply(503,{error:'TEMPORARY_FAILURE'});
   const command={request_id:request.request_id,job_id:item.job_id,org_id:item.org_id,lease_token:item.lease_token};

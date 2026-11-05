@@ -284,8 +284,8 @@
         "management_state_get_v1"
       ],
       "review": {
-        "fingerprint": "b6fceae9c4ca0d45b2e65baa8559b77ca4837a8f5bb923d0f8acc8e58f6ccf7c",
-        "reason": "Reviewed exact contract/type/catalog updates, handler admission and sole outbox wrapper diff. Routine invitation test source hash refreshed without changing ownership, ranges, budgets or CI policy."
+        "fingerprint": "824760998be52513fdfc5b4cf3a5c5ba54213733b76dc63b69495d049fc1afc1",
+        "reason": "Reviewed generated optional inbox DTOs, sole internal outbox wrapper extension, isolated native source import with shifted identical old ownership and exact source hashes. No CI policy or human Auth change."
       }
     },
     {
@@ -361,8 +361,8 @@
         "account_signup_check_v1"
       ],
       "review": {
-        "fingerprint": "f5665e07fe79b7b28b83fa9513311f1008cf73fc0f886f329c23aba1d7bdac86",
-        "reason": "Native account and invitation acceptance unchanged; reviewed signed handler→service RPC integration, provider metadata persistence and live job scope assertions."
+        "fingerprint": "54e3042c641409870340876bd98195744bfb7d118b163d9bcebf97c07d72469b",
+        "reason": "Reviewed common runtime wrapper diff: only service-internal outbox email_phase changes; WF01 entrypoints remain byte-identical. Explicit opt-in external notices do not alter domain commit, scope, plan or existing guide semantics."
       }
     },
     {
@@ -460,8 +460,8 @@
         "role_revoke_preview_v1"
       ],
       "review": {
-        "fingerprint": "2fe3e0c6e42b2fc85ec0414a9a0a749a1517a985c455d9913325a87bea3933dc",
-        "reason": "Reviewed shared runtime wrapper diff: only outbox_deliver service-internal email_event branch changed; all entrypoints owned by WF02 are byte-identical. Existing Stüdyo kurulumu ve yetki guide and runtime behavior remain correct."
+        "fingerprint": "14f9e0f4eba0c3ed1b694669ab380c3a5ff5d5af2f7ec099884401ded319ada0",
+        "reason": "Reviewed common runtime wrapper diff: only service-internal outbox email_phase changes; WF02 entrypoints remain byte-identical. Explicit opt-in external notices do not alter domain commit, scope, plan or existing guide semantics."
       }
     },
     {
@@ -556,8 +556,8 @@
         "class_assignment_set_v1"
       ],
       "review": {
-        "fingerprint": "60726b238a3aeadab2d5afad146c0e43186c74843e1dd1a42b9456bf9a7a8b6c",
-        "reason": "Reviewed shared runtime wrapper diff: only outbox_deliver service-internal email_event branch changed; all entrypoints owned by WF03 are byte-identical. Existing Program ve seans yaşam döngüsü guide and runtime behavior remain correct."
+        "fingerprint": "03441f3691b4393b841d4c4a0a7bf2f68e3c4b4b8d13c09087e07da2d5009788",
+        "reason": "Reviewed common runtime wrapper diff: only service-internal outbox email_phase changes; WF03 entrypoints remain byte-identical. Explicit opt-in external notices do not alter domain commit, scope, plan or existing guide semantics."
       }
     },
     {
@@ -643,8 +643,8 @@
         "person_discipline_set_v1"
       ],
       "review": {
-        "fingerprint": "e05a81e456498bf8a01780065e28d47ae8fd5cb9a3dd1cdc46cebceff2cf60bf",
-        "reason": "Invitation binding and permission paths unchanged; reviewed additive delivery evidence tests using existing invitation fixture and worker finish."
+        "fingerprint": "cb0300b584e8384918478359ece142a6f08181303b721db3ca4bd7ddaa394a54",
+        "reason": "Reviewed common runtime wrapper diff: only service-internal outbox email_phase changes; WF04 entrypoints remain byte-identical. Explicit opt-in external notices do not alter domain commit, scope, plan or existing guide semantics."
       }
     },
     {
@@ -737,8 +737,8 @@
         "negative_limits_get_v1"
       ],
       "review": {
-        "fingerprint": "6077649bb6abce8fcb9f2946b331ceb431fedd99b90b7b28d9a589769b24e394",
-        "reason": "Reviewed shared runtime wrapper diff: only outbox_deliver service-internal email_event branch changed; all entrypoints owned by WF05 are byte-identical. Existing Ürün, satış ve hak guide and runtime behavior remain correct."
+        "fingerprint": "4e17b4180391227ba2ac5e3f62fe7dc11e8f84dd78ffadbe06d14e95d89577d5",
+        "reason": "Reviewed XREQ020 normal sale preview/apply and Starter/sale-lifecycle/document sources: real effects gap confirmed, recorded as open S09; no financial runtime change. Outbox email does not change sale commit."
       }
     },
     {
@@ -815,8 +815,8 @@
         "reservation_capacity_override_v1"
       ],
       "review": {
-        "fingerprint": "7d0af6792b42d91bef728a1fb026432ac08ef7f604c5f05ad6a13f12266f7d10",
-        "reason": "Reviewed shared runtime wrapper diff: only outbox_deliver service-internal email_event branch changed; all entrypoints owned by WF06 are byte-identical. Existing Rezervasyon ve özel ders talebi guide and runtime behavior remain correct."
+        "fingerprint": "fcf20dbcb3cb105d1dce9a608b69e2efee4b9bdf261937daaf62117b147b5d4a",
+        "reason": "Reviewed common runtime wrapper diff: only service-internal outbox email_phase changes; WF06 entrypoints remain byte-identical. Explicit opt-in external notices do not alter domain commit, scope, plan or existing guide semantics."
       }
     },
     {
@@ -878,8 +878,8 @@
         "attendance_start_v1"
       ],
       "review": {
-        "fingerprint": "d52cd8fa4332c137dc5156e50531477141a2bc73b2bde312a21061899c5485fc",
-        "reason": "Reviewed shared runtime wrapper diff: only outbox_deliver service-internal email_event branch changed; all entrypoints owned by WF07 are byte-identical. Existing Yoklama ve hak tüketimi guide and runtime behavior remain correct."
+        "fingerprint": "9d4ca3891e5f968dfcdca0b891a95376a42bb970102a7a42aeee285862a7595d",
+        "reason": "Reviewed common runtime wrapper diff: only service-internal outbox email_phase changes; WF07 entrypoints remain byte-identical. Explicit opt-in external notices do not alter domain commit, scope, plan or existing guide semantics."
       }
     },
     {
@@ -938,8 +938,8 @@
         "debt_adjust_v1"
       ],
       "review": {
-        "fingerprint": "5b89ddcd85245f856d02a04e9c74a51681ad33ed8d96f22057828bb71e0e64ea",
-        "reason": "Reviewed shared runtime wrapper diff: only outbox_deliver service-internal email_event branch changed; all entrypoints owned by WF08 are byte-identical. Existing Borç, tahsilat ve öğrenci alacağı guide and runtime behavior remain correct."
+        "fingerprint": "4ef72956f574e6303f30b07166852f31cf6990a1f0a03eb161502955a0603ec4",
+        "reason": "Reviewed common runtime wrapper diff: only service-internal outbox email_phase changes; WF08 entrypoints remain byte-identical. Explicit opt-in external notices do not alter domain commit, scope, plan or existing guide semantics."
       }
     },
     {
@@ -1023,8 +1023,8 @@
         "calendar_feed_get_v1"
       ],
       "review": {
-        "fingerprint": "6462278d4228d279b670f1b64663cb695a78a2080bac6237587e5b92b5eb763d",
-        "reason": "Reviewed shared runtime wrapper diff: only outbox_deliver service-internal email_event branch changed; all entrypoints owned by WF09 are byte-identical. Existing Public başvuru ve kişisel takvim guide and runtime behavior remain correct."
+        "fingerprint": "30be02a669aa0f5739799d9905b4bd61a485ad9c3907a06d76bd9bb05955b35e",
+        "reason": "Reviewed common runtime wrapper diff: only service-internal outbox email_phase changes; WF09 entrypoints remain byte-identical. Explicit opt-in external notices do not alter domain commit, scope, plan or existing guide semantics."
       }
     },
     {
@@ -1069,8 +1069,8 @@
         "file_upload_complete_v1"
       ],
       "review": {
-        "fingerprint": "e3d56c8d840704a3418cc1cfdddb0bd9839809385a86ea188d0eb8e3b89da435",
-        "reason": "Reviewed shared runtime wrapper diff: only outbox_deliver service-internal email_event branch changed; all entrypoints owned by WF10 are byte-identical. Existing Rapor ve import guide and runtime behavior remain correct."
+        "fingerprint": "dab3612d8964ccf92b1c39a553ea065d2f664dee65d7f85472d5e675989ee0a2",
+        "reason": "Reviewed common runtime wrapper diff: only service-internal outbox email_phase changes; WF10 entrypoints remain byte-identical. Explicit opt-in external notices do not alter domain commit, scope, plan or existing guide semantics."
       }
     },
     {
@@ -1114,8 +1114,8 @@
         "document_publication_preview_v1"
       ],
       "review": {
-        "fingerprint": "193e3875b6b3f359c4780b117f5e95ac80c30d9565b707cde9e1733f5c3982e7",
-        "reason": "Reviewed job_status_get optional email_delivery: current invitation authorization and queue success semantics preserved; signed events expose mail-server delivery separately. Other notification/document/reminder paths unchanged."
+        "fingerprint": "ba3dccddd3f67034b19c5d630a81cb387636e885ca2eaae1656f71d75798c5ec",
+        "reason": "Reviewed opt-in email/transactional only, optional recipient-scoped email_job/preference projections and configured current-plan availability. In_app mandatory, reminder/marketing/digest unchanged."
       }
     },
     {
@@ -1166,8 +1166,8 @@
         "settings_preparation_resolve_v1"
       ],
       "review": {
-        "fingerprint": "358862e1914aff64b568a0e8b30395c048e85dfb5db0822074a6fb47eb4124e3",
-        "reason": "Reviewed shared runtime wrapper diff: only outbox_deliver service-internal email_event branch changed; all entrypoints owned by WF12 are byte-identical. Existing Ayarlar ve medya guide and runtime behavior remain correct."
+        "fingerprint": "12017481f72b660f2093536bf284d48d20eff69d2ac5a690366438321b2770fe",
+        "reason": "Reviewed common runtime wrapper diff: only service-internal outbox email_phase changes; WF12 entrypoints remain byte-identical. Explicit opt-in external notices do not alter domain commit, scope, plan or existing guide semantics."
       }
     },
     {
@@ -1235,8 +1235,8 @@
         "subscription_period_change_request_v1"
       ],
       "review": {
-        "fingerprint": "bc0bf30c3bc20316c6baba15f1e3b6cd9266168dd2ace5da6187bc560a232334",
-        "reason": "Reviewed shared runtime wrapper diff: only outbox_deliver service-internal email_event branch changed; all entrypoints owned by WF13 are byte-identical. Existing Abonelik ve plan erişimi guide and runtime behavior remain correct."
+        "fingerprint": "0a6e3edea827a9117847f0341bfc1a9c13fcf89230a623ff61409a5f8bcafc7d",
+        "reason": "Reviewed common runtime wrapper diff: only service-internal outbox email_phase changes; WF13 entrypoints remain byte-identical. Explicit opt-in external notices do not alter domain commit, scope, plan or existing guide semantics."
       }
     },
     {
@@ -1275,8 +1275,8 @@
         "instructor_agreements_list_v1"
       ],
       "review": {
-        "fingerprint": "57fb34cd8877d00bd751de356039ee24e78e51a70a095f570e55cc3405dc3d79",
-        "reason": "Reviewed shared runtime wrapper diff: only outbox_deliver service-internal email_event branch changed; all entrypoints owned by WF14 are byte-identical. Existing Anlaşma, hakediş ve eğitmen ödemesi guide and runtime behavior remain correct."
+        "fingerprint": "5a975ccac981ffdd4b5d7b26ba887b08ba15b95f07a22ce5c701067cc8a4f3f3",
+        "reason": "Reviewed common runtime wrapper diff: only service-internal outbox email_phase changes; WF14 entrypoints remain byte-identical. Explicit opt-in external notices do not alter domain commit, scope, plan or existing guide semantics."
       }
     },
     {
@@ -1345,8 +1345,8 @@
         "event_actual_start_correct_v1"
       ],
       "review": {
-        "fingerprint": "6a946c2004bd2fdea495e07b115868837823965d59ca6a54a15e3f7456dfedcc",
-        "reason": "Reviewed shared runtime wrapper diff: only outbox_deliver service-internal email_event branch changed; all entrypoints owned by WF15 are byte-identical. Existing Etkinlik kayıt, ödeme ve iptal guide and runtime behavior remain correct."
+        "fingerprint": "9805208cfa45ca3c88fc1cef386e862c283529e0f52f177317bf222ca032d4f3",
+        "reason": "Reviewed common runtime wrapper diff: only service-internal outbox email_phase changes; WF15 entrypoints remain byte-identical. Explicit opt-in external notices do not alter domain commit, scope, plan or existing guide semantics."
       }
     },
     {
@@ -1396,8 +1396,8 @@
         "automation_save_v1"
       ],
       "review": {
-        "fingerprint": "dccc6f2eb7598d44b970c7c89ca73c7ae359ffe507656e1fb72fe3580687ddac",
-        "reason": "Reviewed shared runtime wrapper diff: only outbox_deliver service-internal email_event branch changed; all entrypoints owned by WF16 are byte-identical. Existing Temel aday takibi, genel CRM ve otomasyon guide and runtime behavior remain correct."
+        "fingerprint": "4480d394370cc4d8da4a5cf44594a8cc745721d0514fd22f53ad1146bcf89340",
+        "reason": "Reviewed common runtime wrapper diff: only service-internal outbox email_phase changes; WF16 entrypoints remain byte-identical. Explicit opt-in external notices do not alter domain commit, scope, plan or existing guide semantics."
       }
     },
     {
@@ -1468,8 +1468,8 @@
         "platform_owner_remove_v1"
       ],
       "review": {
-        "fingerprint": "d3089046566868fb70813330a9a793e83af5ae9ed0867a8a2f85a0bbdba92eaa",
-        "reason": "Reviewed shared runtime wrapper diff: only outbox_deliver service-internal email_event branch changed; all entrypoints owned by WF17 are byte-identical. Existing Kapatma, silme ve platform yönetimi guide and runtime behavior remain correct."
+        "fingerprint": "232fabc28d00565e8cedf0e8da4fc85b346236e5b4dd93d6bb0fd18a8c418726",
+        "reason": "Reviewed common runtime wrapper diff: only service-internal outbox email_phase changes; WF17 entrypoints remain byte-identical. Explicit opt-in external notices do not alter domain commit, scope, plan or existing guide semantics."
       }
     },
     {
@@ -1499,8 +1499,8 @@
         "settlement_authority_set_v1"
       ],
       "review": {
-        "fingerprint": "2b5c22bc08807e837b6f9dc45dc2da902a1fc8c662aeaf6e7ff842fd6ce30ce4",
-        "reason": "Reviewed shared runtime wrapper diff: only outbox_deliver service-internal email_event branch changed; all entrypoints owned by WF18 are byte-identical. Existing Merkezler arası hesaplaşma guide and runtime behavior remain correct."
+        "fingerprint": "337c054935ee54879db0081b26360a28c000ed489ca3910c0fbdf09df7f97050",
+        "reason": "Reviewed common runtime wrapper diff: only service-internal outbox email_phase changes; WF18 entrypoints remain byte-identical. Explicit opt-in external notices do not alter domain commit, scope, plan or existing guide semantics."
       }
     },
     {
@@ -1528,8 +1528,8 @@
         "seat_offer_reject_v1"
       ],
       "review": {
-        "fingerprint": "5ce9650ce55be4972ba7704856cfd703abf021ca6ec6c0266e715da30c93efb8",
-        "reason": "Reviewed shared runtime wrapper diff: only outbox_deliver service-internal email_event branch changed; all entrypoints owned by WF19 are byte-identical. Existing Bekleme listesi ve yer teklifi guide and runtime behavior remain correct."
+        "fingerprint": "73ec6c0f7745bae1b238c6e17546ccdf6f59aab734164b235a4e929144e71341",
+        "reason": "Reviewed common runtime wrapper diff: only service-internal outbox email_phase changes; WF19 entrypoints remain byte-identical. Explicit opt-in external notices do not alter domain commit, scope, plan or existing guide semantics."
       }
     },
     {
@@ -1548,7 +1548,9 @@
         "apps/backend/tests/p07-lifecycle-acceptance.mjs",
         "apps/backend/tests/starter-plan-gates-acceptance.mjs",
         "apps/backend/tests/email-provider-unit.mjs",
-        "apps/backend/tests/email-events-unit.mjs"
+        "apps/backend/tests/email-events-unit.mjs",
+        "apps/backend/tests/transactional-email-unit.mjs",
+        "apps/backend/tests/transactional-email-acceptance.mjs"
       ],
       "sources": [
         "apps/backend/database/invitation-delivery.sql",
@@ -1586,7 +1588,10 @@
         "apps/backend/supabase/functions/backend-v1/email-provider.ts",
         "apps/backend/database/email-delivery-events.sql",
         "apps/backend/supabase/migrations/20261105150000_email_delivery_events.sql",
-        "apps/backend/supabase/functions/backend-v1/email-events.ts"
+        "apps/backend/supabase/functions/backend-v1/email-events.ts",
+        "apps/backend/database/transactional-email.sql",
+        "apps/backend/supabase/migrations/20261105150001_transactional_notification_email.sql",
+        "apps/backend/supabase/functions/backend-v1/transactional-email.ts"
       ],
       "operations": [
         "seat_offer_issue_v1",
@@ -1601,8 +1606,8 @@
         "subscription_boundary_apply_v1"
       ],
       "review": {
-        "fingerprint": "68ee0cbd0fa7a9121d73d6b8be39946cd256dc7c6470833f5d56578f6328588f",
-        "reason": "Reviewed signed raw-body timeout/cancellation, official Svix vector, service-only event persistence, duplicate mismatch and early/out-of-order native projection coverage."
+        "fingerprint": "51738c2ba934bb54e07e1b9ce0dc6896aeb30efc21c4b34614be9f6311f312b7",
+        "reason": "Reviewed transactional source/worker/lease/privacy/event-retention, independent live-plan finding fix and new native source. Existing signed tick fence and native Auth preserved."
       }
     }
   ]

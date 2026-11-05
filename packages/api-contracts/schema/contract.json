@@ -4585,6 +4585,17 @@
               "type": "null"
             }
           ]
+        },
+        "email_job": {
+          "description": "Optional own-recipient transactional delivery status, read only via the notification inbox. Job success is provider acceptance; email_delivery is separate evidence.",
+          "anyOf": [
+            {
+              "$ref": "#/$defs/JobStatusView"
+            },
+            {
+              "type": "null"
+            }
+          ]
         }
       },
       "required": [
@@ -6058,6 +6069,26 @@
         },
         "as_of": {
           "$ref": "#/$defs/Instant"
+        },
+        "email_preference": {
+          "type": "object",
+          "properties": {
+            "enabled": {
+              "type": "boolean"
+            },
+            "version": {
+              "$ref": "#/$defs/PositiveInt"
+            },
+            "available": {
+              "type": "boolean"
+            }
+          },
+          "required": [
+            "enabled",
+            "version",
+            "available"
+          ],
+          "additionalProperties": false
         }
       },
       "required": [
@@ -96493,7 +96524,7 @@
       "uuid": "backend uuid@14.0.3 v7 for all inserted IDs; DB defaults not required",
       "external_transport": "POST /functions/v1/backend-v1/{operation}; direct typed request body",
       "internal_rpc": "service-only api_v1 named functions; actor/session/UUID bank supplied by verified gateway",
-      "migration_count": 111,
+      "migration_count": 112,
       "acceptance_source": "apps/backend/docs/00-FtkSaaS-yeni-sohbet-devir.md"
     },
     "decision_sprint": {

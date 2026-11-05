@@ -1,3 +1,4 @@
+import './transactional-email-unit.mjs';
 import './email-events-unit.mjs';
 import './email-provider-unit.mjs';
 import './edge-bundle-unit.mjs';
