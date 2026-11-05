@@ -318,6 +318,7 @@ async function apiFixture(t){
   await mutate(owner,'event_save_v1',input,k);assert.equal((await db.query('select count(*)::int n from core.events where org_id=$1 and name=$2',[org,input.name])).rows[0].n,1);
  });
  await t.test('configured lesson deficits are scoped by center/discipline and a later sale settles the same pool',async()=>{
+  await db.query("insert into core.policy_versions(id,org_id,key,effective_at,mandatory,value) values($1,$2,'negative_default',now(),false,$3)",[key(),org,{kind:'integer',value:100}]);
   await db.query("insert into core.policy_versions(id,org_id,key,effective_at,mandatory,value) values($1,$2,'negative_upper',now(),true,$3)",[key(),org,{kind:'integer',value:1}]);
   const p=(await mutate(owner,'person_create_v1',{display_name:'Scoped deficit student',contacts:[]})).primary_id;await mutate(owner,'student_activate_v1',{person_id:p});
   const second=(await must(owner,'discipline_save_v1',{org_id:org,name:'Deficit other discipline',state:'active'},key())).primary_id;await mutate(owner,'center_discipline_set_v1',{discipline_id:second,state:'active'});
