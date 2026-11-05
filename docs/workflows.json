@@ -16,7 +16,8 @@
         "apps/backend/tests/invitation-delivery-acceptance.mjs",
         "apps/backend/tests/ci-experiment-checks.mjs",
         "apps/backend/tests/ci-api-suites.test.mjs",
-        "apps/backend/tests/deployment-cli-unit.mjs"
+        "apps/backend/tests/deployment-cli-unit.mjs",
+        "apps/backend/tests/edge-bundle-unit.mjs"
       ],
       "sources": [
         "apps/backend/database/canonical-settings-scope.sql",
@@ -283,8 +284,8 @@
         "management_state_get_v1"
       ],
       "review": {
-        "fingerprint": "d9a314aab02973f69544c25b496f853784e31eef3b1f8b0a65801c4f364f6cdd",
-        "reason": "Güncel main CLI v3 tanı kaynakları korunarak PR201 teslim filtresi ve PR203 aday test envanteri/kök genişlemesi birlikte incelendi; tüm kaynak/run/attempt ve eski test sahipliği/exclusive kontrolleri korunur."
+        "fingerprint": "3982f827b167952ca288934f70e2ef0611813268ddea80c98e0bcfcf6c87a729",
+        "reason": "PR204 synchronized with main2865885: retain delivery filters and growing-test inventory safeguards; share standalone validator refs with unchanged440 exports. Source budget/parity tests retained; generated reference conflicts rebuilt."
       }
     },
     {
