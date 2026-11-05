@@ -1,6 +1,7 @@
 import {isDesignSandbox} from './design-sandbox.mjs';
 import {classifyChanges,ownerOf} from './scope.mjs';
 import {coverageHash,acceptanceProfile} from './shards.mjs';
+import {candidateSchedule} from './duration-reference.mjs';
 import {documentScope} from './document-scope.mjs';
 export function assertReady(pr){
  if(pr.state!=='open'||pr.draft)throw Error('Draft or closed candidate cannot merge');
@@ -91,7 +92,8 @@ export async function resolveCandidate(github,context,core,kind){
  const scope={safe:sourceScope.kind==='documentation'};
  if(kind==='full'&&scope.safe)throw Error('Documentation-only source uses documentation acceptance, not full clean');
  if(kind==='documentation'&&!scope.safe){core.setOutput('eligible','false');return;}
- const binding={kind,profile:kind==='full'?acceptanceProfile:undefined,coverage:kind==='full'?coverageHash(acceptanceProfile):undefined,pr:p.number,head:p.head.sha,base:p.base.sha,merge,tree:commit.tree.sha,run_id:context.runId,attempt:Number(process.env.GITHUB_RUN_ATTEMPT),benchmark:false};
+ let binding={kind,profile:kind==='full'?acceptanceProfile:undefined,coverage:kind==='full'?coverageHash(acceptanceProfile):undefined,pr:p.number,head:p.head.sha,base:p.base.sha,merge,tree:commit.tree.sha,run_id:context.runId,attempt:Number(process.env.GITHUB_RUN_ATTEMPT),benchmark:false};
+ if(kind==='full')binding=await candidateSchedule(github,context,binding,m=>core.warning?.(m));
  core.setOutput('eligible','true');core.setOutput('merge',merge);core.setOutput('binding',JSON.stringify(binding));
 }
 export function currentAttemptBinding(binding,context){

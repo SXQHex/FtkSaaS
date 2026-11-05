@@ -1,7 +1,10 @@
 import {ciFile} from '../paths.mjs';
 import fs from 'node:fs';
-import {validateJobs,coverageHash,roleName,shardPlan,apiTimeBalance,acceptancePlan,acceptanceProfile,apiRoles} from './shards.mjs';
+import {validateJobs,coverageHash,roleName,shardPlan,apiTimeBalance,acceptanceProfile,apiRoles} from './shards.mjs';
 import {currentAttemptBinding} from './source.mjs';
+import {validateSchedule,scheduledPlan,publishReference} from './duration-reference.mjs';
+import {buildInventory} from './api-suites.mjs';
+import {repositoryRoot} from '../paths.mjs';
 
 export function measurements(jobs,created,profile='four-isolated-v2'){
  const seconds=(a,b)=>(Date.parse(b)-Date.parse(a))/1000;
@@ -17,6 +20,7 @@ export async function collect(github,context,core,binding){
  fs.rmSync(ciFile('binding.json'),{force:true});
  binding=currentAttemptBinding(binding,context);
  if(binding.kind!=='full'||binding.profile!==acceptanceProfile||binding.coverage!==coverageHash(binding.profile))throw Error('Collector profile/coverage mismatch');
+ validateSchedule(binding.schedule);
  const run=(await github.rest.actions.getWorkflowRun({...context.repo,run_id:context.runId})).data;
  if(run.id!==binding.run_id||run.run_attempt!==binding.attempt||run.head_sha!==binding.head||run.event!=='pull_request'||run.path!=='.github/workflows/ci-full.yml')throw Error('Collector workflow/source/attempt mismatch');
  // GitHub includes retained successful jobs in the requested attempt view.
@@ -31,8 +35,14 @@ export async function collect(github,context,core,binding){
  const rows=measurements(jobs,run.created_at,binding.profile),sharded=rows.filter(r=>r.role!=='serial-reference');
  const total=rs=>rs.reduce((n,r)=>n+r.runner_s,0)/60;
  const end=Math.max(...sharded.map(r=>Date.parse(r.finished)));
- const report={balance_mode:'advisory',balance,test_step_includes_backend_setup:true,backend_phase_details:'Each required job summary and timings artifact separately measures backend setup/tests/seed-health-advisors; queue/setup below refers to GitHub job and checkout/package installation.',source:binding,distribution:acceptancePlan().map(b=>({shard:b.shard,units:b.units.map(u=>u.id),projected_wall_seconds:b.projected_wall_seconds})),jobs:rows,sharded_wait_s:(end-Date.parse(run.created_at))/1000,longest_api_s:Math.max(...rows.filter(r=>r.role.startsWith('api-')).map(r=>r.test_s)),sharded_runner_minutes:total(sharded),serial_runner_minutes:total(rows.filter(r=>r.role==='serial-reference')),acceptance_roles_runner_minutes:total(rows),completed_workflow_runner_minutes:jobs.filter(j=>j.status==='completed'&&j.started_at&&j.completed_at).reduce((s,j)=>s+(Date.parse(j.completed_at)-Date.parse(j.started_at))/60000,0),workflow_total_note:'Collector is still running; final total workflow runner minutes must be measured after completion'};
+ const report={balance_mode:'advisory',balance,test_step_includes_backend_setup:true,backend_phase_details:'Each required job summary and timings artifact separately measures backend setup/tests/seed-health-advisors; queue/setup below refers to GitHub job and checkout/package installation.',source:binding,distribution:scheduledPlan(buildInventory(repositoryRoot).units,binding.schedule).map(b=>({shard:b.shard,units:b.units.map(u=>u.id),projected_wall_seconds:b.projected_wall_seconds})),jobs:rows,sharded_wait_s:(end-Date.parse(run.created_at))/1000,longest_api_s:Math.max(...rows.filter(r=>r.role.startsWith('api-')).map(r=>r.test_s)),sharded_runner_minutes:total(sharded),serial_runner_minutes:total(rows.filter(r=>r.role==='serial-reference')),acceptance_roles_runner_minutes:total(rows),completed_workflow_runner_minutes:jobs.filter(j=>j.status==='completed'&&j.started_at&&j.completed_at).reduce((s,j)=>s+(Date.parse(j.completed_at)-Date.parse(j.started_at))/60000,0),workflow_total_note:'Collector is still running; final total workflow runner minutes must be measured after completion'};
  fs.mkdirSync(ciFile(),{recursive:true});fs.writeFileSync(ciFile('measurements.json'),JSON.stringify(report,null,2));
  await core.summary.addRaw('## API time balance (advisory)\n\n'+JSON.stringify(balance)+'\n\nAll required tests succeeded for this unchanged run source. GitHub may retain successful executions from earlier attempts; job IDs and accepted_attempt describe the current API view, while timestamps describe execution. Timing optimization never blocks functional/source acceptance.\n\n```json\n'+JSON.stringify(report,null,2)+'\n```\n').write();
  fs.writeFileSync(ciFile('binding.json'),JSON.stringify({...binding,balance_mode:'advisory',balance_policy:balance.version}));
+ await publishReference(github,context,binding,jobs,m=>core.warning?.(m));
+ const finalRun=(await github.rest.actions.getWorkflowRun({...context.repo,run_id:context.runId})).data;
+ if(finalRun.id!==run.id||finalRun.run_attempt!==run.run_attempt||finalRun.head_sha!==run.head_sha){
+  for(const name of ['binding.json','duration-reference.json'])fs.rmSync(ciFile(name),{force:true});
+  throw Error('Workflow source/attempt changed during timing collection');
+ }
 }

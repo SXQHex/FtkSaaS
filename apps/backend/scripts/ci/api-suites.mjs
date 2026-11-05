@@ -101,7 +101,7 @@ export function executionPhases(units){
  return [...exclusive,...(parallel.length?[{concurrency:2,units:parallel}]:[])];
 }
 
-export function materialize(inventory,directory,{measurement=false,measurementAdapter}={}){
+export function materialize(inventory,directory,{measurement=false,measurementAdapter,timingDirectory}={}){
  fs.mkdirSync(directory,{recursive:true});
  return inventory.units.map(unit=>{
   const original=pathToFileURL(path.resolve(inventory.root??process.cwd(),unit.source)).href;
@@ -114,7 +114,8 @@ export function materialize(inventory,directory,{measurement=false,measurementAd
   if(measurement&&!measurementAdapter)throw Error('Measurement adapter required');
   const adapter=measurementAdapter;
   const resolve=measurement?`resolve(specifier,context,next){return specifier==='node:test'&&context.parentURL?.startsWith(${JSON.stringify(testRoot)})?{url:${JSON.stringify(adapter)},shortCircuit:true}:next(specifier,context);},`:'';
-  const wrapper=`import {registerHooks} from 'node:module';\nconst target=${JSON.stringify(original)};\nconst source=${JSON.stringify(unit.code)};\nregisterHooks({${resolve}load(url,context,next){const result=next(url,context);return url===target?{...result,source}:result;}});\nawait import(target);\n`;
+  const timing=timingDirectory?`import fs from 'node:fs';\nconst started=performance.now();\nprocess.once('exit',exit_code=>{try{fs.mkdirSync(${JSON.stringify(timingDirectory)},{recursive:true});fs.writeFileSync(${JSON.stringify(path.join(timingDirectory,unit.id+'.json'))},JSON.stringify({id:${JSON.stringify(unit.id)},sha256:${JSON.stringify(hash(unit.code))},seconds:(performance.now()-started)/1000,exit_code}));}catch{console.warn('API process timing unavailable');}});\n`:'';
+  const wrapper=`import {registerHooks} from 'node:module';\n${timing}const target=${JSON.stringify(original)};\nconst source=${JSON.stringify(unit.code)};\nregisterHooks({${resolve}load(url,context,next){const result=next(url,context);return url===target?{...result,source}:result;}});\nawait import(target);\n`;
   const file=path.join(directory,unit.id+'.test.mjs');fs.writeFileSync(file,wrapper);return file;
  });
 }

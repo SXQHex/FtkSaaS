@@ -339,6 +339,8 @@ test('manual CLI plans an explicit commit range independently of origin/main and
 }));
 
 test('automatic candidate tests Draft source, binds the live main base and rejects retarget or moved head',async()=>{
+ const previousAttempt=process.env.GITHUB_RUN_ATTEMPT;process.env.GITHUB_RUN_ATTEMPT='1';
+ try{
  for(const [paths,kind] of [[['apps/backend/database/kernel.sql'],'full'],[['README.md'],'documentation']]){
   const {github,pr}=scopedGithub(paths);pr.draft=true;const out={},context={repo:{},issue:{number:9},payload:{pull_request:structuredClone(pr)},runId:8,sha:'M'};
   await resolveCandidate(github,context,{setOutput:(k,v)=>out[k]=v},'auto');assert.equal(out.kind,kind);assert.equal(out.merge,'M');assert.throws(()=>assertReady(pr));
@@ -346,6 +348,7 @@ test('automatic candidate tests Draft source, binds the live main base and rejec
   pr.base.ref='main';pr.head.sha='moved';await assert.rejects(resolveCandidate(github,context,{setOutput(){}},'auto'),/Candidate changed/);
  }
  const gate=fs.readFileSync('.github/workflows/ci-gate.yml','utf8');assert(gate.includes("github.event.action != 'edited' || github.event.changes.base != null"));
+ }finally{if(previousAttempt===undefined)delete process.env.GITHUB_RUN_ATTEMPT;else process.env.GITHUB_RUN_ATTEMPT=previousAttempt;}
 });
 
 test('web1 design files are isolated while mixed and renamed production paths retain checks',()=>{

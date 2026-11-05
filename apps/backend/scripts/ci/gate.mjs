@@ -1,4 +1,5 @@
 import {validateQuality} from './quality-proof.mjs';
+import {validateSchedule} from './duration-reference.mjs';
 import {validateJobs,coverageHash,roleName} from './shards.mjs';
 import {assertReady,assertParents,policyMatches,resolveMerged,remoteSourceScope} from './source.mjs';
 import {mkdtempSync,writeFileSync,rmSync} from 'node:fs';import {tmpdir} from 'node:os';import {join} from 'node:path';import {execFileSync} from 'node:child_process';
@@ -9,8 +10,9 @@ export function validateBinding({binding,pr,run,jobs,tested,currentTree,workflow
  if(run.event!=='pull_request'||run.path!=='.github/workflows/ci-full.yml'||run.conclusion!=='success'||run.status!=='completed')throw Error('No successful candidate workflow');
  if(binding.run_id!==run.id||binding.attempt!==run.run_attempt||binding.pr!==pr.number||binding.head!==pr.head.sha||binding.base!==pr.base.sha||run.head_sha!==binding.head)throw Error('Stale head/base/attempt');
  if(binding.merge!==tested.sha||binding.tree!==tested.tree.sha||binding.tree!==currentTree||tested.parents.length!==2||tested.parents[0].sha!==binding.base||tested.parents[1].sha!==binding.head)throw Error('Tested merge parents/tree mismatch');
- if(binding.kind!=='full'||!['four-isolated-v1','four-isolated-v2','eight-isolated-v1','twelve-isolated-v1'].includes(binding.profile)||binding.coverage!==coverageHash(binding.profile))throw Error('Unrecognized/incomplete full coverage');
- const currentProfile=['four-isolated-v2','eight-isolated-v1','twelve-isolated-v1'].includes(binding.profile);
+ if(binding.kind!=='full'||!['four-isolated-v1','four-isolated-v2','eight-isolated-v1','twelve-isolated-v1','twelve-timed-v1'].includes(binding.profile)||binding.coverage!==coverageHash(binding.profile))throw Error('Unrecognized/incomplete full coverage');
+ if(binding.profile==='twelve-timed-v1')validateSchedule(binding.schedule);
+ const currentProfile=['four-isolated-v2','eight-isolated-v1','twelve-isolated-v1','twelve-timed-v1'].includes(binding.profile);
  if(currentProfile&&(!Number.isSafeInteger(binding.source_attempt)||binding.source_attempt<1||binding.source_attempt>binding.attempt))throw Error('Invalid original source attempt');
  validateJobs(jobs,run,{benchmark:binding.benchmark,collector:true,sourceChecks:currentProfile,profile:binding.profile});
  return true;
@@ -19,7 +21,7 @@ export async function receipt(github,repo,run,kind="full"){
  const artifacts=await github.paginate(github.rest.actions.listWorkflowRunArtifacts,{...repo,run_id:run.id,per_page:100});
  const matches=artifacts.filter(a=>a.name===(kind==='quality'?'quality-binding':(kind==='documentation'?'document-binding-':'candidate-binding-')+run.run_attempt)&&!a.expired);const a=matches[0];if(matches.length!==1)throw Error('Missing source binding');
  const zip=await github.rest.actions.downloadArtifact({...repo,artifact_id:a.id,archive_format:'zip'});const dir=mkdtempSync(join(tmpdir(),'ftk-binding-'));
- try{const file=join(dir,'receipt.zip');writeFileSync(file,Buffer.from(zip.data));return JSON.parse(execFileSync('unzip',['-p',file,'binding.json'],{encoding:'utf8',maxBuffer:16000}));}finally{rmSync(dir,{recursive:true,force:true});}
+ try{const file=join(dir,'receipt.zip');writeFileSync(file,Buffer.from(zip.data));return JSON.parse(execFileSync('unzip',['-p',file,'binding.json'],{encoding:'utf8',maxBuffer:128000}));}finally{rmSync(dir,{recursive:true,force:true});}
 }
 // A cancelled, stale or incomplete run cannot shadow a valid receipt for the
 // same live source. Use GitHub's current attempt view, including retained jobs;
@@ -60,7 +62,7 @@ export async function findQualityProof(github,repo,pr,currentTree){
  throw Error('No successful source-bound quality proof');
 }
 export function schemaBaselineName(binding){
- if(['four-isolated-v2','eight-isolated-v1','twelve-isolated-v1'].includes(binding.profile))return 'documentation-baseline';
+ if(['four-isolated-v2','eight-isolated-v1','twelve-isolated-v1','twelve-timed-v1'].includes(binding.profile))return 'documentation-baseline';
  if(binding.profile==='four-isolated-v1')return `documentation-baseline-${binding.attempt}`;
  throw Error('Unrecognized baseline profile');
 }

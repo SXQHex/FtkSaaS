@@ -93,6 +93,7 @@
         "apps/backend/scripts/ci/cleanup.mjs",
         "apps/backend/scripts/ci/collect.mjs",
         "apps/backend/scripts/ci/delta-analysis.mjs",
+        "apps/backend/scripts/ci/duration-reference.mjs",
         "apps/backend/scripts/ci/deploy-development.mjs",
         "apps/backend/scripts/ci/deployment-source.mjs",
         "apps/backend/scripts/ci/design-sandbox.mjs",
@@ -279,8 +280,8 @@
         "management_state_get_v1"
       ],
       "review": {
-        "fingerprint": "73862a6625d1ed16e2f42d5768f485ce2422fcb54143452877b4e7f2904aa0ac",
-        "reason": "Reviewed synchronization with main PR196: twelve-shard source-bound acceptance and refreshed measurements preserved; provider test ownership retained without application behavior changes."
+        "fingerprint": "e9bf37a7a3adf5cd78a5eee709269535364fe796ad944f739f3b0b6bcfd25784",
+        "reason": "PR190 main senkronizasyonu: altı yeni üretim kabul birimi korunarak 91 birimde sabit süre planı, native ölçüm ve kaynak kapıları incelendi; provider gövdeleri değişmedi."
       }
     },
     {
