@@ -102,3 +102,17 @@ test('installation synchronizes the scoped Edge secret before scheduling and sto
   assert(configuredSql.includes(Buffer.from(signingKey).toString('hex')),'the Vault and Edge must receive the same signing value');
  }
 });
+
+test('signed tick delivers a DB-fenced transactional email claim through the same provider lane',async()=>{
+ const email={job_id:id(),org_id:id(),lease_token:'synthetic-lease',api_key:'synthetic-provider',payload:{from:'sender@ftksaas.invalid',to:['recipient@ftksaas.invalid'],subject:'Synthetic transaction',text:'Synthetic link'}},phases=[];let sends=0;
+ const response=await invitationTick(await request(),env,async(url,options)=>{
+  if(url==='https://api.resend.com/emails'){sends++;assert.equal(options.headers['Idempotency-Key'],'ftksaas-notification/'+email.job_id);return Response.json({id:id()});}
+  const body=JSON.parse(options.body);if(body.p_aux.invitation_phase==='claim')return Response.json({_internal_email:email});phases.push(body.p_aux.email_phase);return Response.json({authorized:true,state:'succeeded'});
+ },now);assert.equal(response.status,200);assert.deepEqual(await response.json(),{claimed:1,accepted:true});assert.equal(sends,1);assert.deepEqual(phases,['authorize','finish']);
+});
+test('transactional sender activation is explicit and never silently changes an existing invitation-only tenant',()=>{
+ const source={org:id(),origin:'https://app.ftksaas.invalid',from:'sender@ftksaas.invalid',providerKey:'re_synthetic_key',anonKey:'synthetic-anon',signingKey:'a'.repeat(64)};
+ assert(!configurationSql(source).includes('set transactional_enabled=true'));
+ assert(configurationSql({...source,transactional:true}).includes('set transactional_enabled=true'));
+ assert(configurationSql({...source,transactional:true}).includes('ACCEPTED_TRANSACTIONAL_SOURCE_REQUIRED'));
+});

@@ -3,8 +3,9 @@ import {createHash} from 'node:crypto';
 import {pathToFileURL} from 'node:url';
 export const project='gwyprhenabtpkbojephw'; // accepted development/test project only
 const literal=s=>"pg_catalog.convert_from(pg_catalog.decode('"+Buffer.from(s,'utf8').toString('hex')+"','hex'),'UTF8')";
-export function configurationSql({org,origin,from,providerKey,anonKey,signingKey}){
+export function configurationSql({org,origin,from,providerKey,anonKey,signingKey,transactional=false}){
  if(typeof org!=='string'||typeof origin!=='string'||typeof from!=='string'||!/^[a-f0-9-]{36}$/.test(org)||!/^https:\/\/[a-zA-Z0-9.-]+(?::[0-9]+)?$/.test(origin)||/[\r\n]/.test(from)||!from.includes('@'))throw Error('INVALID_INVITATION_CONFIGURATION');
+ if(typeof transactional!=='boolean')throw Error('INVALID_TRANSACTIONAL_CONFIGURATION');
  if(!providerKey.startsWith('re_')||!anonKey||typeof signingKey!=='string'||!/^[a-f0-9]{64}$/.test(signingKey))throw Error('INVITATION_CREDENTIALS_REQUIRED');
  const providerName='ftk_invitation_resend_'+org+'_'+createHash('sha256').update(providerKey).digest('hex');
  const secrets=[[providerName,providerKey],['ftk_invitation_anon',anonKey],['ftk_invitation_signing',signingKey]];
@@ -18,9 +19,10 @@ export function configurationSql({org,origin,from,providerKey,anonKey,signingKey
  insert into private.invitation_dispatch_config(singleton,enabled,backend_origin,anon_secret_id,signing_secret_id)
  values(true,false,'https://${project}.supabase.co',(select id from vault.secrets where name='ftk_invitation_anon'),(select id from vault.secrets where name='ftk_invitation_signing'))
  on conflict(singleton) do update set (enabled,backend_origin,anon_secret_id,signing_secret_id) = (false,excluded.backend_origin,excluded.anon_secret_id,excluded.signing_secret_id);
+ ${transactional?`if to_regprocedure('private.transactional_email_ready(uuid)') is null then raise exception 'ACCEPTED_TRANSACTIONAL_SOURCE_REQUIRED';end if;update private.invitation_sender_config set transactional_enabled=true where org_id=${literal(org)}::uuid;`:''}
  end $config$;`;
 }
-export async function configure({org,origin,from,apply=false,token=process.env.SUPABASE_ACCESS_TOKEN,providerKey=process.env.FTK_INVITATION_RESEND_API_KEY,signingKey=process.env.FTK_INVITATION_TICK_SECRET,request=fetch}={}){
+export async function configure({org,origin,from,transactional=false,webhookSecret=process.env.FTK_RESEND_WEBHOOK_SECRET,apply=false,token=process.env.SUPABASE_ACCESS_TOKEN,providerKey=process.env.FTK_INVITATION_RESEND_API_KEY,signingKey=process.env.FTK_INVITATION_TICK_SECRET,request=fetch}={}){
  if(!token||!org||!origin)throw Error('SUPABASE_ACCESS_TOKEN, --org and --app-origin required');
  const api=async(route,body)=>{
   const res=await request('https://api.supabase.com/v1/projects/'+project+route,{method:body===undefined?'GET':'POST',headers:{authorization:'Bearer '+token,'content-type':'application/json'},body:body===undefined?undefined:JSON.stringify(body),signal:AbortSignal.timeout(30000)});
@@ -30,11 +32,11 @@ export async function configure({org,origin,from,apply=false,token=process.env.S
  // Reuse an explicitly supplied sending key, or the already configured Resend
  // SMTP credential. Never print credentials, SQL text, recipient or token.
  if(!providerKey&&auth.smtp_host==='smtp.resend.com')providerKey=auth.smtp_pass;
- const source={org,origin,from:from??auth.smtp_admin_email,providerKey,anonKey:keys.find(k=>k.name==='anon')?.api_key,signingKey};
+ const source={org,origin,transactional,from:from??auth.smtp_admin_email,providerKey,anonKey:keys.find(k=>k.name==='anon')?.api_key,signingKey};
  const sql=configurationSql(source);
  if(!apply)return {project,mode:'read-only',configuration_valid:true};
  await api('/database/query',{query:sql});
- await api('/secrets',[{name:'FTK_INVITATION_TICK_SECRET',value:signingKey}]);
+ await api('/secrets',[{name:'FTK_INVITATION_TICK_SECRET',value:signingKey},...(webhookSecret?[{name:'FTK_RESEND_WEBHOOK_SECRET',value:webhookSecret}]:[])]);
  await api('/database/query',{query:fs.readFileSync(new URL('./invitation-cron-install.sql',import.meta.url),'utf8')});
  const rows=await api('/database/query',{query:"select c.enabled,(select count(*)::int from private.invitation_sender_config where enabled) enabled_tenants,(select count(*)::int from cron.job where jobname='ftksaas-invitations' and username='ftk_ops_invitation' and active) scheduler_count from private.invitation_dispatch_config c where singleton"});
  if(rows.length!==1||rows[0].enabled!==true||rows[0].scheduler_count!==1)throw Error('INVITATION_CONFIGURATION_READBACK_FAILED');
@@ -42,6 +44,6 @@ export async function configure({org,origin,from,apply=false,token=process.env.S
 }
 if(import.meta.url===pathToFileURL(process.argv[1]??'').href){
  const args=process.argv.slice(2),value=k=>{const at=args.indexOf(k);return at<0?undefined:args[at+1];};
- try{console.log(JSON.stringify(await configure({org:value('--org'),origin:value('--app-origin'),from:value('--from'),apply:args.includes('--apply')})));}
+ try{console.log(JSON.stringify(await configure({org:value('--org'),origin:value('--app-origin'),from:value('--from'),transactional:args.includes('--transactional-email'),apply:args.includes('--apply')})));}
  catch(error){console.error(error.message);process.exitCode=1;}
 }

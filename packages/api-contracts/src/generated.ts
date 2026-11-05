@@ -835,6 +835,23 @@ reason?: Text
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "SalePreview".
+ */
+export type SalePreview = {
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+id: string
+token: OpaqueToken
+scope_hash: Text
+dependencies: PreviewDependencies
+effects: Effect[]
+blockers: SafeError[]
+expires_at: Instant
+sale: SaleImpact
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
  * via the `definition` "Request_entitlements_get".
  */
 export type RequestEntitlementsGet = {
@@ -3757,6 +3774,9 @@ CrmMetaQueueStatus?: CrmMetaQueueStatus
 CrmLegacyImportSource?: CrmLegacyImportSource
 CrmApplicationSource?: CrmApplicationSource
 CrmImportRowPreview?: CrmImportRowPreview
+SaleDeficitEffect?: SaleDeficitEffect
+SaleImpact?: SaleImpact
+SalePreview?: SalePreview
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -6761,6 +6781,42 @@ kind: Text
 payload: NotificationPayload
 created_at: Instant
 read_at: (Instant | null)
+/**
+ * Optional own-recipient transactional delivery status, read only via the notification inbox. Job success is provider acceptance; email_delivery is separate evidence.
+ */
+email_job?: (JobStatusView | null)
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "JobStatusView".
+ */
+export interface JobStatusView {
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+id: string
+state: JobState
+progress_count: Count
+total_count: (Count | null)
+result_reference: (EntityRef | null)
+safe_error_code: (Text | null)
+privacy?: PrivacyProgress
+/**
+ * Optional invitation email delivery evidence. Job succeeded means provider acceptance; delivered means recipient mail-server acceptance, not inbox placement or reading. Terminal adverse evidence wins over earlier/later delivery events. Null until the job owns a provider reference.
+ */
+email_delivery?: ({
+state: ("accepted" | "delayed" | "delivered" | "bounced" | "complained" | "failed")
+occurred_at: (string | null)
+} | null)
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "PrivacyProgress".
+ */
+export interface PrivacyProgress {
+request_state: PrivacyState
+completed_at: (Instant | null)
+pending_scopes: ("database" | "auth" | "storage" | "exports" | "backups")[]
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -7188,38 +7244,6 @@ result_reference: (EntityRef | null)
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
- * via the `definition` "JobStatusView".
- */
-export interface JobStatusView {
-/**
- * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
- */
-id: string
-state: JobState
-progress_count: Count
-total_count: (Count | null)
-result_reference: (EntityRef | null)
-safe_error_code: (Text | null)
-privacy?: PrivacyProgress
-/**
- * Optional invitation email delivery evidence. Job succeeded means provider acceptance; delivered means recipient mail-server acceptance, not inbox placement or reading. Terminal adverse evidence wins over earlier/later delivery events. Null until the job owns a provider reference.
- */
-email_delivery?: ({
-state: ("accepted" | "delayed" | "delivered" | "bounced" | "complained" | "failed")
-occurred_at: (string | null)
-} | null)
-}
-/**
- * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
- * via the `definition` "PrivacyProgress".
- */
-export interface PrivacyProgress {
-request_state: PrivacyState
-completed_at: (Instant | null)
-pending_scopes: ("database" | "auth" | "storage" | "exports" | "backups")[]
-}
-/**
- * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
  * via the `definition` "AuditView".
  */
 export interface AuditView {
@@ -7412,6 +7436,11 @@ export interface Page_NotificationView {
 items: NotificationView[]
 next_cursor?: (OpaqueToken | null)
 as_of: Instant
+email_preference?: {
+enabled: boolean
+version: PositiveInt
+available: boolean
+}
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -10097,11 +10126,66 @@ end_date: Date
  */
 export interface SuccessSalePreview {
 ok: true
-data: Preview
+data: SalePreview
 /**
  * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
  */
 trace_id: string
+}
+/**
+ * Exact normal sale debt and initial rights projection. Timed products have zero numeric credits; quota is the frozen product quota. Deficits retain consumed-first/time/id order, stop at first unaffordable item; settles=false remains unchanged. No collection, receipt or send is produced by preview.
+ *
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "SaleImpact".
+ */
+export interface SaleImpact {
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+person_id: string
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+product_version_id: string
+kind: EntitlementKind
+booking_mode: BookingMode
+start_date: Date
+end_date: Date
+timezone: Text
+valid_from: Instant
+valid_until: Instant
+debt_minor: Money
+currency: Currency
+granted: Count
+reserved: Count
+consumed: Count
+available: Count
+quota: (QuotaSpec | null)
+deficits: SaleDeficitEffect[]
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "SaleDeficitEffect".
+ */
+export interface SaleDeficitEffect {
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+deficit_id: string
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+reservation_id: string
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+session_id: string
+version: PositiveInt
+reservation_version: PositiveInt
+session_version: PositiveInt
+state: ("consumed" | "reserved")
+quantity: Count
+settles: Bool
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema

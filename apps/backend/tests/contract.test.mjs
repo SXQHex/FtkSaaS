@@ -1,3 +1,4 @@
+import './transactional-email-unit.mjs';
 import './email-events-unit.mjs';
 import './email-provider-unit.mjs';
 import './edge-bundle-unit.mjs';
@@ -372,3 +373,11 @@ import './crm-provider-host-unit.mjs';
 import './crm-provider-host-db-unit.mjs';
 
 import './crm-import-parser-unit.mjs';
+
+test('XREQ-020 normal sale response requires authoritative debt/rights/deficit projection',()=>{
+ const schema=JSON.parse(fs.readFileSync('../../packages/api-contracts/schema/contract.json')),ajv=new Ajv({strict:false});addFormats(ajv);ajv.addSchema(schema,'sale-contract');const validate=ajv.getSchema('sale-contract#/$defs/Success_sale_preview');
+ const data={id:newUuidV7(),token:'synthetic-token',scope_hash:'synthetic-hash',dependencies:{versions:[],policy_hashes:[],permission_hash:'synthetic'},effects:[],blockers:[],expires_at:new Date().toISOString(),sale:{person_id:newUuidV7(),product_version_id:newUuidV7(),kind:'credits',booking_mode:'flexible',start_date:'2026-11-01',end_date:'2026-12-01',timezone:'Europe/Istanbul',valid_from:'2026-10-31T21:00:00Z',valid_until:'2026-11-30T21:00:00Z',debt_minor:'1700',currency:'TRY',granted:5,reserved:2,consumed:2,available:1,quota:null,deficits:[{deficit_id:newUuidV7(),reservation_id:newUuidV7(),session_id:newUuidV7(),version:1,reservation_version:1,session_version:1,state:'consumed',quantity:2,settles:true}]}};
+ const response={ok:true,data,trace_id:newUuidV7()};assert.equal(validate(response),true,JSON.stringify(validate.errors));
+ for(const mutate of [x=>delete x.data.sale,x=>delete x.data.sale.deficits[0].reservation_version,x=>x.data.sale.debt_minor=1700,x=>x.data.sale.available=-1,x=>x.data.sale.deficits[0].settles='true',x=>x.data.sale.extra='untrusted']){const bad=structuredClone(response);mutate(bad);assert.equal(validate(bad),false);}
+ const generic=ajv.getSchema('sale-contract#/$defs/Preview'),legacy=structuredClone(data);delete legacy.sale;assert.equal(generic(legacy),true,'Other preview consumers retain their existing shape');
+});

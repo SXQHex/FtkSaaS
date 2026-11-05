@@ -222,6 +222,8 @@ Bu tablo yalnız izdir; eski kabul metinleri ikinci kez tutulmaz.
 - **Doğrulama senaryosu:** Son yer/son hak yarışı; iptal-telafi ve tekrar kapanış; mevcut güçlü testleri yeniden yazmadan eksik akışı tamamla.
 - **Kaynak alanı:** mevcut Starter, schedule, reservation, attendance, entitlement testleri
 
+**Ek kabul — XREQ-020:** Normal satışın typed borç/hak/deficit-rezervasyon projeksiyonu, geniş source snapshot ve apply stale/belge kapıları migration113 ile kaynakta uygulandı. Üç ürün biçimi, geçmiş/gelecek tarih, ilk yetersiz deficit, belge ve yetki/plan/policy değişimi native senaryoları aday CI kabulünü bekler. Tüketim devri [ortak talepte](../../../docs/requests.md#xreq-020); önceki günlük zincir kabulü veya backend kaynak teslimi frontend S05 kabulü değildir.
+
 **Bu paketin backend dilimi:** Mevcut Starter harness’ine sonlu program→bir kredili paket→borca gerçek manuel tahsilat/replay→iki öğrencinin son yer yarışı→aynı öğrencinin son hak yarışı→atanmış eğitmenin taslağı→CM kapanışı/replay→gerekçeli düzeltme/replay→öğrencinin iptali zinciri eklendi. Kişisel sıfır negatif limit açık fixture seçimidir; merkez varsayımı veya mevcut iki kredili testin değişikliği değildir. Mali geçmişin korunması, negatif bakiye ve Starter hakedişi oluşmaması denetlenir. Mevcut iptal/telafi ve atomiklik testleri korunur; PR150 aday/main/development kabulüyle backend günlük zincir teslimi kapalıdır; [kaynak/ortam kanıtı](00-FtkSaaS-yeni-sohbet-devir.md#s07s10-kabul-paketi). Frontend ekran veya genel Starter kabulü değildir.
 
 <a id="s10"></a>
@@ -527,9 +529,9 @@ Değişen dilimin sözleşme, üretilmiş tip/envanter, WF/F01–F33 izi ve alan
 
 **Uygulama dilimleri:**
 
-- [ ] P14.1 — Mevcut Resend davet sağlayıcı çağrısını ortak tek-deneme transport'una taşı; accepted/rejected/retryable/unknown, aynı payload/idempotency ve sır sızdırmayan sonuçları doğrula. Kaynak hazır; mevcut davet entegrasyonu ve üç küçük transport testi eklendi, yeni aday kabulü beklenir. Genel email kanalı bu dilimde açılmaz.
-- [ ] P14.2 — Mevcut notification/outbox kaynağını Pro/Business işlemsel olayları için kalıcı email claim/authorize/finish ile bağla; canlı kanal/plan/alıcı/olay geçerliliği, frozen payload, lease ve sağlayıcı dedupe süresi korunur. In_app ve Native Auth ayrı kalır.
-- [ ] P14.3 — İmzalı sağlayıcı olaylarını kalıcı tekillik ile işle; accepted/delivered/bounced/complained ve sırasız/tekrar olayları birbirine karıştırma, kalıcı hatayı yeniden gönderme. Mevcut davet akışı için imzalı Resend olay girişi, kalıcı tekillik ve yetkili job_status_get.email_delivery projeksiyonu kaynakta hazırdır; native aday ve gerçek webhook kurulumu beklenir. Genel P14.2 bildirim işleriyle bağlantı ve eşleşmeyen olayların saklama/temizleme işletimi açık kalır.
+- [x] P14.1 — Mevcut Resend davet sağlayıcı çağrısını ortak tek-deneme transport'una taşı; accepted/rejected/retryable/unknown, aynı payload/idempotency ve sır sızdırmayan sonuçları doğrula. PR205 aday/main/development kabulüyle mevcut davet entegrasyonu ve ortak transport teslim edildi; genel email kuyruğu P14.2 sahibindedir.
+- [ ] P14.2 — Mevcut notification/outbox kaynağını Pro/Business işlemsel olayları için kalıcı email claim/authorize/finish ile bağla; canlı kanal/plan/alıcı/olay geçerliliği, frozen payload, lease ve sağlayıcı dedupe süresi korunur. In_app ve Native Auth ayrı kalır. Kaynakta deferred atomik enqueue, güncel plan/tercih/alıcı/kaynak sürümü, dondurulmuş payload, claim/authorize/finish ve terminal payload temizliği hazır; yeni native aday kabulü beklenir.
+- [ ] P14.3 — İmzalı sağlayıcı olaylarını kalıcı tekillik ile işle; accepted/delivered/bounced/complained ve sırasız/tekrar olayları birbirine karıştırma, kalıcı hatayı yeniden gönderme. Mevcut davet akışı için imzalı Resend olay girişi, kalıcı tekillik ve yetkili job_status_get.email_delivery projeksiyonu kaynakta hazırdır; native aday ve gerçek webhook kurulumu beklenir. Genel P14.2 işleri aynı provider-reference kanıtını kullanır; 30 gün sonra eşleşmemiş olaylar bounded tick temizliğine bağlandı. Bu yeni kaynağın native kabulü ve gerçek webhook kurulumu beklenir.
 - [ ] P14.4 — Somut yetkili alıcı/olay üzerinden gerçek teslim ve hata görünürlüğünü doğrula; sentetik/provider kabulü gerçek alıcı teslimi sayılmaz. P15/P16 ayrı sıradadır.
 
 <a id="p15"></a>
