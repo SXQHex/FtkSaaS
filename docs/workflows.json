@@ -284,8 +284,8 @@
         "management_state_get_v1"
       ],
       "review": {
-        "fingerprint": "3982f827b167952ca288934f70e2ef0611813268ddea80c98e0bcfcf6c87a729",
-        "reason": "PR204 synchronized with main2865885: retain delivery filters and growing-test inventory safeguards; share standalone validator refs with unchanged440 exports. Source budget/parity tests retained; generated reference conflicts rebuilt."
+        "fingerprint": "67635cf8e39d9519b5a2a5328d3e7f41f415c4526fb90685e4932c2fe58e3024",
+        "reason": "P14 provider tests join contract suite; PR204 hosted acceptance closes P11 backend only. No API schema or permission change; email transport retains existing invitation behavior."
       }
     },
     {
@@ -1546,7 +1546,8 @@
         "apps/backend/tests/p05-acceptance.mjs",
         "apps/backend/tests/p06-acceptance.mjs",
         "apps/backend/tests/p07-lifecycle-acceptance.mjs",
-        "apps/backend/tests/starter-plan-gates-acceptance.mjs"
+        "apps/backend/tests/starter-plan-gates-acceptance.mjs",
+        "apps/backend/tests/email-provider-unit.mjs"
       ],
       "sources": [
         "apps/backend/database/invitation-delivery.sql",
@@ -1580,7 +1581,8 @@
         "apps/backend/supabase/functions/backend-v1/invitation-delivery.ts",
         "apps/backend/supabase/migrations/20261101040221_invitation_delivery_tracking.sql",
         "docs/workflows.md",
-        "apps/backend/database/subscriber-numbers.sql"
+        "apps/backend/database/subscriber-numbers.sql",
+        "apps/backend/supabase/functions/backend-v1/email-provider.ts"
       ],
       "operations": [
         "seat_offer_issue_v1",
@@ -1595,8 +1597,8 @@
         "subscription_boundary_apply_v1"
       ],
       "review": {
-        "fingerprint": "7e0122778d85cb9de2071b953e9d9e6f78233bdc156a4261c138c21657b6b413",
-        "reason": "Migration110 iki worker plan koşulunu Pro/Business yapar; canlı feature/center/CM/enabled/lease/hash/receipt/transaction sınırları incelendi ve korunur. Yeni native Pro testi CI bekler."
+        "fingerprint": "83eb72209b9cacb74901f12dd47d1f432f70dc7707779b70b48bbea017bdef08",
+        "reason": "P14 provider boundary reuses existing invitation Resend send; exact authorization/lease/idempotency preserved, fixed accepted/rejected/retryable/unknown outcomes. No general email capability or event/webhook activation."
       }
     }
   ]

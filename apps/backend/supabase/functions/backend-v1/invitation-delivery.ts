@@ -1,3 +1,4 @@
+import {sendEmail} from './email-provider.ts';
 type Env=(name:string)=>string|undefined;
 type Fetch=typeof fetch;
 type Claim={job_id:string;org_id:string;invitation_id:string;lease_token:string;recipient:string;sealed_token:string;from_email:string;app_origin:string;api_key:string};
@@ -51,10 +52,9 @@ export async function invitationTick(req:Request,env:Env,send:Fetch=fetch,now=Da
     text:'Hesap erişimi davetinizi kabul etmek için bağlantıyı açın:\n'+link.href+'\n\nBu davet yalnız gönderildiği doğrulanmış e-posta hesabıyla kabul edilebilir. Talep etmediyseniz bu e-postayı yok sayabilirsiniz.'};
    const authorized=await rpc(command,{invitation_phase:'authorize'});
    if(authorized.authorized!==true){await rpc(command,{invitation_phase:'finish',retryable:false});return reply(200,{claimed:1});}
-   const res=await send('https://api.resend.com/emails',{method:'POST',headers:{authorization:'Bearer '+item.api_key,'content-type':'application/json','Idempotency-Key':'ftksaas-invitation/'+item.job_id},body:JSON.stringify(payload),signal:AbortSignal.timeout(15000)});
-   const body=await res.json().catch(()=>null);
-   if(res.ok&&typeof body?.id==='string'&&uuid.test(body.id))provider_reference=body.id;
-   else retryable=res.ok||res.status>=500||res.status===429||(res.status===409&&body?.name==='concurrent_idempotent_requests');
+   const outcome=await sendEmail({apiKey:item.api_key,idempotencyKey:'ftksaas-invitation/'+item.job_id,payload},send);
+   if(outcome.state==='accepted')provider_reference=outcome.provider_reference;
+   else retryable=outcome.state!=='rejected';
   }catch{ retryable=true; /* Unknown provider outcome is retried only within the persisted 23h window. */ }
   await rpc(command,{invitation_phase:'finish',provider_reference,retryable});
   return reply(200,{claimed:1,accepted:provider_reference!==undefined});

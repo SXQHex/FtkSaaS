@@ -467,7 +467,7 @@ Değişen dilimin sözleşme, üretilmiş tip/envanter, WF/F01–F33 izi ve alan
 
 **Uygulama dilimleri:**
 
-**Kaynak dilimi:** Mevcut CSV/Storage/import job/preview/apply/worker yeniden kullanılır; `mapping.kind=crm_applications` açık ayrımdır, kind yoksa öğrenci davranışı değişmez. CRM satırı yalnız ortak `public_applications` üretir; seçili set tek transaction, kalıcı source tür/kimliği ve canlı import+CRM scope’u korunur. P10.1/P10.2 kaynak/native aday kabulü doğrulandı; merge/development teslimi ve P10.3 gerçek veri aktarımı ayrı açık. Teknik sınırlar ve API sırası WF11 sahibindedir.
+**Kaynak dilimi:** Mevcut CSV/Storage/import job/preview/apply/worker yeniden kullanılır; `mapping.kind=crm_applications` açık ayrımdır, kind yoksa öğrenci davranışı değişmez. CRM satırı yalnız ortak `public_applications` üretir; seçili set tek transaction, kalıcı source tür/kimliği ve canlı import+CRM scope’u korunur. P10.1/P10.2 kaynak/native aday, merge/main ve development teslimi doğrulandı; P10.3 gerçek veri aktarımı ayrı açık. Teknik sınırlar ve API sırası WF11 sahibindedir.
 
 - [x] P10.1 — Mevcut import preview/apply altyapısını ve eski başvuru alanlarını incele; yalnız eksik CRM eşlemesini ekle. Önizleme kaynak kimliği, alan hatası, olası mükerrerlik, kaynak/onay kanıtı ve seçilebilir satırları göstermeli. Eksik onay sürümü/zamanı uydurulmasın; gerçek kişisel veri test fixture'ı yapılmasın. Kaynak alanı: mevcut import/CRM kaynakları ve ayrı küçük parser/preview testi.
 - [x] P10.2 — Onaylanmış sabit önizleme/kaynak üzerinden yalnız seçilen kayıtları uygula; scope/plan/rol değişimini yeniden denetle. Aynı aktarım replay tek kayıt; değiştirilmiş snapshot/seçim ve geç hata reddi atomik olsun. İzole native preview→apply→readback, yarış/rollback ve sayım mutabakatı kullan.
@@ -476,7 +476,7 @@ Değişen dilimin sözleşme, üretilmiş tip/envanter, WF/F01–F33 izi ve alan
 <a id="p11"></a>
 ### P11 — Deneme, takip ve segment tam akışı
 
-- [ ] **Tür:** D/K · **Plan:** Pro/Business · **Özellik:** F22,F23,F24
+- [x] **Tür:** D/K · **Plan:** Pro/Business · **Özellik:** F22,F23,F24
 - **Bağımlılık:** P06
 - **Kabul:** Lead→deneme→takip→öğrenci dönüşümü; yenileme/hareketsizlik listesi ve segment yönetimi tamamdır.
 - **Sınır/olumsuz durum:** Segment liste/detail kaynakta var; baştan icat edilmez; otomatik pazarlama gönderimi kapalı.
@@ -485,7 +485,7 @@ Değişen dilimin sözleşme, üretilmiş tip/envanter, WF/F01–F33 izi ve alan
 
 **Uygulama dilimleri:**
 
-**Kaynak incelemesi ve uygulama:** Mevcut P04 free/paid trial ve dönüşüm kaynakları korunur. Pro F24 worker plan uyumu migration110 ile düzeltilir; beş küçük bağımsız native kök; yetki/faaliyet, dönüşüm/kota/Abone No/rollback, yenileme/hareketsizlik projeksiyonu, canlı segment ve worker yetki/tekilliğini ayrı fixture ile sınar. P11.2/P11.3 gerçek aday/main kaynak kabulünü geçti; development Edge yayını başarısızdır. HTTP413 boyut onarımı/yeniden teslim ve kaynak/ortam kanıtı devir sahibindedir; P11 genel kapanışı development teslimini bekler. Genel feature/hosted/frontend kapanışı verilmez.
+**Kaynak incelemesi ve uygulama:** Mevcut P04 free/paid trial ve dönüşüm kaynakları korunur. Pro F24 worker plan uyumu migration110 ile düzeltilir; beş küçük bağımsız native kök; yetki/faaliyet, dönüşüm/kota/Abone No/rollback, yenileme/hareketsizlik projeksiyonu, canlı segment ve worker yetki/tekilliğini ayrı fixture ile sınar. P11.2/P11.3 aday/main kaynak kabulü ve PR204 sonrası gerçek development teslimi doğrulandı; backend P11 kapsamı tamamlandı. Kaynak/ortam kanıtı devir sahibindedir. Frontend ekran kabulü, gerçek Meta/Google ve P10.3 aktarımı bu kapanışa dahil değildir.
 
 - [x] P11.1 — Mevcut lead/trial/activity/convert ve segment liste/detail/config/worker kodunu senaryo bazında eşle; kaynakta çalışan yolu yeniden yazma. Yalnız doğrulanmış sözleşme/runtime/kabul boşluklarını düzelt. Kaynak alanı: p04 CRM, p05 segment/automation ve mevcut kabul testleri; F22/F23/F24 izi aynı dilimde güncellensin.
 - [x] P11.2 — Lead→deneme→sonuç/takip→açık öğrenci dönüşümü için tenant konfigürasyonu, süre/tekrar ve izinli indirim sınırlarını native testle doğrula. Başvuru tek başına öğrencilik/No/satış/rezervasyon açmasın; dönüşüm mevcut No/kota/kimlik kapılarını kullansın. Stale sürüm, canlı rol/plan kaybı, aynı komut replay ve geç hata negatif olsun.
@@ -524,6 +524,13 @@ Değişen dilimin sözleşme, üretilmiş tip/envanter, WF/F01–F33 izi ve alan
 - **Sınır/olumsuz durum:** Starter dış kanal kapalı; Native Auth ayrı; pazarlama/özet/SMS/push kapalı.
 - **Doğrulama senaryosu:** Timeout/unknown, retry/bounce ve iptal edilen olay; provider dedupe sınırları açık; gerçek teslim ayrıca yetkili kanıt.
 - **Kaynak alanı:** p05 notification/worker/adaptör; contract.json; teslim testleri
+
+**Uygulama dilimleri:**
+
+- [ ] P14.1 — Mevcut Resend davet sağlayıcı çağrısını ortak tek-deneme transport'una taşı; accepted/rejected/retryable/unknown, aynı payload/idempotency ve sır sızdırmayan sonuçları doğrula. Kaynak hazır; mevcut davet entegrasyonu ve üç küçük transport testi eklendi, yeni aday kabulü beklenir. Genel email kanalı bu dilimde açılmaz.
+- [ ] P14.2 — Mevcut notification/outbox kaynağını Pro/Business işlemsel olayları için kalıcı email claim/authorize/finish ile bağla; canlı kanal/plan/alıcı/olay geçerliliği, frozen payload, lease ve sağlayıcı dedupe süresi korunur. In_app ve Native Auth ayrı kalır.
+- [ ] P14.3 — İmzalı sağlayıcı olaylarını kalıcı tekillik ile işle; accepted/delivered/bounced/complained ve sırasız/tekrar olayları birbirine karıştırma, kalıcı hatayı yeniden gönderme.
+- [ ] P14.4 — Somut yetkili alıcı/olay üzerinden gerçek teslim ve hata görünürlüğünü doğrula; sentetik/provider kabulü gerçek alıcı teslimi sayılmaz. P15/P16 ayrı sıradadır.
 
 <a id="p15"></a>
 ### P15 — Hatırlatma planlama ve sessiz saat
