@@ -1,0 +1,30 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import {providerFixture} from './crm-provider-fixture.mjs';
+import {newUuidV7 as key} from '../scripts/uuid.mjs';
+import {enqueueMetaNotifications,claimMetaNotification,completeMetaNotification,retryMetaNotification} from '../scripts/crm-meta-queue.mjs';
+
+test('Meta queue batch rollback, route snapshot and stale leases cannot lose or reroute a lead',{timeout:300000},async t=>{
+ const {db,meta,metaForm,role,client,worker,count}=await providerFixture(t);
+ const route={page_id:meta.external_page_id,form_id:meta.external_form_id},event={provider:'meta',external_page_id:route.page_id,external_form_id:route.form_id,external_lead_id:meta.external_lead_id,notification_sent_at:null,lead_created_at:null,attribution:meta.attribution};
+ const queued=async()=>Number((await db.query('select count(*) n from private.crm_meta_notifications where form_id=$1',[metaForm])).rows[0].n);
+ await assert.rejects(enqueueMetaNotifications(client,[event,{...event,external_form_id:'999'}]),/PROVIDER_QUEUE/);assert.equal(await queued(),0);
+ await assert.rejects(enqueueMetaNotifications(client,[event,{...event,attribution:{ad_id:'999'}}]),/PROVIDER_QUEUE/);assert.equal(await queued(),0);
+ assert.deepEqual(await enqueueMetaNotifications(client,[event,event]),{accepted:2});assert.equal(await queued(),1);
+ assert.deepEqual(await enqueueMetaNotifications(client,[{...event,notification_sent_at:'2026-01-01T00:00:00.000Z'}]),{accepted:1});
+ const a=await claimMetaNotification(client,route,60);assert(a);const other=await worker();assert.equal(await claimMetaNotification(other,route,60),null);
+ await assert.rejects(completeMetaNotification(client,a,{...meta,external_lead_id:meta.external_lead_id+'1'}),/PROVIDER_QUEUE/);assert.equal(await count(),0);
+ await assert.rejects(completeMetaNotification(client,a,{...meta,attribution:{ad_id:'999'}}),/PROVIDER_QUEUE/);assert.equal(await count(),0);
+ await db.query("update private.crm_meta_notifications set lease_until=clock_timestamp()-interval '1 second',available_at=clock_timestamp() where id=$1",[a.id]);
+ await assert.rejects(client.query('select private.crm_meta_claim($1,$2,$3,$4)',[route.form_id,route.page_id,a.lease_token,60]));assert.equal(await count(),0);
+ const b=await claimMetaNotification(other,route,60);assert(b);assert.notEqual(a.lease_token,b.lease_token);
+ await assert.rejects(completeMetaNotification(client,a,meta),/PROVIDER_QUEUE/);await assert.rejects(retryMetaNotification(client,a,1),/PROVIDER_QUEUE/);assert.equal(await count(),0);
+ await db.query('update private.crm_intake_forms set center_id=null where id=$1',[metaForm]);await assert.rejects(enqueueMetaNotifications(client,[event]),/PROVIDER_QUEUE/);await assert.rejects(completeMetaNotification(other,b,meta),/PROVIDER_QUEUE/);assert.equal(await count(),0);
+ await db.query('update private.crm_intake_forms set center_id=$2 where id=$1',[metaForm,(await db.query('select center_id from private.crm_meta_notifications where id=$1',[b.id])).rows[0].center_id]);
+ await db.query('delete from private.crm_provider_receiver_scopes where db_role=$1 and form_id=$2',[role,metaForm]);await assert.rejects(completeMetaNotification(other,b,meta),/PROVIDER_QUEUE/);assert.equal(await count(),0);
+ await db.query('insert into private.crm_provider_receiver_scopes(db_role,form_id) values($1,$2)',[role,metaForm]);
+ const receipt=await completeMetaNotification(other,b,meta);assert.equal(receipt.replayed,false);assert.equal(await count(),1);await assert.rejects(retryMetaNotification(other,b,1),/PROVIDER_QUEUE/);
+ await assert.rejects(client.query('select * from private.crm_meta_notifications'));
+ for(const who of ['anon','authenticated','service_role'])for(const signature of ['crm_meta_enqueue(jsonb,uuid[])','crm_meta_claim(text,text,uuid,int)','crm_meta_complete(uuid,uuid,jsonb,uuid[])','crm_meta_retry(uuid,uuid,int)'])assert.equal((await db.query('select has_function_privilege($1,$2,\'EXECUTE\') allowed',[who,'private.'+signature])).rows[0].allowed,false);
+ assert.match(receipt.application_id,/^[0-9a-f-]{36}$/);assert.notEqual(key(),receipt.application_id);
+});

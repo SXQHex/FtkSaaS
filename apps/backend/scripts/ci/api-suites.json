@@ -466,7 +466,7 @@
     },
     {
       "path": "apps/backend/tests/registry.test.mjs",
-      "sha256": "b8115d64c88a98744ba79ea0f30a5e8eec1e674d45e99ef8bf027b6a50bb1909",
+      "sha256": "37a1c9acf5b756508cf62dc726769fe00a59cb989ffed5852d3d234a009de6e3",
       "shared": [
         [
           5,
@@ -786,6 +786,16 @@
           "line": 144,
           "path": "apps/backend/tests/crm-provider-webhook-acceptance.mjs",
           "sha256": "44518d5b6bc6b7fceac9fa29985cfd8f755cd14a635fdc0551d20201ff58cc32"
+        },
+        {
+          "line": 145,
+          "path": "apps/backend/tests/crm-meta-queue-acceptance.mjs",
+          "sha256": "b51c9068c8b2f35270d3a59f5424232969cd79c4ee953a50679e9ce7ed16dcbe"
+        },
+        {
+          "line": 146,
+          "path": "apps/backend/tests/crm-meta-queue-authority-acceptance.mjs",
+          "sha256": "e4793fd5442a5c5dc29c3aa2b4036852a442f405f7b7cbab1ea71724931a14d6"
         }
       ],
       "estimated_seconds": 1356.24

@@ -1,9 +1,10 @@
 // Fetch Request/Response server adapters; the host mounts these on explicit
-// provider URLs. A 200 ACK is emitted only after every applicable write commits.
+// provider URLs. ACK follows intake commit, or minimal durable queue commit.
 import {metaWebhookChallenge,parseMetaLeadNotifications} from './crm-meta-lead.mjs';
 import {readMetaLead} from './crm-meta-graph.mjs';
 import {parseGoogleLead} from './crm-google-lead.mjs';
 import {compileProviderMapping} from './crm-provider-mapping.mjs';
+import {enqueueMetaNotifications,claimMetaNotification,completeMetaNotification,retryMetaNotification} from '../scripts/crm-meta-queue.mjs';
 import {authorizeProviderRoute,submitProviderApplication} from '../scripts/crm-provider-intake.mjs';
 const headers={'content-type':'application/json','cache-control':'no-store','x-content-type-options':'nosniff'};
 const reply=(status,message)=>new Response(JSON.stringify(message?{message}:{}),{status,headers});
@@ -24,7 +25,7 @@ async function rawBody(request,limit){
 }
 const bodyFailure=error=>reply(error.message==='BODY_SIZE'?413:error.message==='BODY_TYPE'?415:['BODY_TIMEOUT','BODY_TRANSPORT'].includes(error.message)?503:400,'Request rejected');
 function snapshot(config){try{return structuredClone(config);}catch{throw Error('PROVIDER_CONFIG');}}
-export function createMetaWebhookHandler(configuration,{client,fetchImpl=fetch}={}){
+function metaConfiguration(configuration,client){
  const config=snapshot(configuration);
  if(!client||!only(config,['app_secret','verify_token','routes'])||!secret(config.app_secret)||!secret(config.verify_token)||!Array.isArray(config.routes)||config.routes.length<1||config.routes.length>1000)throw Error('PROVIDER_CONFIG');
  const routes=new Map();
@@ -33,6 +34,12 @@ export function createMetaWebhookHandler(configuration,{client,fetchImpl=fetch}=
   const key=route.page_id+':'+route.form_id;if(routes.has(key))throw Error('PROVIDER_CONFIG');
   routes.set(key,{...route,mapper:compileProviderMapping('meta',route.mapping)});
  }
+ return {config,routes};
+}
+export function createMetaWebhookHandler(configuration,dependencies={}){return metaWebhook(configuration,dependencies,false);}
+export function createMetaQueuedWebhookHandler(configuration,dependencies={}){return metaWebhook(configuration,dependencies,true);}
+function metaWebhook(configuration,{client,fetchImpl=fetch}={},queued){
+ const {config,routes}=metaConfiguration(configuration,client);
  return async request=>{
   if(request.method==='GET'){
    try{return new Response(metaWebhookChallenge(request.url,config.verify_token),{status:200,headers:{...headers,'content-type':'text/plain'}});}catch{return reply(403,'Request rejected');}
@@ -41,6 +48,10 @@ export function createMetaWebhookHandler(configuration,{client,fetchImpl=fetch}=
   let raw,notifications;try{raw=await rawBody(request,1048576);}catch(error){return bodyFailure(error);}
   try{notifications=parseMetaLeadNotifications(raw,request.headers.get('x-hub-signature-256'),config.app_secret);}catch(error){return reply(error.message==='PROVIDER_AUTH'?403:400,'Request rejected');}
   try{
+   if(queued){
+    for(const event of notifications)if(!routes.has(event.external_page_id+':'+event.external_form_id))throw Error('PROVIDER_ADMISSION');
+    await enqueueMetaNotifications(client,notifications);return reply(200);
+   }
    for(const event of notifications){
     const route=routes.get(event.external_page_id+':'+event.external_form_id);if(!route)throw Error('PROVIDER_ADMISSION');
     await authorizeProviderRoute(client,'meta',event.external_form_id,event.external_page_id);
@@ -65,4 +76,23 @@ export function createGoogleWebhookHandler(configuration,{client}={}){
    return reply(200);
   }catch{return reply(503,'Delivery not committed');}
  };
+}
+
+// One invocation performs at most one Graph retrieval. The host owns scheduling.
+export function createMetaQueueWorker(configuration,{client,fetchImpl=fetch}={}){
+ const config=snapshot(configuration),leaseSeconds=config?.lease_seconds,retrySeconds=config?.retry_seconds;
+ if(!Number.isInteger(leaseSeconds)||leaseSeconds<30||leaseSeconds>300||!Number.isInteger(retrySeconds)||retrySeconds<1||retrySeconds>3600)throw Error('PROVIDER_CONFIG');
+ delete config.lease_seconds;delete config.retry_seconds;
+ const {routes}=metaConfiguration(config,client);if(routes.size!==1)throw Error('PROVIDER_CONFIG');const route=routes.values().next().value;
+ return {async runOnce(){
+  const claim=await claimMetaNotification(client,route,leaseSeconds);if(claim===null)return {claimed:false};
+  try{
+   const lead=await readMetaLead(claim.notification,{...route,app_secret:config.app_secret},{fetchImpl});
+   await completeMetaNotification(client,claim,route.mapper.map(lead));return {claimed:true,completed:true};
+  }catch{
+   // If retry cannot persist, the durable lease expires and another run reclaims.
+   try{await retryMetaNotification(client,claim,retrySeconds);}catch{throw Error('PROVIDER_PROCESSING');}
+   throw Error('PROVIDER_PROCESSING');
+  }
+ }};
 }

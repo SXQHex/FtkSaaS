@@ -2,7 +2,7 @@
 
 Bu dosya yalnız **sıra, bağımlı teslim paketleri ve kontrol noktalarının** sahibidir. Görev içeriği/kabul/dosya alanı [remaining-work.md](remaining-work.md), gerçek kaynak/test/hosted durum [00 devir](00-FtkSaaS-yeni-sohbet-devir.md) sahibindedir. Frontend’in aktif modülü ve sırası değiştirilmez. İkinci roadmap/todo açılmaz.
 
-**Aktif kaynak kabulü:** [ST-02 kabul onarımı](remaining-work.md#takip-ve-tamamlanma-kuralı) PR192 ile kapandı. PR190 ilk sağlayıcı doğrulama kaynağının aday kabulü geçti; Graph okuma aday kabulü de geçti. Ortak native alım aday kabulü de geçti. Sıra HTTP/açık mapping kaynak kabulü → Meta batch toplam bütçe/kalıcı yürütme → gerçek host/form/onay kurulumu ve sağlayıcı kabulü → P10/P11 kalan adımlarıdır. V2 bağımsız çalışma alanı olarak korunur.
+**Aktif kaynak kabulü:** [ST-02 kabul onarımı](remaining-work.md#takip-ve-tamamlanma-kuralı) PR192 ile kapandı. PR190 ilk sağlayıcı doğrulama kaynağının aday kabulü geçti; Graph okuma aday kabulü de geçti. Ortak native alım aday kabulü de geçti. HTTP/açık mapping aday kabulü de geçti. Sıra Meta kalıcı bildirim/tekil worker kaynak kabulü → gerçek host süre bütçesi, worker zamanlaması ve form/onay kurulumu → sağlayıcı kabulü → P10/P11 kalan adımlarıdır. Main’de emekli edilen V2 dosyaları geri getirilmez.
 
 ## Uygulama sırası
 

@@ -49,6 +49,6 @@ export function parseMetaLeadNotifications(raw,signature,appSecret){
   }
  }
  // No implicit acknowledgement or durable dedupe: the receiver must persist
- // verified identities and retrieve actual field/disclaimer data before ack.
+ // verified identities durably before ACK; queued delivery retrieves answers later.
  return result;
 }

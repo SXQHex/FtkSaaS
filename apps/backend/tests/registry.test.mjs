@@ -142,3 +142,5 @@ import './crm-application-intake-acceptance.mjs';
 import './crm-application-review-acceptance.mjs';
 import './crm-provider-intake-acceptance.mjs';
 import './crm-provider-webhook-acceptance.mjs';
+import './crm-meta-queue-acceptance.mjs';
+import './crm-meta-queue-authority-acceptance.mjs';

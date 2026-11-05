@@ -279,8 +279,8 @@
         "management_state_get_v1"
       ],
       "review": {
-        "fingerprint": "e201aa944de6cd9d86f323c40dbef1b815185f9921260e05b25385ddd104e384",
-        "reason": "Reviewed merged main PR194 retirement without restoring removed V2 files; provider HTTP and native test bindings retained, production acceptance preserved."
+        "fingerprint": "2bf5ebfa4ecf707e3b1ff08262632cee5414006b51b5d988fd51c30ae8b25c82",
+        "reason": "Reviewed minimal durable Meta queue, one-item lease worker, tenant snapshot, atomic completion, nonce history and crash fairness tests; existing API behavior retained."
       }
     },
     {
@@ -455,8 +455,8 @@
         "role_revoke_preview_v1"
       ],
       "review": {
-        "fingerprint": "c4078c673c9e3d2cfdca00c4d56f648e371c2474afb7d26817a72cd3e9f96b8a",
-        "reason": "Reviewed merged main PR194 retirement without restoring removed V2 files; provider HTTP and native test bindings retained, production acceptance preserved."
+        "fingerprint": "8d86d0ea9666fd88ba107832fa1bfdc72791cb296fd06cb22c29596922831b89",
+        "reason": "Reviewed minimal durable Meta queue, one-item lease worker, tenant snapshot, atomic completion, nonce history and crash fairness tests; existing API behavior retained."
       }
     },
     {
@@ -638,8 +638,8 @@
         "person_discipline_set_v1"
       ],
       "review": {
-        "fingerprint": "93a044e7a3a46d5c6eed8929c51d0f738a2027e1d8f5b99a47bb670ac951e7df",
-        "reason": "Reviewed merged main PR194 retirement without restoring removed V2 files; provider HTTP and native test bindings retained, production acceptance preserved."
+        "fingerprint": "c60e15a714d78c6f8c07c2571cf6ac7ef2772cb6b1e072e43559ffd9ec65e3c7",
+        "reason": "Reviewed minimal durable Meta queue, one-item lease worker, tenant snapshot, atomic completion, nonce history and crash fairness tests; existing API behavior retained."
       }
     },
     {
@@ -960,7 +960,10 @@
         "apps/backend/tests/crm-provider-fixture.mjs",
         "apps/backend/tests/crm-provider-mapping-unit.mjs",
         "apps/backend/tests/crm-provider-webhook-unit.mjs",
-        "apps/backend/tests/crm-provider-webhook-acceptance.mjs"
+        "apps/backend/tests/crm-provider-webhook-acceptance.mjs",
+        "apps/backend/tests/crm-meta-queue-unit.mjs",
+        "apps/backend/tests/crm-meta-queue-acceptance.mjs",
+        "apps/backend/tests/crm-meta-queue-authority-acceptance.mjs"
       ],
       "sources": [
         "apps/backend/api/public-application.js",
@@ -990,7 +993,10 @@
         "apps/backend/database/crm-provider-route.sql",
         "apps/backend/supabase/migrations/20261105024500_crm_provider_route.sql",
         "apps/backend/transports/crm-provider-mapping.mjs",
-        "apps/backend/transports/crm-provider-webhook.mjs"
+        "apps/backend/transports/crm-provider-webhook.mjs",
+        "apps/backend/database/crm-meta-queue.sql",
+        "apps/backend/supabase/migrations/20261105041500_crm_meta_queue.sql",
+        "apps/backend/scripts/crm-meta-queue.mjs"
       ],
       "operations": [
         "publication_set_v1",
@@ -1004,8 +1010,8 @@
         "calendar_feed_get_v1"
       ],
       "review": {
-        "fingerprint": "81327964abf881ba83e940d1c3234467b9e92d0986d1ea54610894c387368c6b",
-        "reason": "Reviewed merged main PR194 retirement without restoring removed V2 files; provider HTTP and native test bindings retained, production acceptance preserved."
+        "fingerprint": "26c386f15a5486f2e07319363f4a6e1eaacb888514e08001f83771848ec86079",
+        "reason": "Reviewed minimal durable Meta queue, one-item lease worker, tenant snapshot, atomic completion, nonce history and crash fairness tests; existing API behavior retained."
       }
     },
     {

@@ -51860,6 +51860,98 @@
         "replayed"
       ],
       "additionalProperties": false
+    },
+    "CrmMetaNotification": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "provider",
+        "external_page_id",
+        "external_form_id",
+        "external_lead_id",
+        "notification_sent_at",
+        "lead_created_at",
+        "attribution"
+      ],
+      "properties": {
+        "provider": {
+          "const": "meta"
+        },
+        "external_page_id": {
+          "type": "string",
+          "pattern": "^[1-9][0-9]{0,31}$"
+        },
+        "external_form_id": {
+          "type": "string",
+          "pattern": "^[1-9][0-9]{0,31}$"
+        },
+        "external_lead_id": {
+          "type": "string",
+          "pattern": "^[1-9][0-9]{0,31}$"
+        },
+        "notification_sent_at": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "format": "date-time"
+        },
+        "lead_created_at": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "format": "date-time"
+        },
+        "attribution": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "ad_id": {
+              "type": "string",
+              "pattern": "^[1-9][0-9]{0,31}$"
+            },
+            "adgroup_id": {
+              "type": "string",
+              "pattern": "^[1-9][0-9]{0,31}$"
+            }
+          }
+        }
+      }
+    },
+    "CrmMetaQueueReceipt": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "accepted"
+      ],
+      "properties": {
+        "accepted": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 1000
+        }
+      }
+    },
+    "CrmMetaQueueClaim": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "lease_token",
+        "notification"
+      ],
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/FtkUuid"
+        },
+        "lease_token": {
+          "$ref": "#/$defs/FtkUuid"
+        },
+        "notification": {
+          "$ref": "#/$defs/CrmMetaNotification"
+        }
+      }
     }
   },
   "x-contract": {
@@ -95594,6 +95686,18 @@
         "origin": "ftksaas",
         "acceptance": "generic_uuid",
         "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/CrmMetaQueueClaim/properties/id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/CrmMetaQueueClaim/properties/lease_token",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
       }
     ],
     "open_product_decisions": [],
@@ -95769,6 +95873,22 @@
       {
         "function": "private.crm_provider_authorize",
         "kind": "native_receiver_form_admission_before_provider_io"
+      },
+      {
+        "function": "private.crm_meta_enqueue",
+        "kind": "atomic_native_form_scoped_minimal_notification_batch"
+      },
+      {
+        "function": "private.crm_meta_claim",
+        "kind": "single_route_native_admission_with_expiring_lease"
+      },
+      {
+        "function": "private.crm_meta_complete",
+        "kind": "exact_notification_bound_atomic_common_intake_and_completion"
+      },
+      {
+        "function": "private.crm_meta_retry",
+        "kind": "live_lease_owner_delayed_retry_without_provider_details"
       }
     ],
     "runtime": {
@@ -96001,7 +96121,7 @@
       "uuid": "backend uuid@14.0.3 v7 for all inserted IDs; DB defaults not required",
       "external_transport": "POST /functions/v1/backend-v1/{operation}; direct typed request body",
       "internal_rpc": "service-only api_v1 named functions; actor/session/UUID bank supplied by verified gateway",
-      "migration_count": 106,
+      "migration_count": 107,
       "acceptance_source": "apps/backend/docs/00-FtkSaaS-yeni-sohbet-devir.md"
     },
     "decision_sprint": {

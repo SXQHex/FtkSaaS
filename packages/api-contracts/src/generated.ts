@@ -3745,6 +3745,9 @@ CrmPhoneMatch?: CrmPhoneMatch
 CrmProviderAttribution?: CrmProviderAttribution
 CrmProviderDelivery?: CrmProviderDelivery
 CrmProviderReceipt?: CrmProviderReceipt
+CrmMetaNotification?: CrmMetaNotification
+CrmMetaQueueReceipt?: CrmMetaQueueReceipt
+CrmMetaQueueClaim?: CrmMetaQueueClaim
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -23391,4 +23394,42 @@ export interface CrmProviderReceipt {
  */
 application_id: string
 replayed: boolean
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "CrmMetaNotification".
+ */
+export interface CrmMetaNotification {
+provider: "meta"
+external_page_id: string
+external_form_id: string
+external_lead_id: string
+notification_sent_at: (string | null)
+lead_created_at: (string | null)
+attribution: {
+ad_id?: string
+adgroup_id?: string
+}
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "CrmMetaQueueReceipt".
+ */
+export interface CrmMetaQueueReceipt {
+accepted: number
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "CrmMetaQueueClaim".
+ */
+export interface CrmMetaQueueClaim {
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+id: string
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+lease_token: string
+notification: CrmMetaNotification
 }
