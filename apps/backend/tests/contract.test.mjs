@@ -1,5 +1,6 @@
 import './transactional-email-unit.mjs';
 import './email-events-unit.mjs';
+import './resend-webhook-unit.mjs';
 import './email-provider-unit.mjs';
 import './edge-bundle-unit.mjs';
 import './deployment-cli-unit.mjs';

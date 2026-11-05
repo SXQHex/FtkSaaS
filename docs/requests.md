@@ -364,7 +364,7 @@ PR210 main teslimi normal satışın typed projeksiyonunu içerir. PR212 sonras�
 
 ### Frontend PR213 değerlendirmesi — 5 Kasım 2026
 
-PR213 main typed kataloğu gerçek seçili kişi ve merkezle tüketildi; yönetici rol/abonelik okuyucularına bağımlılık kaldırıldı. Sayfalama, kimlik/durum ve hata davranışı regresyonlarla doğrulandı. Aday/main/dağıtım ve bağlı öğrenciyle native kabul tamamlanmadığından XREQ-021 kapanışı verilmez. Kanıt ve kalan kabulün tek sahibi [S06](../apps/web/docs/todo.md#web-s06) kaydıdır.
+PR213 main typed kataloğu PR215 ile gerçek seçili kişi/merkez, sayfalama ve kapalı hata davranışıyla frontend/main/development/web teslim edildi. Manager katalogla create/withdraw native kabulü geçti. Davetle bağlanan gerçek self test hesabının katalog öncesi `people_list_v1` okuması HTTP503/TEMPORARY_FAILURE (retryabletrue), trace `01a1ad5b-b77f-7559-ac7e-7fc7991cfcc4` verdi. İstek: org `01a19b15-5f5a-7fd5-97ce-ab3c791068c1`, center `01a19b1c-8a10-77cf-aabd-f94932b9e2bb`, relationshipstudent, limit25, sortcreated_at_asc; native UI boş ve adlı arama denemelerinde kişi seçemedi. Ayrı native Auth SDK tanı çağrısı aynı503 sonucunu üretti; son denemeyle örtüşen20:17:11Z ve önceki20:14:26Z/20:15:33Z Postgres statement timeout kayıtları var. Bağ accepted ve tek verified active link olarak doğrulandı. Backend’in mevcut self okuyucu sorgu/yetki yolunu incelemesi gerekir; kesin plan kök nedeni henüz kanıtlanmadı. Yeni izin/endpoint veya timeout artırma talep edilmez; self izolasyonu korunarak native kişi keşfi ve katalog/create tamamlanmalıdır. Self kabulü tamamlanmadığından XREQ-021 kapanışı verilmez. Kanıt ve kalan kabulün tek sahibi [S06](../apps/web/docs/todo.md#web-s06) kaydıdır.
 
 ### Backend teslimi — XREQ-021, 5 Kasım 2026
 
