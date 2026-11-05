@@ -12,9 +12,11 @@ function request({raw=body,time=at,id='msg_synthetic',signature,method='POST'}={
  signature??='v1,'+createHmac('sha256',Buffer.from(secret.slice(6),'base64')).update(id+'.'+time+'.'+raw).digest('base64');
  return new Request('https://test.supabase.co/functions/v1/backend-v1/email_provider_events',{method,headers:{'content-type':'application/json','svix-id':id,'svix-timestamp':time,'svix-signature':signature},...(method==='POST'?{body:raw}:{})});
 }
-test('Svix official independent signature vector and rotation signatures verify unchanged raw bytes',async()=>{
+test('Svix official independent signature vector and rotation signatures verify unchanged raw bytes',async t=>{
  const headers=new Headers({'svix-id':'msg_loFOjxBNrRLzqYUf','svix-timestamp':'1731705121','svix-signature':'v1,rAvfW3dJ/X/qxhsaXPOyyCGmRKsaKWcsNccKXlIktD0='});
+ const clock=t.mock.method(Date,'now',()=>1731705121000);
  assert.equal(await verifyEmailSignature('{"event_type":"ping","data":{"success":true}}',headers,'whsec_plJ3nmyCDGBKInavdOK15jsl',1731705121000),true);
+ clock.mock.restore();
  const r=request();r.headers.set('svix-signature','v2,ignored v1,'+Buffer.alloc(32).toString('base64')+' '+r.headers.get('svix-signature'));
  assert.equal(await verifyEmailSignature(body,r.headers,secret,now),true);
  assert.equal(await verifyEmailSignature(body+' ',r.headers,secret,now),false);

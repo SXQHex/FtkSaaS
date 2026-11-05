@@ -284,8 +284,8 @@
         "management_state_get_v1"
       ],
       "review": {
-        "fingerprint": "5488512f754533d0aa2c3257dc5ba444392b383fbcd06e20a8ffab98d1c105d2",
-        "reason": "CI42080690748 exposed invalid people inactive fixture. Exact native import hash now uses supported merged state with unchanged rejection assertion; no runtime or gate changes."
+        "fingerprint": "1e56f27f0aa1a3aed8ce00c47c492d04e87ccadfb14fe85364ef2b9122733e23",
+        "reason": "Reviewed separate dependency-complete webhook bundle and deployment smoke while preserving authenticated backend-v1 and source-bound acceptance."
       }
     },
     {
@@ -361,8 +361,8 @@
         "account_signup_check_v1"
       ],
       "review": {
-        "fingerprint": "54e3042c641409870340876bd98195744bfb7d118b163d9bcebf97c07d72469b",
-        "reason": "Reviewed common runtime wrapper diff: only service-internal outbox email_phase changes; WF01 entrypoints remain byte-identical. Explicit opt-in external notices do not alter domain commit, scope, plan or existing guide semantics."
+        "fingerprint": "5a09b1441a87580981009bd4f5529f67aae479862603fbef279c5153edda5ebc",
+        "reason": "Reviewed config addition: only standalone Resend provider function added; existing local Auth/provider/session settings and hosted backend-v1 JWT unchanged."
       }
     },
     {
@@ -1556,7 +1556,8 @@
         "apps/backend/tests/email-provider-unit.mjs",
         "apps/backend/tests/email-events-unit.mjs",
         "apps/backend/tests/transactional-email-unit.mjs",
-        "apps/backend/tests/transactional-email-acceptance.mjs"
+        "apps/backend/tests/transactional-email-acceptance.mjs",
+        "apps/backend/tests/resend-webhook-unit.mjs"
       ],
       "sources": [
         "apps/backend/database/invitation-delivery.sql",
@@ -1597,7 +1598,9 @@
         "apps/backend/supabase/functions/backend-v1/email-events.ts",
         "apps/backend/database/transactional-email.sql",
         "apps/backend/supabase/migrations/20261105150001_transactional_notification_email.sql",
-        "apps/backend/supabase/functions/backend-v1/transactional-email.ts"
+        "apps/backend/supabase/functions/backend-v1/transactional-email.ts",
+        "apps/backend/supabase/functions/resend-webhook/handler.ts",
+        "apps/backend/supabase/functions/resend-webhook/index.ts"
       ],
       "operations": [
         "seat_offer_issue_v1",
@@ -1612,8 +1615,8 @@
         "subscription_boundary_apply_v1"
       ],
       "review": {
-        "fingerprint": "a6b69631cbbf5160506284dec63b364ac46bd2f0ba4350729372c8a8128c07d8",
-        "reason": "Reviewed restricted-role enqueue regression explicit SET membership and own-grant cleanup; runtime notification logic and worker table access unchanged."
+        "fingerprint": "1f19fce1a6ec0509094594f05d0f9e2ed9d83cb41d9b54ccf57f7dce066f72aa",
+        "reason": "Reviewed dedicated native provider HTTP entry, Standard Webhooks verification and persistence-before-ACK; no caller Supabase client or CORS dependency is needed."
       }
     }
   ]
