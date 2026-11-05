@@ -124,7 +124,7 @@ function SelfDocumentContent({
             <li key={doc.version_id} className="space-y-3 rounded-lg border p-4">
               <div className="flex flex-wrap items-center justify-between gap-3">
                 <h4 className="min-w-0 break-words font-medium">{doc.name}</h4>
-                <Badge variant="outline">
+                <Badge variant="outline" className="max-w-full whitespace-normal wrap-anywhere">
                   {t(doc.accepted ? "requirementMet" : "acceptanceRequired")}
                 </Badge>
               </div>

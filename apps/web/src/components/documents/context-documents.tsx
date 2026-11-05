@@ -84,7 +84,7 @@ function ContextDocumentReader({
                 <li key={`${doc.version_id}:${index}`} className="space-y-3 py-4">
                   <div className="flex flex-wrap items-start justify-between gap-3">
                     <h4 className="min-w-0 break-words font-medium">{doc.name}</h4>
-                    <Badge variant="outline">
+                    <Badge variant="outline" className="max-w-full whitespace-normal wrap-anywhere">
                       {t(doc.accepted ? "requirementMet" : "acceptanceRequired")}
                     </Badge>
                   </div>

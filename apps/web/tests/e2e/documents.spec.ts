@@ -97,7 +97,13 @@ test("self acceptance requires explicit consent and supports keyboard at narrow 
   await expect(self.getByRole("checkbox")).not.toBeChecked();
   await self.getByRole("checkbox").press("Space");
   await accept.press("Enter");
-  await expect(self.getByText("Gereklilik karşılanıyor")).toBeVisible();
+  const acceptedBadge = self.getByText("Gereklilik karşılanıyor", { exact: true });
+  await expect(acceptedBadge).toBeVisible();
+  expect(await acceptedBadge.evaluate((node) => node.scrollWidth <= node.clientWidth)).toBe(true);
   await expect(self.getByRole("checkbox")).toHaveCount(0);
+  expect(await page.locator("main").evaluate((node) => node.scrollWidth <= node.clientWidth)).toBe(
+    true,
+  );
+  expect((await new AxeBuilder({ page }).analyze()).violations).toEqual([]);
   expect(requests).toEqual([]);
 });

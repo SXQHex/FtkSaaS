@@ -109,7 +109,7 @@ export function DocumentsPreview() {
         <h2 className="text-lg font-semibold">{t("sessionDocuments")}</h2>
         <ContextDocuments actorId={id} query={readingQuery} actions={readingActions} />
       </section>
-      <section className="space-y-5 rounded-xl border bg-card p-5">
+      <section className="min-w-0 space-y-5">
         <h2 className="text-lg font-semibold">{t("selfTitle")}</h2>
         <SelfDocumentView
           key={String(accepted)}
