@@ -5,11 +5,9 @@ import {execFileSync} from 'node:child_process';
 import {pathToFileURL} from 'node:url';
 import {analyzeDelta} from './delta-analysis.mjs';
 import {documentScope} from './document-scope.mjs';
-export const apiSuites = [
- 'api-acceptance','event-payment','event-cancellation','registry','person-registry',
- 'room-role-registry','availability-policies','schedule-reads','program-session-lifecycle',
- 'starter-attendance-protection','instructor-earnings','cross-center-settlement','p01-catalog-entitlement-reads','p01-lesson-requests','p01-waitlist-workers'
-].map(n=>'apps/backend/tests/'+n+'.test.mjs');
+const apiManifest=JSON.parse(fs.readFileSync(process.env.FTK_MANUAL_SOURCE_ROOT?process.env.FTK_MANUAL_SOURCE_ROOT+'/apps/backend/scripts/ci/api-suites.json':new URL('./api-suites.json',import.meta.url)));
+export const apiSuites=apiManifest.suites.map(s=>s.path);
+const sharedApiSuite='apps/backend/tests/api-acceptance.test.mjs';
 // Economic consumers and reservation readers are explicit dependencies, not filename guesses.
 export const modules = [
  {id:'p01-requests', sources:['p01-lesson-requests','p01-waitlist-workers','p01-worker-transport','p01-final-scope-guards'], runtimeSources:['apps/backend/scripts/p01-worker.mjs'], operations:['lesson_request_create_v1','lesson_request_withdraw_v1','lesson_request_reject_v1','lesson_request_offer_alternative_v1','lesson_request_accept_alternative_v1','lesson_request_approve_v1','waitlist_join_v1','waitlist_leave_v1','seat_offer_accept_v1','seat_offer_reject_v1','seat_offer_issue_v1','seat_offer_expire_v1','request_expire_v1'], managementRequestProjection:true, migrationCheckLabel:'P01 requests source drift', migrationCheckLabels:{'p01-waitlist-workers':'P01 waitlist source drift','p01-worker-transport':'P01 worker transport source drift','p01-final-scope-guards':'P01 final scope guards source drift'}, suites:['p01-lesson-requests','p01-catalog-entitlement-reads','p01-waitlist-workers']},
@@ -67,9 +65,9 @@ export function select(changes,{diffAvailable=true,headMatches=true,evidence,ciO
    all(p+': shared schema/gateway/migration/build or CI dependency');continue;
   }
   if(/^apps\/backend\/tests\/(contract|governance|ci-policy|ci-selection|ci-documentation|ci-deployment|ci-shards|ci-observer|quality-guard)\.test\.mjs$/.test(p)||p==='apps/backend/tests/types.test.ts'){structural=true;reasons.push(p+': structural checks');continue;}
-  if(apiSuites.includes(p)){structural=true;chosen.add(p);chosen.add(apiSuites[0]);reasons.push(p+': explicit API suite + shared authorization/rights regressions');continue;}
+  if(apiSuites.includes(p)){structural=true;chosen.add(p);chosen.add(sharedApiSuite);reasons.push(p+': explicit API suite + shared authorization/rights regressions');continue;}
   const m=modules.find(m=>(m.sources.some(n=>p==='apps/backend/database/'+n+'.sql'||p==='apps/backend/database/'+n+'-wrappers.sql')||m.runtimeSources?.includes(p)));
-  if(m){structural=true;chosen.add(apiSuites[0]);for(const n of m.suites)chosen.add('apps/backend/tests/'+n+'.test.mjs');reasons.push(p+': '+m.id+' dependency graph + shared authorization/rights regressions');continue;}
+  if(m){structural=true;chosen.add(sharedApiSuite);for(const n of m.suites)chosen.add('apps/backend/tests/'+n+'.test.mjs');reasons.push(p+': '+m.id+' dependency graph + shared authorization/rights regressions');continue;}
   if(p.startsWith('docs/')&&p.endsWith('.json')){structural=true;reasons.push(p+': generated inventory consistency');continue;}
   all(p+': unknown/shared dependency ('+status+'), fail closed to all DB/API suites');
  }

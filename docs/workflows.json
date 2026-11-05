@@ -89,6 +89,7 @@
         "apps/backend/scripts/check-migrations.py",
         "apps/backend/scripts/ci/api-suites.json",
         "apps/backend/scripts/ci/api-suites.mjs",
+        "apps/backend/scripts/ci/candidate-inventory.mjs",
         "apps/backend/scripts/ci/check-quality.mjs",
         "apps/backend/scripts/ci/cleanup.mjs",
         "apps/backend/scripts/ci/collect.mjs",
@@ -281,8 +282,8 @@
         "management_state_get_v1"
       ],
       "review": {
-        "fingerprint": "748edd12c984e688829d8baa762caa683fcf36cd7bc941815d6be03eecc7b96d",
-        "reason": "Gitleaks false positive on existing frozen migration checksum confirmed against file bytes. New manifest entry placed before the unchanged final record; all110 hashes and source/quality guards preserved. No allowlist change."
+        "fingerprint": "58d5086341fd0b25b729a678c1a04369848c49d986621fcdb93fc17271957e74",
+        "reason": "Yeni köklerin aday kapsam/planı ve manuel tanı yolu incelendi. Beş assertion sabit sayılardan tam envanter küme eşitliğine veya yeni kök seçimine taşındı; dar parmak izi inceleme kayıtları, mevcut 64 temsilci ve tüm olumsuz kabul kontrolleri korunur."
       }
     },
     {

@@ -1,3 +1,4 @@
+import {createHash} from 'node:crypto';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {select,apiSuites,parseChanges} from '../scripts/ci/select-tests.mjs';
@@ -330,12 +331,16 @@ test('manual exact range rejects abbreviated SHA, wrong checkout and non-ancesto
 }));
 
 test('manual CLI plans an explicit commit range independently of origin/main and creates no merge receipt',()=>fixture((dir,git)=>{
- const pkg=JSON.parse(fs.readFileSync('apps/backend/package.json'));mkdirSync(join(dir,'apps/backend'),{recursive:true});writeFileSync(join(dir,'apps/backend/package.json'),JSON.stringify(pkg));git('add','.');git('commit','-m','package');const base=git('rev-parse','HEAD');
+ const manifest=JSON.parse(fs.readFileSync('apps/backend/scripts/ci/api-suites.json'));
+ for(const p of ['apps/backend/scripts/ci/api-suites.json',...manifest.suites.flatMap(s=>[s.path,...s.imports.map(i=>i.path)])]){mkdirSync(join(dir,p,'..'),{recursive:true});writeFileSync(join(dir,p),fs.readFileSync(p));}
+ const extra='apps/backend/tests/new-manual-root.test.mjs',code="import test from 'node:test';\nimport assert from 'node:assert/strict';\ntest('new manual root',()=>assert.equal(2,2));\n";
+ writeFileSync(join(dir,extra),code);manifest.suites.push({path:extra,sha256:createHash('sha256').update(code).digest('hex'),shared:[],parts:[{id:'new-manual-root',ranges:[[1,3]]}],imports:[],estimated_seconds:1});writeFileSync(join(dir,'apps/backend/scripts/ci/api-suites.json'),JSON.stringify(manifest));
+ const pkg=JSON.parse(fs.readFileSync('apps/backend/package.json'));pkg.scripts['test:api']+=' tests/new-manual-root.test.mjs';writeFileSync(join(dir,'apps/backend/package.json'),JSON.stringify(pkg));git('add','.');git('commit','-m','package');const base=git('rev-parse','HEAD');
  mkdirSync(join(dir,'apps/backend/database'),{recursive:true});writeFileSync(join(dir,'apps/backend/database/kernel.sql'),'runtime');git('add','.');git('commit','-m','runtime');
  const singleBase=git('rev-parse','HEAD');writeFileSync(join(dir,'README.md'),'Prose after runtime');git('add','.');git('commit','-m','prose');const head=git('rev-parse','HEAD'),output=join(dir,'output');
  const run=from=>{writeFileSync(output,'');execFileSync(process.execPath,[resolve('apps/backend/scripts/ci/manual-targeted.mjs'),'plan',from,head],{cwd:dir,env:{...process.env,FTK_MANUAL_SOURCE_ROOT:dir,GITHUB_OUTPUT:output},stdio:'pipe'});return JSON.parse(fs.readFileSync(join(dir,'.artifacts/ci/selection.json')));};
  assert.equal(run(singleBase).api.length,0);assert(fs.readFileSync(output,'utf8').includes('setup=false'));
- assert.equal(run(base).api.length,apiSuites.length);assert(fs.readFileSync(output,'utf8').includes('setup=true'));assert(!fs.existsSync(join(dir,'.artifacts/ci/binding.json')));
+ assert.deepEqual(run(base).api.sort(),[...apiSuites,extra].sort());assert(fs.readFileSync(output,'utf8').includes('setup=true'));assert(!fs.existsSync(join(dir,'.artifacts/ci/binding.json')));
 }));
 
 test('automatic candidate tests Draft source, binds the live main base and rejects retarget or moved head',async()=>{
@@ -368,4 +373,10 @@ test('retired experiment sources have no lightweight acceptance exemption',()=>{
   const scope=classifyChanges([{path,status:'D'}]);
   assert.equal(scope.kind,'full');assert.equal(scope.backend,true);
  }
+});
+
+test('manual exclusive roots run alone before remaining selected roots',()=>{
+ const calls=[],api=['apps/backend/tests/exclusive.test.mjs','apps/backend/tests/parallel.test.mjs'];
+ runApiPhases({api,exclusive:[api[0]],priority:[]},(cmd,args)=>calls.push({cmd,args}),p=>p);
+ assert.deepEqual(calls,[{cmd:'node',args:['--test','--test-concurrency=1',api[0]]},{cmd:'node',args:['--test','--test-concurrency=2',api[1]]}]);
 });

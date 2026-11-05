@@ -3,8 +3,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import {fileURLToPath} from 'node:url';
-import {apiSuites} from './select-tests.mjs';
-import {validateJobs,roleName} from './shards.mjs';
+import {legacyApiSuites as apiSuites,validateJobs,roleName} from './shards.mjs';
 export function durationSnapshot({run,jobs,logs}){
  const candidate=run?.path==='.github/workflows/ci-full.yml'&&run.event==='pull_request';
  const historical=run?.name==='Main clean acceptance'&&run.event==='push'&&run.head_branch==='main';
