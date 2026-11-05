@@ -38,6 +38,8 @@ import {
 } from "../../lib/student-management";
 import { PersonAccess } from "./person-access";
 import { accessActions, type AccessActions } from "../../lib/person-access";
+import { PersonEntitlements } from "../products/person-entitlements";
+import { readEntitlements } from "../../lib/products";
 import { PersonDisciplines } from "./person-disciplines";
 
 const buttonClass = "h-auto min-h-11 max-w-full whitespace-normal";
@@ -95,6 +97,7 @@ export function StudentsWorkspace({
         disciplines={disciplineActions}
         merging={mergeActions}
         access={accessActions}
+        entitlements={readEntitlements}
       />
     </div>
   );
@@ -167,6 +170,7 @@ export function StudentDirectory({
   disciplines,
   merging,
   access,
+  entitlements,
 }: {
   scope: StudentScope;
   centerName: string;
@@ -174,6 +178,7 @@ export function StudentDirectory({
   disciplines?: DisciplineActions;
   merging?: MergeActions;
   access?: AccessActions;
+  entitlements?: typeof readEntitlements;
 }) {
   const t = useTranslations("students");
   const api = useTranslations("api");
@@ -422,6 +427,7 @@ export function StudentDirectory({
               disciplines={disciplines}
               merging={merging}
               access={access}
+              entitlements={entitlements}
               onMerged={(id) => {
                 refresh();
                 setSelected({ id });
@@ -447,6 +453,7 @@ function StudentDetail({
   merging,
   onMerged,
   access,
+  entitlements,
 }: {
   scope: StudentScope;
   personId: string;
@@ -458,6 +465,7 @@ function StudentDetail({
   disciplines?: DisciplineActions;
   merging?: MergeActions;
   access?: AccessActions;
+  entitlements?: typeof readEntitlements;
 }) {
   const t = useTranslations("students");
   const api = useTranslations("api");
@@ -566,6 +574,9 @@ function StudentDetail({
             <p className="text-sm leading-6 text-muted-foreground">{t("documentStatusHint")}</p>
           </section>
         </>
+      )}
+      {person && entitlements && (
+        <PersonEntitlements scope={scope} personId={person.id} read={entitlements} />
       )}
       <PersonEdit
         key={`${personId}:${person?.version ?? "loading"}`}

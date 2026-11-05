@@ -1,4 +1,5 @@
 import { v7, validate } from "uuid";
+import { validPublishedTerms } from "./product-terms";
 import { validSelfDocumentContext } from "./document-acceptance";
 import type {
   AvailabilityRule,
@@ -9,6 +10,7 @@ import type {
 import { apiClient, ApiFailure } from "./api";
 import { sessionCapacity } from "./session-create";
 export const setupWrites = [
+  "product_publish_v1",
   "document_accept_v1",
   "settings_update_v1",
   "document_version_publish_v1",
@@ -38,6 +40,8 @@ export const setupWrites = [
 export type SetupWrite = (typeof setupWrites)[number];
 type SetupUpload = "document_upload_prepare_v1" | "file_upload_complete_v1";
 type SetupRead =
+  | "products_list_v1"
+  | "entitlements_get_v1"
   | "settings_catalog_get_v1"
   | "settings_get_v1"
   | "document_requirements_get_v1"
@@ -87,6 +91,7 @@ export const setupStorageKey = (scope: SetupScope, slot: string) =>
 export type PendingSetup = { command: SetupCommand; blocked?: boolean };
 const keyPattern = /^[a-f0-9]{8}-[a-f0-9]{4}-7[a-f0-9]{3}-[89ab][a-f0-9]{3}-[a-f0-9]{12}$/i;
 const fields: Record<SetupWrite, string[]> = {
+  product_publish_v1: ["product_id", "terms"],
   document_accept_v1: ["document_version_id", "context"],
   settings_update_v1: ["scope", "patch", "expected_version"],
   document_version_publish_v1: [
@@ -169,6 +174,15 @@ export function recoverSetup(scope: SetupScope, slot: string): PendingSetup | "i
         !input.patch ||
         Object.keys(input.patch).length !== 1 ||
         typeof input.patch.in_app_marketing !== "boolean")
+    )
+      return "invalid";
+    if (
+      command.operation === "product_publish_v1" &&
+      (!scope.centerId ||
+        input.center_id !== scope.centerId ||
+        !validPublishedTerms(input.terms, scope.centerId) ||
+        (input.product_id !== undefined &&
+          (typeof input.product_id !== "string" || !validate(input.product_id))))
     )
       return "invalid";
     if (
