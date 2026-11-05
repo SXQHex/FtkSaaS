@@ -467,10 +467,10 @@ Değişen dilimin sözleşme, üretilmiş tip/envanter, WF/F01–F33 izi ve alan
 
 **Uygulama dilimleri:**
 
-**Kaynak dilimi:** Mevcut CSV/Storage/import job/preview/apply/worker yeniden kullanılır; `mapping.kind=crm_applications` açık ayrımdır, kind yoksa öğrenci davranışı değişmez. CRM satırı yalnız ortak `public_applications` üretir; seçili set tek transaction, kalıcı source tür/kimliği ve canlı import+CRM scope’u korunur. Kaynak/native CI kabulü henüz beklenir; gerçek veri aktarımı yapılmadı. Teknik sınırlar ve API sırası WF11 sahibindedir.
+**Kaynak dilimi:** Mevcut CSV/Storage/import job/preview/apply/worker yeniden kullanılır; `mapping.kind=crm_applications` açık ayrımdır, kind yoksa öğrenci davranışı değişmez. CRM satırı yalnız ortak `public_applications` üretir; seçili set tek transaction, kalıcı source tür/kimliği ve canlı import+CRM scope’u korunur. P10.1/P10.2 kaynak/native aday kabulü doğrulandı; merge/development teslimi ve P10.3 gerçek veri aktarımı ayrı açık. Teknik sınırlar ve API sırası WF11 sahibindedir.
 
-- [ ] P10.1 — Mevcut import preview/apply altyapısını ve eski başvuru alanlarını incele; yalnız eksik CRM eşlemesini ekle. Önizleme kaynak kimliği, alan hatası, olası mükerrerlik, kaynak/onay kanıtı ve seçilebilir satırları göstermeli. Eksik onay sürümü/zamanı uydurulmasın; gerçek kişisel veri test fixture'ı yapılmasın. Kaynak alanı: mevcut import/CRM kaynakları ve ayrı küçük parser/preview testi.
-- [ ] P10.2 — Onaylanmış sabit önizleme/kaynak üzerinden yalnız seçilen kayıtları uygula; scope/plan/rol değişimini yeniden denetle. Aynı aktarım replay tek kayıt; değiştirilmiş snapshot/seçim ve geç hata reddi atomik olsun. İzole native preview→apply→readback, yarış/rollback ve sayım mutabakatı kullan.
+- [x] P10.1 — Mevcut import preview/apply altyapısını ve eski başvuru alanlarını incele; yalnız eksik CRM eşlemesini ekle. Önizleme kaynak kimliği, alan hatası, olası mükerrerlik, kaynak/onay kanıtı ve seçilebilir satırları göstermeli. Eksik onay sürümü/zamanı uydurulmasın; gerçek kişisel veri test fixture'ı yapılmasın. Kaynak alanı: mevcut import/CRM kaynakları ve ayrı küçük parser/preview testi.
+- [x] P10.2 — Onaylanmış sabit önizleme/kaynak üzerinden yalnız seçilen kayıtları uygula; scope/plan/rol değişimini yeniden denetle. Aynı aktarım replay tek kayıt; değiştirilmiş snapshot/seçim ve geç hata reddi atomik olsun. İzole native preview→apply→readback, yarış/rollback ve sayım mutabakatı kullan.
 - [ ] P10.3 — Gerçek kaynak için somut önizleme ve seçilecek satırlar kullanıcı tarafından onaylanmadan hosted aktarım yapma. Kaynağı silme/değiştirme; çıktı/rapora kişisel veri veya secret yazma. Bu PR kaynak uygulaması canlı aktarım yetkisi değildir.
 
 <a id="p11"></a>
@@ -485,7 +485,9 @@ Değişen dilimin sözleşme, üretilmiş tip/envanter, WF/F01–F33 izi ve alan
 
 **Uygulama dilimleri:**
 
-- [ ] P11.1 — Mevcut lead/trial/activity/convert ve segment liste/detail/config/worker kodunu senaryo bazında eşle; kaynakta çalışan yolu yeniden yazma. Yalnız doğrulanmış sözleşme/runtime/kabul boşluklarını düzelt. Kaynak alanı: p04 CRM, p05 segment/automation ve mevcut kabul testleri; F22/F23/F24 izi aynı dilimde güncellensin.
+**Kaynak incelemesi ve uygulama:** Mevcut P04 free/paid trial ve dönüşüm kaynakları korunur. Pro F24 worker plan uyumu migration110 ile düzeltilir; beş küçük bağımsız native kök; yetki/faaliyet, dönüşüm/kota/Abone No/rollback, yenileme/hareketsizlik projeksiyonu, canlı segment ve worker yetki/tekilliğini ayrı fixture ile sınar. P11.2/P11.3 yeni birleşik aday CI sonucunu bekler; testlerin bulunması kabul değildir. Genel feature/hosted/frontend kapanışı verilmez.
+
+- [x] P11.1 — Mevcut lead/trial/activity/convert ve segment liste/detail/config/worker kodunu senaryo bazında eşle; kaynakta çalışan yolu yeniden yazma. Yalnız doğrulanmış sözleşme/runtime/kabul boşluklarını düzelt. Kaynak alanı: p04 CRM, p05 segment/automation ve mevcut kabul testleri; F22/F23/F24 izi aynı dilimde güncellensin.
 - [ ] P11.2 — Lead→deneme→sonuç/takip→açık öğrenci dönüşümü için tenant konfigürasyonu, süre/tekrar ve izinli indirim sınırlarını native testle doğrula. Başvuru tek başına öğrencilik/No/satış/rezervasyon açmasın; dönüşüm mevcut No/kota/kimlik kapılarını kullansın. Stale sürüm, canlı rol/plan kaybı, aynı komut replay ve geç hata negatif olsun.
 - [ ] P11.3 — Yenileme/hareketsizlik ve segment kapsamı ile tekrarlı çalışmada çift görev oluşmamasını doğrula. Var olan worker sınırını kullan; kampanya/pazarlama e-postası açma. P14–P16 bildirim teslimi/otomasyon genişletmesini bu kaynak kapanışına taşımadan bağımlılıklarını koru.
 

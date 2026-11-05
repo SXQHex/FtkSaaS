@@ -1,10 +1,10 @@
 # Veritabanı kaynak referansı
 
-Üretilmiştir: `node apps/backend/scripts/update-docs.mjs --write`. Elle düzenleme. Kaynak içerik özeti: `0ff00608a8e642e8470130f6c02d6672236081978f3196d0dc3a23da5847cf82`. Bu özet CI/hosted kabulü değildir; dağıtılan SHA ve ortam CD artifact'ında bulunur.
+Üretilmiştir: `node apps/backend/scripts/update-docs.mjs --write`. Elle düzenleme. Kaynak içerik özeti: `809a42c566fb83a3f17b7fc4912dbbbe8c9d73b089be9fe6d3cf338a0933d8d9`. Bu özet CI/hosted kabulü değildir; dağıtılan SHA ve ortam CD artifact'ında bulunur.
 
 Alan/scope/değişmez görünümü [fiziksel şema kataloğundadır](contracts/04-FtkSaaS-O4-veri-semasi.md). Bu dosya ikinci DDL sözleşmesi değildir. Etkin PostgreSQL şeması migration zincirinin uygulanmasıyla oluşur; dosyaları regex ile birleştirmek nihai şema çıkarımı sayılmaz.
 
-Sıralı migration: 109. Uygulanmış içerik manifesti: [migrations.sha256.json](../apps/backend/database/migrations.sha256.json). CD, migration içeriklerini canlı geçmişle doğrular; dokümantasyon capture adımı ayrıca read-only pg_catalog snapshot ve Supabase CLI DB tiplerini alır. İş verisi/Auth satırı/secret toplanmaz.
+Sıralı migration: 110. Uygulanmış içerik manifesti: [migrations.sha256.json](../apps/backend/database/migrations.sha256.json). CD, migration içeriklerini canlı geçmişle doğrular; dokümantasyon capture adımı ayrıca read-only pg_catalog snapshot ve Supabase CLI DB tiplerini alır. İş verisi/Auth satırı/secret toplanmaz.
 
 | Migration | SHA256 |
 |---|---|
@@ -117,3 +117,4 @@ Sıralı migration: 109. Uygulanmış içerik manifesti: [migrations.sha256.json
 | [20261105041500_crm_meta_queue.sql](../apps/backend/supabase/migrations/20261105041500_crm_meta_queue.sql) | `42c611d109d70cd541e8f0ddc8ced3c51ed0fe8764aa41c831a182fef22c3b02` |
 | [20261105055000_crm_provider_health.sql](../apps/backend/supabase/migrations/20261105055000_crm_provider_health.sql) | `f05445ab1d121bd21e23618246e8ad6389cedcbd54ec5c5c484c4cb721f1d5cc` |
 | [20261105080000_crm_legacy_import.sql](../apps/backend/supabase/migrations/20261105080000_crm_legacy_import.sql) | `cc7418d3f4d295cce8962f2cf61427a9a2c8f0769608379d25875add29421719` |
+| [20261105100000_crm_lifecycle_plan.sql](../apps/backend/supabase/migrations/20261105100000_crm_lifecycle_plan.sql) | `33782233ba2005782111587563b8bff180d8ca50a8dea45bfd6e14eca3a4829d` |

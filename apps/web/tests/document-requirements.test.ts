@@ -6,6 +6,7 @@ import {
   readContextDocuments,
   readPrivateDocument,
   listSessionDocumentContexts,
+  documentReadActions,
 } from "../src/lib/document-requirements";
 import { setupCall } from "../src/lib/studio-setup";
 vi.mock("../src/lib/studio-setup", async (original) => ({
@@ -101,5 +102,19 @@ test("document context discovery uses the authorized session and scoped ascendin
     org_id: id,
     session_id: other,
     page: { limit: 25, sort: "created_at_asc", cursor: "cursor" },
+  });
+});
+
+test("person lookup rejects self document context without an explicit person", async () => {
+  const selfQuery = { org_id: query.org_id, context: query.context };
+  await expect(documentReadActions.person(selfQuery)).rejects.toThrow("documentChanged");
+  expect(setupCall).not.toHaveBeenCalled();
+});
+test("person lookup preserves the explicit scoped person", async () => {
+  await documentReadActions.person({ ...query, center_id: id });
+  expect(setupCall).toHaveBeenCalledWith("person_get_v1", {
+    org_id: id,
+    person_id: other,
+    center_id: id,
   });
 });

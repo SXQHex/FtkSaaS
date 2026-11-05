@@ -280,8 +280,8 @@
         "management_state_get_v1"
       ],
       "review": {
-        "fingerprint": "055c6c0866e48255236c1456f6f8b6750aaf1823d74aa498537af319cb26b0fe",
-        "reason": "PR198 main eşitlemesi: süre referansı logu aynen korundu; P10 exact 93 birim kabulü ve eksik/kaynak ölçüm retleri değişmedi. WF00 rehberi ve kaynak diff incelendi."
+        "fingerprint": "5231130d670a7bcceeb484a93fd2b18b88b6002109c007d23706e76c2e0d5ee6",
+        "reason": "P11 beş küçük kök envantere zorunlu olarak eklendi: source-bound kabul testi aynı64 temel + açık added listesi ve exact98 örneği doğrular. On iki shard ve eksik/failure/legacy kaynak retleri aynen korunur."
       }
     },
     {
@@ -639,8 +639,8 @@
         "person_discipline_set_v1"
       ],
       "review": {
-        "fingerprint": "ae9e5e990f3b0755270ad4753be94d3bddd116e8b7d562dea48e8e1390e73c90",
-        "reason": "Reviewed P10 explicit CRM import kind, closed legacy provenance, selected-row dependency binding, atomic application-only worker path and parser/native acceptance; old student path preserved."
+        "fingerprint": "0a7841143a40269274bf40e29a6808e4b0375341a1b504472c28da56e3400f3c",
+        "reason": "P11 kişi testleri ayrı yetki/faaliyet ve dönüşüm kota/No/rollback köklerine ayrıldı; eski kişi kaydı ve public callbackleri değişmedi."
       }
     },
     {
@@ -1019,8 +1019,8 @@
         "calendar_feed_get_v1"
       ],
       "review": {
-        "fingerprint": "b0dcadeb8d18f29e10004ceb9714d15969d29a9619abe046c81d960b48764695",
-        "reason": "Reviewed synchronization with main PR196: twelve-shard source-bound acceptance and refreshed measurements preserved; provider test ownership retained without application behavior changes."
+        "fingerprint": "c08bfd864efec840ff5c09b8d2d387cc8e8e39510046eb389634b50172278c43",
+        "reason": "CRM testleri beş bağımsız side-effect importla sahipli envantere kayıtlı; eski public alım/inceleme kodu ve assertionları değişmedi."
       }
     },
     {
@@ -1110,8 +1110,8 @@
         "document_publication_preview_v1"
       ],
       "review": {
-        "fingerprint": "cde2885eafde0a478c3d7af1b07463d8ab67cddda6b4a3f8a5887816c40604f0",
-        "reason": "Reviewed CRM import SQL column declarations, selected-row atomicity and legacy provenance"
+        "fingerprint": "3a151b5bb8172262c0675078a41db9d6b5fc36917a9c04376e96d0ca7d300f72",
+        "reason": "P05 negatif worker senaryosu açık F24 kaybını doğrular; belge runtime ve mevcut Storage/assertion gövdeleri değişmedi, WF11 akışı korundu."
       }
     },
     {
@@ -1354,7 +1354,12 @@
       "tests": [
         "apps/backend/tests/p05-acceptance.mjs",
         "apps/backend/tests/person-registry.test.mjs",
-        "apps/backend/tests/crm-application-review-acceptance.mjs"
+        "apps/backend/tests/crm-application-review-acceptance.mjs",
+        "apps/backend/tests/crm-lifecycle-authority-acceptance.mjs",
+        "apps/backend/tests/crm-lifecycle-acceptance.mjs",
+        "apps/backend/tests/crm-followup-projections-acceptance.mjs",
+        "apps/backend/tests/crm-segment-worker-acceptance.mjs",
+        "apps/backend/tests/crm-followup-acceptance.mjs"
       ],
       "sources": [
         "apps/backend/database/p04-crm-public-wrappers.sql",
@@ -1370,7 +1375,10 @@
         "apps/backend/database/starter-basic-crm.sql",
         "apps/backend/supabase/migrations/20261104111220_starter_basic_crm.sql",
         "apps/backend/database/crm-application-intake.sql",
-        "apps/backend/supabase/migrations/20261104131917_crm_application_intake.sql"
+        "apps/backend/supabase/migrations/20261104131917_crm_application_intake.sql",
+        "apps/backend/database/crm-lifecycle-plan.sql",
+        "apps/backend/supabase/migrations/20261105100000_crm_lifecycle_plan.sql",
+        "apps/backend/tests/crm-lifecycle-fixture.mjs"
       ],
       "operations": [
         "leads_list_v1",
@@ -1384,8 +1392,8 @@
         "automation_save_v1"
       ],
       "review": {
-        "fingerprint": "1662df9395faf74a3d6f974465d614bff35f72fb71f26af5056abc97346e1eb7",
-        "reason": "CI V2 retired by user decision: removed only shadow test copies, pilot fixtures, experimental workflows and active lightweight acceptance integration; production original API inventory, test bodies, core/security and source-bound proof preserved; historical no-runtime receipts still cannot deploy."
+        "fingerprint": "7105646a16942b3356d5995555510368026af224bce41463c5f1d8c4b7cbd500",
+        "reason": "P11 beş küçük bağımsız fixture kökü: yetki/faaliyet, kota/No/rollback, listeler, canlı segment, Pro worker yetki/tekillik. Her bağımlı claim/execute veya rollback zinciri kendi kökünde kaldı; WF16 çağrı sırası korundu."
       }
     },
     {
@@ -1583,8 +1591,8 @@
         "subscription_boundary_apply_v1"
       ],
       "review": {
-        "fingerprint": "d9eb2eed47cdd30cb3a68f91832a6360d853d670ce37cff423e06e0231b0d913",
-        "reason": "CI V2 retired by user decision: removed only shadow test copies, pilot fixtures, experimental workflows and active lightweight acceptance integration; production original API inventory, test bodies, core/security and source-bound proof preserved; historical no-runtime receipts still cannot deploy."
+        "fingerprint": "7e0122778d85cb9de2071b953e9d9e6f78233bdc156a4261c138c21657b6b413",
+        "reason": "Migration110 iki worker plan koşulunu Pro/Business yapar; canlı feature/center/CM/enabled/lease/hash/receipt/transaction sınırları incelendi ve korunur. Yeni native Pro testi CI bekler."
       }
     }
   ]
