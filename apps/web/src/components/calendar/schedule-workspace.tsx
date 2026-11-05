@@ -15,6 +15,7 @@ import {
 import { getCalendar, errorMessageKey } from "../../lib/api";
 import { SessionCalendar } from "./session-calendar";
 import { SessionDetail } from "./session-detail";
+import { LessonRequests } from "../bookings/lesson-requests";
 import { ProgramManager } from "../programs/program-manager";
 
 export function ScheduleWorkspace({
@@ -138,6 +139,13 @@ function CalendarContent({
                 setSelected(null);
                 setAttempt((value) => value + 1);
               }}
+            />
+          )}
+          {actorId && (
+            <LessonRequests
+              scope={{ actorId, orgId, centerId: center.id }}
+              timeZone={center.timezone}
+              onChanged={() => setAttempt((n) => n + 1)}
             />
           )}
         </div>

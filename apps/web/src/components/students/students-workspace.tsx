@@ -38,6 +38,7 @@ import {
 } from "../../lib/student-management";
 import { PersonAccess } from "./person-access";
 import { accessActions, type AccessActions } from "../../lib/person-access";
+import { PersonSales } from "../products/person-sales";
 import { PersonEntitlements } from "../products/person-entitlements";
 import { readEntitlements } from "../../lib/products";
 import { PersonDisciplines } from "./person-disciplines";
@@ -582,9 +583,13 @@ function StudentDetail({
           scope={scope}
           personId={rightsPerson.id}
           read={entitlements}
+          readRevision={attempt}
           management
           onSaved={refreshPersonAndList}
         />
+      )}
+      {rightsPerson && entitlements && (
+        <PersonSales scope={scope} personId={rightsPerson.id} onSaved={refreshPersonAndList} />
       )}
       <PersonEdit
         key={`${personId}:${person?.version ?? "loading"}`}

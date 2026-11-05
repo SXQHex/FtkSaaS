@@ -1,4 +1,10 @@
 import { v7, validate } from "uuid";
+import {
+  bookingWrites,
+  bookingFields,
+  validBookingCommand,
+  type BookingWrite,
+} from "./booking-command";
 import { rightsOperations, validRightsCommand } from "./rights-change";
 import { validPublishedTerms } from "./product-terms";
 import { validSelfDocumentContext } from "./document-acceptance";
@@ -12,6 +18,7 @@ import { apiClient, ApiFailure } from "./api";
 import { sessionCapacity } from "./session-create";
 export const setupWrites = [
   ...rightsOperations,
+  ...bookingWrites,
   "product_publish_v1",
   "document_accept_v1",
   "settings_update_v1",
@@ -42,6 +49,8 @@ export const setupWrites = [
 export type SetupWrite = (typeof setupWrites)[number];
 type SetupUpload = "document_upload_prepare_v1" | "file_upload_complete_v1";
 type SetupRead =
+  | "sale_renew_preview_v1"
+  | "finance_get_v1"
   | "negative_limits_get_v1"
   | "reservation_impact_preview_v1"
   | "products_list_v1"
@@ -95,6 +104,7 @@ export const setupStorageKey = (scope: SetupScope, slot: string) =>
 export type PendingSetup = { command: SetupCommand; blocked?: boolean };
 const keyPattern = /^[a-f0-9]{8}-[a-f0-9]{4}-7[a-f0-9]{3}-[89ab][a-f0-9]{3}-[a-f0-9]{12}$/i;
 const fields: Record<SetupWrite, string[]> = {
+  ...bookingFields,
   credit_adjust_v1: [
     "sale_id",
     "quantity",
@@ -177,6 +187,11 @@ export function recoverSetup(scope: SetupScope, slot: string): PendingSetup | "i
       (input.center_id !== undefined && input.center_id !== scope.centerId) ||
       !keyPattern.test(input.operation_key) ||
       (value.blocked !== undefined && typeof value.blocked !== "boolean")
+    )
+      return "invalid";
+    if (
+      bookingWrites.some((operation) => operation === command.operation) &&
+      !validBookingCommand(command.operation as BookingWrite, input, scope.centerId)
     )
       return "invalid";
     if (

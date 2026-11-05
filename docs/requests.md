@@ -27,6 +27,7 @@ Bu dosya alanlar arası talep ve teslim kabulünün tek kaydıdır. Sohbet devri
 | XREQ-017 | Backend | Frontend | [WF01](workflows.md#wf01), [native telefon tüketicisi](settings.md#native-telefon-doğrulama-tüketicisi) | Telefon kodunu yeniden isteme, pending numaraya authenticated updateUser ile yeni istek üretir; yeni telefon doğrulanana kadar mevcut telefon korunur. | Frontend değerlendirmesi/kabulü bekleniyor | Backend native dilimi PR183 aday/main/development kabulüyle teslim edildi; [kaynak/kanıt](../apps/backend/docs/00-FtkSaaS-yeni-sohbet-devir.md#native-telefon-test-numarası-dilimi). Frontend consumer kaynağı PR184; ekran kabulü açık. |
 | XREQ-018 | Backend; P07 site bağlantısı | Site sunucu handler sahibi | [WF09](workflows.md#wf09), [adaptör sınırı](#xreq-018) ve [sunucu yapılandırması](../apps/backend/docs/remote-backend-setup.md#p07-site-sunucusu-adaptörü). | Güncel contact/kayit handler/DTO, gerçek form/onay sürümleri ve sabit retry kimliğiyle korunan ortak CRM inbox kabulü. | Backend adaptör kaynağı hazır; site tüketici doğrulaması açık | Başka repo/frontend veya canlı form config'i değiştirilmedi; backend kabulü site kabulü yerine geçmez. |
 | XREQ-020 | Frontend; S05 satış inceleme akışı | Backend | [WF05](workflows.md#wf05), `sale_preview_v1` / `sale_apply_v1` | Satış onayından önce gerçek hak/borç ve mevcut eksik hak/rezervasyon etkileri, engeller ve belge gerekliliği normal typed önizlemede görünür. | Backend değerlendirmesi bekleniyor | Frontend 5 Kasım: mevcut kaynak yolu effects/blockers boş dizileri oluşturuyor; etki istemcide tahmin edilmiyor. Bağımsız katalog/yayın ve hak okuma S05 içinde ilerler. |
+| XREQ-021 | Frontend; S06 self özel ders talebi | Backend | [WF06](workflows.md#wf06), `lesson_request_create_v1` tüketicisi | Kendi adına talep yazabilen aktör için etkin merkez disiplinleri ve izinli tercih eğitmenleri salt okunur keşfedilir; yönetici/abonelik yetkisi gerekmez. | Backend değerlendirmesi bekleniyor | Frontend 5 Kasım: mevcut center_discipline_set / rol yönetimi okuyucuları self kataloğu değildir; manager create kaynağı ilerler, self create kapanışı açık kalır. |
 
 Alanların kendi planlarındaki bağımlılık gözlemleri otomatik olarak talep, onay veya işe başlama yetkisi sayılmaz; somut talep bu tabloya kaydedildiğinde `XREQ-001` biçiminde sabit bir kimlik alır.
 
@@ -335,3 +336,19 @@ PR205, mevcut yetkili `job_status_get_v1` davet yanıtına opsiyonel/nullable `e
 **İstenen dar teslim:** Mevcut preview/typed DTO içinde aynı actor/org/merkez/kişi/ürün sürümü/tarih snapshot'ına bağlı gerçek satış, borç ve hak etkileri; mevcut rezervasyon/eksik hak etkisi ve desteklenen bloklayıcılar. Gerekli belge kapısının kişi/ürün/bağlam kullanım sırası ve yeniden kabul davranışı açık olsun. Ayrı endpoint veya yeni istemci hesap motoru şart değildir; kesin DTO/runtime tercihi backend'e aittir. Tahsilat veya başkası adına hukuki kabul istenmez.
 
 **Kabul ölçütleri:** Üç ürün türünde normal, geçmiş/gelecek tarih ve mevcut eksik hak senaryoları; onaydan önce etki okuması; uygulama sonrası hak/finans ile tutarlılık; stale bağımlılık/plan/yetki/belge kaybı reddi ve aynı key kurtarması. Önizleme kendi başına satış/borç/hak bırakmamalı. Frontend katalog/yayın ve mevcut hak okuyucusunu bağımsız tamamlar; bu taleple S05 satış/yenileme kapanışı verilmez.
+
+
+### Frontend PR210 değerlendirmesi — 5 Kasım 2026
+
+[XREQ-020 değerlendirmesi PR210](https://github.com/SXQHex/FtkSaaS/pull/210), head `75662171d659e6d67044204e0b9787e62ba13bf6`, eksik projeksiyonu doğrular ve backend S09'a kaydeder; normal satış runtime düzeltmesi teslim etmez. Frontend, yenilemenin ayrı mevcut preview/apply yolunu tüketir; bu normal satış kapanışı veya backend adına kabul değildir. XREQ-020 açık tutulur.
+
+<a id="xreq-021"></a>
+## XREQ-021 Self özel ders talebi için dar merkez kataloğu
+
+### Frontend talebi — 5 Kasım 2026
+
+**Kaynak gözlemi:** WF06 ve `p01-lesson-requests.sql` kendi kişisi için request.write talebine izin verir. Ancak `disciplines_list_v1` organizasyon disiplinidir; etkin merkez ilişkisini göstermez. Mevcut center_discipline_set management okuyucusu canlı CM yetkisine, Starter eğitmen keşfi de rol yönetimi/abonelik okumalarına bağlıdır. Bunlar self veya yalnız request.write yetkili personel için genel katalog değildir. Frontend hesap kimliğinden kişi tahmin etmez; `people_list_v1` mevcut aktörün izinli gerçek kişi görünümünü tüketebilir. Sorun yeni self talep formunun etkin merkez/disiplin ve opsiyonel tercih eğitmeni seçimidir.
+
+**İstenen dar teslim:** Erişilebilir etkin org/merkezde self talep oluşturabilen kullanıcıya, yazım kurallarıyla uyumlu etkin disiplin ve varsa seçilebilir eğitmen kimliği/görünen adı için salt okunur typed keşif. Kişisel iletişim, finans, role assign veya abonelik yönetim alanları gerekmez. Var olan okuma genişletmesi veya başka authoritative tüketim yolunu backend belirlesin; frontend yeni endpoint/izin icat etmez. Oda/seans oluşturma yetkisi istenmez.
+
+**Kabul ölçütleri:** Native öğrenci kendi adına ilk talebi yazmadan önce seçim yapabilir; kapalı erişim, yanlış tenant/merkez, pasif disiplin/ilişki/eğitmen ve değişen yetki korunur. Salt katalog talep, seans, rezervasyon, hak veya hesap oluşturmaz. Manager talep kaynağı bağımsız ilerler; frontend self create ve S06 kapanışını bu teslim olmadan vermez.

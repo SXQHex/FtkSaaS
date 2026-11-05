@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { useFormatter, useLocale, useTranslations } from "next-intl";
 import type { SessionView } from "@ftksaas/api-contracts";
@@ -31,6 +31,7 @@ import { ReplacementSession } from "./replacement-session";
 import { ProgramRecovery } from "../programs/program-recovery";
 import { SessionChange } from "./session-change";
 import { sessionPath } from "../../lib/session-route";
+import { SessionBookings } from "../bookings/session-bookings";
 import { SessionCapacity } from "./session-capacity";
 
 export function SessionDetail({
@@ -164,6 +165,11 @@ function LiveSessionDetail({
     refresh();
     onChanged?.();
   }
+  const bookingChanged = useCallback(
+    (session: SessionView) =>
+      setResult((current) => (current?.attempt === attempt ? { attempt, session } : current)),
+    [attempt],
+  );
   const commandScope = actorId ? { ...scope, actorId } : null;
   if (!result || result.attempt !== attempt)
     return (
@@ -270,6 +276,9 @@ function LiveSessionDetail({
   return (
     <>
       <SessionSummary session={result.session} timeZone={timeZone} />
+      {commandScope && (
+        <SessionBookings scope={commandScope} session={result.session} onChanged={bookingChanged} />
+      )}
       {replacementId && (
         <Button asChild variant="outline">
           <Link href={sessionPath(scope.orgId, replacementId)}>{lifecycle("viewReplacement")}</Link>

@@ -13,12 +13,14 @@ export function PersonEntitlements({
   personId,
   read = readEntitlements,
   management = false,
+  readRevision = 0,
   onSaved,
 }: {
   scope: SetupScope;
   personId: string;
   read?: typeof readEntitlements;
   management?: boolean;
+  readRevision?: number;
   onSaved?: () => void;
 }) {
   return (
@@ -28,6 +30,7 @@ export function PersonEntitlements({
       personId={personId}
       read={read}
       management={management}
+      readRevision={readRevision}
       onSaved={onSaved}
     />
   );
@@ -37,16 +40,24 @@ function EntitlementConnection({
   personId,
   read,
   management,
+  readRevision,
   onSaved,
 }: {
   scope: SetupScope;
   personId: string;
   read: typeof readEntitlements;
   management: boolean;
+  readRevision: number;
   onSaved?: () => void;
 }) {
   return management ? (
-    <ManagedEntitlements scope={scope} personId={personId} read={read} onSaved={onSaved} />
+    <ManagedEntitlements
+      scope={scope}
+      personId={personId}
+      read={read}
+      onSaved={onSaved}
+      readRevision={readRevision}
+    />
   ) : (
     <EntitlementPanel scope={scope} personId={personId} read={read} />
   );
@@ -56,11 +67,13 @@ function ManagedEntitlements({
   personId,
   read,
   onSaved,
+  readRevision,
 }: {
   scope: SetupScope;
   personId: string;
   read: typeof readEntitlements;
   onSaved?: () => void;
+  readRevision: number;
 }) {
   const [revision, setRevision] = useState(0);
   const command = useSetupCommand(scope, `rights:${personId}`, () => {
@@ -73,7 +86,7 @@ function ManagedEntitlements({
       personId={personId}
       read={read}
       command={command}
-      revision={revision}
+      revision={revision + readRevision}
     />
   );
 }

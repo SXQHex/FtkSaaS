@@ -17,6 +17,7 @@ export function useSetupCommand(
   scope: SetupScope,
   slot: string,
   onSaved: (primaryId?: string) => void,
+  onRejected?: (code: string) => void,
 ) {
   const [pending, setPending] = useState(() => recoverSetup(scope, slot));
   const [busy, setBusy] = useState(false);
@@ -60,6 +61,7 @@ export function useSetupCommand(
           setPending("invalid");
         }
         setMessage(errorKey(cause.failure.error.code));
+        onRejected?.(cause.failure.error.code);
       } else {
         if (
           cause instanceof ApiFailure &&
@@ -124,6 +126,14 @@ export function useSetupCommand(
 }
 export function errorKey(code: string) {
   return [
+    "CAPACITY_FULL",
+    "DOCUMENT_REQUIRED",
+    "ENTITLEMENT_UNAVAILABLE",
+    "CREDIT_LIMIT_EXCEEDED",
+    "QUOTA_EXCEEDED",
+    "CLASS_ACCESS_DENIED",
+    "PARTICIPATION_BLOCKED",
+    "INVALID_STATE_TRANSITION",
     "FORBIDDEN",
     "NOT_FOUND",
     "VERSION_CONFLICT",
