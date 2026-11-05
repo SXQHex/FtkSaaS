@@ -99,6 +99,11 @@ test("rights corrections preserve explicit approvals and keyboard navigation at 
   expect(await page.locator("main").evaluate((node) => node.scrollWidth <= node.clientWidth)).toBe(
     true,
   );
+  expect(
+    await section
+      .getByRole("region", { name: "Hak değişikliği onayı" })
+      .evaluate((node) => node.scrollWidth <= node.clientWidth),
+  ).toBe(true);
   expect((await new AxeBuilder({ page }).analyze()).violations).toEqual([]);
   await section.getByRole("button", { name: "Düzenlemeye dön" }).press("Enter");
   await expect(section.getByRole("button", { name: "Etkileri incele" })).toBeFocused();

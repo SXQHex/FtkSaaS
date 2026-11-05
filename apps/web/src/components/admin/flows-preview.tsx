@@ -260,7 +260,11 @@ export function FlowsPreview() {
     },
   };
   return (
-    <main className="mx-auto min-h-screen w-full min-w-0 max-w-3xl wrap-anywhere space-y-7 p-5 pb-24">
+    <main
+      id="main-content"
+      tabIndex={-1}
+      className="mx-auto min-h-screen w-full min-w-0 max-w-3xl wrap-anywhere space-y-7 p-5 pb-24"
+    >
       <Preferences />
       <h1 className="text-2xl font-semibold">{t("demoTitle")}</h1>
       <p>{t("demoHint")}</p>

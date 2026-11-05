@@ -126,7 +126,7 @@ export function RightsReview({
       <div className="flex flex-wrap gap-3">
         <Button
           type="button"
-          className="h-auto min-h-11 whitespace-normal"
+          className="h-auto min-h-11 max-w-full whitespace-normal"
           disabled={blocked || !confirmed || accepted.length !== result.affected.length}
           onClick={() => {
             if (!(Date.parse(result.preview.expires_at) > Date.now())) setExpired(true);
@@ -138,7 +138,7 @@ export function RightsReview({
         <Button
           type="button"
           variant="outline"
-          className="h-auto min-h-11 whitespace-normal"
+          className="h-auto min-h-11 max-w-full whitespace-normal"
           disabled={disabled}
           onClick={onBack}
         >

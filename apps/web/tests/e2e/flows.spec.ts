@@ -10,6 +10,10 @@ test("booking, request alternative and renewal reviews reflow without native tra
   });
   await page.setViewportSize({ width: 320, height: 950 });
   await page.goto("/tasarim/rezervasyonlar");
+  const skip = page.getByRole("link", { name: "İçeriğe geç" });
+  await skip.focus();
+  await skip.press("Enter");
+  await expect(page.locator("#main-content")).toBeFocused();
   const bookings = page.getByRole("region", { name: "Seans rezervasyonları", exact: true });
   await bookings.getByRole("button", { name: "Sentetik Öğrenci" }).press("Enter");
   await bookings.getByRole("combobox", { name: "Kullanılacak hak" }).selectOption({ index: 1 });
