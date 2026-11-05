@@ -4,6 +4,7 @@ import { useTranslations } from "next-intl";
 import type { ProductView, EntitlementView } from "@ftksaas/api-contracts";
 import { v7 } from "uuid";
 import { Preferences } from "../preferences";
+import { RightsPreview } from "./rights-preview";
 import { ProductCatalog } from "../products/product-manager";
 import { PersonEntitlements } from "../products/person-entitlements";
 import type { useSetupCommand } from "../setup/setup-command";
@@ -34,34 +35,36 @@ const initial: ProductView[] = ["credits", "quota", "unlimited"].map((kind, i) =
     ],
   },
 }));
-const rights = async (): Promise<EntitlementView[]> =>
-  initial.map((product, index) => ({
-    sale_id: product.id,
-    person_id: other,
-    start_date: "2026-11-01",
-    end_date: "2026-12-01",
-    timezone: "Europe/Istanbul",
-    state: "active",
-    available: product.terms.kind === "credits" ? 5 : 1,
-    reserved: 2,
-    consumed: 1,
-    deficit: 0,
-    kind: product.terms.kind,
-    product_version_id: product.version_id,
-    quotas:
-      index === 1
-        ? [
-            {
-              starts_at: "2026-11-01T00:00:00Z",
-              ends_at: "2026-11-08T00:00:00Z",
-              limit: 4,
-              reserved: 2,
-              consumed: 1,
-            },
-          ]
-        : [],
-    deficit_scopes: [],
-  }));
+const initialRights: EntitlementView[] = initial.map((product, index) => ({
+  sale_id: product.id,
+  version: 1,
+  sale_state: "active",
+  person_id: other,
+  start_date: "2026-11-01",
+  end_date: "2026-12-01",
+  timezone: "Europe/Istanbul",
+  state: "active",
+  available: product.terms.kind === "credits" ? 5 : 1,
+  reserved: 2,
+  consumed: 1,
+  deficit: 0,
+  kind: product.terms.kind,
+  product_version_id: product.version_id,
+  quotas:
+    index === 1
+      ? [
+          {
+            starts_at: "2026-11-01T00:00:00Z",
+            ends_at: "2026-11-08T00:00:00Z",
+            limit: 4,
+            reserved: 2,
+            consumed: 1,
+          },
+        ]
+      : [],
+  deficit_scopes: [],
+}));
+const rights = async () => initialRights;
 export function ProductsPreview() {
   const t = useTranslations("products"),
     [items, setItems] = useState(initial),
@@ -104,6 +107,7 @@ export function ProductsPreview() {
         disciplines={disciplines}
       />
       <PersonEntitlements scope={scope} personId={other} read={rights} />
+      <RightsPreview scope={scope} personId={other} initial={initialRights} disciplineId={id} />
     </main>
   );
 }

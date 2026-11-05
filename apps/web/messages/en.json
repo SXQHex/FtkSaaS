@@ -1449,5 +1449,62 @@
     "unsupportedVersion": "This form preserves the existing product name and discipline. Products with wider scopes or freezing cannot be republished here.",
     "existingName": "Package name",
     "preservedNameHint": "The new version keeps its name and discipline. Enter the new terms explicitly below."
+  },
+  "rights": {
+    "title": "Rights management",
+    "kinds": {
+      "credit_adjust": "Adjust credits",
+      "entitlement_extend": "Extend validity",
+      "negative_limit": "Edit negative limit"
+    },
+    "chooseRight": "Right to edit",
+    "rightOption": "Right {number} · {start} – {end}",
+    "noEditableRights": "No active right with a current version is available for this action.",
+    "direction": "Adjustment direction",
+    "increase": "Increase",
+    "decrease": "Decrease",
+    "amount": "Credit quantity",
+    "newEnd": "New end date",
+    "currentEnd": "Current end: {date}",
+    "newLimit": "New personal negative limit",
+    "reason": "Reason",
+    "inspect": "Review effects",
+    "review": "Confirm rights change",
+    "effects": "Backend operation effects",
+    "record": "Record",
+    "entities": {
+      "entitlement_accounts": "Entitlement account",
+      "sales": "Sale"
+    },
+    "quantity": "Quantity: {count}",
+    "preservation": "Listed confirmed reservations and reserved rights remain protected. This approval does not waive other eligibility, resource or attendance blocks; new reservations use current rules.",
+    "affected": "Reservations to preserve: {count}",
+    "acknowledge": "Reservation {number}: I acknowledge preservation of {count} rights.",
+    "confirm": "I approve the reviewed rights change and its reason.",
+    "apply": "Apply change",
+    "back": "Back to editing",
+    "expires": "Approval expires: {date}",
+    "invalidPreview": "The impact preview could not be verified. Reload and review again.",
+    "invalidRights": "Enter a valid quantity/date and reason.",
+    "loading": "Loading…",
+    "close": "Close rights editing",
+    "discipline": "Discipline",
+    "chooseDiscipline": "Select a discipline",
+    "disciplineError": "Active center disciplines could not be read.",
+    "noDisciplines": "No active discipline was found in this center.",
+    "limitsError": "Negative limit information could not be verified.",
+    "reload": "Reload",
+    "notConfigured": "Not configured",
+    "limitHint": "A personal limit cannot exceed the mandatory upper limit. Existing deficits remain; this action does not create a sale, debt or collection.",
+    "limits": {
+      "override": "Personal limit",
+      "default_limit": "Default limit",
+      "upper_limit": "Mandatory upper limit",
+      "effective_limit": "Effective limit",
+      "reserved_deficit": "Reserved deficit",
+      "consumed_deficit": "Consumed deficit"
+    },
+    "demoTitle": "Rights management example",
+    "demoHint": "Synthetic examples only. No real sale, entitlement, reservation or financial record is changed."
   }
 }

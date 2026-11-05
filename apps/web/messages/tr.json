@@ -1449,5 +1449,62 @@
     "unsupportedVersion": "Bu form mevcut ürünün adını, disiplinini veya üst plan kapsamını değiştirmez. Farklı kapsam ya da dondurma içeren ürün burada yeniden yayımlanamaz.",
     "existingName": "Paket adı",
     "preservedNameHint": "Yeni sürümde ad ve disiplin korunur. Yeni koşulları aşağıda açıkça belirt."
+  },
+  "rights": {
+    "title": "Hak yönetimi",
+    "kinds": {
+      "credit_adjust": "Kredi düzelt",
+      "entitlement_extend": "Süreyi uzat",
+      "negative_limit": "Negatif limiti düzenle"
+    },
+    "chooseRight": "Düzenlenecek hak",
+    "rightOption": "Hak {number} · {start} – {end}",
+    "noEditableRights": "Bu işlem için güncel sürümü okunmuş aktif bir hak bulunamadı.",
+    "direction": "Düzeltme yönü",
+    "increase": "Artır",
+    "decrease": "Azalt",
+    "amount": "Kredi adedi",
+    "newEnd": "Yeni bitiş tarihi",
+    "currentEnd": "Mevcut bitiş: {date}",
+    "newLimit": "Yeni kişisel negatif limit",
+    "reason": "Gerekçe",
+    "inspect": "Etkileri incele",
+    "review": "Hak değişikliği onayı",
+    "effects": "Backend işlem etkileri",
+    "record": "Kayıt",
+    "entities": {
+      "entitlement_accounts": "Hak hesabı",
+      "sales": "Satış"
+    },
+    "quantity": "Adet: {count}",
+    "preservation": "Listelenen kesin rezervasyonlar ve ayrılmış haklar korunur. Bu onay diğer uygunluk, kaynak veya katılım engellerini kaldırmaz; yeni rezervasyonlar güncel kuralları kullanır.",
+    "affected": "Korunacak rezervasyon: {count}",
+    "acknowledge": "Rezervasyon {number}: {count} hakkın korunmasını onaylıyorum.",
+    "confirm": "İncelediğim hak değişikliğini ve gerekçesini onaylıyorum.",
+    "apply": "Değişikliği uygula",
+    "back": "Düzenlemeye dön",
+    "expires": "Onay sonu: {date}",
+    "invalidPreview": "Etki önizlemesi doğrulanamadı. Verileri yenileyip tekrar inceleyin.",
+    "invalidRights": "Geçerli bir adet/tarih ve gerekçe girin.",
+    "loading": "Yükleniyor…",
+    "close": "Hak düzenlemeyi kapat",
+    "discipline": "Disiplin",
+    "chooseDiscipline": "Disiplin seçin",
+    "disciplineError": "Etkin merkez disiplinleri okunamadı.",
+    "noDisciplines": "Bu merkezde etkin disiplin bulunamadı.",
+    "limitsError": "Negatif limit bilgisi doğrulanamadı.",
+    "reload": "Yeniden oku",
+    "notConfigured": "Tanımlı değil",
+    "limitHint": "Kişisel limit genel üst sınırı aşamaz. Mevcut eksik haklar silinmez; bu işlem satış, borç veya tahsilat oluşturmaz.",
+    "limits": {
+      "override": "Kişisel limit",
+      "default_limit": "Varsayılan limit",
+      "upper_limit": "Zorunlu üst sınır",
+      "effective_limit": "Etkin limit",
+      "reserved_deficit": "Ayrılmış eksik hak",
+      "consumed_deficit": "Tüketilmiş eksik hak"
+    },
+    "demoTitle": "Hak yönetimi örneği",
+    "demoHint": "Yalnız sentetik örneklerdir. Gerçek satış, hak, rezervasyon veya finans kaydı değiştirilmez."
   }
 }
