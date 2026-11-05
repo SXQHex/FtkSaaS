@@ -284,8 +284,8 @@
         "management_state_get_v1"
       ],
       "review": {
-        "fingerprint": "60c09d4eb337873f473f2f0d2f907bcb6c7138f20a1195cd0d511ec27d510ab0",
-        "reason": "Synced main49deb8c; isolated native fixture uses canonical instructor role, keeps role/person/link negatives and asserts absence of obsolete membership. Inventory hash and source gates preserved."
+        "fingerprint": "5488512f754533d0aa2c3257dc5ba444392b383fbcd06e20a8ffab98d1c105d2",
+        "reason": "CI42080690748 exposed invalid people inactive fixture. Exact native import hash now uses supported merged state with unchanged rejection assertion; no runtime or gate changes."
       }
     },
     {
@@ -821,8 +821,8 @@
         "reservation_capacity_override_v1"
       ],
       "review": {
-        "fingerprint": "88c7d26e8abee0727bcde888ac128b381913deead956bb20d625f5dcee3ebdd5",
-        "reason": "Reviewed current instructor lifecycle and assert_resource authority: catalog explicitly uses person_center_relationships role-derived view. Business role-only choices work; Starter fences and negative assertions remain."
+        "fingerprint": "74d2eb843826d2170351eb0122a19ee973e16d247942894e763398b52ff580a4",
+        "reason": "Reviewed actual people active/merged check constraint and existing native precedent. Non-active instructor test uses merged then restores active; catalog and negative assertions unchanged."
       }
     },
     {

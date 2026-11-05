@@ -506,7 +506,7 @@
         {
           "line": 1,
           "path": "apps/backend/tests/lesson-request-catalog-acceptance.mjs",
-          "sha256": "411f8142c59ed806f2e3edfc2d2daf1842f18276bb6a07f8b9ea181fee7f7bf1"
+          "sha256": "72db9d1988b478aeddd678b6c0423eff21dcb5cf349911b283e5bf5be8374cf7"
         }
       ],
       "estimated_seconds": 173.83
