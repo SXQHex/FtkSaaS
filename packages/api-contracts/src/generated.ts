@@ -3748,6 +3748,7 @@ CrmProviderReceipt?: CrmProviderReceipt
 CrmMetaNotification?: CrmMetaNotification
 CrmMetaQueueReceipt?: CrmMetaQueueReceipt
 CrmMetaQueueClaim?: CrmMetaQueueClaim
+CrmMetaQueueStatus?: CrmMetaQueueStatus
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -23432,4 +23433,19 @@ id: string
  */
 lease_token: string
 notification: CrmMetaNotification
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "CrmMetaQueueStatus".
+ */
+export interface CrmMetaQueueStatus {
+admission_open: boolean
+pending: number
+ready: number
+leased: number
+expired: number
+completed: number
+blocked_snapshot: number
+oldest_pending_seconds: number
+max_attempts: number
 }

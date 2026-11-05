@@ -12,11 +12,11 @@ const object=value=>value!==null&&typeof value==='object'&&!Array.isArray(value)
 const only=(value,keys)=>object(value)&&Object.keys(value).every(key=>keys.includes(key));
 const secret=value=>typeof value==='string'&&value.length>0&&value.length<=4096;
 const id=value=>typeof value==='string'&&/^[1-9][0-9]{0,31}$/.test(value);
-async function rawBody(request,limit){
+async function rawBody(request,limit,timeoutMs=10000){
  if(!/^application\/json(?:\s*;|$)/i.test(request.headers.get('content-type')??''))throw Error('BODY_TYPE');
  const reader=request.body?.getReader();if(!reader)return '';
  let timer,size=0;const chunks=[];
- const deadline=new Promise((_,reject)=>{timer=setTimeout(()=>reject(Error('BODY_TIMEOUT')),10000);});
+ const deadline=new Promise((_,reject)=>{timer=setTimeout(()=>reject(Error('BODY_TIMEOUT')),timeoutMs);});
  try{
   while(true){const {done,value}=await Promise.race([reader.read(),deadline]);if(done)break;size+=value.byteLength;if(size>limit)throw Error('BODY_SIZE');chunks.push(value);}
   try{return new TextDecoder('utf-8',{fatal:true,ignoreBOM:true}).decode(Buffer.concat(chunks));}catch{throw Error('BODY_ENCODING');}
@@ -38,14 +38,15 @@ function metaConfiguration(configuration,client){
 }
 export function createMetaWebhookHandler(configuration,dependencies={}){return metaWebhook(configuration,dependencies,false);}
 export function createMetaQueuedWebhookHandler(configuration,dependencies={}){return metaWebhook(configuration,dependencies,true);}
-function metaWebhook(configuration,{client,fetchImpl=fetch}={},queued){
+function metaWebhook(configuration,{client,fetchImpl=fetch,bodyTimeoutMs=10000}={},queued){
+ if(!Number.isInteger(bodyTimeoutMs)||bodyTimeoutMs<1||bodyTimeoutMs>10000)throw Error('PROVIDER_CONFIG');
  const {config,routes}=metaConfiguration(configuration,client);
  return async request=>{
   if(request.method==='GET'){
    try{return new Response(metaWebhookChallenge(request.url,config.verify_token),{status:200,headers:{...headers,'content-type':'text/plain'}});}catch{return reply(403,'Request rejected');}
   }
   if(request.method!=='POST')return reply(405,'Method not allowed');
-  let raw,notifications;try{raw=await rawBody(request,1048576);}catch(error){return bodyFailure(error);}
+  let raw,notifications;try{raw=await rawBody(request,1048576,bodyTimeoutMs);}catch(error){return bodyFailure(error);}
   try{notifications=parseMetaLeadNotifications(raw,request.headers.get('x-hub-signature-256'),config.app_secret);}catch(error){return reply(error.message==='PROVIDER_AUTH'?403:400,'Request rejected');}
   try{
    if(queued){
@@ -62,13 +63,14 @@ function metaWebhook(configuration,{client,fetchImpl=fetch}={},queued){
   }catch{return reply(503,'Delivery not committed');}
  };
 }
-export function createGoogleWebhookHandler(configuration,{client}={}){
+export function createGoogleWebhookHandler(configuration,{client,bodyTimeoutMs=10000}={}){
+ if(!Number.isInteger(bodyTimeoutMs)||bodyTimeoutMs<1||bodyTimeoutMs>10000)throw Error('PROVIDER_CONFIG');
  const config=snapshot(configuration);
  if(!client||!only(config,['google_key','form_id','mapping'])||!secret(config.google_key)||!id(config.form_id)||BigInt(config.form_id)>9223372036854775807n)throw Error('PROVIDER_CONFIG');
  const mapper=compileProviderMapping('google_ads',config.mapping);
  return async request=>{
   if(request.method!=='POST')return reply(405,'Method not allowed');
-  let raw,lead;try{raw=await rawBody(request,65536);}catch(error){return bodyFailure(error);}
+  let raw,lead;try{raw=await rawBody(request,65536,bodyTimeoutMs);}catch(error){return bodyFailure(error);}
   try{lead=parseGoogleLead(raw,{google_key:config.google_key,form_id:config.form_id},{extractColumns:mapper.extractColumns});}catch(error){return reply(error.message==='PROVIDER_AUTH'?403:400,'Request rejected');}
   try{
    await authorizeProviderRoute(client,'google_ads',lead.external_form_id,null);

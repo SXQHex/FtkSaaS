@@ -28,3 +28,9 @@ export async function retryMetaNotification(client,claim,retrySeconds){
  try{const result=(await client.query('select private.crm_meta_retry($1,$2,$3) result',[claim.id,claim.lease_token,retrySeconds])).rows[0]?.result;if(result!==true)throw Error();}
  catch{throw Error('PROVIDER_QUEUE');}
 }
+
+const validStatus=ajv.getSchema('contract#/$defs/CrmMetaQueueStatus');
+export async function readMetaQueueStatus(client,route){
+ try{const result=(await client.query('select private.crm_meta_status($1,$2) result',[route.form_id,route.page_id])).rows[0]?.result;if(!validStatus(result))throw Error();return result;}
+ catch{throw Error('PROVIDER_QUEUE');}
+}

@@ -89,6 +89,17 @@ async function settlementFixture(t){
  return {platform,plan,owner,outside,db,rows,account,org,A,B,C,person,body,mut,read,fail,D,linked,manager,student,teacher,om,authority,grant,movements,requests,get,line,proposal,submit,decide,product,sell,lesson,correct};
 }
 
+async function provenanceFixture(t){
+ const {platform,plan,owner,outside,db,rows,account,org,A,B,C,person,body,mut,read,fail,D,linked,manager,student,teacher,om,authority,grant,movements,requests,get,line,proposal,submit,decide,product,sell,lesson,correct}=await settlementFixture(t);
+ let sale,l1,m1,pending,approved,baseProduct;
+ // These are real source sales, actual attendance and approved payment; no synthetic movement rows.
+ await grant(person,A);await grant(person,B);await grant(person,C);await grant(manager.p,A);
+ const authorityVersion=await authority(om.p);
+ await mut('settlement_delegation_set_v1',{person_id:om.p,expected_version:authorityVersion.version,granted:true,reason:'Native independent settlement fixture'},null);
+ await grant(manager.p,B,true,om.u);
+ baseProduct=await product();
+ return {platform,plan,owner,outside,db,rows,account,org,A,B,C,person,body,mut,read,fail,D,linked,manager,student,teacher,om,authority,grant,movements,requests,get,line,proposal,submit,decide,product,sell,lesson,correct,baseProduct};
+}
 test('Cross-center payment, correction, reversal and scope chain',async t=>{
  const {platform,plan,owner,outside,db,rows,account,org,A,B,C,person,body,mut,read,fail,D,linked,manager,student,teacher,om,authority,grant,movements,requests,get,line,proposal,submit,decide,product,sell,lesson,correct}=await settlementFixture(t);
  let sale,l1,m1,pending,approved,baseProduct;
@@ -212,15 +223,8 @@ test('Cross-center payment, correction, reversal and scope chain',async t=>{
  });
 });
 
-test('Cross-center sale provenance, valuation and consumption',async t=>{
- const {platform,plan,owner,outside,db,rows,account,org,A,B,C,person,body,mut,read,fail,D,linked,manager,student,teacher,om,authority,grant,movements,requests,get,line,proposal,submit,decide,product,sell,lesson,correct}=await settlementFixture(t);
- let sale,l1,m1,pending,approved,baseProduct;
- // These are real source sales, actual attendance and approved payment; no synthetic movement rows.
- await grant(person,A);await grant(person,B);await grant(person,C);await grant(manager.p,A);
- const authorityVersion=await authority(om.p);
- await mut('settlement_delegation_set_v1',{person_id:om.p,expected_version:authorityVersion.version,granted:true,reason:'Native independent settlement fixture'},null);
- await grant(manager.p,B,true,om.u);
- baseProduct=await product();
+test("Cross-center negative deficits and later source sale settlement",async t=>{
+ const {platform,plan,owner,outside,db,rows,account,org,A,B,C,person,body,mut,read,fail,D,linked,manager,student,teacher,om,authority,grant,movements,requests,get,line,proposal,submit,decide,product,sell,lesson,correct,baseProduct}=await provenanceFixture(t);
  await t.test('DS-SET source-less negative initially creates no transfer; later eligible A sale settles past deficit without reprice',async()=>{
   const p=await linked('settlement-negative'),before=(await movements()).items.filter(x=>x.kind==='accrual').length;
   const l=await lesson(null,true,'attended',p.p);
@@ -232,6 +236,16 @@ test('Cross-center sale provenance, valuation and consumption',async t=>{
   assert.deepEqual(await rows('select id,amount_minor,basis from core.earnings where session_id=$1',[l.sid]),old);
   await correct(l,'no_show');assert((await movements()).items.some(x=>x.kind==='reversal'&&x.source_allocation_id===alloc.id));
  });
+ await t.test('DS-SET B source settles its past deficit without any cross-center share',async()=>{
+  const p=await linked('settlement-b-negative'),l=await lesson(null,true,'attended',p.p),before=await rows('select id,amount_minor,basis from core.earnings where session_id=$1',[l.sid]);
+  const s=await sell(await product(B),B,p.p);
+  assert.equal((await rows('select state from core.credit_deficits where reservation_id=$1',[l.rid]))[0].state,'settled');
+  assert.equal((await movements()).items.some(x=>x.source_sale_id===s),false);
+  assert.deepEqual(await rows('select id,amount_minor,basis from core.earnings where session_id=$1',[l.sid]),before);
+ });
+});
+test("Cross-center non-transfer consumption and no-show terms",async t=>{
+ const {platform,plan,owner,outside,db,rows,account,org,A,B,C,person,body,mut,read,fail,D,linked,manager,student,teacher,om,authority,grant,movements,requests,get,line,proposal,submit,decide,product,sell,lesson,correct,baseProduct}=await provenanceFixture(t);
  await t.test('DS-SET timed, same-center, released and not performed consumption create no transfer',async()=>{
   const before=(await movements()).items.filter(x=>x.kind==='accrual').length;
   const timed=await sell(await product(A,'timed'));const tl=await lesson(timed);assert.equal((await rows('select amount_minor from core.earnings where session_id=$1',[tl.sid]))[0].amount_minor,'75');
@@ -240,7 +254,20 @@ test('Cross-center sale provenance, valuation and consumption',async t=>{
   const q=await sell(await product());await lesson(q,true,'no_show');
   assert.equal((await movements()).items.filter(x=>x.kind==='accrual').length,before);
  });
-
+ await t.test('DS-SET consuming no-show accrues share; pure release does not',async()=>{
+  const terms={kind:'cancellation',terms:{cutoff_minutes:0,before_cutoff:'release',after_cutoff:'consume',no_show:'consume'}};
+  await mut('policy_publish_v1',{key:'student_cancel_group',value:terms,effective_at:new Date(Date.now()-500).toISOString(),mandatory:false},null);
+  const s=await sell(await product()),l=await lesson(s,true,'no_show');
+  const a=(await rows('select id from core.entitlement_allocations where reservation_id=$1',[l.rid]))[0];
+  assert((await movements()).items.some(x=>x.source_allocation_id===a.id&&x.kind==='accrual'));
+  const cancelled=await lesson(await sell(await product()),true,'attended',student.p,B,true);
+  assert.equal((await rows('select state from core.entitlement_allocations where reservation_id=$1',[cancelled.rid]))[0].state,'consumed');
+  const ca=(await rows('select id from core.entitlement_allocations where reservation_id=$1',[cancelled.rid]))[0];assert((await movements()).items.some(x=>x.kind==='accrual'&&x.source_allocation_id===ca.id));
+  await mut('policy_publish_v1',{key:'student_cancel_group',value:{kind:'cancellation',terms:{cutoff_minutes:0,before_cutoff:'release',after_cutoff:'release',no_show:'release'}},effective_at:new Date(Date.now()-100).toISOString(),mandatory:false},null);
+ });
+});
+test("Cross-center largest remainder, release and reconsume",async t=>{
+ const {platform,plan,owner,outside,db,rows,account,org,A,B,C,person,body,mut,read,fail,D,linked,manager,student,teacher,om,authority,grant,movements,requests,get,line,proposal,submit,decide,product,sell,lesson,correct,baseProduct}=await provenanceFixture(t);
  await t.test('DS-SET stable largest remainder includes local use and survives release and reconsume',async()=>{
   const p=await product(A,'credits','100',3),s=await sell(p);
   await lesson(s,true,'attended',student.p,A);
@@ -255,17 +282,9 @@ test('Cross-center sale provenance, valuation and consumption',async t=>{
   assert.equal(list.filter(x=>x.kind==='accrual').every(x=>x.amount_minor==='33'),true);
   assert.equal((await rows('select sum(amount_minor)::text n from private.settlement_credit_units where org_id=$1 and sale_id=$2',[org,s]))[0].n,'100');
  });
- await t.test('DS-SET consuming no-show accrues share; pure release does not',async()=>{
-  const terms={kind:'cancellation',terms:{cutoff_minutes:0,before_cutoff:'release',after_cutoff:'consume',no_show:'consume'}};
-  await mut('policy_publish_v1',{key:'student_cancel_group',value:terms,effective_at:new Date(Date.now()-500).toISOString(),mandatory:false},null);
-  const s=await sell(await product()),l=await lesson(s,true,'no_show');
-  const a=(await rows('select id from core.entitlement_allocations where reservation_id=$1',[l.rid]))[0];
-  assert((await movements()).items.some(x=>x.source_allocation_id===a.id&&x.kind==='accrual'));
-  const cancelled=await lesson(await sell(await product()),true,'attended',student.p,B,true);
-  assert.equal((await rows('select state from core.entitlement_allocations where reservation_id=$1',[cancelled.rid]))[0].state,'consumed');
-  const ca=(await rows('select id from core.entitlement_allocations where reservation_id=$1',[cancelled.rid]))[0];assert((await movements()).items.some(x=>x.kind==='accrual'&&x.source_allocation_id===ca.id));
-  await mut('policy_publish_v1',{key:'student_cancel_group',value:{kind:'cancellation',terms:{cutoff_minutes:0,before_cutoff:'release',after_cutoff:'release',no_show:'release'}},effective_at:new Date(Date.now()-100).toISOString(),mandatory:false},null);
- });
+});
+test("Cross-center source scope and independent earning override",async t=>{
+ const {platform,plan,owner,outside,db,rows,account,org,A,B,C,person,body,mut,read,fail,D,linked,manager,student,teacher,om,authority,grant,movements,requests,get,line,proposal,submit,decide,product,sell,lesson,correct,baseProduct}=await provenanceFixture(t);
  await t.test('DS-SET local-only sale cannot settle B deficit and unknown selection stays hidden',async()=>{
   const p=await linked('settlement-local-only'),negative=await lesson(null,true,'attended',p.p);
   const prod=await product(A,'credits','100',2,[{scope_kind:'center_all_disciplines',center_id:A,discipline_id:null,usage_targets:['lesson']}]);
@@ -288,13 +307,6 @@ test('Cross-center sale provenance, valuation and consumption',async t=>{
   const sale=await sell(prod),l=await lesson(sale);
   assert.equal((await rows('select amount_minor from core.earnings where session_id=$1',[l.sid]))[0].amount_minor,'125');
   assert.equal((await movements()).items.find(x=>x.source_sale_id===sale&&x.kind==='accrual').amount_minor,'250');
- });
- await t.test('DS-SET B source settles its past deficit without any cross-center share',async()=>{
-  const p=await linked('settlement-b-negative'),l=await lesson(null,true,'attended',p.p),before=await rows('select id,amount_minor,basis from core.earnings where session_id=$1',[l.sid]);
-  const s=await sell(await product(B),B,p.p);
-  assert.equal((await rows('select state from core.credit_deficits where reservation_id=$1',[l.rid]))[0].state,'settled');
-  assert.equal((await movements()).items.some(x=>x.source_sale_id===s),false);
-  assert.deepEqual(await rows('select id,amount_minor,basis from core.earnings where session_id=$1',[l.sid]),before);
  });
 });
 

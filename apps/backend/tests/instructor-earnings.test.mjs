@@ -5,10 +5,9 @@ import fs from 'node:fs';
 import {authUser,fixturePlatform,must,call} from './api-client.mjs';
 import {connect} from '../scripts/db.mjs';
 import {newUuidV7 as key} from '../scripts/uuid.mjs';
-test('Instructor agreement and earnings through Auth -> Edge -> RPC',async t=>{
+async function earningsFixture(t){
  const {platform,plan}=await fixturePlatform(),owner=await authUser('earning-owner'),outsider=await authUser('earning-outsider');
- const db=await connect(),rows=async(q,a=[])=>(await db.query(q,a)).rows;
- try{
+ const db=await connect();t.after(()=>db.end());const rows=async(q,a=[])=>(await db.query(q,a)).rows;
  const account=await must(owner,'account_get_v1');
  const org=(await must(platform,'organization_create_v1',{verified_account_id:account.id,name:'Starter acceptance',initial_plan_id:plan},key())).primary_id;
  const center=(await must(owner,'center_create_v1',{org_id:org,name:'Starter',timezone:'Europe/Istanbul'},key())).primary_id;
@@ -66,6 +65,9 @@ test('Instructor agreement and earnings through Auth -> Edge -> RPC',async t=>{
  const earningRows=sid=>rows('select * from core.earnings where session_id=$1 order by created_at,id',[sid]);
  const earningRead=(u=owner)=>must(u,'earnings_list_v1',scope({person_id:instructor.p,interval:{starts_at:'2020-01-01T00:00:00Z',ends_at:'2030-01-01T00:00:00Z'},page:{}}));
  let agreement,original,sid,rid,rv2,closureKey,closurePayload,startReceipt;
+ let pa,pb,saleA;
+ return {
+ earnings_publication: async()=>{
  await t.test('immutable publication and management read use original live authority',async()=>{
   await fail('instructor_agreements_list_v1',{person_id:instructor.p,page:{}},'FORBIDDEN',student.u);
   await fail('instructor_agreement_publish_v1',agreementRequest(terms([fixed(100)])),'NOT_FOUND',outsider);
@@ -97,7 +99,9 @@ test('Instructor agreement and earnings through Auth -> Edge -> RPC',async t=>{
   const gap=await publishChain({starts_at:'2027-05-01T00:00:00Z',ends_at:'2027-06-01T00:00:00Z'},{supersedes_id:next.primary_id,expected_version:next.version});
   assert.equal(gap.version,4);
  });
- let pa,pb,saleA;
+ },
+ earnings_packages_corrections: async()=>{
+ agreement=await agree(terms([fixed(100),personFee(50),percent(5000)]));
  await t.test('package identity override replaces variable conditions; fixed fee occurs once; cash is not required',async()=>{
   pa=await product('credits',{price_minor:'800'});pb=await product('credits',{price_minor:'1001'});
   const identity=(await rows('select product_id from core.product_versions where id=$1',[pa.primary_id]))[0].product_id;
@@ -116,7 +120,6 @@ test('Instructor agreement and earnings through Auth -> Edge -> RPC',async t=>{
   const read=await earningRead(instructor.u);assert.equal(read.items.find(x=>x.session_id===sid).amount_minor,'500');
   assert.equal((await rows("select count(*)::int n from core.entitlement_allocations where reservation_id=any($1) and state='consumed'",[[rid,rv2]]))[0].n,2);
  });
-
  await t.test('same product override covers old and new sale versions without catalog repricing',async()=>{
   const identity=(await rows('select product_id from core.product_versions where id=$1',[pa.primary_id]))[0].product_id;
   const newer=(await mut('product_publish_v1',{product_id:identity,terms:{name:'New catalog price',kind:'credits',booking_mode:'flexible',credits:2,price_minor:'1200',currency:'TRY',freeze:{enabled:false,extends_validity:false},refund:{method:'none'},scopes:[{scope_kind:'organization_all',center_id:null,discipline_id:null,usage_targets:['lesson']}]}})).primary_id;
@@ -126,7 +129,6 @@ test('Instructor agreement and earnings through Auth -> Edge -> RPC',async t=>{
   await mark(ses);await close(ses);assert.equal((await earningRows(ses))[0].amount_minor,'350');
   assert.equal((await rows('select net_minor from core.sales where id=$1',[saleA]))[0].net_minor,'800');
  });
-
  await t.test('negative booking settled before closure still uses general terms and its frozen valuation',async()=>{
   const p=await linked('earning-preclose-negative'),ses=(await makeSession()).primary_id,rv=(await book(ses,p.p)).primary_id;
   await sell(p.p,pa.primary_id,'800');
@@ -149,6 +151,19 @@ test('Instructor agreement and earnings through Auth -> Edge -> RPC',async t=>{
   assert.equal((await rows('select amount_minor from core.earning_allocations where payment_id=$1',[payment]))[0].amount_minor,'500');
   const view=await earningRead();assert.equal(view.items.filter(x=>x.session_id===sid).length,2);
  });
+ await t.test('late outbox failure rolls back linked correction, earning, rights, audit and receipt',async()=>{
+  const preview=await must(owner,'attendance_correct_preview_v1',scope({session_id:sid,corrections:[{reservation_id:rv2,result:'no_show'}],reason:'Correct second attendance'}));
+  const snapshot=async()=>{const x={};for(const table of ['earnings','attendance_closures','attendance_entries','reservations','sessions','entitlement_allocations','entitlement_movements','operation_receipts','audit_events','outbox_jobs'])x[table]=await rows('select to_jsonb(q) d from core.'+table+' q where org_id=$1 order by id',[org]);return x;};
+  const before=await snapshot(),fn='earning_late_'+key().replaceAll('-','');
+  await db.query("create function private."+fn+"() returns trigger language plpgsql set search_path='' as $$begin raise exception using errcode='P0001',message='INTEGRITY_VIOLATION';end$$");
+  await db.query("create trigger "+fn+" before insert on core.outbox_jobs for each row when(new.org_id='"+org+"'::uuid) execute function private."+fn+"()");
+  try{await fail('attendance_correct_apply_v1',{preview:token(preview)},'INTEGRITY_VIOLATION');assert.deepEqual(await snapshot(),before);}
+  finally{await db.query('drop trigger '+fn+' on core.outbox_jobs');await db.query('drop function private.'+fn+'()');}
+  await mut('attendance_correct_apply_v1',{preview:token(preview)});assert.equal((await earningRows(sid)).at(-1).amount_minor,'300');
+ });
+ },
+ earnings_valuation_closure: async()=>{
+ agreement=await agree(terms([fixed(9999)]));pb=await product('credits',{price_minor:'1001'});
  await t.test('negative valuation writer is versioned, read by format, and frozen at reservation',async()=>{
   const sel={operation:'negcredit_valuation_set_v1',selector:{operation:'negcredit_valuation_set_v1',key:{discipline_id:discipline,format:'group'}}};
   const before=(await must(owner,'management_state_get_v1',scope(sel))).items[0];
@@ -165,7 +180,6 @@ test('Instructor agreement and earnings through Auth -> Edge -> RPC',async t=>{
   const correction=await must(owner,'attendance_correct_preview_v1',scope({session_id:ses,corrections:[{reservation_id:rv,result:'no_show'}],reason:'Reverse later settled deficit'}));
   await mut('attendance_correct_apply_v1',{preview:token(correction)});assert.equal((await earningRows(ses))[1].direction,'subtract');
  });
-
  await t.test('timed percentage needs explicit fixed-unit basis; no implicit fee is chosen',async()=>{
   const p=await linked('earning-timed'),prod=await product('timed'),sale=await sell(p.p,prod.primary_id,'1000');
   const missing=(await makeSession()).primary_id;await mut('reservation_create_v1',{session_id:missing,person_id:p.p,source_sale_id:sale,mode:'flexible'});
@@ -174,16 +188,6 @@ test('Instructor agreement and earnings through Auth -> Edge -> RPC',async t=>{
   const prev=agreement;agreement=await agree(terms([percent(5000),{kind:'percentage',rate_bps:4000,basis:{mode:'fixed_unit',unit_minor:'300'},entitlement_kind:'timed'}]),{supersedes_id:prev.primary_id,expected_version:prev.version,valid:{starts_at:new Date(Date.now()-5000).toISOString(),ends_at:'2030-01-01T00:00:00Z'}});
   const configured=(await makeSession()).primary_id;await mut('reservation_create_v1',{session_id:configured,person_id:p.p,source_sale_id:sale,mode:'flexible'});
   await mark(configured);await close(configured);assert.equal((await earningRows(configured))[0].amount_minor,'120');
- });
- await t.test('late outbox failure rolls back linked correction, earning, rights, audit and receipt',async()=>{
-  const preview=await must(owner,'attendance_correct_preview_v1',scope({session_id:sid,corrections:[{reservation_id:rv2,result:'no_show'}],reason:'Correct second attendance'}));
-  const snapshot=async()=>{const x={};for(const table of ['earnings','attendance_closures','attendance_entries','reservations','sessions','entitlement_allocations','entitlement_movements','operation_receipts','audit_events','outbox_jobs'])x[table]=await rows('select to_jsonb(q) d from core.'+table+' q where org_id=$1 order by id',[org]);return x;};
-  const before=await snapshot(),fn='earning_late_'+key().replaceAll('-','');
-  await db.query("create function private."+fn+"() returns trigger language plpgsql set search_path='' as $$begin raise exception using errcode='P0001',message='INTEGRITY_VIOLATION';end$$");
-  await db.query("create trigger "+fn+" before insert on core.outbox_jobs for each row when(new.org_id='"+org+"'::uuid) execute function private."+fn+"()");
-  try{await fail('attendance_correct_apply_v1',{preview:token(preview)},'INTEGRITY_VIOLATION');assert.deepEqual(await snapshot(),before);}
-  finally{await db.query('drop trigger '+fn+' on core.outbox_jobs');await db.query('drop function private.'+fn+'()');}
-  await mut('attendance_correct_apply_v1',{preview:token(preview)});assert.equal((await earningRows(sid)).at(-1).amount_minor,'300');
  });
  await t.test('closure failure is atomic and competing closures cannot earn twice',async()=>{
   const p=await linked('earning-rollback'),ses=(await makeSession()).primary_id;await book(ses,p.p);await mark(ses);const v=await get(ses);
@@ -196,7 +200,6 @@ test('Instructor agreement and earnings through Auth -> Edge -> RPC',async t=>{
   finally{await db.query('drop trigger '+fn+' on core.audit_events');await db.query('drop function private.'+fn+'()');}
   const r=await Promise.all([1,2].map(()=>call(owner,'attendance_close_v1',scope(payload),key())));assert.equal(r.filter(x=>x.result.ok).length,1);assert.equal(r.find(x=>!x.result.ok).result.error.code,'ATTENDANCE_CLOSED');assert.equal((await earningRows(ses)).length,1);
  });
-
  await t.test('Pro uses the explicit agreement path with the same atomic right and earning result',async()=>{
   const sub=(await rows('select * from core.saas_subscriptions where org_id=$1',[org]))[0],pro=key();
   await db.query("insert into core.saas_plan_versions(id,name,effective_at,price_minor,currency,period,limits,features) select $1,'pro',now(),price_minor,currency,period,limits,features from core.saas_plan_versions where id=$2",[pro,plan]);
@@ -204,8 +207,6 @@ test('Instructor agreement and earnings through Auth -> Edge -> RPC',async t=>{
   try{const p=await linked('earning-pro'),ses=(await makeSession()).primary_id;await book(ses,p.p);await mark(ses);await close(ses);assert.equal((await earningRows(ses))[0].amount_minor,'450');}
   finally{await db.query('update core.saas_subscriptions set plan_version_id=$1 where id=$2',[plan,sub.id]);}
  });
-
-
  await t.test('acknowledged negative-limit protection survives paid closure and earns the frozen fee',async()=>{
   const p=await linked('earning-protected'),ses=(await makeSession()).primary_id,rv=(await book(ses,p.p)).primary_id;
   const change={kind:'negative_limit',person_id:p.p,discipline_id:discipline,allowed_negative_credits:0};
@@ -213,6 +214,17 @@ test('Instructor agreement and earnings through Auth -> Edge -> RPC',async t=>{
   await mut('reservation_impact_apply_v1',{preview:token(approval.preview),accepted_reservation_ids:approval.affected.map(x=>x.reservation_id)});
   await mark(ses);assert((await get(ses)).entries[0].protected);await close(ses);assert.equal((await earningRows(ses))[0].amount_minor,'450');
  });
+ },
+ earnings_occurrence_authority: async()=>{
+ // Match the frozen valuation/terms previously produced by earlier tests.
+ await publish('negative_valuation',{kind:'valuation',discipline_id:discipline,format:'group',amount_minor:'900',currency:'TRY'});
+ agreement=await agree(terms([percent(5000),{kind:'percentage',rate_bps:4000,basis:{mode:'fixed_unit',unit_minor:'300'},entitlement_kind:'timed'}]));
+ await agree(terms([fixed(100)]),{format:'private'});
+ // A closed receipt for live-role replay checks belongs to this fresh tenant.
+ const closedStudent=await linked('earning-revocation-closure');
+ sid=(await makeSession()).primary_id;await book(sid,closedStudent.p);await mark(sid);
+ const closedView=await get(sid);closureKey=key();closurePayload={session_id:sid,expected_version:closedView.session_version,performed:true,performed_instructor_ids:[instructor.p]};
+ await mut('attendance_close_v1',closurePayload,closureKey);
  await t.test('explicit early start pins historically published terms and blocks later schedule edits',async()=>{
   const p=await linked('earning-early-start'),ses=(await makeSession()).primary_id,rv=(await book(ses,p.p)).primary_id,old=agreement;
   let v=await get(ses);const k=key(),payload={session_id:ses,expected_version:v.session_version,actual_started_at:new Date().toISOString(),reason:'Instructor explicitly records real start'};
@@ -224,7 +236,6 @@ test('Instructor agreement and earnings through Auth -> Edge -> RPC',async t=>{
   const preview=await must(owner,'session_change_preview_v1',scope({session_id:ses,scope:'single',patch:{capacity:{total:9}},reason:'Cannot edit a started session'}));assert.equal(preview.blockers[0].code,'INVALID_STATE_TRANSITION');
   v=await get(ses);await mut('attendance_mark_v1',{reservation_id:rv,expected_version:v.entries[0].version,result:'attended'});await close(ses);assert.equal((await earningRows(ses))[0].amount_minor,'450');
  });
-
  await t.test('late start evidence excludes a replacement published after the stated real start',async()=>{
   const ses=(await makeSession()).primary_id,old=agreement,actual=new Date().toISOString();
   agreement=await agree(terms([fixed(9000)]),{supersedes_id:old.primary_id,expected_version:old.version,valid:{starts_at:new Date().toISOString(),ends_at:'2030-01-01T00:00:00Z'}});
@@ -255,7 +266,6 @@ test('Instructor agreement and earnings through Auth -> Edge -> RPC',async t=>{
   assert(correction.effects.some(x=>x.amount_minor==='100'));
   await mut('attendance_correct_apply_v1',{preview:token(correction)});assert.equal((await earningRows(privateLesson))[0].amount_minor,'100');
  });
-
  await t.test('blocked participation can consume configured rights but never a variable earning',async()=>{
   await publish('participation_block_credit',{kind:'blocked_credit',effect:'consume'});
   const policyChange={kind:'policy',key:'debt_participation',value:{kind:'boolean',value:true},effective_at:new Date().toISOString(),mandatory:false};
@@ -279,7 +289,6 @@ test('Instructor agreement and earnings through Auth -> Edge -> RPC',async t=>{
    assert.equal((await rows('select state from core.credit_deficits where reservation_id=$1',[rv]))[0].state,'consumed');
   }finally{await publish('debt_participation',{kind:'boolean',value:false});await publish('participation_block_credit',{kind:'blocked_credit',effect:'release'});}
  });
-
  await t.test('room deduction order uses its explicit sale basis once, separately from instructor fixed-unit basis',async()=>{
   let prior=(await list()).items.filter(x=>x.format==='private').at(-1);
   const component={kind:'percentage',rate_bps:5000,basis:{mode:'fixed_unit',unit_minor:'600'},entitlement_kind:'credits'};
@@ -297,6 +306,16 @@ test('Instructor agreement and earnings through Auth -> Edge -> RPC',async t=>{
   await fail('earnings_list_v1',{center_id:c2,person_id:instructor.p,interval:{starts_at:'2020-01-01T00:00:00Z',ends_at:'2030-01-01T00:00:00Z'},page:{}},'FORBIDDEN',manager.u);
   await fail('instructor_agreement_publish_v1',{center_id:c2,...agreementRequest(terms([fixed(1)]))},'FORBIDDEN',manager.u);
  });
+ await t.test('live role revocation blocks instructor read and manager receipt replay',async()=>{
+  const revokeImpact=await mut('role_revoke_preview_v1',{assignment_id:instructor.grant.primary_id,expected_version:instructor.grant.version});
+  await mut('role_revoke_v1',{impact_approval:{id:revokeImpact.id,token:revokeImpact.token},assignment_id:instructor.grant.primary_id,expected_version:instructor.grant.version,reason:'Revoke instructor access'});
+  await fail('attendance_start_v1',startReceipt.payload,'FORBIDDEN',instructor.u,startReceipt.k);
+  await fail('earnings_list_v1',{person_id:instructor.p,interval:{starts_at:'2020-01-01T00:00:00Z',ends_at:'2030-01-01T00:00:00Z'},page:{}},'FORBIDDEN',instructor.u);
+  await mut('center_manager_revoke_v1',{person_id:person,expected_version:1,reason:'Revoke operation access'});
+  await fail('attendance_close_v1',closurePayload,'FORBIDDEN',owner,closureKey);
+ });
+ },
+ earnings_pilot: async()=>{
  await t.test('pilot chain: linked student purchase, self reservation, instructor attendance, rights and manager report reconcile',async()=>{
   const learner=await linked('pilot-learner'),teacher=await linked('pilot-teacher','instructor');
   await mut('availability_save_v1',{resource:{kind:'person',id:teacher.p},rule:{weekdays:[1,2,3,4,5,6,7],local_start:'00:00:00',local_end:'23:59:59',valid_from:'2020-01-01'}});
@@ -327,14 +346,11 @@ test('Instructor agreement and earnings through Auth -> Edge -> RPC',async t=>{
   assert.equal(report.totals.find(x=>x.group_key==='earning_accrual'&&x.currency==='TRY').amount_minor,earning.amount_minor);
   await fail('report_get_v1',{report:'earnings',filters,page:{}},'FORBIDDEN',learner.u);
  });
-
- await t.test('live role revocation blocks instructor read and manager receipt replay',async()=>{
-  const revokeImpact=await mut('role_revoke_preview_v1',{assignment_id:instructor.grant.primary_id,expected_version:instructor.grant.version});
-  await mut('role_revoke_v1',{impact_approval:{id:revokeImpact.id,token:revokeImpact.token},assignment_id:instructor.grant.primary_id,expected_version:instructor.grant.version,reason:'Revoke instructor access'});
-  await fail('attendance_start_v1',startReceipt.payload,'FORBIDDEN',instructor.u,startReceipt.k);
-  await fail('earnings_list_v1',{person_id:instructor.p,interval:{starts_at:'2020-01-01T00:00:00Z',ends_at:'2030-01-01T00:00:00Z'},page:{}},'FORBIDDEN',instructor.u);
-  await mut('center_manager_revoke_v1',{person_id:person,expected_version:1,reason:'Revoke operation access'});
-  await fail('attendance_close_v1',closurePayload,'FORBIDDEN',owner,closureKey);
- });
- }finally{await db.end();}
-});
+ },
+ };
+}
+test("Instructor agreement publication and overlap boundaries",async t=>{const f=await earningsFixture(t);await f.earnings_publication();});
+test("Instructor package valuation and frozen earning corrections",async t=>{const f=await earningsFixture(t);await f.earnings_packages_corrections();});
+test("Instructor negative and timed valuation with atomic closure",async t=>{const f=await earningsFixture(t);await f.earnings_valuation_closure();});
+test("Instructor actual occurrence, room deductions and live authority",async t=>{const f=await earningsFixture(t);await f.earnings_occurrence_authority();});
+test("Instructor linked purchase to manager report reconciliation",async t=>{const f=await earningsFixture(t);await f.earnings_pilot();});

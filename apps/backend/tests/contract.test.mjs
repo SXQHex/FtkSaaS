@@ -363,3 +363,6 @@ test('P05 Starter basic CRM is explicit and person-only followups retain the adv
 });
 
 import './crm-meta-queue-unit.mjs';
+
+import './crm-provider-host-unit.mjs';
+import './crm-provider-host-db-unit.mjs';

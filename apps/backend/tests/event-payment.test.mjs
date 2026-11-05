@@ -7,12 +7,14 @@ import {authUser,fixturePlatform,must,call} from './api-client.mjs';
 import {connect} from '../scripts/db.mjs';
 import {newUuidV7 as key} from '../scripts/uuid.mjs';
 
-test('Q-E01 real Auth/API payment preparation and financial cancellation acceptance',async t=>{
+async function paymentFixture(t){
  const {platform,plan}=await fixturePlatform(),owner=await authUser('qe01-owner'),outsider=await authUser('qe01-outsider');
  const account=await must(owner,'account_get_v1');
  const org=(await must(platform,'organization_create_v1',{verified_account_id:account.id,name:'Q-E01 '+key(),initial_plan_id:plan},key())).primary_id;
  const center=(await must(owner,'center_create_v1',{org_id:org,name:'Q-E01 center',timezone:'Europe/Istanbul'},key())).primary_id;
+ let trigger;
  const db=await connect();
+ t.after(async()=>{try{await removeTrigger();}finally{await db.end();}});
  const scoped=b=>({org_id:org,center_id:center,...b}),mutate=(op,b,k=key())=>must(owner,op,scoped(b),k);
  const fail=async(op,b,code,k=key(),user=owner)=>{const r=await call(user,op,scoped(b),k);assert.equal(r.result.ok,false,JSON.stringify(r.result));assert.equal(r.result.error.code,code,JSON.stringify(r.result));return r;};
  const count=async(sql,args=[])=>(await db.query(sql,args)).rows[0].n;
@@ -29,7 +31,6 @@ test('Q-E01 real Auth/API payment preparation and financial cancellation accepta
  const preview=e=>must(owner,'event_cancel_preview_v1',scoped({event_id:e,reason:'Q-E01 operator cancellation'}));
  const apply=(p,k=key())=>mutate('event_cancel_apply_v1',{preview:{id:p.id,token:p.token}},k);
  async function debtForRegistration(r){return(await db.query('select * from core.debts where org_id=$1 and event_registration_id=$2',[org,r])).rows[0];}
- let trigger;
  async function rejectAudit(action,subject){
   trigger='qe01_'+key().replaceAll('-','');
   await db.query("create function private."+trigger+"() returns trigger language plpgsql set search_path='' as $$begin raise exception using errcode='P0001',message='INTEGRITY_VIOLATION';end$$");
@@ -37,11 +38,13 @@ test('Q-E01 real Auth/API payment preparation and financial cancellation accepta
   await db.query("create trigger "+trigger+" before insert on core.audit_events for each row when ("+condition+") execute function private."+trigger+"()");
  }
  async function removeTrigger(){if(trigger){await db.query('drop trigger if exists '+trigger+' on core.audit_events');await db.query('drop function private.'+trigger+'()');trigger=null;}}
- try{
  await mutate('center_manager_assign_v1',{person_id:ownerPerson});
  const pay=await mutate('saas_payment_submit_v1',{amount_minor:'1000',currency:'TRY',reference:'SYNTHETIC Q-E01',occurred_at:new Date().toISOString()});
  await must(platform,'saas_payment_verify_v1',scoped({payment_id:pay.primary_id,accepted:true}),key());
 
+ let raceEvent,racePeople,racePreparations,loserPreparation;
+ return {
+ event_preparation: async()=>{
  await t.test('preparation creates one scoped debt and no seat; same and different-key repeats reuse it',async()=>{
   const e=await event(),p=await person(),k=key(),a=await prepare(e,p,k),b=await prepare(e,p,k),c=await prepare(e,p);
   assert.equal(a.id,b.id);assert.equal(a.id,c.id);assert.equal(a.debt_id,c.debt_id);assert.equal(a.remaining_minor,'1000');
@@ -67,7 +70,21 @@ test('Q-E01 real Auth/API payment preparation and financial cancellation accepta
   assert.equal((await mutate('event_register_v1',{event_id:e,person_id:p,preparation_id:a.id,preview:{id:pv.id,token:pv.token}},k)).replayed,true);
   await fail('event_register_v1',{event_id:e,person_id:p,preparation_id:a.id},'RESERVATION_EXISTS');
  });
- let raceEvent,racePeople,racePreparations,loserPreparation;
+ await t.test('discounted preparation uses its current debt and the remaining linked payment, not a client paid flag',async()=>{
+  const e=await event(),p=await person(),a=await prepare(e,p);
+  await collect(p,a.debt_id,400);await mutate('debt_adjust_v1',{debt_id:a.debt_id,amount_minor:'600',direction:'decrease',reason:'explicit authorized discount'});
+  const r=await register(e,p,a.id);assert.equal(r.outcome,'registered');
+  const pv=await preview(e);assert.equal(pv.effects.find(x=>x.reason==='student_credit_added').amount_minor,'400');await apply(pv);
+  assert.equal((await get(a.id)).student_credit_available_minor,'400');
+ });
+ await t.test('same-key concurrent prepared registrations return one registration and never create a second debt',async()=>{
+  const e=await event(),p=await person(),a=await prepare(e,p),k=key();await collect(p,a.debt_id,1000);
+  const rs=await Promise.all([register(e,p,a.id,k),register(e,p,a.id,k)]);
+  assert(rs.every(r=>r.outcome==='registered'));assert.equal(rs[0].primary_id,rs[1].primary_id);assert.equal(rs.filter(r=>r.replayed).length,1);
+  assert.equal(await count('select count(*)::int n from core.debts where org_id=$1 and person_id=$2',[org,p]),1);
+ });
+ },
+ event_paid_capacity: async()=>{
  await t.test('two fully paid preparations race for the last seat: one registration and one committed credit closure',async()=>{
   raceEvent=await event({capacity:{nominal:1,maximum:1}});racePeople=[await person(),await person()];
   racePreparations=await Promise.all(racePeople.map(p=>prepare(raceEvent,p)));
@@ -102,6 +119,17 @@ test('Q-E01 real Auth/API payment preparation and financial cancellation accepta
   await fail('student_credit_refund_v1',{...body,amount_minor:'1'},'INSUFFICIENT_STUDENT_CREDIT');
   assert.equal((await get(loserPreparation.id)).student_credit_available_minor,'0');
  });
+ await t.test('late failure rolls back a paid capacity closure; retry commits its financial resolution exactly once',async()=>{
+  const e=await event({capacity:{nominal:1,maximum:1}}),people=[await person(),await person()],a=await prepare(e,people[0]),b=await prepare(e,people[1]);
+  await collect(people[0],a.debt_id,1000);await collect(people[1],b.debt_id,1000);await register(e,people[0],a.id);
+  await rejectAudit('event_register_v1',b.id);const k=key();
+  await fail('event_register_v1',{event_id:e,person_id:people[1],preparation_id:b.id},'INTEGRITY_VIOLATION',k);
+  assert.equal((await get(b.id)).state,'prepared');assert.equal((await get(b.id)).credited_minor,'0');assert.equal(await receiptCount(k),0);
+  assert.equal(await count('select count(*)::int n from core.debt_adjustments where org_id=$1 and debt_id=$2',[org,b.debt_id]),0);
+  await removeTrigger();const r=await register(e,people[1],b.id,k);assert.equal(r.outcome,'capacity_closed');assert.equal(r.student_credit_added_minor,'1000');assert.equal((await register(e,people[1],b.id,k)).replayed,true);
+ });
+ },
+ event_financial_cancellation: async()=>{
  for(const paid of [0,400,1000])await t.test('prestart operator cancellation of preparation and manual registration: paid '+paid+' reverses remaining debt and credits exactly paid',async()=>{
   const e=await event(),p=await person(),a=await prepare(e,p);if(paid)await collect(p,a.debt_id,paid);
   const pv=await preview(e);assert.deepEqual(pv.blockers,[]);
@@ -140,15 +168,6 @@ test('Q-E01 real Auth/API payment preparation and financial cancellation accepta
   await fail('event_register_v1',{event_id:e,person_id:p,preparation_id:a.id,preview:{id:registrationPreview.id,token:registrationPreview.token}},'PREVIEW_STALE');
   assert.equal((await register(e,p,a.id)).outcome,'registered');
  });
- await t.test('late failure rolls back a paid capacity closure; retry commits its financial resolution exactly once',async()=>{
-  const e=await event({capacity:{nominal:1,maximum:1}}),people=[await person(),await person()],a=await prepare(e,people[0]),b=await prepare(e,people[1]);
-  await collect(people[0],a.debt_id,1000);await collect(people[1],b.debt_id,1000);await register(e,people[0],a.id);
-  await rejectAudit('event_register_v1',b.id);const k=key();
-  await fail('event_register_v1',{event_id:e,person_id:people[1],preparation_id:b.id},'INTEGRITY_VIOLATION',k);
-  assert.equal((await get(b.id)).state,'prepared');assert.equal((await get(b.id)).credited_minor,'0');assert.equal(await receiptCount(k),0);
-  assert.equal(await count('select count(*)::int n from core.debt_adjustments where org_id=$1 and debt_id=$2',[org,b.debt_id]),0);
-  await removeTrigger();const r=await register(e,people[1],b.id,k);assert.equal(r.outcome,'capacity_closed');assert.equal(r.student_credit_added_minor,'1000');assert.equal((await register(e,people[1],b.id,k)).replayed,true);
- });
  await t.test('late cancellation failure rolls back debt, credit, preparation, preview and receipt together',async()=>{
   const e=await event(),p=await person(),a=await prepare(e,p);await collect(p,a.debt_id,400);const pv=await preview(e),k=key();await rejectAudit('event_cancel_apply_v1',e);
   await fail('event_cancel_apply_v1',{preview:{id:pv.id,token:pv.token}},'INTEGRITY_VIOLATION',k);
@@ -156,6 +175,13 @@ test('Q-E01 real Auth/API payment preparation and financial cancellation accepta
   assert.equal((await db.query('select state from core.previews where id=$1',[pv.id])).rows[0].state,'current');
   await removeTrigger();await apply(pv,k);assert.equal((await get(a.id)).student_credit_available_minor,'400');
  });
+ await t.test('past planned time does not block operator cancellation and is not proof of actual start',async()=>{
+  const at=Date.now()-3600000,e=await event({interval:{starts_at:new Date(at).toISOString(),ends_at:new Date(at+7200000).toISOString()}});
+  const pv=await preview(e);assert.deepEqual(pv.blockers,[]);await apply(pv);
+  assert.equal((await must(owner,'event_get_v1',scoped({event_id:e}))).state,'cancelled');
+ });
+ },
+ event_payment_authority: async()=>{
  await t.test('tenant/person/center mismatches cannot use preparation, collection, refund or cancel authority',async()=>{
   const e=await event(),p=await person(),a=await prepare(e,p),other=await person();
   await fail('event_register_v1',{event_id:e,person_id:other,preparation_id:a.id},'NOT_FOUND');
@@ -180,20 +206,6 @@ test('Q-E01 real Auth/API payment preparation and financial cancellation accepta
   await fail('event_cancel_preview_v1',{org_id:foreignOrg,center_id:foreignCenter,event_id:e,reason:'cross tenant'},'NOT_FOUND',key(),outsider);
   assert.equal((await get(a.id)).paid_minor,'0');
  });
-
- await t.test('discounted preparation uses its current debt and the remaining linked payment, not a client paid flag',async()=>{
-  const e=await event(),p=await person(),a=await prepare(e,p);
-  await collect(p,a.debt_id,400);await mutate('debt_adjust_v1',{debt_id:a.debt_id,amount_minor:'600',direction:'decrease',reason:'explicit authorized discount'});
-  const r=await register(e,p,a.id);assert.equal(r.outcome,'registered');
-  const pv=await preview(e);assert.equal(pv.effects.find(x=>x.reason==='student_credit_added').amount_minor,'400');await apply(pv);
-  assert.equal((await get(a.id)).student_credit_available_minor,'400');
- });
- await t.test('same-key concurrent prepared registrations return one registration and never create a second debt',async()=>{
-  const e=await event(),p=await person(),a=await prepare(e,p),k=key();await collect(p,a.debt_id,1000);
-  const rs=await Promise.all([register(e,p,a.id,k),register(e,p,a.id,k)]);
-  assert(rs.every(r=>r.outcome==='registered'));assert.equal(rs[0].primary_id,rs[1].primary_id);assert.equal(rs.filter(r=>r.replayed).length,1);
-  assert.equal(await count('select count(*)::int n from core.debts where org_id=$1 and person_id=$2',[org,p]),1);
- });
  await t.test('late collection failure leaves no cash/allocation/receipt; same-key retry records one linked payment',async()=>{
   const e=await event(),p=await person(),a=await prepare(e,p),k=key();
   await rejectAudit('collection_record_v1',null);
@@ -212,15 +224,13 @@ test('Q-E01 real Auth/API payment preparation and financial cancellation accepta
   await fail('collection_record_v1',{person_id:p,debt_ids:[a.debt_id],amount_minor:'1',currency:'TRY',occurred_at:new Date().toISOString()},'FORBIDDEN');
   await mutate('center_manager_assign_v1',{person_id:ownerPerson});assert.equal((await get(a.id)).state,'prepared');
  });
- await t.test('past planned time does not block operator cancellation and is not proof of actual start',async()=>{
-  const at=Date.now()-3600000,e=await event({interval:{starts_at:new Date(at).toISOString(),ends_at:new Date(at+7200000).toISOString()}});
-  const pv=await preview(e);assert.deepEqual(pv.blockers,[]);await apply(pv);
-  assert.equal((await must(owner,'event_get_v1',scoped({event_id:e}))).state,'cancelled');
- });
- }finally{await removeTrigger();await db.end();}
-});
-
-
+ },
+ };
+}
+test("Event scoped payment preparation and idempotent conversion",async t=>{const f=await paymentFixture(t);await f.event_preparation();});
+test("Event paid last-seat race, credit offset and refund",async t=>{const f=await paymentFixture(t);await f.event_paid_capacity();});
+test("Event financial cancellation and preview freshness",async t=>{const f=await paymentFixture(t);await f.event_financial_cancellation();});
+test("Event payment scope, collection rollback and live authority",async t=>{const f=await paymentFixture(t);await f.event_payment_authority();});
 test('P03 linked finance corrections, frozen refunds and instructor payments',async t=>{
  const {platform,plan}=await fixturePlatform(),owner=await authUser('p03-owner'),stranger=await authUser('p03-stranger');
  const account=await must(owner,'account_get_v1');
