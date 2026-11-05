@@ -280,8 +280,8 @@
         "management_state_get_v1"
       ],
       "review": {
-        "fingerprint": "e9bf37a7a3adf5cd78a5eee709269535364fe796ad944f739f3b0b6bcfd25784",
-        "reason": "PR190 main senkronizasyonu: altı yeni üretim kabul birimi korunarak 91 birimde sabit süre planı, native ölçüm ve kaynak kapıları incelendi; provider gövdeleri değişmedi."
+        "fingerprint": "646df7a64bbc0d85ec4869f6b193292855fd60ab4024d18a439bfc36259e7840",
+        "reason": "Seçilen süre referansının kaynak, ölçümlü/tahmini sayılar ve plan hash logu incelendi; seçim algoritması, test kaynakları ve kabul kapıları değişmedi."
       }
     },
     {
