@@ -107,6 +107,7 @@ jobs:
         env:
           FTK_TEST_TIMINGS: '1'
           SHARD: ${{ matrix.shard }}
+          FTK_CI_BINDING: ${{ inputs.binding }}
         run: FTK_EDGE_MEMORY_GUARD=1 node scripts/ci/observe-api.mjs node scripts/test-clean.mjs api "$SHARD"
       - if: always()
         run: node scripts/ci/summarize-timings.mjs
@@ -120,6 +121,7 @@ jobs:
             .artifacts/ci/timings/*.json
             .artifacts/ci/diagnostics/*.jsonl
             .artifacts/ci/api-tests/*.jsonl
+            .artifacts/ci/api-tests/unit-durations.json
           if-no-files-found: ignore
           include-hidden-files: true
           archive: true
@@ -200,4 +202,13 @@ jobs:
             .artifacts/ci/measurements.json
           if-no-files-found: error
           include-hidden-files: true
+          archive: true
+      - name: Publish next-run timing reference
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: api-duration-reference-${{ github.run_attempt }}
+          path: .artifacts/ci/duration-reference.json
+          if-no-files-found: warn
+          include-hidden-files: true
+          retention-days: 90
           archive: true

@@ -104,10 +104,10 @@ export function apiTimeBalance(jobs,run,profile='four-isolated-v2'){
  return {...apiBalancePolicy,api:rows,fastest_s:fastest,slowest_s:slowest,gap_s:gap,ratio,balanced:ratio<=apiBalancePolicy.max_ratio||gap<=apiBalancePolicy.min_gap_s};
 }
 
-export const acceptanceProfile='twelve-isolated-v1';
+export const acceptanceProfile='twelve-timed-v1';
 export function apiRoles(profile=acceptanceProfile){
- if(!['four-isolated-v1','four-isolated-v2','eight-isolated-v1',acceptanceProfile].includes(profile))throw Error('Unknown acceptance profile');
- return Array.from({length:profile===acceptanceProfile?12:profile==='eight-isolated-v1'?8:4},(_,i)=>'api-'+(i+1));
+ if(!['four-isolated-v1','four-isolated-v2','eight-isolated-v1','twelve-isolated-v1',acceptanceProfile].includes(profile))throw Error('Unknown acceptance profile');
+ return Array.from({length:profile.startsWith('twelve-')?12:profile==='eight-isolated-v1'?8:4},(_,i)=>'api-'+(i+1));
 }
 export function acceptancePlan(){return partition(buildInventory(repositoryRoot).units,apiRoles().length);}
 export function coverageHash(profile='four-isolated-v2'){

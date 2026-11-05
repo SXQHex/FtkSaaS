@@ -60,6 +60,7 @@ jobs:
           archive: true
   candidate:
     permissions:
+      actions: read
       contents: read
       pull-requests: read
     # GitHub exposes retargeting as edited; title/body edits start no jobs.
@@ -82,6 +83,16 @@ jobs:
           script: |
             const source=await import(`${process.env.GITHUB_WORKSPACE}/apps/backend/scripts/ci/source.mjs`);
             await source.resolveCandidate(github,context,core,'auto');
+      - name: Preserve frozen candidate schedule
+        if: steps.candidate.outputs.kind == 'full' && github.run_attempt == 1
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: candidate-source
+          path: .artifacts/ci/candidate-source.json
+          include-hidden-files: true
+          if-no-files-found: error
+          retention-days: 90
+          archive: true
   clean:
     permissions:
       contents: read

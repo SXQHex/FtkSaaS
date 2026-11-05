@@ -1,5 +1,11 @@
 # Güncel kaynak ve kabul
 
+## Otomatik API süre referansı kaynak dilimi
+
+Başlangıç main `95e9475e8594ca4f1a7118aa12267e799009fa35` (PR196). Aynı kaynağın [main kabulü41951652133](https://github.com/SXQHex/FtkSaaS/actions/runs/41951652133), [merge proof41951652393](https://github.com/SXQHex/FtkSaaS/actions/runs/41951652393) ve [development41951698911](https://github.com/SXQHex/FtkSaaS/actions/runs/41951698911) completed/success doğrulandı. PR196 test edilen ağaçla birebir aynı ağaç üzerinden kullanıcı kaynak özelinde kurulum onayıyla merge edildi.
+
+A03.4 kapsamında yeni aday başlangıçta uygun başarılı süre artifact’ını seçip tam dağılımı binding hash’ine sabitler; candidate rerun bile ilk artifact’ı kullanır. On iki runner ve 85 birim, özel runner tahsisi olmadan devam eder. SQL-only birimler de native süreç süre kaydına girer. Tam başarılı ölçüm bir sonraki aday için referans üretir; ilk geçişte yeni formatta artifact bulunmadığından repodaki PR195 snapshot’ına dönülür. Main test tekrarlamaz; kaynak/attempt, envanter, assertion, timeout, oneshot ve bellek kapıları korunur. Otomatik kaynak commit’i veya yeni ayrı workflow yoktur. Yeni gerçek adayda referans üretimi, sonraki adayda kullanımı ve main kabulü henüz doğrulanmadı. Geçerli protokol CI politikası sahibindedir.
+
 ## On iki API shard ve süre snapshot yenilemesi
 
 PR195 kullanıcı tarafından main `e8eddd53c3054a8f62f971dd9afa957cca8ada95` üzerine merge edildi. Başarılı aday [41943910333](https://github.com/SXQHex/FtkSaaS/actions/runs/41943910333), attempt1 head `24de174640679e75ba91722d396289c804d56a15`, base `4e99fab7ea8ce10f7da734766125eb3b679cf712`, tested merge `0132fc3302595546d47b61f91d5f12c4c550f49b` ve tree `9def6bb5867be67b5ac899d104e2d41059000a99` için core/sekiz API/quality/full-clean başarılıdır. Arada main’e elle yazılan ağırlık değişikliği nedeniyle merge edilen kaynak bu adayla aynı değildir: [main kabulü41947813421](https://github.com/SXQHex/FtkSaaS/actions/runs/41947813421) failure; [development41947851221](https://github.com/SXQHex/FtkSaaS/actions/runs/41947851221) skipped. PR195’in aday başarısı bu main için kabul sayılmaz.

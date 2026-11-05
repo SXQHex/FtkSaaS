@@ -1,6 +1,8 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {coverageHash,validateJobs,acceptanceProfile,acceptancePlan} from '../scripts/ci/shards.mjs';
+import {freezeSchedule} from '../scripts/ci/duration-reference.mjs';
+import {buildInventory} from '../scripts/ci/api-suites.mjs';
 import {ciFile,repoFile,repositoryRoot} from '../scripts/paths.mjs';
 import fs,{rmSync,writeFileSync,mkdtempSync} from 'node:fs';
 import {validateBinding,verifyMerged,validateDocumentBinding,checkPr,findCandidateProof,schemaBaselineName} from '../scripts/ci/gate.mjs';
@@ -14,6 +16,7 @@ process.chdir(repositoryRoot);
 
 const promoteFixture=v=>{
  v.binding.profile=acceptanceProfile;v.binding.coverage=coverageHash(acceptanceProfile);
+ v.binding.schedule=freezeSchedule(buildInventory(repositoryRoot).units);
  const first=v.jobs.find(j=>j.name.endsWith('api-1'));
  for(let n=5;n<=12;n++)v.jobs.push({...structuredClone(first),id:1000+n,name:first.name.replace('api-1','api-'+n)});
  return v;
@@ -155,7 +158,7 @@ test('collector publishes functional proof despite imbalance or unavailable timi
    const github={rest:{actions:{getWorkflowRun:async()=>({data:{...v.run,created_at:'2026-01-01T00:00:00Z'}}),listJobsForWorkflowRunAttempt:'jobs'}},paginate:async()=>v.jobs};
    const core={warning:s=>warnings.push(s),summary:{addRaw(){return this;},async write(){}}};
    await collect(github,context,core,v.binding);
-   assert.equal(JSON.parse(fs.readFileSync(file)).head,'H');assert.equal(warnings.length,1);
+   assert.equal(JSON.parse(fs.readFileSync(file)).head,'H');assert.equal(warnings.length,2);assert(warnings.some(s=>s.startsWith('API duration reference unavailable:')));
    const report=JSON.parse(fs.readFileSync(reportFile));assert.equal(report.balance.balanced,unavailable?null:false);
    if(unavailable)assert.equal(report.balance.status,'unavailable');
    v.jobs[1].conclusion='failure';await assert.rejects(collect(github,context,core,v.binding),/Failed/);assert(!fs.existsSync(file));
@@ -192,12 +195,15 @@ test('a newer failed execution cannot be replaced by an older success or collect
 }));
 
 test('candidate resolution stays on the original event merge even if the merge ref is regenerated',async()=>{
- const f=rerunFixture(),outputs={};
+ const f=rerunFixture(),outputs={},previousAttempt=process.env.GITHUB_RUN_ATTEMPT;
+ process.env.GITHUB_RUN_ATTEMPT='1';
+ try{
  f.context.issue={number:9};
  f.github.rest.pulls={get:async()=>({data:f.pr})};
  f.github.rest.git={getRef:async()=>{throw Error('Mutable merge ref must not be read');},getCommit:async({commit_sha})=>{assert.equal(commit_sha,'M');return{data:{sha:'M',tree:{sha:'T'},parents:[{sha:'B'},{sha:'H'}]}};},getTree:async({tree_sha})=>({data:{tree:[{type:'blob',mode:'100644',path:'apps/backend/database/kernel.sql',sha:tree_sha}]}})};
  await resolveCandidate(f.github,f.context,{setOutput:(k,v)=>outputs[k]=v},'auto');assert.equal(outputs.merge,'M');
  f.pr.base.sha='new-main';await assert.rejects(resolveCandidate(f.github,f.context,{setOutput(){}},'auto'),/base/);
+ }finally{if(previousAttempt===undefined)delete process.env.GITHUB_RUN_ATTEMPT;else process.env.GITHUB_RUN_ATTEMPT=previousAttempt;}
 });
 
 test('retained core baseline is run scoped; historical accepted receipts keep their original name',()=>{
