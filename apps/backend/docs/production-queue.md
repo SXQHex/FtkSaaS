@@ -2,7 +2,7 @@
 
 Bu dosya yalnız **sıra, bağımlı teslim paketleri ve kontrol noktalarının** sahibidir. Görev içeriği/kabul/dosya alanı [remaining-work.md](remaining-work.md), gerçek kaynak/test/hosted durum [00 devir](00-FtkSaaS-yeni-sohbet-devir.md) sahibindedir. Frontend’in aktif modülü ve sırası değiştirilmez. İkinci roadmap/todo açılmaz.
 
-**Aktif kaynak kabulü:** PR190 doğrulama/Graph/native alım/HTTP-mapping aday kabulleri geçti; kalıcı Meta queue/worker aday kabulü de geçti. Son kullanıcı kapsamı endpoint, süre sınırı, worker zamanlaması ve izleme altyapısını tek push ile merge adayına getirmektir. Gerçek Meta/Google hesap/izin/form/onay ve live teslim kabulü açık bırakılır; bu paket için yeni sağlayıcı bağlantısı kurulmaz. P10/P11 kalan CRM işleri ayrıca açıktır. Yeni kaynak CI başarısını devralmaz; main’de emekli edilen V2 dosyaları geri getirilmez.
+**Aktif kaynak kabulü:** PR199 P10.1/P10.2 aday kabulü doğrulandı; P10.3 gerçek aktarım ayrı açık. Aynı PR'de sıradaki kaynak paketi P11 CRM tam akış incelemesi, Pro worker plan uyumu ve küçük native kabul kökleridir. P10/P11 birleşik merge/main/development kabulü beklenir. Gerçek Node yerleşimi ve Meta/Google hesap/form/onay/live teslimi ayrı açık kalır; kaynak ve ortam kanıtı devir sahibindedir.
 
 ## Uygulama sırası
 

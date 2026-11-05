@@ -366,3 +366,5 @@ import './crm-meta-queue-unit.mjs';
 
 import './crm-provider-host-unit.mjs';
 import './crm-provider-host-db-unit.mjs';
+
+import './crm-import-parser-unit.mjs';

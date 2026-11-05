@@ -174,7 +174,10 @@ test('P05 actual Auth/Storage/documents/inbox/scoped worker acceptance',async t=
   assert(!(await must(owner,'crm_followup_list_v1',scope({kind:'automation_followup',page:{}}))).items.some(x=>x.id===task.id));
   await drain();assert.equal((await rows('select count(*)::int n from core.automation_runs where org_id=$1 and automation_id=$2',[org,automation]))[0].n,1);
   assert.equal((await rows('select count(*)::int n from private.p05_jobs where org_id=$1 and automation_id=$2 and center_id=$3',[org,automation,secondCenter]))[0].n,0);
+  // Feature loss must invalidate even a completed receipt on a supported Pro plan.
+  await db.query("update core.saas_plan_versions set features=array_remove(features,'F24') where id=$1",[plan]);
   await db.query("update core.saas_plan_versions set name='pro' where id=$1",[plan]);await assert.rejects(invoke(auto),/FORBIDDEN|PLAN_FEATURE_UNAVAILABLE/);await db.query("update core.saas_plan_versions set name='business' where id=$1",[plan]);
+  await db.query("update core.saas_plan_versions set features=array_append(features,'F24') where id=$1",[plan]);
   await db.query('delete from private.p05_worker_scopes where db_role=$1',[role]);await assert.rejects(invoke(auto),/FORBIDDEN/);await db.query('insert into private.p05_worker_scopes values($1,$2)',[role,org]);
  });
  }finally{

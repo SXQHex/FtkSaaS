@@ -217,3 +217,7 @@ assert next(Path('supabase/migrations').glob('*_crm_provider_route.sql')).read_b
 assert next(Path('supabase/migrations').glob('*_crm_meta_queue.sql')).read_bytes()==Path('database/crm-meta-queue.sql').read_bytes(),'Meta queue source drift'
 
 assert next(Path('supabase/migrations').glob('*_crm_provider_health.sql')).read_bytes()==Path('database/crm-provider-health.sql').read_bytes(),'Provider health source drift'
+
+assert next(Path('supabase/migrations').glob('*_crm_legacy_import.sql')).read_bytes()==Path('database/crm-legacy-import.sql').read_bytes(),'CRM legacy import source drift'
+
+assert next(Path('supabase/migrations').glob('*_crm_lifecycle_plan.sql')).read_bytes()==Path('database/crm-lifecycle-plan.sql').read_bytes(),'CRM lifecycle plan source drift'

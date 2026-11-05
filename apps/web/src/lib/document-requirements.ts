@@ -57,11 +57,13 @@ export function listSessionDocumentContexts(scope: SetupScope, sessionId: string
 export const documentReadActions = {
   read: readContextDocuments,
   file: readPrivateDocument,
-  person: (query: DocumentQuery) =>
-    setupCall("person_get_v1", {
+  person: async (query: DocumentQuery) => {
+    if (!query.person_id) throw Error("documentChanged");
+    return setupCall("person_get_v1", {
       org_id: query.org_id,
       person_id: query.person_id,
       ...(query.center_id ? { center_id: query.center_id } : {}),
-    }),
+    });
+  },
 };
 export type DocumentReadActions = typeof documentReadActions;
