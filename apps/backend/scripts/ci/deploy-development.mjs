@@ -10,6 +10,22 @@ import {revalidateDeployment} from './deployment-source.mjs';
 
 export const project='gwyprhenabtpkbojephw';
 export const sha256=s=>createHash('sha256').update(s).digest('hex');
+// Only fixed labels and bounded process metadata leave this boundary. Provider
+// output can contain credentials, SQL, paths or customer data, even on failure.
+export function cliFailure(result){
+ const output=[result.stdout,result.stderr].filter(s=>typeof s==='string').map(s=>s.slice(0,32768)+'\n'+s.slice(-32768)).join('\n');
+ const spawn_error=['ENOENT','EACCES','ETIMEDOUT','ENOBUFS'].includes(result.error?.code)?result.error.code:null;
+ const http_status=Number(/\b(?:HTTP(?:\/[0-9.]+)?\s+|status(?:\s+code)?[=: ]+)([45][0-9]{2})\b/i.exec(output)?.[1])||null;
+ let category='unknown';
+ if(http_status===401||http_status===403||/forbidden|unauthori[sz]ed|permission denied|invalid access token/i.test(output))category='authorization';
+ else if(http_status===413)category='request_size';
+ else if(spawn_error==='ETIMEDOUT'||/ENOTFOUND|ECONNRESET|EAI_AGAIN|ETIMEDOUT|timed? ?out|TLS|certificate|network/i.test(output))category='network';
+ else if(spawn_error)category='local_process';
+ else if(/unknown (?:flag|argument)|failed to parse|invalid config/i.test(output))category='configuration';
+ else if(/bundl|compil|module not found|failed to resolve/i.test(output))category='bundle';
+ return {category,exit_code:Number.isInteger(result.status)&&result.status>=0&&result.status<=255?result.status:null,http_status,
+  signal:['SIGTERM','SIGKILL','SIGINT'].includes(result.signal)?result.signal:null,spawn_error};
+}
 export function unchangedEdge(previous,edge,hash){return previous?.success===true&&previous.project===project&&previous.edge_source_sha256===hash&&previous.edge_version===edge?.version&&edge.status==='ACTIVE'&&edge.verify_jwt===true;}
 // CLI stores verbatim SQL chunks without statement separators. MCP stores one
 // complete file. Accept both representations; never normalize quoted contents.
@@ -148,7 +164,7 @@ export async function deliver(){
   actions:{listWorkflowRuns:async a=>({data:await gh('actions/workflows/'+a.workflow_id+'/runs?head_sha='+a.head_sha+'&event=pull_request&per_page=100&page='+a.page)}),listWorkflowRunArtifacts:async a=>({data:await gh('actions/runs/'+a.run_id+'/artifacts?per_page=100&page='+a.page)}),downloadArtifact:async a=>{const r=await fetch('https://api.github.com/repos/SXQHex/FtkSaaS/actions/artifacts/'+a.artifact_id+'/zip',{headers:{Authorization:'Bearer '+process.env.GH_TOKEN},signal:AbortSignal.timeout(30000)});if(!r.ok)throw Error('Cannot read candidate receipt');return {data:await r.arrayBuffer()};},getWorkflowRun:async a=>({data:await gh('actions/runs/'+a.run_id)}),listJobsForWorkflowRun:async a=>({data:await gh('actions/runs/'+a.run_id+'/jobs?filter=latest&per_page=100&page='+a.page)})}
  },paginate:async(method,args)=>{const all=[];for(let page=1;;page++){const data=(await method({...args,page})).data;const rows=Array.isArray(data)?data:(data.jobs??data.artifacts??data.workflow_runs);if(!Array.isArray(rows))throw Error('Invalid GitHub proof page');all.push(...rows);if(rows.length<100)return all;}}};
  const current=()=>revalidateDeployment(github,{owner:'SXQHex',repo:'FtkSaaS'},{sha:receipt.source,expected_main:receipt.expected_main,run_id:Number(receipt.acceptance_run_id),attempt:receipt.acceptance_attempt});
- const cli=(args)=>{const r=spawnSync(path.resolve('node_modules/.bin/supabase'),args,{encoding:'utf8',timeout:600000,maxBuffer:20*1024*1024,env:process.env});if(r.error||r.status!==0)throw Error('Supabase CLI failed in '+stage+'; output withheld to protect credentials/SQL');};
+ const cli=(args)=>{const r=spawnSync(path.resolve('node_modules/.bin/supabase'),args,{encoding:'utf8',timeout:600000,maxBuffer:20*1024*1024,env:process.env});if(r.error||r.status!==0){receipt.cli_failure=cliFailure(r);throw Error('Supabase CLI failed in '+stage+'; diagnostic='+JSON.stringify(receipt.cli_failure)+'; raw output withheld');}};
  try{
   for(const key of ['SUPABASE_ACCESS_TOKEN','GH_TOKEN','ACCEPTED_SHA','ACCEPTANCE_RUN_ID','ACCEPTANCE_ATTEMPT','EXPECTED_MAIN_SHA'])if(!process.env[key])throw Error('Missing required secret/input: '+key);
   if(process.env.SUPABASE_NATIVE_DEPLOY_DISABLED!=='true')throw Error('Native integration deployment must be verified disabled and SUPABASE_NATIVE_DEPLOY_DISABLED=true recorded');

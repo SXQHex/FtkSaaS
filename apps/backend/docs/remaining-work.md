@@ -485,11 +485,11 @@ Değişen dilimin sözleşme, üretilmiş tip/envanter, WF/F01–F33 izi ve alan
 
 **Uygulama dilimleri:**
 
-**Kaynak incelemesi ve uygulama:** Mevcut P04 free/paid trial ve dönüşüm kaynakları korunur. Pro F24 worker plan uyumu migration110 ile düzeltilir; beş küçük bağımsız native kök; yetki/faaliyet, dönüşüm/kota/Abone No/rollback, yenileme/hareketsizlik projeksiyonu, canlı segment ve worker yetki/tekilliğini ayrı fixture ile sınar. P11.2/P11.3 yeni birleşik aday CI sonucunu bekler; testlerin bulunması kabul değildir. Genel feature/hosted/frontend kapanışı verilmez.
+**Kaynak incelemesi ve uygulama:** Mevcut P04 free/paid trial ve dönüşüm kaynakları korunur. Pro F24 worker plan uyumu migration110 ile düzeltilir; beş küçük bağımsız native kök; yetki/faaliyet, dönüşüm/kota/Abone No/rollback, yenileme/hareketsizlik projeksiyonu, canlı segment ve worker yetki/tekilliğini ayrı fixture ile sınar. P11.2/P11.3 gerçek aday/main kaynak kabulünü geçti; development Edge yayını başarısızdır. Tanı/yeniden teslim ve kaynak/ortam kanıtı devir sahibindedir; P11 genel kapanışı development teslimini bekler. Genel feature/hosted/frontend kapanışı verilmez.
 
 - [x] P11.1 — Mevcut lead/trial/activity/convert ve segment liste/detail/config/worker kodunu senaryo bazında eşle; kaynakta çalışan yolu yeniden yazma. Yalnız doğrulanmış sözleşme/runtime/kabul boşluklarını düzelt. Kaynak alanı: p04 CRM, p05 segment/automation ve mevcut kabul testleri; F22/F23/F24 izi aynı dilimde güncellensin.
-- [ ] P11.2 — Lead→deneme→sonuç/takip→açık öğrenci dönüşümü için tenant konfigürasyonu, süre/tekrar ve izinli indirim sınırlarını native testle doğrula. Başvuru tek başına öğrencilik/No/satış/rezervasyon açmasın; dönüşüm mevcut No/kota/kimlik kapılarını kullansın. Stale sürüm, canlı rol/plan kaybı, aynı komut replay ve geç hata negatif olsun.
-- [ ] P11.3 — Yenileme/hareketsizlik ve segment kapsamı ile tekrarlı çalışmada çift görev oluşmamasını doğrula. Var olan worker sınırını kullan; kampanya/pazarlama e-postası açma. P14–P16 bildirim teslimi/otomasyon genişletmesini bu kaynak kapanışına taşımadan bağımlılıklarını koru.
+- [x] P11.2 — Lead→deneme→sonuç/takip→açık öğrenci dönüşümü için tenant konfigürasyonu, süre/tekrar ve izinli indirim sınırlarını native testle doğrula. Başvuru tek başına öğrencilik/No/satış/rezervasyon açmasın; dönüşüm mevcut No/kota/kimlik kapılarını kullansın. Stale sürüm, canlı rol/plan kaybı, aynı komut replay ve geç hata negatif olsun.
+- [x] P11.3 — Yenileme/hareketsizlik ve segment kapsamı ile tekrarlı çalışmada çift görev oluşmamasını doğrula. Var olan worker sınırını kullan; kampanya/pazarlama e-postası açma. P14–P16 bildirim teslimi/otomasyon genişletmesini bu kaynak kapanışına taşımadan bağımlılıklarını koru.
 
 <a id="p12"></a>
 ### P12 — Etkinlik kapasitesi modeli

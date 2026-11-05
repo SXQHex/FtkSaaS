@@ -1,5 +1,13 @@
 # Güncel kaynak ve kabul
 
+## Development Edge teslimi tanı onarımı
+
+Başlangıç main `174b32a8f214cabd475740a5a23588d3a3624113` (PR199). Aynı kaynağın main41990850842 ve merge41990850920 kabulü, aday41987518430, frontend41987518144, compatibility41987518250 ve Vercel41990914708 başarılıdır. Development41990914726 attempt2 source success, deploy failure:110/110 migration içeriği eşleşir, pending_migrations boş; hata Edge yayınındaki Supabase CLI adımındadır. Sağlayıcı nedeni eski kod tarafından atıldığı için bilinmiyor.
+
+Supabase entegrasyonunda07:57–08:01UTC aralığında mevcut v46 için normal Boot/Shutdown ve200invitation tick/RPC kayıtları bulundu; yeni yayın hata kaydı servis loglarında yoktur. Hosted backend-v1 ACTIVE/v46/JWT doğrulaması açık; yeni kaynak yayımlandı kabulü verilmez. Migration yeniden uygulanmaz; hosted veriye reset/seed yapılmaz.
+
+Tanı düzeltmesi yalnız sabit hata sınıfı,0–255çıkış kodu, HTTP4xx/5xx ve izinli signal/spawn kodunu receipt'e taşır. Ham stdout/stderr, provider mesajı, SQL, URL/path veya credential yazılmaz. Deploy komutu, hedef, kaynak/attempt kapıları, başarısız sonuç ve JWT ayarı değişmez. İki küçük süreç içi unit testi sınıflandırma ve özel çıktı sızıntısı reddini sınar. Yerel backend verify380/380, kalite10/10, red→green iki unit testi ve bağımsız kaynak incelemesi başarılıdır; Required/Critical yoktur. Gerçek provider hatası ve başarılı development teslimi hâlâ açık; yeni tanı kaynak kabulü olmadan hosted çalıştırılmaz. PR201 ayrı deploy seçim/filtre işidir.
+
 ## P10 kabulü ve P11 CRM tam akışı
 
 PR199 P10 head `9aa6238e64f369d653248431c65e6ee0969c1e3f`, base `c4acfe87bb096791ccd6b858c49382452cfaef2a`, tested merge `338bd7e5b7885d79fb25a5c03b8881a358e0be33` için [41979438977](https://github.com/SXQHex/FtkSaaS/actions/runs/41979438977) attempt1 candidate/core/on iki API/quality/full-clean completed/success GitHub'dan doğrulandı. P10.1/P10.2 kaynak kabulü tamamdır; merge/main/development ve P10.3 somut kaynak/satır onaylı gerçek aktarım yapılmadı. Bu başarı yeni P11 kaynağının kabulü değildir.

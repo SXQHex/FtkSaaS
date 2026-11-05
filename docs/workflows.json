@@ -15,7 +15,8 @@
         "apps/backend/tests/p06-acceptance.mjs",
         "apps/backend/tests/invitation-delivery-acceptance.mjs",
         "apps/backend/tests/ci-experiment-checks.mjs",
-        "apps/backend/tests/ci-api-suites.test.mjs"
+        "apps/backend/tests/ci-api-suites.test.mjs",
+        "apps/backend/tests/deployment-cli-unit.mjs"
       ],
       "sources": [
         "apps/backend/database/canonical-settings-scope.sql",
@@ -281,8 +282,8 @@
         "management_state_get_v1"
       ],
       "review": {
-        "fingerprint": "748edd12c984e688829d8baa762caa683fcf36cd7bc941815d6be03eecc7b96d",
-        "reason": "Gitleaks false positive on existing frozen migration checksum confirmed against file bytes. New manifest entry placed before the unchanged final record; all110 hashes and source/quality guards preserved. No allowlist change."
+        "fingerprint": "55324b67b75220414f5f1497eabb63d9105c563c4827e6ffe7f5facb7f4fac0b",
+        "reason": "Development failure diagnostic records only fixed enums and bounded numeric/process metadata; raw CLI output is withheld, two unit regressions cover sensitive output and unknown values. Command, target and acceptance controls unchanged."
       }
     },
     {
