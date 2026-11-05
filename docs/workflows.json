@@ -279,8 +279,8 @@
         "management_state_get_v1"
       ],
       "review": {
-        "fingerprint": "a71e2b6b35a8aa13597b2e4cc5608e3f322963872b0daa195357549f6bad347b",
-        "reason": "User cancelled CI V2: removed only isolated shadow files and V2-only wiring; original production API tests, eight-shard inventory and source-bound proof preserved. Historical no-runtime receipts remain non-deployable with their assertion-complete test moved to production CI tests. Exact expiring retirement records, checker unchanged."
+        "fingerprint": "b8dd04af3494fb67248f1ca897fca54630453c26162e928d8858e7a2d32a2dc9",
+        "reason": "Reviewed production behavior split inventory after current main synchronization: existing esbuild probes registration without executing imports; omitted roots are rejected; eight shards, all original assertions and source acceptance remain intact."
       }
     },
     {
@@ -455,8 +455,8 @@
         "role_revoke_preview_v1"
       ],
       "review": {
-        "fingerprint": "36783bb6c8e7da68847cc65460ae379c942ffd14d16784bf93eb3f710b1eed57",
-        "reason": "CI V2 retired by user decision: removed only shadow test copies, pilot fixtures, experimental workflows and active lightweight acceptance integration; production original API inventory, test bodies, core/security and source-bound proof preserved; historical no-runtime receipts still cannot deploy."
+        "fingerprint": "e51b6b713832b66813d1bacc47740470adf96bbaea694179bfd8a431e4cf9b21",
+        "reason": "Reviewed behavior-specific production acceptance roots after main synchronization: original assertions and financial races preserved; independent native fixtures; eight shards and runtime/API contracts unchanged."
       }
     },
     {
@@ -732,8 +732,8 @@
         "negative_limits_get_v1"
       ],
       "review": {
-        "fingerprint": "12b278ddcc9a4302c91e34968fae92bd46e0321230c4aa4997426e1c626cd3fd",
-        "reason": "CI V2 retired by user decision: removed only shadow test copies, pilot fixtures, experimental workflows and active lightweight acceptance integration; production original API inventory, test bodies, core/security and source-bound proof preserved; historical no-runtime receipts still cannot deploy."
+        "fingerprint": "a3b4d07b9273ce290d9e5fa56f13d070224eff602c47f423bc0c32db60eeff23",
+        "reason": "Reviewed behavior-specific production acceptance roots after main synchronization: original assertions and financial races preserved; independent native fixtures; eight shards and runtime/API contracts unchanged."
       }
     },
     {
@@ -810,8 +810,8 @@
         "reservation_capacity_override_v1"
       ],
       "review": {
-        "fingerprint": "82e4095ebd5fcfbe85b143e16f9bdc1a89d1be23f735f3e0bc4434106d5f8b4a",
-        "reason": "CI V2 retired by user decision: removed only shadow test copies, pilot fixtures, experimental workflows and active lightweight acceptance integration; production original API inventory, test bodies, core/security and source-bound proof preserved; historical no-runtime receipts still cannot deploy."
+        "fingerprint": "669cd8146781d3457674a1838a1e0d1a68aa0feeb0b1638ae1a38f5d961963ab",
+        "reason": "Reviewed behavior-specific production acceptance roots after main synchronization: original assertions and financial races preserved; independent native fixtures; eight shards and runtime/API contracts unchanged."
       }
     },
     {
@@ -873,8 +873,8 @@
         "attendance_start_v1"
       ],
       "review": {
-        "fingerprint": "8c914e939552f89ca0e5ac09cdc4de4b7b268c3f8e8043928eb3f47e999b93a8",
-        "reason": "CI V2 retired by user decision: removed only shadow test copies, pilot fixtures, experimental workflows and active lightweight acceptance integration; production original API inventory, test bodies, core/security and source-bound proof preserved; historical no-runtime receipts still cannot deploy."
+        "fingerprint": "b79fd6217a0d9b5c126cd353c585859c21ca5e7a331319404325d33f09c95f14",
+        "reason": "Reviewed behavior-specific production acceptance roots after main synchronization: original assertions and financial races preserved; independent native fixtures; eight shards and runtime/API contracts unchanged."
       }
     },
     {
@@ -933,8 +933,8 @@
         "debt_adjust_v1"
       ],
       "review": {
-        "fingerprint": "65f78cefecf76d7dc39557e62fff213dce44d530f9a5b6f406cbc08ea3201da8",
-        "reason": "CI V2 retired by user decision: removed only shadow test copies, pilot fixtures, experimental workflows and active lightweight acceptance integration; production original API inventory, test bodies, core/security and source-bound proof preserved; historical no-runtime receipts still cannot deploy."
+        "fingerprint": "01e258a7b9ba2dc35068450608d96ef6b432db38e0e7f98a2e95f56d5a5bcd7b",
+        "reason": "Reviewed behavior-specific production acceptance roots after main synchronization: original assertions and financial races preserved; independent native fixtures; eight shards and runtime/API contracts unchanged."
       }
     },
     {
@@ -1230,8 +1230,8 @@
         "instructor_agreements_list_v1"
       ],
       "review": {
-        "fingerprint": "e82966d12bfa799db402a4ffb5412acc620a7f64b50926e8859db03f1ac21dff",
-        "reason": "CI V2 retired by user decision: removed only shadow test copies, pilot fixtures, experimental workflows and active lightweight acceptance integration; production original API inventory, test bodies, core/security and source-bound proof preserved; historical no-runtime receipts still cannot deploy."
+        "fingerprint": "11aee886b3d0bce643a65ff4ec5c2e18b846d38b1619902bb288c3fa730e467b",
+        "reason": "Reviewed behavior-specific production acceptance roots after main synchronization: original assertions and financial races preserved; independent native fixtures; eight shards and runtime/API contracts unchanged."
       }
     },
     {
@@ -1300,8 +1300,8 @@
         "event_actual_start_correct_v1"
       ],
       "review": {
-        "fingerprint": "90fd1a79e476190139db0f13ce5dbfc8c1e81ee87f9470426706d23fff2eff53",
-        "reason": "CI V2 retired by user decision: removed only shadow test copies, pilot fixtures, experimental workflows and active lightweight acceptance integration; production original API inventory, test bodies, core/security and source-bound proof preserved; historical no-runtime receipts still cannot deploy."
+        "fingerprint": "4992ace881992bfed8007e9b53c8024166416277c39e1fbb297b5e83b0d1623a",
+        "reason": "Reviewed behavior-specific production acceptance roots after main synchronization: original assertions and financial races preserved; independent native fixtures; eight shards and runtime/API contracts unchanged."
       }
     },
     {
@@ -1415,8 +1415,8 @@
         "platform_owner_remove_v1"
       ],
       "review": {
-        "fingerprint": "ded05ca85acf99ef0a8a5036d86c98d8c51aa67aed530d78c0bf4531420be3d8",
-        "reason": "CI V2 retired by user decision: removed only shadow test copies, pilot fixtures, experimental workflows and active lightweight acceptance integration; production original API inventory, test bodies, core/security and source-bound proof preserved; historical no-runtime receipts still cannot deploy."
+        "fingerprint": "a08964f9b8b0ccda5aa7424b49cde28f90bc0b1a2d6aef221de340de455e5692",
+        "reason": "Reviewed behavior-specific production acceptance roots after main synchronization: original assertions and financial races preserved; independent native fixtures; eight shards and runtime/API contracts unchanged."
       }
     },
     {
@@ -1446,8 +1446,8 @@
         "settlement_authority_set_v1"
       ],
       "review": {
-        "fingerprint": "9ddd0fc779ba4a9179264c1165890324f5a7604b7d4fe145ad1c6d28a30df295",
-        "reason": "CI V2 retired by user decision: removed only shadow test copies, pilot fixtures, experimental workflows and active lightweight acceptance integration; production original API inventory, test bodies, core/security and source-bound proof preserved; historical no-runtime receipts still cannot deploy."
+        "fingerprint": "b81ba45205ea5a13dd6211c86ad0f52853f566d86be2207e8013c949fb32b7d5",
+        "reason": "Reviewed behavior-specific production acceptance roots after main synchronization: original assertions and financial races preserved; independent native fixtures; eight shards and runtime/API contracts unchanged."
       }
     },
     {
