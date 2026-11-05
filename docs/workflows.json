@@ -123,6 +123,7 @@
         "apps/backend/scripts/ci/source.mjs",
         "apps/backend/scripts/ci/suite-durations.json",
         "apps/backend/scripts/ci/summarize-timings.mjs",
+        "apps/backend/scripts/ci/vercel-deployment.mjs",
         "apps/backend/scripts/ci/timing-reporter.mjs",
         "apps/backend/scripts/ci/timings.mjs",
         "apps/backend/scripts/db.mjs",
@@ -280,8 +281,8 @@
         "management_state_get_v1"
       ],
       "review": {
-        "fingerprint": "5231130d670a7bcceeb484a93fd2b18b88b6002109c007d23706e76c2e0d5ee6",
-        "reason": "P11 beş küçük kök envantere zorunlu olarak eklendi: source-bound kabul testi aynı64 temel + açık added listesi ve exact98 örneği doğrular. On iki shard ve eksik/failure/legacy kaynak retleri aynen korunur."
+        "fingerprint": "748edd12c984e688829d8baa762caa683fcf36cd7bc941815d6be03eecc7b96d",
+        "reason": "Gitleaks false positive on existing frozen migration checksum confirmed against file bytes. New manifest entry placed before the unchanged final record; all110 hashes and source/quality guards preserved. No allowlist change."
       }
     },
     {

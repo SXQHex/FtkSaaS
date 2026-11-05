@@ -1,0 +1,66 @@
+name: Vercel delivery
+on:
+  workflow_run:
+    workflows: [Frontend checks, Main acceptance]
+    types: [completed]
+  workflow_dispatch:
+    inputs:
+      target:
+        description: Deploy current accepted main to this Vercel environment
+        type: choice
+        options: [preview, production]
+        default: preview
+        required: true
+permissions: {}
+concurrency:
+  group: vercel-delivery
+  cancel-in-progress: false
+jobs:
+  source:
+    permissions:
+      contents: read
+      actions: read
+      pull-requests: read
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    outputs:
+      plan: ${{ steps.source.outputs.plan }}
+    steps:
+      # Orchestration always comes from trusted main, never from the PR source.
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: main
+          persist-credentials: false
+      - name: Select accepted Vercel source
+        id: source
+        uses: actions/github-script@ed597411d8f924073f98dfc5c65a23a2325f34cd # v8.0.0
+        with:
+          script: |
+            const cd=await import(`${process.env.GITHUB_WORKSPACE}/apps/backend/scripts/ci/vercel-deployment.mjs`);
+            const plan=await cd.selectVercelSource(github,context);
+            core.setOutput('plan',plan?JSON.stringify(plan):'');
+            await core.summary.addRaw(plan?JSON.stringify(plan):'No apps/web/src change; Vercel deployment not requested.').write();
+  deploy:
+    needs: source
+    if: needs.source.outputs.plan != ''
+    environment: vercel
+    permissions:
+      contents: read
+      actions: read
+      pull-requests: read
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: main
+          persist-credentials: false
+      - name: Deliver exact accepted commit
+        uses: actions/github-script@ed597411d8f924073f98dfc5c65a23a2325f34cd # v8.0.0
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+          VERCEL_PLAN: ${{ needs.source.outputs.plan }}
+        with:
+          script: |
+            const cd=await import(`${process.env.GITHUB_WORKSPACE}/apps/backend/scripts/ci/vercel-deployment.mjs`);
+            await cd.deliverVercel(github,context,core,JSON.parse(process.env.VERCEL_PLAN));

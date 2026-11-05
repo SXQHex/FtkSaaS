@@ -69,7 +69,7 @@ Bu tablo yalnız izdir; eski kabul metinleri ikinci kez tutulmaz.
 
 **Dilim kabulü:** 33 özelliğin her birinde karar→kaynak→test→ortam→plan izi ve açık boşluğun görev sahibi bulunur. İncelenmemiş katman tamamlandı gösterilmez; yeni bir kanıt/roadmap dosyası açılmaz.
 
-- [ ] A03.4 — Otomatik API süre referansı kaynak dilimi hazır: son başarılı kaynak bağlı ölçüm, adayda sabit plan ve rerun korunumu uygulanır. Gerçek adayda tam referans üretimini, sonraki adayda kullanımını ve main kanıtını doğrula; eksik/süresi dolmuş ölçüm fallback’i fonksiyon kabulünü gevşetmez. Kaynak/run/inceleme kanıtı devir sahibindedir.
+- [x] A03.4 — Otomatik API süre referansı üretimi ve sonraki adayda 91/91 ölçümün otomatik kullanımı PR197/PR198 aday/main kabulüyle doğrulandı. Kaynak/run/inceleme kanıtı devir sahibindedir.
 
 ## Starter ve ortak ürün temeli
 
