@@ -1,7 +1,7 @@
 name: Vercel delivery
 on:
   workflow_run:
-    workflows: [Frontend checks, Main acceptance]
+    workflows: [Main acceptance]
     types: [completed]
   workflow_dispatch:
     inputs:
