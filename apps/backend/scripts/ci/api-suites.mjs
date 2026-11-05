@@ -76,9 +76,10 @@ function projectedWall(units){
  return serial+Math.max(...lanes);
 }
 
-export function partition(units){
+export function partition(units,count=8){
+ if(!Number.isSafeInteger(count)||count<1||count>units.length)throw Error('Invalid shard count');
  if(new Set(units.map(u=>u.id)).size!==units.length)throw Error('Duplicate API unit');
- const bins=Array.from({length:8},(_,i)=>({shard:i+1,estimated_seconds:0,units:[]}));
+ const bins=Array.from({length:count},(_,i)=>({shard:i+1,estimated_seconds:0,units:[]}));
  for(const unit of units)if(!Number.isFinite(unit.estimated_seconds)||unit.estimated_seconds<=0)throw Error('Invalid experiment weight');
  const dedicated=units.filter(u=>u.dedicated).sort((a,b)=>a.id.localeCompare(b.id));
  if(dedicated.length>=bins.length)throw Error('Too many dedicated experiment runners');

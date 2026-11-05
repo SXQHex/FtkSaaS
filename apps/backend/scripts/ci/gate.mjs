@@ -9,8 +9,8 @@ export function validateBinding({binding,pr,run,jobs,tested,currentTree,workflow
  if(run.event!=='pull_request'||run.path!=='.github/workflows/ci-full.yml'||run.conclusion!=='success'||run.status!=='completed')throw Error('No successful candidate workflow');
  if(binding.run_id!==run.id||binding.attempt!==run.run_attempt||binding.pr!==pr.number||binding.head!==pr.head.sha||binding.base!==pr.base.sha||run.head_sha!==binding.head)throw Error('Stale head/base/attempt');
  if(binding.merge!==tested.sha||binding.tree!==tested.tree.sha||binding.tree!==currentTree||tested.parents.length!==2||tested.parents[0].sha!==binding.base||tested.parents[1].sha!==binding.head)throw Error('Tested merge parents/tree mismatch');
- if(binding.kind!=='full'||!['four-isolated-v1','four-isolated-v2','eight-isolated-v1'].includes(binding.profile)||binding.coverage!==coverageHash(binding.profile))throw Error('Unrecognized/incomplete full coverage');
- const currentProfile=['four-isolated-v2','eight-isolated-v1'].includes(binding.profile);
+ if(binding.kind!=='full'||!['four-isolated-v1','four-isolated-v2','eight-isolated-v1','twelve-isolated-v1'].includes(binding.profile)||binding.coverage!==coverageHash(binding.profile))throw Error('Unrecognized/incomplete full coverage');
+ const currentProfile=['four-isolated-v2','eight-isolated-v1','twelve-isolated-v1'].includes(binding.profile);
  if(currentProfile&&(!Number.isSafeInteger(binding.source_attempt)||binding.source_attempt<1||binding.source_attempt>binding.attempt))throw Error('Invalid original source attempt');
  validateJobs(jobs,run,{benchmark:binding.benchmark,collector:true,sourceChecks:currentProfile,profile:binding.profile});
  return true;
@@ -60,7 +60,7 @@ export async function findQualityProof(github,repo,pr,currentTree){
  throw Error('No successful source-bound quality proof');
 }
 export function schemaBaselineName(binding){
- if(['four-isolated-v2','eight-isolated-v1'].includes(binding.profile))return 'documentation-baseline';
+ if(['four-isolated-v2','eight-isolated-v1','twelve-isolated-v1'].includes(binding.profile))return 'documentation-baseline';
  if(binding.profile==='four-isolated-v1')return `documentation-baseline-${binding.attempt}`;
  throw Error('Unrecognized baseline profile');
 }

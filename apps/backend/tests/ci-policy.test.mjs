@@ -15,7 +15,7 @@ process.chdir(repositoryRoot);
 const promoteFixture=v=>{
  v.binding.profile=acceptanceProfile;v.binding.coverage=coverageHash(acceptanceProfile);
  const first=v.jobs.find(j=>j.name.endsWith('api-1'));
- for(let n=5;n<=8;n++)v.jobs.push({...structuredClone(first),id:1000+n,name:first.name.replace('api-1','api-'+n)});
+ for(let n=5;n<=12;n++)v.jobs.push({...structuredClone(first),id:1000+n,name:first.name.replace('api-1','api-'+n)});
  return v;
 };
 const rerunFixture=()=>{
@@ -73,7 +73,7 @@ test('all required shard jobs must succeed in the same run attempt view and head
 
 test('reusable full clean retains all obligations while automatic admission and privileged merge are separate',()=>{
  const clean=fs.readFileSync('.github/workflows/clean-suite.yml','utf8'),runner=fs.readFileSync('apps/backend/scripts/test-clean.mjs','utf8');
- assert(clean.includes('shard: [1, 2, 3, 4, 5, 6, 7, 8]'));assert(clean.includes('fail-fast: false'));assert(!clean.includes('max-parallel: 1'));
+ assert(clean.includes('shard: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]'));assert(clean.includes('fail-fast: false'));assert(!clean.includes('max-parallel: 1'));
  assert(clean.includes('needs: [core, api, serial-reference]'));assert(clean.includes('if: always()'));assert(clean.includes('Verify all required jobs'));
  for(const op of ['test:db','dev:seed','dev:health','db:advisors'])assert(runner.includes("['run','"+op+"']"));
  assert(runner.includes("['--dir',repoFile(),'exec','turbo','run','verify','--filter=@ftksaas/backend...']"));
@@ -257,10 +257,10 @@ test('sandbox merge proves exact source without borrowing application acceptance
 });
 
 
-test('eight-shard acceptance requires all eight source-bound jobs and rejects legacy coverage',()=>{
+test('twelve-shard acceptance requires all twelve source-bound jobs and rejects legacy coverage',()=>{
  const v=promoteFixture(valid());v.binding.source_attempt=1;v.jobs[0].steps.push({name:'Upload schema baseline',conclusion:'success'});
  assert(validateBinding(v));
- assert.equal(acceptancePlan().length,8);
+ assert.equal(acceptancePlan().length,12);
  const currentPlan=acceptancePlan(),added=new Set(['document-self-requirements-acceptance','crm-application-intake-acceptance','crm-application-review-acceptance','starter-operations-report-shaping','starter-operations-import-templates','starter-operations-report-access','starter-operations-inbox']);
  // Each split retains one representative of its original acceptance obligation.
  // The full behavior inventory and retirement checks live in ci-api-suites.test.
@@ -272,7 +272,7 @@ test('eight-shard acceptance requires all eight source-bound jobs and rejects le
  const ids=acceptancePlan().flatMap(b=>b.units.map(u=>u.id));assert.equal(ids.length,64);assert.equal(new Set(ids).size,ids.length);
  }
 
- for(let n=5;n<=8;n++)for(const mutate of [x=>x.jobs.splice(x.jobs.findIndex(j=>j.name==='api-'+n),1),x=>x.jobs.find(j=>j.name==='api-'+n).conclusion='failure',x=>x.jobs.find(j=>j.name==='api-'+n).run_attempt=2,x=>x.jobs.find(j=>j.name==='api-'+n).head_sha='other',x=>x.jobs.find(j=>j.name==='api-'+n).steps[0].conclusion='skipped',x=>x.jobs.push(structuredClone(x.jobs.find(j=>j.name==='api-'+n)))]){
+ for(let n=1;n<=12;n++)for(const mutate of [x=>x.jobs.splice(x.jobs.findIndex(j=>j.name==='api-'+n),1),x=>x.jobs.find(j=>j.name==='api-'+n).conclusion='failure',x=>x.jobs.find(j=>j.name==='api-'+n).run_attempt=2,x=>x.jobs.find(j=>j.name==='api-'+n).head_sha='other',x=>x.jobs.find(j=>j.name==='api-'+n).steps[0].conclusion='skipped',x=>x.jobs.push(structuredClone(x.jobs.find(j=>j.name==='api-'+n)))]){
   const x=structuredClone(v);mutate(x);assert.throws(()=>validateBinding(x));
  }
  const legacy=structuredClone(v);legacy.binding.coverage=coverageHash();assert.throws(()=>validateBinding(legacy));

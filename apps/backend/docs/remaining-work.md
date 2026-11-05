@@ -69,6 +69,8 @@ Bu tablo yalnız izdir; eski kabul metinleri ikinci kez tutulmaz.
 
 **Dilim kabulü:** 33 özelliğin her birinde karar→kaynak→test→ortam→plan izi ve açık boşluğun görev sahibi bulunur. İncelenmemiş katman tamamlandı gösterilmez; yeni bir kanıt/roadmap dosyası açılmaz.
 
+- [ ] A03.4 — API dağıtım snapshot’ını son başarılı kaynak bağlı koşudan otomatik al; planı aday başında sabitle, run/attempt/job ve gövde hash’ini doğrula. Eksik/süresi dolmuş ölçümde açık tahmin kullan; main test tekrarı veya otomatik kaynak commit’i üretme.
+
 ## Starter ve ortak ürün temeli
 
 <a id="s01"></a>

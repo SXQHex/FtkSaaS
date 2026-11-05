@@ -279,8 +279,8 @@
         "management_state_get_v1"
       ],
       "review": {
-        "fingerprint": "210f02c5efb6c7cf1e753ca0cc5750ead663e8fe0360973c20efd9055b01f124",
-        "reason": "Reviewed API finance acceptance isolation fix: the negative-credit scenario now seeds its own default100 before mandatory upper1; existing limit, rejection and settlement assertions and runtime contracts remain unchanged."
+        "fingerprint": "8f1a6f821c781d4ed418be108c71419fa778e29a025df3d3075cc28cb2b60f51",
+        "reason": "On iki shard workflow, plan, kaynak coverage, iki dar assertion beklentisi ve merge/main kanıtı incelendi; ürün/API protokolü aynı, CI politikası güncellendi."
       }
     },
     {
