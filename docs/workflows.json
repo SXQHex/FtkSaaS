@@ -284,8 +284,8 @@
         "management_state_get_v1"
       ],
       "review": {
-        "fingerprint": "16062bd021452b5f43a6071b819db1ec606d0b525baf0b423245284b31f9cce3",
-        "reason": "Reviewed exact registry source/import hash and one-line offsets for XREQ-020 isolated native root. All prior bodies, CI commands, coverage ownership and budgets preserved; sale-only typed response and validator negatives reviewed."
+        "fingerprint": "42a70256c27ba6ab2f3eb4b711b540bd05efa4b067dce1eb037e7788bc8741d0",
+        "reason": "Exact native inventory adds Starter history-scope acceptance with payment metadata restored; additive catalog DTO negatives and generated Edge output reviewed. Existing budgets and commands unchanged."
       }
     },
     {
@@ -758,7 +758,8 @@
         "apps/backend/tests/starter-attendance-protection.test.mjs",
         "apps/backend/tests/starter-document-acceptance.mjs",
         "apps/backend/tests/pro-lifecycle-earnings-acceptance.mjs",
-        "apps/backend/tests/event-capacity-package-acceptance.mjs"
+        "apps/backend/tests/event-capacity-package-acceptance.mjs",
+        "apps/backend/tests/lesson-request-catalog-acceptance.mjs"
       ],
       "sources": [
         "apps/backend/database/active-discipline-projection-wrappers.sql",
@@ -803,7 +804,9 @@
         "apps/backend/database/starter-subscriber-projections.sql",
         "apps/backend/supabase/migrations/20261102180626_starter_subscriber_projections.sql",
         "apps/backend/database/event-capacity-practice.sql",
-        "apps/backend/supabase/migrations/20261103233454_event_capacity_practice.sql"
+        "apps/backend/supabase/migrations/20261103233454_event_capacity_practice.sql",
+        "apps/backend/database/lesson-request-catalog.sql",
+        "apps/backend/supabase/migrations/20261105170617_lesson_request_catalog.sql"
       ],
       "operations": [
         "lesson_request_create_v1",
@@ -818,8 +821,8 @@
         "reservation_capacity_override_v1"
       ],
       "review": {
-        "fingerprint": "fcf20dbcb3cb105d1dce9a608b69e2efee4b9bdf261937daaf62117b147b5d4a",
-        "reason": "Reviewed common runtime wrapper diff: only service-internal outbox email_phase changes; WF06 entrypoints remain byte-identical. Explicit opt-in external notices do not alter domain commit, scope, plan or existing guide semantics."
+        "fingerprint": "fcd85b7b5b7d858dd652066e101f6ab672d546c6a8712c6309eb89633dd89d2f",
+        "reason": "Catalog applies live authorization, resource state and exact Starter selected discipline/instructor fences. Pagination and stale write rejection reviewed with independent final review; WF06 matches behavior."
       }
     },
     {

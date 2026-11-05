@@ -360,3 +360,10 @@ Kaynak uygulaması ve native kabul senaryoları aynı PR210 içindedir; aday/mai
 **İstenen dar teslim:** Erişilebilir etkin org/merkezde self talep oluşturabilen kullanıcıya, yazım kurallarıyla uyumlu etkin disiplin ve varsa seçilebilir eğitmen kimliği/görünen adı için salt okunur typed keşif. Kişisel iletişim, finans, role assign veya abonelik yönetim alanları gerekmez. Var olan okuma genişletmesi veya başka authoritative tüketim yolunu backend belirlesin; frontend yeni endpoint/izin icat etmez. Oda/seans oluşturma yetkisi istenmez.
 
 **Kabul ölçütleri:** Native öğrenci kendi adına ilk talebi yazmadan önce seçim yapabilir; kapalı erişim, yanlış tenant/merkez, pasif disiplin/ilişki/eğitmen ve değişen yetki korunur. Salt katalog talep, seans, rezervasyon, hak veya hesap oluşturmaz. Manager talep kaynağı bağımsız ilerler; frontend self create ve S06 kapanışını bu teslim olmadan vermez.
+
+
+### Backend teslimi — XREQ-021, 5 Kasım 2026
+
+Mevcut management okuyucusunda `lesson_request_create_v1` selector anahtarına opsiyonel `catalog:disciplines|instructors` eklendi; yeni endpoint veya izin yoktur. Self kullanıcı gerçek person_id ile, request.write yetkili personel mevcut hedef/yetki kurallarıyla okur. Aynı sayfalı typed yanıt yalnız etkin merkez disiplinleri veya writer'ın kabul ettiği aktif eğitmenin kimliği/görünen adını taşır. Mevcut liste yolu korunur. Create pasif organizasyon disiplini için artık merkez ilişkisi aktif kalsa da NOT_FOUND verir; diğer plan/window/yetki/resource kontrolleri korunur. Katalog kayıt/seans/rezervasyon/hak/hesap oluşturmaz; cursor aktör/selector/merkez/katalogla bağlıdır. Kapsam ve tam tüketim [WF06](workflows.md#wf06) sahibindedir.
+
+Kaynak, negatif sözleşme ve ayrı native katalog kökü hazırlanmıştır; yeni aday/main/development sonucu backend devir kaydında tutulur. Frontend ekran veya S06 kabulü verilmez.

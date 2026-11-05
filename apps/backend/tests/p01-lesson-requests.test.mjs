@@ -1,3 +1,4 @@
+import './lesson-request-catalog-acceptance.mjs';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {authUser,fixturePlatform,must,call} from './api-client.mjs';

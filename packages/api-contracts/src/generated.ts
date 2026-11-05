@@ -17395,6 +17395,7 @@ preferred_instructor_id?: (string | null)
  * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
  */
 discipline_id?: string
+display_name?: Text
 }
 }
 /**
@@ -19980,6 +19981,7 @@ preferred_instructor_id?: (string | null)
  * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
  */
 discipline_id?: string
+catalog?: ("disciplines" | "instructors")
 }
 }
 /**

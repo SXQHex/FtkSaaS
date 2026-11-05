@@ -381,3 +381,9 @@ test('XREQ-020 normal sale response requires authoritative debt/rights/deficit p
  for(const mutate of [x=>delete x.data.sale,x=>delete x.data.sale.deficits[0].reservation_version,x=>x.data.sale.debt_minor=1700,x=>x.data.sale.available=-1,x=>x.data.sale.deficits[0].settles='true',x=>x.data.sale.extra='untrusted']){const bad=structuredClone(response);mutate(bad);assert.equal(validate(bad),false);}
  const generic=ajv.getSchema('sale-contract#/$defs/Preview'),legacy=structuredClone(data);delete legacy.sale;assert.equal(generic(legacy),true,'Other preview consumers retain their existing shape');
 });
+
+test('XREQ-021 catalogs are closed optional lesson-request selectors with minimal display fields',()=>{
+ const schema=JSON.parse(fs.readFileSync('../../packages/api-contracts/schema/contract.json')),ajv=new Ajv({strict:false});addFormats(ajv);ajv.addSchema(schema,'catalog');const selector=ajv.getSchema('catalog#/$defs/ManagementSelector_lesson_request_create_v1'),projection=ajv.getSchema('catalog#/$defs/ManagementProjection_lesson_request_create_v1');
+ const value={operation:'lesson_request_create_v1',key:{person_id:newUuidV7(),catalog:'disciplines'}};assert(selector(value));assert(selector({...value,key:{person_id:value.key.person_id}}));assert(!selector({...value,key:{...value.key,catalog:'contacts'}}));
+ const item={operation:'lesson_request_create_v1',values:{discipline_id:newUuidV7(),display_name:'Synthetic discipline'}};assert(projection(item));assert(!projection({...item,values:{...item.values,email:'private@example.invalid'}}));
+});
