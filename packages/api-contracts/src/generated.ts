@@ -7201,6 +7201,13 @@ total_count: (Count | null)
 result_reference: (EntityRef | null)
 safe_error_code: (Text | null)
 privacy?: PrivacyProgress
+/**
+ * Optional invitation email delivery evidence. Job succeeded means provider acceptance; delivered means recipient mail-server acceptance, not inbox placement or reading. Terminal adverse evidence wins over earlier/later delivery events. Null until the job owns a provider reference.
+ */
+email_delivery?: ({
+state: ("accepted" | "delayed" | "delivered" | "bounced" | "complained" | "failed")
+occurred_at: (string | null)
+} | null)
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema

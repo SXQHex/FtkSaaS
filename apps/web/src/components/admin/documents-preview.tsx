@@ -2,6 +2,7 @@
 import { useState } from "react";
 import { useTranslations } from "next-intl";
 import type { Operations } from "@ftksaas/api-contracts";
+import { SelfDocumentView } from "../documents/self-documents";
 import { ContextDocuments } from "../documents/context-documents";
 import type { DocumentReadActions, DocumentQuery } from "../../lib/document-requirements";
 import { DocumentPublicationForm } from "../documents/document-publication";
@@ -60,6 +61,19 @@ const readingActions: DocumentReadActions = {
 export function DocumentsPreview() {
   const t = useTranslations("documents");
   const [published, setPublished] = useState(false);
+  const [accepted, setAccepted] = useState(false);
+  const selfCommand: ReturnType<typeof useSetupCommand> = {
+    pending: null,
+    busy: false,
+    message: accepted ? "saved" : "",
+    run: async (input) => {
+      if (input?.operation === "document_accept_v1") setAccepted(true);
+    },
+    check: async () => {
+      throw Error("No pending design command");
+    },
+  };
+
   const command: ReturnType<typeof useSetupCommand> = {
     pending: null,
     busy: false,
@@ -94,6 +108,30 @@ export function DocumentsPreview() {
       <section className="space-y-5 rounded-xl border bg-card p-5">
         <h2 className="text-lg font-semibold">{t("sessionDocuments")}</h2>
         <ContextDocuments actorId={id} query={readingQuery} actions={readingActions} />
+      </section>
+      <section className="min-w-0 space-y-5">
+        <h2 className="text-lg font-semibold">{t("selfTitle")}</h2>
+        <SelfDocumentView
+          key={String(accepted)}
+          actorId={id}
+          query={{
+            org_id: org,
+            context: { gate: "reservation", subject: { type: "sessions", id } },
+          }}
+          command={selfCommand}
+          read={async () => [
+            {
+              id,
+              version_id: id,
+              name: "Örnek kendi kabul belgesi",
+              required_at: "reservation",
+              accepted,
+              content_hash: "synthetic-design-only",
+              file: { type: "files", id },
+            },
+          ]}
+          file={readingActions.file}
+        />
       </section>
     </main>
   );

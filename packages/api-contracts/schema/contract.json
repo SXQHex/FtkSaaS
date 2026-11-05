@@ -5275,6 +5275,46 @@
         },
         "privacy": {
           "$ref": "#/$defs/PrivacyProgress"
+        },
+        "email_delivery": {
+          "description": "Optional invitation email delivery evidence. Job succeeded means provider acceptance; delivered means recipient mail-server acceptance, not inbox placement or reading. Terminal adverse evidence wins over earlier/later delivery events. Null until the job owns a provider reference.",
+          "anyOf": [
+            {
+              "type": "object",
+              "properties": {
+                "state": {
+                  "type": "string",
+                  "enum": [
+                    "accepted",
+                    "delayed",
+                    "delivered",
+                    "bounced",
+                    "complained",
+                    "failed"
+                  ]
+                },
+                "occurred_at": {
+                  "anyOf": [
+                    {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                }
+              },
+              "required": [
+                "state",
+                "occurred_at"
+              ],
+              "additionalProperties": false
+            },
+            {
+              "type": "null"
+            }
+          ]
         }
       },
       "required": [
@@ -96453,7 +96493,7 @@
       "uuid": "backend uuid@14.0.3 v7 for all inserted IDs; DB defaults not required",
       "external_transport": "POST /functions/v1/backend-v1/{operation}; direct typed request body",
       "internal_rpc": "service-only api_v1 named functions; actor/session/UUID bank supplied by verified gateway",
-      "migration_count": 110,
+      "migration_count": 111,
       "acceptance_source": "apps/backend/docs/00-FtkSaaS-yeni-sohbet-devir.md"
     },
     "decision_sprint": {

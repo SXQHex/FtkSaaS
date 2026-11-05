@@ -3,9 +3,14 @@ import { screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { render } from "./render";
 import { SessionDocuments } from "../src/components/documents/session-documents";
-import { listSessionDocumentContexts, documentReadActions } from "../src/lib/document-requirements";
+import {
+  listSessionDocumentContexts,
+  readContextDocuments,
+  documentReadActions,
+} from "../src/lib/document-requirements";
 vi.mock("../src/lib/document-requirements", async (original) => ({
   ...(await original<typeof import("../src/lib/document-requirements")>()),
+  readContextDocuments: vi.fn<typeof readContextDocuments>().mockResolvedValue([]),
   listSessionDocumentContexts: vi.fn<typeof listSessionDocumentContexts>(),
   documentReadActions: {
     read: vi.fn<typeof documentReadActions.read>(),
@@ -75,4 +80,29 @@ test("a mismatched session cannot become an editable or readable document contex
     screen.queryByRole("button", { name: "Belge gerekliliklerini göster" }),
   ).not.toBeInTheDocument();
   expect(documentReadActions.read).not.toHaveBeenCalled();
+});
+
+test("self session requirements are lazy and never discover or substitute a participant", async () => {
+  const user = userEvent.setup(),
+    id = "019a2b3c-4d5e-7000-8000-000000000080";
+  render(<SessionDocuments scope={scope} sessionId={id} />);
+  expect(readContextDocuments).not.toHaveBeenCalled();
+  await user.click(screen.getByRole("button", { name: "Kendi belgelerimi incele" }));
+  await screen.findByText("Bu bağlamda kendi adına gerekli belge bulunmuyor.");
+  expect(readContextDocuments).toHaveBeenLastCalledWith({
+    org_id: "org",
+    center_id: "center",
+    context: { gate: "reservation", subject: { type: "sessions", id } },
+  });
+  expect(listSessionDocumentContexts).not.toHaveBeenCalled();
+  expect(documentReadActions.person).not.toHaveBeenCalled();
+  await user.selectOptions(screen.getByRole("combobox"), "attendance");
+  await screen.findByText("Bu bağlamda kendi adına gerekli belge bulunmuyor.");
+  expect(readContextDocuments).toHaveBeenLastCalledWith({
+    org_id: "org",
+    center_id: "center",
+    context: { gate: "attendance", subject: { type: "sessions", id } },
+  });
+  await user.click(screen.getByRole("button", { name: "Kendi belgelerimi gizle" }));
+  expect(screen.queryByRole("region", { name: "Kendi belgelerim" })).not.toBeInTheDocument();
 });

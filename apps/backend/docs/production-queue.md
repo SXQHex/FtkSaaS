@@ -2,7 +2,7 @@
 
 Bu dosya yalnız **sıra, bağımlı teslim paketleri ve kontrol noktalarının** sahibidir. Görev içeriği/kabul/dosya alanı [remaining-work.md](remaining-work.md), gerçek kaynak/test/hosted durum [00 devir](00-FtkSaaS-yeni-sohbet-devir.md) sahibindedir. Frontend’in aktif modülü ve sırası değiştirilmez. İkinci roadmap/todo açılmaz.
 
-**Aktif kaynak kabulü:** PR204 sonrası P10.1/P10.2 ve P11 backend kaynak/main/development teslimi doğrulandı; boyut onarımı kapanmıştır. Sıradaki bağımsız ürün paketi P14→P15→P16'dır; ilk dilim mevcut Resend davet transport'unun ortak ve güvenli sağlayıcı sınırına alınmasıdır. P10.3 gerçek aktarım, Node yerleşimi ve Meta/Google live teslimi ayrı açık kalır. Main'deki deploy filtreleri ve aday test envanteri korunur. Kanıt ve ortam durumu devir sahibindedir.
+**Aktif kaynak kabulü:** PR204 sonrası P10.1/P10.2 ve P11 backend kaynak/main/development teslimi doğrulandı; boyut onarımı kapanmıştır. Sıradaki bağımsız ürün paketi P14→P15→P16'dır; aktif PR205 mevcut Resend davet transport'unu ortak sağlayıcı sınırına alır ve imzalı, kalıcı teslim olayları/iş takibiyle genişler. Genel notification→email kalıcı köprüsü P14.2 ve gerçek teslim P14.4 açık kalır. P10.3 gerçek aktarım, Node yerleşimi ve Meta/Google live teslimi ayrı açık kalır. Main'deki deploy filtreleri ve aday test envanteri korunur. Kanıt ve ortam durumu devir sahibindedir.
 
 ## Uygulama sırası
 

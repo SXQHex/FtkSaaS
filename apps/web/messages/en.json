@@ -1360,6 +1360,14 @@
     "subscriberContext": "Subscriber no: {number}",
     "reservationContext": "Reservation {index}",
     "showRequirements": "Show document requirements",
-    "documentGate": "Operation context"
+    "documentGate": "Operation context",
+    "selfTitle": "My documents",
+    "selfHint": "Review documents that apply to you for this session. Acceptance is recorded for the person linked to your signed-in account.",
+    "selfNoRequirements": "No documents are required for you in this context.",
+    "acceptSelfHint": "Opening or downloading a document does not record acceptance. You can only accept for yourself.",
+    "acceptSelfConsent": "I have read the displayed version of “{name}” and accept it for myself.",
+    "acceptSelf": "Accept for myself",
+    "showSelfDocuments": "Review my documents",
+    "hideSelfDocuments": "Hide my documents"
   }
 }

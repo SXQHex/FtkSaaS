@@ -529,7 +529,7 @@ Değişen dilimin sözleşme, üretilmiş tip/envanter, WF/F01–F33 izi ve alan
 
 - [ ] P14.1 — Mevcut Resend davet sağlayıcı çağrısını ortak tek-deneme transport'una taşı; accepted/rejected/retryable/unknown, aynı payload/idempotency ve sır sızdırmayan sonuçları doğrula. Kaynak hazır; mevcut davet entegrasyonu ve üç küçük transport testi eklendi, yeni aday kabulü beklenir. Genel email kanalı bu dilimde açılmaz.
 - [ ] P14.2 — Mevcut notification/outbox kaynağını Pro/Business işlemsel olayları için kalıcı email claim/authorize/finish ile bağla; canlı kanal/plan/alıcı/olay geçerliliği, frozen payload, lease ve sağlayıcı dedupe süresi korunur. In_app ve Native Auth ayrı kalır.
-- [ ] P14.3 — İmzalı sağlayıcı olaylarını kalıcı tekillik ile işle; accepted/delivered/bounced/complained ve sırasız/tekrar olayları birbirine karıştırma, kalıcı hatayı yeniden gönderme.
+- [ ] P14.3 — İmzalı sağlayıcı olaylarını kalıcı tekillik ile işle; accepted/delivered/bounced/complained ve sırasız/tekrar olayları birbirine karıştırma, kalıcı hatayı yeniden gönderme. Mevcut davet akışı için imzalı Resend olay girişi, kalıcı tekillik ve yetkili job_status_get.email_delivery projeksiyonu kaynakta hazırdır; native aday ve gerçek webhook kurulumu beklenir. Genel P14.2 bildirim işleriyle bağlantı ve eşleşmeyen olayların saklama/temizleme işletimi açık kalır.
 - [ ] P14.4 — Somut yetkili alıcı/olay üzerinden gerçek teslim ve hata görünürlüğünü doğrula; sentetik/provider kabulü gerçek alıcı teslimi sayılmaz. P15/P16 ayrı sıradadır.
 
 <a id="p15"></a>

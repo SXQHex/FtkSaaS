@@ -1360,6 +1360,14 @@
     "subscriberContext": "Abone no: {number}",
     "reservationContext": "Rezervasyon {index}",
     "showRequirements": "Belge gerekliliklerini göster",
-    "documentGate": "İşlem bağlamı"
+    "documentGate": "İşlem bağlamı",
+    "selfTitle": "Kendi belgelerim",
+    "selfHint": "Bu oturum için kendi adına geçerli belgeleri incele. Kabul, oturum açmış hesabına bağlı kişi için kaydedilir.",
+    "selfNoRequirements": "Bu bağlamda kendi adına gerekli belge bulunmuyor.",
+    "acceptSelfHint": "Belgeyi açmak veya indirmek kabul kaydı oluşturmaz. Yalnız kendi adına kabul verebilirsin.",
+    "acceptSelfConsent": "“{name}” belgesinin gösterilen sürümünü okudum ve kendi adıma kabul ediyorum.",
+    "acceptSelf": "Kendi adıma kabul et",
+    "showSelfDocuments": "Kendi belgelerimi incele",
+    "hideSelfDocuments": "Kendi belgelerimi gizle"
   }
 }
