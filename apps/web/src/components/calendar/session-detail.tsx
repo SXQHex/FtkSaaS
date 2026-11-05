@@ -281,7 +281,9 @@ function LiveSessionDetail({
       )}
       {replacementId && (
         <Button asChild variant="outline">
-          <Link href={sessionPath(scope.orgId, replacementId)}>{lifecycle("viewReplacement")}</Link>
+          <Link href={sessionPath(scope.orgId, replacementId, scope.centerId)}>
+            {lifecycle("viewReplacement")}
+          </Link>
         </Button>
       )}
       {commandScope && (
@@ -345,7 +347,7 @@ function LiveSessionDetail({
         variant="outline"
         className="h-auto min-h-11 w-full justify-between whitespace-normal text-left"
       >
-        <Link href={sessionPath(scope.orgId, entry.id)}>
+        <Link href={sessionPath(scope.orgId, entry.id, scope.centerId)}>
           {t("openPage")}
           <ArrowUpRight aria-hidden="true" />
         </Link>

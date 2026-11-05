@@ -72,3 +72,29 @@ test("password recovery without a native session returns to the recovery request
   const { default: UpdatePasswordPage } = await import("../src/app/(auth)/reset-password/page");
   await expect(UpdatePasswordPage()).rejects.toThrow("redirect:/forgot-password?error=session");
 });
+
+test("center context survives native login and MFA without widening the tenant", async () => {
+  const center = "019a2b3c-4d5e-7000-8000-000000000003";
+  const input = { params: Promise.resolve(ids), searchParams: Promise.resolve({ center }) };
+  mocks.user.mockResolvedValue({ data: { user: null }, error: null });
+  await expect(SessionRoute(input)).rejects.toThrow(
+    `redirect:/login?next=${encodeURIComponent(destination + "?center=" + center)}`,
+  );
+  mocks.user.mockResolvedValue({ data: { user: { id: "user" } }, error: null });
+  mocks.assurance.mockResolvedValue({
+    data: { nextLevel: "aal2", currentLevel: "aal1" },
+    error: null,
+  });
+  await expect(SessionRoute(input)).rejects.toThrow(
+    `redirect:/mfa?next=${encodeURIComponent(destination + "?center=" + center)}`,
+  );
+});
+test.each([
+  "invalid",
+  ["019a2b3c-4d5e-7000-8000-000000000003", "019a2b3c-4d5e-7000-8000-000000000004"],
+])("invalid or ambiguous center context fails closed: %s", async (center) => {
+  await expect(
+    SessionRoute({ params: Promise.resolve(ids), searchParams: Promise.resolve({ center }) }),
+  ).rejects.toThrow("notFound");
+  expect(mocks.user).not.toHaveBeenCalled();
+});
