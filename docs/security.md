@@ -1,6 +1,6 @@
 # Güvenlik kaynak referansı
 
-Üretilmiştir: `node apps/backend/scripts/update-docs.mjs --write`. Elle düzenleme. Kaynak içerik özeti: `cd2178e9d541b672f8985044f191c5de8f59cd623284255b0173afcbf4f9c1f4`. Bu özet CI/hosted kabulü değildir; dağıtılan SHA ve ortam CD artifact'ında bulunur.
+Üretilmiştir: `node apps/backend/scripts/update-docs.mjs --write`. Elle düzenleme. Kaynak içerik özeti: `27583496ea29216e92600035be2694d31a7f6afc3ed5a56324a9290acc4773d3`. Bu özet CI/hosted kabulü değildir; dağıtılan SHA ve ortam CD artifact'ında bulunur.
 
 İnsan istemci native Auth → JWT doğrulanan Edge → service-only RPC yolunu kullanır. Canlı oturum/MFA/tenant/rol/plan kontrolü tekrar denetlenir; core/private erişimi istemciye açılmaz. Worker ve public credential transport ayrı yetki yollarıdır. RLS tek başına Edge iş yetkisi değildir. [İstemci değişmezleri](client-integration.md), [teknik sözleşme](contracts/02-FtkSaaS-teknik-sozlesme.md) ve [iş akışları](workflows.md#wf00) normatif ayrıntıyı taşır.
 
@@ -21,6 +21,10 @@ Aşağıdaki liste güvenlik DDL içeren kaynak dosyalarıdır; son policy/grant
 | [class-duty-management.sql](../apps/backend/database/class-duty-management.sql) | `0324c08549d2fb98a7604a496d6e8b418141870a140c25a3798132368984242a` |
 | [commercial-plan-limits.sql](../apps/backend/database/commercial-plan-limits.sql) | `b5dd6eb0f8d30806ff9828b39d084b7344194a02477394e28b3ce2e75fa1ed37` |
 | [crm-application-intake.sql](../apps/backend/database/crm-application-intake.sql) | `65ea718668a031095265e936981bce6457759cfb538d1c4d525534249460e3ba` |
+| [crm-meta-queue.sql](../apps/backend/database/crm-meta-queue.sql) | `42c611d109d70cd541e8f0ddc8ced3c51ed0fe8764aa41c831a182fef22c3b02` |
+| [crm-provider-health.sql](../apps/backend/database/crm-provider-health.sql) | `f05445ab1d121bd21e23618246e8ad6389cedcbd54ec5c5c484c4cb721f1d5cc` |
+| [crm-provider-intake.sql](../apps/backend/database/crm-provider-intake.sql) | `00fd9a3d81be075942172c873aa6cf07ec1317981152886e80893d7c059744bf` |
+| [crm-provider-route.sql](../apps/backend/database/crm-provider-route.sql) | `7d9349675a11a56cf4d86a7bf3e4574eb5dbc6c12588ba04fa1012d6216478d7` |
 | [cross-center-settlement-wrappers.sql](../apps/backend/database/cross-center-settlement-wrappers.sql) | `b2a875f095645531c88dc5c8ca5ad1669bd43c29f50b3f6159d38ff666726d36` |
 | [cross-center-settlement.sql](../apps/backend/database/cross-center-settlement.sql) | `4ea8a8b433b85e317a7c84ca4a4bc41ba443c18845071aba84d525521dc07c30` |
 | [deactivate-expired-offers-wrappers.sql](../apps/backend/database/deactivate-expired-offers-wrappers.sql) | `767bcaf0917db6a7ceb9b20a40b6319b2e28dbc443b23ddf03a5c67beb8fd99c` |
@@ -240,3 +244,7 @@ Aşağıdaki liste güvenlik DDL içeren kaynak dosyalarıdır; son policy/grant
 | [20261103233454_event_capacity_practice.sql](../apps/backend/supabase/migrations/20261103233454_event_capacity_practice.sql) | `0562a2fa7b22721d78e93490051b2bda49f139826836d4f0a984528dfc9ab2f7` |
 | [20261104111220_starter_basic_crm.sql](../apps/backend/supabase/migrations/20261104111220_starter_basic_crm.sql) | `411fdfc92c83f7f0051c02d1e73df6c51a91abbca042697535a1978689e27cda` |
 | [20261104131917_crm_application_intake.sql](../apps/backend/supabase/migrations/20261104131917_crm_application_intake.sql) | `65ea718668a031095265e936981bce6457759cfb538d1c4d525534249460e3ba` |
+| [20261105012400_crm_provider_intake.sql](../apps/backend/supabase/migrations/20261105012400_crm_provider_intake.sql) | `00fd9a3d81be075942172c873aa6cf07ec1317981152886e80893d7c059744bf` |
+| [20261105024500_crm_provider_route.sql](../apps/backend/supabase/migrations/20261105024500_crm_provider_route.sql) | `7d9349675a11a56cf4d86a7bf3e4574eb5dbc6c12588ba04fa1012d6216478d7` |
+| [20261105041500_crm_meta_queue.sql](../apps/backend/supabase/migrations/20261105041500_crm_meta_queue.sql) | `42c611d109d70cd541e8f0ddc8ced3c51ed0fe8764aa41c831a182fef22c3b02` |
+| [20261105055000_crm_provider_health.sql](../apps/backend/supabase/migrations/20261105055000_crm_provider_health.sql) | `f05445ab1d121bd21e23618246e8ad6389cedcbd54ec5c5c484c4cb721f1d5cc` |

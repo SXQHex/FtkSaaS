@@ -267,7 +267,7 @@ test('twelve-shard acceptance requires all twelve source-bound jobs and rejects 
  const v=promoteFixture(valid());v.binding.source_attempt=1;v.jobs[0].steps.push({name:'Upload schema baseline',conclusion:'success'});
  assert(validateBinding(v));
  assert.equal(acceptancePlan().length,12);
- const currentPlan=acceptancePlan(),added=new Set(['document-self-requirements-acceptance','crm-application-intake-acceptance','crm-application-review-acceptance','starter-operations-report-shaping','starter-operations-import-templates','starter-operations-report-access','starter-operations-inbox']);
+ const currentPlan=acceptancePlan(),added=new Set(['document-self-requirements-acceptance','crm-application-intake-acceptance','crm-application-review-acceptance','starter-operations-report-shaping','starter-operations-import-templates','starter-operations-report-access','starter-operations-inbox','crm-provider-delivery-acceptance','crm-provider-authority-acceptance','crm-provider-webhook-acceptance','crm-meta-queue-acceptance','crm-meta-queue-authority-acceptance','crm-provider-host-acceptance']);
  // Each split retains one representative of its original acceptance obligation.
  // The full behavior inventory and retirement checks live in ci-api-suites.test.
  for(const id of ['earnings-packages-corrections','earnings-valuation-closure','earnings-occurrence-authority','earnings-pilot','cross-center-no-transfer','cross-center-rounding','cross-center-source-scope','event-paid-capacity','event-financial-cancellation','event-payment-authority','api-shared-rights','api-live-authority','api-event-finance','event-cancellation-participant-money'])added.add(id);

@@ -1,3 +1,9 @@
+import './crm-meta-lead-unit.mjs';
+import './crm-meta-graph-unit.mjs';
+import './crm-provider-intake-unit.mjs';
+import './crm-provider-mapping-unit.mjs';
+import './crm-provider-webhook-unit.mjs';
+import './crm-google-lead-unit.mjs';
 import './crm-web-form-unit.mjs';
 import './document-self-contract-unit.mjs';
 import './crm-ingress-unit.mjs';
@@ -355,3 +361,8 @@ test('P05 Starter basic CRM is explicit and person-only followups retain the adv
  assert.deepEqual(scope.sources,['manual','phone','whatsapp']);
  assert.equal(fs.readFileSync('database/starter-basic-crm.sql','utf8'),fs.readFileSync('supabase/migrations/20261104111220_starter_basic_crm.sql','utf8'));
 });
+
+import './crm-meta-queue-unit.mjs';
+
+import './crm-provider-host-unit.mjs';
+import './crm-provider-host-db-unit.mjs';

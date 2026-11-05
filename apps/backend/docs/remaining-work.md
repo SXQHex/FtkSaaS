@@ -10,7 +10,7 @@ Bu dosya **Starter, Pro ve Business’ın tamamı için backend görevlerinin te
 - Sorumlu backend’dir. Frontend ekran/tasarım/kabulü bu planın işi değildir; yalnız gerçek API tüketicisi gerektiren bağımlılık [ortak taleple](../../../docs/requests.md) izlenir. Backend frontend adına kapanış vermez.
 - Test/doğrulama yöntemi [aşağıda](#doğrulama-ve-kayıt); saf belge işi DB/API çalıştırmayı gerektirmez. Hosted reset/seed, yeni dış gönderim, production dağıtımı veya canlı veri aktarımı bu planın yazılmasıyla başlamaz.
 
-**ST-02 kabul onarımı açık:** Rapor kökünün beş anlamlı native köke ayrılması ayrı PR'de hazırlanır; timeout/assertion tabanı korunarak gerçek aday/main kabulü beklenir. Sonra PR190 güncel main'e eşitlenir ve P08–P11 sağlayıcı dilimine dönülür. Kaynak ve başarısız koşu kanıtı [devir](00-FtkSaaS-yeni-sohbet-devir.md#st-02-bağımsız-rapor-kabul-kökleri) sahibindedir; bu onarım ürün özelliklerini kapatmaz.
+**ST-02 kabul onarımı tamamlandı:** PR192 aday/main/development kabulü doğrulandı; [kaynak kanıtı](00-FtkSaaS-yeni-sohbet-devir.md#st-02-bağımsız-rapor-kabul-kökleri). PR190 güncel main ile senkronize edilerek yeni birleşik kaynak kabulüne gider. P08–P11 ürün/sağlayıcı işleri kendi alt adımlarında açık kalır.
 
 ## Eski iş kimliklerinin tek görev karşılığı
 
@@ -419,6 +419,22 @@ Değişen dilimin sözleşme, üretilmiş tip/envanter, WF/F01–F33 izi ve alan
 - **Doğrulama senaryosu:** Resmi erişim/yöntem uygulama anında doğrulanır; imza/izin, replay/retry ve alan eşleme; gerçek provider kanıtı.
 - **Kaynak alanı:** sağlayıcı adapter/credential eşleme; ilgili test
 
+**Ortak veri hedefi:** Son kullanıcı talimatıyla Meta (öncelikle Instagram reklamları) ve Google Ads başvuruları mevcut `core.public_applications` tablosunda birleşir. Sağlayıcı başına başvuru/kişi tablosu kurulmaz; kaynak/form/dış başvuru kimliği ve provider atfı aynı başvurunun kanıtıdır. İmza/anahtar doğrulaması sağlayıcıya özel, kalıcı alım/inbox/eşleme/dönüşüm ortaktır. Mevcut web_form-only eşlemesinin provider desteğine genişletilmesi P08.2b/P09.2b kaynak işidir; bu ilk doğrulama katmanı henüz provider kayıtlarını yazmaz.
+
+**Uygulama dilimleri (P08–P11 ortak PR):**
+
+- [ ] P08.1 — Resmi güncel Meta yöntemi, uygulama/hesap/sayfa/form yetkileri ve örnek alan sözleşmesini doğrula. Token paylaşmadan erişim eksiklerini ayır; gerçek erişim yoksa canlı kabul kapalı kalsın. Kaynak alanı: sağlayıcı transport/config; doğrulama: resmi kaynak ve yetki/form readback'i.
+- [ ] P08.2 — Doğrulanmış sağlayıcı bildirimi→güvenilir form/tenant eşlemesi→mevcut ortak başvuru zincirini uygula. Sağlayıcı başvuru kimliğinde tekillik, yeniden teslim, geç hata rollback'i, kaynak/onay kanıtı ve telefon önerisi korunsun; ikinci başvuru deposu kurulmasın. Küçük imza/eşleme testleri ve izole native alım suite'i kullan; invalid sender, yanlış form/tenant ve yarış negatif olsun.
+- [ ] P08.2a — Instagram önceliğiyle Meta Page leadgen doğrulama kaynağının aday/main kabulü: exact challenge/token, ham gövde SHA256 imzası, tam dış kimlik ve batch/zaman ayrımı. Bu dilim endpoint/kalıcı alım değildir; [kaynak/kanıt](00-FtkSaaS-yeni-sohbet-devir.md#p08p09-sağlayıcı-doğrulama-kaynak-dilimi) sahibindedir.
+- [ ] P08.2b.1 — Meta Graph sunucu okuma katmanının kaynak/native kabulü: sabit Graph hostu, açık sürüm/credential ve Page/form sınırı, lead/form/ad tutarlılığı, ayrı field_data/custom_disclaimer_responses kanıtı. HTTP/payload sınırları küçük unit suite ile doğrulanır; gerçek Page token/form erişimi ayrıca gerekir. Bu katman ortak inbox yazımı veya onay normalizasyonu değildir.
+- [ ] P08.2b.2 — Ortak native kalıcı alımın kaynak/aday kabulü: güvenilir provider/form tek eşlemesi, gerçek receiver LOGIN/form scope’u, kilit altında canlı yetki/plan, aynı tabloya dış lead tekilliği ve kapalı kaynak/onay görünümü. Meta/Google aynı sınırı kullanır; iki küçük native kökte yarış/inbox ve iptal/plan/rollback doğrulanır. Kaynak hazırlanması gerçek CI/hosted/provider kabulü değildir.
+- [ ] P08.2b — Güvenilir Page/form eşlemesiyle yetkili Graph lead verisini ve custom_disclaimer_responses yanıtlarını al; ardından aynı ortak başvuru modeline kalıcı dış kimlik tekilliğiyle yaz. Instagram platformunu Page nesnesinden tahmin etme; gerçek form/reklam kanıtıyla koru. Güvenilir token/yetki, native/gerçek sağlayıcı kabulü açık kalır.
+- [ ] P08.2c — HTTP/mapping adapter aday kabulü: imza → gerçek native form admission → Graph → açık alan/checkbox eşlemesi → receipt → ACK; küçük unit ve ayrı native HTTP kökü. Bu kaynak handler’ı hosted mount değildir.
+- [ ] P08.2d — Kalıcı minimal Meta bildirim batch’i → ACK ve tekil lease worker kaynak/native kabulü; commit prefix’ini yeniden okuyarak sonraki kayıtları host timeout’unda aç bırakma. Kaynak kuyruğu provider başvuru deposu değildir; tenant/form/merkez snapshot ve kalıcı nonce tekilliği korunur. Canlı mount için host/DB süre bütçesi, düzenli worker zamanlaması, biriken/yeniden denenemeyen kayıt gözlemi ve gerçek URL/credential/form/onay/tekrar kabulü ayrıca gerekir.
+- [ ] P08.2e — Son kullanıcı kapsamıyla endpoint/süre sınırı/worker zamanlaması/izleme kaynak paketini tek push ile merge adayına getir. Backend Node host, gerçek HTTP/native LOGIN kabulü ve korumalı aggregate status aynı PR’dedir. Gerçek hosted yerleşim/TLS URL readback’i dağıtımda ayrıca doğrulanır; kaynak host implementasyonu yayında demek değildir.
+- [ ] **Ertelenen sağlayıcı kabulü:** Kullanıcı kararıyla gerçek Meta/Google hesap/token/izin/form/alan-onay kurulumu ve gerçek teslim/tekrar testleri bu merge paketini bekletmez; tamamlandı işaretlenmez. Kuyruk metadata retention/temizleme ve gerçek yük/izleme alarmı eşikleri de kanıtsız kapatılmaz.
+- [ ] P08.3 — Yetkili gerçek Meta formundan tek kayıt ve retry kabulünü doğrula; yetkili inbox yeniden okumasıyla bağla. Sentetik payload başarıları gerçek sağlayıcı erişimi/teslimi yerine geçmez. Hesap erişimi veya entegrasyon kurulumu gerektiğinde somut eksik üzerinden ilerle.
+
 <a id="p09"></a>
 ### P09 — Google yerel reklam formu alımı
 
@@ -428,6 +444,16 @@ Değişen dilimin sözleşme, üretilmiş tip/envanter, WF/F01–F33 izi ve alan
 - **Sınır/olumsuz durum:** Web forma yönlendirme ile native form ayrıdır; Meta kabulü Google kanıtı değildir.
 - **Doğrulama senaryosu:** Güncel resmi erişim/yöntem incelemesi, gönderici doğrulama, dedupe/geri doldurma ve gerçek sağlayıcı kabulü.
 - **Kaynak alanı:** Google adapter/config; ilgili test
+
+**Uygulama dilimleri:**
+
+- [ ] P09.1 — Güncel Google yerel lead formunun resmi teslim/yetkilendirme ve alan/kimlik sözleşmesini doğrula. Reklamdan web forma yönlendirmeyi bu yolla karıştırma; Meta token/yetki/alanlarını Google'a taşıma. Kaynak alanı: ayrı Google transport/config; doğrulama: resmi kaynak ve gerçek form erişimi.
+- [ ] P09.2 — Doğrulanmış gönderici ve güvenilir form eşlemesiyle ortak alıma bağla; aynı dış kimlik retry tek kayıt, farklı gerçek başvurular ayrı geçmiş olsun. Sağlayıcı yeniden teslim/geri doldurma yolu varsa aynı tekillik kuralını uygula. Küçük doğrulama/alan testi ve izole native ortak alım kabulü; geçersiz kimlik, yanlış eşleme ve kısmi hata negatif olsun.
+- [ ] P09.2a — Google anahtar/form doğrulama ve normalizasyon kaynağının aday/main kabulü: int64 hassasiyeti, column_id eşlemesi, test/zaman/atfın korunması. [Kaynak/kanıt](00-FtkSaaS-yeni-sohbet-devir.md#p08p09-sağlayıcı-doğrulama-kaynak-dilimi); endpoint veya inbox yazımı değildir.
+- [ ] P09.2b.1 — P08.2b.2 ortak native alımını Google kaynak kimliği/test/zaman/atıf verisiyle doğrula; ayrı başvuru deposu kurulmaz. HTTP receiver/custom soru-onay eşlemesi ve gerçek Google teslimi ayrıca açık kalır.
+- [ ] P09.2b — Güvenilir provider/form→tenant eşlemesi, kalıcı lead_id tekilliği, custom soru/onay alanları, test kayıtları ve HTTP retry/ack ile ortak alımı tamamla. Provider kaynağını web_form gibi gösterme; web CAPTCHA'yı sentetik proof/bot_verified ile aşma.
+- [ ] P09.2c — Google HTTP200{} yalnız kalıcı receipt sonrası; kimlik/payload4xx ile geçici işlem5xx ayrımı, yalnız açık column_id alan/onay eşlemesi ve ortak native inbox readback kabulü. Gerçek form metni/sürümü/soru kimliği ve hosted URL doğrulanmadan live kapanış yoktur.
+- [ ] P09.3 — Yetkili gerçek Google formu→inbox ve tekrar teslimini doğrula; Meta başarısını Google kabulü sayma. Gerçek erişim eksikse mevcut bağımsız kaynak/test dilimlerini durdurma, bu kabulü açık bırak.
 
 <a id="p10"></a>
 ### P10 — Eski başvuru kontrollü aktarımı
@@ -439,6 +465,12 @@ Değişen dilimin sözleşme, üretilmiş tip/envanter, WF/F01–F33 izi ve alan
 - **Doğrulama senaryosu:** Örnek veriyle tekrar/rollback/mutabakat; gerçek aktarım için ayrı somut önizleme ve kullanıcı yetkisi.
 - **Kaynak alanı:** import preview/CRM mapping; aktarım runbook/test
 
+**Uygulama dilimleri:**
+
+- [ ] P10.1 — Mevcut import preview/apply altyapısını ve eski başvuru alanlarını incele; yalnız eksik CRM eşlemesini ekle. Önizleme kaynak kimliği, alan hatası, olası mükerrerlik, kaynak/onay kanıtı ve seçilebilir satırları göstermeli. Eksik onay sürümü/zamanı uydurulmasın; gerçek kişisel veri test fixture'ı yapılmasın. Kaynak alanı: mevcut import/CRM kaynakları ve ayrı küçük parser/preview testi.
+- [ ] P10.2 — Onaylanmış sabit önizleme/kaynak üzerinden yalnız seçilen kayıtları uygula; scope/plan/rol değişimini yeniden denetle. Aynı aktarım replay tek kayıt; değiştirilmiş snapshot/seçim ve geç hata reddi atomik olsun. İzole native preview→apply→readback, yarış/rollback ve sayım mutabakatı kullan.
+- [ ] P10.3 — Gerçek kaynak için somut önizleme ve seçilecek satırlar kullanıcı tarafından onaylanmadan hosted aktarım yapma. Kaynağı silme/değiştirme; çıktı/rapora kişisel veri veya secret yazma. Bu PR kaynak uygulaması canlı aktarım yetkisi değildir.
+
 <a id="p11"></a>
 ### P11 — Deneme, takip ve segment tam akışı
 
@@ -448,6 +480,12 @@ Değişen dilimin sözleşme, üretilmiş tip/envanter, WF/F01–F33 izi ve alan
 - **Sınır/olumsuz durum:** Segment liste/detail kaynakta var; baştan icat edilmez; otomatik pazarlama gönderimi kapalı.
 - **Doğrulama senaryosu:** Tenant config süre/tekrar, kontrollü indirim, segment sonucu ve tekrar çalışmada çift görev olmaması.
 - **Kaynak alanı:** p04 CRM/p05 segment-automation; mevcut acceptance
+
+**Uygulama dilimleri:**
+
+- [ ] P11.1 — Mevcut lead/trial/activity/convert ve segment liste/detail/config/worker kodunu senaryo bazında eşle; kaynakta çalışan yolu yeniden yazma. Yalnız doğrulanmış sözleşme/runtime/kabul boşluklarını düzelt. Kaynak alanı: p04 CRM, p05 segment/automation ve mevcut kabul testleri; F22/F23/F24 izi aynı dilimde güncellensin.
+- [ ] P11.2 — Lead→deneme→sonuç/takip→açık öğrenci dönüşümü için tenant konfigürasyonu, süre/tekrar ve izinli indirim sınırlarını native testle doğrula. Başvuru tek başına öğrencilik/No/satış/rezervasyon açmasın; dönüşüm mevcut No/kota/kimlik kapılarını kullansın. Stale sürüm, canlı rol/plan kaybı, aynı komut replay ve geç hata negatif olsun.
+- [ ] P11.3 — Yenileme/hareketsizlik ve segment kapsamı ile tekrarlı çalışmada çift görev oluşmamasını doğrula. Var olan worker sınırını kullan; kampanya/pazarlama e-postası açma. P14–P16 bildirim teslimi/otomasyon genişletmesini bu kaynak kapanışına taşımadan bağımlılıklarını koru.
 
 <a id="p12"></a>
 ### P12 — Etkinlik kapasitesi modeli
