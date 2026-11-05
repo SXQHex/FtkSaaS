@@ -282,8 +282,8 @@
         "management_state_get_v1"
       ],
       "review": {
-        "fingerprint": "55324b67b75220414f5f1497eabb63d9105c563c4827e6ffe7f5facb7f4fac0b",
-        "reason": "Development failure diagnostic records only fixed enums and bounded numeric/process metadata; raw CLI output is withheld, two unit regressions cover sensitive output and unknown values. Command, target and acceptance controls unchanged."
+        "fingerprint": "318f9295857c93ac36d98e8639bd4423112a67eebbcc19580614d959843b5631",
+        "reason": "CLI v3 local reset retains loopback/no-seed/residue/migration gates. Exact assertion replacement independently reviewed; narrow fingerprint record, no threshold relaxation. Edge fixed diagnostics/isolated cwd explicit consent and remote. WF00 API unchanged."
       }
     },
     {

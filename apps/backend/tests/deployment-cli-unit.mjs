@@ -10,6 +10,10 @@ test('CLI diagnostics classify provider and local failures without retaining out
   ['unknown flag: --unsupported','configuration',null],
   ['request failed: ECONNRESET','network',null],
   ['unrecognized provider response','unknown',null],
+  [JSON.stringify({_tag:'Failure',error:{_tag:'CliConfigValueError',message:'private config value'}}),'configuration',null],
+  [JSON.stringify({_tag:'Failure',error:{_tag:'DbPasswordFlagsError',message:'private database URL'}}),'configuration',null],
+  [JSON.stringify({_tag:'Failure',error:{_tag:'HostedMutationConsentRequiredError',message:'private project'}}),'confirmation',null],
+  [JSON.stringify({_tag:'Failure',error:{_tag:'HostedMutationDeclinedError',message:'context canceled'}}),'confirmation',null],
  ]){
   const result=cliFailure({status:1,stderr,stdout:'private SQL and credential output'});
   assert.deepEqual(result,{category,exit_code:1,http_status,signal:null,spawn_error:null});
