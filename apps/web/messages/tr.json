@@ -1578,7 +1578,6 @@
     "noPrivateSession": "Tam eşleşen özel seans yok. Takvim yönetiminde uygun özel seansı oluşturup talepleri yeniden okuyun.",
     "sales": "Satış ve yenileme",
     "openSales": "Satış ve yenilemeyi aç",
-    "saleBlocked": "Yeni satış, gerçek hak ve borç etkisi önizlemesi hazır olana kadar kullanılamıyor.",
     "renewal": "Paket yenileme",
     "previousSale": "Yenilenecek satış",
     "product": "Yeni ürün sürümü",
@@ -1632,6 +1631,19 @@
     "rightsReloaded": "Satın alınmış haklar yeniden okundu.",
     "demoTitle": "Satış ve rezervasyon örnekleri",
     "demoHint": "Bu ekran yalnız sentetik veriler kullanır; gerçek işlem veya oturum oluşturmaz.",
-    "noRequestActions": "Bu talep için izinli işlem bulunamadı."
+    "noRequestActions": "Bu talep için izinli işlem bulunamadı.",
+    "newSale": "Yeni satış",
+    "inspectSale": "Satışı incele",
+    "saleHint": "Onaydan önce oluşacak borcu, geçerliliği ve hak değişikliklerini kontrol edin.",
+    "saleDebt": "Oluşacak borç",
+    "saleValidity": "Geçerlilik ve merkez saat dilimi",
+    "saleGranted": "Verilecek kredi",
+    "noCollection": "Tahsilat bu işlemle yapılmaz.",
+    "saleDeficits": "Mevcut eksik haklara etki",
+    "noDeficits": "Bu önizlemede bağlı eksik hak bulunmuyor.",
+    "deficitSettled": "Bu satışla karşılanacak; mevcut rezervasyon korunur.",
+    "deficitUnchanged": "Eksik hak bu satışla karşılanmayacak.",
+    "sessionRestricted": "Seans ayrıntısı bu yetkiyle okunamıyor.",
+    "deficitNumber": "Eksik hak {number}"
   }
 }
