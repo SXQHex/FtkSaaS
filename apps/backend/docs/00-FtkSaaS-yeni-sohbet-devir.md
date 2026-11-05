@@ -1,5 +1,11 @@
 # Güncel kaynak ve kabul
 
+## PR210 CI ve XREQ-020
+
+Aday42043003322 head75662171d659e6d67044204e0b9787e62ba13bf6 için core, quality ve11 API shard success; api6 yalnız yeni restricted-role regresyonunun `DROP OWNED` temizliğinde42501 verdi. Fixture creator üyeliği açık `INHERIT FALSE / SET TRUE` ile kurulur; yalnız kendi schema grant'i revoke edilir ve role/function temizlenir. Runtime tablo grant'i veya güvenlik kapısı değişmez.
+
+XREQ-020 kaynak uygulaması migration113'tedir. Normal satış typed etki ve geniş stale snapshot taşır; frontend kodu değiştirilmedi. Yerel backend verify405/405, strict sözleşme negatifleri ve mevcut Edge upload bütçesi geçti (JSON kaynak3.993.767 byte). Gerçek normal SQL preview/apply borç/geçerlilik/hak/deficit sırası ve stale kişi reddi izole PGlite'da geçti; settlement koşulu mutation'ı yakalandı. Bu native Auth/RLS kabulü değildir. Superuser olmayan CREATEROLE ile eski DROP OWNED hatası yeniden üretildi, açık üyelik/kendi-grant temizliği geçti. Son bağımsız incelemede Required/Critical yoktur. Yeni native kök önceki99 birimi koruyup100'e çıkarır; eski satır/aralık/bütçe/runner/kalite kapısı değiştirilmedi. Gerçek aday/native/merge/development kabulü yeni kaynakta doğrulanmalıdır; eski P14 başarısı taşınmaz.
+
 ## P14 transactional email tamamlama kaynağı
 
 PR205 main `5bdba43b61167451aa4c2626c8523beedb8d6667` için main42030074032, merge42030073970, development42030136955 ve Vercel42030137137 success doğrulandı. Ortak transport ve imzalı provider olay kaynağı teslim edildi; P14'ün tamamı diye işaretlenmez. Yeni paket güncel PR209 main'ine eşitlendi; gelen frontend dosyaları değiştirilmedi.
@@ -10,7 +16,6 @@ Gerçek Resend incelemesinde doğrulanmış gönderici alanı ve mevcut Business
 
 Yeni native kök yalnız mevcut registry suite'ine ayrı kayıt olarak eklendi; eski bütün satır/range/ithalat sahipliği bir satır kaydırılarak korunur, bütçe/runner/politika değişmez. Minimal PGlite'da gerçek yeni SQL/preference/page patch'leri derlendi; opt-in, deferred enqueue, freeze, lease fence, accepted projeksiyonu, canlı tercih ve kaynak kaybı iptali geçti; native Auth/RLS değildir. Yeni native senaryolar commit rollback/final kaynak sürümü, Pro/Business, geçmiş Pro+güncel Starter, hesap bağı kaybı,23saat, permanent ret ve yabancı hesabı içerir. Bağımsız incelemenin geçmiş plan yetkisi bulgusu current_plan_name ile giderildi ve negatif test eklendi. PR210 head85a3a72 aday42039064680 attempt1 core/quality ve dokuz API shard success; api1/api5 deferred trigger commit yetkisi, api6 fixture account_links durum hatasıyla başarısızdır. Deferred trigger, worker SECURITY DEFINER çağrısından çıkıldıktan sonra çağıranın kısıtlı kimliğiyle tetikleniyordu. Trigger yalnız sabit iç queue işlemi için SECURITY DEFINER yapıldı; worker core/private tablo grantları genişletilmedi. Gerçek kısıtlı role→bounded definer→commit regresyonu ve doğrudan şema/tablo izin reddi eklendi. Fixture artık geçerli revoked durumuyla aynı hesap-bağı kaybını sınar. PR211 main eşitlemesi gelen frontend dosyalarını değiştirmeden alındı. Önceki yerel backend verify404/404, ayrı kalite10/10 başarılıdır; yeni yetkilendirme kapısını ters çeviren mutation hedefli suite tarafından yakalandı. Son bağımsız incelemede Required/Critical kalmadı. Yeni aday/main/development ve live kurulum/teslim ayrıca gerekir.
 
-XREQ-020 kaynak değerlendirmesi aynı pakette ortak talebin backend alanına kaydedildi: normal sale_preview gerçek borç/hak/eksik hak etkisini vermiyor, yenileme projeksiyonu onun yerine geçmiyor. Finansal runtime değiştirilmedi, frontend/S05 adına kapanış verilmedi; uygulama izi S09'dadır.
 
 ## P10 kabulü ve P11 CRM tam akışı
 

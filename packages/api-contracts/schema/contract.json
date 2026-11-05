@@ -11306,7 +11306,7 @@
           "const": true
         },
         "data": {
-          "$ref": "#/$defs/Preview"
+          "$ref": "#/$defs/SalePreview"
         },
         "trace_id": {
           "$ref": "#/$defs/FtkUuid"
@@ -52299,6 +52299,211 @@
           "type": "boolean"
         }
       }
+    },
+    "SaleDeficitEffect": {
+      "type": "object",
+      "properties": {
+        "deficit_id": {
+          "$ref": "#/$defs/FtkUuid"
+        },
+        "reservation_id": {
+          "$ref": "#/$defs/FtkUuid"
+        },
+        "session_id": {
+          "$ref": "#/$defs/FtkUuid"
+        },
+        "version": {
+          "$ref": "#/$defs/PositiveInt"
+        },
+        "reservation_version": {
+          "$ref": "#/$defs/PositiveInt"
+        },
+        "session_version": {
+          "$ref": "#/$defs/PositiveInt"
+        },
+        "state": {
+          "enum": [
+            "consumed",
+            "reserved"
+          ]
+        },
+        "quantity": {
+          "$ref": "#/$defs/Count"
+        },
+        "settles": {
+          "$ref": "#/$defs/Bool"
+        }
+      },
+      "required": [
+        "deficit_id",
+        "reservation_id",
+        "session_id",
+        "version",
+        "reservation_version",
+        "session_version",
+        "state",
+        "quantity",
+        "settles"
+      ],
+      "additionalProperties": false
+    },
+    "SaleImpact": {
+      "type": "object",
+      "properties": {
+        "person_id": {
+          "$ref": "#/$defs/FtkUuid"
+        },
+        "product_version_id": {
+          "$ref": "#/$defs/FtkUuid"
+        },
+        "kind": {
+          "$ref": "#/$defs/EntitlementKind"
+        },
+        "booking_mode": {
+          "$ref": "#/$defs/BookingMode"
+        },
+        "start_date": {
+          "$ref": "#/$defs/Date"
+        },
+        "end_date": {
+          "$ref": "#/$defs/Date"
+        },
+        "timezone": {
+          "$ref": "#/$defs/Text"
+        },
+        "valid_from": {
+          "$ref": "#/$defs/Instant"
+        },
+        "valid_until": {
+          "$ref": "#/$defs/Instant"
+        },
+        "debt_minor": {
+          "$ref": "#/$defs/Money"
+        },
+        "currency": {
+          "$ref": "#/$defs/Currency"
+        },
+        "granted": {
+          "$ref": "#/$defs/Count"
+        },
+        "reserved": {
+          "$ref": "#/$defs/Count"
+        },
+        "consumed": {
+          "$ref": "#/$defs/Count"
+        },
+        "available": {
+          "$ref": "#/$defs/Count"
+        },
+        "quota": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/QuotaSpec"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "deficits": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/SaleDeficitEffect"
+          }
+        }
+      },
+      "required": [
+        "person_id",
+        "product_version_id",
+        "kind",
+        "booking_mode",
+        "start_date",
+        "end_date",
+        "timezone",
+        "valid_from",
+        "valid_until",
+        "debt_minor",
+        "currency",
+        "granted",
+        "reserved",
+        "consumed",
+        "available",
+        "quota",
+        "deficits"
+      ],
+      "additionalProperties": false,
+      "description": "Exact normal sale debt and initial rights projection. Timed products have zero numeric credits; quota is the frozen product quota. Deficits retain consumed-first/time/id order, stop at first unaffordable item; settles=false remains unchanged. No collection, receipt or send is produced by preview."
+    },
+    "SalePreview": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/FtkUuid"
+        },
+        "token": {
+          "$ref": "#/$defs/OpaqueToken"
+        },
+        "scope_hash": {
+          "$ref": "#/$defs/Text"
+        },
+        "dependencies": {
+          "$ref": "#/$defs/PreviewDependencies"
+        },
+        "effects": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Effect"
+          }
+        },
+        "blockers": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/SafeError"
+          }
+        },
+        "expires_at": {
+          "$ref": "#/$defs/Instant"
+        },
+        "sale": {
+          "$ref": "#/$defs/SaleImpact"
+        }
+      },
+      "required": [
+        "id",
+        "token",
+        "scope_hash",
+        "dependencies",
+        "effects",
+        "blockers",
+        "expires_at",
+        "sale"
+      ],
+      "additionalProperties": false,
+      "allOf": [
+        {
+          "if": {
+            "required": [
+              "configuration_requirement"
+            ]
+          },
+          "then": {
+            "properties": {
+              "blockers": {
+                "minItems": 1,
+                "prefixItems": [
+                  {
+                    "properties": {
+                      "code": {
+                        "const": "POLICY_NOT_CONFIGURED"
+                      }
+                    }
+                  }
+                ]
+              }
+            }
+          }
+        }
+      ]
     }
   },
   "x-contract": {
@@ -63143,7 +63348,7 @@
           "INVITATION_UNAVAILABLE"
         ],
         "transaction_class": "preview",
-        "transaction_guarantee": "Compute sale_preview impact and dependency-bound technical preview only; no business mutation.",
+        "transaction_guarantee": "Compute typed sale debt, validity, initial rights and deficit/reservation effects with actor/org/center/source/document/plan dependencies; only preview evidence persists.",
         "transition": {
           "effect": "technical_preview_only",
           "from": [],
@@ -96073,6 +96278,42 @@
         "origin": "ftksaas",
         "acceptance": "generic_uuid",
         "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/SaleDeficitEffect/properties/deficit_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/SaleDeficitEffect/properties/reservation_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/SaleDeficitEffect/properties/session_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/SaleImpact/properties/person_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/SaleImpact/properties/product_version_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/SalePreview/properties/id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
       }
     ],
     "open_product_decisions": [],
@@ -96524,7 +96765,7 @@
       "uuid": "backend uuid@14.0.3 v7 for all inserted IDs; DB defaults not required",
       "external_transport": "POST /functions/v1/backend-v1/{operation}; direct typed request body",
       "internal_rpc": "service-only api_v1 named functions; actor/session/UUID bank supplied by verified gateway",
-      "migration_count": 112,
+      "migration_count": 113,
       "acceptance_source": "apps/backend/docs/00-FtkSaaS-yeni-sohbet-devir.md"
     },
     "decision_sprint": {

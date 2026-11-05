@@ -284,8 +284,8 @@
         "management_state_get_v1"
       ],
       "review": {
-        "fingerprint": "1322c3dcd2b0bc9af08134f96c41a1c1e86b1a883f1565cf5f97ff00f30ba8a1",
-        "reason": "Only reviewed existing native root body hash refreshed for source-bound restricted trigger regression; no scope, shard, budget or policy weakening."
+        "fingerprint": "16062bd021452b5f43a6071b819db1ec606d0b525baf0b423245284b31f9cce3",
+        "reason": "Reviewed exact registry source/import hash and one-line offsets for XREQ-020 isolated native root. All prior bodies, CI commands, coverage ownership and budgets preserved; sale-only typed response and validator negatives reviewed."
       }
     },
     {
@@ -460,8 +460,8 @@
         "role_revoke_preview_v1"
       ],
       "review": {
-        "fingerprint": "14f9e0f4eba0c3ed1b694669ab380c3a5ff5d5af2f7ec099884401ded319ada0",
-        "reason": "Reviewed common runtime wrapper diff: only service-internal outbox email_phase changes; WF02 entrypoints remain byte-identical. Explicit opt-in external notices do not alter domain commit, scope, plan or existing guide semantics."
+        "fingerprint": "bb92242fd3d80ac3bf5fd96e1161fa56cf76545eb157e7b6d8283e964cf48d4b",
+        "reason": "Registry import adds isolated XREQ-020 sale acceptance. Existing configuration assertions, source ranges and behavior are preserved; guide remains correct."
       }
     },
     {
@@ -643,8 +643,8 @@
         "person_discipline_set_v1"
       ],
       "review": {
-        "fingerprint": "cb0300b584e8384918478359ece142a6f08181303b721db3ca4bd7ddaa394a54",
-        "reason": "Reviewed common runtime wrapper diff: only service-internal outbox email_phase changes; WF04 entrypoints remain byte-identical. Explicit opt-in external notices do not alter domain commit, scope, plan or existing guide semantics."
+        "fingerprint": "eb329f88e9f69e2efbfcf49c81266612d9e7550881129881cb8220d295a943de",
+        "reason": "Registry import adds isolated XREQ-020 sale acceptance. Existing person lifecycle assertions, source ranges and behavior are preserved; guide remains correct."
       }
     },
     {
@@ -660,7 +660,8 @@
         "apps/backend/tests/starter-attendance-protection.test.mjs",
         "apps/backend/tests/event-payment.test.mjs",
         "apps/backend/tests/pro-lifecycle-earnings-acceptance.mjs",
-        "apps/backend/tests/event-capacity-package-acceptance.mjs"
+        "apps/backend/tests/event-capacity-package-acceptance.mjs",
+        "apps/backend/tests/sale-preview-impact-acceptance.mjs"
       ],
       "sources": [
         "apps/backend/database/active-discipline-projection-wrappers.sql",
@@ -709,7 +710,9 @@
         "apps/backend/database/starter-subscriber-projections.sql",
         "apps/backend/supabase/migrations/20261102180626_starter_subscriber_projections.sql",
         "apps/backend/database/event-capacity-practice.sql",
-        "apps/backend/supabase/migrations/20261103233454_event_capacity_practice.sql"
+        "apps/backend/supabase/migrations/20261103233454_event_capacity_practice.sql",
+        "apps/backend/database/sale-preview-impact.sql",
+        "apps/backend/supabase/migrations/20261105153000_sale_preview_impact.sql"
       ],
       "operations": [
         "products_list_v1",
@@ -737,8 +740,8 @@
         "negative_limits_get_v1"
       ],
       "review": {
-        "fingerprint": "4e17b4180391227ba2ac5e3f62fe7dc11e8f84dd78ffadbe06d14e95d89577d5",
-        "reason": "Reviewed XREQ020 normal sale preview/apply and Starter/sale-lifecycle/document sources: real effects gap confirmed, recorded as open S09; no financial runtime change. Outbox email does not change sale commit."
+        "fingerprint": "ed7b29f0e4905cb8018e0e0b833febc66507a3a4dd0e8dd7727675fab5410d56",
+        "reason": "Reviewed exact sale writer projection, timed quota/unlimited and credits, deficit order and out-of-scope exclusion, source/plan/permission/document stale refusal and key recovery; WF05 matches implementation."
       }
     },
     {
@@ -1606,8 +1609,8 @@
         "subscription_boundary_apply_v1"
       ],
       "review": {
-        "fingerprint": "1faf90519f7b4400b980701db66edf7d23e557aba4008436a1f03407c85cc20e",
-        "reason": "CI210 showed deferred enqueue executes after worker definer returned. Fixed private trigger execution context without table grants; added restricted commit regression and corrected revoked fixture state; live guards unchanged."
+        "fingerprint": "a6b69631cbbf5160506284dec63b364ac46bd2f0ba4350729372c8a8128c07d8",
+        "reason": "Reviewed restricted-role enqueue regression explicit SET membership and own-grant cleanup; runtime notification logic and worker table access unchanged."
       }
     }
   ]

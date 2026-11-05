@@ -45,7 +45,7 @@ test('P14 native transactional email: opt-in, source freshness, leases, retry, d
   });
   await t.test('deferred email enqueue survives a bounded worker commit without table grants',async()=>{
    const role='p14_w_'+id().replaceAll('-',''),fn=role+'_notice',nid=id();
-   await db.query('create role "'+role+'" nologin');
+   await db.query('create role "'+role+'" nologin');await db.query('grant "'+role+'" to current_user with inherit false, set true');
    try{
     await db.query(`create function private."${fn}"(n uuid) returns void language plpgsql security definer set search_path='' as $fn$begin insert into core.notifications(id,org_id,recipient_person_id,kind,subject_id,payload) values(n,'${org}','${person}','session_change_apply_v1','${sid}',jsonb_build_object('subject',jsonb_build_object('type','sessions','id','${sid}')));end$fn$`);
     await db.query('revoke all on function private."'+fn+'"(uuid) from public');await db.query('grant usage on schema private to "'+role+'"');await db.query('grant execute on function private."'+fn+'"(uuid) to "'+role+'"');
@@ -53,7 +53,7 @@ test('P14 native transactional email: opt-in, source freshness, leases, retry, d
     assert.equal((await db.query("select has_table_privilege($1,'core.notifications','insert') p",[role])).rows[0].p,false);
     await db.query('begin');try{await db.query('set local role "'+role+'"');await db.query('select private."'+fn+'"($1)',[nid]);await db.query('commit');}catch(error){await db.query('rollback');throw error;}
     const c=await claim();assert.equal(c.job_id,nid);await worker(c,{email_phase:'finish',retryable:false});
-   }finally{await db.query('drop function if exists private."'+fn+'"(uuid)');await db.query('drop owned by "'+role+'"');await db.query('drop role "'+role+'"');}
+   }finally{await db.query('drop function if exists private."'+fn+'"(uuid)');await db.query('revoke usage on schema private from "'+role+'"');await db.query('drop role "'+role+'"');}
   });
   await t.test('Pro availability and revoked recipient account link are checked live',async()=>{
    await db.query("update core.saas_plan_versions set name='pro' where id=$1",[plan]);assert.equal((await list()).email_preference.available,true);
