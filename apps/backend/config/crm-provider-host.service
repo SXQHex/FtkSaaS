@@ -1,0 +1,23 @@
+# Install only after accepted source delivery on an explicitly selected Node host.
+[Unit]
+Description=FtkSaaS provider ingress and worker
+After=network-online.target
+Wants=network-online.target
+[Service]
+Type=simple
+User=ftk-crm
+Group=ftk-crm
+WorkingDirectory=/srv/ftksaas
+EnvironmentFile=/etc/ftksaas/crm-provider.env
+ExecStart=/usr/bin/node apps/backend/transports/crm-provider-host.mjs
+Restart=on-failure
+RestartSec=5
+TimeoutStopSec=10
+KillMode=control-group
+NoNewPrivileges=true
+ProtectSystem=strict
+ProtectHome=true
+PrivateTmp=true
+UMask=0077
+[Install]
+WantedBy=multi-user.target

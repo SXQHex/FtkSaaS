@@ -279,8 +279,8 @@
         "management_state_get_v1"
       ],
       "review": {
-        "fingerprint": "8f1a6f821c781d4ed418be108c71419fa778e29a025df3d3075cc28cb2b60f51",
-        "reason": "On iki shard workflow, plan, kaynak coverage, iki dar assertion beklentisi ve merge/main kanıtı incelendi; ürün/API protokolü aynı, CI politikası güncellendi."
+        "fingerprint": "73862a6625d1ed16e2f42d5768f485ce2422fcb54143452877b4e7f2904aa0ac",
+        "reason": "Reviewed synchronization with main PR196: twelve-shard source-bound acceptance and refreshed measurements preserved; provider test ownership retained without application behavior changes."
       }
     },
     {
@@ -455,8 +455,8 @@
         "role_revoke_preview_v1"
       ],
       "review": {
-        "fingerprint": "2d3263cba797f02a36c895d81fc09442ab07324a3388dd7139e2b153ac8542ef",
-        "reason": "Reviewed API finance acceptance isolation fix: the negative-credit scenario now seeds its own default100 before mandatory upper1; existing limit, rejection and settlement assertions and runtime contracts remain unchanged."
+        "fingerprint": "72bea3b719930d027da5bcda69347b99b90f98f3fc30f983df01ab4ae30f5d02",
+        "reason": "Reviewed synchronization with main PR196: twelve-shard source-bound acceptance and refreshed measurements preserved; provider test ownership retained without application behavior changes."
       }
     },
     {
@@ -638,8 +638,8 @@
         "person_discipline_set_v1"
       ],
       "review": {
-        "fingerprint": "193a21a25184b81f60b26582cac2e5299ed42e5d6cbaba51aa65b6ed0b92a625",
-        "reason": "CI V2 retired by user decision: removed only shadow test copies, pilot fixtures, experimental workflows and active lightweight acceptance integration; production original API inventory, test bodies, core/security and source-bound proof preserved; historical no-runtime receipts still cannot deploy."
+        "fingerprint": "3b88720e72c237c2ce082303d37845d1e981a7fc711773413ba6245b794bea0d",
+        "reason": "Reviewed synchronization with main PR196: twelve-shard source-bound acceptance and refreshed measurements preserved; provider test ownership retained without application behavior changes."
       }
     },
     {
@@ -951,7 +951,22 @@
         "apps/backend/tests/crm-application-intake-acceptance.mjs",
         "apps/backend/tests/crm-application-contract-unit.mjs",
         "apps/backend/tests/crm-ingress-unit.mjs",
-        "apps/backend/tests/crm-web-form-unit.mjs"
+        "apps/backend/tests/crm-web-form-unit.mjs",
+        "apps/backend/tests/crm-meta-lead-unit.mjs",
+        "apps/backend/tests/crm-google-lead-unit.mjs",
+        "apps/backend/tests/crm-meta-graph-unit.mjs",
+        "apps/backend/tests/crm-provider-intake-unit.mjs",
+        "apps/backend/tests/crm-provider-intake-acceptance.mjs",
+        "apps/backend/tests/crm-provider-fixture.mjs",
+        "apps/backend/tests/crm-provider-mapping-unit.mjs",
+        "apps/backend/tests/crm-provider-webhook-unit.mjs",
+        "apps/backend/tests/crm-provider-webhook-acceptance.mjs",
+        "apps/backend/tests/crm-meta-queue-unit.mjs",
+        "apps/backend/tests/crm-meta-queue-acceptance.mjs",
+        "apps/backend/tests/crm-meta-queue-authority-acceptance.mjs",
+        "apps/backend/tests/crm-provider-host-unit.mjs",
+        "apps/backend/tests/crm-provider-host-db-unit.mjs",
+        "apps/backend/tests/crm-provider-host-acceptance.mjs"
       ],
       "sources": [
         "apps/backend/api/public-application.js",
@@ -970,7 +985,26 @@
         "apps/backend/database/crm-application-intake.sql",
         "apps/backend/supabase/migrations/20261104131917_crm_application_intake.sql",
         "apps/backend/scripts/crm-intake-form-config.mjs",
-        "apps/backend/transports/crm-web-form-gateway.mjs"
+        "apps/backend/transports/crm-web-form-gateway.mjs",
+        "apps/backend/transports/crm-meta-lead.mjs",
+        "apps/backend/transports/crm-google-lead.mjs",
+        "apps/backend/transports/crm-meta-graph.mjs",
+        "apps/backend/database/crm-provider-intake.sql",
+        "apps/backend/supabase/migrations/20261105012400_crm_provider_intake.sql",
+        "apps/backend/scripts/crm-provider-intake.mjs",
+        "apps/backend/scripts/crm-provider-form-config.mjs",
+        "apps/backend/database/crm-provider-route.sql",
+        "apps/backend/supabase/migrations/20261105024500_crm_provider_route.sql",
+        "apps/backend/transports/crm-provider-mapping.mjs",
+        "apps/backend/transports/crm-provider-webhook.mjs",
+        "apps/backend/database/crm-meta-queue.sql",
+        "apps/backend/supabase/migrations/20261105041500_crm_meta_queue.sql",
+        "apps/backend/scripts/crm-meta-queue.mjs",
+        "apps/backend/database/crm-provider-health.sql",
+        "apps/backend/supabase/migrations/20261105055000_crm_provider_health.sql",
+        "apps/backend/transports/crm-provider-host.mjs",
+        "apps/backend/transports/crm-provider-host-db.mjs",
+        "apps/backend/config/crm-provider-host.service"
       ],
       "operations": [
         "publication_set_v1",
@@ -984,8 +1018,8 @@
         "calendar_feed_get_v1"
       ],
       "review": {
-        "fingerprint": "df27528b6440997d3d615c2c9f00d946f65342791dad48662a414b12eac95061",
-        "reason": "CI V2 retired by user decision: removed only shadow test copies, pilot fixtures, experimental workflows and active lightweight acceptance integration; production original API inventory, test bodies, core/security and source-bound proof preserved; historical no-runtime receipts still cannot deploy."
+        "fingerprint": "b0dcadeb8d18f29e10004ceb9714d15969d29a9619abe046c81d960b48764695",
+        "reason": "Reviewed synchronization with main PR196: twelve-shard source-bound acceptance and refreshed measurements preserved; provider test ownership retained without application behavior changes."
       }
     },
     {

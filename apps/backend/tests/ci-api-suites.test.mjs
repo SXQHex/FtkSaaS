@@ -20,7 +20,7 @@ const behaviorSplits={
 test('production inventory owns every original line and import once and compiles every payload',()=>{
  const manifest=JSON.parse(fs.readFileSync(new URL('../scripts/ci/api-suites.json',import.meta.url)));
  const inventory=buildInventory(repositoryRoot),bins=partition(inventory.units);
- const added=new Set(['document-self-requirements-acceptance','crm-application-intake-acceptance','crm-application-review-acceptance','starter-operations-report-shaping','starter-operations-import-templates','starter-operations-report-access','starter-operations-inbox']);
+ const added=new Set(['document-self-requirements-acceptance','crm-application-intake-acceptance','crm-application-review-acceptance','starter-operations-report-shaping','starter-operations-import-templates','starter-operations-report-access','starter-operations-inbox','crm-provider-delivery-acceptance','crm-provider-authority-acceptance','crm-provider-webhook-acceptance','crm-meta-queue-acceptance','crm-meta-queue-authority-acceptance','crm-provider-host-acceptance']);
  for(const [retired,parts] of Object.entries(behaviorSplits)){
   assert(!inventory.units.some(u=>u.id===retired),'Retired acceptance unit '+retired);
   for(const id of parts)assert(inventory.units.some(u=>u.id===id),'Missing behavior '+id);
