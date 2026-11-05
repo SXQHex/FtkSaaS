@@ -1,3 +1,5 @@
+import './sale-preview-impact-acceptance.mjs';
+import './transactional-email-acceptance.mjs';
 import './commercial-plan-acceptance.mjs';
 import './subscription-period-acceptance.mjs';
 import './starter-document-acceptance.mjs';
