@@ -4,20 +4,67 @@
   "suites": [
     {
       "path": "apps/backend/tests/api-acceptance.test.mjs",
-      "sha256": "1ce98e6fc17fb97418231021216b214ffc846937b7550e38cffef77e1fdda127",
+      "sha256": "bd909a90e9bf2f9fa4e1f090e8a9cac7d11b878e4a1fd665ad3c01d764ad09d2",
       "shared": [
         [
           2,
-          4
+          50
+        ],
+        [
+          354,
+          355
         ]
       ],
       "parts": [
         {
-          "id": "api-acceptance-root-1",
+          "id": "api-bootstrap",
           "ranges": [
             [
-              5,
-              333
+              51,
+              77
+            ],
+            [
+              356,
+              356
+            ]
+          ]
+        },
+        {
+          "id": "api-shared-rights",
+          "ranges": [
+            [
+              78,
+              159
+            ],
+            [
+              357,
+              357
+            ]
+          ]
+        },
+        {
+          "id": "api-live-authority",
+          "ranges": [
+            [
+              160,
+              249
+            ],
+            [
+              358,
+              358
+            ]
+          ]
+        },
+        {
+          "id": "api-event-finance",
+          "ranges": [
+            [
+              250,
+              353
+            ],
+            [
+              359,
+              359
             ]
           ]
         }
@@ -62,23 +109,11 @@
     },
     {
       "path": "apps/backend/tests/cross-center-settlement.test.mjs",
-      "sha256": "e316f81229a13a8e05da68fd1e35ccc329dcebeec420f0dbd10bd7f659d11072",
+      "sha256": "4140c76d4711516b903640ae00266e43d7dad210392079f6f76b5156b0870826",
       "shared": [
         [
           1,
-          91
-        ],
-        [
-          214,
-          214
-        ],
-        [
-          300,
-          300
-        ],
-        [
-          380,
-          380
+          102
         ]
       ],
       "parts": [
@@ -86,17 +121,44 @@
           "id": "cross-center-payments",
           "ranges": [
             [
-              92,
-              213
+              103,
+              225
             ]
           ]
         },
         {
-          "id": "cross-center-provenance",
+          "id": "cross-center-deficit-sources",
           "ranges": [
             [
-              215,
-              299
+              226,
+              246
+            ]
+          ]
+        },
+        {
+          "id": "cross-center-no-transfer",
+          "ranges": [
+            [
+              247,
+              268
+            ]
+          ]
+        },
+        {
+          "id": "cross-center-rounding",
+          "ranges": [
+            [
+              269,
+              285
+            ]
+          ]
+        },
+        {
+          "id": "cross-center-source-scope",
+          "ranges": [
+            [
+              286,
+              311
             ]
           ]
         },
@@ -104,8 +166,8 @@
           "id": "cross-center-authority",
           "ranges": [
             [
-              301,
-              379
+              312,
+              392
             ]
           ]
         },
@@ -113,8 +175,8 @@
           "id": "cross-center-atomic",
           "ranges": [
             [
-              381,
-              432
+              393,
+              444
             ]
           ]
         }
@@ -124,40 +186,41 @@
     },
     {
       "path": "apps/backend/tests/event-cancellation.test.mjs",
-      "sha256": "ed61c124a5f640f948865552457c4444e0c3d4a769358dac1446e93c9fae361d",
+      "sha256": "79a5add73a3cc687fb689e8bbc76d8b2b367b6c0e213fb60f85c906a81770d82",
       "shared": [
         [
           1,
-          60
+          126
         ],
         [
-          83,
-          107
-        ],
-        [
-          135,
-          141
-        ],
-        [
-          245,
-          248
-        ],
-        [
-          354,
-          382
-        ],
-        [
-          462,
-          464
+          475,
+          476
         ]
       ],
       "parts": [
         {
-          "id": "event-cancellation-monetary",
+          "id": "event-cancellation-center-money",
           "ranges": [
             [
-              61,
-              82
+              127,
+              139
+            ],
+            [
+              477,
+              477
+            ]
+          ]
+        },
+        {
+          "id": "event-cancellation-participant-money",
+          "ranges": [
+            [
+              140,
+              152
+            ],
+            [
+              478,
+              478
             ]
           ]
         },
@@ -165,8 +228,12 @@
           "id": "event-cancellation-package",
           "ranges": [
             [
-              108,
-              134
+              153,
+              181
+            ],
+            [
+              479,
+              479
             ]
           ]
         },
@@ -174,8 +241,12 @@
           "id": "event-cancellation-planned-time",
           "ranges": [
             [
-              142,
-              244
+              182,
+              286
+            ],
+            [
+              480,
+              480
             ]
           ]
         },
@@ -183,8 +254,12 @@
           "id": "event-cancellation-actual-start",
           "ranges": [
             [
-              249,
-              333
+              287,
+              373
+            ],
+            [
+              481,
+              481
             ]
           ]
         },
@@ -192,12 +267,12 @@
           "id": "event-cancellation-settlement-races",
           "ranges": [
             [
-              334,
-              353
+              374,
+              474
             ],
             [
-              383,
-              461
+              482,
+              482
             ]
           ]
         }
@@ -207,24 +282,67 @@
     },
     {
       "path": "apps/backend/tests/event-payment.test.mjs",
-      "sha256": "da97fd1485821eac6f384568c84adff3af57a860abda639ac0920fb448db525f",
+      "sha256": "056fa86fe2b9e758b58f7d7dc20fa918ec630c36ecabfdbb9298fbca3d80aa3f",
       "shared": [
         [
           3,
-          9
+          46
         ],
         [
-          222,
-          223
+          228,
+          229
         ]
       ],
       "parts": [
         {
-          "id": "event-payment-root-1",
+          "id": "event-preparation",
           "ranges": [
             [
-              10,
-              221
+              47,
+              86
+            ],
+            [
+              230,
+              230
+            ]
+          ]
+        },
+        {
+          "id": "event-paid-capacity",
+          "ranges": [
+            [
+              87,
+              131
+            ],
+            [
+              231,
+              231
+            ]
+          ]
+        },
+        {
+          "id": "event-financial-cancellation",
+          "ranges": [
+            [
+              132,
+              183
+            ],
+            [
+              232,
+              232
+            ]
+          ]
+        },
+        {
+          "id": "event-payment-authority",
+          "ranges": [
+            [
+              184,
+              227
+            ],
+            [
+              233,
+              233
             ]
           ]
         },
@@ -232,8 +350,8 @@
           "id": "event-payment-root-2",
           "ranges": [
             [
-              224,
-              399
+              234,
+              409
             ]
           ]
         }
@@ -254,20 +372,80 @@
     },
     {
       "path": "apps/backend/tests/instructor-earnings.test.mjs",
-      "sha256": "94d2548cbd6f014557b2d5c57cf56d7dc555c1f9c0be061e8dfe689319176598",
+      "sha256": "697b07b8f3a64100f875c2ccac30162dd52792140ffa6d2370079e3c03d2d0c1",
       "shared": [
         [
           2,
-          7
+          69
+        ],
+        [
+          350,
+          351
         ]
       ],
       "parts": [
         {
-          "id": "instructor-earnings-root-1",
+          "id": "earnings-publication",
           "ranges": [
             [
-              8,
-              340
+              70,
+              102
+            ],
+            [
+              352,
+              352
+            ]
+          ]
+        },
+        {
+          "id": "earnings-packages-corrections",
+          "ranges": [
+            [
+              103,
+              164
+            ],
+            [
+              353,
+              353
+            ]
+          ]
+        },
+        {
+          "id": "earnings-valuation-closure",
+          "ranges": [
+            [
+              165,
+              217
+            ],
+            [
+              354,
+              354
+            ]
+          ]
+        },
+        {
+          "id": "earnings-occurrence-authority",
+          "ranges": [
+            [
+              218,
+              317
+            ],
+            [
+              355,
+              355
+            ]
+          ]
+        },
+        {
+          "id": "earnings-pilot",
+          "ranges": [
+            [
+              318,
+              349
+            ],
+            [
+              356,
+              356
             ]
           ]
         }
