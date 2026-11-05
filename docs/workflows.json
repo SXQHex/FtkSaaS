@@ -280,8 +280,8 @@
         "management_state_get_v1"
       ],
       "review": {
-        "fingerprint": "f84c5c3d3b446f07bd600ba4e2f44a2ededb2445df450892b50a2712c895bc89",
-        "reason": "Reviewed exact 91-to-93 sample cardinality exception after independent review; SQL-only and missing-source guards remain unchanged, no acceptance threshold lowered"
+        "fingerprint": "055c6c0866e48255236c1456f6f8b6750aaf1823d74aa498537af319cb26b0fe",
+        "reason": "PR198 main eşitlemesi: süre referansı logu aynen korundu; P10 exact 93 birim kabulü ve eksik/kaynak ölçüm retleri değişmedi. WF00 rehberi ve kaynak diff incelendi."
       }
     },
     {

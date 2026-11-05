@@ -93,7 +93,11 @@ export async function resolveCandidate(github,context,core,kind){
  if(kind==='full'&&scope.safe)throw Error('Documentation-only source uses documentation acceptance, not full clean');
  if(kind==='documentation'&&!scope.safe){core.setOutput('eligible','false');return;}
  let binding={kind,profile:kind==='full'?acceptanceProfile:undefined,coverage:kind==='full'?coverageHash(acceptanceProfile):undefined,pr:p.number,head:p.head.sha,base:p.base.sha,merge,tree:commit.tree.sha,run_id:context.runId,attempt:Number(process.env.GITHUB_RUN_ATTEMPT),benchmark:false};
- if(kind==='full')binding=await candidateSchedule(github,context,binding,m=>core.warning?.(m));
+ if(kind==='full'){
+  binding=await candidateSchedule(github,context,binding,m=>core.warning?.(m));
+  const weights=Object.values(binding.schedule.units);
+  core.info?.('API schedule: '+JSON.stringify({reference:binding.schedule.reference,measured_units:weights.filter(w=>w.origin==='previous-success').length,fallback_units:weights.filter(w=>w.origin!=='previous-success').length,shards:binding.schedule.plan.length,schedule_sha256:binding.schedule.sha256}));
+ }
  core.setOutput('eligible','true');core.setOutput('merge',merge);core.setOutput('binding',JSON.stringify(binding));
 }
 export function currentAttemptBinding(binding,context){
