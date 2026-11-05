@@ -170,6 +170,7 @@ export function SetupFeedback({ command }: { command: ReturnType<typeof useSetup
             <div className="flex flex-wrap gap-3">
               <Button
                 type="button"
+                className="h-auto min-h-11 max-w-full whitespace-normal"
                 variant="outline"
                 disabled={command.busy}
                 onClick={() => void command.check()}
@@ -179,6 +180,7 @@ export function SetupFeedback({ command }: { command: ReturnType<typeof useSetup
               {!command.pending.blocked && (
                 <Button
                   type="button"
+                  className="h-auto min-h-11 max-w-full whitespace-normal"
                   variant="outline"
                   disabled={command.busy}
                   onClick={() => void command.run()}

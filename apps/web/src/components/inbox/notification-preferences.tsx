@@ -23,6 +23,23 @@ function PreferenceEditor({
   scope: SetupScope;
   read: typeof readNotificationPreferences;
 }) {
+  const [revision, setRevision] = useState(0);
+  const command = useSetupCommand(
+    { actorId: scope.actorId, orgId: scope.orgId },
+    "notification-preferences",
+    () => setRevision((n) => n + 1),
+  );
+  return <NotificationPreferenceView key={revision} scope={scope} read={read} command={command} />;
+}
+export function NotificationPreferenceView({
+  scope,
+  read = readNotificationPreferences,
+  command,
+}: {
+  scope: SetupScope;
+  read?: typeof readNotificationPreferences;
+  command: ReturnType<typeof useSetupCommand>;
+}) {
   const t = useTranslations("inbox"),
     id = useId();
   const [page, setPage] = useState<Awaited<ReturnType<typeof read>> | null>(null);
@@ -39,14 +56,9 @@ function PreferenceEditor({
     setError(false);
     setRetry((n) => n + 1);
   }
-  const command = useSetupCommand(
-    { actorId: scope.actorId, orgId: scope.orgId },
-    "notification-preferences",
-    () => {
-      reload();
-      heading.current?.focus();
-    },
-  );
+  useEffect(() => {
+    if (command.message === "saved" || command.message === "failed") heading.current?.focus();
+  }, [command.message]);
   useEffect(() => {
     let active = true;
     void read(scope)

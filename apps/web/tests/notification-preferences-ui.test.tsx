@@ -210,3 +210,45 @@ test("cancelling the approval restores focus and journal failure sends no write"
     broken.mockRestore();
   }
 });
+
+test("a final failed preference receipt clears recovery and returns focus without changing opt-in", async () => {
+  const key = setupStorageKey(scope, "notification-preferences"),
+    read = reader();
+  sessionStorage.setItem(
+    key,
+    JSON.stringify({
+      command: {
+        operation: "settings_update_v1",
+        input: {
+          org_id: scope.orgId,
+          scope: "member",
+          operation_key: id,
+          expected_version: 0,
+          patch: { in_app_marketing: true },
+        },
+      },
+    }),
+  );
+  server.use(
+    http.post(
+      "https://project.example.invalid/functions/v1/backend-v1/operation_status_get_v1",
+      () =>
+        HttpResponse.json({
+          ok: true,
+          data: {
+            operation: "settings_update_v1",
+            key: id,
+            status: "failed_final",
+            result_available: false,
+            result_reference: null,
+          },
+          trace_id: id,
+        }),
+    ),
+  );
+  render(<NotificationPreferences scope={scope} read={read} />);
+  await userEvent.click(screen.getByRole("button", { name: "İşlem sonucunu kontrol et" }));
+  await waitFor(() => expect(sessionStorage.getItem(key)).toBeNull());
+  expect(screen.getByRole("heading", { name: "Bildirim tercihleri" })).toHaveFocus();
+  expect(await screen.findByRole("checkbox")).not.toBeChecked();
+});

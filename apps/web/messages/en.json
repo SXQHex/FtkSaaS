@@ -1269,7 +1269,11 @@
     "enableMarketingConfirm": "You will enable in-app marketing notifications for this studio.",
     "disableMarketingConfirm": "You will disable in-app marketing notifications for this studio. Required transaction results will continue.",
     "savePreferences": "Save my preference",
-    "reviewPreferences": "Review change"
+    "reviewPreferences": "Review change",
+    "demoTitle": "Notifications and history design",
+    "demoHint": "Notifications, preferences and operations on this page are synthetic. No real records are read or changed.",
+    "demoLostResponse": "Simulate a lost response on the next mark as read",
+    "demoLostArmed": "Lost response simulation ready"
   },
   "documents": {
     "uploadTitle": "Upload a document file",

@@ -1,5 +1,5 @@
 import { beforeEach, expect, test, vi } from "vitest";
-import { screen, waitFor } from "@testing-library/react";
+import { screen, waitFor, act } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { http, HttpResponse } from "msw";
 import { server } from "./mocks/server";
@@ -234,4 +234,28 @@ test("unknown reply is recovered with the original key even after the server rem
     expect(sessionStorage.getItem(setupStorageKey(scope, "inbox-read"))).toBeNull(),
   );
   expect(await screen.findByText("Bu görünümde bildirim yok.")).toBeInTheDocument();
+});
+
+test("filtering discards a late version response instead of reviving an old approval", async () => {
+  let finish!: (value: number) => void;
+  const user = userEvent.setup(),
+    version = vi.fn<typeof getNotificationVersion>().mockImplementation(
+      () =>
+        new Promise((resolve) => {
+          finish = resolve;
+        }),
+    );
+  render(<InboxFeed scope={scope} list={async () => page([notice])} version={version} />);
+  await user.click(await screen.findByRole("button", { name: "Okundu olarak işaretle" }));
+  await user.click(screen.getByRole("checkbox", { name: "Yalnız okunmamış" }));
+  await act(async () => finish(8));
+  expect(screen.queryByRole("button", { name: "Okundu olarak onayla" })).not.toBeInTheDocument();
+});
+test("refreshing discards an existing approval before rereading notices", async () => {
+  const user = userEvent.setup();
+  render(<InboxFeed scope={scope} list={async () => page([notice])} version={async () => 8} />);
+  await user.click(await screen.findByRole("button", { name: "Okundu olarak işaretle" }));
+  await screen.findByRole("button", { name: "Okundu olarak onayla" });
+  await user.click(screen.getByRole("button", { name: "Yeniden yükle" }));
+  expect(screen.queryByRole("button", { name: "Okundu olarak onayla" })).not.toBeInTheDocument();
 });
