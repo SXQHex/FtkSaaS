@@ -15,7 +15,7 @@ import type { useSetupCommand } from "../setup/setup-command";
 import { SetupFeedback } from "../setup/setup-command";
 import { BookingPanel } from "../bookings/session-bookings";
 import { RequestList } from "../bookings/lesson-requests";
-import { RenewalForm } from "../products/person-sales";
+import { SaleForm } from "../products/sale-form";
 import { Preferences } from "../preferences";
 const id = "019a2b3c-4d5e-7000-8000-000000000080",
   other = "019a2b3c-4d5e-7000-8000-000000000081",
@@ -142,6 +142,44 @@ export function FlowsPreview() {
   const sales = useMemo<SalesApi>(
     () => ({
       documents: api.documents,
+      session: async () => session,
+      salePreview: async (_scope, input) => ({
+        id,
+        token: "synthetic-preview",
+        expires_at: new Date(Date.now() + 900000).toISOString(),
+        scope_hash: "synthetic",
+        dependencies: { versions: [], policy_hashes: [], permission_hash: "synthetic" },
+        effects: [],
+        blockers: [],
+        sale: {
+          ...input,
+          kind: "credits",
+          booking_mode: "flexible",
+          timezone: "Europe/Istanbul",
+          valid_from: `${input.start_date}T00:00:00+03:00`,
+          valid_until: `${input.end_date}T00:00:00+03:00`,
+          debt_minor: "12345",
+          currency: "TRY",
+          granted: 8,
+          reserved: 0,
+          consumed: 2,
+          available: 6,
+          quota: null,
+          deficits: [
+            {
+              deficit_id: id,
+              reservation_id: other,
+              session_id: id,
+              version: 1,
+              reservation_version: 1,
+              session_version: 1,
+              state: "consumed",
+              quantity: 2,
+              settles: true,
+            },
+          ],
+        },
+      }),
       products: async () => ({ items: [product], next_cursor: null, as_of: asOf }),
       rights: async () => rights,
       finance: async () => ({
@@ -254,7 +292,7 @@ export function FlowsPreview() {
         setRequests((old) =>
           old.map((row) => ({ ...row, state: "approved", version: row.version + 1 })),
         );
-      else if (command.operation !== "sale_renew_apply_v1")
+      else if (command.operation !== "sale_renew_apply_v1" && command.operation !== "sale_apply_v1")
         throw Error("Unexpected synthetic command");
       setRevision((n) => n + 1);
     },
@@ -293,9 +331,20 @@ export function FlowsPreview() {
           command={command}
         />
       </section>
+      <section aria-label={t("newSale")} className="min-w-0 space-y-4">
+        <h3 className="font-semibold">{t("newSale")}</h3>
+        <SaleForm
+          key={`new-sale:${revision}`}
+          mode="sale"
+          scope={scope}
+          personId={personId}
+          api={sales}
+          command={command}
+        />
+      </section>
       <section aria-label={t("renewal")} className="min-w-0 space-y-4">
         <h3 className="font-semibold">{t("renewal")}</h3>
-        <RenewalForm
+        <SaleForm
           key={`sale:${revision}`}
           scope={scope}
           personId={personId}

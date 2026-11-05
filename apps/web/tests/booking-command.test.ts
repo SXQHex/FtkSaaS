@@ -45,19 +45,18 @@ test("lesson alternatives require real increasing instants and never replay an i
     ),
   ).toBe(false);
 });
-test("renewal recovery preserves only an exact preview token", () => {
-  expect(
-    validBookingCommand(
-      "sale_renew_apply_v1",
-      { ...base, preview: { id, token: "synthetic" } },
-      id,
-    ),
-  ).toBe(true);
-  expect(
-    validBookingCommand(
-      "sale_renew_apply_v1",
-      { ...base, preview: { id, token: "synthetic", override: true } },
-      id,
-    ),
-  ).toBe(false);
-});
+test.each(["sale_renew_apply_v1", "sale_apply_v1"] as const)(
+  "%s recovery preserves only an exact preview token",
+  (operation) => {
+    expect(
+      validBookingCommand(operation, { ...base, preview: { id, token: "synthetic" } }, id),
+    ).toBe(true);
+    expect(
+      validBookingCommand(
+        operation,
+        { ...base, preview: { id, token: "synthetic", override: true } },
+        id,
+      ),
+    ).toBe(false);
+  },
+);

@@ -1,17 +1,20 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
 import { useFormatter, useLocale, useTranslations } from "next-intl";
-import type { Preview } from "@ftksaas/api-contracts";
+import type { Preview, SalePreview, SessionView } from "@ftksaas/api-contracts";
 import { Button } from "@ftksaas/ui/components/button";
 import { effectMoney } from "../../lib/effect-money";
+import { SaleImpact } from "./sale-impact";
 import { FlowError } from "../bookings/flow-controls";
 export function SaleReview({
   preview,
+  sessions = [],
   disabled,
   onApply,
   onBack,
 }: {
-  preview: Preview;
+  preview: Preview | SalePreview;
+  sessions?: SessionView[];
   disabled: boolean;
   onApply: () => void;
   onBack: () => void;
@@ -40,8 +43,12 @@ export function SaleReview({
       <h4 ref={heading} tabIndex={-1} className="font-semibold outline-none">
         {t("review")}
       </h4>
-      <p>{t("renewalHint")}</p>
-      {preview.sale_lifecycle && (
+      {"sale" in preview ? (
+        <SaleImpact sale={preview.sale} sessions={sessions} />
+      ) : (
+        <p>{t("renewalHint")}</p>
+      )}
+      {"sale_lifecycle" in preview && preview.sale_lifecycle && (
         <>
           <p>
             {preview.sale_lifecycle.start_date} — {preview.sale_lifecycle.end_date}

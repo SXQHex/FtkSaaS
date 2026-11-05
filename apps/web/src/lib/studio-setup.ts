@@ -49,6 +49,7 @@ export const setupWrites = [
 export type SetupWrite = (typeof setupWrites)[number];
 type SetupUpload = "document_upload_prepare_v1" | "file_upload_complete_v1";
 type SetupRead =
+  | "sale_preview_v1"
   | "sale_renew_preview_v1"
   | "finance_get_v1"
   | "negative_limits_get_v1"
