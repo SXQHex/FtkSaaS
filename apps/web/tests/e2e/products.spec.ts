@@ -70,3 +70,51 @@ test("catalog and purchased rights remain accessible with enlarged English dark 
   expect((await new AxeBuilder({ page }).analyze()).violations).toEqual([]);
   expect(calls).toEqual([]);
 });
+
+test("rights corrections preserve explicit approvals and keyboard navigation at 320px", async ({
+  page,
+}) => {
+  const calls: string[] = [];
+  page.on("request", (request) => {
+    if (request.url().includes("/functions/v1/") || request.url().includes("/storage/v1/"))
+      calls.push(request.url());
+  });
+  await page.setViewportSize({ width: 320, height: 950 });
+  await page.goto("/tasarim/paketler");
+  const section = page.getByRole("region", { name: "Hak yönetimi örneği" });
+  await section.getByRole("button", { name: "Kredi düzelt", exact: true }).press("Enter");
+  await section.getByRole("combobox", { name: "Düzenlenecek hak" }).selectOption({ index: 1 });
+  await section.getByRole("combobox", { name: "Düzeltme yönü" }).selectOption("decrease");
+  await section.getByRole("spinbutton", { name: "Kredi adedi" }).fill("2");
+  await section.getByRole("textbox", { name: "Gerekçe" }).fill("Sentetik düzeltme");
+  await section.getByRole("button", { name: "Etkileri incele" }).press("Enter");
+  await expect(section.getByRole("heading", { name: "Hak değişikliği onayı" })).toBeFocused();
+  await section.getByRole("checkbox", { name: /İncelediğim hak/ }).check();
+  await expect(section.getByRole("button", { name: "Değişikliği uygula" })).toBeDisabled();
+  await section.getByRole("checkbox", { name: /Rezervasyon 1:/ }).check();
+  await page.evaluate(async () => {
+    document.documentElement.style.fontSize = "200%";
+    await document.fonts.ready;
+  });
+  expect(await page.locator("main").evaluate((node) => node.scrollWidth <= node.clientWidth)).toBe(
+    true,
+  );
+  expect((await new AxeBuilder({ page }).analyze()).violations).toEqual([]);
+  await section.getByRole("button", { name: "Düzenlemeye dön" }).press("Enter");
+  await expect(section.getByRole("button", { name: "Etkileri incele" })).toBeFocused();
+  await section.getByRole("button", { name: "Etkileri incele" }).press("Enter");
+  await section.getByRole("checkbox", { name: /İncelediğim hak/ }).check();
+  await section.getByRole("checkbox", { name: /Rezervasyon 1:/ }).check();
+  await section.getByRole("button", { name: "Değişikliği uygula" }).press("Enter");
+  await expect(section.getByRole("heading", { name: "Hak yönetimi örneği" })).toBeFocused();
+  await section.getByRole("button", { name: "Negatif limiti düzenle" }).press("Enter");
+  await section
+    .getByRole("combobox", { name: "Disiplin", exact: true })
+    .selectOption({ label: "Salsa" });
+  await section.getByRole("spinbutton", { name: "Yeni kişisel negatif limit" }).fill("3");
+  await section.getByRole("textbox", { name: "Gerekçe" }).fill("Sentetik limit");
+  await section.getByRole("button", { name: "Etkileri incele" }).press("Enter");
+  await section.getByRole("checkbox", { name: /İncelediğim hak/ }).check();
+  await section.getByRole("button", { name: "Değişikliği uygula" }).press("Enter");
+  expect(calls).toEqual([]);
+});
