@@ -38,7 +38,10 @@ begin
  if c is null or v is null or not private.center_accessible(n.org_id,c) then return null;end if;
  return jsonb_build_object('center_id',c,'version',v,'title',title);
 end$$;
-create function private.transactional_email_enqueue() returns trigger language plpgsql security invoker set search_path='' as $$
+-- Deferred firing occurs after a bounded worker's SECURITY DEFINER function
+-- has returned. Keep the trigger's fixed internal work under its own owner; do
+-- not grant core/private table access to the invoking worker role.
+create function private.transactional_email_enqueue() returns trigger language plpgsql security definer set search_path='' as $$
 declare ctx jsonb;
 begin
  if not private.transactional_email_ready(new.org_id) or not exists(select 1 from core.notification_preferences p where p.org_id=new.org_id and p.person_id=new.recipient_person_id and p.channel='email' and p.purpose='transactional' and p.enabled) then return new;end if;

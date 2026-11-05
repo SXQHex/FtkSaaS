@@ -493,6 +493,8 @@ function StudentDetail({
   }, [actions, scope.orgId, scope.centerId, personId, attempt]);
   const current = result?.attempt === attempt ? result : null;
   const person = current?.person;
+  // Keep the rights command/re-read mounted while refreshing the person version it may change.
+  const rightsPerson = person ?? (!current ? result?.person : undefined);
   const relationships = person?.relationships.filter((item) => item.center_id === scope.centerId);
   function refreshPersonAndList() {
     setAttempt((value) => value + 1);
@@ -575,8 +577,14 @@ function StudentDetail({
           </section>
         </>
       )}
-      {person && entitlements && (
-        <PersonEntitlements scope={scope} personId={person.id} read={entitlements} />
+      {rightsPerson && entitlements && (
+        <PersonEntitlements
+          scope={scope}
+          personId={rightsPerson.id}
+          read={entitlements}
+          management
+          onSaved={refreshPersonAndList}
+        />
       )}
       <PersonEdit
         key={`${personId}:${person?.version ?? "loading"}`}

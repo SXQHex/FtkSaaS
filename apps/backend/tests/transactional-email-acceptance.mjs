@@ -43,9 +43,21 @@ test('P14 native transactional email: opt-in, source freshness, leases, retry, d
    await db.query('begin');const final=await notice();await db.query('update core.sessions set version=version+1 where id=$1',[sid]);await db.query('commit');
    const c=await claim();assert.equal(c.job_id,final);assert.equal((await worker(c,{email_phase:'authorize'})).authorized,true);await worker(c,{email_phase:'finish',retryable:false});
   });
+  await t.test('deferred email enqueue survives a bounded worker commit without table grants',async()=>{
+   const role='p14_w_'+id().replaceAll('-',''),fn=role+'_notice',nid=id();
+   await db.query('create role "'+role+'" nologin');
+   try{
+    await db.query(`create function private."${fn}"(n uuid) returns void language plpgsql security definer set search_path='' as $fn$begin insert into core.notifications(id,org_id,recipient_person_id,kind,subject_id,payload) values(n,'${org}','${person}','session_change_apply_v1','${sid}',jsonb_build_object('subject',jsonb_build_object('type','sessions','id','${sid}')));end$fn$`);
+    await db.query('revoke all on function private."'+fn+'"(uuid) from public');await db.query('grant usage on schema private to "'+role+'"');await db.query('grant execute on function private."'+fn+'"(uuid) to "'+role+'"');
+    assert.equal((await db.query("select has_schema_privilege($1,'core','usage') p",[role])).rows[0].p,false);
+    assert.equal((await db.query("select has_table_privilege($1,'core.notifications','insert') p",[role])).rows[0].p,false);
+    await db.query('begin');try{await db.query('set local role "'+role+'"');await db.query('select private."'+fn+'"($1)',[nid]);await db.query('commit');}catch(error){await db.query('rollback');throw error;}
+    const c=await claim();assert.equal(c.job_id,nid);await worker(c,{email_phase:'finish',retryable:false});
+   }finally{await db.query('drop function if exists private."'+fn+'"(uuid)');await db.query('drop owned by "'+role+'"');await db.query('drop role "'+role+'"');}
+  });
   await t.test('Pro availability and revoked recipient account link are checked live',async()=>{
    await db.query("update core.saas_plan_versions set name='pro' where id=$1",[plan]);assert.equal((await list()).email_preference.available,true);
-   const nid=await notice(),c=await claim();const links=(await db.query("update core.account_links set state='inactive' where org_id=$1 and person_id=$2 and state='active' returning id",[org,person])).rows;
+   const nid=await notice(),c=await claim();const links=(await db.query("update core.account_links set state='revoked' where org_id=$1 and person_id=$2 and state='active' returning id",[org,person])).rows;
    try{assert.equal((await worker(c,{email_phase:'authorize'})).authorized,false);await worker(c,{email_phase:'finish',retryable:false});assert.equal((await db.query('select state from core.outbox_jobs where id=$1',[nid])).rows[0].state,'cancelled');}
    finally{await db.query("update core.account_links set state='active' where id=any($1::uuid[])",[links.map(x=>x.id)]);await db.query("update core.saas_plan_versions set name='business' where id=$1",[plan]);}
   });

@@ -711,7 +711,7 @@
         {
           "line": 1,
           "path": "apps/backend/tests/transactional-email-acceptance.mjs",
-          "sha256": "ee049912f6bc0dc9e9d27a2c94a0bddd29667320ed11bc41707b48fc5b961e56"
+          "sha256": "c14b8a31ca45175ff40de0a1ac9f56715ceb7497183725db436a5fb27b865c5d"
         },
         {
           "line": 2,

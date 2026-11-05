@@ -284,8 +284,8 @@
         "management_state_get_v1"
       ],
       "review": {
-        "fingerprint": "824760998be52513fdfc5b4cf3a5c5ba54213733b76dc63b69495d049fc1afc1",
-        "reason": "Reviewed generated optional inbox DTOs, sole internal outbox wrapper extension, isolated native source import with shifted identical old ownership and exact source hashes. No CI policy or human Auth change."
+        "fingerprint": "1322c3dcd2b0bc9af08134f96c41a1c1e86b1a883f1565cf5f97ff00f30ba8a1",
+        "reason": "Only reviewed existing native root body hash refreshed for source-bound restricted trigger regression; no scope, shard, budget or policy weakening."
       }
     },
     {
@@ -1606,8 +1606,8 @@
         "subscription_boundary_apply_v1"
       ],
       "review": {
-        "fingerprint": "51738c2ba934bb54e07e1b9ce0dc6896aeb30efc21c4b34614be9f6311f312b7",
-        "reason": "Reviewed transactional source/worker/lease/privacy/event-retention, independent live-plan finding fix and new native source. Existing signed tick fence and native Auth preserved."
+        "fingerprint": "1faf90519f7b4400b980701db66edf7d23e557aba4008436a1f03407c85cc20e",
+        "reason": "CI210 showed deferred enqueue executes after worker definer returned. Fixed private trigger execution context without table grants; added restricted commit regression and corrected revoked fixture state; live guards unchanged."
       }
     }
   ]
