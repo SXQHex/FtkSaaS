@@ -52,6 +52,16 @@ test('production inventory owns every original line and import once and compiles
 
 });
 
+test('twelve-runner plan preserves every unit and serial fixture without dedicated assignment',()=>{
+ const inventory=buildInventory(repositoryRoot),bins=partition(inventory.units,12);
+ assert.equal(bins.length,12);
+ assert(bins.every(b=>b.units.length>0));
+ assert(inventory.units.every(u=>!u.dedicated));
+ assert.deepEqual(bins.flatMap(b=>b.units.map(u=>u.id)).sort(),inventory.units.map(u=>u.id).sort());
+ assert.deepEqual(partition([...inventory.units].reverse(),12),bins);
+ for(const count of [0,-1,1.5,NaN,Infinity,inventory.units.length+1])assert.throws(()=>partition(inventory.units,count),/Invalid shard count/);
+});
+
 test('each behavior payload registers exactly one native root without running fixtures',()=>{
  const inventory=buildInventory(repositoryRoot),ids=new Set(Object.values(behaviorSplits).flat());
  for(const unit of inventory.units.filter(u=>ids.has(u.id))){

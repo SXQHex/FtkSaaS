@@ -1,5 +1,13 @@
 # Güncel kaynak ve kabul
 
+## On iki API shard ve süre snapshot yenilemesi
+
+PR195 kullanıcı tarafından main `e8eddd53c3054a8f62f971dd9afa957cca8ada95` üzerine merge edildi. Başarılı aday [41943910333](https://github.com/SXQHex/FtkSaaS/actions/runs/41943910333), attempt1 head `24de174640679e75ba91722d396289c804d56a15`, base `4e99fab7ea8ce10f7da734766125eb3b679cf712`, tested merge `0132fc3302595546d47b61f91d5f12c4c550f49b` ve tree `9def6bb5867be67b5ac899d104e2d41059000a99` için core/sekiz API/quality/full-clean başarılıdır. Arada main’e elle yazılan ağırlık değişikliği nedeniyle merge edilen kaynak bu adayla aynı değildir: [main kabulü41947813421](https://github.com/SXQHex/FtkSaaS/actions/runs/41947813421) failure; [development41947851221](https://github.com/SXQHex/FtkSaaS/actions/runs/41947851221) skipped. PR195’in aday başarısı bu main için kabul sayılmaz.
+
+Yeni dal bu main’den başlar. Başarılı adayın 83 tamamlanmış process-wall örneği kendi run/attempt/job ve birebir aynı gövde SHA256 iziyle eski snapshot’ın yerini alır. İstek tanısı üretmeyen canonical-settings-migration ve p07-subscription-lifecycle SQL birimlerinde açık kaynak boyutu tahmini kalır; native root süresi process-wall diye etiketlenmez. Aynı ağırlıklarla 8 shard tahmini test fazı 1012,55–1037,54 sn; 12 shard 668,86–701,78 sn. Kurulum/kuyruk hariç en uzun faz tahmini yaklaşık yüzde32 azalır; gerçek CI hız kazancı henüz doğrulanmadı.
+
+Üretim profili `twelve-isolated-v1`; 85 birim on iki runner’a eksiksiz/tekrarsız dağılır. Özel runner tahsisi yoktur; beş global fixture ayrı seri fazda kalır. Merge/main/CD doğrulaması on iki işin tamamını zorunlu tutar; main test tekrarlamaz. Başarılı son koşudan otomatik snapshot yenilemesi bu dilimde uygulanmadı. Yeni gerçek aday/main/development kabulü beklenir; kaynak değişikliğine eski başarı taşınmaz.
+
 ## İlk beş uzun üretim kabul kökünün davranışlara ayrılması
 
 5 Kasım 2026 kullanıcı talimatı: instructor earnings, cross-center provenance, Q-E01 payment preparation, genel API acceptance ve Q-E02 monetary cancellation kökleri 19 bağımsız davranış birimine ayrıldı. Üretim envanteri 71→85 birimdir; core/sekiz API shard, oneshot, bellek koruması ve kaynak/run/attempt kabulü değişmedi. Yarışın tarafları ve sonucu kullanan iade/mahsup zinciri birlikte tutuldu; diğer kökler kendi Auth/tenant/borç/hak/anlaşma durumunu kurar. Özgün assertion satırları ve alt test başlıkları korundu; UUID/journal kontrolü yeni API fixture'larının her birinde uygulanır. V2 kaynaklarına dokunulmadı.
