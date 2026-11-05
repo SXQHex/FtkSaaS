@@ -1,3 +1,4 @@
+import {testDataPolicyMatches,inventoryPath,packagePath} from './candidate-inventory.mjs';
 import {isDesignSandbox} from './design-sandbox.mjs';
 import {classifyChanges,ownerOf} from './scope.mjs';
 import {coverageHash,acceptanceProfile} from './shards.mjs';
@@ -66,12 +67,13 @@ export const policyPath=p=>!isDesignSandbox(p)&&(
  || ['apps/backend/scripts/test-clean.mjs','apps/backend/scripts/start-dev.mjs','apps/backend/scripts/paths.mjs'].includes(p));
 
 export async function policyMatches(github,repo,base,head){
- const values=await Promise.all([base,head].map(async tree_sha=>{
+ const trees=await Promise.all([base,head].map(async tree_sha=>{
   const t=(await github.rest.git.getTree({...repo,tree_sha,recursive:'1'})).data;
   if(t.truncated)throw Error('Truncated policy tree');
-  return t.tree.filter(x=>x.type==='blob'&&policyPath(x.path)).map(x=>[x.path,x.sha,x.mode]).sort((a,b)=>a[0].localeCompare(b[0]));
+  return t.tree;
  }));
- return JSON.stringify(values[0])===JSON.stringify(values[1]);
+ const values=trees.map(tree=>tree.filter(x=>x.type!=='tree'&&policyPath(x.path)&&![inventoryPath,packagePath].includes(x.path)).map(x=>[x.path,x.sha,x.mode,x.type]).sort((a,b)=>a[0].localeCompare(b[0])));
+ return JSON.stringify(values[0])===JSON.stringify(values[1])&&await testDataPolicyMatches(github,repo,trees);
 }
 export async function resolveCandidate(github,context,core,kind){
  const p=(await github.rest.pulls.get({...context.repo,pull_number:context.issue.number})).data;

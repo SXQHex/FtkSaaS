@@ -1,17 +1,18 @@
+import {loadCandidateInventory} from './candidate-inventory.mjs';
 import {validateQuality} from './quality-proof.mjs';
 import {validateSchedule} from './duration-reference.mjs';
 import {validateJobs,coverageHash,roleName} from './shards.mjs';
 import {assertReady,assertParents,policyMatches,resolveMerged,remoteSourceScope} from './source.mjs';
 import {mkdtempSync,writeFileSync,rmSync} from 'node:fs';import {tmpdir} from 'node:os';import {join} from 'node:path';import {execFileSync} from 'node:child_process';
 export const gateContext='ftksaas/merge-clean';
-export function validateBinding({binding,pr,run,jobs,tested,currentTree,workflowMatches}) {
+export function validateBinding({binding,pr,run,jobs,tested,currentTree,workflowMatches,candidateInventory}) {
  if(pr.state==='open')assertReady(pr);
  if(!workflowMatches)throw Error('Candidate workflow differs from trusted base; reviewed policy installation required');
  if(run.event!=='pull_request'||run.path!=='.github/workflows/ci-full.yml'||run.conclusion!=='success'||run.status!=='completed')throw Error('No successful candidate workflow');
  if(binding.run_id!==run.id||binding.attempt!==run.run_attempt||binding.pr!==pr.number||binding.head!==pr.head.sha||binding.base!==pr.base.sha||run.head_sha!==binding.head)throw Error('Stale head/base/attempt');
  if(binding.merge!==tested.sha||binding.tree!==tested.tree.sha||binding.tree!==currentTree||tested.parents.length!==2||tested.parents[0].sha!==binding.base||tested.parents[1].sha!==binding.head)throw Error('Tested merge parents/tree mismatch');
- if(binding.kind!=='full'||!['four-isolated-v1','four-isolated-v2','eight-isolated-v1','twelve-isolated-v1','twelve-timed-v1'].includes(binding.profile)||binding.coverage!==coverageHash(binding.profile))throw Error('Unrecognized/incomplete full coverage');
- if(binding.profile==='twelve-timed-v1')validateSchedule(binding.schedule);
+ if(binding.kind!=='full'||!['four-isolated-v1','four-isolated-v2','eight-isolated-v1','twelve-isolated-v1','twelve-timed-v1'].includes(binding.profile)||binding.coverage!==coverageHash(binding.profile,candidateInventory))throw Error('Unrecognized/incomplete full coverage');
+ if(binding.profile==='twelve-timed-v1')validateSchedule(binding.schedule,candidateInventory?.inventory.units);
  const currentProfile=['four-isolated-v2','eight-isolated-v1','twelve-isolated-v1','twelve-timed-v1'].includes(binding.profile);
  if(currentProfile&&(!Number.isSafeInteger(binding.source_attempt)||binding.source_attempt<1||binding.source_attempt>binding.attempt))throw Error('Invalid original source attempt');
  validateJobs(jobs,run,{benchmark:binding.benchmark,collector:true,sourceChecks:currentProfile,profile:binding.profile});
@@ -39,7 +40,8 @@ export async function findCandidateProof(github,repo,pr,kind,currentTree,policyB
    const binding=await receipt(github,repo,run,kind);
    validateQuality({binding:await receipt(github,repo,run,'quality'),pr,run,jobs,currentTree});
    const tested=(await github.rest.git.getCommit({...repo,commit_sha:binding.merge})).data;
-   (kind==='documentation'?validateDocumentBinding:validateBinding)({binding,pr,run,jobs,tested,currentTree,workflowMatches});
+   const candidateInventory=kind==='full'&&!binding.profile?.startsWith('four-isolated-')?await loadCandidateInventory(github,repo,tested.tree.sha):undefined;
+   (kind==='documentation'?validateDocumentBinding:validateBinding)({binding,pr,run,jobs,tested,currentTree,workflowMatches,candidateInventory});
    const live=(await github.rest.actions.getWorkflowRun({...repo,run_id:run.id})).data;
    if(live.id!==run.id||live.run_attempt!==run.run_attempt||live.head_sha!==run.head_sha||live.status!=='completed'||live.conclusion!=='success')throw Error('Candidate run changed during proof verification');
    return {binding,run:live};

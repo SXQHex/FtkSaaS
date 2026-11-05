@@ -1,8 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {apiSuites} from '../scripts/ci/select-tests.mjs';
 import {join} from 'node:path';
-import {shardPlan,predictedWall,apiBalancePolicy,durations,apiTimeBalance} from '../scripts/ci/shards.mjs';
+import {legacyApiSuites as apiSuites,shardPlan,predictedWall,apiBalancePolicy,durations,apiTimeBalance} from '../scripts/ci/shards.mjs';
 import {measurements} from '../scripts/ci/collect.mjs';
 import {durationSnapshot} from '../scripts/ci/refresh-suite-durations.mjs';
 import fs,{mkdtempSync,writeFileSync,rmSync} from 'node:fs';
