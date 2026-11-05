@@ -1,3 +1,5 @@
+import './email-events-unit.mjs';
+import './email-provider-unit.mjs';
 import './edge-bundle-unit.mjs';
 import './deployment-cli-unit.mjs';
 import './crm-meta-lead-unit.mjs';

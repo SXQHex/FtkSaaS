@@ -8,6 +8,8 @@ import {timedFetch} from './request-diagnostics.mjs';
 import {configurationSql} from '../scripts/configure-invitation-delivery.mjs';
 const compiled=await build({entryPoints:['supabase/functions/backend-v1/invitation-delivery.ts'],bundle:true,platform:'browser',format:'esm',write:false});
 const {invitationTick:runtimeTick}=await import('data:text/javascript;base64,'+Buffer.from(compiled.outputFiles[0].text).toString('base64'));
+const compiledEvents=await build({entryPoints:['supabase/functions/backend-v1/email-events.ts'],bundle:true,platform:'browser',format:'esm',write:false});
+const {emailEvents:receiveEmailEvent}=await import('data:text/javascript;base64,'+Buffer.from(compiledEvents.outputFiles[0].text).toString('base64'));
 const workerSigning='b'.repeat(64);
 // Test-only operational environment; all existing Auth/RPC assertions stay intact.
 const invitationTick=(request,env,send,now)=>runtimeTick(request,name=>name==='FTK_INVITATION_TICK_SECRET'?workerSigning:env(name),send,now);
@@ -31,7 +33,7 @@ test('XREQ-003: native Auth invitation job scope, durable leases and provider ha
   assert.equal(res.status,200);return res.json();
  };
  const claim=async()=> (await worker({request_id:id()},{invitation_phase:'claim'}))._internal_invitation;
- let job,lease;
+ let job,lease;const emailEvents=[];
  try{
   await t.test('sender reads pending invitation while another account, tenant and center do not',async()=>{
    job=(await send()).job_id;const pending=await status(job);assert.equal(pending.state,'pending');assert.equal(pending.total_count,1);assert.equal(pending.progress_count,0);assert.equal(pending.result_reference,null);
@@ -86,6 +88,32 @@ test('XREQ-003: native Auth invitation job scope, durable leases and provider ha
    assert.equal((await db.query('select state from core.invitations where id=$1',[invitation])).rows[0].state,'revoked');
    assert.equal((await worker(c,{invitation_phase:'finish',provider_reference})).state,'succeeded');
   });
+  await t.test('email delivery evidence survives early webhook, duplicate and out-of-order events without another send',async()=>{
+   job=(await send()).job_id;const c=await claim(),provider_reference=id(),stamp=new Date().toISOString();
+   const ingest=async(kind,at=stamp,event_id='msg_'+id().replaceAll('-',''))=>{
+    const r={event_id,provider_reference,kind,occurred_at:at,payload_hash:'a'.repeat(64)};emailEvents.push(event_id);
+    assert.equal((await worker(r,{email_event:true})).accepted,true);return r;
+   };
+   const delivered=await ingest('delivered');assert.equal((await status(job)).email_delivery,null);
+   const webhookKey=crypto.getRandomValues(new Uint8Array(32)),webhookId='msg_'+id().replaceAll('-',''),time=String(Math.floor(Date.now()/1000));emailEvents.push(webhookId);
+   const raw=JSON.stringify({type:'email.delivered',created_at:stamp,data:{email_id:provider_reference}}),signature=createHmac('sha256',webhookKey).update(webhookId+'.'+time+'.'+raw).digest('base64');
+   const signed=new Request(env.API_URL+'/functions/v1/backend-v1/email_provider_events',{method:'POST',headers:{'svix-id':webhookId,'svix-timestamp':time,'svix-signature':'v1,'+signature},body:raw});
+   const acknowledged=await receiveEmailEvent(signed,n=>({FTK_RESEND_WEBHOOK_SECRET:'whsec_'+Buffer.from(webhookKey).toString('base64'),SUPABASE_URL:env.API_URL,SUPABASE_SERVICE_ROLE_KEY:env.SERVICE_ROLE_KEY})[n],(url,options)=>timedFetch('email.signed_event_rpc',url,options));assert.equal(acknowledged.status,200);
+
+   assert.equal((await worker(delivered,{email_event:true})).accepted,true);
+   assert.equal((await db.query('select count(*)::int n from private.email_provider_events where event_id=$1',[delivered.event_id])).rows[0].n,1);
+   await assert.rejects(worker({...delivered,kind:'bounced'},{email_event:true}));
+   await worker(c,{invitation_phase:'finish',provider_reference});
+   assert.equal((await status(job)).email_delivery.state,'delivered');
+   await ingest('accepted');await ingest('delayed');assert.equal((await status(job)).email_delivery.state,'delivered');
+   await ingest('bounced',new Date(Date.now()-60000).toISOString());assert.equal((await status(job)).email_delivery.state,'bounced');
+   await ingest('delivered');assert.equal((await status(job)).email_delivery.state,'bounced');
+   await ingest('complained');const state=await status(job);assert.equal(state.state,'succeeded');assert.equal(state.email_delivery.state,'complained');
+   assert.equal(await claim(),null);assert.equal((await db.query('select attempts::int n from core.outbox_jobs where id=$1',[job])).rows[0].n,1);
+   const denied=await call(foreign,'job_status_get_v1',{org_id:org,job_id:job});assert.equal(denied.result.error.code,'NOT_FOUND');
+   const privileges=(await db.query("select has_function_privilege('authenticated','private.email_event_ingest(jsonb)','execute') f,has_table_privilege('authenticated','private.email_provider_events','select') t")).rows[0];assert.equal(privileges.f,false);assert.equal(privileges.t,false);
+   const direct=await timedFetch('email.denied_rpc',env.API_URL+'/rest/v1/rpc/outbox_deliver_v1',{method:'POST',headers:{authorization:'Bearer '+owner.jwt,apikey:env.ANON_KEY,'Content-Profile':'api_v1','content-type':'application/json'},body:JSON.stringify({p_request:delivered,p_actor_auth_id:null,p_session_id:null,p_ids:[],p_aux:{email_event:true}})});await direct.arrayBuffer();assert([401,403,404].includes(direct.status));
+  });
   await t.test('delivery retains its declared F26 gate while original sender can still track the cancellation',async()=>{
    job=(await send()).job_id;const features=(await db.query('select features from core.saas_plan_versions where id=$1',[plan])).rows[0].features;
    await db.query("update core.saas_plan_versions set features=array_remove(features,'F26') where id=$1",[plan]);
@@ -118,6 +146,7 @@ test('XREQ-003: native Auth invitation job scope, durable leases and provider ha
    assert.equal((await status(job)).state,'succeeded');
   });
  }finally{
+  await db.query('delete from private.email_provider_events where event_id=any($1::text[])',[emailEvents]);
   await db.query('delete from private.invitation_sender_config where org_id=$1',[org]);await db.query('delete from vault.secrets where id=$1',[secret]);
  }
 });

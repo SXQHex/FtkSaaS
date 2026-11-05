@@ -2,7 +2,7 @@
 
 Bu dosya yalnız **sıra, bağımlı teslim paketleri ve kontrol noktalarının** sahibidir. Görev içeriği/kabul/dosya alanı [remaining-work.md](remaining-work.md), gerçek kaynak/test/hosted durum [00 devir](00-FtkSaaS-yeni-sohbet-devir.md) sahibindedir. Frontend’in aktif modülü ve sırası değiştirilmez. İkinci roadmap/todo açılmaz.
 
-**Aktif kaynak kabulü:** PR199 P10.1/P10.2 ve P11 kaynakları aday/main kabulünü geçti; development Edge teslimi başarısızdır. CLI v3 tanısı HTTP413 boyut reddini doğruladı; önce ortak doğrulayıcıları paylaşan dar bundle boyut onarımı ve gerçek development yeniden teslimi doğrulanır; Vercel başarılıdır. P10.3 gerçek aktarım, Node yerleşimi ve Meta/Google live teslimi ayrı açık kalır. Main’e alınmış PR201 deploy seçim/filtre ve aday test envanteri politikası korunur. Kanıt ve ortam durumu devir sahibindedir.
+**Aktif kaynak kabulü:** PR204 sonrası P10.1/P10.2 ve P11 backend kaynak/main/development teslimi doğrulandı; boyut onarımı kapanmıştır. Sıradaki bağımsız ürün paketi P14→P15→P16'dır; aktif PR205 mevcut Resend davet transport'unu ortak sağlayıcı sınırına alır ve imzalı, kalıcı teslim olayları/iş takibiyle genişler. Genel notification→email kalıcı köprüsü P14.2 ve gerçek teslim P14.4 açık kalır. P10.3 gerçek aktarım, Node yerleşimi ve Meta/Google live teslimi ayrı açık kalır. Main'deki deploy filtreleri ve aday test envanteri korunur. Kanıt ve ortam durumu devir sahibindedir.
 
 ## Uygulama sırası
 
@@ -28,11 +28,11 @@ Bu dosya yalnız **sıra, bağımlı teslim paketleri ve kontrol noktalarının*
 
 **S14–S16 kontrol noktası:** S14–S16 backend kaynak paketi PR156 ile aday/main/development kabulünü geçti; [kaynak/ortam kanıtı](00-FtkSaaS-yeni-sohbet-devir.md#s14s16-kaynak-paketi) ve açık hosted/tüketici sınırları [backlog](remaining-work.md#s14) sahibindedir.
 
-### Aktif kaynak paketi: P08–P11 CRM sağlayıcı/aktarım/yaşam döngüsü
+### CRM paketinin kalan gerçek kabulleri
 
 P01–P04, P12/P13, PR177 Starter CRM, PR182 P05/P06 + XREQ-016 ve PR188 P07 backend adaptörü teslimleri tamamlandı; [kaynak/ortam kanıtı](00-FtkSaaS-yeni-sohbet-devir.md) sahibindedir. P07'nin gerçek site bağlantısı ve form→inbox kabulü [XREQ-018](../../../docs/requests.md#xreq-018) altında açık; frontend deploy kısıtı bu kabulü bekletir, P05/P06'ya bağlı P08–P11 backend kaynağını durdurmaz.
 
-Kullanıcının güncel isteğiyle [P08](remaining-work.md#p08)–[P11](remaining-work.md#p11) tek Draft PR'de başlatılır. Alt dilimlerin kabul/görev sahibi backlog'dur. İlk adım mevcut ortak alım ve CRM kaynaklarına karşı sağlayıcı/aktarım boşluk incelemesidir. Son kullanıcı önceliği Instagram reklamlarıdır: önce Meta Page leadgen/Graph alımının Instagram anlık formu yolu hedeflenir; Google doğrulama kaynağı korunur. Gerçek Meta/Google erişimi ayrı doğrulanır; eksik erişim bağımsız P10/P11 kaynak incelemesini durdurmaz. Ortak sözleşme/migration değişiklikleri seri tutulur. İki–üç kaynak diliminde küçük hedefli test ve bağımsız inceleme kontrol noktası, merge adayında yürürlükteki tam kabul korunur. Gerçek provider veya hosted veri aktarımı doğrulanmamışsa kaynak hazır olsa bile ilgili görev kapalı gösterilmez.
+P08–P11 backend kaynak paketi teslim edildi; gerçek sağlayıcı erişimi, site bağlantısı ve veri aktarımının açık sınırları [backlog](remaining-work.md#p08) sahibindedir. Kullanıcının Meta/Google canlı kurulumunu erteleme kararı korunur; bu işler bağımsız P14–P16 ürün geliştirmesini bekletmez. Yeni kaynakta küçük hedefli testler, bağımsız inceleme ve merge adayında yürürlükteki tam kabul korunur.
 
 Dış e-posta ertelemesi de kaldırıldı; mevcut kurulum yeniden sıfırdan başlatılmaz. P14/P15 mevcut kaynak/sağlayıcı incelemesiyle kendi sırasında yürütülür; P16, P11/P15 bağımlılıklarını korur. Posta kurulumunun varlığı bütün bildirim olaylarının teslim kabulü değildir.
 

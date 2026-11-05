@@ -311,3 +311,12 @@ Mevcut ortak başvuru API'si üzerinden contact/kayit sunucu adaptörü hazırla
 4. Timeout/ok:false hatadır; eski depoya fallback ile sahte başarı üretilmez. Geçmiş aktarımı P10'un ayrı önizleme/onay işidir; kaynak silinmez veya otomatik taşınmaz.
 
 **Backend durumu:** Adaptör kaynağı ve küçük hedefli eşleme/gateway testleri hazır; aday kanıtı [backend devrinde](../apps/backend/docs/00-FtkSaaS-yeni-sohbet-devir.md#p07-web-formu-adaptörü). Canlı handler/config/widget ve inbox kabulü doğrulanmış değildir. Site/frontend kendi kabul alanını ayrıca doldurur; backend karşı alan adına kapanış vermez.
+
+<a id="xreq-019"></a>
+## XREQ-019 Davet gönderiminden gerçek teslim durumunu ayırma
+
+### Backend talebi ve kaynak devri — 5 Kasım 2026
+
+PR205, mevcut yetkili `job_status_get_v1` davet yanıtına opsiyonel/nullable `email_delivery:{state,occurred_at}` ekler; [typed sözleşme](../packages/api-contracts/schema/contract.json) ve [WF20](workflows.md#wf20) esastır. Eski alanlar ve izinler korunur. `state=succeeded` sağlayıcının gönderimi kabul ettiğini belirtir; tek başına alıcı teslimi değildir. Email_delivery accepted/delayed/delivered/bounced/complained/failed olabilir. Delivered alıcı mail sunucusu kabulüdür; inbox/okunma değildir. Alan yok/null ise teslim kanıtı uydurulmaz. Sağlayıcı kimliği, alıcı ve ham hata UI'ye eklenmez.
+
+**Beklenen tüketici/kabul:** Davet işini gösteren ekran mevcut iş takibini korur, ek teslim kanıtını ayrı gösterir; bounce/şikâyeti başarılı teslim diye sunmaz ve otomatik yeniden davet göndermez. Pending/running, eski yanıt, accepted ve terminal hata durumları; başka hesap/tenant/merkez erişim reddi sınanır. Bu kaynak devridir; backend aday/main/development ve gerçek webhook kabulü henüz açık, frontend değerlendirme/ekran kabulü kendi alanında beklenir. Backend karşı alan adına onay/kapanış vermez.

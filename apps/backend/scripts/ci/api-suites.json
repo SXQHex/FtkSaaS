@@ -575,7 +575,7 @@
         {
           "line": 3,
           "path": "apps/backend/tests/invitation-delivery-acceptance.mjs",
-          "sha256": "e14014089c4ef788c78c249f8460e073edf48d598e07e92e4bb336e1b6f7bb8e"
+          "sha256": "d62b7e4ae20eb950dffbaff2e465be0c427193838de0e832904ffd99ccac5b23"
         },
         {
           "line": 4,
