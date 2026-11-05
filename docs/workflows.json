@@ -123,6 +123,7 @@
         "apps/backend/scripts/ci/source.mjs",
         "apps/backend/scripts/ci/suite-durations.json",
         "apps/backend/scripts/ci/summarize-timings.mjs",
+        "apps/backend/scripts/ci/vercel-deployment.mjs",
         "apps/backend/scripts/ci/timing-reporter.mjs",
         "apps/backend/scripts/ci/timings.mjs",
         "apps/backend/scripts/db.mjs",
@@ -280,8 +281,8 @@
         "management_state_get_v1"
       ],
       "review": {
-        "fingerprint": "646df7a64bbc0d85ec4869f6b193292855fd60ab4024d18a439bfc36259e7840",
-        "reason": "Seçilen süre referansının kaynak, ölçümlü/tahmini sayılar ve plan hash logu incelendi; seçim algoritması, test kaynakları ve kabul kapıları değişmedi."
+        "fingerprint": "8e40c50371e753c9134fb4657b744c6871e3c05d4432b4ed45bf2dc7706c5d40",
+        "reason": "Vercel source-only seçim, silme/rename, frontend/main proof, tam SHA API isteği ve preview/production hedef reddi incelendi; token ortamı ve gerçek deploy kabulü ayrı beklenir."
       }
     },
     {
