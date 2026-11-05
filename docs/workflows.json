@@ -15,7 +15,8 @@
         "apps/backend/tests/p06-acceptance.mjs",
         "apps/backend/tests/invitation-delivery-acceptance.mjs",
         "apps/backend/tests/ci-experiment-checks.mjs",
-        "apps/backend/tests/ci-api-suites.test.mjs"
+        "apps/backend/tests/ci-api-suites.test.mjs",
+        "apps/backend/tests/deployment-cli-unit.mjs"
       ],
       "sources": [
         "apps/backend/database/canonical-settings-scope.sql",
@@ -281,8 +282,8 @@
         "management_state_get_v1"
       ],
       "review": {
-        "fingerprint": "748edd12c984e688829d8baa762caa683fcf36cd7bc941815d6be03eecc7b96d",
-        "reason": "Gitleaks false positive on existing frozen migration checksum confirmed against file bytes. New manifest entry placed before the unchanged final record; all110 hashes and source/quality guards preserved. No allowlist change."
+        "fingerprint": "318f9295857c93ac36d98e8639bd4423112a67eebbcc19580614d959843b5631",
+        "reason": "CLI v3 local reset retains loopback/no-seed/residue/migration gates. Exact assertion replacement independently reviewed; narrow fingerprint record, no threshold relaxation. Edge fixed diagnostics/isolated cwd explicit consent and remote. WF00 API unchanged."
       }
     },
     {

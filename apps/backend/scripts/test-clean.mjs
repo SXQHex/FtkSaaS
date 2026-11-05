@@ -35,7 +35,7 @@ if(!url||!['127.0.0.1','localhost'].includes(new URL(url).hostname))throw new Er
 fs.mkdirSync('.dev',{recursive:true,mode:0o700});
 const fd=fs.openSync('.dev/clean-reset.log','w',0o600);
 const resetStart=performance.now();
-try { run('node_modules/.bin/supabase',['db','reset','--local','--no-seed','--yes'],{stdio:['ignore',fd,fd]}); }
+try { run('node_modules/.bin/supabase',['db','reset','--no-seed','--yes'],{stdio:['ignore',fd,fd]}); }
 finally { fs.closeSync(fd); }
 const resetDone=performance.now();
 await import('./wait-local.mjs');

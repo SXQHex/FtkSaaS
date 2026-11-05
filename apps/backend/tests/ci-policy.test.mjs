@@ -80,7 +80,7 @@ test('reusable full clean retains all obligations while automatic admission and 
  assert(clean.includes('needs: [core, api, serial-reference]'));assert(clean.includes('if: always()'));assert(clean.includes('Verify all required jobs'));
  for(const op of ['test:db','dev:seed','dev:health','db:advisors'])assert(runner.includes("['run','"+op+"']"));
  assert(runner.includes("['--dir',repoFile(),'exec','turbo','run','verify','--filter=@ftksaas/backend...']"));
- assert(runner.includes("['db','reset','--local','--no-seed','--yes']"));assert(runner.includes("'auth.users'"));
+ assert(runner.includes("['db','reset','--no-seed','--yes']"));assert(runner.includes("'auth.users'"));
  const full=fs.readFileSync('.github/workflows/ci-full.yml','utf8'),gate=fs.readFileSync('.github/workflows/ci-gate.yml','utf8');
  assert(full.includes("needs.candidate.outputs.kind == 'full'"));assert(full.includes("needs.candidate.outputs.kind == 'documentation'"));assert(full.includes('synchronize'));assert(!full.includes('statuses: write'));assert(!full.includes('secrets:'));
  assert(!fs.existsSync('.github/workflows/ci-docs.yml'));assert(!fs.existsSync('apps/backend/scripts/ci/recovery.mjs'));

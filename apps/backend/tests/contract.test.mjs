@@ -1,3 +1,4 @@
+import './deployment-cli-unit.mjs';
 import './crm-meta-lead-unit.mjs';
 import './crm-meta-graph-unit.mjs';
 import './crm-provider-intake-unit.mjs';
