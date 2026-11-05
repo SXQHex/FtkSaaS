@@ -554,7 +554,7 @@ package_usage?: ("consume" | "eligibility_only")
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
  * via the `definition` "ImportTarget".
  */
-export type ImportTarget = ("display_name" | "email" | "phone" | "source_key" | "person_ref" | "opening_credits" | "opening_debt_minor" | "currency" | "product_version_ref" | "start_date" | "end_date" | "opening_credit_value_minor")
+export type ImportTarget = ("display_name" | "email" | "phone" | "source_key" | "person_ref" | "opening_credits" | "opening_debt_minor" | "currency" | "product_version_ref" | "start_date" | "end_date" | "opening_credit_value_minor" | "interest" | "message" | "partner_name" | "mode" | "consents" | "source_url")
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
  * via the `definition` "PolicyKey".
@@ -1184,6 +1184,11 @@ export type PackageScopeKind = ("center_discipline" | "center_all_disciplines" |
  * via the `definition` "SignedMoney".
  */
 export type SignedMoney = string
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "CrmApplicationSource".
+ */
+export type CrmApplicationSource = (CrmIntakeSource | CrmLegacyImportSource)
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
  * via the `definition` "CrmIntakeSource".
@@ -3749,6 +3754,9 @@ CrmMetaNotification?: CrmMetaNotification
 CrmMetaQueueReceipt?: CrmMetaQueueReceipt
 CrmMetaQueueClaim?: CrmMetaQueueClaim
 CrmMetaQueueStatus?: CrmMetaQueueStatus
+CrmLegacyImportSource?: CrmLegacyImportSource
+CrmApplicationSource?: CrmApplicationSource
+CrmImportRowPreview?: CrmImportRowPreview
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -4254,6 +4262,7 @@ target: ImportTarget
 export interface ImportMapping {
 columns: ImportColumn[]
 delimiter?: ("," | ";")
+kind?: ("students" | "crm_applications")
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -4279,6 +4288,25 @@ contacts?: {
 kind: ("email" | "phone")
 value: Text
 }[]
+interest?: string
+message?: string
+partner_name?: string
+mode?: string
+/**
+ * @maxItems 20
+ */
+consents?: []|[CrmIntakeConsent]|[CrmIntakeConsent, CrmIntakeConsent]|[CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent]|[CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent]|[CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent]|[CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent]|[CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent]|[CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent]|[CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent]|[CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent]|[CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent]|[CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent]|[CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent]|[CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent]|[CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent]|[CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent]|[CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent]|[CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent]|[CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent]|[CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent]
+source_url?: string
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "CrmIntakeConsent".
+ */
+export interface CrmIntakeConsent {
+purpose: string
+accepted: boolean
+version: string
+occurred_at: string
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -4515,6 +4543,8 @@ opening_credits: Count
 existing_negative_credits: Count
 opening_debt_totals: ImportMoneyTotal[]
 original_credit_basis_totals: ImportMoneyTotal[]
+import_kind?: ("students" | "crm_applications")
+new_applications?: Count
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -4588,6 +4618,7 @@ export interface JobRef {
  */
 job_id: string
 state: JobState
+selected_rows_count?: Count
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -6787,6 +6818,80 @@ row_number: PositiveInt
 state: ImportRowState
 error_code: (Text | null)
 created_references: EntityRef[]
+application?: (CrmImportRowPreview | null)
+/**
+ * @maxItems 12
+ */
+field_errors?: []|[("source_key" | "display_name" | "phone" | "email" | "interest" | "message" | "partner_name" | "mode" | "consents" | "source_url" | "row")]|[("source_key" | "display_name" | "phone" | "email" | "interest" | "message" | "partner_name" | "mode" | "consents" | "source_url" | "row"), ("source_key" | "display_name" | "phone" | "email" | "interest" | "message" | "partner_name" | "mode" | "consents" | "source_url" | "row")]|[("source_key" | "display_name" | "phone" | "email" | "interest" | "message" | "partner_name" | "mode" | "consents" | "source_url" | "row"), ("source_key" | "display_name" | "phone" | "email" | "interest" | "message" | "partner_name" | "mode" | "consents" | "source_url" | "row"), ("source_key" | "display_name" | "phone" | "email" | "interest" | "message" | "partner_name" | "mode" | "consents" | "source_url" | "row")]|[("source_key" | "display_name" | "phone" | "email" | "interest" | "message" | "partner_name" | "mode" | "consents" | "source_url" | "row"), ("source_key" | "display_name" | "phone" | "email" | "interest" | "message" | "partner_name" | "mode" | "consents" | "source_url" | "row"), ("source_key" | "display_name" | "phone" | "email" | "interest" | "message" | "partner_name" | "mode" | "consents" | "source_url" | "row"), ("source_key" | "display_name" | "phone" | "email" | "interest" | "message" | "partner_name" | "mode" | "consents" | "source_url" | "row")]|[("source_key" | "display_name" | "phone" | "email" | "interest" | "message" | "partner_name" | "mode" | "consents" | "source_url" | "row"), ("source_key" | "display_name" | "phone" | "email" | "interest" | "message" | "partner_name" | "mode" | "consents" | "source_url" | "row"), ("source_key" | "display_name" | "phone" | "email" | "interest" | "message" | "partner_name" | "mode" | "consents" | "source_url" | "row"), ("source_key" | "display_name" | "phone" | "email" | "interest" | "message" | "partner_name" | "mode" | "consents" | "source_url" | "row"), ("source_key" | "display_name" | "phone" | "email" | "interest" | "message" | "partner_name" | "mode" | "consents" | "source_url" | "row")]|[("source_key" | "display_name" | "phone" | "email" | "interest" | "message" | "partner_name" | "mode" | "consents" | "source_url" | "row"), ("source_key" | "display_name" | "phone" | "email" | "interest" | "message" | "partner_name" | "mode" | "consents" | "source_url" | "row"), ("source_key" | "display_name" | "phone" | "email" | "interest" | "message" | "partner_name" | "mode" | "consents" | "source_url" | "row"), ("source_key" | "display_name" | "phone" | "email" | "interest" | "message" | "partner_name" | "mode" | "consents" | "source_url" | "row"), ("source_key" | "display_name" | "phone" | "email" | "interest" | "message" | "partner_name" | "mode" | "consents" | "source_url" | "row"), ("source_key" | "display_name" | "phone" | "email" | "interest" | "message" | "partner_name" | "mode" | "consents" | "source_url" | "row")]|[("source_key" | "display_name" | "phone" | "email" | "interest" | "message" | "partner_name" | "mode" | "consents" | "source_url" | "row"), ("source_key" | "display_name" | "phone" | "email" | "interest" | "message" | "partner_name" | "mode" | "consents" | "source_url" | "row"), ("source_key" | "display_name" | "phone" | "email" | "interest" | "message" | "partner_name" | "mode" | "consents" | "source_url" | "row"), ("source_key" | "display_name" | "phone" | "email" | "interest" | "message" | "partner_name" | "mode" | "consents" | "source_url" | "row"), ("source_key" | "display_name" | "phone" | "email" | "interest" | "message" | "partner_name" | "mode" | "consents" | "source_url" | "row"), ("source_key" | "display_name" | "phone" | "email" | "interest" | "message" | "partner_name" | "mode" | "consents" | "source_url" | "row"), ("source_key" | "display_name" | "phone" | "email" | "interest" | "message" | "partner_name" | "mode" | "consents" | "source_url" | "row")]|[("source_key" | "display_name" | "phone" | "email" | "interest" | "message" | "partner_name" | "mode" | "consents" | "source_url" | "row"), ("source_key" | "display_name" | "phone" | "email" | "interest" | "message" | "partner_name" | "mode" | "consents" | "source_url" | "row"), ("source_key" | "display_name" | "phone" | "email" | "interest" | "message" | "partner_name" | "mode" | "consents" | "source_url" | "row"), ("source_key" | "display_name" | "phone" | "email" | "interest" | "message" | "partner_name" | "mode" | "consents" | "source_url" | "row"), ("source_key" | "display_name" | "phone" | "email" | "interest" | "message" | "partner_name" | "mode" | "consents" | "source_url" | "row"), ("source_key" | "display_name" | "phone" | "email" | "interest" | "message" | "partner_name" | "mode" | "consents" | "source_url" | "row"), ("source_key" | "display_name" | "phone" | "email" | "interest" | "message" | "partner_name" | "mode" | "consents" | "source_url" | "row"), ("source_key" | "display_name" | "phone" | "email" | "interest" | "message" | "partner_name" | "mode" | "consents" | "source_url" | "row")]|[("source_key" | "display_name" | "phone" | "email" | "interest" | "message" | "partner_name" | "mode" | "consents" | "source_url" | "row"), ("source_key" | "display_name" | "phone" | "email" | "interest" | "message" | "partner_name" | "mode" | "consents" | "source_url" | "row"), ("source_key" | "display_name" | "phone" | "email" | "interest" | "message" | "partner_name" | "mode" | "consents" | "source_url" | "row"), ("source_key" | "display_name" | "phone" | "email" | "interest" | "message" | "partner_name" | "mode" | "consents" | "source_url" | "row"), ("source_key" | "display_name" | "phone" | "email" | "interest" | "message" | "partner_name" | "mode" | "consents" | "source_url" | "row"), ("source_key" | "display_name" | "phone" | "email" | "interest" | "message" | "partner_name" | "mode" | "consents" | "source_url" | "row"), ("source_key" | "display_name" | "phone" | "email" | "interest" | "message" | "partner_name" | "mode" | "consents" | "source_url" | "row"), ("source_key" | "display_name" | "phone" | "email" | "interest" | "message" | "partner_name" | "mode" | "consents" | "source_url" | "row"), ("source_key" | "display_name" | "phone" | "email" | "interest" | "message" | "partner_name" | "mode" | "consents" | "source_url" | "row")]|[("source_key" | "display_name" | "phone" | "email" | "interest" | "message" | "partner_name" | "mode" | "consents" | "source_url" | "row"), ("source_key" | "display_name" | "phone" | "email" | "interest" | "message" | "partner_name" | "mode" | "consents" | "source_url" | "row"), ("source_key" | "display_name" | "phone" | "email" | "interest" | "message" | "partner_name" | "mode" | "consents" | "source_url" | "row"), ("source_key" | "display_name" | "phone" | "email" | "interest" | "message" | "partner_name" | "mode" | "consents" | "source_url" | "row"), ("source_key" | "display_name" | "phone" | "email" | "interest" | "message" | "partner_name" | "mode" | "consents" | "source_url" | "row"), ("source_key" | "display_name" | "phone" | "email" | "interest" | "message" | "partner_name" | "mode" | "consents" | "source_url" | "row"), ("source_key" | "display_name" | "phone" | "email" | "interest" | "message" | "partner_name" | "mode" | "consents" | "source_url" | "row"), ("source_key" | "display_name" | "phone" | "email" | "interest" | "message" | "partner_name" | "mode" | "consents" | "source_url" | "row"), ("source_key" | "display_name" | "phone" | "email" | "interest" | "message" | "partner_name" | "mode" | "consents" | "source_url" | "row"), ("source_key" | "display_name" | "phone" | "email" | "interest" | "message" | "partner_name" | "mode" | "consents" | "source_url" | "row")]|[("source_key" | "display_name" | "phone" | "email" | "interest" | "message" | "partner_name" | "mode" | "consents" | "source_url" | "row"), ("source_key" | "display_name" | "phone" | "email" | "interest" | "message" | "partner_name" | "mode" | "consents" | "source_url" | "row"), ("source_key" | "display_name" | "phone" | "email" | "interest" | "message" | "partner_name" | "mode" | "consents" | "source_url" | "row"), ("source_key" | "display_name" | "phone" | "email" | "interest" | "message" | "partner_name" | "mode" | "consents" | "source_url" | "row"), ("source_key" | "display_name" | "phone" | "email" | "interest" | "message" | "partner_name" | "mode" | "consents" | "source_url" | "row"), ("source_key" | "display_name" | "phone" | "email" | "interest" | "message" | "partner_name" | "mode" | "consents" | "source_url" | "row"), ("source_key" | "display_name" | "phone" | "email" | "interest" | "message" | "partner_name" | "mode" | "consents" | "source_url" | "row"), ("source_key" | "display_name" | "phone" | "email" | "interest" | "message" | "partner_name" | "mode" | "consents" | "source_url" | "row"), ("source_key" | "display_name" | "phone" | "email" | "interest" | "message" | "partner_name" | "mode" | "consents" | "source_url" | "row"), ("source_key" | "display_name" | "phone" | "email" | "interest" | "message" | "partner_name" | "mode" | "consents" | "source_url" | "row"), ("source_key" | "display_name" | "phone" | "email" | "interest" | "message" | "partner_name" | "mode" | "consents" | "source_url" | "row")]|[("source_key" | "display_name" | "phone" | "email" | "interest" | "message" | "partner_name" | "mode" | "consents" | "source_url" | "row"), ("source_key" | "display_name" | "phone" | "email" | "interest" | "message" | "partner_name" | "mode" | "consents" | "source_url" | "row"), ("source_key" | "display_name" | "phone" | "email" | "interest" | "message" | "partner_name" | "mode" | "consents" | "source_url" | "row"), ("source_key" | "display_name" | "phone" | "email" | "interest" | "message" | "partner_name" | "mode" | "consents" | "source_url" | "row"), ("source_key" | "display_name" | "phone" | "email" | "interest" | "message" | "partner_name" | "mode" | "consents" | "source_url" | "row"), ("source_key" | "display_name" | "phone" | "email" | "interest" | "message" | "partner_name" | "mode" | "consents" | "source_url" | "row"), ("source_key" | "display_name" | "phone" | "email" | "interest" | "message" | "partner_name" | "mode" | "consents" | "source_url" | "row"), ("source_key" | "display_name" | "phone" | "email" | "interest" | "message" | "partner_name" | "mode" | "consents" | "source_url" | "row"), ("source_key" | "display_name" | "phone" | "email" | "interest" | "message" | "partner_name" | "mode" | "consents" | "source_url" | "row"), ("source_key" | "display_name" | "phone" | "email" | "interest" | "message" | "partner_name" | "mode" | "consents" | "source_url" | "row"), ("source_key" | "display_name" | "phone" | "email" | "interest" | "message" | "partner_name" | "mode" | "consents" | "source_url" | "row"), ("source_key" | "display_name" | "phone" | "email" | "interest" | "message" | "partner_name" | "mode" | "consents" | "source_url" | "row")]
+source_key?: string
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "CrmImportRowPreview".
+ */
+export interface CrmImportRowPreview {
+intake: CrmIntake
+source: CrmLegacyImportSource
+/**
+ * @maxItems 50
+ */
+phone_matches: CrmPhoneMatch[]
+phone_matches_truncated: boolean
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "CrmIntake".
+ */
+export interface CrmIntake {
+display_name: string
+phone: string
+email?: string
+interest?: string
+message?: string
+partner_name?: string
+mode?: string
+attribution?: {
+campaign_id?: string
+ad_id?: string
+utm_source?: string
+utm_medium?: string
+utm_campaign?: string
+utm_term?: string
+utm_content?: string
+page_url?: string
+}
+/**
+ * @maxItems 20
+ */
+consents: []|[CrmIntakeConsent]|[CrmIntakeConsent, CrmIntakeConsent]|[CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent]|[CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent]|[CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent]|[CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent]|[CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent]|[CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent]|[CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent]|[CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent]|[CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent]|[CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent]|[CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent]|[CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent]|[CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent]|[CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent]|[CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent]|[CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent]|[CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent]|[CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent]
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "CrmLegacyImportSource".
+ */
+export interface CrmLegacyImportSource {
+channel: "legacy_import"
+form_key: string
+source_namespace: string
+source_key: string
+source_url: (string | null)
+file_checksum: string
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+import_job_id: string
+row_number: number
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "CrmPhoneMatch".
+ */
+export interface CrmPhoneMatch {
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+person_id: string
+display_name: string
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -11575,6 +11680,11 @@ center_id?: (string | null)
  */
 operation_key: string
 preview: PreviewToken
+/**
+ * @minItems 1
+ * @maxItems 5000
+ */
+selected_row_numbers?: [number, ...(number)[]]
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -12485,43 +12595,6 @@ data: Page_PublicCalendarItem
  * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
  */
 trace_id: string
-}
-/**
- * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
- * via the `definition` "CrmIntake".
- */
-export interface CrmIntake {
-display_name: string
-phone: string
-email?: string
-interest?: string
-message?: string
-partner_name?: string
-mode?: string
-attribution?: {
-campaign_id?: string
-ad_id?: string
-utm_source?: string
-utm_medium?: string
-utm_campaign?: string
-utm_term?: string
-utm_content?: string
-page_url?: string
-}
-/**
- * @maxItems 20
- */
-consents: []|[CrmIntakeConsent]|[CrmIntakeConsent, CrmIntakeConsent]|[CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent]|[CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent]|[CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent]|[CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent]|[CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent]|[CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent]|[CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent]|[CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent]|[CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent]|[CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent]|[CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent]|[CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent]|[CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent]|[CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent]|[CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent]|[CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent]|[CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent]|[CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent, CrmIntakeConsent]
-}
-/**
- * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
- * via the `definition` "CrmIntakeConsent".
- */
-export interface CrmIntakeConsent {
-purpose: string
-accepted: boolean
-version: string
-occurred_at: string
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -15772,6 +15845,10 @@ state: ImportRowState
 created_references: string[]
 error_code?: (Text | null)
 source_namespace: Text
+/**
+ * @maxItems 12
+ */
+field_errors?: []|[("source_key" | "display_name" | "phone" | "email" | "interest" | "message" | "partner_name" | "mode" | "consents" | "source_url" | "row")]|[("source_key" | "display_name" | "phone" | "email" | "interest" | "message" | "partner_name" | "mode" | "consents" | "source_url" | "row"), ("source_key" | "display_name" | "phone" | "email" | "interest" | "message" | "partner_name" | "mode" | "consents" | "source_url" | "row")]|[("source_key" | "display_name" | "phone" | "email" | "interest" | "message" | "partner_name" | "mode" | "consents" | "source_url" | "row"), ("source_key" | "display_name" | "phone" | "email" | "interest" | "message" | "partner_name" | "mode" | "consents" | "source_url" | "row"), ("source_key" | "display_name" | "phone" | "email" | "interest" | "message" | "partner_name" | "mode" | "consents" | "source_url" | "row")]|[("source_key" | "display_name" | "phone" | "email" | "interest" | "message" | "partner_name" | "mode" | "consents" | "source_url" | "row"), ("source_key" | "display_name" | "phone" | "email" | "interest" | "message" | "partner_name" | "mode" | "consents" | "source_url" | "row"), ("source_key" | "display_name" | "phone" | "email" | "interest" | "message" | "partner_name" | "mode" | "consents" | "source_url" | "row"), ("source_key" | "display_name" | "phone" | "email" | "interest" | "message" | "partner_name" | "mode" | "consents" | "source_url" | "row")]|[("source_key" | "display_name" | "phone" | "email" | "interest" | "message" | "partner_name" | "mode" | "consents" | "source_url" | "row"), ("source_key" | "display_name" | "phone" | "email" | "interest" | "message" | "partner_name" | "mode" | "consents" | "source_url" | "row"), ("source_key" | "display_name" | "phone" | "email" | "interest" | "message" | "partner_name" | "mode" | "consents" | "source_url" | "row"), ("source_key" | "display_name" | "phone" | "email" | "interest" | "message" | "partner_name" | "mode" | "consents" | "source_url" | "row"), ("source_key" | "display_name" | "phone" | "email" | "interest" | "message" | "partner_name" | "mode" | "consents" | "source_url" | "row")]|[("source_key" | "display_name" | "phone" | "email" | "interest" | "message" | "partner_name" | "mode" | "consents" | "source_url" | "row"), ("source_key" | "display_name" | "phone" | "email" | "interest" | "message" | "partner_name" | "mode" | "consents" | "source_url" | "row"), ("source_key" | "display_name" | "phone" | "email" | "interest" | "message" | "partner_name" | "mode" | "consents" | "source_url" | "row"), ("source_key" | "display_name" | "phone" | "email" | "interest" | "message" | "partner_name" | "mode" | "consents" | "source_url" | "row"), ("source_key" | "display_name" | "phone" | "email" | "interest" | "message" | "partner_name" | "mode" | "consents" | "source_url" | "row"), ("source_key" | "display_name" | "phone" | "email" | "interest" | "message" | "partner_name" | "mode" | "consents" | "source_url" | "row")]|[("source_key" | "display_name" | "phone" | "email" | "interest" | "message" | "partner_name" | "mode" | "consents" | "source_url" | "row"), ("source_key" | "display_name" | "phone" | "email" | "interest" | "message" | "partner_name" | "mode" | "consents" | "source_url" | "row"), ("source_key" | "display_name" | "phone" | "email" | "interest" | "message" | "partner_name" | "mode" | "consents" | "source_url" | "row"), ("source_key" | "display_name" | "phone" | "email" | "interest" | "message" | "partner_name" | "mode" | "consents" | "source_url" | "row"), ("source_key" | "display_name" | "phone" | "email" | "interest" | "message" | "partner_name" | "mode" | "consents" | "source_url" | "row"), ("source_key" | "display_name" | "phone" | "email" | "interest" | "message" | "partner_name" | "mode" | "consents" | "source_url" | "row"), ("source_key" | "display_name" | "phone" | "email" | "interest" | "message" | "partner_name" | "mode" | "consents" | "source_url" | "row")]|[("source_key" | "display_name" | "phone" | "email" | "interest" | "message" | "partner_name" | "mode" | "consents" | "source_url" | "row"), ("source_key" | "display_name" | "phone" | "email" | "interest" | "message" | "partner_name" | "mode" | "consents" | "source_url" | "row"), ("source_key" | "display_name" | "phone" | "email" | "interest" | "message" | "partner_name" | "mode" | "consents" | "source_url" | "row"), ("source_key" | "display_name" | "phone" | "email" | "interest" | "message" | "partner_name" | "mode" | "consents" | "source_url" | "row"), ("source_key" | "display_name" | "phone" | "email" | "interest" | "message" | "partner_name" | "mode" | "consents" | "source_url" | "row"), ("source_key" | "display_name" | "phone" | "email" | "interest" | "message" | "partner_name" | "mode" | "consents" | "source_url" | "row"), ("source_key" | "display_name" | "phone" | "email" | "interest" | "message" | "partner_name" | "mode" | "consents" | "source_url" | "row"), ("source_key" | "display_name" | "phone" | "email" | "interest" | "message" | "partner_name" | "mode" | "consents" | "source_url" | "row")]|[("source_key" | "display_name" | "phone" | "email" | "interest" | "message" | "partner_name" | "mode" | "consents" | "source_url" | "row"), ("source_key" | "display_name" | "phone" | "email" | "interest" | "message" | "partner_name" | "mode" | "consents" | "source_url" | "row"), ("source_key" | "display_name" | "phone" | "email" | "interest" | "message" | "partner_name" | "mode" | "consents" | "source_url" | "row"), ("source_key" | "display_name" | "phone" | "email" | "interest" | "message" | "partner_name" | "mode" | "consents" | "source_url" | "row"), ("source_key" | "display_name" | "phone" | "email" | "interest" | "message" | "partner_name" | "mode" | "consents" | "source_url" | "row"), ("source_key" | "display_name" | "phone" | "email" | "interest" | "message" | "partner_name" | "mode" | "consents" | "source_url" | "row"), ("source_key" | "display_name" | "phone" | "email" | "interest" | "message" | "partner_name" | "mode" | "consents" | "source_url" | "row"), ("source_key" | "display_name" | "phone" | "email" | "interest" | "message" | "partner_name" | "mode" | "consents" | "source_url" | "row"), ("source_key" | "display_name" | "phone" | "email" | "interest" | "message" | "partner_name" | "mode" | "consents" | "source_url" | "row")]|[("source_key" | "display_name" | "phone" | "email" | "interest" | "message" | "partner_name" | "mode" | "consents" | "source_url" | "row"), ("source_key" | "display_name" | "phone" | "email" | "interest" | "message" | "partner_name" | "mode" | "consents" | "source_url" | "row"), ("source_key" | "display_name" | "phone" | "email" | "interest" | "message" | "partner_name" | "mode" | "consents" | "source_url" | "row"), ("source_key" | "display_name" | "phone" | "email" | "interest" | "message" | "partner_name" | "mode" | "consents" | "source_url" | "row"), ("source_key" | "display_name" | "phone" | "email" | "interest" | "message" | "partner_name" | "mode" | "consents" | "source_url" | "row"), ("source_key" | "display_name" | "phone" | "email" | "interest" | "message" | "partner_name" | "mode" | "consents" | "source_url" | "row"), ("source_key" | "display_name" | "phone" | "email" | "interest" | "message" | "partner_name" | "mode" | "consents" | "source_url" | "row"), ("source_key" | "display_name" | "phone" | "email" | "interest" | "message" | "partner_name" | "mode" | "consents" | "source_url" | "row"), ("source_key" | "display_name" | "phone" | "email" | "interest" | "message" | "partner_name" | "mode" | "consents" | "source_url" | "row"), ("source_key" | "display_name" | "phone" | "email" | "interest" | "message" | "partner_name" | "mode" | "consents" | "source_url" | "row")]|[("source_key" | "display_name" | "phone" | "email" | "interest" | "message" | "partner_name" | "mode" | "consents" | "source_url" | "row"), ("source_key" | "display_name" | "phone" | "email" | "interest" | "message" | "partner_name" | "mode" | "consents" | "source_url" | "row"), ("source_key" | "display_name" | "phone" | "email" | "interest" | "message" | "partner_name" | "mode" | "consents" | "source_url" | "row"), ("source_key" | "display_name" | "phone" | "email" | "interest" | "message" | "partner_name" | "mode" | "consents" | "source_url" | "row"), ("source_key" | "display_name" | "phone" | "email" | "interest" | "message" | "partner_name" | "mode" | "consents" | "source_url" | "row"), ("source_key" | "display_name" | "phone" | "email" | "interest" | "message" | "partner_name" | "mode" | "consents" | "source_url" | "row"), ("source_key" | "display_name" | "phone" | "email" | "interest" | "message" | "partner_name" | "mode" | "consents" | "source_url" | "row"), ("source_key" | "display_name" | "phone" | "email" | "interest" | "message" | "partner_name" | "mode" | "consents" | "source_url" | "row"), ("source_key" | "display_name" | "phone" | "email" | "interest" | "message" | "partner_name" | "mode" | "consents" | "source_url" | "row"), ("source_key" | "display_name" | "phone" | "email" | "interest" | "message" | "partner_name" | "mode" | "consents" | "source_url" | "row"), ("source_key" | "display_name" | "phone" | "email" | "interest" | "message" | "partner_name" | "mode" | "consents" | "source_url" | "row")]|[("source_key" | "display_name" | "phone" | "email" | "interest" | "message" | "partner_name" | "mode" | "consents" | "source_url" | "row"), ("source_key" | "display_name" | "phone" | "email" | "interest" | "message" | "partner_name" | "mode" | "consents" | "source_url" | "row"), ("source_key" | "display_name" | "phone" | "email" | "interest" | "message" | "partner_name" | "mode" | "consents" | "source_url" | "row"), ("source_key" | "display_name" | "phone" | "email" | "interest" | "message" | "partner_name" | "mode" | "consents" | "source_url" | "row"), ("source_key" | "display_name" | "phone" | "email" | "interest" | "message" | "partner_name" | "mode" | "consents" | "source_url" | "row"), ("source_key" | "display_name" | "phone" | "email" | "interest" | "message" | "partner_name" | "mode" | "consents" | "source_url" | "row"), ("source_key" | "display_name" | "phone" | "email" | "interest" | "message" | "partner_name" | "mode" | "consents" | "source_url" | "row"), ("source_key" | "display_name" | "phone" | "email" | "interest" | "message" | "partner_name" | "mode" | "consents" | "source_url" | "row"), ("source_key" | "display_name" | "phone" | "email" | "interest" | "message" | "partner_name" | "mode" | "consents" | "source_url" | "row"), ("source_key" | "display_name" | "phone" | "email" | "interest" | "message" | "partner_name" | "mode" | "consents" | "source_url" | "row"), ("source_key" | "display_name" | "phone" | "email" | "interest" | "message" | "partner_name" | "mode" | "consents" | "source_url" | "row"), ("source_key" | "display_name" | "phone" | "email" | "interest" | "message" | "partner_name" | "mode" | "consents" | "source_url" | "row")]
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -15822,13 +15899,14 @@ bot_verified_at: (Instant | null)
 request_reference?: (string | null)
 person_id?: (string | null)
 crm_form_id?: (string | null)
-source_snapshot?: (CrmIntakeSource | {
+source_snapshot?: (CrmApplicationSource | {
 
 })
 intake?: (CrmIntakeView | null)
 routing_history?: CrmApplicationRouting[]
 provider_payload_hash?: (string | null)
 provider_lead_id?: (string | null)
+import_row_id?: (string | null)
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -15880,7 +15958,7 @@ purpose: string
 accepted: boolean
 version: string
 occurred_at: string
-source: CrmIntakeSource
+source: CrmApplicationSource
 received_at: string
 }
 /**
@@ -18315,7 +18393,7 @@ publication_id?: string
  */
 form_id?: string
 center_id?: (string | null)
-source?: CrmIntakeSource
+source?: CrmApplicationSource
 intake?: CrmIntakeView
 routing_history?: CrmApplicationRouting[]
 /**
@@ -18324,17 +18402,6 @@ routing_history?: CrmApplicationRouting[]
 phone_matches?: CrmPhoneMatch[]
 phone_matches_truncated?: boolean
 }
-}
-/**
- * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
- * via the `definition` "CrmPhoneMatch".
- */
-export interface CrmPhoneMatch {
-/**
- * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
- */
-person_id: string
-display_name: string
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema

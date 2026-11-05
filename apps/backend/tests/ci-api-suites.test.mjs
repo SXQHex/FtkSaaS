@@ -31,7 +31,7 @@ test('all completed process samples are required, including SQL-only units',()=>
  const samples={},jobs=schedule.plan.map(b=>({id:b.shard+100,name:'clean / api-'+b.shard}));
  for(const b of schedule.plan)samples['api-'+b.shard]={role:'api-'+b.shard,run_id:4,attempt:1,head:binding.head,merge:binding.merge,schedule:schedule.sha256,units:b.units.map(id=>({id,sha256:schedule.units[id].sha256,seconds:2,exit_code:0}))};
  const reference=measuredReference(binding,jobs,samples);
- assert.equal(Object.keys(reference.units).length,91);
+ assert.equal(Object.keys(reference.units).length,93);
  assert(reference.units['canonical-settings-migration-acceptance']);
  const frozen=freezeSchedule(units,reference);assert(Object.values(frozen.units).every(u=>u.origin==='previous-success'&&u.seconds===2));
  for(const mutate of [x=>x['api-12'].units.pop(),x=>x['api-1'].attempt=3,x=>x['api-1'].run_id=5,x=>x['api-1'].schedule='other',x=>x['api-1'].units[0].sha256='other',x=>x['api-1'].units[0].seconds=0,x=>x['api-1'].units[0].exit_code=1]){
@@ -99,7 +99,7 @@ const behaviorSplits={
 test('production inventory owns every original line and import once and compiles every payload',()=>{
  const manifest=JSON.parse(fs.readFileSync(new URL('../scripts/ci/api-suites.json',import.meta.url)));
  const inventory=buildInventory(repositoryRoot),bins=partition(inventory.units);
- const added=new Set(['document-self-requirements-acceptance','crm-application-intake-acceptance','crm-application-review-acceptance','starter-operations-report-shaping','starter-operations-import-templates','starter-operations-report-access','starter-operations-inbox','crm-provider-delivery-acceptance','crm-provider-authority-acceptance','crm-provider-webhook-acceptance','crm-meta-queue-acceptance','crm-meta-queue-authority-acceptance','crm-provider-host-acceptance']);
+ const added=new Set(['document-self-requirements-acceptance','crm-application-intake-acceptance','crm-application-review-acceptance','starter-operations-report-shaping','starter-operations-import-templates','starter-operations-report-access','starter-operations-inbox','crm-provider-delivery-acceptance','crm-provider-authority-acceptance','crm-provider-webhook-acceptance','crm-meta-queue-acceptance','crm-meta-queue-authority-acceptance','crm-provider-host-acceptance','crm-import-acceptance','crm-import-authority-acceptance']);
  for(const [retired,parts] of Object.entries(behaviorSplits)){
   assert(!inventory.units.some(u=>u.id===retired),'Retired acceptance unit '+retired);
   for(const id of parts)assert(inventory.units.some(u=>u.id===id),'Missing behavior '+id);

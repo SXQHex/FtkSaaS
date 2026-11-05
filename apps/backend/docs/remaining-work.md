@@ -467,6 +467,8 @@ Değişen dilimin sözleşme, üretilmiş tip/envanter, WF/F01–F33 izi ve alan
 
 **Uygulama dilimleri:**
 
+**Kaynak dilimi:** Mevcut CSV/Storage/import job/preview/apply/worker yeniden kullanılır; `mapping.kind=crm_applications` açık ayrımdır, kind yoksa öğrenci davranışı değişmez. CRM satırı yalnız ortak `public_applications` üretir; seçili set tek transaction, kalıcı source tür/kimliği ve canlı import+CRM scope’u korunur. Kaynak/native CI kabulü henüz beklenir; gerçek veri aktarımı yapılmadı. Teknik sınırlar ve API sırası WF11 sahibindedir.
+
 - [ ] P10.1 — Mevcut import preview/apply altyapısını ve eski başvuru alanlarını incele; yalnız eksik CRM eşlemesini ekle. Önizleme kaynak kimliği, alan hatası, olası mükerrerlik, kaynak/onay kanıtı ve seçilebilir satırları göstermeli. Eksik onay sürümü/zamanı uydurulmasın; gerçek kişisel veri test fixture'ı yapılmasın. Kaynak alanı: mevcut import/CRM kaynakları ve ayrı küçük parser/preview testi.
 - [ ] P10.2 — Onaylanmış sabit önizleme/kaynak üzerinden yalnız seçilen kayıtları uygula; scope/plan/rol değişimini yeniden denetle. Aynı aktarım replay tek kayıt; değiştirilmiş snapshot/seçim ve geç hata reddi atomik olsun. İzole native preview→apply→readback, yarış/rollback ve sayım mutabakatı kullan.
 - [ ] P10.3 — Gerçek kaynak için somut önizleme ve seçilecek satırlar kullanıcı tarafından onaylanmadan hosted aktarım yapma. Kaynağı silme/değiştirme; çıktı/rapora kişisel veri veya secret yazma. Bu PR kaynak uygulaması canlı aktarım yetkisi değildir.
