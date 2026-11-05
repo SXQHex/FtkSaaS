@@ -16,7 +16,8 @@
         "apps/backend/tests/invitation-delivery-acceptance.mjs",
         "apps/backend/tests/ci-experiment-checks.mjs",
         "apps/backend/tests/ci-api-suites.test.mjs",
-        "apps/backend/tests/deployment-cli-unit.mjs"
+        "apps/backend/tests/deployment-cli-unit.mjs",
+        "apps/backend/tests/edge-bundle-unit.mjs"
       ],
       "sources": [
         "apps/backend/database/canonical-settings-scope.sql",
@@ -282,8 +283,8 @@
         "management_state_get_v1"
       ],
       "review": {
-        "fingerprint": "318f9295857c93ac36d98e8639bd4423112a67eebbcc19580614d959843b5631",
-        "reason": "CLI v3 local reset retains loopback/no-seed/residue/migration gates. Exact assertion replacement independently reviewed; narrow fingerprint record, no threshold relaxation. Edge fixed diagnostics/isolated cwd explicit consent and remote. WF00 API unchanged."
+        "fingerprint": "4cb942ac86691d5eac4b76d91cfebdc48fd4d040ace715e2f6af1be8b261bee0",
+        "reason": "HTTP413 recovery shares referenced standalone Ajv validators with inlineRefs=false; same schemas/formats/440 exports and request/response boolean semantics. Source budget/parity tests added. No API/JWT/DB gate changes."
       }
     },
     {
