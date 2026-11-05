@@ -2,8 +2,9 @@ import fs from 'node:fs';
 import {buildInventory,partition} from './api-suites.mjs';
 import {repositoryRoot} from '../paths.mjs';
 import {createHash} from 'node:crypto';
-import {apiSuites} from './select-tests.mjs';
 export const durations=JSON.parse(fs.readFileSync(new URL('./suite-durations.json',import.meta.url)));
+// Historical four-shard measurements never define current acceptance inventory.
+export const legacyApiSuites=Object.keys(durations.seconds).map(n=>'apps/backend/tests/'+n+'.test.mjs');
 const cache=new Map();
 const suiteName=p=>p.replace(/^apps\/backend\/tests\//,'').replace(/\.test\.mjs$/,'');
 const compare=(a,b)=>a<b?-1:a>b?1:0;
@@ -16,7 +17,7 @@ export function predictedWall(suites,seconds=durations.seconds){
  }
  return Math.max(...slots);
 }
-export function shardPlan(suites=apiSuites,seconds=durations.seconds){
+export function shardPlan(suites=legacyApiSuites,seconds=durations.seconds){
  if(new Set(suites).size!==suites.length)throw Error('Duplicate API inventory');
  if(JSON.stringify([...suites].sort())!==JSON.stringify(Object.keys(seconds).map(n=>'apps/backend/tests/'+n+'.test.mjs').sort()))throw Error('Missing/unknown duration inventory; remeasure new suite');
  for(const suite of suites)if(!Number.isFinite(seconds[suiteName(suite)])||seconds[suiteName(suite)]<=0)throw Error('Invalid duration');
@@ -63,7 +64,7 @@ export function shardPlan(suites=apiSuites,seconds=durations.seconds){
  cache.set(key,best);return structuredClone(best);
 }
 export const apiBalancePolicy=Object.freeze({version:'api-wall-v1',max_ratio:1.25,min_gap_s:120});
-function legacyCoverageHash(){return createHash('sha256').update(JSON.stringify({balance:apiBalancePolicy,api:[...apiSuites].sort(),plan:shardPlan(),core:['verify','test:db','dev:seed','dev:health','db:advisors'],reset:'34-or-current-manifest; empty auth/tenant/receipts per runner',concurrency:2})).digest('hex');}
+function legacyCoverageHash(){return createHash('sha256').update(JSON.stringify({balance:apiBalancePolicy,api:[...legacyApiSuites].sort(),plan:shardPlan(),core:['verify','test:db','dev:seed','dev:health','db:advisors'],reset:'34-or-current-manifest; empty auth/tenant/receipts per runner',concurrency:2})).digest('hex');}
 export const roleName=j=>j.name.split(' / ').at(-1);
 export function validateJobs(jobs,run,{benchmark=false,collector=false,sourceChecks=false,profile='four-isolated-v2'}={}){
  const names=['core',...apiRoles(profile),...(benchmark?['serial-reference']:[]),...(collector?['full-clean']:[])];
@@ -110,9 +111,10 @@ export function apiRoles(profile=acceptanceProfile){
  return Array.from({length:profile.startsWith('twelve-')?12:profile==='eight-isolated-v1'?8:4},(_,i)=>'api-'+(i+1));
 }
 export function acceptancePlan(){return partition(buildInventory(repositoryRoot).units,apiRoles().length);}
-export function coverageHash(profile='four-isolated-v2'){
+export function coverageHash(profile='four-isolated-v2',candidate){
  apiRoles(profile);
  if(profile.startsWith('four-isolated-'))return legacyCoverageHash();
- const inventory=buildInventory(repositoryRoot);
- return createHash('sha256').update(JSON.stringify({profile,balance:apiBalancePolicy,manifest:JSON.parse(fs.readFileSync(new URL('./api-suites.json',import.meta.url))),units:inventory.units.map(u=>({id:u.id,source:u.source,sha256:createHash('sha256').update(u.code).digest('hex'),exclusive:u.exclusive})),plan:partition(inventory.units,apiRoles(profile).length).map(b=>({shard:b.shard,units:b.units.map(u=>u.id)})),core:['verify','test:db','dev:seed','dev:health','db:advisors'],reset:'current-manifest; empty auth/tenant/receipts per runner',concurrency:2,test_timeout:'native'})).digest('hex');
+ const inventory=candidate?.inventory??buildInventory(repositoryRoot);
+ const manifest=candidate?.manifest??JSON.parse(fs.readFileSync(new URL('./api-suites.json',import.meta.url)));
+ return createHash('sha256').update(JSON.stringify({profile,balance:apiBalancePolicy,manifest,units:inventory.units.map(u=>({id:u.id,source:u.source,sha256:createHash('sha256').update(u.code).digest('hex'),exclusive:u.exclusive})),plan:partition(inventory.units,apiRoles(profile).length).map(b=>({shard:b.shard,units:b.units.map(u=>u.id)})),core:['verify','test:db','dev:seed','dev:health','db:advisors'],reset:'current-manifest; empty auth/tenant/receipts per runner',concurrency:2,test_timeout:'native'})).digest('hex');
 }

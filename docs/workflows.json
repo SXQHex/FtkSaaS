@@ -91,6 +91,7 @@
         "apps/backend/scripts/check-migrations.py",
         "apps/backend/scripts/ci/api-suites.json",
         "apps/backend/scripts/ci/api-suites.mjs",
+        "apps/backend/scripts/ci/candidate-inventory.mjs",
         "apps/backend/scripts/ci/check-quality.mjs",
         "apps/backend/scripts/ci/cleanup.mjs",
         "apps/backend/scripts/ci/collect.mjs",
@@ -283,8 +284,8 @@
         "management_state_get_v1"
       ],
       "review": {
-        "fingerprint": "4cb942ac86691d5eac4b76d91cfebdc48fd4d040ace715e2f6af1be8b261bee0",
-        "reason": "HTTP413 recovery shares referenced standalone Ajv validators with inlineRefs=false; same schemas/formats/440 exports and request/response boolean semantics. Source budget/parity tests added. No API/JWT/DB gate changes."
+        "fingerprint": "3982f827b167952ca288934f70e2ef0611813268ddea80c98e0bcfcf6c87a729",
+        "reason": "PR204 synchronized with main2865885: retain delivery filters and growing-test inventory safeguards; share standalone validator refs with unchanged440 exports. Source budget/parity tests retained; generated reference conflicts rebuilt."
       }
     },
     {
