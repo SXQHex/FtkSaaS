@@ -1269,7 +1269,11 @@
     "enableMarketingConfirm": "Bu stüdyo için uygulama içi pazarlama bildirimlerini açacaksın.",
     "disableMarketingConfirm": "Bu stüdyo için uygulama içi pazarlama bildirimlerini kapatacaksın. Zorunlu işlem sonuçları devam eder.",
     "savePreferences": "Tercihimi kaydet",
-    "reviewPreferences": "Değişikliği incele"
+    "reviewPreferences": "Değişikliği incele",
+    "demoTitle": "Bildirim ve geçmiş tasarımı",
+    "demoHint": "Bu sayfadaki bildirimler, tercihler ve işlemler sentetiktir. Gerçek kayıt okunmaz veya değiştirilmez.",
+    "demoLostResponse": "Sonraki okundu işleminde yanıt kaybını örnekle",
+    "demoLostArmed": "Yanıt kaybı örneği hazır"
   },
   "documents": {
     "uploadTitle": "Belge dosyası yükle",
