@@ -285,8 +285,8 @@
         "management_state_get_v1"
       ],
       "review": {
-        "fingerprint": "088f1df41317adf1097775834521866d0e529263d290a614d4abdf61587f7383",
-        "reason": "Reviewed PR234 native fixture failure: flexible reservation writer requires reservation_window before capacity_check. Added explicit missing-policy rejection then normal policy publication; preserved physical CAPACITY_FULL assertion and all original behavior."
+        "fingerprint": "1eb8e4f1bcd07171627ff6e9ab1827352b03ff9fc9e554a528f7a82e1ae7ec75",
+        "reason": "Reviewed final catalogue grouping regression and single-transaction version12 migration; request/receipt protocol and all field schemas/defaults/consumers remain unchanged."
       }
     },
     {
@@ -1174,7 +1174,10 @@
         "apps/backend/database/starter-work-templates.sql",
         "apps/backend/database/subscriber-report-catalog.sql",
         "apps/backend/supabase/migrations/20261102070247_subscriber_report_catalog.sql",
-        "docs/settings.md"
+        "docs/settings.md",
+        "apps/backend/database/settings-catalog-v12.sql",
+        "apps/backend/database/settings-behavior-groups.sql",
+        "apps/backend/supabase/migrations/20261106201122_settings_behavior_groups.sql"
       ],
       "operations": [
         "notification_preferences_set_v1",
@@ -1189,8 +1192,8 @@
         "settings_preparation_resolve_v1"
       ],
       "review": {
-        "fingerprint": "16462426dd235bc22dda135d212391bebe210d45cab97ec6e9b3e75c479a2e68",
-        "reason": "Reviewed native historical-plan fixture correction: job identity is UUID and dedupe key remains its text representation; settings behavior and all assertions unchanged."
+        "fingerprint": "cf36b567a7b654d1aa9b05a4ffea22db302c720596f07d522f7c74d0e58456cf",
+        "reason": "Reviewed final single-transaction v12 catalogue/version guard, unchanged ACL/identity/defaults, added native catalogue group assertions and the settings guide; 69-group audit keeps incomplete subfields open."
       }
     },
     {

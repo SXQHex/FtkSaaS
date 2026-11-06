@@ -2,6 +2,12 @@
 
 Güncel kabul/hosted durum [00 devirde](../apps/backend/docs/00-FtkSaaS-yeni-sohbet-devir.md), ortak/backend açık alanlar [proje backlog’unda](../apps/backend/docs/remaining-work.md#ertelenmiş-ve-kapsam-dışı), frontend FD tüketimi [WEB-S12’de](../apps/web/docs/todo.md#web-s12) tutulur. 69 davranış grubunun normatif sahibi [02 sözleşmedir](contracts/02-FtkSaaS-teknik-sozlesme.md#ayarlar-sozlesmesi-ve-davranis-sprinti); bu belge gerçek typed alan ve tüketici eşlemesidir. Starter FD07 başlangıcı [teknik sözleşmeden](contracts/02-FtkSaaS-teknik-sozlesme.md#starter-başlangıç-ayarları-ve-selfpublic) okunur.
 
+## Katalog grupları ve sıfırlama sınırı
+
+`settings_catalog_get_v1` katalog sürümü12,87 desteklenen alanı24 normatif davranış grubuna bağlar. `group` bir izin veya domain komutu değildir. Takvim görünümü S10; kullanıcı sessiz saatleri ve üyenin olay bazlı hatırlatma seçimleri S13; merkez hatırlatmaları M14, org hatırlatmaları O07; paket hazırlık şablonları merkezde M10, orgda O10 grubundadır. S12 kanal/amaç tercihi bu ayrımdan bağımsızdır. Kalan normatif gruplar native Auth/domain komutları veya henüz desteklenmeyen alt alanlar içerebilir;87 alan bütün69 grubun teslimi sayılmaz.
+
+İstemci grubu güncel katalogdan çözer; eski grup üyeliğini sabitlemez. Reset isteği grup kimliği yerine açık `fields` listesi gönderir. Önizlemenin before/after etkisi kullanıcıya gösterilir; katalog etiketinden örtük reset veya yazma yetkisi türetilmez. Grup düzeltmesi kayıtlı değer, default, miras, consumer veya geçmişi taşımaz; daha önce açık alanlarla alınmış reset önizlemesi aynı sürüm/yetki şartlarıyla korunur.
+
 ## İşlemler
 
 ### ST-03 — Starter tüketici kapsamı

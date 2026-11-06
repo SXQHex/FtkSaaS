@@ -33,6 +33,7 @@ test('User settings concurrency, reset and history',async t=>{
  try{
  const {org,center,person}=await settingsTenant(fixture);
   await t.test('user data is global and self-only; strict keys and live versions protect retries',async()=>{
+   const catalogue=await must(owner,'settings_catalog_get_v1',{scope:'user'});assert.deepEqual(catalogue.fields.filter(f=>f.group==='S10').map(f=>f.key).sort(),['calendar_view','show_weekends']);for(const f of catalogue.fields.filter(f=>f.key.startsWith('quiet_hours_')))assert.equal(f.group,'S13');
    const v=await read(owner,{scope:'user'});assert.equal(v.values.theme,'system');assert.equal(v.values.language,'auto');assert.equal(v.version,0);assert.equal(v.values.font_scale,null);assert.equal(v.values.startup_context,null);
    const k=key(),patch={theme:'dark',honorific:'Teacher'};const saved=await write(owner,{scope:'user'},patch,v.version,k);
    assert.equal(saved.version,1);assert.equal((await write(owner,{scope:'user'},patch,v.version,k)).replayed,true);
@@ -111,6 +112,7 @@ test('Tenant settings authority, privacy and notification delivery',async t=>{
   await t.test('member, center, organization and platform scopes are separate; role revocation also denies replay',async()=>{
    for(const [scope,patch] of [['member',{profile_visible:true}],['organization',{description:'Organization description'}],['center',{description:'Center description'}]]){
     const q={scope,org_id:org,...scope==='center'?{center_id:center}:{}};const v=await read(owner,q);if(scope==='member')assert.equal(v.values.in_app_reminders,true);await write(owner,q,patch,v.version);assert.equal((await read(owner,q)).values[Object.keys(patch)[0]],Object.values(patch)[0]);
+    const catalogue=await must(owner,'settings_catalog_get_v1',q);for(const f of catalogue.fields){if(f.consumer==='reminder_settings')assert.equal(f.group,{member:'S13',organization:'O07',center:'M14'}[scope]);if(f.key==='package_templates')assert.equal(f.group,{organization:'O10',center:'M10'}[scope]);}
    }
    await fail('NOT_FOUND',other,'settings_get_v1',{scope:'member',org_id:org});
    await fail('FORBIDDEN',owner,'settings_get_v1',{scope:'platform'});

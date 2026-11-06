@@ -1,5 +1,96 @@
 # Güncel kaynak ve kabul
 
+## A03/S10 kaynak ve ayar denetimi — 6 Kasım 2026
+
+Aktif dal `feature/backend-evidence-settings-audit`, başlangıç main `0ebaaea7fb44eff548fc2ddcf4838379b389d8c5` (PR236). Aynı SHA'nın [main proof](https://github.com/SXQHex/FtkSaaS/actions/runs/42285309243), [merge proof](https://github.com/SXQHex/FtkSaaS/actions/runs/42285309497) ve [development](https://github.com/SXQHex/FtkSaaS/actions/runs/42285376465) completed/success doğrulandı. Açık backend PR yoktu. Bu kaynak yeni native aday kabulüne gider; başlangıç başarısı yeni kaynak/native kabulü sayılmaz.
+
+### S10 katalog grup düzeltmesi
+
+69 normatif grubun karşılaştırmasında22 alanın group metadata'sı yanlış bulundu: org/merkez/member hatırlatma ve kullanıcı sessiz saatleri S10 altında, paket hazırlık şablonları O06/M07 altındaydı. Migration119 katalogv12 ile bunları O07/M14/S13 ve O10/M10'a bağlar.87 alanın key/schema/default/consumer değeri birebir korunur; hiçbir kayıtlı ayar, geçmiş, rol, plan veya generic reset protokolü değiştirilmez. SettingsCatalog beş scope'un catalog_version sabiti12 ve üretilmiş okuyucu validatorları aynı teslimdedir. Mevcut frontend tüketicisi katalog group/version sabitlemez; frontend kodu değişmez. Yeni tüketici sürümü ve grupları güncel katalogdan okur; kesin API davranışı docs/settings sahibindedir.
+
+Yeni sözleşme testi önce O06≠O10 ile kırmızı, düzeltmeyle yeşildir; eski v11 alanlarının group dışındaki tüm içeriğini karşılaştırır ve yeni migration'ı kaynaklarla eşler. İzole PostgreSQL kontrolü87 alan/24 grup, katalog sürümü12, fonksiyon OID/ACL/security-invoker/search_path korunumu ve beklenmeyen eski sürümde atomik ret geçti. Bu kontroldeki execute gövdesi katalog stub'ıdır; native Auth/API/hosted kabulü değildir. Mevcut gerçek native settings köküne kullanıcı/merkez/org/member katalog grup assertionları eklendi; önceki assertion/süre/kök/sahiplik korunur. İki ek satırın yalnız range/hash izi güncellendi. Yeni kaynak native CI/main/development kabulü henüz verilmedi.
+
+Yerel son verify270 sözleşme/yönetişim/restore +135 CI +10 kalite testi (415) başarılıdır. Gerçek belge kontrolü35 dosya/1679 yerel bağlantı, floor guard0 bulgu; bağımsız son kaynak incelemesinde Critical/Required0. Yeni native aday/main/development ve hosted katalogv12 kabulü henüz yoktur.
+
+### 69 grubun tüketici ve açık sınır envanteri
+
+Tablo tam grup envanteridir; bütün alt alanların runtime teslimi değildir. Sayı typed tercih alanlarını gösterir;0 native/domain tüketicinin yokluğu anlamına gelmez. Her typed alanın default/schema/scope/consumer kaynağı config/frontend-settings.json, gerçek uygulaması frontend-settings/ilgili consumer SQL ve settings rehberidir. Native Auth kendi sağlayıcı kuralını, domain API açık komut/policy değerini kullanır; bunlar için hayali generic default/miras üretilmez. User/member self; center canlı CM; organization Owner/OM ve fatura Owner-only; platform yetkili operator sınırları mevcut native testlerle ayrı korunur. Şablon çözümü mevcut domain yazma yetkisi vermez. Aşağıdaki S/M/O/P kimlikleri ayar namespace'idir; görev numaralarıyla aynı kayıt değildir.
+
+| Ayar grubu | Typed alan | Mevcut tüketici | Kapanmamış sınır / görev sahibi |
+|---|---:|---|---|
+| S01 | 1 | Profil/medya komutları; honorific | Fotoğraf/paylaşım tüketimi ve ekran kabulü S10/G01–G03. |
+| S02 | 0 | Native Auth ve hesap kimlik projeksiyonu | Gerçek telefon/kurtarma ortamı S08; org iletişimi ayrı. |
+| S03 | 0 | Güvenli davet/link/merge komutları | Yanlış hesap/expiry/revoke frontend kabulü S07/XREQ-004. |
+| S04 | 0 | Native parola/recovery ve güvenlik bildirimi | Hosted nonce/PKCE/recovery S08. |
+| S05 | 0 | Native Google/TOTP ve hesap yöntemleri | Sağlayıcı/ekran S08; passkey erteli, yeni yöntem açılmaz. |
+| S06 | 0 | Kendi session/history/revoke komutları | Gerçek cihaz/çıkış tüketimi S08/G; cihaz etiketi yetki değil. |
+| S07 | 7 | Hesap gösterim tercihleri | Cihaz dili/timezone/DST ekran kabulü G; iş zamanı değişmez. |
+| S08 | 4 | Tema/kontrast/hareket/ölçek | Cihaz/erişilebilirlik ekran kabulü G; sistem tercihi istemcide. |
+| S09 | 2 | Hesap başlangıç bağlamı tercihleri | Yetkili bağlam çözümü ve cihaz temizliği G/S08. |
+| S10 | 4 | Takvim görünümü; member rapor/import şablonları | Kaydedilmiş her ekran/sütun seçeneği desteklenmiş sayılmaz; S10. |
+| S11 | 0 | Kişisel takvim aboneliği komutları | Gerçek host/GET/HEAD/seans route S15. |
+| S12 | 1 | in_app amaç tercihi; bildirim kullanılabilirliği | Desteklenmeyen kanal açılmaz; P14/P15 dışında kalan consumer S10. |
+| S13 | 7 | Self olay hatırlatmaları; global sessiz saat | P15 teslim kanıtı korunur; cihaz/gösterim tüketimi G/S10. |
+| S14 | 8 | İlgi/öneri ve pazarlama/reklam/analitik tercihleri | Tercih teknik veri toplama/hukuki izin değildir; O08/S10. |
+| S15 | 4 | Üye paylaşım tercihleri ve katılımcı projeksiyonu | Ayrıntılı amaç/metin izin geçmişi bütünlüğü O08/S10. |
+| S16 | 0 | Mevcut hesap/org lifecycle komutları | Veri kopyası ve doğrulanmış imha O08; tamamlandı uydurulmaz. |
+| S17 | 0 | Kendi güvenlik geçmişi; alan seçmeli reset | Her güvenilen cihaz/cache akışı teslim edilmiş sayılmaz; S08/S10. |
+| M01 | 4 | Merkez komutları ve kimlik/iletişim tercihleri | Harita/ulaşımın bütün alt alanları mevcut DTO değil; S10. |
+| M02 | 1 | Merkez timezone/availability; hazırlık şablonları | Geçmiş seans değişmez; bütün takvim şablonları S10. |
+| M03 | 0 | Oda/kaynak/kapasite komutları | Kaynak varsayılanları domain API; bütün görünüm seçenekleri S10. |
+| M04 | 0 | Merkez disiplin komutları | Sıra/simge/renk gibi eksik alt alanlar S10; yeni global katalog V2. |
+| M05 | 0 | Merkez rol/grant komutları | Varsayılan izin şablonları tam değil; S10/O04. |
+| M06 | 1 | Program/seans komutları; süre hazırlığı | Her biçim/tekrar/özel gün defaultu hazır değil; S10. |
+| M07 | 0 | Talep/rezervasyon/bekleme ve pencere politikaları | Domain politika yayını; paket şablonu bu gruptan çıkarıldı. Eksik tercihler S10. |
+| M08 | 0 | Borç/negatif hak/kişisel limit komutları | Domain politika/etki kapıları; serbest generic ayar yok; S10. |
+| M09 | 0 | Yoklama/gerçekleşme/düzeltme komutları | Yeni yoklama default/gösterim alt alanları S10. |
+| M10 | 1 | Paket hazırlığı ve ürün/satış komutları | Her indirim/fiyat defaultu hazır değil; S10/P03. |
+| M11 | 0 | Tahsilat/iade/düzeltme komutları | Banka/finans özet defaultları tam değil; S10. |
+| M12 | 0 | Eğitmen anlaşması komutları | Anlaşma default/şablon kataloğu tam değil; S10/P04. |
+| M13 | 0 | Etkinlik komutları | Yeni etkinlik defaultları tam değil; S10/P12–P13. |
+| M14 | 6 | Merkez hatırlatma ayarları | P15 default/override kapıları; her şablon/alıcı seçeneği hazır değil; S10. |
+| M15 | 0 | Belge yükle/yayın/etki/onay | S13 hosted kapalı; metin/dil/şablon alt alanları S10. |
+| M16 | 3 | Public profil/yayın/başvuru komutları | Gerçek widget/hostname/action S14/P07. |
+| M17 | 0 | Plan kapılı iş otomasyonu komutları | P16 worker kanıtı korunur; hazır şablon tercihleri S10. |
+| M18 | 1 | Merkez rapor şablonları ve export | S11 hosted kapalı; bütün rapor tasarım seçenekleri S10. |
+| M19 | 1 | Merkez import şablonları ve mapping | S12 hosted kapalı; yeni paylaşım seçenekleri S10. |
+| M20 | 0 | Mevcut policy override ve alan seçmeli reset | Bütün gruplara genellenmiş miras/yayın ekranı/APIsi yok; S10. |
+| M21 | 0 | CRM alım/lead/takip/atama komutları | Yeni aşama/alan/sıra ayar kataloğu tam değil; S10/P05–P11. |
+| M22 | 0 | Canlı role/grant/management ve ayar history | Her ayar grubunun alan bazlı izin/denetimi S10/O04. |
+| O01 | 15 | Org kimlik/marka/fatura/public tercihleri | Fatura Owner-only; tema/font paketi null destek sınırı korunur; S10. |
+| O02 | 1 | Ortak politika yayını ve availability hazırlığı | Kopya canlı miras değildir; bütün alanların lock/override desteği S10. |
+| O03 | 0 | Org/merkez görev ve izin komutları | Devredilen izin şablonu/toplu apply ayarları tam değil; S10/O04. |
+| O04 | 0 | Native MFA ve mevcut canlı yetkilendirme | Genel org-rol MFA/reauth şartı kataloğu tam değil; S10/O04. |
+| O05 | 0 | Org disiplin kataloğu komutları | Renk/simge/sıra/defaultların bütünü hazır değil; S10. |
+| O06 | 0 | Hesap dil/bölge tercihleri ayrı tutulur | Org dil/bölge default alanları katalogda yok; S10. Paket şablonu buradan çıkarıldı. |
+| O07 | 7 | Org hatırlatma ve merkez override tercihleri | P14/P15 teslim kanıtı korunur; tüm gönderici/şablon alanları S10. |
+| O08 | 0 | Org belge ve sürümlü gereksinim komutları | S13 hosted kapalı; her kurumsal şablon/dil/yerel kilit S10. |
+| O09 | 0 | Ortak CRM inbox/route/review komutları | Yeni ortak aşama/alan ayarları tam değil; S10/P05–P11/B02. |
+| O10 | 1 | Paket hazırlığı; ürün/satış komutları | Yeni şablon ürün yayını değildir; bütün kilit/defaultlar S10. |
+| O11 | 0 | Katılım/negatif hak/pencere policy komutları | Geçmiş rezervasyon koruması ayrı; tüm ortak yerel sınırlar S10. |
+| O12 | 0 | Finans ve merkezler arası hesaplaşma komutları | Banka/alıcı/özet ayar kataloğu tam değil; S10/B03. |
+| O13 | 0 | Otomasyon komutları/worker | Ortak hazır iş şablonları tam değil; S10/P16. |
+| O14 | 2 | Org rapor/import şablonları | Canlı tüketici yetkisi paylaşım izninden ayrıdır; kalan seçenekler S10. |
+| O15 | 0 | Hazır sağlayıcı backend ingress/worker | Meta/Google gerçek kurulum kullanıcı kararıyla erteli; P08/P09/S10. |
+| O16 | 0 | Üye paylaşımı ve public alan seçimi | Org amaç/metin/alıcı ayarlarının bütünü hazır değil; S10/O08. |
+| O17 | 0 | SaaS dönem/plan/yenileme komutları; fatura O01 | S16 kaynak kapalı; harici otomatik ödeme sağlayıcısı açılmaz; S10. |
+| O18 | 1 | Yeni merkeze tek sefer program süresi kopyası | Bütün takvim/çalışma günü defaultları mevcut değil; S10. |
+| O19 | 0 | Mevcut anlaşma/ücret model komutları | Ortak anlaşma şablon kataloğu eksik; S10/P04. |
+| O20 | 0 | Etkinlik komutları | Ortak event default/şablon kataloğu eksik; S10/P12–P13. |
+| O21 | 0 | Settings history/reset ve domain sürümlü yayın | Bütün ayarlarda ileri yürürlük/taslak/rollback yok; S10. |
+| P01 | 4 | Uygulama/destek/bakım metni tercihleri | Hazır dil/logo/default kataloglarının bütünü yok; S10. |
+| P02 | 0 | Native Auth config ve hesap güvenlik komutları | Teknik Auth motoru işletim alanı; genel platform ayar UI/API yok; S08/O04. |
+| P03 | 0 | Mevcut sürümlü plan katalog ve sabit limit motoru | Yeni generic plan/fiyat ayar arayüzü yok; S10/P01/S16. |
+| P04 | 0 | Kaynakta kapalı typed katalog ve settings API | Yeni key/schema teknik geliştirmedir; genellenmiş ileri yayın yok; S10. |
+| P05 | 0 | Yetkili scoped Cron/worker işletimi | Teknik scheduler ayar ekranı erteli; O01–O03/O10; business B05 ile ilgili değil. |
+| P06 | 0 | Mevcut posta/bildirim sağlayıcı workerı | Sırlar normal ayar readinde yok; teknik config/şablon UI tam değil; S10/O02. |
+| P07 | 0 | Dosya/job sınırları ve mevcut veri lifecycle | Teknik saklama/restore/aktarımı ayar ekranı kapatmaz; O05–O08/O10. |
+| P08 | 0 | Public/CRM sağlayıcı ingress | Bot/imza/secret teknik alan; gerçek form/sağlayıcı P07–P09/S14. |
+| P09 | 0 | Mevcut platform izinleri ve işletim kayıtları | Support/impersonation gibi yeni yetki yok; teknik bakım/CI Yönetim, O01–O10. |
+
+S10.2 envanter karşılaştırması tamamlandı; S10 genel kapanışı verilmez. Özellikle O06 org dil/bölge defaultları, M12/O19 anlaşma şablonları, M20/O21 genel miras/yayın ve O03 rol şablonları gibi gerçek eksikler S10.3'te kalır. Onaylanmış ama henüz sunulmayan alanlar frontend'de kaydedilmiş/etkin gösterilmez. Bu tablo A03.2/A03.3'ün33 özellik için gerçek test/hosted/plan eşlemesinin yerine geçmez; o genel kapı açık kalır. Teknik işletim ayarlarının ertelenmesi yeni ürün kararı değildir; normatif erteleme korunur.
+
+
 ## Eylem yetkisi keşfi — XREQ-023/024
 
 [PR234](https://github.com/SXQHex/FtkSaaS/pull/234), main `47e6e0d3d1a190c3d313441b522cbc9df0125f02` ile birleşti. Head `7932a21f1154be7f835155b8425e9d6f192916da`, base `4a2bc94a27a420973e339f114d68f1542f2ef529`, tested merge aynı `47e6e0d3d1a190c3d313441b522cbc9df0125f02`; [aday](https://github.com/SXQHex/FtkSaaS/actions/runs/42276705226), [main proof](https://github.com/SXQHex/FtkSaaS/actions/runs/42278972299), [development](https://github.com/SXQHex/FtkSaaS/actions/runs/42279042012) ve [Vercel](https://github.com/SXQHex/FtkSaaS/actions/runs/42279042152) completed/success doğrulandı. Kaynak/native/main/development backend teslimi kapalıdır; frontend ekran kabulü karşı alanın sorumluluğundadır.
@@ -13,7 +104,7 @@ Migration118 mevcut `management_state_get_v1` içinde altı typed selector'ı ge
 <a id="a03s15-aktif-backend-kabul-paketi"></a>
 ## A03–S15 hosted kabul paketi — 6 Kasım 2026
 
-Aktif dal `feature/backend-hosted-acceptance`; taban main `f9ead24ee40adbbc4140e4361506d52d84d57a44` (PR233). [Main proof](https://github.com/SXQHex/FtkSaaS/actions/runs/42281965972), [merge proof](https://github.com/SXQHex/FtkSaaS/actions/runs/42281965458), [development](https://github.com/SXQHex/FtkSaaS/actions/runs/42282766841) ve [Vercel](https://github.com/SXQHex/FtkSaaS/actions/runs/42282766758) completed/success doğrulandı. PR235/233 yalnız frontend kaynakları değiştirdi; PR234 sonrası backend/API farkı yoktur. Bu paket yalnız backend kabul/takip ve kendi talep değerlendirmelerini günceller; runtime, migration, sözleşme, CI veya frontend kodu değişmez.
+PR236 ile tamamlanan hosted paketin dalı `feature/backend-hosted-acceptance`; taban main `f9ead24ee40adbbc4140e4361506d52d84d57a44` (PR233). [Main proof](https://github.com/SXQHex/FtkSaaS/actions/runs/42281965972), [merge proof](https://github.com/SXQHex/FtkSaaS/actions/runs/42281965458), [development](https://github.com/SXQHex/FtkSaaS/actions/runs/42282766841) ve [Vercel](https://github.com/SXQHex/FtkSaaS/actions/runs/42282766758) completed/success doğrulandı. PR235/233 yalnız frontend kaynakları değiştirdi; PR234 sonrası backend/API farkı yoktur. Bu paket yalnız backend kabul/takip ve kendi talep değerlendirmelerini günceller; runtime, migration, sözleşme, CI veya frontend kodu değişmez.
 
 ### S12 gerçek dosya, Cron ve tekrar kabulü
 

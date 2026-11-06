@@ -109,6 +109,19 @@ test('subscriber numbers are lossless decimal identifiers on person and report p
  assert(valid('ReportColumns',['group_key','subscriber_number']));
  assert(!valid('PersonSummary',{...person,subscriber_number:1001}));
 });
+test('settings catalogue groups isolate calendar display, reminders and package preparation without changing stored fields',()=>{
+ const fields=JSON.parse(fs.readFileSync('config/frontend-settings.json')).fields;
+ for(const f of fields){
+  if(f.consumer==='reminder_settings')assert.equal(f.group,{organization:'O07',center:'M14',member:'S13'}[f.scope],f.scope+'.'+f.key);
+  if(f.consumer==='reminder_quiet_until')assert.equal(f.group,'S13',f.key);
+  if(f.key==='package_templates')assert.equal(f.group,{organization:'O10',center:'M10'}[f.scope],f.scope);
+ }
+ assert.deepEqual(fields.filter(f=>f.scope==='user'&&f.group==='S10').map(f=>f.key).sort(),['calendar_view','show_weekends']);
+ const previous=JSON.parse(fs.readFileSync('database/settings-catalog-v11.sql','utf8').split("$fields$select '")[1].split("'::jsonb$fields$")[0].replaceAll("''","'"));
+ const withoutGroups=xs=>xs.map(({group,...rest})=>rest);assert.deepEqual(withoutGroups(fields),withoutGroups(previous));
+ const config=JSON.parse(fs.readFileSync('config/frontend-settings.json'));const sql=fs.readFileSync('database/settings-catalog-v'+config.version+'.sql');
+ const migration=fs.readdirSync('supabase/migrations').find(x=>x.endsWith('_settings_behavior_groups.sql'));assert(migration);assert.equal(fs.readFileSync('supabase/migrations/'+migration,'utf8'),sql.toString().replace('commit;\n',fs.readFileSync('database/settings-behavior-groups.sql','utf8')+'commit;\n'));
+});
 test('subscriber report column is supported by every persisted template catalogue',()=>{
  const config=JSON.parse(fs.readFileSync('config/frontend-settings.json'));
  const fields=config.fields.filter(x=>x.key==='report_templates');assert.equal(fields.length,3);
