@@ -1,5 +1,7 @@
 "use client";
 
+import dynamic from "next/dynamic";
+import { WorkspaceLoading } from "../workspace-loading";
 import { useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
 import type { CenterView, OrganizationView } from "@ftksaas/api-contracts";
@@ -16,7 +18,10 @@ import { getCalendar, errorMessageKey } from "../../lib/api";
 import { SessionCalendar } from "./session-calendar";
 import { SessionDetail } from "./session-detail";
 import { LessonRequests } from "../bookings/lesson-requests";
-import { ProgramManager } from "../programs/program-manager";
+const ProgramManager = dynamic(
+  () => import("../programs/program-manager").then((module) => module.ProgramManager),
+  { loading: WorkspaceLoading },
+);
 
 export function ScheduleWorkspace({
   studios,

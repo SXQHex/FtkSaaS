@@ -100,8 +100,9 @@ export async function sendSetupCommand(command: SetupCommand) {
   return setupCall(command.operation, command.input);
 }
 export type SetupScope = { actorId: string; orgId: string; centerId?: string };
+export const setupActorPrefix = (actorId: string) => `ftksaas:setup:v1:${actorId}:`;
 export const setupStorageKey = (scope: SetupScope, slot: string) =>
-  `ftksaas:setup:v1:${scope.actorId}:${scope.orgId}:${scope.centerId ?? "organization"}:${slot}`;
+  `${setupActorPrefix(scope.actorId)}${scope.orgId}:${scope.centerId ?? "organization"}:${slot}`;
 export type PendingSetup = { command: SetupCommand; blocked?: boolean };
 const keyPattern = /^[a-f0-9]{8}-[a-f0-9]{4}-7[a-f0-9]{3}-[89ab][a-f0-9]{3}-[a-f0-9]{12}$/i;
 const fields: Record<SetupWrite, string[]> = {

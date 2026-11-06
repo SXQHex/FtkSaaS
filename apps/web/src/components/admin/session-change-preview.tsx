@@ -5,7 +5,7 @@ import Link from "next/link";
 import { useTranslations } from "next-intl";
 import { Button } from "@ftksaas/ui/components/button";
 import { SessionChangeFlow } from "../calendar/session-change";
-import { SessionSummary } from "../calendar/session-detail";
+import { SessionSummary } from "../calendar/session-summary";
 import { Preferences } from "../preferences";
 import { sampleChangeActions, sampleSession } from "./session-change-fixtures";
 

@@ -14,6 +14,22 @@ Build önbelleği apps/web/turbo.json içinde .next çıktıları, açık NEXT_P
 
 TypeScript sürümü kök pnpm-workspace.yaml katalogundaki 7.0.2'dir. Next.js 16.4.3 varsayılan proje-yerel tsc CLI yoluyla build sırasında tip kontrolü yapar; ignoreBuildErrors veya TypeScript 6 fallback'i yoktur. Frontend lint için Oxlint, format için Oxfmt kullanılır; bağımsız tsc typecheck korunur. Oxlint React/Hooks, Next.js, JSX erişilebilirlik ve Vitest yerleşik kural gruplarını açar. `lint`, uyarıları hata sayar ve ardından Oxfmt check çalıştırır; bu nedenle mevcut `check:frontend` ve frontend CI format denetimini de içerir. Type-aware lint için ek tsgolint bu geçişe eklenmez. Vitest/MSW ve Playwright sürümleri manifestlerde tam sabittir. Node .nvmrc, pnpm kök packageManager kaynağından seçilir.
 
+## Next.js yükleme sınırları
+
+Ana `/` sayfası URL değişmeden `(workspace)` route grubunda kalır. Grubun `loading.tsx` sınırı native Auth beklenirken yalnız yerelleştirilmiş, kişisel veri içermeyen iskeleti stream eder. Root layout içindeki locale/cookie okuması bu sınırdan önce tamamlanır. Stream başlamışsa giriş/MFA yönlendirmesi HTTP200 gövdesindeki Next yönlendirmesi olabilir; istemci içerik almadan native kontrol tamamlanır. Sınır köke taşınmaz: seans/satış belgesi yollarının geçersiz UUID kontrolleri ve gerçek HTTP404 davranışı korunur.
+
+`StudioWorkspace` ekranları module-level `next/dynamic` sınırlarından, yalnız seçilen bölüm render edildiğinde yükler. Program yönetimi ve doğrudan seans düzenleme de eylem anında yüklenir. SSR varsayılanı korunur; `ssr:false` eklenmez. `WorkspaceLoading` mevcut tokenları, TR/EN yükleme metnini, canlı durum bildirimini ve azaltılmış hareket stilini kullanır. Seans özeti `session-summary.tsx` sahibindedir; doğrudan sayfa, Sheet'in bütün komut/düzenleme bağımlılıklarını sırf özeti göstermek için import etmez. Bileşen taşınması markup veya kapasite/tarih davranışını değiştirmez.
+
+Ana sayfa sunucunun doğruladığı native kullanıcı ID'sini React key ve `authUserId` olarak kabuğa verir. Başka native hesaba giriş veya çıkış mevcut snapshot'ı temizler, bekleyen okuma sonucunu düşürür ve Next router üzerinden girişe döner. Domain komutlarının aktörü ayrıca gerçek `account_get_v1.id` olmaya devam eder. Kullanıcı/tenant verileri için ortak Next cache veya iş komutları için Server Action katmanı eklenmez; mevcut typed Edge ve recovery günlüğü aynı tüketicilerde kalır. Ölçüm ve kabul durumu [aktif bölüm kaydındadır](todo.md#web-s06).
+
+## Erişim değişince bekleyen işlemler
+
+Ana kabuktaki **Bekleyen işlemler** paneli, `account_get_v1.id` doğrulandıktan sonra organizasyon/merkez listeleri reddedilse bile açılır. Hesap okuması diğer bootstrap okumalarıyla paraleldir; her bağımsız okumadaki Auth/session reddi eski snapshot ve kurtarma kimliğini düşürür. `PendingOperations` yalnız açıldığında `next/dynamic` ile yüklenir. Aynı sekmenin aynı aktöre ait gerçek org/merkez UUID'li `sale-renew:{person}`, `rights:{person}`, `bookings:{session}` ve `lesson-requests` kayıtları keşfedilir. Scope listeden tahmin edilmez; eski kayıttan alınır, `recoverSetup` doğrulamasından geçer. Tanınan bozuk kayıt eylemsiz hata verir; farklı komut ailesi/yabancı aktör/bozuk scope keşfe alınmaz. Panel S05/S06 işlemlerini kapsar; genel bir backend iş kuyruğu değildir.
+
+Panel var olan `useSetupCommand` ve `SetupFeedback` üzerinden işlem durumunu veya aynı payload/proof/key ile replay'i sunar. Yerel kayıt yetki sağlamaz; backend eski org/merkez ve güncel native rol/planı yeniden denetler. Kesin sonuç sonrası bootstrap yeniden okunur; hak/borç veya rezervasyon sonucu uydurulmaz, ilgili ekran güncel veriyi yeniden okur. Liste panel açılışında keşfedilir; başka yüzeyde kayıt değişmişse kapatıp yeniden açılır. Mobilde iç içe kutu kenarları azaltılır; mevcut tokenlar ve TR/EN metinleri kullanılır.
+
+Aynı slot birden fazla yüzeyde açık olabilir. Ortak hook, yeni yazı veya kontrol öncesinde ve geç yanıt sonrasında kaydın bütün JSON içeriğinin beklenen komutla eşitliğini denetler. Karşılaştırma payload ve blocked işaretini de içerir; salt operation_key yeterli değildir. Daha yeni kayıt varsa eski controller yazmaz, silmez veya blocked yapmaz; eylemleri durdurup görünümü yeniden açma yönergesi verir. Kontrol ile storage değişikliği arasında await yoktur. Bu koruma backend idempotency'nin yerine geçmez.
+
 ## Çalıştırma
 
 Repo kökünde:

@@ -1,7 +1,7 @@
 import { expect, test } from "vitest";
 import { screen, within } from "@testing-library/react";
 import { render } from "./render";
-import { SessionSummary } from "../src/components/calendar/session-detail";
+import { SessionSummary } from "../src/components/calendar/session-summary";
 import { sampleSession } from "../src/components/admin/session-change-fixtures";
 
 test("category capacity displays backend totals, held and remaining independently, including zero", () => {

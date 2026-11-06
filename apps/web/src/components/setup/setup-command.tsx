@@ -9,6 +9,7 @@ import {
   sendSetupCommand,
   setupCall,
   setupStorageKey,
+  type PendingSetup,
   type SetupCommand,
   type SetupScope,
 } from "../../lib/studio-setup";
@@ -31,9 +32,28 @@ export function useSetupCommand(
     };
   }, []);
   const key = setupStorageKey(scope, slot);
-  function clear() {
+  function ownsRecord(expected: PendingSetup | null) {
+    let current: unknown;
+    try {
+      const raw = sessionStorage.getItem(key);
+      current = raw === null ? null : JSON.parse(raw);
+    } catch {
+      setPending("invalid");
+      setMessage("storageFailed");
+      return false;
+    }
+    if (JSON.stringify(current) !== JSON.stringify(expected)) {
+      setPending("invalid");
+      setMessage("storageChanged");
+      return false;
+    }
+    return true;
+  }
+  function clear(expected: PendingSetup) {
+    if (!ownsRecord(expected)) return false;
     sessionStorage.removeItem(key);
     setPending(null);
+    return true;
   }
   async function run(command?: SetupCommand) {
     if (lock.current || pending === "invalid") return;
@@ -44,19 +64,21 @@ export function useSetupCommand(
     setMessage("");
     let sent = false;
     try {
+      if (!ownsRecord(pending)) return;
       sessionStorage.setItem(key, JSON.stringify(record));
       setPending(record);
       sent = true;
       const result = await sendSetupCommand(record.command);
       if (!mounted.current) return;
-      clear();
+      if (!clear(record)) return;
       setMessage("saved");
       onSaved(result?.primary_id);
     } catch (cause) {
       if (!mounted.current) return;
+      if (sent && !ownsRecord(record)) return;
       if (sent && !pending && !isUncertainSetup(cause) && cause instanceof ApiFailure) {
         try {
-          clear();
+          if (!clear(record)) return;
         } catch {
           setPending("invalid");
         }
@@ -89,12 +111,13 @@ export function useSetupCommand(
     lock.current = true;
     setBusy(true);
     try {
+      if (!ownsRecord(pending)) return;
       const result = await setupCall("operation_status_get_v1", {
         org_id: scope.orgId,
         operation: pending.command.operation,
         key: pending.command.input.operation_key,
       });
-      if (!mounted.current) return;
+      if (!mounted.current || !ownsRecord(pending)) return;
       if (
         result.operation !== pending.command.operation ||
         result.key !== pending.command.input.operation_key
@@ -103,11 +126,11 @@ export function useSetupCommand(
         return;
       }
       if (result.status === "succeeded") {
-        clear();
+        if (!clear(pending)) return;
         setMessage("saved");
         onSaved(result.result_reference?.id);
       } else if (result.status === "failed_final") {
-        clear();
+        if (!clear(pending)) return;
         setMessage("failed");
       } else if (result.status === "result_expired") {
         const blocked = { ...pending, blocked: true };
@@ -116,7 +139,7 @@ export function useSetupCommand(
         setMessage("uncertain");
       } else setMessage("uncertain");
     } catch {
-      setMessage("uncertain");
+      if (mounted.current && ownsRecord(pending)) setMessage("uncertain");
     } finally {
       lock.current = false;
       if (mounted.current) setBusy(false);
@@ -166,7 +189,7 @@ export function SetupFeedback({ command }: { command: ReturnType<typeof useSetup
           <p role="alert">{t(command.message)}</p>
         ))}
       {command.pending && (
-        <div className="space-y-3 rounded-lg border p-4">
+        <div className="space-y-3 rounded-lg border p-3 sm:p-4">
           <p>
             {t(
               command.pending === "invalid"
