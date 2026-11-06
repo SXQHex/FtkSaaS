@@ -219,7 +219,7 @@ Bildirim opt-in default ve miras kuralları [ayar sözleşmesinden](contracts/02
 
 **Hata/kurtarma:** Unsupported alan yazılabilir gibi sunulmaz. `null`, miras, false ve sıfır farklıdır. Gerçek provider/domain politikası bir görünüm tercihiyle kurulmuş sayılmaz. **Sonuç/yan etki:** Organizasyonun üç isteğe bağlı #RRGGBB ana/ikincil/vurgu rengi vardır; font paketi seçimi ve merkez özel renk yoktur. Kontrast, açık/koyu ve hata/başarı renkleri sistemce yönetilir. Ayarın davranış etkisi alan tüketici devrinden izlenir; generic ayar yazımı keyfî ürün kuralı oluşturmaz.
 
-İzin hazırlığı için yetkili CM, `settings_catalog_get_v1(scope:center)` içindeki `preparation_templates.permissions` kaynağını seçer; `settings_preparation_resolve_v1(kind:permission)` yalnız açık öneri verir. Hedef/sürüm ve izin başına ayrı `permission_set_v1` komutu ayrıca gerekir. Şablon yazımı, reset veya çözümleme mevcut yetkileri değiştirmez. F05/merkez yetkisi her çözümleme ve writer/replay aşamasında yeniden denetlenir; kapsam ve desteklenen izinler [ayar rehberindedir](settings.md#izin-hazırlık-şablonları).
+İzin hazırlığı için yetkili CM, `settings_catalog_get_v1(scope:center)` içindeki `preparation_templates.permissions` kaynağını seçer; `settings_preparation_resolve_v1(kind:permission)` yalnız açık öneri verir. Hedef/sürüm ve izin başına ayrı `permission_set_v1` komutu ayrıca gerekir. Şablon yazımı, reset veya çözümleme mevcut yetkileri değiştirmez. F05/merkez yetkisi her çözümleme ve writer/replay aşamasında yeniden denetlenir; kapsam ve desteklenen izinler [ayar rehberindedir](settings.md#personel-izin-hazırlık-şablonları).
 
 ## WF13
 

@@ -10,7 +10,7 @@ Güncel kabul/hosted durum [00 devirde](../apps/backend/docs/00-FtkSaaS-yeni-soh
 
 ## İşlemler
 
-### İzin hazırlık şablonları
+### Personel izin hazırlık şablonları
 
 Organization O03 ve center M05 `permission_templates` default boş dizidir. Her kapalı öğe `key`, `name`, açık `grants:[{permission,enabled}]` taşır. Desteklenen ilk alt küme `person.manage`, `person.activate`, `invite.student`, `reservation.write`, `attendance.draft`, `sale.write`, `finance.collect`tir. Her izin en çok bir kez bulunur; boş isim, yinelenen key/izin ve fazladan alan reddedilir. Diğer devredilebilir izinler bu alt teslimin hazırlık kataloğuna eklenmedi. Şablon rol, kişi, merkez kapsamı, yürürlük veya otomatik uygulama içermez; mevcut writer allowlist'ini genişletmez.
 
