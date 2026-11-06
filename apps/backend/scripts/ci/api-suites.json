@@ -726,7 +726,7 @@
         {
           "line": 2,
           "path": "apps/backend/tests/transactional-email-acceptance.mjs",
-          "sha256": "e7fd17a8ca8bb9425310030b2393e98a632547b0e3ab0d9ba30ca4ea05fe5183"
+          "sha256": "56443df8d603e8bef87729768cd4f3ca93f55a9b6a3ca12640dbf9ef2447be32"
         },
         {
           "line": 3,
@@ -746,7 +746,7 @@
         {
           "line": 6,
           "path": "apps/backend/tests/frontend-settings-acceptance.mjs",
-          "sha256": "3cdaf5dca3a267da74a9329c89db67a83c87029536644ad30e0f4301ee563a34",
+          "sha256": "7dba73584bd690d94ffe8e24323095785dce3f440b7a6d1dba8c405acc382bcd",
           "shared": [
             [
               1,
@@ -761,12 +761,12 @@
               141
             ],
             [
-              170,
-              171
+              174,
+              175
             ],
             [
-              212,
-              213
+              216,
+              217
             ]
           ],
           "parts": [
@@ -788,7 +788,7 @@
                 ],
                 [
                   142,
-                  169
+                  173
                 ]
               ]
             },
@@ -796,8 +796,8 @@
               "id": "settings-startup-context",
               "ranges": [
                 [
-                  172,
-                  211
+                  176,
+                  215
                 ]
               ]
             },
@@ -805,8 +805,8 @@
               "id": "settings-brand-colors",
               "ranges": [
                 [
-                  214,
-                  250
+                  218,
+                  254
                 ]
               ]
             }
@@ -1038,7 +1038,7 @@
         {
           "line": 153,
           "path": "apps/backend/tests/reminder-scheduling-acceptance.mjs",
-          "sha256": "10d26bac3e1fe3a8f33d12c177678395415734050b54182f6df2f6f03170a3c6"
+          "sha256": "b2670d4ef73be336a3d5e73d552eba4db2901c4165bff81b0440694a8e1a69d7"
         },
         {
           "line": 154,

@@ -284,8 +284,8 @@
         "management_state_get_v1"
       ],
       "review": {
-        "fingerprint": "cfe056190417c5312e4bc077fa62c6b6931310c8d25561b565bf8a580a6b763a",
-        "reason": "P15 DST regression extends the registered native suite; API envelope, ownership and complete inventory remain unchanged after source review."
+        "fingerprint": "89e346a42919cec6ae11c1d0ce47662bcaa31306edfc67c16159d26b278d5bcd",
+        "reason": "Reviewed source-bound inventory hashes and line ownership after focused native fixture corrections; complete 103-unit acceptance and quality gates preserved."
       }
     },
     {
@@ -1122,8 +1122,8 @@
         "document_publication_preview_v1"
       ],
       "review": {
-        "fingerprint": "76486f67065ff0c92265cf00325a900ffc3cd56d3ea590072e36762407914a56",
-        "reason": "Reviewed reminder-specific email opt-in, closed source mapping, quiet-hour final authorization and preserved mandatory in_app/transactional behavior; consumer details updated in settings guide."
+        "fingerprint": "7ad260c669ac38fe7aa55a6cd42ccfc2ea879c55272de55451fccf691a4262c3",
+        "reason": "Reviewed reminder email native regression: parse PostgreSQL bigint attempts without changing zero-attempt assertion, live preferences or quiet-hour authorization."
       }
     },
     {
@@ -1178,8 +1178,8 @@
         "settings_preparation_resolve_v1"
       ],
       "review": {
-        "fingerprint": "5106b23797e98130b2ce4511d617c42442d756970cd438f4fb8f3f4b4767c094",
-        "reason": "Reviewed reminder settings and quiet interval source: compare resolved IANA instants through DST gap and fold, preserving timing and reset contracts."
+        "fingerprint": "dd8772aeaf8a99b571ab1b2dd9868b21bed64b4f4778d1e72d46a7f0c1b0af08",
+        "reason": "Reviewed catalog round-trip fixture: denied center override is asserted before explicit Business organization enablement; every declared field and replay assertion remains."
       }
     },
     {
@@ -1411,8 +1411,8 @@
         "automation_save_v1"
       ],
       "review": {
-        "fingerprint": "af6e2afa891e2e12fba991bf4f7978fdc2abc5ebb73e16f8f436eef16ec61b33",
-        "reason": "Reviewed final failed-only retry scope/config/job version binding, current candidate/segment/creator checks, safe diagnostics and direct domain-result reference; successful effects remain non-retryable."
+        "fingerprint": "9cbb2600a72f2d40889ff173a40c18433ab2618ca52814307ca39734ed6c8873",
+        "reason": "Reviewed automation result and retry authorization: SECURITY INVOKER helpers receive only server-role SELECT UPDATE on private jobs; tenant and version guards remain."
       }
     },
     {
@@ -1631,8 +1631,8 @@
         "subscription_boundary_apply_v1"
       ],
       "review": {
-        "fingerprint": "dba504a9be724f3c88720767d7d5e5c2c2a66348d1da33a0537786f0971076df",
-        "reason": "Reviewed worker scheduling and delivery source: quiet periods end at the resolved IANA instant; new fold and gap tests preserve immediate in-app and final email authorization."
+        "fingerprint": "dcafba62f187ae19e6051ae0a6cc7e0f67152bea29f264d173da36148f1ccba1",
+        "reason": "Reviewed additive migration ACL and native attempts checks: dedicated worker LOGIN permissions and existing lease fences are unchanged; human API stays invoker scoped."
       }
     }
   ]

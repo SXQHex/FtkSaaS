@@ -1,5 +1,9 @@
 begin;
 alter table private.p05_jobs add column domain_result jsonb;
+-- Human API helpers retain SECURITY INVOKER. Only the server role may inspect
+-- job outcomes and reset a validated failed job; native worker LOGINs keep
+-- using their existing fenced SECURITY DEFINER entrypoints.
+grant select,update on private.p05_jobs to service_role;
 create function private.automation_retry_eligible(c private.p05_jobs,a core.automations,x private.p05_configuration_scopes) returns boolean language plpgsql stable security invoker set search_path='' as $$
 begin
  if not coalesce(x.enabled and a.state='active' and private.current_plan_name(c.org_id) in ('pro','business') and private.access_mode(c.org_id) in ('normal','grace') and c.center_id=any(x.execution_center_ids) and private.center_accessible(c.org_id,c.center_id) and private.is_manager(c.org_id,x.creator_person_id,c.center_id) and split_part(c.event_key,':',1)=a.version::text,false) then return false;end if;
