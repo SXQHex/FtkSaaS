@@ -22,6 +22,14 @@ Ana `/` sayfası URL değişmeden `(workspace)` route grubunda kalır. Grubun `l
 
 Ana sayfa sunucunun doğruladığı native kullanıcı ID'sini React key ve `authUserId` olarak kabuğa verir. Başka native hesaba giriş veya çıkış mevcut snapshot'ı temizler, bekleyen okuma sonucunu düşürür ve Next router üzerinden girişe döner. Domain komutlarının aktörü ayrıca gerçek `account_get_v1.id` olmaya devam eder. Kullanıcı/tenant verileri için ortak Next cache veya iş komutları için Server Action katmanı eklenmez; mevcut typed Edge ve recovery günlüğü aynı tüketicilerde kalır. Ölçüm ve kabul durumu [aktif bölüm kaydındadır](todo.md#web-s06).
 
+## Erişim değişince bekleyen işlemler
+
+Ana kabuktaki **Bekleyen işlemler** paneli, `account_get_v1.id` doğrulandıktan sonra organizasyon/merkez listeleri reddedilse bile açılır. Hesap okuması diğer bootstrap okumalarıyla paraleldir; her bağımsız okumadaki Auth/session reddi eski snapshot ve kurtarma kimliğini düşürür. `PendingOperations` yalnız açıldığında `next/dynamic` ile yüklenir. Aynı sekmenin aynı aktöre ait gerçek org/merkez UUID'li `sale-renew:{person}`, `rights:{person}`, `bookings:{session}` ve `lesson-requests` kayıtları keşfedilir. Scope listeden tahmin edilmez; eski kayıttan alınır, `recoverSetup` doğrulamasından geçer. Tanınan bozuk kayıt eylemsiz hata verir; farklı komut ailesi/yabancı aktör/bozuk scope keşfe alınmaz. Panel S05/S06 işlemlerini kapsar; genel bir backend iş kuyruğu değildir.
+
+Panel var olan `useSetupCommand` ve `SetupFeedback` üzerinden işlem durumunu veya aynı payload/proof/key ile replay'i sunar. Yerel kayıt yetki sağlamaz; backend eski org/merkez ve güncel native rol/planı yeniden denetler. Kesin sonuç sonrası bootstrap yeniden okunur; hak/borç veya rezervasyon sonucu uydurulmaz, ilgili ekran güncel veriyi yeniden okur. Liste panel açılışında keşfedilir; başka yüzeyde kayıt değişmişse kapatıp yeniden açılır. Mobilde iç içe kutu kenarları azaltılır; mevcut tokenlar ve TR/EN metinleri kullanılır.
+
+Aynı slot birden fazla yüzeyde açık olabilir. Ortak hook, yeni yazı veya kontrol öncesinde ve geç yanıt sonrasında kaydın bütün JSON içeriğinin beklenen komutla eşitliğini denetler. Karşılaştırma payload ve blocked işaretini de içerir; salt operation_key yeterli değildir. Daha yeni kayıt varsa eski controller yazmaz, silmez veya blocked yapmaz; eylemleri durdurup görünümü yeniden açma yönergesi verir. Kontrol ile storage değişikliği arasında await yoktur. Bu koruma backend idempotency'nin yerine geçmez.
+
 ## Çalıştırma
 
 Repo kökünde:

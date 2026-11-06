@@ -4,9 +4,9 @@ Aktif bölüm, kaynak ve kabulün tek sahibi [frontend todo kaydıdır](todo.md#
 
 ## Devam bağlamı
 
-PR220 main ve development/Vercel teslimi başarılıdır. PR222 ile main’e alınan satış/yenileme kurtarması liste ve kişi okuma reddinden bağımsız erişimi düzeltir. Gerçek native kontrollü yanıt kaybı/same-key replay ve yetkisiz aktör reddi kanıtı, sınırları ve korunan test satışları yalnız [S05 kaydındadır](todo.md#web-s05). PR222 main/development/web teslimi S06 devam diliminin taban kontrolünde doğrulandı; XREQ-021 self timeout ve S06 bağımlılığı sürer.
+PR220 main ve development/Vercel teslimi başarılıdır. PR222 ile main’e alınan satış/yenileme kurtarması liste ve kişi okuma reddinden bağımsız erişimi düzeltir. Gerçek native kontrollü yanıt kaybı/same-key replay ve yetkisiz aktör reddi kanıtı, sınırları ve korunan test satışları yalnız [S05 kaydındadır](todo.md#web-s05). PR222 main/development/web teslimi S06 devam diliminin taban kontrolünde doğrulandı; XREQ-021 kişi keşfi timeout engeli PR221 sonrası hosted tekrarda kapanmıştır; kalan S06 kabulü kendi bölümünde izlenir.
 
-Kullanıcının PR221/açık işler incelemesi ve Next.js geliştirme talimatıyla hazırlanan frontend yükleme/kimlik diliminin kaynak, ölçüm ve kabul durumu [S06 kaydındadır](todo.md#web-s06). Backend PR221 bu dala taşınmadı; self canlı kabulü bağımlılığı aynı kayıtta açıktır.
+Kullanıcının PR221/açık işler incelemesi ve Next.js geliştirme talimatıyla hazırlanan frontend yükleme/kimlik diliminin kaynak, ölçüm ve kabul durumu [S06 kaydındadır](todo.md#web-s06). PR221 main bu dala alındı. User1 kişi/katalog→kendi talebi→geri çekme hosted tekrarı geçti; kalan self akışlar ve yeni genel kurtarma panelinin hosted kabulü aynı kayıtta açıktır. Kullanıcının CI beklemeden aynı Draft PR223 içinde devam talimatı korunur.
 
 S02 teslim kabulü tamamlandı; XREQ-012 kaynak/ortam ve frontend consumer uyum incelemesinin tek sahibi [S02 kabul kaydıdır](todo.md#web-s02). S02'nin kapanış belgesi PR146 ile main'dedir; yeni S03 kaynağının kabulü bundan ayrıdır.
 
