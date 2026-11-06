@@ -1,4 +1,5 @@
 "use client";
+import dynamic from "next/dynamic";
 import { useEffect, useRef, useState } from "react";
 import { useLocale, useTranslations } from "next-intl";
 import type { FinanceView } from "@ftksaas/api-contracts";
@@ -11,6 +12,7 @@ import { SetupFeedback, useSetupCommand } from "../setup/setup-command";
 import { FlowError, flowError } from "../bookings/flow-controls";
 import { effectMoney } from "../../lib/effect-money";
 import { SaleForm } from "./sale-form";
+const SaleLifecycle = dynamic(() => import("./sale-lifecycle").then((m) => m.SaleLifecycle));
 export function PersonSales({
   scope,
   personId,
@@ -44,6 +46,7 @@ function SaleConnection({
   api: SalesApi;
 }) {
   const [scope] = useState(initialScope);
+  const [lifecycle, setLifecycle] = useState(false);
   const [sale, setSale] = useState<boolean | null>(null);
   const t = useTranslations("flows"),
     [open, setOpen] = useState(false),
@@ -93,6 +96,27 @@ function SaleConnection({
             {t("renewal")}
           </Button>
         </div>
+      )}
+      {open && (
+        <Button
+          type="button"
+          variant="outline"
+          disabled={command.busy || !!command.pending}
+          aria-expanded={lifecycle}
+          onClick={() => setLifecycle((v) => !v)}
+        >
+          {t("packageLifecycle")}
+        </Button>
+      )}
+      {open && lifecycle && (
+        <SaleLifecycle
+          scope={scope}
+          personId={personId}
+          onSaved={() => {
+            setRevision((v) => v + 1);
+            onSaved?.();
+          }}
+        />
       )}
       {open && sale !== null && (
         <SaleForm

@@ -1427,7 +1427,7 @@
     "publishVersion": "New version of {name}",
     "versionTarget": "Product receiving the new version: {name}",
     "publication": "Package publication",
-    "publicationHint": "Published for lessons in the selected center and discipline. Freezing is outside this Starter form; sale dates are selected separately at sale time.",
+    "publicationHint": "Choose package terms explicitly. Publishing does not change earlier sales; sale dates are chosen separately.",
     "closePublication": "Close publication form",
     "discipline": "Discipline",
     "chooseDiscipline": "Choose a discipline",
@@ -1490,7 +1490,17 @@
     "demoHint": "Packages, rights and publication operations are synthetic. No real records are read or changed.",
     "unsupportedVersion": "This form preserves the existing product name and discipline. Products with wider scopes or freezing cannot be republished here.",
     "existingName": "Package name",
-    "preservedNameHint": "The new version keeps its name and discipline. Enter the new terms explicitly below."
+    "preservedNameHint": "The new version keeps its name and discipline. Enter the new terms explicitly below.",
+    "advancedTerms": "Pro scope and freezing terms",
+    "valuation": "Negative credit valuation",
+    "freezeSummary": "Freezing",
+    "freezeOff": "Disabled",
+    "freezeOn": "Enabled",
+    "extendsValidity": "Extends validity",
+    "noExtension": "Does not extend validity",
+    "allDisciplinesScope": "All disciplines at center",
+    "lessonTarget": "Lesson",
+    "eventTarget": "Event"
   },
   "rights": {
     "title": "Rights management",
@@ -1684,7 +1694,8 @@
     "deficitSettled": "Settled by this sale; the existing reservation is preserved.",
     "deficitUnchanged": "This sale will leave the deficit unchanged.",
     "sessionRestricted": "Your access does not include this session detail.",
-    "deficitNumber": "Deficit {number}"
+    "deficitNumber": "Deficit {number}",
+    "packageLifecycle": "Freezing and termination"
   },
   "pendingOperations": {
     "title": "Pending operations",
@@ -2024,5 +2035,65 @@
       "billing_address": "Billing address",
       "billing_email": "Billing email"
     }
+  },
+  "productPro": {
+    "title": "Pro package terms",
+    "loading": "Reading plan and scope…",
+    "reload": "Read again",
+    "unavailable": "A product with wider scope or freezing requires Pro or Business.",
+    "centerOnly": "This package can only be used in the selected center.",
+    "allDisciplines": "All disciplines in this center",
+    "disciplines": "Eligible disciplines",
+    "usage": "Usage targets",
+    "lesson": "Lessons",
+    "event": "Events",
+    "retainedRestrictions": "This product has distinct scopes or class/event restrictions. These are retained; only freeze terms can be edited here.",
+    "freezeEnabled": "Allow freezing",
+    "extendsValidity": "Extend validity by frozen time",
+    "maxDays": "Maximum freeze days (optional)"
+  },
+  "saleLifecycle": {
+    "title": "Package lifecycle",
+    "hint": "Purchased terms are preserved. Freezing, renewal, termination and financial refund are separate actions.",
+    "loading": "Reading packages…",
+    "refresh": "Read packages again",
+    "empty": "No readable packages for this person.",
+    "source": "Package to manage",
+    "choose": "Choose",
+    "sale": "Package {number}",
+    "balances": "Available {available} · Reserved {reserved} · Consumed {consumed}",
+    "notActive": "Lifecycle actions are unavailable for this sale.",
+    "freeze": "Freeze package",
+    "freeze_end": "End freeze",
+    "terminate": "Terminate package",
+    "start": "Freeze start date",
+    "end": "End date (exclusive)",
+    "freezeSource": "Freeze to end",
+    "reason": "Action reason",
+    "preview": "Preview package action",
+    "sourceDates": "Current validity: {start} — {end}",
+    "terminationHint": "Termination is not a financial refund or cash payment. Confirm only the rights and reservation effects returned by the backend.",
+    "protectionHint": "Confirmed reservations and actual frozen time are checked by the backend.",
+    "requestedDates": "Requested freeze: {start} — {end} (exclusive)",
+    "requestedEnd": "Requested freeze end: {end} (exclusive)",
+    "selectedFreeze": "Selected freeze: {start} — {end}"
+  },
+  "valuation": {
+    "title": "Negative credit valuation",
+    "hint": "Valuation does not create rights or payments. History is not recalculated; effective time and mandatory policy are checked by the backend.",
+    "refresh": "Read valuation again",
+    "loading": "Reading authorized source…",
+    "discipline": "Valuation discipline",
+    "format": "Valuation session format",
+    "choose": "Choose",
+    "group": "Group",
+    "private": "Private lesson",
+    "notConfigured": "No center valuation for this discipline and format.",
+    "amount": "Value per credit",
+    "currency": "Valuation currency",
+    "effective": "Valuation effective from",
+    "review": "Review valuation",
+    "confirm": "I approve these valuation terms",
+    "apply": "Publish valuation"
   }
 }

@@ -4,6 +4,7 @@ import type {
   DisciplineView,
   BookingMode,
   RefundMethod,
+  FreezeTerms,
 } from "@ftksaas/api-contracts";
 export type ProductDraft = {
   name: string;
@@ -17,6 +18,8 @@ export type ProductDraft = {
   quotaLimit: string;
   refund: RefundMethod;
   usedUnitPrice: string;
+  scopes?: ProductTerms["scopes"];
+  freeze?: FreezeTerms;
 };
 const maxMoney = 9223372036854775807n;
 function money(value: unknown): value is string {
@@ -49,19 +52,23 @@ export function priceToMinor(value: string, currency: string) {
 }
 export function productTerms(
   draft: ProductDraft,
-  discipline: DisciplineView,
+  discipline: DisciplineView | undefined,
   centerId: string,
 ): ProductTerms {
-  if (discipline.id !== draft.disciplineId || discipline.state !== "active" || !draft.name.trim())
+  if (
+    (!draft.scopes &&
+      (!discipline || discipline.id !== draft.disciplineId || discipline.state !== "active")) ||
+    !draft.name.trim()
+  )
     throw Error("invalidProduct");
   const terms: ProductTerms = {
-    name: `${discipline.name} ${draft.name.trim()}`,
+    name: draft.scopes ? draft.name.trim() : `${discipline!.name} ${draft.name.trim()}`,
     kind: draft.kind === "credits" ? "credits" : "timed",
     booking_mode: draft.bookingMode,
     credits: draft.kind === "credits" ? Number(draft.credits) : null,
     price_minor: priceToMinor(draft.price, draft.currency),
     currency: draft.currency,
-    freeze: { enabled: false, extends_validity: false },
+    freeze: draft.freeze ?? { enabled: false, extends_validity: false },
     refund: {
       method: draft.refund,
       ...(draft.refund === "used_at_unit_price"
@@ -72,11 +79,11 @@ export function productTerms(
       draft.kind === "quota"
         ? { period: draft.quotaPeriod, limit: Number(draft.quotaLimit) }
         : null,
-    scopes: [
+    scopes: draft.scopes ?? [
       {
         scope_kind: "center_discipline",
         center_id: centerId,
-        discipline_id: discipline.id,
+        discipline_id: discipline!.id,
         usage_targets: ["lesson"],
       },
     ],
@@ -84,7 +91,7 @@ export function productTerms(
   if (!validPublishedTerms(terms, centerId)) throw Error("invalidProduct");
   return terms;
 }
-// Recovery accepts only the narrow lesson product shape this Starter form can create.
+// Publication recovery accepts native center-scoped terms; the writer enforces the live plan.
 export function validPublishedTerms(value: unknown, centerId: string): value is ProductTerms {
   if (
     !object(value) ||
@@ -108,9 +115,11 @@ export function validPublishedTerms(value: unknown, centerId: string): value is 
     typeof value.currency !== "string" ||
     !/^[A-Z]{3}$/.test(value.currency) ||
     !object(value.freeze) ||
-    !keys(value.freeze, ["enabled", "extends_validity"]) ||
-    value.freeze.enabled !== false ||
-    value.freeze.extends_validity !== false ||
+    !keys(value.freeze, ["enabled", "extends_validity", "max_days"]) ||
+    typeof value.freeze.enabled !== "boolean" ||
+    typeof value.freeze.extends_validity !== "boolean" ||
+    (!value.freeze.enabled && value.freeze.extends_validity) ||
+    (value.freeze.max_days != null && !positive(value.freeze.max_days)) ||
     !object(value.refund) ||
     !keys(value.refund, ["method", "used_unit_minor"]) ||
     !["none", "credit_ratio", "used_at_unit_price", "time_ratio"].includes(
@@ -136,17 +145,44 @@ export function validPublishedTerms(value: unknown, centerId: string): value is 
             !positive(value.quota.limit)))
   )
     return false;
-  if (!Array.isArray(value.scopes) || value.scopes.length !== 1) return false;
-  const scope = value.scopes[0];
-  return (
-    object(scope) &&
-    keys(scope, ["scope_kind", "center_id", "discipline_id", "usage_targets"]) &&
-    scope.scope_kind === "center_discipline" &&
-    scope.center_id === centerId &&
-    typeof scope.discipline_id === "string" &&
-    validate(scope.discipline_id) &&
-    Array.isArray(scope.usage_targets) &&
-    scope.usage_targets.length === 1 &&
-    scope.usage_targets[0] === "lesson"
-  );
+  if (!Array.isArray(value.scopes) || !value.scopes.length) return false;
+  const signatures = new Set<string>();
+  return value.scopes.every((scope) => {
+    if (
+      !object(scope) ||
+      !keys(scope, [
+        "scope_kind",
+        "center_id",
+        "discipline_id",
+        "class_id",
+        "event_id",
+        "usage_targets",
+      ]) ||
+      scope.center_id !== centerId ||
+      !["center_discipline", "center_all_disciplines"].includes(String(scope.scope_kind)) ||
+      (scope.scope_kind === "center_discipline"
+        ? typeof scope.discipline_id !== "string" || !validate(scope.discipline_id)
+        : scope.discipline_id !== null) ||
+      !Array.isArray(scope.usage_targets) ||
+      !scope.usage_targets.length ||
+      new Set(scope.usage_targets).size !== scope.usage_targets.length ||
+      scope.usage_targets.some((t) => t !== "lesson" && t !== "event") ||
+      [scope.class_id, scope.event_id].some(
+        (id) => id != null && (typeof id !== "string" || !validate(id)),
+      ) ||
+      (scope.class_id != null && !scope.usage_targets.includes("lesson")) ||
+      (scope.event_id != null && !scope.usage_targets.includes("event"))
+    )
+      return false;
+    const signature = JSON.stringify([
+      scope.scope_kind,
+      scope.discipline_id,
+      scope.class_id ?? null,
+      scope.event_id ?? null,
+      [...scope.usage_targets].sort(),
+    ]);
+    if (signatures.has(signature)) return false;
+    signatures.add(signature);
+    return true;
+  });
 }

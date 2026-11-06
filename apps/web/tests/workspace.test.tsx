@@ -125,6 +125,8 @@ beforeEach(() => {
   HTMLElement.prototype.releasePointerCapture = vi.fn<HTMLElement["releasePointerCapture"]>();
 });
 test("live shell reads accessible studios without selectors, sample records or closed-organization reads", async () => {
+  // The shell assertions exercise API scope; module instrumentation is not an API timeout.
+  await import("../src/components/setup/studio-setup");
   const user = userEvent.setup();
   render(<StudioWorkspace authUserId="native-user" />);
   await screen.findByRole("heading", { name: "Merhaba, Test Yöneticisi" });

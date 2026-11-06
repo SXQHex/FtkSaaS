@@ -1,3 +1,5 @@
+import { validValuationCommand } from "./negative-valuation";
+import { lifecycleWrites } from "./sale-lifecycle-command";
 import { validOperating } from "./operating-settings";
 import { validAgreement } from "./agreement-command";
 import {
@@ -33,6 +35,8 @@ import type {
 import { apiClient, ApiFailure } from "./api";
 import { sessionCapacity } from "./session-create";
 export const setupWrites = [
+  "negcredit_valuation_set_v1",
+  ...lifecycleWrites,
   "instructor_agreement_publish_v1",
   ...attendanceWrites,
   ...rightsOperations,
@@ -72,6 +76,9 @@ export const setupWrites = [
 export type SetupWrite = (typeof setupWrites)[number];
 type SetupUpload = "document_upload_prepare_v1" | "file_upload_complete_v1";
 type SetupRead =
+  | "freeze_preview_v1"
+  | "freeze_end_preview_v1"
+  | "sale_terminate_preview_v1"
   | "instructor_agreements_list_v1"
   | "calendar_get_v1"
   | "attendance_get_v1"
@@ -138,6 +145,17 @@ export const setupStorageKey = (scope: SetupScope, slot: string) =>
 export type PendingSetup = { command: SetupCommand; blocked?: boolean };
 const keyPattern = /^[a-f0-9]{8}-[a-f0-9]{4}-7[a-f0-9]{3}-[89ab][a-f0-9]{3}-[a-f0-9]{12}$/i;
 const fields: Record<SetupWrite, string[]> = {
+  negcredit_valuation_set_v1: [
+    "discipline_id",
+    "format",
+    "expected_version",
+    "amount_minor",
+    "currency",
+    "effective_at",
+  ],
+  freeze_apply_v1: ["preview"],
+  freeze_end_apply_v1: ["preview"],
+  sale_terminate_apply_v1: ["preview"],
   instructor_agreement_publish_v1: [
     "person_id",
     "discipline_id",
@@ -278,6 +296,21 @@ export function recoverSetup(scope: SetupScope, slot: string): PendingSetup | "i
     if (
       balanceOperations.some((operation) => operation === command.operation) &&
       !validBalanceCommand(command.operation as BalanceOperation, input, scope.centerId, slot)
+    )
+      return "invalid";
+    if (
+      (slot.startsWith("valuation-") || command.operation === "negcredit_valuation_set_v1") &&
+      (command.operation !== "negcredit_valuation_set_v1" ||
+        !validValuationCommand(input, scope.centerId, slot))
+    )
+      return "invalid";
+    if (
+      (slot.startsWith("sale-lifecycle:") ||
+        lifecycleWrites.some((op) => op === command.operation)) &&
+      (!lifecycleWrites.some((op) => op === command.operation) ||
+        !validCorrection(input, scope.centerId) ||
+        !/^sale-lifecycle:[^:]+$/.test(slot) ||
+        !validate(slot.slice("sale-lifecycle:".length)))
     )
       return "invalid";
     if (slot.startsWith("sale-refund:") && command.operation !== "sale_refund_apply_v1")

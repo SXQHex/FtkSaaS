@@ -1427,7 +1427,7 @@
     "publishVersion": "{name} için yeni sürüm",
     "versionTarget": "Yeni sürümün ürün kaydı: {name}",
     "publication": "Paket yayını",
-    "publicationHint": "Seçili merkez ve disiplinin dersleri için yayımlanır. Dondurma bu Starter formunun kapsamında değildir; satış tarihleri satış sırasında ayrıca seçilir.",
+    "publicationHint": "Paket koşullarını açıkça seçin. Yeni yayın önceki satışların koşullarını değiştirmez; satış tarihleri satış sırasında ayrıca belirlenir.",
     "closePublication": "Yayın formunu kapat",
     "discipline": "Disiplin",
     "chooseDiscipline": "Disiplin seç",
@@ -1490,7 +1490,17 @@
     "demoHint": "Paketler, haklar ve yayın işlemleri sentetiktir. Gerçek kayıt okunmaz veya değiştirilmez.",
     "unsupportedVersion": "Bu form mevcut ürünün adını, disiplinini veya üst plan kapsamını değiştirmez. Farklı kapsam ya da dondurma içeren ürün burada yeniden yayımlanamaz.",
     "existingName": "Paket adı",
-    "preservedNameHint": "Yeni sürümde ad ve disiplin korunur. Yeni koşulları aşağıda açıkça belirt."
+    "preservedNameHint": "Yeni sürümde ad ve disiplin korunur. Yeni koşulları aşağıda açıkça belirt.",
+    "advancedTerms": "Pro kapsam ve dondurma koşulları",
+    "valuation": "Negatif kredi değerlemesi",
+    "freezeSummary": "Dondurma",
+    "freezeOff": "Kapalı",
+    "freezeOn": "Açık",
+    "extendsValidity": "Süre uzar",
+    "noExtension": "Süre uzamaz",
+    "allDisciplinesScope": "Merkezde tüm disiplinler",
+    "lessonTarget": "Ders",
+    "eventTarget": "Etkinlik"
   },
   "rights": {
     "title": "Hak yönetimi",
@@ -1684,7 +1694,8 @@
     "deficitSettled": "Bu satışla karşılanacak; mevcut rezervasyon korunur.",
     "deficitUnchanged": "Eksik hak bu satışla karşılanmayacak.",
     "sessionRestricted": "Seans ayrıntısı bu yetkiyle okunamıyor.",
-    "deficitNumber": "Eksik hak {number}"
+    "deficitNumber": "Eksik hak {number}",
+    "packageLifecycle": "Dondurma ve sonlandırma"
   },
   "pendingOperations": {
     "title": "Bekleyen işlemler",
@@ -2024,5 +2035,65 @@
       "billing_address": "Fatura adresi",
       "billing_email": "Fatura e-postası"
     }
+  },
+  "productPro": {
+    "title": "Pro paket koşulları",
+    "loading": "Plan ve kapsam okunuyor…",
+    "reload": "Yeniden oku",
+    "unavailable": "Farklı kapsam ya da dondurma içeren ürün için Pro veya Business planı gerekir.",
+    "centerOnly": "Bu paket yalnız seçili merkezde kullanılır.",
+    "allDisciplines": "Merkezdeki tüm disiplinler",
+    "disciplines": "Geçerli disiplinler",
+    "usage": "Kullanım hedefleri",
+    "lesson": "Dersler",
+    "event": "Etkinlikler",
+    "retainedRestrictions": "Bu ürünün farklı kapsam veya sınıf/etkinlik kısıtları korunur. Bu ekranda yalnız dondurma koşulları düzenlenebilir.",
+    "freezeEnabled": "Dondurma kullanılabilir",
+    "extendsValidity": "Dondurulan süre geçerlilik süresine eklensin",
+    "maxDays": "En fazla dondurma günü (isteğe bağlı)"
+  },
+  "saleLifecycle": {
+    "title": "Paket yaşam döngüsü",
+    "hint": "Satılmış paketin koşulları korunur. Dondurma, yenileme, sonlandırma ve finansal iade ayrı işlemlerdir.",
+    "loading": "Paketler okunuyor…",
+    "refresh": "Paketleri yeniden oku",
+    "empty": "Bu kişiye ait okunabilen paket yok.",
+    "source": "İşlem yapılacak paket",
+    "choose": "Seçin",
+    "sale": "Paket {number}",
+    "balances": "Kullanılabilir {available} · Ayrılmış {reserved} · Kullanılmış {consumed}",
+    "notActive": "Bu satış için etkin yaşam döngüsü işlemi açılamıyor.",
+    "freeze": "Paketi dondur",
+    "freeze_end": "Dondurmayı bitir",
+    "terminate": "Paketi sonlandır",
+    "start": "Dondurma başlangıç tarihi",
+    "end": "Bitiş tarihi (hariç)",
+    "freezeSource": "Bitirilecek dondurma",
+    "reason": "İşlem gerekçesi",
+    "preview": "Paket işlemini önizle",
+    "sourceDates": "Mevcut geçerlilik: {start} — {end}",
+    "terminationHint": "Sonlandırma finansal iade veya nakit ödeme değildir. Yalnız backend’in gösterdiği hak ve rezervasyon etkilerini onaylayın.",
+    "protectionHint": "Kesin rezervasyonların korunması ve fiilî dondurma süresi backend tarafından denetlenir.",
+    "requestedDates": "İstenen dondurma aralığı: {start} — {end} (bitiş hariç)",
+    "requestedEnd": "İstenen dondurma bitişi: {end} (hariç)",
+    "selectedFreeze": "Seçilen dondurma: {start} — {end}"
+  },
+  "valuation": {
+    "title": "Negatif kredi değerlemesi",
+    "hint": "Değerleme yeni hak veya ödeme oluşturmaz. Geçmiş işlemler yeniden hesaplanmaz; yürürlük ve zorunlu üst politika backend tarafından denetlenir.",
+    "refresh": "Değerlemeyi yeniden oku",
+    "loading": "Yetkili kaynak okunuyor…",
+    "discipline": "Değerleme disiplini",
+    "format": "Değerleme ders biçimi",
+    "choose": "Seçin",
+    "group": "Grup",
+    "private": "Özel ders",
+    "notConfigured": "Merkezde bu disiplin ve biçim için değerleme kaydı yok.",
+    "amount": "Birim kredi değeri",
+    "currency": "Değerleme para birimi",
+    "effective": "Değerleme yürürlük başlangıcı",
+    "review": "Değerlemeyi incele",
+    "confirm": "Bu değerleme koşullarını onaylıyorum",
+    "apply": "Değerlemeyi yayımla"
   }
 }

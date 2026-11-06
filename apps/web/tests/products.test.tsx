@@ -265,12 +265,23 @@ test("a wider existing product cannot be silently narrowed by the Starter versio
     next_cursor: null,
     as_of: "2026-11-05T00:00:00Z",
   });
+  server.use(
+    http.post("https://project.example.invalid/functions/v1/backend-v1/subscription_get_v1", () =>
+      HttpResponse.json({
+        ok: true,
+        data: { plan: "starter", limits: { entries: [] }, usage: { entries: [] } },
+        trace_id: id,
+      }),
+    ),
+  );
   render(<ProductManager scope={scope} {...api} />);
   await userEvent.click(
     await screen.findByRole("button", { name: "Salsa Başlangıç için yeni sürüm" }),
   );
   await screen.findByText(/Farklı kapsam ya da dondurma içeren ürün/);
   expect(screen.queryByRole("textbox", { name: "Fiyat" })).not.toBeInTheDocument();
+  await userEvent.click(screen.getByRole("button", { name: "Pro kapsam ve dondurma koşulları" }));
+  expect(screen.queryByRole("button", { name: "Yayını incele" })).not.toBeInTheDocument();
 });
 test("switching a credit-ratio product to timed removes the incompatible refund choice", async () => {
   const user = userEvent.setup();
@@ -322,4 +333,50 @@ test("native catalog and right readers preserve scoped IDs and explicitly includ
   });
   expect(bodies[0]).not.toHaveProperty("actorId");
   expect(bodies[0]?.request_id).not.toBe(bodies[1]?.request_id);
+});
+
+test("Pro publication reviews and recovers explicit center-wide event and freeze conditions", async () => {
+  const user = userEvent.setup(),
+    bodies: Record<string, unknown>[] = [];
+  server.use(
+    http.post("https://project.example.invalid/functions/v1/backend-v1/subscription_get_v1", () =>
+      HttpResponse.json({
+        ok: true,
+        data: { plan: "pro", limits: { entries: [] }, usage: { entries: [] } },
+        trace_id: id,
+      }),
+    ),
+    http.post(endpoint, async ({ request }) => {
+      bodies.push((await request.json()) as Record<string, unknown>);
+      return success();
+    }),
+  );
+  render(<ProductManager scope={scope} {...reads()} />);
+  await user.click(screen.getByRole("button", { name: "Yeni paket yayımla" }));
+  await screen.findByRole("combobox", { name: "Disiplin" });
+  await user.click(screen.getByRole("button", { name: "Pro kapsam ve dondurma koşulları" }));
+  await user.click(await screen.findByLabelText("Merkezdeki tüm disiplinler"));
+  await user.click(screen.getByLabelText("Etkinlikler"));
+  await user.click(screen.getByLabelText("Dondurma kullanılabilir"));
+  await user.click(screen.getByLabelText("Dondurulan süre geçerlilik süresine eklensin"));
+  await user.type(screen.getByLabelText("En fazla dondurma günü (isteğe bağlı)"), "30");
+  await fill(user);
+  expect(bodies).toHaveLength(0);
+  await user.click(screen.getByRole("button", { name: "Bu sürümü yayımla" }));
+  await waitFor(() => expect(bodies).toHaveLength(1));
+  expect(bodies[0]).toMatchObject({
+    center_id: center,
+    terms: {
+      name: "Yeni",
+      freeze: { enabled: true, extends_validity: true, max_days: 30 },
+      scopes: [
+        {
+          scope_kind: "center_all_disciplines",
+          center_id: center,
+          discipline_id: null,
+          usage_targets: ["lesson", "event"],
+        },
+      ],
+    },
+  });
 });
