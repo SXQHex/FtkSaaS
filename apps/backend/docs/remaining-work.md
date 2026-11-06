@@ -545,18 +545,18 @@ Değişen dilimin sözleşme, üretilmiş tip/envanter, WF/F01–F33 izi ve alan
 - **Sınır/olumsuz durum:** Geçersiz hatırlatma atlanır; işlemsel/in_app/Auth ertelenmez; digest kullanılabilir değildir. Önceden kabul edilmiş seçenek/defaultlar FD04’ten alınır; bu plan yeni default seçmez.
 - **Doğrulama senaryosu:** Geceyi aşan aralık, yaz/kış saati, ders değişimi/iptali, preference değişimi ve kuyruk gecikmesi; son anda tekrar uygunluk.
 - **Kaynak alanı:** reminder-scheduling/workers/email SQL, settings catalog v11, contract.json ve reminder-scheduling/transactional-email acceptance.
-- **Teslim durumu:** PR219 native/main/development teslimi tamamlandı. Zaman/miras/sessiz saat ve kaynak denetimleri teslim edildi; hosted kabul XREQ-021 canlı engeli giderildikten sonra tamamlanır.
+- **Teslim durumu:** PR219 native/main/development teslimi tamamlandı. Zaman/miras/sessiz saat ve kaynak denetimleri teslim edildi; XREQ-021 backend self zinciri geçti; P15 hosted alt senaryolarının tamamlananları ve açık sınırları [devir kontrol noktasında](00-FtkSaaS-yeni-sohbet-devir.md#pr221-teslim-ve-6-kasım-canlı-kontrol-noktası) izlenir.
 
 <a id="p16"></a>
 ### P16 — Otomasyon sonuç ve hata akışı
 
-- [ ] **Tür:** D/K · **Plan:** Pro/Business · **Özellik:** F23,F24,F26,F27
-- **Bağımlılık:** P11,P15
+- [x] **Tür:** D/K · **Plan:** Pro/Business · **Özellik:** F23,F24,F26,F27
+- **Bağımlılık:** P11,P15. P15 çalışma bağımlılıkları teslim edildi; yalnız Business hosted kabulü açık.
 - **Kabul:** Desteklenen trigger/action görev veya hizmet hatırlatması üretir; sonuç/hata ve disable/retry görünür.
 - **Sınır/olumsuz durum:** Kampanya/indirim/geri kazanım maili açılmaz; tekrar iş aynı domain sonucu üretir.
 - **Doğrulama senaryosu:** Segment değişimi, yetki/plan kaybı, worker kesintisi ve işlem öncesi koşul denetimi.
 - **Kaynak alanı:** automation-results SQL, P05 worker/management ve automation-results acceptance.
-- **Teslim durumu:** PR219 native/main/development teslimi tamamlandı. Son20 iş/güvenli hata/domain sonuç referansı, disable ve canlı denetimli sürümlü retry teslim edildi; hosted kabul açık.
+- **Teslim durumu:** PR219 native/main/development teslimi tamamlandı. Son20 iş/güvenli hata/domain sonuç referansı, disable ve canlı denetimli sürümlü retry teslim edildi. Gerçek cron→API sonucu, tek takip, tamamlanmış işe retry reddi, sürüm çatışması ve disable sonrası yeni kaynakta çalışmama geçti. Native güvenli hata/lease/retry kanıtı korunur; gerçek kaynak/ortam sonuçları [devir kontrol noktasında](00-FtkSaaS-yeni-sohbet-devir.md#pr221-teslim-ve-6-kasım-canlı-kontrol-noktası) izlenir.
 
 ## Business işlevleri
 
