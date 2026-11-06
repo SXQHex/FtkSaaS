@@ -61,6 +61,11 @@ test('XREQ023/024 action discovery reuses live writer authority without domain e
   assert.equal(refund.result.ok,false);assert.equal(refund.result.error.code,'INSUFFICIENT_STUDENT_CREDIT');
   assert.equal((await read('student_credit_refund_v1',{person_id:studentPerson})).items.length,1);
   await api('collection_record_v1',{person_id:studentPerson,debt_ids:[debt],amount_minor:'1000',currency:'TRY',occurred_at:new Date().toISOString()});
+  // Authority discovery is independent of the writer's required policy. Prove
+  // the missing-window guard, then publish the prerequisite before testing room capacity.
+  const missingWindow=await call(owner,'reservation_capacity_override_v1',scope({...actions[1][1],mode:'flexible',reason:'Synthetic missing-window guard'}),key());
+  assert.equal(missingWindow.result.ok,false);assert.equal(missingWindow.result.error.code,'POLICY_NOT_CONFIGURED');
+  await api('policy_publish_v1',{center_id:null,key:'reservation_window',value:{kind:'window',opens_minutes_before:10080,closes_minutes_before:0,manager_exception:false},effective_at:new Date(Date.now()-1000).toISOString(),mandatory:false});
   await db.query('update core.rooms set capacity=0 where org_id=$1 and id=$2',[org,room]);
   try{
    assert.equal((await read('reservation_capacity_override_v1',actions[1][1])).items.length,1);

@@ -285,8 +285,8 @@
         "management_state_get_v1"
       ],
       "review": {
-        "fingerprint": "588039cdb45783bf08c5674d8ecb9982c1ed912ed8f391aac4058e85637375fd",
-        "reason": "Reviewed regenerated runtime metadata and four implemented management read paths; validators and Edge request/response behavior stay byte-identical because DTOs are unchanged. Six selectors and append-only migration add the missing source reads."
+        "fingerprint": "088f1df41317adf1097775834521866d0e529263d290a614d4abdf61587f7383",
+        "reason": "Reviewed PR234 native fixture failure: flexible reservation writer requires reservation_window before capacity_check. Added explicit missing-policy rejection then normal policy publication; preserved physical CAPACITY_FULL assertion and all original behavior."
       }
     },
     {
@@ -829,8 +829,8 @@
         "reservation_capacity_override_v1"
       ],
       "review": {
-        "fingerprint": "7c2eb17c262dbfedf059ea74e44958c0e66aef1702c07b78d215b2c255f7639a",
-        "reason": "Reviewed six action-discovery selectors and matching read-path metadata, original writer preflight, canonical self/source scopes and native coverage; authority discovery remains separate from command eligibility."
+        "fingerprint": "4a8ebf7b4353c75a5e1068d1fe550d3a5e6aca3e405af5f566ebaaabb8a77912",
+        "reason": "Reviewed PR234 native fixture failure: flexible reservation writer requires reservation_window before capacity_check. Added explicit missing-policy rejection then normal policy publication; preserved physical CAPACITY_FULL assertion and all original behavior."
       }
     },
     {
@@ -955,8 +955,8 @@
         "debt_adjust_v1"
       ],
       "review": {
-        "fingerprint": "2ffa79aa944b1f46c0f03ae9653f9eaf3a92a1620a884513188ce66e1e047b43",
-        "reason": "Reviewed six action-discovery selectors and matching read-path metadata, original writer preflight, canonical self/source scopes and native coverage; authority discovery remains separate from command eligibility."
+        "fingerprint": "e0d2176b32358e55acc8366b3d999a70869286e575d1acf351ad1b07b847d98c",
+        "reason": "Reviewed PR234 native fixture failure: flexible reservation writer requires reservation_window before capacity_check. Added explicit missing-policy rejection then normal policy publication; preserved physical CAPACITY_FULL assertion and all original behavior."
       }
     },
     {
