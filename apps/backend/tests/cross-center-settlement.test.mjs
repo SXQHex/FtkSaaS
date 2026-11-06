@@ -105,6 +105,7 @@ test('Cross-center payment, correction, reversal and scope chain',async t=>{
  let sale,l1,m1,pending,approved,baseProduct;
  await t.test('DS-AUTH owner delegation and exact center grant chain does not imply operational authority',async()=>{
   assert.equal((await authority()).version,1);
+  assert.equal((await authority()).subscriber_number,(await db.query('select private.subscriber_number($1,$2) n',[org,person])).rows[0].n);
   await fail('settlement_movements_list_v1',{currency:'TRY',page:{}},'FORBIDDEN');
   await fail('settlement_authority_get_v1',{person_id:person},'FORBIDDEN',A,student.u);
   await fail('settlement_authority_get_v1',{person_id:person},'NOT_FOUND',A,outside);

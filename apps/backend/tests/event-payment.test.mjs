@@ -48,6 +48,9 @@ async function paymentFixture(t){
  await t.test('preparation creates one scoped debt and no seat; same and different-key repeats reuse it',async()=>{
   const e=await event(),p=await person(),k=key(),a=await prepare(e,p,k),b=await prepare(e,p,k),c=await prepare(e,p);
   assert.equal(a.id,b.id);assert.equal(a.id,c.id);assert.equal(a.debt_id,c.debt_id);assert.equal(a.remaining_minor,'1000');
+  const preparedSubscriber=(await db.query('select private.subscriber_number($1,$2) n',[org,p])).rows[0].n;
+  assert.equal(a.subscriber_number,preparedSubscriber);
+  assert.equal((await get(a.id)).subscriber_number,preparedSubscriber);
   assert.equal(await count('select count(*)::int n from core.event_registrations where org_id=$1 and event_id=$2',[org,e]),0);
   assert.equal(await count('select count(*)::int n from core.debts where org_id=$1 and person_id=$2',[org,p]),1);
   await fail('event_payment_prepare_v1',{event_id:e,person_id:await person()},'IDEMPOTENCY_PAYLOAD_MISMATCH',k);
@@ -66,6 +69,10 @@ async function paymentFixture(t){
   await collect(p,a.debt_id,600);const pv=await must(owner,'event_registration_preview_v1',scoped({event_id:e,person_id:p,preparation_id:a.id}));assert.deepEqual(pv.blockers,[]);
   const k=key(),r=await mutate('event_register_v1',{event_id:e,person_id:p,preparation_id:a.id,preview:{id:pv.id,token:pv.token}},k);
   assert.equal(r.outcome,'registered');assert.equal((await get(a.id)).registration_id,r.primary_id);
+  const subscriberEvent=await must(owner,'event_get_v1',scoped({event_id:e}));
+  const expectedSubscriber=(await db.query('select private.subscriber_number($1,$2) n',[org,p])).rows[0].n;
+  assert.equal(subscriberEvent.registrations.find(x=>x.id===r.primary_id).subscriber_number,expectedSubscriber);
+  for(const duty of subscriberEvent.duties)assert.equal(duty.subscriber_number,(await db.query('select private.subscriber_number($1,$2) n',[org,duty.person_id])).rows[0].n);
   assert.equal((await debtForRegistration(r.primary_id)).id,a.debt_id);
   assert.equal((await mutate('event_register_v1',{event_id:e,person_id:p,preparation_id:a.id,preview:{id:pv.id,token:pv.token}},k)).replayed,true);
   await fail('event_register_v1',{event_id:e,person_id:p,preparation_id:a.id},'RESERVATION_EXISTS');

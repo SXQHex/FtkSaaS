@@ -1,10 +1,10 @@
 # Veritabanı kaynak referansı
 
-Üretilmiştir: `node apps/backend/scripts/update-docs.mjs --write`. Elle düzenleme. Kaynak içerik özeti: `e89db3f50a3637796822d30093d861e23b0685b309462e2fdf01b6ce24731bbf`. Bu özet CI/hosted kabulü değildir; dağıtılan SHA ve ortam CD artifact'ında bulunur.
+Üretilmiştir: `node apps/backend/scripts/update-docs.mjs --write`. Elle düzenleme. Kaynak içerik özeti: `82c3534cdf56d7a1c4dfa9dbee8031656d716d47994a71f5e181b9fd1d925dbb`. Bu özet CI/hosted kabulü değildir; dağıtılan SHA ve ortam CD artifact'ında bulunur.
 
 Alan/scope/değişmez görünümü [fiziksel şema kataloğundadır](contracts/04-FtkSaaS-O4-veri-semasi.md). Bu dosya ikinci DDL sözleşmesi değildir. Etkin PostgreSQL şeması migration zincirinin uygulanmasıyla oluşur; dosyaları regex ile birleştirmek nihai şema çıkarımı sayılmaz.
 
-Sıralı migration: 116. Uygulanmış içerik manifesti: [migrations.sha256.json](../apps/backend/database/migrations.sha256.json). CD, migration içeriklerini canlı geçmişle doğrular; dokümantasyon capture adımı ayrıca read-only pg_catalog snapshot ve Supabase CLI DB tiplerini alır. İş verisi/Auth satırı/secret toplanmaz.
+Sıralı migration: 117. Uygulanmış içerik manifesti: [migrations.sha256.json](../apps/backend/database/migrations.sha256.json). CD, migration içeriklerini canlı geçmişle doğrular; dokümantasyon capture adımı ayrıca read-only pg_catalog snapshot ve Supabase CLI DB tiplerini alır. İş verisi/Auth satırı/secret toplanmaz.
 
 | Migration | SHA256 |
 |---|---|
@@ -124,3 +124,4 @@ Sıralı migration: 116. Uygulanmış içerik manifesti: [migrations.sha256.json
 | [20261105170617_lesson_request_catalog.sql](../apps/backend/supabase/migrations/20261105170617_lesson_request_catalog.sql) | `44d6d95780d3854f3f24f4aa0693db9b6420307a20261df6f8ddd2962c0ee461` |
 | [20261106084130_p15_p16_reminders_automation.sql](../apps/backend/supabase/migrations/20261106084130_p15_p16_reminders_automation.sql) | `92854c175866a3a92f75daf92842ebdbc0a1a9831480cbf481cfcf53a54320c4` |
 | [20261106114157_people_registry_scaling.sql](../apps/backend/supabase/migrations/20261106114157_people_registry_scaling.sql) | `a924e70856a67e8321314ef624cd9f71b1196c836a6688b42321392d5cf709fe` |
+| [20261106174559_upper_plan_subscriber_projections.sql](../apps/backend/supabase/migrations/20261106174559_upper_plan_subscriber_projections.sql) | `e7459bac0113563f57fce53b447e278749625a929d75f59fffc42693a26a1071` |
