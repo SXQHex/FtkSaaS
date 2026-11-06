@@ -283,3 +283,18 @@ test("invitation fragment survives login and signup navigation without entering 
     .poll(() => page.evaluate(() => sessionStorage.getItem("ftksaas:pending-invitation")))
     .toBeNull();
 });
+
+test("sale document links preserve the exact version and center through native login", async ({
+  page,
+}) => {
+  const path =
+    "/organizasyon/019a2b3c-4d5e-7000-8000-000000000001/paket/019a2b3c-4d5e-7000-8000-000000000002/belgeler?center=019a2b3c-4d5e-7000-8000-000000000003";
+  await page.goto(path);
+  await expect(page.getByRole("heading", { name: "Hesabına giriş yap" })).toBeVisible();
+  expect(new URL(page.url()).searchParams.get("next")).toBe(path);
+  await page.getByRole("link", { name: "Hesap oluştur", exact: true }).click();
+  await expect(page.getByLabel("Ad soyad")).toBeVisible();
+  expect(new URL(page.url()).searchParams.get("next")).toBe(path);
+  await page.goto(path.split("?")[0]!);
+  await expect(page.getByRole("heading", { name: "Sayfa bulunamadı" })).toBeVisible();
+});

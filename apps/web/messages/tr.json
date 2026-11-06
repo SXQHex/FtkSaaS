@@ -1284,6 +1284,9 @@
     "demoLostArmed": "Yanıt kaybı örneği hazır"
   },
   "documents": {
+    "backToWorkspace": "Çalışma alanına dön",
+    "saleSelfHint": "Bu paket sürümünün gerekli belgelerini kendi hesabınızla inceleyip kabul edebilirsiniz. Belge kabulü paket satın almaz ve ödeme oluşturmaz.",
+    "saleTitle": "Satış için belgeler",
     "uploadTitle": "Belge dosyası yükle",
     "uploadHint": "Yalnız PDF veya UTF-8 düz metin, en çok 2 MiB. Dosya özel alanda saklanır; yüklemek belgeyi yayımlamaz.",
     "nextVersion": "Mevcut belgenin yeni sürümü için dosya yüklüyorsunuz.",
@@ -1516,6 +1519,8 @@
     "demoHint": "Yalnız sentetik örneklerdir. Gerçek satış, hak, rezervasyon veya finans kaydı değiştirilmez."
   },
   "flows": {
+    "selfDocumentsLinkHint": "Bu bağlantıyı öğrenciyle paylaşın. Herkes yalnız kendi adına kabul verir. Öğrenci kabul ettikten sonra gereklilikleri yeniden okuyup satışı yeniden inceleyin.",
+    "selfDocumentsLink": "Öğrenci için belge kabul bağlantısı",
     "review": "İşlemi incele",
     "confirm": "Gösterilen işlemi ve etkilerini onaylıyorum.",
     "apply": "İşlemi uygula",

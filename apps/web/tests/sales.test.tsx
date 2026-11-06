@@ -425,6 +425,10 @@ test("document blocker disables apply and opening documents discards the old pre
   expect(await screen.findByRole("button", { name: "İşlemi uygula" })).toBeDisabled();
   await user.click(screen.getByRole("button", { name: "Gerekli belgeler" }));
   expect(screen.queryByRole("button", { name: "İşlemi uygula" })).not.toBeInTheDocument();
+  expect(screen.getByRole("link", { name: "Öğrenci için belge kabul bağlantısı" })).toHaveAttribute(
+    "href",
+    `/organizasyon/${scope.orgId}/paket/${product.version_id}/belgeler?center=${scope.centerId}`,
+  );
 });
 test("uncertain normal sale recovers same proof and key after remount despite denied reads", async () => {
   const reads = normalApi(),
