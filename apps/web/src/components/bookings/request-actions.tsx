@@ -66,7 +66,7 @@ export function RequestActions({
       new Date(Date.parse(row.requested_start) + row.duration_minutes * 60000).toISOString();
   useEffect(() => {
     if (action !== "approve") return;
-    let active = true;
+    const lifetime = new AbortController();
     void api
       .calendar({
         org_id: scope.orgId,
@@ -87,7 +87,7 @@ export function RequestActions({
             return detail;
           }),
         );
-        if (active)
+        if (!lifetime.signal.aborted)
           setSessions(
             details.filter(
               (item) =>
@@ -107,10 +107,10 @@ export function RequestActions({
           );
       })
       .catch((cause) => {
-        if (active) setError(flowError(cause));
+        if (!lifetime.signal.aborted) setError(flowError(cause));
       });
     return () => {
-      active = false;
+      lifetime.abort();
     };
   }, [
     api,

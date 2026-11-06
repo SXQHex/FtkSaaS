@@ -1,0 +1,50 @@
+name: Workflow checks
+on:
+  pull_request:
+    branches: [main]
+    types: [opened, synchronize, reopened, edited]
+permissions: {}
+concurrency:
+  group: workflow-checks-${{ github.event.pull_request.number }}-${{ github.event.action == 'edited' && github.event.changes.base == null && 'metadata' || 'source' }}
+  cancel-in-progress: true
+jobs:
+  validate:
+    name: Workflow validators
+    if: github.event.action != 'edited' || github.event.changes.base != null
+    permissions:
+      contents: read
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Install verified validators
+        id: install
+        timeout-minutes: 5
+        run: |
+          set -euo pipefail
+          bash apps/web/scripts/workflow-validation/install-tools.sh "$RUNNER_TEMP/workflow-tools"
+          echo "$RUNNER_TEMP/workflow-tools" >> "$GITHUB_PATH"
+      # Run every scanner even when an earlier scanner reports a finding.
+      # None of the four scanners has continue-on-error or write permissions.
+      - name: Actionlint
+        if: ${{ !cancelled() && steps.install.outcome == 'success' }}
+        timeout-minutes: 2
+        run: actionlint
+      - name: Zizmor
+        if: ${{ !cancelled() && steps.install.outcome == 'success' }}
+        timeout-minutes: 2
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: zizmor --config apps/web/scripts/workflow-validation/zizmor.yml --no-progress --strict-collection --format=github .github
+      - name: Poutine
+        if: ${{ !cancelled() && steps.install.outcome == 'success' }}
+        timeout-minutes: 2
+        run: poutine analyze_local . --config apps/web/scripts/workflow-validation/poutine.yml --disable-version-check --fail-on-violation
+      - name: Pinact
+        if: ${{ !cancelled() && steps.install.outcome == 'success' }}
+        timeout-minutes: 2
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: pinact run --check --verify-comment --min-age 7 --verify-min-age

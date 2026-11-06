@@ -8,6 +8,8 @@ Kullanıcının6 Kasım son talimatı tarayıcı kontrollerini atlayıp açık b
 
 PR223 main/development/Vercel teslimi ve bu oturumdaki ek native/bağlı Chrome kanıtları todo'ya işlendi. Geçici MFA faktörü kaldırıldı, geçici Pro CM rolü geri atandı; test oturumları kapatıldı. Tutarlı dummy kayıtlar/audit geçmişi korunur. Kullanıcı yeniden istemeden tarayıcı/canlı kabul denenmez. Yerel birim/statik/build kontrolleri kaynak teslimini doğrular; ertelenen gerçek kabul yerine sayılmaz.
 
+PR228 main’e alındı. Kullanıcının CI araçları ve sabit sürüm numaraları talimatı `chore/workflow-validators` dalında ayrı PR olarak teslim edilir; bakım kanıtı [S08 kaydındadır](todo.md#web-s08).
+
 S08 mevcut shadcn temasını, native Auth/typed Edge, hesap/tenant izolasyonu ve aynı payload/key kurtarmasını kullanır. Kaynaklar yalnız apps/web ve gerektiğinde packages/ui; backend/kontrat/CI/kalite politikası değiştirilmez. [XREQ-023](../../../docs/requests.md#xreq-023) ve [XREQ-024](../../../docs/requests.md#xreq-024) frontend talepleridir; backend adına çözüm/onay yazılmaz. Büyük modül PR tercihi, Draft PR ve önceki başarılı CI/inceleme sonrası merge yetkisi sürer. CI beklemeden geliştirme ve kalan işleri açık izleme kullanıcı tercihidir.
 
 CRM karar aktarımının frontend görevi ve kabul sınırı [S04'e bağlı açık ek kapsamda](todo.md#crm-temel-aday-takibi) tutulur. Bu belge aktarımı önceki S04 kabulünü değiştirmez; yeni CRM diliminin runtime ve hosted kabulü yapılmış sayılmaz. Backend sözleşme bağımlılığı aynı kayıttadır; burada ikinci görev listesi tutulmaz.

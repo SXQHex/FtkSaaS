@@ -30,17 +30,17 @@ export function PrivateDocument({
     heading.current?.focus();
   }, []);
   useEffect(() => {
-    let active = true;
-    let url: string | undefined;
+    const lifetime = new AbortController();
     void read(query, expected)
       .then(async (file) => {
         const text = file.type === "text/plain" ? await file.text() : null;
-        if (!active) return;
-        url = URL.createObjectURL(file);
+        if (lifetime.signal.aborted) return;
+        const url = URL.createObjectURL(file);
+        lifetime.signal.addEventListener("abort", () => URL.revokeObjectURL(url), { once: true });
         setContent({ url, text, pdf: file.type === "application/pdf" });
       })
       .catch((cause) => {
-        if (active)
+        if (!lifetime.signal.aborted)
           setError(
             cause instanceof Error && cause.message === "documentChanged"
               ? "documentChanged"
@@ -48,8 +48,7 @@ export function PrivateDocument({
           );
       });
     return () => {
-      active = false;
-      if (url) URL.revokeObjectURL(url);
+      lifetime.abort();
     };
   }, [query, expected, read]);
   return (

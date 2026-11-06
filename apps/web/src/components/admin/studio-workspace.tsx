@@ -97,11 +97,11 @@ export function StudioWorkspace({ authUserId }: { authUserId: string }) {
   const [retry, setRetry] = useState(0);
   const [signingOut, setSigningOut] = useState(false);
   useEffect(() => {
-    let active = true;
+    const lifetime = new AbortController();
     const client = browserClient();
     const { data } = client.auth.onAuthStateChange((event, session) => {
       if (event === "SIGNED_OUT" || (event === "SIGNED_IN" && session?.user.id !== authUserId)) {
-        active = false;
+        lifetime.abort();
         setSnapshot(null);
         setAccountId(null);
         router.replace("/login");
@@ -110,11 +110,11 @@ export function StudioWorkspace({ authUserId }: { authUserId: string }) {
     });
     function rejectRead(cause: unknown): never {
       if (
-        active &&
+        !lifetime.signal.aborted &&
         cause instanceof ApiFailure &&
         ["AUTH_REQUIRED", "SESSION_REVOKED"].includes(cause.failure.error.code)
       ) {
-        active = false;
+        lifetime.abort();
         setSnapshot(null);
         setAccountId(null);
         router.replace("/login?error=session");
@@ -127,14 +127,14 @@ export function StudioWorkspace({ authUserId }: { authUserId: string }) {
         const [account, organizations, settings] = await Promise.all([
           getAccount()
             .then((account) => {
-              if (active) setAccountId(account.id);
+              if (!lifetime.signal.aborted) setAccountId(account.id);
               return account;
             })
             .catch(rejectRead),
           getOrganizations().catch(rejectRead),
           getUserSettings().catch(rejectRead),
         ]);
-        if (!active) return;
+        if (lifetime.signal.aborted) return;
         const studios = await Promise.all(
           organizations.map(async (organization) => ({
             organization,
@@ -143,7 +143,7 @@ export function StudioWorkspace({ authUserId }: { authUserId: string }) {
               : [],
           })),
         );
-        if (!active) return;
+        if (lifetime.signal.aborted) return;
         setSnapshot({ account, studios });
         setError("");
         let deviceTheme: string | null = null;
@@ -160,13 +160,13 @@ export function StudioWorkspace({ authUserId }: { authUserId: string }) {
         document.documentElement.dataset.motion = settings.motion ?? "system";
         document.documentElement.dataset.contrast = settings.contrast ?? "system";
       } catch (cause) {
-        if (!active) return;
+        if (lifetime.signal.aborted) return;
         setError(errorMessageKey(cause));
       }
     }
     void load();
     return () => {
-      active = false;
+      lifetime.abort();
       data.subscription.unsubscribe();
       document.documentElement.style.fontSize = "";
       delete document.documentElement.dataset.motion;

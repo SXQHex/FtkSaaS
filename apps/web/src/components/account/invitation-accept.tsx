@@ -25,10 +25,10 @@ function InvitationForm({ nativeUserId }: { nativeUserId: string }) {
   const lock = useRef(false);
   const initialToken = useRef<string | null>(null);
   useEffect(() => {
-    let active = true;
+    const lifetime = new AbortController();
     const { data } = browserClient().auth.onAuthStateChange((event, session) => {
       if (event === "SIGNED_OUT" || (session && session.user.id !== nativeUserId)) {
-        active = false;
+        lifetime.abort();
         setAccount(null);
         setToken("");
         initialToken.current = "";
@@ -40,16 +40,16 @@ function InvitationForm({ nativeUserId }: { nativeUserId: string }) {
         return accountCall("account_get_v1", {});
       })
       .then((result) => {
-        if (active) {
+        if (!lifetime.signal.aborted) {
           setAccount(result);
           setToken(initialToken.current ?? "");
         }
       })
       .catch((cause) => {
-        if (active) setMessage(accountError(cause));
+        if (!lifetime.signal.aborted) setMessage(accountError(cause));
       });
     return () => {
-      active = false;
+      lifetime.abort();
       data.subscription.unsubscribe();
     };
   }, [nativeUserId]);

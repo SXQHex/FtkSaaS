@@ -1,0 +1,16 @@
+rules:
+  dangerous-triggers:
+    ignore:
+      # Trusted-main deployment resolver validates successful exact-source main
+      # acceptance before exposing deployment credentials to the accepted source.
+      - cd-development.yml:4:3
+      - vercel.yml:3:3
+      # The privileged verifier checks out trusted main only; candidate code
+      # executes separately with contents:read and no deployment secrets.
+      - ci-gate.yml:4:3
+      - ci-gate.yml:7:3
+  self-repository:
+    ignore:
+      # Relative reusable workflow is bound to the candidate merge commit.
+      # Keep the repository's supported GitHub syntax rather than rewriting it.
+      - ci-full.yml:102:11

@@ -57,18 +57,18 @@ function FinanceConnection({
   const current = result?.key === key ? result : null;
   useEffect(() => {
     if (!open || !query) return;
-    let active = true;
+    const lifetime = new AbortController();
     void api
       .read(scope, personId, query, cursor)
       .then((view) => {
         if (!financeMatches(view, personId, query, scope.centerId)) throw Error("invalidFinance");
-        if (active) setResult({ key, view });
+        if (!lifetime.signal.aborted) setResult({ key, view });
       })
       .catch((cause) => {
-        if (active) setResult({ key, error: flowError(cause) });
+        if (!lifetime.signal.aborted) setResult({ key, error: flowError(cause) });
       });
     return () => {
-      active = false;
+      lifetime.abort();
     };
   }, [scope, personId, api, open, query, cursor, key]);
   useEffect(() => {
