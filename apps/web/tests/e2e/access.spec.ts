@@ -298,3 +298,32 @@ test("sale document links preserve the exact version and center through native l
   await page.goto(path.split("?")[0]!);
   await expect(page.getByRole("heading", { name: "Sayfa bulunamadı" })).toBeVisible();
 });
+
+test("invalid session and sale-document links remain HTTP 404 before authentication", async ({
+  page,
+}) => {
+  for (const path of [
+    "/organizasyon/invalid/seans/invalid",
+    "/organizasyon/invalid/paket/invalid/belgeler?center=invalid",
+  ]) {
+    const response = await page.goto(path);
+    expect(response?.status()).toBe(404);
+    await expect(page.getByRole("heading", { name: "Sayfa bulunamadı" })).toBeVisible();
+  }
+});
+
+test("anonymous session and sale-document links preserve their scope through login", async ({
+  page,
+}) => {
+  const org = "019a2b3c-4d5e-7000-8000-000000000001";
+  const target = "019a2b3c-4d5e-7000-8000-000000000002";
+  const center = "019a2b3c-4d5e-7000-8000-000000000003";
+  for (const path of [
+    `/organizasyon/${org}/seans/${target}?center=${center}`,
+    `/organizasyon/${org}/paket/${target}/belgeler?center=${center}`,
+  ]) {
+    await page.goto(path);
+    await expect(page.getByRole("heading", { name: "Hesabına giriş yap" })).toBeVisible();
+    expect(new URL(page.url()).searchParams.get("next")).toBe(path);
+  }
+});

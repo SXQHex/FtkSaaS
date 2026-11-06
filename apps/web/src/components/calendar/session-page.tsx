@@ -1,6 +1,8 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
+import dynamic from "next/dynamic";
+import { WorkspaceLoading } from "../workspace-loading";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
@@ -12,9 +14,12 @@ import { browserClient } from "../../lib/supabase/client";
 import { sessionPath } from "../../lib/session-route";
 import { Preferences } from "../preferences";
 import { SessionBookings } from "../bookings/session-bookings";
-import { SessionSummary } from "./session-detail";
+import { SessionSummary } from "./session-summary";
 import { SessionDocuments } from "../documents/session-documents";
-import { SessionChange } from "./session-change";
+const SessionChange = dynamic(
+  () => import("./session-change").then((module) => module.SessionChange),
+  { loading: WorkspaceLoading },
+);
 
 export function SessionPage({
   orgId,

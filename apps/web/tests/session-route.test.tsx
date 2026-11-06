@@ -98,3 +98,10 @@ test.each([
   ).rejects.toThrow("notFound");
   expect(mocks.user).not.toHaveBeenCalled();
 });
+
+test("workspace binds its client lifecycle to the verified native user", async () => {
+  const { default: HomePage } = await import("../src/app/(workspace)/page");
+  const page = await HomePage();
+  expect(page.key).toBe("user");
+  expect(page.props).toEqual({ authUserId: "user" });
+});

@@ -1,6 +1,8 @@
 "use client";
 
 import { useEffect, useState, useSyncExternalStore } from "react";
+import dynamic from "next/dynamic";
+import { WorkspaceLoading } from "../workspace-loading";
 import { useRouter } from "next/navigation";
 import { useTheme } from "next-themes";
 import { useTranslations } from "next-intl";
@@ -9,13 +11,6 @@ import type { AccountView, CenterView, OrganizationView } from "@ftksaas/api-con
 import { Button } from "@ftksaas/ui/components/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@ftksaas/ui/components/card";
 import { Alert, AlertDescription } from "@ftksaas/ui/components/alert";
-import { ScheduleWorkspace } from "../calendar/schedule-workspace";
-import { StudentsWorkspace } from "../students/students-workspace";
-import { InstructorTasks } from "../setup/instructor-tasks";
-import { StudioSetup } from "../setup/studio-setup";
-import { DocumentsWorkspace } from "../documents/documents-workspace";
-import { ProductsWorkspace } from "../products/products-workspace";
-import { InboxWorkspace } from "../inbox/inbox-workspace";
 import { Preferences } from "../preferences";
 import { AdminShell, sections, type AdminSection } from "./admin-shell";
 import {
@@ -28,6 +23,40 @@ import {
 } from "../../lib/api";
 import { accessibleCenters } from "../../lib/context";
 import { browserClient } from "../../lib/supabase/client";
+
+const ScheduleWorkspace = dynamic(
+  () => import("../calendar/schedule-workspace").then((module) => module.ScheduleWorkspace),
+  { loading: WorkspaceLoading },
+);
+const StudentsWorkspace = dynamic(
+  () => import("../students/students-workspace").then((module) => module.StudentsWorkspace),
+  { loading: WorkspaceLoading },
+);
+const InstructorTasks = dynamic(
+  () => import("../setup/instructor-tasks").then((module) => module.InstructorTasks),
+  { loading: WorkspaceLoading },
+);
+const StudioSetup = dynamic(
+  () => import("../setup/studio-setup").then((module) => module.StudioSetup),
+  { loading: WorkspaceLoading },
+);
+const DocumentsWorkspace = dynamic(
+  () => import("../documents/documents-workspace").then((module) => module.DocumentsWorkspace),
+  { loading: WorkspaceLoading },
+);
+const ProductsWorkspace = dynamic(
+  () => import("../products/products-workspace").then((module) => module.ProductsWorkspace),
+  { loading: WorkspaceLoading },
+);
+const InboxWorkspace = dynamic(
+  () => import("../inbox/inbox-workspace").then((module) => module.InboxWorkspace),
+  { loading: WorkspaceLoading },
+);
+
+const PendingOperations = dynamic(
+  () => import("../setup/pending-operations").then((module) => module.PendingOperations),
+  { loading: WorkspaceLoading },
+);
 
 type Studio = { organization: OrganizationView; centers: CenterView[] };
 type Snapshot = { account: AccountView; studios: Studio[] };
@@ -47,13 +76,16 @@ const shortcuts = [
   { section: "finance", icon: CreditCard },
 ] as const;
 
-export function StudioWorkspace() {
+export function StudioWorkspace({ authUserId }: { authUserId: string }) {
   const router = useRouter();
   const { setTheme } = useTheme();
   const t = useTranslations("live");
   const nav = useTranslations("admin");
   const common = useTranslations("common");
   const api = useTranslations("api");
+  const recovery = useTranslations("pendingOperations");
+  const [accountId, setAccountId] = useState<string | null>(null);
+  const [recovering, setRecovering] = useState(false);
   const section = useSyncExternalStore(subscribe, currentSection, initialSection);
   const [snapshot, setSnapshot] = useState<Snapshot | null>(null);
   const [error, setError] = useState("");
@@ -62,27 +94,47 @@ export function StudioWorkspace() {
   useEffect(() => {
     let active = true;
     const client = browserClient();
-    const { data } = client.auth.onAuthStateChange((event) => {
-      if (event === "SIGNED_OUT") {
+    const { data } = client.auth.onAuthStateChange((event, session) => {
+      if (event === "SIGNED_OUT" || (event === "SIGNED_IN" && session?.user.id !== authUserId)) {
         active = false;
         setSnapshot(null);
+        setAccountId(null);
         router.replace("/login");
         router.refresh();
       }
     });
+    function rejectRead(cause: unknown): never {
+      if (
+        active &&
+        cause instanceof ApiFailure &&
+        ["AUTH_REQUIRED", "SESSION_REVOKED"].includes(cause.failure.error.code)
+      ) {
+        active = false;
+        setSnapshot(null);
+        setAccountId(null);
+        router.replace("/login?error=session");
+        router.refresh();
+      }
+      throw cause;
+    }
     async function load() {
       try {
         const [account, organizations, settings] = await Promise.all([
-          getAccount(),
-          getOrganizations(),
-          getUserSettings(),
+          getAccount()
+            .then((account) => {
+              if (active) setAccountId(account.id);
+              return account;
+            })
+            .catch(rejectRead),
+          getOrganizations().catch(rejectRead),
+          getUserSettings().catch(rejectRead),
         ]);
         if (!active) return;
         const studios = await Promise.all(
           organizations.map(async (organization) => ({
             organization,
             centers: ["normal", "grace"].includes(organization.access_mode)
-              ? accessibleCenters(await getCenters(organization.id))
+              ? accessibleCenters(await getCenters(organization.id).catch(rejectRead))
               : [],
           })),
         );
@@ -105,14 +157,6 @@ export function StudioWorkspace() {
       } catch (cause) {
         if (!active) return;
         setError(errorMessageKey(cause));
-        if (
-          cause instanceof ApiFailure &&
-          ["AUTH_REQUIRED", "SESSION_REVOKED"].includes(cause.failure.error.code)
-        ) {
-          setSnapshot(null);
-          router.replace("/login?error=session");
-          router.refresh();
-        }
       }
     }
     void load();
@@ -123,13 +167,14 @@ export function StudioWorkspace() {
       delete document.documentElement.dataset.motion;
       delete document.documentElement.dataset.contrast;
     };
-  }, [retry, router, setTheme]);
+  }, [authUserId, retry, router, setTheme]);
   async function signOut() {
     setSigningOut(true);
     try {
       const result = await browserClient().auth.signOut({ scope: "local" });
       if (result.error) throw result.error;
       setSnapshot(null);
+      setAccountId(null);
       router.replace("/login");
       router.refresh();
     } catch {
@@ -162,6 +207,27 @@ export function StudioWorkspace() {
           </p>
         </div>
       </div>
+      {accountId && (
+        <div className="mb-6">
+          <Button
+            variant="outline"
+            className="h-auto min-h-11 whitespace-normal"
+            aria-expanded={recovering}
+            onClick={() => setRecovering((value) => !value)}
+          >
+            {recovery(recovering ? "close" : "open")}
+          </Button>
+          {recovering && (
+            <div className="mt-4">
+              <PendingOperations
+                key={accountId}
+                actorId={accountId}
+                onSaved={() => setRetry((value) => value + 1)}
+              />
+            </div>
+          )}
+        </div>
+      )}
       {error && (
         <Alert variant="destructive" className="mb-6">
           <AlertDescription>
@@ -180,16 +246,7 @@ export function StudioWorkspace() {
           </AlertDescription>
         </Alert>
       )}
-      {!snapshot && !error && (
-        <output aria-live="polite" className="block space-y-4">
-          <span className="sr-only">{t("loading")}</span>
-          <span aria-hidden="true" className="block space-y-3 rounded-xl border bg-card p-6">
-            <span className="block h-4 w-40 animate-pulse rounded bg-muted" />
-            <span className="block h-4 w-full max-w-md animate-pulse rounded bg-muted" />
-            <span className="block h-4 w-2/3 max-w-sm animate-pulse rounded bg-muted" />
-          </span>
-        </output>
-      )}
+      {!snapshot && !error && <WorkspaceLoading />}
       {snapshot &&
         ["overview", "studio"].includes(section) &&
         snapshot.studios.flatMap(({ organization, centers }) =>
