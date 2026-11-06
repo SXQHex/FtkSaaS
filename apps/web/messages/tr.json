@@ -1953,7 +1953,18 @@
     "basis": "Değerleme temeli",
     "saleUnit": "Satış birimi",
     "fixedUnit": "Açık birim değeri",
-    "unitAmount": "Birim tutarı"
+    "unitAmount": "Birim tutarı",
+    "templateHeading": "Anlaşma hazırlık şablonları",
+    "templateOpen": "Şablondan hazırla",
+    "templateClose": "Şablon seçimini kapat",
+    "templateNotice": "Şablon yalnız disiplin, ders biçimi ve ücret şartlarını önerir. Kişi, geçerlilik ve gerekçeyi ayrıca seçip yayını onaylayın.",
+    "templateRetry": "Şablonları yeniden oku",
+    "templateEmpty": "Bu kapsam için uygun anlaşma şablonu bulunamadı. Elle giriş yapabilirsiniz.",
+    "templateOrganization": "Organizasyon",
+    "templateCenter": "Merkez",
+    "templateVersion": "Sürüm {version}",
+    "templateSelected": "Seçilen şablon: {name}",
+    "templateManual": "Ücreti elle gir"
   },
   "operatingSettings": {
     "organization": "Organizasyon işletim ayarları",

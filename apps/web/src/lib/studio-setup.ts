@@ -85,6 +85,7 @@ type SetupRead =
   | "reservation_impact_preview_v1"
   | "products_list_v1"
   | "entitlements_get_v1"
+  | "settings_preparation_resolve_v1"
   | "settings_catalog_get_v1"
   | "settings_get_v1"
   | "settings_history_get_v1"

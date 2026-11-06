@@ -1,4 +1,6 @@
 "use client";
+import dynamic from "next/dynamic";
+import type { PreparedAgreement } from "../../lib/agreement-preparations";
 import { useEffect, useId, useState } from "react";
 import { useFormatter, useTranslations } from "next-intl";
 import type {
@@ -21,6 +23,9 @@ import { ConfirmWrite, FlowError, flowError } from "../bookings/flow-controls";
 import { LocalTimeField } from "../programs/local-time-field";
 import { PayTermsFields } from "./pay-terms-fields";
 import { PayTermsSummary } from "./pay-terms-summary";
+const AgreementPreparationPicker = dynamic(() =>
+  import("./agreement-preparation-picker").then((m) => m.AgreementPreparationPicker),
+);
 export function AgreementForm({
   scope,
   personId,
@@ -63,8 +68,11 @@ export function AgreementForm({
       error?: string;
     } | null>(null),
     [attempt, setAttempt] = useState(0);
+  const [templatesOpen, setTemplatesOpen] = useState(false),
+    [preparing, setPreparing] = useState(false),
+    [prepared, setPrepared] = useState<{ value: PreparedAgreement; name: string } | null>(null);
   const command = useSetupCommand(scope, `agreements:${personId}`, onSaved, onRejected),
-    disabled = command.busy || !!command.pending;
+    disabled = command.busy || !!command.pending || preparing;
   useEffect(() => {
     const life = new AbortController();
     void api
@@ -104,6 +112,63 @@ export function AgreementForm({
       <p className="text-sm text-muted-foreground">{t("immutable")}</p>
       {prior && <p>{t("replaces", { version: prior.version })}</p>}
       <SetupFeedback command={command} />
+      <Button
+        type="button"
+        variant="outline"
+        disabled={command.busy || !!command.pending}
+        onClick={() => {
+          setReview(null);
+          setPreparing(false);
+          setTemplatesOpen((v) => !v);
+        }}
+      >
+        {t(templatesOpen ? "templateClose" : "templateOpen")}
+      </Button>
+      {templatesOpen && (
+        <AgreementPreparationPicker
+          scope={scope}
+          disciplineId={prior?.discipline_id ?? requirement?.discipline_id}
+          format={prior?.format ?? requirement?.format}
+          disabled={command.busy || !!command.pending}
+          onStart={() => {
+            setReview(null);
+            setPrepared(null);
+            setPreparing(true);
+            setError("");
+          }}
+          onFailed={() => setPreparing(false)}
+          onResolved={(value, name) => {
+            setReview(null);
+            setPrepared({ value, name });
+            setPreparing(false);
+            setError("");
+            setDraft((current) => ({
+              ...current,
+              disciplineId: value.agreement_request.discipline_id,
+              format: value.agreement_request.format,
+            }));
+          }}
+        />
+      )}
+      {prepared && (
+        <div className="space-y-3 rounded-md border p-3">
+          <p>{t("templateSelected", { name: prepared.name })}</p>
+          <PayTermsSummary terms={prepared.value.agreement_request.terms} />
+          <Button
+            type="button"
+            variant="outline"
+            disabled={disabled}
+            onClick={() => {
+              setPrepared(null);
+              setPay(emptyPayDraft());
+              setReview(null);
+              setError("");
+            }}
+          >
+            {t("templateManual")}
+          </Button>
+        </div>
+      )}
       <form
         className="space-y-4"
         onChange={() => setReview(null)}
@@ -113,7 +178,16 @@ export function AgreementForm({
           try {
             if (!catalog.rows?.some((row) => row.id === draft.disciplineId))
               throw Error("invalidAgreement");
-            setReview(agreementCommand(scope, personId, timeZone, draft, payTerms(pay), prior));
+            setReview(
+              agreementCommand(
+                scope,
+                personId,
+                timeZone,
+                draft,
+                prepared?.value.agreement_request.terms ?? payTerms(pay),
+                prior,
+              ),
+            );
             setError("");
           } catch {
             setReview(null);
@@ -126,7 +200,7 @@ export function AgreementForm({
           <select
             id={`${id}-discipline`}
             required
-            disabled={!!prior || !!requirement}
+            disabled={!!prior || !!requirement || !!prepared}
             className="min-h-11 w-full rounded-md border bg-background px-3"
             value={draft.disciplineId}
             onChange={(event) => change({ disciplineId: event.target.value })}
@@ -142,7 +216,7 @@ export function AgreementForm({
           <select
             id={`${id}-format`}
             required
-            disabled={!!prior || !!requirement}
+            disabled={!!prior || !!requirement || !!prepared}
             className="min-h-11 w-full rounded-md border bg-background px-3"
             value={draft.format}
             onChange={(event) => change({ format: event.target.value })}
@@ -167,16 +241,18 @@ export function AgreementForm({
             onChange={(ends) => change({ ends, endOffset: "" })}
             onChoice={(endOffset) => change({ endOffset })}
           />
-          <PayTermsFields
-            scope={scope}
-            api={api}
-            value={pay}
-            onChange={(next) => {
-              setReview(null);
-              setPay(next);
-              setError("");
-            }}
-          />
+          {!prepared && (
+            <PayTermsFields
+              scope={scope}
+              api={api}
+              value={pay}
+              onChange={(next) => {
+                setReview(null);
+                setPay(next);
+                setError("");
+              }}
+            />
+          )}
           <Label htmlFor={`${id}-reason`}>{t("reason")}</Label>
           <Input
             id={`${id}-reason`}
@@ -215,6 +291,7 @@ export function AgreementForm({
             · {timeZone}
           </p>
           <p>{review.input.reason}</p>
+          {prepared && <p>{t("templateSelected", { name: prepared.name })}</p>}
           <PayTermsSummary terms={review.input.terms} packages={pay.packages} />
           <p>{t("immutable")}</p>
         </ConfirmWrite>
