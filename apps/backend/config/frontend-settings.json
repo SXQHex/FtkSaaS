@@ -1,5 +1,5 @@
 {
-  "version": 12,
+  "version": 13,
   "fields": [
     {
       "scope": "user",
@@ -2362,6 +2362,98 @@
       "default": null,
       "group": "S13",
       "consumer": "reminder_quiet_until"
+    },
+    {
+      "scope": "organization",
+      "key": "agreement_templates",
+      "schema": {
+        "type": "array",
+        "maxItems": 100,
+        "items": {
+          "type": "object",
+          "properties": {
+            "key": {
+              "type": "string",
+              "pattern": "^[A-Za-z0-9_-]{1,64}$"
+            },
+            "name": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 100
+            },
+            "discipline_id": {
+              "$ref": "#/$defs/FtkUuid"
+            },
+            "format": {
+              "type": "string",
+              "enum": [
+                "group",
+                "private"
+              ]
+            },
+            "terms": {
+              "$ref": "#/$defs/PayTerms"
+            }
+          },
+          "required": [
+            "key",
+            "name",
+            "discipline_id",
+            "format",
+            "terms"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "default": [],
+      "group": "O19",
+      "consumer": "domain_preparation_resolve"
+    },
+    {
+      "scope": "center",
+      "key": "agreement_templates",
+      "schema": {
+        "type": "array",
+        "maxItems": 100,
+        "items": {
+          "type": "object",
+          "properties": {
+            "key": {
+              "type": "string",
+              "pattern": "^[A-Za-z0-9_-]{1,64}$"
+            },
+            "name": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 100
+            },
+            "discipline_id": {
+              "$ref": "#/$defs/FtkUuid"
+            },
+            "format": {
+              "type": "string",
+              "enum": [
+                "group",
+                "private"
+              ]
+            },
+            "terms": {
+              "$ref": "#/$defs/PayTerms"
+            }
+          },
+          "required": [
+            "key",
+            "name",
+            "discipline_id",
+            "format",
+            "terms"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "default": [],
+      "group": "M12",
+      "consumer": "domain_preparation_resolve"
     }
   ]
 }

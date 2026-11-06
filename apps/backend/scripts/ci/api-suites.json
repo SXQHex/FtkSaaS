@@ -675,7 +675,7 @@
     },
     {
       "path": "apps/backend/tests/registry.test.mjs",
-      "sha256": "15b56f1714e5073948cec62b8bcac4b11b22ceada280050db8071967643431a6",
+      "sha256": "48c6bbe5698ff8a2a580690169983b9a498b36e3d4b9265a3067d6ddad557f70",
       "shared": [
         [
           8,
@@ -1054,6 +1054,11 @@
           "line": 156,
           "path": "apps/backend/tests/people-self-scale-acceptance.mjs",
           "sha256": "0590f78531c2fad0289e140f510d448357dfd69b3bca46f994e18eac41991f05"
+        },
+        {
+          "line": 157,
+          "path": "apps/backend/tests/agreement-preparation-acceptance.mjs",
+          "sha256": "695fca4333215afd1b0a3824f3e5ce1e6f31d6717a6aaab13f149d89c1400e51"
         }
       ],
       "estimated_seconds": 1356.24

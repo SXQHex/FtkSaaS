@@ -4,11 +4,21 @@ Güncel kabul/hosted durum [00 devirde](../apps/backend/docs/00-FtkSaaS-yeni-soh
 
 ## Katalog grupları ve sıfırlama sınırı
 
-`settings_catalog_get_v1` katalog sürümü12,87 desteklenen alanı24 normatif davranış grubuna bağlar. `group` bir izin veya domain komutu değildir. Takvim görünümü S10; kullanıcı sessiz saatleri ve üyenin olay bazlı hatırlatma seçimleri S13; merkez hatırlatmaları M14, org hatırlatmaları O07; paket hazırlık şablonları merkezde M10, orgda O10 grubundadır. S12 kanal/amaç tercihi bu ayrımdan bağımsızdır. Kalan normatif gruplar native Auth/domain komutları veya henüz desteklenmeyen alt alanlar içerebilir;87 alan bütün69 grubun teslimi sayılmaz.
+`settings_catalog_get_v1` katalog sürümü13,89 desteklenen alanı26 normatif davranış grubuna bağlar. `group` bir izin veya domain komutu değildir. Takvim görünümü S10; kullanıcı sessiz saatleri ve üyenin olay bazlı hatırlatma seçimleri S13; merkez hatırlatmaları M14, org hatırlatmaları O07; paket hazırlık şablonları merkezde M10, orgda O10, anlaşma hazırlık şablonları merkezde M12, orgda O19 grubundadır. S12 kanal/amaç tercihi bu ayrımdan bağımsızdır. Kalan normatif gruplar native Auth/domain komutları veya henüz desteklenmeyen alt alanlar içerebilir;89 alan bütün69 grubun teslimi sayılmaz.
 
 İstemci grubu güncel katalogdan çözer; eski grup üyeliğini sabitlemez. Reset isteği grup kimliği yerine açık `fields` listesi gönderir. Önizlemenin before/after etkisi kullanıcıya gösterilir; katalog etiketinden örtük reset veya yazma yetkisi türetilmez. Grup düzeltmesi kayıtlı değer, default, miras, consumer veya geçmişi taşımaz; daha önce açık alanlarla alınmış reset önizlemesi aynı sürüm/yetki şartlarıyla korunur.
 
 ## İşlemler
+
+### Anlaşma hazırlık şablonları
+
+Organization/center scope'larında `agreement_templates` boş liste defaultlu kapalı bir hazırlık alanıdır. Her öğe `key`, `name`, gerçek `discipline_id`, `format` ve açık `terms` taşır. Ücret modeli/bileşenler/para birimi/salon kesintisi ve varsa gerçek ürün kimlikli paket istisnaları mevcut anlaşma sözleşmesiyle doğrulanır. Hazır ücret, kişi veya tarih üretilmez. Kullanıcı/member/platform scope'una bu alan yazılamaz. Organizasyonda mevcut Owner/OM ayar yetkisi, merkezde canlı CM ve her iki scope'ta F20/plan kontrolü gerekir; Starter katalog alanını writable=false görür ve şablonu değiştiremez/resetleyemez. Şablon yönetimi yeni rol veya merkez yayın yetkisi vermez.
+
+Yetkili CM merkez kataloğunun `preparation_templates.agreements` listesinde kullanılabilir merkez ve organizasyon şablonlarını açık kaynaklarıyla görür. `settings_preparation_resolve_v1` için `kind:agreement`, hedef `center_id` ve listedeki gerçek `source` gönderilir. Kaynağın güncel document version'ı, anahtarı, merkez/disiplin kapsamı, canlı merkez yetkisi ve F20 yeniden denetlenir. Eski kaynak sürümü VERSION_CONFLICT, kayıp kaynak/yabancı disiplin/ürün NOT_FOUND, kayıp CM FORBIDDEN ve plan kaybı PLAN_FEATURE_UNAVAILABLE verir. Okuma anlaşma, hakediş, preview veya işlem makbuzu oluşturmaz.
+
+Sonuç `agreement_request:{discipline_id,format,terms}` önerisidir. İstemci kişi, yürürlük başlangıç/bitişi, gerekçe ve gerekiyorsa gerçek predecessor/sürümü ayrıca seçer; mevcut `instructor_agreement_publish_v1` komutunu açık onayla çağırır ve anlaşma geçmişini yeniden okur. Yayın aşamasındaki bağımsız canlı yetki, çakışma, geçerlilik, kaynak ve idempotency kontrolleri korunur. Hazırlık sonucu writer onayı değildir. Mevcut anlaşma/başlamış ders/kapanmış hakediş sonraki şablon değişikliğinden etkilenmez.
+
+Organizasyon ve merkez dizileri ayrı saklanır; örgüt kaynağını seçmek açık okuma tercihidir, merkez dizisine sessiz kopya veya otomatik birleştirme değildir. Key yalnız kendi scope dizisinde tekildir. Mevcut merkez/durumlar backfill edilmez. Update/reset/history aynı settings sürüm/replay protokolünü kullanır. Seçili reset preview sonucu boş listedir; organizasyon şablonunu merkeze yayımlamaz. Eski ayar değerlerinin tamamı korunur; yeni alanlar dışında katalogv12'nin group/schema/default değerleri değişmez.
 
 ### ST-03 — Starter tüketici kapsamı
 

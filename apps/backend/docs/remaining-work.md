@@ -54,7 +54,7 @@ Bu tablo yalnız izdir; eski kabul metinleri ikinci kez tutulmaz.
 <a id="a03"></a>
 ### A03 — 33 özellik için kanıt ve boşluk eşlemesi
 
-- [ ] **Tür:** D · **Plan:** Tümü · **Özellik:** F01–F33
+- [x] **Tür:** D · **Plan:** Tümü · **Özellik:** F01–F33
 - **Bağımlılık:** A02
 - **Kabul:** Her özellik karar, kaynak, test, hosted ve plan erişimiyle eşleşir.
 - **Sınır/olumsuz durum:** Boş evidence bütün özelliği yok saymaz; metadata düzeltmesi kod kabulü değildir.
@@ -64,10 +64,12 @@ Bu tablo yalnız izdir; eski kabul metinleri ikinci kez tutulmaz.
 **Uygulama alt adımları:**
 
 - [x] A03.1 — Her F01–F33 için normatif karar/plan kapsamını mevcut operasyon ve WF kaynaklarıyla eşleştir; metadata eksikliğini runtime eksikliğinden ayır.
-- [ ] A03.2 — Bağlı gerçek testleri ve kaynak/run/ortam kanıtını incele; doğrulanmamış, eksik veya uygulanamaz katmanı gerekçesiyle ayır. Sırf test dosyası bulunması başarı kanıtı değildir.
-- [ ] A03.3 — Her gerçek boşluğu mevcut görev kimliğine bağla; sahipsiz operasyon veya çelişen kabul bırakma. Makine metadata'sını yalnız doğrulanmış kanıtla güncelle; mevcut sağlam işlevi yeniden yazma.
+- [x] A03.2 — Bağlı gerçek testler ve kaynak/run/ortam kanıtı33 özellik için incelendi; doğrulanmamış hosted/ekran/işletim katmanları ayrıldı. Sırf test dosyası bulunması başarı kanıtı sayılmadı.
+- [x] A03.3 — Özellik boşlukları mevcut S/P/B/O/G görevlerine bağlandı;220 operasyonun WF sahipliği ve F referansı olmayan7 ortak işlemin görev sahipleri denetlendi. Genel feature/DS kabul metadata'sı pending korundu; alt teslim bütünü kapatmadı.
 
 **Dilim kabulü:** 33 özelliğin her birinde karar→kaynak→test→ortam→plan izi ve açık boşluğun görev sahibi bulunur. İncelenmemiş katman tamamlandı gösterilmez; yeni bir kanıt/roadmap dosyası açılmaz.
+
+**Kapanış:** [Özellik/gerçek test/ortam eşlemesi](00-FtkSaaS-yeni-sohbet-devir.md#a03-özellik-kanıt-eşlemesi--7-kasım-2026) mevcut devir sahibindedir. A03 denetimi kapalı; S10/S07/S08/S14/S15 ve bütün ürün G01–G03 açıkları bu kapanışla silinmez.
 
 - [x] A03.4 — Otomatik API süre referansı üretimi ve sonraki adayda 91/91 ölçümün otomatik kullanımı PR197/PR198 aday/main kabulüyle doğrulandı. Kaynak/run/inceleme kanıtı devir sahibindedir.
 
@@ -242,9 +244,11 @@ Bu tablo yalnız izdir; eski kabul metinleri ikinci kez tutulmaz.
 
 **S10.1 — XREQ-023/024 eylem okuyucuları:** Mevcut typed management yolu kapasite istisnası, tahsilat, alacak iadesi/mahsup, borç düzeltmesi ve satış iade önizlemesi için gerçek source entity/sürümü ve canlı writer yetkisini sunar. İlk işlem geçmiş receipt istemez; tutar veya başarılı komut uydurmaz. Aynı selector'ın self/başka merkez/rol-grant-plan kaybı, canonical alias ve Business cross-center kaynak durumu sınanır. Backend kaynak/native/main/development ve altı gerçek hosted okuma kabulü tamamlandı; frontend ekran kabulü ayrı kalır; [aktif kaynak ve kanıt](00-FtkSaaS-yeni-sohbet-devir.md#eylem-yetkisi-keşfi--xreq-023024). Bu alt teslim bütün 69 ayar grubunun kapanışı değildir.
 
-**S10.2 — Grup envanteri ve katalog düzeltmesi:**69 grubun mevcut typed/native/domain tüketicisi ve açık sınırı karşılaştırıldı; [kaynak denetimi](00-FtkSaaS-yeni-sohbet-devir.md#69-grubun-tüketici-ve-açık-sınır-envanteri) envanter sahibidir.22 yanlış group eşlemesi katalogv12/migration119 ile düzeltilir; kayıtlı değer/default/yetki değişmez. Yeni kaynak/native/main/development kabulü devirde ayrı izlenir.
+**S10.2 — Grup envanteri ve katalog düzeltmesi:**69 grubun mevcut typed/native/domain tüketicisi ve açık sınırı karşılaştırıldı; [kaynak denetimi](00-FtkSaaS-yeni-sohbet-devir.md#69-grubun-tüketici-ve-açık-sınır-envanteri) envanter sahibidir.22 yanlış group eşlemesi katalogv12/migration119 ile düzeltildi; kayıtlı değer/default/yetki değişmedi. PR238 kaynak/native/main/development teslimi ve salt okunur hosted katalog eşliği doğrulandı; [kanıt](00-FtkSaaS-yeni-sohbet-devir.md#s102-kaynakhosted-katalog-karşılaştırması). Bu SQL karşılaştırması gerçek beş-scope HTTP/ekran kabulü değildir.
 
-**S10.3 — Kalan gerçek ayar alt alanları:** Tam tüketici/default/miras/yetki kabulü henüz olmayan alanlar açık kalır: org dil/bölge defaultları; merkez/org anlaşma şablonları; rol/grant öneri şablonları; tüm gruplar için kaynakta desteklenmeyen genel taslak/ileri yayın/miras/rollback ve bunlara bağlı typed seçenekler. Domain komutunun varlığı bu ayar alt alanlarının desteği değildir. Normatif erteleme kapsamındaki platform teknik işletim ayarları yeniden ürün kapsamına alınmaz. S10 bu açıklar nedeniyle kapanmadı.
+**S10.3 — Kalan gerçek ayar alt alanları:** Tam tüketici/default/miras/yetki kabulü henüz olmayan alanlar açık kalır: O06 org dil/bölge defaultları; M12/O19 merkez/org anlaşma şablonları; M02/O03 rol/grant öneri şablonları; izinli alanların açık organizasyondan al/yerel override kaldırma, kaynak gösterimi ve geçmiş değeri yeni sürümle uygulama tüketicileri. Mevcut69 grup envanterindeki diğer eksik alt alanlar da bu kimliğe bağlıdır; bu kısa liste tamamının teslim edildiği anlamına gelmez. Domain komutunun varlığı ayar alt alanının desteği değildir. Kabul edilmiş FD11'e göre genel tercih kayıt anında uygulanır; ileri yürürlük mevcut belge/politika domain akışında kalır. Bütün ayarlar için yeni genel taslak/ileri yayın motoru veya ikinci onay ilk teslim görevi değildir. Mevcut reset/history ve sürüm/replay/yetki testleri korunur; eksik tüketiciler tamamlanmış sayılmaz. Ertelenen platform teknik işletim ayarları yeniden ürün kapsamına alınmaz. S10 bu açıklar nedeniyle kapanmadı.
+
+**S10.3a — M12/O19 anlaşma hazırlığı:** Organization/center kapalı `agreement_templates`, gerçek kaynak/sürümle `settings_preparation_resolve_v1(kind:agreement)` ve mevcut writer'a açık yayın devri uygulanır. Starter F20 reddi, mevcut canlı merkez yayın yetkisi, gerçek disiplin/ürün ve immutable geçmiş korunur. [Kaynak/doğrulama](00-FtkSaaS-yeni-sohbet-devir.md#s10-anlaşma-hazırlık-kaynağı--7-kasım-2026). Yeni native aday/main/development/hosted kabulü henüz tamamlanmadı; bu alt dilim bütün S10.3'ü veya M12/O19'un her normatif alt alanını kapatmaz.
 
 <a id="s11"></a>
 ### S11 — Rapor ve güvenli indirme

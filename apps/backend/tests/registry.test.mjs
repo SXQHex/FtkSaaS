@@ -154,3 +154,4 @@ import './crm-import-authority-acceptance.mjs';
 import './reminder-scheduling-acceptance.mjs';
 import './automation-results-acceptance.mjs';
 import './people-self-scale-acceptance.mjs';
+import './agreement-preparation-acceptance.mjs';

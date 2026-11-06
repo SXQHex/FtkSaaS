@@ -5868,7 +5868,8 @@
       "features": [
         "F02",
         "F15",
-        "F16"
+        "F16",
+        "F20"
       ],
       "required_features": [],
       "runtime_required_features": [],
@@ -5882,8 +5883,8 @@
       },
       "billing_class": "read",
       "limits": [
-        "Read-only explicit template/source/version selection. Resolve grants no execution permission and creates no rule, product, sale or job.",
-        "New centers copy org preparation arrays once; existing centers and business snapshots do not live-inherit.",
+        "Read-only explicit template/source/version selection. Resolve grants no execution permission and creates no rule, product, sale, agreement, earning or job.",
+        "New centers copy only existing availability/package preparation arrays once. Agreement sources are chosen explicitly; existing business snapshots never live-inherit.",
         "Package dates and refund method are explicit; no automatic rolling validity or implicit none."
       ]
     },
