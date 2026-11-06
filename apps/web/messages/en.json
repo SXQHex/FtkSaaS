@@ -1634,7 +1634,8 @@
       "CREDIT_LIMIT_EXCEEDED": "The negative credit limit would be exceeded. Check current rights and limits.",
       "QUOTA_EXCEEDED": "The selected right has reached its period quota.",
       "CLASS_ACCESS_DENIED": "The student is not eligible for this class or booking mode.",
-      "PARTICIPATION_BLOCKED": "Current participation rules block this action."
+      "PARTICIPATION_BLOCKED": "Current participation rules block this action.",
+      "invalidAttendance": "Attendance information could not be verified. Check the current record, selection and reason."
     },
     "financeCurrency": "Sale currency for the financial summary",
     "rightsReloaded": "Purchased rights reloaded.",
@@ -1666,7 +1667,8 @@
     "rights": "Rights adjustment",
     "reservation": "Booking",
     "request": "Lesson request",
-    "finance": "Collection"
+    "finance": "Collection",
+    "attendance": "attendance"
   },
   "finance": {
     "title": "Student finances",
@@ -1779,5 +1781,64 @@
     "reviewSaleRefund": "Review sale refund",
     "invalidFinancePreview": "Finance preview could not be verified. Request a new review of the source and effects.",
     "financeEffects": "Finance and entitlement effects"
+  },
+  "attendance": {
+    "title": "Attendance",
+    "open": "Open attendance",
+    "hide": "Hide attendance",
+    "loading": "Loading attendance…",
+    "refresh": "Refresh attendance",
+    "retry": "Retry",
+    "permissionFailed": "Permission for this attendance action could not be verified. Check again.",
+    "draft": "Draft attendance",
+    "closed": "Attendance closed",
+    "revision": "Closure revision: {version}",
+    "actualStart": "Actual start",
+    "notStarted": "Not recorded",
+    "unknownStart": "Start information was not provided",
+    "draftHint": "Draft marks are not final attendance or rights consumption. Final results are reread from the backend after closure.",
+    "cancelled": "Attendance cannot be changed for a cancelled session.",
+    "empty": "No participants in this attendance sheet.",
+    "participants": "Attendance participants",
+    "participant": "Participant {number}",
+    "subscriber": "Subscriber No {number}",
+    "protected": "An existing reservation is protected; this does not grant new rights or a debt exemption.",
+    "edit": "Mark attendance",
+    "correct": "Correct attendance",
+    "hideEditor": "Close editor",
+    "start": "Record actual start",
+    "close": "Close attendance",
+    "reason": "Reason",
+    "result": "Attendance result",
+    "blockReason": "Attendance block",
+    "reviewBlock": "Review block",
+    "previewCorrection": "Review correction",
+    "choose": "Choose",
+    "invalidAttendance": "Attendance information could not be verified. Check the current record, selection and reason.",
+    "closeHint": "The backend determines rights effects atomically. Starter closure does not create fees or earnings; other plans retain their agreement checks.",
+    "countSummary": "{marked} of {total} participants marked.",
+    "performed": "Did the session actually take place?",
+    "yes": "Yes, it took place",
+    "no": "No, it did not take place",
+    "actualInstructors": "Assigned instructors who actually performed",
+    "instructor": "Assigned instructor {number}",
+    "instructorCount": "Instructors who performed: {count}",
+    "rights": "Current entitlements",
+    "readRights": "Reread entitlements",
+    "noRights": "No entitlement records for this person.",
+    "rightCounts": "Available {available}, reserved {reserved}, consumed {consumed}.",
+    "effects": "Backend correction effects",
+    "effect": "Effect {number}",
+    "quantity": "Quantity: {count}",
+    "results": {
+      "unmarked": "Unmarked",
+      "attended": "Attended",
+      "no_show": "No show",
+      "blocked": "Blocked"
+    },
+    "reasons": {
+      "debt_policy": "Debt policy",
+      "credit_limit_exceeded": "Negative credit limit"
+    }
   }
 }

@@ -1634,7 +1634,8 @@
       "CREDIT_LIMIT_EXCEEDED": "Negatif kredi sınırı aşılıyor. Güncel hak ve limitleri kontrol edin.",
       "QUOTA_EXCEEDED": "Seçilen hakkın dönem kotası dolu.",
       "CLASS_ACCESS_DENIED": "Öğrenci bu sınıf veya kayıt biçimi için uygun değil.",
-      "PARTICIPATION_BLOCKED": "Güncel katılım kuralları bu işlemi engelliyor."
+      "PARTICIPATION_BLOCKED": "Güncel katılım kuralları bu işlemi engelliyor.",
+      "invalidAttendance": "Yoklama bilgileri doğrulanamadı. Güncel kaydı, seçimi ve gerekçeyi kontrol edin."
     },
     "financeCurrency": "Finans özeti için satışın para birimi",
     "rightsReloaded": "Satın alınmış haklar yeniden okundu.",
@@ -1666,7 +1667,8 @@
     "rights": "Hak düzeltmesi",
     "reservation": "Rezervasyon",
     "request": "Özel ders talebi",
-    "finance": "Tahsilat"
+    "finance": "Tahsilat",
+    "attendance": "yoklama"
   },
   "finance": {
     "title": "Öğrenci finansı",
@@ -1779,5 +1781,64 @@
     "reviewSaleRefund": "Satış iadesini incele",
     "invalidFinancePreview": "Finans önizlemesi doğrulanamadı. Kaynak ve etkiler için yeni inceleme alın.",
     "financeEffects": "Finans ve hak etkileri"
+  },
+  "attendance": {
+    "title": "Yoklama",
+    "open": "Yoklamayı aç",
+    "hide": "Yoklamayı gizle",
+    "loading": "Yoklama okunuyor…",
+    "refresh": "Yoklamayı yenile",
+    "retry": "Tekrar dene",
+    "permissionFailed": "Bu yoklama eyleminin yetkisi doğrulanamadı. Tekrar kontrol edin.",
+    "draft": "Taslak yoklama",
+    "closed": "Yoklama kapalı",
+    "revision": "Kapanış revizyonu: {version}",
+    "actualStart": "Fiilî başlangıç",
+    "notStarted": "Kaydedilmedi",
+    "unknownStart": "Başlangıç bilgisi verilmedi",
+    "draftHint": "Taslak işaretler kesin katılım veya hak tüketimi değildir. Kesin sonuç kapanıştan sonra backend’den okunur.",
+    "cancelled": "İptal edilmiş seansın yoklaması değiştirilemez.",
+    "empty": "Bu yoklamada katılımcı yok.",
+    "participants": "Yoklama katılımcıları",
+    "participant": "Katılımcı {number}",
+    "subscriber": "Abone No {number}",
+    "protected": "Mevcut rezervasyon koruması var; yeni hak veya borç muafiyeti sağlamaz.",
+    "edit": "Katılımı işaretle",
+    "correct": "Yoklamayı düzelt",
+    "hideEditor": "Düzenlemeyi kapat",
+    "start": "Fiilî başlangıcı kaydet",
+    "close": "Yoklamayı kapat",
+    "reason": "Gerekçe",
+    "result": "Katılım sonucu",
+    "blockReason": "Katılım engeli",
+    "reviewBlock": "Engeli incele",
+    "previewCorrection": "Düzeltmeyi incele",
+    "choose": "Seçin",
+    "invalidAttendance": "Yoklama bilgileri doğrulanamadı. Güncel kaydı, seçimi ve gerekçeyi kontrol edin.",
+    "closeHint": "Kapanış hak etkilerini backend atomik olarak belirler. Starter kapanışı ücret veya hakediş üretmez; diğer planların sözleşme kontrolleri korunur.",
+    "countSummary": "{total} katılımcıdan {marked} tanesi işaretli.",
+    "performed": "Seans fiilen gerçekleşti mi?",
+    "yes": "Evet, gerçekleşti",
+    "no": "Hayır, gerçekleşmedi",
+    "actualInstructors": "Fiilen görev yapan atanmış eğitmenler",
+    "instructor": "Atanmış eğitmen {number}",
+    "instructorCount": "Fiilen görev yapan eğitmen: {count}",
+    "rights": "Güncel haklar",
+    "readRights": "Hakları yeniden oku",
+    "noRights": "Bu kişi için hak kaydı yok.",
+    "rightCounts": "Kullanılabilir {available}, ayrılmış {reserved}, kullanılmış {consumed}.",
+    "effects": "Backend düzeltme etkileri",
+    "effect": "Etki {number}",
+    "quantity": "Miktar: {count}",
+    "results": {
+      "unmarked": "İşaretlenmemiş",
+      "attended": "Katıldı",
+      "no_show": "Gelmedi",
+      "blocked": "Engellendi"
+    },
+    "reasons": {
+      "debt_policy": "Borç politikası",
+      "credit_limit_exceeded": "Negatif hak sınırı"
+    }
   }
 }

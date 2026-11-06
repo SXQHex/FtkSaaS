@@ -22,6 +22,7 @@ import { ReplacementSession } from "./replacement-session";
 import { ProgramRecovery } from "../programs/program-recovery";
 import { SessionChange } from "./session-change";
 import { sessionPath } from "../../lib/session-route";
+import { AttendanceAccess } from "../attendance/attendance-access";
 import { SessionBookings } from "../bookings/session-bookings";
 import { SessionSummary, SessionFacts } from "./session-summary";
 
@@ -269,6 +270,14 @@ function LiveSessionDetail({
       <SessionSummary session={result.session} timeZone={timeZone} />
       {commandScope && (
         <SessionBookings scope={commandScope} session={result.session} onChanged={bookingChanged} />
+      )}
+      {commandScope && (
+        <AttendanceAccess
+          scope={commandScope}
+          sessionId={result.session.id}
+          timeZone={timeZone}
+          onChanged={bookingChanged}
+        />
       )}
       {replacementId && (
         <Button asChild variant="outline">

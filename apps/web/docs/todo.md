@@ -521,14 +521,28 @@ Starter owner’ın normal native oturumunda aynı yeni main kaynağıyla, mevcu
 
 ### WEB-S07 — Eğitmen paneli ve yoklama
 
+**Durum: kaynak/otomatik geliştirme tamam; Chrome/canlı kabul açık.** Kullanıcının PR232 main sonrasında XREQ-023/024’ü bekletip devam etme talimatıyla `feature/web-s07-attendance`, main `4a2bc94a27a420973e339f114d68f1542f2ef529` üzerinden açıldı. Aynı tabanın [main proof](https://github.com/SXQHex/FtkSaaS/actions/runs/42270172551), [merge proof](https://github.com/SXQHex/FtkSaaS/actions/runs/42270172432), [development](https://github.com/SXQHex/FtkSaaS/actions/runs/42270243168) ve [Vercel](https://github.com/SXQHex/FtkSaaS/actions/runs/42270243483) koşuları başarılıdır. Bu kanıt yeni S07 adayının CI veya gerçek eğitmen kabulü yerine geçmez.
+
+**Kaynak teslimi — WF07:** Eğitmen mevcut normal yetkili takvim/seans akışından yoklamaya geçer; takvimdeki seans paneli ve doğrudan seans sayfası aynı lazy bileşeni kullanır. Açılmadan yoklama/yazma okuyucuları çağrılmaz. `session_get_v1` ile `attendance_get_v1` paralel okunur; yanlış seans, tekrar eden rezervasyon, geçersiz sürüm ve birbirini tutmayan seans/yoklama snapshot’ı reddedilir. Katılımcı yalnız izinli DTO’daki Abone No veya gerçek listedeki sırasıyla gösterilir; kişi/finans yönetimi veya ad araması için ek yetki türetilmez. Kendi görev sınırının sahibi normal backend yetkilendirmesidir; hesap UUID’si kişi UUID’si varsayılmaz.
+
+Fiilî başlangıç planlı saatten üretilmez: açık yerel saat dilimi, DST gap/offset kontrolü ve gerekçeyle `attendance_start_v1` gönderilir; gelecek/tekrarlı başlangıç kabul edilmez, eksik başlangıç alanı “başlamadı” sayılmaz. Her eylem kendi normal typed management selector’ünü kontrol eder; ret yazma alanını kapatır, altyapı/konfigürasyon hatası görünür tekrar kontrolü sunar. Katılımcı düzenleyicisinin açılması yalnız o satırın mark/block yetkilerini okur; bütün liste için eager kişi/yetki sorgusu yapılmaz.
+
+Taslak katıldı/gelmedi ve politika engeli farklı komutlardır; `expected_version` gerçek rezervasyon sürümüdür. İptal edilmiş seans düzenlenmez. Kapatma güncel seans sürümü, işaretli katılımcı özeti, açık gerçekleşti/gerçekleşmedi beyanı ve yalnız gerçek atama listesinden seçilen eğitmenlerle ayrı onaylanır. Starter ücret/anlaşma/hakediş üretimi eklenmez; diğer planların backend kontrolleri aşılmaz. Kapalı yoklamada gerekçeli satır düzeltmesi → kendi `attendance_correct_preview_v1` yetkisi → session dependency/version’ı doğrulanan backend etkileri → süre/engel/token doğrulaması → açık onay → `attendance_correct_apply_v1` kullanılır. Önce/sonra sonuç görünür; eski inceleme düzenleme veya geç yanıtla geri gelemez. İstemcide hak tüketimi veya geri yükleme formülü yoktur.
+
+Başarı ve kesin ret seans/yoklamayı yeniden okur; ret nedeni yeni snapshot sonrasında görünür kalır. Kapatma/düzeltme sonrasında normal `entitlements_get_v1` ile ilgili kişilerin hakları ayrıca yeniden okunur; hak okuma reddi boş/sahte başarıya dönüştürülmez. `attendance:{session}` yalnız start/close/correct-apply, `attendance-row:{reservation}` yalnız mark/block kabul eder. Genel Bekleyen işlemler paneli izin/katalog keşfinden bağımsız aynı payload/key/token ve yeni request_id ile beş komutun status/replay yolunu korur.
+
+**Doğrulama:** Yeni35 regresyonla781 web +1 UI testi ve8/8 lint/format/typecheck/test/build görevi geçti. Ayrı gerçek selector isteği/yanlış hedef/ret/konfigürasyon hatası, paralel snapshot sürüm çakışması, gerçek rezervasyon sürümü, gerçek/DST başlangıç, kapatma beyanı/atanmamış eğitmen reddi, düzenleme sonrası onayın düşmesi, geç preview, kesin ret mesajı, güncel okuma ve beş komutun remount/exact recovery yolları sınandı. Satır slotunun hedef eşitliğini gevşeten mutasyon testleri kırdı; kaynak byte düzeyinde geri alındı ve ilgili8 test tekrar geçti. Bağımsız son kaynak incelemesinde Required/Critical bulgu kalmadı. Tarayıcı çalıştırılmadı.
+
+**Açık gerçek kabul:** Normal atanmış eğitmenin kendi takvimi/izinli katılımcıları, yetkili kapatma/düzeltme, belge/borç/negatif limit/iptal/rol kaybı matrisi, gerçek hak tüketimi ve bağlantı kaybı → tam reload zinciri Chrome/canlı ortamda açık. Typed okuyucu kaynakları gerçek normal hesaptaki kabul kanıtı değildir. XREQ-023/024 bu çalışma kapsamında bekletilir; çözüldü veya bu modülün kapanış kanıtı sayılmaz.
+
 **Ekranlar:** Eğitmenin kendi görev takvimi; seans yoklaması; kapatma özeti; gerekçeli düzeltme.
 
-- [ ] Atanmış eğitmenin kendi seanslarını ve izinli katılımcı alanlarını göster; finans ve kişi yönetim yetkisini atamadan türetme.
-- [ ] `attendance_get_v1`, `attendance_start_v1`: planlanan ve fiilî başlangıcı ayır; başlatma için gerçek yetki ve backend zaman kuralını kullan.
-- [ ] `attendance_mark_v1`/`attendance_block_v1`: izinli katılım/gelmeme/engel durumları, gerekçe, güncel sürüm ve satır bazlı başarısızlık. Toplu iş ancak sözleşme destekliyorsa kullanılır.
-- [ ] `attendance_close_v1`: sonuç ve hak tüketimi özeti; taslak işareti kesin katılım sayılmaz. Starter'da anlaşma/hakediş ekranı gerekmez ve ücret oluşturulmaz.
-- [ ] `attendance_correct_preview_v1` → `attendance_correct_apply_v1`: kapalı yoklamanın önce/sonra hak etkisi ve gerekçesi; eski kayıt geçmişi korunur.
-- [ ] Seans iptali, erişim kaybı, borç/negatif limit ve belge engelinde uygulanabilir sonraki adımı sun; sonradan ödeme ile geçmiş seans için yeni hakediş üretildiği izlenimi verme.
+- [x] Atanmış eğitmenin kendi seanslarını ve izinli katılımcı alanlarını göster; finans ve kişi yönetim yetkisini atamadan türetme.
+- [x] `attendance_get_v1`, `attendance_start_v1`: planlanan ve fiilî başlangıcı ayır; başlatma için gerçek yetki ve backend zaman kuralını kullan.
+- [x] `attendance_mark_v1`/`attendance_block_v1`: izinli katılım/gelmeme/engel durumları, gerekçe, güncel sürüm ve satır bazlı başarısızlık. Toplu iş ancak sözleşme destekliyorsa kullanılır.
+- [x] `attendance_close_v1`: sonuç ve hak tüketimi özeti; taslak işareti kesin katılım sayılmaz. Starter'da anlaşma/hakediş ekranı gerekmez ve ücret oluşturulmaz.
+- [x] `attendance_correct_preview_v1` → `attendance_correct_apply_v1`: kapalı yoklamanın önce/sonra hak etkisi ve gerekçesi; eski kayıt geçmişi korunur.
+- [x] Seans iptali, erişim kaybı, borç/negatif limit ve belge engelinde uygulanabilir sonraki adımı sun; sonradan ödeme ile geçmiş seans için yeni hakediş üretildiği izlenimi verme.
 
 **Kabul:** Gerçek atamalı eğitmen taslak kaydeder; yetkili kapatır/düzeltir; hak yalnız beklenen miktarda değişir, çift gönderim tüketimi tekrarlamaz. **Bağımlılık:** S03/S06/S11.
 
@@ -566,7 +580,7 @@ Oxlint’in yeni immutable-effect denetimi için yalnız işaretlenen dokuz effe
 
 **Son kaynak doğrulaması:** Yeni40 regresyonla746 web +1 UI testi ve8/8 lint/format/typecheck/test/build görevi geçti. Gerçek typed selector/yanlış hedef/ret/konfigürasyon hatası, üç bakiye işleminin ayrı onayı ve form değişiminde onayın düşmesi, satış kaynağı değişirken geç preview, self görünümünün hiçbir yönetim okuyucusu çağırmaması sınandı. Dört writer sonrası gerçek yeniden okuma ve üç bakiye işlemi + satış iadesinin kayıp yanıtta genel panelden exact payload/key/token kurtarması doğrulandı. Borç slotunun hedef eşitliğini gevşeten mutasyon regresyonu kırdı; dosya byte düzeyinde geri alındı ve11 ilgili test tekrar geçti. Quality0 bulgu/10 test, belge kontrolü ve bağımsız inceleme geçti; Required/Critical bulgu kalmadı. Tarayıcı çalıştırılmadı.
 
-**Açık gerçek kabul:** Chrome/erişilebilirlik/canlı uçtan uca satış→tahsilat→düzeltme→alacak→mahsup/iade matrisi; normal yönetici/personel/self/başka merkez/rol kaybı kabulü ve XREQ-024 gerçek collector okuyucusu. Bu kayıt kaynak tamamlanmasını belirtir; modülün hosted kabulü veya yeni adayın merge/main teslimi değildir.
+**Açık gerçek kabul:** Chrome/erişilebilirlik/canlı uçtan uca satış→tahsilat→düzeltme→alacak→mahsup/iade matrisi; normal yönetici/personel/self/başka merkez/rol kaybı kabulü ve XREQ-024 gerçek collector okuyucusu. Kaynak PR232 ile main `4a2bc94a27a420973e339f114d68f1542f2ef529` içindedir; aynı main’in kaynak/dağıtım kanıtı S07 başlangıcında bağlantılıdır. Modülün hosted kabulü açık kalır.
 
 **Ekranlar:** Öğrenci finans özeti; borç detayları; tahsilat; düzeltme/iade/mahsup; hareket geçmişi.
 
@@ -740,7 +754,7 @@ Aynı owner’ın gerçek `settings_update_v1(scope:member)` tercihi UI’da inc
 
 ## 7. Bölüm bölüm teslim: tek aktif bölüm
 
-Kullanıcının6 Kasım son kararı: **Tarayıcı kabullerini açık bırak, geliştirmeye odaklan.** S05/S06'nın kaynak ve otomatik teslimi main'dedir; kalan canlı kabuller kendi matrislerinde, override yetki okuyucusu XREQ-023'te açık tutulur. **WEB-S08** kaynak geliştirmesi tamamlandı; Chrome/canlı kabul ve XREQ-024 kendi bölümünde açık kalır. Bu teslimde sonraki modül başlatılmaz. S01 temel, S02, S03 ve S04 kapanışları korunur; S11'in canlı kabulü ayrıca açık kalır. Aynı anda ikinci geliştirme modülü açılmaz.
+Kullanıcının6 Kasım son kararı: **Tarayıcı kabullerini açık bırak, geliştirmeye odaklan.** S05/S06'nın kaynak ve otomatik teslimi main'dedir; kalan canlı kabuller kendi matrislerinde, override yetki okuyucusu XREQ-023'te açık tutulur. **WEB-S08** kaynak geliştirmesi tamamlandı; Chrome/canlı kabul ve XREQ-024 kendi bölümünde açık kalır. Kullanıcının devam talimatıyla sıradaki bağımsız **WEB-S07** kaynak geliştirmesi tamamlandı; kendi Chrome/canlı matrisi açık kalır. XREQ-023/024 bekletilir. S01 temel, S02, S03 ve S04 kapanışları korunur; S11'in canlı kabulü ayrıca açık kalır. Aynı anda ikinci geliştirme modülü açılmaz.
 
 S01–S13 işlev kapsamını izler. Teslim bölümleri ise kullanıcının baştan sona kullanabildiği akışlardır: örneğin davet kabulü öğrenci bölümünde, satışın zorunlu belge adımı satış bölümünde çalışır. Ortak bir bağımlılık önce kullanılacağı bölümün içinde tamamlanır ve daha sonra yeniden yazılmaz. Bölümün kabulü ileride yazılacak bir ekrana bağlanmaz: gerektiğinde yetkilendirilmiş mevcut kayıt kullanılır; yeni ekranlar arasındaki uçtan uca bağlantı, bağlantıyı kullanan sonraki bölümün açık kabul maddesidir. Gerekli gerçek kayıt/okuma yoksa bölüm engelli kalır, mock ile kapanmaz. Başka bir bölüme ait henüz yapılmamış işlem, mevcut bölümde çalışıyormuş gibi düğme/özet olarak sunulmaz.
 
@@ -754,7 +768,7 @@ S01–S13 işlev kapsamını izler. Teslim bölümleri ise kullanıcının başt
 | 6 | **Paket, satış ve hak yönetimi — kaynak teslimi tamam; canlı kabul açık** — S05 | Üç ürün türünde yayın/satış/yenileme/hak düzeltmesi, zorunlu belge adımı ve öğrenci profilindeki hak görünümü tamam. |
 | 7 | **Tahsilat ve finans — kaynak tamam; canlı kabul/XREQ-024 açık** — S08 | Finans özeti, tahsilat/düzeltme/satış iadesi/alacak iadesi/mahsup/borç düzeltmesi kaynağı tamam; gerçek kabul bu bölümde açık. Rapor karşılaştırması sonraki rapor bölümündedir. |
 | 8 | **Rezervasyon ve özel ders talepleri — kaynak teslimi tamam; canlı kabul/XREQ-023 açık** — S06, S09 self eylemleri | Yönetici ve öğrenci için kayıt/iptal/hak seçimi; talep/alternatif/onay; son kontenjan ve açık işlem reddi tamam. |
-| 9 | **Eğitmen paneli ve yoklama** — S07 | Kendi görevleri, başlangıç/taslak/kapatma/düzeltme ve hak tüketimi tamam; ücret/hakediş üretimi yok. |
+| 9 | **Eğitmen paneli ve yoklama — kaynak/otomatik tamam; canlı kabul açık** — S07 | Kendi yetkili seans akışı, fiilî başlangıç, taslak/kapatma/gerekçeli düzeltme kaynağı tamam. Gerçek hak etkisi/eğitmen kabulü açık; Starter ücret/hakedişi üretilmez. |
 | 10 | **Öğrenci paneli ve public ders başvurusu** — S09 günlük panel/public | Önceki tamamlanmış self işlemler tek panelde birleşir; gerçek widget/gateway ile başvuru ve yönetici değerlendirmesi tamam. |
 | 11 | **Kişisel takvim aboneliği** — S09 ICS | Gerçek takvim istemcisi → GET/HEAD → ICS → yetkili seans; rotate/revoke ve erişim kaybı tamam. |
 | 12 | **Raporlar ve veri aktarımı** — S10 | Finans/katılım raporu ve CSV; öğrenci/kredi/borç import'unda dosya→preview→apply→worker→satır sonucu tamam. |
