@@ -238,9 +238,9 @@ Bu tablo yalnız izdir; eski kabul metinleri ikinci kez tutulmaz.
 - **Doğrulama senaryosu:** Owner/merkez/personel/self ve plan kapıları; değişiklik→yeniden okuma→etkilenen işlem; Pro bildirim alanları P14/P15 ile kapanır. Hatırlatma/quiet-hours hedefi P15, mevcut availability okuması kaynakta mevcuttur.
 - **Kaynak alanı:** docs/settings.md; typed settings/management SQL; ilgili test
 
-**İncelenen kapsam:** 69 normatif davranış grubu ile mevcut 67 typed alan aynı sayım değildir. Beş scope’un katalog/typed round-trip, yetki, sürüm/reset/replay testleri frontend-settings-acceptance; org kopyası/merkez seçimi, program süresi, availability, paket, medya/paylaşım/public ve tahsilat tüketicileri starter-preparation-acceptance içindedir. Mevcut çalışan testler tekrar yazılmaz; bu pakette kaynak/gerçek koşu kanıtı uzlaştırılır. Bunlardan bütün 69 grubun veya gerçek frontend/hosted davranışının kapandığı sonucu çıkarılmaz. P14/P15 backend kaynak ve canlı bildirim/zamanlama kabulü tamamlandı; kalan S10 işi bütün 69 grubun tüketici/varsayılan/miras/yetki eşlemesidir. [Kaynak/ortam kaydı](00-FtkSaaS-yeni-sohbet-devir.md#s07s10-kabul-paketi).
+**İncelenen kapsam:** 69 normatif davranış grubu ile mevcut 87 typed alan (21 grup) aynı sayım değildir. Beş scope’un katalog/typed round-trip, yetki, sürüm/reset/replay testleri frontend-settings-acceptance; org kopyası/merkez seçimi, program süresi, availability, paket, medya/paylaşım/public ve tahsilat tüketicileri starter-preparation-acceptance içindedir. Mevcut çalışan testler tekrar yazılmaz; bu pakette kaynak/gerçek koşu kanıtı uzlaştırılır. Bunlardan bütün 69 grubun veya gerçek frontend/hosted davranışının kapandığı sonucu çıkarılmaz. P14/P15 backend kaynak ve canlı bildirim/zamanlama kabulü tamamlandı; kalan S10 işi bütün 69 grubun tüketici/varsayılan/miras/yetki eşlemesidir. [Kaynak/ortam kaydı](00-FtkSaaS-yeni-sohbet-devir.md#s07s10-kabul-paketi).
 
-**S10.1 — XREQ-023/024 eylem okuyucuları:** Mevcut typed management yolu kapasite istisnası, tahsilat, alacak iadesi/mahsup, borç düzeltmesi ve satış iade önizlemesi için gerçek source entity/sürümü ve canlı writer yetkisini sunar. İlk işlem geçmiş receipt istemez; tutar veya başarılı komut uydurmaz. Aynı selector'ın self/başka merkez/rol-grant-plan kaybı, canonical alias ve Business cross-center kaynak durumu sınanır. Yeni kaynak/native/main/development ve frontend kabulü ayrı izlenir; [aktif kaynak ve kanıt](00-FtkSaaS-yeni-sohbet-devir.md#eylem-yetkisi-keşfi--xreq-023024). Bu alt teslim bütün 69 ayar grubunun kapanışı değildir.
+**S10.1 — XREQ-023/024 eylem okuyucuları:** Mevcut typed management yolu kapasite istisnası, tahsilat, alacak iadesi/mahsup, borç düzeltmesi ve satış iade önizlemesi için gerçek source entity/sürümü ve canlı writer yetkisini sunar. İlk işlem geçmiş receipt istemez; tutar veya başarılı komut uydurmaz. Aynı selector'ın self/başka merkez/rol-grant-plan kaybı, canonical alias ve Business cross-center kaynak durumu sınanır. Backend kaynak/native/main/development ve altı gerçek hosted okuma kabulü tamamlandı; frontend ekran kabulü ayrı kalır; [aktif kaynak ve kanıt](00-FtkSaaS-yeni-sohbet-devir.md#eylem-yetkisi-keşfi--xreq-023024). Bu alt teslim bütün 69 ayar grubunun kapanışı değildir.
 
 <a id="s11"></a>
 ### S11 — Rapor ve güvenli indirme
@@ -257,26 +257,26 @@ Bu tablo yalnız izdir; eski kabul metinleri ikinci kez tutulmaz.
 <a id="s12"></a>
 ### S12 — Öğrenci/kredi/borç importu
 
-- [ ] **Tür:** D/H · **Plan:** Tümü · **Özellik:** F31,F07,F19
+- [x] **Tür:** D/H · **Plan:** Tümü · **Özellik:** F31,F07,F19
 - **Bağımlılık:** S04
 - **Kabul:** Önizleme ve onayla kişi, kalan hak ve borç doğru içe alınır.
 - **Sınır/olumsuz durum:** Retry çift öğrenci/hak/borç üretmez; Abone No ve Starter kotası uygulanır; Pro/Business yeni sınır kabulü P01’de tamamlanır.
 - **Doğrulama senaryosu:** Kısmi hata, yinelenen dosya, kota sınırı ve kaynak-sonuç mutabakatı; gerçek iş çıktısı.
 - **Kaynak alanı:** p06 import kaynakları; mevcut acceptance
 
-**Backend dilimi:** Mevcut Starter private CSV→preview→açık apply→worker→kısmi sonuç, hak/borç ve 100 öğrenci sınırı korunur. Aynı kaynak tekrarı kişi/satış/borçla birlikte Abone No’yu da korur; son boş slot numara alır, taşan satırın kişi/borç/sayaç etkisi geri alınır. Yeni import motoru veya politika limiti eklenmedi. Backend diliminin aday/main/development teslimi tamamlandı; [kaynak ve ortam kanıtı](00-FtkSaaS-yeni-sohbet-devir.md#s11s13-dosya-ve-belge-kabulü). Pro/Business limit kabulü P01 ile tamamlandı. Gerçek hosted dosya yükleme→preview→apply→worker→sonuç kabulü açık kalır; genel S12 kapanmadı.
+**Backend dilimi:** Mevcut Starter private CSV→preview→açık apply→worker→kısmi sonuç, hak/borç ve 100 öğrenci sınırı korunur. Aynı kaynak tekrarı kişi/satış/borçla birlikte Abone No’yu da korur; son boş slot numara alır, taşan satırın kişi/borç/sayaç etkisi geri alınır. Yeni import motoru veya politika limiti eklenmedi. Backend diliminin aday/main/development teslimi tamamlandı; [kaynak ve ortam kanıtı](00-FtkSaaS-yeni-sohbet-devir.md#s11s13-dosya-ve-belge-kabulü). Pro/Business limit kabulü P01 ile tamamlandı. Gerçek hosted signed upload→checksum→preview→açık apply→normal Cron→kısmi sonuç ve aynı dosya/namespace tekrar kabulü tamamlandı. GUID/Abone No, hak/borç/cash mutabakatı ve yabancı org job/row retleri doğrulandı; S12 backend kabulü kapalıdır. Frontend ekran kabulü ayrı kalır. [Hosted kanıt](00-FtkSaaS-yeni-sohbet-devir.md#s12-gerçek-dosya-cron-ve-tekrar-kabulü).
 
 <a id="s13"></a>
 ### S13 — Sürümlü belge ve onay akışı
 
-- [ ] **Tür:** D/H · **Plan:** Tümü · **Özellik:** F30
+- [x] **Tür:** D/H · **Plan:** Tümü · **Özellik:** F30
 - **Bağımlılık:** A03
 - **Kabul:** Dosya yüklenir, sürümlenir, işlem bağlamında gerekli onay alınır ve yetkili indirilir.
 - **Sınır/olumsuz durum:** Hash/bayt/sürüm ve tenant korunur; bağlamsız kişi özeti otomatik gereksinim değildir.
 - **Doğrulama senaryosu:** Yanlış sürüm, yetkisiz/eski download ve required belge eksikliği; gerçek Storage bayt kabulü.
 - **Kaynak alanı:** p05 document/private Storage; mevcut acceptance
 
-**Backend dilimi:** Mevcut registry harness’inde ayrı sınırlı Starter belge kökü eklendi. Gerçek native Auth ve private Storage baytları, iki farklı hash/sürüm, self onay olmadan ret, onay sonrası aynı komutla rezervasyon, eski rezervasyon/byte/onay geçmişinin korunması ve link kaybında içerik/replay reddi doğrulanır. Ürün davranışı, Storage grantları veya private dosya transport’u değişmedi. Backend diliminin aday/main/development teslimi tamamlandı; [kaynak ve ortam kanıtı](00-FtkSaaS-yeni-sohbet-devir.md#s11s13-dosya-ve-belge-kabulü). Gerçek hosted Storage/ekran tüketicisi kabulü açık kalır; yerel gerçek Storage ve CD şema doğrulaması bu kabul yerine geçmez, genel S13 kapanmadı.
+**Backend dilimi:** Mevcut registry harness’inde ayrı sınırlı Starter belge kökü eklendi. Gerçek native Auth ve private Storage baytları, iki farklı hash/sürüm, self onay olmadan ret, onay sonrası aynı komutla rezervasyon, eski rezervasyon/byte/onay geçmişinin korunması ve link kaybında içerik/replay reddi doğrulanır. Ürün davranışı, Storage grantları veya private dosya transport’u değişmedi. Backend diliminin aday/main/development teslimi tamamlandı; [kaynak ve ortam kanıtı](00-FtkSaaS-yeni-sohbet-devir.md#s11s13-dosya-ve-belge-kabulü). Gerçek hosted signed upload/checksum/publish ve contextual private bayt okuması iki sürümde doğrulandı. Self kabul olmadan gerçek satış apply reddi, onay sonrası yeni preview ile satış, yenilenen sürümde tekrar gate, eski sürüm/içerik ve yabancı org/on-behalf/direct Storage retleri geçti; ilk satış/hak ve iki onay geçmişi korundu. S13 backend hosted kabulü kapalıdır; tarayıcı/ekran kabulü karşı alanda kalır. [Hosted kanıt](00-FtkSaaS-yeni-sohbet-devir.md#s13-gerçek-private-belge-ve-yenilenmiş-onay).
 
 <a id="s14"></a>
 ### S14 — Temel public başvuru kabulü
