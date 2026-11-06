@@ -285,8 +285,8 @@
         "management_state_get_v1"
       ],
       "review": {
-        "fingerprint": "2fe99765550b0137457f7f6ea9227ed76ee6851473f2d26af1bee862775ca1c0",
-        "reason": "Reviewed original submit helper restored byte-for-byte and separate independent routing ingress fixture. Existing assertions are preserved; RATE_LIMITED/no-row side effects and actual-phone hashes are checked. No guard, threshold or exception changes."
+        "fingerprint": "48209f921f8aafee03a184b50940e9a8b36c0bd47da78142380c60fcec8c4897",
+        "reason": "Reviewed S05 additive response definitions, generated validators and native assertions. Migration manifest prepends the new checksum without rewriting the historical final auth checksum line; security policy remains unchanged."
       }
     },
     {
@@ -627,7 +627,9 @@
         "apps/backend/supabase/migrations/20261102180626_starter_subscriber_projections.sql",
         "apps/backend/database/commercial-plan-limits.sql",
         "apps/backend/supabase/migrations/20261103141306_commercial_plan_limits.sql",
-        "apps/backend/database/people-registry-scaling.sql"
+        "apps/backend/database/people-registry-scaling.sql",
+        "apps/backend/database/upper-plan-subscriber-projections.sql",
+        "apps/backend/supabase/migrations/20261106174559_upper_plan_subscriber_projections.sql"
       ],
       "operations": [
         "account_access_send_v1",
@@ -646,8 +648,8 @@
         "person_discipline_set_v1"
       ],
       "review": {
-        "fingerprint": "679afe1d9c74884bad1e62906f806a1af57e306cd9c3aa73d760dd1a9196c0c2",
-        "reason": "Reviewed account-link name sync in actual identity source: new scale fixture verifies person projection equals account_get name, then searches that identity while retaining exact self/relationship isolation assertions."
+        "fingerprint": "d844810c361f1531d41fbe3c42bd3df4cf3cd3d76593273e293c102492a65c50",
+        "reason": "Reviewed S05 additive nullable subscriber projections and native assertions; existing UUID, authorization, plan and pagination behavior unchanged; guide records the new response field."
       }
     },
     {
@@ -743,8 +745,8 @@
         "negative_limits_get_v1"
       ],
       "review": {
-        "fingerprint": "ed7b29f0e4905cb8018e0e0b833febc66507a3a4dd0e8dd7727675fab5410d56",
-        "reason": "Reviewed exact sale writer projection, timed quota/unlimited and credits, deficit order and out-of-scope exclusion, source/plan/permission/document stale refusal and key recovery; WF05 matches implementation."
+        "fingerprint": "21d491aa83fb6f58e95ca8d6a4cde32832fa20f8718a6a906d5b2621833de565",
+        "reason": "Reviewed S05 additive nullable subscriber projections and native assertions; existing UUID, authorization, plan and pagination behavior unchanged; guide records the new response field."
       }
     },
     {
@@ -887,8 +889,8 @@
         "attendance_start_v1"
       ],
       "review": {
-        "fingerprint": "9d4ca3891e5f968dfcdca0b891a95376a42bb970102a7a42aeee285862a7595d",
-        "reason": "Reviewed common runtime wrapper diff: only service-internal outbox email_phase changes; WF07 entrypoints remain byte-identical. Explicit opt-in external notices do not alter domain commit, scope, plan or existing guide semantics."
+        "fingerprint": "aaeff6672fd84639cd930747e8da42bb9acfc74bb865eaae72923fdc5c03ba35",
+        "reason": "Reviewed S05 additive nullable subscriber projections and native assertions; existing UUID, authorization, plan and pagination behavior unchanged; guide records the new response field."
       }
     },
     {
@@ -947,8 +949,8 @@
         "debt_adjust_v1"
       ],
       "review": {
-        "fingerprint": "4ef72956f574e6303f30b07166852f31cf6990a1f0a03eb161502955a0603ec4",
-        "reason": "Reviewed common runtime wrapper diff: only service-internal outbox email_phase changes; WF08 entrypoints remain byte-identical. Explicit opt-in external notices do not alter domain commit, scope, plan or existing guide semantics."
+        "fingerprint": "219f4bb34c040644de1c286d5cbf273b99f98bc2734d30f91e893af65acf6ed3",
+        "reason": "Reviewed S05 additive nullable subscriber projections and native assertions; existing UUID, authorization, plan and pagination behavior unchanged; guide records the new response field."
       }
     },
     {
@@ -1078,8 +1080,8 @@
         "file_upload_complete_v1"
       ],
       "review": {
-        "fingerprint": "dab3612d8964ccf92b1c39a553ea065d2f664dee65d7f85472d5e675989ee0a2",
-        "reason": "Reviewed common runtime wrapper diff: only service-internal outbox email_phase changes; WF10 entrypoints remain byte-identical. Explicit opt-in external notices do not alter domain commit, scope, plan or existing guide semantics."
+        "fingerprint": "677e0b34ed9f4922660803046952af4f7de3c715f35de591941529d80894c298",
+        "reason": "Reviewed S05 additive nullable subscriber projections and native assertions; existing UUID, authorization, plan and pagination behavior unchanged; guide records the new response field."
       }
     },
     {
@@ -1279,7 +1281,9 @@
         "apps/backend/database/starter-availability-management.sql",
         "docs/workflows.md",
         "apps/backend/database/program-configuration-requirements.sql",
-        "apps/backend/supabase/migrations/20261103123239_program_configuration_requirements.sql"
+        "apps/backend/supabase/migrations/20261103123239_program_configuration_requirements.sql",
+        "apps/backend/database/upper-plan-subscriber-projections.sql",
+        "apps/backend/supabase/migrations/20261106174559_upper_plan_subscriber_projections.sql"
       ],
       "operations": [
         "instructor_agreement_publish_v1",
@@ -1290,8 +1294,8 @@
         "instructor_agreements_list_v1"
       ],
       "review": {
-        "fingerprint": "5a975ccac981ffdd4b5d7b26ba887b08ba15b95f07a22ce5c701067cc8a4f3f3",
-        "reason": "Reviewed common runtime wrapper diff: only service-internal outbox email_phase changes; WF14 entrypoints remain byte-identical. Explicit opt-in external notices do not alter domain commit, scope, plan or existing guide semantics."
+        "fingerprint": "7d37afba0c6cb5c4651318354d8651819e4a1d8a4eaa4a6819aae73b1449100d",
+        "reason": "Reviewed S05 additive nullable subscriber projections and native assertions; existing UUID, authorization, plan and pagination behavior unchanged; guide records the new response field."
       }
     },
     {
@@ -1337,7 +1341,9 @@
         "apps/backend/database/wrappers.sql",
         "docs/workflows.md",
         "apps/backend/database/event-capacity-practice.sql",
-        "apps/backend/supabase/migrations/20261103233454_event_capacity_practice.sql"
+        "apps/backend/supabase/migrations/20261103233454_event_capacity_practice.sql",
+        "apps/backend/database/upper-plan-subscriber-projections.sql",
+        "apps/backend/supabase/migrations/20261106174559_upper_plan_subscriber_projections.sql"
       ],
       "operations": [
         "event_save_v1",
@@ -1360,8 +1366,8 @@
         "event_actual_start_correct_v1"
       ],
       "review": {
-        "fingerprint": "9805208cfa45ca3c88fc1cef386e862c283529e0f52f177317bf222ca032d4f3",
-        "reason": "Reviewed common runtime wrapper diff: only service-internal outbox email_phase changes; WF15 entrypoints remain byte-identical. Explicit opt-in external notices do not alter domain commit, scope, plan or existing guide semantics."
+        "fingerprint": "52394f8388e91abac099b597debf289665e7829e8c0c9dd2330fb87d41bd26f8",
+        "reason": "Reviewed S05 additive nullable subscriber projections and native assertions; existing UUID, authorization, plan and pagination behavior unchanged; guide records the new response field."
       }
     },
     {
@@ -1400,7 +1406,9 @@
         "apps/backend/supabase/migrations/20261104131917_crm_application_intake.sql",
         "apps/backend/supabase/migrations/20261105100000_crm_lifecycle_plan.sql",
         "apps/backend/tests/crm-lifecycle-fixture.mjs",
-        "docs/workflows.md"
+        "docs/workflows.md",
+        "apps/backend/database/upper-plan-subscriber-projections.sql",
+        "apps/backend/supabase/migrations/20261106174559_upper_plan_subscriber_projections.sql"
       ],
       "operations": [
         "leads_list_v1",
@@ -1414,8 +1422,8 @@
         "automation_save_v1"
       ],
       "review": {
-        "fingerprint": "733b84003160f0d78d0b8e0476f791a20f209f1859a39a037869d19fab261568",
-        "reason": "Reviewed final separate routing fixture and original shared-phone helper preservation; real intake budget and native Auth routing/version/visibility assertions retain behavior. Existing workflow guide stays accurate."
+        "fingerprint": "ca9bb53405e664fb43dfcb64a572652cd8808ab7461d83f5e3bcd3e1035d478e",
+        "reason": "Reviewed S05 additive nullable subscriber projections and native assertions; existing UUID, authorization, plan and pagination behavior unchanged; guide records the new response field."
       }
     },
     {
@@ -1503,7 +1511,9 @@
         "apps/backend/database/cross-center-settlement-wrappers.sql",
         "apps/backend/database/cross-center-settlement.sql",
         "apps/backend/database/runtime-wrappers-current.sql",
-        "docs/workflows.md"
+        "docs/workflows.md",
+        "apps/backend/database/upper-plan-subscriber-projections.sql",
+        "apps/backend/supabase/migrations/20261106174559_upper_plan_subscriber_projections.sql"
       ],
       "operations": [
         "settlement_movements_list_v1",
@@ -1517,8 +1527,8 @@
         "settlement_authority_set_v1"
       ],
       "review": {
-        "fingerprint": "337c054935ee54879db0081b26360a28c000ed489ca3910c0fbdf09df7f97050",
-        "reason": "Reviewed common runtime wrapper diff: only service-internal outbox email_phase changes; WF18 entrypoints remain byte-identical. Explicit opt-in external notices do not alter domain commit, scope, plan or existing guide semantics."
+        "fingerprint": "7ea991d3c5466440ba05ed99db07bc6b494fcbd6b55280742a3805027855dc11",
+        "reason": "Reviewed S05 additive nullable subscriber projections and native assertions; existing UUID, authorization, plan and pagination behavior unchanged; guide records the new response field."
       }
     },
     {

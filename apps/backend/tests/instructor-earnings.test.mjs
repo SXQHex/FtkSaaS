@@ -76,6 +76,7 @@ async function earningsFixture(t){
   await fail('instructor_agreement_publish_v1',agreementRequest(terms([fixed('9223372036854775808')])),'VALIDATION_FAILED');
   agreement=await agree(terms([fixed(100),personFee(50),percent(5000)]));original=agreement;
   const a=await list();assert.equal(a.items[0].id,agreement.primary_id);assert.equal(a.items[0].version,1);
+  assert.equal(a.items[0].subscriber_number,(await rows('select private.subscriber_number($1,$2) n',[org,instructor.p]))[0].n);
   const legacy=key();await db.query("insert into core.instructor_agreements(id,org_id,center_id,person_id,discipline_id,format,valid_from,model,terms,state) values($1,$2,$3,$4,$5,'group','2020-01-01','session_fixed',$6,'inactive')",[legacy,org,center,instructor.p,discipline,terms([fixed(1)])]);
   const oldView=(await list()).items.find(x=>x.id===legacy);assert.equal(oldView.valid.ends_at,null);assert.equal(oldView.published_at,null);
   const replay=key(),request=agreementRequest(terms([fixed(100)]),{format:'private'});const first=await mut('instructor_agreement_publish_v1',request,replay);assert((await mut('instructor_agreement_publish_v1',request,replay)).replayed);
@@ -118,6 +119,7 @@ async function earningsFixture(t){
   assert((await mut('attendance_close_v1',closurePayload,closureKey)).replayed);
   assert.equal((await rows('select count(*)::int n from core.cash_movements where org_id=$1',[org]))[0].n,0);
   const read=await earningRead(instructor.u);assert.equal(read.items.find(x=>x.session_id===sid).amount_minor,'500');
+  assert.equal(read.items.find(x=>x.session_id===sid).subscriber_number,(await rows('select private.subscriber_number($1,$2) n',[org,instructor.p]))[0].n);
   assert.equal((await rows("select count(*)::int n from core.entitlement_allocations where reservation_id=any($1) and state='consumed'",[[rid,rv2]]))[0].n,2);
  });
  await t.test('same product override covers old and new sale versions without catalog repricing',async()=>{

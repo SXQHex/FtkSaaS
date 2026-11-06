@@ -225,3 +225,5 @@ assert next(Path('supabase/migrations').glob('*_crm_lifecycle_plan.sql')).read_b
 assert next(Path('supabase/migrations').glob('*_p15_p16_reminders_automation.sql')).read_text()==''.join(Path('database',n).read_text() for n in ['settings-catalog-v11.sql', 'reminder-scheduling.sql', 'reminder-workers.sql', 'reminder-email.sql', 'automation-results.sql']),'P15/P16 source drift'
 
 assert next(Path('supabase/migrations').glob('*_people_registry_scaling.sql')).read_bytes()==Path('database/people-registry-scaling.sql').read_bytes(),'People scope source drift'
+
+assert next(Path('supabase/migrations').glob('*_upper_plan_subscriber_projections.sql')).read_bytes()==Path('database/upper-plan-subscriber-projections.sql').read_bytes(),'Upper-plan subscriber source drift'

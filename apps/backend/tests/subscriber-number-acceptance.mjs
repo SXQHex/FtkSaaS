@@ -36,6 +36,14 @@ test('Abone No allocation, backfill, alias merge and scoped discovery through re
    const attempts=await Promise.all([call(owner,'student_activate_v1',scope({person_id:second}),key()),call(owner,'student_activate_v1',scope({person_id:second}),key())]);
    assert(attempts.some(x=>x.result.ok));assert.equal(await number(second),'1002');assert.equal((await ledger()).length,2);
   });
+  await t.test('CRM lead projection reads numbered and unnumbered people without allocation',async()=>{
+   const before=await counter();
+   for(const pid of [first,ownerPerson]){
+    const view=(await db.query("select private.p04_lead_view(jsonb_populate_record(null::core.leads,jsonb_build_object('id',$1::uuid,'org_id',$2::uuid,'person_id',$3::uuid,'state','open','version',1))) v",[key(),org,pid])).rows[0].v;
+    assert.equal(view.subscriber_number,await number(pid));
+   }
+   assert.equal(await counter(),before);
+  });
   await t.test('different people allocate uniquely in parallel and reactivation keeps the original number',async()=>{
    const persons=await Promise.all([person('Concurrent A'),person('Concurrent B')]);await Promise.all(persons.map(person_id=>mut('student_activate_v1',{person_id})));
    assert.deepEqual((await Promise.all(persons.map(number))).sort(),['1003','1004']);

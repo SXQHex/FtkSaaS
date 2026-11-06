@@ -389,3 +389,10 @@ test('XREQ-021 catalogs are closed optional lesson-request selectors with minima
  const value={operation:'lesson_request_create_v1',key:{person_id:newUuidV7(),catalog:'disciplines'}};assert(selector(value));assert(selector({...value,key:{person_id:value.key.person_id}}));assert(!selector({...value,key:{...value.key,catalog:'contacts'}}));
  const item={operation:'lesson_request_create_v1',values:{discipline_id:newUuidV7(),display_name:'Synthetic discipline'}};assert(projection(item));assert(!projection({...item,values:{...item.values,email:'private@example.invalid'}}));
 });
+
+test('upper-plan person projections preserve the nullable decimal subscriber identifier',()=>{
+ for(const name of ['EarningView','LeadView','EventRegistrationView','EventDutyView','EventPaymentPreparationView','AgreementVersionView','SettlementAuthorityView','CrmFollowupView']){
+  assert.deepEqual(p.$defs[name].properties.subscriber_number,p.$defs.PersonSummary.properties.subscriber_number,name);
+  assert(!p.$defs[name].required.includes('subscriber_number'),`${name}: additive response field`);
+ }
+});
