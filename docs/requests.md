@@ -348,7 +348,7 @@ Kaynak uygulaması ve native kabul senaryoları aynı PR210 içindedir; aday/mai
 
 ### Frontend PR210 değerlendirmesi — 5 Kasım 2026
 
-PR210 main teslimi normal satışın typed projeksiyonunu içerir. PR212 sonrası frontend kaynak dilimi `SalePreview.sale` üzerinden kesin borç/para birimi, geçerlilik, kredili/kotalı/sınırsız hak ve mevcut eksik hak/rezervasyon kararlarını gösterir; açık onayla normal `sale_apply_v1` ve aynı proof/key kurtarmasını kullanır. Yenileme ayrı preview/apply olarak korunur. PR214 main/development/web teslimi ve normal native UI’de üç ürün türünün borç/hak eşleşmesi, yenileme ve Starter stale reddi doğrulandı. Kalan negatif/Starter matrisi tamamlanmadığından XREQ-020 kapanışı verilmez; frontend kaynak/test/aday ve canlı kanıtın sahibi [S05](../apps/web/docs/todo.md#web-s05) kaydıdır.
+PR210 main teslimi normal satışın typed projeksiyonunu içerir. PR212 sonrası frontend kaynak dilimi `SalePreview.sale` üzerinden kesin borç/para birimi, geçerlilik, kredili/kotalı/sınırsız hak ve mevcut eksik hak/rezervasyon kararlarını gösterir; açık onayla normal `sale_apply_v1` ve aynı proof/key kurtarmasını kullanır. Yenileme ayrı preview/apply olarak korunur. PR214 main/development/web teslimi ve normal native UI’de üç ürün türünün borç/hak eşleşmesi, yenileme ve Starter stale reddi doğrulandı. 6 Kasımda Starter üç tür satış/yenileme, eski ürün sürümü koşullarının korunması ve gerçek frontend preview expiry/yeni inceleme kabulü tamamlandı. Belge, plan/yetki kaybı ve native belirsiz yanıt matrisi açık olduğundan XREQ-020 kapanışı verilmez; frontend kaynak/test/aday ve canlı kanıtın sahibi [S05](../apps/web/docs/todo.md#web-s05) kaydıdır.
 
 <a id="xreq-021"></a>
 ## XREQ-021 Self özel ders talebi için dar merkez kataloğu
