@@ -1,6 +1,6 @@
 # Frontend sohbet devri
 
-Aktif bölüm, kaynak ve kabulün tek sahibi [frontend todo kaydıdır](todo.md#web-s05).
+Aktif bölüm, kaynak ve kabulün tek sahibi [frontend todo kaydıdır](todo.md#web-s08).
 
 ## Devam bağlamı
 

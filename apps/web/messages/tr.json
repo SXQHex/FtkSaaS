@@ -1725,6 +1725,28 @@
     "retryPermission": "Tahsilat yetkisini yeniden kontrol et",
     "center": "Merkez",
     "noCenter": "Finans için erişilebilir bir merkez yok.",
-    "choosePerson": "Öğrenci seç"
+    "choosePerson": "Öğrenci seç",
+    "correction": "Tahsilat düzeltmesi",
+    "sourceCollection": "Kaynak tahsilat",
+    "collectionNumber": "Tahsilat {number}",
+    "correctionPermissionFailed": "Tahsilat düzeltme yetkisi doğrulanamadı.",
+    "correctionHint": "Yeni toplamı değil, artırılacak veya azaltılacak farkı girin. Zaman dilimi: {timeZone}. Borç ve alacak etkisini incelemede kontrol edin.",
+    "correctionAmount": "Düzeltme farkı",
+    "correctionDirection": "Düzeltme yönü",
+    "increase": "Tahsilatı artır",
+    "decrease": "Tahsilatı azalt",
+    "correctionTime": "Düzeltme zamanı",
+    "correctionReason": "Gerekçe",
+    "reviewCorrection": "Düzeltmeyi incele",
+    "invalidCorrectionPreview": "Düzeltme etkileri doğrulanamadı. Yeni inceleme alın.",
+    "correctionEffects": "Borç ve alacak etkileri",
+    "effectEntities": {
+      "debts": "Borç",
+      "cash_movements": "Para hareketi",
+      "debt_allocations": "Borç tahsisi",
+      "student_credit_accounts": "Öğrenci alacağı",
+      "student_credit_movements": "Alacak hareketi"
+    },
+    "effectRecord": "Kayıt {number}"
   }
 }

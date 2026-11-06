@@ -1725,6 +1725,28 @@
     "retryPermission": "Check collection permission again",
     "center": "Center",
     "noCenter": "No accessible center for finances.",
-    "choosePerson": "Choose a student"
+    "choosePerson": "Choose a student",
+    "correction": "Collection correction",
+    "sourceCollection": "Original collection",
+    "collectionNumber": "Collection {number}",
+    "correctionPermissionFailed": "Collection correction permission could not be verified.",
+    "correctionHint": "Enter the amount to increase or decrease, rather than the new total. Time zone: {timeZone}. Review debt and credit effects before applying.",
+    "correctionAmount": "Correction difference",
+    "correctionDirection": "Correction direction",
+    "increase": "Increase collection",
+    "decrease": "Decrease collection",
+    "correctionTime": "Correction time",
+    "correctionReason": "Reason",
+    "reviewCorrection": "Review correction",
+    "invalidCorrectionPreview": "Correction effects could not be verified. Request a new review.",
+    "correctionEffects": "Debt and credit effects",
+    "effectEntities": {
+      "debts": "Debt",
+      "cash_movements": "Cash movement",
+      "debt_allocations": "Debt allocation",
+      "student_credit_accounts": "Student credit",
+      "student_credit_movements": "Credit movement"
+    },
+    "effectRecord": "Record {number}"
   }
 }

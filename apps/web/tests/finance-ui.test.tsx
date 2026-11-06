@@ -15,6 +15,12 @@ vi.mock("../src/lib/supabase/client", () => ({
 }));
 const id = "019a2b3c-4d5e-7000-8000-000000000001",
   other = "019a2b3c-4d5e-7000-8000-000000000002";
+const corrections = {
+  canCorrect: async () => false,
+  preview: async () => {
+    throw Error("denied");
+  },
+};
 const scope = { actorId: id, orgId: other, centerId: id };
 const view: FinanceView = {
   person_id: id,
@@ -52,7 +58,7 @@ beforeEach(() => {
 test("finance is lazy, uses an explicit currency and does not turn historical unknown payment into cash", async () => {
   const user = userEvent.setup(),
     read = vi.fn<FinanceApi["read"]>(async () => view),
-    api = { read, canCollect: vi.fn<FinanceApi["canCollect"]>(async () => false) };
+    api = { read, corrections, canCollect: vi.fn<FinanceApi["canCollect"]>(async () => false) };
   render(<PersonFinance scope={scope} personId={id} timeZone="Europe/Istanbul" api={api} />);
   expect(read).not.toHaveBeenCalled();
   await user.click(screen.getByRole("button", { name: "Finansı aç" }));
@@ -77,7 +83,7 @@ test("a failed refresh removes stale balances and a foreign-person projection is
       scope={scope}
       personId={id}
       timeZone="UTC"
-      api={{ read, canCollect: async () => false }}
+      api={{ read, corrections, canCollect: async () => false }}
     />,
   );
   await user.click(screen.getByRole("button", { name: "Finansı aç" }));
@@ -107,7 +113,7 @@ test("a late finance response from the previous account/person cannot reappear",
           scope={changed ? { ...scope, actorId: other } : scope}
           personId={changed ? other : id}
           timeZone="UTC"
-          api={{ read, canCollect: async () => false }}
+          api={{ read, corrections, canCollect: async () => false }}
         />
       </>
     );
@@ -136,6 +142,7 @@ test("collection requires explicit method, allocation, local time and review; su
         ? [{ ...view.debts[0]!, remaining_minor: "0", paid_minor: "320000" }]
         : view.debts,
     })),
+    corrections,
     canCollect: async () => true,
   };
   server.use(
@@ -199,6 +206,7 @@ test("a later currency request wins and a denied collection reader never opens a
             movements: { ...view.movements, items: [] },
           }),
     ),
+    corrections,
     canCollect: vi.fn<FinanceApi["canCollect"]>(async () => {
       throw Error("POLICY_NOT_CONFIGURED");
     }),
@@ -290,6 +298,7 @@ test("debt selection keeps ledger numbering when earlier debts are already settl
           ...view,
           debts: [{ id, remaining_minor: "0", due_at: "2026-10-01T12:00:00Z" }, ...view.debts],
         }),
+        corrections,
         canCollect: async () => true,
       }}
     />,
