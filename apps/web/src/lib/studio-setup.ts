@@ -1,4 +1,5 @@
 import { v7, validate } from "uuid";
+import { validCorrection } from "./collection-correction";
 import { validCollection } from "./collection-command";
 import {
   bookingWrites,
@@ -20,6 +21,7 @@ import { sessionCapacity } from "./session-create";
 export const setupWrites = [
   ...rightsOperations,
   "collection_record_v1",
+  "collection_correct_apply_v1",
   ...bookingWrites,
   "product_publish_v1",
   "document_accept_v1",
@@ -54,6 +56,7 @@ type SetupRead =
   | "sale_preview_v1"
   | "sale_renew_preview_v1"
   | "finance_get_v1"
+  | "collection_correct_preview_v1"
   | "negative_limits_get_v1"
   | "reservation_impact_preview_v1"
   | "products_list_v1"
@@ -109,6 +112,7 @@ export type PendingSetup = { command: SetupCommand; blocked?: boolean };
 const keyPattern = /^[a-f0-9]{8}-[a-f0-9]{4}-7[a-f0-9]{3}-[89ab][a-f0-9]{3}-[a-f0-9]{12}$/i;
 const fields: Record<SetupWrite, string[]> = {
   ...bookingFields,
+  collection_correct_apply_v1: ["preview"],
   collection_record_v1: [
     "person_id",
     "amount_minor",
@@ -211,6 +215,18 @@ export function recoverSetup(scope: SetupScope, slot: string): PendingSetup | "i
       rightsOperations.some((operation) => operation === command.operation) &&
       (!validRightsCommand(command.operation, input, scope.centerId) ||
         (command.operation === "negative_limit_set_v1" && slot !== `rights:${input.person_id}`))
+    )
+      return "invalid";
+    if (
+      slot.startsWith("collection-correct:") &&
+      command.operation !== "collection_correct_apply_v1"
+    )
+      return "invalid";
+    if (
+      command.operation === "collection_correct_apply_v1" &&
+      (!validCorrection(input, scope.centerId) ||
+        !/^collection-correct:[^:]+$/.test(slot) ||
+        !validate(slot.slice("collection-correct:".length)))
     )
       return "invalid";
     if (slot.startsWith("finance:") && command.operation !== "collection_record_v1")

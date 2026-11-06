@@ -10,6 +10,7 @@ import type { SetupScope } from "../../lib/studio-setup";
 import { FlowError, flowError } from "../bookings/flow-controls";
 import { SetupFeedback, useSetupCommand } from "../setup/setup-command";
 import { FinanceLedger } from "./finance-ledger";
+import { CollectionCorrection } from "./collection-correction";
 import { CollectionAccess } from "./collection-access";
 export function PersonFinance(props: {
   scope: SetupScope;
@@ -129,6 +130,17 @@ function FinanceConnection({
               {current?.view && (
                 <>
                   <FinanceLedger view={current.view} />
+                  <CollectionCorrection
+                    key={`correction:${key}`}
+                    scope={scope}
+                    movements={current.view.movements.items}
+                    timeZone={timeZone}
+                    api={api.corrections}
+                    onSaved={() => {
+                      setCursor(undefined);
+                      setRevision((n) => n + 1);
+                    }}
+                  />
                   <CollectionAccess
                     key={key}
                     scope={scope}

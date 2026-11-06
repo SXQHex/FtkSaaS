@@ -8,7 +8,7 @@ export type PendingOperation = {
   kind: "sale" | "rights" | "reservation" | "request" | "finance";
 };
 const operations: Record<PendingOperation["kind"], readonly string[]> = {
-  finance: ["collection_record_v1"],
+  finance: ["collection_record_v1", "collection_correct_apply_v1"],
   sale: ["sale_apply_v1", "sale_renew_apply_v1"],
   rights: rightsOperations,
   reservation: bookingWrites.filter((operation) => operation.startsWith("reservation_")),
@@ -19,6 +19,7 @@ function slotKind(slot: string): PendingOperation["kind"] | null {
   const [family, target, extra] = slot.split(":");
   if (!target || !validate(target) || extra !== undefined) return null;
   switch (family) {
+    case "collection-correct":
     case "finance":
       return "finance";
     case "sale-renew":
