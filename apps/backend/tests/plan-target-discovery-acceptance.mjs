@@ -1,0 +1,48 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import {preparationFixture} from './starter-preparation-fixture.mjs';
+import {authUser,must,call} from './api-client.mjs';
+import {newUuidV7 as key} from '../scripts/uuid.mjs';
+
+test('XREQ027 owner discovers real downgrade versions and schedules only an explicit selected target',{timeout:300000},async t=>{
+ const f=await preparationFixture(),{db,org,center,owner,plan}=f;t.after(()=>db.end());
+ await db.query("update core.saas_plan_versions set name='business' where id=$1",[plan]);
+ const api=(op,b={},u=owner,k=key())=>must(u,op,{org_id:org,...b},k);
+ const denied=async(code,op,b,u=owner)=>{const r=await call(u,op,{org_id:org,...b},key());assert.equal(r.result.ok,false);assert.equal(r.result.error.code,code);};
+ const planVersion=async(name,{period='monthly',currency='TRY',amount=500,future=false}={})=>{
+  const id=key();await db.query("insert into core.saas_plan_versions(id,name,effective_at,price_minor,currency,period,limits,features) select $1,$2,now()+case when $3 then interval '1 day' else interval '-1 day' end,$4,$5,$6,limits,features from core.saas_plan_versions where id=$7",[id,name,future,amount,currency,period,plan]);return id;
+ };
+ const pro=await planVersion('pro'),starter=await planVersion('starter',{amount:250}),future=await planVersion('pro',{future:true}),wrongPeriod=await planVersion('pro',{period:'yearly'}),wrongCurrency=await planVersion('pro',{currency:'USD'}),same=await planVersion('business'),zero=await planVersion('pro',{amount:0});
+ const read=()=>api('subscription_get_v1');
+ const effects=async()=>{
+  const result={};for(const table of ['saas_change_requests','saas_quotes','operation_receipts','audit_events'])result[table]=Number((await db.query('select count(*)::int n from core.'+table+' where org_id=$1',[org])).rows[0].n);return result;
+ };
+ const before=await effects(),snapshot=await read(),options=snapshot.billing.downgrade_options;
+ const chosen=options.find(o=>o.target.id===pro);assert(chosen);assert.equal(chosen.plan,'pro');assert.equal(chosen.target.amount_minor,'500');assert.equal(chosen.target.period,'monthly');assert.equal(chosen.target.currency,'TRY');assert.equal(chosen.kept_center_required,true);assert.equal(Date.parse(chosen.effective_at),Date.parse(snapshot.period_end));assert(options.some(o=>o.target.id===starter));
+ for(const id of [future,wrongPeriod,wrongCurrency,same,zero,plan])assert(!options.some(o=>o.target.id===id));
+ assert.deepEqual(await effects(),before);
+ const manager=await authUser('plan-target-org-manager'),account=await must(manager,'account_get_v1');
+ const person=(await api('person_create_v1',{center_id:center,display_name:'Synthetic plan catalog manager',contacts:[]})).primary_id;
+ await db.query("insert into core.account_links(id,org_id,account_id,person_id,state,verified_at) values($1,$2,$3,$4,'active',now())",[key(),org,account.id,person]);
+ await api('org_manager_assign_v1',{person_id:person});
+ assert.deepEqual((await api('subscription_get_v1',{},manager)).billing.downgrade_options,[]);
+ await denied('FORBIDDEN','subscription_downgrade_request_v1',{target_plan_id:pro,kept_center_id:center},manager);
+ const outsider=await authUser('plan-target-outsider');await must(outsider,'account_get_v1');await denied('NOT_FOUND','subscription_get_v1',{},outsider);
+ const selected=await api('management_state_get_v1',{operation:'subscription_downgrade_request_v1',selector:{operation:'subscription_downgrade_request_v1',key:{target_plan_id:chosen.target.id}}});
+ assert.equal(selected.items[0].current.values.target_plan_id,pro);assert.equal(selected.items[0].versions[0].version,snapshot.subscription_version);
+ const command={target_plan_id:chosen.target.id,kept_center_id:center,expected_version:selected.items[0].versions[0].version};
+ await db.query("update core.saas_plan_versions set effective_at=now()+interval '1 day' where id=$1",[pro]);
+ const staleBefore=await effects();await denied('NOT_FOUND','subscription_downgrade_request_v1',command);assert.deepEqual(await effects(),staleBefore);assert(!(await read()).billing.downgrade_options.some(o=>o.target.id===pro));
+ await db.query("update core.saas_plan_versions set effective_at=now()-interval '1 day' where id=$1",[pro]);
+ const operationKey=key(),scheduled=await api('subscription_downgrade_request_v1',command,owner,operationKey);assert.equal((await api('subscription_downgrade_request_v1',command,owner,operationKey)).replayed,true);
+ const actual=(await db.query('select target_plan_id,effective_at,state from core.saas_change_requests where org_id=$1 and id=$2',[org,scheduled.primary_id])).rows[0];assert.equal(actual.target_plan_id,pro);assert.equal(actual.state,'scheduled');assert.equal(+actual.effective_at,Date.parse(chosen.effective_at));assert.equal((await read()).billing.current.id,plan);
+ await api('subscription_change_cancel_v1',{change_id:scheduled.primary_id,expected_version:scheduled.version});
+ const yearly=await planVersion('business',{period:'yearly',amount:12000}),current=await read();
+ const period=await api('subscription_period_change_request_v1',{target_plan_id:yearly,expected_version:current.subscription_version,amount_minor:'12000',currency:'TRY',effective_at:current.period_end});
+ assert.deepEqual((await read()).billing.downgrade_options,[]);
+ await api('subscription_change_cancel_v1',{change_id:period.primary_id,expected_version:period.version});
+ assert((await read()).billing.downgrade_options.some(o=>o.target.id===pro));
+ await db.query("update core.saas_subscriptions set starts_at=now()-interval '1 month',period_end=now()-interval '1 second' where org_id=$1",[org]);
+ const expired=await read();assert.deepEqual(expired.billing.downgrade_options,[]);
+ await denied('SUBSCRIPTION_NOT_STARTED','subscription_downgrade_request_v1',{...command,expected_version:expired.subscription_version});
+});

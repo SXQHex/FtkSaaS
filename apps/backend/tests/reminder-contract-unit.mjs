@@ -9,7 +9,7 @@ test('P15 settings keep closed scopes, accepted timing choices and explicit quie
 test('P15 shared scope validators preserve all branch constraints after removing duplicated base validation',()=>{
  const expanded=structuredClone(contract);
  const names=['SettingsView','SettingsCatalog','Request_settings_update','Request_settings_reset_preview','Request_settings_reset_apply','Request_settings_history_get','Request_settings_catalog_get','Request_settings_get'];
- for(const name of names){const d=expanded.$defs[name];for(const key of Object.keys(d.properties)){const schemas=d.oneOf.flatMap(b=>b.properties[key]?[b.properties[key]]:[]);if(schemas.length)d.properties[key]={anyOf:schemas};}}
+ for(const name of names){const d=expanded.$defs[name];for(const key of Object.keys(d.properties)){const schemas=d.oneOf.flatMap(b=>b.properties[key]?[b.properties[key]]:[]);if(schemas.length)d.properties[key]={allOf:[d.properties[key],{anyOf:schemas}]};}}
  const compile=s=>{const ajv=new Ajv({strict:false,allErrors:false});addFormats(ajv);ajv.addSchema(s,'contract');return name=>ajv.getSchema('contract#/$defs/'+name);};const compact=compile(contract),repeated=compile(expanded);
  const samples=[null,{},[],request('user',{quiet_hours_enabled:false}),request('member',{in_app_reminders:false}),request('center',{lesson_reminder_hours:1}),request('organization',{payment_reminder_days:3})];
  for(const scope of ['user','member','center','organization','platform']){

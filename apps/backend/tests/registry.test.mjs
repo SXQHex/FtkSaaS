@@ -155,3 +155,5 @@ import './reminder-scheduling-acceptance.mjs';
 import './automation-results-acceptance.mjs';
 import './people-self-scale-acceptance.mjs';
 import './agreement-preparation-acceptance.mjs';
+import './permission-preparation-acceptance.mjs';
+import './plan-target-discovery-acceptance.mjs';

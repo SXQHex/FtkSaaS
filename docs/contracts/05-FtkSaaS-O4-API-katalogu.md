@@ -222,7 +222,7 @@
 | `calendar_link_rotate_v1` | runtime / ilgili WF’yi oku | `calendar.self` | W / config | client_api_version: 1; request_id: FtkUuid; operation_key: FtkUuid; organization_scope: object; link_id: FtkUuid; expected_version: PositiveInt | Success_calendar_link_rotate |
 | `calendar_link_revoke_v1` | runtime / ilgili WF’yi oku | `calendar.self` | W / config | client_api_version: 1; request_id: FtkUuid; operation_key: FtkUuid; link_id: FtkUuid; expected_version: PositiveInt | Success_calendar_link_revoke |
 | `calendar_feed_get_v1` | runtime / ilgili WF’yi oku | `calendar.feed` | R / read | client_api_version: 1; request_id: FtkUuid; token: string | Success_calendar_feed_get |
-| `settings_preparation_resolve_v1` | runtime / ilgili WF’yi oku | `preparation.resolve` | R / read | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; center_id: FtkUuid; kind: availability / package / agreement; source: PreparationSourceReference; resource?: ResourceRef; rule_index?: integer | Success_settings_preparation_resolve |
+| `settings_preparation_resolve_v1` | runtime / ilgili WF’yi oku | `preparation.resolve` | R / read | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; center_id: FtkUuid; kind: availability / package / agreement / permission; source: PreparationSourceReference; resource?: ResourceRef; rule_index?: integer | Success_settings_preparation_resolve |
 | `account_signup_check_v1` | runtime / ilgili WF’yi oku | `auth.signup` | E / exempt | client_api_version: 1; request_id: FtkUuid; email: string | Success_account_signup_check |
 | `role_revoke_preview_v1` | runtime / ilgili WF’yi oku | `center.manage` | P / config | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; center_id: FtkUuid; expected_version: PositiveInt; assignment_id: FtkUuid | Success_role_revoke_preview |
 | `subscription_period_change_request_v1` | runtime / ilgili WF’yi oku | `subscription.owner` | W / exempt | client_api_version: 1; request_id: FtkUuid; org_id: FtkUuid; center_id?: FtkUuid ∣ null; operation_key: FtkUuid; expected_version: PositiveInt; target_plan_id: FtkUuid; amount_minor: Money; currency: Currency; effective_at: Instant | Success_subscription_period_change_request |
@@ -257,7 +257,7 @@
 | roles_list_v1 | read | none | None | contract_only |  |
 | role_assign_v1 | command | append_or_current_scope_lock | management_state_get_v1 | implemented | role_assignments.active, no_account_link_creation |
 | role_revoke_v1 | command | row_version | roles_list_v1 | implemented | role_assignments.inactive_live_next_request |
-| permission_set_v1 | command | row_version | person_get_v1 | implemented | permission_overrides, people.permission_aggregate_version |
+| permission_set_v1 | command | row_version | management_state_get_v1 | implemented | permission_overrides, people.permission_aggregate_version |
 | org_manager_assign_v1 | command | append_or_current_scope_lock | management_state_get_v1 | contract_only | role_assignments.org_manager, no_implicit_center_operation_grant |
 | org_manager_revoke_v1 | command | row_version | roles_list_v1 | implemented | role_assignments.org_manager_inactive |
 | manager_self_assign_center_v1 | command | append_or_current_scope_lock | management_state_get_v1 | contract_only | manager_self_assign_center.authorized_result |

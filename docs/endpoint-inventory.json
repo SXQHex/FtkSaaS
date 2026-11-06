@@ -3352,7 +3352,9 @@
         }
       },
       "billing_class": "exempt",
-      "limits": []
+      "limits": [
+        "billing.downgrade_options returns Owner-only effective lower-rank positive-price plan versions with same period/currency; current active paid boundary and no pending period change. No quote, schedule or plan change is created."
+      ]
     },
     {
       "name": "subscription_upgrade_quote_v1",
@@ -4934,7 +4936,8 @@
         "Original live authority and supported selectors are listed in runtime_selectors. Class/program discovery requires explicit organization/center and live schedule.manage; program reuse requires a fresh preview, never a saved approval.",
         "role_assign_v1 selector supports instructor only, explicit matching center/scope and live center manager authority; optional person_id discovers active/inactive assignment IDs and row versions. No account link IDs or general F05 personnel listing.",
         "session_assignment_set_v1 selector key={} or {session_id} lists open unstarted sessions requiring instructor assignment, including overdue; explicit center/live manager, starts_at_asc keyset, real session version and session_detail. No implicit appointment or calendar time window.",
-        "Six action-discovery selectors return one authorized source entity with current.values limited to the typed selector key: collection_record, reservation_capacity_override, student_credit_refund/offset, debt_adjust and sale_refund_preview. Original live writer authorization is reused without executing its domain branch; no prior transaction, preview, receipt or amount is invented. Explicit center required; source/person/alias scope and plan gates remain live. This is authority discovery, not a promise that capacity, balance, documents or other write-time conditions will pass."
+        "Six action-discovery selectors return one authorized source entity with current.values limited to the typed selector key: collection_record, reservation_capacity_override, student_credit_refund/offset, debt_adjust and sale_refund_preview. Original live writer authorization is reused without executing its domain branch; no prior transaction, preview, receipt or amount is invented. Explicit center required; source/person/alias scope and plan gates remain live. This is authority discovery, not a promise that capacity, balance, documents or other write-time conditions will pass.",
+        "permission_set_v1: center CM/F05 reads the target staff/instructor person version and stored override_exists plus enabled only when a stored override exists. No synthetic contextual effective permission."
       ]
     },
     {
@@ -5869,7 +5872,8 @@
         "F02",
         "F15",
         "F16",
-        "F20"
+        "F20",
+        "F05"
       ],
       "required_features": [],
       "runtime_required_features": [],
@@ -5883,7 +5887,7 @@
       },
       "billing_class": "read",
       "limits": [
-        "Read-only explicit template/source/version selection. Resolve grants no execution permission and creates no rule, product, sale, agreement, earning or job.",
+        "Read-only explicit template/source/version selection. Resolve grants no execution permission and creates no rule, product, sale, agreement, earning or job. Permission proposals have no target, role or version; each explicit permission_set command rechecks live center, F05, target role and actual person version.",
         "New centers copy only existing availability/package preparation arrays once. Agreement sources are chosen explicitly; existing business snapshots never live-inherit.",
         "Package dates and refund method are explicit; no automatic rolling validity or implicit none."
       ]
