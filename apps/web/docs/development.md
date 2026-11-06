@@ -1,6 +1,20 @@
 # Frontend geliştirme
 
-Kapsam yalnız FtkSaaS'tır. Web uygulaması apps/web, ortak arayüz packages/ui sahibindedir. Kök [AGENTS](../../../AGENTS.md), [istemci protokolü](../../../docs/client-integration.md) ve [API sözleşme paketi](../../../packages/api-contracts/README.md) önceliklidir. Starter bölüm planı, aktif bölüm, bağımlılıklar ve frontend kabul takibi [todo.md](todo.md) içindedir. Repo/backend kabulü [00 devirde](../../backend/docs/00-FtkSaaS-yeni-sohbet-devir.md), ortak işler [proje backlog’unda](../../backend/docs/remaining-work.md) tutulur.
+Kapsam yalnız FtkSaaS'tır. Web uygulaması apps/web, ortak arayüz packages/ui sahibindedir. Kök [AGENTS](../../../AGENTS.md), [istemci protokolü](../../../docs/client-integration.md) ve [API sözleşme paketi](../../../packages/api-contracts/README.md) önceliklidir. Pro ilk teslim hedefi, Starter varyantı, sonraki Business kapsamı, modül sırası ve frontend kabul takibinin tek sahibi [todo.md](todo.md) dosyasıdır. Bu rehber uygulama yöntemini ve mevcut ekran davranışlarını tutar; ikinci görev/kabul listesi oluşturmaz. Repo/backend kabulü [00 devirde](../../backend/docs/00-FtkSaaS-yeni-sohbet-devir.md), backend açık işleri [kendi backlog’unda](../../backend/docs/remaining-work.md) tutulur.
+
+<a id="plan-ve-rol-uyarlamasi"></a>
+
+## Plan ve role uygun ortak ekran geliştirme
+
+Yeni akışlar [teslim planındaki](todo.md#7-bölüm-bölüm-teslim-tek-aktif-bölüm) sırayla Pro'nun çok kaynaklı kullanıcı yolculuğundan geliştirilir. Aynı modülde Starter'ın tek kaynak seçimi ve kapalı özellikleri doğrulanır; bu iş bütün Pro bittikten sonraya bırakılmaz. Ortak bileşeni plan başına kopyalama veya her bileşene dağılmış plan adı kontrolleri yerine mevcut typed plan/rol/işlem projeksiyonları tüketilir. Plan, canlı rol ve belirli eylem yetkisi farklıdır; genel abonelik okuması bütün yazıların yetki kaynağı değildir.
+
+Organizasyon işleri ile merkez operasyonları ayrı kapsamdır. Org gelen kutusu/raporu/ayarını tek küresel seçili merkeze zorlamadan `org_id`, gerektiğinde `center_id` ve gerçek kişi/seans hedefi taşınır. Tek seçeneğin otomatik gösterilmesi işlem yetkisi üretmez. Mevcut scope tipi ve komut günlüğü genişletilir; hesap/merkez değişince seçili nesne, cursor, açık form, preview ve geç yanıt yeni bağlama sızmaz. Business için kapsam, izinli projeksiyon, para birimi ve ayar kaynağı/mirası korunur; sonraki çok merkezli işlemler sırf bu altyapı için erkenden uygulanmaz.
+
+Yönetici, resepsiyon/personel, eğitmen ve öğrenci görevleri aynı izinli bileşenlerle farklı günlük görünümlerde birleştirilir. Yönetici paneline birkaç filtre eklemek self portalın kabulü değildir. Günlük iş → kişi/seans/aday/etkinlik ayrıntısı → ilgili işlem → sonuç akışı izlenir. Kısa işlem Sheet/Dialog, karmaşık yaşam döngüsü ayrı detay/adımlı akış olabilir. Finans ve yoğun karşılaştırmalar tabloda; mobil günlük görevler kısa liste/kartta sunulur. Yeni detaylarda kararlı bağlantı, reload, geri/ileri ve giriş sonrası dönüş korunur; çalışan hash kabuğu topluca yeniden yazılmaz.
+
+Her dilim gerçek okuma → kullanıcı kararı → gerekiyorsa preview → açık onay/komut → yeniden okuma → hata/kurtarmayı tamamlar. Pro ürün payload'ı genişlerken aynı komutu kabul eden kurtarma doğrulaması da güncellenir. Anlaşma sürümü, paket etkisi, mali sonuç veya worker işi istemcide tekrar hesaplanmaz. `PLAN_FEATURE_UNAVAILABLE`, yetkisizlik, eksik config ve geçici hata ayrı kullanıcı durumlarıdır; eksik okuyucu sahte yetki veya başarıyla doldurulmaz.
+
+Ayar ve belge tüketimi ilgili iş akışının parçasıdır. Kaydetme ile gerçek tüketici etkisi, kaynak/default/miras, seçili reset ve geçmiş birlikte doğrulanır; kapsamın sahibi [S12 eşlemesidir](todo.md#web-s12). Plan daralması ve erişim kaybı yeni form/komutlarda erken sınanır. Kaynak, otomatik test/CI, yayın ve canlı kabul ayrı kaydedilir; ertelenen gerçek kontrollerin tek takibi [todo teslim kapısındadır](todo.md#pro-ilk-teslim-kapisi).
 
 ## Bileşen ve araç kuralları
 
@@ -20,7 +34,7 @@ Ana `/` sayfası URL değişmeden `(workspace)` route grubunda kalır. Grubun `l
 
 `StudioWorkspace` ekranları module-level `next/dynamic` sınırlarından, yalnız seçilen bölüm render edildiğinde yükler. Program yönetimi ve doğrudan seans düzenleme de eylem anında yüklenir. SSR varsayılanı korunur; `ssr:false` eklenmez. `WorkspaceLoading` mevcut tokenları, TR/EN yükleme metnini, canlı durum bildirimini ve azaltılmış hareket stilini kullanır. Seans özeti `session-summary.tsx` sahibindedir; doğrudan sayfa, Sheet'in bütün komut/düzenleme bağımlılıklarını sırf özeti göstermek için import etmez. Bileşen taşınması markup veya kapasite/tarih davranışını değiştirmez.
 
-Ana sayfa sunucunun doğruladığı native kullanıcı ID'sini React key ve `authUserId` olarak kabuğa verir. Başka native hesaba giriş veya çıkış mevcut snapshot'ı temizler, bekleyen okuma sonucunu düşürür ve Next router üzerinden girişe döner. Domain komutlarının aktörü ayrıca gerçek `account_get_v1.id` olmaya devam eder. Kullanıcı/tenant verileri için ortak Next cache veya iş komutları için Server Action katmanı eklenmez; mevcut typed Edge ve recovery günlüğü aynı tüketicilerde kalır. Ölçüm ve kabul durumu [aktif bölüm kaydındadır](todo.md#web-s06).
+Ana sayfa sunucunun doğruladığı native kullanıcı ID'sini React key ve `authUserId` olarak kabuğa verir. Başka native hesaba giriş veya çıkış mevcut snapshot'ı temizler, bekleyen okuma sonucunu düşürür ve Next router üzerinden girişe döner. Domain komutlarının aktörü ayrıca gerçek `account_get_v1.id` olmaya devam eder. Kullanıcı/tenant verileri için ortak Next cache veya iş komutları için Server Action katmanı eklenmez; mevcut typed Edge ve recovery günlüğü aynı tüketicilerde kalır. Ölçüm ve kabul durumu [S06 kaynak/kabul kaydındadır](todo.md#web-s06).
 
 ## Erişim değişince bekleyen işlemler
 
@@ -112,14 +126,14 @@ Oxlint’te `vitest/valid-expect.maxArgs=2`, Vitest’in desteklediği tanılama
 Tasarım yönü: kullanıcının verdiği nötr shadcn OKLCH tokenları, 0.625rem radius, sistem fontu; marka çalışması yapılmadı. Sidebar-07 yerleşimi mevcut shadcn bileşenleriyle uyarlandı. Kuruluş/merkez seçici kullanılmaz. Günün dersleri ve sıradaki ders ana odağı oluşturur; öğrenci/paket/ödeme görünümleri kart, detaylar Sheet kullanır. Kaynak ve MIT izi packages/ui/registry-sources.json ile LICENSE içindedir.
 
 - `AdminShell`: kontrollü bölüm seçimi, daraltılabilir masaüstü menüsü, mobil Sheet, sayfa araması (Ctrl/⌘+K), hesap/görünüm ve yardım panelleri. Auth, plan veya domain yetkisi uygulamaz.
-- `StudioWorkspace`: native oturum altında gerçek account/organization/center ve kullanıcı ayarı okumaları. Kuruluş/merkez seçici yoktur; izinli merkezler kartlarla gösterilir. Closed/bootstrap kuruluşlar için merkez okuması yapılmaz. Oturum kapandıktan sonra geç gelen yanıt ekrana taşınmaz; API hatası sentetik veriye dönüştürülmez. Ders programı calendar_get_v1, güncel seans detayı session_get_v1 ile okunur. Öğrenciler bölümü gerçek kişi okumaları ve öğrencilik işlemlerine bağlıdır; paket/finans/rapor/inbox alanları canlı consumer’ları bağlanana kadar açık bir hazırlık durumu gösterir.
+- `StudioWorkspace`: native oturum altında gerçek account/organization/center ve kullanıcı ayarı okumaları. Kuruluş/merkez seçici yoktur; izinli merkezler kartlarla gösterilir. Closed/bootstrap kuruluşlar için merkez okuması yapılmaz. Oturum kapandıktan sonra geç gelen yanıt ekrana taşınmaz; API hatası sentetik veriye dönüştürülmez. Ders programı calendar_get_v1, güncel seans detayı session_get_v1 ile okunur. Öğrenciler, paket/satış, rezervasyon/talep, finans ve belge/inbox alanlarında gerçek tüketiciler vardır; rapor gibi henüz bağlanmamış alanlar açık hazırlık durumu gösterir. Menü veya kaynak mevcudiyeti tam ürün kabulü değildir; ayrıntılı durum [todo](todo.md) sahibindedir.
 - `AdminPreview`: URL hash ve geri/ileri gezinme; ders günü seçimi, öğrenci arama/filtre, detay panelleri ve örnek kart ekleme. Geçici eklenen kartlar yenilemede sıfırlanır. Bildirim okundu durumu yalnız önizleme belleğindedir; CSV açıkça örnek olarak indirilir.
 - `preview-data`: yalnız `/tasarim` tarafından kullanılan kurgusal kişiler, dersler ve paketler. Fiyatlar/öğrenci sayıları ürün kararı veya canlı veri değildir.
 
 TR/EN ve açık/koyu/sistem teması mevcut tercih altyapısını kullanır. Önizlemedeki örnek kayıtlar gerçek hesap veya hosted kabulü değildir. `admin-design.spec.ts` gezinme/detay, örnek kayıt izolasyonu, klavye araması, mobil menü, axe, TR/EN ve büyütülmüş metin akışlarını gerçek tarayıcıda doğrular. Testlerin yazılmış olması çalışıp geçtiği anlamına gelmez; gerçek CI sonucu ayrıca değerlendirilir.
 
 
-## Starter ekran yönü ve takvim sınırı
+## Ortak ekran yönü ve takvim sınırı
 
 Kullanıcının yüklediği `frontend-design` becerisi bu dilimde uygulanır. Kabul edilmiş nötr tema korunur: beyaz `#ffffff`, yüzey `#fafafa`, ikincil yüzey `#f5f5f5`, ana metin `#171717`, yardımcı metin `#737373`, çizgi `#e5e5e5`; uygulamanın mevcut OKLCH tokenları tek CSS kaynağıdır. Sistem sans yazı ailesi, sol hizalı içerik ve tabular saat/rakamlar kullanılır. Görsel odak stüdyonun gün/hafta programıdır; yeni KPI kartları ve dekoratif grafikler eklenmez. Mobilde saat ve ders adı öne çıkar; detay Sheet ile bağlam korunur. Kontenjan yoklama veya gerçekleşme değildir.
 
@@ -127,7 +141,7 @@ Kullanıcının yüklediği `frontend-design` becerisi bu dilimde uygulanır. Ka
 
 Syncfusion yalnız çizelge seçildiğinde dinamik yüklenir. `NEXT_PUBLIC_SYNCFUSION_LICENSE_KEY`, kurulu35.x sürümüne uygun onaylı Community License anahtarıyla build ortamında tanımlanır; Turbo build girdisidir. Anahtar yokken lisanssız Scheduler başlatılmaz, aynı gerçek verinin liste görünümü kullanılır. Liste/gün/hafta işlevi lisans anahtarı gerektirmez. Anahtar değerini kaynak/PR/log’a yazma. İlk adaptör salt okunurdur; sürükle-bırak, resize ve dahili editör kapalıdır. Seans seçimi bizim detay panelimize gider. Lisans kaydı: [Community License](https://www.syncfusion.com/products/communitylicense); uygulama kaynakları [Scheduler](https://ej2.syncfusion.com/react/documentation/schedule/getting-started), [yerelleştirme](https://ej2.syncfusion.com/react/documentation/schedule/localization) ve [saat dilimi](https://ej2.syncfusion.com/react/documentation/schedule/timezone). Üçüncü taraf paketler kendi lisans bildirimlerini korur.
 
-Starter’ın ekran/işlem ayrıntıları ve bölüm kabul ölçütleri [frontend yol haritasında](todo.md) tutulur. Bir bölüm bitmeden sonraki bölümün uygulamasına geçilmez; bu rehber ikinci görev listesi içermez.
+Pro ve Starter ekran/işlem ayrıntıları ile bölüm kabul ölçütleri [frontend yol haritasında](todo.md) tutulur. Tek aktif bölüm, ertelenen canlı kabul ve bağımlılığı hazır sonraki dilimin seçimi [teslim sırasına](todo.md#7-bölüm-bölüm-teslim-tek-aktif-bölüm) uyar; bu rehber ikinci görev listesi içermez.
 
 
 ## Doğrudan seans bağlantısı

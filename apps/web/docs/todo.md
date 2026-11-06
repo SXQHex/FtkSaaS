@@ -1,21 +1,22 @@
-# Starter frontend geliştirme yol haritası
+# Pro ilk teslim frontend geliştirme yol haritası
 
-Amaç: Bir Starter stüdyosunun kuruluşundan günlük ders, öğrenci, satış, rezervasyon, yoklama ve tahsilat yönetimine; öğrencinin kendi hesabından işlem yapmasına kadar bütün izinli akışları web arayüzünde tamamlamak.
+Amaç: İlk ürün tesliminde Pro'nun tek merkezde çok kaynaklı işletme akışlarını uçtan uca tamamlamak; her modülde Starter'ın sade görünümünü ve sınırlarını korumak. Ortak kapsam/yetki mimarisi Business'ı taşımalı; Business'a özgü çok merkezli işlemler sonraki teslimde tamamlanmalıdır.
 
-Bu belge Starter frontend'in uygulama ve takip planıdır. Modül adımları, aktif bölüm, sıra, bağımlılıklar ve frontend kabul kanıtları burada tutulur. Frontend bölüm planı ve kabul takibinin sahibi bu dosyadır; ürün kararı, proje iş akışı ve API sözleşmesi kök `/docs` kaynaklarından tüketilir. Frontend planlama işi backend kodu veya ortak ürün kararı değiştirme yetkisi vermez. Bu dosya frontend bağımlılık gözlemlerini tutar. Karşı alana somut talep, değerlendirme/onay ve teslim durumu yalnız [ortak talep kaydında](../../../docs/requests.md) tutulur; burada ilgili talep kimliği ve frontend etkisi bulunur. Talep kaydı backend işini kendiliğinden başlatmaz. İşaretli bir ekran veya başarılı mock testi, modülün canlı kabulü değildir.
+Bu belge frontend'in tek uygulama, sıra ve kabul planıdır. Kullanıcının 6 Kasım 2026 tarihli Pro ilk teslim kararı ve `FtkSaaS-Pro-Ilk-Teslim-Modul-Haritasi.md` değerlendirmesi mevcut S01–S13 sahiplerine ve aşağıdaki Pro alt kapsamlarına aktarılmıştır; rapor ikinci yaşayan backlog değildir. S01–S04'ün geçmiş kabulü korunur, yeni Pro farklarına aktarılmaz. Ürün kararı, proje iş akışı ve API sözleşmesi kök `/docs` kaynaklarından tüketilir. Frontend planlama işi backend kodu veya ortak ürün kararı değiştirme yetkisi vermez. Karşı alana somut talep, değerlendirme/onay ve teslim durumu yalnız [ortak talep kaydında](../../../docs/requests.md) tutulur; burada ilgili talep kimliği ve frontend etkisi bulunur. İşaretli kaynak görevi, başarılı mock testi, merge ve canlı kabul ayrı durumlardır.
 
 ## 1. Kaynak ve değerlendirme yöntemi
 
-Plan, mevcut `src/app`, `src/components`, `src/lib/api.ts` ile aşağıdaki ürün ve backend kaynakları birlikte incelenerek hazırlanmıştır. Kaynak envanteri PR91'in bulunduğu main `5455ba824868e30adac131993608e81477a3b461` ile karşılaştırılmıştır; bu envanter tek başına canlı kabul kanıtı değildir. Repo/backend kaynak ve CI snapshot'ı [00 devirde](../../backend/docs/00-FtkSaaS-yeni-sohbet-devir.md), frontend bölüm kabulü burada tutulur. Backend değiştiğinde geliştirmeye başlamadan ilgili DTO, selector ve yetki tekrar okunur.
+Raporun inceleme tabanı `4a2bc94a27a420973e339f114d68f1542f2ef529`; bu belge değişikliğinin senkronize tabanı PR234 sonrası main `47e6e0d3d1a190c3d313441b522cbc9df0125f02`'dır. Yeni tabanın [main proof](https://github.com/SXQHex/FtkSaaS/actions/runs/42278972299), [merge proof](https://github.com/SXQHex/FtkSaaS/actions/runs/42278972207), [development](https://github.com/SXQHex/FtkSaaS/actions/runs/42279042012) ve [Vercel delivery](https://github.com/SXQHex/FtkSaaS/actions/runs/42279042152) sonuçları başarılı doğrulandı. Bu kanıt yeni belge adayının CI sonucu veya bütün Pro akışlarının canlı kabulü değildir. Rapor kaynaklar ve ayrı bağlamda AI incelemesine dayanır; dış firma/insan denetimi veya yeni tarayıcı kabulü değildir. Repo/backend kabulü [00 devirde](../../backend/docs/00-FtkSaaS-yeni-sohbet-devir.md) kalır. Yeni uygulama diliminden önce güncel main, açık PR, DTO, selector ve yetki tekrar okunur.
 
 | Konu | Yetkili kaynak |
 |---|---|
-| Ürün kapsamı ve Starter sınırları | [Ürün sözleşmesi](../../../docs/contracts/01-FtkSaaS-urun-kapsam-sozlesmesi.md), [WF00](../../../docs/workflows.md#wf00) |
+| Ürün kapsamı ve plan sınırları | [Ürün sözleşmesi](../../../docs/contracts/01-FtkSaaS-urun-kapsam-sozlesmesi.md), [WF00](../../../docs/workflows.md#wf00) |
 | İstek/yanıt, hata, sürüm, plan ve izin | [Makine sözleşmesi](../../../packages/api-contracts/schema/contract.json), [üretilmiş tipler](../../../packages/api-contracts/src), [operasyon envanteri](../../../docs/endpoint-inventory.json) |
 | İstemci ve veri bütünlüğü | [İstemci protokolü](../../../docs/client-integration.md), [durum/hata/izin](../../../docs/contracts/06-FtkSaaS-O4-durum-hata-izin.md) |
 | Program, rezervasyon ve haklar | [WF03 program](../../../docs/workflows.md#wf03), [WF05 satış/hak](../../../docs/workflows.md#wf05), [WF06 rezervasyon/talep](../../../docs/workflows.md#wf06), [WF07 yoklama](../../../docs/workflows.md#wf07) |
 | Finans, belge, rapor ve import | [WF08 finans](../../../docs/workflows.md#wf08), [WF11 belge](../../../docs/workflows.md#wf11), [WF10 rapor/import](../../../docs/workflows.md#wf10) |
-| Public, hesap ve abonelik | [WF09 public](../../../docs/workflows.md#wf09), [WF17 hesap/abonelik](../../../docs/workflows.md#wf17) |
+| Public, hesap ve abonelik | [WF09 public](../../../docs/workflows.md#wf09), [WF13 abonelik](../../../docs/workflows.md#wf13), [WF17 lifecycle](../../../docs/workflows.md#wf17) |
+| Pro anlaşma, hakediş, etkinlik, CRM ve bekleme | [WF14](../../../docs/workflows.md#wf14), [WF15](../../../docs/workflows.md#wf15), [WF16](../../../docs/workflows.md#wf16), [WF19](../../../docs/workflows.md#wf19), [P08](../../../docs/decisions/P08-accepted-scope.md) |
 | Ayar alanları ve tüketiciler | [Ayar rehberi](../../../docs/settings.md) |
 | UI ve kabul araçları | [Web geliştirme rehberi](development.md), [CI politikası](../../../docs/ci-policy.md) |
 
@@ -26,27 +27,33 @@ Emekli alan devirleri güncel kaynak değildir; WF rehberi ve makine sözleşmes
 Bu liste [01 ürün kapsamının](../../../docs/contracts/01-FtkSaaS-urun-kapsam-sozlesmesi.md) frontend plana yansımasıdır; ikinci ürün kararı kaynağı değildir. Davranış ayrıntısının sahibi [02 teknik sözleşme](../../../docs/contracts/02-FtkSaaS-teknik-sozlesme.md) ve [WF rehberidir](../../../docs/workflows.md).
 
 - Starter: 1 aktif merkez, 1 aktif oda, 1 aktif disiplin, 1 aktif eğitmen ve 100 aktif öğrenci. Aynı kişinin mükerrer sayılması ve eşzamanlı son slot yarışı backend'in sorumluluğudur.
-- Tüm seanslar tek mantıksal oda ve geçerli eğitmen kapsamında yürür. Seans/kategori kontenjanı fiziksel oda kapasitesiyle tutarlı olmalıdır.
-- Kredili, dönemsel kotalı ve sınırsız süreli ürünler desteklenir. Paket seçili merkez/disiplin kapsamındadır; adı kayıtlı disiplin adıyla başlar. Eski satışın koşulları yeni ürün sürümüyle değiştirilmez.
-- Öğrenci self rezervasyonu, özel ders talebi, dar public ders başvurusu, anlaşmasız/hakedişsiz yoklama ve manuel finans akışları kapsamdadır.
+- Pro: tek fiziksel lokasyon/merkez, 250 aktif öğrenci; çoklu oda, disiplin ve eğitmen. Backend'in `unlimited:true` çıktısı sahte büyük sayı veya kullanım sayısı olarak gösterilmez. Kaynak ve son öğrenci slotu denetimi backend'dedir.
+- Business: en fazla 5 merkez; Business işlemlerinin sonraki teslim planı [bölüm 10'dadır](#business-sonraki-teslim). Özel teklif/özel limit ve beş merkezi aşma kapsam dışıdır; iptal edilen ürün B05'i geri getirme. Bölüm 5'teki B05 kimliği yalnız dosya/worker bağımlılığıdır.
+- Starter'da tek kaynak sadeleşmesi korunur; Pro seansları çoklu kaynakla planlanır. Seans/kategori kontenjanı fiziksel oda kapasitesiyle tutarlı olmalıdır. Etkinlik kapasitesi ders modelinden ayrı tüketilir.
+- Kredili, dönemsel kotalı ve sınırsız süreli ürünlerde Starter merkez/disiplin/ders kapsamı korunur; Pro ürün ve yaşam döngüsü [S05](#web-s05) içinde genişletilir. Eski satışın koşulları yeni ürün sürümüyle değiştirilmez.
+- Öğrenci self işlemleri ve manuel finans ortak temeldir. Pro personel izinleri, anlaşma/hakediş, bekleme/teklif, paket yaşam döngüsü, CRM, etkinlik, otomasyon ve rapor kapsamı aşağıda açık iş olarak izlenir; sözleşmede bulunması kaynak veya hosted kabulü değildir.
 - Starter'a personel izin yönetimi (F05), bekleme/yer teklifi (F12), paket dondurma/değişim (F17), merkezler arası hesaplaşma (F18), hakediş (F20), gelişmiş CRM/deneme kampanyası/segment/otomasyon (F21–F24), otomatik hatırlatmalar (F27) ve etkinlik/workshop/parti (F29) eklenmez. Ortak API ailesindeki alt işlem ayrıca plan kapısından geçirilir. Starter'ın yeni elle aday kaydı/not/takip kapsamı [CRM ek diliminde](#crm-temel-aday-takibi) ayrı açık tutulur; bu karar runtime desteği değildir.
 - SaaS planı yükseltme/düşürme F32'dir; öğrenci paketinin F17 kapsamındaki değişimiyle karıştırılmaz. F25 ders başvurusu da genel CRM yetkisi değildir.
 - Fiyat, çalışma saati, iptal penceresi, vade, hukuki metin, özel limit ve sağlayıcı ayarı uydurulmaz. Backend'in açık defaultu dışında eksik değer kurulum gerektirir.
 - Syncfusion `SessionCalendar` içinde kalır. Yeni modülleri somut geliştirme faydası varsa değerlendirilir; tek ürün ailesini kullanmak teslim koşulu değildir. Expo bu planın dışındadır.
+- Global disiplin registry'si, lead/follow/switch, yeni indirim motoru ve bağlı posta kutusu bu teslimin işi değildir. Meta/Google yerel başvuru alımı mevcut P08/G02 kapsamındadır; reklam performans panoları ve dönüşüm geri bildirimiyle karıştırılıp kendiliğinden V2'ye taşınmaz.
 
 ## 3. Mevcut kaynaktan devralınacak temel
 
-Bu tablo kodun başlangıç envanteridir; canlı kabul kaydı değildir.
+Bu tablo inceleme tabanındaki durumun gezinme özetidir; ayrıntılı kaynak ve kabul kanıtı ilgili S bölümündedir. Tamamlanma yüzdesi ekran/API/test sayısından türetilmez.
 
-| Alan | Kaynakta bulunan temel | Tamamlama işi |
+| Alan | Devralınan temel / kabul sınırı | Pro ilk teslimde kalan işin sahibi |
 |---|---|---|
-| Kimlik | Giriş, kayıt, kurtarma, Google dönüşü, TOTP ve korumalı route | Gerçek sağlayıcı kabulü; hesap/oturum/güvenlik/davet kabulü ve lifecycle ekranları |
-| Kabuk | Gerçek hesap/organizasyon/merkez okumaları, mobil menü, TR/EN ve tema | Role uygun başlangıç, işlem bağlantıları, yenilemede korunabilen gezinme ve erişim kaybı |
-| Takvim | Gün/hafta/liste, gerçek seans detayı, korumalı doğrudan seans route'u | Sınıf/program/tek seans oluşturma, tam kaynak ataması, iptal/telafi ve lisanslı Scheduler kabulü |
-| Seans değişikliği | Saat ve kontenjan preview/apply, sonuç kurtarma | Oda/eğitmen ve seri DST seçimleri, yetkili eylem görünürlüğü, hosted kabul |
-| Öğrenci | Arama/sayfalama, kişi oluşturma/düzenleme, öğrencilik, davet işi | Disiplin ilişkisi, kişi birleştirme, davet/link yönetimi ve diğer modüllere gerçek bağlantı |
-| Paket, finans, rapor, inbox | Kabukta hazırlık görünümü; tasarımda sentetik örnekler | Canlı okuma ve bütün izinli yazma akışları |
-| Ayarlar | Kullanıcı ayarını okuma ve bazı görünüm tercihleri | Scope/sürüm/default/miras/reset ve gerçek alan tüketicileri |
+| S01 | Temel hesap/güvenlik kabulü var; ek kurtarma/sağlayıcı kabulleri açık | [Kapsam/rol ve gezinme](#ortak-kapsam-erisimi), [ek kabul](#açık-ek-kabul-kontrolleri) |
+| S02 | Starter kurulum kabulü ve bazı çoklu kaynak okuyucuları var | [Pro ekip/kaynak ve anlaşma](#pro-kaynak-ve-ekip) |
+| S03 | Starter ve belirli Pro/Business takvim senaryoları kabul edilmiş | [Tam Pro program/kaynak kabulü](#pro-program-kabulu) |
+| S04 | Starter kişi/öğrenci kabulü var; CRM eki açık | [Temel aday](#crm-temel-aday-takibi), [Pro CRM](#pro-crm) |
+| S05/S06 | Kaynak/otomatik teslim var; canlı matris ve XREQ-023 frontend uyumu açık | [Paket yaşam döngüsü](#pro-paket-yasam-dongusu), [bekleme/teklif](#pro-bekleme-teklif) |
+| S07 | Main'de açık; #233'te mevcut yoklama kaynağı/test çalışması var | [Adayı devralma ve Pro hakediş](#web-s07); ikinci yoklama uygulaması açılmaz |
+| S08 | PR232 ile kaynak main'de; canlı kabul/XREQ-024 frontend uyumu açık | [Okuyucu uyumu ve finans mutabakatı](#pro-finans-kabulu); yeniden yazım yok |
+| S09/S10 | Tam günlük panel, public/ICS ve rapor/import yolculukları açık | [Self paneller](#web-s09), [Pro rapor/import](#web-s10) |
+| S11 | Belge/inbox/geçmiş kaynağı ve otomatik teslim var; canlı kabul açık | Mevcut altyapının bağlamsal tüketimi, [hatırlatma/otomasyon](#pro-bildirim-otomasyon) |
+| S12/S13 | Bazı ayar tüketicileri ve plan okuması var | [FD sahipliği](#web-s12), [dönem/plan ve lifecycle](#web-s13) |
 
 `/tasarim`, `/tasarim/seans` ve `/tasarim/ogrenciler` referans/fixture alanlarıdır. Bu alanların etkileşimleri canlı iş tamamlanması olarak işaretlenmez. Yeni ekranlar mevcut bileşenleri geliştirir; çalışan Auth/takvim/öğrenci temeli yeniden yazılmaz.
 
@@ -90,12 +97,16 @@ Her modül aşağıdaki koşullarla tasarlanır; bunlar en sonda eklenecek ayrı
 | B05 | Rapor/import/belge için tenant teknik limit/config ve çalışan iş hatları | Backend/ortam sahibi: private yükleme, checksum, worker ve indirme yetkisi kanıtı. Eksik config güvenli kurulum mesajı olur. | S10, S11 |
 | B06 | Eylem izinleri ve bazı yönetim/detail selector'ları işlem bazında doğrulanmalı | Her modülün ilk işi gerçek okuma→sürüm→komut matrisi. Eksik projection somutlaştığında ortak talep kaydı açılır; S11 self okuma için [XREQ-016](../../../docs/requests.md#xreq-016) backend teslim edilmiş, frontend canlı kabulü açıktır; “endpoint var” kabulü yetmez. | Tüm modüller |
 | B07 | Kurulu sürüme uygun Syncfusion anahtarı ve gerçek Scheduler tarayıcı kabulü | Ortam sahibi + frontend: anahtarın build'de kullanımı, TR/EN/timezone/mobil kabulü. Liste fallback'i çalışmaya devam eder. | S03 |
+| B08 | XREQ-023/024: rezervasyon/finans eylem yetkisi | [PR234](https://github.com/SXQHex/FtkSaaS/pull/234) head `7932a21f1154be7f835155b8425e9d6f192916da`, main `47e6e0d3d1a190c3d313441b522cbc9df0125f02` ile birleşti; aynı main/dağıtım sonuçları bölüm 1'de doğrulandı. Altı okuyucunun frontend uyumu ve canlı kabulü [S06](#pro-bekleme-teklif)/[S08](#pro-finans-kabulu) içinde açık; artık sıra numarası beklemeden ele alınabilir. Bu belge güncellemesi ortak talebi veya ekran kabulünü kapatmaz. | S06, S08 |
+| B09 | XREQ-018 web formları ve Meta/Google yerel başvuru alımı | [XREQ-018](../../../docs/requests.md#xreq-018), [P08](../../../docs/decisions/P08-accepted-scope.md) ve backend [G02](../../backend/docs/remaining-work.md#g02). Gerçek form/hesap/onay alanı/ingress/tekrar kanıtı; frontend [CRM kaynak alımını](#pro-crm) tüketir. fethiyetango.com formlarına veya başka repoya yazma yetkisi doğmaz. | S04, S09 |
+| B10 | XREQ-019/022/025 projeksiyonları | [Ortak talepler](../../../docs/requests.md): davet işi/posta teslimi ayrımı, hatırlatma/otomasyon katalog ve retry alanları, üst planlarda nullable Abone No. Geliştirilen DTO ve hosted teslim ayrı doğrulanır; Abone No yetki veya UUID yerine geçmez. | S04, S07, S11, etkinlik |
+| B11 | Backend/işletim çıkış kanıtı | [G02](../../backend/docs/remaining-work.md#g02) ve uygulanabilir [O01](../../backend/docs/remaining-work.md#o01)–[O10](../../backend/docs/remaining-work.md#o10): gerçek config, worker/süre/izleme, yük/kurtarma, restore/silme. Kanıt ilgili backend/ortam sahibinden alınır; frontend bunları yeniden sahiplenmez veya CI ile kapanmış saymaz. | İlk Pro teslimi |
 
 Availability için `management_state_get_v1(operation: availability_save_v1)` okuması vardır; B01 bütün yönetim okumalarının eksik olduğu anlamına gelmez. Şablon resolve sonucu güncelleme sürümü yerine geçmez. Platform yetkili organizasyon yaratma ve SaaS ödeme doğrulama işleri sıradan kullanıcı self-service ekranı olarak varsayılmaz.
 
 ## 6. Modül planları
 
-Her modülün “bitti” ölçütü kendi aşağıdaki kabul senaryosu **ve** bölüm 8'deki ortak teslim kapısıdır. API listeleri ana bağlantılardır; tam request/response tanımı ortak paketten alınır.
+Mevcut işaretli maddeler belirtilen kaynak/kabul sınırında okunur; yeni Pro farkları ayrı açık tutulur. Her modülün “bitti” ölçütü kendi aşağıdaki kabul senaryosu **ve** bölüm 8'deki ortak teslim kapısıdır. API listeleri ana bağlantılardır; tam request/response tanımı ortak paketten alınır.
 
 <a id="web-s01"></a>
 
@@ -117,9 +128,23 @@ Her modülün “bitti” ölçütü kendi aşağıdaki kabul senaryosu **ve** b
 
 **XREQ-017 dar consumer devamı — 4 Kasım:** Kullanıcının [PR183](https://github.com/SXQHex/FtkSaaS/pull/183) inceleme/devam talimatıyla `fix/web-xreq-017-phone-resend`, main `1df2fe5b13368286162f7d738db88fb84c0fc1d9` üzerinden açıldı. PR183 head `2a9e5f5cf1554ad56322ef1cb4fa0890523ff46b` içindeki talep/rehber ve native test incelendi: yeniden gönderim yalnız HTTP200 değil, authenticated PUT /user sonrası phone_change_sent_at ilerlemesiyle kanıtlanıyor. Sabit test OTP’leri SMS teslimatı, expiry veya kod rotasyonu kanıtı değildir. Native aday [koşusu](https://github.com/SXQHex/FtkSaaS/actions/runs/41847503663) ilk incelemede çalışıyordu; backend kabulü verilmedi. Bu talep henüz main’deki ortak talep kaydında bulunmadığından karşı alanın açık talebi buraya kopyalanmaz; özgün kapsam PR183 içindeki XREQ-017 sahibindedir.
 
-Mevcut telefon yeniden kod düğmesi `auth.resend(phone_change)` yerine `auth.updateUser({phone:identity.pending_phone})` kullanır. Taslaktaki başka numara gönderilmez; mevcut doğrulanmış telefon istemcide değiştirilmez. Native bekleme/ret hata olarak kalır; otomatik retry veya yerel süre bypass’ı yoktur. `verifyOtp(phone_change)` ve SDK’nın oturum saklaması korunur; başarının mevcut `onSaved` yolu AccountWorkspace profilini yeniden okur ve SessionManager’ı remount ederek güvenlik geçmişini yeniler. E-posta resend/redirect ve diğer kimlik akışları değişmez. Kurulu SDK kaynağı ve resmî updateUser referansı incelendi. PR183 native test/config/runtime sahipliği taşınmadı; hosted test OTP/sağlayıcı kurulumu yapılmadı. Kaynak düzeltmesi ve mock regresyonu gerçek native ekran kabulü değildir; XREQ-017 canlı/izole ekran kabulü açık kalır. S01 temel kapanışı korunur; ana aktif bölüm S11’dir.
+Mevcut telefon yeniden kod düğmesi `auth.resend(phone_change)` yerine `auth.updateUser({phone:identity.pending_phone})` kullanır. Taslaktaki başka numara gönderilmez; mevcut doğrulanmış telefon istemcide değiştirilmez. Native bekleme/ret hata olarak kalır; otomatik retry veya yerel süre bypass’ı yoktur. `verifyOtp(phone_change)` ve SDK’nın oturum saklaması korunur; başarının mevcut `onSaved` yolu AccountWorkspace profilini yeniden okur ve SessionManager’ı remount ederek güvenlik geçmişini yeniler. E-posta resend/redirect ve diğer kimlik akışları değişmez. Kurulu SDK kaynağı ve resmî updateUser referansı incelendi. PR183 native test/config/runtime sahipliği taşınmadı; hosted test OTP/sağlayıcı kurulumu yapılmadı. Kaynak düzeltmesi ve mock regresyonu gerçek native ekran kabulü değildir; XREQ-017 canlı/izole ekran kabulü açık kalır. S01 temel kapanışı korunur; güncel aktif bölüm [bölüm 7](#7-bölüm-bölüm-teslim-tek-aktif-bölüm) sahibindedir.
 
 **XREQ-017 kaynak doğrulaması:** Yeni4 odaklı test dahil son `check:frontend` web497 + ortak UI1 test, lint/format,typecheck ve production build başarılıdır. Doğru selector’lü regresyonlar eski kaynakta iki hata verdi; telefon consumer düzeltmesiyle geçti. Quality floor0 bulgu/10 test, izolasyon,35 yaşayan belge/1410 yerel bağlantı ve bağımsız son inceleme başarılı; açık Required/Critical kaynak bulgusu yok. Yalnız yerel MSW süreçleri `NODE_USE_ENV_PROXY=0` ile çalıştı. Yeni aday CI/main/development teslimi ve gerçek native ekran kabulü beklenir; PR183 kabulü veya XREQ-017 kapanışı bu yerel testlerden çıkarılmaz.
+
+<a id="ortak-kapsam-erisimi"></a>
+
+#### Pro ortak kapsam, erişim ve görev odaklı gezinme
+
+**Durum:** Açık; S01 temel teslimi yeniden açılmaz. Mevcut `lib/context.ts`, native hesap ve typed transport üzerinde, ilk Pro yolculuğunu açacak dar değişiklikler yapılır. Genel kabuk yeniden yazımı değildir. S02/S09/S12/S13 bu ortak sınırı kullanır.
+
+- [ ] Organizasyon işleri ile merkez operasyonlarını ayır; org inbox/rapor/ayarlarını zorunlu küresel merkez seçimine bağlama. İlk merkezi seçmek yazma yetkisi veya işlem hedefi üretmez.
+- [ ] Yönetici, resepsiyon/personel, eğitmen ve öğrenci eylemlerini canlı plan/rol/işlem projeksiyonlarıyla sun; Owner/OM kimliğinden CM veya finans yetkisi türetme.
+- [ ] Hesap/org/merkez değişiminde seçili nesne, cursor, açık form, preview ve geç yanıtları doğru scope'a bağla. Önceki komutun kurtarması özgün aktör/scope/payload/key ile erişilebilir kalsın.
+- [ ] S13 erişim modu/limit/kullanım ve izinli kurtarma eylemlerini erken tüket. Plan daralması, tutulacak kaynak seçimi ve erişim kaybını S02–S06 geliştirmesinde sınayarak S13 tam ekranını bekleme.
+- [ ] Yeni kişi/seans/aday/etkinlik detaylarında kararlı hedef, giriş sonrası dönüş, reload ve geri/ileri davranışı kur; bütün hash kabuğunu tek PR'da taşımaya çalışma.
+
+**Kabul:** Yanlış rol/merkezde eski veri/eylem yok; doğrudan URL yetkiyi aşmıyor; kapalı erişimde izinli kurtarma kaybolmuyor. S12 tercihleri ilgili görünümde etkili. Otomatik rol/scope matrisi ile ertelenen gerçek hesap kabulü ayrı izlenir.
 
 <a id="web-s02"></a>
 
@@ -127,7 +152,7 @@ Mevcut telefon yeniden kod düğmesi `auth.resend(phone_change)` yerine `auth.up
 
 **Ekranlar:** Stüdyo kurulum kontrol listesi; organizasyon/merkez bilgisi; oda; disiplin; tek eğitmen ve yönetici kapsamı; haftalık uygunluk/istisnalar.
 
-**Durum: S02 teslim kabulü tamamlandı.** PR145 ile XREQ-012 temizliği main ve development ortamına teslim edildi; aşağıdaki son uyum kontrolü tamamdır. Bu kapanış belge değişikliğinin kendi CI/merge teslimi ayrıca izlenir. Temel ekranlar PR133 ile main'de. PR134 main `61137c86c9ae015e2fc8f9dfef250a372bc1211d` merkez–disiplin ve kapanış okumalarını sağlıyor; yeni consumer PR136 ile main `d0a6b5639ba12809d6b5a5b61ca7f02ab485db31` üzerinden teslim edildi. [Main kabulü](https://github.com/SXQHex/FtkSaaS/actions/runs/41418558318), [merge doğrulaması](https://github.com/SXQHex/FtkSaaS/actions/runs/41418558300), [development teslimi](https://github.com/SXQHex/FtkSaaS/actions/runs/41418657844) ve Vercel dağıtımı başarılı doğrulandı. S03 başlatılmadı.
+**Durum: S02 Starter temel teslim kabulü tamamlandı; Pro alt kapsamları açık.** PR145 ile XREQ-012 temizliği main ve development ortamına teslim edildi; aşağıdaki son uyum kontrolü tamamdır. Bu kapanış belge değişikliğinin kendi CI/merge teslimi ayrıca izlenir. Temel ekranlar PR133 ile main'de. PR134 main `61137c86c9ae015e2fc8f9dfef250a372bc1211d` merkez–disiplin ve kapanış okumalarını sağlıyor; yeni consumer PR136 ile main `d0a6b5639ba12809d6b5a5b61ca7f02ab485db31` üzerinden teslim edildi. [Main kabulü](https://github.com/SXQHex/FtkSaaS/actions/runs/41418558318), [merge doğrulaması](https://github.com/SXQHex/FtkSaaS/actions/runs/41418558300), [development teslimi](https://github.com/SXQHex/FtkSaaS/actions/runs/41418657844) ve Vercel dağıtımı başarılı doğrulandı. Bu tarihli S02 kanıtı sonraki S03 kabulünden ayrıdır.
 
 **Güncel entegrasyon kaynağı — 2 Kasım 2026:** XREQ-009 consumer'ı [PR141](https://github.com/SXQHex/FtkSaaS/pull/141) ile main `5137b69fc436e49ca46dc47af86d1e88ea1a5766` üzerine teslim edildi. [Frontend CI](https://github.com/SXQHex/FtkSaaS/actions/runs/41454415725), [merge proof](https://github.com/SXQHex/FtkSaaS/actions/runs/41458486529), [main proof](https://github.com/SXQHex/FtkSaaS/actions/runs/41458486442), [development teslimi](https://github.com/SXQHex/FtkSaaS/actions/runs/41458609116) ve [Vercel dağıtımı](https://vercel.com/erkinkunbuk-4818/ftksaas-web/3UcqfJ1iWrz5SY8TBW8EXJWvJZHq) başarılıdır; hosted son kontrolü önceki sohbet kabulünde başarılıdır. Sonraki main `eb0f1df91deeb031d890f8b0b2978d6f8a617317` için [main proof](https://github.com/SXQHex/FtkSaaS/actions/runs/41460406786) ve [development teslimi](https://github.com/SXQHex/FtkSaaS/actions/runs/41460501240) de başarılıdır. Yeni belge değişikliğinin kendi CI sonucu bu eski kanıtlardan türetilmez. Mevcut consumer dar atama keşfi/cursor/gerçek atama sürümü, tam etki önizlemesiyle gerekçeli kaldırma, tarih kesmeyen yönetici işleri ve güncel seansla manuel onarımı içerir; Pro genel okuyucusu korunur. Tamamlanan yayın adımları artık açık iş değildir.
 
@@ -176,9 +201,34 @@ Eski merkez instructor ilişki satırı yalnız Business test organizasyonunda b
 
 **Son uyum ve kapanış — 2 Kasım 2026:** [PR145](https://github.com/SXQHex/FtkSaaS/pull/145), main `eba8597beda7b08c27b8b05da0768484ddf53fe3` için [main proof](https://github.com/SXQHex/FtkSaaS/actions/runs/41511385623), [merge proof](https://github.com/SXQHex/FtkSaaS/actions/runs/41511385708) ve [development teslimi](https://github.com/SXQHex/FtkSaaS/actions/runs/41511489528) completed/success doğrulandı. Teslim işi hosted backend doğrulamasını ve aday şema karşılaştırmasını geçti. Temizlik migration'ında plan filtresi yoktur: Starter/Pro/Business eski fiziksel instructor ilişkileri kaldırılır ve CHECK yeni yazımı engeller. Rol kaynaklı okuma projeksiyonu korunur. S02 eğitmen consumer'ının management keşfi, role_assign, etki önizlemesi ve role_revoke request/response sözleşmesi değişmedi; frontend fiziksel instructor ilişkisine yazmıyor. Sözleşmedeki ilişki oluşturma enum daralması S02 rol consumer'ını etkilemez; eklenen nullable Abone No alanları ayrı operasyon projeksiyonlarıdır. Bu nedenle runtime uyarlaması gerekmedi. Önceki gerçek UI kabulü korunur; yeni canlı yazma/test tekrarı yapılmadı ve yapılmış sayılmaz. Backend temizliği frontend'den SQL ile tekrarlanmadı.
 
-**Kapanış belgesinin teslimi:** PR146 main `b150fb8115b5a65e31d2b8770bccb7f96e530f47` için [main proof](https://github.com/SXQHex/FtkSaaS/actions/runs/41525386176), [merge proof](https://github.com/SXQHex/FtkSaaS/actions/runs/41525386106) ve [development teslimi](https://github.com/SXQHex/FtkSaaS/actions/runs/41525500533) completed/success doğrulandı. S02 ürün/geliştirme veya kapanış teslim bağımlılığı kalmadı.
+**Kapanış belgesinin teslimi:** PR146 main `b150fb8115b5a65e31d2b8770bccb7f96e530f47` için [main proof](https://github.com/SXQHex/FtkSaaS/actions/runs/41525386176), [merge proof](https://github.com/SXQHex/FtkSaaS/actions/runs/41525386106) ve [development teslimi](https://github.com/SXQHex/FtkSaaS/actions/runs/41525500533) completed/success doğrulandı. S02'nin bu Starter temel tesliminde ürün/geliştirme veya kapanış teslim bağımlılığı kalmadı.
 
-**Kabul:** Yetkili kullanıcı boş Starter stüdyosunu ilk program için hazırlar; owner/CM, kaynak/öğrenci sınırları ve hata/kurtarma anlaşılırdır. **Kapanış:** XREQ-012 kaynak/ortam teslimi ve frontend uyum incelemesiyle S02 kabulü tamamdır; sıradaki aktif bölüm S03'tür.
+**Kabul:** Yetkili kullanıcı boş Starter stüdyosunu ilk program için hazırlar; owner/CM, kaynak/öğrenci sınırları ve hata/kurtarma anlaşılırdır. **Kapanış:** XREQ-012 kaynak/ortam teslimi ve frontend uyum incelemesiyle S02 Starter kabulü tamamdır; güncel sıra [bölüm 7](#7-bölüm-bölüm-teslim-tek-aktif-bölüm) sahibindedir.
+
+<a id="pro-kaynak-ve-ekip"></a>
+
+#### Pro kaynaklar, ekip ve işletim ayarları
+
+**Durum:** Açık Pro genişlemesi; yukarıdaki Starter kabulü korunur. **Bağımlılık:** [Ortak kapsam/erişim](#ortak-kapsam-erisimi), S04 kişi ve S12 işletim ayarları; F01–F05/F07.
+
+- [ ] Mevcut oda/disiplin/eğitmen formlarını çoklu kaynak, uygunluk ve istisnalarla tamamla. Resepsiyon/personel ve uygun asistan görevlerinde kişi ilişkisi, hesap bağı, rol ataması ve işlem iznini ayır.
+- [ ] Personel izin verme/kaldırma ve açık oturumda canlı yetki kaybını uygula; satış/tahsilat/rezervasyon izinleri birbirini açmasın.
+- [ ] İşletim politikaları ve ödeme yöntemi/reference ayarlarını gerçek writable katalogla bağla; ücret, çalışma saati ve politika değeri uydurma. Kaynak/default/reset/geçmiş kabulü S12 ile birlikte yapılır.
+- [ ] Pro tek merkez/250 aktif öğrenci ve backend sınırsız kaynak gösterimini; Starter tek kaynak/100 öğrenci ile ikinci kaynak/son slot retlerini ayrı doğrula.
+
+**Kabul:** İki oda ve birden fazla disiplin/eğitmenle kurulum, dar personel izinleri ve izin kaybı çalışır; Starter sade görünümü aynı modülde korunur.
+
+<a id="pro-egitmen-anlasmalari"></a>
+
+#### Pro eğitmen anlaşmaları — programın önkoşulu
+
+**Durum:** Açık; S02 kaynak kurulumuna bağlı F13/F20 alt kapsamı. **Bağımlılık:** Pro ekip ve [WF14](../../../docs/workflows.md#wf14). S07 hakediş ekranı beklenmez.
+
+- [ ] `instructor_agreements_list_v1` → yetkili gerçek şart seçimi → `instructor_agreement_publish_v1` → listeyi yeniden oku zincirini kişi/merkez/disiplin/format/yürürlük kapsamıyla kur.
+- [ ] Yeni zincir ile `supersedes_id`/`expected_version` isteyen yeni sürümü ayır; geçmiş anlaşma yerinde düzenlenmez. Ücret ayrıntısı yalnız yetkili projeksiyonda görünür.
+- [ ] Program preview'sindeki `configuration_requirement` tanısından yetkili anlaşma ekranına dönüş sun; yayımdan sonra eski preview düşsün ve program yeniden önizlensin. Başka engellerin kalktığını varsayma.
+
+**Kabul:** Geçerli anlaşmayla gerçek Pro program önkoşulu çözülür; tarih/kapsam/format uyumsuzluğu açıklanır. Starter anlaşmasız çalışır. İlk yeni geliştirme paketi ekip→anlaşma→mevcut takvimde program önizleme/uygulamayı birlikte tamamlar.
 
 <a id="web-s03"></a>
 
@@ -321,6 +371,18 @@ Sayfa yeni kaynak için reload edildi; mevcut native Pro oturumunda Europe/Berli
 
 **Kabul:** Tekrarlayan program oluştur → bir seansı değiştir → gelecek seriyi değiştir → iptal/telafi oluştur; oda/eğitmen çakışması, mevcut rezervasyonlu seansın korunması, stale preview ve DST sınırı gerçek backend'de sınanır. **Bağımlılık:** S02, B01/B07; rezervasyonlu sınamalar için yetkilendirilmiş mevcut kabul kaydı. Yeni rezervasyonu UI'dan oluşturma yolculuğu S06'nın kabulündedir.
 
+<a id="pro-program-kabulu"></a>
+
+#### Pro program ve çok kaynaklı takvim kabulü
+
+**Durum:** Açık Pro genişlemesi; yukarıdaki belirli Pro/Business senaryoları tam Pro modül kabulü değildir. **Bağımlılık:** S02 Pro kaynak/anlaşma; F08–F10/F13/F14.
+
+- [ ] Oda/eğitmen/disiplin filtreleri ve seçimlerini mevcut program, tek seans, görev, değişiklik, iptal ve telafi yüzeylerinde tutarlı tamamla. Kaynak değişimini kapasite değişiminden; sınıf görev mirasını tam açık görev listesinden ayır.
+- [ ] Seri/DST, anlaşma geçerliliği, çakışma ve kesin rezervasyon etkilerini gerçek preview üzerinden göster; anlaşma değişince eski onay kullanılamasın.
+- [ ] Community License onayını kurulu sürüm/build anahtarı ve yayımlanmış gerçek Scheduler görünümüyle doğrula; onay bildirimi tek başına kabul değildir. Liste fallback'i korunur.
+
+**Kabul:** İki odada eşzamanlı çakışmasız ders, aynı eğitmen çakışmasının reddi, seri/kaynak değişimi, iptal/telafi ve doğru yeniden okuma; Starter tek kaynak regresyonu. FD01/FD10 ayar etkisi aynı dilimde sınanır.
+
 <a id="web-s04"></a>
 
 ### WEB-S04 — Öğrenci ve kişi yönetimi
@@ -354,13 +416,13 @@ Sayfa yeni kaynak için reload edildi; mevcut native Pro oturumunda Europe/Berli
 
 **Test verisinin son durumu:** Sayfalama kayıtları pasiftir. İlk temel hedef/Tango ilişkisi ile finans hedefinin ve erişim kontrolünde geçici açılan test öğrenciliğinin son durumu pasiftir; aktif öğrenci kontenjanı tüketilmez. Temel/finans/replay kaynakları birleştirilmiş geçmiş olarak korunur. Finans fixture’ındaki 1000 kuruş test borcu ve 3 kredi, geçmiş koruma kanıtı için yerinde bırakıldı; ödeme/tahsilat yoktur. Mock davet ve mock hesap bağı iptal edildi; bekleyen test ders talebi reddedildi. Mock yabancı organizasyona gerçek hesap bağlantısı/rolü verilmedi. Mevcut kişilerin finansı, rolleri ve native hesap bağları değiştirilmedi. CLI test girişleri test sonunda yalnız kendi native oturumları kapsamında kapatıldı; credential/tokenlar kaynaklara veya kabul raporuna konmaz.
 
-**Starter dışında:** Çok merkezli birleştirme onayı toplama ve `person_merge_approve_v1` arayüzü Pro/Business kapsamıdır; [XREQ-006](../../../docs/requests.md) Starter kapanış engeli değildir. Çok merkez/geçersiz birleştirme backend reddi korunur. Profilin hak/finans/rezervasyon alt görünümleri S05/S08/S06 sahibi olarak kalır. S04’ün tamamlanması bu sonraki modüllerin teslimi anlamına gelmez.
+**Starter dışında:** Çok merkezli birleştirme onayı toplama ve `person_merge_approve_v1` arayüzü sonraki Business kapsamıdır; [XREQ-006](../../../docs/requests.md) Starter kapanış engeli değildir. Çok merkez/geçersiz birleştirme backend reddi korunur. Profilin hak/finans/rezervasyon alt görünümleri S05/S08/S06 sahibi olarak kalır. S04’ün tamamlanması bu sonraki modüllerin teslimi anlamına gelmez.
 
 <a id="crm-temel-aday-takibi"></a>
 
 #### CRM temel aday takibi — S04'e bağlı açık ek kapsam
 
-**Durum:** 4 Kasım [ürün kararı](../../../docs/contracts/01-FtkSaaS-urun-kapsam-sozlesmesi.md) ve [CRM mimarisi](../../../docs/decisions/P08-accepted-scope.md) kabul edildi; bu yeni dilimin uygulama/hosted kabulü açık. Önceki S04 teslim kanıtı yeni kapsama taşınmaz. S03 kapanışından sonraki [bölüm sırası](#7-bölüm-bölüm-teslim-tek-aktif-bölüm) korunur; sonraki uygulamaya geçişte bu ek kapsam açık iş olarak hesaba katılır.
+**Durum:** 4 Kasım [ürün kararı](../../../docs/contracts/01-FtkSaaS-urun-kapsam-sozlesmesi.md) ve [CRM mimarisi](../../../docs/decisions/P08-accepted-scope.md) kabul edildi; bu yeni dilimin uygulama/hosted kabulü açık. Önceki S04 teslim kanıtı yeni kapsama taşınmaz. Güncel [bölüm sırası](#7-bölüm-bölüm-teslim-tek-aktif-bölüm) korunur; sonraki uygulamaya geçişte bu ek kapsam açık iş olarak hesaba katılır.
 
 - [ ] Yayımlanmış API ile elle aday oluştur → listede/aramada bul → ayrıntı → not → takip tarihi → yenileyip yeniden oku zincirini tamamla. Form zorunlulukları, tarih/saat ve desteklenen güncelleme/tamamlama anlamı sözleşmeden alınır.
 - [ ] Mevcut shadcn/ui, yönetici kabuğu ve geliştirme rehberini kullan; hazır bileşenle alternatif auth/backend taşıma. İlk dilime fırsat/pipeline, şirket, fatura, proje veya posta kutusu ekranı varsayma.
@@ -368,15 +430,28 @@ Sayfa yeni kaynak için reload edildi; mevcut native Pro oturumunda Europe/Berli
 - [ ] Kişi ile ayrı başvuruları ve kaynak geçmişini ayır; telefon eşleşmesini otomatik birleşim veya doğrulanmış kimlik sayma. Başvuru sonucunu öğrenci/satış/ödeme/izin başarısı gibi gösterme. Plan/merkez/aktör görünürlüğü API'den gelir.
 - [ ] next-intl/timezone sözleşmesi, klavye, odak, etiket, hata mesajı ve mobil görünümü doğrula. Gerçek yetkili test hesabında kayıt/not/takibin yenileme sonrası kalıcılığı; plan/yetki ve kurtarma durumları sınanır. Backend suite veya mock sonucu hosted ekran kabulü değildir.
 
-**Bağımlılık yönetimi:** Backend [P05](../../backend/docs/remaining-work.md#p05) sözleşme devri. Sözleşme varsa kontrollü fixture ile bileşen/erişilebilirlik çalışması yapılabilir; runtime yoksa entegrasyon tamamlandı sayılmaz. Sözleşme eksikse DTO/endpoint/izin uydurma; eksik yüzeyi [ortak talebin](../../../docs/requests.md) kendi alanında belirt. Backend runtime/sözleşme/CI politikasını değiştirme. Sırası geldiğinde ortak kutu ve sağlayıcı ekranları gerçek desteğe göre genişler; Starter bunları beklemez. İlk sağlayıcı veya Pro/Business yetkileri frontend tarafından seçilmez.
+**Bağımlılık yönetimi:** Backend [P05](../../backend/docs/remaining-work.md#p05) sözleşme devri. Sözleşme varsa kontrollü fixture ile bileşen/erişilebilirlik çalışması yapılabilir; runtime yoksa entegrasyon tamamlandı sayılmaz. Sözleşme eksikse DTO/endpoint/izin uydurma; eksik yüzeyi [ortak talebin](../../../docs/requests.md) kendi alanında belirt. Backend runtime/sözleşme/CI politikasını değiştirme. Temel Starter aday dilimi sağlayıcı alımını beklemeden geliştirilebilir; ilk ürün tesliminin Pro sağlayıcı sınırı [Pro CRM kabulünde](#pro-crm) korunur. Sağlayıcı veya Pro/Business yetkileri frontend tarafından icat edilmez.
 
 **Teslim:** PR ilgili WF, gerçek API sırası, izin/plan sınırı, hata kurtarma ve yeniden okumayı açıklar; kod, yerel test, aday/main ve hosted kanıtları ayrı yazılır. Mevcut alan sahipliği ve CI/devir kuralları uygulanır.
+
+<a id="pro-crm"></a>
+
+#### Pro CRM, deneme/dönüşüm ve ortak başvuru kaynakları
+
+**Durum:** Açık; temel aday dilimi bunun alt bağımlılığıdır. **Bağımlılık:** S02; deneme/dönüşüm S03/S05/S06; public yüzey S09, sağlayıcı alımı B09. Temel aday kaydı finans/hakediş geliştirmesini beklemek zorunda değildir.
+
+- [ ] Aday kaynak/ilgi/sorumlu, deneme teklifi/kayıt, mevcut kişi eşleştirme veya yeni kişi ve öğrenciye dönüşümü tamamla. Dönüşüm otomatik satış/tahsilat değildir; yenileme/hareketsiz takip listeleri gerçek okumaları kullanır.
+- [ ] Ortak başvuru kutusunda aynı kişinin farklı gerçek başvurularını ve kaynak/onay geçmişini koru. Telefon eşleşmesi yalnız öneridir; nullable Abone No varsa göster, komutlarda UUID kullan.
+- [ ] S09 public ders/etkinlik başvurusunu ortak kutuya bağla; XREQ-018'in fethiyetango.com kayıt/iletişim formu adaptörleri backend/site sahibindedir. Turnstile/ingress sonucu kesin rezervasyon veya iletişim izni sayılmaz.
+- [ ] Meta/Google yerel formlarından backend'in aldığı kayıtları ortak kaynak görünümünde tüket; gerçek hesap/form kimliği, onay alanı eşlemesi ve retry/tekrar kabulünü ayrı tamamla. Sağlayıcı auth/backend'ini frontend'de yeniden yazma.
+
+**Kabul:** Kaynak→başvuru→yetkili eşleme→aday→takip/deneme→öğrenci zinciri; aynı teslim tek kayıt, aynı kişinin yeni başvurusu ayrı geçmiş. Starter temel aday/dar ders başvurusu sınırında kalır. G02 provider pending iken tam Pro kabulünü kapatmaz; reklam performans raporları/dönüşüm geri bildirimi bu yerel form alımıyla aynı kapsam değildir.
 
 <a id="web-s05"></a>
 
 ### WEB-S05 — Paket kataloğu, satış ve haklar
 
-**Durum: kaynak/otomatik teslim tamam; canlı kabul açık.** Kullanıcının6 Kasım tarayıcı kontrollerini atlayıp geliştirmeye dönme talimatıyla kalan canlı matris açık bırakıldı; aktif geliştirme [S08](#web-s08) oldu. Önceki5 Kasım devam talimatıyla S11’in kaynak/otomatik tesliminden sonra S05’e geçildi; S03 daha önce tamamlandığından yeniden açılmaz. `feature/web-s05-products-and-rights` dalı main `a988840d1a8ae211f418317dcfd130594ea4ef06` üzerinden açıldı. Aynı main’in kabul/development/web kanıtı [S11 PR208 teslimindedir](#web-s11). Teslim öncesi dal güncel main `5bdba43b61167451aa4c2626c8523beedb8d6667` ile senkronize edildi; [main proof](https://github.com/SXQHex/FtkSaaS/actions/runs/42030074032), [merge proof](https://github.com/SXQHex/FtkSaaS/actions/runs/42030073970), [development](https://github.com/SXQHex/FtkSaaS/actions/runs/42030136955) ve [Vercel](https://github.com/SXQHex/FtkSaaS/actions/runs/42030137137) başarılıdır. Backend’in yeni XREQ-019 devir kaydı korunmuş, bu bölümün satış talebi XREQ-020 olarak ayrılmıştır.
+**Durum: Starter kaynak/otomatik teslim tamam; canlı kabul ve aşağıdaki Pro genişlemesi açık.** Kullanıcının6 Kasım tarayıcı kontrollerini atlayıp geliştirmeye dönme talimatıyla kalan canlı matris açık bırakıldı; güncel geliştirme sırası [bölüm 7](#7-bölüm-bölüm-teslim-tek-aktif-bölüm) sahibindedir. Önceki5 Kasım devam talimatıyla S11’in kaynak/otomatik tesliminden sonra S05’e geçildi; S03 daha önce tamamlandığından yeniden açılmaz. `feature/web-s05-products-and-rights` dalı main `a988840d1a8ae211f418317dcfd130594ea4ef06` üzerinden açıldı. Aynı main’in kabul/development/web kanıtı [S11 PR208 teslimindedir](#web-s11). Teslim öncesi dal güncel main `5bdba43b61167451aa4c2626c8523beedb8d6667` ile senkronize edildi; [main proof](https://github.com/SXQHex/FtkSaaS/actions/runs/42030074032), [merge proof](https://github.com/SXQHex/FtkSaaS/actions/runs/42030073970), [development](https://github.com/SXQHex/FtkSaaS/actions/runs/42030136955) ve [Vercel](https://github.com/SXQHex/FtkSaaS/actions/runs/42030137137) başarılıdır. Backend’in yeni XREQ-019 devir kaydı korunmuş, bu bölümün satış talebi XREQ-020 olarak ayrılmıştır.
 
 **PR209 teslimi ve bu paketin tabanı:** Katalog/yayın/hak okuyucu [PR209](https://github.com/SXQHex/FtkSaaS/pull/209) ile main `8f65f54f3296aa921cef109fa7d6beee0cd71e7a` kaynağına birleşti. [Frontend CI](https://github.com/SXQHex/FtkSaaS/actions/runs/42032994372), [kontrat uyumu](https://github.com/SXQHex/FtkSaaS/actions/runs/42032994278), [aday kabulü](https://github.com/SXQHex/FtkSaaS/actions/runs/42032994445), aynı main için [main proof](https://github.com/SXQHex/FtkSaaS/actions/runs/42036454216), [merge proof](https://github.com/SXQHex/FtkSaaS/actions/runs/42036454224), [development](https://github.com/SXQHex/FtkSaaS/actions/runs/42036533563) ve [Vercel](https://github.com/SXQHex/FtkSaaS/actions/runs/42036533618) completed/success doğrulandı. Kullanıcının bağımsız hak yönetimini tek geniş pakette tamamlama talimatıyla `feature/web-s05-rights-management` bu main üzerinden açıldı. S05 bütünü ve canlı kabul açık kalır.
 
@@ -452,11 +527,24 @@ Geçici yerel React kaynak bileşeni + gerçek native Auth/Edge hattında Person
 
 **Kabul:** Kredili, kotalı süreli ve sınırsız ürünün her biri için yayın → satış → hak/borç okuma → izinli yenileme/düzeltme; eski satış snapshot'ı yeni ürün sürümünden etkilenmez. Rezervasyon ve yoklamada bu hakların tüketimi sırasıyla S06/S07 kabulünde tamamlanır. **Bağımlılık:** S04, S02 disiplin okuması, S11 belge kabulü, B06.
 
+<a id="pro-paket-yasam-dongusu"></a>
+
+#### Pro ürün, satış ve paket yaşam döngüsü
+
+**Durum:** Açık Pro genişlemesi; mevcut satış/hak ve komut kurtarma kaynağı yeniden kullanılır. **Bağımlılık:** S02/S04/S11/S12; F15–F17/F19.
+
+- [ ] `lib/product-terms.ts` içindeki tek `center_discipline`, yalnız `lesson` ve `freeze.enabled=false` varsayımlarını sözleşmenin izin verdiği Pro ürün kapsamlarıyla genişlet; Business merkezler arası kullanımını açma.
+- [ ] Dondurma/bitirme, paket değişimi, yenileme ve sonlandırmayı ayrı niyetlerle sun; SaaS abonelik değişimiyle karıştırma. Kotalı/sınırsız seçenekler ve etkinlik hedeflerini gerçek DTO'dan al.
+- [ ] Korunmuş rezervasyonlar, mali fark ve hak etkisini backend preview'sinden göster; satış snapshot'ını yeni ürün sürümüyle değiştirme. Pro negatif kredi değerlemesini yalnız izinli gerçek okumaya/komuta bağla.
+- [ ] Yeni ürün payload'larıyla komut günlüğünün doğrulamasını da güncelle; kayıp yanıt/reload geçerli Pro komutunu yanlış reddetmesin.
+
+**Kabul:** Yayın/satış→dondurma/bitirme→değişim→yenileme/sonlandırmada hak/borç/rezervasyon tutarlılığı ve S11 belge kapısı. Starter formu/F17 retleri aynı modülde regresyondan geçer; mali mutabakat S08 ile birlikte yapılır.
+
 <a id="web-s06"></a>
 
 ### WEB-S06 — Rezervasyon ve özel ders talepleri
 
-**Durum: kaynak/otomatik teslim tamam; canlı kabul ve XREQ-023 yetki okuyucusu açık.** Kullanıcının6 Kasım son talimatıyla tarayıcı kontrolleri durduruldu; bağımsız geliştirme [S08](#web-s08) altında sürer. Tam kapanış verilmez. Native takvim seans ayrıntısında lazy rezervasyon yönetimi ve merkez bağlamında lazy özel ders talepleri bağlandı. `people_list_v1(relationship:student)` kullanıcının mevcut yetkili kişi görünümünü verir; self hesap UUID'si person UUID'si varsayılmaz, isim/telefon eşleşmesinden hesap bağı kurulmaz. Backend self satırlarını veya izinli yönetici/personel hedeflerini döndürür; açık seçilen gerçek kişiyle işlem yapılır.
+**Durum: Starter kaynak/otomatik teslim tamam; canlı kabul, XREQ-023 frontend uyumu ve aşağıdaki Pro bekleme/teklif kapsamı açık.** Kullanıcının6 Kasım son talimatıyla tarayıcı kontrolleri durduruldu; güncel aktif geliştirme [bölüm 7](#7-bölüm-bölüm-teslim-tek-aktif-bölüm) sahibindedir. Tam kapanış verilmez. Native takvim seans ayrıntısında lazy rezervasyon yönetimi ve merkez bağlamında lazy özel ders talepleri bağlandı. `people_list_v1(relationship:student)` kullanıcının mevcut yetkili kişi görünümünü verir; self hesap UUID'si person UUID'si varsayılmaz, isim/telefon eşleşmesinden hesap bağı kurulmaz. Backend self satırlarını veya izinli yönetici/personel hedeflerini döndürür; açık seçilen gerçek kişiyle işlem yapılır.
 
 **Next.js yükleme ve kimlik sınırı — 6 Kasım 2026:** `feature/web-next-navigation`, main `ea0d6cb26bba86fa5fd9c5c239d54330170ca1e6` üzerinden hazırlanır; aynı main'in [kaynak kabulü](https://github.com/SXQHex/FtkSaaS/actions/runs/42209348917) success olarak doğrulandı. Teslim hazırlığında PR222 main `19a73a8e73a684c29440c8624342d2c4c8831bdb` üzerine senkronlandı; aynı kaynağın [main](https://github.com/SXQHex/FtkSaaS/actions/runs/42214818853), [development](https://github.com/SXQHex/FtkSaaS/actions/runs/42214888290) ve [Vercel](https://github.com/SXQHex/FtkSaaS/actions/runs/42214888296) teslimi success olarak doğrulandı. PR222 satış kurtarma kaynağı ve kabul kayıtları korundu. PR221 kişi keşfi düzeltmesi main `c79a2bd82dc044c6641eda53331ee49b2cdd598f` üzerinden aynı dala alındı; [main](https://github.com/SXQHex/FtkSaaS/actions/runs/42217599974), [development](https://github.com/SXQHex/FtkSaaS/actions/runs/42217660266) ve [Vercel](https://github.com/SXQHex/FtkSaaS/actions/runs/42217660240) başarıları doğrulandı. Self hosted tekrarın sınırları aşağıdadır. Kabuktaki yedi çalışma alanı, program yönetimi ve doğrudan seans düzenleyici `next/dynamic` ile ayrıldı. Seans özeti mevcut markup/tarih/kapasite davranışıyla ayrı modüle taşındı; Sheet üzerinden düzenleyiciye giden statik import yolu doğrudan sayfadan kaldırıldı. `/` URL'sini koruyan `(workspace)` grubu yükleme iskeletini stream eder; seans/satış belgesi yollarına kök loading yayılmadığı için geçersiz adresler HTTP404 kalır. Native kullanıcı değişiminde önceki tenant snapshot'ı ve geç yanıtlar düşürülür; backend account ID ayrı kalır. WF05/WF06 okuma→preview/komut→yeniden okuma, yetki/plan denetimi ve aynı proof/key ile kurtarma tüketicileri korunur.
 
@@ -517,9 +605,23 @@ Starter owner’ın normal native oturumunda aynı yeni main kaynağıyla, mevcu
 
 **Kabul:** İki kişinin son yer yarışında tek kesin kayıt; iptalde doğru hak bırakma; aynı isteğin tekrarı tek rezervasyon; alternatif kabulünde çakışma/erişim/preview değişimi güvenli reddedilir. **Bağımlılık:** S03/S05/S11; yönetici/self kabuk.
 
+<a id="pro-bekleme-teklif"></a>
+
+#### Pro rezervasyon, bekleme listesi ve süreli yer teklifi
+
+**Durum:** Açık; mevcut kayıt/iptal/özel ders akışı korunur. **Bağımlılık:** S03 Pro program, S05 Pro paket, [XREQ-023](../../../docs/requests.md#xreq-023); F09–F12.
+
+- [ ] Personel/yönetici/self kayıt ve talep sınırlarını tamamla. Kapasite istisnasının `reservation_capacity_override_v1` named yetki okuyucusunu gerçek teslim sonrası tüket; fiziksel tavan/uygunluk yazma zamanında ayrıca denetlenir.
+- [ ] `waitlist_join_v1`, `waitlist_leave_v1`, `seat_offer_accept_v1`, `seat_offer_reject_v1` tüketicilerini ekle. Offer issue/expire worker işi tarayıcıya taşınmaz.
+- [ ] Teklif süresi, güncel kapasite/hak/uygunluk kontrolü, ret ve yeniden okumayı göster; bekleme/alternatif seçimi kesin rezervasyon değildir.
+
+**Kabul:** Son yer yarışı, süresi dolan/yinelenen teklif kabulü, hak/izin kaybı tek doğru kayıt üretir. Starter'da F12 kapalıdır. Backend #234 teslimi frontend uyumu veya canlı kabulü kendiliğinden kapatmaz; hazır olduğunda okuyucu işi sıra beklemez.
+
 <a id="web-s07"></a>
 
 ### WEB-S07 — Eğitmen paneli ve yoklama
+
+**Güncel kaynak durumu:** [Draft PR233](https://github.com/SXQHex/FtkSaaS/pull/233), `feature/web-s07-attendance` head `2dedf8e9ee8bfa47c3448b7f5ef36c1aa1dff3c6`, görev/yoklama workspace'i ve kaynak testlerini içeriyor; main'e birleşmedi. PR kaydı 795 web + 1 UI testi ve 49 yeni regresyon bildiriyor; bu plan güncellemesi testleri tekrar çalıştırmadı ve yeni canlı kabul yapmadı. Adayın ayrıntılı kaynak/kabul kaydı birleştirilirken korunmalı; aşağıdaki main checklist'i ikinci uygulama başlatma gerekçesi değildir. Chrome/canlı matris açık. Aktif iş/sıra [bölüm 7](#7-bölüm-bölüm-teslim-tek-aktif-bölüm) sahibindedir.
 
 **Ekranlar:** Eğitmenin kendi görev takvimi; seans yoklaması; kapatma özeti; gerekçeli düzeltme.
 
@@ -532,15 +634,28 @@ Starter owner’ın normal native oturumunda aynı yeni main kaynağıyla, mevcu
 
 **Kabul:** Gerçek atamalı eğitmen taslak kaydeder; yetkili kapatır/düzeltir; hak yalnız beklenen miktarda değişir, çift gönderim tüketimi tekrarlamaz. **Bağımlılık:** S03/S06/S11.
 
+<a id="pro-hakedis"></a>
+
+#### Pro hakediş ve eğitmen ödemeleri
+
+**Durum:** Açık; #233 yoklama kaynağı üzerine genişler. **Bağımlılık:** S02 anlaşmalar, S03 program, S06 rezervasyon; [WF14](../../../docs/workflows.md#wf14)/F20.
+
+- [ ] Eğitmen/asistan/personelin başlatma, taslak, kapatma ve düzeltme yetkilerini sözleşmeye göre ayır; ücretli görevde gerçek anlaşma sürümü, hak tüketimi ve hakediş çıktısını bağla. İstemcide ücret formülü yazma.
+- [ ] `earnings_list_v1`, `instructor_payment_record_v1`, `instructor_payment_correct_v1` ile hakediş/ödenen/kalan ve gerekçeli düzeltme geçmişini sun. Öğrenci tahsilatı eğitmen ödemesi değildir.
+- [ ] Eğitmen kendi görev/katılımcı/hakedişi dışındaki finans projeksiyonunu görmesin. S09 günlük paneli aynı izinli bileşenleri kullansın.
+- [ ] İlk gerçek hakedişi S10'un `earnings` raporuyla bu dilimde karşılaştır; ortak rapor/export ekranının tamamlanmasını bekleme.
+
+**Kabul:** Başlat→işaretle→kapat→hak/hakediş oku→ödeme→düzelt zincirinde tekrar ikinci tüketim/ödeme üretmez; geçmiş anlaşma/ödeme korunur. Starter yoklaması hakediş üretmez.
+
 <a id="web-s08"></a>
 
 ### WEB-S08 — Manuel finans ve öğrenci alacağı
 
-**Durum: kaynak geliştirmesi tamam; Chrome/canlı kabul ve XREQ-024 açık.** Kullanıcının6 Kasım “S08’i komple bitir, Chrome testleri açık kalsın” talimatıyla kalan satış iadesi, alacak iadesi, mahsup, borç düzeltmesi ve güvenli salt okunur özet tamamlandı. `feature/web-s08-complete` dalının başlangıcı PR230 sonrası main `bb21a7274f2db8e56cf15709819e05ef736e7404` kaynağıdır. Aynı kaynağın [main proof](https://github.com/SXQHex/FtkSaaS/actions/runs/42264137912), [development](https://github.com/SXQHex/FtkSaaS/actions/runs/42264212799) ve [Vercel](https://github.com/SXQHex/FtkSaaS/actions/runs/42264212812) koşuları başarılıdır. Bu taban kanıtı yeni S08 adayının CI kabulü yerine geçmez. Chrome/canlı kontroller kullanıcı kararıyla çalıştırılmaz; mevcut backend okuyucu bağımlılığı veya uçtan uca finans kabulü mock ile kapatılmaz.
+**Durum: kaynak geliştirmesi tamam; Chrome/canlı kabul ve XREQ-024 frontend uyumu açık.** Kullanıcının6 Kasım “S08’i komple bitir, Chrome testleri açık kalsın” talimatıyla kalan satış iadesi, alacak iadesi, mahsup, borç düzeltmesi ve güvenli salt okunur özet tamamlandı. `feature/web-s08-complete` dalının başlangıcı PR230 sonrası main `bb21a7274f2db8e56cf15709819e05ef736e7404` kaynağıdır. Aynı kaynağın [main proof](https://github.com/SXQHex/FtkSaaS/actions/runs/42264137912), [development](https://github.com/SXQHex/FtkSaaS/actions/runs/42264212799) ve [Vercel](https://github.com/SXQHex/FtkSaaS/actions/runs/42264212812) koşuları başarılıdır. Bu taban kanıtı yeni S08 adayının CI kabulü yerine geçmez. Chrome/canlı kontroller kullanıcı kararıyla çalıştırılmaz; mevcut backend okuyucu bağımlılığı veya uçtan uca finans kabulü mock ile kapatılmaz.
 
 **İlk kaynak dilimi — WF08:** Menüde Ödemeler ve öğrenci detayında lazy finans paneli gerçek kişi/merkez ile açık para birimi ister. Net borç/ödenen/alacağa aktarılan/kalan ile öğrenci alacağı ayrı, BigInt/Intl hassasiyetiyle gösterilir; DTO'daki opsiyonel eksik alan0 sayılmaz. Nakit/banka/POS snapshot'ı ve bilinmeyen tarihsel yöntem ayrıdır. Hareket cursor'ü yalnız hareket sayfasını değiştirir; her yanıttaki borç toplamı yeniden toplanır, sayfalar arasında çoğaltılmaz. Güncelleme hatası veya yanlış kişi/merkez/para birimi eski bakiyeyi güncel göstermez; hesap/kişi/kapsam değişimi geç yanıt ve eski formu düşürür.
 
-Manuel tahsilatta yöntem/para birimi/tutar/referans, açık saat diliminde gerçek işlem zamanı ve otomatik vade sırası veya açık borç seti seçilir. Banka/POS referansı zorunludur. DST gap reddedilir, tekrarlanan saatte offset açık seçilir. Tutarın krediye dağılımı istemcide kesinleştirilmez; açık inceleme/onay → collection_record → gerçek finans yeniden okuması vardır. Form değişimi eski onayı kaldırır. `finance:{person}` günlüğü yalnız aynı kişi/kapsamda collection_record komutuna izin verir; diğer komut ailesi veya bozuk yöntem reddedilir. Aynı approved payload/key ile status/replay, bağımsız genel Bekleyen işlemler panelinden de liste/finans erişimi olmadan açılır. Yeni request_id alınır, yeni operation_key üretilmez. Gerçek collector yetki okuyucusu [XREQ-024](../../../docs/requests.md#xreq-024) nedeniyle açık bağımlılıktır; erişim reddi self'e yazma formu açmaz, altyapı/konfigürasyon hatası yalnız işlem alanında açık tekrar kontrolü gösterir. Finans okuması bu bağımlılıktan ayrı çalışır.
+Manuel tahsilatta yöntem/para birimi/tutar/referans, açık saat diliminde gerçek işlem zamanı ve otomatik vade sırası veya açık borç seti seçilir. Banka/POS referansı zorunludur. DST gap reddedilir, tekrarlanan saatte offset açık seçilir. Tutarın krediye dağılımı istemcide kesinleştirilmez; açık inceleme/onay → collection_record → gerçek finans yeniden okuması vardır. Form değişimi eski onayı kaldırır. `finance:{person}` günlüğü yalnız aynı kişi/kapsamda collection_record komutuna izin verir; diğer komut ailesi veya bozuk yöntem reddedilir. Aynı approved payload/key ile status/replay, bağımsız genel Bekleyen işlemler panelinden de liste/finans erişimi olmadan açılır. Yeni request_id alınır, yeni operation_key üretilmez. Gerçek collector yetki okuyucusunun teslim sonrası frontend uyumu [XREQ-024](../../../docs/requests.md#xreq-024) kapsamında açıktır; erişim reddi self'e yazma formu açmaz, altyapı/konfigürasyon hatası yalnız işlem alanında açık tekrar kontrolü gösterir. Finans okuması bu bağımlılıktan ayrı çalışır.
 
 **Tahsilat düzeltmesi kaynak dilimi — WF08:** Güncel main `86a77dc49cca498b2d2d9eeee0c074de04639a4b` üzerinden devam edildi. Hareket sayfasındaki gerçek kaynak tahsilat seçilir; `collection_correct_preview_v1` yetki okuyucusu tahsilat izninden bağımsız doğrulanır. Ret/hata halinde form açılmaz, başka kayda geçiş korunur. Form `next/dynamic` ile yetki doğrulandıktan sonra yüklenir. Pozitif fark + artır/azalt yönü, açık saat dilimindeki gerçek zaman ve gerekçe preview’a gönderilir; yeni toplam veya istemcide borç/alacak dağılımı hesaplanmaz. Backend etkileri ve engelleri gösterilir; bozuk tutar/para birimi/token, dolmuş önizleme veya engel uygulanamaz. Düzenleme ve kaynak değişimi eski incelemeyi düşürür; geç preview yanıtı geri gelmez. Onay ekranı girdinin saat dilimini korur. Başarı/ret finansı ve hareketleri ilk sayfadan yeniden okur. `collection-correct:{cash_movement_id}` günlüğü yalnız scoped apply preview/token/key saklar; genel Bekleyen işlemler paneli finans/kişi keşfinden bağımsız aynı payload/key ile kurtarır. Bu kaynak teslimi canlı `finance.refund` yetki/kabulünün geçtiği anlamına gelmez; tarayıcı/canlı matris açık kalır.
 
@@ -566,7 +681,7 @@ Oxlint’in yeni immutable-effect denetimi için yalnız işaretlenen dokuz effe
 
 **Son kaynak doğrulaması:** Yeni40 regresyonla746 web +1 UI testi ve8/8 lint/format/typecheck/test/build görevi geçti. Gerçek typed selector/yanlış hedef/ret/konfigürasyon hatası, üç bakiye işleminin ayrı onayı ve form değişiminde onayın düşmesi, satış kaynağı değişirken geç preview, self görünümünün hiçbir yönetim okuyucusu çağırmaması sınandı. Dört writer sonrası gerçek yeniden okuma ve üç bakiye işlemi + satış iadesinin kayıp yanıtta genel panelden exact payload/key/token kurtarması doğrulandı. Borç slotunun hedef eşitliğini gevşeten mutasyon regresyonu kırdı; dosya byte düzeyinde geri alındı ve11 ilgili test tekrar geçti. Quality0 bulgu/10 test, belge kontrolü ve bağımsız inceleme geçti; Required/Critical bulgu kalmadı. Tarayıcı çalıştırılmadı.
 
-**Açık gerçek kabul:** Chrome/erişilebilirlik/canlı uçtan uca satış→tahsilat→düzeltme→alacak→mahsup/iade matrisi; normal yönetici/personel/self/başka merkez/rol kaybı kabulü ve XREQ-024 gerçek collector okuyucusu. Bu kayıt kaynak tamamlanmasını belirtir; modülün hosted kabulü veya yeni adayın merge/main teslimi değildir.
+**Açık gerçek kabul:** Chrome/erişilebilirlik/canlı uçtan uca satış→tahsilat→düzeltme→alacak→mahsup/iade matrisi; normal yönetici/personel/self/başka merkez/rol kaybı kabulü ve XREQ-024 gerçek collector okuyucusu. Bu kayıt kaynak tamamlanmasını belirtir; hosted kabul değildir. PR232 main/ortam tesliminin güncel kaydı [finans bütünleşik kabulündedir](#pro-finans-kabulu).
 
 **Ekranlar:** Öğrenci finans özeti; borç detayları; tahsilat; düzeltme/iade/mahsup; hareket geçmişi.
 
@@ -577,18 +692,32 @@ Oxlint’in yeni immutable-effect denetimi için yalnız işaretlenen dokuz effe
 - [x] `student_credit_refund_v1`, `student_credit_offset_v1`, `debt_adjust_v1` (kaynak/otomatik kapsam; canlı kabul açık): nakit iade, borca mahsup ve borç düzeltmesini farklı eylemler yap; gerekçe ve kaynak kaydı göster.
 - [x] Öğrenci self kullanımına uygun salt okunur finans bileşeninde yalnız backend’in izinli özeti; yönetici işlemlerine bağlantı verme. Para birimi, sınır/büyük tutar ve küsurat görüntülemesini ortak güvenli yardımcılarla yap.
 
-**Kabul:** Satış → kısmi tahsilat → düzeltme → alacak → mahsup/iade zinciri gerçek bakiyeler ve geçmişle tutarlı; çift onay/bağlantı kaybı mükerrer para hareketi oluşturmaz. **Bağımlılık:** S04/S05/S12; rapor karşılaştırması S10.
+**Kabul:** Satış → kısmi tahsilat → düzeltme → alacak → mahsup/iade zinciri gerçek bakiyeler ve geçmişle tutarlı; çift onay/bağlantı kaybı mükerrer para hareketi oluşturmaz. **Bağımlılık:** S04/S05/S12; ilk S10 rapor karşılaştırması bu finans dilimiyle birlikte yapılır.
+
+<a id="pro-finans-kabulu"></a>
+
+#### Finans okuyucu uyumu ve Pro bütünleşik kabul
+
+**Durum:** PR232 kaynağı inceleme tabanında main'e ve bölüm 1'deki teslimlere ulaşmıştır. Mevcut finans yeniden yazılmaz; PR234 backend teslimine rağmen XREQ-024 frontend uyumu ve canlı kabul açık kalır. **Bağımlılık:** S05; backend okuyucu teslimi B08.
+
+- [ ] Teslim sonrası `collection_record_v1`, `sale_refund_preview_v1`, `student_credit_refund_v1`, `student_credit_offset_v1`, `debt_adjust_v1` için gerçek reader→writer→readback ve ret davranışını doğrula. #234'ün altıncı okuyucusu S06 kapasite istisnasıdır; `collection_correct_preview_v1` ayrı mevcut iznini korur.
+- [ ] Henüz tahsilatı olmayan kişi, dar collector/personel, tam finans görünümü olmadan izinli işlem ve canlı rol/izin kaybını kabul et; okuma iznini yazma yetkisi sayma.
+- [ ] Paket ve etkinlik yaşam döngüsü geliştikçe hak/borç/alacak/nakit etkilerini mevcut finansla birlikte doğrula. Satış iadesini otomatik nakit çıkışı veya rezervasyon iptali diye gösterme.
+- [ ] İlk gerçek tahsilat/bakiye mutabakatını S10 `collections_debts` raporuyla bu dilimde yap; bütün rapor/CSV kapsamı finalde genişler.
+
+**Kabul:** Kısmi tahsilat→düzeltme→alacak→mahsup/iade zinciri gerçek bakiyeler ve raporla tutarlıdır. Okuyucu tüketimi backend tesliminde sıra beklemeden ele alınır; kullanıcının ertelediği Chrome/canlı kabul ayrıca açık kalır.
 
 <a id="web-s09"></a>
 
 ### WEB-S09 — Öğrenci paneli, public ders başvurusu ve kişisel takvim
 
-**Ekranlar:** Öğrencinin dersleri/hakları/borcu/talepleri; paylaşılan ders takvimi ve başvuru; yönetici başvuru kutusu; kişisel takvim bağlantıları.
+**Durum:** Açık. Öğrenci/eğitmen günlük panelleri, public ve ICS ayrı alt teslimlerdir; ortak yönetici kabuğu küçük filtrelerle self paneli sayılmaz. **Ekranlar:** Öğrencinin dersleri/hakları/borcu/talepleri; eğitmenin görev/yoklama/hakedişi; paylaşılan ders/etkinlik takvimi ve başvuru; kişisel takvim bağlantıları. Başvuru kutusunun aday/eşleme işi [S04 CRM](#pro-crm) sahibindedir.
 
 - [ ] Öğrenci ana ekranında sıradaki ders, kendi kesin kayıtları, uygun dersler, hakları, borç/alacak ve işlem bildirimlerini gerçek self okumalarla birleştir. Başka öğrencilerin özel alanları görünmez.
-- [ ] `publication_set_v1`: ders yayını, kamuya açık başlık/mekan/ücret/koşul ve yayından kaldırma. Public bilgi seçimi S12'deki izinli alanlarla tutarlı olur.
+- [ ] Pro öğrencide bekleme/yer teklifi ve izinli self eylemlerini; eğitmende yalnız kendi görev/yoklama/hakedişini tamamlanmış S06/S07 akışlarıyla birleştir. Gerçek self kişi bağlantısını kullan; hesap UUID'sinden kişi üretme.
+- [ ] `publication_set_v1`: izinli ders/etkinlik yayını, kamuya açık başlık/mekan/ücret/koşul ve yayından kaldırma. Public bilgi seçimi S12'deki izinli alanlarla tutarlı olur; Starter yalnız dar ders kapsamındadır.
 - [ ] `public_calendar_get_v1` ve `public_application_submit_v1`: gerçek public giriş yolu, widget tokenı, amaç/hostname ve hata/tekrar davranışı. Anonim çağrıyı Auth tokenı varmış gibi modelleme.
-- [ ] `public_application_review_v1` ve ilgili management okumasıyla dar ders başvurusunu değerlendir; kişi/aday eşlemesi ve sonuç. Genel lead/CRM/deneme kampanyası oluşturma.
+- [ ] `public_application_review_v1` ve ilgili management okumasını S04 ortak kutu/eşleme akışına bağla; Starter dar ders başvurusunu Pro CRM/deneme izni gibi kullanma. Başvuru kesin kayıt veya iletişim izni değildir.
 - [ ] `calendar_links_get_v1`, `calendar_link_create_v1`, `calendar_link_rotate_v1`, `calendar_link_revoke_v1`: kendi hesabında açık organizasyon ve `lessons`/`duties` seçimi, kopyalama, yenileme/iptal; URL'yi log/analytics'e gönderme.
 - [ ] ICS bağlantısını gerçek GET/HEAD servisinden takvim istemcisine ekle; her seans mevcut korumalı seans route'una gider. Rotate/revoke, üyelik/abonelik kaybı ve iptal edilen seans görünürlüğünü kabul et.
 - [ ] Kesin ortak ders katılımcıları için izinli profil/fotoğraf/iletişim paylaşımını canlı tercihlerle uygula; ilgi filtresi yeni erişim yetkisi yaratmaz.
@@ -599,14 +728,15 @@ Oxlint’in yeni immutable-effect denetimi için yalnız işaretlenen dokuz effe
 
 ### WEB-S10 — Raporlar, CSV ve import
 
-**Ekranlar:** Tahsilat/borç ve ders/katılım raporları; dışa aktarma işi; dosya yükleme/eşleme/önizleme/uygulama/sonuç sihirbazı.
+**Durum:** Açık. İlk tahsilat/hakediş rapor mutabakatı S08/S07 ile birlikte yapılır; tüm rapor/export ve kontrollü import iki ayrı alt teslimdir. **Ekranlar:** Pro rapor türleri, dışa aktarma işi; dosya yükleme/eşleme/önizleme/uygulama/sonuç sihirbazı.
 
-- [ ] `report_get_v1`: yalnız Starter `collections_debts` ve `lesson_attendance`, açık tarih/merkez filtreleri, sayfalama, para birimi ve tüm filtre sonucunun toplamı. Sayfa toplamını genel toplam sayma.
+- [ ] `report_get_v1`: Pro `collections_debts`, `lesson_attendance`, `renewal`, `occupancy`, `resource_usage`, `earnings`, `crm_conversion`; her türün filtre/alan/yetkisi kendi DTO'sundan alınır. Starter yalnız iki temel raporu, `cross_center_usage` yalnız Business'ı kapsar. Tarih/merkez/para birimi/as_of ve sayfa/genel toplam ayrımını koru.
 - [ ] `report_export_start_v1` → `job_status_get_v1` → `report_file_get_v1`: authenticated CSV indirme, bekleme/başarısızlık/süre dolma, kayıp yetki ve aynı anahtar kurtarma. Export yetkisini rapor okumasından türetme.
 - [ ] `import_upload_prepare_v1` → private signed upload → gereken tamamlanma doğrulaması → `import_preview_v1`; `job_status_get_v1`/`preview_get_v1` ile teknik sonucu göster.
 - [ ] Virgül/noktalı virgül, açık sütun eşlemesi, `source_namespace`/`source_key`, mevcut `person_ref`, kişi/iletişim, açılış kredi ve borç alanları. Dosyadan hesap/davet veya nakit tahsilat üretme.
 - [ ] `import_apply_v1` → `import_rows_list_v1`: satır sonucu, kısmi hata, yeniden okuma ve desteklenen tekrar. Başarılı kaynak anahtarı tekrar uygulanmaz; önizleme kendi başına kayıt oluşturmaz.
 - [ ] Kendi ve yetkili ortak rapor/import şablonlarını `settings_template_resolve_v1` ile açık kaynak/sürümle hazırla; otomatik job/apply yoktur.
+- [ ] Pro 250/Starter 100 aktif öğrenci ve son slot yarışını import'ta koru. Gerçek eski CRM veri aktarımı ayrıca kaynak/onay ister; genel CSV ekranı bu aktarımı yapmış sayılmaz. Şema/config/private dosya/worker hazırlığını finali beklemeden keşfet.
 
 **Kabul:** Rapor sayfaları/toplam/CSV tutarlı; dosyada hatalı satır doğru gösterilir; son öğrenci slotu yarışında başarısız import satırı yarım kişi/hak/borç bırakmaz; başka hesabın dosyası indirilemez. **Bağımlılık:** S02/S04–S08/S11/S12, B05.
 
@@ -614,7 +744,7 @@ Oxlint’in yeni immutable-effect denetimi için yalnız işaretlenen dokuz effe
 
 ### WEB-S11 — Belge, işlemsel inbox ve denetim geçmişi
 
-**Durum: kaynak ve otomatik kabul teslimi tamam; canlı kabul açık.** Kullanıcının canlı kabulleri ayrı tutup devam talimatıyla aktif kaynak bölümü S05 olmuştur. S03 kapanış belgesi PR175 ile main'e alındı. Kullanıcının 4 Kasım devam talimatıyla S11 başlatıldı; bölüm kapanmadı. İlk devam dalı `feature/web-s11`, başlangıç main `68ac0a800d0ee13c29d75625702d10d850d4f7c3`. Aynı main'in [kaynak kabulü](https://github.com/SXQHex/FtkSaaS/actions/runs/41818132044) ve [development teslimi](https://github.com/SXQHex/FtkSaaS/actions/runs/41818184012) başarılıdır; bunlar yeni S11 kaynağının kabulü değildir.
+**Durum: Temel belge/inbox/geçmiş kaynağı ve otomatik teslim tamam; canlı kabul ve Pro bildirim/otomasyon kapsamı açık.** Kullanıcının canlı kabulleri ayrı tutup devam talimatı korunur; güncel aktif bölüm ve sıra [bölüm 7](#7-bölüm-bölüm-teslim-tek-aktif-bölüm) sahibindedir. S03 kapanış belgesi PR175 ile main'e alındı. Kullanıcının 4 Kasım devam talimatıyla S11 başlatıldı; bölüm kapanmadı. İlk devam dalı `feature/web-s11`, başlangıç main `68ac0a800d0ee13c29d75625702d10d850d4f7c3`. Aynı main'in [kaynak kabulü](https://github.com/SXQHex/FtkSaaS/actions/runs/41818132044) ve [development teslimi](https://github.com/SXQHex/FtkSaaS/actions/runs/41818184012) başarılıdır; bunlar yeni S11 kaynağının kabulü değildir.
 
 **İlk kaynak dilimi — inbox ve bağlamsal geçmiş:** Yönetici kabuğundaki bildirim görünümü normal/grace organizasyonu açık seçer; mevcut native Auth/typed Edge yoluyla yalnız kendi inbox'ını25'lik, `created_at_asc` cursor sayfalarıyla okur. Okunmamış filtresi/organizasyon değişince cursor ve eski görünüm temizlenir. Okundu komutundan önce `management_state_get_v1(notification_mark_read_v1)` selector'ü aynı notifications varlığının gerçek sürümünü okur; ayrı kullanıcı onayından sonra `notification_mark_read_v1` gönderilir. Sürüm çatışması eski onayı düşürür; yeni sürüm okuması ve onay gerekir. Başarıda liste yeniden okunur. Başlıksız gerçek DTO için bilinen bildirim türleri TR/EN etiketlenir; ham teknik adlar kullanıcı metni yapılmaz.
 
@@ -705,23 +835,61 @@ Aynı owner’ın gerçek `settings_update_v1(scope:member)` tercihi UI’da inc
 
 **Kabul:** Yetkilendirilmiş mevcut işlem bağlamında eksik belge gerekliliği okunur; doğru kişi doğru sürümü açar/kabul eder; yeni sürüm yeniden kabul gerektirdiğinde eski onay yeterli olmaz. Başka kullanıcının inbox/audit bilgisi okunamaz. Satış/rezervasyon/yoklama formundaki belge kapısının uçtan uca kabulü o formun teslimindedir. **Bağımlılık:** B05/B06 ve gerçek işlem bağlamı; bağlamsız kişi belge özeti oluşturulmaz.
 
+<a id="pro-bildirim-otomasyon"></a>
+
+#### Pro bildirimler, hatırlatmalar ve takip otomasyonu
+
+**Durum:** Açık; S11 inbox/belge/iş takibi altyapısı yeniden kullanılır. **Bağımlılık:** S12 tercihler, S04 CRM ve ilgili ders/paket/etkinlik olayları; XREQ-019/022, F24/F26/F27.
+
+- [ ] İşlem sonucu, job başarısı, e-posta sağlayıcı kabulü/teslimi ve davet kabulünü ayrı göster; gerçek kanal kullanılabilirliğiyle çalış.
+- [ ] Gerçek katalogdaki ders/etkinlik/paket/vade hatırlatmalarını, timezone ve geceyi aşan sessiz saatleri tüket; Business ayar mirası sonraki varyanttır.
+- [ ] Desteklenen segment/trigger/action/enabled ayarlarını bağla; `recent_jobs`, güvenli hata, disable ve yalnız `retry_available` için sürümlü retry sun.
+- [ ] Serbest cron/kod, kampanya postası veya otomatik satış/tahsilat üretme. Worker işini tarayıcıya taşıma.
+
+**Kabul:** Tek kaynak olay tek takip/uyarı; tamamlanmış iş tekrar çalıştırılamaz. Kanal/izin kaybı ve DST doğru görünür, gerçek teslim ayrıca kanıtlanır. Starter uygulama içi sınırı korunur. Belge kapısının satış/rezervasyon/yoklama/etkinlik kabulü kendi işlemiyle kapanır.
+
+<a id="web-pro-events"></a>
+
+### Pro etkinlik, atölye ve paketli Pratik
+
+**Durum:** Açık yeni Pro kapsamı; R11 rapor karşılığı, mevcut S03/S05/S07/S08/S11 bileşenlerini tüketir. **Bağımlılık:** Anlaşmalar, Pro ürün ve hakediş; public yüzey S09/CRM. Normatif akış [WF15](../../../docs/workflows.md#wf15), F29 ve F15–F17/F20/F25 bağlarıdır.
+
+- [ ] Etkinlik liste/detay→oluştur/yayımla→kayıt preview→gereken ödeme hazırlığı/durumu→kesin kayıt→yeniden okuma zincirini görevler, iptal, fiilî başlangıç, katılım/kapatma/düzeltmeyle tamamla. Yeni online ödeme sağlayıcısı varsayma.
+- [ ] Odaya bağlı etkinlikte fiziksel tavanlı sayısal kapasite; odasız etkinlikte sözleşmenin açık sınırsız seçeneği. Ders kategori modelini kör kopyalama; ödeme hazırlığı yer tutma değildir.
+- [ ] Paketli Pratik'te `eligibility_only` koşulunu geçerli paket ve kullanılabilir ders hakkıyla göster; kayıt/yoklama/iptal ders kredisi ayırmaz veya tüketmez. Canlı uygunluk ile son katılım anındaki uygunluğu ayır; hak kaybı kesin kaydı kendiliğinden iptal etmez.
+- [ ] İptal/iade/belge ve eğitmen görevi etkilerini mevcut ortak akışlara bağla. Merkez iptalindeki öğrenci alacağı otomatik nakit çıkışı sayılmaz.
+
+**Kabul:** Ücretli/kapsama bağlı kayıt, son yer, iptal, fiilî başlangıç/katılım/kapanış; Pratik sonrası ders kredisi değişmez, uygunluğunu kaybeden kayıt doğru uyarı ve katılım kontrolü alır. Öğrenci/merkez iptalinin mali sonucu, hakediş ve raporla doğrulanır. Starter F29 erişimi kapalıdır.
+
 <a id="web-s12"></a>
 
 ### WEB-S12 — Ayarlar ve gerçek davranış tüketicileri
 
-**Ekranlar:** Kendi görünüm/mahremiyet tercihleri; organizasyon ve merkez ayarları; politika yayını; marka/medya; şablonlar; seçili alan reseti ve geçmiş.
+**Durum:** Açık çapraz modül kabulü. Ayar kaydetme tek başına kapanış değildir; her dilimde **kaydet → gerçek tüketici etkisi → kaynak/default/miras → seçili reset → geçmiş** doğrulanır. **Ekranlar:** Kendi görünüm/mahremiyet tercihleri; organizasyon ve merkez ayarları; politika yayını; marka/medya; şablonlar; seçili alan reseti ve geçmiş.
 
 - [ ] `settings_catalog_get_v1`, `settings_get_v1`, `settings_update_v1`, `settings_reset_preview_v1`, `settings_reset_apply_v1`, `settings_history_get_v1` ile scope, salt okunur/unsupported, mevcut sürüm, kaynak/default/miras ve açık override göster.
 - [ ] FD01: dil, tarih/sayı/saat biçimi, cihaz/manual timezone, hafta başlangıcı, takvim görünümü, tema, ölçek, kontrast ve hareket gerçek tüketicilere bağlanır. Kişisel görüntüleme timezone'u işletim timezone'unu değiştirmez.
 - [ ] FD02/FD03: üç organizasyon rengi, logo ve kendi fotoğrafı; `media_get_v1`, private okuma ve açık kaldırma. Null-only renk/font paket alanlarına çalışmayan katalog ekranı ekleme.
 - [ ] FD04/FD05: kullanılabilir bildirim tercihleri, profil/fotoğraf/e-posta/telefon görünürlüğü, ilgi filtresi ve izinli geçmiş önerileri. Üye kendi ayarını değiştirir; yönetici başkasının tercihlerini yazmaz.
 - [ ] FD06/FD07: `policies_get_v1`/`policy_publish_v1`, uygunluk, rezervasyon/iptal/katılım/negatif limit davranışı ve manuel tahsilat yöntem/reference tüketimi. Yeni organizasyon defaultlarını mevcut kurumlara geri doldurma.
-- [ ] FD08/FD09: belge/public alan yayını ve dar ders başvurusu tercihleri; Starter dışı CRM tüketicisini açma.
+- [ ] FD08/FD09: belge/public alan yayını ve planına uygun ders/etkinlik/başvuru tercihleri; Starter'a üst plan CRM/etkinlik tüketicisi açma.
 - [ ] FD10: rapor/import ve availability/paket hazırlık şablonları. `settings_preparation_resolve_v1` yalnız typed taslak üretir; gerçek komut ve onay ayrıca gerekir. Kaynak sürümü değişince yeniden çöz.
 - [ ] FD11: seçili alan reset önizlemesi, kapsam/sürüm/expiry, değişim geçmişi. Reset yayınlanmış ürün, başlamış iş veya önceki satış koşulunu değiştirmez.
 - [ ] FD12: hesap/organizasyon lifecycle ekranlarına doğru bağlan; desteklenmeyen ayarın kaydedildiği veya fiziksel imhanın bittiği izlenimini verme.
 
 **Kabul:** Bir ayarı kaydet → ilgili ekranda etkisini göster → kaynak/mirası kontrol et → seçili alanı resetle; başka scope veya yayınlanmış kayıt etkilenmez. Görünürlük kapandığında yeni katılımcı/medya okumaları kesilir. **Bağımlılık:** İlgili alanla birlikte geliştirilir; bütün ayarlar en sona bırakılmaz.
+
+| Ayar kapsamı | Tüketiciyle birlikte teslim yeri | Kapanışta görülecek etki |
+|---|---|---|
+| FD01 | Ortak kapsam/erişim, S03, S09 | Tercih gerçek takvim/liste/self ekranda; kişisel timezone işletimi değiştirmez |
+| FD02/FD03 | S02 ve mevcut S01 | Typed marka/private medya, kaldırma ve gerçek görünüm; unsupported font/renk seçeneği yok |
+| FD04/FD05 | S09, S11 Pro bildirim | Kanal/sessiz saat/görünürlük; kapanan paylaşımın yeni okumaları kesilir |
+| FD06–FD09 | S02/S05/S06/S04 CRM/S09/etkinlik; mevcut S11 | Politika/uygunluk/tahsilat/belge/public ayarı gerçek işte etkili; eski satış/kesin kayıt korunur |
+| FD10 | S03/S05/S10 | Açık kaynak/sürümle hazırlık; resolve otomatik publish/apply/job değildir |
+| FD11 | Ayar değiştiren her dilim | Önce/sonra, sürüm ve default/miras; parent değişiminde stale reset preview yenilenir |
+| FD12 | S13 ve mevcut S01 | Doğru lifecycle hedefi, erişim ve gerçek işlem/silme durumu |
+
+Bu eşleme uygulama yerini gösterir; FD kapsamının kabul checklist'i yukarıdadır. Bütün satırların tüketici/reset/geçmiş zinciri tamamlanmadan S12 kapanmaz.
 
 <a id="web-s13"></a>
 
@@ -729,43 +897,52 @@ Aynı owner’ın gerçek `settings_update_v1(scope:member)` tercihi UI’da inc
 
 **Ekranlar:** Aboneliğim; plan/kullanım/erişim; teklif ve ödeme bildirimi; bekleyen değişiklik; kapsam seçimi; kapatma/yeniden açma/silme etki ve takip.
 
+**Durum:** Tam yaşam döngüsü açık; erişim/limit/kullanım ve daralma/kurtarma davranışı [ortak kapsam/erişim](#ortak-kapsam-erisimi) içinde erken ele alınır. Tam ekranlar finalden önce tamamlanır; öğrenci paket değişimi S05'tir.
+
 - [ ] `subscription_get_v1`: gerçek dönem, plan, erişim modu, kullanım limitleri ve `starter_scope_required`/seçilmiş kapsam. Kotaları tasarım örneklerinden veya listelenen ilk sayfadan hesaplama.
 - [ ] Yetkisiz role finans/abonelik owner görünümü sunma; kapalı erişim ekranında backend'in izin verdiği kurtarma/hesap işlemlerini göster.
 - [ ] `subscription_upgrade_quote_v1`, `saas_payment_submit_v1`, `subscription_renewal_set_v1`: gerçek teklif/tutar/para birimi/expiry, yenileme tercihi ve ödeme bildirimi. Platformun ödeme doğrulama veya grace komutları kullanıcı paneline taşınmaz; online ödeme sağlayıcısı icat edilmez.
+- [ ] Aylık↔yıllık `subscription_period_change_request_v1`: [WF13](../../../docs/workflows.md#wf13) dar okuyucusundan gerçek hedef plan, kabul edilen tutar/para birimi/yürürlük ve abonelik sürümünü al. Tek bekleyen değişiklik, plan değişikliğiyle çakışma/iptal ve dönem sınırı davranışını göster; istemci tarih/fiyat hesaplamaz, ödeme bildirimi doğrulama değildir.
 - [ ] `subscription_downgrade_request_v1`/`subscription_change_cancel_v1`: açık sürümle merkez/oda/disiplin/eğitmen/en fazla 100 öğrenci seçimi ve dönem sınırı. Kaynaklar otomatik ilk kayıt seçimiyle daraltılmaz; geçmiş/veri silinmez.
 - [ ] `organization_close_preview_v1`/`organization_close_apply_v1`/`organization_reopen_v1`: açık işler, abonelik/yenileme ve yeniden açılma koşulları. UI hizmet tarihini kendi hesabıyla ileri taşımaz.
 - [ ] `organization_delete_preview_v1`/`organization_delete_apply_v1`: taze yetki/reauth, iki aşamalı açık etki/onay, export bağlantısı ve gerçek job/progress. `partial`, hukuki saklama ve `retry_wait` tamamlandı sayılmaz.
+- [ ] Pro→Business ticari görünümünü gerçek yayımlanan ürün kapsamına bağla; desteklenmeyen ürüne satın alma akışı vaat etme. Daralmada tarihçe/hak/borç korunur, kaynaklar otomatik seçilmez.
 
 **Kabul:** Limit/kapalı erişim doğrudan route ve işlemde de korunur; dönem sınırı/iptal edilmiş değişiklik doğru görünür; lifecycle talebi kayıp yanıtta tekrarlanmaz. **Bağımlılık:** B06, S01/S02/S10; Starter'a dönüş seçicileri B01 ve ilgili kişi okumalarını ister.
 
 ## 7. Bölüm bölüm teslim: tek aktif bölüm
 
-Kullanıcının6 Kasım son kararı: **Tarayıcı kabullerini açık bırak, geliştirmeye odaklan.** S05/S06'nın kaynak ve otomatik teslimi main'dedir; kalan canlı kabuller kendi matrislerinde, override yetki okuyucusu XREQ-023'te açık tutulur. **WEB-S08** kaynak geliştirmesi tamamlandı; Chrome/canlı kabul ve XREQ-024 kendi bölümünde açık kalır. Bu teslimde sonraki modül başlatılmaz. S01 temel, S02, S03 ve S04 kapanışları korunur; S11'in canlı kabulü ayrıca açık kalır. Aynı anda ikinci geliştirme modülü açılmaz.
+**Aktif mevcut uygulama: S07 / [PR233](https://github.com/SXQHex/FtkSaaS/pull/233).** Mevcut yoklama kaynağı tamamlanıp teslim tabanı uzlaştırılır; ikinci uygulama başlatılmaz. S08 kaynak PR232 ile main'dedir. **Sonraki yeni paket: S02 Pro ekip/kaynak + eğitmen anlaşmaları + mevcut S03 takviminde gerçek Pro programı.** Yalnız bu yolculuğu açan ortak kapsam/rol/erişim düzeltmeleri pakete girer; genel kabuk göçü yapılmaz. Bu belge PR'si uygulama geliştirmesi veya S07 merge işlemi değildir.
 
-S01–S13 işlev kapsamını izler. Teslim bölümleri ise kullanıcının baştan sona kullanabildiği akışlardır: örneğin davet kabulü öğrenci bölümünde, satışın zorunlu belge adımı satış bölümünde çalışır. Ortak bir bağımlılık önce kullanılacağı bölümün içinde tamamlanır ve daha sonra yeniden yazılmaz. Bölümün kabulü ileride yazılacak bir ekrana bağlanmaz: gerektiğinde yetkilendirilmiş mevcut kayıt kullanılır; yeni ekranlar arasındaki uçtan uca bağlantı, bağlantıyı kullanan sonraki bölümün açık kabul maddesidir. Gerekli gerçek kayıt/okuma yoksa bölüm engelli kalır, mock ile kapanmaz. Başka bir bölüme ait henüz yapılmamış işlem, mevcut bölümde çalışıyormuş gibi düğme/özet olarak sunulmaz.
+Kullanıcının tarayıcı/Chrome/canlı kabulleri açık bırakıp geliştirmeye odaklanma kararı sürer. S05/S06/S08/S11 ve diğer modüllerin ertelenen gerçek kabulü kaynak tamamlandı diye kapatılmaz. XREQ-023/024'ün beklenen backend kaynak/main/dağıtım teslimi artık doğrulandı; S06/S08 okuyucu uyumu sıra numarası beklemeden alınabilecek hazır devam işidir. Bu belge çalışması frontend uyumunu uygulamaz veya canlı kabulü kapatmaz. Pro ekip/anlaşma paketi de bağımsız geliştirilebilir. S01–S04'ün geçmiş temel/Starter kabulleri yeni Pro farklarından ayrıdır.
 
-| Sıra | Tamamlanacak bölüm | Bölüm kapanışının somut sonucu |
+S01–S13 işlev ve kabul sahipliğini korur; eksik Pro kapsamları aynı dosyanın ilgili alt bölümlerindedir. Aşağıdaki R00–R14 yalnız kullanıcı raporunun **sıra ve bağımlılık eşlemesidir**, ikinci checklist veya ayrı durum ağacı değildir. Görev/kabul değişikliği bağlı S/Pro bölümünde yapılır.
+
+| Rapor sırası | Uygulama/kabul sahibi | Bağımlılık ve tamamlanacak sonuç |
 |---|---|---|
-| 1 | **Hesap ve güvenlik — temel teslim kapalı** — S01, kendi tercihleri için S12 | Giriş/kayıt/kurtarma/Google/TOTP, profil, oturumlar, güvenlik ve hesap lifecycle akışları tamam. |
-| 2 | **Öğrenci yönetimi — kapanış teslimi tamam** — S04 çekirdeği ve gereken S01 davet kabulü | Mevcut liste/profil/oluşturma/düzenleme/öğrencilik akışları; disiplin, tek merkezli birleştirme ve hesap erişimi dahil gerçek kabul. Çok merkezli onay keşfi bu kapanışa dahil değildir. Paket/finans alt görünümü kendi sonraki bölümünün sorumluluğudur; bu aşamada sahte özet eklenmez. |
-| 3 | **Stüdyo kurulumu ve işletme erişimi** — S02, gereken S12 politikaları ve S13 temel plan görünümü | Gerçek kaynak katalogları, merkez/oda/disiplin/eğitmen/uygunluk ve plan sınırlarıyla stüdyo program oluşturmaya hazır. B01 burada çözülür. |
-| 4 | **Belgeler ve işlemsel bildirimler — kaynak/otomatik teslimi tamam; canlı kabul açık** — S11 | Özel yükleme/yayın, bağlamsal okuma/onay, inbox ve izinli geçmiş tamam; sonraki iş formlarına bağlanacak çalışan bileşenler hazır. |
-| 5 | **Program ve seanslar** — S03 | Sınıf/program/tek seans oluşturma; kaynak ataması, değişiklik, iptal/telafi, Scheduler ve gerçek çakışma kabulü tamam. |
-| 6 | **Paket, satış ve hak yönetimi — kaynak teslimi tamam; canlı kabul açık** — S05 | Üç ürün türünde yayın/satış/yenileme/hak düzeltmesi, zorunlu belge adımı ve öğrenci profilindeki hak görünümü tamam. |
-| 7 | **Tahsilat ve finans — kaynak tamam; canlı kabul/XREQ-024 açık** — S08 | Finans özeti, tahsilat/düzeltme/satış iadesi/alacak iadesi/mahsup/borç düzeltmesi kaynağı tamam; gerçek kabul bu bölümde açık. Rapor karşılaştırması sonraki rapor bölümündedir. |
-| 8 | **Rezervasyon ve özel ders talepleri — kaynak teslimi tamam; canlı kabul/XREQ-023 açık** — S06, S09 self eylemleri | Yönetici ve öğrenci için kayıt/iptal/hak seçimi; talep/alternatif/onay; son kontenjan ve açık işlem reddi tamam. |
-| 9 | **Eğitmen paneli ve yoklama** — S07 | Kendi görevleri, başlangıç/taslak/kapatma/düzeltme ve hak tüketimi tamam; ücret/hakediş üretimi yok. |
-| 10 | **Öğrenci paneli ve public ders başvurusu** — S09 günlük panel/public | Önceki tamamlanmış self işlemler tek panelde birleşir; gerçek widget/gateway ile başvuru ve yönetici değerlendirmesi tamam. |
-| 11 | **Kişisel takvim aboneliği** — S09 ICS | Gerçek takvim istemcisi → GET/HEAD → ICS → yetkili seans; rotate/revoke ve erişim kaybı tamam. |
-| 12 | **Raporlar ve veri aktarımı** — S10 | Finans/katılım raporu ve CSV; öğrenci/kredi/borç import'unda dosya→preview→apply→worker→satır sonucu tamam. |
-| 13 | **Ayarlar ve abonelik yaşam döngüsü** — kalan S12/S13 | Önceki bölümlerde kullanılan ayarlara ek kalan FD tüketicileri, şablon/reset, plan geçişi, ödeme bildirimi, kuruluş kapanış/silme ve takip tamam. |
-| 14 | **Bütün Starter kabulü** | Bölüm 9'daki gerçek kullanıcı yolculuğu, tüm roller/plan sınırları, erişilebilirlik ve ilgili yayın kanıtları tamam. |
+| R00 kaynak/teslim uzlaştırma | Bölüm 1, [S07](#web-s07), [S08](#pro-finans-kabulu), bölüm 5 | Güncel main/açık PR ve kaynak/CI/yayın/canlı ayrımı; #233 korunur. #234 tesliminde altı okuyucu tüketimi; sağlayıcı/ICS/import/işletim hazırlığı erken keşfedilir. |
+| R01 kapsam/erişim/gezinme | [S01 ortak kapsam](#ortak-kapsam-erisimi), S12/S13 | R00; org/merkez ve rol ayrımı, daralma/erişim kaybı, kurtarma ve kararlı hedefler. |
+| R02 Pro kaynak/ekip | [S02 Pro ekip](#pro-kaynak-ve-ekip), S04/S12 | R01; çoklu oda/disiplin/eğitmen, personel izinleri, uygunluk ve gerçek işletim ayarları. |
+| R03 eğitmen anlaşmaları | [S02 anlaşma](#pro-egitmen-anlasmalari) | R02; geçerli ücret anlaşmasıyla program önkoşulunu çöz; hakediş ekranını bekleme. |
+| R04 Pro takvim/program | [S03 Pro kabul](#pro-program-kabulu) | R02/R03; çok kaynak, atama/seri/DST, iptal/telafi ve lisanslı Scheduler. |
+| R05 ürün/satış/paket yaşam döngüsü | [S05 Pro paket](#pro-paket-yasam-dongusu), S11/S12 | R02 ve mevcut kişi/belge temeli; satış, dondurma/bitirme, değişim, yenileme/sonlandırma. |
+| R06 rezervasyon/bekleme | [S06 Pro bekleme](#pro-bekleme-teklif) | R04/R05; personel/self, son yer ve süreli teklif; XREQ-023 istisna tüketimi. |
+| R07 yoklama/hakediş | [S07](#web-s07), [Pro hakediş](#pro-hakedis) | R03/R04/R06; mevcut yoklama üzerine ödeme/düzeltme; ilk gerçek earnings rapor karşılaştırması burada. |
+| R08 finans bütünlüğü | [S08 Pro kabul](#pro-finans-kabulu) | R05 ve backend okuyucu teslimi; mevcut finansın uyumu, ilk collections_debts mutabakatı. Okuyucu işi R00'dan itibaren alınır. |
+| R09 günlük paneller/ICS | [S09](#web-s09), S07/S01 | R01 ve kullanılan R04–R08 akışları; öğrenci/eğitmen günlük işleri ve gerçek takvim istemcisi. |
+| R10 CRM/public kaynak alımı | [S04 CRM](#pro-crm), [S09 public](#web-s09) | R02; temel aday erken alınabilir, deneme/dönüşüm R04–R06'yı, sağlayıcı alımı backend/ortamı bekler. |
+| R11 etkinlik/Pratik | [Pro etkinlik](#web-pro-events) | R03/R05/R07; kayıt/kapasite/katılım, kredi tüketmeyen Pratik ve ortak finans/belge etkileri. |
+| R12 bildirim/otomasyon | [S11 Pro bildirim](#pro-bildirim-otomasyon), S12 | Mevcut inbox, CRM ve ilgili ders/paket/etkinlik olayları; katalog, sessiz saat, iş sonucu/güvenli retry. |
+| R13 rapor/export/import | [S10](#web-s10) | İlgili operasyonlar ve private dosya/worker; bütün rapor/CSV mutabakatı ve kontrollü veri aktarımı. |
+| R14 abonelik/lifecycle | [S13](#web-s13), S01/S12 | R01/R02 ve export için R13; aylık/yıllık dönem, plan/yenileme, downgrade, kapanış/silme. Erken erişim testleri R01–R06'da. |
 
-**Bölüm çalışma döngüsü:** mevcut kaynak/eksik kontrolü → gerekiyorsa backend/ortam bağımlılığını çözme → UI/UX ve gerçek API → hata/kurtarma → anlamlı testler → gerçek ortam kabulü → tek modül PR'sini son inceleme/merge'e sunma → aynı main ve ilgili dağıtım sonucunu doğrulama → sonraki bölüm.
+**Dalga sırası:** R00 uzlaştırma → R01–R03 ilk Pro paketi → R04/R05, ardından R06/R07 ve ilgili R08 mali sonuçlar → R09/R10 → R11/R12 → R13/R14 ve kalan çapraz ayarlar/belgeler → bölüm 9 bütün Pro+Starter kabulü. Bu katı tek seri değildir: temel CRM, erken okuyucu uyumu ve hazırlık keşfi bağımlılığı hazır olduğunda seçilebilir. Mevcut S07 işi bu zincir gerekçesiyle geri alınmaz; yeni Pro hakediş kabulü anlaşma/program önkoşullarını bekler.
 
-CI veya hosted kabul bekleyen bölüm, kullanıcı farklı sıra seçmedikçe aktif kalır. Kullanıcının 5 Kasım talimatıyla S11 canlı kabulleri açık tutulmuş, kaynak geliştirme S05’e geçirilmiştir. Engelde kalan somut okuma/config/yetki, sahibi ve kapanış kanıtı yazılır; engel gizlenerek başka modüle geçilmez. Sıra değişikliği ancak kullanıcının açık kararıyla yapılır ve aktif kayıt güncellenir. Kullanıcı açıkça erken merge isterse kaynak main'e alınabilir; bu, eksik kabulü kapatmaz ve bölüm tamamlandı sayılmaz.
+**Tek aktif bölüm:** Aynı anda ikinci uygulama modülü açılmaz. Bölümün kaynak çalışması tamamlanınca kullanıcı tarafından ertelenen canlı kabul kendi sahibiyle açık bırakılarak bu sıradaki hazır modüle geçilir. Dış bağımlılıkta engel, sahibi ve gereken kanıt yazılır; işi kapatmadan bağımsız dilim seçilebilir. Öncelik değişikliği aktif kayıt ve handover bağlantısıyla tutarlı olmalıdır.
 
-Aynı bölümdeki küçük düzeltmeler aynı dal/PR'de sürer. Önceki bölüm PR'si birleşmişse kalan kabul veya tamamlayıcı iş için tek devam PR'si kullanılır; her commit ayrı PR/merge talebi oluşturmaz. Takvim tarihi veya süre tahmini, ilgili backend/sağlayıcı bağımlılığının eforu doğrulanmadan verilmez.
+**Bölüm çalışma döngüsü:** güncel kaynak/eksik → gerçek WF/DTO/selector ve bağımlılık → UI/gerçek API → hata/kurtarma → ilgili otomatik doğrulama → son inceleme ve modül Draft PR'si → kaynak bağlı CI/main/ilgili yayın kanıtı. Ertelenen gerçek kabul ayrı kalır, ilk ürün tesliminden önce bölüm 9'da kapanır. Gerçek kayıt/okuma yoksa mock ile kabul verilmez; sonraki modüle ait çalışmayan düğme/özet gösterilmez.
+
+PR sınırı tek endpoint/commit değil tamamlanan kullanıcı akışıdır. Anlaşma yönetimi, bekleme/teklif, paket yaşam döngüsü, etkinlik ve rapor/export anlamlı paketlerdir; bağımsız alt sistemler tek dev PR'a yığılmaz. Aynı bölümdeki küçük düzeltmeler aynı PR'de sürer. CI/full clean devri ve kaynak bağlı merge/yayın kuralları değişmez; bu plan CI kapılarını gevşetme yetkisi vermez. Efor/bağımlılık ölçülmeden gün veya kesin PR sayısı sözü verilmez.
 
 ## 8. Her modülün teslim kapısı
 
@@ -778,52 +955,79 @@ Aynı bölümdeki küçük düzeltmeler aynı dal/PR'de sürer. Önceki bölüm 
 7. **Kaynak ve yayın:** Son kaynak incelemesi, aynı head/base/merge için CI; merge sonrası main kanıtı ve ilgili dağıtım. Frontend kanıtı bu dosyada ilgili bölümün kapanış kaydında tutulur; eski head'in başarısı yeni head'e taşınmaz.
 8. **Doküman:** Modül adımları, kalan bağımlılıklar, açık kabul ve sıradaki frontend işi bu dosyada güncellenir. Kapanış kaydı kaynak SHA'sını, ilgili CI/dağıtım bağlantılarını ve gerçek ortam kabul sonucunu içerir. Ürün/DTO değişikliği ihtiyacı ortak talep kaydına yazılır ve yetkili kapsamda ele alınır; bu dosya talep kimliğine bağlanır. Talep kaydının kendi alanları dışında ortak `/docs` sözleşmeleri frontend planı/ilerlemesi için güncellenmez.
 
-## 9. Starter'ın bütününe ait son kabul zinciri
+<a id="pro-ilk-teslim-kapisi"></a>
 
-- [ ] Yetkili işletmeci tek merkez/oda/disiplin/eğitmen kurar; eksik config ve ikinci kaynak reddi doğru görünür.
-- [ ] Kişi oluşturulur, öğrenci etkinleştirilir, disipline bağlanır, davet doğru hesapla kabul edilir.
-- [ ] Kredili, kotalı süreli ve sınırsız ürün yayımlanır; satış ve gereken belge kabulü yapılır; hak ve borç ayrı oluşur.
-- [ ] Tekrarlayan program oluşturulur; açık ve sabit grup kayıtları, öğrenci self kaydı ve özel ders alternatif/onay akışı tamamlanır.
-- [ ] Oda/eğitmen çakışması, kontenjan/borç/negatif limit/belge reddi ve mevcut kesin rezervasyon koruması gösterilir.
-- [ ] Fiilî başlangıç → yoklama taslağı → kapatma → gerekçeli düzeltme hakları doğru etkiler; Starter'da hakediş oluşmaz.
-- [ ] Tahsilat → kısmi ödeme → düzeltme/iade/mahsup zinciri; finans ekranı, rapor ve CSV aynı sonuçları verir.
-- [ ] Öğrenci/kredi/borç import'u preview/apply/worker/sonuç ve tekrar senaryosuyla tamamlanır; hesap/davet/nakit otomatik üretilmez.
-- [ ] Public ders başvurusu gerçek widget/gateway ile; ICS gerçek istemcide, yetkili seans hedefi ve rotate/revoke ile kabul edilir.
-- [ ] TR/EN, açık/koyu, telefon/masaüstü, klavye, 320px/%200, yanlış rol/tenant, oturum iptali, stale preview ve kayıp yanıt zincirin tamamında doğrulanır.
-- [ ] Abonelik/yenileme/kapanış ve izinli hesap/organizasyon yaşam döngüsü doğru durumları gösterir; fiziksel imha beklemesi sahte başarıya çevrilmez.
-- [ ] Canlı menüde bitmiş gibi duran placeholder, kopuk hedef, yalnız sentetik verili modül veya çözümsüz zorunlu backend/sağlayıcı bağımlılığı kalmaz.
+## 9. Pro ve Starter bütün ürün kabulü
 
-## 10. Ürün kapsamı izlenebilirliği
+Aşağıdaki gerçek uçtan uca kabuller kaynak tesliminden ayrıdır. Kullanıcının erteleme kararıyla bu belge çalışmasında tarayıcı/canlı test yapılmadı; ilk ürün teslimi bunlar kapanmadan verilmez.
 
-Bu eşleme bütün Starter özelliklerinin bir teslim sahibine sahip olmasını sağlar. Başarı yüzdesi endpoint veya çizilmiş ekran sayısından hesaplanmaz.
+- [ ] Çok kaynaklı Pro kurulum → personel izinleri → anlaşma → program → kişi/öğrencilik/disiplin/davet → satış → rezervasyon → yoklama → hakediş/ödeme.
+- [ ] Kredili/kotalı/sınırsız ürün → dondurma/bitirme/değişim/yenileme/sonlandırma → korunmuş rezervasyonlar → hak/borç/tahsilat/düzeltme/iade/mahsup → rapor/CSV mutabakatı; eski satış/anlaşma snapshot'ları korunur.
+- [ ] Oda/eğitmen çakışması, kapasite/borç/negatif limit/belge reddi; son yer/bekleme/teklif, süre/izin/hak değişiminde tek kesin kayıt. Öğrenci self kayıt/iptal/teklifi, özel ders alternatif/onayını bitirir.
+- [ ] Web ve kapsamda kalan gerçek Meta/Google yerel formu → ortak inbox → kişi eşleme → takip/deneme → öğrenci dönüşümü. Tekrar teslim tek kayıt, yeni başvuru ayrı geçmiş; sağlayıcı pending tam Pro kabulü değildir.
+- [ ] Etkinlik/Pratik → kayıt/uygunluk/kapasite → fiilî başlangıç/katılım/kapanış → iptal/iade ve eğitmen etkileri; Pratik ders kredisi tüketmez.
+- [ ] Belge sürümü → doğru kişinin kabulü → satış/rezervasyon/yoklama/etkinlik kapısı; işlemsel inbox, gerçek e-posta, sessiz saat ve otomasyon sonuç/retry ayrımı.
+- [ ] Öğrenci/kredi/borç import'u → private dosya/preview/açık apply/worker/satır sonucu → tekrar → Pro 250/Starter 100 ve son slot yarışı; hesap/davet/nakit otomatik üretilmez, yetki kaybında dosya erişimi kesilir.
+- [ ] Aylık/yıllık dönem ve plan değişimi → iptal/yenileme/downgrade kaynak seçimi → erişim kaybı/kurtarma; öğrenci/Owner/CM/personel ayrımı. Hesap/kuruluş kapatma/yeniden açma/silmede retention/partial/retry_wait sahte tamamlandı gösterilmez.
+- [ ] Starter varyantı: tek merkez/oda/disiplin/eğitmen, 100 öğrenci, temel aday takibi, dar public ders başvurusu, anlaşmasız/hakedişsiz yoklama; Pro-only eylemlere doğrudan erişim reddi, geçmiş/hak/borç koruması.
+- [ ] Öğrenci/eğitmen kişisel takvim linki gerçek GET/HEAD ve takvim istemcisinde çalışır; yetkili seans hedefi, rotate/revoke, hesap/üyelik kaybı ve iptal edilmiş seans doğru görünür.
+- [ ] TR/EN, açık/koyu, telefon/masaüstü, klavye/odak, 320px/%200/axe, yanlış rol/tenant, oturum iptali, stale preview ve kayıp yanıt→tam reload zincirleri uygulanabilir ekranlarda tamamlanır; FD01–FD12 tüketici/reset/geçmiş eşlemesi kapanır.
+- [ ] Canlı menüde bitmiş gibi duran placeholder/kopuk hedef/sentetik modül kalmaz; her modülün son kaynak CI/main/ilgili yayın kanıtı doğrulanır.
+- [ ] Backend [G02](../../backend/docs/remaining-work.md#g02) ve uygulanabilir O01–O10 ortam/config, worker/süre/izleme, yük/kurtarma, restore/silme kanıtı ilgili sahibinden alınır. Frontend bu işleri yeniden açmaz; yetkili açık ürün/kabul kararı olmadan kapsamdan düşürmez.
 
-| Ürün özelliği | Frontend teslimi |
+## 10. Ürün kapsamı izlenebilirliği ve sonraki Business teslimi
+
+Bu tablo F01–F33 için teslim sahibine navigasyondur; plan erişiminin yeni normatif sahibi değildir. Görev ve kabul checklist'leri ilgili bölümde tutulur. Özellik/API/test sayısı tamamlanma yüzdesi değildir.
+
+| Ürün özelliği | Frontend teslim sahibi |
 |---|---|
-| F01 işletme/merkez/oda | S02; lifecycle S13 |
+| F01 işletme/merkez/oda | S02; lifecycle S13; Business merkez yönetimi |
 | F02 çalışma saatleri/uygunluk | S02 + S12 |
-| F03 kurallar/istisnalar | S12; etkiler S03/S05/S06/S07 |
-| F04 hesap eşleştirme/roller | S01/S02/S04; plan ayrımı S13 |
+| F03 kurallar/istisnalar | S12; etkiler S03/S05/S06/S07/etkinlik; Business hiyerarşi |
+| F04 hesap eşleştirme/roller | S01 ortak kapsam, S02/S04; plan ayrımı S13 |
+| F05 personel izinleri | S02 Pro ekip; Starter'a açılmaz |
 | F06 öğrenci/eğitmen/hesap | S01/S07/S09 |
-| F07 kişi/öğrencilik/birleştirme | S04; import S10 |
+| F07 kişi/öğrencilik/birleştirme | S04; import S10; Business birleşik kişi/CRM |
 | F08 takvim/kaynak | S03; kişisel abonelik S09 |
 | F09 özel ders talebi | S06 |
 | F10 program/sabit grup | S03/S05/S06 |
 | F11 öğrenci self rezervasyonu | S06/S09 |
-| F13 eğitmen ataması/değişimi | S02/S03; tek aktif eğitmen sınırı |
+| F12 bekleme/yer teklifi | S06 Pro bekleme |
+| F13 eğitmen ataması/değişimi | S02 Pro anlaşma + S03 |
 | F14 yoklama/iptal/telafi | S03/S06/S07 |
-| F15 kredi/geçerlilik/hareket | S05/S06/S07/S10 |
-| F16 süreli/sınırsız üyelik | S05/S06/S07 |
-| F19 manuel finans | S08 |
-| F25 dar public ders başvurusu | S09 |
-| F26 işlemsel bildirim | S11; sonuç bağlantıları ilgili modülde |
-| F28 Starter temel rapor/export | S10 |
-| F30 belge/onay | S11; gerçek işlem kapıları S05/S06/S07 |
-| F31 import | S10 |
-| F32 abonelik/erişim/limit | S13 + bütün modüllerde ret durumları |
-| F33 geçmiş/idempotency | Ortak yazma koşulları, S11/S13 |
-| FD01–FD12 Starter tüketicileri | S12 ve ilgili iş modülleri |
+| F15 kredi/geçerlilik/hareket | S05/S06/S07/S10 ve etkinlik |
+| F16 süreli/sınırsız üyelik | S05/S06/S07 ve etkinlik |
+| F17 paket yaşam döngüsü | S05 Pro paket; SaaS aboneliği değildir |
+| F18 merkezler arası hak/hesaplaşma | Yalnız aşağıdaki Business paketi |
+| F19 manuel finans | S08; paket etkileri S05 |
+| F20 anlaşma/hakediş/ödeme | S02 anlaşma, S07 hakediş ve etkinlik |
+| F21–F23 CRM/deneme/dönüşüm | S04 Pro CRM |
+| F24 takip otomasyonu | S11 Pro otomasyon; S04 verisi |
+| F25 public yayın/başvuru | S09 public, S04 CRM, etkinlik |
+| F26 işlemsel bildirim | S11; günlük görünüm S09 |
+| F27 hatırlatmalar | S11 Pro bildirim + S12 |
+| F28 rapor/export | S10; Business birleşik rapor |
+| F29 etkinlik/Pratik | Pro etkinlik alt bölümü |
+| F30 belge/onay | S11; bağlamsal kapılar S05/S06/S07/etkinlik |
+| F31 import | S10; eski CRM aktarımı ayrı kaynak/onay |
+| F32 abonelik/erişim/limit | S13, S01 ortak kapsam; bütün modüllerde ret/daralma |
+| F33 geçmiş/idempotency | Ortak yazma koşulları, S11/S13 ve bütün komutlar |
+| FD01–FD12 | S12 teslim yeri eşlemesi; ilgili iş modülünün tüketici kabulü |
 
-Kapsam dışı feature'ların tam listesi bölüm 2'dedir. Yeni karar veya backend yetkisi bu eşlemeyi değiştirirse ilgili modül planı aynı değişiklikte güncellenir.
+<a id="business-sonraki-teslim"></a>
+
+### Business — Pro sonrasındaki dört genişleme paketi
+
+Şimdi korunacak mimari sınırlar [S01 ortak kapsam/erişim](#ortak-kapsam-erisimi) ve [geliştirme rehberindedir](development.md#plan-ve-rol-uyarlamasi). Aşağıdaki Business davranışları ilk Pro tesliminin önkoşulu değildir; mevcut belirli Business testleri bu paketlerin kapanışı sayılamaz.
+
+| Sonraki paket | Eklenecek davranış | Kabul |
+|---|---|---|
+| Merkez/organizasyon ve politika | En fazla 5 merkez, Owner/OM/CM ayrımı, zorunlu/tavsiye miras ve izinli override | 6. merkez reddi; bir merkezin operasyon/finans yetkisi diğerine taşınmaz |
+| Birleşik kişi/CRM | Merkez onaylı kişi birleşimi, org kutusu, başvuruyu merkeze yönlendirme/aktarma | Tek kişi/Abone No ve kaynak/onay geçmişi; yetkisiz merkez okuması reddedilir |
+| Merkezler arası hak/hesaplaşma | Ürün kullanım kapsamı, hareketler, talep/geri çekme/karşı merkez kararı, delegasyon ve açık hesaplaşma yetkisi | Owner/OM tek başına finans yetkisi vermez; A/B izinleri bağımsız, tekrar çift hareket üretmez |
+| Birleşik rapor ve regresyon | Org/merkez raporları, cross_center_usage, 1250 kotasında ortak kişinin tek sayımı | Merkez/genel toplam mutabakatı; Business→Pro/Starter daralması geçmişi bozmaz |
+
+Özel teklif/limit ve beş merkezi aşma kapsamı yoktur. Diğer sonraki sürüm sınırları bölüm 2'de kalır; reklam performansı/dönüşüm geri bildirimi ertelenmesi yerel form alımını kapsamdan çıkarmaz.
 
 ## 11. WEB-S01 güncel kabul durumu
 
