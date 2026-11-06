@@ -403,6 +403,10 @@ WF06 consumer'ı yönetici kapasite istisnasını `management_state_get_v1` ça�
 
 **İstenen sonuç:** Mevcut API/sözleşme içinde gerçekten desteklenen yetki okuyucusu/selector belirlenmeli veya mevcut selector tamamlanmalıdır. Yönetici/izinli personel/atanmış eğitmen sınırları ile self/yanlış merkez/erişim kaybı retleri korunmalı; sırf UI açılsın diye geniş rol, varsayılan izin veya sahte başarı eklenmemelidir. Frontend kendi consumer'ını backend'in kesinleşen teslimine uyarlar. Kanıt ve ertelenen ekran kabulünün tek sahibi [S06](../apps/web/docs/todo.md#web-s06) kaydıdır.
 
+### Backend kaynak değerlendirmesi — XREQ-023, 6 Kasım 2026
+
+Mevcut typed selector gerçek canlı writer yetkisini kullanan salt okunur seans projeksiyonuyla uygulanıyor; istemci formatı değişmiyor. Aynı kişi/seans ve opsiyonel satış anahtarı korunur; Business cross-center satış desteği keşif sırasında daraltılmaz. Kapasiteyi aşma yetkisi fiziksel odayı aşma hakkı değildir. Tam davranış ve ret sınırlarının sahibi [WF06](workflows.md#wf06); aday/main/development aşamasının sahibi [backend devir](../apps/backend/docs/00-FtkSaaS-yeni-sohbet-devir.md#eylem-yetkisi-keşfi--xreq-023024). Kaynak hazır; henüz native CI veya frontend kabulü verilmedi.
+
 <a id="xreq-024"></a>
 ## XREQ-024 Manuel tahsilat için gerçek eylem yetkisi keşfi
 
@@ -412,8 +416,12 @@ S08 geliştirmesinde yönetici işlemini self finans okumasından ayırmak için
 
 **İstenen sonuç:** Kişi/merkez kapsamında tahsilat eyleminin kullanılabilirliği, ilk tahsilatı olmayan kişide de, desteklenen normal typed reader ile keşfedilebilsin. Geçerli collector ile self/başka merkez/rol kaybı ayrımı korunsun. Mevcut selector destekleniyorsa gereken kesin tüketim biçimi; değilse desteklenen mevcut yol veya tamamlanan selector teslim edilsin. Yeni izin veya frontend rol tahmini talep edilmiyor. Frontend finans özeti ve manuel tahsilat kaynağını geliştirmeye devam eder; yetki okuması başarısızsa yalnız işlem alanı güvenli kapalı ve tekrar denenebilir kalır. Kaynak/otomatik doğrulama ve açık ekran kabulünün sahibi [S08](../apps/web/docs/todo.md#web-s08) kaydıdır.
 
+### Backend kaynak değerlendirmesi — XREQ-024, 6 Kasım 2026
+
+Tahsilat ile PR232'nin aynı okuyucuya bağlı alacak iadesi/mahsup/borç düzeltmesi/satış iade önizlemesi selector'ları birlikte uygulanıyor. İlk işlem için geçmiş receipt aranmaz. Kaynak entity/sürüm ve yalnız selector anahtarları döner; tutar/bakiye veya sahte finans okuması yoktur. Mevcut finance.collect, mahsup dahil, finance.refund'dan ayrı kalır; yalnız rolü bulunan yetkili kişinin kendi kimliği ve canonical alias sınırları korunur. [WF08](workflows.md#wf08) beş selector'ın kesin tüketim sahibidir. Native CI/main/development bekliyor; karşı alan adına ekran kabulü veya talep kapanışı verilmedi. Kaynak/ortam kanıtı [backend devir](../apps/backend/docs/00-FtkSaaS-yeni-sohbet-devir.md#eylem-yetkisi-keşfi--xreq-023024) sahibindedir.
+
 ## XREQ-025 Üst-plan kişi projeksiyonlarında Abone No
 
 ### Backend sözleşme devri — 6 Kasım 2026
 
-A03–S15 kaynak paketi; WF04'teki mevcut Abone No tüketiminin aynı isteğe bağlı nullable `subscriber_number` alanı EarningView, AgreementVersionView, EventRegistrationView, EventDutyView, EventPaymentPreparationView, LeadView, CrmFollowupView (otomasyon dahil) ve SettlementAuthorityView yanıtlarına ekleniyor. UUID komut girdileri, sayfalama, yetki ve plan sınırları değişmiyor. Numarasız kişi null döner; numara erişim veya hesap kimliği değildir. Frontend yeni API/izin kurmadan uygun kişi referansında alanı gösterebilir; mevcut cevapları aynı şekilde işlemeye devam edebilir. Backend native/main/development teslimi henüz bekliyor; kaynak/ortam aşamasının tek sahibi [backend devir](../apps/backend/docs/00-FtkSaaS-yeni-sohbet-devir.md#a03s15-aktif-backend-kabul-paketi). Frontend uygulama veya ekran kabulü verilmedi.
+A03–S15 kaynak paketi; WF04'teki mevcut Abone No tüketiminin aynı isteğe bağlı nullable `subscriber_number` alanı EarningView, AgreementVersionView, EventRegistrationView, EventDutyView, EventPaymentPreparationView, LeadView, CrmFollowupView (otomasyon dahil) ve SettlementAuthorityView yanıtlarına ekleniyor. UUID komut girdileri, sayfalama, yetki ve plan sınırları değişmiyor. Numarasız kişi null döner; numara erişim veya hesap kimliği değildir. Frontend yeni API/izin kurmadan uygun kişi referansında alanı gösterebilir; mevcut cevapları aynı şekilde işlemeye devam edebilir. PR231 backend native/main/development teslimi tamamlandı; kaynak/ortam aşamasının tek sahibi [backend devir](../apps/backend/docs/00-FtkSaaS-yeni-sohbet-devir.md#a03s15-aktif-backend-kabul-paketi). Frontend uygulama veya ekran kabulü verilmedi.

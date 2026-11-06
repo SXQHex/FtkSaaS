@@ -396,3 +396,11 @@ test('upper-plan person projections preserve the nullable decimal subscriber ide
   assert(!p.$defs[name].required.includes('subscriber_number'),`${name}: additive response field`);
  }
 });
+
+test('action discovery declares six supported typed management selectors without inventing write values',()=>{
+ const op=p['x-contract'].operations.find(x=>x.name==='management_state_get_v1');
+ for(const name of ['collection_record_v1','reservation_capacity_override_v1','student_credit_refund_v1','student_credit_offset_v1','debt_adjust_v1','sale_refund_preview_v1']){
+  assert(op.runtime_selectors.includes(name),name);
+  assert(valid('ManagementProjection_'+name,{operation:name,values:{}}));
+ }
+});

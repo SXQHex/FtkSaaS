@@ -285,8 +285,8 @@
         "management_state_get_v1"
       ],
       "review": {
-        "fingerprint": "48209f921f8aafee03a184b50940e9a8b36c0bd47da78142380c60fcec8c4897",
-        "reason": "Reviewed S05 additive response definitions, generated validators and native assertions. Migration manifest prepends the new checksum without rewriting the historical final auth checksum line; security policy remains unchanged."
+        "fingerprint": "588039cdb45783bf08c5674d8ecb9982c1ed912ed8f391aac4058e85637375fd",
+        "reason": "Reviewed regenerated runtime metadata and four implemented management read paths; validators and Edge request/response behavior stay byte-identical because DTOs are unchanged. Six selectors and append-only migration add the missing source reads."
       }
     },
     {
@@ -461,8 +461,8 @@
         "role_revoke_preview_v1"
       ],
       "review": {
-        "fingerprint": "368efd102040a0bfd6e05b8ec855c299ec27c2a13de814986e9de736f32c4943",
-        "reason": "Reviewed registry source ownership and new native scale import; center resource and role behavior unchanged, existing authorization acceptance retained."
+        "fingerprint": "82d680b66c465532f9886ff4d7839e5af395aef56bf640795c5c45331d502952",
+        "reason": "Reviewed six action-discovery selectors and matching read-path metadata, original writer preflight, canonical self/source scopes and native coverage; authority discovery remains separate from command eligibility."
       }
     },
     {
@@ -648,8 +648,8 @@
         "person_discipline_set_v1"
       ],
       "review": {
-        "fingerprint": "d844810c361f1531d41fbe3c42bd3df4cf3cd3d76593273e293c102492a65c50",
-        "reason": "Reviewed S05 additive nullable subscriber projections and native assertions; existing UUID, authorization, plan and pagination behavior unchanged; guide records the new response field."
+        "fingerprint": "7e8e35b6e91fa20c64e43ee81f10a30e43bce07b9473b19505302781bc2de5d4",
+        "reason": "Reviewed six action-discovery selectors, original writer preflight and canonical entity scopes; no command side effects or new permission. New native root preserves existing registry shard ownership; WF06/WF08 document authority versus write-time eligibility."
       }
     },
     {
@@ -764,7 +764,8 @@
         "apps/backend/tests/starter-document-acceptance.mjs",
         "apps/backend/tests/pro-lifecycle-earnings-acceptance.mjs",
         "apps/backend/tests/event-capacity-package-acceptance.mjs",
-        "apps/backend/tests/lesson-request-catalog-acceptance.mjs"
+        "apps/backend/tests/lesson-request-catalog-acceptance.mjs",
+        "apps/backend/tests/action-management-acceptance.mjs"
       ],
       "sources": [
         "apps/backend/database/active-discipline-projection-wrappers.sql",
@@ -811,7 +812,9 @@
         "apps/backend/database/event-capacity-practice.sql",
         "apps/backend/supabase/migrations/20261103233454_event_capacity_practice.sql",
         "apps/backend/database/lesson-request-catalog.sql",
-        "apps/backend/supabase/migrations/20261105170617_lesson_request_catalog.sql"
+        "apps/backend/supabase/migrations/20261105170617_lesson_request_catalog.sql",
+        "apps/backend/database/action-management-discovery.sql",
+        "apps/backend/supabase/migrations/20261106183023_action_management_discovery.sql"
       ],
       "operations": [
         "lesson_request_create_v1",
@@ -826,8 +829,8 @@
         "reservation_capacity_override_v1"
       ],
       "review": {
-        "fingerprint": "74d2eb843826d2170351eb0122a19ee973e16d247942894e763398b52ff580a4",
-        "reason": "Reviewed actual people active/merged check constraint and existing native precedent. Non-active instructor test uses merged then restores active; catalog and negative assertions unchanged."
+        "fingerprint": "7c2eb17c262dbfedf059ea74e44958c0e66aef1702c07b78d215b2c255f7639a",
+        "reason": "Reviewed six action-discovery selectors and matching read-path metadata, original writer preflight, canonical self/source scopes and native coverage; authority discovery remains separate from command eligibility."
       }
     },
     {
@@ -904,7 +907,8 @@
         "apps/backend/tests/starter-operations-acceptance.mjs",
         "apps/backend/tests/event-payment.test.mjs",
         "apps/backend/tests/starter-attendance-protection.test.mjs",
-        "apps/backend/tests/pro-lifecycle-earnings-acceptance.mjs"
+        "apps/backend/tests/pro-lifecycle-earnings-acceptance.mjs",
+        "apps/backend/tests/action-management-acceptance.mjs"
       ],
       "sources": [
         "apps/backend/database/active-discipline-projection-wrappers.sql",
@@ -937,7 +941,9 @@
         "apps/backend/database/runtime-wrappers.sql",
         "apps/backend/database/starter-attendance-protection-wrappers.sql",
         "apps/backend/database/wrappers.sql",
-        "docs/workflows.md"
+        "docs/workflows.md",
+        "apps/backend/database/action-management-discovery.sql",
+        "apps/backend/supabase/migrations/20261106183023_action_management_discovery.sql"
       ],
       "operations": [
         "finance_get_v1",
@@ -949,8 +955,8 @@
         "debt_adjust_v1"
       ],
       "review": {
-        "fingerprint": "219f4bb34c040644de1c286d5cbf273b99f98bc2734d30f91e893af65acf6ed3",
-        "reason": "Reviewed S05 additive nullable subscriber projections and native assertions; existing UUID, authorization, plan and pagination behavior unchanged; guide records the new response field."
+        "fingerprint": "2ffa79aa944b1f46c0f03ae9653f9eaf3a92a1620a884513188ce66e1e047b43",
+        "reason": "Reviewed six action-discovery selectors and matching read-path metadata, original writer preflight, canonical self/source scopes and native coverage; authority discovery remains separate from command eligibility."
       }
     },
     {

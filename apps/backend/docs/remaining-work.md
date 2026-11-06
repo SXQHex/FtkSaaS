@@ -155,7 +155,7 @@ Bu tablo yalnız izdir; eski kabul metinleri ikinci kez tutulmaz.
 <a id="s05"></a>
 ### S05 — Abone No operasyon projeksiyonları
 
-- [ ] **Tür:** K · **Plan:** Tümü · **Özellik:** F07,F28,F31
+- [x] **Tür:** K · **Plan:** Tümü · **Özellik:** F07,F28,F31
 - **Bağımlılık:** S04
 - **Kabul:** Operasyonun kişi referansı gereken arama, liste ve raporlarında No bulunur.
 - **Sınır/olumsuz durum:** UUID teknik ilişki olarak kalır; No ile yetkisiz çözümleme yok; geçmiş dış belgeler yeniden yazılmaz.
@@ -165,10 +165,10 @@ Bu tablo yalnız izdir; eski kabul metinleri ikinci kez tutulmaz.
 **Uygulama alt adımları:**
 
 - [x] S05.1 — Kişi referansı kullanan mevcut arama/liste/rapor/export projeksiyonlarını envanterden tara; Abone No gereken yüzeyleri ve mevcut izin kapsamlarını belirle.
-- [ ] S05.2 — Gerekli DTO/projeksiyonlara No'yu taşı; komut ve ilişkilerde UUID'yi koru. Değişen makine sözleşmesinden tip/katalogları üret; ilgili WF/API eşlemesini incele.
-- [ ] S05.3 — No ile bul→UUID komut→yeniden oku→rapor/export zincirini doğrula; alias araması, scope ve yetki kaybını sınayarak frontend'e sözleşme devrini yap.
+- [x] S05.2 — Gerekli DTO/projeksiyonlara No'yu taşı; komut ve ilişkilerde UUID'yi koru. Değişen makine sözleşmesinden tip/katalogları üret; ilgili WF/API eşlemesini incele.
+- [x] S05.3 — No ile bul→UUID komut→yeniden oku→rapor/export zincirini doğrula; alias araması, scope ve yetki kaybını sınayarak frontend'e sözleşme devrini yap.
 
-**İncelenen yüzeyler:** Starter ve üst-plan kişi/liste/rapor/export envanteri tarandı. Önceki PersonSummary/PersonView, ReportRow/CSV, ReservationView, AttendanceEntryView, EntitlementView, FinanceView, NegativeLimitsView, RoleView, ClassAssignmentView, ProtectedObligationView, LessonRequestView, SeatOfferView ve WaitlistEntryView teslimleri korunur. Kalan EarningView, LeadView, EventRegistrationView, EventDutyView, EventPaymentPreparationView, AgreementVersionView, SettlementAuthorityView ve CrmFollowupView için isteğe bağlı nullable Abone No eklendi; otomasyon takipleri ayrı kaynakta aynı alanı taşır. UUID girdileri, plan/izin filtreleri ve tahsis davranışı değişmez. Yeni kaynak ve native CI bekleyen aşama [devirde](00-FtkSaaS-yeni-sohbet-devir.md#a03s15-aktif-backend-kabul-paketi). S05.2/S05.3 ve genel S05, yeni kaynağın native/main/development doğrulaması tamamlanana kadar açıktır; frontend ekran kabulü ayrı kalır.
+**İncelenen yüzeyler:** Starter ve üst-plan kişi/liste/rapor/export envanteri tarandı. Önceki PersonSummary/PersonView, ReportRow/CSV, ReservationView, AttendanceEntryView, EntitlementView, FinanceView, NegativeLimitsView, RoleView, ClassAssignmentView, ProtectedObligationView, LessonRequestView, SeatOfferView ve WaitlistEntryView teslimleri korunur. Kalan EarningView, LeadView, EventRegistrationView, EventDutyView, EventPaymentPreparationView, AgreementVersionView, SettlementAuthorityView ve CrmFollowupView için isteğe bağlı nullable Abone No eklendi; otomasyon takipleri ayrı kaynakta aynı alanı taşır. UUID girdileri, plan/izin filtreleri ve tahsis davranışı değişmez. Kaynak/ortam kanıtı [devirde](00-FtkSaaS-yeni-sohbet-devir.md#a03s15-aktif-backend-kabul-paketi). PR231 aday/main/development doğrulaması tamamlandı; S05 backend teslimi kapalıdır. [Kabul uzlaştırması](00-FtkSaaS-yeni-sohbet-devir.md#pr231-kabul-uzlaştırması); frontend ekran kabulü ayrı kalır.
 
 **Dilim kabulü:** Aynı kişi izinli operasyon yüzeylerinde tutarlı numarayla görünür. Numara kişisel/finans verisine ek erişim sağlamaz; yeni export mevcut yetkiyi uygular. Önceden üretilmiş dış belge değişmez; frontend'in ekran uyarlaması/kabulü backend adına kapatılmaz.
 
@@ -239,6 +239,8 @@ Bu tablo yalnız izdir; eski kabul metinleri ikinci kez tutulmaz.
 - **Kaynak alanı:** docs/settings.md; typed settings/management SQL; ilgili test
 
 **İncelenen kapsam:** 69 normatif davranış grubu ile mevcut 67 typed alan aynı sayım değildir. Beş scope’un katalog/typed round-trip, yetki, sürüm/reset/replay testleri frontend-settings-acceptance; org kopyası/merkez seçimi, program süresi, availability, paket, medya/paylaşım/public ve tahsilat tüketicileri starter-preparation-acceptance içindedir. Mevcut çalışan testler tekrar yazılmaz; bu pakette kaynak/gerçek koşu kanıtı uzlaştırılır. Bunlardan bütün 69 grubun veya gerçek frontend/hosted davranışının kapandığı sonucu çıkarılmaz. P14/P15 backend kaynak ve canlı bildirim/zamanlama kabulü tamamlandı; kalan S10 işi bütün 69 grubun tüketici/varsayılan/miras/yetki eşlemesidir. [Kaynak/ortam kaydı](00-FtkSaaS-yeni-sohbet-devir.md#s07s10-kabul-paketi).
+
+**S10.1 — XREQ-023/024 eylem okuyucuları:** Mevcut typed management yolu kapasite istisnası, tahsilat, alacak iadesi/mahsup, borç düzeltmesi ve satış iade önizlemesi için gerçek source entity/sürümü ve canlı writer yetkisini sunar. İlk işlem geçmiş receipt istemez; tutar veya başarılı komut uydurmaz. Aynı selector'ın self/başka merkez/rol-grant-plan kaybı, canonical alias ve Business cross-center kaynak durumu sınanır. Yeni kaynak/native/main/development ve frontend kabulü ayrı izlenir; [aktif kaynak ve kanıt](00-FtkSaaS-yeni-sohbet-devir.md#eylem-yetkisi-keşfi--xreq-023024). Bu alt teslim bütün 69 ayar grubunun kapanışı değildir.
 
 <a id="s11"></a>
 ### S11 — Rapor ve güvenli indirme
