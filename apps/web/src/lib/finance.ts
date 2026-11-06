@@ -2,7 +2,7 @@ import { validate } from "uuid";
 import type { FinanceView } from "@ftksaas/api-contracts";
 import { balanceApi, refundApi } from "./finance-management";
 import { correctionApi } from "./collection-correction";
-import { ApiFailure } from "./api";
+import { actionAuthority } from "./action-authority";
 import { money } from "./collection-command";
 export { collectionCommand, validCollection } from "./collection-command";
 import { setupCall, type SetupScope, type SetupInput } from "./studio-setup";
@@ -61,29 +61,8 @@ export const financeApi = {
     if (!financeMatches(view, personId, currency, scope.centerId)) throw Error("invalidFinance");
     return view;
   },
-  canCollect: async (scope: SetupScope, personId: string) => {
-    try {
-      const page = await setupCall("management_state_get_v1", {
-        org_id: scope.orgId,
-        center_id: scope.centerId,
-        operation: "collection_record_v1",
-        selector: { operation: "collection_record_v1", key: { person_id: personId } },
-      });
-      return page.items.some(
-        (item) =>
-          item.operation === "collection_record_v1" &&
-          item.current?.operation === "collection_record_v1" &&
-          item.current.values.person_id === personId,
-      );
-    } catch (cause) {
-      if (
-        cause instanceof ApiFailure &&
-        ["FORBIDDEN", "NOT_FOUND"].includes(cause.failure.error.code)
-      )
-        return false;
-      throw cause;
-    }
-  },
+  canCollect: (scope: SetupScope, personId: string) =>
+    actionAuthority(scope, { operation: "collection_record_v1", key: { person_id: personId } }),
 };
 export type FinanceApi = typeof financeApi;
 export type CollectionInput = SetupInput<"collection_record_v1">;

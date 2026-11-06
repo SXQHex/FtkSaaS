@@ -68,7 +68,7 @@ const PendingOperations = dynamic(
   { loading: WorkspaceLoading },
 );
 
-type Studio = { organization: OrganizationView; centers: CenterView[] };
+type Studio = { organization: OrganizationView; centers: CenterView[]; centerError?: string };
 type Snapshot = { account: AccountView; studios: Studio[] };
 function subscribe(callback: () => void) {
   window.addEventListener("hashchange", callback);
@@ -128,6 +128,8 @@ export function StudioWorkspace({ authUserId }: { authUserId: string }) {
       throw cause;
     }
     async function load() {
+      setSnapshot(null);
+      setError("");
       try {
         const [account, organizations, settings] = await Promise.all([
           getAccount()
@@ -141,12 +143,19 @@ export function StudioWorkspace({ authUserId }: { authUserId: string }) {
         ]);
         if (lifetime.signal.aborted) return;
         const studios = await Promise.all(
-          organizations.map(async (organization) => ({
-            organization,
-            centers: ["normal", "grace"].includes(organization.access_mode)
-              ? accessibleCenters(await getCenters(organization.id).catch(rejectRead))
-              : [],
-          })),
+          organizations.map(async (organization): Promise<Studio> => {
+            if (!["normal", "grace"].includes(organization.access_mode))
+              return { organization, centers: [] };
+            try {
+              return {
+                organization,
+                centers: accessibleCenters(await getCenters(organization.id).catch(rejectRead)),
+              };
+            } catch (cause) {
+              if (lifetime.signal.aborted) throw cause;
+              return { organization, centers: [], centerError: errorMessageKey(cause) };
+            }
+          }),
         );
         if (lifetime.signal.aborted) return;
         setSnapshot({ account, studios });
@@ -256,6 +265,25 @@ export function StudioWorkspace({ authUserId }: { authUserId: string }) {
           </AlertDescription>
         </Alert>
       )}
+      {snapshot?.studios
+        .filter((studio) => studio.centerError)
+        .map((studio) => (
+          <Alert key={studio.organization.id} variant="destructive" className="mb-6">
+            <AlertDescription>
+              <p>
+                {t("centerReadFailed", { name: studio.organization.name })}{" "}
+                {api(studio.centerError!)}
+              </p>
+              <Button
+                variant="outline"
+                className="mt-3 min-h-11"
+                onClick={() => setRetry((value) => value + 1)}
+              >
+                {common("retry")}
+              </Button>
+            </AlertDescription>
+          </Alert>
+        ))}
       {!snapshot && !error && <WorkspaceLoading />}
       {snapshot &&
         ["overview", "studio"].includes(section) &&

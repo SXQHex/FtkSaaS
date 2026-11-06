@@ -302,7 +302,8 @@
       "inbox": "Hesabına gelen güncellemeler.",
       "documents": "Özel belge dosyalarını yükleyin, sürümleri ve yayın etkilerini yönetin.",
       "attendance": "Erişebildiğiniz seansları gün veya hafta olarak açın. Yoklama ve her eylemin yetkisi seçili seans için ayrıca doğrulanır."
-    }
+    },
+    "centerReadFailed": "{name}: merkezler okunamadı."
   },
   "calendar": {
     "label": "Ders programı",

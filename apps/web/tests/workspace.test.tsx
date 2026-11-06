@@ -1,5 +1,5 @@
 import { render } from "./render";
-import { act, screen } from "@testing-library/react";
+import { act, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { beforeEach, expect, test, vi } from "vitest";
 import type { AccountView, OrganizationView } from "@ftksaas/api-contracts";
@@ -301,4 +301,62 @@ test("a late Auth rejection still clears recovery after an earlier unrelated rea
   );
   expect(screen.queryByRole("button", { name: "Bekleyen işlemleri aç" })).not.toBeInTheDocument();
   expect(mocks.replace).toHaveBeenCalledWith("/login?error=session");
+});
+
+test("an unavailable center catalog does not block organization inbox discovery", async () => {
+  const { ApiFailure } = await import("../src/lib/api");
+  mocks.centers.mockRejectedValue(
+    new ApiFailure({
+      ok: false,
+      error: { code: "FORBIDDEN", retryable: false, trace_id: "synthetic" },
+    }),
+  );
+  window.location.hash = "#inbox";
+  render(<StudioWorkspace authUserId="native-user" />);
+  expect(await screen.findByRole("combobox", { name: "Organizasyon" })).toHaveValue(
+    organizations[0].id,
+  );
+  expect(
+    screen.getByText(/Kuruluş A: merkezler okunamadı/).closest("[role=alert]"),
+  ).toBeInTheDocument();
+  expect(
+    mocks.setup.mock.calls.some(
+      ([operation, input]) =>
+        operation === "notifications_list_v1" && input.org_id === organizations[0].id,
+    ),
+  ).toBe(true);
+  expect(mocks.setup.mock.calls.some(([operation]) => operation === "calendar_get_v1")).toBe(false);
+});
+test("center discovery Auth rejection still clears the whole account and recovery", async () => {
+  const { ApiFailure } = await import("../src/lib/api");
+  mocks.centers.mockRejectedValue(
+    new ApiFailure({
+      ok: false,
+      error: { code: "SESSION_REVOKED", retryable: false, trace_id: "synthetic" },
+    }),
+  );
+  render(<StudioWorkspace authUserId="native-user" />);
+  await vi.waitFor(() => expect(mocks.replace).toHaveBeenCalledWith("/login?error=session"));
+  expect(screen.queryByRole("button", { name: "Bekleyen işlemleri aç" })).not.toBeInTheDocument();
+  expect(
+    screen.queryByRole("heading", { name: "Merhaba, Test Yöneticisi" }),
+  ).not.toBeInTheDocument();
+});
+
+test("retrying a center read clears its old error and preserves organization-only navigation", async () => {
+  mocks.centers.mockRejectedValueOnce(new Error("offline"));
+  window.location.hash = "#inbox";
+  const user = userEvent.setup();
+  render(<StudioWorkspace authUserId="native-user" />);
+  const message = await screen.findByText(/Kuruluş A: merkezler okunamadı/);
+  const alert = message.closest('[role="alert"]')!;
+  await user.click(within(alert as HTMLElement).getByRole("button", { name: "Yeniden dene" }));
+  await vi.waitFor(() =>
+    expect(screen.queryByText(/Kuruluş A: merkezler okunamadı/)).not.toBeInTheDocument(),
+  );
+  expect(await screen.findByRole("combobox", { name: "Organizasyon" })).toHaveValue(
+    organizations[0].id,
+  );
+  expect(mocks.centers).toHaveBeenCalledTimes(2);
+  expect(window.location.hash).toBe("#inbox");
 });

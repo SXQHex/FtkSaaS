@@ -6,9 +6,9 @@ Bu belge frontend'in tek uygulama, sıra ve kabul planıdır. Kullanıcının 6 
 
 ## 1. Kaynak ve değerlendirme yöntemi
 
-Raporun inceleme tabanı `4a2bc94a27a420973e339f114d68f1542f2ef529`; bu Pro uygulama paketinin tabanı PR233 sonrası main `f9ead24ee40adbbc4140e4361506d52d84d57a44` kaynağıdır. Aynı tabanın [main proof](https://github.com/SXQHex/FtkSaaS/actions/runs/42281965972), [merge proof](https://github.com/SXQHex/FtkSaaS/actions/runs/42281965458), [development](https://github.com/SXQHex/FtkSaaS/actions/runs/42282766841) ve [Vercel](https://github.com/SXQHex/FtkSaaS/actions/runs/42282766758) sonuçları başarılı doğrulandı. Bu kanıt yeni Pro adayının CI sonucu veya hosted kabulü değildir. Rapor kaynaklar ve ayrı bağlamda AI incelemesine dayanır; dış firma/insan denetimi değildir. Repo/backend kabulü [00 devirde](../../backend/docs/00-FtkSaaS-yeni-sohbet-devir.md) kalır.
+Bu R00→R01 kaynak paketinin tabanı PR237 sonrası main `950e2a2fb42a076e638488d5af93cc0b2cb05cdf` kaynağıdır. Aynı kaynağın [main proof](https://github.com/SXQHex/FtkSaaS/actions/runs/42288151089), [merge proof](https://github.com/SXQHex/FtkSaaS/actions/runs/42288151187), [development](https://github.com/SXQHex/FtkSaaS/actions/runs/42288230566) ve [Vercel](https://github.com/SXQHex/FtkSaaS/actions/runs/42288230684) sonuçları başarılı doğrulandı. PR237 kaynak adayının [frontend test/build/dört tarayıcı](https://github.com/SXQHex/FtkSaaS/actions/runs/42286432761) ve [aday kabulü](https://github.com/SXQHex/FtkSaaS/actions/runs/42286434339) başarılıdır. Compatibility workflow'unda yalnız scope çalıştı, compatibility işi kapsam nedeniyle skipped kaldı; bu ayrı test kabulü sayılmaz. Bu eski kanıtlar yeni adayın CI veya canlı kabulü değildir.
 
-PR236 sonrasında dal ayrıca main `0ebaaea7fb44eff548fc2ddcf4838379b389d8c5` ile senkronize edildi; değişiklikler backend/talep belgelerindedir. Aynı kaynağın [main proof](https://github.com/SXQHex/FtkSaaS/actions/runs/42285309243), [merge proof](https://github.com/SXQHex/FtkSaaS/actions/runs/42285309497), [development](https://github.com/SXQHex/FtkSaaS/actions/runs/42285376465) ve [Vercel](https://github.com/SXQHex/FtkSaaS/actions/runs/42285376434) sonuçları başarılıdır. Bu senkronizasyon XREQ-023/024 kullanıcı kabulünü değiştirmez.
+Pro ilk teslim raporunun inceleme tabanı `4a2bc94a27a420973e339f114d68f1542f2ef529` idi; planın sahipliği ve R00–R14 eşlemesi korunur. Backend kabulünün sahibi [00 devir](../../backend/docs/00-FtkSaaS-yeni-sohbet-devir.md); belge/kaynak, native CI, dağıtım ve hosted/frontend ekran kabulü ayrıdır.
 
 | Konu | Yetkili kaynak |
 |---|---|
@@ -99,7 +99,7 @@ Her modül aşağıdaki koşullarla tasarlanır; bunlar en sonda eklenecek ayrı
 | B05 | Rapor/import/belge için tenant teknik limit/config ve çalışan iş hatları | Backend/ortam sahibi: private yükleme, checksum, worker ve indirme yetkisi kanıtı. Eksik config güvenli kurulum mesajı olur. | S10, S11 |
 | B06 | Eylem izinleri ve bazı yönetim/detail selector'ları işlem bazında doğrulanmalı | Her modülün ilk işi gerçek okuma→sürüm→komut matrisi. Eksik projection somutlaştığında ortak talep kaydı açılır; S11 self okuma için [XREQ-016](../../../docs/requests.md#xreq-016) backend teslim edilmiş, frontend canlı kabulü açıktır; “endpoint var” kabulü yetmez. | Tüm modüller |
 | B07 | Kurulu sürüme uygun Syncfusion anahtarı ve gerçek Scheduler tarayıcı kabulü | Ortam sahibi + frontend: anahtarın build'de kullanımı, TR/EN/timezone/mobil kabulü. Liste fallback'i çalışmaya devam eder. | S03 |
-| B08 | XREQ-023/024: rezervasyon/finans eylem yetkisi | Kullanıcının son düzeltmesine göre backend teslim kabulü doğrulanmadı; backend çalışması sürüyor. PR234 kaynaklarının main'de bulunması bu teslim veya canlı kabulün yerine geçmez. [S06](#pro-bekleme-teklif)/[S08](#pro-finans-kabulu) uyumu beklemede; bağımsız Pro ekip/anlaşma geliştirmesi sürer. | S06, S08 |
+| B08 | XREQ-023/024: rezervasyon/finans eylem yetkisi | PR234 kaynak/aday/main/development kanıtı yeniden doğrulandı; backend devir altı hosted okumayı kaydeder. Frontend altı reader tüketimi R00 adayında gerçek kaynak/selector/sürüm doğrulamasına uyarlandı. S06/S08 Chrome/canlı ekran kabulü açık; backend bekleme gerekçesi kullanılmaz. [Ortak talepler](../../../docs/requests.md#xreq-023). | S06, S08 |
 | B09 | XREQ-018 web formları ve Meta/Google yerel başvuru alımı | [XREQ-018](../../../docs/requests.md#xreq-018), [P08](../../../docs/decisions/P08-accepted-scope.md) ve backend [G02](../../backend/docs/remaining-work.md#g02). Gerçek form/hesap/onay alanı/ingress/tekrar kanıtı; frontend [CRM kaynak alımını](#pro-crm) tüketir. fethiyetango.com formlarına veya başka repoya yazma yetkisi doğmaz. | S04, S09 |
 | B10 | XREQ-019/022/025 projeksiyonları | [Ortak talepler](../../../docs/requests.md): davet işi/posta teslimi ayrımı, hatırlatma/otomasyon katalog ve retry alanları, üst planlarda nullable Abone No. Geliştirilen DTO ve hosted teslim ayrı doğrulanır; Abone No yetki veya UUID yerine geçmez. | S04, S07, S11, etkinlik |
 | B11 | Backend/işletim çıkış kanıtı | [G02](../../backend/docs/remaining-work.md#g02) ve uygulanabilir [O01](../../backend/docs/remaining-work.md#o01)–[O10](../../backend/docs/remaining-work.md#o10): gerçek config, worker/süre/izleme, yük/kurtarma, restore/silme. Kanıt ilgili backend/ortam sahibinden alınır; frontend bunları yeniden sahiplenmez veya CI ile kapanmış saymaz. | İlk Pro teslimi |
@@ -145,6 +145,8 @@ Mevcut telefon yeniden kod düğmesi `auth.resend(phone_change)` yerine `auth.up
 - [ ] Hesap/org/merkez değişiminde seçili nesne, cursor, açık form, preview ve geç yanıtları doğru scope'a bağla. Önceki komutun kurtarması özgün aktör/scope/payload/key ile erişilebilir kalsın.
 - [ ] S13 erişim modu/limit/kullanım ve izinli kurtarma eylemlerini erken tüket. Plan daralması, tutulacak kaynak seçimi ve erişim kaybını S02–S06 geliştirmesinde sınayarak S13 tam ekranını bekleme.
 - [ ] Yeni kişi/seans/aday/etkinlik detaylarında kararlı hedef, giriş sonrası dönüş, reload ve geri/ileri davranışı kur; bütün hash kabuğunu tek PR'da taşımaya çalışma.
+
+**R01 kaynak dilimi:** Organizasyon keşfi merkez listesinin başarısına bağlanmaz. Merkez okuma hatası ilgili kuruluşta görünür/yeniden denenebilir; inbox normal kendi yetkisiyle açılır. Auth reddi bu kısmi başarı yoluna girmez; bütün hesap görünümü ve kurtarma düşer. Yenileme eski snapshot'ı kaldırır. Bu dilim yukarıdaki erişim/plan/route matrisinin tamamlandığı anlamına gelmez; mevcut kapsam ve key izolasyonu korunur.
 
 **Kabul:** Yanlış rol/merkezde eski veri/eylem yok; doğrudan URL yetkiyi aşmıyor; kapalı erişimde izinli kurtarma kaybolmuyor. S12 tercihleri ilgili görünümde etkili. Otomatik rol/scope matrisi ile ertelenen gerçek hesap kabulü ayrı izlenir.
 
@@ -224,7 +226,7 @@ Eski merkez instructor ilişki satırı yalnız Business test organizasyonunda b
 
 #### Pro eğitmen anlaşmaları — programın önkoşulu
 
-**Durum:** `feature/web-pro-team-agreements` adayında kaynak geliştirildi; main ve Chrome/canlı kabul açık. S02 kaynak kurulumuna bağlı F13/F20 alt kapsamı. **Bağımlılık:** Pro ekip ve [WF14](../../../docs/workflows.md#wf14). S07 hakediş ekranı beklenmez.
+**Durum:** PR237 ile kaynak main'de; Chrome/canlı kabul açık. S02 kaynak kurulumuna bağlı F13/F20 alt kapsamı. **Bağımlılık:** Pro ekip ve [WF14](../../../docs/workflows.md#wf14). S07 hakediş ekranı beklenmez.
 
 - [x] `instructor_agreements_list_v1` → yetkili gerçek şart seçimi → `instructor_agreement_publish_v1` → listeyi yeniden oku zincirini kişi/merkez/disiplin/format/yürürlük kapsamıyla kur.
 - [x] Yeni zincir ile `supersedes_id`/`expected_version` isteyen yeni sürümü ayır; geçmiş anlaşma yerinde düzenlenmez. Ücret ayrıntısı yalnız yetkili projeksiyonda görünür.
@@ -627,7 +629,7 @@ Starter owner’ın normal native oturumunda aynı yeni main kaynağıyla, mevcu
 - [ ] `waitlist_join_v1`, `waitlist_leave_v1`, `seat_offer_accept_v1`, `seat_offer_reject_v1` tüketicilerini ekle. Offer issue/expire worker işi tarayıcıya taşınmaz.
 - [ ] Teklif süresi, güncel kapasite/hak/uygunluk kontrolü, ret ve yeniden okumayı göster; bekleme/alternatif seçimi kesin rezervasyon değildir.
 
-**Kabul:** Son yer yarışı, süresi dolan/yinelenen teklif kabulü, hak/izin kaybı tek doğru kayıt üretir. Starter'da F12 kapalıdır. XREQ-023 backend teslim kabulü doğrulanmadı; çalışma sürüyor. Gerçek teslim sonrası frontend uyumu ayrıca alınır.
+**Kabul:** Son yer yarışı, süresi dolan/yinelenen teklif kabulü, hak/izin kaybı tek doğru kayıt üretir. Starter'da F12 kapalıdır. XREQ-023 backend teslim kanıtı B08'de doğrulandı. R00 adayında boş yanıt yetki sayılmaz; tek gerçek seans/sürüm ve aynı selector anahtarları aranır. Fiziksel tavan ve diğer iş kuralları gerçek writer tarafından yeniden denetlenir; Chrome/canlı UI kabulü açık.
 
 <a id="web-s07"></a>
 
@@ -635,7 +637,7 @@ Starter owner’ın normal native oturumunda aynı yeni main kaynağıyla, mevcu
 
 **Durum: PR233 yoklama/görev kaynağı main'de; Chrome/canlı kabul ve Pro hakediş açık.** Kullanıcının PR232 main sonrasında XREQ-023/024’ü bekletip devam etme talimatıyla `feature/web-s07-attendance`, main `4a2bc94a27a420973e339f114d68f1542f2ef529` üzerinden açıldı. Aynı tabanın [main proof](https://github.com/SXQHex/FtkSaaS/actions/runs/42270172551), [merge proof](https://github.com/SXQHex/FtkSaaS/actions/runs/42270172432), [development](https://github.com/SXQHex/FtkSaaS/actions/runs/42270243168) ve [Vercel](https://github.com/SXQHex/FtkSaaS/actions/runs/42270243483) koşuları başarılıdır. Bu kanıt yeni S07 adayının CI veya gerçek eğitmen kabulü yerine geçmez.
 
-**Main teslimi:** PR233 main `f9ead24ee40adbbc4140e4361506d52d84d57a44` kaynağına birleşti; aynı kaynağın main/merge/development/Vercel kanıtı bölüm 1'de doğrulandı. Chrome/canlı veya Pro hakediş kabulü verilmez.
+**Main teslimi:** PR233 main `f9ead24ee40adbbc4140e4361506d52d84d57a44` kaynağına birleşti; main proof42281965972, merge proof42281965458, development42282766841 ve Vercel42282766758 başarılı doğrulandı. Güncel taban bölüm 1'dedir. Chrome/canlı veya Pro hakediş kabulü verilmez.
 
 **Kaynak teslimi — WF07:** Ana menüdeki **Görev ve yoklama** alanı (`#attendance`) ile mevcut normal yetkili takvim/seans akışından yoklamaya geçilir; takvimdeki seans paneli ve doğrudan seans sayfası aynı lazy bileşeni kullanır. Açılmadan yoklama/yazma okuyucuları çağrılmaz. `session_get_v1` ile `attendance_get_v1` paralel okunur; yanlış seans, tekrar eden rezervasyon, geçersiz sürüm ve birbirini tutmayan seans/yoklama snapshot’ı reddedilir. Katılımcı yalnız izinli DTO’daki Abone No veya gerçek listedeki sırasıyla gösterilir; kişi/finans yönetimi veya ad araması için ek yetki türetilmez. Kendi görev sınırının sahibi normal backend yetkilendirmesidir; hesap UUID’si kişi UUID’si varsayılmaz.
 
@@ -732,7 +734,7 @@ Oxlint’in yeni immutable-effect denetimi için yalnız işaretlenen dokuz effe
 
 #### Finans okuyucu uyumu ve Pro bütünleşik kabul
 
-**Durum:** PR232 kaynağı inceleme tabanında main'e ve bölüm 1'deki teslimlere ulaşmıştır. Mevcut finans yeniden yazılmaz; XREQ-024 backend teslim kabulü doğrulanmadı; backend çalışması ve frontend uyumu/canlı kabul açık kalır. **Bağımlılık:** S05; backend okuyucu teslimi B08.
+**Durum:** PR232 kaynağı inceleme tabanında main'e ve bölüm 1'deki teslimlere ulaşmıştır. Mevcut finans yeniden yazılmaz; XREQ-024 backend teslim kanıtı B08'de doğrulandı. R00 adayında beş okuyucu gerçek kişi/borç/satış kaynağı ve sürümüyle eşleştirilir; Chrome/canlı kabul açıktır. **Bağımlılık:** S05; backend okuyucu teslimi B08.
 
 - [ ] Teslim sonrası `collection_record_v1`, `sale_refund_preview_v1`, `student_credit_refund_v1`, `student_credit_offset_v1`, `debt_adjust_v1` için gerçek reader→writer→readback ve ret davranışını doğrula. #234'ün altıncı okuyucusu S06 kapasite istisnasıdır; `collection_correct_preview_v1` ayrı mevcut iznini korur.
 - [ ] Henüz tahsilatı olmayan kişi, dar collector/personel, tam finans görünümü olmadan izinli işlem ve canlı rol/izin kaybını kabul et; okuma iznini yazma yetkisi sayma.
@@ -946,15 +948,23 @@ Bu eşleme uygulama yerini gösterir; FD kapsamının kabul checklist'i yukarıd
 
 ## 7. Bölüm bölüm teslim: tek aktif bölüm
 
-**Aktif yeni paket: S02 Pro ekip/kaynak + eğitmen anlaşmaları + mevcut S03 takviminde Pro program önkoşulu.** `feature/web-pro-team-agreements`, bölüm 1'deki PR233 sonrası main tabanından açıldı. S07 yoklama ve S08 finans mevcut kaynağı korunur; ikinci uygulama veya genel kabuk göçü yapılmaz. Anlaşma kaynak kapsamı ve kalan ekip işleri kendi S02 alt bölümlerindedir.
+**Aktif kaynak paketi: R00 teslim/okuyucu uzlaştırması → R01 kapsam ve erişim ayrımı.** Kullanıcının §7'yi R00'dan itibaren izleme talimatıyla `feature/web-r00-action-reader-alignment` bölüm 1'deki PR237 sonrası main'den açıldı. PR237'nin anlaşma/program bağlantısı kaynağı main'dedir; bu R02/R03 ilk Pro paketinin bütününü kapatmaz. R00/R01 kaynak dilimi doğrulanmadan R02 yeni geliştirmesi açılmaz. Ardından mevcut S02 Pro ekip/kaynak ve anlaşma/program önkoşulunun kalanlarına dönülür; R04/R05'e atlanmaz.
 
-Kullanıcının tarayıcı/Chrome/canlı kabulleri açık bırakıp geliştirmeye odaklanma kararı sürer. S05/S06/S08/S11 ve diğer modüllerin ertelenen gerçek kabulü kaynak tamamlandı diye kapatılmaz. Son kullanıcı düzeltmesi XREQ-023/024 backend teslim kabulünü doğrulamıyor; backend çalışması sürerken bu bağımsız paket geliştirilir. S01–S04'ün geçmiş temel/Starter kabulleri yeni Pro farklarından ayrıdır.
+R00'da PR234 aday/main/development sonuçları yeniden doğrulandı; backend hosted okuma kaydı kaynak sahibinde bulundu. Önceki XREQ-023/024 backend bekleme hükmü kaldırıldı, frontend ekran kabulü kapatılmadı. Altı normal management okuyucusu tek source entity/sürüm ve exact selector anahtarlarına uyarlandı. Boş sonuç yetki vermez; eksik/çoklu veya bozuk kaynak hata olur, farklı selector hedefi mevcut unavailable/false sonucunu korur. FORBIDDEN/NOT_FOUND eylemi kapatır; plan/config/Auth hatası görünür kalır. Writer yeniden yetki ve domain denetimi yapar; frontend receipt, bakiye veya komut sürümü üretmez.
+
+R01'de bir kuruluşun merkez kataloğu okunamadığında normal organizasyon inbox'u ve diğer erişilebilir kuruluşlar kullanılabilir kalır. Merkez hatası kendi kuruluş adıyla görünür ve yeniden okunabilir; sahte merkez üretilmez. AUTH_REQUIRED/SESSION_REVOKED tüm snapshot ve kurtarma hesabını düşürür. Yenileme eski snapshot'ı kaldırır, geç yanıtlar eski kapsamı geri getirmez. Ortak kapsamın diğer açık maddeleri [S01 alt bölümünde](#ortak-kapsam-erisimi) kalır; R01 bütünü kapatılmaz.
+
+**Bu adayın otomatik doğrulaması:** 39 yeni regresyonla864 web +1 UI testi,8/8 lint/format/typecheck/test/build görevi geçti. Altı action reader için boş/çoklu/bozuk kaynak, gerçek entity/sürüm ve exact selector; optional Business satış anahtarı, normal ret ile config/plan/Auth hatası ayrımı sınandı. Yanlış selector hedefinde mevcut false assertion'ı korundu. Merkez hatasında organizasyon inbox'u, Auth kaybında tam kapanma ve hatalı merkez tekrar okumasında hedefin korunması sınandı. Eski shell yeni organizasyon regresyonunda kırıldı; boş yanıtı yetki sayan mutasyon altı testi kırdı. Kaynaklar byte düzeyinde geri alındı ve son tam kontrol geçti. Bağımsız son incelemede Required/Critical bulgu yok. Kalite0 bulgu/10 guard testi, docs:check ve frontend izolasyonu geçti. Chrome/canlı kontrol çalıştırılmadı; bu sayılar yeni aday CI/merge/dağıtım kanıtı değildir.
+
+**R00 erken hazırlık sınırı:** B04 public widget/hostname/action ve gerçek ICS host/seans route kabulü backend S14/S15'te hâlâ açıktır; kod/native HTTP kontrolü gerçek host kanıtı değildir. B05 import/private belge dosya/worker kabulü PR236 backend kaydında vardır; frontend import/belge yolculuğunun teslimi değildir. İşletim kataloğunun tam writable kapsamı S12/B06, site form handler/izinli sağlayıcı alımı B09/XREQ-018 sahibinde açık kalır. Yeni provider/config veya canlı işlem oluşturulmadı.
+
+Kullanıcının Chrome/tarayıcı/canlı kabulleri açık bırakma talimatı sürer. S05/S06/S08/S11 ve diğer modüllerin ertelenen gerçek kabulü otomatik test veya kaynak merge'iyle kapanmaz. S01–S04'ün geçmiş Starter kabulleri yeni Pro farklarından ayrıdır.
 
 S01–S13 işlev ve kabul sahipliğini korur; eksik Pro kapsamları aynı dosyanın ilgili alt bölümlerindedir. Aşağıdaki R00–R14 yalnız kullanıcı raporunun **sıra ve bağımlılık eşlemesidir**, ikinci checklist veya ayrı durum ağacı değildir. Görev/kabul değişikliği bağlı S/Pro bölümünde yapılır.
 
 | Rapor sırası | Uygulama/kabul sahibi | Bağımlılık ve tamamlanacak sonuç |
 |---|---|---|
-| R00 kaynak/teslim uzlaştırma | Bölüm 1, [S07](#web-s07), [S08](#pro-finans-kabulu), bölüm 5 | Güncel main/açık PR ve kaynak/CI/yayın/canlı ayrımı; #233 main kaynağı korunur. XREQ-023/024 doğrulanmış tesliminden sonra altı okuyucu tüketimi; sağlayıcı/ICS/import/işletim hazırlığı erken keşfedilir. |
+| R00 kaynak/teslim uzlaştırma | Bölüm 1, [S07](#web-s07), [S08](#pro-finans-kabulu), bölüm 5 | Güncel main/açık PR ve kaynak/CI/yayın/canlı ayrımı; #233 main kaynağı korunur. XREQ-023/024 backend teslim kanıtı doğrulandı; altı okuyucu uyumu bu adayda; sağlayıcı/ICS/import/işletim hazırlığı erken keşfedilir. |
 | R01 kapsam/erişim/gezinme | [S01 ortak kapsam](#ortak-kapsam-erisimi), S12/S13 | R00; org/merkez ve rol ayrımı, daralma/erişim kaybı, kurtarma ve kararlı hedefler. |
 | R02 Pro kaynak/ekip | [S02 Pro ekip](#pro-kaynak-ve-ekip), S04/S12 | R01; çoklu oda/disiplin/eğitmen, personel izinleri, uygunluk ve gerçek işletim ayarları. |
 | R03 eğitmen anlaşmaları | [S02 anlaşma](#pro-egitmen-anlasmalari) | R02; geçerli ücret anlaşmasıyla program önkoşulunu çöz; hakediş ekranını bekleme. |

@@ -302,7 +302,8 @@
       "inbox": "Updates for your account.",
       "documents": "Upload private document files and manage versions and publication impact.",
       "attendance": "Open authorized sessions by day or week. Attendance and each action are authorized separately for the selected session."
-    }
+    },
+    "centerReadFailed": "{name}: centers could not be read."
   },
   "calendar": {
     "label": "Class schedule",
