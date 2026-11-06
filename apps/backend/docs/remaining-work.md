@@ -539,19 +539,19 @@ Değişen dilimin sözleşme, üretilmiş tip/envanter, WF/F01–F33 izi ve alan
 <a id="p15"></a>
 ### P15 — Hatırlatma planlama ve sessiz saat
 
-- [ ] **Tür:** K · **Plan:** Pro/Business · **Özellik:** F27,F03,F24
+- [x] **Tür:** K · **Plan:** Pro/Business · **Özellik:** F27,F03,F24
 - **Bağımlılık:** P14,S10
 - **Kabul:** Ders/paket ayarları ve Business miras; merkez olay zamanı, kullanıcının sessiz saatine uygun gönderim.
 - **Sınır/olumsuz durum:** Geçersiz hatırlatma atlanır; işlemsel/in_app/Auth ertelenmez; digest kullanılabilir değildir. Önceden kabul edilmiş seçenek/defaultlar FD04’ten alınır; bu plan yeni default seçmez.
 - **Doğrulama senaryosu:** Geceyi aşan aralık, yaz/kış saati, ders değişimi/iptali, preference değişimi ve kuyruk gecikmesi; son anda tekrar uygunluk.
 - **Kaynak alanı:** reminder-scheduling/workers/email SQL, settings catalog v11, contract.json ve reminder-scheduling/transactional-email acceptance.
-- **Teslim durumu:** PR219 native/main/development teslimi tamamlandı. Zaman/miras/sessiz saat ve kaynak denetimleri teslim edildi; XREQ-021 backend self zinciri geçti; P15 hosted alt senaryolarının tamamlananları ve açık sınırları [devir kontrol noktasında](00-FtkSaaS-yeni-sohbet-devir.md#pr221-teslim-ve-6-kasım-canlı-kontrol-noktası) izlenir.
+- **Teslim durumu:** Kaynak/native/main/development ve gerçek Pro/Business kabulü tamamlandı. Business izin kapısı, merkez override, parent-version stale reset ve canlı miras; Pro sessiz saat/provider teslimi ile özgün ayar geri yüklemesi [devirde](00-FtkSaaS-yeni-sohbet-devir.md#p15-business-canlı-kabul-kapanışı--6-kasım-2026) kanıtlıdır. Frontend ekran kabulü kendi sahibindedir.
 
 <a id="p16"></a>
 ### P16 — Otomasyon sonuç ve hata akışı
 
 - [x] **Tür:** D/K · **Plan:** Pro/Business · **Özellik:** F23,F24,F26,F27
-- **Bağımlılık:** P11,P15. P15 çalışma bağımlılıkları teslim edildi; yalnız Business hosted kabulü açık.
+- **Bağımlılık:** P11,P15; backend kabulü tamamlandı.
 - **Kabul:** Desteklenen trigger/action görev veya hizmet hatırlatması üretir; sonuç/hata ve disable/retry görünür.
 - **Sınır/olumsuz durum:** Kampanya/indirim/geri kazanım maili açılmaz; tekrar iş aynı domain sonucu üretir.
 - **Doğrulama senaryosu:** Segment değişimi, yetki/plan kaybı, worker kesintisi ve işlem öncesi koşul denetimi.
