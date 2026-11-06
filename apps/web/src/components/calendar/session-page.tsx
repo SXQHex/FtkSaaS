@@ -13,6 +13,7 @@ import { ApiFailure, errorMessageKey, getAccount, getSession } from "../../lib/a
 import { browserClient } from "../../lib/supabase/client";
 import { sessionPath } from "../../lib/session-route";
 import { Preferences } from "../preferences";
+import { AttendanceAccess } from "../attendance/attendance-access";
 import { SessionBookings } from "../bookings/session-bookings";
 import { SessionSummary } from "./session-summary";
 import { SessionDocuments } from "../documents/session-documents";
@@ -164,6 +165,14 @@ export function SessionPage({
             <SessionBookings
               scope={{ actorId: current.accountId!, orgId, centerId }}
               session={current.session}
+              onChanged={bookingChanged}
+            />
+          )}
+          {centerId && (
+            <AttendanceAccess
+              scope={{ actorId: current.accountId!, orgId, centerId }}
+              sessionId={sessionId}
+              timeZone={current.timeZone ?? "UTC"}
               onChanged={bookingChanged}
             />
           )}

@@ -238,7 +238,8 @@
       "studio": "Studio",
       "settings": "Settings",
       "inbox": "Notifications",
-      "documents": "Documents"
+      "documents": "Documents",
+      "attendance": "Tasks and attendance"
     },
     "groups": {
       "0": "Daily activity",
@@ -299,7 +300,8 @@
       "studio": "Studios and centers your account can access.",
       "settings": "Your language, appearance and account preferences.",
       "inbox": "Updates for your account.",
-      "documents": "Upload private document files and manage versions and publication impact."
+      "documents": "Upload private document files and manage versions and publication impact.",
+      "attendance": "Open authorized sessions by day or week. Attendance and each action are authorized separately for the selected session."
     }
   },
   "calendar": {
@@ -1634,7 +1636,8 @@
       "CREDIT_LIMIT_EXCEEDED": "The negative credit limit would be exceeded. Check current rights and limits.",
       "QUOTA_EXCEEDED": "The selected right has reached its period quota.",
       "CLASS_ACCESS_DENIED": "The student is not eligible for this class or booking mode.",
-      "PARTICIPATION_BLOCKED": "Current participation rules block this action."
+      "PARTICIPATION_BLOCKED": "Current participation rules block this action.",
+      "invalidAttendance": "Attendance information could not be verified. Check the current record, selection and reason."
     },
     "financeCurrency": "Sale currency for the financial summary",
     "rightsReloaded": "Purchased rights reloaded.",
@@ -1666,7 +1669,8 @@
     "rights": "Rights adjustment",
     "reservation": "Booking",
     "request": "Lesson request",
-    "finance": "Collection"
+    "finance": "Collection",
+    "attendance": "attendance"
   },
   "finance": {
     "title": "Student finances",
@@ -1779,5 +1783,93 @@
     "reviewSaleRefund": "Review sale refund",
     "invalidFinancePreview": "Finance preview could not be verified. Request a new review of the source and effects.",
     "financeEffects": "Finance and entitlement effects"
+  },
+  "attendance": {
+    "title": "Attendance",
+    "open": "Open attendance",
+    "hide": "Hide attendance",
+    "loading": "Loading attendance…",
+    "refresh": "Refresh attendance",
+    "retry": "Retry",
+    "permissionFailed": "Permission for this attendance action could not be verified. Check again.",
+    "draft": "Draft attendance",
+    "closed": "Attendance closed",
+    "revision": "Closure revision: {version}",
+    "actualStart": "Actual start",
+    "notStarted": "Not recorded",
+    "unknownStart": "Start information was not provided",
+    "draftHint": "Draft marks are not final attendance or rights consumption. Final results are reread from the backend after closure.",
+    "cancelled": "Attendance cannot be changed for a cancelled session.",
+    "empty": "No participants in this attendance sheet.",
+    "participants": "Attendance participants",
+    "participant": "Participant {number}",
+    "subscriber": "Subscriber No {number}",
+    "protected": "An existing reservation is protected; this does not grant new rights or a debt exemption.",
+    "edit": "Mark attendance",
+    "correct": "Correct attendance",
+    "hideEditor": "Close editor",
+    "start": "Record actual start",
+    "close": "Close attendance",
+    "reason": "Reason",
+    "result": "Attendance result",
+    "blockReason": "Attendance block",
+    "reviewBlock": "Review block",
+    "previewCorrection": "Review correction",
+    "choose": "Choose",
+    "invalidAttendance": "Attendance information could not be verified. Check the current record, selection and reason.",
+    "closeHint": "The backend determines rights effects atomically. Starter closure does not create fees or earnings; other plans retain their agreement checks.",
+    "countSummary": "{marked} of {total} participants marked.",
+    "performed": "Did the session actually take place?",
+    "yes": "Yes, it took place",
+    "no": "No, it did not take place",
+    "actualInstructors": "Assigned instructors who actually performed",
+    "instructor": "Assigned instructor {number}",
+    "instructorCount": "Instructors who performed: {count}",
+    "rights": "Current entitlements",
+    "readRights": "Reread entitlements",
+    "noRights": "No entitlement records for this person.",
+    "rightCounts": "Available {available}, reserved {reserved}, consumed {consumed}.",
+    "effects": "Backend correction effects",
+    "effect": "Effect {number}",
+    "quantity": "Quantity: {count}",
+    "results": {
+      "unmarked": "Unmarked",
+      "attended": "Attended",
+      "no_show": "No show",
+      "blocked": "Blocked"
+    },
+    "reasons": {
+      "debt_policy": "Debt policy",
+      "credit_limit_exceeded": "Negative credit limit"
+    },
+    "tasks": "Tasks and attendance",
+    "tasksHint": "Open authorized sessions by day or week. Attendance and each action are authorized separately for the selected session.",
+    "center": "Center",
+    "noCenter": "No accessible active center for attendance.",
+    "taskDate": "Task date",
+    "taskRange": "Date range",
+    "day": "Day",
+    "week": "Week",
+    "refreshTasks": "Refresh tasks",
+    "loadingTasks": "Loading sessions…",
+    "taskPageCount": "{count} sessions on this page.",
+    "noTasks": "No sessions to show on this page.",
+    "openTask": "Open attendance for {title}",
+    "hideTask": "Close attendance for {title}",
+    "nextTasks": "Next sessions",
+    "filterResult": "Attendance filter",
+    "allParticipants": "All participants",
+    "findSubscriber": "Find by subscriber number",
+    "noMatchingParticipants": "No participants match this filter.",
+    "completeMarks": "Mark the result for every participant before closing attendance.",
+    "goToUnmarked": "Go to an unmarked participant",
+    "conditionsChanged": "Permission or current attendance conditions could not be verified. Refresh attendance, entitlements and required documents; contact an authorized manager if needed.",
+    "failedParticipant": "Action could not be completed: {label}",
+    "returnToParticipant": "Return to this participant",
+    "attendanceDocuments": "Review attendance documents",
+    "hideAttendanceDocuments": "Close attendance documents",
+    "retryRights": "Reread this person's entitlements",
+    "plannedTime": "Scheduled time",
+    "hideRights": "Hide entitlements"
   }
 }

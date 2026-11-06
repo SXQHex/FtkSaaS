@@ -1,3 +1,9 @@
+import {
+  attendanceWrites,
+  attendanceFields,
+  validAttendanceCommand,
+  type AttendanceWrite,
+} from "./attendance-command";
 import { v7, validate } from "uuid";
 import {
   balanceOperations,
@@ -25,6 +31,7 @@ import type {
 import { apiClient, ApiFailure } from "./api";
 import { sessionCapacity } from "./session-create";
 export const setupWrites = [
+  ...attendanceWrites,
   ...rightsOperations,
   ...balanceOperations,
   "collection_record_v1",
@@ -61,6 +68,9 @@ export const setupWrites = [
 export type SetupWrite = (typeof setupWrites)[number];
 type SetupUpload = "document_upload_prepare_v1" | "file_upload_complete_v1";
 type SetupRead =
+  | "calendar_get_v1"
+  | "attendance_get_v1"
+  | "attendance_correct_preview_v1"
   | "sale_refund_preview_v1"
   | "sale_preview_v1"
   | "sale_renew_preview_v1"
@@ -120,6 +130,7 @@ export const setupStorageKey = (scope: SetupScope, slot: string) =>
 export type PendingSetup = { command: SetupCommand; blocked?: boolean };
 const keyPattern = /^[a-f0-9]{8}-[a-f0-9]{4}-7[a-f0-9]{3}-[89ab][a-f0-9]{3}-[a-f0-9]{12}$/i;
 const fields: Record<SetupWrite, string[]> = {
+  ...attendanceFields,
   ...bookingFields,
   ...balanceFields,
   collection_correct_apply_v1: ["preview"],
@@ -257,6 +268,16 @@ export function recoverSetup(scope: SetupScope, slot: string): PendingSetup | "i
       (!validCorrection(input, scope.centerId) ||
         !/^sale-refund:[^:]+$/.test(slot) ||
         !validate(slot.slice("sale-refund:".length)))
+    )
+      return "invalid";
+    if (
+      /^attendance(?:-row)?:/.test(slot) &&
+      !attendanceWrites.some((op) => op === command.operation)
+    )
+      return "invalid";
+    if (
+      attendanceWrites.some((op) => op === command.operation) &&
+      !validAttendanceCommand(command.operation as AttendanceWrite, input, scope.centerId, slot)
     )
       return "invalid";
     if (slot.startsWith("finance:") && command.operation !== "collection_record_v1")

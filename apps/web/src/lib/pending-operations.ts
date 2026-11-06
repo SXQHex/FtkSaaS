@@ -1,3 +1,4 @@
+import { attendanceWrites } from "./attendance-command";
 import { balanceOperations } from "./finance-actions";
 import { validate } from "uuid";
 import { bookingWrites } from "./booking-command";
@@ -6,9 +7,10 @@ import { recoverSetup, setupActorPrefix, type SetupScope } from "./studio-setup"
 export type PendingOperation = {
   scope: SetupScope;
   slot: string;
-  kind: "sale" | "rights" | "reservation" | "request" | "finance";
+  kind: "attendance" | "sale" | "rights" | "reservation" | "request" | "finance";
 };
 const operations: Record<PendingOperation["kind"], readonly string[]> = {
+  attendance: attendanceWrites,
   finance: [
     "collection_record_v1",
     "collection_correct_apply_v1",
@@ -25,6 +27,9 @@ function slotKind(slot: string): PendingOperation["kind"] | null {
   const [family, target, extra] = slot.split(":");
   if (!target || !validate(target) || extra !== undefined) return null;
   switch (family) {
+    case "attendance":
+    case "attendance-row":
+      return "attendance";
     case "sale-refund":
     case "credit-refund":
     case "credit-offset":

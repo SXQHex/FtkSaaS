@@ -53,6 +53,11 @@ const InboxWorkspace = dynamic(
   { loading: WorkspaceLoading },
 );
 
+const AttendanceWorkspace = dynamic(
+  () => import("../attendance/attendance-workspace").then((m) => m.AttendanceWorkspace),
+  { loading: WorkspaceLoading },
+);
+
 const FinanceWorkspace = dynamic(
   () => import("../finance/finance-workspace").then((module) => module.FinanceWorkspace),
   { loading: WorkspaceLoading },
@@ -363,6 +368,9 @@ export function StudioWorkspace({ authUserId }: { authUserId: string }) {
       {snapshot && section === "students" && (
         <StudentsWorkspace studios={snapshot.studios} actorId={snapshot.account.id} />
       )}
+      {snapshot && section === "attendance" && (
+        <AttendanceWorkspace actorId={snapshot.account.id} studios={snapshot.studios} />
+      )}
       {snapshot && section === "finance" && (
         <FinanceWorkspace actorId={snapshot.account.id} studios={snapshot.studios} />
       )}
@@ -389,6 +397,7 @@ export function StudioWorkspace({ authUserId }: { authUserId: string }) {
           "documents",
           "packages",
           "finance",
+          "attendance",
         ].includes(section) && (
           <Card className="shadow-none">
             <CardContent className="flex min-h-72 flex-col items-center justify-center px-5 py-12 text-center">
