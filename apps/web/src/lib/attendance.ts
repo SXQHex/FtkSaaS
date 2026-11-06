@@ -70,18 +70,30 @@ export const attendanceApi = {
   rights: async (scope: SetupScope, view: AttendanceView) =>
     Promise.all(
       [...new Set(view.entries.map((x) => x.person_id))].map(async (personId) => {
-        const rows = await readEntitlements(scope, personId);
-        if (
-          rows.some(
-            (row) =>
-              row.person_id !== personId ||
-              ![row.available, row.reserved, row.consumed].every(
-                (v) => Number.isSafeInteger(v) && v >= 0,
-              ),
+        try {
+          const rows = await readEntitlements(scope, personId);
+          if (
+            rows.some(
+              (row) =>
+                row.person_id !== personId ||
+                ![row.available, row.reserved, row.consumed].every(
+                  (v) => Number.isSafeInteger(v) && v >= 0,
+                ),
+            )
           )
-        )
-          throw Error("invalidAttendance");
-        return { personId, rows };
+            throw Error("invalidAttendance");
+          return { personId, rows };
+        } catch (cause) {
+          return {
+            personId,
+            error:
+              cause instanceof ApiFailure
+                ? cause.failure.error.code
+                : cause instanceof Error && cause.message === "invalidAttendance"
+                  ? "invalidAttendance"
+                  : "network",
+          };
+        }
       }),
     ),
 };

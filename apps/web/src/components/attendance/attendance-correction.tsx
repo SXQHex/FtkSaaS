@@ -1,4 +1,5 @@
 "use client";
+import { AttendanceError } from "./attendance-error";
 import { useEffect, useId, useState } from "react";
 import { useTranslations } from "next-intl";
 import { v7 } from "uuid";
@@ -8,7 +9,7 @@ import { Input } from "@ftksaas/ui/components/input";
 import { Label } from "@ftksaas/ui/components/label";
 import { correctionRequest, correctionMatches } from "../../lib/attendance";
 import { SetupFeedback, useSetupCommand } from "../setup/setup-command";
-import { FlowError, flowError } from "../bookings/flow-controls";
+import { flowError } from "../bookings/flow-controls";
 import { AttendancePermission } from "./attendance-permission";
 import type { AttendanceRowProps } from "./attendance-row";
 import { AttendanceReview } from "./attendance-review";
@@ -27,7 +28,7 @@ export function AttendanceCorrection({
     scope,
     `attendance:${view.session_id}`,
     () => onSaved(true),
-    (code) => onSaved(false, code),
+    (code) => onSaved(false, code, row.reservation_id),
   );
   const [request, setRequest] = useState<ReturnType<typeof correctionRequest> | null>(null),
     [preview, setPreview] = useState<Preview | null>(null),
@@ -126,7 +127,7 @@ export function AttendanceCorrection({
         (error === "invalidAttendance" ? (
           <p role="alert">{t("invalidAttendance")}</p>
         ) : (
-          <FlowError code={error} />
+          <AttendanceError code={error} />
         ))}{" "}
       {preview && request && (
         <AttendanceReview

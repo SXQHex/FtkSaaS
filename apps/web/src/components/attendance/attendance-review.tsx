@@ -5,7 +5,7 @@ import { validate } from "uuid";
 import type { Preview } from "@ftksaas/api-contracts";
 import { Button } from "@ftksaas/ui/components/button";
 import { effectMoney } from "../../lib/effect-money";
-import { FlowError } from "../bookings/flow-controls";
+import { AttendanceError } from "./attendance-error";
 export function AttendanceReview({
   preview,
   timeZone,
@@ -67,9 +67,9 @@ export function AttendanceReview({
         </p>
       )}
       {invalid && <p role="alert">{t("invalidAttendance")}</p>}
-      {expired && <FlowError code="PREVIEW_STALE" />}
+      {expired && <AttendanceError code="PREVIEW_STALE" />}
       {preview.blockers.map((b, i) => (
-        <FlowError key={i} code={b.code} />
+        <AttendanceError key={i} code={b.code} />
       ))}
       <ul className="space-y-2" aria-label={t("effects")}>
         {preview.effects.map((effect, i) => (

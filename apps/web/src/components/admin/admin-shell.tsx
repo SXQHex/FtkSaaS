@@ -8,6 +8,7 @@ import {
   FileText,
   Building2,
   CalendarDays,
+  ClipboardCheck,
   ChartNoAxesCombined,
   ChevronRight,
   CircleHelp,
@@ -41,6 +42,7 @@ import { Preferences } from "../preferences";
 export const sections = [
   "overview",
   "schedule",
+  "attendance",
   "students",
   "packages",
   "finance",
@@ -54,6 +56,7 @@ export type AdminSection = (typeof sections)[number];
 const icons = {
   overview: LayoutDashboard,
   schedule: CalendarDays,
+  attendance: ClipboardCheck,
   students: Users,
   packages: Package,
   finance: CreditCard,
@@ -64,7 +67,7 @@ const icons = {
   documents: FileText,
 };
 const groups: AdminSection[][] = [
-  ["overview", "schedule", "students"],
+  ["overview", "schedule", "attendance", "students"],
   ["packages", "finance", "reports"],
   ["studio", "documents", "settings"],
 ];

@@ -1,4 +1,5 @@
 "use client";
+import { AttendanceError } from "./attendance-error";
 import { useId, useState } from "react";
 import { useTranslations } from "next-intl";
 import { v7 } from "uuid";
@@ -7,7 +8,7 @@ import { Label } from "@ftksaas/ui/components/label";
 import type { SetupCommand } from "../../lib/studio-setup";
 import { attendanceMark } from "../../lib/attendance-command";
 import { SetupFeedback, useSetupCommand } from "../setup/setup-command";
-import { ConfirmWrite, FlowError } from "../bookings/flow-controls";
+import { ConfirmWrite } from "../bookings/flow-controls";
 import { AttendancePermission } from "./attendance-permission";
 import type { AttendanceRowProps } from "./attendance-row";
 import { AttendanceCorrection } from "./attendance-correction";
@@ -26,7 +27,7 @@ function AttendanceDraft({ scope, view, row, number, api, onSaved }: AttendanceR
     scope,
     `attendance-row:${row.reservation_id}`,
     () => onSaved(),
-    (code) => onSaved(false, code),
+    (code) => onSaved(false, code, row.reservation_id),
   );
   const [draft, setDraft] = useState<SetupCommand | null>(null),
     [error, setError] = useState("");
@@ -134,7 +135,7 @@ function AttendanceDraft({ scope, view, row, number, api, onSaved }: AttendanceR
         (error === "invalidAttendance" ? (
           <p role="alert">{t("invalidAttendance")}</p>
         ) : (
-          <FlowError code={error} />
+          <AttendanceError code={error} />
         ))}{" "}
       {draft && (
         <ConfirmWrite

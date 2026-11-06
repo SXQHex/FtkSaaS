@@ -16,7 +16,8 @@ type Props = {
   data: Awaited<ReturnType<AttendanceApi["read"]>>;
   timeZone: string;
   api: AttendanceApi;
-  onSaved: (rights?: boolean, error?: string) => void;
+  onUnmarked?: () => void;
+  onSaved: (rights?: boolean, error?: string, reservationId?: string) => void;
 };
 export function AttendanceSessionActions(props: Props) {
   const { data } = props;
@@ -40,6 +41,7 @@ function SessionForm({
   timeZone,
   onSaved,
   mode,
+  onUnmarked,
 }: Props & { mode: "start" | "close" }) {
   const t = useTranslations("attendance"),
     flow = useTranslations("flows"),
@@ -124,6 +126,16 @@ function SessionForm({
                   total: data.view.entries.length,
                 })}
               </p>
+              {data.view.entries.some((row) => row.result === "unmarked") && (
+                <div className="space-y-2">
+                  <p>{t("completeMarks")}</p>
+                  {onUnmarked && (
+                    <Button type="button" variant="outline" onClick={onUnmarked}>
+                      {t("goToUnmarked")}
+                    </Button>
+                  )}
+                </div>
+              )}
               <Label htmlFor={id}>{t("performed")}</Label>
               <select
                 id={id}
@@ -147,7 +159,14 @@ function SessionForm({
               </fieldset>
             </>
           )}
-          <Button className="h-auto min-h-11 whitespace-normal">{flow("review")}</Button>
+          <Button
+            disabled={
+              mode === "close" && data.view.entries.some((row) => row.result === "unmarked")
+            }
+            className="h-auto min-h-11 whitespace-normal"
+          >
+            {flow("review")}
+          </Button>
         </fieldset>
       </form>
       {invalid && <p role="alert">{t("invalidAttendance")}</p>}

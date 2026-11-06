@@ -238,7 +238,8 @@
       "studio": "Studio",
       "settings": "Settings",
       "inbox": "Notifications",
-      "documents": "Documents"
+      "documents": "Documents",
+      "attendance": "Tasks and attendance"
     },
     "groups": {
       "0": "Daily activity",
@@ -299,7 +300,8 @@
       "studio": "Studios and centers your account can access.",
       "settings": "Your language, appearance and account preferences.",
       "inbox": "Updates for your account.",
-      "documents": "Upload private document files and manage versions and publication impact."
+      "documents": "Upload private document files and manage versions and publication impact.",
+      "attendance": "Open authorized sessions by day or week. Attendance and each action are authorized separately for the selected session."
     }
   },
   "calendar": {
@@ -1839,6 +1841,35 @@
     "reasons": {
       "debt_policy": "Debt policy",
       "credit_limit_exceeded": "Negative credit limit"
-    }
+    },
+    "tasks": "Tasks and attendance",
+    "tasksHint": "Open authorized sessions by day or week. Attendance and each action are authorized separately for the selected session.",
+    "center": "Center",
+    "noCenter": "No accessible active center for attendance.",
+    "taskDate": "Task date",
+    "taskRange": "Date range",
+    "day": "Day",
+    "week": "Week",
+    "refreshTasks": "Refresh tasks",
+    "loadingTasks": "Loading sessions…",
+    "taskPageCount": "{count} sessions on this page.",
+    "noTasks": "No sessions to show on this page.",
+    "openTask": "Open attendance for {title}",
+    "hideTask": "Close attendance for {title}",
+    "nextTasks": "Next sessions",
+    "filterResult": "Attendance filter",
+    "allParticipants": "All participants",
+    "findSubscriber": "Find by subscriber number",
+    "noMatchingParticipants": "No participants match this filter.",
+    "completeMarks": "Mark the result for every participant before closing attendance.",
+    "goToUnmarked": "Go to an unmarked participant",
+    "conditionsChanged": "Permission or current attendance conditions could not be verified. Refresh attendance, entitlements and required documents; contact an authorized manager if needed.",
+    "failedParticipant": "Action could not be completed: {label}",
+    "returnToParticipant": "Return to this participant",
+    "attendanceDocuments": "Review attendance documents",
+    "hideAttendanceDocuments": "Close attendance documents",
+    "retryRights": "Reread this person's entitlements",
+    "plannedTime": "Scheduled time",
+    "hideRights": "Hide entitlements"
   }
 }

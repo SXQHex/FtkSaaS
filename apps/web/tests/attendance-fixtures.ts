@@ -66,5 +66,9 @@ export const makeApi = (): AttendanceApi => ({
   read: async () => ({ session, view }),
   access: async () => false,
   preview: async () => preview,
-  rights: async () => [],
+  rights: async (_scope, source) =>
+    [...new Set(source.entries.map((row) => row.person_id))].map((personId) => ({
+      personId,
+      rows: [],
+    })),
 });
