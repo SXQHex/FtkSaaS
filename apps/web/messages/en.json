@@ -1953,7 +1953,18 @@
     "basis": "Valuation basis",
     "saleUnit": "Sale unit",
     "fixedUnit": "Explicit unit value",
-    "unitAmount": "Unit amount"
+    "unitAmount": "Unit amount",
+    "templateHeading": "Agreement preparation templates",
+    "templateOpen": "Prepare from template",
+    "templateClose": "Close template selection",
+    "templateNotice": "A template suggests only discipline, session format and pay terms. Choose the person, validity and reason separately and confirm publication.",
+    "templateRetry": "Reload templates",
+    "templateEmpty": "No matching agreement templates in this scope. You can enter terms manually.",
+    "templateOrganization": "Organization",
+    "templateCenter": "Center",
+    "templateVersion": "Version {version}",
+    "templateSelected": "Selected template: {name}",
+    "templateManual": "Enter pay terms manually"
   },
   "operatingSettings": {
     "organization": "Organization operating settings",
