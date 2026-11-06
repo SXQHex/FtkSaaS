@@ -12,12 +12,16 @@ import type { SetupScope } from "../../lib/studio-setup";
 import { SetupFeedback, useSetupCommand } from "../setup/setup-command";
 import { PrivateDocument } from "./private-document";
 type Command = ReturnType<typeof useSetupCommand>;
-type Reads = { read?: typeof readContextDocuments; file?: typeof readPrivateDocument };
+type ViewOptions = {
+  read?: typeof readContextDocuments;
+  file?: typeof readPrivateDocument;
+  headingLevel?: 2 | 3;
+};
 export function SelfDocuments({
   scope,
   context,
   ...reads
-}: { scope: SetupScope; context: AcceptanceContext } & Reads) {
+}: { scope: SetupScope; context: AcceptanceContext } & ViewOptions) {
   return (
     <SelfDocumentConnection
       key={JSON.stringify([scope, context])}
@@ -31,7 +35,7 @@ function SelfDocumentConnection({
   scope,
   context,
   ...reads
-}: { scope: SetupScope; context: AcceptanceContext } & Reads) {
+}: { scope: SetupScope; context: AcceptanceContext } & ViewOptions) {
   const [revision, setRevision] = useState(0);
   const command = useSetupCommand(scope, "document-accept", () => setRevision((n) => n + 1));
   return (
@@ -49,7 +53,7 @@ export function SelfDocumentView({
   query,
   command,
   ...reads
-}: { actorId: string; query: SelfDocumentQuery; command: Command } & Reads) {
+}: { actorId: string; query: SelfDocumentQuery; command: Command } & ViewOptions) {
   return (
     <SelfDocumentContent
       key={JSON.stringify([actorId, query])}
@@ -64,7 +68,10 @@ function SelfDocumentContent({
   command,
   read = readContextDocuments,
   file = readPrivateDocument,
-}: { query: SelfDocumentQuery; command: Command } & Reads) {
+  headingLevel = 3,
+}: { query: SelfDocumentQuery; command: Command } & ViewOptions) {
+  const Heading = headingLevel === 2 ? "h2" : "h3";
+  const DocumentHeading = headingLevel === 2 ? "h3" : "h4";
   const [query] = useState(initialQuery),
     t = useTranslations("documents");
   const [page, setPage] = useState<DocumentView[] | null>(null),
@@ -98,9 +105,9 @@ function SelfDocumentContent({
   return (
     <section aria-label={t("selfTitle")} className="space-y-4 rounded-lg border p-4">
       <div className="flex flex-wrap items-center justify-between gap-3">
-        <h3 ref={heading} tabIndex={-1} className="font-semibold outline-none">
+        <Heading ref={heading} tabIndex={-1} className="font-semibold outline-none">
           {t("selfTitle")}
-        </h3>
+        </Heading>
         <Button
           variant="outline"
           className="h-auto min-h-11 max-w-full whitespace-normal"
@@ -123,7 +130,9 @@ function SelfDocumentContent({
           {page.map((doc) => (
             <li key={doc.version_id} className="space-y-3 rounded-lg border p-4">
               <div className="flex flex-wrap items-center justify-between gap-3">
-                <h4 className="min-w-0 break-words font-medium">{doc.name}</h4>
+                <DocumentHeading className="min-w-0 break-words font-medium">
+                  {doc.name}
+                </DocumentHeading>
                 <Badge variant="outline" className="max-w-full whitespace-normal wrap-anywhere">
                   {t(doc.accepted ? "requirementMet" : "acceptanceRequired")}
                 </Badge>
@@ -148,6 +157,7 @@ function SelfDocumentContent({
       )}
       {selected && (
         <PrivateDocument
+          headingLevel={headingLevel === 2 ? 3 : 4}
           key={`${selected.version_id}:${selected.file.id}`}
           query={query}
           expected={selected}

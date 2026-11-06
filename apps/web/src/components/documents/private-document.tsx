@@ -10,14 +10,17 @@ export function PrivateDocument({
   read,
   onClose,
   children,
+  headingLevel = 4,
 }: {
   query: DocumentQuery;
   expected: DocumentView;
   read: DocumentReadActions["file"];
   onClose: () => void;
   children?: ReactNode;
+  headingLevel?: 3 | 4;
 }) {
   const t = useTranslations("documents");
+  const Heading = headingLevel === 3 ? "h3" : "h4";
   const [content, setContent] = useState<{ url: string; text: string | null; pdf: boolean } | null>(
       null,
     ),
@@ -55,9 +58,13 @@ export function PrivateDocument({
       aria-label={t("privateContent")}
     >
       <div className="flex flex-wrap items-center justify-between gap-3">
-        <h4 ref={heading} tabIndex={-1} className="min-w-0 break-words font-medium outline-none">
+        <Heading
+          ref={heading}
+          tabIndex={-1}
+          className="min-w-0 break-words font-medium outline-none"
+        >
           {expected.name}
-        </h4>
+        </Heading>
         <Button
           className="h-auto min-h-11 max-w-full whitespace-normal"
           variant="outline"

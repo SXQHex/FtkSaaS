@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { beforeEach, afterEach, expect, test, vi } from "vitest";
 import { File as NodeFile } from "node:buffer";
-import { screen, waitFor, act } from "@testing-library/react";
+import { screen, waitFor, act, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { http, HttpResponse } from "msw";
 import type { DocumentView } from "@ftksaas/api-contracts";
@@ -358,4 +358,49 @@ test("self expired receipt blocks replay without a second acceptance", async () 
   ).not.toBeInTheDocument();
   expect(screen.queryByRole("checkbox")).not.toBeInTheDocument();
   expect(send).not.toHaveBeenCalled();
+});
+
+test("sale requirements accept the exact product version for self and read back acceptance", async () => {
+  const context = {
+    gate: "sale" as const,
+    subject: { type: "product_versions" as const, id },
+    product_version_id: id,
+  };
+  const saleDoc = { ...doc, required_at: "sale" as const };
+  const user = userEvent.setup(),
+    api = reads(),
+    bodies: Record<string, unknown>[] = [];
+  api.read.mockResolvedValueOnce([saleDoc]).mockResolvedValue([{ ...saleDoc, accepted: true }]);
+  server.use(
+    http.post(endpoint, async ({ request }) => {
+      bodies.push((await request.json()) as Record<string, unknown>);
+      expect(sessionStorage.getItem(setupStorageKey(scope, "document-accept"))).not.toBeNull();
+      return success();
+    }),
+  );
+  render(<SelfDocuments scope={scope} context={context} headingLevel={2} {...api} />);
+  await screen.findByText("Kabul gerekli");
+  expect(screen.getByRole("heading", { name: doc.name, level: 3 })).toBeVisible();
+  expect(screen.queryByRole("checkbox")).not.toBeInTheDocument();
+  await open(user);
+  expect(
+    within(screen.getByRole("article", { name: "Özel belge içeriği" })).getByRole("heading", {
+      name: doc.name,
+      level: 3,
+    }),
+  ).toHaveFocus();
+  expect(api.read).toHaveBeenCalledWith({ org_id: other, context });
+  expect(api.file).toHaveBeenCalledWith({ org_id: other, context }, saleDoc);
+  expect(screen.getByRole("button", { name: "Kendi adıma kabul et" })).toBeDisabled();
+  expect(bodies).toHaveLength(0);
+  await user.click(screen.getByRole("checkbox"));
+  await user.click(screen.getByRole("button", { name: "Kendi adıma kabul et" }));
+  await screen.findByText("Gereklilik karşılanıyor");
+  expect(bodies).toHaveLength(1);
+  expect(bodies[0]).toMatchObject({ org_id: other, context, document_version_id: doc.version_id });
+  expect(bodies[0]).not.toHaveProperty("person_id");
+  expect(revoke).toHaveBeenCalledWith("blob:self-document");
+  expect(screen.queryByRole("checkbox")).not.toBeInTheDocument();
+  expect(api.read).toHaveBeenCalledTimes(2);
+  expect(screen.getByRole("heading", { name: "Kendi belgelerim", level: 2 })).toHaveFocus();
 });

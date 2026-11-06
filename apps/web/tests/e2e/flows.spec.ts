@@ -109,6 +109,25 @@ for (const locale of ["tr", "en"] as const) {
       })
       .press("Enter");
     await expect(inspect).toBeFocused();
+    await sale
+      .getByRole("button", {
+        name: locale === "tr" ? "Gerekli belgeler" : "Required documents",
+        exact: true,
+      })
+      .click();
+    const acceptanceLink = sale.getByRole("link", {
+      name:
+        locale === "tr"
+          ? "Öğrenci için belge kabul bağlantısı"
+          : "Document acceptance link for the student",
+    });
+    await expect(acceptanceLink).toBeVisible();
+    await expect(acceptanceLink).toHaveAttribute(
+      "href",
+      /\/organizasyon\/[^/]+\/paket\/[^/]+\/belgeler\?center=/,
+    );
+    expect(await sale.evaluate((node) => node.scrollWidth <= node.clientWidth)).toBe(true);
+    expect((await new AxeBuilder({ page }).analyze()).violations).toEqual([]);
     expect(calls).toEqual([]);
   });
 }

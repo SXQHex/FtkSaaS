@@ -1,5 +1,7 @@
 "use client";
 import { useEffect, useId, useRef, useState } from "react";
+import Link from "next/link";
+import { saleDocumentPath } from "../../lib/sale-document-route";
 import { useTranslations } from "next-intl";
 import { v7 } from "uuid";
 import type { EntitlementView, Preview, SalePreview, SessionView } from "@ftksaas/api-contracts";
@@ -259,20 +261,39 @@ export function SaleForm({
             {t("documents")}
           </Button>
           {docs && (
-            <ContextDocuments
-              actorId={scope.actorId}
-              actions={api.documents}
-              query={{
-                org_id: scope.orgId,
-                center_id: scope.centerId,
-                person_id: personId,
-                context: {
-                  gate: "sale",
-                  subject: { type: "product_versions", id: product.version_id },
-                  product_version_id: product.version_id,
-                },
-              }}
-            />
+            <div className="space-y-4">
+              {scope.centerId && (
+                <div className="space-y-2">
+                  <Button
+                    asChild
+                    variant="outline"
+                    className="h-auto min-h-11 max-w-full whitespace-normal"
+                  >
+                    <Link
+                      prefetch={false}
+                      href={saleDocumentPath(scope.orgId, scope.centerId, product.version_id)}
+                    >
+                      {t("selfDocumentsLink")}
+                    </Link>
+                  </Button>
+                  <p className="text-sm text-muted-foreground">{t("selfDocumentsLinkHint")}</p>
+                </div>
+              )}
+              <ContextDocuments
+                actorId={scope.actorId}
+                actions={api.documents}
+                query={{
+                  org_id: scope.orgId,
+                  center_id: scope.centerId,
+                  person_id: personId,
+                  context: {
+                    gate: "sale",
+                    subject: { type: "product_versions", id: product.version_id },
+                    product_version_id: product.version_id,
+                  },
+                }}
+              />
+            </div>
           )}
         </>
       )}

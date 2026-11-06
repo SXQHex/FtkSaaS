@@ -1284,6 +1284,9 @@
     "demoLostArmed": "Lost response simulation ready"
   },
   "documents": {
+    "backToWorkspace": "Back to workspace",
+    "saleSelfHint": "Review and accept the required documents for this package version using your own account. Accepting a document does not purchase a package or create a payment.",
+    "saleTitle": "Documents for a sale",
     "uploadTitle": "Upload a document file",
     "uploadHint": "PDF or UTF-8 plain text only, up to 2 MiB. Files remain private; uploading does not publish a document.",
     "nextVersion": "You are uploading a new version of an existing document.",
@@ -1516,6 +1519,8 @@
     "demoHint": "Synthetic examples only. No real sale, entitlement, reservation or financial record is changed."
   },
   "flows": {
+    "selfDocumentsLinkHint": "Share this link with the student. Each person can only accept for themselves. After the student accepts, reload the requirements and review the sale again.",
+    "selfDocumentsLink": "Document acceptance link for the student",
     "review": "Review action",
     "confirm": "I approve the displayed action and its effects.",
     "apply": "Apply action",
