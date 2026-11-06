@@ -375,6 +375,12 @@ Mevcut management okuyucusunda `lesson_request_create_v1` selector anahtarına o
 Kaynak, negatif sözleşme ve ayrı native katalog kökü hazırlanmıştır; yeni aday/main/development sonucu backend devir kaydında tutulur. Frontend ekran veya S06 kabulü verilmez.
 
 
+### Backend self okuyucu değerlendirmesi — XREQ-021, 6 Kasım 2026
+
+Gerçek tenant verisindeki118 aktif kişide görünürlük SQL'i18,4s sürüyor;17,6s operational helper'da, assigned helper8,6ms. Native Auth veya DB parolası reddi değildir. Alias ilişkilerini her hedef için bütün tenant üzerinde yeniden hesaplayan yol daraltılır: aynı yetki/kapsam/alias semantiğiyle root-once indexed bileşen; projeksiyonda tek üyelik çözümü; operasyon yetkisi ve olası ataması olmayan self aktöründe doğrudan kendi kişi indeksi. Eğitmen/assistant atanmış kişi erişimi, iletişim gizliliği, cursor ve canlı merkez/plan kapıları korunur. Yeni endpoint/izin/timeout artışı veya frontend değişikliği yoktur.
+
+10k bağımsız kişi ve alias ile native regresyon adaydır. Kaynak/native/main/development ve hosted gerçek öğrenci kataloğu/create tekrarının kanıtı backend devrinde tutulur; bu değerlendirme henüz talep kapanışı veya frontend ekran kabulü değildir.
+
 <a id="xreq-022"></a>
 ## XREQ-022 Hatırlatma ayarları ve otomasyon iş sonuçlarının tüketimi
 
