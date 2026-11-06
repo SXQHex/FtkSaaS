@@ -285,8 +285,8 @@
         "management_state_get_v1"
       ],
       "review": {
-        "fingerprint": "c8ad720de29fdf4d5be4e531dd0ffb41fed2a7eb9796c5a963f7bf7afe9e1ea3",
-        "reason": "Reviewed unchanged runtime220/migration116 and existing CRM child-only inventory hash update. No B05 API/migration/generator or gate changes remain; original identity, receipt and CI policy preserved."
+        "fingerprint": "6b40ac313615fa6f18da0197fe125f12a62df08b0b345d9d1fdf06b661588fea",
+        "reason": "Reviewed final CRM child fixture/hash fix: explicit RATE_LIMITED and zero application/person/lead side effects before independent contact routing. Original runtime and all source/CI guards unchanged."
       }
     },
     {
@@ -1414,8 +1414,8 @@
         "automation_save_v1"
       ],
       "review": {
-        "fingerprint": "79f3e5480a5d1e8d8693a4419dda6559656cf8a65c7dbabf3499d1643278c87b",
-        "reason": "Reviewed existing CRM org lock/version guard and new two-actor routing race plus A-to-B old-CM visibility regression; guide describes the unchanged runtime behavior explicitly."
+        "fingerprint": "05d01a8810c4aeafd4f6b8e6d5574caeec85d82c29766077c6f3f4eb8837a3f1",
+        "reason": "Reviewed real intake limit3 per org/contact, explicit fourth rejection with unchanged row counts, and separate-contact routing concurrency/visibility assertions. No rate limit/config change; guide remains accurate."
       }
     },
     {

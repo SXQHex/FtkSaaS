@@ -25,7 +25,7 @@ test('P06 explicit review preserves shared-phone identity, routing scope and rec
   const form=key();await db.query("insert into private.crm_intake_forms(id,org_id,center_id,channel,form_key,source_url,enabled) values($1,$2,null,'web_form','synthetic-general','https://example.invalid/register',true)",[form,org]);
   const validators=await import('../supabase/functions/backend-v1/validators.js');
   const reject=async(op,b,code,u=owner,k=key())=>{const x=await call(u,op,{org_id:org,center_id:center,...b},k);assert.equal(validators['request_'+op](x.request),true,JSON.stringify(validators['request_'+op].errors));assert.equal(x.result.ok,false,JSON.stringify(x.result));assert.equal(x.result.error.code,code,JSON.stringify(x.result));};
-  const submit=async()=>{const request={client_api_version:1,request_id:key(),form_id:form,client_request_key:key(),bot_proof:'synthetic',intake:{display_name:'Synthetic applicant',phone:'+905550000002',consents:[]}};await db.query("select set_config('request.jwt.claim.role','service_role',false)");const result=(await db.query('select api_v1.public_application_submit_v1($1,null,null,$2,$3) result',[request,Array.from({length:64},key),{ip_hash:createHash('sha256').update(request.client_request_key).digest('hex'),target_hash:createHash('sha256').update(request.intake.phone).digest('hex'),phase:'submit',bot_verified:true}])).rows[0].result;assert.equal(result.ok,true,JSON.stringify(result));return (await db.query('select id from core.public_applications where request_reference=$1',[request.client_request_key])).rows[0].id;};
+  const submit=async(phone='+905550000002',expectedError=null)=>{const request={client_api_version:1,request_id:key(),form_id:form,client_request_key:key(),bot_proof:'synthetic',intake:{display_name:'Synthetic applicant',phone,consents:[]}};await db.query("select set_config('request.jwt.claim.role','service_role',false)");const result=(await db.query('select api_v1.public_application_submit_v1($1,null,null,$2,$3) result',[request,Array.from({length:64},key),{ip_hash:createHash('sha256').update(request.client_request_key).digest('hex'),target_hash:createHash('sha256').update(request.intake.phone).digest('hex'),phase:'submit',bot_verified:true}])).rows[0].result;if(expectedError){assert.equal(result.ok,false,JSON.stringify(result));assert.equal(result.error.code,expectedError);return null;}assert.equal(result.ok,true,JSON.stringify(result));return (await db.query('select id from core.public_applications where request_reference=$1',[request.client_request_key])).rows[0].id;};
   const list=(c=null,u=owner,k={})=>api('management_state_get_v1',{center_id:c,operation:'public_application_review_v1',selector:{operation:'public_application_review_v1',key:k},page:{}},u);
   const application=await submit();
   const general=(await list()).items.find(x=>x.entity.id===application);assert.equal(general.current.values.center_id,null);assert.equal(general.current.values.phone_matches.length,2);assert.equal(general.current.values.phone_matches_truncated,false);
@@ -80,7 +80,12 @@ test('P06 explicit review preserves shared-phone identity, routing scope and rec
   assert.equal(Number((await db.query('select count(*) n from core.people where org_id=$1',[org])).rows[0].n),beforePeople+1);
   await t.test('two organization managers serialize routing and transfer removes the previous center visibility',async()=>{
    const counts=async()=>(await db.query('select (select count(*)::int from core.public_applications where org_id=$1) applications,(select count(*)::int from core.people where org_id=$1) people,(select count(*)::int from core.leads where org_id=$1) leads',[org])).rows[0];
-   const before=await counts(),racing=await submit();
+   // The earlier shared-contact cases fill its real per-target intake budget.
+   // Keep that denial covered; routing concurrency uses an independent applicant.
+   const before=await counts();
+   await submit('+905550000002','RATE_LIMITED');
+   assert.deepEqual(await counts(),before);
+   const racing=await submit('+905550000003');
    await api('org_manager_assign_v1',{center_id:null,person_id:cmPerson});
    try{
     const attempts=await Promise.all([owner,cmUser].map((user,index)=>call(user,'public_application_review_v1',{org_id:org,center_id:null,application_id:racing,action:'assign_center',target_center_id:index===0?center:second,expected_version:1},key())));
