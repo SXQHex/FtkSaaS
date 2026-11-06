@@ -227,3 +227,5 @@ assert next(Path('supabase/migrations').glob('*_p15_p16_reminders_automation.sql
 assert next(Path('supabase/migrations').glob('*_people_registry_scaling.sql')).read_bytes()==Path('database/people-registry-scaling.sql').read_bytes(),'People scope source drift'
 
 assert next(Path('supabase/migrations').glob('*_upper_plan_subscriber_projections.sql')).read_bytes()==Path('database/upper-plan-subscriber-projections.sql').read_bytes(),'Upper-plan subscriber source drift'
+
+assert next(Path('supabase/migrations').glob('*_action_management_discovery.sql')).read_bytes()==Path('database/action-management-discovery.sql').read_bytes(),'Action management source drift'

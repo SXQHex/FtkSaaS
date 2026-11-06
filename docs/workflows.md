@@ -123,6 +123,8 @@ Freeze bitişi yerel gün sınırlarını ve fiilen kullanılan dondurma süresi
 
 Özel ders talebi ve alternatif yanıtı yer/hak tutmaz; alternatif kabulü merkez onayı değildir. Aynı açık talep çoğaltılmaz. Onay tam eşleşen uygun özel seansı seçer veya mevcut seans/rezervasyon yazarlarıyla atomik oluşturur. Süre dışı yönetici işlemi açık `window_exception: true`, boş olmayan gerekçe, `manager_exception` politikası ve canlı CM yetkisi ister; rol tek başına bypass değildir.
 
+**Kapasite eylemi keşfi:** `management_state_get_v1(operation:reservation_capacity_override_v1,selector:{operation:reservation_capacity_override_v1,key:{person_id,session_id,source_sale_id?}})` açık merkezde mevcut writer'ın canlı CM/izinli personel/atanmış eğitmen yetkisini denetler. Yanıt tek gerçek seans entity/sürümü ve aynı typed anahtarları içerir; miktar, mode veya gerekçe uydurmaz. Opsiyonel satış aynı org ve canonical kişiye ait olmalıdır; Business'ta başka merkezdeki satış sırf merkezi farklı diye reddedilmez. Kaynak/ürün uygunluğu, fiziksel oda ve ders kapasitesi, hak/borç/belge kapıları gerçek komutta yeniden uygulanır. Reader başarısı rezervasyon garantisi değildir; okuyucu hiçbir rezervasyon/hak/preview/receipt yazmaz.
+
 ## WF07
 
 **Amaç/aktör:** Yetkili operatör gerçek katılımı kaydeder ve yoklamayı kapatır.
@@ -142,6 +144,18 @@ Taslak yoklama hak tüketmez. `attendance_start_v1` gerçek başlangıç snapsho
 **Hata/kurtarma:** Para birimleri birleştirilmez; tutar string/minor-unit sözleşmesi kullanılır. Düzeltmedeki yönlü fark yeni toplam sayılmaz. Kullanılmış alacak silinemez; başarısız iş otomatik yeni anahtarla denenmez. **Sonuç/yan etki:** Borç, brüt/net tahsilat ve öğrenci alacağı ayrı gösterilir; satış, borç indirimi ve nakit çıkışı eşitlenmez. Düzeltme bağlı hareket üretir, eski finans geçmişini silmez. Başarıda bakiye ve ilgili geçmiş/satış/hak okunur.
 
 Kalan borç `max(0, net − gross_paid + claimed)` üzerinden okunur; alacağa aktarılmış ödeme ikinci kez borcu kapatmaz. `CashCorrection.amount_minor` yönlü farktır, yeni toplam değildir. Ters tahsisler SignedMoney, bakiye toplamları nonnegative Money'dir. Satış iadesinin aggregate sürümü gerçek satış kimliğine aittir; yeni refund fact ayrı referanstır. Tahsilat yöntemlerinin typed seçimi ve zorunlu referansı [ayar tüketicisinde](settings.md) tanımlıdır.
+
+**Finans eylemi keşfi:** Aşağıdaki mevcut `management_state_get_v1` selector'ları açık org/center ile kullanılır. `operation` ve `selector.operation` aynı olmalıdır. Reader, gerçek writer'ın canlı yetki/plan/abonelik kontrolünü yeniden kullanır; finans okumasından veya rol etiketinden ek izin türetilmez. Kaynak kişi/merkez/alias ayrımı korunur; yalnız rolü bulunan yetkili aktörün kendi kişisi için mevcut self istisnası sürer.
+
+| operation | selector.key | Mevcut yetki | Dönen kaynak |
+|---|---|---|---|
+| collection_record_v1 | person_id | finance.collect | people |
+| student_credit_refund_v1 | person_id | finance.refund | people |
+| student_credit_offset_v1 | person_id, debt_id | finance.collect | debts |
+| debt_adjust_v1 | debt_id | finance.refund | debts |
+| sale_refund_preview_v1 | sale_id | finance.refund | sales |
+
+Yetkili sonuç tek `items` satırında gerçek entity/state/version ve `current:{operation,values:selector.key}` döndürür. `exists` kaynak varlığını belirtir; geçmiş tahsilatın varlığı veya komut başarısı değildir. İlk tahsilattan ve ilk iade/mahsuptan önce de keşif yapılır. Tutar/para birimi/tarih uydurulmaz; bakiye veya hukuki onay üretilmez. Okuma preview, receipt, audit veya finans hareketi yazmaz. Komut uygun bakiye, kaynak sürümü, belge, iptal/iade ve diğer domain koşullarını işlem anında tekrar denetler. Yetki kaybı FORBIDDEN, yabancı/kapsam dışı kaynak NOT_FOUND, eksik merkez veya uyumsuz sayfalama VALIDATION_FAILED olur. Kayıp plan/abonelik mevcut writer ret kodlarını korur. Eski read-only yanıtı kullanmak yazma yetkisi sağlamaz.
 
 ## WF09
 

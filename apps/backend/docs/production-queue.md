@@ -2,7 +2,7 @@
 
 Bu dosya yalnız **sıra, bağımlı teslim paketleri ve kontrol noktalarının** sahibidir. Görev içeriği/kabul/dosya alanı [remaining-work.md](remaining-work.md), gerçek kaynak/test/hosted durum [00 devir](00-FtkSaaS-yeni-sohbet-devir.md) sahibindedir. Frontend’in aktif modülü ve sırası değiştirilmez. İkinci roadmap/todo açılmaz.
 
-**Aktif paket:** Kullanıcı A03–S15 backend açıklarının kapatılmasını istedi. S05 üst-plan Abone No projeksiyonları kaynakta tamamlanıyor; S11 backend hosted kabulü mevcut gerçek B04 kanıtıyla kapalı. Sonraki bağımlı kontroller S05 kaynak/native/main/development → A03 özellik/kanıt uzlaştırması ve S10 tüketici envanteri → S12/S13 gerçek hosted dosya/belge → S08/S14/S15 gerçek tüketici sınırlarıdır. Tamamlanmış P14–P16 ve B01–B04 hatları yeniden kurulmaz. Görev ayrıntısı [remaining-work](remaining-work.md), aşama ve kanıt [devir](00-FtkSaaS-yeni-sohbet-devir.md#a03s15-aktif-backend-kabul-paketi) sahibindedir; frontend kabulü kendi alanında kalır.
+**Aktif paket:** S05 backend PR231 aday/main/development teslimi ve S11 hosted kabulü kapalıdır. Kullanıcı main'deki frontend taleplerini önce istedi; aktif kaynak paketi [S10.1](remaining-work.md#s10) XREQ-023/024 ve aynı management okuyucusuna bağlı finans eylemleridir. Sıra: altı eylem selector'ının native/aday/main/development kabulü → A03 özellik/kanıt uzlaştırması ve S10 kalan tüketici envanteri → S12/S13 gerçek hosted dosya/belge → S08/S14/S15 gerçek tüketici sınırları. Tamamlanmış P14–P16/B01–B04 hatları yeniden kurulmaz. Aşama ve kanıt [devir](00-FtkSaaS-yeni-sohbet-devir.md#eylem-yetkisi-keşfi--xreq-023024), ölçütler [remaining-work](remaining-work.md) sahibindedir; frontend adına kabul verilmez.
 
 ## Uygulama sırası
 

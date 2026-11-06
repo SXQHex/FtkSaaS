@@ -326,12 +326,12 @@
 | sale_renew_preview_v1 | preview | preview_dependencies | entitlements_get_v1 | implemented |  |
 | sale_renew_apply_v1 | apply | preview_dependencies | entitlements_get_v1 | implemented | sales.new_sale, rights.issue, deficits.settle_past_then_future, debts, new_priority_reservations_if_selected |
 | finance_get_v1 | read | none | None | contract_only |  |
-| collection_record_v1 | command | append_or_current_scope_lock | management_state_get_v1 | contract_only | cash_movements, debt_allocations, student_credit_excess |
+| collection_record_v1 | command | append_or_current_scope_lock | management_state_get_v1 | implemented | cash_movements, debt_allocations, student_credit_excess |
 | collection_correct_preview_v1 | preview | preview_dependencies | finance_get_v1 | implemented |  |
 | collection_correct_apply_v1 | correction | preview_dependencies | collection_correct_preview_v1 | implemented | cash_movements.linked_correction, debt_allocations.reverse_adjust, student_credit_if_overpaid |
-| student_credit_refund_v1 | command | append_or_current_scope_lock | management_state_get_v1 | contract_only | student_credit_movements, cash_refund_movement |
-| student_credit_offset_v1 | command | row_version | management_state_get_v1 | contract_only | student_credit_movements, debt_allocations |
-| debt_adjust_v1 | command | append_or_current_scope_lock | management_state_get_v1 | contract_only | debt_adjustments, student_credit_if_accepted_policy |
+| student_credit_refund_v1 | command | append_or_current_scope_lock | management_state_get_v1 | implemented | student_credit_movements, cash_refund_movement |
+| student_credit_offset_v1 | command | row_version | management_state_get_v1 | implemented | student_credit_movements, debt_allocations |
+| debt_adjust_v1 | command | append_or_current_scope_lock | management_state_get_v1 | implemented | debt_adjustments, student_credit_if_accepted_policy |
 | instructor_agreement_publish_v1 | command | create_absent_update_requires_version | instructor_agreements_list_v1 | implemented | instructor_agreements.new_immutable_version, future_unstarted_assignment_selection |
 | earnings_list_v1 | read | none | None | operational_development_limited |  |
 | instructor_payment_record_v1 | command | append_or_current_scope_lock | earnings_list_v1 | implemented | instructor_payments, earning_allocations.partial |
