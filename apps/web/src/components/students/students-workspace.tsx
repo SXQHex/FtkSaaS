@@ -39,6 +39,7 @@ import {
 import { PersonAccess } from "./person-access";
 import { accessActions, type AccessActions } from "../../lib/person-access";
 import { PersonSales } from "../products/person-sales";
+import { SalesRecovery } from "../products/sales-recovery";
 import { PersonEntitlements } from "../products/person-entitlements";
 import { readEntitlements } from "../../lib/products";
 import { PersonDisciplines } from "./person-disciplines";
@@ -245,6 +246,7 @@ export function StudentDirectory({
   }
   return (
     <section className="min-w-0 space-y-5 wrap-anywhere" aria-label={t("directory")}>
+      {entitlements && !selected && <SalesRecovery scope={scope} onSaved={refresh} />}
       <form onSubmit={submit} className="flex flex-wrap items-end gap-3">
         <div className="w-full min-w-0 space-y-2 sm:flex-1">
           <Label htmlFor="student-search">{t("search")}</Label>
@@ -590,6 +592,9 @@ function StudentDetail({
       )}
       {rightsPerson && entitlements && (
         <PersonSales scope={scope} personId={rightsPerson.id} onSaved={refreshPersonAndList} />
+      )}
+      {!rightsPerson && entitlements && (
+        <SalesRecovery scope={scope} personId={personId} onSaved={refreshPersonAndList} />
       )}
       <PersonEdit
         key={`${personId}:${person?.version ?? "loading"}`}
