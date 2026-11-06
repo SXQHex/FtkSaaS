@@ -1,3 +1,4 @@
+import './reminder-contract-unit.mjs';
 import './transactional-email-unit.mjs';
 import './email-events-unit.mjs';
 import './resend-webhook-unit.mjs';

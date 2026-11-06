@@ -675,7 +675,7 @@
     },
     {
       "path": "apps/backend/tests/registry.test.mjs",
-      "sha256": "574fe5686ad85f51ae0bb6a7f20cc590aaa479ddc83433ac0ddd0e49428a0104",
+      "sha256": "cd8afd71d344ebd3644767387f20a0a116f5790e44dfaaab9af90c3b7c834057",
       "shared": [
         [
           7,
@@ -700,6 +700,10 @@
         [
           141,
           141
+        ],
+        [
+          152,
+          152
         ]
       ],
       "parts": [
@@ -722,7 +726,7 @@
         {
           "line": 2,
           "path": "apps/backend/tests/transactional-email-acceptance.mjs",
-          "sha256": "9ba1437ef1a567409d81a923df1d87a04687d467f446927ef8ed2af231085066"
+          "sha256": "56443df8d603e8bef87729768cd4f3ca93f55a9b6a3ca12640dbf9ef2447be32"
         },
         {
           "line": 3,
@@ -742,7 +746,7 @@
         {
           "line": 6,
           "path": "apps/backend/tests/frontend-settings-acceptance.mjs",
-          "sha256": "3cdaf5dca3a267da74a9329c89db67a83c87029536644ad30e0f4301ee563a34",
+          "sha256": "7dba73584bd690d94ffe8e24323095785dce3f440b7a6d1dba8c405acc382bcd",
           "shared": [
             [
               1,
@@ -757,12 +761,12 @@
               141
             ],
             [
-              170,
-              171
+              174,
+              175
             ],
             [
-              212,
-              213
+              216,
+              217
             ]
           ],
           "parts": [
@@ -784,7 +788,7 @@
                 ],
                 [
                   142,
-                  169
+                  173
                 ]
               ]
             },
@@ -792,8 +796,8 @@
               "id": "settings-startup-context",
               "ranges": [
                 [
-                  172,
-                  211
+                  176,
+                  215
                 ]
               ]
             },
@@ -801,8 +805,8 @@
               "id": "settings-brand-colors",
               "ranges": [
                 [
-                  214,
-                  250
+                  218,
+                  254
                 ]
               ]
             }
@@ -1030,6 +1034,16 @@
           "line": 151,
           "path": "apps/backend/tests/crm-import-authority-acceptance.mjs",
           "sha256": "20a0ab62a84af439b432a4cc6318484771f9c915ed136c0c9885124e8d1c3424"
+        },
+        {
+          "line": 153,
+          "path": "apps/backend/tests/reminder-scheduling-acceptance.mjs",
+          "sha256": "a18ba01ffbbd9d06d9a7cf44e68150c39eb599170212f757eaa9ffdbb83e6e29"
+        },
+        {
+          "line": 154,
+          "path": "apps/backend/tests/automation-results-acceptance.mjs",
+          "sha256": "dfb129f39201693fb72dc7dfaa1f1bd790c09cb81a254449e8f90f0b5b6faad8"
         }
       ],
       "estimated_seconds": 1356.24

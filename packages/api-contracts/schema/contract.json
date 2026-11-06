@@ -6071,24 +6071,10 @@
           "$ref": "#/$defs/Instant"
         },
         "email_preference": {
-          "type": "object",
-          "properties": {
-            "enabled": {
-              "type": "boolean"
-            },
-            "version": {
-              "$ref": "#/$defs/PositiveInt"
-            },
-            "available": {
-              "type": "boolean"
-            }
-          },
-          "required": [
-            "enabled",
-            "version",
-            "available"
-          ],
-          "additionalProperties": false
+          "$ref": "#/$defs/NotificationEmailPreferenceView"
+        },
+        "reminder_email_preference": {
+          "$ref": "#/$defs/NotificationEmailPreferenceView"
         }
       },
       "required": [
@@ -13967,6 +13953,22 @@
         },
         "scope": {
           "$ref": "#/$defs/ConfigurationScope"
+        },
+        "retry_job": {
+          "type": "object",
+          "properties": {
+            "id": {
+              "$ref": "#/$defs/FtkUuid"
+            },
+            "version": {
+              "$ref": "#/$defs/PositiveInt"
+            }
+          },
+          "required": [
+            "id",
+            "version"
+          ],
+          "additionalProperties": false
         }
       },
       "required": [
@@ -13978,7 +13980,30 @@
         "scope"
       ],
       "additionalProperties": false,
-      "x-invariant": "Existing target needs expected_version; create rejects expected_version. No silent upsert."
+      "x-invariant": "Existing target needs expected_version; create rejects expected_version. No silent upsert.",
+      "allOf": [
+        {
+          "if": {
+            "required": [
+              "retry_job"
+            ]
+          },
+          "then": {
+            "required": [
+              "automation_id",
+              "expected_version"
+            ],
+            "properties": {
+              "automation_id": {
+                "$ref": "#/$defs/FtkUuid"
+              },
+              "expected_version": {
+                "$ref": "#/$defs/PositiveInt"
+              }
+            }
+          }
+        }
+      ]
     },
     "Success_automation_save": {
       "type": "object",
@@ -34344,6 +34369,13 @@
             },
             "scope": {
               "$ref": "#/$defs/ConfigurationScope"
+            },
+            "recent_jobs": {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/AutomationJobView"
+              },
+              "maxItems": 20
             }
           },
           "required": [],
@@ -43574,6 +43606,41 @@
               "type": "null"
             }
           ]
+        },
+        "quiet_hours_enabled": {
+          "type": "boolean"
+        },
+        "quiet_hours_weekdays": {
+          "type": "array",
+          "items": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 7
+          },
+          "maxItems": 7,
+          "uniqueItems": true
+        },
+        "quiet_hours_start": {
+          "anyOf": [
+            {
+              "type": "string",
+              "pattern": "^([01][0-9]|2[0-3]):[0-5][0-9]$"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "quiet_hours_end": {
+          "anyOf": [
+            {
+              "type": "string",
+              "pattern": "^([01][0-9]|2[0-3]):[0-5][0-9]$"
+            },
+            {
+              "type": "null"
+            }
+          ]
         }
       },
       "required": [],
@@ -43835,6 +43902,15 @@
             ],
             "additionalProperties": false
           }
+        },
+        "lesson_reminders_enabled": {
+          "type": "boolean"
+        },
+        "package_reminders_enabled": {
+          "type": "boolean"
+        },
+        "payment_reminders_enabled": {
+          "type": "boolean"
         }
       },
       "required": [],
@@ -44406,6 +44482,39 @@
             ],
             "additionalProperties": false
           }
+        },
+        "lesson_reminders_enabled": {
+          "type": "boolean"
+        },
+        "lesson_reminder_hours": {
+          "type": "integer",
+          "enum": [
+            1,
+            3,
+            24
+          ]
+        },
+        "package_reminders_enabled": {
+          "type": "boolean"
+        },
+        "package_reminder_days": {
+          "type": "integer",
+          "enum": [
+            3,
+            7,
+            14
+          ]
+        },
+        "payment_reminders_enabled": {
+          "type": "boolean"
+        },
+        "payment_reminder_days": {
+          "type": "integer",
+          "enum": [
+            1,
+            3,
+            7
+          ]
         }
       },
       "required": [],
@@ -45042,6 +45151,42 @@
               "type": "null"
             }
           ]
+        },
+        "lesson_reminders_enabled": {
+          "type": "boolean"
+        },
+        "lesson_reminder_hours": {
+          "type": "integer",
+          "enum": [
+            1,
+            3,
+            24
+          ]
+        },
+        "package_reminders_enabled": {
+          "type": "boolean"
+        },
+        "package_reminder_days": {
+          "type": "integer",
+          "enum": [
+            3,
+            7,
+            14
+          ]
+        },
+        "payment_reminders_enabled": {
+          "type": "boolean"
+        },
+        "payment_reminder_days": {
+          "type": "integer",
+          "enum": [
+            1,
+            3,
+            7
+          ]
+        },
+        "reminder_center_overrides_enabled": {
+          "type": "boolean"
         }
       },
       "required": [],
@@ -45091,130 +45236,14 @@
     "SettingsView": {
       "type": "object",
       "properties": {
-        "scope": {
-          "$ref": "#/$defs/SettingsScope"
-        },
-        "version": {
-          "$ref": "#/$defs/SettingsVersion"
-        },
-        "values": {
-          "anyOf": [
-            {
-              "$ref": "#/$defs/UserSettingsValues"
-            },
-            {
-              "$ref": "#/$defs/MemberSettingsValues"
-            },
-            {
-              "$ref": "#/$defs/CenterSettingsValues"
-            },
-            {
-              "$ref": "#/$defs/OrganizationSettingsValues"
-            },
-            {
-              "$ref": "#/$defs/PlatformSettingsValues"
-            }
-          ]
-        },
-        "as_of": {
-          "$ref": "#/$defs/Instant"
-        },
-        "overridden_fields": {
-          "type": "array",
-          "items": {
-            "type": "string",
-            "enum": [
-              "accent_color",
-              "ad_measurement",
-              "ad_personalization",
-              "address",
-              "application_name",
-              "availability_templates",
-              "billing_address",
-              "billing_email",
-              "billing_name",
-              "calendar_view",
-              "contact_email",
-              "contact_phone",
-              "contrast",
-              "date_format",
-              "description",
-              "email_visible",
-              "font_package_id",
-              "font_scale",
-              "history_recommendations",
-              "honorific",
-              "import_templates",
-              "in_app_marketing",
-              "in_app_reminders",
-              "interest_center_ids",
-              "interest_discipline_ids",
-              "language",
-              "maintenance_message",
-              "marketing_in_app",
-              "motion",
-              "number_format",
-              "optional_analytics",
-              "package_templates",
-              "phone_visible",
-              "photo_visible",
-              "primary_color",
-              "profile_visible",
-              "program_duration_minutes",
-              "public_fields",
-              "public_hours",
-              "public_profile_enabled",
-              "remember_context",
-              "report_templates",
-              "secondary_color",
-              "show_weekends",
-              "startup_context",
-              "support_email",
-              "support_url",
-              "theme",
-              "theme_package_id",
-              "time_format",
-              "timezone_mode",
-              "timezone_name",
-              "week_start"
-            ]
-          },
-          "uniqueItems": true,
-          "maxItems": 50
-        },
-        "program_duration_source": {
-          "type": "object",
-          "properties": {
-            "kind": {
-              "type": "string",
-              "enum": [
-                "system_default",
-                "organization_copy",
-                "center_local"
-              ]
-            },
-            "organization_version": {
-              "$ref": "#/$defs/SettingsVersion"
-            }
-          },
-          "required": [
-            "kind"
-          ],
-          "additionalProperties": false
-        },
-        "logo": {
-          "anyOf": [
-            {
-              "$ref": "#/$defs/SettingsMediaAsset"
-            },
-            {
-              "type": "null"
-            }
-          ]
-        },
-        "preparation_sources": {
-          "$ref": "#/$defs/PreparationSources"
-        }
+        "scope": {},
+        "version": {},
+        "values": {},
+        "as_of": {},
+        "overridden_fields": {},
+        "program_duration_source": {},
+        "logo": {},
+        "preparation_sources": {}
       },
       "required": [
         "scope",
@@ -45264,7 +45293,11 @@
                   "optional_analytics",
                   "timezone_name",
                   "font_scale",
-                  "startup_context"
+                  "startup_context",
+                  "quiet_hours_enabled",
+                  "quiet_hours_weekdays",
+                  "quiet_hours_start",
+                  "quiet_hours_end"
                 ]
               },
               "uniqueItems": true,
@@ -45310,7 +45343,10 @@
                   "in_app_reminders",
                   "in_app_marketing",
                   "report_templates",
-                  "import_templates"
+                  "import_templates",
+                  "lesson_reminders_enabled",
+                  "package_reminders_enabled",
+                  "payment_reminders_enabled"
                 ]
               },
               "uniqueItems": true,
@@ -45357,7 +45393,13 @@
                   "public_fields",
                   "public_hours",
                   "availability_templates",
-                  "package_templates"
+                  "package_templates",
+                  "lesson_reminders_enabled",
+                  "lesson_reminder_hours",
+                  "package_reminders_enabled",
+                  "package_reminder_days",
+                  "payment_reminders_enabled",
+                  "payment_reminder_days"
                 ]
               },
               "uniqueItems": true,
@@ -45435,7 +45477,14 @@
                   "public_profile_enabled",
                   "report_templates",
                   "secondary_color",
-                  "theme_package_id"
+                  "theme_package_id",
+                  "lesson_reminders_enabled",
+                  "lesson_reminder_hours",
+                  "package_reminders_enabled",
+                  "package_reminder_days",
+                  "payment_reminders_enabled",
+                  "payment_reminder_days",
+                  "reminder_center_overrides_enabled"
                 ]
               },
               "uniqueItems": true,
@@ -45505,62 +45554,7 @@
     "SettingsFieldKeys": {
       "type": "array",
       "items": {
-        "type": "string",
-        "enum": [
-          "accent_color",
-          "ad_measurement",
-          "ad_personalization",
-          "address",
-          "application_name",
-          "availability_templates",
-          "billing_address",
-          "billing_email",
-          "billing_name",
-          "calendar_view",
-          "contact_email",
-          "contact_phone",
-          "contrast",
-          "date_format",
-          "description",
-          "email_visible",
-          "font_package_id",
-          "font_scale",
-          "history_recommendations",
-          "honorific",
-          "import_templates",
-          "in_app_marketing",
-          "in_app_reminders",
-          "interest_center_ids",
-          "interest_discipline_ids",
-          "language",
-          "maintenance_message",
-          "marketing_in_app",
-          "motion",
-          "number_format",
-          "optional_analytics",
-          "package_templates",
-          "phone_visible",
-          "photo_visible",
-          "primary_color",
-          "profile_visible",
-          "program_duration_minutes",
-          "public_fields",
-          "public_hours",
-          "public_profile_enabled",
-          "remember_context",
-          "report_templates",
-          "secondary_color",
-          "show_weekends",
-          "startup_context",
-          "support_email",
-          "support_url",
-          "theme",
-          "theme_package_id",
-          "time_format",
-          "timezone_mode",
-          "timezone_name",
-          "week_start"
-        ]
+        "$ref": "#/$defs/SettingsFieldKey"
       },
       "minItems": 1,
       "maxItems": 50,
@@ -45751,62 +45745,7 @@
       "type": "object",
       "properties": {
         "key": {
-          "type": "string",
-          "enum": [
-            "accent_color",
-            "ad_measurement",
-            "ad_personalization",
-            "address",
-            "application_name",
-            "availability_templates",
-            "billing_address",
-            "billing_email",
-            "billing_name",
-            "calendar_view",
-            "contact_email",
-            "contact_phone",
-            "contrast",
-            "date_format",
-            "description",
-            "email_visible",
-            "font_package_id",
-            "font_scale",
-            "history_recommendations",
-            "honorific",
-            "import_templates",
-            "in_app_marketing",
-            "in_app_reminders",
-            "interest_center_ids",
-            "interest_discipline_ids",
-            "language",
-            "maintenance_message",
-            "marketing_in_app",
-            "motion",
-            "number_format",
-            "optional_analytics",
-            "package_templates",
-            "phone_visible",
-            "photo_visible",
-            "primary_color",
-            "profile_visible",
-            "program_duration_minutes",
-            "public_fields",
-            "public_hours",
-            "public_profile_enabled",
-            "remember_context",
-            "report_templates",
-            "secondary_color",
-            "show_weekends",
-            "startup_context",
-            "support_email",
-            "support_url",
-            "theme",
-            "theme_package_id",
-            "time_format",
-            "timezone_mode",
-            "timezone_name",
-            "week_start"
-          ]
+          "$ref": "#/$defs/SettingsFieldKey"
         },
         "group": {
           "type": "string",
@@ -45823,7 +45762,9 @@
             "p06_import_prepare",
             "public_profile",
             "domain_preparation_resolve",
-            "schedule_calendar_preferences"
+            "schedule_calendar_preferences",
+            "reminder_settings",
+            "reminder_quiet_until"
           ]
         },
         "writable": {
@@ -45841,60 +45782,15 @@
     "SettingsCatalog": {
       "type": "object",
       "properties": {
-        "scope": {
-          "$ref": "#/$defs/SettingsScope"
-        },
-        "catalog_version": {
-          "const": 10
-        },
-        "fields": {
-          "type": "array",
-          "items": {
-            "$ref": "#/$defs/SettingsFieldDescriptor"
-          }
-        },
-        "defaults": {
-          "anyOf": [
-            {
-              "$ref": "#/$defs/UserSettingsValues"
-            },
-            {
-              "$ref": "#/$defs/MemberSettingsValues"
-            },
-            {
-              "$ref": "#/$defs/CenterSettingsValues"
-            },
-            {
-              "$ref": "#/$defs/OrganizationSettingsValues"
-            },
-            {
-              "$ref": "#/$defs/PlatformSettingsValues"
-            }
-          ]
-        },
-        "brand_packages": {
-          "type": "array",
-          "maxItems": 0,
-          "items": {
-            "type": "null"
-          }
-        },
-        "limitations": {
-          "type": "array",
-          "items": {
-            "type": "string",
-            "maxLength": 400
-          }
-        },
-        "work_templates": {
-          "$ref": "#/$defs/WorkTemplates"
-        },
-        "preparation_templates": {
-          "$ref": "#/$defs/PreparationTemplates"
-        },
-        "notification_delivery": {
-          "$ref": "#/$defs/NotificationDeliverySupport"
-        }
+        "scope": {},
+        "catalog_version": {},
+        "fields": {},
+        "defaults": {},
+        "brand_packages": {},
+        "limitations": {},
+        "work_templates": {},
+        "preparation_templates": {},
+        "notification_delivery": {}
       },
       "required": [
         "scope",
@@ -45913,7 +45809,7 @@
               "const": "user"
             },
             "catalog_version": {
-              "const": 10
+              "const": 11
             },
             "fields": {
               "type": "array",
@@ -45965,7 +45861,7 @@
               "const": "member"
             },
             "catalog_version": {
-              "const": 10
+              "const": 11
             },
             "fields": {
               "type": "array",
@@ -46017,7 +45913,7 @@
               "const": "center"
             },
             "catalog_version": {
-              "const": 10
+              "const": 11
             },
             "fields": {
               "type": "array",
@@ -46069,7 +45965,7 @@
               "const": "organization"
             },
             "catalog_version": {
-              "const": 10
+              "const": 11
             },
             "fields": {
               "type": "array",
@@ -46121,7 +46017,7 @@
               "const": "platform"
             },
             "catalog_version": {
-              "const": 10
+              "const": 11
             },
             "fields": {
               "type": "array",
@@ -46171,24 +46067,12 @@
     "Request_settings_catalog_get": {
       "type": "object",
       "properties": {
-        "client_api_version": {
-          "const": 1
-        },
-        "request_id": {
-          "$ref": "#/$defs/FtkUuid"
-        },
-        "scope": {
-          "$ref": "#/$defs/SettingsScope"
-        },
-        "org_id": {
-          "$ref": "#/$defs/FtkUuid"
-        },
-        "center_id": {
-          "$ref": "#/$defs/FtkUuid"
-        },
-        "template_center_id": {
-          "$ref": "#/$defs/FtkUuid"
-        }
+        "client_api_version": {},
+        "request_id": {},
+        "scope": {},
+        "org_id": {},
+        "center_id": {},
+        "template_center_id": {}
       },
       "required": [
         "client_api_version",
@@ -46341,21 +46225,11 @@
     "Request_settings_get": {
       "type": "object",
       "properties": {
-        "client_api_version": {
-          "const": 1
-        },
-        "request_id": {
-          "$ref": "#/$defs/FtkUuid"
-        },
-        "scope": {
-          "$ref": "#/$defs/SettingsScope"
-        },
-        "org_id": {
-          "$ref": "#/$defs/FtkUuid"
-        },
-        "center_id": {
-          "$ref": "#/$defs/FtkUuid"
-        }
+        "client_api_version": {},
+        "request_id": {},
+        "scope": {},
+        "org_id": {},
+        "center_id": {}
       },
       "required": [
         "client_api_version",
@@ -46505,60 +46379,16 @@
     "Request_settings_update": {
       "type": "object",
       "properties": {
-        "client_api_version": {
-          "const": 1
-        },
-        "request_id": {
-          "$ref": "#/$defs/FtkUuid"
-        },
-        "scope": {
-          "$ref": "#/$defs/SettingsScope"
-        },
-        "org_id": {
-          "$ref": "#/$defs/FtkUuid"
-        },
-        "center_id": {
-          "$ref": "#/$defs/FtkUuid"
-        },
-        "operation_key": {
-          "$ref": "#/$defs/FtkUuid"
-        },
-        "expected_version": {
-          "$ref": "#/$defs/SettingsVersion"
-        },
-        "reason": {
-          "type": "string",
-          "maxLength": 1000
-        },
-        "patch": {
-          "anyOf": [
-            {
-              "$ref": "#/$defs/UserSettingsValues"
-            },
-            {
-              "$ref": "#/$defs/MemberSettingsValues"
-            },
-            {
-              "$ref": "#/$defs/CenterSettingsValues"
-            },
-            {
-              "$ref": "#/$defs/OrganizationSettingsValues"
-            },
-            {
-              "$ref": "#/$defs/PlatformSettingsValues"
-            }
-          ]
-        },
-        "logo_image": {
-          "anyOf": [
-            {
-              "$ref": "#/$defs/SettingsImageUpload"
-            },
-            {
-              "type": "null"
-            }
-          ]
-        }
+        "client_api_version": {},
+        "request_id": {},
+        "scope": {},
+        "org_id": {},
+        "center_id": {},
+        "operation_key": {},
+        "expected_version": {},
+        "reason": {},
+        "patch": {},
+        "logo_image": {}
       },
       "required": [
         "client_api_version",
@@ -46815,24 +46645,12 @@
     "Request_settings_reset_preview": {
       "type": "object",
       "properties": {
-        "client_api_version": {
-          "const": 1
-        },
-        "request_id": {
-          "$ref": "#/$defs/FtkUuid"
-        },
-        "scope": {
-          "$ref": "#/$defs/SettingsScope"
-        },
-        "org_id": {
-          "$ref": "#/$defs/FtkUuid"
-        },
-        "center_id": {
-          "$ref": "#/$defs/FtkUuid"
-        },
-        "fields": {
-          "$ref": "#/$defs/SettingsFieldKeys"
-        }
+        "client_api_version": {},
+        "request_id": {},
+        "scope": {},
+        "org_id": {},
+        "center_id": {},
+        "fields": {}
       },
       "required": [
         "client_api_version",
@@ -46857,29 +46675,7 @@
             "fields": {
               "type": "array",
               "items": {
-                "type": "string",
-                "enum": [
-                  "honorific",
-                  "language",
-                  "date_format",
-                  "time_format",
-                  "number_format",
-                  "week_start",
-                  "timezone_mode",
-                  "theme",
-                  "contrast",
-                  "motion",
-                  "remember_context",
-                  "calendar_view",
-                  "show_weekends",
-                  "marketing_in_app",
-                  "ad_personalization",
-                  "ad_measurement",
-                  "optional_analytics",
-                  "timezone_name",
-                  "font_scale",
-                  "startup_context"
-                ]
+                "$ref": "#/$defs/UserSettingsFieldKey"
               },
               "minItems": 1,
               "maxItems": 50,
@@ -46912,20 +46708,7 @@
             "fields": {
               "type": "array",
               "items": {
-                "type": "string",
-                "enum": [
-                  "profile_visible",
-                  "photo_visible",
-                  "email_visible",
-                  "phone_visible",
-                  "history_recommendations",
-                  "interest_center_ids",
-                  "interest_discipline_ids",
-                  "in_app_reminders",
-                  "in_app_marketing",
-                  "report_templates",
-                  "import_templates"
-                ]
+                "$ref": "#/$defs/MemberSettingsFieldKey"
               },
               "minItems": 1,
               "maxItems": 50,
@@ -46962,21 +46745,7 @@
             "fields": {
               "type": "array",
               "items": {
-                "type": "string",
-                "enum": [
-                  "description",
-                  "address",
-                  "contact_phone",
-                  "contact_email",
-                  "program_duration_minutes",
-                  "report_templates",
-                  "import_templates",
-                  "public_profile_enabled",
-                  "public_fields",
-                  "public_hours",
-                  "availability_templates",
-                  "package_templates"
-                ]
+                "$ref": "#/$defs/CenterSettingsFieldKey"
               },
               "minItems": 1,
               "maxItems": 50,
@@ -47011,29 +46780,7 @@
             "fields": {
               "type": "array",
               "items": {
-                "type": "string",
-                "enum": [
-                  "accent_color",
-                  "address",
-                  "availability_templates",
-                  "billing_address",
-                  "billing_email",
-                  "billing_name",
-                  "contact_email",
-                  "contact_phone",
-                  "description",
-                  "font_package_id",
-                  "import_templates",
-                  "package_templates",
-                  "primary_color",
-                  "program_duration_minutes",
-                  "public_fields",
-                  "public_hours",
-                  "public_profile_enabled",
-                  "report_templates",
-                  "secondary_color",
-                  "theme_package_id"
-                ]
+                "$ref": "#/$defs/OrganizationSettingsFieldKey"
               },
               "minItems": 1,
               "maxItems": 50,
@@ -47064,13 +46811,7 @@
             "fields": {
               "type": "array",
               "items": {
-                "type": "string",
-                "enum": [
-                  "application_name",
-                  "support_email",
-                  "support_url",
-                  "maintenance_message"
-                ]
+                "$ref": "#/$defs/PlatformSettingsFieldKey"
               },
               "minItems": 1,
               "maxItems": 50,
@@ -47110,34 +46851,15 @@
     "Request_settings_reset_apply": {
       "type": "object",
       "properties": {
-        "client_api_version": {
-          "const": 1
-        },
-        "request_id": {
-          "$ref": "#/$defs/FtkUuid"
-        },
-        "scope": {
-          "$ref": "#/$defs/SettingsScope"
-        },
-        "org_id": {
-          "$ref": "#/$defs/FtkUuid"
-        },
-        "center_id": {
-          "$ref": "#/$defs/FtkUuid"
-        },
-        "operation_key": {
-          "$ref": "#/$defs/FtkUuid"
-        },
-        "expected_version": {
-          "$ref": "#/$defs/SettingsVersion"
-        },
-        "reason": {
-          "type": "string",
-          "maxLength": 1000
-        },
-        "preview": {
-          "$ref": "#/$defs/PreviewToken"
-        }
+        "client_api_version": {},
+        "request_id": {},
+        "scope": {},
+        "org_id": {},
+        "center_id": {},
+        "operation_key": {},
+        "expected_version": {},
+        "reason": {},
+        "preview": {}
       },
       "required": [
         "client_api_version",
@@ -47370,26 +47092,12 @@
     "Request_settings_history_get": {
       "type": "object",
       "properties": {
-        "client_api_version": {
-          "const": 1
-        },
-        "request_id": {
-          "$ref": "#/$defs/FtkUuid"
-        },
-        "scope": {
-          "$ref": "#/$defs/SettingsScope"
-        },
-        "org_id": {
-          "$ref": "#/$defs/FtkUuid"
-        },
-        "center_id": {
-          "$ref": "#/$defs/FtkUuid"
-        },
-        "cursor": {
-          "type": "string",
-          "maxLength": 2048,
-          "pattern": "^[a-f0-9]+$"
-        }
+        "client_api_version": {},
+        "request_id": {},
+        "scope": {},
+        "org_id": {},
+        "center_id": {},
+        "cursor": {}
       },
       "required": [
         "client_api_version",
@@ -52513,6 +52221,276 @@
           }
         }
       ]
+    },
+    "AutomationJobView": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/FtkUuid"
+        },
+        "version": {
+          "$ref": "#/$defs/PositiveInt"
+        },
+        "center_id": {
+          "$ref": "#/$defs/FtkUuid"
+        },
+        "person_id": {
+          "$ref": "#/$defs/FtkUuid"
+        },
+        "state": {
+          "$ref": "#/$defs/JobState"
+        },
+        "attempts": {
+          "$ref": "#/$defs/Count"
+        },
+        "next_attempt_at": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Instant"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "safe_error_code": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Text"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "result_reference": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/EntityRef"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "retry_available": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "id",
+        "version",
+        "center_id",
+        "person_id",
+        "state",
+        "attempts",
+        "next_attempt_at",
+        "safe_error_code",
+        "result_reference",
+        "retry_available"
+      ],
+      "additionalProperties": false
+    },
+    "UserSettingsFieldKey": {
+      "type": "string",
+      "enum": [
+        "honorific",
+        "language",
+        "date_format",
+        "time_format",
+        "number_format",
+        "week_start",
+        "timezone_mode",
+        "theme",
+        "contrast",
+        "motion",
+        "remember_context",
+        "calendar_view",
+        "show_weekends",
+        "marketing_in_app",
+        "ad_personalization",
+        "ad_measurement",
+        "optional_analytics",
+        "timezone_name",
+        "font_scale",
+        "startup_context",
+        "quiet_hours_enabled",
+        "quiet_hours_weekdays",
+        "quiet_hours_start",
+        "quiet_hours_end"
+      ]
+    },
+    "MemberSettingsFieldKey": {
+      "type": "string",
+      "enum": [
+        "profile_visible",
+        "photo_visible",
+        "email_visible",
+        "phone_visible",
+        "history_recommendations",
+        "interest_center_ids",
+        "interest_discipline_ids",
+        "in_app_reminders",
+        "in_app_marketing",
+        "report_templates",
+        "import_templates",
+        "lesson_reminders_enabled",
+        "package_reminders_enabled",
+        "payment_reminders_enabled"
+      ]
+    },
+    "CenterSettingsFieldKey": {
+      "type": "string",
+      "enum": [
+        "description",
+        "address",
+        "contact_phone",
+        "contact_email",
+        "program_duration_minutes",
+        "report_templates",
+        "import_templates",
+        "public_profile_enabled",
+        "public_fields",
+        "public_hours",
+        "availability_templates",
+        "package_templates",
+        "lesson_reminders_enabled",
+        "lesson_reminder_hours",
+        "package_reminders_enabled",
+        "package_reminder_days",
+        "payment_reminders_enabled",
+        "payment_reminder_days"
+      ]
+    },
+    "OrganizationSettingsFieldKey": {
+      "type": "string",
+      "enum": [
+        "accent_color",
+        "address",
+        "availability_templates",
+        "billing_address",
+        "billing_email",
+        "billing_name",
+        "contact_email",
+        "contact_phone",
+        "description",
+        "font_package_id",
+        "import_templates",
+        "package_templates",
+        "primary_color",
+        "program_duration_minutes",
+        "public_fields",
+        "public_hours",
+        "public_profile_enabled",
+        "report_templates",
+        "secondary_color",
+        "theme_package_id",
+        "lesson_reminders_enabled",
+        "lesson_reminder_hours",
+        "package_reminders_enabled",
+        "package_reminder_days",
+        "payment_reminders_enabled",
+        "payment_reminder_days",
+        "reminder_center_overrides_enabled"
+      ]
+    },
+    "PlatformSettingsFieldKey": {
+      "type": "string",
+      "enum": [
+        "application_name",
+        "support_email",
+        "support_url",
+        "maintenance_message"
+      ]
+    },
+    "SettingsFieldKey": {
+      "type": "string",
+      "enum": [
+        "accent_color",
+        "ad_measurement",
+        "ad_personalization",
+        "address",
+        "application_name",
+        "availability_templates",
+        "billing_address",
+        "billing_email",
+        "billing_name",
+        "calendar_view",
+        "contact_email",
+        "contact_phone",
+        "contrast",
+        "date_format",
+        "description",
+        "email_visible",
+        "font_package_id",
+        "font_scale",
+        "history_recommendations",
+        "honorific",
+        "import_templates",
+        "in_app_marketing",
+        "in_app_reminders",
+        "interest_center_ids",
+        "interest_discipline_ids",
+        "language",
+        "maintenance_message",
+        "marketing_in_app",
+        "motion",
+        "number_format",
+        "optional_analytics",
+        "package_templates",
+        "phone_visible",
+        "photo_visible",
+        "primary_color",
+        "profile_visible",
+        "program_duration_minutes",
+        "public_fields",
+        "public_hours",
+        "public_profile_enabled",
+        "remember_context",
+        "report_templates",
+        "secondary_color",
+        "show_weekends",
+        "startup_context",
+        "support_email",
+        "support_url",
+        "theme",
+        "theme_package_id",
+        "time_format",
+        "timezone_mode",
+        "timezone_name",
+        "week_start",
+        "lesson_reminders_enabled",
+        "lesson_reminder_hours",
+        "package_reminders_enabled",
+        "package_reminder_days",
+        "payment_reminders_enabled",
+        "payment_reminder_days",
+        "reminder_center_overrides_enabled",
+        "quiet_hours_enabled",
+        "quiet_hours_weekdays",
+        "quiet_hours_start",
+        "quiet_hours_end"
+      ]
+    },
+    "NotificationEmailPreferenceView": {
+      "type": "object",
+      "properties": {
+        "enabled": {
+          "type": "boolean"
+        },
+        "version": {
+          "$ref": "#/$defs/PositiveInt"
+        },
+        "available": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "enabled",
+        "version",
+        "available"
+      ],
+      "additionalProperties": false
     }
   },
   "x-contract": {
@@ -67762,6 +67740,7 @@
           "FORBIDDEN",
           "IDEMPOTENCY_PAYLOAD_MISMATCH",
           "INTEGRITY_VIOLATION",
+          "INVALID_STATE_TRANSITION",
           "NOT_FOUND",
           "OPERATION_IN_PROGRESS",
           "OPERATION_RESULT_EXPIRED",
@@ -67790,7 +67769,9 @@
           "receipt_audit_outbox_atomic_domain_commit",
           "configuration_scope_org_owner_or_org_manager_else_center_manager",
           "automation_execution_separate_current_center_authority",
-          "required_feature_gates_separate_from_references"
+          "required_feature_gates_separate_from_references",
+          "failed_job_retry_live_scope_version_candidate_and_segment_recheck",
+          "successful_automation_effect_never_retried"
         ],
         "audit": true,
         "notification": "outbox_if_user_visible_business_result",
@@ -72971,7 +72952,9 @@
           "billing_gate_worker",
           "same_key_same_payload_replay",
           "receipt_audit_outbox_atomic_domain_commit",
-          "required_feature_gates_separate_from_references"
+          "required_feature_gates_separate_from_references",
+          "current_inherited_reminder_timing_and_source_generation",
+          "invalid_or_expired_reminders_skipped_without_domain_effect"
         ],
         "audit": true,
         "notification": "outbox_if_user_visible_business_result",
@@ -94843,30 +94826,6 @@
         "generation": "uuidv7"
       },
       {
-        "path": "#/$defs/Request_settings_catalog_get/properties/request_id",
-        "origin": "ftksaas",
-        "acceptance": "generic_uuid",
-        "generation": "uuidv7"
-      },
-      {
-        "path": "#/$defs/Request_settings_catalog_get/properties/org_id",
-        "origin": "ftksaas",
-        "acceptance": "generic_uuid",
-        "generation": "uuidv7"
-      },
-      {
-        "path": "#/$defs/Request_settings_catalog_get/properties/center_id",
-        "origin": "ftksaas",
-        "acceptance": "generic_uuid",
-        "generation": "uuidv7"
-      },
-      {
-        "path": "#/$defs/Request_settings_catalog_get/properties/template_center_id",
-        "origin": "ftksaas",
-        "acceptance": "generic_uuid",
-        "generation": "uuidv7"
-      },
-      {
         "path": "#/$defs/Request_settings_catalog_get/oneOf/0/properties/request_id",
         "origin": "ftksaas",
         "acceptance": "generic_uuid",
@@ -94933,24 +94892,6 @@
         "generation": "uuidv7"
       },
       {
-        "path": "#/$defs/Request_settings_get/properties/request_id",
-        "origin": "ftksaas",
-        "acceptance": "generic_uuid",
-        "generation": "uuidv7"
-      },
-      {
-        "path": "#/$defs/Request_settings_get/properties/org_id",
-        "origin": "ftksaas",
-        "acceptance": "generic_uuid",
-        "generation": "uuidv7"
-      },
-      {
-        "path": "#/$defs/Request_settings_get/properties/center_id",
-        "origin": "ftksaas",
-        "acceptance": "generic_uuid",
-        "generation": "uuidv7"
-      },
-      {
         "path": "#/$defs/Request_settings_get/oneOf/0/properties/request_id",
         "origin": "ftksaas",
         "acceptance": "generic_uuid",
@@ -95006,30 +94947,6 @@
       },
       {
         "path": "#/$defs/Success_settings_get/properties/trace_id",
-        "origin": "ftksaas",
-        "acceptance": "generic_uuid",
-        "generation": "uuidv7"
-      },
-      {
-        "path": "#/$defs/Request_settings_update/properties/request_id",
-        "origin": "ftksaas",
-        "acceptance": "generic_uuid",
-        "generation": "uuidv7"
-      },
-      {
-        "path": "#/$defs/Request_settings_update/properties/org_id",
-        "origin": "ftksaas",
-        "acceptance": "generic_uuid",
-        "generation": "uuidv7"
-      },
-      {
-        "path": "#/$defs/Request_settings_update/properties/center_id",
-        "origin": "ftksaas",
-        "acceptance": "generic_uuid",
-        "generation": "uuidv7"
-      },
-      {
-        "path": "#/$defs/Request_settings_update/properties/operation_key",
         "origin": "ftksaas",
         "acceptance": "generic_uuid",
         "generation": "uuidv7"
@@ -95125,24 +95042,6 @@
         "generation": "uuidv7"
       },
       {
-        "path": "#/$defs/Request_settings_reset_preview/properties/request_id",
-        "origin": "ftksaas",
-        "acceptance": "generic_uuid",
-        "generation": "uuidv7"
-      },
-      {
-        "path": "#/$defs/Request_settings_reset_preview/properties/org_id",
-        "origin": "ftksaas",
-        "acceptance": "generic_uuid",
-        "generation": "uuidv7"
-      },
-      {
-        "path": "#/$defs/Request_settings_reset_preview/properties/center_id",
-        "origin": "ftksaas",
-        "acceptance": "generic_uuid",
-        "generation": "uuidv7"
-      },
-      {
         "path": "#/$defs/Request_settings_reset_preview/oneOf/0/properties/request_id",
         "origin": "ftksaas",
         "acceptance": "generic_uuid",
@@ -95198,30 +95097,6 @@
       },
       {
         "path": "#/$defs/Success_settings_reset_preview/properties/trace_id",
-        "origin": "ftksaas",
-        "acceptance": "generic_uuid",
-        "generation": "uuidv7"
-      },
-      {
-        "path": "#/$defs/Request_settings_reset_apply/properties/request_id",
-        "origin": "ftksaas",
-        "acceptance": "generic_uuid",
-        "generation": "uuidv7"
-      },
-      {
-        "path": "#/$defs/Request_settings_reset_apply/properties/org_id",
-        "origin": "ftksaas",
-        "acceptance": "generic_uuid",
-        "generation": "uuidv7"
-      },
-      {
-        "path": "#/$defs/Request_settings_reset_apply/properties/center_id",
-        "origin": "ftksaas",
-        "acceptance": "generic_uuid",
-        "generation": "uuidv7"
-      },
-      {
-        "path": "#/$defs/Request_settings_reset_apply/properties/operation_key",
         "origin": "ftksaas",
         "acceptance": "generic_uuid",
         "generation": "uuidv7"
@@ -95312,24 +95187,6 @@
       },
       {
         "path": "#/$defs/Success_settings_reset_apply/properties/trace_id",
-        "origin": "ftksaas",
-        "acceptance": "generic_uuid",
-        "generation": "uuidv7"
-      },
-      {
-        "path": "#/$defs/Request_settings_history_get/properties/request_id",
-        "origin": "ftksaas",
-        "acceptance": "generic_uuid",
-        "generation": "uuidv7"
-      },
-      {
-        "path": "#/$defs/Request_settings_history_get/properties/org_id",
-        "origin": "ftksaas",
-        "acceptance": "generic_uuid",
-        "generation": "uuidv7"
-      },
-      {
-        "path": "#/$defs/Request_settings_history_get/properties/center_id",
         "origin": "ftksaas",
         "acceptance": "generic_uuid",
         "generation": "uuidv7"
@@ -96323,6 +96180,36 @@
         "origin": "ftksaas",
         "acceptance": "generic_uuid",
         "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Request_automation_save/properties/retry_job/properties/id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/AutomationJobView/properties/id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/AutomationJobView/properties/center_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/AutomationJobView/properties/person_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Request_automation_save/allOf/0/then/properties/automation_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
       }
     ],
     "open_product_decisions": [],
@@ -96774,7 +96661,7 @@
       "uuid": "backend uuid@14.0.3 v7 for all inserted IDs; DB defaults not required",
       "external_transport": "POST /functions/v1/backend-v1/{operation}; direct typed request body",
       "internal_rpc": "service-only api_v1 named functions; actor/session/UUID bank supplied by verified gateway",
-      "migration_count": 114,
+      "migration_count": 115,
       "acceptance_source": "apps/backend/docs/00-FtkSaaS-yeni-sohbet-devir.md"
     },
     "decision_sprint": {

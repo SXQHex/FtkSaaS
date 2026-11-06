@@ -14,7 +14,14 @@ def typ(s):
  if 'const' in s:return str(s['const'])
  if 'enum' in s:return ' / '.join(map(str,s['enum']))
  return ' ∣ '.join(s['type']) if isinstance(s.get('type'),list) else s.get('type','schema')
-def fields(s):return '; '.join(k+('' if k in s.get('required',[]) else '?')+': '+typ(v) for k,v in s.get('properties',{}).items())
+def fields(s):
+ def field_type(key,value):
+  if value:return typ(value)
+  # Closed scope branches carry the validation once; render their real types
+  # instead of mistaking the base key allowlist for an untyped payload.
+  variants=[typ(branch['properties'][key]) for branch in s.get('oneOf',[]) if key in branch.get('properties',{})]
+  return ' ∣ '.join(dict.fromkeys(variants)) if variants else typ(value)
+ return '; '.join(k+('' if k in s.get('required',[]) else '?')+': '+field_type(k,v) for k,v in s.get('properties',{}).items())
 def cell(v):return str(v).replace('|','∣').replace('\n',' ')
 def worker(o):return o['permission']=='system.worker' or o.get('actor_source')=='server_worker_claim'
 

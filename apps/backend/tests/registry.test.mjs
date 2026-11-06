@@ -149,3 +149,6 @@ import './crm-meta-queue-authority-acceptance.mjs';
 import './crm-provider-host-acceptance.mjs';
 import './crm-import-acceptance.mjs';
 import './crm-import-authority-acceptance.mjs';
+
+import './reminder-scheduling-acceptance.mjs';
+import './automation-results-acceptance.mjs';

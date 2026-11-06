@@ -147,6 +147,10 @@ test('Typed settings catalog round-trip in every scope',async t=>{
  const {org,center,person}=await settingsTenant(fixture);
   await t.test('all declared fields in five scopes round-trip through real typed APIs; unsupported branding cannot fake success',async()=>{
    const fields=JSON.parse(fs.readFileSync('config/frontend-settings.json','utf8')).fields;
+   const orgScope={scope:'organization',org_id:org},centerScope={scope:'center',org_id:org,center_id:center};
+   assert.equal((await must(owner,'settings_catalog_get_v1',centerScope)).fields.find(f=>f.key==='lesson_reminder_hours').writable,false);
+   await fail('FORBIDDEN',owner,'settings_update_v1',{...centerScope,expected_version:(await read(owner,centerScope)).version,patch:{lesson_reminder_hours:1}},key());
+   await write(owner,orgScope,{reminder_center_overrides_enabled:true},(await read(owner,orgScope)).version);
    const operator=await authUser('settings-field-operator');await must(operator,'account_get_v1');
    await db.query('insert into private.platform_operators(auth_user_id) values($1)',[operator.id]);
    try{

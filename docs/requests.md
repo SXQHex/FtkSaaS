@@ -371,3 +371,15 @@ PR213 main typed kataloğu PR215 ile gerçek seçili kişi/merkez, sayfalama ve 
 Mevcut management okuyucusunda `lesson_request_create_v1` selector anahtarına opsiyonel `catalog:disciplines|instructors` eklendi; yeni endpoint veya izin yoktur. Self kullanıcı gerçek person_id ile, request.write yetkili personel mevcut hedef/yetki kurallarıyla okur. Aynı sayfalı typed yanıt yalnız etkin merkez disiplinleri veya writer'ın kabul ettiği aktif eğitmenin kimliği/görünen adını taşır. Mevcut liste yolu korunur. Create pasif organizasyon disiplini için artık merkez ilişkisi aktif kalsa da NOT_FOUND verir; diğer plan/window/yetki/resource kontrolleri korunur. Katalog kayıt/seans/rezervasyon/hak/hesap oluşturmaz; cursor aktör/selector/merkez/katalogla bağlıdır. Kapsam ve tam tüketim [WF06](workflows.md#wf06) sahibindedir.
 
 Kaynak, negatif sözleşme ve ayrı native katalog kökü hazırlanmıştır; yeni aday/main/development sonucu backend devir kaydında tutulur. Frontend ekran veya S06 kabulü verilmez.
+
+
+<a id="xreq-022"></a>
+## XREQ-022 Hatırlatma ayarları ve otomasyon iş sonuçlarının tüketimi
+
+### Backend kaynak devri — 6 Kasım 2026
+
+P15/P16 tek backend paketidir. Yeni endpoint yoktur. [Ayar rehberi](settings.md#bildirim-kullanılabilirliği), [WF16](workflows.md#wf16) ve ortak typed sözleşme mevcut settings, notifications_list ve automation_save/management yollarındaki ek alanların sahibidir. Frontend kendi alanında değerlendirir; bu kayıt ekran kabulü veya karşı alan onayı değildir.
+
+**Beklenen tüketici:** Organizasyon/merkezde ders-etkinlik/paket/vade seçenekleri ve Business mirası; kullanıcıda açık timezone ile sessiz saat; member tür kapıları ve ayrı email/reminder tercihi gerçek katalog/writable/available alanlarından gösterilsin. Marketing/digest hazır seçenek olarak sunulmasın. Merkez resetinde preview.after gösterilsin; parent değişiminde PREVIEW_STALE sonrası yeniden önizleme alınsın. Otomasyon ayrıntısında recent_jobs güvenli hata/sonuç, disable ve yalnız retry_available iş için sürümlü retry kullanılsın; eski tüketiciler yeni opsiyonel alanlar olmadan çalışmayı sürdürür.
+
+**Kabul ölçütleri:** Pro miras/Business izinli override, kapalı kanal, geceyi aşan sessiz saat, DST, stale reset/iş sürümü, başarısız işten tek sonuçla kurtarma ve başarılı işe tekrar ret. State=succeeded sağlayıcı kabulü ile email_delivery.delivered ayrı sunulsun; ham provider hata, alıcı veya sır gösterilmesin. Backend aday/main/development ve hosted kabulünün durumu backend devrindedir; frontend kendi ekran kabulünü ayrıca verir.
