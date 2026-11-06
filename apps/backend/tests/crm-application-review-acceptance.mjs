@@ -5,7 +5,7 @@ import {authUser,fixturePlatform,must,call} from './api-client.mjs';
 import {connect} from '../scripts/db.mjs';
 import {newUuidV7 as key} from '../scripts/uuid.mjs';
 
-test('P06 explicit review preserves shared-phone identity, routing scope and receipt/version safety',async()=>{
+test('P06 explicit review preserves shared-phone identity, routing scope and receipt/version safety',async t=>{
  const db=await connect();let trigger;let triggerFunction;
  try{
   const {platform,plan}=await fixturePlatform(),owner=await authUser('crm-review'),cmUser=await authUser('crm-review-cm');
@@ -78,6 +78,26 @@ test('P06 explicit review preserves shared-phone identity, routing scope and rec
   await db.query('drop function private.'+triggerFunction+'()');triggerFunction=null;
   await api('public_application_review_v1',rollbackBody,owner,rollbackKey);
   assert.equal(Number((await db.query('select count(*) n from core.people where org_id=$1',[org])).rows[0].n),beforePeople+1);
+  await t.test('two organization managers serialize routing and transfer removes the previous center visibility',async()=>{
+   const counts=async()=>(await db.query('select (select count(*)::int from core.public_applications where org_id=$1) applications,(select count(*)::int from core.people where org_id=$1) people,(select count(*)::int from core.leads where org_id=$1) leads',[org])).rows[0];
+   const before=await counts(),racing=await submit();
+   await api('org_manager_assign_v1',{center_id:null,person_id:cmPerson});
+   try{
+    const attempts=await Promise.all([owner,cmUser].map((user,index)=>call(user,'public_application_review_v1',{org_id:org,center_id:null,application_id:racing,action:'assign_center',target_center_id:index===0?center:second,expected_version:1},key())));
+    assert.equal(attempts.filter(x=>x.result.ok).length,1);
+    assert.equal(attempts.find(x=>!x.result.ok).result.error.code,'VERSION_CONFLICT');
+    let row=(await db.query('select center_id,version::int version,routing_history from core.public_applications where id=$1',[racing])).rows[0];
+    assert.equal(row.version,2);assert.equal(row.routing_history.length,1);
+    if(row.center_id!==center)await api('public_application_review_v1',{center_id:null,application_id:racing,action:'assign_center',target_center_id:center,expected_version:row.version});
+   }finally{await api('org_manager_revoke_v1',{center_id:null,person_id:cmPerson,expected_version:1,reason:'Synthetic routing race delegation ended'});}
+   const visible=(await list(center,cmUser,{application_id:racing})).items[0];assert.equal(visible.entity.id,racing);
+   const current=(await db.query('select version::int version,routing_history from core.public_applications where id=$1',[racing])).rows[0];
+   await api('public_application_review_v1',{center_id:null,application_id:racing,action:'assign_center',target_center_id:second,expected_version:current.version});
+   await reject('management_state_get_v1',{operation:'public_application_review_v1',selector:{operation:'public_application_review_v1',key:{application_id:racing}},page:{}},'NOT_FOUND',cmUser);
+   assert(!(await list(center,cmUser)).items.some(x=>x.entity.id===racing));
+   const moved=(await list(second,owner,{application_id:racing})).items[0];assert.equal(moved.current.values.center_id,second);assert.equal(moved.current.values.routing_history.length,current.routing_history.length+1);
+   assert.deepEqual(await counts(),{...before,applications:before.applications+1});
+  });
   await db.query("update core.role_assignments set state='inactive',version=version+1 where org_id=$1 and person_id=$2 and role='center_manager'",[org,cmPerson]);
   await reject('public_application_review_v1',body,'FORBIDDEN',cmUser,opKey);
  }finally{if(trigger)await db.query('drop trigger if exists '+trigger+' on core.public_applications');if(triggerFunction)await db.query('drop function if exists private.'+triggerFunction+'()');await db.end();}

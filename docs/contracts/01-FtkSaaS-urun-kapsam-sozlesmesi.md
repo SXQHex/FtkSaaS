@@ -14,7 +14,6 @@ Plan kapsamı bu belgenin; ayrıntılı davranış, geçiş ve güvenlik kararla
 - **Starter:** Sabit yürüyen tek disiplinli ders programını, öğrencilerini, sınıf/seans rezervasyonlarını, paketlerini, yoklama ve temel finansını yöneten bağımsız eğitmen/küçük stüdyo.
 - **Pro:** **Bir fiziksel lokasyon** içinde çok oda, çok disiplin ve/veya çok eğitmen, tüm ders/program/etkinlik/CRM/iş otomasyonu/eğitmen hakedişi fonksiyonları olan hareket/eğitim merkezi.
 - **Business:** Pro kapsamı + **en fazla beş merkez**; merkezler kendi erişim, operasyon ve finans yetkilerinde izole, organizasyon altında bağlı; mevcut koşullarla merkezler arası kullanım ve onaylı hesaplaşma.
-- **Beş merkez üzeri:** Otomatik sınırsızlık veya genel bypass değil, teklif/özel sözleşme kapsamında müşteri başına sürümlü, açıkça kabul edilmiş merkez limitinin ve gerekiyorsa alan davranışlarının ayrı tanımlanması. Tenant izolasyonu, mali bütünlük, gizlilik, kimlik, audit ve güvenlik kapıları özel teklifle devre dışı bırakılamaz. Standart yeni bir dördüncü plan veya fiyat bu kararla oluşturulmadı.
 
 #### Bağlayıcı kapsam
 
@@ -51,11 +50,11 @@ Plan kapsamı bu belgenin; ayrıntılı davranış, geçiş ve güvenlik kararla
 
 Plan değişiminin sürümlü kapsam seçimi, dönem sınırı ve kapalı kaynaklardaki eski işlemlerin davranışı [teknik sözleşmede](02-FtkSaaS-teknik-sozlesme.md#starter-kapsam-seçimi-ve-kapı-uygulaması) tanımlıdır. Geçmiş kayıt korunumu operasyon yetkisi sağlamaz.
 
-#### Lokasyon, özel teklif ve limit temsili
+#### Lokasyon ve limit temsili
 
 Pro’nun odaları aynı fiziksel işletme lokasyonunun ders alanlarıdır. Ayrı lokasyon ayrı merkezdir ve Business gerektirir; oda adını değiştirmek bu sınırı kaldırmaz. Yazılım oda adından fiziksel adresi kanıtlamaz; aktif öğrenci kotası kötüye kullanımın ölçeğini sınırlar, tek başına lokasyon doğrulaması değildir.
 
-Business standart merkez veya öğrenci sınırının üzeri müşteri başına sürümlü, açıkça kabul edilmiş özel sözleşme gerektirir. Standart dördüncü plan, genel bypass veya otomatik sınırsız merkez yoktur. Oda/eğitmen için sınırsızlık API/DB/okuma/doğrulayıcı/kapılarda açık ve aynı anlamda temsil edilir; 0 veya sihirli büyük sayı kullanılmaz. Ürün kararı runtime/hosted kabulü değildir; aktarım [backend backlog’unun](../../apps/backend/docs/remaining-work.md#p01) sorumluluğundadır.
+Business en fazla beş aktif merkezle sınırlıdır; bu sınır aşılamaz. Özel teklif, müşteri bazlı özel limit ve bunlara bağlı kabul/geçiş akışı ürün kapsamı dışındadır. Bütün planlarda bağlayıcı tablodaki standart limitler uygulanır. Oda/eğitmen için sınırsızlık API/DB/okuma/doğrulayıcı/kapılarda açık ve aynı anlamda temsil edilir; 0 veya sihirli büyük sayı kullanılmaz. Ürün kararı runtime/hosted kabulü değildir; aktarım [backend backlog’unun](../../apps/backend/docs/remaining-work.md#p01) sorumluluğundadır.
 
 ## Belgenin durumu
 

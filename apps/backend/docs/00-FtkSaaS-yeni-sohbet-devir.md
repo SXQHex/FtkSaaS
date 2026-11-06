@@ -1,5 +1,37 @@
 # Güncel kaynak ve kabul
 
+## Business B01–B04 — 6 Kasım devam kontrol noktası
+
+Başlangıç main `378cd058c7396fab1c9e1ef0657a3207302c1b2a` (PR225). [Main proof42226916343](https://github.com/SXQHex/FtkSaaS/actions/runs/42226916343), [development42226988452](https://github.com/SXQHex/FtkSaaS/actions/runs/42226988452), [Vercel42226988410](https://github.com/SXQHex/FtkSaaS/actions/runs/42226988410) başarılıdır. P14/P15/P16 tekrar edilmedi. Aktif dal `feature/backend-business-acceptance`; henüz yeni aday/full clean yayımlanmadı.
+
+### B01 gerçek iki merkez ve canlı yetki
+
+Business org `01a164f2-8682-75f4-9a4f-455ebbe16989`, A `01a16503-c61f-73c9-81f6-de414090e7cb`, B `01a16503-c622-7519-b61a-895881dfffb5`. Gerçek owner ve kullanıcının açıkça yetkilendirdiği mevcut test hesabı native Auth→Edge→RPC ile kullanıldı. Kota testinde kişi `01a16503-c622-7519-b61a-adf59dc250ac` A/B okumalarında aynı GUID ve Abone No'yu taşıdı; subscription active_students100→100 kaldı. Owner org/A/B kişi okumaları geçti. Ön snapshot'ta bu kişinin aktif öğrenci merkezi yalnız A idi. Oluşan B ilişkisi `01a1b11c-96a7-74b5-80eb-815f1fcb10b6` ve geçici owner CM ataması `01a1b11c-82c2-733f-aa6c-55fc591cbfaa` audit/created_at ile bu denemeye bağlandı; yalnız bu kayıtlar native pasifleştirmeyle kapatıldı, geçmiş silinmedi. Son SQL readback her ikisini inactive ve benzersiz aktif öğrenci kotasını100 doğruladı. Daha sonraki normal owner ikinci merkez yöneticiliği, iki merkezli satış/rapor işlemi için native self-assign ile eklendi ve tutarlı işletme verisi olarak korundu.
+
+| Sınırlı aktör senaryosu | Gerçek sonuç |
+|---|---|
+| Student iken başka A kişisini okuma | NOT_FOUND |
+| Geçici CM_A → A kişisi okuma | Başarılı; ilişki projeksiyonu yalnız A |
+| B kişisini A bağlamından okuma/değiştirme | İki komut NOT_FOUND; veri değişmedi |
+| Org birleşik/B finans raporu | FORBIDDEN |
+| Native CM_A kaldırma sonrası aynı kişi okuması | NOT_FOUND; öğrenci hesabından yönetim hakkı türemedi |
+
+Atama `01a1b124-a076-750f-bea5-d2533cb4d3a3`; işlem aralığı `2026-11-06T13:54:54.604439+00:00`–`2026-11-06T13:56:13.330610+00:00` UTC. Standart5merkez/1250öğrenci, eşzamanlı son slot ve aynı kişinin ikinci merkezde tek sayımı native commercial-plan-acceptance kaynağındadır. Plan düşüşüyle erişime kapanan merkezde kişi/borç korunumu p07-subscription-lifecycle fixture93–98'de gerçek PostgreSQL ile sınanır; bu, hosted fiziksel merkez kapatma testi diye sunulmaz. Bu kaynakların kabulü başarılı PR221 native tam koşusundadır; yeni aday onları yeniden doğrulayacaktır.
+
+### B04 gerçek tutar ve CSV kabulü
+
+Her merkez için kendi yayımlanmış dört ders/1.600TRY paket sürümü kullanıldı. A tahsilat800TRY/kalan800TRY, B tahsilat1200TRY/kalan400TRY; birleşik tahsilat2000TRY/kalan1200TRY. A+B satır çokluğu birleşik raporla birebir; tutarlar aynı metric/currency içinde karşılaştırıldı ve bağımsız cash/debt ledger readback'iyle eşleşti. İlk boş raporlar bu kabul sayılmadı. İki merkezde açık ilgi/takip lead'i oluşturuldu; CRM dönüşüm raporu basis_count A1/B1/org2 döndürdü; açık lead'ler dönüşmüş gibi sunulmadı.
+
+Satışlar `01a1b125-d2ee-7590-ae64-cb3467f59652` / `01a1b128-34f5-724f-8b6c-5139db58d8fe`, borçlar `01a1b125-d2ee-7590-ae64-f744e5889658` / `01a1b128-34f5-724f-8b6c-7cd16caebe4f`. Kullanıcının tutarlı dummy kayıtları koruma talimatıyla ürün/satış/tahsilat/lead kayıtları bırakıldı. Sahip ve yetkilendirilmiş test aktörü dışında oturum açılmadı; giriş/parola/token rapora yazılmadı.
+
+Mevcut Business P06 worker scope'u aktifti, org config satırı yoktu. Yalnız bu org'da mevcut kabul kurulumlarındaki2097152byte import/5000satır/16777216byte export tavanlarıyla config başlatıldı; mevcut satır ezilmedi, yeni ürün varsayılanı veya başka tenant ayarı üretilmedi. Gerçek cron işleri owner `01a1b12d-095a-70f3-bed0-b2d7456393b2` ve CM_A `01a1b12d-71b3-727d-bc12-7e62f1398af4` başarılı oldu. Owner CSV4satır, yalnız A CSV2satır; text/csv ve no-store doğrulandı. Dosya SHA256 owner `25db156f81f5aa7e391e0f6bcf2c65c309e4c5b2aa52e88147963fcda77b6f95`, A `ef9a7b405caf69e5b81f0281109a13744618ebe1a546ea47baac0466d17a6e1b`. Atama kaldırılınca aynı aktörün kendi dosyası, job status ve aynı operation_key ile export replay'i FORBIDDEN oldu. Finans/statü okuması dosya indirme yetkisi diye varsayılmadı. Cross-center settlement raporundaki gerçek tutar ve iki taraflı hosted zincir B03'te açık; B04 bütün paket diye kapanmadı.
+
+### Yeni kaynak ve kalan karar/teslim
+
+B02: mevcut CRM native köküne iki gerçek fixture org yöneticisinin aynı expected_version ile yönlendirme yarışı, tek kazanan/VERSION_CONFLICT, A→B transferden sonra eski CM liste/ayrıntı reddi ve tek başvuru/kişi/lead sayımı eklendi. Mevcut assertion'lar korundu. API envanterindeki yalnız bu mevcut kaynağın hash'i ve WF00/WF16 inceleme izi güncellendi; runner/shard/eşik/politika değiştirilmedi. Yerel verify412 kontrol geçti; yeni native alt test henüz CI'da çalışmadı, kabul diye sunulmaz.
+
+Kullanıcının 6 Kasım son kararıyla B05 tamamen ürün kapsamından çıkarıldı; [normatif kapsam](../../../docs/contracts/01-FtkSaaS-urun-kapsam-sozlesmesi.md#lokasyon-ve-limit-temsili) ve geliştirme sırası buna göre güncellendi. Push edilmemiş teklif API/DTO/validator, migration117 ve testleri kaldırıldı; migration zinciri116 ve mevcut runtime220 operasyon olarak kaldı. Bu PR B01/B04 canlı kanıtı ve B02 yönlendirme regresyon kaynağını taşır. Yeni CRM native alt test henüz CI'da çalışmadı; B03 hosted hesaplaşma ve B04'ün ona bağlı kısmı açıktır.
+
 ## P15/P16 kaynak kabulü ve XREQ-021 canlı doğrulaması
 
 PR219 head `bc03bc332966cdbc70d4d1ca055f126c42d5e3da`, base `e5a91024790277910f049824e958e3f312346368`, tested merge `0f8360d6f767450bddbdc792f4aa45058f3ace34` için [42206397576](https://github.com/SXQHex/FtkSaaS/actions/runs/42206397576) candidate/core/on iki API/quality/full-clean başarılıdır. PR219 main `d319ebfc546f74a4939af0aed8b46e3d1f6f642c`; [main proof42208491810](https://github.com/SXQHex/FtkSaaS/actions/runs/42208491810), [development42208557461](https://github.com/SXQHex/FtkSaaS/actions/runs/42208557461) başarılı. Ardından PR220 yalnız frontend/koordinasyon kaydıyla main `ea0d6cb26bba86fa5fd9c5c239d54330170ca1e6`; aynı kaynağın [main proof42209348917](https://github.com/SXQHex/FtkSaaS/actions/runs/42209348917) ve [development42209400479](https://github.com/SXQHex/FtkSaaS/actions/runs/42209400479) başarılıdır. P15/P16 kaynak/migration115 teslim edildi; güncel hosted kabul aşağıdaki kontrol noktasındadır.
@@ -291,7 +323,7 @@ Backend verify 169 sözleşme/yönetişim/restore + 105 CI politika + 10 kalite 
 
 ## P01 ticari limit kaynak paketi
 
-PR164'ün teslim edilen kaynak branch'i `feature/pro-commercial-foundation` idi. Yeni 99'uncu migration standart planın etkin limit çözümlemesini abonelik okuması, kapasite tüketen mevcut komutlar ve S16 dönem karşılaştırması için birleştirir; geçmiş katalog/fiyat/ödenmiş dönem satırlarını değiştirmez. Wire ayrımı ve kullanıcı akışı yalnız [WF13](../../../docs/workflows.md#wf13) sahibindedir. Starter mevcut tek kaynak kuralını kullanır; üst-plan disiplinine yeni sayısal kota icat edilmez. Business özel teklif B05 kapsamı ayrıca açıktır.
+PR164'ün teslim edilen kaynak branch'i `feature/pro-commercial-foundation` idi. Yeni 99'uncu migration standart planın etkin limit çözümlemesini abonelik okuması, kapasite tüketen mevcut komutlar ve S16 dönem karşılaştırması için birleştirir; geçmiş katalog/fiyat/ödenmiş dönem satırlarını değiştirmez. Wire ayrımı ve kullanıcı akışı yalnız [WF13](../../../docs/workflows.md#wf13) sahibindedir. Starter mevcut tek kaynak kuralını kullanır; üst-plan disiplinine yeni sayısal kota icat edilmez.
 
 Yerel kanıt: Yeni migration 99 sıfırdan izole loopback DB'ye uygulandı; önceki 98 migration değişmedi. İlk native koşuda Starter/Pro/Business ticari kapasite + mevcut CRM + FIN-01 toplam 13 test başarılı (278,5 saniye). Son slotta paralel aktivasyon, reactivation, merge, Business aynı kişinin ikinci merkez bağlantısı ve 5→6 merkez yarışı; sonlu usage/açık sınırsız limit; farklı raw catalog limitli S16 seçenek/request ve tarihsel plan satırının birebir korunması sınandı. Üç planda iç import row guard aynı kapasiteyi reddetti. Mevcut S16 paid-time/worker/immutable katalog kabul kökü ayrıca başarılı (200,0 saniye).
 
