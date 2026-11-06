@@ -659,7 +659,10 @@
       "expired": "Expired",
       "active": "Active account link",
       "inactive": "Inactive account link"
-    }
+    },
+    "openPage": "Open person page",
+    "backToPeople": "Back to people",
+    "directCenterScope": "Linked center scope"
   },
   "account": {
     "title": "My account",
@@ -1676,7 +1679,8 @@
     "request": "Lesson request",
     "finance": "Collection",
     "attendance": "attendance",
-    "agreements": "Instructor agreement"
+    "agreements": "Instructor agreement",
+    "settings": "Operating settings"
   },
   "finance": {
     "title": "Student finances",
@@ -1950,5 +1954,41 @@
     "saleUnit": "Sale unit",
     "fixedUnit": "Explicit unit value",
     "unitAmount": "Unit amount"
+  },
+  "operatingSettings": {
+    "organization": "Organization operating settings",
+    "center": "Center operating settings",
+    "refresh": "Refresh",
+    "loading": "Loading…",
+    "version": "Settings version: {version}",
+    "noFields": "No supported operating fields in this scope.",
+    "history": "Settings history",
+    "newValue": "New value",
+    "reason": "Reason",
+    "review": "Review change",
+    "previewReset": "Preview default reset",
+    "before": "Before",
+    "after": "After",
+    "local": "Local selection",
+    "default": "Default value",
+    "unset": "Not specified",
+    "readonly": "You cannot change this field.",
+    "durationHint": "Preparation duration for new programs. Existing programs are unchanged. Reset returns to the system default.",
+    "system_default": "System default",
+    "organization_copy": "Organization creation copy",
+    "center_local": "Center local value",
+    "invalidSettings": "Check the selected field, value and reason.",
+    "emptyHistory": "No settings history in this scope.",
+    "more": "Next page",
+    "fields": {
+      "description": "Description",
+      "address": "Address",
+      "contact_phone": "Contact phone",
+      "contact_email": "Contact email",
+      "program_duration_minutes": "Program preparation duration (minutes)",
+      "billing_name": "Billing name",
+      "billing_address": "Billing address",
+      "billing_email": "Billing email"
+    }
   }
 }

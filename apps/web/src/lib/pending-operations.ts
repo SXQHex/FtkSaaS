@@ -7,10 +7,19 @@ import { recoverSetup, setupActorPrefix, type SetupScope } from "./studio-setup"
 export type PendingOperation = {
   scope: SetupScope;
   slot: string;
-  kind: "agreements" | "attendance" | "sale" | "rights" | "reservation" | "request" | "finance";
+  kind:
+    | "settings"
+    | "agreements"
+    | "attendance"
+    | "sale"
+    | "rights"
+    | "reservation"
+    | "request"
+    | "finance";
 };
 const operations: Record<PendingOperation["kind"], readonly string[]> = {
   attendance: attendanceWrites,
+  settings: ["settings_update_v1", "settings_reset_apply_v1"],
   agreements: ["instructor_agreement_publish_v1"],
   finance: [
     "collection_record_v1",
@@ -24,6 +33,8 @@ const operations: Record<PendingOperation["kind"], readonly string[]> = {
   request: bookingWrites.filter((operation) => operation.startsWith("lesson_request_")),
 };
 function slotKind(slot: string): PendingOperation["kind"] | null {
+  if (slot === "operating-settings:organization" || slot === "operating-settings:center")
+    return "settings";
   if (slot === "lesson-requests") return "request";
   const [family, target, extra] = slot.split(":");
   if (!target || !validate(target) || extra !== undefined) return null;
@@ -59,11 +70,18 @@ export function discoverPendingOperations(actorId: string): PendingOperation[] |
       const key = sessionStorage.key(index);
       if (!key?.startsWith(prefix)) continue;
       const [orgId, centerId, ...parts] = key.slice(prefix.length).split(":");
-      if (!orgId || !centerId || !validate(orgId) || !validate(centerId)) continue;
+      if (
+        !orgId ||
+        !centerId ||
+        !validate(orgId) ||
+        (centerId !== "organization" && !validate(centerId))
+      )
+        continue;
       const slot = parts.join(":"),
         kind = slotKind(slot);
       if (!kind) continue;
-      const scope = { actorId, orgId, centerId };
+      if (centerId === "organization" && slot !== "operating-settings:organization") continue;
+      const scope = { actorId, orgId, ...(centerId === "organization" ? {} : { centerId }) };
       const pending = recoverSetup(scope, slot);
       if (
         pending &&

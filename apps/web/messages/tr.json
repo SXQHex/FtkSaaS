@@ -659,7 +659,10 @@
       "expired": "Süresi dolmuş",
       "active": "Aktif hesap bağlantısı",
       "inactive": "Pasif hesap bağlantısı"
-    }
+    },
+    "openPage": "Kişi sayfasını aç",
+    "backToPeople": "Kişilere dön",
+    "directCenterScope": "Bağlantıdaki merkez kapsamı"
   },
   "account": {
     "title": "Hesabım",
@@ -1676,7 +1679,8 @@
     "request": "Özel ders talebi",
     "finance": "Tahsilat",
     "attendance": "yoklama",
-    "agreements": "Eğitmen anlaşması"
+    "agreements": "Eğitmen anlaşması",
+    "settings": "İşletim ayarı"
   },
   "finance": {
     "title": "Öğrenci finansı",
@@ -1950,5 +1954,41 @@
     "saleUnit": "Satış birimi",
     "fixedUnit": "Açık birim değeri",
     "unitAmount": "Birim tutarı"
+  },
+  "operatingSettings": {
+    "organization": "Organizasyon işletim ayarları",
+    "center": "Merkez işletim ayarları",
+    "refresh": "Yeniden oku",
+    "loading": "Yükleniyor…",
+    "version": "Ayar sürümü: {version}",
+    "noFields": "Bu kapsamda gösterilebilen işletim alanı yok.",
+    "history": "Ayar geçmişi",
+    "newValue": "Yeni değer",
+    "reason": "Gerekçe",
+    "review": "Değişikliği incele",
+    "previewReset": "Varsayılana dönüşü önizle",
+    "before": "Önce",
+    "after": "Sonra",
+    "local": "Yerel seçim",
+    "default": "Varsayılan değer",
+    "unset": "Belirtilmemiş",
+    "readonly": "Bu alanı değiştirme yetkisi yok.",
+    "durationHint": "Yeni programlar için hazırlık süresidir. Mevcut programları değiştirmez. Sıfırlama sistem varsayılanına döner.",
+    "system_default": "Sistem varsayılanı",
+    "organization_copy": "Kuruluş oluşturma kopyası",
+    "center_local": "Merkez yerel değeri",
+    "invalidSettings": "Seçilen alanı, değeri ve gerekçeyi kontrol edin.",
+    "emptyHistory": "Bu kapsamda ayar geçmişi yok.",
+    "more": "Sonraki sayfa",
+    "fields": {
+      "description": "Açıklama",
+      "address": "Adres",
+      "contact_phone": "İletişim telefonu",
+      "contact_email": "İletişim e-postası",
+      "program_duration_minutes": "Program hazırlık süresi (dakika)",
+      "billing_name": "Fatura adı",
+      "billing_address": "Fatura adresi",
+      "billing_email": "Fatura e-postası"
+    }
   }
 }

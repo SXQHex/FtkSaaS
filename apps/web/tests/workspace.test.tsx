@@ -360,3 +360,16 @@ test("retrying a center read clears its old error and preserves organization-onl
   expect(mocks.centers).toHaveBeenCalledTimes(2);
   expect(window.location.hash).toBe("#inbox");
 });
+
+test("returning to the workspace revalidates revoked scope before old actions can reappear", async () => {
+  render(<StudioWorkspace authUserId="native-user" />);
+  await screen.findByRole("heading", { name: "Merhaba, Test Yöneticisi" });
+  mocks.organizations.mockResolvedValue([]);
+  act(() => window.dispatchEvent(new Event("focus")));
+  expect(
+    screen.queryByRole("heading", { name: "Merhaba, Test Yöneticisi" }),
+  ).not.toBeInTheDocument();
+  await vi.waitFor(() => expect(mocks.organizations).toHaveBeenCalledTimes(2));
+  await screen.findByRole("heading", { name: "Merhaba, Test Yöneticisi" });
+  expect(screen.queryByRole("button", { name: "Kuruluş A" })).not.toBeInTheDocument();
+});

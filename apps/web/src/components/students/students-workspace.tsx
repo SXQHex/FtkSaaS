@@ -1,5 +1,7 @@
 "use client";
 
+import Link from "next/link";
+import { personPath } from "../../lib/person-route";
 import dynamic from "next/dynamic";
 import { WorkspaceLoading } from "../workspace-loading";
 import { useEffect, useRef, useState, type FormEvent } from "react";
@@ -417,6 +419,12 @@ export function StudentDirectory({
             <SheetHeader className="pr-16">
               <SheetTitle>{t("detailTitle")}</SheetTitle>
               <SheetDescription>{centerName}</SheetDescription>
+              <Link
+                href={personPath(scope.orgId, scope.centerId, selected.id)}
+                className="inline-flex min-h-11 items-center underline"
+              >
+                {t("openPage")}
+              </Link>
             </SheetHeader>
             <SheetClose asChild>
               <Button
@@ -452,7 +460,7 @@ export function StudentDirectory({
   );
 }
 
-function StudentDetail({
+export function StudentDetail({
   scope,
   personId,
   centerName,

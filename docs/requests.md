@@ -33,6 +33,9 @@ Bu dosya alanlar arası talep ve teslim kabulünün tek kaydıdır. Sohbet devri
 
 | XREQ-024 | Frontend; S08 manuel tahsilat yetki keşfi | Backend | [WF08](workflows.md#wf08), `management_state_get_v1` / `collection_record_v1`; [gözlem](#xreq-024) | Finans okuması tahsilat izni sayılmaz; gerçek kişi/merkezde collector yetkisi desteklenen normal reader ile keşfedilir. | Backend teslim kanıtı doğrulandı; frontend Chrome/canlı kabul açık | Frontend6 Kasım R00: PR234 aday/main/development kanıtı ve aynı selector tüketimi incelendi; exact kaynak/sürüm uyumu frontend adayında. Ekran kabulü kapanmadı. |
 
+| XREQ-026 | Frontend; R02 personel işlem izinleri | Backend | [WF02](workflows.md#wf02), `permission_set_v1` ve typed management selector | Gerçek kişi/merkez/izin için mevcut override durumu ile writer'ın kullanacağı gerçek kişi sürümü normal yetkili okuyucudan keşfedilsin; rol varsayılanından izin uydurulmasın. | Backend değerlendirmesi bekleniyor | Kaynak incelemesinde typed selector/projection var; desteklenen runtime reader devri bulunamadı. Frontend kaynak bağımlılığı; canlı deneme yapılmadı. |
+| XREQ-027 | Frontend; R01 plan daralması ve tutulacak kaynaklar | Backend | [WF13](workflows.md#wf13), `subscription_get_v1` / `subscription_downgrade_request_v1` | Normal aktör, downgrade hedefinin gerçek plan sürüm kimliğini ve izinli seçeneklerini keşfedebilsin; korunan kaynak seçimi gerçek hedefle gönderilsin. | Backend değerlendirmesi bekleniyor | Billing okuması aynı planın dönem seçeneklerini veriyor; planlar arası hedef keşfi kaynağı/devri bulunamadı. Sabit UUID/fiyat/limit uydurulmadı. |
+
 Alanların kendi planlarındaki bağımlılık gözlemleri otomatik olarak talep, onay veya işe başlama yetkisi sayılmaz; somut talep bu tabloya kaydedildiğinde `XREQ-001` biçiminde sabit bir kimlik alır.
 
 ## XREQ-001 kayıtta mevcut hesap bildirimi
@@ -429,3 +432,22 @@ Tahsilat ile PR232'nin aynı okuyucuya bağlı alacak iadesi/mahsup/borç düzel
 ### Backend sözleşme devri — 6 Kasım 2026
 
 A03–S15 kaynak paketi; WF04'teki mevcut Abone No tüketiminin aynı isteğe bağlı nullable `subscriber_number` alanı EarningView, AgreementVersionView, EventRegistrationView, EventDutyView, EventPaymentPreparationView, LeadView, CrmFollowupView (otomasyon dahil) ve SettlementAuthorityView yanıtlarına ekleniyor. UUID komut girdileri, sayfalama, yetki ve plan sınırları değişmiyor. Numarasız kişi null döner; numara erişim veya hesap kimliği değildir. Frontend yeni API/izin kurmadan uygun kişi referansında alanı gösterebilir; mevcut cevapları aynı şekilde işlemeye devam edebilir. PR231 backend native/main/development teslimi tamamlandı; kaynak/ortam aşamasının tek sahibi [backend devir](../apps/backend/docs/00-FtkSaaS-yeni-sohbet-devir.md#a03s15-aktif-backend-kabul-paketi). Frontend uygulama veya ekran kabulü verilmedi.
+
+
+<a id="xreq-026"></a>
+## XREQ-026 Personel izinleri için desteklenen mevcut durum ve sürüm okuması
+
+### Frontend talebi — 6 Kasım 2026
+
+R02'de kişi ilişkisi, hesap bağı, rol ve tekil işlem izni ayrıdır. `permission_set_v1` kişi sürümü, açık merkez, `permission` ve `enabled` ister. Typed `management_state_get_v1(operation:permission_set_v1,selector:{operation:permission_set_v1,key:{person_id,permission}})` ve projection tanımı vardır; bu selector'ın çalışan runtime/normal tüketim devri bulunamadı. Bu kaynak incelemesidir; canlı çağrı/ret gözlemi değildir.
+
+**İstenen sonuç:** Mevcut desteklenen normal reader gösterilsin veya bu selector tamamlanıp tüketim devri verilsin. Saklanmış override var/yok ve enabled değeri, kullanılacak gerçek entity/sürüm, rol varsayılanı ile override ayrımı açık olsun. CM/plan/F05 ve hedef rol sınırı korunmalı; staff/instructor ile tek başına assistant uygunluğu backend tarafından belirlenmeli. `permission_set_v1` komutundaki person.manage/person.activate/invite.student/reservation.write/attendance.draft/sale.write/finance.collect beyaz listesi frontend tarafından genişletilmez. Rol, kişi adı veya finans okumasından izin türetilmez. Grant/revoke ve açık oturumda yetki kaybı frontend kabulü bu teslimi bekler; çalışan normal rol/kaynak/ayar işleri sürer. Frontend durum/kabul sahibi [R02](../apps/web/docs/todo.md#pro-kaynak-ve-ekip).
+
+<a id="xreq-027"></a>
+## XREQ-027 Plan daralması hedefi için gerçek plan sürümü keşfi
+
+### Frontend talebi — 6 Kasım 2026
+
+R01 plan daralmasında tutulacak merkez/oda/disiplin/eğitmen/öğrenci seçimini S13 tam ekranını beklemeden ele almayı ister. Mevcut `subscription_downgrade_request_v1` gerçek `target_plan_id`, isteğe bağlı `kept_center_id/kept_scope/expected_version` alır. `subscription_get_v1` mevcut plan/limit/kullanımı ve starter_scope/pending_starter_scope/required bilgisini verir; billing period_change_options aynı planın dönem seçenekleridir. Buradan başka planın sürüm UUID'si, fiyatı veya izinli hedefi türetilemez. Kaynaklarda normal planlar arası hedef kataloğu/devir yolu bulunamadı; canlı deneme yapılmadı.
+
+**İstenen sonuç:** Çalışan mevcut normal keşif yolu ve tüketim biçimi gösterilsin; eksikse gerçek izinli hedef plan sürümlerinin kapsamı/sürümü, gerekirse koşul ve preview bağları teslim edilsin. Sabit UUID, iç tablo/service erişimi veya aynı plan dönem seçeneğini downgrade hedefi sayma talep edilmiyor. Gerçek hedef olmadan çalışmayan downgrade düğmesi yayınlanmaz. Mevcut limit/kullanım ve erişim kaybı tüketimi devam eder; kalan frontend seçim/kabul sahibi [R01](../apps/web/docs/todo.md#ortak-kapsam-erisimi).

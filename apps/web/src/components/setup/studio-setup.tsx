@@ -1,4 +1,5 @@
 "use client";
+import dynamic from "next/dynamic";
 import { useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
 import type {
@@ -16,6 +17,33 @@ import { PolicySetup } from "./policy-setup";
 import { RoomSetup } from "./room-setup";
 import { RoleSetup } from "./role-setup";
 import { errorKey } from "./setup-command";
+
+const OperatingSettings = dynamic(() =>
+  import("../settings/operating-settings").then((m) => m.OperatingSettings),
+);
+function OperatingSettingsAccess({
+  scope,
+  target,
+}: {
+  scope: SetupScope;
+  target: "organization" | "center";
+}) {
+  const [open, setOpen] = useState(false),
+    t = useTranslations("operatingSettings");
+  return (
+    <section className="space-y-4">
+      <Button
+        type="button"
+        variant="outline"
+        aria-expanded={open}
+        onClick={() => setOpen((v) => !v)}
+      >
+        {t(target)}
+      </Button>
+      {open && <OperatingSettings scope={scope} target={target} />}
+    </section>
+  );
+}
 
 function PlanSummary({ orgId }: { orgId: string }) {
   const t = useTranslations("setup");
@@ -200,6 +228,7 @@ function CenterSetup({
             target={{ kind: "center", center }}
             onSaved={onChanged}
           />
+          <OperatingSettingsAccess scope={scope} target="center" />
           <SetupChecklist scope={scope} timezone={center.timezone} />
           <CenterDisciplines scope={scope} onChanged={onChanged} />
           <RoomSetup scope={scope} onChanged={onChanged} />
@@ -222,6 +251,7 @@ function OrganizationSetup({
   const [organization, setOrganization] = useState<OrganizationView | null>(null);
   const [centers, setCenters] = useState<CenterView[] | null>(null);
   const [selected, setSelected] = useState("");
+  const [centerError, setCenterError] = useState("");
   const [error, setError] = useState("");
   const [retry, setRetry] = useState(0);
   useEffect(() => {
@@ -230,19 +260,27 @@ function OrganizationSetup({
       const org = await setupCall("organization_get_v1", { org_id: initial.id });
       const rows: CenterView[] = [];
       let cursor: string | null | undefined;
-      if (["normal", "bootstrap", "grace"].includes(org.access_mode)) {
-        do {
-          const result = await setupCall("centers_list_v1", {
-            org_id: org.id,
-            page: { limit: 50, ...(cursor ? { cursor } : {}) },
-          });
-          rows.push(...result.items);
-          cursor = result.next_cursor;
-        } while (cursor);
+      let centerFailure = "";
+      try {
+        if (["normal", "bootstrap", "grace"].includes(org.access_mode)) {
+          do {
+            const result = await setupCall("centers_list_v1", {
+              org_id: org.id,
+              page: { limit: 50, ...(cursor ? { cursor } : {}) },
+            });
+            rows.push(...result.items);
+            cursor = result.next_cursor;
+          } while (cursor);
+        }
+      } catch (cause) {
+        const code = setupError(cause);
+        if (["AUTH_REQUIRED", "SESSION_REVOKED"].includes(code)) throw cause;
+        centerFailure = errorKey(code);
       }
       if (active) {
+        setCenterError(centerFailure);
         setOrganization(org);
-        setCenters(rows);
+        setCenters(centerFailure ? null : rows);
         setSelected((id) =>
           rows.some((center) => center.id === id) ? id : rows.length === 1 ? rows[0].id : "",
         );
@@ -263,6 +301,7 @@ function OrganizationSetup({
   function reload() {
     setOrganization(null);
     setCenters(null);
+    setCenterError("");
     setError("");
     setRetry((n) => n + 1);
   }
@@ -304,31 +343,35 @@ function OrganizationSetup({
           </section>
           {["bootstrap", "normal"].includes(org.access_mode) && (
             <>
-              <section className="space-y-4" aria-label={t("centers")}>
-                <h3 className="text-lg font-semibold">{t("centers")}</h3>
-                <div className="flex flex-wrap gap-3">
-                  {centers
-                    ?.filter((row) => row.state === "active")
-                    .map((row) => (
-                      <Button
-                        key={row.id}
-                        type="button"
-                        variant={selected === row.id ? "default" : "outline"}
-                        onClick={() => setSelected(row.id)}
-                        aria-pressed={selected === row.id}
-                      >
-                        {row.name}
-                      </Button>
-                    ))}
-                </div>
-                <details className="space-y-4 rounded-lg border p-4">
-                  <summary className="cursor-pointer font-medium">{t("createCenter")}</summary>
-                  <SourceForm scope={scope} target={{ kind: "center" }} onSaved={saved} />
-                </details>
-              </section>
+              {centerError && <p role="alert">{t(centerError)}</p>}
+              {centers && (
+                <section className="space-y-4" aria-label={t("centers")}>
+                  <h3 className="text-lg font-semibold">{t("centers")}</h3>
+                  <div className="flex flex-wrap gap-3">
+                    {centers
+                      ?.filter((row) => row.state === "active")
+                      .map((row) => (
+                        <Button
+                          key={row.id}
+                          type="button"
+                          variant={selected === row.id ? "default" : "outline"}
+                          onClick={() => setSelected(row.id)}
+                          aria-pressed={selected === row.id}
+                        >
+                          {row.name}
+                        </Button>
+                      ))}
+                  </div>
+                  <details className="space-y-4 rounded-lg border p-4">
+                    <summary className="cursor-pointer font-medium">{t("createCenter")}</summary>
+                    <SourceForm scope={scope} target={{ kind: "center" }} onSaved={saved} />
+                  </details>
+                </section>
+              )}
               {org.access_mode === "normal" && (
                 <>
                   <DisciplinesSetup scope={scope} onChanged={saved} />
+                  <OperatingSettingsAccess scope={scope} target="organization" />
                   <PolicySetup scope={scope} />
                 </>
               )}

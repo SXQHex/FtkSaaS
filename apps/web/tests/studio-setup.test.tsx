@@ -850,3 +850,23 @@ test("room and instructor availability landmarks have distinct resource names", 
     }),
   ).toBeVisible();
 });
+
+test("organization settings remain discoverable when center catalog access is denied", async () => {
+  mocks.call.mockImplementation(async (operation) => {
+    if (operation === "organization_get_v1") return organization;
+    if (operation === "centers_list_v1")
+      throw new ApiFailure({
+        ok: false,
+        error: { code: "FORBIDDEN", retryable: false, trace_id: organization.id },
+      });
+    if (operation === "subscription_get_v1") return plan;
+    if (operation === "policies_get_v1") return [];
+    return { items: [], next_cursor: null };
+  });
+  render(<StudioSetup actorId="actor" organizations={[organization]} onChanged={mocks.saved} />);
+  expect(
+    await screen.findByRole("button", { name: "Organizasyon işletim ayarları" }),
+  ).toBeVisible();
+  expect(screen.queryByText("Merkez oluştur")).not.toBeInTheDocument();
+  expect(screen.queryByRole("button", { name: "Merkezi kaydet" })).not.toBeInTheDocument();
+});
