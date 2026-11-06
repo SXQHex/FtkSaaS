@@ -10,6 +10,7 @@ import type {
 import { render } from "./render";
 import { ScheduleWorkspace } from "../src/components/calendar/schedule-workspace";
 const mocks = vi.hoisted(() => ({
+  catalog: vi.fn<typeof import("../src/lib/program").getProgramCatalog>(),
   calendar: vi.fn<typeof import("../src/lib/api").getCalendar>(),
   session: vi.fn<typeof import("../src/lib/api").getSession>(),
 }));
@@ -17,6 +18,10 @@ vi.mock("../src/lib/api", async (original) => ({
   ...(await original<typeof import("../src/lib/api")>()),
   getCalendar: mocks.calendar,
   getSession: mocks.session,
+}));
+vi.mock("../src/lib/program", async (load) => ({
+  ...(await load<typeof import("../src/lib/program")>()),
+  getProgramCatalog: mocks.catalog,
 }));
 vi.mock("../src/components/programs/program-manager", () => ({
   ProgramManager: ({ onChanged }: { onChanged: () => void }) => (
@@ -150,4 +155,62 @@ test("management replaces the calendar and returns to the preserved period with 
   await user.click(screen.getByRole("button", { name: "Takvime dön" }));
   expect(screen.getByRole("button", { name: "Sonraki dönem" })).toBeVisible();
   expect(screen.queryByRole("region", { name: "Test program yönetimi" })).not.toBeInTheDocument();
+});
+test("resource filters narrow normal calendar records by real room, instructor and discipline together", async () => {
+  const user = userEvent.setup();
+  mocks.catalog.mockResolvedValue({
+    rooms: [
+      { id: "r1", name: "Salon 1" },
+      { id: "r2", name: "Salon 2" },
+    ],
+    instructors: [{ id: "i1", name: "Eğitmen 1" }],
+    disciplines: [{ id: "tango", name: "Tango" }],
+    duties: [],
+  });
+  const start = new Date();
+  const day = new Intl.DateTimeFormat("en-CA", {
+    timeZone: center.timezone,
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  }).format(start);
+  mocks.calendar.mockResolvedValue([
+    {
+      ...item("Birinci ders", `${day}T10:00:00Z`),
+      discipline_id: "tango",
+      resources: [
+        { kind: "room", id: "r1" },
+        { kind: "person", id: "i1" },
+      ],
+    },
+    {
+      ...item("İkinci ders", `${day}T10:00:00Z`),
+      discipline_id: "tango",
+      resources: [
+        { kind: "room", id: "r2" },
+        { kind: "person", id: "i1" },
+      ],
+    },
+  ]);
+  render(<ScheduleWorkspace studios={studios} actorId="actor" />);
+  await screen.findByText("Birinci ders");
+  expect(mocks.catalog).not.toHaveBeenCalled();
+  await user.click(screen.getByRole("button", { name: "Kaynak filtreleri" }));
+  await user.selectOptions(await screen.findByLabelText("Oda filtresi"), "r1");
+  await user.selectOptions(screen.getByLabelText("Eğitmen filtresi"), "i1");
+  await user.selectOptions(screen.getByLabelText("Disiplin filtresi"), "tango");
+  expect(screen.queryByText("İkinci ders")).not.toBeInTheDocument();
+  expect(screen.getByText("Birinci ders")).toBeInTheDocument();
+  expect(mocks.calendar).toHaveBeenCalledOnce();
+  await user.click(screen.getByRole("button", { name: "Filtreleri temizle" }));
+  expect(screen.getByText("İkinci ders")).toBeInTheDocument();
+});
+test("filter catalog denial does not remove the authorized calendar or fabricate options", async () => {
+  const user = userEvent.setup();
+  mocks.catalog.mockRejectedValue(Error("FORBIDDEN"));
+  render(<ScheduleWorkspace studios={studios} actorId="actor" />);
+  await user.click(await screen.findByRole("button", { name: "Kaynak filtreleri" }));
+  await screen.findByRole("button", { name: "Kaynakları yeniden oku" });
+  expect(screen.getByRole("region", { name: "Ders programı" })).toBeInTheDocument();
+  expect(screen.queryByLabelText("Oda filtresi")).not.toBeInTheDocument();
 });

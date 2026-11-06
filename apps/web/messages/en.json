@@ -375,7 +375,15 @@
     "editingSession": "Selected session",
     "sessionActions": "Session actions",
     "backToDetail": "Back to session details",
-    "changeSession": "Edit session"
+    "changeSession": "Edit session",
+    "resourceFilters": "Resource filters",
+    "resourceFiltersClose": "Close resource filters",
+    "resourceFilterHint": "Filters narrow the calendar read for this interval; they do not change program or session fields.",
+    "resourceRetry": "Reload resources",
+    "roomFilter": "Room filter",
+    "instructorFilter": "Instructor filter",
+    "disciplineFilter": "Discipline filter",
+    "allResources": "All"
   },
   "sessionChange": {
     "title": "Change session",
@@ -456,7 +464,7 @@
       "succeeded": "The operation succeeded but could not be matched to this session. Get help before starting a new operation."
     },
     "resourcesTitle": "Room and instructor changes",
-    "resourcesHint": "Only selected fields change. Choosing a room replaces the session resource list with that room. Instructor changes preserve assistant duties. The preview validates the result. Choosing an instructor creates explicit session duties; later class default changes do not update this session.",
+    "resourcesHint": "Only selected fields change. Choosing a room replaces the session resource list with that room. Instructor changes preserve assistant duties. The preview validates the result. Choosing an instructor creates explicit session duties; later class default changes do not update this session. Replacing the instructor replaces all current instructor duties with the selected instructor; assistant duties are retained.",
     "replaceRoom": "Change room",
     "replaceInstructor": "Change instructor",
     "newRoom": "New room",
@@ -472,7 +480,15 @@
     "offsetMinutes": "{offset}",
     "removeOffset": "Remove choice for {date}",
     "previewResources": "{count} resources",
-    "previewDuties": "{count} duties"
+    "previewDuties": "{count} duties",
+    "backToChange": "Back to change",
+    "refreshAfterAgreement": "Preview the change again after checking agreements, then confirm the new result separately.",
+    "replaceDuties": "Replace duty list",
+    "replaceDutiesHint": "This replaces the entire duty list. Select every instructor and assistant to retain. An empty list removes all duties; the backend preview checks eligibility again.",
+    "retryResources": "Read resources again",
+    "previewDutyList": "Preview duty list",
+    "instructorDuty": "Instructor",
+    "assistantDuty": "Assistant"
   },
   "students": {
     "mergeTitle": "Merge person records",
@@ -1191,7 +1207,11 @@
     "chooseClass": "Select a class",
     "chooseClassHint": "Manage its schedule, default duties and class details here.",
     "editorContext": "Center timezone: {timezone}",
-    "refreshAfterAgreement": "Get a new program preview after the agreement step. Other blockers are checked separately."
+    "refreshAfterAgreement": "Get a new program preview after the agreement step. Other blockers are checked separately.",
+    "additionalDuties": "Instructor and assistant duties",
+    "explicitDutiesHint": "Selected duties are explicit session/program assignments; they do not inherit class defaults.",
+    "previewResources": "Previewed resources and duties",
+    "assignedPerson": "Assigned person"
   },
   "sessionLifecycle": {
     "cancelTitle": "Cancel session",
@@ -1964,7 +1984,10 @@
     "templateCenter": "Center",
     "templateVersion": "Version {version}",
     "templateSelected": "Selected template: {name}",
-    "templateManual": "Enter pay terms manually"
+    "templateManual": "Enter pay terms manually",
+    "useForDuty": "Use version {version} for this duty",
+    "instructor": "Instructor",
+    "assistant": "Assistant"
   },
   "operatingSettings": {
     "organization": "Organization operating settings",

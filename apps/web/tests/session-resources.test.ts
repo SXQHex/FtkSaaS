@@ -33,3 +33,19 @@ test("series offsets must resolve a real ambiguous local time", () => {
     "invalidTime",
   );
 });
+
+test("explicit duty lists preserve agreement references and never rewrite room/capacity", () => {
+  const assignments = [
+    { person_id: "one", duty: "instructor" as const, agreement_id: "terms" },
+    { person_id: "two", duty: "instructor" as const },
+    { person_id: "help", duty: "assistant" as const },
+  ];
+  expect(resourcePatch(sampleSession, { assignments })).toEqual({ assignments });
+  expect(resourcePatch(sampleSession, { assignments: [] })).toEqual({ assignments: [] });
+  expect(() => resourcePatch(sampleSession, { assignments, instructorId: "one" })).toThrow(
+    "invalidForm",
+  );
+  expect(() =>
+    resourcePatch(sampleSession, { assignments: [...assignments, assignments[0]] }),
+  ).toThrow("invalidForm");
+});

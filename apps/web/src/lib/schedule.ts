@@ -1,4 +1,4 @@
-import type { CalendarItem, Interval } from "@ftksaas/api-contracts";
+import type { CalendarItem, Interval, ResourceRef } from "@ftksaas/api-contracts";
 
 // Calendar providers consume this view model, never domain write commands.
 export type CalendarEntry = {
@@ -7,6 +7,8 @@ export type CalendarEntry = {
   title: string;
   startsAt: string;
   endsAt: string;
+  resources?: ResourceRef[];
+  disciplineIds?: string[];
   capacity?: { total: number; held: number; remaining: number };
 };
 export type CalendarRange = "day" | "week";
@@ -16,6 +18,13 @@ export const calendarEntry = (item: CalendarItem): CalendarEntry => ({
   title: item.title,
   startsAt: item.starts_at,
   endsAt: item.ends_at,
+  resources: item.resources ?? [],
+  disciplineIds:
+    item.type === "session"
+      ? item.discipline_id
+        ? [item.discipline_id]
+        : []
+      : (item.discipline_ids ?? []),
   ...(item.capacity && "total" in item.capacity
     ? {
         capacity: {
@@ -83,4 +92,16 @@ export function calendarInterval(date: string, range: CalendarRange, timeZone: s
 }
 export function entryKey(entry: CalendarEntry) {
   return `${entry.kind}:${entry.id}`;
+}
+
+export type CalendarFilters = { roomId?: string; instructorId?: string; disciplineId?: string };
+export function matchesCalendarFilters(entry: CalendarEntry, filters: CalendarFilters) {
+  return (
+    ((!filters.roomId ||
+      entry.resources?.some((r) => r.kind === "room" && r.id === filters.roomId)) &&
+      (!filters.instructorId ||
+        entry.resources?.some((r) => r.kind === "person" && r.id === filters.instructorId)) &&
+      (!filters.disciplineId || entry.disciplineIds?.includes(filters.disciplineId))) ||
+    false
+  );
 }

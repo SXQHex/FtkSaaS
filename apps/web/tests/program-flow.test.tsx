@@ -385,3 +385,54 @@ test("agreement handoff discards the blocked preview, rereads published history 
     input: { preview: { id: fresh.id, token: fresh.token } },
   });
 });
+test("Pro program submits all explicit duties and reviews returned source identities before approval", async () => {
+  const duties = [
+    { id: "teacher", name: "Test Eğitmen", duty: "instructor" as const },
+    { id: "second", name: "İkinci eğitmen", duty: "instructor" as const },
+    { id: "helper", name: "Destek", duty: "assistant" as const },
+  ];
+  mocks.call.mockResolvedValue({
+    ...preview,
+    sessions: [
+      {
+        session_id: "planned",
+        interval: { starts_at: "2030-01-07T16:30:00Z", ends_at: "2030-01-07T17:30:00Z" },
+        resources: [{ kind: "room", id: "room" }],
+        assignments: [
+          { person_id: "teacher", duty: "instructor" },
+          { person_id: "second", duty: "instructor" },
+          { person_id: "helper", duty: "assistant" },
+        ],
+        capacity: { total: 20 },
+      },
+    ],
+  });
+  render(
+    <ProgramForm
+      scope={scope}
+      selected={selected}
+      catalog={{ ...catalog, duties }}
+      timeZone="Europe/Istanbul"
+      onSaved={mocks.saved}
+    />,
+  );
+  const user = userEvent.setup();
+  await user.click(screen.getByLabelText(/İkinci eğitmen/));
+  await user.click(screen.getByLabelText(/Destek/));
+  await fillProgram();
+  await screen.findByRole("button", { name: "Onayla ve oluştur" });
+  expect(mocks.call.mock.calls[0][1]).toMatchObject({
+    schedule: {
+      inherit_class_assignments: false,
+      assignments: [
+        { person_id: "teacher", duty: "instructor" },
+        { person_id: "second", duty: "instructor" },
+        { person_id: "helper", duty: "assistant" },
+      ],
+    },
+  });
+  const sources = screen.getByRole("list", { name: "Önizlenen kaynaklar ve görevler" });
+  expect(within(sources).getByText(/İkinci eğitmen/)).toBeInTheDocument();
+  expect(within(sources).getByText(/Destek/)).toBeInTheDocument();
+  expect(mocks.send).not.toHaveBeenCalled();
+});

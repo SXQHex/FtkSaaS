@@ -217,3 +217,33 @@ test("a late history response from another person cannot enter the new scope", a
   resolve({ items: [row], as_of: "2026-11-06T00:00:00Z", next_cursor: null });
   await waitFor(() => expect(screen.queryByText("Sürüm 7")).not.toBeInTheDocument());
 });
+test("using a native agreement version requires an explicit target duty and does not publish", async () => {
+  api.list.mockResolvedValue({ items: [row], next_cursor: null, as_of: "2026-11-06T00:00:00Z" });
+  const useVersion =
+    vi.fn<(value: AgreementVersionView, duty: "instructor" | "assistant") => void>();
+  render(
+    <InstructorAgreements
+      scope={scope}
+      personId={person}
+      timeZone="UTC"
+      api={api}
+      requirement={{
+        kind: "instructor_agreement",
+        blocker_index: 0,
+        person_id: person,
+        discipline_id: discipline,
+        format: "group",
+        starts_at: "2027-01-01T00:00:00Z",
+      }}
+      targetDuties={["instructor", "assistant"]}
+      onUseVersion={useVersion}
+    />,
+  );
+  const user = userEvent.setup();
+  expect(
+    await screen.findByRole("button", { name: "Görev için sürüm 7 seç · Eğitmen" }),
+  ).toBeEnabled();
+  await user.click(screen.getByRole("button", { name: "Görev için sürüm 7 seç · Asistan" }));
+  expect(useVersion).toHaveBeenCalledExactlyOnceWith(row, "assistant");
+  expect(mocks.send).not.toHaveBeenCalled();
+});

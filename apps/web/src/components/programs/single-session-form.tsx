@@ -3,11 +3,12 @@ import { useState } from "react";
 import { useTranslations } from "next-intl";
 import { v7 } from "uuid";
 import { Button } from "@ftksaas/ui/components/button";
-import type { SessionCapacity, SessionFormat } from "@ftksaas/api-contracts";
+import type { DutyInput, SessionCapacity, SessionFormat } from "@ftksaas/api-contracts";
 import type { SetupScope } from "../../lib/studio-setup";
-import { sessionCapacity, sessionInterval } from "../../lib/session-create";
+import { sessionAssignments, sessionCapacity, sessionInterval } from "../../lib/session-create";
 import { SetupFeedback, useSetupCommand } from "../setup/setup-command";
 import { LocalTimeField } from "./local-time-field";
+import { AdditionalDuties } from "./additional-duties";
 import { CapacityFields } from "./capacity-fields";
 import type { ClassValues, NamedOption } from "./class-form";
 import type { ProgramCatalog } from "./program-form";
@@ -34,6 +35,7 @@ export function SingleSessionForm({
     [toChoice, setToChoice] = useState("");
   const [roomId, setRoomId] = useState(""),
     [personId, setPersonId] = useState("");
+  const [extras, setExtras] = useState<DutyInput[]>([]);
   const [inherit, setInherit] = useState(false),
     [total, setTotal] = useState(NaN);
   const [categories, setCategories] = useState<SessionCapacity["categories"]>(null);
@@ -98,7 +100,7 @@ export function SingleSessionForm({
               format,
               interval,
               resources: [{ kind: "room", id: roomId }],
-              assignments: inherit ? [] : [{ person_id: personId, duty: "instructor" }],
+              assignments: inherit ? [] : sessionAssignments(personId, extras),
               capacity,
               inherit_class_assignments: inherit,
             },
@@ -161,7 +163,27 @@ export function SingleSessionForm({
             {t("inheritDuties")}
           </label>
         )}
-        {select("instructor", personId, setPersonId, catalog.instructors, !inherit, inherit)}
+        {select(
+          "instructor",
+          personId,
+          (value) => {
+            setPersonId(value);
+            setExtras((current) =>
+              current.filter((a) => !(a.person_id === value && a.duty === "instructor")),
+            );
+          },
+          catalog.instructors,
+          !inherit,
+          inherit,
+        )}
+        {!inherit && (
+          <AdditionalDuties
+            people={catalog.duties ?? []}
+            primaryId={personId}
+            value={extras}
+            onChange={setExtras}
+          />
+        )}
         <CapacityFields
           total={total}
           categories={categories}

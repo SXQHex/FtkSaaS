@@ -1,6 +1,7 @@
 "use client";
 import { useId, useMemo } from "react";
 import { useTranslations } from "next-intl";
+import { AdditionalDuties } from "./additional-duties";
 import { CapacityFields } from "./capacity-fields";
 import { Button } from "@ftksaas/ui/components/button";
 import { Input } from "@ftksaas/ui/components/input";
@@ -58,7 +59,8 @@ export function ProgramFields({
           step={type === "time" ? 1 : type === "number" ? 1 : undefined}
           min={type === "number" ? (name === "total" ? 0 : 1) : undefined}
           value={typeof draft[name] === "number" && Number.isNaN(draft[name]) ? "" : draft[name]}
-          onChange={(event) =>
+          onChange={(event) => {
+            if (["starts_on", "ends_on", "local_start"].includes(name)) setOffsets({});
             setDraft({
               ...draft,
               [name]:
@@ -67,8 +69,8 @@ export function ProgramFields({
                     ? NaN
                     : Number(event.target.value)
                   : event.target.value,
-            })
-          }
+            });
+          }}
         />
       </div>
     );
@@ -90,14 +92,15 @@ export function ProgramFields({
               <input
                 type="checkbox"
                 checked={draft.weekdays.includes(day)}
-                onChange={(event) =>
+                onChange={(event) => {
+                  setOffsets({});
                   setDraft({
                     ...draft,
                     weekdays: event.target.checked
                       ? [...draft.weekdays, day].sort()
                       : draft.weekdays.filter((d) => d !== day),
-                  })
-                }
+                  });
+                }}
               />
               {t(`day${day}`)}
             </label>
@@ -126,7 +129,18 @@ export function ProgramFields({
               required={!draft.inherit_class_assignments || name === "room_id"}
               disabled={name === "person_id" && draft.inherit_class_assignments}
               value={draft[name]}
-              onChange={(event) => setDraft({ ...draft, [name]: event.target.value })}
+              onChange={(event) =>
+                setDraft({
+                  ...draft,
+                  [name]: event.target.value,
+                  extra_assignments:
+                    name === "person_id"
+                      ? draft.extra_assignments?.filter(
+                          (a) => !(a.person_id === event.target.value && a.duty === "instructor"),
+                        )
+                      : draft.extra_assignments,
+                })
+              }
               className="min-h-11 w-full rounded-md border bg-background px-3 text-sm"
             >
               <option value="">{t("choose")}</option>
@@ -139,6 +153,14 @@ export function ProgramFields({
           </div>
         ))}
       </div>
+      {!draft.inherit_class_assignments && (
+        <AdditionalDuties
+          people={catalog.duties ?? []}
+          primaryId={draft.person_id}
+          value={draft.extra_assignments ?? []}
+          onChange={(extra_assignments) => setDraft({ ...draft, extra_assignments })}
+        />
+      )}
       <CapacityFields
         total={draft.total}
         categories={draft.categories}
@@ -151,7 +173,12 @@ export function ProgramFields({
             id={`${id}-${date}`}
             required
             value={offsets[date] ?? ""}
-            onChange={(event) => setOffsets({ ...offsets, [date]: Number(event.target.value) })}
+            onChange={(event) => {
+              const next = { ...offsets };
+              if (event.target.value === "") delete next[date];
+              else next[date] = Number(event.target.value);
+              setOffsets(next);
+            }}
             className="min-h-11 w-full rounded-md border bg-background px-3 text-sm"
           >
             <option value="">{t("choose")}</option>

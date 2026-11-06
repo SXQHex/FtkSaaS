@@ -375,7 +375,15 @@
     "editingSession": "İşlem yapılan seans",
     "sessionActions": "Seans işlemleri",
     "backToDetail": "Seans detayına dön",
-    "changeSession": "Seansı düzenle"
+    "changeSession": "Seansı düzenle",
+    "resourceFilters": "Kaynak filtreleri",
+    "resourceFiltersClose": "Kaynak filtrelerini kapat",
+    "resourceFilterHint": "Filtreler yalnız bu aralıkta okunan takvimi daraltır; program veya seans alanlarını değiştirmez.",
+    "resourceRetry": "Kaynakları yeniden oku",
+    "roomFilter": "Oda filtresi",
+    "instructorFilter": "Eğitmen filtresi",
+    "disciplineFilter": "Disiplin filtresi",
+    "allResources": "Tümü"
   },
   "sessionChange": {
     "title": "Seansı değiştir",
@@ -456,7 +464,7 @@
       "succeeded": "İşlem başarılı görünüyor ancak seansla eşleştirilemedi. Yeni işlem göndermeden destek al."
     },
     "resourcesTitle": "Oda ve eğitmen değişikliği",
-    "resourcesHint": "Yalnız seçtiğiniz alanlar değiştirilir. Oda seçimi seansın kaynak listesini seçilen odayla değiştirir. Eğitmen seçiminde asistan görevleri korunur. Sonuçlar önizlemede denetlenir. Eğitmen seçimi seansa özel görev listesi oluşturur; sonraki sınıf varsayılanı değişiklikleri bu seansı değiştirmez.",
+    "resourcesHint": "Yalnız seçtiğiniz alanlar değiştirilir. Oda seçimi seansın kaynak listesini seçilen odayla değiştirir. Eğitmen seçiminde asistan görevleri korunur. Sonuçlar önizlemede denetlenir. Eğitmen seçimi seansa özel görev listesi oluşturur; sonraki sınıf varsayılanı değişiklikleri bu seansı değiştirmez. Eğitmen değişimi tüm mevcut eğitmen görevlerini seçilen eğitmenle değiştirir; asistan görevleri korunur.",
     "replaceRoom": "Odayı değiştir",
     "replaceInstructor": "Eğitmeni değiştir",
     "newRoom": "Yeni oda",
@@ -472,7 +480,15 @@
     "offsetMinutes": "{offset}",
     "removeOffset": "{date} seçimini kaldır",
     "previewResources": "{count} kaynak",
-    "previewDuties": "{count} görev"
+    "previewDuties": "{count} görev",
+    "backToChange": "Değişikliğe dön",
+    "refreshAfterAgreement": "Anlaşma kontrolünden sonra değişikliği yeniden önizleyin ve sonucu ayrıca onaylayın.",
+    "replaceDuties": "Görev listesini değiştir",
+    "replaceDutiesHint": "Seçim tam görev listesinin yerini alır. Korunacak tüm eğitmen ve asistanları seçin. Boş liste görevleri kaldırır; backend önizlemesi uygunluğu yeniden denetler.",
+    "retryResources": "Kaynakları yeniden oku",
+    "previewDutyList": "Önizleme görev listesi",
+    "instructorDuty": "Eğitmen",
+    "assistantDuty": "Asistan"
   },
   "students": {
     "mergeTitle": "Kişi kayıtlarını birleştir",
@@ -1191,7 +1207,11 @@
     "chooseClass": "Bir sınıf seçin",
     "chooseClassHint": "Programını, varsayılan görevlerini ve sınıf bilgilerini buradan yönetin.",
     "editorContext": "Merkez saat dilimi: {timezone}",
-    "refreshAfterAgreement": "Anlaşma adımından sonra yeni bir program önizlemesi alın. Diğer engeller ayrıca kontrol edilir."
+    "refreshAfterAgreement": "Anlaşma adımından sonra yeni bir program önizlemesi alın. Diğer engeller ayrıca kontrol edilir.",
+    "additionalDuties": "Eğitmen ve asistan görevleri",
+    "explicitDutiesHint": "Seçilen görevler açık seans/program görevleridir; sınıf varsayılanlarını devralmaz.",
+    "previewResources": "Önizlenen kaynaklar ve görevler",
+    "assignedPerson": "Görevli kişi"
   },
   "sessionLifecycle": {
     "cancelTitle": "Seansı iptal et",
@@ -1964,7 +1984,10 @@
     "templateCenter": "Merkez",
     "templateVersion": "Sürüm {version}",
     "templateSelected": "Seçilen şablon: {name}",
-    "templateManual": "Ücreti elle gir"
+    "templateManual": "Ücreti elle gir",
+    "useForDuty": "Görev için sürüm {version} seç",
+    "instructor": "Eğitmen",
+    "assistant": "Asistan"
   },
   "operatingSettings": {
     "organization": "Organizasyon işletim ayarları",

@@ -1,9 +1,16 @@
 "use client";
 
+import dynamic from "next/dynamic";
 import { useRef, useState, type FormEvent } from "react";
 import { useLocale, useTranslations } from "next-intl";
 import { v7, validate as isUuid } from "uuid";
-import type { ChangeScope, Preview, SessionView, LocalOffsetChoice } from "@ftksaas/api-contracts";
+import type {
+  ChangeScope,
+  Preview,
+  SessionView,
+  LocalOffsetChoice,
+  ScheduleConfigurationRequirement,
+} from "@ftksaas/api-contracts";
 import { Button } from "@ftksaas/ui/components/button";
 import { Input } from "@ftksaas/ui/components/input";
 import { Label } from "@ftksaas/ui/components/label";
@@ -20,6 +27,10 @@ import { resourcePatch, type ResourceDraft } from "../../lib/session-resources";
 import { SessionResources } from "./session-resources";
 import { SeriesOffsets } from "./series-offsets";
 import { ScheduleConfiguration } from "../programs/schedule-configuration";
+
+const InstructorAgreements = dynamic(() =>
+  import("../agreements/instructor-agreements").then((m) => m.InstructorAgreements),
+);
 
 type Pending = { operation_key: string; preview: { id: string; token: string } };
 type Props = {
@@ -91,6 +102,8 @@ export function SessionChangeFlow({
   actions,
 }: Props & { actions: SessionChangeActions }) {
   const t = useTranslations("sessionChange");
+  const [configuration, setConfiguration] = useState<ScheduleConfigurationRequirement | null>(null);
+  const [needsPreview, setNeedsPreview] = useState(false);
   const locale = useLocale();
   const storageKey = `ftksaas:session-change:${actorId}:${orgId}:${session.id}`;
   const [stage, setStage] = useState<Stage>(() => recover(storageKey));
@@ -166,6 +179,7 @@ export function SessionChangeFlow({
       return;
     }
     locked.current = true;
+    setNeedsPreview(false);
     setStage({ phase: "previewing" });
     try {
       const result = await actions.preview({
@@ -317,7 +331,64 @@ export function SessionChangeFlow({
           {message(stage.error)}
         </p>
       )}
-      {(stage.phase === "edit" || stage.phase === "previewing") && (
+      {needsPreview && <output aria-live="polite">{t("refreshAfterAgreement")}</output>}
+      {configuration && centerId && (
+        <section className="space-y-4">
+          <InstructorAgreements
+            scope={{ actorId, orgId, centerId }}
+            personId={configuration.person_id}
+            requirement={configuration}
+            timeZone={timeZone}
+            onPublished={() => setNeedsPreview(true)}
+            targetDuties={[
+              ...new Set(
+                (resourcePatch(session, resources).assignments ?? session.assignments)
+                  .filter((a) => a.person_id === configuration.person_id)
+                  .map((a) => a.duty),
+              ),
+            ]}
+            onUseVersion={(row, duty) => {
+              const assignments =
+                resourcePatch(session, resources).assignments ?? session.assignments;
+              if (!assignments.some((a) => a.person_id === row.person_id && a.duty === duty))
+                return;
+              const selectedAssignments = assignments.map((a) =>
+                a.person_id === row.person_id && a.duty === duty
+                  ? { ...a, agreement_id: row.id }
+                  : a,
+              );
+              setResources({
+                ...resources,
+                instructorId: undefined,
+                instructorName: undefined,
+                assignments: selectedAssignments,
+                assignmentReferences: [
+                  ...new Map(
+                    [
+                      ...(resources.assignmentReferences ?? session.assignments),
+                      ...selectedAssignments,
+                    ].map((a) => [`${a.person_id}:${a.duty}`, a]),
+                  ).values(),
+                ],
+              });
+              setConfiguration(null);
+              setStage({ phase: "edit" });
+              setNeedsPreview(true);
+            }}
+          />
+          <Button
+            type="button"
+            variant="outline"
+            onClick={() => {
+              setConfiguration(null);
+              setNeedsPreview(true);
+            }}
+          >
+            {t("backToChange")}
+          </Button>
+        </section>
+      )}
+      {!configuration && (stage.phase === "edit" || stage.phase === "previewing") && (
         <form onSubmit={preview} className="space-y-5" aria-busy={busy}>
           <fieldset disabled={busy} className="min-w-0 space-y-5">
             <legend className="sr-only">{t("title")}</legend>
@@ -378,6 +449,7 @@ export function SessionChangeFlow({
             {centerId && (
               <SessionResources
                 scope={{ actorId, orgId, centerId }}
+                assignments={resources.assignmentReferences ?? session.assignments}
                 value={resources}
                 onChange={setResources}
               />
@@ -453,6 +525,18 @@ export function SessionChangeFlow({
                   </p>
                 )}
 
+                <ul className="space-y-1" aria-label={t("previewDutyList")}>
+                  {item.assignments.map((a) => (
+                    <li key={`${a.person_id}:${a.duty}`}>
+                      {t(a.duty === "instructor" ? "instructorDuty" : "assistantDuty")}:{" "}
+                      {resources.dutyNames?.[`${a.person_id}:${a.duty}`] ??
+                        (a.person_id === resources.instructorId
+                          ? resources.instructorName
+                          : undefined) ??
+                        a.person_id}
+                    </li>
+                  ))}
+                </ul>
                 <p>
                   {t("previewResources", { count: item.resources.length })} ·{" "}
                   {t("previewDuties", { count: item.assignments.length })}
@@ -474,6 +558,21 @@ export function SessionChangeFlow({
             </div>
           )}
           <ScheduleConfiguration
+            onConfigure={
+              centerId
+                ? () => {
+                    const requirement = stage.preview.configuration_requirement;
+                    if (
+                      requirement?.kind !== "instructor_agreement" ||
+                      stage.preview.blockers[requirement.blocker_index]?.code !==
+                        "POLICY_NOT_CONFIGURED"
+                    )
+                      return;
+                    setConfiguration(requirement);
+                    setStage({ phase: "edit" });
+                  }
+                : undefined
+            }
             preview={stage.preview}
             timeZone={timeZone}
             people={

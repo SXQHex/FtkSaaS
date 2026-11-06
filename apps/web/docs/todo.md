@@ -234,7 +234,7 @@ Eski merkez instructor ilişki satırı yalnız Business test organizasyonunda b
 
 #### Pro eğitmen anlaşmaları — programın önkoşulu
 
-**Durum:** PR237 temel anlaşma kaynağı main’de; R03 hazırlık şablonu tüketimi aktif kaynak paketidir. Chrome/canlı kabul açık. S02 kaynak kurulumuna bağlı F13/F20 alt kapsamı. **Bağımlılık:** Pro ekip ve [WF14](../../../docs/workflows.md#wf14). S07 hakediş ekranı beklenmez.
+**Durum:** PR237 temel anlaşma kaynağı ve PR241 hazırlık şablonu tüketimi main’de; R03 kaynak kapsamı teslim edildi. Chrome/canlı kabul açık. S02 kaynak kurulumuna bağlı F13/F20 alt kapsamı. **Bağımlılık:** Pro ekip ve [WF14](../../../docs/workflows.md#wf14). S07 hakediş ekranı beklenmez.
 
 - [x] `instructor_agreements_list_v1` → yetkili gerçek şart seçimi → `instructor_agreement_publish_v1` → listeyi yeniden oku zincirini kişi/merkez/disiplin/format/yürürlük kapsamıyla kur.
 - [x] Yeni zincir ile `supersedes_id`/`expected_version` isteyen yeni sürümü ayır; geçmiş anlaşma yerinde düzenlenmez. Ücret ayrıntısı yalnız yetkili projeksiyonda görünür.
@@ -402,13 +402,22 @@ Sayfa yeni kaynak için reload edildi; mevcut native Pro oturumunda Europe/Berli
 
 #### Pro program ve çok kaynaklı takvim kabulü
 
-**Durum:** Açık Pro genişlemesi; yukarıdaki belirli Pro/Business senaryoları tam Pro modül kabulü değildir. **Bağımlılık:** S02 Pro kaynak/anlaşma; F08–F10/F13/F14.
+**Durum:** R04 kaynak genişlemesi tek PR için hazırlanıyor; Chrome/canlı ve Community License build/widget kabulü açık. Önceki belirli Pro/Business senaryoları tam Pro modül kabulü değildir. **Bağımlılık:** S02 Pro kaynak/anlaşma; F08–F10/F13/F14.
 
-- [ ] Oda/eğitmen/disiplin filtreleri ve seçimlerini mevcut program, tek seans, görev, değişiklik, iptal ve telafi yüzeylerinde tutarlı tamamla. Kaynak değişimini kapasite değişiminden; sınıf görev mirasını tam açık görev listesinden ayır.
-- [ ] Seri/DST, anlaşma geçerliliği, çakışma ve kesin rezervasyon etkilerini gerçek preview üzerinden göster; anlaşma değişince eski onay kullanılamasın.
+- [x] Normal takvim kayıtlarında oda/eğitmen/disiplin filtreleri; mevcut program/tek seans/görev/değişiklik/iptal/telafi yüzeylerinin kaynak seçimleri. Kapasite-only patch kaynak/görev yazmaz; sınıf mirası açık tam görev listesinden ayrıdır.
+- [x] Seri/DST ve anlaşma önkoşulunu native preview üzerinden göster; kaynak/görev kimliklerini sonuçtan doğrula, anlaşma kontrolüne geçerken eski preview/onayı düşür ve ayrı yeni preview→apply iste. Çakışma ve kesin rezervasyon etkilerini istemcide hesaplama.
+- [ ] Chrome/canlı: iki odada eşzamanlı ders, aynı eğitmen çakışmasının reddi, seri/kaynak değişimi, iptal/telafi, FD01/FD10 ayar etkisi ve Starter tek kaynak regresyonu.
 - [ ] Community License onayını kurulu sürüm/build anahtarı ve yayımlanmış gerçek Scheduler görünümüyle doğrula; onay bildirimi tek başına kabul değildir. Liste fallback'i korunur.
 
-**Kabul:** İki odada eşzamanlı çakışmasız ders, aynı eğitmen çakışmasının reddi, seri/kaynak değişimi, iptal/telafi ve doğru yeniden okuma; Starter tek kaynak regresyonu. FD01/FD10 ayar etkisi aynı dilimde sınanır.
+**R04 kaynak — WF03/WF14:** Filtre kataloğu eylemle lazy yüklenir; yalnız normal `getProgramCatalog` ve `calendar_get_v1` projeksiyonları kullanılır. Oda `resources.kind=room`, eğitmen `kind=person`, seans disiplini `discipline_id`, etkinlik etiketleri `discipline_ids` ile eşleşir. Aynı dönem tüm sayfaları okunduktan sonra üç filtre birlikte uygulanır; istemcide görev/rol keşfinden yeni takvim kaydı türetilmez. Filtre kataloğu reddi yetkili takvimi kaldırmaz; tekrar okuma ve temizleme sunulur. Hesap/org/merkez geçişi eski filtre/detay durumunu kaldırır; filtre değişimi açık seansı kapatır. Aynı aralık/listede olmayan kayıtlar aranmış sayılmaz.
+
+Program ve tek seans birincil eğitmene ek olarak normal görev kataloğundaki eğitmen/asistanları seçebilir. Sınıf mirasında explicit liste boş gönderilir; tekrar eden kişi/görev çifti reddedilir. Seans değişikliğinde oda, tek eğitmen değişimi ve tam görev listesi ayrı seçimdir; tam listede korunacak herkes açık seçilir ve boş liste görevleri kaldırır. Mevcut anlaşma referansı, katalogdan çıkmış görev ve kaldırıp geri ekleme korunur. Önizlemede dönen görevler/kimliklerle eşleşen adlar gösterilir; bilinmeyen ad tahmin edilmez. Yeni görev için anlaşmayı backend çözer; yeni rol, ücret veya yetki üretilmez. Sınıf görevi tam anahtar/sürüm selector'üyle mevcut akışındadır; desteklenmeyen seri keşfi veya session miras selector'ü eklenmedi.
+
+Seans değişikliğinin geçerli anlaşma tanısından normal yetki denetimli anlaşma paneline geçilir; eski preview/operation-key taslağı bırakılır. Yayın sonrası geçmiş yeniden okunur; mevcut görev açık bir anlaşma referansı taşıyorsa kapsam/tarih/formatı eşleşen dönen sürüm kullanıcı tarafından ayrıca seçilir. Tanı duty içermediğinden kullanıcı gerçek görev rolünü de açıkça seçer; yalnız hedef kişi/görev çifti güncellenir, aynı kişinin diğer görev referansı korunur. Diğer görev seçimi veya görevi kaldırıp yeniden seçme taze anlaşma referansını eski seans referansıyla ezmez. Yeni preview bütün seri geçerliliğini yeniden denetler; sürüm düğmesi tek başına canonical geçerlilik kanıtı değildir. Yayın/geri dönüş yeni preview ve ayrı apply ister; yetkisiz anlaşma okuyucusu ücret göstermez. Yeni programda zaman/tarih/hafta günü değişimi eski DST offset seçimlerini temizler; boş offset sıfır sayılmaz. İptal preview→ayrı onay→apply, telafi yeni rezervasyon gereği ve kayıp yanıtta aynı key/payload status/replay mevcut native altyapıda korunur. Başarı sonrası seans/takvim yeniden okunur. Liste fallback'i ve lisanslı Scheduler sınırı değiştirilmedi; yeni bağımlılık/backend/CI değişikliği yoktur.
+
+**R04 son otomatik doğrulama:** 14 yeni regresyonla918 web +1 UI testi ve8/8 lint/format/typecheck/test/build görevi geçti. Birlikte kaynak/disiplin filtreleme, katalog reddinde yetkili takvim, explicit çoklu görev ve miras ayrımı, aynı payload/key kurtarması, tam görev listesinde gerçek ref’lerin korunması, eski anlaşma→native yeni yayın→geçmiş okuma→açık kişi/görev sürüm seçimi→farklı preview id/token→ayrı apply ve DST offset temizliği sınandı. Aynı kişinin ikinci görev ref’i ve görev çıkar/geri ekle sonrası yeni ref korunur. Kalite0 bulgu/10 guard testi, docs:check ve frontend izolasyonu geçti. Bağımsız incelemede bulunan iki reference/rol bulgusu düzeltildi; son delta incelemesinde Required/Critical yok. Tarayıcı kurulmadı/çalıştırılmadı; CI, main/yayın ve gerçek kabul ayrı aşamalardır.
+
+**Kabul:** Kaynak ve otomatik kontroller ayrı kaydedilir; üstteki Chrome/canlı ve lisans kalemleri kullanıcı talimatıyla açık tutulur. Bütün Pro kabulü veya yayın kapanışı kaynak testiyle verilmez.
 
 <a id="web-s04"></a>
 
@@ -961,7 +970,7 @@ Bu eşleme uygulama yerini gösterir; FD kapsamının kabul checklist'i yukarıd
 
 ## 7. Bölüm bölüm teslim: tek aktif bölüm
 
-**Aktif kaynak paketi: R03 eğitmen anlaşmaları; `feature/web-r03-agreement-templates`.** Kullanıcı XREQ-026/027 için backend güncellemesini bekleyip R03 ile devam etme kararı verdi. R01/R02’nin bağımlı maddeleri açık kalır. PR239 main’e birleşti (`af5b8a536d1bc500b51dabdefea0cbfde0e639e7`); aynı kaynağın [main proof](https://github.com/SXQHex/FtkSaaS/actions/runs/42304508554), [merge proof](https://github.com/SXQHex/FtkSaaS/actions/runs/42304508686), [development](https://github.com/SXQHex/FtkSaaS/actions/runs/42304598099) ve [Vercel](https://github.com/SXQHex/FtkSaaS/actions/runs/42304598103) sonuçları başarılı doğrulandı. Bu kanıt yeni R03 adayına aktarılmaz.
+**Aktif kaynak paketi: R04 Pro takvim/program; `feature/web-r04-pro-scheduling`.** Kullanıcı R04 kaynak kapsamının tek PR ile teslimini istedi; Chrome/canlı kabuller açık kalır. XREQ-026/027 için backend güncellemesi ve R01/R02’nin bağımlı frontend maddeleri beklemede kalır. PR241 main’e birleşti (`cec29f55da5ae8a203700e5d7578268934560af0`); aynı kaynağın [main proof](https://github.com/SXQHex/FtkSaaS/actions/runs/42307769694), [merge proof](https://github.com/SXQHex/FtkSaaS/actions/runs/42307769610), [development](https://github.com/SXQHex/FtkSaaS/actions/runs/42307835970) ve [Vercel](https://github.com/SXQHex/FtkSaaS/actions/runs/42307836063) sonuçları başarılı doğrulandı. Bu kanıt yeni R04 adayına aktarılmaz.
 
 R00'da PR234 aday/main/development sonuçları yeniden doğrulandı; backend hosted okuma kaydı kaynak sahibinde bulundu. Önceki XREQ-023/024 backend bekleme hükmü kaldırıldı, frontend ekran kabulü kapatılmadı. Altı normal management okuyucusu tek source entity/sürüm ve exact selector anahtarlarına uyarlandı. Boş sonuç yetki vermez; eksik/çoklu veya bozuk kaynak hata olur, farklı selector hedefi mevcut unavailable/false sonucunu korur. FORBIDDEN/NOT_FOUND eylemi kapatır; plan/config/Auth hatası görünür kalır. Writer yeniden yetki ve domain denetimi yapar; frontend receipt, bakiye veya komut sürümü üretmez.
 

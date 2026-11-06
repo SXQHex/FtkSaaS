@@ -1,5 +1,5 @@
 import type { ManagementStateView, ProgramSpec } from "@ftksaas/api-contracts";
-import { sessionCapacity } from "./session-create";
+import { sessionCapacity, sessionAssignments } from "./session-create";
 import { localTimeChoices } from "./session-change";
 import { setupCall, type SetupScope } from "./studio-setup";
 
@@ -40,6 +40,7 @@ export type ProgramInput = {
   total: number;
   categories?: ProgramSpec["capacity"]["categories"];
   inherit_class_assignments?: boolean;
+  extra_assignments?: import("@ftksaas/api-contracts").DutyInput[];
 };
 export function buildProgram(
   input: ProgramInput,
@@ -74,7 +75,7 @@ export function buildProgram(
     room_id: input.room_id,
     assignments: input.inherit_class_assignments
       ? []
-      : [{ person_id: input.person_id, duty: "instructor" }],
+      : sessionAssignments(input.person_id, input.extra_assignments),
     capacity: sessionCapacity(input.total, input.categories),
     offset_choices: choices,
     inherit_class_assignments: input.inherit_class_assignments ?? false,

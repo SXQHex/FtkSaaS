@@ -8,6 +8,8 @@ import type { CenterView, OrganizationView } from "@ftksaas/api-contracts";
 import { CalendarDays } from "lucide-react";
 import { Button } from "@ftksaas/ui/components/button";
 import {
+  matchesCalendarFilters,
+  type CalendarFilters,
   calendarEntry,
   calendarInterval,
   dateInZone,
@@ -20,6 +22,11 @@ import { SessionDetail } from "./session-detail";
 import { LessonRequests } from "../bookings/lesson-requests";
 const ProgramManager = dynamic(
   () => import("../programs/program-manager").then((module) => module.ProgramManager),
+  { loading: WorkspaceLoading },
+);
+
+const CalendarResourceFilters = dynamic(
+  () => import("./calendar-resource-filters").then((m) => m.CalendarResourceFilters),
   { loading: WorkspaceLoading },
 );
 
@@ -71,7 +78,7 @@ export function ScheduleWorkspace({
         )}
       </div>
       <CalendarContent
-        key={`${scope.organization.id}:${scope.center.id}`}
+        key={`${actorId ?? "member"}:${scope.organization.id}:${scope.center.id}`}
         actorId={actorId}
         orgId={scope.organization.id}
         center={scope.center}
@@ -91,6 +98,9 @@ function CalendarContent({
 }) {
   const program = useTranslations("program");
   const [managing, setManaging] = useState(false);
+  const [filtersOpen, setFiltersOpen] = useState(false),
+    [filters, setFilters] = useState<CalendarFilters>({});
+  const calendar = useTranslations("calendar");
   const api = useTranslations("api");
   const [date, setDate] = useState(() => dateInZone(new Date(), center.timezone));
   const [range, setRange] = useState<CalendarRange>("day");
@@ -155,12 +165,39 @@ function CalendarContent({
           )}
         </div>
       )}
+      {!managing && actorId && (
+        <div className="space-y-3">
+          <Button
+            variant="outline"
+            aria-expanded={filtersOpen}
+            onClick={() => {
+              setSelected(null);
+              setFilters({});
+              setFiltersOpen((v) => !v);
+            }}
+          >
+            {calendar(filtersOpen ? "resourceFiltersClose" : "resourceFilters")}
+          </Button>
+          {filtersOpen && (
+            <CalendarResourceFilters
+              scope={{ actorId, orgId, centerId: center.id }}
+              value={filters}
+              onChange={(next) => {
+                setSelected(null);
+                setFilters(next);
+              }}
+            />
+          )}
+        </div>
+      )}
       {!managing && (
         <SessionCalendar
           date={date}
           range={range}
           timeZone={center.timezone}
-          entries={current?.entries ?? []}
+          entries={(current?.entries ?? []).filter((entry) =>
+            matchesCalendarFilters(entry, filters),
+          )}
           loading={!current}
           error={current?.error ? api(current.error) : undefined}
           onDateChange={(value) => {
