@@ -379,7 +379,7 @@ Kaynak, negatif sözleşme ve ayrı native katalog kökü hazırlanmıştır; ye
 
 Gerçek tenant verisindeki118 aktif kişide görünürlük SQL'i18,4s sürüyor;17,6s operational helper'da, assigned helper8,6ms. Native Auth veya DB parolası reddi değildir. Alias ilişkilerini her hedef için bütün tenant üzerinde yeniden hesaplayan yol daraltılır: aynı yetki/kapsam/alias semantiğiyle root-once indexed bileşen; projeksiyonda tek üyelik çözümü; operasyon yetkisi ve olası ataması olmayan self aktöründe doğrudan kendi kişi indeksi. Eğitmen/assistant atanmış kişi erişimi, iletişim gizliliği, cursor ve canlı merkez/plan kapıları korunur. Yeni endpoint/izin/timeout artışı veya frontend değişikliği yoktur.
 
-10k bağımsız kişi ve alias ile native regresyon adaydır. Kaynak/native/main/development ve hosted gerçek öğrenci kataloğu/create tekrarının kanıtı backend devrinde tutulur; bu değerlendirme henüz talep kapanışı veya frontend ekran kabulü değildir.
+PR221 ile 10k bağımsız kişi/alias native regresyonu, main ve development teslimi geçti. Gerçek User1 native Auth→self kişi keşfi→disiplin/eğitmen kataloğu→talep create→ayrıntı→withdraw zinciri başarılıdır; son talep withdrawn/version2 doğrulandı. Kaynak/run/ortam ve kalıcı talep kimliğinin tek sahibi [backend devridir](../apps/backend/docs/00-FtkSaaS-yeni-sohbet-devir.md#pr221-teslim-ve-6-kasım-canlı-kontrol-noktası). Backend self okuyucu engeli çözüldü; frontend ekran kabulü ve talebin karşı alan kapanışı frontend sahibinde kalır.
 
 <a id="xreq-022"></a>
 ## XREQ-022 Hatırlatma ayarları ve otomasyon iş sonuçlarının tüketimi
