@@ -284,8 +284,8 @@
         "management_state_get_v1"
       ],
       "review": {
-        "fingerprint": "89e346a42919cec6ae11c1d0ce47662bcaa31306edfc67c16159d26b278d5bcd",
-        "reason": "Reviewed source-bound inventory hashes and line ownership after focused native fixture corrections; complete 103-unit acceptance and quality gates preserved."
+        "fingerprint": "d865fa052b221aa8c9b12a1d55a658f1299da3013547e55fe2800b5e717e8561",
+        "reason": "Reviewed one explicit UUID parameter cast in native fixture and its source inventory hash; test ownership, assertions and acceptance gates unchanged."
       }
     },
     {
@@ -1178,8 +1178,8 @@
         "settings_preparation_resolve_v1"
       ],
       "review": {
-        "fingerprint": "dd8772aeaf8a99b571ab1b2dd9868b21bed64b4f4778d1e72d46a7f0c1b0af08",
-        "reason": "Reviewed catalog round-trip fixture: denied center override is asserted before explicit Business organization enablement; every declared field and replay assertion remains."
+        "fingerprint": "16462426dd235bc22dda135d212391bebe210d45cab97ec6e9b3e75c479a2e68",
+        "reason": "Reviewed native historical-plan fixture correction: job identity is UUID and dedupe key remains its text representation; settings behavior and all assertions unchanged."
       }
     },
     {
@@ -1631,8 +1631,8 @@
         "subscription_boundary_apply_v1"
       ],
       "review": {
-        "fingerprint": "dcafba62f187ae19e6051ae0a6cc7e0f67152bea29f264d173da36148f1ccba1",
-        "reason": "Reviewed additive migration ACL and native attempts checks: dedicated worker LOGIN permissions and existing lease fences are unchanged; human API stays invoker scoped."
+        "fingerprint": "9f3d12adc50c287a64de123bbba19688054fc51564247f6165d6cd328e63f2d9",
+        "reason": "Reviewed worker fixture identity cast after 42P08 reproduction; no domain, worker permission, lease, timing or delivery behavior changes."
       }
     }
   ]
