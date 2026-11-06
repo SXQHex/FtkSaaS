@@ -1,5 +1,6 @@
 import { validate } from "uuid";
 import type { FinanceView } from "@ftksaas/api-contracts";
+import { balanceApi, refundApi } from "./finance-management";
 import { correctionApi } from "./collection-correction";
 import { ApiFailure } from "./api";
 import { money } from "./collection-command";
@@ -47,6 +48,8 @@ export function financeMatches(
 }
 export const financeApi = {
   corrections: correctionApi,
+  balance: balanceApi,
+  refunds: refundApi,
   read: async (scope: SetupScope, personId: string, currency: string, cursor?: string) => {
     const view = await setupCall("finance_get_v1", {
       org_id: scope.orgId,

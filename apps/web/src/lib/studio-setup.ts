@@ -1,4 +1,10 @@
 import { v7, validate } from "uuid";
+import {
+  balanceOperations,
+  balanceFields,
+  validBalanceCommand,
+  type BalanceOperation,
+} from "./finance-actions";
 import { validCorrection } from "./collection-correction";
 import { validCollection } from "./collection-command";
 import {
@@ -20,8 +26,10 @@ import { apiClient, ApiFailure } from "./api";
 import { sessionCapacity } from "./session-create";
 export const setupWrites = [
   ...rightsOperations,
+  ...balanceOperations,
   "collection_record_v1",
   "collection_correct_apply_v1",
+  "sale_refund_apply_v1",
   ...bookingWrites,
   "product_publish_v1",
   "document_accept_v1",
@@ -53,6 +61,7 @@ export const setupWrites = [
 export type SetupWrite = (typeof setupWrites)[number];
 type SetupUpload = "document_upload_prepare_v1" | "file_upload_complete_v1";
 type SetupRead =
+  | "sale_refund_preview_v1"
   | "sale_preview_v1"
   | "sale_renew_preview_v1"
   | "finance_get_v1"
@@ -112,7 +121,9 @@ export type PendingSetup = { command: SetupCommand; blocked?: boolean };
 const keyPattern = /^[a-f0-9]{8}-[a-f0-9]{4}-7[a-f0-9]{3}-[89ab][a-f0-9]{3}-[a-f0-9]{12}$/i;
 const fields: Record<SetupWrite, string[]> = {
   ...bookingFields,
+  ...balanceFields,
   collection_correct_apply_v1: ["preview"],
+  sale_refund_apply_v1: ["preview"],
   collection_record_v1: [
     "person_id",
     "amount_minor",
@@ -227,6 +238,25 @@ export function recoverSetup(scope: SetupScope, slot: string): PendingSetup | "i
       (!validCorrection(input, scope.centerId) ||
         !/^collection-correct:[^:]+$/.test(slot) ||
         !validate(slot.slice("collection-correct:".length)))
+    )
+      return "invalid";
+    if (
+      /^(credit-refund|credit-offset|debt-adjust):/.test(slot) &&
+      !balanceOperations.some((operation) => operation === command.operation)
+    )
+      return "invalid";
+    if (
+      balanceOperations.some((operation) => operation === command.operation) &&
+      !validBalanceCommand(command.operation as BalanceOperation, input, scope.centerId, slot)
+    )
+      return "invalid";
+    if (slot.startsWith("sale-refund:") && command.operation !== "sale_refund_apply_v1")
+      return "invalid";
+    if (
+      command.operation === "sale_refund_apply_v1" &&
+      (!validCorrection(input, scope.centerId) ||
+        !/^sale-refund:[^:]+$/.test(slot) ||
+        !validate(slot.slice("sale-refund:".length)))
     )
       return "invalid";
     if (slot.startsWith("finance:") && command.operation !== "collection_record_v1")

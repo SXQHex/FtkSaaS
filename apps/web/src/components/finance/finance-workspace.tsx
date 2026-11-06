@@ -68,7 +68,7 @@ function FinanceDirectory({ scope, timeZone }: { scope: SetupScope; timeZone: st
             {person.display_name}
             {person.subscriber_number ? ` · ${person.subscriber_number}` : ""}
           </p>
-          <PersonFinance scope={scope} personId={person.id} timeZone={timeZone} />
+          <PersonFinance management scope={scope} personId={person.id} timeZone={timeZone} />
         </>
       )}
     </section>

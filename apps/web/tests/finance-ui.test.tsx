@@ -15,6 +15,16 @@ vi.mock("../src/lib/supabase/client", () => ({
 }));
 const id = "019a2b3c-4d5e-7000-8000-000000000001",
   other = "019a2b3c-4d5e-7000-8000-000000000002";
+const additional = {
+  balance: { access: async () => false },
+  refunds: {
+    sales: async () => [],
+    access: async () => false,
+    preview: async () => {
+      throw Error("denied");
+    },
+  },
+};
 const corrections = {
   canCorrect: async () => false,
   preview: async () => {
@@ -58,7 +68,21 @@ beforeEach(() => {
 test("finance is lazy, uses an explicit currency and does not turn historical unknown payment into cash", async () => {
   const user = userEvent.setup(),
     read = vi.fn<FinanceApi["read"]>(async () => view),
-    api = { read, corrections, canCollect: vi.fn<FinanceApi["canCollect"]>(async () => false) };
+    api = {
+      ...additional,
+      balance: { access: vi.fn<FinanceApi["balance"]["access"]>(additional.balance.access) },
+      refunds: {
+        ...additional.refunds,
+        sales: vi.fn<FinanceApi["refunds"]["sales"]>(additional.refunds.sales),
+        access: vi.fn<FinanceApi["refunds"]["access"]>(additional.refunds.access),
+      },
+      read,
+      corrections: {
+        ...corrections,
+        canCorrect: vi.fn<FinanceApi["corrections"]["canCorrect"]>(corrections.canCorrect),
+      },
+      canCollect: vi.fn<FinanceApi["canCollect"]>(async () => false),
+    };
   render(<PersonFinance scope={scope} personId={id} timeZone="Europe/Istanbul" api={api} />);
   expect(read).not.toHaveBeenCalled();
   await user.click(screen.getByRole("button", { name: "Finansı aç" }));
@@ -70,6 +94,11 @@ test("finance is lazy, uses an explicit currency and does not turn historical un
   ).toBeVisible();
   expect(screen.queryByRole("button", { name: "Tahsilatı incele" })).not.toBeInTheDocument();
   expect(read).toHaveBeenCalledWith(scope, id, "TRY", undefined);
+  expect(api.canCollect).not.toHaveBeenCalled();
+  expect(api.corrections.canCorrect).not.toHaveBeenCalled();
+  expect(api.balance.access).not.toHaveBeenCalled();
+  expect(api.refunds.sales).not.toHaveBeenCalled();
+  expect(api.refunds.access).not.toHaveBeenCalled();
 });
 test("a failed refresh removes stale balances and a foreign-person projection is rejected", async () => {
   const user = userEvent.setup(),
@@ -80,10 +109,11 @@ test("a failed refresh removes stale balances and a foreign-person projection is
       .mockResolvedValueOnce({ ...view, person_id: other });
   render(
     <PersonFinance
+      management
       scope={scope}
       personId={id}
       timeZone="UTC"
-      api={{ read, corrections, canCollect: async () => false }}
+      api={{ ...additional, read, corrections, canCollect: async () => false }}
     />,
   );
   await user.click(screen.getByRole("button", { name: "Finansı aç" }));
@@ -110,10 +140,11 @@ test("a late finance response from the previous account/person cannot reappear",
       <>
         <button onClick={() => setChanged(true)}>Hesabı değiştir</button>
         <PersonFinance
+          management
           scope={changed ? { ...scope, actorId: other } : scope}
           personId={changed ? other : id}
           timeZone="UTC"
-          api={{ read, corrections, canCollect: async () => false }}
+          api={{ ...additional, read, corrections, canCollect: async () => false }}
         />
       </>
     );
@@ -135,6 +166,7 @@ test("collection requires explicit method, allocation, local time and review; su
   let saved = false;
   const writes: Record<string, unknown>[] = [];
   const api = {
+    ...additional,
     read: vi.fn<FinanceApi["read"]>(async () => ({
       ...view,
       credit_available_minor: saved ? "50" : "0",
@@ -156,7 +188,9 @@ test("collection requires explicit method, allocation, local time and review; su
       });
     }),
   );
-  render(<PersonFinance scope={scope} personId={id} timeZone="Europe/Istanbul" api={api} />);
+  render(
+    <PersonFinance management scope={scope} personId={id} timeZone="Europe/Istanbul" api={api} />,
+  );
   await user.click(screen.getByRole("button", { name: "Finansı aç" }));
   await user.type(screen.getByLabelText("Para birimi", { exact: true }), "TRY");
   await user.click(screen.getByRole("button", { name: "Finansı oku" }));
@@ -193,6 +227,7 @@ test("a later currency request wins and a denied collection reader never opens a
   const user = userEvent.setup();
   let resolve!: (value: FinanceView) => void;
   const api = {
+    ...additional,
     read: vi.fn<FinanceApi["read"]>((_scope, _person, currency: string) =>
       currency === "TRY"
         ? new Promise<FinanceView>((r) => {
@@ -211,7 +246,7 @@ test("a later currency request wins and a denied collection reader never opens a
       throw Error("POLICY_NOT_CONFIGURED");
     }),
   };
-  render(<PersonFinance scope={scope} personId={id} timeZone="UTC" api={api} />);
+  render(<PersonFinance management scope={scope} personId={id} timeZone="UTC" api={api} />);
   await user.click(screen.getByRole("button", { name: "Finansı aç" }));
   await user.type(screen.getByLabelText("Para birimi", { exact: true }), "TRY");
   await user.click(screen.getByRole("button", { name: "Finansı oku" }));
@@ -290,10 +325,12 @@ test("debt selection keeps ledger numbering when earlier debts are already settl
   const user = userEvent.setup();
   render(
     <PersonFinance
+      management
       scope={scope}
       personId={id}
       timeZone="UTC"
       api={{
+        ...additional,
         read: async () => ({
           ...view,
           debts: [{ id, remaining_minor: "0", due_at: "2026-10-01T12:00:00Z" }, ...view.debts],

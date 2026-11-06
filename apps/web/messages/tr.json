@@ -1747,6 +1747,37 @@
       "student_credit_accounts": "Öğrenci alacağı",
       "student_credit_movements": "Alacak hareketi"
     },
-    "effectRecord": "Kayıt {number}"
+    "effectRecord": "Kayıt {number}",
+    "balanceKinds": {
+      "student_credit_refund_v1": "Alacağı nakit iade et",
+      "student_credit_offset_v1": "Alacağı borca mahsup et",
+      "debt_adjust_v1": "Borcu düzelt"
+    },
+    "balanceHints": {
+      "student_credit_refund_v1": "Bu işlem öğrenci alacağını azaltır ve nakit çıkışı kaydeder. Satış veya ders hakkını değiştirmez.",
+      "student_credit_offset_v1": "Öğrenci alacağı seçilen borca uygulanır. Nakit hareketi oluşturulmaz; kesin bakiye işlemden sonra yeniden okunur.",
+      "debt_adjust_v1": "Borç için artırılacak veya azaltılacak farkı girin. Bu işlem nakit tahsilat veya iade değildir."
+    },
+    "actionDebt": "{action}: kaynak borç",
+    "balancePermissionFailed": "{action} yetkisi doğrulanamadı.",
+    "missingDebtVersion": "Borç sürümü bulunamadı. Finans bilgilerini yeniden okuyun.",
+    "actionAmount": "İşlem tutarı",
+    "debtDirection": "Borç düzeltme yönü",
+    "debtIncrease": "Borcu artır",
+    "debtDecrease": "Borcu azalt",
+    "refundTime": "İade zamanı",
+    "invalidBalanceAction": "Tutar, alacak, seçilen borç, sürüm, gerekçe veya saat doğrulanamadı. Bilgileri kontrol edin.",
+    "offsetVersion": "Kaynak borç sürümü: {version}",
+    "management": "Yetkili finans işlemleri",
+    "saleRefund": "Satış iadesi",
+    "refundSource": "İade edilecek satış",
+    "saleNumber": "Satış {number}",
+    "noRefundSale": "Bu kişi için okunabilir satış bulunamadı.",
+    "refundPermissionFailed": "Satış iadesi yetkisi doğrulanamadı.",
+    "saleRefundHint": "Satış iadesi otomatik nakit çıkışı değildir. Borç, alacak, hak ve rezervasyon etkilerini backend incelemesinden kontrol edin. Nakit alacak iadesi ayrı bir işlemdir.",
+    "refundRights": "Kaynak haklar: kullanılabilir {available}, ayrılmış {reserved}, kullanılmış {consumed}.",
+    "reviewSaleRefund": "Satış iadesini incele",
+    "invalidFinancePreview": "Finans önizlemesi doğrulanamadı. Kaynak ve etkiler için yeni inceleme alın.",
+    "financeEffects": "Finans ve hak etkileri"
   }
 }

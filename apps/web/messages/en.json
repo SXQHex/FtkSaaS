@@ -1747,6 +1747,37 @@
       "student_credit_accounts": "Student credit",
       "student_credit_movements": "Credit movement"
     },
-    "effectRecord": "Record {number}"
+    "effectRecord": "Record {number}",
+    "balanceKinds": {
+      "student_credit_refund_v1": "Refund student credit in cash",
+      "student_credit_offset_v1": "Offset student credit against debt",
+      "debt_adjust_v1": "Adjust debt"
+    },
+    "balanceHints": {
+      "student_credit_refund_v1": "This reduces student credit and records a cash outflow. It does not change a sale or lesson rights.",
+      "student_credit_offset_v1": "Student credit is applied to the selected debt without a cash movement. Final balances are reread after completion.",
+      "debt_adjust_v1": "Enter a difference to increase or decrease debt. This is not a cash collection or refund."
+    },
+    "actionDebt": "{action}: source debt",
+    "balancePermissionFailed": "Permission for {action} could not be verified.",
+    "missingDebtVersion": "Debt version is unavailable. Read finance again.",
+    "actionAmount": "Transaction amount",
+    "debtDirection": "Debt adjustment direction",
+    "debtIncrease": "Increase debt",
+    "debtDecrease": "Decrease debt",
+    "refundTime": "Refund time",
+    "invalidBalanceAction": "Amount, credit, selected debt, version, reason or time could not be verified. Check the details.",
+    "offsetVersion": "Source debt version: {version}",
+    "management": "Authorized finance operations",
+    "saleRefund": "Sale refund",
+    "refundSource": "Sale to refund",
+    "saleNumber": "Sale {number}",
+    "noRefundSale": "No readable sale is available for this person.",
+    "refundPermissionFailed": "Sale refund permission could not be verified.",
+    "saleRefundHint": "A sale refund does not automatically pay out cash. Review backend debt, credit, entitlement and reservation effects. Refunding student credit in cash is a separate operation.",
+    "refundRights": "Source rights: {available} available, {reserved} reserved, {consumed} consumed.",
+    "reviewSaleRefund": "Review sale refund",
+    "invalidFinancePreview": "Finance preview could not be verified. Request a new review of the source and effects.",
+    "financeEffects": "Finance and entitlement effects"
   }
 }

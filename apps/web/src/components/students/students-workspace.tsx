@@ -589,6 +589,7 @@ function StudentDetail({
       )}
       {rightsPerson && (
         <PersonFinance
+          management
           scope={scope}
           personId={rightsPerson.id}
           timeZone={Intl.DateTimeFormat().resolvedOptions().timeZone}
