@@ -1485,7 +1485,7 @@ as_of: Instant
 /**
  * @maxItems 50
  */
-overridden_fields: ("description" | "address" | "contact_phone" | "contact_email" | "program_duration_minutes" | "report_templates" | "import_templates" | "public_profile_enabled" | "public_fields" | "public_hours" | "availability_templates" | "package_templates" | "lesson_reminders_enabled" | "lesson_reminder_hours" | "package_reminders_enabled" | "package_reminder_days" | "payment_reminders_enabled" | "payment_reminder_days")[]
+overridden_fields: ("description" | "address" | "contact_phone" | "contact_email" | "program_duration_minutes" | "report_templates" | "import_templates" | "public_profile_enabled" | "public_fields" | "public_hours" | "availability_templates" | "package_templates" | "lesson_reminders_enabled" | "lesson_reminder_hours" | "package_reminders_enabled" | "package_reminder_days" | "payment_reminders_enabled" | "payment_reminder_days" | "agreement_templates")[]
 program_duration_source?: {
 kind: ("system_default" | "organization_copy" | "center_local")
 organization_version?: SettingsVersion
@@ -1499,7 +1499,7 @@ as_of: Instant
 /**
  * @maxItems 50
  */
-overridden_fields: ("accent_color" | "address" | "availability_templates" | "billing_address" | "billing_email" | "billing_name" | "contact_email" | "contact_phone" | "description" | "font_package_id" | "import_templates" | "package_templates" | "primary_color" | "program_duration_minutes" | "public_fields" | "public_hours" | "public_profile_enabled" | "report_templates" | "secondary_color" | "theme_package_id" | "lesson_reminders_enabled" | "lesson_reminder_hours" | "package_reminders_enabled" | "package_reminder_days" | "payment_reminders_enabled" | "payment_reminder_days" | "reminder_center_overrides_enabled")[]
+overridden_fields: ("accent_color" | "address" | "availability_templates" | "billing_address" | "billing_email" | "billing_name" | "contact_email" | "contact_phone" | "description" | "font_package_id" | "import_templates" | "package_templates" | "primary_color" | "program_duration_minutes" | "public_fields" | "public_hours" | "public_profile_enabled" | "report_templates" | "secondary_color" | "theme_package_id" | "lesson_reminders_enabled" | "lesson_reminder_hours" | "package_reminders_enabled" | "package_reminder_days" | "payment_reminders_enabled" | "payment_reminder_days" | "reminder_center_overrides_enabled" | "agreement_templates")[]
 logo?: (SettingsMediaAsset | null)
 } | {
 scope: "platform"
@@ -1523,88 +1523,25 @@ export type SettingsFieldKeys = [SettingsFieldKey, ...(SettingsFieldKey)[]]
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
  * via the `definition` "SettingsFieldKey".
  */
-export type SettingsFieldKey = ("accent_color" | "ad_measurement" | "ad_personalization" | "address" | "application_name" | "availability_templates" | "billing_address" | "billing_email" | "billing_name" | "calendar_view" | "contact_email" | "contact_phone" | "contrast" | "date_format" | "description" | "email_visible" | "font_package_id" | "font_scale" | "history_recommendations" | "honorific" | "import_templates" | "in_app_marketing" | "in_app_reminders" | "interest_center_ids" | "interest_discipline_ids" | "language" | "maintenance_message" | "marketing_in_app" | "motion" | "number_format" | "optional_analytics" | "package_templates" | "phone_visible" | "photo_visible" | "primary_color" | "profile_visible" | "program_duration_minutes" | "public_fields" | "public_hours" | "public_profile_enabled" | "remember_context" | "report_templates" | "secondary_color" | "show_weekends" | "startup_context" | "support_email" | "support_url" | "theme" | "theme_package_id" | "time_format" | "timezone_mode" | "timezone_name" | "week_start" | "lesson_reminders_enabled" | "lesson_reminder_hours" | "package_reminders_enabled" | "package_reminder_days" | "payment_reminders_enabled" | "payment_reminder_days" | "reminder_center_overrides_enabled" | "quiet_hours_enabled" | "quiet_hours_weekdays" | "quiet_hours_start" | "quiet_hours_end")
+export type SettingsFieldKey = ("accent_color" | "ad_measurement" | "ad_personalization" | "address" | "application_name" | "availability_templates" | "billing_address" | "billing_email" | "billing_name" | "calendar_view" | "contact_email" | "contact_phone" | "contrast" | "date_format" | "description" | "email_visible" | "font_package_id" | "font_scale" | "history_recommendations" | "honorific" | "import_templates" | "in_app_marketing" | "in_app_reminders" | "interest_center_ids" | "interest_discipline_ids" | "language" | "maintenance_message" | "marketing_in_app" | "motion" | "number_format" | "optional_analytics" | "package_templates" | "phone_visible" | "photo_visible" | "primary_color" | "profile_visible" | "program_duration_minutes" | "public_fields" | "public_hours" | "public_profile_enabled" | "remember_context" | "report_templates" | "secondary_color" | "show_weekends" | "startup_context" | "support_email" | "support_url" | "theme" | "theme_package_id" | "time_format" | "timezone_mode" | "timezone_name" | "week_start" | "lesson_reminders_enabled" | "lesson_reminder_hours" | "package_reminders_enabled" | "package_reminder_days" | "payment_reminders_enabled" | "payment_reminder_days" | "reminder_center_overrides_enabled" | "quiet_hours_enabled" | "quiet_hours_weekdays" | "quiet_hours_start" | "quiet_hours_end" | "agreement_templates")
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
  * via the `definition` "SettingsCatalog".
  */
 export type SettingsCatalog = ({
-scope: unknown
-catalog_version: unknown
-fields: unknown
+scope: ("user" | "member" | "center" | "organization" | "platform")
+catalog_version: 13
+fields: SettingsFieldDescriptor[]
 defaults: unknown
-brand_packages: unknown
-limitations: unknown
-work_templates?: unknown
-preparation_templates?: unknown
-notification_delivery?: unknown
+/**
+ * @maxItems 0
+ */
+brand_packages: []
+limitations: string[]
+work_templates?: WorkTemplates
+preparation_templates?: PreparationTemplates
+notification_delivery?: NotificationDeliverySupport
 } & SettingsCatalog1)
-export type SettingsCatalog1 = ({
-scope: "user"
-catalog_version: 12
-fields: SettingsFieldDescriptor[]
-defaults: UserSettingsValues
-/**
- * @maxItems 0
- */
-brand_packages: []
-limitations: string[]
-work_templates?: WorkTemplates
-preparation_templates?: PreparationTemplates
-notification_delivery?: NotificationDeliverySupport
-} | {
-scope: "member"
-catalog_version: 12
-fields: SettingsFieldDescriptor[]
-defaults: MemberSettingsValues
-/**
- * @maxItems 0
- */
-brand_packages: []
-limitations: string[]
-work_templates?: WorkTemplates
-preparation_templates?: PreparationTemplates
-notification_delivery?: NotificationDeliverySupport
-} | {
-scope: "center"
-catalog_version: 12
-fields: SettingsFieldDescriptor[]
-defaults: CenterSettingsValues
-/**
- * @maxItems 0
- */
-brand_packages: []
-limitations: string[]
-work_templates?: WorkTemplates
-preparation_templates?: PreparationTemplates
-notification_delivery?: NotificationDeliverySupport
-} | {
-scope: "organization"
-catalog_version: 12
-fields: SettingsFieldDescriptor[]
-defaults: OrganizationSettingsValues
-/**
- * @maxItems 0
- */
-brand_packages: []
-limitations: string[]
-work_templates?: WorkTemplates
-preparation_templates?: PreparationTemplates
-notification_delivery?: NotificationDeliverySupport
-} | {
-scope: "platform"
-catalog_version: 12
-fields: SettingsFieldDescriptor[]
-defaults: PlatformSettingsValues
-/**
- * @maxItems 0
- */
-brand_packages: []
-limitations: string[]
-work_templates?: WorkTemplates
-preparation_templates?: PreparationTemplates
-notification_delivery?: NotificationDeliverySupport
-})
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
  * via the `definition` "WorkTemplateReference".
@@ -1660,6 +1597,27 @@ version: SettingsVersion
  * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
  */
 center_id: string
+})
+export type SettingsCatalog1 = ({
+scope: "user"
+catalog_version: 13
+defaults: UserSettingsValues
+} | {
+scope: "member"
+catalog_version: 13
+defaults: MemberSettingsValues
+} | {
+scope: "center"
+catalog_version: 13
+defaults: CenterSettingsValues
+} | {
+scope: "organization"
+catalog_version: 13
+defaults: OrganizationSettingsValues
+} | {
+scope: "platform"
+catalog_version: 13
+defaults: PlatformSettingsValues
 })
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -2006,12 +1964,12 @@ export type MemberSettingsFieldKey = ("profile_visible" | "photo_visible" | "ema
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
  * via the `definition` "CenterSettingsFieldKey".
  */
-export type CenterSettingsFieldKey = ("description" | "address" | "contact_phone" | "contact_email" | "program_duration_minutes" | "report_templates" | "import_templates" | "public_profile_enabled" | "public_fields" | "public_hours" | "availability_templates" | "package_templates" | "lesson_reminders_enabled" | "lesson_reminder_hours" | "package_reminders_enabled" | "package_reminder_days" | "payment_reminders_enabled" | "payment_reminder_days")
+export type CenterSettingsFieldKey = ("description" | "address" | "contact_phone" | "contact_email" | "program_duration_minutes" | "report_templates" | "import_templates" | "public_profile_enabled" | "public_fields" | "public_hours" | "availability_templates" | "package_templates" | "lesson_reminders_enabled" | "lesson_reminder_hours" | "package_reminders_enabled" | "package_reminder_days" | "payment_reminders_enabled" | "payment_reminder_days" | "agreement_templates")
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
  * via the `definition` "OrganizationSettingsFieldKey".
  */
-export type OrganizationSettingsFieldKey = ("accent_color" | "address" | "availability_templates" | "billing_address" | "billing_email" | "billing_name" | "contact_email" | "contact_phone" | "description" | "font_package_id" | "import_templates" | "package_templates" | "primary_color" | "program_duration_minutes" | "public_fields" | "public_hours" | "public_profile_enabled" | "report_templates" | "secondary_color" | "theme_package_id" | "lesson_reminders_enabled" | "lesson_reminder_hours" | "package_reminders_enabled" | "package_reminder_days" | "payment_reminders_enabled" | "payment_reminder_days" | "reminder_center_overrides_enabled")
+export type OrganizationSettingsFieldKey = ("accent_color" | "address" | "availability_templates" | "billing_address" | "billing_email" | "billing_name" | "contact_email" | "contact_phone" | "description" | "font_package_id" | "import_templates" | "package_templates" | "primary_color" | "program_duration_minutes" | "public_fields" | "public_hours" | "public_profile_enabled" | "report_templates" | "secondary_color" | "theme_package_id" | "lesson_reminders_enabled" | "lesson_reminder_hours" | "package_reminders_enabled" | "package_reminder_days" | "payment_reminders_enabled" | "payment_reminder_days" | "reminder_center_overrides_enabled" | "agreement_templates")
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
  * via the `definition` "PlatformSettingsFieldKey".
@@ -2405,7 +2363,7 @@ org_id: string
  * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
  */
 center_id: string
-kind: ("availability" | "package")
+kind: ("availability" | "package" | "agreement")
 source: PreparationSourceReference
 resource?: ResourceRef
 rule_index?: number
@@ -2444,6 +2402,22 @@ org_id: string
 center_id: string
 kind: "package"
 source: PreparationSourceReference
+} | {
+client_api_version: 1
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+request_id: string
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+org_id: string
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+center_id: string
+kind: "agreement"
+source: PreparationSourceReference
 })
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -2465,6 +2439,17 @@ terms: ProductTerms
 sale_dates: {
 start_date: Date
 end_date: Date
+}
+} | {
+kind: "agreement"
+source: PreparationSourceReference
+agreement_request: {
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+discipline_id: string
+format: SessionFormat
+terms: PayTerms
 }
 })
 /**
@@ -3774,6 +3759,7 @@ OrganizationSettingsFieldKey?: OrganizationSettingsFieldKey
 PlatformSettingsFieldKey?: PlatformSettingsFieldKey
 SettingsFieldKey?: SettingsFieldKey
 NotificationEmailPreferenceView?: NotificationEmailPreferenceView
+AgreementPreparationTemplate?: AgreementPreparationTemplate
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -22386,6 +22372,19 @@ package_reminders_enabled?: boolean
 package_reminder_days?: (3 | 7 | 14)
 payment_reminders_enabled?: boolean
 payment_reminder_days?: (1 | 3 | 7)
+/**
+ * @maxItems 100
+ */
+agreement_templates?: {
+key: string
+name: string
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+discipline_id: string
+format: ("group" | "private")
+terms: PayTerms
+}[]
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -22544,6 +22543,19 @@ package_reminder_days?: (3 | 7 | 14)
 payment_reminders_enabled?: boolean
 payment_reminder_days?: (1 | 3 | 7)
 reminder_center_overrides_enabled?: boolean
+/**
+ * @maxItems 100
+ */
+agreement_templates?: {
+key: string
+name: string
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+discipline_id: string
+format: ("group" | "private")
+terms: PayTerms
+}[]
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -22705,6 +22717,13 @@ source: PreparationSourceReference
 template: StarterPackageTemplate
 }[]
 package_currency_suggestion: "TRY"
+/**
+ * @maxItems 200
+ */
+agreements?: {
+source: PreparationSourceReference
+template: AgreementPreparationTemplate
+}[]
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
@@ -22769,6 +22788,20 @@ quota: ({
 period: ("week" | "month")
 limit: number
 } | null)
+}
+/**
+ * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema
+ * via the `definition` "AgreementPreparationTemplate".
+ */
+export interface AgreementPreparationTemplate {
+key: string
+name: string
+/**
+ * Domain/reference UUID. New FtkSaaS production MUST use UUIDv7; pre-existing UUID input is preserved.
+ */
+discipline_id: string
+format: ("group" | "private")
+terms: PayTerms
 }
 /**
  * This interface was referenced by `FtkSaaSDomainAPIContract22AcceptedDisciplineAndUUIDv7Amendments`'s JSON-Schema

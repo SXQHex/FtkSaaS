@@ -44595,6 +44595,45 @@
             3,
             7
           ]
+        },
+        "agreement_templates": {
+          "type": "array",
+          "maxItems": 100,
+          "items": {
+            "type": "object",
+            "properties": {
+              "key": {
+                "type": "string",
+                "pattern": "^[A-Za-z0-9_-]{1,64}$"
+              },
+              "name": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 100
+              },
+              "discipline_id": {
+                "$ref": "#/$defs/FtkUuid"
+              },
+              "format": {
+                "type": "string",
+                "enum": [
+                  "group",
+                  "private"
+                ]
+              },
+              "terms": {
+                "$ref": "#/$defs/PayTerms"
+              }
+            },
+            "required": [
+              "key",
+              "name",
+              "discipline_id",
+              "format",
+              "terms"
+            ],
+            "additionalProperties": false
+          }
         }
       },
       "required": [],
@@ -45267,6 +45306,45 @@
         },
         "reminder_center_overrides_enabled": {
           "type": "boolean"
+        },
+        "agreement_templates": {
+          "type": "array",
+          "maxItems": 100,
+          "items": {
+            "type": "object",
+            "properties": {
+              "key": {
+                "type": "string",
+                "pattern": "^[A-Za-z0-9_-]{1,64}$"
+              },
+              "name": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 100
+              },
+              "discipline_id": {
+                "$ref": "#/$defs/FtkUuid"
+              },
+              "format": {
+                "type": "string",
+                "enum": [
+                  "group",
+                  "private"
+                ]
+              },
+              "terms": {
+                "$ref": "#/$defs/PayTerms"
+              }
+            },
+            "required": [
+              "key",
+              "name",
+              "discipline_id",
+              "format",
+              "terms"
+            ],
+            "additionalProperties": false
+          }
         }
       },
       "required": [],
@@ -45479,7 +45557,8 @@
                   "package_reminders_enabled",
                   "package_reminder_days",
                   "payment_reminders_enabled",
-                  "payment_reminder_days"
+                  "payment_reminder_days",
+                  "agreement_templates"
                 ]
               },
               "uniqueItems": true,
@@ -45564,7 +45643,8 @@
                   "package_reminder_days",
                   "payment_reminders_enabled",
                   "payment_reminder_days",
-                  "reminder_center_overrides_enabled"
+                  "reminder_center_overrides_enabled",
+                  "agreement_templates"
                 ]
               },
               "uniqueItems": true,
@@ -45862,15 +45942,49 @@
     "SettingsCatalog": {
       "type": "object",
       "properties": {
-        "scope": {},
-        "catalog_version": {},
-        "fields": {},
+        "scope": {
+          "type": "string",
+          "enum": [
+            "user",
+            "member",
+            "center",
+            "organization",
+            "platform"
+          ]
+        },
+        "catalog_version": {
+          "const": 13
+        },
+        "fields": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/SettingsFieldDescriptor"
+          }
+        },
         "defaults": {},
-        "brand_packages": {},
-        "limitations": {},
-        "work_templates": {},
-        "preparation_templates": {},
-        "notification_delivery": {}
+        "brand_packages": {
+          "type": "array",
+          "maxItems": 0,
+          "items": {
+            "type": "null"
+          }
+        },
+        "limitations": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "maxLength": 400
+          }
+        },
+        "work_templates": {
+          "$ref": "#/$defs/WorkTemplates"
+        },
+        "preparation_templates": {
+          "$ref": "#/$defs/PreparationTemplates"
+        },
+        "notification_delivery": {
+          "$ref": "#/$defs/NotificationDeliverySupport"
+        }
       },
       "required": [
         "scope",
@@ -45883,264 +45997,94 @@
       "additionalProperties": false,
       "oneOf": [
         {
-          "type": "object",
           "properties": {
             "scope": {
               "const": "user"
             },
             "catalog_version": {
-              "const": 12
-            },
-            "fields": {
-              "type": "array",
-              "items": {
-                "$ref": "#/$defs/SettingsFieldDescriptor"
-              }
+              "const": 13
             },
             "defaults": {
               "$ref": "#/$defs/UserSettingsValues"
-            },
-            "brand_packages": {
-              "type": "array",
-              "maxItems": 0,
-              "items": {
-                "type": "null"
-              }
-            },
-            "limitations": {
-              "type": "array",
-              "items": {
-                "type": "string",
-                "maxLength": 400
-              }
-            },
-            "work_templates": {
-              "$ref": "#/$defs/WorkTemplates"
-            },
-            "preparation_templates": {
-              "$ref": "#/$defs/PreparationTemplates"
-            },
-            "notification_delivery": {
-              "$ref": "#/$defs/NotificationDeliverySupport"
             }
           },
           "required": [
             "scope",
             "catalog_version",
-            "fields",
-            "defaults",
-            "brand_packages",
-            "limitations"
-          ],
-          "additionalProperties": false
+            "defaults"
+          ]
         },
         {
-          "type": "object",
           "properties": {
             "scope": {
               "const": "member"
             },
             "catalog_version": {
-              "const": 12
-            },
-            "fields": {
-              "type": "array",
-              "items": {
-                "$ref": "#/$defs/SettingsFieldDescriptor"
-              }
+              "const": 13
             },
             "defaults": {
               "$ref": "#/$defs/MemberSettingsValues"
-            },
-            "brand_packages": {
-              "type": "array",
-              "maxItems": 0,
-              "items": {
-                "type": "null"
-              }
-            },
-            "limitations": {
-              "type": "array",
-              "items": {
-                "type": "string",
-                "maxLength": 400
-              }
-            },
-            "work_templates": {
-              "$ref": "#/$defs/WorkTemplates"
-            },
-            "preparation_templates": {
-              "$ref": "#/$defs/PreparationTemplates"
-            },
-            "notification_delivery": {
-              "$ref": "#/$defs/NotificationDeliverySupport"
             }
           },
           "required": [
             "scope",
             "catalog_version",
-            "fields",
-            "defaults",
-            "brand_packages",
-            "limitations"
-          ],
-          "additionalProperties": false
+            "defaults"
+          ]
         },
         {
-          "type": "object",
           "properties": {
             "scope": {
               "const": "center"
             },
             "catalog_version": {
-              "const": 12
-            },
-            "fields": {
-              "type": "array",
-              "items": {
-                "$ref": "#/$defs/SettingsFieldDescriptor"
-              }
+              "const": 13
             },
             "defaults": {
               "$ref": "#/$defs/CenterSettingsValues"
-            },
-            "brand_packages": {
-              "type": "array",
-              "maxItems": 0,
-              "items": {
-                "type": "null"
-              }
-            },
-            "limitations": {
-              "type": "array",
-              "items": {
-                "type": "string",
-                "maxLength": 400
-              }
-            },
-            "work_templates": {
-              "$ref": "#/$defs/WorkTemplates"
-            },
-            "preparation_templates": {
-              "$ref": "#/$defs/PreparationTemplates"
-            },
-            "notification_delivery": {
-              "$ref": "#/$defs/NotificationDeliverySupport"
             }
           },
           "required": [
             "scope",
             "catalog_version",
-            "fields",
-            "defaults",
-            "brand_packages",
-            "limitations"
-          ],
-          "additionalProperties": false
+            "defaults"
+          ]
         },
         {
-          "type": "object",
           "properties": {
             "scope": {
               "const": "organization"
             },
             "catalog_version": {
-              "const": 12
-            },
-            "fields": {
-              "type": "array",
-              "items": {
-                "$ref": "#/$defs/SettingsFieldDescriptor"
-              }
+              "const": 13
             },
             "defaults": {
               "$ref": "#/$defs/OrganizationSettingsValues"
-            },
-            "brand_packages": {
-              "type": "array",
-              "maxItems": 0,
-              "items": {
-                "type": "null"
-              }
-            },
-            "limitations": {
-              "type": "array",
-              "items": {
-                "type": "string",
-                "maxLength": 400
-              }
-            },
-            "work_templates": {
-              "$ref": "#/$defs/WorkTemplates"
-            },
-            "preparation_templates": {
-              "$ref": "#/$defs/PreparationTemplates"
-            },
-            "notification_delivery": {
-              "$ref": "#/$defs/NotificationDeliverySupport"
             }
           },
           "required": [
             "scope",
             "catalog_version",
-            "fields",
-            "defaults",
-            "brand_packages",
-            "limitations"
-          ],
-          "additionalProperties": false
+            "defaults"
+          ]
         },
         {
-          "type": "object",
           "properties": {
             "scope": {
               "const": "platform"
             },
             "catalog_version": {
-              "const": 12
-            },
-            "fields": {
-              "type": "array",
-              "items": {
-                "$ref": "#/$defs/SettingsFieldDescriptor"
-              }
+              "const": 13
             },
             "defaults": {
               "$ref": "#/$defs/PlatformSettingsValues"
-            },
-            "brand_packages": {
-              "type": "array",
-              "maxItems": 0,
-              "items": {
-                "type": "null"
-              }
-            },
-            "limitations": {
-              "type": "array",
-              "items": {
-                "type": "string",
-                "maxLength": 400
-              }
-            },
-            "work_templates": {
-              "$ref": "#/$defs/WorkTemplates"
-            },
-            "preparation_templates": {
-              "$ref": "#/$defs/PreparationTemplates"
-            },
-            "notification_delivery": {
-              "$ref": "#/$defs/NotificationDeliverySupport"
             }
           },
           "required": [
             "scope",
             "catalog_version",
-            "fields",
-            "defaults",
-            "brand_packages",
-            "limitations"
-          ],
-          "additionalProperties": false
+            "defaults"
+          ]
         }
       ]
     },
@@ -50172,6 +50116,26 @@
         },
         "package_currency_suggestion": {
           "const": "TRY"
+        },
+        "agreements": {
+          "type": "array",
+          "maxItems": 200,
+          "items": {
+            "type": "object",
+            "properties": {
+              "source": {
+                "$ref": "#/$defs/PreparationSourceReference"
+              },
+              "template": {
+                "$ref": "#/$defs/AgreementPreparationTemplate"
+              }
+            },
+            "required": [
+              "source",
+              "template"
+            ],
+            "additionalProperties": false
+          }
         }
       },
       "required": [
@@ -50200,7 +50164,8 @@
           "type": "string",
           "enum": [
             "availability",
-            "package"
+            "package",
+            "agreement"
           ]
         },
         "source": {
@@ -50298,6 +50263,38 @@
             "source"
           ],
           "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "client_api_version": {
+              "const": 1
+            },
+            "request_id": {
+              "$ref": "#/$defs/FtkUuid"
+            },
+            "org_id": {
+              "$ref": "#/$defs/FtkUuid"
+            },
+            "center_id": {
+              "$ref": "#/$defs/FtkUuid"
+            },
+            "kind": {
+              "const": "agreement"
+            },
+            "source": {
+              "$ref": "#/$defs/PreparationSourceReference"
+            }
+          },
+          "required": [
+            "client_api_version",
+            "request_id",
+            "org_id",
+            "center_id",
+            "kind",
+            "source"
+          ],
+          "additionalProperties": false
         }
       ]
     },
@@ -50379,6 +50376,43 @@
             "source",
             "product_request",
             "sale_dates"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "kind": {
+              "const": "agreement"
+            },
+            "source": {
+              "$ref": "#/$defs/PreparationSourceReference"
+            },
+            "agreement_request": {
+              "type": "object",
+              "properties": {
+                "discipline_id": {
+                  "$ref": "#/$defs/FtkUuid"
+                },
+                "format": {
+                  "$ref": "#/$defs/SessionFormat"
+                },
+                "terms": {
+                  "$ref": "#/$defs/PayTerms"
+                }
+              },
+              "required": [
+                "discipline_id",
+                "format",
+                "terms"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "required": [
+            "kind",
+            "source",
+            "agreement_request"
           ],
           "additionalProperties": false
         }
@@ -52439,7 +52473,8 @@
         "package_reminders_enabled",
         "package_reminder_days",
         "payment_reminders_enabled",
-        "payment_reminder_days"
+        "payment_reminder_days",
+        "agreement_templates"
       ]
     },
     "OrganizationSettingsFieldKey": {
@@ -52471,7 +52506,8 @@
         "package_reminder_days",
         "payment_reminders_enabled",
         "payment_reminder_days",
-        "reminder_center_overrides_enabled"
+        "reminder_center_overrides_enabled",
+        "agreement_templates"
       ]
     },
     "PlatformSettingsFieldKey": {
@@ -52549,7 +52585,8 @@
         "quiet_hours_enabled",
         "quiet_hours_weekdays",
         "quiet_hours_start",
-        "quiet_hours_end"
+        "quiet_hours_end",
+        "agreement_templates"
       ]
     },
     "NotificationEmailPreferenceView": {
@@ -52569,6 +52606,41 @@
         "enabled",
         "version",
         "available"
+      ],
+      "additionalProperties": false
+    },
+    "AgreementPreparationTemplate": {
+      "type": "object",
+      "properties": {
+        "key": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9_-]{1,64}$"
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 100
+        },
+        "discipline_id": {
+          "$ref": "#/$defs/FtkUuid"
+        },
+        "format": {
+          "type": "string",
+          "enum": [
+            "group",
+            "private"
+          ]
+        },
+        "terms": {
+          "$ref": "#/$defs/PayTerms"
+        }
+      },
+      "required": [
+        "key",
+        "name",
+        "discipline_id",
+        "format",
+        "terms"
       ],
       "additionalProperties": false
     }
@@ -80284,7 +80356,8 @@
         "features": [
           "F02",
           "F15",
-          "F16"
+          "F16",
+          "F20"
         ],
         "permission": "preparation.resolve",
         "actor_source": "server_verified",
@@ -80323,7 +80396,7 @@
           "CREDIT_LIMIT_EXCEEDED"
         ],
         "transaction_class": "read",
-        "transaction_guarantee": "Resolve one versioned private/shared preparation into an authorized typed report/import request. No job, business write or receipt; execution rechecks current domain authority.",
+        "transaction_guarantee": "Resolve one explicit versioned availability/package/agreement preparation under live domain authority. No publication, job, business write or receipt; execution rechecks the original writer authority.",
         "transition": {
           "effect": "read_or_preview_only",
           "from": [],
@@ -80358,8 +80431,8 @@
         "runtime_transport": "authenticated Edge adapter -> service-only RPC; rules/transaction in PostgreSQL",
         "runtime_external_path": "/functions/v1/backend-v1/settings_preparation_resolve_v1",
         "runtime_limits": [
-          "Read-only explicit template/source/version selection. Resolve grants no execution permission and creates no rule, product, sale or job.",
-          "New centers copy org preparation arrays once; existing centers and business snapshots do not live-inherit.",
+          "Read-only explicit template/source/version selection. Resolve grants no execution permission and creates no rule, product, sale, agreement, earning or job.",
+          "New centers copy only existing availability/package preparation arrays once. Agreement sources are chosen explicitly; existing business snapshots never live-inherit.",
           "Package dates and refund method are explicit; no automatic rolling validity or implicit none."
         ],
         "required_features": [],
@@ -80378,6 +80451,11 @@
           {
             "feature": "F16",
             "when": "timed_package_preparation",
+            "mode": "required_if_selected"
+          },
+          {
+            "feature": "F20",
+            "when": "agreement_preparation",
             "mode": "required_if_selected"
           }
         ],
@@ -96297,6 +96375,48 @@
         "origin": "ftksaas",
         "acceptance": "generic_uuid",
         "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Request_settings_preparation_resolve/oneOf/2/properties/request_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Request_settings_preparation_resolve/oneOf/2/properties/org_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/Request_settings_preparation_resolve/oneOf/2/properties/center_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/ResolvedDomainPreparation/oneOf/2/properties/agreement_request/properties/discipline_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/AgreementPreparationTemplate/properties/discipline_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/CenterSettingsValues/properties/agreement_templates/items/properties/discipline_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
+      },
+      {
+        "path": "#/$defs/OrganizationSettingsValues/properties/agreement_templates/items/properties/discipline_id",
+        "origin": "ftksaas",
+        "acceptance": "generic_uuid",
+        "generation": "uuidv7"
       }
     ],
     "open_product_decisions": [],
@@ -96748,7 +96868,7 @@
       "uuid": "backend uuid@14.0.3 v7 for all inserted IDs; DB defaults not required",
       "external_transport": "POST /functions/v1/backend-v1/{operation}; direct typed request body",
       "internal_rpc": "service-only api_v1 named functions; actor/session/UUID bank supplied by verified gateway",
-      "migration_count": 119,
+      "migration_count": 120,
       "acceptance_source": "apps/backend/docs/00-FtkSaaS-yeni-sohbet-devir.md"
     },
     "decision_sprint": {
@@ -98786,7 +98906,8 @@
           "attendance_block_v1",
           "negcredit_valuation_set_v1",
           "instructor_agreements_list_v1",
-          "attendance_start_v1"
+          "attendance_start_v1",
+          "settings_preparation_resolve_v1"
         ],
         "dependencies": [
           "plan_gate_alignment",
@@ -98811,7 +98932,8 @@
           "attendance_block_v1",
           "negcredit_valuation_set_v1",
           "instructor_agreements_list_v1",
-          "attendance_start_v1"
+          "attendance_start_v1",
+          "settings_preparation_resolve_v1"
         ],
         "contract_only_operations": [],
         "acceptance_case_ids": [

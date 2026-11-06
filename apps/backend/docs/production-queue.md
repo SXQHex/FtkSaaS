@@ -2,7 +2,7 @@
 
 Bu dosya yalnız **sıra, bağımlı teslim paketleri ve kontrol noktalarının** sahibidir. Görev içeriği/kabul/dosya alanı [remaining-work.md](remaining-work.md), gerçek kaynak/test/hosted durum [00 devir](00-FtkSaaS-yeni-sohbet-devir.md) sahibindedir. Frontend’in aktif modülü ve sırası değiştirilmez. İkinci roadmap/todo açılmaz.
 
-**Aktif paket:** [S10.2](remaining-work.md#s10)69 grup denetimi ve22 yanlış katalog grup eşlemesinin kaynak düzeltmesidir; native/aday/main/development kontrol noktası [devir](00-FtkSaaS-yeni-sohbet-devir.md#a03s10-kaynak-ve-ayar-denetimi--6-kasım-2026) sahibindedir. Sonraki sıra A03.2/A03.3 gerçek özellik kanıt eşlemesi → S10.3 gerçek eksik ayar alt alanları → S08/S14/S15 ortam/tüketici sınırları. S05/S11/S12/S13 ve P14–P16/B01–B04 tamamlanan kabulü tekrar kurulmaz; frontend adına kapanış verilmez.
+**Aktif paket:** [A03.2/A03.3](remaining-work.md#a03)33 özellik ve ortak operasyonların gerçek test/ortam/plan/gap eşlemesi tamamlandı; [kanıt](00-FtkSaaS-yeni-sohbet-devir.md#a03-özellik-kanıt-eşlemesi--7-kasım-2026). PR238 S10.2 native/main/development teslimi doğrulandı. Aynı pakette S10.3a M12/O19 anlaşma hazırlığı aday kaynağına eklenir; native/dağıtım kabulü [devirde](00-FtkSaaS-yeni-sohbet-devir.md#s10-anlaşma-hazırlık-kaynağı--7-kasım-2026) ayrıdır. Sonraki kaynak sırası S10.3 kalan gerçek eksik ayar alt alanları → S07/S08/S14/S15 ortam/tüketici sınırları. Genel tercih için yeni ileri yayın motoru FD11 ilk teslimine eklenmez. S05/S11/S12/S13 ve P14–P16/B01–B04 tamamlanan kabulü tekrar kurulmaz; frontend adına kapanış verilmez.
 
 ## Uygulama sırası
 

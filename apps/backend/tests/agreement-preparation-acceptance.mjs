@@ -1,0 +1,68 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import {authUser,fixturePlatform,must,call} from './api-client.mjs';
+import {connect} from '../scripts/db.mjs';
+import {newUuidV7 as key} from '../scripts/uuid.mjs';
+
+test('S10 agreement templates prepare explicit immutable publications with live plan and center authority',{timeout:300000},async()=>{
+ const {platform,plan}=await fixturePlatform(),owner=await authUser('agreement-preparation'),other=await authUser('agreement-preparation-outsider');
+ const account=await must(owner,'account_get_v1');await must(other,'account_get_v1');const db=await connect();
+ try{
+  await db.query("update core.saas_plan_versions set name='pro' where id=$1",[plan]);
+  const org=(await must(platform,'organization_create_v1',{verified_account_id:account.id,name:'Synthetic agreement preparation',initial_plan_id:plan},key())).primary_id;
+  const api=(op,b={},k=key(),u=owner)=>must(u,op,{org_id:org,...b},k);
+  const denied=async(code,op,b,k=key(),u=owner)=>{const r=await call(u,op,{org_id:org,...b},k);assert.equal(r.result.ok,false);assert.equal(r.result.error.code,code);};
+  const center=(await api('center_create_v1',{name:'Preparation center',timezone:'UTC'})).primary_id;
+  const person=(await db.query('select owner_person_id from core.organizations where id=$1',[org])).rows[0].owner_person_id;
+  await api('center_manager_assign_v1',{center_id:center,person_id:person});
+  const payment=(await api('saas_payment_submit_v1',{center_id:center,amount_minor:'1000',currency:'TRY',reference:'Synthetic agreement preparation',occurred_at:new Date().toISOString()})).primary_id;
+  await api('saas_payment_verify_v1',{payment_id:payment,accepted:true},key(),platform);
+  const discipline=(await api('discipline_save_v1',{name:'Synthetic preparation discipline',state:'active'})).primary_id;
+  await api('center_discipline_set_v1',{center_id:center,discipline_id:discipline,state:'active'});
+  await api('role_assign_v1',{center_id:center,person_id:person,role:'instructor',scope:{center_id:center}});
+  const terms={model:'session_fixed',currency:'TRY',components:[{kind:'session_fixed',amount_minor:'25000'}],room_fee:{kind:'free',order:'after_instructor_share'}};
+  const template={key:'fixed',name:'Synthetic explicit fee',discipline_id:discipline,format:'group',terms};
+  const q={scope:'organization'},read=()=>api('settings_get_v1',q);
+  let v=await read();const save={...q,expected_version:v.version,patch:{agreement_templates:[template]}},saveKey=key();
+  await api('settings_update_v1',save,saveKey);assert.equal((await api('settings_update_v1',save,saveKey)).replayed,true);
+  const catalog=await api('settings_catalog_get_v1',{scope:'center',center_id:center});
+  const selected=catalog.preparation_templates.agreements.find(x=>x.template.key==='fixed'&&x.source.scope==='organization');assert(selected);assert.deepEqual(selected.template,template);
+  const request={center_id:center,kind:'agreement',source:selected.source};
+  const count=async()=>Number((await db.query('select count(*)::int n from core.instructor_agreements where org_id=$1',[org])).rows[0].n);
+  const effects=async()=>{
+   const result={};for(const table of ['operation_receipts','audit_events','notifications','earnings','previews'])result[table]=Number((await db.query('select count(*)::int n from core.'+table+' where org_id=$1',[org])).rows[0].n);return result;
+  };
+  const before=await count(),priorEffects=await effects(),resolved=await api('settings_preparation_resolve_v1',request);assert.deepEqual(resolved.agreement_request,{discipline_id:discipline,format:'group',terms});assert.equal(await count(),before);assert.deepEqual(await effects(),priorEffects);
+  await denied('NOT_FOUND','settings_preparation_resolve_v1',request,key(),other);
+  await denied('VERSION_CONFLICT','settings_preparation_resolve_v1',{...request,source:{...selected.source,version:0}});
+  await denied('NOT_FOUND','settings_preparation_resolve_v1',{...request,source:{...selected.source,key:'missing'}});
+  await denied('NOT_FOUND','settings_preparation_resolve_v1',{...request,source:{scope:'center',key:'fixed',version:0,center_id:key()}});
+  v=await read();await denied('VALIDATION_FAILED','settings_update_v1',{...q,expected_version:v.version,patch:{agreement_templates:[template,template]}});
+  await denied('VALIDATION_FAILED','settings_update_v1',{...q,expected_version:v.version,patch:{agreement_templates:[{...template,terms:{...terms,model:'percentage'}}]}});
+  await denied('NOT_FOUND','settings_update_v1',{...q,expected_version:v.version,patch:{agreement_templates:[{...template,discipline_id:key()}]}});
+  await denied('NOT_FOUND','settings_update_v1',{...q,expected_version:v.version,patch:{agreement_templates:[{...template,terms:{...terms,package_overrides:[{product_id:key(),components:[{kind:'per_person',amount_minor:'100'}]}]}}]}});
+  const published=(await api('instructor_agreement_publish_v1',{center_id:center,person_id:person,...resolved.agreement_request,reason:'Explicit synthetic publication',valid:{starts_at:'2030-01-01T00:00:00Z',ends_at:'2031-01-01T00:00:00Z'}})).primary_id;
+  assert.equal(await count(),before+1);
+  v=await read();await api('settings_update_v1',{...q,expected_version:v.version,patch:{agreement_templates:[{...template,name:'Changed preparation',terms:{...terms,components:[{kind:'session_fixed',amount_minor:'30000'}]}}]}});
+  await denied('VERSION_CONFLICT','settings_preparation_resolve_v1',request);
+  assert.deepEqual((await db.query('select terms from core.instructor_agreements where id=$1',[published])).rows[0].terms,terms);
+  const cq={scope:'center',center_id:center},cv=await api('settings_get_v1',cq),local={...cq,expected_version:cv.version,patch:{agreement_templates:[template]}},localKey=key();
+  await api('settings_update_v1',local,localKey);const localRead=await api('settings_get_v1',cq);assert.deepEqual(localRead.values.agreement_templates,[template]);
+  const reset=await api('settings_reset_preview_v1',{...cq,fields:['agreement_templates']});assert.deepEqual(reset.after.agreement_templates,[]);
+  await api('settings_reset_apply_v1',{...cq,expected_version:reset.version,preview:{id:reset.id,token:reset.token}});
+  assert.deepEqual((await api('settings_get_v1',cq)).values.agreement_templates,[]);assert.equal(await count(),before+1);
+  const currentCatalog=await api('settings_catalog_get_v1',cq),currentSource=currentCatalog.preparation_templates.agreements.find(x=>x.source.scope==='organization').source;
+  await db.query("update core.saas_plan_versions set name='business' where id=$1",[plan]);
+  assert.equal((await api('settings_preparation_resolve_v1',{...request,source:currentSource})).agreement_request.terms.components[0].amount_minor,'30000');
+  await db.query("update core.saas_plan_versions set name='starter' where id=$1",[plan]);
+  await denied('PLAN_FEATURE_UNAVAILABLE','settings_preparation_resolve_v1',{...request,source:currentSource});
+  await denied('PLAN_FEATURE_UNAVAILABLE','settings_update_v1',save,saveKey);
+  const starterCatalog=await api('settings_catalog_get_v1',cq);assert.equal(starterCatalog.fields.find(f=>f.key==='agreement_templates').writable,false);assert.deepEqual(starterCatalog.preparation_templates.agreements,[]);
+  await db.query("update core.saas_plan_versions set name='pro' where id=$1",[plan]);
+  const role=(await db.query("select version from core.role_assignments where org_id=$1 and scope_center_id=$2 and person_id=$3 and role='center_manager' and state='active'",[org,center,person])).rows[0];
+  await api('center_manager_revoke_v1',{center_id:center,person_id:person,expected_version:Number(role.version),reason:'Synthetic preparation authority revocation'});
+  await denied('FORBIDDEN','settings_preparation_resolve_v1',{...request,source:currentSource});
+  await denied('FORBIDDEN','settings_update_v1',local,localKey);
+  assert.equal(await count(),before+1);
+ }finally{await db.end();}
+});

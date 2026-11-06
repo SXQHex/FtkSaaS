@@ -39,6 +39,54 @@ test('P05 Storage adapter checks actual bytes/hash/mime/size and returns no inte
  const fakePdf=documentStorage('http://private-kong.invalid','synthetic',async()=>new Response('not a pdf',{headers:{'content-type':'application/pdf'}}));await assert.rejects(fakePdf.download(object),/MIME/);
 });
 const p=JSON.parse(fs.readFileSync('../../packages/api-contracts/schema/contract.json'));const a=new Ajv({strict:false,allErrors:true});addFormats(a);a.addSchema(p,'contract');const valid=(n,x)=>a.getSchema('contract#/$defs/'+n)(x);const id=newUuidV7();
+test('agreement preparations are typed proposals without instructor, dates or publication authority',async()=>{
+ const terms={model:'session_fixed',currency:'TRY',components:[{kind:'session_fixed',amount_minor:'25000'}],room_fee:{kind:'free',order:'after_instructor_share'}};
+ const template={key:'fixed',name:'Explicit fixed fee',discipline_id:id,format:'group',terms};
+ for(const scope of ['Center','Organization']){
+  assert(valid(scope+'SettingsValues',{agreement_templates:[template]}));
+  for(const addition of [{person_id:id},{valid:{starts_at:'2030-01-01T00:00:00Z'}},{published:true}])assert(!valid(scope+'SettingsValues',{agreement_templates:[{...template,...addition}]}));
+ }
+ assert(!valid('UserSettingsValues',{agreement_templates:[template]}));assert(!valid('MemberSettingsValues',{agreement_templates:[]}));
+ const operation=p['x-contract'].operations.find(o=>o.name==='settings_preparation_resolve_v1');
+ assert(operation.features.includes('F20'));assert(operation.conditional_features.some(c=>c.feature==='F20'&&c.when==='agreement_preparation'&&c.mode==='required_if_selected'));
+ assert(!operation.required_features.includes('F20'));assert(!operation.runtime_required_features.includes('F20'));
+ const source={scope:'organization',key:'fixed',version:2};
+ const request={client_api_version:1,request_id:id,org_id:id,center_id:id,kind:'agreement',source};
+ assert(valid('Request_settings_preparation_resolve',request));assert(!valid('Request_settings_preparation_resolve',{...request,person_id:id}));
+ const result={kind:'agreement',source,agreement_request:{discipline_id:id,format:'group',terms}};
+ assert(valid('ResolvedDomainPreparation',result));assert(!valid('ResolvedDomainPreparation',{...result,operation_id:id}));
+ const generated=await import('../supabase/functions/backend-v1/validators.js');
+ assert(generated.request_settings_preparation_resolve_v1(request));assert(!generated.request_settings_preparation_resolve_v1({...request,person_id:id}));
+ const update={client_api_version:1,request_id:id,operation_key:id,org_id:id,center_id:id,scope:'center',expected_version:0,patch:{agreement_templates:[template]}};
+ assert(generated.request_settings_update_v1(update));assert(!generated.request_settings_update_v1({...update,patch:{agreement_templates:[{...template,published:true}]}}));
+ assert(generated.success_settings_preparation_resolve_v1({ok:true,data:result,trace_id:id}));
+ const publish={client_api_version:1,request_id:id,org_id:id,center_id:id,operation_key:id,...result.agreement_request};
+ assert(!valid('Request_instructor_agreement_publish',publish));
+ assert(valid('Request_instructor_agreement_publish',{...publish,person_id:id,reason:'Explicit publication',valid:{starts_at:'2030-01-01T00:00:00Z',ends_at:'2031-01-01T00:00:00Z'}}));
+ const config=JSON.parse(fs.readFileSync('config/frontend-settings.json'));
+ for(const scope of ['user','member','center','organization','platform']){
+  const fields=config.fields.filter(f=>f.scope===scope);
+  const data={scope,catalog_version:config.version,fields:fields.map(f=>({key:f.key,group:f.group,consumer:f.consumer,writable:true})),defaults:Object.fromEntries(fields.map(f=>[f.key,f.default])),brand_packages:[],limitations:[]};
+  assert(valid('SettingsCatalog',data));assert(generated.success_settings_catalog_get_v1({ok:true,data,trace_id:id}));
+  for(const patch of [{fields:[{}]},{brand_packages:[null]},{limitations:[4]}]){
+   assert(!valid('SettingsCatalog',{...data,...patch}));assert(!generated.success_settings_catalog_get_v1({ok:true,data:{...data,...patch},trace_id:id}));
+  }
+ }
+ const inline=s=>{
+  if(Array.isArray(s))return s.map(inline);
+  if(!s||typeof s!=='object')return s;
+  if(s.$ref&&s.$ref!=='#/$defs/FtkUuid')return inline(p.$defs[s.$ref.split('/').at(-1)]);
+  const result=Object.fromEntries(Object.entries(s).map(([k,v])=>[k,inline(v)]));
+  if(s.enum&&!s.type)result.type='string';return result;
+ };
+ for(const scope of ['organization','center']){const f=config.fields.find(f=>f.scope===scope&&f.key==='agreement_templates');assert(f);assert.equal(f.group,scope==='organization'?'O19':'M12');assert.deepEqual(f.default,[]);}
+ for(const f of config.fields.filter(f=>f.key==='agreement_templates'))assert.deepEqual(f.schema.items.properties.terms,{$ref:'#/$defs/PayTerms'});
+ const sqlSchema=JSON.parse(fs.readFileSync('database/agreement-preparations.sql','utf8').split("$schema$select '")[1].split("'::jsonb$schema$")[0].replaceAll("''","'"));
+ assert.deepEqual(sqlSchema,inline(p.$defs.PayTerms));
+ const migration=fs.readdirSync('supabase/migrations').find(x=>x.endsWith('_agreement_preparations.sql'));assert(migration);
+ const catalog=fs.readFileSync('database/settings-catalog-v13.sql','utf8'),impl=fs.readFileSync('database/agreement-preparations.sql','utf8');
+ assert.equal(fs.readFileSync('supabase/migrations/'+migration,'utf8'),catalog.replace('commit;\n',()=>impl.replace('begin;\n','')));
+});
 test('Starter instructor discovery exposes assignment versions without broadening writes',()=>{
  const reader=p['x-contract'].operations.find(o=>o.name==='management_state_get_v1');
  assert(reader.runtime_selectors.includes('role_assign_v1'));
@@ -110,7 +158,7 @@ test('subscriber numbers are lossless decimal identifiers on person and report p
  assert(!valid('PersonSummary',{...person,subscriber_number:1001}));
 });
 test('settings catalogue groups isolate calendar display, reminders and package preparation without changing stored fields',()=>{
- const fields=JSON.parse(fs.readFileSync('config/frontend-settings.json')).fields;
+ const fields=JSON.parse(fs.readFileSync('config/frontend-settings.json')).fields.filter(f=>f.key!=='agreement_templates');
  for(const f of fields){
   if(f.consumer==='reminder_settings')assert.equal(f.group,{organization:'O07',center:'M14',member:'S13'}[f.scope],f.scope+'.'+f.key);
   if(f.consumer==='reminder_quiet_until')assert.equal(f.group,'S13',f.key);
@@ -119,7 +167,7 @@ test('settings catalogue groups isolate calendar display, reminders and package 
  assert.deepEqual(fields.filter(f=>f.scope==='user'&&f.group==='S10').map(f=>f.key).sort(),['calendar_view','show_weekends']);
  const previous=JSON.parse(fs.readFileSync('database/settings-catalog-v11.sql','utf8').split("$fields$select '")[1].split("'::jsonb$fields$")[0].replaceAll("''","'"));
  const withoutGroups=xs=>xs.map(({group,...rest})=>rest);assert.deepEqual(withoutGroups(fields),withoutGroups(previous));
- const config=JSON.parse(fs.readFileSync('config/frontend-settings.json'));const sql=fs.readFileSync('database/settings-catalog-v'+config.version+'.sql');
+ const config={version:12};const sql=fs.readFileSync('database/settings-catalog-v'+config.version+'.sql');
  const migration=fs.readdirSync('supabase/migrations').find(x=>x.endsWith('_settings_behavior_groups.sql'));assert(migration);assert.equal(fs.readFileSync('supabase/migrations/'+migration,'utf8'),sql.toString().replace('commit;\n',fs.readFileSync('database/settings-behavior-groups.sql','utf8')+'commit;\n'));
 });
 test('subscriber report column is supported by every persisted template catalogue',()=>{

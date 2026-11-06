@@ -238,6 +238,8 @@ Standart planın etkin ticari limitleri geçmiş katalog/fiyat satırı değişt
 
 Pro/Business ücretli eğitmen görevlendirmesi içindir; Starter'da çağrılmaz.
 
+İsteğe bağlı hazırlık: yetkili merkez kataloğundaki `preparation_templates.agreements` kaynağı → `settings_preparation_resolve_v1(kind:agreement,source)` → açık kişi/tarih/gerekçe seçimi. Bu adım yalnız `discipline_id/format/terms` önerir; yayın veya mevcut anlaşmanın yerine geçme değildir. Kaynak/sürüm/plan/canlı CM yeniden denetlenir. [Şablon kapsamı ve reset sınırı](settings.md#anlaşma-hazırlık-şablonları) WF12 ayar yolundadır.
+
 `instructor_agreements_list_v1(org_id,center_id,person_id,page)` ile mevcut immutable sürümler okunur. Yetkili `earnings.manage` aktörü gerçek ücret şartlarını seçtikten sonra `instructor_agreement_publish_v1` çağrısında aynı org/center/person/discipline, format, `valid.starts_at/ends_at`, `terms`, `reason` ve sabit operation key gönderir. Yeni zincirde predecessor/version yoktur; değiştirmede `supersedes_id + expected_version` birlikte gerekir. Merkez ve bütün oluşumları kapsayan yürürlük açık seçilir; ücret/model/oda payı varsayılmaz.
 
 Başarı sonrası liste ve yeni program preview yeniden okunur; önceki preview anlaşma bağımlılığı değiştiğinden kullanılmaz. Yeni preview'de engel yoksa ayrı etki onayıyla apply yapılır. Eksik anlaşmayı düzeltmek başka kaynak/yetki/çakışma engellerinin de kalktığı garantisi değildir.
