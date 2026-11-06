@@ -1,4 +1,5 @@
 import { v7, validate } from "uuid";
+import { validCollection } from "./collection-command";
 import {
   bookingWrites,
   bookingFields,
@@ -18,6 +19,7 @@ import { apiClient, ApiFailure } from "./api";
 import { sessionCapacity } from "./session-create";
 export const setupWrites = [
   ...rightsOperations,
+  "collection_record_v1",
   ...bookingWrites,
   "product_publish_v1",
   "document_accept_v1",
@@ -107,6 +109,15 @@ export type PendingSetup = { command: SetupCommand; blocked?: boolean };
 const keyPattern = /^[a-f0-9]{8}-[a-f0-9]{4}-7[a-f0-9]{3}-[89ab][a-f0-9]{3}-[a-f0-9]{12}$/i;
 const fields: Record<SetupWrite, string[]> = {
   ...bookingFields,
+  collection_record_v1: [
+    "person_id",
+    "amount_minor",
+    "currency",
+    "occurred_at",
+    "debt_ids",
+    "note",
+    "payment",
+  ],
   credit_adjust_v1: [
     "sale_id",
     "quantity",
@@ -200,6 +211,13 @@ export function recoverSetup(scope: SetupScope, slot: string): PendingSetup | "i
       rightsOperations.some((operation) => operation === command.operation) &&
       (!validRightsCommand(command.operation, input, scope.centerId) ||
         (command.operation === "negative_limit_set_v1" && slot !== `rights:${input.person_id}`))
+    )
+      return "invalid";
+    if (slot.startsWith("finance:") && command.operation !== "collection_record_v1")
+      return "invalid";
+    if (
+      command.operation === "collection_record_v1" &&
+      (!validCollection(input, scope.centerId) || slot !== `finance:${input.person_id}`)
     )
       return "invalid";
     if (["session_create_v1", "replacement_session_create_v1"].includes(command.operation))

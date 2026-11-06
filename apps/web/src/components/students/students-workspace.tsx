@@ -1,5 +1,7 @@
 "use client";
 
+import dynamic from "next/dynamic";
+import { WorkspaceLoading } from "../workspace-loading";
 import { useEffect, useRef, useState, type FormEvent } from "react";
 import { useTranslations } from "next-intl";
 import type { CenterView, OrganizationView, PersonView } from "@ftksaas/api-contracts";
@@ -43,6 +45,11 @@ import { SalesRecovery } from "../products/sales-recovery";
 import { PersonEntitlements } from "../products/person-entitlements";
 import { readEntitlements } from "../../lib/products";
 import { PersonDisciplines } from "./person-disciplines";
+
+const PersonFinance = dynamic(
+  () => import("../finance/person-finance").then((module) => module.PersonFinance),
+  { loading: WorkspaceLoading },
+);
 
 const buttonClass = "h-auto min-h-11 max-w-full whitespace-normal";
 export function StudentsWorkspace({
@@ -580,6 +587,13 @@ function StudentDetail({
           </section>
         </>
       )}
+      {rightsPerson && (
+        <PersonFinance
+          scope={scope}
+          personId={rightsPerson.id}
+          timeZone={Intl.DateTimeFormat().resolvedOptions().timeZone}
+        />
+      )}
       {rightsPerson && entitlements && (
         <PersonEntitlements
           scope={scope}
@@ -590,6 +604,7 @@ function StudentDetail({
           onSaved={refreshPersonAndList}
         />
       )}
+
       {rightsPerson && entitlements && (
         <PersonSales scope={scope} personId={rightsPerson.id} onSaved={refreshPersonAndList} />
       )}
