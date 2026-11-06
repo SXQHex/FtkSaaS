@@ -285,8 +285,8 @@
         "management_state_get_v1"
       ],
       "review": {
-        "fingerprint": "171bdf492ceb8f84a1fc672de3a50c7fc8b3022d4e6884f0bd5bab93f27ec2f1",
-        "reason": "Reviewed native fixture source hash after correcting search input to authoritative account identity; complete104-unit ownership and all gates remain."
+        "fingerprint": "2fe99765550b0137457f7f6ea9227ed76ee6851473f2d26af1bee862775ca1c0",
+        "reason": "Reviewed original submit helper restored byte-for-byte and separate independent routing ingress fixture. Existing assertions are preserved; RATE_LIMITED/no-row side effects and actual-phone hashes are checked. No guard, threshold or exception changes."
       }
     },
     {
@@ -1414,8 +1414,8 @@
         "automation_save_v1"
       ],
       "review": {
-        "fingerprint": "9cbb2600a72f2d40889ff173a40c18433ab2618ca52814307ca39734ed6c8873",
-        "reason": "Reviewed automation result and retry authorization: SECURITY INVOKER helpers receive only server-role SELECT UPDATE on private jobs; tenant and version guards remain."
+        "fingerprint": "733b84003160f0d78d0b8e0476f791a20f209f1859a39a037869d19fab261568",
+        "reason": "Reviewed final separate routing fixture and original shared-phone helper preservation; real intake budget and native Auth routing/version/visibility assertions retain behavior. Existing workflow guide stays accurate."
       }
     },
     {

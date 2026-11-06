@@ -2,7 +2,7 @@
 
 Bu dosya yalnız **sıra, bağımlı teslim paketleri ve kontrol noktalarının** sahibidir. Görev içeriği/kabul/dosya alanı [remaining-work.md](remaining-work.md), gerçek kaynak/test/hosted durum [00 devir](00-FtkSaaS-yeni-sohbet-devir.md) sahibindedir. Frontend’in aktif modülü ve sırası değiştirilmez. İkinci roadmap/todo açılmaz.
 
-**Aktif kaynak kabulü:** P14 backend kaynak/main/development ve canlı teslim/hata kabulü tamamlandı; [kanıt](00-FtkSaaS-yeni-sohbet-devir.md#p14-kaynak-ve-canlı-kabul-kapanışı). [P15/P16](remaining-work.md#p15) kaynak/native/main/development ve Pro/Business canlı kabulleri tamamlandı; [kanıt](00-FtkSaaS-yeni-sohbet-devir.md#p15-business-canlı-kabul-kapanışı--6-kasım-2026). Sonraki ürün paketi mevcut sıradaki B01–B05’tir; diğer açık hosted/işletim kabulleri kendi sahiplerinde korunur. XREQ-020/021 backend teslimleri main'dedir; frontend kabulü kendi alanında kalır. P10.3 gerçek aktarım, Node yerleşimi ve Meta/Google live teslimi ayrı açık kalır. Main'deki deploy filtreleri ve aday test envanteri korunur.
+**Aktif kaynak kabulü:** P14 backend kaynak/main/development ve canlı teslim/hata kabulü tamamlandı; [kanıt](00-FtkSaaS-yeni-sohbet-devir.md#p14-kaynak-ve-canlı-kabul-kapanışı). [P15/P16](remaining-work.md#p15) kaynak/native/main/development ve Pro/Business canlı kabulleri tamamlandı; [kanıt](00-FtkSaaS-yeni-sohbet-devir.md#p15-business-canlı-kabul-kapanışı--6-kasım-2026). Sonraki ürün paketi mevcut sıradaki B01–B04’tir; diğer açık hosted/işletim kabulleri kendi sahiplerinde korunur. XREQ-020/021 backend teslimleri main'dedir; frontend kabulü kendi alanında kalır. P10.3 gerçek aktarım, Node yerleşimi ve Meta/Google live teslimi ayrı açık kalır. Main'deki deploy filtreleri ve aday test envanteri korunur.
 
 ## Uygulama sırası
 
@@ -22,7 +22,7 @@ Bu dosya yalnız **sıra, bağımlı teslim paketleri ve kontrol noktalarının*
 | 9 | [P08](remaining-work.md#p08)–[P11](remaining-work.md#p11) | Sağlayıcı başına gerçek kabul, kontrollü aktarım ve CRM tam akışı |
 | 10 | [P12](remaining-work.md#p12)–[P13](remaining-work.md#p13) | Etkinlik kapasitesi ve kredi tüketmeyen uygunluk |
 | 11 | [P14](remaining-work.md#p14)–[P16](remaining-work.md#p16) | E-posta teslim→zamanlama/sessiz saat→otomasyon |
-| 12 | [B01](remaining-work.md#b01)–[B05](remaining-work.md#b05) | Business scope, ortak inbox, hesaplaşma, rapor ve özel teklif |
+| 12 | [B01](remaining-work.md#b01)–[B04](remaining-work.md#b04) | Business scope, ortak inbox, hesaplaşma ve rapor |
 
 **S01–S02 kontrol noktası:** Ayrı teslimin backend kapanışı doğrulandı; [görev kabulü](remaining-work.md#s01) ve [kaynak/ortam kanıtı](00-FtkSaaS-yeni-sohbet-devir.md#s01s02-backend-kabulü) kendi sahiplerindedir. Frontend ekran sırası ve kabulü değişmez.
 

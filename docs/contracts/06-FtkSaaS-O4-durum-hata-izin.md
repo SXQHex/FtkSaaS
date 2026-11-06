@@ -14,7 +14,7 @@ Starter canlı limit/özellik/kapsam ve receipt tekrar denetimi uygulanır; [hat
 
 ## 26 Ekim — Starter/Pro/Business plan erişim hedefi
 
-[Ürün kararı](01-FtkSaaS-urun-kapsam-sozlesmesi.md): Starter 1 merkez/1 aktif oda/1 disiplin/1 aktif eğitmen/100 aktif öğrenci; self-servis ve temel ders public başvurusu açık; bağımsız etkinlik, genel CRM/otomasyon ve hakediş kapalı. Pro bütün tek merkezli fonksiyonları, Business en fazla 5 merkezi kapsar. Operasyon rolü, owner/grant veya doğrudan RPC çağrısı plan kapısını aşmaz. Mevcut öğrenci limitinde `RelationshipState=active` ve canlı yetki esas alınır; eski kayıtlar/rezervasyonlar plan düşüşüyle silinmez. Starter isteklerinin hata/izin eşlemesi mevcut `08`, gerçek API ve PR56 kabulüne bağlıdır; yeni hata kodu veya izin enum’u eklenmemiştir. Pro/Business ayrı limit/özel teklif hedefinin tamamı bu dar kabulden türetilmez.
+[Ürün kararı](01-FtkSaaS-urun-kapsam-sozlesmesi.md): Starter 1 merkez/1 aktif oda/1 disiplin/1 aktif eğitmen/100 aktif öğrenci; self-servis ve temel ders public başvurusu açık; bağımsız etkinlik, genel CRM/otomasyon ve hakediş kapalı. Pro bütün tek merkezli fonksiyonları, Business en fazla 5 merkezi kapsar. Operasyon rolü, owner/grant veya doğrudan RPC çağrısı plan kapısını aşmaz. Mevcut öğrenci limitinde `RelationshipState=active` ve canlı yetki esas alınır; eski kayıtlar/rezervasyonlar plan düşüşüyle silinmez. Starter isteklerinin hata/izin eşlemesi mevcut `08`, gerçek API ve PR56 kabulüne bağlıdır; yeni hata kodu veya izin enum’u eklenmemiştir. Pro/Business standart limitlerinin tam kabulü bu dar kabulden türetilmez.
 
 
 ## Durum aileleri

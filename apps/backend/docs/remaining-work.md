@@ -324,7 +324,7 @@ Bu tablo yalnız izdir; eski kabul metinleri ikinci kez tutulmaz.
 - **Doğrulama senaryosu:** 249→250→251 ve 1249→1250→1251 paralel aktivasyon, import/merge/yeniden aktivasyon; 5→6 merkez reddi.
 - **Kaynak alanı:** plan-limit/runtime gate; contract.json; yeni migration/test
 
-**Backend teslimi:** PR164 aday/main/development kabulüyle tamamlandı; [tam kaynak/ortam kanıtı](00-FtkSaaS-yeni-sohbet-devir.md#p01-ticari-limit-kaynak-paketi) sahibindedir. Açık sınırsız DTO'nun frontend tüketici bağımlılığı [XREQ-014](../../../docs/requests.md#xreq-014) kendi sahibinde açık kalır; Business özel teklif B05 kapsamındadır.
+**Backend teslimi:** PR164 aday/main/development kabulüyle tamamlandı; [tam kaynak/ortam kanıtı](00-FtkSaaS-yeni-sohbet-devir.md#p01-ticari-limit-kaynak-paketi) sahibindedir. Açık sınırsız DTO'nun frontend tüketici bağımlılığı [XREQ-014](../../../docs/requests.md#xreq-014) kendi sahibinde açık kalır.
 
 <a id="p02"></a>
 ### P02 — Çoklu kaynak ve operasyon personeli
@@ -563,12 +563,14 @@ Değişen dilimin sözleşme, üretilmiş tip/envanter, WF/F01–F33 izi ve alan
 <a id="b01"></a>
 ### B01 — Business merkez ve birleşik kişi yetkisi
 
-- [ ] **Tür:** D/K · **Plan:** Business · **Özellik:** F01,F03,F04,F05,F07
+- [x] **Tür:** D/K · **Plan:** Business · **Özellik:** F01,F03,F04,F05,F07
 - **Bağımlılık:** P01,P02,S05
 - **Kabul:** Beş merkeze kadar günlük yönetim; aynı öğrenci No ve org kotasında tek sayılır.
 - **Sınır/olumsuz durum:** Merkez yöneticisi başka merkez kişisel/finans verisini göremez; org yetkisi ayrı.
 - **Doğrulama senaryosu:** A/B merkez rollerini aynı kişiyle değiştir; birleşik okuma ve komut reddi; kapanan merkez eski kayıt koruması.
 - **Kaynak alanı:** center lifecycle/role/person SQL; mevcut scope testleri
+
+- **Teslim durumu:** Native standart kapasite/planla kapanan kapsam-geçmiş testleri ile gerçek iki merkez kota/Abone No ve sınırlı aktör okuma/yazma/yetki kaybı kabulü geçti; [kanıt](00-FtkSaaS-yeni-sohbet-devir.md#b01-gerçek-iki-merkez-ve-canlı-yetki). Hosted fiziksel merkez kapatma iddiası yoktur.
 
 <a id="b02"></a>
 ### B02 — Başvuru yönlendirme ve ortak gelen kutusu
@@ -599,16 +601,6 @@ Değişen dilimin sözleşme, üretilmiş tip/envanter, WF/F01–F33 izi ve alan
 - **Sınır/olumsuz durum:** Öğrenci toplamı mükerrer sayılmaz; finans tutarları kör toplanmaz; export aynı yetkiye bağlı.
 - **Doğrulama senaryosu:** A/B/Org filtreleri, No, cross-center tutar ve yetki kaybı sonrası indirme; kaynakla mutabakat.
 - **Kaynak alanı:** report/CRM scope projeksiyonları; ilgili test
-
-<a id="b05"></a>
-### B05 — Özel teklif ve limit geçişleri
-
-- [ ] **Tür:** K/D · **Plan:** Business/plan geçişleri · **Özellik:** F32,F01,F07
-- **Bağımlılık:** P01,S16,B01
-- **Kabul:** Standart üzeri merkez/öğrenci için sürümlü kabul edilmiş özel limit okunur/uygulanır.
-- **Sınır/olumsuz durum:** Genel bypass veya sınırsız merkez yok; kota düşüşü mevcut hak/borcu silmez, yeni aktivasyonu sınırlar.
-- **Doğrulama senaryosu:** Özel→standart, Business→Pro→Starter mevcut seçim kuralları; limit aşımı/sürüm çakışması ve dönem talebi birlikte.
-- **Kaynak alanı:** subscription/plan limit SQL; contract.json; ilgili test
 
 ## Ortak üretim işletimi
 
@@ -738,10 +730,10 @@ Değişen dilimin sözleşme, üretilmiş tip/envanter, WF/F01–F33 izi ve alan
 ### G03 — Business ve toplam backend kapanışı
 
 - [ ] **Tür:** D/H · **Plan:** Business/Tümü · **Özellik:** F01–F33
-- **Bağımlılık:** G01,G02,B01–B05; O01–O10
+- **Bağımlılık:** G01,G02,B01–B04; O01–O10
 - **Kabul:** 5 merkez/1250, ortak CRM, org raporu ve hesaplaşma uçtan uca; 33 özellik izlenebilir.
-- **Sınır/olumsuz durum:** Her plan kendi kapısını taşır; genel güvenlik/retention özel teklifle kapatılamaz.
-- **Doğrulama senaryosu:** A/B merkez+org rolleri, özel teklif, restore ve yük kanıtı; bütün uygulanabilir K/T/H tamam, son kaynak incelemesi.
+- **Sınır/olumsuz durum:** Her plan kendi kapısını taşır; genel güvenlik/retention kapıları korunur.
+- **Doğrulama senaryosu:** A/B merkez+org rolleri, restore ve yük kanıtı; bütün uygulanabilir K/T/H tamam, son kaynak incelemesi.
 - **Kaynak alanı:** backend kabul matrisi; devir/backlog/kuyruk
 
 ## F01–F33 kapsama izi
@@ -752,7 +744,7 @@ A03 ve G03 genel iz/kabul kapılarıdır. Aşağıdaki tablo görev navigasyonud
 
 | Özellik | Ad | Görevler | Kaynak/test akışı |
 |---|---|---|---|
-| F01 | İşletme, merkez, oda ve kaynak tanımı | S01, P01, P02, B01, B05 | [WF02](../../../docs/workflows.md#wf02), [WF17](../../../docs/workflows.md#wf17) |
+| F01 | İşletme, merkez, oda ve kaynak tanımı | S01, P01, P02, B01 | [WF02](../../../docs/workflows.md#wf02), [WF17](../../../docs/workflows.md#wf17) |
 | F02 | Çalışma saatleri, izin ve uygunluk | S09, S10, P02 | [WF03](../../../docs/workflows.md#wf03), [WF12](../../../docs/workflows.md#wf12) |
 | F03 | İşletme kuralları ve merkez istisnaları | S01, S10, P15, B01 | [WF03](../../../docs/workflows.md#wf03) |
 | F04 | Hesap eşleştirme, çoklu rol, kapsamlı yetkilendirme | S06–S08, S10, B01 | [WF00](../../../docs/workflows.md#wf00), [WF02](../../../docs/workflows.md#wf02), [WF04](../../../docs/workflows.md#wf04), [WF17](../../../docs/workflows.md#wf17), [WF18](../../../docs/workflows.md#wf18) |
@@ -783,7 +775,7 @@ A03 ve G03 genel iz/kabul kapılarıdır. Aşağıdaki tablo görev navigasyonud
 | F29 | Atölye/etkinlik, kontenjan, kayıt ve katılım | P12, P13 | [WF15](../../../docs/workflows.md#wf15) |
 | F30 | Temel form ve sürümlü belge onayı | S13, O05, O08 | [WF10](../../../docs/workflows.md#wf10), [WF11](../../../docs/workflows.md#wf11) |
 | F31 | Öğrenci, kalan kredi ve borç için veri içe aktarma | S04, S12, P10 | [WF00](../../../docs/workflows.md#wf00), [WF10](../../../docs/workflows.md#wf10), [WF12](../../../docs/workflows.md#wf12), [WF20](../../../docs/workflows.md#wf20) |
-| F32 | İşletme aboneliği, erişim ve kullanım limitleri | S16, P01, B05 | [WF02](../../../docs/workflows.md#wf02), [WF04](../../../docs/workflows.md#wf04), [WF13](../../../docs/workflows.md#wf13), [WF17](../../../docs/workflows.md#wf17), [WF20](../../../docs/workflows.md#wf20) |
+| F32 | İşletme aboneliği, erişim ve kullanım limitleri | S16, P01 | [WF02](../../../docs/workflows.md#wf02), [WF04](../../../docs/workflows.md#wf04), [WF13](../../../docs/workflows.md#wf13), [WF17](../../../docs/workflows.md#wf17), [WF20](../../../docs/workflows.md#wf20) |
 | F33 | Denetlenebilir geçmiş ve yinelenen işlem koruması | A02, O01–O10 | [WF00](../../../docs/workflows.md#wf00), [WF05](../../../docs/workflows.md#wf05), [WF08](../../../docs/workflows.md#wf08), [WF14](../../../docs/workflows.md#wf14), [WF17](../../../docs/workflows.md#wf17), [WF20](../../../docs/workflows.md#wf20) |
 
 ## Doğrulama ve kayıt
