@@ -285,8 +285,8 @@
         "management_state_get_v1"
       ],
       "review": {
-        "fingerprint": "1eb8e4f1bcd07171627ff6e9ab1827352b03ff9fc9e554a528f7a82e1ae7ec75",
-        "reason": "Reviewed final catalogue grouping regression and single-transaction version12 migration; request/receipt protocol and all field schemas/defaults/consumers remain unchanged."
+        "fingerprint": "a0a3db58cbbcc7022833cf2a3dff33aab80756e43c182335326fd0eb210823d3",
+        "reason": "Schema-sharing regression fixture yeni root ortak alanlarını korur; beş gerçek katalog scope kontrol girdisi eklendi. Mevcut assertionlar ve kapsam aynı/artan."
       }
     },
     {
@@ -461,8 +461,8 @@
         "role_revoke_preview_v1"
       ],
       "review": {
-        "fingerprint": "82d680b66c465532f9886ff4d7839e5af395aef56bf640795c5c45331d502952",
-        "reason": "Reviewed six action-discovery selectors and matching read-path metadata, original writer preflight, canonical self/source scopes and native coverage; authority discovery remains separate from command eligibility."
+        "fingerprint": "140bb38f60dc4077783f5e828a3c2da818e7cd5ed507d66fbf64a7088e2f70f5",
+        "reason": "Registry yalnız yeni bağımsız anlaşma hazırlık kökünü import eder; mevcut kuruluş/rol/plan davranışı ve eski assertionlar korunur."
       }
     },
     {
@@ -648,8 +648,8 @@
         "person_discipline_set_v1"
       ],
       "review": {
-        "fingerprint": "7e8e35b6e91fa20c64e43ee81f10a30e43bce07b9473b19505302781bc2de5d4",
-        "reason": "Reviewed six action-discovery selectors, original writer preflight and canonical entity scopes; no command side effects or new permission. New native root preserves existing registry shard ownership; WF06/WF08 document authority versus write-time eligibility."
+        "fingerprint": "782c387832c001f8e3b49da6e453e42de1acf370fc6dd2995e8a40da6cd1a1c7",
+        "reason": "Kişi/öğrencilik ve davet kaynakları değişmedi; ortak registry harnessine yalnız yeni bağımsız anlaşma hazırlık importu eklendi, WF04 işlem/rehber sınırı korunur."
       }
     },
     {
@@ -1149,7 +1149,8 @@
         "apps/backend/tests/reminder-scheduling-acceptance.mjs",
         "apps/backend/tests/starter-operations-acceptance.mjs",
         "apps/backend/tests/starter-preparation-acceptance.mjs",
-        "apps/backend/tests/starter-preparation-fixture.mjs"
+        "apps/backend/tests/starter-preparation-fixture.mjs",
+        "apps/backend/tests/agreement-preparation-acceptance.mjs"
       ],
       "sources": [
         "apps/backend/config/frontend-settings.json",
@@ -1177,7 +1178,10 @@
         "docs/settings.md",
         "apps/backend/database/settings-catalog-v12.sql",
         "apps/backend/database/settings-behavior-groups.sql",
-        "apps/backend/supabase/migrations/20261106201122_settings_behavior_groups.sql"
+        "apps/backend/supabase/migrations/20261106201122_settings_behavior_groups.sql",
+        "apps/backend/database/agreement-preparations.sql",
+        "apps/backend/database/settings-catalog-v13.sql",
+        "apps/backend/supabase/migrations/20261106211933_agreement_preparations.sql"
       ],
       "operations": [
         "notification_preferences_set_v1",
@@ -1192,8 +1196,8 @@
         "settings_preparation_resolve_v1"
       ],
       "review": {
-        "fingerprint": "cf36b567a7b654d1aa9b05a4ffea22db302c720596f07d522f7c74d0e58456cf",
-        "reason": "Reviewed final single-transaction v12 catalogue/version guard, unchanged ACL/identity/defaults, added native catalogue group assertions and the settings guide; 69-group audit keeps incomplete subfields open."
+        "fingerprint": "d0dd0610cad0e20a7b6142d77abea39b7e0524bc922af62e26917392d82e7458",
+        "reason": "Katalog root ortak alan eşliği ve beş scope pozitif/negatif kontrolü; P15 fixture branchte olmayan ortak alanı boş anyOf yapmaz, constraint korunur."
       }
     },
     {
@@ -1276,7 +1280,8 @@
         "apps/backend/tests/event-payment.test.mjs",
         "apps/backend/tests/program-configuration-acceptance.mjs",
         "apps/backend/tests/earning-payment-selection-acceptance.mjs",
-        "apps/backend/tests/pro-lifecycle-earnings-acceptance.mjs"
+        "apps/backend/tests/pro-lifecycle-earnings-acceptance.mjs",
+        "apps/backend/tests/agreement-preparation-acceptance.mjs"
       ],
       "sources": [
         "apps/backend/database/cross-center-settlement-wrappers.sql",
@@ -1292,7 +1297,9 @@
         "apps/backend/database/program-configuration-requirements.sql",
         "apps/backend/supabase/migrations/20261103123239_program_configuration_requirements.sql",
         "apps/backend/database/upper-plan-subscriber-projections.sql",
-        "apps/backend/supabase/migrations/20261106174559_upper_plan_subscriber_projections.sql"
+        "apps/backend/supabase/migrations/20261106174559_upper_plan_subscriber_projections.sql",
+        "apps/backend/database/agreement-preparations.sql",
+        "apps/backend/database/settings-catalog-v13.sql"
       ],
       "operations": [
         "instructor_agreement_publish_v1",
@@ -1303,8 +1310,8 @@
         "instructor_agreements_list_v1"
       ],
       "review": {
-        "fingerprint": "7d37afba0c6cb5c4651318354d8651819e4a1d8a4eaa4a6819aae73b1449100d",
-        "reason": "Reviewed S05 additive nullable subscriber projections and native assertions; existing UUID, authorization, plan and pagination behavior unchanged; guide records the new response field."
+        "fingerprint": "eb265d79c6cbe938ead713a4fe91e6f8e13bb1cd6b82c18da6a7595a2acc86be",
+        "reason": "Aynı PayTerms anlaşma hazırlık dalı; immutable yayın ve canlı CM/F20 kapıları değişmedi."
       }
     },
     {
