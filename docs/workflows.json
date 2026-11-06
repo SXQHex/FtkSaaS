@@ -285,8 +285,8 @@
         "management_state_get_v1"
       ],
       "review": {
-        "fingerprint": "ebb8c2278ca6604aeeae86a79177eb7d6483e51e71af070803f71d0d20c0a245",
-        "reason": "Final main synchronization preserves frontend requests and adds backend assessments; only manifest new-record ordering changed, historical hashes and all scan/gate rules retained."
+        "fingerprint": "10e4fd0a5a1cca526bf223628bae44eda23ed511c2a064990ed0c2836203abde",
+        "reason": "Yeni iki test hash kaydı korunur; expiry fixture gerçek billing scope başlangıcını da hizalar, runner ve assertion sahipliği değişmez"
       }
     },
     {
@@ -464,8 +464,8 @@
         "role_revoke_preview_v1"
       ],
       "review": {
-        "fingerprint": "a352df06003aff97d533c5cb27f146bb9c351aa89280450b2ee24c1d664b6fee",
-        "reason": "Reviewed permission preflight and target role parity, exact people version/override state, explicit writer path and cross-center/plan/CM-loss native cases; no fake effective permission."
+        "fingerprint": "87cfce09f68d2a40bac199e04a3444faf9dc4a1353f296a0df66873a90a2f38a",
+        "reason": "Rol atama doğrulanmış hesap bağlantısı ister; fixture gerçek Auth ve account_links önkoşuluyla düzeltilir, izin writer değişmez"
       }
     },
     {
@@ -1203,8 +1203,8 @@
         "settings_preparation_resolve_v1"
       ],
       "review": {
-        "fingerprint": "1e8e86e53b617b8cef113b723c8e43c2f92e20c76d764ed779bf710dc3263d4d",
-        "reason": "Reviewed seven-permission source/reset/proposal boundary, prior89-field preservation, explicit target state read and common scope schema parity fixture preserving root constraints."
+        "fingerprint": "5a58594c7e9de0abdcda9a0d868818899f850cd6dde5bde9e786e5fbd7668b0e",
+        "reason": "İzin hazırlığı yan etkisiz öneridir; fixture staff ve assistant hesap bağlantılarını kurar, katalog ve resolver davranışı değişmez"
       }
     },
     {
@@ -1275,8 +1275,8 @@
         "subscription_period_change_request_v1"
       ],
       "review": {
-        "fingerprint": "53871a114b2c7b3a2a1e09adde5b97e83eb24e719aea03048b43f300c6ae59d1",
-        "reason": "Reviewed Owner-only real lower-rank plan version discovery, same currency/period/active boundary/pending-period filters, explicit existing command and stale/expiry/cancel/OM negative acceptance."
+        "fingerprint": "0195749a999bbb3393815cb5198dc579fe213a5abf111a7c4647e448ad3a2a01",
+        "reason": "Owner-only ret ve non-owner boş katalog korunur; expiry core ve billing scope başlangıcı birlikte hizalanır, API dönem sırası sınanır"
       }
     },
     {

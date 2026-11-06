@@ -1062,13 +1062,13 @@
         },
         {
           "path": "apps/backend/tests/permission-preparation-acceptance.mjs",
-          "sha256": "5cca85e383880ece387c985b834d906683f68cedb5c71a1ea3b0f13afb01bcba",
+          "sha256": "c5213d9c49c82f6c1e41585607f90f0aef6a725225124982cfdeebdeb705e76a",
           "line": 158
         },
         {
           "line": 159,
           "path": "apps/backend/tests/plan-target-discovery-acceptance.mjs",
-          "sha256": "58a2cdc0a8c7718dcfdace3d33a1620a91d51a7efece4d4d4de917f1412ab5c6"
+          "sha256": "5d99f97d5038586d6ba1d7a4684f1afb569fef680e70de51e8feea19a4e9c7b5"
         }
       ],
       "estimated_seconds": 1356.24

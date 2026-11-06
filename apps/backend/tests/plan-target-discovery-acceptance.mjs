@@ -8,7 +8,7 @@ test('XREQ027 owner discovers real downgrade versions and schedules only an expl
  const f=await preparationFixture(),{db,org,center,owner,plan}=f;t.after(()=>db.end());
  await db.query("update core.saas_plan_versions set name='business' where id=$1",[plan]);
  const api=(op,b={},u=owner,k=key())=>must(u,op,{org_id:org,...b},k);
- const denied=async(code,op,b,u=owner)=>{const r=await call(u,op,{org_id:org,...b},key());assert.equal(r.result.ok,false);assert.equal(r.result.error.code,code);};
+ const denied=async(code,op,b,u=owner)=>{const r=await call(u,op,{org_id:org,...b},key());assert.equal(r.result.ok,false);assert.equal(r.result.error.code,code);assert.equal(r.result.data,undefined);};
  const planVersion=async(name,{period='monthly',currency='TRY',amount=500,future=false}={})=>{
   const id=key();await db.query("insert into core.saas_plan_versions(id,name,effective_at,price_minor,currency,period,limits,features) select $1,$2,now()+case when $3 then interval '1 day' else interval '-1 day' end,$4,$5,$6,limits,features from core.saas_plan_versions where id=$7",[id,name,future,amount,currency,period,plan]);return id;
  };
@@ -25,7 +25,8 @@ test('XREQ027 owner discovers real downgrade versions and schedules only an expl
  const person=(await api('person_create_v1',{center_id:center,display_name:'Synthetic plan catalog manager',contacts:[]})).primary_id;
  await db.query("insert into core.account_links(id,org_id,account_id,person_id,state,verified_at) values($1,$2,$3,$4,'active',now())",[key(),org,account.id,person]);
  await api('org_manager_assign_v1',{person_id:person});
- assert.deepEqual((await api('subscription_get_v1',{},manager)).billing.downgrade_options,[]);
+ await denied('FORBIDDEN','subscription_get_v1',{},manager);
+ assert.deepEqual((await db.query('select private.subscription_downgrade_options($1,$2) options',[org,person])).rows[0].options,[]);
  await denied('FORBIDDEN','subscription_downgrade_request_v1',{target_plan_id:pro,kept_center_id:center},manager);
  const outsider=await authUser('plan-target-outsider');await must(outsider,'account_get_v1');await denied('NOT_FOUND','subscription_get_v1',{},outsider);
  const selected=await api('management_state_get_v1',{operation:'subscription_downgrade_request_v1',selector:{operation:'subscription_downgrade_request_v1',key:{target_plan_id:chosen.target.id}}});
@@ -42,7 +43,8 @@ test('XREQ027 owner discovers real downgrade versions and schedules only an expl
  assert.deepEqual((await read()).billing.downgrade_options,[]);
  await api('subscription_change_cancel_v1',{change_id:period.primary_id,expected_version:period.version});
  assert((await read()).billing.downgrade_options.some(o=>o.target.id===pro));
- await db.query("update core.saas_subscriptions set starts_at=now()-interval '1 month',period_end=now()-interval '1 second' where org_id=$1",[org]);
- const expired=await read();assert.deepEqual(expired.billing.downgrade_options,[]);
+ await db.query("update core.saas_subscriptions set starts_at=(now()-interval '1 second')-interval '1 month',period_end=now()-interval '1 second' where org_id=$1",[org]);
+ assert.equal((await db.query('update private.p07_subscription_scope x set period_start=s.starts_at from core.saas_subscriptions s where s.org_id=$1 and x.subscription_id=s.id',[org])).rowCount,1);
+ const expired=await read();assert.deepEqual(expired.billing.downgrade_options,[]);assert(Date.parse(expired.period_start)<Date.parse(expired.period_end));
  await denied('SUBSCRIPTION_NOT_STARTED','subscription_downgrade_request_v1',{...command,expected_version:expired.subscription_version});
 });

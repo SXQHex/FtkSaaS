@@ -12,6 +12,12 @@ test('S10 permission templates require explicit per-target grants and preserve l
  const outsider=await authUser('permission-preparation-outsider');await must(outsider,'account_get_v1');
  const denied=async(code,op,b,u=owner,k=key())=>{const r=await call(u,op,scoped(b),k);assert.equal(r.result.ok,false);assert.equal(r.result.error.code,code,JSON.stringify(r.result));};
  const target=(await api('person_create_v1',{display_name:'Synthetic permission target',contacts:[]})).primary_id;
+ await denied('ACCOUNT_LINK_REQUIRED','role_assign_v1',{person_id:target,role:'staff',scope:{center_id:center}});
+ const linkAccount=async(personId,label)=>{
+  const user=await authUser(label),account=await must(user,'account_get_v1');
+  await db.query("insert into core.account_links(id,org_id,account_id,person_id,state,verified_at) values($1,$2,$3,$4,'active',now())",[key(),org,account.id,personId]);
+ };
+ await linkAccount(target,'permission-preparation-staff');
  await api('role_assign_v1',{person_id:target,role:'staff',scope:{center_id:center}});
  const grants=[{permission:'attendance.draft',enabled:true},{permission:'sale.write',enabled:false}],template={key:'desk',name:'Synthetic explicit desk',grants};
  const counts=async()=>{
@@ -52,6 +58,7 @@ test('S10 permission templates require explicit per-target grants and preserve l
  const unassigned=(await api('person_create_v1',{display_name:'Synthetic unassigned permission target',contacts:[]})).primary_id;
  const unassignedVersion=Number((await db.query('select version from core.people where org_id=$1 and id=$2',[org,unassigned])).rows[0].version);
  await denied('ACCOUNT_LINK_REQUIRED','permission_set_v1',{...lastCommand,person_id:unassigned,expected_version:unassignedVersion});
+ await linkAccount(unassigned,'permission-preparation-assistant');
  await api('role_assign_v1',{person_id:unassigned,role:'assistant',scope:{center_id:center}});
  await denied('ACCOUNT_LINK_REQUIRED','management_state_get_v1',{operation:'permission_set_v1',selector:{operation:'permission_set_v1',key:{person_id:unassigned,permission:'attendance.draft'}}});
  assert.deepEqual(await applied(),grants);
