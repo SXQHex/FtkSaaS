@@ -1,5 +1,6 @@
 "use client";
-import { useEffect, useId, useRef, useState } from "react";
+import dynamic from "next/dynamic";
+import { useEffect, useId, useState } from "react";
 import { useTranslations } from "next-intl";
 import type { FinanceView } from "@ftksaas/api-contracts";
 import { Button } from "@ftksaas/ui/components/button";
@@ -8,19 +9,20 @@ import { Label } from "@ftksaas/ui/components/label";
 import { financeApi, financeMatches, type FinanceApi } from "../../lib/finance";
 import type { SetupScope } from "../../lib/studio-setup";
 import { FlowError, flowError } from "../bookings/flow-controls";
-import { SetupFeedback, useSetupCommand } from "../setup/setup-command";
 import { FinanceLedger } from "./finance-ledger";
-import { CollectionCorrection } from "./collection-correction";
-import { CollectionAccess } from "./collection-access";
+const FinanceManagement = dynamic(() =>
+  import("./finance-management").then((module) => module.FinanceManagement),
+);
 export function PersonFinance(props: {
   scope: SetupScope;
   personId: string;
   timeZone: string;
   api?: FinanceApi;
+  management?: boolean;
 }) {
   return (
     <FinanceConnection
-      key={JSON.stringify([props.scope, props.personId, props.timeZone])}
+      key={JSON.stringify([props.scope, props.personId, props.timeZone, props.management])}
       {...props}
     />
   );
@@ -30,15 +32,16 @@ function FinanceConnection({
   personId,
   timeZone,
   api = financeApi,
+  management = false,
 }: {
   scope: SetupScope;
   personId: string;
   timeZone: string;
   api?: FinanceApi;
+  management?: boolean;
 }) {
   const t = useTranslations("finance"),
-    id = useId(),
-    heading = useRef<HTMLHeadingElement>(null);
+    id = useId();
   const [open, setOpen] = useState(false),
     [currency, setCurrency] = useState(""),
     [query, setQuery] = useState(""),
@@ -47,12 +50,6 @@ function FinanceConnection({
   const key = JSON.stringify([query, cursor, revision]);
   const [result, setResult] = useState<{ key: string; view?: FinanceView; error?: string } | null>(
     null,
-  );
-  const command = useSetupCommand(
-    scope,
-    `finance:${personId}`,
-    () => setRevision((n) => n + 1),
-    () => setRevision((n) => n + 1),
   );
   const current = result?.key === key ? result : null;
   useEffect(() => {
@@ -71,15 +68,11 @@ function FinanceConnection({
       lifetime.abort();
     };
   }, [scope, personId, api, open, query, cursor, key]);
-  useEffect(() => {
-    if (command.message) heading.current?.focus();
-  }, [command.message]);
   return (
     <section className="min-w-0 space-y-4 border-t pt-4" aria-label={t("title")}>
-      <h3 className="font-semibold outline-none" tabIndex={-1} ref={heading}>
+      <h3 className="font-semibold outline-none" tabIndex={-1}>
         {t("title")}
       </h3>
-      <SetupFeedback command={command} />
       <Button
         className="h-auto min-h-11 max-w-full whitespace-normal"
         variant="outline"
@@ -130,25 +123,19 @@ function FinanceConnection({
               {current?.view && (
                 <>
                   <FinanceLedger view={current.view} />
-                  <CollectionCorrection
-                    key={`correction:${key}`}
-                    scope={scope}
-                    movements={current.view.movements.items}
-                    timeZone={timeZone}
-                    api={api.corrections}
-                    onSaved={() => {
-                      setCursor(undefined);
-                      setRevision((n) => n + 1);
-                    }}
-                  />
-                  <CollectionAccess
-                    key={key}
-                    scope={scope}
-                    view={current.view}
-                    timeZone={timeZone}
-                    api={api}
-                    command={command}
-                  />
+                  {management && (
+                    <FinanceManagement
+                      key={key}
+                      scope={scope}
+                      view={current.view}
+                      timeZone={timeZone}
+                      api={api}
+                      onSaved={() => {
+                        setCursor(undefined);
+                        setRevision((n) => n + 1);
+                      }}
+                    />
+                  )}
                 </>
               )}
               <div className="flex flex-wrap gap-3">
