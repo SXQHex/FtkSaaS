@@ -215,7 +215,7 @@ Bu tablo yalnız izdir; eski kabul metinleri ikinci kez tutulmaz.
 <a id="s09"></a>
 ### S09 — Starter günlük ders ve hak akışı
 
-**Ek talep — XREQ-021:** Self özel ders talebi öncesi dar etkin merkez disiplin/eğitmen katalog selector kaynağı hazır; [tüketim devri](../../../docs/requests.md#xreq-021). Yeni kaynak/native/main/development ve frontend kabulü ayrı doğrulanır.
+**Ek talep — XREQ-021:** Dar katalog main/development teslim edildi. Bağlı öğrencinin katalog öncesi people_list zaman aşımı, ölçülmüş alias/yetki taraması kaynağına bağlıdır. İndeksli self keşfi/alias bileşeni ve10k kişi regresyonu yeni adayda; native/main/development ve hosted tekrar açık. [Tüketim devri](../../../docs/requests.md#xreq-021), [kaynak/ortam kanıtı](00-FtkSaaS-yeni-sohbet-devir.md).
 
 - [x] **Tür:** D · **Plan:** Starter ve miras alanlar · **Özellik:** F02,F08,F09,F10,F11,F13,F14,F15,F16,F19
 - **Bağımlılık:** S02,S03
@@ -545,7 +545,7 @@ Değişen dilimin sözleşme, üretilmiş tip/envanter, WF/F01–F33 izi ve alan
 - **Sınır/olumsuz durum:** Geçersiz hatırlatma atlanır; işlemsel/in_app/Auth ertelenmez; digest kullanılabilir değildir. Önceden kabul edilmiş seçenek/defaultlar FD04’ten alınır; bu plan yeni default seçmez.
 - **Doğrulama senaryosu:** Geceyi aşan aralık, yaz/kış saati, ders değişimi/iptali, preference değişimi ve kuyruk gecikmesi; son anda tekrar uygunluk.
 - **Kaynak alanı:** reminder-scheduling/workers/email SQL, settings catalog v11, contract.json ve reminder-scheduling/transactional-email acceptance.
-- **Teslim durumu:** P16 ile tek PR adayı hazırlanıyor. Zaman/miras/sessiz saat ve canlı kaynak denetimleri kaynakta; native aday, main/development ve hosted kabul henüz açık.
+- **Teslim durumu:** PR219 native/main/development teslimi tamamlandı. Zaman/miras/sessiz saat ve kaynak denetimleri teslim edildi; hosted kabul XREQ-021 canlı engeli giderildikten sonra tamamlanır.
 
 <a id="p16"></a>
 ### P16 — Otomasyon sonuç ve hata akışı
@@ -556,7 +556,7 @@ Değişen dilimin sözleşme, üretilmiş tip/envanter, WF/F01–F33 izi ve alan
 - **Sınır/olumsuz durum:** Kampanya/indirim/geri kazanım maili açılmaz; tekrar iş aynı domain sonucu üretir.
 - **Doğrulama senaryosu:** Segment değişimi, yetki/plan kaybı, worker kesintisi ve işlem öncesi koşul denetimi.
 - **Kaynak alanı:** automation-results SQL, P05 worker/management ve automation-results acceptance.
-- **Teslim durumu:** P15 ile tek PR adayı hazırlanıyor. Son20 iş/güvenli hata/domain sonuç referansı, disable ve canlı denetimli sürümlü retry kaynakta; native aday, main/development ve hosted kabul henüz açık.
+- **Teslim durumu:** PR219 native/main/development teslimi tamamlandı. Son20 iş/güvenli hata/domain sonuç referansı, disable ve canlı denetimli sürümlü retry teslim edildi; hosted kabul açık.
 
 ## Business işlevleri
 
