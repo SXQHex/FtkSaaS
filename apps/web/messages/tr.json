@@ -964,7 +964,9 @@
     },
     "roles": {
       "center_manager": "Merkez yöneticisi",
-      "instructor": "Eğitmen"
+      "instructor": "Eğitmen",
+      "staff": "Personel",
+      "assistant": "Asistan"
     },
     "access": {
       "bootstrap": "Kuruluş başlangıç aşamasında.",
@@ -1184,7 +1186,8 @@
     "planAction": "Programı planla",
     "chooseClass": "Bir sınıf seçin",
     "chooseClassHint": "Programını, varsayılan görevlerini ve sınıf bilgilerini buradan yönetin.",
-    "editorContext": "Merkez saat dilimi: {timezone}"
+    "editorContext": "Merkez saat dilimi: {timezone}",
+    "refreshAfterAgreement": "Anlaşma adımından sonra yeni bir program önizlemesi alın. Diğer engeller ayrıca kontrol edilir."
   },
   "sessionLifecycle": {
     "cancelTitle": "Seansı iptal et",
@@ -1227,7 +1230,8 @@
     "occurrence": "İlgili seans başlangıcı",
     "timeZone": "Saat dilimi",
     "nextStep": "Bu merkezde ücret anlaşmalarını yönetme yetkisi olan kişi, ilgili anlaşmanın kapsamını ve yürürlüğünü kontrol etmelidir. Yapılandırma tamamlandıktan sonra forma dönüp yeni bir önizleme al ve güncel etkileri ayrıca onayla.",
-    "limited": "Yalnız ilk belirlenen anlaşma engeli gösterilir. Yeni önizlemede başka engeller çıkabilir."
+    "limited": "Yalnız ilk belirlenen anlaşma engeli gösterilir. Yeni önizlemede başka engeller çıkabilir.",
+    "configure": "Anlaşmayı incele"
   },
   "inbox": {
     "title": "Bildirim kutusu",
@@ -1670,7 +1674,8 @@
     "reservation": "Rezervasyon",
     "request": "Özel ders talebi",
     "finance": "Tahsilat",
-    "attendance": "yoklama"
+    "attendance": "yoklama",
+    "agreements": "Eğitmen anlaşması"
   },
   "finance": {
     "title": "Öğrenci finansı",
@@ -1871,5 +1876,78 @@
     "retryRights": "Bu kişinin haklarını yeniden oku",
     "plannedTime": "Planlanan zaman",
     "hideRights": "Hakları kapat"
+  },
+  "agreements": {
+    "title": "Eğitmen anlaşmaları",
+    "historyHint": "Yayımlanan koşullar değiştirilemez. Yeni koşullar için ayrı bir sürüm yayımlayın.",
+    "refresh": "Geçmişi yenile",
+    "loading": "Yükleniyor…",
+    "pageCount": "Bu sayfada {count} sürüm",
+    "empty": "Bu kişi için yayımlanmış anlaşma yok.",
+    "version": "Sürüm {version}",
+    "group": "Grup",
+    "private": "Özel ders",
+    "openEnded": "Açık uçlu",
+    "newVersion": "Yeni sürüm yayımla",
+    "more": "Sonraki sayfa",
+    "create": "Yeni anlaşma oluştur",
+    "retry": "Tekrar dene",
+    "immutable": "Onayınız bu kişi, merkez, disiplin, ders biçimi, tarih aralığı ve ücret koşulları için geçerlidir. Önceki sürümler geçmişte korunur.",
+    "replaces": "Yerine geçilecek sürüm: {version}",
+    "discipline": "Disiplin",
+    "format": "Ders biçimi",
+    "choose": "Seçin",
+    "starts": "Geçerlilik başlangıcı",
+    "ends": "Geçerlilik bitişi",
+    "reason": "Gerekçe",
+    "invalidAgreement": "Koşulları kontrol edin. Model, tutarlar, kapsam ve geçerlilik aralığı uyumlu olmalıdır.",
+    "back": "Geri",
+    "model": "Ücret modeli",
+    "currency": "Para birimi (ISO 4217)",
+    "models": {
+      "percentage": "Yüzde payı",
+      "session_fixed": "Seans başına sabit",
+      "per_person": "Kişi başına",
+      "fixed_plus_person": "Sabit ve kişi başına",
+      "explicit_mixed": "Açık bileşenli karma"
+    },
+    "roomFee": "Salon payı",
+    "roomKind": "Salon payı türü",
+    "roomKinds": {
+      "free": "Salon payı yok",
+      "fixed": "Sabit tutar",
+      "percentage": "Yüzde"
+    },
+    "roomAmount": "Salon payı tutarı",
+    "roomRate": "Salon payı yüzdesi",
+    "roomOrder": "Salon payının uygulanma sırası",
+    "before_instructor_share": "Eğitmen payından önce",
+    "after_instructor_share": "Eğitmen payından sonra",
+    "packageTerms": "Pakete özel koşullar",
+    "packageHint": "Pakete özel koşullar yalnız seçilen ürün kimliğine uygulanır. Değerler açıkça belirtilmelidir.",
+    "package": "Paket",
+    "packageNumber": "Paket koşulu {number}",
+    "removePackage": "Paket koşulunu kaldır",
+    "addComponent": "Bileşen ekle",
+    "component": "Ücret bileşeni {number}",
+    "componentKind": "Bileşen türü",
+    "componentKinds": {
+      "percentage": "Yüzde payı",
+      "session_fixed": "Seans başına sabit",
+      "per_person": "Kişi başına"
+    },
+    "entitlementKind": "Hak türü kapsamı",
+    "entitlements": {
+      "all": "Tüm hak türleri",
+      "credits": "Kredi",
+      "timed": "Süreli"
+    },
+    "percentage": "Yüzde (0–100)",
+    "amount": "Tutar",
+    "removeComponent": "Bileşeni kaldır",
+    "basis": "Değerleme temeli",
+    "saleUnit": "Satış birimi",
+    "fixedUnit": "Açık birim değeri",
+    "unitAmount": "Birim tutarı"
   }
 }

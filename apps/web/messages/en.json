@@ -964,7 +964,9 @@
     },
     "roles": {
       "center_manager": "Center manager",
-      "instructor": "Instructor"
+      "instructor": "Instructor",
+      "staff": "Staff",
+      "assistant": "Assistant"
     },
     "access": {
       "bootstrap": "Organization is in bootstrap.",
@@ -1184,7 +1186,8 @@
     "planAction": "Plan schedule",
     "chooseClass": "Select a class",
     "chooseClassHint": "Manage its schedule, default duties and class details here.",
-    "editorContext": "Center timezone: {timezone}"
+    "editorContext": "Center timezone: {timezone}",
+    "refreshAfterAgreement": "Get a new program preview after the agreement step. Other blockers are checked separately."
   },
   "sessionLifecycle": {
     "cancelTitle": "Cancel session",
@@ -1227,7 +1230,8 @@
     "occurrence": "Affected session start",
     "timeZone": "Time zone",
     "nextStep": "Someone authorized to manage fee agreements at this center must check the agreement scope and effective dates. After configuration, return to the form, request a new preview and separately confirm its current effects.",
-    "limited": "Only the first identified agreement blocker is shown. A new preview may reveal other blockers."
+    "limited": "Only the first identified agreement blocker is shown. A new preview may reveal other blockers.",
+    "configure": "Review agreement"
   },
   "inbox": {
     "title": "Inbox",
@@ -1670,7 +1674,8 @@
     "reservation": "Booking",
     "request": "Lesson request",
     "finance": "Collection",
-    "attendance": "attendance"
+    "attendance": "attendance",
+    "agreements": "Instructor agreement"
   },
   "finance": {
     "title": "Student finances",
@@ -1871,5 +1876,78 @@
     "retryRights": "Reread this person's entitlements",
     "plannedTime": "Scheduled time",
     "hideRights": "Hide entitlements"
+  },
+  "agreements": {
+    "title": "Instructor agreements",
+    "historyHint": "Published terms are immutable. Publish a separate version for new terms.",
+    "refresh": "Refresh history",
+    "loading": "Loading…",
+    "pageCount": "{count} versions on this page",
+    "empty": "No published agreements for this person.",
+    "version": "Version {version}",
+    "group": "Group",
+    "private": "Private",
+    "openEnded": "Open ended",
+    "newVersion": "Publish new version",
+    "more": "Next page",
+    "create": "Create agreement",
+    "retry": "Retry",
+    "immutable": "Your approval covers this person, center, discipline, class format, validity interval and pay terms. Earlier versions remain in history.",
+    "replaces": "Replacing version: {version}",
+    "discipline": "Discipline",
+    "format": "Class format",
+    "choose": "Choose",
+    "starts": "Valid from",
+    "ends": "Valid until",
+    "reason": "Reason",
+    "invalidAgreement": "Check the model, amounts, scope and validity interval for compatible, explicit terms.",
+    "back": "Back",
+    "model": "Pay model",
+    "currency": "Currency (ISO 4217)",
+    "models": {
+      "percentage": "Percentage share",
+      "session_fixed": "Fixed per session",
+      "per_person": "Per person",
+      "fixed_plus_person": "Fixed plus per person",
+      "explicit_mixed": "Explicit mixed components"
+    },
+    "roomFee": "Room fee",
+    "roomKind": "Room fee type",
+    "roomKinds": {
+      "free": "No room fee",
+      "fixed": "Fixed amount",
+      "percentage": "Percentage"
+    },
+    "roomAmount": "Room fee amount",
+    "roomRate": "Room fee percentage",
+    "roomOrder": "Room fee order",
+    "before_instructor_share": "Before instructor share",
+    "after_instructor_share": "After instructor share",
+    "packageTerms": "Package specific terms",
+    "packageHint": "Overrides apply only to the selected product identity. All values must be explicit.",
+    "package": "Package",
+    "packageNumber": "Package terms {number}",
+    "removePackage": "Remove package terms",
+    "addComponent": "Add component",
+    "component": "Pay component {number}",
+    "componentKind": "Component type",
+    "componentKinds": {
+      "percentage": "Percentage share",
+      "session_fixed": "Fixed per session",
+      "per_person": "Per person"
+    },
+    "entitlementKind": "Entitlement scope",
+    "entitlements": {
+      "all": "All entitlement types",
+      "credits": "Credits",
+      "timed": "Timed"
+    },
+    "percentage": "Percentage (0–100)",
+    "amount": "Amount",
+    "removeComponent": "Remove component",
+    "basis": "Valuation basis",
+    "saleUnit": "Sale unit",
+    "fixedUnit": "Explicit unit value",
+    "unitAmount": "Unit amount"
   }
 }
