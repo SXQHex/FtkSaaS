@@ -522,7 +522,7 @@ Değişen dilimin sözleşme, üretilmiş tip/envanter, WF/F01–F33 izi ve alan
 <a id="p14"></a>
 ### P14 — İşlemsel e-posta teslimi
 
-- [ ] **Tür:** K/H · **Plan:** Pro/Business · **Özellik:** F26,F24
+- [x] **Tür:** K/H · **Plan:** Pro/Business · **Özellik:** F26,F24
 - **Bağımlılık:** S07,P01
 - **Kabul:** İşlemsel e-posta oluşturma, teslim sonucu ve hata gözlenir; in_app korunur.
 - **Sınır/olumsuz durum:** Starter dış kanal kapalı; Native Auth ayrı; pazarlama/özet/SMS/push kapalı.
@@ -534,7 +534,7 @@ Değişen dilimin sözleşme, üretilmiş tip/envanter, WF/F01–F33 izi ve alan
 - [x] P14.1 — Mevcut Resend davet sağlayıcı çağrısını ortak tek-deneme transport'una taşı; accepted/rejected/retryable/unknown, aynı payload/idempotency ve sır sızdırmayan sonuçları doğrula. PR205 aday/main/development kabulüyle mevcut davet entegrasyonu ve ortak transport teslim edildi; genel email kuyruğu P14.2 sahibindedir.
 - [x] P14.2 — Kalıcı genel email claim/authorize/finish, canlı plan/tercih/alıcı/kaynak, frozen payload/lease/retry ve terminal payload temizliği PR210 aday/main/development kabulüyle teslim edildi; gerçek alıcı kabulü P14.4'tedir.
 - [x] P14.3 — İmzalı provider olayları, tekillik/sırasızlık, genel email ve davet teslim projeksiyonu ile bounded orphan temizliği PR210 kaynak/native/main/development kabulünü geçti. Canlı webhook kurulumu/gerçek teslim P14.4'tedir.
-- [ ] P14.4 — Somut yetkili alıcı/olay üzerinden gerçek teslim ve hata görünürlüğünü doğrula; sentetik/provider kabulü gerçek alıcı teslimi sayılmaz. P15/P16 ayrı sıradadır.
+- [x] P14.4 — PR216 main/development sonrası gerçek Pro hesabında native Auth→tercih→rol işlemi→transactional_email kuyruğu→Resend→imzalı webhook→notifications_list teslim/hata görünürlüğü doğrulandı. Gerçek teslim, kalıcı sağlayıcı reddi, tekrar olay tekilliği, opt-out ve in_app korunması geçti; [kaynak/ortam kanıtı](00-FtkSaaS-yeni-sohbet-devir.md#p14-kaynak-ve-canlı-kabul-kapanışı). P15/P16 ayrı sıradadır.
 
 <a id="p15"></a>
 ### P15 — Hatırlatma planlama ve sessiz saat
