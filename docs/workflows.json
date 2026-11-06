@@ -284,8 +284,8 @@
         "management_state_get_v1"
       ],
       "review": {
-        "fingerprint": "1e56f27f0aa1a3aed8ce00c47c492d04e87ccadfb14fe85364ef2b9122733e23",
-        "reason": "Reviewed separate dependency-complete webhook bundle and deployment smoke while preserving authenticated backend-v1 and source-bound acceptance."
+        "fingerprint": "d865fa052b221aa8c9b12a1d55a658f1299da3013547e55fe2800b5e717e8561",
+        "reason": "Reviewed one explicit UUID parameter cast in native fixture and its source inventory hash; test ownership, assertions and acceptance gates unchanged."
       }
     },
     {
@@ -460,8 +460,8 @@
         "role_revoke_preview_v1"
       ],
       "review": {
-        "fingerprint": "bb92242fd3d80ac3bf5fd96e1161fa56cf76545eb157e7b6d8283e964cf48d4b",
-        "reason": "Registry import adds isolated XREQ-020 sale acceptance. Existing configuration assertions, source ranges and behavior are preserved; guide remains correct."
+        "fingerprint": "ee8d37ef06a8b1bddc67f3f23b2cbb3b108dbd1ee6a17d3a087437db64dfc59f",
+        "reason": "Reviewed registry import additions and reminder center inheritance authority: owner/OM organization configuration does not grant CM execution authority; existing setup guide remains accurate."
       }
     },
     {
@@ -643,8 +643,8 @@
         "person_discipline_set_v1"
       ],
       "review": {
-        "fingerprint": "eb329f88e9f69e2efbfcf49c81266612d9e7550881129881cb8220d295a943de",
-        "reason": "Registry import adds isolated XREQ-020 sale acceptance. Existing person lifecycle assertions, source ranges and behavior are preserved; guide remains correct."
+        "fingerprint": "e2561c6d83eadd4986a027c9a5ebfbb02b6545222c98cca4787361512c31d5be",
+        "reason": "Reviewed registry additions and unchanged Starter negative channel assertions; global user quiet control does not license reminder delivery or change person lifecycle."
       }
     },
     {
@@ -1086,29 +1086,31 @@
       "guide": "docs/workflows.md#wf11",
       "detail": "docs/workflows.md",
       "tests": [
-        "apps/backend/tests/p05-acceptance.mjs",
-        "apps/backend/tests/starter-operations-acceptance.mjs",
-        "apps/backend/tests/starter-document-acceptance.mjs",
-        "apps/backend/tests/document-self-requirements-acceptance.mjs",
-        "apps/backend/tests/document-self-contract-unit.mjs",
-        "apps/backend/tests/crm-import-parser-unit.mjs",
-        "apps/backend/tests/crm-import-fixture.mjs",
         "apps/backend/tests/crm-import-acceptance.mjs",
-        "apps/backend/tests/crm-import-authority-acceptance.mjs"
+        "apps/backend/tests/crm-import-authority-acceptance.mjs",
+        "apps/backend/tests/crm-import-fixture.mjs",
+        "apps/backend/tests/crm-import-parser-unit.mjs",
+        "apps/backend/tests/document-self-contract-unit.mjs",
+        "apps/backend/tests/document-self-requirements-acceptance.mjs",
+        "apps/backend/tests/p05-acceptance.mjs",
+        "apps/backend/tests/starter-document-acceptance.mjs",
+        "apps/backend/tests/starter-operations-acceptance.mjs",
+        "apps/backend/tests/transactional-email-acceptance.mjs"
       ],
       "sources": [
+        "apps/backend/database/crm-legacy-import.sql",
+        "apps/backend/database/document-self-requirements.sql",
         "apps/backend/database/p05-bind.sql",
         "apps/backend/database/p05-document-protection.sql",
         "apps/backend/database/p05-documents.sql",
         "apps/backend/database/p05-notifications.sql",
         "apps/backend/database/p05-wrappers.sql",
         "apps/backend/database/p06-bind.sql",
+        "apps/backend/database/reminder-email.sql",
         "apps/backend/database/runtime-wrappers-current.sql",
-        "docs/workflows.md",
-        "apps/backend/database/document-self-requirements.sql",
         "apps/backend/supabase/migrations/20261104131914_document_self_requirements.sql",
-        "apps/backend/database/crm-legacy-import.sql",
-        "apps/backend/supabase/migrations/20261105080000_crm_legacy_import.sql"
+        "apps/backend/supabase/migrations/20261105080000_crm_legacy_import.sql",
+        "docs/workflows.md"
       ],
       "operations": [
         "notifications_list_v1",
@@ -1120,8 +1122,8 @@
         "document_publication_preview_v1"
       ],
       "review": {
-        "fingerprint": "ba3dccddd3f67034b19c5d630a81cb387636e885ca2eaae1656f71d75798c5ec",
-        "reason": "Reviewed opt-in email/transactional only, optional recipient-scoped email_job/preference projections and configured current-plan availability. In_app mandatory, reminder/marketing/digest unchanged."
+        "fingerprint": "7ad260c669ac38fe7aa55a6cd42ccfc2ea879c55272de55451fccf691a4262c3",
+        "reason": "Reviewed reminder email native regression: parse PostgreSQL bigint attempts without changing zero-attempt assertion, live preferences or quiet-hour authorization."
       }
     },
     {
@@ -1132,8 +1134,10 @@
       "detail": "docs/settings.md",
       "tests": [
         "apps/backend/tests/frontend-settings-acceptance.mjs",
-        "apps/backend/tests/starter-preparation-acceptance.mjs",
+        "apps/backend/tests/reminder-contract-unit.mjs",
+        "apps/backend/tests/reminder-scheduling-acceptance.mjs",
         "apps/backend/tests/starter-operations-acceptance.mjs",
+        "apps/backend/tests/starter-preparation-acceptance.mjs",
         "apps/backend/tests/starter-preparation-fixture.mjs"
       ],
       "sources": [
@@ -1146,7 +1150,10 @@
         "apps/backend/database/p05-notifications.sql",
         "apps/backend/database/p05-wrappers.sql",
         "apps/backend/database/p06-bind.sql",
+        "apps/backend/database/reminder-scheduling.sql",
         "apps/backend/database/runtime-wrappers-current.sql",
+        "apps/backend/database/settings-catalog-v10.sql",
+        "apps/backend/database/settings-catalog-v11.sql",
         "apps/backend/database/starter-domain-preparations-wrappers.sql",
         "apps/backend/database/starter-domain-preparations.sql",
         "apps/backend/database/starter-notification-support.sql",
@@ -1154,10 +1161,9 @@
         "apps/backend/database/starter-settings-media.sql",
         "apps/backend/database/starter-work-templates-wrappers.sql",
         "apps/backend/database/starter-work-templates.sql",
-        "docs/settings.md",
-        "apps/backend/database/settings-catalog-v10.sql",
+        "apps/backend/database/subscriber-report-catalog.sql",
         "apps/backend/supabase/migrations/20261102070247_subscriber_report_catalog.sql",
-        "apps/backend/database/subscriber-report-catalog.sql"
+        "docs/settings.md"
       ],
       "operations": [
         "notification_preferences_set_v1",
@@ -1172,8 +1178,8 @@
         "settings_preparation_resolve_v1"
       ],
       "review": {
-        "fingerprint": "12017481f72b660f2093536bf284d48d20eff69d2ac5a690366438321b2770fe",
-        "reason": "Reviewed common runtime wrapper diff: only service-internal outbox email_phase changes; WF12 entrypoints remain byte-identical. Explicit opt-in external notices do not alter domain commit, scope, plan or existing guide semantics."
+        "fingerprint": "16462426dd235bc22dda135d212391bebe210d45cab97ec6e9b3e75c479a2e68",
+        "reason": "Reviewed native historical-plan fixture correction: job identity is UUID and dedupe key remains its text representation; settings behavior and all assertions unchanged."
       }
     },
     {
@@ -1362,16 +1368,20 @@
       "guide": "docs/workflows.md#wf16",
       "detail": "docs/workflows.md",
       "tests": [
-        "apps/backend/tests/p05-acceptance.mjs",
-        "apps/backend/tests/person-registry.test.mjs",
+        "apps/backend/tests/automation-results-acceptance.mjs",
         "apps/backend/tests/crm-application-review-acceptance.mjs",
-        "apps/backend/tests/crm-lifecycle-authority-acceptance.mjs",
-        "apps/backend/tests/crm-lifecycle-acceptance.mjs",
+        "apps/backend/tests/crm-followup-acceptance.mjs",
         "apps/backend/tests/crm-followup-projections-acceptance.mjs",
+        "apps/backend/tests/crm-lifecycle-acceptance.mjs",
+        "apps/backend/tests/crm-lifecycle-authority-acceptance.mjs",
         "apps/backend/tests/crm-segment-worker-acceptance.mjs",
-        "apps/backend/tests/crm-followup-acceptance.mjs"
+        "apps/backend/tests/p05-acceptance.mjs",
+        "apps/backend/tests/person-registry.test.mjs"
       ],
       "sources": [
+        "apps/backend/database/automation-results.sql",
+        "apps/backend/database/crm-application-intake.sql",
+        "apps/backend/database/crm-lifecycle-plan.sql",
         "apps/backend/database/p04-crm-public-wrappers.sql",
         "apps/backend/database/p04-crm-public.sql",
         "apps/backend/database/p05-bind.sql",
@@ -1379,16 +1389,15 @@
         "apps/backend/database/p05-followups.sql",
         "apps/backend/database/p05-notifications.sql",
         "apps/backend/database/p05-wrappers.sql",
+        "apps/backend/database/reminder-workers.sql",
         "apps/backend/database/runtime-wrappers-current.sql",
         "apps/backend/database/session-capacity.sql",
-        "docs/workflows.md",
         "apps/backend/database/starter-basic-crm.sql",
         "apps/backend/supabase/migrations/20261104111220_starter_basic_crm.sql",
-        "apps/backend/database/crm-application-intake.sql",
         "apps/backend/supabase/migrations/20261104131917_crm_application_intake.sql",
-        "apps/backend/database/crm-lifecycle-plan.sql",
         "apps/backend/supabase/migrations/20261105100000_crm_lifecycle_plan.sql",
-        "apps/backend/tests/crm-lifecycle-fixture.mjs"
+        "apps/backend/tests/crm-lifecycle-fixture.mjs",
+        "docs/workflows.md"
       ],
       "operations": [
         "leads_list_v1",
@@ -1402,8 +1411,8 @@
         "automation_save_v1"
       ],
       "review": {
-        "fingerprint": "4480d394370cc4d8da4a5cf44594a8cc745721d0514fd22f53ad1146bcf89340",
-        "reason": "Reviewed common runtime wrapper diff: only service-internal outbox email_phase changes; WF16 entrypoints remain byte-identical. Explicit opt-in external notices do not alter domain commit, scope, plan or existing guide semantics."
+        "fingerprint": "9cbb2600a72f2d40889ff173a40c18433ab2618ca52814307ca39734ed6c8873",
+        "reason": "Reviewed automation result and retry authorization: SECURITY INVOKER helpers receive only server-role SELECT UPDATE on private jobs; tenant and version guards remain."
       }
     },
     {
@@ -1545,6 +1554,9 @@
       "guide": "docs/workflows.md#wf20",
       "detail": "docs/workflows.md",
       "tests": [
+        "apps/backend/tests/automation-results-acceptance.mjs",
+        "apps/backend/tests/email-events-unit.mjs",
+        "apps/backend/tests/email-provider-unit.mjs",
         "apps/backend/tests/invitation-delivery-acceptance.mjs",
         "apps/backend/tests/invitation-delivery-unit.mjs",
         "apps/backend/tests/ops-hosted-acceptance.mjs",
@@ -1552,14 +1564,15 @@
         "apps/backend/tests/p05-acceptance.mjs",
         "apps/backend/tests/p06-acceptance.mjs",
         "apps/backend/tests/p07-lifecycle-acceptance.mjs",
+        "apps/backend/tests/reminder-scheduling-acceptance.mjs",
+        "apps/backend/tests/resend-webhook-unit.mjs",
         "apps/backend/tests/starter-plan-gates-acceptance.mjs",
-        "apps/backend/tests/email-provider-unit.mjs",
-        "apps/backend/tests/email-events-unit.mjs",
-        "apps/backend/tests/transactional-email-unit.mjs",
         "apps/backend/tests/transactional-email-acceptance.mjs",
-        "apps/backend/tests/resend-webhook-unit.mjs"
+        "apps/backend/tests/transactional-email-unit.mjs"
       ],
       "sources": [
+        "apps/backend/database/automation-results.sql",
+        "apps/backend/database/email-delivery-events.sql",
         "apps/backend/database/invitation-delivery.sql",
         "apps/backend/database/p01-final-scope-guards.sql",
         "apps/backend/database/p01-waitlist-workers-wrappers.sql",
@@ -1580,7 +1593,12 @@
         "apps/backend/database/p07-subscription-bind.sql",
         "apps/backend/database/p07-subscription-lifecycle-wrappers.sql",
         "apps/backend/database/p07-subscription-workers.sql",
+        "apps/backend/database/reminder-email.sql",
+        "apps/backend/database/reminder-scheduling.sql",
+        "apps/backend/database/reminder-workers.sql",
         "apps/backend/database/runtime-wrappers-current.sql",
+        "apps/backend/database/subscriber-numbers.sql",
+        "apps/backend/database/transactional-email.sql",
         "apps/backend/scripts/configure-invitation-delivery.mjs",
         "apps/backend/scripts/invitation-cron-install.sql",
         "apps/backend/scripts/ops-cron-health.sql",
@@ -1588,19 +1606,17 @@
         "apps/backend/scripts/p01-worker.mjs",
         "apps/backend/scripts/p05-worker.mjs",
         "apps/backend/scripts/p06-worker.mjs",
-        "apps/backend/supabase/functions/backend-v1/invitation-delivery.ts",
-        "apps/backend/supabase/migrations/20261101040221_invitation_delivery_tracking.sql",
-        "docs/workflows.md",
-        "apps/backend/database/subscriber-numbers.sql",
-        "apps/backend/supabase/functions/backend-v1/email-provider.ts",
-        "apps/backend/database/email-delivery-events.sql",
-        "apps/backend/supabase/migrations/20261105150000_email_delivery_events.sql",
         "apps/backend/supabase/functions/backend-v1/email-events.ts",
-        "apps/backend/database/transactional-email.sql",
-        "apps/backend/supabase/migrations/20261105150001_transactional_notification_email.sql",
+        "apps/backend/supabase/functions/backend-v1/email-provider.ts",
+        "apps/backend/supabase/functions/backend-v1/invitation-delivery.ts",
         "apps/backend/supabase/functions/backend-v1/transactional-email.ts",
         "apps/backend/supabase/functions/resend-webhook/handler.ts",
-        "apps/backend/supabase/functions/resend-webhook/index.ts"
+        "apps/backend/supabase/functions/resend-webhook/index.ts",
+        "apps/backend/supabase/migrations/20261101040221_invitation_delivery_tracking.sql",
+        "apps/backend/supabase/migrations/20261105150000_email_delivery_events.sql",
+        "apps/backend/supabase/migrations/20261105150001_transactional_notification_email.sql",
+        "apps/backend/supabase/migrations/20261106084130_p15_p16_reminders_automation.sql",
+        "docs/workflows.md"
       ],
       "operations": [
         "seat_offer_issue_v1",
@@ -1615,8 +1631,8 @@
         "subscription_boundary_apply_v1"
       ],
       "review": {
-        "fingerprint": "1f19fce1a6ec0509094594f05d0f9e2ed9d83cb41d9b54ccf57f7dce066f72aa",
-        "reason": "Reviewed dedicated native provider HTTP entry, Standard Webhooks verification and persistence-before-ACK; no caller Supabase client or CORS dependency is needed."
+        "fingerprint": "9f3d12adc50c287a64de123bbba19688054fc51564247f6165d6cd328e63f2d9",
+        "reason": "Reviewed worker fixture identity cast after 42P08 reproduction; no domain, worker permission, lease, timing or delivery behavior changes."
       }
     }
   ]

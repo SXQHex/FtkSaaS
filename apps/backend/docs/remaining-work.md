@@ -544,7 +544,8 @@ Değişen dilimin sözleşme, üretilmiş tip/envanter, WF/F01–F33 izi ve alan
 - **Kabul:** Ders/paket ayarları ve Business miras; merkez olay zamanı, kullanıcının sessiz saatine uygun gönderim.
 - **Sınır/olumsuz durum:** Geçersiz hatırlatma atlanır; işlemsel/in_app/Auth ertelenmez; digest kullanılabilir değildir. Önceden kabul edilmiş seçenek/defaultlar FD04’ten alınır; bu plan yeni default seçmez.
 - **Doğrulama senaryosu:** Geceyi aşan aralık, yaz/kış saati, ders değişimi/iptali, preference değişimi ve kuyruk gecikmesi; son anda tekrar uygunluk.
-- **Kaynak alanı:** notification preferences/scheduler; contract.json; ilgili test
+- **Kaynak alanı:** reminder-scheduling/workers/email SQL, settings catalog v11, contract.json ve reminder-scheduling/transactional-email acceptance.
+- **Teslim durumu:** P16 ile tek PR adayı hazırlanıyor. Zaman/miras/sessiz saat ve canlı kaynak denetimleri kaynakta; native aday, main/development ve hosted kabul henüz açık.
 
 <a id="p16"></a>
 ### P16 — Otomasyon sonuç ve hata akışı
@@ -554,7 +555,8 @@ Değişen dilimin sözleşme, üretilmiş tip/envanter, WF/F01–F33 izi ve alan
 - **Kabul:** Desteklenen trigger/action görev veya hizmet hatırlatması üretir; sonuç/hata ve disable/retry görünür.
 - **Sınır/olumsuz durum:** Kampanya/indirim/geri kazanım maili açılmaz; tekrar iş aynı domain sonucu üretir.
 - **Doğrulama senaryosu:** Segment değişimi, yetki/plan kaybı, worker kesintisi ve işlem öncesi koşul denetimi.
-- **Kaynak alanı:** p05 automation worker/management; mevcut acceptance
+- **Kaynak alanı:** automation-results SQL, P05 worker/management ve automation-results acceptance.
+- **Teslim durumu:** P15 ile tek PR adayı hazırlanıyor. Son20 iş/güvenli hata/domain sonuç referansı, disable ve canlı denetimli sürümlü retry kaynakta; native aday, main/development ve hosted kabul henüz açık.
 
 ## Business işlevleri
 
