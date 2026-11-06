@@ -1,6 +1,8 @@
 "use client";
 
 import { useEffect, useState, useSyncExternalStore } from "react";
+import dynamic from "next/dynamic";
+import { WorkspaceLoading } from "../workspace-loading";
 import { useRouter } from "next/navigation";
 import { useTheme } from "next-themes";
 import { useTranslations } from "next-intl";
@@ -9,13 +11,6 @@ import type { AccountView, CenterView, OrganizationView } from "@ftksaas/api-con
 import { Button } from "@ftksaas/ui/components/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@ftksaas/ui/components/card";
 import { Alert, AlertDescription } from "@ftksaas/ui/components/alert";
-import { ScheduleWorkspace } from "../calendar/schedule-workspace";
-import { StudentsWorkspace } from "../students/students-workspace";
-import { InstructorTasks } from "../setup/instructor-tasks";
-import { StudioSetup } from "../setup/studio-setup";
-import { DocumentsWorkspace } from "../documents/documents-workspace";
-import { ProductsWorkspace } from "../products/products-workspace";
-import { InboxWorkspace } from "../inbox/inbox-workspace";
 import { Preferences } from "../preferences";
 import { AdminShell, sections, type AdminSection } from "./admin-shell";
 import {
@@ -28,6 +23,35 @@ import {
 } from "../../lib/api";
 import { accessibleCenters } from "../../lib/context";
 import { browserClient } from "../../lib/supabase/client";
+
+const ScheduleWorkspace = dynamic(
+  () => import("../calendar/schedule-workspace").then((module) => module.ScheduleWorkspace),
+  { loading: WorkspaceLoading },
+);
+const StudentsWorkspace = dynamic(
+  () => import("../students/students-workspace").then((module) => module.StudentsWorkspace),
+  { loading: WorkspaceLoading },
+);
+const InstructorTasks = dynamic(
+  () => import("../setup/instructor-tasks").then((module) => module.InstructorTasks),
+  { loading: WorkspaceLoading },
+);
+const StudioSetup = dynamic(
+  () => import("../setup/studio-setup").then((module) => module.StudioSetup),
+  { loading: WorkspaceLoading },
+);
+const DocumentsWorkspace = dynamic(
+  () => import("../documents/documents-workspace").then((module) => module.DocumentsWorkspace),
+  { loading: WorkspaceLoading },
+);
+const ProductsWorkspace = dynamic(
+  () => import("../products/products-workspace").then((module) => module.ProductsWorkspace),
+  { loading: WorkspaceLoading },
+);
+const InboxWorkspace = dynamic(
+  () => import("../inbox/inbox-workspace").then((module) => module.InboxWorkspace),
+  { loading: WorkspaceLoading },
+);
 
 type Studio = { organization: OrganizationView; centers: CenterView[] };
 type Snapshot = { account: AccountView; studios: Studio[] };
@@ -47,7 +71,7 @@ const shortcuts = [
   { section: "finance", icon: CreditCard },
 ] as const;
 
-export function StudioWorkspace() {
+export function StudioWorkspace({ authUserId }: { authUserId: string }) {
   const router = useRouter();
   const { setTheme } = useTheme();
   const t = useTranslations("live");
@@ -62,8 +86,8 @@ export function StudioWorkspace() {
   useEffect(() => {
     let active = true;
     const client = browserClient();
-    const { data } = client.auth.onAuthStateChange((event) => {
-      if (event === "SIGNED_OUT") {
+    const { data } = client.auth.onAuthStateChange((event, session) => {
+      if (event === "SIGNED_OUT" || (event === "SIGNED_IN" && session?.user.id !== authUserId)) {
         active = false;
         setSnapshot(null);
         router.replace("/login");
@@ -123,7 +147,7 @@ export function StudioWorkspace() {
       delete document.documentElement.dataset.motion;
       delete document.documentElement.dataset.contrast;
     };
-  }, [retry, router, setTheme]);
+  }, [authUserId, retry, router, setTheme]);
   async function signOut() {
     setSigningOut(true);
     try {
@@ -180,16 +204,7 @@ export function StudioWorkspace() {
           </AlertDescription>
         </Alert>
       )}
-      {!snapshot && !error && (
-        <output aria-live="polite" className="block space-y-4">
-          <span className="sr-only">{t("loading")}</span>
-          <span aria-hidden="true" className="block space-y-3 rounded-xl border bg-card p-6">
-            <span className="block h-4 w-40 animate-pulse rounded bg-muted" />
-            <span className="block h-4 w-full max-w-md animate-pulse rounded bg-muted" />
-            <span className="block h-4 w-2/3 max-w-sm animate-pulse rounded bg-muted" />
-          </span>
-        </output>
-      )}
+      {!snapshot && !error && <WorkspaceLoading />}
       {snapshot &&
         ["overview", "studio"].includes(section) &&
         snapshot.studios.flatMap(({ organization, centers }) =>

@@ -17,7 +17,7 @@ const mocks = vi.hoisted(() => ({
   signOut: vi.fn<() => Promise<{ error: Error | null }>>(),
   send: vi.fn<(command: import("../src/lib/studio-setup").SetupCommand) => Promise<unknown>>(),
   setup: vi.fn<(operation: string, input: Record<string, unknown>) => Promise<unknown>>(),
-  listener: null as null | ((event: string) => void),
+  listener: null as null | ((event: string, session?: { user: { id: string } } | null) => void),
 }));
 const router = { replace: mocks.replace, refresh: mocks.refresh };
 vi.mock("next/navigation", () => ({ useRouter: () => router }));
@@ -40,7 +40,7 @@ vi.mock("../src/lib/supabase/client", () => ({
   browserClient: () => ({
     auth: {
       signOut: mocks.signOut,
-      onAuthStateChange: (listener: (event: string) => void) => {
+      onAuthStateChange: (listener: NonNullable<typeof mocks.listener>) => {
         mocks.listener = listener;
         return { data: { subscription: { unsubscribe: mocks.unsubscribe } } };
       },
@@ -126,7 +126,7 @@ beforeEach(() => {
 });
 test("live shell reads accessible studios without selectors, sample records or closed-organization reads", async () => {
   const user = userEvent.setup();
-  render(<StudioWorkspace />);
+  render(<StudioWorkspace authUserId="native-user" />);
   await screen.findByRole("heading", { name: "Merhaba, Test Yöneticisi" });
   await user.click(screen.getAllByRole("button", { name: "Stüdyo" })[0]);
   await user.click(await screen.findByRole("button", { name: "Kuruluş A" }));
@@ -148,7 +148,7 @@ test("late account response after sign-out cannot repopulate the shell", async (
         resolve = done;
       }),
   );
-  render(<StudioWorkspace />);
+  render(<StudioWorkspace authUserId="native-user" />);
   act(() => mocks.listener?.("SIGNED_OUT"));
   await act(async () => resolve(account));
   expect(mocks.replace).toHaveBeenCalledWith("/login");
@@ -157,19 +157,19 @@ test("late account response after sign-out cannot repopulate the shell", async (
 });
 test("API failure renders a retryable error without demo fallback", async () => {
   mocks.account.mockRejectedValue(new Error("offline"));
-  render(<StudioWorkspace />);
+  render(<StudioWorkspace authUserId="native-user" />);
   expect(await screen.findByRole("alert")).toHaveTextContent("Bağlantı kurulamadı");
   expect(screen.queryByText("Ece Demir")).not.toBeInTheDocument();
 });
 test("account theme initializes an unset device but never overwrites a saved device choice", async () => {
   mocks.settings.mockResolvedValue({ remember_context: false, theme: "light" });
-  const first = render(<StudioWorkspace />);
+  const first = render(<StudioWorkspace authUserId="native-user" />);
   await screen.findByRole("heading", { name: "Merhaba, Test Yöneticisi" });
   expect(mocks.setTheme).toHaveBeenCalledWith("light");
   first.unmount();
   mocks.setTheme.mockClear();
   localStorage.setItem("theme", "dark");
-  render(<StudioWorkspace />);
+  render(<StudioWorkspace authUserId="native-user" />);
   await screen.findByRole("heading", { name: "Merhaba, Test Yöneticisi" });
   expect(mocks.setTheme).not.toHaveBeenCalled();
 });
@@ -195,7 +195,7 @@ test("self center-manager assignment rereads the previously forbidden task list"
     return {};
   });
   const user = userEvent.setup();
-  render(<StudioWorkspace />);
+  render(<StudioWorkspace authUserId="native-user" />);
   await screen.findByRole("heading", { name: "Merhaba, Test Yöneticisi" });
   await user.click(screen.getAllByRole("button", { name: "Stüdyo" })[0]);
   await user.click(await screen.findByRole("button", { name: "Kuruluş A" }));
@@ -204,4 +204,38 @@ test("self center-manager assignment rereads the previously forbidden task list"
   );
   expect(await screen.findByText("Eğitmen atanması gereken seans yok.")).toBeVisible();
   expect(mocks.send.mock.calls[0][0].operation).toBe("manager_self_assign_center_v1");
+});
+
+test("switching native accounts hides the old tenant immediately", async () => {
+  render(<StudioWorkspace authUserId="native-user" />);
+  await screen.findByRole("heading", { name: "Merhaba, Test Yöneticisi" });
+  act(() => mocks.listener?.("SIGNED_IN", { user: { id: "other-native-user" } }));
+  expect(screen.queryByText("Test Yöneticisi")).not.toBeInTheDocument();
+  expect(
+    screen.queryByRole("heading", { name: "Merhaba, Test Yöneticisi" }),
+  ).not.toBeInTheDocument();
+  expect(mocks.replace).toHaveBeenCalledWith("/login");
+  expect(mocks.refresh).toHaveBeenCalledOnce();
+});
+test("a late tenant read cannot restore the previous account after switching", async () => {
+  let finish!: (value: Awaited<ReturnType<typeof mocks.centers>>) => void;
+  mocks.centers.mockImplementationOnce(
+    () =>
+      new Promise((resolve) => {
+        finish = resolve;
+      }),
+  );
+  render(<StudioWorkspace authUserId="native-user" />);
+  await vi.waitFor(() => expect(mocks.centers).toHaveBeenCalledOnce());
+  act(() => mocks.listener?.("SIGNED_IN", { user: { id: "other-native-user" } }));
+  await act(async () => finish([]));
+  expect(screen.queryByText("Test Yöneticisi")).not.toBeInTheDocument();
+  expect(mocks.replace).toHaveBeenCalledWith("/login");
+});
+test("refreshing the same native identity keeps the active workspace", async () => {
+  render(<StudioWorkspace authUserId="native-user" />);
+  await screen.findByRole("heading", { name: "Merhaba, Test Yöneticisi" });
+  act(() => mocks.listener?.("SIGNED_IN", { user: { id: "native-user" } }));
+  expect(screen.getByRole("heading", { name: "Merhaba, Test Yöneticisi" })).toBeVisible();
+  expect(mocks.replace).not.toHaveBeenCalled();
 });
