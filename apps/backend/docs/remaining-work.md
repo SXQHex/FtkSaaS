@@ -575,32 +575,38 @@ Değişen dilimin sözleşme, üretilmiş tip/envanter, WF/F01–F33 izi ve alan
 <a id="b02"></a>
 ### B02 — Başvuru yönlendirme ve ortak gelen kutusu
 
-- [ ] **Tür:** K · **Plan:** Business · **Özellik:** F21,F25
+- [x] **Tür:** K · **Plan:** Business · **Özellik:** F21,F25
 - **Bağımlılık:** P06,B01
 - **Kabul:** Merkezli form ilgili merkeze, genel form org inboxa; yetkili atar/aktarır.
 - **Sınır/olumsuz durum:** Aktarım kopya üretmez; merkez personeli atanmamışı/başka merkezdekini göremez.
 - **Doğrulama senaryosu:** İki yöneticinin eşzamanlı ataması, geçmiş/onay korunumu, aktarım sonrası önceki scope erişimi.
 - **Kaynak alanı:** CRM assignment/inbox SQL; contract.json; ilgili test
 
+- **Teslim durumu:** Gerçek Auth native yarış/yönlendirme/aktarım ve önceki merkez görünürlük kaybı son aday/main/development ile doğrulandı; [kaynak/ortam kanıtı](00-FtkSaaS-yeni-sohbet-devir.md#b02-kaynak-kapanışı-ve-kapsam-kararı). Gerçek form sağlayıcısı ve bot uçtan uca kabulü P07'de açık kalır.
+
 <a id="b03"></a>
 ### B03 — Merkezler arası kullanım ve hesaplaşma
 
-- [ ] **Tür:** D · **Plan:** Business · **Özellik:** F18,F19,F20
+- [x] **Tür:** D · **Plan:** Business · **Özellik:** F18,F19,F20
 - **Bağımlılık:** B01,P04,P13
 - **Kabul:** A talep→B onay/ret→kullanım→satış bedeli payı→mutabakat zinciri tamamdır.
 - **Sınır/olumsuz durum:** Kaynak kabulü mevcut; finans yeniden tasarlanmaz, merkezler arası işlem tek yanlı kaçırılamaz.
 - **Doğrulama senaryosu:** Onay/ret/iptal/düzeltme ve retry; iki tarafın yetkili tutarlarının aynı ledger ile mutabakatı.
 - **Kaynak alanı:** cross-center-settlement kaynak/test; mevcut ledger
 
+- **Teslim durumu:** Uygulanabilir native kaynak/main/development ve gerçek iki merkez kabulü tamamlandı; [tutar/rol/replay/rapor/CSV kanıtı](00-FtkSaaS-yeni-sohbet-devir.md#b03b04-gerçek-hesaplaşma-ve-rapor-kapanışı--6-kasım-2026). Frontend ekranı ve gerçek sağlayıcı formu bu işin kapanışı değildir.
+
 <a id="b04"></a>
 ### B04 — Birleşik rapor ve CRM kapsamı
 
-- [ ] **Tür:** D/K · **Plan:** Business · **Özellik:** F21,F23,F24,F28
+- [x] **Tür:** D/K · **Plan:** Business · **Özellik:** F21,F23,F24,F28
 - **Bağımlılık:** B02,B03,S11,P16
 - **Kabul:** Org yöneticisi birleşik, merkez yöneticisi yetkili merkez raporunu görür.
 - **Sınır/olumsuz durum:** Öğrenci toplamı mükerrer sayılmaz; finans tutarları kör toplanmaz; export aynı yetkiye bağlı.
 - **Doğrulama senaryosu:** A/B/Org filtreleri, No, cross-center tutar ve yetki kaybı sonrası indirme; kaynakla mutabakat.
 - **Kaynak alanı:** report/CRM scope projeksiyonları; ilgili test
+
+- **Teslim durumu:** Uygulanabilir native kaynak/main/development ve gerçek iki merkez kabulü tamamlandı; [tutar/rol/replay/rapor/CSV kanıtı](00-FtkSaaS-yeni-sohbet-devir.md#b03b04-gerçek-hesaplaşma-ve-rapor-kapanışı--6-kasım-2026). Frontend ekranı ve gerçek sağlayıcı formu bu işin kapanışı değildir.
 
 ## Ortak üretim işletimi
 
