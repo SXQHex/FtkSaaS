@@ -274,7 +274,8 @@
         "packages/api-contracts/src/generated.ts",
         "packages/api-contracts/src/index.ts",
         "packages/api-contracts/src/operations.ts",
-        "packages/api-contracts/src/runtime.ts"
+        "packages/api-contracts/src/runtime.ts",
+        "apps/backend/supabase/migrations/20261106114157_people_registry_scaling.sql"
       ],
       "operations": [
         "operation_status_get_v1",
@@ -284,8 +285,8 @@
         "management_state_get_v1"
       ],
       "review": {
-        "fingerprint": "d865fa052b221aa8c9b12a1d55a658f1299da3013547e55fe2800b5e717e8561",
-        "reason": "Reviewed one explicit UUID parameter cast in native fixture and its source inventory hash; test ownership, assertions and acceptance gates unchanged."
+        "fingerprint": "6e26177c715d0aa3a7a4f59ca15e9c7118e029012377235f036126048a84422d",
+        "reason": "Reviewed final migration116 registry scaling name, source/hash binding and preserved existing manifest entries; no policy or DTO changes."
       }
     },
     {
@@ -460,8 +461,8 @@
         "role_revoke_preview_v1"
       ],
       "review": {
-        "fingerprint": "ee8d37ef06a8b1bddc67f3f23b2cbb3b108dbd1ee6a17d3a087437db64dfc59f",
-        "reason": "Reviewed registry import additions and reminder center inheritance authority: owner/OM organization configuration does not grant CM execution authority; existing setup guide remains accurate."
+        "fingerprint": "368efd102040a0bfd6e05b8ec855c299ec27c2a13de814986e9de736f32c4943",
+        "reason": "Reviewed registry source ownership and new native scale import; center resource and role behavior unchanged, existing authorization acceptance retained."
       }
     },
     {
@@ -574,7 +575,8 @@
         "apps/backend/tests/registry.test.mjs",
         "apps/backend/tests/subscriber-number-acceptance.mjs",
         "apps/backend/tests/starter-operations-acceptance.mjs",
-        "apps/backend/tests/commercial-plan-acceptance.mjs"
+        "apps/backend/tests/commercial-plan-acceptance.mjs",
+        "apps/backend/tests/people-self-scale-acceptance.mjs"
       ],
       "sources": [
         "apps/backend/database/active-discipline-projection-wrappers.sql",
@@ -624,7 +626,8 @@
         "apps/backend/database/starter-subscriber-projections.sql",
         "apps/backend/supabase/migrations/20261102180626_starter_subscriber_projections.sql",
         "apps/backend/database/commercial-plan-limits.sql",
-        "apps/backend/supabase/migrations/20261103141306_commercial_plan_limits.sql"
+        "apps/backend/supabase/migrations/20261103141306_commercial_plan_limits.sql",
+        "apps/backend/database/people-registry-scaling.sql"
       ],
       "operations": [
         "account_access_send_v1",
@@ -643,8 +646,8 @@
         "person_discipline_set_v1"
       ],
       "review": {
-        "fingerprint": "e2561c6d83eadd4986a027c9a5ebfbb02b6545222c98cca4787361512c31d5be",
-        "reason": "Reviewed registry additions and unchanged Starter negative channel assertions; global user quiet control does not license reminder delivery or change person lifecycle."
+        "fingerprint": "6f4c4ec3f16c9542b34497c14cc54ff33763ed7d34aa33899e14669e19541885",
+        "reason": "Reviewed final registry scaling source path; measured alias/visibility fix and all native negative guards unchanged."
       }
     },
     {

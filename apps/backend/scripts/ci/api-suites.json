@@ -675,7 +675,7 @@
     },
     {
       "path": "apps/backend/tests/registry.test.mjs",
-      "sha256": "cd8afd71d344ebd3644767387f20a0a116f5790e44dfaaab9af90c3b7c834057",
+      "sha256": "e2b2e4049fc9221ad205ae7b62383e0555496b36dcbe0d4bb11e810d23f3bc7a",
       "shared": [
         [
           7,
@@ -1044,6 +1044,11 @@
           "line": 154,
           "path": "apps/backend/tests/automation-results-acceptance.mjs",
           "sha256": "dfb129f39201693fb72dc7dfaa1f1bd790c09cb81a254449e8f90f0b5b6faad8"
+        },
+        {
+          "line": 155,
+          "path": "apps/backend/tests/people-self-scale-acceptance.mjs",
+          "sha256": "f94ba5f64172855730d29d126734a720bfd457f00995b29c113e145503e2241c"
         }
       ],
       "estimated_seconds": 1356.24
