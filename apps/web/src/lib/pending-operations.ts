@@ -7,10 +7,11 @@ import { recoverSetup, setupActorPrefix, type SetupScope } from "./studio-setup"
 export type PendingOperation = {
   scope: SetupScope;
   slot: string;
-  kind: "attendance" | "sale" | "rights" | "reservation" | "request" | "finance";
+  kind: "agreements" | "attendance" | "sale" | "rights" | "reservation" | "request" | "finance";
 };
 const operations: Record<PendingOperation["kind"], readonly string[]> = {
   attendance: attendanceWrites,
+  agreements: ["instructor_agreement_publish_v1"],
   finance: [
     "collection_record_v1",
     "collection_correct_apply_v1",
@@ -27,6 +28,8 @@ function slotKind(slot: string): PendingOperation["kind"] | null {
   const [family, target, extra] = slot.split(":");
   if (!target || !validate(target) || extra !== undefined) return null;
   switch (family) {
+    case "agreements":
+      return "agreements";
     case "attendance":
     case "attendance-row":
       return "attendance";

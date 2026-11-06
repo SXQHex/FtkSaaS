@@ -203,7 +203,7 @@ function CenterSetup({
           <SetupChecklist scope={scope} timezone={center.timezone} />
           <CenterDisciplines scope={scope} onChanged={onChanged} />
           <RoomSetup scope={scope} onChanged={onChanged} />
-          <RoleSetup scope={scope} onChanged={onChanged} />
+          <RoleSetup scope={scope} onChanged={onChanged} timeZone={center.timezone} />
         </>
       )}
     </section>

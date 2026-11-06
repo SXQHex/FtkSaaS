@@ -1,6 +1,7 @@
 "use client";
 
 import { useFormatter, useTranslations } from "next-intl";
+import { Button } from "@ftksaas/ui/components/button";
 import type { Preview } from "@ftksaas/api-contracts";
 import type { NamedOption } from "./class-form";
 
@@ -9,11 +10,15 @@ export function ScheduleConfiguration({
   timeZone,
   people = [],
   disciplines = [],
+  onConfigure,
+  disabled = false,
 }: {
   preview: Preview;
   timeZone: string;
   people?: NamedOption[];
   disciplines?: NamedOption[];
+  onConfigure?: () => void;
+  disabled?: boolean;
 }) {
   const t = useTranslations("scheduleConfiguration");
   const format = useFormatter();
@@ -62,6 +67,11 @@ export function ScheduleConfiguration({
         ))}
       </dl>
       <p>{t("nextStep")}</p>
+      {onConfigure && (
+        <Button type="button" variant="outline" disabled={disabled} onClick={onConfigure}>
+          {t("configure")}
+        </Button>
+      )}
       <p className="text-muted-foreground">{t("limited")}</p>
     </section>
   );
