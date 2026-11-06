@@ -255,3 +255,81 @@ test("a concurrently repaired session cannot open a new assignment form", async 
   expect(screen.queryByLabelText("Yeni eğitmen")).not.toBeInTheDocument();
   expect(mocks.send).not.toHaveBeenCalled();
 });
+
+test.each(["staff", "assistant"])(
+  "Pro assigns %s from a real person and center without linking an account",
+  async (role) => {
+    const base = mocks.call.getMockImplementation()!;
+    mocks.call.mockImplementation(async (operation, input) => {
+      if (operation === "subscription_get_v1") return { plan: "pro" };
+      if (operation === "roles_list_v1") return { items: [], next_cursor: null };
+      if (operation === "people_list_v1")
+        return { items: [{ id: person, display_name: "Synthetic Staff" }], next_cursor: null };
+      return base(operation, input);
+    });
+    const user = userEvent.setup();
+    render(<RoleSetup scope={scope} onChanged={mocks.saved} timeZone="Europe/Istanbul" />);
+    await user.selectOptions(await screen.findByLabelText("Kişi"), person);
+    await user.selectOptions(screen.getByLabelText("Görev"), role);
+    await user.click(screen.getByRole("button", { name: "Görevlendirmeyi onayla" }));
+    expect(mocks.send).toHaveBeenCalledExactlyOnceWith({
+      operation: "role_assign_v1",
+      input: {
+        org_id: scope.orgId,
+        center_id: scope.centerId,
+        person_id: person,
+        role,
+        scope: { center_id: scope.centerId },
+        operation_key: expect.any(String),
+      },
+    });
+    expect(
+      mocks.call.mock.calls.some(([op]) => op.includes("account") || op === "permission_set_v1"),
+    ).toBe(false);
+  },
+);
+test("Starter never offers Pro staff/assistant or agreement controls", async () => {
+  const base = mocks.call.getMockImplementation()!;
+  mocks.call.mockImplementation(async (operation, input) =>
+    operation === "people_list_v1"
+      ? { items: [{ id: person, display_name: "Synthetic Instructor" }], next_cursor: null }
+      : base(operation, input),
+  );
+  render(<RoleSetup scope={scope} onChanged={mocks.saved} timeZone="Europe/Istanbul" />);
+  await screen.findByLabelText("Görev");
+  expect(screen.queryByRole("option", { name: "Personel" })).not.toBeInTheDocument();
+  expect(screen.queryByRole("option", { name: "Asistan" })).not.toBeInTheDocument();
+  expect(screen.queryByRole("button", { name: "Eğitmen anlaşmaları" })).not.toBeInTheDocument();
+  expect(mocks.call.mock.calls.some(([op]) => op === "instructor_agreements_list_v1")).toBe(false);
+});
+test("Pro agreement history is read only when the instructor's agreement panel opens", async () => {
+  const base = mocks.call.getMockImplementation()!;
+  mocks.call.mockImplementation(async (operation, input) => {
+    if (operation === "subscription_get_v1") return { plan: "pro" };
+    if (operation === "roles_list_v1")
+      return {
+        items: [
+          {
+            id: assignment,
+            version: 5,
+            person_id: person,
+            role: "instructor",
+            state: "active",
+            scope_center_id: scope.centerId,
+          },
+        ],
+        next_cursor: null,
+      };
+    return base(operation, input);
+  });
+  const user = userEvent.setup();
+  render(<RoleSetup scope={scope} onChanged={mocks.saved} timeZone="Europe/Istanbul" />);
+  const open = await screen.findByRole("button", { name: "Eğitmen anlaşmaları" });
+  expect(mocks.call.mock.calls.some(([op]) => op === "instructor_agreements_list_v1")).toBe(false);
+  await user.click(open);
+  await screen.findByText("Bu kişi için yayımlanmış anlaşma yok.");
+  expect(mocks.call).toHaveBeenCalledWith(
+    "instructor_agreements_list_v1",
+    expect.objectContaining({ person_id: person, center_id: scope.centerId }),
+  );
+});

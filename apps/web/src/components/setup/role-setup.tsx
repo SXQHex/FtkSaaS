@@ -1,4 +1,5 @@
 "use client";
+import dynamic from "next/dynamic";
 import { useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
 import { v7 } from "uuid";
@@ -12,6 +13,9 @@ import { getSetupRoles } from "../../lib/instructor-setup";
 import { RevokeInstructor } from "./revoke-instructor";
 import { AvailabilityEditor } from "./availability-editor";
 
+const InstructorAgreements = dynamic(() =>
+  import("../agreements/instructor-agreements").then((m) => m.InstructorAgreements),
+);
 type NamedRole = { role: RoleView; name: string | null };
 function RevokeRole({
   scope,
@@ -76,7 +80,15 @@ function RevokeRole({
     </div>
   );
 }
-function AssignRole({ scope, onSaved }: { scope: SetupScope; onSaved: () => void }) {
+function AssignRole({
+  scope,
+  onSaved,
+  upperPlan,
+}: {
+  scope: SetupScope;
+  onSaved: () => void;
+  upperPlan: boolean;
+}) {
   const t = useTranslations("setup");
   const command = useSetupCommand(scope, "assign", onSaved);
   const [query, setQuery] = useState("");
@@ -159,11 +171,22 @@ function AssignRole({ scope, onSaved }: { scope: SetupScope; onSaved: () => void
             };
             if (data.get("role") === "center_manager")
               void command.run({ operation: "center_manager_assign_v1", input: base });
-            else
+            else {
+              const role = data.get("role");
+              if (
+                role !== "instructor" &&
+                !(upperPlan && (role === "staff" || role === "assistant"))
+              )
+                return;
               void command.run({
                 operation: "role_assign_v1",
-                input: { ...base, role: "instructor", scope: { center_id: scope.centerId! } },
+                input: {
+                  ...base,
+                  role: role as "instructor" | "staff" | "assistant",
+                  scope: { center_id: scope.centerId! },
+                },
               });
+            }
           }}
         >
           {page.items.length ? (
@@ -193,6 +216,12 @@ function AssignRole({ scope, onSaved }: { scope: SetupScope; onSaved: () => void
               >
                 <option value="instructor">{t("roles.instructor")}</option>
                 <option value="center_manager">{t("roles.center_manager")}</option>
+                {upperPlan && (
+                  <>
+                    <option value="staff">{t("roles.staff")}</option>
+                    <option value="assistant">{t("roles.assistant")}</option>
+                  </>
+                )}
               </select>
               <p className="text-sm text-muted-foreground">{t("roleHint")}</p>
               <Button>{t("confirmAssign")}</Button>
@@ -218,21 +247,38 @@ function AssignRole({ scope, onSaved }: { scope: SetupScope; onSaved: () => void
     </section>
   );
 }
-export function RoleSetup({ scope, onChanged }: { scope: SetupScope; onChanged: () => void }) {
+export function RoleSetup({
+  scope,
+  onChanged,
+  timeZone,
+}: {
+  scope: SetupScope;
+  onChanged: () => void;
+  timeZone?: string;
+}) {
   const t = useTranslations("setup");
+  const [upperPlan, setUpperPlan] = useState(false);
   const [roles, setRoles] = useState<NamedRole[] | null>(null);
   const [error, setError] = useState("");
   const [retry, setRetry] = useState(0);
   useEffect(() => {
     let active = true;
     async function load() {
-      const rows = await getSetupRoles({ orgId: scope.orgId, centerId: scope.centerId });
+      setRoles(null);
+      setError("");
+      const [rows, plan] = await Promise.all([
+        getSetupRoles({ orgId: scope.orgId, centerId: scope.centerId }),
+        setupCall("subscription_get_v1", { org_id: scope.orgId }),
+      ]);
       const entries = await Promise.all(
         rows
           .filter(
             (role) =>
-              ["instructor", "center_manager"].includes(role.role) &&
-              role.scope_center_id === scope.centerId,
+              [
+                "instructor",
+                "center_manager",
+                ...(plan.plan !== "starter" ? ["staff", "assistant"] : []),
+              ].includes(role.role) && role.scope_center_id === scope.centerId,
           )
           .map(async (role) => {
             let name: string | null = null;
@@ -252,6 +298,7 @@ export function RoleSetup({ scope, onChanged }: { scope: SetupScope; onChanged: 
       );
       if (active) {
         setRoles(entries);
+        setUpperPlan(plan.plan !== "starter");
         setError("");
       }
     }
@@ -302,12 +349,15 @@ export function RoleSetup({ scope, onChanged }: { scope: SetupScope; onChanged: 
               </li>
             ))}
           </ul>
-          <AssignRole scope={scope} onSaved={saved} />
+          <AssignRole scope={scope} onSaved={saved} upperPlan={upperPlan} />
           {roles
             .filter(({ role }) => role.role === "instructor" && role.state === "active")
             .map(({ role, name }) => (
               <div key={role.id} className="space-y-3 border-t pt-6">
                 <p className="font-medium">{name ?? t("nameUnavailable")}</p>
+                {upperPlan && timeZone && (
+                  <AgreementDetails scope={scope} personId={role.person_id} timeZone={timeZone} />
+                )}
                 <AvailabilityEditor
                   scope={scope}
                   resource={{ kind: "person", id: role.person_id }}
@@ -317,6 +367,32 @@ export function RoleSetup({ scope, onChanged }: { scope: SetupScope; onChanged: 
             ))}
         </>
       )}
+    </section>
+  );
+}
+
+function AgreementDetails({
+  scope,
+  personId,
+  timeZone,
+}: {
+  scope: SetupScope;
+  personId: string;
+  timeZone: string;
+}) {
+  const [open, setOpen] = useState(false);
+  const t = useTranslations("agreements");
+  return (
+    <section className="space-y-3">
+      <Button
+        variant="outline"
+        type="button"
+        aria-expanded={open}
+        onClick={() => setOpen((v) => !v)}
+      >
+        {t("title")}
+      </Button>
+      {open && <InstructorAgreements scope={scope} personId={personId} timeZone={timeZone} />}
     </section>
   );
 }

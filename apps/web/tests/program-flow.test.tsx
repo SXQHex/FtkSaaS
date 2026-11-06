@@ -1,5 +1,5 @@
 import { beforeEach, expect, test, vi } from "vitest";
-import { screen, waitFor } from "@testing-library/react";
+import { screen, waitFor, fireEvent, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { render } from "./render";
 import { ClassForm } from "../src/components/programs/class-form";
@@ -18,6 +18,16 @@ vi.mock("../src/lib/studio-setup", async (load) => ({
   setupCall: mocks.call,
   sendSetupCommand: mocks.send,
 }));
+vi.mock("../src/lib/agreements", async (load) => {
+  const actual = await load<typeof import("../src/lib/agreements")>();
+  return {
+    ...actual,
+    agreementApi: {
+      ...actual.agreementApi,
+      disciplines: async () => [{ id: "019a2b3c-4d5e-7000-8000-000000000005", name: "Tango" }],
+    },
+  };
+});
 const scope = {
   actorId: "actor",
   orgId: "019a2b3c-4d5e-7000-8000-000000000001",
@@ -264,4 +274,114 @@ test("returning to the form allows a fresh preview", async () => {
   await user.click(await screen.findByRole("button", { name: "Forma dön" }));
   await user.click(screen.getByRole("button", { name: "Programı önizle" }));
   await waitFor(() => expect(mocks.call).toHaveBeenCalledTimes(2));
+});
+
+test("agreement handoff discards the blocked preview, rereads published history and requires a distinct confirmed preview", async () => {
+  const person = "019a2b3c-4d5e-7000-8000-000000000004",
+    discipline = "019a2b3c-4d5e-7000-8000-000000000005";
+  const blocked = {
+    ...preview,
+    blockers: [{ code: "POLICY_NOT_CONFIGURED", retryable: false, trace_id: "synthetic" }],
+    configuration_requirement: {
+      kind: "instructor_agreement",
+      blocker_index: 0,
+      person_id: person,
+      discipline_id: discipline,
+      format: "group",
+      starts_at: "2030-01-07T16:30:00Z",
+    },
+  };
+  const fresh = {
+    ...preview,
+    id: "019a2b3c-4d5e-7000-8000-000000000006",
+    token: "fresh-after-agreement",
+  };
+  let previews = 0,
+    published = false;
+  mocks.call.mockImplementation(async (operation) => {
+    if (operation === "program_preview_v1") return ++previews === 1 ? blocked : fresh;
+    if (operation === "instructor_agreements_list_v1")
+      return {
+        items: published
+          ? [
+              {
+                id: discipline,
+                version: 1,
+                person_id: person,
+                center_id: scope.centerId,
+                discipline_id: discipline,
+                format: "group",
+                valid: { starts_at: "2030-01-01T00:00:00Z", ends_at: "2030-03-01T00:00:00Z" },
+                terms: {
+                  model: "session_fixed",
+                  currency: "TRY",
+                  components: [{ kind: "session_fixed", amount_minor: "100000" }],
+                  room_fee: { kind: "free", order: "before_instructor_share" },
+                },
+                supersedes_id: null,
+                published_at: "2029-12-01T00:00:00Z",
+              },
+            ]
+          : [],
+        next_cursor: null,
+      };
+    throw Error(`Unexpected ${operation}`);
+  });
+  mocks.send.mockImplementation(async (command) => {
+    if (command.operation === "instructor_agreement_publish_v1") published = true;
+    return {};
+  });
+  render(
+    <ProgramForm
+      scope={scope}
+      selected={selected}
+      catalog={catalog}
+      timeZone="Europe/Istanbul"
+      onSaved={mocks.saved}
+    />,
+  );
+  const user = await fillProgram();
+  await user.click(await screen.findByRole("button", { name: "Anlaşmayı incele" }));
+  expect(screen.queryByRole("button", { name: "Onayla ve oluştur" })).not.toBeInTheDocument();
+  await user.click(await screen.findByRole("button", { name: "Yeni anlaşma oluştur" }));
+  expect(await screen.findByLabelText("Disiplin")).toBeDisabled();
+  expect(screen.getByLabelText("Ders biçimi")).toBeDisabled();
+  fireEvent.change(screen.getByLabelText("Geçerlilik başlangıcı"), {
+    target: { value: "2030-01-01T00:00" },
+  });
+  fireEvent.change(screen.getByLabelText("Geçerlilik bitişi"), {
+    target: { value: "2030-03-01T00:00" },
+  });
+  await user.selectOptions(screen.getByLabelText("Ücret modeli"), "session_fixed");
+  await user.type(screen.getByLabelText("Para birimi (ISO 4217)"), "TRY");
+  await user.selectOptions(screen.getByLabelText("Bileşen türü"), "session_fixed");
+  await user.type(screen.getByLabelText("Tutar"), "1000");
+  await user.selectOptions(screen.getByLabelText("Salon payı türü"), "free");
+  await user.selectOptions(
+    screen.getByLabelText("Salon payının uygulanma sırası"),
+    "before_instructor_share",
+  );
+  await user.type(screen.getByLabelText("Gerekçe"), "Yeni dönem koşulları");
+  await user.click(screen.getByRole("button", { name: "İşlemi incele" }));
+  const review = screen.getByRole("region", { name: "İşlemi incele" });
+  await user.click(within(review).getByRole("checkbox"));
+  await user.click(within(review).getByRole("button", { name: "İşlemi uygula" }));
+  await screen.findByText(
+    "Anlaşma adımından sonra yeni bir program önizlemesi alın. Diğer engeller ayrıca kontrol edilir.",
+  );
+  expect(
+    mocks.call.mock.calls.filter(([op]) => op === "instructor_agreements_list_v1"),
+  ).toHaveLength(2);
+  expect(previews).toBe(1);
+  expect(mocks.saved).not.toHaveBeenCalled();
+  await user.click(screen.getByRole("button", { name: "Programı önizle" }));
+  expect(await screen.findByRole("button", { name: "Onayla ve oluştur" })).toBeDisabled();
+  expect(mocks.send).toHaveBeenCalledTimes(1);
+  await user.click(screen.getByRole("checkbox", { name: "Gösterilen etkileri onaylıyorum" }));
+  await user.click(screen.getByRole("button", { name: "Onayla ve oluştur" }));
+  await waitFor(() => expect(mocks.saved).toHaveBeenCalledOnce());
+  expect(mocks.send.mock.calls[1][0]).toMatchObject({
+    operation: "program_apply_v1",
+    input: { preview: { id: fresh.id, token: fresh.token } },
+  });
 });

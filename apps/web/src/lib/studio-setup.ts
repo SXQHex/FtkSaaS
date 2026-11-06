@@ -1,3 +1,4 @@
+import { validAgreement } from "./agreement-command";
 import {
   attendanceWrites,
   attendanceFields,
@@ -31,6 +32,7 @@ import type {
 import { apiClient, ApiFailure } from "./api";
 import { sessionCapacity } from "./session-create";
 export const setupWrites = [
+  "instructor_agreement_publish_v1",
   ...attendanceWrites,
   ...rightsOperations,
   ...balanceOperations,
@@ -68,6 +70,7 @@ export const setupWrites = [
 export type SetupWrite = (typeof setupWrites)[number];
 type SetupUpload = "document_upload_prepare_v1" | "file_upload_complete_v1";
 type SetupRead =
+  | "instructor_agreements_list_v1"
   | "calendar_get_v1"
   | "attendance_get_v1"
   | "attendance_correct_preview_v1"
@@ -130,6 +133,16 @@ export const setupStorageKey = (scope: SetupScope, slot: string) =>
 export type PendingSetup = { command: SetupCommand; blocked?: boolean };
 const keyPattern = /^[a-f0-9]{8}-[a-f0-9]{4}-7[a-f0-9]{3}-[89ab][a-f0-9]{3}-[a-f0-9]{12}$/i;
 const fields: Record<SetupWrite, string[]> = {
+  instructor_agreement_publish_v1: [
+    "person_id",
+    "discipline_id",
+    "format",
+    "valid",
+    "terms",
+    "supersedes_id",
+    "expected_version",
+    "reason",
+  ],
   ...attendanceFields,
   ...bookingFields,
   ...balanceFields,
@@ -280,6 +293,13 @@ export function recoverSetup(scope: SetupScope, slot: string): PendingSetup | "i
       !validAttendanceCommand(command.operation as AttendanceWrite, input, scope.centerId, slot)
     )
       return "invalid";
+    if (slot.startsWith("agreements:") && command.operation !== "instructor_agreement_publish_v1")
+      return "invalid";
+    if (
+      command.operation === "instructor_agreement_publish_v1" &&
+      !validAgreement(input, scope.centerId, slot)
+    )
+      return "invalid";
     if (slot.startsWith("finance:") && command.operation !== "collection_record_v1")
       return "invalid";
     if (
@@ -380,7 +400,9 @@ export function recoverSetup(scope: SetupScope, slot: string): PendingSetup | "i
       return "invalid";
     if (
       command.operation === "role_assign_v1" &&
-      (input.scope?.center_id !== scope.centerId || input.role !== "instructor")
+      (input.scope?.center_id !== scope.centerId ||
+        typeof input.role !== "string" ||
+        !["instructor", "staff", "assistant"].includes(input.role))
     )
       return "invalid";
     if (

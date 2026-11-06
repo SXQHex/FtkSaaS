@@ -13,6 +13,7 @@ export function ProgramReview({
   disabled,
   onApply,
   onBack,
+  onConfigure,
 }: {
   preview: Preview;
   timeZone: string;
@@ -20,6 +21,7 @@ export function ProgramReview({
   disabled: boolean;
   onApply: () => void;
   onBack: () => void;
+  onConfigure?: () => void;
 }) {
   const t = useTranslations("program");
   const errors = useTranslations("setup");
@@ -53,6 +55,8 @@ export function ProgramReview({
         </p>
       ))}
       <ScheduleConfiguration
+        onConfigure={onConfigure}
+        disabled={disabled}
         preview={preview}
         timeZone={timeZone}
         people={catalog?.instructors}
