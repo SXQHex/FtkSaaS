@@ -30,6 +30,12 @@ test.each([
         : operation === "student_credit_offset_v1"
           ? { person_id: person, debt_id: debt }
           : { person_id: person };
+  const entity =
+    operation === "student_credit_refund_v1"
+      ? { type: "people", id: person }
+      : operation === "sale_refund_preview_v1"
+        ? { type: "sales", id: debt }
+        : { type: "debts", id: debt };
   let wrong = false;
   server.use(
     http.post("*/functions/v1/backend-v1/management_state_get_v1", async ({ request }) => {
@@ -47,9 +53,9 @@ test.each([
             {
               operation,
               exists: true,
-              entity: { type: "sales", id: debt },
+              entity,
               state: "active",
-              versions: [],
+              versions: [{ entity, version: 7 }],
               as_of: "2026-11-06T10:00:00Z",
               current: {
                 operation,

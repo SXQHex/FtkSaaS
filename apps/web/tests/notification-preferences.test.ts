@@ -9,7 +9,7 @@ const id = "019a2b3c-4d5e-7000-8000-000000000080";
 const scope = { actorId: id, orgId: id };
 const catalog = {
   scope: "member" as const,
-  catalog_version: 10 as const,
+  catalog_version: 13 as const,
   fields: [
     {
       key: "in_app_marketing" as const,

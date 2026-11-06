@@ -1,3 +1,4 @@
+import { validOperating } from "./operating-settings";
 import { validAgreement } from "./agreement-command";
 import {
   attendanceWrites,
@@ -43,6 +44,7 @@ export const setupWrites = [
   "product_publish_v1",
   "document_accept_v1",
   "settings_update_v1",
+  "settings_reset_apply_v1",
   "document_version_publish_v1",
   "notification_mark_read_v1",
   "organization_update_v1",
@@ -85,6 +87,8 @@ type SetupRead =
   | "entitlements_get_v1"
   | "settings_catalog_get_v1"
   | "settings_get_v1"
+  | "settings_history_get_v1"
+  | "settings_reset_preview_v1"
   | "document_requirements_get_v1"
   | "reservation_list_v1"
   | "document_publication_preview_v1"
@@ -184,7 +188,8 @@ const fields: Record<SetupWrite, string[]> = {
   ],
   product_publish_v1: ["product_id", "terms"],
   document_accept_v1: ["document_version_id", "context"],
-  settings_update_v1: ["scope", "patch", "expected_version"],
+  settings_update_v1: ["scope", "patch", "expected_version", "reason"],
+  settings_reset_apply_v1: ["scope", "expected_version", "preview", "reason"],
   document_version_publish_v1: [
     "document_id",
     "file_id",
@@ -319,11 +324,13 @@ export function recoverSetup(scope: SetupScope, slot: string): PendingSetup | "i
     if (
       input.expected_version !== undefined &&
       (!Number.isSafeInteger(input.expected_version) ||
-        input.expected_version < (command.operation === "settings_update_v1" ? 0 : 1))
+        input.expected_version <
+          (["settings_update_v1", "settings_reset_apply_v1"].includes(command.operation) ? 0 : 1))
     )
       return "invalid";
     if (
       command.operation === "settings_update_v1" &&
+      !slot.startsWith("operating-settings:") &&
       (input.scope !== "member" ||
         input.center_id !== undefined ||
         !Number.isSafeInteger(input.expected_version) ||
@@ -332,6 +339,17 @@ export function recoverSetup(scope: SetupScope, slot: string): PendingSetup | "i
         Object.keys(input.patch).length !== 1 ||
         typeof input.patch.in_app_marketing !== "boolean")
     )
+      return "invalid";
+    if (
+      slot.startsWith("operating-settings:") &&
+      (!["settings_update_v1", "settings_reset_apply_v1"].includes(command.operation) ||
+        !validOperating(input, scope.centerId, slot) ||
+        (command.operation === "settings_update_v1"
+          ? input.preview !== undefined
+          : input.patch !== undefined))
+    )
+      return "invalid";
+    if (command.operation === "settings_reset_apply_v1" && !slot.startsWith("operating-settings:"))
       return "invalid";
     if (
       command.operation === "product_publish_v1" &&

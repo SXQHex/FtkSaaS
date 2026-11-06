@@ -1,3 +1,4 @@
+import { actionAuthority } from "./action-authority";
 import { documentReadActions } from "./document-requirements";
 import type { BookingMode, LessonRequestView } from "@ftksaas/api-contracts";
 import { ApiFailure, getStudents, getCalendar, getSession } from "./api";
@@ -54,24 +55,11 @@ async function requestChoices(
 }
 export const bookingApi = {
   documents: documentReadActions,
-  capacity: async (scope: SetupScope, person_id: string, session_id: string) => {
-    try {
-      await setupCall("management_state_get_v1", {
-        org_id: scope.orgId,
-        center_id: scope.centerId,
-        operation: "reservation_capacity_override_v1",
-        selector: { operation: "reservation_capacity_override_v1", key: { person_id, session_id } },
-      });
-      return true;
-    } catch (cause) {
-      if (
-        cause instanceof ApiFailure &&
-        ["FORBIDDEN", "NOT_FOUND"].includes(cause.failure.error.code)
-      )
-        return false;
-      throw cause;
-    }
-  },
+  capacity: (scope: SetupScope, person_id: string, session_id: string) =>
+    actionAuthority(scope, {
+      operation: "reservation_capacity_override_v1",
+      key: { person_id, session_id },
+    }),
   requestActions: async (scope: SetupScope, row: LessonRequestView) => {
     const candidates = [
       {
