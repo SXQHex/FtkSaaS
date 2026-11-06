@@ -405,7 +405,7 @@ WF06 consumer'ı yönetici kapasite istisnasını `management_state_get_v1` ça�
 
 ### Backend kaynak değerlendirmesi — XREQ-023, 6 Kasım 2026
 
-Mevcut typed selector gerçek canlı writer yetkisini kullanan salt okunur seans projeksiyonuyla uygulanıyor; istemci formatı değişmiyor. Aynı kişi/seans ve opsiyonel satış anahtarı korunur; Business cross-center satış desteği keşif sırasında daraltılmaz. Kapasiteyi aşma yetkisi fiziksel odayı aşma hakkı değildir. Tam davranış ve ret sınırlarının sahibi [WF06](workflows.md#wf06); aday/main/development aşamasının sahibi [backend devir](../apps/backend/docs/00-FtkSaaS-yeni-sohbet-devir.md#eylem-yetkisi-keşfi--xreq-023024). Kaynak hazır; henüz native CI veya frontend kabulü verilmedi.
+Mevcut typed selector gerçek canlı writer yetkisini kullanan salt okunur seans projeksiyonuyla uygulanıyor; istemci formatı değişmiyor. Aynı kişi/seans ve opsiyonel satış anahtarı korunur; Business cross-center satış desteği keşif sırasında daraltılmaz. Kapasiteyi aşma yetkisi fiziksel odayı aşma hakkı değildir. Tam davranış ve ret sınırlarının sahibi [WF06](workflows.md#wf06); aday/main/development aşamasının sahibi [backend devir](../apps/backend/docs/00-FtkSaaS-yeni-sohbet-devir.md#eylem-yetkisi-keşfi--xreq-023024). PR234 ile backend kaynak/native/main/development ve hosted okuma kabulü tamamlandı. Frontend kendi ekran kabulünü ayrı doğrular.
 
 <a id="xreq-024"></a>
 ## XREQ-024 Manuel tahsilat için gerçek eylem yetkisi keşfi
@@ -418,7 +418,7 @@ S08 geliştirmesinde yönetici işlemini self finans okumasından ayırmak için
 
 ### Backend kaynak değerlendirmesi — XREQ-024, 6 Kasım 2026
 
-Tahsilat ile PR232'nin aynı okuyucuya bağlı alacak iadesi/mahsup/borç düzeltmesi/satış iade önizlemesi selector'ları birlikte uygulanıyor. İlk işlem için geçmiş receipt aranmaz. Kaynak entity/sürüm ve yalnız selector anahtarları döner; tutar/bakiye veya sahte finans okuması yoktur. Mevcut finance.collect, mahsup dahil, finance.refund'dan ayrı kalır; yalnız rolü bulunan yetkili kişinin kendi kimliği ve canonical alias sınırları korunur. [WF08](workflows.md#wf08) beş selector'ın kesin tüketim sahibidir. Native CI/main/development bekliyor; karşı alan adına ekran kabulü veya talep kapanışı verilmedi. Kaynak/ortam kanıtı [backend devir](../apps/backend/docs/00-FtkSaaS-yeni-sohbet-devir.md#eylem-yetkisi-keşfi--xreq-023024) sahibindedir.
+Tahsilat ile PR232'nin aynı okuyucuya bağlı alacak iadesi/mahsup/borç düzeltmesi/satış iade önizlemesi selector'ları birlikte uygulanıyor. İlk işlem için geçmiş receipt aranmaz. Kaynak entity/sürüm ve yalnız selector anahtarları döner; tutar/bakiye veya sahte finans okuması yoktur. Mevcut finance.collect, mahsup dahil, finance.refund'dan ayrı kalır; yalnız rolü bulunan yetkili kişinin kendi kimliği ve canonical alias sınırları korunur. [WF08](workflows.md#wf08) beş selector'ın kesin tüketim sahibidir. PR234 ile backend native CI/main/development ve hosted okuma kabulü tamamlandı; karşı alan adına ekran kabulü veya talep kapanışı verilmedi. Kaynak/ortam kanıtı [backend devir](../apps/backend/docs/00-FtkSaaS-yeni-sohbet-devir.md#eylem-yetkisi-keşfi--xreq-023024) sahibindedir.
 
 ## XREQ-025 Üst-plan kişi projeksiyonlarında Abone No
 
