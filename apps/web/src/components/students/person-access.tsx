@@ -60,17 +60,18 @@ function AccessList({
   const command = useAccessCommand(scope, personId, operation, actions, saved, refresh);
   const invitation = operation === "account_access_revoke_v1";
   useEffect(() => {
-    let active = true;
+    const lifetime = new AbortController();
     actions
       .list(scope, personId, operation, cursor)
       .then((data) => {
-        if (active) setResult({ attempt, revision, cursor, data });
+        if (!lifetime.signal.aborted) setResult({ attempt, revision, cursor, data });
       })
       .catch((cause) => {
-        if (active) setResult({ attempt, revision, cursor, error: studentError(cause) });
+        if (!lifetime.signal.aborted)
+          setResult({ attempt, revision, cursor, error: studentError(cause) });
       });
     return () => {
-      active = false;
+      lifetime.abort();
     };
   }, [actions, scope, personId, operation, cursor, attempt, revision]);
   const current =

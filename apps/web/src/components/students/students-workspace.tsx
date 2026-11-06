@@ -207,17 +207,17 @@ export function StudentDirectory({
   const cursor = cursors.at(-1);
   const key = JSON.stringify([scope.actorId, scope.orgId, scope.centerId, query, cursor, attempt]);
   useEffect(() => {
-    let active = true;
+    const lifetime = new AbortController();
     actions
       .list({ orgId: scope.orgId, centerId: scope.centerId, query, cursor })
       .then((data) => {
-        if (active) setResult({ key, data });
+        if (!lifetime.signal.aborted) setResult({ key, data });
       })
       .catch((error: unknown) => {
-        if (active) setResult({ key, error: errorMessageKey(error) });
+        if (!lifetime.signal.aborted) setResult({ key, error: errorMessageKey(error) });
       });
     return () => {
-      active = false;
+      lifetime.abort();
     };
   }, [actions, scope.orgId, scope.centerId, query, cursor, key]);
   const current = result?.key === key ? result : null;

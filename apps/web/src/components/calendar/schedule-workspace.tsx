@@ -104,20 +104,20 @@ function CalendarContent({
   const interval = calendarInterval(date, range, center.timezone);
   const key = `${orgId}:${center.id}:${interval.starts_at}:${interval.ends_at}:${attempt}`;
   useEffect(() => {
-    let active = true;
+    const lifetime = new AbortController();
     getCalendar({
       org_id: orgId,
       center_id: center.id,
       interval: { starts_at: interval.starts_at, ends_at: interval.ends_at },
     })
       .then((items) => {
-        if (active) setResult({ key, entries: items.map(calendarEntry) });
+        if (!lifetime.signal.aborted) setResult({ key, entries: items.map(calendarEntry) });
       })
       .catch((cause: unknown) => {
-        if (active) setResult({ key, error: errorMessageKey(cause) });
+        if (!lifetime.signal.aborted) setResult({ key, error: errorMessageKey(cause) });
       });
     return () => {
-      active = false;
+      lifetime.abort();
     };
   }, [orgId, center.id, interval.starts_at, interval.ends_at, key]);
   const current = result?.key === key ? result : null;

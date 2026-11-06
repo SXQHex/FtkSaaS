@@ -37,17 +37,17 @@ export function CollectionCorrection({
   const movement = collections.find((row) => row.id === selected);
   useEffect(() => {
     if (!movement) return;
-    let active = true;
+    const lifetime = new AbortController();
     void api
       .canCorrect(scope, movement.id)
       .then((allowed) => {
-        if (active) setAccess({ id: movement.id, allowed });
+        if (!lifetime.signal.aborted) setAccess({ id: movement.id, allowed });
       })
       .catch(() => {
-        if (active) setAccess({ id: movement.id, failed: true });
+        if (!lifetime.signal.aborted) setAccess({ id: movement.id, failed: true });
       });
     return () => {
-      active = false;
+      lifetime.abort();
     };
   }, [scope, movement, api, attempt]);
   const current = movement && access?.id === movement.id ? access : null;

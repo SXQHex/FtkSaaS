@@ -1,0 +1,8 @@
+skip:
+  # Only these isolated candidate-test jobs intentionally execute the verified
+  # merge tree. Each has contents:read, persist-credentials:false, no secrets,
+  # and checks the expected SHA/tree before setup or package installation.
+  # Other rules, jobs and workflows remain fully scanned.
+  - rule: untrusted_checkout_exec
+    path: .github/workflows/clean-suite.yml
+    job: [core, api, serial-reference]
