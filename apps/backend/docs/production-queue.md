@@ -2,7 +2,7 @@
 
 Bu dosya yalnız **sıra, bağımlı teslim paketleri ve kontrol noktalarının** sahibidir. Görev içeriği/kabul/dosya alanı [remaining-work.md](remaining-work.md), gerçek kaynak/test/hosted durum [00 devir](00-FtkSaaS-yeni-sohbet-devir.md) sahibindedir. Frontend’in aktif modülü ve sırası değiştirilmez. İkinci roadmap/todo açılmaz.
 
-**Aktif paket:** XREQ-023/024 backend kaynak/native/main/development ve altı hosted okuma kabulü tamamlandı. S12 gerçek dosya/Cron/tekrar ve S13 private belge/yenilenmiş self onay backend hosted kabulü kapalıdır. Sonraki sıra A03 özellik/kanıt uzlaştırması ve S10 kalan tüketici envanteri → S08/S14/S15 gerçek tüketici sınırlarıdır. Tamamlanmış S05/S11/P14–P16/B01–B04 hatları yeniden kurulmaz. Gerçek aşama/kanıt [devir](00-FtkSaaS-yeni-sohbet-devir.md#a03s15-hosted-kabul-paketi--6-kasım-2026), ölçütler [remaining-work](remaining-work.md) sahibindedir; frontend adına kabul verilmez.
+**Aktif paket:** [S10.2](remaining-work.md#s10)69 grup denetimi ve22 yanlış katalog grup eşlemesinin kaynak düzeltmesidir; native/aday/main/development kontrol noktası [devir](00-FtkSaaS-yeni-sohbet-devir.md#a03s10-kaynak-ve-ayar-denetimi--6-kasım-2026) sahibindedir. Sonraki sıra A03.2/A03.3 gerçek özellik kanıt eşlemesi → S10.3 gerçek eksik ayar alt alanları → S08/S14/S15 ortam/tüketici sınırları. S05/S11/S12/S13 ve P14–P16/B01–B04 tamamlanan kabulü tekrar kurulmaz; frontend adına kapanış verilmez.
 
 ## Uygulama sırası
 

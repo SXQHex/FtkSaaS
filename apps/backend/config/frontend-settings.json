@@ -1,5 +1,5 @@
 {
-  "version": 11,
+  "version": 12,
   "fields": [
     {
       "scope": "user",
@@ -1774,7 +1774,7 @@
         }
       },
       "default": [],
-      "group": "O06",
+      "group": "O10",
       "consumer": "domain_preparation_resolve"
     },
     {
@@ -2047,7 +2047,7 @@
         }
       },
       "default": [],
-      "group": "M07",
+      "group": "M10",
       "consumer": "domain_preparation_resolve"
     },
     {
@@ -2117,7 +2117,7 @@
         "type": "boolean"
       },
       "default": true,
-      "group": "S10",
+      "group": "O07",
       "consumer": "reminder_settings"
     },
     {
@@ -2132,7 +2132,7 @@
         ]
       },
       "default": 24,
-      "group": "S10",
+      "group": "O07",
       "consumer": "reminder_settings"
     },
     {
@@ -2142,7 +2142,7 @@
         "type": "boolean"
       },
       "default": true,
-      "group": "S10",
+      "group": "O07",
       "consumer": "reminder_settings"
     },
     {
@@ -2157,7 +2157,7 @@
         ]
       },
       "default": 7,
-      "group": "S10",
+      "group": "O07",
       "consumer": "reminder_settings"
     },
     {
@@ -2167,7 +2167,7 @@
         "type": "boolean"
       },
       "default": true,
-      "group": "S10",
+      "group": "O07",
       "consumer": "reminder_settings"
     },
     {
@@ -2182,7 +2182,7 @@
         ]
       },
       "default": 3,
-      "group": "S10",
+      "group": "O07",
       "consumer": "reminder_settings"
     },
     {
@@ -2192,7 +2192,7 @@
         "type": "boolean"
       },
       "default": true,
-      "group": "S10",
+      "group": "M14",
       "consumer": "reminder_settings"
     },
     {
@@ -2207,7 +2207,7 @@
         ]
       },
       "default": 24,
-      "group": "S10",
+      "group": "M14",
       "consumer": "reminder_settings"
     },
     {
@@ -2217,7 +2217,7 @@
         "type": "boolean"
       },
       "default": true,
-      "group": "S10",
+      "group": "M14",
       "consumer": "reminder_settings"
     },
     {
@@ -2232,7 +2232,7 @@
         ]
       },
       "default": 7,
-      "group": "S10",
+      "group": "M14",
       "consumer": "reminder_settings"
     },
     {
@@ -2242,7 +2242,7 @@
         "type": "boolean"
       },
       "default": true,
-      "group": "S10",
+      "group": "M14",
       "consumer": "reminder_settings"
     },
     {
@@ -2257,7 +2257,7 @@
         ]
       },
       "default": 3,
-      "group": "S10",
+      "group": "M14",
       "consumer": "reminder_settings"
     },
     {
@@ -2267,7 +2267,7 @@
         "type": "boolean"
       },
       "default": false,
-      "group": "S10",
+      "group": "O07",
       "consumer": "reminder_settings"
     },
     {
@@ -2277,7 +2277,7 @@
         "type": "boolean"
       },
       "default": true,
-      "group": "S10",
+      "group": "S13",
       "consumer": "reminder_settings"
     },
     {
@@ -2287,7 +2287,7 @@
         "type": "boolean"
       },
       "default": true,
-      "group": "S10",
+      "group": "S13",
       "consumer": "reminder_settings"
     },
     {
@@ -2297,7 +2297,7 @@
         "type": "boolean"
       },
       "default": true,
-      "group": "S10",
+      "group": "S13",
       "consumer": "reminder_settings"
     },
     {
@@ -2307,7 +2307,7 @@
         "type": "boolean"
       },
       "default": false,
-      "group": "S10",
+      "group": "S13",
       "consumer": "reminder_quiet_until"
     },
     {
@@ -2324,7 +2324,7 @@
         "uniqueItems": true
       },
       "default": [],
-      "group": "S10",
+      "group": "S13",
       "consumer": "reminder_quiet_until"
     },
     {
@@ -2342,7 +2342,7 @@
         ]
       },
       "default": null,
-      "group": "S10",
+      "group": "S13",
       "consumer": "reminder_quiet_until"
     },
     {
@@ -2360,7 +2360,7 @@
         ]
       },
       "default": null,
-      "group": "S10",
+      "group": "S13",
       "consumer": "reminder_quiet_until"
     }
   ]

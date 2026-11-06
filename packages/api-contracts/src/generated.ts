@@ -1541,7 +1541,7 @@ notification_delivery?: unknown
 } & SettingsCatalog1)
 export type SettingsCatalog1 = ({
 scope: "user"
-catalog_version: 11
+catalog_version: 12
 fields: SettingsFieldDescriptor[]
 defaults: UserSettingsValues
 /**
@@ -1554,7 +1554,7 @@ preparation_templates?: PreparationTemplates
 notification_delivery?: NotificationDeliverySupport
 } | {
 scope: "member"
-catalog_version: 11
+catalog_version: 12
 fields: SettingsFieldDescriptor[]
 defaults: MemberSettingsValues
 /**
@@ -1567,7 +1567,7 @@ preparation_templates?: PreparationTemplates
 notification_delivery?: NotificationDeliverySupport
 } | {
 scope: "center"
-catalog_version: 11
+catalog_version: 12
 fields: SettingsFieldDescriptor[]
 defaults: CenterSettingsValues
 /**
@@ -1580,7 +1580,7 @@ preparation_templates?: PreparationTemplates
 notification_delivery?: NotificationDeliverySupport
 } | {
 scope: "organization"
-catalog_version: 11
+catalog_version: 12
 fields: SettingsFieldDescriptor[]
 defaults: OrganizationSettingsValues
 /**
@@ -1593,7 +1593,7 @@ preparation_templates?: PreparationTemplates
 notification_delivery?: NotificationDeliverySupport
 } | {
 scope: "platform"
-catalog_version: 11
+catalog_version: 12
 fields: SettingsFieldDescriptor[]
 defaults: PlatformSettingsValues
 /**
