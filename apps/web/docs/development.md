@@ -81,6 +81,8 @@ Frontend komutları yalnız @ftksaas/web, @ftksaas/ui ve gerekli ortak tip kontr
 
 Frontend checks ve Frontend contract compatibility PR olaylarında veya manuel tetiklenir; gerçek iş kapsamını `ci-scope.mjs` seçer. Frontend runtime değişikliği lint/typecheck/test/build ve dört tarayıcı projesini, ortak sözleşme/TypeScript/manifest/lockfile/Turbo değişikliği ayrıca kontrat uyum kontrolünü seçer. İncelenmiş yalnız belge farkında ağır frontend işleri atlanır; backend-only runtime farkı frontend testini kendiliğinden başlatmaz. Main proof başarılı adayın exact-source/artifact/run-attempt kanıtını doğrular; aynı testleri main'de yeniden çalıştırmaz. Workflow concurrency/artifact alanları ve bağlayıcı kabul kuralları [CI politikasının](../../../docs/ci-policy.md) sahibindedir.
 
+Tarayıcı matrisinde `ci-apt.mjs`, Ubuntu’nun tanınan Azure/mirror-list kaynaklarını kurulumdan önce doğrudan `https://archive.ubuntu.com/ubuntu` kaynağına çevirir. Dağıtım/bileşen ve Signed-By alanları, üçüncü taraf depolar ve paket imza/TLS doğrulaması korunur. APT bağlantı/veri zaman aşımı30 saniye, yeniden deneme2 ve eksik indeks hatası kesin başarısızlıktır; bilinmeyen kaynak düzeni sessiz başarı vermez. Kaynak hazırlama2, tarayıcı/OS bağımlılık kurulumu8 dakika ile sınırlıdır. Playwright’ın mevcut `install --with-deps` yolu, seçilen tarayıcı ve dört gerçek test projesi aynen korunur. Yerel fixture/YAML testi runner ağını doğrulamaz; kurulumun gerçek sonucu yeni CI koşusundan alınır.
+
 Ters yöndeki tetikleme ve merge kabulü mevcut [CI politikası](../../../docs/ci-policy.md#ci-split--frontendbackend-kaynak-sınırı) kapsamındadır; frontend çalışması backend workflow/gate kaynaklarını değiştirmez. Yerel görev ayrımı uzak CI kabulünün yerine geçmez.
 
 ## Dil, tema ve Expo sınırı

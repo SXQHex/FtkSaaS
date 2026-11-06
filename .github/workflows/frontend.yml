@@ -106,7 +106,13 @@ jobs:
           node-version-file: '.nvmrc'
       - run: corepack enable
       - run: pnpm install --frozen-lockfile
+      - name: Prepare Ubuntu package sources
+        timeout-minutes: 2
+        run: |
+          set -euo pipefail
+          sudo -- "$(command -v node)" apps/web/scripts/ci-apt.mjs
       - name: Install selected browser
+        timeout-minutes: 8
         env:
           BROWSER: ${{ matrix.browser == 'mobile' && 'webkit' || matrix.browser }}
         run: pnpm --filter @ftksaas/web exec playwright install --with-deps "$BROWSER"
