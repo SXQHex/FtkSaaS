@@ -675,7 +675,7 @@
     },
     {
       "path": "apps/backend/tests/registry.test.mjs",
-      "sha256": "574fe5686ad85f51ae0bb6a7f20cc590aaa479ddc83433ac0ddd0e49428a0104",
+      "sha256": "cd8afd71d344ebd3644767387f20a0a116f5790e44dfaaab9af90c3b7c834057",
       "shared": [
         [
           7,
@@ -700,6 +700,10 @@
         [
           141,
           141
+        ],
+        [
+          152,
+          152
         ]
       ],
       "parts": [
@@ -722,7 +726,7 @@
         {
           "line": 2,
           "path": "apps/backend/tests/transactional-email-acceptance.mjs",
-          "sha256": "9ba1437ef1a567409d81a923df1d87a04687d467f446927ef8ed2af231085066"
+          "sha256": "e7fd17a8ca8bb9425310030b2393e98a632547b0e3ab0d9ba30ca4ea05fe5183"
         },
         {
           "line": 3,
@@ -1030,6 +1034,16 @@
           "line": 151,
           "path": "apps/backend/tests/crm-import-authority-acceptance.mjs",
           "sha256": "20a0ab62a84af439b432a4cc6318484771f9c915ed136c0c9885124e8d1c3424"
+        },
+        {
+          "line": 153,
+          "path": "apps/backend/tests/reminder-scheduling-acceptance.mjs",
+          "sha256": "10d26bac3e1fe3a8f33d12c177678395415734050b54182f6df2f6f03170a3c6"
+        },
+        {
+          "line": 154,
+          "path": "apps/backend/tests/automation-results-acceptance.mjs",
+          "sha256": "dfb129f39201693fb72dc7dfaa1f1bd790c09cb81a254449e8f90f0b5b6faad8"
         }
       ],
       "estimated_seconds": 1356.24

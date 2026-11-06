@@ -2,7 +2,7 @@
 
 Bu dosya yalnız **sıra, bağımlı teslim paketleri ve kontrol noktalarının** sahibidir. Görev içeriği/kabul/dosya alanı [remaining-work.md](remaining-work.md), gerçek kaynak/test/hosted durum [00 devir](00-FtkSaaS-yeni-sohbet-devir.md) sahibindedir. Frontend’in aktif modülü ve sırası değiştirilmez. İkinci roadmap/todo açılmaz.
 
-**Aktif kaynak kabulü:** P14 backend kaynak/main/development ve canlı teslim/hata kabulü tamamlandı; [kanıt](00-FtkSaaS-yeni-sohbet-devir.md#p14-kaynak-ve-canlı-kabul-kapanışı). Sıradaki bağımsız ürün paketi [P15](remaining-work.md#p15), ardından P16'dır. XREQ-020/021 backend teslimleri main'dedir; frontend kabulü kendi alanında kalır. P10.3 gerçek aktarım, Node yerleşimi ve Meta/Google live teslimi ayrı açık kalır. Main'deki deploy filtreleri ve aday test envanteri korunur.
+**Aktif kaynak kabulü:** P14 backend kaynak/main/development ve canlı teslim/hata kabulü tamamlandı; [kanıt](00-FtkSaaS-yeni-sohbet-devir.md#p14-kaynak-ve-canlı-kabul-kapanışı). Kullanıcının6 Kasım talimatıyla [P15](remaining-work.md#p15) ve [P16](remaining-work.md#p16) tek geniş PR'da geliştirilir; kaynak/adayı ve açık kabuller alan devrinde izlenir. XREQ-020/021 backend teslimleri main'dedir; frontend kabulü kendi alanında kalır. P10.3 gerçek aktarım, Node yerleşimi ve Meta/Google live teslimi ayrı açık kalır. Main'deki deploy filtreleri ve aday test envanteri korunur.
 
 ## Uygulama sırası
 
