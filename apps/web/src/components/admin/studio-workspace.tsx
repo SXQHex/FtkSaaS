@@ -53,6 +53,11 @@ const InboxWorkspace = dynamic(
   { loading: WorkspaceLoading },
 );
 
+const PendingOperations = dynamic(
+  () => import("../setup/pending-operations").then((module) => module.PendingOperations),
+  { loading: WorkspaceLoading },
+);
+
 type Studio = { organization: OrganizationView; centers: CenterView[] };
 type Snapshot = { account: AccountView; studios: Studio[] };
 function subscribe(callback: () => void) {
@@ -78,6 +83,9 @@ export function StudioWorkspace({ authUserId }: { authUserId: string }) {
   const nav = useTranslations("admin");
   const common = useTranslations("common");
   const api = useTranslations("api");
+  const recovery = useTranslations("pendingOperations");
+  const [accountId, setAccountId] = useState<string | null>(null);
+  const [recovering, setRecovering] = useState(false);
   const section = useSyncExternalStore(subscribe, currentSection, initialSection);
   const [snapshot, setSnapshot] = useState<Snapshot | null>(null);
   const [error, setError] = useState("");
@@ -90,23 +98,43 @@ export function StudioWorkspace({ authUserId }: { authUserId: string }) {
       if (event === "SIGNED_OUT" || (event === "SIGNED_IN" && session?.user.id !== authUserId)) {
         active = false;
         setSnapshot(null);
+        setAccountId(null);
         router.replace("/login");
         router.refresh();
       }
     });
+    function rejectRead(cause: unknown): never {
+      if (
+        active &&
+        cause instanceof ApiFailure &&
+        ["AUTH_REQUIRED", "SESSION_REVOKED"].includes(cause.failure.error.code)
+      ) {
+        active = false;
+        setSnapshot(null);
+        setAccountId(null);
+        router.replace("/login?error=session");
+        router.refresh();
+      }
+      throw cause;
+    }
     async function load() {
       try {
         const [account, organizations, settings] = await Promise.all([
-          getAccount(),
-          getOrganizations(),
-          getUserSettings(),
+          getAccount()
+            .then((account) => {
+              if (active) setAccountId(account.id);
+              return account;
+            })
+            .catch(rejectRead),
+          getOrganizations().catch(rejectRead),
+          getUserSettings().catch(rejectRead),
         ]);
         if (!active) return;
         const studios = await Promise.all(
           organizations.map(async (organization) => ({
             organization,
             centers: ["normal", "grace"].includes(organization.access_mode)
-              ? accessibleCenters(await getCenters(organization.id))
+              ? accessibleCenters(await getCenters(organization.id).catch(rejectRead))
               : [],
           })),
         );
@@ -129,14 +157,6 @@ export function StudioWorkspace({ authUserId }: { authUserId: string }) {
       } catch (cause) {
         if (!active) return;
         setError(errorMessageKey(cause));
-        if (
-          cause instanceof ApiFailure &&
-          ["AUTH_REQUIRED", "SESSION_REVOKED"].includes(cause.failure.error.code)
-        ) {
-          setSnapshot(null);
-          router.replace("/login?error=session");
-          router.refresh();
-        }
       }
     }
     void load();
@@ -154,6 +174,7 @@ export function StudioWorkspace({ authUserId }: { authUserId: string }) {
       const result = await browserClient().auth.signOut({ scope: "local" });
       if (result.error) throw result.error;
       setSnapshot(null);
+      setAccountId(null);
       router.replace("/login");
       router.refresh();
     } catch {
@@ -186,6 +207,27 @@ export function StudioWorkspace({ authUserId }: { authUserId: string }) {
           </p>
         </div>
       </div>
+      {accountId && (
+        <div className="mb-6">
+          <Button
+            variant="outline"
+            className="h-auto min-h-11 whitespace-normal"
+            aria-expanded={recovering}
+            onClick={() => setRecovering((value) => !value)}
+          >
+            {recovery(recovering ? "close" : "open")}
+          </Button>
+          {recovering && (
+            <div className="mt-4">
+              <PendingOperations
+                key={accountId}
+                actorId={accountId}
+                onSaved={() => setRetry((value) => value + 1)}
+              />
+            </div>
+          )}
+        </div>
+      )}
       {error && (
         <Alert variant="destructive" className="mb-6">
           <AlertDescription>

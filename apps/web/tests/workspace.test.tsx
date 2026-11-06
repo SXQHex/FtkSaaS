@@ -239,3 +239,66 @@ test("refreshing the same native identity keeps the active workspace", async () 
   expect(screen.getByRole("heading", { name: "Merhaba, Test Yöneticisi" })).toBeVisible();
   expect(mocks.replace).not.toHaveBeenCalled();
 });
+
+test("pending operations stay reachable when organization discovery is denied", async () => {
+  mocks.organizations.mockRejectedValueOnce(Error("Forbidden"));
+  const user = userEvent.setup();
+  render(<StudioWorkspace authUserId="native-user" />);
+  await screen.findByRole("alert");
+  await user.click(await screen.findByRole("button", { name: "Bekleyen işlemleri aç" }));
+  expect(await screen.findByText("Bu hesap için bu sekmede bekleyen işlem yok.")).toBeVisible();
+  expect(mocks.centers).not.toHaveBeenCalled();
+});
+
+test("an authentication rejection cannot be reopened by a late account response", async () => {
+  const { ApiFailure } = await import("../src/lib/api");
+  let finish!: (value: AccountView) => void;
+  mocks.account.mockImplementationOnce(
+    () =>
+      new Promise((resolve) => {
+        finish = resolve;
+      }),
+  );
+  mocks.organizations.mockRejectedValueOnce(
+    new ApiFailure({
+      ok: false,
+      error: {
+        code: "AUTH_REQUIRED",
+        retryable: false,
+        trace_id: account.id,
+      },
+    }),
+  );
+  render(<StudioWorkspace authUserId="native-user" />);
+  await vi.waitFor(() => expect(mocks.replace).toHaveBeenCalledWith("/login?error=session"));
+  await act(async () => finish(account));
+  expect(screen.queryByRole("button", { name: "Bekleyen işlemleri aç" })).not.toBeInTheDocument();
+});
+
+test("a late Auth rejection still clears recovery after an earlier unrelated read fails", async () => {
+  const { ApiFailure } = await import("../src/lib/api");
+  let rejectSettings!: (error: unknown) => void;
+  mocks.settings.mockImplementationOnce(
+    () =>
+      new Promise((_, reject) => {
+        rejectSettings = reject;
+      }),
+  );
+  mocks.organizations.mockRejectedValueOnce(Error("offline"));
+  render(<StudioWorkspace authUserId="native-user" />);
+  await screen.findByRole("button", { name: "Bekleyen işlemleri aç" });
+  await act(async () =>
+    rejectSettings(
+      new ApiFailure({
+        ok: false,
+        error: {
+          code: "SESSION_REVOKED",
+          retryable: false,
+          trace_id: account.id,
+        },
+      }),
+    ),
+  );
+  expect(screen.queryByRole("button", { name: "Bekleyen işlemleri aç" })).not.toBeInTheDocument();
+  expect(mocks.replace).toHaveBeenCalledWith("/login?error=session");
+});

@@ -929,6 +929,7 @@
     "failed": "The action could not be completed. Check access and the current record state.",
     "network": "Data could not be read. Check your connection and retry.",
     "pending": "An earlier action has an uncertain result. Resolve it before starting another.",
+    "storageChanged": "The operation record changed in another view. Close and reopen this view to load the current record.",
     "storageFailed": "Recovery tracking could not be read or saved. No new command was sent; contact support about any uncertain earlier action.",
     "uncertain": "The result could not be confirmed. Check this action instead of restarting it with a new key.",
     "check": "Check action result",
@@ -1653,5 +1654,17 @@
     "deficitUnchanged": "This sale will leave the deficit unchanged.",
     "sessionRestricted": "Your access does not include this session detail.",
     "deficitNumber": "Deficit {number}"
+  },
+  "pendingOperations": {
+    "title": "Pending operations",
+    "open": "Open pending operations",
+    "close": "Close pending operations",
+    "hint": "Check previous operations from this tab even when access changes. After a final result, refresh the relevant screen.",
+    "empty": "This account has no pending operations in this tab.",
+    "item": "{kind} · Operation {number}",
+    "sale": "Sale or renewal",
+    "rights": "Rights adjustment",
+    "reservation": "Booking",
+    "request": "Lesson request"
   }
 }

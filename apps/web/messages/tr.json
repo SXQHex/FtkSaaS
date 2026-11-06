@@ -929,6 +929,7 @@
     "failed": "İşlem tamamlanamadı. Yetkini ve kaydın güncel durumunu kontrol et.",
     "network": "Veri okunamadı. Bağlantını kontrol edip yeniden dene.",
     "pending": "Sonucu belirsiz bir işlem var. Yeni işlem başlatmadan bu sonucu doğrula.",
+    "storageChanged": "İşlem takibi başka bir ekranda değişti. Güncel kaydı yüklemek için bu görünümü kapatıp yeniden aç.",
     "storageFailed": "İşlem takibi okunamıyor veya yazılamıyor. Yeni komut gönderilmedi; önceki belirsiz işlem için destek al.",
     "uncertain": "Sonuç doğrulanamadı. Yeni anahtarla tekrar başlatma; aynı işlemin sonucunu kontrol et.",
     "check": "İşlem sonucunu kontrol et",
@@ -1653,5 +1654,17 @@
     "deficitUnchanged": "Eksik hak bu satışla karşılanmayacak.",
     "sessionRestricted": "Seans ayrıntısı bu yetkiyle okunamıyor.",
     "deficitNumber": "Eksik hak {number}"
+  },
+  "pendingOperations": {
+    "title": "Bekleyen işlemler",
+    "open": "Bekleyen işlemleri aç",
+    "close": "Bekleyen işlemleri kapat",
+    "hint": "Erişimin değişmiş olsa da bu sekmedeki önceki işlemin sonucunu kontrol edebilirsin. Kesin sonuçtan sonra ilgili ekranı yenile.",
+    "empty": "Bu hesap için bu sekmede bekleyen işlem yok.",
+    "item": "{kind} · İşlem {number}",
+    "sale": "Satış veya yenileme",
+    "rights": "Hak düzeltmesi",
+    "reservation": "Rezervasyon",
+    "request": "Özel ders talebi"
   }
 }
