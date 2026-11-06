@@ -21,7 +21,7 @@ test('XREQ-021 native self discovery remains isolated with 10000 unrelated peopl
  const before=(await db.query('select count(*)::int people,(select count(*)::int from core.operation_receipts where org_id=$1) receipts from core.people where org_id=$1',[org])).rows[0];
  const read=(user,extra={})=>must(user,'people_list_v1',{org_id:org,center_id:center,page:{limit:25,sort:'created_at_asc'},...extra});
  const own=await read(student);assert.deepEqual(own.items.map(p=>p.id),[person]);assert.equal(own.next_cursor,null);
- const filtered=await read(student,{relationship:'student',query:'Scale self'});assert.deepEqual(filtered.items.map(p=>p.id),[person]);
+ assert.equal(own.items[0].display_name,member.display_name);const filtered=await read(student,{relationship:'student',query:member.display_name});assert.deepEqual(filtered.items.map(p=>p.id),[person]);
  assert.deepEqual((await read(student,{query:'unrelated'})).items,[]);
  const denied=await call(foreign,'people_list_v1',{org_id:org,center_id:center,page:{limit:25,sort:'created_at_asc'}});assert.equal(denied.result.ok,false);
  const first=await read(owner),second=await read(owner,{page:{limit:25,sort:'created_at_asc',cursor:first.next_cursor}});assert.equal(first.items.length,25);assert.equal(second.items.length,25);assert(first.next_cursor);assert.equal(new Set([...first.items,...second.items].map(p=>p.id)).size,50);

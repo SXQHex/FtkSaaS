@@ -285,8 +285,8 @@
         "management_state_get_v1"
       ],
       "review": {
-        "fingerprint": "6e26177c715d0aa3a7a4f59ca15e9c7118e029012377235f036126048a84422d",
-        "reason": "Reviewed final migration116 registry scaling name, source/hash binding and preserved existing manifest entries; no policy or DTO changes."
+        "fingerprint": "171bdf492ceb8f84a1fc672de3a50c7fc8b3022d4e6884f0bd5bab93f27ec2f1",
+        "reason": "Reviewed native fixture source hash after correcting search input to authoritative account identity; complete104-unit ownership and all gates remain."
       }
     },
     {
@@ -646,8 +646,8 @@
         "person_discipline_set_v1"
       ],
       "review": {
-        "fingerprint": "6f4c4ec3f16c9542b34497c14cc54ff33763ed7d34aa33899e14669e19541885",
-        "reason": "Reviewed final registry scaling source path; measured alias/visibility fix and all native negative guards unchanged."
+        "fingerprint": "679afe1d9c74884bad1e62906f806a1af57e306cd9c3aa73d760dd1a9196c0c2",
+        "reason": "Reviewed account-link name sync in actual identity source: new scale fixture verifies person projection equals account_get name, then searches that identity while retaining exact self/relationship isolation assertions."
       }
     },
     {

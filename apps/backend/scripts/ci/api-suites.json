@@ -1048,7 +1048,7 @@
         {
           "line": 155,
           "path": "apps/backend/tests/people-self-scale-acceptance.mjs",
-          "sha256": "f94ba5f64172855730d29d126734a720bfd457f00995b29c113e145503e2241c"
+          "sha256": "0590f78531c2fad0289e140f510d448357dfd69b3bca46f994e18eac41991f05"
         }
       ],
       "estimated_seconds": 1356.24
